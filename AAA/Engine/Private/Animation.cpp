@@ -1,0 +1,125 @@
+#include "Animation.h"
+#include "Channel.h"
+
+
+CAnimation::CAnimation()
+{
+}
+
+CAnimation::CAnimation(const CAnimation& Prototype)
+    : m_fDuration { Prototype.m_fDuration }
+    , m_fTickPerSecond{ Prototype.m_fTickPerSecond }
+    , m_fCurrentTrackPosition{ Prototype.m_fCurrentTrackPosition }
+    , m_iNumChannels{ Prototype.m_iNumChannels }
+    , m_Channels{ Prototype.m_Channels }
+    , m_CurrentKeyFrameIndices{ Prototype.m_CurrentKeyFrameIndices }
+    , m_strName{ Prototype.m_strName }
+    
+{	
+    for (auto& pChannel : m_Channels)
+        Safe_AddRef(pChannel);
+}
+
+HRESULT CAnimation::Initialize(const ANIMATION_DATA& data, class CModel* pModel)
+{
+    m_strName = data.strName;
+    m_fDuration = data.fDuration;
+    m_fTickPerSecond = data.fTickPerSecond;
+    m_iNumChannels = (_uint)data.Channels.size();
+
+    m_CurrentKeyFrameIndices.resize(m_iNumChannels);
+
+    for (const auto& channelData : data.Channels)
+    {
+        CChannel* pChannel = CChannel::Create(channelData, pModel);
+        if (nullptr == pChannel)
+            return E_FAIL;
+		m_Channels.push_back(pChannel);
+    }
+
+	return S_OK;
+}
+
+_bool CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones, _float fTimeDelta, _bool isLoop)
+{
+    m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
+
+    _bool isFinished = false;
+    if (m_fCurrentTrackPosition >= m_fDuration)
+    {
+        if (false == isLoop)
+        {
+            m_fCurrentTrackPosition = m_fDuration;
+            isFinished = true;
+        }
+        else
+            m_fCurrentTrackPosition = 0.f;
+    }
+
+    _uint       iChannelIndex = {};
+
+    for (auto& pChannel : m_Channels)
+    {
+        pChannel->Update_TransformationMatrix(Bones, m_fCurrentTrackPosition, &m_CurrentKeyFrameIndices[iChannelIndex++]);
+    }
+
+
+    return isFinished;
+
+
+}
+
+void CAnimation::Compute_BoneKeyFrames(unordered_map<_uint, KEYFRAME>& Out, _float fTimeDelta, _bool isLoop)
+{
+    m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
+
+    if (m_fCurrentTrackPosition >= m_fDuration)
+    {
+        if (!isLoop)
+            m_fCurrentTrackPosition = m_fDuration;
+        else
+            m_fCurrentTrackPosition = 0.f;
+    }
+
+    _uint iChannelIndex = {};
+    for (auto& pChannel : m_Channels)
+    {
+        KEYFRAME kf = pChannel->Compute_TransformationMatrix(
+            m_fCurrentTrackPosition, &m_CurrentKeyFrameIndices[iChannelIndex++]);
+        Out[pChannel->Get_BoneIndex()] = kf;
+    }
+}
+
+void CAnimation::Reset_TrackPosition()
+{
+    m_fCurrentTrackPosition = 0.f;
+    fill(m_CurrentKeyFrameIndices.begin(), m_CurrentKeyFrameIndices.end(), 0);
+}
+
+CAnimation* CAnimation::Create(const ANIMATION_DATA& data, class CModel* pModel)
+{
+    CAnimation* pInstance = new CAnimation();
+
+    if (FAILED(pInstance->Initialize(data, pModel)))
+    {
+        MSG_BOX("Failed to Created : CAnimation");
+        Safe_Release(pInstance);
+    }
+
+    return pInstance;
+}
+
+CAnimation* CAnimation::Clone()
+{
+    return new CAnimation(*this);
+}
+
+void CAnimation::Free()
+{
+	__super::Free();
+
+    for (auto& pChannel : m_Channels)
+        Safe_Release(pChannel);
+
+    m_Channels.clear();
+}
