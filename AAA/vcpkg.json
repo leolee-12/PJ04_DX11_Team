@@ -1,0 +1,10 @@
+{
+    "name": "marb1e",
+    "version": "0.1.0",
+    "dependencies": [
+      {
+        "name": "directxtex",
+        "features": []
+      }
+    ]
+  }

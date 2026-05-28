@@ -1,0 +1,201 @@
+#ifndef Engine_Struct_h__
+#define Engine_Struct_h__
+
+namespace Engine
+{
+	typedef struct tagEngineDesc
+	{
+		HINSTANCE		hInstance;
+		HWND			hWnd;
+		WINMODE			eWinMode;
+		unsigned int	iViewportWidth, iViewportHeight;
+		unsigned int	iNumLevels;
+	}ENGINE_DESC;
+
+	typedef struct tagLightDesc
+	{
+		LIGHT			eType;
+		XMFLOAT4		vDiffuse, vAmbient, vSpecular;
+
+		XMFLOAT4		vDirection;
+		XMFLOAT4		vPosition;
+		float			fRange;
+	}LIGHT_DESC;
+
+	typedef struct tagShadowLightDesc
+	{
+		XMFLOAT4		vEye, vAt;
+		float			fFovy, fNear, fFar;
+		float			fWidth, fHeight;
+	}SHADOW_LIGHT_DESC;
+
+	typedef struct tagKeyFrame
+	{
+		XMFLOAT3		vScale;
+		XMFLOAT4		vRotation;
+		XMFLOAT3		vTranslation;
+		float			fTrackPosition;
+	}KEYFRAME;
+
+	typedef struct tagSubscriptionHandle {
+		wstring			strEventType;
+		unsigned int	uiIndex;
+		unsigned int	uiVersion;
+	}SUBHANDLE;
+
+	typedef struct tagVertexPosition
+	{
+		XMFLOAT3		vPosition;
+
+		static const unsigned int		iNumElements = { 1 };
+
+		static constexpr D3D11_INPUT_ELEMENT_DESC   Elements[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		};
+	}VTXPOS;
+
+	typedef struct tagVertexPositionColor
+	{
+		XMFLOAT3		vPosition;
+		XMFLOAT4		vColor;
+
+		static const unsigned int		iNumElements = { 2 };
+
+		static constexpr D3D11_INPUT_ELEMENT_DESC   Elements[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		};
+	}VTXCOLOR;
+
+	typedef struct tagVertexPositionTexcoord
+	{
+		XMFLOAT3		vPosition;
+		XMFLOAT2		vTexcoord;
+
+		static const unsigned int		iNumElements = { 2 };
+
+		static constexpr D3D11_INPUT_ELEMENT_DESC   Elements[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		};
+	}VTXTEX;
+
+	typedef struct tagVertexPositionNormalTexcoord
+	{
+		XMFLOAT3		vPosition;
+		XMFLOAT3		vNormal;
+		XMFLOAT2		vTexcoord;
+
+		static const unsigned int		iNumElements = { 3 };
+
+		static constexpr D3D11_INPUT_ELEMENT_DESC   Elements[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		};
+	}VTXNORTEX;
+
+	typedef struct tagVertexMesh
+	{
+		XMFLOAT3		vPosition;
+		XMFLOAT3		vNormal;
+		XMFLOAT2		vTexcoord;
+
+		XMFLOAT3		vTangent;
+		XMFLOAT3		vBinormal;
+
+		static const unsigned int		iNumElements = { 5 };
+
+		static constexpr D3D11_INPUT_ELEMENT_DESC   Elements[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		};
+	}VTXMESH;
+
+	typedef struct tagVertexAnimationMesh
+	{
+		XMFLOAT3		vPosition;
+		XMFLOAT3		vNormal;
+		XMFLOAT2		vTexcoord;
+
+		XMFLOAT3		vTangent;
+		XMFLOAT3		vBinormal;
+
+		XMUINT4			vBlendIndex;
+		XMFLOAT4		vBlendWeight;
+
+		static const unsigned int		iNumElements = { 7 };
+
+		static constexpr D3D11_INPUT_ELEMENT_DESC   Elements[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"BLENDINDEX", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, 56, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"BLENDWEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 72, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		};
+	}VTXANIMMESH;
+
+	typedef struct tagVertexParticleInstance
+	{
+		XMFLOAT4			vRight;
+		XMFLOAT4			vUp;
+		XMFLOAT4			vLook;
+		XMFLOAT4			vTranslation;
+		XMFLOAT2			vLifeTime;
+	}VTXPARTICLE_INSTANCE;
+
+	typedef struct tagVertexRectInstanceDesc
+	{
+		static const unsigned int		iNumElements = { 7 };
+
+		static constexpr D3D11_INPUT_ELEMENT_DESC   Elements[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+
+			{"TEXCOORD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"TEXCOORD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"TEXCOORD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"TEXCOORD", 4, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"TEXCOORD", 5, DXGI_FORMAT_R32G32_FLOAT, 1, 64, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+		};
+	}VTXRECT_INSTANCE_DESC;
+
+	typedef struct tagVertexPointInstanceDesc
+	{
+		static const unsigned int		iNumElements = { 6 };
+
+		static constexpr D3D11_INPUT_ELEMENT_DESC   Elements[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+
+			{"WORLD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"WORLD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"WORLD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"WORLD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+
+			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 64, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+		};
+	}VTXPOINT_INSTANCE_DESC;
+
+	typedef struct tagVertexTrail
+	{
+		XMFLOAT3          vPosition;
+		XMFLOAT2          vTexcoord;     /* x: 길이(0=꼬리,1=선두), y: 폭(0=base,1=tip) */
+		float             fAge;          /* 정점 생성 후 경과 시간(초) */
+
+		static const unsigned int         iNumElements = { 3 };
+
+		static constexpr D3D11_INPUT_ELEMENT_DESC   Elements[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 1, DXGI_FORMAT_R32_FLOAT,       0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		};
+	}VTXTRAIL;
+}
+
+
+#endif // Engine_Struct_h__

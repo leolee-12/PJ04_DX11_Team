@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="99. Defines">
+      <UniqueIdentifier>{6dddf281-8a73-4de2-a7d7-35e752969735}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject">
+      <UniqueIdentifier>{998c82c0-2ef5-457f-bbe6-45b63b21e082}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98. ShaderFiles">
+      <UniqueIdentifier>{00e30270-76c4-4996-a09e-492e77484cc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97. DataSystem">
+      <UniqueIdentifier>{2bc4e55e-b3fc-4cf9-af28-7e79ae4f5749}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97. DataSystem\DataLoader">
+      <UniqueIdentifier>{65eb43f5-f4ed-41c4-9029-de8eeb174508}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\99. Factory">
+      <UniqueIdentifier>{5114196d-bc6c-4998-93e1-18fd4a2e81f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\00. Camera">
+      <UniqueIdentifier>{ba0c14f7-6cfd-4471-926f-3cbd3b632e55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test">
+      <UniqueIdentifier>{89f71a9d-8abf-42de-96db-ec93db453c6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\TestFiona">
+      <UniqueIdentifier>{0916bd2f-10ca-4681-a8f8-5b4d19f31718}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\Terrain">
+      <UniqueIdentifier>{61edf243-83b4-4191-9339-07578a04f915}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\TestNonAnim">
+      <UniqueIdentifier>{cb877a97-6b0e-4817-bb69-d7e6836d721f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\00. Camera\Free">
+      <UniqueIdentifier>{dd2cd863-482a-4286-b3df-f3f050dd4f56}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Public\GameContent_Defines.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\GameContent_const.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ResourceData.h">
+      <Filter>97. DataSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelData.h">
+      <Filter>97. DataSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ObjectData.h">
+      <Filter>97. DataSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\GameObject_Factory.h">
+      <Filter>00. GameObject\99. Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Loader_Prototype.h">
+      <Filter>97. DataSystem\DataLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Terrain.h">
+      <Filter>00. GameObject\Test\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TestFiona.h">
+      <Filter>00. GameObject\Test\TestFiona</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\GameContent_enum.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TestNonAnim.h">
+      <Filter>00. GameObject\Test\TestNonAnim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\GameContrnt_Events.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Camera_Free.h">
+      <Filter>00. GameObject\00. Camera\Free</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Private\GameObject_Factory.cpp">
+      <Filter>00. GameObject\99. Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loader_Prototype.cpp">
+      <Filter>97. DataSystem\DataLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Terrain.cpp">
+      <Filter>00. GameObject\Test\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestFiona.cpp">
+      <Filter>00. GameObject\Test\TestFiona</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestNonAnim.cpp">
+      <Filter>00. GameObject\Test\TestNonAnim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Camera_Free.cpp">
+      <Filter>00. GameObject\00. Camera\Free</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
