@@ -421,12 +421,14 @@ FodyWeavers.xsd
 Resources/
 
 # FBX Converter - ignore fbx/ysh files but keep folders
-JusinDX11_Marb1e/FBX_Converter/NonAnim/*.fbx
-JusinDX11_Marb1e/FBX_Converter/NonAnim/*.ysh
-JusinDX11_Marb1e/FBX_Converter/Anim/*.fbx
-JusinDX11_Marb1e/FBX_Converter/Anim/*.ysh
-JusinDX11_Marb1e/FBX_Converter/Export/*.fbx
-JusinDX11_Marb1e/FBX_Converter/Export/*.ysh
-JusinDX11_Marb1e/FBX_Converter/Map/*.fbx
-JusinDX11_Marb1e/FBX_Converter/Map/*.ysh
-JusinDX11_Marb1e/*.zip
+AAA/FBX_Converter/NonAnim/*.fbx
+AAA/FBX_Converter/NonAnim/*.ysh
+AAA/FBX_Converter/Anim/*.fbx
+AAA/FBX_Converter/Anim/*.ysh
+AAA/FBX_Converter/Export/*.fbx
+AAA/FBX_Converter/Export/*.ysh
+AAA/FBX_Converter/Map/*.fbx
+AAA/FBX_Converter/Map/*.ysh
+AAA/*.zip
+
+.claude/
