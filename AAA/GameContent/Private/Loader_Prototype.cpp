@@ -45,67 +45,10 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
 }
 
 HRESULT Ready_Prototype_Shaders(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-{
+{     
     if (FAILED(pProxy->Add_Prototype(Shader_VtxTex.iLevelID, Shader_VtxTex.szProtoTag,
         CShader::Create(pDevice, pContext, Shader_VtxTex.szFileTag, VTXTEX::Elements, VTXTEX::iNumElements))))
         return E_FAIL;
-
-    if (FAILED(pProxy->Add_Prototype(Shader_VtxNorTex.iLevelID, Shader_VtxNorTex.szProtoTag,
-        CShader::Create(pDevice, pContext, Shader_VtxNorTex.szFileTag, VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
-        return E_FAIL;
-
-    if (FAILED(pProxy->Add_Prototype(Shader_VtxMesh.iLevelID, Shader_VtxMesh.szProtoTag,
-        CShader::Create(pDevice, pContext, Shader_VtxMesh.szFileTag, VTXMESH::Elements, VTXMESH::iNumElements))))
-        return E_FAIL;
-
-    if (FAILED(pProxy->Add_Prototype(Shader_VtxAnimMesh.iLevelID, Shader_VtxAnimMesh.szProtoTag,
-        CShader::Create(pDevice, pContext, Shader_VtxAnimMesh.szFileTag, VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
-        return E_FAIL;
-
-    if (FAILED(pProxy->Add_Prototype(Shader_Trail.iLevelID, Shader_Trail.szProtoTag,
-        CShader::Create(pDevice, pContext, Shader_Trail.szFileTag, VTXTRAIL::Elements, VTXTRAIL::iNumElements))))
-        return E_FAIL;
-
-    if (FAILED(pProxy->Add_Prototype(Shader_Slash.iLevelID, Shader_Slash.szProtoTag,
-        CShader::Create(pDevice, pContext, Shader_Slash.szFileTag, VTXMESH::Elements, VTXMESH::iNumElements))))
-        return E_FAIL;
-
-    if (FAILED(pProxy->Add_Prototype(Shader_Sprite.iLevelID, Shader_Sprite.szProtoTag,
-        CShader::Create(pDevice, pContext, Shader_Sprite.szFileTag, VTXTEX::Elements, VTXTEX::iNumElements))))
-        return E_FAIL;
-
-    if (FAILED(pProxy->Add_Prototype(Shader_SlashFire.iLevelID, Shader_SlashFire.szProtoTag,
-        CShader::Create(pDevice, pContext, Shader_SlashFire.szFileTag, VTXMESH::Elements, VTXMESH::iNumElements))))
-        return E_FAIL;
-
-    if (FAILED(pProxy->Add_Prototype(Shader_SlashGeo.iLevelID, Shader_SlashGeo.szProtoTag,
-        CShader::Create(pDevice, pContext, Shader_SlashGeo.szFileTag, VTXMESH::Elements, VTXMESH::iNumElements)))) 
-        return E_FAIL;
-
-    if (FAILED(pProxy->Add_Prototype(Shader_SlashGeoFire.iLevelID, Shader_SlashGeoFire.szProtoTag,
-        CShader::Create(pDevice, pContext, Shader_SlashGeoFire.szFileTag, VTXMESH::Elements, VTXMESH::iNumElements)))) 
-        return E_FAIL;
-
-    if (FAILED(pProxy->Add_Prototype(Shader_GroundDecal.iLevelID, Shader_GroundDecal.szProtoTag,
-        CShader::Create(pDevice, pContext, Shader_GroundDecal.szFileTag, VTXTEX::Elements, VTXTEX::iNumElements))))
-        return E_FAIL;
-
-    if (FAILED(pProxy->Add_Prototype(Shader_MagicCircle.iLevelID, Shader_MagicCircle.szProtoTag,
-        CShader::Create(pDevice, pContext, Shader_MagicCircle.szFileTag, VTXTEX::Elements, VTXTEX::iNumElements))))
-        return E_FAIL;
-
-    if (FAILED(pProxy->Add_Prototype(Shader_CrackBurst.iLevelID, Shader_CrackBurst.szProtoTag,
-        CShader::Create(pDevice, pContext, Shader_CrackBurst.szFileTag, VTXPOINT_INSTANCE_DESC::Elements, VTXPOINT_INSTANCE_DESC::iNumElements))))
-        return E_FAIL;
-
-    if (FAILED(pProxy->Add_Prototype(Shader_Skill4Fan.iLevelID, Shader_Skill4Fan.szProtoTag,
-        CShader::Create(pDevice, pContext, Shader_Skill4Fan.szFileTag, VTXTEX::Elements, VTXTEX::iNumElements))))
-        return E_FAIL;
-
-    if (FAILED(pProxy->Add_Prototype(Shader_Skill4ChargeRing.iLevelID, Shader_Skill4ChargeRing.szProtoTag,
-        CShader::Create(pDevice, pContext, Shader_Skill4ChargeRing.szFileTag, VTXTEX::Elements, VTXTEX::iNumElements))))
-        return E_FAIL;
-
 
     return S_OK;
 }

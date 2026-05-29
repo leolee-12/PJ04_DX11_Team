@@ -43,6 +43,9 @@
     <ClCompile Include="..\Private\TestNonAnim.cpp" />
     <ClCompile Include="..\private\TestRect.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

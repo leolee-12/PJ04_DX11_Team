@@ -37,17 +37,17 @@ namespace ProtoDesc
 	inline constexpr SHADER_DESC Shader_VtxAnimMesh = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"), TEXT("../Bin/ShaderFiles/Shader_VtxAnimMesh.hlsl") };
 	inline constexpr SHADER_DESC Shader_VtxMesh = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"), TEXT("../Bin/ShaderFiles/Shader_VtxMesh.hlsl") };
 	inline constexpr SHADER_DESC Shader_VtxNorTex = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxNorTex"), TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl") };
-	inline constexpr SHADER_DESC Shader_Trail = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Trail"), TEXT("../Bin/ShaderFiles/Shader_Trail.hlsl") };
-	inline constexpr SHADER_DESC Shader_Slash = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Slash"), TEXT("../Bin/ShaderFiles/Shader_Slash.hlsl") };
-	inline constexpr SHADER_DESC Shader_Sprite = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Sprite"), TEXT("../Bin/ShaderFiles/Shader_Sprite.hlsl") };
-	inline constexpr SHADER_DESC Shader_SlashFire = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_SlashFire"), TEXT("../Bin/ShaderFiles/Shader_SlashFire.hlsl") };
-	inline constexpr SHADER_DESC Shader_SlashGeo = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_SlashGeo"),     TEXT("../Bin/ShaderFiles/Shader_SlashGeo.hlsl") };
-	inline constexpr SHADER_DESC Shader_SlashGeoFire = { ETOUI(LEVEL::STATIC),TEXT("Prototype_Component_Shader_SlashGeoFire"), TEXT("../Bin/ShaderFiles/Shader_SlashGeoFire.hlsl") };
-	inline constexpr SHADER_DESC Shader_GroundDecal = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_GroundDecal"), TEXT("../Bin/ShaderFiles/Shader_GroundDecal.hlsl") };
-	inline constexpr SHADER_DESC Shader_MagicCircle = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_MagicCircle"), TEXT("../Bin/ShaderFiles/Shader_MagicCircle.hlsl") };
-	inline constexpr SHADER_DESC Shader_CrackBurst = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_CrackBurst"), TEXT("../Bin/ShaderFiles/Shader_CrackBurst.hlsl") };
-	inline constexpr SHADER_DESC Shader_Skill4Fan = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Skill4Fan"), TEXT("../Bin/ShaderFiles/Shader_Skill4Fan.hlsl") };
-	inline constexpr SHADER_DESC  Shader_Skill4ChargeRing = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Skill4ChargeRing"), TEXT("../Bin/ShaderFiles/Shader_Skill4ChargeRing.hlsl") };
+	//inline constexpr SHADER_DESC Shader_Trail = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Trail"), TEXT("../Bin/ShaderFiles/Shader_Trail.hlsl") };
+	//inline constexpr SHADER_DESC Shader_Slash = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Slash"), TEXT("../Bin/ShaderFiles/Shader_Slash.hlsl") };
+	//inline constexpr SHADER_DESC Shader_Sprite = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Sprite"), TEXT("../Bin/ShaderFiles/Shader_Sprite.hlsl") };
+	//inline constexpr SHADER_DESC Shader_SlashFire = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_SlashFire"), TEXT("../Bin/ShaderFiles/Shader_SlashFire.hlsl") };
+	//inline constexpr SHADER_DESC Shader_SlashGeo = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_SlashGeo"),     TEXT("../Bin/ShaderFiles/Shader_SlashGeo.hlsl") };
+	//inline constexpr SHADER_DESC Shader_SlashGeoFire = { ETOUI(LEVEL::STATIC),TEXT("Prototype_Component_Shader_SlashGeoFire"), TEXT("../Bin/ShaderFiles/Shader_SlashGeoFire.hlsl") };
+	//inline constexpr SHADER_DESC Shader_GroundDecal = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_GroundDecal"), TEXT("../Bin/ShaderFiles/Shader_GroundDecal.hlsl") };
+	//inline constexpr SHADER_DESC Shader_MagicCircle = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_MagicCircle"), TEXT("../Bin/ShaderFiles/Shader_MagicCircle.hlsl") };
+	//inline constexpr SHADER_DESC Shader_CrackBurst = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_CrackBurst"), TEXT("../Bin/ShaderFiles/Shader_CrackBurst.hlsl") };
+	//inline constexpr SHADER_DESC Shader_Skill4Fan = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Skill4Fan"), TEXT("../Bin/ShaderFiles/Shader_Skill4Fan.hlsl") };
+	//inline constexpr SHADER_DESC  Shader_Skill4ChargeRing = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Skill4ChargeRing"), TEXT("../Bin/ShaderFiles/Shader_Skill4ChargeRing.hlsl") };
 
 	inline constexpr TEXTURE_DESC Texture_LoadingUI = { ETOUI(LEVEL::LOADING), TEXT("Prototype_Component_Texture_LoadingUI"), TEXT("../../Resources/Textures/LoadingUI/LoadingUI_%d.png"), 3 };
 
