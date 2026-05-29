@@ -148,11 +148,11 @@ HRESULT CLIENT_DLL Load_Level(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice
 
 HRESULT CLIENT_DLL Load_Fonts(CGameInstance_Proxy* pProxy)
 {
-    if (FAILED(pProxy->Add_Font(TEXT("Font_Default"), TEXT("../../Resources/Fonts/ER_Default.spritefont"))))
+    /*if (FAILED(pProxy->Add_Font(TEXT("Font_Default"), TEXT("../../Resources/Fonts/ER_Default.spritefont"))))
         return E_FAIL;
 
     if (FAILED(pProxy->Add_Font(TEXT("Font_Semibold"), TEXT("../../Resources/Fonts/ER_Semibold.spritefont"))))
-        return E_FAIL;
+        return E_FAIL;*/
 
     return S_OK;
 }

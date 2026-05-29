@@ -21,9 +21,6 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	CTitleUI* m_pTitleUI_1 = { nullptr };
-	CTitleUI* m_pTitleUI_2 = { nullptr };
-
 	LOGO_STATE m_eLogoState = { LOGO_STATE::LOGO1 };
 
 private:

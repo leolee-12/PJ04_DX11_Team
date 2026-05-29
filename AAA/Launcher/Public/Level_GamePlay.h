@@ -19,8 +19,6 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	CLumia* m_pLumia = { nullptr };
-
 	enum class EEndingPhase { NONE, SLOW, HOLD, RECOVER };
 
 	EEndingPhase m_eEndingPhase = { EEndingPhase::NONE };

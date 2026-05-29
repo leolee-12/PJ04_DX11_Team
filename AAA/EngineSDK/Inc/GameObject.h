@@ -125,7 +125,7 @@ protected: // 이벤트 버스 헬퍼
 	void	Subscribe_Event(const wstring& strEventTag, function<void(void*)> Handler);
 	void	UnSubscribe_Event(const wstring& strEventTag);
 
-	virtual HRESULT Ready_Events() = 0;
+	virtual HRESULT Ready_Events() { return S_OK; }
 
 protected:
 	template<typename T>

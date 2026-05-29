@@ -17,10 +17,6 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	_bool   m_bInGameStart = { false };
-	_bool   m_bLevelChange_GameStart = { false };
-
-private:
 	virtual HRESULT Ready_Events() override;
 	HRESULT Ready_Lights();
 

@@ -1,7 +1,6 @@
 #include "Loader.h"
 #include "GameContent_const.h"
 #include "GameInstance.h"
-#include "BackGround.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice { pDevice }

@@ -6,6 +6,7 @@
 #include "Terrain.h"
 #include "TestFiona.h"
 #include "TestNonAnim.h"
+#include "TestRect.h"
 
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
@@ -81,6 +82,11 @@ void CGameObject_Factory::Register_Test()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Maps/NaviMesh_Lumia.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))))
         )
+    );
+
+    Register(CTestRect::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
+        CREATOR(CTestRect),
+        LOADER()
     );
 }
 

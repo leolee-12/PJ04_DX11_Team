@@ -37,6 +37,9 @@
     <Filter Include="00. GameObject\00. Camera\Free">
       <UniqueIdentifier>{dd2cd863-482a-4286-b3df-f3f050dd4f56}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\Test\TestRect">
+      <UniqueIdentifier>{e586cfae-6cf8-428a-b68e-29fbbff687e2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -78,6 +81,9 @@
     <ClInclude Include="..\Public\Camera_Free.h">
       <Filter>00. GameObject\00. Camera\Free</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\TestRect.h">
+      <Filter>00. GameObject\Test\TestRect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -97,6 +103,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Camera_Free.cpp">
       <Filter>00. GameObject\00. Camera\Free</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\TestRect.cpp">
+      <Filter>00. GameObject\Test\TestRect</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

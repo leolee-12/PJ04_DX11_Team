@@ -6,7 +6,6 @@
 
 #include "Loader_Prototype.h"
 #include "GameObject_Factory.h"
-#include "Combatant_Manager.h"
 
 CEditorApp::CEditorApp()
 {
@@ -202,5 +201,4 @@ void CEditorApp::Free()
     CGameInstance::DestroyInstance();
 
     CGameObject_Factory::DestroyInstance();
-    CCombatant_Manager::DestroyInstance();
 }

@@ -3,13 +3,6 @@
 #include "GameInstance.h"
 #include "Camera_Free.h"
 #include "Loader_Prototype.h"
-#include "Lumia.h"
-#include "Hisui.h"
-#include "Camera_MOBA.h"
-#include "Hisui_Hud.h"
-#include "Inventory_UI.h"
-#include "Equipment_UI.h"
-#include "Combatant_Manager.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel { pDevice, pContext }
@@ -21,61 +14,18 @@ HRESULT CLevel_GamePlay::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
-    if (FAILED(Load_Level(m_pGameInstance_Proxy, m_pDevice, m_pContext,
+    /*if (FAILED(Load_Level(m_pGameInstance_Proxy, m_pDevice, m_pContext,
         L"../../Resources/LevelData/GamePlay.JSON", ETOUI(LEVEL::GAMEPLAY))))
-        return E_FAIL;
-
-    //if (FAILED(Load_Level(m_pGameInstance_Proxy, m_pDevice, m_pContext,
-    //    L"../../Resources/LevelData/TestDebug.JSON", ETOUI(LEVEL::GAMEPLAY))))
-    //    return E_FAIL;
+        return E_FAIL;*/
 
     if (FAILED(Ready_Lights()))
         return E_FAIL;
-
-    m_pLumia = m_pGameInstance_Proxy->Find_GameObject<CLumia>(ETOUI(LEVEL::GAMEPLAY), L"Map_Layer", L"Proto_Lumia_0");
-
-    auto pHisui = m_pGameInstance_Proxy->Find_GameObject<CHisui>(
-        ETOUI(LEVEL::GAMEPLAY), L"Live_Object_Layer", L"Proto_Hisui_1");
-    auto pCamera = m_pGameInstance_Proxy->Find_GameObject<CCamera_MOBA>(
-        ETOUI(LEVEL::GAMEPLAY), L"Layer_Camera", L"Proto_CameraMOBA_0");
-    auto pHud = m_pGameInstance_Proxy->Find_GameObject<CHisui_Hud>(
-        ETOUI(LEVEL::GAMEPLAY), L"UI_Layer", L"HisuiHud");
-    auto pInvenUI = m_pGameInstance_Proxy->Find_GameObject<CInventory_UI>(
-        ETOUI(LEVEL::GAMEPLAY), L"UI_Layer", L"Inventory_UI");
-    auto pEquipUI = m_pGameInstance_Proxy->Find_GameObject<CEquipment_UI>(
-        ETOUI(LEVEL::GAMEPLAY), L"UI_Layer", L"Equipment_UI");
-
-    if (pHisui)
-    {
-        if (pCamera)
-            pCamera->Set_Target(pHisui);
-        if (pHud)
-            pHud->Set_Hisui(pHisui);
-        if (pInvenUI)
-            pInvenUI->Set_Hisui(pHisui);
-        if (pEquipUI)
-            pEquipUI->Set_Hisui(pHisui);
-    }
-
-    m_pGameInstance_Proxy->Play_BGM(TEXT("P0_0.wav"), ETOUI(SOUND_CHANNEL::BGM), 1.f);
 
     return S_OK;
 }
 
 void CLevel_GamePlay::Update(_float fTimeDelta)
 {
-    Key_Input();
-
-    auto* pCM = CCombatant_Manager::GetInstance();
-
-    pCM->Resolve_Overlaps_Slide();   
-    pCM->Cache_PrevPositions();
-
-    if (m_eEndingPhase != EEndingPhase::NONE)
-    {
-        _float fRaw = m_pGameInstance_Proxy->Get_RawTimeDelta(TEXT("Timer_60"));
-        Update_EndingSequence(fRaw);
-    }
 }
 
 HRESULT CLevel_GamePlay::Render()

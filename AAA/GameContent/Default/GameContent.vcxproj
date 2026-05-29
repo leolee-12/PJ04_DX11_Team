@@ -32,6 +32,7 @@
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\TestFiona.h" />
     <ClInclude Include="..\Public\TestNonAnim.h" />
+    <ClInclude Include="..\public\TestRect.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Camera_Free.cpp" />
@@ -40,6 +41,7 @@
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\TestFiona.cpp" />
     <ClCompile Include="..\Private\TestNonAnim.cpp" />
+    <ClCompile Include="..\private\TestRect.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

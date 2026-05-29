@@ -15,21 +15,19 @@ HRESULT CLevel_Lobby::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
-    if (FAILED(Load_Level(m_pGameInstance_Proxy, m_pDevice, m_pContext,
+    /*if (FAILED(Load_Level(m_pGameInstance_Proxy, m_pDevice, m_pContext,
         L"../../Resources/LevelData/Lobby.JSON", ETOUI(LEVEL::LOBBY))))
-        return E_FAIL;
+        return E_FAIL;*/
 
     if (FAILED(Ready_Lights()))
         return E_FAIL;
-
-    m_pGameInstance_Proxy->Play_BGM(TEXT("BGM_Lobby_0.wav"), ETOUI(SOUND_CHANNEL::BGM), 1.f);
 
     return S_OK;
 }
 
 void CLevel_Lobby::Update(_float fTimeDelta)
 {
-    if (m_bLevelChange_GameStart)
+    /*if (m_bLevelChange_GameStart)
     {
         if (FAILED(m_pGameInstance_Proxy->Change_Level(ETOI(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY))))
         {
@@ -42,7 +40,7 @@ void CLevel_Lobby::Update(_float fTimeDelta)
     {
         if (!m_bInGameStart)
             m_pGameInstance_Proxy->Publish(TEXT("Return_Lobby"), nullptr);
-    }
+    }*/
 }
 
 HRESULT CLevel_Lobby::Render()
@@ -55,20 +53,6 @@ HRESULT CLevel_Lobby::Render()
 
 HRESULT CLevel_Lobby::Ready_Events()
 {
-    Subscribe_Event(TEXT("Enter_View"), [this](void* pData) {
-        _int iType = *(static_cast<_int*>(pData));
-        m_bInGameStart = (iType == ETOI(LOBBY_VIEW::GAME_START));
-        });
-
-    Subscribe_Event(TEXT("Return_Lobby"), [this](void* pData) {
-        m_bInGameStart = false;
-        });
-
-    Subscribe_Event(TEXT("Click_GameStartBtn"), [this](void* pData) {
-        if (!m_bInGameStart) return;
-        m_bLevelChange_GameStart = true;
-        });
-
     return S_OK;
 }
 

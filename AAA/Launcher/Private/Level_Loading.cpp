@@ -23,9 +23,9 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
 
     m_eNextLevelID = eNextLevelID;
 
-    if (FAILED(Load_Level(m_pGameInstance_Proxy, m_pDevice, m_pContext, 
+    /*if (FAILED(Load_Level(m_pGameInstance_Proxy, m_pDevice, m_pContext, 
         L"../../Resources/LevelData/Loading.JSON", ETOUI(LEVEL::LOADING))))
-        return E_FAIL;
+        return E_FAIL;*/
 
     m_pLoader = CLoader::Create(m_pDevice, m_pContext, eNextLevelID);
     if (nullptr == m_pLoader)
@@ -67,8 +67,6 @@ void CLevel_Loading::Update(_float fTimeDelta)
 
         if (SUCCEEDED(m_pGameInstance_Proxy->Change_Level(ETOI(m_eNextLevelID), pNextLevel)))
             return;
-
-
     }
 }
 

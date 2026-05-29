@@ -11,7 +11,6 @@
 #include "EditCamera.h"
 #include "Edit_Grid.h"
 #include "NavMesh_Editor.h"
-#include "Lumia.h"
 
 CLevel_Edit::CLevel_Edit(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel{ pDevice, pContext }
@@ -217,14 +216,14 @@ void CLevel_Edit::Delete_Object(CGameObject* pObject)
 
 void CLevel_Edit::Pick_And_Place(_fvector vOrigin, _fvector vDir)
 {
-    if (m_bNavEditMode)
+    /*if (m_bNavEditMode)
     {
         _float3 fHitPos = {};
         _float  fDummy = {};
         if (m_pLumia->Pick_Floor(vOrigin, vDir, &fHitPos, &fDummy))
             m_pNavMeshEditor->OnClick(fHitPos);
         return;
-    }
+    }*/
 
     _float3 fHitPos = {};
     if (!m_pGameInstance_Proxy->Pick_RayToPlane(vOrigin, vDir, &fHitPos))
@@ -315,13 +314,13 @@ const vector<CLevel_Edit::EDITOR_OBJECT_HANDLE>* CLevel_Edit::Get_CameraLayer() 
 
 void CLevel_Edit::Begin_NavEditMode()
 {
-    // CLumia 캐싱, 없으면 모드 진입 거부
-    m_pLumia = dynamic_cast<CLumia*>(
-        m_pGameInstance_Proxy->Find_GameObject(ETOUI(EDIT_LEVEL::EDIT), L"Default_Layer", L"Proto_Lumia_0"));
+    //// CLumia 캐싱, 없으면 모드 진입 거부
+    //m_pLumia = dynamic_cast<CLumia*>(
+    //    m_pGameInstance_Proxy->Find_GameObject(ETOUI(EDIT_LEVEL::EDIT), L"Default_Layer", L"Proto_Lumia_0"));
 
-    if (!m_pLumia) return;
+    //if (!m_pLumia) return;
 
-    m_bNavEditMode = true;
+    //m_bNavEditMode = true;
 }
 
 void CLevel_Edit::End_NavEditMode()

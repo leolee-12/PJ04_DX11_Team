@@ -6,8 +6,6 @@
 #include "GameObject_Factory.h"
 #include "Loader_Prototype.h"
 #include "Level_Logo.h"
-#include "DebugDraw_Manager.h"
-#include "Combatant_Manager.h"
 
 CMainApp::CMainApp()
 {
@@ -35,13 +33,6 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Ready_Prototype_For_Static()))
 		return E_FAIL;
 
-#ifdef _DEBUG
-	m_pDebugDraw_Manager = CDebugDraw_Manager::GetInstance();
-	Safe_AddRef(m_pDebugDraw_Manager);
-
-	if (FAILED(m_pDebugDraw_Manager->Initialize(m_pDevice, m_pContext)))
-		return E_FAIL;
-#endif
 
 	CGameObject_Factory::GetInstance()->RegisterAll();
 
@@ -58,9 +49,6 @@ HRESULT CMainApp::Initialize()
 
 void CMainApp::Update(_float fTimeDelta)
 {
-#ifdef _DEBUG
-	m_pDebugDraw_Manager->Tick(fTimeDelta);
-#endif
 	m_pGameInstance_Proxy->Update_Engine(fTimeDelta);
 }
 
@@ -71,11 +59,6 @@ HRESULT CMainApp::Render()
 
 	if (FAILED(m_pGameInstance_Proxy->Draw()))
 		return E_FAIL;
-
-#ifdef _DEBUG
-	if (FAILED(m_pDebugDraw_Manager->Render()))
-		return E_FAIL;
-#endif
 
 	if (FAILED(m_pGameInstance_Proxy->End_Draw()))
 		return E_FAIL;
@@ -143,9 +126,4 @@ void CMainApp::Free()
 	CGameInstance::DestroyInstance();
 
 	CGameObject_Factory::DestroyInstance();
-	CCombatant_Manager::DestroyInstance();
-#ifdef _DEBUG
-	Safe_Release(m_pDebugDraw_Manager);
-	CDebugDraw_Manager::DestroyInstance();
-#endif
 }

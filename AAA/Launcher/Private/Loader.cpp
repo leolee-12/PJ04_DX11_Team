@@ -1,7 +1,6 @@
 #include "Loader.h"
 #include "GameContent_const.h"
 #include "GameInstance.h"
-#include "BackGround.h"
 #include "GameObject_Factory.h"
 #include "DataLoader.h"
 #include <set>
