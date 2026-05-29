@@ -6,6 +6,9 @@ NS_BEGIN(Engine)
 
 class ENGINE_DLL CShader final : public CComponent
 {
+	//GENERATED_BODY(CShader)
+	//PROPERTY(_int, a, "a", "aa")
+
 private:
 	CShader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CShader(const CShader& Prototype);

@@ -9,7 +9,7 @@ NS_BEGIN(Engine)
 class CGameInstance_Proxy;
 class CObject_Manager;
 
-class ENGINE_DLL CGameObject abstract : public CBase
+class ENGINE_DLL CGameObject abstract : public CBase, public IReflectable
 {
 	friend class CObject_Manager;
 public:
@@ -77,17 +77,11 @@ public: //파싱 관련 함수
 	void Copy_ObjectData(ENGINE_OBJECT_DATA* pOutData);
 
 public: // 프로퍼티함수
-	virtual vector<FPROPERTY>& Get_Properties() const
-	{
-		static vector<FPROPERTY> empty;
-		return empty;
-	}
+	// Get_Properties / Get_PropertyPtr 는 IReflectable 로 이동됨
+	const unordered_map<wstring, CComponent*>& Get_Components() const { return m_Components; }
 
-	virtual const void* Get_PropertyPtr(size_t uOffset) const { return nullptr; }
-	virtual void* Get_PropertyPtr(size_t uOffset) { return nullptr; }
-
-	virtual json Serialize() const;
-	virtual void Deserialize(const json& j);
+	virtual json Serialize() const override;
+	virtual void Deserialize(const json& j) override;
 
 public: // Collision 콜백
 	virtual void Enter_Collision(CGameObject* pOther) {};

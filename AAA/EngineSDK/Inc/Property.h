@@ -13,6 +13,24 @@ namespace Engine {
 		PROP_TYPE	eType = {};
 		size_t		uOffset = {};
 	}FPROPERTY;
+
+	class ENGINE_DLL IReflectable
+	{
+	public:
+		virtual ~IReflectable() = default;
+
+		virtual vector<FPROPERTY>& Get_Properties() const
+		{
+			static vector<FPROPERTY> empty;
+			return empty;
+		}
+
+		virtual const void* Get_PropertyPtr(size_t uOffset) const { return nullptr; }
+		virtual void* Get_PropertyPtr(size_t uOffset) { return nullptr; }
+
+		virtual json Serialize() const;          
+		virtual void Deserialize(const json& j);
+	};
 }
 
 typedef _uint  ANIM_INDEX;

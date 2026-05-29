@@ -1,5 +1,6 @@
 #include "ImGui_Manager.h"
 
+
 #include "GameInstance.h"
 #include "GameObject_Factory.h"
 #include "Level_Edit.h"
@@ -519,6 +520,20 @@ void CImGui_Manager::Draw_Inspector()
 
     Draw_Properties(pSelected);
 
+    for (auto& [tag, pComponent] : pSelected->Get_Components())
+    {
+        if (!pComponent) continue;
+        if (pComponent->Get_Properties().empty()) continue;
+
+        string strTag = WstrToStr(tag);
+        if (ImGui::CollapsingHeader(strTag.c_str()))
+        {
+            ImGui::PushID(pComponent);
+            Draw_Properties(pComponent);
+            ImGui::PopID();
+        }
+    }
+
     auto pContainer = dynamic_cast<CContainerObject*>(pSelected);
     if (pContainer)
     {
@@ -569,11 +584,11 @@ void CImGui_Manager::Draw_Inspector()
     return;
 }
 
-void CImGui_Manager::Draw_Properties(CGameObject* pObject)
+void CImGui_Manager::Draw_Properties(IReflectable* pHolder)
 {
     string strCurrentCategory = {};
 
-    for (auto& prop : pObject->Get_Properties())
+    for (auto& prop : pHolder->Get_Properties())
     {
         const string strPropCategory = WstrToStr(prop.strCategory);
         if (strPropCategory != strCurrentCategory)
@@ -582,7 +597,7 @@ void CImGui_Manager::Draw_Properties(CGameObject* pObject)
             ImGui::Text("[%s]", strCurrentCategory.c_str());
         }
 
-        void* pData = pObject->Get_PropertyPtr(prop.uOffset);
+        void* pData = pHolder->Get_PropertyPtr(prop.uOffset);
         if (!pData) continue;
 
         string strPropName = WstrToStr(prop.strName);
@@ -626,7 +641,8 @@ void CImGui_Manager::Draw_Properties(CGameObject* pObject)
 			case PROP_TYPE::ANIM_INDEX:
 			{
 				int iVal = (int)*((_uint*)pData);
-				CModel* pModel = pObject->Get_Component<CModel>(L"Com_Model");
+                CGameObject* pObject = dynamic_cast<CGameObject*>(pHolder);
+                CModel* pModel = pObject ? pObject->Get_Component<CModel>(L"Com_Model") : nullptr;
 				if (!pModel) break;
 				_uint iNumAnims = pModel->Get_MaxAnimationIndex() + 1;
 				string strItems;

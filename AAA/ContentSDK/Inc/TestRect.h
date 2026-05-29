@@ -44,7 +44,6 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CVIBuffer_Rect* m_pVIBuffer = { nullptr };
 	
-
 private:
 	virtual HRESULT Ready_Events() override { return S_OK; }
 	HRESULT Ready_Components();
@@ -53,6 +52,7 @@ private:
 public:
 	static CTestRect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
+protected:
 	virtual void Free();
 };
 
