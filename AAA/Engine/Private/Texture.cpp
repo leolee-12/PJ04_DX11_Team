@@ -1,6 +1,6 @@
 #include "Texture.h"
 #include "Shader.h"
-#include <DirectXTex.h>
+#include <DirectTex/DirectXTex.h>
 
 CTexture::CTexture(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent { pDevice, pContext }

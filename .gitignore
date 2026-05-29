@@ -417,6 +417,9 @@ FodyWeavers.xsd
 *.msm
 *.msp
 
+# vcpkg (removed - using local libs in ThirdPartyLib)
+vcpkg_installed/
+
 # Resources folder (textures, assets)
 Resources/
 
