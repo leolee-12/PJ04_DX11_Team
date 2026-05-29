@@ -1,5 +1,5 @@
-
 #include "TestRect.h"
+
 #include "GameInstance.h"
 #include "GameContent_const.h"
 #include "Navigation.h"
@@ -44,7 +44,7 @@ void CTestRect::Update(_float fTimeDelta)
 
 void CTestRect::Late_Update(_float fTimeDelta)
 {
-    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::BLEND, this);
 }
 
 HRESULT CTestRect::Render()
@@ -63,12 +63,12 @@ HRESULT CTestRect::Render()
 
 HRESULT CTestRect::Ready_Components()
 {
-    m_pShaderCom = Add_Component<CShader>(Shader_VtxAnimMesh.iLevelID, Shader_VtxAnimMesh.szProtoTag, TEXT("Com_Shader"));
-    if (nullptr == m_pShaderCom)
+    m_pShaderCom = Add_Component<CShader>(Shader_VtxTex.iLevelID, Shader_VtxTex.szProtoTag, TEXT("Com_Shader"));
+    if (m_pShaderCom == nullptr)
         return E_FAIL;
 
     m_pVIBuffer = Add_Component<CVIBuffer_Rect>(VI_Rect.iLevelID, VI_Rect.szProtoTag, TEXT("Com_Model"));
-    if (nullptr == m_pVIBuffer)
+    if (m_pVIBuffer == nullptr)
         return E_FAIL;
 
     return S_OK;
@@ -76,7 +76,6 @@ HRESULT CTestRect::Ready_Components()
 
 HRESULT CTestRect::Bind_ShaderResources()
 {
-
     if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
 
@@ -88,14 +87,13 @@ HRESULT CTestRect::Bind_ShaderResources()
     return S_OK;
 }
 
-
 CTestRect* CTestRect::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     CTestRect* pInstance = new CTestRect(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX("Failed to Created : CTestRect");
+        MSG_BOX("Failed to Created: CTestRect");
         Safe_Release(pInstance);
     }
 
@@ -108,7 +106,7 @@ CGameObject* CTestRect::Clone(void* pArg)
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Cloned : CTestRect");
+        MSG_BOX("Failed to Cloned: CTestRect");
         Safe_Release(pInstance);
     }
 

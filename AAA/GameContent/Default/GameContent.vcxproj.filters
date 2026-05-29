@@ -108,4 +108,9 @@
       <Filter>00. GameObject\Test\TestRect</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl">
+      <Filter>98. ShaderFiles</Filter>
+    </FxCompile>
+  </ItemGroup>
 </Project>
