@@ -69,8 +69,11 @@ void CGameObject_Factory::Register_Test()
     Register(TEXT("Proto_TestFiona"), TEXT("TEST_OBJECT"),
         CREATOR(CTestFiona),
         LOADER(
+            /*pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/Aligator/aligator.ysh", 
+                    XMMatrixRotationY(XMConvertToRadians(180.f))))*/
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Hisui/Hisui_S002.ysh", 
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/Kirby/Kirby.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))))
         )
     );
@@ -78,8 +81,8 @@ void CGameObject_Factory::Register_Test()
     Register(TEXT("Proto_TestNonAnim"), TEXT("TEST_OBJECT"),
         CREATOR(CTestNonAnim),
         LOADER(
-            pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LumiaNavi"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Maps/NaviMesh_Lumia.ysh",
+            pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_NonAnim"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/Aligator/Aligator.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))))
         )
     );

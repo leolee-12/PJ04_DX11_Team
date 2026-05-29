@@ -60,13 +60,14 @@ HRESULT CTestFiona::Render()
 
     for (size_t i = 0; i < iNumMeshes; i++)
     {
+        _uint _iPassIdx = 0;
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", (_uint)i, MTEX_TYPE::DIFFUSE, 0)))
-            return E_FAIL;
+            _iPassIdx = 1;
 
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", (_uint)i)))
             return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Begin(0)))
+        if (FAILED(m_pShaderCom->Begin(_iPassIdx)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render((_uint)i)))
@@ -81,7 +82,11 @@ HRESULT CTestFiona::Render()
 
 HRESULT CTestFiona::Ready_Components()
 {
-    m_pShaderCom = Add_Component<CShader>(Shader_VtxAnimMesh.iLevelID, Shader_VtxAnimMesh.szProtoTag, TEXT("Com_Shader"));
+    /*m_pShaderCom = Add_Component<CShader>(Shader_VtxAnimMesh.iLevelID, Shader_VtxAnimMesh.szProtoTag, TEXT("Com_Shader"));
+    if (nullptr == m_pShaderCom)
+        return E_FAIL;*/
+
+    m_pShaderCom = Add_Component<CShader>(Shader_AnimMesh_PBR.iLevelID, Shader_AnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
     if (nullptr == m_pShaderCom)
         return E_FAIL;
 

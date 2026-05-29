@@ -543,10 +543,20 @@ void New_Convert_NoAnim()
 
 
         // Materials
+        json jMatInfo;                                                  // [추가]
+        jMatInfo["model"] = stem;                                       // [추가]
+        jMatInfo["material_count"] = (uint32_t)scene->mNumMaterials;     // [추가]
+        json jMaterialArray = json::array();                            // [추가]
+
         WriteVal(file, (uint32_t)scene->mNumMaterials);
         for (uint32_t j = 0; j < scene->mNumMaterials; ++j)
         {
             aiMaterial* pMaterial = scene->mMaterials[j];
+
+            json jMat;                                                  // [추가]
+            jMat["index"] = j;                                          // [추가]
+            json jTexArray = json::array();                             // [추가]
+
             for (uint32_t k = 0; k < AI_TEXTURE_TYPE_MAX; ++k)
             {
                 uint32_t iNumTex = pMaterial->GetTextureCount(static_cast<aiTextureType>(k));
@@ -559,9 +569,23 @@ void New_Convert_NoAnim()
                     _splitpath_s(strPath.data, nullptr, 0, nullptr, 0, szName, MAX_PATH, szExt, MAX_PATH);
                     string texName = string(szName) + string(szExt);
                     WriteStr(file, texName);
+
+                    json jTex;                                                          // [추가]
+                    jTex["type"] = GetTextureTypeName(static_cast<aiTextureType>(k));    // [추가]
+                    jTex["slot"] = ii;                                                  // [추가]
+                    jTex["name"] = texName;                                             // [추가]
+                    jTexArray.push_back(jTex);                                          // [추가]
                 }
             }
+            jMat["textures"] = jTexArray;                               // [추가]
+            jMaterialArray.push_back(jMat);                            // [추가]
         }
+
+        jMatInfo["materials"] = jMaterialArray;                                 // [추가]
+        ofstream matFile("../Export/" + stem + "_material.json");               // [추가]
+        matFile << jMatInfo.dump(4);                                            // [추가]
+        matFile.close();                                                        // [추가]
+        cout << "Material exported: " << stem << "_material.json\n";            // [추가]
 
         cout << "Exported: " << stem << ".ysh\n";
     }
@@ -677,10 +701,20 @@ void New_Convert_Anim()
         //return;
 
         // Materials
+        json jMatInfo;                                                  // [추가]
+        jMatInfo["model"] = stem;                                       // [추가]
+        jMatInfo["material_count"] = (uint32_t)scene->mNumMaterials;     // [추가]
+        json jMaterialArray = json::array();                            // [추가]
+
         WriteVal(file, (uint32_t)scene->mNumMaterials);
         for (uint32_t j = 0; j < scene->mNumMaterials; ++j)
         {
             aiMaterial* pMaterial = scene->mMaterials[j];
+
+            json jMat;                                                  // [추가]
+            jMat["index"] = j;                                          // [추가]
+            json jTexArray = json::array();                             // [추가]
+
             for (uint32_t k = 0; k < AI_TEXTURE_TYPE_MAX; ++k)
             {
                 uint32_t iNumTex = pMaterial->GetTextureCount(static_cast<aiTextureType>(k));
@@ -693,8 +727,16 @@ void New_Convert_Anim()
                     _splitpath_s(strPath.data, nullptr, 0, nullptr, 0, szName, MAX_PATH, szExt, MAX_PATH);
                     string texName = string(szName) + string(szExt);
                     WriteStr(file, texName);
+
+                    json jTex;                                                          // [추가]
+                    jTex["type"] = GetTextureTypeName(static_cast<aiTextureType>(k));    // [추가]
+                    jTex["slot"] = ii;                                                  // [추가]
+                    jTex["name"] = texName;                                             // [추가]
+                    jTexArray.push_back(jTex);                                          // [추가]
                 }
             }
+            jMat["textures"] = jTexArray;                               // [추가]
+            jMaterialArray.push_back(jMat);                            // [추가]
         }
 
         WriteVal(file, (uint32_t)scene->mNumAnimations);
@@ -793,6 +835,12 @@ void New_Convert_Anim()
         jFile << jAnimList.dump(4);
         jFile.close();
         cout << "AnimList exported: " << stem << "_AnimList.json\n";
+
+        jMatInfo["materials"] = jMaterialArray;
+        ofstream matFile("../Export/" + stem + "_material.json");
+        matFile << jMatInfo.dump(4);
+        matFile.close();
+        cout << "Material exported: " << stem << "_material.json\n";
 
         cout << "Exported: " << stem << ".ysh\n";
     }
