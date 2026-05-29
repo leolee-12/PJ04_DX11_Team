@@ -1,12 +1,13 @@
 #pragma once
 
 #include "Base.h"
+#include "Property.h"
 
 NS_BEGIN(Engine)
 
 class CGameInstance_Proxy;
 
-class ENGINE_DLL CComponent abstract : public CBase
+class ENGINE_DLL CComponent abstract : public CBase, public IReflectable
 {
 protected:
 	CComponent(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
