@@ -623,6 +623,9 @@
     <ClCompile Include="..\private\Effect_Manager.cpp">
       <Filter>05. GameObject\Effect\Manager</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Property.cpp">
+      <Filter>05. GameObject\01. Property</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Engine_Shader_Defines.hlsli">
