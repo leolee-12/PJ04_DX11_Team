@@ -47,8 +47,8 @@ HRESULT CTexture::Initialize_Prototype(const _tchar* pTextureFilePath, _uint iNu
 
 			const DirectX::Image* img = scratch.GetImage(0, 0, 0);
 			FCpuImage cpu;
-			cpu.width = img->width;
-			cpu.height = img->height;
+			cpu.width = static_cast<_uint>(img->width);
+			cpu.height = static_cast<_uint>(img->height);
 			cpu.rowPitch = img->rowPitch;
 			cpu.pixels.assign(img->pixels, img->pixels + img->rowPitch * img->height);
 			m_Images.push_back(move(cpu));
