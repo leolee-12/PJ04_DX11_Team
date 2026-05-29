@@ -17,6 +17,8 @@ namespace Client
 		BGM = 0, 
 		END = 32
 	};
+
+	enum class VTXTEX_SHADER { DEFAULT, ALPHABLEND };
 }
 
 using namespace Client;

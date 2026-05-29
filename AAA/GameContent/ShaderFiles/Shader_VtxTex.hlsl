@@ -59,28 +59,26 @@ PS_OUT PS_MAIN(PS_IN In)
 {
     PS_OUT Out;
        
-    //if (In.vTexcoord.x > g_fUVCutRight || In.vTexcoord.x < g_fUVCutLeft)
-    //    discard;
+    if (In.vTexcoord.x > (1.f - g_fUVCutRight) || In.vTexcoord.x < g_fUVCutLeft)
+        discard;
     
-    //if (In.vTexcoord.y > g_fUVCutBottom || In.vTexcoord.y < g_fUVCutTop)
-    //    discard;
+    if (In.vTexcoord.y > (1.f - g_fUVCutBottom) || In.vTexcoord.y < g_fUVCutTop)
+        discard;
     
-    //if (g_bFlipX == 1)
-    //    In.vTexcoord.x = -In.vTexcoord.x + 1.f;
+    if (g_bFlipX == 1)
+        In.vTexcoord.x = -In.vTexcoord.x + 1.f;
     
-    //if (g_bFlipY == 1)
-    //    In.vTexcoord.y = -In.vTexcoord.y + 1.f;
+    if (g_bFlipY == 1)
+        In.vTexcoord.y = -In.vTexcoord.y + 1.f;
     
     //Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
-    //Out.vColor.xyz *= g_vColor;
-    
-    
     Out.vColor = float4(1.f, 1.f, 1.f, 1.f);
+    Out.vColor.xyz *= g_vColor;
     
-    //Out.vColor.a *= g_fAlpha;
+    Out.vColor.a *= g_fAlpha;
     
-    //if (g_bAlphaTest == true && Out.vColor.a <= g_fTestAlpha)
-    //    discard;
+    if (g_bAlphaTest == true && Out.vColor.a <= g_fTestAlpha)
+        discard;
     
     return Out;
 }
