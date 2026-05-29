@@ -14,6 +14,21 @@ class CTestRect final : public CGameObject
 {
 	GENERATED_BODY(CTestRect)
 
+	// UI DEFAULT, ALPHABLEND
+	PROPERTY(_bool,		m_bFlipX,		L"Flip X",			L"Shader");
+	PROPERTY(_bool,		m_bFlipY,		L"Flip Y",			L"Shader");
+	PROPERTY(_float3,	m_vColor,		L"Color",			L"Shader");
+	PROPERTY(_float,	m_fAlpha,		L"Alpha",			L"Shader");
+
+	PROPERTY(_bool,		m_bAlphaTest,	L"Alpha_Test",		L"Shader");
+	PROPERTY(_float,	m_fTestAlpha,	L"Test_Alpha",		L"Shader");
+
+	PROPERTY(_float,	m_fUVCutRight,	L"UV_Cut_Right",	L"Shader");
+	PROPERTY(_float,	m_fUVCutLeft,	L"UV_Cut_Left",		L"Shader");
+					 
+	PROPERTY(_float,	m_fUVCutTop,	L"UV_Cut_Top",		L"Shader");
+	PROPERTY(_float,	m_fUVCutBottom, L"UV_Cut_Bottom",	L"Shader");
+
 public:
 	typedef struct tagTRectDesc : public CGameObject::GAMEOBJECT_DESC
 	{
@@ -39,6 +54,8 @@ public:
 		pOutData->strPrototypeTag = PROTOTYPE_TAG;
 	}
 
+protected:
+	virtual HRESULT Bind_ShaderValue();
 
 private:
 	CShader* m_pShaderCom = { nullptr };

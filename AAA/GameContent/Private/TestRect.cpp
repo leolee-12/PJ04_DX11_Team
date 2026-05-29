@@ -6,12 +6,32 @@
 
 CTestRect::CTestRect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
+    , m_bFlipX(false)
+    , m_bFlipY(false)
+    , m_vColor{ 1.f, 1.f, 1.f }
+    , m_fAlpha(1.f)
+    , m_bAlphaTest(false)
+    , m_fTestAlpha(0.f)
+    , m_fUVCutRight(1.f)
+    , m_fUVCutLeft(0.f)
+    , m_fUVCutTop(0.f)
+    , m_fUVCutBottom(1.f)
 {
 
 }
 
 CTestRect::CTestRect(const CTestRect& Prototype)
     : CGameObject(Prototype)
+    , m_bFlipX(false)
+    , m_bFlipY(false)
+    , m_vColor{ 1.f, 1.f, 1.f }
+    , m_fAlpha(1.f)
+    , m_bAlphaTest(false)
+    , m_fTestAlpha(0.f)
+    , m_fUVCutRight(0.f)
+    , m_fUVCutLeft(0.f)
+    , m_fUVCutTop(0.f)
+    , m_fUVCutBottom(0.f)
 {
 
 }
@@ -35,7 +55,6 @@ HRESULT CTestRect::Initialize(void* pArg)
 
 void CTestRect::Priority_Update(_float fTimeDelta)
 {
-
 }
 
 void CTestRect::Update(_float fTimeDelta)
@@ -52,13 +71,43 @@ HRESULT CTestRect::Render()
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Begin(0)))
+    if (FAILED(Bind_ShaderValue()))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Begin(ETOUI(VTXTEX_SHADER::ALPHABLEND))))
         return E_FAIL;
    
     if (FAILED(m_pVIBuffer->Render()))
         return E_FAIL;
 
     return S_OK;
+}
+
+HRESULT CTestRect::Bind_ShaderValue()
+{
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bFlipX", &m_bFlipX, sizeof(m_bFlipX))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bFlipY", &m_bFlipY, sizeof(m_bFlipY))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &m_vColor, sizeof(m_vColor))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(m_fAlpha))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bAlphaTest", &m_bAlphaTest, sizeof(m_bAlphaTest))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fTestAlpha", &m_fTestAlpha, sizeof(m_fTestAlpha))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fUVCutRight", &m_fUVCutRight, sizeof(m_fUVCutRight))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fUVCutLeft", &m_fUVCutLeft, sizeof(m_fUVCutLeft))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fUVCutTop", &m_fUVCutTop, sizeof(m_fUVCutTop))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fUVCutBottom", &m_fUVCutBottom, sizeof(m_fUVCutBottom))))
+        return E_FAIL;
 }
 
 HRESULT CTestRect::Ready_Components()
