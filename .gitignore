@@ -435,3 +435,12 @@ AAA/FBX_Converter/Map/*.ysh
 AAA/*.zip
 
 .claude/
+
+# Shader
+!/AAA/Editor/[Bb]in/
+/AAA/Editor/[Bb]in/*
+!/AAA/Editor/[Bb]in/ShaderFiles/
+/AAA/Editor/[Bb]in/ShaderFiles/Engine_Shader_Defines.hlsli
+/AAA/Editor/[Bb]in/ShaderFiles/Shader_Cell.hlsl
+/AAA/Editor/[Bb]in/ShaderFiles/Shader_Deferred.hlsl
+/AAA/Editor/[Bb]in/ShaderFiles/Shader_VtxTex.hlsl
