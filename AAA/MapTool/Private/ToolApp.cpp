@@ -1,0 +1,181 @@
+#include "ToolApp.h"
+#include "ImGui_Manager.h"
+#include "Level_Edit.h"
+
+#include "GameObject_Factory.h"
+
+#include "GameInstance.h"
+#include "Loader_Prototype.h"
+
+// ImGui
+#include "imgui.h"
+#include "imgui_internal.h"          
+#include "imgui_impl_win32.h"
+#include "imgui_impl_dx11.h"
+
+CToolApp::CToolApp()
+{
+}
+
+HRESULT CToolApp::Initialize()
+{
+	if (FAILED(Ready_Engine()))
+		return E_FAIL;
+
+	m_pImGui_Manager = CImGui_Manager::GetInstance();
+	Safe_AddRef(m_pImGui_Manager);
+
+	CLevel_Edit* pPreLevel = CLevel_Edit::Create(m_pDevice, m_pContext);
+	if (nullptr == pPreLevel)
+		return E_FAIL;
+
+	if (FAILED(m_pGI_Proxy->Change_Level(ETOI(TOOL_LEVEL::EDIT), pPreLevel)))
+		return E_FAIL;
+
+	m_pImGui_Manager->ImGui_Initialize(&m_pDevice, &m_pContext, pPreLevel, &m_pSRV);
+
+	if (FAILED(Ready_SharedResources()))
+		return E_FAIL;
+
+	CGameObject_Factory::GetInstance()->RegisterAll();
+
+	if (FAILED(Load_Fonts(m_pGI_Proxy)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+void CToolApp::Update(_float fTimeDelta)
+{
+	m_pGI_Proxy->Update_Engine(fTimeDelta); 
+}
+
+HRESULT CToolApp::Render()
+{
+	Editor_BeginDraw();
+
+	if (FAILED(m_pGI_Proxy->Draw()))
+		return E_FAIL;
+
+	if (FAILED(m_pGI_Proxy->Begin_Draw()))
+		return E_FAIL;
+
+	m_pImGui_Manager->ImGui_Render();
+
+	if (FAILED(m_pGI_Proxy->End_Draw()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CToolApp::Ready_Engine()
+{
+	ENGINE_DESC EngineDesc{};
+	EngineDesc.hInstance		= g_hInstance;
+	EngineDesc.hWnd				= g_hWnd;
+	EngineDesc.eWinMode			= WINMODE::WIN;
+	EngineDesc.iViewportWidth	= g_iWinSizeX;
+	EngineDesc.iViewportHeight	= g_iWinSizeY;
+	EngineDesc.iNumLevels		= max(ETOUI(LEVEL::END), ETOUI(TOOL_LEVEL::END));
+
+	if (FAILED(CGameInstance::Initialize_Engine(EngineDesc, &m_pDevice, &m_pContext)))
+	{
+		MSG_BOX("Failed to Initialize : Engine");
+		return E_FAIL;
+	}
+
+	m_pGI_Proxy = CGameInstance::GetProxy();
+	return S_OK;
+}
+
+HRESULT CToolApp::Ready_EditRTV()
+{
+	if (nullptr == m_pDevice)
+		return E_FAIL;
+
+	D3D11_TEXTURE2D_DESC desc{};
+	desc.Width = m_iViewportWidth;
+	desc.Height = m_iViewportHeight;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	desc.SampleDesc.Count = 1;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+
+	ID3D11Texture2D* pTex = nullptr;
+	if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &pTex)))            
+		return E_FAIL;
+	if (FAILED(m_pDevice->CreateRenderTargetView(pTex, nullptr, &m_pRTV)))
+		return E_FAIL;
+	if (FAILED(m_pDevice->CreateShaderResourceView(pTex, nullptr, &m_pSRV)))
+		return E_FAIL;
+	Safe_Release(pTex);
+
+	D3D11_TEXTURE2D_DESC dsDesc{};
+	dsDesc.Width = m_iViewportWidth;
+	dsDesc.Height = m_iViewportHeight;
+	dsDesc.MipLevels = 1;
+	dsDesc.ArraySize = 1;
+	dsDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	dsDesc.SampleDesc.Count = 1;
+	dsDesc.Usage = D3D11_USAGE_DEFAULT;
+	dsDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+
+	ID3D11Texture2D* pDSTex = nullptr;
+	if (FAILED(m_pDevice->CreateTexture2D(&dsDesc, nullptr, &pDSTex)))        
+		return E_FAIL;
+	if (FAILED(m_pDevice->CreateDepthStencilView(pDSTex, nullptr, &m_pDSV))) 
+		return E_FAIL;
+	Safe_Release(pDSTex);
+
+	return S_OK;
+}
+
+void CToolApp::Editor_BeginDraw()
+{
+	D3D11_VIEWPORT vp{};
+	vp.TopLeftX	= 0;
+	vp.TopLeftY	= 0;
+	vp.Width	= static_cast<_float>(m_iViewportWidth);
+	vp.Height	= static_cast<_float>(m_iViewportHeight);
+	vp.MinDepth	= 0.f;
+	vp.MaxDepth	= 1.f;
+	m_pContext->RSSetViewports(1, &vp);
+
+	_float clearColor[4] = { 0.35f, 0.35f, 0.35f, 1.f };
+	m_pContext->ClearRenderTargetView(m_pRTV, clearColor);
+	m_pContext->ClearDepthStencilView(m_pDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
+	m_pContext->OMSetRenderTargets(1, &m_pRTV, m_pDSV);
+}
+
+CToolApp* CToolApp::Create()
+{
+	CToolApp* pInstance = new CToolApp();
+	if (FAILED(pInstance->Initialize()))
+	{
+		MSG_BOX("Failed to Created : CToolApp");
+		Safe_Release(pInstance);
+	}
+	return pInstance;
+}
+
+void CToolApp::Free()
+{
+	Safe_Release(m_pRTV);
+	Safe_Release(m_pSRV);
+	Safe_Release(m_pDSV);
+
+	Safe_Release(m_pImGui_Manager);
+	ImGui_ImplDX11_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+
+	Safe_Release(m_pGI_Proxy);
+	Safe_Release(m_pDevice);
+	Safe_Release(m_pContext);
+
+	CGameInstance::DestroyInstance();
+
+	__super::Free();
+}
