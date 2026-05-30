@@ -54,21 +54,23 @@ void CTestFiona::Late_Update(_float fTimeDelta)
 HRESULT CTestFiona::Render()
 {
     if (FAILED(Bind_ShaderResources()))
+
         return E_FAIL;
 
     size_t      iNumMeshes = m_pModelCom->Get_NumMeshes();
 
     for (size_t i = 0; i < iNumMeshes; i++)
+    //for (size_t i = 0; i < 1; i++)
     {
         _uint iPassIdx = 0;
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", (_uint)i, MTEX_TYPE::DIFFUSE, 0)))
-            iPassIdx = 1;
+            iPassIdx = 0;
 
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", (_uint)i, MTEX_TYPE::NORMALS, 0)))
-            iPassIdx = 1;
+            iPassIdx = 0;
 
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", (_uint)i, MTEX_TYPE::METALNESS, 0)))
-            iPassIdx = 1;
+            iPassIdx = 0;
 
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnkownTexture", (_uint)i, MTEX_TYPE::UNKNOWN, 0)))
             iPassIdx = 1;
@@ -76,7 +78,7 @@ HRESULT CTestFiona::Render()
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", (_uint)i)))
             return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Begin(iPassIdx)))
+        if (FAILED(m_pShaderCom->Begin(1)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render((_uint)i)))
