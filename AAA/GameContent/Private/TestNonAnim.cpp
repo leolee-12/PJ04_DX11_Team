@@ -43,7 +43,6 @@ void CTestNonAnim::Update(_float fTimeDelta)
 
 void CTestNonAnim::Late_Update(_float fTimeDelta)
 {
-
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 
@@ -56,13 +55,28 @@ HRESULT CTestNonAnim::Render()
 
     for (size_t i = 0; i < iNumMeshes; i++)
     {
-        /*if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", (_uint)i, MTEX_TYPE::DIFFUSE, 0)))
-            return E_FAIL;*/
+        /*Texture2D g_DiffuseTexture;
+        Texture2D g_NormalTexture;
+        Texture2D g_UnkownTexture;
+        Texture2D g_MRATexture;*/
 
-        //if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", (_uint)i)))
-        //    return E_FAIL;
+        _uint iPassIdx = 0;
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", (_uint)i, MTEX_TYPE::DIFFUSE, 0)))
+            iPassIdx = 1;
 
-        if (FAILED(m_pShaderCom->Begin(1)))
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", (_uint)i, MTEX_TYPE::NORMALS, 0)))
+            iPassIdx = 1;
+
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", (_uint)i, MTEX_TYPE::METALNESS, 0)))
+            iPassIdx = 1;
+
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnkownTexture", (_uint)i, MTEX_TYPE::UNKNOWN, 0)))
+            iPassIdx = 1;
+
+        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", (_uint)i)))
+            int a = 1;
+
+        if (FAILED(m_pShaderCom->Begin(0)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render((_uint)i)))
@@ -74,11 +88,11 @@ HRESULT CTestNonAnim::Render()
 
 HRESULT CTestNonAnim::Ready_Components()
 {
-    m_pShaderCom = Add_Component<CShader>(Shader_VtxMesh.iLevelID, Shader_VtxMesh.szProtoTag, TEXT("Com_Shader"));
+    m_pShaderCom = Add_Component<CShader>(Shader_NonAnimMesh_PBR.iLevelID, Shader_NonAnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
     if (nullptr == m_pShaderCom)
         return E_FAIL;
 
-    m_pModelCom = Add_Component<CModel>(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LumiaNavi"), TEXT("Com_Model"));
+    m_pModelCom = Add_Component<CModel>(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_NonAnim"), TEXT("Com_Model"));
     if (nullptr == m_pModelCom)
         return E_FAIL;
 
@@ -94,22 +108,6 @@ HRESULT CTestNonAnim::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance_Proxy->Get_CamPosition(), sizeof(_float4))))
-        return E_FAIL;
-
-    const LIGHT_DESC* pLightDesc = m_pGameInstance_Proxy->Get_LightDesc(0);
-    if (nullptr == pLightDesc)
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
         return E_FAIL;
 
     return S_OK;

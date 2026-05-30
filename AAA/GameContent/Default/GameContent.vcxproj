@@ -44,6 +44,8 @@
     <ClCompile Include="..\private\TestRect.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
