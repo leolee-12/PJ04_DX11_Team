@@ -20,3 +20,8 @@ xcopy			/y		.\Engine\ShaderFiles\*.*				.\GameContent\ShaderFiles\
 xcopy			/y /s	.\GameContent\ShaderFiles\*.*			.\Launcher\Bin\ShaderFiles\
 xcopy			/y /s	.\GameContent\ShaderFiles\*.*			.\Editor\Bin\ShaderFiles\
 
+xcopy                 /y              .\Engine\Bin\*.dll                                              .\AnimUITool\Bin\
+  xcopy                 /y              .\Engine\ThirdPartyLib\*.dll                    .\AnimUITool\Bin\
+  xcopy                 /y              .\GameContent\Bin\*.dll                                 .\AnimUITool\Bin\
+  xcopy                 /y /s   .\GameContent\ShaderFiles\*.*                   .\AnimUITool\Bin\ShaderFiles\
+
