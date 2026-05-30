@@ -3,18 +3,21 @@
 
 NS_BEGIN(Engine)
 
-class ENGINE_DLL CEffect abstract : public CGameObject
+class ENGINE_DLL CEffect_Part abstract : public CGameObject
 {
 public:
-    struct EFFECT_DESC : public CGameObject::GAMEOBJECT_DESC
+    struct EFFECT_PART_DESC : public CGameObject::GAMEOBJECT_DESC
     {
-        _float4x4* pParentMatrix{};
+        _float fStartRatio{};
+        _float fEndRatio{};
+
+        _float3 vLocalPos;
     };
 
 protected:
-    CEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-    CEffect(const CEffect& Prototype);
-    virtual ~CEffect() = default;
+    CEffect_Part(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    CEffect_Part(const CEffect_Part& Prototype);
+    virtual ~CEffect_Part() = default;
 
 protected:
     HRESULT Initialize_Prototype() override;
@@ -27,15 +30,13 @@ public:
     virtual HRESULT Render() override;
 
 protected:
-    _float m_fTotlaTime{};
     _float m_fAccTime{};
+    _float m_fDelayTime{};
+    _float m_fDuration{ 1.f };
 
-    _float m_fPlaySpeed{};
-
+    _bool m_bIsPlay{};
+    _bool m_bActive{};
     _bool m_bLoop{};
-    _bool m_bIsFinished{};
-
-    _float4x4* m_pParentMatrix{};
 
 protected:
     virtual void Free() override;

@@ -186,7 +186,9 @@
     <ClInclude Include="..\Public\DataLoader.h" />
     <ClInclude Include="..\Public\DebugDraw.h" />
     <ClInclude Include="..\public\Effect.h" />
+    <ClInclude Include="..\Public\Effect_Part.h" />
     <ClInclude Include="..\public\Effect_Manager.h" />
+    <ClInclude Include="..\Public\Effect_Quad.h" />
     <ClInclude Include="..\Public\Engine_Defines.h" />
     <ClInclude Include="..\Public\Engine_Enum.h" />
     <ClInclude Include="..\Public\Engine_Function.h" />
@@ -263,7 +265,9 @@
     <ClCompile Include="..\Private\DataLoader.cpp" />
     <ClCompile Include="..\Private\DebugDraw.cpp" />
     <ClCompile Include="..\private\Effect.cpp" />
+    <ClCompile Include="..\Private\Effect_Part.cpp" />
     <ClCompile Include="..\private\Effect_Manager.cpp" />
+    <ClCompile Include="..\Private\Effect_Quad.cpp" />
     <ClCompile Include="..\private\EventBus.cpp" />
     <ClCompile Include="..\Private\Font_Manager.cpp" />
     <ClCompile Include="..\private\GameInstance.cpp" />

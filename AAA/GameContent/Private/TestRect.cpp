@@ -2,7 +2,6 @@
 
 #include "GameInstance.h"
 #include "GameContent_const.h"
-#include "Navigation.h"
 
 CTestRect::CTestRect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
@@ -17,7 +16,6 @@ CTestRect::CTestRect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     , m_fUVCutTop(0.f)
     , m_fUVCutBottom(1.f)
 {
-
 }
 
 CTestRect::CTestRect(const CTestRect& Prototype)
@@ -33,7 +31,6 @@ CTestRect::CTestRect(const CTestRect& Prototype)
     , m_fUVCutTop(0.f)
     , m_fUVCutBottom(0.f)
 {
-
 }
 
 HRESULT CTestRect::Initialize_Prototype()
@@ -91,6 +88,7 @@ HRESULT CTestRect::Bind_ShaderValue()
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &m_vColor, sizeof(m_vColor))))
         return E_FAIL;
+
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(m_fAlpha))))
         return E_FAIL;
 
@@ -108,6 +106,8 @@ HRESULT CTestRect::Bind_ShaderValue()
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fUVCutBottom", &m_fUVCutBottom, sizeof(m_fUVCutBottom))))
         return E_FAIL;
+
+    return S_OK;
 }
 
 HRESULT CTestRect::Ready_Components()

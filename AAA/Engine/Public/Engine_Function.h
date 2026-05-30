@@ -72,6 +72,17 @@ namespace Engine
 		MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, &wstr[0], size);
 		return wstr;
 	}
+
+	namespace Helper
+	{
+		inline void FloatClamp(float& fFloat, const float& fMin, const float& fMax)
+		{
+			if (fFloat > fMax)
+				fFloat = fMax;
+			else if (fFloat < fMin)
+				fFloat = fMin;
+		}
+	}
 }
 
 #endif // Engine_Function_h__
