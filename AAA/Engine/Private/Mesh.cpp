@@ -124,6 +124,9 @@ HRESULT CMesh::Ready_NonAnim(const MESH_DATA& data, _fmatrix PreTransformMatrix)
         const VTXMESH_DATA& src = data.NonAnimVertices[i];
 
         pVertices[i].vTexcoord = src.vTexcoord;
+        pVertices[i].vTexcoord1 = src.vTexcoord1;   
+        pVertices[i].vTexcoord2 = src.vTexcoord2;   
+        pVertices[i].vTexcoord3 = src.vTexcoord3;
 
         XMStoreFloat3(&pVertices[i].vPosition,
             XMVector3TransformCoord(XMLoadFloat3(&src.vPosition), PreTransformMatrix));
@@ -204,6 +207,9 @@ HRESULT CMesh::Ready_Anim(CModel* pOwner, const MESH_DATA& data)
         pVertices[i].vPosition = src.vPosition;
         pVertices[i].vNormal = src.vNormal;
         pVertices[i].vTexcoord = src.vTexcoord;
+        pVertices[i].vTexcoord1 = src.vTexcoord1;
+        pVertices[i].vTexcoord2 = src.vTexcoord2;
+        pVertices[i].vTexcoord3 = src.vTexcoord3;
         pVertices[i].vTangent = src.vTangent;
         pVertices[i].vBinormal = src.vBinormal;
         pVertices[i].vBlendIndex = src.vBlendIndex;
