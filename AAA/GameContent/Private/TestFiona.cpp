@@ -60,14 +60,23 @@ HRESULT CTestFiona::Render()
 
     for (size_t i = 0; i < iNumMeshes; i++)
     {
-        _uint _iPassIdx = 0;
+        _uint iPassIdx = 0;
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", (_uint)i, MTEX_TYPE::DIFFUSE, 0)))
-            _iPassIdx = 1;
+            iPassIdx = 1;
+
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", (_uint)i, MTEX_TYPE::NORMALS, 0)))
+            iPassIdx = 1;
+
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", (_uint)i, MTEX_TYPE::METALNESS, 0)))
+            iPassIdx = 1;
+
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnkownTexture", (_uint)i, MTEX_TYPE::UNKNOWN, 0)))
+            iPassIdx = 1;
 
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", (_uint)i)))
             return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Begin(_iPassIdx)))
+        if (FAILED(m_pShaderCom->Begin(iPassIdx)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render((_uint)i)))

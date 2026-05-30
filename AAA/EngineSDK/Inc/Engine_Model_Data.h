@@ -8,6 +8,9 @@ namespace Engine
 		XMFLOAT3 vPosition;
 		XMFLOAT3 vNormal;
 		XMFLOAT2 vTexcoord;
+		XMFLOAT2 vTexcoord1;   // 추가
+		XMFLOAT2 vTexcoord2;   // 추가
+		XMFLOAT2 vTexcoord3;
 		XMFLOAT3 vTangent;
 		XMFLOAT3 vBinormal;
 	}VTXMESH_DATA;
@@ -17,6 +20,9 @@ namespace Engine
 		XMFLOAT3 vPosition;
 		XMFLOAT3 vNormal;
 		XMFLOAT2 vTexcoord;
+		XMFLOAT2 vTexcoord1;
+		XMFLOAT2 vTexcoord2;
+		XMFLOAT2 vTexcoord3;
 		XMFLOAT3 vTangent;
 		XMFLOAT3 vBinormal;
 		XMUINT4  vBlendIndex;   // 메시 로컬 본 인덱스 (0..num_bones-1)
