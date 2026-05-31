@@ -19,15 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Private\ImGui_Manager.cpp" />
+    <ClCompile Include="..\Private\EditInstance.cpp" />
     <ClCompile Include="..\Private\Level_Edit.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\ToolApp.cpp" />
     <ClCompile Include="..\Private\EditCamera.cpp" />
     <ClCompile Include="..\Private\Edit_Grid.cpp" />
-    <ClCompile Include="..\Private\Level_Tool.cpp" />
     <ClCompile Include="..\Private\Panel.cpp" />
+    <ClCompile Include="..\Private\Panel_Toolbar.cpp" />
+    <ClCompile Include="..\Private\Panel_Palette.cpp" />
+    <ClCompile Include="..\Private\Panel_NavMesh.cpp" />
     <ClCompile Include="..\Private\Panel_Console.cpp" />
     <ClCompile Include="..\Private\Panel_Hierarchy.cpp" />
     <ClCompile Include="..\Private\Panel_Inspector.cpp" />
@@ -44,7 +46,7 @@
     <ClCompile Include="MapTool.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Public\ImGui_Manager.h" />
+    <ClInclude Include="..\Public\EditInstance.h" />
     <ClInclude Include="..\Public\Level_Edit.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Loader.h" />
@@ -55,8 +57,10 @@
     <ClInclude Include="..\Public\MapTool_Struct.h" />
     <ClInclude Include="..\Public\EditCamera.h" />
     <ClInclude Include="..\Public\Edit_Grid.h" />
-    <ClInclude Include="..\Public\Level_Tool.h" />
     <ClInclude Include="..\Public\Panel.h" />
+    <ClInclude Include="..\Public\Panel_Toolbar.h" />
+    <ClInclude Include="..\Public\Panel_Palette.h" />
+    <ClInclude Include="..\Public\Panel_NavMesh.h" />
     <ClInclude Include="..\Public\Panel_Console.h" />
     <ClInclude Include="..\Public\Panel_Hierarchy.h" />
     <ClInclude Include="..\Public\Panel_Inspector.h" />
@@ -174,6 +178,9 @@
       <AdditionalLibraryDirectories>../../EngineSDK/Lib/;../../ContentSDK/Lib/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Engine.lib;GameContent.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>cd /d $(SolutionDir)&amp;&amp;call UpdateLib.bat</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

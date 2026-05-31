@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "MapTool_Defines.h"
 #include "Base.h"
 
@@ -7,7 +7,7 @@ class CGameInstance_Proxy;
 NS_END
 
 NS_BEGIN(MapTool)
-class CImGui_Manager;
+class CEditInstance;
 
 class CToolApp final : public CBase
 {
@@ -25,7 +25,7 @@ private:
 	ID3D11Device*				m_pDevice = { nullptr };
 	ID3D11DeviceContext*		m_pContext = { nullptr };
 
-	CImGui_Manager*				m_pImGui_Manager = { nullptr };
+	CEditInstance*				m_pEditInstance = { nullptr };
 
 	ID3D11RenderTargetView*		m_pRTV = { nullptr };
 	ID3D11ShaderResourceView*	m_pSRV = { nullptr };
@@ -36,10 +36,10 @@ private:
 
 private:
 	HRESULT Ready_Engine();
-	HRESULT	Ready_SharedResources();
+	HRESULT	Init_ImGui();
 	HRESULT	Ready_EditRTV();
-	HRESULT	Start_Level();
 	void	Editor_BeginDraw();
+	void	Draw_LoadingOverlay();
 
 public:
 	static CToolApp* Create();

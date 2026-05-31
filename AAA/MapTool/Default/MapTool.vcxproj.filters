@@ -93,8 +93,14 @@
     <ClInclude Include="..\Public\ToolApp.h">
       <Filter>00. App</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Level_Tool.h">
-      <Filter>01. Levels\Tool</Filter>
+    <ClInclude Include="..\Public\Panel_Toolbar.h">
+      <Filter>03. Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_Palette.h">
+      <Filter>03. Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_NavMesh.h">
+      <Filter>03. Panels</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EditCamera.h">
       <Filter>02. Objects\Camera</Filter>
@@ -114,8 +120,8 @@
     <ClInclude Include="targetver.h">
       <Filter>98. Default</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\ImGui_Manager.h">
-      <Filter>97. ImGui\Manager</Filter>
+    <ClInclude Include="..\Public\EditInstance.h">
+      <Filter>00. App</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Edit.h">
       <Filter>01. Levels\Edit</Filter>
@@ -173,8 +179,14 @@
     <ClCompile Include="..\Private\ToolApp.cpp">
       <Filter>00. App</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Level_Tool.cpp">
-      <Filter>01. Levels\Tool</Filter>
+    <ClCompile Include="..\Private\Panel_Toolbar.cpp">
+      <Filter>03. Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Palette.cpp">
+      <Filter>03. Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_NavMesh.cpp">
+      <Filter>03. Panels</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EditCamera.cpp">
       <Filter>02. Objects\Camera</Filter>
@@ -185,8 +197,8 @@
     <ClCompile Include="MapTool.cpp">
       <Filter>98. Default</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\ImGui_Manager.cpp">
-      <Filter>97. ImGui\Manager</Filter>
+    <ClCompile Include="..\Private\EditInstance.cpp">
+      <Filter>00. App</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Edit.cpp">
       <Filter>01. Levels\Edit</Filter>

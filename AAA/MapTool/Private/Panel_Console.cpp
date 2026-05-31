@@ -1,7 +1,5 @@
-#include "Panel_Console.h"
+癤�#include "Panel_Console.h"
 #include "imgui.h"
-
-using namespace AnimUITool;
 
 CPanel_Console::CPanel_Console(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPanel(pDevice, pContext)
@@ -11,10 +9,13 @@ CPanel_Console::CPanel_Console(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 
 void CPanel_Console::Render()
 {
-    ImGui::Begin(m_szName);
+    if (!Begin_Panel())
+    {
+        End_Panel();
+        return;
+    }
 
-    // 레벨 토글 버튼 (켜짐=색상, 꺼짐=회색)
-    auto FilterButton = [](const char* szLabel, bool& bShow, ImVec4 vOnColor)
+    auto FilterButton = [](const char* szLabel, _bool& bShow, ImVec4 vOnColor)
         {
             ImGui::PushStyleColor(ImGuiCol_Button, bShow ? vOnColor : ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
             if (ImGui::SmallButton(szLabel))
@@ -43,17 +44,17 @@ void CPanel_Console::Render()
         case LOG_LEVEL::INFO:    vColor = ImVec4(0.8f, 0.8f, 0.8f, 1.0f); szPrefix = "[Info]    "; break;
         case LOG_LEVEL::WARNING: vColor = ImVec4(1.0f, 0.9f, 0.3f, 1.0f); szPrefix = "[Warning] "; break;
         case LOG_LEVEL::ERROR_:  vColor = ImVec4(1.0f, 0.3f, 0.3f, 1.0f); szPrefix = "[Error]   "; break;
-        default:                 vColor = ImVec4(1, 1, 1, 1);                                     break;
+        default:                 vColor = ImVec4(1, 1, 1, 1);                                       break;
         }
         ImGui::TextColored(vColor, "%s%s", szPrefix, Entry.strMessage.c_str());
     }
 
-    // 맨 아래에 있을 때만 자동 스크롤 (사용자가 위로 올리면 따라가지 않음)
     if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
         ImGui::SetScrollHereY(1.0f);
 
     ImGui::EndChild();
-    ImGui::End();
+
+    End_Panel();
 }
 
 CPanel_Console* CPanel_Console::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -61,7 +62,7 @@ CPanel_Console* CPanel_Console::Create(ID3D11Device* pDevice, ID3D11DeviceContex
     return new CPanel_Console(pDevice, pContext);
 }
 
-void CPanel_Console::Free() 
-{ 
+void CPanel_Console::Free()
+{
     __super::Free();
 }

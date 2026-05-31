@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "MapTool_Defines.h"
 #include "Level.h"
 

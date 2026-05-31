@@ -1,4 +1,4 @@
-#include "Edit_Grid.h"
+ï»¿#include "Edit_Grid.h"
 #include "Shader.h"
 
 const D3D11_INPUT_ELEMENT_DESC CEdit_Grid::s_Elements[2] =
@@ -19,7 +19,7 @@ void CEdit_Grid::Render(const _float4x4* pView, const _float4x4* pProj)
 {
 	if (!m_pShader || !m_pVB) return;
 
-	// ¿ùµå Çà·ÄÀº Ç×µîÇà·Ä (±×¸®µå´Â ¿ùµå ¿øÁ¡¿¡ °íÁ¤)
+	// ì›”ë“œ í–‰ë ¬ì€ í•­ë“±í–‰ë ¬ (ê·¸ë¦¬ë“œëŠ” ì›”ë“œ ì›ì ì— ê³ ì •)
 	_float4x4 matWorld;
 	XMStoreFloat4x4(&matWorld, XMMatrixIdentity());
 

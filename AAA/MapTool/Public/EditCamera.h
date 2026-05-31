@@ -1,8 +1,8 @@
-#pragma once
-#include "AnimUITool_Defines.h"
+﻿#pragma once
+#include "MapTool_Defines.h"
 #include "Camera.h"
 
-NS_BEGIN(AnimUITool)
+NS_BEGIN(MapTool)
 
 class CEditCamera final : public Engine::CCamera
 {
@@ -32,7 +32,7 @@ public:
     }
 
 public:
-    void Set_Active(_bool b) { m_bActive = b; }
+     void Set_Active(_bool b) { m_bActive = b; }
 
 private:
     _float m_fMouseSensor = {};

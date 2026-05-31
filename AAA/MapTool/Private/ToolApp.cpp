@@ -1,15 +1,13 @@
-#include "ToolApp.h"
-#include "ImGui_Manager.h"
-#include "Level_Edit.h"
+﻿#include "ToolApp.h"
+
+#include "EditInstance.h"
+#include "Level_Loading.h"
 
 #include "GameObject_Factory.h"
-
 #include "GameInstance.h"
-#include "Loader_Prototype.h"
 
-// ImGui
 #include "imgui.h"
-#include "imgui_internal.h"          
+#include "imgui_internal.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 
@@ -22,24 +20,29 @@ HRESULT CToolApp::Initialize()
 	if (FAILED(Ready_Engine()))
 		return E_FAIL;
 
-	m_pImGui_Manager = CImGui_Manager::GetInstance();
-	Safe_AddRef(m_pImGui_Manager);
-
-	CLevel_Edit* pPreLevel = CLevel_Edit::Create(m_pDevice, m_pContext);
-	if (nullptr == pPreLevel)
+	if (FAILED(Ready_EditRTV()))
 		return E_FAIL;
 
-	if (FAILED(m_pGI_Proxy->Change_Level(ETOI(TOOL_LEVEL::EDIT), pPreLevel)))
+	if (FAILED(Init_ImGui()))
 		return E_FAIL;
 
-	m_pImGui_Manager->ImGui_Initialize(&m_pDevice, &m_pContext, pPreLevel, &m_pSRV);
+	// 공유 상태 허브 (씬 SRV 등록)
+	m_pEditInstance = CEditInstance::GetInstance();
+	Safe_AddRef(m_pEditInstance);
+	m_pEditInstance->Set_SceneSRV(m_pSRV);
 
-	if (FAILED(Ready_SharedResources()))
+	if (FAILED(m_pEditInstance->Initialize(m_pDevice, m_pContext)))
 		return E_FAIL;
 
+	// 팩토리 레시피 등록(배치 팔레트/인스펙터 자동 연동)
 	CGameObject_Factory::GetInstance()->RegisterAll();
 
-	if (FAILED(Load_Fonts(m_pGI_Proxy)))
+	// 로딩 레벨 진입 → 워커가 공용 리소스/셰이더/폰트 적재 → 완료 시 EDIT 자동 전환
+	CLevel_Loading* pLoading = CLevel_Loading::Create(m_pDevice, m_pContext, TOOL_LEVEL::EDIT);
+	if (nullptr == pLoading)
+		return E_FAIL;
+
+	if (FAILED(m_pGI_Proxy->Change_Level(ETOI(TOOL_LEVEL::LOADING), pLoading)))
 		return E_FAIL;
 
 	return S_OK;
@@ -47,20 +50,43 @@ HRESULT CToolApp::Initialize()
 
 void CToolApp::Update(_float fTimeDelta)
 {
-	m_pGI_Proxy->Update_Engine(fTimeDelta); 
+	m_pGI_Proxy->Update_Engine(fTimeDelta);
+
+	if (!m_pEditInstance->Is_Loading())
+		m_pEditInstance->Update_Panels(fTimeDelta);
 }
 
 HRESULT CToolApp::Render()
 {
+	// 1) 엔진 씬을 오프스크린 RTV에 렌더
 	Editor_BeginDraw();
 
 	if (FAILED(m_pGI_Proxy->Draw()))
 		return E_FAIL;
 
+	// 2) ImGui 프레임 (로딩 중에는 오버레이만, 그 외에는 패널)
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+
+	if (m_pEditInstance->Is_Loading())
+		Draw_LoadingOverlay();
+	else
+		m_pEditInstance->Render_Panels();
+
+	ImGui::Render();
+
+	// 3) 백버퍼에 ImGui 출력
 	if (FAILED(m_pGI_Proxy->Begin_Draw()))
 		return E_FAIL;
 
-	m_pImGui_Manager->ImGui_Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
+	}
 
 	if (FAILED(m_pGI_Proxy->End_Draw()))
 		return E_FAIL;
@@ -88,6 +114,53 @@ HRESULT CToolApp::Ready_Engine()
 	return S_OK;
 }
 
+HRESULT CToolApp::Init_ImGui()
+{
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+	io.IniFilename = nullptr;   // 도킹 레이아웃은 Panel_Manager가 DockBuilder로 구성
+
+	io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\malgun.ttf", 15.0f, nullptr, io.Fonts->GetGlyphRangesKorean());
+
+	ImGui::StyleColorsDark();
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		style.WindowRounding = 0.0f;
+		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+	}
+
+	ImGui_ImplWin32_Init(g_hWnd);
+	ImGui_ImplDX11_Init(m_pDevice, m_pContext);
+
+	return S_OK;
+}
+
+void CToolApp::Draw_LoadingOverlay()
+{
+	ImGuiViewport* vp = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(vp->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+	ImGui::SetNextWindowBgAlpha(0.85f);
+
+	ImGuiWindowFlags flags =
+		ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize |
+		ImGuiWindowFlags_NoDocking;
+
+	if (ImGui::Begin("##LoadingOverlay", nullptr, flags))
+	{
+		ImGui::Text("Loading Map Tool...");
+		ImGui::ProgressBar(m_pEditInstance->Get_LoadProgress(), ImVec2(320.f, 0.f));
+	}
+	ImGui::End();
+}
+
 HRESULT CToolApp::Ready_EditRTV()
 {
 	if (nullptr == m_pDevice)
@@ -104,7 +177,7 @@ HRESULT CToolApp::Ready_EditRTV()
 	desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 
 	ID3D11Texture2D* pTex = nullptr;
-	if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &pTex)))            
+	if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &pTex)))
 		return E_FAIL;
 	if (FAILED(m_pDevice->CreateRenderTargetView(pTex, nullptr, &m_pRTV)))
 		return E_FAIL;
@@ -123,9 +196,9 @@ HRESULT CToolApp::Ready_EditRTV()
 	dsDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
 	ID3D11Texture2D* pDSTex = nullptr;
-	if (FAILED(m_pDevice->CreateTexture2D(&dsDesc, nullptr, &pDSTex)))        
+	if (FAILED(m_pDevice->CreateTexture2D(&dsDesc, nullptr, &pDSTex)))
 		return E_FAIL;
-	if (FAILED(m_pDevice->CreateDepthStencilView(pDSTex, nullptr, &m_pDSV))) 
+	if (FAILED(m_pDevice->CreateDepthStencilView(pDSTex, nullptr, &m_pDSV)))
 		return E_FAIL;
 	Safe_Release(pDSTex);
 
@@ -162,11 +235,13 @@ CToolApp* CToolApp::Create()
 
 void CToolApp::Free()
 {
+	Safe_Release(m_pEditInstance);
+	CEditInstance::DestroyInstance();
+
 	Safe_Release(m_pRTV);
 	Safe_Release(m_pSRV);
 	Safe_Release(m_pDSV);
 
-	Safe_Release(m_pImGui_Manager);
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
@@ -176,6 +251,7 @@ void CToolApp::Free()
 	Safe_Release(m_pContext);
 
 	CGameInstance::DestroyInstance();
+	CGameObject_Factory::DestroyInstance();
 
 	__super::Free();
 }

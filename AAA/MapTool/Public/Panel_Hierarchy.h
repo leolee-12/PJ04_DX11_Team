@@ -1,8 +1,7 @@
-#pragma once
-
+﻿#pragma once
 #include "Panel.h"
 
-NS_BEGIN(AnimUITool)
+NS_BEGIN(MapTool)
 
 class CPanel_Hierarchy final : public CPanel
 {

@@ -1,7 +1,11 @@
-#pragma once
+﻿#pragma once
 #include "Panel.h"
 
-NS_BEGIN(AnimUITool)
+NS_BEGIN(Engine)
+class CGameObject;
+NS_END
+
+NS_BEGIN(MapTool)
 
 class CPanel_Viewport final : public CPanel
 {
@@ -10,18 +14,14 @@ private:
 	virtual ~CPanel_Viewport() = default;
 
 public:
-	_bool						Is_Hovered() const { return m_bHovered; }
-
-public:
 	virtual void				Render() override;
-	void						Set_SRV(ID3D11ShaderResourceView* pSRV);
 
 private:
-	ID3D11ShaderResourceView*	m_pSRV = { nullptr };
-
-private:
+	// 오프스크린 씬 텍스처는 CEditInstance 가 보유(App 소유). 매 프레임 그쪽에서 읽어온다.
 	static constexpr _float		m_fTargetAspect = { 1600.f / 900.f };
-	_bool						m_bHovered = { false };
+
+private:
+	void						Draw_Gizmo(CGameObject* pSelected, const ImVec2& vImagePos, const ImVec2& vImageSize);
 
 public:
 	static CPanel_Viewport*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -1,7 +1,28 @@
-#include "Panel_Viewport.h"
-#include "imgui.h"
+﻿#include "Panel_Viewport.h"
 
-using namespace AnimUITool;
+#include "EditInstance.h"
+#include "Level_Edit.h"
+
+#include "GameInstance.h"
+#include "GameObject.h"
+#include "Transform.h"
+#include "GameContrnt_Events.h"     // UI_RBTN_PROBE / WORLD_RBTN_DOWN
+
+#include "imgui.h"
+#include "ImGuizmo.h"
+
+namespace
+{
+    ImGuizmo::OPERATION ToImGuizmoOp(MapTool::GIZMO_OP eOp)
+    {
+        switch (eOp)
+        {
+        case MapTool::GIZMO_OP::ROTATE: return ImGuizmo::ROTATE;
+        case MapTool::GIZMO_OP::SCALE:  return ImGuizmo::SCALE;
+        default:                        return ImGuizmo::TRANSLATE;
+        }
+    }
+}
 
 CPanel_Viewport::CPanel_Viewport(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPanel(pDevice, pContext)
@@ -11,53 +32,156 @@ CPanel_Viewport::CPanel_Viewport(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 void CPanel_Viewport::Render()
 {
-    ImGui::Begin(m_szName);
-
-    ImVec2 vAvail = ImGui::GetContentRegionAvail();
-    if (vAvail.x >= 1.f && vAvail.y >= 1.f)
+    if (!Begin_Panel())
     {
-        const float fAvailAspect = vAvail.x / vAvail.y;
-        ImVec2 vSize;
-        if (fAvailAspect > m_fTargetAspect) { vSize.y = vAvail.y; vSize.x = vAvail.y * m_fTargetAspect; }
-        else { vSize.x = vAvail.x; vSize.y = vAvail.x / m_fTargetAspect; }
-
-        ImVec2 vOffset((vAvail.x - vSize.x) * 0.5f, (vAvail.y - vSize.y) * 0.5f);
-        ImVec2 vCursor = ImGui::GetCursorPos();
-        ImGui::SetCursorPos(ImVec2(vCursor.x + vOffset.x, vCursor.y + vOffset.y));
-
-        ImVec2 vImagePos = ImGui::GetCursorScreenPos();
-
-        if (m_pSRV)
-            ImGui::Image((ImTextureID)m_pSRV, vSize);
-        else
-            ImGui::Dummy(vSize);
-
-        m_bHovered = ImGui::IsItemHovered();
-
-        if (ImGui::IsItemHovered())
-        {
-            ImVec2 m = ImGui::GetMousePos();
-            float ndcX = ((m.x - vImagePos.x) / vSize.x) * 2.f - 1.f;
-            float ndcY = 1.f - ((m.y - vImagePos.y) / vSize.y) * 2.f;
-            ImGui::SetTooltip("NDC: %.2f, %.2f", ndcX, ndcY);
-        }
-        else
-            m_bHovered = false;
+        End_Panel();
+        return;
     }
 
-    ImGui::End();
+    CEditInstance* pEI = CEditInstance::GetInstance();
+
+    ImVec2 vAvail = ImGui::GetContentRegionAvail();
+    if (vAvail.x < 1.f || vAvail.y < 1.f)
+    {
+        End_Panel();
+        return;
+    }
+
+    // 16:9 종횡비 유지 레터박스
+    _float fAvailAspect = vAvail.x / vAvail.y;
+    ImVec2 vSize = {};
+    if (fAvailAspect > m_fTargetAspect)
+    {
+        vSize.y = vAvail.y;
+        vSize.x = vAvail.y * m_fTargetAspect;
+    }
+    else
+    {
+        vSize.x = vAvail.x;
+        vSize.y = vAvail.x / m_fTargetAspect;
+    }
+
+    ImVec2 vOffset((vAvail.x - vSize.x) * 0.5f, (vAvail.y - vSize.y) * 0.5f);
+    ImVec2 vCursor = ImGui::GetCursorPos();
+    ImGui::SetCursorPos(ImVec2(vCursor.x + vOffset.x, vCursor.y + vOffset.y));
+
+    ImVec2 vPos = ImGui::GetCursorScreenPos();
+
+    ID3D11ShaderResourceView* pSRV = pEI->Get_SceneSRV();
+    if (pSRV)
+        ImGui::Image((ImTextureID)pSRV, vSize);
+    else
+        ImGui::Dummy(vSize);
+
+    // 뷰포트 스크린 사각형 공유(오버레이/피킹용)
+    pEI->Set_ViewportRect(_float2(vPos.x, vPos.y), _float2(vSize.x, vSize.y));
+
+    CLevel_Edit* pLevel = pEI->Get_Level();
+    if (nullptr == pLevel)
+    {
+        End_Panel();
+        return;
+    }
+
+    _bool bRightHeld = ImGui::IsWindowHovered() && ImGui::IsMouseDown(ImGuiMouseButton_Right);
+    _bool bImageHovered = ImGui::IsItemHovered();
+
+    if (bImageHovered && !bRightHeld && !ImGuizmo::IsOver())
+    {
+        ImVec2 mouse = ImGui::GetMousePos();
+
+        // 이미지 로컬 좌표 → NDC
+        _float ndcX = ((mouse.x - vPos.x) / vSize.x) * 2.f - 1.f;
+        _float ndcY = 1.f - ((mouse.y - vPos.y) / vSize.y) * 2.f;
+
+        XMVECTOR origin, dir;
+        m_pGI_Proxy->Compute_PickingRay(ndcX, ndcY, &origin, &dir);
+
+        // 좌클릭 배치
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+            pLevel->Pick_And_Place(origin, dir);
+
+        if (m_pGI_Proxy->Mouse_Down(DIMB::WHEEL))
+        {
+            _float2 vNDC = { ndcX, ndcY };
+            UI_RBTN_PROBE eProbe = { vNDC, false };
+            m_pGI_Proxy->Publish(TEXT("UI_RButton_Probe"), &eProbe);
+
+            if (eProbe.bConsumed)
+            {
+                End_Panel();
+                return;
+            }
+
+            WORLD_RBTN_DOWN eEvent = { vNDC };
+            m_pGI_Proxy->Publish(TEXT("World_RButton_Click"), &eEvent);
+        }
+
+        // ESC : 배치 모드 취소
+        if (ImGui::IsKeyPressed(ImGuiKey_Escape))
+            pLevel->End_PlaceMode();
+    }
+
+    pLevel->Set_CameraActive(bRightHeld);
+
+    CGameObject* pSelected = pLevel->Get_Selected();
+    if (pSelected)
+        Draw_Gizmo(pSelected, vPos, vSize);
+
+    End_Panel();
 }
 
-void CPanel_Viewport::Set_SRV(ID3D11ShaderResourceView* pSRV)
+void CPanel_Viewport::Draw_Gizmo(CGameObject* pSelected, const ImVec2& vImagePos, const ImVec2& vImageSize)
 {
-    if (m_pSRV == pSRV)
+    ImGuizmo::BeginFrame();
+    ImGuizmo::Enable(true);
+
+    // 이 패널의 DrawList에 기즈모를 그린다.
+    ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+    ImGuizmo::SetRect(vImagePos.x, vImagePos.y, vImageSize.x, vImageSize.y);
+
+    PROJ_TYPE eProjType = pSelected->Get_ProjType();
+    ImGuizmo::SetOrthographic(eProjType == PROJ_TYPE::ORTHO);
+
+    const _float4x4* pView = m_pGI_Proxy->Get_Matrix(D3DTS::VIEW, eProjType);
+    const _float4x4* pProj = m_pGI_Proxy->Get_Matrix(D3DTS::PROJ, eProjType);
+    if (!pView || !pProj)
         return;
 
-    Safe_Release(m_pSRV);
+    CTransform* pTransform = pSelected->Get_Transform();
+    _float4x4 matWorld = *pTransform->Get_WorldMatrixPtr();
 
-    m_pSRV = pSRV;
+    ImGuizmo::OPERATION eOp = ToImGuizmoOp(CEditInstance::GetInstance()->Get_GizmoOp());
 
-    Safe_AddRef(m_pSRV);
+    _float snap[3] = { 0, 0, 0 };
+    if (eOp == ImGuizmo::TRANSLATE && eProjType == PROJ_TYPE::ORTHO)
+        snap[0] = snap[1] = snap[2] = 1.f;
+
+    ImGuizmo::Manipulate(
+        (float*)pView,
+        (float*)pProj,
+        eOp,
+        ImGuizmo::LOCAL,
+        (float*)&matWorld,
+        nullptr, snap);
+
+    if (ImGuizmo::IsUsing())
+    {
+        if (eOp == ImGuizmo::TRANSLATE && eProjType == PROJ_TYPE::ORTHO)
+        {
+            _float4 OriginPos = {};
+            XMStoreFloat4(&OriginPos, pTransform->Get_State(STATE::POSITION));
+
+            _float3 MovePos = {};
+            memcpy(&MovePos, matWorld.m[3], sizeof(_float3));
+
+            _float3 FixedPos = MovePos;
+            FixedPos.z = OriginPos.z;
+
+            memcpy(matWorld.m[3], &FixedPos, sizeof(_float3));
+        }
+        pTransform->Set_WorldMatrix(XMLoadFloat4x4(&matWorld));
+    }
 }
 
 CPanel_Viewport* CPanel_Viewport::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -65,9 +189,7 @@ CPanel_Viewport* CPanel_Viewport::Create(ID3D11Device* pDevice, ID3D11DeviceCont
     return new CPanel_Viewport(pDevice, pContext);
 }
 
-void CPanel_Viewport::Free() 
+void CPanel_Viewport::Free()
 {
-    Safe_Release(m_pSRV);
-
     __super::Free();
 }

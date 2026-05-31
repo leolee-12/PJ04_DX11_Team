@@ -1,4 +1,4 @@
-#include "Level_Edit.h"
+ï»¿#include "Level_Edit.h"
 #include "Loader.h"
 #include "EditCamera.h"
 #include "Edit_Grid.h"
@@ -115,7 +115,7 @@ void CLevel_Edit::Load_Level(const wstring& strFilePath)
 {
 	m_pSelected = nullptr;
 	m_Layers.clear();
-	m_pGameInstance_Proxy->Clear_Objects(ETOUI(EDIT_LEVEL::EDIT));
+	m_pGameInstance_Proxy->Clear_Objects(ETOUI(TOOL_LEVEL::EDIT));
 
 	string strContent = {};
 	if (FAILED(CDataLoader::Read_Json(strFilePath.c_str(), &strContent)))
@@ -277,7 +277,7 @@ void CLevel_Edit::Preview_Camera(CGameObject* pCam)
 
 	Set_CameraActive(false);
 
-	// Ä«¸Ş¶ó ·¹ÀÌ¾î ÀüºÎ Off
+	// ì¹´ë©”ë¼ ë ˆì´ì–´ ì „ë¶€ Off
 	auto it = m_Layers.find(L"Layer_Camera");
 	if (it != m_Layers.end())
 	{
@@ -314,7 +314,7 @@ const vector<CLevel_Edit::EDITOR_OBJECT_HANDLE>* CLevel_Edit::Get_CameraLayer() 
 
 //void CLevel_Edit::Begin_NavEditMode()
 //{
-//	//// CLumia Ä³½Ì, ¾øÀ¸¸é ¸ğµå ÁøÀÔ °ÅºÎ
+//	//// CLumia ìºì‹±, ì—†ìœ¼ë©´ ëª¨ë“œ ì§„ì… ê±°ë¶€
 //	//m_pLumia = dynamic_cast<CLumia*>(
 //	//    m_pGameInstance_Proxy->Find_GameObject(ETOUI(EDIT_LEVEL::EDIT), L"Default_Layer", L"Proto_Lumia_0"));
 //
@@ -326,7 +326,7 @@ const vector<CLevel_Edit::EDITOR_OBJECT_HANDLE>* CLevel_Edit::Get_CameraLayer() 
 //void CLevel_Edit::End_NavEditMode()
 //{
 //	m_bNavEditMode = false;
-//	m_pLumia = nullptr;  // ¼ÒÀ¯±Ç ¾øÀ½, Release ºÒÇÊ¿ä
+//	m_pLumia = nullptr;  // ì†Œìœ ê¶Œ ì—†ìŒ, Release ë¶ˆí•„ìš”
 //}
 //
 //void CLevel_Edit::Nav_Undo()
@@ -379,7 +379,7 @@ HRESULT CLevel_Edit::Ready_EditCamera()
 			CEditCamera::Create(m_pDevice, m_pContext));
 	}
 
-	// ¿ÀºêÁ§Æ® ¸Å´ÏÀú¿¡ Ãß°¡ (·¹ÀÌ¾î´Â Ä«¸Ş¶ó Àü¿ë)
+	// ì˜¤ë¸Œì íŠ¸ ë§¤ë‹ˆì €ì— ì¶”ê°€ (ë ˆì´ì–´ëŠ” ì¹´ë©”ë¼ ì „ìš©)
 	CGameObject* pCam = nullptr;
 	CEditCamera::EDIT_CAMERA_FREE_DESC desc{};
 	desc.vEye = { 0.f, 5.f, -10.f };

@@ -1,7 +1,7 @@
-#include "EditCamera.h"
+ï»¿#include "EditCamera.h"
 #include "imgui.h"
 
-using namespace AnimUITool;
+using namespace MapTool;
 
 CEditCamera::CEditCamera(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCamera{ pDevice, pContext } {
@@ -29,7 +29,7 @@ void CEditCamera::Priority_Update(_float fTimeDelta)
     {
         ImGuiIO& io = ImGui::GetIO();
 
-        if (io.MouseDown[1])   // ¿ìÅ¬¸¯ µå·¡±× = È¸Àü
+        if (io.MouseDown[1])   // ìš°í´ë¦­ ë“œëž˜ê·¸ = íšŒì „
         {
             if (io.MouseDelta.x)
                 m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), io.MouseDelta.x * m_fMouseSensor * fTimeDelta);
@@ -37,10 +37,10 @@ void CEditCamera::Priority_Update(_float fTimeDelta)
                 m_pTransformCom->Turn(m_pTransformCom->Get_State(STATE::RIGHT), io.MouseDelta.y * m_fMouseSensor * fTimeDelta);
         }
 
-        if (io.MouseWheel != 0.f)   // ÈÙ = ÀüÈÄÁø
+        if (io.MouseWheel != 0.f)   // íœ  = ì „í›„ì§„
             m_pTransformCom->Go_Straight(fTimeDelta * io.MouseWheel);
 
-        if (io.MouseDown[1])        // ¿ìÅ¬¸¯ Áß WASD
+        if (io.MouseDown[1])        // ìš°í´ë¦­ ì¤‘ WASD
         {
             if (ImGui::IsKeyDown(ImGuiKey_W)) m_pTransformCom->Go_Straight(fTimeDelta);
             if (ImGui::IsKeyDown(ImGuiKey_S)) m_pTransformCom->Go_Backward(fTimeDelta);
