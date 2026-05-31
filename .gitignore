@@ -437,6 +437,11 @@ AAA/*.zip
 AAA/EngineSDK/
 AAA/ContentSDK/
 
+# PhysX libs - re-include despite [Dd]ebug/ rule above
+!AAA/Engine/ThirdPartyLib/PhysX/
+!AAA/Engine/ThirdPartyLib/PhysX/debug/
+!AAA/Engine/ThirdPartyLib/PhysX/debug/**
+
 .claude/
 
 # Shader
