@@ -7,6 +7,7 @@
 #include "TestFiona.h"
 #include "TestNonAnim.h"
 #include "TestRect.h"
+#include "TestMap.h"
 
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
@@ -73,16 +74,25 @@ void CGameObject_Factory::Register_Test()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/Aligator/aligator.ysh", 
                     XMMatrixRotationY(XMConvertToRadians(180.f))))*/
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/Aligator/Aligator_Anim.ysh",
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/WaddleDee/Model.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))))
         )
     );
 
-    Register(TEXT("Proto_TestNonAnim"), TEXT("TEST_OBJECT"),
+    Register(TEXT("Land_SeRock_6"), TEXT("TEST_OBJECT"),
         CREATOR(CTestNonAnim),
         LOADER(
-            pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_NonAnim"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/Aligator/Model.ysh",
+            pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Land_SeRock_6"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/Stage1-0/Land_SeRock_6.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))))
+        )
+    );
+
+    Register(TEXT("Land_Transparent_4"), TEXT("TEST_OBJECT"),
+        CREATOR(CTestNonAnim),
+        LOADER(
+            pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Land_Transparent_4"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/Stage1-0/Land_Transparent_4.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))))
         )
     );
@@ -91,6 +101,70 @@ void CGameObject_Factory::Register_Test()
         CREATOR(CTestRect),
         LOADER()
     );
+
+    auto RegisterMap = [this](const _tchar* szObjectProtoTag, const _tchar* szModelProtoTag, const _char* szModelPath)
+        {
+            Register(szObjectProtoTag, TEXT("MAP_OBJECT"),
+                [szObjectProtoTag, szModelProtoTag](ID3D11Device* pDevice, ID3D11DeviceContext* pContext) -> CBase*
+                {
+                    return dynamic_cast<CBase*>(
+                        CTestMap::Create(pDevice, pContext, szObjectProtoTag, szModelProtoTag));
+                },
+                [szModelProtoTag, szModelPath](CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+                {
+                    TRY_ADD_PROTO(
+                        pProxy,
+                        ETOUI(LEVEL::GAMEPLAY),
+                        szModelProtoTag,
+                        CModel::Create(
+                            pDevice,
+                            pContext,
+                            MODEL::NONANIM,
+                            szModelPath,
+                            XMMatrixRotationY(XMConvertToRadians(180.f))));
+                }
+            );
+        };
+
+    RegisterMap(
+        TEXT("Proto_Land_GsAllBuilding_0"),
+        TEXT("Prototype_Component_Model_Land_GsAllBuilding_0"),
+        "../../Resources/Models/Test/Stage1-0/Land_GsAllBuilding_0.ysh");
+
+    RegisterMap(
+        TEXT("Proto_Land_GsBuilding_1"),
+        TEXT("Prototype_Component_Model_Land_GsBuilding_1"),
+        "../../Resources/Models/Test/Stage1-0/Land_GsBuilding_1.ysh");
+
+    RegisterMap(
+        TEXT("Proto_Land_GsBuilding_7"),
+        TEXT("Prototype_Component_Model_Land_GsBuilding_7"),
+        "../../Resources/Models/Test/Stage1-0/Land_GsBuilding_7.ysh");
+
+    RegisterMap(
+        TEXT("Proto_Land_GsDefault_2"),
+        TEXT("Prototype_Component_Model_Land_GsDefault_2"),
+        "../../Resources/Models/Test/Stage1-0/Land_GsDefault_2.ysh");
+
+    RegisterMap(
+        TEXT("Proto_Land_GsDefault_5"),
+        TEXT("Prototype_Component_Model_Land_GsDefault_5"),
+        "../../Resources/Models/Test/Stage1-0/Land_GsDefault_5.ysh");
+
+    RegisterMap(
+       TEXT("Proto_Land_SeRock_3"),
+       TEXT("Prototype_Component_Model_Land_SeRock_3"),
+       "../../Resources/Models/Test/Stage1-0/Land_SeRock_3.ysh");
+    
+    RegisterMap(
+        TEXT("Proto_Land_SeRock_6"),
+        TEXT("Prototype_Component_Model_Land_SeRock_6"),
+        "../../Resources/Models/Test/Stage1-0/Land_SeRock_6.ysh");
+
+    RegisterMap(
+        TEXT("Proto_Land_Transparent_4"),
+        TEXT("Prototype_Component_Model_Land_Transparent_4"),
+        "../../Resources/Models/Test/Stage1-0/Land_Transparent_4.ysh");
 }
 
 void CGameObject_Factory::Register_Container()

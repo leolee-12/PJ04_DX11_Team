@@ -43,6 +43,9 @@
     <Filter Include="98. ShaderFiles\Marb1e">
       <UniqueIdentifier>{c5ab5b79-8b3c-4a71-af78-735b22243355}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\Test\TestMap">
+      <UniqueIdentifier>{63727501-0cde-4d54-ba7a-2748b3341edb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -87,6 +90,9 @@
     <ClInclude Include="..\public\TestRect.h">
       <Filter>00. GameObject\Test\TestRect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\TestMap.h">
+      <Filter>00. GameObject\Test\TestMap</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -109,6 +115,9 @@
     </ClCompile>
     <ClCompile Include="..\private\TestRect.cpp">
       <Filter>00. GameObject\Test\TestRect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestMap.cpp">
+      <Filter>00. GameObject\Test\TestMap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

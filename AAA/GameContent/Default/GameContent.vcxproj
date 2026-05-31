@@ -31,6 +31,7 @@
     <ClInclude Include="..\Public\ResourceData.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\TestFiona.h" />
+    <ClInclude Include="..\Public\TestMap.h" />
     <ClInclude Include="..\Public\TestNonAnim.h" />
     <ClInclude Include="..\public\TestRect.h" />
   </ItemGroup>
@@ -40,6 +41,7 @@
     <ClCompile Include="..\Private\Loader_Prototype.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\TestFiona.cpp" />
+    <ClCompile Include="..\Private\TestMap.cpp" />
     <ClCompile Include="..\Private\TestNonAnim.cpp" />
     <ClCompile Include="..\private\TestRect.cpp" />
   </ItemGroup>
