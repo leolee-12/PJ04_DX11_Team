@@ -72,16 +72,15 @@ void CGameObject_Factory::Register_Test()
         CREATOR(CTestFiona),
         LOADER(
             /*pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/Aligator/aligator.ysh", 
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/Aligator/aligator.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))))*/
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/BladeNight/BladeNight.ysh",
-                    XMMatrixRotationY(XMConvertToRadians(180.f))))
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/BladeKnight/BladeKnight.ysh"
                     //, XMMatrixRotationY(XMConvertToRadians(180.f))
-            ))
+                ))
         )
     );
+
 
     Register(TEXT("Proto_TestNonAnim"), TEXT("TEST_OBJECT"),
         CREATOR(CTestNonAnim),
@@ -100,6 +99,8 @@ void CGameObject_Factory::Register_Test()
     Register(CTestEffectQuad::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
         CREATOR(CTestEffectQuad),
         LOADER()
+    );
+
     Register(CTestMarb1e::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
         CREATOR(CTestMarb1e),
         LOADER(
