@@ -58,6 +58,15 @@
     <Filter Include="01. Levels\Loader">
       <UniqueIdentifier>{4e6c892c-a544-457e-b413-00e04340cddb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. Objects\MapStage">
+      <UniqueIdentifier>{23a1ab83-c458-44b1-8c02-9f652d9f9f45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Panels\Profiler">
+      <UniqueIdentifier>{1cfcb692-1664-4e2a-9477-1731a2118f9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. App\Profiler">
+      <UniqueIdentifier>{ca47b2f8-828c-492e-a221-b4ec0ee698ec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Panel.h">
@@ -134,6 +143,21 @@
     </ClInclude>
     <ClInclude Include="..\Public\Loader.h">
       <Filter>01. Levels\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapSection_Defines.h">
+      <Filter>02. Objects\MapStage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapSection.h">
+      <Filter>02. Objects\MapStage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapStage.h">
+      <Filter>02. Objects\MapStage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapToolProfiler.h">
+      <Filter>00. App\Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_Profiler.h">
+      <Filter>03. Panels\Profiler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -214,6 +238,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\Loader.cpp">
       <Filter>01. Levels\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapSection.cpp">
+      <Filter>02. Objects\MapStage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapStage.cpp">
+      <Filter>02. Objects\MapStage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapToolProfiler.cpp">
+      <Filter>00. App\Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Profiler.cpp">
+      <Filter>03. Panels\Profiler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

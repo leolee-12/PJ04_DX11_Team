@@ -24,6 +24,10 @@
     <ClCompile Include="..\Private\Level_Edit.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
+    <ClCompile Include="..\Private\MapSection.cpp" />
+    <ClCompile Include="..\Private\MapStage.cpp" />
+    <ClCompile Include="..\Private\MapToolProfiler.cpp" />
+    <ClCompile Include="..\Private\Panel_Profiler.cpp" />
     <ClCompile Include="..\Private\ToolApp.cpp" />
     <ClCompile Include="..\Private\EditCamera.cpp" />
     <ClCompile Include="..\Private\Edit_Grid.cpp" />
@@ -52,6 +56,10 @@
     <ClInclude Include="..\Public\Level_Edit.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Loader.h" />
+    <ClInclude Include="..\Public\MapSection.h" />
+    <ClInclude Include="..\Public\MapSection_Defines.h" />
+    <ClInclude Include="..\Public\MapStage.h" />
+    <ClInclude Include="..\Public\MapToolProfiler.h" />
     <ClInclude Include="..\Public\ToolApp.h" />
     <ClInclude Include="..\Public\MapTool_Defines.h" />
     <ClInclude Include="..\Public\MapTool_Enum.h" />
@@ -62,6 +70,7 @@
     <ClInclude Include="..\Public\Panel.h" />
     <ClInclude Include="..\Public\Panel_Toolbar.h" />
     <ClInclude Include="..\Public\Panel_Palette.h" />
+    <ClInclude Include="..\Public\Panel_Profiler.h" />
     <ClInclude Include="..\Public\Panel_NavMesh.h" />
     <ClInclude Include="..\Public\Panel_Console.h" />
     <ClInclude Include="..\Public\Panel_Hierarchy.h" />

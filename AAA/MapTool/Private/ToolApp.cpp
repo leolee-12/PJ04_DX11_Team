@@ -2,6 +2,7 @@
 
 #include "EditInstance.h"
 #include "Level_Loading.h"
+#include "MapToolProfiler.h"
 
 #include "GameObject_Factory.h"
 #include "GameInstance.h"
@@ -179,6 +180,7 @@ void CToolApp::Free()
 
 	CGameInstance::DestroyInstance();
 	CGameObject_Factory::DestroyInstance();
+	CMapToolProfiler::DestroyInstance();
 
 	__super::Free();
 }

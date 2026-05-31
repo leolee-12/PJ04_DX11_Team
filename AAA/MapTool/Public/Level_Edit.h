@@ -9,6 +9,7 @@ NS_END
 
 NS_BEGIN(Client)
 class CLumia;
+class CMapStage;
 NS_END
 
 NS_BEGIN(MapTool)
@@ -92,12 +93,14 @@ private:
 	//CNavMesh_Editor* m_pNavMeshEditor = { nullptr };
 	_bool			 m_bNavEditMode = { false };
 	CLumia* m_pLumia = { nullptr };
+	Client::CMapStage* m_pMapStage = { nullptr };
 
 private:
 	virtual HRESULT Ready_Events() override { return S_OK; }
 	HRESULT	 Ready_EditLights();
 	HRESULT  Ready_EditCamera();
 	HRESULT  Ready_EditGrid();
+	HRESULT  Ready_MapStage();
 
 public:
 	static CLevel_Edit* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

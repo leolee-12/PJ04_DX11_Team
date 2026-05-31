@@ -8,6 +8,7 @@
 #include "Panel_Inspector.h"
 #include "Panel_NavMesh.h"
 #include "Panel_Console.h"
+#include "Panel_Profiler.h"
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -28,6 +29,7 @@ HRESULT CPanel_Manager::Initialize()
     if (FAILED(Add_Panel(L"Inspector", CPanel_Inspector::Create(m_pDevice, m_pContext)))) return E_FAIL;
     if (FAILED(Add_Panel(L"NavMesh",   CPanel_NavMesh::Create(m_pDevice, m_pContext))))   return E_FAIL;
     if (FAILED(Add_Panel(L"Console",   CPanel_Console::Create(m_pDevice, m_pContext))))   return E_FAIL;
+    if (FAILED(Add_Panel(L"Profiler",  CPanel_Profiler::Create(m_pDevice, m_pContext))))  return E_FAIL;
 
     return S_OK;
 }
@@ -123,6 +125,7 @@ void CPanel_Manager::Render_DockSpace()
         ImGui::DockBuilderDockWindow("Inspector", right);
         ImGui::DockBuilderDockWindow("NavMesh",   right);     // Inspector와 탭으로 묶임
         ImGui::DockBuilderDockWindow("Console",   bottom);
+        ImGui::DockBuilderDockWindow("Profiler",  bottom);
         ImGui::DockBuilderFinish(dockspace_id);
     }
 
