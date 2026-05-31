@@ -180,6 +180,15 @@ _bool CTransform::Follow_Waypoints(deque<_float3>& Waypoints, _float fTimeDelta,
     return Waypoints.empty();
 }
 
+void CTransform::Go_Dir(_float fTimeDelta, _fvector vDir)
+{
+    _vector     vPosition = Get_State(STATE::POSITION);
+
+    vPosition += XMVectorSetW(XMVector3Normalize(vDir), 0.f) * m_fSpeedPerSec * fTimeDelta;
+
+    Set_State(STATE::POSITION, vPosition);
+}
+
 void CTransform::Rotation(_fvector vAxis, _float fRadian)
 {
     _float3         vScaled = Get_Scaled();

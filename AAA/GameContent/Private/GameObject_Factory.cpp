@@ -7,6 +7,7 @@
 #include "TestFiona.h"
 #include "TestNonAnim.h"
 #include "TestRect.h"
+#include "TestEffectQuad.h"
 
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
@@ -73,7 +74,7 @@ void CGameObject_Factory::Register_Test()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/Aligator/aligator.ysh", 
                     XMMatrixRotationY(XMConvertToRadians(180.f))))*/
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/Aligator/Aligator_Anim.ysh",
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/BladeNight/BladeNight.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))))
         )
     );
@@ -89,6 +90,11 @@ void CGameObject_Factory::Register_Test()
 
     Register(CTestRect::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
         CREATOR(CTestRect),
+        LOADER()
+    );
+
+    Register(CTestEffectQuad::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
+        CREATOR(CTestEffectQuad),
         LOADER()
     );
 }

@@ -94,7 +94,7 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pInstance->m_pShadow_Dir)
         return E_FAIL;
 
-    m_pInstance->m_pEffect_Manager = CEffect_Manager::Create();
+    m_pInstance->m_pEffect_Manager = CEffect_Manager::Create(*ppDevice, *ppContext);
     if (nullptr == m_pInstance->m_pEffect_Manager)
         return E_FAIL;
 

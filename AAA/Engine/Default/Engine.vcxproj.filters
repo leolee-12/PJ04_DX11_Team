@@ -657,5 +657,8 @@
     <FxCompile Include="..\ShaderFiles\Shader_Deferred.hlsl">
       <Filter>95. ShaderFiles</Filter>
     </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_Effect_VtxTex.hlsl">
+      <Filter>95. ShaderFiles</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

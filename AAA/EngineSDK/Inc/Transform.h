@@ -80,6 +80,8 @@ public:
 	_bool Go_ToPoint(_fvector vTargetPos, _float fTimeDelta, CNavigation* pNavigation = nullptr);
 	_bool Follow_Waypoints(deque<_float3>& Waypoints, _float fTimeDelta, CNavigation* pNavi = nullptr);
 
+	void Go_Dir(_float fTimeDelta, _fvector vDir);
+
 	void Rotation(_fvector vAxis, _float fRadian);
 	void Rotation(_fvector vQuatanion);
 	void Rotate(_fvector vQuatanion);

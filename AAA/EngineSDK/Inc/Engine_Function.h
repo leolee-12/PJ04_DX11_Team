@@ -75,12 +75,39 @@ namespace Engine
 
 	namespace Helper
 	{
-		inline void FloatClamp(float& fFloat, const float& fMin, const float& fMax)
+		static constexpr _float fEpsilon = { 0.00001f };
+
+		inline void FloatClamp(float& fOutFloat, const float fMin, const float fMax)
 		{
-			if (fFloat > fMax)
-				fFloat = fMax;
-			else if (fFloat < fMin)
-				fFloat = fMin;
+			if (fOutFloat > fMax)
+				fOutFloat = fMax;
+			else if (fOutFloat < fMin)
+				fOutFloat = fMin;
+		}
+
+		inline float FloatLerp(const float fMin, const float fMax, const float fRatio)
+		{
+			return fMin + fRatio * (fMax - fMin);
+		}
+
+		// 비율 리턴
+		inline float FloatInverseLerp(const float fMin, const float fMax, const float fValue)
+		{
+			if (fMax == fMin)
+				return 1.f;
+
+			return (fValue - fMin) / (fMax - fMin);
+		}
+
+		// 비율 리턴
+		inline float FloatSmoothStep(const float fMinTime, const float fMaxTime, const float fTime)
+		{
+			if (fMinTime == fMaxTime)
+				return 1.f;
+
+			float fRatio = (fTime - fMinTime) / (fMaxTime - fMinTime);
+			FloatClamp(fRatio, 0.f, 1.f);
+			return fRatio * fRatio * (3.f - 2.f * fRatio);
 		}
 	}
 }

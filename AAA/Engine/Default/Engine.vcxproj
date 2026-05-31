@@ -318,6 +318,7 @@
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_Cell.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Deferred.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_Effect_VtxTex.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
