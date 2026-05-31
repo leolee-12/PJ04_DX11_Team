@@ -26,6 +26,7 @@ class CSound_Manager;
 class CTarget_Manager;
 class CShadow_Dir;
 class CEffect_Manager;
+class CPhysX_Manager;
 
 class ENGINE_DLL CGameInstance 
 {
@@ -212,6 +213,7 @@ private:
 	CTarget_Manager*			m_pTarget_Manager = { nullptr };
 	CShadow_Dir*				m_pShadow_Dir = { nullptr };
 	CEffect_Manager*			m_pEffect_Manager = { nullptr };
+	CPhysX_Manager*				m_pPhysX_Manager = { nullptr };
 
 	mutable mt19937             m_RandomGenerator;
 

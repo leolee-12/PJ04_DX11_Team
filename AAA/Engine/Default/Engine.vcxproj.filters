@@ -217,6 +217,12 @@
     <Filter Include="05. GameObject\Effect\Manager">
       <UniqueIdentifier>{e435d7f0-3a1d-4e62-950d-122e3a3dfb16}</UniqueIdentifier>
     </Filter>
+    <Filter Include="16. PhysX">
+      <UniqueIdentifier>{c1fe8712-6c82-4df0-a436-8107d7043445}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="16. PhysX\Manager">
+      <UniqueIdentifier>{25e5c569-711b-4ff7-bc27-c95ee9c5b5cb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -432,6 +438,9 @@
     <ClInclude Include="..\public\Effect_Manager.h">
       <Filter>05. GameObject\Effect\Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\PhysX_Manager.h">
+      <Filter>16. PhysX\Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -625,6 +634,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Property.cpp">
       <Filter>05. GameObject\01. Property</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\PhysX_Manager.cpp">
+      <Filter>16. PhysX\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

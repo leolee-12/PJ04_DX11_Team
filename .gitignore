@@ -434,6 +434,9 @@ AAA/FBX_Converter/Map/*.fbx
 AAA/FBX_Converter/Map/*.ysh
 AAA/*.zip
 
+AAA/EngineSDK/
+AAA/ContentSDK/
+
 .claude/
 
 # Shader

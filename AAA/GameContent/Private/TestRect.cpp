@@ -108,6 +108,8 @@ HRESULT CTestRect::Bind_ShaderValue()
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fUVCutBottom", &m_fUVCutBottom, sizeof(m_fUVCutBottom))))
         return E_FAIL;
+    
+    return S_OK;
 }
 
 HRESULT CTestRect::Ready_Components()
