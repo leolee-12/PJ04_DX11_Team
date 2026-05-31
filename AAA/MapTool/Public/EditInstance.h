@@ -18,6 +18,7 @@ NS_END
 
 NS_BEGIN(MapTool)
 class CLevel_Edit;
+class CImGui_Manager;
 class CPanel_Manager;
 class CPanel;
 
@@ -31,6 +32,9 @@ private:
 
 public:
 	HRESULT			Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	void			ImGui_BeginFrame();
+	void			Render_UI();
+	void			ImGui_Render();
 	void			Update_Panels(_float fTimeDelta);
 	void			Render_Panels();
 	CPanel*			Get_Panel(const _wstring& strPanelTag);
@@ -53,13 +57,14 @@ public:
 	void			Set_GizmoOp(GIZMO_OP eOp) { m_eGizmoOp = eOp; }
 	GIZMO_OP		Get_GizmoOp() const { return m_eGizmoOp; }
 
-	// 로딩 진행률 (Loader 갱신 → App 오버레이가 표시)
+	// 로딩 진행률 (Loader 갱신 -> ImGui 매니저 오버레이가 표시)
 	void			Set_Loading(_bool bLoading) { m_bLoading = bLoading; }
 	_bool			Is_Loading() const { return m_bLoading; }
 	void			Set_LoadProgress(_float fProgress) { m_fLoadProgress = fProgress; }
 	_float			Get_LoadProgress() const { return m_fLoadProgress; }
 
 private:
+	CImGui_Manager*				m_pImGui_Manager = { nullptr };
 	CPanel_Manager*				m_pPanelManager = { nullptr };
 
 	CLevel_Edit*				m_pLevel = { nullptr };

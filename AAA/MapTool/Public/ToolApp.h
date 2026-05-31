@@ -36,10 +36,8 @@ private:
 
 private:
 	HRESULT Ready_Engine();
-	HRESULT	Init_ImGui();
 	HRESULT	Ready_EditRTV();
 	void	Editor_BeginDraw();
-	void	Draw_LoadingOverlay();
 
 public:
 	static CToolApp* Create();

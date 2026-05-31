@@ -6,11 +6,6 @@
 #include "GameObject_Factory.h"
 #include "GameInstance.h"
 
-#include "imgui.h"
-#include "imgui_internal.h"
-#include "imgui_impl_win32.h"
-#include "imgui_impl_dx11.h"
-
 CToolApp::CToolApp()
 {
 }
@@ -21,9 +16,6 @@ HRESULT CToolApp::Initialize()
 		return E_FAIL;
 
 	if (FAILED(Ready_EditRTV()))
-		return E_FAIL;
-
-	if (FAILED(Init_ImGui()))
 		return E_FAIL;
 
 	// 공유 상태 허브 (씬 SRV 등록)
@@ -65,28 +57,14 @@ HRESULT CToolApp::Render()
 		return E_FAIL;
 
 	// 2) ImGui 프레임 (로딩 중에는 오버레이만, 그 외에는 패널)
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-
-	if (m_pEditInstance->Is_Loading())
-		Draw_LoadingOverlay();
-	else
-		m_pEditInstance->Render_Panels();
-
-	ImGui::Render();
+	m_pEditInstance->ImGui_BeginFrame();
+	m_pEditInstance->Render_UI();
 
 	// 3) 백버퍼에 ImGui 출력
 	if (FAILED(m_pGI_Proxy->Begin_Draw()))
 		return E_FAIL;
 
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		ImGui::UpdatePlatformWindows();
-		ImGui::RenderPlatformWindowsDefault();
-	}
+	m_pEditInstance->ImGui_Render();
 
 	if (FAILED(m_pGI_Proxy->End_Draw()))
 		return E_FAIL;
@@ -112,53 +90,6 @@ HRESULT CToolApp::Ready_Engine()
 
 	m_pGI_Proxy = CGameInstance::GetProxy();
 	return S_OK;
-}
-
-HRESULT CToolApp::Init_ImGui()
-{
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-
-	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-	io.IniFilename = nullptr;   // 도킹 레이아웃은 Panel_Manager가 DockBuilder로 구성
-
-	io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\malgun.ttf", 15.0f, nullptr, io.Fonts->GetGlyphRangesKorean());
-
-	ImGui::StyleColorsDark();
-
-	ImGuiStyle& style = ImGui::GetStyle();
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		style.WindowRounding = 0.0f;
-		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-	}
-
-	ImGui_ImplWin32_Init(g_hWnd);
-	ImGui_ImplDX11_Init(m_pDevice, m_pContext);
-
-	return S_OK;
-}
-
-void CToolApp::Draw_LoadingOverlay()
-{
-	ImGuiViewport* vp = ImGui::GetMainViewport();
-	ImGui::SetNextWindowPos(vp->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-	ImGui::SetNextWindowBgAlpha(0.85f);
-
-	ImGuiWindowFlags flags =
-		ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
-		ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize |
-		ImGuiWindowFlags_NoDocking;
-
-	if (ImGui::Begin("##LoadingOverlay", nullptr, flags))
-	{
-		ImGui::Text("Loading Map Tool...");
-		ImGui::ProgressBar(m_pEditInstance->Get_LoadProgress(), ImVec2(320.f, 0.f));
-	}
-	ImGui::End();
 }
 
 HRESULT CToolApp::Ready_EditRTV()
@@ -241,10 +172,6 @@ void CToolApp::Free()
 	Safe_Release(m_pRTV);
 	Safe_Release(m_pSRV);
 	Safe_Release(m_pDSV);
-
-	ImGui_ImplDX11_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
 
 	Safe_Release(m_pGI_Proxy);
 	Safe_Release(m_pDevice);

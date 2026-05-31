@@ -123,6 +123,9 @@
     <ClInclude Include="..\Public\EditInstance.h">
       <Filter>00. App</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\ImGui_Manager.h">
+      <Filter>97. ImGui\Manager</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Level_Edit.h">
       <Filter>01. Levels\Edit</Filter>
     </ClInclude>
@@ -199,6 +202,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\EditInstance.cpp">
       <Filter>00. App</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ImGui_Manager.cpp">
+      <Filter>97. ImGui\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Edit.cpp">
       <Filter>01. Levels\Edit</Filter>
