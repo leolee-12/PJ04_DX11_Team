@@ -1,0 +1,61 @@
+#pragma once
+#include "Base.h"
+#include "Engine_Defines.h"
+
+#pragma warning(push, 0)
+#ifdef new
+#undef new
+#endif
+
+#include <PhysX/PxPhysicsAPI.h>
+
+#if defined(_DEBUG) && defined(DBG_NEW)
+#define new DBG_NEW            
+#endif
+#pragma warning(pop)
+
+NS_BEGIN(Engine)
+
+class ENGINE_DLL CPhysX_Manager final : public CBase
+{
+private:
+    CPhysX_Manager() = default;
+    virtual ~CPhysX_Manager() = default;
+
+private:
+    HRESULT Initialize();
+
+public:
+    void    Simulate(_float fTimeDelta);          // 매 프레임 simulate/fetchResults
+    void    Reset_For_SceneChange();              // 레벨 바뀌면 static actor 정리
+
+    physx::PxRigidStatic* Cook_StaticMesh(
+        const _float3* pVertices, _uint iNumVertices,
+        const _uint* pIndices, _uint iNumIndices,
+        _fmatrix WorldMatrix);
+
+    physx::PxController* Create_CapsuleController(
+        const _float3& vPos, _float fRadius, _float fHeight);
+
+    physx::PxPhysics* Get_Physics() const { return m_pPhysics; }
+    physx::PxScene* Get_Scene()   const { return m_pScene; }
+
+private:
+    physx::PxFoundation* m_pFoundation = { nullptr };
+    physx::PxPhysics* m_pPhysics = { nullptr };
+    physx::PxScene* m_pScene = { nullptr };
+    physx::PxDefaultCpuDispatcher* m_pDispatcher = { nullptr };
+    physx::PxControllerManager* m_pCCTManager = { nullptr };
+    physx::PxMaterial* m_pDefaultMtrl = { nullptr };
+
+    physx::PxDefaultAllocator      m_Allocator;
+    physx::PxDefaultErrorCallback  m_ErrorCallback;
+
+    _bool   m_bExtensionsInited = { false };
+
+public:
+    static CPhysX_Manager* Create();
+    virtual void Free() override;
+};
+
+NS_END

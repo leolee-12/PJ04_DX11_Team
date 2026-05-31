@@ -676,6 +676,19 @@ HRESULT CGameInstance_Proxy::Spawn_Effect(_uint iLevel, const _wstring& strProto
 }
 #pragma endregion
 
+#pragma region EDITMODE
+void CGameInstance_Proxy::Set_EditMode(_bool bEdit)
+{
+	if (m_pOwner == nullptr) return;
+	m_pOwner->Set_EditMode(bEdit);
+}
+
+_bool CGameInstance_Proxy::Is_EditMode() const
+{
+	if (m_pOwner == nullptr) return false;   // 안전 기본값
+	return m_pOwner->Is_EditMode();
+}
+#pragma endregion
 
 
 CGameInstance_Proxy* CGameInstance_Proxy::Create(CGameInstance* pOwner)

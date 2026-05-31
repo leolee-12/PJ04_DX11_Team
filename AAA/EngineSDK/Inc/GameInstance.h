@@ -26,6 +26,7 @@ class CSound_Manager;
 class CTarget_Manager;
 class CShadow_Dir;
 class CEffect_Manager;
+class CPhysX_Manager;
 
 class ENGINE_DLL CGameInstance 
 {
@@ -193,6 +194,12 @@ public:
 #endif
 #pragma endregion
 
+#pragma region EDITMODE
+  public:
+	  void  Set_EditMode(_bool bEdit) { m_bEditMode = bEdit; }
+	  _bool Is_EditMode() const		  { return m_bEditMode; }
+#pragma endregion
+
 
 
 private:
@@ -212,8 +219,10 @@ private:
 	CTarget_Manager*			m_pTarget_Manager = { nullptr };
 	CShadow_Dir*				m_pShadow_Dir = { nullptr };
 	CEffect_Manager*			m_pEffect_Manager = { nullptr };
+	CPhysX_Manager*				m_pPhysX_Manager = { nullptr };
 
 	mutable mt19937             m_RandomGenerator;
+	_bool						m_bEditMode = { false };
 
 private:
 	static CGameInstance* m_pInstance;

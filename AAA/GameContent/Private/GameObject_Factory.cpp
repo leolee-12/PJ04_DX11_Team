@@ -7,6 +7,7 @@
 #include "TestFiona.h"
 #include "TestNonAnim.h"
 #include "TestRect.h"
+#include "TestMarb1e.h"
 
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
@@ -73,8 +74,9 @@ void CGameObject_Factory::Register_Test()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/Aligator/aligator.ysh", 
                     XMMatrixRotationY(XMConvertToRadians(180.f))))*/
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/Aligator/Aligator_Anim.ysh",
-                    XMMatrixRotationY(XMConvertToRadians(180.f))))
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/BladeKnight/BladeKnight.ysh"
+                    //, XMMatrixRotationY(XMConvertToRadians(180.f))
+            ))
         )
     );
 
@@ -90,6 +92,16 @@ void CGameObject_Factory::Register_Test()
     Register(CTestRect::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
         CREATOR(CTestRect),
         LOADER()
+    );
+
+    Register(CTestMarb1e::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
+        CREATOR(CTestMarb1e),
+        LOADER(
+            pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Marb1e"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/Marb1e/BladeKnight.ysh"
+                    //, XMMatrixRotationY(XMConvertToRadians(180.f))
+                ))
+        )
     );
 }
 
