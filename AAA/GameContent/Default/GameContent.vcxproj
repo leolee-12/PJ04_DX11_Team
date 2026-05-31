@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Camera_Free.h" />
+    <ClInclude Include="..\Public\GameContent_AnimEvents.h" />
     <ClInclude Include="..\Public\GameContent_const.h" />
     <ClInclude Include="..\Public\GameContent_Defines.h" />
     <ClInclude Include="..\Public\GameContent_enum.h" />
@@ -32,6 +33,7 @@
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\TestFiona.h" />
     <ClInclude Include="..\Public\TestMap.h" />
+    <ClInclude Include="..\public\TestMarb1e.h" />
     <ClInclude Include="..\Public\TestNonAnim.h" />
     <ClInclude Include="..\public\TestRect.h" />
   </ItemGroup>
@@ -42,6 +44,7 @@
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\TestFiona.cpp" />
     <ClCompile Include="..\Private\TestMap.cpp" />
+    <ClCompile Include="..\private\TestMarb1e.cpp" />
     <ClCompile Include="..\Private\TestNonAnim.cpp" />
     <ClCompile Include="..\private\TestRect.cpp" />
   </ItemGroup>

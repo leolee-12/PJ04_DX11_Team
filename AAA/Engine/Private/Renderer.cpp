@@ -22,18 +22,18 @@ HRESULT CRenderer::Initialize()
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Normal"), iWidth, iHeight, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 1.f))))
         return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Shade"), iWidth, iHeight, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 1.f))))
-        return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Specular"), iWidth, iHeight, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
-        return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Depth"), iWidth, iHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
         return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_MRA"), iWidth, iHeight, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 1.f, 1.f, 0.f))))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Light"), iWidth, iHeight, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+        return E_FAIL;
+
 
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_LightDepth"), g_iMaxWidth, g_iMaxHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(1.f, 1.f, 1.f, 1.f))))
         return E_FAIL;
     if (FAILED(Ready_DepthStencil_Buffer()))
-        return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_OutlineMask"), iWidth, iHeight, DXGI_FORMAT_R8G8_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
         return E_FAIL;
 
     /* 만든 렌더타겟들을 장치에 동시에 바인딩되는 기준으로 모은다. */
@@ -43,14 +43,13 @@ HRESULT CRenderer::Initialize()
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Depth"))))
         return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Shade"))))
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_MRA"))))
         return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Specular"))))
+
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Light"))))
         return E_FAIL;
 
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_ShadowObjects"), TEXT("Target_LightDepth"))))
-        return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_OutlineMask"), TEXT("Target_OutlineMask"))))
         return E_FAIL;
 
 
@@ -67,18 +66,17 @@ HRESULT CRenderer::Initialize()
 #ifdef _DEBUG
     //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Diffuse"), 150.f, 100.f, 300.f, 200.f)))
     //    return E_FAIL;
-    ///*if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Diffuse"), iWidth * 0.5f, iHeight * 0.5f, iWidth, iHeight)))
-    //    return E_FAIL;*/
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Normal"), 150.f, 300.f, 300.f, 200.f)))
-    //    return E_FAIL;
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Shade"), 450.f, 100.f, 300.f, 200.f)))
-    //    return E_FAIL;
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Specular"), 450.f, 300.f, 300.f, 200.f)))
-    //    return E_FAIL;
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_LightDepth"), 150.f, 100.f, 300.f, 200.f)))
-    //    return E_FAIL;
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_OutlineMask"), 450.f, 100.f, 300.f, 200.f)))
-    //    return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_MRA"), 150.f, 100.f, 300.f, 200.f)))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Diffuse"), 150.f, 300.f, 300.f, 200.f)))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Depth"), 150.f, 500.f, 300.f, 200.f)))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Normal"), 150.f, 700.f, 300.f, 200.f)))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Light"), 450.f, 100.f, 300.f, 200.f)))
+        return E_FAIL;
 #endif
 
     return S_OK;
@@ -111,12 +109,6 @@ HRESULT CRenderer::Draw()
         return E_FAIL;
     if (FAILED(Render_NonLight()))
         return E_FAIL;
-    if (FAILED(Render_OutlineHull()))
-        return E_FAIL;
-    if (FAILED(Render_OutlineMask()))
-        return E_FAIL;
-    if (FAILED(Render_Outline()))     
-        return E_FAIL;
 
     if (FAILED(Render_Blend()))
         return E_FAIL;
@@ -127,12 +119,10 @@ HRESULT CRenderer::Draw()
         return E_FAIL;
     if (FAILED(Render_UI_FRONT()))
         return E_FAIL;
-    if (FAILED(Render_Text()))
-        return E_FAIL;
 
 #ifdef _DEBUG
-    //if (FAILED(Render_Debug()))
-    //    return E_FAIL;
+    if (FAILED(Render_Debug()))
+        return E_FAIL;
 #endif
 
     return S_OK;
@@ -187,73 +177,6 @@ HRESULT CRenderer::Render_Shadow()
     return S_OK;
 }
 
-HRESULT CRenderer::Render_OutlineMask()
-{
-    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_OutlineMask"))))
-        return E_FAIL;
-
-    for (auto& pRenderObject : m_RenderObjects[ETOUI(RENDERID::OUTLINE_MASK)])
-    {
-        if (nullptr != pRenderObject)
-            pRenderObject->Render_OutlineMask();
-
-        Safe_Release(pRenderObject);
-    }
-    m_RenderObjects[ETOUI(RENDERID::OUTLINE_MASK)].clear();
-
-    if (FAILED(m_pGameInstance_Proxy->End_MRT()))
-        return E_FAIL;
-
-    return S_OK;
-}
-
-HRESULT CRenderer::Render_Outline()
-{
-    // Target_OutlineMask 를 SRV 로 바인딩하고 풀스크린 패스로 백버퍼에 합성
-    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(
-        TEXT("Target_OutlineMask"), m_pShader, "g_OutlineMaskTexture")))
-        return E_FAIL;
-
-    _float2 vTexel = {
-        1.f / (_float)m_pGameInstance_Proxy->Get_WindowWidth(),
-        1.f / (_float)m_pGameInstance_Proxy->Get_WindowHeight()
-    };
-
-    if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
-        return E_FAIL;
-    if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix",
-        m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::ORTHO))))
-        return E_FAIL;
-    if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix",
-        m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::ORTHO))))
-        return E_FAIL;
-    if (FAILED(m_pShader->Bind_RawValue("g_vTexel", &vTexel, sizeof(_float2))))
-        return E_FAIL;
-
-    if (FAILED(m_pVIBuffer->Bind_Resources()))
-        return E_FAIL;
-
-    if (FAILED(m_pShader->Begin(ETOUI(DEFERRED::OUTLINE))))
-        return E_FAIL;
-
-    if (FAILED(m_pVIBuffer->Render()))
-        return E_FAIL;
-
-    return S_OK;
-}
-
-HRESULT CRenderer::Render_OutlineHull()
-{
-    for (auto& pRenderObject : m_RenderObjects[ETOUI(RENDERID::OUTLINE_HULL)])
-    {
-        if (nullptr != pRenderObject)
-            pRenderObject->Render_OutlineHull();
-        Safe_Release(pRenderObject);
-    }
-    m_RenderObjects[ETOUI(RENDERID::OUTLINE_HULL)].clear();
-    return S_OK;
-}
-
 HRESULT CRenderer::Render_NonBlend()
 {
     if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_GameObjects"))))
@@ -280,9 +203,13 @@ HRESULT CRenderer::Render_Lights()
     if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_LightAcc"))))
         return E_FAIL;
 
-    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Normal"), m_pShader, "g_NormalTexture")))
+    if(FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Diffuse"), m_pShader, "g_DiffuseTexture")))
         return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShader, "g_DepthTexture")))
+    if(FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Normal"), m_pShader, "g_NormalTexture")))
+        return E_FAIL;
+    if(FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShader, "g_DepthTexture")))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_MRA"), m_pShader, "g_MRATexture")))
         return E_FAIL;
 
     if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
@@ -312,15 +239,15 @@ HRESULT CRenderer::Render_Lights()
 
 HRESULT CRenderer::Render_Combined()
 {
-    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Diffuse"), m_pShader, "g_DiffuseTexture")))
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Light"), m_pShader, "g_LightTexture")))
         return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Shade"), m_pShader, "g_ShadeTexture")))
+    if(FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Diffuse"), m_pShader, "g_DiffuseTexture")))
         return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Specular"), m_pShader, "g_SpecularTexture")))
+    if(FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_MRA"), m_pShader, "g_MRATexture")))
         return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShader, "g_DepthTexture")))
+    if(FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShader, "g_DepthTexture")))
         return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_LightDepth"), m_pShader, "g_LightDepthTexture")))
+    if(FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_LightDepth"), m_pShader, "g_LightDepthTexture")))
         return E_FAIL;
 
     if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
@@ -441,21 +368,6 @@ HRESULT CRenderer::Render_UI_FRONT()
     return S_OK;
 }
 
-HRESULT CRenderer::Render_Text()
-{
-    for (auto& pRenderObject : m_RenderObjects[ETOUI(RENDERID::UI_TEXT)])
-    {
-        if (nullptr != pRenderObject)
-            pRenderObject->Render();
-
-        Safe_Release(pRenderObject);
-    }
-
-    m_RenderObjects[ETOUI(RENDERID::UI_TEXT)].clear();
-
-    return S_OK;
-}
-
 HRESULT CRenderer::Ready_DepthStencil_Buffer()
 {
     ID3D11Texture2D* pDepthStencilTexture = { nullptr };
@@ -523,8 +435,6 @@ HRESULT CRenderer::Render_Debug()
 
     m_pGameInstance_Proxy->Render_RT_Debug(TEXT("MRT_GameObjects"), m_pShader, m_pVIBuffer);
     m_pGameInstance_Proxy->Render_RT_Debug(TEXT("MRT_LightAcc"), m_pShader, m_pVIBuffer);
-    //m_pGameInstance_Proxy->Render_RT_Debug(TEXT("MRT_OutlineMask"), m_pShader, m_pVIBuffer);
-    //m_pGameInstance_Proxy->Render_RT_Debug(TEXT("MRT_ShadowObjects"), m_pShader, m_pVIBuffer);
 
     return S_OK;
 }

@@ -26,6 +26,9 @@ public:
 	{
 		return m_fDuration > 0.f ? m_fCurrentTrackPosition / m_fDuration : 1.f;
 	}
+	
+public:
+	void	Set_Progress(_float fProgress) { m_fCurrentTrackPosition = fProgress * m_fDuration; }
 
 private:
 	string				m_strName = {};

@@ -88,6 +88,7 @@ struct PS_OUT
     float4 vDiffuse : SV_TARGET0;
     float4 vNormal : SV_TARGET1;
     float4 vDepth : SV_TARGET2;
+    float4 vMRA : SV_TARGET3;
 };
 
 struct PS_BACKOUT
@@ -106,9 +107,8 @@ PS_OUT PS_MAIN(PS_IN In)
 
     float3 vAlbedo = lerp(vBase.rgb, vEye.rgb, vEye.a);
     vector vMtrlDiffuse = vector(vAlbedo, vBase.a);
-
-    if (vMtrlDiffuse.a < 0.1f)
-        discard;
+    
+    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
 
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);

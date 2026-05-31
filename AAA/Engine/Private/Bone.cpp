@@ -18,8 +18,8 @@ HRESULT CBone::Initialize(const BONE_DATA& data)
 void CBone::Update_CombinedTransformMatrices(const vector<class CBone*>& Bones, _fmatrix PreTransformMatrix)
 {
     if (-1 == m_iParentIndex)
-        XMStoreFloat4x4(&m_CombinedTransformationMatrix, 
-            PreTransformMatrix * XMLoadFloat4x4(&m_TransformationMatrix));
+        XMStoreFloat4x4(&m_CombinedTransformationMatrix,
+            XMLoadFloat4x4(&m_TransformationMatrix) * PreTransformMatrix);
     else
         XMStoreFloat4x4(&m_CombinedTransformationMatrix,
             XMLoadFloat4x4(&m_TransformationMatrix) * XMLoadFloat4x4(&Bones[m_iParentIndex]->m_CombinedTransformationMatrix));

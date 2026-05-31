@@ -46,6 +46,9 @@
     <Filter Include="00. GameObject\Test\TestMap">
       <UniqueIdentifier>{63727501-0cde-4d54-ba7a-2748b3341edb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\Test\TestMarb1e">
+      <UniqueIdentifier>{840c0faf-b354-4895-adb2-a5936fb65b71}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -93,6 +96,12 @@
     <ClInclude Include="..\Public\TestMap.h">
       <Filter>00. GameObject\Test\TestMap</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\TestMarb1e.h">
+      <Filter>00. GameObject\Test\TestMarb1e</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\GameContent_AnimEvents.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -115,6 +124,9 @@
     </ClCompile>
     <ClCompile Include="..\private\TestRect.cpp">
       <Filter>00. GameObject\Test\TestRect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\TestMarb1e.cpp">
+      <Filter>00. GameObject\Test\TestMarb1e</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TestMap.cpp">
       <Filter>00. GameObject\Test\TestMap</Filter>

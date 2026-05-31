@@ -88,6 +88,4 @@ namespace Engine
 		vector<MATERIAL_DATA>  Materials;
 		vector<ANIMATION_DATA>   Animations;
 	}MODEL_DATA;
-
-
 }

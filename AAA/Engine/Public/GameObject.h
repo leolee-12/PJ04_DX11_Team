@@ -38,8 +38,6 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 	virtual HRESULT Render_Shadow() { return S_OK; };
-	virtual HRESULT Render_OutlineMask() { return S_OK; }
-	virtual HRESULT Render_OutlineHull() { return S_OK; }
 	virtual void Initialize_NaviPlacement() {};
 
 public:

@@ -55,15 +55,11 @@ private:
 	HRESULT Render_NonBlend();
 	HRESULT Render_Lights();
 	HRESULT Render_Combined();
-	HRESULT Render_OutlineHull();
-	HRESULT Render_OutlineMask();
-	HRESULT Render_Outline();
 	HRESULT Render_NonLight();
 	HRESULT Render_Blend();
 	HRESULT Render_UI_BACK();
 	HRESULT Render_UI_MIDDLE();
 	HRESULT Render_UI_FRONT();
-	HRESULT Render_Text();
 
 private:
 	HRESULT Ready_DepthStencil_Buffer();
