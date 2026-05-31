@@ -14,6 +14,8 @@
 #include "NavMesh_Editor.h"
 #include "UIContainerObject.h"
 #include "UIPartObject.h"
+#include "Animator.h"
+#include "GameContent_AnimEvents.h"
 
 IMPLEMENT_SINGLETON(CImGui_Manager)
 
@@ -520,6 +522,13 @@ void CImGui_Manager::Draw_Inspector()
 
     Draw_Properties(pSelected);
 
+    auto pModel = pSelected->Get_Component<CModel>(TEXT("Com_Model"));
+    auto pAnimator = pSelected->Get_Component<CAnimator>(TEXT("Com_Animator"));
+    if (pModel && pAnimator)
+        Draw_AnimatorEditor(pModel, pAnimator);
+
+    ImGui::Separator();
+
     for (auto& [tag, pComponent] : pSelected->Get_Components())
     {
         if (!pComponent) continue;
@@ -1005,6 +1014,92 @@ void CImGui_Manager::Draw_Transform(CGameObject* pObject, const string& strSuffi
         _float fUniformScale = vScale.x;
         if (ImGui::DragFloat(("Scale##" + strSuffix).c_str(), &fUniformScale, 0.1f))
             pTransform->Set_Scale(fUniformScale, fUniformScale, fUniformScale);
+    }
+}
+
+void CImGui_Manager::Draw_AnimatorEditor(CModel* pModel, CAnimator* pAnimator)
+{
+    if (!pModel || !pAnimator) return;
+    if (!ImGui::CollapsingHeader("Animator", ImGuiTreeNodeFlags_DefaultOpen)) return;
+
+    static int   s_iSel = 0, s_iPrevSel = -1;
+    static bool  s_bPlay = true, s_bLoop = true;
+    static float s_fPreview = 0.f;
+
+    _uint iMax = pModel->Get_MaxAnimationIndex();
+    if (s_iSel > (int)iMax) s_iSel = 0;
+    string strName = pModel->Get_AnimationName((_uint)s_iSel);
+
+    if (ImGui::BeginCombo("Animation", strName.c_str()))
+    {
+        for (_uint i = 0; i <= iMax; ++i)
+            if (ImGui::Selectable(pModel->Get_AnimationName(i).c_str(), (_uint)s_iSel == i))
+                s_iSel = (int)i;
+        ImGui::EndCombo();
+    }
+
+    ImGui::Checkbox("Play", &s_bPlay); ImGui::SameLine();
+    ImGui::Checkbox("Loop", &s_bLoop);
+
+    // 선택 변경 시에만 전환 (애니메이터 API)
+    if (s_iSel != s_iPrevSel)
+    {
+        pAnimator->Play(strName, s_bLoop, true, 0.f);
+        s_iPrevSel = s_iSel; s_fPreview = 0.f;
+    }
+
+    if (s_bPlay)
+    {
+        pAnimator->Resume();
+        pAnimator->Play(strName, s_bLoop, false, 0.f);          // 루프 플래그만 유지
+        pAnimator->Update(ImGui::GetIO().DeltaTime);            // ★ 에디터가 단독 구동
+        s_fPreview = pAnimator->Get_Progress();
+        ImGui::SliderFloat("Preview", &s_fPreview, 0.f, 1.f);
+    }
+    else
+    {
+        pAnimator->Pause();
+        if (ImGui::SliderFloat("Preview", &s_fPreview, 0.f, 1.f))
+            pAnimator->Seek(s_fPreview);
+    }
+
+    // ── 이벤트 편집 ──
+    ANIM_EVENT_TRACK& track = pAnimator->Get_Track(strName);
+    if (ImGui::Button("+ Add Event"))
+        track.Events.push_back({ (int)EANIM_EVENT::Fx, s_fPreview });
+
+    for (int i = 0; i < (int)track.Events.size(); ++i)
+    {
+        ImGui::PushID(i);
+        ANIM_EVENT& e = track.Events[i];
+
+        const char* szCur = "None";
+        for (auto& [v, n] : g_AnimEventNames) if ((int)v == e.iEventType) szCur = n;
+        if (ImGui::BeginCombo("Type", szCur))
+        {
+            for (auto& [v, n] : g_AnimEventNames)
+                if (ImGui::Selectable(n, (int)v == e.iEventType)) e.iEventType = (int)v;
+            ImGui::EndCombo();
+        }
+
+        ImGui::SliderFloat("Start", &e.fTriggerProgress, 0.f, 1.f);
+        ImGui::Checkbox("Range", &e.bIsRange);
+        if (e.bIsRange) ImGui::SliderFloat("End", &e.fEndProgress, 0.f, 1.f);
+
+        char pbuf[128]; strcpy_s(pbuf, e.strParam.c_str());
+        if (ImGui::InputText("Param", pbuf, sizeof(pbuf))) e.strParam = pbuf;
+        ImGui::InputInt("IntParam", &e.iIntParam);
+        ImGui::DragFloat3("Offset", &e.vOffset.x, 0.1f);
+
+        if (ImGui::Button("X Delete")) track.Events.erase(track.Events.begin() + i--);
+        ImGui::Separator();
+        ImGui::PopID();
+    }
+
+    if (ImGui::Button("Save"))
+    {
+        pAnimator->Sort_Track(strName);
+        pAnimator->Save_ToFile(TEXT("../../Resources/Models/Test/Marb1e/Marb1e_animevents.json"));
     }
 }
 

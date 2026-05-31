@@ -44,25 +44,32 @@ void CChannel::Update_TransformationMatrix(const vector<CBone*>& Bones, _float f
     }
     else /* 무조건 보간이 필요한 상태. */
     {
-        while (fCurrentTrackPosition >= m_KeyFrames[*pCurrentKeyIndex + 1].fTrackPosition)
-            ++*pCurrentKeyIndex;        
+        if (*pCurrentKeyIndex >= m_iNumKeyFrames ||
+            fCurrentTrackPosition < m_KeyFrames[*pCurrentKeyIndex].fTrackPosition)
+            *pCurrentKeyIndex = 0;
 
-        _vector vSourScale = XMLoadFloat3(&m_KeyFrames[*pCurrentKeyIndex].vScale);
-        _vector vDestScale = XMLoadFloat3(&m_KeyFrames[*pCurrentKeyIndex + 1].vScale);
+        while (*pCurrentKeyIndex + 1 < m_iNumKeyFrames &&
+            fCurrentTrackPosition >= m_KeyFrames[*pCurrentKeyIndex + 1].fTrackPosition)
+            ++*pCurrentKeyIndex;
 
-        _vector vSourRotation = XMLoadFloat4(&m_KeyFrames[*pCurrentKeyIndex].vRotation);
-        _vector vDestRotation = XMLoadFloat4(&m_KeyFrames[*pCurrentKeyIndex + 1].vRotation);
-        
-        _vector vSourTranslation = XMVectorSetW(XMLoadFloat3(&m_KeyFrames[*pCurrentKeyIndex].vTranslation), 1.f);
-        _vector vDestTranslation = XMVectorSetW(XMLoadFloat3(&m_KeyFrames[*pCurrentKeyIndex + 1].vTranslation), 1.f);
-        
-        _float  fRatio = (fCurrentTrackPosition - m_KeyFrames[*pCurrentKeyIndex].fTrackPosition) /
-            (m_KeyFrames[*pCurrentKeyIndex + 1].fTrackPosition - m_KeyFrames[*pCurrentKeyIndex].fTrackPosition);
+        const KEYFRAME& kSrc = m_KeyFrames[*pCurrentKeyIndex];
+        const KEYFRAME& kDst = m_KeyFrames[*pCurrentKeyIndex + 1];
 
+        _vector vSourScale = XMLoadFloat3(&kSrc.vScale);
+        _vector vDestScale = XMLoadFloat3(&kDst.vScale);
+        _vector vSourRotation = XMLoadFloat4(&kSrc.vRotation);
+        _vector vDestRotation = XMLoadFloat4(&kDst.vRotation);
+        _vector vSourTranslation = XMVectorSetW(XMLoadFloat3(&kSrc.vTranslation), 1.f);
+        _vector vDestTranslation = XMVectorSetW(XMLoadFloat3(&kDst.vTranslation), 1.f);
 
-        vScale = XMVectorLerp(vSourScale, vDestScale, fRatio); // (vSourScale + vDestScale) * fRatio;
+        _float fDenom = kDst.fTrackPosition - kSrc.fTrackPosition;
+        _float fRatio = (fDenom > 0.f)
+            ? (fCurrentTrackPosition - kSrc.fTrackPosition) / fDenom : 0.f;
+        fRatio = max(0.f, min(1.f, fRatio));
+
+        vScale = XMVectorLerp(vSourScale, vDestScale, fRatio);
         vRotation = XMQuaternionSlerp(vSourRotation, vDestRotation, fRatio);
-        vTranslation = XMVectorLerp(vSourTranslation, vDestTranslation, fRatio);        
+        vTranslation = XMVectorLerp(vSourTranslation, vDestTranslation, fRatio);
     }
 
     _matrix     TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vTranslation);
@@ -89,23 +96,30 @@ KEYFRAME CChannel::Compute_TransformationMatrix(_float fCurrentTrackPosition, _u
     }
     else /* 무조건 보간이 필요한 상태. */
     {
-        while (fCurrentTrackPosition >= m_KeyFrames[*pCurrentKeyIndex + 1].fTrackPosition)
+        if (*pCurrentKeyIndex >= m_iNumKeyFrames ||
+            fCurrentTrackPosition < m_KeyFrames[*pCurrentKeyIndex].fTrackPosition)
+            *pCurrentKeyIndex = 0;
+
+        while (*pCurrentKeyIndex + 1 < m_iNumKeyFrames &&
+            fCurrentTrackPosition >= m_KeyFrames[*pCurrentKeyIndex + 1].fTrackPosition)
             ++*pCurrentKeyIndex;
 
-        _vector vSourScale = XMLoadFloat3(&m_KeyFrames[*pCurrentKeyIndex].vScale);
-        _vector vDestScale = XMLoadFloat3(&m_KeyFrames[*pCurrentKeyIndex + 1].vScale);
+        const KEYFRAME& kSrc = m_KeyFrames[*pCurrentKeyIndex];
+        const KEYFRAME& kDst = m_KeyFrames[*pCurrentKeyIndex + 1];
 
-        _vector vSourRotation = XMLoadFloat4(&m_KeyFrames[*pCurrentKeyIndex].vRotation);
-        _vector vDestRotation = XMLoadFloat4(&m_KeyFrames[*pCurrentKeyIndex + 1].vRotation);
+        _vector vSourScale = XMLoadFloat3(&kSrc.vScale);
+        _vector vDestScale = XMLoadFloat3(&kDst.vScale);
+        _vector vSourRotation = XMLoadFloat4(&kSrc.vRotation);
+        _vector vDestRotation = XMLoadFloat4(&kDst.vRotation);
+        _vector vSourTranslation = XMVectorSetW(XMLoadFloat3(&kSrc.vTranslation), 1.f);
+        _vector vDestTranslation = XMVectorSetW(XMLoadFloat3(&kDst.vTranslation), 1.f);
 
-        _vector vSourTranslation = XMVectorSetW(XMLoadFloat3(&m_KeyFrames[*pCurrentKeyIndex].vTranslation), 1.f);
-        _vector vDestTranslation = XMVectorSetW(XMLoadFloat3(&m_KeyFrames[*pCurrentKeyIndex + 1].vTranslation), 1.f);
+        _float fDenom = kDst.fTrackPosition - kSrc.fTrackPosition;
+        _float fRatio = (fDenom > 0.f)
+            ? (fCurrentTrackPosition - kSrc.fTrackPosition) / fDenom : 0.f;
+        fRatio = max(0.f, min(1.f, fRatio));
 
-        _float  fRatio = (fCurrentTrackPosition - m_KeyFrames[*pCurrentKeyIndex].fTrackPosition) /
-            (m_KeyFrames[*pCurrentKeyIndex + 1].fTrackPosition - m_KeyFrames[*pCurrentKeyIndex].fTrackPosition);
-
-
-        vScale = XMVectorLerp(vSourScale, vDestScale, fRatio); // (vSourScale + vDestScale) * fRatio;
+        vScale = XMVectorLerp(vSourScale, vDestScale, fRatio);
         vRotation = XMQuaternionSlerp(vSourRotation, vDestRotation, fRatio);
         vTranslation = XMVectorLerp(vSourTranslation, vDestTranslation, fRatio);
     }

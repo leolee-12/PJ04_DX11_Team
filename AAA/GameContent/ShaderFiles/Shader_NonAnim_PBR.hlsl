@@ -88,6 +88,7 @@ struct PS_OUT
     float4 vDiffuse : SV_TARGET0;
     float4 vNormal : SV_TARGET1;
     float4 vDepth : SV_TARGET2;
+    float4 vMRA : SV_TARGET3;
 };
 
 struct PS_BACKOUT
@@ -106,6 +107,8 @@ PS_OUT PS_MAIN(PS_IN In)
 
     float3 vAlbedo = lerp(vBase.rgb, vEye.rgb, vEye.a);
     vector vMtrlDiffuse = vector(vAlbedo, vBase.a);
+    
+    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
 
     if (vMtrlDiffuse.a < 0.1f)
         discard;
@@ -113,117 +116,26 @@ PS_OUT PS_MAIN(PS_IN In)
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
+    Out.vMRA = float4(mra, 1.f);
 
     return Out;
 }
 
-PS_BACKOUT PS_NONDIFF(PS_IN In)
+PS_OUT PS_DEFFUSE(PS_IN In)
 {
-    PS_BACKOUT Out;
+    PS_OUT Out;
     
-    vector vMtrlDiffuse = vector(1.f, 1.f, 1.f, 1.f);
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     if (vMtrlDiffuse.a < 0.1f)
         discard;
    
     
     Out.vDiffuse = vMtrlDiffuse;
-    //Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    //Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
-    
-    return Out;
-}
-
-PS_BACKOUT PS_PROJECTILE(PS_IN In)
-{
-    PS_BACKOUT Out;
-    
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
-    
-    Out.vDiffuse = vMtrlDiffuse * g_vBlendColor;
-    
-    return Out;
-}
-
-PS_OUT PS_BLEND(PS_IN In)
-{
-    PS_OUT Out;
-
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-
-    Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
     
     return Out;
 }
-
-PS_OUT PS_GRASS(PS_IN In)
-{
-    PS_OUT Out;
-    
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-    if (vMtrlDiffuse.a < 0.2f)
-        discard;
- 
-    Out.vDiffuse = vMtrlDiffuse;
-    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
-    
-    return Out;
-}
-
-PS_OUT PS_NORMALMAP(PS_IN In)
-{
-    PS_OUT Out;
-    
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-    if (vMtrlDiffuse.a < 0.1f)
-        discard;
-    
-    vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
-    float3 vNormal = vNormalDesc.xyz * 2.f - 1.f;
-    
-    float3x3 WorldMatrix = float3x3(In.vTangent.xyz, In.vBinormal.xyz, In.vNormal.xyz);
-    
-    vNormal = normalize(mul(vNormal, WorldMatrix));
-  
-    Out.vDiffuse = vMtrlDiffuse;
-    Out.vNormal = vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
-    
-    return Out;
-}
-
-struct PS_OUT_SHADOW
-{
-    float4 vLightDepth : SV_TARGET0;
-};
-
-PS_OUT_SHADOW PS_MAIN_SHADOW(PS_IN In)
-{
-    PS_OUT_SHADOW Out;
-    
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-    if (vMtrlDiffuse.a < 0.1f)
-        discard;
-        
-    Out.vLightDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    
-    return Out;
-}
-
-struct PS_OUT_OUTLINEMASK
-{
-    float4 vMask : SV_TARGET0;
-};
-
-PS_OUT_OUTLINEMASK PS_MAIN_OUTLINEMASK(PS_IN In)
-{
-    PS_OUT_OUTLINEMASK Out;
-    Out.vMask = float4(g_vMaskValue.x, g_vMaskValue.y, 0.f, 0.f);
-    return Out;
-}
-
 
 
 technique11 DefaultTechnique
@@ -238,7 +150,8 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
     }
-    pass NonDiffusePass // 1
+
+    pass DeffusePass // 1
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -246,70 +159,6 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_NONDIFF();
-    }
-    pass BlendPass // 2
-    {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Z_Disable, 0);
-        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_BLEND();
-    }
-    pass Shadow // 3
-    {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_SHADOW();
-    }
-
-    pass NormalMappingPass // 4
-    {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_NORMALMAP();
-    }
-
-    pass OutlineMaskPass // 5
-    {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Z_Disable, 0);
-        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_OUTLINEMASK();
-    }
-
-    pass ProjectilePass // 6
-    {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_PROJECTILE();
-    }
-
-    pass GrassPass // 7
-    {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_GRASS();
+        PixelShader = compile ps_5_0 PS_DEFFUSE();
     }
 }

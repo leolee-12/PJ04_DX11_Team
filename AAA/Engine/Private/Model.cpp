@@ -4,6 +4,7 @@
 #include "DataLoader.h"
 #include "Bone.h"
 #include "Animation.h"
+#include "Animator.h"
 
 
 CModel::CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -172,6 +173,35 @@ void CModel::Set_AnimationIndex(_uint iIndex, _bool isLoop, _bool isRestart, _fl
     m_isBlending = true;
 
     m_Animations[m_iBlendTargetAnimIndex]->Reset_TrackPosition();
+}
+
+_int CModel::Get_AnimationIndex(const string& strName) const
+{
+    for (_uint i = 0; i < m_iNumAnimations; ++i)
+        if (m_Animations[i]->Get_AnimationName() == strName)
+            return (_int)i;
+    return -1;
+}
+
+const string& CModel::Get_CurrentAnimName() const
+{
+    static const string strEmpty = {};
+    _uint idx = m_isBlending ? m_iBlendTargetAnimIndex : m_iCurrentAnimationIndex;
+    if (idx == (_uint)-1 || idx >= m_Animations.size())
+        return strEmpty;
+    return m_Animations[idx]->Get_AnimationName();
+}
+
+void CModel::Seek_Animation(_float fProgress)
+{
+    _uint idx = m_isBlending ? m_iBlendTargetAnimIndex : m_iCurrentAnimationIndex;
+    if (idx == (_uint)-1 || idx >= m_Animations.size())
+        return;
+
+    m_Animations[idx]->Set_Progress(fProgress);
+    m_Animations[idx]->Update_TransformationMatrices(m_Bones, 0.f, false);
+    for (auto& pBone : m_Bones)
+        pBone->Update_CombinedTransformMatrices(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
 }
 
 _bool CModel::Play_Animation(_float fTimeDelta)

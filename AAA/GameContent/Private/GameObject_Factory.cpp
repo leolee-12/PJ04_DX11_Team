@@ -8,6 +8,7 @@
 #include "TestNonAnim.h"
 #include "TestRect.h"
 #include "TestEffectQuad.h"
+#include "TestMarb1e.h"
 
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
@@ -76,6 +77,9 @@ void CGameObject_Factory::Register_Test()
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/BladeNight/BladeNight.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))))
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/BladeKnight/BladeKnight.ysh"
+                    //, XMMatrixRotationY(XMConvertToRadians(180.f))
+            ))
         )
     );
 
@@ -96,6 +100,14 @@ void CGameObject_Factory::Register_Test()
     Register(CTestEffectQuad::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
         CREATOR(CTestEffectQuad),
         LOADER()
+    Register(CTestMarb1e::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
+        CREATOR(CTestMarb1e),
+        LOADER(
+            pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Marb1e"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/Marb1e/BladeKnight.ysh"
+                    //, XMMatrixRotationY(XMConvertToRadians(180.f))
+                ))
+        )
     );
 }
 

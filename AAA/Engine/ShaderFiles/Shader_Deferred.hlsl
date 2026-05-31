@@ -4,57 +4,50 @@ float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 float4x4 g_ShadowLightViewMatrix, g_ShadowLightProjMatrix;
 float4x4 g_ViewMatrixInverse, g_ProjMatrixInverse;
 
-Texture2D g_Texture;
-Texture2D g_NormalTexture;
-Texture2D g_DiffuseTexture;
-Texture2D g_ShadeTexture;
-Texture2D g_DepthTexture;
-Texture2D g_SpecularTexture;
-Texture2D g_LightDepthTexture;
-Texture2D g_OutlineMaskTexture;
+  /* G-buffer */
+Texture2D g_Texture; // 디버그용
+Texture2D g_DiffuseTexture; // albedo (rgb), alpha
+Texture2D g_NormalTexture; // world normal * 0.5 + 0.5
+Texture2D g_DepthTexture; // (z/w, viewZ/500, ...)
+Texture2D g_MRATexture; // r=metallic, g=roughness, b=ao
+Texture2D g_LightTexture; // HDR 광량 누적 (Combine 입력)
+Texture2D g_LightDepthTexture; // 그림자맵
 
 vector g_vCamPosition;
 
+  /* Light */
 vector g_vLightDir;
 vector g_vLightPos;
 float g_fLightRange;
-
 vector g_vLightDiffuse;
 vector g_vLightAmbient;
 vector g_vLightSpecular;
 
-vector g_vMtrlAmbient = 1.f;
-vector g_vMtrlSpecular = 1.f;
+  /* Combine 전용 앰비언트 (바인딩 안 해도 기본값 사용) */
+vector g_vAmbientColor = float4(0.15f, 0.15f, 0.18f, 1.f);
 
-float2 g_vTexel;
+static const float PI = 3.14159265f;
 
+  //============================ Common VS ============================
 struct VS_IN
 {
-    float3 vPosition : POSITION;    
+    float3 vPosition : POSITION;
     float2 vTexcoord : TEXCOORD0;
 };
-
 struct VS_OUT
 {
     float4 vPosition : SV_POSITION;
     float2 vTexcoord : TEXCOORD0;
 };
-    
-
-/* 정점셰이더 : 정점 데이터의 변환 과정을 수행한다. */
 
 VS_OUT VS_MAIN(VS_IN In)
 {
     VS_OUT Out;
-    
-    /* 월드변환, 뷰 벼환, 투영변환 */ 
     float4 vPosition = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
     vPosition = mul(vPosition, g_ViewMatrix);
     vPosition = mul(vPosition, g_ProjMatrix);
-    
     Out.vPosition = vPosition;
     Out.vTexcoord = In.vTexcoord;
-    
     return Out;
 }
 
@@ -64,199 +57,138 @@ struct PS_IN
     float2 vTexcoord : TEXCOORD0;
 };
 
-struct PS_OUT_BACKBUFFER
+  //============================ PBR Helpers ============================
+float3 Fresnel(float3 F0, float cosT)
 {
-    float4 vBackBuffer : SV_TARGET0;
-};
-    
-
-
-PS_OUT_BACKBUFFER PS_MAIN_DEBUG(PS_IN In)
+    return F0 + (1.f - F0) * pow(1.f - cosT, 5.f);
+}
+float DistGGX(float3 N, float3 H, float r)
 {
-    PS_OUT_BACKBUFFER Out;
-    
-    Out.vBackBuffer = g_Texture.Sample(LinearSampler, In.vTexcoord);
-    
-    return Out;
+    float a = r * r, a2 = a * a;
+    float NdotH = saturate(dot(N, H));
+    float d = NdotH * NdotH * (a2 - 1.f) + 1.f;
+    return a2 / max(PI * d * d, 1e-5);
+}
+float GeomSchlick(float NdotX, float r)
+{
+    float k = (r + 1.f);
+    k = k * k / 8.f;
+    return NdotX / (NdotX * (1.f - k) + k);
+}
+float GeomSmith(float3 N, float3 V, float3 L, float r)
+{
+    return GeomSchlick(saturate(dot(N, V)), r) * GeomSchlick(saturate(dot(N, L)), r);
 }
 
-struct PS_OUT_LIGHT
+float3 RecoverWorldPos(float2 uv, float depthZ, float viewZ)
 {
-    float4 vShade : SV_TARGET0;
-    float4 vSpecular : SV_TARGET1;
-};
-    
-
-PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
-{
-    PS_OUT_LIGHT Out = (PS_OUT_LIGHT) 0;
-    
-    vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
-    vector vDepthDesc = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
-    float fViewZ = vDepthDesc.y * 500.f;
-    
-    float4 vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
-    
-    Out.vShade = g_vLightDiffuse * (saturate(dot(normalize(g_vLightDir) * -1.f, normalize(vNormal))) + (g_vLightAmbient * g_vMtrlAmbient));
-    
-    vector vReflect = reflect(normalize(g_vLightDir), normalize(vNormal));
-    
-    vector vWorldPos;
-    
-    /* 투영공간상의 위치 */
-    vWorldPos.x = In.vTexcoord.x * 2.f - 1.f;
-    vWorldPos.y = In.vTexcoord.y * -2.f + 1.f;
-    vWorldPos.z = vDepthDesc.x;
-    vWorldPos.w = 1.f;
-    
-    /* 뷰스페이스 상의 위치 */
-    vWorldPos *= fViewZ;
-    vWorldPos = mul(vWorldPos, g_ProjMatrixInverse);
-    
-    /* 월드스페이스 상의 위치 */
-    vWorldPos = mul(vWorldPos, g_ViewMatrixInverse);
-        
-    vector vLook = vWorldPos - g_vCamPosition;
-    Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) *
-        pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), 50.f);
-    
-    return Out;
+    float4 p;
+    p.x = uv.x * 2.f - 1.f;
+    p.y = uv.y * -2.f + 1.f;
+    p.z = depthZ;
+    p.w = 1.f;
+    p *= viewZ;
+    p = mul(p, g_ProjMatrixInverse);
+    p = mul(p, g_ViewMatrixInverse);
+    return p.xyz;
 }
 
-PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
+float3 CookTorrance(float3 N, float3 V, float3 L, float3 albedo,
+                      float metallic, float roughness, float3 radiance)
 {
-    PS_OUT_LIGHT Out = (PS_OUT_LIGHT) 0;
-    
-    vector vNormalDesc = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
-    vector vDepthDesc = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
-    float fViewZ = vDepthDesc.y * 500.f;
-    
-    float4 vNormal = float4(vNormalDesc.xyz * 2.f - 1.f, 0.f);
-    vector vWorldPos;
-    
-    /* 투영공간상의 위치 */
-    vWorldPos.x = In.vTexcoord.x * 2.f - 1.f;
-    vWorldPos.y = In.vTexcoord.y * -2.f + 1.f;
-    vWorldPos.z = vDepthDesc.x;
-    vWorldPos.w = 1.f;
-    
-    /* 뷰스페이스 상의 위치 */
-    vWorldPos *= fViewZ;
-    vWorldPos = mul(vWorldPos, g_ProjMatrixInverse);
-    
-    /* 월드스페이스 상의 위치 */
-    vWorldPos = mul(vWorldPos, g_ViewMatrixInverse);
-        
-    vector vLightDir = vWorldPos - g_vLightPos;
-    
-    float fAtt = saturate((g_fLightRange - length(vLightDir)) / g_fLightRange);
-    
-    Out.vShade = (g_vLightDiffuse * (saturate(dot(normalize(vLightDir) * -1.f, normalize(vNormal))) + (g_vLightAmbient * g_vMtrlAmbient))) * fAtt;
-    
-    vector vReflect = reflect(normalize(vLightDir), normalize(vNormal));
-    
-    
-    vector vLook = vWorldPos - g_vCamPosition;
-    Out.vSpecular = ((g_vLightSpecular * g_vMtrlSpecular) *
-        pow(saturate(dot(normalize(vReflect) * -1.f, normalize(vLook))), 50.f)) * fAtt;
-    
-    return Out;
+    roughness = clamp(roughness, 0.04f, 1.f);
+    float3 H = normalize(V + L);
+    float3 F0 = lerp(0.04f, albedo, metallic);
+    float3 F = Fresnel(F0, saturate(dot(H, V)));
+    float D = DistGGX(N, H, roughness);
+    float G = GeomSmith(N, V, L, roughness);
+
+    float3 spec = (D * G * F) /
+          max(4.f * saturate(dot(N, V)) * saturate(dot(N, L)), 1e-4);
+
+    float3 kD = (1.f - F) * (1.f - metallic);
+    float3 diff = kD * albedo / PI;
+
+    return (diff + spec) * radiance * saturate(dot(N, L));
 }
 
-
-PS_OUT_BACKBUFFER PS_MAIN_COMBINED(PS_IN In)
+  //============================ Debug (pass 0) ============================
+float4 PS_MAIN_DEBUG(PS_IN In) : SV_TARGET0
 {
-    PS_OUT_BACKBUFFER Out;
-    
-    vector vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-    if (0.f == vDiffuse.a)
-        discard;
-    vector vShade = g_ShadeTexture.Sample(LinearSampler, In.vTexcoord);
-    vector vSpecular = g_SpecularTexture.Sample(LinearSampler, In.vTexcoord);
-    
-    Out.vBackBuffer = vDiffuse * vShade + vSpecular;
-    
-    vector vDepthDesc = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
-    float fViewZ = vDepthDesc.y * 500.f;
-
-    vector vWorldPos;
-    
-    /* 투영공간상의 위치 */
-    vWorldPos.x = In.vTexcoord.x * 2.f - 1.f;
-    vWorldPos.y = In.vTexcoord.y * -2.f + 1.f;
-    vWorldPos.z = vDepthDesc.x;
-    vWorldPos.w = 1.f;
-    
-    /* 뷰스페이스 상의 위치 */
-    vWorldPos *= fViewZ;
-    vWorldPos = mul(vWorldPos, g_ProjMatrixInverse);
-    /* 월드스페이스 상의 위치 */
-    vWorldPos = mul(vWorldPos, g_ViewMatrixInverse);
-    
-    float4 vLightClip = mul(float4(vWorldPos.xyz, 1.f), g_ShadowLightViewMatrix);
-    vLightClip = mul(vLightClip, g_ShadowLightProjMatrix);
-
-    float2 vTexcoord;
-    vTexcoord.x = (vLightClip.x / vLightClip.w) * 0.5f + 0.5f;
-    vTexcoord.y = (vLightClip.y / vLightClip.w) * -0.5f + 0.5f;
-
-    float fLightProjZ = vLightClip.z / vLightClip.w; 
-    float fSampledDepth = g_LightDepthTexture.Sample(BorderSampler, vTexcoord).r;
-
-    float fShadowBias = 0.002f;
-    if (fLightProjZ <= 1.f && fLightProjZ - fShadowBias > fSampledDepth)
-        Out.vBackBuffer *= 0.5f;
-    
-    return Out;
+    return g_Texture.Sample(LinearSampler, In.vTexcoord);
 }
 
-PS_OUT_BACKBUFFER PS_MAIN_OUTLINE(PS_IN In)
+  //============================ Directional (pass 1) ============================
+float4 PS_MAIN_DIRECTIONAL(PS_IN In) : SV_TARGET0
 {
-    PS_OUT_BACKBUFFER Out;
+    float4 nd = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
+    float4 dd = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
+    float3 albedo = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
 
-    float2 self = g_OutlineMaskTexture.Sample(LinearSampler, In.vTexcoord).rg;
-    if (self.r > 0.01f || self.g > 0.01f)
+    float3 N = normalize(nd.xyz * 2.f - 1.f);
+    float3 wp = RecoverWorldPos(In.vTexcoord, dd.x, dd.y * 500.f);
+    float3 V = normalize(g_vCamPosition.xyz - wp);
+    float3 L = normalize(-g_vLightDir.xyz);
+
+    float3 Lo = CookTorrance(N, V, L, albedo, mra.r, mra.g, g_vLightDiffuse.rgb);
+    return float4(Lo, 1.f);
+}
+
+  //============================ Point (pass 2) ============================
+float4 PS_MAIN_POINT(PS_IN In) : SV_TARGET0
+{
+    float4 nd = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
+    float4 dd = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
+    float3 albedo = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
+
+    float3 N = normalize(nd.xyz * 2.f - 1.f);
+    float3 wp = RecoverWorldPos(In.vTexcoord, dd.x, dd.y * 500.f);
+    float3 V = normalize(g_vCamPosition.xyz - wp);
+
+    float3 Lvec = g_vLightPos.xyz - wp;
+    float dist = length(Lvec);
+    float att = saturate((g_fLightRange - dist) / g_fLightRange);
+    att *= att;
+    float3 L = Lvec / max(dist, 1e-4);
+
+    float3 Lo = CookTorrance(N, V, L, albedo, mra.r, mra.g, g_vLightDiffuse.rgb) * att;
+    return float4(Lo, 1.f);
+}
+
+  //============================ Combined (pass 3) ============================
+float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
+{
+    float4 albedoA = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (0.f == albedoA.a)
         discard;
 
-    static const float2 dirs[8] =
-    {
-        float2(1, 0), float2(-1, 0), float2(0, 1), float2(0, -1),
-          float2(1, 1), float2(-1, 1), float2(1, -1), float2(-1, -1)
-    };
+    float3 light = g_LightTexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
 
-    float thinR = 0.f, thickR = 0.f;
-    float thinG = 0.f, thickG = 0.f;
+      /* 앰비언트 (추후 IBL로 교체) */
+    float3 ambient = albedoA.rgb * g_vAmbientColor.rgb * mra.b; // mra.b = AO
+    float3 color = light + ambient;
 
-      [unroll]
-    for (int i = 0; i < 8; ++i)
-    {
-        float2 d = dirs[i];
+      /* 그림자 */
+    float4 dd = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
+    float3 wp = RecoverWorldPos(In.vTexcoord, dd.x, dd.y * 500.f);
+    float4 lc = mul(float4(wp, 1.f), g_ShadowLightViewMatrix);
+    lc = mul(lc, g_ShadowLightProjMatrix);
+    float2 suv = float2(lc.x / lc.w * 0.5f + 0.5f, lc.y / lc.w * -0.5f + 0.5f);
+    float pz = lc.z / lc.w;
+    float sd = g_LightDepthTexture.Sample(BorderSampler, suv).r;
+    if (pz <= 1.f && pz - 0.002f > sd)
+        color *= 0.5f;
 
-        float2 n1 = g_OutlineMaskTexture.Sample(LinearSampler, In.vTexcoord + d * g_vTexel).rg;
-        if (n1.r > 0.4f && n1.r < 0.6f)
-            thinR = 1.f;
-        if (n1.g > 0.4f && n1.g < 0.6f)
-            thinG = 1.f;
-
-          [unroll]
-        for (int r = 1; r <= 2; ++r)
-        {
-            float2 n = g_OutlineMaskTexture.Sample(LinearSampler, In.vTexcoord + d * g_vTexel * r).rg;
-            if (n.r > 0.9f)
-                thickR = 1.f;
-            if (n.g > 0.9f)
-                thickG = 1.f;
-        }
-    }
-
-    if (thinR + thickR + thinG + thickG < 0.01f)
-        discard;
-    
-    float3 color = (thinG + thickG > 0.5f) ? float3(1.f, 0.f, 0.f) : float3(1.f, 1.f, 1.f);
-    Out.vBackBuffer = float4(color, 1.f);
-    return Out;
+      /* 톤매핑 + 감마 */
+    color = color / (color + 1.f); // Reinhard
+    color = pow(color, 1.f / 2.2f); // 감마
+    return float4(color, 1.f);
 }
 
+  //============================ Technique ============================
 technique11 DefaultTechnique
 {
     pass Debug // 0
@@ -264,18 +196,15 @@ technique11 DefaultTechnique
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_DEBUG();
     }
-
     pass Directional // 1
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Z_Disable, 0);
         SetBlendState(BS_Additive, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_DIRECTIONAL();
@@ -285,7 +214,6 @@ technique11 DefaultTechnique
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Z_Disable, 0);
         SetBlendState(BS_Additive, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_POINT();
@@ -295,20 +223,8 @@ technique11 DefaultTechnique
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Z_Disable, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_COMBINED();
     }
-    pass Outline // 4
-    {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Z_Disable, 0);
-        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN_OUTLINE();
-    }
-
 }

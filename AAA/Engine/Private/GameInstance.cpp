@@ -16,6 +16,7 @@
 #include "Target_Manager.h"
 #include "Shadow_Dir.h"
 #include "Effect_Manager.h"
+#include "PhysX_Manager.h"
 
 CGameInstance* CGameInstance::m_pInstance = { nullptr };
 CGameInstance_Proxy* CGameInstance::m_pGameInstance_Proxy = { nullptr };
@@ -98,6 +99,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pInstance->m_pEffect_Manager)
         return E_FAIL;
 
+    m_pInstance->m_pPhysX_Manager = CPhysX_Manager::Create();
+    if (nullptr == m_pInstance->m_pPhysX_Manager)
+        return E_FAIL;
+
     m_pInstance->m_RandomGenerator.seed(random_device{}());
     
 
@@ -115,6 +120,8 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
     m_pSound_Manager->Set_ListenerPos(*m_pCamera_Manager->Get_CamPosition());
     m_pSound_Manager->Update();
     m_pObject_Manager->Late_Update(fTimeDelta);
+
+    m_pPhysX_Manager->Simulate(fTimeDelta);
 
     m_pCollision_Manager->Check_Collisions(fTimeDelta);
 
@@ -449,6 +456,7 @@ void	CGameInstance::Add_CollisionPool(_uint SrcGroup, _uint DstGroup)
 void	CGameInstance::Reset_For_SceneChange()
 {
     m_pCollision_Manager->Reset_For_SceneChange();
+    m_pPhysX_Manager->Reset_For_SceneChange();
 }
 void	CGameInstance::Clear_CollisionPool()
 {
@@ -541,6 +549,7 @@ void CGameInstance::Free()
 	m_pGameInstance_Proxy->Disconnect();
 
     Safe_Release(m_pEffect_Manager);
+    Safe_Release(m_pPhysX_Manager);
     Safe_Release(m_pShadow_Dir);
     Safe_Release(m_pTarget_Manager);
     Safe_Release(m_pSound_Manager);
