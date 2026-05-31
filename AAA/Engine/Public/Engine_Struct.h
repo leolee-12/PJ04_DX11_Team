@@ -43,6 +43,27 @@ namespace Engine
 		unsigned int	uiVersion;
 	}SUBHANDLE;
 
+	typedef struct tagAnimEvent
+	{
+		int         iEventType = 0;          // 의미는 클라이언트 enum(EANIM_EVENT)이 결정
+		float       fTriggerProgress = 0.f;  // 시작 지점 (0~1)
+
+		bool        bIsRange = false;        // true면 구간 이벤트
+		float       fEndProgress = 0.f;      // 구간 끝 (start <= end)
+
+		string      strParam;                // 이펙트 프로토타입 태그 / 소켓 본 이름 (자유도 위해 string)
+		int         iIntParam = 0;
+		XMFLOAT3    vOffset = {};
+
+		bool        bActive = false;         // 런타임 전용 (직렬화 X)
+	}ANIM_EVENT;
+
+	typedef struct tagAnimEventTrack
+	{
+		string              strAnimName;
+		vector<ANIM_EVENT>  Events;          // fTriggerProgress 오름차순 유지
+	}ANIM_EVENT_TRACK;
+
 	typedef struct tagVertexPosition
 	{
 		XMFLOAT3		vPosition;

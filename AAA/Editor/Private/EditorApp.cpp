@@ -30,7 +30,8 @@ HRESULT CEditorApp::Initialize()
     Ready_EditRTV();
 
     m_pGameInstance_Proxy = CGameInstance::GetProxy();
-     m_pGameInstance_Proxy->Disable_InputDeveice();
+    m_pGameInstance_Proxy->Disable_InputDeveice();
+    m_pGameInstance_Proxy->Set_EditMode(true);
 
     m_pImGui_Manager = CImGui_Manager::GetInstance();
     Safe_AddRef(m_pImGui_Manager);

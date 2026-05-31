@@ -47,9 +47,12 @@ public:
 	virtual HRESULT Initialize(void* pArg);
 
 public:
-	void	Set_AnimationIndex(_uint iIndex, _bool isLoop = false, _bool isRestart = false, _float fBlendDuration = 0.2f);
-	_bool   Play_Animation(_float fTimeDelta);
-	HRESULT Render(_uint iMeshIndex);
+	void		  Set_AnimationIndex(_uint iIndex, _bool isLoop = false, _bool isRestart = false, _float fBlendDuration = 0.2f);
+	_int		  Get_AnimationIndex(const string& strName) const;
+	const string& Get_CurrentAnimName() const;
+	void		  Seek_Animation(_float fProgress);
+	_bool		  Play_Animation(_float fTimeDelta);
+	HRESULT		  Render(_uint iMeshIndex);
 
 public:
 	HRESULT Bind_Material(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, MTEX_TYPE eType, _uint iIndex);

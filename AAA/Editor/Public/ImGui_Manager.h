@@ -11,6 +11,8 @@ NS_BEGIN(Engine)
 class CGameInstance_Proxy;
 class CGameObject;
 class IReflectable;
+class CAnimator;
+class CModel;
 NS_END
 
 NS_BEGIN(Editor)
@@ -38,6 +40,8 @@ private:
 	void Draw_Palette();
 	void Draw_Viewport();
 	void Draw_Transform(CGameObject* pObject, const string& strSuffix = "");
+
+	void Draw_AnimatorEditor(CModel* pModel, CAnimator* pAnimator);
 
 public:
 	virtual void Free() override;

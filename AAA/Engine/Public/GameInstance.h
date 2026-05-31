@@ -194,6 +194,12 @@ public:
 #endif
 #pragma endregion
 
+#pragma region EDITMODE
+  public:
+	  void  Set_EditMode(_bool bEdit) { m_bEditMode = bEdit; }
+	  _bool Is_EditMode() const		  { return m_bEditMode; }
+#pragma endregion
+
 
 
 private:
@@ -216,6 +222,7 @@ private:
 	CPhysX_Manager*				m_pPhysX_Manager = { nullptr };
 
 	mutable mt19937             m_RandomGenerator;
+	_bool						m_bEditMode = { false };
 
 private:
 	static CGameInstance* m_pInstance;

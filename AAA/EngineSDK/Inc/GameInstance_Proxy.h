@@ -182,6 +182,12 @@ public:
         const CEffect::EFFECT_DESC& desc, CEffect** ppOut = nullptr);
 #pragma endregion
 
+#pragma region EDITMODE
+  public:
+      void  Set_EditMode(_bool bEdit);
+      _bool Is_EditMode() const;
+#pragma endregion
+
 private:
     CGameInstance* m_pOwner = { nullptr };
 
