@@ -2,7 +2,7 @@
 
 using namespace physx;
 
-#define PX_RELEASE(x) if(x){ x->release(); x = nullptr; }
+//#define PX_RELEASE(x) if(x){ x->release(); x = nullptr; }
 
 HRESULT CPhysX_Manager::Initialize()
 {

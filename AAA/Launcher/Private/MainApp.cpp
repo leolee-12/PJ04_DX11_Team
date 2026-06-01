@@ -85,19 +85,19 @@ HRESULT CMainApp::Ready_Prototype_For_Static()
 
 HRESULT CMainApp::Start_Logo()
 {
-	CLevel* pLevelLogo = CLevel_Logo::Create(m_pDevice, m_pContext);
-	if (nullptr == pLevelLogo)
-		return E_FAIL;
-
-	if (FAILED(m_pGameInstance_Proxy->Change_Level(ETOI(LEVEL::LOGO), pLevelLogo)))
-		return E_FAIL;
-
-	//CLevel* pLevelLoading = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY);
-	//if (nullptr == pLevelLoading)
+	//CLevel* pLevelLogo = CLevel_Logo::Create(m_pDevice, m_pContext);
+	//if (nullptr == pLevelLogo)
 	//	return E_FAIL;
 	//
-	//if (FAILED(m_pGameInstance_Proxy->Change_Level(ETOI(LEVEL::LOADING), pLevelLoading)))
+	//if (FAILED(m_pGameInstance_Proxy->Change_Level(ETOI(LEVEL::LOGO), pLevelLogo)))
 	//	return E_FAIL;
+
+	CLevel* pLevelLoading = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY);
+	if (nullptr == pLevelLoading)
+		return E_FAIL;
+	
+	if (FAILED(m_pGameInstance_Proxy->Change_Level(ETOI(LEVEL::LOADING), pLevelLoading)))
+		return E_FAIL;
 
 	return S_OK;
 }

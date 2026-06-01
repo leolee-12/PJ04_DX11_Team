@@ -14,9 +14,27 @@ HRESULT CLevel_GamePlay::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
-    /*if (FAILED(Load_Level(m_pGameInstance_Proxy, m_pDevice, m_pContext,
+    if (FAILED(Load_Level(m_pGameInstance_Proxy, m_pDevice, m_pContext,
         L"../../Resources/LevelData/GamePlay.JSON", ETOUI(LEVEL::GAMEPLAY))))
-        return E_FAIL;*/
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Camera_Free"), CCamera_Free::Create(m_pDevice, m_pContext))))
+        return E_FAIL;
+
+    CCamera_Free::CAMERA_FREE_DESC      CameraDesc{};
+
+    CameraDesc.vEye = _float3(0.f, 10.f, -7.f);
+    CameraDesc.vAt = _float3(0.f, 0.f, 0.f);
+    CameraDesc.fFovy = XMConvertToRadians(60.f);
+    CameraDesc.fNear = 0.1f;
+    CameraDesc.fFar = 500.f;
+    CameraDesc.fSpeedPerSec = 20.f;
+    CameraDesc.fRotationPerSec = XMConvertToRadians(180.f);
+    CameraDesc.fMouseSensor = 0.05f;
+
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Camera_Free"),
+        ETOUI(LEVEL::GAMEPLAY), TEXT("Layer_Camera"), TEXT("CameraFree"), & CameraDesc)))
+        return E_FAIL;
 
     if (FAILED(Ready_Lights()))
         return E_FAIL;
@@ -51,8 +69,8 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 
     LightDesc.eType = LIGHT::DIRECTIONAL;
     LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-    LightDesc.vAmbient = _float4(0.2f, 0.2f, 0.2f, 1.f);
-    LightDesc.vSpecular = _float4(0.f, 0.f, 0.f, 1.f);
+    LightDesc.vAmbient = _float4(0.5f, 0.5f, 0.5f, 1.f);
+    LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
     LightDesc.vDirection = _float4(0.25f, -1.f, 0.25f, 0.f);
 
     if (FAILED(m_pGameInstance_Proxy->Add_Light(LightDesc)))

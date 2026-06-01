@@ -1,0 +1,206 @@
+#include "Engine_Shader_Defines.hlsli"
+
+float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
+
+Texture2D g_DiffuseTexture;   
+Texture2D g_NormalTexture;    
+Texture2D g_MRATexture;       
+
+Texture2D g_MossTexture; 
+
+float  g_NormalStrength = 1.f;     
+float  g_fAOStrength    = 1.f;     
+
+int    g_iUseTopProjection = 0;
+float2 g_TopUVScale  = float2(1.f, 1.f);
+float  g_TopUVRotate = 0.f;        
+float2 g_TopUVOffset = float2(0.f, 0.f);
+
+float2 g_vBaseUVScale = float2(0.1f, 0.1f);
+
+int g_iHasMoss = 0;
+float g_fMossAmount = 1.f; // 전역 이끼 강도
+
+float g_fDirtAmount = 1.f;
+
+struct VS_IN
+{
+    float3 vPosition : POSITION;
+    float3 vNormal   : NORMAL;
+    float2 vTexcoord  : TEXCOORD0;
+    float2 vTexcoord1 : TEXCOORD1;
+    float2 vTexcoord2 : TEXCOORD2;
+    float2 vTexcoord3 : TEXCOORD3;
+    float4 vTangent  : TANGENT;
+    float4 vBinormal : BINORMAL;
+    float4 vColor    : COLOR0;     // _c0  tint / blend
+    float4 vColor1   : COLOR1;     // _c1  AO / blend
+    float4 vColor2   : COLOR2;     // _c2  spare mask
+};
+
+struct VS_OUT
+{
+    float4 vPosition : SV_POSITION;
+    float4 vNormal   : NORMAL;
+    float2 vTexcoord  : TEXCOORD0;
+    float2 vTexcoord1 : TEXCOORD1;
+    float2 vTexcoord2 : TEXCOORD2;
+    float2 vTexcoord3 : TEXCOORD3;
+    float4 vWorldPos : TEXCOORD4;
+    float4 vProjPos  : TEXCOORD5;
+    float4 vTangent  : TANGENT;
+    float4 vBinormal : BINORMAL;
+    float4 vColor    : COLOR0;
+    float4 vColor1   : COLOR1;
+    float4 vColor2   : COLOR2;
+};
+
+VS_OUT VS_MAIN(VS_IN In)
+{
+    VS_OUT Out;
+
+    float4 vWorld = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
+    Out.vPosition = mul(mul(vWorld, g_ViewMatrix), g_ProjMatrix);
+
+    Out.vNormal    = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix));
+    Out.vTexcoord  = In.vTexcoord;
+    Out.vTexcoord1 = In.vTexcoord1;
+    Out.vTexcoord2 = In.vTexcoord2;
+    Out.vTexcoord3 = In.vTexcoord3;
+    Out.vWorldPos  = vWorld;
+    Out.vProjPos   = Out.vPosition;
+
+    Out.vTangent    = normalize(mul(float4(In.vTangent.xyz, 0.f), g_WorldMatrix));
+    Out.vTangent.w  = In.vTangent.w;
+    Out.vBinormal   = normalize(mul(float4(In.vBinormal.xyz, 0.f), g_WorldMatrix));
+    Out.vBinormal.w = In.vBinormal.w;
+
+    Out.vColor  = In.vColor;
+    Out.vColor1 = In.vColor1;
+    Out.vColor2 = In.vColor2;
+
+    return Out;
+}
+
+struct PS_IN
+{
+    float4 vPosition : SV_POSITION;
+    float4 vNormal   : NORMAL;
+    float2 vTexcoord  : TEXCOORD0;
+    float2 vTexcoord1 : TEXCOORD1;
+    float2 vTexcoord2 : TEXCOORD2;
+    float2 vTexcoord3 : TEXCOORD3;
+    float4 vWorldPos : TEXCOORD4;
+    float4 vProjPos  : TEXCOORD5;
+    float4 vTangent  : TANGENT;
+    float4 vBinormal : BINORMAL;
+    float4 vColor    : COLOR0;
+    float4 vColor1   : COLOR1;
+    float4 vColor2   : COLOR2;
+};
+
+struct PS_OUT
+{
+    float4 vDiffuse : SV_TARGET0;
+    float4 vNormal  : SV_TARGET1;
+    float4 vDepth   : SV_TARGET2;
+    float4 vMRA     : SV_TARGET3;
+};
+
+// world XZ projection UV for top faces (2D rotate + scale + offset)
+float2 TopProjectUV(float3 worldPos)
+{
+    float2 p = worldPos.xz * g_TopUVScale;
+    float s = sin(g_TopUVRotate), c = cos(g_TopUVRotate);
+    p = float2(p.x * c - p.y * s, p.x * s + p.y * c);
+    return p + g_TopUVOffset;
+}
+
+PS_OUT PS_MAIN(PS_IN In)
+{
+    PS_OUT Out;
+
+    // ---- pick UV: uv0(월드XZ)에 타일링 스케일, 또는 Top 투영 ----
+    float2 uv = (g_iUseTopProjection != 0) ? TopProjectUV(In.vWorldPos.xyz)
+                                             : In.vTexcoord * g_vBaseUVScale;
+
+ 
+    float4 vBase = g_DiffuseTexture.Sample(LinearSampler, uv);
+    if (vBase.a < 0.1f)
+        discard;
+    float3 albedo = vBase.rgb;
+    float3 mra    = g_MRATexture.Sample(LinearSampler, uv).rgb;   
+
+    float3 N = normalize(In.vNormal.xyz);
+    float3 T = normalize(In.vTangent.xyz);
+    T = normalize(T - dot(T, N) * N);                  
+    float3 B = cross(N, T) * In.vTangent.w;            
+    float3x3 TBN = float3x3(T, B, N);
+
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, uv).rg * 2.f - 1.f;
+    nrg *= g_NormalStrength;
+    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+    nTS.y = -nTS.y;                                  
+    float3 Nw = normalize(mul(nTS, TBN));
+
+    float ao = lerp(1.f, In.vColor1.r, g_fAOStrength);  
+    albedo *= ao;
+    mra.b  *= ao;           
+    
+    if (g_iHasMoss != 0)
+    {
+        float w = saturate((1.f - In.vColor.g) * g_fMossAmount); // 마젠타(G=0)=moss
+
+        float3 mossAlbedo = g_MossTexture.Sample(LinearSampler, uv).rgb;
+        albedo = lerp(albedo, mossAlbedo, w);
+        mra.g = lerp(mra.g, 1.f, w);
+    }
+
+    Out.vDiffuse = float4(albedo, 1.f);
+    Out.vNormal  = float4(Nw * 0.5f + 0.5f, 0.f);
+    Out.vDepth   = float4(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
+    Out.vMRA     = float4(mra, 1.f);
+    return Out;
+}
+
+PS_OUT PS_OVERLAY(PS_IN In)   // DirtParts / Cover 전용
+{
+    PS_OUT Out;
+    float2 uv = In.vTexcoord * g_vBaseUVScale;
+
+      // c0.r = 때 마스크. (mask 텍스처로 얼룩 깨기는 선택)
+    float coverage = saturate(1.f - In.vColor.r) * g_fDirtAmount;
+    if (coverage < 0.5f)
+        discard; // 안 칠한 곳은 베이스가 보이게
+
+    float3 dirt = g_DiffuseTexture.Sample(LinearSampler, uv).rgb; // CoverC
+    Out.vDiffuse = float4(dirt, 1.f);
+    Out.vNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f); // 노멀맵 없음 → 기하노멀
+    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
+    Out.vMRA = float4(0.f, 1.f, 1.f, 1.f); // metal0 / rough1 / ao1 기본
+    return Out;
+}
+
+technique11 DefaultTechnique
+{
+    pass DefaultPass // 0
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN();
+    }
+
+    pass OverlayPass // 1
+    {
+        SetRasterizerState(RS_Decal); 
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_OVERLAY();
+    }
+}
