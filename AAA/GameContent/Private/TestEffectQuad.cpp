@@ -29,9 +29,6 @@ HRESULT CTestEffectQuad::Initialize(void* pArg)
     tDesc.m_iVIBufferLevel = VI_Rect.iLevelID;
     tDesc.wstrVIBufferTag = VI_Rect.szProtoTag;
 
-    tDesc.fRotationPerSec = 1.f;
-    tDesc.fSpeedPerSec = 1.f;
-
     if (FAILED(__super::Initialize(&tDesc)))
         return E_FAIL;
 

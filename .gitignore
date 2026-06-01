@@ -434,8 +434,8 @@ AAA/FBX_Converter/Map/*.fbx
 AAA/FBX_Converter/Map/*.ysh
 AAA/*.zip
 
-AAA/EngineSDK/
-AAA/ContentSDK/
+/AAA/EngineSDK/
+/AAA/ContentSDK/
 
 # PhysX libs - re-include despite [Dd]ebug/ rule above
 !AAA/Engine/ThirdPartyLib/PhysX/
@@ -452,7 +452,3 @@ AAA/ContentSDK/
 /AAA/Editor/[Bb]in/ShaderFiles/Shader_Cell.hlsl
 /AAA/Editor/[Bb]in/ShaderFiles/Shader_Deferred.hlsl
 /AAA/Editor/[Bb]in/ShaderFiles/Shader_VtxTex.hlsl
-
-
-/AAA/EngineSDK/
-/AAA/ContentSDK/
