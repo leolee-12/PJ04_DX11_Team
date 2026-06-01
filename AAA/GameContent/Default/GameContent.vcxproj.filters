@@ -43,7 +43,10 @@
     <Filter Include="98. ShaderFiles\Marb1e">
       <UniqueIdentifier>{c5ab5b79-8b3c-4a71-af78-735b22243355}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\Test\TestMarb1e">
+    <Filter Include="00. GameObject\Test\TestEffectQuad">
+      <UniqueIdentifier>{0d1ac5b9-9bf3-49d1-848a-61300fc9ce8b}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="00. GameObject\Test\TestMarb1e">
       <UniqueIdentifier>{840c0faf-b354-4895-adb2-a5936fb65b71}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -90,7 +93,10 @@
     <ClInclude Include="..\public\TestRect.h">
       <Filter>00. GameObject\Test\TestRect</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\TestMarb1e.h">
+    <ClInclude Include="..\Public\TestEffectQuad.h">
+      <Filter>00. GameObject\Test\TestEffectQuad</Filter>
+	</ClInclude>
+	<ClInclude Include="..\public\TestMarb1e.h">
       <Filter>00. GameObject\Test\TestMarb1e</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\GameContent_AnimEvents.h">
@@ -119,7 +125,10 @@
     <ClCompile Include="..\private\TestRect.cpp">
       <Filter>00. GameObject\Test\TestRect</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\TestMarb1e.cpp">
+    <ClCompile Include="..\Private\TestEffectQuad.cpp">
+      <Filter>00. GameObject\Test\TestEffectQuad</Filter>
+	</ClCompile>
+	<ClCompile Include="..\private\TestMarb1e.cpp">
       <Filter>00. GameObject\Test\TestMarb1e</Filter>
     </ClCompile>
   </ItemGroup>

@@ -217,7 +217,13 @@
     <Filter Include="05. GameObject\Effect\Manager">
       <UniqueIdentifier>{e435d7f0-3a1d-4e62-950d-122e3a3dfb16}</UniqueIdentifier>
     </Filter>
-    <Filter Include="16. PhysX">
+    <Filter Include="05. GameObject\Effect\EffectPart">
+      <UniqueIdentifier>{42b80ec2-d825-4521-b1ae-204abc8fe1cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Quad">
+      <UniqueIdentifier>{11914a26-172e-4caa-8ce4-2866473d5ef5}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="16. PhysX">
       <UniqueIdentifier>{c1fe8712-6c82-4df0-a436-8107d7043445}</UniqueIdentifier>
     </Filter>
     <Filter Include="16. PhysX\Manager">
@@ -441,7 +447,13 @@
     <ClInclude Include="..\public\Effect_Manager.h">
       <Filter>05. GameObject\Effect\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\PhysX_Manager.h">
+    <ClInclude Include="..\Public\Effect_Part.h">
+      <Filter>05. GameObject\Effect\EffectPart</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_Quad.h">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Quad</Filter>
+	</ClInclude>
+	<ClInclude Include="..\public\PhysX_Manager.h">
       <Filter>16. PhysX\Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Animator.h">
@@ -641,7 +653,13 @@
     <ClCompile Include="..\Private\Property.cpp">
       <Filter>05. GameObject\01. Property</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\PhysX_Manager.cpp">
+    <ClCompile Include="..\Private\Effect_Part.cpp">
+      <Filter>05. GameObject\Effect\EffectPart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_Quad.cpp">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Quad</Filter>
+	</ClCompile>
+	<ClCompile Include="..\private\PhysX_Manager.cpp">
       <Filter>16. PhysX\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Animator.cpp">
@@ -658,6 +676,9 @@
       <Filter>95. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\ShaderFiles\Shader_Deferred.hlsl">
+      <Filter>95. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_Effect_VtxTex.hlsl">
       <Filter>95. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

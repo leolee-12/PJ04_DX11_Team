@@ -434,8 +434,8 @@ AAA/FBX_Converter/Map/*.fbx
 AAA/FBX_Converter/Map/*.ysh
 AAA/*.zip
 
-AAA/EngineSDK/
-AAA/ContentSDK/
+/AAA/EngineSDK/
+/AAA/ContentSDK/
 
 # PhysX libs - re-include despite [Dd]ebug/ rule above
 !AAA/Engine/ThirdPartyLib/PhysX/
