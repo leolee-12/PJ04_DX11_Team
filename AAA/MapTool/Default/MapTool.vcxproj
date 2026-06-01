@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Private\CullingUtil.cpp" />
     <ClCompile Include="..\Private\EditInstance.cpp" />
     <ClCompile Include="..\Private\ImGui_Manager.cpp" />
     <ClCompile Include="..\Private\Level_Edit.cpp" />
@@ -51,6 +52,7 @@
     <ClCompile Include="MapTool.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Public\CullingUtil.h" />
     <ClInclude Include="..\Public\EditInstance.h" />
     <ClInclude Include="..\Public\ImGui_Manager.h" />
     <ClInclude Include="..\Public\Level_Edit.h" />

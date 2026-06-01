@@ -2,6 +2,7 @@
 #include "ImGui_Manager.h"
 #include "Level_Edit.h"
 #include "Panel_Manager.h"
+#include "CullingUtil.h"
 
 IMPLEMENT_SINGLETON(CEditInstance)
 
@@ -18,6 +19,13 @@ HRESULT CEditInstance::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pC
 	{
 		m_pPanelManager = CPanel_Manager::Create(pDevice, pContext);
 		if (nullptr == m_pPanelManager)
+			return E_FAIL;
+	}
+
+	if (nullptr == m_pCullingUtil)
+	{
+		m_pCullingUtil = CCullingUtil::Create();
+		if (nullptr == m_pCullingUtil)
 			return E_FAIL;
 	}
 
@@ -80,6 +88,7 @@ CGameObject* CEditInstance::Get_Selected() const
 
 void CEditInstance::Free()
 {
+	Safe_Release(m_pCullingUtil);
 	Safe_Release(m_pPanelManager);
 	Safe_Release(m_pImGui_Manager);
 

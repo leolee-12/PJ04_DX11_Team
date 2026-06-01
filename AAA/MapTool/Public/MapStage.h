@@ -23,25 +23,24 @@ public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
 public:
-	const MAP_STAGE_PROFILE&			Get_Profile() const { return m_Profile; }
+	const MAP_STAGE_PROFILE&		Get_Profile() const { return m_Profile; }
 	const vector<CMapSection*>&		Get_Sections() const { return m_Sections; }
-	const wstring&					Get_StageName() const { return m_strStageName; }
+	const _wstring&					Get_StageName() const { return m_strStageName; }
 
 private:
 	virtual HRESULT Ready_Events() override { return S_OK; }
 	HRESULT							Ready_Sections(const MAP_STAGE_DESC* pDesc);
 	void							Reset_ProfileFrame();
 	void							Submit_VisibleSections();
-	_bool							Build_WorldFrustum(BoundingFrustum* pOutFrustum) const;
 	void							Count_Submitted(RENDERID eRenderID);
 
 public:
 	static CMapStage*				Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
 private:
-	vector<CMapSection*>				m_Sections;
-	wstring							m_strProtoTag = { PROTOTYPE_TAG };
-	wstring							m_strStageName;
+	vector<CMapSection*>			m_Sections;
+	_wstring						m_strProtoTag = { PROTOTYPE_TAG };
+	_wstring						m_strStageName;
 	_uint							m_iSectionProtoLevel = {};
 	MAP_STAGE_PROFILE				m_Profile = {};
 

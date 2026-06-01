@@ -2,6 +2,8 @@
 
 #include <Windows.h>
 
+#include "CullingUtil.h"
+#include "EditInstance.h"
 #include "GameInstance_Proxy.h"
 
 NS_BEGIN(Client)
@@ -148,7 +150,10 @@ void CMapStage::Submit_VisibleSections()
 	const double dStart = Now_PerfCounter();
 
 	BoundingFrustum WorldFrustum{};
-	const _bool bHasFrustum = Build_WorldFrustum(&WorldFrustum);
+	::MapTool::CCullingUtil* pCullingUtil = ::MapTool::CEditInstance::GetInstance()->Get_CullingUtil();
+	const _bool bHasFrustum = (nullptr != pCullingUtil) ?
+		pCullingUtil->Build_WorldFrustum(m_pGameInstance_Proxy, PROJ_TYPE::PERSPEC, &WorldFrustum) :
+		false;
 
 	for (CMapSection* pSection : m_Sections)
 	{
@@ -160,7 +165,8 @@ void CMapStage::Submit_VisibleSections()
 		if (iTypeIndex < MAP_SECTION_TYPE_COUNT)
 			++m_Profile.iSectionTypeCount[iTypeIndex];
 
-		if (bHasFrustum && pSection->Is_Culling() && !WorldFrustum.Intersects(pSection->Get_WorldBounds()))
+		if (nullptr != pCullingUtil &&
+			pCullingUtil->Should_CullAABB(bHasFrustum, pSection->Is_Culling(), WorldFrustum, pSection->Get_WorldBounds()))
 		{
 			++m_Profile.iCulledSections;
 			continue;
@@ -183,23 +189,6 @@ void CMapStage::Submit_VisibleSections()
 	}
 
 	m_Profile.dCullingCpuMs = PerfCounter_ToMs(dStart, Now_PerfCounter());
-}
-
-_bool CMapStage::Build_WorldFrustum(BoundingFrustum* pOutFrustum) const
-{
-	if (nullptr == pOutFrustum || nullptr == m_pGameInstance_Proxy)
-		return false;
-
-	const _float4x4* pView = m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC);
-	const _float4x4* pProj = m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
-	if (nullptr == pView || nullptr == pProj)
-		return false;
-
-	BoundingFrustum LocalFrustum{};
-	BoundingFrustum::CreateFromMatrix(LocalFrustum, XMLoadFloat4x4(pProj));
-	LocalFrustum.Transform(*pOutFrustum, XMMatrixInverse(nullptr, XMLoadFloat4x4(pView)));
-
-	return true;
 }
 
 void CMapStage::Count_Submitted(RENDERID eRenderID)

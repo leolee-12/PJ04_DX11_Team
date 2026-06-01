@@ -4,9 +4,6 @@
     <Filter Include="00. App">
       <UniqueIdentifier>{2a7264af-40a2-4757-9482-96f5e7fdd4be}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Levels">
-      <UniqueIdentifier>{35e7a30f-47e6-4264-9b5d-7769a6aa3c11}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. Objects">
       <UniqueIdentifier>{b3b7bac2-c0b8-4b78-a5f9-a6d46c8529fe}</UniqueIdentifier>
     </Filter>
@@ -40,9 +37,6 @@
     <Filter Include="02. Objects\Camera">
       <UniqueIdentifier>{b12c09d0-c36b-47d6-a528-13cafe5057d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Levels\Tool">
-      <UniqueIdentifier>{d92d8af8-9554-448d-8062-490c19fd90ec}</UniqueIdentifier>
-    </Filter>
     <Filter Include="98. Default">
       <UniqueIdentifier>{af80204d-74ad-49b5-9062-98caf5bf0c62}</UniqueIdentifier>
     </Filter>
@@ -52,20 +46,35 @@
     <Filter Include="97. ImGui\Manager">
       <UniqueIdentifier>{145d22c2-9d22-43df-a2db-0327d67036de}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Levels\Edit">
-      <UniqueIdentifier>{16801054-3ab6-4dc2-bd99-c5287519aa18}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01. Levels\Loader">
-      <UniqueIdentifier>{4e6c892c-a544-457e-b413-00e04340cddb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. Objects\MapStage">
       <UniqueIdentifier>{23a1ab83-c458-44b1-8c02-9f652d9f9f45}</UniqueIdentifier>
     </Filter>
     <Filter Include="03. Panels\Profiler">
       <UniqueIdentifier>{1cfcb692-1664-4e2a-9477-1731a2118f9c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. App\Profiler">
+    <Filter Include="01. API">
+      <UniqueIdentifier>{04303959-6606-45ed-9feb-21e3c219aad7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. API\00. EditInstance">
+      <UniqueIdentifier>{dba9231c-6a69-48a3-a36d-b2a67c3dab61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. API\01. Profiler">
       <UniqueIdentifier>{ca47b2f8-828c-492e-a221-b4ec0ee698ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. API\02. CullingUtil">
+      <UniqueIdentifier>{8ab573f2-a853-4f14-91ec-eb29aaf55945}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. Levels">
+      <UniqueIdentifier>{35e7a30f-47e6-4264-9b5d-7769a6aa3c11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. Levels\Tool">
+      <UniqueIdentifier>{d92d8af8-9554-448d-8062-490c19fd90ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. Levels\Edit">
+      <UniqueIdentifier>{16801054-3ab6-4dc2-bd99-c5287519aa18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. Levels\Loader">
+      <UniqueIdentifier>{4e6c892c-a544-457e-b413-00e04340cddb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -129,20 +138,17 @@
     <ClInclude Include="targetver.h">
       <Filter>98. Default</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\EditInstance.h">
-      <Filter>00. App</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\ImGui_Manager.h">
       <Filter>97. ImGui\Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Edit.h">
-      <Filter>01. Levels\Edit</Filter>
+      <Filter>02. Levels\Edit</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Loading.h">
-      <Filter>01. Levels\Loader</Filter>
+      <Filter>02. Levels\Loader</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Loader.h">
-      <Filter>01. Levels\Loader</Filter>
+      <Filter>02. Levels\Loader</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MapSection_Defines.h">
       <Filter>02. Objects\MapStage</Filter>
@@ -154,10 +160,16 @@
       <Filter>02. Objects\MapStage</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MapToolProfiler.h">
-      <Filter>00. App\Profiler</Filter>
+      <Filter>01. API\01. Profiler</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Panel_Profiler.h">
       <Filter>03. Panels\Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CullingUtil.h">
+      <Filter>01. API\02. CullingUtil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EditInstance.h">
+      <Filter>01. API\00. EditInstance</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -224,20 +236,17 @@
     <ClCompile Include="MapTool.cpp">
       <Filter>98. Default</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\EditInstance.cpp">
-      <Filter>00. App</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\ImGui_Manager.cpp">
       <Filter>97. ImGui\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Edit.cpp">
-      <Filter>01. Levels\Edit</Filter>
+      <Filter>02. Levels\Edit</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Loading.cpp">
-      <Filter>01. Levels\Loader</Filter>
+      <Filter>02. Levels\Loader</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Loader.cpp">
-      <Filter>01. Levels\Loader</Filter>
+      <Filter>02. Levels\Loader</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MapSection.cpp">
       <Filter>02. Objects\MapStage</Filter>
@@ -246,10 +255,16 @@
       <Filter>02. Objects\MapStage</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MapToolProfiler.cpp">
-      <Filter>00. App\Profiler</Filter>
+      <Filter>01. API\01. Profiler</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Panel_Profiler.cpp">
       <Filter>03. Panels\Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CullingUtil.cpp">
+      <Filter>01. API\02. CullingUtil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EditInstance.cpp">
+      <Filter>01. API\00. EditInstance</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

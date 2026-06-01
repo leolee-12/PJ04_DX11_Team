@@ -91,7 +91,7 @@ private:
 	_uint	m_iPlaceCount = {};
 
 	//CNavMesh_Editor* m_pNavMeshEditor = { nullptr };
-	_bool			 m_bNavEditMode = { false };
+	_bool m_bNavEditMode = { false };
 	CLumia* m_pLumia = { nullptr };
 	Client::CMapStage* m_pMapStage = { nullptr };
 

@@ -27,8 +27,8 @@ inline constexpr _uint MAP_SECTION_TYPE_COUNT = static_cast<_uint>(MAP_SECTION_T
 
 struct MAP_SECTION_DESC : public CGameObject::GAMEOBJECT_DESC
 {
-	wstring				strSectionName;
-	wstring				strModelProtoTag;
+	_wstring			strSectionName;
+	_wstring			strModelProtoTag;
 	_uint				iModelProtoLevel = {};
 	MAP_SECTION_TYPE	eSectionType = { MAP_SECTION_TYPE::UNKNOWN };
 	RENDERID			eRenderID = { RENDERID::NONBLEND };
@@ -39,7 +39,7 @@ struct MAP_SECTION_DESC : public CGameObject::GAMEOBJECT_DESC
 
 struct MAP_STAGE_DESC : public CGameObject::GAMEOBJECT_DESC
 {
-	wstring						strStageName;
+	_wstring					strStageName;
 	_uint						iSectionProtoLevel = {};
 	vector<MAP_SECTION_DESC>	SectionDescs;
 };
