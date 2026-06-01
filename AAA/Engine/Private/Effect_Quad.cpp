@@ -21,8 +21,15 @@ HRESULT CEffect_Quad::Initialize(void* pArg)
 {
     EFFECT_QUAD_DESC* pDesc = static_cast<EFFECT_QUAD_DESC*>(pArg);
 
+    m_iVIBufferLevel = pDesc->iVIBufferLevel;
     m_wstrVIBufferTag = pDesc->wstrVIBufferTag;
+
+    m_iTextureLevel = pDesc->iTextureLevel;
     m_wstrTextureTag = pDesc->wstrTextureTag;
+
+    m_bCustomShader = pDesc->bCustomShader;
+    m_iShaderLevel = pDesc->iShaderLevel;
+    m_wstrShaderTag = pDesc->wstrShaderTag;
 
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
@@ -68,7 +75,11 @@ HRESULT CEffect_Quad::Render()
 
 HRESULT CEffect_Quad::Ready_Components()
 {
-    m_pShaderCom = m_pGameInstance_Proxy->Get_2DShader();
+    if(m_bCustomShader == false)
+        m_pShaderCom = m_pGameInstance_Proxy->Get_2DShader();
+    else
+        m_pShaderCom = Add_Component<CShader>(m_iShaderLevel, m_wstrShaderTag, TEXT("Com_Shader"));
+
     if (m_pShaderCom == nullptr)
         return E_FAIL;
 

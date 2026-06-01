@@ -187,6 +187,7 @@
     <ClInclude Include="..\Public\DataLoader.h" />
     <ClInclude Include="..\Public\DebugDraw.h" />
     <ClInclude Include="..\public\Effect.h" />
+    <ClInclude Include="..\Public\Effect_Mesh.h" />
     <ClInclude Include="..\Public\Effect_Part.h" />
     <ClInclude Include="..\public\Effect_Manager.h" />
     <ClInclude Include="..\Public\Effect_Quad.h" />
@@ -268,6 +269,7 @@
     <ClCompile Include="..\Private\DataLoader.cpp" />
     <ClCompile Include="..\Private\DebugDraw.cpp" />
     <ClCompile Include="..\private\Effect.cpp" />
+    <ClCompile Include="..\Private\Effect_Mesh.cpp" />
     <ClCompile Include="..\Private\Effect_Part.cpp" />
     <ClCompile Include="..\private\Effect_Manager.cpp" />
     <ClCompile Include="..\Private\Effect_Quad.cpp" />
@@ -322,6 +324,7 @@
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_Cell.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Deferred.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_Effect_Mesh.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Effect_VtxTex.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
