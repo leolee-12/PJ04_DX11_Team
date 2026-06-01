@@ -1,13 +1,15 @@
 ﻿#include "MapStage.h"
 
+#ifdef _DEBUG
 #include <Windows.h>
+#endif
 
-#include "CullingUtil.h"
-#include "EditInstance.h"
+#include "CullingContext.h"
 #include "GameInstance_Proxy.h"
 
 NS_BEGIN(Client)
 
+#ifdef _DEBUG
 namespace
 {
 	double Now_PerfCounter()
@@ -32,6 +34,7 @@ namespace
 		return (dEnd - dStart) * 1000.0 / dFrequency;
 	}
 }
+#endif
 
 CMapStage::CMapStage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject { pDevice, pContext }
@@ -63,6 +66,13 @@ HRESULT CMapStage::Initialize(void* pArg)
 	m_strStageName = pDesc->strStageName;
 	m_iSectionProtoLevel = pDesc->iSectionProtoLevel;
 
+	if (nullptr == m_pMainViewCullingContext)
+	{
+		m_pMainViewCullingContext = ::MapTool::CCullingContext::Create();
+		if (nullptr == m_pMainViewCullingContext)
+			return E_FAIL;
+	}
+
 	if (FAILED(Ready_Sections(pDesc)))
 		return E_FAIL;
 
@@ -71,12 +81,16 @@ HRESULT CMapStage::Initialize(void* pArg)
 
 void CMapStage::Late_Update(_float fTimeDelta)
 {
+#ifdef _DEBUG
 	const double dStart = Now_PerfCounter();
 
 	Reset_ProfileFrame();
+#endif
 	Submit_VisibleSections();
 
+#ifdef _DEBUG
 	m_Profile.dStageLateUpdateCpuMs = PerfCounter_ToMs(dStart, Now_PerfCounter());
+#endif
 }
 
 HRESULT CMapStage::Render()
@@ -131,6 +145,7 @@ HRESULT CMapStage::Ready_Sections(const MAP_STAGE_DESC* pDesc)
 	return S_OK;
 }
 
+#ifdef _DEBUG
 void CMapStage::Reset_ProfileFrame()
 {
 	const _uint iNextFrame = m_Profile.iFrameIndex + 1;
@@ -144,15 +159,18 @@ void CMapStage::Reset_ProfileFrame()
 			pSection->Reset_FrameProfile();
 	}
 }
+#endif
 
 void CMapStage::Submit_VisibleSections()
 {
+#ifdef _DEBUG
 	const double dStart = Now_PerfCounter();
+#endif
 
-	BoundingFrustum WorldFrustum{};
-	::MapTool::CCullingUtil* pCullingUtil = ::MapTool::CEditInstance::GetInstance()->Get_CullingUtil();
-	const _bool bHasFrustum = (nullptr != pCullingUtil) ?
-		pCullingUtil->Build_WorldFrustum(m_pGameInstance_Proxy, PROJ_TYPE::PERSPEC, &WorldFrustum) :
+	const _float4x4* pViewMatrix = m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC);
+	const _float4x4* pProjMatrix = m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
+	const _bool bHasFrustum = (nullptr != m_pMainViewCullingContext) ?
+		m_pMainViewCullingContext->Update_FromViewProj(pViewMatrix, pProjMatrix) :
 		false;
 
 	for (CMapSection* pSection : m_Sections)
@@ -160,37 +178,51 @@ void CMapStage::Submit_VisibleSections()
 		if (nullptr == pSection)
 			continue;
 
+#ifdef _DEBUG
 		const MAP_SECTION_TYPE eType = pSection->Get_SectionType();
 		const _uint iTypeIndex = static_cast<_uint>(eType);
 		if (iTypeIndex < MAP_SECTION_TYPE_COUNT)
 			++m_Profile.iSectionTypeCount[iTypeIndex];
+#endif
 
-		if (nullptr != pCullingUtil &&
-			pCullingUtil->Should_CullAABB(bHasFrustum, pSection->Is_Culling(), WorldFrustum, pSection->Get_WorldBounds()))
+		if (bHasFrustum &&
+			nullptr != m_pMainViewCullingContext &&
+			m_pMainViewCullingContext->Should_CullAABB(pSection->Is_Culling(), pSection->Get_WorldBounds()))
 		{
+#ifdef _DEBUG
 			++m_Profile.iCulledSections;
+#endif
 			continue;
 		}
 
+#ifdef _DEBUG
 		++m_Profile.iVisibleSections;
+#endif
 
 		if (!pSection->Is_Renderable())
 			continue;
 
 		const RENDERID eRenderID = pSection->Get_RenderID();
 		m_pGameInstance_Proxy->Add_RenderGroup(eRenderID, pSection);
+#ifdef _DEBUG
 		Count_Submitted(eRenderID);
+#endif
 
 		if (pSection->Is_ShadowCaster())
 		{
 			m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pSection);
+#ifdef _DEBUG
 			Count_Submitted(RENDERID::SHADOW);
+#endif
 		}
 	}
 
+#ifdef _DEBUG
 	m_Profile.dCullingCpuMs = PerfCounter_ToMs(dStart, Now_PerfCounter());
+#endif
 }
 
+#ifdef _DEBUG
 void CMapStage::Count_Submitted(RENDERID eRenderID)
 {
 	switch (eRenderID)
@@ -208,6 +240,7 @@ void CMapStage::Count_Submitted(RENDERID eRenderID)
 		break;
 	}
 }
+#endif
 
 CMapStage* CMapStage::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
@@ -227,6 +260,8 @@ void CMapStage::Free()
 	for (CMapSection*& pSection : m_Sections)
 		Safe_Release(pSection);
 	m_Sections.clear();
+
+	Safe_Release(m_pMainViewCullingContext);
 
 	__super::Free();
 }

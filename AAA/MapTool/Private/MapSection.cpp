@@ -1,7 +1,10 @@
 ﻿#include "MapSection.h"
 
+#ifdef _DEBUG
 #include <Windows.h>
+#endif
 
+#include "CullingContext.h"
 #include "GameContent_const.h"
 #include "GameInstance_Proxy.h"
 #include "Model.h"
@@ -9,6 +12,7 @@
 
 NS_BEGIN(Client)
 
+#ifdef _DEBUG
 namespace
 {
 	double Now_PerfCounter()
@@ -33,6 +37,7 @@ namespace
 		return (dEnd - dStart) * 1000.0 / dFrequency;
 	}
 }
+#endif
 
 CMapSection::CMapSection(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject { pDevice, pContext }
@@ -79,13 +84,17 @@ HRESULT CMapSection::Initialize(void* pArg)
 
 HRESULT CMapSection::Render()
 {
+#ifdef _DEBUG
 	const double dStart = Now_PerfCounter();
 
 	m_Profile = {};
+#endif
 
 	if (FAILED(Bind_ShaderResources()))
 	{
+#ifdef _DEBUG
 		m_Profile.dRenderCpuMs = PerfCounter_ToMs(dStart, Now_PerfCounter());
+#endif
 		return E_FAIL;
 	}
 
@@ -105,20 +114,28 @@ HRESULT CMapSection::Render()
 
 		if (FAILED(m_pShaderCom->Begin(iPassIndex)))
 		{
+#ifdef _DEBUG
 			m_Profile.dRenderCpuMs = PerfCounter_ToMs(dStart, Now_PerfCounter());
+#endif
 			return E_FAIL;
 		}
 
 		if (FAILED(m_pModelCom->Render(static_cast<_uint>(i))))
 		{
+#ifdef _DEBUG
 			m_Profile.dRenderCpuMs = PerfCounter_ToMs(dStart, Now_PerfCounter());
+#endif
 			return E_FAIL;
 		}
 
+#ifdef _DEBUG
 		++m_Profile.iEstimatedDrawCalls;
+#endif
 	}
 
+#ifdef _DEBUG
 	m_Profile.dRenderCpuMs = PerfCounter_ToMs(dStart, Now_PerfCounter());
+#endif
 	return S_OK;
 }
 
@@ -153,13 +170,18 @@ void CMapSection::Refresh_WorldBounds()
 	if (nullptr == m_pTransformCom)
 		return;
 
-	m_LocalBounds.Transform(m_WorldBounds, XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+	::MapTool::CCullingContext::Transform_AABB(
+		m_LocalBounds,
+		XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()),
+		&m_WorldBounds);
 }
 
+#ifdef _DEBUG
 void CMapSection::Reset_FrameProfile()
 {
 	m_Profile = {};
 }
+#endif
 
 HRESULT CMapSection::Ready_Components(const MAP_SECTION_DESC* pDesc)
 {
@@ -204,30 +226,20 @@ void CMapSection::Update_LocalBounds()
 {
 	if (nullptr == m_pModelCom)
 	{
-		m_LocalBounds = BoundingBox(_float3(0.f, 0.f, 0.f), _float3(1.f, 1.f, 1.f));
+		m_LocalBounds = ::MapTool::CCullingContext::Make_DefaultAABB();
 		return;
 	}
 
 	_float3 vMin{}, vMax{};
 	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
 
-	if (vMin.x > vMax.x || vMin.y > vMax.y || vMin.z > vMax.z)
+	if (!::MapTool::CCullingContext::Is_ValidAABB(vMin, vMax))
 	{
-		m_LocalBounds = BoundingBox(_float3(0.f, 0.f, 0.f), _float3(1.f, 1.f, 1.f));
+		m_LocalBounds = ::MapTool::CCullingContext::Make_DefaultAABB();
 		return;
 	}
 
-	const _float3 vCenter(
-		(vMin.x + vMax.x) * 0.5f,
-		(vMin.y + vMax.y) * 0.5f,
-		(vMin.z + vMax.z) * 0.5f);
-
-	const _float3 vExtents(
-		(vMax.x - vMin.x) * 0.5f,
-		(vMax.y - vMin.y) * 0.5f,
-		(vMax.z - vMin.z) * 0.5f);
-
-	m_LocalBounds = BoundingBox(vCenter, vExtents);
+	m_LocalBounds = ::MapTool::CCullingContext::Make_AABB_FromMinMax(vMin, vMax);
 }
 
 _uint CMapSection::Get_RenderPassIndex() const

@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#ifdef _DEBUG
+
 #include <fstream>
 
 #include "MapTool_Defines.h"
@@ -57,3 +59,5 @@ protected:
 };
 
 NS_END
+
+#endif

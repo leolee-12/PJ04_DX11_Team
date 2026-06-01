@@ -29,14 +29,18 @@ public:
 
 public:
 	void							Refresh_WorldBounds();
+#ifdef _DEBUG
 	void							Reset_FrameProfile();
+#endif
 	const BoundingBox&				Get_WorldBounds() const { return m_WorldBounds; }
 	MAP_SECTION_TYPE				Get_SectionType() const { return m_eSectionType; }
 	RENDERID						Get_RenderID() const { return m_eRenderID; }
 	_bool							Is_ShadowCaster() const { return m_bCastShadow; }
 	_bool							Is_Culling() const { return m_bEnableCulling; }
 	_bool							Is_Renderable() const { return m_bRenderable; }
+#ifdef _DEBUG
 	const MAP_SECTION_PROFILE&		Get_Profile() const { return m_Profile; }
+#endif
 	const wstring&					Get_SectionName() const { return m_strSectionName; }
 
 private:
@@ -61,7 +65,9 @@ private:
 	_bool							m_bCastShadow = { false };
 	_bool							m_bEnableCulling = { true };
 	_bool							m_bRenderable = { true };
+#ifdef _DEBUG
 	MAP_SECTION_PROFILE				m_Profile = {};
+#endif
 
 protected:
 	virtual void					Free() override;

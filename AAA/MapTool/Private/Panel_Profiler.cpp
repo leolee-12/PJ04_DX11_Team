@@ -1,5 +1,7 @@
 ﻿#include "Panel_Profiler.h"
 
+#ifdef _DEBUG
+
 #include "MapToolProfiler.h"
 
 CPanel_Profiler::CPanel_Profiler(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -74,3 +76,5 @@ void CPanel_Profiler::Free()
 {
 	__super::Free();
 }
+
+#endif

@@ -1,5 +1,7 @@
 ﻿#include "MapToolProfiler.h"
 
+#ifdef _DEBUG
+
 #include <fstream>
 
 IMPLEMENT_SINGLETON(CMapToolProfiler)
@@ -176,3 +178,5 @@ void CMapToolProfiler::Free()
 
 	__super::Free();
 }
+
+#endif

@@ -44,6 +44,7 @@ struct MAP_STAGE_DESC : public CGameObject::GAMEOBJECT_DESC
 	vector<MAP_SECTION_DESC>	SectionDescs;
 };
 
+#ifdef _DEBUG
 struct MAP_SECTION_PROFILE
 {
 	double	dRenderCpuMs = {};
@@ -65,5 +66,6 @@ struct MAP_STAGE_PROFILE
 	double	dCullingCpuMs = {};
 	double	dSectionRenderCpuMs = {};
 };
+#endif
 
 NS_END

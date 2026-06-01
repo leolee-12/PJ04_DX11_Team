@@ -2,8 +2,11 @@
 #include "Loader.h"
 #include "EditCamera.h"
 #include "Edit_Grid.h"
+#include "EnvObjectLoader.h"
 #include "MapStage.h"
+#ifdef _DEBUG
 #include "MapToolProfiler.h"
+#endif
 
 #include "GameObject_Factory.h"
 #include "GameContent_const.h"
@@ -37,6 +40,9 @@ HRESULT CLevel_Edit::Initialize()
 	if (FAILED(Ready_MapStage()))
 		return E_FAIL;
 
+	if (FAILED(Ready_EnvObjects()))
+		return E_FAIL;
+
 	//m_pNavMeshEditor = CNavMesh_Editor::Create();
 	//if (nullptr == m_pNavMeshEditor)
 	//	return E_FAIL;
@@ -50,6 +56,7 @@ void CLevel_Edit::Update(_float fTimeDelta)
 	if (m_pGameInstance_Proxy->Key_Down(DIK_ESCAPE))
 		m_pGameInstance_Proxy->Publish(TEXT("Return_Lobby"), nullptr);
 
+#ifdef _DEBUG
 	CMapToolProfiler* pProfiler = CMapToolProfiler::GetInstance();
 	if (m_pGameInstance_Proxy->Key_Down(DIK_F9) || m_pGameInstance_Proxy->Key_Down(DIK_1))
 		pProfiler->Toggle_Enabled();
@@ -59,6 +66,7 @@ void CLevel_Edit::Update(_float fTimeDelta)
 		pProfiler->Reset();
 
 	pProfiler->Update(fTimeDelta);
+#endif
 }
 
 HRESULT CLevel_Edit::Render()
@@ -70,7 +78,9 @@ HRESULT CLevel_Edit::Render()
 		m_pGrid->Render(pView, pProj);
 	}
 
+#ifdef _DEBUG
 	CMapToolProfiler::GetInstance()->Capture_Frame();
+#endif
 
 	return S_OK;
 }
@@ -134,13 +144,21 @@ void CLevel_Edit::Load_Level(const wstring& strFilePath)
 {
 	m_pSelected = nullptr;
 	m_Layers.clear();
+#ifdef _DEBUG
 	CMapToolProfiler::GetInstance()->Set_Stage(nullptr);
+#endif
 	m_pMapStage = nullptr;
 	m_pGameInstance_Proxy->Clear_Objects(ETOUI(TOOL_LEVEL::EDIT));
 
 	if (FAILED(Ready_MapStage()))
 	{
 		MSG_BOX("Failed to ready MapStage while loading level.");
+		return;
+	}
+
+	if (FAILED(Ready_EnvObjects()))
+	{
+		MSG_BOX("Failed to ready EnvObjects while loading level.");
 		return;
 	}
 
@@ -523,7 +541,43 @@ HRESULT CLevel_Edit::Ready_MapStage()
 	if (nullptr == m_pMapStage)
 		return E_FAIL;
 
+#ifdef _DEBUG
 	CMapToolProfiler::GetInstance()->Set_Stage(m_pMapStage);
+#endif
+
+	return S_OK;
+}
+
+HRESULT CLevel_Edit::Ready_EnvObjects()
+ {
+	const _uint iEditLevel = ETOUI(TOOL_LEVEL::EDIT);
+	static const wchar_t* kEnvJsonPaths[] =
+	{
+		L"../../Resources/Models/Test/Decor_Decor/Decor_Decor.json",
+		L"../../Resources/Models/Test/Toy_Decor/Toy_Decor.json",
+		L"../../Resources/Models/Test/Toy_Obj/Toy_Obj.json",
+		L"../../Resources/Models/Test/Decor_Obj/Decor_Obj.json"
+	};
+
+	for (const wchar_t* pJsonPath : kEnvJsonPaths)
+	{
+		string strDummy;
+		if (FAILED(CDataLoader::Read_Json(pJsonPath, &strDummy)))
+		{
+			MapTool::Log_Info(string("EnvObject source skipped: ") + WstrToStr(pJsonPath));
+			continue;
+		}
+
+		if (FAILED(Client::CEnvObjectLoader::Load_FromJsonFile(
+			m_pGameInstance_Proxy,
+			m_pDevice,
+			m_pContext,
+			iEditLevel,
+			pJsonPath)))
+		{
+			MapTool::Log_Warning(string("EnvObject source failed: ") + WstrToStr(pJsonPath));
+		}
+	}
 
 	return S_OK;
 }
@@ -543,7 +597,9 @@ CLevel_Edit* CLevel_Edit::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 void CLevel_Edit::Free()
 {
+#ifdef _DEBUG
 	CMapToolProfiler::GetInstance()->Set_Stage(nullptr);
+#endif
 	m_pMapStage = nullptr;
 
 	Safe_Release(m_pGrid);

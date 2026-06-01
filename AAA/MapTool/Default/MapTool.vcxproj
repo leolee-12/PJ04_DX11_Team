@@ -19,8 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Private\CullingUtil.cpp" />
+    <ClCompile Include="..\Private\CullingContext.cpp" />
     <ClCompile Include="..\Private\EditInstance.cpp" />
+    <ClCompile Include="..\Private\EnvObject.cpp" />
+    <ClCompile Include="..\Private\EnvObject_Effect.cpp" />
+    <ClCompile Include="..\Private\EnvObject_Interact.cpp" />
+    <ClCompile Include="..\Private\EnvObject_Static.cpp" />
+    <ClCompile Include="..\Private\EnvObjectLoader.cpp" />
     <ClCompile Include="..\Private\ImGui_Manager.cpp" />
     <ClCompile Include="..\Private\Level_Edit.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
@@ -52,8 +57,14 @@
     <ClCompile Include="MapTool.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Public\CullingUtil.h" />
+    <ClInclude Include="..\Public\CullingContext.h" />
     <ClInclude Include="..\Public\EditInstance.h" />
+    <ClInclude Include="..\Public\EnvObject.h" />
+    <ClInclude Include="..\Public\EnvObject_Defines.h" />
+    <ClInclude Include="..\Public\EnvObject_Effect.h" />
+    <ClInclude Include="..\Public\EnvObject_Interact.h" />
+    <ClInclude Include="..\Public\EnvObject_Static.h" />
+    <ClInclude Include="..\Public\EnvObjectLoader.h" />
     <ClInclude Include="..\Public\ImGui_Manager.h" />
     <ClInclude Include="..\Public\Level_Edit.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />

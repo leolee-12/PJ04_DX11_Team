@@ -21,7 +21,6 @@ class CLevel_Edit;
 class CImGui_Manager;
 class CPanel_Manager;
 class CPanel;
-class CCullingUtil;
 
 class CEditInstance final : public CBase
 {
@@ -39,7 +38,6 @@ public:
 	void			Update_Panels(_float fTimeDelta);
 	void			Render_Panels();
 	CPanel*			Get_Panel(const _wstring& strPanelTag);
-	CCullingUtil*	Get_CullingUtil() const { return m_pCullingUtil; }
 
 	// 현재 편집 레벨 (약참조)
 	void			Set_Level(CLevel_Edit* pLevel) { m_pLevel = pLevel; }
@@ -68,7 +66,6 @@ public:
 private:
 	CImGui_Manager*				m_pImGui_Manager = { nullptr };
 	CPanel_Manager*				m_pPanelManager = { nullptr };
-	CCullingUtil*				m_pCullingUtil = { nullptr };
 
 	CLevel_Edit*				m_pLevel = { nullptr };
 	ID3D11ShaderResourceView*	m_pSceneSRV = { nullptr };

@@ -61,7 +61,7 @@
     <Filter Include="01. API\01. Profiler">
       <UniqueIdentifier>{ca47b2f8-828c-492e-a221-b4ec0ee698ec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. API\02. CullingUtil">
+    <Filter Include="01. API\02. CullingContext">
       <UniqueIdentifier>{8ab573f2-a853-4f14-91ec-eb29aaf55945}</UniqueIdentifier>
     </Filter>
     <Filter Include="02. Levels">
@@ -75,6 +75,9 @@
     </Filter>
     <Filter Include="02. Levels\Loader">
       <UniqueIdentifier>{4e6c892c-a544-457e-b413-00e04340cddb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. Objects\EnvObject">
+      <UniqueIdentifier>{a30fef72-aeb9-4730-8c6d-5306c5b0bc78}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -165,11 +168,29 @@
     <ClInclude Include="..\Public\Panel_Profiler.h">
       <Filter>03. Panels\Profiler</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\CullingUtil.h">
-      <Filter>01. API\02. CullingUtil</Filter>
+    <ClInclude Include="..\Public\CullingContext.h">
+      <Filter>01. API\02. CullingContext</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EditInstance.h">
       <Filter>01. API\00. EditInstance</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvObject.h">
+      <Filter>02. Objects\EnvObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvObject_Defines.h">
+      <Filter>02. Objects\EnvObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvObject_Effect.h">
+      <Filter>02. Objects\EnvObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvObject_Interact.h">
+      <Filter>02. Objects\EnvObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvObject_Static.h">
+      <Filter>02. Objects\EnvObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvObjectLoader.h">
+      <Filter>02. Objects\EnvObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -260,11 +281,26 @@
     <ClCompile Include="..\Private\Panel_Profiler.cpp">
       <Filter>03. Panels\Profiler</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\CullingUtil.cpp">
-      <Filter>01. API\02. CullingUtil</Filter>
+    <ClCompile Include="..\Private\CullingContext.cpp">
+      <Filter>01. API\02. CullingContext</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EditInstance.cpp">
       <Filter>01. API\00. EditInstance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvObject.cpp">
+      <Filter>02. Objects\EnvObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvObject_Effect.cpp">
+      <Filter>02. Objects\EnvObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvObject_Interact.cpp">
+      <Filter>02. Objects\EnvObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvObject_Static.cpp">
+      <Filter>02. Objects\EnvObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvObjectLoader.cpp">
+      <Filter>02. Objects\EnvObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
