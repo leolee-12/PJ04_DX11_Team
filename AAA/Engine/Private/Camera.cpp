@@ -35,6 +35,9 @@ HRESULT CCamera::Initialize(void* pArg)
 		m_fFar = pDesc->fFar;
 		m_fFovy = pDesc->fFovy;
 
+		pDesc->fRotationPerSec = 180.f;
+		pDesc->fSpeedPerSec = 20.f;
+
 		if (FAILED(__super::Initialize(pArg)))
 			return E_FAIL;
 

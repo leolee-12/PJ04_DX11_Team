@@ -18,6 +18,16 @@ HRESULT CCamera_Free::Initialize_Prototype()
 
 HRESULT CCamera_Free::Initialize(void* pArg)
 {
+    auto        pDesc = static_cast<CAMERA_FREE_DESC*>(pArg);
+    if (pDesc)
+    {
+        m_fMouseSensor = pDesc->fMouseSensor;
+    }
+    else
+    {
+        m_fMouseSensor = 0.05f;
+    }
+
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
@@ -29,38 +39,46 @@ HRESULT CCamera_Free::Initialize(void* pArg)
 
 void CCamera_Free::Priority_Update(_float fTimeDelta)
 {
-    if (!m_bActive) return;
+    _long       MouseMove = {};
 
-    /*_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
-    _vector vLook = XMVector3Normalize(m_pTransformCom->Get_State(STATE::LOOK));
-    _vector vRight = XMVector3Normalize(m_pTransformCom->Get_State(STATE::RIGHT));
-    _vector vUp = XMVector3Normalize(m_pTransformCom->Get_State(STATE::UP));
+    if (MouseMove = m_pGameInstance_Proxy->Get_DIMouseMove(DIMM::X))
+    {
+        m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), MouseMove * m_fMouseSensor * fTimeDelta);
+    }
 
-    _float fSpeed = 10.f * fTimeDelta;
+    if (MouseMove = m_pGameInstance_Proxy->Get_DIMouseMove(DIMM::Y))
+    {
+        m_pTransformCom->Turn(m_pTransformCom->Get_State(STATE::RIGHT), MouseMove * m_fMouseSensor * fTimeDelta);
+    }
 
-    if (m_pGameInstance_Proxy->Key_Pressing(DIK_W)) vPos += vLook * fSpeed;
-    if (m_pGameInstance_Proxy->Key_Pressing(DIK_S)) vPos -= vLook * fSpeed;
-    if (m_pGameInstance_Proxy->Key_Pressing(DIK_D)) vPos += vRight * fSpeed;
-    if (m_pGameInstance_Proxy->Key_Pressing(DIK_A)) vPos -= vRight * fSpeed;
-    if (m_pGameInstance_Proxy->Key_Pressing(DIK_E)) vPos += vUp * fSpeed;
-    if (m_pGameInstance_Proxy->Key_Pressing(DIK_Q)) vPos -= vUp * fSpeed;
+    if (m_pGameInstance_Proxy->Key_Pressing(DIK_W))
+    {
+        m_pTransformCom->Go_Straight(fTimeDelta);
+    }
+    if (m_pGameInstance_Proxy->Key_Pressing(DIK_S))
+    {
+        m_pTransformCom->Go_Backward(fTimeDelta);
+    }
+    if (m_pGameInstance_Proxy->Key_Pressing(DIK_A))
+    {
+        m_pTransformCom->Go_Left(fTimeDelta);
+    }
+    if (m_pGameInstance_Proxy->Key_Pressing(DIK_D))
+    {
+        m_pTransformCom->Go_Right(fTimeDelta);
+    }
 
-    m_pTransformCom->Set_State(STATE::POSITION, vPos);*/
 
     __super::Priority_Update(fTimeDelta);
 }
 
 void CCamera_Free::Update(_float fTimeDelta)
 {
-    if (!m_bActive) return;
-
     __super::Update(fTimeDelta);
 }
 
 void CCamera_Free::Late_Update(_float fTimeDelta)
 {
-    if (!m_bActive) return;
-
     __super::Late_Update(fTimeDelta);
 }
 
@@ -71,11 +89,6 @@ HRESULT CCamera_Free::Render()
 
 HRESULT CCamera_Free::Ready_Events()
 {
-    Subscribe_Event(TEXT("Enter_View"), [this](void* pData) {
-        _int iView = *static_cast<_int*>(pData);
-        m_bActive = (iView == ETOI(LOBBY_VIEW::STORAGE));
-        });
-
     return S_OK;
 }
 

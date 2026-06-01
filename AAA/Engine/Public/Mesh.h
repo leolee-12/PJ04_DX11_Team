@@ -50,6 +50,7 @@ private:
 
 private:
 	HRESULT Ready_NonAnim(const MESH_DATA& data, _fmatrix PreTransformMatrix);
+	HRESULT Ready_Map(const MESH_DATA& data, _fmatrix PreTransformMatrix);
 	HRESULT Ready_Anim(CModel* pOwner, const MESH_DATA& data);
 public:
 	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, CModel* pOwner, const MESH_DATA& data, _fmatrix PreTransformMatrix, _bool bPickable = false);

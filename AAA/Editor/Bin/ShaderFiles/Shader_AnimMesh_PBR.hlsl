@@ -21,8 +21,8 @@ struct VS_IN
     float2 vTexcoord2 : TEXCOORD2;
     float2 vTexcoord3 : TEXCOORD3;
     
-    float3 vTangent : TANGENT;
-    float3 vBinormal : BINORMAL;
+    float4 vTangent : TANGENT;
+    float4 vBinormal : BINORMAL;
     
     uint4 vBlendIndex : BLENDINDEX;
     float4 vBlendWeight : BLENDWEIGHT;
@@ -68,6 +68,7 @@ VS_OUT VS_MAIN(VS_IN In)
     float4 vPosition = mul(float4(In.vPosition, 1.f), BoneMatrix);
     float4 vNormal = mul(float4(In.vNormal, 0.f), BoneMatrix);
     
+    
     float4x4 matWV, matWVP;
     
     matWV = mul(g_WorldMatrix, g_ViewMatrix);
@@ -81,6 +82,13 @@ VS_OUT VS_MAIN(VS_IN In)
     Out.vTexcoord3 = In.vTexcoord3;
     Out.vWorldPos = mul(vPosition, g_WorldMatrix);
     Out.vProjPos = Out.vPosition;
+    
+    float4 vTangent = mul(float4(In.vTangent.xyz, 0.f), BoneMatrix);
+    float4 vBinormal = mul(float4(In.vBinormal.xyz, 0.f), BoneMatrix);
+    Out.vTangent = normalize(mul(vTangent, g_WorldMatrix));
+    Out.vTangent.w = In.vTangent.w;
+    Out.vBinormal = normalize(mul(vBinormal, g_WorldMatrix));
+    Out.vBinormal.w = In.vBinormal.w;
     
     return Out;
 }
@@ -123,34 +131,6 @@ VS_OUT VS_TEST(VS_IN In)
     return Out;
 }
 
-VS_OUT_HULL VS_OUTLINE_HULL(VS_IN In)
-{
-    VS_OUT_HULL Out;
-
-    float fW = 1.f - (In.vBlendWeight.x + In.vBlendWeight.y + In.vBlendWeight.z);
-    float4x4 BoneMatrix =
-          g_BoneMatrices[In.vBlendIndex.x] * In.vBlendWeight.x +
-          g_BoneMatrices[In.vBlendIndex.y] * In.vBlendWeight.y +
-          g_BoneMatrices[In.vBlendIndex.z] * In.vBlendWeight.z +
-          g_BoneMatrices[In.vBlendIndex.w] * fW;
-
-    float4 vPos = mul(float4(In.vPosition, 1.f), BoneMatrix);
-    float4 vNor = mul(float4(In.vNormal, 0.f), BoneMatrix);
-
-      // 오브젝트 공간에서 노말 방향으로 부풀림
-    vPos.xyz += normalize(vNor.xyz) * g_fHullThickness;
-
-    float4x4 matWV = mul(g_WorldMatrix, g_ViewMatrix);
-    float4x4 matWVP = mul(matWV, g_ProjMatrix);
-
-    Out.vPosition = mul(vPos, matWVP);
-    return Out;
-}
-
-/* w 나누기 연산 : 2차원 투영스페이스로의 변환. */
-/* 뷰포트로의 변환 (윈도우좌표로의 변환) */ 
-/* 래스터라이즈 (정점정보를 기반으로 해서 픽셀의 정보를 생성한다. ) */ 
-
 struct PS_IN
 {
     float4 vPosition : SV_POSITION;
@@ -173,6 +153,33 @@ struct PS_OUT
     float4 vDepth : SV_TARGET2;
     float4 vMRA : SV_TARGET3;
 };
+
+//PS_OUT PS_MAIN(PS_IN In)
+//{
+//    PS_OUT Out;
+//
+//    vector vEye = g_UnkownTexture.Sample(ClampSampler, In.vTexcoord);
+//    vector vBase = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord1);
+//    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord1).rgb;
+//
+//    float3 vAlbedo = lerp(vBase.rgb, vEye.rgb, vEye.a);
+//    vector vMtrlDiffuse = vector(vAlbedo, vBase.a);
+//
+//    if (vMtrlDiffuse.a < 0.1f)
+//        discard;
+//    
+//    float3 N = normalize(In.vNormal);
+//    float3 T = normalize(In.vTangent.xyz);
+//    T = normalize(T - dot(T, N) * N);
+//    float3 B = cross(T, N) * In.vBinormal.w;
+//
+//    Out.vDiffuse = vMtrlDiffuse;
+//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+//    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
+//    Out.vMRA = float4(mra, 1.f);
+//    
+//    return Out;
+//}
     
 
 /* 픽셀셰이더 : 픽셀의 최종적인 색을 결정해준다. */
@@ -182,17 +189,31 @@ PS_OUT PS_MAIN(PS_IN In)
 
     vector vEye = g_UnkownTexture.Sample(ClampSampler, In.vTexcoord);
     vector vBase = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord1);
+    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord1).rgb;
 
     float3 vAlbedo = lerp(vBase.rgb, vEye.rgb, vEye.a);
     vector vMtrlDiffuse = vector(vAlbedo, vBase.a);
 
     if (vMtrlDiffuse.a < 0.1f)
         discard;
+  
+    float3 N = normalize(In.vNormal);
+    float3 T = normalize(In.vTangent.xyz);
+    float3 B = normalize(In.vBinormal.xyz);
+  
+    float3x3 TBN = float3x3(T, B, N);
+
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, In.vTexcoord1).rg * 2.f - 1.f;
+    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+    nTS.y = -nTS.y;
+    
+    float3 Nw = mul(nTS, TBN);
 
     Out.vDiffuse = vMtrlDiffuse;
-    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vNormal = vector(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
-    
+    Out.vMRA = float4(mra, 1.f);
+  
     return Out;
 }
 
@@ -222,45 +243,8 @@ PS_OUT PS_TEST(PS_IN In)
     Out.vDiffuse = vector(1.f, 1.f, 1.f, 1.f);
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
+    Out.vMRA = float4(0.f, 1.f, 1.f, 1.f);
     
-    return Out;
-}
-
-struct PS_OUT_SHADOW
-{
-    float4 vLightDepth : SV_TARGET0;
-};
-
-PS_OUT_SHADOW PS_MAIN_SHADOW(PS_IN In)
-{
-    PS_OUT_SHADOW Out;
-    
-    Out.vLightDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    
-    return Out;
-}
-
-struct PS_OUT_OUTLINEMASK
-{
-    float4 vMask : SV_TARGET0;
-};
-
-PS_OUT_OUTLINEMASK PS_MAIN_OUTLINEMASK(PS_IN In)
-{
-    PS_OUT_OUTLINEMASK Out;
-    Out.vMask = float4(g_vMaskValue.x, g_vMaskValue.y, 0.f, 0.f);
-    return Out;
-}
-
-struct PS_OUT_HULL
-{
-    float4 vBackBuffer : SV_TARGET0;
-};
-
-PS_OUT_HULL PS_OUTLINE_HULL(VS_OUT_HULL In)
-{
-    PS_OUT_HULL Out;
-    Out.vBackBuffer = float4(0.f, 0.f, 0.f, 1.f);
     return Out;
 }
 

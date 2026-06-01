@@ -5,13 +5,14 @@
 
 NS_BEGIN(Client)
 
-class CCamera_Free final : public CCamera
+class CLIENT_DLL CCamera_Free final : public CCamera
 {
 	GENERATED_BODY(CCamera_Free)
 
 public:
 	typedef struct tagCameraFreeDesc final : public CCamera::CAMERA_DESC
 	{
+		_float		fMouseSensor;
 	}CAMERA_FREE_DESC;
 
 	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_CameraFree";
@@ -32,6 +33,9 @@ public:
 	{
 		pOutData->strPrototypeTag = PROTOTYPE_TAG;
 	}
+
+private:
+	_float	m_fMouseSensor = {};
 
 private:
 	virtual HRESULT Ready_Events() override;
