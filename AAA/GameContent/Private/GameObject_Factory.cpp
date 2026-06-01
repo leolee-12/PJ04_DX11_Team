@@ -8,6 +8,7 @@
 #include "TestNonAnim.h"
 #include "TestRect.h"
 #include "TestEffectQuad.h"
+#include "Sample_MeshEffect.h"
 #include "TestMarb1e.h"
 
 IMPLEMENT_SINGLETON(CGameObject_Factory)
@@ -100,6 +101,14 @@ void CGameObject_Factory::Register_Test()
         CREATOR(CTestEffectQuad),
         LOADER()
     );
+    Register(CSample_MeshEffect::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
+        CREATOR(CSample_MeshEffect),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, (ETOUI(LEVEL::GAMEPLAY)), TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
 
     Register(CTestMarb1e::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
         CREATOR(CTestMarb1e),

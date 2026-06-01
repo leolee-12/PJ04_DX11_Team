@@ -2,26 +2,26 @@
 
 #include "GameContent_Defines.h"
 
-#include "Effect_Quad.h"
+#include "Effect_Mesh.h"
 
 NS_BEGIN(Client)
 
-class CTestEffectQuad final : public CEffect_Quad
+class CSample_MeshEffect final : public CEffect_Mesh
 {
-	GENERATED_BODY(CTestEffectQuad)
+	GENERATED_BODY(CSample_MeshEffect)
 
 public:
-	struct TEST_EFFECT_QUAD_DESC : public CEffect_Quad::EFFECT_QUAD_DESC
+	struct SAMPLE_MESHEFFECT_DESC : public CEffect_Mesh::EFFECT_MESH_DESC
 	{
 
 	};
 
-	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_TestEffectQuad";
+	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_SampleMeshEffect";
 
 private:
-	CTestEffectQuad(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CTestEffectQuad(const CTestEffectQuad& Prototype);
-	virtual ~CTestEffectQuad() = default;
+	CSample_MeshEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CSample_MeshEffect(const CSample_MeshEffect& Prototype);
+	virtual ~CSample_MeshEffect() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -38,7 +38,7 @@ public:
 	}
 
 public:
-	static CTestEffectQuad* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CSample_MeshEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 private:
 	virtual void Free();

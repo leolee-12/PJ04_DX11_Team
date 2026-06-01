@@ -17,6 +17,10 @@ HRESULT CEffect_Manager::Initialize()
     if (m_p2DShader == nullptr)
         return E_FAIL;
 
+    m_pMeshShader = CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_Effect_Mesh.hlsl"), VTXEFFECTMESH::Elements, VTXEFFECTMESH::iNumElements);
+    if (m_pMeshShader == nullptr)
+        return E_FAIL;
+
     return S_OK;
 }
 

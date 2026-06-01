@@ -73,6 +73,8 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
     // Rot
     PROPERTY(_bool, m_bRotationChange,   L"RotationChange",    L"Effect_Rot");
 
+    PROPERTY(_float, m_fRotSpeed,        L"RotSpeed",   L"Effect_Rot");
+
     PROPERTY(_float3, m_vRotationAxis,   L"m_vRotationAxis",   L"Effect_Rot");
     PROPERTY(_float, m_fRot_Start_Ratio, L"Rot_Start_Ratio",   L"Effect_Rot");
     PROPERTY(_float, m_fRot_End_Ratio,   L"Rot_End_Ratio",     L"Effect_Rot");
@@ -85,6 +87,7 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
     PROPERTY(_float3, m_vMoveDir,           L"MoveDir",             L"Effect_Move");
     PROPERTY(_float, m_fMove_Start_Ratio,   L"Move_Start_Ratio",    L"Effect_Move");
     PROPERTY(_float, m_fMove_End_Ratio,     L"Move_End_Ratio",      L"Effect_Move");
+
 
     // Move Sin
     PROPERTY(_bool, m_bMoveSin,                L"MoveSin",                               L"Effect_MoveSin");
@@ -137,13 +140,6 @@ protected:
 
     virtual void Update_EffectPart(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
 
-private:
-    vector<RATIO_VALUE> m_AlphaRatioValue;
-    vector<RATIO_VALUE> m_SizeRatioValue;
-    vector<RATIO_VALUE_FLOAT3> m_ColorRatioValue;
-
-private:
-    void Init_PropertyValue();
     void Update_Value(_float fTimeDelta);
     void Update_Alpha(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
     void Update_Size(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
@@ -151,6 +147,14 @@ private:
     void Update_Rot(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
     void Update_Move(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
     void Update_MoveSin(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
+
+private:
+    vector<RATIO_VALUE> m_AlphaRatioValue;
+    vector<RATIO_VALUE> m_SizeRatioValue;
+    vector<RATIO_VALUE_FLOAT3> m_ColorRatioValue;
+
+private:
+    void Init_PropertyValue();
 
 protected:
     virtual void Free() override;

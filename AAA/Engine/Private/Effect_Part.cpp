@@ -47,7 +47,7 @@ void CEffect_Part::Late_Update(_float fTimeDelta)
     if (m_bActive == false)
         return;
 
-    // ¤·¤§
+    // ¤·¤§ dd
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::BLEND, this);
 }
 
@@ -140,6 +140,7 @@ void CEffect_Part::Init_PropertyValue()
 
     // Rot
     m_bRotationChange = { false };
+    m_fRotSpeed = { 360.f };
     m_vRotationAxis = { 0.f, 1.f, 0.f };
     m_fRot_Start_Ratio = { 0.f };
     m_fRot_End_Ratio = { 1.f };
@@ -271,7 +272,7 @@ void CEffect_Part::Update_Size(const _float fTimeDelta, const _float fActiveTime
         if (m_fSize < Helper::fEpsilon)
             m_fSize = Helper::fEpsilon;
 
-        m_pTransformCom->Set_Scale(m_fSize, m_fSize, 1.f);
+        m_pTransformCom->Set_Scale(m_fSize, m_fSize, m_fSize);
     }
 
     m_SizeRatioValue.clear();
@@ -317,7 +318,11 @@ void CEffect_Part::Update_Rot(const _float fTimeDelta, const _float fActiveTime,
         return;
 
     if (fRatio >= m_fRot_Start_Ratio && fRatio <= m_fRot_End_Ratio)
-        m_pTransformCom->Turn(XMLoadFloat3(&m_vRotationAxis), fTimeDelta);
+    {
+        m_pTransformCom->Rotate(XMQuaternionRotationAxis(XMLoadFloat3(&m_vRotationAxis),
+            XMConvertToRadians(m_fRotSpeed) * fTimeDelta));
+
+    }
 }
 
 void CEffect_Part::Update_Move(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
@@ -326,7 +331,11 @@ void CEffect_Part::Update_Move(const _float fTimeDelta, const _float fActiveTime
         return;
 
     if (fRatio >= m_fMove_Start_Ratio && fRatio <= m_fMove_End_Ratio)
-        m_pTransformCom->Go_Dir(fTimeDelta * m_fMoveSpeed, XMVector3Normalize(XMLoadFloat3(&m_vMoveDir)));
+    {
+        _vector vPosition =  m_pTransformCom->Get_State(STATE::POSITION);
+        vPosition += XMVectorSetW(XMVector3Normalize(XMLoadFloat3(&m_vMoveDir)), 0.f) * m_fMoveSpeed * fTimeDelta;
+        m_pTransformCom->Set_State(STATE::POSITION, vPosition);
+    }
 }
 
 void CEffect_Part::Update_MoveSin(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
