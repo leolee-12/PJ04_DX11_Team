@@ -11,6 +11,10 @@ class CNavigation;
 
 class ENGINE_DLL CTransform final : public CComponent
 {
+	GENERATED_BODY(CTransform)
+	PROPERTY(_float, m_fSpeedPerSec, L"Speed/sec", L"Default")
+	PROPERTY(_float, m_fRotationPerSec, L"Rotation/sec/dgree", L"Default")
+
 public:
 	typedef struct tagTransformDesc
 	{
@@ -99,8 +103,7 @@ private:
 		_float4					m_States[ETOUI(STATE::END)];
 	};
 
-	_float					m_fSpeedPerSec = {};
-	_float					m_fRotationPerSec = {};
+	
 
 
 public:

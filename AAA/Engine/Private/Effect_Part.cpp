@@ -23,6 +23,9 @@ HRESULT CEffect_Part::Initialize(void* pArg)
 {
     EFFECT_PART_DESC* pDesc = static_cast<EFFECT_PART_DESC*>(pArg);
 
+    pDesc->fSpeedPerSec = 1.f;
+    pDesc->fRotationPerSec = 360.f;
+
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
    
@@ -143,11 +146,14 @@ void CEffect_Part::Init_PropertyValue()
 
     //Move
     m_bMoveChange = { false };
+    m_fMoveSpeed = 1.f;
     m_vMoveDir = { 1.f, 0.f, 0.f };
     m_fMove_Start_Ratio = { 0.f };
     m_fMove_End_Ratio = { 1.f };
 
     m_bMoveSin = { false };
+    m_fSinCyclePerDuration = 1.f;
+    m_fAmplitude = 1.f;
 }
 
 void CEffect_Part::Update_Value(_float fTimeDelta)
@@ -184,6 +190,7 @@ void CEffect_Part::Update_Value(_float fTimeDelta)
     if (fActiveTime >= m_fDuration)
     {
         if(m_bMoveChange)
+            // 이거 나중에 부모 위치 반영한 로컬로 바꿔줘야 함.
             m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&m_vLocalPos), 1.f));
 
         if (m_bLoop)
@@ -311,7 +318,6 @@ void CEffect_Part::Update_Rot(const _float fTimeDelta, const _float fActiveTime,
 
     if (fRatio >= m_fRot_Start_Ratio && fRatio <= m_fRot_End_Ratio)
         m_pTransformCom->Turn(XMLoadFloat3(&m_vRotationAxis), fTimeDelta);
-
 }
 
 void CEffect_Part::Update_Move(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
@@ -320,21 +326,31 @@ void CEffect_Part::Update_Move(const _float fTimeDelta, const _float fActiveTime
         return;
 
     if (fRatio >= m_fMove_Start_Ratio && fRatio <= m_fMove_End_Ratio)
-        m_pTransformCom->Go_Dir(fTimeDelta, XMVector3Normalize(XMLoadFloat3(&m_vMoveDir)));
+        m_pTransformCom->Go_Dir(fTimeDelta * m_fMoveSpeed, XMVector3Normalize(XMLoadFloat3(&m_vMoveDir)));
 }
 
 void CEffect_Part::Update_MoveSin(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
 {
     if (m_bMoveSin == false)
+    {
+        if (m_fPreOffsetY != 0.f)
+        {
+            _vector vCurPos = m_pTransformCom->Get_State(STATE::POSITION);
+            m_pTransformCom->Set_State(STATE::POSITION, vCurPos - XMVectorSet(0.f, m_fPreOffsetY, 0.f, 0.f));
+            m_fPreOffsetY = 0.f;
+        }
+
         return;
+    }
 
-    m_fAccMoveSinTime += fTimeDelta;
+    _float fCurOffsetY = sinf(fRatio * XM_2PI * m_fSinCyclePerDuration) * m_fAmplitude;
 
-    if (m_fAccMoveSinTime >= 360.f)
-        m_fAccMoveSinTime -= 360.f;
+    _vector vCurPos = m_pTransformCom->Get_State(STATE::POSITION);
 
-    _float3 vDir = _float3(0.f, sinf(XMConvertToRadians(m_fAccMoveSinTime * 90.f)), 0.f);
-    m_pTransformCom->Go_Dir(fTimeDelta, XMVector3Normalize(XMLoadFloat3(&vDir)));
+    _float fDY = fCurOffsetY - m_fPreOffsetY;
+    m_pTransformCom->Set_State(STATE::POSITION, vCurPos + XMVectorSet(0.f, fDY, 0.f, 0.f));
+    
+    m_fPreOffsetY = fCurOffsetY;
 }
 
 void CEffect_Part::Free()

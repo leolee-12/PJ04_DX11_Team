@@ -80,13 +80,16 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
 
     // Move
     PROPERTY(_bool, m_bMoveChange,          L"MoveChange",          L"Effect_Move");
+    PROPERTY(_float, m_fMoveSpeed,          L"MoveSpeed",           L"Effect_Move");
 
     PROPERTY(_float3, m_vMoveDir,           L"MoveDir",             L"Effect_Move");
     PROPERTY(_float, m_fMove_Start_Ratio,   L"Move_Start_Ratio",    L"Effect_Move");
     PROPERTY(_float, m_fMove_End_Ratio,     L"Move_End_Ratio",      L"Effect_Move");
 
     // Move Sin
-    PROPERTY(_bool, m_bMoveSin, L"MoveSin", L"Effect_MoveSin");
+    PROPERTY(_bool, m_bMoveSin,                L"MoveSin",                               L"Effect_MoveSin");
+    PROPERTY(_float, m_fSinCyclePerDuration,   L"Cycle_Per_Duration(Recommend int)",     L"Effect_MoveSin");
+    PROPERTY(_float, m_fAmplitude,             L"Amplitude",                             L"Effect_MoveSin");
 
 public:
     struct EFFECT_PART_DESC : public CGameObject::GAMEOBJECT_DESC
@@ -127,7 +130,7 @@ protected:
 
     _bool m_bActive{ true };
 
-    _float m_fAccMoveSinTime{};
+    _float m_fPreOffsetY{};
 
 protected:
     HRESULT Bind_ShaderValue();
