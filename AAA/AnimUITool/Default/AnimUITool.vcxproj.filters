@@ -49,6 +49,21 @@
     <Filter Include="96. ShaderFiles">
       <UniqueIdentifier>{b0e00da9-d2b7-4846-a001-5be1ecd5c365}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. Objects\Preview_Actor">
+      <UniqueIdentifier>{fe46b911-fdf0-4e5e-8db9-2dd3c9ff0956}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Panels\Animation">
+      <UniqueIdentifier>{496127c3-2f2f-4aa4-a1ca-0cb42ff0b1d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Panels\Animation\Context">
+      <UniqueIdentifier>{bbb21f79-4c27-4232-a4be-92c8fc234e04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Panels\Browser">
+      <UniqueIdentifier>{735ee1b2-fa09-4f5e-9098-f857f3c6b25b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="96. ShaderFiles\Defines">
+      <UniqueIdentifier>{faad848a-186b-4861-910b-572f60a2a359}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Panel.h">
@@ -104,6 +119,18 @@
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>98. Default</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Preview_Actor.h">
+      <Filter>02. Objects\Preview_Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_Animation.h">
+      <Filter>03. Panels\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Anim_Context.h">
+      <Filter>03. Panels\Animation\Context</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_Browser.h">
+      <Filter>03. Panels\Browser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -164,6 +191,15 @@
     <ClCompile Include="AnimUITool.cpp">
       <Filter>98. Default</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Preview_Actor.cpp">
+      <Filter>02. Objects\Preview_Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Animation.cpp">
+      <Filter>03. Panels\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Browser.cpp">
+      <Filter>03. Panels\Browser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="AnimUITool.ico">
@@ -177,5 +213,21 @@
     <ResourceCompile Include="AnimUITool.rc">
       <Filter>98. Default</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Bin\ShaderFiles\Engine_Shader_Defines.hlsli">
+      <Filter>96. ShaderFiles\Defines</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_AnimMesh_PBR.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_Grid.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_NonAnim_PBR.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

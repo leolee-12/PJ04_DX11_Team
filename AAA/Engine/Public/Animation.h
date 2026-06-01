@@ -20,6 +20,7 @@ public:
 	void  Reset_TrackPosition();
 
 public:
+	void			Get_ChannelBoneIndices(vector<_uint>& Out) const;
 	const string& Get_AnimationName() const { return m_strName; }
 
 	_float Get_Progress() const

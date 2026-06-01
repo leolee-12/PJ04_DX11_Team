@@ -1,5 +1,6 @@
 #include "EditCamera.h"
 #include "imgui.h"
+#include "GameInstance_Proxy.h"
 
 using namespace AnimUITool;
 
@@ -29,31 +30,59 @@ void CEditCamera::Priority_Update(_float fTimeDelta)
     {
         ImGuiIO& io = ImGui::GetIO();
 
-        if (io.MouseDown[1])   // 우클릭 드래그 = 회전
+        if (io.MouseDown[1])
         {
             if (io.MouseDelta.x)
-                m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), io.MouseDelta.x * m_fMouseSensor * fTimeDelta);
+                m_pTransformCom->Turn(
+                    XMVectorSet(0.f, 1.f, 0.f, 0.f),
+                    io.MouseDelta.x * m_fMouseSensor * fTimeDelta);
+
             if (io.MouseDelta.y)
-                m_pTransformCom->Turn(m_pTransformCom->Get_State(STATE::RIGHT), io.MouseDelta.y * m_fMouseSensor * fTimeDelta);
+                m_pTransformCom->Turn(
+                    m_pTransformCom->Get_State(STATE::RIGHT),
+                    io.MouseDelta.y * m_fMouseSensor * fTimeDelta);
         }
 
-        if (io.MouseWheel != 0.f)   // 휠 = 전후진
+        if (io.MouseWheel != 0.f)
             m_pTransformCom->Go_Straight(fTimeDelta * io.MouseWheel);
 
-        if (io.MouseDown[1])        // 우클릭 중 WASD
+        if (io.MouseDown[1])
         {
             if (ImGui::IsKeyDown(ImGuiKey_W)) m_pTransformCom->Go_Straight(fTimeDelta);
             if (ImGui::IsKeyDown(ImGuiKey_S)) m_pTransformCom->Go_Backward(fTimeDelta);
             if (ImGui::IsKeyDown(ImGuiKey_A)) m_pTransformCom->Go_Left(fTimeDelta);
             if (ImGui::IsKeyDown(ImGuiKey_D)) m_pTransformCom->Go_Right(fTimeDelta);
+
+            _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+            _vector vUp = XMVector3Normalize(m_pTransformCom->Get_State(STATE::UP));
+
+            _float fSpeed = m_pTransformCom->Get_SpeedPerSec() * fTimeDelta;
+
+            if (ImGui::IsKeyDown(ImGuiKey_Q))
+                vPos -= vUp * fSpeed;
+
+            if (ImGui::IsKeyDown(ImGuiKey_E))
+                vPos += vUp * fSpeed;
+
+            m_pTransformCom->Set_State(STATE::POSITION, vPos);
         }
     }
     __super::Priority_Update(fTimeDelta);
 }
 
-void CEditCamera::Update(_float fTimeDelta) { __super::Update(fTimeDelta); }
-void CEditCamera::Late_Update(_float fTimeDelta) { __super::Late_Update(fTimeDelta); }
-HRESULT CEditCamera::Render() { return E_NOTIMPL; }
+void CEditCamera::Update(_float fTimeDelta)
+{
+    __super::Update(fTimeDelta);
+}
+
+void CEditCamera::Late_Update(_float fTimeDelta)
+{ 
+    __super::Late_Update(fTimeDelta);
+}
+HRESULT CEditCamera::Render()
+{ 
+    return S_OK;
+}
 
 CEditCamera* CEditCamera::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

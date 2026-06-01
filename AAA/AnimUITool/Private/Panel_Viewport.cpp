@@ -1,5 +1,9 @@
 #include "Panel_Viewport.h"
 #include "imgui.h"
+#include "Model.h"
+#include "Preview_Actor.h"
+#include "GameInstance_Proxy.h"
+#include "Panel_Manager.h"
 
 using namespace AnimUITool;
 
@@ -27,22 +31,50 @@ void CPanel_Viewport::Render()
 
         ImVec2 vImagePos = ImGui::GetCursorScreenPos();
 
-        if (m_pSRV)
-            ImGui::Image((ImTextureID)m_pSRV, vSize);
-        else
-            ImGui::Dummy(vSize);
+        if (m_pSRV) ImGui::Image((ImTextureID)m_pSRV, vSize);
+        else        ImGui::Dummy(vSize);
 
         m_bHovered = ImGui::IsItemHovered();
 
-        if (ImGui::IsItemHovered())
+        // ── 본 위치 점 오버레이 ──
+        ANIM_CONTEXT& ctx = m_pPanel_Manager->Get_Context();
+        if (ctx.pActor && ctx.pModel)
         {
-            ImVec2 m = ImGui::GetMousePos();
-            float ndcX = ((m.x - vImagePos.x) / vSize.x) * 2.f - 1.f;
-            float ndcY = 1.f - ((m.y - vImagePos.y) / vSize.y) * 2.f;
-            ImGui::SetTooltip("NDC: %.2f, %.2f", ndcX, ndcY);
+            const _float4x4* pView = m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC);
+            const _float4x4* pProj = m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
+            const _float4x4* pWorld = ctx.pActor->Get_Transform()->Get_WorldMatrixPtr();
+
+            if (pView && pProj && pWorld)
+            {
+                XMMATRIX mWorld = XMLoadFloat4x4(pWorld);
+                XMMATRIX mVP = XMLoadFloat4x4(pView) * XMLoadFloat4x4(pProj);
+                ImDrawList* dl = ImGui::GetWindowDrawList();
+
+                const _uint iNum = ctx.pModel->Get_NumBones();
+                for (_uint i = 0; i < iNum; ++i)
+                {
+                    const _float4x4* pBone = ctx.pModel->Get_BoneMatrixPtr(ctx.pModel->Get_BoneName(i));
+                    if (!pBone) continue;
+
+                    // Combined의 위치(행4) = 모델공간 본 위치 → 월드 → 클립
+                    XMVECTOR posModel = XMVectorSet(pBone->_41, pBone->_42, pBone->_43, 1.f);
+                    XMVECTOR posWorld = XMVector3TransformCoord(posModel, mWorld);
+                    XMVECTOR clip = XMVector4Transform(XMVectorSetW(posWorld, 1.f), mVP);
+
+                    float w = XMVectorGetW(clip);
+                    if (w < 1e-5f) continue;                       // 카메라 뒤
+                    float ndcX = XMVectorGetX(clip) / w;
+                    float ndcY = XMVectorGetY(clip) / w;
+                    ImVec2 sp(vImagePos.x + (ndcX + 1.f) * 0.5f * vSize.x,
+                        vImagePos.y + (1.f - ndcY) * 0.5f * vSize.y);
+
+                    _bool bSel = ((_int)i == ctx.iSelBone);
+                    dl->AddCircleFilled(sp, bSel ? 6.f : 3.f,
+                        bSel ? IM_COL32(255, 80, 80, 255)      // 선택: 빨강+큼
+                        : IM_COL32(255, 230, 0, 170));     // 일반: 노랑
+                }
+            }
         }
-        else
-            m_bHovered = false;
     }
 
     ImGui::End();

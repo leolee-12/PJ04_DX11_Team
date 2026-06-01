@@ -3,7 +3,33 @@
 #include "EditCamera.h"
 #include "Edit_Grid.h"
 
-using namespace AnimUITool;
+#include "Shader.h"
+#include "Model.h"
+#include "Preview_Actor.h"
+#include "GameContent_const.h"
+
+namespace 
+{ 
+    constexpr const _char* PREVIEW_MODEL_PATH =
+        "../../Resources/Models/Test/BladeKnight/BladeKnight.ysh";
+
+    MODEL Read_YshType(const _wstring& strPath)
+    {
+        FILE* fp = nullptr; _wfopen_s(&fp, strPath.c_str(), L"rb");
+        if (!fp) return MODEL::END;
+        uint32_t magic = 0, ver = 0, type = 0;
+        fread(&magic, 4, 1, fp); 
+        fread(&ver, 4, 1, fp); 
+        fread(&type, 4, 1, fp);
+
+        fclose(fp);
+        if (magic != 0x2E595348) 
+            return MODEL::END;
+
+        return (type == 0) ? MODEL::NONANIM : MODEL::ANIM;
+    }
+}
+
 
 CLevel_Tool::CLevel_Tool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel(pDevice, pContext) {
@@ -21,6 +47,9 @@ HRESULT CLevel_Tool::Initialize()
         return E_FAIL;
 
     if (FAILED(Ready_Grid()))   
+        return E_FAIL;
+
+    if (FAILED(Ready_PreviewShaders()))
         return E_FAIL;
 
     return S_OK;
@@ -74,6 +103,21 @@ HRESULT CLevel_Tool::Ready_Grid()
     return (m_pGrid == nullptr) ? E_FAIL : S_OK;
 }
 
+HRESULT CLevel_Tool::Ready_PreviewShaders()
+{
+    const _uint L = ETOUI(TOOL_LEVEL::STATIC);
+    if (!m_pGameInstance_Proxy->Has_Prototype(L, L"Proto_Shader_AnimMesh"))
+        m_pGameInstance_Proxy->Add_Prototype(L, L"Proto_Shader_AnimMesh",
+            CShader::Create(m_pDevice, m_pContext, Shader_AnimMesh_PBR.szFileTag,
+                VTXANIMMESH::Elements, VTXANIMMESH::iNumElements));
+
+    if (!m_pGameInstance_Proxy->Has_Prototype(L, L"Proto_Shader_NonAnimMesh"))
+        m_pGameInstance_Proxy->Add_Prototype(L, L"Proto_Shader_NonAnimMesh",
+            CShader::Create(m_pDevice, m_pContext, Shader_NonAnimMesh_PBR.szFileTag,
+                VTXMESH::Elements, VTXMESH::iNumElements));
+    return S_OK;
+}
+
 void CLevel_Tool::Update(_float fTimeDelta) 
 {
 }
@@ -92,6 +136,69 @@ HRESULT CLevel_Tool::Render()
 void CLevel_Tool::Set_CameraActive(_bool bActive)
 {
     if (m_pCamera) m_pCamera->Set_Active(bActive);
+}
+
+CGameObject* CLevel_Tool::Load_Preview(const _wstring& strYshPath)
+{
+    MODEL eType = Read_YshType(strYshPath);
+    if (eType == MODEL::END) { Log_Error("Invalid .ysh header."); return nullptr; }
+
+    Clear_Preview();    // 기존 1개 제거(단일 교체형)
+
+    // 모델 proto (경로 단위 재사용)
+    std::wstring strModelTag;
+    auto it = m_ModelTags.find(strYshPath);
+    if (it != m_ModelTags.end())
+        strModelTag = it->second;
+    else
+    {
+        strModelTag = L"Proto_Model_" + std::to_wstring(m_iTagCounter++);
+        std::string sPath(strYshPath.begin(), strYshPath.end());   // ASCII 경로 가정
+        if (FAILED(m_pGameInstance_Proxy->Add_Prototype(ETOUI(TOOL_LEVEL::STATIC), strModelTag,
+            CModel::Create(m_pDevice, m_pContext, eType, sPath.c_str()))))
+        {
+            Log_Error("Model prototype create failed."); return nullptr;
+        }
+        m_ModelTags[strYshPath] = strModelTag;
+    }
+
+    // 액터 proto (1회)
+    if (!m_pGameInstance_Proxy->Has_Prototype(ETOUI(TOOL_LEVEL::STATIC), CPreview_Actor::PROTOTYPE_TAG))
+        m_pGameInstance_Proxy->Add_Prototype(ETOUI(TOOL_LEVEL::STATIC), CPreview_Actor::PROTOTYPE_TAG,
+            CPreview_Actor::Create(m_pDevice, m_pContext));
+
+    CPreview_Actor::PREVIEW_DESC desc{};
+    desc.iProtoLevel = ETOUI(TOOL_LEVEL::STATIC);
+    desc.eType = eType;
+    desc.szModelTag = strModelTag.c_str();      // Initialize 내에서만 사용(동기 호출)
+    desc.szShaderTag = (eType == MODEL::ANIM) ? L"Proto_Shader_AnimMesh" : L"Proto_Shader_NonAnimMesh";
+
+    CGameObject* pObj = nullptr;
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pObj,
+        ETOUI(TOOL_LEVEL::STATIC), CPreview_Actor::PROTOTYPE_TAG,
+        ETOUI(TOOL_LEVEL::EDIT), L"Layer_Preview", L"Preview", &desc)))
+        return nullptr;
+
+    m_pPreview = pObj;
+    return pObj;
+}
+
+void CLevel_Tool::Clear_Preview()
+{
+    if (m_pPreview)
+    {
+        Log_Info("Clear_Preview: destroy requested.");
+        m_pGameInstance_Proxy->Destroy_GameObject(m_pPreview);
+        m_pPreview = nullptr;
+    }
+    else
+        Log_Warning("Clear_Preview: m_pPreview == null");
+}
+
+void CLevel_Tool::Recalc_CameraProj()
+{
+    if (m_pCamera)
+        m_pCamera->Recalculate_ProjMatrix();
 }
 
 CLevel_Tool* CLevel_Tool::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

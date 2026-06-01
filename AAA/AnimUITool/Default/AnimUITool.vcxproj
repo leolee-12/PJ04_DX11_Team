@@ -24,11 +24,14 @@
     <ClCompile Include="..\Private\Edit_Grid.cpp" />
     <ClCompile Include="..\Private\Level_Tool.cpp" />
     <ClCompile Include="..\Private\Panel.cpp" />
+    <ClCompile Include="..\Private\Panel_Animation.cpp" />
+    <ClCompile Include="..\Private\Panel_Browser.cpp" />
     <ClCompile Include="..\Private\Panel_Console.cpp" />
     <ClCompile Include="..\Private\Panel_Hierarchy.cpp" />
     <ClCompile Include="..\Private\Panel_Inspector.cpp" />
     <ClCompile Include="..\Private\Panel_Manager.cpp" />
     <ClCompile Include="..\Private\Panel_Viewport.cpp" />
+    <ClCompile Include="..\Private\Preview_Actor.cpp" />
     <ClCompile Include="..\ThirdParty\ImGui\Src\imgui.cpp" />
     <ClCompile Include="..\ThirdParty\ImGui\Src\ImGuizmo.cpp" />
     <ClCompile Include="..\ThirdParty\ImGui\Src\imgui_demo.cpp" />
@@ -45,15 +48,19 @@
     <ClInclude Include="..\Public\AnimUITool_Enum.h" />
     <ClInclude Include="..\Public\AnimUITool_Func.h" />
     <ClInclude Include="..\Public\AnimUITool_Struct.h" />
+    <ClInclude Include="..\Public\Anim_Context.h" />
     <ClInclude Include="..\Public\EditCamera.h" />
     <ClInclude Include="..\Public\Edit_Grid.h" />
     <ClInclude Include="..\Public\Level_Tool.h" />
     <ClInclude Include="..\Public\Panel.h" />
+    <ClInclude Include="..\Public\Panel_Animation.h" />
+    <ClInclude Include="..\Public\Panel_Browser.h" />
     <ClInclude Include="..\Public\Panel_Console.h" />
     <ClInclude Include="..\Public\Panel_Hierarchy.h" />
     <ClInclude Include="..\Public\Panel_Inspector.h" />
     <ClInclude Include="..\Public\Panel_Manager.h" />
     <ClInclude Include="..\Public\Panel_Viewport.h" />
+    <ClInclude Include="..\Public\Preview_Actor.h" />
     <ClInclude Include="AnimUITool.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Resource.h" />
@@ -65,6 +72,23 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AnimUITool.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Bin\ShaderFiles\Engine_Shader_Defines.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_AnimMesh_PBR.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Effect</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_Grid.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Effect</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_NonAnim_PBR.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Effect</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

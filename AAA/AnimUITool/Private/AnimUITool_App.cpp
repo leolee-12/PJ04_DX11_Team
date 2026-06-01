@@ -2,6 +2,7 @@
 #include "GameInstance.h"
 #include "Panel_Manager.h"
 #include "Panel_Viewport.h"
+#include "Preview_Actor.h"
 
 #include "Level_Tool.h"
 
@@ -49,10 +50,12 @@ HRESULT CAnimUITool_App::Initialize()
 		return E_FAIL;
 
 	m_pToolLevel = pLevel;
+	
+	m_pPanel_Manager->Set_Level(pLevel);
 
-		Log_Info("AnimUITool initialized.");
+	Log_Info("AnimUITool initialized.");
 
-		return S_OK;
+	return S_OK;
 
 }
 
@@ -142,6 +145,40 @@ HRESULT CAnimUITool_App::Render()
 
 	return S_OK;
 }
+
+void CAnimUITool_App::OnResize(_uint iWidth, _uint iHeight)
+{
+	if (iWidth == 0 || iHeight == 0) return;
+	if (iWidth == m_iViewportWidth && iHeight == m_iViewportHeight) return;
+
+	m_iViewportWidth = iWidth;
+	m_iViewportHeight = iHeight;
+
+	Safe_Release(m_pRTV);
+	Safe_Release(m_pSRV);
+	Safe_Release(m_pDSV);
+
+	// 멤버 크기로 재생성
+	if (FAILED(Ready_EditRTV())) 
+	{ 
+		Log_Error("Resize edit RT failed."); 
+		return;
+	}   
+
+	if (m_pViewportPanel)
+	{
+		m_pViewportPanel->Set_SRV(m_pSRV);
+		m_pViewportPanel->Set_Aspect((_float)iWidth / (_float)iHeight);   // 레터박스 종횡비 갱신
+	}
+
+	// 카메라 proj를 새 종횡비로 재계산
+	D3D11_VIEWPORT vp{};
+	vp.Width = (_float)iWidth; vp.Height = (_float)iHeight; vp.MaxDepth = 1.f;
+	m_pContext->RSSetViewports(1, &vp);
+	if (m_pToolLevel)
+		m_pToolLevel->Recalc_CameraProj();
+}
+
 
 void CAnimUITool_App::Render_DockSpace()
 {

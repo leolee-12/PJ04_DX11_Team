@@ -66,6 +66,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         if (g_bNeedResize)
         {
             pProxy->OnResize(g_iResizeWidth, g_iResizeHeight);
+            pApp->OnResize(g_iResizeWidth, g_iResizeHeight);        // 에디터 화면도 리사이즈
             g_bNeedResize = false;
         }
 
