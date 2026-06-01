@@ -29,6 +29,7 @@ struct MAP_SECTION_DESC : public CGameObject::GAMEOBJECT_DESC
 {
 	_wstring			strSectionName;
 	_wstring			strModelProtoTag;
+	_wstring			strModelPath;
 	_uint				iModelProtoLevel = {};
 	MAP_SECTION_TYPE	eSectionType = { MAP_SECTION_TYPE::UNKNOWN };
 	RENDERID			eRenderID = { RENDERID::NONBLEND };

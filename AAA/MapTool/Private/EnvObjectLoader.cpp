@@ -1,5 +1,7 @@
 #include "EnvObjectLoader.h"
 
+#include <cwctype>
+#include <exception>
 #include <filesystem>
 #include <unordered_set>
 
@@ -10,6 +12,7 @@
 #include "GameInstance_Proxy.h"
 #include "MapTool_Func.h"
 #include "Model.h"
+#include "YshModelValidator.h"
 
 NS_BEGIN(Client)
 
@@ -20,11 +23,18 @@ namespace
 	constexpr wchar_t kLayerEnvStatic[] = L"Layer_EnvStatic";
 	constexpr wchar_t kLayerEnvInteract[] = L"Layer_EnvInteract";
 	constexpr wchar_t kLayerEnvEffect[] = L"Layer_EnvEffect";
-	constexpr wchar_t kModelRoot[] = L"../../Resources/Models/Test";
+	constexpr wchar_t kPrimaryModelRoot[] = L"../../Resources/Maps";
+	constexpr wchar_t kFallbackModelRoot[] = L"../../Resources/Models/Test";
 
-	unordered_map<wstring, wstring>& Get_ModelPathCache()
+	struct ENV_MODEL_CACHE_ENTRY
 	{
-		static unordered_map<wstring, wstring> s_Cache;
+		wstring strModelPath;
+		wstring strModelProtoTag;
+	};
+
+	unordered_map<wstring, ENV_MODEL_CACHE_ENTRY>& Get_ModelPathCache()
+	{
+		static unordered_map<wstring, ENV_MODEL_CACHE_ENTRY> s_Cache;
 		return s_Cache;
 	}
 
@@ -38,6 +48,63 @@ namespace
 	{
 		static unordered_set<wstring> s_Set;
 		return s_Set;
+	}
+
+	unordered_set<wstring>& Get_RejectedModelLogSet()
+	{
+		static unordered_set<wstring> s_Set;
+		return s_Set;
+	}
+
+	unordered_set<wstring>& Get_TrimmedResolveLogSet()
+	{
+		static unordered_set<wstring> s_Set;
+		return s_Set;
+	}
+
+	void Normalize_PathToken(wstring* pInOut)
+	{
+		if (nullptr == pInOut)
+			return;
+
+		for (wchar_t& ch : *pInOut)
+		{
+			if (iswalnum(ch))
+				continue;
+
+			ch = L'_';
+		}
+	}
+
+	wstring Make_ModelProtoTag(const path& Root, const path& FilePath)
+	{
+		error_code ErrorCode;
+		path RelativePath = relative(FilePath, Root, ErrorCode);
+		if (ErrorCode)
+			RelativePath = FilePath.filename();
+
+		RelativePath.replace_extension();
+		wstring strToken = RelativePath.wstring();
+		Normalize_PathToken(&strToken);
+		return L"Prototype_Component_Model_Env_" + strToken;
+	}
+
+	_bool IsValidEnvModelFile(const path& FilePath)
+	{
+		wstring strReason;
+		if (!MapTool::YshModelValidator::Validate_NonAnimYsh(FilePath, &strReason))
+		{
+			const wstring strPath = FilePath.wstring();
+			if (Get_RejectedModelLogSet().insert(strPath).second)
+			{
+				MapTool::Log_Warning(
+					"EnvObject ignored invalid non-anim ysh: " + WstrToStr(strPath)
+					+ " reason=" + WstrToStr(strReason));
+			}
+			return false;
+		}
+
+		return true;
 	}
 
 	vector<string> Split_DottedPath(const string& strPath)
@@ -196,20 +263,9 @@ namespace
 		return true;
 	}
 
-	void Build_ModelPathCache_IfNeeded()
+	void Index_ModelRoot(const path& Root)
 	{
-		if (Get_ModelPathCacheBuilt())
-			return;
-
-		Get_ModelPathCacheBuilt() = true;
 		error_code ErrorCode;
-		const path Root = weakly_canonical(path(kModelRoot), ErrorCode);
-		if (ErrorCode || !exists(Root))
-		{
-			MapTool::Log_Warning("EnvObject model root missing: ../../Resources/Models/Test");
-			return;
-		}
-
 		for (recursive_directory_iterator Iter(Root, directory_options::skip_permission_denied, ErrorCode), End;
 			Iter != End;
 			Iter.increment(ErrorCode))
@@ -224,8 +280,42 @@ namespace
 			if (0 != _wcsicmp(FilePath.extension().c_str(), L".ysh"))
 				continue;
 
-			Get_ModelPathCache().try_emplace(FilePath.stem().wstring(), FilePath.wstring());
+			if (!IsValidEnvModelFile(FilePath))
+				continue;
+
+			const wstring strStem = FilePath.stem().wstring();
+			if (Get_ModelPathCache().find(strStem) != Get_ModelPathCache().end())
+				continue;
+
+			ENV_MODEL_CACHE_ENTRY Entry{};
+			Entry.strModelPath = FilePath.wstring();
+			Entry.strModelProtoTag = Make_ModelProtoTag(Root, FilePath);
+			Get_ModelPathCache().emplace(strStem, move(Entry));
 		}
+	}
+
+	void Build_ModelPathCache_IfNeeded()
+	{
+		if (Get_ModelPathCacheBuilt())
+			return;
+
+		Get_ModelPathCacheBuilt() = true;
+
+		auto IndexIfExists = [](_In_z_ const wchar_t* pRootPath) -> _bool
+		{
+			error_code ErrorCode;
+			const path Root = weakly_canonical(path(pRootPath), ErrorCode);
+			if (ErrorCode || !exists(Root))
+				return false;
+
+			Index_ModelRoot(Root);
+			return true;
+		};
+
+		const _bool bIndexedPrimary = IndexIfExists(kPrimaryModelRoot);
+		const _bool bIndexedFallback = IndexIfExists(kFallbackModelRoot);
+		if (!bIndexedPrimary && !bIndexedFallback)
+			MapTool::Log_Warning("EnvObject model roots missing: ../../Resources/Maps and ../../Resources/Models/Test");
 	}
 
 	ENV_SOURCE_TYPE Classify_SourceType(const wstring& strSourceFile)
@@ -291,13 +381,38 @@ namespace
 			return false;
 
 		Build_ModelPathCache_IfNeeded();
-		const auto Iter = Get_ModelPathCache().find(pDesc->strObjectName);
-		if (Iter == Get_ModelPathCache().end())
-			return false;
 
-		pDesc->strModelProtoTag = L"Prototype_Component_Model_Env_" + pDesc->strObjectName;
-		pDesc->strModelPath = Iter->second;
-		return true;
+		auto ResolveByKey = [&](const wstring& strLookupKey) -> _bool
+		{
+			const auto Iter = Get_ModelPathCache().find(strLookupKey);
+			if (Iter == Get_ModelPathCache().end())
+				return false;
+
+			pDesc->strModelProtoTag = Iter->second.strModelProtoTag;
+			pDesc->strModelPath = Iter->second.strModelPath;
+			return true;
+		};
+
+		if (ResolveByKey(pDesc->strObjectName))
+			return true;
+
+		if (pDesc->strObjectName.size() > 1 && L'L' == pDesc->strObjectName.back())
+		{
+			wstring strTrimmedName = pDesc->strObjectName.substr(0, pDesc->strObjectName.size() - 1);
+			if (ResolveByKey(strTrimmedName))
+			{
+				if (Get_TrimmedResolveLogSet().insert(pDesc->strObjectName).second)
+				{
+					MapTool::Log_Info(
+						"EnvObject trimmed model match: object=" + WstrToStr(pDesc->strObjectName)
+						+ " model=" + WstrToStr(strTrimmedName)
+						+ " path=" + WstrToStr(pDesc->strModelPath));
+				}
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	HRESULT Ensure_ModelPrototype(
@@ -313,11 +428,37 @@ namespace
 		if (pProxy->Has_Prototype(iModelLevel, Desc.strModelProtoTag))
 			return S_OK;
 
+		if (!IsValidEnvModelFile(path(Desc.strModelPath)))
+			return E_FAIL;
+
 		const string strModelPath = WstrToStr(Desc.strModelPath);
-		return pProxy->Add_Prototype(
+		CModel* pModelPrototype = nullptr;
+		try
+		{
+			pModelPrototype = CModel::Create(pDevice, pContext, MODEL::NONANIM, strModelPath.c_str());
+		}
+		catch (const std::exception& e)
+		{
+			MapTool::Log_Warning(
+				"EnvObject model creation exception: object=" + WstrToStr(Desc.strObjectName)
+				+ " path=" + strModelPath
+				+ " reason=" + e.what());
+			return E_FAIL;
+		}
+
+		if (nullptr == pModelPrototype)
+			return E_FAIL;
+
+		if (FAILED(pProxy->Add_Prototype(
 			iModelLevel,
 			Desc.strModelProtoTag.c_str(),
-			CModel::Create(pDevice, pContext, MODEL::NONANIM, strModelPath.c_str()));
+			pModelPrototype)))
+		{
+			Safe_Release(pModelPrototype);
+			return E_FAIL;
+		}
+
+		return S_OK;
 	}
 
 	wstring Make_ObjectName(const ENV_OBJECT_DESC& Desc)

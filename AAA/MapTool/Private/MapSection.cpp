@@ -1,5 +1,7 @@
 ﻿#include "MapSection.h"
 
+#include <exception>
+
 #ifdef _DEBUG
 #include <Windows.h>
 #endif
@@ -7,10 +9,30 @@
 #include "CullingContext.h"
 #include "GameContent_const.h"
 #include "GameInstance_Proxy.h"
+#include "MapTool_Func.h"
 #include "Model.h"
 #include "Shader.h"
+#include "YshModelValidator.h"
 
 NS_BEGIN(Client)
+
+namespace
+{
+	_bool Is_NonAnimYsh(const wstring& strPath, const wstring& strSectionName)
+	{
+		wstring strReason;
+		if (!MapTool::YshModelValidator::Validate_NonAnimYsh(strPath, &strReason))
+		{
+			MapTool::Log_Warning(
+				"MapSection ignored invalid non-anim ysh: section=" + WstrToStr(strSectionName)
+				+ " path=" + WstrToStr(strPath)
+				+ " reason=" + WstrToStr(strReason));
+			return false;
+		}
+
+		return true;
+	}
+}
 
 #ifdef _DEBUG
 namespace
@@ -188,12 +210,56 @@ HRESULT CMapSection::Ready_Components(const MAP_SECTION_DESC* pDesc)
 	if (nullptr == pDesc)
 		return E_FAIL;
 
+	if (!pDesc->bRenderable)
+		return S_OK;
+
 	m_pShaderCom = Add_Component<CShader>(
 		Shader_NonAnimMesh_PBR.iLevelID,
 		Shader_NonAnimMesh_PBR.szProtoTag,
 		TEXT("Com_Shader"));
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
+
+	if (!m_pGameInstance_Proxy->Has_Prototype(pDesc->iModelProtoLevel, pDesc->strModelProtoTag))
+	{
+		if (pDesc->strModelPath.empty())
+			return E_FAIL;
+
+		if (!Is_NonAnimYsh(pDesc->strModelPath, pDesc->strSectionName))
+			return E_FAIL;
+
+		const string strModelPath = WstrToStr(pDesc->strModelPath);
+		CModel* pModelPrototype = nullptr;
+		try
+		{
+			pModelPrototype = CModel::Create(
+				m_pDevice,
+				m_pContext,
+				MODEL::NONANIM,
+				strModelPath.c_str(),
+				XMMatrixRotationY(XMConvertToRadians(180.f)));
+		}
+		catch (const std::exception& e)
+		{
+			MapTool::Log_Warning(
+				"MapSection model creation exception: section=" + WstrToStr(pDesc->strSectionName)
+				+ " path=" + strModelPath
+				+ " reason=" + e.what());
+			return E_FAIL;
+		}
+
+		if (nullptr == pModelPrototype)
+			return E_FAIL;
+
+		if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
+			pDesc->iModelProtoLevel,
+			pDesc->strModelProtoTag.c_str(),
+			pModelPrototype)))
+		{
+			Safe_Release(pModelPrototype);
+			return E_FAIL;
+		}
+	}
 
 	m_pModelCom = Add_Component<CModel>(
 		pDesc->iModelProtoLevel,

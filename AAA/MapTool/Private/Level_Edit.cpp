@@ -18,6 +18,105 @@
 #include "DataLoader.h"
 //#include "NavMesh_Editor.h"
 
+#include <algorithm>
+#include <filesystem>
+
+namespace
+{
+	using namespace std::filesystem;
+
+	constexpr wchar_t kMapModelRoot[] = L"../../Resources/Maps";
+
+	_bool Equals_NoCase(const wstring& strLeft, const wstring& strRight)
+	{
+		return 0 == _wcsicmp(strLeft.c_str(), strRight.c_str());
+	}
+
+	void Add_UniqueCandidate(const wstring& strCandidate, vector<wstring>* pOutCandidates)
+	{
+		if (nullptr == pOutCandidates || strCandidate.empty())
+			return;
+
+		auto Iter = find_if(
+			pOutCandidates->begin(),
+			pOutCandidates->end(),
+			[&](const wstring& strExisting) { return Equals_NoCase(strExisting, strCandidate); });
+		if (Iter == pOutCandidates->end())
+			pOutCandidates->push_back(strCandidate);
+	}
+
+	void Build_MapSectionModelCandidates(const wstring& strSectionName, vector<wstring>* pOutCandidates)
+	{
+		if (nullptr == pOutCandidates)
+			return;
+
+		pOutCandidates->clear();
+		Add_UniqueCandidate(strSectionName + L".ysh", pOutCandidates);
+
+		if (0 == strSectionName.rfind(L"Land_", 0))
+			Add_UniqueCandidate(strSectionName.substr(5) + L".ysh", pOutCandidates);
+	}
+
+	_bool Try_ResolveMapSectionModelPath(const wstring& strSectionName, wstring* pOutPath)
+	{
+		if (nullptr == pOutPath)
+			return false;
+
+		error_code ErrorCode;
+		const path Root = weakly_canonical(path(kMapModelRoot), ErrorCode);
+		if (ErrorCode || !exists(Root))
+			return false;
+
+		vector<wstring> Candidates;
+		Build_MapSectionModelCandidates(strSectionName, &Candidates);
+		if (Candidates.empty())
+			return false;
+
+		for (recursive_directory_iterator Iter(Root, directory_options::skip_permission_denied, ErrorCode), End;
+			Iter != End;
+			Iter.increment(ErrorCode))
+		{
+			if (ErrorCode)
+				break;
+
+			if (!Iter->is_regular_file())
+				continue;
+
+			const wstring strFilename = Iter->path().filename().wstring();
+			auto CandidateIter = find_if(
+				Candidates.begin(),
+				Candidates.end(),
+				[&](const wstring& strCandidate) { return Equals_NoCase(strFilename, strCandidate); });
+			if (CandidateIter == Candidates.end())
+				continue;
+
+			*pOutPath = Iter->path().wstring();
+			return true;
+		}
+
+		return false;
+	}
+
+	wstring Make_MapSectionModelProtoTag(const wstring& strSectionName)
+	{
+		return L"Prototype_Component_Model_MapSection_" + strSectionName;
+	}
+
+	_bool Try_GetLegacyMapSectionModelPath(const wstring& strSectionName, wstring* pOutPath)
+	{
+		if (nullptr == pOutPath)
+			return false;
+
+		const wstring strLegacyPath = L"../../Resources/Models/Test/Stage1-0/" + strSectionName + L".ysh";
+		error_code ErrorCode;
+		if (!exists(path(strLegacyPath), ErrorCode) || ErrorCode)
+			return false;
+
+		*pOutPath = strLegacyPath;
+		return true;
+	}
+}
+
 CLevel_Edit::CLevel_Edit(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
 {
@@ -58,11 +157,11 @@ void CLevel_Edit::Update(_float fTimeDelta)
 
 #ifdef _DEBUG
 	CMapToolProfiler* pProfiler = CMapToolProfiler::GetInstance();
-	if (m_pGameInstance_Proxy->Key_Down(DIK_F9) || m_pGameInstance_Proxy->Key_Down(DIK_1))
+	if (m_pGameInstance_Proxy->Key_Down(DIK_1))
 		pProfiler->Toggle_Enabled();
-	if (m_pGameInstance_Proxy->Key_Down(DIK_F10) || m_pGameInstance_Proxy->Key_Down(DIK_2))
+	if (m_pGameInstance_Proxy->Key_Down(DIK_2))
 		pProfiler->Toggle_CsvEnabled();
-	if (m_pGameInstance_Proxy->Key_Down(DIK_F11) || m_pGameInstance_Proxy->Key_Down(DIK_3))
+	if (m_pGameInstance_Proxy->Key_Down(DIK_3))
 		pProfiler->Reset();
 
 	pProfiler->Update(fTimeDelta);
@@ -477,29 +576,23 @@ HRESULT CLevel_Edit::Ready_MapStage()
 			return E_FAIL;
 	}
 
-	auto LoadModelPrototype = [&](const wstring& strObjectProtoTag) -> HRESULT
-		{
-			auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(strObjectProtoTag);
-			if (nullptr == pReg)
-				return E_FAIL;
-
-			pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
-			return S_OK;
-		};
-
 	auto AddSectionDesc = [&](Client::MAP_STAGE_DESC& StageDesc,
 		const wstring& strName,
-		const wstring& strObjectProtoTag,
-		const wstring& strModelProtoTag,
 		Client::MAP_SECTION_TYPE eType,
 		RENDERID eRenderID) -> HRESULT
 		{
-			if (FAILED(LoadModelPrototype(strObjectProtoTag)))
+			wstring strModelPath;
+			const _bool bHasLegacyPath = Try_GetLegacyMapSectionModelPath(strName, &strModelPath);
+			if (!bHasLegacyPath
+				&& !Try_ResolveMapSectionModelPath(strName, &strModelPath))
 				return E_FAIL;
 
 			Client::MAP_SECTION_DESC SectionDesc{};
 			SectionDesc.strSectionName = strName;
-			SectionDesc.strModelProtoTag = strModelProtoTag;
+			SectionDesc.strModelProtoTag = bHasLegacyPath
+				? L"Prototype_Component_Model_" + strName
+				: Make_MapSectionModelProtoTag(strName);
+			SectionDesc.strModelPath = strModelPath;
 			SectionDesc.iModelProtoLevel = iModelLevel;
 			SectionDesc.eSectionType = eType;
 			SectionDesc.eRenderID = eRenderID;
@@ -516,14 +609,14 @@ HRESULT CLevel_Edit::Ready_MapStage()
 	StageDesc.iSectionProtoLevel = iEditLevel;
 	StageDesc.SectionDescs.reserve(8);
 
-	if (FAILED(AddSectionDesc(StageDesc, L"Land_GsAllBuilding_0", L"Proto_Land_GsAllBuilding_0", L"Prototype_Component_Model_Land_GsAllBuilding_0", Client::MAP_SECTION_TYPE::BUILDING, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"Land_GsBuilding_1", L"Proto_Land_GsBuilding_1", L"Prototype_Component_Model_Land_GsBuilding_1", Client::MAP_SECTION_TYPE::BUILDING, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"Land_GsBuilding_7", L"Proto_Land_GsBuilding_7", L"Prototype_Component_Model_Land_GsBuilding_7", Client::MAP_SECTION_TYPE::BUILDING, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"Land_GsDefault_2", L"Proto_Land_GsDefault_2", L"Prototype_Component_Model_Land_GsDefault_2", Client::MAP_SECTION_TYPE::GROUND, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"Land_GsDefault_5", L"Proto_Land_GsDefault_5", L"Prototype_Component_Model_Land_GsDefault_5", Client::MAP_SECTION_TYPE::GROUND, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"Land_SeRock_3", L"Proto_Land_SeRock_3", L"Prototype_Component_Model_Land_SeRock_3", Client::MAP_SECTION_TYPE::ROCK, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"Land_SeRock_6", L"Proto_Land_SeRock_6", L"Prototype_Component_Model_Land_SeRock_6", Client::MAP_SECTION_TYPE::ROCK, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"Land_Transparent_4", L"Proto_Land_Transparent_4", L"Prototype_Component_Model_Land_Transparent_4", Client::MAP_SECTION_TYPE::TRANSPARENT, RENDERID::NONBLEND))) return E_FAIL;
+	if (FAILED(AddSectionDesc(StageDesc, L"Land_GsAllBuilding_0", Client::MAP_SECTION_TYPE::BUILDING, RENDERID::NONBLEND))) return E_FAIL;
+	if (FAILED(AddSectionDesc(StageDesc, L"Land_GsBuilding_1", Client::MAP_SECTION_TYPE::BUILDING, RENDERID::NONBLEND))) return E_FAIL;
+	if (FAILED(AddSectionDesc(StageDesc, L"Land_GsBuilding_7", Client::MAP_SECTION_TYPE::BUILDING, RENDERID::NONBLEND))) return E_FAIL;
+	if (FAILED(AddSectionDesc(StageDesc, L"Land_GsDefault_2", Client::MAP_SECTION_TYPE::GROUND, RENDERID::NONBLEND))) return E_FAIL;
+	if (FAILED(AddSectionDesc(StageDesc, L"Land_GsDefault_5", Client::MAP_SECTION_TYPE::GROUND, RENDERID::NONBLEND))) return E_FAIL;
+	if (FAILED(AddSectionDesc(StageDesc, L"Land_SeRock_3", Client::MAP_SECTION_TYPE::ROCK, RENDERID::NONBLEND))) return E_FAIL;
+	if (FAILED(AddSectionDesc(StageDesc, L"Land_SeRock_6", Client::MAP_SECTION_TYPE::ROCK, RENDERID::NONBLEND))) return E_FAIL;
+	if (FAILED(AddSectionDesc(StageDesc, L"Land_Transparent_4", Client::MAP_SECTION_TYPE::TRANSPARENT, RENDERID::NONBLEND))) return E_FAIL;
 	StageDesc.SectionDescs.back().bRenderable = false;
 
 	CGameObject* pStageObject = nullptr;
@@ -553,7 +646,7 @@ HRESULT CLevel_Edit::Ready_EnvObjects()
 	const _uint iEditLevel = ETOUI(TOOL_LEVEL::EDIT);
 	static const wchar_t* kEnvJsonPaths[] =
 	{
-		L"../../Resources/Models/Test/Decor_Decor/Decor_Decor.json",
+		L"../../Resources/Maps/Decor_Decor.json",
 		L"../../Resources/Models/Test/Toy_Decor/Toy_Decor.json",
 		L"../../Resources/Models/Test/Toy_Obj/Toy_Obj.json",
 		L"../../Resources/Models/Test/Decor_Obj/Decor_Obj.json"
