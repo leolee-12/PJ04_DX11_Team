@@ -7,6 +7,8 @@
 #include "TestFiona.h"
 #include "TestNonAnim.h"
 #include "TestRect.h"
+#include "TestEffectQuad.h"
+#include "Sample_MeshEffect.h"
 #include "TestMarb1e.h"
 #include "TestMarb1eMap.h"
 
@@ -72,14 +74,15 @@ void CGameObject_Factory::Register_Test()
         CREATOR(CTestFiona),
         LOADER(
             /*pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/Aligator/aligator.ysh", 
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/Aligator/aligator.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))))*/
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/Aligator/Aligator_Anim.ysh"
                     //, XMMatrixRotationY(XMConvertToRadians(180.f))
-            ))
+                ))
         )
     );
+
 
     Register(TEXT("Proto_TestNonAnim"), TEXT("TEST_OBJECT"),
         CREATOR(CTestNonAnim),
@@ -95,6 +98,19 @@ void CGameObject_Factory::Register_Test()
         CREATOR(CTestRect),
         LOADER()
     );
+
+    Register(CTestEffectQuad::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
+        CREATOR(CTestEffectQuad),
+        LOADER()
+    );
+    Register(CSample_MeshEffect::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
+        CREATOR(CSample_MeshEffect),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, (ETOUI(LEVEL::GAMEPLAY)), TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
 
     Register(CTestMarb1e::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
         CREATOR(CTestMarb1e),

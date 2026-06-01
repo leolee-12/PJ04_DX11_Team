@@ -674,6 +674,21 @@ HRESULT CGameInstance_Proxy::Spawn_Effect(_uint iLevel, const _wstring& strProto
 
 	return m_pOwner->m_pEffect_Manager->Spawn(iLevel, strProtoTag, desc, ppOut);
 }
+CShader* CGameInstance_Proxy::Get_2DShader()
+{
+	if (!IsConnected())
+		return nullptr;
+
+	return m_pOwner->m_pEffect_Manager->Get_2DShader();
+}
+
+CShader* CGameInstance_Proxy::Get_MeshShader()
+{
+	if (!IsConnected())
+		return nullptr;
+
+	return m_pOwner->m_pEffect_Manager->Get_MeshShader();
+}
 #pragma endregion
 
 #pragma region EDITMODE

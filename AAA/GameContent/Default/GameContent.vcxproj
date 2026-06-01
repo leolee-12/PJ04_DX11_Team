@@ -31,7 +31,9 @@
     <ClInclude Include="..\public\MapObject.h" />
     <ClInclude Include="..\Public\ObjectData.h" />
     <ClInclude Include="..\Public\ResourceData.h" />
+    <ClInclude Include="..\Public\Sample_MeshEffect.h" />
     <ClInclude Include="..\Public\Terrain.h" />
+    <ClInclude Include="..\Public\TestEffectQuad.h" />
     <ClInclude Include="..\Public\TestFiona.h" />
     <ClInclude Include="..\public\TestMarb1e.h" />
     <ClInclude Include="..\public\TestMarb1eMap.h" />
@@ -42,8 +44,10 @@
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\GameObject_Factory.cpp" />
     <ClCompile Include="..\Private\Loader_Prototype.cpp" />
+    <ClCompile Include="..\Private\Sample_MeshEffect.cpp" />
     <ClCompile Include="..\private\MapObject.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
+    <ClCompile Include="..\Private\TestEffectQuad.cpp" />
     <ClCompile Include="..\Private\TestFiona.cpp" />
     <ClCompile Include="..\private\TestMarb1e.cpp" />
     <ClCompile Include="..\private\TestMarb1eMap.cpp" />

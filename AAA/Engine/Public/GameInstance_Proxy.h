@@ -179,7 +179,10 @@ public:
 
 #pragma region EFFECT_MANAGER
     HRESULT Spawn_Effect(_uint iLevel, const _wstring& strProtoTag,
-        const CEffect::EFFECT_DESC& desc, CEffect** ppOut = nullptr);
+const CEffect::EFFECT_DESC& desc, CEffect** ppOut = nullptr);
+
+    CShader* Get_2DShader();
+    CShader* Get_MeshShader();
 #pragma endregion
 
 #pragma region EDITMODE
