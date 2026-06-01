@@ -32,7 +32,6 @@ private:
 	HRESULT							Ready_Sections(const MAP_STAGE_DESC* pDesc);
 	void							Reset_ProfileFrame();
 	void							Submit_VisibleSections();
-	void							Collect_SectionRenderProfile();
 	_bool							Build_WorldFrustum(BoundingFrustum* pOutFrustum) const;
 	void							Count_Submitted(RENDERID eRenderID);
 

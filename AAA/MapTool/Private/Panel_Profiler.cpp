@@ -50,7 +50,6 @@ void CPanel_Profiler::Render()
 	ImGui::Text("Culling: %.3f ms", Frame.dCullingCpuMs);
 	ImGui::Text("Section Render: %.3f ms", Frame.dSectionRenderCpuMs);
 	ImGui::Text("Estimated Draw Calls: %u", Frame.iEstimatedDrawCalls);
-	ImGui::TextDisabled("Estimated Triangles: unavailable without Engine/VIBuffer counters");
 
 	ImGui::Separator();
 	ImGui::Text("Type Counts");

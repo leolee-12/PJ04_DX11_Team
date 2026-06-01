@@ -51,11 +51,11 @@ void CLevel_Edit::Update(_float fTimeDelta)
 		m_pGameInstance_Proxy->Publish(TEXT("Return_Lobby"), nullptr);
 
 	CMapToolProfiler* pProfiler = CMapToolProfiler::GetInstance();
-	if (m_pGameInstance_Proxy->Key_Down(DIK_F9))
+	if (m_pGameInstance_Proxy->Key_Down(DIK_F9) || m_pGameInstance_Proxy->Key_Down(DIK_1))
 		pProfiler->Toggle_Enabled();
-	if (m_pGameInstance_Proxy->Key_Down(DIK_F10))
+	if (m_pGameInstance_Proxy->Key_Down(DIK_F10) || m_pGameInstance_Proxy->Key_Down(DIK_2))
 		pProfiler->Toggle_CsvEnabled();
-	if (m_pGameInstance_Proxy->Key_Down(DIK_F11))
+	if (m_pGameInstance_Proxy->Key_Down(DIK_F11) || m_pGameInstance_Proxy->Key_Down(DIK_3))
 		pProfiler->Reset();
 
 	pProfiler->Update(fTimeDelta);
@@ -69,6 +69,9 @@ HRESULT CLevel_Edit::Render()
 		const _float4x4* pProj = m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
 		m_pGrid->Render(pView, pProj);
 	}
+
+	CMapToolProfiler::GetInstance()->Capture_Frame();
+
 	return S_OK;
 }
 
@@ -136,11 +139,17 @@ void CLevel_Edit::Load_Level(const wstring& strFilePath)
 	m_pGameInstance_Proxy->Clear_Objects(ETOUI(TOOL_LEVEL::EDIT));
 
 	if (FAILED(Ready_MapStage()))
+	{
+		MSG_BOX("Failed to ready MapStage while loading level.");
 		return;
+	}
 
 	string strContent = {};
 	if (FAILED(CDataLoader::Read_Json(strFilePath.c_str(), &strContent)))
+	{
+		MSG_BOX("Failed to read level file.");
 		return;
+	}
 
 	try
 	{
@@ -478,6 +487,7 @@ HRESULT CLevel_Edit::Ready_MapStage()
 			SectionDesc.eRenderID = eRenderID;
 			SectionDesc.bCastShadow = false;
 			SectionDesc.bEnableCulling = true;
+			SectionDesc.bRenderable = true;
 
 			StageDesc.SectionDescs.push_back(SectionDesc);
 			return S_OK;
@@ -495,7 +505,8 @@ HRESULT CLevel_Edit::Ready_MapStage()
 	if (FAILED(AddSectionDesc(StageDesc, L"Land_GsDefault_5", L"Proto_Land_GsDefault_5", L"Prototype_Component_Model_Land_GsDefault_5", Client::MAP_SECTION_TYPE::GROUND, RENDERID::NONBLEND))) return E_FAIL;
 	if (FAILED(AddSectionDesc(StageDesc, L"Land_SeRock_3", L"Proto_Land_SeRock_3", L"Prototype_Component_Model_Land_SeRock_3", Client::MAP_SECTION_TYPE::ROCK, RENDERID::NONBLEND))) return E_FAIL;
 	if (FAILED(AddSectionDesc(StageDesc, L"Land_SeRock_6", L"Proto_Land_SeRock_6", L"Prototype_Component_Model_Land_SeRock_6", Client::MAP_SECTION_TYPE::ROCK, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"Land_Transparent_4", L"Proto_Land_Transparent_4", L"Prototype_Component_Model_Land_Transparent_4", Client::MAP_SECTION_TYPE::TRANSPARENT, RENDERID::BLEND))) return E_FAIL;
+	if (FAILED(AddSectionDesc(StageDesc, L"Land_Transparent_4", L"Proto_Land_Transparent_4", L"Prototype_Component_Model_Land_Transparent_4", Client::MAP_SECTION_TYPE::TRANSPARENT, RENDERID::NONBLEND))) return E_FAIL;
+	StageDesc.SectionDescs.back().bRenderable = false;
 
 	CGameObject* pStageObject = nullptr;
 	if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(

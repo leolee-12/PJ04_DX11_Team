@@ -34,6 +34,7 @@ struct MAP_SECTION_DESC : public CGameObject::GAMEOBJECT_DESC
 	RENDERID			eRenderID = { RENDERID::NONBLEND };
 	_bool				bCastShadow = { false };
 	_bool				bEnableCulling = { true };
+	_bool				bRenderable = { true };
 };
 
 struct MAP_STAGE_DESC : public CGameObject::GAMEOBJECT_DESC
@@ -47,7 +48,6 @@ struct MAP_SECTION_PROFILE
 {
 	double	dRenderCpuMs = {};
 	_uint	iEstimatedDrawCalls = {};
-	_uint	iEstimatedTriangles = {};
 };
 
 struct MAP_STAGE_PROFILE
@@ -61,7 +61,6 @@ struct MAP_STAGE_PROFILE
 	_uint	iSubmittedShadow = {};
 	_uint	iSectionTypeCount[MAP_SECTION_TYPE_COUNT] = {};
 	_uint	iEstimatedDrawCalls = {};
-	_uint	iEstimatedTriangles = {};
 	double	dStageLateUpdateCpuMs = {};
 	double	dCullingCpuMs = {};
 	double	dSectionRenderCpuMs = {};

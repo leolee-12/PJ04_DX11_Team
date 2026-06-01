@@ -17,12 +17,17 @@ namespace
 
 	double PerfCounter_ToMs(double dStart, double dEnd)
 	{
-		LARGE_INTEGER freq{};
-		QueryPerformanceFrequency(&freq);
-		if (0 == freq.QuadPart)
+		static const double dFrequency = []() -> double
+			{
+				LARGE_INTEGER freq{};
+				QueryPerformanceFrequency(&freq);
+				return static_cast<double>(freq.QuadPart);
+			}();
+
+		if (0.0 == dFrequency)
 			return 0.0;
 
-		return (dEnd - dStart) * 1000.0 / static_cast<double>(freq.QuadPart);
+		return (dEnd - dStart) * 1000.0 / dFrequency;
 	}
 }
 
@@ -68,7 +73,6 @@ void CMapStage::Late_Update(_float fTimeDelta)
 
 	Reset_ProfileFrame();
 	Submit_VisibleSections();
-	Collect_SectionRenderProfile();
 
 	m_Profile.dStageLateUpdateCpuMs = PerfCounter_ToMs(dStart, Now_PerfCounter());
 }
@@ -131,6 +135,12 @@ void CMapStage::Reset_ProfileFrame()
 	m_Profile = {};
 	m_Profile.iFrameIndex = iNextFrame;
 	m_Profile.iTotalSections = static_cast<_uint>(m_Sections.size());
+
+	for (CMapSection* pSection : m_Sections)
+	{
+		if (nullptr != pSection)
+			pSection->Reset_FrameProfile();
+	}
 }
 
 void CMapStage::Submit_VisibleSections()
@@ -145,8 +155,6 @@ void CMapStage::Submit_VisibleSections()
 		if (nullptr == pSection)
 			continue;
 
-		pSection->Refresh_WorldBounds();
-
 		const MAP_SECTION_TYPE eType = pSection->Get_SectionType();
 		const _uint iTypeIndex = static_cast<_uint>(eType);
 		if (iTypeIndex < MAP_SECTION_TYPE_COUNT)
@@ -160,6 +168,9 @@ void CMapStage::Submit_VisibleSections()
 
 		++m_Profile.iVisibleSections;
 
+		if (!pSection->Is_Renderable())
+			continue;
+
 		const RENDERID eRenderID = pSection->Get_RenderID();
 		m_pGameInstance_Proxy->Add_RenderGroup(eRenderID, pSection);
 		Count_Submitted(eRenderID);
@@ -172,20 +183,6 @@ void CMapStage::Submit_VisibleSections()
 	}
 
 	m_Profile.dCullingCpuMs = PerfCounter_ToMs(dStart, Now_PerfCounter());
-}
-
-void CMapStage::Collect_SectionRenderProfile()
-{
-	for (CMapSection* pSection : m_Sections)
-	{
-		if (nullptr == pSection)
-			continue;
-
-		const MAP_SECTION_PROFILE& SectionProfile = pSection->Get_Profile();
-		m_Profile.dSectionRenderCpuMs += SectionProfile.dRenderCpuMs;
-		m_Profile.iEstimatedDrawCalls += SectionProfile.iEstimatedDrawCalls;
-		m_Profile.iEstimatedTriangles += SectionProfile.iEstimatedTriangles;
-	}
 }
 
 _bool CMapStage::Build_WorldFrustum(BoundingFrustum* pOutFrustum) const

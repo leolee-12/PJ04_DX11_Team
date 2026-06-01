@@ -18,6 +18,7 @@ private:
 public:
 	void								Set_Stage(Client::CMapStage* pStage);
 	void								Update(_float fTimeDelta);
+	void								Capture_Frame();
 	void								Reset();
 
 	void								Set_Enabled(_bool bEnabled) { m_bEnabled = bEnabled; }
@@ -36,13 +37,18 @@ private:
 	void								Open_CsvIfNeeded();
 	void								Close_Csv();
 	void								Write_CsvRow();
+	void								Reset_CaptureSession();
 
 private:
 	Client::CMapStage*					m_pStage = { nullptr };
 	Client::MAP_STAGE_PROFILE			m_Frame = {};
 	_bool								m_bEnabled = { true };
 	_bool								m_bCsvEnabled = { false };
+	_bool								m_bFrameBaseValid = { false };
+	_bool								m_bCsvHasWrittenRow = { false };
+	_uint								m_iFrameBase = {};
 	_float								m_fElapsedSeconds = {};
+	_float								m_fCsvWriteAccumulator = {};
 	wstring								m_strCsvPath = { L"../../Resources/Profile/MapTool_Profile.csv" };
 	ofstream							m_Csv;
 

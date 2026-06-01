@@ -20,12 +20,17 @@ namespace
 
 	double PerfCounter_ToMs(double dStart, double dEnd)
 	{
-		LARGE_INTEGER freq{};
-		QueryPerformanceFrequency(&freq);
-		if (0 == freq.QuadPart)
+		static const double dFrequency = []() -> double
+			{
+				LARGE_INTEGER freq{};
+				QueryPerformanceFrequency(&freq);
+				return static_cast<double>(freq.QuadPart);
+			}();
+
+		if (0.0 == dFrequency)
 			return 0.0;
 
-		return (dEnd - dStart) * 1000.0 / static_cast<double>(freq.QuadPart);
+		return (dEnd - dStart) * 1000.0 / dFrequency;
 	}
 }
 
@@ -61,6 +66,7 @@ HRESULT CMapSection::Initialize(void* pArg)
 	m_eRenderID = pDesc->eRenderID;
 	m_bCastShadow = pDesc->bCastShadow;
 	m_bEnableCulling = pDesc->bEnableCulling;
+	m_bRenderable = pDesc->bRenderable;
 
 	if (FAILED(Ready_Components(pDesc)))
 		return E_FAIL;
@@ -148,6 +154,11 @@ void CMapSection::Refresh_WorldBounds()
 		return;
 
 	m_LocalBounds.Transform(m_WorldBounds, XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+}
+
+void CMapSection::Reset_FrameProfile()
+{
+	m_Profile = {};
 }
 
 HRESULT CMapSection::Ready_Components(const MAP_SECTION_DESC* pDesc)
