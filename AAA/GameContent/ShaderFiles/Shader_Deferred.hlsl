@@ -4,6 +4,7 @@ float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 float4x4 g_ShadowLightViewMatrix, g_ShadowLightProjMatrix;
 float4x4 g_ViewMatrixInverse, g_ProjMatrixInverse;
 
+
   /* G-buffer */
 Texture2D g_Texture; // 디버그용
 Texture2D g_DiffuseTexture; // albedo (rgb), alpha
@@ -14,6 +15,11 @@ Texture2D g_LightTexture; // HDR 광량 누적 (Combine 입력)
 Texture2D g_LightDepthTexture; // 그림자맵
 
 vector g_vCamPosition;
+
+TextureCube g_IrradianceCube; // Diffuse_Cube.dds
+TextureCube g_PrefilteredCube; // Specular_Cube.dds (mip=roughness)
+float g_fIBLIntensity = 1.f;
+int g_iSpecularMip = 1.f;
 
   /* Light */
 vector g_vLightDir;
@@ -27,6 +33,8 @@ vector g_vLightSpecular;
 vector g_vAmbientColor = float4(0.15f, 0.15f, 0.18f, 1.f);
 
 static const float PI = 3.14159265f;
+
+
 
   //============================ Common VS ============================
 struct VS_IN
@@ -80,6 +88,22 @@ float GeomSmith(float3 N, float3 V, float3 L, float r)
     return GeomSchlick(saturate(dot(N, V)), r) * GeomSchlick(saturate(dot(N, L)), r);
 }
 
+// IBL 헬퍼
+float3 Fresnel_Rough(float3 F0, float cosT, float rough)
+{
+    float3 Fr = max((1.f - rough).xxx, F0);
+    return F0 + (Fr - F0) * pow(1.f - cosT, 5.f);
+}
+float2 EnvBRDFApprox(float rough, float NdotV)   // BRDF LUT 불필요
+{
+    const float4 c0 = float4(-1.f, -0.0275f, -0.572f, 0.022f);
+    const float4 c1 = float4(1.f, 0.0425f, 1.04f, -0.04f);
+    float4 r = rough * c0 + c1;
+    float a004 = min(r.x * r.x, exp2(-9.28f * NdotV)) * r.x + r.y;
+    return float2(-1.04f, 1.04f) * a004 + r.zw;
+}
+
+// 복원헬퍼
 float3 RecoverWorldPos(float2 uv, float depthZ, float viewZ)
 {
     float4 p;
@@ -168,7 +192,30 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
 
       /* 앰비언트 (추후 IBL로 교체) */
-    float3 ambient = albedoA.rgb * g_vAmbientColor.rgb * mra.b; // mra.b = AO
+    float4 nd = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
+    float3 N = normalize(nd.xyz * 2.f - 1.f);
+    float4 ddA = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
+    float3 wpA = RecoverWorldPos(In.vTexcoord, ddA.x, ddA.y * 500.f);
+    float3 V = normalize(g_vCamPosition.xyz - wpA);
+    float NdotV = saturate(dot(N, V));
+
+    float metallic = mra.r;
+    float roughness = mra.g;
+    float ao = mra.b;
+
+    float3 F0 = lerp(0.04f, albedoA.rgb, metallic);
+    float3 kS = Fresnel_Rough(F0, NdotV, roughness);
+    float3 kD = (1.f - kS) * (1.f - metallic);
+
+    float3 irradiance = g_IrradianceCube.Sample(LinearSampler, N).rgb; // BC6H=선형HDR, 감마해제X
+    float3 diffuseIBL = irradiance * albedoA.rgb * kD;
+
+    float3 R = reflect(-V, N);
+    float3 prefiltered = g_PrefilteredCube.SampleLevel(LinearSampler, R, roughness * (g_iSpecularMip - 1)).rgb;
+    float2 envBRDF = EnvBRDFApprox(roughness, NdotV);
+    float3 specularIBL = prefiltered * (F0 * envBRDF.x + envBRDF.y);
+
+    float3 ambient = (diffuseIBL + specularIBL) * ao * g_fIBLIntensity;
     float3 color = light + ambient;
 
       /* 그림자 */
@@ -182,9 +229,6 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     if (pz <= 1.f && pz - 0.002f > sd)
         color *= 0.5f;
 
-      /* 톤매핑 + 감마 */
-    color = color / (color + 1.f); // Reinhard
-    color = pow(color, 1.f / 2.2f); // 감마
     return float4(color, 1.f);
 }
 

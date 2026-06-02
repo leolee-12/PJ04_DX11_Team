@@ -64,7 +64,7 @@ void CEdit_Grid::Build_Vertices(_uint iCellCount, _float fCellSize)
 
 		_float4 vColor = (fabsf(x) < 1e-4f)
 			? _float4(1.f, 0.f, 0.f, 1.f)
-			: _float4(0.35f, 0.35f, 0.35f, 0.5f);
+			: _float4(1.f, 1.f, 1.f, 0.5f);
 
 		vertices.push_back({ _float3(x, 0.f, -fHalf), vColor });
 		vertices.push_back({ _float3(x, 0.f, fHalf), vColor });
@@ -76,7 +76,7 @@ void CEdit_Grid::Build_Vertices(_uint iCellCount, _float fCellSize)
 
 		_float4 vColor = (fabsf(z) < 1e-4f)
 			? _float4(0.f, 0.f, 1.f, 1.f)
-			: _float4(0.35f, 0.35f, 0.35f, 0.5f);
+			: _float4(1.f, 1.f, 1.f, 0.5f);
 
 		vertices.push_back({ _float3(-fHalf, 0.f, z), vColor });
 		vertices.push_back({ _float3(fHalf, 0.f, z), vColor });

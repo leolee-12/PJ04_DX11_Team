@@ -34,6 +34,12 @@ SamplerState UISampler
     AddressV = CLAMP;
 };
 
+SamplerState MirrorSampler
+{
+    Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = MIRROR;
+    AddressV = MIRROR;
+};
 
 
 
@@ -119,7 +125,7 @@ BlendState BS_Additive
     BlendEnable[0] = true;
     BlendEnable[1] = true;
 
-    SrcBlend = One;
+    SrcBlend = Src_Alpha;
     DestBlend = One;
     BlendOp = Add;
 };

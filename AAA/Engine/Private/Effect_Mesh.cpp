@@ -4,14 +4,14 @@
 
 CEffect_Mesh::CEffect_Mesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Part(pDevice, pContext)
-    , m_bUseTextureCom(false)
 {
+    Init_PropertyValue();
 }
 
 CEffect_Mesh::CEffect_Mesh(const CEffect_Mesh& Prototype)
     : CEffect_Part(Prototype)
-    , m_bUseTextureCom(false)
 {
+    Init_PropertyValue();
 }
 
 HRESULT CEffect_Mesh::Initialize_Prototype()
@@ -27,14 +27,10 @@ HRESULT CEffect_Mesh::Initialize(void* pArg)
     m_iModelLevel = pDesc->iModelLevel;
     m_wstrModelTag = pDesc->wstrModelTag;
     m_bUseDiffuseTexture = pDesc->bUseDiffuseTexture;
-    m_bUseUnKnownTexture = pDesc->bUseUnKnownTexture;
-
-    // Texture
-    m_bUseTextureCom = pDesc->bUseTextureCom;
-    m_iTextureLevel = pDesc->iTextureLevel;
-    m_wstrTextureTag = pDesc->wstrTextureTag;
+    m_bUseUnknownTexture = pDesc->bUseUnKnownTexture;
 
     // Shader
+    m_bCustomShader = pDesc->bCustomShader;
     m_iShaderLevel = pDesc->iShaderLevel;
     m_wstrShaderTag = pDesc->wstrShaderTag;
 
@@ -81,13 +77,14 @@ HRESULT CEffect_Mesh::Render()
                 return E_FAIL;
         }
 
-        if (m_bUseUnKnownTexture == true)
+        if (m_bUseUnknownTexture == true)
         {
             if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnknownTexture", i, MTEX_TYPE::UNKNOWN, 0)))
                 return E_FAIL;
         }
 
-        if (FAILED(m_pShaderCom->Begin(0)))
+        Helper::IntClamp(m_iShdaerPass, ShaderPass::Default, ShaderPass::ShaderPass_End - 1);
+        if (FAILED(m_pShaderCom->Begin(m_iShdaerPass)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render(i)))
@@ -99,20 +96,14 @@ HRESULT CEffect_Mesh::Render()
 
 HRESULT CEffect_Mesh::Ready_Components()
 {
-    m_pShaderCom = m_pGameInstance_Proxy->Get_MeshShader();
-    if (m_pShaderCom == nullptr)
-        return E_FAIL;
+    if (m_bCustomShader == false)
+        m_pShaderCom = m_pGameInstance_Proxy->Get_MeshShader();
+    else
+        m_pShaderCom = Add_Component<CShader>(m_iShaderLevel, m_wstrShaderTag, TEXT("Com_Shader"));
 
     m_pModelCom = Add_Component<CModel>(m_iModelLevel, m_wstrModelTag, TEXT("Com_Model"));
     if (m_pModelCom == nullptr)
         return E_FAIL;
-
-    if (m_bUseTextureCom == true)
-    {
-        m_pTextureCom = Add_Component<CTexture>(m_iTextureLevel, m_wstrTextureTag, TEXT("Com_Texture"));
-        if (m_pTextureCom == nullptr)
-            return E_FAIL;
-    }
 
     return S_OK;
 }
@@ -133,23 +124,20 @@ HRESULT CEffect_Mesh::Bind_ShaderResources()
 HRESULT CEffect_Mesh::Bind_ShaderValue()
 {
     if (FAILED(__super::Bind_ShaderValue()))
-        return E_FAIL;
-    
-    if(m_pTextureCom != nullptr)
-    {
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseTexture", &m_bUseTextureCom, sizeof(m_bUseTextureCom))))
-            return E_FAIL;
-    }
-    else {
-        _bool bCantUse = false;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseTexture", &bCantUse, sizeof(bCantUse))))
-            return E_FAIL;
-    }
+        return E_FAIL;   
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseDiffuseTexture", &m_bUseDiffuseTexture, sizeof(m_bUseDiffuseTexture))))
         return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vDiffuseTiling", &m_vDiffuseTiling, sizeof(m_vDiffuseTiling))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vDiffuseOffset", &m_vDiffuseOffset, sizeof(m_vDiffuseOffset))))
+        return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseUnknownTexture", &m_bUseUnKnownTexture, sizeof(m_bUseUnKnownTexture))))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseUnknownTexture", &m_bUseUnknownTexture, sizeof(m_bUseUnknownTexture))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vUnknownTiling", &m_vUnknownTiling, sizeof(m_vUnknownTiling))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vUnknownOffset", &m_vUnknownOffset, sizeof(m_vUnknownOffset))))
         return E_FAIL;
 
     return S_OK;
@@ -158,6 +146,33 @@ HRESULT CEffect_Mesh::Bind_ShaderValue()
 void CEffect_Mesh::Update_EffectPart(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
 {
 
+}
+
+void CEffect_Mesh::Update_UVScroll(const _float fTimeDelta)
+{
+    __super::Update_UVScroll(fTimeDelta);
+
+    MoveUVScroll(fTimeDelta, m_vDiffuseUVScroll, m_vDiffuseOffset, m_vDiffuseUVSpeed);
+    MoveUVScroll(fTimeDelta, m_vUnknownUVScroll, m_vUnknownOffset, m_vUnknownUVSpeed);
+}
+
+void CEffect_Mesh::Init_PropertyValue()
+{
+    // Diffuse Texture
+    m_bUseDiffuseTexture = false;
+    m_vDiffuseTiling = { 1.f, 1.f };
+    m_vDiffuseOffset = { 0.f, 0.f };
+
+    m_vDiffuseUVScroll = false;
+    m_vDiffuseUVSpeed = { 0.f, 0.f };
+
+    // Unknown Texture
+    m_bUseUnknownTexture = false;
+    m_vUnknownTiling = { 1.f, 1.f };
+    m_vUnknownOffset = { 0.f, 0.f };
+
+    m_vUnknownUVScroll = false;
+    m_vUnknownUVSpeed = { 0.f, 0.f };
 }
 
 void CEffect_Mesh::Free()

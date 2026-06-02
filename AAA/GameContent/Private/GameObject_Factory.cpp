@@ -101,13 +101,25 @@ void CGameObject_Factory::Register_Test()
 
     Register(CTestEffectQuad::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
         CREATOR(CTestEffectQuad),
-        LOADER()
+        LOADER(
+            TRY_ADD_PROTO(pProxy, Texture_Common_Flash02.iLevelID, Texture_Common_Flash02.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Common_Flash02.szFileTag, Texture_Common_Flash02.iNumTex));
+
+            TRY_ADD_PROTO(pProxy, Texture_TestMask.iLevelID, Texture_TestMask.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_TestMask.szFileTag, Texture_TestMask.iNumTex));
+        )
     );
     Register(CSample_MeshEffect::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
         CREATOR(CSample_MeshEffect),
         LOADER(
             TRY_ADD_PROTO(pProxy, (ETOUI(LEVEL::GAMEPLAY)), TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+
+            TRY_ADD_PROTO(pProxy, Texture_Common_Flash02.iLevelID, Texture_Common_Flash02.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Common_Flash02.szFileTag, Texture_Common_Flash02.iNumTex));
+
+            TRY_ADD_PROTO(pProxy, Texture_TestMask.iLevelID, Texture_TestMask.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_TestMask.szFileTag, Texture_TestMask.iNumTex));
         )
     );
 

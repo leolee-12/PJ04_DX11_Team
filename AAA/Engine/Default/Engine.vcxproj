@@ -198,6 +198,7 @@
     <ClInclude Include="..\Public\Engine_Model_Data.h" />
     <ClInclude Include="..\Public\Engine_Struct.h" />
     <ClInclude Include="..\Public\Engine_Typedef.h" />
+    <ClInclude Include="..\public\Environment_Manager.h" />
     <ClInclude Include="..\public\EventBus.h" />
     <ClInclude Include="..\Public\Font_Manager.h" />
     <ClInclude Include="..\public\GameInstance.h" />
@@ -273,6 +274,7 @@
     <ClCompile Include="..\Private\Effect_Part.cpp" />
     <ClCompile Include="..\private\Effect_Manager.cpp" />
     <ClCompile Include="..\Private\Effect_Quad.cpp" />
+    <ClCompile Include="..\private\Environment_Manager.cpp" />
     <ClCompile Include="..\private\EventBus.cpp" />
     <ClCompile Include="..\Private\Font_Manager.cpp" />
     <ClCompile Include="..\private\GameInstance.cpp" />
@@ -322,6 +324,7 @@
     <None Include="..\ShaderFiles\Engine_Shader_Defines.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_Bloom.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Cell.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Deferred.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Effect_Mesh.hlsl" />

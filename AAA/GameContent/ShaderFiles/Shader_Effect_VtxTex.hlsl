@@ -1,7 +1,16 @@
 #include "Engine_Shader_Defines.hlsli"
 
 float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
+
 Texture2D g_Texture;
+bool g_bUseTexture = { false };
+float2 g_vTextureTiling = { 1.f, 1.f };
+float2 g_vTextureOffset = { 0.f, 0.f };
+
+Texture2D g_Mask;
+bool g_bUseMask = { false };
+float2 g_vMaskTiling = { 1.f, 1.f };
+float2 g_vMaskOffset = { 0.f, 0.f };
 
 bool g_bFlipX = { false };
 bool g_bFlipY = { false };
@@ -16,6 +25,7 @@ float g_fUVCutLeft = { 0.f };
 
 float g_fUVCutTop = { 0.f };
 float g_fUVCutBottom = { 0.f };
+
 
 struct VS_IN
 {
@@ -70,10 +80,21 @@ PS_OUT PS_MAIN(PS_IN In)
     if (g_bFlipY == 1)
         In.vTexcoord.y = -In.vTexcoord.y + 1.f;
     
-    //Out.vColor = g_Texture.Sample(LinearSampler, In.vTexcoord);
     Out.vColor = float4(1.f, 1.f, 1.f, 1.f);
-    Out.vColor.xyz *= g_vColor;
     
+    if (g_bUseTexture == true)
+    {
+        float2 vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling;
+        Out.vColor *= g_Texture.Sample(LinearSampler, vUV);
+    }
+    
+    if (g_bUseMask == true)
+    {
+        float2 vUV = g_vMaskOffset + In.vTexcoord * g_vMaskTiling;
+        Out.vColor *= g_Mask.Sample(LinearSampler, vUV);
+    }
+    
+    Out.vColor.xyz *= g_vColor;
     Out.vColor.a *= g_fAlpha;
     
     if (g_bAlphaTest == true && Out.vColor.a <= g_fTestAlpha)
@@ -87,7 +108,7 @@ technique11 DefaultTechnique
     pass DefaultPass
     {
         SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
@@ -98,8 +119,19 @@ technique11 DefaultTechnique
     pass AlphaBlend
     {
         SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetDepthStencilState(DSS_NoWrite, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_MAIN()));
+    }
+
+    pass Additive
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NoWrite, 0);
+        SetBlendState(BS_Additive, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
         SetGeometryShader(NULL);

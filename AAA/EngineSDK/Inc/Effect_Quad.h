@@ -8,20 +8,22 @@ class CVIBuffer_Rect;
 
 class ENGINE_DLL CEffect_Quad abstract : public CEffect_Part
 {
+    GENERATED_BODY_ABSTRACT(CEffect_Quad)
 
 public:
     struct EFFECT_QUAD_DESC : public CEffect_Part::EFFECT_PART_DESC
     {
+        // Buffer
         _uint iVIBufferLevel{};
         _wstring wstrVIBufferTag;
 
-        _uint iTextureLevel{};
-        _wstring wstrTextureTag;
-
-        _bool bCustomShader{};
+        // Shader
         _uint iShaderLevel{};
         _wstring wstrShaderTag;
     };
+
+private:
+    enum ShaderPass { Default, AlphaBlend, ADDITIVE, ShaderPass_End };
 
 protected:
     CEffect_Quad(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -40,6 +42,7 @@ public:
 
 protected:
     virtual void Update_EffectPart(const _float fTimeDelta, const _float fActiveTime, const _float fRatio) override;
+    virtual void Update_UVScroll(const _float fTimeDelta) override;
 
 private:
     HRESULT Ready_Components();
@@ -49,15 +52,15 @@ private:
 private:
     CVIBuffer_Rect* m_pVIBuffer{};
 
+private:
     _uint m_iVIBufferLevel{};
     _wstring m_wstrVIBufferTag;
 
-    _uint m_iTextureLevel{};
-    _wstring m_wstrTextureTag;
-
-    _bool m_bCustomShader{};
     _uint m_iShaderLevel{};
     _wstring m_wstrShaderTag;
+
+private:
+    void Init_PropertyValue();
 
 protected:
     virtual void Free() override;
