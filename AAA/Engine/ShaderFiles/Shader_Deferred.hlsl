@@ -29,6 +29,14 @@ vector g_vLightDiffuse;
 vector g_vLightAmbient;
 vector g_vLightSpecular;
 
+    /* Bloom */
+Texture2D g_SceneTexture; // HDR 씬
+Texture2D g_BloomTexture; // 블러 대상
+float2 g_vBlurDir; // (1,0)=H, (0,1)=V
+float2 g_vTexelSize; // 1/해상도 (블룸 타겟 기준)
+float g_fThreshold = 1.0f;
+float g_fBloomIntensity = 1.0f;
+
   /* Combine 전용 앰비언트 (바인딩 안 해도 기본값 사용) */
 vector g_vAmbientColor = float4(0.15f, 0.15f, 0.18f, 1.f);
 
@@ -117,8 +125,7 @@ float3 RecoverWorldPos(float2 uv, float depthZ, float viewZ)
     return p.xyz;
 }
 
-float3 CookTorrance(float3 N, float3 V, float3 L, float3 albedo,
-                      float metallic, float roughness, float3 radiance)
+float3 CookTorrance(float3 N, float3 V, float3 L, float3 albedo, float metallic, float roughness, float3 radiance)
 {
     roughness = clamp(roughness, 0.04f, 1.f);
     float3 H = normalize(V + L);
@@ -232,6 +239,45 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     return float4(color, 1.f);
 }
 
+//============================ HDR (pass 4) ============================
+float4 PS_BRIGHT(PS_IN In) : SV_TARGET0
+{
+    float3 c = g_SceneTexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    float luma = dot(c, float3(0.2126f, 0.7152f, 0.0722f));
+    float k = max(luma - g_fThreshold, 0.f) / max(luma, 1e-4f); // soft knee
+    return float4(c * k, 1.f);
+}
+
+//============================ Blur (pass 5) ============================
+float4 PS_BLUR(PS_IN In) : SV_TARGET0
+{
+    const float w[5] = { 0.227027f, 0.194594f, 0.121622f, 0.054054f, 0.016216f };
+    float3 result = g_BloomTexture.Sample(LinearSampler, In.vTexcoord).rgb * w[0];
+      [unroll]
+    for (int i = 1; i < 5; ++i)
+    {
+        float2 off = g_vBlurDir * g_vTexelSize * i;
+        result += g_BloomTexture.Sample(LinearSampler, In.vTexcoord + off).rgb * w[i];
+        result += g_BloomTexture.Sample(LinearSampler, In.vTexcoord - off).rgb * w[i];
+    }
+    return float4(result, 1.f);
+}
+
+//============================ Compsite (pass 6) ============================
+float4 PS_COMPOSITE(PS_IN In) : SV_TARGET0
+{
+    float4 scene = g_SceneTexture.Sample(LinearSampler, In.vTexcoord);
+    if (0.f == scene.a)        
+        discard;
+    
+    float4 bloom = g_BloomTexture.Sample(LinearSampler, In.vTexcoord);
+    
+    float3 color = scene.rgb + bloom.rgb * g_fBloomIntensity;
+    color = color / (color + 1.f); // Reinhard
+    color = pow(color, 1.f / 2.2f); // 감마
+    return float4(color, 1.f);
+}
+
   //============================ Technique ============================
 technique11 DefaultTechnique
 {
@@ -270,5 +316,26 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_COMBINED();
+    }
+    pass Bright //4
+    {
+        VertexShader = compile vs_5_0 VS_MAIN();
+        PixelShader = compile ps_5_0 PS_BRIGHT();
+        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+    }
+    pass Blur //5
+    {
+        VertexShader = compile vs_5_0 VS_MAIN();
+        PixelShader = compile ps_5_0 PS_BLUR();
+        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+    } 
+    pass Composite //6
+    {
+        VertexShader = compile vs_5_0 VS_MAIN();
+        PixelShader = compile ps_5_0 PS_COMPOSITE();
+        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
     }
 }
