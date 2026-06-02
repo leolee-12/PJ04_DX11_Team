@@ -74,6 +74,17 @@ HRESULT CImGui_Manager::ImGui_Initialize(ID3D11Device** ppDevice, ID3D11DeviceCo
     m_pSRV = *ppSRV;
     Safe_AddRef(m_pSRV);
 
+    m_pContext = *ppContext;
+    Safe_AddRef(m_pContext);
+
+    D3D11_BLEND_DESC bd{};
+    bd.RenderTarget[0].BlendEnable = FALSE;                                  // 블렌딩 OFF = RT의 RGB 그대로
+    bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    if (FAILED((*ppDevice)->CreateBlendState(&bd, &m_pOpaqueBlend)))
+        return E_FAIL;
+
+    m_ViewportDraw = { m_pContext, m_pOpaqueBlend };
+
     m_eGizmoOp = ImGuizmo::TRANSLATE;
 
     return S_OK;
@@ -781,8 +792,10 @@ void CImGui_Manager::Draw_Viewport()
     // 패널 크기와 위치
     ImVec2 vPos = ImGui::GetCursorScreenPos();
 
-    // 씬 텍스처 표시
+    ImDrawList* dl = ImGui::GetWindowDrawList();
+    dl->AddCallback(Viewport_DisableBlend, &m_ViewportDraw);  
     ImGui::Image((ImTextureID)m_pSRV, vSize);
+    dl->AddCallback(ImDrawCallback_ResetRenderState, nullptr);
 
     const _float4x4* pView = m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC);
     const _float4x4* pProj = m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
@@ -1106,6 +1119,8 @@ void CImGui_Manager::Draw_AnimatorEditor(CModel* pModel, CAnimator* pAnimator)
 void CImGui_Manager::Free()
 {
     Safe_Release(m_pSRV);
+    Safe_Release(m_pOpaqueBlend);   
+    Safe_Release(m_pContext);
     Safe_Release(m_pLevel_Edit);
     Safe_Release(m_pGameInstance_Proxy);
 
@@ -1113,4 +1128,11 @@ void CImGui_Manager::Free()
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
+}
+
+void CImGui_Manager::Viewport_DisableBlend(const ImDrawList*, const ImDrawCmd* cmd)
+{
+    auto* p = static_cast<CImGui_Manager::VIEWPORT_DRAW*>(cmd->UserCallbackData);
+    const float bf[4] = { 0.f, 0.f, 0.f, 0.f };
+    p->pContext->OMSetBlendState(p->pBlend, bf, 0xffffffff);
 }

@@ -8,6 +8,14 @@ NS_END
 
 NS_BEGIN(Client)
 
+struct ENV_ENTRY 
+{ 
+    const _tchar* tag; 
+    const _tchar* diff; 
+    const _tchar* spec; 
+    float intensity; 
+};
+
 HRESULT CLIENT_DLL Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy,
 	ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
