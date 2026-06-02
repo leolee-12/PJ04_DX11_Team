@@ -2,17 +2,29 @@
 
 float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
-bool g_bUseDiffuseTexture = { false };
 Texture2D g_DiffuseTexture;
+bool g_bUseDiffuseTexture = { false };
+float2 g_vDiffuseTiling = { 1.f, 1.f };
+float2 g_vDiffuseOffset = { 0.f, 0.f };
 
-bool g_bUseUnknownTexture = { false };
 Texture2D g_UnknownTexture;
+bool g_bUseUnknownTexture = { false };
+float2 g_vUnknownTiling = { 1.f, 1.f };
+float2 g_vUnknownOffset = { 0.f, 0.f };
 
-bool g_bUseTexture = { false };
 Texture2D g_Texture;
+bool g_bUseTexture = { false };
+float2 g_vTextureTiling = { 1.f, 1.f };
+float2 g_vTextureOffset = { 0.f, 0.f };
+
+Texture2D g_Mask;
+bool g_bUseMask = { false };
+float2 g_vMaskTiling = { 1.f, 1.f };
+float2 g_vMaskOffset = { 0.f, 0.f };
 
 float3 g_vColor = { 1.f, 1.f, 1.f };
 float g_fAlpha = { 1.f };
+
 
 struct VS_IN
 {
@@ -65,18 +77,31 @@ PS_OUT PS_MAIN(PS_IN In)
    
     Out.vColor = float4(1.f, 1.f, 1.f, 1.f);
     
+    if (g_bUseTexture == true)
+    {
+        float2 vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling;
+        Out.vColor *= g_Texture.Sample(LinearSampler, vUV);
+    }
+    
+    if (g_bUseMask == true)
+    {
+        float2 vUV = g_vMaskOffset + In.vTexcoord * g_vMaskTiling;
+        Out.vColor *= g_Mask.Sample(LinearSampler, vUV);
+    }
+    
     if (g_bUseDiffuseTexture == true)
-        Out.vColor *= g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    {
+        float2 vUV = g_vDiffuseOffset + In.vTexcoord * g_vDiffuseTiling;
+        Out.vColor *= g_DiffuseTexture.Sample(LinearSampler, vUV);
+    }
     
     if (g_bUseUnknownTexture == true)
-        Out.vColor *= g_UnknownTexture.Sample(LinearSampler, In.vTexcoord);
+    {
+        float2 vUV = g_vUnknownOffset + In.vTexcoord * g_vUnknownTiling;
+        Out.vColor *= g_UnknownTexture.Sample(LinearSampler, vUV);
+    }
     
-    if (g_bUseTexture == true)
-        Out.vColor *= g_Texture.Sample(LinearSampler, In.vTexcoord);         
-    
-    Out.vColor.xyz *= g_vColor;        
-
-    
+    Out.vColor.xyz *= g_vColor;          
     Out.vColor.a *= g_fAlpha;
     
     return Out;
@@ -90,8 +115,8 @@ technique11 DefaultTechnique
 {
     pass DefaultPass
     {
-        SetRasterizerState(RS_Cull_None);
-        SetDepthStencilState(DSS_NoWrite, 0);
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
@@ -101,9 +126,20 @@ technique11 DefaultTechnique
 
     pass AlphaBlend
     {
-        SetRasterizerState(RS_Cull_None);
+        SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_NoWrite, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_MAIN()));
+    }
+
+    pass Additive
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NoWrite, 0);
+        SetBlendState(BS_Additive, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
         SetGeometryShader(NULL);

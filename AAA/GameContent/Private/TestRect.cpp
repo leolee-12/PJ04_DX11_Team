@@ -74,6 +74,9 @@ HRESULT CTestRect::Render()
     if (FAILED(m_pShaderCom->Begin(ETOUI(VTXTEX_SHADER::ALPHABLEND))))
         return E_FAIL;
    
+    if (FAILED(m_pVIBuffer->Bind_Resources()))
+        return E_FAIL;
+
     if (FAILED(m_pVIBuffer->Render()))
         return E_FAIL;
 
