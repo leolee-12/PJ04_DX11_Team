@@ -23,13 +23,35 @@ HRESULT CEffect_Part::Initialize(void* pArg)
 {
     EFFECT_PART_DESC* pDesc = static_cast<EFFECT_PART_DESC*>(pArg);
 
-    pDesc->fSpeedPerSec = 1.f;
-    pDesc->fRotationPerSec = 360.f;
+    // Texture
+    m_bUseTextureCom = pDesc->bUseTextureCom;
+    m_iTextureLevel = pDesc->iTextureLevel;
+    m_wstrTextureTag = pDesc->wstrTextureTag;
+
+    // Mask
+    m_bUseMaskCom = pDesc->bUseMaskCom;
+    m_iMaskLevel = pDesc->iMaskLevel;
+    m_wstrMaskTag = pDesc->wstrMaskTag;
 
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
    
+    if (FAILED(Ready_Components()))
+        return E_FAIL;
+
     return S_OK;
+}
+
+void CEffect_Part::MoveUVScroll(const _float fTimeDelta, const _bool bUpdate, _float2& vUV, const _float2 vSpeed)
+{
+    if (bUpdate == true)
+    {
+        vUV.x = vUV.x + vSpeed.x * fTimeDelta;
+        vUV.y = vUV.y + vSpeed.y * fTimeDelta;
+
+        vUV.x = fmodf(vUV.x, 1.f);
+        vUV.y = fmodf(vUV.y, 1.f);
+    }
 }
 
 void CEffect_Part::Priority_Update(_float fTimeDelta)
@@ -40,6 +62,8 @@ void CEffect_Part::Priority_Update(_float fTimeDelta)
 void CEffect_Part::Update(_float fTimeDelta)
 {
     Update_Value(fTimeDelta);
+
+    Update_UVScroll(fTimeDelta);
 }
 
 void CEffect_Part::Late_Update(_float fTimeDelta)
@@ -65,12 +89,76 @@ HRESULT CEffect_Part::Bind_ShaderValue()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &m_vColor, sizeof(m_vColor))))
         return E_FAIL;
 
+    // Texture
+    if (m_pTextureCom != nullptr && m_bUseTextureCom == true)
+    {
+        if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 0)))
+            return E_FAIL;
+
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseTexture", &m_bUseTextureCom, sizeof(m_bUseTextureCom))))
+            return E_FAIL;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_vTextureTiling", &m_vTextureTiling, sizeof(m_vTextureTiling))))
+            return E_FAIL;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_vTextureOffset", &m_vTextureOffset, sizeof(m_vTextureOffset))))
+            return E_FAIL;
+    }
+    else
+    {
+        _bool bFalse = false;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseTexture", &bFalse, sizeof(bFalse))))
+            return E_FAIL;
+    }
+
+    // Mask
+    if (m_pMaskCom != nullptr && m_bUseMaskCom == true)
+    {
+        if (FAILED(m_pMaskCom->Bind_ShaderResource(m_pShaderCom, "g_Mask", 0)))
+            return E_FAIL;
+
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseMask", &m_bUseMaskCom, sizeof(m_bUseMaskCom))))
+            return E_FAIL;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_vMaskTiling", &m_vMaskTiling, sizeof(m_vMaskTiling))))
+            return E_FAIL;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_vMaskOffset", &m_vMaskOffset, sizeof(m_vMaskOffset))))
+            return E_FAIL;
+    }
+    else
+    {
+        _bool bFalse = false;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseMask", &bFalse, sizeof(bFalse))))
+            return E_FAIL;
+    }
+
     return S_OK;
 }
 
 void CEffect_Part::Update_EffectPart(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
 {
 
+}
+
+void CEffect_Part::Update_UVScroll(const _float fTimeDelta)
+{
+    MoveUVScroll(fTimeDelta, m_bTextureUVScroll, m_vTextureOffset, m_vTextureUVSpeed);
+    MoveUVScroll(fTimeDelta, m_bMaskUVScroll, m_vMaskOffset, m_vMaskUVSpeed);
+}
+
+HRESULT CEffect_Part::Ready_Components()
+{
+    if (m_bUseTextureCom == true)
+    {
+        m_pTextureCom = Add_Component<CTexture>(m_iTextureLevel, m_wstrTextureTag, TEXT("Com_Texture"));
+        if (m_pTextureCom == nullptr)
+            return E_FAIL;
+    }
+
+    if (m_bUseMaskCom == true)
+    {
+        m_pMaskCom = Add_Component<CTexture>(m_iMaskLevel, m_wstrMaskTag, TEXT("Com_Mask"));
+        if (m_pMaskCom == nullptr)
+            return E_FAIL;
+    }
+    return S_OK;
 }
 
 void CEffect_Part::Init_PropertyValue()
@@ -105,6 +193,8 @@ void CEffect_Part::Init_PropertyValue()
 
 
     // Size
+    m_fSize = { 1.f };
+
     m_bSizeChange = { false };
 
     m_SizeRatioValue.reserve(4);
@@ -155,6 +245,22 @@ void CEffect_Part::Init_PropertyValue()
     m_bMoveSin = { false };
     m_fSinCyclePerDuration = 1.f;
     m_fAmplitude = 1.f;
+
+    // Texture
+    m_bUseTextureCom = false;
+    m_vTextureTiling = { 1.f, 1.f };
+    m_vTextureOffset = { 0.f, 0.f };
+
+    m_bTextureUVScroll = false;
+    m_vTextureUVSpeed = { 0.f, 0.f };
+
+    // Mask
+    m_bUseMaskCom = false;
+    m_vMaskTiling = { 1.f, 1.f };
+    m_vMaskOffset = { 0.f, 0.f };
+
+    m_bMaskUVScroll = false;
+    m_vMaskUVSpeed = { 0.f, 0.f };
 }
 
 void CEffect_Part::Update_Value(_float fTimeDelta)
@@ -233,10 +339,10 @@ void CEffect_Part::Update_Alpha(const _float fTimeDelta, const _float fActiveTim
             }
         }
     }
-    else
+ /*   else
     {
         m_fAlpha = 1.f;
-    }
+    }*/
 
     m_AlphaRatioValue.clear();
 }

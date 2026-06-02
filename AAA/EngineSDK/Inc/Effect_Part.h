@@ -94,10 +94,37 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
     PROPERTY(_float, m_fSinCyclePerDuration,   L"Cycle_Per_Duration(Recommend int)",     L"Effect_MoveSin");
     PROPERTY(_float, m_fAmplitude,             L"Amplitude",                             L"Effect_MoveSin");
 
+
+    // Texture
+    PROPERTY(_bool, m_bUseTextureCom, L"Use_TextureCom", L"Effect_Model");
+    PROPERTY(_float2, m_vTextureTiling, L"Texture_Tiling", L"Effect_Model");
+    PROPERTY(_float2, m_vTextureOffset, L"Texture_Offset", L"Effect_Model");
+
+    PROPERTY(_bool, m_bTextureUVScroll, L"Texture_UVScroll", L"Effect_Model");
+    PROPERTY(_float2, m_vTextureUVSpeed, L"Texture_UVSpeed", L"Effect_Model");
+
+    // Mask
+    PROPERTY(_bool, m_bUseMaskCom, L"Use_MaskCom", L"Effect_Model");
+    PROPERTY(_float2, m_vMaskTiling, L"Mask_Tiling", L"Effect_Model");
+    PROPERTY(_float2, m_vMaskOffset, L"Mask_Offset", L"Effect_Model");
+
+    PROPERTY(_bool, m_bMaskUVScroll, L"Mask_UVScroll", L"Effect_Model");
+    PROPERTY(_float2, m_vMaskUVSpeed, L"Mask_UVSpeed", L"Effect_Model");
+
 public:
     struct EFFECT_PART_DESC : public CGameObject::GAMEOBJECT_DESC
     {
         _bool bCustomShader{};
+
+        // TextureCom관련
+        _bool bUseTextureCom{};
+        _uint iTextureLevel{};
+        _wstring wstrTextureTag;
+
+        // MaskCom관련
+        _bool bUseMaskCom{};
+        _uint iMaskLevel{};
+        _wstring wstrMaskTag;
     };
 
 private:
@@ -122,6 +149,8 @@ protected:
     virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void* pArg) override;
 
+    void MoveUVScroll(const _float fTimeDelta, const _bool bUpdate, _float2& vUV, const _float2 vSpeed);
+
 public:
     virtual void    Priority_Update(_float fTimeDelta) override;
     virtual void    Update(_float fTimeDelta) override;
@@ -132,7 +161,15 @@ protected:
     _bool m_bCustomShader{};
     CShader* m_pShaderCom{};
     CTexture* m_pTextureCom{};
+    CTexture* m_pMaskCom{};
 
+    // Texture
+    _uint m_iTextureLevel{};
+    _wstring m_wstrTextureTag;
+
+    // Mask
+    _uint m_iMaskLevel{};
+    _wstring m_wstrMaskTag;
 
 protected:
     _bool m_bActive{ true };
@@ -143,6 +180,7 @@ protected:
     HRESULT Bind_ShaderValue();
 
     virtual void Update_EffectPart(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
+    virtual void Update_UVScroll(const _float fTimeDelta);
 
     void Update_Value(_float fTimeDelta);
     void Update_Alpha(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
@@ -158,6 +196,8 @@ private:
     vector<RATIO_VALUE_FLOAT3> m_ColorRatioValue;
 
 private:
+    HRESULT Ready_Components();
+
     void Init_PropertyValue();
 
 protected:

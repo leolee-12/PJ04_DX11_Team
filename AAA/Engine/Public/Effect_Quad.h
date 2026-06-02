@@ -10,25 +10,12 @@ class ENGINE_DLL CEffect_Quad abstract : public CEffect_Part
 {
     GENERATED_BODY_ABSTRACT(CEffect_Quad)
 
-    // Texture
-    PROPERTY(_bool, m_bUseTextureCom,       L"Use_TextureCom",      L"Effect_Model");
-    PROPERTY(_float2, m_vTextureTiling,     L"Texture_Tiling",      L"Effect_Model");
-    PROPERTY(_float2, m_vTextureOffset,     L"Texture_Offset",      L"Effect_Model");
-
-    PROPERTY(_bool, m_vTextureUVScroll,     L"Texture_UVScroll",    L"Effect_Model");
-    PROPERTY(_float2, m_vTextureUVSpeed,    L"Texture_UVSpeed",     L"Effect_Model");
-
 public:
     struct EFFECT_QUAD_DESC : public CEffect_Part::EFFECT_PART_DESC
     {
         // Buffer
         _uint iVIBufferLevel{};
         _wstring wstrVIBufferTag;
-
-        // Texture
-        _bool bUseTextureCom{};
-        _uint iTextureLevel{};
-        _wstring wstrTextureTag;
 
         // Shader
         _uint iShaderLevel{};
@@ -52,7 +39,7 @@ public:
 
 protected:
     virtual void Update_EffectPart(const _float fTimeDelta, const _float fActiveTime, const _float fRatio) override;
-    virtual void Update_UVScroll(const _float fTimeDelta);
+    virtual void Update_UVScroll(const _float fTimeDelta) override;
 
 private:
     HRESULT Ready_Components();
@@ -65,9 +52,6 @@ private:
 private:
     _uint m_iVIBufferLevel{};
     _wstring m_wstrVIBufferTag;
-
-    _uint m_iTextureLevel{};
-    _wstring m_wstrTextureTag;
 
     _uint m_iShaderLevel{};
     _wstring m_wstrShaderTag;

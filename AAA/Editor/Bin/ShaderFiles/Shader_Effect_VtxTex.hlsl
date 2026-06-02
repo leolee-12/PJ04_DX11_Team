@@ -7,6 +7,11 @@ bool g_bUseTexture = { false };
 float2 g_vTextureTiling = { 1.f, 1.f };
 float2 g_vTextureOffset = { 0.f, 0.f };
 
+Texture2D g_Mask;
+bool g_bUseMask = { false };
+float2 g_vMaskTiling = { 1.f, 1.f };
+float2 g_vMaskOffset = { 0.f, 0.f };
+
 bool g_bFlipX = { false };
 bool g_bFlipY = { false };
 float3 g_vColor = { 1.f, 1.f, 1.f };
@@ -81,6 +86,12 @@ PS_OUT PS_MAIN(PS_IN In)
     {
         float2 vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling;
         Out.vColor *= g_Texture.Sample(LinearSampler, vUV);
+    }
+    
+    if (g_bUseMask == true)
+    {
+        float2 vUV = g_vMaskOffset + In.vTexcoord * g_vMaskTiling;
+        Out.vColor *= g_Mask.Sample(LinearSampler, vUV);
     }
     
     Out.vColor.xyz *= g_vColor;
