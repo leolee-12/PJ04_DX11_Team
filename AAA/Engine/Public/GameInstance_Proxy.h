@@ -179,7 +179,7 @@ public:
 
 #pragma region EFFECT_MANAGER
     HRESULT Spawn_Effect(_uint iLevel, const _wstring& strProtoTag,
-const CEffect::EFFECT_DESC& desc, CEffect** ppOut = nullptr);
+    const CEffect::EFFECT_DESC& desc, CEffect** ppOut = nullptr);
 
     CShader* Get_2DShader();
     CShader* Get_MeshShader();
@@ -189,6 +189,13 @@ const CEffect::EFFECT_DESC& desc, CEffect** ppOut = nullptr);
   public:
       void  Set_EditMode(_bool bEdit);
       _bool Is_EditMode() const;
+#pragma endregion
+
+#pragma region ENVIRONMENT_MANAGER
+  public:
+      HRESULT Register_Environment(const _wstring& tag, const _tchar* d, const _tchar* s, _float i = 1.f);
+      HRESULT Set_CurrentEnvironment(const _wstring& tag);
+      const ENVIRONMENT_DESC& Get_CurrentEnvironment() const;
 #pragma endregion
 
 private:

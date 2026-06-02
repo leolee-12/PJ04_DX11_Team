@@ -260,6 +260,17 @@ HRESULT CRenderer::Render_Combined()
         return E_FAIL;
     if (FAILED(m_pShader->Bind_Matrix("g_ShadowLightProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
         return E_FAIL;
+
+    const auto& env = m_pGameInstance_Proxy->Get_CurrentEnvironment();
+    if (FAILED(m_pShader->Bind_SRV("g_IrradianceCube", env.pDiffuseSRV)))
+        return E_FAIL;
+    if (FAILED(m_pShader->Bind_SRV("g_PrefilteredCube", env.pSpecularSRV)))
+        return E_FAIL;
+    if (FAILED(m_pShader->Bind_RawValue("g_iSpecularMip", &env.iSpecularMip, sizeof(_uint))))
+        return E_FAIL;
+    if (FAILED(m_pShader->Bind_RawValue("g_fIBLIntensity", &env.fIntensity, sizeof(_float))))
+        return E_FAIL;
+
     if (FAILED(m_pVIBuffer->Bind_Resources()))
         return E_FAIL;
 

@@ -22,6 +22,14 @@ namespace Engine
 		float			fRange;
 	}LIGHT_DESC;
 
+	typedef struct tagEnvironmentDesc
+	{
+		ID3D11ShaderResourceView* pDiffuseSRV = { nullptr };  // irradiance cube  (BC6H HDR)
+		ID3D11ShaderResourceView* pSpecularSRV = { nullptr };  // prefiltered cube (BC6H HDR, mip=roughness)
+		unsigned int              iSpecularMip = { 1 };        // ½ºÆäÅ§·¯ Å¥ºê ¹Ó ¼ö
+		float                     fIntensity = { 1.f };      // ¸Êº° IBL ¼¼±â
+	}ENVIRONMENT_DESC;
+
 	typedef struct tagShadowLightDesc
 	{
 		XMFLOAT4		vEye, vAt;
