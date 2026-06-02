@@ -78,7 +78,7 @@ HRESULT CTestFiona::Render()
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", (_uint)i)))
             return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Begin(1)))
+        if (FAILED(m_pShaderCom->Begin(0)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render((_uint)i)))

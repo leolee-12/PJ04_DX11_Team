@@ -26,20 +26,14 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
         CVIBuffer_Point::Create(pDevice, pContext))))
         return E_FAIL;
 
-    CVIBuffer_Point_Instance::POINT_INSTANCE_DESC instDesc{};
-    instDesc.iNumInstance = 15;
-    instDesc.vCenter = { 0.f, 0.f, 0.f };
-    instDesc.vRange = { 5.f, 1.f, 5.f };
-    instDesc.vSize = { 0.8f, 1.2f };
-    instDesc.vAspect = { 4.f, 4.f };
-    instDesc.vRollRange = { -XMConvertToRadians(45), XMConvertToRadians(45) };
-    instDesc.vSpeed = { 2.f, 3.f };
-    instDesc.vLifeTime = { 0.4f, 0.6f };
-    instDesc.fEmitDuration = 1.5f;
-    instDesc.isLoop = false;
-    instDesc.vPivot = { 0.f, 0.f, 0.f };
-    pProxy->Add_Prototype(VI_CrackInstance.iLevelID, VI_CrackInstance.szProtoTag,
-        CVIBuffer_Point_Instance::Create(pDevice, pContext, &instDesc));
+    static const ENV_ENTRY g_EnvTable[] = {
+      { TEXT("Field"), TEXT("../../Resources/Env/Field_Diffuse.dds"), TEXT("../../Resources/Env/Field_Specular.dds"), 0.5f },
+        // 맵 추가 = 행 추가
+    };
+
+    for (auto& e : g_EnvTable)
+        pProxy->Register_Environment(e.tag, e.diff, e.spec, e.intensity);
+    
 
     return S_OK;
 }
@@ -56,6 +50,10 @@ HRESULT Ready_Prototype_Shaders(CGameInstance_Proxy* pProxy, ID3D11Device* pDevi
 
     if (FAILED(pProxy->Add_Prototype(Shader_AnimMesh_PBR.iLevelID, Shader_AnimMesh_PBR.szProtoTag,
         CShader::Create(pDevice, pContext, Shader_AnimMesh_PBR.szFileTag, VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
+        return E_FAIL;
+
+    if (FAILED(pProxy->Add_Prototype(Shader_Map.iLevelID, Shader_Map.szProtoTag,
+        CShader::Create(pDevice, pContext, Shader_Map.szFileTag, VTXMAPMESH::Elements, VTXMAPMESH::iNumElements))))
         return E_FAIL;
 
     return S_OK;

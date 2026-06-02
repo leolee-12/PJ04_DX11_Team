@@ -139,7 +139,7 @@ HRESULT CModel::Initialize_Prototype(MODEL eType, const _char* pModelFilePath, _
     m_eType = eType;
 	m_PickableFilter = fcFillter;
 
-	return m_eType == MODEL::NONANIM ? Ready_NonAnim(pModelFilePath, PreTransformMatrix) : Ready_Anim(pModelFilePath, PreTransformMatrix);
+    return m_eType == MODEL::ANIM ? Ready_Anim(pModelFilePath, PreTransformMatrix) : Ready_NonAnim(pModelFilePath, PreTransformMatrix);
 }
 
 HRESULT CModel::Initialize(void* pArg)

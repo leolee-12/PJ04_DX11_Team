@@ -6,6 +6,7 @@
 #include "Shadow_Dir.h"
 #include "Effect_Manager.h"
 #include "Timer_Manager.h"
+#include "Environment_Manager.h"
 
 #pragma region ENGINE
 void CGameInstance_Proxy::Update_Engine(_float fTimeDelta)
@@ -702,6 +703,30 @@ _bool CGameInstance_Proxy::Is_EditMode() const
 {
 	if (m_pOwner == nullptr) return false;   // 안전 기본값
 	return m_pOwner->Is_EditMode();
+}
+HRESULT CGameInstance_Proxy::Register_Environment(const _wstring& tag, const _tchar* d, const _tchar* s, _float i)
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->m_pEnvironment_Manager->Register(tag, d, s, i);
+}
+HRESULT CGameInstance_Proxy::Set_CurrentEnvironment(const _wstring& tag)
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->m_pEnvironment_Manager->Set_Current(tag);
+}
+const ENVIRONMENT_DESC& CGameInstance_Proxy::Get_CurrentEnvironment() const
+{
+	if (!IsConnected())
+	{
+		static ENVIRONMENT_DESC empty{};
+		return empty;
+	}
+
+	return m_pOwner->m_pEnvironment_Manager->Get_Current();
 }
 #pragma endregion
 
