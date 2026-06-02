@@ -27,11 +27,14 @@ HRESULT CEditorApp::Initialize()
         return E_FAIL;
     }
 
-    Ready_EditRTV();
-
     m_pGameInstance_Proxy = CGameInstance::GetProxy();
     m_pGameInstance_Proxy->Disable_InputDeveice();
     m_pGameInstance_Proxy->Set_EditMode(true);
+
+    Ready_EditRTV();
+    m_pGameInstance_Proxy->Bind_RenderTarget(m_pRTV, m_pDSV, g_iWinSizeX, g_iWinSizeY);
+
+    
 
     m_pImGui_Manager = CImGui_Manager::GetInstance();
     Safe_AddRef(m_pImGui_Manager);
@@ -65,15 +68,11 @@ void CEditorApp::Update(_float fTimeDelta)
 HRESULT CEditorApp::Render()
 {
     Editor_BeginDraw();
-
     if (FAILED(m_pGameInstance_Proxy->Draw()))
         return E_FAIL;
-
     if (FAILED(m_pGameInstance_Proxy->Begin_Draw()))
         return E_FAIL;
-
     m_pImGui_Manager->ImGui_Render();
-
     if (FAILED(m_pGameInstance_Proxy->End_Draw()))
         return E_FAIL;
 
@@ -115,8 +114,8 @@ HRESULT CEditorApp::Ready_EditRTV()
         return E_FAIL;
 
     D3D11_TEXTURE2D_DESC desc{};
-    desc.Width = m_iViewportWidth;
-    desc.Height = m_iViewportHeight;
+    desc.Width = g_iWinSizeX;
+    desc.Height = g_iWinSizeY;
     desc.MipLevels = 1;
     desc.ArraySize = 1;
     desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -134,8 +133,8 @@ HRESULT CEditorApp::Ready_EditRTV()
     Safe_Release(pTex);
 
     D3D11_TEXTURE2D_DESC dsDesc{};
-    dsDesc.Width = m_iViewportWidth;
-    dsDesc.Height = m_iViewportHeight;
+    dsDesc.Width = g_iWinSizeX;
+    dsDesc.Height = g_iWinSizeY;
     dsDesc.MipLevels = 1;
     dsDesc.ArraySize = 1;
     dsDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -159,8 +158,8 @@ void CEditorApp::Editor_BeginDraw()
     ZeroMemory(&ViewPortDesc, sizeof(D3D11_VIEWPORT));
     ViewPortDesc.TopLeftX = 0;
     ViewPortDesc.TopLeftY = 0;
-    ViewPortDesc.Width  = (_float)m_iViewportWidth;
-    ViewPortDesc.Height = (_float)m_iViewportHeight;
+    ViewPortDesc.Width  = (_float)g_iWinSizeX;
+    ViewPortDesc.Height = (_float)g_iWinSizeY;
     ViewPortDesc.MinDepth = 0.f;
     ViewPortDesc.MaxDepth = 1.f;
 
@@ -169,7 +168,6 @@ void CEditorApp::Editor_BeginDraw()
     _float clearColor[4] = { 0.35f, 0.35f, 0.35f, 1.f };
     m_pContext->ClearRenderTargetView(m_pRTV, clearColor);
     m_pContext->ClearDepthStencilView(m_pDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
-    m_pContext->OMSetRenderTargets(1, &m_pRTV, m_pDSV);
 }
 
 CEditorApp* CEditorApp::Create()

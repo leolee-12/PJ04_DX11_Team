@@ -27,6 +27,7 @@ class CTarget_Manager;
 class CShadow_Dir;
 class CEffect_Manager;
 class CPhysX_Manager;
+class CEnvironment_Manager;
 
 class ENGINE_DLL CGameInstance 
 {
@@ -220,6 +221,7 @@ private:
 	CShadow_Dir*				m_pShadow_Dir = { nullptr };
 	CEffect_Manager*			m_pEffect_Manager = { nullptr };
 	CPhysX_Manager*				m_pPhysX_Manager = { nullptr };
+	CEnvironment_Manager*		m_pEnvironment_Manager = { nullptr };
 
 	mutable mt19937             m_RandomGenerator;
 	_bool						m_bEditMode = { false };

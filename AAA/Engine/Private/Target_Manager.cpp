@@ -56,7 +56,7 @@ HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencil
 	ID3D11ShaderResourceView* nullSRVs[8] = { nullptr };
 	m_pContext->PSSetShaderResources(0, 8, nullSRVs);
 
-	m_pContext->OMGetRenderTargets(1, &m_pBackBufferRTV, &m_pOriginalDSV);
+	m_pContext->OMGetRenderTargets(1, &m_pPrevRTV, &m_pOriginalDSV);
 
 	ID3D11RenderTargetView* pRenderTargets[8] = { nullptr };
 
@@ -79,13 +79,13 @@ HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencil
 HRESULT CTarget_Manager::End_MRT()
 {
 	ID3D11RenderTargetView* pRenderTargets[8] = {
-		m_pBackBufferRTV, 
+		m_pPrevRTV,
 		nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 	};
 
 	m_pContext->OMSetRenderTargets(8, pRenderTargets, m_pOriginalDSV);
 
-	Safe_Release(m_pBackBufferRTV);
+	Safe_Release(m_pPrevRTV);
 	Safe_Release(m_pOriginalDSV);
 
 	return S_OK;

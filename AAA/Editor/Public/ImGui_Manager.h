@@ -53,7 +53,16 @@ private:
 	ID3D11ShaderResourceView* m_pSRV = { nullptr };
 	_bool m_bKeyInputEnabled = { false };
 
+	ID3D11DeviceContext* m_pContext = { nullptr };
+	ID3D11BlendState* m_pOpaqueBlend = { nullptr };
+
+	struct VIEWPORT_DRAW { ID3D11DeviceContext* pContext; ID3D11BlendState* pBlend; };
+	VIEWPORT_DRAW m_ViewportDraw{};
+
 	unordered_map<CGameObject*, _float3> m_RotEditEuler;
+
+private:
+	static void Viewport_DisableBlend(const ImDrawList*, const ImDrawCmd* cmd);
 };
 
 NS_END

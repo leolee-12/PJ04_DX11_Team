@@ -23,13 +23,20 @@ HRESULT CTestEffectQuad::Initialize(void* pArg)
 {
     TEST_EFFECT_QUAD_DESC tDesc{};
 
-    tDesc.iTextureLevel = Texture_LoadingUI.iLevelID;
-    tDesc.wstrTextureTag = Texture_LoadingUI.szProtoTag;
-
     tDesc.iVIBufferLevel = VI_Rect.iLevelID;
     tDesc.wstrVIBufferTag = VI_Rect.szProtoTag;
 
+    tDesc.bUseTextureCom = true;
+    tDesc.iTextureLevel = Texture_Common_Flash02.iLevelID;
+    tDesc.wstrTextureTag = Texture_Common_Flash02.szProtoTag;
+
+    tDesc.bUseMaskCom = true;
+    tDesc.iMaskLevel = Texture_TestMask.iLevelID;
+    tDesc.wstrMaskTag = Texture_TestMask.szProtoTag;
+
     tDesc.bCustomShader = false;
+    tDesc.iShaderLevel = 0;
+    tDesc.wstrShaderTag = L"";
 
     if (FAILED(__super::Initialize(&tDesc)))
         return E_FAIL;

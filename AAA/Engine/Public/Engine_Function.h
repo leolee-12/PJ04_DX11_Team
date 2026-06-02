@@ -75,7 +75,15 @@ namespace Engine
 
 	namespace Helper
 	{
-		static constexpr _float fEpsilon = { 0.00001f };
+		static constexpr float fEpsilon = { 0.00001f };
+
+		inline void IntClamp(int& fOutInt, const int fMin, const int fMax)
+		{
+			if (fOutInt > fMax)
+				fOutInt = fMax;
+			else if (fOutInt < fMin)
+				fOutInt = fMin;
+		}
 
 		inline void FloatClamp(float& fOutFloat, const float fMin, const float fMax)
 		{

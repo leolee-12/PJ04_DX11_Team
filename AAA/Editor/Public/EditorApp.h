@@ -34,9 +34,6 @@ private:
 	ID3D11RenderTargetView* m_pRTV = { nullptr };
 	ID3D11ShaderResourceView* m_pSRV = { nullptr };
 	ID3D11DepthStencilView* m_pDSV = { nullptr };
-
-	static constexpr _uint m_iViewportWidth		= 1600;
-	static constexpr _uint m_iViewportHeight	= 900;
 private:
 	HRESULT Start_Level();
 	HRESULT Ready_SharedResources();

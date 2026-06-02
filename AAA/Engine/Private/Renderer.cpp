@@ -30,6 +30,13 @@ HRESULT CRenderer::Initialize()
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Light"), iWidth, iHeight, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
         return E_FAIL;
 
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Scene"), iWidth, iHeight, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_BloomA"), iWidth >> 1, iHeight >> 1, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_BloomB"), iWidth >> 1, iHeight >> 1, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+        return E_FAIL;
 
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_LightDepth"), g_iMaxWidth, g_iMaxHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(1.f, 1.f, 1.f, 1.f))))
         return E_FAIL;
@@ -50,6 +57,13 @@ HRESULT CRenderer::Initialize()
         return E_FAIL;
 
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_ShadowObjects"), TEXT("Target_LightDepth"))))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_Scene"), TEXT("Target_Scene"))))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_BloomA"), TEXT("Target_BloomA"))))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_BloomB"), TEXT("Target_BloomB"))))
         return E_FAIL;
 
 
@@ -77,6 +91,14 @@ HRESULT CRenderer::Initialize()
 
     if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Light"), 450.f, 100.f, 300.f, 200.f)))
         return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Scene"), 450.f, 300.f, 300.f, 200.f)))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_BloomA"), 450.f, 500.f, 300.f, 200.f)))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_BloomB"), 450.f, 700.f, 300.f, 200.f)))
+        return E_FAIL;
 #endif
 
     return S_OK;
@@ -97,6 +119,14 @@ void CRenderer::Add_RenderGroup_UI(RENDERUIID eGroupID, CUIObject* pUIObject)
 
 HRESULT CRenderer::Draw()
 {
+    if (nullptr != m_pOutRTV)
+    {
+        m_pContext->OMSetRenderTargets(1, &m_pOutRTV, m_pOutDSV);
+        Change_ViewportDesc(m_iOutWidth, m_iOutHeight);
+    }
+    else
+        m_pGameInstance_Proxy->Bind_BackBuffer();
+
     if (FAILED(Render_Priority()))
         return E_FAIL;
     if (FAILED(Render_Shadow()))
@@ -107,9 +137,12 @@ HRESULT CRenderer::Draw()
         return E_FAIL;
     if (FAILED(Render_Combined()))
         return E_FAIL;
-    if (FAILED(Render_NonLight()))
+    if (FAILED(Render_Bloom()))
         return E_FAIL;
 
+    
+    if (FAILED(Render_NonLight()))
+        return E_FAIL;
     if (FAILED(Render_Blend()))
         return E_FAIL;
 
@@ -131,10 +164,20 @@ HRESULT CRenderer::Draw()
 #ifdef _DEBUG
 void CRenderer::Add_DebugComponent(CComponent* pComponent)
 {
+    if (!m_bDebugRender) return;
+
     m_DebugComponents.push_back(pComponent);
     Safe_AddRef(pComponent);
 }
 #endif
+
+void CRenderer::Bind_RenderTarget(ID3D11RenderTargetView* pRTV, ID3D11DepthStencilView* pDSV, _uint iWidth, _uint iHeight)
+{
+    m_pOutRTV = pRTV;
+    m_pOutDSV = pDSV;
+    m_iOutWidth = iWidth;
+    m_iOutHeight = iHeight;
+}
 
 HRESULT CRenderer::Render_Priority()
 {
@@ -172,7 +215,7 @@ HRESULT CRenderer::Render_Shadow()
     if (FAILED(m_pGameInstance_Proxy->End_MRT()))
         return E_FAIL;
 
-    Change_ViewportDesc((_uint)m_pGameInstance_Proxy->Get_WindowWidth(), (_uint)m_pGameInstance_Proxy->Get_WindowHeight());
+    Change_ViewportDesc(Render_Width(), Render_Height());
 
     return S_OK;
 }
@@ -239,6 +282,9 @@ HRESULT CRenderer::Render_Lights()
 
 HRESULT CRenderer::Render_Combined()
 {
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Scene"))))
+        return E_FAIL;
+
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Light"), m_pShader, "g_LightTexture")))
         return E_FAIL;
     if(FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Diffuse"), m_pShader, "g_DiffuseTexture")))
@@ -260,12 +306,105 @@ HRESULT CRenderer::Render_Combined()
         return E_FAIL;
     if (FAILED(m_pShader->Bind_Matrix("g_ShadowLightProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
         return E_FAIL;
+
+    const auto& env = m_pGameInstance_Proxy->Get_CurrentEnvironment();
+    if (FAILED(m_pShader->Bind_SRV("g_IrradianceCube", env.pDiffuseSRV)))
+        return E_FAIL;
+    if (FAILED(m_pShader->Bind_SRV("g_PrefilteredCube", env.pSpecularSRV)))
+        return E_FAIL;
+    if (FAILED(m_pShader->Bind_RawValue("g_iSpecularMip", &env.iSpecularMip, sizeof(_uint))))
+        return E_FAIL;
+    if (FAILED(m_pShader->Bind_RawValue("g_fIBLIntensity", &env.fIntensity, sizeof(_float))))
+        return E_FAIL;
+
     if (FAILED(m_pVIBuffer->Bind_Resources()))
         return E_FAIL;
 
     if (FAILED(m_pShader->Begin(ETOUI(DEFERRED::COMBINED))))
         return E_FAIL;
 
+    if (FAILED(m_pVIBuffer->Render()))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->End_MRT()))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT CRenderer::Render_Bloom()
+{
+    _uint iWidth = static_cast<_uint>(m_pGameInstance_Proxy->Get_WindowWidth());
+    _uint iHeight = static_cast<_uint>(m_pGameInstance_Proxy->Get_WindowHeight());
+
+    _float2 vTexel = { 1.f / (iWidth / 2), 1.f / (iHeight / 2) };
+
+    const _uint iHalfW = iWidth / 2;
+    const _uint iHalfH = iHeight / 2;
+
+    Change_ViewportDesc(iHalfW, iHalfH);
+
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_BloomA"))))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene"), m_pShader, "g_SceneTexture")))
+        return E_FAIL;
+    if (FAILED(m_pShader->Bind_RawValue("g_fThreshold", &m_fThreshold, sizeof(_float))))
+        return E_FAIL;
+    if (FAILED(m_pShader->Begin(ETOUI(DEFERRED::BRIGHT))))
+        return E_FAIL;
+    if (FAILED(m_pVIBuffer->Bind_Resources()))
+        return E_FAIL;
+    if (FAILED(m_pVIBuffer->Render()))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->End_MRT()))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_BloomB"))))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_BloomA"), m_pShader, "g_BloomTexture")))
+        return E_FAIL;
+    _float2 dirH = { 1,0 };
+    if (FAILED(m_pShader->Bind_RawValue("g_vBlurDir", &dirH, sizeof(_float2))))
+        return E_FAIL;
+    if (FAILED(m_pShader->Bind_RawValue("g_vTexelSize", &vTexel, sizeof(_float2))))
+        return E_FAIL;
+    if (FAILED(m_pShader->Begin(ETOUI(DEFERRED::BLUR))))
+        return E_FAIL;
+    if (FAILED(m_pVIBuffer->Bind_Resources()))
+        return E_FAIL;
+    if (FAILED(m_pVIBuffer->Render()))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->End_MRT()))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_BloomA"))))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_BloomB"), m_pShader, "g_BloomTexture")))
+        return E_FAIL;
+    _float2 dirV = { 0, 1 };
+    if (FAILED(m_pShader->Bind_RawValue("g_vBlurDir", &dirV, sizeof(_float2))))
+        return E_FAIL;
+    if (FAILED(m_pShader->Begin(ETOUI(DEFERRED::BRIGHT))))
+        return E_FAIL;
+    if (FAILED(m_pVIBuffer->Bind_Resources()))
+        return E_FAIL;
+    if (FAILED(m_pVIBuffer->Render()))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->End_MRT()))
+        return E_FAIL;
+
+    Change_ViewportDesc(Render_Width(), Render_Height());
+
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene"), m_pShader, "g_SceneTexture")))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_BloomA"), m_pShader, "g_BloomTexture")))
+        return E_FAIL;
+    if (FAILED(m_pShader->Bind_RawValue("g_fBloomIntensity", &m_fBloomIntensity, sizeof(_float))))
+        return E_FAIL;
+    if (FAILED(m_pShader->Begin(ETOUI(DEFERRED::COMPSITE))))
+        return E_FAIL;
+    if (FAILED(m_pVIBuffer->Bind_Resources()))
+        return E_FAIL;
     if (FAILED(m_pVIBuffer->Render()))
         return E_FAIL;
 
@@ -368,6 +507,16 @@ HRESULT CRenderer::Render_UI_FRONT()
     return S_OK;
 }
 
+_uint CRenderer::Render_Width() const
+{
+    return m_pOutRTV ? m_iOutWidth : (_uint)m_pGameInstance_Proxy->Get_WindowWidth();
+} 
+
+_uint CRenderer::Render_Height() const
+{
+    return m_pOutRTV ? m_iOutHeight : (_uint)m_pGameInstance_Proxy->Get_WindowHeight();
+}
+
 HRESULT CRenderer::Ready_DepthStencil_Buffer()
 {
     ID3D11Texture2D* pDepthStencilTexture = { nullptr };
@@ -417,6 +566,8 @@ HRESULT CRenderer::Change_ViewportDesc(_uint iWidth, _uint iHeight)
 #ifdef _DEBUG
 HRESULT CRenderer::Render_Debug()
 {
+    if (!m_bDebugRender) return S_FALSE;
+
     for (auto& pDebugCom : m_DebugComponents)
     {
         pDebugCom->Render();
@@ -435,6 +586,10 @@ HRESULT CRenderer::Render_Debug()
 
     m_pGameInstance_Proxy->Render_RT_Debug(TEXT("MRT_GameObjects"), m_pShader, m_pVIBuffer);
     m_pGameInstance_Proxy->Render_RT_Debug(TEXT("MRT_LightAcc"), m_pShader, m_pVIBuffer);
+
+    m_pGameInstance_Proxy->Render_RT_Debug(TEXT("MRT_Scene"), m_pShader, m_pVIBuffer);
+    m_pGameInstance_Proxy->Render_RT_Debug(TEXT("MRT_BloomA"), m_pShader, m_pVIBuffer);
+    m_pGameInstance_Proxy->Render_RT_Debug(TEXT("MRT_BloomB"), m_pShader, m_pVIBuffer);
 
     return S_OK;
 }
