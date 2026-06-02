@@ -40,6 +40,9 @@ public:
         _wstring wstrShaderTag;
     };
 
+private:
+    enum ShaderPass { Default, AlphaBlend, ADDITIVE, ShaderPass_End };
+
 protected:
     CEffect_Mesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     CEffect_Mesh(const CEffect_Mesh& Prototype);

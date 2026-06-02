@@ -10,6 +10,8 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
 {
     GENERATED_BODY_ABSTRACT(CEffect_Part)
 
+    PROPERTY(_int, m_iShdaerPass,   L"ShdaerPass",  L"Effect");
+
     PROPERTY(_float3, m_vLocalPos,  L"LocalPos",    L"Effect");
 
     PROPERTY(_bool, m_bIsPlay,      L"Play",        L"Effect");

@@ -22,6 +22,9 @@ public:
         _wstring wstrShaderTag;
     };
 
+private:
+    enum ShaderPass { Default, AlphaBlend, ADDITIVE, ShaderPass_End };
+
 protected:
     CEffect_Quad(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     CEffect_Quad(const CEffect_Quad& Prototype);

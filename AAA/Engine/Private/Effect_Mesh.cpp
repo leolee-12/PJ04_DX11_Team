@@ -83,8 +83,8 @@ HRESULT CEffect_Mesh::Render()
                 return E_FAIL;
         }
 
-        const _uint iAlphaBlendPass = 1;
-        if (FAILED(m_pShaderCom->Begin(iAlphaBlendPass)))
+        Helper::IntClamp(m_iShdaerPass, ShaderPass::Default, ShaderPass::ShaderPass_End - 1);
+        if (FAILED(m_pShaderCom->Begin(m_iShdaerPass)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render(i)))

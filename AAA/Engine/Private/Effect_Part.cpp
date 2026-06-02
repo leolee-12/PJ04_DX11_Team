@@ -163,6 +163,8 @@ HRESULT CEffect_Part::Ready_Components()
 
 void CEffect_Part::Init_PropertyValue()
 {
+    m_iShdaerPass = { 0 };
+
     m_vLocalPos = { 0.f, 0.f, 0.f };
 
     m_bIsPlay = { true };
