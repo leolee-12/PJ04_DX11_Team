@@ -55,6 +55,12 @@ public:
 	const _char*			Get_ResolvedShaderName() const;
 	_uint					Get_ResolvedPassIndex() const;
 
+	void					Reset_MeshVisibility();
+	_bool					Is_MeshVisible(_uint iMesh) const;
+	void					Set_MeshVisible(_uint iMesh, _bool bVisible);
+	void					Set_AllMeshVisible(_bool bVisible);
+	void					Set_SoloMesh(_uint iMesh);
+
 	CAnimator*				Get_Animator() const { return m_pAnimatorCom; }
 	CModel*					Get_Model() const { return m_pModelCom; }
 
@@ -68,6 +74,7 @@ private:
 	PREVIEW_DESC			m_Desc{};
 	PREVIEW_SHADER_MODE		m_ePreviewShaderMode = { PREVIEW_SHADER_MODE::AUTO };
 	_int					m_iPreviewPassOverride = { -1 };	// -1 = AUTO
+	vector<_bool>			m_MeshVisible;
 
 private:
 	virtual HRESULT			Ready_Events() override { return S_OK; }

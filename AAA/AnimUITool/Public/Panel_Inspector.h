@@ -24,6 +24,7 @@ private:
 	void						Render_RenderDebug();
 	void						Render_Properties(IReflectable* pHolder);
 	void						Render_Bones();
+	void						Render_Meshs();
 
 private:
 	unordered_map<CGameObject*, _float3>	m_RotEditEuler;

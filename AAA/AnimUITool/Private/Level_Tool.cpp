@@ -83,7 +83,7 @@ HRESULT CLevel_Tool::Ready_Camera()
     desc.fNear = 0.1f;
     desc.fFar = 1000.f;
     desc.fSpeedPerSec = 20.f;                      
-    desc.fRotationPerSec = XMConvertToRadians(540.f);
+    desc.fRotationPerSec = XMConvertToRadians(360.f);
     desc.fMouseSensor = 0.05f;
 
     CGameObject* pCam = nullptr;

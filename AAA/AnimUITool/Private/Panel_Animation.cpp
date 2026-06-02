@@ -59,6 +59,8 @@ void CPanel_Animation::Render()
 
     string strName = pModel->Get_AnimationName((_uint)ctx.iClip);
 
+    ImGui::Text("Animation : %u", pModel->Get_NumAnimations());
+
     ImGui::SetNextItemWidth(260.f);
     if (ImGui::BeginCombo("Clip", strName.c_str()))
     {
@@ -177,16 +179,28 @@ void CPanel_Animation::Render_EventTimeline()
     ImGui::SameLine();
     if (ImGui::Button("Save"))
     {
-        pAnim->Sort_Track(strName);          // 진행순 정렬
-        m_iSelEvent = -1;                    // 정렬로 인덱스 무효
+        pAnim->Sort_Track(strName);
+        m_iSelEvent = -1;
+
         std::string s(m_szEventPath);
-        pAnim->Save_ToFile(std::wstring(s.begin(), s.end()));
+        std::wstring ws(s.begin(), s.end());
+
+        if (SUCCEEDED(pAnim->Save_ToFile(ws)))
+            Log_Info("Saved anim events: " + s);
+        else
+            Log_Error("Failed to save anim events: " + s);
     }
     ImGui::SameLine();
     if (ImGui::Button("Load"))
     {
         std::string s(m_szEventPath);
-        pAnim->Load_FromFile(std::wstring(s.begin(), s.end()));
+        std::wstring ws(s.begin(), s.end());
+
+        if (SUCCEEDED(pAnim->Load_FromFile(ws)))
+            Log_Info("Loaded anim events: " + s);
+        else
+            Log_Error("Failed to load anim events: " + s);
+
         m_iSelEvent = -1;
     }
     ImGui::SetNextItemWidth(-1.f);

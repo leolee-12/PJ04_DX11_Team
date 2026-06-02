@@ -32,6 +32,8 @@ void CPanel_Inspector::Render()
     Render_Transform(ctx.pActor);
     Render_Properties(ctx.pActor);
     ImGui::Separator();
+    Render_Meshs();
+    ImGui::Separator();
     Render_Bones();
 
     ImGui::End();
@@ -297,6 +299,59 @@ void CPanel_Inspector::Render_Bones()
         ImGui::Text("%u: %s", idx, pModel->Get_BoneName(idx).c_str());
         ImGui::PopStyleColor();
     }
+    ImGui::EndChild();
+}
+
+void CPanel_Inspector::Render_Meshs()
+{
+    ANIM_CONTEXT& ctx = m_pPanel_Manager->Get_Context();
+
+    CPreview_Actor* pActor = ctx.pActor;
+    CModel* pModel = ctx.pModel;
+
+    if (!pActor || !pModel)
+        return;
+
+    if (!ImGui::CollapsingHeader("Meshes", ImGuiTreeNodeFlags_DefaultOpen))
+        return;
+
+    const _uint iNumMeshes = (_uint)pModel->Get_NumMeshes();
+
+    ImGui::Text("Mesh Count: %u", iNumMeshes);
+
+    if (ImGui::Button("All On"))
+        pActor->Set_AllMeshVisible(true);
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("All Off"))
+        pActor->Set_AllMeshVisible(false);
+
+    ImGui::Separator();
+
+    ImGui::BeginChild("MeshVisibilityList", ImVec2(0, 180.f), true);
+
+    for (_uint i = 0; i < iNumMeshes; ++i)
+    {
+        ImGui::PushID((int)i);
+
+        bool bVisible = pActor->Is_MeshVisible(i);
+        if (ImGui::Checkbox("##visible", &bVisible))
+            pActor->Set_MeshVisible(i, bVisible);
+
+        ImGui::SameLine();
+
+        if (ImGui::SmallButton("Solo"))
+            pActor->Set_SoloMesh(i);
+
+        ImGui::SameLine();
+
+        const string& strMeshName = pModel->Get_MeshName(i);
+        ImGui::Text("%u: %s", i, strMeshName.c_str());
+
+        ImGui::PopID();
+    }
+
     ImGui::EndChild();
 }
 

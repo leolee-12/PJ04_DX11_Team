@@ -6,6 +6,7 @@
 #include "Animator.h"
 #include "GameContent_AnimEvents.h"
 
+
 CPreview_Actor::CPreview_Actor(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
 	, m_iAnimationIndex { 0 }
@@ -56,9 +57,12 @@ HRESULT CPreview_Actor::Render()
     const _bool bUsingAnimShader = (m_pShaderCom == m_pAnimShaderCom);
     const _uint iPass = Get_ResolvedPassIndex();
 
-    const size_t iNum = m_pModelCom->Get_NumMeshes();
-    for (size_t i = 0; i < iNum; ++i)
+    const _uint iNum = m_pModelCom->Get_NumMeshes();
+    for (_uint i = 0; i < iNum; ++i)
     {
+        if (!Is_MeshVisible((_uint)i))
+            continue;
+
         if (FAILED(Bind_MaterialOrClear("g_DiffuseTexture", (_uint)i, MTEX_TYPE::DIFFUSE)))
             return E_FAIL;
 
@@ -119,6 +123,40 @@ _uint CPreview_Actor::Get_ResolvedPassIndex() const
     return (m_Desc.eType == MODEL::ANIM) ? 1 : 0;
 }
 
+void CPreview_Actor::Reset_MeshVisibility()
+{
+    const _uint iNumMeshes = m_pModelCom ? m_pModelCom->Get_NumMeshes() : 0;
+    m_MeshVisible.assign(iNumMeshes, true);
+}
+
+_bool CPreview_Actor::Is_MeshVisible(_uint iMesh) const
+{
+    if (iMesh >= m_MeshVisible.size())
+        return true;
+
+    return m_MeshVisible[iMesh] != 0;
+}
+
+void CPreview_Actor::Set_MeshVisible(_uint iMesh, _bool bVisible)
+{
+    if (iMesh >= m_MeshVisible.size())
+        return;
+
+    m_MeshVisible[iMesh] = bVisible ? 1 : 0;
+}
+
+void CPreview_Actor::Set_AllMeshVisible(_bool bVisible)
+{
+    for (size_t i = 0; i < m_MeshVisible.size(); ++i)
+        m_MeshVisible[i] = bVisible;
+}
+
+void CPreview_Actor::Set_SoloMesh(_uint iMesh) 
+{
+    for (size_t i = 0; i < m_MeshVisible.size(); ++i)
+        m_MeshVisible[i] = (i == iMesh);
+}
+
 HRESULT CPreview_Actor::Ready_Components()
 {
     m_pAnimShaderCom = Add_Component<CShader>(
@@ -149,6 +187,8 @@ HRESULT CPreview_Actor::Ready_Components()
     if (nullptr == m_pModelCom)
         return E_FAIL;
 
+    Reset_MeshVisibility();
+
     if (m_Desc.eType == MODEL::ANIM)
     {
         CAnimator::ANIMATOR_DESC AnimDesc{};
@@ -163,26 +203,37 @@ HRESULT CPreview_Actor::Ready_Components()
             return E_FAIL;
     }
 
-    m_pAnimatorCom->Set_EventCallback(
-        [this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase)
-        {
-            switch (static_cast<EANIM_EVENT>(e.iEventType))
+    if (m_pAnimatorCom)
+    {
+        m_pAnimatorCom->Set_EventCallback(
+            [this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase)
             {
-            case EANIM_EVENT::Fx:
-                if (phase == ANIM_EVENT_PHASE::POINT)
+                const _char* szPhase = "";
+
+                switch (static_cast<EANIM_EVENT>(e.iEventType))
                 {
-                    int TestBreak = 10;
+                case EANIM_EVENT::Fx:
+                    if (phase == ANIM_EVENT_PHASE::POINT)
+                    {
+                        szPhase = "POINT";
+                    }
+                    break;
+                case EANIM_EVENT::Hitbox:
+                    if (phase == ANIM_EVENT_PHASE::BEGIN)
+                        szPhase = "BEGIN";
+                    if (phase == ANIM_EVENT_PHASE::END)
+                        szPhase = "END";
+                    break;
+                default:
+                    break;
                 }
-                break;
-            case EANIM_EVENT::Hitbox:
-                if (phase == ANIM_EVENT_PHASE::BEGIN)
-                    int TestBreak = 10;
-                if (phase == ANIM_EVENT_PHASE::END)
-                    int TestBreak = 10;
-                break;
-            default: break;
-            }
-        });
+
+                Log_Info("AnimEvent Fired : type=" +
+                    to_string(e.iEventType) +
+                    ", phase=" +
+                    szPhase);
+            });
+    }
 
     return S_OK;
 }
