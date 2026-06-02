@@ -45,7 +45,7 @@ private:
 
 	ID3D11DepthStencilView* m_pMaxDSV = { nullptr };
 
-	_float					m_fThreshold = { 1.f };
+	_float					m_fThreshold = { 1.0f };
 	_float					m_fBloomIntensity = { 1.f };
 
 #ifdef _DEBUG

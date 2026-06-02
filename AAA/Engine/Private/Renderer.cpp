@@ -129,9 +129,12 @@ HRESULT CRenderer::Draw()
         return E_FAIL;
     if (FAILED(Render_Combined()))
         return E_FAIL;
-    if (FAILED(Render_NonLight()))
+    if (FAILED(Render_Bloom()))
         return E_FAIL;
 
+    
+    if (FAILED(Render_NonLight()))
+        return E_FAIL;
     if (FAILED(Render_Blend()))
         return E_FAIL;
 
@@ -318,13 +321,18 @@ HRESULT CRenderer::Render_Bloom()
 
     _float2 vTexel = { 1.f / (iWidth / 2), 1.f / (iHeight / 2) };
 
+    const _uint iHalfW = iWidth / 2;
+    const _uint iHalfH = iHeight / 2;
+
+    Change_ViewportDesc(iHalfW, iHalfH);
+
     if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_BloomA"))))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene"), m_pShader, "g_SceneTexture")))
         return E_FAIL;
     if (FAILED(m_pShader->Bind_RawValue("g_fThreshold", &m_fThreshold, sizeof(_float))))
         return E_FAIL;
-    if (FAILED(m_pShader->Begin(0)))
+    if (FAILED(m_pShader->Begin(ETOUI(DEFERRED::BRIGHT))))
         return E_FAIL;
     if (FAILED(m_pVIBuffer->Bind_Resources()))
         return E_FAIL;
@@ -342,7 +350,7 @@ HRESULT CRenderer::Render_Bloom()
         return E_FAIL;
     if (FAILED(m_pShader->Bind_RawValue("g_vTexelSize", &vTexel, sizeof(_float2))))
         return E_FAIL;
-    if (FAILED(m_pShader->Begin(1)))
+    if (FAILED(m_pShader->Begin(ETOUI(DEFERRED::BLUR))))
         return E_FAIL;
     if (FAILED(m_pVIBuffer->Bind_Resources()))
         return E_FAIL;
@@ -358,7 +366,7 @@ HRESULT CRenderer::Render_Bloom()
     _float2 dirV = { 0, 1 };
     if (FAILED(m_pShader->Bind_RawValue("g_vBlurDir", &dirV, sizeof(_float2))))
         return E_FAIL;
-    if (FAILED(m_pShader->Begin(1)))
+    if (FAILED(m_pShader->Begin(ETOUI(DEFERRED::BRIGHT))))
         return E_FAIL;
     if (FAILED(m_pVIBuffer->Bind_Resources()))
         return E_FAIL;
@@ -367,13 +375,15 @@ HRESULT CRenderer::Render_Bloom()
     if (FAILED(m_pGameInstance_Proxy->End_MRT()))
         return E_FAIL;
 
+    Change_ViewportDesc((_uint)m_pGameInstance_Proxy->Get_WindowWidth(), (_uint)m_pGameInstance_Proxy->Get_WindowHeight());
+
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene"), m_pShader, "g_SceneTexture")))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_BloomA"), m_pShader, "g_BloomTexture")))
         return E_FAIL;
     if (FAILED(m_pShader->Bind_RawValue("g_fBloomIntensity", &m_fBloomIntensity, sizeof(_float))))
         return E_FAIL;
-    if (FAILED(m_pShader->Begin(2)))
+    if (FAILED(m_pShader->Begin(ETOUI(DEFERRED::COMPSITE))))
         return E_FAIL;
     if (FAILED(m_pVIBuffer->Bind_Resources()))
         return E_FAIL;
