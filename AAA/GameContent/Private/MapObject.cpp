@@ -100,6 +100,11 @@ _bool CMapObject::Is_OverlayMesh(_uint iMesh) const
     return m_pModelCom->Get_MeshName(iMesh).find("Parts") != string::npos;
 }
 
+HRESULT CMapObject::Bind_WorldMatrix()
+{
+    return m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix");
+}
+
 HRESULT CMapObject::Ready_MapComponents()
 {
     m_pShaderCom = Add_Component<CShader>(Shader_Map.iLevelID, Shader_Map.szProtoTag, TEXT("Com_Shader"));
@@ -115,7 +120,7 @@ HRESULT CMapObject::Ready_MapComponents()
 
 HRESULT CMapObject::Bind_ShaderResources()
 {
-    if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+    if (FAILED(Bind_WorldMatrix()))
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
         return E_FAIL;

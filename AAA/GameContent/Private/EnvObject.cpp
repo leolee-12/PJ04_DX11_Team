@@ -1,6 +1,7 @@
 #include "EnvObject.h"
 
-#include "CullingContext.h"
+#include <cmath>
+
 #include "GameContent_const.h"
 #include "GameInstance_Proxy.h"
 #include "Model.h"
@@ -19,6 +20,40 @@ namespace
 		return XMMatrixScalingFromVector(vScale)
 			* XMMatrixRotationQuaternion(vRotation)
 			* XMMatrixTranslationFromVector(vPosition);
+	}
+
+	BoundingBox Make_DefaultAABB()
+	{
+		BoundingBox Bounds{};
+		Bounds.Center = _float3(0.f, 0.f, 0.f);
+		Bounds.Extents = _float3(0.5f, 0.5f, 0.5f);
+		return Bounds;
+	}
+
+	_bool Is_FiniteFloat(_float fValue)
+	{
+		return std::isfinite(fValue);
+	}
+
+	_bool Is_ValidAABB(const _float3& vMin, const _float3& vMax)
+	{
+		return Is_FiniteFloat(vMin.x) && Is_FiniteFloat(vMin.y) && Is_FiniteFloat(vMin.z)
+			&& Is_FiniteFloat(vMax.x) && Is_FiniteFloat(vMax.y) && Is_FiniteFloat(vMax.z)
+			&& vMax.x >= vMin.x && vMax.y >= vMin.y && vMax.z >= vMin.z;
+	}
+
+	BoundingBox Make_AABB_FromMinMax(const _float3& vMin, const _float3& vMax)
+	{
+		BoundingBox Bounds{};
+		Bounds.Center = _float3(
+			(vMin.x + vMax.x) * 0.5f,
+			(vMin.y + vMax.y) * 0.5f,
+			(vMin.z + vMax.z) * 0.5f);
+		Bounds.Extents = _float3(
+			(vMax.x - vMin.x) * 0.5f,
+			(vMax.y - vMin.y) * 0.5f,
+			(vMax.z - vMin.z) * 0.5f);
+		return Bounds;
 	}
 }
 
@@ -141,20 +176,20 @@ void CEnvObject::Update_LocalBounds()
 {
 	if (nullptr == m_pModelCom)
 	{
-		m_LocalBounds = ::MapTool::CCullingContext::Make_DefaultAABB();
+		m_LocalBounds = Make_DefaultAABB();
 		return;
 	}
 
 	_float3 vMin{}, vMax{};
 	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
 
-	if (!::MapTool::CCullingContext::Is_ValidAABB(vMin, vMax))
+	if (!Is_ValidAABB(vMin, vMax))
 	{
-		m_LocalBounds = ::MapTool::CCullingContext::Make_DefaultAABB();
+		m_LocalBounds = Make_DefaultAABB();
 		return;
 	}
 
-	m_LocalBounds = ::MapTool::CCullingContext::Make_AABB_FromMinMax(vMin, vMax);
+	m_LocalBounds = Make_AABB_FromMinMax(vMin, vMax);
 }
 
 void CEnvObject::Refresh_WorldBounds()
@@ -162,28 +197,13 @@ void CEnvObject::Refresh_WorldBounds()
 	if (nullptr == m_pTransformCom)
 		return;
 
-	::MapTool::CCullingContext::Transform_AABB(
-		m_LocalBounds,
-		XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()),
-		&m_WorldBounds);
+	m_LocalBounds.Transform(m_WorldBounds, XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 }
 
 _bool CEnvObject::Is_VisibleInCurrentView() const
 {
-	if (!m_bEnableCulling || nullptr == m_pGameInstance_Proxy)
-		return true;
-
-	::MapTool::CCullingContext* pContext = ::MapTool::CCullingContext::Create();
-	if (nullptr == pContext)
-		return true;
-
-	pContext->Update_FromViewProj(
-		m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType),
-		m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType));
-
-	const _bool bVisible = !pContext->Should_CullAABB(true, m_WorldBounds);
-	Safe_Release(pContext);
-	return bVisible;
+	// Culling will be re-enabled after the engine-side API migration lands.
+	return true;
 }
 
 void CEnvObject::Apply_TransformFromDesc()

@@ -5,12 +5,12 @@
 #include <filesystem>
 #include <unordered_set>
 
+#include "DataLoader.h"
 #include "EnvObject_Effect.h"
 #include "EnvObject_Interact.h"
 #include "EnvObject_Static.h"
-#include "DataLoader.h"
+#include "GameContent_Log.h"
 #include "GameInstance_Proxy.h"
-#include "MapTool_Func.h"
 #include "Model.h"
 #include "YshModelValidator.h"
 
@@ -23,8 +23,9 @@ namespace
 	constexpr wchar_t kLayerEnvStatic[] = L"Layer_EnvStatic";
 	constexpr wchar_t kLayerEnvInteract[] = L"Layer_EnvInteract";
 	constexpr wchar_t kLayerEnvEffect[] = L"Layer_EnvEffect";
-	constexpr wchar_t kPrimaryModelRoot[] = L"../../Resources/Maps";
-	constexpr wchar_t kFallbackModelRoot[] = L"../../Resources/Models/Test";
+	constexpr wchar_t kEnvModelRoot[] = L"../../Resources/Map/Motif";
+	constexpr wchar_t kEnvDecorJsonPath[] = L"../../Resources/Map/Decor_Decor.json";
+	constexpr _bool kEnableYshPrevalidation = false;	// ysh  유효성 검증 Toggle
 
 	struct ENV_MODEL_CACHE_ENTRY
 	{
@@ -76,6 +77,66 @@ namespace
 		}
 	}
 
+	wstring To_LowerCopy(wstring strValue)
+	{
+		for (wchar_t& ch : strValue)
+			ch = static_cast<wchar_t>(towlower(ch));
+
+		return strValue;
+	}
+
+	const json* Find_JsonValue(const json& jSource, const string& strPath);
+
+	_bool Try_Build_EnvObjectAllowSet(unordered_set<wstring>* pOutAllowSet)
+	{
+		if (nullptr == pOutAllowSet)
+			return false;
+
+		string strContent;
+		if (FAILED(CDataLoader::Read_Json(kEnvDecorJsonPath, &strContent)))
+			return false;
+
+		json jRoot;
+		try
+		{
+			jRoot = json::parse(strContent);
+		}
+		catch (const std::exception&)
+		{
+			return false;
+		}
+
+		const json* pData = Find_JsonValue(jRoot, "data");
+		if (nullptr == pData || !pData->is_object())
+			return false;
+
+		for (auto ItSection = pData->begin(); ItSection != pData->end(); ++ItSection)
+		{
+			if (!ItSection.value().is_object())
+				continue;
+
+			for (auto ItEntry = ItSection.value().begin(); ItEntry != ItSection.value().end(); ++ItEntry)
+			{
+				if (!ItEntry.value().is_object())
+					continue;
+
+				const json* pObjectName = Find_JsonValue(ItEntry.value(), "Basic.ObjectName");
+				if (nullptr == pObjectName || !pObjectName->is_string())
+					continue;
+
+				wstring strObjectName = StrToWstr(pObjectName->get<string>());
+				if (strObjectName.empty())
+					continue;
+
+				pOutAllowSet->insert(To_LowerCopy(strObjectName));
+				if (strObjectName.size() > 1 && L'L' == strObjectName.back())
+					pOutAllowSet->insert(To_LowerCopy(strObjectName.substr(0, strObjectName.size() - 1)));
+			}
+		}
+
+		return !pOutAllowSet->empty();
+	}
+
 	wstring Make_ModelProtoTag(const path& Root, const path& FilePath)
 	{
 		error_code ErrorCode;
@@ -91,13 +152,16 @@ namespace
 
 	_bool IsValidEnvModelFile(const path& FilePath)
 	{
+		if (!kEnableYshPrevalidation)
+			return true;
+
 		wstring strReason;
-		if (!MapTool::YshModelValidator::Validate_NonAnimYsh(FilePath, &strReason))
+		if (!YshModelValidator::Validate_NonAnimYsh(FilePath, &strReason))
 		{
 			const wstring strPath = FilePath.wstring();
 			if (Get_RejectedModelLogSet().insert(strPath).second)
 			{
-				MapTool::Log_Warning(
+				Log_GameContentWarning(
 					"EnvObject ignored invalid non-anim ysh: " + WstrToStr(strPath)
 					+ " reason=" + WstrToStr(strReason));
 			}
@@ -263,7 +327,7 @@ namespace
 		return true;
 	}
 
-	void Index_ModelRoot(const path& Root)
+	void Index_ModelRoot(const path& Root, const unordered_set<wstring>& AllowSet)
 	{
 		error_code ErrorCode;
 		for (recursive_directory_iterator Iter(Root, directory_options::skip_permission_denied, ErrorCode), End;
@@ -283,7 +347,10 @@ namespace
 			if (!IsValidEnvModelFile(FilePath))
 				continue;
 
-			const wstring strStem = FilePath.stem().wstring();
+			const wstring strStem = To_LowerCopy(FilePath.stem().wstring());
+			if (AllowSet.find(strStem) == AllowSet.end())
+				continue;
+
 			if (Get_ModelPathCache().find(strStem) != Get_ModelPathCache().end())
 				continue;
 
@@ -301,21 +368,22 @@ namespace
 
 		Get_ModelPathCacheBuilt() = true;
 
-		auto IndexIfExists = [](_In_z_ const wchar_t* pRootPath) -> _bool
+		error_code ErrorCode;
+		const path Root = weakly_canonical(path(kEnvModelRoot), ErrorCode);
+		if (ErrorCode || !exists(Root))
 		{
-			error_code ErrorCode;
-			const path Root = weakly_canonical(path(pRootPath), ErrorCode);
-			if (ErrorCode || !exists(Root))
-				return false;
+			Log_GameContentWarning("EnvObject model root missing: ../../Resources/Map/Motif");
+			return;
+		}
 
-			Index_ModelRoot(Root);
-			return true;
-		};
+		unordered_set<wstring> AllowSet;
+		if (!Try_Build_EnvObjectAllowSet(&AllowSet))
+		{
+			Log_GameContentWarning("EnvObject allowlist build failed: ../../Resources/Map/Decor_Decor.json");
+			return;
+		}
 
-		const _bool bIndexedPrimary = IndexIfExists(kPrimaryModelRoot);
-		const _bool bIndexedFallback = IndexIfExists(kFallbackModelRoot);
-		if (!bIndexedPrimary && !bIndexedFallback)
-			MapTool::Log_Warning("EnvObject model roots missing: ../../Resources/Maps and ../../Resources/Models/Test");
+		Index_ModelRoot(Root, AllowSet);
 	}
 
 	ENV_SOURCE_TYPE Classify_SourceType(const wstring& strSourceFile)
@@ -384,7 +452,7 @@ namespace
 
 		auto ResolveByKey = [&](const wstring& strLookupKey) -> _bool
 		{
-			const auto Iter = Get_ModelPathCache().find(strLookupKey);
+			const auto Iter = Get_ModelPathCache().find(To_LowerCopy(strLookupKey));
 			if (Iter == Get_ModelPathCache().end())
 				return false;
 
@@ -403,7 +471,7 @@ namespace
 			{
 				if (Get_TrimmedResolveLogSet().insert(pDesc->strObjectName).second)
 				{
-					MapTool::Log_Info(
+					Log_GameContentInfo(
 						"EnvObject trimmed model match: object=" + WstrToStr(pDesc->strObjectName)
 						+ " model=" + WstrToStr(strTrimmedName)
 						+ " path=" + WstrToStr(pDesc->strModelPath));
@@ -435,11 +503,11 @@ namespace
 		CModel* pModelPrototype = nullptr;
 		try
 		{
-			pModelPrototype = CModel::Create(pDevice, pContext, MODEL::MAP, strModelPath.c_str());
+			pModelPrototype = CModel::Create(pDevice, pContext, MODEL::NONANIM, strModelPath.c_str());
 		}
 		catch (const std::exception& e)
 		{
-			MapTool::Log_Warning(
+			Log_GameContentWarning(
 				"EnvObject model creation exception: object=" + WstrToStr(Desc.strObjectName)
 				+ " path=" + strModelPath
 				+ " reason=" + e.what());
@@ -500,7 +568,6 @@ namespace
 		Desc.strSection = strSection;
 		Desc.strEntryKey = strEntryKey;
 		Desc.eSourceType = Classify_SourceType(strSourceFile);
-		Desc.iModelProtoLevel = ETOUI(TOOL_LEVEL::EDIT);
 		return Desc;
 	}
 
@@ -667,7 +734,7 @@ HRESULT CEnvObjectLoader::Build_Descriptors_FromJsonFile(const wstring& strJsonP
 	}
 	catch (const std::exception& e)
 	{
-		MapTool::Log_Warning(
+		Log_GameContentWarning(
 			"EnvObject json parse failed: " + WstrToStr(strJsonPath)
 			+ " reason=" + e.what());
 		return E_FAIL;
@@ -710,12 +777,14 @@ HRESULT CEnvObjectLoader::Load_FromJsonFile(
 
 	for (ENV_OBJECT_DESC& Desc : Descs)
 	{
+		Desc.iModelProtoLevel = iObjectLevel;
+
 		if ((ENV_OBJECT_KIND::STATIC == Desc.eKind || ENV_OBJECT_KIND::INTERACT == Desc.eKind)
 			&& Desc.strModelProtoTag.empty())
 		{
 			auto& MissingSet = Get_MissingModelLogSet();
 			if (MissingSet.insert(Desc.strObjectName).second)
-				MapTool::Log_Warning("EnvObject model missing: " + WstrToStr(Desc.strObjectName));
+				Log_GameContentWarning("EnvObject model missing: " + WstrToStr(Desc.strObjectName));
 
 			++iSkippedMissingModel;
 			continue;
@@ -724,7 +793,7 @@ HRESULT CEnvObjectLoader::Load_FromJsonFile(
 		if (FAILED(Ensure_ModelPrototype(pProxy, pDevice, pContext, Desc.iModelProtoLevel, Desc))
 			&& !Desc.strModelProtoTag.empty())
 		{
-			MapTool::Log_Warning("EnvObject model prototype creation failed: " + WstrToStr(Desc.strObjectName));
+			Log_GameContentWarning("EnvObject model prototype creation failed: " + WstrToStr(Desc.strObjectName));
 			++iSkippedMissingModel;
 			continue;
 		}
@@ -747,7 +816,7 @@ HRESULT CEnvObjectLoader::Load_FromJsonFile(
 		++iCreatedCount;
 	}
 
-	MapTool::Log_Info(
+	Log_GameContentInfo(
 		"EnvObject load complete: " + WstrToStr(strJsonPath)
 		+ " created=" + to_string(iCreatedCount)
 		+ " skipped_missing_model=" + to_string(iSkippedMissingModel));

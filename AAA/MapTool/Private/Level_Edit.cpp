@@ -3,6 +3,7 @@
 #include "EditCamera.h"
 #include "Edit_Grid.h"
 #include "EnvObjectLoader.h"
+#include "GameContent_Log.h"
 #include "MapStage.h"
 #ifdef _DEBUG
 #include "MapToolProfiler.h"
@@ -17,6 +18,30 @@
 #include "DataExporter.h"
 #include "DataLoader.h"
 //#include "NavMesh_Editor.h"
+
+namespace
+{
+	void Forward_GameContentLog(Client::GAMECONTENT_LOG_LEVEL eLevel, const char* pMessage)
+	{
+		const string strMessage = (nullptr != pMessage) ? pMessage : "";
+
+		switch (eLevel)
+		{
+		case Client::GAMECONTENT_LOG_LEVEL::INFO:
+			MapTool::Log_Info(strMessage);
+			break;
+		case Client::GAMECONTENT_LOG_LEVEL::WARNING:
+			MapTool::Log_Warning(strMessage);
+			break;
+		case Client::GAMECONTENT_LOG_LEVEL::ERROR_:
+			MapTool::Log_Error(strMessage);
+			break;
+		default:
+			MapTool::Log_Info(strMessage);
+			break;
+		}
+	}
+}
 
 #include <algorithm>
 #include <filesystem>
@@ -136,8 +161,8 @@ HRESULT CLevel_Edit::Initialize()
 	if (FAILED(Ready_EditGrid()))
 		return E_FAIL;
 
-	//if (FAILED(Ready_MapStage()))
-	//	return E_FAIL;
+	if (FAILED(Ready_MapStage()))
+		return E_FAIL;
 
 	if (FAILED(Ready_EnvObjects()))
 		return E_FAIL;
@@ -217,6 +242,8 @@ void CLevel_Edit::Save_Level(const wstring& strFilePath, const wstring& strLevel
 {
 	json jLevel;
 	jLevel["Level_Tag"] = WstrToStr(strLevelTag);
+	if (nullptr != m_pMapStage)
+		jLevel["MapStage"] = m_pMapStage->Serialize();
 
 	json jObjects = json::array();
 
@@ -224,6 +251,9 @@ void CLevel_Edit::Save_Level(const wstring& strFilePath, const wstring& strLevel
 	{
 		for (auto& handle : Objects)
 		{
+			if (handle.pObject == m_pMapStage)
+				continue;
+
 			json jObj = handle.pObject->Serialize();
 
 			jObj["Object_Tag"] = WstrToStr(handle.strName);
@@ -272,11 +302,17 @@ void CLevel_Edit::Load_Level(const wstring& strFilePath)
 	{
 		json jLevel = json::parse(strContent);
 
+		if (nullptr != m_pMapStage && jLevel.contains("MapStage"))
+			m_pMapStage->Deserialize(jLevel["MapStage"]);
+
 		for (auto& jObj : jLevel["Objects"])
 		{
 			string strProto = jObj["Prototype_Tag"].get<string>();
 			string strLayer = jObj["Layer_Tag"].get<string>();
 			string strName = jObj["Object_Tag"].get<string>();
+
+			if (0 == _wcsicmp(StrToWstr(strProto).c_str(), Client::CMapStage::PROTOTYPE_TAG))
+				continue;
 
 			wstring wProto = StrToWstr(strProto);
 			wstring wLayer = StrToWstr(strLayer);
@@ -634,6 +670,12 @@ HRESULT CLevel_Edit::Ready_MapStage()
 	if (nullptr == m_pMapStage)
 		return E_FAIL;
 
+	Add_Layer(L"Layer_MapStage");
+	m_Layers[L"Layer_MapStage"].push_back({
+		Client::CMapStage::PROTOTYPE_TAG,
+		L"MapStage",
+		m_pMapStage });
+
 #ifdef _DEBUG
 	CMapToolProfiler::GetInstance()->Set_Stage(m_pMapStage);
 #endif
@@ -644,6 +686,7 @@ HRESULT CLevel_Edit::Ready_MapStage()
 HRESULT CLevel_Edit::Ready_EnvObjects()
  {
 	const _uint iEditLevel = ETOUI(TOOL_LEVEL::EDIT);
+	Client::Set_GameContentLogSink(&Forward_GameContentLog);
 	static const wchar_t* kEnvJsonPaths[] =
 	{
 		L"../../Resources/Map/Decor_Decor.json",

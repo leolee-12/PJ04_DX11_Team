@@ -45,10 +45,7 @@ void CEnvObject_Interact::Late_Update(_float fTimeDelta)
 		return;
 
 	Refresh_WorldBounds();
-	m_bVisible = Is_VisibleInCurrentView();
-	if (!m_bVisible)
-		return;
-
+	m_bVisible = true;
 	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 

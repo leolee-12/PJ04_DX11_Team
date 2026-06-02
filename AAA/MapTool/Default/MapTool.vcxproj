@@ -21,17 +21,10 @@
   <ItemGroup>
     <ClCompile Include="..\Private\CullingContext.cpp" />
     <ClCompile Include="..\Private\EditInstance.cpp" />
-    <ClCompile Include="..\Private\EnvObject.cpp" />
-    <ClCompile Include="..\Private\EnvObject_Effect.cpp" />
-    <ClCompile Include="..\Private\EnvObject_Interact.cpp" />
-    <ClCompile Include="..\Private\EnvObject_Static.cpp" />
-    <ClCompile Include="..\Private\EnvObjectLoader.cpp" />
     <ClCompile Include="..\Private\ImGui_Manager.cpp" />
     <ClCompile Include="..\Private\Level_Edit.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
-    <ClCompile Include="..\Private\MapSection.cpp" />
-    <ClCompile Include="..\Private\MapStage.cpp" />
     <ClCompile Include="..\Private\MapToolProfiler.cpp" />
     <ClCompile Include="..\Private\Panel_Profiler.cpp" />
     <ClCompile Include="..\Private\ToolApp.cpp" />
@@ -203,7 +196,7 @@
       <AdditionalDependencies>Engine.lib;GameContent.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>cd /d $(SolutionDir)&amp;&amp;call UpdateLib.bat</Command>
+      <Command>cd /d "$(ProjectDir)..\..\" &amp;&amp; call "UpdateLib.bat"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

@@ -1,40 +1,8 @@
-﻿#include "MapStage.h"
+#include "MapStage.h"
 
-#ifdef _DEBUG
-#include <Windows.h>
-#endif
-
-#include "CullingContext.h"
 #include "GameInstance_Proxy.h"
 
 NS_BEGIN(Client)
-
-#ifdef _DEBUG
-namespace
-{
-	double Now_PerfCounter()
-	{
-		LARGE_INTEGER counter{};
-		QueryPerformanceCounter(&counter);
-		return static_cast<double>(counter.QuadPart);
-	}
-
-	double PerfCounter_ToMs(double dStart, double dEnd)
-	{
-		static const double dFrequency = []() -> double
-			{
-				LARGE_INTEGER freq{};
-				QueryPerformanceFrequency(&freq);
-				return static_cast<double>(freq.QuadPart);
-			}();
-
-		if (0.0 == dFrequency)
-			return 0.0;
-
-		return (dEnd - dStart) * 1000.0 / dFrequency;
-	}
-}
-#endif
 
 CMapStage::CMapStage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject { pDevice, pContext }
@@ -66,31 +34,21 @@ HRESULT CMapStage::Initialize(void* pArg)
 	m_strStageName = pDesc->strStageName;
 	m_iSectionProtoLevel = pDesc->iSectionProtoLevel;
 
-	if (nullptr == m_pMainViewCullingContext)
-	{
-		m_pMainViewCullingContext = ::MapTool::CCullingContext::Create();
-		if (nullptr == m_pMainViewCullingContext)
-			return E_FAIL;
-	}
-
 	if (FAILED(Ready_Sections(pDesc)))
 		return E_FAIL;
 
+	Refresh_SectionTransforms();
 	return S_OK;
 }
 
 void CMapStage::Late_Update(_float fTimeDelta)
 {
-#ifdef _DEBUG
-	const double dStart = Now_PerfCounter();
+	UNREFERENCED_PARAMETER(fTimeDelta);
 
-	Reset_ProfileFrame();
-#endif
+	// Stage profiling is temporarily disabled during migration.
+	// Reset_ProfileFrame();
+	Refresh_SectionTransforms();
 	Submit_VisibleSections();
-
-#ifdef _DEBUG
-	m_Profile.dStageLateUpdateCpuMs = PerfCounter_ToMs(dStart, Now_PerfCounter());
-#endif
 }
 
 CGameObject* CMapStage::Clone(void* pArg)
@@ -134,10 +92,23 @@ HRESULT CMapStage::Ready_Sections(const MAP_STAGE_DESC* pDesc)
 			return E_FAIL;
 		}
 
+		pSection->Set_ParentMatrix(m_pTransformCom->Get_WorldMatrixPtr());
+		pSection->Refresh_CombinedWorldMatrix();
 		m_Sections.push_back(pSection);
 	}
 
 	return S_OK;
+}
+
+void CMapStage::Refresh_SectionTransforms() const
+{
+	for (CMapSection* pSection : m_Sections)
+	{
+		if (nullptr == pSection)
+			continue;
+
+		pSection->Refresh_CombinedWorldMatrix();
+	}
 }
 
 #ifdef _DEBUG
@@ -158,63 +129,36 @@ void CMapStage::Reset_ProfileFrame()
 
 void CMapStage::Submit_VisibleSections()
 {
-#ifdef _DEBUG
-	const double dStart = Now_PerfCounter();
-#endif
-
-	const _float4x4* pViewMatrix = m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC);
-	const _float4x4* pProjMatrix = m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
-	const _bool bHasFrustum = (nullptr != m_pMainViewCullingContext) ?
-		m_pMainViewCullingContext->Update_FromViewProj(pViewMatrix, pProjMatrix) :
-		false;
+	// Frustum culling is temporarily disabled during migration.
+	// The stage still submits sections exactly once, preserving MapTool behavior.
+	//
+	// const _float4x4* pViewMatrix = m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC);
+	// const _float4x4* pProjMatrix = m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
+	// const _bool bHasFrustum = (nullptr != m_pMainViewCullingContext) ?
+	// 	m_pMainViewCullingContext->Update_FromViewProj(pViewMatrix, pProjMatrix) :
+	// 	false;
 
 	for (CMapSection* pSection : m_Sections)
 	{
 		if (nullptr == pSection)
 			continue;
 
-#ifdef _DEBUG
-		const MAP_SECTION_TYPE eType = pSection->Get_SectionType();
-		const _uint iTypeIndex = static_cast<_uint>(eType);
-		if (iTypeIndex < MAP_SECTION_TYPE_COUNT)
-			++m_Profile.iSectionTypeCount[iTypeIndex];
-#endif
-
-		if (bHasFrustum &&
-			nullptr != m_pMainViewCullingContext &&
-			m_pMainViewCullingContext->Should_CullAABB(pSection->Is_Culling(), pSection->Get_WorldBounds()))
-		{
-#ifdef _DEBUG
-			++m_Profile.iCulledSections;
-#endif
-			continue;
-		}
-
-#ifdef _DEBUG
-		++m_Profile.iVisibleSections;
-#endif
+		// if (bHasFrustum &&
+		// 	nullptr != m_pMainViewCullingContext &&
+		// 	m_pMainViewCullingContext->Should_CullAABB(pSection->Is_Culling(), pSection->Get_WorldBounds()))
+		// {
+		// 	continue;
+		// }
 
 		if (!pSection->Is_Renderable())
 			continue;
 
 		const RENDERID eRenderID = pSection->Get_RenderID();
 		m_pGameInstance_Proxy->Add_RenderGroup(eRenderID, pSection);
-#ifdef _DEBUG
-		Count_Submitted(eRenderID);
-#endif
 
 		if (pSection->Is_ShadowCaster())
-		{
 			m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pSection);
-#ifdef _DEBUG
-			Count_Submitted(RENDERID::SHADOW);
-#endif
-		}
 	}
-
-#ifdef _DEBUG
-	m_Profile.dCullingCpuMs = PerfCounter_ToMs(dStart, Now_PerfCounter());
-#endif
 }
 
 #ifdef _DEBUG
@@ -255,8 +199,6 @@ void CMapStage::Free()
 	for (CMapSection*& pSection : m_Sections)
 		Safe_Release(pSection);
 	m_Sections.clear();
-
-	Safe_Release(m_pMainViewCullingContext);
 
 	__super::Free();
 }
