@@ -6,6 +6,12 @@
 #include "Panel_Viewport.h"
 #include "Panel_Inspector.h"
 #include "Panel_Console.h"
+#include "Panel_Animation.h"
+#include "Preview_Actor.h"
+#include "Panel_Browser.h"
+#include <filesystem>
+
+#include "Level_Tool.h"
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -30,6 +36,13 @@ HRESULT CPanel_Manager::Initialize()
 
     if (FAILED(Add_Panel(L"Console", CPanel_Console::Create(m_pDevice, m_pContext))))
         return E_FAIL;
+
+    if (FAILED(Add_Panel(L"Animation", CPanel_Animation::Create(m_pDevice, m_pContext))))
+        return E_FAIL;
+
+    if (FAILED(Add_Panel(L"Browser", CPanel_Browser::Create(m_pDevice, m_pContext))))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -86,6 +99,40 @@ void CPanel_Manager::Clear_Selected()
     m_pSelected = nullptr;
 }
 
+void CPanel_Manager::Bind_Preview(CPreview_Actor* pActor)
+{
+    m_Context.pActor = pActor;
+    m_Context.pModel = pActor ? pActor->Get_Model() : nullptr;
+    m_Context.pAnimator = pActor ? pActor->Get_Animator() : nullptr;
+    m_Context.iClip = 0; m_Context.fProgress = 0.f; m_Context.iRootBone = -1;
+    if (!pActor) 
+    {
+        m_Context.strName.clear();
+        m_Context.strModelPath.clear();
+    }
+    Set_Selected(pActor);
+}
+
+void CPanel_Manager::Load_Preview(const std::wstring& strYshPath)
+{
+    if (!m_pLevel) 
+        return;
+    CGameObject* p = m_pLevel->Load_Preview(strYshPath);
+    Bind_Preview(dynamic_cast<CPreview_Actor*>(p));
+    if (p)
+    {
+        m_Context.strName = filesystem::path(strYshPath).stem().wstring();
+        m_Context.strModelPath = strYshPath;
+    }
+}
+
+void CPanel_Manager::Clear_Preview()
+{
+    if (m_pLevel) 
+        m_pLevel->Clear_Preview();
+    Bind_Preview(nullptr);
+}
+
 void CPanel_Manager::Render_DockSpace()
 {
     ImGuiViewport* vp = ImGui::GetMainViewport();
@@ -112,15 +159,16 @@ void CPanel_Manager::Render_DockSpace()
         ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
         ImGui::DockBuilderSetNodeSize(dockspace_id, vp->WorkSize);
 
-        ImGuiID left, center, right, bottom;
-        ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.18f, &left, &center);
-        ImGui::DockBuilderSplitNode(center, ImGuiDir_Right, 0.22f, &right, &center);
-        ImGui::DockBuilderSplitNode(center, ImGuiDir_Down, 0.25f, &bottom, &center);
+        ImGuiID center = dockspace_id, left, bottom;
+        ImGui::DockBuilderSplitNode(center, ImGuiDir_Down, 0.30f, &bottom, &center); 
+        ImGui::DockBuilderSplitNode(center, ImGuiDir_Left, 0.24f, &left, &center); 
 
+        ImGui::DockBuilderDockWindow("Inspector", left);
         ImGui::DockBuilderDockWindow("Hierarchy", left);
+        ImGui::DockBuilderDockWindow("Console", left);
         ImGui::DockBuilderDockWindow("Viewport", center);
-        ImGui::DockBuilderDockWindow("Inspector", right);
-        ImGui::DockBuilderDockWindow("Console", bottom);
+        ImGui::DockBuilderDockWindow("Animation", bottom);
+        ImGui::DockBuilderDockWindow("Browser", bottom);
         ImGui::DockBuilderFinish(dockspace_id);
     }
 

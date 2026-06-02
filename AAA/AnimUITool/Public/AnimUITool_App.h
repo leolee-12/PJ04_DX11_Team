@@ -23,6 +23,8 @@ public:
 	void						Update(_float fTimeDelta);
 	HRESULT						Render();
 
+	void						OnResize(_uint iWidth, _uint iHeight);
+
 private:
 	CGameInstance_Proxy*		m_pGameInstance_Proxy = { nullptr };
 	ID3D11Device*				m_pDevice = { nullptr };
@@ -37,8 +39,8 @@ private:
 	ID3D11ShaderResourceView*	m_pSRV = { nullptr };
 	ID3D11DepthStencilView*		m_pDSV = { nullptr };
 
-	static constexpr _uint		m_iViewportWidth = { 1600 };
-	static constexpr _uint		m_iViewportHeight = { 900 };
+	_uint						m_iViewportWidth = { 1600 };
+	_uint						m_iViewportHeight = { 900 };
 
 private:
 	HRESULT						Init_Engine();

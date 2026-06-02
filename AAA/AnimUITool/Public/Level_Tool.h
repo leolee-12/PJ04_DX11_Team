@@ -2,6 +2,10 @@
 #include "AnimUITool_Defines.h"
 #include "Level.h"
 
+NS_BEGIN(Engine)
+class CGameObject;
+NS_END
+
 NS_BEGIN(AnimUITool)
 
 class CEditCamera;
@@ -20,15 +24,23 @@ public:
 
     void                Set_CameraActive(_bool b);
 
+    CGameObject*        Load_Preview(const _wstring& strYshPath);
+    void                Clear_Preview();
+    void                Recalc_CameraProj();
+
 private:
-    CEditCamera*        m_pCamera = { nullptr };  
-    CEdit_Grid*         m_pGrid = { nullptr };   
+    CEditCamera*            m_pCamera = { nullptr };  
+    CEdit_Grid*             m_pGrid = { nullptr };   
+    CGameObject*            m_pPreview = { nullptr };
+    map<_wstring, _wstring> m_ModelTags;
+    _uint                   m_iTagCounter = { 0 };
 
 private:
     virtual HRESULT     Ready_Events() override { return S_OK; }
     HRESULT             Ready_Lights();
     HRESULT             Ready_Camera();
     HRESULT             Ready_Grid();
+    HRESULT             Ready_PreviewShaders();
 
 public:
     static CLevel_Tool* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

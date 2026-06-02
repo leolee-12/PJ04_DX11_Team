@@ -96,6 +96,14 @@ void CAnimation::Reset_TrackPosition()
     fill(m_CurrentKeyFrameIndices.begin(), m_CurrentKeyFrameIndices.end(), 0);
 }
 
+void CAnimation::Get_ChannelBoneIndices(vector<_uint>& Out) const
+{
+    Out.clear();
+    Out.reserve(m_Channels.size());
+    for (auto* pChannel : m_Channels)
+        if (pChannel) Out.push_back(pChannel->Get_BoneIndex());
+}
+
 CAnimation* CAnimation::Create(const ANIMATION_DATA& data, class CModel* pModel)
 {
     CAnimation* pInstance = new CAnimation();
