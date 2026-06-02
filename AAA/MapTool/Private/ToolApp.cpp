@@ -21,7 +21,9 @@ HRESULT CToolApp::Initialize()
 	if (FAILED(Ready_EditRTV()))
 		return E_FAIL;
 
-	// 공유 상태 허브 (씬 SRV 등록)
+	m_pGI_Proxy->Bind_RenderTarget(m_pRTV, m_pDSV, m_iViewportWidth, m_iViewportHeight);
+
+	// Shared scene SRV for the editor panels.
 	m_pEditInstance = CEditInstance::GetInstance();
 	Safe_AddRef(m_pEditInstance);
 	m_pEditInstance->Set_SceneSRV(m_pSRV);
@@ -29,10 +31,10 @@ HRESULT CToolApp::Initialize()
 	if (FAILED(m_pEditInstance->Initialize(m_pDevice, m_pContext)))
 		return E_FAIL;
 
-	// 팩토리 레시피 등록(배치 팔레트/인스펙터 자동 연동)
+	// Register factory recipes for palette and inspector integration.
 	CGameObject_Factory::GetInstance()->RegisterAll();
 
-	// 로딩 레벨 진입 → 워커가 공용 리소스/셰이더/폰트 적재 → 완료 시 EDIT 자동 전환
+	// Enter loading and switch to EDIT after shared resources are ready.
 	CLevel_Loading* pLoading = CLevel_Loading::Create(m_pDevice, m_pContext, TOOL_LEVEL::EDIT);
 	if (nullptr == pLoading)
 		return E_FAIL;
@@ -53,17 +55,17 @@ void CToolApp::Update(_float fTimeDelta)
 
 HRESULT CToolApp::Render()
 {
-	// 1) 엔진 씬을 오프스크린 RTV에 렌더
+	// 1) Render the engine scene into the offscreen RTV.
 	Editor_BeginDraw();
 
 	if (FAILED(m_pGI_Proxy->Draw()))
 		return E_FAIL;
 
-	// 2) ImGui 프레임 (로딩 중에는 오버레이만, 그 외에는 패널)
+	// 2) Build the ImGui frame and panels.
 	m_pEditInstance->ImGui_BeginFrame();
 	m_pEditInstance->Render_UI();
 
-	// 3) 백버퍼에 ImGui 출력
+	// 3) Present ImGui on the backbuffer.
 	if (FAILED(m_pGI_Proxy->Begin_Draw()))
 		return E_FAIL;
 
@@ -153,7 +155,6 @@ void CToolApp::Editor_BeginDraw()
 	_float clearColor[4] = { 0.35f, 0.35f, 0.35f, 1.f };
 	m_pContext->ClearRenderTargetView(m_pRTV, clearColor);
 	m_pContext->ClearDepthStencilView(m_pDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
-	m_pContext->OMSetRenderTargets(1, &m_pRTV, m_pDSV);
 }
 
 CToolApp* CToolApp::Create()

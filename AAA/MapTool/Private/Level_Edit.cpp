@@ -18,6 +18,8 @@
 #include "DataExporter.h"
 #include "DataLoader.h"
 //#include "NavMesh_Editor.h"
+#include <algorithm>
+#include <filesystem>
 
 namespace
 {
@@ -42,9 +44,6 @@ namespace
 		}
 	}
 }
-
-#include <algorithm>
-#include <filesystem>
 
 namespace
 {
@@ -177,6 +176,9 @@ HRESULT CLevel_Edit::Initialize()
 
 void CLevel_Edit::Update(_float fTimeDelta)
 {
+	if (m_pGameInstance_Proxy->Key_Down(DIK_F2))
+		m_pGameInstance_Proxy->Toggle_DebugRender();
+
 	if (m_pGameInstance_Proxy->Key_Down(DIK_ESCAPE))
 		m_pGameInstance_Proxy->Publish(TEXT("Return_Lobby"), nullptr);
 

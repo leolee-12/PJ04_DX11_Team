@@ -1,12 +1,13 @@
 ﻿#pragma once
 #include <Windows.h>
 #include <process.h>
+#include <algorithm>
+#include <filesystem>
+
+#include "Engine_Defines.h"
 
 #include "GameContent_Defines.h"
 
-using namespace Engine;
-
-#include "Engine_Defines.h"
 #include "MapTool_Enum.h"
 #include "MapTool_Struct.h"
 #include "MapTool_Func.h"
