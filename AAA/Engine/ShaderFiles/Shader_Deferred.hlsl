@@ -229,9 +229,6 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     if (pz <= 1.f && pz - 0.002f > sd)
         color *= 0.5f;
 
-      /* 톤매핑 + 감마 */
-    color = color / (color + 1.f); // Reinhard
-    color = pow(color, 1.f / 2.2f); // 감마
     return float4(color, 1.f);
 }
 

@@ -705,5 +705,8 @@
     <FxCompile Include="..\ShaderFiles\Shader_Effect_Mesh.hlsl">
       <Filter>95. ShaderFiles</Filter>
     </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_Bloom.hlsl">
+      <Filter>95. ShaderFiles</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

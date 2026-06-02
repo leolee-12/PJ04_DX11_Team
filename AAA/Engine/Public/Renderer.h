@@ -45,6 +45,9 @@ private:
 
 	ID3D11DepthStencilView* m_pMaxDSV = { nullptr };
 
+	_float					m_fThreshold = { 1.f };
+	_float					m_fBloomIntensity = { 1.f };
+
 #ifdef _DEBUG
 	list<CComponent*>		m_DebugComponents;
 #endif
@@ -55,6 +58,8 @@ private:
 	HRESULT Render_NonBlend();
 	HRESULT Render_Lights();
 	HRESULT Render_Combined();
+	HRESULT Render_Bloom();
+
 	HRESULT Render_NonLight();
 	HRESULT Render_Blend();
 	HRESULT Render_UI_BACK();
