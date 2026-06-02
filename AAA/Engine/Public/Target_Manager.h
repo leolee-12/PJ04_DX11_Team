@@ -32,7 +32,7 @@ private:
 	ID3D11Device*				m_pDevice = { nullptr };
 	ID3D11DeviceContext*		m_pContext = { nullptr };
 
-	ID3D11RenderTargetView*		m_pBackBufferRTV = { nullptr };
+	ID3D11RenderTargetView*		m_pPrevRTV = { nullptr };
 	ID3D11DepthStencilView*		m_pOriginalDSV = { nullptr };
 
 

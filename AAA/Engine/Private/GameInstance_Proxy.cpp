@@ -41,6 +41,14 @@ HRESULT CGameInstance_Proxy::End_Draw()
 	return m_pOwner->End_Draw();
 }
 
+void    CGameInstance_Proxy::Bind_RenderTarget(ID3D11RenderTargetView* pRTV, ID3D11DepthStencilView* pDSV, _uint w, _uint h)
+{
+	if (m_pOwner == nullptr)
+		return;
+
+	m_pOwner->m_pRenderer->Bind_RenderTarget(pRTV, pDSV, w, h);
+}
+
 void    CGameInstance_Proxy::Clear_Resources(_int iLevelIndex)
 {
 	if (m_pOwner == nullptr)
@@ -246,6 +254,13 @@ void CGameInstance_Proxy::Add_DebugComponent(CComponent* pComponent)
 		return;
 
 	m_pOwner->m_pRenderer->Add_DebugComponent(pComponent);
+}
+void CGameInstance_Proxy::Toggle_DebugRender()
+{
+	if (!IsConnected())
+		return;
+
+	m_pOwner->m_pRenderer->Toggle_DebugRender();
 }
 #endif
 #pragma endregion

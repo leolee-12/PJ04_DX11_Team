@@ -266,9 +266,13 @@ float4 PS_BLUR(PS_IN In) : SV_TARGET0
 //============================ Compsite (pass 6) ============================
 float4 PS_COMPOSITE(PS_IN In) : SV_TARGET0
 {
-    float3 scene = g_SceneTexture.Sample(LinearSampler, In.vTexcoord).rgb;
-    float3 bloom = g_BloomTexture.Sample(LinearSampler, In.vTexcoord).rgb;
-    float3 color = scene + bloom * g_fBloomIntensity;
+    float4 scene = g_SceneTexture.Sample(LinearSampler, In.vTexcoord);
+    if (0.f == scene.a)        
+        discard;
+    
+    float4 bloom = g_BloomTexture.Sample(LinearSampler, In.vTexcoord);
+    
+    float3 color = scene.rgb + bloom.rgb * g_fBloomIntensity;
     color = color / (color + 1.f); // Reinhard
     color = pow(color, 1.f / 2.2f); // °¨¸¶
     return float4(color, 1.f);
