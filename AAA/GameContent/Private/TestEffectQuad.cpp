@@ -23,11 +23,13 @@ HRESULT CTestEffectQuad::Initialize(void* pArg)
 {
     TEST_EFFECT_QUAD_DESC tDesc{};
 
-    tDesc.m_iVIBufferLevel = Texture_LoadingUI.iLevelID;
+    tDesc.iTextureLevel = Texture_LoadingUI.iLevelID;
     tDesc.wstrTextureTag = Texture_LoadingUI.szProtoTag;
 
-    tDesc.m_iVIBufferLevel = VI_Rect.iLevelID;
+    tDesc.iVIBufferLevel = VI_Rect.iLevelID;
     tDesc.wstrVIBufferTag = VI_Rect.szProtoTag;
+
+    tDesc.bCustomShader = false;
 
     if (FAILED(__super::Initialize(&tDesc)))
         return E_FAIL;

@@ -18,7 +18,7 @@ public:
 
 	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_TestEffectQuad";
 
-protected:
+private:
 	CTestEffectQuad(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CTestEffectQuad(const CTestEffectQuad& Prototype);
 	virtual ~CTestEffectQuad() = default;

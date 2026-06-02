@@ -4,29 +4,39 @@
 
 NS_BEGIN(Engine)
 
-class CVIBuffer_Rect;
+class CModel;
 
-class ENGINE_DLL CEffect_Quad abstract : public CEffect_Part
+class ENGINE_DLL CEffect_Mesh abstract : public CEffect_Part
 {
+    GENERATED_BODY_ABSTRACT(CEffect_Mesh)
+    PROPERTY(_bool, m_bUseDiffuseTexture,   L"Use_Diffuse_Textrue",  L"Effect_Model");
+    PROPERTY(_bool, m_bUseUnKnownTexture,   L"Use_UnKnown_Textrue",  L"Effect_Model");
+
+    PROPERTY(_bool, m_bUseTextureCom,       L"Use_TextureCom",      L"Effect_Model");
 
 public:
-    struct EFFECT_QUAD_DESC : public CEffect_Part::EFFECT_PART_DESC
+    struct EFFECT_MESH_DESC : public CEffect_Part::EFFECT_PART_DESC
     {
-        _uint iVIBufferLevel{};
-        _wstring wstrVIBufferTag;
+        // Model 관련
+        _uint iModelLevel{};
+        _wstring wstrModelTag;
+        _bool bUseDiffuseTexture{};
+        _bool bUseUnKnownTexture{};
 
+        // Texture 컴포넌트 관련
+        _bool bUseTextureCom{};
         _uint iTextureLevel{};
         _wstring wstrTextureTag;
 
-        _bool bCustomShader{};
+        // Shader
         _uint iShaderLevel{};
         _wstring wstrShaderTag;
     };
 
 protected:
-    CEffect_Quad(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-    CEffect_Quad(const CEffect_Quad& Prototype);
-    virtual ~CEffect_Quad() = default;
+    CEffect_Mesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    CEffect_Mesh(const CEffect_Mesh& Prototype);
+    virtual ~CEffect_Mesh() = default;
 
 protected:
     virtual HRESULT Initialize_Prototype() override;
@@ -47,17 +57,20 @@ private:
     HRESULT Bind_ShaderValue();
 
 private:
-    CVIBuffer_Rect* m_pVIBuffer{};
+    CModel* m_pModelCom{};
 
-    _uint m_iVIBufferLevel{};
-    _wstring m_wstrVIBufferTag;
+    // Model
+    _uint m_iModelLevel{};
+    _wstring m_wstrModelTag;
 
+    // Textuue
     _uint m_iTextureLevel{};
     _wstring m_wstrTextureTag;
 
-    _bool m_bCustomShader{};
+    // Shader
     _uint m_iShaderLevel{};
     _wstring m_wstrShaderTag;
+
 
 protected:
     virtual void Free() override;

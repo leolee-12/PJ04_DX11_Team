@@ -12,11 +12,15 @@ class ENGINE_DLL CEffect_Quad abstract : public CEffect_Part
 public:
     struct EFFECT_QUAD_DESC : public CEffect_Part::EFFECT_PART_DESC
     {
+        _uint iVIBufferLevel{};
         _wstring wstrVIBufferTag;
+
+        _uint iTextureLevel{};
         _wstring wstrTextureTag;
 
-        _uint m_iVIBufferLevel{};
-        _uint m_iTextureLevel{};
+        _bool bCustomShader{};
+        _uint iShaderLevel{};
+        _wstring wstrShaderTag;
     };
 
 protected:
@@ -46,10 +50,14 @@ private:
     CVIBuffer_Rect* m_pVIBuffer{};
 
     _uint m_iVIBufferLevel{};
-    _uint m_iTextureLevel{};
-
     _wstring m_wstrVIBufferTag;
+
+    _uint m_iTextureLevel{};
     _wstring m_wstrTextureTag;
+
+    _bool m_bCustomShader{};
+    _uint m_iShaderLevel{};
+    _wstring m_wstrShaderTag;
 
 protected:
     virtual void Free() override;

@@ -19,7 +19,13 @@ HRESULT CMesh::Initialize_Prototype(MODEL eType, CModel* pOwner, const MESH_DATA
 	m_strName = data.strName;
 	m_bPickable = bPickable;
 
-    HRESULT hr = MODEL::NONANIM == eType ? Ready_NonAnim(data, PreTransformMatrix) : Ready_Anim(pOwner, data);
+    HRESULT hr = S_OK;
+    switch (eType)
+    {
+        case MODEL::NONANIM: hr = Ready_NonAnim(data, PreTransformMatrix); break;
+        case MODEL::MAP:     hr = Ready_Map(data, PreTransformMatrix);     break;
+        default:             hr = Ready_Anim(pOwner, data);                break;  
+    }
     if (FAILED(hr))
         return E_FAIL;
 
@@ -132,10 +138,12 @@ HRESULT CMesh::Ready_NonAnim(const MESH_DATA& data, _fmatrix PreTransformMatrix)
             XMVector3TransformCoord(XMLoadFloat3(&src.vPosition), PreTransformMatrix));
         XMStoreFloat3(&pVertices[i].vNormal,
             XMVector3TransformNormal(XMLoadFloat3(&src.vNormal), PreTransformMatrix));
-        XMStoreFloat3(&pVertices[i].vTangent,
-            XMVector3TransformNormal(XMLoadFloat3(&src.vTangent), PreTransformMatrix));
-        XMStoreFloat3(&pVertices[i].vBinormal,
-            XMVector3TransformNormal(XMLoadFloat3(&src.vBinormal), PreTransformMatrix));
+        XMStoreFloat3(reinterpret_cast<XMFLOAT3*>(&pVertices[i].vTangent),
+            XMVector3TransformNormal(XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(&src.vTangent)), PreTransformMatrix));
+        pVertices[i].vTangent.w = src.vTangent.w;
+        XMStoreFloat3(reinterpret_cast<XMFLOAT3*>(&pVertices[i].vBinormal),
+            XMVector3TransformNormal(XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(&src.vBinormal)), PreTransformMatrix));
+        pVertices[i].vBinormal.w = src.vBinormal.w;
     }
 
     for (_uint i = 0; i < m_iNumVertices; ++i)
@@ -171,6 +179,93 @@ HRESULT CMesh::Ready_NonAnim(const MESH_DATA& data, _fmatrix PreTransformMatrix)
     if (FAILED(hr)) return E_FAIL;
 
     // Index Buffer
+    D3D11_BUFFER_DESC IBDesc{};
+    IBDesc.ByteWidth = m_iIndexStride * m_iNumIndices;
+    IBDesc.Usage = D3D11_USAGE_DEFAULT;
+    IBDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+    IBDesc.StructureByteStride = m_iIndexStride;
+
+    D3D11_SUBRESOURCE_DATA IBInitData{};
+    IBInitData.pSysMem = data.Indices.data();
+
+    if (FAILED(m_pDevice->CreateBuffer(&IBDesc, &IBInitData, &m_pIB)))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT CMesh::Ready_Map(const MESH_DATA& data, _fmatrix PreTransformMatrix)
+{
+    m_iMaterialIndex = data.iMaterialIndex;
+    m_iNumVertexBuffers = 1;
+    m_iVertexStride = sizeof(VTXMAPMESH);
+    m_iNumVertices = (_uint)data.MapVertices.size();
+    m_iNumIndices = (_uint)data.Indices.size();
+    m_iIndexStride = 4;
+    m_eIndexFormat = DXGI_FORMAT_R32_UINT;
+    m_ePrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+    VTXMAPMESH* pVertices = new VTXMAPMESH[m_iNumVertices];
+    ZeroMemory(pVertices, sizeof(VTXMAPMESH) * m_iNumVertices);
+
+    for (_uint i = 0; i < m_iNumVertices; ++i)
+    {
+        const VTXMAPMESH_DATA& src = data.MapVertices[i];
+
+        pVertices[i].vTexcoord = src.vTexcoord;
+        pVertices[i].vTexcoord1 = src.vTexcoord1;
+        pVertices[i].vTexcoord2 = src.vTexcoord2;
+        pVertices[i].vTexcoord3 = src.vTexcoord3;
+        pVertices[i].vColor = src.vColor;
+        pVertices[i].vColor1 = src.vColor1;
+        pVertices[i].vColor2 = src.vColor2;
+
+        XMStoreFloat3(&pVertices[i].vPosition,
+            XMVector3TransformCoord(XMLoadFloat3(&src.vPosition), PreTransformMatrix));
+        XMStoreFloat3(&pVertices[i].vNormal,
+            XMVector3TransformNormal(XMLoadFloat3(&src.vNormal), PreTransformMatrix));
+        XMStoreFloat3(reinterpret_cast<XMFLOAT3*>(&pVertices[i].vTangent),
+            XMVector3TransformNormal(XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(&src.vTangent)),
+                PreTransformMatrix));
+        pVertices[i].vTangent.w = src.vTangent.w;
+        XMStoreFloat3(reinterpret_cast<XMFLOAT3*>(&pVertices[i].vBinormal),
+            XMVector3TransformNormal(XMLoadFloat3(reinterpret_cast<const XMFLOAT3*>(&src.vBinormal)),
+                PreTransformMatrix));
+        pVertices[i].vBinormal.w = src.vBinormal.w;
+    }
+
+    for (_uint i = 0; i < m_iNumVertices; ++i)
+    {
+        m_vAABBMin.x = min(m_vAABBMin.x, pVertices[i].vPosition.x);
+        m_vAABBMin.y = min(m_vAABBMin.y, pVertices[i].vPosition.y);
+        m_vAABBMin.z = min(m_vAABBMin.z, pVertices[i].vPosition.z);
+        m_vAABBMax.x = max(m_vAABBMax.x, pVertices[i].vPosition.x);
+        m_vAABBMax.y = max(m_vAABBMax.y, pVertices[i].vPosition.y);
+        m_vAABBMax.z = max(m_vAABBMax.z, pVertices[i].vPosition.z);
+    }
+
+    if (m_bPickable)
+    {
+        m_PickingPositions.reserve(m_iNumVertices);
+        for (_uint i = 0; i < m_iNumVertices; ++i)
+            m_PickingPositions.push_back(pVertices[i].vPosition);
+
+        m_PickingIndices.assign(data.Indices.begin(), data.Indices.end());
+    }
+
+    D3D11_BUFFER_DESC VBDesc{};
+    VBDesc.ByteWidth = m_iVertexStride * m_iNumVertices;
+    VBDesc.Usage = D3D11_USAGE_DEFAULT;
+    VBDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    VBDesc.StructureByteStride = m_iVertexStride;
+
+    D3D11_SUBRESOURCE_DATA VBInitData{};
+    VBInitData.pSysMem = pVertices;
+
+    HRESULT hr = m_pDevice->CreateBuffer(&VBDesc, &VBInitData, &m_pVB);
+    Safe_Delete_Array(pVertices);
+    if (FAILED(hr)) return E_FAIL;
+
     D3D11_BUFFER_DESC IBDesc{};
     IBDesc.ByteWidth = m_iIndexStride * m_iNumIndices;
     IBDesc.Usage = D3D11_USAGE_DEFAULT;

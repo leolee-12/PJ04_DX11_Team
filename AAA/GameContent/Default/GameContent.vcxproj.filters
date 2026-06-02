@@ -45,9 +45,18 @@
     </Filter>
     <Filter Include="00. GameObject\Test\TestEffectQuad">
       <UniqueIdentifier>{0d1ac5b9-9bf3-49d1-848a-61300fc9ce8b}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="00. GameObject\Test\TestMarb1e">
+    </Filter>
+    <Filter Include="00. GameObject\Test\TestMarb1e">
       <UniqueIdentifier>{840c0faf-b354-4895-adb2-a5936fb65b71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\Sample_MeshEffect">
+      <UniqueIdentifier>{6f695d5c-93d8-4d75-9564-48bf4a3b1640}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\TestMarb1eMap">
+      <UniqueIdentifier>{867f635d-c832-4d05-b596-a899a327f1a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\01. Map">
+      <UniqueIdentifier>{52aa1b5e-9f41-4300-b321-d94a31de3ab2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -95,12 +104,21 @@
     </ClInclude>
     <ClInclude Include="..\Public\TestEffectQuad.h">
       <Filter>00. GameObject\Test\TestEffectQuad</Filter>
-	</ClInclude>
-	<ClInclude Include="..\public\TestMarb1e.h">
+    </ClInclude>
+    <ClInclude Include="..\public\TestMarb1e.h">
       <Filter>00. GameObject\Test\TestMarb1e</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\GameContent_AnimEvents.h">
       <Filter>99. Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Sample_MeshEffect.h">
+      <Filter>00. GameObject\Test\Sample_MeshEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\TestMarb1eMap.h">
+      <Filter>00. GameObject\Test\TestMarb1eMap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\MapObject.h">
+      <Filter>00. GameObject\01. Map</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -127,9 +145,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\TestEffectQuad.cpp">
       <Filter>00. GameObject\Test\TestEffectQuad</Filter>
-	</ClCompile>
-	<ClCompile Include="..\private\TestMarb1e.cpp">
+    </ClCompile>
+    <ClCompile Include="..\private\TestMarb1e.cpp">
       <Filter>00. GameObject\Test\TestMarb1e</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Sample_MeshEffect.cpp">
+      <Filter>00. GameObject\Test\Sample_MeshEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\TestMarb1eMap.cpp">
+      <Filter>00. GameObject\Test\TestMarb1eMap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MapObject.cpp">
+      <Filter>00. GameObject\01. Map</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -140,6 +167,9 @@
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </FxCompile>
     <FxCompile Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_Map.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </FxCompile>
   </ItemGroup>

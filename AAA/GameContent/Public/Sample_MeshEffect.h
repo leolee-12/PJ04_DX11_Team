@@ -1,30 +1,33 @@
 #pragma once
 
 #include "GameContent_Defines.h"
-#include "Camera.h"
+
+#include "Effect_Mesh.h"
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL CCamera_Free final : public CCamera
+class CSample_MeshEffect final : public CEffect_Mesh
 {
-	GENERATED_BODY(CCamera_Free)
+	GENERATED_BODY(CSample_MeshEffect)
 
 public:
-	typedef struct tagCameraFreeDesc final : public CCamera::CAMERA_DESC
+	struct SAMPLE_MESHEFFECT_DESC : public CEffect_Mesh::EFFECT_MESH_DESC
 	{
-		_float		fMouseSensor;
-	}CAMERA_FREE_DESC;
 
-	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_CameraFree";
+	};
+
+	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_SampleMeshEffect";
 
 private:
-	CCamera_Free(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CCamera_Free(const CCamera_Free& Prototype);
-	virtual ~CCamera_Free() = default;
+	CSample_MeshEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CSample_MeshEffect(const CSample_MeshEffect& Prototype);
+	virtual ~CSample_MeshEffect() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
+
+public:
 	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
@@ -34,17 +37,11 @@ public:
 		pOutData->strPrototypeTag = PROTOTYPE_TAG;
 	}
 
-private:
-	_float	m_fMouseSensor = {};
-
-private:
-	virtual HRESULT Ready_Events() override;
-
 public:
-	static CCamera_Free* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CSample_MeshEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
+private:
 	virtual void Free();
-
 };
 
 NS_END
