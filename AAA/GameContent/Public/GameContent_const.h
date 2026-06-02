@@ -51,6 +51,8 @@ namespace ProtoDesc
 	inline constexpr TEXTURE_DESC Texture_LoadingUI = { ETOUI(LEVEL::LOADING), TEXT("Prototype_Component_Texture_LoadingUI"), TEXT("../../Resources/Textures/LoadingUI/LoadingUI_%d.png"), 3 };
 	inline constexpr COMPONENT_DESC Model_Slash = { ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Slash") };
 	
+	// Sample Mask
+	inline constexpr TEXTURE_DESC Texture_Common_Flash02 = { ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Texture_Common_Flash02"), TEXT("../../Resources/Models/Test/SmokeSphereOriginal/common_flash02.png"), 1 };
 
 }
 

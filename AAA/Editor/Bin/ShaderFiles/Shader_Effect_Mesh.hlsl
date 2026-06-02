@@ -2,17 +2,24 @@
 
 float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
-bool g_bUseDiffuseTexture = { false };
 Texture2D g_DiffuseTexture;
+bool g_bUseDiffuseTexture = { false };
+float2 g_vDiffuseTiling = { 1.f, 1.f };
+float2 g_vDiffuseOffset = { 0.f, 0.f };
 
-bool g_bUseUnknownTexture = { false };
 Texture2D g_UnknownTexture;
+bool g_bUseUnknownTexture = { false };
+float2 g_vUnknownTiling = { 1.f, 1.f };
+float2 g_vUnknownOffset = { 0.f, 0.f };
 
-bool g_bUseTexture = { false };
 Texture2D g_Texture;
+bool g_bUseTexture = { false };
+float2 g_vTextureTiling = { 1.f, 1.f };
+float2 g_vTextureOffset = { 0.f, 0.f };
 
 float3 g_vColor = { 1.f, 1.f, 1.f };
 float g_fAlpha = { 1.f };
+
 
 struct VS_IN
 {
@@ -66,13 +73,22 @@ PS_OUT PS_MAIN(PS_IN In)
     Out.vColor = float4(1.f, 1.f, 1.f, 1.f);
     
     if (g_bUseDiffuseTexture == true)
-        Out.vColor *= g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    {
+        float2 vUV = g_vDiffuseOffset + In.vTexcoord * g_vDiffuseTiling;
+        Out.vColor *= g_DiffuseTexture.Sample(LinearSampler, vUV);
+    }
     
     if (g_bUseUnknownTexture == true)
-        Out.vColor *= g_UnknownTexture.Sample(LinearSampler, In.vTexcoord);
+    {
+        float2 vUV = g_vUnknownOffset + In.vTexcoord * g_vUnknownTiling;
+        Out.vColor *= g_UnknownTexture.Sample(LinearSampler, vUV);
+    }
     
     if (g_bUseTexture == true)
-        Out.vColor *= g_Texture.Sample(LinearSampler, In.vTexcoord);         
+    {
+        float2 vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling;
+        Out.vColor *= g_Texture.Sample(LinearSampler, vUV);
+    }
     
     Out.vColor.xyz *= g_vColor;        
 

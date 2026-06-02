@@ -9,10 +9,31 @@ class CModel;
 class ENGINE_DLL CEffect_Mesh abstract : public CEffect_Part
 {
     GENERATED_BODY_ABSTRACT(CEffect_Mesh)
-    PROPERTY(_bool, m_bUseDiffuseTexture,   L"Use_Diffuse_Textrue",  L"Effect_Model");
-    PROPERTY(_bool, m_bUseUnKnownTexture,   L"Use_UnKnown_Textrue",  L"Effect_Model");
 
-    PROPERTY(_bool, m_bUseTextureCom,       L"Use_TextureCom",      L"Effect_Model");
+    // Diffuse
+    PROPERTY(_bool, m_bUseDiffuseTexture,   L"Use_Diffuse_Textrue",     L"Effect_Model");
+    PROPERTY(_float2, m_vDiffuseTiling,     L"Diffuse_Tiling",          L"Effect_Model");
+    PROPERTY(_float2, m_vDiffuseOffset,     L"Diffuse_Offset",          L"Effect_Model");
+
+    PROPERTY(_bool, m_vDiffuseUVScroll,     L"Diffuse_UVScroll", L"Effect_Model");
+    PROPERTY(_float2, m_vDiffuseUVSpeed,    L"Diffuse_UVSpeed", L"Effect_Model");
+
+    // Unkown
+    PROPERTY(_bool, m_bUseUnknownTexture,   L"Use_Unknown_Textrue",     L"Effect_Model");
+    PROPERTY(_float2, m_vUnknownTiling,     L"Unknown_Tiling",          L"Effect_Model");
+    PROPERTY(_float2, m_vUnknownOffset,     L"UnKnown_Offset",          L"Effect_Model");
+
+    PROPERTY(_bool, m_vUnknownUVScroll,     L"UnKnown_UVScroll",        L"Effect_Model");
+    PROPERTY(_float2, m_vUnknownUVSpeed,    L"UnKnown_UVSpeed",         L"Effect_Model");
+
+
+    // Texture
+    PROPERTY(_bool, m_bUseTextureCom,       L"Use_TextureCom",          L"Effect_Model");
+    PROPERTY(_float2, m_vTextureTiling,     L"Texture_Tiling",          L"Effect_Model");
+    PROPERTY(_float2, m_vTextureOffset,     L"Texture_Offset",          L"Effect_Model");
+
+    PROPERTY(_bool, m_vTextureUVScroll,     L"Texture_UVScroll",        L"Effect_Model");
+    PROPERTY(_float2, m_vTextureUVSpeed,    L"Texture_UVSpeed",         L"Effect_Model");
 
 public:
     struct EFFECT_MESH_DESC : public CEffect_Part::EFFECT_PART_DESC
@@ -50,6 +71,7 @@ public:
 
 protected:
     virtual void Update_EffectPart(const _float fTimeDelta, const _float fActiveTime, const _float fRatio) override;
+    virtual void Update_UVScroll(const _float fTimeDelta);
 
 private:
     HRESULT Ready_Components();
@@ -63,7 +85,7 @@ private:
     _uint m_iModelLevel{};
     _wstring m_wstrModelTag;
 
-    // Textuue
+    // Texture
     _uint m_iTextureLevel{};
     _wstring m_wstrTextureTag;
 
@@ -71,6 +93,8 @@ private:
     _uint m_iShaderLevel{};
     _wstring m_wstrShaderTag;
 
+private:
+    void Init_PropertyValue();
 
 protected:
     virtual void Free() override;

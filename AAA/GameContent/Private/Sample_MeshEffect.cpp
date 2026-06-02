@@ -29,9 +29,13 @@ HRESULT CSample_MeshEffect::Initialize(void* pArg)
     tDesc.bUseDiffuseTexture = false;
     tDesc.bUseUnKnownTexture = true;
 
-    tDesc.bUseTextureCom = false;
-    //tDesc.iTextureLevel = Texture_LoadingUI.iLevelID;
-    //tDesc.wstrTextureTag = Texture_LoadingUI.szProtoTag;
+    tDesc.bUseTextureCom = true;
+    tDesc.iTextureLevel = Texture_Common_Flash02.iLevelID;
+    tDesc.wstrTextureTag = Texture_Common_Flash02.szProtoTag;
+
+    tDesc.bCustomShader = false;
+    tDesc.iShaderLevel = 0;
+    tDesc.wstrShaderTag = L"";
 
     if (FAILED(__super::Initialize(&tDesc)))
         return E_FAIL;

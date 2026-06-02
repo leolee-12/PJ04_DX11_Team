@@ -97,6 +97,7 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
 public:
     struct EFFECT_PART_DESC : public CGameObject::GAMEOBJECT_DESC
     {
+        _bool bCustomShader{};
     };
 
 private:
@@ -128,9 +129,12 @@ public:
     virtual HRESULT Render() override;
 
 protected:
+    _bool m_bCustomShader{};
     CShader* m_pShaderCom{};
     CTexture* m_pTextureCom{};
 
+
+protected:
     _bool m_bActive{ true };
 
     _float m_fPreOffsetY{};
