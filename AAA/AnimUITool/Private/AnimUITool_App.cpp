@@ -33,9 +33,12 @@ HRESULT CAnimUITool_App::Initialize()
 		return E_FAIL;
 	}
 
+	m_pGameInstance_Proxy->Bind_RenderTarget(m_pRTV, m_pDSV, m_iViewportWidth, m_iViewportHeight);
+
 	if (auto* pViewport = dynamic_cast<CPanel_Viewport*>(m_pPanel_Manager->Get_Panel(L"Viewport")))
 	{
 		pViewport->Set_SRV(m_pSRV);
+		pViewport->Set_Aspect((_float)m_iViewportWidth / (_float)m_iViewportHeight);
 		m_pViewportPanel = pViewport;
 	}
 
@@ -165,10 +168,17 @@ void CAnimUITool_App::OnResize(_uint iWidth, _uint iHeight)
 		return;
 	}   
 
+	m_pGameInstance_Proxy->Bind_RenderTarget(
+		m_pRTV,
+		m_pDSV,
+		m_iViewportWidth,
+		m_iViewportHeight
+	);
+
 	if (m_pViewportPanel)
 	{
 		m_pViewportPanel->Set_SRV(m_pSRV);
-		m_pViewportPanel->Set_Aspect((_float)iWidth / (_float)iHeight);   // 레터박스 종횡비 갱신
+		m_pViewportPanel->Set_Aspect((_float)m_iViewportWidth / (_float)m_iViewportHeight);   // 레터박스 종횡비 갱신
 	}
 
 	// 카메라 proj를 새 종횡비로 재계산
