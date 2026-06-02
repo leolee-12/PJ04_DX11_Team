@@ -13,23 +13,29 @@ HRESULT CMaterial::Initialize(const MATERIAL_DATA& data, const _char* pModelFile
 {
 	_char			szDrive[MAX_PATH] = {};
 	_char			szDir[MAX_PATH] = {};
+
 	_splitpath_s(pModelFilePath, szDrive, MAX_PATH, szDir, MAX_PATH, nullptr, 0, nullptr, 0);
 
 	for (size_t i = 0; i < MTEX_TYPE_MAX; ++i)
 	{
 		for (const string& strTextureName : data.TextureNames[i])
 		{
-			string strTexturePath = string(szDrive) + string(szDir) + strTextureName;
-			wstring wstrTexturePath = StrToWstr(strTexturePath);
+			string strBaseName = strTextureName;
+			if (size_t iDot = strBaseName.rfind('.'); iDot != string::npos)
+				strBaseName = strBaseName.substr(0, iDot);
+
+			const string strFolder = string(szDrive) + string(szDir);
+			const string strDDS = strFolder + strBaseName + ".dds";
+			const string strPNG = strFolder + strBaseName + ".png";
 
 			ID3D11ShaderResourceView* pSRV = { nullptr };
-			HRESULT		hr = {};
+			HRESULT hr = E_FAIL;
 
-			wstring wstrExt = wstrTexturePath.substr(wstrTexturePath.rfind(L'.'));
-			if (wstrExt == L".dds" || wstrExt == L".DDS")
-				hr = CreateDDSTextureFromFile(m_pDevice, wstrTexturePath.c_str(), nullptr, &pSRV);
-			else
-				hr = CreateWICTextureFromFile(m_pDevice, wstrTexturePath.c_str(), nullptr, &pSRV);
+			// 같은 폴더에서 .dds 우선, 없으면 .png
+			if (std::filesystem::exists(strDDS))
+				hr = CreateDDSTextureFromFile(m_pDevice, StrToWstr(strDDS).c_str(), nullptr, &pSRV);
+			else if (std::filesystem::exists(strPNG))
+				hr = CreateWICTextureFromFile(m_pDevice, StrToWstr(strPNG).c_str(), nullptr, &pSRV);
 
 			if (FAILED(hr))
 				return E_FAIL;
