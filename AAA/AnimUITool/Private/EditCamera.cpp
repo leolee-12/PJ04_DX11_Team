@@ -34,12 +34,12 @@ void CEditCamera::Priority_Update(_float fTimeDelta)
             if (io.MouseDelta.x)
                 m_pTransformCom->Turn(
                     XMVectorSet(0.f, 1.f, 0.f, 0.f),
-                    io.MouseDelta.x * m_fMouseSensor);
+                    io.MouseDelta.x * m_fMouseSensor * fTimeDelta);
 
             if (io.MouseDelta.y)
                 m_pTransformCom->Turn(
                     m_pTransformCom->Get_State(STATE::RIGHT),
-                    io.MouseDelta.y * m_fMouseSensor);
+                    io.MouseDelta.y * m_fMouseSensor * fTimeDelta);
         }
 
         if (io.MouseWheel != 0.f)

@@ -97,27 +97,27 @@ VS_OUT VS_TEST(VS_IN In)
 {
     VS_OUT Out;
     
-    //float fWeightW = 1.f - (In.vBlendWeight.x + In.vBlendWeight.y + In.vBlendWeight.z);
+    float fWeightW = 1.f - (In.vBlendWeight.x + In.vBlendWeight.y + In.vBlendWeight.z);
     
-    //float4x4 m0 = g_BoneMatrices[In.vBlendIndex.x] * In.vBlendWeight.x;
-    //float4x4 m1 = g_BoneMatrices[In.vBlendIndex.y] * In.vBlendWeight.y;
-    //float4x4 m2 = g_BoneMatrices[In.vBlendIndex.z] * In.vBlendWeight.z;
-    //float4x4 m3 = g_BoneMatrices[In.vBlendIndex.w] * fWeightW;
+    float4x4 m0 = g_BoneMatrices[In.vBlendIndex.x] * In.vBlendWeight.x;
+    float4x4 m1 = g_BoneMatrices[In.vBlendIndex.y] * In.vBlendWeight.y;
+    float4x4 m2 = g_BoneMatrices[In.vBlendIndex.z] * In.vBlendWeight.z;
+    float4x4 m3 = g_BoneMatrices[In.vBlendIndex.w] * fWeightW;
 
-    //float4x4 BoneMatrix = m0 + m1 + m2 + m3;
+    float4x4 BoneMatrix = m0 + m1 + m2 + m3;
 
     
     /* 월드변환, 뷰 벼환, 투영변환 */ 
-    //float4 vPosition = mul(float4(In.vPosition, 1.f), BoneMatrix);
-    //float4 vNormal = mul(float4(In.vNormal, 0.f), BoneMatrix);
+    float4 vPosition = mul(float4(In.vPosition, 1.f), BoneMatrix);
+    float4 vNormal = mul(float4(In.vNormal, 0.f), BoneMatrix);
     
     float4x4 matWV, matWVP;
     
     matWV = mul(g_WorldMatrix, g_ViewMatrix);
     matWVP = mul(matWV, g_ProjMatrix);
     
-    float4 vPosition = float4(In.vPosition.rgb, 1.f);
-    float4 vNormal = float4(In.vNormal.rgb, 0.f);
+    //float4 vPosition = float4(In.vPosition.rgb, 1.f);
+    //float4 vNormal = float4(In.vNormal.rgb, 0.f);
 
     Out.vPosition = mul(vPosition, matWVP);
     Out.vNormal = normalize(mul(vNormal, g_WorldMatrix));

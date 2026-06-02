@@ -214,20 +214,4 @@
       <Filter>98. Default</Filter>
     </ResourceCompile>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Bin\ShaderFiles\Engine_Shader_Defines.hlsli">
-      <Filter>96. ShaderFiles\Defines</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_AnimMesh_PBR.hlsl">
-      <Filter>96. ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_Grid.hlsl">
-      <Filter>96. ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_NonAnim_PBR.hlsl">
-      <Filter>96. ShaderFiles</Filter>
-    </FxCompile>
-  </ItemGroup>
 </Project>
