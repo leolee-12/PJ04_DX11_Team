@@ -4,20 +4,23 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine\Default\Engine.vcxproj", "{24F1C936-38BB-422E-868F-05958F7FC28A}"
-	ProjectSection(ProjectDependencies) = postProject
-		{0476B805-357E-45E8-8CFE-57915A71D1AF} = {0476B805-357E-45E8-8CFE-57915A71D1AF}
-		{75252A25-FE5C-4E14-A27B-CB65772242C0} = {75252A25-FE5C-4E14-A27B-CB65772242C0}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Editor", "Editor\Default\Editor.vcxproj", "{0476B805-357E-45E8-8CFE-57915A71D1AF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameContent", "GameContent\Default\GameContent.vcxproj", "{75252A25-FE5C-4E14-A27B-CB65772242C0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{24F1C936-38BB-422E-868F-05958F7FC28A} = {24F1C936-38BB-422E-868F-05958F7FC28A}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EXE", "EXE", "{C8D5274F-AC00-46C7-1F8D-E88E81087A52}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DLL", "DLL", "{A2CE729C-9F16-4C1F-83AD-3F9A1DD8F4A1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Launcher", "Launcher\Default\Launcher.vcxproj", "{05763A88-1C77-4FF3-8075-4D48BD77046E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{24F1C936-38BB-422E-868F-05958F7FC28A} = {24F1C936-38BB-422E-868F-05958F7FC28A}
+		{75252A25-FE5C-4E14-A27B-CB65772242C0} = {75252A25-FE5C-4E14-A27B-CB65772242C0}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AnimUITool", "AnimUITool\Default\AnimUITool.vcxproj", "{73BB3C72-765D-412E-90EB-3459F9ABEEFF}"
 	ProjectSection(ProjectDependencies) = postProject

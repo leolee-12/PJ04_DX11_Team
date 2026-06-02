@@ -435,7 +435,7 @@ namespace
 		CModel* pModelPrototype = nullptr;
 		try
 		{
-			pModelPrototype = CModel::Create(pDevice, pContext, MODEL::NONANIM, strModelPath.c_str());
+			pModelPrototype = CModel::Create(pDevice, pContext, MODEL::MAP, strModelPath.c_str());
 		}
 		catch (const std::exception& e)
 		{

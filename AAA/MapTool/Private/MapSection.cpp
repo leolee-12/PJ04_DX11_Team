@@ -225,8 +225,8 @@ HRESULT CMapSection::Ready_Components(const MAP_SECTION_DESC* pDesc)
 		if (pDesc->strModelPath.empty())
 			return E_FAIL;
 
-		if (!Is_NonAnimYsh(pDesc->strModelPath, pDesc->strSectionName))
-			return E_FAIL;
+		//if (!Is_NonAnimYsh(pDesc->strModelPath, pDesc->strSectionName))
+		//	return E_FAIL;
 
 		const string strModelPath = WstrToStr(pDesc->strModelPath);
 		CModel* pModelPrototype = nullptr;
@@ -235,7 +235,7 @@ HRESULT CMapSection::Ready_Components(const MAP_SECTION_DESC* pDesc)
 			pModelPrototype = CModel::Create(
 				m_pDevice,
 				m_pContext,
-				MODEL::NONANIM,
+				MODEL::MAP,
 				strModelPath.c_str(),
 				XMMatrixRotationY(XMConvertToRadians(180.f)));
 		}

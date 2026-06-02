@@ -63,6 +63,14 @@ RasterizerState RS_Cull_None
     FrontCounterClockwise = false;
 };
 
+RasterizerState RS_Decal
+{
+    FillMode = Solid;
+    CullMode = Back;
+    DepthBias = -1000; // 카메라 쪽으로 살짝 당겨 z-fighting 방지
+    SlopeScaledDepthBias = -1.f;
+};
+
 DepthStencilState DSS_Default
 {
     DepthEnable = true;

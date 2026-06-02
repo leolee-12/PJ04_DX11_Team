@@ -11,8 +11,8 @@ namespace Engine
 		XMFLOAT2 vTexcoord1;   // 추가
 		XMFLOAT2 vTexcoord2;   // 추가
 		XMFLOAT2 vTexcoord3;
-		XMFLOAT3 vTangent;
-		XMFLOAT3 vBinormal;
+		XMFLOAT4 vTangent;
+		XMFLOAT4 vBinormal;
 	}VTXMESH_DATA;
 
 	typedef struct tagVertexAnimMeshData
@@ -23,11 +23,26 @@ namespace Engine
 		XMFLOAT2 vTexcoord1;
 		XMFLOAT2 vTexcoord2;
 		XMFLOAT2 vTexcoord3;
-		XMFLOAT3 vTangent;
-		XMFLOAT3 vBinormal;
+		XMFLOAT4 vTangent;
+		XMFLOAT4 vBinormal;
 		XMUINT4  vBlendIndex;   // 메시 로컬 본 인덱스 (0..num_bones-1)
 		XMFLOAT4 vBlendWeight;
 	}VTXANIMMESH_DATA;
+
+	typedef struct tagVertexMapMeshData
+	{
+		XMFLOAT3 vPosition;
+		XMFLOAT3 vNormal;
+		XMFLOAT2 vTexcoord;
+		XMFLOAT2 vTexcoord1;
+		XMFLOAT2 vTexcoord2;
+		XMFLOAT2 vTexcoord3;
+		XMFLOAT4 vTangent;
+		XMFLOAT4 vBinormal;
+		XMFLOAT4 vColor;        // _c0
+		XMFLOAT4 vColor1;       // _c1
+		XMFLOAT4 vColor2;       // _c2
+	}VTXMAPMESH_DATA;
 
 	typedef struct tagKeyFrameData
 	{
@@ -57,6 +72,7 @@ namespace Engine
 		_uint						iMaterialIndex;
 		vector<VTXMESH_DATA>		NonAnimVertices;
 		vector<VTXANIMMESH_DATA>	AnimVertices;
+		vector<VTXMAPMESH_DATA>     MapVertices;
 		vector<_uint>				Indices;
 		vector<MESH_BONE_DATA>		Bones;
 	}MESH_DATA;

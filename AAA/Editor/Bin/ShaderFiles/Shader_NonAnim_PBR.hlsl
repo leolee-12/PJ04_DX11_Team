@@ -10,6 +10,8 @@ Texture2D g_MRATexture;
 float2 g_vMaskValue;
 float4 g_vBlendColor;
 
+float g_NormalStrength = 1.f;
+
 struct VS_IN
 {
     float3 vPosition : POSITION;
@@ -18,9 +20,9 @@ struct VS_IN
     float2 vTexcoord1 : TEXCOORD1;
     float2 vTexcoord2 : TEXCOORD2;
     float2 vTexcoord3 : TEXCOORD3;
-
-    float3 vTangent : TANGENT;
-    float3 vBinormal : BINORMAL;
+    
+    float4 vTangent : TANGENT;
+    float4 vBinormal : BINORMAL;  
 };
 
 struct VS_OUT
@@ -58,9 +60,15 @@ VS_OUT VS_MAIN(VS_IN In)
     Out.vTexcoord3 = In.vTexcoord3;
     Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
     Out.vProjPos = Out.vPosition;
-    Out.vTangent = normalize(mul(float4(In.vTangent, 0.f), g_WorldMatrix));
-    Out.vBinormal = normalize(mul(float4(In.vBinormal, 0.f), g_WorldMatrix));
-
+    
+    float3 T = normalize(In.vTangent.xyz);
+    float3 B = normalize(In.vBinormal.xyz);
+    Out.vTangent = normalize(mul(float4(T, 0.f), g_WorldMatrix));
+    Out.vTangent.w = In.vTangent.w;
+    Out.vBinormal = normalize(mul(float4(B, 0.f), g_WorldMatrix));
+    Out.vBinormal.w = In.vBinormal.w;
+   
+    
     return Out;
 }
 
@@ -96,6 +104,20 @@ struct PS_BACKOUT
     float4 vDiffuse : SV_TARGET0;
 };
 
+float3 PerturbNormal(float3 N, float3 worldPos, float2 uv, float3 nTS)
+{
+    float3 dp1 = ddx(worldPos), dp2 = ddy(worldPos);
+    float2 d1 = ddx(uv), d2 = ddy(uv);
+    float3 dp2perp = cross(dp2, N);
+    float3 dp1perp = cross(N, dp1);
+    float3 T = dp2perp * d1.x + dp1perp * d2.x;
+    float3 B = dp2perp * d1.y + dp1perp * d2.y;
+    float inv = rsqrt(max(dot(T, T), dot(B, B)));
+
+      // 베이스 노멀은 N 그대로, 접선방향 디테일만 더함
+    return normalize(N + (T * inv * nTS.x + B * inv * nTS.y));
+}
+    
 
 /* 픽셀셰이더 : 픽셀의 최종적인 색을 결정해준다. */
 PS_OUT PS_MAIN(PS_IN In)
@@ -104,18 +126,50 @@ PS_OUT PS_MAIN(PS_IN In)
 
     vector vEye = g_UnkownTexture.Sample(ClampSampler, In.vTexcoord);
     vector vBase = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord1);
-
     float3 vAlbedo = lerp(vBase.rgb, vEye.rgb, vEye.a);
-    vector vMtrlDiffuse = vector(vAlbedo, vBase.a);
-    
-    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    if (vBase.a < 0.1f)
+        discard;
 
-    Out.vDiffuse = vMtrlDiffuse;
-    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
+    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord1).rgb;
 
+    //Out.vDiffuse = float4(vAlbedo, vBase.a);
+    Out.vDiffuse = float4((In.vTangent.w * 0.5f + 0.5f).rrr, 1.f);
+    Out.vNormal = float4(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
+    Out.vMRA = float4(mra, 1.f);
     return Out;
 }
+
+//PS_OUT PS_MAIN(PS_IN In)
+//{
+//    PS_OUT Out;
+
+//    vector vEye = g_UnkownTexture.Sample(ClampSampler, In.vTexcoord);
+//    vector vBase = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord1);
+//    float3 vAlbedo = lerp(vBase.rgb, vEye.rgb, vEye.a);
+//    if (vBase.a < 0.1f)
+//        discard;
+
+//    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord1).rgb;
+
+   
+//    float3 N = normalize(In.vNormal);
+//    float3 T = normalize(In.vTangent.xyz);
+//    T = normalize(T - dot(T, N) * N);
+//    float3 B = cross(N, T) * In.vTangent.w;
+//    float3x3 TBN = float3x3(T, B, N);
+
+//    float2 nrg = g_NormalTexture.Sample(LinearSampler, In.vTexcoord1).rg * 2.f - 1.f;
+//    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+//    nTS.y = -nTS.y;
+//    float3 Nw = mul(nTS, TBN);
+    
+//    Out.vDiffuse = float4(vAlbedo, vBase.a);
+//    Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
+//    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
+//    Out.vMRA = float4(mra, 1.f);
+//    return Out;
+//}
 
 PS_OUT PS_DEFFUSE(PS_IN In)
 {

@@ -4,12 +4,16 @@
 
 CTransform::CTransform(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CComponent(pDevice, pContext)
+    , m_fSpeedPerSec(0.f)
+    , m_fRotationPerSec(0.f)
 {
 	XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());
 }
 
 CTransform::CTransform(const CTransform& Prototype)
     : CComponent(Prototype)
+    , m_fSpeedPerSec(Prototype.m_fSpeedPerSec)
+    , m_fRotationPerSec(Prototype.m_fRotationPerSec)
 {
 }
 
@@ -180,6 +184,15 @@ _bool CTransform::Follow_Waypoints(deque<_float3>& Waypoints, _float fTimeDelta,
     return Waypoints.empty();
 }
 
+void CTransform::Go_Dir(_float fTimeDelta, _fvector vDir)
+{
+    _vector     vPosition = Get_State(STATE::POSITION);
+
+    vPosition += XMVectorSetW(XMVector3Normalize(vDir), 0.f) * m_fSpeedPerSec * fTimeDelta;
+
+    Set_State(STATE::POSITION, vPosition);
+}
+
 void CTransform::Rotation(_fvector vAxis, _float fRadian)
 {
     _float3         vScaled = Get_Scaled();
@@ -219,7 +232,7 @@ void CTransform::Rotate(_fvector vQuatanion)
 
 void CTransform::Turn(_fvector vAxis, _float fTimeDelta)
 {
-    Rotate(XMQuaternionRotationAxis(vAxis, m_fRotationPerSec * fTimeDelta));
+    Rotate(XMQuaternionRotationAxis(vAxis, XMConvertToRadians(m_fRotationPerSec) * fTimeDelta));
 }
 
 void CTransform::Chase(_fvector vGoal, _float fTimeDelta, _float fLimit, CNavigation* pNavigation)
@@ -281,7 +294,7 @@ _bool CTransform::LookAt_Smooth(_fvector vAt, _float fTimeDelta)
     _float fCrossY = XMVectorGetZ(vLook) * XMVectorGetX(vDesired) - XMVectorGetX(vLook) * XMVectorGetZ(vDesired);
     _float fYaw = atan2f(fCrossY, fDot);
 
-    _float fSpeed = m_fRotationPerSec * (1.f + fabsf(fYaw));
+    _float fSpeed = XMConvertToRadians(m_fRotationPerSec) * (1.f + fabsf(fYaw));
 
     _float fMaxStep = fSpeed * fTimeDelta;
     _float fApplied = (fabsf(fYaw) > fMaxStep)

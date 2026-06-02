@@ -6,7 +6,6 @@
 CTestNonAnim::CTestNonAnim(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
 {
-
 }
 
 CTestNonAnim::CTestNonAnim(const CTestNonAnim& Prototype)

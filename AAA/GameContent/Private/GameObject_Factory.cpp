@@ -7,8 +7,11 @@
 #include "TestFiona.h"
 #include "TestNonAnim.h"
 #include "TestRect.h"
+#include "TestEffectQuad.h"
+#include "Sample_MeshEffect.h"
 #include "TestMap.h"
 #include "TestMarb1e.h"
+#include "TestMarb1eMap.h"
 
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
@@ -71,23 +74,24 @@ void CGameObject_Factory::Register_Test()
     Register(TEXT("Proto_TestFiona"), TEXT("TEST_OBJECT"),
         CREATOR(CTestFiona),
         LOADER(
+            /*pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/Aligator/aligator.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))))*/
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/Aligator/Model.ysh", 
-                    XMMatrixRotationY(XMConvertToRadians(180.f))
-            //pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
-            //    CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/Aligator/Aligator_Anim.ysh"
-            //        //, XMMatrixRotationY(XMConvertToRadians(180.f))
-            ))
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/Aligator/Aligator_Anim.ysh"
+                    //, XMMatrixRotationY(XMConvertToRadians(180.f))
+                ))
         )
     );
 
-    Register(CTestMarb1e::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
-        CREATOR(CTestMarb1e),
+
+    Register(TEXT("Proto_TestNonAnim"), TEXT("TEST_OBJECT"),
+        CREATOR(CTestNonAnim),
         LOADER(
-            pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Marb1e"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/Marb1e/BladeKnight.ysh"
-                    //, XMMatrixRotationY(XMConvertToRadians(180.f))
-            ))
+            pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_NonAnim"),
+                CModel::Create(pDevice, pContext, MODEL::MAP, "../../Resources/Models/Test/Marb1e/Land_GsAllBuilding_0.ysh"
+                    //,XMMatrixRotationY(XMConvertToRadians(180.f))
+                ))
         )
     );
 
@@ -96,7 +100,38 @@ void CGameObject_Factory::Register_Test()
         LOADER()
     );
 
-    auto RegisterMap = [this](const _tchar* szObjectProtoTag, const _tchar* szModelProtoTag, const _char* szModelPath)
+    Register(CTestEffectQuad::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
+        CREATOR(CTestEffectQuad),
+        LOADER()
+    );
+    Register(CSample_MeshEffect::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
+        CREATOR(CSample_MeshEffect),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, (ETOUI(LEVEL::GAMEPLAY)), TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+
+    Register(CTestMarb1e::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
+        CREATOR(CTestMarb1e),
+        LOADER(
+            pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Marb1e"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/Marb1e/BladeKnight.ysh"
+                    //, XMMatrixRotationY(XMConvertToRadians(180.f))
+                ))
+        )
+    );
+
+    Register(CTestMarb1eMap::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
+        CREATOR(CTestMarb1eMap),
+        LOADER(
+            pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Map"),
+                CModel::Create(pDevice, pContext, MODEL::MAP, "../../Resources/Models/Test/Marb1e/Land_GsAllBuilding_0.ysh"))
+        )
+    );
+
+    /*auto RegisterMap = [this](const _tchar* szObjectProtoTag, const _tchar* szModelProtoTag, const _char* szModelPath)
         {
             Register(szObjectProtoTag, TEXT("MAP_OBJECT"),
                 [szObjectProtoTag, szModelProtoTag](ID3D11Device* pDevice, ID3D11DeviceContext* pContext) -> CBase*
@@ -113,7 +148,7 @@ void CGameObject_Factory::Register_Test()
                         CModel::Create(
                             pDevice,
                             pContext,
-                            MODEL::NONANIM,
+                            MODEL::MAP,
                             szModelPath,
                             XMMatrixRotationY(XMConvertToRadians(180.f))));
                 }
@@ -158,7 +193,7 @@ void CGameObject_Factory::Register_Test()
     RegisterMap(
         TEXT("Proto_Land_Transparent_4"),
         TEXT("Prototype_Component_Model_Land_Transparent_4"),
-        "../../Resources/Models/Test/Stage1-0/Land_Transparent_4.ysh");
+        "../../Resources/Models/Test/Stage1-0/Land_Transparent_4.ysh");*/
 }
 
 void CGameObject_Factory::Register_Container()

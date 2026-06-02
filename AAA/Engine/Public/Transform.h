@@ -11,6 +11,10 @@ class CNavigation;
 
 class ENGINE_DLL CTransform final : public CComponent
 {
+	GENERATED_BODY(CTransform)
+	PROPERTY(_float, m_fSpeedPerSec, L"Speed/sec", L"Default")
+	PROPERTY(_float, m_fRotationPerSec, L"Rotation/sec/dgree", L"Default")
+
 public:
 	typedef struct tagTransformDesc
 	{
@@ -80,6 +84,8 @@ public:
 	_bool Go_ToPoint(_fvector vTargetPos, _float fTimeDelta, CNavigation* pNavigation = nullptr);
 	_bool Follow_Waypoints(deque<_float3>& Waypoints, _float fTimeDelta, CNavigation* pNavi = nullptr);
 
+	void Go_Dir(_float fTimeDelta, _fvector vDir);
+
 	void Rotation(_fvector vAxis, _float fRadian);
 	void Rotation(_fvector vQuatanion);
 	void Rotate(_fvector vQuatanion);
@@ -97,8 +103,7 @@ private:
 		_float4					m_States[ETOUI(STATE::END)];
 	};
 
-	_float					m_fSpeedPerSec = {};
-	_float					m_fRotationPerSec = {};
+	
 
 
 public:

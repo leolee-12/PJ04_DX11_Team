@@ -54,7 +54,9 @@ HRESULT CDataLoader::Read_ysh(const _tchar* pFilePath, MODEL_DATA& out)
 
     if (magic != 0x2E595348) return E_FAIL;
 
-    out.eType = (type == 0) ? MODEL::NONANIM : MODEL::ANIM;
+    out.eType = (type == 0) ? MODEL::NONANIM
+        : (type == 2) ? MODEL::MAP
+        : MODEL::ANIM;
 
     // º»
     if (out.eType == MODEL::ANIM)
@@ -77,6 +79,12 @@ HRESULT CDataLoader::Read_ysh(const _tchar* pFilePath, MODEL_DATA& out)
             mesh.NonAnimVertices.resize(numVerts);
             file.read(reinterpret_cast<char*>(mesh.NonAnimVertices.data()),
                 sizeof(VTXMESH_DATA) * numVerts);
+        }
+        else if (out.eType == MODEL::MAP)
+        {
+            mesh.MapVertices.resize(numVerts);
+            file.read(reinterpret_cast<char*>(mesh.MapVertices.data()),
+                sizeof(VTXMAPMESH_DATA) * numVerts);
         }
         else
         {

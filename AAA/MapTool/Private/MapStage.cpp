@@ -93,11 +93,6 @@ void CMapStage::Late_Update(_float fTimeDelta)
 #endif
 }
 
-HRESULT CMapStage::Render()
-{
-	return S_OK;
-}
-
 CGameObject* CMapStage::Clone(void* pArg)
 {
 	CMapStage* pInstance = new CMapStage(*this);

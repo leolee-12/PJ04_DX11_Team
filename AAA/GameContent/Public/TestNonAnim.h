@@ -12,6 +12,8 @@ NS_BEGIN(Client)
 
 class CTestNonAnim final : public CGameObject
 {
+	GENERATED_BODY(CTestNonAnim)
+
 public:
 	typedef struct tagMonsterDesc : public CGameObject::GAMEOBJECT_DESC
 	{

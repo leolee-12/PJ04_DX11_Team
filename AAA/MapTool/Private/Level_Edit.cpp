@@ -25,7 +25,7 @@ namespace
 {
 	using namespace std::filesystem;
 
-	constexpr wchar_t kMapModelRoot[] = L"../../Resources/Maps";
+	constexpr wchar_t kMapModelRoot[] = L"../../Resources/Map";
 
 	_bool Equals_NoCase(const wstring& strLeft, const wstring& strRight)
 	{
@@ -136,8 +136,8 @@ HRESULT CLevel_Edit::Initialize()
 	if (FAILED(Ready_EditGrid()))
 		return E_FAIL;
 
-	if (FAILED(Ready_MapStage()))
-		return E_FAIL;
+	//if (FAILED(Ready_MapStage()))
+	//	return E_FAIL;
 
 	if (FAILED(Ready_EnvObjects()))
 		return E_FAIL;
@@ -609,15 +609,15 @@ HRESULT CLevel_Edit::Ready_MapStage()
 	StageDesc.iSectionProtoLevel = iEditLevel;
 	StageDesc.SectionDescs.reserve(8);
 
-	if (FAILED(AddSectionDesc(StageDesc, L"Land_GsAllBuilding_0", Client::MAP_SECTION_TYPE::BUILDING, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"Land_GsBuilding_1", Client::MAP_SECTION_TYPE::BUILDING, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"Land_GsBuilding_7", Client::MAP_SECTION_TYPE::BUILDING, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"Land_GsDefault_2", Client::MAP_SECTION_TYPE::GROUND, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"Land_GsDefault_5", Client::MAP_SECTION_TYPE::GROUND, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"Land_SeRock_3", Client::MAP_SECTION_TYPE::ROCK, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"Land_SeRock_6", Client::MAP_SECTION_TYPE::ROCK, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"Land_Transparent_4", Client::MAP_SECTION_TYPE::TRANSPARENT, RENDERID::NONBLEND))) return E_FAIL;
-	StageDesc.SectionDescs.back().bRenderable = false;
+	if (FAILED(AddSectionDesc(StageDesc, L"GsAllBuilding_0", Client::MAP_SECTION_TYPE::BUILDING, RENDERID::NONBLEND))) return E_FAIL;
+	if (FAILED(AddSectionDesc(StageDesc, L"GsBuilding_1", Client::MAP_SECTION_TYPE::BUILDING, RENDERID::NONBLEND))) return E_FAIL;
+	if (FAILED(AddSectionDesc(StageDesc, L"GsBuilding_7", Client::MAP_SECTION_TYPE::BUILDING, RENDERID::NONBLEND))) return E_FAIL;
+	if (FAILED(AddSectionDesc(StageDesc, L"GsDefault_2", Client::MAP_SECTION_TYPE::GROUND, RENDERID::NONBLEND))) return E_FAIL;
+	if (FAILED(AddSectionDesc(StageDesc, L"GsDefault_5", Client::MAP_SECTION_TYPE::GROUND, RENDERID::NONBLEND))) return E_FAIL;
+	if (FAILED(AddSectionDesc(StageDesc, L"SeRock_3", Client::MAP_SECTION_TYPE::ROCK, RENDERID::NONBLEND))) return E_FAIL;
+	if (FAILED(AddSectionDesc(StageDesc, L"SeRock_6", Client::MAP_SECTION_TYPE::ROCK, RENDERID::NONBLEND))) return E_FAIL;
+	//if (FAILED(AddSectionDesc(StageDesc, L"Transparent_4", Client::MAP_SECTION_TYPE::TRANSPARENT, RENDERID::NONBLEND))) return E_FAIL;
+	//StageDesc.SectionDescs.back().bRenderable = false;
 
 	CGameObject* pStageObject = nullptr;
 	if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(
@@ -646,10 +646,10 @@ HRESULT CLevel_Edit::Ready_EnvObjects()
 	const _uint iEditLevel = ETOUI(TOOL_LEVEL::EDIT);
 	static const wchar_t* kEnvJsonPaths[] =
 	{
-		L"../../Resources/Maps/Decor_Decor.json",
-		L"../../Resources/Models/Test/Toy_Decor/Toy_Decor.json",
-		L"../../Resources/Models/Test/Toy_Obj/Toy_Obj.json",
-		L"../../Resources/Models/Test/Decor_Obj/Decor_Obj.json"
+		L"../../Resources/Map/Decor_Decor.json",
+		L"../../Resources/Map/Toy_Decor.json",
+		L"../../Resources/Map/Toy_Obj.json",
+		L"../../Resources/Map/Decor_Obj.json"
 	};
 
 	for (const wchar_t* pJsonPath : kEnvJsonPaths)
