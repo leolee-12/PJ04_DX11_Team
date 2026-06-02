@@ -20,6 +20,15 @@ private:
 	virtual ~CModel() = default;
 
 public:
+	// Ãß°¡
+	_uint Get_NumAnimations() const { return (_uint)m_Animations.size(); }
+
+	_uint Get_NumBones() const { return static_cast<_uint>(m_Bones.size()); }
+	const string& Get_BoneName(_uint iIndex) const;
+	_int Get_BoneParentIndex(_uint iIndex) const;
+	_int Get_RootBoneIndex() const;
+	void Get_AnimChannelBoneIndices(_uint iAnimIndex, vector<_uint>& Out);
+
 	size_t Get_NumMeshes() const {
 		return m_iNumMeshes;
 	}

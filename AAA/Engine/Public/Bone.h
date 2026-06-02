@@ -18,6 +18,10 @@ private:
 	virtual ~CBone() = default;
 
 public:
+	// Ãß°¡
+	const string&	Get_Name() const { return m_strName; }
+	_int			Get_ParentIndex() const { return m_iParentIndex; }
+
 	_bool Compare_Name(const string& strBoneName) {
 		return strBoneName == m_strName;
 	}

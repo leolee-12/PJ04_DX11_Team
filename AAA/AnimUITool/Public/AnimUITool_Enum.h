@@ -7,6 +7,14 @@ namespace AnimUITool
     enum class TOOL_LEVEL { STATIC, EDIT, END };
 
     enum class LOG_LEVEL { INFO, WARNING, ERROR_, END };
+
+    enum class PREVIEW_SHADER_MODE
+    {
+        AUTO,
+        ANIM_MESH,
+        NONANIM_MESH,
+        END
+    };
 }
 
 #endif // AnimUITool_Enum_h__

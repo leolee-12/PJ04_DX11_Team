@@ -36,6 +36,33 @@ CModel::CModel(const CModel& Prototype)
 
 }
 
+const string& CModel::Get_BoneName(_uint iIndex) const
+{
+    static const string s_Empty;
+    return (iIndex < m_Bones.size()) ? m_Bones[iIndex]->Get_Name() : s_Empty;
+}
+
+_int CModel::Get_BoneParentIndex(_uint iIndex) const
+{
+    return (iIndex < m_Bones.size()) ? m_Bones[iIndex]->Get_ParentIndex() : -1;
+}
+
+_int CModel::Get_RootBoneIndex() const
+{
+    for (_uint i = 0; i < static_cast<_uint>(m_Bones.size()); i++)
+        if (m_Bones[i]->Get_ParentIndex() < 0)
+            return static_cast<_int>(i);
+
+    return m_Bones.empty() ? -1 : 0;
+}
+
+void CModel::Get_AnimChannelBoneIndices(_uint iAnimIndex, vector<_uint>& Out)
+{
+    Out.clear();
+    if (iAnimIndex < m_Animations.size())
+        m_Animations[iAnimIndex]->Get_ChannelBoneIndices(Out);
+}
+
 _int CModel::Get_BoneIndex(const string& strBoneName)
 {
     _int        iIndex = { -1 };

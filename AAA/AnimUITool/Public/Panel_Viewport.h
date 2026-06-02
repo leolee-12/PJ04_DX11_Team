@@ -15,12 +15,13 @@ public:
 public:
 	virtual void				Render() override;
 	void						Set_SRV(ID3D11ShaderResourceView* pSRV);
+	void						Set_Aspect(_float fAspect) { m_fTargetAspect = fAspect; }
 
 private:
 	ID3D11ShaderResourceView*	m_pSRV = { nullptr };
 
 private:
-	static constexpr _float		m_fTargetAspect = { 1600.f / 900.f };
+	_float						m_fTargetAspect = { 1600.f / 900.f };
 	_bool						m_bHovered = { false };
 
 public:
