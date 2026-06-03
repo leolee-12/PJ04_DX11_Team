@@ -182,6 +182,8 @@
     <ClInclude Include="..\public\Collision_Manager.h" />
     <ClInclude Include="..\public\Component.h" />
     <ClInclude Include="..\Public\ContainerObject.h" />
+    <ClInclude Include="..\Public\Culling_Context.h" />
+    <ClInclude Include="..\Public\Culling_Util.h" />
     <ClInclude Include="..\Public\CustomFont.h" />
     <ClInclude Include="..\Public\DataExporter.h" />
     <ClInclude Include="..\Public\DataLoader.h" />
@@ -266,6 +268,8 @@
     <ClCompile Include="..\private\Collision_Manager.cpp" />
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\Private\ContainerObject.cpp" />
+    <ClCompile Include="..\Private\Culling_Context.cpp" />
+    <ClCompile Include="..\Private\Culling_Util.cpp" />
     <ClCompile Include="..\Private\CustomFont.cpp" />
     <ClCompile Include="..\Private\DataExporter.cpp" />
     <ClCompile Include="..\Private\DataLoader.cpp" />

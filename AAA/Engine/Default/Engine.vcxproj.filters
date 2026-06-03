@@ -244,6 +244,9 @@
     <Filter Include="18. ShaderGlobal">
       <UniqueIdentifier>{a6f96f26-41b6-4a5a-8a4c-51da7d9eb84f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="19. Culling">
+      <UniqueIdentifier>{7467f37f-4478-4e05-9ece-ea4b10c3cb1c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -480,6 +483,12 @@
     <ClInclude Include="..\public\ShaderGlobal_Manager.h">
       <Filter>18. ShaderGlobal</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Culling_Util.h">
+      <Filter>19. Culling</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Culling_Context.h">
+      <Filter>19. Culling</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -694,6 +703,12 @@
     </ClCompile>
     <ClCompile Include="..\private\ShaderGlobal_Manager.cpp">
       <Filter>18. ShaderGlobal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Culling_Util.cpp">
+      <Filter>19. Culling</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Culling_Context.cpp">
+      <Filter>19. Culling</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
