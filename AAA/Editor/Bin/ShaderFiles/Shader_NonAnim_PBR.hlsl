@@ -12,6 +12,8 @@ float4 g_vBlendColor;
 
 float g_NormalStrength = 1.f;
 
+float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
+
 struct VS_IN
 {
     float3 vPosition : POSITION;
@@ -97,6 +99,7 @@ struct PS_OUT
     float4 vNormal : SV_TARGET1;
     float4 vDepth : SV_TARGET2;
     float4 vMRA : SV_TARGET3;
+    float4 vEmissive : SV_TARGET4;
 };
 
 struct PS_BACKOUT
@@ -137,6 +140,8 @@ PS_OUT PS_MAIN(PS_IN In)
     Out.vNormal = float4(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(mra, 1.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vBase.a, 1.f);
+    
     return Out;
 }
 
@@ -184,6 +189,7 @@ PS_OUT PS_DEFFUSE(PS_IN In)
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(0.f, 1.f, 1.f, 1.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
     return Out;
 }
 

@@ -23,6 +23,8 @@ float g_fMossAmount = 1.f; // 전역 이끼 강도
 
 float g_fDirtAmount = 1.f;
 
+float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
+
 struct VS_IN
 {
     float3 vPosition : POSITION;
@@ -105,6 +107,7 @@ struct PS_OUT
     float4 vNormal  : SV_TARGET1;
     float4 vDepth   : SV_TARGET2;
     float4 vMRA     : SV_TARGET3;
+    float4 vEmissive : SV_TARGET4;
 };
 
 // world XZ projection UV for top faces (2D rotate + scale + offset)
@@ -138,7 +141,7 @@ PS_OUT PS_MAIN(PS_IN In)
     float3x3 TBN = float3x3(T, B, N);
 
     float2 nrg = g_NormalTexture.Sample(LinearSampler, uv).rg * 2.f - 1.f;
-    nrg *= g_NormalStrength;
+    nrg *= 0.f; //g_NormalStrength;
     float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
     nTS.y = -nTS.y;                                  
     float3 Nw = normalize(mul(nTS, TBN));
@@ -158,8 +161,11 @@ PS_OUT PS_MAIN(PS_IN In)
 
     Out.vDiffuse = float4(albedo, 1.f);
     Out.vNormal  = float4(Nw * 0.5f + 0.5f, 0.f);
+    //Out.vNormal = float4(In.vNormal.rgb * 0.5f + 0.5f, 0.f);
     Out.vDepth   = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA     = float4(mra, 1.f);
+    //Out.vMRA     = float4(mra, 1.f);
+    Out.vMRA = float4(1, 0.05, 1, 1);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vBase.a, 1.f);
     return Out;
 }
 
@@ -178,6 +184,7 @@ PS_OUT PS_OVERLAY(PS_IN In)   // DirtParts / Cover 전용
     Out.vNormal  = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f); // 노멀맵 없음 → 기하노멀
     Out.vDepth   = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA     = float4(0.f, 1.f, 1.f, 1.f); // metal0 / rough1 / ao1 기본
+    Out.vEmissive = float4(0.f, 0.f, 0.f, 1.f);
     return Out;
 }
 

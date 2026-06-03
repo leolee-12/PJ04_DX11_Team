@@ -70,6 +70,7 @@ private:
 	HRESULT Render_SSAO();
 	HRESULT Render_Lights();
 	HRESULT Render_Combined();
+	HRESULT Render_SSR();
 	HRESULT Render_Bloom();
 
 	HRESULT Render_NonLight();

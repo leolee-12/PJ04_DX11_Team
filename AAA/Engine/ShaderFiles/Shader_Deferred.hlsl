@@ -12,6 +12,7 @@ Texture2D g_DepthTexture; // (z/w, viewZ/500, ...)
 Texture2D g_MRATexture; // r=metallic, g=roughness, b=ao
 Texture2D g_LightTexture; // HDR 광량 누적 (Combine 입력)
 Texture2D g_LightDepthTexture; // 그림자맵
+Texture2D g_EmissiveTexture; // 이미시브
 
 vector g_vCamPosition;
 
@@ -230,6 +231,9 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     float sd = g_LightDepthTexture.Sample(BorderSampler, suv).r;
     if (pz <= 1.f && pz - 0.002f > sd)
         color *= 0.5f;
+    
+    float3 emissive = g_EmissiveTexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    color += emissive;
 
     return float4(color, 1.f);
 }
