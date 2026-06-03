@@ -8,7 +8,6 @@ class CGameInstance_Proxy;
 NS_END
 
 NS_BEGIN(Client)
-
 class CMapStage;
 
 class CLIENT_DLL CMapDescriptor final : public CBase

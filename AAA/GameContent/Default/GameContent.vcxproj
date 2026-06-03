@@ -43,6 +43,7 @@
     <ClInclude Include="..\Public\ResourceData.h" />
     <ClInclude Include="..\Public\Sample_MeshEffect.h" />
     <ClInclude Include="..\Public\MapDescriptor.h" />
+    <ClInclude Include="..\Public\SmokeSphereOriginal.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\TestEffectQuad.h" />
     <ClInclude Include="..\Public\TestFiona.h" />
@@ -52,6 +53,7 @@
     <ClInclude Include="..\Public\TestNonAnim.h" />
     <ClInclude Include="..\public\TestRect.h" />
     <ClInclude Include="..\Public\YshModelValidator.h" />
+    <ClInclude Include="..\Public\WalkSmoke.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Camera_Free.cpp" />
@@ -68,6 +70,7 @@
     <ClCompile Include="..\Private\Sample_MeshEffect.cpp" />
     <ClCompile Include="..\private\MapObject.cpp" />
     <ClCompile Include="..\Private\MapDescriptor.cpp" />
+    <ClCompile Include="..\Private\SmokeSphereOriginal.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\TestEffectQuad.cpp" />
     <ClCompile Include="..\Private\TestFiona.cpp" />
@@ -76,6 +79,7 @@
     <ClCompile Include="..\private\TestMarb1eMap.cpp" />
     <ClCompile Include="..\Private\TestNonAnim.cpp" />
     <ClCompile Include="..\private\TestRect.cpp" />
+    <ClCompile Include="..\Private\WalkSmoke.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl" />

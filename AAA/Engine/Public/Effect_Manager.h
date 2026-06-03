@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Base.h"
-#include "Effect.h"
+#include "Effect_Container.h"
 
 NS_BEGIN(Engine)
 
@@ -21,8 +21,8 @@ public:
     HRESULT Initialize();
     HRESULT Spawn(_uint iLevel,
         const _wstring& strProtoTag,
-        const CEffect::EFFECT_DESC& desc,
-        CEffect** ppOut = nullptr);
+        const CEffect_Container::EFFECT_CONTAINER_DESC& desc,
+        CEffect_Container** ppOut = nullptr);
 
     CShader* Get_2DShader() { return m_p2DShader; }
     CShader* Get_MeshShader() { return m_pMeshShader; }

@@ -103,6 +103,53 @@ PS_OUT PS_MAIN(PS_IN In)
     return Out;
 }
 
+
+
+
+
+PS_OUT PS_MAIN_MIRROR(PS_IN In)
+{
+    PS_OUT Out;
+       
+    if (In.vTexcoord.x > (1.f - g_fUVCutRight) || In.vTexcoord.x < g_fUVCutLeft)
+        discard;
+    
+    if (In.vTexcoord.y > (1.f - g_fUVCutBottom) || In.vTexcoord.y < g_fUVCutTop)
+        discard;
+    
+    if (g_bFlipX == 1)
+        In.vTexcoord.x = -In.vTexcoord.x + 1.f;
+    
+    if (g_bFlipY == 1)
+        In.vTexcoord.y = -In.vTexcoord.y + 1.f;
+    
+    Out.vColor = float4(1.f, 1.f, 1.f, 1.f);
+    
+    if (g_bUseTexture == true)
+    {
+        float2 vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling;
+        Out.vColor *= g_Texture.Sample(MirrorSampler, vUV);
+    }
+    
+    if (g_bUseMask == true)
+    {
+        float2 vUV = g_vMaskOffset + In.vTexcoord * g_vMaskTiling;
+        Out.vColor *= g_Mask.Sample(MirrorSampler, vUV);
+    }
+    
+    Out.vColor.xyz *= g_vColor;
+    Out.vColor.a *= g_fAlpha;
+    
+    if (g_bAlphaTest == true && Out.vColor.a <= g_fTestAlpha)
+        discard;
+    
+    return Out;
+}
+
+
+
+
+
 technique11 DefaultTechnique
 {
     pass DefaultPass
@@ -136,5 +183,38 @@ technique11 DefaultTechnique
         SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
         SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0, PS_MAIN()));
+    }
+
+    pass DefaultPass_Mirror
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_MAIN_MIRROR()));
+    }
+
+    pass AlphaBlend_Mirror
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NoWrite, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_MAIN_MIRROR()));
+    }
+
+    pass Additive_Mirror
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_NoWrite, 0);
+        SetBlendState(BS_Additive, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_MAIN_MIRROR()));
     }
 }

@@ -15,6 +15,8 @@
 #include "UIPartObject.h"
 #include "Animator.h"
 #include "GameContent_AnimEvents.h"
+#include "Effect_Container.h"
+#include "Effect_Part.h"
 #include "MapDescriptor.h"
 
 IMPLEMENT_SINGLETON(CImGui_Manager)
@@ -107,6 +109,7 @@ void CImGui_Manager::ImGui_Render()
     float fRightWidth = vSize.x * 0.2f;      // 오른쪽 20%
     float fCenterWidth = vSize.x - fLeftWidth - fRightWidth;
     float fTopHeight = vSize.y * 0.1f;      // 상단 10%
+    float fCenterHeight = vSize.y - fTopHeight;
 
     // Toolbar (상단 전체)
     ImGui::SetNextWindowPos(vPos, ImGuiCond_Always);
@@ -123,10 +126,15 @@ void CImGui_Manager::ImGui_Render()
     ImGui::SetNextWindowSize(ImVec2(fLeftWidth, (vSize.y - fTopHeight) * 0.5f), ImGuiCond_Always);
     Draw_Palette();
 
-    // Viewport (중앙)
+    // Viewport (중앙 상단 75%)
     ImGui::SetNextWindowPos(ImVec2(vPos.x + fLeftWidth, vPos.y + fTopHeight), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(fCenterWidth, vSize.y - fTopHeight), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(fCenterWidth, fCenterHeight * 0.75f), ImGuiCond_Always);
     Draw_Viewport();
+
+    // Shader Globals (중앙 하단 25%)
+    ImGui::SetNextWindowPos(ImVec2(vPos.x + fLeftWidth, vPos.y + fTopHeight + fCenterHeight * 0.75f), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(fCenterWidth, fCenterHeight * 0.25f), ImGuiCond_Always);
+    Draw_ShaderGlobals();
 
     // Inspector (오른쪽)
     ImGui::SetNextWindowPos(ImVec2(vPos.x + fLeftWidth + fCenterWidth, vPos.y + fTopHeight), ImGuiCond_Always);
@@ -630,6 +638,29 @@ void CImGui_Manager::Draw_Inspector()
             return a.first < b.first;
             });
 
+        for (auto& [tag, pPart] : vecSorted)
+        {
+            string strTag = WstrToStr(tag);
+            if (ImGui::CollapsingHeader(strTag.c_str()))
+            {
+                ImGui::PushID(pPart);
+                Draw_Transform(pPart, strTag);
+                ImGui::Separator();
+                Draw_Properties(pPart);
+                ImGui::PopID();
+            }
+        }
+    }
+
+    auto pEffectContainer = dynamic_cast<CEffect_Container*>(pSelected);
+    if (pEffectContainer)
+    {
+        auto& pEffectPart = pEffectContainer->Get_EffectPartObject();
+        vector<pair<wstring, CEffect_Part*>> vecSorted(pEffectPart.begin(), pEffectPart.end());
+        sort(vecSorted.begin(), vecSorted.end(), [](const auto& a, const auto& b) {
+            return a.first < b.first;
+            });
+        
         for (auto& [tag, pPart] : vecSorted)
         {
             string strTag = WstrToStr(tag);
@@ -1158,6 +1189,43 @@ void CImGui_Manager::Draw_AnimatorEditor(CModel* pModel, CAnimator* pAnimator)
         pAnimator->Sort_Track(strName);
         pAnimator->Save_ToFile(TEXT("../../Resources/Models/Test/Marb1e/Marb1e_animevents.json"));
     }
+}
+
+void CImGui_Manager::Draw_ShaderGlobals()
+{
+    ImGui::Begin("Shader Globals", nullptr,
+        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+
+    if (nullptr != m_pGameInstance_Proxy)
+    {
+        auto& Globals = m_pGameInstance_Proxy->Get_ShaderGlobals();
+
+        _int iID = 0;
+        for (auto& g : Globals)
+        {
+            ImGui::PushID(iID++);   // 라벨 중복 대비 고유 ID
+
+            switch (g.eType)
+            {
+                case GVAL::FLOAT:
+                    ImGui::SliderFloat(g.strLabel.c_str(), &g.vValue.x, g.vRange.x, g.vRange.y);
+                    break;
+                case GVAL::FLOAT2:
+                    ImGui::SliderFloat2(g.strLabel.c_str(), &g.vValue.x, g.vRange.x, g.vRange.y);
+                    break;
+                case GVAL::FLOAT3:
+                    ImGui::SliderFloat3(g.strLabel.c_str(), &g.vValue.x, g.vRange.x, g.vRange.y);
+                    break;
+                case GVAL::FLOAT4:
+                    ImGui::SliderFloat4(g.strLabel.c_str(), &g.vValue.x, g.vRange.x, g.vRange.y);
+                    break;
+            }
+
+            ImGui::PopID();
+        }
+    }
+
+    ImGui::End();
 }
 
 void CImGui_Manager::Free()

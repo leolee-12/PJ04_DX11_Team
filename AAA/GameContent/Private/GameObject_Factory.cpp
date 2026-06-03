@@ -13,6 +13,12 @@
 #include "TestMarb1e.h"
 #include "TestMarb1eMap.h"
 
+// Effect_Container
+#include "WalkSmoke.h"
+
+// Effect_Part
+#include "SmokeSphereOriginal.h"
+
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
 #define CREATOR(CLASS) \
@@ -113,7 +119,7 @@ void CGameObject_Factory::Register_Test()
     Register(CSample_MeshEffect::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
         CREATOR(CSample_MeshEffect),
         LOADER(
-            TRY_ADD_PROTO(pProxy, (ETOUI(LEVEL::GAMEPLAY)), TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+            TRY_ADD_PROTO(pProxy, (ETOUI(LEVEL::GAMEPLAY)), TEXT("Prototype_Component_Model_SmokeSphereOriginal_Test"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
 
             TRY_ADD_PROTO(pProxy, Texture_Common_Flash02.iLevelID, Texture_Common_Flash02.szProtoTag,
@@ -143,69 +149,22 @@ void CGameObject_Factory::Register_Test()
         )
     );
 
-    /*auto RegisterMap = [this](const _tchar* szObjectProtoTag, const _tchar* szModelProtoTag, const _char* szModelPath)
-        {
-            Register(szObjectProtoTag, TEXT("MAP_OBJECT"),
-                [szObjectProtoTag, szModelProtoTag](ID3D11Device* pDevice, ID3D11DeviceContext* pContext) -> CBase*
-                {
-                    return dynamic_cast<CBase*>(
-                        CTestMap::Create(pDevice, pContext, szObjectProtoTag, szModelProtoTag));
-                },
-                [szModelProtoTag, szModelPath](CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-                {
-                    TRY_ADD_PROTO(
-                        pProxy,
-                        ETOUI(LEVEL::GAMEPLAY),
-                        szModelProtoTag,
-                        CModel::Create(
-                            pDevice,
-                            pContext,
-                            MODEL::MAP,
-                            szModelPath,
-                            XMMatrixRotationY(XMConvertToRadians(180.f))));
-                }
-            );
-        };
 
-    RegisterMap(
-        TEXT("Proto_Land_GsAllBuilding_0"),
-        TEXT("Prototype_Component_Model_Land_GsAllBuilding_0"),
-        "../../Resources/Models/Test/Stage1-0/Land_GsAllBuilding_0.ysh");
 
-    RegisterMap(
-        TEXT("Proto_Land_GsBuilding_1"),
-        TEXT("Prototype_Component_Model_Land_GsBuilding_1"),
-        "../../Resources/Models/Test/Stage1-0/Land_GsBuilding_1.ysh");
 
-    RegisterMap(
-        TEXT("Proto_Land_GsBuilding_7"),
-        TEXT("Prototype_Component_Model_Land_GsBuilding_7"),
-        "../../Resources/Models/Test/Stage1-0/Land_GsBuilding_7.ysh");
 
-    RegisterMap(
-        TEXT("Proto_Land_GsDefault_2"),
-        TEXT("Prototype_Component_Model_Land_GsDefault_2"),
-        "../../Resources/Models/Test/Stage1-0/Land_GsDefault_2.ysh");
-
-    RegisterMap(
-        TEXT("Proto_Land_GsDefault_5"),
-        TEXT("Prototype_Component_Model_Land_GsDefault_5"),
-        "../../Resources/Models/Test/Stage1-0/Land_GsDefault_5.ysh");
-
-    RegisterMap(
-       TEXT("Proto_Land_SeRock_3"),
-       TEXT("Prototype_Component_Model_Land_SeRock_3"),
-       "../../Resources/Models/Test/Stage1-0/Land_SeRock_3.ysh");
-    
-    RegisterMap(
-        TEXT("Proto_Land_SeRock_6"),
-        TEXT("Prototype_Component_Model_Land_SeRock_6"),
-        "../../Resources/Models/Test/Stage1-0/Land_SeRock_6.ysh");
-
-    RegisterMap(
-        TEXT("Proto_Land_Transparent_4"),
-        TEXT("Prototype_Component_Model_Land_Transparent_4"),
-        "../../Resources/Models/Test/Stage1-0/Land_Transparent_4.ysh");*/
+    // Effect_Container
+    // 1. WalkSmoke
+    Register(CWalkSmoke::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CWalkSmoke),
+        LOADER
+        (
+            // SmokeSphereOriginal
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CSmokeSphereOriginal::PROTOTYPE_TAG,
+                CSmokeSphereOriginal::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
 }
 
 void CGameObject_Factory::Register_Container()

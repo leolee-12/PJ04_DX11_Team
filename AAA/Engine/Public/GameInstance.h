@@ -28,6 +28,7 @@ class CShadow_Dir;
 class CEffect_Manager;
 class CPhysX_Manager;
 class CEnvironment_Manager;
+class CShaderGlobal_Manager;
 
 class ENGINE_DLL CGameInstance 
 {
@@ -185,7 +186,7 @@ private:
 #pragma region TARGET_MANAGER
 	HRESULT Add_RenderTarget(const _wstring& strTargetTag, _uint iWidth, _uint iHeight, DXGI_FORMAT ePixelFormat, const _float4& vClearColor);
 	HRESULT Add_MRT(const _wstring& strMRTTag, const _wstring& strTargetTag);
-	HRESULT Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV);
+	HRESULT Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV, _bool bBindDSV);
 	HRESULT End_MRT();
 
 #ifdef _DEBUG
@@ -222,6 +223,7 @@ private:
 	CEffect_Manager*			m_pEffect_Manager = { nullptr };
 	CPhysX_Manager*				m_pPhysX_Manager = { nullptr };
 	CEnvironment_Manager*		m_pEnvironment_Manager = { nullptr };
+	CShaderGlobal_Manager*		m_pShaderGlobal_Manager = { nullptr };
 
 	mutable mt19937             m_RandomGenerator;
 	_bool						m_bEditMode = { false };

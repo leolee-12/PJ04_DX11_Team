@@ -158,7 +158,7 @@ PS_OUT PS_MAIN(PS_IN In)
 
     Out.vDiffuse = float4(albedo, 1.f);
     Out.vNormal  = float4(Nw * 0.5f + 0.5f, 0.f);
-    Out.vDepth   = float4(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
+    Out.vDepth   = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA     = float4(mra, 1.f);
     return Out;
 }
@@ -175,9 +175,9 @@ PS_OUT PS_OVERLAY(PS_IN In)   // DirtParts / Cover 전용
 
     float3 dirt = g_DiffuseTexture.Sample(LinearSampler, uv).rgb; // CoverC
     Out.vDiffuse = float4(dirt, 1.f);
-    Out.vNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f); // 노멀맵 없음 → 기하노멀
-    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
-    Out.vMRA = float4(0.f, 1.f, 1.f, 1.f); // metal0 / rough1 / ao1 기본
+    Out.vNormal  = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f); // 노멀맵 없음 → 기하노멀
+    Out.vDepth   = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA     = float4(0.f, 1.f, 1.f, 1.f); // metal0 / rough1 / ao1 기본
     return Out;
 }
 

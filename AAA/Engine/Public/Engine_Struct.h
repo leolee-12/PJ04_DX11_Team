@@ -51,6 +51,15 @@ namespace Engine
 		unsigned int	uiVersion;
 	}SUBHANDLE;
 
+	struct GLOBAL_DESC
+	{
+		string  strShaderName;            // 셰이더 변수명 "g_fSSAORadius"
+		string  strLabel;                 // 에디터 표시명 "SSAO Radius"
+		GVAL    eType = GVAL::FLOAT;
+		XMFLOAT4 vValue = {};              // FLOAT은 .x만 사용
+		XMFLOAT2 vRange = { 0.f, 1.f };    // 에디터 슬라이더 min/max
+	};
+
 	typedef struct tagAnimEvent
 	{
 		int         iEventType = 0;          // 의미는 클라이언트 enum(EANIM_EVENT)이 결정
