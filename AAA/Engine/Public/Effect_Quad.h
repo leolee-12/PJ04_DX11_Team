@@ -23,7 +23,7 @@ public:
     };
 
 private:
-    enum ShaderPass { Default, AlphaBlend, ADDITIVE, ShaderPass_End };
+    enum ShaderPass { Default, AlphaBlend, Additive, Default_Mirror, AlphaBlend_Mirror, Additive_Mirror, ShaderPass_End };
 
 protected:
     CEffect_Quad(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -41,8 +41,8 @@ public:
     virtual HRESULT Render() override;
 
 protected:
+    virtual void Update_UVScroll(const _float fTimeDelta, const _float fActiveTime, const _float fRatio) override;
     virtual void Update_EffectPart(const _float fTimeDelta, const _float fActiveTime, const _float fRatio) override;
-    virtual void Update_UVScroll(const _float fTimeDelta) override;
 
 private:
     HRESULT Ready_Components();

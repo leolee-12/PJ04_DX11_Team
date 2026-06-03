@@ -58,6 +58,21 @@
     <Filter Include="00. GameObject\01. Map">
       <UniqueIdentifier>{52aa1b5e-9f41-4300-b321-d94a31de3ab2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\02. Effect">
+      <UniqueIdentifier>{289ff231-82b4-41ae-806c-a6d26b461dfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\02. Effect\00. EffectContainer">
+      <UniqueIdentifier>{48e671a4-0884-4bc5-9390-1d1119d15de8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\02. Effect\00. EffectContainer\00. WalkSmoke">
+      <UniqueIdentifier>{9f8fcf1c-0b3e-48eb-9310-44093cf6ed7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\02. Effect\01. Effect_Part">
+      <UniqueIdentifier>{40aab48f-b6b1-4fe9-80fa-b4ca0ea5dad0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\02. Effect\01. Effect_Part\00. SmokeSphereOriginal">
+      <UniqueIdentifier>{362df019-e5fa-4be5-9f18-eea43e8e277e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -120,6 +135,12 @@
     <ClInclude Include="..\public\MapObject.h">
       <Filter>00. GameObject\01. Map</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\WalkSmoke.h">
+      <Filter>00. GameObject\02. Effect\00. EffectContainer\00. WalkSmoke</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SmokeSphereOriginal.h">
+      <Filter>00. GameObject\02. Effect\01. Effect_Part\00. SmokeSphereOriginal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -157,6 +178,12 @@
     </ClCompile>
     <ClCompile Include="..\private\MapObject.cpp">
       <Filter>00. GameObject\01. Map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\WalkSmoke.cpp">
+      <Filter>00. GameObject\02. Effect\00. EffectContainer\00. WalkSmoke</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SmokeSphereOriginal.cpp">
+      <Filter>00. GameObject\02. Effect\01. Effect_Part\00. SmokeSphereOriginal</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
