@@ -1,6 +1,5 @@
 #include "ImGui_Manager.h"
 
-
 #include "GameInstance.h"
 #include "GameObject_Factory.h"
 #include "Level_Edit.h"
@@ -16,6 +15,7 @@
 #include "UIPartObject.h"
 #include "Animator.h"
 #include "GameContent_AnimEvents.h"
+#include "MapDescriptor.h"
 
 IMPLEMENT_SINGLETON(CImGui_Manager)
 
@@ -235,6 +235,50 @@ void CImGui_Manager::Draw_Toolbar()
     }
 
     ImGui::SameLine();
+
+    CMapDescriptor* pMapDescriptor = CMapDescriptor::GetInstance();
+
+    const _uint iMapPreviewPresetCount = pMapDescriptor->Get_MapPresetCount();
+    static _int s_iMapPreviewPreset = 0;
+    if (0 < iMapPreviewPresetCount)
+    {
+        if (s_iMapPreviewPreset < 0 || static_cast<_uint>(s_iMapPreviewPreset) >= iMapPreviewPresetCount)
+            s_iMapPreviewPreset = 0;
+
+        ImGui::SetNextItemWidth(100.f);
+        if (ImGui::BeginCombo("##MapPreviewPreset", pMapDescriptor->Get_MapPresetLabel(static_cast<_uint>(s_iMapPreviewPreset))))
+        {
+            for (_uint i = 0; i < iMapPreviewPresetCount; ++i)
+            {
+                const _bool bSelected = (static_cast<_uint>(s_iMapPreviewPreset) == i);
+                if (ImGui::Selectable(pMapDescriptor->Get_MapPresetLabel(i), bSelected))
+                    s_iMapPreviewPreset = static_cast<_int>(i);
+                if (bSelected)
+                    ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndCombo();
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Load Map"))
+            m_pLevel_Edit->Load_MapPreview(static_cast<_uint>(s_iMapPreviewPreset));
+
+        ImGui::SameLine();
+        if (ImGui::Button("Clear Map"))
+            m_pLevel_Edit->Clear_MapPreview();
+
+        string strMapPreviewStatus = WstrToStr(m_pLevel_Edit->Get_MapPreviewStatus());
+        const string strFullMapPreviewStatus = strMapPreviewStatus;
+        if (strMapPreviewStatus.size() > 48)
+            strMapPreviewStatus = strMapPreviewStatus.substr(0, 45) + "...";
+
+        ImGui::SameLine();
+        ImGui::TextDisabled("%s", strMapPreviewStatus.c_str());
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("%s", strFullMapPreviewStatus.c_str());
+
+        ImGui::SameLine();
+    }
 
     auto OpButton = [this](const char* label, ImGuizmo::OPERATION op) {
         bool bActive = (m_eGizmoOp == op);

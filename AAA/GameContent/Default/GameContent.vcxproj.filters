@@ -67,6 +67,9 @@
     <Filter Include="00. GameObject\02. EnvObject\EnvObj_Load">
       <UniqueIdentifier>{cad642eb-e745-4355-90b4-b1497ba3ef09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\01. Map\MapDescriptor">
+      <UniqueIdentifier>{077c1198-d891-486e-b491-c184ad619dd7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -165,6 +168,9 @@
     <ClInclude Include="..\Public\EnvObjectLoader.h">
       <Filter>00. GameObject\02. EnvObject\EnvObj_Load</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MapDescriptor.h">
+      <Filter>00. GameObject\01. Map\MapDescriptor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -229,6 +235,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\EnvObjectLoader.cpp">
       <Filter>00. GameObject\02. EnvObject\EnvObj_Load</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapDescriptor.cpp">
+      <Filter>00. GameObject\01. Map\MapDescriptor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -762,6 +762,27 @@ HRESULT CEnvObjectLoader::Load_FromJsonFile(
 	_uint iObjectLevel,
 	const wstring& strJsonPath)
 {
+	return Load_FromJsonFile(
+		pProxy,
+		pDevice,
+		pContext,
+		iObjectLevel,
+		strJsonPath,
+		nullptr,
+		nullptr,
+		nullptr);
+}
+
+HRESULT CEnvObjectLoader::Load_FromJsonFile(
+	CGameInstance_Proxy* pProxy,
+	ID3D11Device* pDevice,
+	ID3D11DeviceContext* pContext,
+	_uint iObjectLevel,
+	const wstring& strJsonPath,
+	ENV_OBJECT_CREATED_CALLBACK pCreatedCallback,
+	void* pCallbackContext,
+	ENV_OBJECT_LOAD_REPORT* pOutReport)
+{
 	if (nullptr == pProxy)
 		return E_FAIL;
 
@@ -772,8 +793,8 @@ HRESULT CEnvObjectLoader::Load_FromJsonFile(
 	if (FAILED(Build_Descriptors_FromJsonFile(strJsonPath, &Descs)))
 		return E_FAIL;
 
-	_uint iCreatedCount = 0;
-	_uint iSkippedMissingModel = 0;
+	ENV_OBJECT_LOAD_REPORT Report{};
+	Report.iDescriptorCount = static_cast<_uint>(Descs.size());
 
 	for (ENV_OBJECT_DESC& Desc : Descs)
 	{
@@ -786,7 +807,7 @@ HRESULT CEnvObjectLoader::Load_FromJsonFile(
 			if (MissingSet.insert(Desc.strObjectName).second)
 				Log_GameContentWarning("EnvObject model missing: " + WstrToStr(Desc.strObjectName));
 
-			++iSkippedMissingModel;
+			++Report.iSkippedMissingModel;
 			continue;
 		}
 
@@ -794,34 +815,47 @@ HRESULT CEnvObjectLoader::Load_FromJsonFile(
 			&& !Desc.strModelProtoTag.empty())
 		{
 			Log_GameContentWarning("EnvObject model prototype creation failed: " + WstrToStr(Desc.strObjectName));
-			++iSkippedMissingModel;
+			++Report.iSkippedMissingModel;
 			continue;
 		}
 
 		CGameObject* pCreatedObject = nullptr;
 		const wchar_t* pProtoTag = Get_ObjectPrototypeTag(Desc.eKind);
 		if (nullptr == pProtoTag)
+		{
+			++Report.iSkippedCreateFailed;
 			continue;
+		}
 
+		const wchar_t* pLayerTag = Get_ObjectLayerTag(Desc.eKind);
+		const wstring strObjectName = Make_ObjectName(Desc);
 		if (FAILED(pProxy->Add_GameObject_Return(
 			&pCreatedObject,
 			iObjectLevel,
 			pProtoTag,
 			iObjectLevel,
-			Get_ObjectLayerTag(Desc.eKind),
-			Make_ObjectName(Desc),
+			pLayerTag,
+			strObjectName,
 			&Desc)))
+		{
+			++Report.iSkippedCreateFailed;
 			continue;
+		}
 
-		++iCreatedCount;
+		++Report.iCreatedCount;
+		if (nullptr != pCreatedCallback)
+			pCreatedCallback(pCallbackContext, pCreatedObject, pProtoTag, pLayerTag, strObjectName);
 	}
+
+	if (nullptr != pOutReport)
+		*pOutReport = Report;
 
 	Log_GameContentInfo(
 		"EnvObject load complete: " + WstrToStr(strJsonPath)
-		+ " created=" + to_string(iCreatedCount)
-		+ " skipped_missing_model=" + to_string(iSkippedMissingModel));
+		+ " created=" + to_string(Report.iCreatedCount)
+		+ " skipped_missing_model=" + to_string(Report.iSkippedMissingModel)
+		+ " skipped_create_failed=" + to_string(Report.iSkippedCreateFailed));
 
 	return S_OK;
 }
-
 NS_END

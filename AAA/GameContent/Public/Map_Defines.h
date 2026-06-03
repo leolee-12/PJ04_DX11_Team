@@ -45,6 +45,24 @@ struct MAP_STAGE_DESC : public CGameObject::GAMEOBJECT_DESC
 	vector<MAP_SECTION_DESC>	SectionDescs;
 };
 
+struct MAP_SECTION_PRESET
+{
+	const _tchar* pSectionName;
+	Client::MAP_SECTION_TYPE eType;
+	RENDERID eRenderID;
+};
+
+struct MAP_PRESET
+{
+	const _char* pLabel;
+	const _tchar* pStageName;
+	const MAP_SECTION_PRESET* pSections;
+	_uint iSectionCount;
+
+	const _tchar* const* pEnvJsonPaths;
+	_uint iEnvJsonPathCount;
+};
+
 #ifdef _DEBUG
 struct MAP_SECTION_PROFILE
 {

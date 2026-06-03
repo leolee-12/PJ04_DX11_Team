@@ -691,7 +691,7 @@ HRESULT CLevel_Edit::Ready_EnvObjects()
 	Client::Set_GameContentLogSink(&Forward_GameContentLog);
 	static const wchar_t* kEnvJsonPaths[] =
 	{
-		L"../../Resources/Map/Decor_Decor.json",
+		L"../../Resources/Map/Decor_Decor_FlipZ_FullMatrix.json",
 		L"../../Resources/Map/Toy_Decor.json",
 		L"../../Resources/Map/Toy_Obj.json",
 		L"../../Resources/Map/Decor_Obj.json"

@@ -42,6 +42,7 @@
     <ClInclude Include="..\Public\ObjectData.h" />
     <ClInclude Include="..\Public\ResourceData.h" />
     <ClInclude Include="..\Public\Sample_MeshEffect.h" />
+    <ClInclude Include="..\Public\MapDescriptor.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\TestEffectQuad.h" />
     <ClInclude Include="..\Public\TestFiona.h" />
@@ -66,6 +67,7 @@
     <ClCompile Include="..\Private\MapStage.cpp" />
     <ClCompile Include="..\Private\Sample_MeshEffect.cpp" />
     <ClCompile Include="..\private\MapObject.cpp" />
+    <ClCompile Include="..\Private\MapDescriptor.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\TestEffectQuad.cpp" />
     <ClCompile Include="..\Private\TestFiona.cpp" />
