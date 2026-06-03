@@ -241,6 +241,9 @@
     <Filter Include="17. Enviroment\Manager">
       <UniqueIdentifier>{be5e73f5-a2ef-4332-a877-99b44b266624}</UniqueIdentifier>
     </Filter>
+    <Filter Include="18. ShaderGlobal">
+      <UniqueIdentifier>{a6f96f26-41b6-4a5a-8a4c-51da7d9eb84f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -474,6 +477,9 @@
     <ClInclude Include="..\public\Environment_Manager.h">
       <Filter>17. Enviroment\Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\ShaderGlobal_Manager.h">
+      <Filter>18. ShaderGlobal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -686,6 +692,9 @@
     <ClCompile Include="..\private\Effect_Container.cpp">
       <Filter>05. GameObject\Effect</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\ShaderGlobal_Manager.cpp">
+      <Filter>18. ShaderGlobal</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Engine_Shader_Defines.hlsli">
@@ -703,6 +712,9 @@
       <Filter>95. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\ShaderFiles\Shader_Effect_Mesh.hlsl">
+      <Filter>95. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_PostProsess.hlsl">
       <Filter>95. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

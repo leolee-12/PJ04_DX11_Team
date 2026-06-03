@@ -19,7 +19,7 @@ class ENGINE_DLL CEffect_Container abstract : public CGameObject
 public:
     struct EFFECT_CONTAINER_DESC : public CGameObject::GAMEOBJECT_DESC
     {
-        const _float4x4* pParentMatrix{};
+        const _float4x4* pParentMatrix = { nullptr };
     };
 
 protected:
@@ -39,14 +39,24 @@ public:
 
     void EffectContainer_Start();
 
+public:
+    const unordered_map<_wstring, CEffect_Part*>& Get_EffectPartObject() const
+    {
+        return m_EffestParts;
+    }
+
+public:
+    virtual json Serialize() const override;
+    virtual void Deserialize(const json& j) override;
+
 protected:
-    vector<CEffect_Part*> m_EffestParts;
+    unordered_map<_wstring, CEffect_Part*> m_EffestParts;
 
     const _float4x4* m_pParentMatrix{};
     _float4x4 m_CombinedWorldMatrix{};
 
 protected:
-    HRESULT Add_Effect_PartObject(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
+    HRESULT Add_Effect_PartObject(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, const _wstring& strPartTag, void* pArg = nullptr);
 
     void Compute_CombinedWorldMatrix();
 

@@ -36,8 +36,8 @@ HRESULT CEffect_Container::Initialize(void* pArg)
 
 void CEffect_Container::Priority_Update(_float fTimeDelta)
 {
-    for (auto& pEffectPart : m_EffestParts)
-        pEffectPart->Priority_Update(fTimeDelta);
+    for (auto& [tag, pPart] : m_EffestParts)
+        pPart->Priority_Update(fTimeDelta);
 }
 
 void CEffect_Container::Update(_float fTimeDelta)
@@ -60,14 +60,14 @@ void CEffect_Container::Update(_float fTimeDelta)
         }
     }
 
-    for (auto& pEffectPart : m_EffestParts)    
-        pEffectPart->Update_EffectByContainer(fTimeDelta, m_fAccTime);
+    for (auto& [tag, pPart] : m_EffestParts)
+        pPart->Update_EffectByContainer(fTimeDelta, m_fAccTime);
 }
 
 void CEffect_Container::Late_Update(_float fTimeDelta)
 {
-    for (auto& pEffectPart : m_EffestParts)
-        pEffectPart->Late_Update(fTimeDelta);
+    for (auto& [tag, pPart] : m_EffestParts)
+        pPart->Late_Update(fTimeDelta);
 
     if (m_bIsPlay == false)
         return;
@@ -77,19 +77,46 @@ void CEffect_Container::Late_Update(_float fTimeDelta)
 
 HRESULT CEffect_Container::Render()
 {
-    for (auto& pEffectPart : m_EffestParts)
-        pEffectPart->Render();
+    for (auto& [tag, pPart] : m_EffestParts)
+        pPart->Render();
 
     return S_OK;
 }
 
 void CEffect_Container::EffectContainer_Start()
 {
-    for (auto& pEffectPart : m_EffestParts)
-        pEffectPart->Effect_Start();
+    for (auto& [tag, pPart] : m_EffestParts)
+        pPart->Effect_Start();
 }
 
-HRESULT CEffect_Container::Add_Effect_PartObject(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg)
+json CEffect_Container::Serialize() const
+{
+    json j = __super::Serialize();
+
+    for (auto& [tag, pPart] : m_EffestParts)
+    {
+        string strTag = WstrToStr(tag);
+        j["UIPartObjects"][strTag] = pPart->Serialize();
+    }
+
+    return j;
+}
+
+void CEffect_Container::Deserialize(const json& j)
+{
+    __super::Deserialize(j);
+
+    if (!j.contains("UIPartObjects")) return;
+
+    for (auto& [tag, pPart] : m_EffestParts)
+    {
+        string strTag = WstrToStr(tag);
+        if (j["UIPartObjects"].contains(strTag))
+            pPart->Deserialize(j["UIPartObjects"][strTag]);
+    }
+}
+
+HRESULT CEffect_Container::Add_Effect_PartObject(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, const _wstring& strPartTag, void* pArg)
 {
     CEffect_Part* pEffectPart = dynamic_cast<CEffect_Part*>(
         m_pGameInstance_Proxy->Clone_Prototype(PROTOTYPE::GAMEOBJECT, iPrototypeLevelIndex, strPrototypeTag, pArg));
@@ -97,7 +124,7 @@ HRESULT CEffect_Container::Add_Effect_PartObject(_uint iPrototypeLevelIndex, con
     if (pEffectPart == nullptr)
         return E_FAIL;
 
-    m_EffestParts.push_back(pEffectPart);
+    m_EffestParts.emplace(strPartTag, pEffectPart);
 
     return S_OK;
 }
@@ -127,8 +154,8 @@ void CEffect_Container::Init_PropetyValue()
 
 void CEffect_Container::Free()
 {
-    for (auto& pEffectPart : m_EffestParts)
-        Safe_Release(pEffectPart);
+    for (auto& [tag, pPart] : m_EffestParts)
+        Safe_Release(pPart);
     m_EffestParts.clear();
 
     __super::Free();

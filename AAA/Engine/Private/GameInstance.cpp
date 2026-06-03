@@ -18,6 +18,7 @@
 #include "Effect_Manager.h"
 #include "PhysX_Manager.h"
 #include "Environment_Manager.h"
+#include "ShaderGlobal_Manager.h"
 
 CGameInstance* CGameInstance::m_pInstance = { nullptr };
 CGameInstance_Proxy* CGameInstance::m_pGameInstance_Proxy = { nullptr };
@@ -107,6 +108,13 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     m_pInstance->m_pEnvironment_Manager = CEnvironment_Manager::Create(*ppDevice, *ppContext);
     if (nullptr == m_pInstance->m_pEnvironment_Manager)
         return E_FAIL;
+
+    m_pInstance->m_pShaderGlobal_Manager = CShaderGlobal_Manager::Create();
+    if (nullptr == m_pInstance->m_pShaderGlobal_Manager)
+        return E_FAIL;
+
+
+    
 
     
 
@@ -507,9 +515,9 @@ HRESULT CGameInstance::Add_MRT(const _wstring& strMRTTag, const _wstring& strTar
 {
     return m_pTarget_Manager->Add_MRT(strMRTTag, strTargetTag);
 }
-HRESULT CGameInstance::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV)
+HRESULT CGameInstance::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV, _bool bBindDSV)
 {
-    return m_pTarget_Manager->Begin_MRT(strMRTTag, pDSV);
+    return m_pTarget_Manager->Begin_MRT(strMRTTag, pDSV, bBindDSV);
 }
 HRESULT CGameInstance::End_MRT()
 {
@@ -555,6 +563,7 @@ void CGameInstance::Free()
 {
 	m_pGameInstance_Proxy->Disconnect();
 
+    Safe_Release(m_pShaderGlobal_Manager);
     Safe_Release(m_pEnvironment_Manager);
     Safe_Release(m_pEffect_Manager);
     Safe_Release(m_pPhysX_Manager);

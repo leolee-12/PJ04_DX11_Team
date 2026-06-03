@@ -4,7 +4,6 @@ float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 float4x4 g_ShadowLightViewMatrix, g_ShadowLightProjMatrix;
 float4x4 g_ViewMatrixInverse, g_ProjMatrixInverse;
 
-
   /* G-buffer */
 Texture2D g_Texture; // 디버그용
 Texture2D g_DiffuseTexture; // albedo (rgb), alpha
@@ -29,13 +28,8 @@ vector g_vLightDiffuse;
 vector g_vLightAmbient;
 vector g_vLightSpecular;
 
-    /* Bloom */
-Texture2D g_SceneTexture; // HDR 씬
-Texture2D g_BloomTexture; // 블러 대상
-float2 g_vBlurDir; // (1,0)=H, (0,1)=V
-float2 g_vTexelSize; // 1/해상도 (블룸 타겟 기준)
-float g_fThreshold = 1.0f;
-float g_fBloomIntensity = 1.0f;
+/* SSAO */
+Texture2D g_SSAOTexture; // SSAO 블러 결과
 
   /* Combine 전용 앰비언트 (바인딩 안 해도 기본값 사용) */
 vector g_vAmbientColor = float4(0.15f, 0.15f, 0.18f, 1.f);
@@ -112,16 +106,16 @@ float2 EnvBRDFApprox(float rough, float NdotV)   // BRDF LUT 불필요
 }
 
 // 복원헬퍼
-float3 RecoverWorldPos(float2 uv, float depthZ, float viewZ)
+float3 RecoverWorldPos(float2 uv, float depthZ)
 {
     float4 p;
     p.x = uv.x * 2.f - 1.f;
     p.y = uv.y * -2.f + 1.f;
-    p.z = depthZ;
+    p.z = depthZ; 
     p.w = 1.f;
-    p *= viewZ;
-    p = mul(p, g_ProjMatrixInverse);
-    p = mul(p, g_ViewMatrixInverse);
+    p = mul(p, g_ProjMatrixInverse); 
+    p /= p.w; 
+    p = mul(float4(p.xyz, 1.f), g_ViewMatrixInverse); 
     return p.xyz;
 }
 
@@ -158,7 +152,7 @@ float4 PS_MAIN_DIRECTIONAL(PS_IN In) : SV_TARGET0
     float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
 
     float3 N = normalize(nd.xyz * 2.f - 1.f);
-    float3 wp = RecoverWorldPos(In.vTexcoord, dd.x, dd.y * 500.f);
+    float3 wp = RecoverWorldPos(In.vTexcoord, dd.x);
     float3 V = normalize(g_vCamPosition.xyz - wp);
     float3 L = normalize(-g_vLightDir.xyz);
 
@@ -175,7 +169,7 @@ float4 PS_MAIN_POINT(PS_IN In) : SV_TARGET0
     float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
 
     float3 N = normalize(nd.xyz * 2.f - 1.f);
-    float3 wp = RecoverWorldPos(In.vTexcoord, dd.x, dd.y * 500.f);
+    float3 wp = RecoverWorldPos(In.vTexcoord, dd.x);
     float3 V = normalize(g_vCamPosition.xyz - wp);
 
     float3 Lvec = g_vLightPos.xyz - wp;
@@ -202,7 +196,7 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     float4 nd = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
     float3 N = normalize(nd.xyz * 2.f - 1.f);
     float4 ddA = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
-    float3 wpA = RecoverWorldPos(In.vTexcoord, ddA.x, ddA.y * 500.f);
+    float3 wpA = RecoverWorldPos(In.vTexcoord, ddA.x);
     float3 V = normalize(g_vCamPosition.xyz - wpA);
     float NdotV = saturate(dot(N, V));
 
@@ -222,12 +216,13 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     float2 envBRDF = EnvBRDFApprox(roughness, NdotV);
     float3 specularIBL = prefiltered * (F0 * envBRDF.x + envBRDF.y);
 
-    float3 ambient = (diffuseIBL + specularIBL) * ao * g_fIBLIntensity;
+    float ssao = g_SSAOTexture.Sample(LinearSampler, In.vTexcoord).r;
+    float3 ambient = (diffuseIBL + specularIBL) * ao * ssao * g_fIBLIntensity;
     float3 color = light + ambient;
 
       /* 그림자 */
     float4 dd = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
-    float3 wp = RecoverWorldPos(In.vTexcoord, dd.x, dd.y * 500.f);
+    float3 wp = RecoverWorldPos(In.vTexcoord, dd.x);
     float4 lc = mul(float4(wp, 1.f), g_ShadowLightViewMatrix);
     lc = mul(lc, g_ShadowLightProjMatrix);
     float2 suv = float2(lc.x / lc.w * 0.5f + 0.5f, lc.y / lc.w * -0.5f + 0.5f);
@@ -236,45 +231,6 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     if (pz <= 1.f && pz - 0.002f > sd)
         color *= 0.5f;
 
-    return float4(color, 1.f);
-}
-
-//============================ HDR (pass 4) ============================
-float4 PS_BRIGHT(PS_IN In) : SV_TARGET0
-{
-    float3 c = g_SceneTexture.Sample(LinearSampler, In.vTexcoord).rgb;
-    float luma = dot(c, float3(0.2126f, 0.7152f, 0.0722f));
-    float k = max(luma - g_fThreshold, 0.f) / max(luma, 1e-4f); // soft knee
-    return float4(c * k, 1.f);
-}
-
-//============================ Blur (pass 5) ============================
-float4 PS_BLUR(PS_IN In) : SV_TARGET0
-{
-    const float w[5] = { 0.227027f, 0.194594f, 0.121622f, 0.054054f, 0.016216f };
-    float3 result = g_BloomTexture.Sample(LinearSampler, In.vTexcoord).rgb * w[0];
-      [unroll]
-    for (int i = 1; i < 5; ++i)
-    {
-        float2 off = g_vBlurDir * g_vTexelSize * i;
-        result += g_BloomTexture.Sample(LinearSampler, In.vTexcoord + off).rgb * w[i];
-        result += g_BloomTexture.Sample(LinearSampler, In.vTexcoord - off).rgb * w[i];
-    }
-    return float4(result, 1.f);
-}
-
-//============================ Compsite (pass 6) ============================
-float4 PS_COMPOSITE(PS_IN In) : SV_TARGET0
-{
-    float4 scene = g_SceneTexture.Sample(LinearSampler, In.vTexcoord);
-    if (0.f == scene.a)        
-        discard;
-    
-    float4 bloom = g_BloomTexture.Sample(LinearSampler, In.vTexcoord);
-    
-    float3 color = scene.rgb + bloom.rgb * g_fBloomIntensity;
-    color = color / (color + 1.f); // Reinhard
-    color = pow(color, 1.f / 2.2f); // 감마
     return float4(color, 1.f);
 }
 
@@ -316,26 +272,5 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_COMBINED();
-    }
-    pass Bright //4
-    {
-        VertexShader = compile vs_5_0 VS_MAIN();
-        PixelShader = compile ps_5_0 PS_BRIGHT();
-        SetDepthStencilState(DSS_Z_Disable, 0);
-        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
-    }
-    pass Blur //5
-    {
-        VertexShader = compile vs_5_0 VS_MAIN();
-        PixelShader = compile ps_5_0 PS_BLUR();
-        SetDepthStencilState(DSS_Z_Disable, 0);
-        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
-    } 
-    pass Composite //6
-    {
-        VertexShader = compile vs_5_0 VS_MAIN();
-        PixelShader = compile ps_5_0 PS_COMPOSITE();
-        SetDepthStencilState(DSS_Z_Disable, 0);
-        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
     }
 }
