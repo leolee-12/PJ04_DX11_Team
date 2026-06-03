@@ -186,7 +186,7 @@
     <ClInclude Include="..\Public\DataExporter.h" />
     <ClInclude Include="..\Public\DataLoader.h" />
     <ClInclude Include="..\Public\DebugDraw.h" />
-    <ClInclude Include="..\public\Effect.h" />
+    <ClInclude Include="..\public\Effect_Container.h" />
     <ClInclude Include="..\Public\Effect_Mesh.h" />
     <ClInclude Include="..\Public\Effect_Part.h" />
     <ClInclude Include="..\public\Effect_Manager.h" />
@@ -269,7 +269,7 @@
     <ClCompile Include="..\Private\DataExporter.cpp" />
     <ClCompile Include="..\Private\DataLoader.cpp" />
     <ClCompile Include="..\Private\DebugDraw.cpp" />
-    <ClCompile Include="..\private\Effect.cpp" />
+    <ClCompile Include="..\private\Effect_Container.cpp" />
     <ClCompile Include="..\Private\Effect_Mesh.cpp" />
     <ClCompile Include="..\Private\Effect_Part.cpp" />
     <ClCompile Include="..\private\Effect_Manager.cpp" />

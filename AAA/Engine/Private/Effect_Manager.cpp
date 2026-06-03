@@ -53,8 +53,8 @@ void CEffect_Manager::Free()
 
 HRESULT CEffect_Manager::Spawn(_uint iLevel,
     const _wstring& strProtoTag,
-    const CEffect::EFFECT_DESC& desc,
-    CEffect** ppOut)
+    const CEffect_Container::EFFECT_CONTAINER_DESC& desc,
+    CEffect_Container** ppOut)
 {
     // 같은 프로토타입을 빠르게 여러 번 발화해도 이름 충돌 안 나게 카운터로 고유화
     _wstring strObjTag = strProtoTag + L"#" + std::to_wstring(m_iSpawnCounter++);
@@ -64,12 +64,12 @@ HRESULT CEffect_Manager::Spawn(_uint iLevel,
         &pObj,
         iLevel, strProtoTag,
         iLevel, EFFECT_LAYER_TAG, strObjTag,
-        const_cast<CEffect::EFFECT_DESC*>(&desc));
+        const_cast<CEffect_Container::EFFECT_CONTAINER_DESC*>(&desc));
 
     if (FAILED(hr) || nullptr == pObj)
         return E_FAIL;
 
-    CEffect* pEffect = dynamic_cast<CEffect*>(pObj);
+    CEffect_Container* pEffect = dynamic_cast<CEffect_Container*>(pObj);
     if (nullptr == pEffect)
     {
         // 프로토타입이 CEffect 파생이 아니면 즉시 회수

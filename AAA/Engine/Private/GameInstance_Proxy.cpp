@@ -683,7 +683,7 @@ HRESULT CGameInstance_Proxy::Update_ShadowLight(const SHADOW_LIGHT_DESC& ShadowD
 #pragma endregion
 
 #pragma region EFFECT_MANAGER
-HRESULT CGameInstance_Proxy::Spawn_Effect(_uint iLevel, const _wstring& strProtoTag, const CEffect::EFFECT_DESC& desc, CEffect** ppOut)
+HRESULT CGameInstance_Proxy::Spawn_Effect(_uint iLevel, const _wstring& strProtoTag, const CEffect_Container::EFFECT_CONTAINER_DESC& desc, CEffect_Container** ppOut)
 {
 	if (!IsConnected())
 		return E_FAIL;
