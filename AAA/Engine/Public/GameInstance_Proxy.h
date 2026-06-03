@@ -24,6 +24,8 @@ public: // Engine
     HRESULT Begin_Draw();
     HRESULT Draw();
     HRESULT End_Draw();
+    void    Bind_RenderTarget(ID3D11RenderTargetView* pRTV, ID3D11DepthStencilView* pDSV, _uint w, _uint h);
+
     void    Clear_Resources(_int iLevelIndex);
 
     _float RandomFloat(_float fMin, _float fMax) const;
@@ -83,6 +85,7 @@ public: //Renderer
     void    Add_RenderGroup_UI(RENDERUIID eGroupID, CUIObject* pUIObject);
 #ifdef _DEBUG
     void    Add_DebugComponent(class CComponent* pComponent);
+    void    Toggle_DebugRender();
 #endif
 #pragma endregion
 

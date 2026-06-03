@@ -28,7 +28,11 @@ public:
 
 #ifdef _DEBUG
 	void Add_DebugComponent(class CComponent* pComponent);
+	void Toggle_DebugRender() { m_bDebugRender = !m_bDebugRender; }
 #endif
+
+public:
+	void Bind_RenderTarget(ID3D11RenderTargetView* pRTV, ID3D11DepthStencilView* pDSV, _uint iWidth, _uint iHeight);
 
 private:
 	ID3D11Device* m_pDevice = { nullptr };
@@ -45,12 +49,18 @@ private:
 
 	ID3D11DepthStencilView* m_pMaxDSV = { nullptr };
 
-	_float					m_fThreshold = { 1.f };
+	_float					m_fThreshold = { 1.0f };
 	_float					m_fBloomIntensity = { 1.f };
 
 #ifdef _DEBUG
 	list<CComponent*>		m_DebugComponents;
+	_bool					m_bDebugRender = { false };
 #endif
+
+	ID3D11RenderTargetView* m_pOutRTV = { nullptr };
+	ID3D11DepthStencilView* m_pOutDSV = { nullptr };
+	_uint                   m_iOutWidth = { 0 };
+	_uint                   m_iOutHeight = { 0 };
 
 private:
 	HRESULT Render_Priority();
@@ -65,6 +75,9 @@ private:
 	HRESULT Render_UI_BACK();
 	HRESULT Render_UI_MIDDLE();
 	HRESULT Render_UI_FRONT();
+
+	_uint Render_Width()  const;
+	_uint Render_Height() const;
 
 private:
 	HRESULT Ready_DepthStencil_Buffer();

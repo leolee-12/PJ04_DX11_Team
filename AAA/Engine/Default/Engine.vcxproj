@@ -324,7 +324,6 @@
     <None Include="..\ShaderFiles\Engine_Shader_Defines.hlsli" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\ShaderFiles\Shader_Bloom.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Cell.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Deferred.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Effect_Mesh.hlsl" />

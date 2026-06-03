@@ -119,6 +119,14 @@ void CRenderer::Add_RenderGroup_UI(RENDERUIID eGroupID, CUIObject* pUIObject)
 
 HRESULT CRenderer::Draw()
 {
+    if (nullptr != m_pOutRTV)
+    {
+        m_pContext->OMSetRenderTargets(1, &m_pOutRTV, m_pOutDSV);
+        Change_ViewportDesc(m_iOutWidth, m_iOutHeight);
+    }
+    else
+        m_pGameInstance_Proxy->Bind_BackBuffer();
+
     if (FAILED(Render_Priority()))
         return E_FAIL;
     if (FAILED(Render_Shadow()))
@@ -129,9 +137,12 @@ HRESULT CRenderer::Draw()
         return E_FAIL;
     if (FAILED(Render_Combined()))
         return E_FAIL;
-    if (FAILED(Render_NonLight()))
+    if (FAILED(Render_Bloom()))
         return E_FAIL;
 
+    
+    if (FAILED(Render_NonLight()))
+        return E_FAIL;
     if (FAILED(Render_Blend()))
         return E_FAIL;
 
@@ -153,10 +164,20 @@ HRESULT CRenderer::Draw()
 #ifdef _DEBUG
 void CRenderer::Add_DebugComponent(CComponent* pComponent)
 {
+    if (!m_bDebugRender) return;
+
     m_DebugComponents.push_back(pComponent);
     Safe_AddRef(pComponent);
 }
 #endif
+
+void CRenderer::Bind_RenderTarget(ID3D11RenderTargetView* pRTV, ID3D11DepthStencilView* pDSV, _uint iWidth, _uint iHeight)
+{
+    m_pOutRTV = pRTV;
+    m_pOutDSV = pDSV;
+    m_iOutWidth = iWidth;
+    m_iOutHeight = iHeight;
+}
 
 HRESULT CRenderer::Render_Priority()
 {
@@ -194,7 +215,7 @@ HRESULT CRenderer::Render_Shadow()
     if (FAILED(m_pGameInstance_Proxy->End_MRT()))
         return E_FAIL;
 
-    Change_ViewportDesc((_uint)m_pGameInstance_Proxy->Get_WindowWidth(), (_uint)m_pGameInstance_Proxy->Get_WindowHeight());
+    Change_ViewportDesc(Render_Width(), Render_Height());
 
     return S_OK;
 }
@@ -318,13 +339,18 @@ HRESULT CRenderer::Render_Bloom()
 
     _float2 vTexel = { 1.f / (iWidth / 2), 1.f / (iHeight / 2) };
 
+    const _uint iHalfW = iWidth / 2;
+    const _uint iHalfH = iHeight / 2;
+
+    Change_ViewportDesc(iHalfW, iHalfH);
+
     if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_BloomA"))))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene"), m_pShader, "g_SceneTexture")))
         return E_FAIL;
     if (FAILED(m_pShader->Bind_RawValue("g_fThreshold", &m_fThreshold, sizeof(_float))))
         return E_FAIL;
-    if (FAILED(m_pShader->Begin(0)))
+    if (FAILED(m_pShader->Begin(ETOUI(DEFERRED::BRIGHT))))
         return E_FAIL;
     if (FAILED(m_pVIBuffer->Bind_Resources()))
         return E_FAIL;
@@ -342,7 +368,7 @@ HRESULT CRenderer::Render_Bloom()
         return E_FAIL;
     if (FAILED(m_pShader->Bind_RawValue("g_vTexelSize", &vTexel, sizeof(_float2))))
         return E_FAIL;
-    if (FAILED(m_pShader->Begin(1)))
+    if (FAILED(m_pShader->Begin(ETOUI(DEFERRED::BLUR))))
         return E_FAIL;
     if (FAILED(m_pVIBuffer->Bind_Resources()))
         return E_FAIL;
@@ -358,7 +384,7 @@ HRESULT CRenderer::Render_Bloom()
     _float2 dirV = { 0, 1 };
     if (FAILED(m_pShader->Bind_RawValue("g_vBlurDir", &dirV, sizeof(_float2))))
         return E_FAIL;
-    if (FAILED(m_pShader->Begin(1)))
+    if (FAILED(m_pShader->Begin(ETOUI(DEFERRED::BRIGHT))))
         return E_FAIL;
     if (FAILED(m_pVIBuffer->Bind_Resources()))
         return E_FAIL;
@@ -367,13 +393,15 @@ HRESULT CRenderer::Render_Bloom()
     if (FAILED(m_pGameInstance_Proxy->End_MRT()))
         return E_FAIL;
 
+    Change_ViewportDesc(Render_Width(), Render_Height());
+
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene"), m_pShader, "g_SceneTexture")))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_BloomA"), m_pShader, "g_BloomTexture")))
         return E_FAIL;
     if (FAILED(m_pShader->Bind_RawValue("g_fBloomIntensity", &m_fBloomIntensity, sizeof(_float))))
         return E_FAIL;
-    if (FAILED(m_pShader->Begin(2)))
+    if (FAILED(m_pShader->Begin(ETOUI(DEFERRED::COMPSITE))))
         return E_FAIL;
     if (FAILED(m_pVIBuffer->Bind_Resources()))
         return E_FAIL;
@@ -479,6 +507,16 @@ HRESULT CRenderer::Render_UI_FRONT()
     return S_OK;
 }
 
+_uint CRenderer::Render_Width() const
+{
+    return m_pOutRTV ? m_iOutWidth : (_uint)m_pGameInstance_Proxy->Get_WindowWidth();
+} 
+
+_uint CRenderer::Render_Height() const
+{
+    return m_pOutRTV ? m_iOutHeight : (_uint)m_pGameInstance_Proxy->Get_WindowHeight();
+}
+
 HRESULT CRenderer::Ready_DepthStencil_Buffer()
 {
     ID3D11Texture2D* pDepthStencilTexture = { nullptr };
@@ -528,6 +566,8 @@ HRESULT CRenderer::Change_ViewportDesc(_uint iWidth, _uint iHeight)
 #ifdef _DEBUG
 HRESULT CRenderer::Render_Debug()
 {
+    if (!m_bDebugRender) return S_FALSE;
+
     for (auto& pDebugCom : m_DebugComponents)
     {
         pDebugCom->Render();

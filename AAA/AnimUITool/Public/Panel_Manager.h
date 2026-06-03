@@ -1,6 +1,7 @@
 #pragma once
 #include "AnimUITool_Defines.h"
 #include "Base.h"
+#include "Anim_Context.h"
 
 NS_BEGIN(Engine)
 class CGameObject;
@@ -9,6 +10,8 @@ NS_END
 NS_BEGIN(AnimUITool)
 
 class CPanel;
+class CLevel_Tool;
+class CPreview_Actor;
 
 class CPanel_Manager final : public CBase
 {
@@ -28,12 +31,23 @@ public:
 	void						Set_Selected(CGameObject* pObject);
 	void						Clear_Selected();
 
+	ANIM_CONTEXT&				Get_Context() { return m_Context; }
+	void						Bind_Preview(CPreview_Actor* pActor);
+
+	void						Set_Level(CLevel_Tool* pLevel) { m_pLevel = pLevel; }  
+	void						Load_Preview(const _wstring& strYshPath);          
+	void						Clear_Preview();                                       
+
 private:
 	ID3D11Device*				m_pDevice = { nullptr };
 	ID3D11DeviceContext*		m_pContext = { nullptr };
 
 	map<_wstring, CPanel*>		m_Panels;
 	CGameObject*				m_pSelected = { nullptr };
+
+	CLevel_Tool*				m_pLevel = { nullptr };
+
+	ANIM_CONTEXT				m_Context;
 
 private:
 	void						Render_DockSpace();

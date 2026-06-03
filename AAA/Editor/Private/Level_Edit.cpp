@@ -41,8 +41,8 @@ HRESULT CLevel_Edit::Initialize()
 
 void CLevel_Edit::Update(_float fTimeDelta)
 {
-    if (m_pGameInstance_Proxy->Key_Down(DIK_ESCAPE))
-        m_pGameInstance_Proxy->Publish(TEXT("Return_Lobby"), nullptr);
+    if (m_pGameInstance_Proxy->Key_Down(DIK_F2))
+        m_pGameInstance_Proxy->Toggle_DebugRender();
 }
 
 HRESULT CLevel_Edit::Render()
