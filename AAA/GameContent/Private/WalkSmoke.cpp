@@ -59,8 +59,8 @@ HRESULT CWalkSmoke::Render()
 
 HRESULT CWalkSmoke::Ready_EffectPartObjects()
 {
-    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CSmokeSphereOriginal::PROTOTYPE_TAG);
-    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CSmokeSphereOriginal::PROTOTYPE_TAG);
+    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CSmokeSphereOriginal::PROTOTYPE_TAG, TEXT("1"));
+    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CSmokeSphereOriginal::PROTOTYPE_TAG, TEXT("2"));
 
     return S_OK;
 }

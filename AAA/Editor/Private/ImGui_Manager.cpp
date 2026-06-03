@@ -16,6 +16,8 @@
 #include "UIPartObject.h"
 #include "Animator.h"
 #include "GameContent_AnimEvents.h"
+#include "Effect_Container.h"
+#include "Effect_Part.h"
 
 IMPLEMENT_SINGLETON(CImGui_Manager)
 
@@ -592,6 +594,29 @@ void CImGui_Manager::Draw_Inspector()
             return a.first < b.first;
             });
 
+        for (auto& [tag, pPart] : vecSorted)
+        {
+            string strTag = WstrToStr(tag);
+            if (ImGui::CollapsingHeader(strTag.c_str()))
+            {
+                ImGui::PushID(pPart);
+                Draw_Transform(pPart, strTag);
+                ImGui::Separator();
+                Draw_Properties(pPart);
+                ImGui::PopID();
+            }
+        }
+    }
+
+    auto pEffectContainer = dynamic_cast<CEffect_Container*>(pSelected);
+    if (pEffectContainer)
+    {
+        auto& pEffectPart = pEffectContainer->Get_EffectPartObject();
+        vector<pair<wstring, CEffect_Part*>> vecSorted(pEffectPart.begin(), pEffectPart.end());
+        sort(vecSorted.begin(), vecSorted.end(), [](const auto& a, const auto& b) {
+            return a.first < b.first;
+            });
+        
         for (auto& [tag, pPart] : vecSorted)
         {
             string strTag = WstrToStr(tag);
