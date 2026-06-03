@@ -24,7 +24,7 @@ HRESULT CSample_MeshEffect::Initialize(void* pArg)
     SAMPLE_MESHEFFECT_DESC tDesc{};
 
     tDesc.iModelLevel = ETOUI(LEVEL::GAMEPLAY);
-    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_SmokeSphereOriginal");
+    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_SmokeSphereOriginal_Test");
 
     tDesc.bUseDiffuseTexture = false;
     tDesc.bUseUnKnownTexture = true;

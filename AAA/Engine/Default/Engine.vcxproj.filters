@@ -453,7 +453,7 @@
     <ClInclude Include="..\public\VIBuffer_Point.h">
       <Filter>07. Component\VIBuffer\Point</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Effect.h">
+    <ClInclude Include="..\public\Effect_Container.h">
       <Filter>05. GameObject\Effect</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Effect_Manager.h">
@@ -665,9 +665,6 @@
     <ClCompile Include="..\private\VIBuffer_Point.cpp">
       <Filter>07. Component\VIBuffer\Point</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Effect.cpp">
-      <Filter>05. GameObject\Effect</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\Effect_Manager.cpp">
       <Filter>05. GameObject\Effect\Manager</Filter>
     </ClCompile>
@@ -691,6 +688,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Environment_Manager.cpp">
       <Filter>17. Enviroment\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Effect_Container.cpp">
+      <Filter>05. GameObject\Effect</Filter>
     </ClCompile>
     <ClCompile Include="..\private\ShaderGlobal_Manager.cpp">
       <Filter>18. ShaderGlobal</Filter>
