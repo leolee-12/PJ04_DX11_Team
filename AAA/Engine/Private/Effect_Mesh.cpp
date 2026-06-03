@@ -143,15 +143,15 @@ HRESULT CEffect_Mesh::Bind_ShaderValue()
     return S_OK;
 }
 
-void CEffect_Mesh::Update_UVScroll(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Mesh::Update_UVScroll(const _float fTimeDelta, const _float fRatio)
 {
-    __super::Update_UVScroll(fTimeDelta, fActiveTime, fRatio);
+    __super::Update_UVScroll(fTimeDelta, fRatio);
     
     MoveUVScroll(fRatio, m_vDiffuseUVScroll, m_vDiffuseUVScrollCount, m_vDiffuseOffset, m_vCurDiffuseUVOffset);
     MoveUVScroll(fRatio, m_vUnknownUVScroll, m_vUnknownUVScrollCount, m_vUnknownOffset, m_vCurUnknownUVOffset);
 }
 
-void CEffect_Mesh::Update_EffectPart(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Mesh::Update_EffectPart(const _float fTimeDelta, const _float fRatio)
 {
 
 }

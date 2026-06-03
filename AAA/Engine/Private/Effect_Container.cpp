@@ -42,6 +42,8 @@ void CEffect_Container::Priority_Update(_float fTimeDelta)
 
 void CEffect_Container::Update(_float fTimeDelta)
 {
+    Debug_ResetPlay();
+
     if (m_bIsPlay == false)
         return;
 
@@ -51,7 +53,7 @@ void CEffect_Container::Update(_float fTimeDelta)
     {
         if (m_bLoop == true)
         {
-            m_fAccTime -= m_fDuration;
+            m_fAccTime = 0.f;
         }
         else
         {
@@ -61,7 +63,7 @@ void CEffect_Container::Update(_float fTimeDelta)
     }
 
     for (auto& [tag, pPart] : m_EffestParts)
-        pPart->Update_EffectByContainer(fTimeDelta, m_fAccTime);
+        pPart->Update(fTimeDelta);
 }
 
 void CEffect_Container::Late_Update(_float fTimeDelta)
@@ -87,6 +89,14 @@ void CEffect_Container::EffectContainer_Start()
 {
     for (auto& [tag, pPart] : m_EffestParts)
         pPart->Effect_Start();
+
+    m_bIsPlay = true;
+    m_fAccTime = 0.f;
+}
+
+void CEffect_Container::Set_ParentMatrix(const _float4x4* pParentMatrix)
+{
+    m_pParentMatrix = pParentMatrix;
 }
 
 json CEffect_Container::Serialize() const
@@ -116,6 +126,20 @@ void CEffect_Container::Deserialize(const json& j)
     }
 }
 
+void CEffect_Container::Debug_ResetPlay()
+{
+    if (m_bPreResetPlayDoubleCheck == false && m_bResetPlayDoubleCheck == true)
+    {
+        m_bPreResetPlayDoubleCheck = true;
+        EffectContainer_Start();
+    }
+
+    if (m_bPreResetPlayDoubleCheck == true && m_bResetPlayDoubleCheck == false)
+    {
+        m_bPreResetPlayDoubleCheck = false;
+    }
+}
+
 HRESULT CEffect_Container::Add_Effect_PartObject(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, const _wstring& strPartTag, void* pArg)
 {
     CEffect_Part* pEffectPart = dynamic_cast<CEffect_Part*>(
@@ -124,6 +148,7 @@ HRESULT CEffect_Container::Add_Effect_PartObject(_uint iPrototypeLevelIndex, con
     if (pEffectPart == nullptr)
         return E_FAIL;
 
+    pEffectPart->Set_ParentMatrix(m_pTransformCom->Get_WorldMatrixPtr());
     m_EffestParts.emplace(strPartTag, pEffectPart);
 
     return S_OK;
@@ -144,11 +169,13 @@ void CEffect_Container::Compute_CombinedWorldMatrix()
 
 void CEffect_Container::Init_PropetyValue()
 {
+    m_bResetPlayDoubleCheck = { false };
+
     m_bIsPlay = { true };
 
     m_bLoop = { true };
 
-    m_fDuration = { 5.f };
+    m_fDuration = { 1.f };
     m_fAccTime = { 0.f };
 }
 

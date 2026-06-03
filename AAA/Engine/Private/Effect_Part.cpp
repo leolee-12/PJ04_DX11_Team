@@ -64,7 +64,7 @@ void CEffect_Part::Priority_Update(_float fTimeDelta)
 
 void CEffect_Part::Update(_float fTimeDelta)
 {
-    Update_EffectSelf(fTimeDelta);
+    Update_Value(fTimeDelta);
 }
 
 void CEffect_Part::Late_Update(_float fTimeDelta)
@@ -83,22 +83,15 @@ HRESULT CEffect_Part::Render()
     return S_OK;
 }
 
-void CEffect_Part::Update_EffectSelf(_float fTimeDelta)
-{
-    m_fAccTime += fTimeDelta;
-
-    Update_Core(fTimeDelta, m_fAccTime);
-}
-
-void CEffect_Part::Update_EffectByContainer(_float fTimeDelta, _float fAccTime)
-{
-    Update_Core(fTimeDelta, fAccTime);
-}
-
 void CEffect_Part::Effect_Start()
 {
     m_bIsPlay = true;
     m_fAccTime = 0.f;
+}
+
+void CEffect_Part::Set_ParentMatrix(const _float4x4* pParentMatrix)
+{
+    m_pParentMatrix = pParentMatrix;
 }
 
 void CEffect_Part::Compute_CombinedWorldMatrix()
@@ -194,13 +187,15 @@ void CEffect_Part::Init_PropertyValue()
 
     m_bLoop = { true };
 
-    m_fDuration = { 5.f };
+    m_fDuration = { 1.f };
     m_fAccTime = { 0.f };
-    m_fDelayTime = { 0.f };
 
-    m_fAlpha = { 1.0f };
+    m_fStartRatio = { 0.f };
+    m_fEndRatio = { 1.f };
 
     // Alpha
+    m_fAlpha = { 1.0f };
+
     m_bFadeInOut = { false };
 
     m_AlphaRatioValue.reserve(4);
@@ -291,58 +286,52 @@ void CEffect_Part::Init_PropertyValue()
     m_vMaskUVScrollCount = { 0.f, 0.f };
 }
 
-void CEffect_Part::Update_Core(const _float fTimeDelta, const _float fAccTime)
-{
-    Update_Value(fTimeDelta, fAccTime);
-}
-
-void CEffect_Part::Update_Value(const _float fTimeDelta, const _float fAccTime)
+void CEffect_Part::Update_Value(const _float fTimeDelta)
 {
     if (m_bIsPlay == false)
-    {
-        m_bActive = false;
-        return;
-    }
+        return;  
 
-    if (fAccTime < m_fDelayTime)
-    {
-        m_bActive = false;
-        return;
-    }
+    m_fAccTime += fTimeDelta;
 
-    m_bActive = true;
-
-    const _float fActiveTime = fAccTime - m_fDelayTime;
-    _float fRatio = fActiveTime / m_fDuration;
+    _float fRatio = m_fAccTime / m_fDuration;
     Helper::FloatClamp(fRatio, 0.f, 1.f);
 
-    // Update
-    Update_Alpha(fTimeDelta, fActiveTime, fRatio);
-    Update_Size(fTimeDelta, fActiveTime, fRatio);
-    Update_Color(fTimeDelta, fActiveTime, fRatio);
-    Update_Rot(fTimeDelta, fActiveTime, fRatio);
-    Update_Move(fTimeDelta, fActiveTime, fRatio);       // Move관련 가장 먼저
-    Update_MoveSin(fTimeDelta, fActiveTime, fRatio);
-    Update_UVScroll(fTimeDelta, fActiveTime, fRatio);
+    if (fRatio < m_fStartRatio || fRatio > m_fEndRatio)
+        m_bActive = false;
+    else
+        m_bActive = true;
 
-    Update_EffectPart(fTimeDelta, fActiveTime, fRatio);
-
-
-    if (fActiveTime >= m_fDuration)
+    if (m_bActive == true)
     {
-        if (m_bLoop == false)
-        {
-            m_bIsPlay = false;
-            m_bActive = false;
-        }
-        else
+        // Update
+        Update_Alpha(fTimeDelta, fRatio);
+        Update_Size(fTimeDelta, fRatio);
+        Update_Color(fTimeDelta, fRatio);
+        Update_Rot(fTimeDelta, fRatio);
+        Update_Move(fTimeDelta, fRatio);       // Move관련 가장 먼저
+        Update_MoveSin(fTimeDelta, fRatio);
+        Update_UVScroll(fTimeDelta, fRatio);
+
+        Update_EffectPart(fTimeDelta, fRatio);
+    }
+
+
+    if (m_fAccTime >= m_fDuration)
+    {
+        if (m_bLoop == true)
         {
             m_fAccTime = 0.f;
         }
+        else
+        {
+            m_bIsPlay = false;
+            m_bActive = false;
+            m_fAccTime = m_fDuration;
+        }
     }
 }
 
-void CEffect_Part::Update_Alpha(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Part::Update_Alpha(const _float fTimeDelta, const _float fRatio)
 {   
     if (m_bFadeInOut == true)
     {
@@ -377,7 +366,7 @@ void CEffect_Part::Update_Alpha(const _float fTimeDelta, const _float fActiveTim
     m_AlphaRatioValue.clear();
 }
 
-void CEffect_Part::Update_Size(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Part::Update_Size(const _float fTimeDelta, const _float fRatio)
 {
     if (m_bSizeChange == true)
     {
@@ -414,7 +403,7 @@ void CEffect_Part::Update_Size(const _float fTimeDelta, const _float fActiveTime
     m_SizeRatioValue.clear();
 }
 
-void CEffect_Part::Update_Color(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Part::Update_Color(const _float fTimeDelta, const _float fRatio)
 {
     if (m_bColorChange == true)
     {
@@ -448,7 +437,7 @@ void CEffect_Part::Update_Color(const _float fTimeDelta, const _float fActiveTim
     m_ColorRatioValue.clear();
 }
 
-void CEffect_Part::Update_Rot(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Part::Update_Rot(const _float fTimeDelta, const _float fRatio)
 {
     if (m_bRotationChange == false)
         return;
@@ -463,7 +452,7 @@ void CEffect_Part::Update_Rot(const _float fTimeDelta, const _float fActiveTime,
     }
 }
 
-void CEffect_Part::Update_Move(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Part::Update_Move(const _float fTimeDelta, const _float fRatio)
 {
     _vector vBasePos = XMLoadFloat3(&m_vLocalPos);
 
@@ -480,7 +469,7 @@ void CEffect_Part::Update_Move(const _float fTimeDelta, const _float fActiveTime
     m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(vBasePos, 1.f));
 }
 
-void CEffect_Part::Update_MoveSin(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Part::Update_MoveSin(const _float fTimeDelta, const _float fRatio)
 {
     if (m_bMoveSin == false)
         return;
@@ -492,13 +481,13 @@ void CEffect_Part::Update_MoveSin(const _float fTimeDelta, const _float fActiveT
     m_pTransformCom->Set_State(STATE::POSITION, vCurPos + XMVectorSet(0.f, fCurOffsetY, 0.f, 0.f));
 }
 
-void CEffect_Part::Update_UVScroll(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Part::Update_UVScroll(const _float fTimeDelta, const _float fRatio)
 {
     MoveUVScroll(fRatio, m_bTextureUVScroll, m_vTextureUVScrollCount, m_vTextureOffset, m_vCurTextureUVOffset);
     MoveUVScroll(fRatio, m_bMaskUVScroll, m_vMaskUVScrollCount, m_vMaskOffset, m_vCurMaskUVOffset);
 }
 
-void CEffect_Part::Update_EffectPart(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Part::Update_EffectPart(const _float fTimeDelta, const _float fRatio)
 {
 
 }
