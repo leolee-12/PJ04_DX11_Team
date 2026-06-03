@@ -32,7 +32,8 @@ HRESULT CMapStage::Initialize(void* pArg)
 		return E_FAIL;
 	m_strStageName = pDesc->strStageName;
 	m_iSectionProtoLevel = pDesc->iSectionProtoLevel;
-	m_pTransformCom->Rotation(XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(180.f)));
+	m_pTransformCom->Rotation(
+		XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(180.f)));
 
 	if (FAILED(Ready_Sections(pDesc)))
 		return E_FAIL;

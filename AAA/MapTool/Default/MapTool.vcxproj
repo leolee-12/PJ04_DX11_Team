@@ -52,12 +52,24 @@
   <ItemGroup>
     <ClInclude Include="..\Public\CullingContext.h" />
     <ClInclude Include="..\Public\EditInstance.h" />
-    <ClInclude Include="..\Public\EnvObject.h" />
-    <ClInclude Include="..\Public\EnvObject_Defines.h" />
-    <ClInclude Include="..\Public\EnvObject_Effect.h" />
-    <ClInclude Include="..\Public\EnvObject_Interact.h" />
-    <ClInclude Include="..\Public\EnvObject_Static.h" />
-    <ClInclude Include="..\Public\EnvObjectLoader.h" />
+    <ClInclude Include="..\Public\EnvObject.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvObject_Defines.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvObject_Effect.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvObject_Interact.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvObject_Static.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvObjectLoader.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\Public\ImGui_Manager.h" />
     <ClInclude Include="..\Public\Level_Edit.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />

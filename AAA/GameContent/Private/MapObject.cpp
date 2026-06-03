@@ -64,7 +64,7 @@ HRESULT CMapObject::Render()
 
         _int iZero = 0;
         m_pShaderCom->Bind_RawValue("g_iHasMoss", &iZero, sizeof(_int)); 
-        m_pShaderCom->Bind_RawValue("g_iHasDirt", &iZero, sizeof(_int));
+        //m_pShaderCom->Bind_RawValue("g_iHasDirt", &iZero, sizeof(_int));
 
         _int iUseTop = (m_bTopProjection &&
             m_pModelCom->Get_MeshName((_uint)i).find("Top") != string::npos) ? 1 : 0;
