@@ -9,6 +9,7 @@
 #include "TestRect.h"
 #include "TestEffectQuad.h"
 #include "Sample_MeshEffect.h"
+#include "TestMap.h"
 #include "TestMarb1e.h"
 #include "TestMarb1eMap.h"
 

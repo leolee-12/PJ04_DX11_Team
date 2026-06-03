@@ -46,6 +46,9 @@
     <Filter Include="00. GameObject\Test\TestEffectQuad">
       <UniqueIdentifier>{0d1ac5b9-9bf3-49d1-848a-61300fc9ce8b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\Test\TestMap">
+      <UniqueIdentifier>{63727501-0cde-4d54-ba7a-2748b3341edb}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\Test\TestMarb1e">
       <UniqueIdentifier>{840c0faf-b354-4895-adb2-a5936fb65b71}</UniqueIdentifier>
     </Filter>
@@ -73,12 +76,24 @@
     <Filter Include="00. GameObject\02. Effect\01. Effect_Part\00. SmokeSphereOriginal">
       <UniqueIdentifier>{362df019-e5fa-4be5-9f18-eea43e8e277e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\02. EnvObject">
+      <UniqueIdentifier>{ce9ba11f-9390-48f8-9a7f-e24b38b55608}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\02. EnvObject\EnvObj_Load">
+      <UniqueIdentifier>{cad642eb-e745-4355-90b4-b1497ba3ef09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\01. Map\MapDescriptor">
+      <UniqueIdentifier>{077c1198-d891-486e-b491-c184ad619dd7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
       <Filter>99. Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\GameContent_const.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\GameContent_Log.h">
       <Filter>99. Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ResourceData.h">
@@ -95,6 +110,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\Loader_Prototype.h">
       <Filter>97. DataSystem\DataLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapSection.h">
+      <Filter>00. GameObject\01. Map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Map_Defines.h">
+      <Filter>00. GameObject\01. Map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapStage.h">
+      <Filter>00. GameObject\01. Map</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Terrain.h">
       <Filter>00. GameObject\Test\Terrain</Filter>
@@ -120,6 +144,9 @@
     <ClInclude Include="..\Public\TestEffectQuad.h">
       <Filter>00. GameObject\Test\TestEffectQuad</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\TestMap.h">
+      <Filter>00. GameObject\Test\TestMap</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\TestMarb1e.h">
       <Filter>00. GameObject\Test\TestMarb1e</Filter>
     </ClInclude>
@@ -141,13 +168,46 @@
     <ClInclude Include="..\Public\SmokeSphereOriginal.h">
       <Filter>00. GameObject\02. Effect\01. Effect_Part\00. SmokeSphereOriginal</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\EnvObject.h">
+      <Filter>00. GameObject\02. EnvObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvObject_Defines.h">
+      <Filter>00. GameObject\02. EnvObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvObject_Effect.h">
+      <Filter>00. GameObject\02. EnvObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvObject_Interact.h">
+      <Filter>00. GameObject\02. EnvObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvObject_Static.h">
+      <Filter>00. GameObject\02. EnvObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\YshModelValidator.h">
+      <Filter>00. GameObject\02. EnvObject\EnvObj_Load</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvObjectLoader.h">
+      <Filter>00. GameObject\02. EnvObject\EnvObj_Load</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapDescriptor.h">
+      <Filter>00. GameObject\01. Map\MapDescriptor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
       <Filter>00. GameObject\99. Factory</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\GameContent_Log.cpp">
+      <Filter>99. Defines</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Loader_Prototype.cpp">
       <Filter>97. DataSystem\DataLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapSection.cpp">
+      <Filter>00. GameObject\01. Map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapStage.cpp">
+      <Filter>00. GameObject\01. Map</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Terrain.cpp">
       <Filter>00. GameObject\Test\Terrain</Filter>
@@ -184,6 +244,27 @@
     </ClCompile>
     <ClCompile Include="..\Private\SmokeSphereOriginal.cpp">
       <Filter>00. GameObject\02. Effect\01. Effect_Part\00. SmokeSphereOriginal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestMap.cpp">
+      <Filter>00. GameObject\Test\TestMap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvObject.cpp">
+      <Filter>00. GameObject\02. EnvObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvObject_Effect.cpp">
+      <Filter>00. GameObject\02. EnvObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvObject_Interact.cpp">
+      <Filter>00. GameObject\02. EnvObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvObject_Static.cpp">
+      <Filter>00. GameObject\02. EnvObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvObjectLoader.cpp">
+      <Filter>00. GameObject\02. EnvObject\EnvObj_Load</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapDescriptor.cpp">
+      <Filter>00. GameObject\01. Map\MapDescriptor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
