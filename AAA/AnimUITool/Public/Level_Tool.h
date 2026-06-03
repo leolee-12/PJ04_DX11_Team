@@ -41,6 +41,7 @@ private:
     HRESULT             Ready_Camera();
     HRESULT             Ready_Grid();
     HRESULT             Ready_PreviewShaders();
+    HRESULT             Ready_TestUI();
 
 public:
     static CLevel_Tool* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

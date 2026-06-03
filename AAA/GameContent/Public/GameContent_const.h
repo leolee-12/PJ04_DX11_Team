@@ -43,7 +43,7 @@ namespace ProtoDesc
 	inline constexpr SHADER_DESC Shader_NonAnimMesh_PBR = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_NonAnimMesh_PBR"), TEXT("../Bin/ShaderFiles/Shader_NonAnim_PBR.hlsl") };
 	inline constexpr SHADER_DESC Shader_Map = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Map"), TEXT("../Bin/ShaderFiles/Shader_Map.hlsl") };
 
-
+	inline constexpr SHADER_DESC Shader_UI = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_UI"), TEXT("../Bin/ShaderFiles/Shader_UI.hlsl") };
 
 
 

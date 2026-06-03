@@ -7,6 +7,9 @@
 #include "Model.h"
 #include "Preview_Actor.h"
 #include "GameContent_const.h"
+#include "GameObject_Factory.h"
+#include "UI_Image.h"
+#include "UI_TestImageContainer.h"
 
 namespace 
 { 
@@ -50,6 +53,9 @@ HRESULT CLevel_Tool::Initialize()
         return E_FAIL;
 
     if (FAILED(Ready_PreviewShaders()))
+        return E_FAIL;
+
+    if (FAILED(Ready_TestUI()))
         return E_FAIL;
 
     return S_OK;
@@ -115,6 +121,52 @@ HRESULT CLevel_Tool::Ready_PreviewShaders()
         m_pGameInstance_Proxy->Add_Prototype(L, L"Proto_Shader_NonAnimMesh",
             CShader::Create(m_pDevice, m_pContext, Shader_NonAnimMesh_PBR.szFileTag,
                 VTXMESH::Elements, VTXMESH::iNumElements));
+    return S_OK;
+}
+
+HRESULT CLevel_Tool::Ready_TestUI()
+{
+    auto* pReg = Client::CGameObject_Factory::GetInstance()
+        ->Get_Registration(Client::CUI_TestImageContainer::PROTOTYPE_TAG);
+    if (!pReg)
+        return E_FAIL;
+
+    const _uint L = ETOUI(TOOL_LEVEL::STATIC);
+
+    if (!m_pGameInstance_Proxy->Has_Prototype(L, Client::CUI_TestImageContainer::PROTOTYPE_TAG))
+    {
+        pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
+
+        m_pGameInstance_Proxy->Add_Prototype(
+            L,
+            Client::CUI_TestImageContainer::PROTOTYPE_TAG,
+            pReg->CreatorFunc(m_pDevice, m_pContext));
+    }
+
+    Client::CUI_TestImageContainer::UI_TESTIMAGE_CONTAINER_DESC desc{};
+    desc.vPosition = { -200.f, 0.f, 0.f, 1.f };
+    desc.bCreateImagePart = true;
+    desc.szPartTag = L"Image";
+
+    desc.ImageDesc.iTextureLevel = ETOUI(LEVEL::STATIC);
+    desc.ImageDesc.szTextureProtoTag = L"Proto_Tex_TestUI";
+    desc.ImageDesc.vSize = { 300.f, 300.f };
+    desc.ImageDesc.vPosition = { 0.f, 0.f };
+    desc.ImageDesc.iRenderLayer = 1;
+
+    CGameObject* pSource = nullptr;
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pSource, L, Client::CUI_TestImageContainer::PROTOTYPE_TAG, ETOUI(TOOL_LEVEL::EDIT), L"Layer_UI", L"Test_UI_Source",  &desc)))
+        return E_FAIL;
+
+    json jUI = pSource->Serialize();
+    jUI["Transform"]["vPosition"][0] = 200.f;
+
+    CGameObject* pLoaded = nullptr;
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pLoaded, L, Client::CUI_TestImageContainer::PROTOTYPE_TAG, ETOUI(TOOL_LEVEL::EDIT), L"Layer_UI", L"Test_UI_Loaded",  nullptr)))
+        return E_FAIL;
+    
+    pLoaded->Deserialize(jUI);
+
     return S_OK;
 }
 

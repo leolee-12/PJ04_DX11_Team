@@ -64,6 +64,9 @@
     <Filter Include="96. ShaderFiles\Defines">
       <UniqueIdentifier>{faad848a-186b-4861-910b-572f60a2a359}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03. Panels\UICanvas">
+      <UniqueIdentifier>{82aac75a-ceed-489b-a9ca-2b0eaf934ea4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Panel.h">

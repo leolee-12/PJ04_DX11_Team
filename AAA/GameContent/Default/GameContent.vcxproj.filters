@@ -58,6 +58,33 @@
     <Filter Include="00. GameObject\01. Map">
       <UniqueIdentifier>{52aa1b5e-9f41-4300-b321-d94a31de3ab2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\UI">
+      <UniqueIdentifier>{b3062cee-972c-4fb7-87e9-6219b23c53ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIContainer">
+      <UniqueIdentifier>{5ca0474a-ed3f-4d60-a221-b2411ba793c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart">
+      <UniqueIdentifier>{94c38715-2dd9-4f4e-8d6c-9d093835cbe4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart\Image">
+      <UniqueIdentifier>{a5a2e4ed-68be-4718-95b0-6b592bbe34a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart\Text">
+      <UniqueIdentifier>{3b5135bf-091a-43f9-a1b4-477f575eacaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart\SpriteAnim">
+      <UniqueIdentifier>{7d5d177d-f408-4ec2-9309-c09bb6f04f26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart\Effect">
+      <UniqueIdentifier>{0be37482-7fe4-4538-a085-a1d70dd6ef22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98. ShaderFiles\Hojun">
+      <UniqueIdentifier>{a6e24554-9141-4712-87e0-61e01d059777}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\TestImageContainer">
+      <UniqueIdentifier>{7f906e56-5e2d-404b-824c-cb4f519151e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -120,6 +147,12 @@
     <ClInclude Include="..\public\MapObject.h">
       <Filter>00. GameObject\01. Map</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\UI_Image.h">
+      <Filter>00. GameObject\UI\UIPart\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_TestImageContainer.h">
+      <Filter>00. GameObject\Test\TestImageContainer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -158,6 +191,12 @@
     <ClCompile Include="..\private\MapObject.cpp">
       <Filter>00. GameObject\01. Map</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\UI_Image.cpp">
+      <Filter>00. GameObject\UI\UIPart\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_TestImageContainer.cpp">
+      <Filter>00. GameObject\Test\TestImageContainer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl">
@@ -171,6 +210,9 @@
     </FxCompile>
     <FxCompile Include="..\ShaderFiles\Shader_Map.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_UI.hlsl">
+      <Filter>98. ShaderFiles\Hojun</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

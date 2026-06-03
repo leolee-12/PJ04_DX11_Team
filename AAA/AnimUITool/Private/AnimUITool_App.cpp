@@ -3,6 +3,7 @@
 #include "Panel_Manager.h"
 #include "Panel_Viewport.h"
 #include "Preview_Actor.h"
+#include "GameObject_Factory.h"
 
 #include "Level_Tool.h"
 
@@ -41,6 +42,8 @@ HRESULT CAnimUITool_App::Initialize()
 		pViewport->Set_Aspect((_float)m_iViewportWidth / (_float)m_iViewportHeight);
 		m_pViewportPanel = pViewport;
 	}
+
+	Client::CGameObject_Factory::GetInstance()->RegisterAll();
 
 	CLevel_Tool* pLevel = CLevel_Tool::Create(m_pDevice, m_pContext);
 	if (nullptr == pLevel) 
@@ -325,6 +328,8 @@ void CAnimUITool_App::Free()
 	Safe_Release(m_pGameInstance_Proxy);
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);
+
+	Client::CGameObject_Factory::DestroyInstance();
 
 	CGameInstance::DestroyInstance();
 }
