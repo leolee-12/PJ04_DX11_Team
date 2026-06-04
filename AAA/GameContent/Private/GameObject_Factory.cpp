@@ -14,6 +14,10 @@
 #include "TestMarb1eMap.h"
 #include "Material_Object.h"
 
+// Kirby
+#include "Kirby.h"
+#include "Kirby_Body.h"
+
 // Effect_Container
 #include "WalkSmoke.h"
 
@@ -162,6 +166,17 @@ void CGameObject_Factory::Register_Test()
 
 
 
+    // Kirby
+    Register(CKirby::PROTOTYPE_TAG, TEXT("Kirby"), CREATOR(CKirby),
+        LOADER
+        (
+            // Kirby_Body
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CKirby_Body::PROTOTYPE_TAG,
+                CKirby_Body::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Kirby_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/yse/Kirby/Kirby.ysh"));
+        )
+    );
 
 
     // Effect_Container
