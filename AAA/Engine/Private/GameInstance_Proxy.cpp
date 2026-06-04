@@ -7,6 +7,7 @@
 #include "Effect_Manager.h"
 #include "Timer_Manager.h"
 #include "Environment_Manager.h"
+#include "ShaderGlobal_Manager.h"
 
 #pragma region ENGINE
 void CGameInstance_Proxy::Update_Engine(_float fTimeDelta)
@@ -615,12 +616,12 @@ HRESULT CGameInstance_Proxy::Add_MRT(const _wstring& strMRTTag, const _wstring& 
 
 	return m_pOwner->Add_MRT(strMRTTag, strTargetTag);
 }
-HRESULT CGameInstance_Proxy::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV)
+HRESULT CGameInstance_Proxy::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV, _bool bBindDSV)
 {
 	if (!IsConnected())
 		return E_FAIL;
 
-	return m_pOwner->Begin_MRT(strMRTTag, pDSV);
+	return m_pOwner->Begin_MRT(strMRTTag, pDSV, bBindDSV);
 }
 HRESULT CGameInstance_Proxy::End_MRT()
 {
@@ -683,7 +684,7 @@ HRESULT CGameInstance_Proxy::Update_ShadowLight(const SHADOW_LIGHT_DESC& ShadowD
 #pragma endregion
 
 #pragma region EFFECT_MANAGER
-HRESULT CGameInstance_Proxy::Spawn_Effect(_uint iLevel, const _wstring& strProtoTag, const CEffect::EFFECT_DESC& desc, CEffect** ppOut)
+HRESULT CGameInstance_Proxy::Spawn_Effect(_uint iLevel, const _wstring& strProtoTag, const CEffect_Container::EFFECT_CONTAINER_DESC& desc, CEffect_Container** ppOut)
 {
 	if (!IsConnected())
 		return E_FAIL;
@@ -719,6 +720,9 @@ _bool CGameInstance_Proxy::Is_EditMode() const
 	if (m_pOwner == nullptr) return false;   // 안전 기본값
 	return m_pOwner->Is_EditMode();
 }
+#pragma endregion
+
+#pragma region ENVIRONMENT_MANAGER
 HRESULT CGameInstance_Proxy::Register_Environment(const _wstring& tag, const _tchar* d, const _tchar* s, _float i)
 {
 	if (!IsConnected())
@@ -742,6 +746,40 @@ const ENVIRONMENT_DESC& CGameInstance_Proxy::Get_CurrentEnvironment() const
 	}
 
 	return m_pOwner->m_pEnvironment_Manager->Get_Current();
+}
+#pragma endregion
+
+#pragma region SHADERGLOBAL_MANAGER
+HRESULT CGameInstance_Proxy::Bind_ShaderGlobals(CShader* pShader, const string& strName)
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->m_pShaderGlobal_Manager->Bind(pShader, strName);
+}
+HRESULT CGameInstance_Proxy::Bind_ShaderGlobals(CShader* pShader, initializer_list<const _char*> Names)
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->m_pShaderGlobal_Manager->Bind(pShader, Names);
+}
+void CGameInstance_Proxy::Set_ShaderGlobal(const string& strName, const _float4& vValue)
+{
+	if (!IsConnected())
+		return;
+
+	m_pOwner->m_pShaderGlobal_Manager->Set(strName, vValue);
+}
+vector<GLOBAL_DESC>& CGameInstance_Proxy::Get_ShaderGlobals()
+{
+	if (!IsConnected())
+	{
+		static vector<GLOBAL_DESC> empty{};
+		return empty;
+	}
+	
+	return m_pOwner->m_pShaderGlobal_Manager->Get_All();
 }
 #pragma endregion
 

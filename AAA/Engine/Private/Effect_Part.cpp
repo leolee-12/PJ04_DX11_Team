@@ -42,16 +42,19 @@ HRESULT CEffect_Part::Initialize(void* pArg)
     return S_OK;
 }
 
-void CEffect_Part::MoveUVScroll(const _float fTimeDelta, const _bool bUpdate, _float2& vUV, const _float2 vSpeed)
+void CEffect_Part::MoveUVScroll(const _float fRatio, const _bool bUpdate, const _float2 vScrollCount, const _float2 vBaseUV, _float2& vOutUV)
 {
-    if (bUpdate == true)
+    if (bUpdate == false)
     {
-        vUV.x = vUV.x + vSpeed.x * fTimeDelta;
-        vUV.y = vUV.y + vSpeed.y * fTimeDelta;
-
-        vUV.x = fmodf(vUV.x, 1.f);
-        vUV.y = fmodf(vUV.y, 1.f);
+        vOutUV = vBaseUV;
+        return;
     }
+
+    vOutUV.x = vBaseUV.x + vScrollCount.x * fRatio;
+    vOutUV.y = vBaseUV.y + vScrollCount.y * fRatio;
+
+    vOutUV.x = fmodf(vOutUV.x, 1.f);
+    vOutUV.y = fmodf(vOutUV.y, 1.f);
 }
 
 void CEffect_Part::Priority_Update(_float fTimeDelta)
@@ -62,8 +65,6 @@ void CEffect_Part::Priority_Update(_float fTimeDelta)
 void CEffect_Part::Update(_float fTimeDelta)
 {
     Update_Value(fTimeDelta);
-
-    Update_UVScroll(fTimeDelta);
 }
 
 void CEffect_Part::Late_Update(_float fTimeDelta)
@@ -71,13 +72,39 @@ void CEffect_Part::Late_Update(_float fTimeDelta)
     if (m_bActive == false)
         return;
 
-    // ㅇㄷ dd
-    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::BLEND, this);
+    Compute_CombinedWorldMatrix();
+
+    //test
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 
 HRESULT CEffect_Part::Render()
 {
     return S_OK;
+}
+
+void CEffect_Part::Effect_Start()
+{
+    m_bIsPlay = true;
+    m_fAccTime = 0.f;
+}
+
+void CEffect_Part::Set_ParentMatrix(const _float4x4* pParentMatrix)
+{
+    m_pParentMatrix = pParentMatrix;
+}
+
+void CEffect_Part::Compute_CombinedWorldMatrix()
+{
+    if (m_pParentMatrix != nullptr)
+    {
+        XMStoreFloat4x4(&m_CombinedWorldMatrix,
+            XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()) * XMLoadFloat4x4(m_pParentMatrix));
+    }
+    else
+    {
+        XMStoreFloat4x4(&m_CombinedWorldMatrix, XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+    }
 }
 
 HRESULT CEffect_Part::Bind_ShaderValue()
@@ -99,7 +126,7 @@ HRESULT CEffect_Part::Bind_ShaderValue()
             return E_FAIL;
         if (FAILED(m_pShaderCom->Bind_RawValue("g_vTextureTiling", &m_vTextureTiling, sizeof(m_vTextureTiling))))
             return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_vTextureOffset", &m_vTextureOffset, sizeof(m_vTextureOffset))))
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_vTextureOffset", &m_vCurTextureUVOffset, sizeof(m_vCurTextureUVOffset))))
             return E_FAIL;
     }
     else
@@ -119,7 +146,7 @@ HRESULT CEffect_Part::Bind_ShaderValue()
             return E_FAIL;
         if (FAILED(m_pShaderCom->Bind_RawValue("g_vMaskTiling", &m_vMaskTiling, sizeof(m_vMaskTiling))))
             return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_vMaskOffset", &m_vMaskOffset, sizeof(m_vMaskOffset))))
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_vMaskOffset", &m_vCurMaskUVOffset, sizeof(m_vCurMaskUVOffset))))
             return E_FAIL;
     }
     else
@@ -130,17 +157,6 @@ HRESULT CEffect_Part::Bind_ShaderValue()
     }
 
     return S_OK;
-}
-
-void CEffect_Part::Update_EffectPart(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
-{
-
-}
-
-void CEffect_Part::Update_UVScroll(const _float fTimeDelta)
-{
-    MoveUVScroll(fTimeDelta, m_bTextureUVScroll, m_vTextureOffset, m_vTextureUVSpeed);
-    MoveUVScroll(fTimeDelta, m_bMaskUVScroll, m_vMaskOffset, m_vMaskUVSpeed);
 }
 
 HRESULT CEffect_Part::Ready_Components()
@@ -171,13 +187,15 @@ void CEffect_Part::Init_PropertyValue()
 
     m_bLoop = { true };
 
-    m_fDuration = { 5.f };
+    m_fDuration = { 1.f };
     m_fAccTime = { 0.f };
-    m_fDelayTime = { 0.f };
 
-    m_fAlpha = { 1.0f };
+    m_fStartRatio = { 0.f };
+    m_fEndRatio = { 1.f };
 
     // Alpha
+    m_fAlpha = { 1.0f };
+
     m_bFadeInOut = { false };
 
     m_AlphaRatioValue.reserve(4);
@@ -232,18 +250,21 @@ void CEffect_Part::Init_PropertyValue()
 
     // Rot
     m_bRotationChange = { false };
-    m_fRotSpeed = { 360.f };
+    m_fRotationDegree = { 360.f };
     m_vRotationAxis = { 0.f, 1.f, 0.f };
     m_fRot_Start_Ratio = { 0.f };
     m_fRot_End_Ratio = { 1.f };
 
     //Move
     m_bMoveChange = { false };
-    m_fMoveSpeed = 1.f;
+
     m_vMoveDir = { 1.f, 0.f, 0.f };
+    m_fMoveDistance = 1.f;
+
     m_fMove_Start_Ratio = { 0.f };
     m_fMove_End_Ratio = { 1.f };
 
+    // MoveSin
     m_bMoveSin = { false };
     m_fSinCyclePerDuration = 1.f;
     m_fAmplitude = 1.f;
@@ -254,7 +275,7 @@ void CEffect_Part::Init_PropertyValue()
     m_vTextureOffset = { 0.f, 0.f };
 
     m_bTextureUVScroll = false;
-    m_vTextureUVSpeed = { 0.f, 0.f };
+    m_vTextureUVScrollCount = { 0.f, 0.f };
 
     // Mask
     m_bUseMaskCom = false;
@@ -262,64 +283,60 @@ void CEffect_Part::Init_PropertyValue()
     m_vMaskOffset = { 0.f, 0.f };
 
     m_bMaskUVScroll = false;
-    m_vMaskUVSpeed = { 0.f, 0.f };
+    m_vMaskUVScrollCount = { 0.f, 0.f };
 }
 
-void CEffect_Part::Update_Value(_float fTimeDelta)
+void CEffect_Part::Update_Value(const _float fTimeDelta)
 {
     if (m_bIsPlay == false)
-        return;
+        return;  
 
-    // Time Update
     m_fAccTime += fTimeDelta;
 
-    if (m_fAccTime < m_fDelayTime)
-    {
-        m_bActive = false;
-        return;
-    }
-
-    m_bActive = true;
-
-    // Time
-    const _float fActiveTime = m_fAccTime - m_fDelayTime;
-    _float fRatio = fActiveTime / m_fDuration;
+    _float fRatio = m_fAccTime / m_fDuration;
     Helper::FloatClamp(fRatio, 0.f, 1.f);
 
-    Update_Alpha(fTimeDelta, fActiveTime, fRatio);
-    Update_Size(fTimeDelta, fActiveTime, fRatio);
-    Update_Color(fTimeDelta, fActiveTime, fRatio);
-    Update_Rot(fTimeDelta, fActiveTime, fRatio);
-    Update_Move(fTimeDelta, fActiveTime, fRatio);
-    Update_MoveSin(fTimeDelta, fActiveTime, fRatio);
+    if (fRatio < m_fStartRatio || fRatio > m_fEndRatio)
+        m_bActive = false;
+    else
+        m_bActive = true;
 
-    Update_EffectPart(fTimeDelta, fActiveTime, fRatio);
-
-    // Time Update
-    if (fActiveTime >= m_fDuration)
+    if (m_bActive == true)
     {
-        if(m_bMoveChange)
-            // 이거 나중에 부모 위치 반영한 로컬로 바꿔줘야 함.
-            m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&m_vLocalPos), 1.f));
+        // Update
+        Update_Alpha(fTimeDelta, fRatio);
+        Update_Size(fTimeDelta, fRatio);
+        Update_Color(fTimeDelta, fRatio);
+        Update_Rot(fTimeDelta, fRatio);
+        Update_Move(fTimeDelta, fRatio);       // Move관련 가장 먼저
+        Update_MoveSin(fTimeDelta, fRatio);
+        Update_UVScroll(fTimeDelta, fRatio);
 
-        if (m_bLoop)
+        Update_EffectPart(fTimeDelta, fRatio);
+    }
+
+
+    if (m_fAccTime >= m_fDuration)
+    {
+        if (m_bLoop == true)
         {
             m_fAccTime = 0.f;
         }
         else
         {
-            m_fAccTime = m_fDelayTime + m_fDuration;
             m_bIsPlay = false;
+            m_bActive = false;
+            m_fAccTime = m_fDuration;
         }
     }
 }
 
-void CEffect_Part::Update_Alpha(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Part::Update_Alpha(const _float fTimeDelta, const _float fRatio)
 {   
     if (m_bFadeInOut == true)
     {
-        const _float fStartRatio = 0.f;
-        const _float fEndRatio = 1.f;
+        const _float fStartRatio = m_fStartRatio;
+        const _float fEndRatio = m_fEndRatio;
 
         m_AlphaRatioValue.push_back({ fStartRatio, m_fAlphaStartValue });
 
@@ -349,12 +366,12 @@ void CEffect_Part::Update_Alpha(const _float fTimeDelta, const _float fActiveTim
     m_AlphaRatioValue.clear();
 }
 
-void CEffect_Part::Update_Size(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Part::Update_Size(const _float fTimeDelta, const _float fRatio)
 {
     if (m_bSizeChange == true)
     {
-        const _float fStartRatio = 0.f;
-        const _float fEndRatio = 1.f;
+        const _float fStartRatio = m_fStartRatio;
+        const _float fEndRatio = m_fEndRatio;
 
         m_SizeRatioValue.push_back({ fStartRatio, m_fSizeStartValue });
 
@@ -386,12 +403,12 @@ void CEffect_Part::Update_Size(const _float fTimeDelta, const _float fActiveTime
     m_SizeRatioValue.clear();
 }
 
-void CEffect_Part::Update_Color(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Part::Update_Color(const _float fTimeDelta, const _float fRatio)
 {
     if (m_bColorChange == true)
     {
-        const _float fStartRatio = 0.f;
-        const _float fEndRatio = 1.f;
+        const _float fStartRatio = m_fStartRatio;
+        const _float fEndRatio = m_fEndRatio;
 
         m_ColorRatioValue.push_back({ fStartRatio, m_vColorStartValue });
 
@@ -420,54 +437,59 @@ void CEffect_Part::Update_Color(const _float fTimeDelta, const _float fActiveTim
     m_ColorRatioValue.clear();
 }
 
-void CEffect_Part::Update_Rot(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Part::Update_Rot(const _float fTimeDelta, const _float fRatio)
 {
     if (m_bRotationChange == false)
         return;
 
     if (fRatio >= m_fRot_Start_Ratio && fRatio <= m_fRot_End_Ratio)
     {
-        m_pTransformCom->Rotate(XMQuaternionRotationAxis(XMLoadFloat3(&m_vRotationAxis),
-            XMConvertToRadians(m_fRotSpeed) * fTimeDelta));
+        _float fSubRatio = (fRatio - m_fRot_Start_Ratio) / (m_fRot_End_Ratio - m_fRot_Start_Ratio);
 
+        _float fCurDegree = m_fRotationDegree * fSubRatio;
+
+        m_pTransformCom->Rotation(XMLoadFloat3(&m_vRotationAxis), XMConvertToRadians(fCurDegree));
     }
 }
 
-void CEffect_Part::Update_Move(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Part::Update_Move(const _float fTimeDelta, const _float fRatio)
 {
-    if (m_bMoveChange == false)
-        return;
+    _vector vBasePos = XMLoadFloat3(&m_vLocalPos);
 
-    if (fRatio >= m_fMove_Start_Ratio && fRatio <= m_fMove_End_Ratio)
+    if (m_bMoveChange == true &&
+        fRatio >= m_fMove_Start_Ratio && fRatio <= m_fMove_End_Ratio)
     {
-        _vector vPosition =  m_pTransformCom->Get_State(STATE::POSITION);
-        vPosition += XMVectorSetW(XMVector3Normalize(XMLoadFloat3(&m_vMoveDir)), 0.f) * m_fMoveSpeed * fTimeDelta;
-        m_pTransformCom->Set_State(STATE::POSITION, vPosition);
+        _float fSubRatio = (fRatio - m_fMove_Start_Ratio) / (m_fMove_End_Ratio - m_fMove_Start_Ratio);
+
+        _float fCurDistance = m_fMoveDistance * fSubRatio;
+
+        vBasePos += XMVector3Normalize(XMLoadFloat3(&m_vMoveDir)) * fCurDistance;
     }
+
+    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(vBasePos, 1.f));
 }
 
-void CEffect_Part::Update_MoveSin(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Part::Update_MoveSin(const _float fTimeDelta, const _float fRatio)
 {
     if (m_bMoveSin == false)
-    {
-        if (m_fPreOffsetY != 0.f)
-        {
-            _vector vCurPos = m_pTransformCom->Get_State(STATE::POSITION);
-            m_pTransformCom->Set_State(STATE::POSITION, vCurPos - XMVectorSet(0.f, m_fPreOffsetY, 0.f, 0.f));
-            m_fPreOffsetY = 0.f;
-        }
-
         return;
-    }
 
     _float fCurOffsetY = sinf(fRatio * XM_2PI * m_fSinCyclePerDuration) * m_fAmplitude;
 
     _vector vCurPos = m_pTransformCom->Get_State(STATE::POSITION);
 
-    _float fDY = fCurOffsetY - m_fPreOffsetY;
-    m_pTransformCom->Set_State(STATE::POSITION, vCurPos + XMVectorSet(0.f, fDY, 0.f, 0.f));
-    
-    m_fPreOffsetY = fCurOffsetY;
+    m_pTransformCom->Set_State(STATE::POSITION, vCurPos + XMVectorSet(0.f, fCurOffsetY, 0.f, 0.f));
+}
+
+void CEffect_Part::Update_UVScroll(const _float fTimeDelta, const _float fRatio)
+{
+    MoveUVScroll(fRatio, m_bTextureUVScroll, m_vTextureUVScrollCount, m_vTextureOffset, m_vCurTextureUVOffset);
+    MoveUVScroll(fRatio, m_bMaskUVScroll, m_vMaskUVScrollCount, m_vMaskOffset, m_vCurMaskUVOffset);
+}
+
+void CEffect_Part::Update_EffectPart(const _float fTimeDelta, const _float fRatio)
+{
+
 }
 
 void CEffect_Part::Free()

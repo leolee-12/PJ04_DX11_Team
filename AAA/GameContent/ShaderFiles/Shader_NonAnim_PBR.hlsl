@@ -33,25 +33,25 @@ struct VS_OUT
     float2 vTexcoord1 : TEXCOORD1;
     float2 vTexcoord2 : TEXCOORD2;
     float2 vTexcoord3 : TEXCOORD3;
-    
+
     float4 vWorldPos : TEXCOORD4;
     float4 vProjPos : TEXCOORD5;
     float4 vTangent : TANGENT;
     float4 vBinormal : BINORMAL;
 };
-    
+
 
 /* 정점셰이더 : 정점 데이터의 변환 과정을 수행한다. */
 
 VS_OUT VS_MAIN(VS_IN In)
 {
-    VS_OUT Out;    
-    
-    /* 월드변환, 뷰 벼환, 투영변환 */ 
+    VS_OUT Out;
+
+    /* 월드변환, 뷰 벼환, 투영변환 */
     float4      vPosition = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
     vPosition = mul(vPosition, g_ViewMatrix);
     vPosition = mul(vPosition, g_ProjMatrix);
-    
+
     Out.vPosition = vPosition;
     Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix));
     Out.vTexcoord = In.vTexcoord;
@@ -73,8 +73,8 @@ VS_OUT VS_MAIN(VS_IN In)
 }
 
 /* w 나누기 연산 : 2차원 투영스페이스로의 변환. */
-/* 뷰포트로의 변환 (윈도우좌표로의 변환) */ 
-/* 래스터라이즈 (정점정보를 기반으로 해서 픽셀의 정보를 생성한다. ) */ 
+/* 뷰포트로의 변환 (윈도우좌표로의 변환) */
+/* 래스터라이즈 (정점정보를 기반으로 해서 픽셀의 정보를 생성한다. ) */
 
 struct PS_IN
 {
@@ -84,7 +84,7 @@ struct PS_IN
     float2 vTexcoord1 : TEXCOORD1;
     float2 vTexcoord2 : TEXCOORD2;
     float2 vTexcoord3 : TEXCOORD3;
-    
+
     float4 vWorldPos : TEXCOORD4;
     float4 vProjPos : TEXCOORD5;
     float4 vTangent : TANGENT;
@@ -135,7 +135,7 @@ PS_OUT PS_MAIN(PS_IN In)
     //Out.vDiffuse = float4(vAlbedo, vBase.a);
     Out.vDiffuse = float4((In.vTangent.w * 0.5f + 0.5f).rrr, 1.f);
     Out.vNormal = float4(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(mra, 1.f);
     return Out;
 }
@@ -174,18 +174,23 @@ PS_OUT PS_MAIN(PS_IN In)
 PS_OUT PS_DEFFUSE(PS_IN In)
 {
     PS_OUT Out;
-    
+
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     if (vMtrlDiffuse.a < 0.1f)
         discard;
-   
-    
+
+
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
-    
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(0.f, 1.f, 1.f, 1.f);
     return Out;
 }
+
+
+
+
+
 
 
 technique11 DefaultTechnique

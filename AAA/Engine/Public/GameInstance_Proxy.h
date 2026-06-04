@@ -163,7 +163,7 @@ public: // Picking
 #pragma region TARGET_MANAGER
     HRESULT Add_RenderTarget(const _wstring& strTargetTag, _uint iWidth, _uint iHeight, DXGI_FORMAT ePixelFormat, const _float4& vClearColor);
     HRESULT Add_MRT(const _wstring& strMRTTag, const _wstring& strTargetTag);
-    HRESULT Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV = nullptr);
+    HRESULT Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV = nullptr, _bool bBindDSV = true);
     HRESULT End_MRT();
     HRESULT Bind_RT_ShaderResource(const _wstring& strTargetTag, class CShader* pShader, const _char* pConstantName);
 
@@ -182,7 +182,7 @@ public:
 
 #pragma region EFFECT_MANAGER
     HRESULT Spawn_Effect(_uint iLevel, const _wstring& strProtoTag,
-    const CEffect::EFFECT_DESC& desc, CEffect** ppOut = nullptr);
+    const CEffect_Container::EFFECT_CONTAINER_DESC& desc, CEffect_Container** ppOut = nullptr);
 
     CShader* Get_2DShader();
     CShader* Get_MeshShader();
@@ -199,6 +199,14 @@ public:
       HRESULT Register_Environment(const _wstring& tag, const _tchar* d, const _tchar* s, _float i = 1.f);
       HRESULT Set_CurrentEnvironment(const _wstring& tag);
       const ENVIRONMENT_DESC& Get_CurrentEnvironment() const;
+#pragma endregion
+
+#pragma region SHADERGLOBAL_MANAGER
+  public:
+      HRESULT Bind_ShaderGlobals(class CShader* pShader, const string& strName);
+      HRESULT Bind_ShaderGlobals(class CShader* pShader, initializer_list<const _char*> Names);
+      void    Set_ShaderGlobal(const string& strName, const _float4& vValue);
+      vector<GLOBAL_DESC>& Get_ShaderGlobals();
 #pragma endregion
 
 private:

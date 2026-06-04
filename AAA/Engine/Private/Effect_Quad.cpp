@@ -93,7 +93,7 @@ HRESULT CEffect_Quad::Ready_Components()
 
 HRESULT CEffect_Quad::Bind_ShaderResources()
 {
-    if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
@@ -112,13 +112,13 @@ HRESULT CEffect_Quad::Bind_ShaderValue()
     return S_OK;
 }
 
-void CEffect_Quad::Update_EffectPart(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Quad::Update_UVScroll(const _float fTimeDelta, const _float fRatio)
 {
+    __super::Update_UVScroll(fTimeDelta, fRatio);
 }
 
-void CEffect_Quad::Update_UVScroll(const _float fTimeDelta)
+void CEffect_Quad::Update_EffectPart(const _float fTimeDelta, const _float fRatio)
 {
-    __super::Update_UVScroll(fTimeDelta);
 }
 
 void CEffect_Quad::Init_PropertyValue()

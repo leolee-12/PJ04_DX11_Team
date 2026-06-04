@@ -42,6 +42,8 @@ private:
 	void Draw_Transform(CGameObject* pObject, const string& strSuffix = "");
 
 	void Draw_AnimatorEditor(CModel* pModel, CAnimator* pAnimator);
+	
+	void Draw_ShaderGlobals();
 
 public:
 	virtual void Free() override;

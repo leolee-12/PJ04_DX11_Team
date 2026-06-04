@@ -10,17 +10,19 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
 {
     GENERATED_BODY_ABSTRACT(CEffect_Part)
 
-    PROPERTY(_int, m_iShdaerPass,   L"ShdaerPass",  L"Effect");
+    PROPERTY(_int, m_iShdaerPass,       L"ShdaerPass",  L"Effect");
 
-    PROPERTY(_float3, m_vLocalPos,  L"LocalPos",    L"Effect");
+    PROPERTY(_float3, m_vLocalPos,      L"LocalPos",    L"Effect");
 
-    PROPERTY(_bool, m_bIsPlay,      L"Play",        L"Effect");
+    PROPERTY(_bool, m_bIsPlay,          L"Play",        L"Effect");
 
-    PROPERTY(_bool, m_bLoop,        L"Loop",        L"Effect");
+    PROPERTY(_bool, m_bLoop,            L"Loop",        L"Effect");
 
-    PROPERTY(_float, m_fDuration,   L"Duration",    L"Effect");
-    PROPERTY(_float, m_fAccTime,    L"AccTime",     L"Effect");
-    PROPERTY(_float, m_fDelayTime,  L"DelayTime",   L"Effect");
+    PROPERTY(_float, m_fDuration,       L"Duration",    L"Effect");
+    PROPERTY(_float, m_fAccTime,        L"AccTime",     L"Effect");
+
+    PROPERTY(_float, m_fStartRatio,     L"StartRatio",   L"Effect");
+    PROPERTY(_float, m_fEndRatio,       L"EndRatio",   L"Effect");
 
     // Alpha
     PROPERTY(_float, m_fAlpha,               L"Alpha",                L"Effect_Alpha");
@@ -75,7 +77,7 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
     // Rot
     PROPERTY(_bool, m_bRotationChange,   L"RotationChange",    L"Effect_Rot");
 
-    PROPERTY(_float, m_fRotSpeed,        L"RotSpeed",   L"Effect_Rot");
+    PROPERTY(_float, m_fRotationDegree,  L"RotationDegree",    L"Effect_Rot");
 
     PROPERTY(_float3, m_vRotationAxis,   L"m_vRotationAxis",   L"Effect_Rot");
     PROPERTY(_float, m_fRot_Start_Ratio, L"Rot_Start_Ratio",   L"Effect_Rot");
@@ -84,9 +86,10 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
 
     // Move
     PROPERTY(_bool, m_bMoveChange,          L"MoveChange",          L"Effect_Move");
-    PROPERTY(_float, m_fMoveSpeed,          L"MoveSpeed",           L"Effect_Move");
 
     PROPERTY(_float3, m_vMoveDir,           L"MoveDir",             L"Effect_Move");
+    PROPERTY(_float, m_fMoveDistance,       L"MoveDistance",        L"Effect_Move");
+
     PROPERTY(_float, m_fMove_Start_Ratio,   L"Move_Start_Ratio",    L"Effect_Move");
     PROPERTY(_float, m_fMove_End_Ratio,     L"Move_End_Ratio",      L"Effect_Move");
 
@@ -98,20 +101,20 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
 
 
     // Texture
-    PROPERTY(_bool, m_bUseTextureCom, L"Use_TextureCom", L"Effect_Model");
-    PROPERTY(_float2, m_vTextureTiling, L"Texture_Tiling", L"Effect_Model");
-    PROPERTY(_float2, m_vTextureOffset, L"Texture_Offset", L"Effect_Model");
+    PROPERTY(_bool, m_bUseTextureCom,           L"Use_TextureCom",          L"Effect_Model");
+    PROPERTY(_float2, m_vTextureTiling,         L"Texture_Tiling",          L"Effect_Model");
+    PROPERTY(_float2, m_vTextureOffset,         L"Texture_Offset",          L"Effect_Model");
 
-    PROPERTY(_bool, m_bTextureUVScroll, L"Texture_UVScroll", L"Effect_Model");
-    PROPERTY(_float2, m_vTextureUVSpeed, L"Texture_UVSpeed", L"Effect_Model");
+    PROPERTY(_bool, m_bTextureUVScroll,         L"Texture_UVScroll",        L"Effect_Model");
+    PROPERTY(_float2, m_vTextureUVScrollCount,  L"Texture_UVScrollCount",   L"Effect_Model");
 
     // Mask
-    PROPERTY(_bool, m_bUseMaskCom, L"Use_MaskCom", L"Effect_Model");
-    PROPERTY(_float2, m_vMaskTiling, L"Mask_Tiling", L"Effect_Model");
-    PROPERTY(_float2, m_vMaskOffset, L"Mask_Offset", L"Effect_Model");
+    PROPERTY(_bool, m_bUseMaskCom,          L"Use_MaskCom",         L"Effect_Model");
+    PROPERTY(_float2, m_vMaskTiling,        L"Mask_Tiling",         L"Effect_Model");
+    PROPERTY(_float2, m_vMaskOffset,        L"Mask_Offset",         L"Effect_Model");
 
-    PROPERTY(_bool, m_bMaskUVScroll, L"Mask_UVScroll", L"Effect_Model");
-    PROPERTY(_float2, m_vMaskUVSpeed, L"Mask_UVSpeed", L"Effect_Model");
+    PROPERTY(_bool, m_bMaskUVScroll,        L"Mask_UVScroll",       L"Effect_Model");
+    PROPERTY(_float2, m_vMaskUVScrollCount, L"Mask_UVScrollCount",  L"Effect_Model");
 
 public:
     struct EFFECT_PART_DESC : public CGameObject::GAMEOBJECT_DESC
@@ -128,6 +131,9 @@ public:
         _uint iMaskLevel{};
         _wstring wstrMaskTag;
     };
+
+private:
+    enum Sampler { DEFAULT, MIRROR, SAMPLER_END };
 
 private:
     struct RATIO_VALUE
@@ -151,13 +157,16 @@ protected:
     virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void* pArg) override;
 
-    void MoveUVScroll(const _float fTimeDelta, const _bool bUpdate, _float2& vUV, const _float2 vSpeed);
+    void MoveUVScroll(const _float fRatio, const _bool bUpdate, const _float2 vScrollCount, const _float2 vBaseUV, _float2& vOutUv);
 
 public:
     virtual void    Priority_Update(_float fTimeDelta) override;
     virtual void    Update(_float fTimeDelta) override;
     virtual void    Late_Update(_float fTimeDelta) override;
     virtual HRESULT Render() override;
+
+    virtual void    Effect_Start();
+    void Set_ParentMatrix(const _float4x4* pParentMatrix);
 
 protected:
     _bool m_bCustomShader{};
@@ -176,21 +185,30 @@ protected:
 protected:
     _bool m_bActive{ true };
 
-    _float m_fPreOffsetY{};
+    _float2 m_vCurTextureUVOffset{};
+    _float2 m_vCurMaskUVOffset{};
+
+    const _float4x4* m_pParentMatrix{};
+    _float4x4 m_CombinedWorldMatrix{};
+
+protected:
+    void Compute_CombinedWorldMatrix();
 
 protected:
     HRESULT Bind_ShaderValue();
 
-    virtual void Update_EffectPart(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
-    virtual void Update_UVScroll(const _float fTimeDelta);
+protected:
+    void Update_Value(const _float fTimeDelta);
 
-    void Update_Value(_float fTimeDelta);
-    void Update_Alpha(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
-    void Update_Size(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
-    void Update_Color(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
-    void Update_Rot(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
-    void Update_Move(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
-    void Update_MoveSin(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
+    void Update_Alpha(const _float fTimeDelta, const _float fRatio);
+    void Update_Size(const _float fTimeDelta, const _float fRatio);
+    void Update_Color(const _float fTimeDelta, const _float fRatio);
+    void Update_Rot(const _float fTimeDelta, const _float fRatio);
+    void Update_Move(const _float fTimeDelta, const _float fRatio);
+    void Update_MoveSin(const _float fTimeDelta, const _float fRatio);
+    virtual void Update_UVScroll(const _float fTimeDelta, const _float fRatio);
+
+    virtual void Update_EffectPart(const _float fTimeDelta, const _float fRatio);
 
 private:
     vector<RATIO_VALUE> m_AlphaRatioValue;

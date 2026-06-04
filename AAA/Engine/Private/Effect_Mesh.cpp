@@ -110,7 +110,7 @@ HRESULT CEffect_Mesh::Ready_Components()
 
 HRESULT CEffect_Mesh::Bind_ShaderResources()
 {
-    if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
@@ -130,30 +130,30 @@ HRESULT CEffect_Mesh::Bind_ShaderValue()
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vDiffuseTiling", &m_vDiffuseTiling, sizeof(m_vDiffuseTiling))))
         return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vDiffuseOffset", &m_vDiffuseOffset, sizeof(m_vDiffuseOffset))))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vDiffuseOffset", &m_vCurDiffuseUVOffset, sizeof(m_vCurDiffuseUVOffset))))
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseUnknownTexture", &m_bUseUnknownTexture, sizeof(m_bUseUnknownTexture))))
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vUnknownTiling", &m_vUnknownTiling, sizeof(m_vUnknownTiling))))
         return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vUnknownOffset", &m_vUnknownOffset, sizeof(m_vUnknownOffset))))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vUnknownOffset", &m_vCurUnknownUVOffset, sizeof(m_vCurUnknownUVOffset))))
         return E_FAIL;
 
     return S_OK;
 }
 
-void CEffect_Mesh::Update_EffectPart(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Mesh::Update_UVScroll(const _float fTimeDelta, const _float fRatio)
 {
-
+    __super::Update_UVScroll(fTimeDelta, fRatio);
+    
+    MoveUVScroll(fRatio, m_vDiffuseUVScroll, m_vDiffuseUVScrollCount, m_vDiffuseOffset, m_vCurDiffuseUVOffset);
+    MoveUVScroll(fRatio, m_vUnknownUVScroll, m_vUnknownUVScrollCount, m_vUnknownOffset, m_vCurUnknownUVOffset);
 }
 
-void CEffect_Mesh::Update_UVScroll(const _float fTimeDelta)
+void CEffect_Mesh::Update_EffectPart(const _float fTimeDelta, const _float fRatio)
 {
-    __super::Update_UVScroll(fTimeDelta);
 
-    MoveUVScroll(fTimeDelta, m_vDiffuseUVScroll, m_vDiffuseOffset, m_vDiffuseUVSpeed);
-    MoveUVScroll(fTimeDelta, m_vUnknownUVScroll, m_vUnknownOffset, m_vUnknownUVSpeed);
 }
 
 void CEffect_Mesh::Init_PropertyValue()
@@ -164,7 +164,7 @@ void CEffect_Mesh::Init_PropertyValue()
     m_vDiffuseOffset = { 0.f, 0.f };
 
     m_vDiffuseUVScroll = false;
-    m_vDiffuseUVSpeed = { 0.f, 0.f };
+    m_vDiffuseUVScrollCount = { 0.f, 0.f };
 
     // Unknown Texture
     m_bUseUnknownTexture = false;
@@ -172,7 +172,7 @@ void CEffect_Mesh::Init_PropertyValue()
     m_vUnknownOffset = { 0.f, 0.f };
 
     m_vUnknownUVScroll = false;
-    m_vUnknownUVSpeed = { 0.f, 0.f };
+    m_vUnknownUVScrollCount = { 0.f, 0.f };
 }
 
 void CEffect_Mesh::Free()

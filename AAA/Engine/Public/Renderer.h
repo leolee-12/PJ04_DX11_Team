@@ -43,14 +43,12 @@ private:
 	vector<CUIObject*>		m_RenderUIs[ETOUI(RENDERUIID::END)];
 
 	CGameInstance_Proxy*	m_pGameInstance_Proxy = { nullptr };
-	CShader*				m_pShader = { nullptr };
+	CShader*				m_pShaderDeferred = { nullptr };
+	CShader*				m_pShaderPost = { nullptr };
 	CVIBuffer_Rect*			m_pVIBuffer = { nullptr };
 	_float4x4				m_WorldMatrix{};
 
 	ID3D11DepthStencilView* m_pMaxDSV = { nullptr };
-
-	_float					m_fThreshold = { 1.0f };
-	_float					m_fBloomIntensity = { 1.f };
 
 #ifdef _DEBUG
 	list<CComponent*>		m_DebugComponents;
@@ -62,10 +60,14 @@ private:
 	_uint                   m_iOutWidth = { 0 };
 	_uint                   m_iOutHeight = { 0 };
 
+	_uint					m_iRTWidth = {};  
+	_uint					m_iRTHeight = {};
+
 private:
 	HRESULT Render_Priority();
 	HRESULT Render_Shadow();
 	HRESULT Render_NonBlend();
+	HRESULT Render_SSAO();
 	HRESULT Render_Lights();
 	HRESULT Render_Combined();
 	HRESULT Render_Bloom();
