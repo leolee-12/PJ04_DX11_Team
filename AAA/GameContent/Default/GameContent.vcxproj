@@ -41,6 +41,7 @@
     <ClInclude Include="..\public\TestRect.h" />
     <ClInclude Include="..\Public\UI_Image.h" />
     <ClInclude Include="..\Public\UI_TestImageContainer.h" />
+    <ClInclude Include="..\Public\UI_Title.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Camera_Free.cpp" />
@@ -57,6 +58,7 @@
     <ClCompile Include="..\private\TestRect.cpp" />
     <ClCompile Include="..\Private\UI_Image.cpp" />
     <ClCompile Include="..\Private\UI_TestImageContainer.cpp" />
+    <ClCompile Include="..\Private\UI_Title.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl" />

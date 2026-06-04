@@ -2,6 +2,7 @@
 #include "GameInstance.h"
 #include "Panel_Manager.h"
 #include "Panel_Viewport.h"
+#include "Panel_UICanvas.h"
 #include "Preview_Actor.h"
 #include "GameObject_Factory.h"
 
@@ -41,6 +42,14 @@ HRESULT CAnimUITool_App::Initialize()
 		pViewport->Set_SRV(m_pSRV);
 		pViewport->Set_Aspect((_float)m_iViewportWidth / (_float)m_iViewportHeight);
 		m_pViewportPanel = pViewport;
+	}
+
+	if (auto* pUICanvas = dynamic_cast<CPanel_UICanvas*>(m_pPanel_Manager->Get_Panel(L"UICanvas")))
+	{
+		pUICanvas->Set_SRV(m_pSRV);
+		pUICanvas->Set_Aspect((_float)m_iViewportWidth / (_float)m_iViewportHeight);
+		pUICanvas->Set_DesignSize((_float)m_iViewportWidth, (_float)m_iViewportHeight);
+		m_pUICanvasPanel = pUICanvas;
 	}
 
 	Client::CGameObject_Factory::GetInstance()->RegisterAll();
@@ -115,10 +124,22 @@ HRESULT CAnimUITool_App::Init_ImGui()
 
 void CAnimUITool_App::Update(_float fTimeDelta)
 {
-	if (m_pToolLevel && m_pViewportPanel)
-		m_pToolLevel->Set_CameraActive(m_pViewportPanel->Is_Hovered());
+	if (m_pToolLevel && m_pPanel_Manager)
+	{
+		const _bool bAnimationMode =
+			m_pPanel_Manager->Get_WorkMode() == TOOL_MODE::ANIMATION;
 
-	m_pGameInstance_Proxy->Update_Engine(fTimeDelta); 
+		const _bool bCameraActive =
+			bAnimationMode &&
+			m_pViewportPanel &&
+			m_pViewportPanel->Is_Hovered();
+
+		m_pToolLevel->Set_CameraActive(bCameraActive);
+		m_pToolLevel->Set_GridVisible(bAnimationMode);
+		m_pToolLevel->Set_PreviewVisible(bAnimationMode);
+	}
+
+	m_pGameInstance_Proxy->Update_Engine(fTimeDelta);
 	m_pPanel_Manager->Update(fTimeDelta);
 }
 

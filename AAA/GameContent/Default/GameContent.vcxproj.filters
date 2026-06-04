@@ -85,6 +85,9 @@
     <Filter Include="00. GameObject\Test\TestImageContainer">
       <UniqueIdentifier>{7f906e56-5e2d-404b-824c-cb4f519151e7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\UI\UIContainer\Title">
+      <UniqueIdentifier>{6621da30-94ec-4236-908b-f21c296456b0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -153,6 +156,9 @@
     <ClInclude Include="..\Public\UI_TestImageContainer.h">
       <Filter>00. GameObject\Test\TestImageContainer</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\UI_Title.h">
+      <Filter>00. GameObject\UI\UIContainer\Title</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -196,6 +202,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\UI_TestImageContainer.cpp">
       <Filter>00. GameObject\Test\TestImageContainer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_Title.cpp">
+      <Filter>00. GameObject\UI\UIContainer\Title</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

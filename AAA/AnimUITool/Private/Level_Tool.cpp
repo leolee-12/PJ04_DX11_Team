@@ -8,8 +8,8 @@
 #include "Preview_Actor.h"
 #include "GameContent_const.h"
 #include "GameObject_Factory.h"
-#include "UI_Image.h"
-#include "UI_TestImageContainer.h"
+
+#include "UI_Title.h"
 
 namespace 
 { 
@@ -127,42 +127,42 @@ HRESULT CLevel_Tool::Ready_PreviewShaders()
 HRESULT CLevel_Tool::Ready_TestUI()
 {
     auto* pReg = Client::CGameObject_Factory::GetInstance()
-        ->Get_Registration(Client::CUI_TestImageContainer::PROTOTYPE_TAG);
+        ->Get_Registration(Client::CUI_Title::PROTOTYPE_TAG);
     if (!pReg)
         return E_FAIL;
 
     const _uint L = ETOUI(TOOL_LEVEL::STATIC);
 
-    if (!m_pGameInstance_Proxy->Has_Prototype(L, Client::CUI_TestImageContainer::PROTOTYPE_TAG))
+    if (!m_pGameInstance_Proxy->Has_Prototype(L, Client::CUI_Title::PROTOTYPE_TAG))
     {
         pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
 
         m_pGameInstance_Proxy->Add_Prototype(
             L,
-            Client::CUI_TestImageContainer::PROTOTYPE_TAG,
+            Client::CUI_Title::PROTOTYPE_TAG,
             pReg->CreatorFunc(m_pDevice, m_pContext));
     }
 
-    Client::CUI_TestImageContainer::UI_TESTIMAGE_CONTAINER_DESC desc{};
-    desc.vPosition = { -200.f, 0.f, 0.f, 1.f };
-    desc.bCreateImagePart = true;
-    desc.szPartTag = L"Image";
+    Client::CUI_Title::UI_TITLE_DESC desc{};
+    desc.vPosition = { -250.f, 120.f, 0.f, 1.f };
+    desc.bCreateTitleImage = true;
+    desc.szTitleImagePartTag = Client::CUI_Title::PART_TAG_TITLE_IMAGE;
 
-    desc.ImageDesc.iTextureLevel = ETOUI(LEVEL::STATIC);
-    desc.ImageDesc.szTextureProtoTag = L"Proto_Tex_TestUI";
-    desc.ImageDesc.vSize = { 300.f, 300.f };
-    desc.ImageDesc.vPosition = { 0.f, 0.f };
-    desc.ImageDesc.iRenderLayer = 1;
+    desc.TitleImageDesc.iTextureLevel = ETOUI(LEVEL::STATIC);
+    desc.TitleImageDesc.szTextureProtoTag = L"Proto_Tex_TestUI";
+    desc.TitleImageDesc.vSize = { 496.f, 317.f };
+    desc.TitleImageDesc.vPosition = { 0.f, 0.f };
+    desc.TitleImageDesc.iRenderLayer = 1;
 
     CGameObject* pSource = nullptr;
-    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pSource, L, Client::CUI_TestImageContainer::PROTOTYPE_TAG, ETOUI(TOOL_LEVEL::EDIT), L"Layer_UI", L"Test_UI_Source",  &desc)))
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pSource, L, Client::CUI_Title::PROTOTYPE_TAG, ETOUI(TOOL_LEVEL::EDIT), L"Layer_UI", L"Test_UI_Title_Source",  &desc)))
         return E_FAIL;
 
     json jUI = pSource->Serialize();
-    jUI["Transform"]["vPosition"][0] = 200.f;
+    jUI["Transform"]["vPosition"][0] = 250.f;
 
     CGameObject* pLoaded = nullptr;
-    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pLoaded, L, Client::CUI_TestImageContainer::PROTOTYPE_TAG, ETOUI(TOOL_LEVEL::EDIT), L"Layer_UI", L"Test_UI_Loaded",  nullptr)))
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pLoaded, L, Client::CUI_Title::PROTOTYPE_TAG, ETOUI(TOOL_LEVEL::EDIT), L"Layer_UI", L"Test_UI_Title_Loaded",  nullptr)))
         return E_FAIL;
     
     pLoaded->Deserialize(jUI);
@@ -176,18 +176,29 @@ void CLevel_Tool::Update(_float fTimeDelta)
 
 HRESULT CLevel_Tool::Render()
 {
-    if (m_pGrid)
+    if (m_bGridVisible && m_pGrid)
     {
-        const _float4x4* pView = m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC);
-        const _float4x4* pProj = m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
+        const _float4x4* pView =
+            m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC);
+
+        const _float4x4* pProj =
+            m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
+
         m_pGrid->Render(pView, pProj);
     }
+
     return S_OK;
 }
 
 void CLevel_Tool::Set_CameraActive(_bool bActive)
 {
     if (m_pCamera) m_pCamera->Set_Active(bActive);
+}
+
+void CLevel_Tool::Set_PreviewVisible(_bool bVisible)
+{
+    if (m_pPreview)
+    m_pPreview->Set_Active(bVisible);
 }
 
 CGameObject* CLevel_Tool::Load_Preview(const _wstring& strYshPath)

@@ -135,6 +135,9 @@
     <ClInclude Include="..\Public\Panel_Browser.h">
       <Filter>03. Panels\Browser</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Panel_UICanvas.h">
+      <Filter>03. Panels\UICanvas</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\ThirdParty\ImGui\Src\ImGuizmo.cpp">
@@ -202,6 +205,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Panel_Browser.cpp">
       <Filter>03. Panels\Browser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_UICanvas.cpp">
+      <Filter>03. Panels\UICanvas</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

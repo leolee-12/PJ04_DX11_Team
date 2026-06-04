@@ -13,6 +13,7 @@
 #include "TestMarb1eMap.h"
 #include "UI_Image.h"
 #include "UI_TestImageContainer.h"
+#include "UI_Title.h"
 
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
@@ -73,7 +74,7 @@ void CGameObject_Factory::Register_UI()
 
     TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), TEXT("Proto_Tex_TestUI"),
         CTexture::Create(pDevice, pContext,
-            TEXT("../../Resources/Models/Test/Aligator/ModelC_BaseColor.1238033416.png"), 1));
+            TEXT("../../Resources/CHJ/UI/Title/TitleLogo_KR^u.png"), 1));
         )
     );
 }
@@ -169,6 +170,22 @@ void CGameObject_Factory::Register_UIContainer()
 {
     Register(CUI_TestImageContainer::PROTOTYPE_TAG, TEXT("UI_CONTAINER_TEST"),
         CREATOR(CUI_TestImageContainer),
+        LOADER(
+            auto* pImageReg = CGameObject_Factory::GetInstance()
+            ->Get_Registration(CUI_Image::PROTOTYPE_TAG);
+
+    if (pImageReg)
+    {
+        pImageReg->ResourceLoader(pProxy, pDevice, pContext);
+
+        TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), CUI_Image::PROTOTYPE_TAG,
+            pImageReg->CreatorFunc(pDevice, pContext));
+    }
+        )
+    );
+
+    Register(CUI_Title::PROTOTYPE_TAG, TEXT("UI_CONTAINER"),
+        CREATOR(CUI_Title),
         LOADER(
             auto* pImageReg = CGameObject_Factory::GetInstance()
             ->Get_Registration(CUI_Image::PROTOTYPE_TAG);

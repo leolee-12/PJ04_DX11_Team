@@ -7,6 +7,8 @@
 #include "Panel_Inspector.h"
 #include "Panel_Console.h"
 #include "Panel_Animation.h"
+#include "Panel_UICanvas.h"
+
 #include "Preview_Actor.h"
 #include "Panel_Browser.h"
 #include <filesystem>
@@ -29,6 +31,9 @@ HRESULT CPanel_Manager::Initialize()
         return E_FAIL;
 
     if (FAILED(Add_Panel(L"Viewport", CPanel_Viewport::Create(m_pDevice, m_pContext))))
+        return E_FAIL;
+
+    if (FAILED(Add_Panel(L"UICanvas", CPanel_UICanvas::Create(m_pDevice, m_pContext))))
         return E_FAIL;
 
     if (FAILED(Add_Panel(L"Inspector", CPanel_Inspector::Create(m_pDevice, m_pContext))))
@@ -70,17 +75,32 @@ CPanel* CPanel_Manager::Get_Panel(const _wstring& strPanelTag)
 void CPanel_Manager::Update(_float fTimeDelta)
 {
     for (auto& [tag, pPanel] : m_Panels)
-        if (pPanel->Is_Open())
-            pPanel->Update(fTimeDelta);
+    {
+        if (!pPanel->Is_Open())
+            continue;
+
+        if (!Is_PanelAllowedInCurrentMode(tag))
+            continue;
+
+        pPanel->Update(fTimeDelta);
+    }
 }
 
 void CPanel_Manager::Render()
 {
     Render_DockSpace();
+    Render_ModeBar();
 
     for (auto& [tag, pPanel] : m_Panels)
-        if (pPanel->Is_Open())
-            pPanel->Render();
+    {
+        if (!pPanel->Is_Open())
+            continue;
+
+        if (!Is_PanelAllowedInCurrentMode(tag))
+            continue;
+
+        pPanel->Render();
+    }
 }
 
 void CPanel_Manager::Set_Selected(Engine::CGameObject* pObject)
@@ -167,6 +187,7 @@ void CPanel_Manager::Render_DockSpace()
         ImGui::DockBuilderDockWindow("Hierarchy", left);
         ImGui::DockBuilderDockWindow("Console", left);
         ImGui::DockBuilderDockWindow("Viewport", center);
+        ImGui::DockBuilderDockWindow("UICanvas", center);
         ImGui::DockBuilderDockWindow("Animation", bottom);
         ImGui::DockBuilderDockWindow("Browser", bottom);
         ImGui::DockBuilderFinish(dockspace_id);
@@ -174,6 +195,65 @@ void CPanel_Manager::Render_DockSpace()
 
     ImGui::DockSpace(dockspace_id, ImVec2(0, 0), ImGuiDockNodeFlags_None);
     ImGui::End();
+}
+
+void CPanel_Manager::Render_ModeBar()
+{
+    if (!ImGui::BeginMainMenuBar())
+        return;
+
+    if (ImGui::BeginMenu("Panels"))
+    {
+        for (auto& [tag, pPanel] : m_Panels)
+        {
+            _bool bOpen = pPanel->Is_Open();
+            if (ImGui::Checkbox(pPanel->Get_Name(), &bOpen))
+                pPanel->Set_Open(bOpen);
+        }
+
+        ImGui::EndMenu();
+    }
+
+    ImGui::SameLine();
+
+    _int iMode = static_cast<_int>(m_eWorkMode);
+
+    if (ImGui::RadioButton("Animation", iMode == ETOI(TOOL_MODE::ANIMATION)))
+        m_eWorkMode = TOOL_MODE::ANIMATION;
+
+    ImGui::SameLine();
+
+    if (ImGui::RadioButton("UI", iMode == ETOI(TOOL_MODE::UI)))
+        m_eWorkMode = TOOL_MODE::UI;
+
+
+   
+
+    ImGui::EndMainMenuBar();
+}
+
+_bool CPanel_Manager::Is_PanelAllowedInCurrentMode(const _wstring& strPanelTag) const
+{
+    if (m_eWorkMode == TOOL_MODE::ANIMATION)
+    {
+        if (strPanelTag == L"UICanvas")
+            return false;
+
+        return true;
+    }
+
+    if (m_eWorkMode == TOOL_MODE::UI)
+    {
+        if (strPanelTag == L"Animation")
+            return false;
+
+        if (strPanelTag == L"Viewport")
+            return false;
+
+        return true;
+    }
+
+    return true;
 }
 
 CPanel_Manager* CPanel_Manager::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
