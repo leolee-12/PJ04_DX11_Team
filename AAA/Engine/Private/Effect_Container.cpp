@@ -59,6 +59,8 @@ void CEffect_Container::Update(_float fTimeDelta)
         {
             m_fAccTime = m_fDuration;
             m_bIsPlay = false;
+
+            m_pParentMatrix = nullptr;
         }
     }
 
@@ -85,13 +87,24 @@ HRESULT CEffect_Container::Render()
     return S_OK;
 }
 
-void CEffect_Container::EffectContainer_Start()
+void CEffect_Container::EffectContainer_Start(
+    const _float3& vSpawnPos,
+    const _float3& vLook,
+    const _float4x4* pParentMatrix)
 {
     for (auto& [tag, pPart] : m_EffestParts)
         pPart->Effect_Start();
 
     m_bIsPlay = true;
     m_fAccTime = 0.f;
+
+    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&vSpawnPos), 1.f));
+
+    _vector vDir = XMLoadFloat3(&vLook);
+    if (XMVector3Equal(vDir, XMVectorZero()) == false)
+        m_pTransformCom->LookAt(vDir);
+
+    m_pParentMatrix = pParentMatrix;
 }
 
 void CEffect_Container::Set_ParentMatrix(const _float4x4* pParentMatrix)
@@ -131,7 +144,7 @@ void CEffect_Container::Debug_ResetPlay()
     if (m_bPreResetPlayDoubleCheck == false && m_bResetPlayDoubleCheck == true)
     {
         m_bPreResetPlayDoubleCheck = true;
-        EffectContainer_Start();
+        EffectContainer_Start(_float3{ 0.f, 0.f, 0.f });
     }
 
     if (m_bPreResetPlayDoubleCheck == true && m_bResetPlayDoubleCheck == false)

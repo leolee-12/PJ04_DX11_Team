@@ -42,9 +42,6 @@ void CWalkSmoke::Priority_Update(_float fTimeDelta)
 
 void CWalkSmoke::Update(_float fTimeDelta)
 {
-    if (m_pGameInstance_Proxy->Key_Down(DIK_0) == true)
-        EffectContainer_Start();
-
     __super::Update(fTimeDelta);
 }
 

@@ -75,7 +75,7 @@ void CEffect_Part::Late_Update(_float fTimeDelta)
     Compute_CombinedWorldMatrix();
 
     //test
-    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::BLEND, this);
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 
 HRESULT CEffect_Part::Render()
@@ -335,8 +335,8 @@ void CEffect_Part::Update_Alpha(const _float fTimeDelta, const _float fRatio)
 {   
     if (m_bFadeInOut == true)
     {
-        const _float fStartRatio = 0.f;
-        const _float fEndRatio = 1.f;
+        const _float fStartRatio = m_fStartRatio;
+        const _float fEndRatio = m_fEndRatio;
 
         m_AlphaRatioValue.push_back({ fStartRatio, m_fAlphaStartValue });
 
@@ -370,8 +370,8 @@ void CEffect_Part::Update_Size(const _float fTimeDelta, const _float fRatio)
 {
     if (m_bSizeChange == true)
     {
-        const _float fStartRatio = 0.f;
-        const _float fEndRatio = 1.f;
+        const _float fStartRatio = m_fStartRatio;
+        const _float fEndRatio = m_fEndRatio;
 
         m_SizeRatioValue.push_back({ fStartRatio, m_fSizeStartValue });
 
@@ -407,8 +407,8 @@ void CEffect_Part::Update_Color(const _float fTimeDelta, const _float fRatio)
 {
     if (m_bColorChange == true)
     {
-        const _float fStartRatio = 0.f;
-        const _float fEndRatio = 1.f;
+        const _float fStartRatio = m_fStartRatio;
+        const _float fEndRatio = m_fEndRatio;
 
         m_ColorRatioValue.push_back({ fStartRatio, m_vColorStartValue });
 

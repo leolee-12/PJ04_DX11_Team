@@ -18,7 +18,7 @@ class ENGINE_DLL CEffect_Container abstract : public CGameObject
 
     PROPERTY(_float, m_fDuration,               L"Duration",                L"Effect_Container");
     PROPERTY(_float, m_fAccTime,                L"AccTime",                 L"Effect_Container");
-
+    
 public:
     struct EFFECT_CONTAINER_DESC : public CGameObject::GAMEOBJECT_DESC
     {
@@ -39,7 +39,11 @@ public:
     virtual void    Late_Update(_float fTimeDelta) override;
     virtual HRESULT Render() override;
 
-    void EffectContainer_Start();
+    void EffectContainer_Start(
+        const _float3& vSpawnPos,
+        const _float3& vLook = {0.f, 0.f, 0.f},
+        const _float4x4* pParentMatrix = nullptr);
+
     void Set_ParentMatrix(const _float4x4* pParentMatrix);
 
 public:
