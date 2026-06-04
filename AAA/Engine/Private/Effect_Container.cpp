@@ -119,7 +119,7 @@ json CEffect_Container::Serialize() const
     for (auto& [tag, pPart] : m_EffestParts)
     {
         string strTag = WstrToStr(tag);
-        j["UIPartObjects"][strTag] = pPart->Serialize();
+        j["EffectPartObjects"][strTag] = pPart->Serialize();
     }
 
     return j;
