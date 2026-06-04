@@ -1,12 +1,6 @@
 #pragma once
-
 #include "Editor_Defines.h"
 #include "Level.h"
-
-
-/* 로딩레벨에 필요한 객체(배경, 로딩바, 로딩텍스트)들을 생성한다. */
-/* 로딩레벨을 갱신하여 화면에 보여준다. */
-/* 다음 레벨을 위한 자원을 준비한다. */
 
 NS_BEGIN(Engine)
 class CGameObject;
@@ -15,10 +9,10 @@ NS_END
 
 NS_BEGIN(Client)
 class CLumia;
+class CMapStage;
 NS_END
 
 NS_BEGIN(Editor)
-
 class CEditCamera;
 class CEdit_Grid;
 class CNavMesh_Editor;
@@ -28,9 +22,9 @@ class CLevel_Edit final : public CLevel
 public:
 	typedef struct tagObjectHandle
 	{
-		wstring       strPrototypeTag;
-		wstring		  strName;
-		CGameObject* pObject;
+		_wstring		strPrototypeTag;
+		_wstring		strName;
+		CGameObject*	pObject;
 	}EDITOR_OBJECT_HANDLE;
 
 private:
@@ -38,14 +32,14 @@ private:
 	virtual ~CLevel_Edit() = default;
 
 public:
-	virtual HRESULT Initialize();
-	virtual void Update(_float fTimeDelta) override;
-	virtual HRESULT Render() override;
+	virtual HRESULT	Initialize();
+	virtual void	Update(_float fTimeDelta) override;
+	virtual HRESULT	Render() override;
 
 public:
 	CGameObject*	Spawn_Object(const wstring& strProtoTag, const wstring& strLayerTag, const wstring& strName, void* pArg = nullptr);
-	void	Save_Level(const wstring& strFilePath, const wstring& strLevelTag);
-	void	Load_Level(const wstring& strFilePath);
+	void			Save_Level(const wstring& strFilePath, const wstring& strLevelTag);
+	void			Load_Level(const wstring& strFilePath);
 
 public:
 	void	Add_Layer(const wstring& strLayerTag);
@@ -53,13 +47,12 @@ public:
 	void	Change_ObjectLayer(CGameObject* pObject, const wstring& strNewLayer);
 	void    Delete_Object(CGameObject* pObject);
 
-public: // 그리드 추가함수
+public:
 	void Pick_And_Place(_fvector vOrigin, _fvector vDir);
 	void Place_Object_At(const _float3& vPos);
 	void Begin_PlaceMode(const wstring& strProtoTag, const wstring& strLayerTag);
 	void End_PlaceMode();
 	_bool Is_PlaceMode() const { return m_ePlaceMode == PLACE_MODE::PENDING; }
-
 
 public:
 	const unordered_map<wstring, vector<EDITOR_OBJECT_HANDLE>>& Get_Layers() { return m_Layers; }
@@ -74,7 +67,7 @@ public:
 	void	Back_To_Edit();
 	const vector<EDITOR_OBJECT_HANDLE>* Get_CameraLayer() const;
 
-public: // NavMesh
+public:
 	void  Begin_NavEditMode();
 	void  End_NavEditMode();
 	_bool Is_NavEditMode()  const { return m_bNavEditMode; }
@@ -83,6 +76,16 @@ public: // NavMesh
 	void  Load_NavMesh(const wstring& strFilePath);
 	const CNavMesh_Editor* Get_NavMeshEditor() const { return m_pNavMeshEditor; }
 	void Nav_Redo();
+
+public:	// Map Preview - Public Func
+	HRESULT			Load_MapPreview(_uint iPresetIndex);
+	void			Clear_MapPreview();
+	_uint			Get_MapPreviewPresetCount() const;
+	const _char*	Get_MapPreviewPresetLabel(_uint iPresetIndex) const;
+	_bool			Is_MapPreviewLoaded() const { return nullptr != m_pMapStage || 0 != m_iEnvObjCreatedCount; }
+	const _wstring& Get_MapPreviewStatus() const { return m_strMapPreviewStatus; }
+	const _wstring& Get_LoadedMapPreviewStageName() const { return m_strLoadedMapStageName; }
+	_uint			Get_MapPreviewEnvCreatedCount() const { return m_iEnvObjCreatedCount; }
 
 private:
 	CEditCamera* m_pCamera = { nullptr };
@@ -101,11 +104,24 @@ private:
 	_bool			 m_bNavEditMode = { false };
 	CLumia*			 m_pLumia = { nullptr };
 
+	// Map Preview - Members
+	CMapStage* m_pMapStage = { nullptr };
+	_wstring	m_strMapPreviewStatus = { L"Map preset not loaded." };
+	_wstring	m_strLoadedMapStageName = {};
+	_uint		m_iEnvObjCreatedCount = {};
+	unordered_set<CGameObject*> m_MapPreviewObjects;
+
 private:
 	virtual HRESULT Ready_Events() override { return S_OK; }
 	HRESULT	 Ready_EditLights();
 	HRESULT  Ready_EditCamera();
 	HRESULT  Ready_EditGrid();
+
+	// Map Preview - Private Func
+	void	 Clear_MapPreviewLayer(const _wstring& strLayerTag);
+	void	 Add_MapPreviewObjectHandle(const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag, CGameObject* pObject);
+	static void On_MapPreviewObjectCreated(void* pContext, CGameObject* pObject,
+		const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);
 
 public:
 	static CLevel_Edit* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
