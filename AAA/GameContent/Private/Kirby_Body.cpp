@@ -60,23 +60,32 @@ HRESULT CKirby_Body::Render()
 
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
-        _uint iPassIdx = 0;
-        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
-            iPassIdx = 0;
+        if (i == 0 || i == 2 || i == 3 || i == 5 || i == 6 || i == 7)
+            continue;
 
-        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", i, MTEX_TYPE::NORMALS, 0)))
-            iPassIdx = 0;
+        if(FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_EyeTexture", i, MTEX_TYPE::UNKNOWN, 0)))
+            return E_FAIL;
+        if(FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_SkinTexture", i, MTEX_TYPE::UNKNOWN, 1)))
+            return E_FAIL;
+        if(FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MouthTexture", i, MTEX_TYPE::UNKNOWN, 2)))
+            return E_FAIL;
+        if(FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_EyeMaskTexture", i, MTEX_TYPE::UNKNOWN, 3)))
+            return E_FAIL;
+        //if(FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_WetMaskTexture", i, MTEX_TYPE::UNKNOWN, 4)))
+        //    return E_FAIL;
+        //if(FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", i, MTEX_TYPE::NORMALS, 0)))
+        //    return E_FAIL;
 
-        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
-            iPassIdx = 0;
-
-        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnkownTexture", i, MTEX_TYPE::UNKNOWN, 0)))
-            iPassIdx = 1;
-
-        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", (_uint)i)))
+            return E_FAIL;
+        if(FAILED(m_pShaderCom->Bind_RawValue("g_vBodyColor", &m_vBodyColor, sizeof(_float4))))
+            return E_FAIL;
+        if(FAILED(m_pShaderCom->Bind_RawValue("g_vFootColor", &m_vFootColor, sizeof(_float4))))
+            return E_FAIL;
+        if(FAILED(m_pShaderCom->Bind_RawValue("g_vBlushColor", &m_vBlushColor, sizeof(_float4))))
             return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Begin(2)))
+        if (FAILED(m_pShaderCom->Begin(0)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render(i)))
@@ -89,7 +98,7 @@ HRESULT CKirby_Body::Render()
 HRESULT CKirby_Body::Ready_Components()
 {
     /* For.Com_Shader */
-    m_pShaderCom = Add_Component<CShader>(Shader_AnimMesh_PBR.iLevelID, Shader_AnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
+    m_pShaderCom = Add_Component<CShader>(Shader_Kirby.iLevelID, Shader_Kirby.szProtoTag, TEXT("Com_Shader"));
     if (m_pShaderCom == nullptr)
         return E_FAIL;
 
