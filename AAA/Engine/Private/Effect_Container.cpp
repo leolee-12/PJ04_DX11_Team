@@ -42,6 +42,8 @@ void CEffect_Container::Priority_Update(_float fTimeDelta)
 
 void CEffect_Container::Update(_float fTimeDelta)
 {
+    Debug_ResetPlay();
+
     if (m_bIsPlay == false)
         return;
 
@@ -51,17 +53,19 @@ void CEffect_Container::Update(_float fTimeDelta)
     {
         if (m_bLoop == true)
         {
-            m_fAccTime -= m_fDuration;
+            m_fAccTime = 0.f;
         }
         else
         {
             m_fAccTime = m_fDuration;
             m_bIsPlay = false;
+
+            m_pParentMatrix = nullptr;
         }
     }
 
     for (auto& [tag, pPart] : m_EffestParts)
-        pPart->Update_EffectByContainer(fTimeDelta, m_fAccTime);
+        pPart->Update(fTimeDelta);
 }
 
 void CEffect_Container::Late_Update(_float fTimeDelta)
@@ -83,10 +87,29 @@ HRESULT CEffect_Container::Render()
     return S_OK;
 }
 
-void CEffect_Container::EffectContainer_Start()
+void CEffect_Container::EffectContainer_Start(
+    const _float3& vSpawnPos,
+    const _float3& vLook,
+    const _float4x4* pParentMatrix)
 {
     for (auto& [tag, pPart] : m_EffestParts)
         pPart->Effect_Start();
+
+    m_bIsPlay = true;
+    m_fAccTime = 0.f;
+
+    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&vSpawnPos), 1.f));
+
+    _vector vDir = XMLoadFloat3(&vLook);
+    if (XMVector3Equal(vDir, XMVectorZero()) == false)
+        m_pTransformCom->LookAt(vDir);
+
+    m_pParentMatrix = pParentMatrix;
+}
+
+void CEffect_Container::Set_ParentMatrix(const _float4x4* pParentMatrix)
+{
+    m_pParentMatrix = pParentMatrix;
 }
 
 json CEffect_Container::Serialize() const
@@ -96,7 +119,7 @@ json CEffect_Container::Serialize() const
     for (auto& [tag, pPart] : m_EffestParts)
     {
         string strTag = WstrToStr(tag);
-        j["UIPartObjects"][strTag] = pPart->Serialize();
+        j["EffectPartObjects"][strTag] = pPart->Serialize();
     }
 
     return j;
@@ -116,6 +139,20 @@ void CEffect_Container::Deserialize(const json& j)
     }
 }
 
+void CEffect_Container::Debug_ResetPlay()
+{
+    if (m_bPreResetPlayDoubleCheck == false && m_bResetPlayDoubleCheck == true)
+    {
+        m_bPreResetPlayDoubleCheck = true;
+        EffectContainer_Start(_float3{ 0.f, 0.f, 0.f });
+    }
+
+    if (m_bPreResetPlayDoubleCheck == true && m_bResetPlayDoubleCheck == false)
+    {
+        m_bPreResetPlayDoubleCheck = false;
+    }
+}
+
 HRESULT CEffect_Container::Add_Effect_PartObject(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, const _wstring& strPartTag, void* pArg)
 {
     CEffect_Part* pEffectPart = dynamic_cast<CEffect_Part*>(
@@ -124,6 +161,7 @@ HRESULT CEffect_Container::Add_Effect_PartObject(_uint iPrototypeLevelIndex, con
     if (pEffectPart == nullptr)
         return E_FAIL;
 
+    pEffectPart->Set_ParentMatrix(m_pTransformCom->Get_WorldMatrixPtr());
     m_EffestParts.emplace(strPartTag, pEffectPart);
 
     return S_OK;
@@ -144,11 +182,13 @@ void CEffect_Container::Compute_CombinedWorldMatrix()
 
 void CEffect_Container::Init_PropetyValue()
 {
+    m_bResetPlayDoubleCheck = { false };
+
     m_bIsPlay = { true };
 
     m_bLoop = { true };
 
-    m_fDuration = { 5.f };
+    m_fDuration = { 1.f };
     m_fAccTime = { 0.f };
 }
 

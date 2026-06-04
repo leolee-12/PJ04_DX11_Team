@@ -10,17 +10,19 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
 {
     GENERATED_BODY_ABSTRACT(CEffect_Part)
 
-    PROPERTY(_int, m_iShdaerPass,   L"ShdaerPass",  L"Effect");
+    PROPERTY(_int, m_iShdaerPass,       L"ShdaerPass",  L"Effect");
 
-    PROPERTY(_float3, m_vLocalPos,  L"LocalPos",    L"Effect");
+    PROPERTY(_float3, m_vLocalPos,      L"LocalPos",    L"Effect");
 
-    PROPERTY(_bool, m_bIsPlay,      L"Play",        L"Effect");
+    PROPERTY(_bool, m_bIsPlay,          L"Play",        L"Effect");
 
-    PROPERTY(_bool, m_bLoop,        L"Loop",        L"Effect");
+    PROPERTY(_bool, m_bLoop,            L"Loop",        L"Effect");
 
-    PROPERTY(_float, m_fDuration,   L"Duration",    L"Effect");
-    PROPERTY(_float, m_fAccTime,    L"AccTime",     L"Effect");
-    PROPERTY(_float, m_fDelayTime,  L"DelayTime",   L"Effect");
+    PROPERTY(_float, m_fDuration,       L"Duration",    L"Effect");
+    PROPERTY(_float, m_fAccTime,        L"AccTime",     L"Effect");
+
+    PROPERTY(_float, m_fStartRatio,     L"StartRatio",   L"Effect");
+    PROPERTY(_float, m_fEndRatio,       L"EndRatio",   L"Effect");
 
     // Alpha
     PROPERTY(_float, m_fAlpha,               L"Alpha",                L"Effect_Alpha");
@@ -163,10 +165,8 @@ public:
     virtual void    Late_Update(_float fTimeDelta) override;
     virtual HRESULT Render() override;
 
-    virtual void    Update_EffectSelf(_float fTimeDelta);
-    virtual void    Update_EffectByContainer(_float fTimeDelta, _float fAccTime);
-
     virtual void    Effect_Start();
+    void Set_ParentMatrix(const _float4x4* pParentMatrix);
 
 protected:
     _bool m_bCustomShader{};
@@ -198,20 +198,17 @@ protected:
     HRESULT Bind_ShaderValue();
 
 protected:
-    void Update_Core(const _float fTimeDelta, const _float fAccTime);
+    void Update_Value(const _float fTimeDelta);
 
-    // 
-    void Update_Value(const _float fTimeDelta, const _float fAccTime);
+    void Update_Alpha(const _float fTimeDelta, const _float fRatio);
+    void Update_Size(const _float fTimeDelta, const _float fRatio);
+    void Update_Color(const _float fTimeDelta, const _float fRatio);
+    void Update_Rot(const _float fTimeDelta, const _float fRatio);
+    void Update_Move(const _float fTimeDelta, const _float fRatio);
+    void Update_MoveSin(const _float fTimeDelta, const _float fRatio);
+    virtual void Update_UVScroll(const _float fTimeDelta, const _float fRatio);
 
-    void Update_Alpha(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
-    void Update_Size(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
-    void Update_Color(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
-    void Update_Rot(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
-    void Update_Move(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
-    void Update_MoveSin(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
-    virtual void Update_UVScroll(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
-
-    virtual void Update_EffectPart(const _float fTimeDelta, const _float fActiveTime, const _float fRatio);
+    virtual void Update_EffectPart(const _float fTimeDelta, const _float fRatio);
 
 private:
     vector<RATIO_VALUE> m_AlphaRatioValue;
