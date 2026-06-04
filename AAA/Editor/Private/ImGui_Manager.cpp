@@ -1219,6 +1219,13 @@ void CImGui_Manager::Draw_ShaderGlobals()
                 case GVAL::FLOAT4:
                     ImGui::SliderFloat4(g.strLabel.c_str(), &g.vValue.x, g.vRange.x, g.vRange.y);
                     break;
+                case GVAL::BOOL:
+                {
+                    bool b = (g.vValue.x > 0.5f);
+                    if (ImGui::Checkbox(g.strLabel.c_str(), &b))
+                        g.vValue.x = b ? 1.f : 0.f;
+                    break;
+                }
             }
 
             ImGui::PopID();

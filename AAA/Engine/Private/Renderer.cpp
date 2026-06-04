@@ -411,14 +411,12 @@ HRESULT CRenderer::Render_Combined()
     const auto& env = m_pGameInstance_Proxy->Get_CurrentEnvironment();
     if (FAILED(m_pShaderDeferred->Bind_SRV("g_IrradianceCube", env.pDiffuseSRV)))
         return E_FAIL;
-    if (FAILED(m_pShaderDeferred->Bind_SRV("g_PrefilteredCube", env.pSpecularSRV)))
-        return E_FAIL;
-    if (FAILED(m_pShaderDeferred->Bind_RawValue("g_iSpecularMip", &env.iSpecularMip, sizeof(_uint))))
-        return E_FAIL;
     if (FAILED(m_pShaderDeferred->Bind_RawValue("g_fIBLIntensity", &env.fIntensity, sizeof(_float))))
         return E_FAIL;
 
     //볼류메트릭포그
+    if (FAILED(m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderDeferred, "g_fFogEnable")))
+        return E_FAIL;
     if (FAILED(m_pShaderDeferred->Bind_SRV("g_FogVolume", m_pIntegSRV)))
         return E_FAIL;
     if (FAILED(m_pShaderDeferred->Bind_Matrix("g_ProjMatrixInverse", m_pGameInstance_Proxy->Get_InverseMatrix_Prespec(D3DTS::PROJ))))
@@ -449,9 +447,8 @@ HRESULT CRenderer::Render_SSR()
     if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Scene_SSR"), nullptr, false)))
         return E_FAIL;
 
-    if (FAILED(m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderPost, { "g_fSSRIntensity", "g_fSSRMaxDistance",
-"g_fSSRThickness" })))
-return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderPost, { "g_fSSRIntensity", "g_fSSRMaxDistance", "g_fSSRThickness" })))
+        return E_FAIL;
 
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene"), m_pShaderPost, "g_SceneTexture")))
         return E_FAIL;
@@ -472,9 +469,21 @@ return E_FAIL;
         return E_FAIL;
     if (FAILED(m_pShaderPost->Bind_Matrix("g_ProjMatrixInverse", m_pGameInstance_Proxy->Get_InverseMatrix_Prespec(D3DTS::PROJ))))
         return E_FAIL;
+    if (FAILED(m_pShaderPost->Bind_Matrix("g_CamViewMatrixInverse", m_pGameInstance_Proxy->Get_InverseMatrix_Prespec(D3DTS::VIEW))))
+        return E_FAIL;
     if (FAILED(m_pShaderPost->Bind_Matrix("g_CamViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC))))
         return E_FAIL;
     if (FAILED(m_pShaderPost->Bind_Matrix("g_CamProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC))))
+        return E_FAIL;
+
+    const auto& env = m_pGameInstance_Proxy->Get_CurrentEnvironment();
+    if (FAILED(m_pShaderPost->Bind_SRV("g_PrefilteredCube", env.pSpecularSRV)))
+        return E_FAIL;
+    if (FAILED(m_pShaderPost->Bind_RawValue("g_iSpecularMip", &env.iSpecularMip, sizeof(_uint))))
+        return E_FAIL;
+    if (FAILED(m_pShaderPost->Bind_RawValue("g_fIBLIntensity", &env.fIntensity, sizeof(_float))))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_SSAO_Blur"), m_pShaderPost, "g_SSAOTexture")))
         return E_FAIL;
 
     if (FAILED(m_pVIBuffer->Bind_Resources()))
@@ -491,6 +500,10 @@ return E_FAIL;
 
 HRESULT CRenderer::Render_VolumetricFog()
 {
+    const _float4* pEnable = m_pGameInstance_Proxy->Get_ShaderGlobal("g_fFogEnable");
+    if (nullptr == pEnable || pEnable->x < 0.5f)
+        return S_OK;
+
     /* 1) 디렉셔널 라이트 검색 */
     const LIGHT_DESC* pDirLight = nullptr;
     for (_uint i = 0; ; ++i)
