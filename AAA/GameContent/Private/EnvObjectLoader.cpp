@@ -369,7 +369,7 @@ namespace
 		Get_ModelPathCacheBuilt() = true;
 
 		error_code ErrorCode;
-		const path Root = weakly_canonical(path(kEnvModelRoot), ErrorCode);
+		const path Root = path(kEnvModelRoot);
 		if (ErrorCode || !exists(Root))
 		{
 			Log_GameContentWarning("EnvObject model root missing: ../../Resources/Map/Motif");

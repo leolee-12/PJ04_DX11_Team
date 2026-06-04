@@ -116,7 +116,8 @@ namespace
 			return false;
 
 		error_code ErrorCode;
-		const path Root = weakly_canonical(path(kMapModelRoot), ErrorCode);
+		//const path Root = weakly_canonical(path(kMapModelRoot), ErrorCode);
+		const path Root = path(kMapModelRoot);
 		if (ErrorCode || !exists(Root, ErrorCode))
 			return false;
 
