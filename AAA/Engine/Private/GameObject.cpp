@@ -6,6 +6,7 @@ CGameObject::CGameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     , m_pContext{ pContext }
     , m_pGameInstance_Proxy { CGameInstance::GetProxy() }
     , m_eProjType{ PROJ_TYPE::PERSPEC }
+    , m_iMaterialID{ 0 }
 {
     Safe_AddRef(m_pDevice);
     Safe_AddRef(m_pContext);
@@ -17,6 +18,7 @@ CGameObject::CGameObject(const CGameObject& Prototype)
     , m_pGameInstance_Proxy{ CGameInstance::GetProxy() }
     , m_eProjType{ Prototype.m_eProjType }
     , m_bActive{ Prototype.m_bActive }
+    , m_iMaterialID{ Prototype.m_iMaterialID }
 {
     Safe_AddRef(m_pDevice);
     Safe_AddRef(m_pContext);

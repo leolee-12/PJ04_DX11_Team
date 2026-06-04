@@ -15,7 +15,7 @@ class CMaterial_Object final : public CGameObject
 	GENERATED_BODY(CMaterial_Object)
 	PROPERTY(_float4, m_vAlbedo, L"AlbedoColor(RGBA)", L"Color")
 	PROPERTY(_float4, m_vEmissiveColor, L"EmissiveColor(RGBA)", L"Color")
-	PROPERTY(_float4, m_vMRA, L"MRA(Metalness, Roughness, AO)", L"Material")
+	PROPERTY(_float3, m_vMRA, L"MRA(Metalness, Roughness, AO)", L"Material")
 
 public:
 	typedef struct tagMonsterDesc : public CGameObject::GAMEOBJECT_DESC

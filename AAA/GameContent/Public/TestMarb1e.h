@@ -14,7 +14,6 @@ NS_BEGIN(Client)
 class CTestMarb1e final : public CGameObject
 {
 	GENERATED_BODY(CTestMarb1e)
-	PROPERTY(ANIM_INDEX, m_iAnimationIndex, L"Animation_Index", L"Animation")
 
 public:
 	typedef struct tagMonsterDesc : public CGameObject::GAMEOBJECT_DESC

@@ -193,10 +193,14 @@ float4 PS_SSR(PS_IN In) : SV_TARGET0
     if (ndcZ == 0.f)
         return scene; // ¹è°æ
 
-    float3 mra = g_MRATexture.Sample(PointSampler, In.vTexcoord).rgb;
+    float4 mra4 = g_MRATexture.Sample(PointSampler, In.vTexcoord);
+    float3 mra = mra4.rgb;
     float metallic = mra.r;
     float roughness = mra.g;
     float ao = mra.b;
+    
+    uint matID = (uint) round(mra4.a * 255.f);
+    bool bWater = (matID == MAT_WATER);
 
     float3 albedo = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord).rgb;
     float3 worldN = normalize(g_NormalTexture.Sample(PointSampler, In.vTexcoord).xyz * 2.f - 1.f);

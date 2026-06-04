@@ -7,14 +7,12 @@
 
 CTestMarb1e::CTestMarb1e(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
-    , m_iAnimationIndex{ 0 }
 {
 
 }
 
 CTestMarb1e::CTestMarb1e(const CTestMarb1e& Prototype)
     : CGameObject(Prototype)
-    , m_iAnimationIndex{ Prototype.m_iAnimationIndex }
 {
 
 }

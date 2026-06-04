@@ -6,7 +6,7 @@ CMaterial_Object::CMaterial_Object(ID3D11Device* pDevice, ID3D11DeviceContext* p
     : CGameObject{ pDevice, pContext }
     , m_vAlbedo(1.f,1.f,1.f,1.f)
     , m_vEmissiveColor(0.f,0.f,0.f,0.f)
-    , m_vMRA(0.f,1.f,1.f,1.f)
+    , m_vMRA(0.f,1.f,1.f)
 {
 }
 
@@ -60,7 +60,7 @@ HRESULT CMaterial_Object::Render()
     {
         if (FAILED(m_pShaderCom->Bind_RawValue("g_vAlbedo", &m_vAlbedo, sizeof(_float4))))
             return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_vMRA", &m_vMRA, sizeof(_float4))))
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_vMRA", &m_vMRA, sizeof(_float3))))
             return E_FAIL;
         if (FAILED(m_pShaderCom->Bind_RawValue("g_vEmissiveColor", &m_vEmissiveColor, sizeof(_float4))))
             return E_FAIL;
@@ -97,6 +97,8 @@ HRESULT CMaterial_Object::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
         return E_FAIL;
 
     return S_OK;

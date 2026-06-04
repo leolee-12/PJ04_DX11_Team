@@ -705,6 +705,14 @@ void CImGui_Manager::Draw_Properties(IReflectable* pHolder)
 				ImGui::InputInt(("##" + strPropName).c_str(), (int*)pData);
 				break;
 			}
+            case PROP_TYPE::UINT:
+            {
+                ImGui::Text(strPropName.c_str());
+                int v = (int)(*(_uint*)pData);
+                if (ImGui::InputInt(("##" + strPropName).c_str(), &v))
+                    *(_uint*)pData = (_uint)(v < 0 ? 0 : v); 
+                break;
+            }
 			case PROP_TYPE::FLOAT:
 				ImGui::Text(strPropName.c_str());
 				ImGui::DragFloat(("##" + strPropName).c_str(), (float*)pData, 0.1f);

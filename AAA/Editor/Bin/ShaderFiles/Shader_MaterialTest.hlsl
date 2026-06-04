@@ -8,9 +8,11 @@ float4 g_vBlendColor;
 float g_NormalStrength = 1.f;
 
 float4 g_vAlbedo = float4(1.f, 1.f, 1.f, 1.f);
-float4 g_vMRA = float4(0.f, 1.f, 1.f, 1.f);
+float3 g_vMRA = float3(0.f, 1.f, 1.f);
 
 float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
+
+uint g_iMaterialID = 0;
 
 struct VS_IN
 {
@@ -111,12 +113,11 @@ PS_OUT PS_MAIN(PS_IN In)
 
 
     float3 vAlbedo = g_vAlbedo.rgb;
-    float3 mra = g_vMRA.rgb;
 
     Out.vDiffuse = float4(vAlbedo, 1.f);
     Out.vNormal = float4(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(mra, 1.f);
+    Out.vMRA = float4(g_vMRA, 1.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
     
     return Out;
