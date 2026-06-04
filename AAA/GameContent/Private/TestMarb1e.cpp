@@ -42,8 +42,8 @@ void CTestMarb1e::Priority_Update(_float fTimeDelta)
 void CTestMarb1e::Update(_float fTimeDelta)
 {
     /*if (m_pGameInstance_Proxy->Is_EditMode())
-        return;*/
-    /*m_pAnimatorCom->Play("Attack", true);
+        return;
+    m_pAnimatorCom->Play("Catch", true);
 
     m_pAnimatorCom->Update(fTimeDelta);*/
 }

@@ -142,7 +142,7 @@ void CGameObject_Factory::Register_Test()
         CREATOR(CTestMarb1e),
         LOADER(
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Marb1e"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/Marb1e/BladeKnight.ysh"
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/Aligator/Aligator_Anim.ysh"
                     //, XMMatrixRotationY(XMConvertToRadians(180.f))
                 ))
         )
