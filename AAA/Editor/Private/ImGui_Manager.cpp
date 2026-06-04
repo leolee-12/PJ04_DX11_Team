@@ -606,6 +606,8 @@ void CImGui_Manager::Draw_Inspector()
         }
     }
 
+    ImGui::Separator();
+
     auto pContainer = dynamic_cast<CContainerObject*>(pSelected);
     if (pContainer)
     {
@@ -617,6 +619,7 @@ void CImGui_Manager::Draw_Inspector()
 
         for (auto& [tag, pPart] : vecSorted)
         {
+
             string strTag = WstrToStr(tag);
             if (ImGui::CollapsingHeader(strTag.c_str()))
             {
@@ -670,6 +673,9 @@ void CImGui_Manager::Draw_Inspector()
         
         for (auto& [tag, pPart] : vecSorted)
         {
+            ImGui::Separator();
+            ImGui::Separator();
+
             string strTag = WstrToStr(tag);
             if (ImGui::CollapsingHeader(strTag.c_str()))
             {
@@ -681,6 +687,8 @@ void CImGui_Manager::Draw_Inspector()
             }
         }
     }
+
+    ImGui::Separator();
 
     ImGui::End();
     return;
