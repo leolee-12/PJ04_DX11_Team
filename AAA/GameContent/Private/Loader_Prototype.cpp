@@ -56,6 +56,10 @@ HRESULT Ready_Prototype_Shaders(CGameInstance_Proxy* pProxy, ID3D11Device* pDevi
         CShader::Create(pDevice, pContext, Shader_MtrlTest.szFileTag, VTXMESH::Elements, VTXMESH::iNumElements))))
         return E_FAIL;
 
+    if (FAILED(pProxy->Add_Prototype(Shader_Kirby.iLevelID, Shader_Kirby.szProtoTag,
+        CShader::Create(pDevice, pContext, Shader_Kirby.szFileTag, VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
+        return E_FAIL;
+
     return S_OK;
 }
 

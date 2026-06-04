@@ -101,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_Kirby.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Map.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_MaterialTest.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl" />

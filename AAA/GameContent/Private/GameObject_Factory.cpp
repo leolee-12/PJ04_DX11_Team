@@ -182,21 +182,6 @@ void CGameObject_Factory::Register_Test()
         )
     );
 
-
-
-    // Kirby
-    Register(CKirby::PROTOTYPE_TAG, TEXT("Kirby"), CREATOR(CKirby),
-        LOADER
-        (
-            // Kirby_Body
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CKirby_Body::PROTOTYPE_TAG,
-                CKirby_Body::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Kirby_Body"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/yse/Kirby/Kirby.ysh"));
-        )
-    );
-
-
     // Effect_Container
     // 1. WalkSmoke
     Register(CWalkSmoke::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CWalkSmoke),
@@ -223,7 +208,19 @@ void CGameObject_Factory::Register_Test()
 
 void CGameObject_Factory::Register_Container()
 {
-   
+    // Kirby
+    Register(CKirby::PROTOTYPE_TAG, TEXT("Kirby"),
+        CREATOR(CKirby),
+        LOADER
+        (
+            // Kirby_Body
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CKirby_Body::PROTOTYPE_TAG,
+                CKirby_Body::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Kirby_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Kirby/Kirby.ysh")
+                , XMMatrixRotationY(XMConvertToRadians(180.f))
+            ))
+    );
 }
 
 void CGameObject_Factory::Register_UIContainer()
