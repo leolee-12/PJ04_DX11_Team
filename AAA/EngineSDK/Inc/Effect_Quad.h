@@ -41,8 +41,8 @@ public:
     virtual HRESULT Render() override;
 
 protected:
-    virtual void Update_UVScroll(const _float fTimeDelta, const _float fActiveTime, const _float fRatio) override;
-    virtual void Update_EffectPart(const _float fTimeDelta, const _float fActiveTime, const _float fRatio) override;
+    virtual void Update_UVScroll(const _float fTimeDelta, const _float fRatio) override;
+    virtual void Update_EffectPart(const _float fTimeDelta, const _float fRatio) override;
 
 private:
     HRESULT Ready_Components();

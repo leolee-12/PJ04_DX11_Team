@@ -18,6 +18,8 @@
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
+#include "SmokeLowPoly.h"
+#include "SmokeTail.h"
 
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
@@ -163,6 +165,16 @@ void CGameObject_Factory::Register_Test()
                 CSmokeSphereOriginal::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+            // SmokeLowPoly
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CSmokeLowPoly::PROTOTYPE_TAG,
+                CSmokeLowPoly::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_SmokeLowPoly"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
+            // SmokeTail
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CSmokeTail::PROTOTYPE_TAG,
+                CSmokeTail::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_SmokeTail"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Effect/SmokeTail/Model_SmokeTail.ysh"));
         )
     );
 }

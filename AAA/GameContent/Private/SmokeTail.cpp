@@ -1,31 +1,31 @@
-#include "SmokeSphereOriginal.h"
+#include "SmokeTail.h"
 
 #include "GameInstance.h"
 
 #include "GameContent_const.h"
 
-CSmokeSphereOriginal::CSmokeSphereOriginal(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSmokeTail::CSmokeTail(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Mesh{ pDevice, pContext }
 {
 }
 
-CSmokeSphereOriginal::CSmokeSphereOriginal(const CSmokeSphereOriginal& Prototype)
+CSmokeTail::CSmokeTail(const CSmokeTail& Prototype)
     : CEffect_Mesh(Prototype)
 {
 }
 
-HRESULT CSmokeSphereOriginal::Initialize_Prototype()
+HRESULT CSmokeTail::Initialize_Prototype()
 {
     m_eProjType = PROJ_TYPE::PERSPEC;
     return S_OK;
 }
 
-HRESULT CSmokeSphereOriginal::Initialize(void* pArg)
+HRESULT CSmokeTail::Initialize(void* pArg)
 {
-    SMOKE_SPHERE_ORIGIANL_DESC tDesc{};
+    SMOKE_TAIL_DESC tDesc{};
 
     tDesc.iModelLevel = ETOUI(LEVEL::GAMEPLAY);
-    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_SmokeSphereOriginal");
+    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_SmokeTail");
 
     tDesc.bUseDiffuseTexture = false;
     tDesc.bUseUnKnownTexture = true;
@@ -43,60 +43,60 @@ HRESULT CSmokeSphereOriginal::Initialize(void* pArg)
     //tDesc.wstrShaderTag = L"";
 
     if (FAILED(__super::Initialize(&tDesc)))
-        return E_FAIL;   
+        return E_FAIL;
 
     return S_OK;
 }
 
-void CSmokeSphereOriginal::Priority_Update(_float fTimeDelta)
+void CSmokeTail::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 }
 
-void CSmokeSphereOriginal::Update(_float fTimeDelta)
+void CSmokeTail::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 }
 
-void CSmokeSphereOriginal::Late_Update(_float fTimeDelta)
+void CSmokeTail::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 }
 
-HRESULT CSmokeSphereOriginal::Render()
+HRESULT CSmokeTail::Render()
 {
     __super::Render();
 
     return S_OK;
 }
 
-CSmokeSphereOriginal* CSmokeSphereOriginal::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSmokeTail* CSmokeTail::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CSmokeSphereOriginal* pInstance = new CSmokeSphereOriginal(pDevice, pContext);
+    CSmokeTail* pInstance = new CSmokeTail(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX("Failed to Created: CSmokeSphereOriginal");
+        MSG_BOX("Failed to Created: CSmokeTail");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CSmokeSphereOriginal::Clone(void* pArg)
+CGameObject* CSmokeTail::Clone(void* pArg)
 {
-    CSmokeSphereOriginal* pInstance = new CSmokeSphereOriginal(*this);
+    CSmokeTail* pInstance = new CSmokeTail(*this);
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Cloned: CSmokeSphereOriginal");
+        MSG_BOX("Failed to Cloned: CSmokeTail");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CSmokeSphereOriginal::Free()
+void CSmokeTail::Free()
 {
     __super::Free();
 }

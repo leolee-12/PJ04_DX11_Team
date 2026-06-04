@@ -112,12 +112,12 @@ HRESULT CEffect_Quad::Bind_ShaderValue()
     return S_OK;
 }
 
-void CEffect_Quad::Update_UVScroll(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Quad::Update_UVScroll(const _float fTimeDelta, const _float fRatio)
 {
-    __super::Update_UVScroll(fTimeDelta, fActiveTime, fRatio);
+    __super::Update_UVScroll(fTimeDelta, fRatio);
 }
 
-void CEffect_Quad::Update_EffectPart(const _float fTimeDelta, const _float fActiveTime, const _float fRatio)
+void CEffect_Quad::Update_EffectPart(const _float fTimeDelta, const _float fRatio)
 {
 }
 

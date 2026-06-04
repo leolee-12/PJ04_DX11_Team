@@ -4,6 +4,8 @@
 #include "GameContent_const.h"
 
 #include "SmokeSphereOriginal.h"
+#include "SmokeLowPoly.h"
+#include "SmokeTail.h"
 
 CWalkSmoke::CWalkSmoke(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Container(pDevice, pContext)
@@ -35,8 +37,6 @@ HRESULT CWalkSmoke::Initialize(void* pArg)
 
 void CWalkSmoke::Priority_Update(_float fTimeDelta)
 {
-
-
     __super::Priority_Update(fTimeDelta);
 }
 
@@ -59,8 +59,11 @@ HRESULT CWalkSmoke::Render()
 
 HRESULT CWalkSmoke::Ready_EffectPartObjects()
 {
-    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CSmokeSphereOriginal::PROTOTYPE_TAG, TEXT("1"));
-    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CSmokeSphereOriginal::PROTOTYPE_TAG, TEXT("2"));
+    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CSmokeSphereOriginal::PROTOTYPE_TAG, TEXT("Proto_SmokeSphereOriginal"));
+    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CSmokeLowPoly::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeLowPoly_1"));
+    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CSmokeLowPoly::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeLowPoly_2"));
+    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CSmokeLowPoly::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeLowPoly_3"));
+    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CSmokeTail::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeTail"));
 
     return S_OK;
 }
