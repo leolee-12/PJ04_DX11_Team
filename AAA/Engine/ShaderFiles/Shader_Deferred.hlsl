@@ -32,6 +32,9 @@ vector g_vLightSpecular;
 /* SSAO */
 Texture2D g_SSAOTexture; // SSAO 블러 결과
 
+Texture3D g_FogVolume; // 적분된 froxel (rgb=inScatter, a=transmittance)
+float4 g_vFogDepthParams;
+
   /* Combine 전용 앰비언트 (바인딩 안 해도 기본값 사용) */
 vector g_vAmbientColor = float4(0.15f, 0.15f, 0.18f, 1.f);
 
@@ -104,6 +107,14 @@ float2 EnvBRDFApprox(float rough, float NdotV)   // BRDF LUT 불필요
     float4 r = rough * c0 + c1;
     float a004 = min(r.x * r.x, exp2(-9.28f * NdotV)) * r.x + r.y;
     return float2(-1.04f, 1.04f) * a004 + r.zw;
+}
+
+// 픽셀 뷰공간 성형깊이 복원용
+float ViewZFromDepth(float2 uv, float ndcZ)
+{
+    float4 p = float4(uv.x * 2.f - 1.f, uv.y * -2.f + 1.f, ndcZ, 1.f);
+    p = mul(p, g_ProjMatrixInverse);
+    return p.z / p.w;
 }
 
 // 복원헬퍼
@@ -234,6 +245,14 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     
     float3 emissive = g_EmissiveTexture.Sample(LinearSampler, In.vTexcoord).rgb;
     color += emissive;
+    
+    /* 볼류메트릭 포그 (froxel) */
+    float fogViewZ = ViewZFromDepth(In.vTexcoord, ddA.x);
+    float fogW = log(max(fogViewZ, g_vFogDepthParams.x) / g_vFogDepthParams.x)
+                 / log(g_vFogDepthParams.y / g_vFogDepthParams.x);
+    fogW = saturate(fogW);
+    float4 fog = g_FogVolume.SampleLevel(ClampSampler, float3(In.vTexcoord, fogW), 0);
+    color = color * fog.a + fog.rgb; // 투과율로 감쇠 후 in-scatter 가산
 
     return float4(color, 1.f);
 }
