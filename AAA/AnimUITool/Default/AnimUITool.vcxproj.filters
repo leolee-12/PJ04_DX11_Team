@@ -64,6 +64,9 @@
     <Filter Include="96. ShaderFiles\Defines">
       <UniqueIdentifier>{faad848a-186b-4861-910b-572f60a2a359}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03. Panels\UICanvas">
+      <UniqueIdentifier>{82aac75a-ceed-489b-a9ca-2b0eaf934ea4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Panel.h">
@@ -132,6 +135,9 @@
     <ClInclude Include="..\Public\Panel_Browser.h">
       <Filter>03. Panels\Browser</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Panel_UICanvas.h">
+      <Filter>03. Panels\UICanvas</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\ThirdParty\ImGui\Src\ImGuizmo.cpp">
@@ -199,6 +205,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Panel_Browser.cpp">
       <Filter>03. Panels\Browser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_UICanvas.cpp">
+      <Filter>03. Panels\UICanvas</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

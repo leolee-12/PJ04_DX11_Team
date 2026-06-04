@@ -12,6 +12,9 @@
 #include "TestMap.h"
 #include "TestMarb1e.h"
 #include "TestMarb1eMap.h"
+#include "UI_Image.h"
+#include "UI_TestImageContainer.h"
+#include "UI_Title.h"
 #include "Material_Object.h"
 
 // Kirby
@@ -73,6 +76,21 @@ void CGameObject_Factory::RegisterAll()
 
 void CGameObject_Factory::Register_UI()
 {
+    Register(CUI_Image::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
+        CREATOR(CUI_Image),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, Shader_UI.iLevelID, Shader_UI.szProtoTag,
+                CShader::Create(pDevice, pContext, Shader_UI.szFileTag,
+                    VTXTEX::Elements, VTXTEX::iNumElements));
+
+    TRY_ADD_PROTO(pProxy, VI_Rect.iLevelID, VI_Rect.szProtoTag,
+        CVIBuffer_Rect::Create(pDevice, pContext));
+
+    TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), TEXT("Proto_Tex_TestUI"),
+        CTexture::Create(pDevice, pContext,
+            TEXT("../../Resources/CHJ/UI/Title/TitleLogo_KR^u.png"), 1));
+        )
+    );
 }
 
 void CGameObject_Factory::Register_Camera()
@@ -210,7 +228,37 @@ void CGameObject_Factory::Register_Container()
 
 void CGameObject_Factory::Register_UIContainer()
 {
-   
+    Register(CUI_TestImageContainer::PROTOTYPE_TAG, TEXT("UI_CONTAINER_TEST"),
+        CREATOR(CUI_TestImageContainer),
+        LOADER(
+            auto* pImageReg = CGameObject_Factory::GetInstance()
+            ->Get_Registration(CUI_Image::PROTOTYPE_TAG);
+
+    if (pImageReg)
+    {
+        pImageReg->ResourceLoader(pProxy, pDevice, pContext);
+
+        TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), CUI_Image::PROTOTYPE_TAG,
+            pImageReg->CreatorFunc(pDevice, pContext));
+    }
+        )
+    );
+
+    Register(CUI_Title::PROTOTYPE_TAG, TEXT("UI_CONTAINER"),
+        CREATOR(CUI_Title),
+        LOADER(
+            auto* pImageReg = CGameObject_Factory::GetInstance()
+            ->Get_Registration(CUI_Image::PROTOTYPE_TAG);
+
+    if (pImageReg)
+    {
+        pImageReg->ResourceLoader(pProxy, pDevice, pContext);
+
+        TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), CUI_Image::PROTOTYPE_TAG,
+            pImageReg->CreatorFunc(pDevice, pContext));
+    }
+        )
+    );
 }
 
 void CGameObject_Factory::Register_NonAnimObject()

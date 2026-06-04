@@ -50,12 +50,18 @@ void CPanel_Browser::Render()
 {
     ImGui::Begin(m_szName);
 
-    if (m_bNeedRefresh) Refresh();
+    if (m_bNeedRefresh) 
+        Refresh();
 
-    if (ImGui::Button("Refresh")) m_bNeedRefresh = true;
-    ImGui::Separator();
     Render_Breadcrumb();
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Refresh")) 
+        m_bNeedRefresh = true;
+
     ImGui::Separator();
+
     Render_Contents();
 
     ImGui::End();

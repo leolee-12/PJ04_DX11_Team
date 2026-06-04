@@ -58,6 +58,9 @@
     <ClInclude Include="..\public\TestMarb1eMap.h" />
     <ClInclude Include="..\Public\TestNonAnim.h" />
     <ClInclude Include="..\public\TestRect.h" />
+    <ClInclude Include="..\Public\UI_Image.h" />
+    <ClInclude Include="..\Public\UI_TestImageContainer.h" />
+    <ClInclude Include="..\Public\UI_Title.h" />
     <ClInclude Include="..\Public\YshModelValidator.h" />
     <ClInclude Include="..\Public\WalkSmoke.h" />
   </ItemGroup>
@@ -91,6 +94,9 @@
     <ClCompile Include="..\private\TestMarb1eMap.cpp" />
     <ClCompile Include="..\Private\TestNonAnim.cpp" />
     <ClCompile Include="..\private\TestRect.cpp" />
+    <ClCompile Include="..\Private\UI_Image.cpp" />
+    <ClCompile Include="..\Private\UI_TestImageContainer.cpp" />
+    <ClCompile Include="..\Private\UI_Title.cpp" />
     <ClCompile Include="..\Private\WalkSmoke.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -98,6 +104,12 @@
     <FxCompile Include="..\ShaderFiles\Shader_Map.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_MaterialTest.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_UI.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Effect</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Effect</ShaderType>
+    </FxCompile>
     <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -21,14 +21,16 @@ HRESULT CUIPartObject::Initialize_Prototype()
 
 HRESULT CUIPartObject::Initialize(void* pArg)
 {
-    auto		pDesc = static_cast<UI_PARTOBJECT_DESC*>(pArg);
+	if (pArg)
+	{
+		auto pDesc = static_cast<UI_PARTOBJECT_DESC*>(pArg);
+		m_pParentMatrix = pDesc->pParentMatrix;
+	}
 
-    m_pParentMatrix = pDesc->pParentMatrix;
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
 
-    if (FAILED(__super::Initialize(pArg)))
-        return E_FAIL;
-
-    return S_OK;
+	return S_OK;
 }
 
 void CUIPartObject::Priority_Update(_float fTimeDelta)
@@ -46,6 +48,11 @@ void CUIPartObject::Late_Update(_float fTimeDelta)
 HRESULT CUIPartObject::Render()
 {
 	return S_OK;
+}
+
+void CUIPartObject::Set_ParentMatrix(const _float4x4* pParentMatrix)
+{
+	m_pParentMatrix = pParentMatrix;
 }
 
 void CUIPartObject::Compute_CombinedWorldMatrix(_fmatrix ChildMatrix)
