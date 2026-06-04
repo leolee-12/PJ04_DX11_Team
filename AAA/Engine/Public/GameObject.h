@@ -12,6 +12,8 @@ class CObject_Manager;
 class ENGINE_DLL CGameObject abstract : public CBase, public IReflectable
 {
 	friend class CObject_Manager;
+	GENERATED_BODY_ABSTRACT(CGameObject)
+	PROPERTY(_uint, m_iMaterialID, L"Material_ID(0~255)", L"Material")
 public:
 	typedef struct tagGameObjectDesc : public CTransform::TRANSFORM_DESC
 	{

@@ -6,6 +6,7 @@
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
 #include "ImGuizmo.h"
+#include "Property.h"
 
 NS_BEGIN(Engine)
 class CGameInstance_Proxy;
@@ -37,6 +38,7 @@ private:
 	void Draw_Gizmo();
 	void Draw_Inspector();
 	void Draw_Properties(IReflectable* pHolder);
+	void Draw_Property(IReflectable* pHolder, const FPROPERTY& prop);
 	void Draw_Palette();
 	void Draw_Viewport();
 	void Draw_Transform(CGameObject* pObject, const string& strSuffix = "");

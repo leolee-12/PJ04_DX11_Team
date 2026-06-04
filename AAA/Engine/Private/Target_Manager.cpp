@@ -101,6 +101,15 @@ HRESULT CTarget_Manager::Bind_ShaderResource(const _wstring& strTargetTag, CShad
 	return pRenderTarget->Bind_ShaderResource(pShader, pConstantName);
 }
 
+HRESULT CTarget_Manager::Bind_CSShaderResource(const _wstring& strTargetTag, _uint iSlot)
+{
+	CRenderTarget* pRenderTarget = Find_RenderTarget(strTargetTag);
+	if (nullptr == pRenderTarget)
+		return E_FAIL;
+
+	return pRenderTarget->Bind_CSShaderResource(iSlot);
+}
+
 #ifdef _DEBUG
 
 HRESULT CTarget_Manager::Ready_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)

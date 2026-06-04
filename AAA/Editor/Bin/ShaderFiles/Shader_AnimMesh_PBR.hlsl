@@ -12,6 +12,10 @@ float4x4 g_BoneMatrices[512];
 float2 g_vMaskValue;
 float g_fHullThickness;
 
+float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
+
+uint g_iMaterialID = 0;
+
 struct VS_IN
 {
     float3 vPosition : POSITION;
@@ -152,6 +156,7 @@ struct PS_OUT
     float4 vNormal : SV_TARGET1;
     float4 vDepth : SV_TARGET2;
     float4 vMRA : SV_TARGET3;
+    float4 vEmissive : SV_TARGET4;
 };
 
 //PS_OUT PS_MAIN(PS_IN In)
@@ -213,7 +218,8 @@ PS_OUT PS_MAIN(PS_IN In)
     Out.vNormal = vector(In.vNormal.rgb * 0.5f + 0.5f, 0.f);
     //Out.vNormal = vector(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(mra, 1.f);
+    Out.vMRA = float4(mra, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
   
     return Out;
 }
@@ -232,7 +238,8 @@ PS_OUT PS_NONEYE(PS_IN In)
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(mra, 1.f);
+    Out.vMRA = float4(mra, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
     
     return Out;
 }
@@ -244,7 +251,7 @@ PS_OUT PS_TEST(PS_IN In)
     Out.vDiffuse = vector(1.f, 1.f, 1.f, 1.f);
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(0.f, 1.f, 1.f, 1.f);
+    Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
     
     return Out;
 }
