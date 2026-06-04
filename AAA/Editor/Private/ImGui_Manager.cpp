@@ -681,97 +681,110 @@ void CImGui_Manager::Draw_Inspector()
 
 void CImGui_Manager::Draw_Properties(IReflectable* pHolder)
 {
-    string strCurrentCategory = {};
+    // 카테고리별로 프로퍼티를 모음 (최초 등장 순서 유지)
+    vector<string>                                  vecOrder;
+    unordered_map<string, vector<const FPROPERTY*>> mapByCategory;
 
     for (auto& prop : pHolder->Get_Properties())
     {
-        const string strPropCategory = WstrToStr(prop.strCategory);
-        if (strPropCategory != strCurrentCategory)
+        const string strCat = WstrToStr(prop.strCategory);
+        if (mapByCategory.find(strCat) == mapByCategory.end())
+            vecOrder.push_back(strCat);
+        mapByCategory[strCat].push_back(&prop);
+    }
+
+    for (auto& strCategory : vecOrder)
+    {
+        // 카테고리 이름이 비어 있으면 헤더 없이 그대로 출력
+        if (strCategory.empty())
         {
-            strCurrentCategory = strPropCategory;
-            ImGui::Text("[%s]", strCurrentCategory.c_str());
+            for (auto* pProp : mapByCategory[strCategory])
+                Draw_Property(pHolder, *pProp);
+            continue;
         }
 
-        void* pData = pHolder->Get_PropertyPtr(prop.uOffset);
-        if (!pData) continue;
-
-        string strPropName = WstrToStr(prop.strName);
-
-		switch (prop.eType)
-		{
-			case PROP_TYPE::INT:
-			{
-				ImGui::Text(strPropName.c_str());
-				ImGui::InputInt(("##" + strPropName).c_str(), (int*)pData);
-				break;
-			}
-            case PROP_TYPE::UINT:
-            {
-                ImGui::Text(strPropName.c_str());
-                int v = (int)(*(_uint*)pData);
-                if (ImGui::InputInt(("##" + strPropName).c_str(), &v))
-                    *(_uint*)pData = (_uint)(v < 0 ? 0 : v); 
-                break;
-            }
-			case PROP_TYPE::FLOAT:
-				ImGui::Text(strPropName.c_str());
-				ImGui::DragFloat(("##" + strPropName).c_str(), (float*)pData, 0.1f);
-				break;
-			case PROP_TYPE::BOOL:
-			{
-				ImGui::Text(strPropName.c_str());
-				ImGui::Checkbox(("##" + strPropName).c_str(), (bool*)pData);
-				break;
-			}
-			case PROP_TYPE::FLOAT2:
-			{
-				ImGui::Text(strPropName.c_str());
-				ImGui::DragFloat2(("##" + strPropName).c_str(), (float*)pData, 0.1f);
-				break;
-			}
-			case PROP_TYPE::FLOAT3:
-			{
-				ImGui::Text(strPropName.c_str());
-				ImGui::DragFloat3(("##" + strPropName).c_str(), (float*)pData, 0.1f);
-				break;
-			}
-			case PROP_TYPE::FLOAT4:
-			{
-				ImGui::Text(strPropName.c_str());
-				ImGui::DragFloat4(("##" + strPropName).c_str(), (float*)pData, 0.1f);
-				break;
-			}
-			case PROP_TYPE::ANIM_INDEX:
-			{
-				int iVal = (int)*((_uint*)pData);
-                CGameObject* pObject = dynamic_cast<CGameObject*>(pHolder);
-                CModel* pModel = pObject ? pObject->Get_Component<CModel>(L"Com_Model") : nullptr;
-				if (!pModel) break;
-				_uint iNumAnims = pModel->Get_MaxAnimationIndex() + 1;
-				string strItems;
-				for (_uint i = 0; i < iNumAnims; ++i)
-					strItems += to_string(i) + ": " + pModel->Get_AnimationName(i) + '\0';
-				strItems += '\0'; // 종료
-
-				ImGui::Text(strPropName.c_str());
-				ImGui::PushID(strPropName.c_str());
-				if (ImGui::Combo(("##" + strPropName).c_str(), &iVal, strItems.c_str()))
-					*(_uint*)pData = (_uint)iVal;
-				ImGui::PopID();
-				break;
-			}
-			case PROP_TYPE::WSTRING:
-			{
-				wstring* pWstr = (wstring*)pData;
-				string str = WstrToStr(*pWstr);
-				char buf[256] = {};
-				strcpy_s(buf, str.c_str());
-				if (ImGui::InputText(("##" + strPropName).c_str(), buf, sizeof(buf)))
-					*pWstr = StrToWstr(buf);
-				break;
-			}
-		}
+        // 폴더처럼 접히는 카테고리 헤더 (기본 펼침)
+        if (ImGui::CollapsingHeader(strCategory.c_str()))
+        {
+            ImGui::Indent();
+            for (auto* pProp : mapByCategory[strCategory])
+                Draw_Property(pHolder, *pProp);
+            ImGui::Unindent();
+        }
     }
+}
+
+void CImGui_Manager::Draw_Property(IReflectable* pHolder, const FPROPERTY& prop)
+{
+    void* pData = pHolder->Get_PropertyPtr(prop.uOffset);
+    if (!pData) return;
+
+    string strPropName = WstrToStr(prop.strName);
+    string strID = "##" + to_string(prop.uOffset);   // 고유 ID
+
+    // 이름이 10글자를 넘으면 기존처럼 위에, 아니면 위젯 오른쪽에 표시
+    bool bLabelAbove = prop.strName.length() > 10;
+    if (bLabelAbove)
+        ImGui::Text(strPropName.c_str());
+
+    // 위에 띄웠으면 숨김 라벨(ID만), 아니면 이름+ID
+    string strLabel = bLabelAbove ? strID : (strPropName + strID);
+
+    switch (prop.eType)
+    {
+        case PROP_TYPE::INT:
+            ImGui::InputInt(strLabel.c_str(), (int*)pData);
+            break;
+        case PROP_TYPE::UINT:
+        {
+            int v = (int)(*(_uint*)pData);
+            if (ImGui::InputInt(strLabel.c_str(), &v))
+                *(_uint*)pData = (_uint)(v < 0 ? 0 : v);
+            break;
+        }
+        case PROP_TYPE::FLOAT:
+            ImGui::DragFloat(strLabel.c_str(), (float*)pData, 0.1f);
+            break;
+        case PROP_TYPE::BOOL:
+            ImGui::Checkbox(strLabel.c_str(), (bool*)pData);
+            break;
+        case PROP_TYPE::FLOAT2:
+            ImGui::DragFloat2(strLabel.c_str(), (float*)pData, 0.1f);
+            break;
+        case PROP_TYPE::FLOAT3:
+            ImGui::DragFloat3(strLabel.c_str(), (float*)pData, 0.1f);
+            break;
+        case PROP_TYPE::FLOAT4:
+            ImGui::DragFloat4(strLabel.c_str(), (float*)pData, 0.1f);
+            break;
+        case PROP_TYPE::ANIM_INDEX:
+        {
+            int iVal = (int)*((_uint*)pData);
+            CGameObject* pObject = dynamic_cast<CGameObject*>(pHolder);
+            CModel* pModel = pObject ? pObject->Get_Component<CModel>(L"Com_Model") : nullptr;
+            if (!pModel) break;
+            _uint iNumAnims = pModel->Get_MaxAnimationIndex() + 1;
+            string strItems;
+            for (_uint i = 0; i < iNumAnims; ++i)
+                strItems += to_string(i) + ": " + pModel->Get_AnimationName(i) + '\0';
+            strItems += '\0';
+
+            if (ImGui::Combo(strLabel.c_str(), &iVal, strItems.c_str()))
+                *(_uint*)pData = (_uint)iVal;
+            break;
+        }
+        case PROP_TYPE::WSTRING:
+        {
+            wstring* pWstr = (wstring*)pData;
+            string str = WstrToStr(*pWstr);
+            char buf[256] = {};
+            strcpy_s(buf, str.c_str());
+            if (ImGui::InputText(strLabel.c_str(), buf, sizeof(buf)))
+                *pWstr = StrToWstr(buf);
+            break;
+        }
+    }
+    ImGui::Separator();
 }
 
 void CImGui_Manager::Draw_Palette()
