@@ -117,7 +117,7 @@ PS_OUT PS_MAIN(PS_IN In)
     Out.vDiffuse = float4(vAlbedo, 1.f);
     Out.vNormal = float4(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(g_vMRA, 1.f);
+    Out.vMRA = float4(g_vMRA, g_iMaterialID / 255.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
     
     return Out;
