@@ -15,7 +15,6 @@ NS_BEGIN(Client)
 class CKirby_Body final : public CPartObject
 {
 	GENERATED_BODY(CKirby_Body)
-	PROPERTY(ANIM_INDEX, m_iAnimationIndex, L"Animation_Index", L"Animation")
 
 public:
 	struct KIRBY_BODY_DESC : public CPartObject::PARTOBJECT_DESC

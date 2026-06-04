@@ -8,14 +8,11 @@
 
 CKirby_Body::CKirby_Body(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPartObject(pDevice, pContext)
-    , m_iAnimationIndex(0)
 {
 }
 
 CKirby_Body::CKirby_Body(const CKirby_Body& Prototype)
-    : CPartObject(Prototype)
-    , m_iAnimationIndex(Prototype.m_iAnimationIndex)
-{
+    : CPartObject(Prototype){
 }
 
 HRESULT CKirby_Body::Initialize_Prototype()
