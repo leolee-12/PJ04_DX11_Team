@@ -30,6 +30,24 @@ CPanel_Viewport::CPanel_Viewport(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
     strcpy_s(m_szName, "Viewport");
 }
 
+HRESULT CPanel_Viewport::Initialize()
+{
+    D3D11_BLEND_DESC bd{};
+    bd.RenderTarget[0].BlendEnable = FALSE;                                  // 블렌딩 OFF = RT의 RGB 그대로
+    bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+    //bd.AlphaToCoverageEnable = FALSE;
+    //bd.IndependentBlendEnable = FALSE;
+    //bd.RenderTarget[0].BlendEnable = FALSE;
+    //bd.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+    if (FAILED(m_pDevice->CreateBlendState(&bd, &m_pViewportOpaqueBlend)))
+        return E_FAIL;
+
+    m_ViewportDrawDesc = { m_pContext, m_pViewportOpaqueBlend };
+    return S_OK;
+}
+
 void CPanel_Viewport::Render()
 {
     if (!Begin_Panel())
@@ -69,7 +87,12 @@ void CPanel_Viewport::Render()
 
     ID3D11ShaderResourceView* pSRV = pEI->Get_SceneSRV();
     if (pSRV)
+    {
+        ImDrawList* pDrawList = ImGui::GetWindowDrawList();
+        pDrawList->AddCallback(Viewport_DisableBlend, &m_ViewportDrawDesc);
         ImGui::Image((ImTextureID)pSRV, vSize);
+        pDrawList->AddCallback(ImDrawCallback_ResetRenderState, nullptr);
+    }
     else
         ImGui::Dummy(vSize);
 
@@ -131,6 +154,13 @@ void CPanel_Viewport::Render()
     End_Panel();
 }
 
+void CPanel_Viewport::Viewport_DisableBlend(const ImDrawList*, const ImDrawCmd* cmd)
+{
+    auto* pDesc = static_cast<VIEWPORT_DRAW_DESC*>(cmd->UserCallbackData);
+    const float blendFactor[4] = { 0.f, 0.f, 0.f, 0.f };
+    pDesc->pContext->OMSetBlendState(pDesc->pBlendState, blendFactor, 0xffffffff);
+}
+
 void CPanel_Viewport::Draw_Gizmo(CGameObject* pSelected, const ImVec2& vImagePos, const ImVec2& vImageSize)
 {
     ImGuizmo::BeginFrame();
@@ -186,10 +216,20 @@ void CPanel_Viewport::Draw_Gizmo(CGameObject* pSelected, const ImVec2& vImagePos
 
 CPanel_Viewport* CPanel_Viewport::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    return new CPanel_Viewport(pDevice, pContext);
+    CPanel_Viewport* pInstance = new CPanel_Viewport(pDevice, pContext);
+
+    if (FAILED(pInstance->Initialize()))
+    {
+        MSG_BOX("Failed to Created : CToolApp");
+        Safe_Release(pInstance);
+    }
+
+    return pInstance;
 }
 
 void CPanel_Viewport::Free()
 {
+    Safe_Release(m_pViewportOpaqueBlend);
+
     __super::Free();
 }

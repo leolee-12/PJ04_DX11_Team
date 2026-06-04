@@ -486,7 +486,7 @@
     <ClInclude Include="..\Public\Culling_Util.h">
       <Filter>19. Culling</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Culling_Context.h">
+    <ClInclude Include="..\Public\Frustum_Manager.h">
       <Filter>19. Culling</Filter>
     </ClInclude>
   </ItemGroup>
@@ -707,7 +707,7 @@
     <ClCompile Include="..\Private\Culling_Util.cpp">
       <Filter>19. Culling</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Culling_Context.cpp">
+    <ClCompile Include="..\Private\Frustum_Manager.cpp">
       <Filter>19. Culling</Filter>
     </ClCompile>
   </ItemGroup>

@@ -60,6 +60,25 @@ namespace Engine
 		XMFLOAT2 vRange = { 0.f, 1.f };    // 에디터 슬라이더 min/max
 	};
 
+	struct CULLING_VIEW_DESC
+	{
+		const XMFLOAT4X4*	pView = { nullptr };
+		const XMFLOAT4X4*	pProj = { nullptr };
+		float				fCullMargin = { 0.f };
+	};
+
+#ifdef _DEBUG
+	struct FRUSTUM_CULLING_STATS
+	{
+		unsigned int   iTestedAABB = {};
+		unsigned int   iCulledAABB = {};
+		unsigned int   iPassedAABB = {};
+		unsigned int   iDisabledPolicy = {};
+		unsigned int   iInvalidViewFailOpen = {};
+		unsigned int   iInvalidBoundsFailOpen = {};
+	};
+#endif
+
 	typedef struct tagAnimEvent
 	{
 		int         iEventType = 0;          // 의미는 클라이언트 enum(EANIM_EVENT)이 결정

@@ -182,7 +182,6 @@
     <ClInclude Include="..\public\Collision_Manager.h" />
     <ClInclude Include="..\public\Component.h" />
     <ClInclude Include="..\Public\ContainerObject.h" />
-    <ClInclude Include="..\Public\Culling_Context.h" />
     <ClInclude Include="..\Public\Culling_Util.h" />
     <ClInclude Include="..\Public\CustomFont.h" />
     <ClInclude Include="..\Public\DataExporter.h" />
@@ -203,6 +202,7 @@
     <ClInclude Include="..\public\Environment_Manager.h" />
     <ClInclude Include="..\public\EventBus.h" />
     <ClInclude Include="..\Public\Font_Manager.h" />
+    <ClInclude Include="..\Public\Frustum_Manager.h" />
     <ClInclude Include="..\public\GameInstance.h" />
     <ClInclude Include="..\public\GameInstance_Proxy.h" />
     <ClInclude Include="..\public\GameObject.h" />
@@ -268,7 +268,6 @@
     <ClCompile Include="..\private\Collision_Manager.cpp" />
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\Private\ContainerObject.cpp" />
-    <ClCompile Include="..\Private\Culling_Context.cpp" />
     <ClCompile Include="..\Private\Culling_Util.cpp" />
     <ClCompile Include="..\Private\CustomFont.cpp" />
     <ClCompile Include="..\Private\DataExporter.cpp" />
@@ -282,6 +281,7 @@
     <ClCompile Include="..\private\Environment_Manager.cpp" />
     <ClCompile Include="..\private\EventBus.cpp" />
     <ClCompile Include="..\Private\Font_Manager.cpp" />
+    <ClCompile Include="..\Private\Frustum_Manager.cpp" />
     <ClCompile Include="..\private\GameInstance.cpp" />
     <ClCompile Include="..\private\GameInstance_Proxy.cpp" />
     <ClCompile Include="..\private\GameObject.cpp" />

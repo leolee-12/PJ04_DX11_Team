@@ -1,3 +1,5 @@
+#include <chrono>
+
 #include "MapStage.h"
 
 #include "GameInstance_Proxy.h"
@@ -46,10 +48,23 @@ void CMapStage::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
-	// Stage profiling is temporarily disabled during migration.
-	// Reset_ProfileFrame();
+#ifdef _DEBUG
+	Reset_ProfileFrame();
+#endif
+
 	Refresh_SectionTransforms();
+
+#ifdef _DEBUG
+	const auto CullingBegin = std::chrono::steady_clock::now();
+#endif
+
 	Submit_VisibleSections();
+
+#ifdef _DEBUG
+	const auto CullingEnd = std::chrono::steady_clock::now();
+	m_Profile.dCullingCpuMs =
+		std::chrono::duration<double, std::milli>(CullingEnd - CullingBegin).count();
+#endif
 }
 
 CGameObject* CMapStage::Clone(void* pArg)
@@ -130,35 +145,44 @@ void CMapStage::Reset_ProfileFrame()
 
 void CMapStage::Submit_VisibleSections()
 {
-	// Frustum culling is temporarily disabled during migration.
-	// The stage still submits sections exactly once, preserving MapTool behavior.
-	//
-	// const _float4x4* pViewMatrix = m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC);
-	// const _float4x4* pProjMatrix = m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
-	// const _bool bHasFrustum = (nullptr != m_pMainViewCullingContext) ?
-	// 	m_pMainViewCullingContext->Update_FromViewProj(pViewMatrix, pProjMatrix) :
-	// 	false;
-
 	for (CMapSection* pSection : m_Sections)
 	{
 		if (nullptr == pSection)
 			continue;
 
-		// if (bHasFrustum &&
-		// 	nullptr != m_pMainViewCullingContext &&
-		// 	m_pMainViewCullingContext->Should_CullAABB(pSection->Is_Culling(), pSection->Get_WorldBounds()))
-		// {
-		// 	continue;
-		// }
-
 		if (!pSection->Is_Renderable())
 			continue;
 
-		const RENDERID eRenderID = pSection->Get_RenderID();
-		m_pGameInstance_Proxy->Add_RenderGroup(eRenderID, pSection);
+		const _bool bCullMainView = m_pGameInstance_Proxy->Should_CullAABB(
+			CULLING_VIEW::MAIN_CAMERA,
+			pSection->Is_Culling(),
+			pSection->Get_WorldBounds());
+
+		if (!bCullMainView)
+		{
+			const RENDERID eRenderID = pSection->Get_RenderID();
+			m_pGameInstance_Proxy->Add_RenderGroup(eRenderID, pSection);
+
+#ifdef _DEBUG
+			++m_Profile.iVisibleSections;
+			Count_Submitted(eRenderID);
+#endif
+		}
+#ifdef _DEBUG
+		else
+		{
+			++m_Profile.iCulledSections;
+		}
+#endif
 
 		if (pSection->Is_ShadowCaster())
+		{
 			m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pSection);
+
+#ifdef _DEBUG
+			Count_Submitted(RENDERID::SHADOW);
+#endif
+		}
 	}
 }
 

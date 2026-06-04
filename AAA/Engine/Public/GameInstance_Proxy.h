@@ -7,6 +7,7 @@ class CGameObject;
 class CUIObject;
 class CGameInstance;
 class CLevel;
+enum class CULLING_VIEW;
 
 class ENGINE_DLL CGameInstance_Proxy final : public CBase
 {
@@ -112,6 +113,14 @@ public: // CameraManager
     const _float4* Get_CamPosition() const;
     void Set_Transform(D3DTS eState, PROJ_TYPE eType, _fmatrix StateMatrix);
     void Set_Transform(D3DTS eState, PROJ_TYPE eType, const _float4x4& StateMatrix);
+#pragma endregion
+
+#pragma region FRUSTUM_MANAGER
+  public: // FrustumManager
+      _bool Update_CullingView(CULLING_VIEW eView, const CULLING_VIEW_DESC& Desc);
+      _bool Should_CullAABB(CULLING_VIEW eView, _bool bEnableCulling, const BoundingBox& WorldBounds) const;
+      _bool XM_CALLCONV IsIn_CullingView_WorldSpace(CULLING_VIEW eView, _fvector vWorldPos, _float fRange = 0.f) const;
+      _bool IsIn_CullingView_AABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const;
 #pragma endregion
 
 #pragma region LIGHTMANAGER

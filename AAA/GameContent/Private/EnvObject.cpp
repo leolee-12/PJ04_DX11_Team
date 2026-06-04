@@ -202,8 +202,19 @@ void CEnvObject::Refresh_WorldBounds()
 
 _bool CEnvObject::Is_VisibleInCurrentView() const
 {
-	// Culling will be re-enabled after the engine-side API migration lands.
-	return true;
+	if (!m_bRenderable || !Has_RenderModel())
+		return false;
+
+	if (nullptr == m_pGameInstance_Proxy)
+		return true;
+
+	if (!m_bEnableCulling)
+		return true;
+
+	return !m_pGameInstance_Proxy->Should_CullAABB(
+		CULLING_VIEW::MAIN_CAMERA,
+		m_bEnableCulling,
+		m_WorldBounds);
 }
 
 void CEnvObject::Apply_TransformFromDesc()

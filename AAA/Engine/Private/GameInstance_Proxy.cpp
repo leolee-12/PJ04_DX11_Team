@@ -1,6 +1,7 @@
 #include "GameInstance_Proxy.h"
 #include "GameInstance.h"
 #include "Target_Manager.h"
+#include "Frustum_Manager.h"
 #include "Light_Manager.h"
 #include "Renderer.h"
 #include "Shadow_Dir.h"
@@ -395,6 +396,40 @@ void CGameInstance_Proxy::Set_Transform(D3DTS eState, PROJ_TYPE eType, const _fl
 		return;
 
 	return m_pOwner->Set_Transform(eState, eType, StateMatrix);
+}
+#pragma endregion
+
+#pragma region FRUSTUM_MANAGER
+_bool CGameInstance_Proxy::Update_CullingView(CULLING_VIEW eView, const CULLING_VIEW_DESC& Desc)
+{
+	if (!IsConnected())
+		return false;
+
+	return m_pOwner->Update_CullingView(eView, Desc);
+}
+
+_bool CGameInstance_Proxy::Should_CullAABB(CULLING_VIEW eView, _bool bEnableCulling, const BoundingBox& WorldBounds) const
+{
+	if (!IsConnected())
+		return false;
+
+	return m_pOwner->Should_CullAABB(eView, bEnableCulling, WorldBounds);
+}
+
+_bool XM_CALLCONV CGameInstance_Proxy::IsIn_CullingView_WorldSpace(CULLING_VIEW eView,	_fvector vWorldPos,	_float fRange) const
+{
+	if (!IsConnected())
+		return true;
+
+	return m_pOwner->IsIn_CullingView_WorldSpace(eView, vWorldPos, fRange);
+}
+
+_bool CGameInstance_Proxy::IsIn_CullingView_AABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const
+{
+	if (!IsConnected())
+		return true;
+
+	return m_pOwner->IsIn_CullingView_AABB(eView, WorldBounds);
 }
 #pragma endregion
 
