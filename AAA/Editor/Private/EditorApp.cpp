@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 #include "ImGui_Manager.h"
 #include "Level_Edit.h"
+#include "MapDescriptor.h"
 
 #include "Loader_Prototype.h"
 #include "GameObject_Factory.h"
@@ -197,6 +198,7 @@ void CEditorApp::Free()
     Safe_Release(m_pDevice);
     Safe_Release(m_pContext);
 
+    CMapDescriptor::DestroyInstance();
     CGameInstance::DestroyInstance();
 
     CGameObject_Factory::DestroyInstance();

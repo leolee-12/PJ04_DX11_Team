@@ -12,7 +12,7 @@ NS_BEGIN(Client)
 
 // 맵 구조물 공통 베이스: Shader_Map 기반 PBR G-buffer + 오버레이(DirtParts) 메커니즘.
 // moss/dirt 같은 구조물별 레이어는 파생에서 Bind_MeshLayers 오버라이드로 추가.
-class CMapObject abstract : public CGameObject
+class CLIENT_DLL CMapObject abstract : public CGameObject
 {
     GENERATED_BODY_ABSTRACT(CMapObject)
 
@@ -42,6 +42,7 @@ protected:
     virtual const _tchar* Get_ModelProtoTag() const = 0;   // 구조물별 .ysh 모델 프로토타입
     virtual void  Bind_MeshLayers(_uint iMesh) {}          // 베이스: no-op(순수 PBR)
     virtual _bool Is_OverlayMesh(_uint iMesh) const;       // 기본: 이름에 "Parts"
+    virtual HRESULT Bind_WorldMatrix();
 
 protected:
     virtual HRESULT Ready_Events() override { return S_OK; }
