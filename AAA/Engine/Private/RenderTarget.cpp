@@ -46,6 +46,12 @@ HRESULT CRenderTarget::Bind_ShaderResource(CShader* pShader, const _char* pConst
 	return pShader->Bind_SRV(pConstantName, m_pSRV);
 }
 
+HRESULT CRenderTarget::Bind_CSShaderResource(_uint iSlot)
+{
+	m_pContext->CSSetShaderResources(iSlot, 1, &m_pSRV);
+	return S_OK;
+}
+
 void CRenderTarget::Clear()
 {
 	m_pContext->ClearRenderTargetView(m_pRTV, reinterpret_cast<_float*>(&m_vClearColor));

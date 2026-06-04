@@ -12,6 +12,7 @@
 #include "TestMap.h"
 #include "TestMarb1e.h"
 #include "TestMarb1eMap.h"
+#include "Material_Object.h"
 
 // Kirby
 #include "Kirby.h"
@@ -152,6 +153,14 @@ void CGameObject_Factory::Register_Test()
         LOADER(
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Map"),
                 CModel::Create(pDevice, pContext, MODEL::MAP, "../../Resources/Models/Test/Marb1e/Land_GsAllBuilding_0.ysh"))
+        )
+    );
+
+    Register(CMaterial_Object::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
+        CREATOR(CMaterial_Object),
+        LOADER(
+            pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_MaterialObject"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Shader_Test_Object/Model_SmokeSphereOriginal.ysh"))
         )
     );
 

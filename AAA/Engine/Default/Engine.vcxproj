@@ -181,6 +181,7 @@
     <ClInclude Include="..\Public\Collider.h" />
     <ClInclude Include="..\public\Collision_Manager.h" />
     <ClInclude Include="..\public\Component.h" />
+    <ClInclude Include="..\public\ComputeShader.h" />
     <ClInclude Include="..\Public\ContainerObject.h" />
     <ClInclude Include="..\Public\CustomFont.h" />
     <ClInclude Include="..\Public\DataExporter.h" />
@@ -265,6 +266,7 @@
     <ClCompile Include="..\Private\Collider.cpp" />
     <ClCompile Include="..\private\Collision_Manager.cpp" />
     <ClCompile Include="..\private\Component.cpp" />
+    <ClCompile Include="..\private\ComputeShader.cpp" />
     <ClCompile Include="..\Private\ContainerObject.cpp" />
     <ClCompile Include="..\Private\CustomFont.cpp" />
     <ClCompile Include="..\Private\DataExporter.cpp" />
@@ -331,6 +333,7 @@
     <FxCompile Include="..\ShaderFiles\Shader_Effect_Mesh.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Effect_VtxTex.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_PostProsess.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_VolumetricFog.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

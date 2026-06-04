@@ -1,4 +1,8 @@
 
+#define MAT_DEFAULT 0
+#define MAT_WATER   1
+
+
 SamplerState LinearSampler
 {
     Filter = MIN_MAG_MIP_LINEAR;

@@ -20,6 +20,7 @@ public:
 	HRESULT Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV, _bool bBindDSV);
 	HRESULT End_MRT();
 	HRESULT Bind_ShaderResource(const _wstring& strTargetTag, class CShader* pShader, const _char* pConstantName);
+	HRESULT Bind_CSShaderResource(const _wstring& strTargetTag, _uint iSlot);
 
 #ifdef _DEBUG
 public:

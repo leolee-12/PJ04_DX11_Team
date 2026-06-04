@@ -42,6 +42,7 @@
     <ClInclude Include="..\Public\Map_Defines.h" />
     <ClInclude Include="..\Public\MapStage.h" />
     <ClInclude Include="..\public\MapObject.h" />
+    <ClInclude Include="..\public\Material_Object.h" />
     <ClInclude Include="..\Public\ObjectData.h" />
     <ClInclude Include="..\Public\ResourceData.h" />
     <ClInclude Include="..\Public\Sample_MeshEffect.h" />
@@ -75,6 +76,7 @@
     <ClCompile Include="..\Private\Loader_Prototype.cpp" />
     <ClCompile Include="..\Private\MapSection.cpp" />
     <ClCompile Include="..\Private\MapStage.cpp" />
+    <ClCompile Include="..\private\Material_Object.cpp" />
     <ClCompile Include="..\Private\Sample_MeshEffect.cpp" />
     <ClCompile Include="..\private\MapObject.cpp" />
     <ClCompile Include="..\Private\MapDescriptor.cpp" />
@@ -94,6 +96,7 @@
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Map.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_MaterialTest.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl" />
   </ItemGroup>
