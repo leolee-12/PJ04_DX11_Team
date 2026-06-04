@@ -28,14 +28,29 @@ HRESULT CContainerObject::Initialize(void* pArg)
 
 void CContainerObject::Priority_Update(_float fTimeDelta)
 {
+    for (auto& Pair : m_PartObjects)
+    {
+        if (Pair.second != nullptr)
+            Pair.second->Priority_Update(fTimeDelta);
+    }
 }
 
 void CContainerObject::Update(_float fTimeDelta)
 {
+    for (auto& Pair : m_PartObjects)
+    {
+        if (Pair.second != nullptr)
+            Pair.second->Update(fTimeDelta);
+    }
 }
 
 void CContainerObject::Late_Update(_float fTimeDelta)
 {
+    for (auto& Pair : m_PartObjects)
+    {
+        if (Pair.second != nullptr)
+            Pair.second->Late_Update(fTimeDelta);
+    }
 }
 
 HRESULT CContainerObject::Render()
@@ -45,8 +60,8 @@ HRESULT CContainerObject::Render()
 
 HRESULT CContainerObject::Add_PartObject(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, const _wstring& strPartTag, void* pArg)
 {
-    auto        pPartObject = dynamic_cast<CPartObject*>(m_pGameInstance_Proxy->Clone_Prototype(PROTOTYPE::GAMEOBJECT, iPrototypeLevelIndex, strPrototypeTag, pArg));
-    if (nullptr == pPartObject)
+    auto pPartObject = dynamic_cast<CPartObject*>(m_pGameInstance_Proxy->Clone_Prototype(PROTOTYPE::GAMEOBJECT, iPrototypeLevelIndex, strPrototypeTag, pArg));
+    if (pPartObject == nullptr)
         return E_FAIL;
 
     m_PartObjects.emplace(strPartTag, pPartObject);   

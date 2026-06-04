@@ -11,6 +11,7 @@ public:
 	{
 		const _float4x4* pParentMatrix;
 	}PARTOBJECT_DESC;
+
 protected:
 	CPartObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CPartObject(const CPartObject& Prototype);

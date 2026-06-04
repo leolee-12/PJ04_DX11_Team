@@ -12,29 +12,42 @@ CAnimator::CAnimator(const CAnimator& Prototype)
 
 HRESULT CAnimator::Initialize(void* pArg)
 {
-    if (nullptr == pArg) return E_FAIL;
+    if (pArg == nullptr)
+        return E_FAIL;
+
     ANIMATOR_DESC* pDesc = static_cast<ANIMATOR_DESC*>(pArg);
     m_pModel = pDesc->pModel;
     Safe_AddRef(m_pModel);
+
     if (!pDesc->strDataFile.empty())
         Load_FromFile(pDesc->strDataFile);
+
     return S_OK;
 }
 
 // ── 재생 제어 ──
 void CAnimator::Play(const string& strAnimName, _bool bLoop, _bool bRestart, _float fBlend)
 {
-    if (nullptr == m_pModel) return;
+    if (nullptr == m_pModel)
+        return;
+
     _int iIndex = m_pModel->Get_AnimationIndex(strAnimName);
-    if (iIndex < 0) return;
+
+    if (iIndex < 0)
+        return;
+
     m_pModel->Set_AnimationIndex((_uint)iIndex, bLoop, bRestart, fBlend);
+
     m_bFinished = false;
 }
 
 void CAnimator::Seek(_float fProgress)
 {
-    if (nullptr == m_pModel) return;
+    if (nullptr == m_pModel)
+        return;
+
     m_pModel->Seek_Animation(fProgress);
+
     m_fPrevProgress = fProgress;   // 스크럽 직후 이벤트 중복발화 방지
 }
 
@@ -52,7 +65,8 @@ _float CAnimator::Get_Progress() const
 // ── Update: 재생 + 이벤트 판정 ──
 void CAnimator::Update(_float fTimeDelta)
 {
-    if (nullptr == m_pModel) return;
+    if (nullptr == m_pModel)
+        return;
 
     if (!m_bPaused)
         m_bFinished = m_pModel->Play_Animation(fTimeDelta);   // ★ 애니메이터가 단독 구동
