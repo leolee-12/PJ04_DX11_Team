@@ -147,37 +147,6 @@ PS_OUT PS_MAIN(PS_IN In)
     return Out;
 }
 
-//PS_OUT PS_MAIN(PS_IN In)
-//{
-//    PS_OUT Out;
-
-//    vector vEye = g_UnkownTexture.Sample(ClampSampler, In.vTexcoord);
-//    vector vBase = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord1);
-//    float3 vAlbedo = lerp(vBase.rgb, vEye.rgb, vEye.a);
-//    if (vBase.a < 0.1f)
-//        discard;
-
-//    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord1).rgb;
-
-   
-//    float3 N = normalize(In.vNormal);
-//    float3 T = normalize(In.vTangent.xyz);
-//    T = normalize(T - dot(T, N) * N);
-//    float3 B = cross(N, T) * In.vTangent.w;
-//    float3x3 TBN = float3x3(T, B, N);
-
-//    float2 nrg = g_NormalTexture.Sample(LinearSampler, In.vTexcoord1).rg * 2.f - 1.f;
-//    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
-//    nTS.y = -nTS.y;
-//    float3 Nw = mul(nTS, TBN);
-    
-//    Out.vDiffuse = float4(vAlbedo, vBase.a);
-//    Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
-//    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
-//    Out.vMRA = float4(mra, 1.f);
-//    return Out;
-//}
-
 PS_OUT PS_DEFFUSE(PS_IN In)
 {
     PS_OUT Out;

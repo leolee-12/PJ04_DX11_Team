@@ -31,7 +31,7 @@ Texture2D g_DiffuseTexture; // albedo (F0)
 float g_fSSRIntensity = 1.0f;
 float g_fSSRMaxDistance = 30.0f;
 float g_fSSRThickness = 0.5f;
-static const int SSR_STEPS = 32;
+static const int SSR_STEPS = 64;
 
 /* SSR 폴백용 IBL */
 TextureCube g_PrefilteredCube; // 디퍼드와 동일 큐브
@@ -297,6 +297,7 @@ float4 PS_SSR(PS_IN In) : SV_TARGET0
             float2 e = smoothstep(0.f, 0.15f, hitUV) * smoothstep(0.f, 0.15f, 1.f - hitUV);
             float edgeFade = e.x * e.y;
             conf = saturate(hit * roughFade * edgeFade * g_fSSRIntensity);
+            conf *= smoothstep(0.02f, 0.10f, roughness);
         }
     }
 

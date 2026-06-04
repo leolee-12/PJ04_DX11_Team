@@ -624,6 +624,13 @@ void CImGui_Manager::Draw_Inspector()
                 Draw_Transform(pPart, strTag);
                 ImGui::Separator();
                 Draw_Properties(pPart);
+
+                // 파트 오브젝트의 애니메이터 노출
+                auto pPartModel = pPart->Get_Component<CModel>(TEXT("Com_Model"));
+                auto pPartAnimator = pPart->Get_Component<CAnimator>(TEXT("Com_Animator"));
+                if (pPartModel && pPartAnimator)
+                    Draw_AnimatorEditor(pPartModel, pPartAnimator);
+
                 ImGui::PopID();
             }
         }
@@ -1131,51 +1138,50 @@ void CImGui_Manager::Draw_AnimatorEditor(CModel* pModel, CAnimator* pAnimator)
     if (!pModel || !pAnimator) return;
     if (!ImGui::CollapsingHeader("Animator", ImGuiTreeNodeFlags_DefaultOpen)) return;
 
-    static int   s_iSel = 0, s_iPrevSel = -1;
-    static bool  s_bPlay = true, s_bLoop = true;
-    static float s_fPreview = 0.f;
+    // 애니메이터(파트 포함)마다 독립 상태 유지
+    struct ANIM_UI_STATE { int iSel = 0, iPrevSel = -1; bool bPlay = true, bLoop = true; float fPreview = 0.f; };
+    static unordered_map<CAnimator*, ANIM_UI_STATE> s_States;
+    ANIM_UI_STATE& st = s_States[pAnimator];
 
     _uint iMax = pModel->Get_MaxAnimationIndex();
-    if (s_iSel > (int)iMax) s_iSel = 0;
-    string strName = pModel->Get_AnimationName((_uint)s_iSel);
+    if (st.iSel > (int)iMax) st.iSel = 0;
+    string strName = pModel->Get_AnimationName((_uint)st.iSel);
 
     if (ImGui::BeginCombo("Animation", strName.c_str()))
     {
         for (_uint i = 0; i <= iMax; ++i)
-            if (ImGui::Selectable(pModel->Get_AnimationName(i).c_str(), (_uint)s_iSel == i))
-                s_iSel = (int)i;
+            if (ImGui::Selectable(pModel->Get_AnimationName(i).c_str(), (_uint)st.iSel == i))
+                st.iSel = (int)i;
         ImGui::EndCombo();
     }
 
-    ImGui::Checkbox("Play", &s_bPlay); ImGui::SameLine();
-    ImGui::Checkbox("Loop", &s_bLoop);
+    ImGui::Checkbox("Play", &st.bPlay); ImGui::SameLine();
+    ImGui::Checkbox("Loop", &st.bLoop);
 
-    // 선택 변경 시에만 전환 (애니메이터 API)
-    if (s_iSel != s_iPrevSel)
+    if (st.iSel != st.iPrevSel)
     {
-        pAnimator->Play(strName, s_bLoop, true, 0.f);
-        s_iPrevSel = s_iSel; s_fPreview = 0.f;
+        pAnimator->Play(strName, st.bLoop, true, 0.f);
+        st.iPrevSel = st.iSel; st.fPreview = 0.f;
     }
 
-    if (s_bPlay)
+    if (st.bPlay)
     {
         pAnimator->Resume();
-        pAnimator->Play(strName, s_bLoop, false, 0.f);          // 루프 플래그만 유지
-        pAnimator->Update(ImGui::GetIO().DeltaTime);            // ★ 에디터가 단독 구동
-        s_fPreview = pAnimator->Get_Progress();
-        ImGui::SliderFloat("Preview", &s_fPreview, 0.f, 1.f);
+        pAnimator->Play(strName, st.bLoop, false, 0.f);
+        pAnimator->Update(ImGui::GetIO().DeltaTime);
+        st.fPreview = pAnimator->Get_Progress();
+        ImGui::SliderFloat("Preview", &st.fPreview, 0.f, 1.f);
     }
     else
     {
         pAnimator->Pause();
-        if (ImGui::SliderFloat("Preview", &s_fPreview, 0.f, 1.f))
-            pAnimator->Seek(s_fPreview);
+        if (ImGui::SliderFloat("Preview", &st.fPreview, 0.f, 1.f))
+            pAnimator->Seek(st.fPreview);
     }
 
-    // ── 이벤트 편집 ──
     ANIM_EVENT_TRACK& track = pAnimator->Get_Track(strName);
     if (ImGui::Button("+ Add Event"))
-        track.Events.push_back({ (int)EANIM_EVENT::Fx, s_fPreview });
+        track.Events.push_back({ (int)EANIM_EVENT::Fx, st.fPreview });
 
     for (int i = 0; i < (int)track.Events.size(); ++i)
     {
