@@ -639,6 +639,14 @@ HRESULT CGameInstance_Proxy::Bind_RT_ShaderResource(const _wstring& strTargetTag
 	return m_pOwner->m_pTarget_Manager->Bind_ShaderResource(strTargetTag, pShader, pConstantName);
 }
 
+HRESULT CGameInstance_Proxy::Bind_RT_CSResource(const _wstring& strTargetTag, _uint iSlot)
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->m_pTarget_Manager->Bind_CSShaderResource(strTargetTag, iSlot);
+}
+
 #ifdef _DEBUG
 HRESULT CGameInstance_Proxy::Ready_RT_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
 {
@@ -780,6 +788,13 @@ vector<GLOBAL_DESC>& CGameInstance_Proxy::Get_ShaderGlobals()
 	}
 	
 	return m_pOwner->m_pShaderGlobal_Manager->Get_All();
+}
+const _float4* CGameInstance_Proxy::Get_ShaderGlobal(const string& strName) const
+{
+	if (!IsConnected())
+		return nullptr;
+
+	return m_pOwner->m_pShaderGlobal_Manager->Get(strName);
 }
 #pragma endregion
 

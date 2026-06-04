@@ -6,14 +6,16 @@
 NS_BEGIN(Engine)
 class CShader;
 class CModel;
-class CAnimator;
 NS_END
 
 NS_BEGIN(Client)
 
-class CTestMarb1e final : public CGameObject
+class CMaterial_Object final : public CGameObject
 {
-	GENERATED_BODY(CTestMarb1e)
+	GENERATED_BODY(CMaterial_Object)
+	PROPERTY(_float4, m_vAlbedo, L"AlbedoColor(RGBA)", L"Color")
+	PROPERTY(_float4, m_vEmissiveColor, L"EmissiveColor(RGBA)", L"Color")
+	PROPERTY(_float3, m_vMRA, L"MRA(Metalness, Roughness, AO)", L"Material")
 
 public:
 	typedef struct tagMonsterDesc : public CGameObject::GAMEOBJECT_DESC
@@ -21,12 +23,12 @@ public:
 
 	}MONSTER_DESC;
 
-	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_TestMarb1e";
+	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_MaterialObject";
 
 protected:
-	CTestMarb1e(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CTestMarb1e(const CTestMarb1e& Prototype);
-	virtual ~CTestMarb1e() = default;
+	CMaterial_Object(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CMaterial_Object(const CMaterial_Object& Prototype);
+	virtual ~CMaterial_Object() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -44,8 +46,6 @@ public:
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
-	CAnimator* m_pAnimatorCom = { nullptr };
-
 
 private:
 	virtual HRESULT Ready_Events() override { return S_OK; }
@@ -53,7 +53,7 @@ private:
 	HRESULT Bind_ShaderResources();
 
 public:
-	static CTestMarb1e* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CMaterial_Object* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free();
 };

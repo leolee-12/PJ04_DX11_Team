@@ -12,13 +12,12 @@ Texture2D g_DepthTexture; // (z/w, viewZ/500, ...)
 Texture2D g_MRATexture; // r=metallic, g=roughness, b=ao
 Texture2D g_LightTexture; // HDR 광량 누적 (Combine 입력)
 Texture2D g_LightDepthTexture; // 그림자맵
+Texture2D g_EmissiveTexture; // 이미시브
 
 vector g_vCamPosition;
 
 TextureCube g_IrradianceCube; // Diffuse_Cube.dds
-TextureCube g_PrefilteredCube; // Specular_Cube.dds (mip=roughness)
 float g_fIBLIntensity = 1.f;
-int g_iSpecularMip = 1.f;
 
   /* Light */
 vector g_vLightDir;
@@ -30,6 +29,11 @@ vector g_vLightSpecular;
 
 /* SSAO */
 Texture2D g_SSAOTexture; // SSAO 블러 결과
+
+// 볼류메트릭 포그
+Texture3D g_FogVolume; // 적분된 froxel (rgb=inScatter, a=transmittance)
+float4 g_vFogDepthParams;
+float g_fFogEnable;
 
   /* Combine 전용 앰비언트 (바인딩 안 해도 기본값 사용) */
 vector g_vAmbientColor = float4(0.15f, 0.15f, 0.18f, 1.f);
@@ -96,13 +100,13 @@ float3 Fresnel_Rough(float3 F0, float cosT, float rough)
     float3 Fr = max((1.f - rough).xxx, F0);
     return F0 + (Fr - F0) * pow(1.f - cosT, 5.f);
 }
-float2 EnvBRDFApprox(float rough, float NdotV)   // BRDF LUT 불필요
+
+// 픽셀 뷰공간 성형깊이 복원용
+float ViewZFromDepth(float2 uv, float ndcZ)
 {
-    const float4 c0 = float4(-1.f, -0.0275f, -0.572f, 0.022f);
-    const float4 c1 = float4(1.f, 0.0425f, 1.04f, -0.04f);
-    float4 r = rough * c0 + c1;
-    float a004 = min(r.x * r.x, exp2(-9.28f * NdotV)) * r.x + r.y;
-    return float2(-1.04f, 1.04f) * a004 + r.zw;
+    float4 p = float4(uv.x * 2.f - 1.f, uv.y * -2.f + 1.f, ndcZ, 1.f);
+    p = mul(p, g_ProjMatrixInverse);
+    return p.z / p.w;
 }
 
 // 복원헬퍼
@@ -208,16 +212,12 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     float3 kS = Fresnel_Rough(F0, NdotV, roughness);
     float3 kD = (1.f - kS) * (1.f - metallic);
 
-    float3 irradiance = g_IrradianceCube.Sample(LinearSampler, N).rgb; // BC6H=선형HDR, 감마해제X
+    float3 irradiance = g_IrradianceCube.Sample(LinearSampler, N).rgb;
     float3 diffuseIBL = irradiance * albedoA.rgb * kD;
 
-    float3 R = reflect(-V, N);
-    float3 prefiltered = g_PrefilteredCube.SampleLevel(LinearSampler, R, roughness * (g_iSpecularMip - 1)).rgb;
-    float2 envBRDF = EnvBRDFApprox(roughness, NdotV);
-    float3 specularIBL = prefiltered * (F0 * envBRDF.x + envBRDF.y);
-
+      // 스펙큘러 IBL은 SSR 패스로 이전 (반사 중복 제거 + SSR 폴백)
     float ssao = g_SSAOTexture.Sample(LinearSampler, In.vTexcoord).r;
-    float3 ambient = (diffuseIBL + specularIBL) * ao * ssao * g_fIBLIntensity;
+    float3 ambient = diffuseIBL * ao * ssao * g_fIBLIntensity;
     float3 color = light + ambient;
 
       /* 그림자 */
@@ -230,6 +230,20 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     float sd = g_LightDepthTexture.Sample(BorderSampler, suv).r;
     if (pz <= 1.f && pz - 0.002f > sd)
         color *= 0.5f;
+    
+    float3 emissive = g_EmissiveTexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    color += emissive;
+    
+    /* 볼류메트릭 포그 (froxel) */
+    if (g_fFogEnable > 0.5f)
+    {
+        float fogViewZ = ViewZFromDepth(In.vTexcoord, ddA.x);
+        float fogW = log(max(fogViewZ, g_vFogDepthParams.x) / g_vFogDepthParams.x)
+                     / log(g_vFogDepthParams.y / g_vFogDepthParams.x);
+        fogW = saturate(fogW);
+        float4 fog = g_FogVolume.SampleLevel(ClampSampler, float3(In.vTexcoord, fogW), 0);
+        color = color * fog.a + fog.rgb;
+    }
 
     return float4(color, 1.f);
 }

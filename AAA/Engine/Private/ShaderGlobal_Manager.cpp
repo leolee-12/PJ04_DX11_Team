@@ -13,6 +13,21 @@ HRESULT CShaderGlobal_Manager::Initialize()
     Register({ "g_fSSAOPower",      "SSAO Power",      GVAL::FLOAT, { 1.8f,   0.f, 0.f, 0.f }, { 0.5f, 4.f } });
     Register({ "g_fThreshold",      "Bloom Threshold", GVAL::FLOAT, { 1.f,    0.f, 0.f, 0.f }, { 0.f,  5.f } });
     Register({ "g_fBloomIntensity", "Bloom Intensity", GVAL::FLOAT, { 1.f,    0.f, 0.f, 0.f }, { 0.f,  3.f } });
+
+    Register({ "g_fSSRIntensity",   "SSR Intensity",   GVAL::FLOAT, { 1.0f,  0.f, 0.f, 0.f }, { 0.f,  3.f } });
+    Register({ "g_fSSRMaxDistance", "SSR MaxDistance", GVAL::FLOAT, { 30.0f, 0.f, 0.f, 0.f }, { 1.f, 100.f } });
+    Register({ "g_fSSRThickness",   "SSR Thickness",   GVAL::FLOAT, { 0.5f,  0.f, 0.f, 0.f }, { 0.05f, 5.f } });
+
+    Register({ "g_fFogDensity",        "Fog Density",        GVAL::FLOAT,  { 0.04f, 0.f, 0.f, 0.f }, { 0.f, 0.3f } });
+    Register({ "g_vFogColor",          "Fog Color",          GVAL::FLOAT3, { 0.70f, 0.80f, 1.00f, 0.f }, { 0.f, 1.f } });
+    Register({ "g_fFogFar",            "Fog Far",            GVAL::FLOAT,  { 80.0f, 0.f, 0.f, 0.f }, { 5.f, 200.f } });
+    Register({ "g_fFogHeightFalloff",  "Fog HeightFalloff",  GVAL::FLOAT,  { 0.04f, 0.f, 0.f, 0.f }, { 0.f, 0.5f } });
+    Register({ "g_fFogBaseHeight",     "Fog BaseHeight",     GVAL::FLOAT,  { 0.00f, 0.f, 0.f, 0.f }, { -50.f, 50.f } });
+    Register({ "g_fFogAnisotropy",     "Fog Anisotropy",     GVAL::FLOAT,  { 0.60f, 0.f, 0.f, 0.f }, { -0.9f, 0.9f } });
+    Register({ "g_fFogAmbient",        "Fog Ambient",        GVAL::FLOAT,  { 0.02f, 0.f, 0.f, 0.f }, { 0.f, 0.5f } });
+    Register({ "g_fFogShadowStrength", "Fog ShadowStrength", GVAL::FLOAT,  { 1.00f, 0.f, 0.f, 0.f }, { 0.f, 1.f } });
+
+    Register({ "g_fFogEnable",          "Fog Enable",        GVAL::BOOL,   { 0.f, 0.f, 0.f, 0.f }, { 0.f, 1.f } });
     // 향후: 포그 색(FLOAT3)/밀도, IBL 강도 등. (IBL 강도는 현재 Environment_Manager 소관이라 옮길지 결정 후)
 
     return S_OK;
@@ -75,6 +90,7 @@ _uint CShaderGlobal_Manager::Type_Size(GVAL eType) const
         case GVAL::FLOAT2: return sizeof(_float2);
         case GVAL::FLOAT3: return sizeof(_float3);
         case GVAL::FLOAT4: return sizeof(_float4);
+        case GVAL::BOOL:   return sizeof(_float);
     }
     return sizeof(_float4);
 }

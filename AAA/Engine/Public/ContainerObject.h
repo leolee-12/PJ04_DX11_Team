@@ -8,6 +8,11 @@ class CPartObject;
 
 class ENGINE_DLL CContainerObject abstract : public CGameObject
 {
+public:
+	typedef struct tagContainerObjectDesc : public CGameObject::GAMEOBJECT_DESC
+	{
+	}COTAINEROBJECT_DESC;
+
 protected:
 	CContainerObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CContainerObject(const CContainerObject& Prototype);

@@ -13,6 +13,7 @@ class CGameInstance_Proxy;
 class CVIBuffer_Rect;
 class CShader;
 class CComponent;
+class CComputeShader;
 
 class CRenderer final : public CBase
 {
@@ -63,13 +64,34 @@ private:
 	_uint					m_iRTWidth = {};  
 	_uint					m_iRTHeight = {};
 
+	// 볼류메트릭포그
+
+	CComputeShader* m_pCSInject = { nullptr };
+	CComputeShader* m_pCSIntegrate = { nullptr };
+	ID3D11Buffer* m_pFroxelCB = { nullptr };
+
+	ID3D11Texture3D* m_pScatterTex = { nullptr };
+	ID3D11UnorderedAccessView* m_pScatterUAV = { nullptr };
+	ID3D11ShaderResourceView* m_pScatterSRV = { nullptr };
+
+	ID3D11Texture3D* m_pIntegTex = { nullptr };
+	ID3D11UnorderedAccessView* m_pIntegUAV = { nullptr };
+	ID3D11ShaderResourceView* m_pIntegSRV = { nullptr };
+
+	//froxel
+	ID3D11SamplerState*		m_pShadowSampler = { nullptr };
+	_float                  m_fFogTime = { 0.f };
+
+
 private:
 	HRESULT Render_Priority();
 	HRESULT Render_Shadow();
 	HRESULT Render_NonBlend();
 	HRESULT Render_SSAO();
 	HRESULT Render_Lights();
+	HRESULT Render_VolumetricFog();
 	HRESULT Render_Combined();
+	HRESULT Render_SSR();
 	HRESULT Render_Bloom();
 
 	HRESULT Render_NonLight();
@@ -83,6 +105,7 @@ private:
 
 private:
 	HRESULT Ready_DepthStencil_Buffer();
+	HRESULT Ready_Froxel_Volumes();
 	HRESULT Change_ViewportDesc(_uint iWidth, _uint iHeight);
 
 #ifdef _DEBUG

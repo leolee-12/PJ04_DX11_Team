@@ -7,14 +7,12 @@
 
 CTestMarb1e::CTestMarb1e(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
-    , m_iAnimationIndex{ 0 }
 {
 
 }
 
 CTestMarb1e::CTestMarb1e(const CTestMarb1e& Prototype)
     : CGameObject(Prototype)
-    , m_iAnimationIndex{ Prototype.m_iAnimationIndex }
 {
 
 }
@@ -44,8 +42,8 @@ void CTestMarb1e::Priority_Update(_float fTimeDelta)
 void CTestMarb1e::Update(_float fTimeDelta)
 {
     /*if (m_pGameInstance_Proxy->Is_EditMode())
-        return;*/
-    /*m_pAnimatorCom->Play("Attack", true);
+        return;
+    m_pAnimatorCom->Play("Catch", true);
 
     m_pAnimatorCom->Update(fTimeDelta);*/
 }

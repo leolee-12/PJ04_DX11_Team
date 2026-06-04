@@ -60,6 +60,26 @@ namespace Engine
 		XMFLOAT2 vRange = { 0.f, 1.f };    // 에디터 슬라이더 min/max
 	};
 
+	static const unsigned int FROXEL_W = 160;
+	static const unsigned int FROXEL_H = 90;
+	static const unsigned int FROXEL_D = 64;
+
+	typedef struct tagFroxelCB
+	{
+		XMFLOAT4X4 mCamViewInv;
+		XMFLOAT4X4 mCamProjInv;
+		XMFLOAT4X4 mShadowView;
+		XMFLOAT4X4 mShadowProj;
+
+		XMFLOAT4 vCamPos;       
+		XMFLOAT4 vLightDir;     
+		XMFLOAT4 vLightColor;   
+		XMFLOAT4 vFogScatter;   
+		XMFLOAT4 vFogParams;    
+		XMFLOAT4 vFogParams2;   
+		XMFLOAT4 vGridParams;   
+	}FROXEL_CB;
+
 	typedef struct tagAnimEvent
 	{
 		int         iEventType = 0;          // 의미는 클라이언트 enum(EANIM_EVENT)이 결정

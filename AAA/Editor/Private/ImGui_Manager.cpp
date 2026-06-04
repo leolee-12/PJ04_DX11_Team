@@ -624,6 +624,13 @@ void CImGui_Manager::Draw_Inspector()
                 Draw_Transform(pPart, strTag);
                 ImGui::Separator();
                 Draw_Properties(pPart);
+
+                // 파트 오브젝트의 애니메이터 노출
+                auto pPartModel = pPart->Get_Component<CModel>(TEXT("Com_Model"));
+                auto pPartAnimator = pPart->Get_Component<CAnimator>(TEXT("Com_Animator"));
+                if (pPartModel && pPartAnimator)
+                    Draw_AnimatorEditor(pPartModel, pPartAnimator);
+
                 ImGui::PopID();
             }
         }
@@ -681,89 +688,110 @@ void CImGui_Manager::Draw_Inspector()
 
 void CImGui_Manager::Draw_Properties(IReflectable* pHolder)
 {
-    string strCurrentCategory = {};
+    // 카테고리별로 프로퍼티를 모음 (최초 등장 순서 유지)
+    vector<string>                                  vecOrder;
+    unordered_map<string, vector<const FPROPERTY*>> mapByCategory;
 
     for (auto& prop : pHolder->Get_Properties())
     {
-        const string strPropCategory = WstrToStr(prop.strCategory);
-        if (strPropCategory != strCurrentCategory)
+        const string strCat = WstrToStr(prop.strCategory);
+        if (mapByCategory.find(strCat) == mapByCategory.end())
+            vecOrder.push_back(strCat);
+        mapByCategory[strCat].push_back(&prop);
+    }
+
+    for (auto& strCategory : vecOrder)
+    {
+        // 카테고리 이름이 비어 있으면 헤더 없이 그대로 출력
+        if (strCategory.empty())
         {
-            strCurrentCategory = strPropCategory;
-            ImGui::Text("[%s]", strCurrentCategory.c_str());
+            for (auto* pProp : mapByCategory[strCategory])
+                Draw_Property(pHolder, *pProp);
+            continue;
         }
 
-        void* pData = pHolder->Get_PropertyPtr(prop.uOffset);
-        if (!pData) continue;
-
-        string strPropName = WstrToStr(prop.strName);
-
-		switch (prop.eType)
-		{
-			case PROP_TYPE::INT:
-			{
-				ImGui::Text(strPropName.c_str());
-				ImGui::InputInt(("##" + strPropName).c_str(), (int*)pData);
-				break;
-			}
-			case PROP_TYPE::FLOAT:
-				ImGui::Text(strPropName.c_str());
-				ImGui::DragFloat(("##" + strPropName).c_str(), (float*)pData, 0.1f);
-				break;
-			case PROP_TYPE::BOOL:
-			{
-				ImGui::Text(strPropName.c_str());
-				ImGui::Checkbox(("##" + strPropName).c_str(), (bool*)pData);
-				break;
-			}
-			case PROP_TYPE::FLOAT2:
-			{
-				ImGui::Text(strPropName.c_str());
-				ImGui::DragFloat2(("##" + strPropName).c_str(), (float*)pData, 0.1f);
-				break;
-			}
-			case PROP_TYPE::FLOAT3:
-			{
-				ImGui::Text(strPropName.c_str());
-				ImGui::DragFloat3(("##" + strPropName).c_str(), (float*)pData, 0.1f);
-				break;
-			}
-			case PROP_TYPE::FLOAT4:
-			{
-				ImGui::Text(strPropName.c_str());
-				ImGui::DragFloat4(("##" + strPropName).c_str(), (float*)pData, 0.1f);
-				break;
-			}
-			case PROP_TYPE::ANIM_INDEX:
-			{
-				int iVal = (int)*((_uint*)pData);
-                CGameObject* pObject = dynamic_cast<CGameObject*>(pHolder);
-                CModel* pModel = pObject ? pObject->Get_Component<CModel>(L"Com_Model") : nullptr;
-				if (!pModel) break;
-				_uint iNumAnims = pModel->Get_MaxAnimationIndex() + 1;
-				string strItems;
-				for (_uint i = 0; i < iNumAnims; ++i)
-					strItems += to_string(i) + ": " + pModel->Get_AnimationName(i) + '\0';
-				strItems += '\0'; // 종료
-
-				ImGui::Text(strPropName.c_str());
-				ImGui::PushID(strPropName.c_str());
-				if (ImGui::Combo(("##" + strPropName).c_str(), &iVal, strItems.c_str()))
-					*(_uint*)pData = (_uint)iVal;
-				ImGui::PopID();
-				break;
-			}
-			case PROP_TYPE::WSTRING:
-			{
-				wstring* pWstr = (wstring*)pData;
-				string str = WstrToStr(*pWstr);
-				char buf[256] = {};
-				strcpy_s(buf, str.c_str());
-				if (ImGui::InputText(("##" + strPropName).c_str(), buf, sizeof(buf)))
-					*pWstr = StrToWstr(buf);
-				break;
-			}
-		}
+        // 폴더처럼 접히는 카테고리 헤더 (기본 펼침)
+        if (ImGui::CollapsingHeader(strCategory.c_str()))
+        {
+            ImGui::Indent();
+            for (auto* pProp : mapByCategory[strCategory])
+                Draw_Property(pHolder, *pProp);
+            ImGui::Unindent();
+        }
     }
+}
+
+void CImGui_Manager::Draw_Property(IReflectable* pHolder, const FPROPERTY& prop)
+{
+    void* pData = pHolder->Get_PropertyPtr(prop.uOffset);
+    if (!pData) return;
+
+    string strPropName = WstrToStr(prop.strName);
+    string strID = "##" + to_string(prop.uOffset);   // 고유 ID
+
+    // 이름이 10글자를 넘으면 기존처럼 위에, 아니면 위젯 오른쪽에 표시
+    bool bLabelAbove = prop.strName.length() > 10;
+    if (bLabelAbove)
+        ImGui::Text(strPropName.c_str());
+
+    // 위에 띄웠으면 숨김 라벨(ID만), 아니면 이름+ID
+    string strLabel = bLabelAbove ? strID : (strPropName + strID);
+
+    switch (prop.eType)
+    {
+        case PROP_TYPE::INT:
+            ImGui::InputInt(strLabel.c_str(), (int*)pData);
+            break;
+        case PROP_TYPE::UINT:
+        {
+            int v = (int)(*(_uint*)pData);
+            if (ImGui::InputInt(strLabel.c_str(), &v))
+                *(_uint*)pData = (_uint)(v < 0 ? 0 : v);
+            break;
+        }
+        case PROP_TYPE::FLOAT:
+            ImGui::DragFloat(strLabel.c_str(), (float*)pData, 0.1f);
+            break;
+        case PROP_TYPE::BOOL:
+            ImGui::Checkbox(strLabel.c_str(), (bool*)pData);
+            break;
+        case PROP_TYPE::FLOAT2:
+            ImGui::DragFloat2(strLabel.c_str(), (float*)pData, 0.1f);
+            break;
+        case PROP_TYPE::FLOAT3:
+            ImGui::DragFloat3(strLabel.c_str(), (float*)pData, 0.1f);
+            break;
+        case PROP_TYPE::FLOAT4:
+            ImGui::DragFloat4(strLabel.c_str(), (float*)pData, 0.1f);
+            break;
+        case PROP_TYPE::ANIM_INDEX:
+        {
+            int iVal = (int)*((_uint*)pData);
+            CGameObject* pObject = dynamic_cast<CGameObject*>(pHolder);
+            CModel* pModel = pObject ? pObject->Get_Component<CModel>(L"Com_Model") : nullptr;
+            if (!pModel) break;
+            _uint iNumAnims = pModel->Get_MaxAnimationIndex() + 1;
+            string strItems;
+            for (_uint i = 0; i < iNumAnims; ++i)
+                strItems += to_string(i) + ": " + pModel->Get_AnimationName(i) + '\0';
+            strItems += '\0';
+
+            if (ImGui::Combo(strLabel.c_str(), &iVal, strItems.c_str()))
+                *(_uint*)pData = (_uint)iVal;
+            break;
+        }
+        case PROP_TYPE::WSTRING:
+        {
+            wstring* pWstr = (wstring*)pData;
+            string str = WstrToStr(*pWstr);
+            char buf[256] = {};
+            strcpy_s(buf, str.c_str());
+            if (ImGui::InputText(strLabel.c_str(), buf, sizeof(buf)))
+                *pWstr = StrToWstr(buf);
+            break;
+        }
+    }
+    ImGui::Separator();
 }
 
 void CImGui_Manager::Draw_Palette()
@@ -1110,51 +1138,50 @@ void CImGui_Manager::Draw_AnimatorEditor(CModel* pModel, CAnimator* pAnimator)
     if (!pModel || !pAnimator) return;
     if (!ImGui::CollapsingHeader("Animator", ImGuiTreeNodeFlags_DefaultOpen)) return;
 
-    static int   s_iSel = 0, s_iPrevSel = -1;
-    static bool  s_bPlay = true, s_bLoop = true;
-    static float s_fPreview = 0.f;
+    // 애니메이터(파트 포함)마다 독립 상태 유지
+    struct ANIM_UI_STATE { int iSel = 0, iPrevSel = -1; bool bPlay = true, bLoop = true; float fPreview = 0.f; };
+    static unordered_map<CAnimator*, ANIM_UI_STATE> s_States;
+    ANIM_UI_STATE& st = s_States[pAnimator];
 
     _uint iMax = pModel->Get_MaxAnimationIndex();
-    if (s_iSel > (int)iMax) s_iSel = 0;
-    string strName = pModel->Get_AnimationName((_uint)s_iSel);
+    if (st.iSel > (int)iMax) st.iSel = 0;
+    string strName = pModel->Get_AnimationName((_uint)st.iSel);
 
     if (ImGui::BeginCombo("Animation", strName.c_str()))
     {
         for (_uint i = 0; i <= iMax; ++i)
-            if (ImGui::Selectable(pModel->Get_AnimationName(i).c_str(), (_uint)s_iSel == i))
-                s_iSel = (int)i;
+            if (ImGui::Selectable(pModel->Get_AnimationName(i).c_str(), (_uint)st.iSel == i))
+                st.iSel = (int)i;
         ImGui::EndCombo();
     }
 
-    ImGui::Checkbox("Play", &s_bPlay); ImGui::SameLine();
-    ImGui::Checkbox("Loop", &s_bLoop);
+    ImGui::Checkbox("Play", &st.bPlay); ImGui::SameLine();
+    ImGui::Checkbox("Loop", &st.bLoop);
 
-    // 선택 변경 시에만 전환 (애니메이터 API)
-    if (s_iSel != s_iPrevSel)
+    if (st.iSel != st.iPrevSel)
     {
-        pAnimator->Play(strName, s_bLoop, true, 0.f);
-        s_iPrevSel = s_iSel; s_fPreview = 0.f;
+        pAnimator->Play(strName, st.bLoop, true, 0.f);
+        st.iPrevSel = st.iSel; st.fPreview = 0.f;
     }
 
-    if (s_bPlay)
+    if (st.bPlay)
     {
         pAnimator->Resume();
-        pAnimator->Play(strName, s_bLoop, false, 0.f);          // 루프 플래그만 유지
-        pAnimator->Update(ImGui::GetIO().DeltaTime);            // ★ 에디터가 단독 구동
-        s_fPreview = pAnimator->Get_Progress();
-        ImGui::SliderFloat("Preview", &s_fPreview, 0.f, 1.f);
+        pAnimator->Play(strName, st.bLoop, false, 0.f);
+        pAnimator->Update(ImGui::GetIO().DeltaTime);
+        st.fPreview = pAnimator->Get_Progress();
+        ImGui::SliderFloat("Preview", &st.fPreview, 0.f, 1.f);
     }
     else
     {
         pAnimator->Pause();
-        if (ImGui::SliderFloat("Preview", &s_fPreview, 0.f, 1.f))
-            pAnimator->Seek(s_fPreview);
+        if (ImGui::SliderFloat("Preview", &st.fPreview, 0.f, 1.f))
+            pAnimator->Seek(st.fPreview);
     }
 
-    // ── 이벤트 편집 ──
     ANIM_EVENT_TRACK& track = pAnimator->Get_Track(strName);
     if (ImGui::Button("+ Add Event"))
-        track.Events.push_back({ (int)EANIM_EVENT::Fx, s_fPreview });
+        track.Events.push_back({ (int)EANIM_EVENT::Fx, st.fPreview });
 
     for (int i = 0; i < (int)track.Events.size(); ++i)
     {
@@ -1219,6 +1246,13 @@ void CImGui_Manager::Draw_ShaderGlobals()
                 case GVAL::FLOAT4:
                     ImGui::SliderFloat4(g.strLabel.c_str(), &g.vValue.x, g.vRange.x, g.vRange.y);
                     break;
+                case GVAL::BOOL:
+                {
+                    bool b = (g.vValue.x > 0.5f);
+                    if (ImGui::Checkbox(g.strLabel.c_str(), &b))
+                        g.vValue.x = b ? 1.f : 0.f;
+                    break;
+                }
             }
 
             ImGui::PopID();
