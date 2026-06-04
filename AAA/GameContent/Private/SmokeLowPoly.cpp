@@ -1,31 +1,31 @@
-#include "SmokeSphereOriginal.h"
+#include "SmokeLowPoly.h"
 
 #include "GameInstance.h"
 
 #include "GameContent_const.h"
 
-CSmokeSphereOriginal::CSmokeSphereOriginal(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSmokeLowPoly::CSmokeLowPoly(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Mesh{ pDevice, pContext }
 {
 }
 
-CSmokeSphereOriginal::CSmokeSphereOriginal(const CSmokeSphereOriginal& Prototype)
+CSmokeLowPoly::CSmokeLowPoly(const CSmokeLowPoly& Prototype)
     : CEffect_Mesh(Prototype)
 {
 }
 
-HRESULT CSmokeSphereOriginal::Initialize_Prototype()
+HRESULT CSmokeLowPoly::Initialize_Prototype()
 {
     m_eProjType = PROJ_TYPE::PERSPEC;
     return S_OK;
 }
 
-HRESULT CSmokeSphereOriginal::Initialize(void* pArg)
+HRESULT CSmokeLowPoly::Initialize(void* pArg)
 {
-    SMOKE_SPHERE_ORIGIANL_DESC tDesc{};
+    SMOKE_LOW_POLY_DESC tDesc{};
 
     tDesc.iModelLevel = ETOUI(LEVEL::GAMEPLAY);
-    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_SmokeSphereOriginal");
+    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_SmokeLowPoly");
 
     tDesc.bUseDiffuseTexture = false;
     tDesc.bUseUnKnownTexture = true;
@@ -43,60 +43,60 @@ HRESULT CSmokeSphereOriginal::Initialize(void* pArg)
     //tDesc.wstrShaderTag = L"";
 
     if (FAILED(__super::Initialize(&tDesc)))
-        return E_FAIL;   
+        return E_FAIL;
 
     return S_OK;
 }
 
-void CSmokeSphereOriginal::Priority_Update(_float fTimeDelta)
+void CSmokeLowPoly::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 }
 
-void CSmokeSphereOriginal::Update(_float fTimeDelta)
+void CSmokeLowPoly::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 }
 
-void CSmokeSphereOriginal::Late_Update(_float fTimeDelta)
+void CSmokeLowPoly::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 }
 
-HRESULT CSmokeSphereOriginal::Render()
+HRESULT CSmokeLowPoly::Render()
 {
     __super::Render();
 
     return S_OK;
 }
 
-CSmokeSphereOriginal* CSmokeSphereOriginal::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSmokeLowPoly* CSmokeLowPoly::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CSmokeSphereOriginal* pInstance = new CSmokeSphereOriginal(pDevice, pContext);
+    CSmokeLowPoly* pInstance = new CSmokeLowPoly(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX("Failed to Created: CSmokeSphereOriginal");
+        MSG_BOX("Failed to Created: CSmokeLowPoly");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CSmokeSphereOriginal::Clone(void* pArg)
+CGameObject* CSmokeLowPoly::Clone(void* pArg)
 {
-    CSmokeSphereOriginal* pInstance = new CSmokeSphereOriginal(*this);
+    CSmokeLowPoly* pInstance = new CSmokeLowPoly(*this);
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Cloned: CSmokeSphereOriginal");
+        MSG_BOX("Failed to Cloned: CSmokeLowPoly");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CSmokeSphereOriginal::Free()
+void CSmokeLowPoly::Free()
 {
     __super::Free();
 }
