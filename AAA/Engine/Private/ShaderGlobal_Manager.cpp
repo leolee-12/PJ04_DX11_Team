@@ -28,6 +28,12 @@ HRESULT CShaderGlobal_Manager::Initialize()
     Register({ "g_fFogShadowStrength", "Fog ShadowStrength", GVAL::FLOAT,  { 1.00f, 0.f, 0.f, 0.f }, { 0.f, 1.f } });
 
     Register({ "g_fFogEnable",          "Fog Enable",        GVAL::BOOL,   { 0.f, 0.f, 0.f, 0.f }, { 0.f, 1.f } });
+
+    Register({ "g_fDoFEnable",    "DoF Enable",     GVAL::BOOL,  { 0.f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
+    Register({ "g_fFocusDist",    "DoF FocusDist",  GVAL::FLOAT, { 12.f, 0.f, 0.f, 0.f }, { 0.5f, 100.f } });
+    Register({ "g_fFocusRange",   "DoF FocusRange", GVAL::FLOAT, { 8.f,  0.f, 0.f, 0.f }, { 0.5f, 60.f } });
+    Register({ "g_fDoFMaxCoC",    "DoF MaxBlur",    GVAL::FLOAT, { 12.f, 0.f, 0.f, 0.f }, { 1.f, 40.f } });
+    Register({ "g_fDoFAutoFocus", "DoF AutoFocus",  GVAL::BOOL,  { 1.f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
     // 향후: 포그 색(FLOAT3)/밀도, IBL 강도 등. (IBL 강도는 현재 Environment_Manager 소관이라 옮길지 결정 후)
 
     return S_OK;

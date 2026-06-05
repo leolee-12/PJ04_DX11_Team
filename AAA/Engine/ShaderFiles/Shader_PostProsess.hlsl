@@ -33,11 +33,20 @@ float g_fSSRMaxDistance = 30.0f;
 float g_fSSRThickness = 0.5f;
 static const int SSR_STEPS = 64;
 
+// DoF
+float g_fDoFEnable = 0.f;
+float g_fFocusDist = 12.f; // autofocus 꺼졌을 때 수동 초점거리(view 단위)
+float g_fFocusRange = 8.f; // 이만큼 벗어나면 최대 blur
+float g_fDoFMaxCoC = 12.f; // 최대 blur 반경(half-res 픽셀)
+float g_fDoFAutoFocus = 1.f; // 1=화면 중앙 깊이로 자동 초점
+
 /* SSR 폴백용 IBL */
 TextureCube g_PrefilteredCube; // 디퍼드와 동일 큐브
 int g_iSpecularMip = 1;
 float g_fIBLIntensity = 1.f;
 float4x4 g_CamViewMatrixInverse;
+
+
 
     //============================ Common VS ============================
 struct VS_IN
@@ -91,6 +100,23 @@ float3 Hash3(float2 uv, float i)
     q += i * float3(13.13f, 17.17f, 19.19f);
     return frac(sin(q) * 43758.5453f) * 2.f - 1.f;
 }
+
+//DoF 헬퍼
+float DoF_ViewZ(float2 uv)
+{
+    float ndcZ = g_DepthTexture.SampleLevel(LinearSampler, uv, 0).x; // z/w
+    return ViewPosFromUV(uv, ndcZ).z;
+}
+float DoF_Focus()
+{
+    return (g_fDoFAutoFocus > 0.5f) ? DoF_ViewZ(float2(0.5f, 0.5f)) : g_fFocusDist;
+}
+float DoF_CoC(float2 uv, float focus) // 음수=near, 양수=far, [-1,1]
+{
+    float vz = DoF_ViewZ(uv);
+    return clamp((vz - focus) / max(g_fFocusRange, 1e-3f), -1.f, 1.f);
+}
+
 
   //============================ Bloom Bright (pass 0) ============================
 float4 PS_BLOOMBRIGHT(PS_IN In) : SV_TARGET0
@@ -307,6 +333,59 @@ float4 PS_SSR(PS_IN In) : SV_TARGET0
     return float4(scene.rgb + reflection, scene.a);
 }
 
+// Downsample + CoC → half. rgb=color, a=coc*0.5+0.5 (6)
+float4 PS_DOF_DOWN(PS_IN In) : SV_TARGET0
+{
+    float coc = DoF_CoC(In.vTexcoord, DoF_Focus());
+    float3 col = g_SceneTexture.SampleLevel(LinearSampler, In.vTexcoord, 0).rgb;
+    return float4(col, coc * 0.5f + 0.5f);
+}
+
+  // Scatter-as-gather blur → half. g_BloomTexture = Target_DoF_Down (7)
+static const int DOF_TAPS = 16;
+float4 PS_DOF_BLUR(PS_IN In) : SV_TARGET0
+{
+    float4 c0 = g_BloomTexture.SampleLevel(LinearSampler, In.vTexcoord, 0);
+    float3 sum = 0.f;
+    float wsum = 0.f;
+    float cocSum = 0.f;
+      [unroll]
+    for (int i = 0; i < DOF_TAPS; ++i)
+    {
+        float t = (i + 0.5f) / DOF_TAPS;
+        float ang = t * 6.2831853f * 4.0f; // 나선
+        float rad = sqrt(t); // 디스크 균등 분포
+        float2 off = float2(cos(ang), sin(ang)) * rad * g_fDoFMaxCoC * g_vTexelSize;
+        float4 s = g_BloomTexture.SampleLevel(LinearSampler, In.vTexcoord + off, 0);
+        float scoc = s.a * 2.f - 1.f;
+          // '샘플'의 blur 반경이 중심까지 닿으면 기여 → near/far 모두 번짐
+        float w = saturate(abs(scoc) * g_fDoFMaxCoC - rad * g_fDoFMaxCoC + 1.f);
+        sum += s.rgb * w;
+        wsum += w;
+        cocSum += scoc * w;
+    }
+    float3 col = (wsum > 1e-4f) ? sum / wsum : c0.rgb;
+    float bledCoC = (wsum > 1e-4f) ? cocSum / wsum : (c0.a * 2.f - 1.f);
+    return float4(col, bledCoC * 0.5f + 0.5f);
+}
+
+  // Composite → full. g_SceneTexture=sharp(SSR), g_BloomTexture=blurred(half) (8)
+float4 PS_DOF_COMPOSITE(PS_IN In) : SV_TARGET0
+{
+    float3 sharp = g_SceneTexture.SampleLevel(LinearSampler, In.vTexcoord, 0).rgb;
+    if (g_fDoFEnable < 0.5f)
+        return float4(sharp, 1.f); // 비활성 패스스루
+
+    float4 b = g_BloomTexture.SampleLevel(LinearSampler, In.vTexcoord, 0); // 업샘플
+    float coc = abs(DoF_CoC(In.vTexcoord, DoF_Focus())); // 이 픽셀 흐림량
+    float bled = b.a * 2.f - 1.f; // 번져 들어온 CoC
+    float nearBleed = saturate(-bled); // 앞 물체가 위로 번짐
+    float tt = max(smoothstep(0.05f, 0.5f, coc), nearBleed);
+    return float4(lerp(sharp, b.rgb, saturate(tt)), 1.f);
+}
+
+
+
     //============================ Technique ============================
 technique11 DefaultTechnique
 {
@@ -363,5 +442,32 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_SSR();
+    }
+    pass DoF_Down // 6
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DOF_DOWN();
+    }
+    pass DoF_Blur // 7
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DOF_BLUR();
+    }
+    pass DoF_Composite // 8
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DOF_COMPOSITE();
     }
 }

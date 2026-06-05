@@ -38,9 +38,17 @@ HRESULT CRenderer::Initialize()
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Scene_SSR"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
         return E_FAIL;
 
-    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_BloomA"), m_iRTWidth >> 1, m_iRTHeight >> 1, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+    const _uint iHalfW = m_iRTWidth >> 1, iHalfH = m_iRTHeight >> 1;
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_DoF_Down"), iHalfW, iHalfH, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
         return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_BloomB"), m_iRTWidth >> 1, m_iRTHeight >> 1, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_DoF_Blur"), iHalfW, iHalfH, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Scene_DoF"), m_iRTWidth, m_iRTHeight,DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0, 0, 0, 0))))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_BloomA"), iHalfW, iHalfH, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_BloomB"), iHalfW, iHalfH, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
         return E_FAIL;
 
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_SSAO"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R8_UNORM, _float4(1.f, 1.f, 1.f, 1.f))))
@@ -74,6 +82,13 @@ HRESULT CRenderer::Initialize()
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_Scene"), TEXT("Target_Scene"))))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_Scene_SSR"), TEXT("Target_Scene_SSR"))))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_DoF_Down"), TEXT("Target_DoF_Down"))))  
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_DoF_Blur"), TEXT("Target_DoF_Blur"))))  
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_Scene_DoF"), TEXT("Target_Scene_DoF")))) 
         return E_FAIL;
 
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_BloomA"), TEXT("Target_BloomA"))))
@@ -176,6 +191,8 @@ HRESULT CRenderer::Draw()
     if (FAILED(Render_Combined()))
         return E_FAIL;
     if (FAILED(Render_SSR()))
+        return E_FAIL;
+    if (FAILED(Render_DoF()))
         return E_FAIL;
     if (FAILED(Render_Bloom()))
         return E_FAIL;
@@ -500,6 +517,98 @@ HRESULT CRenderer::Render_SSR()
     return S_OK;
 }
 
+HRESULT CRenderer::Render_DoF()
+{
+    const _float4* pEn = m_pGameInstance_Proxy->Get_ShaderGlobal("g_fDoFEnable");
+    const bool bOn = (nullptr != pEn && pEn->x >= 0.5f);
+
+    auto BindCommon = [&]() -> HRESULT {
+        if (FAILED(m_pShaderPost->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix))) return E_FAIL;
+        if (FAILED(m_pShaderPost->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW,
+            PROJ_TYPE::ORTHO)))) return E_FAIL;
+        if (FAILED(m_pShaderPost->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ,
+            PROJ_TYPE::ORTHO)))) return E_FAIL;
+        if (FAILED(m_pShaderPost->Bind_Matrix("g_ProjMatrixInverse",
+            m_pGameInstance_Proxy->Get_InverseMatrix_Prespec(D3DTS::PROJ)))) return E_FAIL;
+        return S_OK;
+        };
+
+    m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderPost,
+        { "g_fDoFEnable", "g_fFocusDist", "g_fFocusRange", "g_fDoFMaxCoC", "g_fDoFAutoFocus" });
+
+    if (bOn)
+    {
+        const _uint hw = m_iRTWidth >> 1, hh = m_iRTHeight >> 1;
+        _float2 vHalfTexel = { 1.f / hw, 1.f / hh };
+        Change_ViewportDesc(hw, hh);
+
+        /* (1) Down + CoC */
+        if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_DoF_Down"), nullptr, false)))
+            return E_FAIL;
+        if (FAILED(BindCommon()))
+            return E_FAIL;
+
+        if(FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene_SSR"), m_pShaderPost, "g_SceneTexture")))
+            return E_FAIL;
+        if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShaderPost, "g_DepthTexture")))
+            return E_FAIL;
+        if (FAILED(m_pShaderPost->Begin(ETOUI(POSTPROSESS::DOF_DOWN))))
+            return E_FAIL;
+        if (FAILED(m_pVIBuffer->Bind_Resources()))
+            return E_FAIL;
+        if (FAILED(m_pVIBuffer->Render()))
+            return E_FAIL;
+        if (FAILED(m_pGameInstance_Proxy->End_MRT()))
+            return E_FAIL;
+
+        /* (2) Scatter-gather blur */
+        if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_DoF_Blur"), nullptr, false)))
+            return E_FAIL;
+        if (FAILED(BindCommon()))
+            return E_FAIL;
+
+        if(FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_DoF_Down"), m_pShaderPost, "g_BloomTexture")))
+            return E_FAIL;
+        if (FAILED(m_pShaderPost->Bind_RawValue("g_vTexelSize", &vHalfTexel, sizeof(_float2))))
+            return E_FAIL;
+
+        if (FAILED(m_pShaderPost->Begin(ETOUI(POSTPROSESS::DOF_BLUR))))
+            return E_FAIL;
+        if(FAILED(m_pVIBuffer->Bind_Resources()))
+            return E_FAIL;
+        if (FAILED(m_pVIBuffer->Render()))
+            return E_FAIL;
+        if (FAILED(m_pGameInstance_Proxy->End_MRT())) return E_FAIL;
+    }
+
+    /* (3) Composite → Target_Scene_DoF (비활성 시 패스스루) */
+    Change_ViewportDesc(Render_Width(), Render_Height());
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Scene_DoF"), nullptr, false)))
+        return E_FAIL;
+    if (FAILED(BindCommon()))
+        return E_FAIL;
+
+    if(FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene_SSR"), m_pShaderPost, "g_SceneTexture")))
+        return E_FAIL;
+    if(FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShaderPost, "g_DepthTexture")))
+        return E_FAIL;
+    if(FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(bOn ? TEXT("Target_DoF_Blur") : TEXT("Target_Scene_SSR"), m_pShaderPost, "g_BloomTexture")))
+        return E_FAIL;
+        
+    if (FAILED(m_pShaderPost->Begin(ETOUI(POSTPROSESS::DOF_COMPOSITE))))
+        return E_FAIL;
+
+    if(FAILED(m_pVIBuffer->Bind_Resources()))
+        return E_FAIL;
+    if (FAILED(m_pVIBuffer->Render()))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->End_MRT()))
+        return E_FAIL;
+
+    return S_OK;
+}
+
 HRESULT CRenderer::Render_VolumetricFog()
 {
     const _float4* pEnable = m_pGameInstance_Proxy->Get_ShaderGlobal("g_fFogEnable");
@@ -606,7 +715,7 @@ HRESULT CRenderer::Render_Bloom()
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderPost, "g_fThreshold")))
         return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene_SSR"), m_pShaderPost, "g_SceneTexture")))
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene_DoF"), m_pShaderPost, "g_SceneTexture")))
         return E_FAIL;
     if (FAILED(m_pShaderPost->Begin(ETOUI(POSTPROSESS::BRIGHT))))
         return E_FAIL;
@@ -653,7 +762,7 @@ HRESULT CRenderer::Render_Bloom()
 
     Change_ViewportDesc(Render_Width(), Render_Height());
 
-    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene_SSR"), m_pShaderPost, "g_SceneTexture")))
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Scene_DoF"), m_pShaderPost, "g_SceneTexture")))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_BloomA"), m_pShaderPost, "g_BloomTexture")))
         return E_FAIL;
