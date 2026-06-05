@@ -253,9 +253,6 @@
     <Filter Include="00. GameInstance\Proxy">
       <UniqueIdentifier>{345bd200-d819-455a-9f83-28b6dd616f31}</UniqueIdentifier>
     </Filter>
-    <Filter Include="05. GameObject\SkySphere">
-      <UniqueIdentifier>{5660c0be-5fe7-4be7-8da5-546e64358bd0}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">

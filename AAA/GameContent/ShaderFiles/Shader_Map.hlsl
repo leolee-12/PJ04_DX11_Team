@@ -198,6 +198,35 @@ PS_OUT PS_WHITE(PS_IN In)   // 임시 흰색 출력
     return Out;
 }
 
+//============================ Shadow (depth-only) ============================
+struct VS_SHADOW_OUT
+{
+    float4 vPosition : SV_POSITION;
+    float4 vProjPos : TEXCOORD0;
+};
+
+VS_SHADOW_OUT VS_SHADOW(VS_IN In)
+{
+    VS_SHADOW_OUT Out;
+    float4 vWorld = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
+    Out.vPosition = mul(mul(vWorld, g_ViewMatrix), g_ProjMatrix);
+    Out.vProjPos = Out.vPosition;
+    return Out;
+}
+
+struct PS_SHADOW_OUT
+{
+    float4 vLightDepth : SV_TARGET0;
+};
+
+PS_SHADOW_OUT PS_SHADOW(VS_SHADOW_OUT In)
+{
+    PS_SHADOW_OUT Out;
+    float d = In.vProjPos.z / In.vProjPos.w; // 디퍼드의 pz(=lc.z/lc.w)와 동일 공간
+    Out.vLightDepth = float4(d, d, d, 1.f);
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass DefaultPass // 0
@@ -229,5 +258,15 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_WHITE();
+    }
+
+    pass ShadowPass // 3
+    {
+        SetRasterizerState(RS_Default); // 피터팬 심하면 앞면 컬링 RS로 교체
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_SHADOW();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_SHADOW();
     }
 }
