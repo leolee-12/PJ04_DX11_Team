@@ -26,7 +26,7 @@ struct VS_IN
     float2 vTexcoord3 : TEXCOORD3;
     
     float4 vTangent : TANGENT;
-    float4 vBinormal : BINORMAL;  
+    float4 vBinormal : BINORMAL;
 };
 
 struct VS_OUT
@@ -52,7 +52,7 @@ VS_OUT VS_MAIN(VS_IN In)
     VS_OUT Out;
 
     /* 월드변환, 뷰 벼환, 투영변환 */
-    float4      vPosition = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
+    float4 vPosition = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
     vPosition = mul(vPosition, g_ViewMatrix);
     vPosition = mul(vPosition, g_ProjMatrix);
 
@@ -98,69 +98,18 @@ struct PS_IN
 struct PS_OUT
 {
     float4 vDiffuse : SV_TARGET0;
-    float4 vNormal : SV_TARGET1;
-    float4 vDepth : SV_TARGET2;
-    float4 vMRA : SV_TARGET3;
-    float4 vEmissive : SV_TARGET4;
 };
-
-struct PS_BACKOUT
-{
-    float4 vDiffuse : SV_TARGET0;
-};
-
-float3 PerturbNormal(float3 N, float3 worldPos, float2 uv, float3 nTS)
-{
-    float3 dp1 = ddx(worldPos), dp2 = ddy(worldPos);
-    float2 d1 = ddx(uv), d2 = ddy(uv);
-    float3 dp2perp = cross(dp2, N);
-    float3 dp1perp = cross(N, dp1);
-    float3 T = dp2perp * d1.x + dp1perp * d2.x;
-    float3 B = dp2perp * d1.y + dp1perp * d2.y;
-    float inv = rsqrt(max(dot(T, T), dot(B, B)));
-
-      // 베이스 노멀은 N 그대로, 접선방향 디테일만 더함
-    return normalize(N + (T * inv * nTS.x + B * inv * nTS.y));
-}
-    
 
 /* 픽셀셰이더 : 픽셀의 최종적인 색을 결정해준다. */
 PS_OUT PS_MAIN(PS_IN In)
 {
     PS_OUT Out;
 
-    vector vEye = g_UnkownTexture.Sample(ClampSampler, In.vTexcoord);
-    vector vBase = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord1);
-    float3 vAlbedo = lerp(vBase.rgb, vEye.rgb, vEye.a);
-    if (vBase.a < 0.1f)
-        discard;
+    vector vDiffuse = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord);
 
-    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord1).rgb;
 
-    //Out.vDiffuse = float4(vAlbedo, vBase.a);
-    Out.vDiffuse = float4((In.vTangent.w * 0.5f + 0.5f).rrr, 1.f);
-    Out.vNormal = float4(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(mra, g_iMaterialID / 255.f);
-    Out.vEmissive = float4(g_vEmissiveColor.rgb * vBase.a, 1.f);
+    Out.vDiffuse = vDiffuse;
     
-    return Out;
-}
-
-PS_OUT PS_DEFFUSE(PS_IN In)
-{
-    PS_OUT Out;
-
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-    if (vMtrlDiffuse.a < 0.1f)
-        discard;
-
-
-    Out.vDiffuse = vMtrlDiffuse;
-    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
-    Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
     return Out;
 }
 
@@ -168,23 +117,12 @@ technique11 DefaultTechnique
 {
     pass DefaultPass // 0
     {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Z_Disable, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
-    }
-
-    pass DeffusePass // 1
-    {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_DEFFUSE();
     }
 }

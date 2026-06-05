@@ -164,12 +164,6 @@ PS_OUT PS_DEFFUSE(PS_IN In)
     return Out;
 }
 
-
-
-
-
-
-
 technique11 DefaultTechnique
 {
     pass DefaultPass // 0

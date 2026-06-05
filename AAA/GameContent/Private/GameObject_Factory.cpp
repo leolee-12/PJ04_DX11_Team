@@ -8,7 +8,6 @@
 #include "TestNonAnim.h"
 #include "TestRect.h"
 #include "TestEffectQuad.h"
-#include "Sample_MeshEffect.h"
 #include "TestMap.h"
 #include "TestMarb1e.h"
 #include "TestMarb1eMap.h"
@@ -28,6 +27,9 @@
 #include "SmokeSphereOriginal.h"
 #include "SmokeLowPoly.h"
 #include "SmokeTail.h"
+
+//sky
+#include "SkySphere.h"
 
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
@@ -141,19 +143,6 @@ void CGameObject_Factory::Register_Test()
                 CTexture::Create(pDevice, pContext, Texture_TestMask.szFileTag, Texture_TestMask.iNumTex));
         )
     );
-    Register(CSample_MeshEffect::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
-        CREATOR(CSample_MeshEffect),
-        LOADER(
-            TRY_ADD_PROTO(pProxy, (ETOUI(LEVEL::GAMEPLAY)), TEXT("Prototype_Component_Model_SmokeSphereOriginal_Test"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
-
-            TRY_ADD_PROTO(pProxy, Texture_Common_Flash02.iLevelID, Texture_Common_Flash02.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Common_Flash02.szFileTag, Texture_Common_Flash02.iNumTex));
-
-            TRY_ADD_PROTO(pProxy, Texture_TestMask.iLevelID, Texture_TestMask.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_TestMask.szFileTag, Texture_TestMask.iNumTex));
-        )
-    );
 
 
     Register(CTestMarb1e::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
@@ -180,6 +169,14 @@ void CGameObject_Factory::Register_Test()
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_MaterialObject"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Shader_Test_Object/Model_SmokeSphereOriginal.ysh"))
         )
+    );
+
+
+
+
+    Register(CSkySphere::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
+        CREATOR(CSkySphere),
+        LOADER()
     );
 
     // Effect_Container

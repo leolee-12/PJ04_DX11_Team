@@ -250,6 +250,9 @@
     <Filter Include="95. ShaderFiles\raw Shader">
       <UniqueIdentifier>{fb5dcb1b-6cbb-4a13-9d9d-75c0717ece59}</UniqueIdentifier>
     </Filter>
+    <Filter Include="05. GameObject\SkySphere">
+      <UniqueIdentifier>{5660c0be-5fe7-4be7-8da5-546e64358bd0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
