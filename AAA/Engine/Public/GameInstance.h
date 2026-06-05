@@ -29,6 +29,7 @@ class CEffect_Manager;
 class CPhysX_Manager;
 class CEnvironment_Manager;
 class CShaderGlobal_Manager;
+class CFrustum_Manager;
 
 class ENGINE_DLL CGameInstance 
 {
@@ -119,6 +120,13 @@ private:
 	const _float4* Get_CamPosition() const;
 	void Set_Transform(D3DTS eState, PROJ_TYPE eType, _fmatrix StateMatrix);
 	void Set_Transform(D3DTS eState, PROJ_TYPE eType, const _float4x4& StateMatrix);
+#pragma endregion
+
+#pragma region FRUSTUM_MANAGER
+	_bool Update_CullingView(CULLING_VIEW eView, const CULLING_VIEW_DESC& Desc);
+	_bool Should_CullAABB(CULLING_VIEW eView, _bool bEnableCulling, const BoundingBox& WorldBounds) const;
+	_bool XM_CALLCONV IsIn_CullingView_WorldSpace(CULLING_VIEW eView, _fvector vWorldPos, _float fRange = 0.f) const;
+	_bool IsIn_CullingView_AABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const;
 #pragma endregion
 
 #pragma region LIGHT_MANAGER
@@ -212,6 +220,7 @@ private:
 	CObject_Manager*			m_pObject_Manager = { nullptr };
 	CRenderer*					m_pRenderer = { nullptr };
 	CCamera_Manager*			m_pCamera_Manager = { nullptr };
+	CFrustum_Manager*			m_pFrustum_Manager = { nullptr };
 	CInput_Device*				m_pInput_Device = { nullptr };
 	CLight_Manager*				m_pLight_Manager = { nullptr };
 	CFont_Manager*				m_pFont_Manager = { nullptr };

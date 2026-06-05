@@ -52,14 +52,41 @@
     <Filter Include="00. GameObject\Test\TestMarb1e">
       <UniqueIdentifier>{840c0faf-b354-4895-adb2-a5936fb65b71}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\Test\Sample_MeshEffect">
-      <UniqueIdentifier>{6f695d5c-93d8-4d75-9564-48bf4a3b1640}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\Test\TestMarb1eMap">
       <UniqueIdentifier>{867f635d-c832-4d05-b596-a899a327f1a6}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\01. Map">
       <UniqueIdentifier>{52aa1b5e-9f41-4300-b321-d94a31de3ab2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI">
+      <UniqueIdentifier>{b3062cee-972c-4fb7-87e9-6219b23c53ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIContainer">
+      <UniqueIdentifier>{5ca0474a-ed3f-4d60-a221-b2411ba793c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart">
+      <UniqueIdentifier>{94c38715-2dd9-4f4e-8d6c-9d093835cbe4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart\Image">
+      <UniqueIdentifier>{a5a2e4ed-68be-4718-95b0-6b592bbe34a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart\Text">
+      <UniqueIdentifier>{3b5135bf-091a-43f9-a1b4-477f575eacaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart\SpriteAnim">
+      <UniqueIdentifier>{7d5d177d-f408-4ec2-9309-c09bb6f04f26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart\Effect">
+      <UniqueIdentifier>{0be37482-7fe4-4538-a085-a1d70dd6ef22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98. ShaderFiles\Hojun">
+      <UniqueIdentifier>{a6e24554-9141-4712-87e0-61e01d059777}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\TestImageContainer">
+      <UniqueIdentifier>{7f906e56-5e2d-404b-824c-cb4f519151e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIContainer\Title">
+      <UniqueIdentifier>{6621da30-94ec-4236-908b-f21c296456b0}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\02. Effect">
       <UniqueIdentifier>{289ff231-82b4-41ae-806c-a6d26b461dfa}</UniqueIdentifier>
@@ -102,6 +129,9 @@
     </Filter>
     <Filter Include="00. GameObject\04. Character\00. Kirby\Parts">
       <UniqueIdentifier>{ce8838df-6dca-44f5-99b6-21707344efd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\01. Map\SkySphere">
+      <UniqueIdentifier>{c77df806-0179-45ff-b02d-ef8c9d34da35}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -171,14 +201,20 @@
     <ClInclude Include="..\Public\GameContent_AnimEvents.h">
       <Filter>99. Defines</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Sample_MeshEffect.h">
-      <Filter>00. GameObject\Test\Sample_MeshEffect</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\TestMarb1eMap.h">
       <Filter>00. GameObject\Test\TestMarb1eMap</Filter>
     </ClInclude>
     <ClInclude Include="..\public\MapObject.h">
       <Filter>00. GameObject\01. Map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_Image.h">
+      <Filter>00. GameObject\UI\UIPart\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_TestImageContainer.h">
+      <Filter>00. GameObject\Test\TestImageContainer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_Title.h">
+      <Filter>00. GameObject\UI\UIContainer\Title</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\WalkSmoke.h">
       <Filter>00. GameObject\02. Effect\00. EffectContainer\00. WalkSmoke</Filter>
@@ -228,6 +264,9 @@
     <ClInclude Include="..\Public\Kirby_Body.h">
       <Filter>00. GameObject\04. Character\00. Kirby\Parts</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SkySphere.h">
+      <Filter>00. GameObject\01. Map\SkySphere</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -266,14 +305,20 @@
     <ClCompile Include="..\private\TestMarb1e.cpp">
       <Filter>00. GameObject\Test\TestMarb1e</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Sample_MeshEffect.cpp">
-      <Filter>00. GameObject\Test\Sample_MeshEffect</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\TestMarb1eMap.cpp">
       <Filter>00. GameObject\Test\TestMarb1eMap</Filter>
     </ClCompile>
     <ClCompile Include="..\private\MapObject.cpp">
       <Filter>00. GameObject\01. Map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_Image.cpp">
+      <Filter>00. GameObject\UI\UIPart\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_TestImageContainer.cpp">
+      <Filter>00. GameObject\Test\TestImageContainer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_Title.cpp">
+      <Filter>00. GameObject\UI\UIContainer\Title</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\WalkSmoke.cpp">
       <Filter>00. GameObject\02. Effect\00. EffectContainer\00. WalkSmoke</Filter>
@@ -320,6 +365,9 @@
     <ClCompile Include="..\Private\Kirby_Body.cpp">
       <Filter>00. GameObject\04. Character\00. Kirby\Parts</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\SkySphere.cpp">
+      <Filter>00. GameObject\01. Map\SkySphere</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl">
@@ -334,7 +382,16 @@
     <FxCompile Include="..\ShaderFiles\Shader_Map.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_UI.hlsl">
+      <Filter>98. ShaderFiles\Hojun</Filter>
+    </FxCompile>
     <FxCompile Include="..\ShaderFiles\Shader_MaterialTest.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_Kirby.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_SkySphere.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </FxCompile>
   </ItemGroup>

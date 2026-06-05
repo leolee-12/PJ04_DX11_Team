@@ -35,7 +35,14 @@ public:
 	virtual void Deserialize(const json& j) override;
 
 protected:
-	unordered_map<_wstring, CUIPartObject*>			m_UIPartObjects;
+	typedef struct tagUIPartPrototypeInfo
+	{
+		_uint		iPrototypeLevel = {};
+		_wstring	strPrototypeTag = {};
+	}UI_PART_PROTOTYPE_INFO;
+
+	unordered_map<_wstring, CUIPartObject*>				m_UIPartObjects;
+	unordered_map<_wstring, UI_PART_PROTOTYPE_INFO>		m_UIPartPrototypeInfos;
 
 protected:
 	HRESULT Add_UIPartObject(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag,

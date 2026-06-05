@@ -24,6 +24,9 @@ public:
 	void						Update(_float fTimeDelta);
 	void						Render();
 
+	TOOL_MODE					Get_WorkMode() const { return m_eWorkMode; }
+	void						Set_WorkMode(TOOL_MODE eMode) { m_eWorkMode = eMode; }
+
 	HRESULT						Add_Panel(const _wstring& strPanelTag, CPanel* pPanel);
 	CPanel*						Get_Panel(const _wstring& strPanelTag);
 
@@ -49,8 +52,12 @@ private:
 
 	ANIM_CONTEXT				m_Context;
 
+	TOOL_MODE					m_eWorkMode = { TOOL_MODE::ANIMATION };
+
 private:
 	void						Render_DockSpace();
+	void						Render_ModeBar();
+	_bool						Is_PanelAllowedInCurrentMode(const _wstring& strPanelTag) const;
 
 public:
 	static CPanel_Manager*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

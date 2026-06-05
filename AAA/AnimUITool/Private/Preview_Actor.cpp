@@ -41,6 +41,9 @@ HRESULT CPreview_Actor::Initialize(void* pArg)
 
 void CPreview_Actor::Late_Update(_float fTimeDelta)
 {
+    if (!m_bActive)
+        return;
+
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 

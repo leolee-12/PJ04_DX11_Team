@@ -6,6 +6,7 @@
 #include "Object_Manager.h"
 #include "Renderer.h"
 #include "Camera_Manager.h"
+#include "Frustum_Manager.h"
 #include "Input_Device.h"
 #include "Light_Manager.h"
 #include "Picking_Utils.h"
@@ -43,6 +44,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 
     m_pInstance->m_pCamera_Manager = CCamera_Manager::Create(static_cast<_float>(EngineDesc.iViewportWidth), static_cast<_float>(EngineDesc.iViewportHeight));
     if (nullptr == m_pInstance->m_pCamera_Manager)
+        return E_FAIL;
+
+    m_pInstance->m_pFrustum_Manager = CFrustum_Manager::Create();
+    if (nullptr == m_pInstance->m_pFrustum_Manager)
         return E_FAIL;
 
     m_pInstance->m_pTimer_Manager = CTimer_Manager::Create();
@@ -131,6 +136,9 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
     m_pObject_Manager->Priority_Update(fTimeDelta);
     m_pObject_Manager->Update(fTimeDelta);
 	m_pCamera_Manager->Update();
+    m_pFrustum_Manager->Update(
+        m_pCamera_Manager->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC),
+        m_pCamera_Manager->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC));
 
     m_pSound_Manager->Set_ListenerPos(*m_pCamera_Manager->Get_CamPosition());
     m_pSound_Manager->Update();
@@ -524,6 +532,40 @@ HRESULT CGameInstance::End_MRT()
     return m_pTarget_Manager->End_MRT();
 }
 
+#pragma region FRUSTUM_MANAGER
+_bool CGameInstance::Update_CullingView(CULLING_VIEW eView, const CULLING_VIEW_DESC& Desc)
+{
+    if (nullptr == m_pFrustum_Manager)
+        return false;
+
+    return m_pFrustum_Manager->Update_View(eView, Desc);
+}
+
+_bool CGameInstance::Should_CullAABB(CULLING_VIEW eView, _bool bEnableCulling, const BoundingBox& WorldBounds) const
+{
+    if (nullptr == m_pFrustum_Manager)
+        return false;
+
+    return m_pFrustum_Manager->Should_CullAABB(eView, bEnableCulling, WorldBounds);
+}
+
+_bool XM_CALLCONV CGameInstance::IsIn_CullingView_WorldSpace(CULLING_VIEW eView, _fvector vWorldPos, _float fRange) const
+{
+    if (nullptr == m_pFrustum_Manager)
+        return true;
+
+    return m_pFrustum_Manager->IsIn_WorldSpace(eView, vWorldPos, fRange);
+}
+
+_bool CGameInstance::IsIn_CullingView_AABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const
+{
+    if (nullptr == m_pFrustum_Manager)
+        return true;
+
+    return m_pFrustum_Manager->IsIn_WorldSpace_AABB(eView, WorldBounds);
+}
+#pragma endregion
+
 #ifdef _DEBUG
 HRESULT CGameInstance::Ready_RT_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
 {
@@ -580,6 +622,7 @@ void CGameInstance::Free()
     Safe_Release(m_pLevel_Manager);
     Safe_Release(m_pPrototype_Manager);
     Safe_Release(m_pTimer_Manager);
+    Safe_Release(m_pFrustum_Manager);
     Safe_Release(m_pCamera_Manager);
     Safe_Release(m_pGameInstance_Proxy);
     Safe_Release(m_pGraphic_Device);

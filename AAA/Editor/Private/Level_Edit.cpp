@@ -394,7 +394,7 @@ HRESULT CLevel_Edit::Ready_EditLights()
     LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
     LightDesc.vAmbient = _float4(0.2f, 0.2f, 0.2f, 1.f);
     LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
-    LightDesc.vDirection = _float4(-0.3f, -1.f, -0.3f, 0.f);
+    LightDesc.vDirection = _float4(0.4f, -1.f, 0.5f, 0.f);
 
     if (FAILED(m_pGameInstance_Proxy->Add_Light(LightDesc)))
         return E_FAIL;

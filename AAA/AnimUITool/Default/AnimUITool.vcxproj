@@ -30,6 +30,7 @@
     <ClCompile Include="..\Private\Panel_Hierarchy.cpp" />
     <ClCompile Include="..\Private\Panel_Inspector.cpp" />
     <ClCompile Include="..\Private\Panel_Manager.cpp" />
+    <ClCompile Include="..\Private\Panel_UICanvas.cpp" />
     <ClCompile Include="..\Private\Panel_Viewport.cpp" />
     <ClCompile Include="..\Private\Preview_Actor.cpp" />
     <ClCompile Include="..\ThirdParty\ImGui\Src\imgui.cpp" />
@@ -59,6 +60,7 @@
     <ClInclude Include="..\Public\Panel_Hierarchy.h" />
     <ClInclude Include="..\Public\Panel_Inspector.h" />
     <ClInclude Include="..\Public\Panel_Manager.h" />
+    <ClInclude Include="..\Public\Panel_UICanvas.h" />
     <ClInclude Include="..\Public\Panel_Viewport.h" />
     <ClInclude Include="..\Public\Preview_Actor.h" />
     <ClInclude Include="AnimUITool.h" />

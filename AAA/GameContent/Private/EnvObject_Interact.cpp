@@ -42,10 +42,17 @@ void CEnvObject_Interact::Late_Update(_float fTimeDelta)
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
 	if (!m_bRenderable || !Has_RenderModel())
+	{
+		m_bVisible = false;
 		return;
+	}
 
 	Refresh_WorldBounds();
-	m_bVisible = true;
+
+	m_bVisible = Is_VisibleInCurrentView();
+	if (!m_bVisible)
+		return;
+
 	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 

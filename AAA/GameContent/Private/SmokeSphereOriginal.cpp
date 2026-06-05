@@ -31,12 +31,12 @@ HRESULT CSmokeSphereOriginal::Initialize(void* pArg)
     tDesc.bUseUnKnownTexture = true;
 
     tDesc.bUseTextureCom = false;
-    tDesc.iTextureLevel = Texture_Common_Flash02.iLevelID;
-    tDesc.wstrTextureTag = Texture_Common_Flash02.szProtoTag;
+    tDesc.iTextureLevel = 0;
+    tDesc.wstrTextureTag = L"";
 
     tDesc.bUseMaskCom = false;
-    tDesc.iMaskLevel = Texture_TestMask.iLevelID;
-    tDesc.wstrMaskTag = Texture_TestMask.szProtoTag;
+    tDesc.iMaskLevel = 0;
+    tDesc.wstrMaskTag = L"";
 
     tDesc.bCustomShader = false;
     //tDesc.iShaderLevel = 0;

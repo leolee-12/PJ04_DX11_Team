@@ -29,6 +29,14 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
 
     for (auto& e : g_EnvTable)
         pProxy->Register_Environment(e.tag, e.diff, e.spec, e.intensity);
+
+
+    //sky Sphere
+
+    if (FAILED(pProxy->Add_Prototype(Model_SkyTest.iLevelID, Model_SkyTest.szProtoTag,
+        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Sky/Test/Model.ysh"))))
+        return E_FAIL;
+
     
 
     return S_OK;
@@ -54,6 +62,14 @@ HRESULT Ready_Prototype_Shaders(CGameInstance_Proxy* pProxy, ID3D11Device* pDevi
 
     if (FAILED(pProxy->Add_Prototype(Shader_MtrlTest.iLevelID, Shader_MtrlTest.szProtoTag,
         CShader::Create(pDevice, pContext, Shader_MtrlTest.szFileTag, VTXMESH::Elements, VTXMESH::iNumElements))))
+        return E_FAIL;
+
+    if (FAILED(pProxy->Add_Prototype(Shader_Kirby.iLevelID, Shader_Kirby.szProtoTag,
+        CShader::Create(pDevice, pContext, Shader_Kirby.szFileTag, VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
+        return E_FAIL;
+
+    if (FAILED(pProxy->Add_Prototype(Shader_SkySphere.iLevelID, Shader_SkySphere.szProtoTag,
+        CShader::Create(pDevice, pContext, Shader_SkySphere.szFileTag, VTXMESH::Elements, VTXMESH::iNumElements))))
         return E_FAIL;
 
     return S_OK;

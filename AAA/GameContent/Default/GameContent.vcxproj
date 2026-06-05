@@ -45,8 +45,8 @@
     <ClInclude Include="..\public\Material_Object.h" />
     <ClInclude Include="..\Public\ObjectData.h" />
     <ClInclude Include="..\Public\ResourceData.h" />
-    <ClInclude Include="..\Public\Sample_MeshEffect.h" />
     <ClInclude Include="..\Public\MapDescriptor.h" />
+    <ClInclude Include="..\Public\SkySphere.h" />
     <ClInclude Include="..\Public\SmokeLowPoly.h" />
     <ClInclude Include="..\Public\SmokeSphereOriginal.h" />
     <ClInclude Include="..\Public\SmokeTail.h" />
@@ -58,6 +58,9 @@
     <ClInclude Include="..\public\TestMarb1eMap.h" />
     <ClInclude Include="..\Public\TestNonAnim.h" />
     <ClInclude Include="..\public\TestRect.h" />
+    <ClInclude Include="..\Public\UI_Image.h" />
+    <ClInclude Include="..\Public\UI_TestImageContainer.h" />
+    <ClInclude Include="..\Public\UI_Title.h" />
     <ClInclude Include="..\Public\YshModelValidator.h" />
     <ClInclude Include="..\Public\WalkSmoke.h" />
   </ItemGroup>
@@ -77,9 +80,9 @@
     <ClCompile Include="..\Private\MapSection.cpp" />
     <ClCompile Include="..\Private\MapStage.cpp" />
     <ClCompile Include="..\private\Material_Object.cpp" />
-    <ClCompile Include="..\Private\Sample_MeshEffect.cpp" />
     <ClCompile Include="..\private\MapObject.cpp" />
     <ClCompile Include="..\Private\MapDescriptor.cpp" />
+    <ClCompile Include="..\Private\SkySphere.cpp" />
     <ClCompile Include="..\Private\SmokeLowPoly.cpp" />
     <ClCompile Include="..\Private\SmokeSphereOriginal.cpp" />
     <ClCompile Include="..\Private\SmokeTail.cpp" />
@@ -91,13 +94,24 @@
     <ClCompile Include="..\private\TestMarb1eMap.cpp" />
     <ClCompile Include="..\Private\TestNonAnim.cpp" />
     <ClCompile Include="..\private\TestRect.cpp" />
+    <ClCompile Include="..\Private\UI_Image.cpp" />
+    <ClCompile Include="..\Private\UI_TestImageContainer.cpp" />
+    <ClCompile Include="..\Private\UI_Title.cpp" />
     <ClCompile Include="..\Private\WalkSmoke.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_Kirby.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Map.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_MaterialTest.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_SkySphere.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_UI.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Effect</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Effect</ShaderType>
+    </FxCompile>
     <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

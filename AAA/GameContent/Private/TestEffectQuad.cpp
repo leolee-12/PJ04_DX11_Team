@@ -27,12 +27,12 @@ HRESULT CTestEffectQuad::Initialize(void* pArg)
     tDesc.wstrVIBufferTag = VI_Rect.szProtoTag;
 
     tDesc.bUseTextureCom = true;
-    tDesc.iTextureLevel = Texture_Common_Flash02.iLevelID;
-    tDesc.wstrTextureTag = Texture_Common_Flash02.szProtoTag;
+    tDesc.iTextureLevel = 0;
+    tDesc.wstrTextureTag = L"";
 
     tDesc.bUseMaskCom = true;
-    tDesc.iMaskLevel = Texture_TestMask.iLevelID;
-    tDesc.wstrMaskTag = Texture_TestMask.szProtoTag;
+    tDesc.iMaskLevel = 0;
+    tDesc.wstrMaskTag = L"";
 
     tDesc.bCustomShader = false;
     tDesc.iShaderLevel = 0;
