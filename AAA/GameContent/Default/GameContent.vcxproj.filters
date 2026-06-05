@@ -388,5 +388,8 @@
     <FxCompile Include="..\ShaderFiles\Shader_MaterialTest.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_Kirby.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

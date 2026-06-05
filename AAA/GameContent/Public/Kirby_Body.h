@@ -48,6 +48,10 @@ private:
 	CModel* m_pModelCom = { nullptr };
 	CAnimator* m_pAnimatorCom = { nullptr };
 
+	_float4 m_vBodyColor = { 1.f, 0.45f, 0.55f, 1.f };
+	_float4 m_vFootColor = { 1.f, 0.1882353f, 0.3764706f, 1.f };
+	_float4 m_vBlushColor = { 1.f, 0.25f, 0.4f, 1.f };
+
 public:
 	static CKirby_Body* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
