@@ -63,17 +63,27 @@ void CUIContainerObject::Clear_UIPartObjects()
 {
     for (auto& Pair : m_UIPartObjects)
         Safe_Release(Pair.second);
+
     m_UIPartObjects.clear();
+    m_UIPartPrototypeInfos.clear();
 }
 
 json CUIContainerObject::Serialize() const
 {
     json j = __super::Serialize();
+    j["UIPartObjects"] = json::object();
 
     for (auto& [tag, pPart] : m_UIPartObjects)
     {
-        string strTag = WstrToStr(tag);
-        j["UIPartObjects"][strTag] = pPart->Serialize();
+        auto iter = m_UIPartPrototypeInfos.find(tag);
+        if (iter == m_UIPartPrototypeInfos.end())
+            continue;
+
+        json jPart = pPart->Serialize();
+        jPart["ProtoTag"] = WstrToStr(iter->second.strPrototypeTag);
+        jPart["ProtoLevel"] = iter->second.iPrototypeLevel;
+
+        j["UIPartObjects"][WstrToStr(tag)] = jPart;
     }
 
     return j;
@@ -83,23 +93,55 @@ void CUIContainerObject::Deserialize(const json& j)
 {
     __super::Deserialize(j);
 
-    if (!j.contains("UIPartObjects")) return;
+    Clear_UIPartObjects();
 
-    for (auto& [tag, pPart] : m_UIPartObjects)
+    if (!j.contains("UIPartObjects"))
+        return;
+
+    for (auto& [strPartTag, jPart] : j["UIPartObjects"].items())
     {
-        string strTag = WstrToStr(tag);
-        if (j["UIPartObjects"].contains(strTag))
-            pPart->Deserialize(j["UIPartObjects"][strTag]);
+        if (!jPart.contains("ProtoTag") || !jPart.contains("ProtoLevel"))
+            continue;
+
+        _wstring strPartTagW = StrToWstr(strPartTag);
+        _wstring strProtoTag = StrToWstr(jPart["ProtoTag"].get<string>());
+        _uint iProtoLevel = jPart["ProtoLevel"].get<_uint>();
+
+        if (FAILED(Add_UIPartObject(iProtoLevel, strProtoTag, strPartTagW, nullptr)))
+            continue;
+
+        auto iter = m_UIPartObjects.find(strPartTagW);
+        if (iter != m_UIPartObjects.end())
+            iter->second->Deserialize(jPart);
     }
 }
 
 HRESULT CUIContainerObject::Add_UIPartObject(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, const _wstring& strPartTag, void* pArg)
 {
-    auto        pUIPartObject = dynamic_cast<CUIPartObject*>(m_pGameInstance_Proxy->Clone_Prototype(PROTOTYPE::GAMEOBJECT, iPrototypeLevelIndex, strPrototypeTag, pArg));
+    if (m_UIPartObjects.find(strPartTag) != m_UIPartObjects.end())
+        return E_FAIL;
+
+    if (pArg)
+    {
+        auto pDesc = static_cast<CUIPartObject::UI_PARTOBJECT_DESC*>(pArg);
+        pDesc->pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    }
+
+    auto pUIPartObject = dynamic_cast<CUIPartObject*>(
+        m_pGameInstance_Proxy->Clone_Prototype(
+            PROTOTYPE::GAMEOBJECT,
+            iPrototypeLevelIndex,
+            strPrototypeTag,
+            pArg));
+
     if (nullptr == pUIPartObject)
         return E_FAIL;
 
+    pUIPartObject->Set_ParentMatrix(m_pTransformCom->Get_WorldMatrixPtr());
+
     m_UIPartObjects.emplace(strPartTag, pUIPartObject);
+    m_UIPartPrototypeInfos.emplace(strPartTag,
+        UI_PART_PROTOTYPE_INFO{ iPrototypeLevelIndex, strPrototypeTag });
 
     return S_OK;
 }
@@ -112,5 +154,5 @@ void CUIContainerObject::Free()
         Safe_Release(Pair.second);
 
     m_UIPartObjects.clear();
-
+    m_UIPartPrototypeInfos.clear();
 }

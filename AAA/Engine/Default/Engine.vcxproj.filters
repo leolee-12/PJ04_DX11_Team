@@ -229,6 +229,12 @@
     <Filter Include="18. ShaderGlobal">
       <UniqueIdentifier>{a6f96f26-41b6-4a5a-8a4c-51da7d9eb84f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="19. ComputeShader">
+      <UniqueIdentifier>{7b5e5d7e-2f3c-4d08-b33f-881a052e9531}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="95. ShaderFiles\raw Shader">
+      <UniqueIdentifier>{fb5dcb1b-6cbb-4a13-9d9d-75c0717ece59}</UniqueIdentifier>
+    </Filter>
     <Filter Include="19. Culling">
       <UniqueIdentifier>{7467f37f-4478-4e05-9ece-ea4b10c3cb1c}</UniqueIdentifier>
     </Filter>
@@ -483,6 +489,9 @@
     <ClInclude Include="..\public\ShaderGlobal_Manager.h">
       <Filter>18. ShaderGlobal</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\ComputeShader.h">
+      <Filter>19. ComputeShader</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Culling_Util.h">
       <Filter>19. Culling</Filter>
     </ClInclude>
@@ -704,6 +713,9 @@
     <ClCompile Include="..\private\ShaderGlobal_Manager.cpp">
       <Filter>18. ShaderGlobal</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\ComputeShader.cpp">
+      <Filter>19. ComputeShader</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Culling_Util.cpp">
       <Filter>19. Culling</Filter>
     </ClCompile>
@@ -731,6 +743,9 @@
     </FxCompile>
     <FxCompile Include="..\ShaderFiles\Shader_PostProsess.hlsl">
       <Filter>95. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_VolumetricFog.hlsl">
+      <Filter>95. ShaderFiles\raw Shader</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

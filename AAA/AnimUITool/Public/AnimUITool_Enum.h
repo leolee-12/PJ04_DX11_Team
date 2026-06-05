@@ -6,6 +6,8 @@ namespace AnimUITool
 {
     enum class TOOL_LEVEL { STATIC, EDIT, END };
 
+    enum class TOOL_MODE { ANIMATION, UI, END };
+
     enum class LOG_LEVEL { INFO, WARNING, ERROR_, END };
 
     enum class PREVIEW_SHADER_MODE

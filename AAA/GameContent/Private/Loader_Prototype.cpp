@@ -14,10 +14,6 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
         CVIBuffer_Rect::Create(pDevice, pContext))))
         return E_FAIL;
 
-    if (FAILED(pProxy->Add_Prototype(ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Navigation_Lumia"),
-        CNavigation::Create(pDevice, pContext, L"../../Resources/Models/Maps/Navigation/Lumia_Navi.nav"))))
-        return E_FAIL;
-
     if (FAILED(pProxy->Add_Prototype(VI_Trail.iLevelID, VI_Trail.szProtoTag,
         CVIBuffer_Trail::Create(pDevice, pContext))))
         return E_FAIL;
@@ -54,6 +50,14 @@ HRESULT Ready_Prototype_Shaders(CGameInstance_Proxy* pProxy, ID3D11Device* pDevi
 
     if (FAILED(pProxy->Add_Prototype(Shader_Map.iLevelID, Shader_Map.szProtoTag,
         CShader::Create(pDevice, pContext, Shader_Map.szFileTag, VTXMAPMESH::Elements, VTXMAPMESH::iNumElements))))
+        return E_FAIL;
+
+    if (FAILED(pProxy->Add_Prototype(Shader_MtrlTest.iLevelID, Shader_MtrlTest.szProtoTag,
+        CShader::Create(pDevice, pContext, Shader_MtrlTest.szFileTag, VTXMESH::Elements, VTXMESH::iNumElements))))
+        return E_FAIL;
+
+    if (FAILED(pProxy->Add_Prototype(Shader_Kirby.iLevelID, Shader_Kirby.szProtoTag,
+        CShader::Create(pDevice, pContext, Shader_Kirby.szFileTag, VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
         return E_FAIL;
 
     return S_OK;

@@ -2,7 +2,9 @@
 #include "GameInstance.h"
 #include "Panel_Manager.h"
 #include "Panel_Viewport.h"
+#include "Panel_UICanvas.h"
 #include "Preview_Actor.h"
+#include "GameObject_Factory.h"
 
 #include "Level_Tool.h"
 
@@ -33,11 +35,24 @@ HRESULT CAnimUITool_App::Initialize()
 		return E_FAIL;
 	}
 
+	m_pGameInstance_Proxy->Bind_RenderTarget(m_pRTV, m_pDSV, m_iViewportWidth, m_iViewportHeight);
+
 	if (auto* pViewport = dynamic_cast<CPanel_Viewport*>(m_pPanel_Manager->Get_Panel(L"Viewport")))
 	{
 		pViewport->Set_SRV(m_pSRV);
+		pViewport->Set_Aspect((_float)m_iViewportWidth / (_float)m_iViewportHeight);
 		m_pViewportPanel = pViewport;
 	}
+
+	if (auto* pUICanvas = dynamic_cast<CPanel_UICanvas*>(m_pPanel_Manager->Get_Panel(L"UICanvas")))
+	{
+		pUICanvas->Set_SRV(m_pSRV);
+		pUICanvas->Set_Aspect((_float)m_iViewportWidth / (_float)m_iViewportHeight);
+		pUICanvas->Set_DesignSize((_float)m_iViewportWidth, (_float)m_iViewportHeight);
+		m_pUICanvasPanel = pUICanvas;
+	}
+
+	Client::CGameObject_Factory::GetInstance()->RegisterAll();
 
 	CLevel_Tool* pLevel = CLevel_Tool::Create(m_pDevice, m_pContext);
 	if (nullptr == pLevel) 
@@ -109,10 +124,22 @@ HRESULT CAnimUITool_App::Init_ImGui()
 
 void CAnimUITool_App::Update(_float fTimeDelta)
 {
-	if (m_pToolLevel && m_pViewportPanel)
-		m_pToolLevel->Set_CameraActive(m_pViewportPanel->Is_Hovered());
+	if (m_pToolLevel && m_pPanel_Manager)
+	{
+		const _bool bAnimationMode =
+			m_pPanel_Manager->Get_WorkMode() == TOOL_MODE::ANIMATION;
 
-	m_pGameInstance_Proxy->Update_Engine(fTimeDelta); 
+		const _bool bCameraActive =
+			bAnimationMode &&
+			m_pViewportPanel &&
+			m_pViewportPanel->Is_Hovered();
+
+		m_pToolLevel->Set_CameraActive(bCameraActive);
+		m_pToolLevel->Set_GridVisible(bAnimationMode);
+		m_pToolLevel->Set_PreviewVisible(bAnimationMode);
+	}
+
+	m_pGameInstance_Proxy->Update_Engine(fTimeDelta);
 	m_pPanel_Manager->Update(fTimeDelta);
 }
 
@@ -165,10 +192,17 @@ void CAnimUITool_App::OnResize(_uint iWidth, _uint iHeight)
 		return;
 	}   
 
+	m_pGameInstance_Proxy->Bind_RenderTarget(
+		m_pRTV,
+		m_pDSV,
+		m_iViewportWidth,
+		m_iViewportHeight
+	);
+
 	if (m_pViewportPanel)
 	{
 		m_pViewportPanel->Set_SRV(m_pSRV);
-		m_pViewportPanel->Set_Aspect((_float)iWidth / (_float)iHeight);   // 레터박스 종횡비 갱신
+		m_pViewportPanel->Set_Aspect((_float)m_iViewportWidth / (_float)m_iViewportHeight);   // 레터박스 종횡비 갱신
 	}
 
 	// 카메라 proj를 새 종횡비로 재계산
@@ -315,6 +349,8 @@ void CAnimUITool_App::Free()
 	Safe_Release(m_pGameInstance_Proxy);
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);
+
+	Client::CGameObject_Factory::DestroyInstance();
 
 	CGameInstance::DestroyInstance();
 }

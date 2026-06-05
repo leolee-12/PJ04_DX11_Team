@@ -12,6 +12,14 @@
 #include "TestMap.h"
 #include "TestMarb1e.h"
 #include "TestMarb1eMap.h"
+#include "UI_Image.h"
+#include "UI_TestImageContainer.h"
+#include "UI_Title.h"
+#include "Material_Object.h"
+
+// Kirby
+#include "Kirby.h"
+#include "Kirby_Body.h"
 
 // Effect_Container
 #include "WalkSmoke.h"
@@ -68,6 +76,21 @@ void CGameObject_Factory::RegisterAll()
 
 void CGameObject_Factory::Register_UI()
 {
+    Register(CUI_Image::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
+        CREATOR(CUI_Image),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, Shader_UI.iLevelID, Shader_UI.szProtoTag,
+                CShader::Create(pDevice, pContext, Shader_UI.szFileTag,
+                    VTXTEX::Elements, VTXTEX::iNumElements));
+
+    TRY_ADD_PROTO(pProxy, VI_Rect.iLevelID, VI_Rect.szProtoTag,
+        CVIBuffer_Rect::Create(pDevice, pContext));
+
+    TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), TEXT("Proto_Tex_TestUI"),
+        CTexture::Create(pDevice, pContext,
+            TEXT("../../Resources/CHJ/UI/Title/TitleLogo_KR^u.png"), 1));
+        )
+    );
 }
 
 void CGameObject_Factory::Register_Camera()
@@ -137,7 +160,7 @@ void CGameObject_Factory::Register_Test()
         CREATOR(CTestMarb1e),
         LOADER(
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Marb1e"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/Marb1e/BladeKnight.ysh"
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/Aligator/Aligator_Anim.ysh"
                     //, XMMatrixRotationY(XMConvertToRadians(180.f))
                 ))
         )
@@ -151,9 +174,13 @@ void CGameObject_Factory::Register_Test()
         )
     );
 
-
-
-
+    Register(CMaterial_Object::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
+        CREATOR(CMaterial_Object),
+        LOADER(
+            pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_MaterialObject"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Shader_Test_Object/Model_SmokeSphereOriginal.ysh"))
+        )
+    );
 
     // Effect_Container
     // 1. WalkSmoke
@@ -181,12 +208,54 @@ void CGameObject_Factory::Register_Test()
 
 void CGameObject_Factory::Register_Container()
 {
-   
+    // Kirby
+    Register(CKirby::PROTOTYPE_TAG, TEXT("Kirby"),
+        CREATOR(CKirby),
+        LOADER
+        (
+            // Kirby_Body
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CKirby_Body::PROTOTYPE_TAG,
+                CKirby_Body::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Kirby_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Kirby/Kirby.ysh")
+                , XMMatrixRotationY(XMConvertToRadians(180.f))
+            ))
+    );
 }
 
 void CGameObject_Factory::Register_UIContainer()
 {
-   
+    Register(CUI_TestImageContainer::PROTOTYPE_TAG, TEXT("UI_CONTAINER_TEST"),
+        CREATOR(CUI_TestImageContainer),
+        LOADER(
+            auto* pImageReg = CGameObject_Factory::GetInstance()
+            ->Get_Registration(CUI_Image::PROTOTYPE_TAG);
+
+    if (pImageReg)
+    {
+        pImageReg->ResourceLoader(pProxy, pDevice, pContext);
+
+        TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), CUI_Image::PROTOTYPE_TAG,
+            pImageReg->CreatorFunc(pDevice, pContext));
+    }
+        )
+    );
+
+    Register(CUI_Title::PROTOTYPE_TAG, TEXT("UI_CONTAINER"),
+        CREATOR(CUI_Title),
+        LOADER(
+            auto* pImageReg = CGameObject_Factory::GetInstance()
+            ->Get_Registration(CUI_Image::PROTOTYPE_TAG);
+
+    if (pImageReg)
+    {
+        pImageReg->ResourceLoader(pProxy, pDevice, pContext);
+
+        TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), CUI_Image::PROTOTYPE_TAG,
+            pImageReg->CreatorFunc(pDevice, pContext));
+    }
+        )
+    );
 }
 
 void CGameObject_Factory::Register_NonAnimObject()

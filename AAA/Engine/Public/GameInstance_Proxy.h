@@ -175,6 +175,7 @@ public: // Picking
     HRESULT Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV = nullptr, _bool bBindDSV = true);
     HRESULT End_MRT();
     HRESULT Bind_RT_ShaderResource(const _wstring& strTargetTag, class CShader* pShader, const _char* pConstantName);
+    HRESULT Bind_RT_CSResource(const _wstring& strTargetTag, _uint iSlot);
 
 #ifdef _DEBUG
 public:
@@ -216,6 +217,7 @@ public:
       HRESULT Bind_ShaderGlobals(class CShader* pShader, initializer_list<const _char*> Names);
       void    Set_ShaderGlobal(const string& strName, const _float4& vValue);
       vector<GLOBAL_DESC>& Get_ShaderGlobals();
+      const _float4* Get_ShaderGlobal(const string& strName) const;
 #pragma endregion
 
 private:

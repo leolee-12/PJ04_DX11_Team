@@ -32,6 +32,7 @@ HRESULT CMapStage::Initialize(void* pArg)
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
+
 	m_strStageName = pDesc->strStageName;
 	m_iSectionProtoLevel = pDesc->iSectionProtoLevel;
 	m_pTransformCom->Rotation(

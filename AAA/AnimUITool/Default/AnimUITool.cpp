@@ -46,7 +46,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         return FALSE;
 
     CGameInstance_Proxy* pProxy = CGameInstance::GetProxy();
-    pProxy->Add_Timer(TEXT("Timer_Default"));
+
+    if (FAILED(pProxy->Add_Timer(TEXT("Timer_Default"))))
+        return E_FAIL;
+
+    if (FAILED(pProxy->Add_Timer(TEXT("Timer_60"))))
+        return E_FAIL;
+
+    _float fTimeAcc = {};
 
     MSG msg{};
     while (true)
@@ -55,30 +62,41 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
         {
             if (WM_QUIT == msg.message)
                 break;
+
             TranslateMessage(&msg);
             DispatchMessage(&msg);
             continue;
         }
 
-        if (g_bAppClosing)
-            continue;
-
-        if (g_bNeedResize)
+        if (!g_bAppClosing)
         {
-            pProxy->OnResize(g_iResizeWidth, g_iResizeHeight);
-            pApp->OnResize(g_iResizeWidth, g_iResizeHeight);        // 에디터 화면도 리사이즈
-            g_bNeedResize = false;
-        }
+            if (g_bNeedResize)
+            {
+                pProxy->OnResize(g_iResizeWidth, g_iResizeHeight);
+                g_bNeedResize = false;
+            }
 
-        pProxy->Compute_Timer(TEXT("Timer_Default"));
-        pApp->Update(pProxy->Get_TimeDelta(TEXT("Timer_Default")));
-        pApp->Render();
+            pProxy->Compute_Timer(TEXT("Timer_Default"));
+
+            fTimeAcc += pProxy->Get_TimeDelta(TEXT("Timer_Default"));
+
+            if (fTimeAcc >= 1.f / 60.f)
+            {
+                pProxy->Compute_Timer(TEXT("Timer_60"));
+
+                pApp->Update(pProxy->Get_TimeDelta(TEXT("Timer_60")));
+                pApp->Render();
+
+                fTimeAcc = { 0.f };
+            }
+        }
     }
 
     Safe_Release(pProxy);
     Safe_Release(pApp);
 
     return (int)msg.wParam;
+
 }
 
 ATOM MyRegisterClass(HINSTANCE hInstance)

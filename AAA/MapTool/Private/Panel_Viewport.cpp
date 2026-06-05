@@ -86,6 +86,7 @@ void CPanel_Viewport::Render()
     ImVec2 vPos = ImGui::GetCursorScreenPos();
 
     ID3D11ShaderResourceView* pSRV = pEI->Get_SceneSRV();
+
     if (pSRV)
     {
         ImDrawList* pDrawList = ImGui::GetWindowDrawList();

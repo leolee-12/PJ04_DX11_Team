@@ -24,7 +24,7 @@ HRESULT CMaterial::Initialize(const MATERIAL_DATA& data, const _char* pModelFile
 			if (size_t iDot = strBaseName.rfind('.'); iDot != string::npos)
 				strBaseName = strBaseName.substr(0, iDot);
 
-			const string strFolder = string(szDrive) + string(szDir);
+			const string strFolder = string(szDir);
 			const string strDDS = strFolder + strBaseName + ".dds";
 			const string strPNG = strFolder + strBaseName + ".png";
 

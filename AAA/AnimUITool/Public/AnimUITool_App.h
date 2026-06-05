@@ -10,6 +10,7 @@ NS_END
 NS_BEGIN(AnimUITool)
 class CPanel_Manager;
 class CPanel_Viewport;
+class CPanel_UICanvas;
 class CLevel_Tool;
 
 class CAnimUITool_App final : public CBase
@@ -32,6 +33,7 @@ private:
 
 	CPanel_Manager*				m_pPanel_Manager = { nullptr };
 	CPanel_Viewport*			m_pViewportPanel = { nullptr };
+	CPanel_UICanvas*			m_pUICanvasPanel = { nullptr };
 	CLevel_Tool*				m_pToolLevel = { nullptr };
 
 
