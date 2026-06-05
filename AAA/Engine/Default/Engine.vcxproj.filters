@@ -1,18 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="00.GameInstance">
-      <UniqueIdentifier>{ef26726d-fab5-45ae-a4a5-4a60cf3e523d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Device">
-      <UniqueIdentifier>{586ca780-2e95-4191-8660-52b5e30ed97e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Device\Graphic">
-      <UniqueIdentifier>{12258d25-17a6-453d-9010-b4036b4dcbd8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Device\Input">
-      <UniqueIdentifier>{ad9e3226-3321-4031-96e8-91a6f96f01cf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="98.SuperClass">
       <UniqueIdentifier>{22f47e1e-11bb-49ec-a8fa-53436410515f}</UniqueIdentifier>
     </Filter>
@@ -39,9 +27,6 @@
     </Filter>
     <Filter Include="05. GameObject">
       <UniqueIdentifier>{3901bc1e-e6e4-4c81-adbf-1f8210f5ab2d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00.GameInstance\Proxy">
-      <UniqueIdentifier>{345bd200-d819-455a-9f83-28b6dd616f31}</UniqueIdentifier>
     </Filter>
     <Filter Include="06. Renderer">
       <UniqueIdentifier>{a6664c98-6e60-4438-a666-f4bc556419db}</UniqueIdentifier>
@@ -250,6 +235,24 @@
     <Filter Include="95. ShaderFiles\raw Shader">
       <UniqueIdentifier>{fb5dcb1b-6cbb-4a13-9d9d-75c0717ece59}</UniqueIdentifier>
     </Filter>
+    <Filter Include="19. Culling">
+      <UniqueIdentifier>{7467f37f-4478-4e05-9ece-ea4b10c3cb1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Device">
+      <UniqueIdentifier>{586ca780-2e95-4191-8660-52b5e30ed97e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Device\Graphic">
+      <UniqueIdentifier>{12258d25-17a6-453d-9010-b4036b4dcbd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Device\Input">
+      <UniqueIdentifier>{ad9e3226-3321-4031-96e8-91a6f96f01cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameInstance">
+      <UniqueIdentifier>{ef26726d-fab5-45ae-a4a5-4a60cf3e523d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameInstance\Proxy">
+      <UniqueIdentifier>{345bd200-d819-455a-9f83-28b6dd616f31}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -274,10 +277,10 @@
       <Filter>99.Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\public\GameInstance.h">
-      <Filter>00.GameInstance</Filter>
+      <Filter>00. GameInstance</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Graphic_Device.h">
-      <Filter>01.Device\Graphic</Filter>
+      <Filter>01. Device\Graphic</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Timer.h">
       <Filter>02.Timers</Filter>
@@ -304,7 +307,7 @@
       <Filter>05. GameObject\00. Manager\Layer</Filter>
     </ClInclude>
     <ClInclude Include="..\public\GameInstance_Proxy.h">
-      <Filter>00.GameInstance\Proxy</Filter>
+      <Filter>00. GameInstance\Proxy</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Renderer.h">
       <Filter>06. Renderer</Filter>
@@ -340,7 +343,7 @@
       <Filter>05. GameObject\01. Property</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Input_Device.h">
-      <Filter>01.Device\Input</Filter>
+      <Filter>01. Device\Input</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Light_Manager.h">
       <Filter>09. Lights\Manager</Filter>
@@ -489,16 +492,22 @@
     <ClInclude Include="..\public\ComputeShader.h">
       <Filter>19. ComputeShader</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Culling_Util.h">
+      <Filter>19. Culling</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Frustum_Manager.h">
+      <Filter>19. Culling</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
       <Filter>98.SuperClass</Filter>
     </ClCompile>
     <ClCompile Include="..\private\GameInstance.cpp">
-      <Filter>00.GameInstance</Filter>
+      <Filter>00. GameInstance</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Graphic_Device.cpp">
-      <Filter>01.Device\Graphic</Filter>
+      <Filter>01. Device\Graphic</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Timer.cpp">
       <Filter>02.Timers</Filter>
@@ -525,7 +534,7 @@
       <Filter>05. GameObject\00. Manager\Layer</Filter>
     </ClCompile>
     <ClCompile Include="..\private\GameInstance_Proxy.cpp">
-      <Filter>00.GameInstance\Proxy</Filter>
+      <Filter>00. GameInstance\Proxy</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Renderer.cpp">
       <Filter>06. Renderer</Filter>
@@ -558,7 +567,7 @@
       <Filter>05. GameObject\Camera</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Input_Device.cpp">
-      <Filter>01.Device\Input</Filter>
+      <Filter>01. Device\Input</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Light.cpp">
       <Filter>09. Lights</Filter>
@@ -706,6 +715,12 @@
     </ClCompile>
     <ClCompile Include="..\private\ComputeShader.cpp">
       <Filter>19. ComputeShader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Culling_Util.cpp">
+      <Filter>19. Culling</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Frustum_Manager.cpp">
+      <Filter>19. Culling</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

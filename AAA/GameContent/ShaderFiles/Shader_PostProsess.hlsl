@@ -106,7 +106,8 @@ float4 PS_BLUR(PS_IN In) : SV_TARGET0
 {
     const float w[5] = { 0.227027f, 0.194594f, 0.121622f, 0.054054f, 0.016216f };
     float3 result = g_BloomTexture.Sample(LinearSampler, In.vTexcoord).rgb * w[0];
-        [unroll]
+    
+    [unroll]
     for (int i = 1; i < 5; ++i)
     {
         float2 off = g_vBlurDir * g_vTexelSize * i;
