@@ -50,7 +50,7 @@ CMapSection::CMapSection(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 }
 
 CMapSection::CMapSection(const CMapSection& Prototype)
-	: CMapObject { Prototype }
+	: CMapObject(Prototype)
 	, m_strProtoTag { Prototype.m_strProtoTag }
 {
 }
@@ -72,7 +72,8 @@ HRESULT CMapSection::Initialize(void* pArg)
 	m_strModelPath = pDesc->strModelPath;
 	m_eSectionType = pDesc->eSectionType;
 	m_eRenderID = pDesc->eRenderID;
-	m_bCastShadow = pDesc->bCastShadow;
+	//m_bCastShadow = pDesc->bCastShadow;
+	m_bCastShadow = true;
 	m_bEnableCulling = pDesc->bEnableCulling;
 	m_bRenderable = pDesc->bRenderable;
 
@@ -111,6 +112,24 @@ void CMapSection::Late_Update(_float fTimeDelta)
 
 HRESULT CMapSection::Render_Shadow()
 {
+	if (!m_bRenderable || !m_bCastShadow || nullptr == m_pModelCom || nullptr == m_pShaderCom)
+		return S_OK;
+
+	if (FAILED(Bind_WorldMatrix()))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
+		return E_FAIL;
+
+	size_t n = m_pModelCom->Get_NumMeshes();
+	for (size_t i = 0; i < n; ++i)
+	{
+		if (FAILED(m_pShaderCom->Begin(3))) 
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Render((_uint)i)))
+			return E_FAIL;
+	}
 	return S_OK;
 }
 

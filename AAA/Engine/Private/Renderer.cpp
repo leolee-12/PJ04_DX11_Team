@@ -112,6 +112,8 @@ HRESULT CRenderer::Initialize()
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Emissive"), 450.f, 100.f, 300.f, 200.f)))
         return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_LightDepth"), 450.f, 300.f, 300.f, 200.f)))
+        return E_FAIL;
 
     //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Light"), 150.f, 100.f, 300.f, 200.f)))
     //    return E_FAIL;
@@ -910,6 +912,7 @@ HRESULT CRenderer::Render_Debug()
 
     m_pGameInstance_Proxy->Render_RT_Debug(TEXT("MRT_GameObjects"), m_pShaderDeferred, m_pVIBuffer);
     m_pGameInstance_Proxy->Render_RT_Debug(TEXT("MRT_LightAcc"), m_pShaderDeferred, m_pVIBuffer);
+    m_pGameInstance_Proxy->Render_RT_Debug(TEXT("MRT_ShadowObjects"), m_pShaderDeferred, m_pVIBuffer);
 
     m_pGameInstance_Proxy->Render_RT_Debug(TEXT("MRT_Scene"), m_pShaderDeferred, m_pVIBuffer);
     m_pGameInstance_Proxy->Render_RT_Debug(TEXT("MRT_BloomA"), m_pShaderDeferred, m_pVIBuffer);

@@ -43,6 +43,7 @@ void CMapObject::Update(_float fTimeDelta) {}
 void CMapObject::Late_Update(_float fTimeDelta)
 {
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
 
 HRESULT CMapObject::Render()
