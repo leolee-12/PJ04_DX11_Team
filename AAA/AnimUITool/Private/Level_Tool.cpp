@@ -10,6 +10,9 @@
 #include "GameObject_Factory.h"
 
 #include "UI_Title.h"
+#include "Panel_Manager.h"
+#include "UIContainerObject.h"
+#include "UIPartObject.h"
 
 namespace 
 { 
@@ -158,16 +161,32 @@ HRESULT CLevel_Tool::Ready_TestUI()
     if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pSource, L, Client::CUI_Title::PROTOTYPE_TAG, ETOUI(TOOL_LEVEL::EDIT), L"Layer_UI", L"Test_UI_Title_Source",  &desc)))
         return E_FAIL;
 
+    Track_UIContainer(pSource);
+
     json jUI = pSource->Serialize();
     jUI["Transform"]["vPosition"][0] = 250.f;
 
     CGameObject* pLoaded = nullptr;
     if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pLoaded, L, Client::CUI_Title::PROTOTYPE_TAG, ETOUI(TOOL_LEVEL::EDIT), L"Layer_UI", L"Test_UI_Title_Loaded",  nullptr)))
         return E_FAIL;
+
+    Track_UIContainer(pLoaded);
     
     pLoaded->Deserialize(jUI);
 
     return S_OK;
+}
+
+void CLevel_Tool::Track_UIContainer(CGameObject* pObject)
+{
+    auto* pContainer = dynamic_cast<CUIContainerObject*>(pObject);
+    if (!pContainer)
+        return;
+
+    if (find(m_UIContainers.begin(), m_UIContainers.end(), pContainer) != m_UIContainers.end())
+        return;
+
+    m_UIContainers.push_back(pContainer);
 }
 
 void CLevel_Tool::Update(_float fTimeDelta) 
@@ -278,5 +297,8 @@ CLevel_Tool* CLevel_Tool::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 void CLevel_Tool::Free()
 {
     __super::Free();
+
+    m_UIContainers.clear();
+
     Safe_Release(m_pGrid);   
 }

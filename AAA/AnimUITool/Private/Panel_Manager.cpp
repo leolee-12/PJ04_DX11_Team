@@ -1,6 +1,7 @@
 #include "Panel_Manager.h"
 #include "Panel.h"
 #include "GameObject.h"
+#include "UIContainerObject.h"
 
 #include "Panel_Hierarchy.h"
 #include "Panel_Viewport.h"
@@ -133,6 +134,13 @@ void CPanel_Manager::Bind_Preview(CPreview_Actor* pActor)
     Set_Selected(pActor);
 }
 
+void CPanel_Manager::Set_UISelected(CUIContainerObject* pContainer, CUIPartObject* pPart, const _wstring& strPartTag)
+{
+    m_UIContext.Selection.pContainer = pContainer;
+    m_UIContext.Selection.pPart = pPart;
+    m_UIContext.Selection.strPartTag = strPartTag;
+}
+
 void CPanel_Manager::Load_Preview(const std::wstring& strYshPath)
 {
     if (!m_pLevel) 
@@ -151,6 +159,30 @@ void CPanel_Manager::Clear_Preview()
     if (m_pLevel) 
         m_pLevel->Clear_Preview();
     Bind_Preview(nullptr);
+}
+
+void CPanel_Manager::Clear_UISelected()
+{
+    m_UIContext.Selection.Clear();
+}
+
+_bool CPanel_Manager::Validate_UISelection()
+{
+    UI_SELECTION& Selection = m_UIContext.Selection;
+
+    if (!Selection.Valid())
+        return false;
+
+    const auto& Parts = Selection.pContainer->Get_UIPartObjects();
+    auto iter = Parts.find(Selection.strPartTag);
+
+    if (iter == Parts.end() || iter->second != Selection.pPart)
+    {
+        Clear_UISelected();
+        return false;
+    }
+
+    return true;
 }
 
 void CPanel_Manager::Render_DockSpace()
@@ -271,6 +303,8 @@ CPanel_Manager* CPanel_Manager::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 void CPanel_Manager::Free()
 {
     __super::Free();
+
+    Clear_UISelected();
 
     Safe_Release(m_pSelected);
 

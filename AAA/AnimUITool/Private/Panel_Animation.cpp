@@ -86,7 +86,6 @@ void CPanel_Animation::Render()
     {
         pAnim->Resume();
         pAnim->Play(strName, ctx.bLoop, false, 0.f);     
-        pAnim->Update(ImGui::GetIO().DeltaTime);          
         ctx.fProgress = pAnim->Get_Progress();
         ImGui::SliderFloat("##timeline", &ctx.fProgress, 0.f, 1.f, "%.3f");
     }
