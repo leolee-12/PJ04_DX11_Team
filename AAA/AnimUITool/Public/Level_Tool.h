@@ -30,6 +30,7 @@ public:
     void                        Set_PreviewVisible(_bool bVisible);
 
     CGameObject*                Load_Preview(const _wstring& strYshPath);
+    CGameObject*                Load_Kirby();
     void                        Clear_Preview();
     void                        Recalc_CameraProj();
 

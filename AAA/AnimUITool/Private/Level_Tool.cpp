@@ -6,6 +6,7 @@
 #include "Shader.h"
 #include "Model.h"
 #include "Preview_Actor.h"
+#include "Preview_Kirby.h"
 #include "GameContent_const.h"
 #include "GameObject_Factory.h"
 
@@ -58,21 +59,26 @@ HRESULT CLevel_Tool::Initialize()
     if (FAILED(Ready_PreviewShaders()))
         return E_FAIL;
 
-    if (FAILED(Ready_TestUI()))
-        return E_FAIL;
+    //if (FAILED(Ready_TestUI()))
+    //    return E_FAIL;
 
     return S_OK;
 }
 
 HRESULT CLevel_Tool::Ready_Lights()
 {
-    LIGHT_DESC LightDesc{};
+    LIGHT_DESC      LightDesc{};
+
     LightDesc.eType = LIGHT::DIRECTIONAL;
-    LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);   
-    LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
+    LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+    LightDesc.vAmbient = _float4(0.2f, 0.2f, 0.2f, 1.f);
     LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
-    LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
-    return m_pGameInstance_Proxy->Add_Light(LightDesc);
+    LightDesc.vDirection = _float4(-0.3f, -1.f, -0.3f, 0.f);
+
+    if (FAILED(m_pGameInstance_Proxy->Add_Light(LightDesc)))
+        return E_FAIL;
+
+    return S_OK;
 }
 
 HRESULT CLevel_Tool::Ready_Camera()
@@ -259,6 +265,47 @@ CGameObject* CLevel_Tool::Load_Preview(const _wstring& strYshPath)
     if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pObj,
         ETOUI(TOOL_LEVEL::STATIC), CPreview_Actor::PROTOTYPE_TAG,
         ETOUI(TOOL_LEVEL::EDIT), L"Layer_Preview", L"Preview", &desc)))
+        return nullptr;
+
+    m_pPreview = pObj;
+    return pObj;
+}
+
+CGameObject* CLevel_Tool::Load_Kirby()
+{
+    const _uint L = ETOUI(TOOL_LEVEL::STATIC);
+
+    Clear_Preview();    // 기존 Preview 정리
+
+    // 1) Shader_Kirby_Proto - Kirby 는 스키닝 메쉬라 VTXANIMMESH 레이아웃 
+    if (!m_pGameInstance_Proxy->Has_Prototype(L, L"Proto_Shader_Kirby"))
+        m_pGameInstance_Proxy->Add_Prototype(L, L"Proto_Shader_Kirby",
+            CShader::Create(m_pDevice, m_pContext, Shader_Kirby.szFileTag,
+                VTXANIMMESH::Elements, VTXANIMMESH::iNumElements));
+
+    // 2) Kirby 모델 proto - ANIM, 180도 Y 회전 (GameContent 와 동일하게 정면)
+    if (!m_pGameInstance_Proxy->Has_Prototype(L, L"Proto_Model_Kirby"))
+        m_pGameInstance_Proxy->Add_Prototype(L, L"Proto_Model_Kirby",
+            CModel::Create(m_pDevice, m_pContext, MODEL::ANIM,
+                "../../Resources/CHJ/AnimModel/Kirby/Kirby.ysh",
+                XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+    // 3) Preview_Kirby proto (1회만)
+    if (!m_pGameInstance_Proxy->Has_Prototype(L, CPreview_Kirby::PROTOTYPE_TAG))
+        m_pGameInstance_Proxy->Add_Prototype(L, CPreview_Kirby::PROTOTYPE_TAG,
+            CPreview_Kirby::Create(m_pDevice, m_pContext));
+    
+    // 4) 스폰 
+    CPreview_Kirby::PREVIEW_KIRBY_DESC desc{};
+    desc.iProtoLevel = L;
+    desc.szShaderTag = L"Proto_Shader_Kirby";
+    desc.szModelTag = L"Proto_Model_Kirby";
+    desc.strAnimEvents = {};
+
+    CGameObject* pObj = nullptr;
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pObj,
+        L, CPreview_Kirby::PROTOTYPE_TAG,
+        ETOUI(TOOL_LEVEL::EDIT), L"Layer_Preview", L"Preview_Kirby", &desc)))
         return nullptr;
 
     m_pPreview = pObj;

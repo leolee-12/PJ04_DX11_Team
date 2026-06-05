@@ -7,6 +7,7 @@ class CModel;
 class CAnimator;
 class CUIContainerObject;
 class CUIPartObject;
+class CGameObject;
 NS_END
 
 namespace AnimUITool
@@ -19,7 +20,7 @@ namespace AnimUITool
 
     typedef struct tagAnimContext
     {
-        class   CPreview_Actor*     pActor = { nullptr };
+        CGameObject*                pOwner = { nullptr };
         CModel*                     pModel = { nullptr };
         CAnimator*                  pAnimator = { nullptr };
 
@@ -34,7 +35,7 @@ namespace AnimUITool
         _int                        iRootBone = { -1 };
         _int                        iSelBone = { -1 };
 
-        _bool                       Valid() const { return pActor && pModel && pAnimator; }
+        _bool                       Valid() const { return  pModel && pAnimator; }
     }ANIM_CONTEXT;
 
     typedef struct tagUISelection

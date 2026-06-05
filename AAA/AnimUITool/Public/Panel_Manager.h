@@ -12,7 +12,6 @@ NS_BEGIN(AnimUITool)
 
 class CPanel;
 class CLevel_Tool;
-class CPreview_Actor;
 
 class CPanel_Manager final : public CBase
 {
@@ -36,7 +35,7 @@ public:
 	void						Clear_Selected();
 
 	ANIM_CONTEXT&				Get_Context() { return m_Context; }
-	void						Bind_Preview(CPreview_Actor* pActor);
+	void						Bind_Preview(CGameObject* pOwner);
 
 	UI_CONTEXT&					Get_UIContext() { return m_UIContext; }
 	const UI_CONTEXT&			Get_UIContext() const { return m_UIContext; }

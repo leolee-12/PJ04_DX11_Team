@@ -6,6 +6,8 @@
 #include "Panel_Manager.h"
 #include "Transform.h"
 #include "Property.h"
+#include "Preview_Kirby.h"
+#include "Kirby_States.h"
 
 CPanel_Inspector::CPanel_Inspector(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPanel(pDevice, pContext)
@@ -18,7 +20,7 @@ void CPanel_Inspector::Render()
     ImGui::Begin(m_szName);
 
     ANIM_CONTEXT& ctx = m_pPanel_Manager->Get_Context();
-    if (!ctx.pActor || !ctx.pModel)
+    if (!ctx.pOwner || !ctx.pModel)
     {
         ImGui::TextDisabled("(no model loaded)");
         ImGui::End();
@@ -27,10 +29,11 @@ void CPanel_Inspector::Render()
 
     Render_Model();
     ImGui::Separator();
+    Render_KirbyFace(ctx.pOwner);
     Render_RenderDebug();
     ImGui::Separator();
-    Render_Transform(ctx.pActor);
-    Render_Properties(ctx.pActor);
+    Render_Transform(ctx.pOwner);
+    Render_Properties(ctx.pOwner);
     ImGui::Separator();
     Render_Meshs();
     ImGui::Separator();
@@ -46,8 +49,8 @@ void CPanel_Inspector::Render_Model()
     ImGui::Text("[Model]");
     std::string name(ctx.strName.begin(), ctx.strName.end());
     ImGui::Text("Name: %s", name.empty() ? "-" : name.c_str());
-    ImGui::Text("Type: %s", ctx.pActor->Get_Type() == MODEL::ANIM ? "ANIM" :
-        "NONANIM");
+    if (auto* pv = dynamic_cast<CPreview_Actor*>(ctx.pOwner))
+        ImGui::Text("Type: %s", pv->Get_Type() == MODEL::ANIM ? "ANIM" : "NONANIM");
     ImGui::Text("Meshes: %zu", ctx.pModel->Get_NumMeshes());
     // (NonAnim/Anim는 .ysh에 박힌 값. 변경/저장은 추후 .AnimClips/bake 단계와 연동)
 }
@@ -87,7 +90,7 @@ void CPanel_Inspector::Render_Transform(CGameObject* pObject)
 void CPanel_Inspector::Render_RenderDebug()
 {
     ANIM_CONTEXT& ctx = m_pPanel_Manager->Get_Context();
-    CPreview_Actor* pActor = ctx.pActor;
+    CPreview_Actor* pActor = dynamic_cast<CPreview_Actor*>(ctx.pOwner);
     if (!pActor)
         return;
 
@@ -306,7 +309,7 @@ void CPanel_Inspector::Render_Meshs()
 {
     ANIM_CONTEXT& ctx = m_pPanel_Manager->Get_Context();
 
-    CPreview_Actor* pActor = ctx.pActor;
+    CPreview_Actor* pActor = dynamic_cast<CPreview_Actor*>(ctx.pOwner);
     CModel* pModel = ctx.pModel;
 
     if (!pActor || !pModel)
@@ -353,6 +356,50 @@ void CPanel_Inspector::Render_Meshs()
     }
 
     ImGui::EndChild();
+}
+
+void CPanel_Inspector::Render_KirbyFace(CGameObject* pObject)
+{
+    CPreview_Kirby* pKirby = dynamic_cast<CPreview_Kirby*>(pObject);
+    if (!pKirby)
+        return;
+
+    if (!ImGui::CollapsingHeader("Kirby Face", ImGuiTreeNodeFlags_DefaultOpen) || pObject == nullptr )
+        return;
+
+    {
+        const char* szCur = "?";
+        for (auto& [v, n] : g_KirbyBodyNames) if (v == pKirby->Get_Body()) szCur = n;
+        if (ImGui::BeginCombo("Body", szCur))
+        {
+            for (auto& [v, n] : g_KirbyBodyNames)
+                if (ImGui::Selectable(n, v == pKirby->Get_Body())) pKirby->Set_Body(v);
+            ImGui::EndCombo();
+        }
+    }
+    // Mouth
+    {
+        const char* szCur = "?";
+        for (auto& [v, n] : g_KirbyMouthNames) if (v == pKirby->Get_Mouth()) szCur = n;
+        if (ImGui::BeginCombo("Mouth", szCur))
+        {
+            for (auto& [v, n] : g_KirbyMouthNames)
+                if (ImGui::Selectable(n, v == pKirby->Get_Mouth())) pKirby->Set_Mouth(v);
+            ImGui::EndCombo();
+        }
+    }
+    // Eye
+    {
+        const char* szCur = "?";
+        for (auto& [v, n] : g_KirbyEyeNames) if (v == pKirby->Get_Eye()) szCur = n;
+        if (ImGui::BeginCombo("Eye", szCur))
+        {
+            for (auto& [v, n] : g_KirbyEyeNames)
+                if (ImGui::Selectable(n, v == pKirby->Get_Eye())) pKirby->Set_Eye(v);
+            ImGui::EndCombo();
+        }
+    }
+
 }
 
 CPanel_Inspector* CPanel_Inspector::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

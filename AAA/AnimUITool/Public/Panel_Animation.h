@@ -13,7 +13,7 @@ public:
 	virtual void				Render() override;
 
 private:
-	void*						m_pPrevActor = { nullptr };
+	CGameObject*				m_pPrevActor = { nullptr };
 
 private:
 	_int						m_iPrevClip = { -1 };

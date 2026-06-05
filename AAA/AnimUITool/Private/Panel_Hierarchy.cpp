@@ -27,21 +27,21 @@ void CPanel_Hierarchy::Render_AnimationHierarchy()
 {
     ANIM_CONTEXT& ctx = m_pPanel_Manager->Get_Context();
 
-    if (ctx.pActor)
+    if (ctx.pOwner)
     {
         std::string name(ctx.strName.begin(), ctx.strName.end());
         if (name.empty())
             name = "Preview";
 
         const float fAvail = ImGui::GetContentRegionAvail().x;
-        _bool bSelected = (m_pPanel_Manager->Get_Selected() == ctx.pActor);
+        _bool bSelected = (m_pPanel_Manager->Get_Selected() == ctx.pOwner);
 
         if (ImGui::Selectable(name.c_str(), bSelected, 0, ImVec2(fAvail - 60.f, 0.f)))
-            m_pPanel_Manager->Set_Selected(ctx.pActor);
+            m_pPanel_Manager->Set_Selected(ctx.pOwner);
 
         ImGui::SameLine();
 
-        ImGui::PushID(ctx.pActor);
+        ImGui::PushID(ctx.pOwner);
         _bool bDelete = ImGui::SmallButton("Delete");
         ImGui::PopID();
 
@@ -54,7 +54,8 @@ void CPanel_Hierarchy::Render_AnimationHierarchy()
             return;
         }
 
-        ImGui::TextDisabled("Type: %s", ctx.pActor->Get_Type() == MODEL::ANIM ? "ANIM" : "NONANIM");
+        if (auto* pv = dynamic_cast<CPreview_Actor*>(ctx.pOwner))
+            ImGui::TextDisabled("Type: %s", pv->Get_Type() == MODEL::ANIM ? "ANIM" : "NONANIM");
     }
     else
     {

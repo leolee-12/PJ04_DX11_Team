@@ -10,6 +10,7 @@
 #include "imgui_impl_dx11.h"
 
 using namespace Engine;
+using namespace Client;
 
 #include "Engine_Defines.h"
 #include "AnimUITool_Enum.h"

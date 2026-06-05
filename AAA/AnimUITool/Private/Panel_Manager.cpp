@@ -1,6 +1,8 @@
 #include "Panel_Manager.h"
 #include "Panel.h"
 #include "GameObject.h"
+#include "Model.h"
+#include "Animator.h"
 #include "UIContainerObject.h"
 
 #include "Panel_Hierarchy.h"
@@ -10,14 +12,11 @@
 #include "Panel_Animation.h"
 #include "Panel_UICanvas.h"
 
-#include "Preview_Actor.h"
 #include "Panel_Browser.h"
 #include <filesystem>
 
 #include "Level_Tool.h"
 
-#include "imgui.h"
-#include "imgui_internal.h"
 
 CPanel_Manager::CPanel_Manager(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice(pDevice), m_pContext(pContext)
@@ -120,18 +119,18 @@ void CPanel_Manager::Clear_Selected()
     m_pSelected = nullptr;
 }
 
-void CPanel_Manager::Bind_Preview(CPreview_Actor* pActor)
+void CPanel_Manager::Bind_Preview(CGameObject* pOwner)
 {
-    m_Context.pActor = pActor;
-    m_Context.pModel = pActor ? pActor->Get_Model() : nullptr;
-    m_Context.pAnimator = pActor ? pActor->Get_Animator() : nullptr;
+    m_Context.pOwner = pOwner;
+    m_Context.pModel = pOwner ? pOwner->Get_Component<CModel>(L"Com_Model") : nullptr;
+    m_Context.pAnimator = pOwner ? pOwner->Get_Component<CAnimator>(L"Com_Animator") : nullptr;
     m_Context.iClip = 0; m_Context.fProgress = 0.f; m_Context.iRootBone = -1;
-    if (!pActor) 
+    if (!pOwner)
     {
         m_Context.strName.clear();
         m_Context.strModelPath.clear();
     }
-    Set_Selected(pActor);
+    Set_Selected(pOwner);
 }
 
 void CPanel_Manager::Set_UISelected(CUIContainerObject* pContainer, CUIPartObject* pPart, const _wstring& strPartTag)
@@ -146,7 +145,7 @@ void CPanel_Manager::Load_Preview(const std::wstring& strYshPath)
     if (!m_pLevel) 
         return;
     CGameObject* p = m_pLevel->Load_Preview(strYshPath);
-    Bind_Preview(dynamic_cast<CPreview_Actor*>(p));
+    Bind_Preview(p);
     if (p)
     {
         m_Context.strName = filesystem::path(strYshPath).stem().wstring();
@@ -258,7 +257,16 @@ void CPanel_Manager::Render_ModeBar()
     if (ImGui::RadioButton("UI", iMode == ETOI(TOOL_MODE::UI)))
         m_eWorkMode = TOOL_MODE::UI;
 
-
+    ImGui::SameLine();
+    if (ImGui::Button("Load Kirby (Test)"))
+    {
+        if (m_pLevel)
+        {
+            Bind_Preview(m_pLevel->Load_Kirby());
+            m_Context.strName = L"Kirby";
+            m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby.ysh";
+        }
+    }
    
 
     ImGui::EndMainMenuBar();
