@@ -46,5 +46,6 @@ namespace Engine
 		ANISOTROPY, GLTF_MERALLICROUGHNESS
 	};
 
+	enum class CULLING_VIEW { MAIN_CAMERA, SHADOW_LIGHT, EDITOR_VIEWPORT, END };
 }
 #endif // Engine_Enum_h__

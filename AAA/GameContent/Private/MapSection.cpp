@@ -114,19 +114,6 @@ HRESULT CMapSection::Render_Shadow()
 	return S_OK;
 }
 
-CGameObject* CMapSection::Clone(void* pArg)
-{
-	CMapSection* pInstance = new CMapSection(*this);
-
-	if (FAILED(pInstance->Initialize(pArg)))
-	{
-		MSG_BOX("Failed to Cloned : CMapSection");
-		Safe_Release(pInstance);
-	}
-
-	return pInstance;
-}
-
 void CMapSection::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 {
 	if (nullptr == pOutData)
@@ -251,6 +238,19 @@ CMapSection* CMapSection::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CMapSection");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CGameObject* CMapSection::Clone(void* pArg)
+{
+	CMapSection* pInstance = new CMapSection(*this);
+
+	if (FAILED(pInstance->Initialize(pArg)))
+	{
+		MSG_BOX("Failed to Cloned : CMapSection");
 		Safe_Release(pInstance);
 	}
 
