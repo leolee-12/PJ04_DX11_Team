@@ -14,6 +14,8 @@
 #include "MapStage.h"
 #include "MapDescriptor.h"
 
+#include "Effect_Container.h"
+
 CLevel_Edit::CLevel_Edit(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel{ pDevice, pContext }
 {
@@ -74,6 +76,8 @@ CGameObject* CLevel_Edit::Spawn_Object(const wstring& strProtoTag, const wstring
     wstring strFinalLayer = strLayerTag;
     if (pReg->strCategory == L"CAMERA_OBJECT")
         strFinalLayer = L"Layer_Camera";
+    else if (pReg->strCategory == L"Effect_Container") ////////
+        strFinalLayer = L"Layer_Effect";
 
     Engine::CGameObject* pObj = { nullptr };
     m_pGameInstance_Proxy->Add_GameObject_Return(
@@ -456,6 +460,105 @@ _uint CLevel_Edit::Get_MapPreviewPresetCount() const
 const _char* CLevel_Edit::Get_MapPreviewPresetLabel(_uint iPresetIndex) const
 {
     return CMapDescriptor::GetInstance()->Get_MapPresetLabel(iPresetIndex);
+}
+
+HRESULT CLevel_Edit::Save_Selected_Effect(const wstring& strFilePath)
+{
+    CEffect_Container* pEffect = dynamic_cast<CEffect_Container*>(m_pSelected);
+    if (pEffect == nullptr)
+        return E_FAIL;
+
+    wstring strPrototypeTag;
+    wstring strObjectTag;
+    wstring strLayerTag;
+    _bool bFound = false;
+
+    for (auto& [LayerTag, Objects] : m_Layers)
+    {
+        for (auto& handle : Objects)
+        {
+            if (handle.pObject != m_pSelected)
+                continue;
+
+            strPrototypeTag = handle.strPrototypeTag;
+            strObjectTag = handle.strName;
+            strLayerTag = LayerTag;
+            bFound = true;
+            break;
+        }
+
+        if (bFound)
+            break;
+    }
+
+    if (bFound == false)
+        return E_FAIL;
+
+    json jEffect = pEffect->Serialize();
+    jEffect["Prototype_Tag"] = WstrToStr(strPrototypeTag);
+    jEffect["Object_Tag"] = WstrToStr(strObjectTag);
+    jEffect["Layer_Tag"] = WstrToStr(strLayerTag);
+
+    return CDataExporter::Write_JsonFile(strFilePath.c_str(), jEffect);
+}
+
+HRESULT CLevel_Edit::Load_Selected_Effect(const wstring& strFilePath)
+{
+    string strContent;
+    if (FAILED(CDataLoader::Read_Json(strFilePath.c_str(), &strContent)))
+        return E_FAIL;
+
+    try
+    {
+        json jEffect = json::parse(strContent);
+
+        if (!jEffect.contains("Prototype_Tag"))
+            return E_FAIL;
+
+        wstring strProtoTag = StrToWstr(jEffect["Prototype_Tag"].get<string>());
+
+        wstring strLayerTag = L"Layer_Effect";
+        if (jEffect.contains("Layer_Tag"))
+            strLayerTag = StrToWstr(jEffect["Layer_Tag"].get<string>());
+
+        wstring strObjectTag = strProtoTag + L"_Loaded";
+        if (jEffect.contains("Object_Tag"))
+            strObjectTag = StrToWstr(jEffect["Object_Tag"].get<string>());
+
+        // 이름 충돌 방지
+        wstring strFinalObjectTag = strObjectTag;
+        _uint iSuffix = 1;
+
+        auto IsNameUsed = [&](const wstring& strName) -> _bool
+            {
+                for (auto& [LayerTag, Objects] : m_Layers)
+                {
+                    for (auto& handle : Objects)
+                    {
+                        if (handle.strName == strName)
+                            return true;
+                    }
+                }
+                return false;
+            };
+
+        while (IsNameUsed(strFinalObjectTag))
+            strFinalObjectTag = strObjectTag + L"_" + to_wstring(iSuffix++);
+
+        CGameObject* pObj = Spawn_Object(strProtoTag, strLayerTag, strFinalObjectTag);
+        if (nullptr == pObj)
+            return E_FAIL;
+
+        pObj->Deserialize(jEffect);
+        m_pSelected = pObj;
+    }
+    catch (json::exception&)
+    {
+        MSG_BOX("JSON PARSE ERROR");
+        return E_FAIL;
+    }
+
+    return S_OK;
 }
 
 HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
