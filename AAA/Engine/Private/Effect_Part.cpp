@@ -75,7 +75,7 @@ void CEffect_Part::Late_Update(_float fTimeDelta)
     Compute_CombinedWorldMatrix();
 
     //test
-    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::BLEND, this);
 }
 
 HRESULT CEffect_Part::Render()
@@ -92,6 +92,14 @@ void CEffect_Part::Effect_Start()
 void CEffect_Part::Set_ParentMatrix(const _float4x4* pParentMatrix)
 {
     m_pParentMatrix = pParentMatrix;
+}
+
+void CEffect_Part::Update_PlayValue(_bool bIsPlay, _bool bLoop, _float fDuration, _float fAccTime)
+{
+    m_bIsPlay = bIsPlay;
+    m_bLoop = bLoop;
+    m_fDuration = fDuration;
+    m_fAccTime = fAccTime;
 }
 
 void CEffect_Part::Compute_CombinedWorldMatrix()
@@ -179,7 +187,7 @@ HRESULT CEffect_Part::Ready_Components()
 
 void CEffect_Part::Init_PropertyValue()
 {
-    m_iShdaerPass = { 0 };
+    m_iShaderPass = { 0 };
 
     m_vLocalPos = { 0.f, 0.f, 0.f };
 
@@ -303,16 +311,7 @@ void CEffect_Part::Update_Value(const _float fTimeDelta)
 
     if (m_bActive == true)
     {
-        // Update
-        Update_Alpha(fTimeDelta, fRatio);
-        Update_Size(fTimeDelta, fRatio);
-        Update_Color(fTimeDelta, fRatio);
-        Update_Rot(fTimeDelta, fRatio);
-        Update_Move(fTimeDelta, fRatio);       // Move관련 가장 먼저
-        Update_MoveSin(fTimeDelta, fRatio);
-        Update_UVScroll(fTimeDelta, fRatio);
-
-        Update_EffectPart(fTimeDelta, fRatio);
+        Update_Core(fTimeDelta, fRatio);
     }
 
 
@@ -329,6 +328,20 @@ void CEffect_Part::Update_Value(const _float fTimeDelta)
             m_fAccTime = m_fDuration;
         }
     }
+}
+
+void CEffect_Part::Update_Core(const _float fTimeDelta, const _float fRatio)
+{
+    // Update
+    Update_Alpha(fTimeDelta, fRatio);
+    Update_Size(fTimeDelta, fRatio);
+    Update_Color(fTimeDelta, fRatio);
+    Update_Rot(fTimeDelta, fRatio);
+    Update_Move(fTimeDelta, fRatio);       // Move관련 가장 먼저
+    Update_MoveSin(fTimeDelta, fRatio);
+    Update_UVScroll(fTimeDelta, fRatio);
+
+    Update_EffectPart(fTimeDelta, fRatio);
 }
 
 void CEffect_Part::Update_Alpha(const _float fTimeDelta, const _float fRatio)

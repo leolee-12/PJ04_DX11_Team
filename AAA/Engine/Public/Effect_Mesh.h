@@ -11,20 +11,20 @@ class ENGINE_DLL CEffect_Mesh abstract : public CEffect_Part
     GENERATED_BODY_ABSTRACT(CEffect_Mesh)
 
     // Diffuse
-    PROPERTY(_bool, m_bUseDiffuseTexture,           L"Use Diffuse Textrue",     L"Diffuse");
-    PROPERTY(_float2, m_vDiffuseTiling,             L"Tiling",                  L"Diffuse");
-    PROPERTY(_float2, m_vDiffuseOffset,             L"Offset",                  L"Diffuse");
+    PROPERTY(_bool, m_bUseDiffuseTexture,           L"Use Diffuse Textrue_D",     L"Diffuse");
+    PROPERTY(_float2, m_vDiffuseTiling,             L"Tiling_D",                  L"Diffuse");
+    PROPERTY(_float2, m_vDiffuseOffset,             L"Offset_D",                  L"Diffuse");
 
-    PROPERTY(_bool, m_vDiffuseUVScroll,             L"UV Scroll     _",         L"Diffuse");
-    PROPERTY(_float2, m_vDiffuseUVScrollCount,      L"UV Scroll Count",         L"Diffuse");
+    PROPERTY(_bool, m_vDiffuseUVScroll,             L"UV Scroll     _D",         L"Diffuse");
+    PROPERTY(_float2, m_vDiffuseUVScrollCount,      L"UV Scroll Count_D",         L"Diffuse");
 
     // Unknown
-    PROPERTY(_bool, m_bUseUnknownTexture,           L"Use Unknown Textrue",     L"Unknown");
-    PROPERTY(_float2, m_vUnknownTiling,             L"Tiling",                  L"Unknown");
-    PROPERTY(_float2, m_vUnknownOffset,             L"Offset",                  L"Unknown");
+    PROPERTY(_bool, m_bUseUnknownTexture,           L"Use Unknown Textrue_U",     L"Unknown");
+    PROPERTY(_float2, m_vUnknownTiling,             L"Tiling_U",                  L"Unknown");
+    PROPERTY(_float2, m_vUnknownOffset,             L"Offset_U",                  L"Unknown");
 
-    PROPERTY(_bool, m_vUnknownUVScroll,             L"UV Scroll     _",         L"Unknown");
-    PROPERTY(_float2, m_vUnknownUVScrollCount,      L"UV Scroll Count",         L"Unknown");
+    PROPERTY(_bool, m_vUnknownUVScroll,             L"UV Scroll     _U",          L"Unknown");
+    PROPERTY(_float2, m_vUnknownUVScrollCount,      L"UV Scroll Count_U",         L"Unknown");
 
 public:
     struct EFFECT_MESH_DESC : public CEffect_Part::EFFECT_PART_DESC

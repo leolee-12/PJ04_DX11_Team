@@ -10,6 +10,18 @@ class ENGINE_DLL CEffect_Quad abstract : public CEffect_Part
 {
     GENERATED_BODY_ABSTRACT(CEffect_Quad)
 
+    // Sprite Animation Texture
+    PROPERTY(_bool, m_bSpriteAniTexture, L"Sprite Animation Texture", L"Sprite Animation");
+    
+    PROPERTY(_int, m_iTexFrameX,     L"Frame X_T",   L"Sprite Animation");
+    PROPERTY(_int, m_iTexFrameY,     L"Frame Y_T",   L"Sprite Animation");
+        
+    // Sprite Animation Mask
+    PROPERTY(_bool, m_bSpriteAniMask, L"Sprite Animation Mask", L"Sprite Animation");
+    
+    PROPERTY(_int, m_iMaskFrameX, L"Frame X_M", L"Sprite Animation");
+    PROPERTY(_int, m_iMaskFrameY, L"Frame Y_M", L"Sprite Animation");
+    
 public:
     struct EFFECT_QUAD_DESC : public CEffect_Part::EFFECT_PART_DESC
     {
@@ -41,8 +53,13 @@ public:
     virtual HRESULT Render() override;
 
 protected:
+    virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;
+
     virtual void Update_UVScroll(const _float fTimeDelta, const _float fRatio) override;
     virtual void Update_EffectPart(const _float fTimeDelta, const _float fRatio) override;
+
+    virtual void Update_TexSpriteAnimation(const _float fTimeDelta, const _float fRatio);
+    virtual void Update_MaskSpriteAnimation(const _float fTimeDelta, const _float fRatio);
 
 private:
     HRESULT Ready_Components();
@@ -58,6 +75,12 @@ private:
 
     _uint m_iShaderLevel{};
     _wstring m_wstrShaderTag;
+
+    _float2 m_fCurTexAniUV{};
+    _float2 m_fCurTexAniSize{};
+
+    _float2 m_fCurMaskAniUV{};
+    _float2 m_fCurMaskAniSize{};
 
 private:
     void Init_PropertyValue();

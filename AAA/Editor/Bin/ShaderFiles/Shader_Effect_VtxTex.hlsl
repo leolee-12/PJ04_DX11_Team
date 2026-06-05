@@ -7,10 +7,18 @@ bool g_bUseTexture = { false };
 float2 g_vTextureTiling = { 1.f, 1.f };
 float2 g_vTextureOffset = { 0.f, 0.f };
 
+bool g_bSpriteAniTexture = { false };
+float2 g_vSpriteAniTexUV = { 0.f, 0.f };
+float2 g_vSpriteAniTexSize = { 1.f, 1.f };
+
 Texture2D g_Mask;
 bool g_bUseMask = { false };
 float2 g_vMaskTiling = { 1.f, 1.f };
 float2 g_vMaskOffset = { 0.f, 0.f };
+
+bool g_bSpriteAniMask = { false };
+float2 g_vSpriteAniMaskUV = { 0.f, 0.f };
+float2 g_vSpriteAniMaskSize = { 1.f, 1.f };
 
 bool g_bFlipX = { false };
 bool g_bFlipY = { false };
@@ -25,6 +33,7 @@ float g_fUVCutLeft = { 0.f };
 
 float g_fUVCutTop = { 0.f };
 float g_fUVCutBottom = { 0.f };
+
 
 
 struct VS_IN
@@ -84,13 +93,25 @@ PS_OUT PS_MAIN(PS_IN In)
     
     if (g_bUseTexture == true)
     {
-        float2 vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling;
+        float2 vUV = float2(0.f, 0.f);
+        
+        if (g_bSpriteAniTexture == true)
+            vUV = In.vTexcoord * g_vSpriteAniTexSize + g_vSpriteAniTexUV;
+        else
+            vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling;
+        
         Out.vColor *= g_Texture.Sample(LinearSampler, vUV);
     }
     
     if (g_bUseMask == true)
     {
-        float2 vUV = g_vMaskOffset + In.vTexcoord * g_vMaskTiling;
+        float2 vUV = float2(0.f, 0.f);
+        
+        if (g_bSpriteAniMask == true)
+            vUV = In.vTexcoord * g_vSpriteAniMaskSize + g_vSpriteAniMaskUV;
+        else
+            vUV = g_vMaskOffset + In.vTexcoord * g_vMaskTiling;
+        
         Out.vColor *= g_Mask.Sample(LinearSampler, vUV);
     }
     
@@ -127,14 +148,26 @@ PS_OUT PS_MAIN_MIRROR(PS_IN In)
     
     if (g_bUseTexture == true)
     {
-        float2 vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling;
-        Out.vColor *= g_Texture.Sample(MirrorSampler, vUV);
+        float2 vUV = float2(0.f, 0.f);
+        
+        if (g_bSpriteAniTexture == true)
+            vUV = In.vTexcoord * g_vSpriteAniTexSize + g_vSpriteAniTexUV;
+        else
+            vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling;
+        
+        Out.vColor *= g_Texture.Sample(LinearSampler, vUV);
     }
     
     if (g_bUseMask == true)
     {
-        float2 vUV = g_vMaskOffset + In.vTexcoord * g_vMaskTiling;
-        Out.vColor *= g_Mask.Sample(MirrorSampler, vUV);
+        float2 vUV = float2(0.f, 0.f);
+        
+        if (g_bSpriteAniMask == true)
+            vUV = In.vTexcoord * g_vSpriteAniMaskSize + g_vSpriteAniMaskUV;
+        else
+            vUV = g_vMaskOffset + In.vTexcoord * g_vMaskTiling;
+        
+        Out.vColor *= g_Mask.Sample(LinearSampler, vUV);
     }
     
     Out.vColor.xyz *= g_vColor;

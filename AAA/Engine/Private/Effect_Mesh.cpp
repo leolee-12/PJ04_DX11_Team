@@ -57,6 +57,13 @@ void CEffect_Mesh::Update(_float fTimeDelta)
 void CEffect_Mesh::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
+
+    if (m_bActive == false)
+        return;
+
+    Compute_CombinedWorldMatrix();
+
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 
 HRESULT CEffect_Mesh::Render()
@@ -83,8 +90,8 @@ HRESULT CEffect_Mesh::Render()
                 return E_FAIL;
         }
 
-        Helper::IntClamp(m_iShdaerPass, ShaderPass::Default, ShaderPass::ShaderPass_End - 1);
-        if (FAILED(m_pShaderCom->Begin(m_iShdaerPass)))
+        Helper::IntClamp(m_iShaderPass, ShaderPass::Default, ShaderPass::ShaderPass_End - 1);
+        if (FAILED(m_pShaderCom->Begin(m_iShaderPass)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render(i)))
