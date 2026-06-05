@@ -69,13 +69,7 @@ void CEffect_Part::Update(_float fTimeDelta)
 
 void CEffect_Part::Late_Update(_float fTimeDelta)
 {
-    if (m_bActive == false)
-        return;
-
-    Compute_CombinedWorldMatrix();
-
-    //test
-    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::BLEND, this);
+    __super::Late_Update(fTimeDelta);
 }
 
 HRESULT CEffect_Part::Render()

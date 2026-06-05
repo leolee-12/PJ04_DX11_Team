@@ -56,7 +56,12 @@ void CTestEffectQuad::Update(_float fTimeDelta)
 
 void CTestEffectQuad::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
+    if (m_bActive == false)
+        return;
+
+    Compute_CombinedWorldMatrix();
+
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::BLEND, this);
 }
 
 HRESULT CTestEffectQuad::Render()
