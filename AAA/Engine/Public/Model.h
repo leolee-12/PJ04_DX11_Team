@@ -67,6 +67,12 @@ public:
 	HRESULT Bind_Material(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, MTEX_TYPE eType, _uint iIndex);
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
 
+public:
+	const MESH_LAYER_IDX& Get_MeshLayer(_uint iMesh) const;
+	void  Set_MeshLayer(_uint iMesh, const MESH_LAYER_IDX& v);
+	_uint Get_MeshTextureCount(_uint iMesh, MTEX_TYPE eType) const;
+	HRESULT Save_MeshLayers() const;
+
 private:
 	/* 파일로부터 읽어낸 모든 정보를 담고 있는다. */
 	MODEL						m_eType = { MODEL::END };
@@ -93,6 +99,8 @@ private:
 	_float						m_fBlendElapsed = { };
 	_bool						m_isBlending = { false };
 
+	vector<MESH_LAYER_IDX>		m_MeshLayers;
+	string						m_strMeshLayerPath;
 
 private:
 	HRESULT Ready_Meshes(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix);
@@ -102,6 +110,9 @@ private:
 
 	HRESULT Ready_NonAnim(const _char* pModelFilePath, _fmatrix PreTransformMatrix);
 	HRESULT Ready_Anim(const _char* pModelFilePath, _fmatrix PreTransformMatrix);
+
+private:
+	void Load_MeshLayers(const _char* pModelFilePath);
 
 public:
 	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix = XMMatrixIdentity(), PickableFilter fcFillter = nullptr);

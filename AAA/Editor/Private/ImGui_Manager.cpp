@@ -21,6 +21,17 @@
 
 IMPLEMENT_SINGLETON(CImGui_Manager)
 
+static const char* TexTypeName(_uint t)
+{
+    static const char* names[MTEX_TYPE_MAX] = {
+        "None","Diffuse","Specular","Ambient","Emissive","Height","Normals","Shininess",
+        "Opacity","Displacement","Lightmap","Reflection","BaseColor","NormalCamera",
+        "EmissionColor","Metalness(MRA)","Roughness","AO","Unknown(Mask)","Sheen","Clearcoat",
+        "Transmission","MayaBase","MayaSpecular","MayaSpecColor","MayaSpecRough","Anisotropy"
+    };
+    return (t < MTEX_TYPE_MAX) ? names[t] : "?";
+}
+
 CImGui_Manager::CImGui_Manager()
     : m_pGameInstance_Proxy(CGameInstance::GetProxy())
 {
@@ -327,91 +338,6 @@ void CImGui_Manager::Draw_Toolbar()
     }
 
     ImGui::SameLine();
-
-    // --- Nav Edit 토글 ---
-    if (m_pLevel_Edit->Is_NavEditMode())
-    {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.f));
-        if (ImGui::Button("NavEdit [ON]"))
-            m_pLevel_Edit->End_NavEditMode();
-        ImGui::PopStyleColor();
-
-        const CNavMesh_Editor* pNav = m_pLevel_Edit->Get_NavMeshEditor();
-        ImGui::SameLine();
-        ImGui::Text("Tris:%u  Pending:%u/3",
-            pNav->Get_TriangleCount(), pNav->Get_PendingCount());
-
-        ImGui::SameLine();
-        if (ImGui::Button("Undo##nav"))
-            m_pLevel_Edit->Nav_Undo();
-
-        ImGui::SameLine();
-        if (ImGui::Button("Redo##nav"))
-            m_pLevel_Edit->Nav_Redo();
-
-        ImGui::SameLine();
-        {
-            float fSnap = pNav->Get_SnapRadius();
-            ImGui::SetNextItemWidth(100.f);
-            if (ImGui::DragFloat("Snap##nav", &fSnap, 0.05f, 0.05f, 5.f, "%.2f"))
-                const_cast<CNavMesh_Editor*>(pNav)->Set_SnapRadius(fSnap);
-        }
-    }
-    else
-    {
-        if (ImGui::Button("NavEdit [OFF]"))
-            m_pLevel_Edit->Begin_NavEditMode();
-    }
-
-    ImGui::SameLine();
-
-    // --- Nav Save ---
-    static char s_NavSaveBuf[64] = {};
-    if (ImGui::Button("NavSave"))
-    {
-        memset(s_NavSaveBuf, 0, sizeof(s_NavSaveBuf));
-        ImGui::OpenPopup("Nav Save");
-    }
-    if (ImGui::BeginPopupModal("Nav Save", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-    {
-        ImGui::Text("File name (.nav):");
-        ImGui::InputText("##navsave", s_NavSaveBuf, 64);
-        if (ImGui::Button("OK"))
-        {
-            wstring path(s_NavSaveBuf, s_NavSaveBuf + strlen(s_NavSaveBuf));
-            m_pLevel_Edit->Save_NavMesh(g_strEditPath + path + L".nav");
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
-        ImGui::EndPopup();
-    }
-
-    ImGui::SameLine();
-
-    // --- Nav Load ---
-    static char s_NavLoadBuf[64] = {};
-    if (ImGui::Button("NavLoad"))
-    {
-        memset(s_NavLoadBuf, 0, sizeof(s_NavLoadBuf));
-        ImGui::OpenPopup("Nav Load");
-    }
-    if (ImGui::BeginPopupModal("Nav Load", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-    {
-        ImGui::Text("File name (.nav):");
-        ImGui::InputText("##navload", s_NavLoadBuf, 64);
-        if (ImGui::Button("OK"))
-        {
-            wstring path(s_NavLoadBuf, s_NavLoadBuf + strlen(s_NavLoadBuf));
-            m_pLevel_Edit->Load_NavMesh(g_strEditPath + path + L".nav");
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
-        ImGui::EndPopup();
-    }
-
-    ImGui::SameLine();
     ImGui::Separator();
     ImGui::SameLine();
 
@@ -581,6 +507,11 @@ void CImGui_Manager::Draw_Inspector()
 
     Draw_Transform(pSelected);
 
+    ImGui::Separator();
+
+    Draw_MeshLayerPanel(pSelected);
+
+    ImGui::Separator();
     ImGui::Separator();
 
     Draw_Properties(pSelected);
@@ -1260,6 +1191,52 @@ void CImGui_Manager::Draw_ShaderGlobals()
     }
 
     ImGui::End();
+}
+
+void CImGui_Manager::Draw_MeshLayerPanel(CGameObject* pObj)
+{
+    if (nullptr == pObj) return;
+    CModel* pModel = pObj->Get_Component<CModel>(L"Com_Model");
+    if (nullptr == pModel) return;
+    if (!ImGui::CollapsingHeader("Mesh Texture Layers")) return;
+
+    size_t n = pModel->Get_NumMeshes();
+    for (size_t i = 0; i < n; ++i)
+    {
+        MESH_LAYER_IDX L = pModel->Get_MeshLayer((_uint)i);
+        ImGui::PushID((int)i);
+        ImGui::Text("%zu: %s", i, pModel->Get_MeshName((_uint)i).c_str());
+
+        bool changed = false;
+        bool bAnyField = false;
+
+        for (_uint t = 0; t < MTEX_TYPE_MAX; ++t)
+        {
+            int count = (int)pModel->Get_MeshTextureCount((_uint)i, (MTEX_TYPE)t);
+            if (count <= 1) continue;            // 고를 게 없는 타입은 숨김
+
+            bAnyField = true;
+            int iv = (int)L.idx[t];
+            ImGui::SetNextItemWidth(120.f);
+            if (ImGui::InputInt(TexTypeName(t), &iv))
+            {
+                if (iv < 0)      iv = 0;
+                if (iv >= count) iv = count - 1; // 사용 가능 개수로 클램프 → E_FAIL 방지
+                L.idx[t] = (_uint)iv;
+                changed = true;
+            }
+            ImGui::SameLine(); ImGui::Text("/ %d", count);
+        }
+        if (!bAnyField)
+            ImGui::TextDisabled("  (single-texture mesh)");
+
+        if (changed) pModel->Set_MeshLayer((_uint)i, L);
+        ImGui::Separator();
+        ImGui::PopID();
+    }
+
+    if (ImGui::Button("Bake (Save sidecar)"))
+        pModel->Save_MeshLayers();
 }
 
 void CImGui_Manager::Free()

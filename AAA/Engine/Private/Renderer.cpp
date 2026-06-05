@@ -534,7 +534,7 @@ HRESULT CRenderer::Render_DoF()
         };
 
     m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderPost,
-        { "g_fDoFEnable", "g_fFocusDist", "g_fFocusRange", "g_fDoFMaxCoC", "g_fDoFAutoFocus" });
+        { "g_fDoFEnable", "g_fFocusDist", "g_fAperture", "g_fDoFMaxCoC", "g_fDoFAutoFocus" });
 
     if (bOn)
     {
@@ -653,6 +653,12 @@ HRESULT CRenderer::Render_VolumetricFog()
         cb->vLightDir = _float4(0.f, -1.f, 0.f, 0.f);
         cb->vLightColor = _float4(0.f, 0.f, 0.f, 0.f);
     }
+
+    const _float4* pFogLI = m_pGameInstance_Proxy->Get_ShaderGlobal("g_fFogLightIntensity");
+    const _float fFogLI = (nullptr != pFogLI) ? pFogLI->x : 1.f;
+    cb->vLightColor.x *= fFogLI;
+    cb->vLightColor.y *= fFogLI;
+    cb->vLightColor.z *= fFogLI;
 
     auto Fog = [&](const _char* n) -> _float4
         {
