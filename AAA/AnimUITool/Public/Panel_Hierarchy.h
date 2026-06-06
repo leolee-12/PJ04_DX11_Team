@@ -13,6 +13,12 @@ private:
 public:
 	virtual void				Render() override;
 
+private:
+	void						Render_AnimationHierarchy();
+	void						Render_UIHierarchy();
+
+	const _char*				Get_RenderLayerName(RENDERUIID eRenderLayer);
+
 public:
 	static CPanel_Hierarchy*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 

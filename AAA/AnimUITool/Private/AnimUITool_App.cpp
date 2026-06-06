@@ -6,13 +6,10 @@
 #include "Preview_Actor.h"
 #include "GameObject_Factory.h"
 
+#include "AnimUITool_Defines.h"
+
 #include "Level_Tool.h"
 
-// ImGui Çì´õ
-#include "imgui.h"
-#include "imgui_internal.h"          
-#include "imgui_impl_win32.h"
-#include "imgui_impl_dx11.h"
 
 CAnimUITool_App::CAnimUITool_App()
 {

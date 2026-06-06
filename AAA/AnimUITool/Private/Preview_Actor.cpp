@@ -39,6 +39,12 @@ HRESULT CPreview_Actor::Initialize(void* pArg)
     return S_OK;
 }
 
+void CPreview_Actor::Update(_float fTimeDelta)
+{
+    if (m_pAnimatorCom && !m_pAnimatorCom->Get_CurrentAnimName().empty())           // 애니메이션 클립이 설정되어 있지 않으면 Update를 호출하지 않지만 Panel_Manager의 ctx에 기본 clip = 0으로 설정되어 있음
+        m_pAnimatorCom->Update(fTimeDelta);
+}
+
 void CPreview_Actor::Late_Update(_float fTimeDelta)
 {
     if (!m_bActive)

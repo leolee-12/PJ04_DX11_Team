@@ -1,5 +1,4 @@
 #include "EditCamera.h"
-#include "imgui.h"
 
 using namespace AnimUITool;
 
