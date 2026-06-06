@@ -549,7 +549,9 @@ HRESULT CModel::Cook_CollisionMesh(const vector<MESH_DATA>& meshes, _fmatrix Pre
     if (Positions.empty() || Indices.size() < 3) return S_OK;
 
     m_pCollisionMesh = m_pGameInstance_Proxy->Cook_TriangleMesh(
-        Positions.data(), (_uint)Positions.size(), Indices.data(), (_uint)Indices.size());
+        Positions.data(), (_uint)Positions.size(),
+        Indices.data(), (_uint)Indices.size(),
+        false);
     return (nullptr != m_pCollisionMesh) ? S_OK : E_FAIL;
 }
 

@@ -857,6 +857,45 @@ void           CGameInstance_Proxy::Remove_StaticActor(PxRigidStatic* pActor)
 
 	m_pOwner->Remove_StaticActor(pActor);
 }
+PxController* CGameInstance_Proxy::Create_CapsuleController(const _float3& vFootPos, _float fRadius, _float fHeight)
+{
+	if (!IsConnected())
+		return nullptr;
+	return m_pOwner->Create_CapsuleController(vFootPos, fRadius, fHeight);
+}
+_bool CGameInstance_Proxy::Move_Controller(PxController* pCtrl, const _float3& vDisp, _float fTimeDelta, _float3* pOutFootPos)
+{
+	if (!IsConnected())
+		return false;
+	return m_pOwner->Move_Controller(pCtrl, vDisp, fTimeDelta, pOutFootPos);
+}
+void CGameInstance_Proxy::Release_Controller(PxController* pCtrl)
+{
+	if (!IsConnected())
+		return;
+	m_pOwner->Release_Controller(pCtrl);
+}
+void CGameInstance_Proxy::Set_ControllerFootPosition(PxController* pCtrl, const _float3& vFootPos)
+{
+	if (!IsConnected())
+		return;
+	m_pOwner->Set_ControllerFootPosition(pCtrl, vFootPos);
+}
+void CGameInstance_Proxy::Toggle_PhysXDebug()
+{
+	if (!IsConnected()) return;
+	m_pOwner->Toggle_PhysXDebug();
+}
+_bool CGameInstance_Proxy::Is_PhysXDebug() const
+{
+	if (!IsConnected()) return false;
+	return m_pOwner->Is_PhysXDebug();
+}
+void CGameInstance_Proxy::Render_PhysXDebug(_fmatrix V, _fmatrix P)
+{
+	if (!IsConnected()) return;
+	m_pOwner->Render_PhysXDebug(V, P);
+}
 #pragma endregion
 
 

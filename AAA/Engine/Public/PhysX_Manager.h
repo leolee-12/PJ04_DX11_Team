@@ -19,7 +19,7 @@ NS_BEGIN(Engine)
 class ENGINE_DLL CPhysX_Manager final : public CBase
 {
 private:
-    CPhysX_Manager() = default;
+    CPhysX_Manager(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual ~CPhysX_Manager() = default;
 
 private:
@@ -38,6 +38,8 @@ public:
     void                  Remove_StaticActor(physx::PxRigidStatic* pActor);
 
     physx::PxController* Create_CapsuleController(const _float3& vPos, _float fRadius, _float fHeight);
+    _bool                Move_Controller(physx::PxController* pCtrl, const _float3& vDisp, _float fTimeDelta, _float3* pOutFootPos);
+    void                 Release_Controller(physx::PxController* pCtrl);
 
     physx::PxRigidStatic* Cook_StaticMesh(
         const _float3* pVertices, _uint iNumVertices,
@@ -46,6 +48,14 @@ public:
 
     physx::PxPhysics* Get_Physics() const { return m_pPhysics; }
     physx::PxScene* Get_Scene()   const { return m_pScene; }
+
+public:
+    void Set_ControllerFootPosition(physx::PxController* pCtrl, const _float3& vFootPos);
+
+public:
+    void  Render_Debug(_fmatrix ViewMatrix, _fmatrix ProjMatrix);   
+    void  Toggle_DebugDraw();                                       
+    _bool Is_DebugDraw() const { return m_bDebugDraw; }
 
 private:
     physx::PxFoundation* m_pFoundation = { nullptr };
@@ -56,14 +66,23 @@ private:
     physx::PxMaterial* m_pDefaultMtrl = { nullptr };
 
     vector<physx::PxRigidStatic*> m_StaticActors;
+    vector<physx::PxController*> m_Controllers;
 
     physx::PxDefaultAllocator      m_Allocator;
     physx::PxDefaultErrorCallback  m_ErrorCallback;
 
     _bool   m_bExtensionsInited = { false };
 
+    ID3D11Device* m_pDevice = { nullptr };
+    ID3D11DeviceContext* m_pContext = { nullptr };
+
+    PrimitiveBatch<VertexPositionColor>* m_pBatch = { nullptr };
+    BasicEffect* m_pEffect = { nullptr };
+    ID3D11InputLayout* m_pInputLayout = { nullptr };
+    _bool                                m_bDebugDraw = { false };
+
 public:
-    static CPhysX_Manager* Create();
+    static CPhysX_Manager* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual void Free() override;
 };
 

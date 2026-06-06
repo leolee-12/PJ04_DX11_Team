@@ -354,6 +354,45 @@ void CImGui_Manager::Draw_Toolbar()
 
     ImGui::SameLine();
 
+    // --- Play / Stop Toggle ---
+    if (m_pGameInstance_Proxy->Is_EditMode())
+    {
+        // 편집 중 → Play
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.15f, 0.65f, 0.15f, 1.f));
+        if (ImGui::Button("Play"))
+        {
+            m_pGameInstance_Proxy->Set_EditMode(false);    // CCT/게임플레이 ON
+            m_pGameInstance_Proxy->Enable_InputDeveice();  // 키입력 ON (WASD)
+            m_bKeyInputEnabled = true;
+        }
+        ImGui::PopStyleColor();
+    }
+    else
+    {
+        // 플레이 중 → Stop
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.75f, 0.2f, 0.2f, 1.f));
+        if (ImGui::Button("Stop"))
+        {
+            m_pGameInstance_Proxy->Set_EditMode(true);     // 편집 모드 복귀
+            m_pGameInstance_Proxy->Disable_InputDeveice(); // 키입력 OFF
+            m_bKeyInputEnabled = false;
+        }
+        ImGui::PopStyleColor();
+    }
+
+    ImGui::SameLine();
+
+    // --- Physics Debug Toggle ---
+    {
+        bool bOn = m_pGameInstance_Proxy->Is_PhysXDebug();
+        if (bOn) ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 1.0f, 1.0f));
+        if (ImGui::Button("Physics Debug"))
+            m_pGameInstance_Proxy->Toggle_PhysXDebug();
+        if (bOn) ImGui::PopStyleColor();
+    }
+
+    ImGui::SameLine();
+
     // --- Effect Save ---
     static char s_EffectSaveBuf[iBufferSize] = {};
     if (ImGui::Button("Effect Save"))

@@ -213,6 +213,10 @@ HRESULT CRenderer::Draw()
 #ifdef _DEBUG
     if (FAILED(Render_Debug()))
         return E_FAIL;
+
+    m_pGameInstance_Proxy->Render_PhysXDebug(
+        XMLoadFloat4x4(m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC)),
+        XMLoadFloat4x4(m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC)));
 #endif
 
     return S_OK;

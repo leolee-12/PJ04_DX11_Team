@@ -108,7 +108,7 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pInstance->m_pEffect_Manager)
         return E_FAIL;
 
-    m_pInstance->m_pPhysX_Manager = CPhysX_Manager::Create();
+    m_pInstance->m_pPhysX_Manager = CPhysX_Manager::Create(*ppDevice, *ppContext);
     if (nullptr == m_pInstance->m_pPhysX_Manager)
         return E_FAIL;
 
@@ -593,7 +593,34 @@ void           CGameInstance::Remove_StaticActor(PxRigidStatic* pActor)
 {
     m_pPhysX_Manager->Remove_StaticActor(pActor);
 }
-
+PxController* CGameInstance::Create_CapsuleController(const _float3& vFootPos, _float fRadius, _float fHeight)
+{
+    return m_pPhysX_Manager->Create_CapsuleController(vFootPos, fRadius, fHeight);
+}
+_bool CGameInstance::Move_Controller(PxController* pCtrl, const _float3& vDisp, _float fTimeDelta, _float3* pOutFootPos)
+{
+    return m_pPhysX_Manager->Move_Controller(pCtrl, vDisp, fTimeDelta, pOutFootPos);
+}
+void CGameInstance::Release_Controller(PxController* pCtrl)
+{
+    m_pPhysX_Manager->Release_Controller(pCtrl);
+}
+void CGameInstance::Set_ControllerFootPosition(PxController* pCtrl, const _float3& vFootPos)
+{
+    m_pPhysX_Manager->Set_ControllerFootPosition(pCtrl, vFootPos);
+}
+void CGameInstance::Toggle_PhysXDebug()
+{
+    m_pPhysX_Manager->Toggle_DebugDraw();
+}
+_bool CGameInstance::Is_PhysXDebug() const
+{
+    return m_pPhysX_Manager->Is_DebugDraw();
+}
+void CGameInstance::Render_PhysXDebug(_fmatrix V, _fmatrix P)
+{
+    m_pPhysX_Manager->Render_Debug(V, P);
+}
 #pragma endregion
 
 
