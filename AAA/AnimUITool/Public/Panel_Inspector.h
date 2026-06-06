@@ -26,6 +26,8 @@ private:
 	void						Render_Bones();
 	void						Render_Meshs();
 	void						Render_KirbyFace(CGameObject* pObject);
+	void						Render_UITransform(CGameObject* pObject);
+	void						Render_UIInspector();
 
 private:
 	unordered_map<CGameObject*, _float3>	m_RotEditEuler;

@@ -8,6 +8,7 @@
 #include "Property.h"
 #include "Preview_Kirby.h"
 #include "Kirby_States.h"
+#include "UIPartObject.h"
 
 CPanel_Inspector::CPanel_Inspector(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPanel(pDevice, pContext)
@@ -18,6 +19,13 @@ CPanel_Inspector::CPanel_Inspector(ID3D11Device* pDevice, ID3D11DeviceContext* p
 void CPanel_Inspector::Render()
 {
     ImGui::Begin(m_szName);
+
+    if (m_pPanel_Manager->Get_WorkMode() == TOOL_MODE::UI)
+    {
+        Render_UIInspector();
+        ImGui::End();
+        return;
+    }
 
     ANIM_CONTEXT& ctx = m_pPanel_Manager->Get_Context();
     if (!ctx.pOwner || !ctx.pModel)
@@ -360,10 +368,6 @@ void CPanel_Inspector::Render_Meshs()
 
 void CPanel_Inspector::Render_KirbyFace(CGameObject* pObject)
 {
-    CPreview_Kirby* pKirby = dynamic_cast<CPreview_Kirby*>(pObject);
-    if (!pKirby)
-        return;
-
     if (!ImGui::CollapsingHeader("Kirby Face", ImGuiTreeNodeFlags_DefaultOpen) || pObject == nullptr )
         return;
 
@@ -400,6 +404,79 @@ void CPanel_Inspector::Render_KirbyFace(CGameObject* pObject)
         }
     }
 
+}
+
+void CPanel_Inspector::Render_UITransform(CGameObject* pObject)
+{
+    CUIPartObject* pPart = dynamic_cast<CUIPartObject*>(*pObject);
+    if (!pPart)
+        return;
+
+    if (!ImGui::CollapsingHeader("Transform (UI)", ImGuiTreeNodeFlags_DefaultOpen))
+        return;
+
+    CTransform* pT = pPart->Get_Transform();
+    UI_CONTEXT& uictx = m_pPanel_Manager->Get_UIContext();
+
+    // Position: x,y = UI 중심좌표 / z = z-order
+    _vector vPos = pT->Get_State(STATE::POSITION);
+    float pos[3] = { XMVectorGetX(vPos), XMVectorGetY(vPos), XMVectorGetZ(vPos) };
+    bool bMoved = false;
+    bMoved |= ImGui::DragFloat2("Position (x,y)", pos, 1.f);
+    bMoved |= ImGui::DragFloat("Z-Order", &pos[2], 0.01f, 0.1f, 2.0f);   // ortho z 범위
+    if (bMoved)
+    {
+        pT->Set_State(STATE::POSITION, XMVectorSet(pos[0], pos[1], pos[2], 1.f));
+        uictx.bDirty = true;
+    }
+
+    // Size: scale.x = 가로, scale.y = 세로 (개별)
+    _float3 sc = pT->Get_Scaled();
+    float size[2] = { sc.x, sc.y };
+    if (ImGui::DragFloat2("Size (w,h)", size, 1.f, 1.f, 99999.f))
+    {
+        pT->Set_Scale(size[0], size[1], 1.f);
+        uictx.bDirty = true;
+    }
+}
+
+void CPanel_Inspector::Render_UIInspector()
+{
+    UI_CONTEXT& uictx = m_pPanel_Manager->Get_UIContext();
+    UI_SELECTION& sel = uictx.Selection;
+
+    if (!sel.Valid() || nullptr == sel.pPart)
+    {
+        ImGui::TextDisabled("(no UI part selected)");
+        return;
+    }
+
+    CUIPartObject* pPart = sel.pPart;
+
+    std::string strName = ToUtf8(sel.strPartTag);
+    ImGui::Text("[UI Part] %s", strName.empty() ? "-" : strName.c_str());
+    ImGui::Separator();
+
+    struct { RENDERUIID v; const char* n; } layers[] = {
+        { RENDERUIID::BACK, "BACK" }, { RENDERUIID::MIDDLE, "MIDDLE" }, { RENDERUIID::FRONT, "FRONT" }
+    };
+    const char* szCur = "?";
+    for (auto& L : layers) if (L.v == pPart->Get_RenderLayer()) szCur = L.n;
+    if (ImGui::BeginCombo("RenderLayer", szCur))
+    {
+        for (auto& L : layers)
+            if (ImGui::Selectable(L.n, L.v == pPart->Get_RenderLayer()))
+            {
+                pPart->Set_RenderLayer(L.v);
+                uictx.bDirty = true;
+            }
+        ImGui::EndCombo();
+    }
+    ImGui::Text("Z (Transform z): %.3f", pPart->Get_ZOrder());
+
+    ImGui::Separator();
+    Render_Transform(pPart);    
+    Render_Properties(pPart);   
 }
 
 CPanel_Inspector* CPanel_Inspector::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

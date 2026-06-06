@@ -59,8 +59,8 @@ HRESULT CLevel_Tool::Initialize()
     if (FAILED(Ready_PreviewShaders()))
         return E_FAIL;
 
-    //if (FAILED(Ready_TestUI()))
-    //    return E_FAIL;
+    if (FAILED(Ready_TestUI()))
+        return E_FAIL;
 
     return S_OK;
 }
@@ -153,7 +153,8 @@ HRESULT CLevel_Tool::Ready_TestUI()
     }
 
     Client::CUI_Title::UI_TITLE_DESC desc{};
-    desc.vPosition = { -250.f, 120.f, 0.f, 1.f };
+    //desc.vPosition = { -250.f, 120.f, 0.f, 1.f };
+    desc.vPosition = { 0.f, 0.f, 0.f, 1.f };
     desc.bCreateTitleImage = true;
     desc.szTitleImagePartTag = Client::CUI_Title::PART_TAG_TITLE_IMAGE;
 
@@ -170,7 +171,7 @@ HRESULT CLevel_Tool::Ready_TestUI()
     Track_UIContainer(pSource);
 
     json jUI = pSource->Serialize();
-    jUI["Transform"]["vPosition"][0] = 250.f;
+    jUI["Transform"]["vPosition"][0] = 0.f;
 
     CGameObject* pLoaded = nullptr;
     if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pLoaded, L, Client::CUI_Title::PROTOTYPE_TAG, ETOUI(TOOL_LEVEL::EDIT), L"Layer_UI", L"Test_UI_Title_Loaded",  nullptr)))
