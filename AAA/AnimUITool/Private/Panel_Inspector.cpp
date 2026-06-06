@@ -6,6 +6,9 @@
 #include "Panel_Manager.h"
 #include "Transform.h"
 #include "Property.h"
+#include "Preview_Kirby.h"
+#include "Kirby_States.h"
+#include "UIPartObject.h"
 
 CPanel_Inspector::CPanel_Inspector(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPanel(pDevice, pContext)
@@ -17,8 +20,15 @@ void CPanel_Inspector::Render()
 {
     ImGui::Begin(m_szName);
 
+    if (m_pPanel_Manager->Get_WorkMode() == TOOL_MODE::UI)
+    {
+        Render_UIInspector();
+        ImGui::End();
+        return;
+    }
+
     ANIM_CONTEXT& ctx = m_pPanel_Manager->Get_Context();
-    if (!ctx.pActor || !ctx.pModel)
+    if (!ctx.pOwner || !ctx.pModel)
     {
         ImGui::TextDisabled("(no model loaded)");
         ImGui::End();
@@ -27,10 +37,11 @@ void CPanel_Inspector::Render()
 
     Render_Model();
     ImGui::Separator();
+    Render_KirbyFace(ctx.pOwner);
     Render_RenderDebug();
     ImGui::Separator();
-    Render_Transform(ctx.pActor);
-    Render_Properties(ctx.pActor);
+    Render_Transform(ctx.pOwner);
+    Render_Properties(ctx.pOwner);
     ImGui::Separator();
     Render_Meshs();
     ImGui::Separator();
@@ -46,8 +57,8 @@ void CPanel_Inspector::Render_Model()
     ImGui::Text("[Model]");
     std::string name(ctx.strName.begin(), ctx.strName.end());
     ImGui::Text("Name: %s", name.empty() ? "-" : name.c_str());
-    ImGui::Text("Type: %s", ctx.pActor->Get_Type() == MODEL::ANIM ? "ANIM" :
-        "NONANIM");
+    if (auto* pv = dynamic_cast<CPreview_Actor*>(ctx.pOwner))
+        ImGui::Text("Type: %s", pv->Get_Type() == MODEL::ANIM ? "ANIM" : "NONANIM");
     ImGui::Text("Meshes: %zu", ctx.pModel->Get_NumMeshes());
     // (NonAnim/Anim는 .ysh에 박힌 값. 변경/저장은 추후 .AnimClips/bake 단계와 연동)
 }
@@ -87,7 +98,7 @@ void CPanel_Inspector::Render_Transform(CGameObject* pObject)
 void CPanel_Inspector::Render_RenderDebug()
 {
     ANIM_CONTEXT& ctx = m_pPanel_Manager->Get_Context();
-    CPreview_Actor* pActor = ctx.pActor;
+    CPreview_Actor* pActor = dynamic_cast<CPreview_Actor*>(ctx.pOwner);
     if (!pActor)
         return;
 
@@ -256,34 +267,34 @@ void CPanel_Inspector::Render_Bones()
     ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, 12.f);
 
     function<void(_uint)> drawNode = [&](_uint i)
-    {
-        const bool leaf = children[i].empty();
-        const bool animated = isAnimated(i);
-
-        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow
-            | ImGuiTreeNodeFlags_DefaultOpen
-            | ImGuiTreeNodeFlags_SpanAvailWidth;
-        if (leaf)                     
-            flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-        if ((_int)i == ctx.iSelBone)  
-            flags |= ImGuiTreeNodeFlags_Selected;
-
-        if (animated) ImGui::PushStyleColor(ImGuiCol_Text, vGreen);
-        ImGui::PushID((int)i);
-        const bool open = ImGui::TreeNodeEx("##bone", flags, "%u: %s", i, pModel->Get_BoneName(i).c_str());
-        if (animated) ImGui::PopStyleColor();           // 라벨 그린 뒤 즉시 복원
-
-        if (ImGui::IsItemClicked()) ctx.iSelBone = (_int)i;
-
-        if (open && !leaf)
         {
-            for (_uint c : children[i]) drawNode(c);
-            ImGui::TreePop();
-        }
-        ImGui::PopID();
-    };
+            const bool leaf = children[i].empty();
+            const bool animated = isAnimated(i);
 
-    for (_uint r : roots) 
+            ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow
+                | ImGuiTreeNodeFlags_DefaultOpen
+                | ImGuiTreeNodeFlags_SpanAvailWidth;
+            if (leaf)
+                flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+            if ((_int)i == ctx.iSelBone)
+                flags |= ImGuiTreeNodeFlags_Selected;
+
+            if (animated) ImGui::PushStyleColor(ImGuiCol_Text, vGreen);
+            ImGui::PushID((int)i);
+            const bool open = ImGui::TreeNodeEx("##bone", flags, "%u: %s", i, pModel->Get_BoneName(i).c_str());
+            if (animated) ImGui::PopStyleColor();           // 라벨 그린 뒤 즉시 복원
+
+            if (ImGui::IsItemClicked()) ctx.iSelBone = (_int)i;
+
+            if (open && !leaf)
+            {
+                for (_uint c : children[i]) drawNode(c);
+                ImGui::TreePop();
+            }
+            ImGui::PopID();
+        };
+
+    for (_uint r : roots)
         drawNode(r);
 
     ImGui::PopStyleVar();
@@ -306,7 +317,7 @@ void CPanel_Inspector::Render_Meshs()
 {
     ANIM_CONTEXT& ctx = m_pPanel_Manager->Get_Context();
 
-    CPreview_Actor* pActor = ctx.pActor;
+    CPreview_Actor* pActor = dynamic_cast<CPreview_Actor*>(ctx.pOwner);
     CModel* pModel = ctx.pModel;
 
     if (!pActor || !pModel)
@@ -355,12 +366,126 @@ void CPanel_Inspector::Render_Meshs()
     ImGui::EndChild();
 }
 
+void CPanel_Inspector::Render_KirbyFace(CGameObject* pObject)
+{
+    CPreview_Kirby* pKirby = dynamic_cast<CPreview_Kirby*>(pObject);
+    if (!pKirby)
+        return;
+
+    if (!ImGui::CollapsingHeader("Kirby Face", ImGuiTreeNodeFlags_DefaultOpen) || pObject == nullptr)
+        return;
+
+    {
+        const char* szCur = "?";
+        for (auto& [v, n] : g_KirbyBodyNames) if (v == pKirby->Get_Body()) szCur = n;
+        if (ImGui::BeginCombo("Body", szCur))
+        {
+            for (auto& [v, n] : g_KirbyBodyNames)
+                if (ImGui::Selectable(n, v == pKirby->Get_Body())) pKirby->Set_Body(v);
+            ImGui::EndCombo();
+        }
+    }
+    // Mouth
+    {
+        const char* szCur = "?";
+        for (auto& [v, n] : g_KirbyMouthNames) if (v == pKirby->Get_Mouth()) szCur = n;
+        if (ImGui::BeginCombo("Mouth", szCur))
+        {
+            for (auto& [v, n] : g_KirbyMouthNames)
+                if (ImGui::Selectable(n, v == pKirby->Get_Mouth())) pKirby->Set_Mouth(v);
+            ImGui::EndCombo();
+        }
+    }
+    // Eye
+    {
+        const char* szCur = "?";
+        for (auto& [v, n] : g_KirbyEyeNames) if (v == pKirby->Get_Eye()) szCur = n;
+        if (ImGui::BeginCombo("Eye", szCur))
+        {
+            for (auto& [v, n] : g_KirbyEyeNames)
+                if (ImGui::Selectable(n, v == pKirby->Get_Eye())) pKirby->Set_Eye(v);
+            ImGui::EndCombo();
+        }
+    }
+
+}
+
+void CPanel_Inspector::Render_UITransform(CUIPartObject* pPart)
+{
+
+    if (!ImGui::CollapsingHeader("Transform (UI)", ImGuiTreeNodeFlags_DefaultOpen))
+        return;
+
+    CTransform* pT = pPart->Get_Transform();
+    UI_CONTEXT& uictx = m_pPanel_Manager->Get_UIContext();
+
+    // Position: x,y = UI 중심좌표 / z = z-order
+    _vector vPos = pT->Get_State(STATE::POSITION);
+    float pos[3] = { XMVectorGetX(vPos), XMVectorGetY(vPos), XMVectorGetZ(vPos) };
+    bool bMoved = false;
+    bMoved |= ImGui::DragFloat2("Position (x,y)", pos, 1.f);
+    bMoved |= ImGui::DragFloat("Z-Order", &pos[2], 0.01f, 0.1f, 2.0f);   // ortho z 범위
+    if (bMoved)
+    {
+        pT->Set_State(STATE::POSITION, XMVectorSet(pos[0], pos[1], pos[2], 1.f));
+        uictx.bDirty = true;
+    }
+
+    // Size: scale.x = 가로, scale.y = 세로 (개별)
+    _float3 sc = pT->Get_Scaled();
+    float size[2] = { sc.x, sc.y };
+    if (ImGui::DragFloat2("Size (w,h)", size, 1.f, 1.f, 99999.f))
+    {
+        pT->Set_Scale(size[0], size[1], 1.f);
+        uictx.bDirty = true;
+    }
+}
+
+void CPanel_Inspector::Render_UIInspector()
+{
+    UI_CONTEXT& uictx = m_pPanel_Manager->Get_UIContext();
+    UI_SELECTION& sel = uictx.Selection;
+
+    if (!sel.Valid() || nullptr == sel.pPart)
+    {
+        ImGui::TextDisabled("(no UI part selected)");
+        return;
+    }
+
+    CUIPartObject* pPart = sel.pPart;
+
+    std::string strName = ToUtf8(sel.strPartTag);
+    ImGui::Text("[UI Part] %s", strName.empty() ? "-" : strName.c_str());
+    ImGui::Separator();
+
+    struct { RENDERUIID v; const char* n; } layers[] = {
+        { RENDERUIID::BACK, "BACK" }, { RENDERUIID::MIDDLE, "MIDDLE" }, { RENDERUIID::FRONT, "FRONT" }
+    };
+    const char* szCur = "?";
+    for (auto& L : layers) if (L.v == pPart->Get_RenderLayer()) szCur = L.n;
+    if (ImGui::BeginCombo("RenderLayer", szCur))
+    {
+        for (auto& L : layers)
+            if (ImGui::Selectable(L.n, L.v == pPart->Get_RenderLayer()))
+            {
+                pPart->Set_RenderLayer(L.v);
+                uictx.bDirty = true;
+            }
+        ImGui::EndCombo();
+    }
+    ImGui::Text("Z (Transform z): %.3f", pPart->Get_ZOrder());
+
+    ImGui::Separator();
+    Render_UITransform(pPart);
+    Render_Properties(pPart);
+}
+
 CPanel_Inspector* CPanel_Inspector::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     return new CPanel_Inspector(pDevice, pContext);
 }
 
-void CPanel_Inspector::Free() 
+void CPanel_Inspector::Free()
 {
     __super::Free();
 }

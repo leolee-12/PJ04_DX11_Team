@@ -6,13 +6,17 @@
 #include "Shader.h"
 #include "Model.h"
 #include "Preview_Actor.h"
+#include "Preview_Kirby.h"
 #include "GameContent_const.h"
 #include "GameObject_Factory.h"
 
 #include "UI_Title.h"
+#include "Panel_Manager.h"
+#include "UIContainerObject.h"
+#include "UIPartObject.h"
 
-namespace 
-{ 
+namespace
+{
     constexpr const _char* PREVIEW_MODEL_PATH =
         "../../Resources/Models/Test/BladeKnight/BladeKnight.ysh";
 
@@ -21,12 +25,12 @@ namespace
         FILE* fp = nullptr; _wfopen_s(&fp, strPath.c_str(), L"rb");
         if (!fp) return MODEL::END;
         uint32_t magic = 0, ver = 0, type = 0;
-        fread(&magic, 4, 1, fp); 
-        fread(&ver, 4, 1, fp); 
+        fread(&magic, 4, 1, fp);
+        fread(&ver, 4, 1, fp);
         fread(&type, 4, 1, fp);
 
         fclose(fp);
-        if (magic != 0x2E595348) 
+        if (magic != 0x2E595348)
             return MODEL::END;
 
         return (type == 0) ? MODEL::NONANIM : MODEL::ANIM;
@@ -40,16 +44,16 @@ CLevel_Tool::CLevel_Tool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 HRESULT CLevel_Tool::Initialize()
 {
-    if (FAILED(__super::Initialize())) 
+    if (FAILED(__super::Initialize()))
         return E_FAIL;
 
-    if (FAILED(Ready_Lights())) 
+    if (FAILED(Ready_Lights()))
         return E_FAIL;
 
-    if (FAILED(Ready_Camera())) 
+    if (FAILED(Ready_Camera()))
         return E_FAIL;
 
-    if (FAILED(Ready_Grid()))   
+    if (FAILED(Ready_Grid()))
         return E_FAIL;
 
     if (FAILED(Ready_PreviewShaders()))
@@ -63,13 +67,18 @@ HRESULT CLevel_Tool::Initialize()
 
 HRESULT CLevel_Tool::Ready_Lights()
 {
-    LIGHT_DESC LightDesc{};
+    LIGHT_DESC      LightDesc{};
+
     LightDesc.eType = LIGHT::DIRECTIONAL;
-    LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);   
-    LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
+    LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+    LightDesc.vAmbient = _float4(0.2f, 0.2f, 0.2f, 1.f);
     LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
-    LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
-    return m_pGameInstance_Proxy->Add_Light(LightDesc);
+    LightDesc.vDirection = _float4(-0.3f, -1.f, -0.3f, 0.f);
+
+    if (FAILED(m_pGameInstance_Proxy->Add_Light(LightDesc)))
+        return E_FAIL;
+
+    return S_OK;
 }
 
 HRESULT CLevel_Tool::Ready_Camera()
@@ -88,7 +97,7 @@ HRESULT CLevel_Tool::Ready_Camera()
     desc.fFovy = XMConvertToRadians(60.f);
     desc.fNear = 0.1f;
     desc.fFar = 1000.f;
-    desc.fSpeedPerSec = 20.f;                      
+    desc.fSpeedPerSec = 20.f;
     desc.fRotationPerSec = XMConvertToRadians(360.f);
     desc.fMouseSensor = 0.05f;
 
@@ -144,7 +153,8 @@ HRESULT CLevel_Tool::Ready_TestUI()
     }
 
     Client::CUI_Title::UI_TITLE_DESC desc{};
-    desc.vPosition = { -250.f, 120.f, 0.f, 1.f };
+    //desc.vPosition = { -250.f, 120.f, 0.f, 1.f };
+    desc.vPosition = { 0.f, 0.f, 0.f, 1.f };
     desc.bCreateTitleImage = true;
     desc.szTitleImagePartTag = Client::CUI_Title::PART_TAG_TITLE_IMAGE;
 
@@ -155,22 +165,38 @@ HRESULT CLevel_Tool::Ready_TestUI()
     desc.TitleImageDesc.iRenderLayer = 1;
 
     CGameObject* pSource = nullptr;
-    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pSource, L, Client::CUI_Title::PROTOTYPE_TAG, ETOUI(TOOL_LEVEL::EDIT), L"Layer_UI", L"Test_UI_Title_Source",  &desc)))
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pSource, L, Client::CUI_Title::PROTOTYPE_TAG, ETOUI(TOOL_LEVEL::EDIT), L"Layer_UI", L"Test_UI_Title_Source", &desc)))
         return E_FAIL;
+
+    Track_UIContainer(pSource);
 
     json jUI = pSource->Serialize();
-    jUI["Transform"]["vPosition"][0] = 250.f;
+    jUI["Transform"]["vPosition"][0] = 0.f;
 
     CGameObject* pLoaded = nullptr;
-    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pLoaded, L, Client::CUI_Title::PROTOTYPE_TAG, ETOUI(TOOL_LEVEL::EDIT), L"Layer_UI", L"Test_UI_Title_Loaded",  nullptr)))
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pLoaded, L, Client::CUI_Title::PROTOTYPE_TAG, ETOUI(TOOL_LEVEL::EDIT), L"Layer_UI", L"Test_UI_Title_Loaded", nullptr)))
         return E_FAIL;
-    
+
+    Track_UIContainer(pLoaded);
+
     pLoaded->Deserialize(jUI);
 
     return S_OK;
 }
 
-void CLevel_Tool::Update(_float fTimeDelta) 
+void CLevel_Tool::Track_UIContainer(CGameObject* pObject)
+{
+    auto* pContainer = dynamic_cast<CUIContainerObject*>(pObject);
+    if (!pContainer)
+        return;
+
+    if (find(m_UIContainers.begin(), m_UIContainers.end(), pContainer) != m_UIContainers.end())
+        return;
+
+    m_UIContainers.push_back(pContainer);
+}
+
+void CLevel_Tool::Update(_float fTimeDelta)
 {
 }
 
@@ -198,7 +224,7 @@ void CLevel_Tool::Set_CameraActive(_bool bActive)
 void CLevel_Tool::Set_PreviewVisible(_bool bVisible)
 {
     if (m_pPreview)
-    m_pPreview->Set_Active(bVisible);
+        m_pPreview->Set_Active(bVisible);
 }
 
 CGameObject* CLevel_Tool::Load_Preview(const _wstring& strYshPath)
@@ -246,6 +272,47 @@ CGameObject* CLevel_Tool::Load_Preview(const _wstring& strYshPath)
     return pObj;
 }
 
+CGameObject* CLevel_Tool::Load_Kirby()
+{
+    const _uint L = ETOUI(TOOL_LEVEL::STATIC);
+
+    Clear_Preview();    // 기존 Preview 정리
+
+    // 1) Shader_Kirby_Proto - Kirby 는 스키닝 메쉬라 VTXANIMMESH 레이아웃 
+    if (!m_pGameInstance_Proxy->Has_Prototype(L, L"Proto_Shader_Kirby"))
+        m_pGameInstance_Proxy->Add_Prototype(L, L"Proto_Shader_Kirby",
+            CShader::Create(m_pDevice, m_pContext, Shader_Kirby.szFileTag,
+                VTXANIMMESH::Elements, VTXANIMMESH::iNumElements));
+
+    // 2) Kirby 모델 proto - ANIM, 180도 Y 회전 (GameContent 와 동일하게 정면)
+    if (!m_pGameInstance_Proxy->Has_Prototype(L, L"Proto_Model_Kirby"))
+        m_pGameInstance_Proxy->Add_Prototype(L, L"Proto_Model_Kirby",
+            CModel::Create(m_pDevice, m_pContext, MODEL::ANIM,
+                "../../Resources/CHJ/AnimModel/Kirby/Kirby.ysh",
+                XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+    // 3) Preview_Kirby proto (1회만)
+    if (!m_pGameInstance_Proxy->Has_Prototype(L, CPreview_Kirby::PROTOTYPE_TAG))
+        m_pGameInstance_Proxy->Add_Prototype(L, CPreview_Kirby::PROTOTYPE_TAG,
+            CPreview_Kirby::Create(m_pDevice, m_pContext));
+
+    // 4) 스폰 
+    CPreview_Kirby::PREVIEW_KIRBY_DESC desc{};
+    desc.iProtoLevel = L;
+    desc.szShaderTag = L"Proto_Shader_Kirby";
+    desc.szModelTag = L"Proto_Model_Kirby";
+    desc.strAnimEvents = {};
+
+    CGameObject* pObj = nullptr;
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pObj,
+        L, CPreview_Kirby::PROTOTYPE_TAG,
+        ETOUI(TOOL_LEVEL::EDIT), L"Layer_Preview", L"Preview_Kirby", &desc)))
+        return nullptr;
+
+    m_pPreview = pObj;
+    return pObj;
+}
+
 void CLevel_Tool::Clear_Preview()
 {
     if (m_pPreview)
@@ -278,5 +345,8 @@ CLevel_Tool* CLevel_Tool::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 void CLevel_Tool::Free()
 {
     __super::Free();
-    Safe_Release(m_pGrid);   
+
+    m_UIContainers.clear();
+
+    Safe_Release(m_pGrid);
 }

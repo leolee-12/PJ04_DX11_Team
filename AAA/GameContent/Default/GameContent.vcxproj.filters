@@ -133,6 +133,9 @@
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\02. SmokeTail">
       <UniqueIdentifier>{d13a01c7-b84d-40fa-a0a4-51a1b67b7315}</UniqueIdentifier>
     </Filter>
+    <Filter Include="99. Defines\Hojun">
+      <UniqueIdentifier>{88dd6f60-69ca-48bd-96f3-47be9351a468}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -266,6 +269,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\SkySphere.h">
       <Filter>00. GameObject\01. Map\SkySphere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Character_States.h">
+      <Filter>99. Defines\Hojun</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_States.h">
+      <Filter>99. Defines\Hojun</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
