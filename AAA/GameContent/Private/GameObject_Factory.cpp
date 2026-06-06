@@ -234,7 +234,7 @@ void CGameObject_Factory::Register_Test()
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CVacuum::PROTOTYPE_TAG,
                 CVacuum::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Common_00_Vacuum"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Vacuum/Common_00_Vacuum.ysh"));                       
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/InhaleEffect2M/Common_00_InhaleEffect2M.ysh"));                       
         )
     );
 }
