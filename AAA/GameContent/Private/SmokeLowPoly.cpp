@@ -61,6 +61,12 @@ void CSmokeLowPoly::Update(_float fTimeDelta)
 void CSmokeLowPoly::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
+
+    if (m_bActive == false)
+        return;
+
+    Compute_CombinedWorldMatrix();
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 
 HRESULT CSmokeLowPoly::Render()

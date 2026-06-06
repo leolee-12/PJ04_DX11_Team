@@ -91,6 +91,12 @@ public:	// Map Preview - Public Func
 	const _wstring&	Get_LoadedMapPreviewStageName() const { return m_strLoadedMapStageName; }
 	_uint			Get_MapPreviewEnvCreatedCount() const { return m_iEnvObjCreatedCount; }
 
+	// Effect
+public:
+	HRESULT Save_Selected_Effect(const wstring& strFilePath);
+	HRESULT Load_Selected_Effect(const wstring& strFilePath);
+
+
 private:
 	CEditCamera* m_pCamera = { nullptr };
 	CGameObject* m_pSelected = { nullptr };

@@ -11,20 +11,20 @@ class ENGINE_DLL CEffect_Mesh abstract : public CEffect_Part
     GENERATED_BODY_ABSTRACT(CEffect_Mesh)
 
     // Diffuse
-    PROPERTY(_bool, m_bUseDiffuseTexture,           L"Use_Diffuse_Textrue",     L"Effect_Model");
-    PROPERTY(_float2, m_vDiffuseTiling,             L"Diffuse_Tiling",          L"Effect_Model");
-    PROPERTY(_float2, m_vDiffuseOffset,             L"Diffuse_Offset",          L"Effect_Model");
+    PROPERTY(_bool, m_bUseDiffuseTexture,           L"Use Diffuse Textrue_D",     L"Diffuse");
+    PROPERTY(_float2, m_vDiffuseTiling,             L"Tiling_D",                  L"Diffuse");
+    PROPERTY(_float2, m_vDiffuseOffset,             L"Offset_D",                  L"Diffuse");
 
-    PROPERTY(_bool, m_vDiffuseUVScroll,             L"Diffuse_UVScroll", L"Effect_Model");
-    PROPERTY(_float2, m_vDiffuseUVScrollCount,      L"Diffuse_UVScrollCount", L"Effect_Model");
+    PROPERTY(_bool, m_vDiffuseUVScroll,             L"UV Scroll     _D",         L"Diffuse");
+    PROPERTY(_float2, m_vDiffuseUVScrollCount,      L"UV Scroll Count_D",         L"Diffuse");
 
-    // Unkown
-    PROPERTY(_bool, m_bUseUnknownTexture,           L"Use_Unknown_Textrue",     L"Effect_Model");
-    PROPERTY(_float2, m_vUnknownTiling,             L"Unknown_Tiling",          L"Effect_Model");
-    PROPERTY(_float2, m_vUnknownOffset,             L"UnKnown_Offset",          L"Effect_Model");
+    // Unknown
+    PROPERTY(_bool, m_bUseUnknownTexture,           L"Use Unknown Textrue_U",     L"Unknown");
+    PROPERTY(_float2, m_vUnknownTiling,             L"Tiling_U",                  L"Unknown");
+    PROPERTY(_float2, m_vUnknownOffset,             L"Offset_U",                  L"Unknown");
 
-    PROPERTY(_bool, m_vUnknownUVScroll,             L"UnKnown_UVScroll",        L"Effect_Model");
-    PROPERTY(_float2, m_vUnknownUVScrollCount,      L"UnKnown_UVScrollCount",         L"Effect_Model");
+    PROPERTY(_bool, m_vUnknownUVScroll,             L"UV Scroll     _U",          L"Unknown");
+    PROPERTY(_float2, m_vUnknownUVScrollCount,      L"UV Scroll Count_U",         L"Unknown");
 
 public:
     struct EFFECT_MESH_DESC : public CEffect_Part::EFFECT_PART_DESC

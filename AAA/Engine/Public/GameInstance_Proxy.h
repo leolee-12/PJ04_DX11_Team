@@ -1,6 +1,12 @@
 #pragma once
 #include "Prototype_Manager.h"
 
+NS_BEGIN(physx)
+class PxTriangleMesh;
+class PxRigidStatic;
+class PxController;
+NS_END
+
 NS_BEGIN(Engine)
 
 class CGameObject;
@@ -218,6 +224,22 @@ public:
       void    Set_ShaderGlobal(const string& strName, const _float4& vValue);
       vector<GLOBAL_DESC>& Get_ShaderGlobals();
       const _float4* Get_ShaderGlobal(const string& strName) const;
+#pragma endregion
+
+#pragma region PHYSIX_MANAGER
+      physx::PxTriangleMesh* Cook_TriangleMesh(const _float3* pPositions, _uint iNumVertices, const _uint* pIndices, _uint iNumIndices, _bool bFlipWinding = true);
+      physx::PxRigidStatic* Add_StaticActor(physx::PxTriangleMesh* pMesh, _fmatrix WorldMatrix);
+      void                   Remove_StaticActor(physx::PxRigidStatic* pActor);
+
+      physx::PxController* Create_CapsuleController(const _float3& vFootPos, _float fRadius, _float fHeight);
+      _bool               Move_Controller(physx::PxController* pCtrl, const _float3& vDisp, _float fTimeDelta, _float3* pOutFootPos);
+      void                Release_Controller(physx::PxController* pCtrl);
+
+      void Set_ControllerFootPosition(physx::PxController* pCtrl, const _float3& vFootPos);
+
+      void  Toggle_PhysXDebug();
+      _bool Is_PhysXDebug() const;
+      void  Render_PhysXDebug(_fmatrix ViewMatrix, _fmatrix ProjMatrix);
 #pragma endregion
 
 #pragma region TEXTURE_HUB

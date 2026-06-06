@@ -59,9 +59,10 @@ HRESULT CMapObject::Render()
         if (Is_OverlayMesh((_uint)i))
             continue;
 
-        m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", (_uint)i, MTEX_TYPE::DIFFUSE, 0);
-        m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", (_uint)i, MTEX_TYPE::NORMALS, 0);
-        m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", (_uint)i, MTEX_TYPE::METALNESS, 0);
+        const MESH_LAYER_IDX& L = m_pModelCom->Get_MeshLayer((_uint)i);
+        m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", (_uint)i, MTEX_TYPE::DIFFUSE, L.idx[ETOUI(MTEX_TYPE::DIFFUSE)]);
+        m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", (_uint)i, MTEX_TYPE::NORMALS, L.idx[ETOUI(MTEX_TYPE::NORMALS)]);
+        m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", (_uint)i, MTEX_TYPE::METALNESS, L.idx[ETOUI(MTEX_TYPE::METALNESS)]);
 
         _int iZero = 0;
         m_pShaderCom->Bind_RawValue("g_iHasMoss", &iZero, sizeof(_int)); 
