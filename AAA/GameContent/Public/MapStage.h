@@ -1,5 +1,4 @@
 #pragma once
-
 #include "MapSection.h"
 
 NS_BEGIN(Client)
@@ -7,7 +6,7 @@ NS_BEGIN(Client)
 class CLIENT_DLL CMapStage final : public CGameObject
 {
 public:
-	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_MapStage";
+	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_MapStage";
 
 private:
 	CMapStage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -29,13 +28,13 @@ public:
 #endif
 
 private:
-	vector<CMapSection*>			m_Sections;
-	_wstring						m_strProtoTag = { PROTOTYPE_TAG };
-	_wstring						m_strStageName;
-	_uint							m_iSectionProtoLevel = {};
+	vector<CMapSection*>	m_Sections;
+	_wstring				m_strProtoTag = { PROTOTYPE_TAG };
+	_wstring				m_strStageName;
+	_uint					m_iSectionProtoLevel = {};
 
 #ifdef _DEBUG
-	MAP_STAGE_PROFILE				m_Profile = {};
+	MAP_STAGE_PROFILE		m_Profile = {};
 #endif
 
 private:
@@ -50,11 +49,11 @@ private:
 #endif
 
 public:
-	static CMapStage* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	virtual CGameObject* Clone(void* pArg) override;
+	static CMapStage*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	virtual CGameObject*	Clone(void* pArg) override;
 
 protected:
-	virtual void					Free() override;
+	virtual void	Free() override;
 };
 
 NS_END

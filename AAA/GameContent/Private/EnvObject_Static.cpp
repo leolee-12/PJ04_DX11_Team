@@ -37,16 +37,47 @@ void CEnvObject_Static::Late_Update(_float fTimeDelta)
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
 	if (!m_bRenderable || !Has_RenderModel())
+	{
+		m_bVisible = false;
 		return;
+	}
 
 	Refresh_WorldBounds();
-	m_bVisible = true;
+
+	m_bVisible = Is_VisibleInCurrentView();
+	if (!m_bVisible)
+		return;
+
 	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
 
 HRESULT CEnvObject_Static::Render()
 {
 	return Render_Model();
+}
+
+HRESULT CEnvObject_Static::Render_Shadow()
+{
+	if (!m_bRenderable || nullptr == m_pModelCom || nullptr == m_pShaderCom)
+		return S_OK;
+
+	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
+		return E_FAIL;
+
+	size_t n = m_pModelCom->Get_NumMeshes();
+	for (size_t i = 0; i < n; ++i)
+	{
+		if (FAILED(m_pShaderCom->Begin(2)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Render((_uint)i)))
+			return E_FAIL;
+	}
+	return S_OK;
 }
 
 CGameObject* CEnvObject_Static::Clone(void* pArg)

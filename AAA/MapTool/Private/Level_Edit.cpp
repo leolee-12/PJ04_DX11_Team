@@ -18,8 +18,6 @@
 #include "DataExporter.h"
 #include "DataLoader.h"
 //#include "NavMesh_Editor.h"
-#include <algorithm>
-#include <filesystem>
 
 namespace
 {
@@ -121,7 +119,7 @@ namespace
 		return false;
 	}
 
-	wstring Make_MapSectionModelProtoTag(const wstring& strSectionName)
+	_wstring Make_MapSectionModelProtoTag(const wstring& strSectionName)
 	{
 		return L"Prototype_Component_Model_MapSection_" + strSectionName;
 	}

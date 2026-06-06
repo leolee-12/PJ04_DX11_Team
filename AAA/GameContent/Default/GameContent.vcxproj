@@ -47,8 +47,8 @@
     <ClInclude Include="..\public\Material_Object.h" />
     <ClInclude Include="..\Public\ObjectData.h" />
     <ClInclude Include="..\Public\ResourceData.h" />
-    <ClInclude Include="..\Public\Sample_MeshEffect.h" />
     <ClInclude Include="..\Public\MapDescriptor.h" />
+    <ClInclude Include="..\Public\SkySphere.h" />
     <ClInclude Include="..\Public\SmokeLowPoly.h" />
     <ClInclude Include="..\Public\SmokeSphereOriginal.h" />
     <ClInclude Include="..\Public\SmokeTail.h" />
@@ -82,9 +82,9 @@
     <ClCompile Include="..\Private\MapSection.cpp" />
     <ClCompile Include="..\Private\MapStage.cpp" />
     <ClCompile Include="..\private\Material_Object.cpp" />
-    <ClCompile Include="..\Private\Sample_MeshEffect.cpp" />
     <ClCompile Include="..\private\MapObject.cpp" />
     <ClCompile Include="..\Private\MapDescriptor.cpp" />
+    <ClCompile Include="..\Private\SkySphere.cpp" />
     <ClCompile Include="..\Private\SmokeLowPoly.cpp" />
     <ClCompile Include="..\Private\SmokeSphereOriginal.cpp" />
     <ClCompile Include="..\Private\SmokeTail.cpp" />
@@ -107,6 +107,7 @@
     <FxCompile Include="..\ShaderFiles\Shader_Map.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_MaterialTest.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_SkySphere.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_UI.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Effect</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>

@@ -28,9 +28,6 @@
     <Filter Include="01. API\01. Profiler">
       <UniqueIdentifier>{ca47b2f8-828c-492e-a221-b4ec0ee698ec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. API\02. CullingContext">
-      <UniqueIdentifier>{8ab573f2-a853-4f14-91ec-eb29aaf55945}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. Levels">
       <UniqueIdentifier>{35e7a30f-47e6-4264-9b5d-7769a6aa3c11}</UniqueIdentifier>
     </Filter>
@@ -168,9 +165,6 @@
     <ClInclude Include="..\Public\Panel_Profiler.h">
       <Filter>04. Panels\Profiler</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\CullingContext.h">
-      <Filter>01. API\02. CullingContext</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\EditInstance.h">
       <Filter>01. API\00. EditInstance</Filter>
     </ClInclude>
@@ -275,9 +269,6 @@
     <ClCompile Include="..\Private\Panel_Profiler.cpp">
       <Filter>04. Panels\Profiler</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\CullingContext.cpp">
-      <Filter>01. API\02. CullingContext</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\EditInstance.cpp">
       <Filter>01. API\00. EditInstance</Filter>
     </ClCompile>
@@ -294,5 +285,10 @@
     <ResourceCompile Include="MapTool.rc">
       <Filter>98. Default</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_Grid.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
