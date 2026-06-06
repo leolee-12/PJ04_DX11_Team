@@ -197,7 +197,7 @@ HRESULT CMapSection::Ready_ModelPrototype(const MAP_SECTION_DESC* pDesc)
 		CModel* pModelPrototype = nullptr;
 		try
 		{
-			pModelPrototype = CModel::Create(
+			pModelPrototype = CModel::Create_WithTextureHub(
 				m_pDevice,
 				m_pContext,
 				MODEL::MAP,

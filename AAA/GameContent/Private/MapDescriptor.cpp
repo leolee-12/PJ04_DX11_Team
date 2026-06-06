@@ -20,7 +20,6 @@ namespace
 	constexpr _tchar kMapLayerEnvInteract[] = L"Layer_EnvInteract";
 	constexpr _tchar kMapLayerEnvEffect[] = L"Layer_EnvEffect";
 	constexpr _tchar kMapModelRoot[] = L"../../Resources/Map";
-	constexpr _tchar kLegacyStageModelRoot[] = L"../../Resources/Models/Test/Stage1-0";
 	constexpr _tchar kMapStageObjectTag[] = L"MapStage";
 
 	struct MAP_DESCRIPTOR_SECTION_PRESET
@@ -34,6 +33,7 @@ namespace
 	{
 		const _char* pLabel;
 		const _tchar* pStageName;
+		const _tchar* pStageFolderName;
 		const MAP_DESCRIPTOR_SECTION_PRESET* pSections;
 		_uint iSectionCount;
 
@@ -41,7 +41,7 @@ namespace
 		_uint iEnvJsonPathCount;
 	};
 
-	constexpr MAP_DESCRIPTOR_SECTION_PRESET kStage1_0Sections[] =
+	constexpr MAP_DESCRIPTOR_SECTION_PRESET kStage1_1Sections[] =
 	{
 		{ L"GsAllBuilding_0", Client::MAP_SECTION_TYPE::BUILDING, RENDERID::NONBLEND },
 		{ L"GsBuilding_1", Client::MAP_SECTION_TYPE::BUILDING, RENDERID::NONBLEND },
@@ -52,18 +52,27 @@ namespace
 		{ L"SeRock_6", Client::MAP_SECTION_TYPE::ROCK, RENDERID::NONBLEND },
 	};
 
-	constexpr const _tchar* kStage1_0EnvJsonPaths[] =
+	constexpr const _tchar* kStage1_1EnvJsonPaths[] =
 	{
-		L"../../Resources/Map/Decor_Decor_FlipZ_FullMatrix.json",
-		L"../../Resources/Map/Toy_Decor.json",
-		L"../../Resources/Map/Toy_Obj.json",
-		L"../../Resources/Map/Decor_Obj.json",
+		  L"../../Resources/Map/Stage1-1/Decor_Decor_FlipZ.json",
+		  L"../../Resources/Map/Stage1-1/Toy_Decor_FlipZ.json",
+		  L"../../Resources/Map/Stage1-1/Toy_Obj_FlipZ.json",
+		  L"../../Resources/Map/Stage1-1/Decor_Obj_FlipZ.json",
 	};
 
 	constexpr MAP_DESCRIPTOR_PRESET kMapPresets[] =
 	{
-		{ "Stage1_0", L"Stage1_0_MapStage", kStage1_0Sections, _countof(kStage1_0Sections), kStage1_0EnvJsonPaths, _countof(kStage1_0EnvJsonPaths) },
+		{
+			"Stage1-1",
+			L"Stage1-1_MapStage",
+			L"Stage1-1",
+			kStage1_1Sections,
+			_countof(kStage1_1Sections),
+			kStage1_1EnvJsonPaths,
+			_countof(kStage1_1EnvJsonPaths)
+		},
 	};
+
 
 	const MAP_DESCRIPTOR_PRESET* Get_MapPreset(_uint iPresetIndex)
 	{
@@ -110,65 +119,40 @@ namespace
 			Add_UniqueCandidate(strSectionName.substr(5) + L".ysh", pOutCandidates);
 	}
 
-	_bool Try_ResolveMapSectionModelPath(const _wstring& strSectionName, _wstring* pOutPath)
+	_bool Try_ResolveMapSectionModelPath(const _wstring& strStageFolderName, const _wstring& strSectionName, _wstring* pOutPath)
 	{
-		if (nullptr == pOutPath)
+		if (nullptr == pOutPath || strStageFolderName.empty())
 			return false;
 
-		error_code ErrorCode;
-		//const path Root = weakly_canonical(path(kMapModelRoot), ErrorCode);
-		const path Root = path(kMapModelRoot);
-		if (ErrorCode || !exists(Root, ErrorCode))
-			return false;
-
-		vector<wstring> Candidates;
+		vector<_wstring> Candidates;
 		Build_MapSectionModelCandidates(strSectionName, &Candidates);
 		if (Candidates.empty())
 			return false;
 
-		ErrorCode.clear();
-		for (recursive_directory_iterator Iter(Root, directory_options::skip_permission_denied, ErrorCode), End;
-			Iter != End;
-			Iter.increment(ErrorCode))
+		const path SectionRoot = path(kMapModelRoot) / strStageFolderName / L"Section";
+
+		error_code ErrorCode;
+		if (!exists(SectionRoot, ErrorCode) || ErrorCode)
+			return false;
+
+		for (const _wstring& strCandidate : Candidates)
 		{
-			if (ErrorCode)
-				break;
+			const path CandidatePath = SectionRoot / strCandidate;
 
-			if (!Iter->is_regular_file())
-				continue;
-
-			const wstring strFilename = Iter->path().filename().wstring();
-			auto CandidateIter = find_if(
-				Candidates.begin(),
-				Candidates.end(),
-				[&](const wstring& strCandidate) { return Equals_NoCase(strFilename, strCandidate); });
-			if (CandidateIter == Candidates.end())
-				continue;
-
-			*pOutPath = Iter->path().wstring();
-			return true;
+			ErrorCode.clear();
+			if (exists(CandidatePath, ErrorCode) && !ErrorCode)
+			{
+				*pOutPath = CandidatePath.wstring();
+				return true;
+			}
 		}
 
 		return false;
 	}
 
-	_bool Try_GetLegacyMapSectionModelPath(const wstring& strSectionName, wstring* pOutPath)
+	_wstring Make_MapSectionModelProtoTag(const _wstring& strStageFolderName, const _wstring& strSectionName)
 	{
-		if (nullptr == pOutPath)
-			return false;
-
-		const wstring strLegacyPath = wstring(kLegacyStageModelRoot) + L"/" + strSectionName + L".ysh";
-		error_code ErrorCode;
-		if (!exists(path(strLegacyPath), ErrorCode) || ErrorCode)
-			return false;
-
-		*pOutPath = strLegacyPath;
-		return true;
-	}
-
-	wstring Make_MapSectionModelProtoTag(const wstring& strSectionName)
-	{
-		return L"Prototype_Component_Model_MapSection_" + strSectionName;
+		return L"Prototype_Component_Model_MapSection_" + strStageFolderName + L"_" + strSectionName;
 	}
 
 	void Accumulate_LoadReport(const Client::ENV_OBJECT_LOAD_REPORT& EnvReport, Client::CMapDescriptor::MAP_PRESET_LOAD_REPORT* pOutReport)
@@ -216,19 +200,20 @@ HRESULT CMapDescriptor::Bulid_MapStageDesc(_uint iPresetIndex, _uint iSectionPro
 		const MAP_DESCRIPTOR_SECTION_PRESET& SectionPreset = pPreset->pSections[i];
 		const wstring strSectionName = SectionPreset.pSectionName;
 
-		wstring strModelPath;
-		const _bool bHasLegacyPath = Try_GetLegacyMapSectionModelPath(strSectionName, &strModelPath);
-		if (!bHasLegacyPath && !Try_ResolveMapSectionModelPath(strSectionName, &strModelPath))
+		_wstring strModelPath;
+		if (!Try_ResolveMapSectionModelPath(pPreset->pStageFolderName, strSectionName, &strModelPath))
 		{
-			Log_GameContentWarning("Map preset section model missing: " + WstrToStr(strSectionName));
+			Log_GameContentWarning(
+				"Map preset section model missing: stage="
+				+ WstrToStr(pPreset->pStageFolderName)
+				+ " section="
+				+ WstrToStr(strSectionName));
 			return E_FAIL;
 		}
 
 		MAP_SECTION_DESC SectionDesc{};
 		SectionDesc.strSectionName = strSectionName;
-		SectionDesc.strModelProtoTag = bHasLegacyPath
-			? L"Prototype_Component_Model_" + strSectionName
-			: Make_MapSectionModelProtoTag(strSectionName);
+		SectionDesc.strModelProtoTag = Make_MapSectionModelProtoTag(pPreset->pStageFolderName, strSectionName);
 		SectionDesc.strModelPath = strModelPath;
 		SectionDesc.iModelProtoLevel = iModelLevel;
 		SectionDesc.eSectionType = SectionPreset.eType;
@@ -336,6 +321,7 @@ HRESULT CMapDescriptor::Load_EnvObject_FromJson(
 			pContext,
 			iPlaceLevel,
 			pJsonPath,
+			pPreset->pStageFolderName,
 			pCreatedCallback,
 			pCallbackContext,
 			&EnvReport)))

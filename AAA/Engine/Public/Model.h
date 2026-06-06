@@ -6,6 +6,7 @@ NS_BEGIN(Engine)
 
 class CMesh;
 class CMaterial;
+class CMaterialEx;
 class CBone;
 class CAnimation;
 
@@ -20,7 +21,6 @@ private:
 	virtual ~CModel() = default;
 
 public:
-	// 추가
 	_uint Get_NumAnimations() const { return (_uint)m_Animations.size(); }
 
 	_uint Get_NumBones() const { return static_cast<_uint>(m_Bones.size()); }
@@ -53,6 +53,7 @@ public:
 
 public:
 	virtual HRESULT Initialize_Prototype(MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter = nullptr);
+	virtual HRESULT Initialize_Prototype_WithTextureHub(MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter = nullptr);
 	virtual HRESULT Initialize(void* pArg);
 
 public:
@@ -68,7 +69,6 @@ public:
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
 
 private:
-	/* 파일로부터 읽어낸 모든 정보를 담고 있는다. */
 	MODEL						m_eType = { MODEL::END };
 	PickableFilter              m_PickableFilter = { nullptr };
 
@@ -78,6 +78,8 @@ private:
 
 	size_t						m_iNumMaterials = {};
 	vector<CMaterial*>			m_Materials;
+	_bool                        m_bUseMaterialEx = { false };
+	vector<CMaterialEx*>        m_MaterialsEx;
 
 	_float4x4					m_PreTransformMatrix = {};	
 	vector<CBone*>				m_Bones;
@@ -97,14 +99,17 @@ private:
 private:
 	HRESULT Ready_Meshes(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix);
 	HRESULT Ready_Materials(const vector<MATERIAL_DATA>& materials, const _char* pModelFilePath);
+	HRESULT Ready_MaterialsEx(const vector<MATERIAL_DATA>& materials, const _char* pModelFilePath);
 	HRESULT Ready_Bones(const vector<BONE_DATA>& bones);
 	HRESULT Ready_Animations(const vector<ANIMATION_DATA>& animations);
 
+	HRESULT Ready_NonAnimEx(const _char* pModelFilePath, _fmatrix PreTransformMatrix);
 	HRESULT Ready_NonAnim(const _char* pModelFilePath, _fmatrix PreTransformMatrix);
 	HRESULT Ready_Anim(const _char* pModelFilePath, _fmatrix PreTransformMatrix);
 
 public:
 	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix = XMMatrixIdentity(), PickableFilter fcFillter = nullptr);
+	static CModel* Create_WithTextureHub(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix = XMMatrixIdentity(), PickableFilter fcFillter = nullptr);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

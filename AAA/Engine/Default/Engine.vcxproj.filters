@@ -253,6 +253,9 @@
     <Filter Include="99. Defines">
       <UniqueIdentifier>{e411772b-c2a6-40ab-8686-9969730280cf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="07. Component\Model\MaterialEx">
+      <UniqueIdentifier>{513a2421-d331-4f8f-a7b5-326ac84b207b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -498,6 +501,12 @@
     <ClInclude Include="..\Public\Frustum_Manager.h">
       <Filter>20. Culling</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Texture_Hub.h">
+      <Filter>07. Component\Model\MaterialEx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MaterialEx.h">
+      <Filter>07. Component\Model\MaterialEx</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -721,6 +730,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Frustum_Manager.cpp">
       <Filter>20. Culling</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Texture_Hub.cpp">
+      <Filter>07. Component\Model\MaterialEx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MaterialEx.cpp">
+      <Filter>07. Component\Model\MaterialEx</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

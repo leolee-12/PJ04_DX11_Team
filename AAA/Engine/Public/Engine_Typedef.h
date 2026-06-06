@@ -38,6 +38,9 @@ namespace Engine
 	typedef		XMMATRIX					_matrix;
 	typedef		FXMMATRIX					_fmatrix;
 	typedef		CXMMATRIX					_cmatrix;
+
+	typedef		unsigned int				TEXTURE_HANDLE;
+	inline constexpr TEXTURE_HANDLE INVALID_TEXTURE_HANDLE = { static_cast<TEXTURE_HANDLE>(-1) };
 }
 
 #endif // Engine_Typedef_h__

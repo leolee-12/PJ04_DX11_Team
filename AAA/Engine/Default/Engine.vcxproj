@@ -215,6 +215,7 @@
     <ClInclude Include="..\Public\Light.h" />
     <ClInclude Include="..\Public\Light_Manager.h" />
     <ClInclude Include="..\Public\Material.h" />
+    <ClInclude Include="..\Public\MaterialEx.h" />
     <ClInclude Include="..\Public\Mesh.h" />
     <ClInclude Include="..\Public\Model.h" />
     <ClInclude Include="..\Public\Navigation.h" />
@@ -232,6 +233,7 @@
     <ClInclude Include="..\Public\Sound_Manager.h" />
     <ClInclude Include="..\Public\Target_Manager.h" />
     <ClInclude Include="..\Public\Texture.h" />
+    <ClInclude Include="..\Public\Texture_Hub.h" />
     <ClInclude Include="..\Public\Timer.h" />
     <ClInclude Include="..\Public\Timer_Manager.h" />
     <ClInclude Include="..\public\Transform.h" />
@@ -295,6 +297,7 @@
     <ClCompile Include="..\Private\Light.cpp" />
     <ClCompile Include="..\Private\Light_Manager.cpp" />
     <ClCompile Include="..\Private\Material.cpp" />
+    <ClCompile Include="..\Private\MaterialEx.cpp" />
     <ClCompile Include="..\Private\Mesh.cpp" />
     <ClCompile Include="..\Private\Model.cpp" />
     <ClCompile Include="..\Private\Navigation.cpp" />
@@ -312,6 +315,7 @@
     <ClCompile Include="..\Private\Sound_Manager.cpp" />
     <ClCompile Include="..\Private\Target_Manager.cpp" />
     <ClCompile Include="..\Private\Texture.cpp" />
+    <ClCompile Include="..\Private\Texture_Hub.cpp" />
     <ClCompile Include="..\Private\Timer.cpp" />
     <ClCompile Include="..\Private\Timer_Manager.cpp" />
     <ClCompile Include="..\private\Transform.cpp" />

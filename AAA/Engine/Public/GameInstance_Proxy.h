@@ -220,6 +220,12 @@ public:
       const _float4* Get_ShaderGlobal(const string& strName) const;
 #pragma endregion
 
+#pragma region TEXTURE_HUB
+  public:
+      HRESULT LoadOrGet_TextureFromHub(const _tchar* pTexturePath, TEXTURE_HANDLE* pOutHandle);
+      HRESULT Bind_TextureFromHub(class CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle);
+#pragma endregion
+
 private:
     CGameInstance* m_pOwner = { nullptr };
 

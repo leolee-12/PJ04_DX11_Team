@@ -30,6 +30,7 @@ class CPhysX_Manager;
 class CEnvironment_Manager;
 class CShaderGlobal_Manager;
 class CFrustum_Manager;
+class CTexture_Hub;
 
 class ENGINE_DLL CGameInstance 
 {
@@ -210,6 +211,11 @@ public:
 	  _bool Is_EditMode() const		  { return m_bEditMode; }
 #pragma endregion
 
+#pragma region TEXTURE_HUB
+	  HRESULT LoadOrGet_TextureFromHub(const _tchar* pTexturePath, TEXTURE_HANDLE* pOutHandle);
+	  HRESULT Bind_TextureFromHub(class CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle);
+#pragma endregion
+
 
 
 private:
@@ -220,7 +226,6 @@ private:
 	CObject_Manager*			m_pObject_Manager = { nullptr };
 	CRenderer*					m_pRenderer = { nullptr };
 	CCamera_Manager*			m_pCamera_Manager = { nullptr };
-	CFrustum_Manager*			m_pFrustum_Manager = { nullptr };
 	CInput_Device*				m_pInput_Device = { nullptr };
 	CLight_Manager*				m_pLight_Manager = { nullptr };
 	CFont_Manager*				m_pFont_Manager = { nullptr };
@@ -233,6 +238,8 @@ private:
 	CPhysX_Manager*				m_pPhysX_Manager = { nullptr };
 	CEnvironment_Manager*		m_pEnvironment_Manager = { nullptr };
 	CShaderGlobal_Manager*		m_pShaderGlobal_Manager = { nullptr };
+	CFrustum_Manager*			m_pFrustum_Manager = { nullptr };
+	CTexture_Hub*				m_pTexture_Hub = { nullptr };
 
 	mutable mt19937             m_RandomGenerator;
 	_bool						m_bEditMode = { false };

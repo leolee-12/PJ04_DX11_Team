@@ -833,6 +833,23 @@ const _float4* CGameInstance_Proxy::Get_ShaderGlobal(const string& strName) cons
 }
 #pragma endregion
 
+#pragma region TEXTURE_HUB
+HRESULT CGameInstance_Proxy::LoadOrGet_TextureFromHub(const _tchar* pTexturePath, TEXTURE_HANDLE* pOutHandle)
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->LoadOrGet_TextureFromHub(pTexturePath, pOutHandle);
+}
+
+HRESULT CGameInstance_Proxy::Bind_TextureFromHub(CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle)
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->Bind_TextureFromHub(pShader, pConstantName, Handle);
+}
+#pragma endregion
 
 CGameInstance_Proxy* CGameInstance_Proxy::Create(CGameInstance* pOwner)
 {

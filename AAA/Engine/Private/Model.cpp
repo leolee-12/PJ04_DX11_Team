@@ -1,6 +1,7 @@
 #include "Model.h"
 #include "Mesh.h"
 #include "Material.h"
+#include "MaterialEx.h"
 #include "DataLoader.h"
 #include "Bone.h"
 #include "Animation.h"
@@ -19,6 +20,8 @@ CModel::CModel(const CModel& Prototype)
     , m_Meshes{ Prototype.m_Meshes }
     , m_iNumMaterials{ Prototype.m_iNumMaterials }
     , m_Materials{ Prototype.m_Materials }
+    , m_bUseMaterialEx{ Prototype.m_bUseMaterialEx }
+    , m_MaterialsEx{ Prototype.m_MaterialsEx }
     , m_PreTransformMatrix{ Prototype.m_PreTransformMatrix }
     , m_iNumAnimations{ Prototype.m_iNumAnimations }
 {
@@ -30,6 +33,9 @@ CModel::CModel(const CModel& Prototype)
 
     for (auto& pMaterial : m_Materials)
         Safe_AddRef(pMaterial);
+
+    for (auto& pMaterialEx : m_MaterialsEx)
+        Safe_AddRef(pMaterialEx);
 
     for (auto& pMesh : m_Meshes)
         Safe_AddRef(pMesh);
@@ -167,6 +173,15 @@ HRESULT CModel::Initialize_Prototype(MODEL eType, const _char* pModelFilePath, _
 	m_PickableFilter = fcFillter;
 
     return m_eType == MODEL::ANIM ? Ready_Anim(pModelFilePath, PreTransformMatrix) : Ready_NonAnim(pModelFilePath, PreTransformMatrix);
+}
+
+HRESULT CModel::Initialize_Prototype_WithTextureHub(MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter)
+{
+    m_eType = eType;
+    m_bUseMaterialEx = true;
+    m_PickableFilter = fcFillter;
+
+    return Ready_NonAnimEx(pModelFilePath, PreTransformMatrix);
 }
 
 HRESULT CModel::Initialize(void* pArg)
@@ -331,6 +346,17 @@ HRESULT CModel::Bind_Material(CShader* pShader, const _char* pConstantName, _uin
     if (iMaterialIndex >= m_iNumMaterials)
         return E_FAIL;
 
+    if (m_bUseMaterialEx)
+    {
+        if (iMaterialIndex >= m_MaterialsEx.size())
+            return E_FAIL;
+
+        return m_MaterialsEx[iMaterialIndex]->Bind_ShaderResource(pShader, pConstantName, eType, iIndex);
+    }
+
+    if (iMaterialIndex >= m_Materials.size())
+        return E_FAIL;
+
     return m_Materials[iMaterialIndex]->Bind_ShaderResource(pShader, pConstantName, eType, iIndex);    
 }
 
@@ -358,6 +384,9 @@ HRESULT CModel::Ready_Meshes(const vector<MESH_DATA>& meshes, _fmatrix PreTransf
 
 HRESULT CModel::Ready_Materials(const vector<MATERIAL_DATA>& materials, const _char* pModelFilePath)
 {
+    if (m_bUseMaterialEx || !m_MaterialsEx.empty())
+        return E_FAIL;
+
 	m_iNumMaterials = materials.size();
     for (const auto& matData : materials)
     {
@@ -366,6 +395,25 @@ HRESULT CModel::Ready_Materials(const vector<MATERIAL_DATA>& materials, const _c
 		m_Materials.push_back(pMaterial);
     }
 	return S_OK;
+}
+
+HRESULT CModel::Ready_MaterialsEx(const vector<MATERIAL_DATA>& materials, const _char* pModelFilePath)
+{
+    if (!m_Materials.empty() || !m_MaterialsEx.empty())
+        return E_FAIL;
+
+    m_iNumMaterials = materials.size();
+
+    for (const auto& matData : materials)
+    {
+        CMaterialEx* pMaterialEx = CMaterialEx::Create(matData, pModelFilePath);
+        if (nullptr == pMaterialEx)
+            return E_FAIL;
+
+        m_MaterialsEx.push_back(pMaterialEx);
+    }
+
+    return S_OK;
 }
 
 HRESULT CModel::Ready_Bones(const vector<BONE_DATA>& bones)
@@ -388,6 +436,23 @@ HRESULT CModel::Ready_Animations(const vector<ANIMATION_DATA>& animations)
         if (nullptr == pAnimation) return E_FAIL;
         m_Animations.push_back(pAnimation);
     }
+    return S_OK;
+}
+
+HRESULT CModel::Ready_NonAnimEx(const _char* pModelFilePath, _fmatrix PreTransformMatrix)
+{
+    MODEL_DATA modelData;
+    if (FAILED(CDataLoader::Read_ysh(StrToWstr(pModelFilePath).c_str(), modelData)))
+        return E_FAIL;
+
+    XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
+
+    if (FAILED(Ready_Meshes(modelData.Meshes, PreTransformMatrix)))
+        return E_FAIL;
+
+    if (FAILED(Ready_MaterialsEx(modelData.Materials, pModelFilePath)))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -444,6 +509,20 @@ CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MOD
     return pInstance;
 }
 
+CModel* CModel::Create_WithTextureHub(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType,
+    const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter)
+{
+    CModel* pInstance = new CModel(pDevice, pContext);
+
+    if (FAILED(pInstance->Initialize_Prototype_WithTextureHub(eType, pModelFilePath, PreTransformMatrix, fcFillter)))
+    {
+        MSG_BOX("Failed to Created : CModel");
+        Safe_Release(pInstance);
+    }
+
+    return pInstance;
+}
+
 CComponent* CModel::Clone(void* pArg)
 {
     CModel* pInstance = new CModel(*this);
@@ -472,6 +551,10 @@ void CModel::Free()
     for (auto& pMaterial : m_Materials)
         Safe_Release(pMaterial);
     m_Materials.clear();
+
+    for (auto& pMaterialEx : m_MaterialsEx)
+        Safe_Release(pMaterialEx);
+    m_MaterialsEx.clear();
 
     for (auto& pMesh : m_Meshes)
         Safe_Release(pMesh);

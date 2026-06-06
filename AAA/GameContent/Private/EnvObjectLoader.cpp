@@ -1,18 +1,18 @@
 #include "EnvObjectLoader.h"
+#include "EnvObject_Effect.h"
+#include "EnvObject_Interact.h"
+#include "EnvObject_Static.h"
+#include "GameContent_Log.h"
+#include "YshModelValidator.h"
+
+#include "DataLoader.h"
+#include "GameInstance_Proxy.h"
+#include "Model.h"
 
 #include <cwctype>
 #include <exception>
 #include <filesystem>
 #include <unordered_set>
-
-#include "DataLoader.h"
-#include "EnvObject_Effect.h"
-#include "EnvObject_Interact.h"
-#include "EnvObject_Static.h"
-#include "GameContent_Log.h"
-#include "GameInstance_Proxy.h"
-#include "Model.h"
-#include "YshModelValidator.h"
 
 NS_BEGIN(Client)
 
@@ -20,11 +20,10 @@ namespace
 {
 	using namespace std::filesystem;
 
-	constexpr wchar_t kLayerEnvStatic[] = L"Layer_EnvStatic";
-	constexpr wchar_t kLayerEnvInteract[] = L"Layer_EnvInteract";
-	constexpr wchar_t kLayerEnvEffect[] = L"Layer_EnvEffect";
-	constexpr wchar_t kEnvModelRoot[] = L"../../Resources/Map/Motif";
-	constexpr wchar_t kEnvDecorJsonPath[] = L"../../Resources/Map/Decor_Decor.json";
+	constexpr _tchar kLayerEnvStatic[] = L"Layer_EnvStatic";
+	constexpr _tchar kLayerEnvInteract[] = L"Layer_EnvInteract";
+	constexpr _tchar kLayerEnvEffect[] = L"Layer_EnvEffect";
+	constexpr _tchar kMapRoot[] = L"../../Resources/Map";
 	constexpr _bool kEnableYshPrevalidation = false;	// ysh  유효성 검증 Toggle
 
 	struct ENV_MODEL_CACHE_ENTRY
@@ -43,6 +42,12 @@ namespace
 	{
 		static _bool s_bBuilt = false;
 		return s_bBuilt;
+	}
+
+	path& Get_ModelPathCacheRoot()
+	{
+		static path s_Root;
+		return s_Root;
 	}
 
 	unordered_set<wstring>& Get_MissingModelLogSet()
@@ -85,57 +90,12 @@ namespace
 		return strValue;
 	}
 
-	const json* Find_JsonValue(const json& jSource, const string& strPath);
-
-	_bool Try_Build_EnvObjectAllowSet(unordered_set<wstring>* pOutAllowSet)
+	path Resolve_EnvModelRoot(const wstring& strStageFolderName)
 	{
-		if (nullptr == pOutAllowSet)
-			return false;
-
-		string strContent;
-		if (FAILED(CDataLoader::Read_Json(kEnvDecorJsonPath, &strContent)))
-			return false;
-
-		json jRoot;
-		try
-		{
-			jRoot = json::parse(strContent);
-		}
-		catch (const std::exception&)
-		{
-			return false;
-		}
-
-		const json* pData = Find_JsonValue(jRoot, "data");
-		if (nullptr == pData || !pData->is_object())
-			return false;
-
-		for (auto ItSection = pData->begin(); ItSection != pData->end(); ++ItSection)
-		{
-			if (!ItSection.value().is_object())
-				continue;
-
-			for (auto ItEntry = ItSection.value().begin(); ItEntry != ItSection.value().end(); ++ItEntry)
-			{
-				if (!ItEntry.value().is_object())
-					continue;
-
-				const json* pObjectName = Find_JsonValue(ItEntry.value(), "Basic.ObjectName");
-				if (nullptr == pObjectName || !pObjectName->is_string())
-					continue;
-
-				wstring strObjectName = StrToWstr(pObjectName->get<string>());
-				if (strObjectName.empty())
-					continue;
-
-				pOutAllowSet->insert(To_LowerCopy(strObjectName));
-				if (strObjectName.size() > 1 && L'L' == strObjectName.back())
-					pOutAllowSet->insert(To_LowerCopy(strObjectName.substr(0, strObjectName.size() - 1)));
-			}
-		}
-
-		return !pOutAllowSet->empty();
+		return path(kMapRoot) / strStageFolderName / L"Env";
 	}
+
+	const json* Find_JsonValue(const json& jSource, const string& strPath);
 
 	wstring Make_ModelProtoTag(const path& Root, const path& FilePath)
 	{
@@ -327,7 +287,7 @@ namespace
 		return true;
 	}
 
-	void Index_ModelRoot(const path& Root, const unordered_set<wstring>& AllowSet)
+	void Index_ModelRoot(const path& Root)
 	{
 		error_code ErrorCode;
 		for (recursive_directory_iterator Iter(Root, directory_options::skip_permission_denied, ErrorCode), End;
@@ -348,8 +308,6 @@ namespace
 				continue;
 
 			const wstring strStem = To_LowerCopy(FilePath.stem().wstring());
-			if (AllowSet.find(strStem) == AllowSet.end())
-				continue;
 
 			if (Get_ModelPathCache().find(strStem) != Get_ModelPathCache().end())
 				continue;
@@ -361,29 +319,30 @@ namespace
 		}
 	}
 
-	void Build_ModelPathCache_IfNeeded()
+	void Build_ModelPathCache_IfNeeded(const wstring& strStageFolderName)
 	{
-		if (Get_ModelPathCacheBuilt())
+		const path Root = Resolve_EnvModelRoot(strStageFolderName);
+
+		if (Get_ModelPathCacheBuilt() && Get_ModelPathCacheRoot() == Root)
 			return;
 
-		Get_ModelPathCacheBuilt() = true;
+		Get_ModelPathCache().clear();
+		Get_ModelPathCacheRoot() = Root;
+		Get_ModelPathCacheBuilt() = false;
+		Get_MissingModelLogSet().clear();
+		Get_RejectedModelLogSet().clear();
+		Get_TrimmedResolveLogSet().clear();
 
 		error_code ErrorCode;
-		const path Root = path(kEnvModelRoot);
-		if (ErrorCode || !exists(Root))
+		if (strStageFolderName.empty() || !exists(Root, ErrorCode) || ErrorCode)
 		{
-			Log_GameContentWarning("EnvObject model root missing: ../../Resources/Map/Motif");
+			Log_GameContentWarning("EnvObject model root missing: " + WstrToStr(Root.wstring()));
 			return;
 		}
 
-		unordered_set<wstring> AllowSet;
-		if (!Try_Build_EnvObjectAllowSet(&AllowSet))
-		{
-			Log_GameContentWarning("EnvObject allowlist build failed: ../../Resources/Map/Decor_Decor.json");
-			return;
-		}
+		Index_ModelRoot(Root);
 
-		Index_ModelRoot(Root, AllowSet);
+		Get_ModelPathCacheBuilt() = true;
 	}
 
 	ENV_SOURCE_TYPE Classify_SourceType(const wstring& strSourceFile)
@@ -443,23 +402,23 @@ namespace
 		Try_ReadUInt(jEntry, "Uid", &pDesc->iUid);
 	}
 
-	_bool Try_ResolveModelForObject(ENV_OBJECT_DESC* pDesc)
+	_bool Try_ResolveModelForObject(ENV_OBJECT_DESC* pDesc, const wstring& strStageFolderName)
 	{
 		if (nullptr == pDesc || pDesc->strObjectName.empty())
 			return false;
 
-		Build_ModelPathCache_IfNeeded();
+		Build_ModelPathCache_IfNeeded(strStageFolderName);
 
 		auto ResolveByKey = [&](const wstring& strLookupKey) -> _bool
-		{
-			const auto Iter = Get_ModelPathCache().find(To_LowerCopy(strLookupKey));
-			if (Iter == Get_ModelPathCache().end())
-				return false;
+			{
+				const auto Iter = Get_ModelPathCache().find(To_LowerCopy(strLookupKey));
+				if (Iter == Get_ModelPathCache().end())
+					return false;
 
-			pDesc->strModelProtoTag = Iter->second.strModelProtoTag;
-			pDesc->strModelPath = Iter->second.strModelPath;
-			return true;
-		};
+				pDesc->strModelProtoTag = Iter->second.strModelProtoTag;
+				pDesc->strModelPath = Iter->second.strModelPath;
+				return true;
+			};
 
 		if (ResolveByKey(pDesc->strObjectName))
 			return true;
@@ -503,7 +462,11 @@ namespace
 		CModel* pModelPrototype = nullptr;
 		try
 		{
-			pModelPrototype = CModel::Create(pDevice, pContext, MODEL::NONANIM, strModelPath.c_str());
+			pModelPrototype = CModel::Create_WithTextureHub(
+				pDevice,
+				pContext,
+				MODEL::NONANIM,
+				strModelPath.c_str());
 		}
 		catch (const std::exception& e)
 		{
@@ -571,7 +534,8 @@ namespace
 		return Desc;
 	}
 
-	void Parse_DecorEntry(const wstring& strSourceFile, const wstring& strSection, const wstring& strEntryKey, const json& jEntry, vector<ENV_OBJECT_DESC>* pOutDescs)
+	void Parse_DecorEntry(const wstring& strSourceFile, const wstring& strSection, const wstring& strEntryKey,
+		const json& jEntry, const wstring& strStageFolderName, vector<ENV_OBJECT_DESC>* pOutDescs)
 	{
 		if (nullptr == pOutDescs)
 			return;
@@ -585,11 +549,12 @@ namespace
 
 		Fill_CommonFlags(jEntry, &Desc);
 		Try_BuildWorldMatrixFromArray(jEntry, "WorldMtx", &Desc);
-		Try_ResolveModelForObject(&Desc);
+		Try_ResolveModelForObject(&Desc, strStageFolderName);
 		pOutDescs->push_back(Desc);
 	}
 
-	void Parse_ToyObjEntry(const wstring& strSourceFile, const wstring& strSection, const wstring& strEntryKey, const json& jEntry, vector<ENV_OBJECT_DESC>* pOutDescs)
+	void Parse_ToyObjEntry(const wstring& strSourceFile, const wstring& strSection, const wstring& strEntryKey,
+		const json& jEntry, const wstring& strStageFolderName, vector<ENV_OBJECT_DESC>* pOutDescs)
 	{
 		if (nullptr == pOutDescs)
 			return;
@@ -610,7 +575,7 @@ namespace
 		Try_ReadString(jEntry, "Gimmick.InteractiveDecorParts.MainComponent.MapCollType", &Desc.tCollision.strMapCollType);
 		Try_ReadFloat(jEntry, "Gimmick.InteractiveDecorParts.MainComponent.MapCollRadius", &Desc.tCollision.fMapCollRadius);
 		Try_ReadFloat3Array(jEntry, "Gimmick.InteractiveDecorParts.MainComponent.Size", &Desc.tCollision.vSize);
-		Try_ResolveModelForObject(&Desc);
+		Try_ResolveModelForObject(&Desc, strStageFolderName);
 		pOutDescs->push_back(Desc);
 	}
 
@@ -658,7 +623,8 @@ namespace
 		pOutDescs->push_back(Desc);
 	}
 
-	void Parse_SectionObject(const wstring& strSourceFile, const wstring& strSection, const json& jSection, vector<ENV_OBJECT_DESC>* pOutDescs)
+	void Parse_SectionObject(const wstring& strSourceFile, const wstring& strSection,
+		const json& jSection, const wstring& strStageFolderName, vector<ENV_OBJECT_DESC>* pOutDescs)
 	{
 		if (!jSection.is_object() || nullptr == pOutDescs)
 			return;
@@ -674,11 +640,11 @@ namespace
 			{
 			case ENV_SOURCE_TYPE::DECOR_DECOR:
 			case ENV_SOURCE_TYPE::TOY_DECOR:
-				Parse_DecorEntry(strSourceFile, strSection, strEntryKey, Iter.value(), pOutDescs);
+				Parse_DecorEntry(strSourceFile, strSection, strEntryKey, Iter.value(), strStageFolderName, pOutDescs);
 				break;
 			case ENV_SOURCE_TYPE::TOY_OBJ:
 				if (0 == _wcsicmp(strSection.c_str(), L"Standard"))
-					Parse_ToyObjEntry(strSourceFile, strSection, strEntryKey, Iter.value(), pOutDescs);
+					Parse_ToyObjEntry(strSourceFile, strSection, strEntryKey, Iter.value(), strStageFolderName, pOutDescs);
 				break;
 			case ENV_SOURCE_TYPE::DECOR_OBJ:
 				Parse_EffectEntry(strSourceFile, strSection, strEntryKey, Iter.value(), pOutDescs);
@@ -716,7 +682,10 @@ HRESULT CEnvObjectLoader::Ready_ObjectPrototypes(CGameInstance_Proxy* pProxy, ID
 	return S_OK;
 }
 
-HRESULT CEnvObjectLoader::Build_Descriptors_FromJsonFile(const wstring& strJsonPath, vector<ENV_OBJECT_DESC>* pOutDescs)
+HRESULT CEnvObjectLoader::Build_Descriptors_FromJsonFile(
+	const wstring& strJsonPath,
+	const wstring& strStageFolderName,
+	vector<ENV_OBJECT_DESC>* pOutDescs)
 {
 	if (nullptr == pOutDescs)
 		return E_FAIL;
@@ -749,7 +718,12 @@ HRESULT CEnvObjectLoader::Build_Descriptors_FromJsonFile(const wstring& strJsonP
 
 	for (auto Iter = pData->begin(); Iter != pData->end(); ++Iter)
 	{
-		Parse_SectionObject(strSourceFile, StrToWstr(Iter.key()), Iter.value(), pOutDescs);
+		Parse_SectionObject(
+			strSourceFile,
+			StrToWstr(Iter.key()),
+			Iter.value(),
+			strStageFolderName,
+			pOutDescs);
 	}
 
 	return S_OK;
@@ -760,7 +734,8 @@ HRESULT CEnvObjectLoader::Load_FromJsonFile(
 	ID3D11Device* pDevice,
 	ID3D11DeviceContext* pContext,
 	_uint iObjectLevel,
-	const wstring& strJsonPath)
+	const wstring& strJsonPath,
+	const wstring& strStageFolderName)
 {
 	return Load_FromJsonFile(
 		pProxy,
@@ -768,6 +743,7 @@ HRESULT CEnvObjectLoader::Load_FromJsonFile(
 		pContext,
 		iObjectLevel,
 		strJsonPath,
+		strStageFolderName,
 		nullptr,
 		nullptr,
 		nullptr);
@@ -779,6 +755,7 @@ HRESULT CEnvObjectLoader::Load_FromJsonFile(
 	ID3D11DeviceContext* pContext,
 	_uint iObjectLevel,
 	const wstring& strJsonPath,
+	const wstring& strStageFolderName,
 	ENV_OBJECT_CREATED_CALLBACK pCreatedCallback,
 	void* pCallbackContext,
 	ENV_OBJECT_LOAD_REPORT* pOutReport)
@@ -790,7 +767,7 @@ HRESULT CEnvObjectLoader::Load_FromJsonFile(
 		return E_FAIL;
 
 	vector<ENV_OBJECT_DESC> Descs;
-	if (FAILED(Build_Descriptors_FromJsonFile(strJsonPath, &Descs)))
+	if (FAILED(Build_Descriptors_FromJsonFile(strJsonPath, strStageFolderName, &Descs)))
 		return E_FAIL;
 
 	ENV_OBJECT_LOAD_REPORT Report{};
