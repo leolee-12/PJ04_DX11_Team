@@ -67,6 +67,9 @@
     <Filter Include="03. Panels\UICanvas">
       <UniqueIdentifier>{82aac75a-ceed-489b-a9ca-2b0eaf934ea4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. Objects\Preview_Kirby">
+      <UniqueIdentifier>{e1d3aae1-6727-4935-acac-12d6279558fe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Panel.h">
@@ -138,6 +141,9 @@
     <ClInclude Include="..\Public\Panel_UICanvas.h">
       <Filter>03. Panels\UICanvas</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Preview_Kirby.h">
+      <Filter>02. Objects\Preview_Kirby</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\ThirdParty\ImGui\Src\ImGuizmo.cpp">
@@ -208,6 +214,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Panel_UICanvas.cpp">
       <Filter>03. Panels\UICanvas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Preview_Kirby.cpp">
+      <Filter>02. Objects\Preview_Kirby</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

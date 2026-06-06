@@ -38,11 +38,11 @@ void CPanel_Viewport::Render()
 
         // ── 본 위치 점 오버레이 ──
         ANIM_CONTEXT& ctx = m_pPanel_Manager->Get_Context();
-        if (ctx.pActor && ctx.pModel)
+        if (ctx.pOwner && ctx.pModel)
         {
             const _float4x4* pView = m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC);
             const _float4x4* pProj = m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
-            const _float4x4* pWorld = ctx.pActor->Get_Transform()->Get_WorldMatrixPtr();
+            const _float4x4* pWorld = ctx.pOwner->Get_Transform()->Get_WorldMatrixPtr();
 
             if (pView && pProj && pWorld)
             {
@@ -97,7 +97,7 @@ CPanel_Viewport* CPanel_Viewport::Create(ID3D11Device* pDevice, ID3D11DeviceCont
     return new CPanel_Viewport(pDevice, pContext);
 }
 
-void CPanel_Viewport::Free() 
+void CPanel_Viewport::Free()
 {
     Safe_Release(m_pSRV);
 

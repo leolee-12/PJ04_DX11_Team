@@ -1,6 +1,9 @@
 #include "Panel_Manager.h"
 #include "Panel.h"
 #include "GameObject.h"
+#include "Model.h"
+#include "Animator.h"
+#include "UIContainerObject.h"
 
 #include "Panel_Hierarchy.h"
 #include "Panel_Viewport.h"
@@ -9,14 +12,11 @@
 #include "Panel_Animation.h"
 #include "Panel_UICanvas.h"
 
-#include "Preview_Actor.h"
 #include "Panel_Browser.h"
 #include <filesystem>
 
 #include "Level_Tool.h"
 
-#include "imgui.h"
-#include "imgui_internal.h"
 
 CPanel_Manager::CPanel_Manager(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice(pDevice), m_pContext(pContext)
@@ -53,13 +53,13 @@ HRESULT CPanel_Manager::Initialize()
 
 HRESULT CPanel_Manager::Add_Panel(const _wstring& strPanelTag, CPanel* pPanel)
 {
-    if (nullptr == pPanel)                              
+    if (nullptr == pPanel)
         return E_FAIL;
 
-    if (m_Panels.find(strPanelTag) != m_Panels.end())   
+    if (m_Panels.find(strPanelTag) != m_Panels.end())
         return E_FAIL;
 
-    if (FAILED(pPanel->Initialize(this)))               
+    if (FAILED(pPanel->Initialize(this)))
         return E_FAIL;
 
     m_Panels.emplace(strPanelTag, pPanel);
@@ -110,7 +110,7 @@ void CPanel_Manager::Set_Selected(Engine::CGameObject* pObject)
 
     Safe_Release(m_pSelected);
     m_pSelected = pObject;
-    Safe_AddRef(m_pSelected);          
+    Safe_AddRef(m_pSelected);
 }
 
 void CPanel_Manager::Clear_Selected()
@@ -119,26 +119,33 @@ void CPanel_Manager::Clear_Selected()
     m_pSelected = nullptr;
 }
 
-void CPanel_Manager::Bind_Preview(CPreview_Actor* pActor)
+void CPanel_Manager::Bind_Preview(CGameObject* pOwner)
 {
-    m_Context.pActor = pActor;
-    m_Context.pModel = pActor ? pActor->Get_Model() : nullptr;
-    m_Context.pAnimator = pActor ? pActor->Get_Animator() : nullptr;
+    m_Context.pOwner = pOwner;
+    m_Context.pModel = pOwner ? pOwner->Get_Component<CModel>(L"Com_Model") : nullptr;
+    m_Context.pAnimator = pOwner ? pOwner->Get_Component<CAnimator>(L"Com_Animator") : nullptr;
     m_Context.iClip = 0; m_Context.fProgress = 0.f; m_Context.iRootBone = -1;
-    if (!pActor) 
+    if (!pOwner)
     {
         m_Context.strName.clear();
         m_Context.strModelPath.clear();
     }
-    Set_Selected(pActor);
+    Set_Selected(pOwner);
+}
+
+void CPanel_Manager::Set_UISelected(CUIContainerObject* pContainer, CUIPartObject* pPart, const _wstring& strPartTag)
+{
+    m_UIContext.Selection.pContainer = pContainer;
+    m_UIContext.Selection.pPart = pPart;
+    m_UIContext.Selection.strPartTag = strPartTag;
 }
 
 void CPanel_Manager::Load_Preview(const std::wstring& strYshPath)
 {
-    if (!m_pLevel) 
+    if (!m_pLevel)
         return;
     CGameObject* p = m_pLevel->Load_Preview(strYshPath);
-    Bind_Preview(dynamic_cast<CPreview_Actor*>(p));
+    Bind_Preview(p);
     if (p)
     {
         m_Context.strName = filesystem::path(strYshPath).stem().wstring();
@@ -148,9 +155,33 @@ void CPanel_Manager::Load_Preview(const std::wstring& strYshPath)
 
 void CPanel_Manager::Clear_Preview()
 {
-    if (m_pLevel) 
+    if (m_pLevel)
         m_pLevel->Clear_Preview();
     Bind_Preview(nullptr);
+}
+
+void CPanel_Manager::Clear_UISelected()
+{
+    m_UIContext.Selection.Clear();
+}
+
+_bool CPanel_Manager::Validate_UISelection()
+{
+    UI_SELECTION& Selection = m_UIContext.Selection;
+
+    if (!Selection.Valid())
+        return false;
+
+    const auto& Parts = Selection.pContainer->Get_UIPartObjects();
+    auto iter = Parts.find(Selection.strPartTag);
+
+    if (iter == Parts.end() || iter->second != Selection.pPart)
+    {
+        Clear_UISelected();
+        return false;
+    }
+
+    return true;
 }
 
 void CPanel_Manager::Render_DockSpace()
@@ -180,8 +211,8 @@ void CPanel_Manager::Render_DockSpace()
         ImGui::DockBuilderSetNodeSize(dockspace_id, vp->WorkSize);
 
         ImGuiID center = dockspace_id, left, bottom;
-        ImGui::DockBuilderSplitNode(center, ImGuiDir_Down, 0.30f, &bottom, &center); 
-        ImGui::DockBuilderSplitNode(center, ImGuiDir_Left, 0.24f, &left, &center); 
+        ImGui::DockBuilderSplitNode(center, ImGuiDir_Down, 0.30f, &bottom, &center);
+        ImGui::DockBuilderSplitNode(center, ImGuiDir_Left, 0.24f, &left, &center);
 
         ImGui::DockBuilderDockWindow("Inspector", left);
         ImGui::DockBuilderDockWindow("Hierarchy", left);
@@ -226,8 +257,17 @@ void CPanel_Manager::Render_ModeBar()
     if (ImGui::RadioButton("UI", iMode == ETOI(TOOL_MODE::UI)))
         m_eWorkMode = TOOL_MODE::UI;
 
+    ImGui::SameLine();
+    if (ImGui::Button("Load Kirby (Test)"))
+    {
+        if (m_pLevel)
+        {
+            Bind_Preview(m_pLevel->Load_Kirby());
+            m_Context.strName = L"Kirby";
+            m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby.ysh";
+        }
+    }
 
-   
 
     ImGui::EndMainMenuBar();
 }
@@ -271,6 +311,8 @@ CPanel_Manager* CPanel_Manager::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 void CPanel_Manager::Free()
 {
     __super::Free();
+
+    Clear_UISelected();
 
     Safe_Release(m_pSelected);
 

@@ -6,13 +6,10 @@
 #include "Preview_Actor.h"
 #include "GameObject_Factory.h"
 
+#include "AnimUITool_Defines.h"
+
 #include "Level_Tool.h"
 
-// ImGui 헤더
-#include "imgui.h"
-#include "imgui_internal.h"          
-#include "imgui_impl_win32.h"
-#include "imgui_impl_dx11.h"
 
 CAnimUITool_App::CAnimUITool_App()
 {
@@ -55,8 +52,8 @@ HRESULT CAnimUITool_App::Initialize()
 	Client::CGameObject_Factory::GetInstance()->RegisterAll();
 
 	CLevel_Tool* pLevel = CLevel_Tool::Create(m_pDevice, m_pContext);
-	if (nullptr == pLevel) 
-	{ 
+	if (nullptr == pLevel)
+	{
 		Log_Error("Failed to create Tool level.");
 		return E_FAIL;
 	}
@@ -65,7 +62,7 @@ HRESULT CAnimUITool_App::Initialize()
 		return E_FAIL;
 
 	m_pToolLevel = pLevel;
-	
+
 	m_pPanel_Manager->Set_Level(pLevel);
 
 	Log_Info("AnimUITool initialized.");
@@ -105,8 +102,8 @@ HRESULT CAnimUITool_App::Init_ImGui()
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 	io.IniFilename = "AnimUITool_imgui.ini";
 
-	io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\malgun.ttf", 15.0f, 
-									nullptr, io.Fonts->GetGlyphRangesKorean());
+	io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\malgun.ttf", 15.0f,
+		nullptr, io.Fonts->GetGlyphRangesKorean());
 
 	ImGui::StyleColorsDark();
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -145,9 +142,9 @@ void CAnimUITool_App::Update(_float fTimeDelta)
 
 HRESULT CAnimUITool_App::Render()
 {
-	Editor_BeginDraw();                              
+	Editor_BeginDraw();
 
-	if (FAILED(m_pGameInstance_Proxy->Draw()))       
+	if (FAILED(m_pGameInstance_Proxy->Draw()))
 		return E_FAIL;
 
 	ImGui_ImplDX11_NewFrame();
@@ -158,7 +155,7 @@ HRESULT CAnimUITool_App::Render()
 
 	ImGui::Render();
 
-	if (FAILED(m_pGameInstance_Proxy->Begin_Draw())) 
+	if (FAILED(m_pGameInstance_Proxy->Begin_Draw()))
 		return E_FAIL;
 
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -186,11 +183,11 @@ void CAnimUITool_App::OnResize(_uint iWidth, _uint iHeight)
 	Safe_Release(m_pDSV);
 
 	// 멤버 크기로 재생성
-	if (FAILED(Ready_EditRTV())) 
-	{ 
-		Log_Error("Resize edit RT failed."); 
+	if (FAILED(Ready_EditRTV()))
+	{
+		Log_Error("Resize edit RT failed.");
 		return;
-	}   
+	}
 
 	m_pGameInstance_Proxy->Bind_RenderTarget(
 		m_pRTV,
@@ -273,7 +270,7 @@ HRESULT CAnimUITool_App::Ready_EditRTV()
 	desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 
 	ID3D11Texture2D* pTex = nullptr;
-	if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &pTex)))            
+	if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &pTex)))
 		return E_FAIL;
 
 	if (FAILED(m_pDevice->CreateRenderTargetView(pTex, nullptr, &m_pRTV)))
@@ -295,10 +292,10 @@ HRESULT CAnimUITool_App::Ready_EditRTV()
 	dsDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
 	ID3D11Texture2D* pDSTex = nullptr;
-	if (FAILED(m_pDevice->CreateTexture2D(&dsDesc, nullptr, &pDSTex)))        
+	if (FAILED(m_pDevice->CreateTexture2D(&dsDesc, nullptr, &pDSTex)))
 		return E_FAIL;
 
-	if (FAILED(m_pDevice->CreateDepthStencilView(pDSTex, nullptr, &m_pDSV))) 
+	if (FAILED(m_pDevice->CreateDepthStencilView(pDSTex, nullptr, &m_pDSV)))
 		return E_FAIL;
 
 	Safe_Release(pDSTex);

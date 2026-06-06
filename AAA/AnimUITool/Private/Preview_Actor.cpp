@@ -8,14 +8,14 @@
 
 
 CPreview_Actor::CPreview_Actor(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject{ pDevice, pContext }
-	, m_iAnimationIndex { 0 }
+    : CGameObject{ pDevice, pContext }
+    , m_iAnimationIndex{ 0 }
 {
 }
 
 CPreview_Actor::CPreview_Actor(const CPreview_Actor& Prototype)
-	: CGameObject{ Prototype }
-	, m_iAnimationIndex { Prototype.m_iAnimationIndex }
+    : CGameObject{ Prototype }
+    , m_iAnimationIndex{ Prototype.m_iAnimationIndex }
 {
 }
 
@@ -37,6 +37,12 @@ HRESULT CPreview_Actor::Initialize(void* pArg)
         return E_FAIL;
 
     return S_OK;
+}
+
+void CPreview_Actor::Update(_float fTimeDelta)
+{
+    if (m_pAnimatorCom && !m_pAnimatorCom->Get_CurrentAnimName().empty())           // 애니메이션 클립이 설정되어 있지 않으면 Update를 호출하지 않지만 Panel_Manager의 ctx에 기본 clip = 0으로 설정되어 있음
+        m_pAnimatorCom->Update(fTimeDelta);
 }
 
 void CPreview_Actor::Late_Update(_float fTimeDelta)
@@ -154,7 +160,7 @@ void CPreview_Actor::Set_AllMeshVisible(_bool bVisible)
         m_MeshVisible[i] = bVisible;
 }
 
-void CPreview_Actor::Set_SoloMesh(_uint iMesh) 
+void CPreview_Actor::Set_SoloMesh(_uint iMesh)
 {
     for (size_t i = 0; i < m_MeshVisible.size(); ++i)
         m_MeshVisible[i] = (i == iMesh);
