@@ -40,7 +40,7 @@ public:
 
 	_bool					Is_Hovered() const { return m_bHovered; }
 	_bool					Is_Clicked() const { return m_bClicked; }
-	
+
 	virtual void			On_Hovered() {}
 	virtual void			On_Click() {}
 	virtual void			On_Release() {}
@@ -57,7 +57,7 @@ protected:
 	HRESULT					Bind_ShaderResource(CShader* pShader, const _char* pConstant, D3DTS eState, PROJ_TYPE eType);
 	void					Picking_Update(const _float4x4& WorldMatrix, CTexture* pTex = nullptr, _uint iTexIdx = 0);
 
-public:	
+public:
 	virtual CGameObject* Clone(void* pArg) = 0;
 	virtual void Free();
 };

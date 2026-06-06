@@ -503,6 +503,82 @@ HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
     return hResult;
 }
 
+HRESULT CLevel_Edit::Load_MapPreviewStage(_uint iPresetIndex)
+{
+    Clear_MapPreviewStage();
+
+    CMapStage* pLoadedStage = nullptr;
+    _wstring strStageName;
+    const HRESULT hResult = CMapDescriptor::GetInstance()->Load_MapStage(
+        m_pDevice,
+        m_pContext,
+        iPresetIndex,
+        ETOUI(EDIT_LEVEL::EDIT),
+        ETOUI(LEVEL::GAMEPLAY),
+        &On_MapPreviewObjectCreated,
+        this,
+        &pLoadedStage,
+        &strStageName);
+
+    if (FAILED(hResult))
+    {
+        m_pMapStage = nullptr;
+        m_strLoadedMapStageName.clear();
+        m_strMapPreviewStatus = 0 != m_iEnvObjCreatedCount
+            ? L"Map stage preview load failed. / env=" + to_wstring(m_iEnvObjCreatedCount)
+            : L"Map stage preview load failed.";
+        return hResult;
+    }
+
+    m_pMapStage = pLoadedStage;
+    m_strLoadedMapStageName = strStageName;
+    if (m_strLoadedMapStageName.empty())
+        m_strLoadedMapStageName = StrToWstr(Get_MapPreviewPresetLabel(iPresetIndex));
+
+    m_strMapPreviewStatus = L"Map stage preview loaded: " + m_strLoadedMapStageName
+        + L" / env=" + to_wstring(m_iEnvObjCreatedCount);
+
+    return hResult;
+}
+
+HRESULT CLevel_Edit::Load_MapPreviewEnv(_uint iPresetIndex)
+{
+    Clear_MapPreviewEnv();
+
+    Client::CMapDescriptor::MAP_PRESET_LOAD_REPORT Report{};
+    const HRESULT hResult = CMapDescriptor::GetInstance()->Load_EnvObject_FromJson(
+        m_pDevice,
+        m_pContext,
+        iPresetIndex,
+        ETOUI(EDIT_LEVEL::EDIT),
+        &On_MapPreviewObjectCreated,
+        this,
+        &Report);
+
+    if (FAILED(hResult))
+    {
+        m_iEnvObjCreatedCount = 0;
+        m_strMapPreviewStatus = nullptr != m_pMapStage
+            ? L"Environment preview load failed. / stage=" + m_strLoadedMapStageName
+            : L"Environment preview load failed.";
+        return hResult;
+    }
+
+    m_iEnvObjCreatedCount = Report.iEnvCreatedCount;
+    m_strMapPreviewStatus = L"Environment preview loaded: env=" + to_wstring(m_iEnvObjCreatedCount);
+    if (!m_strLoadedMapStageName.empty())
+        m_strMapPreviewStatus += L" / stage=" + m_strLoadedMapStageName;
+
+    if (0 != Report.iEnvJsonFailedCount
+        || 0 != Report.iEnvSkippedMissingModel
+        || 0 != Report.iEnvSkippedCreateFailed)
+    {
+        m_strMapPreviewStatus += L" / warnings";
+    }
+
+    return hResult;
+}
+
 void CLevel_Edit::Clear_MapPreview()
 {
     vector<wstring> MapLayers;
@@ -524,6 +600,47 @@ void CLevel_Edit::Clear_MapPreview()
     m_MapPreviewObjects.clear();
     m_strMapPreviewStatus = L"Map preset not loaded.";
 }
+
+void CLevel_Edit::Clear_MapPreviewStage()
+{
+    Clear_MapPreviewLayer(L"Layer_MapStage");
+
+    m_pMapStage = nullptr;
+    m_strLoadedMapStageName.clear();
+
+    if (0 != m_iEnvObjCreatedCount)
+        m_strMapPreviewStatus = L"Environment preview loaded only. / env=" + to_wstring(m_iEnvObjCreatedCount);
+    else
+        m_strMapPreviewStatus = L"Map preset not loaded.";
+}
+
+void CLevel_Edit::Clear_MapPreviewEnv()
+{
+    static const wchar_t* kEnvLayers[] =
+    {
+        L"Layer_EnvStatic",
+        L"Layer_EnvInteract",
+        L"Layer_EnvEffect"
+    };
+
+    for (const wchar_t* pLayerTag : kEnvLayers)
+        Clear_MapPreviewLayer(pLayerTag);
+
+    m_iEnvObjCreatedCount = 0;
+
+    if (nullptr != m_pMapStage)
+    {
+        const _wstring strStageName = m_strLoadedMapStageName.empty()
+            ? L"(loaded stage)"
+            : m_strLoadedMapStageName;
+        m_strMapPreviewStatus = L"Map stage preview loaded: " + strStageName + L" / env=0";
+    }
+    else
+    {
+        m_strMapPreviewStatus = L"Map preset not loaded.";
+    }
+}
+
 void CLevel_Edit::Clear_MapPreviewLayer(const _wstring& strLayerTag)
 {
     auto iter = m_Layers.find(strLayerTag);

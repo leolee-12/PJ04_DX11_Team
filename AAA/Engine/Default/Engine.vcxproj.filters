@@ -1,12 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="98.SuperClass">
-      <UniqueIdentifier>{22f47e1e-11bb-49ec-a8fa-53436410515f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="99.Defines">
-      <UniqueIdentifier>{e411772b-c2a6-40ab-8686-9969730280cf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.Timers">
       <UniqueIdentifier>{0cbbced3-2367-452e-8da2-4064351a570a}</UniqueIdentifier>
     </Filter>
@@ -235,9 +229,6 @@
     <Filter Include="95. ShaderFiles\raw Shader">
       <UniqueIdentifier>{fb5dcb1b-6cbb-4a13-9d9d-75c0717ece59}</UniqueIdentifier>
     </Filter>
-    <Filter Include="19. Culling">
-      <UniqueIdentifier>{7467f37f-4478-4e05-9ece-ea4b10c3cb1c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01. Device">
       <UniqueIdentifier>{586ca780-2e95-4191-8660-52b5e30ed97e}</UniqueIdentifier>
     </Filter>
@@ -253,28 +244,37 @@
     <Filter Include="00. GameInstance\Proxy">
       <UniqueIdentifier>{345bd200-d819-455a-9f83-28b6dd616f31}</UniqueIdentifier>
     </Filter>
+    <Filter Include="20. Culling">
+      <UniqueIdentifier>{7467f37f-4478-4e05-9ece-ea4b10c3cb1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98. SuperClass">
+      <UniqueIdentifier>{22f47e1e-11bb-49ec-a8fa-53436410515f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99. Defines">
+      <UniqueIdentifier>{e411772b-c2a6-40ab-8686-9969730280cf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
-      <Filter>98.SuperClass</Filter>
+      <Filter>98. SuperClass</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Engine_Enum.h">
-      <Filter>99.Defines</Filter>
+      <Filter>99. Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Engine_Function.h">
-      <Filter>99.Defines</Filter>
+      <Filter>99. Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Engine_Macro.h">
-      <Filter>99.Defines</Filter>
+      <Filter>99. Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Engine_Struct.h">
-      <Filter>99.Defines</Filter>
+      <Filter>99. Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Engine_Typedef.h">
-      <Filter>99.Defines</Filter>
+      <Filter>99. Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Engine_Defines.h">
-      <Filter>99.Defines</Filter>
+      <Filter>99. Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\public\GameInstance.h">
       <Filter>00. GameInstance</Filter>
@@ -373,7 +373,7 @@
       <Filter>07. Component\Model\Bone</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Engine_Model_Data.h">
-      <Filter>99.Defines</Filter>
+      <Filter>99. Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Animation.h">
       <Filter>07. Component\Model\Animation</Filter>
@@ -493,15 +493,15 @@
       <Filter>19. ComputeShader</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Culling_Util.h">
-      <Filter>19. Culling</Filter>
+      <Filter>20. Culling</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Frustum_Manager.h">
-      <Filter>19. Culling</Filter>
+      <Filter>20. Culling</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
-      <Filter>98.SuperClass</Filter>
+      <Filter>98. SuperClass</Filter>
     </ClCompile>
     <ClCompile Include="..\private\GameInstance.cpp">
       <Filter>00. GameInstance</Filter>
@@ -717,10 +717,10 @@
       <Filter>19. ComputeShader</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Culling_Util.cpp">
-      <Filter>19. Culling</Filter>
+      <Filter>20. Culling</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Frustum_Manager.cpp">
-      <Filter>19. Culling</Filter>
+      <Filter>20. Culling</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

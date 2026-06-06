@@ -15,8 +15,8 @@
 #include "UIContainerObject.h"
 #include "UIPartObject.h"
 
-namespace 
-{ 
+namespace
+{
     constexpr const _char* PREVIEW_MODEL_PATH =
         "../../Resources/Models/Test/BladeKnight/BladeKnight.ysh";
 
@@ -25,12 +25,12 @@ namespace
         FILE* fp = nullptr; _wfopen_s(&fp, strPath.c_str(), L"rb");
         if (!fp) return MODEL::END;
         uint32_t magic = 0, ver = 0, type = 0;
-        fread(&magic, 4, 1, fp); 
-        fread(&ver, 4, 1, fp); 
+        fread(&magic, 4, 1, fp);
+        fread(&ver, 4, 1, fp);
         fread(&type, 4, 1, fp);
 
         fclose(fp);
-        if (magic != 0x2E595348) 
+        if (magic != 0x2E595348)
             return MODEL::END;
 
         return (type == 0) ? MODEL::NONANIM : MODEL::ANIM;
@@ -44,23 +44,23 @@ CLevel_Tool::CLevel_Tool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 HRESULT CLevel_Tool::Initialize()
 {
-    if (FAILED(__super::Initialize())) 
+    if (FAILED(__super::Initialize()))
         return E_FAIL;
 
-    if (FAILED(Ready_Lights())) 
+    if (FAILED(Ready_Lights()))
         return E_FAIL;
 
-    if (FAILED(Ready_Camera())) 
+    if (FAILED(Ready_Camera()))
         return E_FAIL;
 
-    if (FAILED(Ready_Grid()))   
+    if (FAILED(Ready_Grid()))
         return E_FAIL;
 
     if (FAILED(Ready_PreviewShaders()))
         return E_FAIL;
 
-    //if (FAILED(Ready_TestUI()))
-    //    return E_FAIL;
+    if (FAILED(Ready_TestUI()))
+        return E_FAIL;
 
     return S_OK;
 }
@@ -97,7 +97,7 @@ HRESULT CLevel_Tool::Ready_Camera()
     desc.fFovy = XMConvertToRadians(60.f);
     desc.fNear = 0.1f;
     desc.fFar = 1000.f;
-    desc.fSpeedPerSec = 20.f;                      
+    desc.fSpeedPerSec = 20.f;
     desc.fRotationPerSec = XMConvertToRadians(360.f);
     desc.fMouseSensor = 0.05f;
 
@@ -153,7 +153,8 @@ HRESULT CLevel_Tool::Ready_TestUI()
     }
 
     Client::CUI_Title::UI_TITLE_DESC desc{};
-    desc.vPosition = { -250.f, 120.f, 0.f, 1.f };
+    //desc.vPosition = { -250.f, 120.f, 0.f, 1.f };
+    desc.vPosition = { 0.f, 0.f, 0.f, 1.f };
     desc.bCreateTitleImage = true;
     desc.szTitleImagePartTag = Client::CUI_Title::PART_TAG_TITLE_IMAGE;
 
@@ -164,20 +165,20 @@ HRESULT CLevel_Tool::Ready_TestUI()
     desc.TitleImageDesc.iRenderLayer = 1;
 
     CGameObject* pSource = nullptr;
-    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pSource, L, Client::CUI_Title::PROTOTYPE_TAG, ETOUI(TOOL_LEVEL::EDIT), L"Layer_UI", L"Test_UI_Title_Source",  &desc)))
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pSource, L, Client::CUI_Title::PROTOTYPE_TAG, ETOUI(TOOL_LEVEL::EDIT), L"Layer_UI", L"Test_UI_Title_Source", &desc)))
         return E_FAIL;
 
     Track_UIContainer(pSource);
 
     json jUI = pSource->Serialize();
-    jUI["Transform"]["vPosition"][0] = 250.f;
+    jUI["Transform"]["vPosition"][0] = 0.f;
 
     CGameObject* pLoaded = nullptr;
-    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pLoaded, L, Client::CUI_Title::PROTOTYPE_TAG, ETOUI(TOOL_LEVEL::EDIT), L"Layer_UI", L"Test_UI_Title_Loaded",  nullptr)))
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pLoaded, L, Client::CUI_Title::PROTOTYPE_TAG, ETOUI(TOOL_LEVEL::EDIT), L"Layer_UI", L"Test_UI_Title_Loaded", nullptr)))
         return E_FAIL;
 
     Track_UIContainer(pLoaded);
-    
+
     pLoaded->Deserialize(jUI);
 
     return S_OK;
@@ -195,7 +196,7 @@ void CLevel_Tool::Track_UIContainer(CGameObject* pObject)
     m_UIContainers.push_back(pContainer);
 }
 
-void CLevel_Tool::Update(_float fTimeDelta) 
+void CLevel_Tool::Update(_float fTimeDelta)
 {
 }
 
@@ -223,7 +224,7 @@ void CLevel_Tool::Set_CameraActive(_bool bActive)
 void CLevel_Tool::Set_PreviewVisible(_bool bVisible)
 {
     if (m_pPreview)
-    m_pPreview->Set_Active(bVisible);
+        m_pPreview->Set_Active(bVisible);
 }
 
 CGameObject* CLevel_Tool::Load_Preview(const _wstring& strYshPath)
@@ -294,7 +295,7 @@ CGameObject* CLevel_Tool::Load_Kirby()
     if (!m_pGameInstance_Proxy->Has_Prototype(L, CPreview_Kirby::PROTOTYPE_TAG))
         m_pGameInstance_Proxy->Add_Prototype(L, CPreview_Kirby::PROTOTYPE_TAG,
             CPreview_Kirby::Create(m_pDevice, m_pContext));
-    
+
     // 4) ½ºÆù 
     CPreview_Kirby::PREVIEW_KIRBY_DESC desc{};
     desc.iProtoLevel = L;
@@ -347,5 +348,5 @@ void CLevel_Tool::Free()
 
     m_UIContainers.clear();
 
-    Safe_Release(m_pGrid);   
+    Safe_Release(m_pGrid);
 }

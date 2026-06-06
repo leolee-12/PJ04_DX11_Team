@@ -26,9 +26,9 @@ namespace
 
 CPreview_Kirby::CPreview_Kirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
-	, m_eBody { KIRBY_BODY_STATE::NORMAL }
-	, m_eMouth { KIRBY_MOUTH_STATE::IDLE }
-	, m_eEye { KIRBY_EYE_STATE::IDLE }
+	, m_eBody{ KIRBY_BODY_STATE::NORMAL }
+	, m_eMouth{ KIRBY_MOUTH_STATE::IDLE }
+	, m_eEye{ KIRBY_EYE_STATE::IDLE }
 {
 }
 
@@ -100,17 +100,17 @@ HRESULT CPreview_Kirby::Render()
 		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_SkinTexture", i, MTEX_TYPE::UNKNOWN, 1)))
 			return E_FAIL;
 
-		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MouthTexture", i, MTEX_TYPE::UNKNOWN, 2))) 
-			return E_FAIL;		
-
-		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i))) 
+		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MouthTexture", i, MTEX_TYPE::UNKNOWN, 2)))
 			return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_vBodyColor", &m_vBodyColor, sizeof(_float4)))) 
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_vFootColor", &m_vFootColor, sizeof(_float4)))) 
+
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_vBodyColor", &m_vBodyColor, sizeof(_float4))))
 			return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_vBlushColor", &m_vBlushColor, sizeof(_float4)))) 
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_vFootColor", &m_vFootColor, sizeof(_float4))))
+			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_vBlushColor", &m_vBlushColor, sizeof(_float4))))
 			return E_FAIL;
 
 		if (FAILED(m_pShaderCom->Begin(0)))     // pass 0 = Body
@@ -126,22 +126,22 @@ void CPreview_Kirby::Resolve_VisibleMeshes()
 {
 	const _uint n = (_uint)m_pModelCom->Get_NumMeshes();
 	m_MeshVisible.assign(n, false);
-	auto On = [&](_int i) 
+	auto On = [&](_int i)
 		{
-			if (i >= 0 && (_uint)i < n) 
-				m_MeshVisible[i] = true; 
+			if (i >= 0 && (_uint)i < n)
+				m_MeshVisible[i] = true;
 		};
 
 	// 바디 메쉬 = BODY_STATE
 	switch (m_eBody)
 	{
-	case Client::KIRBY_BODY_STATE::NORMAL:  
-		On(KMESH_BODY); 
+	case Client::KIRBY_BODY_STATE::NORMAL:
+		On(KMESH_BODY);
 		break;
 	case Client::KIRBY_BODY_STATE::STUFFED:
 		On(KMESH_BODY_BIG);
 		break;
-	case Client::KIRBY_BODY_STATE::INHALE: 
+	case Client::KIRBY_BODY_STATE::INHALE:
 		On(KMESH_BODY_VACUUM);
 		break;
 	default:
@@ -153,20 +153,20 @@ void CPreview_Kirby::Resolve_VisibleMeshes()
 	{
 		switch (m_eMouth)
 		{
-		case Client::KIRBY_MOUTH_STATE::IDLE:  
-			On(KMESH_MOUTH_NORMAL);  
+		case Client::KIRBY_MOUTH_STATE::IDLE:
+			On(KMESH_MOUTH_NORMAL);
 			break;
-		case Client::KIRBY_MOUTH_STATE::OPEN:  
-			On(KMESH_MOUTH_OPEN);   
+		case Client::KIRBY_MOUTH_STATE::OPEN:
+			On(KMESH_MOUTH_OPEN);
 			break;
-		case Client::KIRBY_MOUTH_STATE::ANGRY:    
-			On(KMESH_MOUTH_ANGRY);  
+		case Client::KIRBY_MOUTH_STATE::ANGRY:
+			On(KMESH_MOUTH_ANGRY);
 			break;
-		case Client::KIRBY_MOUTH_STATE::SMILE_OPEN: 
+		case Client::KIRBY_MOUTH_STATE::SMILE_OPEN:
 			On(KMESH_MOUTH_SMILE_OP);
 			break;
 		case Client::KIRBY_MOUTH_STATE::SMILE_CLOSE:
-			On(KMESH_MOUTH_SMILE_CL); 
+			On(KMESH_MOUTH_SMILE_CL);
 			break;
 		default:
 			break;
@@ -189,7 +189,7 @@ HRESULT CPreview_Kirby::Ready_Components()
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
 
-	if(FAILED(Ready_EyeTextures()))
+	if (FAILED(Ready_EyeTextures()))
 		return E_FAIL;
 
 	m_MeshVisible.assign(m_pModelCom->Get_NumMeshes(), true);

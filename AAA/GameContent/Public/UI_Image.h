@@ -24,7 +24,7 @@ public:
 	typedef struct tagUIImageDesc : public CUIPartObject::UI_PARTOBJECT_DESC
 	{
 		_uint			iTextureLevel = {};						// 텍스처 프로토 레벨 
-		const _tchar*	szTextureProtoTag = { nullptr };		// 텍스처 프로토 태그 
+		const _tchar* szTextureProtoTag = { nullptr };		// 텍스처 프로토 태그 
 		_float2			vSize = { 100.f, 100.f };
 		_float2			vPosition = { 0.f, 0.f };
 		_uint			iRenderLayer = { 1 };					// RENDERUIID	 (0 : Back / 1 : MIDDLE / 2 : FRONT)
@@ -51,13 +51,13 @@ public:
 	}
 
 public:
-	static CUI_Image*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	virtual CGameObject*	Clone(void* pArg) override;
+	static CUI_Image* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	virtual CGameObject* Clone(void* pArg) override;
 
 private:
-	CShader*				m_pShaderCom = { nullptr };
-	CTexture*				m_pTextureCom = { nullptr };
-	CVIBuffer_Rect*			m_pVIBufferCom = { nullptr };
+	CShader* m_pShaderCom = { nullptr };
+	CTexture* m_pTextureCom = { nullptr };
+	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
 
 private:
 	HRESULT					Ready_Components(UI_IMAGE_DESC* pDesc);

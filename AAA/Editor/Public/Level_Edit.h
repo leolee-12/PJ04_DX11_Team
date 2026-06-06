@@ -79,12 +79,16 @@ public:
 
 public:	// Map Preview - Public Func
 	HRESULT			Load_MapPreview(_uint iPresetIndex);
+	HRESULT			Load_MapPreviewStage(_uint iPresetIndex);
+	HRESULT			Load_MapPreviewEnv(_uint iPresetIndex);
 	void			Clear_MapPreview();
+	void			Clear_MapPreviewStage();
+	void			Clear_MapPreviewEnv();
 	_uint			Get_MapPreviewPresetCount() const;
 	const _char*	Get_MapPreviewPresetLabel(_uint iPresetIndex) const;
 	_bool			Is_MapPreviewLoaded() const { return nullptr != m_pMapStage || 0 != m_iEnvObjCreatedCount; }
-	const _wstring& Get_MapPreviewStatus() const { return m_strMapPreviewStatus; }
-	const _wstring& Get_LoadedMapPreviewStageName() const { return m_strLoadedMapStageName; }
+	const _wstring&	Get_MapPreviewStatus() const { return m_strMapPreviewStatus; }
+	const _wstring&	Get_LoadedMapPreviewStageName() const { return m_strLoadedMapStageName; }
 	_uint			Get_MapPreviewEnvCreatedCount() const { return m_iEnvObjCreatedCount; }
 
 private:

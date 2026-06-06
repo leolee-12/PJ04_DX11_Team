@@ -4,15 +4,15 @@
 namespace Client
 {
 	// 캐릭터들 모두 사용할 상태값 초안 
-	enum class CHARACTER_STATE : int 
+	enum class CHARACTER_STATE : int
 	{
 		IDLE = 0,
 
 		// LOCOMOTION (이동 관련)
 		WALK = 1,
-		RUN = 2, 
+		RUN = 2,
 		FLIGHT = 3,
-		JUMP = 4, 
+		JUMP = 4,
 		BACKJUMP = 5,
 		SLIDE = 6,
 

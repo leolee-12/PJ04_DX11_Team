@@ -29,15 +29,15 @@ public:
     void                        Set_GridVisible(_bool bVisible) { m_bGridVisible = bVisible; }
     void                        Set_PreviewVisible(_bool bVisible);
 
-    CGameObject*                Load_Preview(const _wstring& strYshPath);
-    CGameObject*                Load_Kirby();
+    CGameObject* Load_Preview(const _wstring& strYshPath);
+    CGameObject* Load_Kirby();
     void                        Clear_Preview();
     void                        Recalc_CameraProj();
 
 private:
-    CEditCamera*                m_pCamera = { nullptr };  
-    CEdit_Grid*                 m_pGrid = { nullptr };   
-    CGameObject*                m_pPreview = { nullptr };
+    CEditCamera* m_pCamera = { nullptr };
+    CEdit_Grid* m_pGrid = { nullptr };
+    CGameObject* m_pPreview = { nullptr };
     map<_wstring, _wstring>     m_ModelTags;
     _uint                       m_iTagCounter = { 0 };
     _bool                       m_bGridVisible = { true };
@@ -54,7 +54,7 @@ private:
     void                        Track_UIContainer(CGameObject* pObject);
 
 public:
-    static CLevel_Tool*         Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    static CLevel_Tool* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual void                Free() override;
 };
 

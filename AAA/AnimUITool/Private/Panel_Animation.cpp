@@ -25,20 +25,20 @@ namespace
 }
 
 CPanel_Animation::CPanel_Animation(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CPanel{ pDevice, pContext }
+    : CPanel{ pDevice, pContext }
 {
-	strcpy_s(m_szName, "Animation");
+    strcpy_s(m_szName, "Animation");
 }
 
-void CPanel_Animation::Render() 
+void CPanel_Animation::Render()
 {
     ImGui::Begin(m_szName);
 
     ANIM_CONTEXT& ctx = m_pPanel_Manager->Get_Context();
     if (!ctx.Valid()) { ImGui::TextDisabled("No preview model."); ImGui::End(); return; }
 
-    if (m_pPrevActor != ctx.pOwner) 
-    { 
+    if (m_pPrevActor != ctx.pOwner)
+    {
         m_pPrevActor = ctx.pOwner;
         m_iPrevClip = -1;
 
@@ -49,7 +49,7 @@ void CPanel_Animation::Render()
             fs::path jp = mp.parent_path() / (mp.stem().wstring() + L"_anim_events.json");
 
             std::error_code ec;
-            fs::path rel = fs::relative(jp, fs::current_path(), ec);   
+            fs::path rel = fs::relative(jp, fs::current_path(), ec);
             std::wstring out = (!ec && !rel.empty()) ? rel.wstring() : jp.wstring();
 
             std::string js(out.begin(), out.end());
@@ -60,7 +60,7 @@ void CPanel_Animation::Render()
     CModel* pModel = ctx.pModel;
     CAnimator* pAnim = ctx.pAnimator;
 
-    if (pModel->Get_NumAnimations() == 0)          
+    if (pModel->Get_NumAnimations() == 0)
     {
         ImGui::TextDisabled("No animation clips (model-only .ysh).");
         ImGui::TextDisabled("Use a baked .ysh (model + motion) to preview animation.");
@@ -103,7 +103,7 @@ void CPanel_Animation::Render()
     if (ctx.bPlaying)
     {
         pAnim->Resume();
-        pAnim->Play(strName, ctx.bLoop, false, 0.f);     
+        pAnim->Play(strName, ctx.bLoop, false, 0.f);
         ctx.fProgress = pAnim->Get_Progress();
         ImGui::SliderFloat("##timeline", &ctx.fProgress, 0.f, 1.f, "%.3f");
     }
@@ -248,18 +248,18 @@ void CPanel_Animation::Render_EventTimeline()
         switch (static_cast<Client::EANIM_EVENT>(e.iEventType))
         {
         case Client::EANIM_EVENT::SetBody:
-            Draw_StateCombo("IntParam", e.iIntParam, Client::g_KirbyBodyNames);  
+            Draw_StateCombo("IntParam", e.iIntParam, Client::g_KirbyBodyNames);
             break;
         case Client::EANIM_EVENT::SetMouth:
-            Draw_StateCombo("IntParam", e.iIntParam, Client::g_KirbyMouthNames); 
+            Draw_StateCombo("IntParam", e.iIntParam, Client::g_KirbyMouthNames);
             break;
         case Client::EANIM_EVENT::SetEye:
-            Draw_StateCombo("IntParam", e.iIntParam, Client::g_KirbyEyeNames);   
+            Draw_StateCombo("IntParam", e.iIntParam, Client::g_KirbyEyeNames);
             break;
         default:
-            ImGui::InputInt("IntParam", &e.iIntParam);                           
+            ImGui::InputInt("IntParam", &e.iIntParam);
             break;
-        }        
+        }
         ImGui::DragFloat3("Offset", &e.vOffset.x, 0.1f);
 
 
@@ -273,10 +273,10 @@ void CPanel_Animation::Render_EventTimeline()
 
 CPanel_Animation* CPanel_Animation::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	return new CPanel_Animation(pDevice, pContext);
+    return new CPanel_Animation(pDevice, pContext);
 }
 
-void CPanel_Animation::Free() 
-{ 
-	__super::Free();
- }
+void CPanel_Animation::Free()
+{
+    __super::Free();
+}

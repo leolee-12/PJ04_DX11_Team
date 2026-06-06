@@ -22,15 +22,22 @@ protected:
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
+	virtual HRESULT Render() override;
+	virtual HRESULT Render_Shadow() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
+
+public:
+	_bool   Is_ProfileRenderable() const { return m_bRenderable && Has_RenderModel(); }
+	_bool   Is_ShadowCaster() const { return m_bCastShadow; }
+	_bool   Is_Visible_Main() const { return m_bVisible; }
+	_bool   Is_Visible_Shadow() const { return m_bVisibleShadow; }
 
 protected:
 	HRESULT Ready_RenderComponents(_uint iModelProtoLevel, const wstring& strModelProtoTag);
 	HRESULT Bind_ShaderResources();
-	HRESULT Render_Model();
 	void	Update_LocalBounds();
 	void	Refresh_WorldBounds();
-	_bool	Is_VisibleInCurrentView() const;
+	void	Check_Visible();
 	_bool	Has_RenderModel() const { return nullptr != m_pModelCom; }
 
 protected:
@@ -42,7 +49,9 @@ protected:
 	BoundingBox		m_WorldBounds = {};
 	_bool			m_bRenderable = { true };
 	_bool			m_bEnableCulling = { true };
+	_bool			m_bCastShadow = { false };
 	_bool			m_bVisible = { true };
+	_bool			m_bVisibleShadow = { true };
 	_bool			m_bDebugDraw = { false };
 
 private:

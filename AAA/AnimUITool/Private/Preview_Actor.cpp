@@ -8,14 +8,14 @@
 
 
 CPreview_Actor::CPreview_Actor(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject{ pDevice, pContext }
-	, m_iAnimationIndex { 0 }
+    : CGameObject{ pDevice, pContext }
+    , m_iAnimationIndex{ 0 }
 {
 }
 
 CPreview_Actor::CPreview_Actor(const CPreview_Actor& Prototype)
-	: CGameObject{ Prototype }
-	, m_iAnimationIndex { Prototype.m_iAnimationIndex }
+    : CGameObject{ Prototype }
+    , m_iAnimationIndex{ Prototype.m_iAnimationIndex }
 {
 }
 
@@ -160,7 +160,7 @@ void CPreview_Actor::Set_AllMeshVisible(_bool bVisible)
         m_MeshVisible[i] = bVisible;
 }
 
-void CPreview_Actor::Set_SoloMesh(_uint iMesh) 
+void CPreview_Actor::Set_SoloMesh(_uint iMesh)
 {
     for (size_t i = 0; i < m_MeshVisible.size(); ++i)
         m_MeshVisible[i] = (i == iMesh);
