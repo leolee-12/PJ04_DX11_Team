@@ -350,6 +350,107 @@ void CImGui_Manager::Draw_Toolbar()
             m_pGameInstance_Proxy->Enable_InputDeveice();
         }
         ImGui::PopStyleColor();
+    } 
+
+    ImGui::SameLine();
+
+    // --- Effect Save ---
+    static char s_EffectSaveBuf[iBufferSize] = {};
+    if (ImGui::Button("Effect Save"))
+    {
+        CGameObject* pSelected = m_pLevel_Edit->Get_Selected();
+        CEffect_Container* pSelectedEffect = dynamic_cast<CEffect_Container*>(pSelected);
+
+        if (nullptr == pSelectedEffect)
+        {
+            MSG_BOX("Select Effect Object First");
+        }
+        else
+        {
+            memset(s_EffectSaveBuf, 0, sizeof(s_EffectSaveBuf));
+
+            string strDefaultName = WstrToStr(pSelected->Get_ObjectTag());
+            strncpy_s(s_EffectSaveBuf, strDefaultName.c_str(), _TRUNCATE);
+
+            ImGui::OpenPopup("Effect Save");
+        }
+    }
+
+    ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+    if (ImGui::BeginPopupModal("Effect Save", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("File name (.JSON):");
+        ImGui::InputText("##effectsave", s_EffectSaveBuf, iBufferSize);
+
+        if (ImGui::Button("OK"))
+        {
+            CGameObject* pSelected = m_pLevel_Edit->Get_Selected();
+            CEffect_Container* pSelectedEffect = dynamic_cast<CEffect_Container*>(pSelected);
+
+            if (nullptr == pSelectedEffect)
+            {
+                MSG_BOX("Select Effect Object First");
+            }
+            else if (strlen(s_EffectSaveBuf) == 0)
+            {
+                MSG_BOX("Input Effect File Name");
+            }
+            else
+            {
+                wstring strFileName(s_EffectSaveBuf, s_EffectSaveBuf + strlen(s_EffectSaveBuf));
+                if (FAILED(m_pLevel_Edit->Save_Selected_Effect(g_strEditPath + strFileName +
+                    L".JSON")))
+                    MSG_BOX("Effect Save Failed");
+                else
+                    ImGui::CloseCurrentPopup();
+            }
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel"))
+            ImGui::CloseCurrentPopup();
+
+        ImGui::EndPopup();
+    }
+
+    ImGui::SameLine();
+
+    // --- Effect Load ---
+    static char s_EffectLoadBuf[iBufferSize] = {};
+    if (ImGui::Button("Effect Load"))
+    {
+        memset(s_EffectLoadBuf, 0, sizeof(s_EffectLoadBuf));
+        ImGui::OpenPopup("Effect Load");
+    }
+
+    ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+    if (ImGui::BeginPopupModal("Effect Load", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("File name (.JSON):");
+        ImGui::InputText("##effectload", s_EffectLoadBuf, iBufferSize);
+
+        if (ImGui::Button("OK"))
+        {
+            if (strlen(s_EffectLoadBuf) == 0)
+            {
+                MSG_BOX("Input Effect File Name");
+            }
+            else
+            {
+                wstring strFileName(s_EffectLoadBuf, s_EffectLoadBuf + strlen(s_EffectLoadBuf));
+                if (FAILED(m_pLevel_Edit->Load_Selected_Effect(g_strEditPath + strFileName +
+                    L".JSON")))
+                    MSG_BOX("Effect Load Failed");
+                else
+                    ImGui::CloseCurrentPopup();
+            }
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel"))
+            ImGui::CloseCurrentPopup();
+
+        ImGui::EndPopup();
     }
 
     ImGui::SameLine();
@@ -552,6 +653,8 @@ void CImGui_Manager::Draw_Inspector()
         }
     }
 
+    ImGui::Separator();
+
     auto pContainer = dynamic_cast<CContainerObject*>(pSelected);
     if (pContainer)
     {
@@ -563,6 +666,7 @@ void CImGui_Manager::Draw_Inspector()
 
         for (auto& [tag, pPart] : vecSorted)
         {
+
             string strTag = WstrToStr(tag);
             if (ImGui::CollapsingHeader(strTag.c_str()))
             {
@@ -607,7 +711,7 @@ void CImGui_Manager::Draw_Inspector()
 
     auto pEffectContainer = dynamic_cast<CEffect_Container*>(pSelected);
     if (pEffectContainer)
-    {
+    {      
         auto& pEffectPart = pEffectContainer->Get_EffectPartObject();
         vector<pair<wstring, CEffect_Part*>> vecSorted(pEffectPart.begin(), pEffectPart.end());
         sort(vecSorted.begin(), vecSorted.end(), [](const auto& a, const auto& b) {
@@ -616,6 +720,9 @@ void CImGui_Manager::Draw_Inspector()
         
         for (auto& [tag, pPart] : vecSorted)
         {
+            ImGui::Separator();
+            ImGui::Separator();
+
             string strTag = WstrToStr(tag);
             if (ImGui::CollapsingHeader(strTag.c_str()))
             {
@@ -627,6 +734,8 @@ void CImGui_Manager::Draw_Inspector()
             }
         }
     }
+
+    ImGui::Separator();
 
     ImGui::End();
     return;
