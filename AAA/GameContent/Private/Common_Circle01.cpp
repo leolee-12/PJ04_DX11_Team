@@ -1,31 +1,31 @@
-#include "SmokeTail.h"
+#include "Common_Circle01.h"
 
 #include "GameInstance.h"
 
 #include "GameContent_const.h"
 
-CSmokeTail::CSmokeTail(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CCommon_Circle01::CCommon_Circle01(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Mesh{ pDevice, pContext }
 {
 }
 
-CSmokeTail::CSmokeTail(const CSmokeTail& Prototype)
+CCommon_Circle01::CCommon_Circle01(const CCommon_Circle01& Prototype)
     : CEffect_Mesh(Prototype)
 {
 }
 
-HRESULT CSmokeTail::Initialize_Prototype()
+HRESULT CCommon_Circle01::Initialize_Prototype()
 {
     m_eProjType = PROJ_TYPE::PERSPEC;
     return S_OK;
 }
 
-HRESULT CSmokeTail::Initialize(void* pArg)
+HRESULT CCommon_Circle01::Initialize(void* pArg)
 {
-    SMOKE_TAIL_DESC tDesc{};
+    COMMON_CIRCLE01_DESC tDesc{};
 
     tDesc.iModelLevel = ETOUI(LEVEL::GAMEPLAY);
-    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_SmokeTail");
+    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Common_Circle01");
 
     tDesc.bUseDiffuseTexture = false;
     tDesc.bUseUnKnownTexture = true;
@@ -39,8 +39,8 @@ HRESULT CSmokeTail::Initialize(void* pArg)
     tDesc.wstrMaskTag = L"";
 
     tDesc.bCustomShader = false;
-    //tDesc.iShaderLevel = 0;
-    //tDesc.wstrShaderTag = L"";
+    tDesc.iShaderLevel = 0;
+    tDesc.wstrShaderTag = L"";
 
     if (FAILED(__super::Initialize(&tDesc)))
         return E_FAIL;
@@ -48,17 +48,17 @@ HRESULT CSmokeTail::Initialize(void* pArg)
     return S_OK;
 }
 
-void CSmokeTail::Priority_Update(_float fTimeDelta)
+void CCommon_Circle01::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 }
 
-void CSmokeTail::Update(_float fTimeDelta)
+void CCommon_Circle01::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 }
 
-void CSmokeTail::Late_Update(_float fTimeDelta)
+void CCommon_Circle01::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 
@@ -66,43 +66,43 @@ void CSmokeTail::Late_Update(_float fTimeDelta)
         return;
 
     Compute_CombinedWorldMatrix();
-    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::BLEND, this);
 }
 
-HRESULT CSmokeTail::Render()
+HRESULT CCommon_Circle01::Render()
 {
     __super::Render();
 
     return S_OK;
 }
 
-CSmokeTail* CSmokeTail::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CCommon_Circle01* CCommon_Circle01::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CSmokeTail* pInstance = new CSmokeTail(pDevice, pContext);
+    CCommon_Circle01* pInstance = new CCommon_Circle01(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX("Failed to Created: CSmokeTail");
+        MSG_BOX("Failed to Created: CCommon_Circle01");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CSmokeTail::Clone(void* pArg)
+CGameObject* CCommon_Circle01::Clone(void* pArg)
 {
-    CSmokeTail* pInstance = new CSmokeTail(*this);
+    CCommon_Circle01* pInstance = new CCommon_Circle01(*this);
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Cloned: CSmokeTail");
+        MSG_BOX("Failed to Cloned: CCommon_Circle01");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CSmokeTail::Free()
+void CCommon_Circle01::Free()
 {
     __super::Free();
 }

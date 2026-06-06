@@ -101,7 +101,7 @@ PS_OUT PS_MAIN(PS_IN In)
         Out.vColor *= g_UnknownTexture.Sample(LinearSampler, vUV);
     }
     
-    Out.vColor.xyz *= g_vColor;          
+    Out.vColor.xyz *= g_vColor;
     Out.vColor.a *= g_fAlpha;
     
     return Out;

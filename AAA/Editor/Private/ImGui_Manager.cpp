@@ -339,90 +339,106 @@ void CImGui_Manager::Draw_Toolbar()
             m_pGameInstance_Proxy->Enable_InputDeveice();
         }
         ImGui::PopStyleColor();
-    }
+    } 
 
     ImGui::SameLine();
 
-    // --- Nav Edit Åä±Û ---
-    if (m_pLevel_Edit->Is_NavEditMode())
+    // --- Effect Save ---
+    static char s_EffectSaveBuf[iBufferSize] = {};
+    if (ImGui::Button("Effect Save"))
     {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.f));
-        if (ImGui::Button("NavEdit [ON]"))
-            m_pLevel_Edit->End_NavEditMode();
-        ImGui::PopStyleColor();
+        CGameObject* pSelected = m_pLevel_Edit->Get_Selected();
+        CEffect_Container* pSelectedEffect = dynamic_cast<CEffect_Container*>(pSelected);
 
-        const CNavMesh_Editor* pNav = m_pLevel_Edit->Get_NavMeshEditor();
-        ImGui::SameLine();
-        ImGui::Text("Tris:%u  Pending:%u/3",
-            pNav->Get_TriangleCount(), pNav->Get_PendingCount());
-
-        ImGui::SameLine();
-        if (ImGui::Button("Undo##nav"))
-            m_pLevel_Edit->Nav_Undo();
-
-        ImGui::SameLine();
-        if (ImGui::Button("Redo##nav"))
-            m_pLevel_Edit->Nav_Redo();
-
-        ImGui::SameLine();
+        if (nullptr == pSelectedEffect)
         {
-            float fSnap = pNav->Get_SnapRadius();
-            ImGui::SetNextItemWidth(100.f);
-            if (ImGui::DragFloat("Snap##nav", &fSnap, 0.05f, 0.05f, 5.f, "%.2f"))
-                const_cast<CNavMesh_Editor*>(pNav)->Set_SnapRadius(fSnap);
+            MSG_BOX("Select Effect Object First");
+        }
+        else
+        {
+            memset(s_EffectSaveBuf, 0, sizeof(s_EffectSaveBuf));
+
+            string strDefaultName = WstrToStr(pSelected->Get_ObjectTag());
+            strncpy_s(s_EffectSaveBuf, strDefaultName.c_str(), _TRUNCATE);
+
+            ImGui::OpenPopup("Effect Save");
         }
     }
-    else
-    {
-        if (ImGui::Button("NavEdit [OFF]"))
-            m_pLevel_Edit->Begin_NavEditMode();
-    }
 
-    ImGui::SameLine();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+    if (ImGui::BeginPopupModal("Effect Save", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("File name (.JSON):");
+        ImGui::InputText("##effectsave", s_EffectSaveBuf, iBufferSize);
 
-    // --- Nav Save ---
-    static char s_NavSaveBuf[64] = {};
-    if (ImGui::Button("NavSave"))
-    {
-        memset(s_NavSaveBuf, 0, sizeof(s_NavSaveBuf));
-        ImGui::OpenPopup("Nav Save");
-    }
-    if (ImGui::BeginPopupModal("Nav Save", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-    {
-        ImGui::Text("File name (.nav):");
-        ImGui::InputText("##navsave", s_NavSaveBuf, 64);
         if (ImGui::Button("OK"))
         {
-            wstring path(s_NavSaveBuf, s_NavSaveBuf + strlen(s_NavSaveBuf));
-            m_pLevel_Edit->Save_NavMesh(g_strEditPath + path + L".nav");
-            ImGui::CloseCurrentPopup();
+            CGameObject* pSelected = m_pLevel_Edit->Get_Selected();
+            CEffect_Container* pSelectedEffect = dynamic_cast<CEffect_Container*>(pSelected);
+
+            if (nullptr == pSelectedEffect)
+            {
+                MSG_BOX("Select Effect Object First");
+            }
+            else if (strlen(s_EffectSaveBuf) == 0)
+            {
+                MSG_BOX("Input Effect File Name");
+            }
+            else
+            {
+                wstring strFileName(s_EffectSaveBuf, s_EffectSaveBuf + strlen(s_EffectSaveBuf));
+                if (FAILED(m_pLevel_Edit->Save_Selected_Effect(g_strEditPath + strFileName +
+                    L".JSON")))
+                    MSG_BOX("Effect Save Failed");
+                else
+                    ImGui::CloseCurrentPopup();
+            }
         }
+
         ImGui::SameLine();
-        if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
+        if (ImGui::Button("Cancel"))
+            ImGui::CloseCurrentPopup();
+
         ImGui::EndPopup();
     }
 
     ImGui::SameLine();
 
-    // --- Nav Load ---
-    static char s_NavLoadBuf[64] = {};
-    if (ImGui::Button("NavLoad"))
+    // --- Effect Load ---
+    static char s_EffectLoadBuf[iBufferSize] = {};
+    if (ImGui::Button("Effect Load"))
     {
-        memset(s_NavLoadBuf, 0, sizeof(s_NavLoadBuf));
-        ImGui::OpenPopup("Nav Load");
+        memset(s_EffectLoadBuf, 0, sizeof(s_EffectLoadBuf));
+        ImGui::OpenPopup("Effect Load");
     }
-    if (ImGui::BeginPopupModal("Nav Load", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+
+    ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+    if (ImGui::BeginPopupModal("Effect Load", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
     {
-        ImGui::Text("File name (.nav):");
-        ImGui::InputText("##navload", s_NavLoadBuf, 64);
+        ImGui::Text("File name (.JSON):");
+        ImGui::InputText("##effectload", s_EffectLoadBuf, iBufferSize);
+
         if (ImGui::Button("OK"))
         {
-            wstring path(s_NavLoadBuf, s_NavLoadBuf + strlen(s_NavLoadBuf));
-            m_pLevel_Edit->Load_NavMesh(g_strEditPath + path + L".nav");
-            ImGui::CloseCurrentPopup();
+            if (strlen(s_EffectLoadBuf) == 0)
+            {
+                MSG_BOX("Input Effect File Name");
+            }
+            else
+            {
+                wstring strFileName(s_EffectLoadBuf, s_EffectLoadBuf + strlen(s_EffectLoadBuf));
+                if (FAILED(m_pLevel_Edit->Load_Selected_Effect(g_strEditPath + strFileName +
+                    L".JSON")))
+                    MSG_BOX("Effect Load Failed");
+                else
+                    ImGui::CloseCurrentPopup();
+            }
         }
+
         ImGui::SameLine();
-        if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
+        if (ImGui::Button("Cancel"))
+            ImGui::CloseCurrentPopup();
+
         ImGui::EndPopup();
     }
 
@@ -621,6 +637,8 @@ void CImGui_Manager::Draw_Inspector()
         }
     }
 
+    ImGui::Separator();
+
     auto pContainer = dynamic_cast<CContainerObject*>(pSelected);
     if (pContainer)
     {
@@ -632,6 +650,7 @@ void CImGui_Manager::Draw_Inspector()
 
         for (auto& [tag, pPart] : vecSorted)
         {
+
             string strTag = WstrToStr(tag);
             if (ImGui::CollapsingHeader(strTag.c_str()))
             {
@@ -676,7 +695,7 @@ void CImGui_Manager::Draw_Inspector()
 
     auto pEffectContainer = dynamic_cast<CEffect_Container*>(pSelected);
     if (pEffectContainer)
-    {
+    {      
         auto& pEffectPart = pEffectContainer->Get_EffectPartObject();
         vector<pair<wstring, CEffect_Part*>> vecSorted(pEffectPart.begin(), pEffectPart.end());
         sort(vecSorted.begin(), vecSorted.end(), [](const auto& a, const auto& b) {
@@ -685,6 +704,9 @@ void CImGui_Manager::Draw_Inspector()
         
         for (auto& [tag, pPart] : vecSorted)
         {
+            ImGui::Separator();
+            ImGui::Separator();
+
             string strTag = WstrToStr(tag);
             if (ImGui::CollapsingHeader(strTag.c_str()))
             {
@@ -696,6 +718,8 @@ void CImGui_Manager::Draw_Inspector()
             }
         }
     }
+
+    ImGui::Separator();
 
     ImGui::End();
     return;

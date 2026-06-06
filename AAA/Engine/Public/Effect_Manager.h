@@ -11,7 +11,7 @@ class CShader;
 class CEffect_Manager final : public CBase
 {
 public:
-    static constexpr const _tchar* EFFECT_LAYER_TAG = L"Layer_90_Effect";
+    static constexpr const _tchar* EFFECT_LAYER_TAG = L"Layer_Effect";
 
 private:
     CEffect_Manager(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

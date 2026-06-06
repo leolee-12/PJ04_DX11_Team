@@ -65,7 +65,10 @@ void CEffect_Container::Update(_float fTimeDelta)
     }
 
     for (auto& [tag, pPart] : m_EffestParts)
+    {
+        pPart->Update_PlayValue(m_bIsPlay, m_bLoop, m_fDuration, m_fAccTime);
         pPart->Update(fTimeDelta);
+    }
 }
 
 void CEffect_Container::Late_Update(_float fTimeDelta)
@@ -129,13 +132,13 @@ void CEffect_Container::Deserialize(const json& j)
 {
     __super::Deserialize(j);
 
-    if (!j.contains("UIPartObjects")) return;
+    if (!j.contains("EffectPartObjects")) return;
 
     for (auto& [tag, pPart] : m_EffestParts)
     {
         string strTag = WstrToStr(tag);
-        if (j["UIPartObjects"].contains(strTag))
-            pPart->Deserialize(j["UIPartObjects"][strTag]);
+        if (j["EffectPartObjects"].contains(strTag))
+            pPart->Deserialize(j["EffectPartObjects"][strTag]);
     }
 }
 
