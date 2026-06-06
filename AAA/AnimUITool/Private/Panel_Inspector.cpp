@@ -368,6 +368,10 @@ void CPanel_Inspector::Render_Meshs()
 
 void CPanel_Inspector::Render_KirbyFace(CGameObject* pObject)
 {
+    CPreview_Kirby* pKirby = dynamic_cast<CPreview_Kirby*>(pObject);
+    if (!pKirby)
+        return;
+
     if (!ImGui::CollapsingHeader("Kirby Face", ImGuiTreeNodeFlags_DefaultOpen) || pObject == nullptr )
         return;
 
@@ -406,11 +410,8 @@ void CPanel_Inspector::Render_KirbyFace(CGameObject* pObject)
 
 }
 
-void CPanel_Inspector::Render_UITransform(CGameObject* pObject)
+void CPanel_Inspector::Render_UITransform(CUIPartObject* pPart)
 {
-    CUIPartObject* pPart = dynamic_cast<CUIPartObject*>(*pObject);
-    if (!pPart)
-        return;
 
     if (!ImGui::CollapsingHeader("Transform (UI)", ImGuiTreeNodeFlags_DefaultOpen))
         return;
@@ -475,7 +476,7 @@ void CPanel_Inspector::Render_UIInspector()
     ImGui::Text("Z (Transform z): %.3f", pPart->Get_ZOrder());
 
     ImGui::Separator();
-    Render_Transform(pPart);    
+    Render_UITransform(pPart);    
     Render_Properties(pPart);   
 }
 

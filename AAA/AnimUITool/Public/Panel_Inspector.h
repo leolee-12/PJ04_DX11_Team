@@ -5,6 +5,7 @@
 NS_BEGIN(Engine)
 class CGameObject;
 class IReflectable;
+class CUIPartObject;
 NS_END
 
 NS_BEGIN(AnimUITool)
@@ -26,7 +27,7 @@ private:
 	void						Render_Bones();
 	void						Render_Meshs();
 	void						Render_KirbyFace(CGameObject* pObject);
-	void						Render_UITransform(CGameObject* pObject);
+	void						Render_UITransform(CUIPartObject* pPart);
 	void						Render_UIInspector();
 
 private:
