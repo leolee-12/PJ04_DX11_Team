@@ -18,6 +18,7 @@
 #include "Effect_Container.h"
 #include "Effect_Part.h"
 #include "MapDescriptor.h"
+#include "MapStage.h"
 
 IMPLEMENT_SINGLETON(CImGui_Manager)
 
@@ -775,6 +776,39 @@ void CImGui_Manager::Draw_Inspector()
     }
 
     ImGui::Separator();
+
+    // ===== Map Stage → Sections (컨테이너와 동일한 시각적 표현) =====
+    auto pMapStage = dynamic_cast<CMapStage*>(pSelected);
+    if (pMapStage)
+    {
+        const auto& Sections = pMapStage->Get_Sections();   // vector<CMapSection*> (이미 정렬된 순서)
+
+        ImGui::Separator();
+        ImGui::Text("Sections (%d)", (int)Sections.size());
+
+        for (CMapSection* pSection : Sections)
+        {
+            if (!pSection) continue;
+
+            // 섹션 이름을 헤더 라벨 + 고유 ID로 사용
+            string strName = WstrToStr(pSection->Get_SectionName());
+            string strHeader = strName + "##Section_" + to_string((uintptr_t)pSection);
+
+            if (ImGui::CollapsingHeader(strHeader.c_str()))
+            {
+                ImGui::PushID(pSection);
+
+                // 섹션의 로컬 트랜스폼 (스테이지 부모행렬과 Late_Update에서 합성됨)
+                Draw_Transform(pSection, strName);
+                ImGui::Separator();
+                Draw_Properties(pSection);   // CMapObject의 Normal Strength / UV Scale / Top Projection 등
+
+                ImGui::PopID();
+            }
+            ImGui::Separator();
+            ImGui::Separator();
+        }
+    }
 
     ImGui::End();
     return;
