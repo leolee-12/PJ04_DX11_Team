@@ -58,7 +58,6 @@ private:
 	CShader*				m_pShaderCom = { nullptr };
 	CTexture*				m_pTextureCom = { nullptr };
 	CVIBuffer_Rect*			m_pVIBufferCom = { nullptr };
-	RENDERUIID				m_eRenderLayer = { RENDERUIID::MIDDLE };
 
 private:
 	HRESULT					Ready_Components(UI_IMAGE_DESC* pDesc);

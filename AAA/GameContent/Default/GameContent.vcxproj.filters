@@ -112,6 +112,9 @@
     <Filter Include="00. GameObject\01. Map\SkySphere">
       <UniqueIdentifier>{c77df806-0179-45ff-b02d-ef8c9d34da35}</UniqueIdentifier>
     </Filter>
+    <Filter Include="99. Defines\Hojun">
+      <UniqueIdentifier>{26b2915c-e86e-40e5-9846-5fc911ba428f}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect">
       <UniqueIdentifier>{289ff231-82b4-41ae-806c-a6d26b461dfa}</UniqueIdentifier>
     </Filter>
@@ -281,6 +284,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\SkySphere.h">
       <Filter>00. GameObject\01. Map\SkySphere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Character_States.h">
+      <Filter>99. Defines\Hojun</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_States.h">
+      <Filter>99. Defines\Hojun</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SwordSlash.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\01. SwordSlash</Filter>
