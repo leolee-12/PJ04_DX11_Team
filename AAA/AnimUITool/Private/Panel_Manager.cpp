@@ -53,13 +53,13 @@ HRESULT CPanel_Manager::Initialize()
 
 HRESULT CPanel_Manager::Add_Panel(const _wstring& strPanelTag, CPanel* pPanel)
 {
-    if (nullptr == pPanel)                              
+    if (nullptr == pPanel)
         return E_FAIL;
 
-    if (m_Panels.find(strPanelTag) != m_Panels.end())   
+    if (m_Panels.find(strPanelTag) != m_Panels.end())
         return E_FAIL;
 
-    if (FAILED(pPanel->Initialize(this)))               
+    if (FAILED(pPanel->Initialize(this)))
         return E_FAIL;
 
     m_Panels.emplace(strPanelTag, pPanel);
@@ -110,7 +110,7 @@ void CPanel_Manager::Set_Selected(Engine::CGameObject* pObject)
 
     Safe_Release(m_pSelected);
     m_pSelected = pObject;
-    Safe_AddRef(m_pSelected);          
+    Safe_AddRef(m_pSelected);
 }
 
 void CPanel_Manager::Clear_Selected()
@@ -142,7 +142,7 @@ void CPanel_Manager::Set_UISelected(CUIContainerObject* pContainer, CUIPartObjec
 
 void CPanel_Manager::Load_Preview(const std::wstring& strYshPath)
 {
-    if (!m_pLevel) 
+    if (!m_pLevel)
         return;
     CGameObject* p = m_pLevel->Load_Preview(strYshPath);
     Bind_Preview(p);
@@ -155,7 +155,7 @@ void CPanel_Manager::Load_Preview(const std::wstring& strYshPath)
 
 void CPanel_Manager::Clear_Preview()
 {
-    if (m_pLevel) 
+    if (m_pLevel)
         m_pLevel->Clear_Preview();
     Bind_Preview(nullptr);
 }
@@ -211,8 +211,8 @@ void CPanel_Manager::Render_DockSpace()
         ImGui::DockBuilderSetNodeSize(dockspace_id, vp->WorkSize);
 
         ImGuiID center = dockspace_id, left, bottom;
-        ImGui::DockBuilderSplitNode(center, ImGuiDir_Down, 0.30f, &bottom, &center); 
-        ImGui::DockBuilderSplitNode(center, ImGuiDir_Left, 0.24f, &left, &center); 
+        ImGui::DockBuilderSplitNode(center, ImGuiDir_Down, 0.30f, &bottom, &center);
+        ImGui::DockBuilderSplitNode(center, ImGuiDir_Left, 0.24f, &left, &center);
 
         ImGui::DockBuilderDockWindow("Inspector", left);
         ImGui::DockBuilderDockWindow("Hierarchy", left);
@@ -267,7 +267,7 @@ void CPanel_Manager::Render_ModeBar()
             m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby.ysh";
         }
     }
-   
+
 
     ImGui::EndMainMenuBar();
 }

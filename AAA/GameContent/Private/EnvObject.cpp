@@ -141,7 +141,7 @@ HRESULT CEnvObject::Bind_ShaderResources()
 	return S_OK;
 }
 
-HRESULT CEnvObject::Render_Model()
+HRESULT CEnvObject::Render()
 {
 	if (nullptr == m_pModelCom)
 		return S_OK;
@@ -154,13 +154,13 @@ HRESULT CEnvObject::Render_Model()
 	for (size_t i = 0; i < iNumMeshes; ++i)
 	{
 		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", static_cast<_uint>(i), MTEX_TYPE::DIFFUSE, 0)))
-			continue;
+			int a = 1;/*continue;*/
 		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", static_cast<_uint>(i), MTEX_TYPE::NORMALS, 0)))
-			continue;
+			int a = 1;/*continue;*/
 		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", static_cast<_uint>(i), MTEX_TYPE::METALNESS, 0)))
-			continue;
+			int a = 1;/*continue;*/
 		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnkownTexture", static_cast<_uint>(i), MTEX_TYPE::UNKNOWN, 0)))
-			continue;
+			int a = 1;/*continue;*/
 
 		if (FAILED(m_pShaderCom->Begin(1)))
 			return E_FAIL;
@@ -169,6 +169,29 @@ HRESULT CEnvObject::Render_Model()
 			return E_FAIL;
 	}
 
+	return S_OK;
+}
+
+HRESULT CEnvObject::Render_Shadow()
+{
+	if (!m_bRenderable || nullptr == m_pModelCom || nullptr == m_pShaderCom)
+		return S_OK;
+
+	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
+		return E_FAIL;
+
+	size_t n = m_pModelCom->Get_NumMeshes();
+	for (size_t i = 0; i < n; ++i)
+	{
+		if (FAILED(m_pShaderCom->Begin(2)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Render((_uint)i)))
+			return E_FAIL;
+	}
 	return S_OK;
 }
 
@@ -200,21 +223,31 @@ void CEnvObject::Refresh_WorldBounds()
 	m_LocalBounds.Transform(m_WorldBounds, XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 }
 
-_bool CEnvObject::Is_VisibleInCurrentView() const
+void CEnvObject::Check_Visible()
 {
 	if (!m_bRenderable || !Has_RenderModel())
-		return false;
+	{
+		m_bVisible = false;
+		m_bVisibleShadow = false;
+		return;
+	}
 
 	if (nullptr == m_pGameInstance_Proxy)
-		return true;
+	{
+		m_bVisible = true;
+		m_bVisibleShadow = m_bCastShadow;
+		return;
+	}
 
 	if (!m_bEnableCulling)
-		return true;
+	{
+		m_bVisible = true;
+		m_bVisibleShadow = m_bCastShadow;
+		return;
+	}
 
-	return !m_pGameInstance_Proxy->Should_CullAABB(
-		CULLING_VIEW::MAIN_CAMERA,
-		m_bEnableCulling,
-		m_WorldBounds);
+	m_bVisible = !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, m_bEnableCulling, m_WorldBounds);
+	m_bVisibleShadow = m_bCastShadow && !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_bEnableCulling, m_WorldBounds);
 }
 
 void CEnvObject::Apply_TransformFromDesc()
@@ -238,6 +271,7 @@ void CEnvObject::Apply_DescDefaults()
 {
 	m_bRenderable = !m_tDesc.tCollision.bInvisibleCollision;
 	m_bEnableCulling = m_tDesc.tRender.bUseLodCulling;
+	m_bCastShadow = m_tDesc.tRender.bShadowMappingCaster;
 	m_bVisible = true;
 }
 

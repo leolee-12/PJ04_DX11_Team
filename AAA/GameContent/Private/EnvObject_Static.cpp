@@ -44,17 +44,13 @@ void CEnvObject_Static::Late_Update(_float fTimeDelta)
 
 	Refresh_WorldBounds();
 
-	m_bVisible = Is_VisibleInCurrentView();
-	if (!m_bVisible)
-		return;
+	Check_Visible();
 
-	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
-	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
-}
-
-HRESULT CEnvObject_Static::Render()
-{
-	return Render_Model();
+	if(m_bVisible)
+		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+	
+	if(m_bVisibleShadow)
+		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
 
 HRESULT CEnvObject_Static::Render_Shadow()

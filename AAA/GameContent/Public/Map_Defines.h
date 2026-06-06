@@ -72,18 +72,22 @@ struct MAP_SECTION_PROFILE
 
 struct MAP_STAGE_PROFILE
 {
-	_uint	iFrameIndex = {};
-	_uint	iTotalSections = {};
-	_uint	iVisibleSections = {};
-	_uint	iCulledSections = {};
-	_uint	iSubmittedNonBlend = {};
-	_uint	iSubmittedBlend = {};
-	_uint	iSubmittedShadow = {};
-	_uint	iSectionTypeCount[MAP_SECTION_TYPE_COUNT] = {};
-	_uint	iEstimatedDrawCalls = {};
-	double	dStageLateUpdateCpuMs = {};
-	double	dCullingCpuMs = {};
-	double	dSectionRenderCpuMs = {};
+	_uint   iFrameIndex = {};
+	_uint   iTotalSections = {};
+
+	_uint   iMainCandidateSections = {};
+	_uint   iMainVisibleSections = {};
+	_uint   iMainCulledSections = {};
+	_uint   iMainSubmittedSections = {};
+	_uint   iMainSubmittedNonBlend = {};
+	_uint   iMainSubmittedBlend = {};
+
+	_uint   iShadowCandidateSections = {};
+	_uint   iShadowVisibleSections = {};
+	_uint   iShadowCulledSections = {};
+	_uint   iShadowSubmittedSections = {};
+
+	double  dCullingCpuMs = {};
 };
 #endif
 

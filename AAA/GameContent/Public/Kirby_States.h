@@ -7,7 +7,7 @@ namespace Client
 	enum class KIRBY_ABILITY_STATE : int
 	{
 		NORMAL = 0,
-		BOMB = 1, 
+		BOMB = 1,
 		CUTTER = 2,
 		ICE = 3,
 		END
@@ -28,8 +28,8 @@ namespace Client
 		IDLE = 0,
 		DOUBT = 1,
 		BLINK = 2,
-		CLOSE = 3, 
-		ANGRY = 4, 
+		CLOSE = 3,
+		ANGRY = 4,
 		SURPRISED = 5,
 		SADNESS = 6,
 		END

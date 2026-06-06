@@ -268,19 +268,34 @@ void CImGui_Manager::Draw_Toolbar()
         }
 
         ImGui::SameLine();
-        if (ImGui::Button("Load Map"))
+        if (ImGui::Button("Load All"))
             m_pLevel_Edit->Load_MapPreview(static_cast<_uint>(s_iMapPreviewPreset));
 
         ImGui::SameLine();
-        if (ImGui::Button("Clear Map"))
+        if (ImGui::Button("Load Stage"))
+            m_pLevel_Edit->Load_MapPreviewStage(static_cast<_uint>(s_iMapPreviewPreset));
+
+        ImGui::SameLine();
+        if (ImGui::Button("Load Env"))
+            m_pLevel_Edit->Load_MapPreviewEnv(static_cast<_uint>(s_iMapPreviewPreset));
+
+        ImGui::SameLine();
+        if (ImGui::Button("Clear All"))
             m_pLevel_Edit->Clear_MapPreview();
+
+        ImGui::SameLine();
+        if (ImGui::Button("Clear Stage"))
+            m_pLevel_Edit->Clear_MapPreviewStage();
+
+        ImGui::SameLine();
+        if (ImGui::Button("Clear Env"))
+            m_pLevel_Edit->Clear_MapPreviewEnv();
 
         string strMapPreviewStatus = WstrToStr(m_pLevel_Edit->Get_MapPreviewStatus());
         const string strFullMapPreviewStatus = strMapPreviewStatus;
         if (strMapPreviewStatus.size() > 48)
             strMapPreviewStatus = strMapPreviewStatus.substr(0, 45) + "...";
 
-        ImGui::SameLine();
         ImGui::TextDisabled("%s", strMapPreviewStatus.c_str());
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("%s", strFullMapPreviewStatus.c_str());

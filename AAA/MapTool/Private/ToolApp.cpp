@@ -1,12 +1,14 @@
 ﻿#include "ToolApp.h"
-
 #include "EditInstance.h"
 #include "Level_Loading.h"
+
 #ifdef _DEBUG
 #include "MapToolProfiler.h"
 #endif
 
 #include "GameObject_Factory.h"
+#include "MapDescriptor.h"
+
 #include "GameInstance.h"
 
 CToolApp::CToolApp()
@@ -181,6 +183,7 @@ void CToolApp::Free()
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);
 
+	CMapDescriptor::DestroyInstance();
 	CGameInstance::DestroyInstance();
 	CGameObject_Factory::DestroyInstance();
 #ifdef _DEBUG

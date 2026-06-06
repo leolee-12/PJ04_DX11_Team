@@ -74,11 +74,11 @@ void CEditCamera::Update(_float fTimeDelta)
 }
 
 void CEditCamera::Late_Update(_float fTimeDelta)
-{ 
+{
     __super::Late_Update(fTimeDelta);
 }
 HRESULT CEditCamera::Render()
-{ 
+{
     return S_OK;
 }
 
@@ -104,7 +104,7 @@ CGameObject* CEditCamera::Clone(void* pArg)
     return pInstance;
 }
 
-void CEditCamera::Free() 
-{ 
+void CEditCamera::Free()
+{
     __super::Free();
 }

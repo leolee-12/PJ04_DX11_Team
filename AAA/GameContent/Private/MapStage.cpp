@@ -138,8 +138,18 @@ void CMapStage::Reset_ProfileFrame()
 
 	for (CMapSection* pSection : m_Sections)
 	{
-		if (nullptr != pSection)
-			pSection->Reset_FrameProfile();
+		if (nullptr == pSection)
+			continue;
+
+		if (!pSection->Is_Renderable())
+			continue;
+
+		++m_Profile.iMainCandidateSections;
+
+		if (pSection->Is_ShadowCaster())
+			++m_Profile.iShadowCandidateSections;
+
+		pSection->Reset_FrameProfile();
 	}
 }
 #endif
@@ -154,53 +164,70 @@ void CMapStage::Submit_VisibleSections()
 		if (!pSection->Is_Renderable())
 			continue;
 
-		const _bool bCullMainView = m_pGameInstance_Proxy->Should_CullAABB(
-			CULLING_VIEW::MAIN_CAMERA,
-			pSection->Is_Culling(),
-			pSection->Get_WorldBounds());
+		const _bool bVisibleMain =
+			!m_pGameInstance_Proxy->Should_CullAABB(
+				CULLING_VIEW::MAIN_CAMERA,
+				pSection->Is_Culling(),
+				pSection->Get_WorldBounds());
 
-		if (!bCullMainView)
+		if (bVisibleMain)
 		{
 			const RENDERID eRenderID = pSection->Get_RenderID();
 			m_pGameInstance_Proxy->Add_RenderGroup(eRenderID, pSection);
 
 #ifdef _DEBUG
-			++m_Profile.iVisibleSections;
-			Count_Submitted(eRenderID);
+			++m_Profile.iMainVisibleSections;
+			++m_Profile.iMainSubmittedSections;
+			Count_MainSubmitted(eRenderID);
 #endif
 		}
-#ifdef _DEBUG
 		else
 		{
-			++m_Profile.iCulledSections;
-		}
+#ifdef _DEBUG
+			++m_Profile.iMainCulledSections;
 #endif
+		}
 
-		if (pSection->Is_ShadowCaster())
+		if (!pSection->Is_ShadowCaster())
+			continue;
+
+		const _bool bVisibleShadow =
+			!m_pGameInstance_Proxy->Should_CullAABB(
+				CULLING_VIEW::SHADOW_DIR,
+				pSection->Is_Culling(),
+				pSection->Get_WorldBounds());
+
+		if (bVisibleShadow)
 		{
 			m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pSection);
 
 #ifdef _DEBUG
-			Count_Submitted(RENDERID::SHADOW);
+			++m_Profile.iShadowVisibleSections;
+			++m_Profile.iShadowSubmittedSections;
+#endif
+		}
+		else
+		{
+#ifdef _DEBUG
+			++m_Profile.iShadowCulledSections;
 #endif
 		}
 	}
 }
 
 #ifdef _DEBUG
-void CMapStage::Count_Submitted(RENDERID eRenderID)
+void CMapStage::Count_MainSubmitted(RENDERID eRenderID)
 {
 	switch (eRenderID)
 	{
 	case RENDERID::NONBLEND:
-		++m_Profile.iSubmittedNonBlend;
+		++m_Profile.iMainSubmittedNonBlend;
 		break;
+
 	case RENDERID::BLEND:
-		++m_Profile.iSubmittedBlend;
+		++m_Profile.iMainSubmittedBlend;
 		break;
-	case RENDERID::SHADOW:
-		++m_Profile.iSubmittedShadow;
-		break;
+
 	default:
 		break;
 	}

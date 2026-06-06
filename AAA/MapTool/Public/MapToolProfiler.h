@@ -2,12 +2,40 @@
 
 #ifdef _DEBUG
 
-#include <fstream>
+#include <unordered_set>
 
 #include "MapTool_Defines.h"
 #include "MapStage.h"
 
+NS_BEGIN(Client)
+class CEnvObject;
+class CMapStage;
+NS_END
+
 NS_BEGIN(MapTool)
+
+struct CULLING_COUNTER
+{
+	_uint iCandidate = {};
+	_uint iVisible = {};
+	_uint iCulled = {};
+	_uint iSubmitted = {};
+};
+
+struct MAPTOOL_PROFILE_FRAME
+{
+	_uint iFrameIndex = {};
+
+	_uint iMapSectionTotal = {};
+	CULLING_COUNTER MapMain = {};
+	CULLING_COUNTER MapShadow = {};
+
+	_uint iEnvObjectTotal = {};
+	CULLING_COUNTER EnvMain = {};
+	CULLING_COUNTER EnvShadow = {};
+
+	double dMapCullingCpuMs = {};
+};
 
 class CMapToolProfiler final : public CBase
 {
@@ -18,44 +46,35 @@ private:
 	virtual ~CMapToolProfiler() = default;
 
 public:
-	void								Set_Stage(Client::CMapStage* pStage);
-	void								Update(_float fTimeDelta);
-	void								Capture_Frame();
-	void								Reset();
+	void Set_Stage(Client::CMapStage* pStage);
+	void Register_EnvObject(Client::CEnvObject* pEnvObject);
+	void Clear_EnvObjects();
 
-	void								Set_Enabled(_bool bEnabled) { m_bEnabled = bEnabled; }
-	void								Toggle_Enabled() { m_bEnabled = !m_bEnabled; }
-	_bool								Is_Enabled() const { return m_bEnabled; }
+	void Update(_float fTimeDelta);
+	void Capture_Frame();
+	void Reset();
 
-	void								Set_CsvEnabled(_bool bEnabled);
-	void								Toggle_CsvEnabled() { Set_CsvEnabled(!m_bCsvEnabled); }
-	_bool								Is_CsvEnabled() const { return m_bCsvEnabled; }
+	void Set_Enabled(_bool bEnabled) { m_bEnabled = bEnabled; }
+	void Toggle_Enabled() { m_bEnabled = !m_bEnabled; }
+	_bool Is_Enabled() const { return m_bEnabled; }
 
-	const Client::MAP_STAGE_PROFILE&		Get_Frame() const { return m_Frame; }
-	const wstring&							Get_CsvPath() const { return m_strCsvPath; }
-	_bool									Has_Stage() const { return nullptr != m_pStage; }
+	const MAPTOOL_PROFILE_FRAME& Get_Frame() const { return m_Frame; }
+	_bool Has_Stage() const { return nullptr != m_pStage; }
 
 private:
-	void								Open_CsvIfNeeded();
-	void								Close_Csv();
-	void								Write_CsvRow();
-	void								Reset_CaptureSession();
+	void Reset_CaptureSession();
 
 private:
-	Client::CMapStage*					m_pStage = { nullptr };
-	Client::MAP_STAGE_PROFILE			m_Frame = {};
-	_bool								m_bEnabled = { true };
-	_bool								m_bCsvEnabled = { false };
-	_bool								m_bFrameBaseValid = { false };
-	_bool								m_bCsvHasWrittenRow = { false };
-	_uint								m_iFrameBase = {};
-	_float								m_fElapsedSeconds = {};
-	_float								m_fCsvWriteAccumulator = {};
-	wstring								m_strCsvPath = { L"../../Resources/Profile/MapTool_Profile.csv" };
-	ofstream							m_Csv;
+	Client::CMapStage* m_pStage = { nullptr };
+	unordered_set<Client::CEnvObject*> m_EnvObjects;
+	MAPTOOL_PROFILE_FRAME m_Frame = {};
+
+	_bool m_bEnabled = { true };
+	_bool m_bFrameBaseValid = { false };
+	_uint m_iFrameBase = {};
 
 protected:
-	virtual void						Free() override;
+	virtual void Free() override;
 };
 
 NS_END

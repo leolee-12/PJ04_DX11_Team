@@ -5,6 +5,7 @@
 NS_BEGIN(Engine)
 class CGameObject;
 class IReflectable;
+class CUIPartObject;
 NS_END
 
 NS_BEGIN(AnimUITool)
@@ -26,12 +27,14 @@ private:
 	void						Render_Bones();
 	void						Render_Meshs();
 	void						Render_KirbyFace(CGameObject* pObject);
+	void						Render_UITransform(CUIPartObject* pPart);
+	void						Render_UIInspector();
 
 private:
 	unordered_map<CGameObject*, _float3>	m_RotEditEuler;
 
 public:
-	static CPanel_Inspector*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CPanel_Inspector* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
 protected:
 	virtual void				Free() override;

@@ -38,14 +38,6 @@ void CEnvObject_Effect::Late_Update(_float fTimeDelta)
 	UNREFERENCED_PARAMETER(fTimeDelta);
 }
 
-HRESULT CEnvObject_Effect::Render()
-{
-	if (!Has_RenderModel())
-		return S_OK;
-
-	return Render_Model();
-}
-
 CGameObject* CEnvObject_Effect::Clone(void* pArg)
 {
 	CEnvObject_Effect* pInstance = new CEnvObject_Effect(*this);

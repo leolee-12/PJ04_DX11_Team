@@ -24,8 +24,8 @@ private:
 
 	struct UI_PICK_CANDIDATE
 	{
-		CUIContainerObject*		pContainer = { nullptr };
-		CUIPartObject*			pPart = { nullptr };
+		CUIContainerObject* pContainer = { nullptr };
+		CUIPartObject* pPart = { nullptr };
 		_wstring				strPartTag = {};
 		UI_PART_BOUNDS			Bounds = {};
 	};
@@ -63,7 +63,7 @@ private:
 	_bool						UIToLocalDelta(const _float2& vUIDelta, _float2* pOutLocalDelta) const;
 
 private:
-	ID3D11ShaderResourceView*	m_pSRV = { nullptr };
+	ID3D11ShaderResourceView* m_pSRV = { nullptr };
 
 	_float						m_fTargetAspect = { 1600.f / 900.f };
 
@@ -83,7 +83,7 @@ private:
 	_float						m_fDragStartZ = { 1.f };
 
 public:
-	static CPanel_UICanvas*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CPanel_UICanvas* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
 protected:
 	virtual void				Free() override;
