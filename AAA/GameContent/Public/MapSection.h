@@ -3,6 +3,10 @@
 #include "MapObject.h"
 #include "Map_Defines.h"
 
+NS_BEGIN(physx)
+class PxRigidStatic;
+NS_END
+
 NS_BEGIN(Client)
 
 class CLIENT_DLL CMapSection final : public CMapObject
@@ -63,6 +67,8 @@ private:
 	_bool				m_bCastShadow = { false };
 	_bool				m_bEnableCulling = { true };
 	_bool				m_bRenderable = { true };
+
+	physx::PxRigidStatic* m_pColliderActor = { nullptr };
 
 #ifdef _DEBUG
 	MAP_SECTION_PROFILE	m_Profile = {};

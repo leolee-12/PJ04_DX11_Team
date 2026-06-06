@@ -10,6 +10,8 @@
 #include "Environment_Manager.h"
 #include "ShaderGlobal_Manager.h"
 
+using namespace physx;
+
 #pragma region ENGINE
 void CGameInstance_Proxy::Update_Engine(_float fTimeDelta)
 {
@@ -830,6 +832,69 @@ const _float4* CGameInstance_Proxy::Get_ShaderGlobal(const string& strName) cons
 		return nullptr;
 
 	return m_pOwner->m_pShaderGlobal_Manager->Get(strName);
+}
+#pragma endregion
+
+#pragma region PHYSIX_MANAGER
+PxTriangleMesh* CGameInstance_Proxy::Cook_TriangleMesh(const _float3* p, _uint nv, const _uint* idx, _uint ni, _bool bFlip)
+{
+	if (!IsConnected())
+		return nullptr;
+
+	return m_pOwner->Cook_TriangleMesh(p, nv, idx, ni, bFlip);
+}
+PxRigidStatic* CGameInstance_Proxy::Add_StaticActor(PxTriangleMesh* pMesh, _fmatrix W)
+{
+	if (!IsConnected())
+		return nullptr;
+
+	return m_pOwner->Add_StaticActor(pMesh, W);
+}
+void           CGameInstance_Proxy::Remove_StaticActor(PxRigidStatic* pActor)
+{
+	if (!IsConnected())
+		return;
+
+	m_pOwner->Remove_StaticActor(pActor);
+}
+PxController* CGameInstance_Proxy::Create_CapsuleController(const _float3& vFootPos, _float fRadius, _float fHeight)
+{
+	if (!IsConnected())
+		return nullptr;
+	return m_pOwner->Create_CapsuleController(vFootPos, fRadius, fHeight);
+}
+_bool CGameInstance_Proxy::Move_Controller(PxController* pCtrl, const _float3& vDisp, _float fTimeDelta, _float3* pOutFootPos)
+{
+	if (!IsConnected())
+		return false;
+	return m_pOwner->Move_Controller(pCtrl, vDisp, fTimeDelta, pOutFootPos);
+}
+void CGameInstance_Proxy::Release_Controller(PxController* pCtrl)
+{
+	if (!IsConnected())
+		return;
+	m_pOwner->Release_Controller(pCtrl);
+}
+void CGameInstance_Proxy::Set_ControllerFootPosition(PxController* pCtrl, const _float3& vFootPos)
+{
+	if (!IsConnected())
+		return;
+	m_pOwner->Set_ControllerFootPosition(pCtrl, vFootPos);
+}
+void CGameInstance_Proxy::Toggle_PhysXDebug()
+{
+	if (!IsConnected()) return;
+	m_pOwner->Toggle_PhysXDebug();
+}
+_bool CGameInstance_Proxy::Is_PhysXDebug() const
+{
+	if (!IsConnected()) return false;
+	return m_pOwner->Is_PhysXDebug();
+}
+void CGameInstance_Proxy::Render_PhysXDebug(_fmatrix V, _fmatrix P)
+{
+	if (!IsConnected()) return;
+	m_pOwner->Render_PhysXDebug(V, P);
 }
 #pragma endregion
 

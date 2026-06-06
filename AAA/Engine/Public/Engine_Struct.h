@@ -87,6 +87,11 @@ namespace Engine
 		float				fCullMargin = { 0.f };
 	};
 
+	typedef struct tagMeshLayerIdx
+	{
+		unsigned int  idx[MTEX_TYPE_MAX] = { 0 };   // MTEX_TYPE º° slotArrayIndex
+	}MESH_LAYER_IDX;
+
 #ifdef _DEBUG
 	struct FRUSTUM_CULLING_STATS
 	{
