@@ -21,6 +21,8 @@
   <ItemGroup>
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\Public\Character.h" />
+    <ClInclude Include="..\Public\Common_Circle01.h" />
+    <ClInclude Include="..\Public\Common_Curve03.h" />
     <ClInclude Include="..\Public\GameContent_AnimEvents.h" />
     <ClInclude Include="..\Public\GameContent_const.h" />
     <ClInclude Include="..\Public\GameContent_Defines.h" />
@@ -50,6 +52,7 @@
     <ClInclude Include="..\Public\SmokeLowPoly.h" />
     <ClInclude Include="..\Public\SmokeSphereOriginal.h" />
     <ClInclude Include="..\Public\SmokeTail.h" />
+    <ClInclude Include="..\Public\SwordSlash.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\TestEffectQuad.h" />
     <ClInclude Include="..\Public\TestFiona.h" />
@@ -61,12 +64,16 @@
     <ClInclude Include="..\Public\UI_Image.h" />
     <ClInclude Include="..\Public\UI_TestImageContainer.h" />
     <ClInclude Include="..\Public\UI_Title.h" />
+    <ClInclude Include="..\Public\Vacuum.h" />
+    <ClInclude Include="..\Public\VacuumContainer.h" />
     <ClInclude Include="..\Public\YshModelValidator.h" />
     <ClInclude Include="..\Public\WalkSmoke.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
+    <ClCompile Include="..\Private\Common_Circle01.cpp" />
+    <ClCompile Include="..\Private\Common_Curve03.cpp" />
     <ClCompile Include="..\Private\EnvObject.cpp" />
     <ClCompile Include="..\Private\EnvObject_Effect.cpp" />
     <ClCompile Include="..\Private\EnvObject_Interact.cpp" />
@@ -86,6 +93,7 @@
     <ClCompile Include="..\Private\SmokeLowPoly.cpp" />
     <ClCompile Include="..\Private\SmokeSphereOriginal.cpp" />
     <ClCompile Include="..\Private\SmokeTail.cpp" />
+    <ClCompile Include="..\Private\SwordSlash.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\TestEffectQuad.cpp" />
     <ClCompile Include="..\Private\TestFiona.cpp" />
@@ -97,6 +105,8 @@
     <ClCompile Include="..\Private\UI_Image.cpp" />
     <ClCompile Include="..\Private\UI_TestImageContainer.cpp" />
     <ClCompile Include="..\Private\UI_Title.cpp" />
+    <ClCompile Include="..\Private\Vacuum.cpp" />
+    <ClCompile Include="..\Private\VacuumContainer.cpp" />
     <ClCompile Include="..\Private\WalkSmoke.cpp" />
   </ItemGroup>
   <ItemGroup>

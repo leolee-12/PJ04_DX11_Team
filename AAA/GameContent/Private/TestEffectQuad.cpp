@@ -26,11 +26,11 @@ HRESULT CTestEffectQuad::Initialize(void* pArg)
     tDesc.iVIBufferLevel = VI_Rect.iLevelID;
     tDesc.wstrVIBufferTag = VI_Rect.szProtoTag;
 
-    tDesc.bUseTextureCom = true;
+    tDesc.bUseTextureCom = false;
     tDesc.iTextureLevel = 0;
     tDesc.wstrTextureTag = L"";
 
-    tDesc.bUseMaskCom = true;
+    tDesc.bUseMaskCom = false;
     tDesc.iMaskLevel = 0;
     tDesc.wstrMaskTag = L"";
 
