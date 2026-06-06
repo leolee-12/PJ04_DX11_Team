@@ -49,16 +49,13 @@ void CEnvObject_Interact::Late_Update(_float fTimeDelta)
 
 	Refresh_WorldBounds();
 
-	m_bVisible = Is_VisibleInCurrentView();
-	if (!m_bVisible)
-		return;
+	Check_Visible();
 
-	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
-}
+	if (m_bVisible)
+		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 
-HRESULT CEnvObject_Interact::Render()
-{
-	return Render_Model();
+	if (m_bVisibleShadow)
+		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
 
 CGameObject* CEnvObject_Interact::Clone(void* pArg)

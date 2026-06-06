@@ -23,8 +23,8 @@ namespace AnimUITool
 	static const unsigned int	g_iWinSizeX = { 1600 };
 	static const unsigned int	g_iWinSizeY = { 900 };
 
-	static const wchar_t*		g_strAnimModelPath = { L"../../Resources/CHJ/AnimModel/" };
-	static const wchar_t*		g_strUIScenePath = { L"../../Resources/CHJ/UIScene/" };
+	static const wchar_t* g_strAnimModelPath = { L"../../Resources/CHJ/AnimModel/" };
+	static const wchar_t* g_strUIScenePath = { L"../../Resources/CHJ/UIScene/" };
 }
 
 extern HINSTANCE				g_hInstance;

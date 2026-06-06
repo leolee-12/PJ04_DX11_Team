@@ -136,9 +136,7 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
     m_pObject_Manager->Priority_Update(fTimeDelta);
     m_pObject_Manager->Update(fTimeDelta);
 	m_pCamera_Manager->Update();
-    m_pFrustum_Manager->Update(
-        m_pCamera_Manager->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC),
-        m_pCamera_Manager->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC));
+    m_pFrustum_Manager->Update();
 
     m_pSound_Manager->Set_ListenerPos(*m_pCamera_Manager->Get_CamPosition());
     m_pSound_Manager->Update();

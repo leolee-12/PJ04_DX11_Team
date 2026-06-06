@@ -267,34 +267,34 @@ void CPanel_Inspector::Render_Bones()
     ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, 12.f);
 
     function<void(_uint)> drawNode = [&](_uint i)
-    {
-        const bool leaf = children[i].empty();
-        const bool animated = isAnimated(i);
-
-        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow
-            | ImGuiTreeNodeFlags_DefaultOpen
-            | ImGuiTreeNodeFlags_SpanAvailWidth;
-        if (leaf)                     
-            flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-        if ((_int)i == ctx.iSelBone)  
-            flags |= ImGuiTreeNodeFlags_Selected;
-
-        if (animated) ImGui::PushStyleColor(ImGuiCol_Text, vGreen);
-        ImGui::PushID((int)i);
-        const bool open = ImGui::TreeNodeEx("##bone", flags, "%u: %s", i, pModel->Get_BoneName(i).c_str());
-        if (animated) ImGui::PopStyleColor();           // 라벨 그린 뒤 즉시 복원
-
-        if (ImGui::IsItemClicked()) ctx.iSelBone = (_int)i;
-
-        if (open && !leaf)
         {
-            for (_uint c : children[i]) drawNode(c);
-            ImGui::TreePop();
-        }
-        ImGui::PopID();
-    };
+            const bool leaf = children[i].empty();
+            const bool animated = isAnimated(i);
 
-    for (_uint r : roots) 
+            ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow
+                | ImGuiTreeNodeFlags_DefaultOpen
+                | ImGuiTreeNodeFlags_SpanAvailWidth;
+            if (leaf)
+                flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+            if ((_int)i == ctx.iSelBone)
+                flags |= ImGuiTreeNodeFlags_Selected;
+
+            if (animated) ImGui::PushStyleColor(ImGuiCol_Text, vGreen);
+            ImGui::PushID((int)i);
+            const bool open = ImGui::TreeNodeEx("##bone", flags, "%u: %s", i, pModel->Get_BoneName(i).c_str());
+            if (animated) ImGui::PopStyleColor();           // 라벨 그린 뒤 즉시 복원
+
+            if (ImGui::IsItemClicked()) ctx.iSelBone = (_int)i;
+
+            if (open && !leaf)
+            {
+                for (_uint c : children[i]) drawNode(c);
+                ImGui::TreePop();
+            }
+            ImGui::PopID();
+        };
+
+    for (_uint r : roots)
         drawNode(r);
 
     ImGui::PopStyleVar();
@@ -372,7 +372,7 @@ void CPanel_Inspector::Render_KirbyFace(CGameObject* pObject)
     if (!pKirby)
         return;
 
-    if (!ImGui::CollapsingHeader("Kirby Face", ImGuiTreeNodeFlags_DefaultOpen) || pObject == nullptr )
+    if (!ImGui::CollapsingHeader("Kirby Face", ImGuiTreeNodeFlags_DefaultOpen) || pObject == nullptr)
         return;
 
     {
@@ -476,8 +476,8 @@ void CPanel_Inspector::Render_UIInspector()
     ImGui::Text("Z (Transform z): %.3f", pPart->Get_ZOrder());
 
     ImGui::Separator();
-    Render_UITransform(pPart);    
-    Render_Properties(pPart);   
+    Render_UITransform(pPart);
+    Render_Properties(pPart);
 }
 
 CPanel_Inspector* CPanel_Inspector::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -485,7 +485,7 @@ CPanel_Inspector* CPanel_Inspector::Create(ID3D11Device* pDevice, ID3D11DeviceCo
     return new CPanel_Inspector(pDevice, pContext);
 }
 
-void CPanel_Inspector::Free() 
+void CPanel_Inspector::Free()
 {
     __super::Free();
 }

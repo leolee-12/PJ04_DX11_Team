@@ -55,6 +55,9 @@
     <Filter Include="03. Panels\Animation">
       <UniqueIdentifier>{496127c3-2f2f-4aa4-a1ca-0cb42ff0b1d1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03. Panels\Animation\Context">
+      <UniqueIdentifier>{bbb21f79-4c27-4232-a4be-92c8fc234e04}</UniqueIdentifier>
+    </Filter>
     <Filter Include="03. Panels\Browser">
       <UniqueIdentifier>{735ee1b2-fa09-4f5e-9098-f857f3c6b25b}</UniqueIdentifier>
     </Filter>
@@ -65,7 +68,7 @@
       <UniqueIdentifier>{82aac75a-ceed-489b-a9ca-2b0eaf934ea4}</UniqueIdentifier>
     </Filter>
     <Filter Include="02. Objects\Preview_Kirby">
-      <UniqueIdentifier>{a5471018-b5ac-4f6f-8bb8-844e6dbb9d48}</UniqueIdentifier>
+      <UniqueIdentifier>{e1d3aae1-6727-4935-acac-12d6279558fe}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -128,6 +131,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Panel_Animation.h">
       <Filter>03. Panels\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Anim_Context.h">
+      <Filter>03. Panels\Animation\Context</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Panel_Browser.h">
       <Filter>03. Panels\Browser</Filter>

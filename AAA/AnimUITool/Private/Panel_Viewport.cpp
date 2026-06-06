@@ -97,7 +97,7 @@ CPanel_Viewport* CPanel_Viewport::Create(ID3D11Device* pDevice, ID3D11DeviceCont
     return new CPanel_Viewport(pDevice, pContext);
 }
 
-void CPanel_Viewport::Free() 
+void CPanel_Viewport::Free()
 {
     Safe_Release(m_pSRV);
 

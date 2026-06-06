@@ -14,7 +14,7 @@ namespace Client
         CamShake = 5,
         IFrame = 6,
         LockMove = 7,
-        
+
         // 커비 설정용
         SetEye = 8,
         SetMouth = 9,

@@ -20,9 +20,9 @@ namespace AnimUITool
 
     typedef struct tagAnimContext
     {
-        CGameObject*                pOwner = { nullptr };
-        CModel*                     pModel = { nullptr };
-        CAnimator*                  pAnimator = { nullptr };
+        CGameObject* pOwner = { nullptr };
+        CModel* pModel = { nullptr };
+        CAnimator* pAnimator = { nullptr };
 
         _wstring                    strName = {};           // 모델 표시명 
         _wstring                    strModelPath = {};      // json 경로 파생용

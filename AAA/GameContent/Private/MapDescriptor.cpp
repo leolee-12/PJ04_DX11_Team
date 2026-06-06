@@ -233,7 +233,7 @@ HRESULT CMapDescriptor::Bulid_MapStageDesc(_uint iPresetIndex, _uint iSectionPro
 		SectionDesc.iModelProtoLevel = iModelLevel;
 		SectionDesc.eSectionType = SectionPreset.eType;
 		SectionDesc.eRenderID = SectionPreset.eRenderID;
-		SectionDesc.bCastShadow = false;
+		SectionDesc.bCastShadow = true;
 		SectionDesc.bEnableCulling = true;
 		SectionDesc.bRenderable = true;
 
@@ -463,6 +463,7 @@ HRESULT CMapDescriptor::Ensure_Initialized()
 void CMapDescriptor::Free()
 {
 	Safe_Release(m_pProxy);
+
 	__super::Free();
 }
 

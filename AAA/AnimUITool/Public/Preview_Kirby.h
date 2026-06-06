@@ -23,9 +23,9 @@ private:
 	static T Clamp_State(T e)
 	{
 		_int v = ETOI(e);
-		if (v < 0)                       
+		if (v < 0)
 			v = 0;
-		else if (v >= ETOI(T::END))      
+		else if (v >= ETOI(T::END))
 			v = ETOI(T::END) - 1;
 		return static_cast<T>(v);
 	}
@@ -69,17 +69,17 @@ public:
 	KIRBY_EYE_STATE			Get_Eye() const { return m_eEye; }
 
 private:
-	CShader*				m_pShaderCom = { nullptr };
-	CModel*					m_pModelCom = { nullptr };
-	CAnimator*				m_pAnimatorCom = { nullptr };
-	CTexture*				m_pEyeTextureCom = { nullptr };
-	CTexture*				m_pEyeMaskTextureCom = { nullptr };
+	CShader* m_pShaderCom = { nullptr };
+	CModel* m_pModelCom = { nullptr };
+	CAnimator* m_pAnimatorCom = { nullptr };
+	CTexture* m_pEyeTextureCom = { nullptr };
+	CTexture* m_pEyeMaskTextureCom = { nullptr };
 
 	PREVIEW_KIRBY_DESC		m_Desc{};
 
-	KIRBY_BODY_STATE		m_eBody		= { KIRBY_BODY_STATE::NORMAL };
-	KIRBY_MOUTH_STATE		m_eMouth	= {KIRBY_MOUTH_STATE::IDLE };
-	KIRBY_EYE_STATE			m_eEye		= { KIRBY_EYE_STATE::IDLE };
+	KIRBY_BODY_STATE		m_eBody = { KIRBY_BODY_STATE::NORMAL };
+	KIRBY_MOUTH_STATE		m_eMouth = { KIRBY_MOUTH_STATE::IDLE };
+	KIRBY_EYE_STATE			m_eEye = { KIRBY_EYE_STATE::IDLE };
 
 	vector<_bool>			m_MeshVisible;
 
@@ -95,8 +95,8 @@ private:
 	void					Resolve_VisibleMeshes();
 
 public:
-	static CPreview_Kirby*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	virtual CGameObject*	Clone(void* pArg) override;
+	static CPreview_Kirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	virtual CGameObject* Clone(void* pArg) override;
 
 protected:
 	virtual void			Free() override;

@@ -72,8 +72,7 @@ HRESULT CMapSection::Initialize(void* pArg)
 	m_strModelPath = pDesc->strModelPath;
 	m_eSectionType = pDesc->eSectionType;
 	m_eRenderID = pDesc->eRenderID;
-	//m_bCastShadow = pDesc->bCastShadow;
-	m_bCastShadow = true;
+	m_bCastShadow = pDesc->bCastShadow;
 	m_bEnableCulling = pDesc->bEnableCulling;
 	m_bRenderable = pDesc->bRenderable;
 

@@ -34,7 +34,7 @@ private:
 	unordered_map<CGameObject*, _float3>	m_RotEditEuler;
 
 public:
-	static CPanel_Inspector*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CPanel_Inspector* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
 protected:
 	virtual void				Free() override;
