@@ -7,6 +7,8 @@
 #include "Animator.h"
 #include <fstream>
 
+#include "GameInstance.h"
+#include "PhysX_Manager.h"
 
 CModel::CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent { pDevice, pContext }
@@ -37,6 +39,10 @@ CModel::CModel(const CModel& Prototype)
     for (auto& pMesh : m_Meshes)
         Safe_AddRef(pMesh);
 
+    if (Prototype.m_pCollisionMesh) {
+        m_pCollisionMesh = Prototype.m_pCollisionMesh;
+        m_pCollisionMesh->acquireReference();   // 메시/머티리얼 AddRef와 동일 의미
+    }
 }
 
 const string& CModel::Get_BoneName(_uint iIndex) const
@@ -452,6 +458,10 @@ HRESULT CModel::Ready_NonAnim(const _char* pModelFilePath, _fmatrix PreTransform
     if (FAILED(Ready_Meshes(modelData.Meshes, PreTransformMatrix)))
         return E_FAIL;
 
+    if (MODEL::MAP == m_eType)
+        if (FAILED(Cook_CollisionMesh(modelData.Meshes, PreTransformMatrix)))
+            return E_FAIL;
+
     if (FAILED(Ready_Materials(modelData.Materials, pModelFilePath)))
         return E_FAIL;
 
@@ -521,6 +531,28 @@ void CModel::Load_MeshLayers(const _char* pModelFilePath)
     }
 }
 
+HRESULT CModel::Cook_CollisionMesh(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix)
+{
+    if (nullptr == m_pGameInstance_Proxy) return S_OK;
+
+    vector<_float3> Positions;
+    vector<_uint>   Indices;
+    for (const auto& mesh : meshes) {
+        const _uint iBase = (_uint)Positions.size();
+        for (const auto& v : mesh.MapVertices) {     // MAP은 MapVertices
+            _float3 p;
+            XMStoreFloat3(&p, XMVector3TransformCoord(XMLoadFloat3(&v.vPosition), PreTransformMatrix));
+            Positions.push_back(p);
+        }
+        for (_uint idx : mesh.Indices) Indices.push_back(iBase + idx);
+    }
+    if (Positions.empty() || Indices.size() < 3) return S_OK;
+
+    m_pCollisionMesh = m_pGameInstance_Proxy->Cook_TriangleMesh(
+        Positions.data(), (_uint)Positions.size(), Indices.data(), (_uint)Indices.size());
+    return (nullptr != m_pCollisionMesh) ? S_OK : E_FAIL;
+}
+
 CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter)
 {
     CModel* pInstance = new CModel(pDevice, pContext);
@@ -558,6 +590,12 @@ void CModel::Free()
     for (auto& pBone : m_Bones)
         Safe_Release(pBone);
     m_Bones.clear();
+
+    if (m_pCollisionMesh) 
+    { 
+        m_pCollisionMesh->release(); 
+        m_pCollisionMesh = nullptr; 
+    }
 
     for (auto& pMaterial : m_Materials)
         Safe_Release(pMaterial);

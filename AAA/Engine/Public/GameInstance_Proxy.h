@@ -1,6 +1,11 @@
 #pragma once
 #include "Prototype_Manager.h"
 
+NS_BEGIN(physx)
+class PxTriangleMesh;
+class PxRigidStatic;
+NS_END
+
 NS_BEGIN(Engine)
 
 class CGameObject;
@@ -219,6 +224,14 @@ public:
       vector<GLOBAL_DESC>& Get_ShaderGlobals();
       const _float4* Get_ShaderGlobal(const string& strName) const;
 #pragma endregion
+
+#pragma region PHYSIX_MANAGER
+      physx::PxTriangleMesh* Cook_TriangleMesh(const _float3* pPositions, _uint iNumVertices, const _uint* pIndices, _uint iNumIndices, _bool bFlipWinding = true);
+      physx::PxRigidStatic* Add_StaticActor(physx::PxTriangleMesh* pMesh, _fmatrix WorldMatrix);
+      void                   Remove_StaticActor(physx::PxRigidStatic* pActor);
+#pragma endregion
+
+
 
 private:
     CGameInstance* m_pOwner = { nullptr };

@@ -10,6 +10,8 @@
 #include "Environment_Manager.h"
 #include "ShaderGlobal_Manager.h"
 
+using namespace physx;
+
 #pragma region ENGINE
 void CGameInstance_Proxy::Update_Engine(_float fTimeDelta)
 {
@@ -830,6 +832,30 @@ const _float4* CGameInstance_Proxy::Get_ShaderGlobal(const string& strName) cons
 		return nullptr;
 
 	return m_pOwner->m_pShaderGlobal_Manager->Get(strName);
+}
+#pragma endregion
+
+#pragma region PHYSIX_MANAGER
+PxTriangleMesh* CGameInstance_Proxy::Cook_TriangleMesh(const _float3* p, _uint nv, const _uint* idx, _uint ni, _bool bFlip)
+{
+	if (!IsConnected())
+		return nullptr;
+
+	return m_pOwner->Cook_TriangleMesh(p, nv, idx, ni, bFlip);
+}
+PxRigidStatic* CGameInstance_Proxy::Add_StaticActor(PxTriangleMesh* pMesh, _fmatrix W)
+{
+	if (!IsConnected())
+		return nullptr;
+
+	return m_pOwner->Add_StaticActor(pMesh, W);
+}
+void           CGameInstance_Proxy::Remove_StaticActor(PxRigidStatic* pActor)
+{
+	if (!IsConnected())
+		return;
+
+	m_pOwner->Remove_StaticActor(pActor);
 }
 #pragma endregion
 

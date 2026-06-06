@@ -2,6 +2,10 @@
 
 #include "Component.h"
 
+NS_BEGIN(physx)
+class PxTriangleMesh;
+NS_END
+
 NS_BEGIN(Engine)
 
 class CMesh;
@@ -50,6 +54,7 @@ public:
 
 public:
 	_bool Pick_Mesh(_uint iMeshIndex, _fvector vOrigin, _fvector vDir, _fmatrix WorldMatrix, _float3* pOutHit, float* pOutDist = nullptr);
+	physx::PxTriangleMesh* Get_CollisionMesh() const { return m_pCollisionMesh; }
 
 public:
 	virtual HRESULT Initialize_Prototype(MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter = nullptr);
@@ -99,8 +104,12 @@ private:
 	_float						m_fBlendElapsed = { };
 	_bool						m_isBlending = { false };
 
+	physx::PxTriangleMesh* m_pCollisionMesh = { nullptr };
+
+	// юс╫ц
 	vector<MESH_LAYER_IDX>		m_MeshLayers;
 	string						m_strMeshLayerPath;
+
 
 private:
 	HRESULT Ready_Meshes(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix);
@@ -113,6 +122,7 @@ private:
 
 private:
 	void Load_MeshLayers(const _char* pModelFilePath);
+	HRESULT Cook_CollisionMesh(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix);
 
 public:
 	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix = XMMatrixIdentity(), PickableFilter fcFillter = nullptr);

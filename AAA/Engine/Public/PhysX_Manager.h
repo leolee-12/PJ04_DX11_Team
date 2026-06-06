@@ -29,13 +29,20 @@ public:
     void    Simulate(_float fTimeDelta);          // 매 프레임 simulate/fetchResults
     void    Reset_For_SceneChange();              // 레벨 바뀌면 static actor 정리
 
+    physx::PxTriangleMesh* Cook_TriangleMesh(
+        const _float3* pPositions, _uint iNumVertices,
+        const _uint* pIndices, _uint iNumIndices,
+        _bool bFlipWinding = true);
+
+    physx::PxRigidStatic* Add_StaticActor(physx::PxTriangleMesh* pMesh, _fmatrix WorldMatrix);
+    void                  Remove_StaticActor(physx::PxRigidStatic* pActor);
+
+    physx::PxController* Create_CapsuleController(const _float3& vPos, _float fRadius, _float fHeight);
+
     physx::PxRigidStatic* Cook_StaticMesh(
         const _float3* pVertices, _uint iNumVertices,
         const _uint* pIndices, _uint iNumIndices,
         _fmatrix WorldMatrix);
-
-    physx::PxController* Create_CapsuleController(
-        const _float3& vPos, _float fRadius, _float fHeight);
 
     physx::PxPhysics* Get_Physics() const { return m_pPhysics; }
     physx::PxScene* Get_Scene()   const { return m_pScene; }
@@ -47,6 +54,8 @@ private:
     physx::PxDefaultCpuDispatcher* m_pDispatcher = { nullptr };
     physx::PxControllerManager* m_pCCTManager = { nullptr };
     physx::PxMaterial* m_pDefaultMtrl = { nullptr };
+
+    vector<physx::PxRigidStatic*> m_StaticActors;
 
     physx::PxDefaultAllocator      m_Allocator;
     physx::PxDefaultErrorCallback  m_ErrorCallback;

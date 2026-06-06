@@ -24,6 +24,8 @@
 CGameInstance* CGameInstance::m_pInstance = { nullptr };
 CGameInstance_Proxy* CGameInstance::m_pGameInstance_Proxy = { nullptr };
 
+using namespace physx;
+
 CGameInstance::CGameInstance()
 {
 }
@@ -577,6 +579,23 @@ HRESULT CGameInstance::Render_RT_Debug(const _wstring& strMRTTag, class CShader*
 
 #pragma endregion
 
+#pragma region PHYSIX_MANAGER
+
+PxTriangleMesh* CGameInstance::Cook_TriangleMesh(const _float3* p, _uint nv, const _uint* idx, _uint ni, _bool bFlip)
+{
+    return m_pPhysX_Manager->Cook_TriangleMesh(p, nv, idx, ni, bFlip);
+}
+PxRigidStatic* CGameInstance::Add_StaticActor(PxTriangleMesh* pMesh, _fmatrix W)
+{
+    return m_pPhysX_Manager->Add_StaticActor(pMesh, W);
+}
+void           CGameInstance::Remove_StaticActor(PxRigidStatic* pActor)
+{
+    m_pPhysX_Manager->Remove_StaticActor(pActor);
+}
+
+#pragma endregion
+
 
 
 
@@ -606,7 +625,6 @@ void CGameInstance::Free()
     Safe_Release(m_pShaderGlobal_Manager);
     Safe_Release(m_pEnvironment_Manager);
     Safe_Release(m_pEffect_Manager);
-    Safe_Release(m_pPhysX_Manager);
     Safe_Release(m_pShadow_Dir);
     Safe_Release(m_pTarget_Manager);
     Safe_Release(m_pSound_Manager);
@@ -619,6 +637,7 @@ void CGameInstance::Free()
     Safe_Release(m_pObject_Manager);
     Safe_Release(m_pLevel_Manager);
     Safe_Release(m_pPrototype_Manager);
+    Safe_Release(m_pPhysX_Manager);
     Safe_Release(m_pTimer_Manager);
     Safe_Release(m_pFrustum_Manager);
     Safe_Release(m_pCamera_Manager);

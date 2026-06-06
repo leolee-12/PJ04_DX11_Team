@@ -87,6 +87,9 @@ HRESULT CMapSection::Initialize(void* pArg)
 		m_CombinedWorldMatrix = *m_pTransformCom->Get_WorldMatrixPtr();
 		Update_LocalBounds();
 		Refresh_WorldBounds();
+		if (m_pModelCom && m_pModelCom->Get_CollisionMesh())
+			m_pColliderActor = m_pGameInstance_Proxy->Add_StaticActor(
+				m_pModelCom->Get_CollisionMesh(), XMLoadFloat4x4(&m_CombinedWorldMatrix));
 	}
 	else
 	{
@@ -278,6 +281,12 @@ CGameObject* CMapSection::Clone(void* pArg)
 void CMapSection::Free()
 {
 	__super::Free();
+
+	if (m_pColliderActor)
+	{ 
+		m_pGameInstance_Proxy->Remove_StaticActor(m_pColliderActor);
+		m_pColliderActor = nullptr;
+	}
 }
 
 NS_END

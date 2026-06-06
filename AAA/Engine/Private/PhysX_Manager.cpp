@@ -40,7 +40,81 @@ void CPhysX_Manager::Simulate(_float fTimeDelta)
 
 void CPhysX_Manager::Reset_For_SceneChange()
 {
-    // TODO(§5 이후): 이 씬에 등록된 static actor 정리
+    for (PxRigidStatic* pActor : m_StaticActors) {
+        if (m_pScene) m_pScene->removeActor(*pActor);
+        pActor->release();
+    }
+    m_StaticActors.clear();
+}
+
+PxTriangleMesh* CPhysX_Manager::Cook_TriangleMesh(const _float3* pPositions, _uint iNumVertices, const _uint* pIndices, _uint iNumIndices, _bool bFlipWinding)
+{
+    if (nullptr == m_pPhysics || nullptr == pPositions || nullptr == pIndices ||
+        0 == iNumVertices || iNumIndices < 3)
+        return nullptr;
+
+    const _uint iNumTris = iNumIndices / 3;
+
+    // DX(좌수) 데이터 → PhysX 와인딩 정합: 삼각형 1·2 인덱스 스왑
+    vector<PxU32> Indices(iNumIndices);
+    if (bFlipWinding)
+        for (_uint i = 0; i < iNumTris; ++i) {
+            Indices[i * 3 + 0] = pIndices[i * 3 + 0];
+            Indices[i * 3 + 1] = pIndices[i * 3 + 2];
+            Indices[i * 3 + 2] = pIndices[i * 3 + 1];
+        }
+    else
+        memcpy(Indices.data(), pIndices, sizeof(PxU32) * iNumIndices);
+
+    PxTriangleMeshDesc desc;
+    desc.points.count = iNumVertices;
+    desc.points.stride = sizeof(_float3);
+    desc.points.data = pPositions;
+    desc.triangles.count = iNumTris;
+    desc.triangles.stride = 3 * sizeof(PxU32);
+    desc.triangles.data = Indices.data();
+
+    PxCookingParams params(m_pPhysics->getTolerancesScale());
+    return PxCreateTriangleMesh(params, desc, m_pPhysics->getPhysicsInsertionCallback());
+}
+
+PxRigidStatic* CPhysX_Manager::Add_StaticActor(PxTriangleMesh* pMesh, _fmatrix WorldMatrix)
+{
+    if (nullptr == m_pPhysics || nullptr == m_pScene || nullptr == pMesh)
+        return nullptr;
+
+    // 월드행렬 분해 → (T,R)=PxTransform, S=PxMeshScale (강체 포즈엔 스케일 못 넣음)
+    XMVECTOR vScale, vQuat, vTrans;
+    if (!XMMatrixDecompose(&vScale, &vQuat, &vTrans, WorldMatrix))
+        return nullptr;
+
+    _float3 vS; XMStoreFloat3(&vS, vScale);
+    _float4 qR; XMStoreFloat4(&qR, vQuat);
+    _float3 vT; XMStoreFloat3(&vT, vTrans);
+
+    PxTransform pose(PxVec3(vT.x, vT.y, vT.z), PxQuat(qR.x, qR.y, qR.z, qR.w));
+    PxTriangleMeshGeometry geom(pMesh, PxMeshScale(PxVec3(vS.x, vS.y, vS.z), PxQuat(PxIdentity)));
+
+    PxRigidStatic* pActor = m_pPhysics->createRigidStatic(pose);
+    if (nullptr == pActor) return nullptr;
+
+    if (nullptr == PxRigidActorExt::createExclusiveShape(*pActor, geom, *m_pDefaultMtrl)) {
+        pActor->release();
+        return nullptr;
+    }
+
+    m_pScene->addActor(*pActor);
+    m_StaticActors.push_back(pActor);
+    return pActor;
+}
+
+void CPhysX_Manager::Remove_StaticActor(PxRigidStatic* pActor)
+{
+    if (nullptr == pActor) return;
+    auto it = find(m_StaticActors.begin(), m_StaticActors.end(), pActor);
+    if (it != m_StaticActors.end()) m_StaticActors.erase(it);
+    if (m_pScene) m_pScene->removeActor(*pActor);
+    pActor->release();
 }
 
 PxRigidStatic* CPhysX_Manager::Cook_StaticMesh(
@@ -72,6 +146,7 @@ CPhysX_Manager* CPhysX_Manager::Create()
 
 void CPhysX_Manager::Free()
 {
+    Reset_For_SceneChange();
     PX_RELEASE(m_pCCTManager);
     PX_RELEASE(m_pScene);
     PX_RELEASE(m_pDispatcher);
