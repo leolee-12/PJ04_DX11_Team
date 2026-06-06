@@ -2,181 +2,136 @@
 
 #ifdef _DEBUG
 
-#include <fstream>
+#include "EnvObject.h"
 
 IMPLEMENT_SINGLETON(CMapToolProfiler)
 
-namespace
-{
-	constexpr _float CSV_WRITE_INTERVAL_SECONDS = 0.25f;
-}
-
 void CMapToolProfiler::Set_Stage(Client::CMapStage* pStage)
 {
-	if (m_pStage == pStage)
-		return;
+    if (m_pStage == pStage)
+        return;
 
-	m_pStage = pStage;
-	Reset_CaptureSession();
+    m_pStage = pStage;
+    Reset_CaptureSession();
+}
+
+void CMapToolProfiler::Register_EnvObject(Client::CEnvObject* pEnvObject)
+{
+    if (nullptr != pEnvObject)
+        m_EnvObjects.insert(pEnvObject);
+}
+
+void CMapToolProfiler::Clear_EnvObjects()
+{
+    m_EnvObjects.clear();
 }
 
 void CMapToolProfiler::Update(_float fTimeDelta)
 {
-	if (!m_bEnabled)
-		return;
+    UNREFERENCED_PARAMETER(fTimeDelta);
 
-	if (nullptr == m_pStage)
-	{
-		m_Frame = {};
-		m_bFrameBaseValid = false;
-		m_fCsvWriteAccumulator = 0.f;
-		return;
-	}
+    if (!m_bEnabled)
+        return;
 
-	m_fElapsedSeconds += fTimeDelta;
-	if (m_bCsvEnabled)
-		m_fCsvWriteAccumulator += fTimeDelta;
+    if (nullptr == m_pStage && m_EnvObjects.empty())
+    {
+        m_Frame = {};
+        m_bFrameBaseValid = false;
+    }
 }
 
 void CMapToolProfiler::Capture_Frame()
 {
-	if (!m_bEnabled || nullptr == m_pStage)
-		return;
+    if (!m_bEnabled)
+        return;
 
-	const Client::MAP_STAGE_PROFILE RawFrame = m_pStage->Get_Profile();
-	Client::MAP_STAGE_PROFILE DisplayFrame = RawFrame;
-	DisplayFrame.dSectionRenderCpuMs = 0.0;
-	DisplayFrame.iEstimatedDrawCalls = {};
+    MAPTOOL_PROFILE_FRAME Frame{};
 
-	for (Client::CMapSection* pSection : m_pStage->Get_Sections())
-	{
-		if (nullptr == pSection)
-			continue;
+    if (nullptr != m_pStage)
+    {
+        const Client::MAP_STAGE_PROFILE StageFrame = m_pStage->Get_Profile();
 
-		const Client::MAP_SECTION_PROFILE& SectionProfile = pSection->Get_Profile();
-		DisplayFrame.dSectionRenderCpuMs += SectionProfile.dRenderCpuMs;
-		DisplayFrame.iEstimatedDrawCalls += SectionProfile.iEstimatedDrawCalls;
-	}
+        if (!m_bFrameBaseValid)
+        {
+            m_iFrameBase = StageFrame.iFrameIndex;
+            m_bFrameBaseValid = true;
+        }
 
-	if (!m_bFrameBaseValid)
-	{
-		m_iFrameBase = DisplayFrame.iFrameIndex;
-		m_bFrameBaseValid = true;
-	}
+        Frame.iFrameIndex = (StageFrame.iFrameIndex >= m_iFrameBase)
+            ? (StageFrame.iFrameIndex - m_iFrameBase)
+            : 0;
 
-	m_Frame = DisplayFrame;
-	m_Frame.iFrameIndex = (DisplayFrame.iFrameIndex >= m_iFrameBase) ? (DisplayFrame.iFrameIndex - m_iFrameBase) : 0;
+        Frame.iMapSectionTotal = StageFrame.iTotalSections;
 
-	if (m_bCsvEnabled)
-	{
-		if (!m_bCsvHasWrittenRow || m_fCsvWriteAccumulator >= CSV_WRITE_INTERVAL_SECONDS)
-		{
-			Write_CsvRow();
-			if (m_bCsvEnabled)
-				m_bCsvHasWrittenRow = true;
-			m_fCsvWriteAccumulator = 0.f;
-		}
-	}
+        Frame.MapMain.iCandidate = StageFrame.iMainCandidateSections;
+        Frame.MapMain.iVisible = StageFrame.iMainVisibleSections;
+        Frame.MapMain.iCulled = StageFrame.iMainCulledSections;
+        Frame.MapMain.iSubmitted = StageFrame.iMainSubmittedSections;
+
+        Frame.MapShadow.iCandidate = StageFrame.iShadowCandidateSections;
+        Frame.MapShadow.iVisible = StageFrame.iShadowVisibleSections;
+        Frame.MapShadow.iCulled = StageFrame.iShadowCulledSections;
+        Frame.MapShadow.iSubmitted = StageFrame.iShadowSubmittedSections;
+
+        Frame.dMapCullingCpuMs = StageFrame.dCullingCpuMs;
+    }
+
+    for (Client::CEnvObject* pEnvObject : m_EnvObjects)
+    {
+        if (nullptr == pEnvObject)
+            continue;
+
+        ++Frame.iEnvObjectTotal;
+
+        if (!pEnvObject->Is_ProfileRenderable())
+            continue;
+
+        ++Frame.EnvMain.iCandidate;
+        if (pEnvObject->Is_Visible_Main())
+        {
+            ++Frame.EnvMain.iVisible;
+            ++Frame.EnvMain.iSubmitted;
+        }
+        else
+        {
+            ++Frame.EnvMain.iCulled;
+        }
+
+        if (!pEnvObject->Is_ShadowCaster())
+            continue;
+
+        ++Frame.EnvShadow.iCandidate;
+        if (pEnvObject->Is_Visible_Shadow())
+        {
+            ++Frame.EnvShadow.iVisible;
+            ++Frame.EnvShadow.iSubmitted;
+        }
+        else
+        {
+            ++Frame.EnvShadow.iCulled;
+        }
+    }
+
+    m_Frame = Frame;
 }
 
 void CMapToolProfiler::Reset_CaptureSession()
 {
-	m_Frame = {};
-	m_iFrameBase = {};
-	m_bFrameBaseValid = false;
-	m_fElapsedSeconds = 0.f;
-	m_fCsvWriteAccumulator = 0.f;
-	m_bCsvHasWrittenRow = false;
-
-	if (m_bCsvEnabled)
-		Close_Csv();
+    m_Frame = {};
+    m_iFrameBase = {};
+    m_bFrameBaseValid = false;
 }
 
 void CMapToolProfiler::Reset()
 {
-	Reset_CaptureSession();
-}
-
-void CMapToolProfiler::Set_CsvEnabled(_bool bEnabled)
-{
-	if (m_bCsvEnabled == bEnabled)
-	{
-		if (m_bCsvEnabled)
-			m_bEnabled = true;
-		return;
-	}
-
-	m_bCsvEnabled = bEnabled;
-
-	if (m_bCsvEnabled)
-	{
-		m_bEnabled = true;
-		m_fCsvWriteAccumulator = 0.f;
-		m_bCsvHasWrittenRow = false;
-		Close_Csv();
-	}
-	else
-	{
-		Close_Csv();
-	}
-}
-
-void CMapToolProfiler::Open_CsvIfNeeded()
-{
-	if (m_Csv.is_open())
-		return;
-
-	CreateDirectoryW(L"../../Resources/Profile", nullptr);
-
-	const string strPath = WstrToStr(m_strCsvPath);
-	m_Csv.open(strPath, ios::out | ios::trunc);
-	if (!m_Csv.is_open())
-	{
-		m_bCsvEnabled = false;
-		return;
-	}
-
-	m_Csv
-		<< "elapsed_sec,frame,total,visible,culled,submitted_nonblend,submitted_blend,submitted_shadow,"
-		<< "stage_late_ms,culling_ms,section_render_ms,estimated_draw_calls\n";
-}
-
-void CMapToolProfiler::Close_Csv()
-{
-	if (m_Csv.is_open())
-		m_Csv.close();
-}
-
-void CMapToolProfiler::Write_CsvRow()
-{
-	if (!m_bEnabled || !m_bCsvEnabled || nullptr == m_pStage)
-		return;
-
-	Open_CsvIfNeeded();
-	if (!m_Csv.is_open())
-		return;
-
-	m_Csv
-		<< m_fElapsedSeconds << ','
-		<< m_Frame.iFrameIndex << ','
-		<< m_Frame.iTotalSections << ','
-		<< m_Frame.iVisibleSections << ','
-		<< m_Frame.iCulledSections << ','
-		<< m_Frame.iSubmittedNonBlend << ','
-		<< m_Frame.iSubmittedBlend << ','
-		<< m_Frame.iSubmittedShadow << ','
-		<< m_Frame.dStageLateUpdateCpuMs << ','
-		<< m_Frame.dCullingCpuMs << ','
-		<< m_Frame.dSectionRenderCpuMs << ','
-		<< m_Frame.iEstimatedDrawCalls << '\n';
+    Reset_CaptureSession();
 }
 
 void CMapToolProfiler::Free()
 {
-	Close_Csv();
-	m_pStage = nullptr;
-
-	__super::Free();
+    m_pStage = nullptr;
+    m_EnvObjects.clear();
+    __super::Free();
 }
 
 #endif

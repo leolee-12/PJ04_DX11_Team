@@ -1,17 +1,17 @@
 #pragma once
 #include "AnimUITool_Defines.h"
 #include "Base.h"
+#include "Anim_Context.h"
 
 NS_BEGIN(Engine)
 class CGameObject;
-class CUIContainerObject;
-class CUIPartObject;
 NS_END
 
 NS_BEGIN(AnimUITool)
 
 class CPanel;
 class CLevel_Tool;
+class CPreview_Actor;
 
 class CPanel_Manager final : public CBase
 {
@@ -35,19 +35,11 @@ public:
 	void						Clear_Selected();
 
 	ANIM_CONTEXT&				Get_Context() { return m_Context; }
-	void						Bind_Preview(CGameObject* pOwner);
-
-	UI_CONTEXT&					Get_UIContext() { return m_UIContext; }
-	const UI_CONTEXT&			Get_UIContext() const { return m_UIContext; }
-
-	void						Set_UISelected(CUIContainerObject* pContainer, CUIPartObject* pPart, const _wstring& strPartTag);
+	void						Bind_Preview(CPreview_Actor* pActor);
 
 	void						Set_Level(CLevel_Tool* pLevel) { m_pLevel = pLevel; }  
-	CLevel_Tool*				Get_Level() const { return m_pLevel; }
 	void						Load_Preview(const _wstring& strYshPath);          
 	void						Clear_Preview();                                       
-	void						Clear_UISelected();
-	_bool						Validate_UISelection();
 
 private:
 	ID3D11Device*				m_pDevice = { nullptr };
@@ -59,7 +51,6 @@ private:
 	CLevel_Tool*				m_pLevel = { nullptr };
 
 	ANIM_CONTEXT				m_Context;
-	UI_CONTEXT					m_UIContext;
 
 	TOOL_MODE					m_eWorkMode = { TOOL_MODE::ANIMATION };
 

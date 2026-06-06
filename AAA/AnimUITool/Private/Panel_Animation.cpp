@@ -5,24 +5,6 @@
 #include "Animator.h"
 #include "imgui.h"
 #include "GameContent_AnimEvents.h"
-#include "Kirby_States.h"
-
-namespace
-{
-    // 이름표 기반 enum 콤보, iValue를 직접 편집
-    template<typename TPair, size_t N>
-    void Draw_StateCombo(const char* szLabel, int& iValue, const TPair(&names)[N])
-    {
-        const char* szCur = "?";
-        for (auto& [v, n] : names) if ((int)v == iValue) szCur = n;
-        if (ImGui::BeginCombo(szLabel, szCur))
-        {
-            for (auto& [v, n] : names)
-                if (ImGui::Selectable(n, (int)v == iValue)) iValue = (int)v;
-            ImGui::EndCombo();
-        }
-    }
-}
 
 CPanel_Animation::CPanel_Animation(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPanel{ pDevice, pContext }
@@ -37,12 +19,12 @@ void CPanel_Animation::Render()
     ANIM_CONTEXT& ctx = m_pPanel_Manager->Get_Context();
     if (!ctx.Valid()) { ImGui::TextDisabled("No preview model."); ImGui::End(); return; }
 
-    if (m_pPrevActor != ctx.pOwner) 
+    if (m_pPrevActor != ctx.pActor) 
     { 
-        m_pPrevActor = ctx.pOwner;
+        m_pPrevActor = ctx.pActor;
         m_iPrevClip = -1;
 
-        if (ctx.pOwner && !ctx.strModelPath.empty())
+        if (ctx.pActor && !ctx.strModelPath.empty())
         {
             namespace fs = filesystem;
             fs::path mp(ctx.strModelPath);
@@ -104,6 +86,7 @@ void CPanel_Animation::Render()
     {
         pAnim->Resume();
         pAnim->Play(strName, ctx.bLoop, false, 0.f);     
+        pAnim->Update(ImGui::GetIO().DeltaTime);          
         ctx.fProgress = pAnim->Get_Progress();
         ImGui::SliderFloat("##timeline", &ctx.fProgress, 0.f, 1.f, "%.3f");
     }
@@ -243,25 +226,8 @@ void CPanel_Animation::Render_EventTimeline()
 
         char buf[128]; strcpy_s(buf, e.strParam.c_str());
         if (ImGui::InputText("Param", buf, sizeof(buf))) e.strParam = buf;
-
-        // IntParam: 상태 이벤트면 enum 드롭다운, 아니면 숫자
-        switch (static_cast<Client::EANIM_EVENT>(e.iEventType))
-        {
-        case Client::EANIM_EVENT::SetBody:
-            Draw_StateCombo("IntParam", e.iIntParam, Client::g_KirbyBodyNames);  
-            break;
-        case Client::EANIM_EVENT::SetMouth:
-            Draw_StateCombo("IntParam", e.iIntParam, Client::g_KirbyMouthNames); 
-            break;
-        case Client::EANIM_EVENT::SetEye:
-            Draw_StateCombo("IntParam", e.iIntParam, Client::g_KirbyEyeNames);   
-            break;
-        default:
-            ImGui::InputInt("IntParam", &e.iIntParam);                           
-            break;
-        }        
+        ImGui::InputInt("IntParam", &e.iIntParam);
         ImGui::DragFloat3("Offset", &e.vOffset.x, 0.1f);
-
 
         if (ImGui::Button("Delete Event"))
         {

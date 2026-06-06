@@ -2,15 +2,18 @@
 #include "Loader.h"
 #include "EditCamera.h"
 #include "Edit_Grid.h"
-#include "EnvObjectLoader.h"
-#include "GameContent_Log.h"
-#include "MapStage.h"
-#ifdef _DEBUG
-#include "MapToolProfiler.h"
-#endif
 
 #include "GameObject_Factory.h"
 #include "GameContent_const.h"
+#include "GameContent_Log.h"
+#include "MapDescriptor.h"
+#include "MapStage.h"
+#include "EnvObjectLoader.h"
+#include "EnvObject.h"
+
+#ifdef _DEBUG
+#include "MapToolProfiler.h"
+#endif
 
 #include "GameInstance.h"
 #include "GameInstance_Proxy.h"
@@ -184,10 +187,6 @@ void CLevel_Edit::Update(_float fTimeDelta)
 	CMapToolProfiler* pProfiler = CMapToolProfiler::GetInstance();
 	if (m_pGameInstance_Proxy->Key_Down(DIK_1))
 		pProfiler->Toggle_Enabled();
-	if (m_pGameInstance_Proxy->Key_Down(DIK_2))
-		pProfiler->Toggle_CsvEnabled();
-	if (m_pGameInstance_Proxy->Key_Down(DIK_3))
-		pProfiler->Reset();
 
 	pProfiler->Update(fTimeDelta);
 #endif
@@ -273,9 +272,12 @@ void CLevel_Edit::Load_Level(const wstring& strFilePath)
 {
 	m_pSelected = nullptr;
 	m_Layers.clear();
+
 #ifdef _DEBUG
+	CMapToolProfiler::GetInstance()->Clear_EnvObjects();
 	CMapToolProfiler::GetInstance()->Set_Stage(nullptr);
 #endif
+
 	m_pMapStage = nullptr;
 	m_pGameInstance_Proxy->Clear_Objects(ETOUI(TOOL_LEVEL::EDIT));
 
@@ -591,84 +593,26 @@ HRESULT CLevel_Edit::Ready_EditGrid()
 
 HRESULT CLevel_Edit::Ready_MapStage()
 {
+	constexpr _uint kPresetIndex = 0;
 	const _uint iEditLevel = ETOUI(TOOL_LEVEL::EDIT);
 	const _uint iModelLevel = ETOUI(LEVEL::GAMEPLAY);
 
-	if (!m_pGameInstance_Proxy->Has_Prototype(iEditLevel, Client::CMapSection::PROTOTYPE_TAG))
+	Client::CMapStage* pLoadedStage = nullptr;
+	if (FAILED(Client::CMapDescriptor::GetInstance()->Load_MapStage(
+		m_pDevice,
+		m_pContext,
+		kPresetIndex,
+		iEditLevel,
+		iModelLevel,
+		nullptr,
+		nullptr,
+		&pLoadedStage,
+		nullptr)))
 	{
-		if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
-			iEditLevel,
-			Client::CMapSection::PROTOTYPE_TAG,
-			Client::CMapSection::Create(m_pDevice, m_pContext))))
-			return E_FAIL;
+		return E_FAIL;
 	}
 
-	if (!m_pGameInstance_Proxy->Has_Prototype(iEditLevel, Client::CMapStage::PROTOTYPE_TAG))
-	{
-		if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
-			iEditLevel,
-			Client::CMapStage::PROTOTYPE_TAG,
-			Client::CMapStage::Create(m_pDevice, m_pContext))))
-			return E_FAIL;
-	}
-
-	auto AddSectionDesc = [&](Client::MAP_STAGE_DESC& StageDesc,
-		const wstring& strName,
-		Client::MAP_SECTION_TYPE eType,
-		RENDERID eRenderID) -> HRESULT
-		{
-			wstring strModelPath;
-			const _bool bHasLegacyPath = Try_GetLegacyMapSectionModelPath(strName, &strModelPath);
-			if (!bHasLegacyPath
-				&& !Try_ResolveMapSectionModelPath(strName, &strModelPath))
-				return E_FAIL;
-
-			Client::MAP_SECTION_DESC SectionDesc{};
-			SectionDesc.strSectionName = strName;
-			SectionDesc.strModelProtoTag = bHasLegacyPath
-				? L"Prototype_Component_Model_" + strName
-				: Make_MapSectionModelProtoTag(strName);
-			SectionDesc.strModelPath = strModelPath;
-			SectionDesc.iModelProtoLevel = iModelLevel;
-			SectionDesc.eSectionType = eType;
-			SectionDesc.eRenderID = eRenderID;
-			SectionDesc.bCastShadow = false;
-			SectionDesc.bEnableCulling = true;
-			SectionDesc.bRenderable = true;
-
-			StageDesc.SectionDescs.push_back(SectionDesc);
-			return S_OK;
-		};
-
-	Client::MAP_STAGE_DESC StageDesc{};
-	StageDesc.strStageName = L"Stage1_0_MapStage";
-	StageDesc.iSectionProtoLevel = iEditLevel;
-	StageDesc.SectionDescs.reserve(8);
-
-	if (FAILED(AddSectionDesc(StageDesc, L"GsAllBuilding_0", Client::MAP_SECTION_TYPE::BUILDING, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"GsBuilding_1", Client::MAP_SECTION_TYPE::BUILDING, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"GsBuilding_7", Client::MAP_SECTION_TYPE::BUILDING, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"GsDefault_2", Client::MAP_SECTION_TYPE::GROUND, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"GsDefault_5", Client::MAP_SECTION_TYPE::GROUND, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"SeRock_3", Client::MAP_SECTION_TYPE::ROCK, RENDERID::NONBLEND))) return E_FAIL;
-	if (FAILED(AddSectionDesc(StageDesc, L"SeRock_6", Client::MAP_SECTION_TYPE::ROCK, RENDERID::NONBLEND))) return E_FAIL;
-	//if (FAILED(AddSectionDesc(StageDesc, L"Transparent_4", Client::MAP_SECTION_TYPE::TRANSPARENT, RENDERID::NONBLEND))) return E_FAIL;
-	//StageDesc.SectionDescs.back().bRenderable = false;
-
-	CGameObject* pStageObject = nullptr;
-	if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(
-		&pStageObject,
-		iEditLevel,
-		Client::CMapStage::PROTOTYPE_TAG,
-		iEditLevel,
-		L"Layer_MapStage",
-		L"MapStage",
-		&StageDesc)))
-		return E_FAIL;
-
-	m_pMapStage = dynamic_cast<Client::CMapStage*>(pStageObject);
-	if (nullptr == m_pMapStage)
-		return E_FAIL;
+	m_pMapStage = pLoadedStage;
 
 	Add_Layer(L"Layer_MapStage");
 	m_Layers[L"Layer_MapStage"].push_back({
@@ -679,43 +623,59 @@ HRESULT CLevel_Edit::Ready_MapStage()
 #ifdef _DEBUG
 	CMapToolProfiler::GetInstance()->Set_Stage(m_pMapStage);
 #endif
-
 	return S_OK;
 }
 
 HRESULT CLevel_Edit::Ready_EnvObjects()
- {
+{
+	constexpr _uint kPresetIndex = 0;
 	const _uint iEditLevel = ETOUI(TOOL_LEVEL::EDIT);
-	Client::Set_GameContentLogSink(&Forward_GameContentLog);
-	static const wchar_t* kEnvJsonPaths[] =
-	{
-		L"../../Resources/Map/Decor_Decor_FlipZ_FullMatrix.json",
-		L"../../Resources/Map/Toy_Decor.json",
-		L"../../Resources/Map/Toy_Obj.json",
-		L"../../Resources/Map/Decor_Obj.json"
-	};
 
-	for (const wchar_t* pJsonPath : kEnvJsonPaths)
-	{
-		string strDummy;
-		if (FAILED(CDataLoader::Read_Json(pJsonPath, &strDummy)))
-		{
-			MapTool::Log_Info(string("EnvObject source skipped: ") + WstrToStr(pJsonPath));
-			continue;
-		}
+#ifdef _DEBUG
+	CMapToolProfiler::GetInstance()->Clear_EnvObjects();
+#endif
 
-		if (FAILED(Client::CEnvObjectLoader::Load_FromJsonFile(
-			m_pGameInstance_Proxy,
-			m_pDevice,
-			m_pContext,
-			iEditLevel,
-			pJsonPath)))
-		{
-			MapTool::Log_Warning(string("EnvObject source failed: ") + WstrToStr(pJsonPath));
-		}
-	}
+	Client::CMapDescriptor::MAP_PRESET_LOAD_REPORT Report{};
+	const HRESULT hr = Client::CMapDescriptor::GetInstance()->Load_EnvObject_FromJson(
+		m_pDevice,
+		m_pContext,
+		kPresetIndex,
+		iEditLevel,
+		&On_EnvObjectCreated,
+		this,
+		&Report);
 
-	return S_OK;
+	return FAILED(hr) ? E_FAIL : S_OK;
+}
+
+void CLevel_Edit::On_EnvObjectCreated(
+	void* pContext,
+	CGameObject* pObject,
+	const wstring& strPrototypeTag,
+	const wstring& strLayerTag,
+	const wstring& strObjectTag)
+{
+	UNREFERENCED_PARAMETER(strPrototypeTag);
+	UNREFERENCED_PARAMETER(strObjectTag);
+
+#ifdef _DEBUG
+	CLevel_Edit* pLevel = static_cast<CLevel_Edit*>(pContext);
+	if (nullptr == pLevel || nullptr == pObject)
+		return;
+
+	if (strLayerTag != L"Layer_EnvStatic" && strLayerTag != L"Layer_EnvInteract")
+		return;
+
+	Client::CEnvObject* pEnvObject = dynamic_cast<Client::CEnvObject*>(pObject);
+	if (nullptr == pEnvObject)
+		return;
+
+	CMapToolProfiler::GetInstance()->Register_EnvObject(pEnvObject);
+#else
+	UNREFERENCED_PARAMETER(pContext);
+	UNREFERENCED_PARAMETER(pObject);
+	UNREFERENCED_PARAMETER(strLayerTag);
+#endif
 }
 
 CLevel_Edit* CLevel_Edit::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -734,12 +694,12 @@ CLevel_Edit* CLevel_Edit::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 void CLevel_Edit::Free()
 {
 #ifdef _DEBUG
+	CMapToolProfiler::GetInstance()->Clear_EnvObjects();
 	CMapToolProfiler::GetInstance()->Set_Stage(nullptr);
 #endif
+
 	m_pMapStage = nullptr;
 
 	Safe_Release(m_pGrid);
-	//Safe_Release(m_pNavMeshEditor);
-
 	__super::Free();
 }

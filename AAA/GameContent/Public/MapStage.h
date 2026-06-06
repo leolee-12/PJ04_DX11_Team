@@ -44,8 +44,8 @@ private:
 	void			Submit_VisibleSections();
 
 #ifdef _DEBUG
-	void	Reset_ProfileFrame();
-	void	Count_Submitted(RENDERID eRenderID);
+	void    Reset_ProfileFrame();
+	void    Count_MainSubmitted(RENDERID eRenderID);
 #endif
 
 public:

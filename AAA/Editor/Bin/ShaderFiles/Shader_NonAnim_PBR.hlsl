@@ -147,7 +147,7 @@ PS_OUT PS_MAIN(PS_IN In)
     return Out;
 }
 
-PS_OUT PS_DEFFUSE(PS_IN In)
+PS_OUT PS_DIFFUSE(PS_IN In)
 {
     PS_OUT Out;
 
@@ -156,7 +156,8 @@ PS_OUT PS_DEFFUSE(PS_IN In)
         discard;
 
 
-    Out.vDiffuse = vMtrlDiffuse;
+    //Out.vDiffuse = vMtrlDiffuse;
+    Out.vDiffuse = vector(1.f, 1.f, 1.f, 1.f);
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
@@ -206,7 +207,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 
-    pass DeffusePass // 1
+    pass DiffusePass // 1
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -214,7 +215,7 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_DEFFUSE();
+        PixelShader = compile ps_5_0 PS_DIFFUSE();
     }
 
     pass ShadowPass // 2
