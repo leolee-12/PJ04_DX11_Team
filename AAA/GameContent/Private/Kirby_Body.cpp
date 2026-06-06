@@ -25,13 +25,15 @@ HRESULT CKirby_Body::Initialize(void* pArg)
 {
     KIRBY_BODY_DESC* pDesc = static_cast<KIRBY_BODY_DESC*>(pArg);
 
+    pDesc->fSpeedPerSec = 1.f;
+
     if (FAILED(__super::Initialize(pDesc)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
         return E_FAIL;
-
-    m_pModelCom->Set_AnimationIndex(0);
+    
+    m_pAnimatorCom->Play("Wait", true, true);
 
     return S_OK;
 }
@@ -42,6 +44,70 @@ void CKirby_Body::Priority_Update(_float fTimeDelta)
 
 void CKirby_Body::Update(_float fTimeDelta)
 {
+    static _int iState = 0; // 0: Wait, 1: Run
+
+    _float3 vDir = { 0.f, 0.f, 0.f };
+
+    if (m_pGameInstance_Proxy->Key_Pressing(DIK_W))
+    {
+        vDir.z += 1.f;
+    }
+
+    if (m_pGameInstance_Proxy->Key_Pressing(DIK_S))
+    {
+        vDir.z -= 1.f;
+    }
+
+    if (m_pGameInstance_Proxy->Key_Pressing(DIK_A))
+    {
+        vDir.x -= 1.f;
+    }
+
+    if (m_pGameInstance_Proxy->Key_Pressing(DIK_D))
+    {
+        vDir.x += 1.f;
+    }
+
+    _bool bMove = false;
+
+    if (vDir.x != 0.f || vDir.z != 0.f)
+    {
+        bMove = true;
+
+        _vector vMoveDir = XMVector3Normalize(XMLoadFloat3(&vDir));
+
+        // +Z를 기본 정면으로 보고, 이동 방향에 맞는 Y축 회전각 계산
+        _float fRadian = atan2f(vDir.x, vDir.z);
+
+        m_pTransformCom->Rotation(
+            XMVectorSet(0.f, 1.f, 0.f, 0.f),
+            fRadian
+        );
+
+        // 현재 LOOK 방향으로 이동
+        m_pTransformCom->Go_Straight(fTimeDelta * 10.f);    
+
+        if (iState != 1)
+        {
+            m_pAnimatorCom->Play("Run", true, true);
+            iState = 1;
+        }
+    }
+    else
+    {
+        if (iState != 0)
+        {
+            m_pAnimatorCom->Play("Wait", true, true);
+            iState = 0;
+        }
+    }
+
+    if (m_pGameInstance_Proxy->Key_Pressing(DIK_Z))
+    {
+        Update_Jump(fTimeDelta);
+    }
+
+    m_pAnimatorCom->Update(fTimeDelta);
 }
 
 void CKirby_Body::Late_Update(_float fTimeDelta)
@@ -65,11 +131,12 @@ HRESULT CKirby_Body::Render()
 
         if(FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_EyeTexture", i, MTEX_TYPE::UNKNOWN, 0)))
             return E_FAIL;
+        if(FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_EyeMaskTexture", i, MTEX_TYPE::UNKNOWN, 3)))
+            return E_FAIL;
+
         if(FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_SkinTexture", i, MTEX_TYPE::UNKNOWN, 1)))
             return E_FAIL;
         if(FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MouthTexture", i, MTEX_TYPE::UNKNOWN, 2)))
-            return E_FAIL;
-        if(FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_EyeMaskTexture", i, MTEX_TYPE::UNKNOWN, 3)))
             return E_FAIL;
         //if(FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_WetMaskTexture", i, MTEX_TYPE::UNKNOWN, 4)))
         //    return E_FAIL;
@@ -93,6 +160,20 @@ HRESULT CKirby_Body::Render()
     }
 
     return S_OK;
+}
+
+void CKirby_Body::Update_Jump(_float fTimeDelta)
+{
+    if (false == m_pGameInstance_Proxy->Key_Pressing(DIK_Z))
+        return;
+
+    const _float fJumpSpeed = 8.f;
+
+    _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+
+    vPos += XMVectorSet(0.f, fJumpSpeed * fTimeDelta, 0.f, 0.f);
+
+    m_pTransformCom->Set_State(STATE::POSITION, vPos);
 }
 
 HRESULT CKirby_Body::Ready_Components()
