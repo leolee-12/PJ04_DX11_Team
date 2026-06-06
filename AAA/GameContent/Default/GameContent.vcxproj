@@ -21,7 +21,6 @@
   <ItemGroup>
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\Public\Character.h" />
-    <ClInclude Include="..\Public\Character_States.h" />
     <ClInclude Include="..\Public\GameContent_AnimEvents.h" />
     <ClInclude Include="..\Public\GameContent_const.h" />
     <ClInclude Include="..\Public\GameContent_Defines.h" />
@@ -37,7 +36,6 @@
     <ClInclude Include="..\Public\GameObject_Factory.h" />
     <ClInclude Include="..\Public\Kirby.h" />
     <ClInclude Include="..\Public\Kirby_Body.h" />
-    <ClInclude Include="..\Public\Kirby_States.h" />
     <ClInclude Include="..\Public\LevelData.h" />
     <ClInclude Include="..\Public\Loader_Prototype.h" />
     <ClInclude Include="..\Public\MapSection.h" />

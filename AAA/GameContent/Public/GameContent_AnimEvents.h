@@ -14,11 +14,6 @@ namespace Client
         CamShake = 5,
         IFrame = 6,
         LockMove = 7,
-        
-        // 커비 설정용
-        SetEye = 8,
-        SetMouth = 9,
-        SetBody = 10,
         // 추가는 항상 끝에, 기존 값 변경 금지 (저장 데이터 안정성)
     };
 
@@ -33,8 +28,5 @@ namespace Client
         { EANIM_EVENT::CamShake, "CamShake" },
         { EANIM_EVENT::IFrame,   "IFrame"   },
         { EANIM_EVENT::LockMove, "LockMove" },
-        { EANIM_EVENT::SetEye,   "SetEye"   },
-        { EANIM_EVENT::SetMouth, "SetMouth" },
-        { EANIM_EVENT::SetBody,  "SetBody"  },
     };
 }

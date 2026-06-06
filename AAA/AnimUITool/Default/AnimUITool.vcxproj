@@ -33,7 +33,6 @@
     <ClCompile Include="..\Private\Panel_UICanvas.cpp" />
     <ClCompile Include="..\Private\Panel_Viewport.cpp" />
     <ClCompile Include="..\Private\Preview_Actor.cpp" />
-    <ClCompile Include="..\Private\Preview_Kirby.cpp" />
     <ClCompile Include="..\ThirdParty\ImGui\Src\imgui.cpp" />
     <ClCompile Include="..\ThirdParty\ImGui\Src\ImGuizmo.cpp" />
     <ClCompile Include="..\ThirdParty\ImGui\Src\imgui_demo.cpp" />
@@ -50,6 +49,7 @@
     <ClInclude Include="..\Public\AnimUITool_Enum.h" />
     <ClInclude Include="..\Public\AnimUITool_Func.h" />
     <ClInclude Include="..\Public\AnimUITool_Struct.h" />
+    <ClInclude Include="..\Public\Anim_Context.h" />
     <ClInclude Include="..\Public\EditCamera.h" />
     <ClInclude Include="..\Public\Edit_Grid.h" />
     <ClInclude Include="..\Public\Level_Tool.h" />
@@ -63,7 +63,6 @@
     <ClInclude Include="..\Public\Panel_UICanvas.h" />
     <ClInclude Include="..\Public\Panel_Viewport.h" />
     <ClInclude Include="..\Public\Preview_Actor.h" />
-    <ClInclude Include="..\Public\Preview_Kirby.h" />
     <ClInclude Include="AnimUITool.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Resource.h" />

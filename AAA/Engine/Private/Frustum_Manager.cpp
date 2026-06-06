@@ -1,6 +1,8 @@
 #include "Frustum_Manager.h"
 #include "Culling_Util.h"
 
+#include "GameInstance.h"
+#include "GameInstance_Proxy.h"
 #include <cmath>
 
 NS_BEGIN(Engine)
@@ -55,6 +57,7 @@ namespace
 }
 
 CFrustum_Manager::CFrustum_Manager()
+	: m_pProxy(CGameInstance::GetProxy())
 {
 }
 
@@ -67,18 +70,25 @@ HRESULT CFrustum_Manager::Initialize()
 	return S_OK;
 }
 
-void CFrustum_Manager::Update(const _float4x4* pMatView, const _float4x4* pMatProj)
+void CFrustum_Manager::Update()
 {
 #ifdef _DEBUG
 	Reset_Stats();
 #endif
 
+	// Main_Camera
 	CULLING_VIEW_DESC MainViewDesc{};
-	MainViewDesc.pView = pMatView;
-	MainViewDesc.pProj = pMatProj;
+	MainViewDesc.pView = m_pProxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC);
+	MainViewDesc.pProj = m_pProxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
 	MainViewDesc.fCullMargin = 0.f;
-
 	Update_View(CULLING_VIEW::MAIN_CAMERA, MainViewDesc);
+
+	// Shadow_Dir
+	CULLING_VIEW_DESC ShadowViewDesc{};
+	ShadowViewDesc.pView = m_pProxy->Get_Shadow_Transform(D3DTS::VIEW);
+	ShadowViewDesc.pProj = m_pProxy->Get_Shadow_Transform(D3DTS::PROJ);
+	ShadowViewDesc.fCullMargin = 0.f;
+	Update_View(CULLING_VIEW::SHADOW_DIR, ShadowViewDesc);
 }
 
 _bool CFrustum_Manager::Update_View(CULLING_VIEW eView, const CULLING_VIEW_DESC& Desc)
@@ -255,6 +265,10 @@ CFrustum_Manager* CFrustum_Manager::Create()
 void CFrustum_Manager::Free()
 {
 	Invalidate_All();
+
+	Safe_Release(m_pProxy);
+
+	__super::Free();
 }
 
 NS_END

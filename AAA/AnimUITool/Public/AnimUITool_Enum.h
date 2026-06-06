@@ -17,17 +17,6 @@ namespace AnimUITool
         NONANIM_MESH,
         END
     };
-
-    enum class UI_DRAG_MODE
-    {
-        NONE,
-        MOVE,
-        RESIZE_TL,
-        RESIZE_TR,
-        RESIZE_BL,
-        RESIZE_BR,
-        END
-    };
 }
 
 #endif // AnimUITool_Enum_h__

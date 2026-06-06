@@ -103,6 +103,14 @@ private:
 	HRESULT  Ready_MapStage();
 	HRESULT  Ready_EnvObjects();
 
+private:
+	static void On_EnvObjectCreated(
+		void* pContext,
+		CGameObject* pObject,
+		const wstring& strPrototypeTag,
+		const wstring& strLayerTag,
+		const wstring& strObjectTag);
+
 public:
 	static CLevel_Edit* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void Free() override;
