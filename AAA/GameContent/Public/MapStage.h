@@ -27,6 +27,10 @@ public:
 	const MAP_STAGE_PROFILE& Get_Profile() const { return m_Profile; }
 #endif
 
+public:
+	virtual json Serialize() const override;
+	virtual void Deserialize(const json& j) override;
+
 private:
 	vector<CMapSection*>	m_Sections;
 	_wstring				m_strProtoTag = { PROTOTYPE_TAG };

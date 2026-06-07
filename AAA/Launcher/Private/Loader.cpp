@@ -3,6 +3,8 @@
 #include "GameInstance.h"
 #include "GameObject_Factory.h"
 #include "DataLoader.h"
+#include "Map_Loader.h"
+#include "Launcher_MapProfiles.h"
 #include <set>
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -146,6 +148,15 @@ HRESULT CLoader::Ready_Resources_For_Lobby()
 
 HRESULT CLoader::Ready_Resources_For_GamePlay()
 {
+    Add_Work([this]() -> HRESULT
+        {
+            return Client::CMap_Loader::Preload_Map(
+                m_pDevice,
+                m_pContext,
+                Client::LAUNCHER_MAP_PROFILES::GAMEPLAY_STAGE1_1_MANIFEST,
+                ETOUI(LEVEL::GAMEPLAY));
+        });
+
     string strContent;
     CDataLoader::Read_Json(L"../../Resources/LevelData/GamePlay.JSON", &strContent);
     json jLevel = json::parse(strContent);

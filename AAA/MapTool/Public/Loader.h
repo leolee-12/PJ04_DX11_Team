@@ -30,6 +30,10 @@ public:
 	{
 		return m_iTotalWorkCount ? (_float)m_iFinishedWorkCount.load() / (_float)m_iTotalWorkCount : 1.f;
 	}
+	_uint   Get_FailedWorkCount() const
+	{
+		return m_iFailedWorkCount.load();
+	}
 
 #ifdef _DEBUG
 public:
@@ -50,11 +54,13 @@ private:
 	atomic<_uint>			m_iFinishedWorkCount = { 0 };
 
 	_tchar					m_szLoadingText[MAX_PATH] = {};
+	atomic<_uint>			m_iFailedWorkCount = { 0 };
 
 private:
 	void	Add_Work(function<HRESULT()>&& func);
-	HRESULT Ready_WorkQueue();
-	HRESULT Ready_Resources_For_Edit();
+	HRESULT	Ready_WorkQueue();
+	HRESULT	Ready_Resources_For_Edit();
+	HRESULT	Ready_TexPool_For_Edit();
 
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TOOL_LEVEL eNextLevelID);

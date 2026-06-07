@@ -3,6 +3,8 @@
 #include "GameInstance.h"
 #include "Camera_Free.h"
 #include "Loader_Prototype.h"
+#include "Map_Loader.h"
+#include "Launcher_MapProfiles.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel { pDevice, pContext }
@@ -13,6 +15,18 @@ HRESULT CLevel_GamePlay::Initialize()
 {
     if (FAILED(__super::Initialize()))
         return E_FAIL;
+
+    Client::MAP_LOAD_REPORT MapReport{};
+    Client::CMapStage* pMapStage = nullptr;
+
+    if (FAILED(Client::CMap_Loader::Spawn_Map(
+        Client::LAUNCHER_MAP_PROFILES::GAMEPLAY_STAGE1_1_MANIFEST,
+        ETOUI(LEVEL::GAMEPLAY),
+        &MapReport,
+        &pMapStage)))
+    {
+        return E_FAIL;
+    }
 
     if (FAILED(Load_Level(m_pGameInstance_Proxy, m_pDevice, m_pContext,
         L"../../Resources/LevelData/GamePlay.JSON", ETOUI(LEVEL::GAMEPLAY))))

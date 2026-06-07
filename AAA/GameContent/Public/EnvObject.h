@@ -11,6 +11,12 @@ NS_BEGIN(Client)
 
 class CLIENT_DLL CEnvObject abstract : public CGameObject
 {
+	GENERATED_BODY_ABSTRACT(CEnvObject)
+
+	PROPERTY(_bool, m_bRenderable,    L"Renderable",     L"EnvObject")
+	PROPERTY(_bool, m_bEnableCulling, L"Enable Culling", L"EnvObject")
+	PROPERTY(_bool, m_bCastShadow,    L"Cast Shadow",    L"EnvObject")
+
 public:
 	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_EnvObject";
 
@@ -47,9 +53,6 @@ protected:
 	CModel*			m_pModelCom = { nullptr };
 	BoundingBox		m_LocalBounds = {};
 	BoundingBox		m_WorldBounds = {};
-	_bool			m_bRenderable = { true };
-	_bool			m_bEnableCulling = { true };
-	_bool			m_bCastShadow = { false };
 	_bool			m_bVisible = { true };
 	_bool			m_bVisibleShadow = { true };
 	_bool			m_bDebugDraw = { false };
