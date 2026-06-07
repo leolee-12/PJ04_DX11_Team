@@ -16,6 +16,8 @@ HRESULT CKirby_StateMachine::Initialize(CKirby* pKirby)
     if (m_pKirby == nullptr)
         return E_FAIL;
 
+    Change_State(KIRBY_STATE_TYPE::WAIT);
+
     return S_OK;
 }
 
@@ -26,14 +28,14 @@ KIRBY_STATE_TYPE CKirby_StateMachine::Get_StateType()
 
 void CKirby_StateMachine::Change_State(KIRBY_STATE_TYPE eNewstate)
 {
-    if (m_pCurState == nullptr)
+    if (m_pCurState && m_pCurState->Get_StateType() == eNewstate)
         return;
 
-    if (m_pCurState->Get_StateType() == eNewstate)
-        return;
-
-    m_pCurState->End(m_pKirby);
-    Safe_Release(m_pCurState);
+    if(m_pCurState != nullptr)
+    {
+        m_pCurState->Exit(m_pKirby);
+        Safe_Release(m_pCurState);
+    }
 
     m_pCurState = State_Creator(eNewstate);
 

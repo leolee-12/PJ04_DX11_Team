@@ -518,9 +518,6 @@
     <ClCompile Include="..\Private\Kirby_State.cpp">
       <Filter>05. Kirby\01. StateMachine\State</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Kirby.cpp">
-      <Filter>05. Kirby</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Kirby_StateMachine.cpp">
       <Filter>05. Kirby\01. StateMachine</Filter>
     </ClCompile>
@@ -529,6 +526,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Run.cpp">
       <Filter>05. Kirby\01. StateMachine\State\01. Run</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby.cpp">
+      <Filter>05. Kirby</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

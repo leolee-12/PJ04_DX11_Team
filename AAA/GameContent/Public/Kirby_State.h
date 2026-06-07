@@ -34,7 +34,7 @@ public:
 public:
 	virtual void Enter(CKirby* pKirby);
 	virtual void Update(CKirby* pKirby, const _float fTimeDelta);
-	virtual void End(CKirby* pKirby);
+	virtual void Exit(CKirby* pKirby);
 
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand);

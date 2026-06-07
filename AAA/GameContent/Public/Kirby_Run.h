@@ -26,7 +26,7 @@ public:
 public:
 	virtual void Enter(CKirby* pKirby) override;
 	virtual void Update(CKirby* pKirby, const _float fTimeDelta) override;
-	virtual void End(CKirby* pKirby) override;
+	virtual void Exit(CKirby* pKirby) override;
 
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;

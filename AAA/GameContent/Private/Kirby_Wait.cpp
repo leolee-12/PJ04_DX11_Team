@@ -25,14 +25,14 @@ void CKirby_Wait::Update(CKirby* pKirby, const _float fTimeDelta)
 {
 }
 
-void CKirby_Wait::End(CKirby* pKirby)
+void CKirby_Wait::Exit(CKirby* pKirby)
 {
 }
 
 _bool CKirby_Wait::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
-    __super::Handle_Command(pKirby, pCommand);
-
+    if(__super::Handle_Command(pKirby, pCommand) == true);
+        return true;
 
 
     return true;

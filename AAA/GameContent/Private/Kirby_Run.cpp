@@ -25,7 +25,7 @@ void CKirby_Run::Update(CKirby* pKirby, const _float fTimeDelta)
 {
 }
 
-void CKirby_Run::End(CKirby* pKirby)
+void CKirby_Run::Exit(CKirby* pKirby)
 {
 }
 
