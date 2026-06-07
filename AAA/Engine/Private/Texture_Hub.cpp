@@ -138,7 +138,7 @@ _bool CTexture_Hub::Is_CompatibleDevice(ID3D11Device* pDevice) const
 	return nullptr != pDevice && pDevice == m_pDevice;
 }
 
-CTexture_Hub::TEXTURE_HUB_STATS CTexture_Hub::Get_Stats() const
+TEXTURE_HUB_STATS CTexture_Hub::Get_Stats() const
 {
 	shared_lock<shared_mutex> Lock(m_Mutex);
 

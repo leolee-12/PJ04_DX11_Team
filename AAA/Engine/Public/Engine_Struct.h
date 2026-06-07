@@ -80,17 +80,25 @@ namespace Engine
 		XMFLOAT4 vGridParams;   
 	}FROXEL_CB;
 
+	typedef struct tagMeshLayerIdx
+	{
+		unsigned int  idx[MTEX_TYPE_MAX] = { 0 };   // MTEX_TYPE º° slotArrayIndex
+	}MESH_LAYER_IDX;
+
+	struct TEXTURE_HUB_STATS
+	{
+		unsigned int iUniqueTextureCount = {};
+		unsigned int iCacheHitCount = {};
+		unsigned int iCacheMissCount = {};
+		unsigned int iLoadFailureCount = {};
+	};
+
 	struct CULLING_VIEW_DESC
 	{
 		const XMFLOAT4X4*	pView = { nullptr };
 		const XMFLOAT4X4*	pProj = { nullptr };
 		float				fCullMargin = { 0.f };
 	};
-
-	typedef struct tagMeshLayerIdx
-	{
-		unsigned int  idx[MTEX_TYPE_MAX] = { 0 };   // MTEX_TYPE º° slotArrayIndex
-	}MESH_LAYER_IDX;
 
 #ifdef _DEBUG
 	struct FRUSTUM_CULLING_STATS

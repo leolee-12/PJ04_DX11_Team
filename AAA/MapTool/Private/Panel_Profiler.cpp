@@ -62,6 +62,13 @@ void CPanel_Profiler::Render()
     ImGui::Separator();
     ImGui::Text("Map Culling: %.3f ms", Frame.dMapCullingCpuMs);
 
+    ImGui::Separator();
+    ImGui::Text("Texture Hub: unique %u / hit %u / miss %u / raw fail %u",
+        Frame.iTextureHubUnique,
+        Frame.iTextureHubHit,
+        Frame.iTextureHubMiss,
+        Frame.iTextureHubRawFail);
+
     End_Panel();
 }
 

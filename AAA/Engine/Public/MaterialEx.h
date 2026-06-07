@@ -14,6 +14,7 @@ private:
 public:
     HRESULT Initialize(const MATERIAL_DATA& data, const _char* pModelFilePath);
     HRESULT Bind_ShaderResource(CShader* pShader, const _char* pConstantName, MTEX_TYPE eTexType, _uint iIndex);
+    _uint   Get_TextureCount(MTEX_TYPE eType) const;
 
 private:
     CGameInstance_Proxy*    m_pProxy = { nullptr };

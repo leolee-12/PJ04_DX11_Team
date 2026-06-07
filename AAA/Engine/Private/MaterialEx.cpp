@@ -133,6 +133,14 @@ HRESULT CMaterialEx::Bind_ShaderResource(CShader* pShader, const _char* pConstan
 		m_MaterialHandles[iType][iIndex]);
 }
 
+_uint CMaterialEx::Get_TextureCount(MTEX_TYPE eType) const
+{
+	const _uint iType = ETOUI(eType);
+	return (iType < MTEX_TYPE_MAX)
+		? static_cast<_uint>(m_MaterialHandles[iType].size())
+		: 0u;
+}
+
 CMaterialEx* CMaterialEx::Create(const MATERIAL_DATA& data, const _char* pModelFilePath)
 {
 	CMaterialEx* pInstance = new CMaterialEx();

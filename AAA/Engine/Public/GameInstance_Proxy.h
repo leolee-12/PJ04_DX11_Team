@@ -246,6 +246,7 @@ public:
   public:
       HRESULT LoadOrGet_TextureFromHub(const _tchar* pTexturePath, TEXTURE_HANDLE* pOutHandle);
       HRESULT Bind_TextureFromHub(class CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle);
+      TEXTURE_HUB_STATS Get_TextureHubStats() const;
 #pragma endregion
 
 private:

@@ -4,6 +4,8 @@
 
 #include "EnvObject.h"
 
+#include "GameInstance.h"
+
 IMPLEMENT_SINGLETON(CMapToolProfiler)
 
 void CMapToolProfiler::Set_Stage(Client::CMapStage* pStage)
@@ -46,6 +48,19 @@ void CMapToolProfiler::Capture_Frame()
         return;
 
     MAPTOOL_PROFILE_FRAME Frame{};
+
+    CGameInstance_Proxy* pProxy = CGameInstance::GetProxy();
+    if (nullptr != pProxy)
+    {
+        const TEXTURE_HUB_STATS Stats = pProxy->Get_TextureHubStats();
+
+        Frame.iTextureHubUnique = Stats.iUniqueTextureCount;
+        Frame.iTextureHubHit = Stats.iCacheHitCount;
+        Frame.iTextureHubMiss = Stats.iCacheMissCount;
+        Frame.iTextureHubRawFail = Stats.iLoadFailureCount;
+
+        Safe_Release(pProxy);
+    }
 
     if (nullptr != m_pStage)
     {

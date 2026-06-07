@@ -11,6 +11,8 @@ NS_BEGIN(Client)
 
 namespace
 {
+	constexpr _bool ENABLE_ENV_OBJECT_SHADOW = false;
+
 	_matrix Build_WorldMatrix_FromTRS(const ENV_OBJECT_DESC& Desc)
 	{
 		const _vector vScale = XMLoadFloat3(&Desc.vScale);
@@ -225,6 +227,7 @@ void CEnvObject::Refresh_WorldBounds()
 
 void CEnvObject::Check_Visible()
 {
+
 	if (!m_bRenderable || !Has_RenderModel())
 	{
 		m_bVisible = false;
@@ -232,22 +235,24 @@ void CEnvObject::Check_Visible()
 		return;
 	}
 
+	const _bool bEnableShadow = ENABLE_ENV_OBJECT_SHADOW && m_bCastShadow;
+
 	if (nullptr == m_pGameInstance_Proxy)
 	{
 		m_bVisible = true;
-		m_bVisibleShadow = m_bCastShadow;
+		m_bVisibleShadow = bEnableShadow;
 		return;
 	}
 
 	if (!m_bEnableCulling)
 	{
 		m_bVisible = true;
-		m_bVisibleShadow = m_bCastShadow;
+		m_bVisibleShadow = bEnableShadow;
 		return;
 	}
 
 	m_bVisible = !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, m_bEnableCulling, m_WorldBounds);
-	m_bVisibleShadow = m_bCastShadow && !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_bEnableCulling, m_WorldBounds);
+	m_bVisibleShadow = bEnableShadow && !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_bEnableCulling, m_WorldBounds);
 }
 
 void CEnvObject::Apply_TransformFromDesc()

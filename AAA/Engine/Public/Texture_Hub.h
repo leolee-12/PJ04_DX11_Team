@@ -7,15 +7,6 @@ class CShader;
 
 class ENGINE_DLL CTexture_Hub final : public CBase
 {
-public:
-	struct TEXTURE_HUB_STATS
-	{
-		_uint iUniqueTextureCount = {};
-		_uint iCacheHitCount = {};
-		_uint iCacheMissCount = {};
-		_uint iLoadFailureCount = {};
-	};
-
 private:
 	explicit CTexture_Hub(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CTexture_Hub() = default;

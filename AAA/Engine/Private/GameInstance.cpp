@@ -600,6 +600,14 @@ HRESULT CGameInstance::Bind_TextureFromHub(CShader* pShader, const _char* pConst
 
     return m_pTexture_Hub->Bind_ShaderResource(pShader, pConstantName, Handle);
 }
+
+TEXTURE_HUB_STATS CGameInstance::Get_TextureHubStats() const
+{
+    if (nullptr == m_pTexture_Hub)
+        return {};
+
+    return m_pTexture_Hub->Get_Stats();
+}
 #pragma endregion
 
 #pragma region PHYSIX_MANAGER

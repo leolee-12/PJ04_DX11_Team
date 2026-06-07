@@ -392,9 +392,22 @@ void CModel::Set_MeshLayer(_uint iMesh, const MESH_LAYER_IDX& v)
 _uint CModel::Get_MeshTextureCount(_uint iMesh, MTEX_TYPE eType) const
 {
     if (iMesh >= m_iNumMeshes) return 0u;
-    _uint mat = m_Meshes[iMesh]->Get_MaterialIndex();
-    if (mat >= m_iNumMaterials) return 0u;
-    return m_Materials[mat]->Get_TextureCount(eType);
+
+    const _uint iMaterialIndex = m_Meshes[iMesh]->Get_MaterialIndex();
+    if (iMaterialIndex >= m_iNumMaterials) return 0u;
+
+    if (m_bUseMaterialEx)
+    {
+        if (iMaterialIndex >= m_MaterialsEx.size() || nullptr == m_MaterialsEx[iMaterialIndex])
+            return 0u;
+
+        return m_MaterialsEx[iMaterialIndex]->Get_TextureCount(eType);
+    }
+
+    if (iMaterialIndex >= m_Materials.size() || nullptr == m_Materials[iMaterialIndex])
+        return 0u;
+
+    return m_Materials[iMaterialIndex]->Get_TextureCount(eType);
 }
 
 HRESULT CModel::Save_MeshLayers() const
@@ -505,6 +518,10 @@ HRESULT CModel::Ready_NonAnimEx(const _char* pModelFilePath, _fmatrix PreTransfo
 
     if (FAILED(Ready_Meshes(modelData.Meshes, PreTransformMatrix)))
         return E_FAIL;
+
+    if (MODEL::MAP == m_eType)
+        if (FAILED(Cook_CollisionMesh(modelData.Meshes, PreTransformMatrix)))
+            return E_FAIL;
 
     if (FAILED(Ready_MaterialsEx(modelData.Materials, pModelFilePath)))
         return E_FAIL;

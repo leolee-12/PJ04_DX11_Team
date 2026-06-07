@@ -6,6 +6,11 @@
 
 NS_BEGIN(Client)
 
+namespace
+{
+	constexpr _bool ENABLE_MAP_SECTION_SHADOW = false;
+}
+
 CMapStage::CMapStage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject { pDevice, pContext }
 {
@@ -35,8 +40,6 @@ HRESULT CMapStage::Initialize(void* pArg)
 
 	m_strStageName = pDesc->strStageName;
 	m_iSectionProtoLevel = pDesc->iSectionProtoLevel;
-	//m_pTransformCom->Rotation(
-	//	XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(180.f)));
 
 	if (FAILED(Ready_Sections(pDesc)))
 		return E_FAIL;
@@ -66,19 +69,6 @@ void CMapStage::Late_Update(_float fTimeDelta)
 	m_Profile.dCullingCpuMs =
 		std::chrono::duration<double, std::milli>(CullingEnd - CullingBegin).count();
 #endif
-}
-
-CGameObject* CMapStage::Clone(void* pArg)
-{
-	CMapStage* pInstance = new CMapStage(*this);
-
-	if (FAILED(pInstance->Initialize(pArg)))
-	{
-		MSG_BOX("Failed to Cloned : CMapStage");
-		Safe_Release(pInstance);
-	}
-
-	return pInstance;
 }
 
 void CMapStage::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
@@ -188,6 +178,9 @@ void CMapStage::Submit_VisibleSections()
 #endif
 		}
 
+		if (!ENABLE_MAP_SECTION_SHADOW)
+			continue;
+
 		if (!pSection->Is_ShadowCaster())
 			continue;
 
@@ -241,6 +234,19 @@ CMapStage* CMapStage::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CMapStage");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CGameObject* CMapStage::Clone(void* pArg)
+{
+	CMapStage* pInstance = new CMapStage(*this);
+
+	if (FAILED(pInstance->Initialize(pArg)))
+	{
+		MSG_BOX("Failed to Cloned : CMapStage");
 		Safe_Release(pInstance);
 	}
 

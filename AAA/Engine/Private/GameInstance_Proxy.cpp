@@ -851,7 +851,16 @@ HRESULT CGameInstance_Proxy::Bind_TextureFromHub(CShader* pShader, const _char* 
 
 	return m_pOwner->Bind_TextureFromHub(pShader, pConstantName, Handle);
 }
+
+TEXTURE_HUB_STATS CGameInstance_Proxy::Get_TextureHubStats() const
+{
+	if (!IsConnected())
+		return {};
+
+	return m_pOwner->Get_TextureHubStats();
+}
 #pragma endregion
+
 #pragma region PHYSIX_MANAGER
 PxTriangleMesh* CGameInstance_Proxy::Cook_TriangleMesh(const _float3* p, _uint nv, const _uint* idx, _uint ni, _bool bFlip)
 {
