@@ -17,8 +17,10 @@
 #include "GameContent_AnimEvents.h"
 #include "Effect_Container.h"
 #include "Effect_Part.h"
-#include "MapDescriptor.h"
+#include "Map_EditHelper.h"
 #include "MapStage.h"
+#include "MapObject.h"
+#include "EnvObject.h"
 
 IMPLEMENT_SINGLETON(CImGui_Manager)
 
@@ -31,6 +33,31 @@ static const char* TexTypeName(_uint t)
         "Transmission","MayaBase","MayaSpecular","MayaSpecColor","MayaSpecRough","Anisotropy"
     };
     return (t < MTEX_TYPE_MAX) ? names[t] : "?";
+}
+
+static int ToMapRenderGroupIndex(RENDERID eRenderID)
+{
+    return (eRenderID == RENDERID::BLEND) ? 1 : 0;
+}
+
+static RENDERID FromMapRenderGroupIndex(int iIndex)
+{
+    return (iIndex == 1) ? RENDERID::BLEND : RENDERID::NONBLEND;
+}
+
+static int FindExactMeshNameIndex(CModel* pModel, const string& strMeshName)
+{
+    if (nullptr == pModel || strMeshName.empty())
+        return -1;
+
+    const size_t iNumMeshes = pModel->Get_NumMeshes();
+    for (size_t i = 0; i < iNumMeshes; ++i)
+    {
+        if (pModel->Get_MeshName(static_cast<_uint>(i)) == strMeshName)
+            return static_cast<int>(i);
+    }
+
+    return -1;
 }
 
 CImGui_Manager::CImGui_Manager()
@@ -256,22 +283,22 @@ void CImGui_Manager::Draw_Toolbar()
 
     ImGui::SameLine();
 
-    CMapDescriptor* pMapDescriptor = CMapDescriptor::GetInstance();
-
-    const _uint iMapPreviewPresetCount = pMapDescriptor->Get_MapPresetCount();
+    const _uint iMapPreviewPresetCount = CMap_EditHelper::Get_MapPresetCount();
     static _int s_iMapPreviewPreset = 0;
     if (0 < iMapPreviewPresetCount)
     {
-        if (s_iMapPreviewPreset < 0 || static_cast<_uint>(s_iMapPreviewPreset) >= iMapPreviewPresetCount)
+        if (s_iMapPreviewPreset < 0 || static_cast<_uint>(s_iMapPreviewPreset) >=
+            iMapPreviewPresetCount)
             s_iMapPreviewPreset = 0;
 
         ImGui::SetNextItemWidth(100.f);
-        if (ImGui::BeginCombo("##MapPreviewPreset", pMapDescriptor->Get_MapPresetLabel(static_cast<_uint>(s_iMapPreviewPreset))))
+        if (ImGui::BeginCombo("##MapPreviewPreset",
+            CMap_EditHelper::Get_MapPresetLabel(static_cast<_uint>(s_iMapPreviewPreset))))
         {
             for (_uint i = 0; i < iMapPreviewPresetCount; ++i)
             {
                 const _bool bSelected = (static_cast<_uint>(s_iMapPreviewPreset) == i);
-                if (ImGui::Selectable(pMapDescriptor->Get_MapPresetLabel(i), bSelected))
+                if (ImGui::Selectable(CMap_EditHelper::Get_MapPresetLabel(i), bSelected))
                     s_iMapPreviewPreset = static_cast<_int>(i);
                 if (bSelected)
                     ImGui::SetItemDefaultFocus();
@@ -801,8 +828,11 @@ void CImGui_Manager::Draw_Inspector()
                 // 섹션의 로컬 트랜스폼 (스테이지 부모행렬과 Late_Update에서 합성됨)
                 Draw_Transform(pSection, strName);
                 ImGui::Separator();
-                Draw_Properties(pSection);   // CMapObject의 Normal Strength / UV Scale / Top Projection 등
-
+                Draw_Properties(pSection);
+                ImGui::Separator();
+                Draw_MeshLayerPanel(pSection);
+                ImGui::Separator();
+                Draw_MapSectionRenderOptions(pSection);
                 ImGui::PopID();
             }
             ImGui::Separator();
@@ -1395,7 +1425,7 @@ void CImGui_Manager::Draw_MeshLayerPanel(CGameObject* pObj)
     if (nullptr == pObj) return;
     CModel* pModel = pObj->Get_Component<CModel>(L"Com_Model");
     if (nullptr == pModel) return;
-    if (!ImGui::CollapsingHeader("Mesh Texture Layers")) return;
+    if (!ImGui::CollapsingHeader("Mesh Render Settings (per Model)")) return;
 
     size_t n = pModel->Get_NumMeshes();
     for (size_t i = 0; i < n; ++i)
@@ -1406,6 +1436,19 @@ void CImGui_Manager::Draw_MeshLayerPanel(CGameObject* pObj)
 
         bool changed = false;
         bool bAnyField = false;
+
+        int iPass = L.iPass;
+        ImGui::SetNextItemWidth(120.f);
+        if (ImGui::InputInt("Pass", &iPass))
+        {
+            if (iPass < -1)
+                iPass = -1;
+
+            L.iPass = iPass;
+            changed = true;
+        }
+        ImGui::SameLine();
+        ImGui::TextDisabled("(-1 = default)");
 
         for (_uint t = 0; t < MTEX_TYPE_MAX; ++t)
         {
@@ -1425,7 +1468,7 @@ void CImGui_Manager::Draw_MeshLayerPanel(CGameObject* pObj)
             ImGui::SameLine(); ImGui::Text("/ %d", count);
         }
         if (!bAnyField)
-            ImGui::TextDisabled("  (single-texture mesh)");
+            ImGui::TextDisabled("  (no texture slot override)");
 
         if (changed) pModel->Set_MeshLayer((_uint)i, L);
         ImGui::Separator();
@@ -1434,6 +1477,21 @@ void CImGui_Manager::Draw_MeshLayerPanel(CGameObject* pObj)
 
     if (ImGui::Button("Bake (Save sidecar)"))
         pModel->Save_MeshLayers();
+}
+
+void CImGui_Manager::Draw_MapSectionRenderOptions(CMapSection* pSection)
+{
+    if (nullptr == pSection)
+        return;
+
+    if (!ImGui::CollapsingHeader("Render Group (per Section)", ImGuiTreeNodeFlags_DefaultOpen))
+        return;
+
+    int iRenderGroup = ToMapRenderGroupIndex(pSection->Get_RenderID());
+    const char* RenderGroups[] = { "NONBLEND", "BLEND" };
+
+    if (ImGui::Combo("Render Group", &iRenderGroup, RenderGroups, IM_ARRAYSIZE(RenderGroups)))
+        pSection->Set_RenderID(FromMapRenderGroupIndex(iRenderGroup));
 }
 
 void CImGui_Manager::Free()

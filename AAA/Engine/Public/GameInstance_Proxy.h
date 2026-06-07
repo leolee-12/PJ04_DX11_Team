@@ -241,7 +241,12 @@ public:
       void  Render_PhysXDebug(_fmatrix ViewMatrix, _fmatrix ProjMatrix);
 #pragma endregion
 
-
+#pragma region TEXTURE_HUB
+  public:
+      HRESULT LoadOrGet_TextureFromHub(const _tchar* pTexturePath, TEXTURE_HANDLE* pOutHandle);
+      HRESULT Bind_TextureFromHub(class CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle);
+      TEXTURE_HUB_STATS Get_TextureHubStats() const;
+#pragma endregion
 
 private:
     CGameInstance* m_pOwner = { nullptr };

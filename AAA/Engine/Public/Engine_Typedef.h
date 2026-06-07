@@ -11,6 +11,7 @@ namespace Engine
 
 
 	typedef		wchar_t						_tchar;
+	typedef		string						_string;
 	typedef		wstring						_wstring;
 	
 	typedef		signed short				_short;
@@ -38,6 +39,9 @@ namespace Engine
 	typedef		XMMATRIX					_matrix;
 	typedef		FXMMATRIX					_fmatrix;
 	typedef		CXMMATRIX					_cmatrix;
+
+	typedef		unsigned int				TEXTURE_HANDLE;
+	inline constexpr TEXTURE_HANDLE INVALID_TEXTURE_HANDLE = { static_cast<TEXTURE_HANDLE>(-1) };
 }
 
 #endif // Engine_Typedef_h__

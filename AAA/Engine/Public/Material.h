@@ -23,7 +23,7 @@ public:
 private:
 	ID3D11Device* m_pDevice = { nullptr };
 	ID3D11DeviceContext* m_pContext = { nullptr };
-	vector<ID3D11ShaderResourceView*>			m_Materials[27];
+	vector<ID3D11ShaderResourceView*>	m_Materials[MTEX_TYPE_MAX];
 
 public:
 	static CMaterial* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const MATERIAL_DATA& data, const _char* pModelFilePath);

@@ -252,7 +252,7 @@ technique11 DefaultTechnique
 
     pass WhitePass // 2
     {
-        SetRasterizerState(RS_Decal);
+        SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
