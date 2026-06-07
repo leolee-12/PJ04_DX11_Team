@@ -151,18 +151,38 @@ HRESULT CEnvObject::Render()
 
 	const size_t iNumMeshes = m_pModelCom->Get_NumMeshes();
 
+	// white
+	//for (size_t i = 0; i < iNumMeshes; ++i)
+	//{
+	//	if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", static_cast<_uint>(i), MTEX_TYPE::DIFFUSE, 0)))
+	//		int a = 1;/*continue;*/
+	//	if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", static_cast<_uint>(i), MTEX_TYPE::NORMALS, 0)))
+	//		int a = 1;/*continue;*/
+	//	if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", static_cast<_uint>(i), MTEX_TYPE::METALNESS, 0)))
+	//		int a = 1;/*continue;*/
+	//	if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnkownTexture", static_cast<_uint>(i), MTEX_TYPE::UNKNOWN, 0)))
+	//		int a = 1;/*continue;*/
+	//
+	//	if (FAILED(m_pShaderCom->Begin(1)))
+	//		return E_FAIL;
+	//
+	//	if (FAILED(m_pModelCom->Render(static_cast<_uint>(i))))
+	//		return E_FAIL;
+	//}
+
+	// default
 	for (size_t i = 0; i < iNumMeshes; ++i)
 	{
 		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", static_cast<_uint>(i), MTEX_TYPE::DIFFUSE, 0)))
-			int a = 1;/*continue;*/
+			continue;
 		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", static_cast<_uint>(i), MTEX_TYPE::NORMALS, 0)))
-			int a = 1;/*continue;*/
+			continue;
 		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", static_cast<_uint>(i), MTEX_TYPE::METALNESS, 0)))
-			int a = 1;/*continue;*/
+			continue;
 		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnkownTexture", static_cast<_uint>(i), MTEX_TYPE::UNKNOWN, 0)))
-			int a = 1;/*continue;*/
+			continue;
 
-		if (FAILED(m_pShaderCom->Begin(1)))
+		if (FAILED(m_pShaderCom->Begin(0)))
 			return E_FAIL;
 
 		if (FAILED(m_pModelCom->Render(static_cast<_uint>(i))))
