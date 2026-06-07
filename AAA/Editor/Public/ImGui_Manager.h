@@ -46,6 +46,7 @@ private:
 	void Draw_AnimatorEditor(CModel* pModel, CAnimator* pAnimator);
 	
 	void Draw_ShaderGlobals();
+	void Draw_MeshLayerPanel(CGameObject* pObj);
 
 public:
 	virtual void Free() override;

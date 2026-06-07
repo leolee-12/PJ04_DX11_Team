@@ -29,7 +29,7 @@ public:
 	virtual void End(CKirby* pKirby) override;
 
 public:
-	virtual _bool Handle_Command(CKirby* pKirby, const CKirby_Command& Command) override;
+	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
 public:
 	static CKirby_Run* Create();

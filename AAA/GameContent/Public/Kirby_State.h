@@ -37,7 +37,7 @@ public:
 	virtual void End(CKirby* pKirby);
 
 public:
-	virtual _bool Handle_Command(CKirby* pKirby, const CKirby_Command& Command);
+	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand);
 
 protected:
 	virtual void Free() override;

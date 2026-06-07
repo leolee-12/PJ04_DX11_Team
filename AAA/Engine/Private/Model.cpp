@@ -5,7 +5,10 @@
 #include "Bone.h"
 #include "Animation.h"
 #include "Animator.h"
+#include <fstream>
 
+#include "GameInstance.h"
+#include "PhysX_Manager.h"
 
 CModel::CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent { pDevice, pContext }
@@ -21,7 +24,9 @@ CModel::CModel(const CModel& Prototype)
     , m_Materials{ Prototype.m_Materials }
     , m_PreTransformMatrix{ Prototype.m_PreTransformMatrix }
     , m_iNumAnimations{ Prototype.m_iNumAnimations }
-{
+    , m_MeshLayers{ Prototype.m_MeshLayers }
+    , m_strMeshLayerPath{ Prototype.m_strMeshLayerPath }
+{   
     for (auto& pPrototypeAnimation : Prototype.m_Animations)
         m_Animations.push_back(pPrototypeAnimation->Clone());
 
@@ -34,6 +39,10 @@ CModel::CModel(const CModel& Prototype)
     for (auto& pMesh : m_Meshes)
         Safe_AddRef(pMesh);
 
+    if (Prototype.m_pCollisionMesh) {
+        m_pCollisionMesh = Prototype.m_pCollisionMesh;
+        m_pCollisionMesh->acquireReference();   // 메시/머티리얼 AddRef와 동일 의미
+    }
 }
 
 const string& CModel::Get_BoneName(_uint iIndex) const
@@ -342,6 +351,53 @@ HRESULT CModel::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, 
     return m_Meshes[iMeshIndex]->Bind_BoneMatrices(pShader, pConstantName, m_Bones);
 }
 
+const MESH_LAYER_IDX& CModel::Get_MeshLayer(_uint iMesh) const
+{
+    static const MESH_LAYER_IDX kZero{};
+    return (iMesh < m_MeshLayers.size()) ? m_MeshLayers[iMesh] : kZero;
+}
+
+void CModel::Set_MeshLayer(_uint iMesh, const MESH_LAYER_IDX& v)
+{
+    if (iMesh < m_MeshLayers.size())
+        m_MeshLayers[iMesh] = v;
+}
+
+_uint CModel::Get_MeshTextureCount(_uint iMesh, MTEX_TYPE eType) const
+{
+    if (iMesh >= m_iNumMeshes) return 0u;
+    _uint mat = m_Meshes[iMesh]->Get_MaterialIndex();
+    if (mat >= m_iNumMaterials) return 0u;
+    return m_Materials[mat]->Get_TextureCount(eType);
+}
+
+HRESULT CModel::Save_MeshLayers() const
+{
+    if (m_strMeshLayerPath.empty())
+        return E_FAIL;
+
+    json j;
+    for (size_t i = 0; i < m_MeshLayers.size(); ++i)
+    {
+        const MESH_LAYER_IDX& m = m_MeshLayers[i];
+
+        json jMesh;
+        for (_uint t = 0; t < MTEX_TYPE_MAX; ++t)
+        {
+            if (m.idx[t] != 0)                 
+                jMesh[to_string(t)] = m.idx[t];
+        }
+        if (!jMesh.empty())                   
+            j[to_string(i)] = jMesh;
+    }
+
+    ofstream fout(m_strMeshLayerPath);
+    if (!fout.is_open())
+        return E_FAIL;
+    fout << j.dump(2);
+    return S_OK;
+}
+
 HRESULT CModel::Ready_Meshes(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix)
 {
 	m_iNumMeshes = meshes.size();
@@ -402,8 +458,14 @@ HRESULT CModel::Ready_NonAnim(const _char* pModelFilePath, _fmatrix PreTransform
     if (FAILED(Ready_Meshes(modelData.Meshes, PreTransformMatrix)))
         return E_FAIL;
 
+    if (MODEL::MAP == m_eType)
+        if (FAILED(Cook_CollisionMesh(modelData.Meshes, PreTransformMatrix)))
+            return E_FAIL;
+
     if (FAILED(Ready_Materials(modelData.Materials, pModelFilePath)))
         return E_FAIL;
+
+    //Load_MeshLayers(pModelFilePath);
 
     return S_OK;
 }
@@ -422,6 +484,8 @@ HRESULT CModel::Ready_Anim(const _char* pModelFilePath, _fmatrix PreTransformMat
     if (FAILED(Ready_Meshes(modelData.Meshes, PreTransformMatrix)))
         return E_FAIL;
 
+    //Load_MeshLayers(pModelFilePath);
+
     if (FAILED(Ready_Materials(modelData.Materials, pModelFilePath)))
         return E_FAIL;
 
@@ -429,6 +493,66 @@ HRESULT CModel::Ready_Anim(const _char* pModelFilePath, _fmatrix PreTransformMat
         return E_FAIL;
 
     return S_OK;
+}
+
+void CModel::Load_MeshLayers(const _char* pModelFilePath)
+{
+    m_MeshLayers.assign(m_iNumMeshes, MESH_LAYER_IDX{});   // 전부 0
+
+    string path = pModelFilePath;
+    if (size_t dot = path.rfind('.'); dot != string::npos)
+        path = path.substr(0, dot);
+    path += "_meshlayers.json";
+    m_strMeshLayerPath = path;
+
+    ifstream fin(path);
+    if (!fin.is_open())
+        return;
+
+    json j;
+    try { fin >> j; }
+    catch (...) { return; }
+
+    for (auto& meshItem : j.items())
+    {
+        _uint i = 0;
+        try { i = (_uint)stoul(meshItem.key()); }
+        catch (...) { continue; }
+        if (i >= m_iNumMeshes) continue;
+
+        for (auto& texItem : meshItem.value().items())
+        {
+            _uint t = 0;
+            try { t = (_uint)stoul(texItem.key()); }
+            catch (...) { continue; }
+            if (t >= MTEX_TYPE_MAX) continue;
+            m_MeshLayers[i].idx[t] = texItem.value().get<_uint>();
+        }
+    }
+}
+
+HRESULT CModel::Cook_CollisionMesh(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix)
+{
+    if (nullptr == m_pGameInstance_Proxy) return S_OK;
+
+    vector<_float3> Positions;
+    vector<_uint>   Indices;
+    for (const auto& mesh : meshes) {
+        const _uint iBase = (_uint)Positions.size();
+        for (const auto& v : mesh.MapVertices) {     // MAP은 MapVertices
+            _float3 p;
+            XMStoreFloat3(&p, XMVector3TransformCoord(XMLoadFloat3(&v.vPosition), PreTransformMatrix));
+            Positions.push_back(p);
+        }
+        for (_uint idx : mesh.Indices) Indices.push_back(iBase + idx);
+    }
+    if (Positions.empty() || Indices.size() < 3) return S_OK;
+
+    m_pCollisionMesh = m_pGameInstance_Proxy->Cook_TriangleMesh(
+        Positions.data(), (_uint)Positions.size(),
+        Indices.data(), (_uint)Indices.size(),
+        false);
+    return (nullptr != m_pCollisionMesh) ? S_OK : E_FAIL;
 }
 
 CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter)
@@ -468,6 +592,12 @@ void CModel::Free()
     for (auto& pBone : m_Bones)
         Safe_Release(pBone);
     m_Bones.clear();
+
+    if (m_pCollisionMesh) 
+    { 
+        m_pCollisionMesh->release(); 
+        m_pCollisionMesh = nullptr; 
+    }
 
     for (auto& pMaterial : m_Materials)
         Safe_Release(pMaterial);

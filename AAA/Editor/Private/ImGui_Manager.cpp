@@ -18,8 +18,20 @@
 #include "Effect_Container.h"
 #include "Effect_Part.h"
 #include "MapDescriptor.h"
+#include "MapStage.h"
 
 IMPLEMENT_SINGLETON(CImGui_Manager)
+
+static const char* TexTypeName(_uint t)
+{
+    static const char* names[MTEX_TYPE_MAX] = {
+        "None","Diffuse","Specular","Ambient","Emissive","Height","Normals","Shininess",
+        "Opacity","Displacement","Lightmap","Reflection","BaseColor","NormalCamera",
+        "EmissionColor","Metalness(MRA)","Roughness","AO","Unknown(Mask)","Sheen","Clearcoat",
+        "Transmission","MayaBase","MayaSpecular","MayaSpecColor","MayaSpecRough","Anisotropy"
+    };
+    return (t < MTEX_TYPE_MAX) ? names[t] : "?";
+}
 
 CImGui_Manager::CImGui_Manager()
     : m_pGameInstance_Proxy(CGameInstance::GetProxy())
@@ -343,6 +355,45 @@ void CImGui_Manager::Draw_Toolbar()
 
     ImGui::SameLine();
 
+    // --- Play / Stop Toggle ---
+    if (m_pGameInstance_Proxy->Is_EditMode())
+    {
+        // 편집 중 → Play
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.15f, 0.65f, 0.15f, 1.f));
+        if (ImGui::Button("Play"))
+        {
+            m_pGameInstance_Proxy->Set_EditMode(false);    // CCT/게임플레이 ON
+            m_pGameInstance_Proxy->Enable_InputDeveice();  // 키입력 ON (WASD)
+            m_bKeyInputEnabled = true;
+        }
+        ImGui::PopStyleColor();
+    }
+    else
+    {
+        // 플레이 중 → Stop
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.75f, 0.2f, 0.2f, 1.f));
+        if (ImGui::Button("Stop"))
+        {
+            m_pGameInstance_Proxy->Set_EditMode(true);     // 편집 모드 복귀
+            m_pGameInstance_Proxy->Disable_InputDeveice(); // 키입력 OFF
+            m_bKeyInputEnabled = false;
+        }
+        ImGui::PopStyleColor();
+    }
+
+    ImGui::SameLine();
+
+    // --- Physics Debug Toggle ---
+    {
+        bool bOn = m_pGameInstance_Proxy->Is_PhysXDebug();
+        if (bOn) ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 1.0f, 1.0f));
+        if (ImGui::Button("Physics Debug"))
+            m_pGameInstance_Proxy->Toggle_PhysXDebug();
+        if (bOn) ImGui::PopStyleColor();
+    }
+
+    ImGui::SameLine();
+
     // --- Effect Save ---
     static char s_EffectSaveBuf[iBufferSize] = {};
     if (ImGui::Button("Effect Save"))
@@ -614,6 +665,11 @@ void CImGui_Manager::Draw_Inspector()
 
     ImGui::Separator();
 
+    Draw_MeshLayerPanel(pSelected);
+
+    ImGui::Separator();
+    ImGui::Separator();
+
     Draw_Properties(pSelected);
 
     auto pModel = pSelected->Get_Component<CModel>(TEXT("Com_Model"));
@@ -720,6 +776,39 @@ void CImGui_Manager::Draw_Inspector()
     }
 
     ImGui::Separator();
+
+    // ===== Map Stage → Sections (컨테이너와 동일한 시각적 표현) =====
+    auto pMapStage = dynamic_cast<CMapStage*>(pSelected);
+    if (pMapStage)
+    {
+        const auto& Sections = pMapStage->Get_Sections();   // vector<CMapSection*> (이미 정렬된 순서)
+
+        ImGui::Separator();
+        ImGui::Text("Sections (%d)", (int)Sections.size());
+
+        for (CMapSection* pSection : Sections)
+        {
+            if (!pSection) continue;
+
+            // 섹션 이름을 헤더 라벨 + 고유 ID로 사용
+            string strName = WstrToStr(pSection->Get_SectionName());
+            string strHeader = strName + "##Section_" + to_string((uintptr_t)pSection);
+
+            if (ImGui::CollapsingHeader(strHeader.c_str()))
+            {
+                ImGui::PushID(pSection);
+
+                // 섹션의 로컬 트랜스폼 (스테이지 부모행렬과 Late_Update에서 합성됨)
+                Draw_Transform(pSection, strName);
+                ImGui::Separator();
+                Draw_Properties(pSection);   // CMapObject의 Normal Strength / UV Scale / Top Projection 등
+
+                ImGui::PopID();
+            }
+            ImGui::Separator();
+            ImGui::Separator();
+        }
+    }
 
     ImGui::End();
     return;
@@ -1299,6 +1388,52 @@ void CImGui_Manager::Draw_ShaderGlobals()
     }
 
     ImGui::End();
+}
+
+void CImGui_Manager::Draw_MeshLayerPanel(CGameObject* pObj)
+{
+    if (nullptr == pObj) return;
+    CModel* pModel = pObj->Get_Component<CModel>(L"Com_Model");
+    if (nullptr == pModel) return;
+    if (!ImGui::CollapsingHeader("Mesh Texture Layers")) return;
+
+    size_t n = pModel->Get_NumMeshes();
+    for (size_t i = 0; i < n; ++i)
+    {
+        MESH_LAYER_IDX L = pModel->Get_MeshLayer((_uint)i);
+        ImGui::PushID((int)i);
+        ImGui::Text("%zu: %s", i, pModel->Get_MeshName((_uint)i).c_str());
+
+        bool changed = false;
+        bool bAnyField = false;
+
+        for (_uint t = 0; t < MTEX_TYPE_MAX; ++t)
+        {
+            int count = (int)pModel->Get_MeshTextureCount((_uint)i, (MTEX_TYPE)t);
+            if (count <= 1) continue;            // 고를 게 없는 타입은 숨김
+
+            bAnyField = true;
+            int iv = (int)L.idx[t];
+            ImGui::SetNextItemWidth(120.f);
+            if (ImGui::InputInt(TexTypeName(t), &iv))
+            {
+                if (iv < 0)      iv = 0;
+                if (iv >= count) iv = count - 1; // 사용 가능 개수로 클램프 → E_FAIL 방지
+                L.idx[t] = (_uint)iv;
+                changed = true;
+            }
+            ImGui::SameLine(); ImGui::Text("/ %d", count);
+        }
+        if (!bAnyField)
+            ImGui::TextDisabled("  (single-texture mesh)");
+
+        if (changed) pModel->Set_MeshLayer((_uint)i, L);
+        ImGui::Separator();
+        ImGui::PopID();
+    }
+
+    if (ImGui::Button("Bake (Save sidecar)"))
+        pModel->Save_MeshLayers();
 }
 
 void CImGui_Manager::Free()

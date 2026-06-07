@@ -25,16 +25,18 @@ void CKirby_Controller::Update_KirbyController(_float fTimeDelta)
 {
     while (m_CommandQueue.empty() == false)
     {
-        const CKirby_Command& Command = m_CommandQueue.front();
-        m_pPlayer->Excute_Command(Command);
+        CKirby_Command* pCommand = m_CommandQueue.front();
+        m_pPlayer->Excute_Command(pCommand);
 
         m_CommandQueue.pop();
+
+        Safe_Release(pCommand);
     }
 }
 
-void CKirby_Controller::Push_Command(const CKirby_Command& Command)
+void CKirby_Controller::Push_Command(CKirby_Command* pCommand)
 {
-    m_CommandQueue.push(Command);
+    m_CommandQueue.push(pCommand);
 }
 
 CKirby_Controller* CKirby_Controller::Create(CKirby* pPlayer)

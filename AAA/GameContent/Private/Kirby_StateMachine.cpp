@@ -52,9 +52,9 @@ void CKirby_StateMachine::Update_StateMachine(const _float fTimeDelta)
     m_pCurState->Update(m_pKirby, fTimeDelta);
 }
 
-void CKirby_StateMachine::Handle_Command(const CKirby_Command& Command)
+void CKirby_StateMachine::Handle_Command(CKirby_Command* pCommand)
 {
-    m_pCurState->Handle_Command(m_pKirby, Command);
+    m_pCurState->Handle_Command(m_pKirby, pCommand);
 }
 
 CKirby_State* CKirby_StateMachine::State_Creator(KIRBY_STATE_TYPE eNewstate)

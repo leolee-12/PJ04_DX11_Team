@@ -24,32 +24,36 @@ HRESULT CKirby_InputManager::Initialize(CKirby_Controller* pKirby_Controller)
 
 void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
 {
+    CKirby_Command* pCommand{};
+
     if (m_pGameInstance_Proxy->Key_Pressing(DIK_W))
     {
-        m_pKirby_Controller->Push_Command(MoveTop_Command());
+        pCommand = new MoveTop_Command;
     }
     if (m_pGameInstance_Proxy->Key_Pressing(DIK_A))
     {
-        m_pKirby_Controller->Push_Command(MoveBottom_Command());
+        pCommand = new MoveBottom_Command;
     }
     if (m_pGameInstance_Proxy->Key_Pressing(DIK_S))
     {
-        m_pKirby_Controller->Push_Command(MoveLeft_Command());
+        pCommand = new MoveLeft_Command;
     }
     if (m_pGameInstance_Proxy->Key_Pressing(DIK_D))
     {
-        m_pKirby_Controller->Push_Command(MoveRight_Command());
+        pCommand = new MoveRight_Command;
     }
 
     if (m_pGameInstance_Proxy->Key_Down(DIK_Z))
     {
-        m_pKirby_Controller->Push_Command(Jump_Command());
+        pCommand = new Jump_Command;
     }
 
     if (m_pGameInstance_Proxy->Mouse_Down(DIMB::LBUTTON))
     {
-        m_pKirby_Controller->Push_Command(ATTACK_Command());
+        pCommand = new ATTACK_Command;
     }
+
+    m_pKirby_Controller->Push_Command(pCommand);
 }
 
 CKirby_InputManager* CKirby_InputManager::Create(CKirby_Controller* pKirby_Controller)

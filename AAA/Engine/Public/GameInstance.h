@@ -4,6 +4,12 @@
 #include "GameInstance_Proxy.h"
 #include "Prototype_Manager.h"
 
+NS_BEGIN(physx)
+class PxTriangleMesh;
+class PxRigidStatic;
+class PxController;
+NS_END
+
 NS_BEGIN(Engine)
 
 class CGraphic_Device;
@@ -198,16 +204,27 @@ private:
 	HRESULT End_MRT();
 
 #ifdef _DEBUG
-public:
 	HRESULT Ready_RT_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
 	HRESULT Render_RT_Debug(const _wstring& strMRTTag, class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
 #endif
 #pragma endregion
 
 #pragma region EDITMODE
-  public:
 	  void  Set_EditMode(_bool bEdit) { m_bEditMode = bEdit; }
 	  _bool Is_EditMode() const		  { return m_bEditMode; }
+#pragma endregion
+
+#pragma region PHYSIX_MANAGER
+	  physx::PxTriangleMesh* Cook_TriangleMesh(const _float3* pPositions, _uint iNumVertices, const _uint* pIndices, _uint iNumIndices, _bool bFlipWinding = true);
+	  physx::PxRigidStatic*  Add_StaticActor(physx::PxTriangleMesh* pMesh, _fmatrix WorldMatrix);
+	  void                   Remove_StaticActor(physx::PxRigidStatic* pActor);
+
+	  physx::PxController* Create_CapsuleController(const _float3& vFootPos, _float fRadius, _float fHeight);
+	  void				   Release_Controller(physx::PxController* pCtrl);
+						   
+	  void				   Toggle_PhysXDebug();
+	  _bool				   Is_PhysXDebug() const;
+	  void				   Render_PhysXDebug(_fmatrix ViewMatrix, _fmatrix ProjMatrix);
 #pragma endregion
 
 

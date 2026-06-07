@@ -2,6 +2,16 @@
 #include "Shader.h"
 #include "GameInstance.h"
 
+#pragma warning(push, 0)
+#ifdef new
+#undef new
+#endif
+#include <PhysX/PxPhysicsAPI.h>
+#if defined(_DEBUG) && defined(DBG_NEW)
+#define new DBG_NEW
+#endif
+#pragma warning(pop)
+
 CTransform::CTransform(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CComponent(pDevice, pContext)
     , m_fSpeedPerSec(0.f)

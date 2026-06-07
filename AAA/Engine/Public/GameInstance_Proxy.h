@@ -1,6 +1,12 @@
 #pragma once
 #include "Prototype_Manager.h"
 
+NS_BEGIN(physx)
+class PxTriangleMesh;
+class PxRigidStatic;
+class PxController;
+NS_END
+
 NS_BEGIN(Engine)
 
 class CGameObject;
@@ -111,6 +117,8 @@ public: // CameraManager
     const _float4x4* Get_Matrix(D3DTS eState, PROJ_TYPE eType) const;
     const _float4x4* Get_InverseMatrix_Prespec(D3DTS eState) const;
     const _float4* Get_CamPosition() const;
+    const _float4* Get_CamLook()  const;  
+    const _float4* Get_CamRight() const;
     void Set_Transform(D3DTS eState, PROJ_TYPE eType, _fmatrix StateMatrix);
     void Set_Transform(D3DTS eState, PROJ_TYPE eType, const _float4x4& StateMatrix);
 #pragma endregion
@@ -219,6 +227,21 @@ public:
       vector<GLOBAL_DESC>& Get_ShaderGlobals();
       const _float4* Get_ShaderGlobal(const string& strName) const;
 #pragma endregion
+
+#pragma region PHYSIX_MANAGER
+      physx::PxTriangleMesh* Cook_TriangleMesh(const _float3* pPositions, _uint iNumVertices, const _uint* pIndices, _uint iNumIndices, _bool bFlipWinding = true);
+      physx::PxRigidStatic* Add_StaticActor(physx::PxTriangleMesh* pMesh, _fmatrix WorldMatrix);
+      void                   Remove_StaticActor(physx::PxRigidStatic* pActor);
+
+      physx::PxController* Create_CapsuleController(const _float3& vFootPos, _float fRadius, _float fHeight);
+      void                Release_Controller(physx::PxController* pCtrl);
+
+      void  Toggle_PhysXDebug();
+      _bool Is_PhysXDebug() const;
+      void  Render_PhysXDebug(_fmatrix ViewMatrix, _fmatrix ProjMatrix);
+#pragma endregion
+
+
 
 private:
     CGameInstance* m_pOwner = { nullptr };

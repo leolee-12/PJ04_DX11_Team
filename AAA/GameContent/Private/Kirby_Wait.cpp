@@ -29,9 +29,9 @@ void CKirby_Wait::End(CKirby* pKirby)
 {
 }
 
-_bool CKirby_Wait::Handle_Command(CKirby* pKirby, const CKirby_Command& Command)
+_bool CKirby_Wait::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
-    __super::Handle_Command(pKirby, Command);
+    __super::Handle_Command(pKirby, pCommand);
 
 
 

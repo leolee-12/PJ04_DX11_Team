@@ -25,7 +25,7 @@ void CKirby_State::End(CKirby* pKirby)
 {
 }
 
-_bool CKirby_State::Handle_Command(CKirby* pKirby, const CKirby_Command& Command)
+_bool CKirby_State::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
     // 전역 처리
 

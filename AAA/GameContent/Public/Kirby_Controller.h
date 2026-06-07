@@ -26,13 +26,13 @@ private:
 public:
 	void Update_KirbyController(_float fTimeDelta);
 
-	void Push_Command(const CKirby_Command& Command);
+	void Push_Command(CKirby_Command* pCommand);
 
 private:
 	CGameInstance_Proxy* m_pGameInstance_Proxy = {};
 
 	CKirby* m_pPlayer{};
-	std::queue<CKirby_Command> m_CommandQueue;
+	std::queue<CKirby_Command*> m_CommandQueue;
 
 public:
 	static CKirby_Controller* Create(CKirby* m_pPlayer);
