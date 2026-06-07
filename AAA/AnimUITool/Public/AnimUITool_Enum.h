@@ -28,6 +28,8 @@ namespace AnimUITool
         RESIZE_BR,
         END
     };
+
+    enum class UI_PART_TYPE { IMAGE, SPRITEANIM, END};
 }
 
 #endif // AnimUITool_Enum_h__

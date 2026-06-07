@@ -4,6 +4,8 @@
 #include "Level_Tool.h"
 #include "UIContainerObject.h"
 #include "UIPartObject.h"
+#include "UI_Image.h"
+#include "UI_SpriteAnim.h"
 
 CPanel_Hierarchy::CPanel_Hierarchy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPanel(pDevice, pContext)
@@ -86,6 +88,10 @@ void CPanel_Hierarchy::Render_UIHierarchy()
         return;
     }
 
+    CUIContainerObject* pPendingDeleteContainer = nullptr;
+    CUIContainerObject* pPartDeleteOwner = nullptr;
+    _wstring strPartDeleteTag;
+
     for (auto* pContainer : UIContainers)
     {
         if (nullptr == pContainer)
@@ -97,12 +103,26 @@ void CPanel_Hierarchy::Render_UIHierarchy()
 
         ImGui::PushID(pContainer);
 
+        if (ImGui::SmallButton("X"))
+            pPendingDeleteContainer = pContainer;
+        ImGui::SameLine();
+
+        const _bool bContainerSelected =
+            UIContext.Selection.pContainer == pContainer &&
+            UIContext.Selection.pPart == nullptr;
+
         ImGuiTreeNodeFlags eNodeFlags =
             ImGuiTreeNodeFlags_DefaultOpen |
             ImGuiTreeNodeFlags_OpenOnArrow |
             ImGuiTreeNodeFlags_SpanAvailWidth;
 
+        if (bContainerSelected)
+            eNodeFlags |= ImGuiTreeNodeFlags_Selected;
+
         const _bool bOpened = ImGui::TreeNodeEx(strContainerName.c_str(), eNodeFlags);
+
+        if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+            m_pPanel_Manager->Set_UISelected(pContainer, nullptr, L"");
 
         if (bOpened)
         {
@@ -133,8 +153,50 @@ void CPanel_Hierarchy::Render_UIHierarchy()
 
                     ImGui::PushID(pPart);
 
-                    if (ImGui::Selectable(strPartName.c_str(), bSelected, ImGuiSelectableFlags_SpanAvailWidth))
+                    if (ImGui::SmallButton("X"))
+                    {
+                        pPartDeleteOwner = pContainer;
+                        strPartDeleteTag = strPartTag;
+                    }
+                    ImGui::SameLine();
+
+                    if (ImGui::Selectable(strPartName.c_str(), bSelected,
+                        ImGuiSelectableFlags_SpanAvailWidth))
                         m_pPanel_Manager->Set_UISelected(pContainer, pPart, strPartTag);
+
+                    // Browser 에서 .png/.dds 를 이 파트 행에 드롭 -> 텍스처 실시간 적용
+                    if (ImGui::BeginDragDropTarget())
+                    {
+                        if (const ImGuiPayload* pPayload =
+                            ImGui::AcceptDragDropPayload(DND_FILE_PATH))
+                        {
+                            std::string strPath(static_cast<const char*>(pPayload->Data));
+                            std::string strExt = filesystem::path(strPath).extension().string();
+                            for (auto& c : strExt) c = (char)std::tolower((unsigned char)c);
+
+                            if (auto* pImage = dynamic_cast<CUI_Image*>(pPart))
+                            {
+                                if (strExt == ".png" || strExt == ".dds")
+                                {
+                                    _wstring strProtoTag = pLevel->Register_TextureProto(StrToWstr(strPath));
+
+                                    if (!strProtoTag.empty() && SUCCEEDED(pImage->Set_Texture(ETOUI(TOOL_LEVEL::STATIC), strProtoTag)))
+                                        UIContext.bDirty = true;
+                                }
+                            }
+                            else if (auto* pAnim = dynamic_cast<CUI_SpriteAnim*>(pPart))
+                            {
+                                if (strExt == ".dds")
+                                {
+                                    _wstring strProtoTag = pLevel->Register_TextureProto(StrToWstr(strPath));
+
+                                    if (!strProtoTag.empty() && SUCCEEDED(pAnim->Set_Texture(ETOUI(TOOL_LEVEL::STATIC), strProtoTag)))
+                                        UIContext.bDirty = true;
+                                }
+                            }                         
+                        }
+                        ImGui::EndDragDropTarget();
+                    }
 
                     if (bSelected)
                     {
@@ -152,8 +214,27 @@ void CPanel_Hierarchy::Render_UIHierarchy()
         }
 
         ImGui::PopID();
-    }
-}
+      }
+
+      if (pPartDeleteOwner)
+      {
+          if (UIContext.Selection.pContainer == pPartDeleteOwner &&
+              UIContext.Selection.strPartTag == strPartDeleteTag)
+              m_pPanel_Manager->Set_UISelected(pPartDeleteOwner, nullptr, L"");
+
+          pLevel->Remove_UIPart(pPartDeleteOwner, strPartDeleteTag);
+          UIContext.bDirty = true;
+      }
+
+      if (pPendingDeleteContainer)
+      {
+          if (UIContext.Selection.pContainer == pPendingDeleteContainer)
+              m_pPanel_Manager->Clear_UISelected();
+
+          pLevel->Delete_UIContainer(pPendingDeleteContainer);
+          UIContext.bDirty = true;
+      }
+ }
 
 const _char* CPanel_Hierarchy::Get_RenderLayerName(RENDERUIID eRenderLayer)
 {

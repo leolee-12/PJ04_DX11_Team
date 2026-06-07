@@ -27,10 +27,68 @@ void CPanel_UICanvas::Render()
 
     ImGui::Text("Design: %.0f x %.0f", UIContext.vDesignSize.x, UIContext.vDesignSize.y);
     ImGui::SameLine();
+    if (ImGui::Button("Save"))
+        m_bOpenSavePopup = true;
+
+    if (m_bOpenSavePopup) 
+    { 
+        ImGui::OpenPopup("Save UI");
+        m_bOpenSavePopup = false;
+    }
+
+    ImGui::SameLine();
     ImGui::Checkbox("Grid", &UIContext.bShowGrid);
     ImGui::SameLine();
     ImGui::SetNextItemWidth(100.f);
     ImGui::DragFloat("Step", &UIContext.fGridStep, 1.f, 8.f, 400.f, "%.0f");
+    ImGui::SameLine();
+    if (ImGui::Button("Add Container"))
+    {
+        if (CLevel_Tool* pLevel = m_pPanel_Manager->Get_Level())
+        {
+            CGameObject* pNew = pLevel->Add_UIContainer();
+            if (pNew)
+            {
+                m_pPanel_Manager->Set_UISelected(dynamic_cast<CUIContainerObject*>(pNew), nullptr, L"");
+                m_pPanel_Manager->Get_UIContext().bDirty = true;
+            }
+        }
+    }
+    ImGui::SameLine();
+    UI_SELECTION& sel = m_pPanel_Manager->Get_UIContext().Selection;
+    const _bool bHasContainer = (sel.pContainer != nullptr);
+
+    if (!bHasContainer) ImGui::BeginDisabled();
+    if (ImGui::Button("Part"))
+        ImGui::OpenPopup("AddPartPopup");
+    if (!bHasContainer) ImGui::EndDisabled();
+
+    if (ImGui::BeginPopup("AddPartPopup"))
+    {
+        auto AddPart = [&](UI_PART_TYPE eType)
+            {
+                if (CLevel_Tool* pLevel = m_pPanel_Manager->Get_Level())
+                {
+                    _wstring strPartTag;
+                    CUIPartObject* pPart =
+                        pLevel->Add_UIPart(sel.pContainer, eType, &strPartTag);
+                    if (pPart)
+                    {
+                        m_pPanel_Manager->Set_UISelected(
+                            sel.pContainer, pPart, strPartTag);
+                        m_pPanel_Manager->Get_UIContext().bDirty = true;
+                    }
+                }
+            };
+
+        if (sel.pContainer && ImGui::MenuItem("Image"))
+            AddPart(UI_PART_TYPE::IMAGE);
+
+        if (sel.pContainer && ImGui::MenuItem("SpriteAnim"))
+            AddPart(UI_PART_TYPE::SPRITEANIM);
+
+        ImGui::EndPopup();
+    }
 
     ImGui::Separator();
 
@@ -71,6 +129,19 @@ void CPanel_UICanvas::Render()
         else
             ImGui::Dummy(vSize);
 
+        if (ImGui::BeginDragDropTarget())
+        {
+            if (const ImGuiPayload* p = ImGui::AcceptDragDropPayload(DND_FILE_PATH))
+            {
+                std::string strPath(static_cast<const char*>(p->Data));
+                if (strPath.size() >= 8 && 0 == strPath.compare(strPath.size() - 8, 8, "_ui.json"))
+                {
+                    m_pPanel_Manager->Load_UI_ByPath(StrToWstr(strPath));
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+
         m_bHovered = ImGui::IsItemHovered();
 
         if (m_bHovered)
@@ -108,6 +179,38 @@ void CPanel_UICanvas::Render()
     {
         m_vCanvasMin = {};
         m_vCanvasSize = {};
+    }
+
+    {
+        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+        if (ImGui::BeginPopupModal("Save UI", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::Text("File name:");
+            ImGui::InputText("##savename", m_szSaveName, sizeof(m_szSaveName));
+
+            UI_SELECTION& sel = m_pPanel_Manager->Get_UIContext().Selection;
+
+            if (ImGui::Button("OK"))
+            {
+                if (sel.pContainer && m_pPanel_Manager->Get_Level() && m_szSaveName[0])
+                {
+                    std::string s(m_szSaveName);
+
+                    if (SUCCEEDED(m_pPanel_Manager->Get_Level()->Save_UIContainer(
+                        sel.pContainer,
+                        m_pPanel_Manager->Get_UIContext().vDesignSize,
+                        StrToWstr(s))))
+                    {
+                        m_pPanel_Manager->Get_UIContext().bDirty = false;           // 저장 성공했을 때만 변경
+                        ImGui::CloseCurrentPopup();
+                    }
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
+        }
     }
 
     ImGui::End();

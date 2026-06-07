@@ -114,6 +114,15 @@ void CPanel_Browser::Render_Contents()
         if (ImGui::Selectable(label.c_str(), m_SelectedPath == file.path()))
             m_SelectedPath = file.path();
 
+        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+        {
+            fs::path rel = fs::relative(file.path(), m_RootPath);
+            std::string strPath = "../../Resources/" + WstrToStr(rel.generic_wstring());
+            ImGui::SetDragDropPayload(DND_FILE_PATH, strPath.c_str(), strPath.size() + 1);
+            ImGui::Text("%s", file.path().filename().string().c_str());
+            ImGui::EndDragDropSource();
+        }
+
         if (ToLower(file.path().extension().string()) == ".ysh")
             if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
                 m_pPanel_Manager->Load_Preview(file.path().wstring());

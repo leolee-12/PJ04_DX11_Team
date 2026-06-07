@@ -1,5 +1,5 @@
 #include "UI_Image.h"
-#include "GameInstance.h"
+#include "GameInstance_Proxy.h"
 #include "GameContent_const.h"
 #include "Shader.h"
 #include "Texture.h"
@@ -94,6 +94,31 @@ void CUI_Image::Deserialize(const json& j)
 		static_cast<_uint>(m_iTextureLevel),
 		m_strTextureProtoTag,
 		TEXT("Com_Texture"));
+}
+
+HRESULT CUI_Image::Set_Texture(_int iLevel, const _wstring& strProtoTag)
+{
+	if (strProtoTag.empty())
+		return E_FAIL;
+
+	// try_emplace 는 덮어쓰지 않으므로, 기존 Com_Texture 를 직접 해제 후 제거
+	auto iter = m_Components.find(TEXT("Com_Texture"));
+	if (iter != m_Components.end())
+	{
+		Safe_Release(iter->second);
+		m_Components.erase(iter);
+		m_pTextureCom = nullptr;
+	}
+
+	m_iTextureLevel = iLevel;
+	m_strTextureProtoTag = strProtoTag;
+
+	m_pTextureCom = Add_Component<CTexture>(
+		static_cast<_uint>(m_iTextureLevel),
+		m_strTextureProtoTag,
+		TEXT("Com_Texture"));
+
+	return m_pTextureCom ? S_OK : E_FAIL;
 }
 
 CUI_Image* CUI_Image::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

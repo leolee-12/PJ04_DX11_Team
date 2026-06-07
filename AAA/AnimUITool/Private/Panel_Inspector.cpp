@@ -9,6 +9,9 @@
 #include "Preview_Kirby.h"
 #include "Kirby_States.h"
 #include "UIPartObject.h"
+#include "UIContainerObject.h"
+#include "Level_Tool.h"
+#include "UI_SpriteAnim.h"
 
 CPanel_Inspector::CPanel_Inspector(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPanel(pDevice, pContext)
@@ -446,9 +449,36 @@ void CPanel_Inspector::Render_UIInspector()
     UI_CONTEXT& uictx = m_pPanel_Manager->Get_UIContext();
     UI_SELECTION& sel = uictx.Selection;
 
-    if (!sel.Valid() || nullptr == sel.pPart)
+    if (nullptr == sel.pContainer)
     {
-        ImGui::TextDisabled("(no UI part selected)");
+        ImGui::TextDisabled("(no UI selected)");
+        return;
+    }
+
+    if (nullptr == sel.pPart)
+    {
+        std::string strCName = ToUtf8(sel.pContainer->Get_ObjectTag());
+        ImGui::Text("[UI Container] %s",
+            strCName.empty() ? "-" : strCName.c_str());
+        ImGui::Separator();
+
+        CLevel_Tool* pLevel = m_pPanel_Manager->Get_Level();
+        if (pLevel)
+        {
+            _wstring wTag = pLevel->Get_AuthoredProtoTag(sel.pContainer);
+            char szTag[128] = {};
+            strncpy_s(szTag, ToUtf8(wTag).c_str(), sizeof(szTag) - 1);
+
+            if (ImGui::InputText("Runtime ProtoTag",
+                szTag, sizeof(szTag)))
+            {
+                pLevel->Set_AuthoredProtoTag(
+                    sel.pContainer, StrToWstr(szTag));
+                uictx.bDirty = true;
+            }
+            ImGui::TextDisabled(
+                "RunTime Spawn Class Tag : Save -> json in in !!");
+        }
         return;
     }
 
@@ -478,6 +508,57 @@ void CPanel_Inspector::Render_UIInspector()
     ImGui::Separator();
     Render_UITransform(pPart);
     Render_Properties(pPart);
+    Render_SpriteAnimControl(pPart);
+}
+
+void CPanel_Inspector::Render_SpriteAnimControl(CUIPartObject* pPart)
+{
+    auto* pAnim = dynamic_cast<Client::CUI_SpriteAnim*>(pPart);
+    if (!pAnim)
+        return;
+
+    if (!ImGui::CollapsingHeader("SpriteAnim",
+        ImGuiTreeNodeFlags_DefaultOpen))
+        return;
+
+    const _int iFrameCount = pAnim->Get_FrameCount();
+    const _int iLast = (iFrameCount > 0) ? iFrameCount - 1 : 0;
+
+    const char* szState =
+        pAnim->Is_Finished() ? "Finished" :
+        (pAnim->Is_Playing() ? "Playing" : "Paused");
+    ImGui::Text("State: %s   Frame: %d / %d",
+        szState, pAnim->Get_Frame(), iLast);
+
+    // 진행도 바
+    ImGui::ProgressBar(pAnim->Get_Progress(), ImVec2(-1.f, 0.f));
+
+    float fProgress = pAnim->Get_Progress();
+    if (ImGui::SliderFloat("Seek", &fProgress, 0.f, 1.f, "%.3f"))
+    {
+        pAnim->Pause();
+        pAnim->Seek(fProgress);
+    }
+
+    // 프레임 단위 스크럽
+    if (iFrameCount > 1)
+    {
+        int iFrame = pAnim->Get_Frame();
+        if (ImGui::SliderInt("Frame", &iFrame, 0, iLast))
+        {
+            pAnim->Pause();
+            pAnim->Set_Frame(iFrame);
+        }
+    }
+
+    // 트랜스포트
+    if (ImGui::Button("Restart")) pAnim->Play();
+    ImGui::SameLine();
+    if (ImGui::Button("Pause"))   pAnim->Pause();
+    ImGui::SameLine();
+    if (ImGui::Button("Resume"))  pAnim->Resume();
+    ImGui::SameLine();
+    if (ImGui::Button("Stop"))    pAnim->Stop();
 }
 
 CPanel_Inspector* CPanel_Inspector::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

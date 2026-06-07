@@ -29,6 +29,7 @@ private:
 	void						Render_KirbyFace(CGameObject* pObject);
 	void						Render_UITransform(CUIPartObject* pPart);
 	void						Render_UIInspector();
+	void						Render_SpriteAnimControl(CUIPartObject* pPart);
 
 private:
 	unordered_map<CGameObject*, _float3>	m_RotEditEuler;

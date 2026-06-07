@@ -82,6 +82,9 @@ private:
 	_float2						m_vDragStartSize = {};
 	_float						m_fDragStartZ = { 1.f };
 
+	_char						m_szSaveName[128] = {};
+	_bool						m_bOpenSavePopup = { false };
+
 public:
 	static CPanel_UICanvas* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 

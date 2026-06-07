@@ -13,7 +13,6 @@
 #include "Panel_UICanvas.h"
 
 #include "Panel_Browser.h"
-#include <filesystem>
 
 #include "Level_Tool.h"
 
@@ -169,19 +168,44 @@ _bool CPanel_Manager::Validate_UISelection()
 {
     UI_SELECTION& Selection = m_UIContext.Selection;
 
-    if (!Selection.Valid())
+    if (nullptr == Selection.pContainer)
         return false;
 
+    // 컨테이너가 추적 목록에 없으면(삭제됨) 선택 해제
+    if (m_pLevel)
+    {
+        const auto& Containers = m_pLevel->Get_UIContainers();
+        if (find(Containers.begin(), Containers.end(),
+            Selection.pContainer) == Containers.end())
+        {
+            Clear_UISelected();
+            return false;
+        }
+    }
+
+    // 컨테이너만 선택된 상태는 유효
+    if (nullptr == Selection.pPart)
+        return true;
+
+    // 파트 선택: 컨테이너에 실제 존재하는지 검증, 없으면 파트만 해제
     const auto& Parts = Selection.pContainer->Get_UIPartObjects();
     auto iter = Parts.find(Selection.strPartTag);
-
     if (iter == Parts.end() || iter->second != Selection.pPart)
     {
-        Clear_UISelected();
-        return false;
+        Selection.pPart = nullptr;
+        Selection.strPartTag.clear();
     }
 
     return true;
+}
+
+void CPanel_Manager::Load_UI_ByPath(const _wstring& strFullPath)
+{
+    if (!m_pLevel) 
+        return;
+    _float2 ds = m_UIContext.vDesignSize;
+    if (m_pLevel->Load_UIContainerByPath(strFullPath, ds))
+        m_UIContext.vDesignSize = ds;
 }
 
 void CPanel_Manager::Render_DockSpace()

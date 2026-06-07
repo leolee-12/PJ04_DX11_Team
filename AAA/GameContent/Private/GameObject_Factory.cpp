@@ -15,6 +15,8 @@
 #include "UI_TestImageContainer.h"
 #include "UI_Title.h"
 #include "Material_Object.h"
+#include "UI_GenericContainer.h"
+#include "UI_SpriteAnim.h"
 
 // Kirby
 #include "Kirby.h"
@@ -91,6 +93,23 @@ void CGameObject_Factory::Register_UI()
     TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), TEXT("Proto_Tex_TestUI"),
         CTexture::Create(pDevice, pContext,
             TEXT("../../Resources/CHJ/UI/Title/TitleLogo_KR^u.png"), 1));
+        )
+    );
+
+    Register(CUI_SpriteAnim::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
+        CREATOR(CUI_SpriteAnim),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, Shader_UI.iLevelID, Shader_UI.szProtoTag,
+                CShader::Create(pDevice, pContext, Shader_UI.szFileTag,
+                    VTXTEX::Elements, VTXTEX::iNumElements));
+
+    TRY_ADD_PROTO(pProxy, VI_Rect.iLevelID, VI_Rect.szProtoTag,
+        CVIBuffer_Rect::Create(pDevice, pContext));
+
+    TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC),
+        TEXT("Proto_Tex_StarArray"),
+        CTexture::Create(pDevice, pContext,
+            TEXT("../../Resources/CHJ/UI/Save/Save_Star_array.dds"), 1));
         )
     );
 }
@@ -250,6 +269,35 @@ void CGameObject_Factory::Register_UIContainer()
 
         TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), CUI_Image::PROTOTYPE_TAG,
             pImageReg->CreatorFunc(pDevice, pContext));
+    }
+        )
+    );
+
+    Register(CUI_GenericContainer::PROTOTYPE_TAG,
+        TEXT("UI_CONTAINER"),
+        CREATOR(CUI_GenericContainer),
+        LOADER(
+            auto* pImageReg = CGameObject_Factory::GetInstance()
+            ->Get_Registration(CUI_Image::PROTOTYPE_TAG);
+
+    if (pImageReg)
+    {
+        pImageReg->ResourceLoader(pProxy, pDevice, pContext);
+
+        TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC),
+            CUI_Image::PROTOTYPE_TAG,
+            pImageReg->CreatorFunc(pDevice, pContext));
+    }
+
+    auto* pAnimReg = CGameObject_Factory::GetInstance()
+        ->Get_Registration(CUI_SpriteAnim::PROTOTYPE_TAG);
+
+    if (pAnimReg)
+    {
+        pAnimReg->ResourceLoader(pProxy, pDevice, pContext);
+        TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC),
+            CUI_SpriteAnim::PROTOTYPE_TAG,
+            pAnimReg->CreatorFunc(pDevice, pContext));
     }
         )
     );

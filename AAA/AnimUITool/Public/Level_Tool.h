@@ -5,6 +5,7 @@
 NS_BEGIN(Engine)
 class CGameObject;
 class CUIContainerObject;
+class CUIPartObject;
 NS_END
 
 NS_BEGIN(AnimUITool)
@@ -34,14 +35,32 @@ public:
     void                        Clear_Preview();
     void                        Recalc_CameraProj();
 
+    HRESULT                     Save_UIContainer(CGameObject* pContainer, const _float2& vDesignSize, const _wstring& strFileName);
+    CGameObject*                Load_UIContainerByPath(const _wstring& strFullPath, _float2& vOutDesignSize);
+    void                        Delete_UIContainer(CUIContainerObject* pContainer);
+    CGameObject*                Add_UIContainer();
+    CUIPartObject*              Add_UIPart(CGameObject* pContainer,UI_PART_TYPE eType = UI_PART_TYPE::IMAGE, _wstring* pOutPartTag = nullptr);
+    HRESULT                     Remove_UIPart(CGameObject* pContainer, const _wstring& strPartTag);
+
+    _wstring                    Get_AuthoredProtoTag(CGameObject* pContainer);
+    void                        Set_AuthoredProtoTag(CGameObject* pContainer, const _wstring& strProtoTag);
+
+    _wstring                    Register_TextureProto(const _wstring& strTexturePath);
+
+
 private:
-    CEditCamera* m_pCamera = { nullptr };
-    CEdit_Grid* m_pGrid = { nullptr };
-    CGameObject* m_pPreview = { nullptr };
+    CEditCamera*                m_pCamera = { nullptr };
+    CEdit_Grid*                 m_pGrid = { nullptr };
+    CGameObject*                m_pPreview = { nullptr };
     map<_wstring, _wstring>     m_ModelTags;
     _uint                       m_iTagCounter = { 0 };
     _bool                       m_bGridVisible = { true };
     vector<CUIContainerObject*> m_UIContainers;
+
+    unordered_map<CGameObject*, _wstring> m_AuthoredProtoTags;
+    unordered_map<_wstring, _wstring> m_TextureProtoPaths;  // ProtoTag -> Path
+    _uint                       m_iUIContainerCounter = { 0 };
+    _uint                       m_iUIPartCounter = { 0 };
 
 private:
     virtual HRESULT             Ready_Events() override { return S_OK; }
@@ -52,6 +71,8 @@ private:
     HRESULT                     Ready_TestUI();
 
     void                        Track_UIContainer(CGameObject* pObject);
+
+
 
 public:
     static CLevel_Tool* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
