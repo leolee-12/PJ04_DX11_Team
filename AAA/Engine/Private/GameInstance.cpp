@@ -597,17 +597,9 @@ PxController* CGameInstance::Create_CapsuleController(const _float3& vFootPos, _
 {
     return m_pPhysX_Manager->Create_CapsuleController(vFootPos, fRadius, fHeight);
 }
-_bool CGameInstance::Move_Controller(PxController* pCtrl, const _float3& vDisp, _float fTimeDelta, _float3* pOutFootPos)
-{
-    return m_pPhysX_Manager->Move_Controller(pCtrl, vDisp, fTimeDelta, pOutFootPos);
-}
 void CGameInstance::Release_Controller(PxController* pCtrl)
 {
     m_pPhysX_Manager->Release_Controller(pCtrl);
-}
-void CGameInstance::Set_ControllerFootPosition(PxController* pCtrl, const _float3& vFootPos)
-{
-    m_pPhysX_Manager->Set_ControllerFootPosition(pCtrl, vFootPos);
 }
 void CGameInstance::Toggle_PhysXDebug()
 {
