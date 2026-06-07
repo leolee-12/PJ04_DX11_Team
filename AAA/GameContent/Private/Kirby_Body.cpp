@@ -44,68 +44,8 @@ void CKirby_Body::Priority_Update(_float fTimeDelta)
 
 void CKirby_Body::Update(_float fTimeDelta)
 {
-    static _int iState = 0; // 0: Wait, 1: Run
-
-    _float3 vDir = { 0.f, 0.f, 0.f };
-
-    if (m_pGameInstance_Proxy->Key_Pressing(DIK_W))
-    {
-        vDir.z += 1.f;
-    }
-
-    if (m_pGameInstance_Proxy->Key_Pressing(DIK_S))
-    {
-        vDir.z -= 1.f;
-    }
-
-    if (m_pGameInstance_Proxy->Key_Pressing(DIK_A))
-    {
-        vDir.x -= 1.f;
-    }
-
-    if (m_pGameInstance_Proxy->Key_Pressing(DIK_D))
-    {
-        vDir.x += 1.f;
-    }
-
-    _bool bMove = false;
-
-    if (vDir.x != 0.f || vDir.z != 0.f)
-    {
-        bMove = true;
-
-        _vector vMoveDir = XMVector3Normalize(XMLoadFloat3(&vDir));
-
-        // +Z를 기본 정면으로 보고, 이동 방향에 맞는 Y축 회전각 계산
-        _float fRadian = atan2f(vDir.x, vDir.z);
-
-        m_pTransformCom->Rotation(
-            XMVectorSet(0.f, 1.f, 0.f, 0.f),
-            fRadian
-        );
-
-        // 현재 LOOK 방향으로 이동
-        m_pTransformCom->Go_Straight(fTimeDelta * 10.f);    
-
-        if (iState != 1)
-        {
-            m_pAnimatorCom->Play("Run", true, true);
-            iState = 1;
-        }
-    }
-    else
-    {
-        if (iState != 0)
-        {
-            m_pAnimatorCom->Play("Wait", true, true);
-            iState = 0;
-        }
-    }
-
-    if (m_pGameInstance_Proxy->Key_Pressing(DIK_Z))
-    {
-        Update_Jump(fTimeDelta);
-    }
+    if (m_pGameInstance_Proxy->Is_EditMode())
+        return;
 
     m_pAnimatorCom->Update(fTimeDelta);
 }

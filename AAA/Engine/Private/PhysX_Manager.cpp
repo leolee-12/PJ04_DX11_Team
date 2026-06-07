@@ -169,41 +169,6 @@ PxController* CPhysX_Manager::Create_CapsuleController(const _float3& vFootPos, 
     return pCtrl;
 }
 
-_bool CPhysX_Manager::Move_Controller(physx::PxController* pCtrl, const _float3& vDisp, _float fTimeDelta, _float3* pOutFootPos)
-{
-    if (nullptr == pCtrl)
-        return false;
-
-    PxControllerFilters filters;
-    filters.mFilterFlags = PxQueryFlag::eSTATIC | PxQueryFlag::eDYNAMIC;
-
-    PxControllerCollisionFlags flags =
-        pCtrl->move(PxVec3(vDisp.x, vDisp.y, vDisp.z), 0.001f, fTimeDelta, filters);
-
-    const PxExtendedVec3& foot = pCtrl->getFootPosition();
-
-#ifdef _DEBUG
-    {
-        // Kirby 발 위에서 아래로 1000 레이캐스트 → SQ가 static 메쉬를 찾는지 직접 확인
-        PxRaycastBuffer rayHit;
-        bool b = m_pScene->raycast(
-            PxVec3((PxReal)foot.x, (PxReal)foot.y + 2.f, (PxReal)foot.z),
-            PxVec3(0.f, -1.f, 0.f), 1000.f, rayHit);
-        char buf[256];
-        if (b)
-            sprintf_s(buf, "[RayDown] HIT dist=%.2f hitY=%.2f\n", rayHit.block.distance, rayHit.block.position.y);
-        else
-            sprintf_s(buf, "[RayDown] MISS  (커비 밑에 쿼리 가능한 static 없음!)\n");
-        OutputDebugStringA(buf);
-    }
-#endif
-
-    if (pOutFootPos)
-        *pOutFootPos = _float3((_float)foot.x, (_float)foot.y, (_float)foot.z);
-
-    return flags.isSet(PxControllerCollisionFlag::eCOLLISION_DOWN);
-}
-
 void CPhysX_Manager::Release_Controller(physx::PxController* pCtrl)
 {
     if (nullptr == pCtrl)
@@ -214,13 +179,6 @@ void CPhysX_Manager::Release_Controller(physx::PxController* pCtrl)
         m_Controllers.erase(it);
 
     pCtrl->release();
-}
-
-void CPhysX_Manager::Set_ControllerFootPosition(PxController* pCtrl, const _float3& vFootPos)
-{
-    if (nullptr == pCtrl)
-        return;
-    pCtrl->setFootPosition(PxExtendedVec3(vFootPos.x, vFootPos.y, vFootPos.z));
 }
 
 void CPhysX_Manager::Render_Debug(_fmatrix ViewMatrix, _fmatrix ProjMatrix)

@@ -9,6 +9,7 @@
 #include "Timer_Manager.h"
 #include "Environment_Manager.h"
 #include "ShaderGlobal_Manager.h"
+#include "Camera_Manager.h"
 
 using namespace physx;
 
@@ -382,6 +383,21 @@ const _float4* CGameInstance_Proxy::Get_CamPosition() const
 		return nullptr;
 
 	return m_pOwner->Get_CamPosition();
+}
+
+const _float4* CGameInstance_Proxy::Get_CamLook()  const
+{
+	if (!IsConnected())
+		return nullptr;
+
+	return m_pOwner->m_pCamera_Manager->Get_CamLook();
+}
+const _float4* CGameInstance_Proxy::Get_CamRight() const
+{
+	if (!IsConnected())
+		return nullptr;
+
+	return m_pOwner->m_pCamera_Manager->Get_CamRight();
 }
 
 void CGameInstance_Proxy::Set_Transform(D3DTS eState, PROJ_TYPE eType, _fmatrix StateMatrix)
@@ -863,23 +879,11 @@ PxController* CGameInstance_Proxy::Create_CapsuleController(const _float3& vFoot
 		return nullptr;
 	return m_pOwner->Create_CapsuleController(vFootPos, fRadius, fHeight);
 }
-_bool CGameInstance_Proxy::Move_Controller(PxController* pCtrl, const _float3& vDisp, _float fTimeDelta, _float3* pOutFootPos)
-{
-	if (!IsConnected())
-		return false;
-	return m_pOwner->Move_Controller(pCtrl, vDisp, fTimeDelta, pOutFootPos);
-}
 void CGameInstance_Proxy::Release_Controller(PxController* pCtrl)
 {
 	if (!IsConnected())
 		return;
 	m_pOwner->Release_Controller(pCtrl);
-}
-void CGameInstance_Proxy::Set_ControllerFootPosition(PxController* pCtrl, const _float3& vFootPos)
-{
-	if (!IsConnected())
-		return;
-	m_pOwner->Set_ControllerFootPosition(pCtrl, vFootPos);
 }
 void CGameInstance_Proxy::Toggle_PhysXDebug()
 {

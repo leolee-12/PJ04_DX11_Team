@@ -38,7 +38,6 @@ public:
     void                  Remove_StaticActor(physx::PxRigidStatic* pActor);
 
     physx::PxController* Create_CapsuleController(const _float3& vPos, _float fRadius, _float fHeight);
-    _bool                Move_Controller(physx::PxController* pCtrl, const _float3& vDisp, _float fTimeDelta, _float3* pOutFootPos);
     void                 Release_Controller(physx::PxController* pCtrl);
 
     physx::PxRigidStatic* Cook_StaticMesh(
@@ -48,9 +47,6 @@ public:
 
     physx::PxPhysics* Get_Physics() const { return m_pPhysics; }
     physx::PxScene* Get_Scene()   const { return m_pScene; }
-
-public:
-    void Set_ControllerFootPosition(physx::PxController* pCtrl, const _float3& vFootPos);
 
 public:
     void  Render_Debug(_fmatrix ViewMatrix, _fmatrix ProjMatrix);   

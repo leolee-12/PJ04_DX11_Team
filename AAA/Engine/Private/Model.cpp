@@ -465,7 +465,7 @@ HRESULT CModel::Ready_NonAnim(const _char* pModelFilePath, _fmatrix PreTransform
     if (FAILED(Ready_Materials(modelData.Materials, pModelFilePath)))
         return E_FAIL;
 
-    Load_MeshLayers(pModelFilePath);
+    //Load_MeshLayers(pModelFilePath);
 
     return S_OK;
 }
@@ -484,7 +484,7 @@ HRESULT CModel::Ready_Anim(const _char* pModelFilePath, _fmatrix PreTransformMat
     if (FAILED(Ready_Meshes(modelData.Meshes, PreTransformMatrix)))
         return E_FAIL;
 
-    Load_MeshLayers(pModelFilePath);
+    //Load_MeshLayers(pModelFilePath);
 
     if (FAILED(Ready_Materials(modelData.Materials, pModelFilePath)))
         return E_FAIL;

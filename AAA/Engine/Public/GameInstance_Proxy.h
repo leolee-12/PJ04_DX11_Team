@@ -117,6 +117,8 @@ public: // CameraManager
     const _float4x4* Get_Matrix(D3DTS eState, PROJ_TYPE eType) const;
     const _float4x4* Get_InverseMatrix_Prespec(D3DTS eState) const;
     const _float4* Get_CamPosition() const;
+    const _float4* Get_CamLook()  const;  
+    const _float4* Get_CamRight() const;
     void Set_Transform(D3DTS eState, PROJ_TYPE eType, _fmatrix StateMatrix);
     void Set_Transform(D3DTS eState, PROJ_TYPE eType, const _float4x4& StateMatrix);
 #pragma endregion
@@ -232,10 +234,7 @@ public:
       void                   Remove_StaticActor(physx::PxRigidStatic* pActor);
 
       physx::PxController* Create_CapsuleController(const _float3& vFootPos, _float fRadius, _float fHeight);
-      _bool               Move_Controller(physx::PxController* pCtrl, const _float3& vDisp, _float fTimeDelta, _float3* pOutFootPos);
       void                Release_Controller(physx::PxController* pCtrl);
-
-      void Set_ControllerFootPosition(physx::PxController* pCtrl, const _float3& vFootPos);
 
       void  Toggle_PhysXDebug();
       _bool Is_PhysXDebug() const;
