@@ -57,6 +57,11 @@ HRESULT CKirby::Render()
     return S_OK;
 }
 
+void CKirby::Excute_Command(const CKirby_Command& Command)
+{
+
+}
+
 HRESULT CKirby::Ready_Components()
 {
     return S_OK;

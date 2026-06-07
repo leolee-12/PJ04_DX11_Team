@@ -2,6 +2,8 @@
 
 #include "Character.h"
 
+#include "Kirby_Command.h"
+
 NS_BEGIN(Client)
 
 class CKirby_Body;
@@ -32,6 +34,9 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
+
+public:
+	void Excute_Command(const CKirby_Command& Command);
 
 private:
 	HRESULT Ready_Components();

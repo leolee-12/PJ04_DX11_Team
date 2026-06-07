@@ -103,12 +103,6 @@
     <Filter Include="00. GameObject\04. Character">
       <UniqueIdentifier>{12a38b09-ecf8-45dc-a08f-d9694ed433eb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\04. Character\00. Kirby">
-      <UniqueIdentifier>{12147d60-e62f-468f-83f3-929d881d4809}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\04. Character\00. Kirby\Parts">
-      <UniqueIdentifier>{ce8838df-6dca-44f5-99b6-21707344efd7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\01. Map\SkySphere">
       <UniqueIdentifier>{c77df806-0179-45ff-b02d-ef8c9d34da35}</UniqueIdentifier>
     </Filter>
@@ -178,8 +172,41 @@
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\07. TornadoSpinReverse">
       <UniqueIdentifier>{787e47ba-9f50-4b14-8202-9fedb31d5864}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\Test\TestParticle">
-      <UniqueIdentifier>{04b70375-6559-4d9e-86ac-a630d0e951fa}</UniqueIdentifier>
+    <Filter Include="05. Kirby">
+      <UniqueIdentifier>{12147d60-e62f-468f-83f3-929d881d4809}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. Kirby\00. System">
+      <UniqueIdentifier>{7648d490-820b-4c96-894c-045d0e801ece}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. Kirby\00. System\00. Kirby_Command">
+      <UniqueIdentifier>{e0cdcdad-a6da-44ee-97c0-e62b3a4dd006}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. Kirby\00. System\01. Kirby_InputManager">
+      <UniqueIdentifier>{f66a0972-8423-4e3e-9f13-3734efb87f5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. Kirby\00. System\02. Kirby_Controller">
+      <UniqueIdentifier>{1215fa5f-4c0b-433e-8520-b64bea35bac0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. Kirby\04. Parts">
+      <UniqueIdentifier>{ce8838df-6dca-44f5-99b6-21707344efd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. Kirby\01. StateMachine">
+      <UniqueIdentifier>{3e72c21b-58c2-46a4-91cc-99db8dbcffb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. Kirby\01. StateMachine\State">
+      <UniqueIdentifier>{3fb8322f-bbfe-4bc3-963c-2c3d4d80cee2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. Kirby\01. StateMachine\State\00. Wait">
+      <UniqueIdentifier>{8ba40596-ddff-412c-a0bc-883604bd1093}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. Kirby\01. StateMachine\State\01. Run">
+      <UniqueIdentifier>{9e646af3-48ac-48e3-8513-45d75ec65f43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. Kirby\01. StateMachine\State\02. Jump">
+      <UniqueIdentifier>{3e17907c-bcba-459e-bf79-c4b706ede510}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. Kirby\01. StateMachine\State\03. Attack">
+      <UniqueIdentifier>{a856ba07-405b-4c82-8eb0-595b2b12db9c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -307,10 +334,10 @@
       <Filter>00. GameObject\04. Character</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby.h">
-      <Filter>00. GameObject\04. Character\00. Kirby</Filter>
+      <Filter>05. Kirby</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Body.h">
-      <Filter>00. GameObject\04. Character\00. Kirby\Parts</Filter>
+      <Filter>05. Kirby\04. Parts</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SkySphere.h">
       <Filter>00. GameObject\01. Map\SkySphere</Filter>
@@ -342,8 +369,26 @@
     <ClInclude Include="..\Public\TornadoSpinReverse.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\07. TornadoSpinReverse</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\TestParticle.h">
-      <Filter>00. GameObject\Test\TestParticle</Filter>
+    <ClInclude Include="..\Public\Kirby_InputManager.h">
+      <Filter>05. Kirby\00. System\01. Kirby_InputManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Controller.h">
+      <Filter>05. Kirby\00. System\02. Kirby_Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Command.h">
+      <Filter>05. Kirby\00. System\00. Kirby_Command</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_State.h">
+      <Filter>05. Kirby\01. StateMachine\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_StateMachine.h">
+      <Filter>05. Kirby\01. StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Wait.h">
+      <Filter>05. Kirby\01. StateMachine\State\00. Wait</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Run.h">
+      <Filter>05. Kirby\01. StateMachine\State\01. Run</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -437,11 +482,8 @@
     <ClCompile Include="..\Private\Character.cpp">
       <Filter>00. GameObject\04. Character</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Kirby.cpp">
-      <Filter>00. GameObject\04. Character\00. Kirby</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Kirby_Body.cpp">
-      <Filter>00. GameObject\04. Character\00. Kirby\Parts</Filter>
+      <Filter>05. Kirby\04. Parts</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SkySphere.cpp">
       <Filter>00. GameObject\01. Map\SkySphere</Filter>
@@ -467,8 +509,26 @@
     <ClCompile Include="..\Private\TornadoSpinReverse.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\07. TornadoSpinReverse</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\TestParticle.cpp">
-      <Filter>00. GameObject\Test\TestParticle</Filter>
+    <ClCompile Include="..\Private\Kirby_InputManager.cpp">
+      <Filter>05. Kirby\00. System\01. Kirby_InputManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Controller.cpp">
+      <Filter>05. Kirby\00. System\02. Kirby_Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_State.cpp">
+      <Filter>05. Kirby\01. StateMachine\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby.cpp">
+      <Filter>05. Kirby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_StateMachine.cpp">
+      <Filter>05. Kirby\01. StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Wait.cpp">
+      <Filter>05. Kirby\01. StateMachine\State\00. Wait</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Run.cpp">
+      <Filter>05. Kirby\01. StateMachine\State\01. Run</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

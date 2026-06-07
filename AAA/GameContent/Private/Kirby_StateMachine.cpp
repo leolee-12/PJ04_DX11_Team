@@ -1,0 +1,98 @@
+#include "Kirby_StateMachine.h"
+
+#include "GameInstance.h"
+
+#include "Kirby_Wait.h"
+#include "Kirby_Run.h"
+
+CKirby_StateMachine::CKirby_StateMachine()
+{
+
+}
+
+HRESULT CKirby_StateMachine::Initialize(CKirby* pKirby)
+{
+    m_pKirby = pKirby;
+    if (m_pKirby == nullptr)
+        return E_FAIL;
+
+    return S_OK;
+}
+
+KIRBY_STATE_TYPE CKirby_StateMachine::Get_StateType()
+{
+    return m_pCurState->Get_StateType();
+}
+
+void CKirby_StateMachine::Change_State(KIRBY_STATE_TYPE eNewstate)
+{
+    if (m_pCurState == nullptr)
+        return;
+
+    if (m_pCurState->Get_StateType() == eNewstate)
+        return;
+
+    m_pCurState->End(m_pKirby);
+    Safe_Release(m_pCurState);
+
+    m_pCurState = State_Creator(eNewstate);
+
+    if (m_pCurState == nullptr)
+        return;
+
+    m_pCurState->Enter(m_pKirby);
+
+}
+
+void CKirby_StateMachine::Update_StateMachine(const _float fTimeDelta)
+{
+    if (m_pCurState == nullptr)
+        return;
+
+    m_pCurState->Update(m_pKirby, fTimeDelta);
+}
+
+void CKirby_StateMachine::Handle_Command(const CKirby_Command& Command)
+{
+    m_pCurState->Handle_Command(m_pKirby, Command);
+}
+
+CKirby_State* CKirby_StateMachine::State_Creator(KIRBY_STATE_TYPE eNewstate)
+{
+    CKirby_State* pState{};
+
+    switch (eNewstate)
+    {
+        case KIRBY_STATE_TYPE::WAIT:        pState = CKirby_Wait::Create();     break;
+        case KIRBY_STATE_TYPE::RUN:         pState = CKirby_Run::Create();      break;
+
+        //case KIRBY_STATE_TYPE::JUMP:
+        //     
+        //    break;
+        //case KIRBY_STATE_TYPE::ATTACK:
+        //     
+        //    break;   
+    }
+
+    return pState;
+}
+
+CKirby_StateMachine* CKirby_StateMachine::Create(CKirby* pKirby)
+{
+    CKirby_StateMachine* pInstance = new CKirby_StateMachine();
+
+    if (FAILED(pInstance->Initialize(pKirby)))
+    {
+        MSG_BOX("Failed to Created: CKirby_StateMachine");
+        Safe_Release(pInstance);
+    }
+
+    return pInstance;
+}
+
+void CKirby_StateMachine::Free()
+{
+    Safe_Release(m_pCurState);
+
+    __super::Free();
+}
