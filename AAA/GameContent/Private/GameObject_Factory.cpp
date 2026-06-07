@@ -31,7 +31,9 @@
 #include "SmokeTail.h"
 #include "Common_Curve03.h"
 #include "Common_Circle01.h"
+#include "InhaleEffect.h"
 #include "Vacuum.h"
+#include "TornadoSpinReverse.h"
 
 //sky
 #include "SkySphere.h"
@@ -230,11 +232,34 @@ void CGameObject_Factory::Register_Test()
     Register(CVacuumContainer::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CVacuumContainer),
         LOADER
         (           
+            // InhaleEffect
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CInhaleEffect::PROTOTYPE_TAG,
+                CInhaleEffect::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_InhaleEffect"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/InhaleEffect2M/Common_00_InhaleEffect2M.ysh",
+                    XMMatrixRotationX(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, Texture_Wind01.iLevelID, Texture_Wind01.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Wind01.szFileTag, Texture_Wind01.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Wind02.iLevelID, Texture_Wind02.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Wind02.szFileTag, Texture_Wind02.iNumTex));
+
             // Vacuum
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CVacuum::PROTOTYPE_TAG,
                 CVacuum::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Common_00_Vacuum"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/InhaleEffect2M/Common_00_InhaleEffect2M.ysh"));                       
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Vacuum/Common_00_Vacuum.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            
+            TRY_ADD_PROTO(pProxy, Texture_Twincle.iLevelID, Texture_Twincle.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Twincle.szFileTag, Texture_Twincle.iNumTex));
+
+            // Tornado Spin Reverse
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CTornadoSpinReverse::PROTOTYPE_TAG,
+                CTornadoSpinReverse::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_TornadoSpinReverse"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/TornadoSpinReverse/Tornado_00_TornadoSpinReverse.ysh",
+                    XMMatrixRotationX(XMConvertToRadians(90.f))
+                ));
         )
     );
 }

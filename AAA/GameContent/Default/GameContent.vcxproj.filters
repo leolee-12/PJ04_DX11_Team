@@ -175,6 +175,12 @@
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\06. InhaleEffect">
       <UniqueIdentifier>{eac9b9b7-bf0c-4d4c-bde8-6fc2eb74c3ed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\07. TornadoSpinReverse">
+      <UniqueIdentifier>{787e47ba-9f50-4b14-8202-9fedb31d5864}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\TestParticle">
+      <UniqueIdentifier>{04b70375-6559-4d9e-86ac-a630d0e951fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -330,6 +336,15 @@
     <ClInclude Include="..\Public\VacuumContainer.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\02. VacuumContainer</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\InhaleEffect.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\06. InhaleEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TornadoSpinReverse.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\07. TornadoSpinReverse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TestParticle.h">
+      <Filter>00. GameObject\Test\TestParticle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -445,6 +460,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\VacuumContainer.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\02. VacuumContainer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\InhaleEffect.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\06. InhaleEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TornadoSpinReverse.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\07. TornadoSpinReverse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestParticle.cpp">
+      <Filter>00. GameObject\Test\TestParticle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

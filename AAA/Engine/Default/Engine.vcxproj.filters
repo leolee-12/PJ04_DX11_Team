@@ -253,6 +253,9 @@
     <Filter Include="99. Defines">
       <UniqueIdentifier>{e411772b-c2a6-40ab-8686-9969730280cf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Paricle">
+      <UniqueIdentifier>{cac7e3a1-ecdd-4d62-8d22-bae46537c29b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -498,6 +501,9 @@
     <ClInclude Include="..\Public\Frustum_Manager.h">
       <Filter>20. Culling</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Effect_Particle.h">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -721,6 +727,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Frustum_Manager.cpp">
       <Filter>20. Culling</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_Particle.cpp">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
