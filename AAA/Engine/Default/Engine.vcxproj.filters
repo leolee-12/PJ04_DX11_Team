@@ -1,12 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="02.Timers">
-      <UniqueIdentifier>{0cbbced3-2367-452e-8da2-4064351a570a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.Timers\Manager">
-      <UniqueIdentifier>{69b9332e-8870-4704-a122-906d3b3f0eb3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="03. Levels">
       <UniqueIdentifier>{5a92ba7c-a454-4f53-88b6-9b565eb01420}</UniqueIdentifier>
     </Filter>
@@ -256,6 +250,12 @@
     <Filter Include="07. Component\Model\MaterialEx">
       <UniqueIdentifier>{513a2421-d331-4f8f-a7b5-326ac84b207b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. Timers">
+      <UniqueIdentifier>{0cbbced3-2367-452e-8da2-4064351a570a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. Timers\Manager">
+      <UniqueIdentifier>{69b9332e-8870-4704-a122-906d3b3f0eb3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -286,10 +286,10 @@
       <Filter>01. Device\Graphic</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Timer.h">
-      <Filter>02.Timers</Filter>
+      <Filter>02. Timers</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Timer_Manager.h">
-      <Filter>02.Timers\Manager</Filter>
+      <Filter>02. Timers\Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level.h">
       <Filter>03. Levels</Filter>
@@ -519,10 +519,10 @@
       <Filter>01. Device\Graphic</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Timer.cpp">
-      <Filter>02.Timers</Filter>
+      <Filter>02. Timers</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Timer_Manager.cpp">
-      <Filter>02.Timers\Manager</Filter>
+      <Filter>02. Timers\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level.cpp">
       <Filter>03. Levels</Filter>

@@ -421,9 +421,13 @@ HRESULT CModel::Save_MeshLayers() const
         const MESH_LAYER_IDX& m = m_MeshLayers[i];
 
         json jMesh;
+
+        if (m.iPass >= 0)
+            jMesh["Pass"] = m.iPass;
+
         for (_uint t = 0; t < MTEX_TYPE_MAX; ++t)
         {
-            if (m.idx[t] != 0)                 
+            if (m.idx[t] != 0)
                 jMesh[to_string(t)] = m.idx[t];
         }
         if (!jMesh.empty())                   
@@ -526,6 +530,8 @@ HRESULT CModel::Ready_NonAnimEx(const _char* pModelFilePath, _fmatrix PreTransfo
     if (FAILED(Ready_MaterialsEx(modelData.Materials, pModelFilePath)))
         return E_FAIL;
 
+    Load_MeshLayers(pModelFilePath);
+
     return S_OK;
 }
 
@@ -602,8 +608,14 @@ void CModel::Load_MeshLayers(const _char* pModelFilePath)
         catch (...) { continue; }
         if (i >= m_iNumMeshes) continue;
 
+        if (meshItem.value().contains("Pass") && meshItem.value()["Pass"].is_number_integer())
+            m_MeshLayers[i].iPass = meshItem.value()["Pass"].get<int>();
+
         for (auto& texItem : meshItem.value().items())
         {
+            if (texItem.key() == "Pass")
+                continue;
+
             _uint t = 0;
             try { t = (_uint)stoul(texItem.key()); }
             catch (...) { continue; }

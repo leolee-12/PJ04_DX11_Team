@@ -25,20 +25,15 @@ private:
 	virtual ~CModel() = default;
 
 public:
-	_uint Get_NumAnimations() const { return (_uint)m_Animations.size(); }
-
+	_uint Get_NumAnimations() const { return static_cast<_uint>(m_Animations.size()); }
 	_uint Get_NumBones() const { return static_cast<_uint>(m_Bones.size()); }
 	const string& Get_BoneName(_uint iIndex) const;
 	_int Get_BoneParentIndex(_uint iIndex) const;
 	_int Get_RootBoneIndex() const;
 	void Get_AnimChannelBoneIndices(_uint iAnimIndex, vector<_uint>& Out);
 
-	size_t Get_NumMeshes() const {
-		return m_iNumMeshes;
-	}
-	_uint Get_MaxAnimationIndex() const {
-		return m_Animations.empty() ? 0 : (_uint)m_Animations.size() - 1;
-	}
+	size_t Get_NumMeshes() const { return m_iNumMeshes; }
+	_uint Get_MaxAnimationIndex() const { return m_Animations.empty() ? 0u : static_cast<_uint>(m_Animations.size()) - 1u; }
 	_int Get_BoneIndex(const string& strBoneName);
 
 	const _float4x4* Get_BoneMatrixPtr(const string& strBoneName) const;

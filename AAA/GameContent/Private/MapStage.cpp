@@ -79,6 +79,61 @@ void CMapStage::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	pOutData->strPrototypeTag = m_strProtoTag;
 }
 
+json CMapStage::Serialize() const
+{
+	json j = __super::Serialize();
+	j["StageName"] = WstrToStr(m_strStageName);
+	j["Sections"] = json::array();
+
+	for (const CMapSection* pSection : m_Sections)
+	{
+		if (nullptr == pSection)
+			continue;
+
+		j["Sections"].push_back(pSection->Serialize_SectionState());
+	}
+
+	return j;
+}
+
+void CMapStage::Deserialize(const json& j)
+{
+	__super::Deserialize(j);
+	Refresh_SectionTransforms();
+
+	if (j.contains("StageName") && j["StageName"].is_string())
+		m_strStageName = StrToWstr(j["StageName"].get<string>());
+
+	if (!j.contains("Sections") || !j["Sections"].is_array())
+		return;
+
+	unordered_map<wstring, CMapSection*> SectionByName;
+	for (CMapSection* pSection : m_Sections)
+	{
+		if (nullptr == pSection)
+			continue;
+
+		SectionByName.emplace(pSection->Get_SectionName(), pSection);
+	}
+
+	for (const auto& jSection : j["Sections"])
+	{
+		if (!jSection.is_object())
+			continue;
+		if (!jSection.contains("SectionName") || !jSection["SectionName"].is_string())
+			continue;
+
+		const wstring strSectionName = StrToWstr(jSection["SectionName"].get<string>());
+		auto iter = SectionByName.find(strSectionName);
+		if (iter == SectionByName.end())
+			continue;
+
+		iter->second->Deserialize_SectionState(jSection);
+	}
+
+	Refresh_SectionTransforms();
+}
+
 HRESULT CMapStage::Ready_Sections(const MAP_STAGE_DESC* pDesc)
 {
 	if (nullptr == pDesc)

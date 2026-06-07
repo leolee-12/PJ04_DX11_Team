@@ -6,9 +6,8 @@
 #include "GameObject_Factory.h"
 #include "GameContent_const.h"
 #include "GameContent_Log.h"
-#include "MapDescriptor.h"
+#include "Map_EditHelper.h"
 #include "MapStage.h"
-#include "EnvObjectLoader.h"
 #include "EnvObject.h"
 
 #ifdef _DEBUG
@@ -16,8 +15,6 @@
 #endif
 
 #include "GameInstance.h"
-#include "GameInstance_Proxy.h"
-#include "GameObject.h"
 #include "DataExporter.h"
 #include "DataLoader.h"
 //#include "NavMesh_Editor.h"
@@ -598,7 +595,7 @@ HRESULT CLevel_Edit::Ready_MapStage()
 	const _uint iModelLevel = ETOUI(LEVEL::GAMEPLAY);
 
 	Client::CMapStage* pLoadedStage = nullptr;
-	if (FAILED(Client::CMapDescriptor::GetInstance()->Load_MapStage(
+	if (FAILED(Client::CMap_EditHelper::Load_MapStage(
 		m_pDevice,
 		m_pContext,
 		kPresetIndex,
@@ -616,9 +613,9 @@ HRESULT CLevel_Edit::Ready_MapStage()
 
 	Add_Layer(L"Layer_MapStage");
 	m_Layers[L"Layer_MapStage"].push_back({
-		Client::CMapStage::PROTOTYPE_TAG,
-		L"MapStage",
-		m_pMapStage });
+			Client::CMapStage::PROTOTYPE_TAG,
+			L"MapStage",
+			m_pMapStage });
 
 #ifdef _DEBUG
 	CMapToolProfiler::GetInstance()->Set_Stage(m_pMapStage);
@@ -635,8 +632,8 @@ HRESULT CLevel_Edit::Ready_EnvObjects()
 	CMapToolProfiler::GetInstance()->Clear_EnvObjects();
 #endif
 
-	Client::CMapDescriptor::MAP_PRESET_LOAD_REPORT Report{};
-	const HRESULT hr = Client::CMapDescriptor::GetInstance()->Load_EnvObject_FromJson(
+	Client::CMap_EditHelper::MAP_PRESET_LOAD_REPORT Report{};
+	const HRESULT hr = Client::CMap_EditHelper::Load_EnvObject_FromJson(
 		m_pDevice,
 		m_pContext,
 		kPresetIndex,

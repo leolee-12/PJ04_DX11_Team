@@ -80,10 +80,11 @@ namespace Engine
 		XMFLOAT4 vGridParams;   
 	}FROXEL_CB;
 
-	typedef struct tagMeshLayerIdx
+	struct MESH_LAYER_IDX
 	{
+		int           iPass = -1;                   // -1 = renderer default
 		unsigned int  idx[MTEX_TYPE_MAX] = { 0 };   // MTEX_TYPE º° slotArrayIndex
-	}MESH_LAYER_IDX;
+	};
 
 	struct TEXTURE_HUB_STATS
 	{

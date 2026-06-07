@@ -1,11 +1,6 @@
 #include "MapSection.h"
 
-#include <exception>
-#include <Windows.h>
-
-#include "Engine_Function.h"
-#include "GameInstance_Proxy.h"
-#include "Model.h"
+#include "GameInstance.h"
 
 NS_BEGIN(Client)
 
@@ -70,6 +65,7 @@ HRESULT CMapSection::Initialize(void* pArg)
 	m_strSectionName = pDesc->strSectionName;
 	m_strModelProtoTag = pDesc->strModelProtoTag;
 	m_strModelPath = pDesc->strModelPath;
+	m_iModelProtoLevel = pDesc->iModelProtoLevel;
 	m_eSectionType = pDesc->eSectionType;
 	m_eRenderID = pDesc->eRenderID;
 	m_bCastShadow = pDesc->bCastShadow;
@@ -78,9 +74,6 @@ HRESULT CMapSection::Initialize(void* pArg)
 
 	if (m_bRenderable)
 	{
-		if (FAILED(Ready_ModelPrototype(pDesc)))
-			return E_FAIL;
-
 		if (FAILED(__super::Initialize(pArg)))
 			return E_FAIL;
 
@@ -190,61 +183,42 @@ void CMapSection::Reset_FrameProfile()
 }
 #endif
 
+json CMapSection::Serialize_SectionState() const
+{
+	json j = IReflectable::Serialize();
+
+	j["SectionName"] = WstrToStr(m_strSectionName);
+	j["SectionRender"]["RenderID"] = static_cast<_int>(m_eRenderID);
+
+	return j;
+}
+
+void CMapSection::Deserialize_SectionState(const json& j)
+{
+	IReflectable::Deserialize(j);
+
+	if (j.contains("SectionRender") && j["SectionRender"].is_object())
+	{
+		const json& jRender = j["SectionRender"];
+
+		if (jRender.contains("RenderID") && jRender["RenderID"].is_number_integer())
+			m_eRenderID = static_cast<RENDERID>(jRender["RenderID"].get<_int>());
+	}
+}
+
 const _tchar* CMapSection::Get_ModelProtoTag() const
 {
 	return m_strModelProtoTag.c_str();
 }
 
+_uint CMapSection::Get_ModelProtoLevel() const
+{
+	return m_iModelProtoLevel;
+}
+
 HRESULT CMapSection::Bind_WorldMatrix()
 {
 	return m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix);
-}
-
-HRESULT CMapSection::Ready_ModelPrototype(const MAP_SECTION_DESC* pDesc)
-{
-	if (nullptr == pDesc)
-		return E_FAIL;
-
-	if (!m_pGameInstance_Proxy->Has_Prototype(pDesc->iModelProtoLevel, pDesc->strModelProtoTag))
-	{
-		if (pDesc->strModelPath.empty())
-			return E_FAIL;
-
-		const string strModelPath = WstrToStr(pDesc->strModelPath);
-		CModel* pModelPrototype = nullptr;
-		try
-		{
-			pModelPrototype = CModel::Create_WithTextureHub(
-				m_pDevice,
-				m_pContext,
-				MODEL::MAP,
-				strModelPath.c_str()
-				//, XMMatrixRotationY(XMConvertToRadians(180.f))
-			);
-		}
-		catch (const std::exception& e)
-		{
-			Log_MapSectionWarning(
-				"MapSection model creation exception: section=" + WstrToStr(pDesc->strSectionName)
-				+ " path=" + strModelPath
-				+ " reason=" + e.what());
-			return E_FAIL;
-		}
-
-		if (nullptr == pModelPrototype)
-			return E_FAIL;
-
-		if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
-			pDesc->iModelProtoLevel,
-			pDesc->strModelProtoTag.c_str(),
-			pModelPrototype)))
-		{
-			Safe_Release(pModelPrototype);
-			return E_FAIL;
-		}
-	}
-
-	return S_OK;
 }
 
 void CMapSection::Update_LocalBounds()
