@@ -218,6 +218,7 @@
     <ClInclude Include="..\Public\MaterialEx.h" />
     <ClInclude Include="..\Public\Mesh.h" />
     <ClInclude Include="..\Public\Model.h" />
+    <ClInclude Include="..\public\Movement.h" />
     <ClInclude Include="..\Public\Navigation.h" />
     <ClInclude Include="..\public\Object_Manager.h" />
     <ClInclude Include="..\Public\PartObject.h" />
@@ -300,6 +301,7 @@
     <ClCompile Include="..\Private\MaterialEx.cpp" />
     <ClCompile Include="..\Private\Mesh.cpp" />
     <ClCompile Include="..\Private\Model.cpp" />
+    <ClCompile Include="..\private\Movement.cpp" />
     <ClCompile Include="..\Private\Navigation.cpp" />
     <ClCompile Include="..\private\Object_Manager.cpp" />
     <ClCompile Include="..\Private\PartObject.cpp" />

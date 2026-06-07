@@ -10,6 +10,7 @@
 #include "VIBuffer_Point.h"
 #include "Collider.h"
 #include "Effect_Container.h"
+#include "Movement.h"
 #include <shared_mutex>
 
 /* 1. 원형객체(CGameObject, CComponent)를 보관한다. */

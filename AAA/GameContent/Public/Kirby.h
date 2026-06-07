@@ -6,6 +6,10 @@ NS_BEGIN(physx)
 class PxController;
 NS_END
 
+NS_BEGIN(Engine)
+class CMovement;
+NS_END
+
 NS_BEGIN(Client)
 
 class CKirby_Body;
@@ -46,13 +50,20 @@ private:
 	CKirby_Body* m_pBody{};
 
 	physx::PxController* m_pController = { nullptr };
-	_float               m_fVerticalVelocity{ 0.f };   // 중력 누적 속도(아래로 음수)
-	_bool                m_bGrounded{ false };
+	CMovement* m_pMovement = { nullptr }; 
 
-	static constexpr _float CCT_RADIUS = 0.5f;
-	static constexpr _float CCT_HEIGHT = 1.0f;
+	//controller
+	static constexpr _float CCT_RADIUS = 0.75f;
+	static constexpr _float CCT_HEIGHT = 0.2f;
+
+	//movement
 	static constexpr _float MOVE_SPEED = 6.0f;
+	static constexpr _float ROT_SPEED = 720.0f;   // degree/sec
 	static constexpr _float GRAVITY = -20.0f;
+	static constexpr _float JUMP_SPEED = 8.0f;
+	static constexpr _float MOVE_ACCEL = 40.f;
+	static constexpr _float MOVE_DECEL = 50.f;
+
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

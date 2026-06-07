@@ -231,7 +231,7 @@ technique11 DefaultTechnique
 
     pass ShadowPass // 2
     {
-        SetRasterizerState(RS_Default); // 피터팬 심하면 앞면 컬링 RS로 교체
+        SetRasterizerState(RS_Cull_None); // 피터팬 심하면 앞면 컬링 RS로 교체
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
         VertexShader = compile vs_5_0 VS_SHADOW();

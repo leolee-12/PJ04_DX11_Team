@@ -256,6 +256,9 @@
     <Filter Include="02. Timers\Manager">
       <UniqueIdentifier>{69b9332e-8870-4704-a122-906d3b3f0eb3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="07. Component\Movement">
+      <UniqueIdentifier>{ee43c8cf-5df2-4924-933f-7f5129d9e351}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -507,6 +510,9 @@
     <ClInclude Include="..\Public\MaterialEx.h">
       <Filter>07. Component\Model\MaterialEx</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Movement.h">
+      <Filter>07. Component\Movement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -736,6 +742,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\MaterialEx.cpp">
       <Filter>07. Component\Model\MaterialEx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Movement.cpp">
+      <Filter>07. Component\Movement</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

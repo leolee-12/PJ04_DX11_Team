@@ -84,19 +84,7 @@ HRESULT CMapSection::Initialize(void* pArg)
 		{
 			m_pColliderActor = m_pGameInstance_Proxy->Add_StaticActor(
 				m_pModelCom->Get_CollisionMesh(), XMLoadFloat4x4(&m_CombinedWorldMatrix));
-#ifdef _DEBUG
-			_float4 p; XMStoreFloat4(&p, XMLoadFloat4x4(&m_CombinedWorldMatrix).r[3]);
-			char buf[256];
-			sprintf_s(buf, "[MapColl] %ls  mesh=%p  actor=%p  pos=(%.1f,%.1f,%.1f)\n",
-				m_strSectionName.c_str(), (void*)m_pModelCom->Get_CollisionMesh(),
-				(void*)m_pColliderActor, p.x, p.y, p.z);
-			OutputDebugStringA(buf);
-#endif
 		}
-#ifdef _DEBUG
-		else
-			OutputDebugStringA("[MapColl] !!! 충돌메쉬 없음 (cook 실패 or null) !!!\n");
-#endif
 	}
 	else
 	{
