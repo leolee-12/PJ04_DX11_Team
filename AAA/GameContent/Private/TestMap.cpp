@@ -58,7 +58,7 @@ HRESULT CTestMap::Render()
 	{
 		/*Texture2D g_DiffuseTexture;
 		Texture2D g_NormalTexture;
-		Texture2D g_UnkownTexture;
+		Texture2D g_UnknownTexture;
 		Texture2D g_MRATexture;*/
 
 		_uint iPassIdx = 0;
@@ -71,7 +71,7 @@ HRESULT CTestMap::Render()
 		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", (_uint)i, MTEX_TYPE::METALNESS, 0)))
 			continue;
 
-		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnkownTexture", (_uint)i, MTEX_TYPE::UNKNOWN, 0)))
+		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnknownTexture", (_uint)i, MTEX_TYPE::UNKNOWN, 0)))
 			continue;
 
 		if (FAILED(m_pShaderCom->Begin(1)))

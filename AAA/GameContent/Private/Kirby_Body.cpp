@@ -102,20 +102,6 @@ HRESULT CKirby_Body::Render()
     return S_OK;
 }
 
-void CKirby_Body::Update_Jump(_float fTimeDelta)
-{
-    if (false == m_pGameInstance_Proxy->Key_Pressing(DIK_Z))
-        return;
-
-    const _float fJumpSpeed = 8.f;
-
-    _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
-
-    vPos += XMVectorSet(0.f, fJumpSpeed * fTimeDelta, 0.f, 0.f);
-
-    m_pTransformCom->Set_State(STATE::POSITION, vPos);
-}
-
 HRESULT CKirby_Body::Ready_Components()
 {
     /* For.Com_Shader */
