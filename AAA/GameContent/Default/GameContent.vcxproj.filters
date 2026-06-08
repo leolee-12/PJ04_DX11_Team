@@ -291,6 +291,9 @@
     <ClInclude Include="..\Public\UI_GenericContainer.h">
       <Filter>00. GameObject\UI\UIContainer\GenericContainer</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\UI_Fonts.h">
+      <Filter>99. Defines\Hojun</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">

@@ -77,7 +77,7 @@ void CPanel_Hierarchy::Render_UIHierarchy()
     m_pPanel_Manager->Validate_UISelection();
 
     UI_CONTEXT& UIContext = m_pPanel_Manager->Get_UIContext();
-    const auto& UIContainers = pLevel->Get_UIContainers();
+    auto& UIContainers = pLevel->Get_UIContainerEntries();
 
     if (UIContext.bDirty)
         ImGui::TextColored(ImVec4(1.f, 0.75f, 0.25f, 1.f), "Modified");
@@ -92,8 +92,10 @@ void CPanel_Hierarchy::Render_UIHierarchy()
     CUIContainerObject* pPartDeleteOwner = nullptr;
     _wstring strPartDeleteTag;
 
-    for (auto* pContainer : UIContainers)
+    for (auto& Entry : UIContainers)
     {
+        CUIContainerObject* pContainer = Entry.pContainer;
+
         if (nullptr == pContainer)
             continue;
 
@@ -119,7 +121,13 @@ void CPanel_Hierarchy::Render_UIHierarchy()
         if (bContainerSelected)
             eNodeFlags |= ImGuiTreeNodeFlags_Selected;
 
+        if (!pContainer->Is_Active())
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.55f, 0.55f, 0.55f, 1.f));
+
         const _bool bOpened = ImGui::TreeNodeEx(strContainerName.c_str(), eNodeFlags);
+
+        if (!pContainer->Is_Active())
+            ImGui::PopStyleColor();
 
         if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
             m_pPanel_Manager->Set_UISelected(pContainer, nullptr, L"");
@@ -134,7 +142,37 @@ void CPanel_Hierarchy::Render_UIHierarchy()
             }
             else
             {
+                vector<pair<_wstring, CUIPartObject*>> SortedParts;
+                SortedParts.reserve(UIParts.size());
+
                 for (const auto& Pair : UIParts)
+                {
+                    if (Pair.second)
+                        SortedParts.emplace_back(Pair.first, Pair.second);
+                }
+
+                sort(SortedParts.begin(), SortedParts.end(),
+                    [](const auto& L, const auto& R)
+                    {
+                        CUIPartObject* pLeft = L.second;
+                        CUIPartObject* pRight = R.second;
+
+                        const _int iLeftLayer = static_cast<_int>(pLeft->Get_RenderLayer());
+                        const _int iRightLayer = static_cast<_int>(pRight->Get_RenderLayer());
+
+                        if (iLeftLayer != iRightLayer)
+                            return iLeftLayer < iRightLayer;
+
+                        const _float fLeftZ = pLeft->Get_ZOrder();
+                        const _float fRightZ = pRight->Get_ZOrder();
+
+                        if (fLeftZ != fRightZ)
+                            return fLeftZ < fRightZ;
+
+                        return L.first < R.first;
+                    });
+
+                for (const auto& Pair : SortedParts)
                 {
                     const _wstring& strPartTag = Pair.first;
                     CUIPartObject* pPart = Pair.second;

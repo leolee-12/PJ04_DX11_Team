@@ -22,7 +22,7 @@ HRESULT CCustomFont::Initialize(const _tchar* pFontFilePath)
 	return S_OK;
 }
 
-HRESULT CCustomFont::Draw(const _tchar* pText, const _float2& vPosition, _fvector vColor, _float fRotation, const _float2& vScale)
+HRESULT CCustomFont::Draw(const _tchar* pText, const _float2& vPosition, _fvector vColor, _float fRotation, const _float2& vScale, TEXT_ALIGN eAlign)
 {
 	D3D11_VIEWPORT vp;
 	UINT numVP = 1;
@@ -35,7 +35,17 @@ HRESULT CCustomFont::Draw(const _tchar* pText, const _float2& vPosition, _fvecto
 	vScreenPos.y = (m_fDesignH * 0.5f - vPosition.y) / m_fDesignH * fActualH;
 
 	XMVECTOR size = m_pFont->MeasureString(pText);
-	_float2 vOrigin = { XMVectorGetX(size) * 0.5f, XMVectorGetY(size) * 0.5f };
+	_float fW = XMVectorGetX(size);
+	_float fH = XMVectorGetY(size);
+
+	_float fOriginX = fW * 0.5f;	// 기본 배치는 CENTER
+
+	if (eAlign == TEXT_ALIGN::LEFT)
+		fOriginX = 0.f;
+	else if (eAlign == TEXT_ALIGN::RIGHT)
+		fOriginX = fW;
+
+	_float2 vOrigin = { fOriginX, fH * 0.5f };	// 세로는 중앙 유지
 
 	m_pBatch->Begin();
 
@@ -46,7 +56,14 @@ HRESULT CCustomFont::Draw(const _tchar* pText, const _float2& vPosition, _fvecto
 	return S_OK;
 }
 
+_float2 CCustomFont::Measure(const _tchar* pText) const
+{
+	if (nullptr == m_pFont || nullptr == pText)
+		return _float2(0.f, 0.f);
 
+	XMVECTOR v = m_pFont->MeasureString(pText);
+	return _float2(XMVectorGetX(v), XMVectorGetY(v));
+}
 
 CCustomFont* CCustomFont::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pFontFilePath)
 {

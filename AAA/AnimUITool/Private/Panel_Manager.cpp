@@ -174,9 +174,14 @@ _bool CPanel_Manager::Validate_UISelection()
     // 컨테이너가 추적 목록에 없으면(삭제됨) 선택 해제
     if (m_pLevel)
     {
-        const auto& Containers = m_pLevel->Get_UIContainers();
-        if (find(Containers.begin(), Containers.end(),
-            Selection.pContainer) == Containers.end())
+        const auto& Entries = m_pLevel->Get_UIContainerEntries();        
+        auto it = std::find_if(Entries.begin(), Entries.end(),
+            [&Selection](const UI_CONTAINER_ENTRY& Entry)
+            {
+                return Entry.pContainer == Selection.pContainer;
+            });
+
+        if (it == Entries.end())
         {
             Clear_UISelected();
             return false;

@@ -11,12 +11,15 @@
 #include "TestMap.h"
 #include "TestMarb1e.h"
 #include "TestMarb1eMap.h"
+#include "Material_Object.h"
+
+//UI
 #include "UI_Image.h"
 #include "UI_TestImageContainer.h"
 #include "UI_Title.h"
-#include "Material_Object.h"
 #include "UI_GenericContainer.h"
 #include "UI_SpriteAnim.h"
+#include "UI_Text.h"
 
 // Kirby
 #include "Kirby.h"
@@ -82,36 +85,15 @@ void CGameObject_Factory::Register_UI()
 {
     Register(CUI_Image::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
         CREATOR(CUI_Image),
-        LOADER(
-            TRY_ADD_PROTO(pProxy, Shader_UI.iLevelID, Shader_UI.szProtoTag,
-                CShader::Create(pDevice, pContext, Shader_UI.szFileTag,
-                    VTXTEX::Elements, VTXTEX::iNumElements));
-
-    TRY_ADD_PROTO(pProxy, VI_Rect.iLevelID, VI_Rect.szProtoTag,
-        CVIBuffer_Rect::Create(pDevice, pContext));
-
-    TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), TEXT("Proto_Tex_TestUI"),
-        CTexture::Create(pDevice, pContext,
-            TEXT("../../Resources/CHJ/UI/Title/TitleLogo_KR^u.png"), 1));
-        )
-    );
+        LOADER());
 
     Register(CUI_SpriteAnim::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
         CREATOR(CUI_SpriteAnim),
-        LOADER(
-            TRY_ADD_PROTO(pProxy, Shader_UI.iLevelID, Shader_UI.szProtoTag,
-                CShader::Create(pDevice, pContext, Shader_UI.szFileTag,
-                    VTXTEX::Elements, VTXTEX::iNumElements));
+        LOADER());
 
-    TRY_ADD_PROTO(pProxy, VI_Rect.iLevelID, VI_Rect.szProtoTag,
-        CVIBuffer_Rect::Create(pDevice, pContext));
-
-    TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC),
-        TEXT("Proto_Tex_StarArray"),
-        CTexture::Create(pDevice, pContext,
-            TEXT("../../Resources/CHJ/UI/Save/Save_Star_array.dds"), 1));
-        )
-    );
+    Register(CUI_Text::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
+            CREATOR(CUI_Text),
+            LOADER());
 }
 
 void CGameObject_Factory::Register_Camera()
@@ -241,66 +223,24 @@ void CGameObject_Factory::Register_Container()
 
 void CGameObject_Factory::Register_UIContainer()
 {
-    Register(CUI_TestImageContainer::PROTOTYPE_TAG, TEXT("UI_CONTAINER_TEST"),
+    Register(CUI_TestImageContainer::PROTOTYPE_TAG,
+        TEXT("UI_CONTAINER_TEST"),
         CREATOR(CUI_TestImageContainer),
-        LOADER(
-            auto* pImageReg = CGameObject_Factory::GetInstance()
-            ->Get_Registration(CUI_Image::PROTOTYPE_TAG);
-
-    if (pImageReg)
-    {
-        pImageReg->ResourceLoader(pProxy, pDevice, pContext);
-
-        TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), CUI_Image::PROTOTYPE_TAG,
-            pImageReg->CreatorFunc(pDevice, pContext));
-    }
-        )
+        LOADER()
     );
 
-    Register(CUI_Title::PROTOTYPE_TAG, TEXT("UI_CONTAINER"),
+    Register(CUI_Title::PROTOTYPE_TAG,
+        TEXT("UI_CONTAINER"),
         CREATOR(CUI_Title),
-        LOADER(
-            auto* pImageReg = CGameObject_Factory::GetInstance()
-            ->Get_Registration(CUI_Image::PROTOTYPE_TAG);
-
-    if (pImageReg)
-    {
-        pImageReg->ResourceLoader(pProxy, pDevice, pContext);
-
-        TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), CUI_Image::PROTOTYPE_TAG,
-            pImageReg->CreatorFunc(pDevice, pContext));
-    }
-        )
+        LOADER()
     );
 
     Register(CUI_GenericContainer::PROTOTYPE_TAG,
         TEXT("UI_CONTAINER"),
         CREATOR(CUI_GenericContainer),
-        LOADER(
-            auto* pImageReg = CGameObject_Factory::GetInstance()
-            ->Get_Registration(CUI_Image::PROTOTYPE_TAG);
-
-    if (pImageReg)
-    {
-        pImageReg->ResourceLoader(pProxy, pDevice, pContext);
-
-        TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC),
-            CUI_Image::PROTOTYPE_TAG,
-            pImageReg->CreatorFunc(pDevice, pContext));
-    }
-
-    auto* pAnimReg = CGameObject_Factory::GetInstance()
-        ->Get_Registration(CUI_SpriteAnim::PROTOTYPE_TAG);
-
-    if (pAnimReg)
-    {
-        pAnimReg->ResourceLoader(pProxy, pDevice, pContext);
-        TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC),
-            CUI_SpriteAnim::PROTOTYPE_TAG,
-            pAnimReg->CreatorFunc(pDevice, pContext));
-    }
-        )
+        LOADER()
     );
+    
 }
 
 void CGameObject_Factory::Register_NonAnimObject()

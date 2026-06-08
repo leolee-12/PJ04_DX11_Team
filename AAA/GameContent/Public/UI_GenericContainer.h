@@ -38,6 +38,7 @@ public:
         return Add_UIPartObject(iPrototypeLevelIndex, strPrototypeTag, strPartTag, pArg);
     }
     HRESULT Remove_Part(const _wstring& strPartTag);
+    HRESULT Rename_Part(const _wstring& strOldTag, const _wstring& strNewTag);
 
 public:
     static CUI_GenericContainer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

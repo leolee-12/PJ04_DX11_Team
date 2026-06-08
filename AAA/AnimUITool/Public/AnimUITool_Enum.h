@@ -29,7 +29,7 @@ namespace AnimUITool
         END
     };
 
-    enum class UI_PART_TYPE { IMAGE, SPRITEANIM, END};
+    enum class UI_PART_TYPE { IMAGE, SPRITEANIM, TEXT, END};
 }
 
 #endif // AnimUITool_Enum_h__

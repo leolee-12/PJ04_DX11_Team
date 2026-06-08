@@ -41,6 +41,37 @@ HRESULT CUI_GenericContainer::Remove_Part(const _wstring& strPartTag)
     return S_OK;
 }
 
+HRESULT CUI_GenericContainer::Rename_Part(const _wstring& strOldTag, const _wstring& strNewTag)
+{
+    if (strOldTag.empty() || strNewTag.empty())
+        return E_FAIL;
+
+    if (strOldTag == strNewTag)
+        return S_OK;
+
+    if (m_UIPartObjects.find(strNewTag) != m_UIPartObjects.end())
+        return E_FAIL;
+
+    auto partIt = m_UIPartObjects.find(strOldTag);
+    if (partIt == m_UIPartObjects.end())
+        return E_FAIL;
+
+    auto protoIt = m_UIPartPrototypeInfos.find(strOldTag);
+    if (protoIt == m_UIPartPrototypeInfos.end())
+        return E_FAIL;
+
+    CUIPartObject* pPart = partIt->second;
+    UI_PART_PROTOTYPE_INFO protoInfo = protoIt->second;
+
+    m_UIPartObjects.erase(partIt);
+    m_UIPartPrototypeInfos.erase(protoIt);
+
+    m_UIPartObjects.emplace(strNewTag, pPart);
+    m_UIPartPrototypeInfos.emplace(strNewTag, protoInfo);
+
+    return S_OK;
+}
+
 CUI_GenericContainer* CUI_GenericContainer::Create(
     ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

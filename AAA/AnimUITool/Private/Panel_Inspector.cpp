@@ -12,6 +12,29 @@
 #include "UIContainerObject.h"
 #include "Level_Tool.h"
 #include "UI_SpriteAnim.h"
+#include "UI_Fonts.h"
+#include "UI_Text.h"
+
+namespace
+{
+    template<typename TPair, size_t N>
+    void Draw_StateCombo(const char* szLabel, int& iValue,
+        const TPair(&names)[N])
+    {
+        const char* szCur = "?";
+        for (auto& [v, n] : names) if ((int)v == iValue) szCur = n;
+        if (ImGui::BeginCombo(szLabel, szCur))
+        {
+            for (auto& [v, n] : names)
+                if (ImGui::Selectable(n, (int)v == iValue)) iValue = (int)v;
+            ImGui::EndCombo();
+        }
+    }
+
+    const std::pair<int, const char*> g_TextAlignNames[] = {
+            { 0, "Left" }, { 1, "Center" }, { 2, "Right" },
+    };
+}
 
 CPanel_Inspector::CPanel_Inspector(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPanel(pDevice, pContext)
@@ -150,6 +173,9 @@ void CPanel_Inspector::Render_Properties(IReflectable* pHolder)
 
     for (auto& prop : props)
     {
+        if (prop.strName == L"FontTag" || prop.strName == L"Align")
+            continue;
+
         void* pData = pHolder->Get_PropertyPtr(prop.uOffset);
         if (!pData) continue;
         std::string name(prop.strName.begin(), prop.strName.end());
@@ -197,10 +223,10 @@ void CPanel_Inspector::Render_Properties(IReflectable* pHolder)
         case PROP_TYPE::WSTRING:
         {
             std::wstring* pW = (std::wstring*)pData;
-            std::string s(pW->begin(), pW->end());
-            char buf[256] = {}; strcpy_s(buf, s.c_str());
+            char buf[256] = {};
+            strcpy_s(buf, ToUtf8(*pW).c_str());          
             if (ImGui::InputText(name.c_str(), buf, sizeof(buf)))
-                *pW = std::wstring(buf, buf + strlen(buf));
+                *pW = StrToWstr(buf);                   
             break;
         }
         }
@@ -460,6 +486,11 @@ void CPanel_Inspector::Render_UIInspector()
         std::string strCName = ToUtf8(sel.pContainer->Get_ObjectTag());
         ImGui::Text("[UI Container] %s",
             strCName.empty() ? "-" : strCName.c_str());
+        _bool bActive = sel.pContainer->Is_Active() != false;
+        if (ImGui::Checkbox("Active", &bActive))
+        {
+            sel.pContainer->Set_Active(bActive);
+        }
         ImGui::Separator();
 
         CLevel_Tool* pLevel = m_pPanel_Manager->Get_Level();
@@ -485,7 +516,55 @@ void CPanel_Inspector::Render_UIInspector()
     CUIPartObject* pPart = sel.pPart;
 
     std::string strName = ToUtf8(sel.strPartTag);
-    ImGui::Text("[UI Part] %s", strName.empty() ? "-" : strName.c_str());
+    ImGui::Text("[UI Part]");
+    ImGui::SameLine();
+    ImGui::TextDisabled("%s", strName.empty() ? "-" : strName.c_str());
+
+    static _wstring s_EditSourceTag;
+    static char s_szPartName[128] = {};
+
+    if (s_EditSourceTag != sel.strPartTag)
+    {
+        s_EditSourceTag = sel.strPartTag;
+        strncpy_s(s_szPartName, ToUtf8(sel.strPartTag).c_str(), sizeof(s_szPartName) - 1);
+    }
+
+    ImGui::SetNextItemWidth(-1.f);
+    const bool bEnter =
+        ImGui::InputText("Part Name", s_szPartName, sizeof(s_szPartName),
+            ImGuiInputTextFlags_EnterReturnsTrue);
+
+    const bool bCommit = bEnter || ImGui::IsItemDeactivatedAfterEdit();
+
+    if (bCommit)
+    {
+        std::string strNewName = s_szPartName;
+
+        if (!strNewName.empty())
+        {
+            _wstring strNewTag = StrToWstr(strNewName);
+
+            CLevel_Tool* pLevel = m_pPanel_Manager->Get_Level();
+            if (pLevel && SUCCEEDED(pLevel->Rename_UIPart(
+                sel.pContainer,
+                sel.strPartTag,
+                strNewTag)))
+            {
+                sel.strPartTag = strNewTag;
+                s_EditSourceTag = strNewTag;
+                uictx.bDirty = true;
+            }
+            else
+            {
+                strncpy_s(s_szPartName, ToUtf8(sel.strPartTag).c_str(), sizeof(s_szPartName) - 1);
+            }
+        }
+        else
+        {
+            strncpy_s(s_szPartName, ToUtf8(sel.strPartTag).c_str(), sizeof(s_szPartName) - 1);
+        }
+    }
+
     ImGui::Separator();
 
     struct { RENDERUIID v; const char* n; } layers[] = {
@@ -508,6 +587,7 @@ void CPanel_Inspector::Render_UIInspector()
     ImGui::Separator();
     Render_UITransform(pPart);
     Render_Properties(pPart);
+    Render_TextInspector(pPart);
     Render_SpriteAnimControl(pPart);
 }
 
@@ -559,6 +639,42 @@ void CPanel_Inspector::Render_SpriteAnimControl(CUIPartObject* pPart)
     if (ImGui::Button("Resume"))  pAnim->Resume();
     ImGui::SameLine();
     if (ImGui::Button("Stop"))    pAnim->Stop();
+}
+
+void CPanel_Inspector::Render_TextInspector(CUIPartObject* pPart)
+{
+    auto* pText = dynamic_cast<Client::CUI_Text*>(pPart);
+    if (!pText)
+        return;
+
+    if (!ImGui::CollapsingHeader("Text Properties",
+        ImGuiTreeNodeFlags_DefaultOpen))
+        return;
+
+    UI_CONTEXT& uictx = m_pPanel_Manager->Get_UIContext();
+
+    std::string strCur = ToUtf8(pText->Get_FontTag());
+    if (ImGui::BeginCombo("Font", strCur.c_str()))
+    {
+        for (auto& f : Client::g_UIFonts)
+        {
+            std::string strTag = ToUtf8(f.szTag);
+            if (ImGui::Selectable(strTag.c_str(), strCur == strTag))
+            {
+                pText->Set_FontTag(f.szTag);
+                uictx.bDirty = true;
+            }
+        }
+        ImGui::EndCombo();
+    }
+
+    int iAlign = pText->Get_Align();
+    Draw_StateCombo("Align", iAlign, g_TextAlignNames);
+    if (iAlign != pText->Get_Align())
+    {
+        pText->Set_Align(iAlign);
+        uictx.bDirty = true;
+    }
 }
 
 CPanel_Inspector* CPanel_Inspector::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

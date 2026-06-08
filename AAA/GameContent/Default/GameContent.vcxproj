@@ -35,6 +35,7 @@
     <ClInclude Include="..\Public\EnvObjectLoader.h" />
     <ClInclude Include="..\Public\GameContrnt_Events.h" />
     <ClInclude Include="..\Public\GameObject_Factory.h" />
+    <ClInclude Include="..\Public\UI_Fonts.h" />
     <ClInclude Include="..\Public\UI_GenericContainer.h" />
     <ClInclude Include="..\Public\Kirby.h" />
     <ClInclude Include="..\Public\Kirby_Body.h" />

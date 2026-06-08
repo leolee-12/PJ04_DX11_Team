@@ -47,5 +47,7 @@ namespace Engine
 	};
 
 	enum class CULLING_VIEW { MAIN_CAMERA, SHADOW_DIR, EDITOR_VIEWPORT, END };
+
+	enum class TEXT_ALIGN { LEFT, CENTER, RIGHT, END };
 }
 #endif // Engine_Enum_h__

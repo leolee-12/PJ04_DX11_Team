@@ -4,6 +4,7 @@
 #include "GameObject_Factory.h"
 #include "DataLoader.h"
 #include <set>
+#include "Loader_Prototype.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice { pDevice }
@@ -192,6 +193,16 @@ HRESULT CLoader::Ready_Resources_For_GamePlay()
                 return S_OK;
             });
     }*/
+
+    Add_Work([this, eLevel]()-> HRESULT
+        {
+            return Ready_Level_UIResources(
+                m_pGameInstance_Proxy,
+                m_pDevice,
+                m_pContext,
+                L"../../Resources/CHJ/UI/Levels/Manifest_Test_ui.json",
+                ETOUI(eLevel));
+        });
 
     return S_OK;
 }
