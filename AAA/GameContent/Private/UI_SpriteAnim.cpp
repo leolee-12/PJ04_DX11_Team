@@ -123,7 +123,7 @@ HRESULT CUI_SpriteAnim::Render()
 
 void CUI_SpriteAnim::Deserialize_Internal(const json& j)
 {
-	__super::Deserialize(j);
+	__super::Deserialize_Internal(j);
 	if (!m_strTextureProtoTag.empty() && !m_pTextureCom)
 		m_pTextureCom = Add_Component<CTexture>(static_cast<_uint>(m_iTextureLevel), m_strTextureProtoTag, TEXT("Com_Texture"));
 

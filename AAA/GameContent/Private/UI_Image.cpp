@@ -82,7 +82,7 @@ HRESULT CUI_Image::Render()
 
 void CUI_Image::Deserialize_Internal(const json& j)
 {
-	__super::Deserialize(j);
+	__super::Deserialize_Internal(j);
 
 	if (m_strTextureProtoTag.empty())
 		return;
