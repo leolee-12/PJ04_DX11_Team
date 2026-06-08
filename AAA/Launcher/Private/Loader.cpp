@@ -7,6 +7,7 @@
 #include "Loader_Prototype.h"
 #include "Launcher_MapProfiles.h"
 #include <set>
+#include "Loader_Prototype.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice { pDevice }
@@ -187,6 +188,37 @@ HRESULT CLoader::Ready_Resources_For_GamePlay()
                 return S_OK;
             });
     }
+
+    /*static const wstring kCodeOnlyProtos[] = {
+          L"Proto_NamePlate",
+    };
+
+    for (const wstring& wProto : kCodeOnlyProtos)
+    {
+        if (!visited.insert(wProto).second) continue;
+        if (m_pGameInstance_Proxy->Has_Prototype(ETOUI(eLevel), wProto)) continue;
+
+        Add_Work([this, wProto, eLevel]() -> HRESULT
+            {
+                auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(wProto);
+                if (!pReg) return E_FAIL;
+
+                pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
+                m_pGameInstance_Proxy->Add_Prototype(ETOUI(eLevel), wProto.c_str(),
+                    pReg->CreatorFunc(m_pDevice, m_pContext));
+                return S_OK;
+            });
+    }*/
+
+    Add_Work([this, eLevel]()-> HRESULT
+        {
+            return Ready_Level_UIResources(
+                m_pGameInstance_Proxy,
+                m_pDevice,
+                m_pContext,
+                L"../../Resources/CHJ/UI/Levels/Manifest_Test_ui.json",
+                ETOUI(eLevel));
+        });
 
     return S_OK;
 }

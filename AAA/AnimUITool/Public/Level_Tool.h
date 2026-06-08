@@ -5,6 +5,7 @@
 NS_BEGIN(Engine)
 class CGameObject;
 class CUIContainerObject;
+class CUIPartObject;
 NS_END
 
 NS_BEGIN(AnimUITool)
@@ -23,25 +24,49 @@ public:
     virtual void                Update(_float fTimeDelta) override;
     virtual HRESULT             Render() override;
 
-    const vector<CUIContainerObject*>& Get_UIContainers() const { return m_UIContainers; }
+    const vector<UI_CONTAINER_ENTRY>& Get_UIContainerEntries() const { return m_UIContainers; }     // 읽기 전용
+    vector<UI_CONTAINER_ENTRY>& Get_UIContainerEntries() { return m_UIContainers; }
 
     void                        Set_CameraActive(_bool b);
     void                        Set_GridVisible(_bool bVisible) { m_bGridVisible = bVisible; }
     void                        Set_PreviewVisible(_bool bVisible);
 
-    CGameObject* Load_Preview(const _wstring& strYshPath);
-    CGameObject* Load_Kirby();
+    CGameObject*                Load_Preview(const _wstring& strYshPath);
+    CGameObject*                Load_Kirby();
     void                        Clear_Preview();
     void                        Recalc_CameraProj();
 
+    HRESULT                     Save_UIContainer(CGameObject* pContainer, const _float2& vDesignSize, const _wstring& strFileName);
+    CGameObject*                Load_UIContainerByPath(const _wstring& strFullPath, _float2& vOutDesignSize);
+
+    void                        Delete_UIContainer(CUIContainerObject* pContainer);
+    CGameObject*                Add_UIContainer();
+    CUIPartObject*              Add_UIPart(CGameObject* pContainer,UI_PART_TYPE eType = UI_PART_TYPE::IMAGE, _wstring* pOutPartTag = nullptr);
+    HRESULT                     Remove_UIPart(CGameObject* pContainer, const _wstring& strPartTag);
+    HRESULT                     Rename_UIPart(CGameObject* pContainer, const _wstring& strOldTag, const _wstring& strNewTag);
+
+    HRESULT                     Save_UIManifest(const _wstring& strManifestPath);
+    HRESULT                     Load_UIManifest(const _wstring& strManifestPath);
+
+    _wstring                    Get_AuthoredProtoTag(CGameObject* pContainer);
+    void                        Set_AuthoredProtoTag(CGameObject* pContainer, const _wstring& strProtoTag);
+
+    _wstring                    Register_TextureProto(const _wstring& strTexturePath);
+
+
 private:
-    CEditCamera* m_pCamera = { nullptr };
-    CEdit_Grid* m_pGrid = { nullptr };
-    CGameObject* m_pPreview = { nullptr };
+    CEditCamera*                m_pCamera = { nullptr };
+    CEdit_Grid*                 m_pGrid = { nullptr };
+    CGameObject*                m_pPreview = { nullptr };
     map<_wstring, _wstring>     m_ModelTags;
     _uint                       m_iTagCounter = { 0 };
     _bool                       m_bGridVisible = { true };
-    vector<CUIContainerObject*> m_UIContainers;
+    vector<UI_CONTAINER_ENTRY> m_UIContainers;
+
+    unordered_map<CGameObject*, _wstring> m_AuthoredProtoTags;
+    unordered_map<_wstring, _wstring> m_TextureProtoPaths;  // ProtoTag -> Path
+    _uint                       m_iUIContainerCounter = { 0 };
+    _uint                       m_iUIPartCounter = { 0 };
 
 private:
     virtual HRESULT             Ready_Events() override { return S_OK; }
@@ -49,9 +74,11 @@ private:
     HRESULT                     Ready_Camera();
     HRESULT                     Ready_Grid();
     HRESULT                     Ready_PreviewShaders();
-    HRESULT                     Ready_TestUI();
 
-    void                        Track_UIContainer(CGameObject* pObject);
+    void                        Track_UIContainer(CGameObject* pObject, const _wstring& strPath, const _float2& vDesignSize);
+    void                        UnTrack_UIContainer(CGameObject* pObject);
+
+
 
 public:
     static CLevel_Tool* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

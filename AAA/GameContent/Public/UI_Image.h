@@ -10,7 +10,7 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CUI_Image final : public CUIPartObject
+class CLIENT_DLL CUI_Image final : public CUIPartObject
 {
 	GENERATED_BODY(CUI_Image)
 
@@ -49,6 +49,9 @@ public:
 	{
 		pOut->strPrototypeTag = PROTOTYPE_TAG;
 	}
+
+	//  Editor에서 텍스처 바로 바꾸기 위한 용도
+	HRESULT					Set_Texture(_int iLevel, const _wstring& strProtoTag);
 
 public:
 	static CUI_Image* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
