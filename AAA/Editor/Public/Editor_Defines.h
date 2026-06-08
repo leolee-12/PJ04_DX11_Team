@@ -11,6 +11,7 @@ namespace Editor
 	static const unsigned int		g_iWinSizeY = { 900 };
 
 	static const wchar_t*			g_strEditPath = {L"../../Resources/LevelData/"};
+	static const wchar_t*			g_strLiveobjectPath = { L"../../Resources/LevelData/LiveObject/" };
 
 	enum class EDIT_LEVEL
 	{

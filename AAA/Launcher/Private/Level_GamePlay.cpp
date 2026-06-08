@@ -16,11 +16,15 @@ HRESULT CLevel_GamePlay::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
-    Client::MAP_LOAD_REPORT MapReport{};
-    Client::CMapStage* pMapStage = nullptr;
+    LEVEL_MANIFEST Manifest{};
+    if (FAILED(Load_LevelManifest(LAUNCHER_LEVEL_PROFILES::LEVEL_TEST, &Manifest)))
+        return E_FAIL;
 
-    if (FAILED(Client::CMap_Loader::Spawn_Map(
-        Client::LAUNCHER_MAP_PROFILES::GAMEPLAY_STAGE1_1_MANIFEST,
+    MAP_LOAD_REPORT MapReport{};
+    CMapStage* pMapStage = nullptr;
+
+    if (FAILED(CMap_Loader::Spawn_Map(
+        Manifest.strMapManifest,
         ETOUI(LEVEL::GAMEPLAY),
         &MapReport,
         &pMapStage)))
@@ -29,7 +33,7 @@ HRESULT CLevel_GamePlay::Initialize()
     }
 
     if (FAILED(Load_Level(m_pGameInstance_Proxy, m_pDevice, m_pContext,
-        L"../../Resources/LevelData/GamePlay.JSON", ETOUI(LEVEL::GAMEPLAY))))
+        Manifest.strObjectsFile.c_str(), ETOUI(LEVEL::GAMEPLAY))))
         return E_FAIL;
 
     if (FAILED(m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Camera_Free"), CCamera_Free::Create(m_pDevice, m_pContext))))
@@ -37,8 +41,8 @@ HRESULT CLevel_GamePlay::Initialize()
 
     CCamera_Free::CAMERA_FREE_DESC      CameraDesc{};
 
-    CameraDesc.vEye = _float3(0.f, 10.f, -7.f);
-    CameraDesc.vAt = _float3(0.f, 0.f, 0.f);
+    CameraDesc.vEye = _float3(-130.f, 12.f, -70.f);
+    CameraDesc.vAt = _float3(-130.f, 8.f, -64.f);
     CameraDesc.fFovy = XMConvertToRadians(60.f);
     CameraDesc.fNear = 0.1f;
     CameraDesc.fFar = 500.f;

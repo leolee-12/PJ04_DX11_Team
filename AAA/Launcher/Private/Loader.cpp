@@ -4,6 +4,7 @@
 #include "GameObject_Factory.h"
 #include "DataLoader.h"
 #include "Map_Loader.h"
+#include "Loader_Prototype.h"
 #include "Launcher_MapProfiles.h"
 #include <set>
 
@@ -148,20 +149,24 @@ HRESULT CLoader::Ready_Resources_For_Lobby()
 
 HRESULT CLoader::Ready_Resources_For_GamePlay()
 {
-    Add_Work([this]() -> HRESULT
+    LEVEL_MANIFEST Manifest{};
+    if (FAILED(Load_LevelManifest(LAUNCHER_LEVEL_PROFILES::LEVEL_TEST, &Manifest)))
+        return E_FAIL;
+
+    LEVEL eLevel = LEVEL::GAMEPLAY;
+
+    Add_Work([this, Manifest, eLevel]() -> HRESULT
         {
-            return Client::CMap_Loader::Preload_Map(
+            return CMap_Loader::Preload_Map(
                 m_pDevice,
                 m_pContext,
-                Client::LAUNCHER_MAP_PROFILES::GAMEPLAY_STAGE1_1_MANIFEST,
-                ETOUI(LEVEL::GAMEPLAY));
+                Manifest.strMapManifest,
+                ETOUI(eLevel));
         });
 
     string strContent;
-    CDataLoader::Read_Json(L"../../Resources/LevelData/GamePlay.JSON", &strContent);
+    CDataLoader::Read_Json(Manifest.strObjectsFile.c_str(), &strContent);
     json jLevel = json::parse(strContent);
-
-    LEVEL eLevel = LEVEL::GAMEPLAY;
 
     set<wstring> visited;
     for (auto& jObj : jLevel["Objects"])
@@ -182,27 +187,6 @@ HRESULT CLoader::Ready_Resources_For_GamePlay()
                 return S_OK;
             });
     }
-
-    /*static const wstring kCodeOnlyProtos[] = {
-          L"Proto_NamePlate",
-    };
-
-    for (const wstring& wProto : kCodeOnlyProtos)
-    {
-        if (!visited.insert(wProto).second) continue;
-        if (m_pGameInstance_Proxy->Has_Prototype(ETOUI(eLevel), wProto)) continue;
-
-        Add_Work([this, wProto, eLevel]() -> HRESULT
-            {
-                auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(wProto);
-                if (!pReg) return E_FAIL;
-
-                pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
-                m_pGameInstance_Proxy->Add_Prototype(ETOUI(eLevel), wProto.c_str(),
-                    pReg->CreatorFunc(m_pDevice, m_pContext));
-                return S_OK;
-            });
-    }*/
 
     return S_OK;
 }

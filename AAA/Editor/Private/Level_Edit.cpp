@@ -35,11 +35,6 @@ HRESULT CLevel_Edit::Initialize()
     if (FAILED(Ready_EditGrid()))
         return E_FAIL;
 
-    m_pNavMeshEditor = CNavMesh_Editor::Create();
-    if (nullptr == m_pNavMeshEditor)
-        return E_FAIL;
-
-
     return S_OK;
 }
 
@@ -171,6 +166,87 @@ void CLevel_Edit::Load_Level(const wstring& strFilePath)
                 if (0 <= iPresetIndex)
                     Load_MapPreview(static_cast<_uint>(iPresetIndex));
             }
+        }
+    }
+    catch (json::exception&)
+    {
+        MSG_BOX("JSON PARSE ERROR");
+    }
+}
+
+void CLevel_Edit::Save_LiveObjects(const wstring& strFilePath, const wstring& strLevelTag)
+{
+    json jLevel;
+    jLevel["Level_Tag"] = WstrToStr(strLevelTag);
+
+    json jObjects = json::array();
+
+    // 오브젝트 레이어만 직렬화 (맵/카메라/이펙트/UI 레이어 제외)
+    auto iter = m_Layers.find(OBJECT_LAYER_TAG);
+    if (iter != m_Layers.end())
+    {
+        const wstring& LayerTag = iter->first;
+        for (auto& handle : iter->second)
+        {
+            // 맵 프리뷰로 올라온 객체는 저장 대상 아님
+            if (m_MapPreviewObjects.find(handle.pObject) != m_MapPreviewObjects.end())
+                continue;
+
+            json jObj = handle.pObject->Serialize();
+
+            jObj["Object_Tag"] = WstrToStr(handle.strName);
+            jObj["Prototype_Tag"] = WstrToStr(handle.strPrototypeTag);
+            jObj["Layer_Tag"] = WstrToStr(LayerTag);
+
+            jObjects.push_back(jObj);
+        }
+    }
+
+    jLevel["Objects"] = jObjects;
+
+    CDataExporter::Write_JsonFile(strFilePath.c_str(), jLevel);
+}
+
+void CLevel_Edit::Load_LiveObjects(const wstring& strFilePath)
+{
+    string strContent = {};
+    if (FAILED(CDataLoader::Read_Json(strFilePath.c_str(), &strContent)))
+        return;
+
+    // 기존 오브젝트 레이어만 비우기 (맵 프리뷰/카메라/이펙트/UI는 유지)
+    auto iter = m_Layers.find(L"Layer_Object");
+    if (iter != m_Layers.end())
+    {
+        for (auto& handle : iter->second)
+        {
+            if (m_pSelected == handle.pObject)
+                m_pSelected = nullptr;
+
+            // 혹시라도 맵 프리뷰로 추적 중인 객체면 집합에서도 제거
+            m_MapPreviewObjects.erase(handle.pObject);
+
+            m_pGameInstance_Proxy->Destroy_GameObject(handle.pObject);
+        }
+        iter->second.clear();
+    }
+
+    try
+    {
+        json jLevel = json::parse(strContent);
+
+        for (auto& jObj : jLevel["Objects"])
+        {
+            string strProto = jObj["Prototype_Tag"].get<string>();
+            string strName = jObj["Object_Tag"].get<string>();
+
+            wstring wProto = StrToWstr(strProto);
+            wstring wName = StrToWstr(strName);
+
+            // 레이어는 항상 오브젝트 레이어로 고정해서 스폰
+            CGameObject* pObj = Spawn_Object(wProto, OBJECT_LAYER_TAG, wName);
+
+            if (pObj)
+                pObj->Deserialize(jObj);
         }
     }
     catch (json::exception&)
@@ -362,47 +438,6 @@ const vector<CLevel_Edit::EDITOR_OBJECT_HANDLE>* CLevel_Edit::Get_CameraLayer() 
     return (it != m_Layers.end()) ? &it->second : nullptr;
 }
 
-void CLevel_Edit::Begin_NavEditMode()
-{
-    //// CLumia 캐싱, 없으면 모드 진입 거부
-    //m_pLumia = dynamic_cast<CLumia*>(
-    //    m_pGameInstance_Proxy->Find_GameObject(ETOUI(EDIT_LEVEL::EDIT), L"Default_Layer", L"Proto_Lumia_0"));
-
-    //if (!m_pLumia) return;
-
-    //m_bNavEditMode = true;
-}
-
-void CLevel_Edit::End_NavEditMode()
-{
-    m_bNavEditMode = false;
-    m_pLumia = nullptr;  // 소유권 없음, Release 불필요
-}
-
-void CLevel_Edit::Nav_Undo()
-{
-    if (m_pNavMeshEditor)
-        m_pNavMeshEditor->Undo();
-}
-
-void CLevel_Edit::Save_NavMesh(const wstring& strFilePath)
-{
-    if (m_pNavMeshEditor)
-        m_pNavMeshEditor->Save(strFilePath);
-}
-
-void CLevel_Edit::Load_NavMesh(const wstring& strFilePath)
-{
-    if (m_pNavMeshEditor)
-        m_pNavMeshEditor->Load(strFilePath);
-}
-
-void CLevel_Edit::Nav_Redo()
-{
-    if (m_pNavMeshEditor)
-        m_pNavMeshEditor->Redo();
-}
-
 HRESULT CLevel_Edit::Ready_EditLights()
 {
     LIGHT_DESC      LightDesc{};
@@ -452,7 +487,7 @@ HRESULT CLevel_Edit::Ready_EditCamera()
 
 HRESULT CLevel_Edit::Ready_EditGrid()
 {
-    m_pGrid = CEdit_Grid::Create(m_pDevice, m_pContext, 1000, 1.f);
+    m_pGrid = CEdit_Grid::Create(m_pDevice, m_pContext, 100, 1.f);
     return (m_pGrid == nullptr) ? E_FAIL : S_OK;
 }
 
@@ -822,7 +857,6 @@ void CLevel_Edit::Free()
 {
     __super::Free();
     Safe_Release(m_pGrid);
-    Safe_Release(m_pNavMeshEditor);
 }
 
 
