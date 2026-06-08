@@ -26,7 +26,7 @@ public:
     void    Update(_float fTimeDelta);                 // 재생 + 이벤트 판정 소유
 
 public: // 재생 제어 (오브젝트/에디터는 오직 이것만 사용)
-    void    Play(const string& strAnimName, _bool bLoop = true, _bool bRestart = false, _float fBlend = 0.2f);
+    void    Play(const string& strAnimName, _bool bLoop = true, _bool bRestart = false, _float fBlend = 0.2f, _float fSpeed = 1.0f);
     void    Pause() { m_bPaused = true; }
     void    Resume() { m_bPaused = false; }
     void    Seek(_float fProgress);
@@ -48,6 +48,13 @@ public: // 에디터(데이터 편집)
     virtual json Serialize() const override;
     virtual void Deserialize(const json& j) override;
 
+    // 에디터 수치 확인용
+    void    Set_PlaySpeed(_float fSpeed) { m_fPlaySpeed = fSpeed; }
+    _float  Get_PlaySpeed() const { return m_fPlaySpeed; }
+
+    void    Set_BlendDuration(_float fDuration) { m_fBlendDuration = fDuration; }
+    _float  Get_BlendDuration() { return m_fBlendDuration; }
+
 private:
     void    Fire_Point(const vector<ANIM_EVENT>& events, _float lo, _float hi);
     void    Process_Range(ANIM_EVENT_TRACK& track, _float fCur);
@@ -64,6 +71,9 @@ private:
 
     string  m_strPrevAnimName = {};
     _float  m_fPrevProgress = { 0.f };
+    _float  m_fPlaySpeed = { 1.0f };
+    _float  m_fBlendDuration = { 0.2f };
+
 
 public:
     static CAnimator* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

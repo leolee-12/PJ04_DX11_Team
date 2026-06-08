@@ -218,8 +218,10 @@ void CPanel_Hierarchy::Render_UIHierarchy()
                                 {
                                     _wstring strProtoTag = pLevel->Register_TextureProto(StrToWstr(strPath));
 
-                                    if (!strProtoTag.empty() && SUCCEEDED(pImage->Set_Texture(ETOUI(TOOL_LEVEL::STATIC), strProtoTag)))
+                                    if (!strProtoTag.empty() && SUCCEEDED(pImage->Set_Texture(ETOUI(TOOL_LEVEL::EDIT), strProtoTag)))
+                                    {
                                         UIContext.bDirty = true;
+                                    }
                                 }
                             }
                             else if (auto* pAnim = dynamic_cast<CUI_SpriteAnim*>(pPart))
@@ -228,8 +230,10 @@ void CPanel_Hierarchy::Render_UIHierarchy()
                                 {
                                     _wstring strProtoTag = pLevel->Register_TextureProto(StrToWstr(strPath));
 
-                                    if (!strProtoTag.empty() && SUCCEEDED(pAnim->Set_Texture(ETOUI(TOOL_LEVEL::STATIC), strProtoTag)))
+                                    if (!strProtoTag.empty() && SUCCEEDED(pAnim->Set_Texture(ETOUI(TOOL_LEVEL::EDIT), strProtoTag)))
+                                    {
                                         UIContext.bDirty = true;
+                                    }
                                 }
                             }                         
                         }

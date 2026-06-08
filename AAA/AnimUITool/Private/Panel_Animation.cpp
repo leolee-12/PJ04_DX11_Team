@@ -90,7 +90,7 @@ void CPanel_Animation::Render()
 
     if (ctx.iClip != m_iPrevClip)
     {
-        pAnim->Play(strName, ctx.bLoop, true, 0.f);
+        pAnim->Play(strName, ctx.bLoop, true, ctx.fBlendDuration, ctx.fPlaySpeed);
         m_iPrevClip = ctx.iClip;
         ctx.fProgress = 0.f;
     }
@@ -99,11 +99,27 @@ void CPanel_Animation::Render()
     ImGui::SameLine();
     ImGui::Checkbox("Loop", &ctx.bLoop);
 
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(120.f);
+    // 드래그로 조절 + Ctrl+클릭 or 더블클릭으로 직접 입력
+    ImGui::DragFloat("Speed", &ctx.fPlaySpeed, 0.01f, 0.05f, 8.0f, "%.2fx");
+    ImGui::SameLine();
+    if (ImGui::SmallButton("1x"))
+        ctx.fPlaySpeed = 1.f;
+
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(120.f);
+    // 위와 동일
+    ImGui::DragFloat("Blend Duration", &ctx.fBlendDuration, 0.01f, 0.05f, 8.0f, "%.2fx");
+    ImGui::SameLine();
+    if (ImGui::SmallButton("Default : 0.2f"))
+        ctx.fBlendDuration = 0.2f;
+
     ImGui::SetNextItemWidth(-1.f);
     if (ctx.bPlaying)
     {
         pAnim->Resume();
-        pAnim->Play(strName, ctx.bLoop, false, 0.f);
+        pAnim->Play(strName, ctx.bLoop, false, ctx.fBlendDuration, ctx.fPlaySpeed);
         ctx.fProgress = pAnim->Get_Progress();
         ImGui::SliderFloat("##timeline", &ctx.fProgress, 0.f, 1.f, "%.3f");
     }

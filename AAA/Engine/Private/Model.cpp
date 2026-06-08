@@ -255,7 +255,7 @@ void CModel::Seek_Animation(_float fProgress)
         pBone->Update_CombinedTransformMatrices(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
 }
 
-_bool CModel::Play_Animation(_float fTimeDelta)
+_bool CModel::Play_Animation(_float fTimeDelta, _float fSpeed)
 {
     _bool isFinished = { false };
 
@@ -265,8 +265,8 @@ _bool CModel::Play_Animation(_float fTimeDelta)
         _float t = min(m_fBlendElapsed / m_fBlendDuration, 1.f);
 
         unordered_map<_uint, KEYFRAME> SrcMap, DstMap;
-        m_Animations[m_iCurrentAnimationIndex]->Compute_BoneKeyFrames(SrcMap, fTimeDelta, false);
-        m_Animations[m_iBlendTargetAnimIndex]->Compute_BoneKeyFrames(DstMap, fTimeDelta, false);
+        m_Animations[m_iCurrentAnimationIndex]->Compute_BoneKeyFrames(SrcMap, fTimeDelta, false, fSpeed);
+        m_Animations[m_iBlendTargetAnimIndex]->Compute_BoneKeyFrames(DstMap, fTimeDelta, false, fSpeed);
 
         auto MakeBindKeyFrame = [&](_uint boneIdx) -> KEYFRAME {
             KEYFRAME kf = {};
@@ -323,7 +323,7 @@ _bool CModel::Play_Animation(_float fTimeDelta)
     }
     else
     {
-        isFinished = m_Animations[m_iCurrentAnimationIndex]->Update_TransformationMatrices(m_Bones, fTimeDelta, m_isAnimLoop);
+        isFinished = m_Animations[m_iCurrentAnimationIndex]->Update_TransformationMatrices(m_Bones, fTimeDelta, m_isAnimLoop, fSpeed);
     }
 
     for (auto& pBone : m_Bones) 

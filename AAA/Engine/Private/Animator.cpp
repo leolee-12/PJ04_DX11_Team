@@ -3,11 +3,18 @@
 #include <fstream>
 
 CAnimator::CAnimator(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CComponent{ pDevice, pContext } {
+    : CComponent{ pDevice, pContext }
+    , m_fPlaySpeed{ 1.f }
+    , m_fBlendDuration{ 0.2f }
+{
 }
 
 CAnimator::CAnimator(const CAnimator& Prototype)
-    : CComponent(Prototype), m_Tracks{ Prototype.m_Tracks } {
+    : CComponent(Prototype)
+    , m_Tracks{ Prototype.m_Tracks }
+    , m_fPlaySpeed {Prototype.m_fPlaySpeed}
+    , m_fBlendDuration{Prototype.m_fBlendDuration}
+{
 }
 
 HRESULT CAnimator::Initialize(void* pArg)
@@ -26,7 +33,7 @@ HRESULT CAnimator::Initialize(void* pArg)
 }
 
 // ── 재생 제어 ──
-void CAnimator::Play(const string& strAnimName, _bool bLoop, _bool bRestart, _float fBlend)
+void CAnimator::Play(const string& strAnimName, _bool bLoop, _bool bRestart, _float fBlend, _float fSpeed)
 {
     if (nullptr == m_pModel)
         return;
@@ -36,8 +43,10 @@ void CAnimator::Play(const string& strAnimName, _bool bLoop, _bool bRestart, _fl
     if (iIndex < 0)
         return;
 
-    m_pModel->Set_AnimationIndex((_uint)iIndex, bLoop, bRestart, fBlend);
+    m_fBlendDuration = fBlend;
 
+    m_pModel->Set_AnimationIndex((_uint)iIndex, bLoop, bRestart, m_fBlendDuration);
+    m_fPlaySpeed = fSpeed;
     m_bFinished = false;
 }
 
@@ -69,7 +78,7 @@ void CAnimator::Update(_float fTimeDelta)
         return;
 
     if (!m_bPaused)
-        m_bFinished = m_pModel->Play_Animation(fTimeDelta);   // ★ 애니메이터가 단독 구동
+        m_bFinished = m_pModel->Play_Animation(fTimeDelta, m_fPlaySpeed);   // ★ 애니메이터가 단독 구동
 
     const string& strCur = m_pModel->Get_CurrentAnimName();
     _float        fCur = m_pModel->Get_CurrentAnimProgress();
