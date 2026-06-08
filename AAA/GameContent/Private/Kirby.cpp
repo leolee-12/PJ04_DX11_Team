@@ -11,6 +11,9 @@
 #include "Kirby_Controller.h"
 #include "Kirby_StateMachine.h"
 
+// Ability
+#include "Kirby_Ability_Normal.h"
+
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCharacter{ pDevice, pContext }
 {
@@ -39,6 +42,9 @@ HRESULT CKirby::Initialize(void* pArg)
         return E_FAIL;
 
     if (FAILED(Ready_System()))
+        return E_FAIL;
+
+    if (FAILED(Ready_Ability()))
         return E_FAIL;
   
     return S_OK;
@@ -82,10 +88,20 @@ HRESULT CKirby::Render()
     return S_OK;
 }
 
-void CKirby::Add_WishDir(const _float3& vWishDir)
+void CKirby::Add_MoveDir(const _float3& vWishDir)
 {
     XMStoreFloat3(&m_vWishDir,
         XMLoadFloat3(&vWishDir) + XMLoadFloat3(&m_vWishDir));
+}
+
+_bool CKirby::Has_MoveDir()
+{
+    _vector vWishDir = XMLoadFloat3(&m_vWishDir);
+
+    if (XMVector3Equal(vWishDir, XMVectorZero()))
+        return false;
+
+    return true;
 }
 
 void CKirby::Excute_Command(CKirby_Command* pCommand)
@@ -96,6 +112,19 @@ void CKirby::Excute_Command(CKirby_Command* pCommand)
 void CKirby::Change_State(KIRBY_STATE_TYPE eNewState)
 {
     m_pKirby_StateMachine->Change_State(eNewState);
+}
+
+CKirby_Ability* CKirby::Get_KirbyAbility()
+{
+    return m_pKirby_Ability;
+}
+
+void CKirby::Set_KirbyAbility(CKirby_Ability* pKirby_Ability)
+{
+    if (m_pKirby_Ability != nullptr)
+        Safe_Release(m_pKirby_Ability);
+
+    m_pKirby_Ability = pKirby_Ability;
 }
 
 HRESULT CKirby::Ready_Components()
@@ -146,6 +175,15 @@ HRESULT CKirby::Ready_System()
     return S_OK;
 }
 
+HRESULT CKirby::Ready_Ability()
+{
+    m_pKirby_Ability = CKirby_Ability_Normal::Create();
+    if (m_pKirby_Ability == nullptr)
+        return E_FAIL;
+
+    return S_OK;
+}
+
 HRESULT CKirby::Bind_ShaderResources()
 {
     return S_OK;
@@ -179,6 +217,8 @@ CGameObject* CKirby::Clone(void* pArg)
 
 void CKirby::Free()
 {
+    Safe_Release(m_pKirby_Ability);
+
     Safe_Release(m_pKirby_InputManager);
     Safe_Release(m_pKirby_Controller);
     Safe_Release(m_pKirby_StateMachine);

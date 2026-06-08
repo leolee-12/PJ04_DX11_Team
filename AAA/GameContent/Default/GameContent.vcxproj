@@ -39,6 +39,9 @@
     <ClInclude Include="..\Public\GameObject_Factory.h" />
     <ClInclude Include="..\Public\InhaleEffect.h" />
     <ClInclude Include="..\Public\Kirby.h" />
+    <ClInclude Include="..\Public\Kirby_Ability.h" />
+    <ClInclude Include="..\Public\Kirby_Ability_Normal.h" />
+    <ClInclude Include="..\Public\Kirby_Jump.h" />
     <ClInclude Include="..\Public\Kirby_Run.h" />
     <ClInclude Include="..\Public\Kirby_State.h" />
     <ClInclude Include="..\Public\Kirby_Body.h" />
@@ -94,6 +97,9 @@
     <ClCompile Include="..\Private\GameObject_Factory.cpp" />
     <ClCompile Include="..\Private\InhaleEffect.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp" />
+    <ClCompile Include="..\Private\Kirby_Ability.cpp" />
+    <ClCompile Include="..\Private\Kirby_Ability_Normal.cpp" />
+    <ClCompile Include="..\Private\Kirby_Jump.cpp" />
     <ClCompile Include="..\Private\Kirby_Run.cpp" />
     <ClCompile Include="..\Private\Kirby_State.cpp" />
     <ClCompile Include="..\Private\Kirby_Body.cpp" />

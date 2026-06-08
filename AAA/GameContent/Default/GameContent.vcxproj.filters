@@ -208,6 +208,12 @@
     <Filter Include="05. Kirby\01. StateMachine\State\03. Attack">
       <UniqueIdentifier>{a856ba07-405b-4c82-8eb0-595b2b12db9c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="05. Kirby\02. Kirby_Ability">
+      <UniqueIdentifier>{aec0ec4f-8364-4084-95b0-fba459e158d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. Kirby\02. Kirby_Ability\00. Kirby_Ability_Normal">
+      <UniqueIdentifier>{1f1ebec8-785f-4d2a-be62-dc3edc8740d0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -390,6 +396,15 @@
     <ClInclude Include="..\Public\Kirby_Run.h">
       <Filter>05. Kirby\01. StateMachine\State\01. Run</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Ability.h">
+      <Filter>05. Kirby\02. Kirby_Ability</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Ability_Normal.h">
+      <Filter>05. Kirby\02. Kirby_Ability\00. Kirby_Ability_Normal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Jump.h">
+      <Filter>05. Kirby\01. StateMachine\State\02. Jump</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -526,6 +541,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Run.cpp">
       <Filter>05. Kirby\01. StateMachine\State\01. Run</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Ability.cpp">
+      <Filter>05. Kirby\02. Kirby_Ability</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Ability_Normal.cpp">
+      <Filter>05. Kirby\02. Kirby_Ability\00. Kirby_Ability_Normal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Jump.cpp">
+      <Filter>05. Kirby\01. StateMachine\State\02. Jump</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby.cpp">
       <Filter>05. Kirby</Filter>

@@ -4,7 +4,7 @@ float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 Texture2D g_DiffuseTexture;
 Texture2D g_NormalTexture;
-Texture2D g_UnkownTexture;
+Texture2D g_UnknownTexture;
 Texture2D g_MRATexture;
 
 float2 g_vMaskValue;

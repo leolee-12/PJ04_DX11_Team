@@ -36,6 +36,9 @@ public:
 	virtual void Update(CKirby* pKirby, const _float fTimeDelta);
 	virtual void Exit(CKirby* pKirby);
 
+protected:
+	_bool Handle_MoveCommand(CKirby* pKirby, CKirby_Command* pCommand);
+
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand);
 

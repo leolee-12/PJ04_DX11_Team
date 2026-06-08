@@ -10,6 +10,7 @@
 #include "VIBuffer_Point.h"
 #include "Collider.h"
 #include "Effect_Container.h"
+#include "Animator.h"
 #include "Movement.h"
 #include <shared_mutex>
 

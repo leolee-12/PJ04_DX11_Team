@@ -4,7 +4,7 @@ float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 Texture2D g_DiffuseTexture;
 Texture2D g_NormalTexture;
-Texture2D g_UnkownTexture;
+Texture2D g_UnknownTexture;
 Texture2D g_MRATexture;
 
 float4x4 g_BoneMatrices[512];
@@ -163,7 +163,7 @@ struct PS_OUT
 //{
 //    PS_OUT Out;
 //
-//    vector vEye = g_UnkownTexture.Sample(ClampSampler, In.vTexcoord);
+//    vector vEye = g_UnknownTexture.Sample(ClampSampler, In.vTexcoord);
 //    vector vBase = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord1);
 //    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord1).rgb;
 //
@@ -192,7 +192,7 @@ PS_OUT PS_MAIN(PS_IN In)
 {
     PS_OUT Out;
 
-    vector vEye = g_UnkownTexture.Sample(ClampSampler, In.vTexcoord);
+    vector vEye = g_UnknownTexture.Sample(ClampSampler, In.vTexcoord);
     vector vBase = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord1);
     float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord1).rgb;
 

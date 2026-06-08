@@ -159,7 +159,7 @@ HRESULT CEnvObject::Render()
 			int a = 1;/*continue;*/
 		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", static_cast<_uint>(i), MTEX_TYPE::METALNESS, 0)))
 			int a = 1;/*continue;*/
-		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnkownTexture", static_cast<_uint>(i), MTEX_TYPE::UNKNOWN, 0)))
+		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnknownTexture", static_cast<_uint>(i), MTEX_TYPE::UNKNOWN, 0)))
 			int a = 1;/*continue;*/
 
 		if (FAILED(m_pShaderCom->Begin(1)))

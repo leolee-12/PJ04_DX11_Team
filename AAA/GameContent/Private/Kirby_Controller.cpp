@@ -54,6 +54,14 @@ CKirby_Controller* CKirby_Controller::Create(CKirby* pPlayer)
 
 void CKirby_Controller::Free()
 {
+    while (m_CommandQueue.empty() == false)
+    {
+        CKirby_Command* pCommand = m_CommandQueue.front();
+        Safe_Release(pCommand);
+
+        m_CommandQueue.pop();
+    }
+
     Safe_Release(m_pGameInstance_Proxy);
 
     __super::Free();

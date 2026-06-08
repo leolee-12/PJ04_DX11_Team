@@ -17,8 +17,10 @@ NS_BEGIN(Client)
 class CKirby_InputManager;
 class CKirby_Controller;
 class CKirby_StateMachine;
+class CKirby_Ability;
 
 enum class KIRBY_STATE_TYPE;
+enum class KIRBY_ABILITY_TYPE;
 
 class CKirby_Body;
 
@@ -49,16 +51,25 @@ public:
 	virtual HRESULT Render() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
-	void Add_WishDir(const _float3& vWishDir);
+public:
+	CKirby_Body* Get_Body() { return m_pBody; }
+
+public:
+	void Add_MoveDir(const _float3& vWishDir);
+	_bool Has_MoveDir();
 
 public:
 	void Excute_Command(CKirby_Command* pCommand);
 	void Change_State(KIRBY_STATE_TYPE eNewState);
 
+	CKirby_Ability* Get_KirbyAbility();
+	void Set_KirbyAbility(CKirby_Ability* pKirby_Ability);
+
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_PartObjects();
 	HRESULT Ready_System();
+	HRESULT Ready_Ability();
 	HRESULT Bind_ShaderResources();
 
 private:
@@ -85,6 +96,7 @@ private:
 	CKirby_InputManager*	m_pKirby_InputManager{};
 	CKirby_Controller*		m_pKirby_Controller{};
 	CKirby_StateMachine*	m_pKirby_StateMachine{};
+	CKirby_Ability*			m_pKirby_Ability{};
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
