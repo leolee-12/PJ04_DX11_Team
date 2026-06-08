@@ -31,8 +31,10 @@ void CPanel_Viewport::Render()
 
         ImVec2 vImagePos = ImGui::GetCursorScreenPos();
 
-        if (m_pSRV) ImGui::Image((ImTextureID)m_pSRV, vSize);
-        else        ImGui::Dummy(vSize);
+        if (m_pSRV) 
+            ImGui::Image((ImTextureID)m_pSRV, vSize);
+        else        
+            ImGui::Dummy(vSize);
 
         m_bHovered = ImGui::IsItemHovered();
 

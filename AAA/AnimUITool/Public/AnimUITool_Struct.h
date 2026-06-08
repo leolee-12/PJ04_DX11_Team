@@ -31,6 +31,8 @@ namespace AnimUITool
         _bool                       bPlaying = { true };
         _bool                       bLoop = { true };
         _float                      fProgress = { 0.f };
+        _float                      fPlaySpeed = { 1.f };
+        _float                      fBlendDuration = { 0.2f };
 
         _int                        iRootBone = { -1 };
         _int                        iSelBone = { -1 };

@@ -52,6 +52,9 @@ HRESULT CAnimUITool_App::Initialize()
 
 	Client::CGameObject_Factory::GetInstance()->RegisterAll();
 
+	if (FAILED(Ready_For_Static()))
+		return E_FAIL;	
+
 	// UIPartObjectµé ÀÏ°ý µî·Ï
 	if (FAILED(Client::Ready_Prototype_UIPartObjects(m_pGameInstance_Proxy, m_pDevice, m_pContext)))
 	{
@@ -328,6 +331,23 @@ void CAnimUITool_App::Editor_BeginDraw()
 	m_pContext->ClearRenderTargetView(m_pRTV, clearColor);
 	m_pContext->ClearDepthStencilView(m_pDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 	m_pContext->OMSetRenderTargets(1, &m_pRTV, m_pDSV);
+}
+
+HRESULT CAnimUITool_App::Ready_For_Static()
+{
+	if (FAILED(Ready_Prototype_SharedResources(m_pGameInstance_Proxy, m_pDevice, m_pContext)))
+	{
+		Log_Error("Ready_Prototype_SharedResources failed.");
+		return E_FAIL;
+	}
+
+	if (FAILED(Ready_Prototype_Shaders(m_pGameInstance_Proxy, m_pDevice, m_pContext)))
+	{
+		Log_Error("Ready_Prototype_Shaders failed.");
+		return E_FAIL;
+	}
+
+	return S_OK;
 }
 
 CAnimUITool_App* CAnimUITool_App::Create()

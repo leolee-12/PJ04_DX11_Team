@@ -52,7 +52,7 @@ public:
     void                        Set_AuthoredProtoTag(CGameObject* pContainer, const _wstring& strProtoTag);
 
     _wstring                    Register_TextureProto(const _wstring& strTexturePath);
-
+    _wstring                    Register_TextureProto(const _wstring& strTextureProtoTag, const _wstring& strTexturePath, _uint iLevelIndex);
 
 private:
     CEditCamera*                m_pCamera = { nullptr };

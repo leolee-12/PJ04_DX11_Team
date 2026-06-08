@@ -61,7 +61,7 @@ public:
 	_int		  Get_AnimationIndex(const string& strName) const;
 	const string& Get_CurrentAnimName() const;
 	void		  Seek_Animation(_float fProgress);
-	_bool		  Play_Animation(_float fTimeDelta);
+	_bool		  Play_Animation(_float fTimeDelta, _float fSpeed = 1.0f);
 	HRESULT		  Render(_uint iMeshIndex);
 
 public:
