@@ -8,7 +8,6 @@ class CCamera;
 NS_END
 
 NS_BEGIN(Client)
-class CLumia;
 class CMapStage;
 NS_END
 
@@ -27,6 +26,8 @@ public:
 		CGameObject*	pObject;
 	}EDITOR_OBJECT_HANDLE;
 
+	static constexpr const _tchar* OBJECT_LAYER_TAG = L"Layer_LiveObject";
+
 private:
 	CLevel_Edit(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CLevel_Edit() = default;
@@ -40,6 +41,9 @@ public:
 	CGameObject*	Spawn_Object(const wstring& strProtoTag, const wstring& strLayerTag, const wstring& strName, void* pArg = nullptr);
 	void			Save_Level(const wstring& strFilePath, const wstring& strLevelTag);
 	void			Load_Level(const wstring& strFilePath);
+
+	void			Save_LiveObjects(const wstring& strFilePath, const wstring& strLevelTag);
+	void			Load_LiveObjects(const wstring& strFilePath);
 
 public:
 	void	Add_Layer(const wstring& strLayerTag);
@@ -66,16 +70,6 @@ public:
 	void	Preview_Camera(CGameObject* pCam);
 	void	Back_To_Edit();
 	const vector<EDITOR_OBJECT_HANDLE>* Get_CameraLayer() const;
-
-public:
-	void  Begin_NavEditMode();
-	void  End_NavEditMode();
-	_bool Is_NavEditMode()  const { return m_bNavEditMode; }
-	void  Nav_Undo();
-	void  Save_NavMesh(const wstring& strFilePath);
-	void  Load_NavMesh(const wstring& strFilePath);
-	const CNavMesh_Editor* Get_NavMeshEditor() const { return m_pNavMeshEditor; }
-	void Nav_Redo();
 
 public:	// Map Preview - Public Func
 	HRESULT			Load_MapPreview(_uint iPresetIndex);
@@ -110,15 +104,12 @@ private:
 	wstring m_strPendingLayer = {};
 	_uint	m_iPlaceCount = {};
 
-	CNavMesh_Editor* m_pNavMeshEditor = { nullptr };
-	_bool			 m_bNavEditMode = { false };
-	CLumia*			 m_pLumia = { nullptr };
-
 	// Map Preview - Members
-	CMapStage* m_pMapStage = { nullptr };
+	CMapStage*	m_pMapStage = { nullptr };
 	_wstring	m_strMapPreviewStatus = { L"Map preset not loaded." };
 	_wstring	m_strLoadedMapStageName = {};
 	_uint		m_iEnvObjCreatedCount = {};
+	_int		m_iLoadedMapPresetIndex = { -1 };
 	unordered_set<CGameObject*> m_MapPreviewObjects;
 
 private:
@@ -128,8 +119,8 @@ private:
 	HRESULT  Ready_EditGrid();
 
 	// Map Preview - Private Func
-	void	 Clear_MapPreviewLayer(const _wstring& strLayerTag);
-	void	 Add_MapPreviewObjectHandle(const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag, CGameObject* pObject);
+	void		Clear_MapPreviewLayer(const _wstring& strLayerTag);
+	void		Add_MapPreviewObjectHandle(const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag, CGameObject* pObject);
 	static void On_MapPreviewObjectCreated(void* pContext, CGameObject* pObject,
 		const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);
 

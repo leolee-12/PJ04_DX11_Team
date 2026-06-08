@@ -40,6 +40,7 @@ protected:
 
     // 파생이 바꾸는 지점
     virtual const _tchar* Get_ModelProtoTag() const = 0;   // 구조물별 .ysh 모델 프로토타입
+    virtual _uint Get_ModelProtoLevel() const = 0;
     virtual void  Bind_MeshLayers(_uint iMesh) {}          // 베이스: no-op(순수 PBR)
     virtual _bool Is_OverlayMesh(_uint iMesh) const;       // 기본: 이름에 "Parts"
     virtual HRESULT Bind_WorldMatrix();

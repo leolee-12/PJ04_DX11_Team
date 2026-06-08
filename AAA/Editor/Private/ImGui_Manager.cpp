@@ -17,8 +17,10 @@
 #include "GameContent_AnimEvents.h"
 #include "Effect_Container.h"
 #include "Effect_Part.h"
-#include "MapDescriptor.h"
+#include "Map_EditHelper.h"
 #include "MapStage.h"
+#include "MapObject.h"
+#include "EnvObject.h"
 
 IMPLEMENT_SINGLETON(CImGui_Manager)
 
@@ -31,6 +33,31 @@ static const char* TexTypeName(_uint t)
         "Transmission","MayaBase","MayaSpecular","MayaSpecColor","MayaSpecRough","Anisotropy"
     };
     return (t < MTEX_TYPE_MAX) ? names[t] : "?";
+}
+
+static int ToMapRenderGroupIndex(RENDERID eRenderID)
+{
+    return (eRenderID == RENDERID::BLEND) ? 1 : 0;
+}
+
+static RENDERID FromMapRenderGroupIndex(int iIndex)
+{
+    return (iIndex == 1) ? RENDERID::BLEND : RENDERID::NONBLEND;
+}
+
+static int FindExactMeshNameIndex(CModel* pModel, const string& strMeshName)
+{
+    if (nullptr == pModel || strMeshName.empty())
+        return -1;
+
+    const size_t iNumMeshes = pModel->Get_NumMeshes();
+    for (size_t i = 0; i < iNumMeshes; ++i)
+    {
+        if (pModel->Get_MeshName(static_cast<_uint>(i)) == strMeshName)
+            return static_cast<int>(i);
+    }
+
+    return -1;
 }
 
 CImGui_Manager::CImGui_Manager()
@@ -169,23 +196,25 @@ void CImGui_Manager::Draw_Toolbar()
 
     constexpr _uint iBufferSize = 64;
 
-    static char    s_SaveNameBuf[iBufferSize] = {};
-    if (ImGui::Button("Save")) {
-        memset(s_SaveNameBuf, 0, sizeof(s_SaveNameBuf));
-        ImGui::OpenPopup("Save Level Name");
-    }
-
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
 
-    if (ImGui::BeginPopupModal("Save Level Name", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+    static char s_ObjSaveBuf[iBufferSize] = {};
+    if (ImGui::Button("Object Save")) {
+        memset(s_ObjSaveBuf, 0, sizeof(s_ObjSaveBuf));
+        ImGui::OpenPopup("Save LiveObjects Name");
+    }
+
+    ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal("Save LiveObjects Name", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::Text("Name:");
-        ImGui::InputText("##name", s_SaveNameBuf, iBufferSize);
+        ImGui::InputText("##objname", s_ObjSaveBuf, iBufferSize);
 
         if (ImGui::Button("OK")) {
-            wstring strLevelName(s_SaveNameBuf, s_SaveNameBuf + strlen(s_SaveNameBuf));
-            wstring strFilePath(g_strEditPath + strLevelName + L".JSON");
-            m_pLevel_Edit->Save_Level(strFilePath, strLevelName);
+            wstring strLevelName(s_ObjSaveBuf, s_ObjSaveBuf + strlen(s_ObjSaveBuf));
+            wstring strFilePath(g_strLiveobjectPath + strLevelName + L".json");
+            m_pLevel_Edit->Save_LiveObjects(strFilePath, strLevelName);
             ImGui::CloseCurrentPopup();
         }
 
@@ -199,22 +228,22 @@ void CImGui_Manager::Draw_Toolbar()
 
     ImGui::SameLine();
 
-    static char    s_LoadNameBuf[iBufferSize] = {};
-    if (ImGui::Button("Load")) {
-        memset(s_LoadNameBuf, 0, sizeof(s_LoadNameBuf));
-        ImGui::OpenPopup("Load Level Name");
+    static char s_ObjLoadBuf[iBufferSize] = {};
+    if (ImGui::Button("Object Load")) {
+        memset(s_ObjLoadBuf, 0, sizeof(s_ObjLoadBuf));
+        ImGui::OpenPopup("Load LiveObjects Name");
     }
 
     ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
 
-    if (ImGui::BeginPopupModal("Load Level Name", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (ImGui::BeginPopupModal("Load LiveObjects Name", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::Text("Name:");
-        ImGui::InputText("##name", s_LoadNameBuf, iBufferSize);
+        ImGui::InputText("##objloadname", s_ObjLoadBuf, iBufferSize);
 
         if (ImGui::Button("OK")) {
-            wstring strLevelName(s_LoadNameBuf, s_LoadNameBuf + strlen(s_LoadNameBuf));
-            wstring strFilePath(g_strEditPath + strLevelName + L".JSON");
-            m_pLevel_Edit->Load_Level(strFilePath);
+            wstring strLevelName(s_ObjLoadBuf, s_ObjLoadBuf + strlen(s_ObjLoadBuf));
+            wstring strFilePath(g_strLiveobjectPath + strLevelName + L".json");
+            m_pLevel_Edit->Load_LiveObjects(strFilePath);
             ImGui::CloseCurrentPopup();
         }
 
@@ -256,22 +285,22 @@ void CImGui_Manager::Draw_Toolbar()
 
     ImGui::SameLine();
 
-    CMapDescriptor* pMapDescriptor = CMapDescriptor::GetInstance();
-
-    const _uint iMapPreviewPresetCount = pMapDescriptor->Get_MapPresetCount();
+    const _uint iMapPreviewPresetCount = CMap_EditHelper::Get_MapPresetCount();
     static _int s_iMapPreviewPreset = 0;
     if (0 < iMapPreviewPresetCount)
     {
-        if (s_iMapPreviewPreset < 0 || static_cast<_uint>(s_iMapPreviewPreset) >= iMapPreviewPresetCount)
+        if (s_iMapPreviewPreset < 0 || static_cast<_uint>(s_iMapPreviewPreset) >=
+            iMapPreviewPresetCount)
             s_iMapPreviewPreset = 0;
 
         ImGui::SetNextItemWidth(100.f);
-        if (ImGui::BeginCombo("##MapPreviewPreset", pMapDescriptor->Get_MapPresetLabel(static_cast<_uint>(s_iMapPreviewPreset))))
+        if (ImGui::BeginCombo("##MapPreviewPreset",
+            CMap_EditHelper::Get_MapPresetLabel(static_cast<_uint>(s_iMapPreviewPreset))))
         {
             for (_uint i = 0; i < iMapPreviewPresetCount; ++i)
             {
                 const _bool bSelected = (static_cast<_uint>(s_iMapPreviewPreset) == i);
-                if (ImGui::Selectable(pMapDescriptor->Get_MapPresetLabel(i), bSelected))
+                if (ImGui::Selectable(CMap_EditHelper::Get_MapPresetLabel(i), bSelected))
                     s_iMapPreviewPreset = static_cast<_int>(i);
                 if (bSelected)
                     ImGui::SetItemDefaultFocus();
@@ -801,8 +830,11 @@ void CImGui_Manager::Draw_Inspector()
                 // 섹션의 로컬 트랜스폼 (스테이지 부모행렬과 Late_Update에서 합성됨)
                 Draw_Transform(pSection, strName);
                 ImGui::Separator();
-                Draw_Properties(pSection);   // CMapObject의 Normal Strength / UV Scale / Top Projection 등
-
+                Draw_Properties(pSection);
+                ImGui::Separator();
+                Draw_MeshLayerPanel(pSection);
+                ImGui::Separator();
+                Draw_MapSectionRenderOptions(pSection);
                 ImGui::PopID();
             }
             ImGui::Separator();
@@ -950,7 +982,7 @@ void CImGui_Manager::Draw_Palette()
                         s_isOpenPopup = true;
                     }
                     else {
-                        m_pLevel_Edit->Begin_PlaceMode(strTag, TEXT("Default_Layer"));
+                        m_pLevel_Edit->Begin_PlaceMode(strTag, CLevel_Edit::OBJECT_LAYER_TAG);
                     }
                 }
             }
@@ -1050,69 +1082,23 @@ void CImGui_Manager::Draw_Viewport()
             );
         };
 
-    auto IsValid = [](ImVec2 p) -> bool
-        {
-            return p.x > -9000.f;
-        };
-
-    const CNavMesh_Editor* pNav = m_pLevel_Edit->Get_NavMeshEditor();
-    if (pNav && pView && pProj)
-    {
-        ImDrawList* pDraw = ImGui::GetWindowDrawList();
-
-        // 1. 완성된 삼각형
-        for (auto& tri : pNav->Get_Triangles())
-        {
-            ImVec2 p0 = WorldToScreen(tri.vPoints[0]);
-            ImVec2 p1 = WorldToScreen(tri.vPoints[1]);
-            ImVec2 p2 = WorldToScreen(tri.vPoints[2]);
-
-            if (!IsValid(p0) || !IsValid(p1) || !IsValid(p2)) continue;
-
-            pDraw->AddTriangleFilled(p0, p1, p2, IM_COL32(0, 200, 100, 50));
-            pDraw->AddTriangle(p0, p1, p2, IM_COL32(0, 255, 120, 200), 1.5f);
-        }
-
-        // 2. Pending 점 사이 선
-        const auto& pending = pNav->Get_PendingPoints();
-        if (pending.size() >= 2)
-        {
-            ImVec2 sp0 = WorldToScreen(pending[0]);
-            ImVec2 sp1 = WorldToScreen(pending[1]);
-            if (IsValid(sp0) && IsValid(sp1))
-                pDraw->AddLine(sp0, sp1, IM_COL32(255, 255, 0, 200), 1.5f);
-        }
-
-        // 3. Pending 점 마커 (노란 원)
-        for (auto& pt : pending)
-        {
-            ImVec2 sp = WorldToScreen(pt);
-            if (!IsValid(sp)) continue;
-            pDraw->AddCircleFilled(sp, 5.f, IM_COL32(255, 255, 0, 255));
-            pDraw->AddCircle(sp, 5.f, IM_COL32(0, 0, 0, 200), 12, 1.f);
-        }
-    }
+    
 
     bool bRightHeld = ImGui::IsWindowHovered() && ImGui::IsMouseDown(ImGuiMouseButton_Right);
     bool bImageHovered = ImGui::IsItemHovered();
 
     if (bImageHovered && !bRightHeld && !ImGuizmo::IsOver())
     {
-        if (ImGui::IsKeyChordPressed(ImGuiMod_Ctrl | ImGuiKey_Z))
-            m_pLevel_Edit->Nav_Undo();
-        if (ImGui::IsKeyChordPressed(ImGuiMod_Ctrl | ImGuiKey_Y))
-            m_pLevel_Edit->Nav_Redo();
-
         ImVec2 mouse = ImGui::GetMousePos();
 
-        // 뷰포트 상대 좌표 → NDC
+        // 뷰포트 로컬 좌표 → NDC
         float ndcX = ((mouse.x - vPos.x) / vSize.x) * 2.f - 1.f;
         float ndcY = 1.f - ((mouse.y - vPos.y) / vSize.y) * 2.f;
 
         XMVECTOR origin, dir;
         m_pGameInstance_Proxy->Compute_PickingRay(ndcX, ndcY, &origin, &dir);
 
-        // 좌클릭 → 배치
+        // 좌클릭 → 땅바닥 배치
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
             m_pLevel_Edit->Pick_And_Place(origin, dir);
 
@@ -1130,10 +1116,7 @@ void CImGui_Manager::Draw_Viewport()
 
         // ESC → 배치 모드 취소
         if (ImGui::IsKeyPressed(ImGuiKey_Escape))
-        {
             m_pLevel_Edit->End_PlaceMode();
-            m_pLevel_Edit->End_NavEditMode();
-        }
     }
 
     m_pLevel_Edit->Set_CameraActive(bRightHeld);
@@ -1395,7 +1378,7 @@ void CImGui_Manager::Draw_MeshLayerPanel(CGameObject* pObj)
     if (nullptr == pObj) return;
     CModel* pModel = pObj->Get_Component<CModel>(L"Com_Model");
     if (nullptr == pModel) return;
-    if (!ImGui::CollapsingHeader("Mesh Texture Layers")) return;
+    if (!ImGui::CollapsingHeader("Mesh Render Settings (per Model)")) return;
 
     size_t n = pModel->Get_NumMeshes();
     for (size_t i = 0; i < n; ++i)
@@ -1406,6 +1389,19 @@ void CImGui_Manager::Draw_MeshLayerPanel(CGameObject* pObj)
 
         bool changed = false;
         bool bAnyField = false;
+
+        int iPass = L.iPass;
+        ImGui::SetNextItemWidth(120.f);
+        if (ImGui::InputInt("Pass", &iPass))
+        {
+            if (iPass < -1)
+                iPass = -1;
+
+            L.iPass = iPass;
+            changed = true;
+        }
+        ImGui::SameLine();
+        ImGui::TextDisabled("(-1 = default)");
 
         for (_uint t = 0; t < MTEX_TYPE_MAX; ++t)
         {
@@ -1425,7 +1421,7 @@ void CImGui_Manager::Draw_MeshLayerPanel(CGameObject* pObj)
             ImGui::SameLine(); ImGui::Text("/ %d", count);
         }
         if (!bAnyField)
-            ImGui::TextDisabled("  (single-texture mesh)");
+            ImGui::TextDisabled("  (no texture slot override)");
 
         if (changed) pModel->Set_MeshLayer((_uint)i, L);
         ImGui::Separator();
@@ -1434,6 +1430,21 @@ void CImGui_Manager::Draw_MeshLayerPanel(CGameObject* pObj)
 
     if (ImGui::Button("Bake (Save sidecar)"))
         pModel->Save_MeshLayers();
+}
+
+void CImGui_Manager::Draw_MapSectionRenderOptions(CMapSection* pSection)
+{
+    if (nullptr == pSection)
+        return;
+
+    if (!ImGui::CollapsingHeader("Render Group (per Section)", ImGuiTreeNodeFlags_DefaultOpen))
+        return;
+
+    int iRenderGroup = ToMapRenderGroupIndex(pSection->Get_RenderID());
+    const char* RenderGroups[] = { "NONBLEND", "BLEND" };
+
+    if (ImGui::Combo("Render Group", &iRenderGroup, RenderGroups, IM_ARRAYSIZE(RenderGroups)))
+        pSection->Set_RenderID(FromMapRenderGroupIndex(iRenderGroup));
 }
 
 void CImGui_Manager::Free()

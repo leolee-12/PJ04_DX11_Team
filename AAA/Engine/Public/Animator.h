@@ -46,7 +46,7 @@ public: // 에디터(데이터 편집)
     HRESULT Save_ToFile(const wstring& strPath) const;
 
     virtual json Serialize() const override;
-    virtual void Deserialize(const json& j) override;
+    virtual void Deserialize_Internal(const json& j) override;
 
 private:
     void    Fire_Point(const vector<ANIM_EVENT>& events, _float lo, _float hi);

@@ -189,6 +189,12 @@ HRESULT CKirby::Bind_ShaderResources()
     return S_OK;
 }
 
+void CKirby::On_Deserialized()
+{
+    if (m_pMovement)
+        m_pMovement->Sync_To_Controller();
+}
+
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     CKirby* pInstance = new CKirby(pDevice, pContext);

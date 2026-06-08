@@ -24,7 +24,24 @@ typedef struct tagTexDesc
 	_uint  iNumTex;
 } TEXTURE_DESC;
 
+namespace ShaderPass
+{
+	namespace Map
+	{
+		inline constexpr _uint Default = 0;
+		inline constexpr _uint Overlay = 1;
+		inline constexpr _uint White = 2;
+		inline constexpr _uint Shadow = 3;
+	}
 
+	namespace NonAnimPBR
+	{
+		inline constexpr _uint Default = 0;
+		inline constexpr _uint Diffuse = 1;
+		inline constexpr _uint Shadow = 2;
+		inline constexpr _uint White = 3;
+	}
+}
 
 namespace ProtoDesc
 {

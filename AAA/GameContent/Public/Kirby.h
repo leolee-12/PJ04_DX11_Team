@@ -72,6 +72,8 @@ private:
 	HRESULT Ready_Ability();
 	HRESULT Bind_ShaderResources();
 
+	virtual void On_Deserialized() override;
+
 private:
 	CKirby_Body* m_pBody{};
 

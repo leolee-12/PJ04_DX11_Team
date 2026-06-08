@@ -20,6 +20,7 @@ public:
 
 public:
 	HRESULT Begin(_uint iPassIndex);
+	_uint Get_NumPasses() const { return m_iNumPasses; }
 
 public:
 	HRESULT Bind_Matrix(const _char* pConstantName, const _float4x4* pMatrix);

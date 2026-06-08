@@ -26,7 +26,7 @@ json IReflectable::Serialize() const
     return j;
 }
 
-void IReflectable::Deserialize(const json& j)
+void IReflectable::Deserialize_Internal(const json& j)
 {
     for (auto& prop : Get_Properties())
     {

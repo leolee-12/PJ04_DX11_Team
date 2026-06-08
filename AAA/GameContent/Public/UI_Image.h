@@ -10,7 +10,7 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CUI_Image final : public CUIPartObject
+class CLIENT_DLL CUI_Image final : public CUIPartObject
 {
 	GENERATED_BODY(CUI_Image)
 
@@ -44,11 +44,13 @@ public:
 	virtual void			Update(_float fTimeDetla) override;
 	virtual void			Late_Update(_float fTimeDelta) override;
 	virtual HRESULT			Render() override;
-	virtual void			Deserialize(const json& j) override;
 	virtual void			Copy_PrototypeName(ENGINE_OBJECT_DATA* pOut) override
 	{
 		pOut->strPrototypeTag = PROTOTYPE_TAG;
 	}
+
+	//  Editor에서 텍스처 바로 바꾸기 위한 용도
+	HRESULT					Set_Texture(_int iLevel, const _wstring& strProtoTag);
 
 public:
 	static CUI_Image* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -62,6 +64,8 @@ private:
 private:
 	HRESULT					Ready_Components(UI_IMAGE_DESC* pDesc);
 	HRESULT					Bind_ShaderResources();
+
+	virtual void			Deserialize_Internal(const json& j) override;
 
 protected:
 	virtual void			Free() override;

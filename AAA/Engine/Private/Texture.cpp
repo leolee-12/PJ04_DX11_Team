@@ -125,6 +125,28 @@ void CTexture::Get_TextureSize(_uint iIndex, _float2* pOutSize) const
 	pResource->Release();
 }
 
+_uint CTexture::Get_ArraySize() const
+{
+	if (m_Textures.empty() || nullptr == m_Textures[0])
+		return 0;
+
+	ID3D11Resource* pResource = nullptr;
+	m_Textures[0]->GetResource(&pResource);
+
+	ID3D11Texture2D* pTex2D = nullptr;
+	pResource->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&pTex2D);
+
+	D3D11_TEXTURE2D_DESC desc;
+	pTex2D->GetDesc(&desc);
+
+	_uint iArray = desc.ArraySize;
+
+	pTex2D->Release();
+	pResource->Release();
+
+	return iArray;
+}
+
 HRESULT CTexture::Initialize(void* pArg)
 {
 	return S_OK;

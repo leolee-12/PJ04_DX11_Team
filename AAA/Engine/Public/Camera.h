@@ -37,7 +37,7 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
-	virtual void Deserialize(const json& j) override;
+	virtual void Deserialize_Internal(const json& j) override;
 
 public:
 	void Recalculate_ProjMatrix();

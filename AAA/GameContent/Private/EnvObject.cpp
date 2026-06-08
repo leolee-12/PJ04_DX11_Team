@@ -11,6 +11,8 @@ NS_BEGIN(Client)
 
 namespace
 {
+	constexpr _bool ENABLE_ENV_OBJECT_SHADOW = false;
+
 	_matrix Build_WorldMatrix_FromTRS(const ENV_OBJECT_DESC& Desc)
 	{
 		const _vector vScale = XMLoadFloat3(&Desc.vScale);
@@ -58,7 +60,10 @@ namespace
 }
 
 CEnvObject::CEnvObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CGameObject(pDevice, pContext)
+	: CGameObject{pDevice, pContext}
+	//, m_bRenderable{ true }
+	//, m_bEnableCulling{ true }
+	//, m_bCastShadow{ true }
 {
 }
 
@@ -66,6 +71,9 @@ CEnvObject::CEnvObject(const CEnvObject& Prototype)
 	: CGameObject(Prototype)
 	, m_tDesc(Prototype.m_tDesc)
 	, m_strProtoTag(Prototype.m_strProtoTag)
+	//, m_bRenderable{ Prototype.m_bRenderable }
+	//, m_bEnableCulling{ Prototype.m_bEnableCulling }
+	//, m_bCastShadow{ Prototype.m_bCastShadow }
 {
 }
 
@@ -153,16 +161,31 @@ HRESULT CEnvObject::Render()
 
 	for (size_t i = 0; i < iNumMeshes; ++i)
 	{
-		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", static_cast<_uint>(i), MTEX_TYPE::DIFFUSE, 0)))
+		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(static_cast<_uint>(i));
+
+		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", static_cast<_uint>(i), MTEX_TYPE::DIFFUSE,
+			Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)])))
+			continue;
+		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", static_cast<_uint>(i), MTEX_TYPE::NORMALS,
+			Layer.idx[ETOUI(MTEX_TYPE::NORMALS)])))
 			int a = 1;/*continue;*/
-		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", static_cast<_uint>(i), MTEX_TYPE::NORMALS, 0)))
+		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", static_cast<_uint>(i), MTEX_TYPE::METALNESS,
+			Layer.idx[ETOUI(MTEX_TYPE::METALNESS)])))
 			int a = 1;/*continue;*/
-		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", static_cast<_uint>(i), MTEX_TYPE::METALNESS, 0)))
-			int a = 1;/*continue;*/
-		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnknownTexture", static_cast<_uint>(i), MTEX_TYPE::UNKNOWN, 0)))
+		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnknownTexture", static_cast<_uint>(i), MTEX_TYPE::UNKNOWN,
+			Layer.idx[ETOUI(MTEX_TYPE::UNKNOWN)])))
 			int a = 1;/*continue;*/
 
-		if (FAILED(m_pShaderCom->Begin(1)))
+		_uint iPass = (Layer.iPass >= 0)
+			? static_cast<_uint>(Layer.iPass)
+			: ShaderPass::NonAnimPBR::White;
+
+		if (iPass > ShaderPass::NonAnimPBR::Diffuse)
+			iPass = ShaderPass::NonAnimPBR::White;
+
+		//if (FAILED(m_pShaderCom->Begin(iPass)))
+		//	return E_FAIL;
+		if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::Diffuse)))
 			return E_FAIL;
 
 		if (FAILED(m_pModelCom->Render(static_cast<_uint>(i))))
@@ -187,7 +210,7 @@ HRESULT CEnvObject::Render_Shadow()
 	size_t n = m_pModelCom->Get_NumMeshes();
 	for (size_t i = 0; i < n; ++i)
 	{
-		if (FAILED(m_pShaderCom->Begin(2)))
+		if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::Shadow)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Render((_uint)i)))
 			return E_FAIL;
@@ -225,6 +248,7 @@ void CEnvObject::Refresh_WorldBounds()
 
 void CEnvObject::Check_Visible()
 {
+
 	if (!m_bRenderable || !Has_RenderModel())
 	{
 		m_bVisible = false;
@@ -232,22 +256,24 @@ void CEnvObject::Check_Visible()
 		return;
 	}
 
+	const _bool bEnableShadow = ENABLE_ENV_OBJECT_SHADOW && m_bCastShadow;
+
 	if (nullptr == m_pGameInstance_Proxy)
 	{
 		m_bVisible = true;
-		m_bVisibleShadow = m_bCastShadow;
+		m_bVisibleShadow = bEnableShadow;
 		return;
 	}
 
 	if (!m_bEnableCulling)
 	{
 		m_bVisible = true;
-		m_bVisibleShadow = m_bCastShadow;
+		m_bVisibleShadow = bEnableShadow;
 		return;
 	}
 
 	m_bVisible = !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, m_bEnableCulling, m_WorldBounds);
-	m_bVisibleShadow = m_bCastShadow && !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_bEnableCulling, m_WorldBounds);
+	m_bVisibleShadow = bEnableShadow && !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_bEnableCulling, m_WorldBounds);
 }
 
 void CEnvObject::Apply_TransformFromDesc()

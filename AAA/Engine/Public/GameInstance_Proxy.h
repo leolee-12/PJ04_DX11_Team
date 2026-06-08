@@ -149,7 +149,8 @@ public: // Picking
 #pragma region FONT_MANAGER
     HRESULT Add_Font(const _wstring& strFontTag, const _tchar* pFontFilePath);
     HRESULT Draw_Text(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition,
-        _fvector vColor = XMVectorSet(1.f, 1.f, 1.f, 1.f), _float fRotation = 0.f, const _float2& vScale = _float2(1.f, 1.f));
+        _fvector vColor = XMVectorSet(1.f, 1.f, 1.f, 1.f), _float fRotation = 0.f, const _float2& vScale = _float2(1.f, 1.f), TEXT_ALIGN eAlign = TEXT_ALIGN::CENTER);
+    _float2 Measure_Text(const _wstring& strFontTag, const _tchar* pText);
 #pragma endregion
 
 #pragma region EVENTBUS
@@ -241,7 +242,12 @@ public:
       void  Render_PhysXDebug(_fmatrix ViewMatrix, _fmatrix ProjMatrix);
 #pragma endregion
 
-
+#pragma region TEXTURE_HUB
+  public:
+      HRESULT LoadOrGet_TextureFromHub(const _tchar* pTexturePath, TEXTURE_HANDLE* pOutHandle);
+      HRESULT Bind_TextureFromHub(class CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle);
+      TEXTURE_HUB_STATS Get_TextureHubStats() const;
+#pragma endregion
 
 private:
     CGameInstance* m_pOwner = { nullptr };

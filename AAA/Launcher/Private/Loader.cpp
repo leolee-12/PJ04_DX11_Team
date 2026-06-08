@@ -3,7 +3,11 @@
 #include "GameInstance.h"
 #include "GameObject_Factory.h"
 #include "DataLoader.h"
+#include "Map_Loader.h"
+#include "Loader_Prototype.h"
+#include "Launcher_MapProfiles.h"
 #include <set>
+#include "Loader_Prototype.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice { pDevice }
@@ -146,11 +150,24 @@ HRESULT CLoader::Ready_Resources_For_Lobby()
 
 HRESULT CLoader::Ready_Resources_For_GamePlay()
 {
-    string strContent;
-    CDataLoader::Read_Json(L"../../Resources/LevelData/GamePlay.JSON", &strContent);
-    json jLevel = json::parse(strContent);
+    LEVEL_MANIFEST Manifest{};
+    if (FAILED(Load_LevelManifest(LAUNCHER_LEVEL_PROFILES::LEVEL_TEST, &Manifest)))
+        return E_FAIL;
 
     LEVEL eLevel = LEVEL::GAMEPLAY;
+
+    Add_Work([this, Manifest, eLevel]() -> HRESULT
+        {
+            return CMap_Loader::Preload_Map(
+                m_pDevice,
+                m_pContext,
+                Manifest.strMapManifest,
+                ETOUI(eLevel));
+        });
+
+    string strContent;
+    CDataLoader::Read_Json(Manifest.strObjectsFile.c_str(), &strContent);
+    json jLevel = json::parse(strContent);
 
     set<wstring> visited;
     for (auto& jObj : jLevel["Objects"])
@@ -172,26 +189,19 @@ HRESULT CLoader::Ready_Resources_For_GamePlay()
             });
     }
 
-    /*static const wstring kCodeOnlyProtos[] = {
-          L"Proto_NamePlate",
-    };
-
-    for (const wstring& wProto : kCodeOnlyProtos)
+    if (!Manifest.strUIFile.empty())
     {
-        if (!visited.insert(wProto).second) continue;
-        if (m_pGameInstance_Proxy->Has_Prototype(ETOUI(eLevel), wProto)) continue;
-
-        Add_Work([this, wProto, eLevel]() -> HRESULT
+        wstring strUIFile = Manifest.strUIFile;
+        Add_Work([this, strUIFile, eLevel]() -> HRESULT
             {
-                auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(wProto);
-                if (!pReg) return E_FAIL;
-
-                pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
-                m_pGameInstance_Proxy->Add_Prototype(ETOUI(eLevel), wProto.c_str(),
-                    pReg->CreatorFunc(m_pDevice, m_pContext));
-                return S_OK;
+                return Ready_Level_UIResources(
+                    m_pGameInstance_Proxy,
+                    m_pDevice,
+                    m_pContext,
+                    strUIFile.c_str(),
+                    ETOUI(eLevel));
             });
-    }*/
+    }
 
     return S_OK;
 }

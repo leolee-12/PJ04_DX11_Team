@@ -36,6 +36,7 @@ class CPhysX_Manager;
 class CEnvironment_Manager;
 class CShaderGlobal_Manager;
 class CFrustum_Manager;
+class CTexture_Hub;
 
 class ENGINE_DLL CGameInstance 
 {
@@ -169,7 +170,8 @@ private:
 #pragma region FONT_MANAGER
 	HRESULT Add_Font(const _wstring& strFontTag, const _tchar* pFontFilePath);
 	HRESULT Draw_Text(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition,
-		_fvector vColor = XMVectorSet(1.f, 1.f, 1.f, 1.f), _float fRotation = 0.f, const _float2& vScale = _float2(1.f, 1.f));
+		_fvector vColor = XMVectorSet(1.f, 1.f, 1.f, 1.f), _float fRotation = 0.f, const _float2& vScale = _float2(1.f, 1.f), TEXT_ALIGN eAlign = TEXT_ALIGN::CENTER);
+	_float2 Measure_Text(const _wstring& strFontTag, const _tchar* pText);
 #pragma endregion
 
 #pragma region EVENTBUS
@@ -214,6 +216,12 @@ private:
 	  _bool Is_EditMode() const		  { return m_bEditMode; }
 #pragma endregion
 
+#pragma region TEXTURE_HUB
+	  HRESULT LoadOrGet_TextureFromHub(const _tchar* pTexturePath, TEXTURE_HANDLE* pOutHandle);
+	  HRESULT Bind_TextureFromHub(class CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle);
+	  TEXTURE_HUB_STATS Get_TextureHubStats() const;
+#pragma endregion
+
 #pragma region PHYSIX_MANAGER
 	  physx::PxTriangleMesh* Cook_TriangleMesh(const _float3* pPositions, _uint iNumVertices, const _uint* pIndices, _uint iNumIndices, _bool bFlipWinding = true);
 	  physx::PxRigidStatic*  Add_StaticActor(physx::PxTriangleMesh* pMesh, _fmatrix WorldMatrix);
@@ -229,6 +237,7 @@ private:
 
 
 
+
 private:
 	CGraphic_Device*			m_pGraphic_Device = { nullptr };
 	CTimer_Manager*				m_pTimer_Manager = { nullptr };
@@ -237,7 +246,6 @@ private:
 	CObject_Manager*			m_pObject_Manager = { nullptr };
 	CRenderer*					m_pRenderer = { nullptr };
 	CCamera_Manager*			m_pCamera_Manager = { nullptr };
-	CFrustum_Manager*			m_pFrustum_Manager = { nullptr };
 	CInput_Device*				m_pInput_Device = { nullptr };
 	CLight_Manager*				m_pLight_Manager = { nullptr };
 	CFont_Manager*				m_pFont_Manager = { nullptr };
@@ -250,6 +258,8 @@ private:
 	CPhysX_Manager*				m_pPhysX_Manager = { nullptr };
 	CEnvironment_Manager*		m_pEnvironment_Manager = { nullptr };
 	CShaderGlobal_Manager*		m_pShaderGlobal_Manager = { nullptr };
+	CFrustum_Manager*			m_pFrustum_Manager = { nullptr };
+	CTexture_Hub*				m_pTexture_Hub = { nullptr };
 
 	mutable mt19937             m_RandomGenerator;
 	_bool						m_bEditMode = { false };

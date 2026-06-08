@@ -63,7 +63,7 @@ private:
 	_bool						UIToLocalDelta(const _float2& vUIDelta, _float2* pOutLocalDelta) const;
 
 private:
-	ID3D11ShaderResourceView* m_pSRV = { nullptr };
+	ID3D11ShaderResourceView*	m_pSRV = { nullptr };
 
 	_float						m_fTargetAspect = { 1600.f / 900.f };
 
@@ -81,6 +81,17 @@ private:
 	_float2						m_vDragStartCenter = {};
 	_float2						m_vDragStartSize = {};
 	_float						m_fDragStartZ = { 1.f };
+
+	_float						m_fDragStartFontScale = { 1.f };
+
+	_char						m_szSaveName[128] = {};
+	_bool						m_bOpenSavePopup = { false };
+
+	_char						m_szManifestSaveName[128] = {};
+	_bool						m_bOpenManifestSavePopup = { false };
+
+	_char						m_szManifestLoadName[128] = {};
+	_bool						m_bOpenManifestLoadPopup = { false };
 
 public:
 	static CPanel_UICanvas* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

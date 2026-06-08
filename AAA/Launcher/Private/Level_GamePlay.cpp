@@ -3,6 +3,8 @@
 #include "GameInstance.h"
 #include "Camera_Free.h"
 #include "Loader_Prototype.h"
+#include "Map_Loader.h"
+#include "Launcher_MapProfiles.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel { pDevice, pContext }
@@ -14,17 +16,40 @@ HRESULT CLevel_GamePlay::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
-    if (FAILED(Load_Level(m_pGameInstance_Proxy, m_pDevice, m_pContext,
-        L"../../Resources/LevelData/GamePlay.JSON", ETOUI(LEVEL::GAMEPLAY))))
+    LEVEL_MANIFEST Manifest{};
+    if (FAILED(Load_LevelManifest(LAUNCHER_LEVEL_PROFILES::LEVEL_TEST, &Manifest)))
         return E_FAIL;
+
+    MAP_LOAD_REPORT MapReport{};
+    CMapStage* pMapStage = nullptr;
+
+    if (FAILED(CMap_Loader::Spawn_Map(
+        Manifest.strMapManifest,
+        ETOUI(LEVEL::GAMEPLAY),
+        &MapReport,
+        &pMapStage)))
+    {
+        return E_FAIL;
+    }
+
+    if (FAILED(Load_Level(m_pGameInstance_Proxy, m_pDevice, m_pContext,
+        Manifest.strObjectsFile.c_str(), ETOUI(LEVEL::GAMEPLAY))))
+        return E_FAIL;
+
+    if (!Manifest.strUIFile.empty())
+    {
+        if (FAILED(Load_Level_UI(m_pGameInstance_Proxy, m_pDevice, m_pContext,
+            Manifest.strUIFile.c_str(), ETOUI(LEVEL::GAMEPLAY))))
+            return E_FAIL;
+    }
 
     if (FAILED(m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Camera_Free"), CCamera_Free::Create(m_pDevice, m_pContext))))
         return E_FAIL;
 
     CCamera_Free::CAMERA_FREE_DESC      CameraDesc{};
 
-    CameraDesc.vEye = _float3(0.f, 10.f, -7.f);
-    CameraDesc.vAt = _float3(0.f, 0.f, 0.f);
+    CameraDesc.vEye = _float3(-130.f, 12.f, -70.f);
+    CameraDesc.vAt = _float3(-130.f, 8.f, -64.f);
     CameraDesc.fFovy = XMConvertToRadians(60.f);
     CameraDesc.fNear = 0.1f;
     CameraDesc.fFar = 500.f;

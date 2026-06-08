@@ -520,12 +520,20 @@ HRESULT CGameInstance_Proxy::Add_Font(const _wstring& strFontTag, const _tchar* 
 	return m_pOwner->Add_Font(strFontTag, pFontFilePath);
 }
 
-HRESULT CGameInstance_Proxy::Draw_Text(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition, _fvector vColor, _float fRotation, const _float2& vScale)
+HRESULT CGameInstance_Proxy::Draw_Text(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition, _fvector vColor, _float fRotation, const _float2& vScale, TEXT_ALIGN eAlign)
 {
 	if (!IsConnected())
 		return E_FAIL;
 
-	return m_pOwner->Draw_Text(strFontTag, pText, vPosition, vColor, fRotation, vScale);
+	return m_pOwner->Draw_Text(strFontTag, pText, vPosition, vColor, fRotation, vScale, eAlign);
+}
+
+_float2 CGameInstance_Proxy::Measure_Text(const _wstring& strFontTag, const _tchar* pText)
+{
+	if (!IsConnected())
+		return _float2(0.f, 0.f);
+
+	return m_pOwner->Measure_Text(strFontTag, pText);
 }
 
 #pragma endregion
@@ -848,6 +856,32 @@ const _float4* CGameInstance_Proxy::Get_ShaderGlobal(const string& strName) cons
 		return nullptr;
 
 	return m_pOwner->m_pShaderGlobal_Manager->Get(strName);
+}
+#pragma endregion
+
+#pragma region TEXTURE_HUB
+HRESULT CGameInstance_Proxy::LoadOrGet_TextureFromHub(const _tchar* pTexturePath, TEXTURE_HANDLE* pOutHandle)
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->LoadOrGet_TextureFromHub(pTexturePath, pOutHandle);
+}
+
+HRESULT CGameInstance_Proxy::Bind_TextureFromHub(CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle)
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->Bind_TextureFromHub(pShader, pConstantName, Handle);
+}
+
+TEXTURE_HUB_STATS CGameInstance_Proxy::Get_TextureHubStats() const
+{
+	if (!IsConnected())
+		return {};
+
+	return m_pOwner->Get_TextureHubStats();
 }
 #pragma endregion
 

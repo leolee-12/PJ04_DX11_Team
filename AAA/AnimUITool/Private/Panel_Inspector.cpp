@@ -9,6 +9,32 @@
 #include "Preview_Kirby.h"
 #include "Kirby_States.h"
 #include "UIPartObject.h"
+#include "UIContainerObject.h"
+#include "Level_Tool.h"
+#include "UI_SpriteAnim.h"
+#include "UI_Fonts.h"
+#include "UI_Text.h"
+
+namespace
+{
+    template<typename TPair, size_t N>
+    void Draw_StateCombo(const char* szLabel, int& iValue,
+        const TPair(&names)[N])
+    {
+        const char* szCur = "?";
+        for (auto& [v, n] : names) if ((int)v == iValue) szCur = n;
+        if (ImGui::BeginCombo(szLabel, szCur))
+        {
+            for (auto& [v, n] : names)
+                if (ImGui::Selectable(n, (int)v == iValue)) iValue = (int)v;
+            ImGui::EndCombo();
+        }
+    }
+
+    const std::pair<int, const char*> g_TextAlignNames[] = {
+            { 0, "Left" }, { 1, "Center" }, { 2, "Right" },
+    };
+}
 
 CPanel_Inspector::CPanel_Inspector(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPanel(pDevice, pContext)
@@ -147,6 +173,9 @@ void CPanel_Inspector::Render_Properties(IReflectable* pHolder)
 
     for (auto& prop : props)
     {
+        if (prop.strName == L"FontTag" || prop.strName == L"Align")
+            continue;
+
         void* pData = pHolder->Get_PropertyPtr(prop.uOffset);
         if (!pData) continue;
         std::string name(prop.strName.begin(), prop.strName.end());
@@ -194,10 +223,10 @@ void CPanel_Inspector::Render_Properties(IReflectable* pHolder)
         case PROP_TYPE::WSTRING:
         {
             std::wstring* pW = (std::wstring*)pData;
-            std::string s(pW->begin(), pW->end());
-            char buf[256] = {}; strcpy_s(buf, s.c_str());
+            char buf[256] = {};
+            strcpy_s(buf, ToUtf8(*pW).c_str());          
             if (ImGui::InputText(name.c_str(), buf, sizeof(buf)))
-                *pW = std::wstring(buf, buf + strlen(buf));
+                *pW = StrToWstr(buf);                   
             break;
         }
         }
@@ -446,16 +475,96 @@ void CPanel_Inspector::Render_UIInspector()
     UI_CONTEXT& uictx = m_pPanel_Manager->Get_UIContext();
     UI_SELECTION& sel = uictx.Selection;
 
-    if (!sel.Valid() || nullptr == sel.pPart)
+    if (nullptr == sel.pContainer)
     {
-        ImGui::TextDisabled("(no UI part selected)");
+        ImGui::TextDisabled("(no UI selected)");
+        return;
+    }
+
+    if (nullptr == sel.pPart)
+    {
+        std::string strCName = ToUtf8(sel.pContainer->Get_ObjectTag());
+        ImGui::Text("[UI Container] %s",
+            strCName.empty() ? "-" : strCName.c_str());
+        _bool bActive = sel.pContainer->Is_Active() != false;
+        if (ImGui::Checkbox("Active", &bActive))
+        {
+            sel.pContainer->Set_Active(bActive);
+        }
+        ImGui::Separator();
+
+        CLevel_Tool* pLevel = m_pPanel_Manager->Get_Level();
+        if (pLevel)
+        {
+            _wstring wTag = pLevel->Get_AuthoredProtoTag(sel.pContainer);
+            char szTag[128] = {};
+            strncpy_s(szTag, ToUtf8(wTag).c_str(), sizeof(szTag) - 1);
+
+            if (ImGui::InputText("Runtime ProtoTag",
+                szTag, sizeof(szTag)))
+            {
+                pLevel->Set_AuthoredProtoTag(
+                    sel.pContainer, StrToWstr(szTag));
+                uictx.bDirty = true;
+            }
+            ImGui::TextDisabled(
+                "RunTime Spawn Class Tag : Save -> json in in !!");
+        }
         return;
     }
 
     CUIPartObject* pPart = sel.pPart;
 
     std::string strName = ToUtf8(sel.strPartTag);
-    ImGui::Text("[UI Part] %s", strName.empty() ? "-" : strName.c_str());
+    ImGui::Text("[UI Part]");
+    ImGui::SameLine();
+    ImGui::TextDisabled("%s", strName.empty() ? "-" : strName.c_str());
+
+    static _wstring s_EditSourceTag;
+    static char s_szPartName[128] = {};
+
+    if (s_EditSourceTag != sel.strPartTag)
+    {
+        s_EditSourceTag = sel.strPartTag;
+        strncpy_s(s_szPartName, ToUtf8(sel.strPartTag).c_str(), sizeof(s_szPartName) - 1);
+    }
+
+    ImGui::SetNextItemWidth(-1.f);
+    const bool bEnter =
+        ImGui::InputText("Part Name", s_szPartName, sizeof(s_szPartName),
+            ImGuiInputTextFlags_EnterReturnsTrue);
+
+    const bool bCommit = bEnter || ImGui::IsItemDeactivatedAfterEdit();
+
+    if (bCommit)
+    {
+        std::string strNewName = s_szPartName;
+
+        if (!strNewName.empty())
+        {
+            _wstring strNewTag = StrToWstr(strNewName);
+
+            CLevel_Tool* pLevel = m_pPanel_Manager->Get_Level();
+            if (pLevel && SUCCEEDED(pLevel->Rename_UIPart(
+                sel.pContainer,
+                sel.strPartTag,
+                strNewTag)))
+            {
+                sel.strPartTag = strNewTag;
+                s_EditSourceTag = strNewTag;
+                uictx.bDirty = true;
+            }
+            else
+            {
+                strncpy_s(s_szPartName, ToUtf8(sel.strPartTag).c_str(), sizeof(s_szPartName) - 1);
+            }
+        }
+        else
+        {
+            strncpy_s(s_szPartName, ToUtf8(sel.strPartTag).c_str(), sizeof(s_szPartName) - 1);
+        }
+    }
+
     ImGui::Separator();
 
     struct { RENDERUIID v; const char* n; } layers[] = {
@@ -478,6 +587,94 @@ void CPanel_Inspector::Render_UIInspector()
     ImGui::Separator();
     Render_UITransform(pPart);
     Render_Properties(pPart);
+    Render_TextInspector(pPart);
+    Render_SpriteAnimControl(pPart);
+}
+
+void CPanel_Inspector::Render_SpriteAnimControl(CUIPartObject* pPart)
+{
+    auto* pAnim = dynamic_cast<Client::CUI_SpriteAnim*>(pPart);
+    if (!pAnim)
+        return;
+
+    if (!ImGui::CollapsingHeader("SpriteAnim",
+        ImGuiTreeNodeFlags_DefaultOpen))
+        return;
+
+    const _int iFrameCount = pAnim->Get_FrameCount();
+    const _int iLast = (iFrameCount > 0) ? iFrameCount - 1 : 0;
+
+    const char* szState =
+        pAnim->Is_Finished() ? "Finished" :
+        (pAnim->Is_Playing() ? "Playing" : "Paused");
+    ImGui::Text("State: %s   Frame: %d / %d",
+        szState, pAnim->Get_Frame(), iLast);
+
+    // 진행도 바
+    ImGui::ProgressBar(pAnim->Get_Progress(), ImVec2(-1.f, 0.f));
+
+    float fProgress = pAnim->Get_Progress();
+    if (ImGui::SliderFloat("Seek", &fProgress, 0.f, 1.f, "%.3f"))
+    {
+        pAnim->Pause();
+        pAnim->Seek(fProgress);
+    }
+
+    // 프레임 단위 스크럽
+    if (iFrameCount > 1)
+    {
+        int iFrame = pAnim->Get_Frame();
+        if (ImGui::SliderInt("Frame", &iFrame, 0, iLast))
+        {
+            pAnim->Pause();
+            pAnim->Set_Frame(iFrame);
+        }
+    }
+
+    // 트랜스포트
+    if (ImGui::Button("Restart")) pAnim->Play();
+    ImGui::SameLine();
+    if (ImGui::Button("Pause"))   pAnim->Pause();
+    ImGui::SameLine();
+    if (ImGui::Button("Resume"))  pAnim->Resume();
+    ImGui::SameLine();
+    if (ImGui::Button("Stop"))    pAnim->Stop();
+}
+
+void CPanel_Inspector::Render_TextInspector(CUIPartObject* pPart)
+{
+    auto* pText = dynamic_cast<Client::CUI_Text*>(pPart);
+    if (!pText)
+        return;
+
+    if (!ImGui::CollapsingHeader("Text Properties",
+        ImGuiTreeNodeFlags_DefaultOpen))
+        return;
+
+    UI_CONTEXT& uictx = m_pPanel_Manager->Get_UIContext();
+
+    std::string strCur = ToUtf8(pText->Get_FontTag());
+    if (ImGui::BeginCombo("Font", strCur.c_str()))
+    {
+        for (auto& f : Client::g_UIFonts)
+        {
+            std::string strTag = ToUtf8(f.szTag);
+            if (ImGui::Selectable(strTag.c_str(), strCur == strTag))
+            {
+                pText->Set_FontTag(f.szTag);
+                uictx.bDirty = true;
+            }
+        }
+        ImGui::EndCombo();
+    }
+
+    int iAlign = pText->Get_Align();
+    Draw_StateCombo("Align", iAlign, g_TextAlignNames);
+    if (iAlign != pText->Get_Align())
+    {
+        pText->Set_Align(iAlign);
+        uictx.bDirty = true;
+    }
 }
 
 CPanel_Inspector* CPanel_Inspector::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -7,7 +7,6 @@
 #endif
 
 #include "GameObject_Factory.h"
-#include "MapDescriptor.h"
 
 #include "GameInstance.h"
 
@@ -183,7 +182,6 @@ void CToolApp::Free()
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);
 
-	CMapDescriptor::DestroyInstance();
 	CGameInstance::DestroyInstance();
 	CGameObject_Factory::DestroyInstance();
 #ifdef _DEBUG

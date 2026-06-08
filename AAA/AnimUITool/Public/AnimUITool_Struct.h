@@ -68,6 +68,15 @@ namespace AnimUITool
         _bool           bDirty = { false };
         _wstring        strCurrentJsonPath = {};
     }UI_CONTEXT;
+
+    typedef struct tagUIContainerEntry
+    {
+        Engine::CUIContainerObject* pContainer = { nullptr };
+        _wstring        strPath = L""; // 개별 UIContainer json 경로
+        _wstring        strLayerTag = L"Layer_UI";
+        _float2         vDesignSize = { 1600.f, 900.f };
+        _bool           bExport = true;
+    }UI_CONTAINER_ENTRY;
 }
 
 #endif // AnimUITool_Struct_h__

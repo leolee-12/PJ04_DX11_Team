@@ -128,9 +128,9 @@ json CEffect_Container::Serialize() const
     return j;
 }
 
-void CEffect_Container::Deserialize(const json& j)
+void CEffect_Container::Deserialize_Internal(const json& j)
 {
-    __super::Deserialize(j);
+    __super::Deserialize_Internal(j);
 
     if (!j.contains("EffectPartObjects")) return;
 

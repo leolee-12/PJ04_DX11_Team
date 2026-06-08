@@ -24,13 +24,22 @@ HRESULT CFont_Manager::Add_Font(const _wstring& strFontTag, const _tchar* pFontF
     return S_OK;
 }
 
-HRESULT CFont_Manager::Draw(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition, _fvector vColor, _float fRotation, const _float2& vScale)
+HRESULT CFont_Manager::Draw(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition, _fvector vColor, _float fRotation, const _float2& vScale, TEXT_ALIGN eAlign)
 {
     CCustomFont* pFont = Find_Font(strFontTag);
     if(nullptr == pFont)
         return E_FAIL;
 
-    return pFont->Draw(pText, vPosition, vColor, fRotation, vScale);
+    return pFont->Draw(pText, vPosition, vColor, fRotation, vScale, eAlign);
+}
+
+_float2 CFont_Manager::Measure(const _wstring& strFontTag, const _tchar* pText)
+{
+    CCustomFont* pFont = Find_Font(strFontTag);
+    if (nullptr == pFont)
+        return _float2(0.f, 0.f);
+
+    return pFont->Measure(pText);
 }
 
 CCustomFont* CFont_Manager::Find_Font(const _wstring& strFontTag)
