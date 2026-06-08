@@ -103,9 +103,9 @@ json CGameObject::Serialize() const
     return j;
 }
 
-void CGameObject::Deserialize(const json& j)
+void CGameObject::Deserialize_Internal(const json& j)
 {
-    IReflectable::Deserialize(j);
+    IReflectable::Deserialize_Internal(j);
 
     if (j.contains("Transform"))
     {

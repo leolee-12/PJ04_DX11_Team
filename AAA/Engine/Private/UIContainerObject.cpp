@@ -89,9 +89,9 @@ json CUIContainerObject::Serialize() const
     return j;
 }
 
-void CUIContainerObject::Deserialize(const json& j)
+void CUIContainerObject::Deserialize_Internal(const json& j)
 {
-    __super::Deserialize(j);
+    __super::Deserialize_Internal(j);
 
     Clear_UIPartObjects();
 

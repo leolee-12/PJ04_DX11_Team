@@ -776,7 +776,7 @@ HRESULT CRenderer::Render_Bloom()
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_BloomA"), m_pShaderPost, "g_BloomTexture")))
         return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderPost, "g_fBloomIntensity")))
+    if (FAILED(m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderPost, { "g_fBloomIntensity", "g_fExposure", "g_fToneMapMode" })))
         return E_FAIL;
     if (FAILED(m_pShaderPost->Begin(ETOUI(POSTPROSESS::COMPSITE))))
         return E_FAIL;

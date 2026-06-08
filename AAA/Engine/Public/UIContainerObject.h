@@ -32,7 +32,7 @@ public:
 
 public:
 	virtual json Serialize() const override;
-	virtual void Deserialize(const json& j) override;
+	virtual void Deserialize_Internal(const json& j) override;
 
 protected:
 	typedef struct tagUIPartPrototypeInfo

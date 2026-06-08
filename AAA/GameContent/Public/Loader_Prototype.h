@@ -16,6 +16,13 @@ struct ENV_ENTRY
     float intensity; 
 };
 
+struct LEVEL_MANIFEST
+{
+    wstring strMapManifest;
+    wstring strObjectsFile;
+    wstring strUIFile;
+};
+
 HRESULT CLIENT_DLL Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy,
 	ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
@@ -28,6 +35,10 @@ HRESULT CLIENT_DLL Load_Level(
     ID3D11DeviceContext* pContext,
     const _tchar* strFilePath,
     _uint iLevelIndex);
+
+HRESULT CLIENT_DLL Load_LevelManifest(
+    const _tchar* strManifestPath,
+    LEVEL_MANIFEST* pOut);
 
 HRESULT CLIENT_DLL Load_Fonts(CGameInstance_Proxy* pProxy);
 

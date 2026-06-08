@@ -10,6 +10,7 @@
 #include "UI_Text.h"
 #include "UI_SpriteAnim.h"
 #include "Texture.h"
+#include "Movement.h"
 
 NS_BEGIN(Client)
 
@@ -116,8 +117,40 @@ HRESULT CLIENT_DLL Load_Level(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice
             iLevelIndex, wLayer.c_str(), wObjectName, nullptr);
 
         if (pObj)
+        {
             pObj->Deserialize(jObj);
+        }
     }
+    return S_OK;
+}
+
+HRESULT CLIENT_DLL Load_LevelManifest(const _tchar* strManifestPath, LEVEL_MANIFEST* pOut)
+{
+    if (nullptr == pOut)
+        return E_FAIL;
+
+    string strContent = {};
+    if (FAILED(CDataLoader::Read_Json(strManifestPath, &strContent)))
+        return E_FAIL;
+
+    try
+    {
+        json jManifest = json::parse(strContent);
+
+        if (jManifest.contains("Map_Manifest"))
+            pOut->strMapManifest = StrToWstr(jManifest["Map_Manifest"].get<string>());
+
+        if (jManifest.contains("Objects"))
+            pOut->strObjectsFile = StrToWstr(jManifest["Objects"].get<string>());
+
+        if (jManifest.contains("UI"))
+            pOut->strUIFile = StrToWstr(jManifest["UI"].get<string>());
+    }
+    catch (json::exception&)
+    {
+        return E_FAIL;
+    }
+
     return S_OK;
 }
 
