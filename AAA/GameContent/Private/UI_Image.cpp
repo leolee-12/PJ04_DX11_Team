@@ -14,7 +14,7 @@ CUI_Image::CUI_Image(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 }
 
 CUI_Image::CUI_Image(const CUI_Image& Prototype)
-	: CUIPartObject { Prototype}
+	: CUIPartObject(Prototype)
 	, m_vColor{ Prototype.m_vColor }
 	, m_fAlpha{ Prototype.m_fAlpha }
 	, m_iTextureLevel{ Prototype.m_iTextureLevel }
@@ -80,7 +80,7 @@ HRESULT CUI_Image::Render()
 	return S_OK;
 }
 
-void CUI_Image::Deserialize(const json& j)
+void CUI_Image::Deserialize_Internal(const json& j)
 {
 	__super::Deserialize(j);
 

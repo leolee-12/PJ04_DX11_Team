@@ -53,7 +53,6 @@ public:
 	virtual void			Update(_float fTimeDelta) override;
 	virtual void			Late_Update(_float fTimeDelta) override;
 	virtual HRESULT			Render() override;
-	virtual void			Deserialize(const json& j) override;
 	virtual void			Copy_PrototypeName(ENGINE_OBJECT_DATA* pOut) override
 	{
 		pOut->strPrototypeTag = PROTOTYPE_TAG;
@@ -93,6 +92,8 @@ private:
 	HRESULT					Ready_Components(UI_SPRITEANIM_DESC* pDesc);
 	HRESULT					Bind_ShaderResources();
 	void					Sync_FrameCount();
+
+	virtual void			Deserialize_Internal(const json& j) override;
 
 public:
 	static CUI_SpriteAnim*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

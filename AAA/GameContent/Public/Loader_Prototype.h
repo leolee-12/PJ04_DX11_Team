@@ -20,6 +20,7 @@ struct LEVEL_MANIFEST
 {
     wstring strMapManifest;
     wstring strObjectsFile;
+    wstring strUIFile;
 };
 
 HRESULT CLIENT_DLL Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy,

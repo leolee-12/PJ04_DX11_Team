@@ -183,7 +183,7 @@ json CMapSection::Serialize_SectionState() const
 
 void CMapSection::Deserialize_SectionState(const json& j)
 {
-	IReflectable::Deserialize(j);
+	IReflectable::Deserialize_Internal(j);
 
 	if (j.contains("SectionRender") && j["SectionRender"].is_object())
 	{

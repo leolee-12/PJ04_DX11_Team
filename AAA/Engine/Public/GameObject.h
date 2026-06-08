@@ -81,7 +81,9 @@ public: // 프로퍼티함수
 	const unordered_map<wstring, CComponent*>& Get_Components() const { return m_Components; }
 
 	virtual json Serialize() const override;
-	virtual void Deserialize(const json& j) override;
+	virtual void Deserialize_Internal(const json& j) override;
+
+	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) = 0;
 
 public: // Collision 콜백
 	virtual void Enter_Collision(CGameObject* pOther) {};
@@ -110,10 +112,6 @@ protected:
 protected:
 	HRESULT Add_Component_Internal(const wstring& strComTag, CComponent* pComponent);
 	CComponent* Add_Component_Internal(_uint iProtoLevel, const wstring& strPrototypeTag, const wstring& strComTag, void* pArg);
-
-	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) = 0;
-
-	
 
 protected: // 이벤트 버스 헬퍼
 	void	Subscribe_Event(const wstring& strEventTag, function<void(void*)> Handler);

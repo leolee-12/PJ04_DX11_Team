@@ -214,7 +214,7 @@ void CLevel_Edit::Load_LiveObjects(const wstring& strFilePath)
         return;
 
     // 기존 오브젝트 레이어만 비우기 (맵 프리뷰/카메라/이펙트/UI는 유지)
-    auto iter = m_Layers.find(L"Layer_Object");
+    auto iter = m_Layers.find(OBJECT_LAYER_TAG);
     if (iter != m_Layers.end())
     {
         for (auto& handle : iter->second)

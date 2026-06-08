@@ -160,7 +160,7 @@ json CAnimator::Serialize() const
     return j;
 }
 
-void CAnimator::Deserialize(const json& j)
+void CAnimator::Deserialize_Internal(const json& j)
 {
     m_Tracks.clear();
     for (auto it = j.begin(); it != j.end(); ++it)

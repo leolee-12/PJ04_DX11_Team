@@ -17,7 +17,7 @@ CMapStage::CMapStage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 }
 
 CMapStage::CMapStage(const CMapStage& Prototype)
-	: CGameObject { Prototype }
+	: CGameObject(Prototype)
 	, m_strProtoTag { Prototype.m_strProtoTag }
 {
 }
@@ -96,9 +96,9 @@ json CMapStage::Serialize() const
 	return j;
 }
 
-void CMapStage::Deserialize(const json& j)
+void CMapStage::Deserialize_Internal(const json& j)
 {
-	__super::Deserialize(j);
+	__super::Deserialize_Internal(j);
 	Refresh_SectionTransforms();
 
 	if (j.contains("StageName") && j["StageName"].is_string())

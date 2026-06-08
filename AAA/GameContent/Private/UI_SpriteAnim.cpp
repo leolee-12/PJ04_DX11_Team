@@ -14,7 +14,7 @@ CUI_SpriteAnim::CUI_SpriteAnim(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 }
 
 CUI_SpriteAnim::CUI_SpriteAnim(const CUI_SpriteAnim& Prototype)
-	: CUIPartObject{ Prototype }
+	: CUIPartObject(Prototype)
 	, m_vColor{ Prototype.m_vColor }, m_fAlpha{ Prototype.m_fAlpha }
 	, m_iTextureLevel{ Prototype.m_iTextureLevel }
 	, m_strTextureProtoTag{ Prototype.m_strTextureProtoTag }
@@ -121,7 +121,7 @@ HRESULT CUI_SpriteAnim::Render()
 	return S_OK;
 }
 
-void CUI_SpriteAnim::Deserialize(const json& j)
+void CUI_SpriteAnim::Deserialize_Internal(const json& j)
 {
 	__super::Deserialize(j);
 	if (!m_strTextureProtoTag.empty() && !m_pTextureCom)

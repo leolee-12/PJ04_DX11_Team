@@ -44,7 +44,6 @@ public:
 	virtual void			Update(_float fTimeDetla) override;
 	virtual void			Late_Update(_float fTimeDelta) override;
 	virtual HRESULT			Render() override;
-	virtual void			Deserialize(const json& j) override;
 	virtual void			Copy_PrototypeName(ENGINE_OBJECT_DATA* pOut) override
 	{
 		pOut->strPrototypeTag = PROTOTYPE_TAG;
@@ -65,6 +64,8 @@ private:
 private:
 	HRESULT					Ready_Components(UI_IMAGE_DESC* pDesc);
 	HRESULT					Bind_ShaderResources();
+
+	virtual void			Deserialize_Internal(const json& j) override;
 
 protected:
 	virtual void			Free() override;

@@ -16,20 +16,29 @@ namespace Engine {
 
 	class ENGINE_DLL IReflectable
 	{
-	public:
-		virtual ~IReflectable() = default;
+		public:
+			virtual ~IReflectable() = default;
 
-		virtual vector<FPROPERTY>& Get_Properties() const
-		{
-			static vector<FPROPERTY> empty;
-			return empty;
-		}
+			virtual vector<FPROPERTY>& Get_Properties() const
+			{
+				static vector<FPROPERTY> empty;
+				return empty;
+			}
 
-		virtual const void* Get_PropertyPtr(size_t uOffset) const { return nullptr; }
-		virtual void* Get_PropertyPtr(size_t uOffset) { return nullptr; }
+			virtual const void* Get_PropertyPtr(size_t uOffset) const { return nullptr; }
+			virtual void* Get_PropertyPtr(size_t uOffset) { return nullptr; }
 
-		virtual json Serialize() const;          
-		virtual void Deserialize(const json& j);
+			virtual json Serialize() const;          
+			// NVI: 공개 진입점은 비가상. 파생까지 전체 역직렬화가 끝난 뒤 On_Deserialized()를 1회 보장.
+			void Deserialize(const json& j)
+			{
+				Deserialize_Internal(j);
+				On_Deserialized();
+			}
+
+		protected:
+                virtual void Deserialize_Internal(const json& j);
+                virtual void On_Deserialized() {}
 	};
 }
 
