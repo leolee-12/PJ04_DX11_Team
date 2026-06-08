@@ -32,6 +32,9 @@ HRESULT CLevel_GamePlay::Initialize()
         L"../../Resources/LevelData/GamePlay.JSON", ETOUI(LEVEL::GAMEPLAY))))
         return E_FAIL;
 
+    if (FAILED(Load_Level_UI(m_pGameInstance_Proxy, m_pDevice, m_pContext, L"../../Resources/CHJ/UI/Levels/Manifest_Test_ui.json", ETOUI(LEVEL::GAMEPLAY))))
+        return E_FAIL;
+
     if (FAILED(m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Camera_Free"), CCamera_Free::Create(m_pDevice, m_pContext))))
         return E_FAIL;
 

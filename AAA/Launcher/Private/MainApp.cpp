@@ -33,8 +33,8 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Ready_Prototype_For_Static()))
 		return E_FAIL;
 
-
 	CGameObject_Factory::GetInstance()->RegisterAll();
+
 
 	if (FAILED(Load_Fonts(m_pGameInstance_Proxy)))
 		return E_FAIL;

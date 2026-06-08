@@ -15,7 +15,10 @@ private:
 public:
 	HRESULT Add_Font(const _wstring& strFontTag, const _tchar* pFontFilePath);
 	HRESULT Draw(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition,
-		_fvector vColor, _float fRotation, const _float2& vScale);
+		_fvector vColor, _float fRotation, const _float2& vScale, TEXT_ALIGN eAlign = TEXT_ALIGN::CENTER);
+
+	_float2 Measure(const _wstring& strFontTag, const _tchar* pText);
+
 private:
 	ID3D11Device* m_pDevice = { nullptr };
 	ID3D11DeviceContext* m_pContext = { nullptr };

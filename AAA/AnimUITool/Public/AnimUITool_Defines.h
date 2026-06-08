@@ -9,6 +9,9 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 
+#include <filesystem>
+#include <fstream>
+
 using namespace Engine;
 using namespace Client;
 
@@ -17,6 +20,7 @@ using namespace Client;
 #include "AnimUITool_Struct.h"
 #include "AnimUITool_Func.h"
 
+#define DND_FILE_PATH "DND_FILE_PATH"
 
 namespace AnimUITool
 {

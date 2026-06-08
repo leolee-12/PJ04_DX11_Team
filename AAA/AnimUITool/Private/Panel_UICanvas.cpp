@@ -6,6 +6,8 @@
 #include "UIPartObject.h"
 #include "Transform.h"
 
+#include "UI_Text.h"
+
 using namespace AnimUITool;
 
 CPanel_UICanvas::CPanel_UICanvas(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -27,10 +29,97 @@ void CPanel_UICanvas::Render()
 
     ImGui::Text("Design: %.0f x %.0f", UIContext.vDesignSize.x, UIContext.vDesignSize.y);
     ImGui::SameLine();
+    if (ImGui::Button("Save"))
+        m_bOpenSavePopup = true;
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Save Manifest"))
+        m_bOpenManifestSavePopup = true;
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Load Manifest"))
+        m_bOpenManifestLoadPopup = true;
+
+    if (m_bOpenSavePopup) 
+    { 
+        ImGui::OpenPopup("Save UI");
+        m_bOpenSavePopup = false;
+    }
+
+    if (m_bOpenManifestSavePopup)
+    {
+        ImGui::OpenPopup("Save UI Manifest");
+        m_bOpenManifestSavePopup = false;
+    }
+
+    if (m_bOpenManifestLoadPopup)
+    {
+        ImGui::OpenPopup("Load UI Manifest");
+        m_bOpenManifestLoadPopup = false;
+    }
+
+
+    ImGui::SameLine();
     ImGui::Checkbox("Grid", &UIContext.bShowGrid);
     ImGui::SameLine();
     ImGui::SetNextItemWidth(100.f);
     ImGui::DragFloat("Step", &UIContext.fGridStep, 1.f, 8.f, 400.f, "%.0f");
+    ImGui::SameLine();
+    if (ImGui::Button("Add Container"))
+    {
+        if (CLevel_Tool* pLevel = m_pPanel_Manager->Get_Level())
+        {
+            CGameObject* pNew = pLevel->Add_UIContainer();
+            if (pNew)
+            {
+                m_pPanel_Manager->Set_UISelected(dynamic_cast<CUIContainerObject*>(pNew), nullptr, L"");
+                m_pPanel_Manager->Get_UIContext().bDirty = true;
+            }
+        }
+    }
+    ImGui::SameLine();
+    UI_SELECTION& sel = m_pPanel_Manager->Get_UIContext().Selection;
+    const _bool bHasContainer = (sel.pContainer != nullptr);
+
+    if (!bHasContainer) ImGui::BeginDisabled();
+    if (ImGui::Button("Part"))
+        ImGui::OpenPopup("AddPartPopup");
+    if (!bHasContainer) ImGui::EndDisabled();
+    ImGui::SameLine();
+
+    
+
+    if (ImGui::BeginPopup("AddPartPopup"))
+    {
+        auto AddPart = [&](UI_PART_TYPE eType)
+            {
+                if (CLevel_Tool* pLevel = m_pPanel_Manager->Get_Level())
+                {
+                    _wstring strPartTag;
+                    CUIPartObject* pPart =
+                        pLevel->Add_UIPart(sel.pContainer, eType, &strPartTag);
+                    if (pPart)
+                    {
+                        m_pPanel_Manager->Set_UISelected(
+                            sel.pContainer, pPart, strPartTag);
+                        m_pPanel_Manager->Get_UIContext().bDirty = true;
+                    }
+                }
+            };
+
+        if (sel.pContainer && ImGui::MenuItem("Image"))
+            AddPart(UI_PART_TYPE::IMAGE);
+
+        if (sel.pContainer && ImGui::MenuItem("SpriteAnim"))
+            AddPart(UI_PART_TYPE::SPRITEANIM);
+
+        if (sel.pContainer && ImGui::MenuItem("Text"))
+            AddPart(UI_PART_TYPE::TEXT);
+
+        ImGui::EndPopup();
+    }
 
     ImGui::Separator();
 
@@ -71,6 +160,19 @@ void CPanel_UICanvas::Render()
         else
             ImGui::Dummy(vSize);
 
+        if (ImGui::BeginDragDropTarget())
+        {
+            if (const ImGuiPayload* p = ImGui::AcceptDragDropPayload(DND_FILE_PATH))
+            {
+                std::string strPath(static_cast<const char*>(p->Data));
+                if (strPath.size() >= 8 && 0 == strPath.compare(strPath.size() - 8, 8, "_ui.json"))
+                {
+                    m_pPanel_Manager->Load_UI_ByPath(StrToWstr(strPath));
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+
         m_bHovered = ImGui::IsItemHovered();
 
         if (m_bHovered)
@@ -108,6 +210,117 @@ void CPanel_UICanvas::Render()
     {
         m_vCanvasMin = {};
         m_vCanvasSize = {};
+    }
+
+    // Save UIContainer 팝업
+    {
+        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+        if (ImGui::BeginPopupModal("Save UI", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::Text("File name:");
+            ImGui::InputText("##savename", m_szSaveName, sizeof(m_szSaveName));
+
+            UI_SELECTION& sel = m_pPanel_Manager->Get_UIContext().Selection;
+
+            if (ImGui::Button("OK"))
+            {
+                if (sel.pContainer && m_pPanel_Manager->Get_Level() && m_szSaveName[0])
+                {
+                    std::string s(m_szSaveName);
+
+                    if (SUCCEEDED(m_pPanel_Manager->Get_Level()->Save_UIContainer(
+                        sel.pContainer,
+                        m_pPanel_Manager->Get_UIContext().vDesignSize,
+                        StrToWstr(s))))
+                    {
+                        m_pPanel_Manager->Get_UIContext().bDirty = false;           // 저장 성공했을 때만 변경
+                        ImGui::CloseCurrentPopup();
+                    }
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
+        }
+    }
+
+    // Save UIContainers 팝업
+    {
+        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+
+        if (ImGui::BeginPopupModal("Save UI Manifest", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::Text("Manifest file name:");
+            ImGui::InputText("##manifestname", m_szManifestSaveName, sizeof(m_szManifestSaveName));
+
+            if (ImGui::Button("OK"))
+            {
+                if (m_pPanel_Manager->Get_Level() && m_szManifestSaveName[0])
+                {
+                    std::string strName = m_szManifestSaveName;
+                    std::wstring strFileName = StrToWstr(strName);
+
+                    std::filesystem::path path = L"../../Resources/CHJ/UI/Levels";
+                    path /= strFileName;
+
+                    if (path.extension().empty())
+                        path.replace_extension(L".json");
+
+                    if (SUCCEEDED(m_pPanel_Manager->Get_Level()->Save_UIManifest(path.wstring())))
+                    {
+                        ImGui::CloseCurrentPopup();
+                    }
+                }
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("Cancel"))
+                ImGui::CloseCurrentPopup();
+
+            ImGui::EndPopup();
+        }
+    }
+
+    // Load Manifest 버튼 팝업
+    {
+        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+
+        if (ImGui::BeginPopupModal("Load UI Manifest", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::Text("Manifest file name:");
+            ImGui::InputText("##manifestloadname", m_szManifestLoadName, sizeof(m_szManifestLoadName));
+
+            if (ImGui::Button("OK"))
+            {
+                if (m_pPanel_Manager->Get_Level() && m_szManifestLoadName[0])
+                {
+                    std::string strName = m_szManifestLoadName;
+                    std::wstring strFileName = StrToWstr(strName);
+
+                    std::filesystem::path path = L"../../Resources/CHJ/UI/Levels";
+                    path /= strFileName;
+
+                    if (path.extension().empty())
+                        path.replace_extension(L".json");
+
+                    if (SUCCEEDED(m_pPanel_Manager->Get_Level()->Load_UIManifest(path.wstring())))
+                    {
+                        ImGui::CloseCurrentPopup();
+                    }
+                }
+            }
+
+            ImGui::SameLine();
+
+            if (ImGui::Button("Cancel"))
+                ImGui::CloseCurrentPopup();
+
+            ImGui::EndPopup();
+        }
     }
 
     ImGui::End();
@@ -308,9 +521,14 @@ _bool CPanel_UICanvas::Pick_TopmostPart(const _float2& vMouseUI, UI_PICK_CANDIDA
     _bool bFound = false;
     UI_PICK_CANDIDATE Best{};
 
-    for (auto* pContainer : pLevel->Get_UIContainers())
+    for (const UI_CONTAINER_ENTRY& Entry : pLevel->Get_UIContainerEntries())
     {
+        CUIContainerObject* pContainer = Entry.pContainer;
+
         if (!pContainer)
+            continue;
+
+        if (!pContainer->Is_Active())
             continue;
 
         const auto& Parts = pContainer->Get_UIPartObjects();

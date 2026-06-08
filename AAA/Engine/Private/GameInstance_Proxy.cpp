@@ -520,12 +520,20 @@ HRESULT CGameInstance_Proxy::Add_Font(const _wstring& strFontTag, const _tchar* 
 	return m_pOwner->Add_Font(strFontTag, pFontFilePath);
 }
 
-HRESULT CGameInstance_Proxy::Draw_Text(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition, _fvector vColor, _float fRotation, const _float2& vScale)
+HRESULT CGameInstance_Proxy::Draw_Text(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition, _fvector vColor, _float fRotation, const _float2& vScale, TEXT_ALIGN eAlign)
 {
 	if (!IsConnected())
 		return E_FAIL;
 
-	return m_pOwner->Draw_Text(strFontTag, pText, vPosition, vColor, fRotation, vScale);
+	return m_pOwner->Draw_Text(strFontTag, pText, vPosition, vColor, fRotation, vScale, eAlign);
+}
+
+_float2 CGameInstance_Proxy::Measure_Text(const _wstring& strFontTag, const _tchar* pText)
+{
+	if (!IsConnected())
+		return _float2(0.f, 0.f);
+
+	return m_pOwner->Measure_Text(strFontTag, pText);
 }
 
 #pragma endregion

@@ -49,6 +49,8 @@ public:
 	void						Clear_UISelected();
 	_bool						Validate_UISelection();
 
+	void						Load_UI_ByPath(const _wstring& strFullPath);
+
 private:
 	ID3D11Device* m_pDevice = { nullptr };
 	ID3D11DeviceContext* m_pContext = { nullptr };

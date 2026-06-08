@@ -31,4 +31,12 @@ HRESULT CLIENT_DLL Load_Level(
 
 HRESULT CLIENT_DLL Load_Fonts(CGameInstance_Proxy* pProxy);
 
+HRESULT CLIENT_DLL Ready_Prototype_UIPartObjects(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+
+// (LEVEL_NAME)_ui.json : manifest 파일을 읽고 해당하는 레벨 Prototype Table에 등록한다. -> Loader에서 호출해야함
+HRESULT CLIENT_DLL Ready_Level_UIResources(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* strFilePath, _uint iLevelIndex);
+
+// (LEVEL_NAME)_ui.json : manifest 파일을 읽고 해당하는 레벨의 Object Table에 배치한다(ContainerObject만 - PartObject들은 Prototype 찾아서 Container가 갖고 있음)
+HRESULT CLIENT_DLL Load_Level_UI(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* strFilePath, _uint iLevelIndex);
+
 NS_END
