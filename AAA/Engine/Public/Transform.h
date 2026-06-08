@@ -5,6 +5,10 @@
 /* 1. 객체의 월드 상태를 표현해주는 상태변환행렬을 보관한다.(월드변환행렬) */
 /* 2. 월드행렬의 상태 표현을 위한 여러 인터페이스를 보관한다. */
 
+NS_BEGIN(physx)
+class PxController;
+NS_END
+
 NS_BEGIN(Engine)
 
 class CNavigation;
@@ -102,10 +106,7 @@ private:
 		_float4x4				m_WorldMatrix = {};
 		_float4					m_States[ETOUI(STATE::END)];
 	};
-
 	
-
-
 public:
 	static CTransform* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CComponent* Clone(void* pArg) override;

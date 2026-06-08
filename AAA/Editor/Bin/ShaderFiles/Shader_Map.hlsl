@@ -252,7 +252,7 @@ technique11 DefaultTechnique
 
     pass WhitePass // 2
     {
-        SetRasterizerState(RS_Decal);
+        SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
@@ -262,7 +262,7 @@ technique11 DefaultTechnique
 
     pass ShadowPass // 3
     {
-        SetRasterizerState(RS_Default); // 피터팬 심하면 앞면 컬링 RS로 교체
+        SetRasterizerState(RS_Cull_None);
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
         VertexShader = compile vs_5_0 VS_SHADOW();

@@ -6,7 +6,6 @@
 #include "Object_Manager.h"
 #include "Renderer.h"
 #include "Camera_Manager.h"
-#include "Frustum_Manager.h"
 #include "Input_Device.h"
 #include "Light_Manager.h"
 #include "Picking_Utils.h"
@@ -20,9 +19,13 @@
 #include "PhysX_Manager.h"
 #include "Environment_Manager.h"
 #include "ShaderGlobal_Manager.h"
+#include "Frustum_Manager.h"
+#include "Texture_Hub.h"
 
 CGameInstance* CGameInstance::m_pInstance = { nullptr };
 CGameInstance_Proxy* CGameInstance::m_pGameInstance_Proxy = { nullptr };
+
+using namespace physx;
 
 CGameInstance::CGameInstance()
 {
@@ -46,7 +49,7 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pInstance->m_pCamera_Manager)
         return E_FAIL;
 
-    m_pInstance->m_pFrustum_Manager = CFrustum_Manager::Create();
+    m_pInstance->m_pFrustum_Manager = CFrustum_Manager::Create();   // WY
     if (nullptr == m_pInstance->m_pFrustum_Manager)
         return E_FAIL;
 
@@ -60,6 +63,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 
     m_pInstance->m_pPrototype_Manager = CPrototype_Manager::Create(EngineDesc.iNumLevels);
     if (nullptr == m_pInstance->m_pPrototype_Manager)
+        return E_FAIL;
+
+    m_pInstance->m_pTexture_Hub = CTexture_Hub::Create(*ppDevice, *ppContext);    // WY
+    if (nullptr == m_pInstance->m_pTexture_Hub)
         return E_FAIL;
 
     m_pInstance->m_pObject_Manager = CObject_Manager::Create(EngineDesc.iNumLevels);
@@ -106,7 +113,7 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pInstance->m_pEffect_Manager)
         return E_FAIL;
 
-    m_pInstance->m_pPhysX_Manager = CPhysX_Manager::Create();
+    m_pInstance->m_pPhysX_Manager = CPhysX_Manager::Create(*ppDevice, *ppContext);
     if (nullptr == m_pInstance->m_pPhysX_Manager)
         return E_FAIL;
 
@@ -535,6 +542,19 @@ HRESULT CGameInstance::End_MRT()
     return m_pTarget_Manager->End_MRT();
 }
 
+#ifdef _DEBUG
+HRESULT CGameInstance::Ready_RT_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
+{
+    return m_pTarget_Manager->Ready_Debug(strTargetTag, fX, fY, fSizeX, fSizeY);
+}
+HRESULT CGameInstance::Render_RT_Debug(const _wstring& strMRTTag, class CShader* pShader, class CVIBuffer_Rect* pVIBuffer)
+{
+    return m_pTarget_Manager->Render_Debug(strMRTTag, pShader, pVIBuffer);
+}
+#endif
+
+#pragma endregion
+
 #pragma region FRUSTUM_MANAGER
 _bool CGameInstance::Update_CullingView(CULLING_VIEW eView, const CULLING_VIEW_DESC& Desc)
 {
@@ -569,17 +589,66 @@ _bool CGameInstance::IsIn_CullingView_AABB(CULLING_VIEW eView, const BoundingBox
 }
 #pragma endregion
 
-#ifdef _DEBUG
-HRESULT CGameInstance::Ready_RT_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
+#pragma region TEXTURE_HUB
+HRESULT CGameInstance::LoadOrGet_TextureFromHub(const _tchar* pTexturePath, TEXTURE_HANDLE* pOutHandle)
 {
-    return m_pTarget_Manager->Ready_Debug(strTargetTag, fX, fY, fSizeX, fSizeY);
-}
-HRESULT CGameInstance::Render_RT_Debug(const _wstring& strMRTTag, class CShader* pShader, class CVIBuffer_Rect* pVIBuffer)
-{
-    return m_pTarget_Manager->Render_Debug(strMRTTag, pShader, pVIBuffer);
-}
-#endif
+    if (nullptr == m_pTexture_Hub)
+        return E_FAIL;
 
+    return m_pTexture_Hub->LoadOrGet(pTexturePath, pOutHandle);
+}
+
+HRESULT CGameInstance::Bind_TextureFromHub(CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle)
+{
+    if (nullptr == m_pTexture_Hub)
+        return E_FAIL;
+
+    return m_pTexture_Hub->Bind_ShaderResource(pShader, pConstantName, Handle);
+}
+
+TEXTURE_HUB_STATS CGameInstance::Get_TextureHubStats() const
+{
+    if (nullptr == m_pTexture_Hub)
+        return {};
+
+    return m_pTexture_Hub->Get_Stats();
+}
+#pragma endregion
+
+#pragma region PHYSIX_MANAGER
+
+PxTriangleMesh* CGameInstance::Cook_TriangleMesh(const _float3* p, _uint nv, const _uint* idx, _uint ni, _bool bFlip)
+{
+    return m_pPhysX_Manager->Cook_TriangleMesh(p, nv, idx, ni, bFlip);
+}
+PxRigidStatic* CGameInstance::Add_StaticActor(PxTriangleMesh* pMesh, _fmatrix W)
+{
+    return m_pPhysX_Manager->Add_StaticActor(pMesh, W);
+}
+void           CGameInstance::Remove_StaticActor(PxRigidStatic* pActor)
+{
+    m_pPhysX_Manager->Remove_StaticActor(pActor);
+}
+PxController* CGameInstance::Create_CapsuleController(const _float3& vFootPos, _float fRadius, _float fHeight)
+{
+    return m_pPhysX_Manager->Create_CapsuleController(vFootPos, fRadius, fHeight);
+}
+void CGameInstance::Release_Controller(PxController* pCtrl)
+{
+    m_pPhysX_Manager->Release_Controller(pCtrl);
+}
+void CGameInstance::Toggle_PhysXDebug()
+{
+    m_pPhysX_Manager->Toggle_DebugDraw();
+}
+_bool CGameInstance::Is_PhysXDebug() const
+{
+    return m_pPhysX_Manager->Is_DebugDraw();
+}
+void CGameInstance::Render_PhysXDebug(_fmatrix V, _fmatrix P)
+{
+    m_pPhysX_Manager->Render_Debug(V, P);
+}
 #pragma endregion
 
 
@@ -611,7 +680,6 @@ void CGameInstance::Free()
     Safe_Release(m_pShaderGlobal_Manager);
     Safe_Release(m_pEnvironment_Manager);
     Safe_Release(m_pEffect_Manager);
-    Safe_Release(m_pPhysX_Manager);
     Safe_Release(m_pShadow_Dir);
     Safe_Release(m_pTarget_Manager);
     Safe_Release(m_pSound_Manager);
@@ -623,7 +691,9 @@ void CGameInstance::Free()
     Safe_Release(m_pRenderer);
     Safe_Release(m_pObject_Manager);
     Safe_Release(m_pLevel_Manager);
+    Safe_Release(m_pTexture_Hub);
     Safe_Release(m_pPrototype_Manager);
+    Safe_Release(m_pPhysX_Manager);
     Safe_Release(m_pTimer_Manager);
     Safe_Release(m_pFrustum_Manager);
     Safe_Release(m_pCamera_Manager);

@@ -10,111 +10,104 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
 {
     GENERATED_BODY_ABSTRACT(CEffect_Part)
 
-    PROPERTY(_int, m_iShdaerPass,       L"ShdaerPass",  L"Effect");
+    PROPERTY(_int, m_iShaderPass,       L"Shader Pass", L"Effect");
 
-    PROPERTY(_float3, m_vLocalPos,      L"LocalPos",    L"Effect");
+    PROPERTY(_float3, m_vLocalPos,      L"Local Pos",   L"Effect");
 
-    PROPERTY(_bool, m_bIsPlay,          L"Play",        L"Effect");
-
-    PROPERTY(_bool, m_bLoop,            L"Loop",        L"Effect");
-
-    PROPERTY(_float, m_fDuration,       L"Duration",    L"Effect");
-    PROPERTY(_float, m_fAccTime,        L"AccTime",     L"Effect");
-
-    PROPERTY(_float, m_fStartRatio,     L"StartRatio",   L"Effect");
-    PROPERTY(_float, m_fEndRatio,       L"EndRatio",   L"Effect");
+    PROPERTY(_float, m_fStartRatio,     L"Start Ratio",  L"Effect");
+    PROPERTY(_float, m_fEndRatio,       L"End Ratio",    L"Effect");
 
     // Alpha
-    PROPERTY(_float, m_fAlpha,               L"Alpha",                L"Effect_Alpha");
+    PROPERTY(_float, m_fAlpha,               L"Alpha_A",              L"Alpha");
 
-    PROPERTY(_bool, m_bFadeInOut,            L"FadeInOut",            L"Effect_Alpha");
+    PROPERTY(_bool, m_bFadeInOut,            L"Fade In Out_A",        L"Alpha");
 
-    PROPERTY(_float, m_fAlphaStartValue,     L"m_fAlphaStartValue",   L"Effect_Alpha");
-    PROPERTY(_float, m_fAlphaEndValue,       L"m_fAlphaEndValue",     L"Effect_Alpha");
+    PROPERTY(_float, m_fAlphaStartValue,     L"Start_A",              L"Alpha");
+    PROPERTY(_float, m_fAlphaEndValue,       L"End_A",                L"Alpha");
 
-    PROPERTY(_bool, m_bActive_Alpha_Ratio_0, L"Active_Alpha_Ratio_0", L"Effect_Alpha");
-    PROPERTY(_float, m_fAlpha_Ratio_0,       L"Alpha_Ratio_0",        L"Effect_Alpha");
-    PROPERTY(_float, m_fAlpha_Value_0,       L"m_fAlpha_Value_0",     L"Effect_Alpha");
+    PROPERTY(_bool, m_bActive_Alpha_Ratio_0, L"Active Ratio 0_A",     L"Alpha");
+    PROPERTY(_float, m_fAlpha_Ratio_0,       L"Ratio 0_A",            L"Alpha");
+    PROPERTY(_float, m_fAlpha_Value_0,       L"Value 0_A",            L"Alpha");
 
-    PROPERTY(_bool, m_bActive_Alpha_Ratio_1, L"Active_Alpha_Ratio_1", L"Effect_Alpha");
-    PROPERTY(_float, m_fAlpha_Ratio_1,       L"Alpha_Ratio_1",        L"Effect_Alpha");
-    PROPERTY(_float, m_fAlpha_Value_1,       L"m_fAlpha_Value_1",     L"Effect_Alpha");
+    PROPERTY(_bool, m_bActive_Alpha_Ratio_1, L"Active Ratio 1_A",     L"Alpha");
+    PROPERTY(_float, m_fAlpha_Ratio_1,       L"Ratio 1_A",            L"Alpha");
+    PROPERTY(_float, m_fAlpha_Value_1,       L"Value 1_A",            L"Alpha");
 
     // Size
-    PROPERTY(_float, m_fSize,               L"Size",                L"Effect_Size");
+    PROPERTY(_float, m_fSize,               L"Size_S",                L"Size");
 
-    PROPERTY(_bool, m_bSizeChange,          L"SizeChange",          L"Effect_Size");
+    PROPERTY(_bool, m_bSizeChange,          L"Size Change_S",          L"Size");
 
-    PROPERTY(_float, m_fSizeStartValue,     L"m_fSizeStartValue",   L"Effect_Size");
-    PROPERTY(_float, m_fSizeEndValue,       L"m_fSizeEndValue",     L"Effect_Size");
+    PROPERTY(_float, m_fSizeStartValue,     L"Start_S",               L"Size");
+    PROPERTY(_float, m_fSizeEndValue,       L"End_S",                 L"Size");
 
-    PROPERTY(_bool, m_bActive_Size_Ratio_0, L"Active_Size_Ratio_0", L"Effect_Size");
-    PROPERTY(_float, m_fSize_Ratio_0,       L"Size_Ratio_0",        L"Effect_Size");
-    PROPERTY(_float, m_fSize_Value_0,       L"m_fSize_Value_0",     L"Effect_Size");
+    PROPERTY(_bool, m_bActive_Size_Ratio_0, L"Active Ratio 0_S",      L"Size");
+    PROPERTY(_float, m_fSize_Ratio_0,       L"Ratio 0_S",             L"Size");
+    PROPERTY(_float, m_fSize_Value_0,       L"Value 0_S",             L"Size");
 
-    PROPERTY(_bool, m_bActive_Size_Ratio_1, L"Active_Size_Ratio_1", L"Effect_Size");
-    PROPERTY(_float, m_fSize_Ratio_1,       L"Size_Ratio_1",        L"Effect_Size");
-    PROPERTY(_float, m_fSize_Value_1,       L"m_fSize_Value_1",     L"Effect_Size");
+    PROPERTY(_bool, m_bActive_Size_Ratio_1, L"Active Ratio 1_S",      L"Size");
+    PROPERTY(_float, m_fSize_Ratio_1,       L"Ratio 1_S",             L"Size");
+    PROPERTY(_float, m_fSize_Value_1,       L"Value 1_S",            L"Size");
 
 
     // Color
-    PROPERTY(_float3, m_vColor,              L"Color",                  L"Effect_Color");
+    PROPERTY(_float3, m_vColor,              L"Color     _C",        L"Color");
 
-    PROPERTY(_bool, m_bColorChange,          L"ColorChange",            L"Effect_Color");
+    PROPERTY(_bool, m_bColorChange,          L"Color Change_C",       L"Color");
 
-    PROPERTY(_float3, m_vColorStartValue,    L"m_vColorStartValue",     L"Effect_Color");
-    PROPERTY(_float3, m_vColorEndValue,      L"m_vColorEndValue",       L"Effect_Color");
+    PROPERTY(_float3, m_vColorStartValue,    L"Start_C",              L"Color");
+    PROPERTY(_float3, m_vColorEndValue,      L"End_C",                L"Color");
 
-    PROPERTY(_bool, m_bActive_Color_Ratio_0, L"Active_Color_Ratio_0",   L"Effect_Color");
-    PROPERTY(_float, m_fColor_Ratio_0,       L"Color_Ratio_0",          L"Effect_Color");
-    PROPERTY(_float3, m_vColor_Value_0,      L"m_vColor_Value_0",       L"Effect_Color");
+    PROPERTY(_bool, m_bActive_Color_Ratio_0, L"Active Ratio 0_C",     L"Color");
+    PROPERTY(_float, m_fColor_Ratio_0,       L"Ratio 0_C",            L"Color");
+    PROPERTY(_float3, m_vColor_Value_0,      L"Value 0_C",            L"Color");
 
-    PROPERTY(_bool, m_bActive_Color_Ratio_1, L"Active_Color_Ratio_1",   L"Effect_Color");
-    PROPERTY(_float, m_fColor_Ratio_1,       L"Color_Ratio_1",          L"Effect_Color");
-    PROPERTY(_float3, m_vColor_Value_1,      L"m_vColor_Value_1",       L"Effect_Color");
+    PROPERTY(_bool, m_bActive_Color_Ratio_1, L"Active Ratio 1_C",     L"Color");
+    PROPERTY(_float, m_fColor_Ratio_1,       L"Ratio 1_C",            L"Color");
+    PROPERTY(_float3, m_vColor_Value_1,      L"Value 1_C",            L"Color");
 
 
     // Rot
-    PROPERTY(_bool, m_bRotationChange,   L"RotationChange",    L"Effect_Rot");
+    PROPERTY(_bool, m_bRotationChange,   L"Rotation Change_R",    L"Rot");
 
-    PROPERTY(_float, m_fRotationDegree,  L"RotationDegree",    L"Effect_Rot");
+    PROPERTY(_float, m_fRotationDegree,  L"Rotation Degree_R",    L"Rot");
 
-    PROPERTY(_float3, m_vRotationAxis,   L"m_vRotationAxis",   L"Effect_Rot");
-    PROPERTY(_float, m_fRot_Start_Ratio, L"Rot_Start_Ratio",   L"Effect_Rot");
-    PROPERTY(_float, m_fRot_End_Ratio,   L"Rot_End_Ratio",     L"Effect_Rot");
+    PROPERTY(_float3, m_vRotationAxis,   L"Rotation Axis_R",      L"Rot");
+    PROPERTY(_float, m_fRot_Start_Ratio, L"Start_R",              L"Rot");
+    PROPERTY(_float, m_fRot_End_Ratio,   L"End_R",                L"Rot");
 
 
     // Move
-    PROPERTY(_bool, m_bMoveChange,          L"MoveChange",          L"Effect_Move");
+    PROPERTY(_bool, m_bMoveChange,          L"Move Change_M",     L"Move");
+                                                                
+    PROPERTY(_float3, m_vMoveDir,           L"Move Dir_M",        L"Move");
+    PROPERTY(_float, m_fMoveDistance,       L"Move Distance_M",   L"Move");
 
-    PROPERTY(_float3, m_vMoveDir,           L"MoveDir",             L"Effect_Move");
-    PROPERTY(_float, m_fMoveDistance,       L"MoveDistance",        L"Effect_Move");
-
-    PROPERTY(_float, m_fMove_Start_Ratio,   L"Move_Start_Ratio",    L"Effect_Move");
-    PROPERTY(_float, m_fMove_End_Ratio,     L"Move_End_Ratio",      L"Effect_Move");
+    PROPERTY(_float, m_fMove_Start_Ratio,   L"Start_M",           L"Move");
+    PROPERTY(_float, m_fMove_End_Ratio,     L"End_M",             L"Move");
 
 
     // Move Sin
-    PROPERTY(_bool, m_bMoveSin,                L"MoveSin",                               L"Effect_MoveSin");
-    PROPERTY(_float, m_fSinCyclePerDuration,   L"Cycle_Per_Duration(Recommend int)",     L"Effect_MoveSin");
-    PROPERTY(_float, m_fAmplitude,             L"Amplitude",                             L"Effect_MoveSin");
+    PROPERTY(_bool, m_bMoveSin,                L"Move Sin   _MS",                              L"Move Sin");
+    PROPERTY(_float, m_fSinCyclePerDuration,   L"Cycle Per Duration(Recommend int)_MS",        L"Move Sin");
+    PROPERTY(_float, m_fAmplitude,             L"Amplitude_MS",                                L"Move Sin");
 
 
     // Texture
-    PROPERTY(_bool, m_bUseTextureCom,           L"Use_TextureCom",          L"Effect_Model");
-    PROPERTY(_float2, m_vTextureTiling,         L"Texture_Tiling",          L"Effect_Model");
-    PROPERTY(_float2, m_vTextureOffset,         L"Texture_Offset",          L"Effect_Model");
+    PROPERTY(_bool, m_bUseTextureCom,           L"Use TextureCom_T",          L"Texture Com");
+    PROPERTY(_float2, m_vTextureTiling,         L"Tiling_T",                  L"Texture Com");
+    PROPERTY(_float2, m_vTextureOffset,         L"Offset_T",                  L"Texture Com");
 
-    PROPERTY(_bool, m_bTextureUVScroll,         L"Texture_UVScroll",        L"Effect_Model");
-    PROPERTY(_float2, m_vTextureUVScrollCount,  L"Texture_UVScrollCount",   L"Effect_Model");
+    PROPERTY(_bool, m_bTextureUVScroll,         L"UV Scroll     _T",          L"Texture Com");
+    PROPERTY(_float2, m_vTextureUVScrollCount,  L"UV Scroll Count_T",         L"Texture Com");
 
     // Mask
-    PROPERTY(_bool, m_bUseMaskCom,          L"Use_MaskCom",         L"Effect_Model");
-    PROPERTY(_float2, m_vMaskTiling,        L"Mask_Tiling",         L"Effect_Model");
-    PROPERTY(_float2, m_vMaskOffset,        L"Mask_Offset",         L"Effect_Model");
+    PROPERTY(_bool, m_bUseMaskCom,          L"Use MaskCom_M",             L"Mask Com");
+    PROPERTY(_float2, m_vMaskTiling,        L"Tiling_M",                  L"Mask Com");
+    PROPERTY(_float2, m_vMaskOffset,        L"Offset_M",                  L"Mask Com");
 
-    PROPERTY(_bool, m_bMaskUVScroll,        L"Mask_UVScroll",       L"Effect_Model");
-    PROPERTY(_float2, m_vMaskUVScrollCount, L"Mask_UVScrollCount",  L"Effect_Model");
+    PROPERTY(_bool, m_bMaskUVScroll,        L"UV Scroll     _M",          L"Mask Com");
+    PROPERTY(_float2, m_vMaskUVScrollCount, L"UV Scroll Count_M",         L"Mask Com");
 
 public:
     struct EFFECT_PART_DESC : public CGameObject::GAMEOBJECT_DESC
@@ -168,6 +161,8 @@ public:
     virtual void    Effect_Start();
     void Set_ParentMatrix(const _float4x4* pParentMatrix);
 
+    void Update_PlayValue(_bool bIsPlay, _bool bLoop, _float fDuration, _float fAccTime);
+
 protected:
     _bool m_bCustomShader{};
     CShader* m_pShaderCom{};
@@ -191,6 +186,12 @@ protected:
     const _float4x4* m_pParentMatrix{};
     _float4x4 m_CombinedWorldMatrix{};
 
+
+    _bool m_bIsPlay{};
+    _bool m_bLoop{};
+    _float m_fDuration{};
+    _float m_fAccTime{};
+
 protected:
     void Compute_CombinedWorldMatrix();
 
@@ -199,6 +200,8 @@ protected:
 
 protected:
     void Update_Value(const _float fTimeDelta);
+    
+    virtual void Update_Core(const _float fTimeDelta, const _float fRatio);
 
     void Update_Alpha(const _float fTimeDelta, const _float fRatio);
     void Update_Size(const _float fTimeDelta, const _float fRatio);

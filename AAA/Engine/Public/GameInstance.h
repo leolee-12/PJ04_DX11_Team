@@ -4,6 +4,12 @@
 #include "GameInstance_Proxy.h"
 #include "Prototype_Manager.h"
 
+NS_BEGIN(physx)
+class PxTriangleMesh;
+class PxRigidStatic;
+class PxController;
+NS_END
+
 NS_BEGIN(Engine)
 
 class CGraphic_Device;
@@ -30,6 +36,7 @@ class CPhysX_Manager;
 class CEnvironment_Manager;
 class CShaderGlobal_Manager;
 class CFrustum_Manager;
+class CTexture_Hub;
 
 class ENGINE_DLL CGameInstance 
 {
@@ -199,17 +206,35 @@ private:
 	HRESULT End_MRT();
 
 #ifdef _DEBUG
-public:
 	HRESULT Ready_RT_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
 	HRESULT Render_RT_Debug(const _wstring& strMRTTag, class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
 #endif
 #pragma endregion
 
 #pragma region EDITMODE
-  public:
 	  void  Set_EditMode(_bool bEdit) { m_bEditMode = bEdit; }
 	  _bool Is_EditMode() const		  { return m_bEditMode; }
 #pragma endregion
+
+#pragma region TEXTURE_HUB
+	  HRESULT LoadOrGet_TextureFromHub(const _tchar* pTexturePath, TEXTURE_HANDLE* pOutHandle);
+	  HRESULT Bind_TextureFromHub(class CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle);
+	  TEXTURE_HUB_STATS Get_TextureHubStats() const;
+#pragma endregion
+
+#pragma region PHYSIX_MANAGER
+	  physx::PxTriangleMesh* Cook_TriangleMesh(const _float3* pPositions, _uint iNumVertices, const _uint* pIndices, _uint iNumIndices, _bool bFlipWinding = true);
+	  physx::PxRigidStatic*  Add_StaticActor(physx::PxTriangleMesh* pMesh, _fmatrix WorldMatrix);
+	  void                   Remove_StaticActor(physx::PxRigidStatic* pActor);
+
+	  physx::PxController* Create_CapsuleController(const _float3& vFootPos, _float fRadius, _float fHeight);
+	  void				   Release_Controller(physx::PxController* pCtrl);
+						   
+	  void				   Toggle_PhysXDebug();
+	  _bool				   Is_PhysXDebug() const;
+	  void				   Render_PhysXDebug(_fmatrix ViewMatrix, _fmatrix ProjMatrix);
+#pragma endregion
+
 
 
 
@@ -221,7 +246,6 @@ private:
 	CObject_Manager*			m_pObject_Manager = { nullptr };
 	CRenderer*					m_pRenderer = { nullptr };
 	CCamera_Manager*			m_pCamera_Manager = { nullptr };
-	CFrustum_Manager*			m_pFrustum_Manager = { nullptr };
 	CInput_Device*				m_pInput_Device = { nullptr };
 	CLight_Manager*				m_pLight_Manager = { nullptr };
 	CFont_Manager*				m_pFont_Manager = { nullptr };
@@ -234,6 +258,8 @@ private:
 	CPhysX_Manager*				m_pPhysX_Manager = { nullptr };
 	CEnvironment_Manager*		m_pEnvironment_Manager = { nullptr };
 	CShaderGlobal_Manager*		m_pShaderGlobal_Manager = { nullptr };
+	CFrustum_Manager*			m_pFrustum_Manager = { nullptr };
+	CTexture_Hub*				m_pTexture_Hub = { nullptr };
 
 	mutable mt19937             m_RandomGenerator;
 	_bool						m_bEditMode = { false };

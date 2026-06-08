@@ -63,6 +63,9 @@
     <ClInclude Include="..\public\Level_Lobby.h">
       <Filter>01. Levels\02. Lobby</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Launcher_MapProfiles.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Launcher.ico">

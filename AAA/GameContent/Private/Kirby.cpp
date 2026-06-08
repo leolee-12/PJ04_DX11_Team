@@ -34,6 +34,8 @@ HRESULT CKirby::Initialize(void* pArg)
     if (FAILED(Ready_PartObjects()))
         return E_FAIL;
 
+   
+
     return S_OK;
 }
 
@@ -45,6 +47,38 @@ void CKirby::Priority_Update(_float fTimeDelta)
 void CKirby::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
+
+    if (nullptr == m_pMovement)
+        return;
+
+    if (m_pGameInstance_Proxy->Is_EditMode())
+    {
+        m_pMovement->Sync_To_Controller();
+        return;
+    }
+
+    _vector vWishDir = XMVectorZero();
+    _vector vCamLook = XMLoadFloat4(m_pGameInstance_Proxy->Get_CamLook());
+
+    _vector vCamFwd = XMVector3Normalize(XMVectorSetY(vCamLook, 0.f));                      
+    _vector vCamRight = XMVector3Normalize(XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vCamFwd)); 
+
+    if (m_pGameInstance_Proxy->Key_Pressing(DIK_W)) 
+        vWishDir += vCamFwd;
+
+    if (m_pGameInstance_Proxy->Key_Pressing(DIK_S)) 
+        vWishDir -= vCamFwd;
+
+    if (m_pGameInstance_Proxy->Key_Pressing(DIK_D)) 
+        vWishDir += vCamRight;
+
+    if (m_pGameInstance_Proxy->Key_Pressing(DIK_A)) 
+        vWishDir -= vCamRight;
+
+    if (m_pGameInstance_Proxy->Key_Down(DIK_SPACE))
+        m_pMovement->Jump();
+
+    m_pMovement->Move(vWishDir, fTimeDelta);
 }
 
 void CKirby::Late_Update(_float fTimeDelta)
@@ -59,6 +93,18 @@ HRESULT CKirby::Render()
 
 HRESULT CKirby::Ready_Components()
 {
+    _float3 vFoot;
+    XMStoreFloat3(&vFoot, m_pTransformCom->Get_State(STATE::POSITION));
+    m_pController = m_pGameInstance_Proxy->Create_CapsuleController(vFoot, CCT_RADIUS, CCT_HEIGHT);
+
+    m_pMovement = Add_Component<CMovement>(TEXT("Com_Movement"),
+        CMovement::Create(m_pDevice, m_pContext));
+    if (nullptr == m_pMovement)
+        return E_FAIL;
+    m_pMovement->Set_Refs(m_pTransformCom, m_pController);
+    m_pMovement->Set_Stats(MOVE_SPEED, ROT_SPEED, GRAVITY, JUMP_SPEED);
+    m_pMovement->Set_Acceleration(MOVE_ACCEL, MOVE_DECEL);
+
     return S_OK;
 }
 
@@ -109,5 +155,11 @@ CGameObject* CKirby::Clone(void* pArg)
 
 void CKirby::Free()
 {
+    if (m_pController)
+    {
+        m_pGameInstance_Proxy->Release_Controller(m_pController);
+        m_pController = nullptr;
+    }
+
     __super::Free();
 }

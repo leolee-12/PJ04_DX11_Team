@@ -16,6 +16,10 @@ class CAnimator;
 class CModel;
 NS_END
 
+NS_BEGIN(Client)
+class CMapSection;
+NS_END
+
 NS_BEGIN(Editor)
 
 class CLevel_Edit;
@@ -46,6 +50,8 @@ private:
 	void Draw_AnimatorEditor(CModel* pModel, CAnimator* pAnimator);
 	
 	void Draw_ShaderGlobals();
+	void Draw_MeshLayerPanel(CGameObject* pObj);
+	void Draw_MapSectionRenderOptions(Client::CMapSection* pSection);
 
 public:
 	virtual void Free() override;

@@ -155,13 +155,24 @@ PS_OUT PS_DIFFUSE(PS_IN In)
     if (vMtrlDiffuse.a < 0.1f)
         discard;
 
-
-    //Out.vDiffuse = vMtrlDiffuse;
-    Out.vDiffuse = vector(1.f, 1.f, 1.f, 1.f);
+    Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
+    return Out;
+}
+
+PS_OUT PS_WHITE(PS_IN In)
+{
+    PS_OUT Out;
+
+    Out.vDiffuse = float4(1.f, 1.f, 1.f, 1.f);
+    Out.vNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(0.f, 0.f, 0.f, 1.f);
+
     return Out;
 }
 
@@ -209,7 +220,7 @@ technique11 DefaultTechnique
 
     pass DiffusePass // 1
     {
-        SetRasterizerState(RS_Default);
+        SetRasterizerState(RS_Cull_None);
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
@@ -220,11 +231,21 @@ technique11 DefaultTechnique
 
     pass ShadowPass // 2
     {
-        SetRasterizerState(RS_Default); // 피터팬 심하면 앞면 컬링 RS로 교체
+        SetRasterizerState(RS_Cull_None); // 피터팬 심하면 앞면 컬링 RS로 교체
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
         VertexShader = compile vs_5_0 VS_SHADOW();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_SHADOW();
+    }
+
+    pass WhitePass // 3
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_WHITE();
     }
 }

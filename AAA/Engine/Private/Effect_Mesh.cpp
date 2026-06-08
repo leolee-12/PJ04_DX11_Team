@@ -83,8 +83,8 @@ HRESULT CEffect_Mesh::Render()
                 return E_FAIL;
         }
 
-        Helper::IntClamp(m_iShdaerPass, ShaderPass::Default, ShaderPass::ShaderPass_End - 1);
-        if (FAILED(m_pShaderCom->Begin(m_iShdaerPass)))
+        Helper::IntClamp(m_iShaderPass, ShaderPass::Default, ShaderPass::ShaderPass_End - 1);
+        if (FAILED(m_pShaderCom->Begin(m_iShaderPass)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render(i)))

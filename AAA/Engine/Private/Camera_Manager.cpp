@@ -31,6 +31,8 @@ void CCamera_Manager::Update()
 	}
 
 	memcpy(&m_vCamPosition, &m_InverseMatrix[ETOUI(D3DTS::VIEW)]._41, sizeof m_vCamPosition);
+	memcpy(&m_vCamRight, &m_InverseMatrix[ETOUI(D3DTS::VIEW)]._11, sizeof m_vCamRight);
+	memcpy(&m_vCamLook, &m_InverseMatrix[ETOUI(D3DTS::VIEW)]._31, sizeof m_vCamLook);
 }
 
 CCamera_Manager* CCamera_Manager::Create(_float fWidth, _float fHeigth)

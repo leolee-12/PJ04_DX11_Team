@@ -34,6 +34,11 @@ struct MAPTOOL_PROFILE_FRAME
 	CULLING_COUNTER EnvMain = {};
 	CULLING_COUNTER EnvShadow = {};
 
+	_uint iTextureHubUnique = {};
+	_uint iTextureHubHit = {};
+	_uint iTextureHubMiss = {};
+	_uint iTextureHubRawFail = {};
+
 	double dMapCullingCpuMs = {};
 };
 

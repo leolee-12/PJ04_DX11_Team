@@ -80,6 +80,20 @@ namespace Engine
 		XMFLOAT4 vGridParams;   
 	}FROXEL_CB;
 
+	struct MESH_LAYER_IDX
+	{
+		int           iPass = -1;                   // -1 = renderer default
+		unsigned int  idx[MTEX_TYPE_MAX] = { 0 };   // MTEX_TYPE º° slotArrayIndex
+	};
+
+	struct TEXTURE_HUB_STATS
+	{
+		unsigned int iUniqueTextureCount = {};
+		unsigned int iCacheHitCount = {};
+		unsigned int iCacheMissCount = {};
+		unsigned int iLoadFailureCount = {};
+	};
+
 	struct CULLING_VIEW_DESC
 	{
 		const XMFLOAT4X4*	pView = { nullptr };

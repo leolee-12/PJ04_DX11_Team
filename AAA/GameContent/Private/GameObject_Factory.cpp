@@ -27,11 +27,16 @@
 
 // Effect_Container
 #include "WalkSmoke.h"
+#include "SwordSlash.h"
+#include "VacuumContainer.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
 #include "SmokeLowPoly.h"
 #include "SmokeTail.h"
+#include "Common_Curve03.h"
+#include "Common_Circle01.h"
+#include "Vacuum.h"
 
 //sky
 #include "SkySphere.h"
@@ -202,23 +207,57 @@ void CGameObject_Factory::Register_Test()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Effect/SmokeTail/Model_SmokeTail.ysh"));
         )
     );
+
+    // 2. SwordSlash
+    Register(CSwordSlash::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSwordSlash),
+        LOADER
+        (           
+            // Common_Curve03
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CCommon_Curve03::PROTOTYPE_TAG,
+                CCommon_Curve03::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Common_Curve03"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_Curve03/Model_Common_Curve03.ysh"));
+            
+            //// Common_Circle01
+            //TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CCommon_Circle01::PROTOTYPE_TAG,
+            //    CCommon_Circle01::Create(pDevice, pContext));
+            //TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Common_Circle01"),
+            //    CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_Circle01/Model_Common_Circle01.ysh"));
+        )
+    );
+
+
+    // 2. VacuumContainer
+    Register(CVacuumContainer::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CVacuumContainer),
+        LOADER
+        (           
+            // Vacuum
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CVacuum::PROTOTYPE_TAG,
+                CVacuum::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Common_00_Vacuum"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/InhaleEffect2M/Common_00_InhaleEffect2M.ysh"));                       
+        )
+    );
 }
 
 void CGameObject_Factory::Register_Container()
 {
     // Kirby
-    Register(CKirby::PROTOTYPE_TAG, TEXT("Kirby"),
+    Register
+    (
+        CKirby::PROTOTYPE_TAG, TEXT("Kirby"),
         CREATOR(CKirby),
         LOADER
         (
             // Kirby_Body
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CKirby_Body::PROTOTYPE_TAG,
                 CKirby_Body::Create(pDevice, pContext));
+
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Kirby_Body"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Kirby/Kirby.ysh")
-                , XMMatrixRotationY(XMConvertToRadians(180.f))
-            ))
-    );
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Kirby/Kirby.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    ); 
 }
 
 void CGameObject_Factory::Register_UIContainer()

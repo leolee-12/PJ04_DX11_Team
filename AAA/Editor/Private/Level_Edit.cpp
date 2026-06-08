@@ -12,7 +12,9 @@
 #include "Edit_Grid.h"
 #include "NavMesh_Editor.h"
 #include "MapStage.h"
-#include "MapDescriptor.h"
+#include "Map_EditHelper.h"
+
+#include "Effect_Container.h"
 
 CLevel_Edit::CLevel_Edit(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel{ pDevice, pContext }
@@ -74,6 +76,8 @@ CGameObject* CLevel_Edit::Spawn_Object(const wstring& strProtoTag, const wstring
     wstring strFinalLayer = strLayerTag;
     if (pReg->strCategory == L"CAMERA_OBJECT")
         strFinalLayer = L"Layer_Camera";
+    else if (pReg->strCategory == L"Effect_Container") ////////
+        strFinalLayer = L"Layer_Effect";
 
     Engine::CGameObject* pObj = { nullptr };
     m_pGameInstance_Proxy->Add_GameObject_Return(
@@ -113,6 +117,11 @@ void CLevel_Edit::Save_Level(const wstring& strFilePath, const wstring& strLevel
 
     jLevel["Objects"] = jObjects;
 
+    if (0 <= m_iLoadedMapPresetIndex)
+    {
+        jLevel["MapContent"] = { { "PresetIndex", m_iLoadedMapPresetIndex } };
+    }
+
     CDataExporter::Write_JsonFile(strFilePath.c_str(), jLevel);
 }
 
@@ -125,6 +134,7 @@ void CLevel_Edit::Load_Level(const wstring& strFilePath)
     m_pMapStage = nullptr;
     m_strLoadedMapStageName.clear();
     m_iEnvObjCreatedCount = 0;
+    m_iLoadedMapPresetIndex = -1;
     m_MapPreviewObjects.clear();
     m_strMapPreviewStatus = L"Map preset not loaded.";
 
@@ -150,6 +160,17 @@ void CLevel_Edit::Load_Level(const wstring& strFilePath)
 
             if(pObj)
                 pObj->Deserialize(jObj);
+        }
+
+        if (jLevel.contains("MapContent") && jLevel["MapContent"].is_object())
+        {
+            const json& jMap = jLevel["MapContent"];
+            if (jMap.contains("PresetIndex") && jMap["PresetIndex"].is_number_integer())
+            {
+                const int iPresetIndex = jMap["PresetIndex"].get<int>();
+                if (0 <= iPresetIndex)
+                    Load_MapPreview(static_cast<_uint>(iPresetIndex));
+            }
         }
     }
     catch (json::exception&)
@@ -182,7 +203,7 @@ void CLevel_Edit::Change_ObjectLayer(CGameObject* pObject, const wstring& strNew
 {
     if (!pObject) return;
     if (m_MapPreviewObjects.find(pObject) != m_MapPreviewObjects.end()) return;
-    if (!m_MapPreviewObjects.empty() && CMapDescriptor::GetInstance()->Is_MapLayer(strNewLayer)) return;
+    if (!m_MapPreviewObjects.empty() && CMap_EditHelper::Is_MapLayer(strNewLayer)) return;
 
     Add_Layer(strNewLayer);
 
@@ -435,36 +456,122 @@ HRESULT CLevel_Edit::Ready_EditGrid()
     return (m_pGrid == nullptr) ? E_FAIL : S_OK;
 }
 
-CLevel_Edit* CLevel_Edit::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-{
-    CLevel_Edit* pInstance = new CLevel_Edit(pDevice, pContext);
-
-    if (FAILED(pInstance->Initialize()))
-    {
-        MSG_BOX("Failed to Created : CLevel_Edit");
-        Safe_Release(pInstance);
-    }
-
-    return pInstance;
-}
-
 _uint CLevel_Edit::Get_MapPreviewPresetCount() const
 {
-    return CMapDescriptor::GetInstance()->Get_MapPresetCount();
+    return CMap_EditHelper::Get_MapPresetCount();
 }
 
 const _char* CLevel_Edit::Get_MapPreviewPresetLabel(_uint iPresetIndex) const
 {
-    return CMapDescriptor::GetInstance()->Get_MapPresetLabel(iPresetIndex);
+    return CMap_EditHelper::Get_MapPresetLabel(iPresetIndex);
+}
+
+HRESULT CLevel_Edit::Save_Selected_Effect(const wstring& strFilePath)
+{
+    CEffect_Container* pEffect = dynamic_cast<CEffect_Container*>(m_pSelected);
+    if (pEffect == nullptr)
+        return E_FAIL;
+
+    wstring strPrototypeTag;
+    wstring strObjectTag;
+    wstring strLayerTag;
+    _bool bFound = false;
+
+    for (auto& [LayerTag, Objects] : m_Layers)
+    {
+        for (auto& handle : Objects)
+        {
+            if (handle.pObject != m_pSelected)
+                continue;
+
+            strPrototypeTag = handle.strPrototypeTag;
+            strObjectTag = handle.strName;
+            strLayerTag = LayerTag;
+            bFound = true;
+            break;
+        }
+
+        if (bFound)
+            break;
+    }
+
+    if (bFound == false)
+        return E_FAIL;
+
+    json jEffect = pEffect->Serialize();
+    jEffect["Prototype_Tag"] = WstrToStr(strPrototypeTag);
+    jEffect["Object_Tag"] = WstrToStr(strObjectTag);
+    jEffect["Layer_Tag"] = WstrToStr(strLayerTag);
+
+    return CDataExporter::Write_JsonFile(strFilePath.c_str(), jEffect);
+}
+
+HRESULT CLevel_Edit::Load_Selected_Effect(const wstring& strFilePath)
+{
+    string strContent;
+    if (FAILED(CDataLoader::Read_Json(strFilePath.c_str(), &strContent)))
+        return E_FAIL;
+
+    try
+    {
+        json jEffect = json::parse(strContent);
+
+        if (!jEffect.contains("Prototype_Tag"))
+            return E_FAIL;
+
+        wstring strProtoTag = StrToWstr(jEffect["Prototype_Tag"].get<string>());
+
+        wstring strLayerTag = L"Layer_Effect";
+        if (jEffect.contains("Layer_Tag"))
+            strLayerTag = StrToWstr(jEffect["Layer_Tag"].get<string>());
+
+        wstring strObjectTag = strProtoTag + L"_Loaded";
+        if (jEffect.contains("Object_Tag"))
+            strObjectTag = StrToWstr(jEffect["Object_Tag"].get<string>());
+
+        // 이름 충돌 방지
+        wstring strFinalObjectTag = strObjectTag;
+        _uint iSuffix = 1;
+
+        auto IsNameUsed = [&](const wstring& strName) -> _bool
+            {
+                for (auto& [LayerTag, Objects] : m_Layers)
+                {
+                    for (auto& handle : Objects)
+                    {
+                        if (handle.strName == strName)
+                            return true;
+                    }
+                }
+                return false;
+            };
+
+        while (IsNameUsed(strFinalObjectTag))
+            strFinalObjectTag = strObjectTag + L"_" + to_wstring(iSuffix++);
+
+        CGameObject* pObj = Spawn_Object(strProtoTag, strLayerTag, strFinalObjectTag);
+        if (nullptr == pObj)
+            return E_FAIL;
+
+        pObj->Deserialize(jEffect);
+        m_pSelected = pObj;
+    }
+    catch (json::exception&)
+    {
+        MSG_BOX("JSON PARSE ERROR");
+        return E_FAIL;
+    }
+
+    return S_OK;
 }
 
 HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
 {
     Clear_MapPreview();
 
-    Client::CMapDescriptor::MAP_PRESET_LOAD_REPORT Report{};
+    Client::CMap_EditHelper::MAP_PRESET_LOAD_REPORT Report{};
     CMapStage* pLoadedStage = nullptr;
-    const HRESULT hResult = CMapDescriptor::GetInstance()->Load_MapPreset(
+    const HRESULT hResult = CMap_EditHelper::Load_MapPreset(
         m_pDevice,
         m_pContext,
         iPresetIndex,
@@ -480,6 +587,7 @@ HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
         m_pMapStage = nullptr;
         m_strLoadedMapStageName.clear();
         m_iEnvObjCreatedCount = 0;
+        m_iLoadedMapPresetIndex = -1;
         m_strMapPreviewStatus = L"Map preset load failed.";
         return hResult;
     }
@@ -490,6 +598,7 @@ HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
         m_strLoadedMapStageName = StrToWstr(Get_MapPreviewPresetLabel(iPresetIndex));
 
     m_iEnvObjCreatedCount = Report.iEnvCreatedCount;
+    m_iLoadedMapPresetIndex = static_cast<_int>(iPresetIndex);
     m_strMapPreviewStatus = L"Map preset loaded: " + m_strLoadedMapStageName
         + L" / env=" + to_wstring(m_iEnvObjCreatedCount);
 
@@ -506,10 +615,11 @@ HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
 HRESULT CLevel_Edit::Load_MapPreviewStage(_uint iPresetIndex)
 {
     Clear_MapPreviewStage();
+    m_iLoadedMapPresetIndex = -1;
 
     CMapStage* pLoadedStage = nullptr;
     _wstring strStageName;
-    const HRESULT hResult = CMapDescriptor::GetInstance()->Load_MapStage(
+    const HRESULT hResult = CMap_EditHelper::Load_MapStage(
         m_pDevice,
         m_pContext,
         iPresetIndex,
@@ -544,9 +654,10 @@ HRESULT CLevel_Edit::Load_MapPreviewStage(_uint iPresetIndex)
 HRESULT CLevel_Edit::Load_MapPreviewEnv(_uint iPresetIndex)
 {
     Clear_MapPreviewEnv();
+    m_iLoadedMapPresetIndex = -1;
 
-    Client::CMapDescriptor::MAP_PRESET_LOAD_REPORT Report{};
-    const HRESULT hResult = CMapDescriptor::GetInstance()->Load_EnvObject_FromJson(
+    Client::CMap_EditHelper::MAP_PRESET_LOAD_REPORT Report{};
+    const HRESULT hResult = CMap_EditHelper::Load_EnvObject_FromJson(
         m_pDevice,
         m_pContext,
         iPresetIndex,
@@ -584,10 +695,9 @@ void CLevel_Edit::Clear_MapPreview()
     vector<wstring> MapLayers;
     MapLayers.reserve(m_Layers.size());
 
-    CMapDescriptor* pMapDescriptor = CMapDescriptor::GetInstance();
     for (const auto& Pair : m_Layers)
     {
-        if (pMapDescriptor->Is_MapLayer(Pair.first))
+        if (CMap_EditHelper::Is_MapLayer(Pair.first))
             MapLayers.push_back(Pair.first);
     }
 
@@ -597,6 +707,7 @@ void CLevel_Edit::Clear_MapPreview()
     m_pMapStage = nullptr;
     m_strLoadedMapStageName.clear();
     m_iEnvObjCreatedCount = 0;
+    m_iLoadedMapPresetIndex = -1;
     m_MapPreviewObjects.clear();
     m_strMapPreviewStatus = L"Map preset not loaded.";
 }
@@ -607,6 +718,7 @@ void CLevel_Edit::Clear_MapPreviewStage()
 
     m_pMapStage = nullptr;
     m_strLoadedMapStageName.clear();
+    m_iLoadedMapPresetIndex = -1;
 
     if (0 != m_iEnvObjCreatedCount)
         m_strMapPreviewStatus = L"Environment preview loaded only. / env=" + to_wstring(m_iEnvObjCreatedCount);
@@ -616,17 +728,18 @@ void CLevel_Edit::Clear_MapPreviewStage()
 
 void CLevel_Edit::Clear_MapPreviewEnv()
 {
-    static const wchar_t* kEnvLayers[] =
+    static const _tchar* kEnvLayers[] =
     {
         L"Layer_EnvStatic",
         L"Layer_EnvInteract",
         L"Layer_EnvEffect"
     };
 
-    for (const wchar_t* pLayerTag : kEnvLayers)
+    for (const _tchar* pLayerTag : kEnvLayers)
         Clear_MapPreviewLayer(pLayerTag);
 
     m_iEnvObjCreatedCount = 0;
+    m_iLoadedMapPresetIndex = -1;
 
     if (nullptr != m_pMapStage)
     {
@@ -692,6 +805,18 @@ void CLevel_Edit::On_MapPreviewObjectCreated(void* pContext, CGameObject* pObjec
         pLevel->m_pMapStage = dynamic_cast<Client::CMapStage*>(pObject);
 }
 
+CLevel_Edit* CLevel_Edit::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+    CLevel_Edit* pInstance = new CLevel_Edit(pDevice, pContext);
+
+    if (FAILED(pInstance->Initialize()))
+    {
+        MSG_BOX("Failed to Created : CLevel_Edit");
+        Safe_Release(pInstance);
+    }
+
+    return pInstance;
+}
 
 void CLevel_Edit::Free()
 {

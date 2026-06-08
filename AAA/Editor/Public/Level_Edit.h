@@ -91,6 +91,12 @@ public:	// Map Preview - Public Func
 	const _wstring&	Get_LoadedMapPreviewStageName() const { return m_strLoadedMapStageName; }
 	_uint			Get_MapPreviewEnvCreatedCount() const { return m_iEnvObjCreatedCount; }
 
+	// Effect
+public:
+	HRESULT Save_Selected_Effect(const wstring& strFilePath);
+	HRESULT Load_Selected_Effect(const wstring& strFilePath);
+
+
 private:
 	CEditCamera* m_pCamera = { nullptr };
 	CGameObject* m_pSelected = { nullptr };
@@ -109,10 +115,11 @@ private:
 	CLumia*			 m_pLumia = { nullptr };
 
 	// Map Preview - Members
-	CMapStage* m_pMapStage = { nullptr };
+	CMapStage*	m_pMapStage = { nullptr };
 	_wstring	m_strMapPreviewStatus = { L"Map preset not loaded." };
 	_wstring	m_strLoadedMapStageName = {};
 	_uint		m_iEnvObjCreatedCount = {};
+	_int		m_iLoadedMapPresetIndex = { -1 };
 	unordered_set<CGameObject*> m_MapPreviewObjects;
 
 private:
@@ -122,8 +129,8 @@ private:
 	HRESULT  Ready_EditGrid();
 
 	// Map Preview - Private Func
-	void	 Clear_MapPreviewLayer(const _wstring& strLayerTag);
-	void	 Add_MapPreviewObjectHandle(const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag, CGameObject* pObject);
+	void		Clear_MapPreviewLayer(const _wstring& strLayerTag);
+	void		Add_MapPreviewObjectHandle(const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag, CGameObject* pObject);
 	static void On_MapPreviewObjectCreated(void* pContext, CGameObject* pObject,
 		const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);
 
