@@ -86,9 +86,9 @@ HRESULT CCamera::Render()
 	return S_OK;
 }
 
-void CCamera::Deserialize(const json& j)
+void CCamera::Deserialize_Internal(const json& j)
 {
-	__super::Deserialize(j);
+	__super::Deserialize_Internal(j);
 	Recalculate_ProjMatrix();
 }
 

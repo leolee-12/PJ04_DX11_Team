@@ -29,7 +29,7 @@ public:
 
 public:
 	virtual json Serialize() const override;
-	virtual void Deserialize(const json& j) override;
+	virtual void Deserialize_Internal(const json& j) override;
 
 private:
 	vector<CMapSection*>	m_Sections;

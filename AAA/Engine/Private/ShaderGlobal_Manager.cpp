@@ -23,7 +23,7 @@ HRESULT CShaderGlobal_Manager::Initialize()
     Register({ "g_fFogFar",            "Fog Far",            GVAL::FLOAT,  { 80.0f, 0.f, 0.f, 0.f }, { 5.f, 200.f } });
     Register({ "g_fFogHeightFalloff",  "Fog HeightFalloff",  GVAL::FLOAT,  { 0.04f, 0.f, 0.f, 0.f }, { 0.f, 0.5f } });
     Register({ "g_fFogBaseHeight",     "Fog BaseHeight",     GVAL::FLOAT,  { 0.00f, 0.f, 0.f, 0.f }, { -50.f, 50.f } });
-    Register({ "g_fFogAnisotropy",     "Fog Anisotropy",     GVAL::FLOAT,  { 0.60f, 0.f, 0.f, 0.f }, { -0.9f, 0.9f } });
+    Register({ "g_fFogAnisotropy",     "Fog Anisotropy",     GVAL::FLOAT,  { 0.70f, 0.f, 0.f, 0.f }, { -0.9f, 0.9f } });
     Register({ "g_fFogAmbient",        "Fog Ambient",        GVAL::FLOAT,  { 0.02f, 0.f, 0.f, 0.f }, { 0.f, 0.5f } });
     Register({ "g_fFogShadowStrength", "Fog ShadowStrength", GVAL::FLOAT,  { 1.00f, 0.f, 0.f, 0.f }, { 0.f, 1.f } });
     Register({ "g_fFogLightIntensity", "Fog LightIntensity", GVAL::FLOAT, { 3.f, 0.f, 0.f, 0.f }, { 0.f, 15.f } });
@@ -35,6 +35,9 @@ HRESULT CShaderGlobal_Manager::Initialize()
     Register({ "g_fAperture",     "DoF Aperture",   GVAL::FLOAT, { 1.5f, 0.f, 0.f, 0.f }, { 0.1f, 8.f } });
     Register({ "g_fDoFMaxCoC",    "DoF MaxBlur",    GVAL::FLOAT, { 12.f, 0.f, 0.f, 0.f }, { 1.f, 40.f } });
     Register({ "g_fDoFAutoFocus", "DoF AutoFocus",  GVAL::BOOL,  { 1.f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
+
+    Register({ "g_fExposure",    "Exposure",          GVAL::FLOAT, { 1.0f, 0.f, 0.f, 0.f }, { 0.f, 4.f } });
+    Register({ "g_fToneMapMode", "ToneMap 0R/1A/2E",  GVAL::FLOAT, { 1.0f, 0.f, 0.f, 0.f }, { 0.f, 2.f } });
 
     return S_OK;
 }

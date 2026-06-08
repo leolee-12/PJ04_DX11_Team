@@ -7,18 +7,18 @@ xcopy			/y /s	.\GameContent\Public\nlohmann\json.hpp		.\ContentSDK\Inc\nlohmann\
 xcopy			/y		.\GameContent\Bin\GameContent.lib			.\ContentSDK\lib\
 xcopy			/y		.\GameContent\Public\*.h					.\ContentSDK\Inc\
 
-xcopy			/y		.\Engine\Bin\*.dll							.\Launcher\Bin\
-xcopy			/y		.\Engine\Bin\*.dll							.\Editor\Bin\
-
-xcopy			/y		.\Engine\ThirdPartyLib\*.dll				.\Launcher\Bin\
-xcopy			/y		.\Engine\ThirdPartyLib\*.dll				.\Editor\Bin\
-
-xcopy			/y		.\Engine\Bin\*.dll							.\FBX_Converter\Bin\
-xcopy			/y		.\GameContent\Bin\*.dll						.\Launcher\Bin\
-xcopy			/y		.\GameContent\Bin\*.dll						.\Editor\Bin\
 xcopy			/y		.\Engine\ShaderFiles\*.*					.\GameContent\ShaderFiles\
+
+xcopy			/y		.\Engine\Bin\*.dll							.\Launcher\Bin\
+xcopy			/y		.\Engine\ThirdPartyLib\*.dll				.\Launcher\Bin\
+xcopy			/y		.\GameContent\Bin\*.dll						.\Launcher\Bin\
 xcopy			/y /s	.\GameContent\ShaderFiles\*.*				.\Launcher\Bin\ShaderFiles\
+
+xcopy			/y		.\Engine\Bin\*.dll							.\Editor\Bin\
+xcopy			/y		.\Engine\ThirdPartyLib\*.dll				.\Editor\Bin\
+xcopy			/y		.\GameContent\Bin\*.dll						.\Editor\Bin\
 xcopy			/y /s	.\GameContent\ShaderFiles\*.*				.\Editor\Bin\ShaderFiles\
+
 
 xcopy			/y		.\Engine\Bin\*.dll							.\AnimUITool\Bin\
 xcopy			/y		.\Engine\ThirdPartyLib\*.dll				.\AnimUITool\Bin\

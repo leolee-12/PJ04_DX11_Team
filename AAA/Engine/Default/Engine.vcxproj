@@ -190,6 +190,7 @@
     <ClInclude Include="..\Public\DebugDraw.h" />
     <ClInclude Include="..\public\Effect_Container.h" />
     <ClInclude Include="..\Public\Effect_Mesh.h" />
+    <ClInclude Include="..\Public\Effect_Particle.h" />
     <ClInclude Include="..\Public\Effect_Part.h" />
     <ClInclude Include="..\public\Effect_Manager.h" />
     <ClInclude Include="..\Public\Effect_Quad.h" />
@@ -280,6 +281,7 @@
     <ClCompile Include="..\Private\DebugDraw.cpp" />
     <ClCompile Include="..\private\Effect_Container.cpp" />
     <ClCompile Include="..\Private\Effect_Mesh.cpp" />
+    <ClCompile Include="..\Private\Effect_Particle.cpp" />
     <ClCompile Include="..\Private\Effect_Part.cpp" />
     <ClCompile Include="..\private\Effect_Manager.cpp" />
     <ClCompile Include="..\Private\Effect_Quad.cpp" />

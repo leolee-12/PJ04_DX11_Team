@@ -81,7 +81,7 @@ HRESULT CPreview_Actor::Render()
         if (FAILED(Bind_MaterialOrClear("g_MRATexture", (_uint)i, MTEX_TYPE::METALNESS)))
             return E_FAIL;
 
-        if (FAILED(Bind_MaterialOrClear("g_UnkownTexture", (_uint)i, MTEX_TYPE::UNKNOWN)))
+        if (FAILED(Bind_MaterialOrClear("g_UnknownTexture", (_uint)i, MTEX_TYPE::UNKNOWN)))
             return E_FAIL;
 
         if (bAnimModel && bUsingAnimShader)

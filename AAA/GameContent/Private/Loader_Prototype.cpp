@@ -10,6 +10,7 @@
 #include "UI_Text.h"
 #include "UI_SpriteAnim.h"
 #include "Texture.h"
+#include "Movement.h"
 
 NS_BEGIN(Client)
 
@@ -116,8 +117,40 @@ HRESULT CLIENT_DLL Load_Level(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice
             iLevelIndex, wLayer.c_str(), wObjectName, nullptr);
 
         if (pObj)
+        {
             pObj->Deserialize(jObj);
+        }
     }
+    return S_OK;
+}
+
+HRESULT CLIENT_DLL Load_LevelManifest(const _tchar* strManifestPath, LEVEL_MANIFEST* pOut)
+{
+    if (nullptr == pOut)
+        return E_FAIL;
+
+    string strContent = {};
+    if (FAILED(CDataLoader::Read_Json(strManifestPath, &strContent)))
+        return E_FAIL;
+
+    try
+    {
+        json jManifest = json::parse(strContent);
+
+        if (jManifest.contains("Map_Manifest"))
+            pOut->strMapManifest = StrToWstr(jManifest["Map_Manifest"].get<string>());
+
+        if (jManifest.contains("Objects"))
+            pOut->strObjectsFile = StrToWstr(jManifest["Objects"].get<string>());
+
+        if (jManifest.contains("UI"))
+            pOut->strUIFile = StrToWstr(jManifest["UI"].get<string>());
+    }
+    catch (json::exception&)
+    {
+        return E_FAIL;
+    }
+
     return S_OK;
 }
 
@@ -274,45 +307,6 @@ HRESULT CLIENT_DLL Load_Level_UI(CGameInstance_Proxy* pProxy, ID3D11Device* pDev
             return E_FAIL;
         }
 
-        // 아직 Loader를 거치지 않고 바로 GamePlay 들어가기 때문에 
-        // 임시 fallback 등록 나중에 Loader에서 호출하면 제거 가능
-        /*if (jUI.contains("Textures") && jUI["Textures"].is_object())
-        {
-            for (const auto& [strTextureProtoTag, jTexturePath] : jUI["Textures"].items())
-            {
-                if (strTextureProtoTag.empty() || !jTexturePath.is_string())
-                    return E_FAIL;
-
-                const _wstring wTextureProtoTag = StrToWstr(strTextureProtoTag);
-                const _wstring wTexturePath = StrToWstr(jTexturePath.get<string>());
-
-                if (wTextureProtoTag.empty() || wTexturePath.empty())
-                    return E_FAIL;
-
-                if (!pProxy->Has_Prototype(iLevelIndex, wTextureProtoTag))
-                {
-                    CTexture* pTexture = CTexture::Create(
-                        pDevice,
-                        pContext,
-                        wTexturePath.c_str(),
-                        1);
-
-                    if (nullptr == pTexture)
-                        return E_FAIL;
-
-                    if (FAILED(pProxy->Add_Prototype(
-                        iLevelIndex,
-                        wTextureProtoTag,
-                        pTexture)))
-                    {
-                        Safe_Release(pTexture);
-                        return E_FAIL;
-                    }
-                }
-            }
-        }*/
-
-
         const _wstring strProtoTag =
             StrToWstr(jUI.value("ProtoTag", string()));
 
@@ -328,24 +322,8 @@ HRESULT CLIENT_DLL Load_Level_UI(CGameInstance_Proxy* pProxy, ID3D11Device* pDev
         if (pReg->strCategory != L"UI_CONTAINER")
             return E_FAIL;
 
-        // Loading까지 들어가면 주석해제 (최종 사용본)
         if (!pProxy->Has_Prototype(iContProtoLevel, strProtoTag))
             return E_FAIL;
-
-
-        // Loader 거치지 않는 fallback 등록 버전 - 나중에 제거해야함
-        /*if (!pProxy->Has_Prototype(iContProtoLevel, strProtoTag))
-        {
-            pReg->ResourceLoader(pProxy, pDevice, pContext);
-
-            if (FAILED(pProxy->Add_Prototype(
-                iContProtoLevel,
-                strProtoTag.c_str(),
-                pReg->CreatorFunc(pDevice, pContext))))
-            {
-                return E_FAIL;
-            }
-        }*/
 
         CGameObject* pObj = nullptr;
 

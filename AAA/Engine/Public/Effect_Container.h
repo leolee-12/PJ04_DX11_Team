@@ -51,7 +51,7 @@ public:
 
 public:
     virtual json Serialize() const override;
-    virtual void Deserialize(const json& j) override;
+    virtual void Deserialize_Internal(const json& j) override;
 
 protected:
     unordered_map<_wstring, CEffect_Part*> m_EffestParts;

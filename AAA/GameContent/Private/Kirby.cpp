@@ -7,6 +7,13 @@
 #include "GameContent_const.h"
 #include "Kirby_Body.h"
 
+#include "Kirby_InputManager.h"
+#include "Kirby_Controller.h"
+#include "Kirby_StateMachine.h"
+
+// Ability
+#include "Kirby_Ability_Normal.h"
+
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCharacter{ pDevice, pContext }
 {
@@ -34,8 +41,12 @@ HRESULT CKirby::Initialize(void* pArg)
     if (FAILED(Ready_PartObjects()))
         return E_FAIL;
 
-   
+    if (FAILED(Ready_System()))
+        return E_FAIL;
 
+    if (FAILED(Ready_Ability()))
+        return E_FAIL;
+  
     return S_OK;
 }
 
@@ -46,10 +57,14 @@ void CKirby::Priority_Update(_float fTimeDelta)
 
 void CKirby::Update(_float fTimeDelta)
 {
+    XMStoreFloat3(&m_vWishDir, XMVectorZero());
+
     __super::Update(fTimeDelta);
 
-    if (nullptr == m_pMovement)
-        return;
+    m_pKirby_InputManager->Update_KirbyInput(fTimeDelta);
+    m_pKirby_Controller->Update_KirbyController(fTimeDelta);
+    m_pKirby_StateMachine->Update_StateMachine(fTimeDelta);
+
 
     if (m_pGameInstance_Proxy->Is_EditMode())
     {
@@ -57,28 +72,10 @@ void CKirby::Update(_float fTimeDelta)
         return;
     }
 
-    _vector vWishDir = XMVectorZero();
-    _vector vCamLook = XMLoadFloat4(m_pGameInstance_Proxy->Get_CamLook());
+    //if (m_pGameInstance_Proxy->Key_Down(DIK_SPACE))
+    //    m_pMovement->Jump();
 
-    _vector vCamFwd = XMVector3Normalize(XMVectorSetY(vCamLook, 0.f));                      
-    _vector vCamRight = XMVector3Normalize(XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vCamFwd)); 
-
-    if (m_pGameInstance_Proxy->Key_Pressing(DIK_W)) 
-        vWishDir += vCamFwd;
-
-    if (m_pGameInstance_Proxy->Key_Pressing(DIK_S)) 
-        vWishDir -= vCamFwd;
-
-    if (m_pGameInstance_Proxy->Key_Pressing(DIK_D)) 
-        vWishDir += vCamRight;
-
-    if (m_pGameInstance_Proxy->Key_Pressing(DIK_A)) 
-        vWishDir -= vCamRight;
-
-    if (m_pGameInstance_Proxy->Key_Down(DIK_SPACE))
-        m_pMovement->Jump();
-
-    m_pMovement->Move(vWishDir, fTimeDelta);
+    m_pMovement->Move(XMVectorSetW(XMLoadFloat3(&m_vWishDir), 0), fTimeDelta);
 }
 
 void CKirby::Late_Update(_float fTimeDelta)
@@ -91,16 +88,55 @@ HRESULT CKirby::Render()
     return S_OK;
 }
 
+void CKirby::Add_MoveDir(const _float3& vWishDir)
+{
+    XMStoreFloat3(&m_vWishDir,
+        XMLoadFloat3(&vWishDir) + XMLoadFloat3(&m_vWishDir));
+}
+
+_bool CKirby::Has_MoveDir()
+{
+    _vector vWishDir = XMLoadFloat3(&m_vWishDir);
+
+    if (XMVector3Equal(vWishDir, XMVectorZero()))
+        return false;
+
+    return true;
+}
+
+void CKirby::Excute_Command(CKirby_Command* pCommand)
+{
+    m_pKirby_StateMachine->Handle_Command(pCommand);
+}
+
+void CKirby::Change_State(KIRBY_STATE_TYPE eNewState)
+{
+    m_pKirby_StateMachine->Change_State(eNewState);
+}
+
+CKirby_Ability* CKirby::Get_KirbyAbility()
+{
+    return m_pKirby_Ability;
+}
+
+void CKirby::Set_KirbyAbility(CKirby_Ability* pKirby_Ability)
+{
+    if (m_pKirby_Ability != nullptr)
+        Safe_Release(m_pKirby_Ability);
+
+    m_pKirby_Ability = pKirby_Ability;
+}
+
 HRESULT CKirby::Ready_Components()
 {
-    _float3 vFoot;
-    XMStoreFloat3(&vFoot, m_pTransformCom->Get_State(STATE::POSITION));
-    m_pController = m_pGameInstance_Proxy->Create_CapsuleController(vFoot, CCT_RADIUS, CCT_HEIGHT);
+    _float3 vFootPos;
+    XMStoreFloat3(&vFootPos, m_pTransformCom->Get_State(STATE::POSITION));
+    m_pController = m_pGameInstance_Proxy->Create_CapsuleController(vFootPos, CCT_RADIUS, CCT_HEIGHT);
 
-    m_pMovement = Add_Component<CMovement>(TEXT("Com_Movement"),
-        CMovement::Create(m_pDevice, m_pContext));
-    if (nullptr == m_pMovement)
+    m_pMovement = Add_Component<CMovement>(TEXT("Com_Movement"), CMovement::Create(m_pDevice, m_pContext));
+    if (m_pMovement == nullptr)
         return E_FAIL;
+
     m_pMovement->Set_Refs(m_pTransformCom, m_pController);
     m_pMovement->Set_Stats(MOVE_SPEED, ROT_SPEED, GRAVITY, JUMP_SPEED);
     m_pMovement->Set_Acceleration(MOVE_ACCEL, MOVE_DECEL);
@@ -122,9 +158,41 @@ HRESULT CKirby::Ready_PartObjects()
     return S_OK;
 }
 
+HRESULT CKirby::Ready_System()
+{
+    m_pKirby_StateMachine = CKirby_StateMachine::Create(this);
+    if (m_pKirby_StateMachine == nullptr)
+        return E_FAIL;
+
+    m_pKirby_Controller = CKirby_Controller::Create(this);
+    if (m_pKirby_Controller == nullptr)
+        return E_FAIL;
+
+    m_pKirby_InputManager =  CKirby_InputManager::Create(this, m_pKirby_Controller);
+    if (m_pKirby_InputManager == nullptr)
+        return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT CKirby::Ready_Ability()
+{
+    m_pKirby_Ability = CKirby_Ability_Normal::Create();
+    if (m_pKirby_Ability == nullptr)
+        return E_FAIL;
+
+    return S_OK;
+}
+
 HRESULT CKirby::Bind_ShaderResources()
 {
     return S_OK;
+}
+
+void CKirby::On_Deserialized()
+{
+    if (m_pMovement)
+        m_pMovement->Sync_To_Controller();
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -155,7 +223,13 @@ CGameObject* CKirby::Clone(void* pArg)
 
 void CKirby::Free()
 {
-    if (m_pController)
+    Safe_Release(m_pKirby_Ability);
+
+    Safe_Release(m_pKirby_InputManager);
+    Safe_Release(m_pKirby_Controller);
+    Safe_Release(m_pKirby_StateMachine);
+
+    if (m_pController != nullptr)
     {
         m_pGameInstance_Proxy->Release_Controller(m_pController);
         m_pController = nullptr;
