@@ -23,7 +23,9 @@ KIRBY_STATE_TYPE CKirby_Run::Get_StateType()
 void CKirby_Run::Enter(CKirby* pKirby)
 {
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
-    pAnimator->Play("Run", true);
+    const _float fSpeed = 4.f;
+    pAnimator->Play("Run", true, false, 0.1f, fSpeed);
+
 
 }
 

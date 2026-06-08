@@ -19,7 +19,7 @@ private:
 
 	enum class JUMP_STATE
 	{
-		JUMP_STRAT, LAND_START, LAND_END,
+		JUMP_STRAT, LAND_START/*, LAND_END*/,
 	};
 
 private:

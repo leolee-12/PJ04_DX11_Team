@@ -23,7 +23,7 @@ KIRBY_STATE_TYPE CKirby_Wait::Get_StateType()
 void CKirby_Wait::Enter(CKirby* pKirby)
 {
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
-    pAnimator->Play("Wait");
+    pAnimator->Play("Wait", true, false, 0.1f, 1.8f);
 }
 
 void CKirby_Wait::Update(CKirby* pKirby, const _float fTimeDelta)
