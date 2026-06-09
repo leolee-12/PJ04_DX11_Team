@@ -34,9 +34,23 @@ public:
 public:
 	void Set_Active(_bool b) { m_bActive = b; }
 
+	void Set_PreviewMode(_bool b);
+	void Set_PreviewPose(const _float3& vEye, const _float3& vFwd, const _float3& vUp, _float fFovDeg)
+	{
+		m_vPrevEye = vEye; m_vPrevFwd = vFwd; m_vPrevUp = vUp; m_fPrevFov = fFovDeg;
+	}
+
 private:
-	_float	m_fMouseSensor = {};
+	_float  m_fMouseSensor = {};
 	_bool   m_bActive = { false };
+
+	_bool   m_bPreview = { false };
+	_float3 m_vPrevEye = {};
+	_float3 m_vPrevFwd = { 0.f, 0.f, 1.f };
+	_float3 m_vPrevUp = { 0.f, 1.f, 0.f };
+	_float  m_fPrevFov = { 50.f };
+	_float  m_fNearKeep = { 0.1f };
+	_float  m_fFarKeep = { 1000.f };
 
 private:
 	virtual HRESULT Ready_Events() override { return S_OK; }
