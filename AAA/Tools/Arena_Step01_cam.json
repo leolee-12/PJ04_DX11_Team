@@ -1,0 +1,114 @@
+{
+ "rails": [
+  {
+   "uid": 895590608,
+   "close": false,
+   "nodes": [
+    [
+     -1.0,
+     1.0,
+     10.0
+    ],
+    [
+     -1.0,
+     1.0,
+     21.0
+    ]
+   ]
+  }
+ ],
+ "areas": [
+  {
+   "center": [
+    -2.0,
+    6.5,
+    13.0
+   ],
+   "size": [
+    52.0,
+    21.0,
+    36.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "erpIn": 120,
+   "erpOut": 120,
+   "useRail": true,
+   "railUid": 895590608,
+   "eyeSnap": false,
+   "targetSnap": true,
+   "usePanLimit": false,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 360.0,
+   "base": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -1.0,
+     2.0,
+     15.0
+    ],
+    "snapRate": [
+     0.6,
+     1.0,
+     0.75
+    ],
+    "eyeSnapCenter": [
+     -1.0,
+     0.0,
+     -4.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "distOffs": 6.0,
+    "tiltOffs": -10.0,
+    "rotYOffs": 0.0,
+    "rollOffs": 0.0,
+    "fovYOffs": 0.0
+   },
+   "end": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -1.0,
+     6.0,
+     -4.0
+    ],
+    "snapRate": [
+     0.6,
+     1.0,
+     0.8
+    ],
+    "eyeSnapCenter": [
+     -1.0,
+     1.0,
+     -4.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "distOffs": 6.0,
+    "tiltOffs": -15.0,
+    "rotYOffs": 0.0,
+    "rollOffs": 0.0,
+    "fovYOffs": 0.0
+   }
+  }
+ ]
+}

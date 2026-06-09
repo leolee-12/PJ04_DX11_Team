@@ -178,6 +178,9 @@
     <Filter Include="00. GameObject\UI\UIContainer\GenericContainer">
       <UniqueIdentifier>{56dfa7a0-95de-45e5-bb90-e64da2be4597}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\00. Camera\AreaCam">
+      <UniqueIdentifier>{712968f4-aac4-4c0d-b936-f670af432abf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -363,6 +366,12 @@
     <ClInclude Include="..\Public\UI_Fonts.h">
       <Filter>99. Defines\Hojun</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Camera_AreaCam.h">
+      <Filter>00. GameObject\00. Camera\AreaCam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Camera_AreaData.h">
+      <Filter>00. GameObject\00. Camera\AreaCam</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -505,6 +514,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\UI_GenericContainer.cpp">
       <Filter>00. GameObject\UI\UIContainer\GenericContainer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Camera_AreaCam.cpp">
+      <Filter>00. GameObject\00. Camera\AreaCam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Camera_AreaSolver.cpp">
+      <Filter>00. GameObject\00. Camera\AreaCam</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

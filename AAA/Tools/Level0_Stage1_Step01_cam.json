@@ -1,0 +1,2442 @@
+{
+ "rails": [
+  {
+   "uid": 0,
+   "close": false,
+   "nodes": []
+  },
+  {
+   "uid": 126125678,
+   "close": false,
+   "nodes": [
+    [
+     -19.459999,
+     25.0,
+     257.0
+    ],
+    [
+     -10.989999,
+     25.0,
+     257.0
+    ]
+   ]
+  },
+  {
+   "uid": 1141258341,
+   "close": false,
+   "nodes": [
+    [
+     -45.0,
+     12.5,
+     130.214294
+    ],
+    [
+     -45.0,
+     12.5,
+     171.000015
+    ]
+   ]
+  },
+  {
+   "uid": 1463548197,
+   "close": false,
+   "nodes": [
+    [
+     -143.0,
+     7.5,
+     -107.0
+    ],
+    [
+     -117.799942,
+     7.5,
+     -107.0
+    ]
+   ]
+  },
+  {
+   "uid": 1750696281,
+   "close": false,
+   "nodes": [
+    [
+     -16.5,
+     21.0,
+     227.400009
+    ],
+    [
+     -16.5,
+     21.0,
+     240.0
+    ]
+   ]
+  },
+  {
+   "uid": 1934218964,
+   "close": false,
+   "nodes": [
+    [
+     -48.0,
+     12.5,
+     76.925926
+    ],
+    [
+     -48.0,
+     12.5,
+     97.5
+    ]
+   ]
+  },
+  {
+   "uid": 271042397,
+   "close": false,
+   "nodes": [
+    [
+     -131.0,
+     13.5,
+     -44.5
+    ],
+    [
+     -131.0,
+     13.5,
+     -18.5
+    ]
+   ]
+  },
+  {
+   "uid": 310615592,
+   "close": false,
+   "nodes": [
+    [
+     -52.5,
+     5.5,
+     -10.5
+    ],
+    [
+     -44.5,
+     5.5,
+     0.500001
+    ]
+   ]
+  },
+  {
+   "uid": 494676127,
+   "close": false,
+   "nodes": [
+    [
+     -44.47826,
+     5.0,
+     2.999994
+    ],
+    [
+     -44.47826,
+     5.0,
+     25.999998
+    ]
+   ]
+  },
+  {
+   "uid": 607275986,
+   "close": false,
+   "nodes": [
+    [
+     -19.98,
+     10.0,
+     245.0
+    ],
+    [
+     -10.82,
+     10.0,
+     245.0
+    ]
+   ]
+  },
+  {
+   "uid": 698449375,
+   "close": false,
+   "nodes": [
+    [
+     56.0,
+     29.5,
+     333.0
+    ],
+    [
+     55.950001,
+     29.5,
+     321.0
+    ]
+   ]
+  },
+  {
+   "uid": 739942166,
+   "close": false,
+   "nodes": [
+    [
+     -45.0,
+     12.5,
+     98.714294
+    ],
+    [
+     -45.0,
+     12.5,
+     123.500015
+    ]
+   ]
+  },
+  {
+   "uid": 845226741,
+   "close": false,
+   "nodes": [
+    [
+     -19.5,
+     37.0,
+     268.799988
+    ],
+    [
+     -11.0,
+     37.0,
+     268.799988
+    ]
+   ]
+  },
+  {
+   "uid": 874967495,
+   "close": false,
+   "nodes": [
+    [
+     -44.47826,
+     5.0,
+     49.870003
+    ],
+    [
+     -44.47826,
+     5.0,
+     71.5
+    ]
+   ]
+  }
+ ],
+ "areas": [
+  {
+   "mode": "Normal",
+   "center": [
+    -11.5,
+    21.0,
+    219.0
+   ],
+   "size": [
+    33.0,
+    56.0,
+    42.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "erpIn": 120,
+   "erpOut": 120,
+   "useRail": true,
+   "railUid": 1750696281,
+   "eyeSnap": false,
+   "targetSnap": true,
+   "usePanLimit": false,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 360.0,
+   "base": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -14.0,
+     12.737461,
+     221.852142
+    ],
+    "snapRate": [
+     0.2,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     0.001047,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -18.5,
+     20.0,
+     229.5
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 2.0,
+    "tiltOffs": 20.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   },
+   "end": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -18.5,
+     26.0,
+     229.5
+    ],
+    "snapRate": [
+     0.6,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -18.5,
+     21.0,
+     229.5
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 2.0,
+    "tiltOffs": 10.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   }
+  },
+  {
+   "mode": "Normal",
+   "center": [
+    32.5,
+    21.0,
+    292.0
+   ],
+   "size": [
+    29.0,
+    56.0,
+    32.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 1,
+   "erpIn": 120,
+   "erpOut": 120,
+   "useRail": false,
+   "railUid": 0,
+   "eyeSnap": false,
+   "targetSnap": true,
+   "usePanLimit": false,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 360.0,
+   "base": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -3.5
+    ],
+    "snapCenter": [
+     30.0,
+     26.0,
+     282.0
+    ],
+    "snapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     33.5,
+     36.0,
+     300.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 4.0,
+    "tiltOffs": 40.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   },
+   "end": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     33.5,
+     42.0,
+     300.0
+    ],
+    "snapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     33.5,
+     37.0,
+     300.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 0.0,
+    "tiltOffs": -0.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   }
+  },
+  {
+   "mode": "Normal",
+   "center": [
+    -47.0,
+    12.5,
+    113.5
+   ],
+   "size": [
+    56.0,
+    17.0,
+    31.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "erpIn": 60,
+   "erpOut": 60,
+   "useRail": true,
+   "railUid": 739942166,
+   "eyeSnap": false,
+   "targetSnap": true,
+   "usePanLimit": false,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 360.0,
+   "base": {
+    "targetOffs": [
+     -0.0,
+     5.0,
+     -3.0
+    ],
+    "snapCenter": [
+     -43.997723,
+     17.5,
+     138.5
+    ],
+    "snapRate": [
+     0.8,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -47.0,
+     11.5,
+     111.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 5.0,
+    "tiltOffs": -34.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 8.0
+   },
+   "end": {
+    "targetOffs": [
+     -50.0,
+     11.0,
+     0.5
+    ],
+    "snapCenter": [
+     -47.0,
+     17.5,
+     111.0
+    ],
+    "snapRate": [
+     0.8,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -47.0,
+     12.5,
+     111.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 18.0,
+    "tiltOffs": -30.0,
+    "rotYOffs": -20.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 8.0
+   }
+  },
+  {
+   "mode": "Normal",
+   "center": [
+    3.0,
+    21.0,
+    292.0
+   ],
+   "size": [
+    30.0,
+    56.0,
+    32.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 1,
+   "erpIn": 120,
+   "erpOut": 120,
+   "useRail": false,
+   "railUid": 0,
+   "eyeSnap": false,
+   "targetSnap": false,
+   "usePanLimit": false,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 360.0,
+   "base": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -2.777576,
+     30.679832,
+     317.670868
+    ],
+    "snapRate": [
+     0.0,
+     0.5,
+     0.7
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     13.5,
+     36.0,
+     300.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 4.0,
+    "tiltOffs": 40.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   },
+   "end": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     13.5,
+     42.0,
+     300.0
+    ],
+    "snapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     13.5,
+     37.0,
+     300.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 0.0,
+    "tiltOffs": -0.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   }
+  },
+  {
+   "mode": "Normal",
+   "center": [
+    58.5,
+    29.0,
+    336.0
+   ],
+   "size": [
+    35.0,
+    26.0,
+    32.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "erpIn": 90,
+   "erpOut": 120,
+   "useRail": true,
+   "railUid": 698449375,
+   "eyeSnap": false,
+   "targetSnap": true,
+   "usePanLimit": false,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 360.0,
+   "base": {
+    "targetOffs": [
+     -0.0,
+     1.0,
+     -0.0
+    ],
+    "snapCenter": [
+     56.0,
+     19.0,
+     330.0
+    ],
+    "snapRate": [
+     0.0,
+     0.0,
+     0.5
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     56.0,
+     28.5,
+     330.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 4.0,
+    "tiltOffs": -0.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   },
+   "end": {
+    "targetOffs": [
+     -0.0,
+     1.0,
+     2.0
+    ],
+    "snapCenter": [
+     56.0,
+     34.5,
+     330.0
+    ],
+    "snapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     56.0,
+     29.5,
+     330.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 4.0,
+    "tiltOffs": -0.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   }
+  },
+  {
+   "mode": "Normal",
+   "center": [
+    -87.5,
+    12.5,
+    -8.0
+   ],
+   "size": [
+    19.0,
+    23.0,
+    18.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 2,
+   "erpIn": 120,
+   "erpOut": 120,
+   "useRail": false,
+   "railUid": 0,
+   "eyeSnap": false,
+   "targetSnap": true,
+   "usePanLimit": false,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 360.0,
+   "base": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -80.13372,
+     6.031397,
+     -9.224533
+    ],
+    "snapRate": [
+     0.42,
+     0.6,
+     0.8
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -87.0,
+     11.5,
+     -8.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 3.0,
+    "tiltOffs": 17.5,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": -5.0
+   },
+   "end": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -87.0,
+     17.5,
+     -8.0
+    ],
+    "snapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -87.0,
+     12.5,
+     -8.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 0.0,
+    "tiltOffs": -0.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   }
+  },
+  {
+   "mode": "Normal",
+   "center": [
+    -47.0,
+    12.5,
+    150.5
+   ],
+   "size": [
+    56.0,
+    17.0,
+    43.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "erpIn": 60,
+   "erpOut": 120,
+   "useRail": true,
+   "railUid": 1141258341,
+   "eyeSnap": false,
+   "targetSnap": true,
+   "usePanLimit": false,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 360.0,
+   "base": {
+    "targetOffs": [
+     -50.0,
+     11.0,
+     0.5
+    ],
+    "snapCenter": [
+     -43.997723,
+     17.5,
+     138.5
+    ],
+    "snapRate": [
+     0.8,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -47.0,
+     11.5,
+     111.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 18.0,
+    "tiltOffs": -30.0,
+    "rotYOffs": -20.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 8.0
+   },
+   "end": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -38.0,
+     17.5,
+     168.0
+    ],
+    "snapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -47.0,
+     12.5,
+     111.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 4.0,
+    "tiltOffs": -0.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   }
+  },
+  {
+   "mode": "Normal",
+   "center": [
+    -129.0,
+    9.500022,
+    -8.499978
+   ],
+   "size": [
+    14.0,
+    23.0,
+    17.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "erpIn": 90,
+   "erpOut": 120,
+   "useRail": false,
+   "railUid": 0,
+   "eyeSnap": false,
+   "targetSnap": true,
+   "usePanLimit": false,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 360.0,
+   "base": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -130.0,
+     5.5,
+     -11.0
+    ],
+    "snapRate": [
+     0.3,
+     0.6,
+     0.3
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -127.5,
+     8.5,
+     -9.5
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 3.0,
+    "tiltOffs": 17.5,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": -5.0
+   },
+   "end": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -127.5,
+     14.5,
+     -9.5
+    ],
+    "snapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -127.5,
+     9.5,
+     -9.5
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 0.0,
+    "tiltOffs": -0.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   }
+  },
+  {
+   "mode": "Normal",
+   "center": [
+    -128.5,
+    8.0,
+    -105.0
+   ],
+   "size": [
+    69.0,
+    10.0,
+    44.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "erpIn": 120,
+   "erpOut": 120,
+   "useRail": true,
+   "railUid": 1463548197,
+   "eyeSnap": false,
+   "targetSnap": true,
+   "usePanLimit": true,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 2.0,
+   "base": {
+    "targetOffs": [
+     -0.0,
+     2.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -131.0,
+     -3.5,
+     -66.0
+    ],
+    "snapRate": [
+     0.18,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -130.0,
+     6.5,
+     -32.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 0.0,
+    "tiltOffs": -22.299999,
+    "rotYOffs": 16.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 5.0
+   },
+   "end": {
+    "targetOffs": [
+     -0.0,
+     2.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -130.0,
+     12.5,
+     -79.0
+    ],
+    "snapRate": [
+     0.18,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -130.0,
+     7.5,
+     -79.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 0.0,
+    "tiltOffs": -22.299999,
+    "rotYOffs": -16.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 5.0
+   }
+  },
+  {
+   "mode": "Normal",
+   "center": [
+    -1.5,
+    21.0,
+    250.0
+   ],
+   "size": [
+    67.0,
+    56.0,
+    20.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "erpIn": 120,
+   "erpOut": 120,
+   "useRail": true,
+   "railUid": 607275986,
+   "eyeSnap": false,
+   "targetSnap": true,
+   "usePanLimit": false,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 360.0,
+   "base": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -14.0,
+     21.5,
+     244.0
+    ],
+    "snapRate": [
+     0.7,
+     0.0,
+     0.3
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -1.0,
+     9.0,
+     245.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 3.0,
+    "tiltOffs": 10.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   },
+   "end": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -1.0,
+     15.0,
+     245.0
+    ],
+    "snapRate": [
+     0.4,
+     0.0,
+     0.3
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -1.0,
+     10.0,
+     245.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 0.0,
+    "tiltOffs": -0.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   }
+  },
+  {
+   "mode": "Normal",
+   "center": [
+    -8.5,
+    21.0,
+    284.0
+   ],
+   "size": [
+    53.0,
+    56.0,
+    48.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "erpIn": 120,
+   "erpOut": 120,
+   "useRail": true,
+   "railUid": 845226741,
+   "eyeSnap": false,
+   "targetSnap": true,
+   "usePanLimit": false,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 360.0,
+   "base": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -13.5,
+     30.679832,
+     295.670868
+    ],
+    "snapRate": [
+     0.7,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     1.0,
+     36.0,
+     278.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 3.0,
+    "tiltOffs": 30.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   },
+   "end": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     1.0,
+     42.0,
+     278.0
+    ],
+    "snapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     1.0,
+     37.0,
+     278.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 3.0,
+    "tiltOffs": 30.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   }
+  },
+  {
+   "mode": "Normal",
+   "center": [
+    -0.5,
+    35.5,
+    256.0
+   ],
+   "size": [
+    69.0,
+    27.0,
+    8.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 1,
+   "erpIn": 120,
+   "erpOut": 120,
+   "useRail": true,
+   "railUid": 126125678,
+   "eyeSnap": false,
+   "targetSnap": true,
+   "usePanLimit": false,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 360.0,
+   "base": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -14.0,
+     18.679832,
+     274.670868
+    ],
+    "snapRate": [
+     0.7,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     1.0,
+     24.0,
+     257.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 3.0,
+    "tiltOffs": 30.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   },
+   "end": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     1.0,
+     30.0,
+     257.0
+    ],
+    "snapRate": [
+     0.4,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     1.0,
+     25.0,
+     257.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 3.0,
+    "tiltOffs": 30.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   }
+  },
+  {
+   "mode": "Normal",
+   "center": [
+    57.0,
+    21.0,
+    298.0
+   ],
+   "size": [
+    58.0,
+    56.0,
+    44.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "erpIn": 90,
+   "erpOut": 120,
+   "useRail": false,
+   "railUid": 0,
+   "eyeSnap": false,
+   "targetSnap": false,
+   "usePanLimit": false,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 360.0,
+   "base": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     37.722424,
+     30.679832,
+     295.670868
+    ],
+    "snapRate": [
+     0.0,
+     0.5,
+     0.7
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     54.0,
+     36.0,
+     278.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 4.0,
+    "tiltOffs": 15.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   },
+   "end": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     54.0,
+     42.0,
+     278.0
+    ],
+    "snapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     54.0,
+     37.0,
+     278.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 0.0,
+    "tiltOffs": -0.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   }
+  },
+  {
+   "mode": "Normal",
+   "center": [
+    -109.5,
+    12.5,
+    -8.0
+   ],
+   "size": [
+    25.0,
+    23.0,
+    18.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "erpIn": 120,
+   "erpOut": 120,
+   "useRail": false,
+   "railUid": 0,
+   "eyeSnap": false,
+   "targetSnap": true,
+   "usePanLimit": false,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 360.0,
+   "base": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -108.115654,
+     6.031397,
+     -9.349503
+    ],
+    "snapRate": [
+     0.0,
+     0.0,
+     0.5
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -109.0,
+     11.5,
+     -8.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 0.0,
+    "tiltOffs": 10.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   },
+   "end": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -109.0,
+     17.5,
+     -8.0
+    ],
+    "snapRate": [
+     0.0,
+     0.6,
+     0.8
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -109.0,
+     12.5,
+     -8.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 0.0,
+    "tiltOffs": 7.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   }
+  },
+  {
+   "mode": "Normal",
+   "center": [
+    -40.5,
+    10.5,
+    62.5
+   ],
+   "size": [
+    45.0,
+    19.0,
+    27.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "erpIn": 120,
+   "erpOut": 60,
+   "useRail": true,
+   "railUid": 874967495,
+   "eyeSnap": false,
+   "targetSnap": true,
+   "usePanLimit": false,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 360.0,
+   "base": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -44.177788,
+     7.565277,
+     61.67664
+    ],
+    "snapRate": [
+     0.8,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -44.0,
+     9.5,
+     33.77
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": -3.9,
+    "tiltOffs": -20.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   },
+   "end": {
+    "targetOffs": [
+     -0.0,
+     0.5,
+     -0.0
+    ],
+    "snapCenter": [
+     -44.0,
+     15.5,
+     33.77
+    ],
+    "snapRate": [
+     0.8,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -44.0,
+     10.5,
+     33.77
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": -3.9,
+    "tiltOffs": -20.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   }
+  },
+  {
+   "mode": "Normal",
+   "center": [
+    -44.0,
+    10.5,
+    25.0
+   ],
+   "size": [
+    22.0,
+    19.0,
+    48.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "erpIn": 60,
+   "erpOut": 60,
+   "useRail": true,
+   "railUid": 494676127,
+   "eyeSnap": false,
+   "targetSnap": true,
+   "usePanLimit": false,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 360.0,
+   "base": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -44.177788,
+     7.565277,
+     61.906639
+    ],
+    "snapRate": [
+     0.8,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -44.0,
+     9.5,
+     34.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": -2.0,
+    "tiltOffs": -0.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   },
+   "end": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -44.0,
+     15.5,
+     34.0
+    ],
+    "snapRate": [
+     0.8,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -44.0,
+     10.5,
+     34.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": -3.9,
+    "tiltOffs": -20.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   }
+  },
+  {
+   "mode": "Normal",
+   "center": [
+    -131.0,
+    13.5,
+    -50.0
+   ],
+   "size": [
+    26.0,
+    23.0,
+    66.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "erpIn": 120,
+   "erpOut": 120,
+   "useRail": true,
+   "railUid": 271042397,
+   "eyeSnap": false,
+   "targetSnap": true,
+   "usePanLimit": false,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 360.0,
+   "base": {
+    "targetOffs": [
+     -0.0,
+     2.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -130.0,
+     9.5,
+     -30.0
+    ],
+    "snapRate": [
+     0.3,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -127.5,
+     12.5,
+     -27.5
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 3.0,
+    "tiltOffs": -24.799999,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   },
+   "end": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -127.5,
+     18.5,
+     -27.5
+    ],
+    "snapRate": [
+     0.3,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -127.5,
+     13.5,
+     -27.5
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 3.0,
+    "tiltOffs": 17.5,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   }
+  },
+  {
+   "mode": "Normal",
+   "center": [
+    -52.5,
+    12.5,
+    -8.0
+   ],
+   "size": [
+    51.0,
+    23.0,
+    18.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 1,
+   "erpIn": 120,
+   "erpOut": 60,
+   "useRail": true,
+   "railUid": 310615592,
+   "eyeSnap": false,
+   "targetSnap": true,
+   "usePanLimit": false,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 360.0,
+   "base": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -44.409256,
+     6.031397,
+     -8.143175
+    ],
+    "snapRate": [
+     0.0,
+     0.0,
+     0.5
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -52.5,
+     11.5,
+     -8.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 0.0,
+    "tiltOffs": 10.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   },
+   "end": {
+    "targetOffs": [
+     -0.0,
+     0.0,
+     -0.0
+    ],
+    "snapCenter": [
+     -52.5,
+     17.5,
+     -8.0
+    ],
+    "snapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -52.5,
+     12.5,
+     -8.0
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": -2.0,
+    "tiltOffs": -0.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 0.0
+   }
+  },
+  {
+   "mode": "Normal",
+   "center": [
+    -45.0,
+    12.5,
+    87.0
+   ],
+   "size": [
+    60.0,
+    17.0,
+    22.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "erpIn": 60,
+   "erpOut": 60,
+   "useRail": true,
+   "railUid": 1934218964,
+   "eyeSnap": false,
+   "targetSnap": true,
+   "usePanLimit": false,
+   "panLimitCenter": 180.0,
+   "panLimitRange": 360.0,
+   "base": {
+    "targetOffs": [
+     -0.0,
+     1.0,
+     -1.0
+    ],
+    "snapCenter": [
+     -43.968124,
+     28.744606,
+     90.712914
+    ],
+    "snapRate": [
+     0.8,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -45.0,
+     11.5,
+     81.5
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": -3.9,
+    "tiltOffs": -20.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 2.0
+   },
+   "end": {
+    "targetOffs": [
+     -0.0,
+     5.0,
+     -2.0
+    ],
+    "snapCenter": [
+     -45.0,
+     17.5,
+     81.5
+    ],
+    "snapRate": [
+     0.8,
+     0.0,
+     0.0
+    ],
+    "snapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "eyeSnapCenter": [
+     -45.0,
+     12.5,
+     81.5
+    ],
+    "eyeSnapRate": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "eyeSnapRot": [
+     -0.0,
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "distOffs": 5.0,
+    "tiltOffs": -34.0,
+    "rotYOffs": -0.0,
+    "rollOffs": -0.0,
+    "fovYOffs": 8.0
+   }
+  }
+ ]
+}
