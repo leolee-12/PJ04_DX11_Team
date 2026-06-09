@@ -5,6 +5,8 @@
 #include "Kirby_Wait.h"
 #include "Kirby_Run.h"
 #include "Kirby_Jump.h"
+#include "Kirby_Inhale.h"
+#include "Kirby_Attack.h"
 
 CKirby_StateMachine::CKirby_StateMachine()
 {
@@ -69,10 +71,8 @@ CKirby_State* CKirby_StateMachine::State_Creator(KIRBY_STATE_TYPE eNewstate)
         case KIRBY_STATE_TYPE::WAIT:        pState = CKirby_Wait::Create();     break;
         case KIRBY_STATE_TYPE::RUN:         pState = CKirby_Run::Create();      break;
         case KIRBY_STATE_TYPE::JUMP:        pState = CKirby_Jump::Create();     break;
-
-        //case KIRBY_STATE_TYPE::ATTACK:
-        //     
-        //    break;   
+        case KIRBY_STATE_TYPE::INHALE:      pState = CKirby_Inhale::Create();   break;
+        case KIRBY_STATE_TYPE::ATTACK:      pState = CKirby_Attack::Create();   break;  
     }
 
     return pState;

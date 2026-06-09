@@ -11,8 +11,7 @@ enum class KIRBY_COMMAND_TYPE
 	NONE,
 	MOVE_TOP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT,
 	JUMP,  // A
-	ATTACK // B
-
+	ATTACK_DOWN, ATTACK_UP // B
 };
 
 class CLIENT_DLL CKirby_Command abstract : public CBase
@@ -99,11 +98,21 @@ private:
 };
 
 
-class CLIENT_DLL ATTACK_Command final : public CKirby_Command
+class CLIENT_DLL ATTACK_DOWN_Command final : public CKirby_Command
 {
 public:
-	virtual ~ATTACK_Command() = default;
-	virtual KIRBY_COMMAND_TYPE GetCommandType() override { return KIRBY_COMMAND_TYPE::ATTACK; }
+	virtual ~ATTACK_DOWN_Command() = default;
+	virtual KIRBY_COMMAND_TYPE GetCommandType() override { return KIRBY_COMMAND_TYPE::ATTACK_DOWN; }
+
+private:
+	virtual void Free() { __super::Free(); }
+};
+
+class CLIENT_DLL ATTACK_UP_Command final : public CKirby_Command
+{
+public:
+	virtual ~ATTACK_UP_Command() = default;
+	virtual KIRBY_COMMAND_TYPE GetCommandType() override { return KIRBY_COMMAND_TYPE::ATTACK_UP; }
 
 private:
 	virtual void Free() { __super::Free(); }

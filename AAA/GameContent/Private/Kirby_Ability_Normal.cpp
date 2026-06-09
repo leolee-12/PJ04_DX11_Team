@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 
 #include "Kirby.h"
+#include "Kirby_State.h"
 
 CKirby_Ability_Normal::CKirby_Ability_Normal()
 {
@@ -19,9 +20,16 @@ KIRBY_ABILITY_TYPE CKirby_Ability_Normal::Get_AbilityType()
     return KIRBY_ABILITY_TYPE::NORMAL;
 }
 
-void CKirby_Ability_Normal::On_Attack(CKirby* pKirby)
+void CKirby_Ability_Normal::Down_Attack(CKirby* pKirby)
 {
+    m_bIsFinished = false;
 
+    pKirby->Change_State(KIRBY_STATE_TYPE::INHALE);
+}
+
+void CKirby_Ability_Normal::Up_Attack(CKirby* pKirby)
+{
+    m_bIsFinished = true;
 }
 
 CKirby_Ability_Normal* CKirby_Ability_Normal::Create()

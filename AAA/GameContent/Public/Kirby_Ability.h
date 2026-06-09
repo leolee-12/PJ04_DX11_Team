@@ -27,7 +27,13 @@ protected:
 public:
 	virtual KIRBY_ABILITY_TYPE Get_AbilityType() = 0;
 
-	virtual void On_Attack(CKirby* pKirby) = 0;
+	virtual void Down_Attack(CKirby* pKirby) = 0;
+	virtual void Up_Attack(CKirby* pKirby) = 0;
+
+	_bool IsFinished() { return m_bIsFinished; }
+
+protected:
+	_bool m_bIsFinished{};
 
 protected:
 	virtual void Free() override;

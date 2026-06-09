@@ -23,7 +23,8 @@ private:
 public:
 	virtual KIRBY_ABILITY_TYPE Get_AbilityType() override;
 
-	virtual void On_Attack(CKirby* pKirby) override;
+	virtual void Down_Attack(CKirby* pKirby) override;
+	virtual void Up_Attack(CKirby* pKirby) override;
 
 public:
 	static CKirby_Ability_Normal* Create();

@@ -4,6 +4,7 @@
 
 #include "Kirby.h"
 #include "Kirby_Body.h"
+#include "Kirby_Ability.h"
 
 CKirby_Wait::CKirby_Wait()
 {
@@ -53,6 +54,12 @@ _bool CKirby_Wait::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
         case KIRBY_COMMAND_TYPE::JUMP:
             pKirby->Change_State(KIRBY_STATE_TYPE::JUMP);
             return true;
+
+        case KIRBY_COMMAND_TYPE::ATTACK_DOWN:
+            pKirby->Get_KirbyAbility()->Down_Attack(pKirby);
+            return true;
+
+
     }
 
     return false;
