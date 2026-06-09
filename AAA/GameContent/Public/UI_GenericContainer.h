@@ -32,14 +32,6 @@ public:
         pOutData->strPrototypeTag = PROTOTYPE_TAG;
     }
 
-    // 저작 전용: 선택 컨테이너에 파트 생성·편입 (protected 래퍼)
-    HRESULT Add_Part(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, const _wstring& strPartTag, void* pArg = nullptr)
-    {
-        return Add_UIPartObject(iPrototypeLevelIndex, strPrototypeTag, strPartTag, pArg);
-    }
-    HRESULT Remove_Part(const _wstring& strPartTag);
-    HRESULT Rename_Part(const _wstring& strOldTag, const _wstring& strNewTag);
-
 public:
     static CUI_GenericContainer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     CGameObject* Clone(void* pArg) override;

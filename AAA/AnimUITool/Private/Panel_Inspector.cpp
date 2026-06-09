@@ -14,6 +14,8 @@
 #include "UI_SpriteAnim.h"
 #include "UI_Fonts.h"
 #include "UI_Text.h"
+#include "UI_Image.h"
+#include "UI_Effect.h"
 
 namespace
 {
@@ -222,15 +224,92 @@ void CPanel_Inspector::Render_Properties(IReflectable* pHolder)
         }
         case PROP_TYPE::WSTRING:
         {
-            std::wstring* pW = (std::wstring*)pData;
+            std::wstring* pW = static_cast<std::wstring*>(pData);
+
             char buf[256] = {};
-            strcpy_s(buf, ToUtf8(*pW).c_str());          
+            strcpy_s(buf, ToUtf8(*pW).c_str());
+
             if (ImGui::InputText(name.c_str(), buf, sizeof(buf)))
-                *pW = StrToWstr(buf);                   
+            {
+                *pW = StrToWstr(buf);
+                m_pPanel_Manager->Get_UIContext().bDirty = true;
+            }
+
+            const bool bTextureProperty =
+                prop.strName == L"TextureProtoTag" ||
+                prop.strName == L"MaskTextureProtoTag";
+
+            if (bTextureProperty && ImGui::BeginDragDropTarget())
+            {
+                if (const ImGuiPayload* pPayload =
+                    ImGui::AcceptDragDropPayload(DND_FILE_PATH))
+                {
+                    std::string strPath(static_cast<const char*>(pPayload->Data));
+                    std::string strExt = std::filesystem::path(strPath).extension().string();
+
+                    for (auto& c : strExt)
+                        c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+
+                    if (strExt == ".png" || strExt == ".dds")
+                    {
+                        CLevel_Tool* pLevel = m_pPanel_Manager->Get_Level();
+
+                        if (pLevel)
+                        {
+                            _wstring strProtoTag =
+                                pLevel->Register_TextureProto(StrToWstr(strPath));
+
+                            if (!strProtoTag.empty())
+                            {
+                                *pW = strProtoTag;
+                                m_pPanel_Manager->Get_UIContext().bDirty = true;
+
+                                UI_SELECTION& sel =
+                                    m_pPanel_Manager->Get_UIContext().Selection;
+
+                                if (sel.pPart)
+                                {
+                                    if (auto* pImage =
+                                        dynamic_cast<Client::CUI_Image*>(sel.pPart))
+                                    {
+                                        if (prop.strName == L"TextureProtoTag")
+                                            pImage->Set_Texture(
+                                                ETOUI(TOOL_LEVEL::EDIT),
+                                                strProtoTag);
+                                    }
+                                    else if (auto* pAnim =
+                                        dynamic_cast<Client::CUI_SpriteAnim*>(sel.pPart))
+                                    {
+                                        if (prop.strName == L"TextureProtoTag")
+                                            pAnim->Set_Texture(
+                                                ETOUI(TOOL_LEVEL::EDIT),
+                                                strProtoTag);
+                                    }
+                                    else if (auto* pEffect =
+                                        dynamic_cast<Client::CUI_Effect*>(sel.pPart))
+                                    {
+                                        if (prop.strName == L"TextureProtoTag")
+                                            pEffect->Set_Texture(
+                                                ETOUI(TOOL_LEVEL::EDIT),
+                                                strProtoTag);
+                                        else if (prop.strName == L"MaskTextureProtoTag")
+                                            pEffect->Set_MaskTexture(
+                                                ETOUI(TOOL_LEVEL::EDIT),
+                                                strProtoTag);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                ImGui::EndDragDropTarget();
+            }
             break;
         }
         }
     }
+
 }
 
 void CPanel_Inspector::Render_Bones()
@@ -439,10 +518,80 @@ void CPanel_Inspector::Render_KirbyFace(CGameObject* pObject)
 
 }
 
-void CPanel_Inspector::Render_UITransform(CUIPartObject* pPart)
+void CPanel_Inspector::Render_UIContainerTransform(CUIContainerObject* pContainer, _bool bDefaultOpen)
+{
+    if (!pContainer)
+        return;
+
+    ImGuiTreeNodeFlags iFlags = {};
+    if (bDefaultOpen)
+        iFlags |= ImGuiTreeNodeFlags_DefaultOpen;
+
+    if (!ImGui::CollapsingHeader("Container Transform", iFlags))
+        return;
+
+    CTransform* pT = pContainer->Get_Transform();
+    if (!pT)
+        return;
+
+    UI_CONTEXT& uictx = m_pPanel_Manager->Get_UIContext();
+
+    ImGui::PushID("ContainerTransform");
+
+    _vector vPos = pT->Get_State(STATE::POSITION);
+    float pos[2] =
+    {
+        XMVectorGetX(vPos),
+        XMVectorGetY(vPos)
+    };
+
+    if (ImGui::DragFloat2("Position (x,y)", pos, 1.f))
+    {
+        pT->Set_State(
+            STATE::POSITION,
+            XMVectorSet(
+                pos[0],
+                pos[1],
+                XMVectorGetZ(vPos),
+                1.f));
+
+        uictx.bDirty = true;
+    }
+
+    _float3 vScale = pT->Get_Scaled();
+    float scale[2] =
+    {
+        vScale.x,
+        vScale.y
+    };
+
+    if (ImGui::DragFloat2("Scale (x,y)", scale, 0.01f, 0.01f, 100.f))
+    {
+        pT->Set_Scale(scale[0], scale[1], vScale.z);
+        uictx.bDirty = true;
+    }
+
+    float fRotationDeg = Get_UIRotationZDeg(pT);
+
+    if (ImGui::DragFloat(
+        "Rotation Z",
+        &fRotationDeg,
+        0.5f,
+        -180.f,
+        180.f,
+        "%.1f deg"))
+    {
+        Set_UIRotationZDeg(pT, fRotationDeg);
+        uictx.bDirty = true;
+    }
+
+    ImGui::PopID();
+}
+
+void CPanel_Inspector::Render_UIPartTransform(CUIPartObject* pPart)
 {
 
-    if (!ImGui::CollapsingHeader("Transform (UI)", ImGuiTreeNodeFlags_DefaultOpen))
+    if (!ImGui::CollapsingHeader("Part Transform (UI)", ImGuiTreeNodeFlags_DefaultOpen))
         return;
 
     CTransform* pT = pPart->Get_Transform();
@@ -466,6 +615,14 @@ void CPanel_Inspector::Render_UITransform(CUIPartObject* pPart)
     if (ImGui::DragFloat2("Size (w,h)", size, 1.f, 1.f, 99999.f))
     {
         pT->Set_Scale(size[0], size[1], 1.f);
+        uictx.bDirty = true;
+    }
+
+    _float fRotationDeg = Get_UIRotationZDeg(pT);
+
+    if (ImGui::DragFloat("Rotation Z", &fRotationDeg, 0.5f, -180.f, 180.f, "%.1f deg"))
+    {
+        Set_UIRotationZDeg(pT, fRotationDeg);
         uictx.bDirty = true;
     }
 }
@@ -585,10 +742,13 @@ void CPanel_Inspector::Render_UIInspector()
     ImGui::Text("Z (Transform z): %.3f", pPart->Get_ZOrder());
 
     ImGui::Separator();
-    Render_UITransform(pPart);
+    Render_UIContainerTransform(sel.pContainer, false);
+    ImGui::Separator();
+    Render_UIPartTransform(pPart);
     Render_Properties(pPart);
     Render_TextInspector(pPart);
     Render_SpriteAnimControl(pPart);
+    Render_UIPartBounceInspector(pPart);
 }
 
 void CPanel_Inspector::Render_SpriteAnimControl(CUIPartObject* pPart)
@@ -677,9 +837,63 @@ void CPanel_Inspector::Render_TextInspector(CUIPartObject* pPart)
     }
 }
 
+void CPanel_Inspector::Render_UIPartBounceInspector(CUIPartObject* pPart)
+{
+    if (!pPart)
+        return;
+
+    if (!ImGui::CollapsingHeader("Bounce Test"))
+        return;
+
+    static _float2 s_vDirection = { 0.f, 1.f };
+    static _float  s_fDistance = 12.f;
+    static _float  s_fDuration = 0.28f;
+    static _float  s_fWaveCount = 1.5f;
+    static _float  s_fDamping = 1.2f;
+
+    ImGui::DragFloat2("Direction", (float*)&s_vDirection, 0.05f);
+    ImGui::DragFloat("Distance", &s_fDistance, 0.5f, 0.f, 200.f);
+    ImGui::DragFloat("Duration", &s_fDuration, 0.01f, 0.01f, 5.f);
+    ImGui::DragFloat("Wave Count", &s_fWaveCount, 0.05f, 0.1f, 10.f);
+    ImGui::DragFloat("Damping", &s_fDamping, 0.05f, 0.f, 8.f);
+
+    if (ImGui::Button("Bounce Play"))
+        pPart->Play_Bounce(s_vDirection, s_fDistance, s_fDuration, s_fWaveCount, s_fDamping);
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Bounce Stop"))
+        pPart->Stop_Bounce(true);
+
+    ImGui::TextDisabled(pPart->Is_Bouncing() ? "Playing" : "Idle");
+}
+
 CPanel_Inspector* CPanel_Inspector::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     return new CPanel_Inspector(pDevice, pContext);
+}
+
+float CPanel_Inspector::Get_UIRotationZDeg(CTransform* pT)
+{
+    _vector vRight = pT->Get_State(STATE::RIGHT);
+    return XMConvertToDegrees(atan2f(XMVectorGetY(vRight), XMVectorGetX(vRight)));
+}
+
+void CPanel_Inspector::Set_UIRotationZDeg(CTransform* pT, float fDeg)
+{
+    _float3 vScale = pT->Get_Scaled();
+    _vector vPos = pT->Get_State(STATE::POSITION);
+
+    _matrix matRot = XMMatrixRotationZ(XMConvertToRadians(fDeg));
+
+    pT->Set_State(STATE::RIGHT,
+        XMVector3TransformNormal(XMVectorSet(vScale.x, 0.f, 0.f, 0.f), matRot));
+
+    pT->Set_State(STATE::UP,
+        XMVector3TransformNormal(XMVectorSet(0.f, vScale.y, 0.f, 0.f), matRot));
+
+    pT->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, vScale.z, 0.f));
+    pT->Set_State(STATE::POSITION, vPos);
 }
 
 void CPanel_Inspector::Free()

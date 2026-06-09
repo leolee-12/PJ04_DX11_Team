@@ -7,6 +7,12 @@ NS_END
 
 namespace Client
 {
+    // 호준 테스트용
+    namespace EventTag
+    {
+        inline constexpr const _tchar* Kirby_PointStarGained = L"Kirby.PointStarGained";
+    }
+
     typedef struct tagUIRButtonProbe {
         _float2 vNDC;
         _bool   bConsumed = false;
@@ -25,7 +31,7 @@ namespace Client
 
         EClickHitType  eHitType = EClickHitType::NONE;
         _float         fHitDist = FLT_MAX;
-        CGameObject*   pHitObject = nullptr;
+        CGameObject* pHitObject = nullptr;
         _int           iHitSubIndex = -1;
         _float3        vHitPos = {};
     } WORLD_CLICK_PROBE;
@@ -35,7 +41,7 @@ namespace Client
         _vector       vRayDir;
 
         _float        fHitDist = FLT_MAX;
-        CGameObject*  pHitObject = nullptr;
+        CGameObject* pHitObject = nullptr;
         _int          iHitSubIndex = -1;
     } WORLD_HOVER_PROBE;
 
@@ -46,9 +52,9 @@ namespace Client
     } SKILL_INPUT;
 
     typedef struct tagAttack {
-        CGameObject* pVictim    = { nullptr };
-        CGameObject* pAttacker  = { nullptr };
-        _uint        iDmg       = { 0 };
+        CGameObject* pVictim = { nullptr };
+        CGameObject* pAttacker = { nullptr };
+        _uint        iDmg = { 0 };
     }ATTACK_DESC;
 
     typedef struct tagObjectDiedDesc {
@@ -61,7 +67,7 @@ namespace Client
 
     typedef struct tagShowItemBoxUI {
         _uint   iBoxIdx;
-        _uint* pContents;    
+        _uint* pContents;
     } SHOW_ITEMBOX_UI;
 
     typedef struct tagInventoryTryAdd {
@@ -81,10 +87,16 @@ namespace Client
 
     typedef struct tagCraftFinished {
         _uint   iResultID;
-        _bool   bSuccess;    
+        _bool   bSuccess;
     } CRAFT_FINISHED_DESC;
 
     typedef struct tagBossDefeated {
         CGameObject* pBoss = { nullptr };
-	} BOSS_DEFEATED_DESC;
+    } BOSS_DEFEATED_DESC;
+
+    typedef struct tagKirbyPointStarGained
+    {
+        _uint iAmount = 1;
+    }KIRBY_POINTSTAR_GAINED_DESC;
+
 }

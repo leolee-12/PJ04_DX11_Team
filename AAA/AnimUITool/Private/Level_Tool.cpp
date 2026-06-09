@@ -18,7 +18,9 @@
 #include "GameObject.h"
 #include "UI_GenericContainer.h"
 #include "UI_SpriteAnim.h"
+#include "UI_Image.h"
 #include "UI_Text.h"
+#include "UI_Effect.h"
 
 namespace
 {
@@ -63,9 +65,6 @@ HRESULT CLevel_Tool::Initialize()
 
     if (FAILED(Ready_PreviewShaders()))
         return E_FAIL;
-
-    //if (FAILED(Ready_TestUI()))
-    //    return E_FAIL;
 
     return S_OK;
 }
@@ -210,33 +209,42 @@ HRESULT  CLevel_Tool::Save_UIContainer(CGameObject* pContainer, const _float2& v
 
         // 텍스처 매니페스트: 이 컨테이너가 쓰는 TextureProtoTag -> path
         json jTextures = json::object();
-        if (j["Container"].contains("UIPartObjects"))
-        {
-            for (auto& [strPartTag, jPart] :
-                j["Container"]["UIPartObjects"].items())
+        auto CollectTexturePath = [&](const json& jPart, const char* szField) -> HRESULT
             {
-                if (!jPart.contains("TextureProtoTag"))
-                    continue;
-                std::string strTag =
-                    jPart["TextureProtoTag"].get<std::string>();
+                if (!jPart.contains(szField))
+                    return S_OK;
+
+                std::string strTag = jPart.value(szField, std::string());
                 if (strTag.empty())
-                    continue;
+                    return S_OK;
+
                 auto it = m_TextureProtoPaths.find(StrToWstr(strTag));
-                if (it != m_TextureProtoPaths.end())
-                {
-                    jTextures[strTag] = WstrToStr(it->second);
-                }
-                else
+                if (it == m_TextureProtoPaths.end())
                 {
                     Log_Error("Save_UIContainer: missing texture path for " + strTag);
                     return E_FAIL;
                 }
+
+                jTextures[strTag] = WstrToStr(it->second);
+                return S_OK;
+            };
+
+        if (j["Container"].contains("UIPartObjects"))
+        {
+            for (auto& [strPartTag, jPart] : j["Container"]["UIPartObjects"].items())
+            {
+                if (FAILED(CollectTexturePath(jPart, "TextureProtoTag")))
+                    return E_FAIL;
+
+                if (FAILED(CollectTexturePath(jPart, "MaskTextureProtoTag")))
+                    return E_FAIL;
             }
         }
+
         j["Textures"] = jTextures;
 
         namespace fs = std::filesystem;
-        fs::path dir = L"../../Resources/CHJ/UI";
+        fs::path dir = L"../../Resources/CHJ/UI/Containers";
         std::error_code ec; fs::create_directories(dir, ec);
         fs::path path = dir / (strFileName + L"_ui.json");
 
@@ -389,6 +397,12 @@ CGameObject* CLevel_Tool::Load_UIContainerByPath(const _wstring& strFullPath, _f
                     {
                         jPart["TextureLevel"] = iObjectLevel;
                     }
+
+                    if (jPart.contains("MaskTextureProtoTag") &&
+                        !jPart.value("MaskTextureProtoTag", std::string()).empty())
+                    {
+                        jPart["MaskTextureLevel"] = iObjectLevel;
+                    }
                 }
             }
 
@@ -468,11 +482,10 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
     const _uint iPartProtoLevel = ETOUI(TOOL_LEVEL::STATIC);
     const _uint iTextureLevel = ETOUI(TOOL_LEVEL::EDIT);
 
-    auto* pGeneric =
-        dynamic_cast<Client::CUI_GenericContainer*>(pContainer);
-    if (!pGeneric)
+    auto* pUIContainer = dynamic_cast<CUIContainerObject*>(pContainer);
+    if (!pUIContainer)
     {
-        Log_Warning("Add_UIPart: not a GenericContainer");
+        Log_Warning("Add_UIPart: not a UIContainerObject");
         return nullptr;
     }
 
@@ -484,6 +497,8 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
         strProtoTag = Client::CUI_SpriteAnim::PROTOTYPE_TAG;
     else if (eType == UI_PART_TYPE::TEXT)
         strProtoTag = Client::CUI_Text::PROTOTYPE_TAG;
+    else if (eType == UI_PART_TYPE::EFFECT)
+        strProtoTag = Client::CUI_Effect::PROTOTYPE_TAG;
 
     // 파트 프로토 보장 (SpriteAnim은 컨테이너 로더가 안 올림)
     if (!m_pGameInstance_Proxy->Has_Prototype(iPartProtoLevel, strProtoTag))
@@ -519,7 +534,7 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
         desc.vPosition = { 0.f, 0.f };
         desc.iRenderLayer = 1;
 
-        hr = pGeneric->Add_Part(iPartProtoLevel, strProtoTag, strPartTag, &desc);
+        hr = pUIContainer->Add_Part(iPartProtoLevel, strProtoTag, strPartTag, &desc);
         break;
     }
 
@@ -536,7 +551,7 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
         desc.bLoop = true;
         desc.bAutoPlay = true;
 
-        hr = pGeneric->Add_Part(iPartProtoLevel, strProtoTag, strPartTag, &desc);
+        hr = pUIContainer->Add_Part(iPartProtoLevel, strProtoTag, strPartTag, &desc);
         break;
     }
 
@@ -552,11 +567,39 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
         desc.iRenderLayer = 2;
         desc.vSize = { 300.f, 100.f };
 
-        hr = pGeneric->Add_Part(
+        hr = pUIContainer->Add_Part(iPartProtoLevel, strProtoTag, strPartTag, &desc);
+
+        break;
+    }
+    case UI_PART_TYPE::EFFECT:
+    {
+        Client::CUI_Effect::UI_EFFECT_DESC desc{};
+        desc.iTextureLevel = iTextureLevel;
+        desc.szTextureProtoTag = nullptr;
+        desc.iMaskTextureLevel = iTextureLevel;
+        desc.szMaskTextureProtoTag = nullptr;
+
+        desc.vSize = { 100.f, 100.f };
+        desc.vPosition = { 0.f, 0.f };
+        desc.iRenderLayer = 1;
+
+        desc.vColor = { 1.f, 1.f, 1.f, 1.f };
+        desc.fAlpha = 1.f;
+
+        desc.vEffectTiling = { 1.f, 1.f };
+        desc.vEffectOffset = { 0.f, 0.f };
+        desc.fMaskPower = 1.f;
+        desc.fEffectIntensity = 1.f;
+        desc.iMaskChannel = 3;
+        desc.iInvertMask = 0;
+        desc.iShaderPass = ETOI(Client::CUI_Effect::EFFECT_PASS::MASKED_TEXTURE);
+
+        hr = pUIContainer->Add_Part(
             iPartProtoLevel, strProtoTag, strPartTag, &desc);
 
         break;
     }
+
 
     default:
         hr = E_FAIL;
@@ -566,7 +609,7 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
     if (FAILED(hr))
         return nullptr;
 
-    const auto& Parts = pGeneric->Get_UIPartObjects();
+    const auto& Parts = pUIContainer->Get_UIPartObjects();
     auto it = Parts.find(strPartTag);
     CUIPartObject* pPart =
         (it != Parts.end()) ? it->second : nullptr;
@@ -580,23 +623,22 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
 
 HRESULT CLevel_Tool::Remove_UIPart(CGameObject* pContainer, const _wstring& strPartTag)
 {
-    auto* pGeneric =
-        dynamic_cast<Client::CUI_GenericContainer*>(pContainer);
-    if (!pGeneric)
+    auto* pUIContainer = dynamic_cast<CUIContainerObject*>(pContainer);
+    if (!pUIContainer)
     {
-        Log_Warning("Remove_UIPart: not a GenericContainer");
+        Log_Warning("Remove_UIPart: not a UIContainerObject");
         return E_FAIL;
     }
-    return pGeneric->Remove_Part(strPartTag);
+    return pUIContainer->Remove_Part(strPartTag);
 }
 
 HRESULT CLevel_Tool::Rename_UIPart(CGameObject* pContainer, const _wstring& strOldTag, const _wstring& strNewTag)
 {
-    auto* pGeneric = dynamic_cast<CUI_GenericContainer*>(pContainer);
-    if (nullptr == pGeneric)
+    auto* pUIContainer = dynamic_cast<CUIContainerObject*>(pContainer);
+    if (nullptr == pUIContainer)
         return E_FAIL;
 
-    return pGeneric->Rename_Part(strOldTag, strNewTag);
+    return pUIContainer->Rename_Part(strOldTag, strNewTag);
 }
 
 HRESULT CLevel_Tool::Save_UIManifest(const _wstring& strManifestPath)
@@ -825,6 +867,12 @@ HRESULT CLevel_Tool::Load_UIManifest(const _wstring& strManifestPath)
                     {
                         jPart["TextureLevel"] = iObjectLevel;
                     }
+
+                    if (jPart.contains("MaskTextureProtoTag") &&
+                        !jPart.value("MaskTextureProtoTag", std::string()).empty())
+                    {
+                        jPart["MaskTextureLevel"] = iObjectLevel;
+                    }
                 }
             }
 
@@ -926,6 +974,17 @@ _wstring CLevel_Tool::Register_TextureProto(const _wstring& strTextureProtoTag, 
 
 void CLevel_Tool::Update(_float fTimeDelta)
 {
+    ImGuiIO& io = ImGui::GetIO();
+
+    if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F8, false))
+    {
+        KIRBY_POINTSTAR_GAINED_DESC Desc{};
+        Desc.iAmount = 1;
+
+        m_pGameInstance_Proxy->Publish(EventTag::Kirby_PointStarGained, &Desc);
+
+        Log_Info("Publish: Kirby.PointStarGained");
+    }
 }
 
 HRESULT CLevel_Tool::Render()

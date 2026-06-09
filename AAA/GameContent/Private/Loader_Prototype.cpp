@@ -11,6 +11,7 @@
 #include "UI_SpriteAnim.h"
 #include "Texture.h"
 #include "Movement.h"
+#include "UI_Effect.h"
 
 NS_BEGIN(Client)
 
@@ -174,6 +175,10 @@ HRESULT CLIENT_DLL Ready_Prototype_UIPartObjects(CGameInstance_Proxy* pProxy, ID
 
     if (FAILED(pProxy->Add_Prototype(ETOUI(LEVEL::STATIC), CUI_Text::PROTOTYPE_TAG,
         CUI_Text::Create(pDevice, pContext))))
+        return E_FAIL;
+
+    if (FAILED(pProxy->Add_Prototype(ETOUI(LEVEL::STATIC), CUI_Effect::PROTOTYPE_TAG,
+        CUI_Effect::Create(pDevice, pContext))))
         return E_FAIL;
 
     return S_OK;
@@ -348,6 +353,11 @@ HRESULT CLIENT_DLL Load_Level_UI(CGameInstance_Proxy* pProxy, ID3D11Device* pDev
                     if (jPart.contains("TextureProtoTag") && !jPart["TextureProtoTag"].get<string>().empty())
                     {
                         jPart["TextureLevel"] = iLevelIndex;
+                    }
+
+                    if (jPart.contains("MaskTextureProtoTag") && !jPart["MaskTextureProtoTag"].get<string>().empty())
+                    {
+                        jPart["MaskTextureLevel"] = iLevelIndex;
                     }
                 }
             }

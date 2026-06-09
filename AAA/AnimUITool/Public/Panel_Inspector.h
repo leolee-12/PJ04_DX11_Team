@@ -5,7 +5,9 @@
 NS_BEGIN(Engine)
 class CGameObject;
 class IReflectable;
+class CUIContainerObject;
 class CUIPartObject;
+class CTransform;
 NS_END
 
 NS_BEGIN(AnimUITool)
@@ -27,16 +29,20 @@ private:
 	void						Render_Bones();
 	void						Render_Meshs();
 	void						Render_KirbyFace(CGameObject* pObject);
-	void						Render_UITransform(CUIPartObject* pPart);
+	void						Render_UIContainerTransform(CUIContainerObject* pContainer, _bool bDefaultOpen);
+	void						Render_UIPartTransform(CUIPartObject* pPart);
 	void						Render_UIInspector();
 	void						Render_SpriteAnimControl(CUIPartObject* pPart);
 	void						Render_TextInspector(CUIPartObject* pPart);
+	void						Render_UIPartBounceInspector(CUIPartObject* pPart);
 
 private:
 	unordered_map<CGameObject*, _float3>	m_RotEditEuler;
 
 public:
-	static CPanel_Inspector* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CPanel_Inspector*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static float				Get_UIRotationZDeg(CTransform* pT);
+	static void					Set_UIRotationZDeg(CTransform* pT, float fDeg);
 
 protected:
 	virtual void				Free() override;

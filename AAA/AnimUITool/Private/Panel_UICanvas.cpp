@@ -120,6 +120,9 @@ void CPanel_UICanvas::Render()
         if (sel.pContainer && ImGui::MenuItem("Text"))
             AddPart(UI_PART_TYPE::TEXT);
 
+        if (sel.pContainer && ImGui::MenuItem("Effect"))
+            AddPart(UI_PART_TYPE::EFFECT);
+
         ImGui::EndPopup();
     }
 
@@ -226,7 +229,9 @@ void CPanel_UICanvas::Render()
 
         Draw_Grid(vImagePos.x, vImagePos.y, vSize.x, vSize.y);
         Handle_Selection();
+
         Draw_SelectedPart();
+        Draw_SelectedContainerPivot();
 
         if (m_bHasMouseCanvasPos)
         {
@@ -455,6 +460,103 @@ void CPanel_UICanvas::Handle_Selection()
     Clear_UISelection();
 }
 
+void CPanel_UICanvas::Draw_SelectedContainerPivot()
+{
+    if (!m_pPanel_Manager->Validate_UISelection())
+        return;
+
+    const UI_SELECTION& Selection =
+        m_pPanel_Manager->Get_UIContext().Selection;
+
+    if (!Selection.pContainer)
+        return;
+
+    CTransform* pTransform = Selection.pContainer->Get_Transform();
+    if (!pTransform)
+        return;
+
+    const _float4x4* pWorld = pTransform->Get_WorldMatrixPtr();
+    if (!pWorld)
+        return;
+
+    const _float2 vPivotUI = { pWorld->_41, pWorld->_42 };
+
+    _float2 vPivotScreen{};
+    if (!UIToScreenPos(vPivotUI, &vPivotScreen))
+        return;
+
+    ImDrawList* pDrawList = ImGui::GetWindowDrawList();
+
+    const ImVec2 vPivotDrawPos(vPivotScreen.x, vPivotScreen.y);
+
+    pDrawList->AddCircleFilled(
+        vPivotDrawPos,
+        5.f,
+        IM_COL32(80, 220, 255, 255));
+
+    pDrawList->AddCircle(
+        vPivotDrawPos,
+        8.f,
+        IM_COL32(10, 40, 50, 255),
+        16,
+        2.f);
+
+    pDrawList->AddLine(
+        ImVec2(vPivotDrawPos.x - 12.f, vPivotDrawPos.y),
+        ImVec2(vPivotDrawPos.x + 12.f, vPivotDrawPos.y),
+        IM_COL32(80, 220, 255, 255),
+        2.f);
+
+    pDrawList->AddLine(
+        ImVec2(vPivotDrawPos.x, vPivotDrawPos.y - 12.f),
+        ImVec2(vPivotDrawPos.x, vPivotDrawPos.y + 12.f),
+        IM_COL32(80, 220, 255, 255),
+        2.f);
+
+    auto Normalize2 = [](const _float2& v)
+        {
+            const _float fLen = sqrtf(v.x * v.x + v.y * v.y);
+
+            if (fLen <= FLT_EPSILON)
+                return _float2{ 0.f, 0.f };
+
+            return _float2{ v.x / fLen, v.y / fLen };
+        };
+
+    const _float2 vRight = Normalize2({ pWorld->_11, pWorld->_12 });
+    const _float2 vUp = Normalize2({ pWorld->_21, pWorld->_22 });
+
+    const _float fAxisLen = 36.f;
+
+    auto DrawAxis = [&](const _float2& vAxis, ImU32 iColor)
+        {
+            if (fabsf(vAxis.x) <= FLT_EPSILON &&
+                fabsf(vAxis.y) <= FLT_EPSILON)
+            {
+                return;
+            }
+
+            const _float2 vEndUI =
+            {
+                vPivotUI.x + vAxis.x * fAxisLen,
+                vPivotUI.y + vAxis.y * fAxisLen
+            };
+
+            _float2 vEndScreen{};
+            if (!UIToScreenPos(vEndUI, &vEndScreen))
+                return;
+
+            pDrawList->AddLine(
+                vPivotDrawPos,
+                ImVec2(vEndScreen.x, vEndScreen.y),
+                iColor,
+                2.f);
+        };
+
+    DrawAxis(vRight, IM_COL32(255, 80, 80, 255));
+    DrawAxis(vUp, IM_COL32(80, 255, 120, 255));
+}
+
 void CPanel_UICanvas::Draw_SelectedPart()
 {
     if (!m_pPanel_Manager->Validate_UISelection())
@@ -466,28 +568,25 @@ void CPanel_UICanvas::Draw_SelectedPart()
     if (!Build_PartBounds(Selection.pContainer, Selection.pPart, &Bounds))
         return;
 
-    const _float fHalfW = Bounds.vSize.x * 0.5f;
-    const _float fHalfH = Bounds.vSize.y * 0.5f;
+    _float2 s[4]{};
 
-    _float2 vTL = { Bounds.vCenter.x - fHalfW, Bounds.vCenter.y + fHalfH };
-    _float2 vTR = { Bounds.vCenter.x + fHalfW, Bounds.vCenter.y + fHalfH };
-    _float2 vBL = { Bounds.vCenter.x - fHalfW, Bounds.vCenter.y - fHalfH };
-    _float2 vBR = { Bounds.vCenter.x + fHalfW, Bounds.vCenter.y - fHalfH };
-
-    _float2 sTL{}, sTR{}, sBL{}, sBR{};
-    if (!UIToScreenPos(vTL, &sTL) || !UIToScreenPos(vTR, &sTR) ||
-        !UIToScreenPos(vBL, &sBL) || !UIToScreenPos(vBR, &sBR))
-        return;
+    for (_int i = 0; i < 4; ++i)
+    {
+        if (!UIToScreenPos(Bounds.vCorners[i], &s[i]))
+            return;
+    }
 
     ImDrawList* pDrawList = ImGui::GetWindowDrawList();
 
-    pDrawList->AddRect(
-        ImVec2(sTL.x, sTL.y),
-        ImVec2(sBR.x, sBR.y),
-        IM_COL32(255, 210, 80, 255),
-        0.f,
-        0,
-        2.f);
+    for (int i = 0; i < 4; ++i)
+    {
+        const int next = (i + 1) % 4;
+        pDrawList->AddLine(
+            ImVec2(s[i].x, s[i].y),
+            ImVec2(s[next].x, s[next].y),
+            IM_COL32(255, 210, 80, 255),
+            2.f);
+    }
 
     const _float fHandleHalf = 5.f;
     auto DrawHandle = [&](const _float2& vScreen)
@@ -503,10 +602,8 @@ void CPanel_UICanvas::Draw_SelectedPart()
                 IM_COL32(30, 30, 30, 255));
         };
 
-    DrawHandle(sTL);
-    DrawHandle(sTR);
-    DrawHandle(sBL);
-    DrawHandle(sBR);
+    for (int i = 0; i < 4; ++i)
+        DrawHandle(s[i]);
 }
 
 void CPanel_UICanvas::Clear_UISelection()
@@ -540,6 +637,12 @@ _bool CPanel_UICanvas::Build_PartBounds(CUIContainerObject* pContainer, CUIPartO
 
     pOutBounds->vCenter = { Combined._41, Combined._42 };
     pOutBounds->vSize = { fScaleX, fScaleY };
+    pOutBounds->WorldMatrix = Combined;
+
+    pOutBounds->vCorners[0] = Transform_UIPoint(-0.5f, 0.5f, Combined); // TL
+    pOutBounds->vCorners[1] = Transform_UIPoint(0.5f, 0.5f, Combined); // TR
+    pOutBounds->vCorners[2] = Transform_UIPoint(0.5f, -0.5f, Combined); // BR
+    pOutBounds->vCorners[3] = Transform_UIPoint(-0.5f, -0.5f, Combined); // BL
 
     // Renderer 정렬 기준과 맞춘다. 현재 Get_ZOrder는 Part transform의 z를 반환한다.
     pOutBounds->fZ = pPart->Get_ZOrder();
@@ -581,13 +684,17 @@ _bool CPanel_UICanvas::Pick_TopmostPart(const _float2& vMouseUI, UI_PICK_CANDIDA
             if (!Build_PartBounds(pContainer, pPart, &Bounds))
                 continue;
 
-            const _float fHalfW = Bounds.vSize.x * 0.5f;
-            const _float fHalfH = Bounds.vSize.y * 0.5f;
+            _matrix matWorld = XMLoadFloat4x4(&Bounds.WorldMatrix);
+            _matrix matInv = XMMatrixInverse(nullptr, matWorld);
 
-            if (vMouseUI.x < Bounds.vCenter.x - fHalfW ||
-                vMouseUI.x > Bounds.vCenter.x + fHalfW ||
-                vMouseUI.y < Bounds.vCenter.y - fHalfH ||
-                vMouseUI.y > Bounds.vCenter.y + fHalfH)
+            _vector vLocal = XMVector3TransformCoord(
+                XMVectorSet(vMouseUI.x, vMouseUI.y, 0.f, 1.f),
+                matInv);
+
+            const _float lx = XMVectorGetX(vLocal);
+            const _float ly = XMVectorGetY(vLocal);
+
+            if (fabsf(lx) > 0.5f || fabsf(ly) > 0.5f)
                 continue;
 
             const _int iNewLayer = static_cast<_int>(Bounds.eRenderLayer);
@@ -653,18 +760,13 @@ _bool CPanel_UICanvas::Hit_SelectedHandle(const _float2& vMouseScreen, UI_DRAG_M
     if (!Build_PartBounds(Selection.pContainer, Selection.pPart, &Bounds))
         return false;
 
-    const _float fHalfW = Bounds.vSize.x * 0.5f;
-    const _float fHalfH = Bounds.vSize.y * 0.5f;
+    _float2 s[4]{};
 
-    _float2 vTL = { Bounds.vCenter.x - fHalfW, Bounds.vCenter.y + fHalfH };
-    _float2 vTR = { Bounds.vCenter.x + fHalfW, Bounds.vCenter.y + fHalfH };
-    _float2 vBL = { Bounds.vCenter.x - fHalfW, Bounds.vCenter.y - fHalfH };
-    _float2 vBR = { Bounds.vCenter.x + fHalfW, Bounds.vCenter.y - fHalfH };
-
-    _float2 sTL{}, sTR{}, sBL{}, sBR{};
-    if (!UIToScreenPos(vTL, &sTL) || !UIToScreenPos(vTR, &sTR) ||
-        !UIToScreenPos(vBL, &sBL) || !UIToScreenPos(vBR, &sBR))
-        return false;
+    for (_int i = 0; i < 4; ++i)
+    {
+        if (!UIToScreenPos(Bounds.vCorners[i], &s[i]))
+            return false;
+    }
 
     const _float fHandleHalf = 7.f;
 
@@ -677,10 +779,10 @@ _bool CPanel_UICanvas::Hit_SelectedHandle(const _float2& vMouseScreen, UI_DRAG_M
                 fDy >= -fHandleHalf && fDy <= fHandleHalf;
         };
 
-    if (Hit(sTL)) { *pOutMode = UI_DRAG_MODE::RESIZE_TL; return true; }
-    if (Hit(sTR)) { *pOutMode = UI_DRAG_MODE::RESIZE_TR; return true; }
-    if (Hit(sBL)) { *pOutMode = UI_DRAG_MODE::RESIZE_BL; return true; }
-    if (Hit(sBR)) { *pOutMode = UI_DRAG_MODE::RESIZE_BR; return true; }
+    if (Hit(s[0])) { *pOutMode = UI_DRAG_MODE::RESIZE_TL; return true; }
+    if (Hit(s[1])) { *pOutMode = UI_DRAG_MODE::RESIZE_TR; return true; }
+    if (Hit(s[3])) { *pOutMode = UI_DRAG_MODE::RESIZE_BL; return true; }
+    if (Hit(s[2])) { *pOutMode = UI_DRAG_MODE::RESIZE_BR; return true; }
 
     return false;
 }
@@ -707,6 +809,23 @@ void CPanel_UICanvas::Begin_Drag(UI_DRAG_MODE eMode, const _float2& vMouseUI)
     m_vDragStartCenter = { XMVectorGetX(vPos), XMVectorGetY(vPos) };
     m_vDragStartSize = { vScale.x, vScale.y };
     m_fDragStartZ = XMVectorGetZ(vPos);
+
+    auto NormalizeAxis2 = [](_vector vAxis, const _float2& vFallback)
+        {
+            _float2 v = { XMVectorGetX(vAxis), XMVectorGetY(vAxis) };
+            const _float fLen = sqrtf(v.x * v.x + v.y * v.y);
+
+            if (fLen <= FLT_EPSILON)
+                return vFallback;
+
+            return _float2{ v.x / fLen, v.y / fLen };
+        };
+
+    m_vDragStartRightAxis =
+        NormalizeAxis2(pTransform->Get_State(STATE::RIGHT), { 1.f, 0.f });
+
+    m_vDragStartUpAxis =
+        NormalizeAxis2(pTransform->Get_State(STATE::UP), { 0.f, 1.f });
 }
 
 void CPanel_UICanvas::Update_Drag(const _float2& vMouseUI)
@@ -735,52 +854,73 @@ void CPanel_UICanvas::Update_Drag(const _float2& vMouseUI)
         vMouseUI.y - m_vDragStartMouseUI.y
     };
 
-    _float2 vLocalDelta{};
-    if (!UIToLocalDelta(vUIDelta, &vLocalDelta))
-        vLocalDelta = vUIDelta;
+    _float2 vParentDelta{};
+    if (!UIToLocalDelta(vUIDelta, &vParentDelta))
+        vParentDelta = vUIDelta;
 
     _float2 vNewCenter = m_vDragStartCenter;
     _float2 vNewSize = m_vDragStartSize;
 
+    constexpr _float fMinSize = 8.f;
+
+    auto Dot2 = [](const _float2& a, const _float2& b)
+        {
+            return a.x * b.x + a.y * b.y;
+        };
+
+    auto ApplyResize = [&](const _float fSignX, const _float fSignY)
+        {
+            const _float fDeltaRight = Dot2(vParentDelta, m_vDragStartRightAxis);
+            const _float fDeltaUp = Dot2(vParentDelta, m_vDragStartUpAxis);
+
+            _float fNewW = m_vDragStartSize.x + fSignX * fDeltaRight;
+            _float fNewH = m_vDragStartSize.y + fSignY * fDeltaUp;
+
+            if (fNewW < fMinSize)
+                fNewW = fMinSize;
+
+            if (fNewH < fMinSize)
+                fNewH = fMinSize;
+
+            const _float fAppliedW = fNewW - m_vDragStartSize.x;
+            const _float fAppliedH = fNewH - m_vDragStartSize.y;
+
+            vNewSize = { fNewW, fNewH };
+
+            vNewCenter.x =
+                m_vDragStartCenter.x +
+                m_vDragStartRightAxis.x * (fSignX * fAppliedW * 0.5f) +
+                m_vDragStartUpAxis.x * (fSignY * fAppliedH * 0.5f);
+
+            vNewCenter.y =
+                m_vDragStartCenter.y +
+                m_vDragStartRightAxis.y * (fSignX * fAppliedW * 0.5f) +
+                m_vDragStartUpAxis.y * (fSignY * fAppliedH * 0.5f);
+        };
+
     switch (m_eDragMode)
     {
     case UI_DRAG_MODE::MOVE:
-        vNewCenter.x = m_vDragStartCenter.x + vLocalDelta.x;
-        vNewCenter.y = m_vDragStartCenter.y + vLocalDelta.y;
+        vNewCenter.x = m_vDragStartCenter.x + vParentDelta.x;
+        vNewCenter.y = m_vDragStartCenter.y + vParentDelta.y;
         break;
 
     case UI_DRAG_MODE::RESIZE_TL:
-        vNewSize.x = m_vDragStartSize.x - vLocalDelta.x;
-        vNewSize.y = m_vDragStartSize.y + vLocalDelta.y;
-        vNewCenter.x = m_vDragStartCenter.x + vLocalDelta.x * 0.5f;
-        vNewCenter.y = m_vDragStartCenter.y + vLocalDelta.y * 0.5f;
+        ApplyResize(-1.f, 1.f);
         break;
 
     case UI_DRAG_MODE::RESIZE_TR:
-        vNewSize.x = m_vDragStartSize.x + vLocalDelta.x;
-        vNewSize.y = m_vDragStartSize.y + vLocalDelta.y;
-        vNewCenter.x = m_vDragStartCenter.x + vLocalDelta.x * 0.5f;
-        vNewCenter.y = m_vDragStartCenter.y + vLocalDelta.y * 0.5f;
+        ApplyResize(1.f, 1.f);
         break;
 
     case UI_DRAG_MODE::RESIZE_BL:
-        vNewSize.x = m_vDragStartSize.x - vLocalDelta.x;
-        vNewSize.y = m_vDragStartSize.y - vLocalDelta.y;
-        vNewCenter.x = m_vDragStartCenter.x + vLocalDelta.x * 0.5f;
-        vNewCenter.y = m_vDragStartCenter.y + vLocalDelta.y * 0.5f;
+        ApplyResize(-1.f, -1.f);
         break;
 
     case UI_DRAG_MODE::RESIZE_BR:
-        vNewSize.x = m_vDragStartSize.x + vLocalDelta.x;
-        vNewSize.y = m_vDragStartSize.y - vLocalDelta.y;
-        vNewCenter.x = m_vDragStartCenter.x + vLocalDelta.x * 0.5f;
-        vNewCenter.y = m_vDragStartCenter.y + vLocalDelta.y * 0.5f;
+        ApplyResize(1.f, -1.f);
         break;
     }
-
-    const _float fMinSize = 8.f;
-    if (vNewSize.x < fMinSize) vNewSize.x = fMinSize;
-    if (vNewSize.y < fMinSize) vNewSize.y = fMinSize;
 
     pTransform->Set_Scale(vNewSize.x, vNewSize.y, 1.f);
     pTransform->Set_State(

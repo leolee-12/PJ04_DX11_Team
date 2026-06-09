@@ -85,6 +85,7 @@
     <ClInclude Include="..\Public\UI_Effect.h" />
     <ClInclude Include="..\Public\TornadoSpinReverse.h" />
     <ClInclude Include="..\Public\UI_Image.h" />
+    <ClInclude Include="..\Public\UI_PointStar.h" />
     <ClInclude Include="..\Public\UI_SpriteAnim.h" />
     <ClInclude Include="..\Public\UI_TestImageContainer.h" />
     <ClInclude Include="..\Public\UI_Text.h" />
@@ -145,6 +146,7 @@
     <ClCompile Include="..\Private\UI_Effect.cpp" />
     <ClCompile Include="..\Private\TornadoSpinReverse.cpp" />
     <ClCompile Include="..\Private\UI_Image.cpp" />
+    <ClCompile Include="..\Private\UI_PointStar.cpp" />
     <ClCompile Include="..\Private\UI_SpriteAnim.cpp" />
     <ClCompile Include="..\Private\UI_TestImageContainer.cpp" />
     <ClCompile Include="..\Private\UI_Text.cpp" />

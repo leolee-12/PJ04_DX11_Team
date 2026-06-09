@@ -57,9 +57,9 @@ public:
 	virtual CGameObject* Clone(void* pArg) override;
 
 private:
-	CShader* m_pShaderCom = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
-	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
+	CShader*				m_pShaderCom = { nullptr };
+	CTexture*				m_pTextureCom = { nullptr };
+	CVIBuffer_Rect*			m_pVIBufferCom = { nullptr };
 
 private:
 	HRESULT					Ready_Components(UI_IMAGE_DESC* pDesc);

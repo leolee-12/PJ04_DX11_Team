@@ -60,6 +60,7 @@ void CUI_Image::Priority_Update(_float fTimeDelta)
 
 void CUI_Image::Update(_float fTimeDetla)
 {
+	__super::Update(fTimeDetla);
 }
 
 void CUI_Image::Late_Update(_float fTimeDelta)
