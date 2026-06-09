@@ -33,6 +33,8 @@ public:
     void  Set_Stats(_float fMoveSpeed, _float fRotSpeedDeg, _float fGravity, _float fJumpSpeed);
     void  Set_Acceleration(_float Accel, _float Decel);
 
+    _float Get_VerticalVelocity() { return m_fVerticalVelocity; }
+
     _bool Move(_fvector vWishDir, _float fTimeDelta);
     void  Jump();
     void  Sync_To_Controller();

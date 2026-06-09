@@ -11,16 +11,13 @@ NS_BEGIN(Client)
 
 class CKirby;
 
-class CLIENT_DLL CKirby_Jump final : public CKirby_State
+class CLIENT_DLL CKirby_Fall final : public CKirby_State
 {
 private:
-	CKirby_Jump();
-	virtual ~CKirby_Jump() = default;
+	CKirby_Fall();
+	virtual ~CKirby_Fall() = default;
 
-	enum class JUMP_STATE
-	{
-		JUMP_STRAT,
-	};
+	enum class FALL_STATE { FALLING, LAND_START };
 
 private:
 	HRESULT Initialize();
@@ -37,14 +34,10 @@ public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
 private:
-	_bool m_bFirstFrameSkip{};
-
-	JUMP_STATE m_eJumpType{};
-
-	static _bool m_bLeft;
+	FALL_STATE m_eFallingState{};
 
 public:
-	static CKirby_Jump* Create();
+	static CKirby_Fall* Create();
 private:
 	virtual void Free() override;
 };

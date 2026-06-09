@@ -214,11 +214,14 @@
     <Filter Include="05. Kirby\02. Kirby_Ability\00. Kirby_Ability_Normal">
       <UniqueIdentifier>{1f1ebec8-785f-4d2a-be62-dc3edc8740d0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="05. Kirby\01. StateMachine\State\04. Attack">
+    <Filter Include="05. Kirby\01. StateMachine\State\04. Inhale">
+      <UniqueIdentifier>{1a16a95c-467c-4517-b7e1-f705d612b308}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. Kirby\01. StateMachine\State\05. Attack">
       <UniqueIdentifier>{a856ba07-405b-4c82-8eb0-595b2b12db9c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="05. Kirby\01. StateMachine\State\03. Inhale">
-      <UniqueIdentifier>{1a16a95c-467c-4517-b7e1-f705d612b308}</UniqueIdentifier>
+    <Filter Include="05. Kirby\01. StateMachine\State\03. Fall">
+      <UniqueIdentifier>{90847b7a-deeb-40fd-9d4c-a4fb630d5f56}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -442,10 +445,13 @@
       <Filter>05. Kirby\01. StateMachine\State\02. Jump</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Attack.h">
-      <Filter>05. Kirby\01. StateMachine\State\04. Attack</Filter>
+      <Filter>05. Kirby\01. StateMachine\State\05. Attack</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Inhale.h">
-      <Filter>05. Kirby\01. StateMachine\State\03. Inhale</Filter>
+      <Filter>05. Kirby\01. StateMachine\State\04. Inhale</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Fall.h">
+      <Filter>05. Kirby\01. StateMachine\State\03. Fall</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -624,10 +630,13 @@
       <Filter>05. Kirby</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Attack.cpp">
-      <Filter>05. Kirby\01. StateMachine\State\04. Attack</Filter>
+      <Filter>05. Kirby\01. StateMachine\State\05. Attack</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Inhale.cpp">
-      <Filter>05. Kirby\01. StateMachine\State\03. Inhale</Filter>
+      <Filter>05. Kirby\01. StateMachine\State\04. Inhale</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Fall.cpp">
+      <Filter>05. Kirby\01. StateMachine\State\03. Fall</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

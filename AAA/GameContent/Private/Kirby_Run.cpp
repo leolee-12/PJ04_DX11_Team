@@ -31,6 +31,16 @@ void CKirby_Run::Enter(CKirby* pKirby)
 
 void CKirby_Run::Update(CKirby* pKirby, const _float fTimeDelta)
 {
+    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+
+    // Fall
+    if (Try_FallState(pKirby) == true)
+    {
+        const _float fSpeed = 2.f;
+        pAnimator->Play("Fall", false, false, 0.1f, fSpeed);
+    }
+
+    // Wait
     if (pKirby->Has_MoveDir() == false)
         pKirby->Change_State(KIRBY_STATE_TYPE::WAIT);
 }

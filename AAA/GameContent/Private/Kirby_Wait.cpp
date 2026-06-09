@@ -29,6 +29,14 @@ void CKirby_Wait::Enter(CKirby* pKirby)
 
 void CKirby_Wait::Update(CKirby* pKirby, const _float fTimeDelta)
 {
+    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+
+    // Fall
+    if (Try_FallState(pKirby) == true)
+    {
+        const _float fSpeed = 2.f;
+        pAnimator->Play("Fall", false, false, 0.1f, fSpeed);
+    }
 }
 
 void CKirby_Wait::Exit(CKirby* pKirby)
@@ -58,8 +66,6 @@ _bool CKirby_Wait::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
         case KIRBY_COMMAND_TYPE::ATTACK_DOWN:
             pKirby->Get_KirbyAbility()->Down_Attack(pKirby);
             return true;
-
-
     }
 
     return false;

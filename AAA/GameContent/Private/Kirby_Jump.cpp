@@ -5,7 +5,7 @@
 #include "Kirby.h"
 #include "Kirby_Body.h"
 
- _bool CKirby_Jump::m_bLeftRight = false;
+ _bool CKirby_Jump::m_bLeft = false;
 
 
 CKirby_Jump::CKirby_Jump()
@@ -31,7 +31,7 @@ void CKirby_Jump::Enter(CKirby* pKirby)
 
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
      const _float fSpeed = 5.f;
-    if (m_bLeftRight == true)
+    if (m_bLeft == true)
         pAnimator->Play("JumpL", false, false, 0.1f, fSpeed);
     else
         pAnimator->Play("JumpR", false, false, 0.1f, fSpeed);
@@ -42,55 +42,39 @@ void CKirby_Jump::Enter(CKirby* pKirby)
 
 void CKirby_Jump::Update(CKirby* pKirby, const _float fTimeDelta)
 {
-    CMovement* pMovementCom = static_cast<CMovement*>(pKirby->Get_Component<CMovement>(TEXT("Com_Movement")));
-
     if (m_bFirstFrameSkip == false)
     {
         m_bFirstFrameSkip = true;
         return;
     }
 
-    if (m_bFirstFrameSkip == true)
+    CMovement* pMovementCom = pKirby->Get_Movement();
+
+    _float fYVelocity = pMovementCom->Get_VerticalVelocity();
+    _bool bIsGround = pMovementCom->Is_Grounded();
+
+    // Fall
+    if (fYVelocity <= 0.005f)
     {
-        CKirby_Body* pKirby_Body = pKirby->Get_Body();
-        CAnimator* pAnimator = pKirby_Body->Get_Animator();
-
-        _bool bIsGround = pMovementCom->Is_Grounded();
-
-        if (m_eJumpType == JUMP_STATE::JUMP_STRAT && bIsGround == true)
+        pKirby->Change_State(KIRBY_STATE_TYPE::FALL);
+        if (rand() % 2 == 0)
         {
-            pAnimator->Play("Landing", false, false, 0.05f, 1.f);
+            CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
 
-            pKirby_Body->Set_Eye(KIRBY_EYE_STATE::CLOSE);
+            const _float fSpeed = 2.2f;
 
-            m_eJumpType = JUMP_STATE::LAND_START;
-        }
-        else if (m_eJumpType == JUMP_STATE::LAND_START && pAnimator->Is_Finished())
-        {
-            pKirby_Body->Set_Eye(KIRBY_EYE_STATE::IDLE);
-
-            if (pKirby->Has_MoveDir() == true)
-                pKirby->Change_State(KIRBY_STATE_TYPE::RUN);
+            if (m_bLeft == true)
+                pAnimator->Play("JumpEndL", false, false, 0.0f, fSpeed);
             else
-                pKirby->Change_State(KIRBY_STATE_TYPE::WAIT);
-
- /*           pAnimator->Play("LandingEnd", false, false, 0.05f, 2.f);
-            m_eJumpType = JUMP_STATE::LAND_END;*/
+                pAnimator->Play("JumpEndR", false, false, 0.0f, fSpeed);
         }
-        //else if (m_eJumpType == JUMP_STATE::LAND_END && pAnimator->Is_Finished())
-        //{
-        //    if(pKirby->Has_MoveDir() == true)
-        //        pKirby->Change_State(KIRBY_STATE_TYPE::RUN);
-        //    else
-        //        pKirby->Change_State(KIRBY_STATE_TYPE::WAIT);
-        //}
-    }
+    }      
 }
 
 void CKirby_Jump::Exit(CKirby* pKirby)
 {
     m_bFirstFrameSkip = false;
-    m_bLeftRight = !m_bLeftRight;
+    m_bLeft = !m_bLeft;
 }
 
 _bool CKirby_Jump::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -107,6 +91,8 @@ _bool CKirby_Jump::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
         case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
             Handle_MoveCommand(pKirby, pCommand);
             return true;
+
+
     }
 
     return false;
