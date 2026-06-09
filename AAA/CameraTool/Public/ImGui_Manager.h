@@ -25,7 +25,7 @@ private:
 
 public:
     HRESULT ImGui_Initialize(ID3D11Device** ppDevice, ID3D11DeviceContext** ppContext, CLevel_Edit* pLevelEdit,
-        ID3D11ShaderResourceView** ppSRV);
+        ID3D11ShaderResourceView** ppSRV, ID3D11ShaderResourceView** ppSRV2);
     void ImGui_Render();
 
 private:
@@ -33,6 +33,7 @@ private:
     void Draw_List();
     void Draw_Inspector();
     void Draw_Viewport();
+    void Draw_Preview();
 
     void Draw_AreaInspector(Client::CAM_AREA& A, _int idx);
     void Draw_NodeInspector();
@@ -47,6 +48,8 @@ private:
     CGameInstance_Proxy* m_pGameInstance_Proxy = { nullptr };
     ImGuizmo::OPERATION       m_eGizmoOp = { ImGuizmo::TRANSLATE };
     ID3D11ShaderResourceView* m_pSRV = { nullptr };
+    ID3D11ShaderResourceView* m_pSRV2 = { nullptr };
+
     ID3D11DeviceContext* m_pContext = { nullptr };
     ID3D11BlendState* m_pOpaqueBlend = { nullptr };
 

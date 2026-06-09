@@ -35,7 +35,6 @@ void CLevel_Edit::Update(_float fTimeDelta)
     if (m_bPreview && m_pCamera)
     {
         Client::CAM_POSE pose = m_Solver.Solve(XMLoadFloat3(&m_vKirby));
-        m_pCamera->Set_PreviewPose(pose.eye, pose.fwd, pose.up, pose.fov);
     }
 }
 
@@ -65,7 +64,6 @@ void CLevel_Edit::Add_Layer(const wstring& strLayerTag)
 void CLevel_Edit::Set_Preview(_bool b)
 {
     m_bPreview = b;
-    if (m_pCamera) m_pCamera->Set_PreviewMode(b);
 }
 
 void CLevel_Edit::Set_CameraActive(_bool b)
@@ -74,7 +72,20 @@ void CLevel_Edit::Set_CameraActive(_bool b)
         m_pCamera->Set_Active(b);
 }
 
+void CLevel_Edit::Get_PreviewViewProj(_float4x4* pView, _float4x4* pProj)
+{
+    Client::CAM_POSE p = m_Solver.Solve(XMLoadFloat3(&m_vKirby));
 
+    _vector vEye = XMLoadFloat3(&p.eye);
+    _vector vLook = XMVector3Normalize(XMLoadFloat3(&p.fwd));
+    _vector vUp = XMLoadFloat3(&p.up);
+    if (fabsf(XMVectorGetX(XMVector3Dot(vLook, vUp))) > 0.999f)   // look parallel to up guard
+        vUp = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+
+    XMStoreFloat4x4(pView, XMMatrixLookToLH(vEye, vLook, vUp));
+    _float fAspect = (_float)g_iWinSizeX / (_float)g_iWinSizeY;
+    XMStoreFloat4x4(pProj, XMMatrixPerspectiveFovLH(XMConvertToRadians(p.fov), fAspect, 0.1f, 1000.f));
+}
 
 HRESULT CLevel_Edit::Ready_EditLights()
 {

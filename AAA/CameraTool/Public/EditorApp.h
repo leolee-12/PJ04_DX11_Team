@@ -11,6 +11,7 @@ NS_END
 NS_BEGIN(Editor)
 
 class CImGui_Manager;
+class CLevel_Edit;
 
 class CEditorApp final : public CBase
 {
@@ -34,12 +35,19 @@ private:
 	ID3D11RenderTargetView* m_pRTV = { nullptr };
 	ID3D11ShaderResourceView* m_pSRV = { nullptr };
 	ID3D11DepthStencilView* m_pDSV = { nullptr };
+
+	ID3D11RenderTargetView*		m_pRTV2 = { nullptr };
+	ID3D11ShaderResourceView*	m_pSRV2 = { nullptr };
+	ID3D11DepthStencilView*		m_pDSV2 = { nullptr };
+
+	CLevel_Edit* m_pLevel_Edit = { nullptr };
+	_bool		 m_bPreviewFrame = { false };
+
 private:
 	HRESULT Start_Level();
 	HRESULT Ready_SharedResources();
-
 	HRESULT Ready_EditRTV();
-
+	HRESULT Make_OffscreenRTV(ID3D11RenderTargetView** ppRTV, ID3D11ShaderResourceView** ppSRV, ID3D11DepthStencilView** ppDSV);
 	void Editor_BeginDraw();
 
 public:

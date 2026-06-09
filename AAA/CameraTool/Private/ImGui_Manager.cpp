@@ -29,7 +29,7 @@ void CImGui_Manager::Viewport_DisableBlend(const ImDrawList*, const ImDrawCmd* c
 }
 
 HRESULT CImGui_Manager::ImGui_Initialize(ID3D11Device** ppDevice, ID3D11DeviceContext** ppContext, CLevel_Edit*
-    pLevelEdit, ID3D11ShaderResourceView** ppSRV)
+    pLevelEdit, ID3D11ShaderResourceView** ppSRV, ID3D11ShaderResourceView** ppSRV2)
 {
     if (!pLevelEdit || !ppDevice || !ppContext) { MSG_BOX("ImGui_Initialize Failed"); return E_FAIL; }
 
@@ -55,6 +55,7 @@ HRESULT CImGui_Manager::ImGui_Initialize(ID3D11Device** ppDevice, ID3D11DeviceCo
 
     m_pLevel_Edit = pLevelEdit; Safe_AddRef(m_pLevel_Edit);
     m_pSRV = *ppSRV;            Safe_AddRef(m_pSRV);
+    m_pSRV2 = *ppSRV2;          Safe_AddRef(m_pSRV2);
     m_pContext = *ppContext;    Safe_AddRef(m_pContext);
 
     D3D11_BLEND_DESC bd{};
@@ -91,6 +92,8 @@ void CImGui_Manager::ImGui_Render()
 
     ImGui::SetNextWindowPos(ImVec2(P.x + S.x - rightW, cy), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(rightW, ch), ImGuiCond_Always); Draw_Inspector();
+
+    Draw_Preview();
 
     ImGui::Render();
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -356,15 +359,15 @@ void CImGui_Manager::Draw_Inspector()
 
 void CImGui_Manager::Draw_Viewport()
 {
-    ImGui::Begin("Viewport", nullptr, PANEL_FLAGS);
+    ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoCollapse);
 
     ImVec2 avail = ImGui::GetContentRegionAvail();
     float ta = 1600.f / 900.f, aa = avail.x / avail.y; ImVec2 sz;
     if (aa > ta) { sz.y = avail.y; sz.x = avail.y * ta; }
     else { sz.x = avail.x; sz.y = avail.x / ta; }
     ImVec2 off((avail.x - sz.x) * 0.5f, (avail.y - sz.y) * 0.5f);
-    ImVec2 cur = ImGui::GetCursorPos();
-    ImGui::SetCursorPos(ImVec2(cur.x + off.x, cur.y + off.y));
+    ImVec2 cur = ImGui::GetCursorPos(); ImGui::SetCursorPos(ImVec2(cur.x + off.x, cur.y + off.y));
     ImVec2 vPos = ImGui::GetCursorScreenPos();
 
     ImDrawList* dl = ImGui::GetWindowDrawList();
@@ -376,18 +379,16 @@ void CImGui_Manager::Draw_Viewport()
     const _float4x4* pProj = m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
     if (!pView || !pProj) { ImGui::End(); return; }
 
-    auto W2S = [&](const _float3& w) -> ImVec2
-        {
-            XMVECTOR clip = XMVector4Transform(XMVectorSet(w.x, w.y, w.z, 1.f), XMLoadFloat4x4(pView) *
-                XMLoadFloat4x4(pProj));
-            float cw = XMVectorGetW(clip);
-            if (cw < 1e-5f) return ImVec2(-9999.f, -9999.f);
-            float x = XMVectorGetX(clip) / cw, y = XMVectorGetY(clip) / cw;
-            return ImVec2(vPos.x + (x + 1.f) * 0.5f * sz.x, vPos.y + (1.f - y) * 0.5f * sz.y);
+    auto W2S = [&](const _float3& w) -> ImVec2 {
+        XMVECTOR clip = XMVector4Transform(XMVectorSet(w.x, w.y, w.z, 1.f), XMLoadFloat4x4(pView) *
+            XMLoadFloat4x4(pProj));
+        float cw = XMVectorGetW(clip); if (cw < 1e-5f) return ImVec2(-9999.f, -9999.f);
+        float x = XMVectorGetX(clip) / cw, y = XMVectorGetY(clip) / cw;
+        return ImVec2(vPos.x + (x + 1.f) * 0.5f * sz.x, vPos.y + (1.f - y) * 0.5f * sz.y);
         };
 
     bool bRight = ImGui::IsItemHovered() && ImGui::IsMouseDown(ImGuiMouseButton_Right);
-    m_pLevel_Edit->Set_CameraActive(bRight && !m_pLevel_Edit->Is_Preview());
+    m_pLevel_Edit->Set_CameraActive(bRight);
 
     auto& solver = m_pLevel_Edit->Get_Solver();
     auto& areas = solver.Areas();
@@ -397,80 +398,67 @@ void CImGui_Manager::Draw_Viewport()
     int curArea = solver.Cur_AreaIndex();
     auto sel = m_pLevel_Edit->Get_SelType();
 
-    auto DrawOBB = [&](const CAM_AREA& A, ImU32 col)
-        {
-            _vector c = XMLoadFloat3(&A.center), q = XMLoadFloat4(&A.rot);
-            _float3 h; XMStoreFloat3(&h, XMVectorScale(XMLoadFloat3(&A.size), 0.5f));
-            const float sx[8] = { -1,1,1,-1,-1,1,1,-1 }, sy[8] = { -1,-1,1,1,-1,-1,1,1 }, sz3[8] = {
--1,-1,-1,-1,1,1,1,1 };
-            ImVec2 p[8];
-            for (int k = 0; k < 8; ++k)
-            {
-                _vector l = XMVectorSet(sx[k] * h.x, sy[k] * h.y, sz3[k] * h.z, 0.f);
-                _float3 wf; XMStoreFloat3(&wf, XMVectorAdd(c, XMVector3Rotate(l, q)));
-                p[k] = W2S(wf);
-            }
-            const int e[12][2] = { {0,1},{1,2},{2,3},{3,0},{4,5},{5,6},{6,7},{7,4},{0,4},{1,5},{2,6},{3,7} };
-            for (auto& ed : e)
-                if (p[ed[0]].x > -9000.f && p[ed[1]].x > -9000.f) dl->AddLine(p[ed[0]], p[ed[1]], col, 1.5f);
+    auto DrawOBB = [&](const CAM_AREA& A, ImU32 col) {
+        _vector c = XMLoadFloat3(&A.center), q = XMLoadFloat4(&A.rot);
+        _float3 h; XMStoreFloat3(&h, XMVectorScale(XMLoadFloat3(&A.size), 0.5f));
+        const float sx[8] = { -1,1,1,-1,-1,1,1,-1 }, sy[8] = { -1,-1,1,1,-1,-1,1,1 }, sz3[8] = { -1,-1,-1,-1,1,1,1,1
+        };
+        ImVec2 p[8];
+        for (int k = 0; k < 8; ++k) {
+            _vector l = XMVectorSet(sx[k] * h.x, sy[k] * h.y, sz3[k] * h.z, 0.f);
+            _float3 wf; XMStoreFloat3(&wf, XMVectorAdd(c, XMVector3Rotate(l, q))); p[k] = W2S(wf);
+        }
+        const int e[12][2] = { {0,1},{1,2},{2,3},{3,0},{4,5},{5,6},{6,7},{7,4},{0,4},{1,5},{2,6},{3,7} };
+        for (auto& ed : e) if (p[ed[0]].x > -9000.f && p[ed[1]].x > -9000.f) dl->AddLine(p[ed[0]], p[ed[1]], col,
+            1.5f);
         };
 
-    for (int i = 0; i < (int)areas.size(); ++i)
-    {
+    for (int i = 0; i < (int)areas.size(); ++i) {
         ImU32 col = (sel == CLevel_Edit::SEL::AREA && m_pLevel_Edit->Get_SelArea() == i) ? IM_COL32(255, 220, 60, 255)
             : (i == curArea) ? IM_COL32(80, 220, 120, 255) : IM_COL32(150, 150, 150, 170);
         DrawOBB(areas[i], col);
     }
-    for (int r = 0; r < (int)rails.size(); ++r)
-    {
+    for (int r = 0; r < (int)rails.size(); ++r) {
         auto& R = rails[r];
-        for (int n = 0; n < (int)R.nodes.size(); ++n)
-        {
+        for (int n = 0; n < (int)R.nodes.size(); ++n) {
             ImVec2 a = W2S(R.nodes[n]); if (a.x < -9000.f) continue;
             bool s = (sel == CLevel_Edit::SEL::NODE && m_pLevel_Edit->Get_SelRail() == r &&
                 m_pLevel_Edit->Get_SelNode() == n);
             dl->AddCircleFilled(a, s ? 6.f : 4.f, s ? IM_COL32(255, 230, 80, 255) : IM_COL32(80, 160, 255, 255));
-            if (n + 1 < (int)R.nodes.size())
-            {
-                ImVec2 b = W2S(R.nodes[n + 1]);
-                if (b.x > -9000.f) dl->AddLine(a, b, IM_COL32(80, 160, 255, 200), 2.f);
+            if (n + 1 < (int)R.nodes.size()) {
+                ImVec2 b = W2S(R.nodes[n + 1]); if (b.x > -9000.f) dl->AddLine(a, b,
+                    IM_COL32(80, 160, 255, 200), 2.f);
             }
         }
     }
     {
         ImVec2 kp = W2S(kirby);
-        if (kp.x > -9000.f)
-        {
+        if (kp.x > -9000.f) {
             dl->AddCircleFilled(kp, 5.f, IM_COL32(255, 90, 90, 255));
             dl->AddLine(ImVec2(kp.x - 8, kp.y), ImVec2(kp.x + 8, kp.y), IM_COL32(255, 255, 255, 255));
             dl->AddLine(ImVec2(kp.x, kp.y - 8), ImVec2(kp.x, kp.y + 8), IM_COL32(255, 255, 255, 255));
         }
     }
-    // solved camera frustum
-    {
-        _vector E = XMLoadFloat3(&pose.eye);
-        _vector F = XMVector3Normalize(XMLoadFloat3(&pose.fwd));
-        _vector Uref = XMLoadFloat3(&pose.up);
-        _vector R = XMVector3Cross(Uref, F);
-        if (XMVectorGetX(XMVector3LengthSq(R)) < 1e-6f) R = XMVector3Cross(XMVectorSet(0, 0, 1, 0), F);
-        R = XMVector3Normalize(R);
-        _vector U = XMVector3Normalize(XMVector3Cross(F, R));
-
+    { // solved camera frustum
+        _vector E = XMLoadFloat3(&pose.eye), F = XMVector3Normalize(XMLoadFloat3(&pose.fwd)), Uref =
+            XMLoadFloat3(&pose.up);
+        _vector Rr = XMVector3Cross(Uref, F);
+        if (XMVectorGetX(XMVector3LengthSq(Rr)) < 1e-6f) Rr = XMVector3Cross(XMVectorSet(0, 0, 1, 0), F);
+        Rr = XMVector3Normalize(Rr); _vector U = XMVector3Normalize(XMVector3Cross(F, Rr));
         const float d = 28.f, asp = 16.f / 9.f;
         float hh = d * tanf(XMConvertToRadians(pose.fov) * 0.5f), hw = hh * asp;
         _vector C = XMVectorAdd(E, XMVectorScale(F, d));
         _float3 fc[4]; ImVec2 pe = W2S(pose.eye), pc[4];
         _vector corn[4] = {
-            XMVectorAdd(C, XMVectorAdd(XMVectorScale(R,-hw), XMVectorScale(U, hh))),
-            XMVectorAdd(C, XMVectorAdd(XMVectorScale(R, hw), XMVectorScale(U, hh))),
-            XMVectorAdd(C, XMVectorAdd(XMVectorScale(R, hw), XMVectorScale(U,-hh))),
-            XMVectorAdd(C, XMVectorAdd(XMVectorScale(R,-hw), XMVectorScale(U,-hh))) };
+            XMVectorAdd(C, XMVectorAdd(XMVectorScale(Rr,-hw), XMVectorScale(U, hh))),
+            XMVectorAdd(C, XMVectorAdd(XMVectorScale(Rr, hw), XMVectorScale(U, hh))),
+            XMVectorAdd(C, XMVectorAdd(XMVectorScale(Rr, hw), XMVectorScale(U,-hh))),
+            XMVectorAdd(C, XMVectorAdd(XMVectorScale(Rr,-hw), XMVectorScale(U,-hh))) };
         for (int i = 0; i < 4; ++i) { XMStoreFloat3(&fc[i], corn[i]); pc[i] = W2S(fc[i]); }
         ImU32 oc = IM_COL32(255, 170, 40, 255);
-        if (pe.x > -9000.f)
-        {
-            dl->AddCircleFilled(pe, 4.f, oc);
-            for (int i = 0; i < 4; ++i) if (pc[i].x > -9000.f) dl->AddLine(pe, pc[i], oc, 1.5f);
+        if (pe.x > -9000.f) {
+            dl->AddCircleFilled(pe, 4.f, oc); for (int i = 0; i < 4; ++i) if (pc[i].x > -9000.f)
+                dl->AddLine(pe, pc[i], oc, 1.5f);
         }
         for (int i = 0; i < 4; ++i) {
             int j = (i + 1) % 4; if (pc[i].x > -9000.f && pc[j].x > -9000.f)
@@ -483,12 +471,9 @@ void CImGui_Manager::Draw_Viewport()
     ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
     ImGuizmo::SetRect(vPos.x, vPos.y, sz.x, sz.y);
 
-    // (id 0) 선택된 영역/노드
-    if (sel == CLevel_Edit::SEL::AREA)
-    {
+    if (sel == CLevel_Edit::SEL::AREA) {
         int i = m_pLevel_Edit->Get_SelArea();
-        if (i >= 0 && i < (int)areas.size())
-        {
+        if (i >= 0 && i < (int)areas.size()) {
             ImGuizmo::PushID(0);
             CAM_AREA& A = areas[i];
             XMMATRIX W = XMMatrixScalingFromVector(XMVectorMax(XMLoadFloat3(&A.size), XMVectorReplicate(0.01f)))
@@ -496,11 +481,9 @@ void CImGui_Manager::Draw_Viewport()
                 * XMMatrixTranslationFromVector(XMLoadFloat3(&A.center));
             _float4x4 m; XMStoreFloat4x4(&m, W);
             ImGuizmo::Manipulate((float*)pView, (float*)pProj, m_eGizmoOp, ImGuizmo::LOCAL, (float*)&m);
-            if (ImGuizmo::IsUsing())
-            {
+            if (ImGuizmo::IsUsing()) {
                 XMVECTOR vs, vq, vt;
-                if (XMMatrixDecompose(&vs, &vq, &vt, XMLoadFloat4x4(&m)))
-                {
+                if (XMMatrixDecompose(&vs, &vq, &vt, XMLoadFloat4x4(&m))) {
                     XMStoreFloat3(&A.size, XMVectorMax(vs, XMVectorReplicate(0.01f)));
                     XMStoreFloat4(&A.rot, XMQuaternionNormalize(vq));
                     XMStoreFloat3(&A.center, vt);
@@ -509,11 +492,9 @@ void CImGui_Manager::Draw_Viewport()
             ImGuizmo::PopID();
         }
     }
-    else if (sel == CLevel_Edit::SEL::NODE)
-    {
+    else if (sel == CLevel_Edit::SEL::NODE) {
         int r = m_pLevel_Edit->Get_SelRail(), n = m_pLevel_Edit->Get_SelNode();
-        if (r >= 0 && r < (int)rails.size() && n >= 0 && n < (int)rails[r].nodes.size())
-        {
+        if (r >= 0 && r < (int)rails.size() && n >= 0 && n < (int)rails[r].nodes.size()) {
             ImGuizmo::PushID(0);
             _float3& nd = rails[r].nodes[n];
             _float4x4 m; XMStoreFloat4x4(&m, XMMatrixTranslationFromVector(XMLoadFloat3(&nd)));
@@ -522,9 +503,7 @@ void CImGui_Manager::Draw_Viewport()
             ImGuizmo::PopID();
         }
     }
-
-    // (id 1) 커비 프록시 - 항상 표시 (이동 전용)
-    {
+    {   // kirby gizmo - always
         ImGuizmo::PushID(1);
         _float3& k = m_pLevel_Edit->Kirby();
         _float4x4 m; XMStoreFloat4x4(&m, XMMatrixTranslationFromVector(XMLoadFloat3(&k)));
@@ -536,13 +515,52 @@ void CImGui_Manager::Draw_Viewport()
     ImGui::End();
 }
 
+void CImGui_Manager::Draw_Preview()
+{
+    ImGuiViewport* vp = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(ImVec2(vp->Pos.x + vp->Size.x * 0.5f, vp->Pos.y + vp->Size.y * 0.5f),
+        ImGuiCond_FirstUseEver, ImVec2(0.5f, 0.5f));
+    ImGui::SetNextWindowSize(ImVec2(680, 400), ImGuiCond_FirstUseEver);
+
+    ImGui::Begin("Preview (game cam)", nullptr, ImGuiWindowFlags_NoScrollbar);
+
+    if (!m_pLevel_Edit->Is_Preview())
+    {
+        ImGui::TextWrapped("Preview OFF.  Turn on 'Preview Camera' in the toolbar.");
+        ImGui::End();
+        return;
+    }
+    if (nullptr == m_pSRV2)
+    {
+        ImGui::TextWrapped("m_pSRV2 is null (preview RTV not created).");
+        ImGui::End();
+        return;
+    }
+
+    ImVec2 a = ImGui::GetContentRegionAvail();
+    float ta = 1600.f / 900.f, aa = (a.y > 0.f ? a.x / a.y : ta); ImVec2 sz;
+    if (aa > ta) { sz.y = a.y; sz.x = a.y * ta; }
+    else { sz.x = a.x; sz.y = a.x / ta; }
+    ImVec2 off((a.x - sz.x) * 0.5f, (a.y - sz.y) * 0.5f);
+    ImVec2 cur = ImGui::GetCursorPos(); ImGui::SetCursorPos(ImVec2(cur.x + off.x, cur.y + off.y));
+
+    ImDrawList* dl = ImGui::GetWindowDrawList();
+    dl->AddCallback(Viewport_DisableBlend, &m_ViewportDraw);
+    ImGui::Image((ImTextureID)m_pSRV2, sz);
+    dl->AddCallback(ImDrawCallback_ResetRenderState, nullptr);
+
+    ImGui::End();
+}
+
 void CImGui_Manager::Free()
 {
     Safe_Release(m_pOpaqueBlend);
     Safe_Release(m_pContext);
     Safe_Release(m_pSRV);
+    Safe_Release(m_pSRV2);
     Safe_Release(m_pLevel_Edit);
 
+    Safe_Release(m_pGameInstance_Proxy);
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();

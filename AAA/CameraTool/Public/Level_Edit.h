@@ -57,6 +57,7 @@ public: // preview / nav
     _bool Is_Preview() const { return m_bPreview; }
     void  Set_Preview(_bool b);
     void  Set_CameraActive(_bool b);
+    void  Get_PreviewViewProj(_float4x4* pView, _float4x4* pProj);
 
 public: // map preview (kept)
     void    Add_Layer(const wstring& strLayerTag);
