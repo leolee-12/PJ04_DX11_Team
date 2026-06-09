@@ -74,7 +74,7 @@ HRESULT CTestMarb1e::Render()
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", (_uint)i, MTEX_TYPE::METALNESS, 0)))
             iPassIdx = 0;
 
-        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnkownTexture", (_uint)i, MTEX_TYPE::UNKNOWN, 0)))
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnknownTexture", (_uint)i, MTEX_TYPE::UNKNOWN, 0)))
             iPassIdx = 1;
 
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", (_uint)i)))

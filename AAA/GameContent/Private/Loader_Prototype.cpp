@@ -307,45 +307,6 @@ HRESULT CLIENT_DLL Load_Level_UI(CGameInstance_Proxy* pProxy, ID3D11Device* pDev
             return E_FAIL;
         }
 
-        // 아직 Loader를 거치지 않고 바로 GamePlay 들어가기 때문에 
-        // 임시 fallback 등록 나중에 Loader에서 호출하면 제거 가능
-        /*if (jUI.contains("Textures") && jUI["Textures"].is_object())
-        {
-            for (const auto& [strTextureProtoTag, jTexturePath] : jUI["Textures"].items())
-            {
-                if (strTextureProtoTag.empty() || !jTexturePath.is_string())
-                    return E_FAIL;
-
-                const _wstring wTextureProtoTag = StrToWstr(strTextureProtoTag);
-                const _wstring wTexturePath = StrToWstr(jTexturePath.get<string>());
-
-                if (wTextureProtoTag.empty() || wTexturePath.empty())
-                    return E_FAIL;
-
-                if (!pProxy->Has_Prototype(iLevelIndex, wTextureProtoTag))
-                {
-                    CTexture* pTexture = CTexture::Create(
-                        pDevice,
-                        pContext,
-                        wTexturePath.c_str(),
-                        1);
-
-                    if (nullptr == pTexture)
-                        return E_FAIL;
-
-                    if (FAILED(pProxy->Add_Prototype(
-                        iLevelIndex,
-                        wTextureProtoTag,
-                        pTexture)))
-                    {
-                        Safe_Release(pTexture);
-                        return E_FAIL;
-                    }
-                }
-            }
-        }*/
-
-
         const _wstring strProtoTag =
             StrToWstr(jUI.value("ProtoTag", string()));
 
@@ -361,24 +322,8 @@ HRESULT CLIENT_DLL Load_Level_UI(CGameInstance_Proxy* pProxy, ID3D11Device* pDev
         if (pReg->strCategory != L"UI_CONTAINER")
             return E_FAIL;
 
-        // Loading까지 들어가면 주석해제 (최종 사용본)
         if (!pProxy->Has_Prototype(iContProtoLevel, strProtoTag))
             return E_FAIL;
-
-
-        // Loader 거치지 않는 fallback 등록 버전 - 나중에 제거해야함
-        /*if (!pProxy->Has_Prototype(iContProtoLevel, strProtoTag))
-        {
-            pReg->ResourceLoader(pProxy, pDevice, pContext);
-
-            if (FAILED(pProxy->Add_Prototype(
-                iContProtoLevel,
-                strProtoTag.c_str(),
-                pReg->CreatorFunc(pDevice, pContext))))
-            {
-                return E_FAIL;
-            }
-        }*/
 
         CGameObject* pObj = nullptr;
 

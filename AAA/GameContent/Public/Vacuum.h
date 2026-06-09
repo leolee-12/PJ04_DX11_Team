@@ -1,5 +1,7 @@
 #pragma once
 
+#include "InhaleEffect.h"
+
 #include "GameContent_Defines.h"
 
 #include "Effect_Mesh.h"

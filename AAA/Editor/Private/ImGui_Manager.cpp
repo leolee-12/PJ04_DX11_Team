@@ -1250,7 +1250,14 @@ void CImGui_Manager::Draw_AnimatorEditor(CModel* pModel, CAnimator* pAnimator)
     if (!ImGui::CollapsingHeader("Animator", ImGuiTreeNodeFlags_DefaultOpen)) return;
 
     // 애니메이터(파트 포함)마다 독립 상태 유지
-    struct ANIM_UI_STATE { int iSel = 0, iPrevSel = -1; bool bPlay = true, bLoop = true; float fPreview = 0.f; };
+    struct ANIM_UI_STATE 
+    { 
+        int iSel = 0,iPrevSel = -1; 
+        bool bPlay = true, bLoop = true;
+        float fPreview = 0.f;
+        float fPlaySpeed = 1.f;
+        float fBlendDuration = 0.2f;
+    };
     static unordered_map<CAnimator*, ANIM_UI_STATE> s_States;
     ANIM_UI_STATE& st = s_States[pAnimator];
 
@@ -1268,17 +1275,22 @@ void CImGui_Manager::Draw_AnimatorEditor(CModel* pModel, CAnimator* pAnimator)
 
     ImGui::Checkbox("Play", &st.bPlay); ImGui::SameLine();
     ImGui::Checkbox("Loop", &st.bLoop);
+    ImGui::SetNextItemWidth(120.f);
+    ImGui::DragFloat("Speed", &st.fPlaySpeed, 0.01f, 0.05f, 8.f, "%.2fx");
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(120.f);
+    ImGui::DragFloat("Blend", &st.fBlendDuration, 0.01f, 0.f, 2.f, "%.2fs");
 
     if (st.iSel != st.iPrevSel)
     {
-        pAnimator->Play(strName, st.bLoop, true, 0.f);
+        pAnimator->Play(strName, st.bLoop, true, st.fBlendDuration, st.fPlaySpeed);
         st.iPrevSel = st.iSel; st.fPreview = 0.f;
     }
 
     if (st.bPlay)
     {
         pAnimator->Resume();
-        pAnimator->Play(strName, st.bLoop, false, 0.f);
+        pAnimator->Play(strName, st.bLoop, false, st.fBlendDuration, st.fPlaySpeed);
         pAnimator->Update(ImGui::GetIO().DeltaTime);
         st.fPreview = pAnimator->Get_Progress();
         ImGui::SliderFloat("Preview", &st.fPreview, 0.f, 1.f);

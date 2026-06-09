@@ -52,6 +52,7 @@ private:
 	HRESULT						Ready_EditRTV();
 	void						Editor_BeginDraw();
 
+	HRESULT						Ready_For_Static();
 public:
 	static CAnimUITool_App*		Create();
 

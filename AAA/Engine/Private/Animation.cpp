@@ -40,9 +40,9 @@ HRESULT CAnimation::Initialize(const ANIMATION_DATA& data, class CModel* pModel)
 	return S_OK;
 }
 
-_bool CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones, _float fTimeDelta, _bool isLoop)
+_bool CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones, _float fTimeDelta, _bool isLoop, _float fSpeed)
 {
-    m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
+    m_fCurrentTrackPosition += m_fTickPerSecond * fSpeed * fTimeDelta;
 
     _bool isFinished = false;
     if (m_fCurrentTrackPosition >= m_fDuration)
@@ -69,9 +69,9 @@ _bool CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bone
 
 }
 
-void CAnimation::Compute_BoneKeyFrames(unordered_map<_uint, KEYFRAME>& Out, _float fTimeDelta, _bool isLoop)
+void CAnimation::Compute_BoneKeyFrames(unordered_map<_uint, KEYFRAME>& Out, _float fTimeDelta, _bool isLoop, _float fSpeed)
 {
-    m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
+    m_fCurrentTrackPosition += m_fTickPerSecond * fSpeed * fTimeDelta;
 
     if (m_fCurrentTrackPosition >= m_fDuration)
     {

@@ -9,6 +9,7 @@
 #include "Preview_Kirby.h"
 #include "GameContent_const.h"
 #include "GameObject_Factory.h"
+#include "Loader_Prototype.h"
 
 #include "UI_Title.h"
 #include "Panel_Manager.h"
@@ -77,7 +78,7 @@ HRESULT CLevel_Tool::Ready_Lights()
     LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
     LightDesc.vAmbient = _float4(0.2f, 0.2f, 0.2f, 1.f);
     LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
-    LightDesc.vDirection = _float4(-0.3f, -1.f, -0.3f, 0.f);
+    LightDesc.vDirection = _float4(0.4f, -1.f, 0.5f, 0.f);
 
     if (FAILED(m_pGameInstance_Proxy->Add_Light(LightDesc)))
         return E_FAIL;
@@ -222,7 +223,14 @@ HRESULT  CLevel_Tool::Save_UIContainer(CGameObject* pContainer, const _float2& v
                     continue;
                 auto it = m_TextureProtoPaths.find(StrToWstr(strTag));
                 if (it != m_TextureProtoPaths.end())
+                {
                     jTextures[strTag] = WstrToStr(it->second);
+                }
+                else
+                {
+                    Log_Error("Save_UIContainer: missing texture path for " + strTag);
+                    return E_FAIL;
+                }
             }
         }
         j["Textures"] = jTextures;
@@ -262,6 +270,10 @@ CGameObject* CLevel_Tool::Load_UIContainerByPath(const _wstring& strFullPath, _f
 {
     namespace fs = std::filesystem;
 
+    const _uint iContainerProtoLevel = ETOUI(TOOL_LEVEL::EDIT);
+    const _uint iObjectLevel = ETOUI(TOOL_LEVEL::EDIT);
+    const _uint iPartProtoLevel = ETOUI(TOOL_LEVEL::STATIC);
+
     std::ifstream fin(strFullPath);
     if (!fin.is_open()) {
         Log_Error("Load_UIContainerByPath: open fail: " + WstrToStr(strFullPath));
@@ -296,8 +308,6 @@ CGameObject* CLevel_Tool::Load_UIContainerByPath(const _wstring& strFullPath, _f
             0 == strName.compare(strName.size() - 3, 3, L"_ui"))
             strName = strName.substr(0, strName.size() - 3);
 
-        const _uint L = ETOUI(TOOL_LEVEL::STATIC);
-
         std::wstring strSpawnTag = strAuthoredTag;
         auto* pReg = Client::CGameObject_Factory::GetInstance()
             ->Get_Registration(strSpawnTag);
@@ -324,16 +334,16 @@ CGameObject* CLevel_Tool::Load_UIContainerByPath(const _wstring& strFullPath, _f
             }
         }
 
-        if (!m_pGameInstance_Proxy->Has_Prototype(L, strSpawnTag))
+        if (!m_pGameInstance_Proxy->Has_Prototype(iContainerProtoLevel, strSpawnTag))
         {
             pReg->ResourceLoader(
                 m_pGameInstance_Proxy, m_pDevice, m_pContext);
-            m_pGameInstance_Proxy->Add_Prototype(L, strSpawnTag,
+            m_pGameInstance_Proxy->Add_Prototype(iContainerProtoLevel, strSpawnTag,
                 pReg->CreatorFunc(m_pDevice, m_pContext));
         }
 
         if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(
-            &pObj, L, strSpawnTag,
+            &pObj, iContainerProtoLevel, strSpawnTag,
             ETOUI(TOOL_LEVEL::EDIT), L"Layer_UI", strName, nullptr)))
             return nullptr;
 
@@ -351,17 +361,39 @@ CGameObject* CLevel_Tool::Load_UIContainerByPath(const _wstring& strFullPath, _f
 
         Set_AuthoredProtoTag(pObj, strAuthoredTag);
 
-        if (j.contains("Textures"))
+        if (j.contains("Textures") && j["Textures"].is_object())
         {
             for (auto& [strTag, jPath] : j["Textures"].items())
             {
                 Register_TextureProto(
-                    StrToWstr(jPath.get<std::string>()));
+                    StrToWstr(strTag),
+                    StrToWstr(jPath.get<std::string>()),
+                    iObjectLevel);
             }
         }
 
         if (j.contains("Container"))
-            pObj->Deserialize(j["Container"]);
+        {
+            json jContainer = j["Container"];
+
+            if (jContainer.contains("UIPartObjects") &&
+                jContainer["UIPartObjects"].is_object())
+            {
+                for (auto& [strPartTag, jPart] :
+                    jContainer["UIPartObjects"].items())
+                {
+                    jPart["ProtoLevel"] = iPartProtoLevel;
+
+                    if (jPart.contains("TextureProtoTag") &&
+                        !jPart.value("TextureProtoTag", std::string()).empty())
+                    {
+                        jPart["TextureLevel"] = iObjectLevel;
+                    }
+                }
+            }
+
+            pObj->Deserialize(jContainer);
+        }
 
         Track_UIContainer(pObj, strFullPath, vOutDesignSize);
 
@@ -394,7 +426,8 @@ void CLevel_Tool::Delete_UIContainer(CUIContainerObject* pContainer)
 
 CGameObject* CLevel_Tool::Add_UIContainer()
 {
-    const _uint L = ETOUI(TOOL_LEVEL::STATIC);
+    const _uint iContainerProtoLevel = ETOUI(TOOL_LEVEL::EDIT);
+    const _uint iObjectLevel = ETOUI(TOOL_LEVEL::EDIT);
     const _wstring strTag = Client::CUI_GenericContainer::PROTOTYPE_TAG;
 
     auto* pReg = Client::CGameObject_Factory::GetInstance()
@@ -405,11 +438,12 @@ CGameObject* CLevel_Tool::Add_UIContainer()
         return nullptr;
     }
 
-    if (!m_pGameInstance_Proxy->Has_Prototype(L, strTag))
+    if (!m_pGameInstance_Proxy->Has_Prototype(iContainerProtoLevel, strTag))
     {
         pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
-        m_pGameInstance_Proxy->Add_Prototype(L, strTag,
-            pReg->CreatorFunc(m_pDevice, m_pContext));
+        if (FAILED(m_pGameInstance_Proxy->Add_Prototype(iContainerProtoLevel, strTag,
+            pReg->CreatorFunc(m_pDevice, m_pContext))))
+            return nullptr;
     }
 
     Client::CUI_GenericContainer::UI_GENERIC_CONTAINER_DESC desc{};
@@ -419,8 +453,8 @@ CGameObject* CLevel_Tool::Add_UIContainer()
         L"UIContainer_" + std::to_wstring(m_iUIContainerCounter++);
 
     CGameObject* pObj = nullptr;
-    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pObj, L, strTag,
-        ETOUI(TOOL_LEVEL::EDIT), L"Layer_UI", strName, &desc)))
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pObj, iContainerProtoLevel, strTag,
+        iObjectLevel, L"Layer_UI", strName, &desc)))
         return nullptr;
 
     Track_UIContainer(pObj, L"", _float2{1600.f, 900.f});
@@ -431,6 +465,9 @@ CGameObject* CLevel_Tool::Add_UIContainer()
 
 CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eType, _wstring* pOutPartTag)
 {
+    const _uint iPartProtoLevel = ETOUI(TOOL_LEVEL::STATIC);
+    const _uint iTextureLevel = ETOUI(TOOL_LEVEL::EDIT);
+
     auto* pGeneric =
         dynamic_cast<Client::CUI_GenericContainer*>(pContainer);
     if (!pGeneric)
@@ -439,7 +476,6 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
         return nullptr;
     }
 
-    const _uint L = ETOUI(LEVEL::STATIC);
     _wstring strProtoTag = L"";
 
     if (eType == UI_PART_TYPE::IMAGE)
@@ -450,7 +486,7 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
         strProtoTag = Client::CUI_Text::PROTOTYPE_TAG;
 
     // 파트 프로토 보장 (SpriteAnim은 컨테이너 로더가 안 올림)
-    if (!m_pGameInstance_Proxy->Has_Prototype(L, strProtoTag))
+    if (!m_pGameInstance_Proxy->Has_Prototype(iPartProtoLevel, strProtoTag))
     {
         auto* pReg = Client::CGameObject_Factory::GetInstance()
             ->Get_Registration(strProtoTag);
@@ -461,8 +497,10 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
             return nullptr;
         }
         pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
-        m_pGameInstance_Proxy->Add_Prototype(L, strProtoTag,
-            pReg->CreatorFunc(m_pDevice, m_pContext));
+        if (FAILED(m_pGameInstance_Proxy->Add_Prototype(iPartProtoLevel, strProtoTag, pReg->CreatorFunc(m_pDevice, m_pContext))))
+        {
+            return nullptr;
+        }
     }
 
     _wstring strPartTag =
@@ -475,23 +513,21 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
     case UI_PART_TYPE::IMAGE:
     {
         Client::CUI_Image::UI_IMAGE_DESC desc{};
-        desc.iTextureLevel = ETOUI(LEVEL::STATIC);
-        desc.szTextureProtoTag = L"Proto_Tex_TestUI";
+        desc.iTextureLevel = iTextureLevel;
+        desc.szTextureProtoTag = { nullptr };
         desc.vSize = { 100.f, 100.f };
         desc.vPosition = { 0.f, 0.f };
         desc.iRenderLayer = 1;
 
-        hr = pGeneric->Add_Part(
-            ETOUI(LEVEL::STATIC), strProtoTag, strPartTag, &desc);
-
+        hr = pGeneric->Add_Part(iPartProtoLevel, strProtoTag, strPartTag, &desc);
         break;
     }
 
     case UI_PART_TYPE::SPRITEANIM:
     {
         Client::CUI_SpriteAnim::UI_SPRITEANIM_DESC desc{};
-        desc.iTextureLevel = ETOUI(LEVEL::STATIC);
-        desc.szTextureProtoTag = L"Proto_Tex_StarArray";
+        desc.iTextureLevel = iTextureLevel;
+        desc.szTextureProtoTag = { nullptr };
         desc.vSize = { 100.f, 100.f };
         desc.vPosition = { 0.f, 0.f };
         desc.iRenderLayer = 1;
@@ -500,9 +536,7 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
         desc.bLoop = true;
         desc.bAutoPlay = true;
 
-        hr = pGeneric->Add_Part(
-            ETOUI(LEVEL::STATIC), strProtoTag, strPartTag, &desc);
-
+        hr = pGeneric->Add_Part(iPartProtoLevel, strProtoTag, strPartTag, &desc);
         break;
     }
 
@@ -519,7 +553,7 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
         desc.vSize = { 300.f, 100.f };
 
         hr = pGeneric->Add_Part(
-            ETOUI(LEVEL::STATIC), strProtoTag, strPartTag, &desc);
+            iPartProtoLevel, strProtoTag, strPartTag, &desc);
 
         break;
     }
@@ -630,6 +664,17 @@ HRESULT CLevel_Tool::Load_UIManifest(const _wstring& strManifestPath)
     if (strManifestPath.empty())
         return E_FAIL;
 
+    if (FAILED(Client::Ready_Level_UIResources(
+        m_pGameInstance_Proxy,
+        m_pDevice,
+        m_pContext,
+        strManifestPath.c_str(),
+        ETOUI(TOOL_LEVEL::EDIT))))
+    {
+        Log_Error("Load_UIManifest: Ready_Level_UIResources failed.");
+        return E_FAIL;
+    }
+
     std::ifstream fin(strManifestPath);
     if (!fin.is_open())
     {
@@ -654,7 +699,9 @@ HRESULT CLevel_Tool::Load_UIManifest(const _wstring& strManifestPath)
         return E_FAIL;
     }
 
-    const _uint L = ETOUI(TOOL_LEVEL::STATIC);
+    const _uint iContainerProtoLevel = ETOUI(TOOL_LEVEL::EDIT);
+    const _uint iObjectLevel = ETOUI(TOOL_LEVEL::EDIT);
+    const _uint iPartProtoLevel = ETOUI(TOOL_LEVEL::STATIC);
 
     for (const auto& jEntry : jManifest["UIContainers"])
     {
@@ -724,21 +771,25 @@ HRESULT CLevel_Tool::Load_UIManifest(const _wstring& strManifestPath)
             continue;
         }
 
-        if (!m_pGameInstance_Proxy->Has_Prototype(L, strSpawnTag))
+        if (!m_pGameInstance_Proxy->Has_Prototype(iContainerProtoLevel, strSpawnTag))
         {
             pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
-            m_pGameInstance_Proxy->Add_Prototype(
-                L,
+            if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
+                iContainerProtoLevel,
                 strSpawnTag,
-                pReg->CreatorFunc(m_pDevice, m_pContext));
+                pReg->CreatorFunc(m_pDevice, m_pContext))))
+            {
+                Log_Error("Load_UIManifest: Add_Prototype failed.");
+                continue;
+            }
         }
 
         CGameObject* pObj = nullptr;
         if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(
             &pObj,
-            L,
+            iContainerProtoLevel,
             strSpawnTag,
-            ETOUI(TOOL_LEVEL::EDIT),
+            iObjectLevel,
             strLayerTag,
             strObjectTag,
             nullptr)))
@@ -749,14 +800,36 @@ HRESULT CLevel_Tool::Load_UIManifest(const _wstring& strManifestPath)
 
         Set_AuthoredProtoTag(pObj, strAuthoredTag);
 
-        if (jUI.contains("Textures"))
+        if (jUI.contains("Textures") && jUI["Textures"].is_object())
         {
             for (auto& [strTag, jPath] : jUI["Textures"].items())
-                Register_TextureProto(StrToWstr(jPath.get<std::string>()));
+            {
+                Register_TextureProto(StrToWstr(strTag), StrToWstr(jPath.get<std::string>()), iObjectLevel);
+            }
         }
 
         if (jUI.contains("Container"))
-            pObj->Deserialize(jUI["Container"]);
+        {
+            json jContainer = jUI["Container"];
+
+            if (jContainer.contains("UIPartObjects") &&
+                jContainer["UIPartObjects"].is_object())
+            {
+                for (auto& [strPartTag, jPart] :
+                    jContainer["UIPartObjects"].items())
+                {
+                    jPart["ProtoLevel"] = iPartProtoLevel;
+
+                    if (jPart.contains("TextureProtoTag") &&
+                        !jPart.value("TextureProtoTag", std::string()).empty())
+                    {
+                        jPart["TextureLevel"] = iObjectLevel;
+                    }
+                }
+            }
+
+            pObj->Deserialize(jContainer);
+        }
 
         pObj->Set_Active(bInitialActive);
 
@@ -806,32 +879,49 @@ _wstring CLevel_Tool::Register_TextureProto(const _wstring& strTexturePath)
     if (strTexturePath.empty())
         return L"";
 
-    // 파일 stem 기반 태그: ".../KirbyFace.png" -> "Proto_Tex_KirbyFace"
-    const _wstring strStem = filesystem::path(strTexturePath).stem().wstring();
+    const _wstring strStem = std::filesystem::path(strTexturePath).stem().wstring();
     const _wstring strProtoTag = L"Proto_Tex_" + strStem;
-    m_TextureProtoPaths[strProtoTag] = strTexturePath;
 
-    const _uint L = ETOUI(TOOL_LEVEL::STATIC);
+    return Register_TextureProto(
+        strProtoTag,
+        strTexturePath,
+        ETOUI(TOOL_LEVEL::EDIT));
+}
 
-    // 이미 등록돼 있으면 재사용 (같은 png 중복 로딩/중복 등록 방지)
-    if (m_pGameInstance_Proxy->Has_Prototype(L, strProtoTag))
-        return strProtoTag;
+_wstring CLevel_Tool::Register_TextureProto(const _wstring& strTextureProtoTag, const _wstring& strTexturePath, _uint iLevelIndex)
+{
+    if (strTextureProtoTag.empty() || strTexturePath.empty())
+        return L"";
 
-    CTexture* pTexture = CTexture::Create(m_pDevice, m_pContext, strTexturePath.c_str(), 1);
+    m_TextureProtoPaths[strTextureProtoTag] = strTexturePath;
+
+    if (m_pGameInstance_Proxy->Has_Prototype(iLevelIndex, strTextureProtoTag))
+        return strTextureProtoTag;
+
+    CTexture* pTexture = CTexture::Create(
+        m_pDevice,
+        m_pContext,
+        strTexturePath.c_str(),
+        1);
+
     if (nullptr == pTexture)
     {
         Log_Error("Register_TextureProto: CTexture::Create failed: " + WstrToStr(strTexturePath));
         return L"";
     }
 
-    if (FAILED(m_pGameInstance_Proxy->Add_Prototype(L, strProtoTag, pTexture)))
+    if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
+        iLevelIndex,
+        strTextureProtoTag,
+        pTexture)))
     {
-        Log_Error("Register_TextureProto: Add_Prototype failed: " + WstrToStr(strProtoTag));
+        Safe_Release(pTexture);
+        Log_Error("Register_TextureProto: Add_Prototype failed: " + WstrToStr(strTextureProtoTag));
         return L"";
     }
 
-    Log_Info("Registered texture proto: " + WstrToStr(strProtoTag));
-    return strProtoTag;
+    Log_Info("Registered texture proto: " + WstrToStr(strTextureProtoTag));
+    return strTextureProtoTag;
 }
 
 void CLevel_Tool::Update(_float fTimeDelta)

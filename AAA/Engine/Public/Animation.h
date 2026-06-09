@@ -15,8 +15,8 @@ private:
 
 public:
 	HRESULT Initialize(const ANIMATION_DATA& data, class CModel* pModel);
-	_bool Update_TransformationMatrices(const vector<class CBone*>& Bones, _float fTimeDelta, _bool isLoop);
-	void  Compute_BoneKeyFrames(unordered_map<_uint, KEYFRAME>& Out, _float fTimeDelta, _bool isLoop);
+	_bool Update_TransformationMatrices(const vector<class CBone*>& Bones, _float fTimeDelta, _bool isLoop, _float fSpeed = 1.0f);
+	void  Compute_BoneKeyFrames(unordered_map<_uint, KEYFRAME>& Out, _float fTimeDelta, _bool isLoop, _float fSpeed = 1.0f);
 	void  Reset_TrackPosition();
 
 public:

@@ -39,7 +39,8 @@ public:
 	virtual HRESULT Render() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
-	void Update_Jump(_float fTimeDelta);
+public:
+	CAnimator* Get_Animator() { return m_pAnimatorCom; }
 
 private:
 	HRESULT Ready_Components();

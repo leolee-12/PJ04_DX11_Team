@@ -26,13 +26,31 @@ public:
 	const _char*			Get_Name() const { return m_szName; }
 
 protected:
+	void					Draw_OpaqueImage(ID3D11ShaderResourceView* pSRV, const ImVec2& vSize);
+
+
+private:
+	struct VIEWPORT_DRAW
+	{
+		ID3D11DeviceContext* pContext = { nullptr };
+		ID3D11BlendState* pBlend = { nullptr };
+	};
+
+protected:
 	ID3D11Device*			m_pDevice = { nullptr };
 	ID3D11DeviceContext*	m_pContext = { nullptr };
 	CGameInstance_Proxy*	m_pGameInstance_Proxy = { nullptr };
+
+	ID3D11BlendState*		m_pOpaqueImageBlend = { nullptr };
+	VIEWPORT_DRAW			m_OpaqueImageDraw = {};
+
 	CPanel_Manager*			m_pPanel_Manager = { nullptr };
 
 	_char					m_szName[MAX_PATH] = {};
 	_bool					m_bOpen = { true };
+
+private:
+	static void				Disable_ImageBlend(const ImDrawList*, const ImDrawCmd* cmd);
 
 protected:
 	virtual void			Free() override;

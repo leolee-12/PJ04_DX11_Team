@@ -5,6 +5,8 @@
 #include "GameContent_const.h"
 
 #include "Vacuum.h"
+#include "InhaleEffect.h"
+#include "TornadoSpinReverse.h"
 
 CVacuumContainer::CVacuumContainer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Container(pDevice, pContext)
@@ -58,7 +60,9 @@ HRESULT CVacuumContainer::Render()
 
 HRESULT CVacuumContainer::Ready_EffectPartObjects()
 {
+    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CInhaleEffect::PROTOTYPE_TAG, TEXT("Proto_InhaleEffect"));
     Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CVacuum::PROTOTYPE_TAG, TEXT("Proto_Vacuum"));
+    //Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CTornadoSpinReverse::PROTOTYPE_TAG, TEXT("Proto_TornadoSpinReverse"));
 
     return S_OK;
 }

@@ -7,6 +7,8 @@
 #include "Transform.h"
 
 #include "UI_Text.h"
+#include "UI_Image.h"
+#include "UI_SpriteAnim.h"
 
 using namespace AnimUITool;
 
@@ -164,10 +166,47 @@ void CPanel_UICanvas::Render()
         {
             if (const ImGuiPayload* p = ImGui::AcceptDragDropPayload(DND_FILE_PATH))
             {
-                std::string strPath(static_cast<const char*>(p->Data));
+                string strPath(static_cast<const char*>(p->Data));
+                string strExt = filesystem::path(strPath).extension().string();
                 if (strPath.size() >= 8 && 0 == strPath.compare(strPath.size() - 8, 8, "_ui.json"))
                 {
                     m_pPanel_Manager->Load_UI_ByPath(StrToWstr(strPath));
+                }
+                else if (strExt == ".png" || strExt == ".dds")
+                {
+                    UI_SELECTION& sel = m_pPanel_Manager->Get_UIContext().Selection;
+                    CLevel_Tool* pLevel = m_pPanel_Manager->Get_Level();
+
+                    if (pLevel && sel.pContainer)
+                    {
+                        const UI_PART_TYPE eType =
+                            (strExt == ".dds") ? UI_PART_TYPE::SPRITEANIM : UI_PART_TYPE::IMAGE;
+
+                        _wstring strPartTag;
+                        CUIPartObject* pPart =
+                            pLevel->Add_UIPart(sel.pContainer, eType, &strPartTag);
+
+                        const _wstring strTextureProtoTag =
+                            pLevel->Register_TextureProto(StrToWstr(strPath));
+
+                        if (pPart && !strTextureProtoTag.empty())
+                        {
+                            if (auto* pImage = dynamic_cast<Client::CUI_Image*>(pPart))
+                                pImage->Set_Texture(ETOUI(TOOL_LEVEL::EDIT), strTextureProtoTag);
+                            else if (auto* pAnim = dynamic_cast<Client::CUI_SpriteAnim*>(pPart))
+                                pAnim->Set_Texture(ETOUI(TOOL_LEVEL::EDIT), strTextureProtoTag);
+
+                            if (auto* pTransform = pPart->Get_Transform())
+                            {
+                                pTransform->Set_State(
+                                    STATE::POSITION,
+                                    XMVectorSet(m_vMouseUIPos.x, m_vMouseUIPos.y, 1.f, 1.f));
+                            }
+
+                            m_pPanel_Manager->Set_UISelected(sel.pContainer, pPart, strPartTag);
+                            m_pPanel_Manager->Get_UIContext().bDirty = true;
+                        }
+                    }
                 }
             }
             ImGui::EndDragDropTarget();
