@@ -50,6 +50,23 @@ void CAnimator::Play(const string& strAnimName, _bool bLoop, _bool bRestart, _fl
     m_bFinished = false;
 }
 
+void CAnimator::Play(const ANI_PLAY_INFO* tAniInfo)
+{
+    if (m_pModel == nullptr && tAniInfo == nullptr)
+        return;
+
+    _int iIndex = m_pModel->Get_AnimationIndex(tAniInfo->strAniName);
+
+    if (iIndex < 0)
+        return;
+
+    m_fBlendDuration = tAniInfo->fBlend;
+
+    m_pModel->Set_AnimationIndex((_uint)iIndex, tAniInfo->bLoop, tAniInfo->bRestrat, m_fBlendDuration);
+    m_fPlaySpeed = tAniInfo->fSpeed;
+    m_bFinished = false;
+}
+
 void CAnimator::Seek(_float fProgress)
 {
     if (nullptr == m_pModel)

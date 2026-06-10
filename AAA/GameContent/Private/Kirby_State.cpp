@@ -4,6 +4,7 @@
 
 #include "Kirby.h"
 #include "Kirby_Body.h"
+#include "Kirby_Ability.h"
 
 CKirby_State::CKirby_State()
 {
@@ -41,6 +42,30 @@ _bool CKirby_State::Handle_MoveCommand(CKirby* pKirby, CKirby_Command* pCommand)
     }
 
     return false;
+}
+
+_bool CKirby_State::Try_FallState(CKirby* pKirby)
+{
+    CMovement* pMovementCom = pKirby->Get_Movement();
+    _float fYVelocity = pMovementCom->Get_VerticalVelocity();
+
+    _bool bIsGround = pMovementCom->Is_Grounded();
+    if (bIsGround == false && fYVelocity <= -7.f)
+    {  
+        pKirby->Change_State(KIRBY_STATE_TYPE::FALL);
+        return true;
+    }
+
+    return false;
+}
+
+_bool CKirby_State::Transition_Wait_OR_Run(CKirby* pKirby)
+{
+    if (pKirby->Has_MoveDir() == true)
+        pKirby->Change_State(KIRBY_STATE_TYPE::RUN);
+    else
+        pKirby->Change_State(KIRBY_STATE_TYPE::WAIT);
+    return true;
 }
 
 _bool CKirby_State::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)

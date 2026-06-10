@@ -208,14 +208,20 @@
     <Filter Include="05. Kirby\01. StateMachine\State\02. Jump">
       <UniqueIdentifier>{3e17907c-bcba-459e-bf79-c4b706ede510}</UniqueIdentifier>
     </Filter>
-    <Filter Include="05. Kirby\01. StateMachine\State\03. Attack">
-      <UniqueIdentifier>{a856ba07-405b-4c82-8eb0-595b2b12db9c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="05. Kirby\02. Kirby_Ability">
       <UniqueIdentifier>{aec0ec4f-8364-4084-95b0-fba459e158d0}</UniqueIdentifier>
     </Filter>
     <Filter Include="05. Kirby\02. Kirby_Ability\00. Kirby_Ability_Normal">
       <UniqueIdentifier>{1f1ebec8-785f-4d2a-be62-dc3edc8740d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. Kirby\01. StateMachine\State\03. Fall">
+      <UniqueIdentifier>{90847b7a-deeb-40fd-9d4c-a4fb630d5f56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. Kirby\01. StateMachine\State\04. Attack">
+      <UniqueIdentifier>{1a16a95c-467c-4517-b7e1-f705d612b308}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. Kirby\01. StateMachine\State\05. Hovering">
+      <UniqueIdentifier>{7ab702f2-1ea4-4b6f-abc2-0a8e23722ed6}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\00. Camera\AreaCam">
       <UniqueIdentifier>{712968f4-aac4-4c0d-b936-f670af432abf}</UniqueIdentifier>
@@ -441,6 +447,12 @@
     <ClInclude Include="..\Public\Kirby_Jump.h">
       <Filter>05. Kirby\01. StateMachine\State\02. Jump</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Attack.h">
+      <Filter>05. Kirby\01. StateMachine\State\04. Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Fall.h">
+      <Filter>05. Kirby\01. StateMachine\State\03. Fall</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Camera_AreaCam.h">
       <Filter>00. GameObject\00. Camera\AreaCam</Filter>
     </ClInclude>
@@ -622,6 +634,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby.cpp">
       <Filter>05. Kirby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Attack.cpp">
+      <Filter>05. Kirby\01. StateMachine\State\04. Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Fall.cpp">
+      <Filter>05. Kirby\01. StateMachine\State\03. Fall</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Camera_AreaCam.cpp">
       <Filter>00. GameObject\00. Camera\AreaCam</Filter>
