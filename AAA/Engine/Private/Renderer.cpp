@@ -820,7 +820,7 @@ HRESULT CRenderer::Render_Blend()
 
 HRESULT CRenderer::Render_UI_BACK()
 {
-    sort(m_RenderUIs[ETOUI(RENDERUIID::BACK)].begin(),
+    stable_sort(m_RenderUIs[ETOUI(RENDERUIID::BACK)].begin(),
         m_RenderUIs[ETOUI(RENDERUIID::BACK)].end(),
         [](CUIObject* a, CUIObject* b)
         {
@@ -842,7 +842,7 @@ HRESULT CRenderer::Render_UI_BACK()
 
 HRESULT CRenderer::Render_UI_MIDDLE()
 {
-    sort(m_RenderUIs[ETOUI(RENDERUIID::MIDDLE)].begin(),
+    stable_sort(m_RenderUIs[ETOUI(RENDERUIID::MIDDLE)].begin(),
         m_RenderUIs[ETOUI(RENDERUIID::MIDDLE)].end(),
         [](CUIObject* a, CUIObject* b)
         {
@@ -864,7 +864,7 @@ HRESULT CRenderer::Render_UI_MIDDLE()
 
 HRESULT CRenderer::Render_UI_FRONT()
 {
-    sort(m_RenderUIs[ETOUI(RENDERUIID::FRONT)].begin(),
+    stable_sort(m_RenderUIs[ETOUI(RENDERUIID::FRONT)].begin(),
         m_RenderUIs[ETOUI(RENDERUIID::FRONT)].end(),
         [](CUIObject* a, CUIObject* b)
         {

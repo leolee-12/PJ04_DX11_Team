@@ -16,6 +16,7 @@
 #include "UI_Text.h"
 #include "UI_Image.h"
 #include "UI_Effect.h"
+#include "UIAnimatorCom.h"
 
 namespace
 {
@@ -36,6 +37,73 @@ namespace
     const std::pair<int, const char*> g_TextAlignNames[] = {
             { 0, "Left" }, { 1, "Center" }, { 2, "Right" },
     };
+
+    struct UI_EFFECT_PASS_ITEM
+    {
+        int iPass;
+        const char* szName;
+        const char* szDesc;
+        bool bSourceTexture;
+        bool bMaskTexture;
+        bool bUV;
+        bool bReveal;
+    };
+
+    const UI_EFFECT_PASS_ITEM g_UIEffectPassItems[] =
+    {
+        { 2, "2 MaskedTexture", "Source texture clipped by mask", true, true, true, false },
+        { 3, "3 MaskedColor",   "Color clipped by mask", false, true, false, false },
+        { 4, "4 MaskedAdd",     "Source texture additively blended through mask", true, true, true, false },
+        { 5, "5 BrushReveal",   "Source texture revealed by brush mask", true, true, false, true },
+    };
+
+    const UI_EFFECT_PASS_ITEM* Find_EffectPassItem(int iPass)
+    {
+        for (const auto& item : g_UIEffectPassItems)
+        {
+            if (item.iPass == iPass)
+                return &item;
+        }
+
+        return nullptr;
+    }
+
+    bool Is_EffectInspectorProperty(const wstring& strName)
+    {
+        return strName == L"ShaderPass" ||
+            strName == L"TextureIndex" ||
+            strName == L"MaskTextureIndex" ||
+            strName == L"EffectTiling" ||
+            strName == L"EffectOffset" ||
+            strName == L"MaskPower" ||
+            strName == L"EffectIntensity" ||
+            strName == L"RevealProgress" ||
+            strName == L"RevealSoftness" ||
+            strName == L"MaskChannel" ||
+            strName == L"InvertMask";
+    }
+
+    void* Find_PropertyData(IReflectable* pHolder, const wchar_t* szName,
+        PROP_TYPE eType)
+    {
+        if (!pHolder)
+            return nullptr;
+
+        for (auto& prop : pHolder->Get_Properties())
+        {
+            if (prop.strName == szName && prop.eType == eType)
+                return pHolder->Get_PropertyPtr(prop.uOffset);
+        }
+
+        return nullptr;
+    }
+
+    template<typename T>
+    T* Find_PropertyDataT(IReflectable* pHolder, const wchar_t* szName,
+        PROP_TYPE eType)
+    {
+        return static_cast<T*>(Find_PropertyData(pHolder, szName, eType));
+    }
 }
 
 CPanel_Inspector::CPanel_Inspector(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -173,9 +241,15 @@ void CPanel_Inspector::Render_Properties(IReflectable* pHolder)
     if (props.empty()) return;
     if (!ImGui::CollapsingHeader("Properties", ImGuiTreeNodeFlags_DefaultOpen)) return;
 
+    const bool bEffectPart =
+        dynamic_cast<Client::CUI_Effect*>(pHolder) != nullptr;
+
     for (auto& prop : props)
     {
         if (prop.strName == L"FontTag" || prop.strName == L"Align")
+            continue;
+
+        if (bEffectPart && Is_EffectInspectorProperty(prop.strName))
             continue;
 
         void* pData = pHolder->Get_PropertyPtr(prop.uOffset);
@@ -745,12 +819,187 @@ void CPanel_Inspector::Render_UIInspector()
     Render_UIContainerTransform(sel.pContainer, false);
     ImGui::Separator();
     Render_UIPartTransform(pPart);
+    Render_EffectInspector(pPart);
     Render_Properties(pPart);
     Render_TextInspector(pPart);
     Render_SpriteAnimControl(pPart);
-    Render_UIPartBounceInspector(pPart);
+    Render_UIPartBounceInspector(sel.pContainer, pPart, sel.strPartTag);
 }
 
+void CPanel_Inspector::Render_EffectInspector(CUIPartObject* pPart)
+{
+    auto* pEffect = dynamic_cast<Client::CUI_Effect*>(pPart);
+    if (!pEffect)
+        return;
+
+    if (!ImGui::CollapsingHeader("Effect Shader",
+        ImGuiTreeNodeFlags_DefaultOpen))
+        return;
+
+    UI_CONTEXT& uictx = m_pPanel_Manager->Get_UIContext();
+    IReflectable* pReflect = pEffect;
+
+    int* pShaderPass = Find_PropertyDataT<int>(
+        pReflect, L"ShaderPass", PROP_TYPE::INT);
+    if (!pShaderPass)
+        return;
+
+    const UI_EFFECT_PASS_ITEM* pCurItem = Find_EffectPassItem(*pShaderPass);
+    const char* szCurPass = pCurItem ? pCurItem->szName : "Unsupported";
+
+    if (ImGui::BeginCombo("Shader Pass", szCurPass))
+    {
+        for (const auto& item : g_UIEffectPassItems)
+        {
+            const bool bSelected = *pShaderPass == item.iPass;
+            if (ImGui::Selectable(item.szName, bSelected))
+            {
+                *pShaderPass = item.iPass;
+                pCurItem = &item;
+                uictx.bDirty = true;
+            }
+
+            if (bSelected)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+
+    pCurItem = Find_EffectPassItem(*pShaderPass);
+    if (!pCurItem)
+    {
+        ImGui::TextColored(ImVec4(1.f, 0.45f, 0.35f, 1.f),
+            "Unsupported CUI_Effect pass: %d", *pShaderPass);
+        return;
+    }
+
+    ImGui::TextDisabled("%s", pCurItem->szDesc);
+
+    auto DrawInt = [&](const char* szLabel, const wchar_t* szPropName,
+        int iMin, int iMax)
+    {
+        int* pValue = Find_PropertyDataT<int>(
+            pReflect, szPropName, PROP_TYPE::INT);
+        if (!pValue)
+            return;
+
+        int iValue = *pValue;
+        if (ImGui::DragInt(szLabel, &iValue, 1.f, iMin, iMax))
+        {
+            if (iValue < iMin)
+                iValue = iMin;
+            if (iValue > iMax)
+                iValue = iMax;
+
+            *pValue = iValue;
+            uictx.bDirty = true;
+        }
+    };
+
+    auto DrawFloat = [&](const char* szLabel, const wchar_t* szPropName,
+        float fSpeed, float fMin, float fMax, const char* szFmt)
+    {
+        float* pValue = Find_PropertyDataT<float>(
+            pReflect, szPropName, PROP_TYPE::FLOAT);
+        if (!pValue)
+            return;
+
+        if (ImGui::DragFloat(szLabel, pValue, fSpeed, fMin, fMax, szFmt))
+            uictx.bDirty = true;
+    };
+
+    auto DrawFloat2 = [&](const char* szLabel, const wchar_t* szPropName,
+        float fSpeed)
+    {
+        _float2* pValue = Find_PropertyDataT<_float2>(
+            pReflect, szPropName, PROP_TYPE::FLOAT2);
+        if (!pValue)
+            return;
+
+        if (ImGui::DragFloat2(szLabel, reinterpret_cast<float*>(pValue), fSpeed))
+            uictx.bDirty = true;
+    };
+
+    std::wstring* pTextureTag = Find_PropertyDataT<std::wstring>(
+        pReflect, L"TextureProtoTag", PROP_TYPE::WSTRING);
+    std::wstring* pMaskTextureTag = Find_PropertyDataT<std::wstring>(
+        pReflect, L"MaskTextureProtoTag", PROP_TYPE::WSTRING);
+
+    if (pCurItem->bSourceTexture)
+    {
+        DrawInt("TextureIndex", L"TextureIndex", 0, 9999);
+        if (!pTextureTag || pTextureTag->empty())
+            ImGui::TextColored(ImVec4(1.f, 0.45f, 0.35f, 1.f),
+                "TextureProtoTag required");
+    }
+    else
+    {
+        ImGui::TextDisabled("TextureIndex: not used by this pass");
+    }
+
+    if (pCurItem->bMaskTexture)
+    {
+        DrawInt("MaskTextureIndex", L"MaskTextureIndex", 0, 9999);
+        if (!pMaskTextureTag || pMaskTextureTag->empty())
+            ImGui::TextColored(ImVec4(1.f, 0.45f, 0.35f, 1.f),
+                "MaskTextureProtoTag required");
+    }
+
+    if (pCurItem->bMaskTexture)
+    {
+        int* pMaskChannel = Find_PropertyDataT<int>(
+            pReflect, L"MaskChannel", PROP_TYPE::INT);
+        if (pMaskChannel)
+        {
+            const char* szChannels[] = { "R", "G", "B", "A" };
+            int iChannel = *pMaskChannel;
+            if (iChannel < 0 || iChannel > 3)
+                iChannel = 3;
+
+            if (ImGui::Combo("MaskChannel", &iChannel,
+                szChannels, IM_ARRAYSIZE(szChannels)))
+            {
+                *pMaskChannel = iChannel;
+                uictx.bDirty = true;
+            }
+        }
+
+        int* pInvertMask = Find_PropertyDataT<int>(
+            pReflect, L"InvertMask", PROP_TYPE::INT);
+        if (pInvertMask)
+        {
+            bool bInvert = *pInvertMask != 0;
+            if (ImGui::Checkbox("InvertMask", &bInvert))
+            {
+                *pInvertMask = bInvert ? 1 : 0;
+                uictx.bDirty = true;
+            }
+        }
+
+        DrawFloat("MaskPower", L"MaskPower", 0.05f, 0.001f, 32.f, "%.3f");
+    }
+
+    DrawFloat("EffectIntensity", L"EffectIntensity", 0.05f, 0.f, 100.f, "%.3f");
+
+    if (pCurItem->bUV)
+    {
+        DrawFloat2("EffectTiling", L"EffectTiling", 0.01f);
+        DrawFloat2("EffectOffset", L"EffectOffset", 0.01f);
+    }
+
+    if (pCurItem->bReveal)
+    {
+        float* pProgress = Find_PropertyDataT<float>(
+            pReflect, L"RevealProgress", PROP_TYPE::FLOAT);
+        if (pProgress)
+        {
+            if (ImGui::SliderFloat("RevealProgress", pProgress, 0.f, 1.f, "%.3f"))
+                uictx.bDirty = true;
+        }
+
+        DrawFloat("RevealSoftness", L"RevealSoftness", 0.001f, 0.0001f, 1.f, "%.4f");
+    }
+}
 void CPanel_Inspector::Render_SpriteAnimControl(CUIPartObject* pPart)
 {
     auto* pAnim = dynamic_cast<Client::CUI_SpriteAnim*>(pPart);
@@ -837,9 +1086,9 @@ void CPanel_Inspector::Render_TextInspector(CUIPartObject* pPart)
     }
 }
 
-void CPanel_Inspector::Render_UIPartBounceInspector(CUIPartObject* pPart)
+void CPanel_Inspector::Render_UIPartBounceInspector(CUIContainerObject* pContainer, CUIPartObject* pPart, const _wstring& strPartTag)
 {
-    if (!pPart)
+    if (!pPart || !pContainer)
         return;
 
     if (!ImGui::CollapsingHeader("Bounce Test"))
@@ -857,15 +1106,32 @@ void CPanel_Inspector::Render_UIPartBounceInspector(CUIPartObject* pPart)
     ImGui::DragFloat("Wave Count", &s_fWaveCount, 0.05f, 0.1f, 10.f);
     ImGui::DragFloat("Damping", &s_fDamping, 0.05f, 0.f, 8.f);
 
+    auto* pOwner = dynamic_cast<Client::IUIAnimatorOwner*>(pContainer);
+    Client::CUIAnimatorCom* pAnimator = pOwner ? pOwner->Get_UIAnimatorCom() : nullptr;
+
+    if (!pAnimator)
+    {
+        ImGui::TextDisabled("UIAnimatorCom is not available.");
+        return;
+    }
+
     if (ImGui::Button("Bounce Play"))
-        pPart->Play_Bounce(s_vDirection, s_fDistance, s_fDuration, s_fWaveCount, s_fDamping);
+    {
+        Client::CUIAnimatorCom::UI_BOUNCE_DESC Desc{};
+        Desc.vDirection = s_vDirection;
+        Desc.fDistance = s_fDistance;
+        Desc.fDuration = s_fDuration;
+        Desc.fWaveCount = s_fWaveCount;
+        Desc.fDamping = s_fDamping;
+        pAnimator->Play_Bounce(strPartTag, Desc);
+    }
 
     ImGui::SameLine();
 
     if (ImGui::Button("Bounce Stop"))
-        pPart->Stop_Bounce(true);
+        pAnimator->Stop_Bounce(strPartTag, true);
 
-    ImGui::TextDisabled(pPart->Is_Bouncing() ? "Playing" : "Idle");
+    ImGui::TextDisabled(pAnimator->Is_Bouncing(strPartTag) ? "Playing" : "Idle");
 }
 
 CPanel_Inspector* CPanel_Inspector::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

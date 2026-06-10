@@ -24,6 +24,15 @@ HRESULT CUI_PointStar::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+	m_pUIAnimatorCom = Add_Component<CUIAnimatorCom>(
+		TEXT("Com_UIAnimator"),
+		CUIAnimatorCom::Create(m_pDevice, m_pContext));
+
+	if (!m_pUIAnimatorCom || FAILED(m_pUIAnimatorCom->Initialize(nullptr)))
+		return E_FAIL;
+
+	Bind_UIAnimator();
+
 	return S_OK;
 }
 
@@ -37,6 +46,9 @@ void CUI_PointStar::Update(_float fTimeDelta)
 	if (!m_bActive)
 		return;
 
+	if (m_pUIAnimatorCom)
+		m_pUIAnimatorCom->Update(fTimeDelta);
+
 	__super::Update(fTimeDelta);
 
 	if (m_pSpark && m_pSpark->Is_Active() && m_pSpark->Is_Finished())
@@ -47,7 +59,10 @@ void CUI_PointStar::Update(_float fTimeDelta)
 
 	m_fVisibleElapsed += fTimeDelta;
 
-	if (m_fVisibleElapsed >= m_fVisibleDuration)
+	if (!m_bFadeOut && m_fVisibleElapsed >= m_fVisibleDuration)
+		Begin_PointStarFadeOut();
+
+	if (m_bFadeOut && (!m_pUIAnimatorCom || !m_pUIAnimatorCom->Is_FadingAny()))
 	{
 		if (m_pSpark)
 		{
@@ -55,12 +70,10 @@ void CUI_PointStar::Update(_float fTimeDelta)
 			m_pSpark->Set_Active(false);
 		}
 
-		if (m_pIcon)
-			m_pIcon->Stop_Bounce(true);
+		if (m_pUIAnimatorCom)
+			m_pUIAnimatorCom->Stop_AllBounces(true);
 
-		if (m_pAmount)
-			m_pAmount->Stop_Bounce(true);
-
+		m_bFadeOut = false;
 		Set_Active(false);
 	}
 }
@@ -90,6 +103,8 @@ void CUI_PointStar::On_Deserialized()
 	if (FAILED(Cache_Parts()))
 		return;
 
+	Bind_UIAnimator();
+
 	if (m_pSpark)
 	{
 		m_pSpark->Stop();
@@ -102,11 +117,11 @@ void CUI_PointStar::On_Deserialized()
 void CUI_PointStar::On_UIPartsChanged()
 {
 	Cache_Parts();
+	Bind_UIAnimator();
 }
 
 HRESULT CUI_PointStar::Cache_Parts()
 {
-	m_pIcon = nullptr;
 	m_pSpark = nullptr;
 	m_pAmount = nullptr;
 
@@ -118,10 +133,6 @@ HRESULT CUI_PointStar::Cache_Parts()
 
 			return it->second;
 		};
-
-	m_pIcon = dynamic_cast<CUI_Image*>(FindPart(L"Part_PointStar_Image"));
-	if (!m_pIcon)
-		return E_FAIL;
 
 	m_pSpark = dynamic_cast<CUI_SpriteAnim*>(FindPart(L"Part_PointStar_SpriteAnim"));
 	if (!m_pSpark)
@@ -136,6 +147,12 @@ HRESULT CUI_PointStar::Cache_Parts()
 	return S_OK;
 }
 
+void CUI_PointStar::Bind_UIAnimator()
+{
+	if (m_pUIAnimatorCom)
+		m_pUIAnimatorCom->Bind_Parts(m_UIPartObjects);
+}
+
 void CUI_PointStar::Play_PointStarBounce()
 {
 	const _float2 vDir = { 0.f, 1.f };
@@ -144,21 +161,91 @@ void CUI_PointStar::Play_PointStarBounce()
 	{
 		m_pSpark->Set_Active(true);
 		m_pSpark->Play(false);
-		m_pSpark->Play_Bounce(vDir, 10.f, 0.28f, 1.f, 1.2f);
 	}
 
-	if (m_pIcon)
-		m_pIcon->Play_Bounce(vDir, 7.f, 0.22f, 1.f, 1.f);
+	if (!m_pUIAnimatorCom)
+		return;
 
-	if (m_pAmount)
-		m_pAmount->Play_Bounce(vDir, 6.f, 0.22f, 1.f, 1.f);
+	CUIAnimatorCom::UI_BOUNCE_DESC SparkBounce{};
+	SparkBounce.vDirection = vDir;
+	SparkBounce.fDistance = 10.f;
+	SparkBounce.fDuration = 0.28f;
+	SparkBounce.fWaveCount = 1.f;
+	SparkBounce.fDamping = 1.2f;
+	m_pUIAnimatorCom->Play_Bounce(L"Part_PointStar_SpriteAnim", SparkBounce);
+
+	CUIAnimatorCom::UI_BOUNCE_DESC IconBounce{};
+	IconBounce.vDirection = vDir;
+	IconBounce.fDistance = 7.f;
+	IconBounce.fDuration = 0.22f;
+	IconBounce.fWaveCount = 1.f;
+	IconBounce.fDamping = 1.f;
+	m_pUIAnimatorCom->Play_Bounce(L"Part_PointStar_Image", IconBounce);
+
+	CUIAnimatorCom::UI_BOUNCE_DESC TextBounce{};
+	TextBounce.vDirection = vDir;
+	TextBounce.fDistance = 6.f;
+	TextBounce.fDuration = 0.22f;
+	TextBounce.fWaveCount = 1.f;
+	TextBounce.fDamping = 1.f;
+	m_pUIAnimatorCom->Play_Bounce(L"Part_PointStar_Amount", TextBounce);
+}
+
+void CUI_PointStar::Play_PointStarFadeIn()
+{
+	if (!m_pUIAnimatorCom)
+		return;
+
+	m_pUIAnimatorCom->Stop_AllFades(true);
+
+	CUIAnimatorCom::UI_FADE_DESC FadeIn{};
+	FadeIn.fFromAlpha = 0.f;
+	FadeIn.fToAlpha = -1.f;
+	FadeIn.fDuration = m_fFadeInDuration;
+	FadeIn.bRestoreOnFinish = false;
+
+	m_pUIAnimatorCom->Play_FadeAll(FadeIn);
+}
+
+void CUI_PointStar::Begin_PointStarFadeOut()
+{
+	if (m_bFadeOut)
+		return;
+
+	m_bFadeOut = true;
+
+	if (!m_pUIAnimatorCom)
+		return;
+
+	m_pUIAnimatorCom->Stop_AllBounces(true);
+
+	CUIAnimatorCom::UI_FADE_DESC FadeOut{};
+	FadeOut.fFromAlpha = -1.f;
+	FadeOut.fToAlpha = 0.f;
+	FadeOut.fDuration = m_fFadeOutDuration;
+	FadeOut.bRestoreOnFinish = true;
+
+	m_pUIAnimatorCom->Play_FadeAll(FadeOut);
 }
 
 void CUI_PointStar::On_PointStarGained(const KIRBY_POINTSTAR_GAINED_DESC* pDesc)
 {
 	// UI Active
-	m_bActive = true;
+	const _bool bWasActive = Is_Active();
+	const _bool bWasFadeOut = m_bFadeOut;
+
+	Set_Active(true);
 	m_fVisibleElapsed = 0.f;
+	m_bFadeOut = false;
+
+	if (!bWasActive)
+	{
+		Play_PointStarFadeIn();
+	}
+	else if (bWasFadeOut && m_pUIAnimatorCom)
+	{
+		m_pUIAnimatorCom->Stop_AllFades(true);
+	}
 
 	const _uint iAmount = pDesc ? pDesc->iAmount : 1;
 

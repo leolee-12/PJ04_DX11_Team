@@ -25,7 +25,43 @@ HRESULT CUI_GenericContainer::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pDesc)))
         return E_FAIL;
 
+    m_pUIAnimatorCom = Add_Component<CUIAnimatorCom>(
+        TEXT("Com_UIAnimator"),
+        CUIAnimatorCom::Create(m_pDevice, m_pContext));
+
+    if (!m_pUIAnimatorCom || FAILED(m_pUIAnimatorCom->Initialize(nullptr)))
+        return E_FAIL;
+
+    Bind_UIAnimator();
+
     return S_OK;
+}
+
+void CUI_GenericContainer::Update(_float fTimeDelta)
+{
+    if (!m_bActive)
+        return;
+
+    if (m_pUIAnimatorCom)
+        m_pUIAnimatorCom->Update(fTimeDelta);
+
+    __super::Update(fTimeDelta);
+}
+
+void CUI_GenericContainer::On_Deserialized()
+{
+    Bind_UIAnimator();
+}
+
+void CUI_GenericContainer::On_UIPartsChanged()
+{
+    Bind_UIAnimator();
+}
+
+void CUI_GenericContainer::Bind_UIAnimator()
+{
+    if (m_pUIAnimatorCom)
+        m_pUIAnimatorCom->Bind_Parts(m_UIPartObjects);
 }
 
 CUI_GenericContainer* CUI_GenericContainer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

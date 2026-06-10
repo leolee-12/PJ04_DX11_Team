@@ -673,8 +673,9 @@ _bool CPanel_UICanvas::Pick_TopmostPart(const _float2& vMouseUI, UI_PICK_CANDIDA
         if (!pContainer->Is_Active())
             continue;
 
-        const auto& Parts = pContainer->Get_UIPartObjects();
-        for (const auto& Pair : Parts)
+        vector<pair<_wstring, CUIPartObject*>> OrderedParts;
+        pContainer->Get_UIPartObjectsInOrder(&OrderedParts);
+        for (const auto& Pair : OrderedParts)
         {
             CUIPartObject* pPart = Pair.second;
             if (!pPart)
@@ -720,9 +721,20 @@ _bool CPanel_UICanvas::Pick_TopmostPart(const _float2& vMouseUI, UI_PICK_CANDIDA
                 else if (Bounds.fZ >= Best.Bounds.fZ - fZEqualEpsilon &&
                     Bounds.fZ <= Best.Bounds.fZ + fZEqualEpsilon)
                 {
-                    // 동일한 Render Layer, 같은 Z 값을 가진 오브젝트는 순회에서 나중에 발견한 후보가 선택됨
-                    // 이렇게 되면 보편적으로 더 위에 배치되어 보이는 녀석이 선택됨
-                    bTake = true;
+                    const _int iNewOrder = pContainer->Get_UIPartOrderIndex(Pair.first);
+
+                    _int iBestOrder = -1;
+                    if (Best.pContainer)
+                        iBestOrder = Best.pContainer->Get_UIPartOrderIndex(Best.strPartTag);
+
+                    if (pContainer != Best.pContainer)
+                    {
+                        bTake = true;
+                    }
+                    else if (iNewOrder > iBestOrder)
+                    {
+                        bTake = true;
+                    }
                 }
             }
 

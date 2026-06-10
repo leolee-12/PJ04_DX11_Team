@@ -79,6 +79,9 @@
     <Filter Include="00. GameObject\UI\UIPart\Effect">
       <UniqueIdentifier>{0be37482-7fe4-4538-a085-a1d70dd6ef22}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\UI\Animator">
+      <UniqueIdentifier>{a0cc2fa3-e859-4ce0-bc75-268a9cc6fb1d}</UniqueIdentifier>
+    </Filter>
     <Filter Include="98. ShaderFiles\Hojun">
       <UniqueIdentifier>{a6e24554-9141-4712-87e0-61e01d059777}</UniqueIdentifier>
     </Filter>
@@ -405,6 +408,9 @@
     <ClInclude Include="..\Public\UI_Fonts.h">
       <Filter>99. Defines\Hojun</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\UIAnimatorCom.h">
+      <Filter>00. GameObject\UI\Animator</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\InhaleEffect.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\06. InhaleEffect</Filter>
     </ClInclude>
@@ -583,6 +589,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\UI_GenericContainer.cpp">
       <Filter>00. GameObject\UI\UIContainer\GenericContainer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UIAnimatorCom.cpp">
+      <Filter>00. GameObject\UI\Animator</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\InhaleEffect.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\06. InhaleEffect</Filter>

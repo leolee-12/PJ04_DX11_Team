@@ -26,8 +26,9 @@ public:
 	{
 		return m_UIPartObjects;
 	}
-
-	void Clear_UIPartObjects();
+	void			Get_UIPartObjectsInOrder(vector<pair<_wstring, CUIPartObject*>>* pOutParts) const;
+	_int			Get_UIPartOrderIndex(const _wstring& strPartTag) const;
+	void			Clear_UIPartObjects();
 	
 
 public:
@@ -48,6 +49,7 @@ protected:
 
 	unordered_map<_wstring, CUIPartObject*>				m_UIPartObjects;
 	unordered_map<_wstring, UI_PART_PROTOTYPE_INFO>		m_UIPartPrototypeInfos;
+	vector<_wstring> m_UIPartOrder;
 
 protected:
 	HRESULT Add_UIPartObject(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag,

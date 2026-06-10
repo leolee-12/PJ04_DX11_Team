@@ -2,6 +2,7 @@
 
 #include "GameContent_Defines.h"
 #include "UIContainerObject.h"
+#include "UIAnimatorCom.h"
 
 NS_BEGIN(Client)
 class CUI_Image;
@@ -9,7 +10,7 @@ class CUI_SpriteAnim;
 class CUI_Effect;
 class CUI_Text;
 
-class CUI_Title final : public CUIContainerObject
+class CUI_Title final : public CUIContainerObject, public IUIAnimatorOwner
 {
 	GENERATED_BODY(CUI_Title)
 
@@ -32,6 +33,9 @@ public:
 		pOut->strPrototypeTag = PROTOTYPE_TAG;
 	}
 
+	virtual CUIAnimatorCom*				Get_UIAnimatorCom() override { return m_pUIAnimatorCom; }
+	virtual const CUIAnimatorCom*		Get_UIAnimatorCom() const override { return m_pUIAnimatorCom; }
+
 protected:
 	virtual HRESULT						Ready_Events() override;
 	virtual void						On_Deserialized() override;
@@ -39,10 +43,12 @@ protected:
 
 private:
 	HRESULT								Cache_Parts();
+	void								Bind_UIAnimator();
 
 	// юс╫ц╥н
 	CUI_Image*							m_pIcon = { nullptr };
 	CUI_Effect*							m_pEffect = { nullptr };
+	CUIAnimatorCom*						 m_pUIAnimatorCom = { nullptr };
 
 public:
 	static CUI_Title*					Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

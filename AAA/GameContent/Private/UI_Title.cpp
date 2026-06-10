@@ -26,6 +26,15 @@ HRESULT CUI_Title::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
+    m_pUIAnimatorCom = Add_Component<CUIAnimatorCom>(
+        TEXT("Com_UIAnimator"),
+        CUIAnimatorCom::Create(m_pDevice, m_pContext));
+
+    if (!m_pUIAnimatorCom || FAILED(m_pUIAnimatorCom->Initialize(nullptr)))
+        return E_FAIL;
+
+    Bind_UIAnimator();
+
     return S_OK;
 }
 
@@ -36,6 +45,12 @@ void CUI_Title::Priority_Update(_float fTimeDelta)
 
 void CUI_Title::Update(_float fTimeDelta)
 {
+    if (!m_bActive)
+        return;
+
+    if (m_pUIAnimatorCom)
+        m_pUIAnimatorCom->Update(fTimeDelta);
+
     __super::Update(fTimeDelta);
 }
 
@@ -56,11 +71,14 @@ void CUI_Title::On_Deserialized()
 {
     if (FAILED(Cache_Parts()))
         return;
+
+    Bind_UIAnimator();
 }
 
 void CUI_Title::On_UIPartsChanged()
 {
     Cache_Parts();
+    Bind_UIAnimator();
 }
 
 HRESULT CUI_Title::Cache_Parts()
@@ -93,6 +111,12 @@ HRESULT CUI_Title::Cache_Parts()
     //    return E_FAIL;
 
     return S_OK;
+}
+
+void CUI_Title::Bind_UIAnimator()
+{
+    if (m_pUIAnimatorCom)
+        m_pUIAnimatorCom->Bind_Parts(m_UIPartObjects);
 }
 
 CUI_Title* CUI_Title::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

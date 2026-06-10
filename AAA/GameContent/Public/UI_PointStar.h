@@ -2,6 +2,7 @@
 
 #include "GameContent_Defines.h"
 #include "UIContainerObject.h"
+#include "UIAnimatorCom.h"
 
 NS_BEGIN(Client)
 class CUI_Image;
@@ -9,7 +10,7 @@ class CUI_SpriteAnim;
 class CUI_Effect;
 class CUI_Text;
 
-class CLIENT_DLL CUI_PointStar final : public CUIContainerObject
+class CLIENT_DLL CUI_PointStar final : public CUIContainerObject, public IUIAnimatorOwner
 {
 	GENERATED_BODY(CUI_PointStar)
 
@@ -32,6 +33,9 @@ public:
 		pOut->strPrototypeTag = PROTOTYPE_TAG;
 	}
 
+	virtual CUIAnimatorCom* Get_UIAnimatorCom() override { return m_pUIAnimatorCom; }
+	virtual const CUIAnimatorCom* Get_UIAnimatorCom() const override { return m_pUIAnimatorCom; }
+
 protected:
 	virtual HRESULT			Ready_Events() override;
 	virtual void			On_Deserialized() override;
@@ -39,19 +43,24 @@ protected:
 
 private:
 	HRESULT					Cache_Parts();
+	void					Bind_UIAnimator();
 	void					Play_PointStarBounce();
+	void					Play_PointStarFadeIn();
+	void					Begin_PointStarFadeOut();
 	void					On_PointStarGained(const KIRBY_POINTSTAR_GAINED_DESC* pDesc);
 	void					Refresh_AmountText();
 
 private:
-	CUI_Image*				m_pIcon = { nullptr };
 	CUI_SpriteAnim*			m_pSpark = { nullptr };
-	CUI_Effect*				m_pEffect = { nullptr };
 	CUI_Text*				m_pAmount = { nullptr };
+	CUIAnimatorCom*			 m_pUIAnimatorCom = { nullptr };
 	
 	_uint					m_iStarCount = { 0 };
 	_float					m_fVisibleDuration = { 3.0f };		// ¸¶Áö¸· È¹µæ ÈÄ À¯Áö ½Ã°£
 	_float					m_fVisibleElapsed = { 0.f };
+	_float					m_fFadeInDuration = { 0.12f };
+	_float					m_fFadeOutDuration = { 0.25f };
+	_bool					m_bFadeOut = { false };
 
 
 public:

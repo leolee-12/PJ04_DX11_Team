@@ -152,7 +152,7 @@ void CPanel_Hierarchy::Render_UIHierarchy()
                 }
 
                 sort(SortedParts.begin(), SortedParts.end(),
-                    [](const auto& L, const auto& R)
+                    [pContainer](const auto& L, const auto& R)
                     {
                         CUIPartObject* pLeft = L.second;
                         CUIPartObject* pRight = R.second;
@@ -166,8 +166,19 @@ void CPanel_Hierarchy::Render_UIHierarchy()
                         const _float fLeftZ = pLeft->Get_ZOrder();
                         const _float fRightZ = pRight->Get_ZOrder();
 
-                        if (fLeftZ != fRightZ)
-                            return fLeftZ < fRightZ;
+                        constexpr _float fZEqualEpsilon = 0.0001f;
+
+                        if (fLeftZ < fRightZ - fZEqualEpsilon)
+                            return true;
+
+                        if (fLeftZ > fRightZ + fZEqualEpsilon)
+                            return false;
+
+                        const _int iLeftOrder = pContainer->Get_UIPartOrderIndex(L.first);
+                        const _int iRightOrder = pContainer->Get_UIPartOrderIndex(R.first);
+
+                        if (iLeftOrder != iRightOrder)
+                            return iLeftOrder < iRightOrder;
 
                         return L.first < R.first;
                     });

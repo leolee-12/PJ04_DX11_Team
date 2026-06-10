@@ -34,7 +34,8 @@ private:
 	void						Render_UIInspector();
 	void						Render_SpriteAnimControl(CUIPartObject* pPart);
 	void						Render_TextInspector(CUIPartObject* pPart);
-	void						Render_UIPartBounceInspector(CUIPartObject* pPart);
+	void						Render_EffectInspector(CUIPartObject* pPart);
+	void						Render_UIPartBounceInspector(CUIContainerObject* pContainer, CUIPartObject* pPart, const _wstring& strPartTag);
 
 private:
 	unordered_map<CGameObject*, _float3>	m_RotEditEuler;

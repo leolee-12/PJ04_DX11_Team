@@ -165,21 +165,31 @@ HRESULT CLIENT_DLL Load_Fonts(CGameInstance_Proxy* pProxy)
 
 HRESULT CLIENT_DLL Ready_Prototype_UIPartObjects(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    if (FAILED(pProxy->Add_Prototype(ETOUI(LEVEL::STATIC), CUI_Image::PROTOTYPE_TAG,
-        CUI_Image::Create(pDevice, pContext))))
-        return E_FAIL;
+    const _uint iLevel = ETOUI(LEVEL::STATIC);
 
-    if (FAILED(pProxy->Add_Prototype(ETOUI(LEVEL::STATIC), CUI_SpriteAnim::PROTOTYPE_TAG,
-        CUI_SpriteAnim::Create(pDevice, pContext))))
-        return E_FAIL;
+    if (!pProxy->Has_Prototype(iLevel, CUI_Image::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_Image::PROTOTYPE_TAG, CUI_Image::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
 
-    if (FAILED(pProxy->Add_Prototype(ETOUI(LEVEL::STATIC), CUI_Text::PROTOTYPE_TAG,
-        CUI_Text::Create(pDevice, pContext))))
-        return E_FAIL;
+    if (!pProxy->Has_Prototype(iLevel, CUI_SpriteAnim::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_SpriteAnim::PROTOTYPE_TAG, CUI_SpriteAnim::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
 
-    if (FAILED(pProxy->Add_Prototype(ETOUI(LEVEL::STATIC), CUI_Effect::PROTOTYPE_TAG,
-        CUI_Effect::Create(pDevice, pContext))))
-        return E_FAIL;
+    if (!pProxy->Has_Prototype(iLevel, CUI_Text::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_Text::PROTOTYPE_TAG, CUI_Text::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
+
+    if (!pProxy->Has_Prototype(iLevel, CUI_Effect::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_Effect::PROTOTYPE_TAG, CUI_Effect::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
 
     return S_OK;
 }

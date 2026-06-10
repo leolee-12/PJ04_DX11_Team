@@ -10,10 +10,13 @@ CUI_Effect::CUI_Effect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     , m_vEffectOffset{ 0.f, 0.f }
     , m_fMaskPower{ 1.f }
     , m_fEffectIntensity{ 1.f }
+    , m_fRevealProgress{ 1.f }
+    , m_fRevealSoftness{ 0.05f }
     , m_iMaskChannel{ 3 }
     , m_iInvertMask{ 0 }
     , m_iTextureLevel{ ETOUI(LEVEL::STATIC) }
     , m_iMaskTextureLevel{ ETOUI(LEVEL::STATIC) }
+    , m_iMaskTexIndex{ 0 }
     , m_iShaderPass  {ETOI(EFFECT_PASS::MASKED_TEXTURE)}
 {
 }
@@ -26,12 +29,15 @@ CUI_Effect::CUI_Effect(const CUI_Effect& Prototype)
     , m_vEffectOffset{ Prototype.m_vEffectOffset }
     , m_fMaskPower{ Prototype.m_fMaskPower }
     , m_fEffectIntensity{ Prototype.m_fEffectIntensity }
+    , m_fRevealProgress{ Prototype.m_fRevealProgress }
+    , m_fRevealSoftness{ Prototype.m_fRevealSoftness }
     , m_iMaskChannel{ Prototype.m_iMaskChannel }
     , m_iInvertMask{ Prototype.m_iInvertMask }
     , m_iTextureLevel{ Prototype.m_iTextureLevel }
     , m_strTextureProtoTag{ Prototype.m_strTextureProtoTag }
     , m_iMaskTextureLevel{ Prototype.m_iMaskTextureLevel }
     , m_strMaskTextureProtoTag{ Prototype.m_strMaskTextureProtoTag }
+    , m_iMaskTexIndex{ Prototype.m_iMaskTexIndex }
     , m_iShaderPass{ Prototype.m_iShaderPass }
 {
 }
@@ -64,8 +70,11 @@ HRESULT CUI_Effect::Initialize(void* pArg)
     m_vEffectOffset = pDesc->vEffectOffset;
     m_fMaskPower = pDesc->fMaskPower;
     m_fEffectIntensity = pDesc->fEffectIntensity;
+    m_fRevealProgress = pDesc->fRevealProgress;
+    m_fRevealSoftness = pDesc->fRevealSoftness;
     m_iMaskChannel = pDesc->iMaskChannel;
     m_iInvertMask = pDesc->iInvertMask;
+    m_iMaskTexIndex = pDesc->iMaskTexIndex;
     m_iShaderPass = pDesc->iShaderPass;
 
     if (FAILED(__super::Initialize(pDesc)))
@@ -237,15 +246,34 @@ HRESULT CUI_Effect::Bind_ShaderResources()
     if (FAILED(Bind_ShaderResource(m_pShaderCom, "g_ProjMatrix", D3DTS::PROJ, PROJ_TYPE::ORTHO)))
         return E_FAIL;
 
-    if (!m_pEffectTextureCom || !m_pMaskTextureCom)
-        return E_FAIL;
+    const _bool bNeedEffectTexture =
+        m_iShaderPass == ETOI(EFFECT_PASS::MASKED_TEXTURE) ||
+        m_iShaderPass == ETOI(EFFECT_PASS::MASKED_ADD) ||
+        m_iShaderPass == ETOI(EFFECT_PASS::BRUSH_REVEAL);
 
-    if (FAILED(m_pEffectTextureCom->Bind_ShaderResource(m_pShaderCom, "g_EffectTexture",
-        m_iTexIndex)))
-        return E_FAIL;
+    const _bool bNeedMaskTexture =
+        m_iShaderPass == ETOI(EFFECT_PASS::MASKED_TEXTURE) ||
+        m_iShaderPass == ETOI(EFFECT_PASS::MASKED_COLOR) ||
+        m_iShaderPass == ETOI(EFFECT_PASS::MASKED_ADD) ||
+        m_iShaderPass == ETOI(EFFECT_PASS::BRUSH_REVEAL);
 
-    if (FAILED(m_pMaskTextureCom->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", m_iTexIndex)))
-        return E_FAIL;
+    if (bNeedEffectTexture)
+    {
+        if (!m_pEffectTextureCom)
+            return E_FAIL;
+
+        if (FAILED(m_pEffectTextureCom->Bind_ShaderResource(m_pShaderCom, "g_EffectTexture", m_iTexIndex)))
+            return E_FAIL;
+    }
+
+    if (bNeedMaskTexture)
+    {
+        if (!m_pMaskTextureCom)
+            return E_FAIL;
+
+        if (FAILED(m_pMaskTextureCom->Bind_ShaderResource(m_pShaderCom, "g_MaskTexture", m_iMaskTexIndex)))
+            return E_FAIL;
+    }
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &m_vColor, sizeof(m_vColor))))
         return E_FAIL;
@@ -266,6 +294,14 @@ HRESULT CUI_Effect::Bind_ShaderResources()
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fEffectIntensity", &m_fEffectIntensity,
         sizeof(m_fEffectIntensity))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fRevealProgress", &m_fRevealProgress,
+        sizeof(m_fRevealProgress))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fRevealSoftness", &m_fRevealSoftness,
+        sizeof(m_fRevealSoftness))))
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaskChannel", &m_iMaskChannel,

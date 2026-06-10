@@ -22,6 +22,8 @@ class CLIENT_DLL CUI_Effect final : public CUIPartObject
     PROPERTY(_float2, m_vEffectOffset, L"EffectOffset", L"Effect");
     PROPERTY(_float, m_fMaskPower, L"MaskPower", L"Effect");
     PROPERTY(_float, m_fEffectIntensity, L"EffectIntensity", L"Effect");
+    PROPERTY(_float, m_fRevealProgress, L"RevealProgress", L"Effect");
+    PROPERTY(_float, m_fRevealSoftness, L"RevealSoftness", L"Effect");
     PROPERTY(_int, m_iMaskChannel, L"MaskChannel", L"Effect");
     PROPERTY(_int, m_iInvertMask, L"InvertMask", L"Effect");
 
@@ -30,12 +32,16 @@ class CLIENT_DLL CUI_Effect final : public CUIPartObject
 
     PROPERTY(_int, m_iMaskTextureLevel, L"MaskTextureLevel", L"Texture");
     PROPERTY(_wstring, m_strMaskTextureProtoTag, L"MaskTextureProtoTag", L"Texture");
+    PROPERTY(_int, m_iMaskTexIndex, L"MaskTextureIndex", L"Texture");
 
 public:
     // pass 확인용 안쓰면 지워도 됨
     enum class EFFECT_PASS : _int       
     {
         MASKED_TEXTURE = 2,
+        MASKED_COLOR = 3,
+        MASKED_ADD = 4,
+        BRUSH_REVEAL = 5,
         END
     };
 
@@ -58,8 +64,11 @@ public:
         _float2     vEffectOffset = { 0.f, 0.f };
         _float      fMaskPower = { 1.f };
         _float      fEffectIntensity = { 1.f };
+        _float      fRevealProgress = { 1.f };
+        _float      fRevealSoftness = { 0.05f };
         _int        iMaskChannel = { 3 };   // 0:R, 1:G, 2:B, 3:A
         _int        iInvertMask = { 0 };
+        _int        iMaskTexIndex = { 0 };
         _int        iShaderPass = { ETOI(EFFECT_PASS::MASKED_TEXTURE)};
     } UI_EFFECT_DESC;
 
