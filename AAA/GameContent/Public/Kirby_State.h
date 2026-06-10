@@ -16,7 +16,6 @@ class CKirby;
 enum class KIRBY_STATE_TYPE
 {
 	WAIT, RUN, JUMP, FALL,
-	INHALE,
 	ATTACK,
 };
 

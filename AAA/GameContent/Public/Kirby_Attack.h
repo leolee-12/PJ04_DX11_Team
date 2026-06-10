@@ -13,7 +13,7 @@ class CKirby;
 
 class CLIENT_DLL CKirby_Attack final : public CKirby_State
 {
-protected:
+private:
 	CKirby_Attack();
 	virtual ~CKirby_Attack() = default;
 

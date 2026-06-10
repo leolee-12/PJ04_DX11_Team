@@ -63,6 +63,11 @@ void CMovement::Set_Acceleration(_float Accel, _float Decel)
     m_fDecel = Decel;
 }
 
+void CMovement::Set_MoveSpeed(_float fMoveSpeed)
+{
+    m_fMoveSpeed = fMoveSpeed;
+}
+
 void CMovement::Calc_Vertical(_float fTimeDelta)
 {
     m_fVerticalVelocity += m_fGravity * fTimeDelta;

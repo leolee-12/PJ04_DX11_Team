@@ -4,6 +4,7 @@
 
 #include "Kirby.h"
 #include "Kirby_Body.h"
+#include "Kirby_Ability.h"
 
 CKirby_Attack::CKirby_Attack()
 {
@@ -11,7 +12,6 @@ CKirby_Attack::CKirby_Attack()
 
 HRESULT CKirby_Attack::Initialize()
 {
-
     return S_OK;
 }
 
@@ -22,14 +22,23 @@ KIRBY_STATE_TYPE CKirby_Attack::Get_StateType()
 
 void CKirby_Attack::Enter(CKirby* pKirby)
 {
+    pKirby->Get_KirbyAbility()->Enter_Ability(pKirby);
 }
 
 void CKirby_Attack::Update(CKirby* pKirby, const _float fTimeDelta)
 {
+    CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+    pAbility->Update_Ability(pKirby, fTimeDelta);
+
+    if (pAbility->IsEndAttack() == true)
+    {
+        Transition_Wait_OR_Run(pKirby);
+    }
 }
 
 void CKirby_Attack::Exit(CKirby* pKirby)
 {
+    pKirby->Get_KirbyAbility()->Exit_Ability(pKirby);
 }
 
 _bool CKirby_Attack::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -38,20 +47,16 @@ _bool CKirby_Attack::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 
     KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
 
-    //switch (eCommandType)
-    //{
-    //case KIRBY_COMMAND_TYPE::MOVE_TOP:
-    //case KIRBY_COMMAND_TYPE::MOVE_DOWN:
-    //case KIRBY_COMMAND_TYPE::MOVE_LEFT:
-    //case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
-    //    Handle_MoveCommand(pKirby, pCommand);
-    //    pKirby->Change_State(KIRBY_STATE_TYPE::RUN);
-    //    return true;
+    switch (eCommandType)
+    {
+        case KIRBY_COMMAND_TYPE::ATTACK_UP:
+            pKirby->Get_KirbyAbility()->Up_Attack(pKirby);
+            return true;
+    }
 
-    //case KIRBY_COMMAND_TYPE::JUMP:
-    //    pKirby->Change_State(KIRBY_STATE_TYPE::JUMP);
-    //    return true;
-    //}
+    CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+    if (pAbility->Handle_Command(pKirby, pCommand) == true)
+        return true;
 
     return false;
 }

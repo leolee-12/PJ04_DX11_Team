@@ -4,6 +4,7 @@
 
 #include "Kirby.h"
 #include "Kirby_Body.h"
+#include "Kirby_Ability.h"
 
  _bool CKirby_Jump::m_bLeft = false;
 
@@ -30,11 +31,10 @@ void CKirby_Jump::Enter(CKirby* pKirby)
 
 
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
-     const _float fSpeed = 5.f;
     if (m_bLeft == true)
-        pAnimator->Play("JumpL", false, false, 0.1f, fSpeed);
+        pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::JUMP_L));
     else
-        pAnimator->Play("JumpR", false, false, 0.1f, fSpeed);
+        pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::JUMP_R));
 
     m_bFirstFrameSkip = false;
     m_eJumpType = JUMP_STATE::JUMP_STRAT;
@@ -61,12 +61,10 @@ void CKirby_Jump::Update(CKirby* pKirby, const _float fTimeDelta)
         {
             CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
 
-            const _float fSpeed = 2.2f;
-
             if (m_bLeft == true)
-                pAnimator->Play("JumpEndL", false, false, 0.0f, fSpeed);
+                pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::JUMP_END_L));
             else
-                pAnimator->Play("JumpEndR", false, false, 0.0f, fSpeed);
+                pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::JUMP_END_R));
         }
     }      
 }
@@ -92,7 +90,13 @@ _bool CKirby_Jump::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             Handle_MoveCommand(pKirby, pCommand);
             return true;
 
-
+        case KIRBY_COMMAND_TYPE::ATTACK_DOWN:
+        {
+            CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+            if(pAbility->Can_Attack(KIRBY_ATTACK_LOCATION::AIR))
+                pAbility->Down_Attack(pKirby);
+            return true;
+        }
     }
 
     return false;

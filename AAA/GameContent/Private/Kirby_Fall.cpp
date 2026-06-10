@@ -4,6 +4,7 @@
 
 #include "Kirby.h"
 #include "Kirby_Body.h"
+#include "Kirby_Ability.h"
 
 CKirby_Fall::CKirby_Fall()
 {
@@ -37,7 +38,7 @@ void CKirby_Fall::Update(CKirby* pKirby, const _float fTimeDelta)
         pMovementCom->Is_Grounded() == true)
     {
         m_eFallingState = FALL_STATE::LAND_START;
-        pAnimator->Play("Landing", false, false, 0.05f, 1.f);
+        pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::LANDING));
         pKirby_Body->Set_Eye(KIRBY_EYE_STATE::CLOSE);
     }
     // 애니메이션 끝나면 Wait or Run
@@ -69,6 +70,14 @@ _bool CKirby_Fall::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
         case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
             Handle_MoveCommand(pKirby, pCommand);
             return true;
+
+        case KIRBY_COMMAND_TYPE::ATTACK_DOWN:
+        {
+            CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+            if (pAbility->Can_Attack(KIRBY_ATTACK_LOCATION::AIR))
+                pAbility->Down_Attack(pKirby);
+            return true;
+        }
 
  /*       case KIRBY_COMMAND_TYPE::JUMP:
         {
