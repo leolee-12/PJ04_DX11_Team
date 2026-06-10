@@ -38,6 +38,80 @@ namespace
 
 		return strValue;
 	}
+
+	_bool Is_SameText(const wstring& A, const wchar_t* B)
+	{
+		return 0 == _wcsicmp(A.c_str(), B);
+	}
+
+	ENV_SIMPLE_SHAPE Resolve_SimpleShapeFromObjectName(const wstring& strObjectName)
+	{
+		if (Is_SameText(strObjectName, L"Cube"))
+			return ENV_SIMPLE_SHAPE::BOX;
+
+		if (Is_SameText(strObjectName, L"Sphere"))
+			return ENV_SIMPLE_SHAPE::SPHERE;
+
+		if (Is_SameText(strObjectName, L"Cylinder"))
+			return ENV_SIMPLE_SHAPE::CYLINDER;
+
+		if (Is_SameText(strObjectName, L"Slope"))
+			return ENV_SIMPLE_SHAPE::SLOPE;
+
+		return ENV_SIMPLE_SHAPE::NONE;
+	}
+
+	void Resolve_EnvColliderKind(ENV_OBJECT_DESC* pDesc)
+	{
+		if (nullptr == pDesc)
+			return;
+
+		ENV_COLLISION_DESC& Collision = pDesc->tCollision;
+
+		Collision.eColliderKind = ENV_COLLIDER_KIND::NONE;
+		Collision.eSimpleShape = ENV_SIMPLE_SHAPE::NONE;
+
+		if (pDesc->eKind == ENV_OBJECT_KIND::EFFECT)
+			return;
+
+		if (Collision.bInvalidCollision)
+			return;
+
+		if (pDesc->eSourceType == ENV_SOURCE_TYPE::TOY_DECOR)
+		{
+			const ENV_SIMPLE_SHAPE eShape =
+				Resolve_SimpleShapeFromObjectName(pDesc->strObjectName);
+
+			if (eShape != ENV_SIMPLE_SHAPE::NONE)
+			{
+				Collision.eColliderKind = ENV_COLLIDER_KIND::SIMPLE_SHAPE;
+				Collision.eSimpleShape = eShape;
+				return;
+			}
+
+			Collision.eColliderKind = ENV_COLLIDER_KIND::UNKNOWN;
+			return;
+		}
+
+		if (pDesc->eSourceType == ENV_SOURCE_TYPE::DECOR_DECOR)
+		{
+			Collision.eColliderKind = ENV_COLLIDER_KIND::MODEL_MESH;
+			return;
+		}
+
+		if (pDesc->eSourceType == ENV_SOURCE_TYPE::TOY_OBJ)
+		{
+			if (!Collision.strMapCollType.empty()
+				&& !Is_SameText(Collision.strMapCollType, L"None"))
+			{
+				Collision.eColliderKind = ENV_COLLIDER_KIND::UNKNOWN;
+				return;
+			}
+
+			Collision.eColliderKind = ENV_COLLIDER_KIND::NONE;
+			return;
+		}
+	}
 }
 
 HRESULT CMap_Parser::Parse_Manifest(const _wstring& strManifestPath, MAP_MANIFEST_DESC* pOutManifest)
@@ -449,6 +523,8 @@ void CMap_Parser::Parse_DecorEntry(
 	Fill_CommonFlags(jEntry, &Desc);
 	Try_BuildWorldMatrixFromArray(jEntry, "WorldMtx", &Desc);
 
+	Resolve_EnvColliderKind(&Desc);
+
 	pOutDescs->push_back(Desc);
 }
 
@@ -490,6 +566,8 @@ void CMap_Parser::Parse_ToyObjEntry(
 		jEntry,
 		"Gimmick.InteractiveDecorParts.MainComponent.Size",
 		&Desc.tCollision.vSize);
+
+	Resolve_EnvColliderKind(&Desc);
 
 	pOutDescs->push_back(Desc);
 }
@@ -578,6 +656,8 @@ void CMap_Parser::Parse_EffectEntry(
 
 	Desc.tEffect.eEffectType = Classify_EffectType(Desc.strObjectName, Desc.strComponentName);
 
+	Resolve_EnvColliderKind(&Desc);
+
 	pOutDescs->push_back(Desc);
 }
 
@@ -638,21 +718,41 @@ const json* CMap_Parser::Find_JsonValue(const json& jSource, const string& strPa
 	if (ExactIter != jSource.end())
 		return &(*ExactIter);
 
-	const json* pCurrent = &jSource;
+	const vector<string> Parts = Split_DottedPath(strPath);
 
-	for (const string& Part : Split_DottedPath(strPath))
-	{
-		if (!pCurrent->is_object())
+	function<const json* (const json&, size_t)> FindRecursive;
+	FindRecursive = [&](const json& Current, size_t iStart) -> const json*
+		{
+			if (iStart >= Parts.size())
+				return &Current;
+
+			if (!Current.is_object())
+				return nullptr;
+
+			for (size_t iEnd = Parts.size(); iEnd > iStart; --iEnd)
+			{
+				string strKey;
+
+				for (size_t i = iStart; i < iEnd; ++i)
+				{
+					if (i > iStart)
+						strKey += ".";
+
+					strKey += Parts[i];
+				}
+
+				auto Iter = Current.find(strKey);
+				if (Iter == Current.end())
+					continue;
+
+				if (const json* pFound = FindRecursive(*Iter, iEnd))
+					return pFound;
+			}
+
 			return nullptr;
+		};
 
-		auto Iter = pCurrent->find(Part);
-		if (Iter == pCurrent->end())
-			return nullptr;
-
-		pCurrent = &(*Iter);
-	}
-
-	return pCurrent;
+	return FindRecursive(jSource, 0);
 }
 
 _bool CMap_Parser::Try_ReadString(const json& jSource, const string& strPath, wstring* pOut)
@@ -781,9 +881,14 @@ void CMap_Parser::Fill_CommonFlags(const json& jEntry, ENV_OBJECT_DESC* pDesc)
 	if (nullptr == pDesc)
 		return;
 
-	Try_ReadBoolFromNumeric(jEntry, "IsInvalidCollision", &pDesc->tCollision.bInvalidCollision);
+	if (!Try_ReadBoolFromNumeric(jEntry, "IsInvalidCollision", &pDesc->tCollision.bInvalidCollision))
+		Try_ReadBoolFromNumeric(jEntry, "Basic.Model.IsInvalidCollision", &pDesc->tCollision.bInvalidCollision);
+
 	Try_ReadBoolFromNumeric(jEntry, "IsInvisibleCollision", &pDesc->tCollision.bInvisibleCollision);
-	Try_ReadBoolFromNumeric(jEntry, "IsSlipFallCollision", &pDesc->tCollision.bSlipFallCollision);
+
+	if (!Try_ReadBoolFromNumeric(jEntry, "IsSlipFallCollision", &pDesc->tCollision.bSlipFallCollision))
+		Try_ReadBoolFromNumeric(jEntry, "Basic.Model.IsSlipFallCollisionScene", &pDesc->tCollision.bSlipFallCollision);
+
 	Try_ReadBoolFromNumeric(jEntry, "IsUseObjCollReaction", &pDesc->tCollision.bUseObjCollisionReaction);
 	Try_ReadBoolFromNumeric(jEntry, "IsNeedUpdateCollisionByAnim", &pDesc->tCollision.bNeedUpdateCollisionByAnim);
 	Try_ReadBoolFromNumeric(jEntry, "IsOverrideCollisionAttr", &pDesc->tCollision.bOverrideCollisionAttr);
@@ -792,9 +897,16 @@ void CMap_Parser::Fill_CommonFlags(const json& jEntry, ENV_OBJECT_DESC* pDesc)
 	Try_ReadString(jEntry, "OverrideCollisionTypeInside", &pDesc->tCollision.strOverrideCollisionTypeInside);
 
 	Try_ReadBoolFromNumeric(jEntry, "IsShadowMappingCaster", &pDesc->tRender.bShadowMappingCaster);
-	Try_ReadBoolFromNumeric(jEntry, "UseLodCulling", &pDesc->tRender.bUseLodCulling);
-	Try_ReadBoolFromNumeric(jEntry, "UseNearDistAlpha", &pDesc->tRender.bUseNearDistAlpha);
-	Try_ReadFloat(jEntry, "NearDistAlphaLengthRate", &pDesc->tRender.fNearDistAlphaLengthRate);
+
+	if (!Try_ReadBoolFromNumeric(jEntry, "UseLodCulling", &pDesc->tRender.bUseLodCulling))
+		Try_ReadBoolFromNumeric(jEntry, "Basic.Model.UseLodCulling", &pDesc->tRender.bUseLodCulling);
+
+	if (!Try_ReadBoolFromNumeric(jEntry, "UseNearDistAlpha", &pDesc->tRender.bUseNearDistAlpha))
+		Try_ReadBoolFromNumeric(jEntry, "Basic.Model.UseNearDistAlpha", &pDesc->tRender.bUseNearDistAlpha);
+
+	if (!Try_ReadFloat(jEntry, "NearDistAlphaLengthRate", &pDesc->tRender.fNearDistAlphaLengthRate))
+		Try_ReadFloat(jEntry, "Basic.Model.NearDistAlphaLengthRate", &pDesc->tRender.fNearDistAlphaLengthRate);
+
 	Try_ReadString(jEntry, "Decor.LayerName", &pDesc->tRender.strLayerName);
 	Try_ReadUInt(jEntry, "HideFlag", &pDesc->tRender.iHideFlag);
 

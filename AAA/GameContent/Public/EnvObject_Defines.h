@@ -52,6 +52,26 @@ enum class ENV_INTERACT_TYPE
 	END
 };
 
+enum class ENV_COLLIDER_KIND
+{
+	NONE,
+	SIMPLE_SHAPE,
+	MODEL_MESH,
+	TRIGGER_ONLY,
+	UNKNOWN,
+	END
+};
+
+enum class ENV_SIMPLE_SHAPE
+{
+	NONE,
+	BOX,
+	SPHERE,
+	CYLINDER,
+	SLOPE,
+	END
+};
+
 struct ENV_BOUNDS_DESC
 {
 	_bool	bUseCullBounds = { false };
@@ -77,6 +97,9 @@ struct ENV_COLLISION_DESC
 
 	_float	fMapCollRadius = { 0.f };
 	_float3 vSize = {};
+
+	ENV_COLLIDER_KIND eColliderKind = { ENV_COLLIDER_KIND::NONE };
+	ENV_SIMPLE_SHAPE  eSimpleShape = { ENV_SIMPLE_SHAPE::NONE };
 };
 
 struct ENV_RENDER_DESC

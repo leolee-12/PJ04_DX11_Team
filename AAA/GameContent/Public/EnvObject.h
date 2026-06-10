@@ -7,6 +7,10 @@ class CShader;
 class CModel;
 NS_END
 
+NS_BEGIN(physx)
+class PxRigidStatic;
+NS_END
+
 NS_BEGIN(Client)
 
 class CLIENT_DLL CEnvObject abstract : public CGameObject
@@ -42,6 +46,12 @@ public:
 
 protected:
 	HRESULT Ready_RenderComponents(_uint iModelProtoLevel, const wstring& strModelProtoTag);
+	HRESULT Ready_PhysicsActor();
+	HRESULT Ready_PhysicsActor_ModelMesh();
+	void	Release_PhysicsActor();
+
+	_bool	Should_CreatePhysicsActor() const;
+
 	HRESULT Bind_ShaderResources();
 	void	Update_LocalBounds();
 	void	Refresh_WorldBounds();
@@ -53,6 +63,8 @@ protected:
 	wstring			m_strProtoTag = { PROTOTYPE_TAG };
 	CShader*		m_pShaderCom = { nullptr };
 	CModel*			m_pModelCom = { nullptr };
+	physx::PxRigidStatic* m_pPhysicsActor = { nullptr };
+
 	BoundingBox		m_LocalBounds = {};
 	BoundingBox		m_WorldBounds = {};
 	_bool			m_bVisible = { true };

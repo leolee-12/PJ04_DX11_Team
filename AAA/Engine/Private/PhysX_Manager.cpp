@@ -128,10 +128,19 @@ PxRigidStatic* CPhysX_Manager::Add_StaticActor(PxTriangleMesh* pMesh, _fmatrix W
 
 void CPhysX_Manager::Remove_StaticActor(PxRigidStatic* pActor)
 {
-    if (nullptr == pActor) return;
+    if (nullptr == pActor)
+        return;
+    
     auto it = find(m_StaticActors.begin(), m_StaticActors.end(), pActor);
-    if (it != m_StaticActors.end()) m_StaticActors.erase(it);
-    if (m_pScene) m_pScene->removeActor(*pActor);
+    
+    if (it == m_StaticActors.end())
+        return;
+
+    m_StaticActors.erase(it);
+    
+    if (m_pScene)
+        m_pScene->removeActor(*pActor);
+    
     pActor->release();
 }
 

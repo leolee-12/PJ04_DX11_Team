@@ -1,7 +1,8 @@
 #include "EnvObject.h"
 #include "GameContent_const.h"
 
-#include "GameInstance.h"
+#include "GameInstance_Proxy.h"
+#include "Model.h"
 
 #include <cmath>
 
@@ -11,6 +12,18 @@ namespace
 {
 	constexpr _bool ENABLE_ENV_OBJECT_SHADOW = false;
 	constexpr _float ENV_DISTANCE_CULL_START = 175.f;
+
+	void Log_EnvPhysicsWarning(const string& strMessage)
+	{
+		OutputDebugStringA((strMessage + "\n").c_str());
+	}
+
+#ifdef _DEBUG
+	void Log_EnvPhysicsInfo(const string& strMessage)
+	{
+		OutputDebugStringA((strMessage + "\n").c_str());
+	}
+#endif
 
 	_matrix Build_WorldMatrix_FromTRS(const ENV_OBJECT_DESC& Desc)
 	{
@@ -60,9 +73,6 @@ namespace
 
 CEnvObject::CEnvObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{pDevice, pContext}
-	//, m_bRenderable{ true }
-	//, m_bEnableCulling{ true }
-	//, m_bCastShadow{ true }
 {
 }
 
@@ -70,9 +80,6 @@ CEnvObject::CEnvObject(const CEnvObject& Prototype)
 	: CGameObject(Prototype)
 	, m_tDesc(Prototype.m_tDesc)
 	, m_strProtoTag(Prototype.m_strProtoTag)
-	//, m_bRenderable{ Prototype.m_bRenderable }
-	//, m_bEnableCulling{ Prototype.m_bEnableCulling }
-	//, m_bCastShadow{ Prototype.m_bCastShadow }
 {
 }
 
@@ -129,6 +136,149 @@ HRESULT CEnvObject::Ready_RenderComponents(_uint iModelProtoLevel, const wstring
 	Update_LocalBounds();
 	Refresh_WorldBounds();
 	return S_OK;
+}
+
+HRESULT CEnvObject::Ready_PhysicsActor()
+{
+	Release_PhysicsActor();
+
+	if (!Should_CreatePhysicsActor())
+	{
+#ifdef _DEBUG
+		if (m_tDesc.tCollision.bInvalidCollision)
+		{
+			Log_EnvPhysicsInfo(
+				"[EnvPhysics] Skip actor: invalid collision. object="
+				+ WstrToStr(m_tDesc.strObjectName)
+				+ " uid="
+				+ to_string(m_tDesc.iUid)
+				+ " modelTag="
+				+ WstrToStr(m_tDesc.strModelProtoTag));
+		}
+#endif
+		return S_OK;
+	}
+
+	switch (m_tDesc.tCollision.eColliderKind)
+	{
+	case ENV_COLLIDER_KIND::MODEL_MESH:
+		return Ready_PhysicsActor_ModelMesh();
+
+	case ENV_COLLIDER_KIND::SIMPLE_SHAPE:
+		// 다음 단계에서 Cube / Sphere / Cylinder / Slope 처리 예정.
+		return S_OK;
+
+	case ENV_COLLIDER_KIND::NONE:
+	case ENV_COLLIDER_KIND::TRIGGER_ONLY:
+	case ENV_COLLIDER_KIND::UNKNOWN:
+	default:
+		return S_OK;
+	}
+}
+
+HRESULT CEnvObject::Ready_PhysicsActor_ModelMesh()
+{
+	if (m_tDesc.tCollision.bInvalidCollision)
+	{
+#ifdef _DEBUG
+		Log_EnvPhysicsWarning(
+			"[EnvPhysics] MODEL_MESH actor blocked by IsInvalidCollision. object="
+			+ WstrToStr(m_tDesc.strObjectName)
+			+ " uid="
+			+ to_string(m_tDesc.iUid)
+			+ " modelTag="
+			+ WstrToStr(m_tDesc.strModelProtoTag));
+#endif
+		return S_OK;
+	}
+
+	if (nullptr == m_pGameInstance_Proxy)
+		return E_FAIL;
+
+	if (nullptr == m_pTransformCom)
+		return E_FAIL;
+
+	if (nullptr == m_pModelCom)
+	{
+#ifdef _DEBUG
+		Log_EnvPhysicsWarning(
+			"EnvObject MODEL_MESH collision skipped: model component is null.");
+#endif
+		return S_OK;
+	}
+
+	physx::PxTriangleMesh* pCollisionMesh = m_pModelCom->Get_CollisionMesh();
+	if (nullptr == pCollisionMesh)
+	{
+#ifdef _DEBUG
+		Log_EnvPhysicsWarning(
+			"EnvObject MODEL_MESH collision skipped: cooked collision mesh is null.");
+#endif
+		return S_OK;
+	}
+
+	m_pPhysicsActor = m_pGameInstance_Proxy->Add_StaticActor(
+		pCollisionMesh,
+		XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+
+	if (nullptr == m_pPhysicsActor)
+	{
+#ifdef _DEBUG
+		Log_EnvPhysicsWarning(
+			"[EnvPhysics] MODEL_MESH actor failed: Add_StaticActor returned null. object="
+			+ WstrToStr(m_tDesc.strObjectName)
+			+ " uid="
+			+ to_string(m_tDesc.iUid)
+			+ " modelTag="
+			+ WstrToStr(m_tDesc.strModelProtoTag));
+#endif
+		return E_FAIL;
+	}
+
+#ifdef _DEBUG
+	Log_EnvPhysicsInfo(
+		"[EnvPhysics] MODEL_MESH actor created. object="
+		+ WstrToStr(m_tDesc.strObjectName)
+		+ " uid="
+		+ to_string(m_tDesc.iUid)
+		+ " modelTag="
+		+ WstrToStr(m_tDesc.strModelProtoTag));
+#endif
+
+	return S_OK;
+}
+
+void CEnvObject::Release_PhysicsActor()
+{
+	if (nullptr == m_pPhysicsActor)
+		return;
+
+	if (nullptr != m_pGameInstance_Proxy)
+		m_pGameInstance_Proxy->Remove_StaticActor(m_pPhysicsActor);
+
+	m_pPhysicsActor = nullptr;
+}
+
+_bool CEnvObject::Should_CreatePhysicsActor() const
+{
+	const ENV_COLLISION_DESC& Collision = m_tDesc.tCollision;
+
+	// 충돌 무효 플래그가 켜져 있으면, eColliderKind가 무엇이든 Actor를 만들지 않는다.
+	if (Collision.bInvalidCollision)
+		return false;
+
+	switch (Collision.eColliderKind)
+	{
+	case ENV_COLLIDER_KIND::MODEL_MESH:
+	case ENV_COLLIDER_KIND::SIMPLE_SHAPE:
+	case ENV_COLLIDER_KIND::TRIGGER_ONLY:
+		return true;
+
+	case ENV_COLLIDER_KIND::NONE:
+	case ENV_COLLIDER_KIND::UNKNOWN:
+	default:
+		return false;
+	}
 }
 
 HRESULT CEnvObject::Bind_ShaderResources()
@@ -307,6 +457,8 @@ void CEnvObject::Apply_DescDefaults()
 
 void CEnvObject::Free()
 {
+	Release_PhysicsActor();
+
 	__super::Free();
 }
 

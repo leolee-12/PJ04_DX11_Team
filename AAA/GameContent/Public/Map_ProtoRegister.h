@@ -21,7 +21,7 @@ private:
 private:
 	HRESULT Ready_ObjectPrototypes(_uint iObjectLevel);
 	HRESULT Ready_MapSectionModel(_uint iModelLevel, const MAP_SECTION_DESC& Desc);
-	HRESULT Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_DESC& Desc);
+	HRESULT Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_DESC& Desc, _bool bCookCollisionMesh);
 
 	const _tchar* Get_EnvObjectProtoTag(ENV_OBJECT_KIND eKind) const;
 
