@@ -104,6 +104,13 @@ private:
     _bool m_bPlay = { false };
     CGameObject* m_pKirby = { nullptr };
 
+    // 프리뷰 카메라 스무딩 (게임 CCamera_AreaCam과 동일 거동)
+    _float3 m_eyeCur = {}, m_atCur = {}, m_eyeVel = {}, m_atVel = {};
+    _bool   m_bCamInit = false;
+    _int    m_lastArea = -1;
+    _float  m_areaBlendTimer = 0.f;
+    _float  m_smoothTime = 0.35f;
+
 private:
     virtual HRESULT Ready_Events() override { return S_OK; }
     HRESULT Ready_EditLights();

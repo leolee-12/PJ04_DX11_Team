@@ -12,7 +12,7 @@ public:
     typedef struct tagAreaCamDesc final : public CCamera::CAMERA_DESC {
         wstring strTargetLayer = L"Layer_Player";
         wstring strTargetObj = L"Kirby";
-        wstring strDataPath = L"../../Tools/Level0_Stage1_Step01_cam.json";
+        wstring strDataPath = L"../../Resources/YSH/CameraData/Level0_Stage1_Step01_cam.json";
     } AREACAM_DESC;
 private:
     CCamera_AreaCam(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

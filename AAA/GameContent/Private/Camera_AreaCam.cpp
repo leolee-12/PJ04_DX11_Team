@@ -60,11 +60,22 @@ void CCamera_AreaCam::Priority_Update(_float fTimeDelta)
 
     m_solver.Update(vKirby, fTimeDelta);
     const CAM_POSE& pose = m_solver.Cur_Pose();
-    _vector vEye = XMLoadFloat3(&pose.eye);
-    _vector vAt = XMVectorAdd(vEye, XMLoadFloat3(&pose.fwd));
 
-    if (XMVectorGetX(XMVector3LengthSq(XMVectorSubtract(vEye, vAt))) < 1e-4f)
-        vAt = XMVectorAdd(vEye, XMVectorSet(0.f, 0.f, 1.f, 0.f));
+    _vector vEye = XMLoadFloat3(&pose.eye);
+    _vector vFwd = XMLoadFloat3(&pose.fwd);
+
+    // NaN/degenerate 차단 (NaN은 부등호로 안 걸러져서 IsNaN 명시).
+    // 한 프레임 NaN이 LookAt로 transform에 영구전염되는 것 방지.
+    _bool bBad = XMVector3IsNaN(vEye) || XMVector3IsNaN(vFwd)
+        || (XMVectorGetX(XMVector3LengthSq(vFwd)) < 1e-6f);
+    if (bBad)
+    {
+        vEye = m_bInit ? XMLoadFloat3(&m_eyeCur) : XMVectorSet(0.f, 3.f, -10.f, 0.f);
+        vFwd = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+        XMStoreFloat3(&m_eyeVel, XMVectorZero());   // 속도 NaN 전파도 차단
+        XMStoreFloat3(&m_atVel, XMVectorZero());
+    }
+    _vector vAt = XMVectorAdd(vEye, vFwd);
 
     if (!m_bInit) { XMStoreFloat3(&m_eyeCur, vEye); XMStoreFloat3(&m_atCur, vAt); m_bInit = true; }
 
@@ -75,8 +86,23 @@ void CCamera_AreaCam::Priority_Update(_float fTimeDelta)
 
     m_fFovy = XMConvertToRadians(pose.fov);
     Recalculate_ProjMatrix();
-    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&m_eyeCur), 1.f));
-    m_pTransformCom->LookAt(XMVectorSetW(XMLoadFloat3(&m_atCur), 1.f));
+
+    _vector vE = XMLoadFloat3(&m_eyeCur);
+    _vector vDir = XMVectorSubtract(XMLoadFloat3(&m_atCur), vE);
+    if (XMVectorGetX(XMVector3LengthSq(vDir)) < 1e-6f)   // 눈==타깃 방어
+        vDir = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+    _vector vLook = XMVector3Normalize(vDir);
+    _vector vUpRef = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+    _vector vRight = XMVector3Cross(vUpRef, vLook);
+    if (XMVectorGetX(XMVector3LengthSq(vRight)) < 1e-6f)  // fwd 수직(평행) 방어
+        vRight = XMVector3Cross(XMVectorSet(0.f, 0.f, 1.f, 0.f), vLook);
+    vRight = XMVector3Normalize(vRight);
+    _vector vUp = XMVector3Normalize(XMVector3Cross(vLook, vRight));
+
+    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(vE, 1.f));
+    m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSetW(vRight, 0.f));
+    m_pTransformCom->Set_State(STATE::UP, XMVectorSetW(vUp, 0.f));
+    m_pTransformCom->Set_State(STATE::LOOK, XMVectorSetW(vLook, 0.f));
 
     __super::Priority_Update(fTimeDelta);
 }
