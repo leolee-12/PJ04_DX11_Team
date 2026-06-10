@@ -5,6 +5,7 @@
 #include "Loader_Prototype.h"
 #include "Map_Loader.h"
 #include "Launcher_MapProfiles.h"
+#include "Camera_AreaCam.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel { pDevice, pContext }
@@ -44,22 +45,7 @@ HRESULT CLevel_GamePlay::Initialize()
             return E_FAIL;
     }
 
-    if (FAILED(m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Camera_Free"), CCamera_Free::Create(m_pDevice, m_pContext))))
-        return E_FAIL;
-
-    CCamera_Free::CAMERA_FREE_DESC      CameraDesc{};
-
-    CameraDesc.vEye = _float3(-130.f, 12.f, -70.f);
-    CameraDesc.vAt = _float3(-130.f, 8.f, -64.f);
-    CameraDesc.fFovy = XMConvertToRadians(60.f);
-    CameraDesc.fNear = 0.1f;
-    CameraDesc.fFar = 500.f;
-    CameraDesc.fSpeedPerSec = 20.f;
-    CameraDesc.fRotationPerSec = XMConvertToRadians(180.f);
-    CameraDesc.fMouseSensor = 0.05f;
-
-    if (FAILED(m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Camera_Free"),
-        ETOUI(LEVEL::GAMEPLAY), TEXT("Layer_Camera"), TEXT("CameraFree"), & CameraDesc)))
+    if (FAILED(Ready_Camera()))
         return E_FAIL;
 
     if (FAILED(Ready_Lights()))
@@ -101,6 +87,44 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 
     if (FAILED(m_pGameInstance_Proxy->Add_Light(LightDesc)))
         return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Camera()
+{
+    m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY),
+        TEXT("Prototype_GameObject_Camera_Follow"),
+        CCamera_AreaCam::Create(m_pDevice, m_pContext));
+
+    CCamera_AreaCam::AREACAM_DESC CamDesc{};
+    CamDesc.vEye = _float3(-1.f, 1.f, -10.f);
+    CamDesc.vAt = _float3(0.f, 0.f, 0.f);
+    CamDesc.fFovy = XMConvertToRadians(50.f); CamDesc.fNear = 0.1f; CamDesc.fFar = 1000.f;
+    CamDesc.strTargetLayer = TEXT("Layer_LiveObject");
+    CamDesc.strTargetObj = TEXT("Proto_Kirby_0");
+    m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::GAMEPLAY),
+        TEXT("Prototype_GameObject_Camera_Follow"),
+        ETOUI(LEVEL::GAMEPLAY), TEXT("Layer_Camera"), TEXT("CameraFollow"), &CamDesc);
+
+
+    //if (FAILED(m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Camera_Free"), CCamera_Free::Create(m_pDevice, m_pContext))))
+    //    return E_FAIL;
+    //
+    //CCamera_Free::CAMERA_FREE_DESC      CameraDesc{};
+    //
+    //CameraDesc.vEye = _float3(-130.f, 12.f, -70.f);
+    //CameraDesc.vAt = _float3(-130.f, 8.f, -64.f);
+    //CameraDesc.fFovy = XMConvertToRadians(60.f);
+    //CameraDesc.fNear = 0.1f;
+    //CameraDesc.fFar = 500.f;
+    //CameraDesc.fSpeedPerSec = 20.f;
+    //CameraDesc.fRotationPerSec = XMConvertToRadians(180.f);
+    //CameraDesc.fMouseSensor = 0.05f;
+    //
+    //if (FAILED(m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Camera_Free"),
+    //    ETOUI(LEVEL::GAMEPLAY), TEXT("Layer_Camera"), TEXT("CameraFree"), & CameraDesc)))
+    //    return E_FAIL;
 
     return S_OK;
 }

@@ -1,0 +1,78 @@
+{
+ "rails": [
+  {
+   "uid": 895590608,
+   "close": false,
+   "nodes": [
+    [
+     -1.0,
+     1.0,
+     10.0
+    ],
+    [
+     -1.0,
+     1.0,
+     21.0
+    ]
+   ]
+  }
+ ],
+ "areas": [
+  {
+   "center": [
+    -2.0,
+    6.5,
+    13.0
+   ],
+   "size": [
+    52.0,
+    21.0,
+    36.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "useRail": true,
+   "railUid": 895590608,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  }
+ ]
+}

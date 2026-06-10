@@ -41,10 +41,10 @@ HRESULT CKirby::Initialize(void* pArg)
     if (FAILED(Ready_PartObjects()))
         return E_FAIL;
 
-    if (FAILED(Ready_System()))
+    if (FAILED(Ready_Ability()))
         return E_FAIL;
 
-    if (FAILED(Ready_Ability()))
+    if (FAILED(Ready_System()))
         return E_FAIL;
   
     return S_OK;
@@ -71,9 +71,6 @@ void CKirby::Update(_float fTimeDelta)
         m_pMovement->Sync_To_Controller();
         return;
     }
-
-    //if (m_pGameInstance_Proxy->Key_Down(DIK_SPACE))
-    //    m_pMovement->Jump();
 
     m_pMovement->Move(XMVectorSetW(XMLoadFloat3(&m_vWishDir), 0), fTimeDelta);
 }

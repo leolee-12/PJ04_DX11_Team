@@ -53,6 +53,7 @@ public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
 public:
+	CMovement* Get_Movement() { return m_pMovement; }
 	CKirby_Body* Get_Body() { return m_pBody; }
 
 public:
@@ -87,12 +88,13 @@ private:
 	static constexpr _float CCT_HEIGHT = 0.2f;
 
 	// Movement
-	static constexpr _float MOVE_SPEED = 6.0f;
+	static constexpr _float MOVE_SPEED = 7.0f;
 	static constexpr _float ROT_SPEED = 720.0f;   // degree/sec
-	static constexpr _float GRAVITY = -20.0f;
-	static constexpr _float JUMP_SPEED = 8.0f;
-	static constexpr _float MOVE_ACCEL = 40.f;
-	static constexpr _float MOVE_DECEL = 50.f;
+	static constexpr _float GRAVITY = -36.0f;
+	static constexpr _float JUMP_SPEED = 17.0f;
+
+	static constexpr _float MOVE_ACCEL = 130.f;
+	static constexpr _float MOVE_DECEL = 70.f;
 
 	_float3 m_vWishDir{};
 

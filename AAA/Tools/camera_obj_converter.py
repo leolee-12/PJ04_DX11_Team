@@ -68,15 +68,89 @@ def convert_file(path):
         return XbinYaml(fp.read()).parse()
 
 
+# ─────────────────────────────────────────────────────────────
+#  엔진 익스포트(--slim): 원작 전체 트리 → 우리 커스텀 플랫 스키마
+#    {rails:[{uid,close,nodes}], areas:[{center,size,rot,priority,erpIn,erpOut,
+#     useRail,railUid,scrollDead, base/end:{yaw,pitch,distance,height,fov,
+#     aimOffset,followRate}}]}
+#  GameContent CAreaCameraSolver::Load 가 그대로 읽음(좌표 추가변환 없음).
+#  좌표 변환: Switch(RH, -Z forward) → 우리 엔진(LH, +Z forward) = Z 부호 반전
+#  (안 맞으면 FLIP_Z를 끄거나 FLIP_X로 바꿔 캘리브레이션)
+# ─────────────────────────────────────────────────────────────
+FLIP_Z = True
+
+def _v3(a):
+    x, y, z = a[0], a[1], a[2]
+    return [x, y, (-z if FLIP_Z else z)]
+
+def _quat(a):
+    x, y, z, w = a
+    return [(-x if FLIP_Z else x), (-y if FLIP_Z else y), z, w]   # Z반전 시 best-guess
+
+def _rate3(a):   # SnapRate 등 비율(축별 0~1) — 좌표 아님, 부호 유지
+    return [a[0], a[1], a[2]]
+
+def _ang(v):     # 각도 오프셋: Z거울변환에서 회전 sense가 반대 → 부호 반전
+    return (-v if FLIP_Z else v)
+
+def to_engine(parsed):
+    # 원작에선 영역(OBB)+레일만 가져오고, 카메라 프레이밍은 우리 기본값으로 깔아둠.
+    # (에디터에서 영역별로 손세팅: yaw/pitch/distance/height/fov/aimHeight)
+    rails = []
+    for _, r in parsed.get("Custom", {}).items():
+        if r.get("Kind") != "Rail":              # CameraLimitCollision 등 비-레일 제외
+            continue
+        rails.append({
+            "uid":   r.get("Uid", 0),
+            "close": r.get("IsClose", False),
+            "nodes": [_v3(n["Pos"]) for n in r.get("Node", [])],
+        })
+    areas = []
+    for _, c in parsed.get("Standard", {}).items():
+        mc = c.get("Gimmick.AreaCamera.MainComponent")
+        if not mc:
+            continue
+        ru = c.get("Basic.RailUser", {}) or {}
+        use_rail = mc.get("UseRail", False)
+        frame = {
+            "yaw":       0.0,
+            "pitch":     20.0,
+            "distance":  0.0 if use_rail else 16.0,      # 레일=눈이 레일 위, 비레일=뒤로 16
+            "height":    3.0,
+            "fov":       50.0,
+            "aimHeight": 4.0,
+            "gazePoint": [0.0, 0.0, 0.0],                # Point/Object 응시 좌표
+            "gazeBlend": 1.0,                            # 0=커비, 1=응시대상
+        }
+        areas.append({
+            "center":   _v3(mc["AreaCenter"]),
+            "size":     list(mc["AreaSize"]),            # 크기(범위)는 부호 유지
+            "rot":      _quat(mc.get("AreaRot", [0, 0, 0, 1])),
+            "priority": mc.get("Priority", 0),
+            "useRail":  use_rail,
+            "railUid":  ru.get("TargetRailUid", 0),
+            "scrollDead": [0.0, 0.0, 0.0],
+            "gazeMode": 0,                               # 0=Kirby, 1=Point, 2=Object
+            "gazeTag": "",                              # Object 모드 런타임 해석 태그
+            "frame":    dict(frame),                     # 비레일 프레이밍 / 레일 start
+            "frameEnd": dict(frame),                     # 레일 end (레일 진행도 t로 frame→frameEnd 보간)
+        })
+    return {"rails": rails, "areas": areas}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("input", help=".bin 파일 또는 디렉터리")
     ap.add_argument("-o", "--out", default=None, help="출력 루트(디렉터리 모드)")
+    ap.add_argument("--slim", action="store_true", help="엔진용 커스텀 플랫 스키마로 출력")
     args = ap.parse_args()
 
     if os.path.isfile(args.input):
         data = convert_file(args.input)
-        out = args.out or (os.path.splitext(args.input)[0] + ".json")
+        if args.slim:
+            data = to_engine(data)
+        suffix = "_cam.json" if args.slim else ".json"
+        out = args.out or (os.path.splitext(args.input)[0] + suffix)
         with open(out, "w", encoding="utf-8") as fp:
             json.dump(data, fp, indent=1, ensure_ascii=False)
         print(f"OK: {out}")

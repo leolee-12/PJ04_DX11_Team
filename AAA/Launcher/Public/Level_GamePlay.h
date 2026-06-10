@@ -32,6 +32,7 @@ private:
 private:
 	virtual HRESULT Ready_Events() override;
 	HRESULT Ready_Lights();
+	HRESULT Ready_Camera();
 	void Key_Input();
 	void Update_EndingSequence(_float fRawDelta);
 	void Start_Ending(CGameObject* pBoss);

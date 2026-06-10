@@ -1,5 +1,4 @@
 #include "Movement.h"
-#include "Movement.h"
 #include "Transform.h"
 
 #pragma warning(push, 0)
@@ -29,8 +28,15 @@ CMovement::CMovement(const CMovement& Prototype)
 {
 }
 
-HRESULT CMovement::Initialize_Prototype() { return S_OK; }
-HRESULT CMovement::Initialize(void* /*pArg*/) { return S_OK; }
+HRESULT CMovement::Initialize_Prototype()
+{
+    return S_OK;
+}
+
+HRESULT CMovement::Initialize(void* pArg)
+{
+    return S_OK;
+}
 
 void CMovement::Set_Refs(CTransform* pTransform, physx::PxController* pController)
 {
@@ -55,6 +61,11 @@ void CMovement::Set_Acceleration(_float Accel, _float Decel)
 {
     m_fAccel = Accel;
     m_fDecel = Decel;
+}
+
+void CMovement::Set_MoveSpeed(_float fMoveSpeed)
+{
+    m_fMoveSpeed = fMoveSpeed;
 }
 
 void CMovement::Calc_Vertical(_float fTimeDelta)

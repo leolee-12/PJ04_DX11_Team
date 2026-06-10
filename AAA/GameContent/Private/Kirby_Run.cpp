@@ -4,6 +4,7 @@
 
 #include "Kirby.h"
 #include "Kirby_Body.h"
+#include "Kirby_Ability.h"
 
 CKirby_Run::CKirby_Run()
 {
@@ -23,12 +24,20 @@ KIRBY_STATE_TYPE CKirby_Run::Get_StateType()
 void CKirby_Run::Enter(CKirby* pKirby)
 {
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
-    pAnimator->Play("Run", true);
-
+    pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::RUN));
 }
 
 void CKirby_Run::Update(CKirby* pKirby, const _float fTimeDelta)
 {
+    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+
+    // Fall
+    if (Try_FallState(pKirby) == true)
+    {
+        pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::FALL));
+    }
+
+    // Wait
     if (pKirby->Has_MoveDir() == false)
         pKirby->Change_State(KIRBY_STATE_TYPE::WAIT);
 }
@@ -55,6 +64,14 @@ _bool CKirby_Run::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
         case KIRBY_COMMAND_TYPE::JUMP:
             pKirby->Change_State(KIRBY_STATE_TYPE::JUMP);
             return true;
+
+        case KIRBY_COMMAND_TYPE::ATTACK_DOWN:
+        {
+            CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+            if (pAbility->Can_Attack(KIRBY_ATTACK_LOCATION::GROUND))
+                pAbility->Down_Attack(pKirby);
+            return true;
+        }
     }
 
     return false;

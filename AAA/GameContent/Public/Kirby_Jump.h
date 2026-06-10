@@ -19,7 +19,7 @@ private:
 
 	enum class JUMP_STATE
 	{
-		JUMP_STRAT, LAND_START, LAND_END,
+		JUMP_STRAT,
 	};
 
 private:
@@ -41,7 +41,7 @@ private:
 
 	JUMP_STATE m_eJumpType{};
 
-	static _bool m_bLeftRight;
+	static _bool m_bLeft;
 
 public:
 	static CKirby_Jump* Create();
