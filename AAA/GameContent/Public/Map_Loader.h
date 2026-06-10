@@ -1,6 +1,7 @@
 #pragma once
 #include "Base.h"
 #include "Map_LoadTypes.h"
+#include "Map_Override.h"
 
 NS_BEGIN(Client)
 
@@ -34,6 +35,27 @@ public:
 	// Level 진입 단게에서 캐시된 Package로 Spawn
 	static HRESULT Spawn_Map(
 		const _wstring& strManifestPath,
+		_uint iRuntimeLevel,
+		MAP_LOAD_REPORT* pOutReport = nullptr,
+		CMapStage** ppOutStage = nullptr);
+
+	static HRESULT Spawn_Map_WithOverride(
+		const _wstring& strManifestPath,
+		_uint iRuntimeLevel,
+		const MAP_OVERRIDE_DESC* pOverrideDesc,
+		MAP_LOAD_REPORT* pOutReport = nullptr,
+		CMapStage** ppOutStage = nullptr);
+
+	static HRESULT Preload_MapForLevel(
+		ID3D11Device* pDevice,
+		ID3D11DeviceContext* pContext,
+		const _wstring& strFallbackManifestPath,
+		const _wstring& strLevelObjectsPath,
+		_uint iRuntimeLevel);
+
+	static HRESULT Spawn_MapForLevel(
+		const _wstring& strFallbackManifestPath,
+		const _wstring& strLevelObjectsPath,
 		_uint iRuntimeLevel,
 		MAP_LOAD_REPORT* pOutReport = nullptr,
 		CMapStage** ppOutStage = nullptr);

@@ -81,6 +81,15 @@ void CKirby::Update(_float fTimeDelta)
 void CKirby::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
+
+    if (m_pTriggerSensor && m_pTransformCom)
+    {
+        m_pTriggerSensor->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+
+#ifdef _DEBUG
+        m_pGameInstance_Proxy->Add_DebugComponent(m_pTriggerSensor);
+#endif
+    }
 }
 
 HRESULT CKirby::Render()
@@ -140,6 +149,27 @@ HRESULT CKirby::Ready_Components()
     m_pMovement->Set_Refs(m_pTransformCom, m_pController);
     m_pMovement->Set_Stats(MOVE_SPEED, ROT_SPEED, GRAVITY, JUMP_SPEED);
     m_pMovement->Set_Acceleration(MOVE_ACCEL, MOVE_DECEL);
+
+    // TriggerSensor(Collider)
+    m_pTriggerSensor = Add_Component<CCollider>(
+        TEXT("Com_TriggerSensor"),
+        CCollider::Create(m_pDevice, m_pContext, COLLIDER::AABB));
+    if (nullptr == m_pTriggerSensor)
+        return E_FAIL;
+
+    CCollider::COLLIDER_DESC ColliderDesc{};
+    ColliderDesc.pOwner = this;
+    ColliderDesc.vCenter = _float3(0.f, CCT_RADIUS + CCT_HEIGHT * 0.5f, 0.f);
+    ColliderDesc.vSize = _float3(
+        CCT_RADIUS * 2.f,
+        CCT_HEIGHT + CCT_RADIUS * 2.f,
+        CCT_RADIUS * 2.f);
+
+    if (FAILED(m_pTriggerSensor->Initialize(&ColliderDesc)))
+        return E_FAIL;
+
+    m_pGameInstance_Proxy->Register_Collider(m_pTriggerSensor, CL_PLAYER_SENSOR);
+    m_pGameInstance_Proxy->Add_CollisionPool(CL_PLAYER_SENSOR, CL_ENV_TRIGGER);
 
     return S_OK;
 }

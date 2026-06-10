@@ -1,17 +1,16 @@
 #include "EnvObject.h"
+#include "GameContent_const.h"
+
+#include "GameInstance.h"
 
 #include <cmath>
-
-#include "GameContent_const.h"
-#include "GameInstance_Proxy.h"
-#include "Model.h"
-#include "Shader.h"
 
 NS_BEGIN(Client)
 
 namespace
 {
 	constexpr _bool ENABLE_ENV_OBJECT_SHADOW = false;
+	constexpr _float ENV_DISTANCE_CULL_START = 175.f;
 
 	_matrix Build_WorldMatrix_FromTRS(const ENV_OBJECT_DESC& Desc)
 	{
@@ -265,15 +264,20 @@ void CEnvObject::Check_Visible()
 		return;
 	}
 
-	if (!m_bEnableCulling)
-	{
-		m_bVisible = true;
-		m_bVisibleShadow = bEnableShadow;
-		return;
-	}
+	m_bVisible = !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, m_WorldBounds);
+	m_bVisibleShadow = bEnableShadow && !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_WorldBounds);
 
-	m_bVisible = !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, m_bEnableCulling, m_WorldBounds);
-	m_bVisibleShadow = bEnableShadow && !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_bEnableCulling, m_WorldBounds);
+	if ((m_bVisible || m_bVisibleShadow) && m_bEnableCulling)
+	{
+		const _bool bDistanceCulled =
+			m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_DISTANCE_CULL_START);
+
+		if (bDistanceCulled)
+		{
+			m_bVisible = false;
+			m_bVisibleShadow = false;
+		}
+	}
 }
 
 void CEnvObject::Apply_TransformFromDesc()

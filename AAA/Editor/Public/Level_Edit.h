@@ -14,7 +14,7 @@ NS_END
 NS_BEGIN(Editor)
 class CEditCamera;
 class CEdit_Grid;
-class CNavMesh_Editor;
+class CMap_PreviewSession;
 
 class CLevel_Edit final : public CLevel
 {
@@ -80,10 +80,14 @@ public:	// Map Preview - Public Func
 	void			Clear_MapPreviewEnv();
 	_uint			Get_MapPreviewPresetCount() const;
 	const _char*	Get_MapPreviewPresetLabel(_uint iPresetIndex) const;
-	_bool			Is_MapPreviewLoaded() const { return nullptr != m_pMapStage || 0 != m_iEnvObjCreatedCount; }
-	const _wstring&	Get_MapPreviewStatus() const { return m_strMapPreviewStatus; }
-	const _wstring&	Get_LoadedMapPreviewStageName() const { return m_strLoadedMapStageName; }
-	_uint			Get_MapPreviewEnvCreatedCount() const { return m_iEnvObjCreatedCount; }
+	_bool			Is_MapPreviewLoaded() const;
+	const _wstring& Get_MapPreviewStatus() const;
+	const _wstring& Get_LoadedMapPreviewStageName() const;
+	_uint			Get_MapPreviewEnvCreatedCount() const;
+	const CMap_PreviewSession* Get_MapPreviewSession() const { return m_pMapPreviewSession; }
+	HRESULT Restore_DeletedMapPreviewEnv(const _wstring& strStableKey);
+	HRESULT Restore_AllDeletedMapPreviewEnv();
+	HRESULT Save_MapOverride();
 
 	// Effect
 public:
@@ -105,11 +109,8 @@ private:
 	_uint	m_iPlaceCount = {};
 
 	// Map Preview - Members
+	CMap_PreviewSession* m_pMapPreviewSession = { nullptr };
 	CMapStage*	m_pMapStage = { nullptr };
-	_wstring	m_strMapPreviewStatus = { L"Map preset not loaded." };
-	_wstring	m_strLoadedMapStageName = {};
-	_uint		m_iEnvObjCreatedCount = {};
-	_int		m_iLoadedMapPresetIndex = { -1 };
 	unordered_set<CGameObject*> m_MapPreviewObjects;
 
 private:
@@ -123,6 +124,14 @@ private:
 	void		Add_MapPreviewObjectHandle(const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag, CGameObject* pObject);
 	static void On_MapPreviewObjectCreated(void* pContext, CGameObject* pObject,
 		const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);
+
+	_bool	Should_SkipMapObjectForLevelSave(CGameObject* pObject) const;
+	void	Append_MapLevelData(json* pInOutLevel) const;
+	HRESULT	Load_MapLevelContentFromJson(const json& jLevel);
+	HRESULT	Apply_MapStageOverrideFromJson(const json& jLevel);
+	_bool	Handle_MapSpecificDeletion(CGameObject* pObject);
+	_bool	Try_RegisterAddedMapOverridePlacement(CGameObject* pObject, const _wstring& strObjectTag);
+	void	Try_RegisterLoadedAddedMapObject(CGameObject* pObject, const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);
 
 public:
 	static CLevel_Edit* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -208,9 +208,9 @@ _bool CFrustum_Manager::IsIn_WorldSpace_AABB(CULLING_VIEW eView, const BoundingB
 	return bVisible;
 }
 
-_bool CFrustum_Manager::Should_CullAABB(CULLING_VIEW eView, _bool bEnableCulling, const BoundingBox& WorldBounds) const
+_bool CFrustum_Manager::Should_CullAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const
 {
-	if (!bEnableCulling)
+	if (!m_bEnableFrustumCulling)
 	{
 #ifdef _DEBUG
 		if (Is_ValidViewIndex(eView))
@@ -228,6 +228,18 @@ _bool CFrustum_Manager::Should_CullAABB(CULLING_VIEW eView, _bool bEnableCulling
 #endif
 
 	return bCull;
+}
+
+_bool CFrustum_Manager::Should_CullByDistance(const BoundingBox& WorldBounds, _float fCullDistance) const
+{
+	if (nullptr == m_pProxy)
+		return false;
+
+	const _float4* pCamPos= m_pProxy->Get_CamPosition();
+	if (nullptr == pCamPos)
+		return false;
+
+	return CCulling_Util::Check_CullByDistance(WorldBounds, *pCamPos, fCullDistance);
 }
 
 #ifdef _DEBUG

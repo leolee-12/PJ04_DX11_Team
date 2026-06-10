@@ -20,6 +20,11 @@ struct CULLING_COUNTER
 	_uint iVisible = {};
 	_uint iCulled = {};
 	_uint iSubmitted = {};
+
+	_uint iFrustumCulled = {};
+	_uint iDistanceCulled = {};
+	_uint iOcclusionCulled = {};
+	_uint iDisabled = {};
 };
 
 struct MAPTOOL_PROFILE_FRAME
@@ -34,10 +39,10 @@ struct MAPTOOL_PROFILE_FRAME
 	CULLING_COUNTER EnvMain = {};
 	CULLING_COUNTER EnvShadow = {};
 
-	_uint iTextureHubUnique = {};
-	_uint iTextureHubHit = {};
-	_uint iTextureHubMiss = {};
-	_uint iTextureHubRawFail = {};
+	_uint iTextureHubCached = {};
+	_uint iTextureHubReused = {};
+	_uint iTextureHubLoaded = {};
+	_uint iTextureHubFailed = {};
 
 	double dMapCullingCpuMs = {};
 };

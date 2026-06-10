@@ -276,6 +276,12 @@ void CLevel_Edit::Load_Level(const wstring& strFilePath)
 #endif
 
 	m_pMapStage = nullptr;
+	m_bMapStageLoaded = false;
+	m_bMapEnvLoaded = false;
+	m_iEnvObjCreatedCount = 0;
+	m_iLoadedMapPresetIndex = -1;
+	m_strLoadedMapStageName.clear();
+	m_strMapPreviewStatus = L"Map preset not loaded.";
 	m_pGameInstance_Proxy->Clear_Objects(ETOUI(TOOL_LEVEL::EDIT));
 
 	if (FAILED(Ready_MapStage()))
@@ -594,6 +600,30 @@ HRESULT CLevel_Edit::Ready_MapStage()
 	const _uint iEditLevel = ETOUI(TOOL_LEVEL::EDIT);
 	const _uint iModelLevel = ETOUI(LEVEL::GAMEPLAY);
 
+	_wstring strManifestPath;
+	if (FAILED(Client::CMap_EditHelper::Get_MapPresetManifestPath(
+		kPresetIndex,
+		&strManifestPath)))
+	{
+		return E_FAIL;
+	}
+
+	Client::MAP_LEVEL_CONTENT_DESC MapContentDesc{};
+	MapContentDesc.bHasMapContent = true;
+	MapContentDesc.iPresetIndex = static_cast<_int>(kPresetIndex);
+	MapContentDesc.strManifestPath = strManifestPath;
+
+	json jMapStageOverride = json::object();
+	_bool bHasMapStageOverride = false;
+	const HRESULT hrOverride = Client::CMap_EditHelper::Load_MapOverrideAsset(
+		strManifestPath,
+		&MapContentDesc,
+		&jMapStageOverride,
+		&bHasMapStageOverride);
+
+	if (FAILED(hrOverride))
+		return E_FAIL;
+
 	Client::CMapStage* pLoadedStage = nullptr;
 	if (FAILED(Client::CMap_EditHelper::Load_MapStage(
 		m_pDevice,
@@ -611,11 +641,32 @@ HRESULT CLevel_Edit::Ready_MapStage()
 
 	m_pMapStage = pLoadedStage;
 
+	if (bHasMapStageOverride)
+	{
+		if (FAILED(Client::CMap_EditHelper::Apply_MapStageOverride(
+			m_pMapStage,
+			jMapStageOverride)))
+		{
+			return E_FAIL;
+		}
+	}
+
 	Add_Layer(L"Layer_MapStage");
 	m_Layers[L"Layer_MapStage"].push_back({
-			Client::CMapStage::PROTOTYPE_TAG,
-			L"MapStage",
-			m_pMapStage });
+					Client::CMapStage::PROTOTYPE_TAG,
+					L"MapStage",
+					m_pMapStage });
+
+	m_iLoadedMapPresetIndex = static_cast<_int>(kPresetIndex);
+	m_bMapStageLoaded = true;
+	m_strLoadedMapStageName = m_pMapStage->Get_StageName();
+
+	if (m_strLoadedMapStageName.empty())
+		m_strLoadedMapStageName = StrToWstr(Client::CMap_EditHelper::Get_MapPresetLabel(kPresetIndex));
+
+	m_strMapPreviewStatus = (S_OK == hrOverride)
+		? L"Map stage loaded / asset"
+		: L"Map stage loaded.";
 
 #ifdef _DEBUG
 	CMapToolProfiler::GetInstance()->Set_Stage(m_pMapStage);
@@ -628,21 +679,63 @@ HRESULT CLevel_Edit::Ready_EnvObjects()
 	constexpr _uint kPresetIndex = 0;
 	const _uint iEditLevel = ETOUI(TOOL_LEVEL::EDIT);
 
+	_wstring strManifestPath;
+	if (FAILED(Client::CMap_EditHelper::Get_MapPresetManifestPath(
+		kPresetIndex,
+		&strManifestPath)))
+	{
+		return E_FAIL;
+	}
+
+	Client::MAP_LEVEL_CONTENT_DESC MapContentDesc{};
+	MapContentDesc.bHasMapContent = true;
+	MapContentDesc.iPresetIndex = static_cast<_int>(kPresetIndex);
+	MapContentDesc.strManifestPath = strManifestPath;
+
+	const HRESULT hrOverride = Client::CMap_EditHelper::Load_MapOverrideAsset(
+		strManifestPath,
+		&MapContentDesc);
+
+	if (FAILED(hrOverride))
+		return E_FAIL;
+
 #ifdef _DEBUG
 	CMapToolProfiler::GetInstance()->Clear_EnvObjects();
 #endif
 
 	Client::CMap_EditHelper::MAP_PRESET_LOAD_REPORT Report{};
-	const HRESULT hr = Client::CMap_EditHelper::Load_EnvObject_FromJson(
+	const HRESULT hr = Client::CMap_EditHelper::Load_PresetEnv_WithOverride(
 		m_pDevice,
 		m_pContext,
 		kPresetIndex,
+		MapContentDesc.strManifestPath,
 		iEditLevel,
+		&MapContentDesc.OverrideDesc,
 		&On_EnvObjectCreated,
 		this,
 		&Report);
 
-	return FAILED(hr) ? E_FAIL : S_OK;
+	if (FAILED(hr))
+		return E_FAIL;
+
+	m_iLoadedMapPresetIndex = static_cast<_int>(kPresetIndex);
+	m_bMapEnvLoaded = true;
+	m_iEnvObjCreatedCount = Report.iEnvCreatedCount;
+
+	if (m_bMapStageLoaded)
+	{
+		m_strMapPreviewStatus = (S_OK == hrOverride)
+			? L"Map preset loaded / asset"
+			: L"Map preset loaded.";
+	}
+	else
+	{
+		m_strMapPreviewStatus = (S_OK == hrOverride)
+			? L"Environment preview loaded / asset"
+			: L"Environment preview loaded.";
+	}
+
+	return S_OK;
 }
 
 void CLevel_Edit::On_EnvObjectCreated(

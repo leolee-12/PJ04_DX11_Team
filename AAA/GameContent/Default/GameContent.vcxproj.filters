@@ -312,7 +312,7 @@
     <ClInclude Include="..\Public\EnvObject_Defines.h">
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\EnvObject_Effect.h">
+    <ClInclude Include="..\Public\EnvObject_Trigger.h">
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EnvObject_Interact.h">
@@ -438,6 +438,18 @@
     <ClInclude Include="..\Public\Kirby_Jump.h">
       <Filter>05. Kirby\01. StateMachine\State\02. Jump</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Map_Override.h">
+      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TestTriggerBox.h">
+      <Filter>00. GameObject\Test\TestRect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Map_LevelContent.h">
+      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Map_DeltaIO.h">
+      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -503,7 +515,7 @@
     <ClCompile Include="..\Private\EnvObject.cpp">
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\EnvObject_Effect.cpp">
+    <ClCompile Include="..\Private\EnvObject_Trigger.cpp">
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnvObject_Interact.cpp">
@@ -613,6 +625,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby.cpp">
       <Filter>05. Kirby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Map_Override.cpp">
+      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestTriggerBox.cpp">
+      <Filter>00. GameObject\Test\TestRect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Map_LevelContent.cpp">
+      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Map_DeltaIO.cpp">
+      <Filter>00. GameObject\01. Map\Loader\API</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

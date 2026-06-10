@@ -3,6 +3,8 @@
 #include "GameContent_Log.h"
 #include "Map_ModelResolver.h"
 #include "Map_Parser.h"
+#include "Map_Override.h"
+#include "DataLoader.h"
 
 NS_BEGIN(Client)
 
@@ -56,6 +58,21 @@ HRESULT CMap_Builder::Build_FromManifest(const _wstring& strManifestPath, MAP_PA
 
 	if (FAILED(Validate_And_Filter(pOutPackage)))
 		return E_FAIL;
+
+	if (!Manifest.strDeltaPath.empty())
+	{
+		string strDeltaContent;
+		if (FAILED(CDataLoader::Read_Json(Manifest.strDeltaPath.c_str(), &strDeltaContent)))
+			return E_FAIL;
+
+		MAP_OVERRIDE_DESC OverrideDesc{};
+		json jDelta = json::parse(strDeltaContent);
+		if (FAILED(CMap_Override::Deserialize(jDelta, &OverrideDesc)))
+			return E_FAIL;
+
+		if (FAILED(CMap_Override::Apply(pOutPackage, OverrideDesc)))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }

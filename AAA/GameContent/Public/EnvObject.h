@@ -38,6 +38,8 @@ public:
 	_bool   Is_Visible_Main() const { return m_bVisible; }
 	_bool   Is_Visible_Shadow() const { return m_bVisibleShadow; }
 
+	const ENV_OBJECT_DESC& Get_Desc() const { return m_tDesc; }
+
 protected:
 	HRESULT Ready_RenderComponents(_uint iModelProtoLevel, const wstring& strModelProtoTag);
 	HRESULT Bind_ShaderResources();

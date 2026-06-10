@@ -23,8 +23,9 @@ HRESULT CLevel_GamePlay::Initialize()
     MAP_LOAD_REPORT MapReport{};
     CMapStage* pMapStage = nullptr;
 
-    if (FAILED(CMap_Loader::Spawn_Map(
+    if (FAILED(CMap_Loader::Spawn_MapForLevel(
         Manifest.strMapManifest,
+        Manifest.strObjectsFile,
         ETOUI(LEVEL::GAMEPLAY),
         &MapReport,
         &pMapStage)))

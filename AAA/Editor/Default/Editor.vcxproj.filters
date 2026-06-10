@@ -52,6 +52,9 @@
     <Filter Include="02. Objects\01. NavMash">
       <UniqueIdentifier>{fa7ca004-f5fe-48f0-97fd-9003e627f107}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. Objects\04. Map">
+      <UniqueIdentifier>{435f5dea-a1a0-428d-9391-eb3e1daab1a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Editor.h">
@@ -120,6 +123,9 @@
     <ClInclude Include="..\public\NavMesh_Editor.h">
       <Filter>02. Objects\01. NavMash</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Map_PreviewSession.h">
+      <Filter>02. Objects\04. Map</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Editor.ico">
@@ -185,6 +191,9 @@
     </ClCompile>
     <ClCompile Include="..\private\NavMesh_Editor.cpp">
       <Filter>02. Objects\01. NavMash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Map_PreviewSession.cpp">
+      <Filter>02. Objects\04. Map</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

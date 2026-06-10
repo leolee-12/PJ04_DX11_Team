@@ -30,7 +30,8 @@ public:
 
 	_bool	XM_CALLCONV IsIn_WorldSpace(CULLING_VIEW eView, _fvector vWorldPos, _float fRange = 0.f) const;
 	_bool	IsIn_WorldSpace_AABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const;
-	_bool	Should_CullAABB(CULLING_VIEW eView, _bool bEnableCulling, const BoundingBox& WorldBounds) const;
+	_bool	Should_CullAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const;
+	_bool   Should_CullByDistance(const BoundingBox& WorldBounds, _float fCullDistance) const;
 
 #ifdef _DEBUG
 	void	Reset_Stats();
@@ -39,6 +40,7 @@ public:
 
 private:
 	CGameInstance_Proxy*	m_pProxy = { nullptr };
+	_bool	m_bEnableFrustumCulling = { true };
 
 	FRUSTUM_VIEW_STATE		m_ViewStates[ETOUI(CULLING_VIEW::END)] = {};
 

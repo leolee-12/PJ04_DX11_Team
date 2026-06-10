@@ -1,13 +1,13 @@
 #include "Map_ProtoRegister.h"
-
-#include "EnvObject_Effect.h"
+#include "GameContent_Log.h"
+#include "EnvObject_Trigger.h"
 #include "EnvObject_Interact.h"
 #include "EnvObject_Static.h"
-#include "GameContent_Log.h"
-#include "GameInstance.h"
 #include "MapSection.h"
 #include "MapStage.h"
-#include "Model.h"
+#include "GameObject_Factory.h"
+
+#include "GameInstance.h"
 
 #include <exception>
 
@@ -41,6 +41,25 @@ HRESULT CMap_ProtoRegister::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, c
 
 		if (FAILED(Ready_EnvModel(Levels.iEnvModelLevel, Desc)))
 			return E_FAIL;
+	}
+
+	for (const MAP_ADDED_OBJECT_DESC& Added : Package.AddedObjectDescs)
+	{
+		if (m_pProxy->Has_Prototype(Levels.iObjectLevel, Added.strPrototypeTag))
+			continue;
+
+		auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(Added.strPrototypeTag);
+		if (nullptr == pReg)
+			return E_FAIL;
+
+		pReg->ResourceLoader(m_pProxy, m_pDevice, m_pContext);
+		if (FAILED(m_pProxy->Add_Prototype(
+			Levels.iObjectLevel,
+			Added.strPrototypeTag.c_str(),
+			static_cast<CGameObject*>(pReg->CreatorFunc(m_pDevice, m_pContext)))))
+		{
+			return E_FAIL;
+		}
 	}
 
 	return S_OK;
@@ -86,8 +105,8 @@ HRESULT CMap_ProtoRegister::Ready_ObjectPrototypes(_uint iObjectLevel)
 		CEnvObject_Interact::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	if (FAILED(EnsurePrototype(CEnvObject_Effect::PROTOTYPE_TAG,
-		CEnvObject_Effect::Create(m_pDevice, m_pContext))))
+	if (FAILED(EnsurePrototype(CEnvObject_Trigger::PROTOTYPE_TAG,
+		CEnvObject_Trigger::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	return S_OK;
@@ -189,7 +208,7 @@ const _tchar* CMap_ProtoRegister::Get_EnvObjectProtoTag(ENV_OBJECT_KIND eKind) c
 	{
 	case ENV_OBJECT_KIND::STATIC: return CEnvObject_Static::PROTOTYPE_TAG;
 	case ENV_OBJECT_KIND::INTERACT: return CEnvObject_Interact::PROTOTYPE_TAG;
-	case ENV_OBJECT_KIND::EFFECT: return CEnvObject_Effect::PROTOTYPE_TAG;
+	case ENV_OBJECT_KIND::EFFECT: return CEnvObject_Trigger::PROTOTYPE_TAG;
 	default: return nullptr;
 	}
 }

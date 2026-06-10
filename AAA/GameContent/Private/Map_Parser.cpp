@@ -109,6 +109,13 @@ HRESULT CMap_Parser::Parse_ManifestRoot(
 			pOutManifest->EnvJsonPaths.push_back(Resolve_PathFromManifest(ManifestPath, strRawPath));
 	}
 
+	_wstring strDeltaPath;
+	if (Try_ReadString(jManifest, "DeltaPath", &strDeltaPath)
+		|| Try_ReadString(jManifest, "OverridePath", &strDeltaPath))
+	{
+		pOutManifest->strDeltaPath = Resolve_PathFromManifest(ManifestPath, strDeltaPath);
+	}
+
 	return S_OK;
 }
 
@@ -535,6 +542,40 @@ void CMap_Parser::Parse_EffectEntry(
 	Try_ReadFloat(jEntry, "OutTransitionSec", &Desc.tEffect.fOutTransitionSec);
 	Try_ReadString(jEntry, "Kind", &Desc.tEffect.strKind);
 
+	Try_BuildWorldMatrixFromArray(jEntry, "WorldMtx", &Desc);
+
+	const json* pMainComponent = nullptr;
+
+	if (const json* p = Find_JsonValue(jEntry, "Gimmick.LocalAreaLight.MainComponent"))
+	{
+		pMainComponent = p;
+		Desc.strComponentName = L"LocalAreaLight";
+	}
+	else if (const json* p = Find_JsonValue(jEntry, "Gimmick.DecorPartsCullingArea.MainComponent"))
+	{
+		pMainComponent = p;
+		Desc.strComponentName = L"DecorPartsCullingArea";
+	}
+	else if (const json* p = Find_JsonValue(jEntry, "Gimmick.ToneMappingArea.MainComponent"))
+	{
+		pMainComponent = p;
+		Desc.strComponentName = L"ToneMappingArea";
+	}
+	else if (const json* p = Find_JsonValue(jEntry, "Gimmick.FieldEffect.MainComponent"))
+	{
+		pMainComponent = p;
+		Desc.strComponentName = L"FieldEffect";
+	}
+
+	if (Desc.strComponentName == L"ToneMappingArea")
+	{
+		Try_ReadFloat3Array(*pMainComponent, "Size", &Desc.tEffect.vAreaSize);
+		Try_ReadFloat(*pMainComponent, "ExposureValue", &Desc.tEffect.fExposureValue);
+
+		Desc.tEffect.vAreaCenter = Desc.vPosition;
+		Desc.tEffect.vAreaRot = Desc.vRotation;
+	}
+
 	Desc.tEffect.eEffectType = Classify_EffectType(Desc.strObjectName, Desc.strComponentName);
 
 	pOutDescs->push_back(Desc);
@@ -743,16 +784,12 @@ void CMap_Parser::Fill_CommonFlags(const json& jEntry, ENV_OBJECT_DESC* pDesc)
 	Try_ReadBoolFromNumeric(jEntry, "IsInvalidCollision", &pDesc->tCollision.bInvalidCollision);
 	Try_ReadBoolFromNumeric(jEntry, "IsInvisibleCollision", &pDesc->tCollision.bInvisibleCollision);
 	Try_ReadBoolFromNumeric(jEntry, "IsSlipFallCollision", &pDesc->tCollision.bSlipFallCollision);
-	Try_ReadBoolFromNumeric(jEntry, "IsUseObjCollReaction",
-		&pDesc->tCollision.bUseObjCollisionReaction);
-	Try_ReadBoolFromNumeric(jEntry, "IsNeedUpdateCollisionByAnim",
-		&pDesc->tCollision.bNeedUpdateCollisionByAnim);
-	Try_ReadBoolFromNumeric(jEntry, "IsOverrideCollisionAttr",
-		&pDesc->tCollision.bOverrideCollisionAttr);
+	Try_ReadBoolFromNumeric(jEntry, "IsUseObjCollReaction", &pDesc->tCollision.bUseObjCollisionReaction);
+	Try_ReadBoolFromNumeric(jEntry, "IsNeedUpdateCollisionByAnim", &pDesc->tCollision.bNeedUpdateCollisionByAnim);
+	Try_ReadBoolFromNumeric(jEntry, "IsOverrideCollisionAttr", &pDesc->tCollision.bOverrideCollisionAttr);
 
 	Try_ReadString(jEntry, "OverrideCollisionType", &pDesc->tCollision.strOverrideCollisionType);
-	Try_ReadString(jEntry, "OverrideCollisionTypeInside",
-		&pDesc->tCollision.strOverrideCollisionTypeInside);
+	Try_ReadString(jEntry, "OverrideCollisionTypeInside", &pDesc->tCollision.strOverrideCollisionTypeInside);
 
 	Try_ReadBoolFromNumeric(jEntry, "IsShadowMappingCaster", &pDesc->tRender.bShadowMappingCaster);
 	Try_ReadBoolFromNumeric(jEntry, "UseLodCulling", &pDesc->tRender.bUseLodCulling);
@@ -760,7 +797,9 @@ void CMap_Parser::Fill_CommonFlags(const json& jEntry, ENV_OBJECT_DESC* pDesc)
 	Try_ReadFloat(jEntry, "NearDistAlphaLengthRate", &pDesc->tRender.fNearDistAlphaLengthRate);
 	Try_ReadString(jEntry, "Decor.LayerName", &pDesc->tRender.strLayerName);
 	Try_ReadUInt(jEntry, "HideFlag", &pDesc->tRender.iHideFlag);
-	Try_ReadUInt(jEntry, "Uid", &pDesc->iUid);
+
+	if (!Try_ReadUInt(jEntry, "Uid", &pDesc->iUid))
+		Try_ReadUInt(jEntry, "Basic.BasicInfo.Uid", &pDesc->iUid);
 }
 
 NS_END
