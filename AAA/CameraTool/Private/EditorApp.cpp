@@ -34,10 +34,16 @@ HRESULT CEditorApp::Initialize()
     Ready_EditRTV();
     m_pGameInstance_Proxy->Bind_RenderTarget(m_pRTV, m_pDSV, g_iWinSizeX, g_iWinSizeY);
 
-    
+    if (FAILED(Ready_SharedResources()))
+        return E_FAIL;
+
+    if (FAILED(Load_Fonts(m_pGameInstance_Proxy)))
+        return E_FAIL;
 
     m_pImGui_Manager = CImGui_Manager::GetInstance();
     Safe_AddRef(m_pImGui_Manager);
+
+    CGameObject_Factory::GetInstance()->RegisterAll();
 
     CLevel_Edit* pPreLevel = CLevel_Edit::Create(m_pDevice, m_pContext);
     if (nullptr == pPreLevel)
@@ -48,15 +54,6 @@ HRESULT CEditorApp::Initialize()
 
     m_pLevel_Edit = pPreLevel;
     m_pImGui_Manager->ImGui_Initialize(&m_pDevice, &m_pContext, pPreLevel, &m_pSRV, &m_pSRV2);
-
-    if (FAILED(Ready_SharedResources()))
-        return E_FAIL;
-
-    CGameObject_Factory::GetInstance()->RegisterAll();
-
-    if (FAILED(Load_Fonts(m_pGameInstance_Proxy)))
-        return E_FAIL;
-
 
     return S_OK;
 }

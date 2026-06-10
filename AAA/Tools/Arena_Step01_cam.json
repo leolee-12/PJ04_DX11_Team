@@ -1,273 +1,78 @@
 {
- "Custom": {
-  "0": {
-   "Basic.ObjectName": "Rail",
-   "BezierControlLength": 5.0,
-   "CenterPos": [
+ "rails": [
+  {
+   "uid": 895590608,
+   "close": false,
+   "nodes": [
+    [
+     -1.0,
+     1.0,
+     10.0
+    ],
+    [
+     -1.0,
+     1.0,
+     21.0
+    ]
+   ]
+  }
+ ],
+ "areas": [
+  {
+   "center": [
+    -2.0,
+    6.5,
+    13.0
+   ],
+   "size": [
+    52.0,
+    21.0,
+    36.0
+   ],
+   "rot": [
+    0.0,
     -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "useRail": true,
+   "railUid": 895590608,
+   "scrollDead": [
+    0.0,
     0.0,
     0.0
    ],
-   "ErpType": "Line",
-   "IsClockwise": true,
-   "IsClose": false,
-   "Kind": "Rail",
-   "Node": [
-    {
-     "Pos": [
-      -1.0,
-      1.0,
-      -10.0
-     ]
-    },
-    {
-     "Pos": [
-      -1.0,
-      1.0,
-      -21.0
-     ]
-    }
-   ],
-   "NodeCount": 2,
-   "Radius": 2.0,
-   "Uid": 895590608
-  }
- },
- "Standard": {
-  "0": {
-   "Basic.BasicInfo": {
-    "AllowDestroyGeneratorByExt": false,
-    "CullBoundsCenter": [
-     -0.0,
-     0.0,
-     0.0
-    ],
-    "CullBoundsSize": [
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
      0.0,
      0.0,
      0.0
     ],
-    "CustomBoundsCenter": [
-     -0.0,
-     0.0,
-     0.0
-    ],
-    "CustomBoundsSize": [
-     0.0,
-     0.0,
-     0.0
-    ],
-    "ExclusiveLockId": 0,
-    "GroupId": -1,
-    "IsAbleToHide": false,
-    "IsRemoveGeneratorForDifficultyLevelCasual": false,
-    "IsSoulEnemy": false,
-    "Level": "Lv1",
-    "Position": [
-     -1.0,
-     1.0,
-     4.0
-    ],
-    "RepopType": "None",
-    "Rotation": [
-     0.0,
-     -0.0,
-     -0.0,
-     -1.0
-    ],
-    "SceneScale": [
-     1.0,
-     1.0,
-     1.0
-    ],
-    "SizeType": "M",
-    "TargetLandGroupIndex": -1,
-    "TownAreaCreateRule": "None",
-    "TownAreaUnlockType": "None",
-    "TownBuildingCreateRule": "None",
-    "TownBuildingUnlockType": "None",
-    "Uid": 1578762221,
-    "UseCullBounds": false,
-    "UseCustomBounds": false
+    "gazeBlend": 1.0
    },
-   "Basic.EventReceiver": {
-    "EventReceiverId": -1
-   },
-   "Basic.ObjectName": "AreaCamera",
-   "Basic.RailUser": {
-    "NodeIndex": 0,
-    "TargetRailUid": 895590608
-   },
-   "Gimmick.AreaCamera.CameraOffsetParamBase": {
-    "DistOffs": 6.0,
-    "DofFarDepthOffs": 0.0,
-    "DofFarRateOffs": 0.0,
-    "EyeSnapCenter": [
-     -1.0,
-     0.0,
-     4.0
-    ],
-    "EyeSnapRate": [
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
      0.0,
      0.0,
      0.0
     ],
-    "EyeSnapRot": [
-     0.0,
-     -0.0,
-     -0.0,
-     -1.0
-    ],
-    "FovYOffs": 0.0,
-    "RollOffs": 0.0,
-    "RotYOffs": 0.0,
-    "SnapCenter": [
-     -1.0,
-     2.0,
-     -15.0
-    ],
-    "SnapRate": [
-     0.6,
-     1.0,
-     0.75
-    ],
-    "SnapRot": [
-     0.0,
-     -0.0,
-     -0.0,
-     -1.0
-    ],
-    "TargetOffs": [
-     -0.0,
-     0.0,
-     0.0
-    ],
-    "TiltOffs": -10.0
-   },
-   "Gimmick.AreaCamera.CameraOffsetParamEnd": {
-    "DistOffs": 6.0,
-    "DofFarDepthOffs": 0.0,
-    "DofFarRateOffs": 0.0,
-    "EyeSnapCenter": [
-     -1.0,
-     1.0,
-     4.0
-    ],
-    "EyeSnapRate": [
-     0.0,
-     0.0,
-     0.0
-    ],
-    "EyeSnapRot": [
-     0.0,
-     -0.0,
-     -0.0,
-     -1.0
-    ],
-    "FovYOffs": 0.0,
-    "RollOffs": 0.0,
-    "RotYOffs": 0.0,
-    "SnapCenter": [
-     -1.0,
-     6.0,
-     4.0
-    ],
-    "SnapRate": [
-     0.6,
-     1.0,
-     0.8
-    ],
-    "SnapRot": [
-     0.0,
-     -0.0,
-     -0.0,
-     -1.0
-    ],
-    "TargetOffs": [
-     -0.0,
-     0.0,
-     0.0
-    ],
-    "TiltOffs": -15.0,
-    "UseCustomEyeSnap": false,
-    "UseCustomTargetSnap": false
-   },
-   "Gimmick.AreaCamera.MainComponent": {
-    "AreaCameraMode": "Normal",
-    "AreaCenter": [
-     -2.0,
-     6.5,
-     -13.0
-    ],
-    "AreaCheckMargin": 2.0,
-    "AreaRot": [
-     -0.0,
-     0.0,
-     0.0,
-     -1.0
-    ],
-    "AreaShapeKind": "Cube",
-    "AreaSize": [
-     52.0,
-     21.0,
-     36.0
-    ],
-    "ErpFrameIn": 120,
-    "ErpFrameOut": 120,
-    "EyeSnapCenter": [
-     -1.0,
-     0.0,
-     4.0
-    ],
-    "EyeSnapRot": [
-     0.0,
-     -0.0,
-     -0.0,
-     -1.0
-    ],
-    "IsEyeSnap": false,
-    "IsInitActiveForUseEvent": false,
-    "IsTargetSnap": true,
-    "Kind": "AreaCamera",
-    "PanLimitCenter": 180.0,
-    "PanLimitRange": 360.0,
-    "Priority": 0,
-    "ReactPreWaitFrame": 0,
-    "SnapCenter": [
-     -1.0,
-     2.0,
-     -15.0
-    ],
-    "SnapRot": [
-     0.0,
-     -0.0,
-     -0.0,
-     -1.0
-    ],
-    "UseCustomAreaCheckMargin": false,
-    "UseDofParam": false,
-    "UseEventTrigger": false,
-    "UsePanLimit": false,
-    "UseRail": true
-   },
-   "Gimmick.CameraCommon.CameraSituationFilter": {
-    "DeformCar": true,
-    "DeformCone": true,
-    "DeformCylinder": false,
-    "DeformElevator": false,
-    "DeformGeneral": "AllOn",
-    "DeformGlider": false,
-    "DeformLightbulb": false,
-    "DeformLocker": false,
-    "DeformRing": true,
-    "DeformStairs": true,
-    "DeformVendingMachine": false,
-    "DeformWaterBalloon": false,
-    "DeformWaterTank": false,
-    "Normal": true,
-    "WarpStar": true
+    "gazeBlend": 1.0
    }
   }
- },
- "StepLinkInfo": []
+ ]
 }

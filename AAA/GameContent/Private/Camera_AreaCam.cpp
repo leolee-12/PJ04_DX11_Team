@@ -47,20 +47,21 @@ void CCamera_AreaCam::Priority_Update(_float fTimeDelta)
     _vector vKirby = m_pTarget ? m_pTarget->Get_Transform()->Get_State(STATE::POSITION) : XMVectorSet(0.f, 0.f, 0.f,
         1.f);
 
-    CAM_POSE pose = m_solver.Solve(vKirby);
+    if (m_solver.Cur_GazeMode() == 2) {
+        string tag = m_solver.Cur_GazeTag();
+        // TODO: 프로젝트의 보스/타깃 찾기 방식에 맞춰 위치 획득.
+        //   예) wstring wtag(tag.begin(), tag.end());
+        //       CGameObject* p = m_pGameInstance_Proxy->Find_GameObject(Get_LevelIndex(), L"Layer_Boss", wtag);
+        CGameObject* pTarget = nullptr;   // <- 위 Find_GameObject로 교체
+        if (pTarget) m_solver.Set_GazeOverride(pTarget->Get_Transform()->Get_State(STATE::POSITION), true);
+        else         m_solver.Set_GazeOverride(XMVectorZero(), false);
+    }
+    else m_solver.Set_GazeOverride(XMVectorZero(), false);
+
+    m_solver.Update(vKirby, fTimeDelta);
+    const CAM_POSE& pose = m_solver.Cur_Pose();
     _vector vEye = XMLoadFloat3(&pose.eye);
     _vector vAt = XMVectorAdd(vEye, XMLoadFloat3(&pose.fwd));
-
-#ifdef _DEBUG
-    {
-        _float3 k; XMStoreFloat3(&k, vKirby);
-        char b[224];
-        sprintf_s(b, "K(%.1f,%.1f,%.1f) area=%d rail=%d gaze=%d | EYE(%.1f,%.1f,%.1f) FWD(%.2f,%.2f,%.2f)\n",
-            k.x, k.y, k.z, m_solver.Cur_AreaIndex(), (int)m_solver.Cur_UseRail(), (int)m_solver.Cur_Gazing(),
-            pose.eye.x, pose.eye.y, pose.eye.z, pose.fwd.x, pose.fwd.y, pose.fwd.z);
-        OutputDebugStringA(b);
-    }
-#endif
 
     if (XMVectorGetX(XMVector3LengthSq(XMVectorSubtract(vEye, vAt))) < 1e-4f)
         vAt = XMVectorAdd(vEye, XMVectorSet(0.f, 0.f, 1.f, 0.f));

@@ -3,68 +3,39 @@
 NS_BEGIN(Client)
 
 struct CAM_RAIL {
-    string  srcKey;                 // key in doc["Custom"]; "" = newly added
-    _uint   uid = 0;
-    _bool   close = false;          // IsClose
-    vector<_float3> nodes;          // Node[].Pos (engine coords)
-    // restored from binary
-    _float  radius = 2.f;           // Radius (attach range)
-    _float  bezierCtrlLen = 5.f;    // BezierControlLength
-    _float3 centerPos = {};         // CenterPos
-    _bool   clockwise = false;      // IsClockwise
-    string  kind = "Rail";          // Kind
-    string  erpType = "Line";       // ErpType
-    string  objectName = "Rail";    // Basic.ObjectName
+    _uint           uid = 0;
+    _bool           close = false;
+    vector<_float3> nodes;          // nodes.front()=start, nodes.back()=end
 };
 
-struct CAM_OFFSET {
-    _float3 targetOffs = {};
-    _float3 snapCenter = {};
-    _float3 snapRate = { 1.f,1.f,1.f };
-    _float4 snapRot = { 0.f,0.f,0.f,1.f };
-    _float3 eyeSnapCenter = {};
-    _float3 eyeSnapRate = { 0.f,0.f,0.f };
-    _float4 eyeSnapRot = { 0.f,0.f,0.f,1.f };
-    _float  dist = 0.f, tilt = 0.f, rotY = 0.f, roll = 0.f, fovY = 0.f;
-    // restored
-    _float  dofFarDepth = 0.f;      // DofFarDepthOffs
-    _float  dofFarRate = 0.f;       // DofFarRateOffs
+struct CAM_FRAME {
+    _float yaw = 0.f;    // deg, 수평 회전
+    _float pitch = 20.f;   // deg, +면 위에서 내려봄
+    _float distance = 16.f;   // 타깃 뒤로(레일=0이면 눈이 레일 위)
+    _float height = 3.f;    // 추가 눈 높이
+    _float fov = 50.f;
+    _float aimHeight = 4.f;    // 커비 머리 위 조준(화면 하단 프레이밍)
+    _float3 gazePoint = { 0.f, 0.f, 0.f };  // Point/Object 응시 좌표(에디터 마커)
+    _float  gazeBlend = 1.f;
 };
-
-enum class CAM_MODE { NORMAL, FIXED_GAZING };
 
 struct CAM_AREA {
-    string   srcKey;                // key in doc["Standard"]; "" = newly added
-    CAM_MODE mode = CAM_MODE::NORMAL;
-    _float3  center = {}, size = { 20.f,10.f,20.f };
-    _float4  rot = { 0.f,0.f,0.f,1.f };
-    _int     priority = 0;
-    _float   erpIn = 120.f, erpOut = 120.f;
-    _bool    useRail = false; _uint railUid = 0;
-    _bool    eyeSnap = false, targetSnap = false;
-    _bool    usePanLimit = false;
-    _float   panCenter = 180.f, panRange = 360.f;
-    CAM_OFFSET base, end;
-    // restored from binary
-    string   shapeKind = "Cube";        // AreaShapeKind (Normal|Cube)
-    string   kind = "AreaCamera";       // Kind
-    string   objectName = "AreaCamera"; // Basic.ObjectName
-    _float   checkMargin = 2.f;         // AreaCheckMargin
-    _bool    useCustomMargin = false;   // UseCustomAreaCheckMargin
-    _int     reactPreWait = 0;          // ReactPreWaitFrame
-    _bool    initActiveForEvent = false;// IsInitActiveForUseEvent
-    _bool    useDof = false;            // UseDofParam
-    _bool    useEventTrigger = false;   // UseEventTrigger
-    _int     railNodeIndex = 0;         // Basic.RailUser.NodeIndex
-    // MainComponent-level snaps (separate from base/end offsets)
-    _float3  mcSnapCenter = {};         _float4 mcSnapRot = { 0.f,0.f,0.f,1.f };
-    _float3  mcEyeSnapCenter = {};      _float4 mcEyeSnapRot = { 0.f,0.f,0.f,1.f };
+    _float3 center = {}, size = { 20.f, 10.f, 20.f };
+    _float4 rot = { 0.f, 0.f, 0.f, 1.f };    // OBB 볼륨 방향 전용(카메라엔 영향 X)
+    _int    priority = 0;
+    _bool   useRail = false;
+    _uint   railUid = 0;
+    _float3 scrollDead = { 0.f, 0.f, 0.f };  // 월드축 스크롤 데드존 half-extent
+    CAM_FRAME frame;      // 비레일 프레이밍 / 레일 start
+    CAM_FRAME frameEnd;   // 레일 영역 end (레일 진행도 t로 frame→frameEnd 보간)
+    _int    gazeMode = 0;     // 0=Kirby, 1=Point, 2=Object
+    string  gazeTag;            // Object 모드 런타임 해석 태그
 };
 
 struct CAM_POSE {
     _float3 eye = {};
-    _float3 fwd = { 0.f,0.f,1.f };
-    _float3 up = { 0.f,1.f,0.f };
+    _float3 fwd = { 0.f, 0.f, 1.f };
+    _float3 up = { 0.f, 1.f, 0.f };
     _float  fov = 50.f;
 };
 
@@ -72,43 +43,49 @@ class CLIENT_DLL CAreaCameraSolver
 {
 public:
     _bool    Load(const wstring& path);
-    CAM_POSE Solve(_fvector vKirby);
+    _bool    Save(const wstring& path) const;
+    void     Update(_fvector vKirby, _float dt);   // 프레임당 1회
+    _float   Cur_T() const { return m_curT; }
 
-    _int  Cur_AreaIndex() const { return m_curArea; }
-    _bool Cur_UseRail()   const { return (m_curArea >= 0) && m_areas[m_curArea].useRail; }
-    _bool Cur_Gazing()    const { return (m_curArea >= 0) && m_areas[m_curArea].mode == CAM_MODE::FIXED_GAZING; }
+    const CAM_POSE& Cur_Pose() const { return m_lastPose; }
+    _int     Cur_AreaIndex()   const { return m_curArea; }
+    _bool    Cur_UseRail()     const { return (m_curArea >= 0) && m_areas[m_curArea].useRail; }
 
-    // editor access
-    _bool                   Save(const wstring& path) const;
     vector<CAM_RAIL>& Rails() { return m_rails; }
     vector<CAM_AREA>& Areas() { return m_areas; }
     const vector<CAM_RAIL>& Rails() const { return m_rails; }
     const vector<CAM_AREA>& Areas() const { return m_areas; }
-    void                    Clear() {
-        m_rails.clear(); m_areas.clear(); m_docText.clear(); m_curArea = -1;
-        m_railEngaged = false;
+    void Clear() { m_rails.clear(); m_areas.clear(); m_curArea = -1; m_scrollInit = false; }
+
+    void   Set_GazeOverride(_fvector vPos, _bool bValid) {
+        XMStoreFloat3(&m_gazeOverride, vPos); 
+        m_gazeOverrideValid =bValid;
     }
+    _int   Cur_GazeMode() const { return (m_curArea >= 0) ? m_areas[m_curArea].gazeMode : 0; }
+    string Cur_GazeTag() const { return (m_curArea >= 0) ? m_areas[m_curArea].gazeTag : string(); }
 
 private:
-    const CAM_RAIL* Find_Rail(_uint uid) const;
     _int    Resolve_Area(_fvector vKirby) const;
     static _bool Point_In_OBB(_fvector p, const CAM_AREA& A);
-    _float  Progress_T(const CAM_AREA& A, _fvector vKirby) const;
-    static CAM_OFFSET Lerp_Offset(const CAM_AREA& A, _float t);
+    const CAM_RAIL* Find_Rail(_uint uid) const;
     static _float3 Eval_Rail(const vector<_float3>& nodes, _float t);
     static _float  Project_OnRail(const vector<_float3>& nodes, _fvector vPos);
-    CAM_POSE Solve_Normal(const CAM_AREA&, const CAM_OFFSET&, _fvector, const CAM_RAIL*, _float t) const;
-    CAM_POSE Solve_FixedGazing(const CAM_AREA&, const CAM_OFFSET&, _fvector, const CAM_RAIL*, _float t) const;
+    static CAM_FRAME Lerp_Frame(const CAM_FRAME& a, const CAM_FRAME& b, _float t);
+    CAM_POSE Solve_Area(const CAM_AREA& A, _fvector vKirby) const;
+
+    static _bool Kirby_Beyond_Rail(const CAM_RAIL& R, _fvector kirby);
 
 private:
     vector<CAM_RAIL> m_rails;
     vector<CAM_AREA> m_areas;
     _int             m_curArea = -1;
 
-    mutable _float3  m_lastRailFwd = { 0.f,0.f,1.f };
-    mutable _float3  m_lastRailEyeOffset = {};
-    mutable _bool    m_railEngaged = false;
+    _float3 m_gazeOverride = {};
+    _bool   m_gazeOverrideValid = false;
 
-    string           m_docText;     // full binary dump (verbatim), edited fields rewritten on Save
+    mutable CAM_POSE m_lastPose;
+    mutable _float3  m_scrollPos = {};
+    mutable _bool    m_scrollInit = false;
+    mutable _float   m_curT = 0.f;
 };
 NS_END

@@ -69,7 +69,11 @@ def convert_file(path):
 
 
 # ─────────────────────────────────────────────────────────────
-#  슬림 익스포트: 원작 전체 트리 → 엔진 AREA_CAMERA/RAIL 슬림 스키마
+#  엔진 익스포트(--slim): 원작 전체 트리 → 우리 커스텀 플랫 스키마
+#    {rails:[{uid,close,nodes}], areas:[{center,size,rot,priority,erpIn,erpOut,
+#     useRail,railUid,scrollDead, base/end:{yaw,pitch,distance,height,fov,
+#     aimOffset,followRate}}]}
+#  GameContent CAreaCameraSolver::Load 가 그대로 읽음(좌표 추가변환 없음).
 #  좌표 변환: Switch(RH, -Z forward) → 우리 엔진(LH, +Z forward) = Z 부호 반전
 #  (안 맞으면 FLIP_Z를 끄거나 FLIP_X로 바꿔 캘리브레이션)
 # ─────────────────────────────────────────────────────────────
@@ -89,26 +93,13 @@ def _rate3(a):   # SnapRate 등 비율(축별 0~1) — 좌표 아님, 부호 유
 def _ang(v):     # 각도 오프셋: Z거울변환에서 회전 sense가 반대 → 부호 반전
     return (-v if FLIP_Z else v)
 
-def _offset(d):
-    d = d or {}
-    return {
-        "targetOffs": _v3(d.get("TargetOffs", [0, 0, 0])),
-        "snapCenter": _v3(d.get("SnapCenter", [0, 0, 0])),
-        "snapRate":   _rate3(d.get("SnapRate", [1, 1, 1])),        # ★ 축별 부분추종
-        "snapRot":    _quat(d.get("SnapRot", [0, 0, 0, 1])),       # ★ 룩 base 회전
-        "eyeSnapCenter": _v3(d.get("EyeSnapCenter", [0, 0, 0])),
-        "eyeSnapRate":   _rate3(d.get("EyeSnapRate", [1, 1, 1])),  # ★ 눈 축별 추종
-        "eyeSnapRot":    _quat(d.get("EyeSnapRot", [0, 0, 0, 1])), # ★ 눈 base 회전(카메라 방향)
-        "distOffs":  d.get("DistOffs", 0.0),
-        "tiltOffs":  _ang(d.get("TiltOffs", 0.0)),                 # ★ 거울 → 부호 반전
-        "rotYOffs":  _ang(d.get("RotYOffs", 0.0)),                 # ★
-        "rollOffs":  _ang(d.get("RollOffs", 0.0)),                 # ★
-        "fovYOffs":  d.get("FovYOffs", 0.0),                       # 화각은 부호 무관
-    }
-
-def to_slim(parsed):
+def to_engine(parsed):
+    # 원작에선 영역(OBB)+레일만 가져오고, 카메라 프레이밍은 우리 기본값으로 깔아둠.
+    # (에디터에서 영역별로 손세팅: yaw/pitch/distance/height/fov/aimHeight)
     rails = []
     for _, r in parsed.get("Custom", {}).items():
+        if r.get("Kind") != "Rail":              # CameraLimitCollision 등 비-레일 제외
+            continue
         rails.append({
             "uid":   r.get("Uid", 0),
             "close": r.get("IsClose", False),
@@ -120,23 +111,29 @@ def to_slim(parsed):
         if not mc:
             continue
         ru = c.get("Basic.RailUser", {}) or {}
+        use_rail = mc.get("UseRail", False)
+        frame = {
+            "yaw":       0.0,
+            "pitch":     20.0,
+            "distance":  0.0 if use_rail else 16.0,      # 레일=눈이 레일 위, 비레일=뒤로 16
+            "height":    3.0,
+            "fov":       50.0,
+            "aimHeight": 4.0,
+            "gazePoint": [0.0, 0.0, 0.0],                # Point/Object 응시 좌표
+            "gazeBlend": 1.0,                            # 0=커비, 1=응시대상
+        }
         areas.append({
-            "mode":    mc.get("AreaCameraMode", "Normal"),  # ★ Normal | FixedGazing
-            "center":  _v3(mc["AreaCenter"]),
-            "size":    list(mc["AreaSize"]),               # 크기(범위)는 부호 유지
-            "rot":     _quat(mc.get("AreaRot", [0, 0, 0, 1])),
+            "center":   _v3(mc["AreaCenter"]),
+            "size":     list(mc["AreaSize"]),            # 크기(범위)는 부호 유지
+            "rot":      _quat(mc.get("AreaRot", [0, 0, 0, 1])),
             "priority": mc.get("Priority", 0),
-            "erpIn":   mc.get("ErpFrameIn", 120),
-            "erpOut":  mc.get("ErpFrameOut", 120),
-            "useRail": mc.get("UseRail", False),
-            "railUid": ru.get("TargetRailUid", 0),
-            "eyeSnap":    mc.get("IsEyeSnap", False),
-            "targetSnap": mc.get("IsTargetSnap", False),
-            "usePanLimit":    mc.get("UsePanLimit", False),
-            "panLimitCenter": mc.get("PanLimitCenter", 0.0),
-            "panLimitRange":  mc.get("PanLimitRange", 360.0),
-            "base": _offset(c.get("Gimmick.AreaCamera.CameraOffsetParamBase")),
-            "end":  _offset(c.get("Gimmick.AreaCamera.CameraOffsetParamEnd")),
+            "useRail":  use_rail,
+            "railUid":  ru.get("TargetRailUid", 0),
+            "scrollDead": [0.0, 0.0, 0.0],
+            "gazeMode": 0,                               # 0=Kirby, 1=Point, 2=Object
+            "gazeTag": "",                              # Object 모드 런타임 해석 태그
+            "frame":    dict(frame),                     # 비레일 프레이밍 / 레일 start
+            "frameEnd": dict(frame),                     # 레일 end (레일 진행도 t로 frame→frameEnd 보간)
         })
     return {"rails": rails, "areas": areas}
 
@@ -145,13 +142,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("input", help=".bin 파일 또는 디렉터리")
     ap.add_argument("-o", "--out", default=None, help="출력 루트(디렉터리 모드)")
-    ap.add_argument("--slim", action="store_true", help="엔진용 슬림 스키마로 출력")
+    ap.add_argument("--slim", action="store_true", help="엔진용 커스텀 플랫 스키마로 출력")
     args = ap.parse_args()
 
     if os.path.isfile(args.input):
         data = convert_file(args.input)
         if args.slim:
-            data = to_slim(data)
+            data = to_engine(data)
         suffix = "_cam.json" if args.slim else ".json"
         out = args.out or (os.path.splitext(args.input)[0] + suffix)
         with open(out, "w", encoding="utf-8") as fp:

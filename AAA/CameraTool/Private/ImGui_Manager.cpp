@@ -122,9 +122,8 @@ void CImGui_Manager::Draw_Toolbar()
         wstring w(m_szDocPath, m_szDocPath + strlen(m_szDocPath));
         m_pLevel_Edit->Save_CameraDoc(w);
     }
-    ImGui::SameLine(); if (ImGui::Button("L0"))    strcpy_s(m_szDocPath, "../../Tools/Level0_Stage1_Step01_cam.json");
-    ImGui::SameLine(); if (ImGui::Button("L1"))    strcpy_s(m_szDocPath, "../../Tools/Level1_Stage1_Step01_cam.json");
-    ImGui::SameLine(); if (ImGui::Button("Arena")) strcpy_s(m_szDocPath, "../../Tools/Arena_Step01_cam.json");
+    ImGui::SameLine(); if (ImGui::Button("L0"))    strcpy_s(m_szDocPath, "../../Resources/YSH/CameraData/Level0_Stage1_Step01_cam.json");
+    ImGui::SameLine(); if (ImGui::Button("L1"))    strcpy_s(m_szDocPath, "../../Resources/YSH/CameraData/Level1_Stage1_Step01_cam.json");
 
     if (ImGui::RadioButton("Translate", m_eGizmoOp == ImGuizmo::TRANSLATE)) m_eGizmoOp = ImGuizmo::TRANSLATE;
     ImGui::SameLine();
@@ -133,6 +132,13 @@ void CImGui_Manager::Draw_Toolbar()
     if (ImGui::RadioButton("Scale", m_eGizmoOp == ImGuizmo::SCALE)) m_eGizmoOp = ImGuizmo::SCALE; ImGui::SameLine();
     ImGui::Dummy(ImVec2(16, 0)); ImGui::SameLine();
 
+    if (m_pLevel_Edit->Is_Play()) {
+        if (ImGui::Button("Stop")) m_pLevel_Edit->Set_Play(false);
+    }
+    else {
+        if (ImGui::Button("Play")) m_pLevel_Edit->Set_Play(true);
+    }
+    ImGui::SameLine();
     bool prev = m_pLevel_Edit->Is_Preview();
     if (ImGui::Checkbox("Preview Camera", &prev)) m_pLevel_Edit->Set_Preview(prev);
     ImGui::SameLine();
@@ -196,8 +202,7 @@ void CImGui_Manager::Draw_List()
     for (int i = 0; i < (int)areas.size(); ++i)
     {
         char b[64];
-        sprintf_s(b, "Area %d  p%d %s##a%d", i, areas[i].priority,
-            areas[i].mode == CAM_MODE::FIXED_GAZING ? "FG" : "N", i);
+        sprintf_s(b, "Area %d  p%d##a%d", i, areas[i].priority, i);
         bool s = (sel == CLevel_Edit::SEL::AREA && m_pLevel_Edit->Get_SelArea() == i);
         if (ImGui::Selectable(b, s)) m_pLevel_Edit->Select_Area(i);
     }
@@ -222,45 +227,28 @@ void CImGui_Manager::Draw_List()
     ImGui::End();
 }
 
-void CImGui_Manager::Draw_OffsetEditor(const _char* label, CAM_OFFSET& o)
-{
-    if (!ImGui::TreeNode(label)) return;
-    ImGui::DragFloat3("targetOffs", &o.targetOffs.x, 0.05f);
-    ImGui::DragFloat3("snapCenter", &o.snapCenter.x, 0.1f);
-    ImGui::DragFloat3("snapRate", &o.snapRate.x, 0.01f, 0.f, 1.f);
-    ImGui::DragFloat4("snapRot", &o.snapRot.x, 0.01f);
-    ImGui::DragFloat3("eyeSnapCenter", &o.eyeSnapCenter.x, 0.1f);
-    ImGui::DragFloat3("eyeSnapRate", &o.eyeSnapRate.x, 0.01f, 0.f, 1.f);
-    ImGui::DragFloat4("eyeSnapRot", &o.eyeSnapRot.x, 0.01f);
-    ImGui::DragFloat("dist", &o.dist, 0.1f);
-    ImGui::DragFloat("tilt", &o.tilt, 0.1f);
-    ImGui::DragFloat("rotY", &o.rotY, 0.1f);
-    ImGui::DragFloat("roll", &o.roll, 0.1f);
-    ImGui::DragFloat("fovY", &o.fovY, 0.1f);
-    ImGui::TreePop();
-}
-
 void CImGui_Manager::Draw_AreaInspector(CAM_AREA& A, _int idx)
 {
     ImGui::Text("Area %d", idx);
-    const char* modes[] = { "Normal", "FixedGazing" };
-    int m = (A.mode == CAM_MODE::FIXED_GAZING) ? 1 : 0;
-    if (ImGui::Combo("mode", &m, modes, 2)) A.mode = m ? CAM_MODE::FIXED_GAZING : CAM_MODE::NORMAL;
-
     ImGui::DragFloat3("center", &A.center.x, 0.1f);
     ImGui::DragFloat3("size", &A.size.x, 0.1f, 0.01f, 100000.f);
-    ImGui::DragFloat4("rot (quat)", &A.rot.x, 0.01f);
+    ImGui::DragFloat4("rot (OBB¸¸)", &A.rot.x, 0.01f);
     ImGui::InputInt("priority", &A.priority);
-    ImGui::DragFloat("erpIn", &A.erpIn, 1.f);
-    ImGui::DragFloat("erpOut", &A.erpOut, 1.f);
+    ImGui::DragFloat3("scrollDead", &A.scrollDead.x, 0.1f, 0.f, 1000.f);
 
+    const char* gazes[] = { "Kirby", "Point", "Object" };
+    ImGui::Combo("gazeMode", &A.gazeMode, gazes, 3);
+    if (A.gazeMode == 2) {
+        char buf[128] = {}; strncpy_s(buf, A.gazeTag.c_str(), _TRUNCATE);
+        if (ImGui::InputText("gazeTag", buf, sizeof(buf))) A.gazeTag = buf;
+    }
+
+    ImGui::SeparatorText("Rail");
     ImGui::Checkbox("useRail", &A.useRail);
     {
         char cur[32]; sprintf_s(cur, "%u", A.railUid);
-        if (ImGui::BeginCombo("railUid", cur))
-        {
-            for (auto& R : m_pLevel_Edit->Get_Solver().Rails())
-            {
+        if (ImGui::BeginCombo("railUid", cur)) {
+            for (auto& R : m_pLevel_Edit->Get_Solver().Rails()) {
                 char b[32]; sprintf_s(b, "%u", R.uid);
                 if (ImGui::Selectable(b, R.uid == A.railUid)) A.railUid = R.uid;
             }
@@ -268,29 +256,19 @@ void CImGui_Manager::Draw_AreaInspector(CAM_AREA& A, _int idx)
         }
     }
 
-    ImGui::Checkbox("eyeSnap", &A.eyeSnap); ImGui::SameLine();
-    ImGui::Checkbox("targetSnap", &A.targetSnap);
-    ImGui::Checkbox("usePanLimit", &A.usePanLimit);
-    ImGui::DragFloat("panCenter", &A.panCenter, 0.5f);
-    ImGui::DragFloat("panRange", &A.panRange, 0.5f);
+    Draw_FrameEditor(A.useRail ? "Frame (rail start)" : "Framing", A.frame);
+    if (A.useRail)
+        Draw_FrameEditor("Frame (rail end)", A.frameEnd);
 
     ImGui::Separator();
-    Draw_OffsetEditor("Base offset", A.base);
-    Draw_OffsetEditor("End offset", A.end);
-    ImGui::Separator();
-
-    if (ImGui::Button("Duplicate"))
-    {
+    if (ImGui::Button("Duplicate")) {
         auto& areas = m_pLevel_Edit->Get_Solver().Areas();
-        areas.push_back(A);
-        m_pLevel_Edit->Select_Area((_int)areas.size() - 1);
+        areas.push_back(A); m_pLevel_Edit->Select_Area((_int)areas.size() - 1);
     }
     ImGui::SameLine();
-    if (ImGui::Button("Delete"))
-    {
+    if (ImGui::Button("Delete")) {
         auto& areas = m_pLevel_Edit->Get_Solver().Areas();
-        areas.erase(areas.begin() + idx);
-        m_pLevel_Edit->Select_None();
+        areas.erase(areas.begin() + idx); m_pLevel_Edit->Select_None();
     }
 }
 
@@ -331,28 +309,49 @@ void CImGui_Manager::Draw_KirbyInspector()
     ImGui::DragFloat3("kirby pos", &k.x, 0.1f);
 
     auto& solver = m_pLevel_Edit->Get_Solver();
-    CAM_POSE p = solver.Solve(XMLoadFloat3(&k));
-    ImGui::Separator();
+    const CAM_POSE& p = solver.Cur_Pose();
     ImGui::Text("current area : %d", solver.Cur_AreaIndex());
+    ImGui::Text("t    : %.3f%s", solver.Cur_T(), solver.Cur_UseRail() ? " (rail)" : " (no rail)");
+    ImGui::Text("eye  %.2f %.2f %.2f", p.eye.x, p.eye.y, p.eye.z);
     ImGui::Text("eye  %.2f %.2f %.2f", p.eye.x, p.eye.y, p.eye.z);
     ImGui::Text("fwd  %.2f %.2f %.2f", p.fwd.x, p.fwd.y, p.fwd.z);
     ImGui::Text("fov  %.1f", p.fov);
 }
 
+void CImGui_Manager::Draw_FrameEditor(const _char* label, Client::CAM_FRAME& f)
+{
+    ImGui::PushID(label);
+    ImGui::SeparatorText(label);
+    ImGui::DragFloat("yaw", &f.yaw, 0.5f);
+    ImGui::DragFloat("pitch", &f.pitch, 0.5f);
+    ImGui::DragFloat("distance", &f.distance, 0.1f, 0.f, 1000.f);
+    ImGui::DragFloat("height", &f.height, 0.1f);
+    ImGui::DragFloat("fov", &f.fov, 0.2f, 1.f, 170.f);
+    ImGui::DragFloat("aimHeight", &f.aimHeight, 0.1f);
+    ImGui::DragFloat3("gazePoint", &f.gazePoint.x, 0.1f);
+    ImGui::DragFloat("gazeBlend", &f.gazeBlend, 0.01f, 0.f, 1.f);
+    ImGui::PopID();
+}
+
 void CImGui_Manager::Draw_Inspector()
 {
     ImGui::Begin("Inspector", nullptr, PANEL_FLAGS);
+
+    ImGui::SeparatorText("Kirby Proxy");
+    Draw_KirbyInspector();
+
+    ImGui::Separator();
+
     auto  sel = m_pLevel_Edit->Get_SelType();
     auto& areas = m_pLevel_Edit->Get_Solver().Areas();
 
-    if (sel == CLevel_Edit::SEL::AREA)
-    {
+    if (sel == CLevel_Edit::SEL::AREA) {
         int i = m_pLevel_Edit->Get_SelArea();
         if (i >= 0 && i < (int)areas.size()) Draw_AreaInspector(areas[i], i);
     }
     else if (sel == CLevel_Edit::SEL::NODE) Draw_NodeInspector();
-    else if (sel == CLevel_Edit::SEL::KIRBY) Draw_KirbyInspector();
-    else ImGui::TextWrapped("Select an area / rail node / kirby proxy from the Scene panel.");
+    else if (sel != CLevel_Edit::SEL::KIRBY)
+        ImGui::TextWrapped("Select an area / rail node from the Scene panel.");
 
     ImGui::End();
 }
@@ -394,7 +393,7 @@ void CImGui_Manager::Draw_Viewport()
     auto& areas = solver.Areas();
     auto& rails = solver.Rails();
     _float3 kirby = m_pLevel_Edit->Kirby();
-    CAM_POSE pose = solver.Solve(XMLoadFloat3(&kirby));
+    const CAM_POSE& pose = solver.Cur_Pose();
     int curArea = solver.Cur_AreaIndex();
     auto sel = m_pLevel_Edit->Get_SelType();
 
@@ -503,6 +502,28 @@ void CImGui_Manager::Draw_Viewport()
             ImGuizmo::PopID();
         }
     }
+
+    if(sel == CLevel_Edit::SEL::AREA) {
+        int gi = m_pLevel_Edit->Get_SelArea();
+        if (gi >= 0 && gi < (int)areas.size() && areas[gi].gazeMode != 0) {
+            CAM_AREA& GA = areas[gi];
+            ImVec2 gp = W2S(GA.frame.gazePoint);
+            if (gp.x > -9000.f) {
+                dl->AddCircle(gp, 7.f, IM_COL32(255, 80, 255, 255), 12, 2.f);
+                dl->AddLine(ImVec2(gp.x - 10, gp.y), ImVec2(gp.x + 10, gp.y), IM_COL32(255, 80, 255, 255));
+                dl->AddLine(ImVec2(gp.x, gp.y - 10), ImVec2(gp.x, gp.y + 10), IM_COL32(255, 80, 255, 255));
+            }
+            ImGuizmo::PushID(2);
+            _float4x4 gm; XMStoreFloat4x4(&gm, XMMatrixTranslationFromVector(XMLoadFloat3(&GA.frame.gazePoint)));
+            ImGuizmo::Manipulate((float*)pView, (float*)pProj, ImGuizmo::TRANSLATE, ImGuizmo::LOCAL, (float*)&gm);
+            if (ImGuizmo::IsUsing()) {
+                GA.frame.gazePoint.x = gm.m[3][0]; GA.frame.gazePoint.y = gm.m[3][1];
+                GA.frame.gazePoint.z = gm.m[3][2];
+            }
+            ImGuizmo::PopID();
+        }
+    }
+
     {   // kirby gizmo - always
         ImGuizmo::PushID(1);
         _float3& k = m_pLevel_Edit->Kirby();

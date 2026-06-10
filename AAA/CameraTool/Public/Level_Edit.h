@@ -74,6 +74,10 @@ public: // map preview (kept)
     const _wstring& Get_LoadedMapPreviewStageName() const { return m_strLoadedMapStageName; }
     _uint   Get_MapPreviewEnvCreatedCount() const { return m_iEnvObjCreatedCount; }
 
+public: // play mode
+    _bool Is_Play() const { return m_bPlay; }
+    void  Set_Play(_bool b);
+
 private:
     CEditCamera* m_pCamera = { nullptr };
 
@@ -97,16 +101,21 @@ private:
     _int        m_iLoadedMapPresetIndex = { -1 };
     unordered_set<CGameObject*> m_MapPreviewObjects;
 
+    _bool m_bPlay = { false };
+    CGameObject* m_pKirby = { nullptr };
+
 private:
     virtual HRESULT Ready_Events() override { return S_OK; }
     HRESULT Ready_EditLights();
     HRESULT Ready_EditCamera();
+    HRESULT Ready_Kirby();
 
     void Clear_MapPreviewLayer(const _wstring& strLayerTag);
     void Add_MapPreviewObjectHandle(const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring&
         strObjectTag, CGameObject* pObject);
     static void On_MapPreviewObjectCreated(void* pContext, CGameObject* pObject,
         const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);
+
 
 public:
     static CLevel_Edit* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

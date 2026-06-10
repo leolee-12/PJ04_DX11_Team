@@ -38,7 +38,7 @@ private:
     void Draw_AreaInspector(Client::CAM_AREA& A, _int idx);
     void Draw_NodeInspector();
     void Draw_KirbyInspector();
-    void Draw_OffsetEditor(const _char* label, Client::CAM_OFFSET& off);
+    void Draw_FrameEditor(const _char* label, Client::CAM_FRAME& f);
 
 public:
     virtual void Free() override;
@@ -56,7 +56,7 @@ private:
     struct VIEWPORT_DRAW { ID3D11DeviceContext* pContext; ID3D11BlendState* pBlend; };
     VIEWPORT_DRAW m_ViewportDraw{};
 
-    char m_szDocPath[260] = "../../Tools/Level0_Stage1_Step01_cam.json";
+    char m_szDocPath[260] = "../../Resources/YSH/CameraData/Level0_Stage1_Step01_cam.json";
 
 private:
     static void Viewport_DisableBlend(const ImDrawList*, const ImDrawCmd* cmd);

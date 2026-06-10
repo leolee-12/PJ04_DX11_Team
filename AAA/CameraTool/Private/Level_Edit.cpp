@@ -7,6 +7,9 @@
 #include "EditCamera.h"
 #include "MapStage.h"
 #include "Map_EditHelper.h"
+#include "imgui.h"
+#include "Kirby.h"
+#include "Transform.h"
 
 CLevel_Edit::CLevel_Edit(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel{ pDevice, pContext }
@@ -24,6 +27,9 @@ HRESULT CLevel_Edit::Initialize()
     if (FAILED(Ready_EditCamera()))
         return E_FAIL;
 
+    if (FAILED(Ready_Kirby()))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -32,10 +38,16 @@ void CLevel_Edit::Update(_float fTimeDelta)
     if (m_pGameInstance_Proxy->Key_Down(DIK_F2))
         m_pGameInstance_Proxy->Toggle_DebugRender();
 
-    if (m_bPreview && m_pCamera)
+    if (m_pKirby)
     {
-        Client::CAM_POSE pose = m_Solver.Solve(XMLoadFloat3(&m_vKirby));
+        CTransform* pTr = m_pKirby->Get_Transform();
+        if (m_bPlay)
+            XMStoreFloat3(&m_vKirby, pTr->Get_State(STATE::POSITION));   // 커비 스스로 이동 > 솔버로 풀
+        else
+            pTr->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&m_vKirby), 1.f)); // 기즈모 > 커비로푸시(Sync_To_Controller가 컨트롤러까지 텔레포트)
     }
+
+    m_Solver.Update(XMLoadFloat3(&m_vKirby), fTimeDelta);
 }
 
 HRESULT CLevel_Edit::Render()
@@ -74,7 +86,7 @@ void CLevel_Edit::Set_CameraActive(_bool b)
 
 void CLevel_Edit::Get_PreviewViewProj(_float4x4* pView, _float4x4* pProj)
 {
-    Client::CAM_POSE p = m_Solver.Solve(XMLoadFloat3(&m_vKirby));
+    const Client::CAM_POSE& p = m_Solver.Cur_Pose();
 
     _vector vEye = XMLoadFloat3(&p.eye);
     _vector vLook = XMVector3Normalize(XMLoadFloat3(&p.fwd));
@@ -134,6 +146,37 @@ HRESULT CLevel_Edit::Ready_EditCamera()
     return S_OK;
 }
 
+HRESULT CLevel_Edit::Ready_Kirby()
+{
+    auto* pFactory = Client::CGameObject_Factory::GetInstance();
+    if (nullptr == pFactory) return E_FAIL;
+
+    // 1) 커비 바디/모델 프로토타입 등록(로더 실행) 로더가 GAMEPLAY 레벨에 넣음
+    pFactory->LoadResource(Client::CKirby::PROTOTYPE_TAG, m_pGameInstance_Proxy, m_pDevice, m_pContext);
+
+    // 2) 커비 프로토타입 등록
+    if (!m_pGameInstance_Proxy->Has_Prototype(ETOUI(EDIT_LEVEL::STATIC), Client::CKirby::PROTOTYPE_TAG))
+    {
+        auto* pReg = pFactory->Get_Registration(Client::CKirby::PROTOTYPE_TAG);
+        if (nullptr == pReg) return E_FAIL;
+        m_pGameInstance_Proxy->Add_Prototype(ETOUI(EDIT_LEVEL::STATIC),
+            Client::CKirby::PROTOTYPE_TAG,
+            dynamic_cast<CGameObject*>(pReg->CreatorFunc(m_pDevice, m_pContext)));
+    }
+
+    // 3) 원점에 스폰
+    CGameObject* pKirby = nullptr;
+    Client::CKirby::KIRBY_BODY_DESC desc{};
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pKirby,
+        ETOUI(EDIT_LEVEL::STATIC), Client::CKirby::PROTOTYPE_TAG,
+        ETOUI(EDIT_LEVEL::EDIT), L"Layer_Kirby", L"Kirby", &desc)))
+        return E_FAIL;
+
+    m_pKirby = pKirby;
+    XMStoreFloat3(&m_vKirby, m_pKirby->Get_Transform()->Get_State(STATE::POSITION));
+    return S_OK;
+}
+
 _uint CLevel_Edit::Get_MapPreviewPresetCount() const
 {
     return CMap_EditHelper::Get_MapPresetCount();
@@ -142,6 +185,15 @@ _uint CLevel_Edit::Get_MapPreviewPresetCount() const
 const _char* CLevel_Edit::Get_MapPreviewPresetLabel(_uint iPresetIndex) const
 {
     return CMap_EditHelper::Get_MapPresetLabel(iPresetIndex);
+}
+
+void CLevel_Edit::Set_Play(_bool b)
+{
+    m_bPlay = b;
+    if (b) m_bPreview = true;                       // 플레이 시 게임캠 프리뷰 ON
+    m_pGameInstance_Proxy->Set_EditMode(!b);        // Play=게임모드(커비 Move 활성), Stop=에디트
+    if (b) m_pGameInstance_Proxy->Enable_InputDeveice();   // Play일 때만 커비가 입력받게
+    else   m_pGameInstance_Proxy->Disable_InputDeveice();
 }
 
 HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
