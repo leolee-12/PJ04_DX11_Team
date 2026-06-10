@@ -135,6 +135,7 @@ SHADOW_LIGHT_DESC CCamera::Make_CameraFit_Shadow(const _float4& vLightDir, _floa
 	for (int i = 0; i < 8; ++i)
 		fRadius = fmaxf(fRadius, XMVectorGetX(XMVector3Length(vCorner[i] - vCenter)));
 	fRadius = ceilf(fRadius * 16.f) / 16.f;   // 미세 떨림 억제용 양자화
+	if (fRadius < 0.0625f) fRadius = 0.0625f;  // 0폭 ortho 어서션 방지 (최소 1/16)
 
 	// 5) 라이트 축 (Shadow_Dir 내부 up=(0,1,0)과 반드시 일치)
 	XMVECTOR L = XMVector3Normalize(XMVectorSet(vLightDir.x, vLightDir.y, vLightDir.z, 0.f));

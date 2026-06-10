@@ -11,6 +11,17 @@
 #include "Kirby.h"
 #include "Transform.h"
 
+static _vector SmoothDampV(_fvector cur, _fvector target, _vector& vel, _float smoothTime, _float dt)
+{
+    smoothTime = max(0.0001f, smoothTime);
+    _float omega = 2.f / smoothTime, x = omega * dt;
+    _float e = 1.f / (1.f + x + 0.48f * x * x + 0.235f * x * x * x);
+    _vector change = XMVectorSubtract(cur, target);
+    _vector temp = XMVectorScale(XMVectorAdd(vel, XMVectorScale(change, omega)), dt);
+    vel = XMVectorScale(XMVectorSubtract(vel, XMVectorScale(temp, omega)), e);
+    return XMVectorAdd(target, XMVectorScale(XMVectorAdd(change, temp), e));
+}
+
 CLevel_Edit::CLevel_Edit(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel{ pDevice, pContext }
 {
@@ -48,6 +59,31 @@ void CLevel_Edit::Update(_float fTimeDelta)
     }
 
     m_Solver.Update(XMLoadFloat3(&m_vKirby), fTimeDelta);
+
+    // ---- 프리뷰 카메라 포즈 스무딩 (게임과 동일) ----
+    {
+        const Client::CAM_POSE& pose = m_Solver.Cur_Pose();
+        _vector vEye = XMLoadFloat3(&pose.eye);
+        _vector vFwd = XMLoadFloat3(&pose.fwd);
+        if (XMVector3IsNaN(vEye) || XMVector3IsNaN(vFwd) || XMVectorGetX(XMVector3LengthSq(vFwd)) < 1e-6f)
+        {
+            vEye = m_bCamInit ? XMLoadFloat3(&m_eyeCur) : XMVectorSet(0.f, 3.f, -10.f, 0.f);
+            vFwd = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+            XMStoreFloat3(&m_eyeVel, XMVectorZero()); XMStoreFloat3(&m_atVel, XMVectorZero());
+        }
+        _vector vAt = XMVectorAdd(vEye, vFwd);
+        if (!m_bCamInit) { XMStoreFloat3(&m_eyeCur, vEye); XMStoreFloat3(&m_atCur, vAt); m_bCamInit = true; }
+
+        _int curArea = m_Solver.Cur_AreaIndex();
+        if (curArea != m_lastArea) { m_areaBlendTimer = 0.5f; m_lastArea = curArea; }
+        _float smooth = m_smoothTime;
+        if (m_areaBlendTimer > 0.f) { m_areaBlendTimer -= fTimeDelta; smooth = 0.7f; }
+
+        _vector eVel = XMLoadFloat3(&m_eyeVel), aVel = XMLoadFloat3(&m_atVel);
+        XMStoreFloat3(&m_eyeCur, SmoothDampV(XMLoadFloat3(&m_eyeCur), vEye, eVel, smooth, fTimeDelta));
+        XMStoreFloat3(&m_atCur, SmoothDampV(XMLoadFloat3(&m_atCur), vAt, aVel, smooth, fTimeDelta));
+        XMStoreFloat3(&m_eyeVel, eVel); XMStoreFloat3(&m_atVel, aVel);
+    }
 }
 
 HRESULT CLevel_Edit::Render()
@@ -86,17 +122,21 @@ void CLevel_Edit::Set_CameraActive(_bool b)
 
 void CLevel_Edit::Get_PreviewViewProj(_float4x4* pView, _float4x4* pProj)
 {
-    const Client::CAM_POSE& p = m_Solver.Cur_Pose();
-
-    _vector vEye = XMLoadFloat3(&p.eye);
-    _vector vLook = XMVector3Normalize(XMLoadFloat3(&p.fwd));
-    _vector vUp = XMLoadFloat3(&p.up);
-    if (fabsf(XMVectorGetX(XMVector3Dot(vLook, vUp))) > 0.999f)   // look parallel to up guard
-        vUp = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+    _vector vEye = XMLoadFloat3(&m_eyeCur);
+    _vector vDir = XMVectorSubtract(XMLoadFloat3(&m_atCur), vEye);
+    if (XMVectorGetX(XMVector3LengthSq(vDir)) < 1e-6f) vDir = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+    _vector vLook = XMVector3Normalize(vDir);
+    _vector vUpRef = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+    _vector vRight = XMVector3Cross(vUpRef, vLook);
+    if (XMVectorGetX(XMVector3LengthSq(vRight)) < 1e-6f) vRight = XMVector3Cross(XMVectorSet(0.f, 0.f, 1.f, 0.f),
+        vLook);
+    vRight = XMVector3Normalize(vRight);
+    _vector vUp = XMVector3Normalize(XMVector3Cross(vLook, vRight));
 
     XMStoreFloat4x4(pView, XMMatrixLookToLH(vEye, vLook, vUp));
     _float fAspect = (_float)g_iWinSizeX / (_float)g_iWinSizeY;
-    XMStoreFloat4x4(pProj, XMMatrixPerspectiveFovLH(XMConvertToRadians(p.fov), fAspect, 0.1f, 1000.f));
+    _float fFov = m_Solver.Cur_Pose().fov;
+    XMStoreFloat4x4(pProj, XMMatrixPerspectiveFovLH(XMConvertToRadians(fFov), fAspect, 0.1f, 1000.f));
 }
 
 HRESULT CLevel_Edit::Ready_EditLights()
