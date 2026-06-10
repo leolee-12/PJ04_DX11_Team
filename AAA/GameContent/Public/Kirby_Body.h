@@ -8,9 +8,17 @@ NS_BEGIN(Engine)
 class CShader;
 class CModel;
 class CAnimator;
+class CTexture;
 NS_END
 
 NS_BEGIN(Client)
+
+enum class KIRBY_MESH { BODY_BIG, BODY, BODY_VACUUM,
+	MOUTH_ANGRY, MOUTH_NORMAL, MOUTH_OPEN, MOUTH_SMILE_CLOSE, MOUTH_SMILE_OPEN,
+	LIMBS };
+enum class KIRBY_BODY_STATE { NORMAL, STUFFED, INHALE, END };
+enum class KIRBY_EYE_STATE { IDLE, DOUBT, BLINK, CLOSE, ANGRY, SURPRISED, SADNESS, END };
+enum class KIRBY_MOUTH_STATE { IDLE, OPEN, ANGRY, SMILE_OPEN, SMILE_CLOSE, END };
 
 class CKirby_Body final : public CPartObject
 {
@@ -42,15 +50,37 @@ public:
 public:
 	CAnimator* Get_Animator() { return m_pAnimatorCom; }
 
+public:
+	void Set_Body(KIRBY_BODY_STATE eState) { m_eBody = eState; }
+	void Set_Eye(KIRBY_EYE_STATE eState) { m_eEye = eState; }
+	void Set_Mouth(KIRBY_MOUTH_STATE eState) { m_eMouth = eState; }
+
+	KIRBY_BODY_STATE Get_Body() const { return m_eBody; }
+	KIRBY_EYE_STATE Get_Eye() const { return m_eEye; }
+	KIRBY_MOUTH_STATE Get_Mouth() const { return m_eMouth; }
+
 private:
 	HRESULT Ready_Components();
 	HRESULT Bind_ShaderResources();
 
-private:
-	CShader* m_pShaderCom = { nullptr };
-	CModel* m_pModelCom = { nullptr };
-	CAnimator* m_pAnimatorCom = { nullptr };
+	HRESULT Set_VisibleMeshes();
 
+private:
+	CShader*		m_pShaderCom{};
+	CModel*			m_pModelCom{};
+	CAnimator*		m_pAnimatorCom{};
+
+private:
+	vector<_bool>	m_VisibleMeshes;
+
+	CTexture*		m_pEyeTextureCom{};
+	CTexture*		m_pEyeMaskTextureCom{};
+
+	KIRBY_BODY_STATE m_eBody{};
+	KIRBY_EYE_STATE m_eEye{};
+	KIRBY_MOUTH_STATE m_eMouth{};
+
+private:
 	_float4 m_vBodyColor = { 1.f, 0.45f, 0.55f, 1.f };
 	_float4 m_vFootColor = { 1.f, 0.1882353f, 0.3764706f, 1.f };
 	_float4 m_vBlushColor = { 1.f, 0.25f, 0.4f, 1.f };

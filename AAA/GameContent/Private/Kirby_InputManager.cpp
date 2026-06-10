@@ -31,6 +31,7 @@ void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
 {
     CKirby_Command* pCommand{};
 
+    // Top
     if (m_pGameInstance_Proxy->Key_Pressing(DIK_W))
     {
         _float3 vDir{};
@@ -41,6 +42,7 @@ void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
         }
     }
 
+    // DOWN
     if (m_pGameInstance_Proxy->Key_Pressing(DIK_S))
     {
         _float3 vDir{};
@@ -51,6 +53,7 @@ void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
         }
     }
 
+    // LEFT
     if (m_pGameInstance_Proxy->Key_Pressing(DIK_A))
     {
         _float3 vDir{};
@@ -61,6 +64,7 @@ void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
         }
     }
 
+    // RIGHT
     if (m_pGameInstance_Proxy->Key_Pressing(DIK_D))
     {
         _float3 vDir{};
@@ -71,15 +75,22 @@ void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
         }
     }
 
+    // A
     if (m_pGameInstance_Proxy->Key_Down(DIK_SPACE))
     {
         pCommand = new Jump_Command;
         ProcessCommand(pCommand);
     }
 
+    // B
     if (m_pGameInstance_Proxy->Mouse_Down(DIMB::LBUTTON))
     {
-        pCommand = new ATTACK_Command;
+        pCommand = new ATTACK_DOWN_Command;
+        ProcessCommand(pCommand);
+    }
+    if (m_pGameInstance_Proxy->Mouse_Up(DIMB::LBUTTON))
+    {
+        pCommand = new ATTACK_UP_Command;
         ProcessCommand(pCommand);
     }
 }

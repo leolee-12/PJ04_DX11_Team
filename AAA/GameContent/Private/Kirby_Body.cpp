@@ -59,37 +59,38 @@ void CKirby_Body::Late_Update(_float fTimeDelta)
 
 HRESULT CKirby_Body::Render()
 {
+    if (FAILED(Set_VisibleMeshes()))
+        return E_FAIL;
+
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
 
-    size_t iNumMeshes = m_pModelCom->Get_NumMeshes();
+    const _uint iNumMeshes = (_uint)m_pModelCom->Get_NumMeshes();
 
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
-        if (i == 0 || i == 2 || i == 3 || i == 5 || i == 6 || i == 7)
+        if (i >= m_VisibleMeshes.size() || m_VisibleMeshes[i] == false)
             continue;
 
-        if(FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_EyeTexture", i, MTEX_TYPE::UNKNOWN, 0)))
+        if (FAILED(m_pEyeTextureCom->Bind_ShaderResource(m_pShaderCom, "g_EyeTexture", ETOUI(m_eEye))))
             return E_FAIL;
-        if(FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_EyeMaskTexture", i, MTEX_TYPE::UNKNOWN, 3)))
+        if (FAILED(m_pEyeMaskTextureCom->Bind_ShaderResource(m_pShaderCom, "g_EyeMaskTexture", ETOUI(m_eEye))))
             return E_FAIL;
 
-        if(FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_SkinTexture", i, MTEX_TYPE::UNKNOWN, 1)))
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_SkinTexture", i, MTEX_TYPE::UNKNOWN, 1)))
             return E_FAIL;
-        if(FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MouthTexture", i, MTEX_TYPE::UNKNOWN, 2)))
-            return E_FAIL;
-        //if(FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_WetMaskTexture", i, MTEX_TYPE::UNKNOWN, 4)))
-        //    return E_FAIL;
-        //if(FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", i, MTEX_TYPE::NORMALS, 0)))
-        //    return E_FAIL;
 
-        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", (_uint)i)))
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MouthTexture", i, MTEX_TYPE::UNKNOWN, 2)))
             return E_FAIL;
-        if(FAILED(m_pShaderCom->Bind_RawValue("g_vBodyColor", &m_vBodyColor, sizeof(_float4))))
+
+        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             return E_FAIL;
-        if(FAILED(m_pShaderCom->Bind_RawValue("g_vFootColor", &m_vFootColor, sizeof(_float4))))
+
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_vBodyColor", &m_vBodyColor, sizeof(_float4))))
             return E_FAIL;
-        if(FAILED(m_pShaderCom->Bind_RawValue("g_vBlushColor", &m_vBlushColor, sizeof(_float4))))
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_vFootColor", &m_vFootColor, sizeof(_float4))))
+            return E_FAIL;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_vBlushColor", &m_vBlushColor, sizeof(_float4))))
             return E_FAIL;
 
         if (FAILED(m_pShaderCom->Begin(0)))
@@ -98,7 +99,6 @@ HRESULT CKirby_Body::Render()
         if (FAILED(m_pModelCom->Render(i)))
             return E_FAIL;
     }
-
     return S_OK;
 }
 
@@ -113,6 +113,18 @@ HRESULT CKirby_Body::Ready_Components()
     m_pModelCom = Add_Component<CModel>(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Kirby_Body"), TEXT("Com_Model"));
     if (m_pModelCom == nullptr)
         return E_FAIL;
+
+    m_pEyeTextureCom = Add_Component<CTexture>(TEXT("Com_EyeTexture"),
+        CTexture::Create(m_pDevice, m_pContext, L"../../Resources/CHJ/AnimModel/Kirby/KirbyEye.%02d.png", ETOUI(KIRBY_EYE_STATE::END)));
+    if (nullptr == m_pEyeTextureCom)
+        return E_FAIL;
+
+    m_pEyeMaskTextureCom = Add_Component<CTexture>(TEXT("Com_EyeMaskTexture"),
+        CTexture::Create(m_pDevice, m_pContext, L"../../Resources/CHJ/AnimModel/Kirby/KirbyEyeMask.%02d.png", ETOUI(KIRBY_EYE_STATE::END)));
+    if (nullptr == m_pEyeMaskTextureCom)
+        return E_FAIL;
+
+    m_VisibleMeshes.resize(m_pModelCom->Get_NumMeshes(), true);
 
     /* For.Com_Animator */
     CAnimator::ANIMATOR_DESC AnimDesc{};
@@ -136,6 +148,43 @@ HRESULT CKirby_Body::Bind_ShaderResources()
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
         return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT CKirby_Body::Set_VisibleMeshes()
+{
+    const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+
+    m_VisibleMeshes.assign(iNumMeshes, false);
+
+    auto ShowMesh = [&](KIRBY_MESH eKirbyMesh)
+        {
+            _int iIndex = ETOUI(eKirbyMesh);
+            if (iIndex >= 0 && iIndex < iNumMeshes)
+                m_VisibleMeshes[iIndex] = true;
+        };
+
+    switch (m_eBody)
+    {
+        case KIRBY_BODY_STATE::NORMAL:  ShowMesh(KIRBY_MESH::BODY);         break;
+        case KIRBY_BODY_STATE::STUFFED: ShowMesh(KIRBY_MESH::BODY_BIG);     break;
+        case KIRBY_BODY_STATE::INHALE:  ShowMesh(KIRBY_MESH::BODY_VACUUM);  break;
+    }
+
+    if (m_eBody == KIRBY_BODY_STATE::NORMAL)
+    {
+        switch (m_eMouth)
+        {
+            case KIRBY_MOUTH_STATE::IDLE:           ShowMesh(KIRBY_MESH::MOUTH_NORMAL);         break;
+            case KIRBY_MOUTH_STATE::OPEN:           ShowMesh(KIRBY_MESH::MOUTH_OPEN);           break;
+            case KIRBY_MOUTH_STATE::ANGRY:          ShowMesh(KIRBY_MESH::MOUTH_ANGRY);          break;
+            case KIRBY_MOUTH_STATE::SMILE_OPEN:     ShowMesh(KIRBY_MESH::MOUTH_SMILE_OPEN);     break;
+            case KIRBY_MOUTH_STATE::SMILE_CLOSE:    ShowMesh(KIRBY_MESH::MOUTH_SMILE_CLOSE);    break;
+        }
+    }
+
+    ShowMesh(KIRBY_MESH::LIMBS);
 
     return S_OK;
 }

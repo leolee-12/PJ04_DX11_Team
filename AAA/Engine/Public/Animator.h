@@ -8,6 +8,16 @@ class CModel;
 class ENGINE_DLL CAnimator final : public CComponent
 {
 public:
+    struct ANI_PLAY_INFO
+    {
+        _string strAniName;
+        _bool bLoop{ true };
+        _bool bRestrat{ false };
+        _float fBlend = 0.2f;
+        _float fSpeed = 1.f;
+    };
+
+public:
     typedef struct tagAnimatorDesc
     {
         CModel* pModel = { nullptr };
@@ -27,6 +37,7 @@ public:
 
 public: // 재생 제어 (오브젝트/에디터는 오직 이것만 사용)
     void    Play(const string& strAnimName, _bool bLoop = true, _bool bRestart = false, _float fBlend = 0.2f, _float fSpeed = 1.0f);
+    void    Play(const ANI_PLAY_INFO* tAniInfo);
     void    Pause() { m_bPaused = true; }
     void    Resume() { m_bPaused = false; }
     void    Seek(_float fProgress);

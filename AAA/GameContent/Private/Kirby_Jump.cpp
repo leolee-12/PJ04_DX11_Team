@@ -4,8 +4,9 @@
 
 #include "Kirby.h"
 #include "Kirby_Body.h"
+#include "Kirby_Ability.h"
 
- _bool CKirby_Jump::m_bLeftRight = false;
+ _bool CKirby_Jump::m_bLeft = false;
 
 
 CKirby_Jump::CKirby_Jump()
@@ -30,10 +31,10 @@ void CKirby_Jump::Enter(CKirby* pKirby)
 
 
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
-    if (m_bLeftRight == true)
-        pAnimator->Play("JumpL", false);
+    if (m_bLeft == true)
+        pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::JUMP_L));
     else
-        pAnimator->Play("JumpR", false);
+        pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::JUMP_R));
 
     m_bFirstFrameSkip = false;
     m_eJumpType = JUMP_STATE::JUMP_STRAT;
@@ -41,41 +42,37 @@ void CKirby_Jump::Enter(CKirby* pKirby)
 
 void CKirby_Jump::Update(CKirby* pKirby, const _float fTimeDelta)
 {
-    CMovement* pMovementCom = static_cast<CMovement*>(pKirby->Get_Component<CMovement>(TEXT("Com_Movement")));
-
     if (m_bFirstFrameSkip == false)
     {
         m_bFirstFrameSkip = true;
         return;
     }
 
-    if (m_bFirstFrameSkip == true)
+    CMovement* pMovementCom = pKirby->Get_Movement();
+
+    _float fYVelocity = pMovementCom->Get_VerticalVelocity();
+    _bool bIsGround = pMovementCom->Is_Grounded();
+
+    // Fall
+    if (fYVelocity <= 0.005f)
     {
-        CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+        pKirby->Change_State(KIRBY_STATE_TYPE::FALL);
+        if (rand() % 2 == 0)
+        {
+            CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
 
-        _bool bIsGround = pMovementCom->Is_Grounded();
-
-        if (m_eJumpType == JUMP_STATE::JUMP_STRAT && bIsGround == true)
-        {
-            pAnimator->Play("Landing", false);
-            m_eJumpType = JUMP_STATE::LAND_START;
+            if (m_bLeft == true)
+                pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::JUMP_END_L));
+            else
+                pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::JUMP_END_R));
         }
-        else if (m_eJumpType == JUMP_STATE::LAND_START && pAnimator->Is_Finished())
-        {
-            pAnimator->Play("LandingEnd", false);
-            m_eJumpType = JUMP_STATE::LAND_END;
-        }
-        else if (m_eJumpType == JUMP_STATE::LAND_END && pAnimator->Is_Finished())
-        {
-             pKirby->Change_State(KIRBY_STATE_TYPE::WAIT);
-        }
-    }
+    }      
 }
 
 void CKirby_Jump::Exit(CKirby* pKirby)
 {
     m_bFirstFrameSkip = false;
-    m_bLeftRight = !m_bLeftRight;
+    m_bLeft = !m_bLeft;
 }
 
 _bool CKirby_Jump::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -92,6 +89,14 @@ _bool CKirby_Jump::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
         case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
             Handle_MoveCommand(pKirby, pCommand);
             return true;
+
+        case KIRBY_COMMAND_TYPE::ATTACK_DOWN:
+        {
+            CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+            if(pAbility->Can_Attack(KIRBY_ATTACK_LOCATION::AIR))
+                pAbility->Down_Attack(pKirby);
+            return true;
+        }
     }
 
     return false;
