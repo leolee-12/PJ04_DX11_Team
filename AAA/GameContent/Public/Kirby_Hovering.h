@@ -45,6 +45,11 @@ private:
 	_float m_fAccJumpTime{};
 	_bool m_bCanJump{};
 
+	_float m_fAccNoGravity{};
+	_float m_fMaxNoGravity{};
+
+	_float m_fHoveringGravity{};
+
 private:
 	_bool Update_State(CKirby* pKirby, _float fTimeDelta);
 
@@ -53,6 +58,8 @@ private:
 
 	void Update_CoolTimer(_float fTimeDelta);
 	void Reset_CoolTimer();
+
+	void Update_NoGravityTime(CKirby* pKirby, _float fTimeDelta);
 
 public:
 	static CKirby_Hovering* Create();

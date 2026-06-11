@@ -2,6 +2,8 @@
 
 #include "GameInstance.h"
 
+#include "Movement_Child.h"
+
 #include "Kirby.h"
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
@@ -12,7 +14,7 @@ CKirby_Hovering::CKirby_Hovering()
 
 HRESULT CKirby_Hovering::Initialize()
 {
-    m_fMaxJumpTime = 0.7f;
+    m_fMaxJumpTime = 0.4;
     return S_OK;
 }
 
@@ -38,9 +40,9 @@ void CKirby_Hovering::Enter(CKirby* pKirby)
     pBody->Set_Body(KIRBY_BODY_STATE::STUFFED);
 
     // Speed
-    CMovement* pMovementCom = pKirby->Get_Movement();
-    pMovementCom->Set_Gravity(CKirby::s_fHoverGravity);
-    pMovementCom->Set_JumpSpeed(CKirby::s_fHoverJumpSpeed);
+    CMovement_Child* pMovementCom = pKirby->Get_Movement();
+    pMovementCom->Set_GravityScale(0.6f);
+    pMovementCom->Set_MaxFallVelocity(-1.5f);
 }
 
 void CKirby_Hovering::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -59,12 +61,6 @@ void CKirby_Hovering::Exit(CKirby* pKirby)
     // Mesh
     CKirby_Body* pBody = pKirby->Get_Body();
     pBody->Set_Body(KIRBY_BODY_STATE::NORMAL);
-
-
-    // Speed
-    CMovement* pMovementCom = pKirby->Get_Movement();
-    pMovementCom->Set_Gravity(CKirby::s_fGravity);
-    pMovementCom->Set_JumpSpeed(CKirby::s_fJumpSpeed);
 }
 
 _bool CKirby_Hovering::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -75,6 +71,7 @@ _bool CKirby_Hovering::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 
     switch (eCommandType)
     {
+        // Move Press
         case KIRBY_COMMAND_TYPE::MOVE_TOP:
         case KIRBY_COMMAND_TYPE::MOVE_DOWN:
         case KIRBY_COMMAND_TYPE::MOVE_LEFT:
@@ -86,7 +83,7 @@ _bool CKirby_Hovering::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             Handle_MoveCommand(pKirby, pCommand);
             return true;
         }
-        // Jump
+        // Jump Press
         case KIRBY_COMMAND_TYPE::JUMP:
         {
             if (!pCommand->IsPress())
@@ -94,8 +91,10 @@ _bool CKirby_Hovering::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 
             if (m_bCanJump == true)
             {
-                CMovement* pMovementCom = pKirby->Get_Movement();
-                pMovementCom->Force_Jump();
+                CMovement_Child* pMovementCom = pKirby->Get_Movement();
+                pMovementCom->Set_VelocityY(0.f);
+                const _float fSpeed = 8.f;
+                pMovementCom->Add_Velocity(XMVectorSet(0.f, fSpeed, 0.f, 0.f));
                 Reset_CoolTimer();
             }
                 return true;
@@ -126,13 +125,18 @@ _bool CKirby_Hovering::Update_State(CKirby* pKirby, _float fTimeDelta)
 
         case HOVERING_STATE::FLIGHT_LOOP:
         {
-            CMovement* pMovementCom = pKirby->Get_Movement();
+            CMovement_Child* pMovementCom = pKirby->Get_Movement();
             _bool bIsGround = pMovementCom->Is_Grounded();
 
             if (bIsGround == true)
             {
+                // ³¡
                 m_eHoveringState = HOVERING_STATE::FLIGHT_END;
-                pAnimator->Play("FlightLanding", false, false, 0.1f,2.f);
+                pAnimator->Play("FlightLanding", false, false, 0.1f, 2.f);
+
+                pMovementCom->Set_GravityScale(1.f);
+                pMovementCom->Set_MaxFallVelocity(-15.f);
+
                 bEarlyReturn = true;
             }
             break;

@@ -42,8 +42,8 @@
     <ClInclude Include="..\Public\Kirby_Fall.h" />
     <ClInclude Include="..\Public\Kirby_Attack.h" />
     <ClInclude Include="..\Public\Kirby_Hovering.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\Public\Movement_Child.h" />
     <ClInclude Include="..\Public\UI_Fonts.h" />
@@ -120,8 +120,8 @@
     <ClCompile Include="..\Private\Kirby_Fall.cpp" />
     <ClCompile Include="..\Private\Kirby_Attack.cpp" />
     <ClCompile Include="..\Private\Kirby_Hovering.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\Private\UI_GenericContainer.cpp" />

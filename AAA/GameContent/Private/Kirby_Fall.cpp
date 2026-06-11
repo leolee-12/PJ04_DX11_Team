@@ -82,15 +82,15 @@ _bool CKirby_Fall::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             Handle_MoveCommand(pKirby, pCommand);
             return true;
         }
-        // Jump
-        //case KIRBY_COMMAND_TYPE::JUMP:
-        //{
-        //    if (!pCommand->IsDown())
-        //        return false;
+        // Hovering
+        case KIRBY_COMMAND_TYPE::JUMP:
+        {
+            if (!pCommand->IsDown())
+                return false;
 
-        //    pKirby->Change_State(KIRBY_STATE_TYPE::HOVERING);
-        //    return true;
-        //}
+            pKirby->Change_State(KIRBY_STATE_TYPE::HOVERING);
+            return true;
+        }
         // Attack Down
         case KIRBY_COMMAND_TYPE::ATTACK:
         {
