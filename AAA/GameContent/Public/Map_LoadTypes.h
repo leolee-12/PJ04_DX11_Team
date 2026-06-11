@@ -43,6 +43,8 @@ struct MAP_RUNTIME_LEVELS
     _uint iObjectLevel = {};
     _uint iStageModelLevel = {};
     _uint iEnvModelLevel = {};
+
+    _bool bEnableEnvObjectPicking = { false };
 };
 
 struct MAP_SPAWN_ROUTE

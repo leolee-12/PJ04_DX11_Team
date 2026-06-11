@@ -163,12 +163,6 @@
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\06. InhaleEffect">
       <UniqueIdentifier>{eac9b9b7-bf0c-4d4c-bde8-6fc2eb74c3ed}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\01. Map\Loader">
-      <UniqueIdentifier>{077c1198-d891-486e-b491-c184ad619dd7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\01. Map\Loader\API">
-      <UniqueIdentifier>{09f4e761-18cf-4d6f-a43f-2e1b208fce8b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\UI\UIContainer\GenericContainer">
       <UniqueIdentifier>{56dfa7a0-95de-45e5-bb90-e64da2be4597}</UniqueIdentifier>
     </Filter>
@@ -225,6 +219,12 @@
     </Filter>
     <Filter Include="00. GameObject\00. Camera\AreaCam">
       <UniqueIdentifier>{712968f4-aac4-4c0d-b936-f670af432abf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97. DataSystem\MapLoader">
+      <UniqueIdentifier>{077c1198-d891-486e-b491-c184ad619dd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97. DataSystem\MapLoader\API">
+      <UniqueIdentifier>{09f4e761-18cf-4d6f-a43f-2e1b208fce8b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -373,28 +373,28 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\02. VacuumContainer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Map_Builder.h">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Map_EditHelper.h">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Map_ModelResolver.h">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Map_Parser.h">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Map_ProtoRegister.h">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Map_Spawner.h">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Map_LoadTypes.h">
-      <Filter>00. GameObject\01. Map\Loader</Filter>
+      <Filter>97. DataSystem\MapLoader</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Map_Loader.h">
-      <Filter>00. GameObject\01. Map\Loader</Filter>
+      <Filter>97. DataSystem\MapLoader</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UI_Text.h">
       <Filter>00. GameObject\UI\UIPart\Text</Filter>
@@ -460,19 +460,19 @@
       <Filter>00. GameObject\00. Camera\AreaCam</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Map_Override.h">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TestTriggerBox.h">
       <Filter>00. GameObject\Test\TestRect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Map_LevelContent.h">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Map_DeltaIO.h">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Env_CollisionCatalog.h">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -582,25 +582,25 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\02. VacuumContainer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Map_Builder.cpp">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Map_EditHelper.cpp">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Map_ModelResolver.cpp">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Map_Parser.cpp">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Map_ProtoRegister.cpp">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Map_Spawner.cpp">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Map_Loader.cpp">
-      <Filter>00. GameObject\01. Map\Loader</Filter>
+      <Filter>97. DataSystem\MapLoader</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UI_Text.cpp">
       <Filter>00. GameObject\UI\UIPart\Text</Filter>
@@ -663,19 +663,19 @@
       <Filter>00. GameObject\00. Camera\AreaCam</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Map_Override.cpp">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TestTriggerBox.cpp">
       <Filter>00. GameObject\Test\TestRect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Map_LevelContent.cpp">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Map_DeltaIO.cpp">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Env_CollisionCatalog.cpp">
-      <Filter>00. GameObject\01. Map\Loader\API</Filter>
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

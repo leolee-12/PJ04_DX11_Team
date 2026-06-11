@@ -232,6 +232,13 @@ void CPanel_Hierarchy::Render()
 
     const CMap_PreviewSession* pSession = pLevel->Get_MapPreviewSession();
 
+    const _uint iSelectionRevision = pLevel->Get_SelectionRevision();
+    if (m_iCachedSelectionRevision != iSelectionRevision)
+    {
+        m_iCachedSelectionRevision = iSelectionRevision;
+        m_pPendingScrollTarget = pLevel->Get_Selected();
+    }
+
     ImGui::SetNextItemWidth(-70.f);
     _bool bSearchTextChanged = ImGui::InputTextWithHint(
         "##HierarchySearch",
@@ -270,8 +277,19 @@ void CPanel_Hierarchy::Render()
     {
         const auto& LayerCache = m_HierarchyCache[iLayer];
 
+        const _bool bLayerHasPendingScrollTarget =
+            nullptr != m_pPendingScrollTarget
+            && any_of(
+                LayerCache.Objects.begin(),
+                LayerCache.Objects.end(),
+                [&](const HIERARCHY_OBJECT_CACHE& ObjectCache)
+                {
+                    return ObjectCache.pObject == m_pPendingScrollTarget;
+                });
+
         const HIERARCHY_FILTER_CACHE* pFilterCache = nullptr;
         _uint iMatchedInLayer = static_cast<_uint>(LayerCache.Objects.size());
+        _bool bPendingTargetAlreadyMatched = false;
 
         if (bSearchActive)
         {
@@ -279,17 +297,37 @@ void CPanel_Hierarchy::Render()
             iMatchedInLayer =
                 static_cast<_uint>(pFilterCache->MatchedObjectIndices.size());
 
-            if (0 == iMatchedInLayer)
+            if (bLayerHasPendingScrollTarget)
+            {
+                for (const _uint iMatchedObjectIndex : pFilterCache->MatchedObjectIndices)
+                {
+                    if (LayerCache.Objects[iMatchedObjectIndex].pObject == m_pPendingScrollTarget)
+                    {
+                        bPendingTargetAlreadyMatched = true;
+                        break;
+                    }
+                }
+            }
+
+            if (0 == iMatchedInLayer && !bLayerHasPendingScrollTarget)
                 continue;
         }
+
+        const _uint iDisplayCount = bSearchActive
+            ? iMatchedInLayer + ((bLayerHasPendingScrollTarget && !bPendingTargetAlreadyMatched) ? 1u : 0u)
+            : static_cast<_uint>(LayerCache.Objects.size());
 
         string strTreeLabel = LayerCache.strLayerNameUtf8;
         if (bSearchActive)
         {
-            strTreeLabel += " (" + to_string(iMatchedInLayer)
+            strTreeLabel += " (" + to_string(iDisplayCount)
                 + "/" + to_string(LayerCache.Objects.size()) + ")";
-            ImGui::SetNextItemOpen(true, ImGuiCond_Appearing);
         }
+
+        if (bLayerHasPendingScrollTarget)
+            ImGui::SetNextItemOpen(true, ImGuiCond_Always);
+        else if (bSearchActive)
+            ImGui::SetNextItemOpen(true, ImGuiCond_Appearing);
 
         ImGui::PushID(LayerCache.strLayerNameUtf8.c_str());
 
@@ -314,99 +352,132 @@ void CPanel_Hierarchy::Render()
 
             if (!bHierarchyMutated)
             {
-                const _uint iDrawCount = bSearchActive
-                    ? static_cast<_uint>(pFilterCache->MatchedObjectIndices.size())
-                    : static_cast<_uint>(LayerCache.Objects.size());
+                _bool bPendingScrollTargetDrawn = false;
 
-                for (_uint iDraw = 0; iDraw < iDrawCount; ++iDraw)
-                {
-                    const _uint iObjectIndex = bSearchActive
-                        ? pFilterCache->MatchedObjectIndices[iDraw]
-                        : iDraw;
-
-                    const auto& ObjectCache = LayerCache.Objects[iObjectIndex];
-                    CGameObject* pObject = ObjectCache.pObject;
-                    if (nullptr == pObject)
-                        continue;
-
-                    const _bool bSelected = (pObject == pLevel->Get_Selected());
-                    const _bool bIsMapPreviewObject =
-                        pLevel->Is_MapPreviewObject(pObject);
-                    const _bool bIsAddedMapOverride =
-                        (nullptr != pSession) && pSession->Is_AddedMapObject(pObject);
-
-                    string strDisplayName = ObjectCache.strNameUtf8;
-                    if (bIsAddedMapOverride)
-                        strDisplayName += " [Added]";
-                    else if (bIsMapPreviewObject)
-                        strDisplayName += " [Preview]";
-
-                    const float fAvailWidth = ImGui::GetContentRegionAvail().x;
-
-                    ImGui::PushID(pObject);
-
-                    if (ImGui::Selectable(
-                        strDisplayName.c_str(),
-                        bSelected,
-                        0,
-                        ImVec2(max(1.f, fAvailWidth - 25.f), 0.f)))
+                auto DrawObjectRow =
+                    [&](const HIERARCHY_OBJECT_CACHE& ObjectCache) -> _bool
                     {
-                        pLevel->Set_Selected(pObject);
-                    }
+                        CGameObject* pObject = ObjectCache.pObject;
+                        if (nullptr == pObject)
+                            return false;
 
-                    if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
-                    {
-                        if (bIsAddedMapOverride && nullptr != pSession)
-                        {
-                            CMap_PreviewSession::MAP_PREVIEW_ADDED_ITEM Item{};
-                            if (pSession->Try_GetAddedMapObjectItem(pObject, &Item))
-                            {
-                                const string strProtoUtf8 =
-                                    WstrToStr(Item.strPrototypeTag);
-                                const string strLayerUtf8 =
-                                    WstrToStr(Item.strLayerTag);
-                                const string strObjectTagUtf8 =
-                                    WstrToStr(Item.strObjectTag);
+                        const _bool bSelected = (pObject == pLevel->Get_Selected());
+                        const _bool bIsMapPreviewObject =
+                            pLevel->Is_MapPreviewObject(pObject);
+                        const _bool bIsAddedMapOverride =
+                            (nullptr != pSession) && pSession->Is_AddedMapObject(pObject);
 
-                                ImGui::SetTooltip(
-                                    "Added by map override.\nProto=%s\nLayer=%s\nTag=%s",
-                                    strProtoUtf8.c_str(),
-                                    strLayerUtf8.c_str(),
-                                    strObjectTagUtf8.c_str());
-                            }
-                            else
-                            {
-                                ImGui::SetTooltip("Added by map override.");
-                            }
-                        }
+                        string strDisplayName = ObjectCache.strNameUtf8;
+                        if (bIsAddedMapOverride)
+                            strDisplayName += " [Added]";
                         else if (bIsMapPreviewObject)
+                            strDisplayName += " [Preview]";
+
+                        const float fAvailWidth = ImGui::GetContentRegionAvail().x;
+
+                        ImGui::PushID(pObject);
+
+                        if (ImGui::Selectable(
+                            strDisplayName.c_str(),
+                            bSelected,
+                            0,
+                            ImVec2(max(1.f, fAvailWidth - 25.f), 0.f)))
                         {
-                            ImGui::SetTooltip("Loaded by map preview.");
+                            pLevel->Set_Selected(pObject);
+                        }
+
+                        if (pObject == m_pPendingScrollTarget)
+                        {
+                            ImGui::SetScrollHereY(0.25f);
+                            m_pPendingScrollTarget = nullptr;
+                            bPendingScrollTargetDrawn = true;
+                        }
+
+                        if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal))
+                        {
+                            if (bIsAddedMapOverride && nullptr != pSession)
+                            {
+                                CMap_PreviewSession::MAP_PREVIEW_ADDED_ITEM Item{};
+                                if (pSession->Try_GetAddedMapObjectItem(pObject, &Item))
+                                {
+                                    const string strProtoUtf8 =
+                                        WstrToStr(Item.strPrototypeTag);
+                                    const string strLayerUtf8 =
+                                        WstrToStr(Item.strLayerTag);
+                                    const string strObjectTagUtf8 =
+                                        WstrToStr(Item.strObjectTag);
+
+                                    ImGui::SetTooltip(
+                                        "Added by map override.\nProto=%s\nLayer=%s\nTag=%s",
+                                        strProtoUtf8.c_str(),
+                                        strLayerUtf8.c_str(),
+                                        strObjectTagUtf8.c_str());
+                                }
+                                else
+                                {
+                                    ImGui::SetTooltip("Added by map override.");
+                                }
+                            }
+                            else if (bIsMapPreviewObject)
+                            {
+                                ImGui::SetTooltip("Loaded by map preview.");
+                            }
+                        }
+
+                        if (!bIsMapPreviewObject
+                            && ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+                        {
+                            ImGui::SetDragDropPayload(
+                                "OBJECT_DND",
+                                &pObject,
+                                sizeof(CGameObject*));
+                            ImGui::Text("%s", strDisplayName.c_str());
+                            ImGui::EndDragDropSource();
+                        }
+
+                        ImGui::SameLine();
+
+                        if (ImGui::SmallButton("X"))
+                        {
+                            pLevel->Delete_Object(pObject);
+                            bHierarchyMutated = true;
+                            ImGui::PopID();
+                            return true;
+                        }
+
+                        ImGui::PopID();
+                        return false;
+                    };
+
+                if (bSearchActive)
+                {
+                    for (_uint iMatchedObjectIndex : pFilterCache->MatchedObjectIndices)
+                    {
+                        if (DrawObjectRow(LayerCache.Objects[iMatchedObjectIndex]))
+                            break;
+                    }
+
+                    if (!bHierarchyMutated
+                        && bLayerHasPendingScrollTarget
+                        && !bPendingScrollTargetDrawn)
+                    {
+                        for (const auto& ObjectCache : LayerCache.Objects)
+                        {
+                            if (ObjectCache.pObject != m_pPendingScrollTarget)
+                                continue;
+
+                            DrawObjectRow(ObjectCache);
+                            break;
                         }
                     }
-
-                    if (!bIsMapPreviewObject
-                        && ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+                }
+                else
+                {
+                    for (const auto& ObjectCache : LayerCache.Objects)
                     {
-                        ImGui::SetDragDropPayload(
-                            "OBJECT_DND",
-                            &pObject,
-                            sizeof(CGameObject*));
-                        ImGui::Text("%s", strDisplayName.c_str());
-                        ImGui::EndDragDropSource();
+                        if (DrawObjectRow(ObjectCache))
+                            break;
                     }
-
-                    ImGui::SameLine();
-
-                    if (ImGui::SmallButton("X"))
-                    {
-                        pLevel->Delete_Object(pObject);
-                        bHierarchyMutated = true;
-                        ImGui::PopID();
-                        break;
-                    }
-
-                    ImGui::PopID();
                 }
             }
 

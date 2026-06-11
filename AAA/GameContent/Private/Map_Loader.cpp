@@ -411,9 +411,12 @@ void CMap_Loader::Build_DefaultRuntimeLevels(_uint iRuntimeLevel, MAP_RUNTIME_LE
         return;
 
     *pOutLevels = {};
-    pOutLevels->iObjectLevel = iRuntimeLevel;
-    pOutLevels->iStageModelLevel = iRuntimeLevel;
-    pOutLevels->iEnvModelLevel = iRuntimeLevel;
+    //pOutLevels->iObjectLevel = iRuntimeLevel;
+    //pOutLevels->iStageModelLevel = iRuntimeLevel;
+    //pOutLevels->iEnvModelLevel = iRuntimeLevel;
+    pOutLevels->iObjectLevel = ETOUI(LEVEL::STATIC);
+    pOutLevels->iStageModelLevel = ETOUI(LEVEL::STATIC);
+    pOutLevels->iEnvModelLevel = ETOUI(LEVEL::STATIC);
 }
 
 void CMap_Loader::Build_DefaultRuntimeTargets(_uint iRuntimeLevel, MAP_SPAWN_TARGETS* pOutTargets)

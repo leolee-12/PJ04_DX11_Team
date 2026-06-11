@@ -49,6 +49,7 @@ public:
 
 	// Grid & Placement
 	void Pick_And_Place(_fvector vOrigin, _fvector vDir);
+	void Pick_And_SelectEnvObject(_fvector vOrigin, _fvector vDir);
 	void Place_Object_At(const _float3& vPos);
 	void Begin_PlaceMode(const wstring& strProtoTag, const wstring& strLayerTag);
 	void End_PlaceMode();
@@ -84,14 +85,15 @@ public:
 	const wstring& Get_PendingProto() const { return m_strPendingProto; }
 	const vector<EDITOR_OBJECT_HANDLE>* Get_CameraLayer() const;
 
-	void Set_Selected(CGameObject* pSelected) { m_pSelected = pSelected; }
+	void Set_Selected(CGameObject* pSelected);
 	void Set_CameraActive(_bool b);
 
 	void Preview_Camera(CGameObject* pCam);
 	void Back_To_Edit();
 
-public:	// Hierarchy
+public:       // Hierarchy
 	_uint Get_HierarchyRevision() const { return m_iHierarchyRevision; }
+	_uint Get_SelectionRevision() const { return m_iSelectionRevision; }
 
 private:
 	CEditCamera* m_pCamera = { nullptr };
@@ -120,6 +122,7 @@ private:
 
 	// Hierarchy
 	_uint m_iHierarchyRevision = {};
+	_uint m_iSelectionRevision = {};
 
 private:
 	virtual HRESULT Ready_Events() override { return S_OK; }
@@ -129,7 +132,8 @@ private:
 	HRESULT  Ready_MapStage();
 	HRESULT  Ready_EnvObjects(vector<ENV_OBJECT_DESC>* pOutDeletedEnvDescs = nullptr);
 
-private:
+	_bool XM_CALLCONV Pick_EnvObjectByRay(_fvector vOrigin, _fvector vDir, CGameObject** ppOutObject, _float3* pOutHit, _float* pOutDistance);
+
 	void Clear_MapPreviewLayer(const _wstring& strLayerTag);
 	void Add_MapPreviewObjectHandle(const _wstring& strPrototypeTag, const _wstring& strLayerTag,
 		const _wstring& strObjectTag, CGameObject* pObject);

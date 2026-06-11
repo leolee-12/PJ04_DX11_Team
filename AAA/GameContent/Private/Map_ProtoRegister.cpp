@@ -112,7 +112,7 @@ HRESULT CMap_ProtoRegister::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, c
 		const _bool bCookCollisionMesh =
 			CookRequiredEnvModelTags.find(Desc.strModelProtoTag) != CookRequiredEnvModelTags.end();
 
-		if (FAILED(Ready_EnvModel(Levels.iEnvModelLevel, Desc, bCookCollisionMesh)))
+		if (FAILED(Ready_EnvModel(Levels.iEnvModelLevel, Desc, bCookCollisionMesh, Levels.bEnableEnvObjectPicking)))
 			return E_FAIL;
 	}
 
@@ -229,10 +229,7 @@ HRESULT CMap_ProtoRegister::Ready_MapSectionModel(_uint iModelLevel, const MAP_S
 	return S_OK;
 }
 
-HRESULT CMap_ProtoRegister::Ready_EnvModel(
-	_uint iModelLevel,
-	const ENV_OBJECT_DESC& Desc,
-	_bool bCookCollisionMesh)
+HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_DESC& Desc, _bool bCookCollisionMesh, _bool bEnablePickingData)
 {
 	if (nullptr == m_pProxy)
 		return E_FAIL;
@@ -263,14 +260,31 @@ HRESULT CMap_ProtoRegister::Ready_EnvModel(
 
 	try
 	{
-		pModelPrototype = CModel::Create_WithTextureHub(
-			m_pDevice,
-			m_pContext,
-			MODEL::NONANIM,
-			strModelPath.c_str(),
-			XMMatrixIdentity(),
-			nullptr,
-			bCookCollisionMesh);
+		if (bEnablePickingData)
+		{
+			pModelPrototype = CModel::Create_WithTextureHub(
+				m_pDevice,
+				m_pContext,
+				MODEL::NONANIM,
+				strModelPath.c_str(),
+				XMMatrixIdentity(),
+				[](const string&) -> bool
+				{
+					return true;
+				},
+				bCookCollisionMesh);
+		}
+		else
+		{
+			pModelPrototype = CModel::Create_WithTextureHub(
+				m_pDevice,
+				m_pContext,
+				MODEL::NONANIM,
+				strModelPath.c_str(),
+				XMMatrixIdentity(),
+				nullptr,
+				bCookCollisionMesh);
+		}
 	}
 	catch (const std::exception& e)
 	{

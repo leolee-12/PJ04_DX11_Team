@@ -89,13 +89,6 @@ namespace
 		return &kMapPresets[iPresetIndex];
 	}
 
-	void Forward_GameContentLogToDebug(GAMECONTENT_LOG_LEVEL, const _char* pMessage)
-	{
-		OutputDebugStringA("[GameContent] ");
-		OutputDebugStringA(nullptr != pMessage ? pMessage : "");
-		OutputDebugStringA("\n");
-	}
-
 	_bool Equals_NoCase(const _wstring& strLeft, const _wstring& strRight)
 	{
 		return 0 == _wcsicmp(strLeft.c_str(), strRight.c_str());
@@ -545,7 +538,7 @@ namespace
 
 	HRESULT Spawn_PreviewPackage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const MAP_PACKAGE& Package, _uint iPlaceLevel,
 		_uint iModelLevel, _bool bSpawnStage, _bool bSpawnEnv, CMap_EditHelper::MAP_PRESET_OBJECT_CREATED_CALLBACK pCreatedCallback, void*
-		pCallbackContext, CMap_EditHelper::MAP_PRESET_LOAD_REPORT* pOutReport, CMapStage** ppOutStage)
+		pCallbackContext, CMap_EditHelper::MAP_PRESET_LOAD_REPORT* pOutReport, CMapStage** ppOutStage, _bool bEnableEnvObjectPicking)
 	{
 		if (nullptr == pDevice || nullptr == pContext) return E_FAIL;
 
@@ -554,8 +547,11 @@ namespace
 		*pReport = {};
 		if (nullptr != ppOutStage) *ppOutStage = nullptr;
 
-		MAP_RUNTIME_LEVELS Levels{}; Levels.iObjectLevel = iPlaceLevel; Levels.iStageModelLevel = iModelLevel; Levels.iEnvModelLevel =
-			iPlaceLevel;
+		MAP_RUNTIME_LEVELS Levels{};
+		Levels.iObjectLevel = ETOUI(LEVEL::STATIC);
+		Levels.iStageModelLevel = iModelLevel;
+		Levels.iEnvModelLevel = ETOUI(LEVEL::STATIC);
+		Levels.bEnableEnvObjectPicking = bEnableEnvObjectPicking;
 
 		CMap_ProtoRegister* pRegister = CMap_ProtoRegister::Create(pDevice, pContext);
 		if (nullptr == pRegister) return E_FAIL;
@@ -804,9 +800,9 @@ HRESULT CMap_EditHelper::Load_MapStage(
 		return E_FAIL;
 
 	MAP_RUNTIME_LEVELS Levels{};
-	Levels.iObjectLevel = iPlaceLevel;
+	Levels.iObjectLevel = ETOUI(LEVEL::STATIC);
 	Levels.iStageModelLevel = iModelLevel;
-	Levels.iEnvModelLevel = iPlaceLevel;
+	Levels.iEnvModelLevel = ETOUI(LEVEL::STATIC);
 
 	CMap_ProtoRegister* pRegister = CMap_ProtoRegister::Create(pDevice, pContext);
 	if (nullptr == pRegister)
@@ -1110,10 +1106,14 @@ HRESULT CMap_EditHelper::Load_MapPreset_WithOverride(ID3D11Device* pDevice, ID3D
 		iPlaceLevel, iModelLevel,
 		true, true,
 		pCreatedCallback, pCallbackContext,
-		pOutReport, ppOutStage);
+		pOutReport, ppOutStage,
+		false);
 }
 
-HRESULT CMap_EditHelper::Load_PresetEnv_WithOverride(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _uint iPresetIndex, const _wstring& strManifestPath, _uint iPlaceLevel, const MAP_OVERRIDE_DESC* pOverrideDesc, MAP_PRESET_OBJECT_CREATED_CALLBACK pCreatedCallback, void* pCallbackContext, MAP_PRESET_LOAD_REPORT* pOutReport, vector<ENV_OBJECT_DESC>* pOutDeletedEnvDescs, _wstring* pOutResolvedManifestPath)
+HRESULT CMap_EditHelper::Load_PresetEnv_WithOverride(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _uint iPresetIndex, const
+	_wstring& strManifestPath, _uint iPlaceLevel, const MAP_OVERRIDE_DESC* pOverrideDesc, MAP_PRESET_OBJECT_CREATED_CALLBACK
+	pCreatedCallback, void* pCallbackContext, MAP_PRESET_LOAD_REPORT* pOutReport, vector<ENV_OBJECT_DESC>* pOutDeletedEnvDescs, _wstring*
+	pOutResolvedManifestPath, _bool bEnableEnvObjectPicking)
 {
 	MAP_PACKAGE SourcePackage{};
 	_wstring strResolvedManifestPath;
@@ -1134,10 +1134,11 @@ HRESULT CMap_EditHelper::Load_PresetEnv_WithOverride(ID3D11Device* pDevice, ID3D
 
 	return Spawn_PreviewPackage(
 		pDevice, pContext, SpawnPackage,
-		iPlaceLevel, iPlaceLevel,
+		iPlaceLevel, ETOUI(LEVEL::STATIC),
 		false, true,
 		pCreatedCallback, pCallbackContext,
-		pOutReport, nullptr);
+		pOutReport, nullptr,
+		bEnableEnvObjectPicking);
 }
 
 json CMap_EditHelper::Serialize_MapStageOverride(const CMapStage* pStage)

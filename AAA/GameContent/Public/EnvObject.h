@@ -44,6 +44,8 @@ public:
 
 	const ENV_OBJECT_DESC& Get_Desc() const { return m_tDesc; }
 
+	virtual _bool XM_CALLCONV Pick_Ray(_fvector vOrigin,_fvector vDir, _float3* pOutHit, _float* pOutDistance);
+
 protected:
 	HRESULT Ready_RenderComponents(_uint iModelProtoLevel, const wstring& strModelProtoTag);
 	HRESULT Ready_PhysicsActor();

@@ -4,7 +4,8 @@
 #include "GameInstance_Proxy.h"
 #include "Model.h"
 
-#include <cmath>
+//#include <cfloat>
+//#include <cmath>
 
 NS_BEGIN(Client)
 
@@ -112,6 +113,66 @@ void CEnvObject::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 		return;
 
 	pOutData->strPrototypeTag = m_strProtoTag;
+}
+
+_bool XM_CALLCONV CEnvObject::Pick_Ray(_fvector vOrigin, _fvector vDir, _float3* pOutHit, _float* pOutDistance)
+{
+	if (!m_bRenderable || nullptr == m_pModelCom || nullptr == m_pTransformCom)
+		return false;
+
+	Refresh_WorldBounds();
+
+	float fBoundsDist = 0.f;
+	if (!m_WorldBounds.Intersects(vOrigin, vDir, fBoundsDist))
+		return false;
+
+	const _matrix WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+	_bool bHit = false;
+	_float fBestDist = FLT_MAX;
+	_float3 vBestHit = {};
+
+	const size_t iNumMeshes = m_pModelCom->Get_NumMeshes();
+	for (size_t i = 0; i < iNumMeshes; ++i)
+	{
+		_float3 vHit = {};
+		float fLocalDist = 0.f;
+
+		if (!m_pModelCom->Pick_Mesh(
+			static_cast<_uint>(i),
+			vOrigin,
+			vDir,
+			WorldMatrix,
+			&vHit,
+			&fLocalDist))
+		{
+			continue;
+		}
+
+		UNREFERENCED_PARAMETER(fLocalDist);
+
+		const _vector vHitWorld = XMLoadFloat3(&vHit);
+		const _float fWorldDist = XMVectorGetX(
+			XMVector3Length(vHitWorld - vOrigin));
+
+		if (fWorldDist < fBestDist)
+		{
+			fBestDist = fWorldDist;
+			vBestHit = vHit;
+			bHit = true;
+		}
+	}
+
+	if (!bHit)
+		return false;
+
+	if (nullptr != pOutHit)
+		*pOutHit = vBestHit;
+
+	if (nullptr != pOutDistance)
+		*pOutDistance = fBestDist;
+
+	return true;
 }
 
 HRESULT CEnvObject::Ready_RenderComponents(_uint iModelProtoLevel, const wstring& strModelProtoTag)

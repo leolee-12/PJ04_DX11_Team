@@ -133,7 +133,8 @@ public:
         void* pCallbackContext = nullptr,
         MAP_PRESET_LOAD_REPORT* pOutReport = nullptr,
         vector<ENV_OBJECT_DESC>* pOutDeletedEnvDescs = nullptr,
-        _wstring* pOutResolvedManifestPath = nullptr);
+        _wstring* pOutResolvedManifestPath = nullptr,
+        _bool bEnableEnvObjectPicking = false);
 
     static json Serialize_MapStageOverride(const CMapStage* pStage);
     static HRESULT Apply_MapStageOverride(CMapStage* pStage, const json& jOverride);

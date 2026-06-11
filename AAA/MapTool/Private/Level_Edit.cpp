@@ -286,7 +286,7 @@ void CLevel_Edit::Delete_Object(CGameObject* pObject)
 		return;
 
 	if (m_pSelected == pObject)
-		m_pSelected = nullptr;
+		Set_Selected(nullptr);
 
 	for (auto& [LayerTag, Objects] : m_Layers)
 	{
@@ -316,6 +316,22 @@ void CLevel_Edit::Pick_And_Place(_fvector vOrigin, _fvector vDir)
 	fHitPos.z = roundf(fHitPos.z);
 	fHitPos.y = 0.f;
 	Place_Object_At(fHitPos);
+}
+
+void CLevel_Edit::Pick_And_SelectEnvObject(_fvector vOrigin, _fvector vDir)
+{
+	CGameObject* pPicked = nullptr;
+	_float3 vHit = {};
+	_float fDist = FLT_MAX;
+
+	if (Pick_EnvObjectByRay(vOrigin, vDir, &pPicked, &vHit, &fDist))
+	{
+		Set_Selected(pPicked);
+	}
+	else
+	{
+		Set_Selected(nullptr);
+	}
 }
 
 void CLevel_Edit::Place_Object_At(const _float3& vPos)
@@ -784,7 +800,7 @@ void CLevel_Edit::Clear_MapPreviewLayer(const wstring& strLayerTag)
 		}
 
 		if (m_pSelected == pObject)
-			m_pSelected = nullptr;
+			Set_Selected(nullptr);
 
 		if (pObject == m_pMapStage)
 			m_pMapStage = nullptr;
@@ -861,6 +877,15 @@ void CLevel_Edit::On_MapPreviewObjectCreated(
 		pLevel->m_pMapStage = dynamic_cast<Client::CMapStage*>(pObject);
 
 	On_EnvObjectCreated(pContext, pObject, strPrototypeTag, strLayerTag, strObjectTag);
+}
+
+void CLevel_Edit::Set_Selected(CGameObject* pSelected)
+{
+	if (m_pSelected == pSelected)
+		return;
+
+	m_pSelected = pSelected;
+	++m_iSelectionRevision;
 }
 
 void CLevel_Edit::Set_CameraActive(_bool b)
@@ -969,7 +994,7 @@ HRESULT CLevel_Edit::Ready_MapStage()
 		return E_FAIL;
 
 	const _uint iEditLevel = ETOUI(TOOL_LEVEL::EDIT);
-	const _uint iModelLevel = ETOUI(LEVEL::GAMEPLAY);
+	const _uint iModelLevel = ETOUI(LEVEL::STATIC);
 
 	if (m_MapContentDesc.strManifestPath.empty())
 	{
@@ -1069,7 +1094,9 @@ HRESULT CLevel_Edit::Ready_EnvObjects(vector<Client::ENV_OBJECT_DESC>* pOutDelet
 		&On_MapPreviewObjectCreated,
 		this,
 		&Report,
-		pOutDeletedEnvDescs);
+		pOutDeletedEnvDescs,
+		nullptr,
+		true);
 
 	if (FAILED(hr))
 		return E_FAIL;
@@ -1079,6 +1106,69 @@ HRESULT CLevel_Edit::Ready_EnvObjects(vector<Client::ENV_OBJECT_DESC>* pOutDelet
 	m_iEnvObjCreatedCount = Report.iEnvCreatedCount;
 
 	return S_OK;
+}
+
+_bool XM_CALLCONV CLevel_Edit::Pick_EnvObjectByRay(_fvector vOrigin, _fvector vDir, CGameObject** ppOutObject, _float3* pOutHit, _float* pOutDistance)
+{
+	if (nullptr != ppOutObject)
+		*ppOutObject = nullptr;
+
+	_bool bHitAny = false;
+	_float fBestDist = FLT_MAX;
+	_float3 vBestHit = {};
+	CGameObject* pBestObject = nullptr;
+
+	const auto IsEnvLayer = [](const wstring& strLayerTag) -> _bool
+		{
+			return strLayerTag == L"Layer_EnvStatic"
+				|| strLayerTag == L"Layer_EnvInteract"
+				|| strLayerTag == L"Layer_EnvEffect";
+		};
+
+	for (auto& [strLayerTag, Objects] : m_Layers)
+	{
+		if (!IsEnvLayer(strLayerTag))
+			continue;
+
+		for (const EDITOR_OBJECT_HANDLE& Handle : Objects)
+		{
+			CGameObject* pObject = Handle.pObject;
+			if (nullptr == pObject || pObject->Is_Dead() || !pObject->Is_Active())
+				continue;
+
+			Client::CEnvObject* pEnvObject = dynamic_cast<Client::CEnvObject*>(pObject);
+			if (nullptr == pEnvObject)
+				continue;
+
+			_float3 vHit = {};
+			_float fDist = FLT_MAX;
+
+			if (!pEnvObject->Pick_Ray(vOrigin, vDir, &vHit, &fDist))
+				continue;
+
+			if (fDist < fBestDist)
+			{
+				fBestDist = fDist;
+				vBestHit = vHit;
+				pBestObject = pObject;
+				bHitAny = true;
+			}
+		}
+	}
+
+	if (!bHitAny)
+		return false;
+
+	if (nullptr != ppOutObject)
+		*ppOutObject = pBestObject;
+
+	if (nullptr != pOutHit)
+		*pOutHit = vBestHit;
+
+	if (nullptr != pOutDistance)
+		*pOutDistance = fBestDist;
+
+	return true;
 }
 
 void CLevel_Edit::On_EnvObjectCreated(
