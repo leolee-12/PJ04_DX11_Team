@@ -22,22 +22,27 @@ KIRBY_STATE_TYPE CKirby_Attack::Get_StateType()
 
 void CKirby_Attack::Enter(CKirby* pKirby)
 {
+    // 현재 능력에게 Enter 전달
     pKirby->Get_KirbyAbility()->Enter_Ability(pKirby);
 }
 
 void CKirby_Attack::Update(CKirby* pKirby, const _float fTimeDelta)
 {
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+    // 현재 능력에게 Update 전달
     pAbility->Update_Ability(pKirby, fTimeDelta);
 
+    // Ability가 Attack State가 끝났다고 하면 State 전환
     if (pAbility->IsEndAttack() == true)
     {
         Transition_Wait_OR_Run(pKirby);
+        // Fall 상태도 전환 필요한듯
     }
 }
 
 void CKirby_Attack::Exit(CKirby* pKirby)
 {
+    // 현재 능력에게 Exit 전달
     pKirby->Get_KirbyAbility()->Exit_Ability(pKirby);
 }
 
@@ -60,8 +65,9 @@ _bool CKirby_Attack::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
         }
     }
 
-    // 능력 Command 처리
+    // Ability가 Command 처리
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+
     if (pAbility->Handle_Command(pKirby, pCommand) == true)
         return true;
 

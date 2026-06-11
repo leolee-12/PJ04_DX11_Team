@@ -63,7 +63,7 @@ public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
 public:
-	CMovement* Get_Movement() { return m_pMovement; }
+	CMovement_Child* Get_Movement() { return m_pMovement; }
 	CKirby_Body* Get_Body() { return m_pBody; }
 
 public:
@@ -90,7 +90,7 @@ private:
 	CKirby_Body* m_pBody{};
 
 	physx::PxController* m_pController = { nullptr };
-	CMovement* m_pMovement = { nullptr }; 
+	CMovement_Child* m_pMovement = { nullptr };
 
 	// Controller(Collider: Capsule)
 	static constexpr _float CCT_RADIUS = 0.75f;

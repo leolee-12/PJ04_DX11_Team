@@ -40,35 +40,47 @@ namespace
 CMovement_Child::CMovement_Child(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMovement(pDevice, pContext)
     , m_fMass(1.f)
-    , m_fRBGravity(-20.f)
-    , m_fGravityScale(1.f)
-    , m_fLinearDrag(0.f)
-    , m_fGroundFriction(18.f)
-    , m_fMaxHorizontalSpeed(12.f)
-    , m_fMaxFallVelocity(-15.f)
-    , m_fJumpVelocity(8.f)
+
     , m_bUseGravity(true)
+    , m_fRBGravity(-45.f)
+    , m_fGravityScale(1.f)
+
+    , m_fLinearDrag(0.9f)
     , m_bUseGroundFriction(true)
+    , m_fGroundFriction(40.f)
+
+    , m_fMaxHorizontalSpeed(8.f)
+    , m_fMaxFallVelocity(-15.f)
+    , m_fJumpVelocity(22.f)
+
+    , m_bStopHorizontalOnSideHit(false)
+
+    , m_fRotation_Speed_Degree(720.f)
+
     , m_vVelocity{ 0.f, 0.f, 0.f }
     , m_vForce{ 0.f, 0.f, 0.f }
     , m_vAcceleration{ 0.f, 0.f, 0.f }
-    , m_bStopHorizontalOnSideHit(false)
 {
 }
 
 CMovement_Child::CMovement_Child(const CMovement_Child& Prototype)
     : CMovement(Prototype)
     , m_fMass(Prototype.m_fMass)
+
+    , m_bUseGravity(Prototype.m_bUseGravity)
     , m_fRBGravity(Prototype.m_fRBGravity)
     , m_fGravityScale(Prototype.m_fGravityScale)
+
     , m_fLinearDrag(Prototype.m_fLinearDrag)
+    , m_bUseGroundFriction(Prototype.m_bUseGroundFriction)
     , m_fGroundFriction(Prototype.m_fGroundFriction)
+
     , m_fMaxHorizontalSpeed(Prototype.m_fMaxHorizontalSpeed)
     , m_fMaxFallVelocity(Prototype.m_fMaxFallVelocity)
     , m_fJumpVelocity(Prototype.m_fJumpVelocity)
-    , m_bUseGravity(Prototype.m_bUseGravity)
-    , m_bUseGroundFriction(Prototype.m_bUseGroundFriction)
+
     , m_bStopHorizontalOnSideHit(Prototype.m_bStopHorizontalOnSideHit)
+    , m_fRotation_Speed_Degree(Prototype.m_fRotation_Speed_Degree)
     // Prototype의 런타임 물리 상태는 복사 x
     , m_vVelocity{ 0.f, 0.f, 0.f }
     , m_vForce{ 0.f, 0.f, 0.f }
@@ -338,6 +350,47 @@ void CMovement_Child::Sync_To_Controller()
 
     m_bGrounded = false;
     Sync_BaseVelocityFields();
+}
+
+void CMovement_Child::Rotate_To_Direction(_fvector vDir, _float fTimeDelta)
+{
+    if (m_pTransform == nullptr)
+        return;
+
+    _vector vTargetDir = XMVectorSetY(vDir, 0.f);
+
+    if (XMVectorGetX(XMVector3LengthSq(vTargetDir)) <= EPSILON)
+        return;
+
+    vTargetDir = XMVector3Normalize(vTargetDir);
+
+    _vector vLook = XMVectorSetY(m_pTransform->Get_State(STATE::LOOK), 0.f);
+
+    if (XMVectorGetX(XMVector3LengthSq(vLook)) <= EPSILON)
+        return;
+
+    vLook = XMVector3Normalize(vLook);
+
+    _float fDot = XMVectorGetX(XMVector3Dot(vLook, vTargetDir));
+
+    _float fCross =
+        XMVectorGetZ(vLook) * XMVectorGetX(vTargetDir) -
+        XMVectorGetX(vLook) * XMVectorGetZ(vTargetDir);
+
+    _float fYaw = atan2f(fCross, fDot);
+
+    _float fStep = XMConvertToRadians(m_fRotation_Speed_Degree) * fTimeDelta;
+
+    _float fApply = fabsf(fYaw) <= fStep
+        ? fYaw
+        : (fYaw > 0.f ? fStep : -fStep);
+
+    m_pTransform->Rotate(
+        XMQuaternionRotationAxis(
+            XMVectorSet(0.f, 1.f, 0.f, 0.f),
+            fApply
+        )
+    );
 }
 
 void CMovement_Child::Integrate_Forces(_float fTimeDelta, _vector& vVelocity)

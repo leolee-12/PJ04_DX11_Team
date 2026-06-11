@@ -9,16 +9,22 @@ class CMovement_Child final : public CMovement
 {
     GENERATED_BODY(CMovement_Child)
 
-    PROPERTY(_float,    m_fMass,                L"Mass",            L"RigidBody")
-    PROPERTY(_float,    m_fRBGravity,           L"Gravity",         L"RigidBody")
-    PROPERTY(_float,    m_fGravityScale,        L"GravityScale",    L"RigidBody")
-    PROPERTY(_float,    m_fLinearDrag,          L"LinearDrag", L"RigidBody")
-    PROPERTY(_float,    m_fGroundFriction,      L"GroundFriction", L"RigidBody")
-    PROPERTY(_float,    m_fMaxHorizontalSpeed,  L"MaxHorizontalSpeed", L"RigidBody")
-    PROPERTY(_float,    m_fMaxFallVelocity,     L"MaxFallVelocity", L"RigidBody")
-    PROPERTY(_float,    m_fJumpVelocity,        L"JumpVelocity", L"RigidBody")
-    PROPERTY(_bool,     m_bUseGravity,          L"UseGravity", L"RigidBody")
-    PROPERTY(_bool,     m_bUseGroundFriction,   L"UseGroundFriction", L"RigidBody")
+    PROPERTY(_float,    m_fMass,                    L"질량",                 L"RigidBody")
+                                                                             
+    PROPERTY(_bool,     m_bUseGravity,              L"중력 적용",            L"RigidBody")
+    PROPERTY(_float,    m_fRBGravity,               L"중력 (-)",             L"RigidBody")
+    PROPERTY(_float,    m_fGravityScale,            L"중력 비율",            L"RigidBody")
+                                                                             
+    PROPERTY(_float,    m_fLinearDrag,              L"공기 저항 (+)",        L"RigidBody")
+
+    PROPERTY(_bool,     m_bUseGroundFriction,       L"바닥 마찰력 적용",     L"RigidBody")
+    PROPERTY(_float,    m_fGroundFriction,          L"바닥 마찰력 (+)",      L"RigidBody")
+
+    PROPERTY(_float,    m_fMaxHorizontalSpeed,      L"최대 수평 속도 (+)",   L"RigidBody")
+    PROPERTY(_float,    m_fMaxFallVelocity,         L"최대 낙하 속도 (-)",   L"RigidBody")
+    PROPERTY(_float,    m_fJumpVelocity,            L"순간 점프 속도 (+)",   L"RigidBody")
+
+    PROPERTY(_float,    m_fRotation_Speed_Degree,   L"회전 속도 (Degree)",    L"RigidBody")
 
 public:
     enum class FORCE_MODE
@@ -90,6 +96,9 @@ public:
     // 텔레포트 / 리스폰 / 시작 위치 변경 후 필요.
     // Engine의 CMovement::Sync_To_Controller()에 virtual을 붙일 수 있으면 override로 사용.
     virtual void Sync_To_Controller() override;
+
+    // 회전
+    void Rotate_To_Direction(_fvector vDir, _float fTimeDelta);
 
 private:
     void Integrate_Forces(_float fTimeDelta, _vector& vVelocity);

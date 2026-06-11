@@ -12,7 +12,6 @@ CKirby_Wait::CKirby_Wait()
 
 HRESULT CKirby_Wait::Initialize()
 {
-
     return S_OK;
 }
 
@@ -23,6 +22,7 @@ KIRBY_STATE_TYPE CKirby_Wait::Get_StateType()
 
 void CKirby_Wait::Enter(CKirby* pKirby)
 {
+    // Ani
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();    
     pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::WAIT));
 }
@@ -50,7 +50,7 @@ _bool CKirby_Wait::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 
     switch (eCommandType)
     {
-        // Move
+        // Move Press
         case KIRBY_COMMAND_TYPE::MOVE_TOP:
         case KIRBY_COMMAND_TYPE::MOVE_DOWN:
         case KIRBY_COMMAND_TYPE::MOVE_LEFT:
@@ -63,7 +63,7 @@ _bool CKirby_Wait::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             pKirby->Change_State(KIRBY_STATE_TYPE::RUN);
             return true; 
         }
-        // Jump
+        // Jump Down
         case KIRBY_COMMAND_TYPE::JUMP:
         {
             if (!pCommand->IsDown())
@@ -72,7 +72,7 @@ _bool CKirby_Wait::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             pKirby->Change_State(KIRBY_STATE_TYPE::JUMP);
             return true;
         }
-        // Attack
+        // Attack Down
         case KIRBY_COMMAND_TYPE::ATTACK:
         {
             if (!pCommand->IsDown())

@@ -1,6 +1,7 @@
 #include "Kirby_InputManager.h"
 
 #include "GameInstance.h"
+#include "Movement_Child.h"
 
 #include "Kirby.h"
 #include "Kirby_Controller.h"
@@ -103,7 +104,7 @@ void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
 
 _bool CKirby_InputManager::Cal_MoveDir(MOVE_DIR eMoveDir, _float3& vOutDir)
 {
-    CMovement* pMovement = m_pKiryby->Get_Component<CMovement>(TEXT("Com_Movement"));
+    CMovement_Child* pMovement = m_pKiryby->Get_Component<CMovement_Child>(TEXT("Com_Movement"));
     if (pMovement == nullptr)
         return false;
 
