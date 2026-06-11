@@ -185,7 +185,7 @@ PS_COLOR_OUT PS_MAIN_MIRROR(PS_IN In)
 
 technique11 DefaultTechnique
 {
-    pass DefaultPass
+    pass DefaultPass //0
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -196,7 +196,7 @@ technique11 DefaultTechnique
         SetPixelShader(CompileShader(ps_5_0, PS_GBUFFER()));
     }
 
-    pass AlphaBlend
+    pass AlphaBlend //1
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_NoWrite, 0);
@@ -207,7 +207,7 @@ technique11 DefaultTechnique
         SetPixelShader(CompileShader(ps_5_0, PS_MAIN()));
     }
 
-    pass Additive
+    pass Additive //2 
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_NoWrite, 0);
@@ -218,7 +218,7 @@ technique11 DefaultTechnique
         SetPixelShader(CompileShader(ps_5_0, PS_MAIN()));
     }
 
-    pass DefaultPass_Mirror
+    pass DefaultPass_Mirror //3
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -229,7 +229,7 @@ technique11 DefaultTechnique
         SetPixelShader(CompileShader(ps_5_0, PS_GBUFFER()));
     }
 
-    pass AlphaBlend_Mirror
+    pass AlphaBlend_Mirror //4
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_NoWrite, 0);
@@ -240,7 +240,7 @@ technique11 DefaultTechnique
         SetPixelShader(CompileShader(ps_5_0, PS_MAIN_MIRROR()));
     }
 
-    pass Additive_Mirror
+    pass Additive_Mirror //5
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_NoWrite, 0);

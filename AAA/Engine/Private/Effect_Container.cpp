@@ -4,6 +4,8 @@
 
 #include "Effect_Part.h"
 
+#include "Effect_Manager.h"
+
 
 CEffect_Container::CEffect_Container(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject(pDevice, pContext)
@@ -36,6 +38,9 @@ HRESULT CEffect_Container::Initialize(void* pArg)
 
 void CEffect_Container::Priority_Update(_float fTimeDelta)
 {
+    if (!m_bIsPlay)
+        return;
+
     for (auto& [tag, pPart] : m_EffestParts)
         pPart->Priority_Update(fTimeDelta);
 }
@@ -61,6 +66,9 @@ void CEffect_Container::Update(_float fTimeDelta)
             m_bIsPlay = false;
 
             m_pParentMatrix = nullptr;
+
+            if (m_pPool)   // 휴면되는 순간 매니저로 반납(재생당 1회)
+                m_pPool->Return(m_iPoolLevel, m_strPoolKey, this);
         }
     }
 
@@ -73,17 +81,20 @@ void CEffect_Container::Update(_float fTimeDelta)
 
 void CEffect_Container::Late_Update(_float fTimeDelta)
 {
+    if (!m_bIsPlay)
+        return;
+
     for (auto& [tag, pPart] : m_EffestParts)
         pPart->Late_Update(fTimeDelta);
-
-    if (m_bIsPlay == false)
-        return;
 
     Compute_CombinedWorldMatrix();
 }
 
 HRESULT CEffect_Container::Render()
 {
+    if (!m_bIsPlay) 
+        return S_FALSE;
+
     for (auto& [tag, pPart] : m_EffestParts)
         pPart->Render();
 
