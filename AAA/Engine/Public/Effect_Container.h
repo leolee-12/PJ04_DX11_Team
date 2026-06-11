@@ -1,9 +1,11 @@
 #pragma once
 #include "GameObject.h"
+#include "Effect_Allocator.h"
 
 NS_BEGIN(Engine)
 
 class CEffect_Part;
+class CEffect_Manager;
 
 class ENGINE_DLL CEffect_Container abstract : public CGameObject
 {
@@ -29,6 +31,29 @@ protected:
     CEffect_Container(const CEffect_Container& Prototype);
     virtual ~CEffect_Container() = default;
 
+public:
+#pragma push_macro("new")
+#undef new
+    static void* operator new(size_t n)
+    {
+        return CEffect_Allocator::IsPrototypePass()
+            ? ::operator new(n)                            
+            : CEffect_Allocator::GetInstance()->Alloc(n);  
+    }
+    static void  operator delete(void* p) { CEffect_Allocator::GetInstance()->Dealloc(p); }
+#ifdef _DEBUG
+    static void* operator new(size_t n, int, const char*, int)
+    {
+        return CEffect_Allocator::IsPrototypePass()
+            ? ::operator new(n)
+            : CEffect_Allocator::GetInstance()->Alloc(n);
+    }
+    static void  operator delete(void* p, int, const char*, int) { CEffect_Allocator::GetInstance()->Dealloc(p); }
+#endif
+    static void* operator new[](size_t) = delete;
+    static void  operator delete[](void*) = delete;
+#pragma pop_macro("new")
+
 protected:
     virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void* pArg) override;
@@ -53,11 +78,23 @@ public:
     virtual json Serialize() const override;
     virtual void Deserialize_Internal(const json& j) override;
 
+public: //윤석현추가
+    void Set_Pool(CEffect_Manager* pPool, _uint iLevel, const _wstring& strEffectKey)
+    {
+        m_pPool = pPool;
+        m_iPoolLevel = iLevel;
+        m_strPoolKey = strEffectKey;
+    }
+
 protected:
     unordered_map<_wstring, CEffect_Part*> m_EffestParts;
 
-    const _float4x4* m_pParentMatrix{};
-    _float4x4 m_CombinedWorldMatrix{};
+    const _float4x4* m_pParentMatrix = {};
+    _float4x4 m_CombinedWorldMatrix = {};
+
+    CEffect_Manager* m_pPool = { nullptr };   // 약참조(반납처)
+    _uint    m_iPoolLevel = {};
+    _wstring m_strPoolKey;
 
 private:
     // Debug

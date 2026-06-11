@@ -200,8 +200,10 @@ public:
 #pragma endregion
 
 #pragma region EFFECT_MANAGER
-    HRESULT Spawn_Effect(_uint iLevel, const _wstring& strProtoTag,
-    const CEffect_Container::EFFECT_CONTAINER_DESC& desc, CEffect_Container** ppOut = nullptr);
+    HRESULT Spawn_Effect(_uint iLevel, const _wstring& strEffectKey, const _wstring& strProtoTag, 
+        const CEffect_Container::EFFECT_CONTAINER_DESC& desc, const json* pConfig = nullptr, CEffect_Container** ppOut = nullptr);
+
+    void Set_EffectPrototypeLevel(_uint iLevel);
 
     CShader* Get_2DShader();
     CShader* Get_MeshShader();

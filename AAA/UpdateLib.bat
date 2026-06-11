@@ -30,3 +30,8 @@ xcopy			/y		.\Engine\Bin\*.dll							.\MapTool\Bin\
 xcopy			/y		.\Engine\ThirdPartyLib\*.dll				.\MapTool\Bin\
 xcopy			/y		.\GameContent\Bin\*.dll						.\MapTool\Bin\
 xcopy			/y /s	.\GameContent\ShaderFiles\*.*				.\MapTool\Bin\ShaderFiles\
+
+xcopy			/y		.\Engine\Bin\*.dll							.\CameraTool\Bin\
+xcopy			/y		.\Engine\ThirdPartyLib\*.dll				.\CameraTool\Bin\
+xcopy			/y		.\GameContent\Bin\*.dll						.\CameraTool\Bin\
+xcopy			/y /s	.\GameContent\ShaderFiles\*.*				.\CameraTool\Bin\ShaderFiles\
