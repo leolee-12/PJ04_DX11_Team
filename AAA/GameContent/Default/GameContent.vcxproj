@@ -38,6 +38,8 @@
     <ClInclude Include="..\Public\GameObject_Factory.h" />
     <ClInclude Include="..\Public\Kirby_Fall.h" />
     <ClInclude Include="..\Public\Kirby_Attack.h" />
+    <ClInclude Include="..\Public\Kirby_Hovering.h" />
+    <ClInclude Include="..\Public\Movement_Child.h" />
     <ClInclude Include="..\Public\UI_Fonts.h" />
     <ClInclude Include="..\Public\UI_GenericContainer.h" />
     <ClInclude Include="..\Public\InhaleEffect.h" />
@@ -108,6 +110,8 @@
     <ClCompile Include="..\Private\GameObject_Factory.cpp" />
     <ClCompile Include="..\Private\Kirby_Fall.cpp" />
     <ClCompile Include="..\Private\Kirby_Attack.cpp" />
+    <ClCompile Include="..\Private\Kirby_Hovering.cpp" />
+    <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\Private\UI_GenericContainer.cpp" />
     <ClCompile Include="..\Private\InhaleEffect.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp" />

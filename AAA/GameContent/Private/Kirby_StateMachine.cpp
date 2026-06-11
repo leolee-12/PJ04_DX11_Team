@@ -7,6 +7,7 @@
 #include "Kirby_Jump.h"
 #include "Kirby_Fall.h"
 #include "Kirby_Attack.h"
+#include "Kirby_Hovering.h"
 
 CKirby_StateMachine::CKirby_StateMachine()
 {
@@ -67,11 +68,12 @@ CKirby_State* CKirby_StateMachine::State_Creator(KIRBY_STATE_TYPE eNewstate)
 
     switch (eNewstate)
     {
-        case KIRBY_STATE_TYPE::WAIT:        pState = CKirby_Wait::Create();     break;
-        case KIRBY_STATE_TYPE::RUN:         pState = CKirby_Run::Create();      break;
-        case KIRBY_STATE_TYPE::JUMP:        pState = CKirby_Jump::Create();     break;
-        case KIRBY_STATE_TYPE::FALL:        pState = CKirby_Fall::Create();     break;
-        case KIRBY_STATE_TYPE::ATTACK:      pState = CKirby_Attack::Create();   break;
+        case KIRBY_STATE_TYPE::WAIT:        pState = CKirby_Wait::Create();         break;
+        case KIRBY_STATE_TYPE::RUN:         pState = CKirby_Run::Create();          break;
+        case KIRBY_STATE_TYPE::JUMP:        pState = CKirby_Jump::Create();         break;
+        case KIRBY_STATE_TYPE::FALL:        pState = CKirby_Fall::Create();         break;
+        case KIRBY_STATE_TYPE::ATTACK:      pState = CKirby_Attack::Create();       break;
+        case KIRBY_STATE_TYPE::HOVERING:    pState = CKirby_Hovering::Create();     break;
     }
 
     return pState;

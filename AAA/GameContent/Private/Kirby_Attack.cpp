@@ -49,11 +49,18 @@ _bool CKirby_Attack::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 
     switch (eCommandType)
     {
-        case KIRBY_COMMAND_TYPE::ATTACK_UP:
+        // Attack Up
+        case KIRBY_COMMAND_TYPE::ATTACK:
+        {
+            if (!pCommand->IsUp())
+                return false;
+
             pKirby->Get_KirbyAbility()->Up_Attack(pKirby);
             return true;
+        }
     }
 
+    // 능력 Command 처리
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
     if (pAbility->Handle_Command(pKirby, pCommand) == true)
         return true;

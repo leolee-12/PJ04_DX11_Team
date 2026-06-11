@@ -50,7 +50,7 @@ _bool CKirby_State::Try_FallState(CKirby* pKirby)
     _float fYVelocity = pMovementCom->Get_VerticalVelocity();
 
     _bool bIsGround = pMovementCom->Is_Grounded();
-    if (bIsGround == false && fYVelocity <= -7.f)
+    if (bIsGround == false && fYVelocity <= CKirby::s_fFallVelocityY)
     {  
         pKirby->Change_State(KIRBY_STATE_TYPE::FALL);
         return true;

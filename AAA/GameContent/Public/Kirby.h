@@ -14,6 +14,8 @@ NS_END
 
 NS_BEGIN(Client)
 
+class CMovement_Child;
+
 class CKirby_InputManager;
 class CKirby_Controller;
 class CKirby_StateMachine;
@@ -34,6 +36,15 @@ public:
 	};
 
 	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_Kirby";
+
+	static constexpr _float s_fFallVelocityY = -7.f;
+
+	static constexpr _float s_fGravity = -36.0f;
+	static constexpr _float s_fJumpSpeed = 17.0f;
+
+	static constexpr _float s_fHoverGravity = -2.0f;
+	static constexpr _float s_fHoverJumpSpeed = 3.0f;
+
 
 private:
 	CKirby(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
@@ -88,8 +99,6 @@ private:
 	// Movement
 	static constexpr _float MOVE_SPEED = 7.0f;
 	static constexpr _float ROT_SPEED = 720.0f;   // degree/sec
-	static constexpr _float GRAVITY = -36.0f;
-	static constexpr _float JUMP_SPEED = 17.0f;
 
 	static constexpr _float MOVE_ACCEL = 130.f;
 	static constexpr _float MOVE_DECEL = 70.f;

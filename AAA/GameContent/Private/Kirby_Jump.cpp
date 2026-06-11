@@ -26,7 +26,7 @@ KIRBY_STATE_TYPE CKirby_Jump::Get_StateType()
 
 void CKirby_Jump::Enter(CKirby* pKirby)
 {
-    CMovement* pMovementCom = static_cast<CMovement*>(pKirby->Get_Component<CMovement>(TEXT("Com_Movement")));
+    CMovement* pMovementCom = pKirby->Get_Movement();
     pMovementCom->Jump();
 
 
@@ -54,7 +54,7 @@ void CKirby_Jump::Update(CKirby* pKirby, const _float fTimeDelta)
     _bool bIsGround = pMovementCom->Is_Grounded();
 
     // Fall
-    if (fYVelocity <= 0.005f)
+    if (fYVelocity <= CKirby::s_fFallVelocityY)
     {
         pKirby->Change_State(KIRBY_STATE_TYPE::FALL);
         if (rand() % 2 == 0)
@@ -83,15 +83,33 @@ _bool CKirby_Jump::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 
     switch (eCommandType)
     {
+        // Move
         case KIRBY_COMMAND_TYPE::MOVE_TOP:
         case KIRBY_COMMAND_TYPE::MOVE_DOWN:
         case KIRBY_COMMAND_TYPE::MOVE_LEFT:
         case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
+        {
+            if (!pCommand->IsPress())
+                return false;
+
             Handle_MoveCommand(pKirby, pCommand);
             return true;
-
-        case KIRBY_COMMAND_TYPE::ATTACK_DOWN:
+        }
+        // Jump
+        case KIRBY_COMMAND_TYPE::JUMP:
         {
+            if (!pCommand->IsDown())
+                return false;
+
+            pKirby->Change_State(KIRBY_STATE_TYPE::HOVERING);
+            return true;
+        }
+        // Attack Down
+        case KIRBY_COMMAND_TYPE::ATTACK:
+        {
+            if (!pCommand->IsDown())
+                return false;
+
             CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
             if(pAbility->Can_Attack(KIRBY_ATTACK_LOCATION::AIR))
                 pAbility->Down_Attack(pKirby);

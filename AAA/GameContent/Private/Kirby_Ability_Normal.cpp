@@ -58,7 +58,7 @@ void CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _float fTimeDelta)
     _float fYVelocity = pMovementCom->Get_VerticalVelocity();
 
     _bool bIsGround = pMovementCom->Is_Grounded();
-    if (bIsGround == false && fYVelocity <= 0.005f)
+    if (bIsGround == false && fYVelocity <= CKirby::s_fFallVelocityY)
     {
         m_eCurMoveState = INHALE_MOVE_STATE::FALL;
     }
@@ -133,6 +133,9 @@ _bool CKirby_Ability_Normal::Handle_Command(CKirby* pKirby, CKirby_Command* pCom
         case KIRBY_COMMAND_TYPE::MOVE_LEFT:
         case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
         {
+            if (!pCommand->IsPress())
+                return false;
+
             m_eCurMoveState = INHALE_MOVE_STATE::WALK;
             Move_Command* pMoveCommand = static_cast<Move_Command*>(pCommand);
             pKirby->Add_MoveDir(pMoveCommand->Get_Dir());

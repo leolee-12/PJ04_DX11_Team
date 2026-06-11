@@ -135,7 +135,7 @@ HRESULT CKirby::Ready_Components()
         return E_FAIL;
 
     m_pMovement->Set_Refs(m_pTransformCom, m_pController);
-    m_pMovement->Set_Stats(MOVE_SPEED, ROT_SPEED, GRAVITY, JUMP_SPEED);
+    m_pMovement->Set_Stats(MOVE_SPEED, ROT_SPEED, s_fGravity, s_fJumpSpeed);
     m_pMovement->Set_Acceleration(MOVE_ACCEL, MOVE_DECEL);
 
     return S_OK;
