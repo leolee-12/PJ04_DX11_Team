@@ -21,6 +21,7 @@
 #include "ShaderGlobal_Manager.h"
 #include "Frustum_Manager.h"
 #include "Texture_Hub.h"
+#include "Effect_Allocator.h"
 
 CGameInstance* CGameInstance::m_pInstance = { nullptr };
 CGameInstance_Proxy* CGameInstance::m_pGameInstance_Proxy = { nullptr };
@@ -195,8 +196,8 @@ void CGameInstance::Clear_Resources(_int iLevelIndex)
     if (-1 == iLevelIndex)
         return;
 
+    m_pEffect_Manager->Clear_Level(iLevelIndex);
     m_pObject_Manager->Clear(iLevelIndex);
-
     m_pPrototype_Manager->Clear(iLevelIndex);
 }
 _float CGameInstance::RandomFloat(_float fMin, _float fMax) const
@@ -679,7 +680,6 @@ void CGameInstance::Free()
 
     Safe_Release(m_pShaderGlobal_Manager);
     Safe_Release(m_pEnvironment_Manager);
-    Safe_Release(m_pEffect_Manager);
     Safe_Release(m_pShadow_Dir);
     Safe_Release(m_pTarget_Manager);
     Safe_Release(m_pSound_Manager);
@@ -690,9 +690,13 @@ void CGameInstance::Free()
 	Safe_Release(m_pInput_Device);
     Safe_Release(m_pRenderer);
     Safe_Release(m_pObject_Manager);
+    Safe_Release(m_pEffect_Manager);
     Safe_Release(m_pLevel_Manager);
     Safe_Release(m_pTexture_Hub);
     Safe_Release(m_pPrototype_Manager);
+    
+    CEffect_Allocator::DestroyInstance();
+
     Safe_Release(m_pPhysX_Manager);
     Safe_Release(m_pTimer_Manager);
     Safe_Release(m_pFrustum_Manager);
