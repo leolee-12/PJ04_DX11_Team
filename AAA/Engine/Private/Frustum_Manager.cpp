@@ -106,7 +106,16 @@ _bool CFrustum_Manager::Update_View(CULLING_VIEW eView, const CULLING_VIEW_DESC&
 	BoundingFrustum::CreateFromMatrix(LocalFrustum, XMLoadFloat4x4(Desc.pProj));
 
 	const _matrix ViewInverse = XMMatrixInverse(nullptr, XMLoadFloat4x4(Desc.pView));
+	float det = XMVectorGetX(XMMatrixDeterminant(ViewInverse));
+	if (!(fabsf(det) > 1e-8f))      // NaN(비교 false) 또는 ~0 -> 무효
+	{
+		State.bValid = false;       // IsIn_*가 true(보임) 반환 = 컬링 패스
+		return false;
+	}
 	LocalFrustum.Transform(State.WorldFrustum, ViewInverse);
+
+	XMStoreFloat4(&State.WorldFrustum.Orientation,
+		XMQuaternionNormalize(XMLoadFloat4(&State.WorldFrustum.Orientation)));
 
 	State.bValid = true;
 
