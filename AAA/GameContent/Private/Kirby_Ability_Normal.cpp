@@ -1,6 +1,7 @@
 #include "Kirby_Ability_Normal.h"
 
 #include "GameInstance.h"
+#include "Movement_Child.h"
 
 #include "Kirby.h"
 #include "Kirby_Body.h"
@@ -48,17 +49,17 @@ void CKirby_Ability_Normal::Enter_Ability(CKirby* pKirby)
     m_bEndAttack = false;
 
     // Speed
-    CMovement* pMovementCom = pKirby->Get_Movement();
-    pMovementCom->Set_MoveSpeed(1.5f);
+    CMovement_Child* pMovementCom = pKirby->Get_Movement();
+    pMovementCom->Set_MaxHorizontalSpeed(2.f);
 }
 
 void CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _float fTimeDelta)
 {
-    CMovement* pMovementCom = pKirby->Get_Movement();
+    CMovement_Child* pMovementCom = pKirby->Get_Movement();
     _float fYVelocity = pMovementCom->Get_VerticalVelocity();
 
     _bool bIsGround = pMovementCom->Is_Grounded();
-    if (bIsGround == false && fYVelocity <= 0.005f)
+    if (bIsGround == false && fYVelocity <= CKirby::s_fFallVelocityY)
     {
         m_eCurMoveState = INHALE_MOVE_STATE::FALL;
     }
@@ -79,7 +80,7 @@ void CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _float fTimeDelta)
     {
         m_eInhaleState = INHALE_STATE::INHALE_END;
         pAnimator->Play("InhaleEnd", false, false, 0.1f, 1.5f);
-        pMovementCom->Set_MoveSpeed(7.f);
+        pMovementCom->Set_MaxHorizontalSpeed(8.f);
     }
     if (m_eInhaleState == INHALE_STATE::INHALE_END)
     {
@@ -128,11 +129,15 @@ _bool CKirby_Ability_Normal::Handle_Command(CKirby* pKirby, CKirby_Command* pCom
 
     switch (eCommandType)
     {
+        // Move Press
         case KIRBY_COMMAND_TYPE::MOVE_TOP:
         case KIRBY_COMMAND_TYPE::MOVE_DOWN:
         case KIRBY_COMMAND_TYPE::MOVE_LEFT:
         case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
         {
+            if (!pCommand->IsPress())
+                return false;
+
             m_eCurMoveState = INHALE_MOVE_STATE::WALK;
             Move_Command* pMoveCommand = static_cast<Move_Command*>(pCommand);
             pKirby->Add_MoveDir(pMoveCommand->Get_Dir());

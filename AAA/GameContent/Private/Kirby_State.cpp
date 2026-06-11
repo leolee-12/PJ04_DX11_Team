@@ -1,6 +1,7 @@
 #include "Kirby_State.h"
 
 #include "GameInstance.h"
+#include "Movement_Child.h"
 
 #include "Kirby.h"
 #include "Kirby_Body.h"
@@ -35,6 +36,9 @@ _bool CKirby_State::Handle_MoveCommand(CKirby* pKirby, CKirby_Command* pCommand)
     if (eCommandType == KIRBY_COMMAND_TYPE::MOVE_TOP || eCommandType == KIRBY_COMMAND_TYPE::MOVE_DOWN ||
         eCommandType == KIRBY_COMMAND_TYPE::MOVE_LEFT || eCommandType == KIRBY_COMMAND_TYPE::MOVE_RIGHT)
     {
+        if (!pCommand->IsPress())
+            return false;
+
         Move_Command* pMoveCommand = static_cast<Move_Command*>(pCommand);
         pKirby->Add_MoveDir(pMoveCommand->Get_Dir());
 
@@ -46,11 +50,11 @@ _bool CKirby_State::Handle_MoveCommand(CKirby* pKirby, CKirby_Command* pCommand)
 
 _bool CKirby_State::Try_FallState(CKirby* pKirby)
 {
-    CMovement* pMovementCom = pKirby->Get_Movement();
+    CMovement_Child* pMovementCom = pKirby->Get_Movement();
     _float fYVelocity = pMovementCom->Get_VerticalVelocity();
 
     _bool bIsGround = pMovementCom->Is_Grounded();
-    if (bIsGround == false && fYVelocity <= -7.f)
+    if (bIsGround == false && fYVelocity <= CKirby::s_fFallVelocityY)
     {  
         pKirby->Change_State(KIRBY_STATE_TYPE::FALL);
         return true;

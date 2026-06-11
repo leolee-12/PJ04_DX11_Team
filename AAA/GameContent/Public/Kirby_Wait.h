@@ -13,7 +13,7 @@ class CKirby;
 
 class CLIENT_DLL CKirby_Wait final : public CKirby_State
 {
-protected:
+private:
 	CKirby_Wait();
 	virtual ~CKirby_Wait() = default;
 

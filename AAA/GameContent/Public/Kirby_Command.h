@@ -11,14 +11,27 @@ enum class KIRBY_COMMAND_TYPE
 	NONE,
 	MOVE_TOP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT,
 	JUMP,  // A
-	ATTACK_DOWN, ATTACK_UP // B
+	ATTACK // B
 };
+
+enum class KEY_STATE_TYPE { DOWN, PRESS, UP };
 
 class CLIENT_DLL CKirby_Command abstract : public CBase
 {
 public:
+	CKirby_Command(KEY_STATE_TYPE eKeyState) { m_eKeyState = eKeyState; }
 	virtual ~CKirby_Command() = default;
 	virtual KIRBY_COMMAND_TYPE GetCommandType() = 0;
+
+public:
+	KEY_STATE_TYPE Get_KeyStateType() { return m_eKeyState; }
+
+	_bool IsDown() { return m_eKeyState == KEY_STATE_TYPE::DOWN; }
+	_bool IsPress() { return m_eKeyState == KEY_STATE_TYPE::PRESS; }
+	_bool IsUp() { return m_eKeyState == KEY_STATE_TYPE::UP; }
+
+protected:
+	KEY_STATE_TYPE m_eKeyState{};
 
 protected:	
 	virtual void Free() { __super::Free(); }
@@ -27,7 +40,7 @@ protected:
 class CLIENT_DLL Move_Command abstract : public CKirby_Command
 {
 public:
-	Move_Command(const _float3& vDir) :m_vDir(vDir) {};
+	Move_Command(KEY_STATE_TYPE eKeyState, const _float3& vDir) :CKirby_Command(eKeyState), m_vDir(vDir) {};
 	virtual ~Move_Command() = default;
 	virtual KIRBY_COMMAND_TYPE GetCommandType() = 0;
 
@@ -44,7 +57,7 @@ protected:
 class CLIENT_DLL MoveTop_Command final : public Move_Command
 {
 public:
-	MoveTop_Command(const _float3& vDir) :Move_Command(vDir) {};
+	MoveTop_Command(KEY_STATE_TYPE eKeyState, const _float3& vDir) :Move_Command(eKeyState, vDir) {};
 	virtual ~MoveTop_Command() = default;
 	virtual KIRBY_COMMAND_TYPE GetCommandType() override { return KIRBY_COMMAND_TYPE::MOVE_TOP; }
 
@@ -55,7 +68,7 @@ private:
 class CLIENT_DLL MoveBottom_Command final : public Move_Command
 {
 public:
-	MoveBottom_Command(const _float3& vDir) :Move_Command(vDir) {};
+	MoveBottom_Command(KEY_STATE_TYPE eKeyState, const _float3& vDir) :Move_Command(eKeyState, vDir) {};
 	virtual ~MoveBottom_Command() = default;
 	virtual KIRBY_COMMAND_TYPE GetCommandType() override { return KIRBY_COMMAND_TYPE::MOVE_DOWN; }
 
@@ -66,7 +79,7 @@ private:
 class CLIENT_DLL MoveLeft_Command final : public Move_Command
 {
 public:
-	MoveLeft_Command(const _float3& vDir) :Move_Command(vDir) {};
+	MoveLeft_Command(KEY_STATE_TYPE eKeyState, const _float3& vDir) :Move_Command(eKeyState, vDir) {};
 	virtual ~MoveLeft_Command() = default;
 	virtual KIRBY_COMMAND_TYPE GetCommandType() override { return KIRBY_COMMAND_TYPE::MOVE_LEFT; }
 
@@ -77,7 +90,7 @@ private:
 class CLIENT_DLL MoveRight_Command final : public Move_Command
 {
 public:
-	MoveRight_Command(const _float3& vDir) :Move_Command(vDir) {};
+	MoveRight_Command(KEY_STATE_TYPE eKeyState, const _float3& vDir) :Move_Command(eKeyState, vDir) {};
 	virtual ~MoveRight_Command() = default;
 	virtual KIRBY_COMMAND_TYPE GetCommandType() override { return KIRBY_COMMAND_TYPE::MOVE_RIGHT; }
 
@@ -90,6 +103,7 @@ private:
 class CLIENT_DLL Jump_Command final : public CKirby_Command
 {
 public:
+	Jump_Command(KEY_STATE_TYPE eKeyState) :CKirby_Command(eKeyState) {};
 	virtual ~Jump_Command() = default;
 	virtual KIRBY_COMMAND_TYPE GetCommandType() override { return KIRBY_COMMAND_TYPE::JUMP; }
 
@@ -98,21 +112,12 @@ private:
 };
 
 
-class CLIENT_DLL ATTACK_DOWN_Command final : public CKirby_Command
+class CLIENT_DLL ATTACK_Command final : public CKirby_Command
 {
 public:
-	virtual ~ATTACK_DOWN_Command() = default;
-	virtual KIRBY_COMMAND_TYPE GetCommandType() override { return KIRBY_COMMAND_TYPE::ATTACK_DOWN; }
-
-private:
-	virtual void Free() { __super::Free(); }
-};
-
-class CLIENT_DLL ATTACK_UP_Command final : public CKirby_Command
-{
-public:
-	virtual ~ATTACK_UP_Command() = default;
-	virtual KIRBY_COMMAND_TYPE GetCommandType() override { return KIRBY_COMMAND_TYPE::ATTACK_UP; }
+	ATTACK_Command(KEY_STATE_TYPE eKeyState) :CKirby_Command(eKeyState) {};
+	virtual ~ATTACK_Command() = default;
+	virtual KIRBY_COMMAND_TYPE GetCommandType() override { return KIRBY_COMMAND_TYPE::ATTACK; }
 
 private:
 	virtual void Free() { __super::Free(); }

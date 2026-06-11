@@ -33,13 +33,13 @@ public:
     void  Set_Stats(_float fMoveSpeed, _float fRotSpeedDeg, _float fGravity, _float fJumpSpeed);
     void  Set_Acceleration(_float Accel, _float Decel);
 
-    void  Set_MoveSpeed(_float fMoveSpeed);
+    void  Set_MoveSpeed(_float fMoveSpeed) { m_fMoveSpeed = fMoveSpeed; }
 
     _float Get_VerticalVelocity() { return m_fVerticalVelocity; }
 
     _bool Move(_fvector vWishDir, _float fTimeDelta);
     void  Jump();
-    void  Sync_To_Controller();
+    virtual void  Sync_To_Controller();
 
     _bool Is_Grounded() const { return m_bGrounded; }
 
@@ -55,6 +55,7 @@ protected:
 
     _float3 m_vHorizVel = { 0.f, 0.f, 0.f };
 
+private:
     _bool  m_bJumpQueued = { false };
 
 public:
