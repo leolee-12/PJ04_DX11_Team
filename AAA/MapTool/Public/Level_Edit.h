@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "MapTool_Defines.h"
 #include "Level.h"
+#include "Map_LevelContent.h"
 
 NS_BEGIN(Engine)
 class CGameObject;
@@ -15,7 +16,7 @@ NS_END
 NS_BEGIN(MapTool)
 class CEditCamera;
 class CEdit_Grid;
-//class CNavMesh_Editor;
+class CMap_PreviewSession;
 
 class CLevel_Edit final : public CLevel
 {
@@ -38,8 +39,6 @@ public:
 
 public:
 	CGameObject* Spawn_Object(const wstring& strProtoTag, const wstring& strLayerTag, const wstring& strName, void* pArg = nullptr);
-	void Save_Level(const wstring& strFilePath, const wstring& strLevelTag);
-	void Load_Level(const wstring& strFilePath);
 
 public:
 	// Layer
@@ -68,6 +67,16 @@ public:
 	const _wstring& Get_MapPreviewStatus() const { return m_strMapPreviewStatus; }
 	_bool   Is_MapStageLoaded() const { return m_bMapStageLoaded; }
 	_bool   Is_MapEnvLoaded() const { return m_bMapEnvLoaded; }
+	_bool   Is_MapPreviewObject(CGameObject* pObject) const
+	{
+		return nullptr != pObject
+			&& m_MapPreviewObjects.find(pObject) != m_MapPreviewObjects.end();
+	}
+
+	const CMap_PreviewSession* Get_MapPreviewSession() const { return m_pMapPreviewSession; }
+	HRESULT Restore_DeletedMapPreviewEnv(const _wstring& strStableKey);
+	HRESULT Restore_AllDeletedMapPreviewEnv();
+	HRESULT Save_MapOverride();
 
 	// Getter & Setter
 	const unordered_map<wstring, vector<EDITOR_OBJECT_HANDLE>>& Get_Layers() { return m_Layers; }
@@ -80,6 +89,9 @@ public:
 
 	void Preview_Camera(CGameObject* pCam);
 	void Back_To_Edit();
+
+public:	// Hierarchy
+	_uint Get_HierarchyRevision() const { return m_iHierarchyRevision; }
 
 private:
 	CEditCamera* m_pCamera = { nullptr };
@@ -102,10 +114,12 @@ private:
 	unordered_set<CGameObject*> m_MapPreviewObjects;
 	_bool   m_bMapStageLoaded = { false };
 	_bool   m_bMapEnvLoaded = { false };
+	MAP_LEVEL_CONTENT_DESC m_MapContentDesc = {};
+	CMapStage* m_pMapStage = { nullptr };
+	CMap_PreviewSession* m_pMapPreviewSession = { nullptr };
 
-	_bool m_bNavEditMode = { false };
-	CLumia* m_pLumia = { nullptr };
-	Client::CMapStage* m_pMapStage = { nullptr };
+	// Hierarchy
+	_uint m_iHierarchyRevision = {};
 
 private:
 	virtual HRESULT Ready_Events() override { return S_OK; }
@@ -113,7 +127,7 @@ private:
 	HRESULT  Ready_EditCamera();
 	HRESULT  Ready_EditGrid();
 	HRESULT  Ready_MapStage();
-	HRESULT  Ready_EnvObjects();
+	HRESULT  Ready_EnvObjects(vector<ENV_OBJECT_DESC>* pOutDeletedEnvDescs = nullptr);
 
 private:
 	void Clear_MapPreviewLayer(const _wstring& strLayerTag);
@@ -123,6 +137,19 @@ private:
 		const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);
 	static void On_EnvObjectCreated(void* pContext, CGameObject* pObject,
 		const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);
+
+	HRESULT Prepare_MapContentForPreviewLoad(_uint iPresetIndex, _bool bPresetChanged, _bool bPreserveEnvRuntimeState);
+	void    Sync_MapPreviewRuntimeStateToSession();
+	_bool   Handle_MapSpecificDeletion(CGameObject* pObject);
+	_bool   Try_RegisterAddedMapOverridePlacement(CGameObject* pObject, const _wstring& strObjectTag);
+	void    Try_RegisterLoadedAddedMapObject(
+		CGameObject* pObject,
+		const _wstring& strPrototypeTag,
+		const _wstring& strLayerTag,
+		const _wstring& strObjectTag);
+
+  private:	// Hierarchy
+		void Mark_HierarchyDirty() { ++m_iHierarchyRevision; }
 
 public:
 	static CLevel_Edit* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

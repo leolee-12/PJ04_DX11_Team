@@ -317,7 +317,7 @@ HRESULT CEnvObject::Render()
 
 		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", static_cast<_uint>(i), MTEX_TYPE::DIFFUSE,
 			Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)])))
-			continue;
+			int a = 1;/*continue;*/
 		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", static_cast<_uint>(i), MTEX_TYPE::NORMALS,
 			Layer.idx[ETOUI(MTEX_TYPE::NORMALS)])))
 			int a = 1;/*continue;*/
@@ -330,15 +330,18 @@ HRESULT CEnvObject::Render()
 
 		_uint iPass = (Layer.iPass >= 0)
 			? static_cast<_uint>(Layer.iPass)
-			: ShaderPass::NonAnimPBR::White;
+			: ShaderPass::NonAnimPBR::Diffuse;
 
-		if (iPass > ShaderPass::NonAnimPBR::Diffuse)
-			iPass = ShaderPass::NonAnimPBR::White;
-
-		//if (FAILED(m_pShaderCom->Begin(iPass)))
-		//	return E_FAIL;
-		if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::Diffuse)))
+		if (FAILED(m_pShaderCom->Begin(iPass)))
 			return E_FAIL;
+
+		/* ---- 강제 렌더링 (디버그용) ---- */
+		//if (iPass > ShaderPass::NonAnimPBR::Diffuse)
+		//	iPass = ShaderPass::NonAnimPBR::White;
+		//
+		//if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::White)))
+		//	return E_FAIL;
+		/* -------------------------------- */
 
 		if (FAILED(m_pModelCom->Render(static_cast<_uint>(i))))
 			return E_FAIL;

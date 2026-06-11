@@ -1,19 +1,43 @@
 ﻿#include "Panel_Inspector.h"
-
 #include "EditInstance.h"
 #include "Level_Edit.h"
 
+#include "MapStage.h"
+#include "MapSection.h"
+
 #include "GameInstance.h"
 #include "GameObject.h"
-#include "Component.h"
-#include "Transform.h"
-#include "Model.h"
 #include "ContainerObject.h"
 #include "PartObject.h"
 #include "UIContainerObject.h"
 #include "UIPartObject.h"
 
 #include "imgui.h"
+
+namespace
+{
+    const char* TexTypeName(_uint t)
+    {
+        static const char* names[MTEX_TYPE_MAX] = {
+                "None","Diffuse","Specular","Ambient","Emissive","Height","Normals","Shininess",
+                "Opacity","Displacement","Lightmap","Reflection","BaseColor","NormalCamera",
+                "EmissionColor","Metalness(MRA)","Roughness","AO","Unknown(Mask)","Sheen","Clearcoat",
+                "Transmission","MayaBase","MayaSpecular","MayaSpecColor","MayaSpecRough","Anisotropy"
+        };
+
+        return (t < MTEX_TYPE_MAX) ? names[t] : "?";
+    }
+
+    int ToMapRenderGroupIndex(RENDERID eRenderID)
+    {
+        return (eRenderID == RENDERID::BLEND) ? 1 : 0;
+    }
+
+    RENDERID FromMapRenderGroupIndex(int iIndex)
+    {
+        return (iIndex == 1) ? RENDERID::BLEND : RENDERID::NONBLEND;
+    }
+}
 
 CPanel_Inspector::CPanel_Inspector(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPanel(pDevice, pContext)
@@ -47,6 +71,11 @@ void CPanel_Inspector::Render()
 
     ImGui::Separator();
 
+    Draw_MeshLayerPanel(pSelected);
+
+    ImGui::Separator();
+    ImGui::Separator();
+
     Draw_Properties(pSelected);
 
     for (auto& [tag, pComponent] : pSelected->Get_Components())
@@ -62,6 +91,8 @@ void CPanel_Inspector::Render()
             ImGui::PopID();
         }
     }
+
+    ImGui::Separator();
 
     if (auto pContainer = dynamic_cast<CContainerObject*>(pSelected))
     {
@@ -102,6 +133,9 @@ void CPanel_Inspector::Render()
             }
         }
     }
+
+    if (auto pMapStage = dynamic_cast<Client::CMapStage*>(pSelected))
+        Draw_MapStageSections(pMapStage);
 
     End_Panel();
 }
@@ -156,6 +190,7 @@ void CPanel_Inspector::Draw_Properties(IReflectable* pHolder)
             CGameObject* pObject = dynamic_cast<CGameObject*>(pHolder);
             CModel* pModel = pObject ? pObject->Get_Component<CModel>(L"Com_Model") : nullptr;
             if (!pModel) break;
+
             _uint iNumAnims = pModel->Get_MaxAnimationIndex() + 1;
             string strItems;
             for (_uint i = 0; i < iNumAnims; ++i)
@@ -243,6 +278,136 @@ void CPanel_Inspector::Draw_Transform(CGameObject* pObject, const string& strSuf
         if (ImGui::DragFloat(("Scale##" + strSuffix).c_str(), &fUniformScale, 0.1f))
             pTransform->Set_Scale(fUniformScale, fUniformScale, fUniformScale);
     }
+}
+
+void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
+{
+    if (nullptr == pObject)
+        return;
+
+    CModel* pModel = pObject->Get_Component<CModel>(L"Com_Model");
+    if (nullptr == pModel)
+        return;
+
+    if (!ImGui::CollapsingHeader("Mesh Render Settings (per Model)"))
+        return;
+
+    const size_t iNumMeshes = pModel->Get_NumMeshes();
+    for (size_t i = 0; i < iNumMeshes; ++i)
+    {
+        MESH_LAYER_IDX Layer = pModel->Get_MeshLayer((_uint)i);
+
+        ImGui::PushID((int)i);
+        ImGui::Text("%zu: %s", i, pModel->Get_MeshName((_uint)i).c_str());
+
+        _bool bChanged = false;
+        _bool bAnyField = false;
+
+        int iPass = Layer.iPass;
+        ImGui::SetNextItemWidth(120.f);
+        if (ImGui::InputInt("Pass", &iPass))
+        {
+            if (iPass < -1)
+                iPass = -1;
+
+            Layer.iPass = iPass;
+            bChanged = true;
+        }
+        ImGui::SameLine();
+        ImGui::TextDisabled("(-1 = default)");
+
+        for (_uint t = 0; t < MTEX_TYPE_MAX; ++t)
+        {
+            int iCount = (int)pModel->Get_MeshTextureCount((_uint)i, (MTEX_TYPE)t);
+            if (iCount <= 1)
+                continue;
+
+            bAnyField = true;
+
+            int iValue = (int)Layer.idx[t];
+            ImGui::SetNextItemWidth(120.f);
+            if (ImGui::InputInt(TexTypeName(t), &iValue))
+            {
+                if (iValue < 0)
+                    iValue = 0;
+                if (iValue >= iCount)
+                    iValue = iCount - 1;
+
+                Layer.idx[t] = (_uint)iValue;
+                bChanged = true;
+            }
+            ImGui::SameLine();
+            ImGui::Text("/ %d", iCount);
+        }
+
+        if (!bAnyField)
+            ImGui::TextDisabled("  (no texture slot override)");
+
+        if (bChanged)
+            pModel->Set_MeshLayer((_uint)i, Layer);
+
+        ImGui::Separator();
+        ImGui::PopID();
+    }
+
+    if (ImGui::Button("Bake (Save sidecar)"))
+    {
+        if (FAILED(pModel->Save_MeshLayers()))
+            MSG_BOX("MESH LAYER SAVE FAILED");
+    }
+}
+
+void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
+{
+    if (nullptr == pMapStage)
+        return;
+
+    const auto& Sections = pMapStage->Get_Sections();
+
+    ImGui::Separator();
+    ImGui::Text("Sections (%d)", (int)Sections.size());
+
+    for (Client::CMapSection* pSection : Sections)
+    {
+        if (nullptr == pSection)
+            continue;
+
+        string strName = WstrToStr(pSection->Get_SectionName());
+        string strHeader = strName + "##Section_" + to_string((uintptr_t)pSection);
+
+        if (ImGui::CollapsingHeader(strHeader.c_str()))
+        {
+            ImGui::PushID(pSection);
+
+            Draw_Transform(pSection, strName);
+            ImGui::Separator();
+            Draw_Properties(pSection);
+            ImGui::Separator();
+            Draw_MeshLayerPanel(pSection);
+            ImGui::Separator();
+            Draw_MapSectionRenderOptions(pSection);
+
+            ImGui::PopID();
+        }
+
+        ImGui::Separator();
+        ImGui::Separator();
+    }
+}
+
+void CPanel_Inspector::Draw_MapSectionRenderOptions(Client::CMapSection* pSection)
+{
+    if (nullptr == pSection)
+        return;
+
+    if (!ImGui::CollapsingHeader("Render Group (per Section)", ImGuiTreeNodeFlags_DefaultOpen))
+        return;
+
+    int iRenderGroup = ToMapRenderGroupIndex(pSection->Get_RenderID());
+    const char* RenderGroups[] = { "NONBLEND", "BLEND" };
+
+    if (ImGui::Combo("Render Group", &iRenderGroup, RenderGroups, IM_ARRAYSIZE(RenderGroups)))
+        pSection->Set_RenderID(FromMapRenderGroupIndex(iRenderGroup));
 }
 
 CPanel_Inspector* CPanel_Inspector::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
