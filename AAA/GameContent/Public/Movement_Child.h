@@ -26,6 +26,13 @@ class CMovement_Child final : public CMovement
 
     PROPERTY(_float,    m_fRotation_Speed_Degree,   L"회전 속도 (Degree)",    L"RigidBody")
 
+    PROPERTY(_float,    m_fMaxCoyoteTime,           L"Coyote Time",           L"RigidBody")
+
+    // 접지 관련
+    PROPERTY(_float, m_fGroundPermitDistance,       L"GroundPermitDistance",    L"RigidBody")
+    PROPERTY(_float, m_RayOriginOffsetFromFoot,     L"RayOriginOffsetFromFoot", L"RigidBody")
+
+
 public:
     enum class FORCE_MODE
     {
@@ -50,6 +57,8 @@ public:
 public:
     // Rigidbody 메인 업데이트. 외부 입력 방향을 인자로 받지 않는다.
     _bool Update_RigidBody(_float fTimeDelta);
+
+    _bool Check_GroundBelow();
 
     // Unity Rigidbody.AddForce 느낌.
     void Add_Force(_fvector vValue, FORCE_MODE eMode = FORCE_MODE::FORCE);
@@ -107,12 +116,17 @@ private:
     void Move_Controller(_fvector vVelocity, _float fTimeDelta, _vector& vOutVelocity);
     void Sync_BaseVelocityFields();
 
+    void Update_CoyoteTimer(_float fDeltaTime);
+
 private:
     _float3 m_vVelocity = { 0.f, 0.f, 0.f };
     _float3 m_vForce = { 0.f, 0.f, 0.f };
     _float3 m_vAcceleration = { 0.f, 0.f, 0.f };
 
     _bool  m_bStopHorizontalOnSideHit = { false };
+
+private:
+    _float m_fAccCoyoteTime{};
 
 public:
     static CMovement_Child* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

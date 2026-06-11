@@ -34,11 +34,13 @@ public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
 private:
+	JUMP_STATE m_eJumpType{};
+	static _bool s_bLeft;
+
 	_bool m_bFirstFrameSkip{};
 
-	JUMP_STATE m_eJumpType{};
-
-	static _bool m_bLeft;
+	_float m_fAccGroundIgnoreTime{};
+	_float m_fMaxGroundIgnoreTime{};
 
 public:
 	static CKirby_Jump* Create();

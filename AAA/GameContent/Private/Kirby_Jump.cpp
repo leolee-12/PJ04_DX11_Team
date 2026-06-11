@@ -7,7 +7,7 @@
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
 
- _bool CKirby_Jump::m_bLeft = false;
+ _bool CKirby_Jump::s_bLeft = false;
 
 CKirby_Jump::CKirby_Jump()
 {
@@ -15,6 +15,8 @@ CKirby_Jump::CKirby_Jump()
 
 HRESULT CKirby_Jump::Initialize()
 {
+    m_fMaxGroundIgnoreTime = 0.5f;
+
     return S_OK;
 }
 
@@ -31,13 +33,13 @@ void CKirby_Jump::Enter(CKirby* pKirby)
 
     // Ani
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
-    if (m_bLeft == true)
+    if (s_bLeft == true)
         pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::JUMP_L));
     else
         pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::JUMP_R));
 
     // First Frame Skip
-    m_bFirstFrameSkip = false;
+    m_fAccGroundIgnoreTime = m_fMaxGroundIgnoreTime;
 
     // Jump State
     m_eJumpType = JUMP_STATE::JUMP_STRAT;
@@ -46,9 +48,13 @@ void CKirby_Jump::Enter(CKirby* pKirby)
 void CKirby_Jump::Update(CKirby* pKirby, const _float fTimeDelta)
 {
     // First Frame Skip
-    if (m_bFirstFrameSkip == false)
+    if (m_fAccGroundIgnoreTime > 0.f)
     {
-        m_bFirstFrameSkip = true;
+        m_fAccGroundIgnoreTime -= fTimeDelta;
+
+        if (m_fAccGroundIgnoreTime < 0.f)
+            m_fAccGroundIgnoreTime = 0.f;
+
         return;
     }
 
@@ -65,7 +71,7 @@ void CKirby_Jump::Update(CKirby* pKirby, const _float fTimeDelta)
         {
             CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
 
-            if (m_bLeft == true)
+            if (s_bLeft == true)
                 pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::JUMP_END_L));
             else
                 pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::JUMP_END_R));
@@ -84,7 +90,7 @@ void CKirby_Jump::Exit(CKirby* pKirby)
     m_bFirstFrameSkip = false;
 
     // 왼발 점프, 오른발 점프
-    m_bLeft = !m_bLeft;
+    s_bLeft = !s_bLeft;
 }
 
 _bool CKirby_Jump::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)

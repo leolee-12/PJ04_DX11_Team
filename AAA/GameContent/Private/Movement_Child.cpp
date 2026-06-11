@@ -57,6 +57,11 @@ CMovement_Child::CMovement_Child(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
     , m_fRotation_Speed_Degree(720.f)
 
+    , m_fMaxCoyoteTime(0.1f)
+
+    , m_fGroundPermitDistance(0.2f)
+    , m_RayOriginOffsetFromFoot(0.15f)
+
     , m_vVelocity{ 0.f, 0.f, 0.f }
     , m_vForce{ 0.f, 0.f, 0.f }
     , m_vAcceleration{ 0.f, 0.f, 0.f }
@@ -81,6 +86,11 @@ CMovement_Child::CMovement_Child(const CMovement_Child& Prototype)
 
     , m_bStopHorizontalOnSideHit(Prototype.m_bStopHorizontalOnSideHit)
     , m_fRotation_Speed_Degree(Prototype.m_fRotation_Speed_Degree)
+
+    , m_fGroundPermitDistance(Prototype.m_fGroundPermitDistance)
+    , m_RayOriginOffsetFromFoot(Prototype.m_RayOriginOffsetFromFoot)
+
+    , m_fMaxCoyoteTime(Prototype.m_fMaxCoyoteTime)
     // Prototype의 런타임 물리 상태는 복사 x
     , m_vVelocity{ 0.f, 0.f, 0.f }
     , m_vForce{ 0.f, 0.f, 0.f }
@@ -127,6 +137,7 @@ _bool CMovement_Child::Update_RigidBody(_float fTimeDelta)
 
     // PhysX Controller
     Move_Controller(vVelocity, fTimeDelta, vVelocity);
+    Update_CoyoteTimer(fTimeDelta);
 
     // 수정된 Velocity 저장
     XMStoreFloat3(&m_vVelocity, vVelocity);
@@ -137,6 +148,62 @@ _bool CMovement_Child::Update_RigidBody(_float fTimeDelta)
     Clear_Forces();
 
     return m_bGrounded;
+}
+
+_bool CMovement_Child::Check_GroundBelow()
+{
+    // PxController가 속한 Scene을 가져옴.
+    physx::PxScene* pScene = m_pController->getScene();
+    if (pScene == nullptr)
+        return false;
+
+    // 발 위치를 가지고 옴.
+    const physx::PxExtendedVec3& vFoot = m_pController->getFootPosition();
+
+    // Ray 시작 위치
+    physx::PxVec3 vOrigin(
+        static_cast<float>(vFoot.x),
+        static_cast<float>(vFoot.y) + m_RayOriginOffsetFromFoot,
+        static_cast<float>(vFoot.z)
+    );
+
+    // Ray 방향
+    physx::PxVec3 vDir(0.f, -1.f, 0.f);
+
+    // 총 거리
+    const _float fMaxDistance = m_RayOriginOffsetFromFoot + m_fGroundPermitDistance;
+
+    // 레이케스트 결과를 담는 버퍼
+    physx::PxRaycastBuffer HitBuffer;
+
+    // static들만 검사
+    physx::PxQueryFilterData FilterData;
+    FilterData.flags = physx::PxQueryFlag::eSTATIC;
+
+    // ray 쏨
+    const bool bHit = pScene->raycast(
+        vOrigin,
+        vDir,
+        fMaxDistance,
+        HitBuffer,
+        physx::PxHitFlag::ePOSITION |
+        physx::PxHitFlag::eNORMAL,
+        FilterData
+    );
+
+    if (bHit == false || HitBuffer.hasBlock == false)
+        return false;
+
+    // 가장 가까운 충돌 결과를 꺼냄
+    const physx::PxRaycastHit& Hit = HitBuffer.block;
+
+    // 45도 이하만 바닥으로 인정
+    const _float fMinGroundNormalY = cosf(physx::PxPi / 4.f);
+
+    if (Hit.normal.y < fMinGroundNormalY)
+        return false;
+
+    return true;
 }
 
 void CMovement_Child::Add_Force(_fvector vValue, FORCE_MODE eMode)
@@ -196,11 +263,12 @@ _bool CMovement_Child::Try_Jump()
 
 _bool CMovement_Child::Try_Jump(_float fJumpVelocity)
 {
-    if (!m_bGrounded)
+    if (!m_bGrounded && m_fAccCoyoteTime <= 0.f)
         return false;
 
     Set_VelocityY(fJumpVelocity);
     m_bGrounded = false;
+    m_fAccCoyoteTime = 0.f;
     return true;
 }
 
@@ -213,6 +281,7 @@ void CMovement_Child::Force_Jump(_float fJumpVelocity)
 {
     Set_VelocityY(fJumpVelocity);
     m_bGrounded = false;
+    m_fAccCoyoteTime = 0.f;
 }
 
 void CMovement_Child::Set_Velocity(_fvector vVelocity)
@@ -470,9 +539,10 @@ void CMovement_Child::Move_Controller(_fvector vVelocity, _float fTimeDelta, _ve
         XMVectorSet(static_cast<_float>(foot.x), static_cast<_float>(foot.y), static_cast<_float>(foot.z), 1.f));
 
     // 접지 정리
-    m_bGrounded = flags.isSet(physx::PxControllerCollisionFlag::eCOLLISION_DOWN);
-    if (m_bGrounded && XMVectorGetY(vOutVelocity) < 0.f)
-        vOutVelocity = XMVectorSetY(vOutVelocity, 0.f);
+    _bool bControllerGrounded = flags.isSet(physx::PxControllerCollisionFlag::eCOLLISION_DOWN);
+    _bool bPermitGrounded = Check_GroundBelow();
+
+    m_bGrounded = bControllerGrounded || bPermitGrounded;
 
     //// 천장에 머리 박았을 때 수직 속도 제거
     //if (flags.isSet(physx::PxControllerCollisionFlag::eCOLLISION_UP) && XMVectorGetY(vOutVelocity) > 0.f)
@@ -487,6 +557,17 @@ void CMovement_Child::Sync_BaseVelocityFields()
 {
     m_fVerticalVelocity = m_vVelocity.y;
     m_vHorizVel = { m_vVelocity.x, 0.f, m_vVelocity.z };
+}
+
+void CMovement_Child::Update_CoyoteTimer(_float fDeltaTime)
+{
+    if (m_bGrounded)
+        m_fAccCoyoteTime = m_fMaxCoyoteTime;
+    else
+        m_fAccCoyoteTime -= fDeltaTime;
+
+    if (m_fAccCoyoteTime < 0.f)
+        m_fAccCoyoteTime = 0.f;
 }
 
 CMovement_Child* CMovement_Child::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
