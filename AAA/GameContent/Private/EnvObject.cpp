@@ -178,11 +178,11 @@ HRESULT CEnvObject::Ready_PhysicsActor()
 
 HRESULT CEnvObject::Ready_PhysicsActor_ModelMesh()
 {
-	if (m_tDesc.tCollision.bInvalidCollision)
+	if (!m_tDesc.tCollision.bHasDecorCollisionApxbin)
 	{
 #ifdef _DEBUG
-		Log_EnvPhysicsWarning(
-			"[EnvPhysics] MODEL_MESH actor blocked by IsInvalidCollision. object="
+		Log_EnvPhysicsInfo(
+			"[EnvPhysics] MODEL_MESH actor skipped: no decor collision apxbin. object="
 			+ WstrToStr(m_tDesc.strObjectName)
 			+ " uid="
 			+ to_string(m_tDesc.iUid)
@@ -241,6 +241,8 @@ HRESULT CEnvObject::Ready_PhysicsActor_ModelMesh()
 		+ WstrToStr(m_tDesc.strObjectName)
 		+ " uid="
 		+ to_string(m_tDesc.iUid)
+		+ " apxbin="
+		+ WstrToStr(m_tDesc.tCollision.strDecorCollisionApxbinName)
 		+ " modelTag="
 		+ WstrToStr(m_tDesc.strModelProtoTag));
 #endif
@@ -263,16 +265,17 @@ _bool CEnvObject::Should_CreatePhysicsActor() const
 {
 	const ENV_COLLISION_DESC& Collision = m_tDesc.tCollision;
 
-	// 충돌 무효 플래그가 켜져 있으면, eColliderKind가 무엇이든 Actor를 만들지 않는다.
-	if (Collision.bInvalidCollision)
-		return false;
-
 	switch (Collision.eColliderKind)
 	{
 	case ENV_COLLIDER_KIND::MODEL_MESH:
+		// Decor 모델 메쉬 충돌은 카탈로그 hit가 최종 기준이다.
+		return Collision.bHasDecorCollisionApxbin
+			&& !Collision.bInvalidCollision;
+
 	case ENV_COLLIDER_KIND::SIMPLE_SHAPE:
 	case ENV_COLLIDER_KIND::TRIGGER_ONLY:
-		return true;
+		// 단순 충돌/트리거는 기존 원본 invalid 플래그를 존중한다.
+		return !Collision.bInvalidCollision;
 
 	case ENV_COLLIDER_KIND::NONE:
 	case ENV_COLLIDER_KIND::UNKNOWN:

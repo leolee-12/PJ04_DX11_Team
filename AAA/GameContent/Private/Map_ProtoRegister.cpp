@@ -11,6 +11,18 @@
 
 #include <exception>
 
+namespace
+{
+	_bool Needs_EnvModelCollisionCook(const ENV_OBJECT_DESC& Desc)
+	{
+		const ENV_COLLISION_DESC& Collision = Desc.tCollision;
+
+		return Collision.eColliderKind == ENV_COLLIDER_KIND::MODEL_MESH
+			&& Collision.bHasDecorCollisionApxbin
+			&& !Collision.bInvalidCollision;
+	}
+}
+
 NS_BEGIN(Client)
 
 CMap_ProtoRegister::CMap_ProtoRegister(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -34,72 +46,57 @@ HRESULT CMap_ProtoRegister::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, c
 			return E_FAIL;
 	}
 
+	unordered_set<wstring> AllEnvModelTags;
 	unordered_set<wstring> CookRequiredEnvModelTags;
+
+	const size_t iTotalEnvDescCount = Package.EnvObjectDescs.size();
 
 	for (const ENV_OBJECT_DESC& Desc : Package.EnvObjectDescs)
 	{
 		if (Desc.strModelProtoTag.empty())
 			continue;
 
-		if (!Desc.tCollision.bInvalidCollision
-			&& Desc.tCollision.eColliderKind == ENV_COLLIDER_KIND::MODEL_MESH)
-		{
+		AllEnvModelTags.insert(Desc.strModelProtoTag);
+
+		if (Needs_EnvModelCollisionCook(Desc))
 			CookRequiredEnvModelTags.insert(Desc.strModelProtoTag);
-		}
 	}
 
 #ifdef _DEBUG
 	{
-		size_t iTotalEnvDescCount = 0;
-		size_t iInvalidCollisionDescCount = 0;
+		size_t iCatalogCheckedDescCount = 0;
+		size_t iCatalogHitDescCount = 0;
 		size_t iModelMeshDescCount = 0;
-		size_t iModelMeshValidDescCount = 0;
-		size_t iSimpleShapeValidDescCount = 0;
-		size_t iNoneDescCount = 0;
-
-		unordered_set<wstring> AllEnvModelTags;
+		size_t iModelMeshCookDescCount = 0;
 
 		for (const ENV_OBJECT_DESC& Desc : Package.EnvObjectDescs)
 		{
-			++iTotalEnvDescCount;
+			if (Desc.tCollision.bCatalogCollisionChecked)
+				++iCatalogCheckedDescCount;
 
-			if (!Desc.strModelProtoTag.empty())
-				AllEnvModelTags.insert(Desc.strModelProtoTag);
-
-			if (Desc.tCollision.bInvalidCollision)
-				++iInvalidCollisionDescCount;
+			if (Desc.tCollision.bHasDecorCollisionApxbin)
+				++iCatalogHitDescCount;
 
 			if (Desc.tCollision.eColliderKind == ENV_COLLIDER_KIND::MODEL_MESH)
 			{
 				++iModelMeshDescCount;
 
-				if (!Desc.tCollision.bInvalidCollision)
-					++iModelMeshValidDescCount;
-			}
-			else if (Desc.tCollision.eColliderKind == ENV_COLLIDER_KIND::SIMPLE_SHAPE)
-			{
-				if (!Desc.tCollision.bInvalidCollision)
-					++iSimpleShapeValidDescCount;
-			}
-			else if (Desc.tCollision.eColliderKind == ENV_COLLIDER_KIND::NONE)
-			{
-				++iNoneDescCount;
+				if (Needs_EnvModelCollisionCook(Desc))
+					++iModelMeshCookDescCount;
 			}
 		}
 
 		Log_GameContentInfo(
 			"EnvPhysics summary: totalDesc="
 			+ to_string(iTotalEnvDescCount)
-			+ " invalidDesc="
-			+ to_string(iInvalidCollisionDescCount)
+			+ " catalogChecked="
+			+ to_string(iCatalogCheckedDescCount)
+			+ " catalogHit="
+			+ to_string(iCatalogHitDescCount)
 			+ " modelMeshDesc="
 			+ to_string(iModelMeshDescCount)
-			+ " validModelMeshDesc="
-			+ to_string(iModelMeshValidDescCount)
-			+ " validSimpleShapeDesc="
-			+ to_string(iSimpleShapeValidDescCount)
-			+ " noneDesc="
-			+ to_string(iNoneDescCount)
+			+ " modelMeshCookDesc="
+			+ to_string(iModelMeshCookDescCount)
 			+ " totalModelTags="
 			+ to_string(AllEnvModelTags.size())
 			+ " cookModelTags="
@@ -232,7 +229,10 @@ HRESULT CMap_ProtoRegister::Ready_MapSectionModel(_uint iModelLevel, const MAP_S
 	return S_OK;
 }
 
-HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_DESC& Desc, _bool bCookCollisionMesh)
+HRESULT CMap_ProtoRegister::Ready_EnvModel(
+	_uint iModelLevel,
+	const ENV_OBJECT_DESC& Desc,
+	_bool bCookCollisionMesh)
 {
 	if (nullptr == m_pProxy)
 		return E_FAIL;
@@ -242,6 +242,21 @@ HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_D
 
 	if (m_pProxy->Has_Prototype(iModelLevel, Desc.strModelProtoTag))
 		return S_OK;
+
+#ifdef _DEBUG
+	if (bCookCollisionMesh)
+	{
+		Log_GameContentInfo(
+			"[EnvCook] begin object="
+			+ WstrToStr(Desc.strObjectName)
+			+ " protoTag="
+			+ WstrToStr(Desc.strModelProtoTag)
+			+ " path="
+			+ WstrToStr(Desc.strModelPath)
+			+ " apxbin="
+			+ WstrToStr(Desc.tCollision.strDecorCollisionApxbinName));
+	}
+#endif
 
 	const string strModelPath = WstrToStr(Desc.strModelPath);
 	CModel* pModelPrototype = nullptr;
@@ -260,11 +275,25 @@ HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_D
 	catch (const std::exception& e)
 	{
 		Log_GameContentWarning(
-			"EnvObject model creation exception: object=" + WstrToStr(Desc.strObjectName)
-			+ " path=" + strModelPath
-			+ " reason=" + e.what());
+			"EnvObject model creation exception: object="
+			+ WstrToStr(Desc.strObjectName)
+			+ " path="
+			+ strModelPath
+			+ " reason="
+			+ e.what());
 		return E_FAIL;
 	}
+
+#ifdef _DEBUG
+	if (bCookCollisionMesh)
+	{
+		Log_GameContentInfo(
+			"[EnvCook] end object="
+			+ WstrToStr(Desc.strObjectName)
+			+ " protoTag="
+			+ WstrToStr(Desc.strModelProtoTag));
+	}
+#endif
 
 	if (nullptr == pModelPrototype)
 		return E_FAIL;

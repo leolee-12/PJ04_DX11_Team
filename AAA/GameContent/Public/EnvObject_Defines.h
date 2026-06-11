@@ -100,6 +100,12 @@ struct ENV_COLLISION_DESC
 
 	ENV_COLLIDER_KIND eColliderKind = { ENV_COLLIDER_KIND::NONE };
 	ENV_SIMPLE_SHAPE  eSimpleShape = { ENV_SIMPLE_SHAPE::NONE };
+
+	// Ãß°¡
+	_bool	bCatalogCollisionChecked = { false };
+	_bool	bHasDecorCollisionApxbin = { false };
+	wstring	strDecorCollisionApxbinName;
+	wstring	strDecorCollisionBfresPath;
 };
 
 struct ENV_RENDER_DESC

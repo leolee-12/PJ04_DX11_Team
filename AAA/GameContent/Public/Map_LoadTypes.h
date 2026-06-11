@@ -19,6 +19,7 @@ struct MAP_MANIFEST_DESC
     vector<RENDERID> SectionRenderIDs;
     vector<_wstring> EnvJsonPaths;
     _wstring strDeltaPath;
+    _wstring strDecorCollisionCatalogPath;
 };
 
 struct MAP_ADDED_OBJECT_DESC

@@ -1,9 +1,10 @@
 #include "Map_Builder.h"
-
 #include "GameContent_Log.h"
 #include "Map_ModelResolver.h"
 #include "Map_Parser.h"
 #include "Map_Override.h"
+#include "Env_CollisionCatalog.h"
+
 #include "DataLoader.h"
 
 NS_BEGIN(Client)
@@ -42,6 +43,20 @@ HRESULT CMap_Builder::Build_FromManifest(const _wstring& strManifestPath, MAP_PA
 	MAP_MANIFEST_DESC Manifest{};
 	if (FAILED(CMap_Parser::Parse_Manifest(strManifestPath, &Manifest)))
 		return E_FAIL;
+
+	if (!Manifest.strDecorCollisionCatalogPath.empty())
+	{
+		if (FAILED(CEnv_CollisionCatalog::Load(Manifest.strDecorCollisionCatalogPath)))
+		{
+			// 카탈로그가 없으면 맵 로드를 막지는 않되,
+			// Decor 모델 메쉬 충돌은 모두 꺼지는 쪽으로 안전하게 간다.
+			CEnv_CollisionCatalog::Clear();
+
+			Log_GameContentWarning(
+				"Decor collision catalog unavailable. Decor model mesh collision will be disabled. path="
+				+ WstrToStr(Manifest.strDecorCollisionCatalogPath));
+		}
+	}
 
 	*pOutPackage = {};
 

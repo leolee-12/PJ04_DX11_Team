@@ -1,7 +1,8 @@
 #include "Map_Parser.h"
+#include "GameContent_Log.h"
+#include "Env_CollisionCatalog.h"
 
 #include "DataLoader.h"
-#include "GameContent_Log.h"
 
 #include <cctype>
 #include <exception>
@@ -70,13 +71,16 @@ namespace
 
 		Collision.eColliderKind = ENV_COLLIDER_KIND::NONE;
 		Collision.eSimpleShape = ENV_SIMPLE_SHAPE::NONE;
+		Collision.bCatalogCollisionChecked = false;
+		Collision.bHasDecorCollisionApxbin = false;
+		Collision.strDecorCollisionApxbinName.clear();
+		Collision.strDecorCollisionBfresPath.clear();
 
 		if (pDesc->eKind == ENV_OBJECT_KIND::EFFECT)
 			return;
 
-		if (Collision.bInvalidCollision)
-			return;
-
+		// Toy_Decor의 Cube/Sphere/Cylinder/Slope는 apxbin 카탈로그가 아니라
+		// 원본 배치 데이터 기반 단순 충돌체이므로 기존 처리를 유지한다.
 		if (pDesc->eSourceType == ENV_SOURCE_TYPE::TOY_DECOR)
 		{
 			const ENV_SIMPLE_SHAPE eShape =
@@ -84,23 +88,44 @@ namespace
 
 			if (eShape != ENV_SIMPLE_SHAPE::NONE)
 			{
-				Collision.eColliderKind = ENV_COLLIDER_KIND::SIMPLE_SHAPE;
-				Collision.eSimpleShape = eShape;
+				if (!Collision.bInvalidCollision)
+				{
+					Collision.eColliderKind = ENV_COLLIDER_KIND::SIMPLE_SHAPE;
+					Collision.eSimpleShape = eShape;
+				}
 				return;
 			}
-
-			Collision.eColliderKind = ENV_COLLIDER_KIND::UNKNOWN;
-			return;
 		}
 
-		if (pDesc->eSourceType == ENV_SOURCE_TYPE::DECOR_DECOR)
+		// Decor 계열 모델 메쉬 충돌은 원본 IsInvalidCollision 플래그 대신
+		// DecorCollisionCatalog의 objectName 존재 여부로 판단한다.
+		if (pDesc->eSourceType == ENV_SOURCE_TYPE::DECOR_DECOR
+			|| pDesc->eSourceType == ENV_SOURCE_TYPE::TOY_DECOR)
 		{
-			Collision.eColliderKind = ENV_COLLIDER_KIND::MODEL_MESH;
+			Collision.bCatalogCollisionChecked = true;
+
+			ENV_COLLISION_CATALOG_RECORD Record{};
+			if (CEnv_CollisionCatalog::Try_Find(pDesc->strObjectName, &Record))
+			{
+				Collision.bHasDecorCollisionApxbin = true;
+				Collision.strDecorCollisionApxbinName = Record.strApxbinName;
+				Collision.strDecorCollisionBfresPath = Record.strBfresPath;
+				Collision.eColliderKind = ENV_COLLIDER_KIND::MODEL_MESH;
+			}
+			else
+			{
+				Collision.eColliderKind = ENV_COLLIDER_KIND::NONE;
+			}
+
 			return;
 		}
 
+		// Toy_Obj는 별도 상호작용/기믹 계열이므로 기존 MapCollType 판단을 유지한다.
 		if (pDesc->eSourceType == ENV_SOURCE_TYPE::TOY_OBJ)
 		{
+			if (Collision.bInvalidCollision)
+				return;
+
 			if (!Collision.strMapCollType.empty()
 				&& !Is_SameText(Collision.strMapCollType, L"None"))
 			{
@@ -188,6 +213,23 @@ HRESULT CMap_Parser::Parse_ManifestRoot(
 		|| Try_ReadString(jManifest, "OverridePath", &strDeltaPath))
 	{
 		pOutManifest->strDeltaPath = Resolve_PathFromManifest(ManifestPath, strDeltaPath);
+	}
+
+	_wstring strCatalogPath;
+	if (Try_ReadString(jManifest, "DecorCollisionCatalog", &strCatalogPath)
+		|| Try_ReadString(jManifest, "EnvCollisionCatalog", &strCatalogPath)
+		|| Try_ReadString(jManifest, "CollisionCatalog", &strCatalogPath))
+	{
+		pOutManifest->strDecorCollisionCatalogPath =
+			Resolve_PathFromManifest(ManifestPath, strCatalogPath);
+	}
+	else
+	{
+		// Manifest가 Resources/Map/StageX/StageX_Manifest.json 아래에 있다는 전제의 기본값.
+		pOutManifest->strDecorCollisionCatalogPath =
+			(ManifestPath.parent_path().parent_path() / L"DecorCollisionCatalog.json")
+			.lexically_normal()
+			.wstring();
 	}
 
 	return S_OK;
