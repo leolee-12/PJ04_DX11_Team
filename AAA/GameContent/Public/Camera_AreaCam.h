@@ -31,8 +31,15 @@ private:
     CGameObject* m_pTarget = nullptr;
     wstring           m_strTargetLayer, m_strTargetObj, m_strDataPath;
     _float3 m_eyeCur = {}, m_atCur = {}, m_eyeVel = {}, m_atVel = {};
-    _float  m_smoothTime = 0.35f;
-    _bool   m_bInit = false;
+
+    //_float  m_smoothTime = 0.35f;
+    _float m_smoothBase = { 0.35f };
+    _float m_smoothTrans = { 0.90f };
+    _float m_blendDur = { 0.60f };
+    _float m_blendTimer = { 0.f };
+    _int m_lastArea = { -1 };
+    _bool   m_bInit = { false };
+
 public:
     static CCamera_AreaCam* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual CGameObject* Clone(void* pArg) override;

@@ -59,6 +59,17 @@ void CCamera_AreaCam::Priority_Update(_float fTimeDelta)
     else m_solver.Set_GazeOverride(XMVectorZero(), false);
 
     m_solver.Update(vKirby, fTimeDelta);
+
+    _int curArea = m_solver.Cur_AreaIndex();
+    if (m_bInit && curArea >= 0 && m_lastArea >= 0 && curArea != m_lastArea)
+        m_blendTimer = m_blendDur;                 // 전환 시작
+    m_lastArea = curArea;
+
+    _float fBlend = (m_blendDur > 0.f) ? (m_blendTimer / m_blendDur) : 0.f; // 1→0
+    _float fEase = fBlend * fBlend * (3.f - 2.f * fBlend);                 // smoothstep
+    _float smoothT = m_smoothBase + (m_smoothTrans - m_smoothBase) * fEase;
+    if (m_blendTimer > 0.f) m_blendTimer = max(0.f, m_blendTimer - fTimeDelta);
+
     const CAM_POSE& pose = m_solver.Cur_Pose();
 
     _vector vEye = XMLoadFloat3(&pose.eye);
@@ -80,8 +91,8 @@ void CCamera_AreaCam::Priority_Update(_float fTimeDelta)
     if (!m_bInit) { XMStoreFloat3(&m_eyeCur, vEye); XMStoreFloat3(&m_atCur, vAt); m_bInit = true; }
 
     _vector eVel = XMLoadFloat3(&m_eyeVel), aVel = XMLoadFloat3(&m_atVel);
-    XMStoreFloat3(&m_eyeCur, SmoothDampV(XMLoadFloat3(&m_eyeCur), vEye, eVel, m_smoothTime, fTimeDelta));
-    XMStoreFloat3(&m_atCur, SmoothDampV(XMLoadFloat3(&m_atCur), vAt, aVel, m_smoothTime, fTimeDelta));
+    XMStoreFloat3(&m_eyeCur, SmoothDampV(XMLoadFloat3(&m_eyeCur), vEye, eVel, smoothT, fTimeDelta));
+    XMStoreFloat3(&m_atCur, SmoothDampV(XMLoadFloat3(&m_atCur), vAt, aVel, smoothT, fTimeDelta));
     XMStoreFloat3(&m_eyeVel, eVel); XMStoreFloat3(&m_atVel, aVel);
 
     m_fFovy = XMConvertToRadians(pose.fov);
