@@ -18,6 +18,8 @@ private:
 	{
 		_float2					vCenter = {};
 		_float2					vSize = {};
+		_float2					vCorners[4] = {}; 
+		_float4x4				WorldMatrix = {};
 		_float					fZ = {};
 		RENDERUIID				eRenderLayer = { RENDERUIID::MIDDLE };
 	};
@@ -48,6 +50,8 @@ private:
 	void						Draw_Grid(_float fX, _float fY, _float fW, _float fH);
 
 	void						Handle_Selection();
+
+	void						Draw_SelectedContainerPivot();
 	void						Draw_SelectedPart();
 	void						Clear_UISelection();
 
@@ -61,6 +65,15 @@ private:
 
 	_bool						UIToScreenPos(const _float2& vUIPos, _float2* pOutScreenPos) const;
 	_bool						UIToLocalDelta(const _float2& vUIDelta, _float2* pOutLocalDelta) const;
+
+	// BOUND 코너 계산
+	static _float2				Transform_UIPoint(_float x, _float y, const _float4x4& m)
+	{
+		return {
+			x * m._11 + y * m._21 + m._41,
+			x * m._12 + y * m._22 + m._42
+		};
+	}
 
 private:
 	ID3D11ShaderResourceView*	m_pSRV = { nullptr };
@@ -81,6 +94,8 @@ private:
 	_float2						m_vDragStartCenter = {};
 	_float2						m_vDragStartSize = {};
 	_float						m_fDragStartZ = { 1.f };
+	_float2						m_vDragStartRightAxis = { 1.f, 0.f };
+	_float2						m_vDragStartUpAxis = { 0.f, 1.f };
 
 	_float						m_fDragStartFontScale = { 1.f };
 

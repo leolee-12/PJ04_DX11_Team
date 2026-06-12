@@ -58,6 +58,33 @@ _float CUIObject::Get_ZOrder() const
     return XMVectorGetZ(m_pTransformCom->Get_State(STATE::POSITION));
 }
 
+json CUIObject::Serialize() const
+{
+    json j = __super::Serialize();
+
+    j["RenderLayer"] = static_cast<_int>(m_eRenderLayer);
+
+    return j;
+}
+
+void CUIObject::Deserialize_Internal(const json& j)
+{
+    __super::Deserialize_Internal(j);
+
+    if (!j.contains("RenderLayer"))
+        return;
+
+    _int iLayer = j["RenderLayer"].get<_int>();
+
+    if (iLayer < ETOI(RENDERUIID::BACK) ||
+        iLayer >= ETOI(RENDERUIID::END))
+    {
+        iLayer = ETOI(RENDERUIID::MIDDLE);
+    }
+
+    m_eRenderLayer = static_cast<RENDERUIID>(iLayer);
+}
+
 void CUIObject::Update_UIState(const _float2& fScale)
 {
     m_pTransformCom->Set_Scale(fScale.x, fScale.y, 1.f);

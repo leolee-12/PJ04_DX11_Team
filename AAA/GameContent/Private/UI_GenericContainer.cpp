@@ -6,9 +6,8 @@ CUI_GenericContainer::CUI_GenericContainer(ID3D11Device* pDevice, ID3D11DeviceCo
 {
 }
 
-CUI_GenericContainer::CUI_GenericContainer(
-    const CUI_GenericContainer& Prototype)
-    : CUIContainerObject{ Prototype }
+CUI_GenericContainer::CUI_GenericContainer(const CUI_GenericContainer& Prototype)
+    : CUIContainerObject( Prototype )
 {
 }
 
@@ -26,54 +25,46 @@ HRESULT CUI_GenericContainer::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pDesc)))
         return E_FAIL;
 
+    m_pUIAnimatorCom = Add_Component<CUIAnimatorCom>(
+        TEXT("Com_UIAnimator"),
+        CUIAnimatorCom::Create(m_pDevice, m_pContext));
+
+    if (!m_pUIAnimatorCom || FAILED(m_pUIAnimatorCom->Initialize(nullptr)))
+        return E_FAIL;
+
+    Bind_UIAnimator();
+
     return S_OK;
 }
 
-HRESULT CUI_GenericContainer::Remove_Part(const _wstring& strPartTag)
+void CUI_GenericContainer::Update(_float fTimeDelta)
 {
-    auto it = m_UIPartObjects.find(strPartTag);
-    if (it == m_UIPartObjects.end())
-        return E_FAIL;
+    if (!m_bActive)
+        return;
 
-    Safe_Release(it->second);
-    m_UIPartObjects.erase(it);
-    m_UIPartPrototypeInfos.erase(strPartTag);
-    return S_OK;
+    if (m_pUIAnimatorCom)
+        m_pUIAnimatorCom->Update(fTimeDelta);
+
+    __super::Update(fTimeDelta);
 }
 
-HRESULT CUI_GenericContainer::Rename_Part(const _wstring& strOldTag, const _wstring& strNewTag)
+void CUI_GenericContainer::On_Deserialized()
 {
-    if (strOldTag.empty() || strNewTag.empty())
-        return E_FAIL;
-
-    if (strOldTag == strNewTag)
-        return S_OK;
-
-    if (m_UIPartObjects.find(strNewTag) != m_UIPartObjects.end())
-        return E_FAIL;
-
-    auto partIt = m_UIPartObjects.find(strOldTag);
-    if (partIt == m_UIPartObjects.end())
-        return E_FAIL;
-
-    auto protoIt = m_UIPartPrototypeInfos.find(strOldTag);
-    if (protoIt == m_UIPartPrototypeInfos.end())
-        return E_FAIL;
-
-    CUIPartObject* pPart = partIt->second;
-    UI_PART_PROTOTYPE_INFO protoInfo = protoIt->second;
-
-    m_UIPartObjects.erase(partIt);
-    m_UIPartPrototypeInfos.erase(protoIt);
-
-    m_UIPartObjects.emplace(strNewTag, pPart);
-    m_UIPartPrototypeInfos.emplace(strNewTag, protoInfo);
-
-    return S_OK;
+    Bind_UIAnimator();
 }
 
-CUI_GenericContainer* CUI_GenericContainer::Create(
-    ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+void CUI_GenericContainer::On_UIPartsChanged()
+{
+    Bind_UIAnimator();
+}
+
+void CUI_GenericContainer::Bind_UIAnimator()
+{
+    if (m_pUIAnimatorCom)
+        m_pUIAnimatorCom->Bind_Parts(m_UIPartObjects);
+}
+
+CUI_GenericContainer* CUI_GenericContainer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     CUI_GenericContainer* pInstance =
         new CUI_GenericContainer(pDevice, pContext);

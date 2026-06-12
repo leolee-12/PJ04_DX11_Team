@@ -49,6 +49,7 @@ public:
 		pOut->strPrototypeTag = PROTOTYPE_TAG;
 	}
 
+
 public:
 	// 실제 텍스트 크기(MeasureString x FontScale)  -> 에디터 선택 박스용 
 	_float2							Get_TextSize() const;
@@ -62,6 +63,8 @@ public:
 	void							Set_Align(_int i) { m_iAlign = i; }
 	const _wstring&					Get_FontTag() const { return m_strFontTag; }
 	void							Set_FontTag(const _wstring& strTag) { m_strFontTag = strTag; }
+
+	void							Set_Text(const _wstring& strText) { m_strText = strText; }
 
 public:
 	static CUI_Text*				Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

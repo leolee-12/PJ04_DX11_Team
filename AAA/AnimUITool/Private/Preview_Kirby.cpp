@@ -6,24 +6,6 @@
 #include "Animator.h"
 #include "GameContent_AnimEvents.h"
 
-namespace
-{
-	// 현재는 NORMAL 커비 기준으로 고정 해놨음
-	// Mesh 순서가 달라지면 문제 생김
-	enum KIRBY_MESH : int
-	{
-		KMESH_BODY_BIG = 0,
-		KMESH_BODY = 1,
-		KMESH_BODY_VACUUM = 2,
-		KMESH_MOUTH_ANGRY = 3,
-		KMESH_MOUTH_NORMAL = 4,
-		KMESH_MOUTH_OPEN = 5,
-		KMESH_MOUTH_SMILE_CL = 6,
-		KMESH_MOUTH_SMILE_OP = 7,
-		KMESH_LIMBS = 8,
-	};
-}
-
 CPreview_Kirby::CPreview_Kirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
 	, m_eBody{ KIRBY_BODY_STATE::NORMAL }
@@ -33,7 +15,7 @@ CPreview_Kirby::CPreview_Kirby(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 }
 
 CPreview_Kirby::CPreview_Kirby(const CPreview_Kirby& Prototype)
-	: CGameObject{ Prototype }
+	: CGameObject( Prototype )
 	, m_eBody{ Prototype.m_eBody }
 	, m_eMouth{ Prototype.m_eMouth }
 	, m_eEye{ Prototype.m_eEye }
