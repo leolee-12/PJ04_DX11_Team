@@ -30,6 +30,7 @@
     <ClCompile Include="..\Private\Panel_Hierarchy.cpp" />
     <ClCompile Include="..\Private\Panel_Inspector.cpp" />
     <ClCompile Include="..\Private\Panel_Manager.cpp" />
+    <ClCompile Include="..\Private\Panel_Palette.cpp" />
     <ClCompile Include="..\Private\Panel_Preview.cpp" />
     <ClCompile Include="..\Private\Panel_UICanvas.cpp" />
     <ClCompile Include="..\Private\Panel_Viewport.cpp" />
@@ -62,6 +63,7 @@
     <ClInclude Include="..\Public\Panel_Hierarchy.h" />
     <ClInclude Include="..\Public\Panel_Inspector.h" />
     <ClInclude Include="..\Public\Panel_Manager.h" />
+    <ClInclude Include="..\Public\Panel_Palette.h" />
     <ClInclude Include="..\Public\Panel_Preview.h" />
     <ClInclude Include="..\Public\Panel_UICanvas.h" />
     <ClInclude Include="..\Public\Panel_Viewport.h" />

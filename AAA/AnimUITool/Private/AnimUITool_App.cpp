@@ -87,7 +87,7 @@ HRESULT CAnimUITool_App::Init_Engine()
 	EngineDesc.eWinMode = WINMODE::WIN;
 	EngineDesc.iViewportWidth = g_iWinSizeX;
 	EngineDesc.iViewportHeight = g_iWinSizeY;
-	EngineDesc.iNumLevels = ETOUI(TOOL_LEVEL::END);
+	EngineDesc.iNumLevels = max(ETOUI(LEVEL::END), ETOUI(TOOL_LEVEL::END));
 
 	if (FAILED(CGameInstance::Initialize_Engine(EngineDesc, &m_pDevice, &m_pContext)))
 	{

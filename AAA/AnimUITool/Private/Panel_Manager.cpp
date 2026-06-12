@@ -4,6 +4,8 @@
 #include "Model.h"
 #include "Animator.h"
 #include "UIContainerObject.h"
+#include "ContainerObject.h"
+#include "PartObject.h"
 
 #include "Panel_Hierarchy.h"
 #include "Panel_Viewport.h"
@@ -14,6 +16,7 @@
 #include "Panel_Preview.h"
 
 #include "Panel_Browser.h"
+#include "Panel_Palette.h"
 
 #include "Level_Tool.h"
 
@@ -49,6 +52,9 @@ HRESULT CPanel_Manager::Initialize()
         return E_FAIL;
 
     if (FAILED(Add_Panel(L"Preview", CPanel_Preview::Create(m_pDevice, m_pContext))))
+        return E_FAIL;
+
+    if (FAILED(Add_Panel(L"Palette", CPanel_Palette::Create(m_pDevice, m_pContext))))
         return E_FAIL;
 
     return S_OK;
@@ -217,6 +223,31 @@ void CPanel_Manager::Load_UI_ByPath(const _wstring& strFullPath)
         m_UIContext.vDesignSize = ds;
 }
 
+void CPanel_Manager::Bind_ForAnim(CGameObject* pObj)
+{
+    if (!pObj) 
+    { 
+        Bind_Preview(nullptr);
+        return; 
+    }
+
+    CGameObject* pAnimSrc = pObj;  
+    if (auto* pCont = dynamic_cast<CContainerObject*>(pObj))
+    {
+        pAnimSrc = nullptr;         
+        for (auto& [tag, pPart] : pCont->Get_PartObjects())
+            if (pPart && pPart->Get_Component<CAnimator>(L"Com_Animator")) { pAnimSrc = pPart; break; }
+    }
+
+    m_Context.pOwner = pObj;
+    m_Context.pModel = pAnimSrc ? pAnimSrc->Get_Component<CModel>(L"Com_Model") : nullptr;
+    m_Context.pAnimator = pAnimSrc ? pAnimSrc->Get_Component<CAnimator>(L"Com_Animator") : nullptr;
+    m_Context.iClip = 0; m_Context.fProgress = 0.f;
+    m_Context.strName = pObj->Get_ObjectTag();
+
+    Set_Selected(pObj);
+}
+
 void CPanel_Manager::Render_DockSpace()
 {
     ImGuiViewport* vp = ImGui::GetMainViewport();
@@ -250,6 +281,7 @@ void CPanel_Manager::Render_DockSpace()
         ImGui::DockBuilderDockWindow("Inspector", left);
         ImGui::DockBuilderDockWindow("Hierarchy", left);
         ImGui::DockBuilderDockWindow("Console", left);
+        ImGui::DockBuilderDockWindow("Palette", left);
         ImGui::DockBuilderDockWindow("Viewport", center);
         ImGui::DockBuilderDockWindow("UICanvas", center);
         ImGui::DockBuilderDockWindow("Animation", bottom);
@@ -298,7 +330,8 @@ void CPanel_Manager::Render_ModeBar()
         {
             Bind_Preview(m_pLevel->Load_Kirby());
             m_Context.strName = L"Kirby";
-            m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby.ysh";
+            //m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby.ysh";
+            m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby_AllAbilities.ysh";
         }
     }
 
@@ -322,6 +355,9 @@ _bool CPanel_Manager::Is_PanelAllowedInCurrentMode(const _wstring& strPanelTag) 
             return false;
 
         if (strPanelTag == L"Viewport")
+            return false;
+
+        if (strPanelTag == L"Palette")   
             return false;
 
         return true;

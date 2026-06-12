@@ -49,6 +49,10 @@
 //sky
 #include "SkySphere.h"
 
+// Monster
+#include "BladeKnight.h"
+#include "BladeKnight_Body.h"
+
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
 #define CREATOR(CLASS) \
@@ -301,6 +305,25 @@ void CGameObject_Factory::Register_Container()
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     ); 
+
+    // Monster
+    
+    // 1. BladeKnight(Sword)
+    Register
+    (
+        CBladeKnight::PROTOTYPE_TAG, TEXT("BladeKnight"),
+        CREATOR(CBladeKnight),
+        LOADER
+        (
+            // BladeKnight Body
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CBladeKnight_Body::PROTOTYPE_TAG,
+                CBladeKnight_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_BladeKnight_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM,  "../../Resources/CHJ/Monster/BladeKnight/BladeKnight.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
 }
 
 void CGameObject_Factory::Register_UIContainer()

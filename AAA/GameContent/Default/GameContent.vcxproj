@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Public\BladeKnight_Body.h" />
     <ClInclude Include="..\Public\Camera_AreaData.h" />
     <ClInclude Include="..\public\Camera_AreaCam.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
@@ -45,6 +46,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Public\BladeKnight.h" />
+    <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\Movement_Child.h" />
     <ClInclude Include="..\Public\UI_Enums.h" />
     <ClInclude Include="..\Public\UI_Fonts.h" />
@@ -111,6 +114,7 @@
     <ClInclude Include="..\Public\WalkSmoke.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Private\BladeKnight_Body.cpp" />
     <ClCompile Include="..\Private\Camera_AreaSolver.cpp" />
     <ClCompile Include="..\private\Camera_AreaCam.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
@@ -130,6 +134,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Private\BladeKnight.cpp" />
+    <ClCompile Include="..\Private\Monster.cpp" />
     <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />
     <ClCompile Include="..\Private\UI_GaugeBarCom.cpp" />
