@@ -34,29 +34,104 @@ void CUIContainerObject::Priority_Update(_float fTimeDelta)
 {
     if (!m_bActive) return;
 
-    for (auto& [tag, pPart] : m_UIPartObjects)
+    for (const auto& tag : m_UIPartOrder)
+    {
+        auto iter = m_UIPartObjects.find(tag);
+        if (iter == m_UIPartObjects.end())
+            continue;
+
+        CUIPartObject* pPart = iter->second;
+        if (!pPart || !pPart->Is_Active())
+            continue;
+
         pPart->Priority_Update(fTimeDelta);
+    }
+
 }
 
 void CUIContainerObject::Update(_float fTimeDelta)
 {
-    if (!m_bActive) return;
+    if (!m_bActive) 
+        return;
 
-    for (auto& [tag, pPart] : m_UIPartObjects)
+    for (const auto& tag : m_UIPartOrder)
+    {
+        auto iter = m_UIPartObjects.find(tag);
+        if (iter == m_UIPartObjects.end())
+            continue;
+
+        CUIPartObject* pPart = iter->second;
+        if (!pPart || !pPart->Is_Active())
+            continue;
+
         pPart->Update(fTimeDelta);
+    }
 }
 
 void CUIContainerObject::Late_Update(_float fTimeDelta)
 {
-    if (!m_bActive) return;
+    if (!m_bActive) 
+        return;
 
-    for (auto& [tag, pPart] : m_UIPartObjects)
+    for (const auto& tag : m_UIPartOrder)
+    {
+        auto iter = m_UIPartObjects.find(tag);
+        if (iter == m_UIPartObjects.end())
+            continue;
+
+        CUIPartObject* pPart = iter->second;
+        if (!pPart || !pPart->Is_Active())
+            continue;
+
         pPart->Late_Update(fTimeDelta);
+    }
 }
 
 HRESULT CUIContainerObject::Render()
 {
     return S_OK;
+}
+
+void CUIContainerObject::Get_UIPartObjectsInOrder(vector<pair<_wstring, CUIPartObject*>>* pOutParts) const
+{
+    if (!pOutParts)
+        return;
+
+    pOutParts->clear();
+    pOutParts->reserve(m_UIPartObjects.size());
+
+    unordered_set<_wstring> Visited;
+
+    for (const _wstring& strTag : m_UIPartOrder)
+    {
+        auto iter = m_UIPartObjects.find(strTag);
+        if (iter == m_UIPartObjects.end())
+            continue;
+
+        if (!Visited.insert(strTag).second)
+            continue;
+
+        pOutParts->emplace_back(strTag, iter->second);
+    }
+
+    for (const auto& Pair : m_UIPartObjects)
+    {
+        if (!Visited.insert(Pair.first).second)
+            continue;
+
+        pOutParts->emplace_back(Pair.first, Pair.second);
+    }
+}
+
+_int CUIContainerObject::Get_UIPartOrderIndex(const _wstring& strPartTag) const
+{
+    for (_uint i = 0; i < m_UIPartOrder.size(); ++i)
+    {
+        if (m_UIPartOrder[i] == strPartTag)
+            return static_cast<_int>(i);
+    }
+
+    return -1;
 }
 
 void CUIContainerObject::Clear_UIPartObjects()
@@ -66,14 +141,19 @@ void CUIContainerObject::Clear_UIPartObjects()
 
     m_UIPartObjects.clear();
     m_UIPartPrototypeInfos.clear();
+    m_UIPartOrder.clear();
 }
 
 json CUIContainerObject::Serialize() const
 {
     json j = __super::Serialize();
     j["UIPartObjects"] = json::object();
+    j["UIPartOrder"] = json::array();
 
-    for (auto& [tag, pPart] : m_UIPartObjects)
+    vector<pair<_wstring, CUIPartObject*>> OrderedParts;
+    Get_UIPartObjectsInOrder(&OrderedParts);
+
+    for (auto& [tag, pPart] : OrderedParts)
     {
         auto iter = m_UIPartPrototypeInfos.find(tag);
         if (iter == m_UIPartPrototypeInfos.end())
@@ -83,6 +163,7 @@ json CUIContainerObject::Serialize() const
         jPart["ProtoTag"] = WstrToStr(iter->second.strPrototypeTag);
         jPart["ProtoLevel"] = iter->second.iPrototypeLevel;
 
+        j["UIPartOrder"].push_back(WstrToStr(tag));
         j["UIPartObjects"][WstrToStr(tag)] = jPart;
     }
 
@@ -95,25 +176,134 @@ void CUIContainerObject::Deserialize_Internal(const json& j)
 
     Clear_UIPartObjects();
 
-    if (!j.contains("UIPartObjects"))
+    if (!j.contains("UIPartObjects") || !j["UIPartObjects"].is_object())
         return;
+
+    vector<string> OrderedTags;
+
+    if (j.contains("UIPartOrder") && j["UIPartOrder"].is_array())
+    {
+        for (const auto& jTag : j["UIPartOrder"])
+        {
+            if (jTag.is_string())
+                OrderedTags.push_back(jTag.get<string>());
+        }
+    }
+    else
+    {
+        for (auto& [strPartTag, jPart] : j["UIPartObjects"].items())
+            OrderedTags.push_back(strPartTag);
+    }
+
+    auto LoadPart = [this, &j](const string& strPartTag) -> void
+        {
+            auto iterJson = j["UIPartObjects"].find(strPartTag);
+            if (iterJson == j["UIPartObjects"].end())
+                return;
+
+            const json& jPart = iterJson.value();
+
+            if (!jPart.contains("ProtoTag") || !jPart.contains("ProtoLevel"))
+                return;
+
+            _wstring strPartTagW = StrToWstr(strPartTag);
+            _wstring strProtoTag = StrToWstr(jPart["ProtoTag"].get<string>());
+            _uint iProtoLevel = jPart["ProtoLevel"].get<_uint>();
+
+            if (FAILED(Add_UIPartObject(iProtoLevel, strProtoTag, strPartTagW, nullptr)))
+                return;
+
+            auto iterPart = m_UIPartObjects.find(strPartTagW);
+            if (iterPart != m_UIPartObjects.end())
+                iterPart->second->Deserialize(jPart);
+        };
+
+    unordered_set<string> Visited;
+
+    for (const string& strPartTag : OrderedTags)
+    {
+        if (!Visited.insert(strPartTag).second)
+            continue;
+
+        LoadPart(strPartTag);
+    }
 
     for (auto& [strPartTag, jPart] : j["UIPartObjects"].items())
     {
-        if (!jPart.contains("ProtoTag") || !jPart.contains("ProtoLevel"))
+        if (!Visited.insert(strPartTag).second)
             continue;
 
-        _wstring strPartTagW = StrToWstr(strPartTag);
-        _wstring strProtoTag = StrToWstr(jPart["ProtoTag"].get<string>());
-        _uint iProtoLevel = jPart["ProtoLevel"].get<_uint>();
-
-        if (FAILED(Add_UIPartObject(iProtoLevel, strProtoTag, strPartTagW, nullptr)))
-            continue;
-
-        auto iter = m_UIPartObjects.find(strPartTagW);
-        if (iter != m_UIPartObjects.end())
-            iter->second->Deserialize(jPart);
+        LoadPart(strPartTag);
     }
+}
+HRESULT CUIContainerObject::Add_Part(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, const _wstring& strPartTag, void* pArg)
+{
+    HRESULT hr = Add_UIPartObject(iPrototypeLevelIndex, strPrototypeTag, strPartTag, pArg);
+
+    if (SUCCEEDED(hr))
+        On_UIPartsChanged();
+
+    return hr;
+}
+
+
+HRESULT CUIContainerObject::Remove_Part(const _wstring& strPartTag)
+{
+    auto it = m_UIPartObjects.find(strPartTag);
+    if (it == m_UIPartObjects.end())
+        return E_FAIL;
+
+    Safe_Release(it->second);
+    m_UIPartObjects.erase(it);
+    m_UIPartPrototypeInfos.erase(strPartTag);
+    m_UIPartOrder.erase(
+        remove(m_UIPartOrder.begin(), m_UIPartOrder.end(), strPartTag),
+        m_UIPartOrder.end());
+    On_UIPartsChanged();
+
+    return S_OK;
+}
+
+HRESULT CUIContainerObject::Rename_Part(const _wstring& strOldTag, const _wstring& strNewTag)
+{
+    if (strOldTag.empty() || strNewTag.empty())
+        return E_FAIL;
+
+    if (strOldTag == strNewTag)
+        return S_OK;
+
+    if (m_UIPartObjects.find(strNewTag) != m_UIPartObjects.end())
+        return E_FAIL;
+
+    auto partIt = m_UIPartObjects.find(strOldTag);
+    if (partIt == m_UIPartObjects.end())
+        return E_FAIL;
+
+    auto protoIt = m_UIPartPrototypeInfos.find(strOldTag);
+    if (protoIt == m_UIPartPrototypeInfos.end())
+        return E_FAIL;
+
+    CUIPartObject* pPart = partIt->second;
+    UI_PART_PROTOTYPE_INFO protoInfo = protoIt->second;
+
+    m_UIPartObjects.erase(partIt);
+    m_UIPartPrototypeInfos.erase(protoIt);
+
+    m_UIPartObjects.emplace(strNewTag, pPart);
+    m_UIPartPrototypeInfos.emplace(strNewTag, protoInfo);
+
+    for (_wstring& strTag : m_UIPartOrder)
+    {
+        if (strTag == strOldTag)
+        {
+            strTag = strNewTag;
+            break;
+        }
+    }
+
+    On_UIPartsChanged();
+
+    return S_OK;
 }
 
 HRESULT CUIContainerObject::Add_UIPartObject(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, const _wstring& strPartTag, void* pArg)
@@ -142,6 +332,7 @@ HRESULT CUIContainerObject::Add_UIPartObject(_uint iPrototypeLevelIndex, const _
     m_UIPartObjects.emplace(strPartTag, pUIPartObject);
     m_UIPartPrototypeInfos.emplace(strPartTag,
         UI_PART_PROTOTYPE_INFO{ iPrototypeLevelIndex, strPrototypeTag });
+    m_UIPartOrder.push_back(strPartTag);
 
     return S_OK;
 }
@@ -155,4 +346,5 @@ void CUIContainerObject::Free()
 
     m_UIPartObjects.clear();
     m_UIPartPrototypeInfos.clear();
+    m_UIPartOrder.clear();
 }

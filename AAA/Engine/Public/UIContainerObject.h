@@ -26,13 +26,19 @@ public:
 	{
 		return m_UIPartObjects;
 	}
-
-	void Clear_UIPartObjects();
+	void			Get_UIPartObjectsInOrder(vector<pair<_wstring, CUIPartObject*>>* pOutParts) const;
+	_int			Get_UIPartOrderIndex(const _wstring& strPartTag) const;
+	void			Clear_UIPartObjects();
 	
 
 public:
 	virtual json Serialize() const override;
 	virtual void Deserialize_Internal(const json& j) override;
+
+	// 제작 전용: 선택 컨테이너에 파트 생성·편입
+	HRESULT Add_Part(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, const _wstring& strPartTag, void* pArg = nullptr);
+	HRESULT Remove_Part(const _wstring& strPartTag);
+	HRESULT Rename_Part(const _wstring& strOldTag, const _wstring& strNewTag);
 
 protected:
 	typedef struct tagUIPartPrototypeInfo
@@ -43,10 +49,13 @@ protected:
 
 	unordered_map<_wstring, CUIPartObject*>				m_UIPartObjects;
 	unordered_map<_wstring, UI_PART_PROTOTYPE_INFO>		m_UIPartPrototypeInfos;
+	vector<_wstring> m_UIPartOrder;
 
 protected:
 	HRESULT Add_UIPartObject(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag,
 		const _wstring& strPartTag, void* pArg = nullptr);
+
+	virtual void On_UIPartsChanged() {}
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

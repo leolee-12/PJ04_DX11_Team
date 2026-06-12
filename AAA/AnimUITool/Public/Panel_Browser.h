@@ -15,6 +15,8 @@ public:
     virtual HRESULT Initialize(CPanel_Manager* pPanelManager) override;   
     virtual void    Render() override;
 
+    const fs::path& Get_SelectedPath() const { return m_SelectedPath; }
+
 private:
     void            Refresh();
     void            Render_Breadcrumb();

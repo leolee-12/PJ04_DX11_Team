@@ -452,3 +452,7 @@ AAA/*.zip
 /AAA/Editor/[Bb]in/ShaderFiles/Shader_Cell.hlsl
 /AAA/Editor/[Bb]in/ShaderFiles/Shader_Deferred.hlsl
 /AAA/Editor/[Bb]in/ShaderFiles/Shader_VtxTex.hlsl
+# Personal workspace files (local only, do not track)
+/명세서/
+/AGENTS.md
+/Temp/

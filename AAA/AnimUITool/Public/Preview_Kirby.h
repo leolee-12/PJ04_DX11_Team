@@ -17,6 +17,21 @@ class CPreview_Kirby final : public CGameObject
 {
 	GENERATED_BODY(CPreview_Kirby)
 
+public:
+	enum KIRBY_MESH : int
+	{
+		KMESH_BODY_BIG = 0,
+		KMESH_BODY = 1,
+		KMESH_BODY_VACUUM = 2,
+		KMESH_MOUTH_ANGRY = 3,
+		KMESH_MOUTH_NORMAL = 4,
+		KMESH_MOUTH_OPEN = 5,
+		KMESH_MOUTH_SMILE_CL = 6,
+		KMESH_MOUTH_SMILE_OP = 7,
+		KMESH_LIMBS = 8,
+		END
+	};
+
 private:
 	// iIntParam 깨질 수도 있어서 조정!
 	template<typename T>
@@ -81,7 +96,7 @@ private:
 	KIRBY_MOUTH_STATE		m_eMouth = { KIRBY_MOUTH_STATE::IDLE };
 	KIRBY_EYE_STATE			m_eEye = { KIRBY_EYE_STATE::IDLE };
 
-	vector<_bool>			m_MeshVisible;
+	vector<bool>			m_MeshVisible;
 
 	// Shader cbuffer 색상
 	_float4					m_vBodyColor = { 1.f, 0.45f, 0.55f, 1.f };

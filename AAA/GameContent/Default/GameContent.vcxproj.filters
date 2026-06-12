@@ -64,21 +64,6 @@
     <Filter Include="00. GameObject\UI\UIContainer">
       <UniqueIdentifier>{5ca0474a-ed3f-4d60-a221-b2411ba793c8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\UI\UIPart">
-      <UniqueIdentifier>{94c38715-2dd9-4f4e-8d6c-9d093835cbe4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\UI\UIPart\Image">
-      <UniqueIdentifier>{a5a2e4ed-68be-4718-95b0-6b592bbe34a3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\UI\UIPart\Text">
-      <UniqueIdentifier>{3b5135bf-091a-43f9-a1b4-477f575eacaa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\UI\UIPart\SpriteAnim">
-      <UniqueIdentifier>{7d5d177d-f408-4ec2-9309-c09bb6f04f26}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\UI\UIPart\Effect">
-      <UniqueIdentifier>{0be37482-7fe4-4538-a085-a1d70dd6ef22}</UniqueIdentifier>
-    </Filter>
     <Filter Include="98. ShaderFiles\Hojun">
       <UniqueIdentifier>{a6e24554-9141-4712-87e0-61e01d059777}</UniqueIdentifier>
     </Filter>
@@ -237,6 +222,45 @@
     </Filter>
     <Filter Include="00. GameObject\99. Component\00. Movement_Kirby">
       <UniqueIdentifier>{64b46192-c573-43d2-b69c-e80d42acca30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIContainer\UI_PointStar">
+      <UniqueIdentifier>{ad08d2a7-25f9-4d4f-bafc-4dbf686ad074}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart">
+      <UniqueIdentifier>{94c38715-2dd9-4f4e-8d6c-9d093835cbe4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart\Image">
+      <UniqueIdentifier>{a5a2e4ed-68be-4718-95b0-6b592bbe34a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart\Text">
+      <UniqueIdentifier>{3b5135bf-091a-43f9-a1b4-477f575eacaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart\SpriteAnim">
+      <UniqueIdentifier>{7d5d177d-f408-4ec2-9309-c09bb6f04f26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart\Effect">
+      <UniqueIdentifier>{0be37482-7fe4-4538-a085-a1d70dd6ef22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIContainer\UI_GaugeBar">
+      <UniqueIdentifier>{c6318aa5-ad0e-44a8-adc5-81c167357c13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIContainer\UI_GaugeBar\KirbyStatus">
+      <UniqueIdentifier>{829f9e0b-7ad3-4093-bd7e-05a27371a58e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart\GaugeFill">
+      <UniqueIdentifier>{c26c9ef1-b276-4bc0-9e75-ee3d40797c24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99. Defines\Hojun\UI">
+      <UniqueIdentifier>{cd0a7659-a8f0-4741-aa44-321f59e15d07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\Component">
+      <UniqueIdentifier>{f8846c37-07a1-47ff-8883-5be2b741a76a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\Component\Animator">
+      <UniqueIdentifier>{a0cc2fa3-e859-4ce0-bc75-268a9cc6fb1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\Component\GaugeBar">
+      <UniqueIdentifier>{0319824c-67e9-4142-8520-2c3bc1d47add}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -414,6 +438,9 @@
     <ClInclude Include="..\Public\UI_Fonts.h">
       <Filter>99. Defines\Hojun</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\UIAnimatorCom.h">
+      <Filter>00. GameObject\UI\Component\Animator</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\InhaleEffect.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\06. InhaleEffect</Filter>
     </ClInclude>
@@ -479,6 +506,24 @@
     </ClInclude>
     <ClInclude Include="..\public\Effect_Loader.h">
       <Filter>97. DataSystem\EffectLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_PointStar.h">
+      <Filter>00. GameObject\UI\UIContainer\UI_PointStar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_KirbyStatus.h">
+      <Filter>00. GameObject\UI\UIContainer\UI_GaugeBar\KirbyStatus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_GaugeFill.h">
+      <Filter>00. GameObject\UI\UIPart\GaugeFill</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_Structs.h">
+      <Filter>99. Defines\Hojun\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_Enums.h">
+      <Filter>99. Defines\Hojun\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\UI_GaugeBarCom.h">
+      <Filter>00. GameObject\UI\Component\GaugeBar</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -620,6 +665,9 @@
     <ClCompile Include="..\Private\UI_GenericContainer.cpp">
       <Filter>00. GameObject\UI\UIContainer\GenericContainer</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\UIAnimatorCom.cpp">
+      <Filter>00. GameObject\UI\Component\Animator</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\InhaleEffect.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\06. InhaleEffect</Filter>
     </ClCompile>
@@ -676,6 +724,18 @@
     </ClCompile>
     <ClCompile Include="..\private\Effect_Loader.cpp">
       <Filter>97. DataSystem\EffectLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_PointStar.cpp">
+      <Filter>00. GameObject\UI\UIContainer\UI_PointStar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_KirbyStatus.cpp">
+      <Filter>00. GameObject\UI\UIContainer\UI_GaugeBar\KirbyStatus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_GaugeFill.cpp">
+      <Filter>00. GameObject\UI\UIPart\GaugeFill</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\UI_GaugeBarCom.cpp">
+      <Filter>00. GameObject\UI\Component\GaugeBar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
