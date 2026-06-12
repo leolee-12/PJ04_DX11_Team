@@ -16,6 +16,7 @@
 #include "UI_Text.h"
 #include "UI_Image.h"
 #include "UI_Effect.h"
+#include "UI_GaugeFill.h"
 #include "UIAnimatorCom.h"
 
 namespace
@@ -368,6 +369,14 @@ void CPanel_Inspector::Render_Properties(IReflectable* pHolder)
                                                 strProtoTag);
                                         else if (prop.strName == L"MaskTextureProtoTag")
                                             pEffect->Set_MaskTexture(
+                                                ETOUI(TOOL_LEVEL::EDIT),
+                                                strProtoTag);
+                                    }
+                                    else if (auto* pGauge =
+                                        dynamic_cast<Client::CUI_GaugeFill*>(sel.pPart))
+                                    {
+                                        if (prop.strName == L"TextureProtoTag")
+                                            pGauge->Set_Texture(
                                                 ETOUI(TOOL_LEVEL::EDIT),
                                                 strProtoTag);
                                     }

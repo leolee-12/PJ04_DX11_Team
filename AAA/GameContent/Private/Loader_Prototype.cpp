@@ -12,6 +12,7 @@
 #include "Texture.h"
 #include "Movement.h"
 #include "UI_Effect.h"
+#include "UI_GaugeFill.h"
 
 NS_BEGIN(Client)
 
@@ -188,6 +189,12 @@ HRESULT CLIENT_DLL Ready_Prototype_UIPartObjects(CGameInstance_Proxy* pProxy, ID
     if (!pProxy->Has_Prototype(iLevel, CUI_Effect::PROTOTYPE_TAG))
     {
         if (FAILED(pProxy->Add_Prototype(iLevel, CUI_Effect::PROTOTYPE_TAG, CUI_Effect::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
+
+    if (!pProxy->Has_Prototype(iLevel, CUI_GaugeFill::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_GaugeFill::PROTOTYPE_TAG, CUI_GaugeFill::Create(pDevice, pContext))))
             return E_FAIL;
     }
 

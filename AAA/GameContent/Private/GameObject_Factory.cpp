@@ -18,12 +18,14 @@
 #include "UI_Title.h"
 #include "UI_GenericContainer.h"
 #include "UI_PointStar.h"
+#include "UI_KirbyStatus.h"
 
 // UI Parts
 #include "UI_Image.h"
 #include "UI_SpriteAnim.h"
 #include "UI_Text.h"
 #include "UI_Effect.h"
+#include "UI_GaugeFill.h"
 
 // Kirby
 #include "Kirby.h"
@@ -108,6 +110,10 @@ void CGameObject_Factory::Register_UI()
 
     Register(CUI_Effect::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
         CREATOR(CUI_Effect),
+        LOADER());
+
+    Register(CUI_GaugeFill::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
+        CREATOR(CUI_GaugeFill),
         LOADER());
 }
 
@@ -316,6 +322,12 @@ void CGameObject_Factory::Register_UIContainer()
     Register(CUI_PointStar::PROTOTYPE_TAG,
         TEXT("UI_CONTAINER"),
         CREATOR(CUI_PointStar),
+        LOADER()
+    );
+
+    Register(CUI_KirbyStatus::PROTOTYPE_TAG,
+        TEXT("UI_CONTAINER"),
+        CREATOR(CUI_KirbyStatus),
         LOADER()
     );
     

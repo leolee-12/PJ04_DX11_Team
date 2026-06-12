@@ -9,6 +9,7 @@
 #include "UI_Text.h"
 #include "UI_Image.h"
 #include "UI_SpriteAnim.h"
+#include "UI_GaugeFill.h"
 
 using namespace AnimUITool;
 
@@ -122,6 +123,9 @@ void CPanel_UICanvas::Render()
 
         if (sel.pContainer && ImGui::MenuItem("Effect"))
             AddPart(UI_PART_TYPE::EFFECT);
+
+        if (sel.pContainer && ImGui::MenuItem("GaugeFill"))
+            AddPart(UI_PART_TYPE::GAUGEFILL);
 
         ImGui::EndPopup();
     }

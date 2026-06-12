@@ -147,6 +147,14 @@ _uint CTexture::Get_ArraySize() const
 	return iArray;
 }
 
+ID3D11ShaderResourceView* CTexture::Get_SRV(_uint iIndex) const
+{
+	if (iIndex >= m_Textures.size())
+		return nullptr;
+
+	return m_Textures[iIndex];
+}
+
 HRESULT CTexture::Initialize(void* pArg)
 {
 	return S_OK;

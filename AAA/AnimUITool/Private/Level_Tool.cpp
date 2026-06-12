@@ -21,6 +21,7 @@
 #include "UI_Image.h"
 #include "UI_Text.h"
 #include "UI_Effect.h"
+#include "UI_GaugeFill.h"
 
 namespace
 {
@@ -499,6 +500,8 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
         strProtoTag = Client::CUI_Text::PROTOTYPE_TAG;
     else if (eType == UI_PART_TYPE::EFFECT)
         strProtoTag = Client::CUI_Effect::PROTOTYPE_TAG;
+    else if (eType == UI_PART_TYPE::GAUGEFILL)
+        strProtoTag = Client::CUI_GaugeFill::PROTOTYPE_TAG;
 
     // 파트 프로토 보장 (SpriteAnim은 컨테이너 로더가 안 올림)
     if (!m_pGameInstance_Proxy->Has_Prototype(iPartProtoLevel, strProtoTag))
@@ -592,11 +595,32 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
         desc.fEffectIntensity = 1.f;
         desc.iMaskChannel = 3;
         desc.iInvertMask = 0;
-        desc.iShaderPass = ETOI(Client::CUI_Effect::EFFECT_PASS::MASKED_TEXTURE);
+        desc.iShaderPass = ETOI(Client::UI_EFFECT_PASS::MASKED_TEXTURE);
 
         hr = pUIContainer->Add_Part(
             iPartProtoLevel, strProtoTag, strPartTag, &desc);
 
+        break;
+    }
+    case UI_PART_TYPE::GAUGEFILL:
+    {
+        Client::CUI_GaugeFill::UI_GAUGEFILL_DESC desc{};
+        desc.iTextureLevel = iTextureLevel;
+        desc.szTextureProtoTag = nullptr;
+        desc.vSize = { 100.f, 20.f };
+        desc.vPosition = { 0.f, 0.f };
+        desc.iRenderLayer = 1;
+        desc.vColor = { 1.f, 1.f, 1.f, 1.f };
+        desc.fAlpha = 1.f;
+        desc.fFillRatio = 1.f;
+        desc.fFillSoftness = 0.f;
+        desc.iFillDirection = ETOI(Client::UI_GAUGE_FILL_DIRECTION::LEFT_TO_RIGHT);
+        desc.fMaskPower = 1.f;
+        desc.iMaskChannel = 3;
+        desc.iInvertMask = 0;
+
+        hr = pUIContainer->Add_Part(
+            iPartProtoLevel, strProtoTag, strPartTag, &desc);
         break;
     }
 

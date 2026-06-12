@@ -6,6 +6,7 @@
 #include "UIPartObject.h"
 #include "UI_Image.h"
 #include "UI_SpriteAnim.h"
+#include "UI_GaugeFill.h"
 
 CPanel_Hierarchy::CPanel_Hierarchy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPanel(pDevice, pContext)
@@ -246,7 +247,21 @@ void CPanel_Hierarchy::Render_UIHierarchy()
                                         UIContext.bDirty = true;
                                     }
                                 }
-                            }                         
+                            }
+                            else if (auto* pGauge = dynamic_cast<CUI_GaugeFill*>(pPart))
+                            {
+                                if (strExt == ".png" || strExt == ".dds")
+                                {
+                                    _wstring strProtoTag =
+                                        pLevel->Register_TextureProto(StrToWstr(strPath));
+
+                                    if (!strProtoTag.empty() &&
+                                        SUCCEEDED(pGauge->Set_Texture(ETOUI(TOOL_LEVEL::EDIT), strProtoTag)))
+                                    {
+                                        UIContext.bDirty = true;
+                                    }
+                                }
+                            }
                         }
                         ImGui::EndDragDropTarget();
                     }

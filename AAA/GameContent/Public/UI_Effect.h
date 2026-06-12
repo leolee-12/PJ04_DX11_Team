@@ -1,6 +1,7 @@
 #pragma once
 #include "GameContent_Defines.h"
 #include "UIPartObject.h"
+#include "UI_Enums.h"
 
 NS_BEGIN(Engine)
 class CShader;
@@ -35,16 +36,6 @@ class CLIENT_DLL CUI_Effect final : public CUIPartObject
     PROPERTY(_int, m_iMaskTexIndex, L"MaskTextureIndex", L"Texture");
 
 public:
-    // pass 확인용 안쓰면 지워도 됨
-    enum class EFFECT_PASS : _int       
-    {
-        MASKED_TEXTURE = 2,
-        MASKED_COLOR = 3,
-        MASKED_ADD = 4,
-        BRUSH_REVEAL = 5,
-        END
-    };
-
     typedef struct tagUIEffectDesc : public CUIPartObject::UI_PARTOBJECT_DESC
     {
         _uint       iTextureLevel = {};
@@ -69,7 +60,7 @@ public:
         _int        iMaskChannel = { 3 };   // 0:R, 1:G, 2:B, 3:A
         _int        iInvertMask = { 0 };
         _int        iMaskTexIndex = { 0 };
-        _int        iShaderPass = { ETOI(EFFECT_PASS::MASKED_TEXTURE)};
+        _int        iShaderPass = { ETOI(UI_EFFECT_PASS::MASKED_TEXTURE)};
     } UI_EFFECT_DESC;
 
     static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_UI_Effect";

@@ -2,6 +2,44 @@
 #include "GameInstance.h"
 #include "GameContent_const.h"
 
+namespace
+{
+    constexpr const _tchar* EFFECT_TEXTURE_COM = TEXT("Com_EffectTexture");
+    constexpr const _tchar* EFFECT_TEXTURE_TEMP_COM = TEXT("Com_EffectTexture_Temp");
+    constexpr const _tchar* MASK_TEXTURE_COM = TEXT("Com_MaskTexture");
+    constexpr const _tchar* MASK_TEXTURE_TEMP_COM = TEXT("Com_MaskTexture_Temp");
+
+    _bool Is_ValidEffectPass(_int iPass)
+    {
+        return iPass == ETOI(UI_EFFECT_PASS::MASKED_TEXTURE) ||
+            iPass == ETOI(UI_EFFECT_PASS::MASKED_COLOR) ||
+            iPass == ETOI(UI_EFFECT_PASS::MASKED_ADD) ||
+            iPass == ETOI(UI_EFFECT_PASS::BRUSH_REVEAL);
+    }
+
+    _int Normalize_EffectPass(_int iPass)
+    {
+        return Is_ValidEffectPass(iPass) ?
+            iPass :
+            ETOI(UI_EFFECT_PASS::MASKED_TEXTURE);
+    }
+
+    _bool Needs_EffectTexture(_int iPass)
+    {
+        return iPass == ETOI(UI_EFFECT_PASS::MASKED_TEXTURE) ||
+            iPass == ETOI(UI_EFFECT_PASS::MASKED_ADD) ||
+            iPass == ETOI(UI_EFFECT_PASS::BRUSH_REVEAL);
+    }
+
+    _bool Needs_MaskTexture(_int iPass)
+    {
+        return iPass == ETOI(UI_EFFECT_PASS::MASKED_TEXTURE) ||
+            iPass == ETOI(UI_EFFECT_PASS::MASKED_COLOR) ||
+            iPass == ETOI(UI_EFFECT_PASS::MASKED_ADD) ||
+            iPass == ETOI(UI_EFFECT_PASS::BRUSH_REVEAL);
+    }
+}
+
 CUI_Effect::CUI_Effect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIPartObject{ pDevice, pContext }
     , m_vColor{ 1.f, 1.f, 1.f, 1.f }
@@ -17,7 +55,7 @@ CUI_Effect::CUI_Effect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     , m_iTextureLevel{ ETOUI(LEVEL::STATIC) }
     , m_iMaskTextureLevel{ ETOUI(LEVEL::STATIC) }
     , m_iMaskTexIndex{ 0 }
-    , m_iShaderPass  {ETOI(EFFECT_PASS::MASKED_TEXTURE)}
+    , m_iShaderPass  {ETOI(UI_EFFECT_PASS::MASKED_TEXTURE)}
 {
 }
 
@@ -75,7 +113,7 @@ HRESULT CUI_Effect::Initialize(void* pArg)
     m_iMaskChannel = pDesc->iMaskChannel;
     m_iInvertMask = pDesc->iInvertMask;
     m_iMaskTexIndex = pDesc->iMaskTexIndex;
-    m_iShaderPass = pDesc->iShaderPass;
+    m_iShaderPass = Normalize_EffectPass(pDesc->iShaderPass);
 
     if (FAILED(__super::Initialize(pDesc)))
         return E_FAIL;
@@ -131,13 +169,14 @@ HRESULT CUI_Effect::Render()
 void CUI_Effect::Deserialize_Internal(const json& j)
 {
     __super::Deserialize_Internal(j);
+    m_iShaderPass = Normalize_EffectPass(m_iShaderPass);
 
     if (!m_pEffectTextureCom && !m_strTextureProtoTag.empty())
     {
         m_pEffectTextureCom = Add_Component<CTexture>(
             static_cast<_uint>(m_iTextureLevel),
             m_strTextureProtoTag,
-            TEXT("Com_EffectTexture"));
+            EFFECT_TEXTURE_COM);
     }
 
     if (!m_pMaskTextureCom && !m_strMaskTextureProtoTag.empty())
@@ -145,7 +184,7 @@ void CUI_Effect::Deserialize_Internal(const json& j)
         m_pMaskTextureCom = Add_Component<CTexture>(
             static_cast<_uint>(m_iMaskTextureLevel),
             m_strMaskTextureProtoTag,
-            TEXT("Com_MaskTexture"));
+            MASK_TEXTURE_COM);
     }
 }
 
@@ -154,23 +193,36 @@ HRESULT CUI_Effect::Set_Texture(_int iLevel, const _wstring& strProtoTag)
     if (strProtoTag.empty())
         return E_FAIL;
 
-    auto iter = m_Components.find(TEXT("Com_EffectTexture"));
+    auto iterTemp = m_Components.find(EFFECT_TEXTURE_TEMP_COM);
+    if (iterTemp != m_Components.end())
+    {
+        Safe_Release(iterTemp->second);
+        m_Components.erase(iterTemp);
+    }
+
+    CTexture* pNewTexture = Add_Component<CTexture>(
+        static_cast<_uint>(iLevel),
+        strProtoTag,
+        EFFECT_TEXTURE_TEMP_COM);
+
+    if (!pNewTexture)
+        return E_FAIL;
+
+    auto iter = m_Components.find(EFFECT_TEXTURE_COM);
     if (iter != m_Components.end())
     {
         Safe_Release(iter->second);
         m_Components.erase(iter);
-        m_pEffectTextureCom = nullptr;
     }
+
+    m_Components.erase(EFFECT_TEXTURE_TEMP_COM);
+    m_Components.emplace(EFFECT_TEXTURE_COM, pNewTexture);
 
     m_iTextureLevel = iLevel;
     m_strTextureProtoTag = strProtoTag;
+    m_pEffectTextureCom = pNewTexture;
 
-    m_pEffectTextureCom = Add_Component<CTexture>(
-        static_cast<_uint>(m_iTextureLevel),
-        m_strTextureProtoTag,
-        TEXT("Com_EffectTexture"));
-
-    return m_pEffectTextureCom ? S_OK : E_FAIL;
+    return S_OK;
 }
 
 HRESULT CUI_Effect::Set_MaskTexture(_int iLevel, const _wstring& strProtoTag)
@@ -178,23 +230,36 @@ HRESULT CUI_Effect::Set_MaskTexture(_int iLevel, const _wstring& strProtoTag)
     if (strProtoTag.empty())
         return E_FAIL;
 
-    auto iter = m_Components.find(TEXT("Com_MaskTexture"));
+    auto iterTemp = m_Components.find(MASK_TEXTURE_TEMP_COM);
+    if (iterTemp != m_Components.end())
+    {
+        Safe_Release(iterTemp->second);
+        m_Components.erase(iterTemp);
+    }
+
+    CTexture* pNewTexture = Add_Component<CTexture>(
+        static_cast<_uint>(iLevel),
+        strProtoTag,
+        MASK_TEXTURE_TEMP_COM);
+
+    if (!pNewTexture)
+        return E_FAIL;
+
+    auto iter = m_Components.find(MASK_TEXTURE_COM);
     if (iter != m_Components.end())
     {
         Safe_Release(iter->second);
         m_Components.erase(iter);
-        m_pMaskTextureCom = nullptr;
     }
+
+    m_Components.erase(MASK_TEXTURE_TEMP_COM);
+    m_Components.emplace(MASK_TEXTURE_COM, pNewTexture);
 
     m_iMaskTextureLevel = iLevel;
     m_strMaskTextureProtoTag = strProtoTag;
+    m_pMaskTextureCom = pNewTexture;
 
-    m_pMaskTextureCom = Add_Component<CTexture>(
-        static_cast<_uint>(m_iMaskTextureLevel),
-        m_strMaskTextureProtoTag,
-        TEXT("Com_MaskTexture"));
-
-    return m_pMaskTextureCom ? S_OK : E_FAIL;
+    return S_OK;
 }
 
 HRESULT CUI_Effect::Ready_Components(UI_EFFECT_DESC* pDesc)
@@ -209,14 +274,14 @@ HRESULT CUI_Effect::Ready_Components(UI_EFFECT_DESC* pDesc)
 
     if (!m_strTextureProtoTag.empty())
     {
-        m_pEffectTextureCom = Add_Component<CTexture>(static_cast<_uint>(m_iTextureLevel), m_strTextureProtoTag, TEXT("Com_EffectTexture"));
+        m_pEffectTextureCom = Add_Component<CTexture>(static_cast<_uint>(m_iTextureLevel), m_strTextureProtoTag, EFFECT_TEXTURE_COM);
         if (!m_pEffectTextureCom)
             return E_FAIL;
     }
 
     if (!m_strMaskTextureProtoTag.empty())
     {
-        m_pMaskTextureCom = Add_Component<CTexture>(static_cast<_uint>(m_iMaskTextureLevel), m_strMaskTextureProtoTag, TEXT("Com_MaskTexture"));
+        m_pMaskTextureCom = Add_Component<CTexture>(static_cast<_uint>(m_iMaskTextureLevel), m_strMaskTextureProtoTag, MASK_TEXTURE_COM);
         if (!m_pMaskTextureCom)
             return E_FAIL;
     }
@@ -226,6 +291,8 @@ HRESULT CUI_Effect::Ready_Components(UI_EFFECT_DESC* pDesc)
 
 HRESULT CUI_Effect::Bind_ShaderResources()
 {
+    m_iShaderPass = Normalize_EffectPass(m_iShaderPass);
+
     if (m_pParentMatrix)
     {
         Compute_CombinedWorldMatrix(
@@ -246,16 +313,8 @@ HRESULT CUI_Effect::Bind_ShaderResources()
     if (FAILED(Bind_ShaderResource(m_pShaderCom, "g_ProjMatrix", D3DTS::PROJ, PROJ_TYPE::ORTHO)))
         return E_FAIL;
 
-    const _bool bNeedEffectTexture =
-        m_iShaderPass == ETOI(EFFECT_PASS::MASKED_TEXTURE) ||
-        m_iShaderPass == ETOI(EFFECT_PASS::MASKED_ADD) ||
-        m_iShaderPass == ETOI(EFFECT_PASS::BRUSH_REVEAL);
-
-    const _bool bNeedMaskTexture =
-        m_iShaderPass == ETOI(EFFECT_PASS::MASKED_TEXTURE) ||
-        m_iShaderPass == ETOI(EFFECT_PASS::MASKED_COLOR) ||
-        m_iShaderPass == ETOI(EFFECT_PASS::MASKED_ADD) ||
-        m_iShaderPass == ETOI(EFFECT_PASS::BRUSH_REVEAL);
+    const _bool bNeedEffectTexture = Needs_EffectTexture(m_iShaderPass);
+    const _bool bNeedMaskTexture = Needs_MaskTexture(m_iShaderPass);
 
     if (bNeedEffectTexture)
     {

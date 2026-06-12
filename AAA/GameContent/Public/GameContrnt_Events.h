@@ -10,7 +10,14 @@ namespace Client
     // 호준 테스트용
     namespace EventTag
     {
+        // 커비가 코인 스타 얻었을 때 발화할 이벤트
         inline constexpr const _tchar* Kirby_PointStarGained = L"Kirby.PointStarGained";
+
+        // 커비 HP 변동이 있을 때 
+        inline constexpr const _tchar* Kirby_HP_Updated = L"Kirby.HPUpdated";
+
+        // 커비 능력 변경 시
+        inline constexpr const _tchar* Kirby_Ability_Changed = L"Kirby.AbilityChanged";
     }
 
     typedef struct tagUIRButtonProbe {
@@ -98,5 +105,11 @@ namespace Client
     {
         _uint iAmount = 1;
     }KIRBY_POINTSTAR_GAINED_DESC;
+
+    typedef struct tagKirbyHPUpdated
+    {
+        _float fMaxHP = { 100.f };
+        _float fCurrHp = { 100.f };
+    }KIRBY_HP_UPDATED;
 
 }

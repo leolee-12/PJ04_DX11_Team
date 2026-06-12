@@ -2,6 +2,7 @@
 
 #include "GameContent_Defines.h"
 #include "Component.h"
+#include "UI_Structs.h"
 
 NS_BEGIN(Engine)
 class CUIPartObject;
@@ -12,24 +13,8 @@ NS_BEGIN(Client)
 class CLIENT_DLL CUIAnimatorCom final : public CComponent
 {
 public:
-	typedef struct tagUIBounceDesc
-	{
-		_float2 vDirection = { 0.f, 1.f };
-		_float  fDistance = { 0.f };
-		_float  fDuration = { 0.f };
-		_float  fWaveCount = { 1.f };
-		_float  fDamping = { 0.f };
-		_bool   bRestoreOnFinish = { true };
-	} UI_BOUNCE_DESC;
-
-	typedef struct tagUIFadeDesc
-	{
-		_float  fFromAlpha = { -1.f };
-		_float  fToAlpha = { 1.f };
-		_float  fDuration = { 0.f };
-		_float  fDelay = { 0.f };
-		_bool   bRestoreOnFinish = { false };
-	} UI_FADE_DESC;
+	using UI_BOUNCE_DESC = Client::UI_BOUNCE_DESC;
+	using UI_FADE_DESC = Client::UI_FADE_DESC;
 
 private:
 	typedef struct tagUIBounceRuntime
