@@ -24,6 +24,42 @@ HRESULT CEffect_Manager::Initialize()
     return S_OK;
 }
 
+HRESULT CEffect_Manager::Spawn(_uint iLevel, const _wstring& strEffectKey, const _wstring& strProtoTag, const CEffect_Container::EFFECT_CONTAINER_DESC& desc, const json* pConfig, CEffect_Container** ppOut)
+{
+    POOL_KEY key{ iLevel, strEffectKey };                  // 풀 키 = effectId
+
+    // 재사용 (작성값 이미 들어있음 → config 주입 안 함)
+    auto it = m_Dormant.find(key);
+    if (it != m_Dormant.end() && !it->second.empty())
+    {
+        CEffect_Container* pEffect = it->second.back();
+        it->second.pop_back();
+        if (ppOut) *ppOut = pEffect;
+        return S_OK;
+    }
+
+    // STATIC 프로토에서 클론 + Initialize → 작성값 주입
+    _wstring strObjTag = strEffectKey + L"#" + std::to_wstring(m_iSpawnCounter++);
+
+    CGameObject* pObj = nullptr;
+    HRESULT hr = m_pGameInstance_Proxy->Add_GameObject_Return(
+        &pObj,
+        m_iProtoLevel, strProtoTag,            // 프로토 조회 = STATIC(좌석)
+        iLevel, EFFECT_LAYER_TAG, strObjTag,   // 객체 배치 = 타겟(스테이지) 레벨
+        const_cast<CEffect_Container::EFFECT_CONTAINER_DESC*>(&desc));
+
+    if (FAILED(hr) || !pObj) return E_FAIL;
+
+    CEffect_Container* pEffect = dynamic_cast<CEffect_Container*>(pObj);
+    if (!pEffect) { m_pGameInstance_Proxy->Destroy_GameObject(pObj); return E_FAIL; }
+
+    if (pConfig) pEffect->Deserialize(*pConfig);           // 콜드 전용: Initialize 후 작성값 주입
+    pEffect->Set_Pool(this, iLevel, strEffectKey);          // 반납 키 = effectId
+
+    if (ppOut) *ppOut = pEffect;
+    return S_OK;
+}
+
 CEffect_Manager* CEffect_Manager::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     CEffect_Manager* pInstance = new CEffect_Manager(pDevice, pContext);
@@ -39,46 +75,23 @@ CEffect_Manager* CEffect_Manager::Create(ID3D11Device* pDevice, ID3D11DeviceCont
 
 void CEffect_Manager::Free()
 {
+    m_Dormant.clear();             // 약참조라 Release 금지, clear만
     Safe_Release(m_p2DShader);
     Safe_Release(m_pMeshShader);
-
     Safe_Release(m_pContext);
     Safe_Release(m_pDevice);
     Safe_Release(m_pGameInstance_Proxy);
-
     __super::Free();
 }
 
-
-
-HRESULT CEffect_Manager::Spawn(_uint iLevel,
-    const _wstring& strProtoTag,
-    const CEffect_Container::EFFECT_CONTAINER_DESC& desc,
-    CEffect_Container** ppOut)
+void CEffect_Manager::Return(_uint iLevel, const _wstring& strEffectKey, CEffect_Container* pEffect)
 {
-    // 같은 프로토타입을 빠르게 여러 번 발화해도 이름 충돌 안 나게 카운터로 고유화
-    _wstring strObjTag = strProtoTag + L"#" + std::to_wstring(m_iSpawnCounter++);
+    m_Dormant[POOL_KEY{ iLevel, strEffectKey }].push_back(pEffect);
+}
 
-    CGameObject* pObj = nullptr;
-    HRESULT hr = m_pGameInstance_Proxy->Add_GameObject_Return(
-        &pObj,
-        iLevel, strProtoTag,
-        iLevel, EFFECT_LAYER_TAG, strObjTag,
-        const_cast<CEffect_Container::EFFECT_CONTAINER_DESC*>(&desc));
-
-    if (FAILED(hr) || nullptr == pObj)
-        return E_FAIL;
-
-    CEffect_Container* pEffect = dynamic_cast<CEffect_Container*>(pObj);
-    if (nullptr == pEffect)
-    {
-        // 프로토타입이 CEffect 파생이 아니면 즉시 회수
-        m_pGameInstance_Proxy->Destroy_GameObject(pObj);
-        return E_FAIL;
-    }
-
-    if (ppOut)
-        *ppOut = pEffect;
-
-    return S_OK;
+void CEffect_Manager::Clear_Level(_uint iLevel)
+{
+    // 레벨 언로드 시 그 레벨 객체는 레이어가 파괴 → 휴면 약참조 제거(dangling 방지)
+    for (auto it = m_Dormant.begin(); it != m_Dormant.end(); )
+        it = (it->first.iLevel == iLevel) ? m_Dormant.erase(it) : std::next(it);
 }

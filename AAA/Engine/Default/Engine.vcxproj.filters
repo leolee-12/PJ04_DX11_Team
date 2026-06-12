@@ -262,6 +262,9 @@
     <Filter Include="05. GameObject\Effect\EffectPart\Effect_Paricle">
       <UniqueIdentifier>{cac7e3a1-ecdd-4d62-8d22-bae46537c29b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="05. GameObject\Effect\Allocator">
+      <UniqueIdentifier>{8fc72b6d-5be3-40cf-9275-b99e11825d1d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -519,6 +522,9 @@
     <ClInclude Include="..\Public\Effect_Particle.h">
       <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Effect_Allocator.h">
+      <Filter>05. GameObject\Effect\Allocator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -754,6 +760,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Effect_Particle.cpp">
       <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Effect_Allocator.cpp">
+      <Filter>05. GameObject\Effect\Allocator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

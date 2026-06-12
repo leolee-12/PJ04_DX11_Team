@@ -23,14 +23,14 @@ class CKirby;
 
 enum class ABILITY_ANI
 {
-	WAIT, RUN, FALL, JUMP_L, JUMP_R, JUMP_END_L, JUMP_END_R, LANDING, END
+	WAIT, RUN, FALL,
+	JUMP_L, JUMP_R, JUMP_END_L, JUMP_END_R,
+	LANDING,
+	END
 };
 
 class CLIENT_DLL CKirby_Ability abstract : public CBase
 {
-public:
-
-
 protected:
 	CKirby_Ability();
 	virtual ~CKirby_Ability() = default;

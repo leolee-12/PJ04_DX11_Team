@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#include "Effect_Allocator.h"
 
 NS_BEGIN(Engine)
 
@@ -140,6 +141,29 @@ private:
         _float fRatio{};
         _float3 vValue{};
     };
+
+public:
+#pragma push_macro("new")
+#undef new
+    static void* operator new(size_t n)
+    {
+        return CEffect_Allocator::IsPrototypePass()
+            ? ::operator new(n)
+            : CEffect_Allocator::GetInstance()->Alloc(n);
+    }
+    static void  operator delete(void* p) { CEffect_Allocator::GetInstance()->Dealloc(p); }
+#ifdef _DEBUG
+    static void* operator new(size_t n, int, const char*, int)
+    {
+        return CEffect_Allocator::IsPrototypePass()
+            ? ::operator new(n)
+            : CEffect_Allocator::GetInstance()->Alloc(n);
+    }
+    static void  operator delete(void* p, int, const char*, int) { CEffect_Allocator::GetInstance()->Dealloc(p); }
+#endif
+    static void* operator new[](size_t) = delete;
+    static void  operator delete[](void*) = delete;
+#pragma pop_macro("new")
 
 protected:
     CEffect_Part(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

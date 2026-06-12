@@ -13,7 +13,7 @@ class CKirby;
 
 class CLIENT_DLL CKirby_Run final : public CKirby_State
 {
-protected:
+private:
 	CKirby_Run();
 	virtual ~CKirby_Run() = default;
 

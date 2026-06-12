@@ -761,12 +761,19 @@ HRESULT CGameInstance_Proxy::Update_ShadowLight(const SHADOW_LIGHT_DESC& ShadowD
 #pragma endregion
 
 #pragma region EFFECT_MANAGER
-HRESULT CGameInstance_Proxy::Spawn_Effect(_uint iLevel, const _wstring& strProtoTag, const CEffect_Container::EFFECT_CONTAINER_DESC& desc, CEffect_Container** ppOut)
+HRESULT CGameInstance_Proxy::Spawn_Effect(_uint iLevel, const _wstring& strEffectKey, const _wstring& strProtoTag, const CEffect_Container::EFFECT_CONTAINER_DESC& desc, const json* pConfig, CEffect_Container** ppOut)
 {
 	if (!IsConnected())
 		return E_FAIL;
 
-	return m_pOwner->m_pEffect_Manager->Spawn(iLevel, strProtoTag, desc, ppOut);
+	return m_pOwner->m_pEffect_Manager->Spawn(iLevel, strEffectKey, strProtoTag, desc, pConfig, ppOut);
+}
+void CGameInstance_Proxy::Set_EffectPrototypeLevel(_uint iLevel)
+{
+	if (!IsConnected())
+		return;
+
+	m_pOwner->m_pEffect_Manager->Set_PrototypeLevel(iLevel);
 }
 CShader* CGameInstance_Proxy::Get_2DShader()
 {

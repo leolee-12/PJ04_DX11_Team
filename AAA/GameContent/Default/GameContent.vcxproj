@@ -26,6 +26,7 @@
     <ClInclude Include="..\Public\Character_States.h" />
     <ClInclude Include="..\Public\Common_Circle01.h" />
     <ClInclude Include="..\Public\Common_Curve03.h" />
+    <ClInclude Include="..\public\Effect_Loader.h" />
     <ClInclude Include="..\Public\Env_CollisionCatalog.h" />
     <ClInclude Include="..\Public\GameContent_AnimEvents.h" />
     <ClInclude Include="..\Public\GameContent_const.h" />
@@ -41,6 +42,11 @@
     <ClInclude Include="..\Public\GameObject_Factory.h" />
     <ClInclude Include="..\Public\Kirby_Fall.h" />
     <ClInclude Include="..\Public\Kirby_Attack.h" />
+    <ClInclude Include="..\Public\Kirby_Hovering.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\Public\Movement_Child.h" />
     <ClInclude Include="..\Public\Map_DeltaIO.h" />
     <ClInclude Include="..\Public\UI_Fonts.h" />
     <ClInclude Include="..\Public\UI_GenericContainer.h" />
@@ -109,6 +115,7 @@
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Common_Circle01.cpp" />
     <ClCompile Include="..\Private\Common_Curve03.cpp" />
+    <ClCompile Include="..\private\Effect_Loader.cpp" />
     <ClCompile Include="..\Private\EnvObject.cpp" />
     <ClCompile Include="..\Private\EnvObject_Trigger.cpp" />
     <ClCompile Include="..\Private\EnvObject_Interact.cpp" />
@@ -118,6 +125,11 @@
     <ClCompile Include="..\Private\GameObject_Factory.cpp" />
     <ClCompile Include="..\Private\Kirby_Fall.cpp" />
     <ClCompile Include="..\Private\Kirby_Attack.cpp" />
+    <ClCompile Include="..\Private\Kirby_Hovering.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\Private\Map_DeltaIO.cpp" />
     <ClCompile Include="..\Private\UI_GenericContainer.cpp" />
     <ClCompile Include="..\Private\InhaleEffect.cpp" />

@@ -12,7 +12,6 @@ CKirby_Run::CKirby_Run()
 
 HRESULT CKirby_Run::Initialize()
 {
-
     return S_OK;
 }
 
@@ -23,6 +22,7 @@ KIRBY_STATE_TYPE CKirby_Run::Get_StateType()
 
 void CKirby_Run::Enter(CKirby* pKirby)
 {
+    // Ani
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
     pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::RUN));
 }
@@ -33,9 +33,7 @@ void CKirby_Run::Update(CKirby* pKirby, const _float fTimeDelta)
 
     // Fall
     if (Try_FallState(pKirby) == true)
-    {
         pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::FALL));
-    }
 
     // Wait
     if (pKirby->Has_MoveDir() == false)
@@ -54,19 +52,33 @@ _bool CKirby_Run::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 
     switch (eCommandType)
     {
+        // Move Press
         case KIRBY_COMMAND_TYPE::MOVE_TOP:
         case KIRBY_COMMAND_TYPE::MOVE_DOWN:
         case KIRBY_COMMAND_TYPE::MOVE_LEFT:
         case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
+        {
+            if (!pCommand->IsPress())
+                return false;
+
             Handle_MoveCommand(pKirby, pCommand);
             return true;
-
+        }
+        // Jump Down
         case KIRBY_COMMAND_TYPE::JUMP:
+        {
+            if (!pCommand->IsDown())
+                return false;
+
             pKirby->Change_State(KIRBY_STATE_TYPE::JUMP);
             return true;
-
-        case KIRBY_COMMAND_TYPE::ATTACK_DOWN:
+        }
+        // Attack Down
+        case KIRBY_COMMAND_TYPE::ATTACK:
         {
+            if (!pCommand->IsDown())
+                return false;
+
             CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
             if (pAbility->Can_Attack(KIRBY_ATTACK_LOCATION::GROUND))
                 pAbility->Down_Attack(pKirby);

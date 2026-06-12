@@ -160,7 +160,7 @@ HRESULT CKirby_Body::Set_VisibleMeshes()
 
     auto ShowMesh = [&](KIRBY_MESH eKirbyMesh)
         {
-            _int iIndex = ETOUI(eKirbyMesh);
+            _uint iIndex = ETOUI(eKirbyMesh);
             if (iIndex >= 0 && iIndex < iNumMeshes)
                 m_VisibleMeshes[iIndex] = true;
         };

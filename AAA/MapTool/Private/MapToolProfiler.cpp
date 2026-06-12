@@ -1,4 +1,8 @@
-﻿#include "MapToolProfiler.h"
+﻿#include "Effect_Allocator.h"
+#include "Effect_Allocator.h"
+#include "Effect_Allocator.h"
+#include "Effect_Allocator.h"
+#include "MapToolProfiler.h"
 
 #ifdef _DEBUG
 

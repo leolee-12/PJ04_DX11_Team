@@ -1,6 +1,7 @@
 #include "Kirby_Fall.h"
 
 #include "GameInstance.h"
+#include "Movement_Child.h"
 
 #include "Kirby.h"
 #include "Kirby_Body.h"
@@ -12,7 +13,6 @@ CKirby_Fall::CKirby_Fall()
 
 HRESULT CKirby_Fall::Initialize()
 {
-
     return S_OK;
 }
 
@@ -23,12 +23,13 @@ KIRBY_STATE_TYPE CKirby_Fall::Get_StateType()
 
 void CKirby_Fall::Enter(CKirby* pKirby)
 {
+    // Fall State
     m_eFallingState = FALL_STATE::FALLING;
 }
 
 void CKirby_Fall::Update(CKirby* pKirby, const _float fTimeDelta)
 {
-    CMovement* pMovementCom = pKirby->Get_Movement();
+    CMovement_Child* pMovementCom = pKirby->Get_Movement();
 
     CKirby_Body* pKirby_Body = pKirby->Get_Body();
     CAnimator* pAnimator = pKirby_Body->Get_Animator();
@@ -37,8 +38,11 @@ void CKirby_Fall::Update(CKirby* pKirby, const _float fTimeDelta)
     if (m_eFallingState == FALL_STATE::FALLING &&
         pMovementCom->Is_Grounded() == true)
     {
+        // Fall State
         m_eFallingState = FALL_STATE::LAND_START;
+        // Ani
         pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::LANDING));
+        // Eye
         pKirby_Body->Set_Eye(KIRBY_EYE_STATE::CLOSE);
     }
     // 애니메이션 끝나면 Wait or Run
@@ -52,7 +56,9 @@ void CKirby_Fall::Update(CKirby* pKirby, const _float fTimeDelta)
 void CKirby_Fall::Exit(CKirby* pKirby)
 {
     CKirby_Body* pKirby_Body = pKirby->Get_Body();
+    // Ani
     CAnimator* pAnimator = pKirby_Body->Get_Animator();
+    // Eye
     pKirby_Body->Set_Eye(KIRBY_EYE_STATE::IDLE);
 }
 
@@ -64,32 +70,40 @@ _bool CKirby_Fall::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 
     switch (eCommandType)
     {
+        // Move Press
         case KIRBY_COMMAND_TYPE::MOVE_TOP:
         case KIRBY_COMMAND_TYPE::MOVE_DOWN:
         case KIRBY_COMMAND_TYPE::MOVE_LEFT:
         case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
+        {
+            if (!pCommand->IsPress())
+                return false;
+
             Handle_MoveCommand(pKirby, pCommand);
             return true;
+        }
+        // Jump
+        //case KIRBY_COMMAND_TYPE::JUMP:
+        //{
+        //    if (!pCommand->IsDown())
+        //        return false;
 
-        case KIRBY_COMMAND_TYPE::ATTACK_DOWN:
+        //    pKirby->Change_State(KIRBY_STATE_TYPE::HOVERING);
+        //    return true;
+        //}
+        // Attack Down
+        case KIRBY_COMMAND_TYPE::ATTACK:
         {
+            if (!pCommand->IsDown())
+                return false;
+
             CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+
             if (pAbility->Can_Attack(KIRBY_ATTACK_LOCATION::AIR))
                 pAbility->Down_Attack(pKirby);
+
             return true;
         }
-
- /*       case KIRBY_COMMAND_TYPE::JUMP:
-        {
-            CMovement* pMovementCom = pKirby->Get_Movement();
-            _float fYVelocity = pMovementCom->Get_VerticalVelocity();
-
-            if (fYVelocity <= 0.15f)
-            {
-                pKirby->Change_State(KIRBY_STATE_TYPE::JUMP);
-            }
-            return true;
-        }*/
     }
 
     return false;
