@@ -102,6 +102,11 @@ HRESULT CKirby_Body::Render()
     return S_OK;
 }
 
+const _float4x4* CKirby_Body::Get_BoneMatrixPtr(const _char* pBoneName) const
+{
+    return m_pModelCom->Get_BoneMatrixPtr(pBoneName);
+}
+
 HRESULT CKirby_Body::Ready_Components()
 {
     /* For.Com_Shader */

@@ -48,6 +48,8 @@ public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
 public:
+	const _float4x4* Get_BoneMatrixPtr(const _char* pBoneName) const;
+
 	CAnimator* Get_Animator() { return m_pAnimatorCom; }
 
 public:

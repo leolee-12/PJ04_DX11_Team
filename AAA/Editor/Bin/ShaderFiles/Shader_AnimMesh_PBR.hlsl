@@ -16,6 +16,10 @@ float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
 
 uint g_iMaterialID = 0;
 
+float4 g_vConstantDiffuse = float4(1.f, 1.f, 1.f, 1.f);
+float3 g_vConstantMRA = float3(0.f, 1.f, 1.f);
+float4 g_vConstantEmissive = float4(0.f, 0.f, 0.f, 1.f);
+
 struct VS_IN
 {
     float3 vPosition : POSITION;
@@ -244,6 +248,19 @@ PS_OUT PS_NONEYE(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_CONSTANT_MATERIAL(PS_IN In)
+{
+    PS_OUT Out;
+
+    Out.vDiffuse = g_vConstantDiffuse;
+    Out.vNormal = float4(normalize(In.vNormal).xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(g_vConstantMRA, g_iMaterialID / 255.f);
+    Out.vEmissive = g_vConstantEmissive;
+
+    return Out;
+}
+
 PS_OUT PS_TEST(PS_IN In)
 {
     PS_OUT Out;
@@ -289,5 +306,16 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_TEST();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_TEST();
+    }
+
+    pass ConstantMaterialPass // 3
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_CONSTANT_MATERIAL();
     }
 }

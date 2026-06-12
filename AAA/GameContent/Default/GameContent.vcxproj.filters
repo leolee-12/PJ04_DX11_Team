@@ -190,9 +190,6 @@
     <Filter Include="00. GameObject\05. Kirby\00. System\02. Kirby_Controller">
       <UniqueIdentifier>{1215fa5f-4c0b-433e-8520-b64bea35bac0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\04. Parts">
-      <UniqueIdentifier>{ce8838df-6dca-44f5-99b6-21707344efd7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine">
       <UniqueIdentifier>{3e72c21b-58c2-46a4-91cc-99db8dbcffb4}</UniqueIdentifier>
     </Filter>
@@ -232,11 +229,23 @@
     <Filter Include="00. GameObject\05. Kirby\02. Kirby_Ability\00. Kirby_Ability_Normal">
       <UniqueIdentifier>{1f1ebec8-785f-4d2a-be62-dc3edc8740d0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\99. Component">
+    <Filter Include="00. GameObject\98. Component">
       <UniqueIdentifier>{fcf4220c-26a5-41a4-910d-b87dadeeb6d4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\99. Component\00. Movement_Kirby">
+    <Filter Include="00. GameObject\98. Component\00. Movement_Kirby">
       <UniqueIdentifier>{64b46192-c573-43d2-b69c-e80d42acca30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts">
+      <UniqueIdentifier>{ce8838df-6dca-44f5-99b6-21707344efd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\00. Body">
+      <UniqueIdentifier>{81d949c1-1101-4e64-aa3f-d769238287d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\01. Sword">
+      <UniqueIdentifier>{a70f7f84-5af6-4248-aa3c-e98abf86eb57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\02. SwordHat">
+      <UniqueIdentifier>{d12eb026-e157-4495-859c-6ae236366e96}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -348,9 +357,6 @@
     <ClInclude Include="..\Public\Kirby.h">
       <Filter>00. GameObject\05. Kirby</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Kirby_Body.h">
-      <Filter>00. GameObject\05. Kirby\04. Parts</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\SkySphere.h">
       <Filter>00. GameObject\01. Map\SkySphere</Filter>
     </ClInclude>
@@ -460,7 +466,7 @@
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\05. Hovering</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Movement_Child.h">
-      <Filter>00. GameObject\99. Component</Filter>
+      <Filter>00. GameObject\98. Component</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Camera_AreaCam.h">
       <Filter>00. GameObject\00. Camera\AreaCam</Filter>
@@ -479,6 +485,15 @@
     </ClInclude>
     <ClInclude Include="..\public\Effect_Loader.h">
       <Filter>97. DataSystem\EffectLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Body.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\00. Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Sword.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\01. Sword</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_SwordHat.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\02. SwordHat</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -565,9 +580,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Character.cpp">
       <Filter>00. GameObject\04. Character</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Kirby_Body.cpp">
-      <Filter>00. GameObject\05. Kirby\04. Parts</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SkySphere.cpp">
       <Filter>00. GameObject\01. Map\SkySphere</Filter>
@@ -666,7 +678,7 @@
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\05. Hovering</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Movement_Child.cpp">
-      <Filter>00. GameObject\99. Component</Filter>
+      <Filter>00. GameObject\98. Component</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Camera_AreaCam.cpp">
       <Filter>00. GameObject\00. Camera\AreaCam</Filter>
@@ -676,6 +688,15 @@
     </ClCompile>
     <ClCompile Include="..\private\Effect_Loader.cpp">
       <Filter>97. DataSystem\EffectLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Body.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\00. Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Sword.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\01. Sword</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_SwordHat.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\02. SwordHat</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

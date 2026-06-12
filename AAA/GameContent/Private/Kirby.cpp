@@ -7,7 +7,9 @@
 #include "GameContent_const.h"
 #include "Movement_Child.h"
 
+// Parts
 #include "Kirby_Body.h"
+#include "Kirby_Sword.h"
 
 #include "Kirby_InputManager.h"
 #include "Kirby_Controller.h"
@@ -150,6 +152,7 @@ HRESULT CKirby::Ready_Components()
 
 HRESULT CKirby::Ready_PartObjects()
 {
+    // Body
     CKirby_Body::KIRBY_BODY_DESC BodyDesc{};
     BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 
@@ -158,6 +161,15 @@ HRESULT CKirby::Ready_PartObjects()
         return E_FAIL;
 
     m_pBody = dynamic_cast<CKirby_Body*>(m_PartObjects[TEXT("Body")]);
+
+    // Sword
+    CKirby_Sword::KIRBY_SWORD_DESC SwordDesc{};
+    SwordDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    SwordDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("RHaveL");
+
+    if (FAILED(Add_PartObject(ETOUI(LEVEL::GAMEPLAY), CKirby_Sword::PROTOTYPE_TAG,
+        TEXT("Sword"), &SwordDesc)))
+        return E_FAIL;
 
     return S_OK;
 }

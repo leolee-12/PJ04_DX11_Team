@@ -1,0 +1,162 @@
+#include "Kirby_SwordHat.h"
+
+#include "GameInstance.h"
+
+#include "GameContent_const.h"
+
+#include "Animator.h"
+
+CKirby_SwordHat::CKirby_SwordHat(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+    : CPartObject(pDevice, pContext)
+{
+}
+
+CKirby_SwordHat::CKirby_SwordHat(const CKirby_SwordHat& Prototype)
+    : CPartObject(Prototype) {
+}
+
+HRESULT CKirby_SwordHat::Initialize_Prototype()
+{
+    m_eProjType = PROJ_TYPE::PERSPEC;
+    return S_OK;
+}
+
+HRESULT CKirby_SwordHat::Initialize(void* pArg)
+{
+    KIRBY_SWORDHAT_DESC* pDesc = static_cast<KIRBY_SWORDHAT_DESC*>(pArg);
+
+    m_pSocketBoneMatrix = pDesc->pSocketBoneMatrix;
+
+    if (FAILED(__super::Initialize(pDesc)))
+        return E_FAIL;
+
+    if (FAILED(Ready_Components()))
+        return E_FAIL;
+
+    m_pAnimatorCom->Play("Reset", true, true);
+
+    return S_OK;
+}
+
+void CKirby_SwordHat::Priority_Update(_float fTimeDelta)
+{
+}
+
+void CKirby_SwordHat::Update(_float fTimeDelta)
+{
+    if (m_pGameInstance_Proxy->Is_EditMode())
+        return;
+
+    m_pAnimatorCom->Update(fTimeDelta);
+}
+
+void CKirby_SwordHat::Late_Update(_float fTimeDelta)
+{
+    __super::Compute_CombinedWorldMatrix(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()) *
+        XMLoadFloat4x4(m_pSocketBoneMatrix));
+
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+}
+
+HRESULT CKirby_SwordHat::Render()
+{
+    if (FAILED(Bind_ShaderResources()))
+        return E_FAIL;
+
+    size_t iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+    for (_uint i = 0; i < iNumMeshes; ++i)
+    {
+        _uint iPassIdx = 0;
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
+            iPassIdx = 0;
+
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", i, MTEX_TYPE::NORMALS, 0)))
+            iPassIdx = 0;
+
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
+            iPassIdx = 0;
+
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnknownTexture", i, MTEX_TYPE::UNKNOWN, 0)))
+            iPassIdx = 1;
+
+        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+            return E_FAIL;
+
+        if (FAILED(m_pShaderCom->Begin(1)))
+            return E_FAIL;
+
+        if (FAILED(m_pModelCom->Render(i)))
+            return E_FAIL;
+    }
+
+    return S_OK;
+}
+
+HRESULT CKirby_SwordHat::Ready_Components()
+{
+    /* For.Com_Shader */
+    m_pShaderCom = Add_Component<CShader>(Shader_AnimMesh_PBR.iLevelID, Shader_AnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
+    if (m_pShaderCom == nullptr)
+        return E_FAIL;
+
+    /* For.Com_Model */
+    m_pModelCom = Add_Component<CModel>(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Sword"), TEXT("Com_Model"));
+    if (m_pModelCom == nullptr)
+        return E_FAIL;
+
+    /* For.Com_Animator */
+    CAnimator::ANIMATOR_DESC AnimDesc{};
+    AnimDesc.pModel = m_pModelCom;
+
+    m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
+
+    if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT CKirby_SwordHat::Bind_ShaderResources()
+{
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+CKirby_SwordHat* CKirby_SwordHat::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+    CKirby_SwordHat* pInstance = new CKirby_SwordHat(pDevice, pContext);
+
+    if (FAILED(pInstance->Initialize_Prototype()))
+    {
+        MSG_BOX("Failed to Created: CKirby_SwordHat");
+        Safe_Release(pInstance);
+    }
+
+    return pInstance;
+}
+
+CGameObject* CKirby_SwordHat::Clone(void* pArg)
+{
+    CKirby_SwordHat* pInstance = new CKirby_SwordHat(*this);
+
+    if (FAILED(pInstance->Initialize(pArg)))
+    {
+        MSG_BOX("Failed to Cloned: CKirby_SwordHat");
+        Safe_Release(pInstance);
+    }
+
+    return pInstance;
+}
+
+void CKirby_SwordHat::Free()
+{
+    __super::Free();
+}
