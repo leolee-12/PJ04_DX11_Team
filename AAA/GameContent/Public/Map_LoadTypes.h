@@ -14,12 +14,20 @@ struct MAP_MANIFEST_DESC
     _wstring strLevelName;
     _wstring strStageName;
     _wstring strStageFolderName;
-
     vector<_wstring> SectionNames;
     vector<MAP_SECTION_TYPE> SectionTypes;
     vector<RENDERID> SectionRenderIDs;
-
     vector<_wstring> EnvJsonPaths;
+    _wstring strDeltaPath;
+    _wstring strDecorCollisionCatalogPath;
+};
+
+struct MAP_ADDED_OBJECT_DESC
+{
+    _wstring strPrototypeTag;
+    _wstring strLayerTag;
+    _wstring strObjectTag;
+    json jObject;
 };
 
 struct MAP_PACKAGE
@@ -27,6 +35,7 @@ struct MAP_PACKAGE
     MAP_STAGE_DESC StageDesc;
     vector<ENV_OBJECT_DESC> EnvObjectDescs;
     vector<_wstring> EnvJsonPaths;
+    vector<MAP_ADDED_OBJECT_DESC> AddedObjectDescs;
 };
 
 struct MAP_RUNTIME_LEVELS
@@ -34,6 +43,8 @@ struct MAP_RUNTIME_LEVELS
     _uint iObjectLevel = {};
     _uint iStageModelLevel = {};
     _uint iEnvModelLevel = {};
+
+    _bool bEnableEnvObjectPicking = { false };
 };
 
 struct MAP_SPAWN_ROUTE

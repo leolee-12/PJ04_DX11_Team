@@ -11,6 +11,7 @@
 #include "TestMap.h"
 #include "TestMarb1e.h"
 #include "TestMarb1eMap.h"
+#include "TestTriggerBox.h"
 #include "Material_Object.h"
 
 //UI Container
@@ -280,6 +281,11 @@ void CGameObject_Factory::Register_Test()
                     XMMatrixRotationX(XMConvertToRadians(90.f))
                 ));
         )
+    );
+
+    Register(CTestTriggerBox::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
+        CREATOR(CTestTriggerBox),
+        LOADER()
     );
 }
 

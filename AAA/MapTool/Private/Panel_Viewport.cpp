@@ -121,9 +121,14 @@ void CPanel_Viewport::Render()
         XMVECTOR origin, dir;
         m_pGI_Proxy->Compute_PickingRay(ndcX, ndcY, &origin, &dir);
 
-        // 좌클릭 배치
-        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-            pLevel->Pick_And_Place(origin, dir);
+        // 좌클릭: 배치 모드면 기존 배치, 일반 모드면 EnvObject 선택
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGuizmo::IsUsing())
+        {
+            if (pLevel->Is_PlaceMode())
+                pLevel->Pick_And_Place(origin, dir);
+            else
+                pLevel->Pick_And_SelectEnvObject(origin, dir);
+        }
 
         if (m_pGI_Proxy->Mouse_Down(DIMB::WHEEL))
         {

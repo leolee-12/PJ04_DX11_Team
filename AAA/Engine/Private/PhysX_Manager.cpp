@@ -96,7 +96,7 @@ PxTriangleMesh* CPhysX_Manager::Cook_TriangleMesh(const _float3* pPositions, _ui
     return PxCreateTriangleMesh(params, desc, m_pPhysics->getPhysicsInsertionCallback());
 }
 
-PxRigidStatic* CPhysX_Manager::Add_StaticActor(PxTriangleMesh* pMesh, _fmatrix WorldMatrix)
+PxRigidStatic* CPhysX_Manager::Create_StaticActor(PxTriangleMesh* pMesh, _fmatrix WorldMatrix)
 {
     if (nullptr == m_pPhysics || nullptr == m_pScene || nullptr == pMesh)
         return nullptr;
@@ -128,10 +128,19 @@ PxRigidStatic* CPhysX_Manager::Add_StaticActor(PxTriangleMesh* pMesh, _fmatrix W
 
 void CPhysX_Manager::Remove_StaticActor(PxRigidStatic* pActor)
 {
-    if (nullptr == pActor) return;
+    if (nullptr == pActor)
+        return;
+    
     auto it = find(m_StaticActors.begin(), m_StaticActors.end(), pActor);
-    if (it != m_StaticActors.end()) m_StaticActors.erase(it);
-    if (m_pScene) m_pScene->removeActor(*pActor);
+    
+    if (it == m_StaticActors.end())
+        return;
+
+    m_StaticActors.erase(it);
+    
+    if (m_pScene)
+        m_pScene->removeActor(*pActor);
+    
     pActor->release();
 }
 

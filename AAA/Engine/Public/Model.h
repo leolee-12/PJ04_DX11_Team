@@ -53,7 +53,8 @@ public:
 
 public:
 	virtual HRESULT Initialize_Prototype(MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter = nullptr);
-	virtual HRESULT Initialize_Prototype_WithTextureHub(MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter = nullptr);
+	virtual HRESULT Initialize_Prototype_WithTextureHub(MODEL eType, const _char* pModelFilePath,
+		_fmatrix PreTransformMatrix, PickableFilter fcFillter = nullptr, _bool bCookCollisionMesh = false);
 	virtual HRESULT Initialize(void* pArg);
 
 public:
@@ -84,8 +85,9 @@ private:
 
 	size_t						m_iNumMaterials = {};
 	vector<CMaterial*>			m_Materials;
-	_bool                        m_bUseMaterialEx = { false };
+	_bool                       m_bUseMaterialEx = { false };
 	vector<CMaterialEx*>        m_MaterialsEx;
+	_bool						m_bCookCollisionMesh = { false };
 
 	_float4x4					m_PreTransformMatrix = {};	
 	vector<CBone*>				m_Bones;
@@ -125,7 +127,8 @@ private:
 
 public:
 	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix = XMMatrixIdentity(), PickableFilter fcFillter = nullptr);
-	static CModel* Create_WithTextureHub(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix = XMMatrixIdentity(), PickableFilter fcFillter = nullptr);
+	static CModel* Create_WithTextureHub(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath,
+		_fmatrix PreTransformMatrix = XMMatrixIdentity(), PickableFilter fcFillter = nullptr, _bool bCookCollisionMesh = false);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

@@ -49,12 +49,6 @@
     <Filter Include="03. Objects\Camera">
       <UniqueIdentifier>{b12c09d0-c36b-47d6-a528-13cafe5057d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03. Objects\MapStage">
-      <UniqueIdentifier>{23a1ab83-c458-44b1-8c02-9f652d9f9f45}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03. Objects\EnvObject">
-      <UniqueIdentifier>{a30fef72-aeb9-4730-8c6d-5306c5b0bc78}</UniqueIdentifier>
-    </Filter>
     <Filter Include="04. Panels">
       <UniqueIdentifier>{8cd65a44-7542-4a0f-be36-60fc2d99138f}</UniqueIdentifier>
     </Filter>
@@ -117,9 +111,6 @@
     <ClInclude Include="..\Public\Panel_Palette.h">
       <Filter>04. Panels</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Panel_NavMesh.h">
-      <Filter>04. Panels</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\EditCamera.h">
       <Filter>03. Objects\Camera</Filter>
     </ClInclude>
@@ -150,15 +141,6 @@
     <ClInclude Include="..\Public\Loader.h">
       <Filter>02. Levels\Loader</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\MapSection_Defines.h">
-      <Filter>03. Objects\MapStage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\MapSection.h">
-      <Filter>03. Objects\MapStage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\MapStage.h">
-      <Filter>03. Objects\MapStage</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\MapToolProfiler.h">
       <Filter>01. API\01. Profiler</Filter>
     </ClInclude>
@@ -167,24 +149,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\EditInstance.h">
       <Filter>01. API\00. EditInstance</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\EnvObject.h">
-      <Filter>03. Objects\EnvObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\EnvObject_Defines.h">
-      <Filter>03. Objects\EnvObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\EnvObject_Effect.h">
-      <Filter>03. Objects\EnvObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\EnvObject_Interact.h">
-      <Filter>03. Objects\EnvObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\EnvObject_Static.h">
-      <Filter>03. Objects\EnvObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\EnvObjectLoader.h">
-      <Filter>03. Objects\EnvObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -237,9 +201,6 @@
       <Filter>04. Panels</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Panel_Palette.cpp">
-      <Filter>04. Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Panel_NavMesh.cpp">
       <Filter>04. Panels</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EditCamera.cpp">

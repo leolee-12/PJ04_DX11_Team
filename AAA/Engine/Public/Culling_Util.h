@@ -12,6 +12,7 @@ public:
 	static _bool XM_CALLCONV Transform_AABB(const BoundingBox& LocalBounds, _fmatrix WorldMatrix, BoundingBox* pOutWorldBounds);
 	static BoundingBox Merge_AABB(const BoundingBox& A, const BoundingBox& B);
 	static _bool Expand_AABB(BoundingBox* pBounds, _float fMargin);
+	static _bool Check_CullByDistance(const BoundingBox& WorldBounds, const _float4& vCamPos, _float fCullDistance = 175.f);
 };
 
 NS_END

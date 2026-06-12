@@ -26,6 +26,7 @@ HRESULT CLevel_GamePlay::Initialize()
 
     if (FAILED(CMap_Loader::Spawn_Map(
         Manifest.strMapManifest,
+        Manifest.strObjectsFile,
         ETOUI(LEVEL::GAMEPLAY),
         &MapReport,
         &pMapStage)))

@@ -1,17 +1,30 @@
 #include "EnvObject.h"
-
-#include <cmath>
-
 #include "GameContent_const.h"
+
 #include "GameInstance_Proxy.h"
 #include "Model.h"
-#include "Shader.h"
+
+//#include <cfloat>
+//#include <cmath>
 
 NS_BEGIN(Client)
 
 namespace
 {
 	constexpr _bool ENABLE_ENV_OBJECT_SHADOW = false;
+	constexpr _float ENV_DISTANCE_CULL_START = 175.f;
+
+	void Log_EnvPhysicsWarning(const string& strMessage)
+	{
+		OutputDebugStringA((strMessage + "\n").c_str());
+	}
+
+#ifdef _DEBUG
+	void Log_EnvPhysicsInfo(const string& strMessage)
+	{
+		OutputDebugStringA((strMessage + "\n").c_str());
+	}
+#endif
 
 	_matrix Build_WorldMatrix_FromTRS(const ENV_OBJECT_DESC& Desc)
 	{
@@ -61,9 +74,6 @@ namespace
 
 CEnvObject::CEnvObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{pDevice, pContext}
-	//, m_bRenderable{ true }
-	//, m_bEnableCulling{ true }
-	//, m_bCastShadow{ true }
 {
 }
 
@@ -71,9 +81,6 @@ CEnvObject::CEnvObject(const CEnvObject& Prototype)
 	: CGameObject(Prototype)
 	, m_tDesc(Prototype.m_tDesc)
 	, m_strProtoTag(Prototype.m_strProtoTag)
-	//, m_bRenderable{ Prototype.m_bRenderable }
-	//, m_bEnableCulling{ Prototype.m_bEnableCulling }
-	//, m_bCastShadow{ Prototype.m_bCastShadow }
 {
 }
 
@@ -108,6 +115,66 @@ void CEnvObject::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	pOutData->strPrototypeTag = m_strProtoTag;
 }
 
+_bool XM_CALLCONV CEnvObject::Pick_Ray(_fvector vOrigin, _fvector vDir, _float3* pOutHit, _float* pOutDistance)
+{
+	if (!m_bRenderable || nullptr == m_pModelCom || nullptr == m_pTransformCom)
+		return false;
+
+	Refresh_WorldBounds();
+
+	float fBoundsDist = 0.f;
+	if (!m_WorldBounds.Intersects(vOrigin, vDir, fBoundsDist))
+		return false;
+
+	const _matrix WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+	_bool bHit = false;
+	_float fBestDist = FLT_MAX;
+	_float3 vBestHit = {};
+
+	const size_t iNumMeshes = m_pModelCom->Get_NumMeshes();
+	for (size_t i = 0; i < iNumMeshes; ++i)
+	{
+		_float3 vHit = {};
+		float fLocalDist = 0.f;
+
+		if (!m_pModelCom->Pick_Mesh(
+			static_cast<_uint>(i),
+			vOrigin,
+			vDir,
+			WorldMatrix,
+			&vHit,
+			&fLocalDist))
+		{
+			continue;
+		}
+
+		UNREFERENCED_PARAMETER(fLocalDist);
+
+		const _vector vHitWorld = XMLoadFloat3(&vHit);
+		const _float fWorldDist = XMVectorGetX(
+			XMVector3Length(vHitWorld - vOrigin));
+
+		if (fWorldDist < fBestDist)
+		{
+			fBestDist = fWorldDist;
+			vBestHit = vHit;
+			bHit = true;
+		}
+	}
+
+	if (!bHit)
+		return false;
+
+	if (nullptr != pOutHit)
+		*pOutHit = vBestHit;
+
+	if (nullptr != pOutDistance)
+		*pOutDistance = fBestDist;
+
+	return true;
+}
+
 HRESULT CEnvObject::Ready_RenderComponents(_uint iModelProtoLevel, const wstring& strModelProtoTag)
 {
 	if (strModelProtoTag.empty())
@@ -130,6 +197,152 @@ HRESULT CEnvObject::Ready_RenderComponents(_uint iModelProtoLevel, const wstring
 	Update_LocalBounds();
 	Refresh_WorldBounds();
 	return S_OK;
+}
+
+HRESULT CEnvObject::Ready_PhysicsActor()
+{
+	Release_PhysicsActor();
+
+	if (!Should_CreatePhysicsActor())
+	{
+//#ifdef _DEBUG
+//		if (m_tDesc.tCollision.bInvalidCollision)
+//		{
+//			Log_EnvPhysicsInfo(
+//				"[EnvPhysics] Skip actor: invalid collision. object="
+//				+ WstrToStr(m_tDesc.strObjectName)
+//				+ " uid="
+//				+ to_string(m_tDesc.iUid)
+//				+ " modelTag="
+//				+ WstrToStr(m_tDesc.strModelProtoTag));
+//		}
+//#endif
+		return S_OK;
+	}
+
+	switch (m_tDesc.tCollision.eColliderKind)
+	{
+	case ENV_COLLIDER_KIND::MODEL_MESH:
+		return Ready_PhysicsActor_ModelMesh();
+
+	case ENV_COLLIDER_KIND::SIMPLE_SHAPE:
+		// 다음 단계에서 Cube / Sphere / Cylinder / Slope 처리 예정.
+		return S_OK;
+
+	case ENV_COLLIDER_KIND::NONE:
+	case ENV_COLLIDER_KIND::TRIGGER_ONLY:
+	case ENV_COLLIDER_KIND::UNKNOWN:
+	default:
+		return S_OK;
+	}
+}
+
+HRESULT CEnvObject::Ready_PhysicsActor_ModelMesh()
+{
+	if (!m_tDesc.tCollision.bHasDecorCollisionApxbin)
+	{
+#ifdef _DEBUG
+		Log_EnvPhysicsInfo(
+			"[EnvPhysics] MODEL_MESH actor skipped: no decor collision apxbin. object="
+			+ WstrToStr(m_tDesc.strObjectName)
+			+ " uid="
+			+ to_string(m_tDesc.iUid)
+			+ " modelTag="
+			+ WstrToStr(m_tDesc.strModelProtoTag));
+#endif
+		return S_OK;
+	}
+
+	if (nullptr == m_pGameInstance_Proxy)
+		return E_FAIL;
+
+	if (nullptr == m_pTransformCom)
+		return E_FAIL;
+
+	if (nullptr == m_pModelCom)
+	{
+#ifdef _DEBUG
+		Log_EnvPhysicsWarning(
+			"EnvObject MODEL_MESH collision skipped: model component is null.");
+#endif
+		return S_OK;
+	}
+
+	physx::PxTriangleMesh* pCollisionMesh = m_pModelCom->Get_CollisionMesh();
+	if (nullptr == pCollisionMesh)
+	{
+#ifdef _DEBUG
+		Log_EnvPhysicsWarning(
+			"EnvObject MODEL_MESH collision skipped: cooked collision mesh is null.");
+#endif
+		return S_OK;
+	}
+
+	m_pPhysicsActor = m_pGameInstance_Proxy->Create_StaticActor(
+		pCollisionMesh,
+		XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+
+	if (nullptr == m_pPhysicsActor)
+	{
+#ifdef _DEBUG
+		Log_EnvPhysicsWarning(
+			"[EnvPhysics] MODEL_MESH actor failed: Create_StaticActor returned null. object="
+			+ WstrToStr(m_tDesc.strObjectName)
+			+ " uid="
+			+ to_string(m_tDesc.iUid)
+			+ " modelTag="
+			+ WstrToStr(m_tDesc.strModelProtoTag));
+#endif
+		return E_FAIL;
+	}
+
+//#ifdef _DEBUG
+//	Log_EnvPhysicsInfo(
+//		"[EnvPhysics] MODEL_MESH actor created. object="
+//		+ WstrToStr(m_tDesc.strObjectName)
+//		+ " uid="
+//		+ to_string(m_tDesc.iUid)
+//		+ " apxbin="
+//		+ WstrToStr(m_tDesc.tCollision.strDecorCollisionApxbinName)
+//		+ " modelTag="
+//		+ WstrToStr(m_tDesc.strModelProtoTag));
+//#endif
+
+	return S_OK;
+}
+
+void CEnvObject::Release_PhysicsActor()
+{
+	if (nullptr == m_pPhysicsActor)
+		return;
+
+	if (nullptr != m_pGameInstance_Proxy)
+		m_pGameInstance_Proxy->Remove_StaticActor(m_pPhysicsActor);
+
+	m_pPhysicsActor = nullptr;
+}
+
+_bool CEnvObject::Should_CreatePhysicsActor() const
+{
+	const ENV_COLLISION_DESC& Collision = m_tDesc.tCollision;
+
+	switch (Collision.eColliderKind)
+	{
+	case ENV_COLLIDER_KIND::MODEL_MESH:
+		// Decor 모델 메쉬 충돌은 카탈로그 hit가 최종 기준이다.
+		return Collision.bHasDecorCollisionApxbin
+			&& !Collision.bInvalidCollision;
+
+	case ENV_COLLIDER_KIND::SIMPLE_SHAPE:
+	case ENV_COLLIDER_KIND::TRIGGER_ONLY:
+		// 단순 충돌/트리거는 기존 원본 invalid 플래그를 존중한다.
+		return !Collision.bInvalidCollision;
+
+	case ENV_COLLIDER_KIND::NONE:
+	case ENV_COLLIDER_KIND::UNKNOWN:
+	default:
+		return false;
+	}
 }
 
 HRESULT CEnvObject::Bind_ShaderResources()
@@ -165,7 +378,7 @@ HRESULT CEnvObject::Render()
 
 		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", static_cast<_uint>(i), MTEX_TYPE::DIFFUSE,
 			Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)])))
-			continue;
+			int a = 1;/*continue;*/
 		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", static_cast<_uint>(i), MTEX_TYPE::NORMALS,
 			Layer.idx[ETOUI(MTEX_TYPE::NORMALS)])))
 			int a = 1;/*continue;*/
@@ -178,15 +391,18 @@ HRESULT CEnvObject::Render()
 
 		_uint iPass = (Layer.iPass >= 0)
 			? static_cast<_uint>(Layer.iPass)
-			: ShaderPass::NonAnimPBR::White;
+			: ShaderPass::NonAnimPBR::Diffuse;
 
-		if (iPass > ShaderPass::NonAnimPBR::Diffuse)
-			iPass = ShaderPass::NonAnimPBR::White;
-
-		//if (FAILED(m_pShaderCom->Begin(iPass)))
-		//	return E_FAIL;
-		if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::Diffuse)))
+		if (FAILED(m_pShaderCom->Begin(iPass)))
 			return E_FAIL;
+
+		/* ---- 강제 렌더링 (디버그용) ---- */
+		//if (iPass > ShaderPass::NonAnimPBR::Diffuse)
+		//	iPass = ShaderPass::NonAnimPBR::White;
+		//
+		//if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::White)))
+		//	return E_FAIL;
+		/* -------------------------------- */
 
 		if (FAILED(m_pModelCom->Render(static_cast<_uint>(i))))
 			return E_FAIL;
@@ -265,15 +481,20 @@ void CEnvObject::Check_Visible()
 		return;
 	}
 
-	if (!m_bEnableCulling)
-	{
-		m_bVisible = true;
-		m_bVisibleShadow = bEnableShadow;
-		return;
-	}
+	m_bVisible = !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, m_WorldBounds);
+	m_bVisibleShadow = bEnableShadow && !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_WorldBounds);
 
-	m_bVisible = !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, m_bEnableCulling, m_WorldBounds);
-	m_bVisibleShadow = bEnableShadow && !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_bEnableCulling, m_WorldBounds);
+	if ((m_bVisible || m_bVisibleShadow) && m_bEnableCulling)
+	{
+		const _bool bDistanceCulled =
+			m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_DISTANCE_CULL_START);
+
+		if (bDistanceCulled)
+		{
+			m_bVisible = false;
+			m_bVisibleShadow = false;
+		}
+	}
 }
 
 void CEnvObject::Apply_TransformFromDesc()
@@ -303,6 +524,8 @@ void CEnvObject::Apply_DescDefaults()
 
 void CEnvObject::Free()
 {
+	Release_PhysicsActor();
+
 	__super::Free();
 }
 
