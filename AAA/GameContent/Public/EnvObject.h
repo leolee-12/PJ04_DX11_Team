@@ -7,6 +7,10 @@ class CShader;
 class CModel;
 NS_END
 
+NS_BEGIN(physx)
+class PxRigidStatic;
+NS_END
+
 NS_BEGIN(Client)
 
 class CLIENT_DLL CEnvObject abstract : public CGameObject
@@ -38,8 +42,18 @@ public:
 	_bool   Is_Visible_Main() const { return m_bVisible; }
 	_bool   Is_Visible_Shadow() const { return m_bVisibleShadow; }
 
+	const ENV_OBJECT_DESC& Get_Desc() const { return m_tDesc; }
+
+	virtual _bool XM_CALLCONV Pick_Ray(_fvector vOrigin,_fvector vDir, _float3* pOutHit, _float* pOutDistance);
+
 protected:
 	HRESULT Ready_RenderComponents(_uint iModelProtoLevel, const wstring& strModelProtoTag);
+	HRESULT Ready_PhysicsActor();
+	HRESULT Ready_PhysicsActor_ModelMesh();
+	void	Release_PhysicsActor();
+
+	_bool	Should_CreatePhysicsActor() const;
+
 	HRESULT Bind_ShaderResources();
 	void	Update_LocalBounds();
 	void	Refresh_WorldBounds();
@@ -51,6 +65,8 @@ protected:
 	wstring			m_strProtoTag = { PROTOTYPE_TAG };
 	CShader*		m_pShaderCom = { nullptr };
 	CModel*			m_pModelCom = { nullptr };
+	physx::PxRigidStatic* m_pPhysicsActor = { nullptr };
+
 	BoundingBox		m_LocalBounds = {};
 	BoundingBox		m_WorldBounds = {};
 	_bool			m_bVisible = { true };

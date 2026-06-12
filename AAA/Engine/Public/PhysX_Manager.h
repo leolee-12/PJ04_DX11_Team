@@ -34,7 +34,7 @@ public:
         const _uint* pIndices, _uint iNumIndices,
         _bool bFlipWinding = true);
 
-    physx::PxRigidStatic* Add_StaticActor(physx::PxTriangleMesh* pMesh, _fmatrix WorldMatrix);
+    physx::PxRigidStatic* Create_StaticActor(physx::PxTriangleMesh* pMesh, _fmatrix WorldMatrix);
     void                  Remove_StaticActor(physx::PxRigidStatic* pActor);
 
     physx::PxController* Create_CapsuleController(const _float3& vPos, _float fRadius, _float fHeight);

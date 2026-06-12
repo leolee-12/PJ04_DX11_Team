@@ -6,7 +6,7 @@
 #include "GameObject_Factory.h"
 #include "EditCamera.h"
 #include "MapStage.h"
-#include "Map_EditHelper.h"
+#include "Map_Loader.h"
 #include "imgui.h"
 #include "Kirby.h"
 #include "Transform.h"
@@ -217,16 +217,6 @@ HRESULT CLevel_Edit::Ready_Kirby()
     return S_OK;
 }
 
-_uint CLevel_Edit::Get_MapPreviewPresetCount() const
-{
-    return CMap_EditHelper::Get_MapPresetCount();
-}
-
-const _char* CLevel_Edit::Get_MapPreviewPresetLabel(_uint iPresetIndex) const
-{
-    return CMap_EditHelper::Get_MapPresetLabel(iPresetIndex);
-}
-
 void CLevel_Edit::Set_Play(_bool b)
 {
     m_bPlay = b;
@@ -240,47 +230,64 @@ HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
 {
     Clear_MapPreview();
 
-    Client::CMap_EditHelper::MAP_PRESET_LOAD_REPORT Report{};
+    _wstring strManifestPath;
+    if (FAILED(Client::CMap_Loader::Get_MapPresetManifestPath(iPresetIndex, &strManifestPath)))
+    {
+        m_strMapPreviewStatus = L"Map preset load failed.";
+        return E_FAIL;
+    }
+
+    Client::MAP_RUNTIME_LOAD_CONTEXT Context{};
+    Context.pDevice = m_pDevice;
+    Context.pContext = m_pContext;
+    Context.iPlaceLevel = ETOUI(EDIT_LEVEL::EDIT);
+    Context.iModelLevel = ETOUI(LEVEL::STATIC);
+    Context.pCreatedCallback = &On_MapPreviewObjectCreated;
+    Context.pCallbackContext = this;
+
     CMapStage* pLoadedStage = nullptr;
-    const HRESULT hResult = CMap_EditHelper::Load_MapPreset(
-        m_pDevice,
-        m_pContext,
-        iPresetIndex,
-        ETOUI(EDIT_LEVEL::EDIT),
-        ETOUI(LEVEL::GAMEPLAY),
-        &On_MapPreviewObjectCreated,
-        this,
-        &Report,
+    HRESULT hResult = Client::CMap_Loader::Load_MapStage_Runtime(
+        Context,
+        strManifestPath,
         &pLoadedStage);
 
     if (FAILED(hResult))
     {
-        m_pMapStage = nullptr;
-        m_strLoadedMapStageName.clear();
-        m_iEnvObjCreatedCount = 0;
-        m_iLoadedMapPresetIndex = -1;
+        m_strMapPreviewStatus = L"Map preset load failed.";
+        return hResult;
+    }
+
+    Client::MAP_LOAD_REPORT Report{};
+    hResult = Client::CMap_Loader::Load_Env_Runtime(
+        Context,
+        strManifestPath,
+        nullptr,
+        &Report);
+
+    if (FAILED(hResult))
+    {
+        Clear_MapPreview();
         m_strMapPreviewStatus = L"Map preset load failed.";
         return hResult;
     }
 
     m_pMapStage = pLoadedStage;
-    m_strLoadedMapStageName = Report.strStageName;
+    m_strLoadedMapStageName = nullptr != m_pMapStage ? m_pMapStage->Get_StageName() : L"";
     if (m_strLoadedMapStageName.empty())
-        m_strLoadedMapStageName = StrToWstr(Get_MapPreviewPresetLabel(iPresetIndex));
+        m_strLoadedMapStageName = StrToWstr(Client::CMap_Loader::Get_MapPresetLabel(iPresetIndex));
 
     m_iEnvObjCreatedCount = Report.iEnvCreatedCount;
     m_iLoadedMapPresetIndex = static_cast<_int>(iPresetIndex);
     m_strMapPreviewStatus = L"Map preset loaded: " + m_strLoadedMapStageName
         + L" / env=" + to_wstring(m_iEnvObjCreatedCount);
 
-    if (0 != Report.iEnvJsonFailedCount
-        || 0 != Report.iEnvSkippedMissingModel
+    if (0 != Report.iEnvSkippedMissingModel
         || 0 != Report.iEnvSkippedCreateFailed)
     {
         m_strMapPreviewStatus += L" / warnings";
     }
 
-    return hResult;
+    return S_OK;
 }
 
 HRESULT CLevel_Edit::Load_MapPreviewStage(_uint iPresetIndex)
@@ -288,18 +295,30 @@ HRESULT CLevel_Edit::Load_MapPreviewStage(_uint iPresetIndex)
     Clear_MapPreviewStage();
     m_iLoadedMapPresetIndex = -1;
 
+    _wstring strManifestPath;
+    if (FAILED(Client::CMap_Loader::Get_MapPresetManifestPath(iPresetIndex, &strManifestPath)))
+    {
+        m_pMapStage = nullptr;
+        m_strLoadedMapStageName.clear();
+        m_strMapPreviewStatus = 0 != m_iEnvObjCreatedCount
+            ? L"Map stage preview load failed. / env=" + to_wstring(m_iEnvObjCreatedCount)
+            : L"Map stage preview load failed.";
+        return E_FAIL;
+    }
+
+    Client::MAP_RUNTIME_LOAD_CONTEXT Context{};
+    Context.pDevice = m_pDevice;
+    Context.pContext = m_pContext;
+    Context.iPlaceLevel = ETOUI(EDIT_LEVEL::EDIT);
+    Context.iModelLevel = ETOUI(LEVEL::STATIC);
+    Context.pCreatedCallback = &On_MapPreviewObjectCreated;
+    Context.pCallbackContext = this;
+
     CMapStage* pLoadedStage = nullptr;
-    _wstring strStageName;
-    const HRESULT hResult = CMap_EditHelper::Load_MapStage(
-        m_pDevice,
-        m_pContext,
-        iPresetIndex,
-        ETOUI(EDIT_LEVEL::EDIT),
-        ETOUI(LEVEL::GAMEPLAY),
-        &On_MapPreviewObjectCreated,
-        this,
-        &pLoadedStage,
-        &strStageName);
+    const HRESULT hResult = Client::CMap_Loader::Load_MapStage_Runtime(
+        Context,
+        strManifestPath,
+        &pLoadedStage);
 
     if (FAILED(hResult))
     {
@@ -312,14 +331,14 @@ HRESULT CLevel_Edit::Load_MapPreviewStage(_uint iPresetIndex)
     }
 
     m_pMapStage = pLoadedStage;
-    m_strLoadedMapStageName = strStageName;
+    m_strLoadedMapStageName = nullptr != m_pMapStage ? m_pMapStage->Get_StageName() : L"";
     if (m_strLoadedMapStageName.empty())
-        m_strLoadedMapStageName = StrToWstr(Get_MapPreviewPresetLabel(iPresetIndex));
+        m_strLoadedMapStageName = StrToWstr(Client::CMap_Loader::Get_MapPresetLabel(iPresetIndex));
 
     m_strMapPreviewStatus = L"Map stage preview loaded: " + m_strLoadedMapStageName
         + L" / env=" + to_wstring(m_iEnvObjCreatedCount);
 
-    return hResult;
+    return S_OK;
 }
 
 HRESULT CLevel_Edit::Load_MapPreviewEnv(_uint iPresetIndex)
@@ -327,15 +346,26 @@ HRESULT CLevel_Edit::Load_MapPreviewEnv(_uint iPresetIndex)
     Clear_MapPreviewEnv();
     m_iLoadedMapPresetIndex = -1;
 
-    Client::CMap_EditHelper::MAP_PRESET_LOAD_REPORT Report{};
-    const HRESULT hResult = CMap_EditHelper::Load_EnvObject_FromJson(
-        m_pDevice,
-        m_pContext,
-        iPresetIndex,
-        ETOUI(EDIT_LEVEL::EDIT),
-        &On_MapPreviewObjectCreated,
-        this,
-        &Report);
+    _wstring strManifestPath;
+    if (FAILED(Client::CMap_Loader::Get_MapPresetManifestPath(iPresetIndex, &strManifestPath)))
+    {
+        m_iEnvObjCreatedCount = 0;
+        m_strMapPreviewStatus = nullptr != m_pMapStage
+            ? L"Environment preview load failed. / stage=" + m_strLoadedMapStageName
+            : L"Environment preview load failed.";
+        return E_FAIL;
+    }
+
+    MAP_RUNTIME_LOAD_CONTEXT Context{};
+    Context.pDevice = m_pDevice;
+    Context.pContext = m_pContext;
+    Context.iPlaceLevel = ETOUI(EDIT_LEVEL::EDIT);
+    Context.iModelLevel = ETOUI(LEVEL::STATIC);
+    Context.pCreatedCallback = &On_MapPreviewObjectCreated;
+    Context.pCallbackContext = this;
+
+    MAP_LOAD_REPORT Report{};
+    const HRESULT hResult = CMap_Loader::Load_Env_Runtime(Context, strManifestPath, nullptr, &Report);
 
     if (FAILED(hResult))
     {
@@ -351,14 +381,13 @@ HRESULT CLevel_Edit::Load_MapPreviewEnv(_uint iPresetIndex)
     if (!m_strLoadedMapStageName.empty())
         m_strMapPreviewStatus += L" / stage=" + m_strLoadedMapStageName;
 
-    if (0 != Report.iEnvJsonFailedCount
-        || 0 != Report.iEnvSkippedMissingModel
+    if (0 != Report.iEnvSkippedMissingModel
         || 0 != Report.iEnvSkippedCreateFailed)
     {
         m_strMapPreviewStatus += L" / warnings";
     }
 
-    return hResult;
+    return S_OK;
 }
 
 void CLevel_Edit::Clear_MapPreview()
@@ -368,7 +397,7 @@ void CLevel_Edit::Clear_MapPreview()
 
     for (const auto& Pair : m_Layers)
     {
-        if (CMap_EditHelper::Is_MapLayer(Pair.first))
+        if (CMap_Loader::Is_MapLayer(Pair.first))
             MapLayers.push_back(Pair.first);
     }
 

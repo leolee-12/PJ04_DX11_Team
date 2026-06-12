@@ -19,7 +19,7 @@ namespace Engine
 
 	enum class LIGHT { DIRECTIONAL, POINT, END };
 
-	enum class MODEL { NONANIM, ANIM, MAP, END };
+	enum class MODEL { NONANIM, ANIM, MAP, ENVIRONMENT, END };
 
 	enum class NAVI_POINT { A, B, C, END };
 

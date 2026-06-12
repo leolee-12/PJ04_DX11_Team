@@ -2,7 +2,7 @@
 #include "MapStage.h"
 #include "EnvObject_Static.h"
 #include "EnvObject_Interact.h"
-#include "EnvObject_Effect.h"
+#include "EnvObject_Trigger.h"
 
 #include "GameInstance.h"
 
@@ -133,6 +133,35 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 				strObjectName
 				});
 		}
+	
+		for (const MAP_ADDED_OBJECT_DESC& Added : Package.AddedObjectDescs)
+		{
+			CGameObject* pCreatedObject = nullptr;
+
+			if (FAILED(m_pProxy->Add_GameObject_Return(
+				&pCreatedObject,
+				Levels.iObjectLevel,
+				Added.strPrototypeTag.c_str(),
+				Levels.iObjectLevel,
+				Added.strLayerTag.c_str(),
+				Added.strObjectTag,
+				nullptr)))
+			{
+				Rollback(CreatedObjects);
+				return E_FAIL;
+			}
+
+			if (nullptr != pCreatedObject)
+				pCreatedObject->Deserialize(Added.jObject);
+
+			CreatedObjects.push_back(pCreatedObject);
+			PendingCallbacks.push_back({
+				pCreatedObject,
+				Added.strPrototypeTag,
+				Added.strLayerTag,
+				Added.strObjectTag
+				});
+		}
 	}
 
 	if (nullptr != pOutReport)
@@ -190,7 +219,7 @@ const _tchar* CMap_Spawner::Get_EnvObjectProtoTag(ENV_OBJECT_KIND eKind) const
 	{
 	case ENV_OBJECT_KIND::STATIC: return CEnvObject_Static::PROTOTYPE_TAG;
 	case ENV_OBJECT_KIND::INTERACT: return CEnvObject_Interact::PROTOTYPE_TAG;
-	case ENV_OBJECT_KIND::EFFECT: return CEnvObject_Effect::PROTOTYPE_TAG;
+	case ENV_OBJECT_KIND::EFFECT: return CEnvObject_Trigger::PROTOTYPE_TAG;
 	default: return nullptr;
 	}
 }

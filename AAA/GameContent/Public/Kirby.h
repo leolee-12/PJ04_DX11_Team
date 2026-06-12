@@ -10,6 +10,7 @@ NS_END
 
 NS_BEGIN(Engine)
 class CMovement;
+class CCollider;
 NS_END
 
 NS_BEGIN(Client)
@@ -91,6 +92,7 @@ private:
 
 	physx::PxController* m_pController = { nullptr };
 	CMovement_Child* m_pMovement = { nullptr };
+	CCollider* m_pTriggerSensor = { nullptr };
 
 	// Controller(Collider: Capsule)
 	static constexpr _float CCT_RADIUS = 0.75f;

@@ -19,6 +19,9 @@ namespace Client
 	};
 
 	enum class VTXTEX_SHADER { DEFAULT, ALPHABLEND };
+
+	constexpr _uint CL_PLAYER_SENSOR = 0;
+	constexpr _uint CL_ENV_TRIGGER = 1;
 }
 
 using namespace Client;

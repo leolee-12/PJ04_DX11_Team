@@ -46,29 +46,50 @@ HRESULT CCollider::Initialize_Prototype(COLLIDER eType)
 
 HRESULT CCollider::Initialize(void* pArg)
 {
-    auto    pColliderDesc = static_cast<COLLIDER_DESC*>(pArg);
-    if (pColliderDesc == nullptr) return E_FAIL;
-    
-    CBounding::BOUNDING_DESC BoundingDesc = {};
-    m_pOwner = pColliderDesc->pOwner;
-    BoundingDesc.vCenter = pColliderDesc->vCenter;
+    auto pColliderDesc = static_cast<COLLIDER_DESC*>(pArg);
+    if (pColliderDesc == nullptr)
+        return E_FAIL;
 
+    m_pOwner = pColliderDesc->pOwner;
 
     switch (m_eType)
     {
     case COLLIDER::AABB:
+    {
+        CBounding_AABB::BOUNDING_AABB_DESC BoundingDesc{};
+        BoundingDesc.vCenter = pColliderDesc->vCenter;
+        BoundingDesc.vSize = pColliderDesc->vSize;
         m_pBounding = CBounding_AABB::Create(m_pDevice, m_pContext, &BoundingDesc);
         break;
+    }
+
     case COLLIDER::OBB:
+    {
+        CBounding_OBB::BOUNDING_OBB_DESC BoundingDesc{};
+        BoundingDesc.vCenter = pColliderDesc->vCenter;
+        BoundingDesc.vSize = pColliderDesc->vSize;
+        BoundingDesc.vRadians = pColliderDesc->vRadians;
         m_pBounding = CBounding_OBB::Create(m_pDevice, m_pContext, &BoundingDesc);
         break;
+    }
+
     case COLLIDER::SPHERE:
+    {
+        CBounding_Sphere::BOUNDING_SPHERE_DESC BoundingDesc{};
+        BoundingDesc.vCenter = pColliderDesc->vCenter;
+        BoundingDesc.fRadius = pColliderDesc->fRadius;
         m_pBounding = CBounding_Sphere::Create(m_pDevice, m_pContext, &BoundingDesc);
         break;
     }
 
+    default:
+        return E_FAIL;
+    }
 
-	return S_OK;
+    if (nullptr == m_pBounding)
+        return E_FAIL;
+
+    return S_OK;
 }
 
 void CCollider::Update(_fmatrix TransformMatrix)

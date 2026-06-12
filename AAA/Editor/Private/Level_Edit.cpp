@@ -3,17 +3,16 @@
 
 #include "GameObject.h"
 #include "GameInstance.h"
-#include "GameInstance_Proxy.h"
 
 #include "GameObject_Factory.h"
 #include "DataExporter.h"
 #include "DataLoader.h"
 #include "EditCamera.h"
 #include "Edit_Grid.h"
-#include "NavMesh_Editor.h"
 #include "MapStage.h"
-#include "Map_EditHelper.h"
-
+#include "Map_Loader.h"
+#include "Map_LevelContent.h"
+#include "Map_EditSession.h"
 #include "Effect_Container.h"
 
 CLevel_Edit::CLevel_Edit(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -33,6 +32,10 @@ HRESULT CLevel_Edit::Initialize()
         return E_FAIL;
 
     if (FAILED(Ready_EditGrid()))
+        return E_FAIL;
+
+    m_pMapPreviewSession = CMap_EditSession::Create();
+    if (nullptr == m_pMapPreviewSession)
         return E_FAIL;
 
     return S_OK;
@@ -97,14 +100,14 @@ void CLevel_Edit::Save_Level(const wstring& strFilePath, const wstring& strLevel
     {
         for (auto& handle : Objects)
         {
-            if (m_MapPreviewObjects.find(handle.pObject) != m_MapPreviewObjects.end())
+            if (Should_SkipMapObjectForLevelSave(handle.pObject))
                 continue;
 
             json jObj = handle.pObject->Serialize();
 
-            jObj["Object_Tag"]      = WstrToStr(handle.strName);
-            jObj["Prototype_Tag"]   = WstrToStr(handle.strPrototypeTag);
-            jObj["Layer_Tag"]       = WstrToStr(LayerTag);
+            jObj["Object_Tag"] = WstrToStr(handle.strName);
+            jObj["Prototype_Tag"] = WstrToStr(handle.strPrototypeTag);
+            jObj["Layer_Tag"] = WstrToStr(LayerTag);
 
             jObjects.push_back(jObj);
         }
@@ -112,10 +115,7 @@ void CLevel_Edit::Save_Level(const wstring& strFilePath, const wstring& strLevel
 
     jLevel["Objects"] = jObjects;
 
-    if (0 <= m_iLoadedMapPresetIndex)
-    {
-        jLevel["MapContent"] = { { "PresetIndex", m_iLoadedMapPresetIndex } };
-    }
+    Append_MapLevelData(&jLevel);
 
     CDataExporter::Write_JsonFile(strFilePath.c_str(), jLevel);
 }
@@ -126,12 +126,11 @@ void CLevel_Edit::Load_Level(const wstring& strFilePath)
     m_Layers.clear();
     m_pGameInstance_Proxy->Clear_Objects(ETOUI(EDIT_LEVEL::EDIT));
 
+    if (nullptr != m_pMapPreviewSession)
+        m_pMapPreviewSession->Reset();
+
     m_pMapStage = nullptr;
-    m_strLoadedMapStageName.clear();
-    m_iEnvObjCreatedCount = 0;
-    m_iLoadedMapPresetIndex = -1;
     m_MapPreviewObjects.clear();
-    m_strMapPreviewStatus = L"Map preset not loaded.";
 
     string strContent = {};
     if (FAILED(CDataLoader::Read_Json(strFilePath.c_str(), &strContent)))
@@ -141,30 +140,28 @@ void CLevel_Edit::Load_Level(const wstring& strFilePath)
     {
         json jLevel = json::parse(strContent);
 
-        for (auto& jObj : jLevel["Objects"])
+        if (FAILED(Load_MapLevelContentFromJson(jLevel)))
+            return;
+
+        if (FAILED(Apply_MapStageOverrideFromJson(jLevel)))
+            return;
+
+        if (jLevel.contains("Objects") && jLevel["Objects"].is_array())
         {
-            string strProto = jObj["Prototype_Tag"].get<string>();
-            string strLayer = jObj["Layer_Tag"].get<string>();
-            string strName = jObj["Object_Tag"].get<string>();
-
-            wstring wProto = StrToWstr(strProto);
-            wstring wLayer = StrToWstr(strLayer);
-            wstring wName  = StrToWstr(strName);
-
-            CGameObject* pObj = Spawn_Object(wProto, wLayer, wName);
-
-            if(pObj)
-                pObj->Deserialize(jObj);
-        }
-
-        if (jLevel.contains("MapContent") && jLevel["MapContent"].is_object())
-        {
-            const json& jMap = jLevel["MapContent"];
-            if (jMap.contains("PresetIndex") && jMap["PresetIndex"].is_number_integer())
+            for (auto& jObj : jLevel["Objects"])
             {
-                const int iPresetIndex = jMap["PresetIndex"].get<int>();
-                if (0 <= iPresetIndex)
-                    Load_MapPreview(static_cast<_uint>(iPresetIndex));
+                string strProto = jObj["Prototype_Tag"].get<string>();
+                string strLayer = jObj["Layer_Tag"].get<string>();
+                string strName = jObj["Object_Tag"].get<string>();
+
+                wstring wProto = StrToWstr(strProto);
+                wstring wLayer = StrToWstr(strLayer);
+                wstring wName = StrToWstr(strName);
+
+                CGameObject* pObj = Spawn_Object(wProto, wLayer, wName);
+
+                if (pObj)
+                    pObj->Deserialize(jObj);
             }
         }
     }
@@ -279,7 +276,7 @@ void CLevel_Edit::Change_ObjectLayer(CGameObject* pObject, const wstring& strNew
 {
     if (!pObject) return;
     if (m_MapPreviewObjects.find(pObject) != m_MapPreviewObjects.end()) return;
-    if (!m_MapPreviewObjects.empty() && CMap_EditHelper::Is_MapLayer(strNewLayer)) return;
+    if (!m_MapPreviewObjects.empty() && CMap_Loader::Is_MapLayer(strNewLayer)) return;
 
     Add_Layer(strNewLayer);
 
@@ -316,21 +313,7 @@ void CLevel_Edit::Delete_Object(CGameObject* pObject)
         {
             if (iter->pObject == pObject)
             {
-                const _bool bWasMapPreviewObject = 0 < m_MapPreviewObjects.erase(pObject);
-                if (bWasMapPreviewObject)
-                {
-                    if (pObject == m_pMapStage)
-                    {
-                        m_pMapStage = nullptr;
-                        m_strLoadedMapStageName.clear();
-                    }
-                    else if (m_iEnvObjCreatedCount > 0)
-                    {
-                        --m_iEnvObjCreatedCount;
-                    }
-
-                    m_strMapPreviewStatus = L"Map preset object removed.";
-                }
+                Handle_MapSpecificDeletion(pObject);
 
                 Objects.erase(iter);
                 m_pGameInstance_Proxy->Destroy_GameObject(pObject);
@@ -342,15 +325,6 @@ void CLevel_Edit::Delete_Object(CGameObject* pObject)
 
 void CLevel_Edit::Pick_And_Place(_fvector vOrigin, _fvector vDir)
 {
-    /*if (m_bNavEditMode)
-    {
-        _float3 fHitPos = {};
-        _float  fDummy = {};
-        if (m_pLumia->Pick_Floor(vOrigin, vDir, &fHitPos, &fDummy))
-            m_pNavMeshEditor->OnClick(fHitPos);
-        return;
-    }*/
-
     _float3 fHitPos = {};
     if (!m_pGameInstance_Proxy->Pick_RayToPlane(vOrigin, vDir, &fHitPos))
         return;
@@ -374,6 +348,8 @@ void CLevel_Edit::Place_Object_At(const _float3& vPos)
             XMVectorSet(vPos.x, vPos.y, vPos.z, 1.f)
         );
         pObj->Initialize_NaviPlacement();
+
+        Try_RegisterAddedMapOverridePlacement(pObj, strName);
     }
 }
 
@@ -491,14 +467,78 @@ HRESULT CLevel_Edit::Ready_EditGrid()
     return (m_pGrid == nullptr) ? E_FAIL : S_OK;
 }
 
-_uint CLevel_Edit::Get_MapPreviewPresetCount() const
+_bool CLevel_Edit::Is_MapPreviewLoaded() const
 {
-    return CMap_EditHelper::Get_MapPresetCount();
+    return nullptr != m_pMapPreviewSession
+        && m_pMapPreviewSession->Is_PreviewLoaded();
 }
 
-const _char* CLevel_Edit::Get_MapPreviewPresetLabel(_uint iPresetIndex) const
+const _wstring& CLevel_Edit::Get_MapPreviewStatus() const
 {
-    return CMap_EditHelper::Get_MapPresetLabel(iPresetIndex);
+    static const _wstring s_strDefault = L"Map preset not loaded.";
+    return nullptr != m_pMapPreviewSession
+        ? m_pMapPreviewSession->Get_PreviewStatus()
+        : s_strDefault;
+}
+
+const _wstring& CLevel_Edit::Get_LoadedMapPreviewStageName() const
+{
+    static const _wstring s_strEmpty;
+    return nullptr != m_pMapPreviewSession
+        ? m_pMapPreviewSession->Get_LoadedStageName()
+        : s_strEmpty;
+}
+
+_uint CLevel_Edit::Get_MapPreviewEnvCreatedCount() const
+{
+    return nullptr != m_pMapPreviewSession
+        ? m_pMapPreviewSession->Get_EnvCreatedCount()
+        : 0;
+}
+
+HRESULT CLevel_Edit::Restore_DeletedMapPreviewEnv(const _wstring& strStableKey)
+{
+    if (nullptr == m_pMapPreviewSession)
+        return E_FAIL;
+
+    const auto& MapContentDesc = m_pMapPreviewSession->Get_MapContentDesc();
+    if (0 > MapContentDesc.iPresetIndex)
+        return E_FAIL;
+
+    if (!m_pMapPreviewSession->Restore_DeletedEnvItem(strStableKey))
+        return E_FAIL;
+
+    return Load_MapPreviewEnv(static_cast<_uint>(MapContentDesc.iPresetIndex));
+}
+
+HRESULT CLevel_Edit::Restore_AllDeletedMapPreviewEnv()
+{
+    if (nullptr == m_pMapPreviewSession)
+        return E_FAIL;
+
+    const auto& MapContentDesc = m_pMapPreviewSession->Get_MapContentDesc();
+    if (0 > MapContentDesc.iPresetIndex)
+        return E_FAIL;
+
+    m_pMapPreviewSession->Restore_AllDeletedEnvItems();
+    return Load_MapPreviewEnv(static_cast<_uint>(MapContentDesc.iPresetIndex));
+}
+
+HRESULT CLevel_Edit::Save_MapOverride()
+{
+    if (nullptr == m_pMapPreviewSession)
+        return E_FAIL;
+
+    const Client::MAP_LEVEL_CONTENT_DESC MapContentDesc
+        = m_pMapPreviewSession->Build_MapContentSnapshot();
+
+    if (!MapContentDesc.bHasMapContent || 0 > MapContentDesc.iPresetIndex)
+        return E_FAIL;
+
+    return CMap_Loader::Save_MapPresetOverrideAsset(
+        static_cast<_uint>(MapContentDesc.iPresetIndex),
+        MapContentDesc,
+        m_pMapStage);
 }
 
 HRESULT CLevel_Edit::Save_Selected_Effect(const wstring& strFilePath)
@@ -602,46 +642,132 @@ HRESULT CLevel_Edit::Load_Selected_Effect(const wstring& strFilePath)
 
 HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
 {
+    if (nullptr != m_pMapPreviewSession)
+    {
+        const auto& MapContentDesc = m_pMapPreviewSession->Get_MapContentDesc();
+        if (!MapContentDesc.bHasMapContent
+            || MapContentDesc.iPresetIndex != static_cast<_int>(iPresetIndex))
+        {
+            m_pMapPreviewSession->Reset();
+        }
+    }
+
     Clear_MapPreview();
 
-    Client::CMap_EditHelper::MAP_PRESET_LOAD_REPORT Report{};
-    CMapStage* pLoadedStage = nullptr;
-    const HRESULT hResult = CMap_EditHelper::Load_MapPreset(
-        m_pDevice,
-        m_pContext,
+    Client::MAP_LEVEL_CONTENT_DESC ResolvedMapContentDesc{};
+    if (nullptr != m_pMapPreviewSession)
+        ResolvedMapContentDesc = m_pMapPreviewSession->Get_MapContentDesc();
+
+    ResolvedMapContentDesc.bHasMapContent = true;
+    ResolvedMapContentDesc.iPresetIndex = static_cast<_int>(iPresetIndex);
+
+    const HRESULT hSavedOverride = CMap_Loader::Load_MapPresetOverrideAsset(
         iPresetIndex,
-        ETOUI(EDIT_LEVEL::EDIT),
-        ETOUI(LEVEL::GAMEPLAY),
-        &On_MapPreviewObjectCreated,
-        this,
-        &Report,
+        ResolvedMapContentDesc.strManifestPath,
+        &ResolvedMapContentDesc);
+
+    if (FAILED(hSavedOverride))
+    {
+        if (nullptr != m_pMapPreviewSession)
+            m_pMapPreviewSession->Set_PreviewStatus(L"Map override asset parse failed.");
+        return E_FAIL;
+    }
+
+    if (ResolvedMapContentDesc.strManifestPath.empty())
+    {
+        if (FAILED(CMap_Loader::Get_MapPresetManifestPath(
+            iPresetIndex,
+            &ResolvedMapContentDesc.strManifestPath)))
+        {
+            if (nullptr != m_pMapPreviewSession)
+                m_pMapPreviewSession->Set_PreviewStatus(L"Map preset load failed.");
+            return E_FAIL;
+        }
+    }
+
+    if (nullptr != m_pMapPreviewSession)
+        m_pMapPreviewSession->Set_MapContentDesc(ResolvedMapContentDesc);
+
+    Client::MAP_RUNTIME_LOAD_CONTEXT Context{};
+    Context.pDevice = m_pDevice;
+    Context.pContext = m_pContext;
+    Context.iPlaceLevel = ETOUI(EDIT_LEVEL::EDIT);
+    Context.iModelLevel = ETOUI(LEVEL::STATIC);
+    Context.pCreatedCallback = &On_MapPreviewObjectCreated;
+    Context.pCallbackContext = this;
+
+    CMapStage* pLoadedStage = nullptr;
+    HRESULT hResult = CMap_Loader::Load_MapStage_Runtime(
+        Context,
+        ResolvedMapContentDesc.strManifestPath,
         &pLoadedStage);
 
     if (FAILED(hResult))
     {
         m_pMapStage = nullptr;
-        m_strLoadedMapStageName.clear();
-        m_iEnvObjCreatedCount = 0;
-        m_iLoadedMapPresetIndex = -1;
-        m_strMapPreviewStatus = L"Map preset load failed.";
+
+        if (nullptr != m_pMapPreviewSession)
+        {
+            m_pMapPreviewSession->Set_LoadStageEnabled(false);
+            m_pMapPreviewSession->Set_LoadEnvEnabled(false);
+            m_pMapPreviewSession->Clear_RuntimeState();
+            m_pMapPreviewSession->Set_PreviewStatus(L"Map preset load failed.");
+        }
+
+        return hResult;
+    }
+
+    Client::MAP_LOAD_REPORT Report{};
+    vector<Client::ENV_OBJECT_DESC> DeletedEnvDescs;
+    hResult = CMap_Loader::Load_Env_Runtime(
+        Context,
+        ResolvedMapContentDesc.strManifestPath,
+        &ResolvedMapContentDesc.OverrideDesc,
+        &Report,
+        &DeletedEnvDescs);
+
+    if (FAILED(hResult))
+    {
+        Clear_MapPreview();
+
+        if (nullptr != m_pMapPreviewSession)
+            m_pMapPreviewSession->Set_PreviewStatus(L"Map preset load failed.");
+
         return hResult;
     }
 
     m_pMapStage = pLoadedStage;
-    m_strLoadedMapStageName = Report.strStageName;
-    if (m_strLoadedMapStageName.empty())
-        m_strLoadedMapStageName = StrToWstr(Get_MapPreviewPresetLabel(iPresetIndex));
 
-    m_iEnvObjCreatedCount = Report.iEnvCreatedCount;
-    m_iLoadedMapPresetIndex = static_cast<_int>(iPresetIndex);
-    m_strMapPreviewStatus = L"Map preset loaded: " + m_strLoadedMapStageName
-        + L" / env=" + to_wstring(m_iEnvObjCreatedCount);
-
-    if (0 != Report.iEnvJsonFailedCount
-        || 0 != Report.iEnvSkippedMissingModel
-        || 0 != Report.iEnvSkippedCreateFailed)
+    if (nullptr != m_pMapPreviewSession)
     {
-        m_strMapPreviewStatus += L" / warnings";
+        _wstring strStageName =
+            (nullptr != m_pMapStage) ? m_pMapStage->Get_StageName() : Report.strStageName;
+
+        if (strStageName.empty())
+            strStageName = StrToWstr(CMap_Loader::Get_MapPresetLabel(iPresetIndex));
+
+        m_pMapPreviewSession->Set_PresetIndex(static_cast<_int>(iPresetIndex));
+        m_pMapPreviewSession->Set_ManifestPath(ResolvedMapContentDesc.strManifestPath);
+        m_pMapPreviewSession->Set_LoadStageEnabled(true);
+        m_pMapPreviewSession->Set_LoadEnvEnabled(true);
+        m_pMapPreviewSession->Rebuild_DeletedEnvItems(DeletedEnvDescs);
+        m_pMapPreviewSession->Set_LoadedStageName(strStageName);
+        m_pMapPreviewSession->Set_EnvLoaded(0 < Report.iEnvCreatedCount);
+        m_pMapPreviewSession->Set_EnvCreatedCount(Report.iEnvCreatedCount);
+
+        _wstring strStatus = L"Map preset loaded: " + strStageName
+            + L" / env=" + to_wstring(Report.iEnvCreatedCount);
+
+        if (S_OK == hSavedOverride)
+            strStatus += L" / asset";
+
+        if (0 != Report.iEnvSkippedMissingModel
+            || 0 != Report.iEnvSkippedCreateFailed)
+        {
+            strStatus += L" / warnings";
+        }
+
+        m_pMapPreviewSession->Set_PreviewStatus(strStatus);
     }
 
     return hResult;
@@ -649,77 +775,255 @@ HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
 
 HRESULT CLevel_Edit::Load_MapPreviewStage(_uint iPresetIndex)
 {
-    Clear_MapPreviewStage();
-    m_iLoadedMapPresetIndex = -1;
+    _bool bPresetChanged = false;
+    _bool bPreviousLoadEnv = false;
+
+    if (nullptr != m_pMapPreviewSession)
+    {
+        const auto& MapContentDesc = m_pMapPreviewSession->Get_MapContentDesc();
+        bPreviousLoadEnv = MapContentDesc.bLoadEnv;
+        bPresetChanged = !MapContentDesc.bHasMapContent
+            || MapContentDesc.iPresetIndex != static_cast<_int>(iPresetIndex);
+
+        if (bPresetChanged)
+            m_pMapPreviewSession->Reset();
+    }
+
+    if (bPresetChanged)
+        Clear_MapPreview();
+    else
+        Clear_MapPreviewStage();
+
+    Client::MAP_LEVEL_CONTENT_DESC ResolvedMapContentDesc{};
+    if (nullptr != m_pMapPreviewSession)
+        ResolvedMapContentDesc = m_pMapPreviewSession->Get_MapContentDesc();
+
+    ResolvedMapContentDesc.bHasMapContent = true;
+    ResolvedMapContentDesc.iPresetIndex = static_cast<_int>(iPresetIndex);
+
+    const HRESULT hSavedOverride = CMap_Loader::Load_MapPresetOverrideAsset(iPresetIndex, ResolvedMapContentDesc.strManifestPath, &ResolvedMapContentDesc);
+
+    if (FAILED(hSavedOverride))
+    {
+        if (nullptr != m_pMapPreviewSession)
+            m_pMapPreviewSession->Set_PreviewStatus(L"Map override asset parse failed.");
+        return E_FAIL;
+    }
+
+    if (ResolvedMapContentDesc.strManifestPath.empty())
+    {
+        if (FAILED(CMap_Loader::Get_MapPresetManifestPath(
+            iPresetIndex,
+            &ResolvedMapContentDesc.strManifestPath)))
+        {
+            if (nullptr != m_pMapPreviewSession)
+                m_pMapPreviewSession->Set_PreviewStatus(L"Map stage preview load failed.");
+            return E_FAIL;
+        }
+    }
+
+    if (nullptr != m_pMapPreviewSession)
+        m_pMapPreviewSession->Set_MapContentDesc(ResolvedMapContentDesc);
+
+    Client::MAP_RUNTIME_LOAD_CONTEXT Context{};
+    Context.pDevice = m_pDevice;
+    Context.pContext = m_pContext;
+    Context.iPlaceLevel = ETOUI(EDIT_LEVEL::EDIT);
+    Context.iModelLevel = ETOUI(LEVEL::STATIC);
+    Context.pCreatedCallback = &On_MapPreviewObjectCreated;
+    Context.pCallbackContext = this;
 
     CMapStage* pLoadedStage = nullptr;
-    _wstring strStageName;
-    const HRESULT hResult = CMap_EditHelper::Load_MapStage(
-        m_pDevice,
-        m_pContext,
-        iPresetIndex,
-        ETOUI(EDIT_LEVEL::EDIT),
-        ETOUI(LEVEL::GAMEPLAY),
-        &On_MapPreviewObjectCreated,
-        this,
-        &pLoadedStage,
-        &strStageName);
+    const HRESULT hResult = CMap_Loader::Load_MapStage_Runtime(
+        Context,
+        ResolvedMapContentDesc.strManifestPath,
+        &pLoadedStage);
 
     if (FAILED(hResult))
     {
+        if (bPresetChanged)
+            Clear_MapPreview();
+        else
+            Clear_MapPreviewStage();
+
         m_pMapStage = nullptr;
-        m_strLoadedMapStageName.clear();
-        m_strMapPreviewStatus = 0 != m_iEnvObjCreatedCount
-            ? L"Map stage preview load failed. / env=" + to_wstring(m_iEnvObjCreatedCount)
-            : L"Map stage preview load failed.";
+
+        if (nullptr != m_pMapPreviewSession)
+        {
+            const _uint iEnvCount = m_pMapPreviewSession->Get_EnvCreatedCount();
+            m_pMapPreviewSession->Clear_LoadedStage();
+            m_pMapPreviewSession->Set_LoadStageEnabled(false);
+            m_pMapPreviewSession->Set_LoadEnvEnabled(bPresetChanged ? false : bPreviousLoadEnv);
+
+            if (0 != iEnvCount)
+            {
+                m_pMapPreviewSession->Set_PreviewStatus(
+                    L"Map stage preview load failed. / env=" + to_wstring(iEnvCount));
+            }
+            else
+            {
+                m_pMapPreviewSession->Set_PreviewStatus(L"Map stage preview load failed.");
+            }
+        }
+
         return hResult;
     }
 
     m_pMapStage = pLoadedStage;
-    m_strLoadedMapStageName = strStageName;
-    if (m_strLoadedMapStageName.empty())
-        m_strLoadedMapStageName = StrToWstr(Get_MapPreviewPresetLabel(iPresetIndex));
 
-    m_strMapPreviewStatus = L"Map stage preview loaded: " + m_strLoadedMapStageName
-        + L" / env=" + to_wstring(m_iEnvObjCreatedCount);
+    if (nullptr != m_pMapPreviewSession)
+    {
+        _wstring strLoadedStageName =
+            (nullptr != m_pMapStage) ? m_pMapStage->Get_StageName() : L"";
+
+        if (strLoadedStageName.empty())
+            strLoadedStageName = StrToWstr(CMap_Loader::Get_MapPresetLabel(iPresetIndex));
+
+        m_pMapPreviewSession->Set_PresetIndex(static_cast<_int>(iPresetIndex));
+        m_pMapPreviewSession->Set_ManifestPath(ResolvedMapContentDesc.strManifestPath);
+        m_pMapPreviewSession->Set_LoadStageEnabled(true);
+        m_pMapPreviewSession->Set_LoadEnvEnabled(bPresetChanged ? false : bPreviousLoadEnv);
+        m_pMapPreviewSession->Set_LoadedStageName(strLoadedStageName);
+
+        _wstring strStatus =
+            L"Map stage preview loaded: " + strLoadedStageName
+            + L" / env=" + to_wstring(m_pMapPreviewSession->Get_EnvCreatedCount());
+
+        if (S_OK == hSavedOverride)
+            strStatus += L" / asset";
+
+        m_pMapPreviewSession->Set_PreviewStatus(strStatus);
+    }
 
     return hResult;
 }
 
 HRESULT CLevel_Edit::Load_MapPreviewEnv(_uint iPresetIndex)
 {
-    Clear_MapPreviewEnv();
-    m_iLoadedMapPresetIndex = -1;
+    _bool bPresetChanged = false;
+    if (nullptr != m_pMapPreviewSession)
+    {
+        const auto& MapContentDesc = m_pMapPreviewSession->Get_MapContentDesc();
+        bPresetChanged = !MapContentDesc.bHasMapContent
+            || MapContentDesc.iPresetIndex != static_cast<_int>(iPresetIndex);
 
-    Client::CMap_EditHelper::MAP_PRESET_LOAD_REPORT Report{};
-    const HRESULT hResult = CMap_EditHelper::Load_EnvObject_FromJson(
-        m_pDevice,
-        m_pContext,
+        if (bPresetChanged)
+            m_pMapPreviewSession->Reset();
+    }
+
+    if (bPresetChanged)
+        Clear_MapPreview();
+    else
+        Clear_MapPreviewEnv();
+
+    Client::MAP_LEVEL_CONTENT_DESC ResolvedMapContentDesc{};
+    if (nullptr != m_pMapPreviewSession)
+        ResolvedMapContentDesc = m_pMapPreviewSession->Get_MapContentDesc();
+
+    ResolvedMapContentDesc.bHasMapContent = true;
+    ResolvedMapContentDesc.iPresetIndex = static_cast<_int>(iPresetIndex);
+
+    const HRESULT hSavedOverride = CMap_Loader::Load_MapPresetOverrideAsset(
         iPresetIndex,
-        ETOUI(EDIT_LEVEL::EDIT),
-        &On_MapPreviewObjectCreated,
-        this,
-        &Report);
+        ResolvedMapContentDesc.strManifestPath,
+        &ResolvedMapContentDesc);
+
+    if (FAILED(hSavedOverride))
+    {
+        if (nullptr != m_pMapPreviewSession)
+            m_pMapPreviewSession->Set_PreviewStatus(L"Map override asset parse failed.");
+        return E_FAIL;
+    }
+
+    if (ResolvedMapContentDesc.strManifestPath.empty())
+    {
+        if (FAILED(CMap_Loader::Get_MapPresetManifestPath(
+            iPresetIndex,
+            &ResolvedMapContentDesc.strManifestPath)))
+        {
+            if (nullptr != m_pMapPreviewSession)
+                m_pMapPreviewSession->Set_PreviewStatus(L"Environment preview load failed.");
+            return E_FAIL;
+        }
+    }
+
+    if (nullptr != m_pMapPreviewSession)
+        m_pMapPreviewSession->Set_MapContentDesc(ResolvedMapContentDesc);
+
+    Client::MAP_RUNTIME_LOAD_CONTEXT Context{};
+    Context.pDevice = m_pDevice;
+    Context.pContext = m_pContext;
+    Context.iPlaceLevel = ETOUI(EDIT_LEVEL::EDIT);
+    Context.iModelLevel = ETOUI(LEVEL::STATIC);
+    Context.pCreatedCallback = &On_MapPreviewObjectCreated;
+    Context.pCallbackContext = this;
+
+    Client::MAP_LOAD_REPORT Report{};
+    vector<Client::ENV_OBJECT_DESC> DeletedEnvDescs;
+    const HRESULT hResult = CMap_Loader::Load_Env_Runtime(
+        Context,
+        ResolvedMapContentDesc.strManifestPath,
+        &ResolvedMapContentDesc.OverrideDesc,
+        &Report,
+        &DeletedEnvDescs);
 
     if (FAILED(hResult))
     {
-        m_iEnvObjCreatedCount = 0;
-        m_strMapPreviewStatus = nullptr != m_pMapStage
-            ? L"Environment preview load failed. / stage=" + m_strLoadedMapStageName
-            : L"Environment preview load failed.";
+        if (bPresetChanged)
+            Clear_MapPreview();
+        else
+            Clear_MapPreviewEnv();
+
+        if (nullptr != m_pMapPreviewSession)
+        {
+            m_pMapPreviewSession->Set_EnvLoaded(false);
+            m_pMapPreviewSession->Set_EnvCreatedCount(0);
+
+            if (nullptr != m_pMapStage)
+            {
+                const _wstring& strStageName = m_pMapPreviewSession->Get_LoadedStageName();
+                const _wstring strDisplayStageName =
+                    strStageName.empty() ? L"(loaded stage)" : strStageName;
+
+                m_pMapPreviewSession->Set_PreviewStatus(
+                    L"Environment preview load failed. / stage=" + strDisplayStageName);
+            }
+            else
+            {
+                m_pMapPreviewSession->Set_PreviewStatus(L"Environment preview load failed.");
+            }
+        }
+
         return hResult;
     }
 
-    m_iEnvObjCreatedCount = Report.iEnvCreatedCount;
-    m_strMapPreviewStatus = L"Environment preview loaded: env=" + to_wstring(m_iEnvObjCreatedCount);
-    if (!m_strLoadedMapStageName.empty())
-        m_strMapPreviewStatus += L" / stage=" + m_strLoadedMapStageName;
-
-    if (0 != Report.iEnvJsonFailedCount
-        || 0 != Report.iEnvSkippedMissingModel
-        || 0 != Report.iEnvSkippedCreateFailed)
+    if (nullptr != m_pMapPreviewSession)
     {
-        m_strMapPreviewStatus += L" / warnings";
+        m_pMapPreviewSession->Set_PresetIndex(static_cast<_int>(iPresetIndex));
+        m_pMapPreviewSession->Set_ManifestPath(ResolvedMapContentDesc.strManifestPath);
+        m_pMapPreviewSession->Set_LoadStageEnabled(nullptr != m_pMapStage);
+        m_pMapPreviewSession->Set_LoadEnvEnabled(true);
+        m_pMapPreviewSession->Rebuild_DeletedEnvItems(DeletedEnvDescs);
+        m_pMapPreviewSession->Set_EnvLoaded(0 < Report.iEnvCreatedCount);
+        m_pMapPreviewSession->Set_EnvCreatedCount(Report.iEnvCreatedCount);
+
+        _wstring strStatus = L"Environment preview loaded: env="
+            + to_wstring(Report.iEnvCreatedCount);
+
+        const _wstring& strStageName = m_pMapPreviewSession->Get_LoadedStageName();
+        if (!strStageName.empty())
+            strStatus += L" / stage=" + strStageName;
+
+        if (S_OK == hSavedOverride)
+            strStatus += L" / asset";
+
+        if (0 != Report.iEnvSkippedMissingModel
+            || 0 != Report.iEnvSkippedCreateFailed)
+        {
+            strStatus += L" / warnings";
+        }
+
+        m_pMapPreviewSession->Set_PreviewStatus(strStatus);
     }
 
     return hResult;
@@ -732,7 +1036,7 @@ void CLevel_Edit::Clear_MapPreview()
 
     for (const auto& Pair : m_Layers)
     {
-        if (CMap_EditHelper::Is_MapLayer(Pair.first))
+        if (CMap_Loader::Is_MapLayer(Pair.first))
             MapLayers.push_back(Pair.first);
     }
 
@@ -740,11 +1044,14 @@ void CLevel_Edit::Clear_MapPreview()
         Clear_MapPreviewLayer(strLayerTag);
 
     m_pMapStage = nullptr;
-    m_strLoadedMapStageName.clear();
-    m_iEnvObjCreatedCount = 0;
-    m_iLoadedMapPresetIndex = -1;
     m_MapPreviewObjects.clear();
-    m_strMapPreviewStatus = L"Map preset not loaded.";
+
+    if (nullptr != m_pMapPreviewSession)
+    {
+        m_pMapPreviewSession->Set_LoadStageEnabled(false);
+        m_pMapPreviewSession->Set_LoadEnvEnabled(false);
+        m_pMapPreviewSession->Clear_RuntimeState();
+    }
 }
 
 void CLevel_Edit::Clear_MapPreviewStage()
@@ -752,13 +1059,19 @@ void CLevel_Edit::Clear_MapPreviewStage()
     Clear_MapPreviewLayer(L"Layer_MapStage");
 
     m_pMapStage = nullptr;
-    m_strLoadedMapStageName.clear();
-    m_iLoadedMapPresetIndex = -1;
 
-    if (0 != m_iEnvObjCreatedCount)
-        m_strMapPreviewStatus = L"Environment preview loaded only. / env=" + to_wstring(m_iEnvObjCreatedCount);
-    else
-        m_strMapPreviewStatus = L"Map preset not loaded.";
+    if (nullptr != m_pMapPreviewSession)
+    {
+        const _uint iEnvCount = m_pMapPreviewSession->Get_EnvCreatedCount();
+        m_pMapPreviewSession->Set_LoadStageEnabled(false);
+        m_pMapPreviewSession->Clear_LoadedStage();
+
+        if (0 < iEnvCount)
+            m_pMapPreviewSession->Set_PreviewStatus(
+                L"Environment preview loaded only. / env=" + to_wstring(iEnvCount));
+        else
+            m_pMapPreviewSession->Set_PreviewStatus(L"Map preset not loaded.");
+    }
 }
 
 void CLevel_Edit::Clear_MapPreviewEnv()
@@ -773,19 +1086,26 @@ void CLevel_Edit::Clear_MapPreviewEnv()
     for (const _tchar* pLayerTag : kEnvLayers)
         Clear_MapPreviewLayer(pLayerTag);
 
-    m_iEnvObjCreatedCount = 0;
-    m_iLoadedMapPresetIndex = -1;
+    if (nullptr != m_pMapPreviewSession)
+    {
+        const _bool bStageLoaded = nullptr != m_pMapStage;
+        const _wstring strStageName = m_pMapPreviewSession->Get_LoadedStageName();
 
-    if (nullptr != m_pMapStage)
-    {
-        const _wstring strStageName = m_strLoadedMapStageName.empty()
-            ? L"(loaded stage)"
-            : m_strLoadedMapStageName;
-        m_strMapPreviewStatus = L"Map stage preview loaded: " + strStageName + L" / env=0";
-    }
-    else
-    {
-        m_strMapPreviewStatus = L"Map preset not loaded.";
+        m_pMapPreviewSession->Set_LoadEnvEnabled(false);
+        m_pMapPreviewSession->Set_EnvLoaded(false);
+        m_pMapPreviewSession->Set_EnvCreatedCount(0);
+
+        if (bStageLoaded)
+        {
+            const _wstring strDisplayStageName =
+                strStageName.empty() ? L"(loaded stage)" : strStageName;
+            m_pMapPreviewSession->Set_PreviewStatus(
+                L"Map stage preview loaded: " + strDisplayStageName + L" / env=0");
+        }
+        else
+        {
+            m_pMapPreviewSession->Set_PreviewStatus(L"Map preset not loaded.");
+        }
     }
 }
 
@@ -809,6 +1129,13 @@ void CLevel_Edit::Clear_MapPreviewLayer(const _wstring& strLayerTag)
             m_pSelected = nullptr;
 
         m_MapPreviewObjects.erase(pObject);
+
+        if (nullptr != m_pMapPreviewSession)
+        {
+            m_pMapPreviewSession->Unregister_PreviewObject(pObject);
+            m_pMapPreviewSession->Unregister_AddedMapObject(pObject);
+        }
+
         m_pGameInstance_Proxy->Destroy_GameObject(pObject);
         ObjectIter = Objects.erase(ObjectIter);
     }
@@ -825,6 +1152,13 @@ void CLevel_Edit::Add_MapPreviewObjectHandle(const _wstring& strPrototypeTag, co
     Add_Layer(strLayerTag);
     m_Layers[strLayerTag].push_back({ strPrototypeTag, strObjectTag, pObject });
     m_MapPreviewObjects.insert(pObject);
+
+    if (nullptr != m_pMapPreviewSession)
+    {
+        m_pMapPreviewSession->Register_PreviewObject(strLayerTag, strObjectTag, pObject);
+
+        Try_RegisterLoadedAddedMapObject(pObject, strPrototypeTag, strLayerTag, strObjectTag);
+    }
 }
 
 void CLevel_Edit::On_MapPreviewObjectCreated(void* pContext, CGameObject* pObject,
@@ -838,6 +1172,220 @@ void CLevel_Edit::On_MapPreviewObjectCreated(void* pContext, CGameObject* pObjec
 
     if (Client::CMapStage::PROTOTYPE_TAG == strPrototypeTag)
         pLevel->m_pMapStage = dynamic_cast<Client::CMapStage*>(pObject);
+}
+
+_bool CLevel_Edit::Should_SkipMapObjectForLevelSave(CGameObject* pObject) const
+{
+    if (nullptr == pObject)
+        return false;
+
+    if (m_MapPreviewObjects.find(pObject) != m_MapPreviewObjects.end())
+        return true;
+
+    if (nullptr != m_pMapPreviewSession
+        && m_pMapPreviewSession->Is_AddedMapObject(pObject))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+void CLevel_Edit::Append_MapLevelData(json* pInOutLevel) const
+{
+    if (nullptr == pInOutLevel)
+        return;
+
+    if (nullptr != m_pMapPreviewSession)
+    {
+        const Client::MAP_LEVEL_CONTENT_DESC MapContentDesc
+            = m_pMapPreviewSession->Build_MapContentSnapshot();
+
+        if (MapContentDesc.bHasMapContent && 0 <= MapContentDesc.iPresetIndex)
+            (*pInOutLevel)["MapContent"] = Client::CMap_LevelContent::Serialize(MapContentDesc);
+    }
+
+    if (nullptr != m_pMapStage)
+        (*pInOutLevel)["MapStage"] = Client::CMap_Loader::Serialize_MapStageOverride(m_pMapStage);
+}
+
+HRESULT CLevel_Edit::Load_MapLevelContentFromJson(const json& jLevel)
+{
+    Client::MAP_LEVEL_CONTENT_DESC MapContentDesc{};
+    if (FAILED(Client::CMap_LevelContent::Deserialize(jLevel, &MapContentDesc)))
+    {
+        MSG_BOX("MAP CONTENT PARSE ERROR");
+        return E_FAIL;
+    }
+
+    if (nullptr != m_pMapPreviewSession)
+        m_pMapPreviewSession->Set_MapContentDesc(MapContentDesc);
+
+    if (!(MapContentDesc.bHasMapContent && 0 <= MapContentDesc.iPresetIndex))
+        return S_OK;
+
+    const _uint iPresetIndex = static_cast<_uint>(MapContentDesc.iPresetIndex);
+
+    if (MapContentDesc.bLoadStage && MapContentDesc.bLoadEnv)
+        return Load_MapPreview(iPresetIndex);
+
+    if (MapContentDesc.bLoadStage)
+        return Load_MapPreviewStage(iPresetIndex);
+
+    if (MapContentDesc.bLoadEnv)
+        return Load_MapPreviewEnv(iPresetIndex);
+
+    if (nullptr != m_pMapPreviewSession)
+        m_pMapPreviewSession->Set_PreviewStatus(L"Map content loaded. / stage=off / env=off");
+
+    return S_OK;
+}
+
+HRESULT CLevel_Edit::Apply_MapStageOverrideFromJson(const json& jLevel)
+{
+    if (!jLevel.contains("MapStage"))
+        return S_OK;
+
+    if (nullptr == m_pMapStage)
+        return S_OK;
+
+    if (FAILED(Client::CMap_Loader::Apply_MapStageOverride(m_pMapStage, jLevel["MapStage"])))
+    {
+        MSG_BOX("MAP STAGE OVERRIDE PARSE ERROR");
+        return E_FAIL;
+    }
+
+    return S_OK;
+}
+
+_bool CLevel_Edit::Handle_MapSpecificDeletion(CGameObject* pObject)
+{
+    const _bool bWasMapPreviewObject =
+        m_MapPreviewObjects.find(pObject) != m_MapPreviewObjects.end();
+
+    const _bool bWasAddedMapObject =
+        (nullptr != m_pMapPreviewSession)
+        && m_pMapPreviewSession->Is_AddedMapObject(pObject);
+
+    if (bWasAddedMapObject)
+    {
+        if (nullptr != m_pMapPreviewSession)
+        {
+            m_pMapPreviewSession->Unregister_AddedMapObject(pObject);
+            m_pMapPreviewSession->Unregister_PreviewObject(pObject);
+            m_pMapPreviewSession->Set_PreviewStatus(
+                L"Added map override object removed. / added="
+                + to_wstring(m_pMapPreviewSession->Get_AddedMapObjectCount()));
+        }
+
+        m_MapPreviewObjects.erase(pObject);
+        return true;
+    }
+
+    if (!bWasMapPreviewObject)
+        return false;
+
+    _bool bTrackedDeletedEnv = false;
+    if (nullptr != m_pMapPreviewSession)
+        bTrackedDeletedEnv = m_pMapPreviewSession->Track_DeletedPreviewObject(pObject);
+
+    m_MapPreviewObjects.erase(pObject);
+
+    if (pObject == m_pMapStage)
+    {
+        m_pMapStage = nullptr;
+        if (nullptr != m_pMapPreviewSession)
+            m_pMapPreviewSession->Clear_LoadedStage();
+    }
+    else if (nullptr != m_pMapPreviewSession)
+    {
+        const _uint iEnvCount = m_pMapPreviewSession->Get_EnvCreatedCount();
+        if (0 < iEnvCount)
+        {
+            const _uint iNextEnvCount = iEnvCount - 1;
+            m_pMapPreviewSession->Set_EnvLoaded(0 < iNextEnvCount);
+            m_pMapPreviewSession->Set_EnvCreatedCount(iNextEnvCount);
+        }
+        else
+        {
+            m_pMapPreviewSession->Set_EnvLoaded(false);
+        }
+    }
+
+    if (nullptr != m_pMapPreviewSession)
+    {
+        if (bTrackedDeletedEnv)
+        {
+            m_pMapPreviewSession->Set_PreviewStatus(
+                L"Map preview env override deleted. / deleted="
+                + to_wstring(m_pMapPreviewSession->Get_DeletedEnvCount()));
+        }
+        else
+        {
+            m_pMapPreviewSession->Set_PreviewStatus(L"Map preset object removed.");
+        }
+    }
+
+    return true;
+}
+
+_bool CLevel_Edit::Try_RegisterAddedMapOverridePlacement(CGameObject* pObject, const _wstring& strObjectTag)
+{
+    if (nullptr == pObject || nullptr == m_pMapPreviewSession)
+        return false;
+
+    if (!m_pMapPreviewSession->Get_MapContentDesc().bHasMapContent)
+        return false;
+
+    if (!CMap_Loader::Is_MapLayer(m_strPendingLayer))
+        return false;
+
+    MAP_ADDED_OBJECT_DESC AddedDesc{};
+    AddedDesc.strPrototypeTag = m_strPendingProto;
+    AddedDesc.strLayerTag = m_strPendingLayer;
+    AddedDesc.strObjectTag = strObjectTag;
+    AddedDesc.jObject = pObject->Serialize();
+
+    m_MapPreviewObjects.insert(pObject);
+    m_pMapPreviewSession->Register_AddedMapObject(pObject, AddedDesc, strObjectTag);
+    m_pMapPreviewSession->Set_LoadEnvEnabled(true);
+    m_pMapPreviewSession->Set_PreviewStatus(
+        L"Added map override object: " + strObjectTag
+        + L" / added=" + to_wstring(m_pMapPreviewSession->Get_AddedMapObjectCount()));
+
+    return true;
+}
+
+void CLevel_Edit::Try_RegisterLoadedAddedMapObject(
+    CGameObject* pObject,
+    const _wstring& strPrototypeTag,
+    const _wstring& strLayerTag,
+    const _wstring& strObjectTag)
+{
+    if (nullptr == pObject || nullptr == m_pMapPreviewSession)
+        return;
+
+    const auto& AddedMapObjects =
+        m_pMapPreviewSession->Get_MapContentDesc().OverrideDesc.AddedMapObjects;
+
+    for (const Client::MAP_ADDED_OBJECT_DESC& AddedDesc : AddedMapObjects)
+    {
+        if (AddedDesc.strPrototypeTag != strPrototypeTag)
+            continue;
+        if (AddedDesc.strLayerTag != strLayerTag)
+            continue;
+        if (AddedDesc.strObjectTag != strObjectTag)
+            continue;
+
+        const _wstring strDisplayName =
+            strObjectTag.empty() ? strPrototypeTag : strObjectTag;
+
+        m_pMapPreviewSession->Register_AddedMapObject(
+            pObject,
+            AddedDesc,
+            strDisplayName);
+        break;
+    }
 }
 
 CLevel_Edit* CLevel_Edit::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -856,7 +1404,7 @@ CLevel_Edit* CLevel_Edit::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 void CLevel_Edit::Free()
 {
     __super::Free();
+
+    Safe_Release(m_pMapPreviewSession);
     Safe_Release(m_pGrid);
 }
-
-

@@ -162,6 +162,7 @@ HRESULT CLoader::Ready_Resources_For_GamePlay()
                 m_pDevice,
                 m_pContext,
                 Manifest.strMapManifest,
+                Manifest.strObjectsFile,
                 ETOUI(eLevel));
         });
 
