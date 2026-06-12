@@ -51,12 +51,8 @@ void CKirby_Hovering::Update(CKirby* pKirby, const _float fTimeDelta)
     if (Update_HoveringStateMachine(pKirby, fTimeDelta) == true)
         return;
 
-    // Fall, Flight(Move)로 바뀌면 안되는 애들은 Early Return 됨.
-    Update_LoopState(pKirby, fTimeDelta);
-
-    //Transition_Fall_Ani(pKirby);
-
-
+    if(m_eCurMoveState == HOVERING_STATE::FLIGHT_LOOP)
+        Update_LoopState(pKirby, fTimeDelta);
 }
 
 void CKirby_Hovering::Exit(CKirby* pKirby)
@@ -88,6 +84,9 @@ _bool CKirby_Hovering::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             if (!pCommand->IsPress())
                 return false;
 
+            if (m_bMoveLock == true)
+                return true;
+
             Handle_MoveCommand(pKirby, pCommand);
             return true;
         }
@@ -116,6 +115,17 @@ _bool CKirby_Hovering::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
                     pMovementCom->Add_Velocity(XMVectorSet(0.f, 8.f, 0.f, 0.f));
                 }
             }
+            return true;
+        }
+        case KIRBY_COMMAND_TYPE::ATTACK:
+        {
+            if (!pCommand->IsDown())
+                return false;
+
+            m_eHoveringState = HOVERING_STATE::FLIGHT_END;
+            pAnimator->Play("FlightLanding", false, false, 0.1f, 2.5f);
+
+            m_bMoveLock = true;
 
             return true;
         }
@@ -154,9 +164,11 @@ _bool CKirby_Hovering::Update_HoveringStateMachine(CKirby* pKirby, _float fTimeD
             if (pAnimator->Is_Finished() == true)
             {
                 m_eHoveringState = HOVERING_STATE::SPIT_AIR;
-                pAnimator->Play("AirBall", false, false, 0.0f, 3.5f);
+                pAnimator->Play("AirBall", false, false, 0.0f, 5.f);
 
                 pBody->Set_Body(KIRBY_BODY_STATE::INHALE);
+
+                m_bMoveLock = true;
             }
 
             return true;
@@ -168,6 +180,10 @@ _bool CKirby_Hovering::Update_HoveringStateMachine(CKirby* pKirby, _float fTimeD
             {
                 Transition_Wait_OR_Run(pKirby);
                 pBody->Set_Body(KIRBY_BODY_STATE::NORMAL);
+
+                Reset_Movement(pMovement);
+
+                m_bMoveLock = false;
             }
 
             return true;
@@ -184,12 +200,11 @@ _bool CKirby_Hovering::Check_Landing(CKirby* pKirby, CAnimator* pAnimator, CMove
     if (bIsGround == true)
     {
         m_eHoveringState = HOVERING_STATE::FLIGHT_END;
-        pAnimator->Play("FlightLanding", false, false, 0.1f, 2.f);
+        pAnimator->Play("FlightLanding", false, false, 0.1f, 2.5f);
 
-        pMovement->Set_GravityScale(1.f);
-        pMovement->Set_MaxFallVelocity(CKirby::s_fMaxFallVelocity);
-        pMovement->Set_LinearDrag(CKirby::s_fLinearDrag);
-        pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
+        Reset_Movement(pMovement);
+
+        m_bMoveLock = true;
 
         return true;
     }
@@ -203,7 +218,7 @@ void CKirby_Hovering::Update_LoopState(CKirby* pKirby, _float fTimeDelta)
 
     if (m_bPlayFlightAni == true)
     {
-        pAnimator->Play("Flight", false, true, 0.1f, 2.25f);
+        pAnimator->Play("Flight", false, true, 0.1f, 2.f);
         m_bPlayFlightAni = false;
     }
     else
@@ -214,6 +229,14 @@ void CKirby_Hovering::Update_LoopState(CKirby* pKirby, _float fTimeDelta)
             m_eCurMoveState = HOVERING_MOVE_STATE::FALL;
         }
     }
+}
+
+void CKirby_Hovering::Reset_Movement(CMovement_Child* pMovement)
+{
+    pMovement->Set_GravityScale(1.f);
+    pMovement->Set_MaxFallVelocity(CKirby::s_fMaxFallVelocity);
+    pMovement->Set_LinearDrag(CKirby::s_fLinearDrag);
+    pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
 }
 
 CKirby_Hovering* CKirby_Hovering::Create()

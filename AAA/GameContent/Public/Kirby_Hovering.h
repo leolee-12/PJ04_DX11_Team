@@ -42,6 +42,7 @@ private:
 
 	HOVERING_MOVE_STATE m_eCurMoveState{};
 
+	_bool m_bMoveLock{};
 	_bool m_bPlayFlightAni{};
 
 private:
@@ -49,6 +50,8 @@ private:
 	_bool Check_Landing(CKirby* pKirby, CAnimator *pAnimator, CMovement_Child* pMovement);
 
 	void Update_LoopState(CKirby* pKirby, _float fTimeDelta);
+
+	void Reset_Movement(CMovement_Child* pMovement);
 
 public:
 	static CKirby_Hovering* Create();
