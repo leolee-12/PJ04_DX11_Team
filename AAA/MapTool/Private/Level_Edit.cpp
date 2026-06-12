@@ -8,7 +8,6 @@
 #include "GameContent_const.h"
 #include "GameContent_Log.h"
 #include "Map_Loader.h"
-#include "Map_EditHelper.h"
 #include "MapStage.h"
 #include "EnvObject.h"
 

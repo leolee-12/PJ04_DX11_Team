@@ -513,9 +513,6 @@
     <ClInclude Include="..\Public\Map_LevelContent.h">
       <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Map_DeltaIO.h">
-      <Filter>97. DataSystem\MapLoader\API</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Env_CollisionCatalog.h">
       <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
@@ -756,9 +753,6 @@
       <Filter>00. GameObject\Test\TestRect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Map_LevelContent.cpp">
-      <Filter>97. DataSystem\MapLoader\API</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Map_DeltaIO.cpp">
       <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Env_CollisionCatalog.cpp">

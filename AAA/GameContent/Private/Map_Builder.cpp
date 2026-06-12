@@ -92,13 +92,7 @@ HRESULT CMap_Builder::Build_FromManifest(const _wstring& strManifestPath, MAP_PA
 	return S_OK;
 }
 
-HRESULT CMap_Builder::Build_FromPreset_ForTool(_uint, MAP_PACKAGE*)
-{
-	return E_NOTIMPL;
-}
-
-HRESULT CMap_Builder::Build_StageDesc(const MAP_MANIFEST_DESC& Manifest, MAP_STAGE_DESC*
-	pOutStageDesc)
+HRESULT CMap_Builder::Build_StageDesc(const MAP_MANIFEST_DESC& Manifest, MAP_STAGE_DESC* pOutStageDesc)
 {
 	if (nullptr == pOutStageDesc || nullptr == m_pResolver)
 		return E_FAIL;
