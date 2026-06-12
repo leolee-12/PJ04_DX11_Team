@@ -46,12 +46,12 @@ namespace Client
         END
     };
 
-    inline const std::pair<KIRBY_BODY_STATE, const char> g_KirbyBodyNames[] = {
+    inline const std::pair<KIRBY_BODY_STATE, const char*> g_KirbyBodyNames[] = {
           { KIRBY_BODY_STATE::NORMAL,  "NORMAL"  },
           { KIRBY_BODY_STATE::STUFFED, "STUFFED" },
           { KIRBY_BODY_STATE::INHALE,  "INHALE"  },
     };
-    inline const std::pair<KIRBY_MOUTH_STATE, const char> g_KirbyMouthNames[] = {
+    inline const std::pair<KIRBY_MOUTH_STATE, const char*> g_KirbyMouthNames[] = {
         { KIRBY_MOUTH_STATE::IDLE,        "IDLE"        },
         { KIRBY_MOUTH_STATE::OPEN,        "OPEN"        },
         { KIRBY_MOUTH_STATE::ANGRY,       "ANGRY"       },

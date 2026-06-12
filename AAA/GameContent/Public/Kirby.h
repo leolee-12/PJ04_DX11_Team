@@ -39,11 +39,15 @@ public:
 
 	static constexpr _float s_fFallVelocityY = -7.f;
 
-	static constexpr _float s_fGravity = -36.0f;
-	static constexpr _float s_fJumpSpeed = 17.0f;
+	static constexpr _float s_fLinearDrag = 0.9f;
+	static constexpr _float s_fHoveringLinearDrag = 9.f;
 
-	static constexpr _float s_fHoverGravity = -2.0f;
-	static constexpr _float s_fHoverJumpSpeed = 3.0f;
+	static constexpr _float s_fMaxFallVelocity = -15.f;
+	static constexpr _float s_fHoveringMaxFallVelocity = -1.5f;
+
+	static constexpr _float s_fMaxHorizontalSpeed = 8.f;
+	static constexpr _float s_fHoveringMaxHorizontalSpeed = 4.f;
+
 
 
 private:

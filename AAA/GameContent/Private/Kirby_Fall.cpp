@@ -88,7 +88,12 @@ _bool CKirby_Fall::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             if (!pCommand->IsDown())
                 return false;
 
-            pKirby->Change_State(KIRBY_STATE_TYPE::HOVERING);
+            CMovement_Child* pMovementCom = pKirby->Get_Movement();
+            if (pMovementCom->Is_Grounded() == true)
+                pKirby->Change_State(KIRBY_STATE_TYPE::JUMP);
+            else
+                pKirby->Change_State(KIRBY_STATE_TYPE::HOVERING);
+
             return true;
         }
         // Attack Down

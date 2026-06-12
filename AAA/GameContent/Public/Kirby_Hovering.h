@@ -11,6 +11,7 @@ NS_END
 NS_BEGIN(Client)
 
 class CKirby;
+class CMovement_Child;
 
 class CLIENT_DLL CKirby_Hovering final : public CKirby_State
 {
@@ -18,8 +19,9 @@ private:
 	CKirby_Hovering();
 	virtual ~CKirby_Hovering() = default;
 
-	enum HOVERING_STATE { FLIGHT_START, FLIGHT_LOOP, FLIGHT_END, SPITAIR };
-	enum HOVERING_MOVE_STATE { FALL, MOVE };
+	enum HOVERING_STATE { FLIGHT_START, FLIGHT_LOOP, FLIGHT_END, SPIT_AIR };
+	// Loop에서 두 상태로 분기
+	enum HOVERING_MOVE_STATE { FALL, JUMP};
 
 private:
 	HRESULT Initialize();
@@ -39,27 +41,14 @@ private:
 	HOVERING_STATE m_eHoveringState{};
 
 	HOVERING_MOVE_STATE m_eCurMoveState{};
-	HOVERING_MOVE_STATE m_ePreMoveState{};
 
-	_float m_fMaxJumpTime{};
-	_float m_fAccJumpTime{};
-	_bool m_bCanJump{};
-
-	_float m_fAccNoGravity{};
-	_float m_fMaxNoGravity{};
-
-	_float m_fHoveringGravity{};
+	_bool m_bPlayFlightAni{};
 
 private:
-	_bool Update_State(CKirby* pKirby, _float fTimeDelta);
+	_bool Update_HoveringStateMachine(CKirby* pKirby, _float fTimeDelta);
+	_bool Check_Landing(CKirby* pKirby, CAnimator *pAnimator, CMovement_Child* pMovement);
 
-	void Enter_Ani(CKirby* pKirby);
-	void Update_MoveState(CKirby* pKirby, _float fTimeDelta);
-
-	void Update_CoolTimer(_float fTimeDelta);
-	void Reset_CoolTimer();
-
-	void Update_NoGravityTime(CKirby* pKirby, _float fTimeDelta);
+	void Update_LoopState(CKirby* pKirby, _float fTimeDelta);
 
 public:
 	static CKirby_Hovering* Create();
