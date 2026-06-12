@@ -11,6 +11,7 @@
 #include "ShaderGlobal_Manager.h"
 #include "Camera_Manager.h"
 #include "PhysX_Manager.h"
+#include "Font_Manager.h"
 
 using namespace physx;
 
@@ -527,6 +528,14 @@ HRESULT CGameInstance_Proxy::Draw_Text(const _wstring& strFontTag, const _tchar*
 		return E_FAIL;
 
 	return m_pOwner->Draw_Text(strFontTag, pText, vPosition, vColor, fRotation, vScale, eAlign);
+}
+
+HRESULT CGameInstance_Proxy::Draw_Text_Raw(const _wstring& tag, const _tchar* p, const _float2& pos, _fvector col, const _float2& scl, TEXT_ALIGN a)
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->m_pFont_Manager->Draw_Raw(tag, p, pos, col, scl, a);
 }
 
 _float2 CGameInstance_Proxy::Measure_Text(const _wstring& strFontTag, const _tchar* pText)

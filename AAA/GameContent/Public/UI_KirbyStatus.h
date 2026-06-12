@@ -2,11 +2,11 @@
 
 #include "GameContent_Defines.h"
 #include "UIContainerObject.h"
-#include "UI_GaugeBarCom.h"
 
 NS_BEGIN(Client)
 
 class CUI_GaugeFill;
+class CUI_GaugeBarCom;
 
 class CLIENT_DLL CUI_KirbyStatus final : public CUIContainerObject
 {
@@ -33,17 +33,12 @@ public:
 
 protected:
     virtual HRESULT Ready_Events() override;
-    virtual void On_Deserialized() override;
-    virtual void On_UIPartsChanged() override;
 
 private:
     HRESULT Ready_Components();
-    HRESULT Bind_GaugeBar();
-    void Configure_GaugeBar();
-    void On_HPUpdated(const KIRBY_HP_UPDATED* pDesc);
 
 private:
-    CUI_GaugeBarCom* m_pGaugeBarCom = { nullptr };
+    CUI_GaugeBarCom* m_pGaugeBar = { nullptr };
     _float m_fDefaultMaxHP = { 100.f };
     _float m_fDefaultCurrHP = { 100.f };
 

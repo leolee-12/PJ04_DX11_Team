@@ -152,6 +152,8 @@ public: // Picking
     HRESULT Add_Font(const _wstring& strFontTag, const _tchar* pFontFilePath);
     HRESULT Draw_Text(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition,
         _fvector vColor = XMVectorSet(1.f, 1.f, 1.f, 1.f), _float fRotation = 0.f, const _float2& vScale = _float2(1.f, 1.f), TEXT_ALIGN eAlign = TEXT_ALIGN::CENTER);
+    HRESULT Draw_Text_Raw(const _wstring& tag, const _tchar* p, const _float2& pos, _fvector col, const _float2& scl,
+        TEXT_ALIGN a);
     _float2 Measure_Text(const _wstring& strFontTag, const _tchar* pText);
 #pragma endregion
 

@@ -23,7 +23,6 @@ enum class UI_GAUGE_FILL_DIRECTION : _int
 enum class UI_GAUGE_LAYER_TYPE : _uint
 {
     BACK,
-    GHOST,
     HEAL,
     FILL,
     END

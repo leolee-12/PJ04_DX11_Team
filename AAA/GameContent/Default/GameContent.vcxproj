@@ -49,7 +49,7 @@
     <ClInclude Include="..\Public\UI_Enums.h" />
     <ClInclude Include="..\Public\UI_Fonts.h" />
     <ClInclude Include="..\Public\UIAnimatorCom.h" />
-    <ClInclude Include="..\Public\UI_GaugeBarCom.h" />
+    <ClInclude Include="..\public\UI_GaugeBarCom.h" />
     <ClInclude Include="..\Public\UI_GaugeFill.h" />
     <ClInclude Include="..\Public\UI_GenericContainer.h" />
     <ClInclude Include="..\Public\InhaleEffect.h" />
@@ -132,7 +132,7 @@
     </ClCompile>
     <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />
-    <ClCompile Include="..\Private\UI_GaugeBarCom.cpp" />
+    <ClCompile Include="..\private\UI_GaugeBarCom.cpp" />
     <ClCompile Include="..\Private\UI_GaugeFill.cpp" />
     <ClCompile Include="..\Private\UI_GenericContainer.cpp" />
     <ClCompile Include="..\Private\InhaleEffect.cpp" />

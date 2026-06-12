@@ -522,7 +522,7 @@
     <ClInclude Include="..\Public\UI_Enums.h">
       <Filter>99. Defines\Hojun\UI</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\UI_GaugeBarCom.h">
+    <ClInclude Include="..\public\UI_GaugeBarCom.h">
       <Filter>00. GameObject\UI\Component\GaugeBar</Filter>
     </ClInclude>
   </ItemGroup>
@@ -734,7 +734,7 @@
     <ClCompile Include="..\Private\UI_GaugeFill.cpp">
       <Filter>00. GameObject\UI\UIPart\GaugeFill</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\UI_GaugeBarCom.cpp">
+    <ClCompile Include="..\private\UI_GaugeBarCom.cpp">
       <Filter>00. GameObject\UI\Component\GaugeBar</Filter>
     </ClCompile>
   </ItemGroup>

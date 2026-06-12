@@ -19,6 +19,15 @@ float g_fRevealSoftness = { 0.05f };
 
 float g_fFillRatio = { 1.f };
 float g_fFillSoftness = { 0.f };
+float g_fCapFracU = { 0.2f };
+
+float g_fGhostRatio = { 0.f }; // 직전체력 비율(0이면 일반 게이지)
+float g_fGhostAlpha = { 1.f }; // 노랑 깜빡임 알파
+float4 g_vGhostColor = { 1.f, 0.92f, 0.2f, 1.f }; // 직전체력 잔상 색(노랑)
+
+float g_fFlashFront = { 1.f }; 
+float g_fFlashBlend = { 0.f }; 
+float4 g_vFlashColor = { 1.f, 1.f, 1.f, 1.f };
 
 float2 g_vEffectTiling = float2(1.f, 1.f);
 float2 g_vEffectOffset = float2(0.f, 0.f);
@@ -31,6 +40,16 @@ Texture2D g_EffectTexture;
 Texture2D g_MaskTexture;
 
 Texture2DArray g_TextureArray;              // SpriteAnim용
+
+float Remap_BarU(float u)
+{
+    float c = min(g_fCapFracU, 0.5f); 
+    if (u < c)
+        return u / c;
+    if (u > 1.0f - c)
+        return (1.0f - u) / c; 
+    return 1.0f;
+}
 
 float2 ApplyUVTransform(float2 uv)
 {
@@ -219,14 +238,30 @@ PS_OUT PS_GAUGE_FILL_COLOR(PS_IN In)
 {
     PS_OUT Out;
 
-    float fVisible = ComputeGaugeVisible(In.vTexcoord);
-    if (fVisible <= 0.f)
+    float fAxis = In.vTexcoord.x;
+    if (g_iFillDirection == 1)
+        fAxis = 1.f - fAxis;
+
+    float fFill = saturate(g_fFillRatio);
+    float fGhost = max(fFill, saturate(g_fGhostRatio)); // 잔상은 항상 현재 이상
+
+    if (fAxis > fGhost)                                   // 직전체력 밖 = 빈 공간
         discard;
 
-    float fMask = ExtractMask(g_Texture.Sample(UISampler, In.vTexcoord));
+    float2 shapeUV = float2(Remap_BarU(In.vTexcoord.x), In.vTexcoord.y);
+    float4 vColor = g_Texture.Sample(UISampler, shapeUV);
 
-    Out.vColor.rgb = g_vColor.rgb;
-    Out.vColor.a = g_vColor.a * g_fAlpha * fMask * fVisible;
+      // 현재(핑크) ↔ 직전구간(노랑) 경계. g_fFillSoftness로 부드럽게(0이면 칼같이)
+    float fSoft = max(g_fFillSoftness, 0.f);
+    float fPink = 1.f - smoothstep(fFill, fFill + fSoft, fAxis); // 1=핑크, 0=노랑
+
+    float3 col = lerp(g_vGhostColor.rgb, g_vColor.rgb, fPink);
+    float a = lerp(g_vGhostColor.a * g_fGhostAlpha,
+                        g_vColor.a * g_fAlpha,
+                        fPink);
+
+    Out.vColor.rgb = col;
+    Out.vColor.a = a * vColor.a;
 
     if (Out.vColor.a <= 0.f)
         discard;

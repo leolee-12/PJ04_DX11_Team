@@ -245,7 +245,7 @@ HRESULT  CLevel_Tool::Save_UIContainer(CGameObject* pContainer, const _float2& v
         j["Textures"] = jTextures;
 
         namespace fs = std::filesystem;
-        fs::path dir = L"../../Resources/CHJ/UI/Containers";
+        fs::path dir = L"../../Resources/YSH/UIs/UIData";
         std::error_code ec; fs::create_directories(dir, ec);
         fs::path path = dir / (strFileName + L"_ui.json");
 
