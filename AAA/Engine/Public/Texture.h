@@ -24,6 +24,11 @@ public:
 	void Get_TextureSize(_uint iIndex, _float2* pOutSize) const;
 	_uint Get_NumTextures() const { return m_iNumTextures;  }
 	_uint Get_ArraySize() const;		// Texture2DArray 슬라이스 개수
+
+	// Editor Preview 용 
+public:
+	ID3D11ShaderResourceView* Get_SRV(_uint iIndex) const;
+
 private:
 	struct FCpuImage {
 		vector<_ubyte> pixels;

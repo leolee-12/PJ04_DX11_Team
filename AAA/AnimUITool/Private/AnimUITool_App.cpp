@@ -55,13 +55,6 @@ HRESULT CAnimUITool_App::Initialize()
 	if (FAILED(Ready_For_Static()))
 		return E_FAIL;	
 
-	// UIPartObject들 일괄 등록
-	if (FAILED(Client::Ready_Prototype_UIPartObjects(m_pGameInstance_Proxy, m_pDevice, m_pContext)))
-	{
-		Log_Error("Ready_Prototype_UIPartObjects failed.");
-		return E_FAIL;
-	}
-
 	// Tool Preview 용 폰트 등록
 	if (FAILED(Load_Fonts(m_pGameInstance_Proxy)))
 		Log_Warning("Load_Fonts failed (tool Preview text may not Render).");

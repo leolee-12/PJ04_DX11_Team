@@ -44,6 +44,8 @@ public:
 	virtual void			On_Hovered() {}
 	virtual void			On_Click() {}
 	virtual void			On_Release() {}
+	virtual json			Serialize() const override;
+	virtual void			Deserialize_Internal(const json& j) override;
 
 protected:
 	_float					m_fViewWidth{}, m_fViewHeight{};

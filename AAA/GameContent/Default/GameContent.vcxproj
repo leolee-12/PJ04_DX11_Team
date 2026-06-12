@@ -53,7 +53,11 @@
     <ClInclude Include="..\Public\Map_StageOverrideSerializer.h" />
     <ClInclude Include="..\Public\Movement_Child.h" />
     <ClInclude Include="..\Public\Map_DeltaIO.h" />
+    <ClInclude Include="..\Public\UI_Enums.h" />
     <ClInclude Include="..\Public\UI_Fonts.h" />
+    <ClInclude Include="..\Public\UIAnimatorCom.h" />
+    <ClInclude Include="..\Public\UI_GaugeBarCom.h" />
+    <ClInclude Include="..\Public\UI_GaugeFill.h" />
     <ClInclude Include="..\Public\UI_GenericContainer.h" />
     <ClInclude Include="..\Public\InhaleEffect.h" />
     <ClInclude Include="..\Public\Kirby.h" />
@@ -104,7 +108,10 @@
     <ClInclude Include="..\Public\TornadoSpinReverse.h" />
     <ClInclude Include="..\Public\TestTriggerBox.h" />
     <ClInclude Include="..\Public\UI_Image.h" />
+    <ClInclude Include="..\Public\UI_KirbyStatus.h" />
+    <ClInclude Include="..\Public\UI_PointStar.h" />
     <ClInclude Include="..\Public\UI_SpriteAnim.h" />
+    <ClInclude Include="..\Public\UI_Structs.h" />
     <ClInclude Include="..\Public\UI_TestImageContainer.h" />
     <ClInclude Include="..\Public\UI_Text.h" />
     <ClInclude Include="..\Public\UI_Title.h" />
@@ -140,6 +147,9 @@
     <ClCompile Include="..\Private\Map_StageOverrideSerializer.cpp" />
     <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\Private\Map_DeltaIO.cpp" />
+    <ClCompile Include="..\Private\UIAnimatorCom.cpp" />
+    <ClCompile Include="..\Private\UI_GaugeBarCom.cpp" />
+    <ClCompile Include="..\Private\UI_GaugeFill.cpp" />
     <ClCompile Include="..\Private\UI_GenericContainer.cpp" />
     <ClCompile Include="..\Private\InhaleEffect.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp" />
@@ -183,6 +193,8 @@
     <ClCompile Include="..\Private\TornadoSpinReverse.cpp" />
     <ClCompile Include="..\Private\TestTriggerBox.cpp" />
     <ClCompile Include="..\Private\UI_Image.cpp" />
+    <ClCompile Include="..\Private\UI_KirbyStatus.cpp" />
+    <ClCompile Include="..\Private\UI_PointStar.cpp" />
     <ClCompile Include="..\Private\UI_SpriteAnim.cpp" />
     <ClCompile Include="..\Private\UI_TestImageContainer.cpp" />
     <ClCompile Include="..\Private\UI_Text.cpp" />

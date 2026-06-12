@@ -103,9 +103,9 @@ HRESULT CEnvObject_Trigger::Ready_TriggerCollider()
 		vAreaSize.y <= kMinTriggerAxis ||
 		vAreaSize.z <= kMinTriggerAxis)
 	{
-#ifdef _DEBUG
-		OutputDebugStringA("[EnvTrigger] Skip collider creation due to invalid AreaSize.\n");
-#endif
+//#ifdef _DEBUG
+//		OutputDebugStringA("[EnvTrigger] Skip collider creation due to invalid AreaSize.\n");
+//#endif
 		return S_OK;
 	}
 

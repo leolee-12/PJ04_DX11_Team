@@ -131,10 +131,6 @@ HRESULT CEnv_CollisionCatalog::Load(const _wstring& strCatalogPath)
 	Get_LoadedPath() = strCatalogPath;
 	Get_Loaded() = true;
 
-	Log_GameContentInfo(
-		"EnvCollisionCatalog loaded: path=" + WstrToStr(strCatalogPath)
-		+ " records=" + to_string(Get_Records().size()));
-
 	return S_OK;
 }
 

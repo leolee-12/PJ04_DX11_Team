@@ -9,6 +9,8 @@ CUI_Image::CUI_Image(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CUIPartObject{ pDevice, pContext }
 	, m_vColor{ 1.f, 1.f, 1.f, 1.f }
 	, m_fAlpha{ 1.f }
+	, m_bFlipX{ false }
+	, m_bFlipY{ false }
 	, m_iTextureLevel {ETOUI(LEVEL::STATIC)}
 {
 }
@@ -17,6 +19,8 @@ CUI_Image::CUI_Image(const CUI_Image& Prototype)
 	: CUIPartObject(Prototype)
 	, m_vColor{ Prototype.m_vColor }
 	, m_fAlpha{ Prototype.m_fAlpha }
+	, m_bFlipX{ Prototype.m_bFlipX }
+	, m_bFlipY{ Prototype.m_bFlipY }
 	, m_iTextureLevel{ Prototype.m_iTextureLevel }
 	, m_strTextureProtoTag { Prototype.m_strTextureProtoTag }
 {
@@ -42,6 +46,8 @@ HRESULT CUI_Image::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_eRenderLayer = static_cast<RENDERUIID>(pDesc->iRenderLayer);
+	m_bFlipX = pDesc->bFlipX;
+	m_bFlipY = pDesc->bFlipY;
 
 	// ortho  디자인 좌표계
 	m_pTransformCom->Set_Scale(pDesc->vSize.x, pDesc->vSize.y, 1.f);
@@ -60,6 +66,7 @@ void CUI_Image::Priority_Update(_float fTimeDelta)
 
 void CUI_Image::Update(_float fTimeDetla)
 {
+	__super::Update(fTimeDetla);
 }
 
 void CUI_Image::Late_Update(_float fTimeDelta)
@@ -201,6 +208,17 @@ HRESULT	CUI_Image::Bind_ShaderResources()
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(m_fAlpha))))
+		return E_FAIL;
+
+	_float4 vUVTransform =
+	{
+		m_bFlipX ? -1.f : 1.f,
+		m_bFlipY ? -1.f : 1.f,
+		m_bFlipX ? 1.f : 0.f,
+		m_bFlipY ? 1.f : 0.f
+	};
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vUVTransform", &vUVTransform, sizeof(vUVTransform))))
 		return E_FAIL;
 
 	return S_OK;

@@ -11,6 +11,8 @@
 #include "UI_SpriteAnim.h"
 #include "Texture.h"
 #include "Movement.h"
+#include "UI_Effect.h"
+#include "UI_GaugeFill.h"
 #include "Effect_Loader.h"
 
 NS_BEGIN(Client)
@@ -175,17 +177,37 @@ HRESULT CLIENT_DLL Load_Fonts(CGameInstance_Proxy* pProxy)
 
 HRESULT CLIENT_DLL Ready_Prototype_UIPartObjects(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    if (FAILED(pProxy->Add_Prototype(ETOUI(LEVEL::STATIC), CUI_Image::PROTOTYPE_TAG,
-        CUI_Image::Create(pDevice, pContext))))
-        return E_FAIL;
+    const _uint iLevel = ETOUI(LEVEL::STATIC);
 
-    if (FAILED(pProxy->Add_Prototype(ETOUI(LEVEL::STATIC), CUI_SpriteAnim::PROTOTYPE_TAG,
-        CUI_SpriteAnim::Create(pDevice, pContext))))
-        return E_FAIL;
+    if (!pProxy->Has_Prototype(iLevel, CUI_Image::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_Image::PROTOTYPE_TAG, CUI_Image::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
 
-    if (FAILED(pProxy->Add_Prototype(ETOUI(LEVEL::STATIC), CUI_Text::PROTOTYPE_TAG,
-        CUI_Text::Create(pDevice, pContext))))
-        return E_FAIL;
+    if (!pProxy->Has_Prototype(iLevel, CUI_SpriteAnim::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_SpriteAnim::PROTOTYPE_TAG, CUI_SpriteAnim::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
+
+    if (!pProxy->Has_Prototype(iLevel, CUI_Text::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_Text::PROTOTYPE_TAG, CUI_Text::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
+
+    if (!pProxy->Has_Prototype(iLevel, CUI_Effect::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_Effect::PROTOTYPE_TAG, CUI_Effect::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
+
+    if (!pProxy->Has_Prototype(iLevel, CUI_GaugeFill::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_GaugeFill::PROTOTYPE_TAG, CUI_GaugeFill::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
 
     return S_OK;
 }
@@ -359,6 +381,11 @@ HRESULT CLIENT_DLL Load_Level_UI(CGameInstance_Proxy* pProxy, ID3D11Device* pDev
                     if (jPart.contains("TextureProtoTag") && !jPart["TextureProtoTag"].get<string>().empty())
                     {
                         jPart["TextureLevel"] = iLevelIndex;
+                    }
+
+                    if (jPart.contains("MaskTextureProtoTag") && !jPart["MaskTextureProtoTag"].get<string>().empty())
+                    {
+                        jPart["MaskTextureLevel"] = iLevelIndex;
                     }
                 }
             }

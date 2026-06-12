@@ -11,6 +11,7 @@
 #include "Panel_Console.h"
 #include "Panel_Animation.h"
 #include "Panel_UICanvas.h"
+#include "Panel_Preview.h"
 
 #include "Panel_Browser.h"
 
@@ -45,6 +46,9 @@ HRESULT CPanel_Manager::Initialize()
         return E_FAIL;
 
     if (FAILED(Add_Panel(L"Browser", CPanel_Browser::Create(m_pDevice, m_pContext))))
+        return E_FAIL;
+
+    if (FAILED(Add_Panel(L"Preview", CPanel_Preview::Create(m_pDevice, m_pContext))))
         return E_FAIL;
 
     return S_OK;
@@ -250,6 +254,7 @@ void CPanel_Manager::Render_DockSpace()
         ImGui::DockBuilderDockWindow("UICanvas", center);
         ImGui::DockBuilderDockWindow("Animation", bottom);
         ImGui::DockBuilderDockWindow("Browser", bottom);
+        ImGui::DockBuilderDockWindow("Preview", bottom);
         ImGui::DockBuilderFinish(dockspace_id);
     }
 

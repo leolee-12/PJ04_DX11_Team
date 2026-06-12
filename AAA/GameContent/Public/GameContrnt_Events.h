@@ -7,6 +7,19 @@ NS_END
 
 namespace Client
 {
+    // 호준 테스트용
+    namespace EventTag
+    {
+        // 커비가 코인 스타 얻었을 때 발화할 이벤트
+        inline constexpr const _tchar* Kirby_PointStarGained = L"Kirby.PointStarGained";
+
+        // 커비 HP 변동이 있을 때 
+        inline constexpr const _tchar* Kirby_HP_Updated = L"Kirby.HPUpdated";
+
+        // 커비 능력 변경 시
+        inline constexpr const _tchar* Kirby_Ability_Changed = L"Kirby.AbilityChanged";
+    }
+
     typedef struct tagUIRButtonProbe {
         _float2 vNDC;
         _bool   bConsumed = false;
@@ -25,7 +38,7 @@ namespace Client
 
         EClickHitType  eHitType = EClickHitType::NONE;
         _float         fHitDist = FLT_MAX;
-        CGameObject*   pHitObject = nullptr;
+        CGameObject* pHitObject = nullptr;
         _int           iHitSubIndex = -1;
         _float3        vHitPos = {};
     } WORLD_CLICK_PROBE;
@@ -35,7 +48,7 @@ namespace Client
         _vector       vRayDir;
 
         _float        fHitDist = FLT_MAX;
-        CGameObject*  pHitObject = nullptr;
+        CGameObject* pHitObject = nullptr;
         _int          iHitSubIndex = -1;
     } WORLD_HOVER_PROBE;
 
@@ -46,9 +59,9 @@ namespace Client
     } SKILL_INPUT;
 
     typedef struct tagAttack {
-        CGameObject* pVictim    = { nullptr };
-        CGameObject* pAttacker  = { nullptr };
-        _uint        iDmg       = { 0 };
+        CGameObject* pVictim = { nullptr };
+        CGameObject* pAttacker = { nullptr };
+        _uint        iDmg = { 0 };
     }ATTACK_DESC;
 
     typedef struct tagObjectDiedDesc {
@@ -61,7 +74,7 @@ namespace Client
 
     typedef struct tagShowItemBoxUI {
         _uint   iBoxIdx;
-        _uint* pContents;    
+        _uint* pContents;
     } SHOW_ITEMBOX_UI;
 
     typedef struct tagInventoryTryAdd {
@@ -81,10 +94,22 @@ namespace Client
 
     typedef struct tagCraftFinished {
         _uint   iResultID;
-        _bool   bSuccess;    
+        _bool   bSuccess;
     } CRAFT_FINISHED_DESC;
 
     typedef struct tagBossDefeated {
         CGameObject* pBoss = { nullptr };
-	} BOSS_DEFEATED_DESC;
+    } BOSS_DEFEATED_DESC;
+
+    typedef struct tagKirbyPointStarGained
+    {
+        _uint iAmount = 1;
+    }KIRBY_POINTSTAR_GAINED_DESC;
+
+    typedef struct tagKirbyHPUpdated
+    {
+        _float fMaxHP = { 100.f };
+        _float fCurrHp = { 100.f };
+    }KIRBY_HP_UPDATED;
+
 }

@@ -17,6 +17,9 @@ class CLIENT_DLL CUI_Image final : public CUIPartObject
 	PROPERTY(_float4, m_vColor, L"Color", L"UI");
 	PROPERTY(_float, m_fAlpha, L"Alpha", L"UI");
 
+	PROPERTY(_bool, m_bFlipX, L"FlipX", L"UV");
+	PROPERTY(_bool, m_bFlipY, L"FlipY", L"UV");
+
 	PROPERTY(_int, m_iTextureLevel, L"TextureLevel", L"Texture");
 	PROPERTY(_wstring, m_strTextureProtoTag, L"TextureProtoTag", L"Texture");
 
@@ -28,6 +31,8 @@ public:
 		_float2			vSize = { 100.f, 100.f };
 		_float2			vPosition = { 0.f, 0.f };
 		_uint			iRenderLayer = { 1 };					// RENDERUIID	 (0 : Back / 1 : MIDDLE / 2 : FRONT)
+		_bool			bFlipX = { false };
+		_bool			bFlipY = { false };
 	}UI_IMAGE_DESC;
 
 	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_UI_Image";
@@ -57,9 +62,9 @@ public:
 	virtual CGameObject* Clone(void* pArg) override;
 
 private:
-	CShader* m_pShaderCom = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
-	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
+	CShader*				m_pShaderCom = { nullptr };
+	CTexture*				m_pTextureCom = { nullptr };
+	CVIBuffer_Rect*			m_pVIBufferCom = { nullptr };
 
 private:
 	HRESULT					Ready_Components(UI_IMAGE_DESC* pDesc);

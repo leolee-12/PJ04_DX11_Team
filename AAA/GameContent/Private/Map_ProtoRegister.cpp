@@ -240,20 +240,20 @@ HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_D
 	if (m_pProxy->Has_Prototype(iModelLevel, Desc.strModelProtoTag))
 		return S_OK;
 
-#ifdef _DEBUG
-	if (bCookCollisionMesh)
-	{
-		Log_GameContentInfo(
-			"[EnvCook] begin object="
-			+ WstrToStr(Desc.strObjectName)
-			+ " protoTag="
-			+ WstrToStr(Desc.strModelProtoTag)
-			+ " path="
-			+ WstrToStr(Desc.strModelPath)
-			+ " apxbin="
-			+ WstrToStr(Desc.tCollision.strDecorCollisionApxbinName));
-	}
-#endif
+//#ifdef _DEBUG
+//	if (bCookCollisionMesh)
+//	{
+//		Log_GameContentInfo(
+//			"[EnvCook] begin object="
+//			+ WstrToStr(Desc.strObjectName)
+//			+ " protoTag="
+//			+ WstrToStr(Desc.strModelProtoTag)
+//			+ " path="
+//			+ WstrToStr(Desc.strModelPath)
+//			+ " apxbin="
+//			+ WstrToStr(Desc.tCollision.strDecorCollisionApxbinName));
+//	}
+//#endif
 
 	const string strModelPath = WstrToStr(Desc.strModelPath);
 	CModel* pModelPrototype = nullptr;
@@ -298,16 +298,16 @@ HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_D
 		return E_FAIL;
 	}
 
-#ifdef _DEBUG
-	if (bCookCollisionMesh)
-	{
-		Log_GameContentInfo(
-			"[EnvCook] end object="
-			+ WstrToStr(Desc.strObjectName)
-			+ " protoTag="
-			+ WstrToStr(Desc.strModelProtoTag));
-	}
-#endif
+//#ifdef _DEBUG
+//	if (bCookCollisionMesh)
+//	{
+//		Log_GameContentInfo(
+//			"[EnvCook] end object="
+//			+ WstrToStr(Desc.strObjectName)
+//			+ " protoTag="
+//			+ WstrToStr(Desc.strModelProtoTag));
+//	}
+//#endif
 
 	if (nullptr == pModelPrototype)
 		return E_FAIL;

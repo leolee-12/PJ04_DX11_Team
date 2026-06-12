@@ -205,18 +205,18 @@ HRESULT CEnvObject::Ready_PhysicsActor()
 
 	if (!Should_CreatePhysicsActor())
 	{
-#ifdef _DEBUG
-		if (m_tDesc.tCollision.bInvalidCollision)
-		{
-			Log_EnvPhysicsInfo(
-				"[EnvPhysics] Skip actor: invalid collision. object="
-				+ WstrToStr(m_tDesc.strObjectName)
-				+ " uid="
-				+ to_string(m_tDesc.iUid)
-				+ " modelTag="
-				+ WstrToStr(m_tDesc.strModelProtoTag));
-		}
-#endif
+//#ifdef _DEBUG
+//		if (m_tDesc.tCollision.bInvalidCollision)
+//		{
+//			Log_EnvPhysicsInfo(
+//				"[EnvPhysics] Skip actor: invalid collision. object="
+//				+ WstrToStr(m_tDesc.strObjectName)
+//				+ " uid="
+//				+ to_string(m_tDesc.iUid)
+//				+ " modelTag="
+//				+ WstrToStr(m_tDesc.strModelProtoTag));
+//		}
+//#endif
 		return S_OK;
 	}
 
@@ -296,17 +296,17 @@ HRESULT CEnvObject::Ready_PhysicsActor_ModelMesh()
 		return E_FAIL;
 	}
 
-#ifdef _DEBUG
-	Log_EnvPhysicsInfo(
-		"[EnvPhysics] MODEL_MESH actor created. object="
-		+ WstrToStr(m_tDesc.strObjectName)
-		+ " uid="
-		+ to_string(m_tDesc.iUid)
-		+ " apxbin="
-		+ WstrToStr(m_tDesc.tCollision.strDecorCollisionApxbinName)
-		+ " modelTag="
-		+ WstrToStr(m_tDesc.strModelProtoTag));
-#endif
+//#ifdef _DEBUG
+//	Log_EnvPhysicsInfo(
+//		"[EnvPhysics] MODEL_MESH actor created. object="
+//		+ WstrToStr(m_tDesc.strObjectName)
+//		+ " uid="
+//		+ to_string(m_tDesc.iUid)
+//		+ " apxbin="
+//		+ WstrToStr(m_tDesc.tCollision.strDecorCollisionApxbinName)
+//		+ " modelTag="
+//		+ WstrToStr(m_tDesc.strModelProtoTag));
+//#endif
 
 	return S_OK;
 }
