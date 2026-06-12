@@ -10,6 +10,7 @@
 #include "Environment_Manager.h"
 #include "ShaderGlobal_Manager.h"
 #include "Camera_Manager.h"
+#include "PhysX_Manager.h"
 
 using namespace physx;
 
@@ -940,6 +941,37 @@ void CGameInstance_Proxy::Render_PhysXDebug(_fmatrix V, _fmatrix P)
 {
 	if (!IsConnected()) return;
 	m_pOwner->Render_PhysXDebug(V, P);
+}
+
+physx::PxRigidDynamic* CGameInstance_Proxy::Create_DynamicBox(const _float3& vPos, const _float4& qRot, const _float3& vHalfExtents, _float fDensity)
+{
+	if (!IsConnected()) return nullptr;
+	return m_pOwner->m_pPhysX_Manager->Create_DynamicBox(vPos, qRot, vHalfExtents, fDensity);
+}
+physx::PxRigidDynamic* CGameInstance_Proxy::Create_DynamicSphere(const _float3& vPos, _float fRadius, _float fDensity)
+{
+	if (!IsConnected()) return nullptr;
+	return m_pOwner->m_pPhysX_Manager->Create_DynamicSphere(vPos, fRadius, fDensity);
+}
+physx::PxRigidDynamic* CGameInstance_Proxy::Create_DynamicCapsule(const _float3& vPos, const _float4& qRot, _float fRadius, _float fHalfHeight, _float fDensity)
+{
+	if (!IsConnected()) return nullptr;
+	return m_pOwner->m_pPhysX_Manager->Create_DynamicCapsule(vPos, qRot, fRadius, fHalfHeight, fDensity);
+}
+physx::PxConvexMesh*   CGameInstance_Proxy::Cook_ConvexMesh(const _float3* pPositions, _uint iNumVertices)
+{
+	if (!IsConnected()) return nullptr;
+	return m_pOwner->m_pPhysX_Manager->Cook_ConvexMesh(pPositions, iNumVertices);
+}
+physx::PxRigidDynamic* CGameInstance_Proxy::Create_DynamicConvex(physx::PxConvexMesh* pMesh, _fmatrix WorldMatrix, _float fDensity)
+{
+	if (!IsConnected()) return nullptr;
+	return m_pOwner->m_pPhysX_Manager->Create_DynamicConvex(pMesh, WorldMatrix, fDensity);
+}
+void                   CGameInstance_Proxy::Remove_DynamicActor(physx::PxRigidDynamic* pActor)
+{
+	if (!IsConnected()) return;
+	m_pOwner->m_pPhysX_Manager->Remove_DynamicActor(pActor);
 }
 #pragma endregion
 

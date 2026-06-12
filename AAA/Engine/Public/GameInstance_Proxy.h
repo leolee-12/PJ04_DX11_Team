@@ -5,6 +5,8 @@ NS_BEGIN(physx)
 class PxTriangleMesh;
 class PxRigidStatic;
 class PxController;
+class PxRigidDynamic;
+class PxConvexMesh;
 NS_END
 
 NS_BEGIN(Engine)
@@ -233,15 +235,22 @@ public:
 
 #pragma region PHYSIX_MANAGER
       physx::PxTriangleMesh* Cook_TriangleMesh(const _float3* pPositions, _uint iNumVertices, const _uint* pIndices, _uint iNumIndices, _bool bFlipWinding = true);
-      physx::PxRigidStatic* Add_StaticActor(physx::PxTriangleMesh* pMesh, _fmatrix WorldMatrix);
+      physx::PxRigidStatic*  Add_StaticActor(physx::PxTriangleMesh* pMesh, _fmatrix WorldMatrix);
       void                   Remove_StaticActor(physx::PxRigidStatic* pActor);
 
-      physx::PxController* Create_CapsuleController(const _float3& vFootPos, _float fRadius, _float fHeight);
-      void                Release_Controller(physx::PxController* pCtrl);
+      physx::PxController*   Create_CapsuleController(const _float3& vFootPos, _float fRadius, _float fHeight);
+      void                   Release_Controller(physx::PxController* pCtrl);
 
       void  Toggle_PhysXDebug();
       _bool Is_PhysXDebug() const;
       void  Render_PhysXDebug(_fmatrix ViewMatrix, _fmatrix ProjMatrix);
+
+      physx::PxRigidDynamic* Create_DynamicBox(const _float3& vPos, const _float4& qRot, const _float3& vHalfExtents, _float fDensity = 10.f);
+      physx::PxRigidDynamic* Create_DynamicSphere(const _float3& vPos, _float fRadius, _float fDensity = 10.f);
+      physx::PxRigidDynamic* Create_DynamicCapsule(const _float3& vPos, const _float4& qRot, _float fRadius, _float fHalfHeight, _float fDensity = 10.f);
+      physx::PxConvexMesh*   Cook_ConvexMesh(const _float3* pPositions, _uint iNumVertices);
+      physx::PxRigidDynamic* Create_DynamicConvex(physx::PxConvexMesh* pMesh, _fmatrix WorldMatrix, _float fDensity = 10.f);
+      void                   Remove_DynamicActor(physx::PxRigidDynamic* pActor);
 #pragma endregion
 
 #pragma region TEXTURE_HUB

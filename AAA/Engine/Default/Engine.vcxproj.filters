@@ -265,6 +265,9 @@
     <Filter Include="05. GameObject\Effect\Allocator">
       <UniqueIdentifier>{8fc72b6d-5be3-40cf-9275-b99e11825d1d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="07. Component\RigidBody">
+      <UniqueIdentifier>{ccd05167-e22f-4a0e-87e3-4080ca993d70}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -525,6 +528,9 @@
     <ClInclude Include="..\public\Effect_Allocator.h">
       <Filter>05. GameObject\Effect\Allocator</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\RigIdBody.h">
+      <Filter>07. Component\RigidBody</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -763,6 +769,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Effect_Allocator.cpp">
       <Filter>05. GameObject\Effect\Allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RigIdBody.cpp">
+      <Filter>07. Component\RigidBody</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
