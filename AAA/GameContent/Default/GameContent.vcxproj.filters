@@ -378,9 +378,6 @@
     <ClInclude Include="..\Public\Map_Builder.h">
       <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Map_EditHelper.h">
-      <Filter>97. DataSystem\MapLoader\API</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Map_ModelResolver.h">
       <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
@@ -495,6 +492,21 @@
     <ClInclude Include="..\Public\Env_CollisionCatalog.h">
       <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Map_LayerPolicy.h">
+      <Filter>97. DataSystem\MapLoader\API</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Map_OverrideStore.h">
+      <Filter>97. DataSystem\MapLoader\API</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Map_StageOverrideSerializer.h">
+      <Filter>97. DataSystem\MapLoader\API</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Map_PresetCatalog.h">
+      <Filter>97. DataSystem\MapLoader\API</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Map_EditSession.h">
+      <Filter>97. DataSystem\MapLoader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -605,9 +617,6 @@
     <ClCompile Include="..\Private\Map_Builder.cpp">
       <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Map_EditHelper.cpp">
-      <Filter>97. DataSystem\MapLoader\API</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Map_ModelResolver.cpp">
       <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClCompile>
@@ -706,6 +715,21 @@
     </ClCompile>
     <ClCompile Include="..\Private\Env_CollisionCatalog.cpp">
       <Filter>97. DataSystem\MapLoader\API</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Map_LayerPolicy.cpp">
+      <Filter>97. DataSystem\MapLoader\API</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Map_OverrideStore.cpp">
+      <Filter>97. DataSystem\MapLoader\API</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Map_StageOverrideSerializer.cpp">
+      <Filter>97. DataSystem\MapLoader\API</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Map_PresetCatalog.cpp">
+      <Filter>97. DataSystem\MapLoader\API</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Map_EditSession.cpp">
+      <Filter>97. DataSystem\MapLoader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

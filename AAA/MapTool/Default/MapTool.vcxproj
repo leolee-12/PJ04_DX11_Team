@@ -25,7 +25,6 @@
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\MapToolProfiler.cpp" />
-    <ClCompile Include="..\Private\Map_PreviewSession.cpp" />
     <ClCompile Include="..\Private\Panel_Profiler.cpp" />
     <ClCompile Include="..\Private\ToolApp.cpp" />
     <ClCompile Include="..\Private\EditCamera.cpp" />
@@ -55,7 +54,6 @@
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\Public\MapToolProfiler.h" />
-    <ClInclude Include="..\Public\Map_PreviewSession.h" />
     <ClInclude Include="..\Public\ToolApp.h" />
     <ClInclude Include="..\Public\MapTool_Defines.h" />
     <ClInclude Include="..\Public\MapTool_Enum.h" />

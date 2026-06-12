@@ -9,12 +9,12 @@ NS_END
 
 NS_BEGIN(Client)
 class CMapStage;
+class CMap_EditSession;
 NS_END
 
 NS_BEGIN(Editor)
 class CEditCamera;
 class CEdit_Grid;
-class CMap_PreviewSession;
 
 class CLevel_Edit final : public CLevel
 {
@@ -78,13 +78,11 @@ public:	// Map Preview - Public Func
 	void			Clear_MapPreview();
 	void			Clear_MapPreviewStage();
 	void			Clear_MapPreviewEnv();
-	_uint			Get_MapPreviewPresetCount() const;
-	const _char*	Get_MapPreviewPresetLabel(_uint iPresetIndex) const;
 	_bool			Is_MapPreviewLoaded() const;
 	const _wstring& Get_MapPreviewStatus() const;
 	const _wstring& Get_LoadedMapPreviewStageName() const;
 	_uint			Get_MapPreviewEnvCreatedCount() const;
-	const CMap_PreviewSession* Get_MapPreviewSession() const { return m_pMapPreviewSession; }
+	const CMap_EditSession* Get_MapPreviewSession() const { return m_pMapPreviewSession; }
 	HRESULT Restore_DeletedMapPreviewEnv(const _wstring& strStableKey);
 	HRESULT Restore_AllDeletedMapPreviewEnv();
 	HRESULT Save_MapOverride();
@@ -109,8 +107,8 @@ private:
 	_uint	m_iPlaceCount = {};
 
 	// Map Preview - Members
-	CMap_PreviewSession* m_pMapPreviewSession = { nullptr };
-	CMapStage*	m_pMapStage = { nullptr };
+	CMap_EditSession* m_pMapPreviewSession = { nullptr };
+	CMapStage* m_pMapStage = { nullptr };
 	unordered_set<CGameObject*> m_MapPreviewObjects;
 
 private:

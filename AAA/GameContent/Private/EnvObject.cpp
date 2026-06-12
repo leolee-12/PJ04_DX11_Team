@@ -278,7 +278,7 @@ HRESULT CEnvObject::Ready_PhysicsActor_ModelMesh()
 		return S_OK;
 	}
 
-	m_pPhysicsActor = m_pGameInstance_Proxy->Add_StaticActor(
+	m_pPhysicsActor = m_pGameInstance_Proxy->Create_StaticActor(
 		pCollisionMesh,
 		XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
@@ -286,7 +286,7 @@ HRESULT CEnvObject::Ready_PhysicsActor_ModelMesh()
 	{
 #ifdef _DEBUG
 		Log_EnvPhysicsWarning(
-			"[EnvPhysics] MODEL_MESH actor failed: Add_StaticActor returned null. object="
+			"[EnvPhysics] MODEL_MESH actor failed: Create_StaticActor returned null. object="
 			+ WstrToStr(m_tDesc.strObjectName)
 			+ " uid="
 			+ to_string(m_tDesc.iUid)

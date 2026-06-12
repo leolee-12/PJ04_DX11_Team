@@ -11,12 +11,12 @@ NS_END
 NS_BEGIN(Client)
 class CLumia;
 class CMapStage;
+class CMap_EditSession;
 NS_END
 
 NS_BEGIN(MapTool)
 class CEditCamera;
 class CEdit_Grid;
-class CMap_PreviewSession;
 
 class CLevel_Edit final : public CLevel
 {
@@ -63,18 +63,16 @@ public:
 	void    Clear_MapPreviewStage();
 	void    Clear_MapPreviewEnv();
 
-	_uint   Get_MapPreviewPresetCount() const;
-	const _char* Get_MapPreviewPresetLabel(_uint iPresetIndex) const;
-	const _wstring& Get_MapPreviewStatus() const { return m_strMapPreviewStatus; }
-	_bool   Is_MapStageLoaded() const { return m_bMapStageLoaded; }
-	_bool   Is_MapEnvLoaded() const { return m_bMapEnvLoaded; }
+	const _wstring& Get_MapPreviewStatus() const;
+	_bool   Is_MapStageLoaded() const;
+	_bool   Is_MapEnvLoaded() const;
 	_bool   Is_MapPreviewObject(CGameObject* pObject) const
 	{
 		return nullptr != pObject
 			&& m_MapPreviewObjects.find(pObject) != m_MapPreviewObjects.end();
 	}
 
-	const CMap_PreviewSession* Get_MapPreviewSession() const { return m_pMapPreviewSession; }
+	const CMap_EditSession* Get_MapPreviewSession() const { return m_pMapPreviewSession; }
 	HRESULT Restore_DeletedMapPreviewEnv(const _wstring& strStableKey);
 	HRESULT Restore_AllDeletedMapPreviewEnv();
 	HRESULT Save_MapOverride();
@@ -109,16 +107,9 @@ private:
 	_uint	m_iPlaceCount = {};
 
 	// Map
-	wstring m_strMapPreviewStatus = { L"Map preset not loaded." };
-	wstring m_strLoadedMapStageName = {};
-	_uint   m_iEnvObjCreatedCount = {};
-	_int    m_iLoadedMapPresetIndex = { -1 };
 	unordered_set<CGameObject*> m_MapPreviewObjects;
-	_bool   m_bMapStageLoaded = { false };
-	_bool   m_bMapEnvLoaded = { false };
-	MAP_LEVEL_CONTENT_DESC m_MapContentDesc = {};
 	CMapStage* m_pMapStage = { nullptr };
-	CMap_PreviewSession* m_pMapPreviewSession = { nullptr };
+	CMap_EditSession* m_pMapPreviewSession = { nullptr };
 
 	// Hierarchy
 	_uint m_iHierarchyRevision = {};
@@ -143,6 +134,13 @@ private:
 		const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);
 
 	HRESULT Prepare_MapContentForPreviewLoad(_uint iPresetIndex, _bool bPresetChanged, _bool bPreserveEnvRuntimeState);
+	MAP_LEVEL_CONTENT_DESC Build_MapPreviewContentDescSnapshot() const;
+	void    Apply_MapPreviewContentDesc(const MAP_LEVEL_CONTENT_DESC& Desc, _bool bPreserveRuntimeState = false);
+	const _wstring& Get_MapPreviewLoadedStageNameRef() const;
+	_uint   Get_MapPreviewEnvCreatedCountInternal() const;
+	void    Set_MapPreviewStageRuntime(_bool bLoaded, const wstring& strStageName = L"");
+	void    Set_MapPreviewEnvRuntime(_bool bLoaded, _uint iCreatedCount);
+	void    Set_MapPreviewStatus(const wstring& strStatus);
 	void    Sync_MapPreviewRuntimeStateToSession();
 	_bool   Handle_MapSpecificDeletion(CGameObject* pObject);
 	_bool   Try_RegisterAddedMapOverridePlacement(CGameObject* pObject, const _wstring& strObjectTag);

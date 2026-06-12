@@ -96,7 +96,7 @@ PxTriangleMesh* CPhysX_Manager::Cook_TriangleMesh(const _float3* pPositions, _ui
     return PxCreateTriangleMesh(params, desc, m_pPhysics->getPhysicsInsertionCallback());
 }
 
-PxRigidStatic* CPhysX_Manager::Add_StaticActor(PxTriangleMesh* pMesh, _fmatrix WorldMatrix)
+PxRigidStatic* CPhysX_Manager::Create_StaticActor(PxTriangleMesh* pMesh, _fmatrix WorldMatrix)
 {
     if (nullptr == m_pPhysics || nullptr == m_pScene || nullptr == pMesh)
         return nullptr;

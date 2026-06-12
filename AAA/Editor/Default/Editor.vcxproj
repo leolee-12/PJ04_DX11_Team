@@ -159,7 +159,6 @@
     <ClInclude Include="..\public\Level_Edit.h" />
     <ClInclude Include="..\public\Level_Loading.h" />
     <ClInclude Include="..\Public\Loader.h" />
-    <ClInclude Include="..\Public\Map_PreviewSession.h" />
     <ClInclude Include="..\public\NavMesh_Editor.h" />
     <ClInclude Include="..\ThirdParty\ImGui\Inc\imconfig.h" />
     <ClInclude Include="..\ThirdParty\ImGui\Inc\imgui.h" />
@@ -183,7 +182,6 @@
     <ClCompile Include="..\private\Level_Edit.cpp" />
     <ClCompile Include="..\private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
-    <ClCompile Include="..\Private\Map_PreviewSession.cpp" />
     <ClCompile Include="..\private\NavMesh_Editor.cpp" />
     <ClCompile Include="..\ThirdParty\ImGui\Src\imgui.cpp" />
     <ClCompile Include="..\ThirdParty\ImGui\Src\ImGuizmo.cpp" />

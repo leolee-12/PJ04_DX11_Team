@@ -46,6 +46,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Public\Map_EditSession.h" />
+    <ClInclude Include="..\Public\Map_LayerPolicy.h" />
+    <ClInclude Include="..\Public\Map_OverrideStore.h" />
+    <ClInclude Include="..\Public\Map_PresetCatalog.h" />
+    <ClInclude Include="..\Public\Map_StageOverrideSerializer.h" />
     <ClInclude Include="..\Public\Movement_Child.h" />
     <ClInclude Include="..\Public\Map_DeltaIO.h" />
     <ClInclude Include="..\Public\UI_Fonts.h" />
@@ -70,7 +75,6 @@
     <ClInclude Include="..\Public\Map_Defines.h" />
     <ClInclude Include="..\Public\MapStage.h" />
     <ClInclude Include="..\public\MapObject.h" />
-    <ClInclude Include="..\Public\Map_EditHelper.h" />
     <ClInclude Include="..\Public\Map_LevelContent.h" />
     <ClInclude Include="..\Public\Map_Loader.h" />
     <ClInclude Include="..\Public\Map_LoadTypes.h" />
@@ -129,6 +133,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Private\Map_EditSession.cpp" />
+    <ClCompile Include="..\Private\Map_LayerPolicy.cpp" />
+    <ClCompile Include="..\Private\Map_OverrideStore.cpp" />
+    <ClCompile Include="..\Private\Map_PresetCatalog.cpp" />
+    <ClCompile Include="..\Private\Map_StageOverrideSerializer.cpp" />
     <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\Private\Map_DeltaIO.cpp" />
     <ClCompile Include="..\Private\UI_GenericContainer.cpp" />
@@ -147,7 +156,6 @@
     <ClCompile Include="..\Private\MapSection.cpp" />
     <ClCompile Include="..\Private\MapStage.cpp" />
     <ClCompile Include="..\Private\Map_Builder.cpp" />
-    <ClCompile Include="..\Private\Map_EditHelper.cpp" />
     <ClCompile Include="..\Private\Map_LevelContent.cpp" />
     <ClCompile Include="..\Private\Map_Loader.cpp" />
     <ClCompile Include="..\Private\Map_ModelResolver.cpp" />

@@ -158,7 +158,7 @@ HRESULT CLoader::Ready_Resources_For_GamePlay()
 
     Add_Work([this, Manifest, eLevel]() -> HRESULT
         {
-            return CMap_Loader::Preload_MapForLevel(
+            return CMap_Loader::Preload_Map(
                 m_pDevice,
                 m_pContext,
                 Manifest.strMapManifest,

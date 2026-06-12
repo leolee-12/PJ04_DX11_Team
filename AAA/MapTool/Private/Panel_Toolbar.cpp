@@ -3,7 +3,7 @@
 #include "EditInstance.h"
 #include "Level_Edit.h"
 #include "GameInstance.h"
-#include "Map_EditHelper.h"
+#include "Map_Loader.h"
 
 #include "imgui.h"
 
@@ -14,7 +14,7 @@ namespace
 		if (nullptr == pLevel || nullptr == pInOutPresetIndex)
 			return;
 
-		const _uint iPresetCount = pLevel->Get_MapPreviewPresetCount();
+		const _uint iPresetCount = Client::CMap_Loader::Get_MapPresetCount();
 		if (0 == iPresetCount)
 		{
 			ImGui::TextDisabled("Map preset unavailable.");
@@ -27,12 +27,12 @@ namespace
 		ImGui::SetNextItemWidth(120.f);
 		if (ImGui::BeginCombo(
 			"##MapPreviewPreset",
-			pLevel->Get_MapPreviewPresetLabel(static_cast<_uint>(*pInOutPresetIndex))))
+			Client::CMap_Loader::Get_MapPresetLabel(static_cast<_uint>(*pInOutPresetIndex))))
 		{
 			for (_uint i = 0; i < iPresetCount; ++i)
 			{
 				const _bool bSelected = (static_cast<_uint>(*pInOutPresetIndex) == i);
-				if (ImGui::Selectable(pLevel->Get_MapPreviewPresetLabel(i), bSelected))
+				if (ImGui::Selectable(CMap_Loader::Get_MapPresetLabel(i), bSelected))
 					*pInOutPresetIndex = static_cast<_int>(i);
 
 				if (bSelected)
@@ -76,10 +76,7 @@ namespace
 		if (ImGui::IsItemHovered())
 		{
 			_wstring strOverridePath;
-			if (SUCCEEDED(CMap_EditHelper::Get_MapPresetOverrideAssetPath(
-				static_cast<_uint>(*pInOutPresetIndex),
-				L"",
-				&strOverridePath)))
+			if (SUCCEEDED(CMap_Loader::Get_MapPresetOverrideAssetPath(static_cast<_uint>(*pInOutPresetIndex), L"", &strOverridePath)))
 			{
 				const string strTooltip = WstrToStr(strOverridePath);
 				ImGui::SetTooltip("%s", strTooltip.c_str());

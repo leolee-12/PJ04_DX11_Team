@@ -1,15 +1,13 @@
 #pragma once
-#include "Base.h"
-#include "MapTool_Defines.h"
 #include "Map_LevelContent.h"
 
 NS_BEGIN(Engine)
 class CGameObject;
 NS_END
 
-NS_BEGIN(MapTool)
+NS_BEGIN(Client)
 
-class CMap_PreviewSession final : public CBase
+class CLIENT_DLL CMap_EditSession final : public CBase
 {
 public:
 	struct MAP_PREVIEW_ENV_ITEM
@@ -33,8 +31,8 @@ public:
 	};
 
 private:
-	CMap_PreviewSession();
-	virtual ~CMap_PreviewSession() = default;
+	CMap_EditSession();
+	virtual ~CMap_EditSession() = default;
 
 public:
 	void Reset();
@@ -53,7 +51,11 @@ public:
 
 	_uint Get_DeletedEnvCount() const { return static_cast<_uint>(m_DeletedMapPreviewEnvOrder.size()); }
 
-	void Register_PreviewObject(const _wstring& strLayerTag, const _wstring& strObjectTag, CGameObject* pObject);
+	void Register_PreviewObject(
+		const _wstring& strLayerTag,
+		const _wstring& strObjectTag,
+		CGameObject* pObject);
+
 	void Unregister_PreviewObject(CGameObject* pObject);
 	_bool Track_DeletedPreviewObject(CGameObject* pObject);
 
@@ -66,15 +68,20 @@ public:
 	_bool Try_GetDeletedEnvItem(const _wstring& strStableKey, MAP_PREVIEW_ENV_ITEM* pOutItem) const;
 	_bool Restore_DeletedEnvItem(const _wstring& strStableKey);
 	void Restore_AllDeletedEnvItems();
-	void Rebuild_DeletedEnvItems(const vector<Client::ENV_OBJECT_DESC>& DeletedDescs);
+	void Rebuild_DeletedEnvItems(const vector<ENV_OBJECT_DESC>& DeletedDescs);
 
 	void Clear_RuntimeState();
+
+	_bool Is_StageLoaded() const { return m_bStageLoaded; }
 	void Set_PreviewStatus(const _wstring& strStatus);
 	void Set_LoadedStageName(const _wstring& strStageName);
 	void Clear_LoadedStage();
+
+	_bool Is_EnvLoaded() const { return m_bEnvLoaded; }
+	void Set_EnvLoaded(_bool bLoaded);
 	void Set_EnvCreatedCount(_uint iCount);
 
-	_bool Is_PreviewLoaded() const { return m_bStageLoaded || 0 != m_iEnvCreatedCount; }
+	_bool Is_PreviewLoaded() const { return m_bStageLoaded || m_bEnvLoaded || 0 != m_iEnvCreatedCount; }
 	const _wstring& Get_PreviewStatus() const { return m_strPreviewStatus; }
 	const _wstring& Get_LoadedStageName() const { return m_strLoadedStageName; }
 	_uint Get_EnvCreatedCount() const { return m_iEnvCreatedCount; }
@@ -102,7 +109,8 @@ private:
 	unordered_map<CGameObject*, MAP_PREVIEW_ADDED_ITEM> m_AddedMapObjectUiItems;
 	vector<CGameObject*> m_AddedMapObjectOrder;
 
-	_bool m_bStageLoaded = false;
+	_bool m_bStageLoaded = { false };
+	_bool m_bEnvLoaded = { false };
 	_wstring m_strPreviewStatus = { L"Map preset not loaded." };
 	_wstring m_strLoadedStageName = {};
 	_uint m_iEnvCreatedCount = {};
@@ -113,7 +121,7 @@ private:
 	void Rebuild_DeletedEnvItemsFromWorkingDelta();
 
 public:
-	static CMap_PreviewSession* Create();
+	static CMap_EditSession* Create();
 
 private:
 	virtual void Free() override;

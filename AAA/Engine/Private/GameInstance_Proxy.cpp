@@ -908,12 +908,12 @@ PxTriangleMesh* CGameInstance_Proxy::Cook_TriangleMesh(const _float3* p, _uint n
 
 	return m_pOwner->Cook_TriangleMesh(p, nv, idx, ni, bFlip);
 }
-PxRigidStatic* CGameInstance_Proxy::Add_StaticActor(PxTriangleMesh* pMesh, _fmatrix W)
+PxRigidStatic* CGameInstance_Proxy::Create_StaticActor(PxTriangleMesh* pMesh, _fmatrix W)
 {
 	if (!IsConnected())
 		return nullptr;
 
-	return m_pOwner->Add_StaticActor(pMesh, W);
+	return m_pOwner->Create_StaticActor(pMesh, W);
 }
 void           CGameInstance_Proxy::Remove_StaticActor(PxRigidStatic* pActor)
 {

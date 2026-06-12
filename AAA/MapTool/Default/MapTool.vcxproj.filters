@@ -70,9 +70,6 @@
     <Filter Include="04. Panels\Profiler">
       <UniqueIdentifier>{1cfcb692-1664-4e2a-9477-1731a2118f9c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03. Objects\Map-Env">
-      <UniqueIdentifier>{23a1ab83-c458-44b1-8c02-9f652d9f9f45}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Panel.h">
@@ -152,9 +149,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\EditInstance.h">
       <Filter>01. API\00. EditInstance</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Map_PreviewSession.h">
-      <Filter>03. Objects\Map-Env</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -238,9 +232,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\EditInstance.cpp">
       <Filter>01. API\00. EditInstance</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Map_PreviewSession.cpp">
-      <Filter>03. Objects\Map-Env</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

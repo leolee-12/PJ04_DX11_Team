@@ -1,7 +1,7 @@
 ﻿#include "Panel_Hierarchy.h"
 #include "EditInstance.h"
 #include "Level_Edit.h"
-#include "Map_PreviewSession.h"
+#include "Map_EditSession.h"
 
 #include "GameInstance.h"
 #include "GameObject.h"
@@ -67,7 +67,7 @@ namespace
     {
         ImGui::TextUnformatted("Deleted Env Overrides");
 
-        const MapTool::CMap_PreviewSession* pSession =
+        const CMap_EditSession* pSession =
             (nullptr != pLevel) ? pLevel->Get_MapPreviewSession() : nullptr;
 
         if (nullptr == pSession || 0 == pSession->Get_DeletedEnvCount())
@@ -86,7 +86,7 @@ namespace
 
         for (const auto& strKey : pSession->Get_DeletedEnvOrder())
         {
-            MapTool::CMap_PreviewSession::MAP_PREVIEW_ENV_ITEM Item{};
+            CMap_EditSession::MAP_PREVIEW_ENV_ITEM Item{};
             if (!pSession->Try_GetDeletedEnvItem(strKey, &Item))
                 continue;
 
@@ -143,7 +143,7 @@ namespace
     {
         ImGui::TextUnformatted("Added Map Overrides");
 
-        const MapTool::CMap_PreviewSession* pSession =
+        const CMap_EditSession* pSession =
             (nullptr != pLevel) ? pLevel->Get_MapPreviewSession() : nullptr;
 
         if (nullptr == pSession || 0 == pSession->Get_AddedMapObjectCount())
@@ -162,7 +162,7 @@ namespace
             if (nullptr == pObject)
                 continue;
 
-            MapTool::CMap_PreviewSession::MAP_PREVIEW_ADDED_ITEM Item{};
+            CMap_EditSession::MAP_PREVIEW_ADDED_ITEM Item{};
             if (!pSession->Try_GetAddedMapObjectItem(pObject, &Item))
                 continue;
 
@@ -230,7 +230,7 @@ void CPanel_Hierarchy::Render()
         return;
     }
 
-    const CMap_PreviewSession* pSession = pLevel->Get_MapPreviewSession();
+    const CMap_EditSession* pSession = pLevel->Get_MapPreviewSession();
 
     const _uint iSelectionRevision = pLevel->Get_SelectionRevision();
     if (m_iCachedSelectionRevision != iSelectionRevision)
@@ -397,7 +397,7 @@ void CPanel_Hierarchy::Render()
                         {
                             if (bIsAddedMapOverride && nullptr != pSession)
                             {
-                                CMap_PreviewSession::MAP_PREVIEW_ADDED_ITEM Item{};
+                                CMap_EditSession::MAP_PREVIEW_ADDED_ITEM Item{};
                                 if (pSession->Try_GetAddedMapObjectItem(pObject, &Item))
                                 {
                                     const string strProtoUtf8 =

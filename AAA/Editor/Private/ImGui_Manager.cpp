@@ -17,11 +17,11 @@
 #include "GameContent_AnimEvents.h"
 #include "Effect_Container.h"
 #include "Effect_Part.h"
-#include "Map_EditHelper.h"
+#include "Map_Loader.h"
 #include "MapStage.h"
 #include "MapObject.h"
 #include "EnvObject.h"
-#include "Map_PreviewSession.h"
+#include "Map_EditSession.h"
 
 IMPLEMENT_SINGLETON(CImGui_Manager)
 
@@ -286,7 +286,7 @@ void CImGui_Manager::Draw_Toolbar()
 
     ImGui::SameLine();
 
-    const _uint iMapPreviewPresetCount = CMap_EditHelper::Get_MapPresetCount();
+    const _uint iMapPreviewPresetCount = CMap_Loader::Get_MapPresetCount();
     static _int s_iMapPreviewPreset = 0;
     if (0 < iMapPreviewPresetCount)
     {
@@ -296,12 +296,12 @@ void CImGui_Manager::Draw_Toolbar()
 
         ImGui::SetNextItemWidth(100.f);
         if (ImGui::BeginCombo("##MapPreviewPreset",
-            CMap_EditHelper::Get_MapPresetLabel(static_cast<_uint>(s_iMapPreviewPreset))))
+            CMap_Loader::Get_MapPresetLabel(static_cast<_uint>(s_iMapPreviewPreset))))
         {
             for (_uint i = 0; i < iMapPreviewPresetCount; ++i)
             {
                 const _bool bSelected = (static_cast<_uint>(s_iMapPreviewPreset) == i);
-                if (ImGui::Selectable(CMap_EditHelper::Get_MapPresetLabel(i), bSelected))
+                if (ImGui::Selectable(CMap_Loader::Get_MapPresetLabel(i), bSelected))
                     s_iMapPreviewPreset = static_cast<_int>(i);
                 if (bSelected)
                     ImGui::SetItemDefaultFocus();
@@ -343,7 +343,7 @@ void CImGui_Manager::Draw_Toolbar()
         if (ImGui::IsItemHovered())
         {
             _wstring strOverridePath;
-            if (SUCCEEDED(CMap_EditHelper::Get_MapPresetOverrideAssetPath(
+            if (SUCCEEDED(CMap_Loader::Get_MapPresetOverrideAssetPath(
                 static_cast<_uint>(s_iMapPreviewPreset),
                 L"",
                 &strOverridePath)))
@@ -1489,7 +1489,7 @@ void CImGui_Manager::Draw_MapPreviewDeletedOverrides()
 {
     ImGui::TextUnformatted("Deleted Env Overrides");
 
-    const CMap_PreviewSession* pSession = m_pLevel_Edit->Get_MapPreviewSession();
+    const CMap_EditSession* pSession = m_pLevel_Edit->Get_MapPreviewSession();
     if (nullptr == pSession || 0 == pSession->Get_DeletedEnvCount())
     {
         ImGui::TextDisabled("No deleted env overrides.");
@@ -1506,7 +1506,7 @@ void CImGui_Manager::Draw_MapPreviewDeletedOverrides()
 
     for (const auto& strKey : pSession->Get_DeletedEnvOrder())
     {
-        CMap_PreviewSession::MAP_PREVIEW_ENV_ITEM Item{};
+        CMap_EditSession::MAP_PREVIEW_ENV_ITEM Item{};
         if (!pSession->Try_GetDeletedEnvItem(strKey, &Item))
             continue;
 
@@ -1537,7 +1537,7 @@ void CImGui_Manager::Draw_MapPreviewAddedOverrides()
 {
     ImGui::TextUnformatted("Added Map Overrides");
 
-    const CMap_PreviewSession* pSession = m_pLevel_Edit->Get_MapPreviewSession();
+    const CMap_EditSession* pSession = m_pLevel_Edit->Get_MapPreviewSession();
     if (nullptr == pSession || 0 == pSession->Get_AddedMapObjectCount())
     {
         ImGui::TextDisabled("No added map overrides.");
@@ -1554,7 +1554,7 @@ void CImGui_Manager::Draw_MapPreviewAddedOverrides()
         if (nullptr == pObject)
             continue;
 
-        CMap_PreviewSession::MAP_PREVIEW_ADDED_ITEM Item{};
+        CMap_EditSession::MAP_PREVIEW_ADDED_ITEM Item{};
         if (!pSession->Try_GetAddedMapObjectItem(pObject, &Item))
             continue;
 

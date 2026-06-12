@@ -630,9 +630,9 @@ PxTriangleMesh* CGameInstance::Cook_TriangleMesh(const _float3* p, _uint nv, con
 {
     return m_pPhysX_Manager->Cook_TriangleMesh(p, nv, idx, ni, bFlip);
 }
-PxRigidStatic* CGameInstance::Add_StaticActor(PxTriangleMesh* pMesh, _fmatrix W)
+PxRigidStatic* CGameInstance::Create_StaticActor(PxTriangleMesh* pMesh, _fmatrix W)
 {
-    return m_pPhysX_Manager->Add_StaticActor(pMesh, W);
+    return m_pPhysX_Manager->Create_StaticActor(pMesh, W);
 }
 void           CGameInstance::Remove_StaticActor(PxRigidStatic* pActor)
 {

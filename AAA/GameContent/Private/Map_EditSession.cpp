@@ -1,13 +1,15 @@
-#include "Map_PreviewSession.h"
+#include "Map_EditSession.h"
 #include "EnvObject.h"
 
-NS_BEGIN(MapTool)
+#include <algorithm>
 
-CMap_PreviewSession::CMap_PreviewSession()
+NS_BEGIN(Client)
+
+CMap_EditSession::CMap_EditSession()
 {
 }
 
-void CMap_PreviewSession::Reset()
+void CMap_EditSession::Reset()
 {
 	m_MapContentDesc = {};
 	m_MapPreviewEnvItems.clear();
@@ -20,7 +22,7 @@ void CMap_PreviewSession::Reset()
 	Clear_RuntimeState();
 }
 
-void CMap_PreviewSession::Set_MapContentDesc(const MAP_LEVEL_CONTENT_DESC& Desc)
+void CMap_EditSession::Set_MapContentDesc(const MAP_LEVEL_CONTENT_DESC& Desc)
 {
 	m_MapContentDesc = Desc;
 	m_MapContentDesc.bHasMapContent = Desc.bHasMapContent
@@ -35,7 +37,7 @@ void CMap_PreviewSession::Set_MapContentDesc(const MAP_LEVEL_CONTENT_DESC& Desc)
 	Rebuild_DeletedEnvItemsFromWorkingDelta();
 }
 
-void CMap_PreviewSession::Set_MapContentMeta(const Client::MAP_LEVEL_CONTENT_DESC& Desc)
+void CMap_EditSession::Set_MapContentMeta(const MAP_LEVEL_CONTENT_DESC& Desc)
 {
 	m_MapContentDesc = Desc;
 	m_MapContentDesc.bHasMapContent = Desc.bHasMapContent
@@ -43,42 +45,42 @@ void CMap_PreviewSession::Set_MapContentMeta(const Client::MAP_LEVEL_CONTENT_DES
 		|| !Desc.strManifestPath.empty();
 }
 
-void CMap_PreviewSession::Set_LoadStageEnabled(_bool bEnable)
+void CMap_EditSession::Set_LoadStageEnabled(_bool bEnable)
 {
 	m_MapContentDesc.bLoadStage = bEnable;
 	m_MapContentDesc.bHasMapContent = (0 <= m_MapContentDesc.iPresetIndex)
 		|| !m_MapContentDesc.strManifestPath.empty();
 }
 
-void CMap_PreviewSession::Set_LoadEnvEnabled(_bool bEnable)
+void CMap_EditSession::Set_LoadEnvEnabled(_bool bEnable)
 {
 	m_MapContentDesc.bLoadEnv = bEnable;
 	m_MapContentDesc.bHasMapContent = (0 <= m_MapContentDesc.iPresetIndex)
 		|| !m_MapContentDesc.strManifestPath.empty();
 }
 
-void CMap_PreviewSession::Set_PresetIndex(_int iPresetIndex)
+void CMap_EditSession::Set_PresetIndex(_int iPresetIndex)
 {
 	m_MapContentDesc.iPresetIndex = iPresetIndex;
 	m_MapContentDesc.bHasMapContent = (0 <= m_MapContentDesc.iPresetIndex)
 		|| !m_MapContentDesc.strManifestPath.empty();
 }
 
-void CMap_PreviewSession::Set_ManifestPath(const _wstring& strManifestPath)
+void CMap_EditSession::Set_ManifestPath(const _wstring& strManifestPath)
 {
 	m_MapContentDesc.strManifestPath = strManifestPath;
 	m_MapContentDesc.bHasMapContent = (0 <= m_MapContentDesc.iPresetIndex)
 		|| !m_MapContentDesc.strManifestPath.empty();
 }
 
-_bool CMap_PreviewSession::Is_PreviewEnvLayer(const _wstring& strLayerTag)
+_bool CMap_EditSession::Is_PreviewEnvLayer(const _wstring& strLayerTag)
 {
 	return strLayerTag == L"Layer_EnvStatic"
 		|| strLayerTag == L"Layer_EnvInteract"
 		|| strLayerTag == L"Layer_EnvEffect";
 }
 
-_wstring CMap_PreviewSession::Build_DisplayName(const ENV_OBJECT_DESC& Desc)
+_wstring CMap_EditSession::Build_DisplayName(const ENV_OBJECT_DESC& Desc)
 {
 	_wstring strDisplayName = Desc.strObjectName;
 
@@ -100,7 +102,7 @@ _wstring CMap_PreviewSession::Build_DisplayName(const ENV_OBJECT_DESC& Desc)
 	return strDisplayName;
 }
 
-void CMap_PreviewSession::Register_PreviewObject(
+void CMap_EditSession::Register_PreviewObject(
 	const _wstring& strLayerTag,
 	const _wstring& strObjectTag,
 	CGameObject* pObject)
@@ -111,11 +113,11 @@ void CMap_PreviewSession::Register_PreviewObject(
 	if (!Is_PreviewEnvLayer(strLayerTag))
 		return;
 
-	Client::CEnvObject* pEnvObject = dynamic_cast<Client::CEnvObject*>(pObject);
+	CEnvObject* pEnvObject = dynamic_cast<CEnvObject*>(pObject);
 	if (nullptr == pEnvObject)
 		return;
 
-	const Client::ENV_OBJECT_DESC& Desc = pEnvObject->Get_Desc();
+	const ENV_OBJECT_DESC& Desc = pEnvObject->Get_Desc();
 
 	MAP_PREVIEW_ENV_ITEM Item{};
 	Item.strStableKey = CMap_Override::Build_EnvObjectStableKey(Desc);
@@ -133,7 +135,7 @@ void CMap_PreviewSession::Register_PreviewObject(
 	m_MapPreviewEnvItems[pObject] = Item;
 }
 
-void CMap_PreviewSession::Unregister_PreviewObject(CGameObject* pObject)
+void CMap_EditSession::Unregister_PreviewObject(CGameObject* pObject)
 {
 	if (nullptr == pObject)
 		return;
@@ -141,7 +143,7 @@ void CMap_PreviewSession::Unregister_PreviewObject(CGameObject* pObject)
 	m_MapPreviewEnvItems.erase(pObject);
 }
 
-_bool CMap_PreviewSession::Track_DeletedPreviewObject(CGameObject* pObject)
+_bool CMap_EditSession::Track_DeletedPreviewObject(CGameObject* pObject)
 {
 	if (nullptr == pObject)
 		return false;
@@ -170,7 +172,9 @@ _bool CMap_PreviewSession::Track_DeletedPreviewObject(CGameObject* pObject)
 	return true;
 }
 
-_bool CMap_PreviewSession::Try_GetDeletedEnvItem(const _wstring& strStableKey, MAP_PREVIEW_ENV_ITEM* pOutItem) const
+_bool CMap_EditSession::Try_GetDeletedEnvItem(
+	const _wstring& strStableKey,
+	MAP_PREVIEW_ENV_ITEM* pOutItem) const
 {
 	if (nullptr == pOutItem)
 		return false;
@@ -183,7 +187,7 @@ _bool CMap_PreviewSession::Try_GetDeletedEnvItem(const _wstring& strStableKey, M
 	return true;
 }
 
-_bool CMap_PreviewSession::Restore_DeletedEnvItem(const _wstring& strStableKey)
+_bool CMap_EditSession::Restore_DeletedEnvItem(const _wstring& strStableKey)
 {
 	if (strStableKey.empty())
 		return false;
@@ -197,14 +201,14 @@ _bool CMap_PreviewSession::Restore_DeletedEnvItem(const _wstring& strStableKey)
 	return 0 < iErased;
 }
 
-void CMap_PreviewSession::Restore_AllDeletedEnvItems()
+void CMap_EditSession::Restore_AllDeletedEnvItems()
 {
 	m_MapContentDesc.OverrideDesc.DeletedEnvObjectKeys.clear();
 	m_DeletedMapPreviewEnvItems.clear();
 	m_DeletedMapPreviewEnvOrder.clear();
 }
 
-void CMap_PreviewSession::Rebuild_DeletedEnvItems(const vector<ENV_OBJECT_DESC>& DeletedDescs)
+void CMap_EditSession::Rebuild_DeletedEnvItems(const vector<ENV_OBJECT_DESC>& DeletedDescs)
 {
 	m_DeletedMapPreviewEnvItems.clear();
 	m_DeletedMapPreviewEnvOrder.clear();
@@ -213,7 +217,7 @@ void CMap_PreviewSession::Rebuild_DeletedEnvItems(const vector<ENV_OBJECT_DESC>&
 	for (const auto& Desc : DeletedDescs)
 	{
 		MAP_PREVIEW_ENV_ITEM Item{};
-		Item.strStableKey = Client::CMap_Override::Build_EnvObjectStableKey(Desc);
+		Item.strStableKey = CMap_Override::Build_EnvObjectStableKey(Desc);
 		Item.strDisplayName = Build_DisplayName(Desc);
 		Item.strLayerTag = Desc.tRender.strLayerName;
 		Item.strSourceFile = Desc.strSourceFile;
@@ -239,7 +243,7 @@ void CMap_PreviewSession::Rebuild_DeletedEnvItems(const vector<ENV_OBJECT_DESC>&
 	}
 }
 
-void CMap_PreviewSession::Rebuild_DeletedEnvItemsFromWorkingDelta()
+void CMap_EditSession::Rebuild_DeletedEnvItemsFromWorkingDelta()
 {
 	m_DeletedMapPreviewEnvItems.clear();
 	m_DeletedMapPreviewEnvOrder.clear();
@@ -261,37 +265,43 @@ void CMap_PreviewSession::Rebuild_DeletedEnvItemsFromWorkingDelta()
 	}
 }
 
-void CMap_PreviewSession::Clear_RuntimeState()
+void CMap_EditSession::Clear_RuntimeState()
 {
 	m_bStageLoaded = false;
+	m_bEnvLoaded = false;
 	m_strPreviewStatus = L"Map preset not loaded.";
 	m_strLoadedStageName.clear();
 	m_iEnvCreatedCount = 0;
 }
 
-void CMap_PreviewSession::Set_PreviewStatus(const _wstring& strStatus)
+void CMap_EditSession::Set_PreviewStatus(const _wstring& strStatus)
 {
 	m_strPreviewStatus = strStatus;
 }
 
-void CMap_PreviewSession::Set_LoadedStageName(const _wstring& strStageName)
+void CMap_EditSession::Set_LoadedStageName(const _wstring& strStageName)
 {
 	m_bStageLoaded = true;
 	m_strLoadedStageName = strStageName;
 }
 
-void CMap_PreviewSession::Clear_LoadedStage()
+void CMap_EditSession::Clear_LoadedStage()
 {
 	m_bStageLoaded = false;
 	m_strLoadedStageName.clear();
 }
 
-void CMap_PreviewSession::Set_EnvCreatedCount(_uint iCount)
+void CMap_EditSession::Set_EnvLoaded(_bool bLoaded)
+{
+	m_bEnvLoaded = bLoaded;
+}
+
+void CMap_EditSession::Set_EnvCreatedCount(_uint iCount)
 {
 	m_iEnvCreatedCount = iCount;
 }
 
-void CMap_PreviewSession::Set_WorkingDelta(const MAP_OVERRIDE_DESC& Desc)
+void CMap_EditSession::Set_WorkingDelta(const MAP_OVERRIDE_DESC& Desc)
 {
 	m_MapContentDesc.OverrideDesc = Desc;
 	Rebuild_DeletedEnvItemsFromWorkingDelta();
@@ -301,7 +311,7 @@ void CMap_PreviewSession::Set_WorkingDelta(const MAP_OVERRIDE_DESC& Desc)
 	m_AddedMapObjectOrder.clear();
 }
 
-void CMap_PreviewSession::Register_AddedMapObject(
+void CMap_EditSession::Register_AddedMapObject(
 	CGameObject* pObject,
 	const MAP_ADDED_OBJECT_DESC& Desc,
 	const _wstring& strDisplayName)
@@ -326,7 +336,7 @@ void CMap_PreviewSession::Register_AddedMapObject(
 	}
 }
 
-_bool CMap_PreviewSession::Unregister_AddedMapObject(CGameObject* pObject)
+_bool CMap_EditSession::Unregister_AddedMapObject(CGameObject* pObject)
 {
 	if (nullptr == pObject)
 		return false;
@@ -349,7 +359,7 @@ _bool CMap_PreviewSession::Unregister_AddedMapObject(CGameObject* pObject)
 	return bRemoved;
 }
 
-_bool CMap_PreviewSession::Is_AddedMapObject(CGameObject* pObject) const
+_bool CMap_EditSession::Is_AddedMapObject(CGameObject* pObject) const
 {
 	if (nullptr == pObject)
 		return false;
@@ -357,17 +367,19 @@ _bool CMap_PreviewSession::Is_AddedMapObject(CGameObject* pObject) const
 	return m_AddedMapObjectsByRuntime.find(pObject) != m_AddedMapObjectsByRuntime.end();
 }
 
-_uint CMap_PreviewSession::Get_AddedMapObjectCount() const
+_uint CMap_EditSession::Get_AddedMapObjectCount() const
 {
 	return static_cast<_uint>(m_AddedMapObjectOrder.size());
 }
 
-const vector<CGameObject*>& CMap_PreviewSession::Get_AddedMapObjectOrder() const
+const vector<CGameObject*>& CMap_EditSession::Get_AddedMapObjectOrder() const
 {
 	return m_AddedMapObjectOrder;
 }
 
-_bool CMap_PreviewSession::Try_GetAddedMapObjectItem(CGameObject* pObject, MAP_PREVIEW_ADDED_ITEM* pOutItem) const
+_bool CMap_EditSession::Try_GetAddedMapObjectItem(
+	CGameObject* pObject,
+	MAP_PREVIEW_ADDED_ITEM* pOutItem) const
 {
 	if (nullptr == pObject || nullptr == pOutItem)
 		return false;
@@ -380,7 +392,7 @@ _bool CMap_PreviewSession::Try_GetAddedMapObjectItem(CGameObject* pObject, MAP_P
 	return true;
 }
 
-MAP_OVERRIDE_DESC CMap_PreviewSession::Build_WorkingDeltaSnapshot() const
+MAP_OVERRIDE_DESC CMap_EditSession::Build_WorkingDeltaSnapshot() const
 {
 	MAP_OVERRIDE_DESC Snapshot = m_MapContentDesc.OverrideDesc;
 	Snapshot.AddedMapObjects.clear();
@@ -428,20 +440,20 @@ MAP_OVERRIDE_DESC CMap_PreviewSession::Build_WorkingDeltaSnapshot() const
 	return Snapshot;
 }
 
-Client::MAP_LEVEL_CONTENT_DESC CMap_PreviewSession::Build_MapContentSnapshot() const
+MAP_LEVEL_CONTENT_DESC CMap_EditSession::Build_MapContentSnapshot() const
 {
-	Client::MAP_LEVEL_CONTENT_DESC Desc = m_MapContentDesc;
+	MAP_LEVEL_CONTENT_DESC Desc = m_MapContentDesc;
 	Desc.bHasMapContent = (0 <= Desc.iPresetIndex) || !Desc.strManifestPath.empty();
 	Desc.OverrideDesc = Build_WorkingDeltaSnapshot();
 	return Desc;
 }
 
-CMap_PreviewSession* CMap_PreviewSession::Create()
+CMap_EditSession* CMap_EditSession::Create()
 {
-	return new CMap_PreviewSession();
+	return new CMap_EditSession();
 }
 
-void CMap_PreviewSession::Free()
+void CMap_EditSession::Free()
 {
 	__super::Free();
 }
