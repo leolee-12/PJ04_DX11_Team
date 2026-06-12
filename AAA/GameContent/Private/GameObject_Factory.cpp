@@ -52,15 +52,19 @@
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
 #define CREATOR(CLASS) \
-        [](ID3D11Device* pDevice, ID3D11DeviceContext* pContext)  \
-{ return dynamic_cast<CBase*>(CLASS::Create(pDevice, pContext)); }
+        [](ID3D11Device* pDevice, ID3D11DeviceContext* pContext) {\
+            CEffect_Allocator::PrototypeScope _ps; \
+            return dynamic_cast<CBase*>(CLASS::Create(pDevice, pContext)); \
+        }
 
 #define LOADER(...) \
         [](CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext) { __VA_ARGS__; }
 
 #define TRY_ADD_PROTO(proxy, level, tag, createExpr) \
-      if (!proxy->Has_Prototype(level, tag)) \
-          proxy->Add_Prototype(level, tag, createExpr)
+      if (!proxy->Has_Prototype(level, tag)) { \
+          CEffect_Allocator::PrototypeScope _ps; \
+          proxy->Add_Prototype(level, tag, createExpr); \
+      }
 
 void CGameObject_Factory::Copy_RegisteredTags(vector<wstring>* pOutTags)
 {

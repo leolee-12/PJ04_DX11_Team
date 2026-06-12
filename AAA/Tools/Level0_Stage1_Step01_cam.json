@@ -1,0 +1,1278 @@
+{
+ "rails": [
+  {
+   "uid": 126125678,
+   "close": false,
+   "nodes": [
+    [
+     -19.459999,
+     25.0,
+     257.0
+    ],
+    [
+     -10.989999,
+     25.0,
+     257.0
+    ]
+   ]
+  },
+  {
+   "uid": 1141258341,
+   "close": false,
+   "nodes": [
+    [
+     -45.0,
+     12.5,
+     130.214294
+    ],
+    [
+     -45.0,
+     12.5,
+     171.000015
+    ]
+   ]
+  },
+  {
+   "uid": 1463548197,
+   "close": false,
+   "nodes": [
+    [
+     -143.0,
+     7.5,
+     -107.0
+    ],
+    [
+     -117.799942,
+     7.5,
+     -107.0
+    ]
+   ]
+  },
+  {
+   "uid": 1750696281,
+   "close": false,
+   "nodes": [
+    [
+     -16.5,
+     21.0,
+     227.400009
+    ],
+    [
+     -16.5,
+     21.0,
+     240.0
+    ]
+   ]
+  },
+  {
+   "uid": 1934218964,
+   "close": false,
+   "nodes": [
+    [
+     -48.0,
+     12.5,
+     76.925926
+    ],
+    [
+     -48.0,
+     12.5,
+     97.5
+    ]
+   ]
+  },
+  {
+   "uid": 271042397,
+   "close": false,
+   "nodes": [
+    [
+     -131.0,
+     13.5,
+     -44.5
+    ],
+    [
+     -131.0,
+     13.5,
+     -18.5
+    ]
+   ]
+  },
+  {
+   "uid": 310615592,
+   "close": false,
+   "nodes": [
+    [
+     -52.5,
+     5.5,
+     -10.5
+    ],
+    [
+     -44.5,
+     5.5,
+     0.500001
+    ]
+   ]
+  },
+  {
+   "uid": 494676127,
+   "close": false,
+   "nodes": [
+    [
+     -44.47826,
+     5.0,
+     2.999994
+    ],
+    [
+     -44.47826,
+     5.0,
+     25.999998
+    ]
+   ]
+  },
+  {
+   "uid": 607275986,
+   "close": false,
+   "nodes": [
+    [
+     -19.98,
+     10.0,
+     245.0
+    ],
+    [
+     -10.82,
+     10.0,
+     245.0
+    ]
+   ]
+  },
+  {
+   "uid": 698449375,
+   "close": false,
+   "nodes": [
+    [
+     56.0,
+     29.5,
+     333.0
+    ],
+    [
+     55.950001,
+     29.5,
+     321.0
+    ]
+   ]
+  },
+  {
+   "uid": 739942166,
+   "close": false,
+   "nodes": [
+    [
+     -45.0,
+     12.5,
+     98.714294
+    ],
+    [
+     -45.0,
+     12.5,
+     123.500015
+    ]
+   ]
+  },
+  {
+   "uid": 845226741,
+   "close": false,
+   "nodes": [
+    [
+     -19.5,
+     37.0,
+     268.799988
+    ],
+    [
+     -11.0,
+     37.0,
+     268.799988
+    ]
+   ]
+  },
+  {
+   "uid": 874967495,
+   "close": false,
+   "nodes": [
+    [
+     -44.47826,
+     5.0,
+     49.870003
+    ],
+    [
+     -44.47826,
+     5.0,
+     71.5
+    ]
+   ]
+  }
+ ],
+ "areas": [
+  {
+   "center": [
+    -11.5,
+    21.0,
+    219.0
+   ],
+   "size": [
+    33.0,
+    56.0,
+    42.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "useRail": true,
+   "railUid": 1750696281,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  },
+  {
+   "center": [
+    32.5,
+    21.0,
+    292.0
+   ],
+   "size": [
+    29.0,
+    56.0,
+    32.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 1,
+   "useRail": false,
+   "railUid": 0,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 16.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 16.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  },
+  {
+   "center": [
+    -47.0,
+    12.5,
+    113.5
+   ],
+   "size": [
+    56.0,
+    17.0,
+    31.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "useRail": true,
+   "railUid": 739942166,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  },
+  {
+   "center": [
+    3.0,
+    21.0,
+    292.0
+   ],
+   "size": [
+    30.0,
+    56.0,
+    32.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 1,
+   "useRail": false,
+   "railUid": 0,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 16.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 16.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  },
+  {
+   "center": [
+    58.5,
+    29.0,
+    336.0
+   ],
+   "size": [
+    35.0,
+    26.0,
+    32.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "useRail": true,
+   "railUid": 698449375,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  },
+  {
+   "center": [
+    -87.5,
+    12.5,
+    -8.0
+   ],
+   "size": [
+    19.0,
+    23.0,
+    18.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 2,
+   "useRail": false,
+   "railUid": 0,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 16.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 16.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  },
+  {
+   "center": [
+    -47.0,
+    12.5,
+    150.5
+   ],
+   "size": [
+    56.0,
+    17.0,
+    43.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "useRail": true,
+   "railUid": 1141258341,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  },
+  {
+   "center": [
+    -129.0,
+    9.500022,
+    -8.499978
+   ],
+   "size": [
+    14.0,
+    23.0,
+    17.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "useRail": false,
+   "railUid": 0,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 16.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 16.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  },
+  {
+   "center": [
+    -128.5,
+    8.0,
+    -105.0
+   ],
+   "size": [
+    69.0,
+    10.0,
+    44.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "useRail": true,
+   "railUid": 1463548197,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  },
+  {
+   "center": [
+    -1.5,
+    21.0,
+    250.0
+   ],
+   "size": [
+    67.0,
+    56.0,
+    20.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "useRail": true,
+   "railUid": 607275986,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  },
+  {
+   "center": [
+    -8.5,
+    21.0,
+    284.0
+   ],
+   "size": [
+    53.0,
+    56.0,
+    48.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "useRail": true,
+   "railUid": 845226741,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  },
+  {
+   "center": [
+    -0.5,
+    35.5,
+    256.0
+   ],
+   "size": [
+    69.0,
+    27.0,
+    8.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 1,
+   "useRail": true,
+   "railUid": 126125678,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  },
+  {
+   "center": [
+    57.0,
+    21.0,
+    298.0
+   ],
+   "size": [
+    58.0,
+    56.0,
+    44.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "useRail": false,
+   "railUid": 0,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 16.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 16.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  },
+  {
+   "center": [
+    -109.5,
+    12.5,
+    -8.0
+   ],
+   "size": [
+    25.0,
+    23.0,
+    18.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "useRail": false,
+   "railUid": 0,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 16.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 16.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  },
+  {
+   "center": [
+    -40.5,
+    10.5,
+    62.5
+   ],
+   "size": [
+    45.0,
+    19.0,
+    27.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "useRail": true,
+   "railUid": 874967495,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  },
+  {
+   "center": [
+    -44.0,
+    10.5,
+    25.0
+   ],
+   "size": [
+    22.0,
+    19.0,
+    48.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "useRail": true,
+   "railUid": 494676127,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  },
+  {
+   "center": [
+    -131.0,
+    13.5,
+    -50.0
+   ],
+   "size": [
+    26.0,
+    23.0,
+    66.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "useRail": true,
+   "railUid": 271042397,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  },
+  {
+   "center": [
+    -52.5,
+    12.5,
+    -8.0
+   ],
+   "size": [
+    51.0,
+    23.0,
+    18.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 1,
+   "useRail": true,
+   "railUid": 310615592,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  },
+  {
+   "center": [
+    -45.0,
+    12.5,
+    87.0
+   ],
+   "size": [
+    60.0,
+    17.0,
+    22.0
+   ],
+   "rot": [
+    0.0,
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "priority": 0,
+   "useRail": true,
+   "railUid": 1934218964,
+   "scrollDead": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gazeMode": 0,
+   "gazeTag": "",
+   "frame": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   },
+   "frameEnd": {
+    "yaw": 0.0,
+    "pitch": 20.0,
+    "distance": 0.0,
+    "height": 3.0,
+    "fov": 50.0,
+    "aimHeight": 4.0,
+    "gazePoint": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "gazeBlend": 1.0
+   }
+  }
+ ]
+}

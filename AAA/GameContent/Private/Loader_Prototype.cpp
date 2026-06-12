@@ -13,11 +13,22 @@
 #include "Movement.h"
 #include "UI_Effect.h"
 #include "UI_GaugeFill.h"
+#include "Effect_Loader.h"
 
 NS_BEGIN(Client)
 
 HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
+    // 나중에 이펙트 전체 STATIC으로 로드하면 STATIC으로 바꿀것
+    pProxy->Set_EffectPrototypeLevel(ETOUI(LEVEL::GAMEPLAY));
+
+    // 셰어드 리소스 준비 직후 1회
+    //CEffect_Loader::GetInstance()->Ready(
+    //    TEXT("../../Resources/Effects/effect_manifest.json"),
+    //    pProxy, pDevice, pContext);
+    // 게임플레이에서 호출 커비 등이 자기 레벨로 스폰
+    //CEffect_Loader::GetInstance()->Spawn(L"VacuumContainer", Get_LevelIndex(), vMouthPos, vLook, pParent);
+
     if (FAILED(pProxy->Add_Prototype(VI_Rect.iLevelID, VI_Rect.szProtoTag,
         CVIBuffer_Rect::Create(pDevice, pContext))))
         return E_FAIL;

@@ -5,6 +5,9 @@
 #include "Kirby_Wait.h"
 #include "Kirby_Run.h"
 #include "Kirby_Jump.h"
+#include "Kirby_Fall.h"
+#include "Kirby_Attack.h"
+//#include "Kirby_Hovering.h"
 
 CKirby_StateMachine::CKirby_StateMachine()
 {
@@ -44,7 +47,6 @@ void CKirby_StateMachine::Change_State(KIRBY_STATE_TYPE eNewstate)
         return;
 
     m_pCurState->Enter(m_pKirby);
-
 }
 
 void CKirby_StateMachine::Update_StateMachine(const _float fTimeDelta)
@@ -66,13 +68,12 @@ CKirby_State* CKirby_StateMachine::State_Creator(KIRBY_STATE_TYPE eNewstate)
 
     switch (eNewstate)
     {
-        case KIRBY_STATE_TYPE::WAIT:        pState = CKirby_Wait::Create();     break;
-        case KIRBY_STATE_TYPE::RUN:         pState = CKirby_Run::Create();      break;
-        case KIRBY_STATE_TYPE::JUMP:        pState = CKirby_Jump::Create();     break;
-
-        //case KIRBY_STATE_TYPE::ATTACK:
-        //     
-        //    break;   
+        case KIRBY_STATE_TYPE::WAIT:        pState = CKirby_Wait::Create();         break;
+        case KIRBY_STATE_TYPE::RUN:         pState = CKirby_Run::Create();          break;
+        case KIRBY_STATE_TYPE::JUMP:        pState = CKirby_Jump::Create();         break;
+        case KIRBY_STATE_TYPE::FALL:        pState = CKirby_Fall::Create();         break;
+        case KIRBY_STATE_TYPE::ATTACK:      pState = CKirby_Attack::Create();       break;
+        //case KIRBY_STATE_TYPE::HOVERING:    pState = CKirby_Hovering::Create();     break;
     }
 
     return pState;

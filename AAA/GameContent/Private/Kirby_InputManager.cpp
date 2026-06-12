@@ -1,6 +1,7 @@
 #include "Kirby_InputManager.h"
 
 #include "GameInstance.h"
+#include "Movement_Child.h"
 
 #include "Kirby.h"
 #include "Kirby_Controller.h"
@@ -31,62 +32,79 @@ void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
 {
     CKirby_Command* pCommand{};
 
+    // Top
     if (m_pGameInstance_Proxy->Key_Pressing(DIK_W))
     {
         _float3 vDir{};
         if (Cal_MoveDir(MOVE_DIR::TOP, vDir) == true)
         {
-            pCommand = new MoveTop_Command(vDir);
+            pCommand = new MoveTop_Command(KEY_STATE_TYPE::PRESS, vDir);
             ProcessCommand(pCommand);
         }
     }
 
+    // DOWN
     if (m_pGameInstance_Proxy->Key_Pressing(DIK_S))
     {
         _float3 vDir{};
         if (Cal_MoveDir(MOVE_DIR::DOWN, vDir))
         {
-            pCommand = new MoveLeft_Command(vDir);
+            pCommand = new MoveLeft_Command(KEY_STATE_TYPE::PRESS, vDir);
             ProcessCommand(pCommand);
         }
     }
 
+    // LEFT
     if (m_pGameInstance_Proxy->Key_Pressing(DIK_A))
     {
         _float3 vDir{};
         if (Cal_MoveDir(MOVE_DIR::LEFT, vDir))
         {
-            pCommand = new MoveBottom_Command(vDir);
+            pCommand = new MoveBottom_Command(KEY_STATE_TYPE::PRESS, vDir);
             ProcessCommand(pCommand);
         }
     }
 
+    // RIGHT
     if (m_pGameInstance_Proxy->Key_Pressing(DIK_D))
     {
         _float3 vDir{};
         if (Cal_MoveDir(MOVE_DIR::RIGHT, vDir))
         {
-            pCommand = new MoveRight_Command(vDir);
+            pCommand = new MoveRight_Command(KEY_STATE_TYPE::PRESS, vDir);
             ProcessCommand(pCommand);
         }
     }
 
+    // Jump
+    // A
     if (m_pGameInstance_Proxy->Key_Down(DIK_SPACE))
     {
-        pCommand = new Jump_Command;
+        pCommand = new Jump_Command(KEY_STATE_TYPE::DOWN);
+        ProcessCommand(pCommand);
+    }
+    if (m_pGameInstance_Proxy->Key_Pressing(DIK_SPACE))
+    {
+        pCommand = new Jump_Command(KEY_STATE_TYPE::PRESS);
         ProcessCommand(pCommand);
     }
 
+    // B
     if (m_pGameInstance_Proxy->Mouse_Down(DIMB::LBUTTON))
     {
-        pCommand = new ATTACK_Command;
+        pCommand = new ATTACK_Command(KEY_STATE_TYPE::DOWN);
+        ProcessCommand(pCommand);
+    }
+    if (m_pGameInstance_Proxy->Mouse_Up(DIMB::LBUTTON))
+    {
+        pCommand = new ATTACK_Command(KEY_STATE_TYPE::UP);
         ProcessCommand(pCommand);
     }
 }
 
 _bool CKirby_InputManager::Cal_MoveDir(MOVE_DIR eMoveDir, _float3& vOutDir)
 {
-    CMovement* pMovement = m_pKiryby->Get_Component<CMovement>(TEXT("Com_Movement"));
+    CMovement_Child* pMovement = m_pKiryby->Get_Component<CMovement_Child>(TEXT("Com_Movement"));
     if (pMovement == nullptr)
         return false;
 

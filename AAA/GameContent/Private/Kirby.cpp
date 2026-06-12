@@ -5,6 +5,8 @@
 #include "PartObject.h"
 
 #include "GameContent_const.h"
+#include "Movement_Child.h"
+
 #include "Kirby_Body.h"
 
 #include "Kirby_InputManager.h"
@@ -41,10 +43,10 @@ HRESULT CKirby::Initialize(void* pArg)
     if (FAILED(Ready_PartObjects()))
         return E_FAIL;
 
-    if (FAILED(Ready_System()))
+    if (FAILED(Ready_Ability()))
         return E_FAIL;
 
-    if (FAILED(Ready_Ability()))
+    if (FAILED(Ready_System()))
         return E_FAIL;
   
     return S_OK;
@@ -72,10 +74,14 @@ void CKirby::Update(_float fTimeDelta)
         return;
     }
 
-    //if (m_pGameInstance_Proxy->Key_Down(DIK_SPACE))
-    //    m_pMovement->Jump();
+    if(Has_MoveDir())
+    {
+        _vector vDir = XMLoadFloat3(&m_vWishDir);
+        m_pMovement->Add_Acceleration(vDir * 120.f);
+        m_pMovement->Rotate_To_Direction(vDir, fTimeDelta);
+    }
 
-    m_pMovement->Move(XMVectorSetW(XMLoadFloat3(&m_vWishDir), 0), fTimeDelta);
+    m_pMovement->Update_RigidBody(fTimeDelta);
 }
 
 void CKirby::Late_Update(_float fTimeDelta)
@@ -133,13 +139,11 @@ HRESULT CKirby::Ready_Components()
     XMStoreFloat3(&vFootPos, m_pTransformCom->Get_State(STATE::POSITION));
     m_pController = m_pGameInstance_Proxy->Create_CapsuleController(vFootPos, CCT_RADIUS, CCT_HEIGHT);
 
-    m_pMovement = Add_Component<CMovement>(TEXT("Com_Movement"), CMovement::Create(m_pDevice, m_pContext));
+    m_pMovement = Add_Component<CMovement_Child>(TEXT("Com_Movement"), CMovement_Child::Create(m_pDevice, m_pContext));
     if (m_pMovement == nullptr)
         return E_FAIL;
 
     m_pMovement->Set_Refs(m_pTransformCom, m_pController);
-    m_pMovement->Set_Stats(MOVE_SPEED, ROT_SPEED, GRAVITY, JUMP_SPEED);
-    m_pMovement->Set_Acceleration(MOVE_ACCEL, MOVE_DECEL);
 
     return S_OK;
 }

@@ -15,8 +15,9 @@ class CKirby;
 
 enum class KIRBY_STATE_TYPE
 {
-	WAIT, RUN, JUMP, 
+	WAIT, RUN, JUMP, FALL,
 	ATTACK,
+	HOVERING
 };
 
 class CLIENT_DLL CKirby_State abstract : public CBase
@@ -39,8 +40,14 @@ public:
 protected:
 	_bool Handle_MoveCommand(CKirby* pKirby, CKirby_Command* pCommand);
 
+protected:
+	_bool Try_FallState(CKirby* pKirby);
+	_bool Transition_Wait_OR_Run(CKirby* pKirby);
+
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand);
+
+
 
 protected:
 	virtual void Free() override;
