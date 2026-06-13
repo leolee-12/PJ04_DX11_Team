@@ -27,10 +27,7 @@ struct VS_IN
 	float4 vTangent : TANGENT;
 	float4 vBinormal : BINORMAL;
 
-	float4 iRight : WORLD0;
-	float4 iUp : WORLD1;
-	float4 iLook : WORLD2;
-	float4 iPosition : WORLD3;
+	row_major float4x4 WorldMatrix : WORLD;
 };
 
 struct VS_OUT
@@ -52,39 +49,28 @@ VS_OUT VS_MAIN(VS_IN In)
 {
 	VS_OUT Out;
 
-	float4x4 WorldMatrix = float4x4(
-		In.iRight,
-		In.iUp,
-		In.iLook,
-		In.iPosition
-	);
-
-	float4      vPosition = mul(float4(In.vPosition, 1.f), WorldMatrix);
+	float4 vPosition = mul(float4(In.vPosition, 1.f), In.WorldMatrix);
 	vPosition = mul(vPosition, g_ViewMatrix);
 	vPosition = mul(vPosition, g_ProjMatrix);
 
 	Out.vPosition = vPosition;
-	Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), WorldMatrix));
+	Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), In.WorldMatrix));
 	Out.vTexcoord = In.vTexcoord;
 	Out.vTexcoord1 = In.vTexcoord1;
 	Out.vTexcoord2 = In.vTexcoord2;
 	Out.vTexcoord3 = In.vTexcoord3;
-	Out.vWorldPos = mul(float4(In.vPosition, 1.f), WorldMatrix);
+	Out.vWorldPos = mul(float4(In.vPosition, 1.f), In.WorldMatrix);
 	Out.vProjPos = Out.vPosition;
 
 	float3 T = normalize(In.vTangent.xyz);
 	float3 B = normalize(In.vBinormal.xyz);
-	Out.vTangent = normalize(mul(float4(T, 0.f), WorldMatrix));
+	Out.vTangent = normalize(mul(float4(T, 0.f), In.WorldMatrix));
 	Out.vTangent.w = In.vTangent.w;
-	Out.vBinormal = normalize(mul(float4(B, 0.f), WorldMatrix));
+	Out.vBinormal = normalize(mul(float4(B, 0.f), In.WorldMatrix));
 	Out.vBinormal.w = In.vBinormal.w;
 
 	return Out;
 }
-
-/* w 나누기 연산 : 2차원 투영스페이스로의 변환. */
-/* 뷰포트로의 변환 (윈도우좌표로의 변환) */
-/* 래스터라이즈 (정점정보를 기반으로 해서 픽셀의 정보를 생성한다. ) */
 
 struct PS_IN
 {
@@ -193,14 +179,7 @@ VS_SHADOW_OUT VS_SHADOW(VS_IN In)
 {
 	VS_SHADOW_OUT Out;
 
-	float4x4 WorldMatrix = float4x4(
-		In.iRight,
-		In.iUp,
-		In.iLook,
-		In.iPosition
-	);
-
-	float4 vWorld = mul(float4(In.vPosition, 1.f), WorldMatrix);
+	float4 vWorld = mul(float4(In.vPosition, 1.f), In.WorldMatrix);
 	Out.vPosition = mul(mul(vWorld, g_ViewMatrix), g_ProjMatrix);
 	Out.vProjPos = Out.vPosition;
 	return Out;

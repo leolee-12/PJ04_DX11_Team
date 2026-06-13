@@ -34,7 +34,7 @@ private:
 
 public:
 	void	Submit(CEnvObject_Static* pObj, _uint64 iCurrentFrame);
-	HRESULT	Ensure_InstanceBuffer(_uint iRequiredCount);
+	HRESULT	Reserve_InstanceBuffer(_uint iRequiredCount);
 	HRESULT	Update_InstanceBuffer();
 	virtual	HRESULT Render() override;
 	virtual	HRESULT Render_Shadow() override;
@@ -64,6 +64,7 @@ private:
 	void BeginFrame_IfNeeded(_uint64 iCurrentFrame);
 	_bool Should_Instance() const;
 	HRESULT Bind_ShaderResources();
+	HRESULT Bind_ShadowShaderResources();
 	void Clear_Submissions();
 
 	HRESULT Render_Instanced();

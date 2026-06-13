@@ -6,8 +6,8 @@
 
 namespace
 {
-	static constexpr _uint INSTANCE_MIN_COUNT = 2;
-	static constexpr _uint INSTANCE_MIN_SAVED_DRAWS = 2;
+	static constexpr _uint INSTANCE_MIN_COUNT = 8;
+	static constexpr _uint INSTANCE_MIN_SAVED_DRAWS = 16;
 }
 
 CEnv_InstanceBatch::CEnv_InstanceBatch(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -31,16 +31,11 @@ void CEnv_InstanceBatch::Submit(CEnvObject_Static* pObj, _uint64 iCurrentFrame)
 	tData.pObj = pObj;
 	Safe_AddRef(pObj);
 
-	const _float4x4* pWorld = pObj->Get_Transform()->Get_WorldMatrixPtr();
-	tData.InstanceData.vRight		= _float4(pWorld->_11, pWorld->_12, pWorld->_13, pWorld->_14);
-	tData.InstanceData.vUp			= _float4(pWorld->_21, pWorld->_22, pWorld->_23, pWorld->_24);
-	tData.InstanceData.vLook		= _float4(pWorld->_31, pWorld->_32, pWorld->_33, pWorld->_34);
-	tData.InstanceData.vPosition	= _float4(pWorld->_41, pWorld->_42, pWorld->_43, pWorld->_44);
-
+	tData.InstanceData.matWorld = *pObj->Get_Transform()->Get_WorldMatrixPtr();
 	m_Submitted.push_back(tData);
 }
 
-HRESULT CEnv_InstanceBatch::Ensure_InstanceBuffer(_uint iRequiredCount)
+HRESULT CEnv_InstanceBatch::Reserve_InstanceBuffer(_uint iRequiredCount)
 {
 	if (iRequiredCount <= m_iInstanceCapacity && nullptr != m_pInstanceBuffer)
 		return S_OK;
@@ -70,20 +65,19 @@ HRESULT CEnv_InstanceBatch::Update_InstanceBuffer()
 	if (0 == iCount)
 		return S_OK;
 
-	if (FAILED(Ensure_InstanceBuffer(iCount)))
+	if (FAILED(Reserve_InstanceBuffer(iCount)))
 		return E_FAIL;
 
 	D3D11_MAPPED_SUBRESOURCE tMapped{};
 	if(FAILED(m_pContext->Map(m_pInstanceBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &tMapped)))
 		return E_FAIL;
 
-	vector<ENV_INSTANCE_DATA> InstanceTable;
-	InstanceTable.reserve(iCount);
+	ENV_INSTANCE_DATA* pDst = static_cast<ENV_INSTANCE_DATA*>(tMapped.pData);
 
-	for (const auto& item : m_Submitted)
-		InstanceTable.push_back(item.InstanceData);
-
-	memcpy(tMapped.pData, InstanceTable.data(), sizeof(ENV_INSTANCE_DATA) * iCount);
+	for (_uint i = 0; i < iCount; ++i)
+	{
+		pDst[i] = m_Submitted[i].InstanceData;
+	}
 
 	m_pContext->Unmap(m_pInstanceBuffer, 0);
 
@@ -189,6 +183,20 @@ HRESULT CEnv_InstanceBatch::Bind_ShaderResources()
 	return S_OK;
 }
 
+HRESULT CEnv_InstanceBatch::Bind_ShadowShaderResources()
+{
+	if (nullptr == m_pShaderCom)
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 void CEnv_InstanceBatch::Clear_Submissions()
 {
 	for (auto& item : m_Submitted)
@@ -249,11 +257,41 @@ HRESULT CEnv_InstanceBatch::Render_NotInstanced()
 
 HRESULT CEnv_InstanceBatch::Render_Shadow_Instanced()
 {
-	return Render_Shadow_NotInstanced();
+	const _uint iInstanceCount = static_cast<_uint>(m_Submitted.size());
+	if (0 == iInstanceCount)
+		return S_OK;
+
+	if (FAILED(Update_InstanceBuffer()))
+		return E_FAIL;
+
+	if (FAILED(Bind_ShadowShaderResources()))
+		return E_FAIL;
+
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::Shadow)))
+			return E_FAIL;
+
+		if(FAILED(m_pModelCom->Render_Instanced(i, m_pInstanceBuffer, sizeof(ENV_INSTANCE_DATA), iInstanceCount)))
+			return E_FAIL;
+	}
+
+	return S_OK;
 }
 
 HRESULT CEnv_InstanceBatch::Render_Shadow_NotInstanced()
 {
+	for (auto& item : m_Submitted)
+	{
+		if (nullptr != item.pObj)
+		{
+			if (FAILED(item.pObj->Render_Shadow()))
+				return E_FAIL;
+		}
+	}
+
 	return S_OK;
 }
 

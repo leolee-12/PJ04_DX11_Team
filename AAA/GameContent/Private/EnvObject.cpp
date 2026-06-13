@@ -456,10 +456,11 @@ void CEnvObject::Update_LocalBounds()
 
 void CEnvObject::Refresh_WorldBounds()
 {
-	if (nullptr == m_pTransformCom)
+	if (nullptr == m_pTransformCom || !m_bTransformDirty)
 		return;
 
 	m_LocalBounds.Transform(m_WorldBounds, XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+	m_bTransformDirty = false;
 }
 
 void CEnvObject::Check_Visible()
@@ -510,6 +511,8 @@ void CEnvObject::Apply_TransformFromDesc()
 	{
 		m_pTransformCom->Set_WorldMatrix(Build_WorldMatrix_FromTRS(m_tDesc));
 	}
+
+	m_bTransformDirty = true;
 
 	Refresh_WorldBounds();
 }

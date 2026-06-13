@@ -186,10 +186,7 @@ struct ENV_OBJECT_DESC : public CGameObject::GAMEOBJECT_DESC
 
 struct ENV_INSTANCE_DATA
 {
-	_float4 vRight = {};
-	_float4 vUp = {};
-	_float4 vLook = {};
-	_float4 vPosition = {};
+	_float4x4 matWorld = {};
 };
 
 struct ENV_INSTANCE_KEY

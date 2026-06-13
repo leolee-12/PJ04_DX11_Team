@@ -27,7 +27,7 @@ private:
 	unordered_map<ENV_INSTANCE_KEY, CEnv_InstanceBatch*, ENV_INSTANCE_KEY_HASH> m_Batches;
 
 private:
-	CEnv_InstanceBatch* FindOrCreate_Batch(ENV_INSTANCE_KEY tKey, CEnvObject_Static* pObj);
+	CEnv_InstanceBatch* FindOrCreate_Batch(const ENV_INSTANCE_KEY& tKey);
 
 public:
 	static CEnv_InstanceController* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

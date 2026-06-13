@@ -28,7 +28,7 @@ _bool CEnv_InstanceController::Submit_Main(CEnvObject_Static* pObj)
 	tKey.wstrModelProtoTag = tDesc.strModelProtoTag;
 	tKey.eRenderID = RENDERID::NONBLEND;
 
-	CEnv_InstanceBatch* pBatch = FindOrCreate_Batch(tKey, pObj);
+	CEnv_InstanceBatch* pBatch = FindOrCreate_Batch(tKey);
 	if (nullptr == pBatch)
 	{
 		return false;
@@ -48,11 +48,35 @@ _bool CEnv_InstanceController::Submit_Main(CEnvObject_Static* pObj)
 
 _bool CEnv_InstanceController::Submit_Shadow(CEnvObject_Static* pObj)
 {
-	UNREFERENCED_PARAMETER(pObj);
-	return false;
+	if (nullptr == pObj)
+		return false;
+
+	const ENV_OBJECT_DESC& tDesc = pObj->Get_Desc();
+	if (tDesc.strModelProtoTag.empty())
+		return false;
+
+	ENV_INSTANCE_KEY tKey{};
+	tKey.iModelProtoLevel = tDesc.iModelProtoLevel;
+	tKey.wstrModelProtoTag = tDesc.strModelProtoTag;
+	tKey.eRenderID = RENDERID::SHADOW;
+
+	CEnv_InstanceBatch* pBatch = FindOrCreate_Batch(tKey);
+	if (nullptr == pBatch)
+		return false;
+
+	const _uint64 iCurrentFrame = m_pGameInstance_Proxy->Get_FrameIndex();
+	pBatch->Submit(pObj, iCurrentFrame);
+
+	if (!pBatch->Is_RegisteredThisFrame())
+	{
+		pBatch->Set_RegisteredThisFrame(true);
+		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pBatch);
+	}
+	
+	return true;
 }
 
-CEnv_InstanceBatch* CEnv_InstanceController::FindOrCreate_Batch(ENV_INSTANCE_KEY tKey, CEnvObject_Static* pObj)
+CEnv_InstanceBatch* CEnv_InstanceController::FindOrCreate_Batch(const ENV_INSTANCE_KEY& tKey)
 {
 	auto iter = m_Batches.find(tKey);
 	if (iter != m_Batches.end())
