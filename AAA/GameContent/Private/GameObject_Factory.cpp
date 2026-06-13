@@ -38,6 +38,8 @@
 // Kirby
 #include "Kirby.h"
 #include "Kirby_Body.h"
+#include "Kirby_Sword.h"
+#include "Kirby_SwordHat.h"
 
 // Effect_Container
 #include "WalkSmoke.h"
@@ -172,11 +174,10 @@ void CGameObject_Factory::Register_Test()
 
     Register(TEXT("Proto_TestNonAnim"), TEXT("TEST_OBJECT"),
         CREATOR(CTestNonAnim),
-        LOADER(
+        LOADER
+        (
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_NonAnim"),
-                CModel::Create(pDevice, pContext, MODEL::MAP, "../../Resources/Models/Test/Marb1e/Land_GsAllBuilding_0.ysh"
-                    //,XMMatrixRotationY(XMConvertToRadians(180.f))
-                ))
+                CModel::Create(pDevice, pContext, MODEL::MAP, "../../Resources/Models/Test/Marb1e/Land_GsAllBuilding_0.ysh"))
         )
     );
 
@@ -330,6 +331,18 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Kirby_Body"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Kirby/Kirby.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            // Sword
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CKirby_Sword::PROTOTYPE_TAG,
+                CKirby_Sword::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Sword"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Sword/Sword.ysh"));
+
+            // Sword Hat
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CKirby_SwordHat::PROTOTYPE_TAG,
+                CKirby_SwordHat::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_SwordHat"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Hat/SwordHat.ysh"));
         )
     ); 
 }

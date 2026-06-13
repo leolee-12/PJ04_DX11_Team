@@ -100,6 +100,13 @@ void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
         pCommand = new ATTACK_Command(KEY_STATE_TYPE::UP);
         ProcessCommand(pCommand);
     }
+
+    // Y
+    if (m_pGameInstance_Proxy->Key_Pressing(DIK_X))
+    {
+        pCommand = new Dump_Command(KEY_STATE_TYPE::PRESS);
+        ProcessCommand(pCommand);
+    }
 }
 
 _bool CKirby_InputManager::Cal_MoveDir(MOVE_DIR eMoveDir, _float3& vOutDir)

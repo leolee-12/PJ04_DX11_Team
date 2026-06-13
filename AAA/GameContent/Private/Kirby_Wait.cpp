@@ -12,6 +12,9 @@ CKirby_Wait::CKirby_Wait()
 
 HRESULT CKirby_Wait::Initialize()
 {
+    if (FAILED(__super::Initialize()))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -22,6 +25,8 @@ KIRBY_STATE_TYPE CKirby_Wait::Get_StateType()
 
 void CKirby_Wait::Enter(CKirby* pKirby)
 {
+    __super::Enter(pKirby);
+
     // Ani
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();    
     pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::WAIT));
@@ -29,6 +34,8 @@ void CKirby_Wait::Enter(CKirby* pKirby)
 
 void CKirby_Wait::Update(CKirby* pKirby, const _float fTimeDelta)
 {
+    __super::Update(pKirby, fTimeDelta);
+
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
 
     // Fall
@@ -40,11 +47,13 @@ void CKirby_Wait::Update(CKirby* pKirby, const _float fTimeDelta)
 
 void CKirby_Wait::Exit(CKirby* pKirby)
 {
+    __super::Exit(pKirby);
 }
 
 _bool CKirby_Wait::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
-    __super::Handle_Command(pKirby, pCommand);
+    if (__super::Handle_Command(pKirby, pCommand))
+        return true;
 
     KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
 
