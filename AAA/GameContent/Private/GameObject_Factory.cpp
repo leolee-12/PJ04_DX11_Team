@@ -11,15 +11,22 @@
 #include "TestMap.h"
 #include "TestMarb1e.h"
 #include "TestMarb1eMap.h"
+#include "TestTriggerBox.h"
 #include "Material_Object.h"
 
-//UI
-#include "UI_Image.h"
+//UI Container
 #include "UI_TestImageContainer.h"
 #include "UI_Title.h"
 #include "UI_GenericContainer.h"
+#include "UI_PointStar.h"
+#include "UI_KirbyStatus.h"
+
+// UI Parts
+#include "UI_Image.h"
 #include "UI_SpriteAnim.h"
 #include "UI_Text.h"
+#include "UI_Effect.h"
+#include "UI_GaugeFill.h"
 
 // Kirby
 #include "Kirby.h"
@@ -105,8 +112,16 @@ void CGameObject_Factory::Register_UI()
         LOADER());
 
     Register(CUI_Text::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
-            CREATOR(CUI_Text),
-            LOADER());
+        CREATOR(CUI_Text),
+        LOADER());
+
+    Register(CUI_Effect::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
+        CREATOR(CUI_Effect),
+        LOADER());
+
+    Register(CUI_GaugeFill::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
+        CREATOR(CUI_GaugeFill),
+        LOADER());
 }
 
 void CGameObject_Factory::Register_Camera()
@@ -268,6 +283,11 @@ void CGameObject_Factory::Register_Test()
                 ));
         )
     );
+
+    Register(CTestTriggerBox::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
+        CREATOR(CTestTriggerBox),
+        LOADER()
+    );
 }
 
 void CGameObject_Factory::Register_Container()
@@ -319,6 +339,18 @@ void CGameObject_Factory::Register_UIContainer()
     Register(CUI_GenericContainer::PROTOTYPE_TAG,
         TEXT("UI_CONTAINER"),
         CREATOR(CUI_GenericContainer),
+        LOADER()
+    );
+    
+    Register(CUI_PointStar::PROTOTYPE_TAG,
+        TEXT("UI_CONTAINER"),
+        CREATOR(CUI_PointStar),
+        LOADER()
+    );
+
+    Register(CUI_KirbyStatus::PROTOTYPE_TAG,
+        TEXT("UI_CONTAINER"),
+        CREATOR(CUI_KirbyStatus),
         LOADER()
     );
     

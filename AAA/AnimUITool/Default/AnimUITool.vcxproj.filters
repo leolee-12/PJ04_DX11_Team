@@ -70,6 +70,9 @@
     <Filter Include="02. Objects\Preview_Kirby">
       <UniqueIdentifier>{e1d3aae1-6727-4935-acac-12d6279558fe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03. Panels\Preview">
+      <UniqueIdentifier>{2abfc9cb-9484-4d82-99e3-991eb6fa9327}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Panel.h">
@@ -144,6 +147,9 @@
     <ClInclude Include="..\Public\Preview_Kirby.h">
       <Filter>02. Objects\Preview_Kirby</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Panel_Preview.h">
+      <Filter>03. Panels\Preview</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\ThirdParty\ImGui\Src\ImGuizmo.cpp">
@@ -217,6 +223,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Preview_Kirby.cpp">
       <Filter>02. Objects\Preview_Kirby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Preview.cpp">
+      <Filter>03. Panels\Preview</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

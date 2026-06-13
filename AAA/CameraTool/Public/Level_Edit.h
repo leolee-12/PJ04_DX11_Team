@@ -67,8 +67,6 @@ public: // map preview (kept)
     void    Clear_MapPreview();
     void    Clear_MapPreviewStage();
     void    Clear_MapPreviewEnv();
-    _uint   Get_MapPreviewPresetCount() const;
-    const _char* Get_MapPreviewPresetLabel(_uint iPresetIndex) const;
     _bool   Is_MapPreviewLoaded() const { return nullptr != m_pMapStage || 0 != m_iEnvObjCreatedCount; }
     const _wstring& Get_MapPreviewStatus() const { return m_strMapPreviewStatus; }
     const _wstring& Get_LoadedMapPreviewStageName() const { return m_strLoadedMapStageName; }

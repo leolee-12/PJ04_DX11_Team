@@ -11,6 +11,7 @@ NS_END
 
 NS_BEGIN(Engine)
 class CMovement;
+class CCollider;
 NS_END
 
 NS_BEGIN(Client)
@@ -113,6 +114,8 @@ private:
 	CMovement_Child* m_pMovement{};
 
 	_float3 m_vWishDir{};
+
+	CCollider* m_pTriggerSensor = { nullptr };
 
 private:
 	CKirby_InputManager*	m_pKirby_InputManager{};

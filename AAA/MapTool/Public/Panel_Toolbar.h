@@ -10,25 +10,23 @@ private:
 	virtual ~CPanel_Toolbar() = default;
 
 public:
-	virtual void				Render() override;
+	virtual void	Render() override;
 
 private:
-	static constexpr _uint		BUF_SIZE = { 64 };
-	_char						m_szSaveName[BUF_SIZE] = {};
-	_char						m_szLoadName[BUF_SIZE] = {};
-	_char						m_szLayerName[BUF_SIZE] = {};
-	_bool						m_bKeyInputEnabled = { false };
+	static constexpr _uint	BUF_SIZE = { 64 };
+	_char					m_szLayerName[BUF_SIZE] = {};
+	_bool					m_bKeyInputEnabled = { false };
 
 private:
-	void						Draw_FileButtons(class CLevel_Edit* pLevel);
-	void						Draw_GizmoButtons();
-	void						Draw_CameraButtons(class CLevel_Edit* pLevel);
+	void	Draw_EditButtons(class CLevel_Edit* pLevel);
+	void	Draw_GizmoButtons();
+	void	Draw_CameraButtons(class CLevel_Edit* pLevel);
 
 public:
-	static CPanel_Toolbar*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CPanel_Toolbar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
 protected:
-	virtual void				Free() override;
+	virtual void                            Free() override;
 };
 
 NS_END

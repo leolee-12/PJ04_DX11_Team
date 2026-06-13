@@ -62,6 +62,7 @@ void CUI_Text::Priority_Update(_float fTimeDelta)
 
 void CUI_Text::Update(_float fTimeDelta)
 {
+	__super::Update(fTimeDelta);
 }
 
 void CUI_Text::Late_Update(_float fTimeDelta)
@@ -88,16 +89,32 @@ HRESULT CUI_Text::Render()
 	_float  fBoxW = sqrtf(box._11 * box._11 +
 		box._12 * box._12 + box._13 * box._13);   // row0 길이 = 박스 폭
 
-	// 박스 안 정렬: 앵커를 좌/중/우 모서리로
-	_float fAnchorX = vBoxCenter.x;                          // Center
-	if (m_iAlign == 0)      fAnchorX = vBoxCenter.x - fBoxW * 0.5f;  // Left
-	else if (m_iAlign == 2) fAnchorX = vBoxCenter.x + fBoxW * 0.5f;  // Right
+	_float fTransformRot = atan2f(box._12, box._11);
+	_float fFinalRot = m_fRotation - fTransformRot;
 
-	_float2 vPos = { fAnchorX, vBoxCenter.y };
+	_float fOffsetX = 0.f;
+	if (m_iAlign == 0)
+		fOffsetX = -fBoxW * 0.5f;
+	else if (m_iAlign == 2)
+		fOffsetX = fBoxW * 0.5f;
+
+	_float fRightLen = sqrtf(box._11 * box._11 + box._12 * box._12);
+	if (fRightLen <= FLT_EPSILON)
+		return S_OK;
+
+	_float2 vRight = { box._11 / fRightLen, box._12 / fRightLen };
+
+	_float2 vPos = {
+		vBoxCenter.x + vRight.x * fOffsetX,
+		vBoxCenter.y + vRight.y * fOffsetX
+	};
 
 	m_pGameInstance_Proxy->Draw_Text(
-		m_strFontTag, m_strText.c_str(), vPos,
-		XMLoadFloat4(&m_vColor), m_fRotation,
+		m_strFontTag,
+		m_strText.c_str(),
+		vPos,
+		XMLoadFloat4(&m_vColor),
+		fFinalRot,
 		_float2(m_fFontScale, m_fFontScale),
 		static_cast<TEXT_ALIGN>(m_iAlign));
 

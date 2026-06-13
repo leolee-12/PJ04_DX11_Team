@@ -70,6 +70,8 @@ void CUI_SpriteAnim::Priority_Update(_float fTimeDelta)
 
 void CUI_SpriteAnim::Update(_float fTimeDelta)
 {
+	__super::Update(fTimeDelta);
+
 	if (!m_bIsPlay || m_iFrameCount <= 1 || m_fDuration <= 0.f)
 		return;
 

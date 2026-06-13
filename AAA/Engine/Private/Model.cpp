@@ -25,6 +25,7 @@ CModel::CModel(const CModel& Prototype)
     , m_Materials{ Prototype.m_Materials }
     , m_bUseMaterialEx{ Prototype.m_bUseMaterialEx }
     , m_MaterialsEx{ Prototype.m_MaterialsEx }
+    , m_bCookCollisionMesh{ Prototype.m_bCookCollisionMesh }
     , m_PreTransformMatrix{ Prototype.m_PreTransformMatrix }
     , m_iNumAnimations{ Prototype.m_iNumAnimations }
     , m_MeshLayers{ Prototype.m_MeshLayers }
@@ -184,11 +185,12 @@ HRESULT CModel::Initialize_Prototype(MODEL eType, const _char* pModelFilePath, _
     return m_eType == MODEL::ANIM ? Ready_Anim(pModelFilePath, PreTransformMatrix) : Ready_NonAnim(pModelFilePath, PreTransformMatrix);
 }
 
-HRESULT CModel::Initialize_Prototype_WithTextureHub(MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter)
+HRESULT CModel::Initialize_Prototype_WithTextureHub(MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter, _bool bCookCollisionMesh)
 {
     m_eType = eType;
     m_bUseMaterialEx = true;
     m_PickableFilter = fcFillter;
+    m_bCookCollisionMesh = bCookCollisionMesh;
 
     return Ready_NonAnimEx(pModelFilePath, PreTransformMatrix);
 }
@@ -523,9 +525,11 @@ HRESULT CModel::Ready_NonAnimEx(const _char* pModelFilePath, _fmatrix PreTransfo
     if (FAILED(Ready_Meshes(modelData.Meshes, PreTransformMatrix)))
         return E_FAIL;
 
-    if (MODEL::MAP == m_eType)
+    if (MODEL::MAP == m_eType || m_bCookCollisionMesh)
+    {
         if (FAILED(Cook_CollisionMesh(modelData.Meshes, PreTransformMatrix)))
             return E_FAIL;
+    }
 
     if (FAILED(Ready_MaterialsEx(modelData.Materials, pModelFilePath)))
         return E_FAIL;
@@ -631,14 +635,30 @@ HRESULT CModel::Cook_CollisionMesh(const vector<MESH_DATA>& meshes, _fmatrix Pre
 
     vector<_float3> Positions;
     vector<_uint>   Indices;
-    for (const auto& mesh : meshes) {
-        const _uint iBase = (_uint)Positions.size();
-        for (const auto& v : mesh.MapVertices) {     // MAP은 MapVertices
-            _float3 p;
-            XMStoreFloat3(&p, XMVector3TransformCoord(XMLoadFloat3(&v.vPosition), PreTransformMatrix));
-            Positions.push_back(p);
+
+    if (m_bCookCollisionMesh)
+    {
+        for (const auto& mesh : meshes) {
+            const _uint iBase = (_uint)Positions.size();
+            for (const auto& v : mesh.NonAnimVertices) {     // 환경은 NonAnimVertices
+                _float3 p;
+                XMStoreFloat3(&p, XMVector3TransformCoord(XMLoadFloat3(&v.vPosition), PreTransformMatrix));
+                Positions.push_back(p);
+            }
+            for (_uint idx : mesh.Indices) Indices.push_back(iBase + idx);
         }
-        for (_uint idx : mesh.Indices) Indices.push_back(iBase + idx);
+    }
+    else
+    {
+        for (const auto& mesh : meshes) {
+            const _uint iBase = (_uint)Positions.size();
+            for (const auto& v : mesh.MapVertices) {     // MAP은 MapVertices
+                _float3 p;
+                XMStoreFloat3(&p, XMVector3TransformCoord(XMLoadFloat3(&v.vPosition), PreTransformMatrix));
+                Positions.push_back(p);
+            }
+            for (_uint idx : mesh.Indices) Indices.push_back(iBase + idx);
+        }
     }
     if (Positions.empty() || Indices.size() < 3) return S_OK;
 
@@ -663,11 +683,11 @@ CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MOD
 }
 
 CModel* CModel::Create_WithTextureHub(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType,
-    const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter)
+    const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter, _bool bCookCollisionMesh)
 {
     CModel* pInstance = new CModel(pDevice, pContext);
 
-    if (FAILED(pInstance->Initialize_Prototype_WithTextureHub(eType, pModelFilePath, PreTransformMatrix, fcFillter)))
+    if (FAILED(pInstance->Initialize_Prototype_WithTextureHub(eType, pModelFilePath, PreTransformMatrix, fcFillter, bCookCollisionMesh)))
     {
         MSG_BOX("Failed to Created : CModel");
         Safe_Release(pInstance);

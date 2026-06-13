@@ -1,5 +1,6 @@
 #include "ImGui_Manager.h"
 #include "Level_Edit.h"
+#include "Map_Loader.h"
 #include "GameInstance.h"
 #include "GameInstance_Proxy.h"
 
@@ -155,25 +156,22 @@ void CImGui_Manager::Draw_Toolbar()
         solver.Rails().push_back(R);
     }
 
-    _uint nP = m_pLevel_Edit->Get_MapPreviewPresetCount();
+    _uint nP = CMap_Loader::Get_MapPresetCount();
     if (nP > 0)
     {
         static int s_p = 0; if (s_p >= (int)nP) s_p = 0;
         ImGui::SetNextItemWidth(220);
-        if (ImGui::BeginCombo("##map", m_pLevel_Edit->Get_MapPreviewPresetLabel(s_p)))
+        if (ImGui::BeginCombo("##map", CMap_Loader::Get_MapPresetLabel(s_p)))
         {
             for (_uint i = 0; i < nP; ++i)
-                if (ImGui::Selectable(m_pLevel_Edit->Get_MapPreviewPresetLabel(i), (int)i == s_p)) s_p = i;
+                if (ImGui::Selectable(CMap_Loader::Get_MapPresetLabel(i), (int)i == s_p)) s_p = i;
             ImGui::EndCombo();
         }
-        // both
         ImGui::SameLine(); if (ImGui::Button("Load Map"))   m_pLevel_Edit->Load_MapPreview((_uint)s_p);
         ImGui::SameLine(); if (ImGui::Button("Clear Map"))  m_pLevel_Edit->Clear_MapPreview();
-        // stage only
         ImGui::SameLine(); ImGui::TextDisabled("|"); ImGui::SameLine();
         if (ImGui::Button("Load Stage"))  m_pLevel_Edit->Load_MapPreviewStage((_uint)s_p);
         ImGui::SameLine(); if (ImGui::Button("Clear Stage")) m_pLevel_Edit->Clear_MapPreviewStage();
-        // env only
         ImGui::SameLine(); ImGui::TextDisabled("|"); ImGui::SameLine();
         if (ImGui::Button("Load Env"))    m_pLevel_Edit->Load_MapPreviewEnv((_uint)s_p);
         ImGui::SameLine(); if (ImGui::Button("Clear Env"))   m_pLevel_Edit->Clear_MapPreviewEnv();

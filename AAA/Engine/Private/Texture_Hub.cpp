@@ -143,10 +143,10 @@ TEXTURE_HUB_STATS CTexture_Hub::Get_Stats() const
 	shared_lock<shared_mutex> Lock(m_Mutex);
 
 	TEXTURE_HUB_STATS Stats{};
-	Stats.iUniqueTextureCount = static_cast<_uint>(m_SRVs.size());
-	Stats.iCacheHitCount = m_iCacheHitCount;
-	Stats.iCacheMissCount = m_iCacheMissCount;
-	Stats.iLoadFailureCount = m_iLoadFailureCount;
+	Stats.iCachedSRVCount = static_cast<_uint>(m_SRVs.size());
+	Stats.iCacheReuseCount = m_iCacheHitCount;
+	Stats.iFirstLoadRequestCount = m_iCacheMissCount;
+	Stats.iLoadFailCount = m_iLoadFailureCount;
 	return Stats;
 }
 

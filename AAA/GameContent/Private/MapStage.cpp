@@ -210,10 +210,7 @@ void CMapStage::Submit_VisibleSections()
 			continue;
 
 		const _bool bVisibleMain =
-			!m_pGameInstance_Proxy->Should_CullAABB(
-				CULLING_VIEW::MAIN_CAMERA,
-				pSection->Is_Culling(),
-				pSection->Get_WorldBounds());
+			!m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, pSection->Get_WorldBounds());
 
 		if (bVisibleMain)
 		{
@@ -242,7 +239,6 @@ void CMapStage::Submit_VisibleSections()
 		const _bool bVisibleShadow =
 			!m_pGameInstance_Proxy->Should_CullAABB(
 				CULLING_VIEW::SHADOW_DIR,
-				pSection->Is_Culling(),
 				pSection->Get_WorldBounds());
 
 		if (bVisibleShadow)

@@ -131,7 +131,8 @@ private:
 
 #pragma region FRUSTUM_MANAGER
 	_bool Update_CullingView(CULLING_VIEW eView, const CULLING_VIEW_DESC& Desc);
-	_bool Should_CullAABB(CULLING_VIEW eView, _bool bEnableCulling, const BoundingBox& WorldBounds) const;
+	_bool Should_CullAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const;
+	_bool Should_CullByDistance(const BoundingBox& WorldBounds, _float fCullDistance) const;
 	_bool XM_CALLCONV IsIn_CullingView_WorldSpace(CULLING_VIEW eView, _fvector vWorldPos, _float fRange = 0.f) const;
 	_bool IsIn_CullingView_AABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const;
 #pragma endregion
@@ -224,7 +225,7 @@ private:
 
 #pragma region PHYSIX_MANAGER
 	  physx::PxTriangleMesh* Cook_TriangleMesh(const _float3* pPositions, _uint iNumVertices, const _uint* pIndices, _uint iNumIndices, _bool bFlipWinding = true);
-	  physx::PxRigidStatic*  Add_StaticActor(physx::PxTriangleMesh* pMesh, _fmatrix WorldMatrix);
+	  physx::PxRigidStatic*  Create_StaticActor(physx::PxTriangleMesh* pMesh, _fmatrix WorldMatrix);
 	  void                   Remove_StaticActor(physx::PxRigidStatic* pActor);
 
 	  physx::PxController* Create_CapsuleController(const _float3& vFootPos, _float fRadius, _float fHeight);

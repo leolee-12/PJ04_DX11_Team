@@ -88,10 +88,10 @@ namespace Engine
 
 	struct TEXTURE_HUB_STATS
 	{
-		unsigned int iUniqueTextureCount = {};
-		unsigned int iCacheHitCount = {};
-		unsigned int iCacheMissCount = {};
-		unsigned int iLoadFailureCount = {};
+		unsigned int iCachedSRVCount = {};
+		unsigned int iCacheReuseCount = {};
+		unsigned int iFirstLoadRequestCount = {};
+		unsigned int iLoadFailCount = {};
 	};
 
 	struct CULLING_VIEW_DESC
