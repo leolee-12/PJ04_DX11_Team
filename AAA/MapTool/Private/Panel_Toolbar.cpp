@@ -89,11 +89,11 @@ namespace
 		if (nullptr == pLevel)
 			return;
 
-		const wstring& strStatus = pLevel->Get_MapPreviewStatus();
-		if (strStatus.empty())
+		const _wstring& wstrStatus = pLevel->Get_MapPreviewStatus();
+		if (wstrStatus.empty())
 			return;
 
-		string strDisplay(strStatus.begin(), strStatus.end());
+		_string strDisplay = WstrToStr(wstrStatus);
 		ImGui::TextDisabled("%s", strDisplay.c_str());
 	}
 }
@@ -224,7 +224,7 @@ void CPanel_Toolbar::Draw_CameraButtons(CLevel_Edit* pLevel)
 		{
 			for (const auto& handle : *pLayer)
 			{
-				string strName(handle.strName.begin(), handle.strName.end());
+				_string strName = WstrToStr(handle.strName);
 				if (ImGui::Selectable(strName.c_str()))
 				{
 					pLevel->Preview_Camera(handle.pObject);

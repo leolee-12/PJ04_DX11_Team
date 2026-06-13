@@ -563,7 +563,7 @@ void CImGui_Manager::Draw_Toolbar()
         {
             for (const auto& handle : *pLayer)
             {
-                string strName(handle.strName.begin(), handle.strName.end());
+                string strName = WstrToStr(handle.strName);
 
                 if (ImGui::Selectable(strName.c_str()))
                 {

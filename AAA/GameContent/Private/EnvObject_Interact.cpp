@@ -61,19 +61,6 @@ void CEnvObject_Interact::Late_Update(_float fTimeDelta)
 		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
 
-CGameObject* CEnvObject_Interact::Clone(void* pArg)
-{
-	CEnvObject_Interact* pInstance = new CEnvObject_Interact(*this);
-
-	if (FAILED(pInstance->Initialize(pArg)))
-	{
-		MSG_BOX("Failed to Cloned : CEnvObject_Interact");
-		Safe_Release(pInstance);
-	}
-
-	return pInstance;
-}
-
 void CEnvObject_Interact::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 {
 	__super::Copy_PrototypeName(pOutData);
@@ -86,6 +73,19 @@ CEnvObject_Interact* CEnvObject_Interact::Create(ID3D11Device* pDevice, ID3D11De
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
 		MSG_BOX("Failed to Created : CEnvObject_Interact");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CGameObject* CEnvObject_Interact::Clone(void* pArg)
+{
+	CEnvObject_Interact* pInstance = new CEnvObject_Interact(*this);
+
+	if (FAILED(pInstance->Initialize(pArg)))
+	{
+		MSG_BOX("Failed to Cloned : CEnvObject_Interact");
 		Safe_Release(pInstance);
 	}
 

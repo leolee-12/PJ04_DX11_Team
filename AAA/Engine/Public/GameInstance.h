@@ -67,6 +67,8 @@ private:
 
 	_float RandomFloat(_float fMin, _float fMax) const;
 	_int   RandomInt(_int iMin, _int iMax) const;
+	
+	_int64 Get_FrameIndex();
 #pragma endregion
 
 #pragma region DEVICE
@@ -219,6 +221,8 @@ private:
 
 #pragma region TEXTURE_HUB
 	  HRESULT LoadOrGet_TextureFromHub(const _tchar* pTexturePath, TEXTURE_HANDLE* pOutHandle);
+	  HRESULT Register_TextureNameInHub(const _tchar* pTextureName, TEXTURE_HANDLE Handle);
+	  HRESULT Get_TextureFromHub(const _tchar* pTextureName, TEXTURE_HANDLE* pOutHandle) const;
 	  HRESULT Bind_TextureFromHub(class CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle);
 	  TEXTURE_HUB_STATS Get_TextureHubStats() const;
 #pragma endregion
@@ -264,6 +268,7 @@ private:
 
 	mutable mt19937             m_RandomGenerator;
 	_bool						m_bEditMode = { false };
+	_uint64						m_iFrameIndex = { 0 };
 
 private:
 	static CGameInstance* m_pInstance;

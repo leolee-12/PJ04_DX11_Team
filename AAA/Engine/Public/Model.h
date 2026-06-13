@@ -75,6 +75,9 @@ public:
 	_uint Get_MeshTextureCount(_uint iMesh, MTEX_TYPE eType) const;
 	HRESULT Save_MeshLayers() const;
 
+public:	// Instance
+	HRESULT Render_Instanced(_uint iMeshIndex, ID3D11Buffer* pInstanceBuffer, _uint iInstanceStride, _uint iInstanceCount);
+
 private:
 	MODEL						m_eType = { MODEL::END };
 	PickableFilter              m_PickableFilter = { nullptr };
@@ -113,7 +116,7 @@ private:
 private:
 	HRESULT Ready_Meshes(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix);
 	HRESULT Ready_Materials(const vector<MATERIAL_DATA>& materials, const _char* pModelFilePath);
-	HRESULT Ready_MaterialsEx(const vector<MATERIAL_DATA>& materials, const _char* pModelFilePath);
+	HRESULT Ready_MaterialsEx(const vector<MATERIAL_DATA>& materials);
 	HRESULT Ready_Bones(const vector<BONE_DATA>& bones);
 	HRESULT Ready_Animations(const vector<ANIMATION_DATA>& animations);
 

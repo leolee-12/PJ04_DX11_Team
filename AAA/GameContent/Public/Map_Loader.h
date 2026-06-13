@@ -126,6 +126,8 @@ public:
 	static json			Serialize_MapStageOverride(const CMapStage* pStage);
 	static HRESULT		Apply_MapStageOverride(CMapStage* pStage, const json& jOverride);
 
+	static HRESULT		Ready_TexHub(CGameInstance_Proxy* pProxy);
+
 private:
 	ID3D11Device* m_pDevice = { nullptr };
 	ID3D11DeviceContext* m_pContext = { nullptr };

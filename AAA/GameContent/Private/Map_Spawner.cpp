@@ -3,17 +3,21 @@
 #include "EnvObject_Static.h"
 #include "EnvObject_Interact.h"
 #include "EnvObject_Trigger.h"
+#include "Env_InstanceController.h"
 
 #include "GameInstance.h"
 
 namespace
 {
+	static constexpr const _tchar* ENV_INSTANCE_LAYER_TAG = L"Layer_EnvInstance";
+	static constexpr const _tchar* ENV_INSTANCE_OBJECT_TAG = L"Env_InstanceController";
+
 	struct PENDING_CREATED_CALLBACK_INFO
 	{
-		CGameObject* pObject = nullptr;
-		_wstring        strPrototypeTag;
-		_wstring        strLayerTag;
-		_wstring        strObjectTag;
+		CGameObject*	pObject = nullptr;
+		_wstring		strPrototypeTag;
+		_wstring		strLayerTag;
+		_wstring		strObjectTag;
 	};
 }
 
@@ -52,6 +56,7 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 	vector<CGameObject*> CreatedObjects;
 	vector<PENDING_CREATED_CALLBACK_INFO> PendingCallbacks;
 	CMapStage* pStage = nullptr;
+	CEnv_InstanceController* pEnvInstanceController = nullptr;
 
 	if (Options.bSpawnStage)
 	{
@@ -90,6 +95,44 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 
 	if (Options.bSpawnEnv)
 	{
+		const auto iterStaticEnv = find_if(
+			Package.EnvObjectDescs.begin(),
+			Package.EnvObjectDescs.end(),
+			[](const ENV_OBJECT_DESC& Desc) -> _bool
+			{
+				return Desc.eKind == ENV_OBJECT_KIND::STATIC;
+			});
+
+		if (iterStaticEnv != Package.EnvObjectDescs.end())
+		{
+			CGameObject* pControllerObject = nullptr;
+
+			if (FAILED(m_pProxy->Add_GameObject_Return(
+				&pControllerObject,
+				ETOUI(LEVEL::STATIC),
+				CEnv_InstanceController::PROTOTYPE_TAG,
+				Levels.iObjectLevel,
+				ENV_INSTANCE_LAYER_TAG,
+				ENV_INSTANCE_OBJECT_TAG,
+				nullptr)))
+			{
+				Rollback(CreatedObjects);
+				return E_FAIL;
+			}
+
+			pEnvInstanceController = dynamic_cast<CEnv_InstanceController*>(pControllerObject);
+			if (nullptr == pEnvInstanceController)
+			{
+				if (nullptr != pControllerObject)
+					m_pProxy->Destroy_GameObject(pControllerObject);
+
+				Rollback(CreatedObjects);
+				return E_FAIL;
+			}
+
+			CreatedObjects.push_back(pControllerObject);
+		}
+
 		for (const ENV_OBJECT_DESC& SrcDesc : Package.EnvObjectDescs)
 		{
 			const MAP_SPAWN_ROUTE* pRoute = Resolve_EnvRoute(Targets, SrcDesc.eKind);
@@ -132,6 +175,24 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 				pRoute->pLayerTag,
 				strObjectName
 				});
+
+			if (SrcDesc.eKind == ENV_OBJECT_KIND::STATIC)
+			{
+				if (nullptr == pEnvInstanceController)
+				{
+					Rollback(CreatedObjects);
+					return E_FAIL;
+				}
+
+				CEnvObject_Static* pStaticObject = dynamic_cast<CEnvObject_Static*>(pCreatedObject);
+				if (nullptr == pStaticObject)
+				{
+					Rollback(CreatedObjects);
+					return E_FAIL;
+				}
+
+				pStaticObject->Set_InstanceController(pEnvInstanceController);
+			}
 		}
 	
 		for (const MAP_ADDED_OBJECT_DESC& Added : Package.AddedObjectDescs)

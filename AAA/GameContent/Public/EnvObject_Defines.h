@@ -184,4 +184,37 @@ struct ENV_OBJECT_DESC : public CGameObject::GAMEOBJECT_DESC
 	json jRawProperties;
 };
 
+struct ENV_INSTANCE_DATA
+{
+	_float4 vRight = {};
+	_float4 vUp = {};
+	_float4 vLook = {};
+	_float4 vPosition = {};
+};
+
+struct ENV_INSTANCE_KEY
+{
+	_uint iModelProtoLevel = { 0 };
+	_wstring wstrModelProtoTag = {};
+	RENDERID eRenderID = { RENDERID::NONBLEND };
+
+	_bool operator==(const ENV_INSTANCE_KEY& rhs) const
+	{
+		return iModelProtoLevel == rhs.iModelProtoLevel
+			&& wstrModelProtoTag == rhs.wstrModelProtoTag
+			&& eRenderID == rhs.eRenderID;
+	}
+};
+
+struct ENV_INSTANCE_KEY_HASH
+{
+	size_t operator()(const ENV_INSTANCE_KEY& key) const
+	{
+		size_t h0 = std::hash<_uint>{}(key.iModelProtoLevel);
+		size_t h1 = std::hash<_wstring>{}(key.wstrModelProtoTag);
+		size_t h2 = std::hash<_uint>{}(ETOUI(key.eRenderID));
+		return h0 ^ (h1 << 1) ^ (h2 << 2);
+	}
+};
+
 NS_END

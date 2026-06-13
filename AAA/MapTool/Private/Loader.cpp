@@ -1,15 +1,9 @@
 ﻿#include "Loader.h"
+#include "Map_Loader.h"
 
 #include "Loader_Prototype.h"
 
 #include "GameInstance.h"
-
-namespace
-{
-    using namespace std::filesystem;
-
-    constexpr wchar_t kMapTexPoolRoot[] = L"../../Resources/Map/TexPool";
-}
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice { pDevice }
@@ -132,51 +126,17 @@ HRESULT CLoader::Ready_Resources_For_Edit()
             return Client::Load_Fonts(m_pGameInstance_Proxy);
         });
 
-    if (FAILED(Ready_TexPool_For_Edit()))
-        return E_FAIL;
+
+    Add_Work([this]() -> HRESULT
+        {
+            lstrcpy(m_szLoadingText, TEXT("Loading Map TexHub..."));
+            return CMap_Loader::Ready_TexHub(m_pGameInstance_Proxy);
+        });
+
+    lstrcpy(m_szLoadingText, TEXT("Map TexPool is Loaded"));
 
     return S_OK;
-}
 
-HRESULT CLoader::Ready_TexPool_For_Edit()
-{
-    if (nullptr == m_pGameInstance_Proxy)
-        return E_FAIL;
-
-    vector<wstring> TexturePaths;
-
-    error_code ErrorCode;
-    const path Root(kMapTexPoolRoot);
-    if (!exists(Root, ErrorCode) || ErrorCode)
-        return E_FAIL;
-
-    for (recursive_directory_iterator Iter(Root, directory_options::skip_permission_denied, ErrorCode), End;
-        Iter != End;
-        Iter.increment(ErrorCode))
-    {
-        if (ErrorCode)
-            break;
-
-        if (!Iter->is_regular_file())
-            continue;
-
-        const path FilePath = Iter->path();
-        if (0 != _wcsicmp(FilePath.extension().c_str(), L".dds"))
-            continue;
-
-        TexturePaths.push_back(FilePath.wstring());
-    }
-
-    for (const wstring& strTexturePath : TexturePaths)
-    {
-        Add_Work([this, strTexturePath]() -> HRESULT
-            {
-                lstrcpy(m_szLoadingText, TEXT("Loading Map TexPool..."));
-
-                TEXTURE_HANDLE Handle = INVALID_TEXTURE_HANDLE;
-                return m_pGameInstance_Proxy->LoadOrGet_TextureFromHub(strTexturePath.c_str(), &Handle);
-            });
-    }
 
     return S_OK;
 }

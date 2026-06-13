@@ -139,6 +139,8 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 
 void CGameInstance::Update_Engine(_float fTimeDelta)
 {
+    ++m_iFrameIndex;
+
 	m_pInput_Device->Update();
 
     m_pObject_Manager->Priority_Update(fTimeDelta);
@@ -209,6 +211,10 @@ _int CGameInstance::RandomInt(_int iMin, _int iMax) const
 {
 	uniform_int_distribution<_int> dist(iMin, iMax);
     return dist(m_RandomGenerator);
+}
+_int64 CGameInstance::Get_FrameIndex()
+{
+    return m_iFrameIndex;
 }
 #pragma endregion
 
@@ -605,6 +611,22 @@ HRESULT CGameInstance::LoadOrGet_TextureFromHub(const _tchar* pTexturePath, TEXT
         return E_FAIL;
 
     return m_pTexture_Hub->LoadOrGet(pTexturePath, pOutHandle);
+}
+
+HRESULT CGameInstance::Register_TextureNameInHub(const _tchar* pTextureName, TEXTURE_HANDLE Handle)
+{
+    if (nullptr == m_pTexture_Hub)
+        return E_FAIL;
+
+    return m_pTexture_Hub->Register_TextureName(Handle, pTextureName);
+}
+
+HRESULT CGameInstance::Get_TextureFromHub(const _tchar* pTextureName, TEXTURE_HANDLE* pOutHandle) const
+{
+    if (nullptr == m_pTexture_Hub)
+        return E_FAIL;
+
+    return m_pTexture_Hub->Get(pTextureName, pOutHandle);
 }
 
 HRESULT CGameInstance::Bind_TextureFromHub(CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle)

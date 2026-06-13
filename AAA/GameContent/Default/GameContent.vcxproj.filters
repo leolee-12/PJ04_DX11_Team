@@ -262,6 +262,12 @@
     <Filter Include="00. GameObject\UI\Component\GaugeBar">
       <UniqueIdentifier>{0319824c-67e9-4142-8520-2c3bc1d47add}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\02. EnvObject\Instance">
+      <UniqueIdentifier>{9df9d2af-5f82-4056-9d63-b9f7cc4c1544}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98. ShaderFiles\Leo">
+      <UniqueIdentifier>{a3345da1-0cb7-4733-ac92-e971f6f0980d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -549,6 +555,12 @@
     <ClInclude Include="..\Public\UI_GaugeBarCom.h">
       <Filter>00. GameObject\UI\Component\GaugeBar</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Env_InstanceBatch.h">
+      <Filter>00. GameObject\02. EnvObject\Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Env_InstanceController.h">
+      <Filter>00. GameObject\02. EnvObject\Instance</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -785,6 +797,12 @@
     <ClCompile Include="..\Private\UI_GaugeBarCom.cpp">
       <Filter>00. GameObject\UI\Component\GaugeBar</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Env_InstanceBatch.cpp">
+      <Filter>00. GameObject\02. EnvObject\Instance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Env_InstanceController.cpp">
+      <Filter>00. GameObject\02. EnvObject\Instance</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl">
@@ -810,6 +828,9 @@
     </FxCompile>
     <FxCompile Include="..\ShaderFiles\Shader_SkySphere.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_EnvInstance.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

@@ -8,36 +8,49 @@
 #include "Map_ModelResolver.h"
 #include "Map_ProtoRegister.h"
 #include "Map_Spawner.h"
+#include "GameContent_Log.h"
 
 #include "GameInstance.h"
 #include "DataLoader.h"
+#include "Texture_Hub.h"
 
 #include <mutex>
+#include <filesystem>
 
 namespace
 {
-	std::mutex g_MapPackageCacheMutex;
-	std::unordered_map<std::wstring, MAP_PACKAGE> g_MapPackageCache;
+	using namespace std::filesystem;
 
-	std::wstring Make_MapCacheKey(const std::wstring& strManifestPath, _uint iRuntimeLevel)
+	constexpr _tchar kMapTexPoolRoot[] = L"../../Resources/Map/TexPool";
+	_bool g_bMapTexHubReady = false;
+	mutex g_MapTexHubMutex;
+	mutex g_MapPackageCacheMutex;
+	unordered_map<_wstring, MAP_PACKAGE> g_MapPackageCache;
+
+	string To_LogPath(const path& FilePath)
 	{
-		return std::to_wstring(iRuntimeLevel) + L"|" + strManifestPath;
+		return WstrToStr(FilePath.wstring());
 	}
 
-	void Store_MapPackage(const std::wstring& strManifestPath, _uint iRuntimeLevel, const MAP_PACKAGE& Package)
+	_wstring Make_MapCacheKey(const _wstring& strManifestPath, _uint iRuntimeLevel)
 	{
-		std::lock_guard<std::mutex> lock(g_MapPackageCacheMutex);
+		return to_wstring(iRuntimeLevel) + L"|" + strManifestPath;
+	}
+
+	void Store_MapPackage(const _wstring& strManifestPath, _uint iRuntimeLevel, const MAP_PACKAGE& Package)
+	{
+		lock_guard<mutex> lock(g_MapPackageCacheMutex);
 		g_MapPackageCache[Make_MapCacheKey(strManifestPath, iRuntimeLevel)] = Package;
 	}
 
-	bool Try_GetMapPackage(const std::wstring& strManifestPath,
+	bool Try_GetMapPackage(const _wstring& strManifestPath,
 		_uint iRuntimeLevel,
 		MAP_PACKAGE* pOutPackage)
 	{
 		if (nullptr == pOutPackage)
 			return false;
 
-		std::lock_guard<std::mutex> lock(g_MapPackageCacheMutex);
+		lock_guard<mutex> lock(g_MapPackageCacheMutex);
 
 		const auto iter = g_MapPackageCache.find(Make_MapCacheKey(strManifestPath, iRuntimeLevel));
 		if (iter == g_MapPackageCache.end())
@@ -47,9 +60,7 @@ namespace
 		return true;
 	}
 
-	bool Try_LoadLevelMapContent(
-		const std::wstring& strLevelObjectsPath,
-		Client::MAP_LEVEL_CONTENT_DESC* pOutDesc)
+	bool Try_LoadLevelMapContent(const _wstring& strLevelObjectsPath, MAP_LEVEL_CONTENT_DESC* pOutDesc)
 	{
 		if (nullptr == pOutDesc)
 			return false;
@@ -59,14 +70,14 @@ namespace
 		if (strLevelObjectsPath.empty())
 			return false;
 
-		std::string strContent{};
+		_string strContent{};
 		if (FAILED(CDataLoader::Read_Json(strLevelObjectsPath.c_str(), &strContent)))
 			return false;
 
 		try
 		{
 			json jLevel = json::parse(strContent);
-			return SUCCEEDED(Client::CMap_LevelContent::Deserialize(jLevel, pOutDesc));
+			return SUCCEEDED(CMap_LevelContent::Deserialize(jLevel, pOutDesc));
 		}
 		catch (const json::exception&)
 		{
@@ -74,16 +85,16 @@ namespace
 		}
 	}
 
-	bool Is_RuntimeLoadContextValid(const Client::MAP_RUNTIME_LOAD_CONTEXT& Context)
+	bool Is_RuntimeLoadContextValid(const MAP_RUNTIME_LOAD_CONTEXT& Context)
 	{
 		return nullptr != Context.pDevice
 			&& nullptr != Context.pContext;
 	}
 
 	void Collect_DeletedEnvDescs(
-		const vector<Client::ENV_OBJECT_DESC>& SourceDescs,
-		const Client::MAP_OVERRIDE_DESC* pOverrideDesc,
-		vector<Client::ENV_OBJECT_DESC>* pOutDeletedEnvDescs)
+		const vector<ENV_OBJECT_DESC>& SourceDescs,
+		const MAP_OVERRIDE_DESC* pOverrideDesc,
+		vector<ENV_OBJECT_DESC>* pOutDeletedEnvDescs)
 	{
 		if (nullptr == pOutDeletedEnvDescs)
 			return;
@@ -95,23 +106,23 @@ namespace
 
 		for (const auto& Desc : SourceDescs)
 		{
-			const _wstring strKey = Client::CMap_Override::Build_EnvObjectStableKey(Desc);
+			const _wstring strKey = CMap_Override::Build_EnvObjectStableKey(Desc);
 			if (pOverrideDesc->DeletedEnvObjectKeys.find(strKey) != pOverrideDesc->DeletedEnvObjectKeys.end())
 				pOutDeletedEnvDescs->push_back(Desc);
 		}
 	}
 
 	void Build_RuntimeStageLevels(
-		const Client::MAP_RUNTIME_LOAD_CONTEXT& Context,
-		Client::MAP_RUNTIME_LEVELS* pOutLevels)
+		const MAP_RUNTIME_LOAD_CONTEXT& Context,
+		MAP_RUNTIME_LEVELS* pOutLevels)
 	{
 		if (nullptr == pOutLevels)
 			return;
 
 		*pOutLevels = {};
-		pOutLevels->iObjectLevel = ETOUI(Client::LEVEL::STATIC);
+		pOutLevels->iObjectLevel = ETOUI(LEVEL::STATIC);
 		pOutLevels->iStageModelLevel = Context.iModelLevel;
-		pOutLevels->iEnvModelLevel = ETOUI(Client::LEVEL::STATIC);
+		pOutLevels->iEnvModelLevel = ETOUI(LEVEL::STATIC);
 	}
 
 	void Build_RuntimeEnvLevels(
@@ -241,7 +252,10 @@ HRESULT CMap_Loader::Build_Package(const _wstring& strManifestPath, MAP_PACKAGE*
 
 HRESULT CMap_Loader::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, const MAP_PACKAGE& Package)
 {
-	if (nullptr == m_pDevice || nullptr == m_pContext)
+	if (nullptr == m_pDevice || nullptr == m_pContext || nullptr == m_pProxy)
+		return E_FAIL;
+
+	if (FAILED(Ready_TexHub(m_pProxy)))
 		return E_FAIL;
 
 	CMap_ProtoRegister* pRegister = CMap_ProtoRegister::Create(m_pDevice, m_pContext);
@@ -690,6 +704,119 @@ json CMap_Loader::Serialize_MapStageOverride(const CMapStage* pStage)
 HRESULT CMap_Loader::Apply_MapStageOverride(CMapStage* pStage, const json& jOverride)
 {
 	return CMap_StageOverrideSerializer::Apply(pStage, jOverride);
+}
+
+HRESULT CMap_Loader::Ready_TexHub(CGameInstance_Proxy* pProxy)
+{
+	if (nullptr == pProxy || !pProxy->IsConnected())
+	{
+		Log_GameContentError("Ready_TexHub failed: invalid proxy.");
+		return E_FAIL;
+	}
+
+	lock_guard<mutex> Lock(g_MapTexHubMutex);
+
+	if (g_bMapTexHubReady)
+		return S_OK;
+
+	unordered_map<wstring, path> TextureID;
+
+	error_code ErrorCode;
+	const path Root(kMapTexPoolRoot);
+	if (!exists(Root, ErrorCode) || ErrorCode)
+	{
+		Log_GameContentError(
+			"Ready_TexHub failed: TexPool root missing or inaccessible. root="
+			+ To_LogPath(Root));
+		return E_FAIL;
+	}
+
+	for (recursive_directory_iterator Iter(
+		Root,
+		directory_options::skip_permission_denied,
+		ErrorCode), End;
+		Iter != End;
+		Iter.increment(ErrorCode))
+	{
+		if (ErrorCode)
+		{
+			Log_GameContentError(
+				"Ready_TexHub failed: directory iteration error. root="
+				+ To_LogPath(Root));
+			break;
+		}
+
+		if (!Iter->is_regular_file())
+			continue;
+
+		const path FilePath = Iter->path();
+		wstring strExt = FilePath.extension().wstring();
+		transform(strExt.begin(), strExt.end(), strExt.begin(),
+			[](wchar_t ch) { return static_cast<wchar_t>(towlower(ch)); });
+
+		if (L".dds" != strExt && L".png" != strExt)
+			continue;
+
+		const wstring strTextureId =
+			Engine::CTexture_Hub::Normalize_TextureName(FilePath.filename().wstring());
+
+		const auto iter = TextureID.find(strTextureId);
+		if (iter == TextureID.end())
+		{
+			TextureID.emplace(strTextureId, FilePath);
+			continue;
+		}
+
+		const bool bExistingDDS = 0 == _wcsicmp(iter->second.extension().c_str(), L".dds");
+		const bool bCurrentDDS = 0 == _wcsicmp(FilePath.extension().c_str(), L".dds");
+
+		if (bExistingDDS == bCurrentDDS)
+		{
+			Log_GameContentError(
+				"Ready_TexHub failed: duplicate texture id. id="
+				+ WstrToStr(strTextureId)
+				+ " existing="
+				+ To_LogPath(iter->second)
+				+ " incoming="
+				+ To_LogPath(FilePath));
+			return E_FAIL;
+		}
+
+		if (bCurrentDDS)
+			iter->second = FilePath;
+	}
+
+	if (ErrorCode)
+		return E_FAIL;
+
+	for (const auto& Pair : TextureID)
+	{
+		TEXTURE_HANDLE Handle = INVALID_TEXTURE_HANDLE;
+		const HRESULT hrLoad = pProxy->LoadOrGet_TextureFromHub(Pair.second.c_str(), &Handle);
+		if (FAILED(hrLoad))
+		{
+			Log_GameContentError(
+				"Ready_TexHub failed: texture load failed. id="
+				+ WstrToStr(Pair.first)
+				+ " path="
+				+ To_LogPath(Pair.second));
+			return hrLoad;
+		}
+
+		const HRESULT hrRegister = pProxy->Register_TextureNameInHub(Pair.first.c_str(), Handle);
+		if (FAILED(hrRegister))
+		{
+			Log_GameContentError(
+				"Ready_TexHub failed: texture name registration failed. id="
+				+ WstrToStr(Pair.first)
+				+ " path="
+				+ To_LogPath(Pair.second));
+			return hrRegister;
+		}
+	}
+
+	g_bMapTexHubReady = true;
+	return S_OK;
 }
 
 void CMap_Loader::Build_DefaultRuntimeLevels(_uint iRuntimeLevel, MAP_RUNTIME_LEVELS* pOutLevels)

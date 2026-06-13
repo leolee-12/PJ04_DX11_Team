@@ -443,6 +443,17 @@ HRESULT CModel::Save_MeshLayers() const
     return S_OK;
 }
 
+HRESULT CModel::Render_Instanced(_uint iMeshIndex, ID3D11Buffer* pInstanceBuffer, _uint iInstanceStride, _uint iInstanceCount)
+{
+    if (iMeshIndex >= m_iNumMeshes)
+        return E_FAIL;
+
+    if (FAILED(m_Meshes[iMeshIndex]->Bind_Resources_Instanced(pInstanceBuffer, iInstanceStride)))
+        return E_FAIL;
+
+    return m_Meshes[iMeshIndex]->Render_Instanced(iInstanceCount);
+}
+
 HRESULT CModel::Ready_Meshes(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix)
 {
 	m_iNumMeshes = meshes.size();
@@ -472,7 +483,7 @@ HRESULT CModel::Ready_Materials(const vector<MATERIAL_DATA>& materials, const _c
 	return S_OK;
 }
 
-HRESULT CModel::Ready_MaterialsEx(const vector<MATERIAL_DATA>& materials, const _char* pModelFilePath)
+HRESULT CModel::Ready_MaterialsEx(const vector<MATERIAL_DATA>& materials)
 {
     if (!m_Materials.empty() || !m_MaterialsEx.empty())
         return E_FAIL;
@@ -481,7 +492,7 @@ HRESULT CModel::Ready_MaterialsEx(const vector<MATERIAL_DATA>& materials, const 
 
     for (const auto& matData : materials)
     {
-        CMaterialEx* pMaterialEx = CMaterialEx::Create(matData, pModelFilePath);
+        CMaterialEx* pMaterialEx = CMaterialEx::Create(matData);
         if (nullptr == pMaterialEx)
             return E_FAIL;
 
@@ -531,7 +542,7 @@ HRESULT CModel::Ready_NonAnimEx(const _char* pModelFilePath, _fmatrix PreTransfo
             return E_FAIL;
     }
 
-    if (FAILED(Ready_MaterialsEx(modelData.Materials, pModelFilePath)))
+    if (FAILED(Ready_MaterialsEx(modelData.Materials)))
         return E_FAIL;
 
     Load_MeshLayers(pModelFilePath);

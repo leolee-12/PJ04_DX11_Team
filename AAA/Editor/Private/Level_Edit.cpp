@@ -38,6 +38,9 @@ HRESULT CLevel_Edit::Initialize()
     if (nullptr == m_pMapPreviewSession)
         return E_FAIL;
 
+    if (FAILED(CMap_Loader::Ready_TexHub(m_pGameInstance_Proxy)))
+        return E_FAIL;
+
     return S_OK;
 }
 
