@@ -23,6 +23,7 @@ void CKirby_State::Enter(CKirby* pKirby)
 
 void CKirby_State::Update(CKirby* pKirby, const _float fTimeDelta)
 {
+    pKirby->Update_AbilityDumpCool(fTimeDelta);
 }
 
 void CKirby_State::Exit(CKirby* pKirby)

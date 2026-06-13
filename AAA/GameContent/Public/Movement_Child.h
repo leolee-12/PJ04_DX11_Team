@@ -21,6 +21,7 @@ class CMovement_Child final : public CMovement
     PROPERTY(_float,    m_fGroundFriction,          L"바닥 마찰력 (+)",      L"RigidBody")
 
     PROPERTY(_float,    m_fMaxHorizontalSpeed,      L"최대 수평 속도 (+)",   L"RigidBody")
+    PROPERTY(_float,    m_fMaxVerticalSpeed,        L"최대 수직 속도 (+)",   L"RigidBody")
     PROPERTY(_float,    m_fMaxFallVelocity,         L"최대 낙하 속도 (-)",   L"RigidBody")
     PROPERTY(_float,    m_fJumpVelocity,            L"순간 점프 속도 (+)",   L"RigidBody")
 
@@ -41,9 +42,6 @@ public:
         IMPULSE,         // 순간 충격량. 질량 영향 받음.
         VELOCITY_CHANGE  // 순간 속도 변화. 질량 영향 안 받음.
     };
-
-public:
-    static constexpr const wchar_t* PROTOTYPE_TAG = L"Prototype_Component_Movement_Child";
 
 private:
     CMovement_Child(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -90,6 +88,7 @@ public:
     void Set_LinearDrag(_float fLinearDrag);
     void Set_GroundFriction(_float fGroundFriction);
     void Set_MaxHorizontalSpeed(_float fMaxHorizontalSpeed);
+    void Set_MaxVerticalSpeed(_float fMaxVerticalSpeed);
     void Set_MaxFallVelocity(_float fMaxFallVelocity);
     void Set_JumpVelocity(_float fJumpVelocity);
     void Set_UseGravity(_bool bUseGravity);

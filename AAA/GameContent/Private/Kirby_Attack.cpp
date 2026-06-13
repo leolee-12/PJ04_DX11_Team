@@ -12,6 +12,9 @@ CKirby_Attack::CKirby_Attack()
 
 HRESULT CKirby_Attack::Initialize()
 {
+    if (FAILED(__super::Initialize()))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -22,12 +25,16 @@ KIRBY_STATE_TYPE CKirby_Attack::Get_StateType()
 
 void CKirby_Attack::Enter(CKirby* pKirby)
 {
+    __super::Enter(pKirby);
+
     // 현재 능력에게 Enter 전달
     pKirby->Get_KirbyAbility()->Enter_Ability(pKirby);
 }
 
 void CKirby_Attack::Update(CKirby* pKirby, const _float fTimeDelta)
 {
+    __super::Update(pKirby, fTimeDelta);
+
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
     // 현재 능력에게 Update 전달
     pAbility->Update_Ability(pKirby, fTimeDelta);
@@ -42,13 +49,16 @@ void CKirby_Attack::Update(CKirby* pKirby, const _float fTimeDelta)
 
 void CKirby_Attack::Exit(CKirby* pKirby)
 {
+    __super::Exit(pKirby);
+
     // 현재 능력에게 Exit 전달
     pKirby->Get_KirbyAbility()->Exit_Ability(pKirby);
 }
 
 _bool CKirby_Attack::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
-    __super::Handle_Command(pKirby, pCommand);
+    if (__super::Handle_Command(pKirby, pCommand))
+        return true;
 
     KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
 

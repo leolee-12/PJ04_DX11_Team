@@ -12,6 +12,9 @@ CKirby_Run::CKirby_Run()
 
 HRESULT CKirby_Run::Initialize()
 {
+    if (FAILED(__super::Initialize()))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -22,6 +25,8 @@ KIRBY_STATE_TYPE CKirby_Run::Get_StateType()
 
 void CKirby_Run::Enter(CKirby* pKirby)
 {
+    __super::Enter(pKirby);
+
     // Ani
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
     pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::RUN));
@@ -29,11 +34,15 @@ void CKirby_Run::Enter(CKirby* pKirby)
 
 void CKirby_Run::Update(CKirby* pKirby, const _float fTimeDelta)
 {
+    __super::Update(pKirby, fTimeDelta);
+
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
 
     // Fall
     if (Try_FallState(pKirby) == true)
+    {
         pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::FALL));
+    }
 
     // Wait
     if (pKirby->Has_MoveDir() == false)
@@ -42,11 +51,13 @@ void CKirby_Run::Update(CKirby* pKirby, const _float fTimeDelta)
 
 void CKirby_Run::Exit(CKirby* pKirby)
 {
+    __super::Exit(pKirby);
 }
 
 _bool CKirby_Run::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
-    __super::Handle_Command(pKirby, pCommand);
+    if (__super::Handle_Command(pKirby, pCommand))
+        return true;
 
     KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
 

@@ -23,6 +23,12 @@ CAnimation::CAnimation(const CAnimation& Prototype)
 HRESULT CAnimation::Initialize(const ANIMATION_DATA& data, class CModel* pModel)
 {
     m_strName = data.strName;
+
+    m_strName = data.strName;
+
+    OutputDebugStringA(m_strName.c_str());
+    OutputDebugStringA("\n");
+
     m_fDuration = data.fDuration;
     m_fTickPerSecond = data.fTickPerSecond;
     m_iNumChannels = (_uint)data.Channels.size();
