@@ -12,11 +12,6 @@ NS_END
 
 NS_BEGIN(Client)
 
-enum class KIRBY_ABILITY_TYPE
-{
-	NORMAL
-};
-
 enum class KIRBY_ATTACK_LOCATION { GROUND, AIR };
 
 class CKirby;

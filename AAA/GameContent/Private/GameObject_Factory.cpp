@@ -25,6 +25,7 @@
 #include "Kirby.h"
 #include "Kirby_Body.h"
 #include "Kirby_Sword.h"
+#include "Kirby_SwordHat.h"
 
 // Effect_Container
 #include "WalkSmoke.h"
@@ -293,6 +294,8 @@ void CGameObject_Factory::Register_Container()
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Sword/Sword.ysh"));
 
             // Sword Hat
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CKirby_SwordHat::PROTOTYPE_TAG,
+                CKirby_SwordHat::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_SwordHat"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Hat/SwordHat.ysh"));
         )

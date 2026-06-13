@@ -2,7 +2,7 @@
 
 #include "GameContent_Defines.h"
 
-#include "PartObject.h"
+#include "Kirby_OnOffPart.h"
 
 NS_BEGIN(Engine)
 class CShader;
@@ -12,17 +12,17 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CKirby_SwordHat final : public CPartObject
+class CKirby_SwordHat final : public CKirby_OnOffPart
 {
 	GENERATED_BODY(CKirby_SwordHat)
 
 public:
-	struct KIRBY_SWORDHAT_DESC : public CPartObject::PARTOBJECT_DESC
+	struct KIRBY_SWORDHAT_DESC : public CKirby_OnOffPart::KIRBY_ONONFFPART_DESC
 	{
-		const _float4x4* pSocketBoneMatrix{ nullptr };
 	};
 
-	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_Kirby_Sword";
+	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_Kirby_SwordHat";
+	static constexpr const wchar_t* Kirby_PartTag = L"SwordHat";
 
 private:
 	CKirby_SwordHat(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -52,13 +52,10 @@ private:
 	CModel* m_pModelCom{};
 	CAnimator* m_pAnimatorCom{};
 
-private:
-	const _float4x4* m_pSocketBoneMatrix{ nullptr };
-
 public:
 	static CKirby_SwordHat* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
-protected:
+private:
 	virtual void Free();
 };
 

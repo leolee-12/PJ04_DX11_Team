@@ -19,6 +19,8 @@ namespace Client
 	};
 
 	enum class VTXTEX_SHADER { DEFAULT, ALPHABLEND };
+
+	enum class KIRBY_ABILITY_TYPE { NORMAL, SWORD };
 }
 
 using namespace Client;

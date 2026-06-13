@@ -2,6 +2,7 @@
 
 #include "Character.h"
 
+#include "GameContent_const.h"
 #include "Kirby_Command.h"
 
 NS_BEGIN(physx)
@@ -37,6 +38,10 @@ public:
 
 	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_Kirby";
 
+	// Controller(Collider: Capsule)
+	static constexpr _float CCT_RADIUS = 0.75f;
+	static constexpr _float CCT_HEIGHT = 0.2f;
+
 	static constexpr _float s_fFallVelocityY = -7.f;
 
 	static constexpr _float s_fLinearDrag = 0.9f;
@@ -47,8 +52,6 @@ public:
 
 	static constexpr _float s_fMaxHorizontalSpeed = 8.f;
 	static constexpr _float s_fHoveringMaxHorizontalSpeed = 4.f;
-
-
 
 private:
 	CKirby(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
@@ -69,6 +72,8 @@ public:
 public:
 	CMovement_Child* Get_Movement() { return m_pMovement; }
 	CKirby_Body* Get_Body() { return m_pBody; }
+
+	void OnOffParts(KIRBY_ABILITY_TYPE eAbilityType, _bool fOn);
 
 public:
 	void Add_MoveDir(const _float3& vWishDir);
@@ -95,17 +100,6 @@ private:
 
 	physx::PxController* m_pController = { nullptr };
 	CMovement_Child* m_pMovement = { nullptr };
-
-	// Controller(Collider: Capsule)
-	static constexpr _float CCT_RADIUS = 0.75f;
-	static constexpr _float CCT_HEIGHT = 0.2f;
-
-	// Movement
-	static constexpr _float MOVE_SPEED = 7.0f;
-	static constexpr _float ROT_SPEED = 720.0f;   // degree/sec
-
-	static constexpr _float MOVE_ACCEL = 130.f;
-	static constexpr _float MOVE_DECEL = 70.f;
 
 	_float3 m_vWishDir{};
 

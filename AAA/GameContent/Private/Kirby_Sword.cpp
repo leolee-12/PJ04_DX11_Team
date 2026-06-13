@@ -7,12 +7,12 @@
 #include "Animator.h"
 
 CKirby_Sword::CKirby_Sword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CPartObject(pDevice, pContext)
+    : CKirby_OnOffPart(pDevice, pContext)
 {
 }
 
 CKirby_Sword::CKirby_Sword(const CKirby_Sword& Prototype)
-    : CPartObject(Prototype) {
+    : CKirby_OnOffPart(Prototype) {
 }
 
 HRESULT CKirby_Sword::Initialize_Prototype()
@@ -24,8 +24,6 @@ HRESULT CKirby_Sword::Initialize_Prototype()
 HRESULT CKirby_Sword::Initialize(void* pArg)
 {
     KIRBY_SWORD_DESC* pDesc = static_cast<KIRBY_SWORD_DESC*>(pArg);
-
-    m_pSocketBoneMatrix = pDesc->pSocketBoneMatrix;
 
     if (FAILED(__super::Initialize(pDesc)))
         return E_FAIL;
@@ -40,10 +38,15 @@ HRESULT CKirby_Sword::Initialize(void* pArg)
 
 void CKirby_Sword::Priority_Update(_float fTimeDelta)
 {
+    if (m_bOn == false)
+        return;
 }
 
 void CKirby_Sword::Update(_float fTimeDelta)
 {
+    if (m_bOn == false)
+        return;
+
     if (m_pGameInstance_Proxy->Is_EditMode())
         return;
 
@@ -52,8 +55,10 @@ void CKirby_Sword::Update(_float fTimeDelta)
 
 void CKirby_Sword::Late_Update(_float fTimeDelta)
 {
-    __super::Compute_CombinedWorldMatrix(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()) *
-        XMLoadFloat4x4(m_pSocketBoneMatrix));
+    if (m_bOn == false)
+        return;
+
+    __super::Late_Update(fTimeDelta);
 
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }

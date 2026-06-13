@@ -10,6 +10,7 @@
 // Parts
 #include "Kirby_Body.h"
 #include "Kirby_Sword.h"
+#include "Kirby_SwordHat.h"
 
 #include "Kirby_InputManager.h"
 #include "Kirby_Controller.h"
@@ -96,6 +97,26 @@ HRESULT CKirby::Render()
     return S_OK;
 }
 
+void CKirby::OnOffParts(KIRBY_ABILITY_TYPE eAbilityType, _bool fOn)
+{
+    auto OnOffPart = [this](const wchar_t* PartTag, _bool bOn)->void
+        {
+            auto iter = m_PartObjects.find(PartTag);
+            if (iter != m_PartObjects.end())
+            {
+                static_cast<CKirby_OnOffPart*>(iter->second)->PartOnOff(bOn);
+            }
+        };
+
+    switch (eAbilityType)
+    {
+        case KIRBY_ABILITY_TYPE::SWORD:
+            OnOffPart(CKirby_Sword::Kirby_PartTag, fOn);
+            OnOffPart(CKirby_SwordHat::Kirby_PartTag, fOn);
+            break;
+    }
+}
+
 void CKirby::Add_MoveDir(const _float3& vWishDir)
 {
     XMStoreFloat3(&m_vWishDir,
@@ -168,7 +189,16 @@ HRESULT CKirby::Ready_PartObjects()
     SwordDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("RHaveL");
 
     if (FAILED(Add_PartObject(ETOUI(LEVEL::GAMEPLAY), CKirby_Sword::PROTOTYPE_TAG,
-        TEXT("Sword"), &SwordDesc)))
+        CKirby_Sword::Kirby_PartTag, &SwordDesc)))
+        return E_FAIL;
+
+    // SwordHat
+    CKirby_SwordHat::KIRBY_SWORDHAT_DESC SwordHatDesc{};
+    SwordHatDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    SwordHatDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("HatL");
+
+    if (FAILED(Add_PartObject(ETOUI(LEVEL::GAMEPLAY), CKirby_SwordHat::PROTOTYPE_TAG,
+        CKirby_SwordHat::Kirby_PartTag, &SwordHatDesc)))
         return E_FAIL;
 
     return S_OK;

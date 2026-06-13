@@ -7,12 +7,12 @@
 #include "Animator.h"
 
 CKirby_SwordHat::CKirby_SwordHat(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CPartObject(pDevice, pContext)
+    : CKirby_OnOffPart(pDevice, pContext)
 {
 }
 
 CKirby_SwordHat::CKirby_SwordHat(const CKirby_SwordHat& Prototype)
-    : CPartObject(Prototype) {
+    : CKirby_OnOffPart(Prototype) {
 }
 
 HRESULT CKirby_SwordHat::Initialize_Prototype()
@@ -25,25 +25,28 @@ HRESULT CKirby_SwordHat::Initialize(void* pArg)
 {
     KIRBY_SWORDHAT_DESC* pDesc = static_cast<KIRBY_SWORDHAT_DESC*>(pArg);
 
-    m_pSocketBoneMatrix = pDesc->pSocketBoneMatrix;
-
     if (FAILED(__super::Initialize(pDesc)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
-    m_pAnimatorCom->Play("Reset", true, true);
+    m_pAnimatorCom->Play("Deform", true, true);
 
     return S_OK;
 }
 
 void CKirby_SwordHat::Priority_Update(_float fTimeDelta)
 {
+    if (m_bOn == false)
+        return;
 }
 
 void CKirby_SwordHat::Update(_float fTimeDelta)
 {
+    if (m_bOn == false)
+        return;
+
     if (m_pGameInstance_Proxy->Is_EditMode())
         return;
 
@@ -52,8 +55,10 @@ void CKirby_SwordHat::Update(_float fTimeDelta)
 
 void CKirby_SwordHat::Late_Update(_float fTimeDelta)
 {
-    __super::Compute_CombinedWorldMatrix(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()) *
-        XMLoadFloat4x4(m_pSocketBoneMatrix));
+    if (m_bOn == false)
+        return;
+
+    __super::Late_Update(fTimeDelta);
 
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
@@ -67,23 +72,21 @@ HRESULT CKirby_SwordHat::Render()
 
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
-        _uint iPassIdx = 0;
+        _uint iPassIdx = 1;
+
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
-            iPassIdx = 0;
+            return E_FAIL;
 
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", i, MTEX_TYPE::NORMALS, 0)))
-            iPassIdx = 0;
+            return E_FAIL;
 
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
-            iPassIdx = 0;
-
-        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnknownTexture", i, MTEX_TYPE::UNKNOWN, 0)))
-            iPassIdx = 1;
+            return E_FAIL;
 
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Begin(1)))
+        if (FAILED(m_pShaderCom->Begin(iPassIdx)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render(i)))
@@ -101,7 +104,7 @@ HRESULT CKirby_SwordHat::Ready_Components()
         return E_FAIL;
 
     /* For.Com_Model */
-    m_pModelCom = Add_Component<CModel>(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Sword"), TEXT("Com_Model"));
+    m_pModelCom = Add_Component<CModel>(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_SwordHat"), TEXT("Com_Model"));
     if (m_pModelCom == nullptr)
         return E_FAIL;
 
