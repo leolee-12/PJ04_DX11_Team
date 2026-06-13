@@ -532,7 +532,7 @@ HRESULT CLevel_Edit::Save_MapOverride()
     if (nullptr == m_pMapPreviewSession)
         return E_FAIL;
 
-    const Client::MAP_LEVEL_CONTENT_DESC MapContentDesc
+    const Client::MAP_EDIT_DATA MapContentDesc
         = m_pMapPreviewSession->Build_MapContentSnapshot();
 
     if (!MapContentDesc.bHasMapContent || 0 > MapContentDesc.iPresetIndex)
@@ -657,7 +657,7 @@ HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
 
     Clear_MapPreview();
 
-    Client::MAP_LEVEL_CONTENT_DESC ResolvedMapContentDesc{};
+    Client::MAP_EDIT_DATA ResolvedMapContentDesc{};
     if (nullptr != m_pMapPreviewSession)
         ResolvedMapContentDesc = m_pMapPreviewSession->Get_MapContentDesc();
 
@@ -797,7 +797,7 @@ HRESULT CLevel_Edit::Load_MapPreviewStage(_uint iPresetIndex)
     else
         Clear_MapPreviewStage();
 
-    Client::MAP_LEVEL_CONTENT_DESC ResolvedMapContentDesc{};
+    Client::MAP_EDIT_DATA ResolvedMapContentDesc{};
     if (nullptr != m_pMapPreviewSession)
         ResolvedMapContentDesc = m_pMapPreviewSession->Get_MapContentDesc();
 
@@ -919,7 +919,7 @@ HRESULT CLevel_Edit::Load_MapPreviewEnv(_uint iPresetIndex)
     else
         Clear_MapPreviewEnv();
 
-    Client::MAP_LEVEL_CONTENT_DESC ResolvedMapContentDesc{};
+    Client::MAP_EDIT_DATA ResolvedMapContentDesc{};
     if (nullptr != m_pMapPreviewSession)
         ResolvedMapContentDesc = m_pMapPreviewSession->Get_MapContentDesc();
 
@@ -1201,7 +1201,7 @@ void CLevel_Edit::Append_MapLevelData(json* pInOutLevel) const
 
     if (nullptr != m_pMapPreviewSession)
     {
-        const Client::MAP_LEVEL_CONTENT_DESC MapContentDesc
+        const Client::MAP_EDIT_DATA MapContentDesc
             = m_pMapPreviewSession->Build_MapContentSnapshot();
 
         if (MapContentDesc.bHasMapContent && 0 <= MapContentDesc.iPresetIndex)
@@ -1214,7 +1214,7 @@ void CLevel_Edit::Append_MapLevelData(json* pInOutLevel) const
 
 HRESULT CLevel_Edit::Load_MapLevelContentFromJson(const json& jLevel)
 {
-    Client::MAP_LEVEL_CONTENT_DESC MapContentDesc{};
+    Client::MAP_EDIT_DATA MapContentDesc{};
     if (FAILED(Client::CMap_LevelContent::Deserialize(jLevel, &MapContentDesc)))
     {
         MSG_BOX("MAP CONTENT PARSE ERROR");
@@ -1343,7 +1343,7 @@ _bool CLevel_Edit::Try_RegisterAddedMapOverridePlacement(CGameObject* pObject, c
     if (!CMap_Loader::Is_MapLayer(m_strPendingLayer))
         return false;
 
-    MAP_ADDED_OBJECT_DESC AddedDesc{};
+    MAP_ADD_OBJECT AddedDesc{};
     AddedDesc.strPrototypeTag = m_strPendingProto;
     AddedDesc.strLayerTag = m_strPendingLayer;
     AddedDesc.strObjectTag = strObjectTag;
@@ -1371,7 +1371,7 @@ void CLevel_Edit::Try_RegisterLoadedAddedMapObject(
     const auto& AddedMapObjects =
         m_pMapPreviewSession->Get_MapContentDesc().OverrideDesc.AddedMapObjects;
 
-    for (const Client::MAP_ADDED_OBJECT_DESC& AddedDesc : AddedMapObjects)
+    for (const Client::MAP_ADD_OBJECT& AddedDesc : AddedMapObjects)
     {
         if (AddedDesc.strPrototypeTag != strPrototypeTag)
             continue;

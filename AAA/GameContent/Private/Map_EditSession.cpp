@@ -22,7 +22,7 @@ void CMap_EditSession::Reset()
 	Clear_RuntimeState();
 }
 
-void CMap_EditSession::Set_MapContentDesc(const MAP_LEVEL_CONTENT_DESC& Desc)
+void CMap_EditSession::Set_MapContentDesc(const MAP_EDIT_DATA& Desc)
 {
 	m_MapContentDesc = Desc;
 	m_MapContentDesc.bHasMapContent = Desc.bHasMapContent
@@ -37,7 +37,7 @@ void CMap_EditSession::Set_MapContentDesc(const MAP_LEVEL_CONTENT_DESC& Desc)
 	Rebuild_DeletedEnvItemsFromWorkingDelta();
 }
 
-void CMap_EditSession::Set_MapContentMeta(const MAP_LEVEL_CONTENT_DESC& Desc)
+void CMap_EditSession::Set_MapContentMeta(const MAP_EDIT_DATA& Desc)
 {
 	m_MapContentDesc = Desc;
 	m_MapContentDesc.bHasMapContent = Desc.bHasMapContent
@@ -301,7 +301,7 @@ void CMap_EditSession::Set_EnvCreatedCount(_uint iCount)
 	m_iEnvCreatedCount = iCount;
 }
 
-void CMap_EditSession::Set_WorkingDelta(const MAP_OVERRIDE_DESC& Desc)
+void CMap_EditSession::Set_WorkingDelta(const MAP_EDIT_CHANGE& Desc)
 {
 	m_MapContentDesc.OverrideDesc = Desc;
 	Rebuild_DeletedEnvItemsFromWorkingDelta();
@@ -313,7 +313,7 @@ void CMap_EditSession::Set_WorkingDelta(const MAP_OVERRIDE_DESC& Desc)
 
 void CMap_EditSession::Register_AddedMapObject(
 	CGameObject* pObject,
-	const MAP_ADDED_OBJECT_DESC& Desc,
+	const MAP_ADD_OBJECT& Desc,
 	const _wstring& strDisplayName)
 {
 	if (nullptr == pObject)
@@ -392,9 +392,9 @@ _bool CMap_EditSession::Try_GetAddedMapObjectItem(
 	return true;
 }
 
-MAP_OVERRIDE_DESC CMap_EditSession::Build_WorkingDeltaSnapshot() const
+MAP_EDIT_CHANGE CMap_EditSession::Build_WorkingDeltaSnapshot() const
 {
-	MAP_OVERRIDE_DESC Snapshot = m_MapContentDesc.OverrideDesc;
+	MAP_EDIT_CHANGE Snapshot = m_MapContentDesc.OverrideDesc;
 	Snapshot.AddedMapObjects.clear();
 
 	if (!m_MapContentDesc.bLoadEnv)
@@ -409,7 +409,7 @@ MAP_OVERRIDE_DESC CMap_EditSession::Build_WorkingDeltaSnapshot() const
 		if (Iter == m_AddedMapObjectsByRuntime.end())
 			continue;
 
-		MAP_ADDED_OBJECT_DESC AddedDesc = Iter->second;
+		MAP_ADD_OBJECT AddedDesc = Iter->second;
 
 		if (nullptr != pObject)
 			AddedDesc.jObject = pObject->Serialize();
@@ -440,9 +440,9 @@ MAP_OVERRIDE_DESC CMap_EditSession::Build_WorkingDeltaSnapshot() const
 	return Snapshot;
 }
 
-MAP_LEVEL_CONTENT_DESC CMap_EditSession::Build_MapContentSnapshot() const
+MAP_EDIT_DATA CMap_EditSession::Build_MapContentSnapshot() const
 {
-	MAP_LEVEL_CONTENT_DESC Desc = m_MapContentDesc;
+	MAP_EDIT_DATA Desc = m_MapContentDesc;
 	Desc.bHasMapContent = (0 <= Desc.iPresetIndex) || !Desc.strManifestPath.empty();
 	Desc.OverrideDesc = Build_WorkingDeltaSnapshot();
 	return Desc;

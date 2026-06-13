@@ -134,8 +134,8 @@ private:
 		const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);
 
 	HRESULT Prepare_MapContentForPreviewLoad(_uint iPresetIndex, _bool bPresetChanged, _bool bPreserveEnvRuntimeState);
-	MAP_LEVEL_CONTENT_DESC Build_MapPreviewContentDescSnapshot() const;
-	void    Apply_MapPreviewContentDesc(const MAP_LEVEL_CONTENT_DESC& Desc, _bool bPreserveRuntimeState = false);
+	MAP_EDIT_DATA Build_MapPreviewContentDescSnapshot() const;
+	void    Apply_MapPreviewContentDesc(const MAP_EDIT_DATA& Desc, _bool bPreserveRuntimeState = false);
 	const _wstring& Get_MapPreviewLoadedStageNameRef() const;
 	_uint   Get_MapPreviewEnvCreatedCountInternal() const;
 	void    Set_MapPreviewStageRuntime(_bool bLoaded, const wstring& strStageName = L"");

@@ -1,9 +1,7 @@
 #include "Map_Loader.h"
 #include "Map_LayerPolicy.h"
 #include "Map_PresetCatalog.h"
-#include "Map_LevelContent.h"
-#include "Map_OverrideStore.h"
-#include "Map_StageOverrideSerializer.h"
+#include "Map_EditFile.h"
 #include "Map_Builder.h"
 #include "Map_ModelResolver.h"
 #include "Map_ProtoRegister.h"
@@ -60,7 +58,7 @@ namespace
 		return true;
 	}
 
-	bool Try_LoadLevelMapContent(const _wstring& strLevelObjectsPath, MAP_LEVEL_CONTENT_DESC* pOutDesc)
+	bool Try_LoadLevelMapContent(const _wstring& strLevelObjectsPath, MAP_EDIT_DATA* pOutDesc)
 	{
 		if (nullptr == pOutDesc)
 			return false;
@@ -77,7 +75,7 @@ namespace
 		try
 		{
 			json jLevel = json::parse(strContent);
-			return SUCCEEDED(CMap_LevelContent::Deserialize(jLevel, pOutDesc));
+			return SUCCEEDED(CMap_EditFile::Load_Data(jLevel, pOutDesc));
 		}
 		catch (const json::exception&)
 		{
@@ -93,7 +91,7 @@ namespace
 
 	void Collect_DeletedEnvDescs(
 		const vector<ENV_OBJECT_DESC>& SourceDescs,
-		const MAP_OVERRIDE_DESC* pOverrideDesc,
+		const MAP_EDIT_CHANGE* pOverrideDesc,
 		vector<ENV_OBJECT_DESC>* pOutDeletedEnvDescs)
 	{
 		if (nullptr == pOutDeletedEnvDescs)
@@ -106,7 +104,7 @@ namespace
 
 		for (const auto& Desc : SourceDescs)
 		{
-			const _wstring strKey = CMap_Override::Build_EnvObjectStableKey(Desc);
+			const _wstring strKey = CMap_EditFile::Make_EnvKey(Desc);
 			if (pOverrideDesc->DeletedEnvObjectKeys.find(strKey) != pOverrideDesc->DeletedEnvObjectKeys.end())
 				pOutDeletedEnvDescs->push_back(Desc);
 		}
@@ -144,7 +142,7 @@ namespace
 		const _wstring& strFallbackManifestPath,
 		const _wstring& strLevelObjectsPath,
 		_wstring* pOutManifestPath,
-		MAP_LEVEL_CONTENT_DESC* pOutMapContentDesc,
+		MAP_EDIT_DATA* pOutMapContentDesc,
 		json* pOutMapStageOverride = nullptr,
 		_bool* pOutHasMapStageOverride = nullptr)
 	{
@@ -174,7 +172,7 @@ namespace
 		if (pOutMapContentDesc->strManifestPath.empty())
 			pOutMapContentDesc->strManifestPath = *pOutManifestPath;
 
-		const HRESULT hrAsset = Client::CMap_OverrideStore::Load_OverrideAsset(
+		const HRESULT hrAsset = CMap_EditFile::Load_EditFile(
 			*pOutManifestPath,
 			pOutMapContentDesc,
 			pOutMapStageOverride,
@@ -317,7 +315,7 @@ HRESULT CMap_Loader::Preload_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 		return E_FAIL;
 
 	_wstring strResolvedManifestPath;
-	MAP_LEVEL_CONTENT_DESC MapContentDesc{};
+	MAP_EDIT_DATA MapContentDesc{};
 	if (FAILED(Resolve_LevelMapRequest(strFallbackManifestPath, strLevelObjectsPath, &strResolvedManifestPath, &MapContentDesc)))
 	{
 		return E_FAIL;
@@ -331,7 +329,7 @@ HRESULT CMap_Loader::Preload_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 	HRESULT hr = pMapLoader->Build_Package(strResolvedManifestPath, &Package);
 
 	if (SUCCEEDED(hr) && MapContentDesc.bHasMapContent)
-		hr = CMap_Override::Apply(&Package, MapContentDesc.OverrideDesc);
+		hr = CMap_EditFile::Apply_Change(&Package, MapContentDesc.OverrideDesc);
 
 	if (SUCCEEDED(hr))
 	{
@@ -361,7 +359,7 @@ HRESULT CMap_Loader::Spawn_Map(const _wstring& strManifestPath, _uint iRuntimeLe
 }
 
 HRESULT CMap_Loader::Spawn_Map_WithOverride(const _wstring& strManifestPath, _uint iRuntimeLevel,
-	const MAP_OVERRIDE_DESC* pOverrideDesc, MAP_LOAD_REPORT* pOutReport, CMapStage** ppOutStage)
+	const MAP_EDIT_CHANGE* pOverrideDesc, MAP_LOAD_REPORT* pOutReport, CMapStage** ppOutStage)
 {
 	if (strManifestPath.empty())
 		return E_FAIL;
@@ -372,7 +370,7 @@ HRESULT CMap_Loader::Spawn_Map_WithOverride(const _wstring& strManifestPath, _ui
 
 	if (pOverrideDesc != nullptr)
 	{
-		const HRESULT hrApply = CMap_Override::Apply(&Package, *pOverrideDesc);
+		const HRESULT hrApply = CMap_EditFile::Apply_Change(&Package, *pOverrideDesc);
 		if (FAILED(hrApply))
 			return hrApply;
 	}
@@ -407,7 +405,7 @@ HRESULT CMap_Loader::Spawn_Map(
 	CMapStage** ppOutStage)
 {
 	_wstring strResolvedManifestPath;
-	MAP_LEVEL_CONTENT_DESC MapContentDesc{};
+	MAP_EDIT_DATA MapContentDesc{};
 	json jMapStageOverride = json::object();
 	_bool bHasMapStageOverride = false;
 
@@ -440,7 +438,7 @@ HRESULT CMap_Loader::Spawn_Map(
 	if (bHasMapStageOverride)
 	{
 		CMapStage* pStageToApply = nullptr != ppOutStage ? *ppOutStage : pLocalStage;
-		if (FAILED(CMap_StageOverrideSerializer::Apply(pStageToApply, jMapStageOverride)))
+		if (FAILED(CMap_EditFile::Apply_Stage(pStageToApply, jMapStageOverride)))
 			return E_FAIL;
 	}
 
@@ -507,14 +505,14 @@ HRESULT CMap_Loader::Load_MapStage_Runtime(
 	if (!Is_RuntimeLoadContextValid(Context) || strMapManifestPath.empty())
 		return E_FAIL;
 
-	MAP_LEVEL_CONTENT_DESC MapContentDesc{};
+	MAP_EDIT_DATA MapContentDesc{};
 	json jLocalMapStageOverride = json::object();
 	_bool bLocalHasMapStageOverride = false;
 
 	json* pStageOverride = nullptr != pOutMapStageOverride ? pOutMapStageOverride : &jLocalMapStageOverride;
 	_bool* pHasStageOverride = nullptr != pOutHasMapStageOverride ? pOutHasMapStageOverride : &bLocalHasMapStageOverride;
 
-	const HRESULT hrAsset = CMap_OverrideStore::Load_OverrideAsset(
+	const HRESULT hrAsset = CMap_EditFile::Load_EditFile(
 		strMapManifestPath,
 		&MapContentDesc,
 		pStageOverride,
@@ -559,7 +557,7 @@ HRESULT CMap_Loader::Load_MapStage_Runtime(
 			if (SUCCEEDED(hr) && *pHasStageOverride)
 			{
 				CMapStage* pStageToApply = nullptr != ppOutStage ? *ppOutStage : pLocalStage;
-				hr = CMap_StageOverrideSerializer::Apply(pStageToApply, *pStageOverride);
+				hr = CMap_EditFile::Apply_Stage(pStageToApply, *pStageOverride);
 			}
 		}
 	}
@@ -571,7 +569,7 @@ HRESULT CMap_Loader::Load_MapStage_Runtime(
 HRESULT CMap_Loader::Load_Env_Runtime(
 	const MAP_RUNTIME_LOAD_CONTEXT& Context,
 	const _wstring& strMapManifestPath,
-	const MAP_OVERRIDE_DESC* pOverrideDesc,
+	const MAP_EDIT_CHANGE* pOverrideDesc,
 	MAP_LOAD_REPORT* pOutReport,
 	vector<ENV_OBJECT_DESC>* pOutDeletedEnvDescs,
 	_bool bEnableEnvObjectPicking)
@@ -585,12 +583,12 @@ HRESULT CMap_Loader::Load_Env_Runtime(
 	if (!Is_RuntimeLoadContextValid(Context) || strMapManifestPath.empty())
 		return E_FAIL;
 
-	MAP_LEVEL_CONTENT_DESC LoadedMapContentDesc{};
-	const MAP_OVERRIDE_DESC* pResolvedOverrideDesc = pOverrideDesc;
+	MAP_EDIT_DATA LoadedMapContentDesc{};
+	const MAP_EDIT_CHANGE* pResolvedOverrideDesc = pOverrideDesc;
 
 	if (nullptr == pResolvedOverrideDesc)
 	{
-		const HRESULT hrAsset = CMap_OverrideStore::Load_OverrideAsset(
+		const HRESULT hrAsset = CMap_EditFile::Load_EditFile(
 			strMapManifestPath,
 			&LoadedMapContentDesc);
 
@@ -619,7 +617,7 @@ HRESULT CMap_Loader::Load_Env_Runtime(
 		SpawnPackage.StageDesc = {};
 
 		if (nullptr != pResolvedOverrideDesc)
-			hr = CMap_Override::Apply(&SpawnPackage, *pResolvedOverrideDesc);
+			hr = CMap_EditFile::Apply_Change(&SpawnPackage, *pResolvedOverrideDesc);
 
 		if (SUCCEEDED(hr))
 		{
@@ -666,44 +664,53 @@ _bool CMap_Loader::Is_MapLayer(const _wstring& strLayerTag)
 	return CMap_LayerPolicy::Is_MapLayer(strLayerTag);
 }
 
-HRESULT CMap_Loader::Get_MapOverrideAssetPath(const _wstring& strManifestPath, _wstring* pOutOverridePath)
+HRESULT CMap_Loader::Get_MapOverrideAssetPath(const _wstring& strManifestPath, _wstring*
+	pOutOverridePath)
 {
-	return CMap_OverrideStore::Get_OverrideAssetPath(strManifestPath, pOutOverridePath);
+	return CMap_EditFile::Get_EditFilePath(strManifestPath, pOutOverridePath);
 }
 
-HRESULT CMap_Loader::Load_MapOverrideAsset(const _wstring& strManifestPath, MAP_LEVEL_CONTENT_DESC* pInOutMapContentDesc, json* pOutMapStageOverride, _bool* pOutHasMapStageOverride)
+HRESULT CMap_Loader::Load_MapOverrideAsset(const _wstring& strManifestPath, MAP_EDIT_DATA*
+	pInOutMapContentDesc, json* pOutMapStageOverride, _bool* pOutHasMapStageOverride)
 {
-	return CMap_OverrideStore::Load_OverrideAsset(strManifestPath, pInOutMapContentDesc, pOutMapStageOverride, pOutHasMapStageOverride);
+	return CMap_EditFile::Load_EditFile(strManifestPath, pInOutMapContentDesc, pOutMapStageOverride,
+		pOutHasMapStageOverride);
 }
 
-HRESULT CMap_Loader::Save_MapOverrideAsset(const MAP_LEVEL_CONTENT_DESC& MapContentDesc, const CMapStage* pStage)
+HRESULT CMap_Loader::Save_MapOverrideAsset(const MAP_EDIT_DATA& MapContentDesc, const CMapStage*
+	pStage)
 {
-	return CMap_OverrideStore::Save_OverrideAsset(MapContentDesc, pStage);
+	return CMap_EditFile::Save_EditFile(MapContentDesc, pStage);
 }
 
-HRESULT CMap_Loader::Get_MapPresetOverrideAssetPath(_uint iPresetIndex, const _wstring& strManifestPath, _wstring* pOutOverridePath)
+HRESULT CMap_Loader::Get_MapPresetOverrideAssetPath(_uint iPresetIndex, const _wstring&
+	strManifestPath, _wstring* pOutOverridePath)
 {
-	return CMap_OverrideStore::Get_PresetOverrideAssetPath(iPresetIndex, strManifestPath, pOutOverridePath);
+	return CMap_EditFile::Get_PresetEditFilePath(iPresetIndex, strManifestPath, pOutOverridePath);
 }
 
-HRESULT CMap_Loader::Load_MapPresetOverrideAsset(_uint iPresetIndex, const _wstring& strManifestPath, MAP_LEVEL_CONTENT_DESC* pInOutMapContentDesc, json* pOutMapStageOverride, _bool* pOutHasMapStageOverride)
+HRESULT CMap_Loader::Load_MapPresetOverrideAsset(_uint iPresetIndex, const _wstring&
+	strManifestPath, MAP_EDIT_DATA* pInOutMapContentDesc, json* pOutMapStageOverride, _bool*
+	pOutHasMapStageOverride)
 {
-	return CMap_OverrideStore::Load_PresetOverrideAsset(iPresetIndex, strManifestPath, pInOutMapContentDesc, pOutMapStageOverride, pOutHasMapStageOverride);
+	return CMap_EditFile::Load_PresetEditFile(iPresetIndex, strManifestPath, pInOutMapContentDesc,
+		pOutMapStageOverride, pOutHasMapStageOverride);
 }
 
-HRESULT CMap_Loader::Save_MapPresetOverrideAsset(_uint iPresetIndex, const MAP_LEVEL_CONTENT_DESC& MapContentDesc, const CMapStage* pStage)
+HRESULT CMap_Loader::Save_MapPresetOverrideAsset(_uint iPresetIndex, const MAP_EDIT_DATA&
+	MapContentDesc, const CMapStage* pStage)
 {
-	return CMap_OverrideStore::Save_PresetOverrideAsset(iPresetIndex, MapContentDesc, pStage);
+	return CMap_EditFile::Save_PresetEditFile(iPresetIndex, MapContentDesc, pStage);
 }
 
 json CMap_Loader::Serialize_MapStageOverride(const CMapStage* pStage)
 {
-	return CMap_StageOverrideSerializer::Serialize(pStage);
+	return CMap_EditFile::Save_Stage(pStage);
 }
 
 HRESULT CMap_Loader::Apply_MapStageOverride(CMapStage* pStage, const json& jOverride)
 {
-	return CMap_StageOverrideSerializer::Apply(pStage, jOverride);
+	return CMap_EditFile::Apply_Stage(pStage, jOverride);
 }
 
 HRESULT CMap_Loader::Ready_TexHub(CGameInstance_Proxy* pProxy)

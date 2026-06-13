@@ -609,6 +609,9 @@
     <ClInclude Include="..\Public\Kirby_ControllableState.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Map_EditFile.h">
+      <Filter>97. DataSystem\MapLoader\API</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -871,6 +874,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_ControllableState.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Map_EditFile.cpp">
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

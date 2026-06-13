@@ -116,7 +116,7 @@ HRESULT CMap_ProtoRegister::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, c
 			return E_FAIL;
 	}
 
-	for (const MAP_ADDED_OBJECT_DESC& Added : Package.AddedObjectDescs)
+	for (const MAP_ADD_OBJECT& Added : Package.AddedObjectDescs)
 	{
 		if (m_pProxy->Has_Prototype(Levels.iObjectLevel, Added.strPrototypeTag))
 			continue;

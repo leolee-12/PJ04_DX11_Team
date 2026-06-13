@@ -195,7 +195,7 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 			}
 		}
 	
-		for (const MAP_ADDED_OBJECT_DESC& Added : Package.AddedObjectDescs)
+		for (const MAP_ADD_OBJECT& Added : Package.AddedObjectDescs)
 		{
 			CGameObject* pCreatedObject = nullptr;
 

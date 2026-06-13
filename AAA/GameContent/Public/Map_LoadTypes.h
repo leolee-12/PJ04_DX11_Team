@@ -22,7 +22,7 @@ struct MAP_MANIFEST_DESC
     _wstring strDecorCollisionCatalogPath;
 };
 
-struct MAP_ADDED_OBJECT_DESC
+struct MAP_ADD_OBJECT
 {
     _wstring strPrototypeTag;
     _wstring strLayerTag;
@@ -35,7 +35,7 @@ struct MAP_PACKAGE
     MAP_STAGE_DESC StageDesc;
     vector<ENV_OBJECT_DESC> EnvObjectDescs;
     vector<_wstring> EnvJsonPaths;
-    vector<MAP_ADDED_OBJECT_DESC> AddedObjectDescs;
+    vector<MAP_ADD_OBJECT> AddedObjectDescs;
 };
 
 struct MAP_RUNTIME_LEVELS

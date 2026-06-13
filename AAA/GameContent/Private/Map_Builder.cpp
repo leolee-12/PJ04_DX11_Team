@@ -80,7 +80,7 @@ HRESULT CMap_Builder::Build_FromManifest(const _wstring& strManifestPath, MAP_PA
 		if (FAILED(CDataLoader::Read_Json(Manifest.strDeltaPath.c_str(), &strDeltaContent)))
 			return E_FAIL;
 
-		MAP_OVERRIDE_DESC OverrideDesc{};
+		MAP_EDIT_CHANGE OverrideDesc{};
 		json jDelta = json::parse(strDeltaContent);
 		if (FAILED(CMap_Override::Deserialize(jDelta, &OverrideDesc)))
 			return E_FAIL;

@@ -120,11 +120,11 @@ HRESULT CLoader::Ready_Resources_For_Edit()
             return Client::Ready_Prototype_Shaders(m_pGameInstance_Proxy, m_pDevice, m_pContext);
         });
 
-    Add_Work([this]() -> HRESULT
-        {
-            lstrcpy(m_szLoadingText, TEXT("Loading Fonts..."));
-            return Client::Load_Fonts(m_pGameInstance_Proxy);
-        });
+    //Add_Work([this]() -> HRESULT
+    //    {
+    //        lstrcpy(m_szLoadingText, TEXT("Loading Fonts..."));
+    //        return Client::Load_Fonts(m_pGameInstance_Proxy);
+    //    });
 
 
     Add_Work([this]() -> HRESULT

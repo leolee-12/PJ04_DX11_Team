@@ -69,7 +69,7 @@ public:
 	static HRESULT Spawn_Map_WithOverride(
 		const _wstring& strManifestPath,
 		_uint iRuntimeLevel,
-		const MAP_OVERRIDE_DESC* pOverrideDesc,
+		const MAP_EDIT_CHANGE* pOverrideDesc,
 		MAP_LOAD_REPORT* pOutReport = nullptr,
 		CMapStage** ppOutStage = nullptr);
 
@@ -105,7 +105,7 @@ public:
 	static HRESULT Load_Env_Runtime(
 		const MAP_RUNTIME_LOAD_CONTEXT& Context,
 		const _wstring& strMapManifestPath,
-		const MAP_OVERRIDE_DESC* pOverrideDesc = nullptr,
+		const MAP_EDIT_CHANGE* pOverrideDesc = nullptr,
 		MAP_LOAD_REPORT* pOutReport = nullptr,
 		vector<ENV_OBJECT_DESC>* pOutDeletedEnvDescs = nullptr,
 		_bool bEnableEnvObjectPicking = false);
@@ -116,12 +116,12 @@ public:
 	static _bool		Is_MapLayer(const _wstring& strLayerTag);
 
 	static HRESULT		Get_MapOverrideAssetPath(const _wstring& strManifestPath, _wstring* pOutOverridePath);
-	static HRESULT		Load_MapOverrideAsset(const _wstring& strManifestPath, MAP_LEVEL_CONTENT_DESC* pInOutMapContentDesc, json* pOutMapStageOverride = nullptr, _bool* pOutHasMapStageOverride = nullptr);
-	static HRESULT		Save_MapOverrideAsset(const MAP_LEVEL_CONTENT_DESC& MapContentDesc, const CMapStage* pStage);
+	static HRESULT		Load_MapOverrideAsset(const _wstring& strManifestPath, MAP_EDIT_DATA* pInOutMapContentDesc, json* pOutMapStageOverride = nullptr, _bool* pOutHasMapStageOverride = nullptr);
+	static HRESULT		Save_MapOverrideAsset(const MAP_EDIT_DATA& MapContentDesc, const CMapStage* pStage);
 
 	static HRESULT		Get_MapPresetOverrideAssetPath(_uint iPresetIndex, const _wstring& strManifestPath, _wstring* pOutOverridePath);
-	static HRESULT		Load_MapPresetOverrideAsset(_uint iPresetIndex, const _wstring& strManifestPath, MAP_LEVEL_CONTENT_DESC* pInOutMapContentDesc, json* pOutMapStageOverride = nullptr, _bool* pOutHasMapStageOverride = nullptr);
-	static HRESULT		Save_MapPresetOverrideAsset(_uint iPresetIndex, const MAP_LEVEL_CONTENT_DESC& MapContentDesc, const CMapStage* pStage);
+	static HRESULT		Load_MapPresetOverrideAsset(_uint iPresetIndex, const _wstring& strManifestPath, MAP_EDIT_DATA* pInOutMapContentDesc, json* pOutMapStageOverride = nullptr, _bool* pOutHasMapStageOverride = nullptr);
+	static HRESULT		Save_MapPresetOverrideAsset(_uint iPresetIndex, const MAP_EDIT_DATA& MapContentDesc, const CMapStage* pStage);
 
 	static json			Serialize_MapStageOverride(const CMapStage* pStage);
 	static HRESULT		Apply_MapStageOverride(CMapStage* pStage, const json& jOverride);

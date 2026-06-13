@@ -37,9 +37,9 @@ private:
 public:
 	void Reset();
 
-	const MAP_LEVEL_CONTENT_DESC& Get_MapContentDesc() const { return m_MapContentDesc; }
-	void Set_MapContentDesc(const MAP_LEVEL_CONTENT_DESC& Desc);
-	void Set_MapContentMeta(const MAP_LEVEL_CONTENT_DESC& Desc);
+	const MAP_EDIT_DATA& Get_MapContentDesc() const { return m_MapContentDesc; }
+	void Set_MapContentDesc(const MAP_EDIT_DATA& Desc);
+	void Set_MapContentMeta(const MAP_EDIT_DATA& Desc);
 
 	_bool Is_LoadStageEnabled() const { return m_MapContentDesc.bLoadStage; }
 	_bool Is_LoadEnvEnabled() const { return m_MapContentDesc.bLoadEnv; }
@@ -51,18 +51,15 @@ public:
 
 	_uint Get_DeletedEnvCount() const { return static_cast<_uint>(m_DeletedMapPreviewEnvOrder.size()); }
 
-	void Register_PreviewObject(
-		const _wstring& strLayerTag,
-		const _wstring& strObjectTag,
-		CGameObject* pObject);
+	void Register_PreviewObject(const _wstring& strLayerTag, const _wstring& strObjectTag, CGameObject* pObject);
 
 	void Unregister_PreviewObject(CGameObject* pObject);
 	_bool Track_DeletedPreviewObject(CGameObject* pObject);
 
-	const MAP_OVERRIDE_DESC& Get_WorkingDelta() const { return m_MapContentDesc.OverrideDesc; }
-	void Set_WorkingDelta(const MAP_OVERRIDE_DESC& Desc);
-	MAP_OVERRIDE_DESC Build_WorkingDeltaSnapshot() const;
-	MAP_LEVEL_CONTENT_DESC Build_MapContentSnapshot() const;
+	const MAP_EDIT_CHANGE& Get_WorkingDelta() const { return m_MapContentDesc.OverrideDesc; }
+	void Set_WorkingDelta(const MAP_EDIT_CHANGE& Desc);
+	MAP_EDIT_CHANGE Build_WorkingDeltaSnapshot() const;
+	MAP_EDIT_DATA Build_MapContentSnapshot() const;
 
 	const vector<_wstring>& Get_DeletedEnvOrder() const { return m_DeletedMapPreviewEnvOrder; }
 	_bool Try_GetDeletedEnvItem(const _wstring& strStableKey, MAP_PREVIEW_ENV_ITEM* pOutItem) const;
@@ -88,7 +85,7 @@ public:
 
 	void Register_AddedMapObject(
 		CGameObject* pObject,
-		const MAP_ADDED_OBJECT_DESC& Desc,
+		const MAP_ADD_OBJECT& Desc,
 		const _wstring& strDisplayName);
 
 	_bool Unregister_AddedMapObject(CGameObject* pObject);
@@ -99,13 +96,13 @@ public:
 	_bool Try_GetAddedMapObjectItem(CGameObject* pObject, MAP_PREVIEW_ADDED_ITEM* pOutItem) const;
 
 private:
-	MAP_LEVEL_CONTENT_DESC m_MapContentDesc = {};
+	MAP_EDIT_DATA m_MapContentDesc = {};
 
 	unordered_map<CGameObject*, MAP_PREVIEW_ENV_ITEM> m_MapPreviewEnvItems;
 	unordered_map<_wstring, MAP_PREVIEW_ENV_ITEM> m_DeletedMapPreviewEnvItems;
 	vector<_wstring> m_DeletedMapPreviewEnvOrder;
 
-	unordered_map<CGameObject*, Client::MAP_ADDED_OBJECT_DESC> m_AddedMapObjectsByRuntime;
+	unordered_map<CGameObject*, Client::MAP_ADD_OBJECT> m_AddedMapObjectsByRuntime;
 	unordered_map<CGameObject*, MAP_PREVIEW_ADDED_ITEM> m_AddedMapObjectUiItems;
 	vector<CGameObject*> m_AddedMapObjectOrder;
 
