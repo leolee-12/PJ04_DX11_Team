@@ -101,6 +101,8 @@ private:
 	HRESULT Render_UI_MIDDLE();
 	HRESULT Render_UI_FRONT();
 
+	HRESULT Render_Curtain();
+
 	_uint Render_Width()  const;
 	_uint Render_Height() const;
 

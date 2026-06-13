@@ -111,7 +111,7 @@ HRESULT CUI_SpriteAnim::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Begin(1)))		// pass 1 : SpriteAnim
+	if (FAILED(m_pShaderCom->Begin(Render_Pass())))		// pass 1 : SpriteAnim
 		return E_FAIL;
 
 	if (FAILED(m_pVIBufferCom->Bind_Resources()))

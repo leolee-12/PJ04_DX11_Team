@@ -51,6 +51,9 @@ float4x4 g_CamViewMatrixInverse;
 float g_fExposure = 1.0f; // 커비 ToneMapping 노출 스칼라
 float g_fToneMapMode = 1.0f; // 0=Reinhard(기존) / 1=ACES / 2=노출만(커비 literal)
 
+//ui커튼
+Texture2D g_CurtainTexture;
+
 
 
     //============================ Common VS ============================
@@ -401,7 +404,10 @@ float4 PS_DOF_COMPOSITE(PS_IN In) : SV_TARGET0
     return float4(lerp(sharp.rgb, b.rgb, saturate(tt)), 1.f);
 }
 
-
+float4 PS_CURTAIN_COMPOSITE(PS_IN In) : SV_TARGET0
+{
+    return g_CurtainTexture.Sample(LinearSampler, In.vTexcoord);
+}
 
 
     //============================ Technique ============================
@@ -487,5 +493,15 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DOF_COMPOSITE();
+    }
+
+    pass CurtainComposite // 9
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetBlendState(BS_AlphaBlend, float4(0, 0, 0, 0), 0xffffffff); // 알파오버
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_CURTAIN_COMPOSITE();
     }
 }

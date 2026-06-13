@@ -171,12 +171,24 @@ void CUI_Text::Bake_Text()
 
 	if (!m_strText.empty() && !m_strFontTag.empty())
 	{
+		// m_iAlign(0:L / 1:C / 2:R) == TEXT_ALIGN(LEFT/CENTER/RIGHT) 인덱스 그대로 일치
+		_int iAlign = m_iAlign;
+		if (iAlign < 0 || iAlign > ETOI(TEXT_ALIGN::RIGHT))
+			iAlign = ETOI(TEXT_ALIGN::LEFT);
+		TEXT_ALIGN eAlign = static_cast<TEXT_ALIGN>(iAlign);
+
+		// 박스(m_iTexW) 안에서 정렬 기준이 되는 X 위치
+		//  LEFT  -> 왼쪽 끝(0), CENTER -> 박스 가운데, RIGHT -> 오른쪽 끝
+		_float fPosX = 0.f;
+		if (eAlign == TEXT_ALIGN::CENTER)      fPosX = m_iTexW * 0.5f;
+		else if (eAlign == TEXT_ALIGN::RIGHT)  fPosX = static_cast<_float>(m_iTexW);
+
 		m_pGameInstance_Proxy->Draw_Text_Raw(
 			m_strFontTag, m_strText.c_str(),
-			_float2(0.f, 0.f),                        
+			_float2(fPosX, 0.f),
 			XMVectorSet(1.f, 1.f, 1.f, 1.f),
 			_float2(m_fFontScale, m_fFontScale),
-			TEXT_ALIGN::LEFT);
+			eAlign);
 	}
 
 	m_pContext->OMSetRenderTargets(1, &pOldRTV, pOldDSV);

@@ -59,11 +59,11 @@ public:
 	}
 
 	_int							Get_Align() const { return m_iAlign; }
-	void							Set_Align(_int i) { m_iAlign = i; }
+	void							Set_Align(_int i) { m_iAlign = i; m_bTextDirty = true; }
 	const _wstring&					Get_FontTag() const { return m_strFontTag; }
-	void							Set_FontTag(const _wstring& strTag) { m_strFontTag = strTag; }
+	void							Set_FontTag(const _wstring& strTag) { m_strFontTag = strTag; m_bTextDirty = true; }
 
-	void							Set_Text(const _wstring& strText) { m_strText = strText; }
+	void							Set_Text(const _wstring& strText) { m_strText = strText; m_bTextDirty = true; }
 
 	void							Mark_TextDirty() { m_bTextDirty = true; }
 

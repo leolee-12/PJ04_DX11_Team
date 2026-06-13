@@ -108,9 +108,6 @@
     <ClInclude Include="..\Public\AnimUITool_App.h">
       <Filter>00. App</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Level_Tool.h">
-      <Filter>01. Levels\Tool</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\EditCamera.h">
       <Filter>02. Objects\Camera</Filter>
     </ClInclude>
@@ -149,6 +146,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Panel_Preview.h">
       <Filter>03. Panels\Preview</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Tool.h">
+      <Filter>01. Levels\Tool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

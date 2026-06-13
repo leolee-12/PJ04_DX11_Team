@@ -14,6 +14,11 @@
 #include "UI_Effect.h"
 #include "UI_GaugeFill.h"
 #include "Effect_Loader.h"
+#include "UI_SpriteAnimCurtain.h"
+#include "UI_Curtain.h"
+#include "UI_Eraser.h"
+#include "UI_CurtainTexture.h"
+
 
 NS_BEGIN(Client)
 
@@ -188,6 +193,31 @@ HRESULT CLIENT_DLL Ready_Prototype_UIPartObjects(CGameInstance_Proxy* pProxy, ID
     if (!pProxy->Has_Prototype(iLevel, CUI_SpriteAnim::PROTOTYPE_TAG))
     {
         if (FAILED(pProxy->Add_Prototype(iLevel, CUI_SpriteAnim::PROTOTYPE_TAG, CUI_SpriteAnim::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
+
+    if (!pProxy->Has_Prototype(iLevel, CUI_SpriteAnimCurtain::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_SpriteAnimCurtain::PROTOTYPE_TAG,
+            CUI_SpriteAnimCurtain::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
+
+    if (!pProxy->Has_Prototype(iLevel, CUI_Curtain::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_Curtain::PROTOTYPE_TAG, CUI_Curtain::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
+
+    if (!pProxy->Has_Prototype(iLevel, CUI_Eraser::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_Eraser::PROTOTYPE_TAG, CUI_Eraser::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
+
+    if (!pProxy->Has_Prototype(iLevel, CUI_CurtainTexture::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_CurtainTexture::PROTOTYPE_TAG, CUI_CurtainTexture::Create(pDevice, pContext))))
             return E_FAIL;
     }
 

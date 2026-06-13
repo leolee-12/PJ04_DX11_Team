@@ -124,8 +124,20 @@ void CPanel_UICanvas::Render()
         if (sel.pContainer && ImGui::MenuItem("Effect"))
             AddPart(UI_PART_TYPE::EFFECT);
 
-        if (sel.pContainer && ImGui::MenuItem("GaugeFill"))
+        if (sel.pContainer && ImGui::MenuItem("GaugeFill")) 
             AddPart(UI_PART_TYPE::GAUGEFILL);
+
+        if (sel.pContainer && ImGui::MenuItem("Curtain"))
+            AddPart(UI_PART_TYPE::CURTAIN);
+
+        if (sel.pContainer && ImGui::MenuItem("Eraser"))
+            AddPart(UI_PART_TYPE::ERASER);
+
+        if (sel.pContainer && ImGui::MenuItem("SpriteAnimCurtain"))
+            AddPart(UI_PART_TYPE::SPRITECURTAIN);
+
+        if (sel.pContainer && ImGui::MenuItem("CurtainTexture"))
+            AddPart(UI_PART_TYPE::TEXTURECURTAIN);
 
         ImGui::EndPopup();
     }
@@ -310,7 +322,7 @@ void CPanel_UICanvas::Render()
                     std::string strName = m_szManifestSaveName;
                     std::wstring strFileName = StrToWstr(strName);
 
-                    std::filesystem::path path = L"../../Resources/CHJ/UI/Levels";
+                    std::filesystem::path path = L"../../Resources/YSH/UIs/Manifest/";
                     path /= strFileName;
 
                     if (path.extension().empty())

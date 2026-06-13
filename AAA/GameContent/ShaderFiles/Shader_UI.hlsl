@@ -40,6 +40,7 @@ Texture2D g_EffectTexture;
 Texture2D g_MaskTexture;
 
 Texture2DArray g_TextureArray;              // SpriteAnim용
+bool g_bUseTexture = true; // 커튼: 텍스처 있으면 곱하고, 없으면 단색
 
 float Remap_BarU(float u)
 {
@@ -178,6 +179,14 @@ PS_OUT PS_SPRITEANIM(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_ALPHAERASE(PS_IN In)
+{
+    PS_OUT Out;
+    float a = g_Texture.Sample(UISampler, In.vTexcoord).a * g_fAlpha; // 별=1, 바깥=0
+    Out.vColor = float4(0.f, 0.f, 0.f, a); // RGB는 BS_AlphaErase에서 무시, a가 마스크
+    return Out;
+}
+
 PS_OUT PS_MASKED_COLOR(PS_IN In)
 {
     PS_OUT Out;
@@ -288,6 +297,21 @@ PS_OUT PS_GAUGE_FILL_TEXTURE(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_CURTAINFILL(PS_IN In)
+{
+    PS_OUT Out;
+    float4 col = g_vColor; // 단색 베이스
+    if (g_bUseTexture)
+        col *= g_Texture.Sample(UISampler, ApplyUVTransform(In.vTexcoord));
+    col.a *= g_fAlpha;
+
+    if (col.a <= 0.f)
+        discard;
+
+    Out.vColor = col;
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass UI // pass 0
@@ -368,5 +392,35 @@ technique11 DefaultTechnique
         SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
         SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0, PS_GAUGE_FILL_TEXTURE()));
+    }
+
+    pass CurtainFill // pass 8 : 커튼 RT 일반 텍스처(배경/구멍위 이미지), 알파 기록
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetBlendState(BS_CurtainOver, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_CURTAINFILL())); // 기존 PS 재사용
+    }
+
+    pass CurtainFillAnim // pass 9 : 커튼 RT 스프라이트애님 별, 알파 기록
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetBlendState(BS_CurtainOver, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_SPRITEANIM())); // 기존 PS 재사용
+    }
+
+    pass AlphaErase // pass 10 : 지우개 (별 모양만큼 RT 알파를 0으로)
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetBlendState(BS_AlphaErase, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_ALPHAERASE()));
     }
 }

@@ -10,7 +10,7 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL CUI_SpriteAnim final : public CUIPartObject
+class CLIENT_DLL CUI_SpriteAnim : public CUIPartObject
 {
 	GENERATED_BODY(CUI_SpriteAnim)
 
@@ -70,6 +70,7 @@ public: // UIContainerObject 제어 API
 	_int					Get_FrameCount() const { return m_iFrameCount; }
 	_bool					Is_Playing()     const { return m_bIsPlay; }
 	_bool					Is_Finished()    const { return m_bFinished; }
+	_bool					Is_Loop()		 const { return m_bLoop; }
 
 	// 에디터에서 데이터 제작 용도
 	HRESULT					Set_Texture(_int iLevel, const _wstring& strProtoTag);
@@ -77,7 +78,10 @@ public: // UIContainerObject 제어 API
 	void					Seek(_float fRatio);			// 0 ~ 1 위치로 Seek
 	_float					Get_Progress() const;			// 현재 진행도 0 ~ 1
 
-private:
+protected:
+	virtual _uint Render_Pass() const { return 1; }
+
+protected:
 	CShader*				m_pShaderCom = { nullptr };
 	CTexture*				m_pTextureCom = { nullptr };
 	CVIBuffer_Rect*			m_pVIBufferCom = { nullptr };
@@ -88,7 +92,7 @@ private:
 	_bool					m_bIsPlay = { false };
 	_bool					m_bFinished = { false };
 
-private:
+protected:
 	HRESULT					Ready_Components(UI_SPRITEANIM_DESC* pDesc);
 	HRESULT					Bind_ShaderResources();
 	void					Sync_FrameCount();

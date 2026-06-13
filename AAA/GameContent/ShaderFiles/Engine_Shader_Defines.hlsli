@@ -133,3 +133,27 @@ BlendState BS_Additive
     DestBlend = One;
     BlendOp = Add;
 };
+
+// 커튼 RT 용
+BlendState BS_CurtainOver
+{
+    BlendEnable[0] = true;
+    SrcBlend = Src_Alpha;
+    DestBlend = Inv_Src_Alpha;
+    BlendOp = Add;
+    SrcBlendAlpha = One; // dstA = srcA + (1-srcA)*dstA
+    DestBlendAlpha = Inv_Src_Alpha;
+    BlendOpAlpha = Add;
+};
+
+// 지우개: RGB는 그대로, 대상 알파만 별 모양으로 깎음
+BlendState BS_AlphaErase
+{
+    BlendEnable[0] = true;
+    SrcBlend = Zero; // RGB 유지
+    DestBlend = One;
+    BlendOp = Add;
+    SrcBlendAlpha = Zero; // dstA = (1-srcA)*dstA
+    DestBlendAlpha = Inv_Src_Alpha;
+    BlendOpAlpha = Add;
+};

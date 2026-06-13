@@ -18,6 +18,8 @@
 #include "UI_Effect.h"
 #include "UI_GaugeFill.h"
 #include "UIAnimatorCom.h"
+#include "UI_Curtain.h"
+#include "UI_CurtainAnimBase.h"
 
 namespace
 {
@@ -379,6 +381,20 @@ void CPanel_Inspector::Render_Properties(IReflectable* pHolder)
                                             pGauge->Set_Texture(
                                                 ETOUI(TOOL_LEVEL::EDIT),
                                                 strProtoTag);
+                                    }
+                                    else if (auto* pCurtain =
+                                        dynamic_cast<Client::CUI_Curtain*>(sel.pPart))
+                                    {
+                                        if (prop.strName == L"TextureProtoTag")
+                                            pCurtain->Set_Texture(
+                                                ETOUI(TOOL_LEVEL::EDIT), strProtoTag);
+                                    }
+                                    else if (auto* pEraser =
+                                        dynamic_cast<Client::CUI_CurtainAnimBase*>(sel.pPart))
+                                    {
+                                        if (prop.strName == L"TextureProtoTag")
+                                            pEraser->Set_Texture(
+                                                ETOUI(TOOL_LEVEL::EDIT), strProtoTag);
                                     }
                                 }
                             }
@@ -763,6 +779,9 @@ void CPanel_Inspector::Render_UIInspector()
             ImGui::TextDisabled(
                 "RunTime Spawn Class Tag : Save -> json in in !!");
         }
+
+        ImGui::Separator();
+        Render_Properties(sel.pContainer);
         return;
     }
 
@@ -821,7 +840,8 @@ void CPanel_Inspector::Render_UIInspector()
     ImGui::Separator();
 
     struct { RENDERUIID v; const char* n; } layers[] = {
-        { RENDERUIID::BACK, "BACK" }, { RENDERUIID::MIDDLE, "MIDDLE" }, { RENDERUIID::FRONT, "FRONT" }
+        { RENDERUIID::BACK, "BACK" }, { RENDERUIID::MIDDLE, "MIDDLE" }, { RENDERUIID::FRONT, "FRONT" },
+        { RENDERUIID::CURTAIN, "CURTAIN" }
     };
     const char* szCur = "?";
     for (auto& L : layers) if (L.v == pPart->Get_RenderLayer()) szCur = L.n;

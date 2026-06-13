@@ -262,6 +262,27 @@
     <Filter Include="00. GameObject\UI\Component\GaugeBar">
       <UniqueIdentifier>{0319824c-67e9-4142-8520-2c3bc1d47add}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\UI\UIPart\Curtain">
+      <UniqueIdentifier>{50e62849-c373-4657-829f-82a1ef120723}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart\Curtain\SpriteAnim">
+      <UniqueIdentifier>{4fcbe505-82ee-440a-a5d0-a9ffa573f348}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart\Curtain\Anim">
+      <UniqueIdentifier>{1dae57f3-f855-4352-afa2-5ed2eeeee3ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart\Curtain\Anim\Eraser">
+      <UniqueIdentifier>{9a4d44ca-fd80-4fdb-9d7d-9329be74e4c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart\Curtain\Anim\Texture">
+      <UniqueIdentifier>{b1b94500-8f62-4ab4-b98d-314399c987ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIContainer\FadeOut">
+      <UniqueIdentifier>{c2ff4b5b-9012-4fb3-932a-63f2808a88f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\UIPart\Curtain\Anim\BG">
+      <UniqueIdentifier>{608a4a2a-0e21-4b2b-a250-a9429a4b5c76}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -552,6 +573,27 @@
     <ClInclude Include="..\public\UI_GaugeBarCom.h">
       <Filter>00. GameObject\UI\Component\GaugeBar</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\UI_SpriteAnimCurtain.h">
+      <Filter>00. GameObject\UI\UIPart\Curtain\SpriteAnim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_Curtain.h">
+      <Filter>00. GameObject\UI\UIPart\Curtain\Anim\BG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_Eraser.h">
+      <Filter>00. GameObject\UI\UIPart\Curtain\Anim\Eraser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_CurtainAnimBase.h">
+      <Filter>00. GameObject\UI\UIPart\Curtain\Anim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_CurtainTexture.h">
+      <Filter>00. GameObject\UI\UIPart\Curtain\Anim\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_FadeOut.h">
+      <Filter>00. GameObject\UI\UIContainer\FadeOut</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ICurtainPart.h">
+      <Filter>00. GameObject\UI\UIPart\Curtain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -790,6 +832,24 @@
     </ClCompile>
     <ClCompile Include="..\private\UI_GaugeBarCom.cpp">
       <Filter>00. GameObject\UI\Component\GaugeBar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_SpriteAnimCurtain.cpp">
+      <Filter>00. GameObject\UI\UIPart\Curtain\SpriteAnim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_Curtain.cpp">
+      <Filter>00. GameObject\UI\UIPart\Curtain\Anim\BG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_Eraser.cpp">
+      <Filter>00. GameObject\UI\UIPart\Curtain\Anim\Eraser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_CurtainAnimBase.cpp">
+      <Filter>00. GameObject\UI\UIPart\Curtain\Anim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_CurtainTexture.cpp">
+      <Filter>00. GameObject\UI\UIPart\Curtain\Anim\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_FadeOut.cpp">
+      <Filter>00. GameObject\UI\UIContainer\FadeOut</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
