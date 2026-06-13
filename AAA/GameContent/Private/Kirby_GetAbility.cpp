@@ -12,6 +12,9 @@ CKirby_GetAbility::CKirby_GetAbility()
 
 HRESULT CKirby_GetAbility::Initialize()
 {
+    if (FAILED(__super::Initialize()))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -22,6 +25,8 @@ KIRBY_STATE_TYPE CKirby_GetAbility::Get_StateType()
 
 void CKirby_GetAbility::Enter(CKirby* pKirby)
 {
+    __super::Enter(pKirby);
+
     // Ani
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
     pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::GET_ABILITY));
@@ -32,10 +37,11 @@ void CKirby_GetAbility::Enter(CKirby* pKirby)
 
 void CKirby_GetAbility::Update(CKirby* pKirby, const _float fTimeDelta)
 {
+    __super::Update(pKirby, fTimeDelta);
+
     CKirby_Body* pBody = pKirby->Get_Body();
     CAnimator* pAnimator = pBody->Get_Animator();
     const _float fRatio = pAnimator->Get_Progress();
-
 
     if(pAnimator->Is_Finished() == true)
     {
@@ -54,19 +60,21 @@ void CKirby_GetAbility::Update(CKirby* pKirby, const _float fTimeDelta)
 
 void CKirby_GetAbility::Exit(CKirby* pKirby)
 {
+    __super::Exit(pKirby);
 }
 
 _bool CKirby_GetAbility::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
-    __super::Handle_Command(pKirby, pCommand);
+    if (__super::Handle_Command(pKirby, pCommand))
+        return true;
 
     KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
 
-    switch (eCommandType)
-    {
-        default:        
-            break;
-    }
+    //switch (eCommandType)
+    //{
+    //    default:        
+    //        break;
+    //}
 
     return false;
 }

@@ -41,6 +41,7 @@
     <ClInclude Include="..\Public\GameObject_Factory.h" />
     <ClInclude Include="..\Public\Kirby_AbilityDump.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Sword.h" />
+    <ClInclude Include="..\Public\Kirby_ControllableState.h" />
     <ClInclude Include="..\Public\Kirby_GetAbility.h" />
     <ClInclude Include="..\Public\Kirby_OnOffPart.h" />
     <ClInclude Include="..\Public\Kirby_Fall.h" />
@@ -125,6 +126,7 @@
     <ClCompile Include="..\Private\GameObject_Factory.cpp" />
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
+    <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
     <ClCompile Include="..\Private\Kirby_GetAbility.cpp" />
     <ClCompile Include="..\Private\Kirby_OnOffPart.cpp" />
     <ClCompile Include="..\Private\Kirby_Fall.cpp" />

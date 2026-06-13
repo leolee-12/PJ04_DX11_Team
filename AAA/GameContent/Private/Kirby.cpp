@@ -71,7 +71,6 @@ void CKirby::Update(_float fTimeDelta)
     m_pKirby_Controller->Update_KirbyController(fTimeDelta);
     m_pKirby_StateMachine->Update_StateMachine(fTimeDelta);
 
-
     if (m_pGameInstance_Proxy->Is_EditMode())
     {
         m_pMovement->Sync_To_Controller();
@@ -96,6 +95,12 @@ void CKirby::Late_Update(_float fTimeDelta)
 HRESULT CKirby::Render()
 {
     return S_OK;
+}
+
+void CKirby::On_Deserialized()
+{
+    if (m_pMovement)
+        m_pMovement->Sync_To_Controller();
 }
 
 void CKirby::OnOffParts(KIRBY_ABILITY_TYPE eAbilityType, _bool fOn)
@@ -149,14 +154,6 @@ CKirby_Ability* CKirby::Get_KirbyAbility()
     return m_pKirby_Ability;
 }
 
-void CKirby::Set_KirbyAbility(CKirby_Ability* pKirby_Ability)
-{
-    if (m_pKirby_Ability != nullptr)
-        Safe_Release(m_pKirby_Ability);
-
-    m_pKirby_Ability = pKirby_Ability;
-}
-
 void CKirby::Set_KirbyAbility(KIRBY_ABILITY_TYPE eAbilityState)
 {
     if (m_pKirby_Ability != nullptr)
@@ -177,11 +174,45 @@ void CKirby::Set_KirbyAbility(KIRBY_ABILITY_TYPE eAbilityState)
 
 }
 
+void CKirby::Update_AbilityDumpCool(_float fTimeDelta)
+{
+    if (m_bDecreaseAbilityDumpCool == true)
+    {
+        m_fAccAbilityDumpCoolTime -= fTimeDelta;
+
+        m_bDecreaseAbilityDumpCool = false;
+    }
+    else
+    {
+        m_fAccAbilityDumpCoolTime += fTimeDelta;
+    }
+
+    Helper::FloatClamp(m_fAccAbilityDumpCoolTime, 0.f, m_fMaxAbilityDumpCoolTime);
+
+    //debug
+    char szLog[128] = {};
+    sprintf_s(szLog, "m_fAccAbilityDumpCoolTime : %.3f\n", m_fAccAbilityDumpCoolTime);
+    OutputDebugStringA(szLog);
+}
+
+void CKirby::Reset_AbilityDumpCool()
+{
+    m_fAccAbilityDumpCoolTime = m_fMaxAbilityDumpCoolTime;
+}
+
+_bool CKirby::Can_AbilityDump()
+{
+    if (m_fAccAbilityDumpCoolTime <= 0.f)
+        return true;
+
+    return false;
+}
+
 HRESULT CKirby::Ready_Components()
 {
     _float3 vFootPos;
     XMStoreFloat3(&vFootPos, m_pTransformCom->Get_State(STATE::POSITION));
-    m_pController = m_pGameInstance_Proxy->Create_CapsuleController(vFootPos, CCT_RADIUS, CCT_HEIGHT);
+    m_pController = m_pGameInstance_Proxy->Create_CapsuleController(vFootPos, s_fCCT_Radius, s_fCCT_Height);
 
     m_pMovement = Add_Component<CMovement_Child>(TEXT("Com_Movement"), CMovement_Child::Create(m_pDevice, m_pContext));
     if (m_pMovement == nullptr)
@@ -254,12 +285,6 @@ HRESULT CKirby::Ready_Ability()
 HRESULT CKirby::Bind_ShaderResources()
 {
     return S_OK;
-}
-
-void CKirby::On_Deserialized()
-{
-    if (m_pMovement)
-        m_pMovement->Sync_To_Controller();
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

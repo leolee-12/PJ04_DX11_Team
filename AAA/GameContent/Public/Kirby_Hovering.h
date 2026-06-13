@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Kirby_State.h"
+#include "Kirby_ControllableState.h"
 
 #include "GameContent_Defines.h"
 
@@ -13,7 +13,7 @@ NS_BEGIN(Client)
 class CKirby;
 class CMovement_Child;
 
-class CLIENT_DLL CKirby_Hovering final : public CKirby_State
+class CLIENT_DLL CKirby_Hovering final : public CKirby_ControllableState
 {
 private:
 	CKirby_Hovering();

@@ -14,6 +14,9 @@ CKirby_Hovering::CKirby_Hovering()
 
 HRESULT CKirby_Hovering::Initialize()
 {
+    if (FAILED(__super::Initialize()))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -24,6 +27,8 @@ KIRBY_STATE_TYPE CKirby_Hovering::Get_StateType()
 
 void CKirby_Hovering::Enter(CKirby* pKirby)
 {
+    __super::Enter(pKirby);
+
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
 
     // Ani
@@ -43,28 +48,37 @@ void CKirby_Hovering::Enter(CKirby* pKirby)
     pMovementCom->Set_LinearDrag(CKirby::s_fHoveringLinearDrag);
     pMovementCom->Set_MaxHorizontalSpeed(CKirby::s_fHoveringMaxHorizontalSpeed);
 
+    m_eCurMoveState = HOVERING_MOVE_STATE::FALL;
     m_bPlayFlightAni = false;
 }
 
 void CKirby_Hovering::Update(CKirby* pKirby, const _float fTimeDelta)
 {
+    __super::Update(pKirby, fTimeDelta);
+
     if (Update_HoveringStateMachine(pKirby, fTimeDelta) == true)
         return;
 
-    if(m_eCurMoveState == HOVERING_STATE::FLIGHT_LOOP)
+    if(m_eHoveringState == HOVERING_STATE::FLIGHT_LOOP)
         Update_LoopState(pKirby, fTimeDelta);
 }
 
 void CKirby_Hovering::Exit(CKirby* pKirby)
 {
+    __super::Exit(pKirby);
+
     // Mesh
     CKirby_Body* pBody = pKirby->Get_Body();
     pBody->Set_Body(KIRBY_BODY_STATE::NORMAL);
+
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    Reset_Movement(pMovement);
 }
 
 _bool CKirby_Hovering::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
-    __super::Handle_Command(pKirby, pCommand);
+    if (__super::Handle_Command(pKirby, pCommand))
+        return true;
 
     CKirby_Body* pBody = pKirby->Get_Body();
     CAnimator* pAnimator = pBody->Get_Animator();
@@ -122,6 +136,9 @@ _bool CKirby_Hovering::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             if (!pCommand->IsDown())
                 return false;
 
+            if (m_eHoveringState != HOVERING_STATE::FLIGHT_LOOP)
+                return true;
+
             m_eHoveringState = HOVERING_STATE::FLIGHT_END;
             pAnimator->Play("FlightLanding", false, false, 0.1f, 2.5f);
 
@@ -178,7 +195,17 @@ _bool CKirby_Hovering::Update_HoveringStateMachine(CKirby* pKirby, _float fTimeD
         {
             if (pAnimator->Is_Finished() == true)
             {
-                Transition_Wait_OR_Run(pKirby);
+                _bool bIsGround = pMovement->Is_Grounded();
+                if (bIsGround == false)
+                {
+                    pKirby->Change_State(KIRBY_STATE_TYPE::FALL);
+                    pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::FALL));
+                }
+                else
+                {
+                    Transition_Wait_OR_Run(pKirby);
+                }
+                
                 pBody->Set_Body(KIRBY_BODY_STATE::NORMAL);
 
                 Reset_Movement(pMovement);

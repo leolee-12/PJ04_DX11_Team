@@ -11,7 +11,8 @@ enum class KIRBY_COMMAND_TYPE
 	NONE,
 	MOVE_TOP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT,
 	JUMP,  // A
-	ATTACK // B
+	ATTACK, // B
+	DUMP, // Y
 };
 
 enum class KEY_STATE_TYPE { DOWN, PRESS, UP };
@@ -118,6 +119,17 @@ public:
 	ATTACK_Command(KEY_STATE_TYPE eKeyState) :CKirby_Command(eKeyState) {};
 	virtual ~ATTACK_Command() = default;
 	virtual KIRBY_COMMAND_TYPE GetCommandType() override { return KIRBY_COMMAND_TYPE::ATTACK; }
+
+private:
+	virtual void Free() { __super::Free(); }
+};
+
+class CLIENT_DLL Dump_Command final : public CKirby_Command
+{
+public:
+	Dump_Command(KEY_STATE_TYPE eKeyState) :CKirby_Command(eKeyState) {};
+	virtual ~Dump_Command() = default;
+	virtual KIRBY_COMMAND_TYPE GetCommandType() override { return KIRBY_COMMAND_TYPE::DUMP; }
 
 private:
 	virtual void Free() { __super::Free(); }

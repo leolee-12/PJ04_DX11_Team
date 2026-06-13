@@ -196,24 +196,6 @@
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State">
       <UniqueIdentifier>{3fb8322f-bbfe-4bc3-963c-2c3d4d80cee2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\00. Wait">
-      <UniqueIdentifier>{8ba40596-ddff-412c-a0bc-883604bd1093}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\01. Run">
-      <UniqueIdentifier>{9e646af3-48ac-48e3-8513-45d75ec65f43}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\02. Jump">
-      <UniqueIdentifier>{3e17907c-bcba-459e-bf79-c4b706ede510}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\03. Fall">
-      <UniqueIdentifier>{90847b7a-deeb-40fd-9d4c-a4fb630d5f56}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\04. Attack">
-      <UniqueIdentifier>{1a16a95c-467c-4517-b7e1-f705d612b308}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\05. Hovering">
-      <UniqueIdentifier>{7ab702f2-1ea4-4b6f-abc2-0a8e23722ed6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\00. Camera\AreaCam">
       <UniqueIdentifier>{712968f4-aac4-4c0d-b936-f670af432abf}</UniqueIdentifier>
     </Filter>
@@ -253,11 +235,35 @@
     <Filter Include="00. GameObject\05. Kirby\02. Kirby_Ability\01. Kirby_Ability_Sword">
       <UniqueIdentifier>{fcd6a4fd-d852-4910-bb95-c63423f00f06}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\06. GetAbility">
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState">
+      <UniqueIdentifier>{3ca1c2dd-321f-4630-b372-d441537bdff9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait">
+      <UniqueIdentifier>{8ba40596-ddff-412c-a0bc-883604bd1093}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Run">
+      <UniqueIdentifier>{9e646af3-48ac-48e3-8513-45d75ec65f43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Jump">
+      <UniqueIdentifier>{3e17907c-bcba-459e-bf79-c4b706ede510}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Fall">
+      <UniqueIdentifier>{90847b7a-deeb-40fd-9d4c-a4fb630d5f56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else">
+      <UniqueIdentifier>{81932a37-a633-4e20-b93d-c5e42826e4f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Attack">
+      <UniqueIdentifier>{1a16a95c-467c-4517-b7e1-f705d612b308}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\GetAbility">
       <UniqueIdentifier>{ef199045-e026-474a-9ec3-100f82b3ae9a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\07. AbilityDump">
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\AbilityDump">
       <UniqueIdentifier>{26490427-a373-403b-bd61-8303f0dffa59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Hovering">
+      <UniqueIdentifier>{7ab702f2-1ea4-4b6f-abc2-0a8e23722ed6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -454,10 +460,10 @@
       <Filter>00. GameObject\05. Kirby\01. StateMachine</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Wait.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\00. Wait</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Run.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\01. Run</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Run</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Ability.h">
       <Filter>00. GameObject\05. Kirby\02. Kirby_Ability</Filter>
@@ -466,16 +472,16 @@
       <Filter>00. GameObject\05. Kirby\02. Kirby_Ability\00. Kirby_Ability_Normal</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Jump.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\02. Jump</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Jump</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Attack.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\04. Attack</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Attack</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Fall.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\03. Fall</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Fall</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Hovering.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\05. Hovering</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Hovering</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Movement_Child.h">
       <Filter>00. GameObject\98. Component</Filter>
@@ -511,13 +517,16 @@
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_GetAbility.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\06. GetAbility</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\GetAbility</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Ability_Sword.h">
       <Filter>00. GameObject\05. Kirby\02. Kirby_Ability\01. Kirby_Ability_Sword</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_AbilityDump.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\07. AbilityDump</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\AbilityDump</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_ControllableState.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -672,10 +681,10 @@
       <Filter>00. GameObject\05. Kirby\01. StateMachine</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Wait.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\00. Wait</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Run.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\01. Run</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Run</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ability.cpp">
       <Filter>00. GameObject\05. Kirby\02. Kirby_Ability</Filter>
@@ -684,19 +693,19 @@
       <Filter>00. GameObject\05. Kirby\02. Kirby_Ability\00. Kirby_Ability_Normal</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Jump.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\02. Jump</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Jump</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby.cpp">
       <Filter>00. GameObject\05. Kirby</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Attack.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\04. Attack</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Attack</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Fall.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\03. Fall</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Fall</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Hovering.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\05. Hovering</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Hovering</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Movement_Child.cpp">
       <Filter>00. GameObject\98. Component</Filter>
@@ -723,7 +732,7 @@
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_GetAbility.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\06. GetAbility</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\GetAbility</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_State.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State</Filter>
@@ -732,7 +741,10 @@
       <Filter>00. GameObject\05. Kirby\02. Kirby_Ability\01. Kirby_Ability_Sword</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\07. AbilityDump</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\AbilityDump</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_ControllableState.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
