@@ -238,11 +238,11 @@ HRESULT CKirby::Ready_Components()
 
     CCollider::COLLIDER_DESC ColliderDesc{};
     ColliderDesc.pOwner = this;
-    ColliderDesc.vCenter = _float3(0.f, CCT_RADIUS + CCT_HEIGHT * 0.5f, 0.f);
+    ColliderDesc.vCenter = _float3(0.f, s_fCCT_Radius + s_fCCT_Height * 0.5f, 0.f);
     ColliderDesc.vSize = _float3(
-        CCT_RADIUS * 2.f,
-        CCT_HEIGHT + CCT_RADIUS * 2.f,
-        CCT_RADIUS * 2.f);
+        s_fCCT_Radius * 2.f,
+        s_fCCT_Height + s_fCCT_Radius * 2.f,
+        s_fCCT_Height * 2.f);
 
     if (FAILED(m_pTriggerSensor->Initialize(&ColliderDesc)))
         return E_FAIL;
