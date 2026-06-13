@@ -37,8 +37,12 @@ private:
 	CKirby* m_pKirby{};
 	CKirby_State* m_pCurState{};
 
+	unordered_map<KIRBY_STATE_TYPE, CKirby_State*> m_States;
+
 private:
-	CKirby_State* State_Creator(KIRBY_STATE_TYPE eNewstate);
+	HRESULT Init_State();
+
+	CKirby_State* Find_State(KIRBY_STATE_TYPE eNewstate);
 
 public:
 	static CKirby_StateMachine* Create(CKirby* pKirby);

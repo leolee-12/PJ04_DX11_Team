@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Base.h"
+#include "Kirby_State.h"
 
 #include "GameContent_Defines.h"
 
@@ -13,19 +13,11 @@ NS_BEGIN(Client)
 
 class CKirby;
 
-enum class KIRBY_STATE_TYPE
-{
-	WAIT, RUN, JUMP, FALL,
-	ATTACK,
-	HOVERING,
-	GET_ABILITY, ABILITY_DUMP
-};
-
-class CLIENT_DLL CKirby_State abstract : public CBase
+class CLIENT_DLL CKirby_ControllableState abstract : public CKirby_State
 {
 protected:
-	CKirby_State();
-	virtual ~CKirby_State() = default;
+	CKirby_ControllableState();
+	virtual ~CKirby_ControllableState() = default;
 
 protected:
 	HRESULT Initialize();
@@ -38,17 +30,8 @@ public:
 	virtual void Update(CKirby* pKirby, const _float fTimeDelta);
 	virtual void Exit(CKirby* pKirby);
 
-protected:
-	_bool Handle_MoveCommand(CKirby* pKirby, CKirby_Command* pCommand);
-
-protected:
-	_bool Try_FallState(CKirby* pKirby);
-	_bool Transition_Wait_OR_Run(CKirby* pKirby);
-
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand);
-
-
 
 protected:
 	virtual void Free() override;

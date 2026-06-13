@@ -1,21 +1,24 @@
 #pragma once
 
-#include "Kirby_ControllableState.h"
+#include "Kirby_State.h"
 
 #include "GameContent_Defines.h"
 
 NS_BEGIN(Engine)
+class CGameInstance_Proxy;
+class CAnimator;
 NS_END
 
 NS_BEGIN(Client)
 
 class CKirby;
+class CKirby_Body;
 
-class CLIENT_DLL CKirby_Run final : public CKirby_ControllableState
+class CLIENT_DLL CKirby_GetAbility final : public CKirby_State
 {
 private:
-	CKirby_Run();
-	virtual ~CKirby_Run() = default;
+	CKirby_GetAbility();
+	virtual ~CKirby_GetAbility() = default;
 
 private:
 	HRESULT Initialize();
@@ -31,8 +34,19 @@ public:
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
+private:
+	CGameInstance_Proxy* m_pGameInstance_Proxy = {};
+
+private:
+	_bool m_bPartsOn{};
+	_bool m_bCloseEye{};
+
+private:
+	void Parts_On(CKirby* pKirby, _float fRatio);
+	void Close_Eye(CKirby_Body* pBody, _float fRatio);
+
 public:
-	static CKirby_Run* Create();
+	static CKirby_GetAbility* Create();
 private:
 	virtual void Free() override;
 };
