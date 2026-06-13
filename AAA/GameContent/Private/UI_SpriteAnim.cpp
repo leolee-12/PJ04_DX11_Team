@@ -10,6 +10,7 @@ CUI_SpriteAnim::CUI_SpriteAnim(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 	, m_vColor{ 1.f, 1.f, 1.f, 1.f }, m_fAlpha{ 1.f }
 	, m_iTextureLevel{ ETOUI(LEVEL::STATIC) }
 	, m_fDuration{ 1.f }, m_fEndDelay{ 0.f }, m_bLoop{ true }, m_bAutoPlay{ true }
+	, m_fSpinSpeedDeg{ 0.f }
 {
 }
 
@@ -20,6 +21,7 @@ CUI_SpriteAnim::CUI_SpriteAnim(const CUI_SpriteAnim& Prototype)
 	, m_strTextureProtoTag{ Prototype.m_strTextureProtoTag }
 	, m_fDuration{ Prototype.m_fDuration }, m_fEndDelay{ Prototype.m_fEndDelay }
 	, m_bLoop{ Prototype.m_bLoop }, m_bAutoPlay{ Prototype.m_bAutoPlay }
+	, m_fSpinSpeedDeg{ Prototype.m_fSpinSpeedDeg }
 {
 }
 
@@ -42,6 +44,7 @@ HRESULT CUI_SpriteAnim::Initialize(void* pArg)
 	m_fEndDelay = pDesc->fEndDelay;
 	m_bLoop		= pDesc->bLoop;
 	m_bAutoPlay = pDesc->bAutoPlay;
+	m_fSpinSpeedDeg = pDesc->fSpinSpeedDeg;
 
 	if (FAILED(__super::Initialize(pDesc)))
 		return E_FAIL;
@@ -71,6 +74,8 @@ void CUI_SpriteAnim::Priority_Update(_float fTimeDelta)
 void CUI_SpriteAnim::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
+
+	Update_Spin(fTimeDelta);
 
 	if (!m_bIsPlay || m_iFrameCount <= 1 || m_fDuration <= 0.f)
 		return;
@@ -151,6 +156,10 @@ void CUI_SpriteAnim::Stop()
 	m_fAccTime = 0.f;
 	m_iTexIndex = 0;
 	m_bFinished = false;
+	m_fSpinAngle = 0.f;
+	m_bPrevPlay = false;
+	if (m_fSpinSpeedDeg != 0.f)
+		Apply_Spin();
 }
 
 void CUI_SpriteAnim::Set_Frame(_int iFrame)
@@ -292,6 +301,33 @@ void CUI_SpriteAnim::Sync_FrameCount()
 		? (_int)m_pTextureCom->Get_ArraySize() : 1;
 	if (m_iFrameCount < 1)
 		m_iFrameCount = 1;
+}
+
+void CUI_SpriteAnim::Update_Spin(_float fTimeDelta)
+{
+	if (m_fSpinSpeedDeg == 0.f)        // 회전 데이터 없음 → 트랜스폼 손 안 댐(기존 동작 유지)
+		return;
+
+	if (m_bIsPlay && !m_bPrevPlay)     // 재생이 새로 시작되면 각도 0부터
+		m_fSpinAngle = 0.f;
+	m_bPrevPlay = m_bIsPlay;
+
+	if (!m_bIsPlay)
+		return;
+
+	m_fSpinAngle += XMConvertToRadians(m_fSpinSpeedDeg) * fTimeDelta;
+	Apply_Spin();
+}
+
+void CUI_SpriteAnim::Apply_Spin()
+{
+	// 회전해도 basis 벡터 길이는 보존되므로 매 프레임 현재 스케일을 그대로 읽어 재구성
+	_float3 vScale = m_pTransformCom->Get_Scaled();
+	const _float c = cosf(m_fSpinAngle);
+	const _float s = sinf(m_fSpinAngle);
+	m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(c * vScale.x, s * vScale.x, 0.f, 0.f));
+	m_pTransformCom->Set_State(STATE::UP, XMVectorSet(-s * vScale.y, c * vScale.y, 0.f, 0.f));
+	m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, 1.f, 0.f));
 }
 
 CUI_SpriteAnim* CUI_SpriteAnim::Create(

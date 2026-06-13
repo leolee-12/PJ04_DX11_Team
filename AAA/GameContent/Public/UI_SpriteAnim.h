@@ -24,6 +24,7 @@ class CLIENT_DLL CUI_SpriteAnim : public CUIPartObject
 	PROPERTY(_float, m_fEndDelay, L"EndDelay", L"Anim");
 	PROPERTY(_bool, m_bLoop, L"Loop", L"Anim");
 	PROPERTY(_bool, m_bAutoPlay, L"AutoPlay", L"Anim");
+	PROPERTY(_float, m_fSpinSpeedDeg, L"SpinSpeedDeg", L"Anim");
 
 public:
 	typedef struct tagUISpriteAnimDesc : public CUIPartObject::UI_PARTOBJECT_DESC
@@ -37,6 +38,7 @@ public:
 		_float          fEndDelay = { 0.f };
 		_bool           bLoop = { true };
 		_bool           bAutoPlay = { true };
+		_float          fSpinSpeedDeg = { 0.f };
 	}UI_SPRITEANIM_DESC;
 
 	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_UI_SpriteAnim";
@@ -92,10 +94,16 @@ protected:
 	_bool					m_bIsPlay = { false };
 	_bool					m_bFinished = { false };
 
+	_float                  m_fSpinAngle = { 0.f };   
+	_bool                   m_bPrevPlay = { false };
+
 protected:
 	HRESULT					Ready_Components(UI_SPRITEANIM_DESC* pDesc);
 	HRESULT					Bind_ShaderResources();
 	void					Sync_FrameCount();
+
+	void                    Update_Spin(_float fTimeDelta);   // 회전 진행
+	void                    Apply_Spin();
 
 	virtual void			Deserialize_Internal(const json& j) override;
 
