@@ -38,7 +38,7 @@ void CKirby_Jump::Enter(CKirby* pKirby)
     else
         pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::JUMP_R));
 
-    // First Frame Skip
+    // Ground Ignore
     m_fAccGroundIgnoreTime = m_fMaxGroundIgnoreTime;
 
     // Jump State
@@ -47,7 +47,7 @@ void CKirby_Jump::Enter(CKirby* pKirby)
 
 void CKirby_Jump::Update(CKirby* pKirby, const _float fTimeDelta)
 {
-    // First Frame Skip
+    // Ground Ignore
     if (m_fAccGroundIgnoreTime > 0.f)
     {
         m_fAccGroundIgnoreTime -= fTimeDelta;
@@ -78,7 +78,7 @@ void CKirby_Jump::Update(CKirby* pKirby, const _float fTimeDelta)
         }
     }      
     // Wair or Run(¹Ù·Î ¶¥)
-    if (pMovementCom->Is_Grounded() == true)
+    if (bIsGround == true)
     {
         Transition_Wait_OR_Run(pKirby);
     }

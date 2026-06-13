@@ -13,24 +13,11 @@ NS_BEGIN(Client)
 class CKirby;
 class CMovement_Child;
 
-class CLIENT_DLL CKirby_Ability_Normal final : public CKirby_Ability
+class CLIENT_DLL CKirby_Ability_Sword final : public CKirby_Ability
 {
 private:
-	enum class INHALE_STATE
-	{
-		INHALE_LOOP,
-		SUPER_INHALE_START, SUPER_INHALE_LOOP,
-		INHALE_END
-	};
-
-	enum class INHALE_MOVE_STATE
-	{
-		WAIT, WALK, FALL
-	};
-
-private:
-	CKirby_Ability_Normal();
-	virtual ~CKirby_Ability_Normal() = default;
+	CKirby_Ability_Sword();
+	virtual ~CKirby_Ability_Sword() = default;
 
 private:
 	HRESULT Initialize();
@@ -49,27 +36,8 @@ public:
 
 	virtual _bool Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation) override;
 
-private:
-	INHALE_STATE m_eInhaleState{};
-
-	INHALE_MOVE_STATE m_eCurMoveState{};
-	INHALE_MOVE_STATE m_ePreMoveState{};
-
-	_float m_MaxSuperInHaleTime{};
-	_float m_AccSuperInHaleTime{};
-
-	_bool m_bForceEnterSuperInhaleStart{};
-
-private:
-	void Interpolation_Inhale(CAnimator* pAnimator);
-	void Choose_InhaleAniName(_string& strAniName);
-
-	void Change_Ability(CKirby* pKirby);
-
-	void Reset_Default(CKirby* pKirby);
-
 public:
-	static CKirby_Ability_Normal* Create();
+	static CKirby_Ability_Sword* Create();
 private:
 	virtual void Free() override;
 };

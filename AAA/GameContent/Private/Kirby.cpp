@@ -18,6 +18,7 @@
 
 // Ability
 #include "Kirby_Ability_Normal.h"
+#include "Kirby_Ability_Sword.h"
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCharacter{ pDevice, pContext }
@@ -154,6 +155,26 @@ void CKirby::Set_KirbyAbility(CKirby_Ability* pKirby_Ability)
         Safe_Release(m_pKirby_Ability);
 
     m_pKirby_Ability = pKirby_Ability;
+}
+
+void CKirby::Set_KirbyAbility(KIRBY_ABILITY_TYPE eAbilityState)
+{
+    if (m_pKirby_Ability != nullptr)
+    {
+        Safe_Release(m_pKirby_Ability);
+        m_pKirby_Ability = nullptr;
+    }
+
+    switch (eAbilityState)
+    {
+    case KIRBY_ABILITY_TYPE::NORMAL:
+        m_pKirby_Ability = CKirby_Ability_Normal::Create();
+        break;
+    case KIRBY_ABILITY_TYPE::SWORD:
+        m_pKirby_Ability = CKirby_Ability_Sword::Create();
+        break;
+    }
+
 }
 
 HRESULT CKirby::Ready_Components()

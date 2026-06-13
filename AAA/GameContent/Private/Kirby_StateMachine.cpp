@@ -8,6 +8,7 @@
 #include "Kirby_Fall.h"
 #include "Kirby_Attack.h"
 #include "Kirby_Hovering.h"
+#include "Kirby_GetAbility.h"
 
 CKirby_StateMachine::CKirby_StateMachine()
 {
@@ -18,6 +19,9 @@ HRESULT CKirby_StateMachine::Initialize(CKirby* pKirby)
 {
     m_pKirby = pKirby;
     if (m_pKirby == nullptr)
+        return E_FAIL;
+
+    if (FAILED(Init_State()))
         return E_FAIL;
 
     Change_State(KIRBY_STATE_TYPE::WAIT);
@@ -38,10 +42,9 @@ void CKirby_StateMachine::Change_State(KIRBY_STATE_TYPE eNewstate)
     if(m_pCurState != nullptr)
     {
         m_pCurState->Exit(m_pKirby);
-        Safe_Release(m_pCurState);
     }
 
-    m_pCurState = State_Creator(eNewstate);
+    m_pCurState = Find_State(eNewstate);
 
     if (m_pCurState == nullptr)
         return;
@@ -62,21 +65,39 @@ void CKirby_StateMachine::Handle_Command(CKirby_Command* pCommand)
     m_pCurState->Handle_Command(m_pKirby, pCommand);
 }
 
-CKirby_State* CKirby_StateMachine::State_Creator(KIRBY_STATE_TYPE eNewstate)
+HRESULT CKirby_StateMachine::Init_State()
 {
     CKirby_State* pState{};
 
-    switch (eNewstate)
-    {
-        case KIRBY_STATE_TYPE::WAIT:        pState = CKirby_Wait::Create();         break;
-        case KIRBY_STATE_TYPE::RUN:         pState = CKirby_Run::Create();          break;
-        case KIRBY_STATE_TYPE::JUMP:        pState = CKirby_Jump::Create();         break;
-        case KIRBY_STATE_TYPE::FALL:        pState = CKirby_Fall::Create();         break;
-        case KIRBY_STATE_TYPE::ATTACK:      pState = CKirby_Attack::Create();       break;
-        case KIRBY_STATE_TYPE::HOVERING:    pState = CKirby_Hovering::Create();     break;
-    }
+    auto Register_State = [this](KIRBY_STATE_TYPE eType, CKirby_State* pNewState) -> HRESULT
+        {
+            if (pNewState == nullptr)
+                return E_FAIL;
 
-    return pState;
+            m_States[eType] = pNewState;
+
+            return S_OK;
+        };
+
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::WAIT, CKirby_Wait::Create())))                  return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::RUN, CKirby_Run::Create())))                    return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::JUMP, CKirby_Jump::Create())))                  return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::FALL, CKirby_Fall::Create())))                  return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::ATTACK, CKirby_Attack::Create())))              return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::HOVERING, CKirby_Hovering::Create())))          return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::GET_ABILITY, CKirby_GetAbility::Create())))     return E_FAIL;
+
+    return S_OK;
+}
+
+CKirby_State* CKirby_StateMachine::Find_State(KIRBY_STATE_TYPE eNewstate)
+{
+    auto iter = m_States.find(eNewstate);
+
+    if (iter != m_States.end())
+        return iter->second;
+
+    return nullptr;
 }
 
 CKirby_StateMachine* CKirby_StateMachine::Create(CKirby* pKirby)
@@ -94,7 +115,11 @@ CKirby_StateMachine* CKirby_StateMachine::Create(CKirby* pKirby)
 
 void CKirby_StateMachine::Free()
 {
-    Safe_Release(m_pCurState);
+    m_pCurState = nullptr;
+
+    for (auto& pair : m_States)
+        Safe_Release(pair.second);
+    m_States.clear();
 
     __super::Free();
 }

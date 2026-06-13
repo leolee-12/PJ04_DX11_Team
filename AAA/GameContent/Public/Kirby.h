@@ -85,6 +85,7 @@ public:
 
 	CKirby_Ability* Get_KirbyAbility();
 	void Set_KirbyAbility(CKirby_Ability* pKirby_Ability);
+	void Set_KirbyAbility(KIRBY_ABILITY_TYPE eAbilityState);
 
 private:
 	HRESULT Ready_Components();

@@ -68,6 +68,9 @@ void CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _float fTimeDelta)
         m_eCurMoveState = INHALE_MOVE_STATE::WAIT;
     }
 
+    // Test Code
+    Change_Ability(pKirby);
+
     // Super Inhale Timer
     if (m_AccSuperInHaleTime < m_MaxSuperInHaleTime)
         m_AccSuperInHaleTime += fTimeDelta;
@@ -80,7 +83,7 @@ void CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _float fTimeDelta)
     {
         m_eInhaleState = INHALE_STATE::INHALE_END;
         pAnimator->Play("InhaleEnd", false, false, 0.1f, 1.5f);
-        pMovementCom->Set_MaxHorizontalSpeed(8.f);
+        pMovementCom->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
     }
     if (m_eInhaleState == INHALE_STATE::INHALE_END)
     {
@@ -222,6 +225,34 @@ void CKirby_Ability_Normal::Choose_InhaleAniName(_string& strAniName)
             break;
         }
     }
+}
+
+void CKirby_Ability_Normal::Change_Ability(CKirby* pKirby)
+{
+    //Test Code
+    if (GetAsyncKeyState('T') & 0x8000)
+    {
+        // 먹은 오브젝트에서 가져온다.
+        KIRBY_ABILITY_TYPE eAbilityType = KIRBY_ABILITY_TYPE::SWORD;
+        pKirby->Set_KirbyAbility(eAbilityType);
+
+        Reset_Default(pKirby);
+        pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
+
+        return;
+    }
+}
+
+void CKirby_Ability_Normal::Reset_Default(CKirby* pKirby)
+{
+    // Test Code
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+
+    pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
+
+    CKirby_Body* pKirby_Body = pKirby->Get_Body();
+    pKirby_Body->Set_Eye(KIRBY_EYE_STATE::IDLE);
+    pKirby_Body->Set_Body(KIRBY_BODY_STATE::NORMAL);
 }
 
 CKirby_Ability_Normal* CKirby_Ability_Normal::Create()

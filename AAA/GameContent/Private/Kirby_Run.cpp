@@ -33,7 +33,9 @@ void CKirby_Run::Update(CKirby* pKirby, const _float fTimeDelta)
 
     // Fall
     if (Try_FallState(pKirby) == true)
+    {
         pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::FALL));
+    }
 
     // Wait
     if (pKirby->Has_MoveDir() == false)

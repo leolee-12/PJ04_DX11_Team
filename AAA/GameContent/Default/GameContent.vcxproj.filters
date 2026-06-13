@@ -250,6 +250,12 @@
     <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat">
       <UniqueIdentifier>{d12eb026-e157-4495-859c-6ae236366e96}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\06. Kirby_GetAbility">
+      <UniqueIdentifier>{ef199045-e026-474a-9ec3-100f82b3ae9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\02. Kirby_Ability\01. Kirby_Ability_Sword">
+      <UniqueIdentifier>{fcd6a4fd-d852-4910-bb95-c63423f00f06}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -501,6 +507,12 @@
     <ClInclude Include="..\Public\Kirby_OnOffPart.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_GetAbility.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\06. Kirby_GetAbility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Ability_Sword.h">
+      <Filter>00. GameObject\05. Kirby\02. Kirby_Ability\01. Kirby_Ability_Sword</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -650,9 +662,6 @@
     <ClCompile Include="..\Private\Kirby_Controller.cpp">
       <Filter>00. GameObject\05. Kirby\00. System\02. Kirby_Controller</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Kirby_State.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Kirby_StateMachine.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine</Filter>
     </ClCompile>
@@ -706,6 +715,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_OnOffPart.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_GetAbility.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\06. Kirby_GetAbility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_State.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp">
+      <Filter>00. GameObject\05. Kirby\02. Kirby_Ability\01. Kirby_Ability_Sword</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
