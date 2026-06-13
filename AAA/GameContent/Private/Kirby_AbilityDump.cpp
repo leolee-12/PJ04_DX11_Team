@@ -44,6 +44,7 @@ void CKirby_AbilityDump::Update(CKirby* pKirby, const _float fTimeDelta)
 
     const _float fRatio = pAnimator->Get_Progress();
 
+
     Parts_Off(pKirby, fRatio);
     Close_Eye(pBody, fRatio);
 

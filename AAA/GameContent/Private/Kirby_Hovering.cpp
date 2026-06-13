@@ -126,7 +126,7 @@ _bool CKirby_Hovering::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
                 if (m_bPlayFlightAni == true)
                 {
                     pMovementCom->Set_VelocityY(0.f);
-                    pMovementCom->Add_Velocity(XMVectorSet(0.f, 8.f, 0.f, 0.f));
+                    pMovementCom->Add_Velocity(XMVectorSet(0.f, 10.f, 0.f, 0.f));
                 }
             }
             return true;

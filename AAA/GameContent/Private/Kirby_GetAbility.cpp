@@ -6,6 +6,8 @@
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
 
+#include "Movement_Child.h"
+
 CKirby_GetAbility::CKirby_GetAbility()
 {
 }
@@ -13,6 +15,10 @@ CKirby_GetAbility::CKirby_GetAbility()
 HRESULT CKirby_GetAbility::Initialize()
 {
     if (FAILED(__super::Initialize()))
+        return E_FAIL;
+
+    m_pGameInstance_Proxy = CGameInstance::GetProxy();
+    if (m_pGameInstance_Proxy == nullptr)
         return E_FAIL;
 
     return S_OK;
@@ -39,9 +45,15 @@ void CKirby_GetAbility::Update(CKirby* pKirby, const _float fTimeDelta)
 {
     __super::Update(pKirby, fTimeDelta);
 
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+
     CKirby_Body* pBody = pKirby->Get_Body();
     CAnimator* pAnimator = pBody->Get_Animator();
+
     const _float fRatio = pAnimator->Get_Progress();
+
+    _vector vCamLook = XMVectorSetY(XMLoadFloat4(m_pGameInstance_Proxy->Get_CamLook()), 0.f);
+    pMovement->Rotate_To_Direction(-vCamLook, fTimeDelta);
 
     if(pAnimator->Is_Finished() == true)
     {
@@ -120,5 +132,7 @@ CKirby_GetAbility* CKirby_GetAbility::Create()
 
 void CKirby_GetAbility::Free()
 {
+    Safe_Release(m_pGameInstance_Proxy);
+
     __super::Free();
 }

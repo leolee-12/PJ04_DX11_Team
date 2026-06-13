@@ -5,6 +5,7 @@
 #include "GameContent_Defines.h"
 
 NS_BEGIN(Engine)
+class CGameInstance_Proxy;
 class CAnimator;
 NS_END
 
@@ -32,6 +33,9 @@ public:
 
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
+
+private:
+	CGameInstance_Proxy* m_pGameInstance_Proxy = {};
 
 private:
 	_bool m_bPartsOn{};
