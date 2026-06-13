@@ -63,6 +63,12 @@ HRESULT CKirby_Ability::Initialize()
     m_tAniInfos[iGet_Ability].fBlend = 0.1f;
     m_tAniInfos[iGet_Ability].fSpeed = 2.5f;
 
+    _uint iAbility_Dump = ETOUI(ABILITY_ANI::ABILITY_DUMP);
+    m_tAniInfos[iAbility_Dump].strAniName = "AbilityDump";
+    m_tAniInfos[iAbility_Dump].bLoop = false;
+    m_tAniInfos[iAbility_Dump].fBlend = 0.1f;
+    m_tAniInfos[iAbility_Dump].fSpeed = 3.f;
+
     return S_OK;
 }
 

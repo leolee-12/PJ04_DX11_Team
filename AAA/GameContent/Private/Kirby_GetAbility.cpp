@@ -50,7 +50,6 @@ void CKirby_GetAbility::Update(CKirby* pKirby, const _float fTimeDelta)
 
     Parts_On(pKirby, fRatio);
     Close_Eye(pBody, fRatio);
-
 }
 
 void CKirby_GetAbility::Exit(CKirby* pKirby)
@@ -65,7 +64,8 @@ _bool CKirby_GetAbility::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand
 
     switch (eCommandType)
     {
-
+        default:        
+            break;
     }
 
     return false;
