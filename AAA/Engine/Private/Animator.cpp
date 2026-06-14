@@ -88,14 +88,57 @@ _float CAnimator::Get_Progress() const
     return m_pModel ? m_pModel->Get_CurrentAnimProgress() : 0.f;
 }
 
+void CAnimator::Set_Mask(const _string& strClip, const _string& strRootBone, _bool bLoop, _float fMaskTarget, _float fMaskBlendTime)
+{
+    m_fMaskWeight = 0.f;
+    m_strMaskClip = strClip;
+    m_strMaskRootBone = strRootBone;
+    m_bMaskLoop = bLoop;
+    m_fMaskTarget = fMaskTarget;
+    m_fMaskBlendTime = fMaskBlendTime;
+
+    if (m_pModel)
+        m_pModel->Capture_MaskSnapShot(strRootBone);
+}
+
+void CAnimator::Clear_Mask(_float fMaskBlendTime)
+{
+    m_fMaskTarget = 0.f;
+    if (m_pModel)
+        m_pModel->Clear_MaskSnapShot();
+
+    if (fMaskBlendTime <= 0.f)
+    {
+        m_fMaskWeight = 0.f;
+        m_strMaskClip.clear();
+        m_strMaskRootBone.clear();
+    }
+    else
+        m_fMaskBlendTime = fMaskBlendTime;
+}
+
 // ── Update: 재생 + 이벤트 판정 ──
 void CAnimator::Update(_float fTimeDelta)
 {
     if (nullptr == m_pModel)
         return;
 
+    _float fStep = (m_fMaskBlendTime > 0.f) ? (fTimeDelta / m_fMaskBlendTime) : 1.f;
+    if (m_fMaskWeight < m_fMaskTarget)
+        m_fMaskWeight = min(m_fMaskWeight + fStep, m_fMaskTarget);
+    else
+        m_fMaskWeight = max(m_fMaskWeight - fStep, m_fMaskTarget);
+
+    if (!m_strMaskClip.empty() && m_fMaskTarget <= 0.f && m_fMaskWeight <= 0.f)
+        m_strMaskClip.clear();
+
     if (!m_bPaused)
-        m_bFinished = m_pModel->Play_Animation(fTimeDelta, m_fPlaySpeed);   // ★ 애니메이터가 단독 구동
+    {
+        if (!m_strMaskClip.empty() && m_fMaskWeight > 0.f)
+            m_bFinished = m_pModel->Play_Animation(fTimeDelta, m_strMaskClip, m_strMaskRootBone, m_fPlaySpeed, m_bMaskLoop, m_fMaskWeight);
+        else
+            m_bFinished = m_pModel->Play_Animation(fTimeDelta, m_fPlaySpeed);
+    }
 
     const string& strCur = m_pModel->Get_CurrentAnimName();
     _float        fCur = m_pModel->Get_CurrentAnimProgress();

@@ -996,6 +996,55 @@ _wstring CLevel_Tool::Register_TextureProto(const _wstring& strTextureProtoTag, 
     return strTextureProtoTag;
 }
 
+CGameObject* CLevel_Tool::Spawn_Object(const _wstring& strProtoTag, const _wstring& strLayerTag, const _wstring& strName, void* pArg)
+{
+    auto* pReg = Client::CGameObject_Factory::GetInstance()->Get_Registration(strProtoTag);
+    if (nullptr == pReg) { Log_Error("Spawn_Object: no registration."); return nullptr; }
+
+    const _uint iLevel = ETOUI(TOOL_LEVEL::EDIT);
+
+    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, strProtoTag))
+    {
+        pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);  
+            m_pGameInstance_Proxy->Add_Prototype(iLevel, strProtoTag,
+                pReg->CreatorFunc(m_pDevice, m_pContext));                        
+    }
+
+    CGameObject* pObj = nullptr;
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pObj,
+        iLevel, strProtoTag,
+        ETOUI(TOOL_LEVEL::EDIT), strLayerTag, strName, pArg)))              
+    {
+        Log_Error("Spawn_Object: Add_GameObject failed.");
+        return nullptr;
+    }
+
+    if (pObj)
+        m_SpawnedObjects.push_back(pObj);
+
+    return pObj;
+}
+
+void CLevel_Tool::Clear_Spawned()
+{
+    for (auto* pObj : m_SpawnedObjects)
+        if (pObj)
+            m_pGameInstance_Proxy->Destroy_GameObject(pObj);
+    m_SpawnedObjects.clear();
+}
+
+void CLevel_Tool::Destroy_Spawned(CGameObject* pObject)
+{
+    if (nullptr == pObject)
+        return;
+
+    auto it = find(m_SpawnedObjects.begin(), m_SpawnedObjects.end(), pObject);
+    if (it != m_SpawnedObjects.end())
+        m_SpawnedObjects.erase(it);
+
+    m_pGameInstance_Proxy->Destroy_GameObject( pObject);
+}
+
 void CLevel_Tool::Update(_float fTimeDelta)
 {
     ImGuiIO& io = ImGui::GetIO();

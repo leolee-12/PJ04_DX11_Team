@@ -183,9 +183,14 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, CAnimator* pAnimato
             else if (m_bSpinSlashCharge == false)
             {
                 if (bIsAniFinish) 
+                {
                     m_eCurSwordState = SWORD_STATE::SPIN_SLASH;
+                }
                 else if (!bIsAniFinish)
+                {
                     m_eCurSwordState = SWORD_STATE::NONE;
+                    pKirby->Set_RotationLock(false);
+                }
                 pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
             }
 

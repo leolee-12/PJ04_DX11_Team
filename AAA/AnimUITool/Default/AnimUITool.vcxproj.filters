@@ -73,6 +73,9 @@
     <Filter Include="03. Panels\Preview">
       <UniqueIdentifier>{2abfc9cb-9484-4d82-99e3-991eb6fa9327}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03. Panels\Palette">
+      <UniqueIdentifier>{0ca1783a-af7b-4828-ab67-acf5518b4760}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Panel.h">
@@ -150,6 +153,9 @@
     <ClInclude Include="..\Public\Panel_Preview.h">
       <Filter>03. Panels\Preview</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Panel_Palette.h">
+      <Filter>03. Panels\Palette</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\ThirdParty\ImGui\Src\ImGuizmo.cpp">
@@ -226,6 +232,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Panel_Preview.cpp">
       <Filter>03. Panels\Preview</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Palette.cpp">
+      <Filter>03. Panels\Palette</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
