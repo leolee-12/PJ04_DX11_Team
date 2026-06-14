@@ -308,7 +308,7 @@ void CGameObject_Factory::Register_Container()
                 CKirby_Body::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Kirby_Body"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Kirby/Kirby.ysh",
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Kirby/Kirby.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
 
             // Sword

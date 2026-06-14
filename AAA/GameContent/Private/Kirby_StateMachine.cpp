@@ -68,8 +68,6 @@ void CKirby_StateMachine::Handle_Command(CKirby_Command* pCommand)
 
 HRESULT CKirby_StateMachine::Init_State()
 {
-    CKirby_State* pState{};
-
     auto Register_State = [this](KIRBY_STATE_TYPE eType, CKirby_State* pNewState) -> HRESULT
         {
             if (pNewState == nullptr)
