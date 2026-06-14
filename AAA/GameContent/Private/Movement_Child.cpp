@@ -50,6 +50,7 @@ CMovement_Child::CMovement_Child(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
     , m_fGroundFriction(40.f)
 
     , m_fMaxHorizontalSpeed(8.f)
+    , m_fMaxVerticalSpeed(30.f)
     , m_fMaxFallVelocity(-15.f)
     , m_fJumpVelocity(22.f)
 
@@ -81,6 +82,7 @@ CMovement_Child::CMovement_Child(const CMovement_Child& Prototype)
     , m_fGroundFriction(Prototype.m_fGroundFriction)
 
     , m_fMaxHorizontalSpeed(Prototype.m_fMaxHorizontalSpeed)
+    , m_fMaxVerticalSpeed(Prototype.m_fMaxVerticalSpeed)
     , m_fMaxFallVelocity(Prototype.m_fMaxFallVelocity)
     , m_fJumpVelocity(Prototype.m_fJumpVelocity)
 
@@ -356,6 +358,11 @@ void CMovement_Child::Set_MaxHorizontalSpeed(_float fMaxHorizontalSpeed)
     m_fMaxHorizontalSpeed = fMaxHorizontalSpeed < 0.f ? 0.f : fMaxHorizontalSpeed;
 }
 
+void CMovement_Child::Set_MaxVerticalSpeed(_float fMaxVerticalSpeed)
+{
+    m_fMaxVerticalSpeed = fMaxVerticalSpeed < 0.f ? 0.f : fMaxVerticalSpeed;
+}
+
 void CMovement_Child::Set_MaxFallVelocity(_float fMaxFallVelocity)
 {
     // 아래 방향이 음수인 엔진 기준. 양수로 넣어도 음수로 보정한다.
@@ -515,6 +522,10 @@ void CMovement_Child::Clamp_Velocity(_vector& vVelocity)
             vVelocity = XMVectorSet(XMVectorGetX(vHoriz), XMVectorGetY(vVelocity), XMVectorGetZ(vHoriz), 0.f);
         }
     }
+
+    // 최대 수직 속도
+    if (m_fMaxVerticalSpeed > 0.f && XMVectorGetY(vVelocity) > m_fMaxVerticalSpeed)
+        vVelocity = XMVectorSetY(vVelocity, m_fMaxVerticalSpeed);
 
     // 최대 낙하 속도 제한
     if (XMVectorGetY(vVelocity) < m_fMaxFallVelocity)

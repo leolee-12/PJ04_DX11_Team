@@ -13,6 +13,9 @@ CKirby_Fall::CKirby_Fall()
 
 HRESULT CKirby_Fall::Initialize()
 {
+    if (FAILED(__super::Initialize()))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -23,12 +26,16 @@ KIRBY_STATE_TYPE CKirby_Fall::Get_StateType()
 
 void CKirby_Fall::Enter(CKirby* pKirby)
 {
+    __super::Enter(pKirby);
+
     // Fall State
     m_eFallingState = FALL_STATE::FALLING;
 }
 
 void CKirby_Fall::Update(CKirby* pKirby, const _float fTimeDelta)
 {
+    __super::Update(pKirby, fTimeDelta);
+
     CMovement_Child* pMovementCom = pKirby->Get_Movement();
 
     CKirby_Body* pKirby_Body = pKirby->Get_Body();
@@ -55,6 +62,8 @@ void CKirby_Fall::Update(CKirby* pKirby, const _float fTimeDelta)
 
 void CKirby_Fall::Exit(CKirby* pKirby)
 {
+    __super::Exit(pKirby);
+
     CKirby_Body* pKirby_Body = pKirby->Get_Body();
     // Ani
     CAnimator* pAnimator = pKirby_Body->Get_Animator();
@@ -64,7 +73,8 @@ void CKirby_Fall::Exit(CKirby* pKirby)
 
 _bool CKirby_Fall::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
-    __super::Handle_Command(pKirby, pCommand);
+    if (__super::Handle_Command(pKirby, pCommand))
+        return true;
 
     KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
 
@@ -82,15 +92,20 @@ _bool CKirby_Fall::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             Handle_MoveCommand(pKirby, pCommand);
             return true;
         }
-        // Jump
-        //case KIRBY_COMMAND_TYPE::JUMP:
-        //{
-        //    if (!pCommand->IsDown())
-        //        return false;
+        // Hovering
+        case KIRBY_COMMAND_TYPE::JUMP:
+        {
+            if (!pCommand->IsDown())
+                return false;
 
-        //    pKirby->Change_State(KIRBY_STATE_TYPE::HOVERING);
-        //    return true;
-        //}
+            CMovement_Child* pMovementCom = pKirby->Get_Movement();
+            if (pMovementCom->Is_Grounded() == true)
+                pKirby->Change_State(KIRBY_STATE_TYPE::JUMP);
+            else
+                pKirby->Change_State(KIRBY_STATE_TYPE::HOVERING);
+
+            return true;
+        }
         // Attack Down
         case KIRBY_COMMAND_TYPE::ATTACK:
         {

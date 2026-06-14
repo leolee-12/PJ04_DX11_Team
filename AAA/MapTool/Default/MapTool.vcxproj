@@ -32,7 +32,6 @@
     <ClCompile Include="..\Private\Panel.cpp" />
     <ClCompile Include="..\Private\Panel_Toolbar.cpp" />
     <ClCompile Include="..\Private\Panel_Palette.cpp" />
-    <ClCompile Include="..\Private\Panel_NavMesh.cpp" />
     <ClCompile Include="..\Private\Panel_Console.cpp" />
     <ClCompile Include="..\Private\Panel_Hierarchy.cpp" />
     <ClCompile Include="..\Private\Panel_Inspector.cpp" />
@@ -50,40 +49,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\EditInstance.h" />
-    <ClInclude Include="..\Public\EnvObject.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\Public\EnvObject_Defines.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\Public\EnvObject_Effect.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\Public\EnvObject_Interact.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\Public\EnvObject_Static.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\Public\EnvObjectLoader.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="..\Public\ImGui_Manager.h" />
     <ClInclude Include="..\Public\Level_Edit.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Loader.h" />
-    <ClInclude Include="..\Public\MapSection.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\Public\MapSection_Defines.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\Public\MapStage.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="..\Public\MapToolProfiler.h" />
     <ClInclude Include="..\Public\ToolApp.h" />
     <ClInclude Include="..\Public\MapTool_Defines.h" />
@@ -96,7 +65,6 @@
     <ClInclude Include="..\Public\Panel_Toolbar.h" />
     <ClInclude Include="..\Public\Panel_Palette.h" />
     <ClInclude Include="..\Public\Panel_Profiler.h" />
-    <ClInclude Include="..\Public\Panel_NavMesh.h" />
     <ClInclude Include="..\Public\Panel_Console.h" />
     <ClInclude Include="..\Public\Panel_Hierarchy.h" />
     <ClInclude Include="..\Public\Panel_Inspector.h" />

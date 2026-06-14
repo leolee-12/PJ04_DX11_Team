@@ -426,12 +426,20 @@ _bool CGameInstance_Proxy::Update_CullingView(CULLING_VIEW eView, const CULLING_
 	return m_pOwner->Update_CullingView(eView, Desc);
 }
 
-_bool CGameInstance_Proxy::Should_CullAABB(CULLING_VIEW eView, _bool bEnableCulling, const BoundingBox& WorldBounds) const
+_bool CGameInstance_Proxy::Should_CullAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const
 {
 	if (!IsConnected())
 		return false;
 
-	return m_pOwner->Should_CullAABB(eView, bEnableCulling, WorldBounds);
+	return m_pOwner->Should_CullAABB(eView, WorldBounds);
+}
+
+_bool CGameInstance_Proxy::Should_CullByDistance(const BoundingBox& WorldBounds, _float fCullDistance) const
+{
+	if (!IsConnected())
+		return false;
+
+	return m_pOwner->Should_CullByDistance(WorldBounds, fCullDistance);
 }
 
 _bool XM_CALLCONV CGameInstance_Proxy::IsIn_CullingView_WorldSpace(CULLING_VIEW eView,	_fvector vWorldPos,	_float fRange) const
@@ -900,12 +908,12 @@ PxTriangleMesh* CGameInstance_Proxy::Cook_TriangleMesh(const _float3* p, _uint n
 
 	return m_pOwner->Cook_TriangleMesh(p, nv, idx, ni, bFlip);
 }
-PxRigidStatic* CGameInstance_Proxy::Add_StaticActor(PxTriangleMesh* pMesh, _fmatrix W)
+PxRigidStatic* CGameInstance_Proxy::Create_StaticActor(PxTriangleMesh* pMesh, _fmatrix W)
 {
 	if (!IsConnected())
 		return nullptr;
 
-	return m_pOwner->Add_StaticActor(pMesh, W);
+	return m_pOwner->Create_StaticActor(pMesh, W);
 }
 void           CGameInstance_Proxy::Remove_StaticActor(PxRigidStatic* pActor)
 {

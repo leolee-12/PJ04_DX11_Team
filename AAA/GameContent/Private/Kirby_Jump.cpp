@@ -15,6 +15,9 @@ CKirby_Jump::CKirby_Jump()
 
 HRESULT CKirby_Jump::Initialize()
 {
+    if (FAILED(__super::Initialize()))
+        return E_FAIL;
+
     m_fMaxGroundIgnoreTime = 0.5f;
 
     return S_OK;
@@ -27,6 +30,8 @@ KIRBY_STATE_TYPE CKirby_Jump::Get_StateType()
 
 void CKirby_Jump::Enter(CKirby* pKirby)
 {
+    __super::Enter(pKirby);
+
     // Movement Jump
     CMovement_Child* pMovementCom = pKirby->Get_Movement();
     pMovementCom->Try_Jump();
@@ -38,7 +43,7 @@ void CKirby_Jump::Enter(CKirby* pKirby)
     else
         pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::JUMP_R));
 
-    // First Frame Skip
+    // Ground Ignore
     m_fAccGroundIgnoreTime = m_fMaxGroundIgnoreTime;
 
     // Jump State
@@ -47,7 +52,9 @@ void CKirby_Jump::Enter(CKirby* pKirby)
 
 void CKirby_Jump::Update(CKirby* pKirby, const _float fTimeDelta)
 {
-    // First Frame Skip
+    __super::Update(pKirby, fTimeDelta);
+
+    // Ground Ignore
     if (m_fAccGroundIgnoreTime > 0.f)
     {
         m_fAccGroundIgnoreTime -= fTimeDelta;
@@ -78,7 +85,7 @@ void CKirby_Jump::Update(CKirby* pKirby, const _float fTimeDelta)
         }
     }      
     // Wair or Run(바로 땅)
-    if (pMovementCom->Is_Grounded() == true)
+    if (bIsGround == true)
     {
         Transition_Wait_OR_Run(pKirby);
     }
@@ -86,8 +93,7 @@ void CKirby_Jump::Update(CKirby* pKirby, const _float fTimeDelta)
 
 void CKirby_Jump::Exit(CKirby* pKirby)
 {
-    // First Frame Skip
-    m_bFirstFrameSkip = false;
+    __super::Exit(pKirby);
 
     // 왼발 점프, 오른발 점프
     s_bLeft = !s_bLeft;
@@ -95,7 +101,8 @@ void CKirby_Jump::Exit(CKirby* pKirby)
 
 _bool CKirby_Jump::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
-    __super::Handle_Command(pKirby, pCommand);
+    if (__super::Handle_Command(pKirby, pCommand))
+        return true;
 
     KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
 
@@ -113,15 +120,15 @@ _bool CKirby_Jump::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             Handle_MoveCommand(pKirby, pCommand);
             return true;
         }
-        //// Jump
-        //case KIRBY_COMMAND_TYPE::JUMP:
-        //{
-        //    if (!pCommand->IsDown())
-        //        return false;
+        // Hovering
+        case KIRBY_COMMAND_TYPE::JUMP:
+        {
+            if (!pCommand->IsDown())
+                return false;
 
-        //    pKirby->Change_State(KIRBY_STATE_TYPE::HOVERING);
-        //    return true;
-        //}
+            pKirby->Change_State(KIRBY_STATE_TYPE::HOVERING);
+            return true;
+        }
         // Attack Down
         case KIRBY_COMMAND_TYPE::ATTACK:
         {

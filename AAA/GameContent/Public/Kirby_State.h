@@ -17,7 +17,8 @@ enum class KIRBY_STATE_TYPE
 {
 	WAIT, RUN, JUMP, FALL,
 	ATTACK,
-	HOVERING
+	HOVERING,
+	GET_ABILITY, ABILITY_DUMP
 };
 
 class CLIENT_DLL CKirby_State abstract : public CBase
@@ -26,7 +27,7 @@ protected:
 	CKirby_State();
 	virtual ~CKirby_State() = default;
 
-private:
+protected:
 	HRESULT Initialize();
 
 public:

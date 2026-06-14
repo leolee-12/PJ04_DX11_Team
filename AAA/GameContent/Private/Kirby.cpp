@@ -7,7 +7,10 @@
 #include "GameContent_const.h"
 #include "Movement_Child.h"
 
+// Parts
 #include "Kirby_Body.h"
+#include "Kirby_Sword.h"
+#include "Kirby_SwordHat.h"
 
 #include "Kirby_InputManager.h"
 #include "Kirby_Controller.h"
@@ -15,6 +18,7 @@
 
 // Ability
 #include "Kirby_Ability_Normal.h"
+#include "Kirby_Ability_Sword.h"
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCharacter{ pDevice, pContext }
@@ -67,7 +71,6 @@ void CKirby::Update(_float fTimeDelta)
     m_pKirby_Controller->Update_KirbyController(fTimeDelta);
     m_pKirby_StateMachine->Update_StateMachine(fTimeDelta);
 
-
     if (m_pGameInstance_Proxy->Is_EditMode())
     {
         m_pMovement->Sync_To_Controller();
@@ -87,11 +90,46 @@ void CKirby::Update(_float fTimeDelta)
 void CKirby::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
+
+    if (m_pTriggerSensor && m_pTransformCom)
+    {
+        m_pTriggerSensor->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+
+#ifdef _DEBUG
+        m_pGameInstance_Proxy->Add_DebugComponent(m_pTriggerSensor);
+#endif
+    }
 }
 
 HRESULT CKirby::Render()
 {
     return S_OK;
+}
+
+void CKirby::On_Deserialized()
+{
+    if (m_pMovement)
+        m_pMovement->Sync_To_Controller();
+}
+
+void CKirby::OnOffParts(KIRBY_ABILITY_TYPE eAbilityType, _bool fOn)
+{
+    auto OnOffPart = [this](const wchar_t* PartTag, _bool bOn)->void
+        {
+            auto iter = m_PartObjects.find(PartTag);
+            if (iter != m_PartObjects.end())
+            {
+                static_cast<CKirby_OnOffPart*>(iter->second)->PartOnOff(bOn);
+            }
+        };
+
+    switch (eAbilityType)
+    {
+        case KIRBY_ABILITY_TYPE::SWORD:
+            OnOffPart(CKirby_Sword::Kirby_PartTag, fOn);
+            OnOffPart(CKirby_SwordHat::Kirby_PartTag, fOn);
+            break;
+    }
 }
 
 void CKirby::Add_MoveDir(const _float3& vWishDir)
@@ -125,19 +163,65 @@ CKirby_Ability* CKirby::Get_KirbyAbility()
     return m_pKirby_Ability;
 }
 
-void CKirby::Set_KirbyAbility(CKirby_Ability* pKirby_Ability)
+void CKirby::Set_KirbyAbility(KIRBY_ABILITY_TYPE eAbilityState)
 {
     if (m_pKirby_Ability != nullptr)
+    {
         Safe_Release(m_pKirby_Ability);
+        m_pKirby_Ability = nullptr;
+    }
 
-    m_pKirby_Ability = pKirby_Ability;
+    switch (eAbilityState)
+    {
+    case KIRBY_ABILITY_TYPE::NORMAL:
+        m_pKirby_Ability = CKirby_Ability_Normal::Create();
+        break;
+    case KIRBY_ABILITY_TYPE::SWORD:
+        m_pKirby_Ability = CKirby_Ability_Sword::Create();
+        break;
+    }
+
+}
+
+void CKirby::Update_AbilityDumpCool(_float fTimeDelta)
+{
+    if (m_bDecreaseAbilityDumpCool == true)
+    {
+        m_fAccAbilityDumpCoolTime -= fTimeDelta;
+
+        m_bDecreaseAbilityDumpCool = false;
+    }
+    else
+    {
+        m_fAccAbilityDumpCoolTime += fTimeDelta;
+    }
+
+    Helper::FloatClamp(m_fAccAbilityDumpCoolTime, 0.f, m_fMaxAbilityDumpCoolTime);
+
+    //debug
+    char szLog[128] = {};
+    sprintf_s(szLog, "m_fAccAbilityDumpCoolTime : %.3f\n", m_fAccAbilityDumpCoolTime);
+    OutputDebugStringA(szLog);
+}
+
+void CKirby::Reset_AbilityDumpCool()
+{
+    m_fAccAbilityDumpCoolTime = m_fMaxAbilityDumpCoolTime;
+}
+
+_bool CKirby::Can_AbilityDump()
+{
+    if (m_fAccAbilityDumpCoolTime <= 0.f)
+        return true;
+
+    return false;
 }
 
 HRESULT CKirby::Ready_Components()
 {
     _float3 vFootPos;
     XMStoreFloat3(&vFootPos, m_pTransformCom->Get_State(STATE::POSITION));
-    m_pController = m_pGameInstance_Proxy->Create_CapsuleController(vFootPos, CCT_RADIUS, CCT_HEIGHT);
+    m_pController = m_pGameInstance_Proxy->Create_CapsuleController(vFootPos, s_fCCT_Radius, s_fCCT_Height);
 
     m_pMovement = Add_Component<CMovement_Child>(TEXT("Com_Movement"), CMovement_Child::Create(m_pDevice, m_pContext));
     if (m_pMovement == nullptr)
@@ -145,11 +229,33 @@ HRESULT CKirby::Ready_Components()
 
     m_pMovement->Set_Refs(m_pTransformCom, m_pController);
 
+    // TriggerSensor(Collider)
+    m_pTriggerSensor = Add_Component<CCollider>(
+        TEXT("Com_TriggerSensor"),
+        CCollider::Create(m_pDevice, m_pContext, COLLIDER::AABB));
+    if (nullptr == m_pTriggerSensor)
+        return E_FAIL;
+
+    CCollider::COLLIDER_DESC ColliderDesc{};
+    ColliderDesc.pOwner = this;
+    ColliderDesc.vCenter = _float3(0.f, s_fCCT_Radius + s_fCCT_Height * 0.5f, 0.f);
+    ColliderDesc.vSize = _float3(
+        s_fCCT_Radius * 2.f,
+        s_fCCT_Height + s_fCCT_Radius * 2.f,
+        s_fCCT_Height * 2.f);
+
+    if (FAILED(m_pTriggerSensor->Initialize(&ColliderDesc)))
+        return E_FAIL;
+
+    m_pGameInstance_Proxy->Register_Collider(m_pTriggerSensor, CL_PLAYER_SENSOR);
+    m_pGameInstance_Proxy->Add_CollisionPool(CL_PLAYER_SENSOR, CL_ENV_TRIGGER);
+
     return S_OK;
 }
 
 HRESULT CKirby::Ready_PartObjects()
 {
+    // Body
     CKirby_Body::KIRBY_BODY_DESC BodyDesc{};
     BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 
@@ -158,6 +264,24 @@ HRESULT CKirby::Ready_PartObjects()
         return E_FAIL;
 
     m_pBody = dynamic_cast<CKirby_Body*>(m_PartObjects[TEXT("Body")]);
+
+    // Sword
+    CKirby_Sword::KIRBY_SWORD_DESC SwordDesc{};
+    SwordDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    SwordDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("RHaveL");
+
+    if (FAILED(Add_PartObject(ETOUI(LEVEL::GAMEPLAY), CKirby_Sword::PROTOTYPE_TAG,
+        CKirby_Sword::Kirby_PartTag, &SwordDesc)))
+        return E_FAIL;
+
+    // SwordHat
+    CKirby_SwordHat::KIRBY_SWORDHAT_DESC SwordHatDesc{};
+    SwordHatDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    SwordHatDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("HatL");
+
+    if (FAILED(Add_PartObject(ETOUI(LEVEL::GAMEPLAY), CKirby_SwordHat::PROTOTYPE_TAG,
+        CKirby_SwordHat::Kirby_PartTag, &SwordHatDesc)))
+        return E_FAIL;
 
     return S_OK;
 }
@@ -191,12 +315,6 @@ HRESULT CKirby::Ready_Ability()
 HRESULT CKirby::Bind_ShaderResources()
 {
     return S_OK;
-}
-
-void CKirby::On_Deserialized()
-{
-    if (m_pMovement)
-        m_pMovement->Sync_To_Controller();
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

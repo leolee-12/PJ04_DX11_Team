@@ -11,6 +11,7 @@ NS_END
 NS_BEGIN(Client)
 
 class CKirby;
+class CMovement_Child;
 
 class CLIENT_DLL CKirby_Ability_Normal final : public CKirby_Ability
 {
@@ -62,6 +63,10 @@ private:
 private:
 	void Interpolation_Inhale(CAnimator* pAnimator);
 	void Choose_InhaleAniName(_string& strAniName);
+
+	void Change_Ability(CKirby* pKirby);
+
+	void Reset_Default(CKirby* pKirby);
 
 public:
 	static CKirby_Ability_Normal* Create();

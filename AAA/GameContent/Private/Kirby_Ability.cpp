@@ -1,6 +1,7 @@
 #include "Kirby_Ability.h"
 
 #include "Kirby.h"
+#include "Kirby_State.h"
 
 CKirby_Ability::CKirby_Ability()
 {
@@ -55,6 +56,18 @@ HRESULT CKirby_Ability::Initialize()
     m_tAniInfos[iLanding].bLoop = false;
     m_tAniInfos[iLanding].fBlend = 0.05f;
     m_tAniInfos[iLanding].fSpeed = 1.f;
+
+    _uint iGet_Ability = ETOUI(ABILITY_ANI::GET_ABILITY);
+    m_tAniInfos[iGet_Ability].strAniName = "GetAbilityFirst";
+    m_tAniInfos[iGet_Ability].bLoop = false;
+    m_tAniInfos[iGet_Ability].fBlend = 0.1f;
+    m_tAniInfos[iGet_Ability].fSpeed = 2.5f;
+
+    _uint iAbility_Dump = ETOUI(ABILITY_ANI::ABILITY_DUMP);
+    m_tAniInfos[iAbility_Dump].strAniName = "AbilityDump";
+    m_tAniInfos[iAbility_Dump].bLoop = false;
+    m_tAniInfos[iAbility_Dump].fBlend = 0.1f;
+    m_tAniInfos[iAbility_Dump].fSpeed = 2.5f;
 
     return S_OK;
 }

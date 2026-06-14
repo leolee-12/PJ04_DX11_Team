@@ -14,8 +14,11 @@ class ENGINE_DLL CCollider final : public CComponent
 public:
 	typedef struct tagColliderDesc
 	{
-		_float3		vCenter = {};
-		CGameObject* pOwner = { nullptr };
+		_float3			vCenter = {};
+		_float3			vSize = { 1.f, 1.f, 1.f };
+		_float3			vRadians = {};
+		_float			fRadius = { 0.5f };
+		CGameObject*	pOwner = { nullptr };
 	}COLLIDER_DESC;
 
 private:

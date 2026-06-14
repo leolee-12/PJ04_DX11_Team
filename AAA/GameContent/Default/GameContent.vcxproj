@@ -28,6 +28,7 @@
     <ClInclude Include="..\Public\Common_Circle01.h" />
     <ClInclude Include="..\Public\Common_Curve03.h" />
     <ClInclude Include="..\public\Effect_Loader.h" />
+    <ClInclude Include="..\Public\Env_CollisionCatalog.h" />
     <ClInclude Include="..\Public\GameContent_AnimEvents.h" />
     <ClInclude Include="..\Public\GameContent_const.h" />
     <ClInclude Include="..\Public\GameContent_Defines.h" />
@@ -35,21 +36,34 @@
     <ClInclude Include="..\Public\GameContent_enum.h" />
     <ClInclude Include="..\Public\EnvObject.h" />
     <ClInclude Include="..\Public\EnvObject_Defines.h" />
-    <ClInclude Include="..\Public\EnvObject_Effect.h" />
+    <ClInclude Include="..\Public\EnvObject_Trigger.h" />
     <ClInclude Include="..\Public\EnvObject_Interact.h" />
     <ClInclude Include="..\Public\EnvObject_Static.h" />
     <ClInclude Include="..\Public\GameContrnt_Events.h" />
     <ClInclude Include="..\Public\GameObject_Factory.h" />
+    <ClInclude Include="..\Public\Kirby_AbilityDump.h" />
+    <ClInclude Include="..\Public\Kirby_Ability_Sword.h" />
+    <ClInclude Include="..\Public\Kirby_ControllableState.h" />
+    <ClInclude Include="..\Public\Kirby_GetAbility.h" />
+    <ClInclude Include="..\Public\Kirby_OnOffPart.h" />
     <ClInclude Include="..\Public\Kirby_Fall.h" />
     <ClInclude Include="..\Public\Kirby_Attack.h" />
     <ClInclude Include="..\Public\Kirby_Hovering.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Public\Map_EditSession.h" />
+    <ClInclude Include="..\Public\Map_LayerPolicy.h" />
+    <ClInclude Include="..\Public\Map_OverrideStore.h" />
+    <ClInclude Include="..\Public\Map_PresetCatalog.h" />
+    <ClInclude Include="..\Public\Map_StageOverrideSerializer.h" />
     <ClInclude Include="..\Public\BladeKnight.h" />
     <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\Movement_Child.h" />
+    <ClInclude Include="..\Public\Map_DeltaIO.h" />
     <ClInclude Include="..\Public\UI_Enums.h" />
+    <ClInclude Include="..\Public\Kirby_Sword.h" />
+    <ClInclude Include="..\Public\Kirby_SwordHat.h" />
     <ClInclude Include="..\Public\UI_Fonts.h" />
     <ClInclude Include="..\Public\UIAnimatorCom.h" />
     <ClInclude Include="..\Public\UI_GaugeBarCom.h" />
@@ -75,10 +89,11 @@
     <ClInclude Include="..\Public\Map_Defines.h" />
     <ClInclude Include="..\Public\MapStage.h" />
     <ClInclude Include="..\public\MapObject.h" />
-    <ClInclude Include="..\Public\Map_EditHelper.h" />
+    <ClInclude Include="..\Public\Map_LevelContent.h" />
     <ClInclude Include="..\Public\Map_Loader.h" />
     <ClInclude Include="..\Public\Map_LoadTypes.h" />
     <ClInclude Include="..\Public\Map_ModelResolver.h" />
+    <ClInclude Include="..\Public\Map_Override.h" />
     <ClInclude Include="..\Public\Map_Parser.h" />
     <ClInclude Include="..\Public\Map_ProtoRegister.h" />
     <ClInclude Include="..\Public\Map_Spawner.h" />
@@ -101,6 +116,7 @@
     <ClInclude Include="..\public\TestRect.h" />
     <ClInclude Include="..\Public\UI_Effect.h" />
     <ClInclude Include="..\Public\TornadoSpinReverse.h" />
+    <ClInclude Include="..\Public\TestTriggerBox.h" />
     <ClInclude Include="..\Public\UI_Image.h" />
     <ClInclude Include="..\Public\UI_KirbyStatus.h" />
     <ClInclude Include="..\Public\UI_PointStar.h" />
@@ -123,23 +139,37 @@
     <ClCompile Include="..\Private\Common_Curve03.cpp" />
     <ClCompile Include="..\private\Effect_Loader.cpp" />
     <ClCompile Include="..\Private\EnvObject.cpp" />
-    <ClCompile Include="..\Private\EnvObject_Effect.cpp" />
+    <ClCompile Include="..\Private\EnvObject_Trigger.cpp" />
     <ClCompile Include="..\Private\EnvObject_Interact.cpp" />
     <ClCompile Include="..\Private\EnvObject_Static.cpp" />
+    <ClCompile Include="..\Private\Env_CollisionCatalog.cpp" />
     <ClCompile Include="..\Private\GameContent_Log.cpp" />
     <ClCompile Include="..\Private\GameObject_Factory.cpp" />
+    <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
+    <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
+    <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
+    <ClCompile Include="..\Private\Kirby_GetAbility.cpp" />
+    <ClCompile Include="..\Private\Kirby_OnOffPart.cpp" />
     <ClCompile Include="..\Private\Kirby_Fall.cpp" />
     <ClCompile Include="..\Private\Kirby_Attack.cpp" />
     <ClCompile Include="..\Private\Kirby_Hovering.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Private\Map_EditSession.cpp" />
+    <ClCompile Include="..\Private\Map_LayerPolicy.cpp" />
+    <ClCompile Include="..\Private\Map_OverrideStore.cpp" />
+    <ClCompile Include="..\Private\Map_PresetCatalog.cpp" />
+    <ClCompile Include="..\Private\Map_StageOverrideSerializer.cpp" />
     <ClCompile Include="..\Private\BladeKnight.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
     <ClCompile Include="..\Private\Movement_Child.cpp" />
+    <ClCompile Include="..\Private\Map_DeltaIO.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />
     <ClCompile Include="..\Private\UI_GaugeBarCom.cpp" />
     <ClCompile Include="..\Private\UI_GaugeFill.cpp" />
+    <ClCompile Include="..\Private\Kirby_Sword.cpp" />
+    <ClCompile Include="..\Private\Kirby_SwordHat.cpp" />
     <ClCompile Include="..\Private\UI_GenericContainer.cpp" />
     <ClCompile Include="..\Private\InhaleEffect.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp" />
@@ -156,9 +186,10 @@
     <ClCompile Include="..\Private\MapSection.cpp" />
     <ClCompile Include="..\Private\MapStage.cpp" />
     <ClCompile Include="..\Private\Map_Builder.cpp" />
-    <ClCompile Include="..\Private\Map_EditHelper.cpp" />
+    <ClCompile Include="..\Private\Map_LevelContent.cpp" />
     <ClCompile Include="..\Private\Map_Loader.cpp" />
     <ClCompile Include="..\Private\Map_ModelResolver.cpp" />
+    <ClCompile Include="..\Private\Map_Override.cpp" />
     <ClCompile Include="..\Private\Map_Parser.cpp" />
     <ClCompile Include="..\Private\Map_ProtoRegister.cpp" />
     <ClCompile Include="..\Private\Map_Spawner.cpp" />
@@ -180,6 +211,7 @@
     <ClCompile Include="..\private\TestRect.cpp" />
     <ClCompile Include="..\Private\UI_Effect.cpp" />
     <ClCompile Include="..\Private\TornadoSpinReverse.cpp" />
+    <ClCompile Include="..\Private\TestTriggerBox.cpp" />
     <ClCompile Include="..\Private\UI_Image.cpp" />
     <ClCompile Include="..\Private\UI_KirbyStatus.cpp" />
     <ClCompile Include="..\Private\UI_PointStar.cpp" />

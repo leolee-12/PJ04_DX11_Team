@@ -1,5 +1,7 @@
 #include "Culling_Util.h"
 
+#include "GameInstance.h"
+
 namespace
 {
 	_bool Is_FiniteFloat(_float fValue)
@@ -99,4 +101,33 @@ _bool CCulling_Util::Expand_AABB(BoundingBox* pBounds, _float fMargin)
 	pBounds->Extents.y += fMargin;
 	pBounds->Extents.z += fMargin;
 	return true;
+}
+
+_bool CCulling_Util::Check_CullByDistance(const BoundingBox& WorldBounds, const _float4& vCamPos, _float fCullDistance)
+{
+	if (!Is_FiniteFloat(fCullDistance) || fCullDistance < 0.f)
+		return false;
+
+	if (!Is_FiniteFloat(vCamPos.x) || !Is_FiniteFloat(vCamPos.y) || !Is_FiniteFloat(vCamPos.z))
+		return false;
+
+	if (!Is_FiniteFloat(WorldBounds.Center.x) || !Is_FiniteFloat(WorldBounds.Center.y) || !Is_FiniteFloat(WorldBounds.Center.z))
+		return false;
+
+	if (!Is_FiniteFloat(WorldBounds.Extents.x) || !Is_FiniteFloat(WorldBounds.Extents.y) || !Is_FiniteFloat(WorldBounds.Extents.z))
+		return false;
+
+	const _vector vCam = XMLoadFloat4(&vCamPos);
+	const _vector vCenter = XMLoadFloat3(&WorldBounds.Center);
+	const _vector vExtents = XMLoadFloat3(&WorldBounds.Extents);
+
+	const _float fCenterDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vCenter, vCam)));
+	const _float fBoundsRadius = XMVectorGetX(XMVector3Length(vExtents));
+
+	const _float fSurfaceDistance =
+		(fCenterDistance > fBoundsRadius)
+		? (fCenterDistance - fBoundsRadius)
+		: 0.f;
+
+	return fSurfaceDistance >= fCullDistance;
 }

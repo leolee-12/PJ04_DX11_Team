@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Kirby_State.h"
+#include "Kirby_ControllableState.h"
 
 #include "GameContent_Defines.h"
 
@@ -11,7 +11,7 @@ NS_BEGIN(Client)
 
 class CKirby;
 
-class CLIENT_DLL CKirby_Jump final : public CKirby_State
+class CLIENT_DLL CKirby_Jump final : public CKirby_ControllableState
 {
 private:
 	CKirby_Jump();
@@ -36,8 +36,6 @@ public:
 private:
 	JUMP_STATE m_eJumpType{};
 	static _bool s_bLeft;
-
-	_bool m_bFirstFrameSkip{};
 
 	_float m_fAccGroundIgnoreTime{};
 	_float m_fMaxGroundIgnoreTime{};

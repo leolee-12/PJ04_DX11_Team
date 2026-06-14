@@ -1,15 +1,27 @@
 #include "Map_ProtoRegister.h"
-
-#include "EnvObject_Effect.h"
+#include "GameContent_Log.h"
+#include "EnvObject_Trigger.h"
 #include "EnvObject_Interact.h"
 #include "EnvObject_Static.h"
-#include "GameContent_Log.h"
-#include "GameInstance.h"
 #include "MapSection.h"
 #include "MapStage.h"
-#include "Model.h"
+#include "GameObject_Factory.h"
+
+#include "GameInstance.h"
 
 #include <exception>
+
+namespace
+{
+	_bool Needs_EnvModelCollisionCook(const ENV_OBJECT_DESC& Desc)
+	{
+		const ENV_COLLISION_DESC& Collision = Desc.tCollision;
+
+		return Collision.eColliderKind == ENV_COLLIDER_KIND::MODEL_MESH
+			&& Collision.bHasDecorCollisionApxbin
+			&& !Collision.bInvalidCollision;
+	}
+}
 
 NS_BEGIN(Client)
 
@@ -34,13 +46,93 @@ HRESULT CMap_ProtoRegister::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, c
 			return E_FAIL;
 	}
 
+	unordered_set<wstring> AllEnvModelTags;
+	unordered_set<wstring> CookRequiredEnvModelTags;
+
+	const size_t iTotalEnvDescCount = Package.EnvObjectDescs.size();
+
 	for (const ENV_OBJECT_DESC& Desc : Package.EnvObjectDescs)
 	{
 		if (Desc.strModelProtoTag.empty())
 			continue;
 
-		if (FAILED(Ready_EnvModel(Levels.iEnvModelLevel, Desc)))
+		AllEnvModelTags.insert(Desc.strModelProtoTag);
+
+		if (Needs_EnvModelCollisionCook(Desc))
+			CookRequiredEnvModelTags.insert(Desc.strModelProtoTag);
+	}
+
+#ifdef _DEBUG
+	{
+		size_t iCatalogCheckedDescCount = 0;
+		size_t iCatalogHitDescCount = 0;
+		size_t iModelMeshDescCount = 0;
+		size_t iModelMeshCookDescCount = 0;
+
+		for (const ENV_OBJECT_DESC& Desc : Package.EnvObjectDescs)
+		{
+			if (Desc.tCollision.bCatalogCollisionChecked)
+				++iCatalogCheckedDescCount;
+
+			if (Desc.tCollision.bHasDecorCollisionApxbin)
+				++iCatalogHitDescCount;
+
+			if (Desc.tCollision.eColliderKind == ENV_COLLIDER_KIND::MODEL_MESH)
+			{
+				++iModelMeshDescCount;
+
+				if (Needs_EnvModelCollisionCook(Desc))
+					++iModelMeshCookDescCount;
+			}
+		}
+
+		Log_GameContentInfo(
+			"EnvPhysics summary: totalDesc="
+			+ to_string(iTotalEnvDescCount)
+			+ " catalogChecked="
+			+ to_string(iCatalogCheckedDescCount)
+			+ " catalogHit="
+			+ to_string(iCatalogHitDescCount)
+			+ " modelMeshDesc="
+			+ to_string(iModelMeshDescCount)
+			+ " modelMeshCookDesc="
+			+ to_string(iModelMeshCookDescCount)
+			+ " totalModelTags="
+			+ to_string(AllEnvModelTags.size())
+			+ " cookModelTags="
+			+ to_string(CookRequiredEnvModelTags.size()));
+	}
+#endif
+
+	for (const ENV_OBJECT_DESC& Desc : Package.EnvObjectDescs)
+	{
+		if (Desc.strModelProtoTag.empty())
+			continue;
+
+		const _bool bCookCollisionMesh =
+			CookRequiredEnvModelTags.find(Desc.strModelProtoTag) != CookRequiredEnvModelTags.end();
+
+		if (FAILED(Ready_EnvModel(Levels.iEnvModelLevel, Desc, bCookCollisionMesh, Levels.bEnableEnvObjectPicking)))
 			return E_FAIL;
+	}
+
+	for (const MAP_ADDED_OBJECT_DESC& Added : Package.AddedObjectDescs)
+	{
+		if (m_pProxy->Has_Prototype(Levels.iObjectLevel, Added.strPrototypeTag))
+			continue;
+
+		auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(Added.strPrototypeTag);
+		if (nullptr == pReg)
+			return E_FAIL;
+
+		pReg->ResourceLoader(m_pProxy, m_pDevice, m_pContext);
+		if (FAILED(m_pProxy->Add_Prototype(
+			Levels.iObjectLevel,
+			Added.strPrototypeTag.c_str(),
+			static_cast<CGameObject*>(pReg->CreatorFunc(m_pDevice, m_pContext)))))
+		{
+			return E_FAIL;
+		}
 	}
 
 	return S_OK;
@@ -86,8 +178,8 @@ HRESULT CMap_ProtoRegister::Ready_ObjectPrototypes(_uint iObjectLevel)
 		CEnvObject_Interact::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	if (FAILED(EnsurePrototype(CEnvObject_Effect::PROTOTYPE_TAG,
-		CEnvObject_Effect::Create(m_pDevice, m_pContext))))
+	if (FAILED(EnsurePrototype(CEnvObject_Trigger::PROTOTYPE_TAG,
+		CEnvObject_Trigger::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	return S_OK;
@@ -137,7 +229,7 @@ HRESULT CMap_ProtoRegister::Ready_MapSectionModel(_uint iModelLevel, const MAP_S
 	return S_OK;
 }
 
-HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_DESC& Desc)
+HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_DESC& Desc, _bool bCookCollisionMesh, _bool bEnablePickingData)
 {
 	if (nullptr == m_pProxy)
 		return E_FAIL;
@@ -148,25 +240,74 @@ HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_D
 	if (m_pProxy->Has_Prototype(iModelLevel, Desc.strModelProtoTag))
 		return S_OK;
 
+//#ifdef _DEBUG
+//	if (bCookCollisionMesh)
+//	{
+//		Log_GameContentInfo(
+//			"[EnvCook] begin object="
+//			+ WstrToStr(Desc.strObjectName)
+//			+ " protoTag="
+//			+ WstrToStr(Desc.strModelProtoTag)
+//			+ " path="
+//			+ WstrToStr(Desc.strModelPath)
+//			+ " apxbin="
+//			+ WstrToStr(Desc.tCollision.strDecorCollisionApxbinName));
+//	}
+//#endif
+
 	const string strModelPath = WstrToStr(Desc.strModelPath);
 	CModel* pModelPrototype = nullptr;
 
 	try
 	{
-		pModelPrototype = CModel::Create_WithTextureHub(
-			m_pDevice,
-			m_pContext,
-			MODEL::NONANIM,
-			strModelPath.c_str());
+		if (bEnablePickingData)
+		{
+			pModelPrototype = CModel::Create_WithTextureHub(
+				m_pDevice,
+				m_pContext,
+				MODEL::NONANIM,
+				strModelPath.c_str(),
+				XMMatrixIdentity(),
+				[](const string&) -> bool
+				{
+					return true;
+				},
+				bCookCollisionMesh);
+		}
+		else
+		{
+			pModelPrototype = CModel::Create_WithTextureHub(
+				m_pDevice,
+				m_pContext,
+				MODEL::NONANIM,
+				strModelPath.c_str(),
+				XMMatrixIdentity(),
+				nullptr,
+				bCookCollisionMesh);
+		}
 	}
 	catch (const std::exception& e)
 	{
 		Log_GameContentWarning(
-			"EnvObject model creation exception: object=" + WstrToStr(Desc.strObjectName)
-			+ " path=" + strModelPath
-			+ " reason=" + e.what());
+			"EnvObject model creation exception: object="
+			+ WstrToStr(Desc.strObjectName)
+			+ " path="
+			+ strModelPath
+			+ " reason="
+			+ e.what());
 		return E_FAIL;
 	}
+
+//#ifdef _DEBUG
+//	if (bCookCollisionMesh)
+//	{
+//		Log_GameContentInfo(
+//			"[EnvCook] end object="
+//			+ WstrToStr(Desc.strObjectName)
+//			+ " protoTag="
+//			+ WstrToStr(Desc.strModelProtoTag));
+//	}
+//#endif
 
 	if (nullptr == pModelPrototype)
 		return E_FAIL;
@@ -189,7 +330,7 @@ const _tchar* CMap_ProtoRegister::Get_EnvObjectProtoTag(ENV_OBJECT_KIND eKind) c
 	{
 	case ENV_OBJECT_KIND::STATIC: return CEnvObject_Static::PROTOTYPE_TAG;
 	case ENV_OBJECT_KIND::INTERACT: return CEnvObject_Interact::PROTOTYPE_TAG;
-	case ENV_OBJECT_KIND::EFFECT: return CEnvObject_Effect::PROTOTYPE_TAG;
+	case ENV_OBJECT_KIND::EFFECT: return CEnvObject_Trigger::PROTOTYPE_TAG;
 	default: return nullptr;
 	}
 }
