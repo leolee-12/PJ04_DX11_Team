@@ -65,6 +65,7 @@ private:
 	virtual HRESULT			Ready_Events() override { return S_OK; }
 	virtual HRESULT			Bind_WorldMatrix() override;
 	void					Update_LocalBounds();
+	void					Refresh_ColliderActor();
 
 private:
 	_wstring			m_strProtoTag = { PROTOTYPE_TAG };

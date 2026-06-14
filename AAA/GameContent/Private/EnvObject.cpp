@@ -176,9 +176,9 @@ _bool XM_CALLCONV CEnvObject::Pick_Ray(_fvector vOrigin, _fvector vDir, _float3*
 	return true;
 }
 
-HRESULT CEnvObject::Ready_RenderComponents(_uint iModelProtoLevel, const wstring& strModelProtoTag)
+HRESULT CEnvObject::Ready_RenderComponents(_uint iModelProtoLevel, const wstring& wstrModelProtoTag)
 {
-	if (strModelProtoTag.empty())
+	if (wstrModelProtoTag.empty())
 		return S_OK;
 
 	m_pShaderCom = Add_Component<CShader>(
@@ -190,7 +190,7 @@ HRESULT CEnvObject::Ready_RenderComponents(_uint iModelProtoLevel, const wstring
 
 	m_pModelCom = Add_Component<CModel>(
 		iModelProtoLevel,
-		strModelProtoTag,
+		wstrModelProtoTag,
 		TEXT("Com_Model"));
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
@@ -211,11 +211,11 @@ HRESULT CEnvObject::Ready_PhysicsActor()
 //		{
 //			Log_EnvPhysicsInfo(
 //				"[EnvPhysics] Skip actor: invalid collision. object="
-//				+ WstrToStr(m_tDesc.strObjectName)
+//				+ WstrToStr(m_tDesc.wstrObjectName)
 //				+ " uid="
 //				+ to_string(m_tDesc.iUid)
 //				+ " modelTag="
-//				+ WstrToStr(m_tDesc.strModelProtoTag));
+//				+ WstrToStr(m_tDesc.wstrModelProtoTag));
 //		}
 //#endif
 		return S_OK;
@@ -245,11 +245,11 @@ HRESULT CEnvObject::Ready_PhysicsActor_ModelMesh()
 #ifdef _DEBUG
 		Log_EnvPhysicsInfo(
 			"[EnvPhysics] MODEL_MESH actor skipped: no decor collision apxbin. object="
-			+ WstrToStr(m_tDesc.strObjectName)
+			+ WstrToStr(m_tDesc.wstrObjectName)
 			+ " uid="
 			+ to_string(m_tDesc.iUid)
 			+ " modelTag="
-			+ WstrToStr(m_tDesc.strModelProtoTag));
+			+ WstrToStr(m_tDesc.wstrModelProtoTag));
 #endif
 		return S_OK;
 	}
@@ -288,11 +288,11 @@ HRESULT CEnvObject::Ready_PhysicsActor_ModelMesh()
 #ifdef _DEBUG
 		Log_EnvPhysicsWarning(
 			"[EnvPhysics] MODEL_MESH actor failed: Create_StaticActor returned null. object="
-			+ WstrToStr(m_tDesc.strObjectName)
+			+ WstrToStr(m_tDesc.wstrObjectName)
 			+ " uid="
 			+ to_string(m_tDesc.iUid)
 			+ " modelTag="
-			+ WstrToStr(m_tDesc.strModelProtoTag));
+			+ WstrToStr(m_tDesc.wstrModelProtoTag));
 #endif
 		return E_FAIL;
 	}
@@ -300,13 +300,13 @@ HRESULT CEnvObject::Ready_PhysicsActor_ModelMesh()
 //#ifdef _DEBUG
 //	Log_EnvPhysicsInfo(
 //		"[EnvPhysics] MODEL_MESH actor created. object="
-//		+ WstrToStr(m_tDesc.strObjectName)
+//		+ WstrToStr(m_tDesc.wstrObjectName)
 //		+ " uid="
 //		+ to_string(m_tDesc.iUid)
 //		+ " apxbin="
 //		+ WstrToStr(m_tDesc.tCollision.strDecorCollisionApxbinName)
 //		+ " modelTag="
-//		+ WstrToStr(m_tDesc.strModelProtoTag));
+//		+ WstrToStr(m_tDesc.wstrModelProtoTag));
 //#endif
 
 	return S_OK;

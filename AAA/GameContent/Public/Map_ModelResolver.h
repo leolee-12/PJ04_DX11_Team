@@ -25,8 +25,8 @@ private:
 private:
 	struct ENV_MODEL_ENTRY
 	{
-		_wstring strModelPath;
-		_wstring strModelProtoTag;
+		_wstring wstrModelPath;
+		_wstring wstrModelProtoTag;
 	};
 
 private:

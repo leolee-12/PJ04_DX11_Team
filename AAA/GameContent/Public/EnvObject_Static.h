@@ -25,9 +25,16 @@ public:
 public:	// Instance
 	void	Set_InstanceController(CEnv_InstanceController* pCtrl);
 	_bool	Can_RenderInstance() const;
+	void	Submit_FromSpatialGrid();
+	void	Set_ManagedBySpatialGrid(_bool bManaged) { m_bManagedBySpatialGrid = bManaged; }
 
 private:
 	CEnv_InstanceController* m_pInstanceController = { nullptr };
+	ENV_INSTANCE_BATCH_HANDLE m_InstanceBatchHandle = {};
+	_bool m_bManagedBySpatialGrid = { false };
+
+private:
+	void Submit_RenderGroups();
 
 public:
 	static CEnvObject_Static* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

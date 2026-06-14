@@ -27,7 +27,7 @@ HRESULT CEnvObject_Static::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Ready_RenderComponents(m_tDesc.iModelProtoLevel, m_tDesc.strModelProtoTag)))
+	if (FAILED(Ready_RenderComponents(m_tDesc.iModelProtoLevel, m_tDesc.wstrModelProtoTag)))
 		return E_FAIL;
 
 	//if (FAILED(Ready_PhysicsActor()))
@@ -40,37 +40,10 @@ void CEnvObject_Static::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
-	if (!m_bRenderable || !Has_RenderModel())
-	{
-		m_bVisible = false;
+	if (m_bManagedBySpatialGrid)
 		return;
-	}
 
-	Refresh_WorldBounds();
-
-	Check_Visible();
-
-	if (m_bVisible)
-	{
-		_bool bSubmitted = false;
-
-		if (Can_RenderInstance() && nullptr != m_pInstanceController)
-			bSubmitted = m_pInstanceController->Submit_Main(this);
-		
-		if(!bSubmitted)
-			m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
-	}
-	
-	if(m_bVisibleShadow)
-	{
-		_bool bSubmittedShadow = false;
-
-		if (Can_RenderInstance() && nullptr != m_pInstanceController)
-			bSubmittedShadow = m_pInstanceController->Submit_Shadow(this);
-
-		if (!bSubmittedShadow)
-			m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
-	}
+	Submit_FromSpatialGrid();
 }
 
 HRESULT CEnvObject_Static::Render_Shadow()
@@ -104,10 +77,15 @@ void CEnvObject_Static::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 void CEnvObject_Static::Set_InstanceController(CEnv_InstanceController* pCtrl)
 {
 	Safe_Release(m_pInstanceController);
-
 	m_pInstanceController = pCtrl;
-
 	Safe_AddRef(m_pInstanceController);
+
+	m_InstanceBatchHandle = {};
+
+	if (nullptr != m_pInstanceController && Can_RenderInstance())
+	{
+		m_InstanceBatchHandle = m_pInstanceController->Register_BatchesForDesc(m_tDesc);
+	}
 }
 
 _bool CEnvObject_Static::Can_RenderInstance() const
@@ -118,10 +96,57 @@ _bool CEnvObject_Static::Can_RenderInstance() const
 	if (!Has_RenderModel())
 		return false;
 
-	if (m_tDesc.strModelProtoTag.empty())
+	if (m_tDesc.wstrModelProtoTag.empty())
 		return false;
 
 	return true;
+}
+
+void CEnvObject_Static::Submit_FromSpatialGrid()
+{
+	if (!m_bRenderable || !Has_RenderModel())
+	{
+		m_bVisible = false;
+		m_bVisibleShadow = false;
+		return;
+	}
+
+	Refresh_WorldBounds();
+	Check_Visible();
+	Submit_RenderGroups();
+}
+
+void CEnvObject_Static::Submit_RenderGroups()
+{
+	if (m_bVisible)
+	{
+		_bool bSubmitted = false;
+
+		if (Can_RenderInstance() && nullptr != m_pInstanceController)
+		{
+			bSubmitted = m_pInstanceController->Submit_Main(
+				m_InstanceBatchHandle.iMainBatchIndex,
+				this);
+		}
+
+		if (!bSubmitted)
+			m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+	}
+
+	if (m_bVisibleShadow)
+	{
+		_bool bSubmittedShadow = false;
+
+		if (Can_RenderInstance() && nullptr != m_pInstanceController)
+		{
+			bSubmittedShadow = m_pInstanceController->Submit_Shadow(
+				m_InstanceBatchHandle.iShadowBatchIndex,
+				this);
+		}
+
+		if (!bSubmittedShadow)
+			m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
+	}
 }
 
 CEnvObject_Static* CEnvObject_Static::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

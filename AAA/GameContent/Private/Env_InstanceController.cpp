@@ -14,25 +14,39 @@ CEnv_InstanceController::CEnv_InstanceController(const CEnv_InstanceController& 
 {
 }
 
-_bool CEnv_InstanceController::Submit_Main(CEnvObject_Static* pObj)
+ENV_INSTANCE_BATCH_HANDLE CEnv_InstanceController::Register_BatchesForDesc(const ENV_OBJECT_DESC& tDesc)
+{
+	ENV_INSTANCE_BATCH_HANDLE tHandle{};
+
+	if (tDesc.wstrModelProtoTag.empty())
+		return tHandle;
+
+	ENV_INSTANCE_KEY tMainKey{};
+	tMainKey.iModelProtoLevel = tDesc.iModelProtoLevel;
+	tMainKey.wstrModelProtoTag = tDesc.wstrModelProtoTag;
+	tMainKey.eRenderID = RENDERID::NONBLEND;
+	tHandle.iMainBatchIndex = FindOrCreate_BatchIndex(tMainKey);
+
+	ENV_INSTANCE_KEY tShadowKey{};
+	tShadowKey.iModelProtoLevel = tDesc.iModelProtoLevel;
+	tShadowKey.wstrModelProtoTag = tDesc.wstrModelProtoTag;
+	tShadowKey.eRenderID = RENDERID::SHADOW;
+	tHandle.iShadowBatchIndex = FindOrCreate_BatchIndex(tShadowKey);
+
+	return tHandle;
+}
+
+_bool CEnv_InstanceController::Submit_Main(_uint iBatchIndex, CEnvObject_Static* pObj)
 {
 	if (nullptr == pObj)
 		return false;
 
-	const ENV_OBJECT_DESC& tDesc = pObj->Get_Desc();
-	if (tDesc.strModelProtoTag.empty())
+	if (INVALID_INDEX == iBatchIndex || iBatchIndex >= m_Batches.size())
 		return false;
 
-	ENV_INSTANCE_KEY tKey{};
-	tKey.iModelProtoLevel = tDesc.iModelProtoLevel;
-	tKey.wstrModelProtoTag = tDesc.strModelProtoTag;
-	tKey.eRenderID = RENDERID::NONBLEND;
-
-	CEnv_InstanceBatch* pBatch = FindOrCreate_Batch(tKey);
+	CEnv_InstanceBatch* pBatch = m_Batches[iBatchIndex];
 	if (nullptr == pBatch)
-	{
 		return false;
-	}
 
 	const _uint64 iCurrentFrame = m_pGameInstance_Proxy->Get_FrameIndex();
 	pBatch->Submit(pObj, iCurrentFrame);
@@ -40,27 +54,21 @@ _bool CEnv_InstanceController::Submit_Main(CEnvObject_Static* pObj)
 	if (!pBatch->Is_RegisteredThisFrame())
 	{
 		pBatch->Set_RegisteredThisFrame(true);
-		m_pGameInstance_Proxy->Add_RenderGroup(tKey.eRenderID, pBatch);
+		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, pBatch);
 	}
 
 	return true;
 }
 
-_bool CEnv_InstanceController::Submit_Shadow(CEnvObject_Static* pObj)
+_bool CEnv_InstanceController::Submit_Shadow(_uint iBatchIndex, CEnvObject_Static* pObj)
 {
 	if (nullptr == pObj)
 		return false;
 
-	const ENV_OBJECT_DESC& tDesc = pObj->Get_Desc();
-	if (tDesc.strModelProtoTag.empty())
+	if (INVALID_INDEX == iBatchIndex || iBatchIndex >= m_Batches.size())
 		return false;
 
-	ENV_INSTANCE_KEY tKey{};
-	tKey.iModelProtoLevel = tDesc.iModelProtoLevel;
-	tKey.wstrModelProtoTag = tDesc.strModelProtoTag;
-	tKey.eRenderID = RENDERID::SHADOW;
-
-	CEnv_InstanceBatch* pBatch = FindOrCreate_Batch(tKey);
+	CEnv_InstanceBatch* pBatch = m_Batches[iBatchIndex];
 	if (nullptr == pBatch)
 		return false;
 
@@ -72,14 +80,14 @@ _bool CEnv_InstanceController::Submit_Shadow(CEnvObject_Static* pObj)
 		pBatch->Set_RegisteredThisFrame(true);
 		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pBatch);
 	}
-	
+
 	return true;
 }
 
-CEnv_InstanceBatch* CEnv_InstanceController::FindOrCreate_Batch(const ENV_INSTANCE_KEY& tKey)
+_uint CEnv_InstanceController::FindOrCreate_BatchIndex(const ENV_INSTANCE_KEY& tKey)
 {
-	auto iter = m_Batches.find(tKey);
-	if (iter != m_Batches.end())
+	auto iter = m_BatchIndexByKey.find(tKey);
+	if (iter != m_BatchIndexByKey.end())
 		return iter->second;
 
 	CEnv_InstanceBatch::ENV_INSTANCE_BATCH_DESC tDesc{};
@@ -87,10 +95,12 @@ CEnv_InstanceBatch* CEnv_InstanceController::FindOrCreate_Batch(const ENV_INSTAN
 
 	CEnv_InstanceBatch* pBatch = CEnv_InstanceBatch::Create(m_pDevice, m_pContext, &tDesc);
 	if (nullptr == pBatch)
-		return nullptr;
+		return INVALID_INDEX;
 
-	m_Batches.emplace(tKey, pBatch);
-	return pBatch;
+	const _uint iBatchIndex = static_cast<_uint>(m_Batches.size());
+	m_Batches.push_back(pBatch);
+	m_BatchIndexByKey.emplace(tKey, iBatchIndex);
+	return iBatchIndex;
 }
 
 CEnv_InstanceController* CEnv_InstanceController::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -121,10 +131,11 @@ CGameObject* CEnv_InstanceController::Clone(void* pArg)
 
 void CEnv_InstanceController::Free()
 {
-	for (auto& pair : m_Batches)
-		Safe_Release(pair.second);
+	for (CEnv_InstanceBatch* pBatch : m_Batches)
+		Safe_Release(pBatch);
 
 	m_Batches.clear();
+	m_BatchIndexByKey.clear();
 
 	__super::Free();
 }

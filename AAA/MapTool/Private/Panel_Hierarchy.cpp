@@ -96,9 +96,9 @@ namespace
 
             const string strLayerUtf8 = WstrToStr(Item.strLayerTag);
             const string strObjectTagUtf8 = WstrToStr(Item.strObjectTag);
-            const string strSourceUtf8 = WstrToStr(Item.strSourceFile);
-            const string strSectionUtf8 = WstrToStr(Item.strSection);
-            const string strEntryUtf8 = WstrToStr(Item.strEntryKey);
+            const string strSourceUtf8 = WstrToStr(Item.wstrSourceFile);
+            const string strSectionUtf8 = WstrToStr(Item.wstrSection);
+            const string strEntryUtf8 = WstrToStr(Item.wstrEntryKey);
 
             ImGui::PushID(strKeyUtf8.c_str());
 

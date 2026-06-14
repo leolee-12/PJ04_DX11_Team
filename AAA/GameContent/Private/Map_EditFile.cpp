@@ -57,9 +57,9 @@ namespace
 
 _wstring CMap_EditFile::Make_EnvKey(const ENV_OBJECT_DESC& Desc)
 {
-	return Desc.strSourceFile + L"|"
-		+ Desc.strSection + L"|"
-		+ Desc.strEntryKey + L"|"
+	return Desc.wstrSourceFile + L"|"
+		+ Desc.wstrSection + L"|"
+		+ Desc.wstrEntryKey + L"|"
 		+ to_wstring(Desc.iUid);
 }
 

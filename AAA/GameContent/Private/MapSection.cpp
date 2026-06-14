@@ -63,8 +63,8 @@ HRESULT CMapSection::Initialize(void* pArg)
 	const MAP_SECTION_DESC* pDesc = static_cast<const MAP_SECTION_DESC*>(pArg);
 
 	m_strSectionName = pDesc->strSectionName;
-	m_strModelProtoTag = pDesc->strModelProtoTag;
-	m_strModelPath = pDesc->strModelPath;
+	m_strModelProtoTag = pDesc->wstrModelProtoTag;
+	m_strModelPath = pDesc->wstrModelPath;
 	m_iModelProtoLevel = pDesc->iModelProtoLevel;
 	m_eSectionType = pDesc->eSectionType;
 	m_eRenderID = pDesc->eRenderID;
@@ -80,11 +80,7 @@ HRESULT CMapSection::Initialize(void* pArg)
 		m_CombinedWorldMatrix = *m_pTransformCom->Get_WorldMatrixPtr();
 		Update_LocalBounds();
 		Refresh_WorldBounds();
-		if (m_pModelCom && m_pModelCom->Get_CollisionMesh())
-		{
-			m_pColliderActor = m_pGameInstance_Proxy->Create_StaticActor(
-				m_pModelCom->Get_CollisionMesh(), XMLoadFloat4x4(&m_CombinedWorldMatrix));
-		}
+		Refresh_ColliderActor();
 	}
 	else
 	{
@@ -161,6 +157,7 @@ void CMapSection::Refresh_CombinedWorldMatrix()
 
 	XMStoreFloat4x4(&m_CombinedWorldMatrix, CombinedWorld);
 	Refresh_WorldBounds();
+	Refresh_ColliderActor();
 }
 
 #ifdef _DEBUG
@@ -227,6 +224,25 @@ void CMapSection::Update_LocalBounds()
 	}
 
 	m_LocalBounds = Make_AABB_FromMinMax(vMin, vMax);
+}
+
+void CMapSection::Refresh_ColliderActor()
+{
+	if (nullptr != m_pColliderActor)
+	{
+		m_pGameInstance_Proxy->Remove_StaticActor(m_pColliderActor);
+		m_pColliderActor = nullptr;
+	}
+
+	if (nullptr == m_pModelCom)
+		return;
+
+	if (nullptr == m_pModelCom->Get_CollisionMesh())
+		return;
+
+	m_pColliderActor = m_pGameInstance_Proxy->Create_StaticActor(
+		m_pModelCom->Get_CollisionMesh(),
+		XMLoadFloat4x4(&m_CombinedWorldMatrix));
 }
 
 CMapSection* CMapSection::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

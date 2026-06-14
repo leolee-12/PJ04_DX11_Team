@@ -43,11 +43,12 @@ public:
 	_bool   Is_Visible_Shadow() const { return m_bVisibleShadow; }
 
 	const ENV_OBJECT_DESC& Get_Desc() const { return m_tDesc; }
+	const BoundingBox& Get_WorldBounds() const { return m_WorldBounds; }
 
 	virtual _bool XM_CALLCONV Pick_Ray(_fvector vOrigin,_fvector vDir, _float3* pOutHit, _float* pOutDistance);
 
 protected:
-	HRESULT Ready_RenderComponents(_uint iModelProtoLevel, const wstring& strModelProtoTag);
+	HRESULT Ready_RenderComponents(_uint iModelProtoLevel, const wstring& wstrModelProtoTag);
 	HRESULT Ready_PhysicsActor();
 	HRESULT Ready_PhysicsActor_ModelMesh();
 	void	Release_PhysicsActor();

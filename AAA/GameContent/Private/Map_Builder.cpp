@@ -19,11 +19,11 @@ namespace
 
 	_wstring Describe_EnvObject(const ENV_OBJECT_DESC& Desc)
 	{
-		if (!Desc.strObjectName.empty())
-			return Desc.strObjectName;
+		if (!Desc.wstrObjectName.empty())
+			return Desc.wstrObjectName;
 
-		if (!Desc.strEntryKey.empty())
-			return Desc.strEntryKey;
+		if (!Desc.wstrEntryKey.empty())
+			return Desc.wstrEntryKey;
 
 		return L"<unknown>";
 	}
@@ -113,14 +113,14 @@ HRESULT CMap_Builder::Build_StageDesc(const MAP_MANIFEST_DESC& Manifest, MAP_STA
 	{
 		const _wstring& strSectionName = Manifest.SectionNames[i];
 
-		_wstring strModelPath;
-		_wstring strModelProtoTag;
+		_wstring wstrModelPath;
+		_wstring wstrModelProtoTag;
 
 		if (FAILED(m_pResolver->Resolve_MapSection(
 			Manifest.strStageFolderName,
 			strSectionName,
-			&strModelPath,
-			&strModelProtoTag)))
+			&wstrModelPath,
+			&wstrModelProtoTag)))
 		{
 			Log_GameContentWarning(
 				"Map builder section model missing: stage="
@@ -132,8 +132,8 @@ HRESULT CMap_Builder::Build_StageDesc(const MAP_MANIFEST_DESC& Manifest, MAP_STA
 
 		MAP_SECTION_DESC Desc{};
 		Desc.strSectionName = strSectionName;
-		Desc.strModelPath = strModelPath;
-		Desc.strModelProtoTag = strModelProtoTag;
+		Desc.wstrModelPath = wstrModelPath;
+		Desc.wstrModelProtoTag = wstrModelProtoTag;
 		Desc.iModelProtoLevel = 0;
 		Desc.eSectionType = Manifest.SectionTypes[i];
 		Desc.eRenderID = Manifest.SectionRenderIDs[i];
@@ -194,7 +194,7 @@ HRESULT CMap_Builder::Validate_And_Filter(MAP_PACKAGE* pPackage)
 	for (const ENV_OBJECT_DESC& Desc : pPackage->EnvObjectDescs)
 	{
 		if (Needs_Model(Desc)
-			&& (Desc.strModelPath.empty() || Desc.strModelProtoTag.empty()))
+			&& (Desc.wstrModelPath.empty() || Desc.wstrModelProtoTag.empty()))
 		{
 			Log_GameContentWarning(
 				"Map builder skipped env without model: object="

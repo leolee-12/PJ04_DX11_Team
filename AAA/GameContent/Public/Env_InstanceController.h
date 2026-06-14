@@ -19,15 +19,16 @@ private:
 
 public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
-	
-	_bool Submit_Main(CEnvObject_Static* pObj);
-	_bool Submit_Shadow(CEnvObject_Static* pObj);
+	ENV_INSTANCE_BATCH_HANDLE Register_BatchesForDesc(const ENV_OBJECT_DESC& tDesc);
+	_bool Submit_Main(_uint iBatchIndex, CEnvObject_Static* pObj);
+	_bool Submit_Shadow(_uint iBatchIndex, CEnvObject_Static* pObj);
 
 private:
-	unordered_map<ENV_INSTANCE_KEY, CEnv_InstanceBatch*, ENV_INSTANCE_KEY_HASH> m_Batches;
+	vector<CEnv_InstanceBatch*> m_Batches;
+	unordered_map<ENV_INSTANCE_KEY, _uint, ENV_INSTANCE_KEY_HASH> m_BatchIndexByKey;
 
 private:
-	CEnv_InstanceBatch* FindOrCreate_Batch(const ENV_INSTANCE_KEY& tKey);
+	_uint FindOrCreate_BatchIndex(const ENV_INSTANCE_KEY& tKey);
 
 public:
 	static CEnv_InstanceController* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

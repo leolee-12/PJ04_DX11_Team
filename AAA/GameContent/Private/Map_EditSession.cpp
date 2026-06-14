@@ -83,16 +83,16 @@ _bool CMap_EditSession::Is_PreviewEnvLayer(const _wstring& strLayerTag)
 
 _wstring CMap_EditSession::Build_DisplayName(const ENV_OBJECT_DESC& Desc)
 {
-	_wstring strDisplayName = Desc.strObjectName;
+	_wstring strDisplayName = Desc.wstrObjectName;
 
 	if (strDisplayName.empty())
 	{
-		strDisplayName = Desc.strSection;
-		if (!Desc.strEntryKey.empty())
+		strDisplayName = Desc.wstrSection;
+		if (!Desc.wstrEntryKey.empty())
 		{
 			if (!strDisplayName.empty())
 				strDisplayName += L":";
-			strDisplayName += Desc.strEntryKey;
+			strDisplayName += Desc.wstrEntryKey;
 		}
 	}
 
@@ -128,9 +128,9 @@ void CMap_EditSession::Register_PreviewObject(
 
 	Item.strLayerTag = strLayerTag;
 	Item.strObjectTag = strObjectTag;
-	Item.strSourceFile = Desc.strSourceFile;
-	Item.strSection = Desc.strSection;
-	Item.strEntryKey = Desc.strEntryKey;
+	Item.wstrSourceFile = Desc.wstrSourceFile;
+	Item.wstrSection = Desc.wstrSection;
+	Item.wstrEntryKey = Desc.wstrEntryKey;
 	Item.iUid = Desc.iUid;
 
 	m_MapPreviewEnvItems[pObject] = Item;
@@ -221,9 +221,9 @@ void CMap_EditSession::Rebuild_DeletedEnvItems(const vector<ENV_OBJECT_DESC>& De
 		Item.strStableKey = CMap_EditFile::Make_EnvKey(Desc);
 		Item.strDisplayName = Build_DisplayName(Desc);
 		Item.strLayerTag = Desc.tRender.strLayerName;
-		Item.strSourceFile = Desc.strSourceFile;
-		Item.strSection = Desc.strSection;
-		Item.strEntryKey = Desc.strEntryKey;
+		Item.wstrSourceFile = Desc.wstrSourceFile;
+		Item.wstrSection = Desc.wstrSection;
+		Item.wstrEntryKey = Desc.wstrEntryKey;
 		Item.iUid = Desc.iUid;
 
 		m_DeletedMapPreviewEnvItems[Item.strStableKey] = Item;

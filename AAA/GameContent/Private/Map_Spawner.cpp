@@ -153,7 +153,7 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 			Desc.iModelProtoLevel = Levels.iEnvModelLevel;
 
 			CGameObject* pCreatedObject = nullptr;
-			const wstring strObjectName = Make_EnvObjectName(Desc);
+			const wstring wstrObjectName = Make_EnvObjectName(Desc);
 
 			if (FAILED(m_pProxy->Add_GameObject_Return(
 				&pCreatedObject,
@@ -161,7 +161,7 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 				pProtoTag,
 				pRoute->iPlaceLevel,
 				pRoute->pLayerTag,
-				strObjectName,
+				wstrObjectName,
 				&Desc)))
 			{
 				Rollback(CreatedObjects);
@@ -173,7 +173,7 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 				pCreatedObject,
 				pProtoTag,
 				pRoute->pLayerTag,
-				strObjectName
+				wstrObjectName
 				});
 
 			if (SrcDesc.eKind == ENV_OBJECT_KIND::STATIC)
@@ -287,11 +287,11 @@ const _tchar* CMap_Spawner::Get_EnvObjectProtoTag(ENV_OBJECT_KIND eKind) const
 
 _wstring CMap_Spawner::Make_EnvObjectName(const ENV_OBJECT_DESC& Desc) const
 {
-	wstring strName = L"Env_" + Desc.strObjectName;
+	wstring strName = L"Env_" + Desc.wstrObjectName;
 	if (0 != Desc.iUid)
 		strName += L"_" + to_wstring(Desc.iUid);
-	else if (!Desc.strEntryKey.empty())
-		strName += L"_" + Desc.strEntryKey;
+	else if (!Desc.wstrEntryKey.empty())
+		strName += L"_" + Desc.wstrEntryKey;
 	return strName;
 }
 

@@ -16,9 +16,9 @@ public:
 		_wstring strDisplayName;
 		_wstring strLayerTag;
 		_wstring strObjectTag;
-		_wstring strSourceFile;
-		_wstring strSection;
-		_wstring strEntryKey;
+		_wstring wstrSourceFile;
+		_wstring wstrSection;
+		_wstring wstrEntryKey;
 		_uint    iUid = {};
 	};
 
