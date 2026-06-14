@@ -69,7 +69,8 @@ void CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _float fTimeDelta)
     }
 
     // Test Code
-    Change_Ability(pKirby);
+    if (Change_Ability(pKirby) == true)
+        return;
 
     // Super Inhale Timer
     if (m_AccSuperInHaleTime < m_MaxSuperInHaleTime)
@@ -227,20 +228,23 @@ void CKirby_Ability_Normal::Choose_InhaleAniName(_string& strAniName)
     }
 }
 
-void CKirby_Ability_Normal::Change_Ability(CKirby* pKirby)
+_bool CKirby_Ability_Normal::Change_Ability(CKirby* pKirby)
 {
     //Test Code
     if (GetAsyncKeyState('T') & 0x8000)
     {
+        Reset_Default(pKirby);
+
         // 먹은 오브젝트에서 가져온다.
         KIRBY_ABILITY_TYPE eAbilityType = KIRBY_ABILITY_TYPE::SWORD;
         pKirby->Set_KirbyAbility(eAbilityType);
 
-        Reset_Default(pKirby);
         pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
 
-        return;
+        return true;
     }
+
+    return false;
 }
 
 void CKirby_Ability_Normal::Reset_Default(CKirby* pKirby)

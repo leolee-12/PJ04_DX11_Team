@@ -26,18 +26,94 @@ KIRBY_ABILITY_TYPE CKirby_Ability_Sword::Get_AbilityType()
 
 void CKirby_Ability_Sword::Enter_Ability(CKirby* pKirby)
 {
-
 }
 
 void CKirby_Ability_Sword::Update_Ability(CKirby* pKirby, _float fTimeDelta)
 {
-    CMovement_Child* pMovementCom = pKirby->Get_Movement();
-
     m_bEndAttack = true;
+
+    //CMovement_Child* pMovementCom = pKirby->Get_Movement();
+
+    //CKirby_Body* pBody = pKirby->Get_Body();
+    //CAnimator* pAnimator = pBody->Get_Animator();
+
+    //_bool bIsAniFinish = pAnimator->Is_Finished();
+
+    //switch (m_eCurSwordState)
+    //{
+    //    case SWORD_STATE::SLASH_1:
+    //    {
+    //        if (bIsAniFinish && m_bReserveNextAttack)
+    //        {
+    //            m_eCurSwordState = SWORD_STATE::SLASH_2;
+    //        }
+    //        else if(bIsAniFinish)
+    //        {
+    //            m_eCurSwordState = SWORD_STATE::SLASH_1_END;
+    //        }
+    //        break;
+    //    }
+    //    case SWORD_STATE::SLASH_2:
+    //    {
+    //        if (bIsAniFinish && m_bReserveNextAttack)
+    //        {
+    //            m_eCurSwordState = SWORD_STATE::SLASH_3;
+    //        }
+    //        break;
+    //    }
+    //    case SWORD_STATE::SLASH_3:
+    //    {
+    //        break;
+    //    }
+    //}
+
+
+    //if (m_eCurSwordState != m_ePreSwordState)
+    //{
+    //    switch (m_eCurSwordState)
+    //    {
+    //        case SWORD_STATE::SLASH_1:
+    //        {
+    //            pAnimator->Play("SideSlash", false, false, 0.1f, 1.f);
+    //            break;
+    //        }
+    //        
+    //        case SWORD_STATE::SLASH_1_END:
+    //        {
+    //            pAnimator->Play("SideSlashEnd", false, false, 0.1f, 1.f);
+    //            break;
+    //        }
+
+    //        case SWORD_STATE::SLASH_2:
+    //        {
+    //            pAnimator->Play("MultiswordAttack", false, false, 0.1f, 1.f);
+    //            break;
+    //        }
+
+    //        case SWORD_STATE::SLASH_3:
+    //        {
+    //            pAnimator->Play("DecisiveSlash", false, false, 0.1f, 1.f);
+    //            break;            
+    //        }
+    //    }
+
+    //    m_ePreSwordState = m_eCurSwordState;
+    //}
+
+    //if(bIsAniFinish == true)
+    //    m_bEndAttack = true;
+
+    //debug
+    char szLog[128] = {};
+    sprintf_s(szLog, "Sword Attack\n");
+    OutputDebugStringA(szLog);
 }
 
 void CKirby_Ability_Sword::Exit_Ability(CKirby* pKirby)
 {
+    m_eCurSwordState = SWORD_STATE::NONE;
+    m_ePreSwordState = SWORD_STATE::NONE;
+    m_bReserveNextAttack = false;
 }
 
 _bool CKirby_Ability_Sword::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -47,16 +123,16 @@ _bool CKirby_Ability_Sword::Handle_Command(CKirby* pKirby, CKirby_Command* pComm
     switch (eCommandType)
     {
         // Move Press
-        case KIRBY_COMMAND_TYPE::MOVE_TOP:
-        case KIRBY_COMMAND_TYPE::MOVE_DOWN:
-        case KIRBY_COMMAND_TYPE::MOVE_LEFT:
-        case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
+        case KIRBY_COMMAND_TYPE::ATTACK:
         {
-            if (!pCommand->IsPress())
+            if (!pCommand->IsDown())
                 return false;
 
-            Move_Command* pMoveCommand = static_cast<Move_Command*>(pCommand);
-            pKirby->Add_MoveDir(pMoveCommand->Get_Dir());
+            if (m_eCurSwordState == SWORD_STATE::SLASH_3)
+                return true;
+
+                m_bReserveNextAttack = true;
+
             return true;
         }
     }
@@ -66,14 +142,15 @@ _bool CKirby_Ability_Sword::Handle_Command(CKirby* pKirby, CKirby_Command* pComm
 
 void CKirby_Ability_Sword::Down_Attack(CKirby* pKirby)
 {
-    m_bIsFinished = false;
+    m_bEndAttack = false;
 
     pKirby->Change_State(KIRBY_STATE_TYPE::ATTACK);
+
+    m_eCurSwordState = SWORD_STATE::SLASH_1;
 }
 
 void CKirby_Ability_Sword::Up_Attack(CKirby* pKirby)
 {
-    m_bIsFinished = true;
 }
 
 _bool CKirby_Ability_Sword::Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation)

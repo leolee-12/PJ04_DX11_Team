@@ -16,6 +16,9 @@ class CMovement_Child;
 class CLIENT_DLL CKirby_Ability_Sword final : public CKirby_Ability
 {
 private:
+	enum SWORD_STATE { NONE, SLASH_1, SLASH_1_END, SLASH_2, SLASH_3 };
+
+private:
 	CKirby_Ability_Sword();
 	virtual ~CKirby_Ability_Sword() = default;
 
@@ -35,6 +38,12 @@ public:
 	virtual void Up_Attack(CKirby* pKirby) override;
 
 	virtual _bool Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation) override;
+
+private:
+	SWORD_STATE m_eCurSwordState{};
+	SWORD_STATE m_ePreSwordState{};
+
+	_bool m_bReserveNextAttack{};
 
 public:
 	static CKirby_Ability_Sword* Create();

@@ -165,22 +165,11 @@ CKirby_Ability* CKirby::Get_KirbyAbility()
 
 void CKirby::Set_KirbyAbility(KIRBY_ABILITY_TYPE eAbilityState)
 {
-    if (m_pKirby_Ability != nullptr)
-    {
-        Safe_Release(m_pKirby_Ability);
-        m_pKirby_Ability = nullptr;
-    }
+    auto iter = m_Abilities.find(eAbilityState);
+    if (iter == m_Abilities.end())
+        MSG_BOX("KirbyAbility Bug: Kirby.cpp");
 
-    switch (eAbilityState)
-    {
-    case KIRBY_ABILITY_TYPE::NORMAL:
-        m_pKirby_Ability = CKirby_Ability_Normal::Create();
-        break;
-    case KIRBY_ABILITY_TYPE::SWORD:
-        m_pKirby_Ability = CKirby_Ability_Sword::Create();
-        break;
-    }
-
+    m_pKirby_Ability = iter->second;
 }
 
 void CKirby::Update_AbilityDumpCool(_float fTimeDelta)
@@ -197,11 +186,6 @@ void CKirby::Update_AbilityDumpCool(_float fTimeDelta)
     }
 
     Helper::FloatClamp(m_fAccAbilityDumpCoolTime, 0.f, m_fMaxAbilityDumpCoolTime);
-
-    //debug
-    char szLog[128] = {};
-    sprintf_s(szLog, "m_fAccAbilityDumpCoolTime : %.3f\n", m_fAccAbilityDumpCoolTime);
-    OutputDebugStringA(szLog);
 }
 
 void CKirby::Reset_AbilityDumpCool()
@@ -229,20 +213,17 @@ HRESULT CKirby::Ready_Components()
 
     m_pMovement->Set_Refs(m_pTransformCom, m_pController);
 
+
     // TriggerSensor(Collider)
-    m_pTriggerSensor = Add_Component<CCollider>(
-        TEXT("Com_TriggerSensor"),
+    m_pTriggerSensor = Add_Component<CCollider>(TEXT("Com_TriggerSensor"),
         CCollider::Create(m_pDevice, m_pContext, COLLIDER::AABB));
-    if (nullptr == m_pTriggerSensor)
+    if (m_pTriggerSensor == nullptr)
         return E_FAIL;
 
     CCollider::COLLIDER_DESC ColliderDesc{};
     ColliderDesc.pOwner = this;
     ColliderDesc.vCenter = _float3(0.f, s_fCCT_Radius + s_fCCT_Height * 0.5f, 0.f);
-    ColliderDesc.vSize = _float3(
-        s_fCCT_Radius * 2.f,
-        s_fCCT_Height + s_fCCT_Radius * 2.f,
-        s_fCCT_Height * 2.f);
+    ColliderDesc.vSize = _float3(s_fCCT_Radius * 2.f, s_fCCT_Height + s_fCCT_Radius * 2.f, s_fCCT_Height * 2.f);
 
     if (FAILED(m_pTriggerSensor->Initialize(&ColliderDesc)))
         return E_FAIL;
@@ -305,9 +286,25 @@ HRESULT CKirby::Ready_System()
 
 HRESULT CKirby::Ready_Ability()
 {
-    m_pKirby_Ability = CKirby_Ability_Normal::Create();
-    if (m_pKirby_Ability == nullptr)
+    auto Register_Ability = [this](KIRBY_ABILITY_TYPE eType, CKirby_Ability* pNewAbility) -> HRESULT
+        {
+            if (pNewAbility == nullptr)
+                return E_FAIL;
+
+            m_Abilities[eType] = pNewAbility;
+
+            return S_OK;
+        };
+
+    if (FAILED(Register_Ability(KIRBY_ABILITY_TYPE::NORMAL, CKirby_Ability_Normal::Create())))            return E_FAIL;
+    if (FAILED(Register_Ability(KIRBY_ABILITY_TYPE::SWORD, CKirby_Ability_Sword::Create())))              return E_FAIL;
+
+
+    auto iter = m_Abilities.find(KIRBY_ABILITY_TYPE::NORMAL);
+    if (iter == m_Abilities.end())
         return E_FAIL;
+
+    m_pKirby_Ability = iter->second;
 
     return S_OK;
 }
@@ -345,7 +342,10 @@ CGameObject* CKirby::Clone(void* pArg)
 
 void CKirby::Free()
 {
-    Safe_Release(m_pKirby_Ability);
+    m_pKirby_Ability = nullptr;
+    for (auto pair : m_Abilities)
+        Safe_Release(pair.second);
+    m_Abilities.clear();
 
     Safe_Release(m_pKirby_InputManager);
     Safe_Release(m_pKirby_Controller);

@@ -123,6 +123,8 @@ private:
 	CKirby_StateMachine*	m_pKirby_StateMachine{};
 	CKirby_Ability*			m_pKirby_Ability{};
 
+	unordered_map<KIRBY_ABILITY_TYPE, CKirby_Ability*> m_Abilities;
+
 private:
 	_float m_fAccAbilityDumpCoolTime{};
 	_float m_fMaxAbilityDumpCoolTime{ 0.5f };

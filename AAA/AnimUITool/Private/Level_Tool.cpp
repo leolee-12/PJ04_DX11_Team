@@ -1099,7 +1099,7 @@ CGameObject* CLevel_Tool::Load_Kirby()
     if (!m_pGameInstance_Proxy->Has_Prototype(L, L"Proto_Model_Kirby"))
         m_pGameInstance_Proxy->Add_Prototype(L, L"Proto_Model_Kirby",
             CModel::Create(m_pDevice, m_pContext, MODEL::ANIM,
-                "../../Resources/CHJ/AnimModel/Kirby/Kirby.ysh",
+                "../../Resources/CHJ/AnimModel/Kirby/Kirby_AllAbilities.ysh",
                 XMMatrixRotationY(XMConvertToRadians(180.f))));
 
     // 3) Preview_Kirby proto (1È¸¸¸)

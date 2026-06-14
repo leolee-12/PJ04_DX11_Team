@@ -298,7 +298,7 @@ void CPanel_Manager::Render_ModeBar()
         {
             Bind_Preview(m_pLevel->Load_Kirby());
             m_Context.strName = L"Kirby";
-            m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby.ysh";
+            m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby_AllAbilities.ysh";
         }
     }
 

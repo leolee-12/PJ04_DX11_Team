@@ -64,7 +64,7 @@ private:
 	void Interpolation_Inhale(CAnimator* pAnimator);
 	void Choose_InhaleAniName(_string& strAniName);
 
-	void Change_Ability(CKirby* pKirby);
+	_bool Change_Ability(CKirby* pKirby);
 
 	void Reset_Default(CKirby* pKirby);
 
