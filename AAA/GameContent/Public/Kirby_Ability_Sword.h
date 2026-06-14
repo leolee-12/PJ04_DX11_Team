@@ -66,12 +66,20 @@ private:
 	_uint m_iSuperSpinSlashCount{};
 	_bool m_bForceEnterSwordAni{};
 
+	// Dir
+	_float3 m_vSwordWishDir{};
+	_bool m_bMoveLock{};
+
 private:
-	void Update_SwordState(CAnimator* pAnimator, CMovement_Child* pMovemet, _float fTimeDelta);
+	void Update_SwordState(CKirby* pKirby, CAnimator* pAnimator, CMovement_Child* pMovemet, _float fTimeDelta);
 	void Enter_SwordAni(CAnimator* pAnimator, _float fTimeDelta);
 	void Check_EndAttackState(CAnimator* pAnimator, _float fTimeDelta);
 
 	void Update_ChargeTime(_float fTimeDelta);
+
+	void MoveLock_Ratio(_float fRatio, _float fRatioStart, _float fRatioEnd);
+	void SetSpeed_Ratio(_float fRatio, _float fRatioStart, _float fRatioEnd, CMovement_Child* pMovement, _float fSpeed);
+	void Charge_Start(CKirby* pKirby, CMovement_Child* pMovement);
 
 public:
 	static CKirby_Ability_Sword* Create();

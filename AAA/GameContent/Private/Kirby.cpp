@@ -81,7 +81,8 @@ void CKirby::Update(_float fTimeDelta)
     {
         _vector vDir = XMLoadFloat3(&m_vWishDir);
         m_pMovement->Add_Acceleration(vDir * 120.f);
-        m_pMovement->Rotate_To_Direction(vDir, fTimeDelta);
+        if(!m_RotationLock)
+            m_pMovement->Rotate_To_Direction(vDir, fTimeDelta);
     }
 
     m_pMovement->Update_RigidBody(fTimeDelta);
@@ -135,7 +136,7 @@ void CKirby::OnOffParts(KIRBY_ABILITY_TYPE eAbilityType, _bool fOn)
 void CKirby::Add_MoveDir(const _float3& vWishDir)
 {
     XMStoreFloat3(&m_vWishDir,
-        XMLoadFloat3(&vWishDir) + XMLoadFloat3(&m_vWishDir));
+        XMVectorAdd(XMLoadFloat3(&vWishDir), XMLoadFloat3(&m_vWishDir)));   
 }
 
 _bool CKirby::Has_MoveDir()

@@ -84,6 +84,7 @@ public:
 	// Movement
 	void Add_MoveDir(const _float3& vWishDir);
 	_bool Has_MoveDir();
+	void Set_RotationLock(_bool RotationLock) { m_RotationLock = RotationLock; }
 
 public:
 	//System
@@ -114,6 +115,7 @@ private:
 	CMovement_Child* m_pMovement{};
 
 	_float3 m_vWishDir{};
+	_bool m_RotationLock{};
 
 	CCollider* m_pTriggerSensor = { nullptr };
 
