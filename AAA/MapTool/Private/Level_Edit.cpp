@@ -3,12 +3,14 @@
 #include "EditCamera.h"
 #include "Edit_Grid.h"
 #include "Map_EditSession.h"
+#include "Map_EditFile.h"
 
 #include "GameObject_Factory.h"
 #include "GameContent_const.h"
 #include "GameContent_Log.h"
 #include "Map_Loader.h"
 #include "MapStage.h"
+#include "MapSection.h"
 #include "EnvObject.h"
 
 #ifdef _DEBUG
@@ -363,6 +365,63 @@ void CLevel_Edit::End_PlaceMode()
 	m_ePlaceMode = PLACE_MODE::NONE;
 	m_strPendingLayer = {};
 	m_strPendingProto = {};
+}
+
+_bool CLevel_Edit::Track_EditedMapPreviewEnvObject(
+	CGameObject* pObject,
+	const MAP_ENV_EDITED_DESC& Edit)
+{
+	if (nullptr == m_pMapPreviewSession)
+		return false;
+
+	return m_pMapPreviewSession->Track_EditedPreviewObject(pObject, Edit);
+}
+
+_bool CLevel_Edit::Clear_EditedMapPreviewEnvObject(CGameObject* pObject)
+{
+	if (nullptr == m_pMapPreviewSession)
+		return false;
+
+	return m_pMapPreviewSession->Clear_EditedPreviewObject(pObject);
+}
+
+_bool CLevel_Edit::Try_GetMapPreviewEnvEdit(CGameObject* pObject, MAP_ENV_EDITED_DESC* pOutEdit) const
+{
+	if (nullptr == m_pMapPreviewSession || nullptr == pObject || nullptr == pOutEdit)
+		return false;
+
+	CEnvObject* pEnvObject = dynamic_cast<CEnvObject*>(pObject);
+	if (nullptr == pEnvObject)
+		return false;
+
+	const _wstring strStableKey =
+		CMap_EditFile::Make_EnvKey(pEnvObject->Get_Desc());
+
+	return m_pMapPreviewSession->Try_GetEditedEnvObject(strStableKey, pOutEdit);
+}
+
+_bool CLevel_Edit::Track_EditedMapPreviewSection(const _wstring& strSectionKey, const MAP_ENV_EDITED_DESC& Edit)
+{
+	if (nullptr == m_pMapPreviewSession)
+		return false;
+
+	return m_pMapPreviewSession->Track_EditedMapSection(strSectionKey, Edit);
+}
+
+_bool CLevel_Edit::Clear_EditedMapPreviewSection(const _wstring& strSectionKey)
+{
+	if (nullptr == m_pMapPreviewSession)
+		return false;
+
+	return m_pMapPreviewSession->Clear_EditedMapSection(strSectionKey);
+}
+
+_bool CLevel_Edit::Try_GetMapPreviewSectionEdit(const _wstring& strSectionKey, MAP_ENV_EDITED_DESC* pOutEdit) const
+{
+	if (nullptr == m_pMapPreviewSession)
+		return false;
+
+	return m_pMapPreviewSession->Try_GetEditedMapSection(strSectionKey, pOutEdit);
 }
 
 HRESULT CLevel_Edit::Restore_DeletedMapPreviewEnv(const _wstring& strStableKey)
@@ -1205,6 +1264,20 @@ void CLevel_Edit::Apply_MapPreviewContentDesc(const MAP_EDIT_DATA& Desc, _bool b
 		m_pMapPreviewSession->Set_EditData(Desc);
 }
 
+_wstring CLevel_Edit::Make_MapPreviewSectionKey(const CMapSection* pSection) const
+{
+	if (nullptr == pSection)
+		return L"";
+
+	const _wstring strStageName = nullptr != m_pMapStage
+		? m_pMapStage->Get_StageName()
+		: Get_MapPreviewLoadedStageNameRef();
+
+	return CMap_EditFile::Make_SectionKey(
+		strStageName,
+		pSection->Get_SectionName());
+}
+
 const _wstring& CLevel_Edit::Get_MapPreviewLoadedStageNameRef() const
 {
 	static const _wstring s_strEmpty = L"";
@@ -1257,24 +1330,27 @@ void CLevel_Edit::Sync_MapPreviewRuntimeStateToSession()
 
 	MAP_EDIT_DATA MapContentDesc = Build_MapPreviewContentDescSnapshot();
 
-	const _bool bStageLoaded = m_pMapPreviewSession->Is_StageLoaded();
+	_bool bSessionLoadStage = m_pMapPreviewSession->Is_StageLoaded();
+	if (!bSessionLoadStage)
+		bSessionLoadStage = !WorkingDelta.EditedMapSections.empty();
 
 	_bool bSessionLoadEnv = m_pMapPreviewSession->Is_EnvLoaded();
 	if (!bSessionLoadEnv)
 	{
 		bSessionLoadEnv = !WorkingDelta.DeletedEnvObjectKeys.empty()
+			|| !WorkingDelta.EditedEnvObjects.empty()
 			|| !WorkingDelta.AddedMapObjects.empty();
 	}
 
 	MapContentDesc.bHasMapContent = MapContentDesc.bHasMapContent
 		|| 0 <= MapContentDesc.iPresetIndex
 		|| !MapContentDesc.strManifestPath.empty();
-	MapContentDesc.bLoadStage = bStageLoaded;
+	MapContentDesc.bLoadStage = bSessionLoadStage;
 	MapContentDesc.bLoadEnv = bSessionLoadEnv;
 	MapContentDesc.OverrideDesc = WorkingDelta;
 
 	Apply_MapPreviewContentDesc(MapContentDesc, true);
-	m_pMapPreviewSession->Set_LoadStageEnabled(bStageLoaded);
+	m_pMapPreviewSession->Set_LoadStageEnabled(bSessionLoadStage);
 	m_pMapPreviewSession->Set_LoadEnvEnabled(bSessionLoadEnv);
 }
 

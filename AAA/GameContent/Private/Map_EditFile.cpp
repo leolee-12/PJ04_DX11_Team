@@ -53,6 +53,268 @@ namespace
 
 		return CMap_PresetCatalog::Get_ManifestPath(iPresetIndex, pOutManifestPath);
 	}
+
+	json Save_Float4x4(const _float4x4& Mat)
+	{
+		json j = json::array();
+		for (int iRow = 0; iRow < 4; ++iRow)
+		{
+			j.push_back(json::array({
+					Mat.m[iRow][0],
+					Mat.m[iRow][1],
+					Mat.m[iRow][2],
+					Mat.m[iRow][3]
+				}));
+		}
+		return j;
+	}
+
+	HRESULT Load_Float4x4(const json& jValue, _float4x4* pOutMat)
+	{
+		if (nullptr == pOutMat)
+			return E_FAIL;
+
+		if (!jValue.is_array() || 4 != jValue.size())
+			return E_FAIL;
+
+		_float4x4 Mat{};
+		for (int iRow = 0; iRow < 4; ++iRow)
+		{
+			const json& jRow = jValue[iRow];
+			if (!jRow.is_array() || 4 != jRow.size())
+				return E_FAIL;
+
+			for (int iCol = 0; iCol < 4; ++iCol)
+			{
+				if (!jRow[iCol].is_number())
+					return E_FAIL;
+
+				Mat.m[iRow][iCol] = jRow[iCol].get<_float>();
+			}
+		}
+
+		*pOutMat = Mat;
+		return S_OK;
+	}
+
+	void Apply_WorldMatrixToGameObjectDesc(
+		CGameObject::GAMEOBJECT_DESC* pOutDesc,
+		const _float4x4& Mat)
+	{
+		if (nullptr == pOutDesc)
+			return;
+
+		pOutDesc->vRight = _float4(Mat.m[0][0], Mat.m[0][1], Mat.m[0][2], Mat.m[0][3]);
+		pOutDesc->vUp = _float4(Mat.m[1][0], Mat.m[1][1], Mat.m[1][2], Mat.m[1][3]);
+		pOutDesc->vLook = _float4(Mat.m[2][0], Mat.m[2][1], Mat.m[2][2], Mat.m[2][3]);
+		pOutDesc->vPosition = _float4(Mat.m[3][0], Mat.m[3][1], Mat.m[3][2], Mat.m[3][3]);
+	}
+
+	_bool Has_AnyMapEnvEdit(const MAP_ENV_EDITED_DESC& Edit)
+	{
+		return Edit.bHasRenderable
+			|| Edit.bHasEnableCulling
+			|| Edit.bHasCastShadow
+			|| Edit.bHasWorldMatrix
+			|| Edit.bDisableCollisionMesh;
+	}
+
+	void Apply_EnvEditToDesc(ENV_OBJECT_DESC* pOutDesc, const MAP_ENV_EDITED_DESC& Edit)
+	{
+		if (nullptr == pOutDesc)
+			return;
+
+		if (Edit.bHasRenderable)
+			pOutDesc->tCollision.bInvisibleCollision = !Edit.bRenderable;
+
+		if (Edit.bHasEnableCulling)
+			pOutDesc->tRender.bUseLodCulling = Edit.bEnableCulling;
+
+		if (Edit.bHasCastShadow)
+			pOutDesc->tRender.bShadowMappingCaster = Edit.bCastShadow;
+
+		if (Edit.bHasWorldMatrix)
+		{
+			pOutDesc->bHasWorldMatrix = true;
+			pOutDesc->matWorld = Edit.matWorld;
+
+			CGameObject::GAMEOBJECT_DESC& BaseDesc =
+				static_cast<CGameObject::GAMEOBJECT_DESC&>(*pOutDesc);
+			Apply_WorldMatrixToGameObjectDesc(&BaseDesc, Edit.matWorld);
+		}
+
+		if (Edit.bDisableCollisionMesh)
+			pOutDesc->tCollision.bInvalidCollision = true;
+	}
+
+	void Apply_SectionEditToDesc(MAP_SECTION_DESC* pOutDesc, const MAP_ENV_EDITED_DESC& Edit)
+	{
+		if (nullptr == pOutDesc)
+			return;
+
+		if (Edit.bHasRenderable)
+			pOutDesc->bRenderable = Edit.bRenderable;
+
+		if (Edit.bHasEnableCulling)
+			pOutDesc->bEnableCulling = Edit.bEnableCulling;
+
+		if (Edit.bHasCastShadow)
+			pOutDesc->bCastShadow = Edit.bCastShadow;
+
+		if (Edit.bHasWorldMatrix)
+		{
+			CGameObject::GAMEOBJECT_DESC& BaseDesc =
+				static_cast<CGameObject::GAMEOBJECT_DESC&>(*pOutDesc);
+			Apply_WorldMatrixToGameObjectDesc(&BaseDesc, Edit.matWorld);
+		}
+
+		if (Edit.bDisableCollisionMesh)
+			pOutDesc->bCreateCollisionActor = false;
+	}
+
+	json Save_EditedDesc(const MAP_ENV_EDITED_DESC& Edit)
+	{
+		json j = json::object();
+
+		if (Edit.bHasRenderable)
+			j["Renderable"] = static_cast<bool>(Edit.bRenderable);
+
+		if (Edit.bHasEnableCulling)
+			j["EnableCulling"] = static_cast<bool>(Edit.bEnableCulling);
+
+		if (Edit.bHasCastShadow)
+			j["CastShadow"] = static_cast<bool>(Edit.bCastShadow);
+
+		if (Edit.bHasWorldMatrix)
+			j["WorldMatrix"] = Save_Float4x4(Edit.matWorld);
+
+		if (Edit.bDisableCollisionMesh)
+			j["CollisionMeshDisabled"] = true;
+
+		return j;
+	}
+
+	HRESULT Load_EditedDesc(const json& jValue, MAP_ENV_EDITED_DESC* pOutDesc)
+	{
+		if (nullptr == pOutDesc)
+			return E_FAIL;
+
+		*pOutDesc = {};
+
+		if (!jValue.is_object())
+			return E_FAIL;
+
+		const auto IterRenderable = jValue.find("Renderable");
+		if (IterRenderable != jValue.end())
+		{
+			if (!IterRenderable->is_boolean())
+				return E_FAIL;
+
+			pOutDesc->bHasRenderable = true;
+			pOutDesc->bRenderable = IterRenderable->get<bool>();
+		}
+
+		const auto IterEnableCulling = jValue.find("EnableCulling");
+		if (IterEnableCulling != jValue.end())
+		{
+			if (!IterEnableCulling->is_boolean())
+				return E_FAIL;
+
+			pOutDesc->bHasEnableCulling = true;
+			pOutDesc->bEnableCulling = IterEnableCulling->get<bool>();
+		}
+
+		const auto IterCastShadow = jValue.find("CastShadow");
+		if (IterCastShadow != jValue.end())
+		{
+			if (!IterCastShadow->is_boolean())
+				return E_FAIL;
+
+			pOutDesc->bHasCastShadow = true;
+			pOutDesc->bCastShadow = IterCastShadow->get<bool>();
+		}
+
+		const auto IterWorldMatrix = jValue.find("WorldMatrix");
+		if (IterWorldMatrix != jValue.end())
+		{
+			if (FAILED(Load_Float4x4(*IterWorldMatrix, &pOutDesc->matWorld)))
+				return E_FAIL;
+
+			pOutDesc->bHasWorldMatrix = true;
+		}
+
+		const auto IterCollisionDisabled = jValue.find("CollisionMeshDisabled");
+		if (IterCollisionDisabled != jValue.end())
+		{
+			if (!IterCollisionDisabled->is_boolean())
+				return E_FAIL;
+
+			pOutDesc->bDisableCollisionMesh = IterCollisionDisabled->get<bool>();
+		}
+
+		return S_OK;
+	}
+
+	json Save_EditedMap(const unordered_map<_wstring, MAP_ENV_EDITED_DESC>& EditedMap)
+	{
+		vector<_wstring> Keys;
+		for (const auto& Pair : EditedMap)
+		{
+			if (!Pair.first.empty() && Has_AnyMapEnvEdit(Pair.second))
+				Keys.push_back(Pair.first);
+		}
+
+		sort(Keys.begin(), Keys.end());
+
+		json jResult = json::object();
+		for (const auto& strKey : Keys)
+		{
+			const auto Iter = EditedMap.find(strKey);
+			if (Iter == EditedMap.end())
+				continue;
+
+			jResult[WstrToStr(strKey)] = Save_EditedDesc(Iter->second);
+		}
+
+		return jResult;
+	}
+
+	HRESULT Load_EditedMap(
+		const json& jRoot,
+		const char* pFieldName,
+		unordered_map<_wstring, MAP_ENV_EDITED_DESC>* pOutMap)
+	{
+		if (nullptr == pFieldName || nullptr == pOutMap)
+			return E_FAIL;
+
+		pOutMap->clear();
+
+		const auto IterField = jRoot.find(pFieldName);
+		if (IterField == jRoot.end())
+			return S_OK;
+
+		if (!IterField->is_object())
+			return E_FAIL;
+
+		for (auto Iter = IterField->begin(); Iter != IterField->end(); ++Iter)
+		{
+			const _wstring strKey = StrToWstr(Iter.key());
+			if (strKey.empty())
+				continue;
+
+			MAP_ENV_EDITED_DESC Edit{};
+			if (FAILED(Load_EditedDesc(Iter.value(), &Edit)))
+				return E_FAIL;
+
+			if (!Has_AnyMapEnvEdit(Edit))
+				continue;
+
+			Edit.strStableKey = strKey;
+			(*pOutMap)[strKey] = Edit;
+		}
+
+		return S_OK;
+	}
 }
 
 _wstring CMap_EditFile::Make_EnvKey(const ENV_OBJECT_DESC& Desc)
@@ -63,12 +325,53 @@ _wstring CMap_EditFile::Make_EnvKey(const ENV_OBJECT_DESC& Desc)
 		+ to_wstring(Desc.iUid);
 }
 
-HRESULT CMap_EditFile::Apply_Change(
-	MAP_PACKAGE* pInOutPackage,
-	const MAP_EDIT_CHANGE& OverrideDesc)
+_wstring CMap_EditFile::Make_SectionKey(const _wstring& strStageName, const _wstring& strSectionName)
+{
+	if (strSectionName.empty())
+		return L"";
+
+	if (strStageName.empty())
+		return strSectionName;
+
+	return strStageName + L"|" + strSectionName;
+}
+
+_wstring CMap_EditFile::Make_SectionKey(const MAP_STAGE_DESC& StageDesc, const MAP_SECTION_DESC& SectionDesc)
+{
+	return Make_SectionKey(StageDesc.strStageName, SectionDesc.strSectionName);
+}
+
+HRESULT CMap_EditFile::Apply_Change(MAP_PACKAGE* pInOutPackage, const MAP_EDIT_CHANGE& OverrideDesc)
 {
 	if (nullptr == pInOutPackage)
 		return E_FAIL;
+
+	if (!OverrideDesc.EditedMapSections.empty())
+	{
+		MAP_STAGE_DESC& StageDesc = pInOutPackage->StageDesc;
+		for (MAP_SECTION_DESC& SectionDesc : StageDesc.SectionDescs)
+		{
+			const _wstring strKey = Make_SectionKey(StageDesc, SectionDesc);
+			const auto Iter = OverrideDesc.EditedMapSections.find(strKey);
+			if (Iter == OverrideDesc.EditedMapSections.end())
+				continue;
+
+			Apply_SectionEditToDesc(&SectionDesc, Iter->second);
+		}
+	}
+
+	if (!OverrideDesc.EditedEnvObjects.empty())
+	{
+		for (ENV_OBJECT_DESC& Desc : pInOutPackage->EnvObjectDescs)
+		{
+			const _wstring strKey = Make_EnvKey(Desc);
+			const auto Iter = OverrideDesc.EditedEnvObjects.find(strKey);
+			if (Iter == OverrideDesc.EditedEnvObjects.end())
+				continue;
+
+			Apply_EnvEditToDesc(&Desc, Iter->second);
+		}
+	}
 
 	if (!OverrideDesc.DeletedEnvObjectKeys.empty())
 	{
@@ -97,17 +400,12 @@ HRESULT CMap_EditFile::Apply_Change(
 	return S_OK;
 }
 
-HRESULT CMap_EditFile::Get_EditFilePath(
-	const _wstring& strManifestPath,
-	_wstring* pOutEditFilePath)
+HRESULT CMap_EditFile::Get_EditFilePath(const _wstring& strManifestPath, _wstring* pOutEditFilePath)
 {
 	return Resolve_EditFilePathFromManifest_Impl(strManifestPath, pOutEditFilePath);
 }
 
-HRESULT CMap_EditFile::Get_PresetEditFilePath(
-	_uint iPresetIndex,
-	const _wstring& strManifestPath,
-	_wstring* pOutEditFilePath)
+HRESULT CMap_EditFile::Get_PresetEditFilePath(_uint iPresetIndex, const _wstring& strManifestPath, _wstring* pOutEditFilePath)
 {
 	_wstring strResolvedManifestPath;
 	if (FAILED(Resolve_PresetManifestPathForEditFile(
@@ -356,6 +654,8 @@ json CMap_EditFile::Save_Change(const MAP_EDIT_CHANGE& Desc)
 		jDeletedEnvObjects.push_back(WstrToStr(strKey));
 
 	jOverride["DeletedEnvObjects"] = jDeletedEnvObjects;
+	jOverride["EditedEnvObjects"] = Save_EditedMap(Desc.EditedEnvObjects);
+	jOverride["EditedMapSections"] = Save_EditedMap(Desc.EditedMapSections);
 
 	jOverride["AddedMapObjects"] = json::array();
 	for (const auto& Added : Desc.AddedMapObjects)
@@ -405,6 +705,12 @@ HRESULT CMap_EditFile::Load_Change(const json& jOverride, MAP_EDIT_CHANGE* pOutD
 				pOutDesc->DeletedEnvObjectKeys.insert(strKey);
 		}
 	}
+
+	if (FAILED(Load_EditedMap(jOverride, "EditedEnvObjects", &pOutDesc->EditedEnvObjects)))
+		return E_FAIL;
+
+	if (FAILED(Load_EditedMap(jOverride, "EditedMapSections", &pOutDesc->EditedMapSections)))
+		return E_FAIL;
 
 	const auto IterAdded = jOverride.find("AddedMapObjects");
 	if (IterAdded != jOverride.end())

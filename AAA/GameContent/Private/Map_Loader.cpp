@@ -511,6 +511,9 @@ HRESULT CMap_Loader::Load_MapStage_Runtime(
 	MAP_PACKAGE Package{};
 	HRESULT hr = pMapLoader->Build_Package(strMapManifestPath, &Package);
 
+	if (SUCCEEDED(hr) && MapContentDesc.bHasMapContent)
+		hr = CMap_EditFile::Apply_Change(&Package, MapContentDesc.OverrideDesc);
+
 	if (SUCCEEDED(hr))
 	{
 		Package.EnvObjectDescs.clear();

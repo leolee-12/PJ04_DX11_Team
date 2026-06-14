@@ -4,6 +4,18 @@
 
 #include <algorithm>
 
+namespace
+{
+	_bool Has_AnyMapEnvEdit(const MAP_ENV_EDITED_DESC& Edit)
+	{
+		return Edit.bHasRenderable
+			|| Edit.bHasEnableCulling
+			|| Edit.bHasCastShadow
+			|| Edit.bHasWorldMatrix
+			|| Edit.bDisableCollisionMesh;
+	}
+}
+
 NS_BEGIN(Client)
 
 CMap_EditSession::CMap_EditSession()
@@ -170,6 +182,122 @@ _bool CMap_EditSession::Track_DeletedPreviewObject(CGameObject* pObject)
 	if (OrderIter == m_DeletedMapPreviewEnvOrder.end())
 		m_DeletedMapPreviewEnvOrder.push_back(Item.strStableKey);
 
+	return true;
+}
+
+_bool CMap_EditSession::Track_EditedPreviewObject(
+	CGameObject* pObject,
+	const MAP_ENV_EDITED_DESC& Edit)
+{
+	if (nullptr == pObject)
+		return false;
+
+	const auto IterItem = m_MapPreviewEnvItems.find(pObject);
+	if (IterItem == m_MapPreviewEnvItems.end())
+		return false;
+
+	const _wstring& strStableKey = IterItem->second.strStableKey;
+	if (strStableKey.empty())
+		return false;
+
+	if (!Has_AnyMapEnvEdit(Edit))
+	{
+		m_tEditData.OverrideDesc.EditedEnvObjects.erase(strStableKey);
+	}
+	else
+	{
+		MAP_ENV_EDITED_DESC StoredEdit = Edit;
+		StoredEdit.strStableKey = strStableKey;
+		m_tEditData.OverrideDesc.EditedEnvObjects[strStableKey] = StoredEdit;
+	}
+
+	m_tEditData.bHasMapContent = true;
+	m_tEditData.bLoadEnv = true;
+	return true;
+}
+
+_bool CMap_EditSession::Clear_EditedPreviewObject(CGameObject* pObject)
+{
+	if (nullptr == pObject)
+		return false;
+
+	const auto IterItem = m_MapPreviewEnvItems.find(pObject);
+	if (IterItem == m_MapPreviewEnvItems.end())
+		return false;
+
+	const _wstring& strStableKey = IterItem->second.strStableKey;
+	if (strStableKey.empty())
+		return false;
+
+	const size_t iErased = m_tEditData.OverrideDesc.EditedEnvObjects.erase(strStableKey);
+
+	m_tEditData.bHasMapContent = true;
+	m_tEditData.bLoadEnv = true;
+	return 0 < iErased;
+}
+
+_bool CMap_EditSession::Try_GetEditedEnvObject(
+	const _wstring& strStableKey,
+	MAP_ENV_EDITED_DESC* pOutEdit) const
+{
+	if (nullptr == pOutEdit || strStableKey.empty())
+		return false;
+
+	const auto Iter = m_tEditData.OverrideDesc.EditedEnvObjects.find(strStableKey);
+	if (Iter == m_tEditData.OverrideDesc.EditedEnvObjects.end())
+		return false;
+
+	*pOutEdit = Iter->second;
+	return true;
+}
+
+_bool CMap_EditSession::Track_EditedMapSection(
+	const _wstring& strSectionKey,
+	const MAP_ENV_EDITED_DESC& Edit)
+{
+	if (strSectionKey.empty())
+		return false;
+
+	if (!Has_AnyMapEnvEdit(Edit))
+	{
+		m_tEditData.OverrideDesc.EditedMapSections.erase(strSectionKey);
+	}
+	else
+	{
+		MAP_ENV_EDITED_DESC StoredEdit = Edit;
+		StoredEdit.strStableKey = strSectionKey;
+		m_tEditData.OverrideDesc.EditedMapSections[strSectionKey] = StoredEdit;
+	}
+
+	m_tEditData.bHasMapContent = true;
+	m_tEditData.bLoadStage = true;
+	return true;
+}
+
+_bool CMap_EditSession::Clear_EditedMapSection(const _wstring& strSectionKey)
+{
+	if (strSectionKey.empty())
+		return false;
+
+	const size_t iErased = m_tEditData.OverrideDesc.EditedMapSections.erase(strSectionKey);
+
+	m_tEditData.bHasMapContent = true;
+	m_tEditData.bLoadStage = true;
+	return 0 < iErased;
+}
+
+_bool CMap_EditSession::Try_GetEditedMapSection(
+	const _wstring& strSectionKey,
+	MAP_ENV_EDITED_DESC* pOutEdit) const
+{
+	if (nullptr == pOutEdit || strSectionKey.empty())
+		return false;
+
+	const auto Iter = m_tEditData.OverrideDesc.EditedMapSections.find(strSectionKey);
+	if (Iter == m_tEditData.OverrideDesc.EditedMapSections.end())
+		return false;
+
+	*pOutEdit = Iter->second;
 	return true;
 }
 
@@ -400,6 +528,8 @@ MAP_EDIT_CHANGE CMap_EditSession::Build_ChangeSnapShot() const
 
 	if (!m_tEditData.bLoadEnv)
 	{
+		Snapshot.EditedEnvObjects = m_tEditData.OverrideDesc.EditedEnvObjects;
+		Snapshot.EditedMapSections = m_tEditData.OverrideDesc.EditedMapSections;
 		Snapshot.AddedMapObjects = m_tEditData.OverrideDesc.AddedMapObjects;
 		return Snapshot;
 	}

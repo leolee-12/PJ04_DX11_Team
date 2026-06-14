@@ -6,8 +6,8 @@
 
 namespace
 {
-	static constexpr _uint INSTANCE_MIN_COUNT = 8;
-	static constexpr _uint INSTANCE_MIN_SAVED_DRAWS = 16;
+	static constexpr _uint INSTANCE_MIN_COUNT = 2;
+	static constexpr _uint INSTANCE_MIN_SAVED_DRAWS = 2;
 }
 
 CEnv_InstanceBatch::CEnv_InstanceBatch(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

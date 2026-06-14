@@ -11,7 +11,7 @@ NS_BEGIN(Client)
 
 namespace
 {
-	constexpr _bool ENABLE_ENV_OBJECT_SHADOW = false;
+	constexpr _bool ENABLE_ENV_OBJECT_SHADOW = true;
 	constexpr _float ENV_DISTANCE_CULL_START = 175.f;
 	constexpr _float ENV_SHADOW_DISTANCE_CULL_START = 80.f;
 
@@ -482,22 +482,30 @@ void CEnvObject::Check_Visible()
 		return;
 	}
 
-	// 1. Frustum Culling
-	m_bVisible = !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, m_WorldBounds);
-	m_bVisibleShadow = bEnableShadow && !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_WorldBounds);
+	m_bVisible = true;
+	m_bVisibleShadow = bEnableShadow;
 
-	// 2-1. Main Distance Culling
-	if (m_bVisible && m_bEnableCulling)
+	// Distance -> Frustum
+	// 1. Main
+	if (m_bEnableCulling &&
+		m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_DISTANCE_CULL_START))
 	{
-		if(m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_DISTANCE_CULL_START))
-			m_bVisible = false;
+		m_bVisible = false;
+	}
+	else
+	{
+		m_bVisible = !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, m_WorldBounds);
 	}
 
-	// 2-2. Shadow Distance Culling
-	if (m_bVisibleShadow)
+	// 2. Shadow
+	if (m_bVisibleShadow &&
+		m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_SHADOW_DISTANCE_CULL_START))
 	{
-		if (m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_SHADOW_DISTANCE_CULL_START))
-			m_bVisibleShadow = false;
+		m_bVisibleShadow = false;
+	}
+	else if (m_bVisibleShadow)
+	{
+		m_bVisibleShadow = !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_WorldBounds);
 	}
 }
 

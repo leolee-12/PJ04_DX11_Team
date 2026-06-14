@@ -30,8 +30,8 @@ HRESULT CEnvObject_Static::Initialize(void* pArg)
 	if (FAILED(Ready_RenderComponents(m_tDesc.iModelProtoLevel, m_tDesc.wstrModelProtoTag)))
 		return E_FAIL;
 
-	//if (FAILED(Ready_PhysicsActor()))
-	//	return E_FAIL;
+	if (FAILED(Ready_PhysicsActor()))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -40,10 +40,16 @@ void CEnvObject_Static::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
-	if (m_bManagedBySpatialGrid)
+	if (!m_bRenderable || !Has_RenderModel())
+	{
+		m_bVisible = false;
+		m_bVisibleShadow = false;
 		return;
+	}
 
-	Submit_FromSpatialGrid();
+	Refresh_WorldBounds();
+	Check_Visible();
+	Submit_RenderGroups();
 }
 
 HRESULT CEnvObject_Static::Render_Shadow()
@@ -100,20 +106,6 @@ _bool CEnvObject_Static::Can_RenderInstance() const
 		return false;
 
 	return true;
-}
-
-void CEnvObject_Static::Submit_FromSpatialGrid()
-{
-	if (!m_bRenderable || !Has_RenderModel())
-	{
-		m_bVisible = false;
-		m_bVisibleShadow = false;
-		return;
-	}
-
-	Refresh_WorldBounds();
-	Check_Visible();
-	Submit_RenderGroups();
 }
 
 void CEnvObject_Static::Submit_RenderGroups()

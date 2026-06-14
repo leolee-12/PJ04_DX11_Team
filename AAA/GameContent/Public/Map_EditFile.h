@@ -11,6 +11,10 @@ class CLIENT_DLL CMap_EditFile final
 public:
 	static _wstring Make_EnvKey(const ENV_OBJECT_DESC& Desc);
 
+	static _wstring Make_SectionKey(const _wstring& strStageName, const _wstring& strSectionName);
+
+	static _wstring Make_SectionKey(const MAP_STAGE_DESC& StageDesc, const MAP_SECTION_DESC& SectionDesc);
+
 	static HRESULT Apply_Change(
 		MAP_PACKAGE* pInOutPackage,
 		const MAP_EDIT_CHANGE& OverrideDesc);

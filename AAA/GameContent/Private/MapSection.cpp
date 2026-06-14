@@ -71,6 +71,7 @@ HRESULT CMapSection::Initialize(void* pArg)
 	m_bCastShadow = pDesc->bCastShadow;
 	m_bEnableCulling = pDesc->bEnableCulling;
 	m_bRenderable = pDesc->bRenderable;
+	m_bCreateCollisionActor = pDesc->bCreateCollisionActor;
 
 	if (m_bRenderable)
 	{
@@ -160,6 +161,11 @@ void CMapSection::Refresh_CombinedWorldMatrix()
 	Refresh_ColliderActor();
 }
 
+void CMapSection::Notify_EditTransformChanged()
+{
+	Refresh_CombinedWorldMatrix();
+}
+
 #ifdef _DEBUG
 void CMapSection::Reset_FrameProfile()
 {
@@ -233,6 +239,9 @@ void CMapSection::Refresh_ColliderActor()
 		m_pGameInstance_Proxy->Remove_StaticActor(m_pColliderActor);
 		m_pColliderActor = nullptr;
 	}
+
+	if (!m_bCreateCollisionActor)
+		return;
 
 	if (nullptr == m_pModelCom)
 		return;

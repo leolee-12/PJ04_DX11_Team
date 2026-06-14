@@ -56,6 +56,20 @@ public:
 	void Unregister_PreviewObject(CGameObject* pObject);
 	_bool Track_DeletedPreviewObject(CGameObject* pObject);
 
+	_bool Track_EditedPreviewObject(CGameObject* pObject, const MAP_ENV_EDITED_DESC& Edit);
+
+	_bool Clear_EditedPreviewObject(CGameObject* pObject);
+
+	_bool Try_GetEditedEnvObject(const _wstring& strStableKey, MAP_ENV_EDITED_DESC* pOutEdit) const;
+
+	_bool Track_EditedMapSection(const _wstring& strSectionKey, const MAP_ENV_EDITED_DESC& Edit);
+
+	_bool Clear_EditedMapSection(const _wstring& strSectionKey);
+
+	_bool Try_GetEditedMapSection(const _wstring& strSectionKey, MAP_ENV_EDITED_DESC* pOutEdit) const;
+
+	_uint Get_EditedMapSectionCount() const { return static_cast<_uint>(m_tEditData.OverrideDesc.EditedMapSections.size()); }
+
 	const MAP_EDIT_CHANGE& Get_Change() const { return m_tEditData.OverrideDesc; }
 	void Set_Change(const MAP_EDIT_CHANGE& Desc);
 	MAP_EDIT_CHANGE Build_ChangeSnapShot() const;
