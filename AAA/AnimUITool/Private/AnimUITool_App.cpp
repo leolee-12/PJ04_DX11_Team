@@ -73,6 +73,8 @@ HRESULT CAnimUITool_App::Initialize()
 
 	m_pPanel_Manager->Set_Level(pLevel);
 
+	m_pGameInstance_Proxy->Enable_InputDeveice();
+
 	Log_Info("AnimUITool initialized.");
 
 	return S_OK;

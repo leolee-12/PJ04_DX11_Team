@@ -133,7 +133,9 @@ void CPanel_Manager::Bind_Preview(CGameObject* pOwner)
     m_Context.pOwner = pOwner;
     m_Context.pModel = pOwner ? pOwner->Get_Component<CModel>(L"Com_Model") : nullptr;
     m_Context.pAnimator = pOwner ? pOwner->Get_Component<CAnimator>(L"Com_Animator") : nullptr;
-    m_Context.iClip = 0; m_Context.fProgress = 0.f; m_Context.iRootBone = -1;
+    m_Context.iClip = 0;
+    m_Context.fProgress = 0.f;
+    m_Context.iRootBone = -1;
     if (!pOwner)
     {
         m_Context.strName.clear();
@@ -328,7 +330,8 @@ void CPanel_Manager::Render_ModeBar()
     {
         if (m_pLevel)
         {
-            Bind_Preview(m_pLevel->Load_Kirby());
+            //Bind_Preview(m_pLevel->Load_Kirby());
+            m_pLevel->Load_Kirby();
             m_Context.strName = L"Kirby";
             //m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby.ysh";
             m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby_AllAbilities.ysh";
