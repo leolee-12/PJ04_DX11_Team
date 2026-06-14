@@ -84,15 +84,20 @@ _bool CKirby_Run::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             pKirby->Change_State(KIRBY_STATE_TYPE::JUMP);
             return true;
         }
-        // Attack Down
+        // Attack
         case KIRBY_COMMAND_TYPE::ATTACK:
         {
-            if (!pCommand->IsDown())
-                return false;
-
             CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
             if (pAbility->Can_Attack(KIRBY_ATTACK_LOCATION::GROUND))
-                pAbility->Down_Attack(pKirby);
+            {
+                if (pCommand->IsDown())
+                    pAbility->Enter_Attack_KeyDown(pKirby);
+                else if (pCommand->IsPress())
+                    pAbility->Enter_Attack_KeyPress(pKirby);
+                else if (pCommand->IsUp())
+                    pAbility->Enter_Attack_KeyUp(pKirby);
+            }
+
             return true;
         }
     }

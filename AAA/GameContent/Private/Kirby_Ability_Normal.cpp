@@ -46,31 +46,31 @@ void CKirby_Ability_Normal::Enter_Ability(CKirby* pKirby)
     // Inhale Body
     pKirby_Body->Set_Body(KIRBY_BODY_STATE::INHALE);
 
-    m_bEndAttack = false;
+    m_bReqEndAttackState = false;
 
     // Speed
     CMovement_Child* pMovementCom = pKirby->Get_Movement();
     pMovementCom->Set_MaxHorizontalSpeed(2.f);
 }
 
-void CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _float fTimeDelta)
+ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _float fTimeDelta)
 {
     CMovement_Child* pMovementCom = pKirby->Get_Movement();
     _float fYVelocity = pMovementCom->Get_VerticalVelocity();
 
     _bool bIsGround = pMovementCom->Is_Grounded();
-    if (bIsGround == false && fYVelocity <= CKirby::s_fFallVelocityY)
-    {
+
+    //if (bIsGround == false && fYVelocity <= CKirby::s_fFallVelocityY)
+    if (bIsGround == false)
         m_eCurMoveState = INHALE_MOVE_STATE::FALL;
-    }
-    else if (pKirby->Has_MoveDir() == false)
-    {
-        m_eCurMoveState = INHALE_MOVE_STATE::WAIT;
-    }
+    else if (pKirby->Has_MoveDir() == true)
+        m_eCurMoveState = INHALE_MOVE_STATE::WALK;
+    else
+        m_eCurMoveState = INHALE_MOVE_STATE::WAIT;    
 
     // Test Code
     if (Change_Ability(pKirby) == true)
-        return;
+        return ABILITY_UPDATE_RESULT::ABILITY_CHANGED;
 
     // Super Inhale Timer
     if (m_AccSuperInHaleTime < m_MaxSuperInHaleTime)
@@ -80,7 +80,7 @@ void CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _float fTimeDelta)
     CAnimator* pAnimator = pKirby_Body->Get_Animator();
 
     // Inhale 종료
-    if (m_eInhaleState != INHALE_STATE::INHALE_END && pKirby->Get_KirbyAbility()->IsFinished() == true)
+    if (m_eInhaleState != INHALE_STATE::INHALE_END && m_bReqInhale == true)
     {
         m_eInhaleState = INHALE_STATE::INHALE_END;
         pAnimator->Play("InhaleEnd", false, false, 0.1f, 1.5f);
@@ -94,9 +94,10 @@ void CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _float fTimeDelta)
         if (pAnimator->Is_Finished() == true)
         {
             pKirby_Body->Set_Eye(KIRBY_EYE_STATE::IDLE);
-            m_bEndAttack = true;
+            m_bReqEndAttackState = true;
         }
-        return;
+
+        return ABILITY_UPDATE_RESULT::NONE;
     }
 
     // Inhale 강화
@@ -121,6 +122,8 @@ void CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _float fTimeDelta)
     }
 
     Interpolation_Inhale(pAnimator);
+
+    return ABILITY_UPDATE_RESULT::NONE;
 }
 
 void CKirby_Ability_Normal::Exit_Ability(CKirby* pKirby)
@@ -142,9 +145,18 @@ _bool CKirby_Ability_Normal::Handle_Command(CKirby* pKirby, CKirby_Command* pCom
             if (!pCommand->IsPress())
                 return false;
 
-            m_eCurMoveState = INHALE_MOVE_STATE::WALK;
             Move_Command* pMoveCommand = static_cast<Move_Command*>(pCommand);
             pKirby->Add_MoveDir(pMoveCommand->Get_Dir());
+            return true;
+        }
+
+        // Attack Up
+        case KIRBY_COMMAND_TYPE::ATTACK:
+        {
+            if (!pCommand->IsUp())
+                return false;
+
+            m_bReqInhale = true;
             return true;
         }
     }
@@ -152,16 +164,25 @@ _bool CKirby_Ability_Normal::Handle_Command(CKirby* pKirby, CKirby_Command* pCom
     return false;
 }
 
-void CKirby_Ability_Normal::Down_Attack(CKirby* pKirby)
+_bool CKirby_Ability_Normal::Enter_Attack_KeyDown(CKirby* pKirby)
 {
-    m_bIsFinished = false;
+    m_bReqInhale = false;
 
     pKirby->Change_State(KIRBY_STATE_TYPE::ATTACK);
+
+    return true;
 }
 
-void CKirby_Ability_Normal::Up_Attack(CKirby* pKirby)
+_bool CKirby_Ability_Normal::Enter_Attack_KeyPress(CKirby* pKirby)
 {
-    m_bIsFinished = true;
+    // 무시
+    return true;
+}
+
+_bool CKirby_Ability_Normal::Enter_Attack_KeyUp(CKirby* pKirby)
+{
+    // 무시
+    return true;
 }
 
 _bool CKirby_Ability_Normal::Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation)
