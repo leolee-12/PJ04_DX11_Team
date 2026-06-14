@@ -1,7 +1,7 @@
 #include "GameInstance_Proxy.h"
 #include "GameInstance.h"
 #include "Target_Manager.h"
-#include "Frustum_Manager.h"
+#include "Culling_Manager.h"
 #include "Light_Manager.h"
 #include "Renderer.h"
 #include "Shadow_Dir.h"

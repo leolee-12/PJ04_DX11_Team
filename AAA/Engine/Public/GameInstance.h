@@ -35,7 +35,7 @@ class CEffect_Manager;
 class CPhysX_Manager;
 class CEnvironment_Manager;
 class CShaderGlobal_Manager;
-class CFrustum_Manager;
+class CCulling_Manager;
 class CTexture_Hub;
 
 class ENGINE_DLL CGameInstance 
@@ -263,7 +263,7 @@ private:
 	CPhysX_Manager*				m_pPhysX_Manager = { nullptr };
 	CEnvironment_Manager*		m_pEnvironment_Manager = { nullptr };
 	CShaderGlobal_Manager*		m_pShaderGlobal_Manager = { nullptr };
-	CFrustum_Manager*			m_pFrustum_Manager = { nullptr };
+	CCulling_Manager*			m_pCulling_Manager = { nullptr };
 	CTexture_Hub*				m_pTexture_Hub = { nullptr };
 
 	mutable mt19937             m_RandomGenerator;

@@ -30,8 +30,8 @@ HRESULT CEnvObject_Static::Initialize(void* pArg)
 	if (FAILED(Ready_RenderComponents(m_tDesc.iModelProtoLevel, m_tDesc.strModelProtoTag)))
 		return E_FAIL;
 
-	if (FAILED(Ready_PhysicsActor()))
-		return E_FAIL;
+	//if (FAILED(Ready_PhysicsActor()))
+	//	return E_FAIL;
 
 	return S_OK;
 }

@@ -52,8 +52,6 @@ private:
 	void Draw_ShaderGlobals();
 	void Draw_MeshLayerPanel(CGameObject* pObj);
 	void Draw_MapSectionRenderOptions(Client::CMapSection* pSection);
-	void Draw_MapPreviewDeletedOverrides();
-	void Draw_MapPreviewAddedOverrides();
 
 public:
 	virtual void Free() override;

@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "MapTool_Defines.h"
 #include "Level.h"
-#include "Map_LevelContent.h"
+#include "Map_LoadTypes.h"
 
 NS_BEGIN(Engine)
 class CGameObject;

@@ -507,7 +507,7 @@
     <ClInclude Include="..\Public\Culling_Util.h">
       <Filter>20. Culling</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Frustum_Manager.h">
+    <ClInclude Include="..\Public\Culling_Manager.h">
       <Filter>20. Culling</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Texture_Hub.h">
@@ -746,7 +746,7 @@
     <ClCompile Include="..\Private\Culling_Util.cpp">
       <Filter>20. Culling</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Frustum_Manager.cpp">
+    <ClCompile Include="..\Private\Culling_Manager.cpp">
       <Filter>20. Culling</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Texture_Hub.cpp">

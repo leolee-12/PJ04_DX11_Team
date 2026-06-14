@@ -26,7 +26,7 @@ CMap_Spawner::CMap_Spawner()
 {
 }
 
-HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST& Request, MAP_LOAD_REPORT* pOutReport)
+HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST& Request, MAP_LOAD_RESULT* pOutReport)
 {
 	if (nullptr == m_pProxy)
 		return E_FAIL;

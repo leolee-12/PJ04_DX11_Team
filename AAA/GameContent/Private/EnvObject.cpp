@@ -13,6 +13,7 @@ namespace
 {
 	constexpr _bool ENABLE_ENV_OBJECT_SHADOW = false;
 	constexpr _float ENV_DISTANCE_CULL_START = 175.f;
+	constexpr _float ENV_SHADOW_DISTANCE_CULL_START = 80.f;
 
 	void Log_EnvPhysicsWarning(const string& strMessage)
 	{
@@ -465,7 +466,6 @@ void CEnvObject::Refresh_WorldBounds()
 
 void CEnvObject::Check_Visible()
 {
-
 	if (!m_bRenderable || !Has_RenderModel())
 	{
 		m_bVisible = false;
@@ -482,19 +482,22 @@ void CEnvObject::Check_Visible()
 		return;
 	}
 
+	// 1. Frustum Culling
 	m_bVisible = !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, m_WorldBounds);
 	m_bVisibleShadow = bEnableShadow && !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_WorldBounds);
 
-	if ((m_bVisible || m_bVisibleShadow) && m_bEnableCulling)
+	// 2-1. Main Distance Culling
+	if (m_bVisible && m_bEnableCulling)
 	{
-		const _bool bDistanceCulled =
-			m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_DISTANCE_CULL_START);
-
-		if (bDistanceCulled)
-		{
+		if(m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_DISTANCE_CULL_START))
 			m_bVisible = false;
+	}
+
+	// 2-2. Shadow Distance Culling
+	if (m_bVisibleShadow)
+	{
+		if (m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_SHADOW_DISTANCE_CULL_START))
 			m_bVisibleShadow = false;
-		}
 	}
 }
 
@@ -520,6 +523,7 @@ void CEnvObject::Apply_TransformFromDesc()
 void CEnvObject::Apply_DescDefaults()
 {
 	m_bRenderable = !m_tDesc.tCollision.bInvisibleCollision;
+
 	m_bEnableCulling = m_tDesc.tRender.bUseLodCulling;
 	m_bCastShadow = m_tDesc.tRender.bShadowMappingCaster;
 	m_bVisible = true;

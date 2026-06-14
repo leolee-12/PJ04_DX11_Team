@@ -30,6 +30,24 @@ struct MAP_ADD_OBJECT
     json jObject;
 };
 
+struct MAP_EDIT_CHANGE
+{
+    _uint Version = 2;
+    unordered_set<_wstring> DeletedEnvObjectKeys;
+    vector<MAP_ADD_OBJECT> AddedMapObjects;
+};
+
+struct MAP_EDIT_DATA
+{
+    _bool bHasMapContent = false;
+    _uint Version = 1;
+    _int iPresetIndex = -1;
+    _wstring strManifestPath;
+    _bool bLoadStage = true;
+    _bool bLoadEnv = true;
+    MAP_EDIT_CHANGE OverrideDesc;
+};
+
 struct MAP_PACKAGE
 {
     MAP_STAGE_DESC StageDesc;
@@ -83,7 +101,7 @@ struct MAP_SPAWN_REQUEST
     CMapStage** ppOutStage = nullptr;
 };
 
-struct MAP_LOAD_REPORT
+struct MAP_LOAD_RESULT
 {
     _bool bStageLoaded = false;
     _wstring strStageName;

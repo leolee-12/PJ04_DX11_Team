@@ -1,4 +1,4 @@
-#include "Frustum_Manager.h"
+#include "Culling_Manager.h"
 #include "Culling_Util.h"
 
 #include "GameInstance.h"
@@ -35,7 +35,7 @@ namespace
 			&& Bounds.Extents.z >= 0.f;
 	}
 
-	inline void Reset_ViewState(CFrustum_Manager::FRUSTUM_VIEW_STATE* pState)
+	inline void Reset_ViewState(CCulling_Manager::FRUSTUM_VIEW_STATE* pState)
 	{
 		if (nullptr == pState)
 			return;
@@ -56,12 +56,12 @@ namespace
 #endif
 }
 
-CFrustum_Manager::CFrustum_Manager()
+CCulling_Manager::CCulling_Manager()
 	: m_pProxy(CGameInstance::GetProxy())
 {
 }
 
-HRESULT CFrustum_Manager::Initialize()
+HRESULT CCulling_Manager::Initialize()
 {
 	Invalidate_All();
 #ifdef _DEBUG
@@ -70,7 +70,7 @@ HRESULT CFrustum_Manager::Initialize()
 	return S_OK;
 }
 
-void CFrustum_Manager::Update()
+void CCulling_Manager::Update()
 {
 #ifdef _DEBUG
 	Reset_Stats();
@@ -80,18 +80,18 @@ void CFrustum_Manager::Update()
 	CULLING_VIEW_DESC MainViewDesc{};
 	MainViewDesc.pView = m_pProxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC);
 	MainViewDesc.pProj = m_pProxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
-	MainViewDesc.fCullMargin = 0.f;
+	MainViewDesc.fCullMargin = 6.f;
 	Update_View(CULLING_VIEW::MAIN_CAMERA, MainViewDesc);
 
 	// Shadow_Dir
 	CULLING_VIEW_DESC ShadowViewDesc{};
 	ShadowViewDesc.pView = m_pProxy->Get_Shadow_Transform(D3DTS::VIEW);
 	ShadowViewDesc.pProj = m_pProxy->Get_Shadow_Transform(D3DTS::PROJ);
-	ShadowViewDesc.fCullMargin = 0.f;
+	ShadowViewDesc.fCullMargin = 6.f;
 	Update_View(CULLING_VIEW::SHADOW_DIR, ShadowViewDesc);
 }
 
-_bool CFrustum_Manager::Update_View(CULLING_VIEW eView, const CULLING_VIEW_DESC& Desc)
+_bool CCulling_Manager::Update_View(CULLING_VIEW eView, const CULLING_VIEW_DESC& Desc)
 {
 	if (!Is_ValidViewIndex(eView))
 		return false;
@@ -125,7 +125,7 @@ _bool CFrustum_Manager::Update_View(CULLING_VIEW eView, const CULLING_VIEW_DESC&
 	return true;
 }
 
-void CFrustum_Manager::Invalidate_View(CULLING_VIEW eView)
+void CCulling_Manager::Invalidate_View(CULLING_VIEW eView)
 {
 	if (!Is_ValidViewIndex(eView))
 		return;
@@ -133,13 +133,13 @@ void CFrustum_Manager::Invalidate_View(CULLING_VIEW eView)
 	Reset_ViewState(&m_ViewStates[ETOUI(eView)]);
 }
 
-void CFrustum_Manager::Invalidate_All()
+void CCulling_Manager::Invalidate_All()
 {
 	for (_uint i = 0; i < ETOUI(CULLING_VIEW::END); ++i)
 		Reset_ViewState(&m_ViewStates[i]);
 }
 
-_bool CFrustum_Manager::Is_Valid(CULLING_VIEW eView) const
+_bool CCulling_Manager::Is_Valid(CULLING_VIEW eView) const
 {
 	if (!Is_ValidViewIndex(eView))
 		return false;
@@ -147,12 +147,12 @@ _bool CFrustum_Manager::Is_Valid(CULLING_VIEW eView) const
 	return m_ViewStates[ETOUI(eView)].bValid;
 }
 
-_bool XM_CALLCONV CFrustum_Manager::IsIn_WorldSpace(CULLING_VIEW eView, _fvector vWorldPos, _float fRange) const
+_bool XM_CALLCONV CCulling_Manager::IsIn_WorldSpace(CULLING_VIEW eView, _fvector vWorldPos, _float fRange) const
 {
 	if (!Is_ValidViewIndex(eView))
 		return true;
 
-	const CFrustum_Manager::FRUSTUM_VIEW_STATE& State = m_ViewStates[ETOUI(eView)];
+	const CCulling_Manager::FRUSTUM_VIEW_STATE& State = m_ViewStates[ETOUI(eView)];
 	if (!State.bValid)
 		return true;
 
@@ -172,7 +172,7 @@ _bool XM_CALLCONV CFrustum_Manager::IsIn_WorldSpace(CULLING_VIEW eView, _fvector
 	return State.WorldFrustum.Intersects(WorldSphere);
 }
 
-_bool CFrustum_Manager::IsIn_WorldSpace_AABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const
+_bool CCulling_Manager::IsIn_WorldSpace_AABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const
 {
 	if (!Is_ValidViewIndex(eView))
 		return true;
@@ -217,7 +217,7 @@ _bool CFrustum_Manager::IsIn_WorldSpace_AABB(CULLING_VIEW eView, const BoundingB
 	return bVisible;
 }
 
-_bool CFrustum_Manager::Should_CullAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const
+_bool CCulling_Manager::Should_CullAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const
 {
 	if (!m_bEnableFrustumCulling)
 	{
@@ -239,7 +239,7 @@ _bool CFrustum_Manager::Should_CullAABB(CULLING_VIEW eView, const BoundingBox& W
 	return bCull;
 }
 
-_bool CFrustum_Manager::Should_CullByDistance(const BoundingBox& WorldBounds, _float fCullDistance) const
+_bool CCulling_Manager::Should_CullByDistance(const BoundingBox& WorldBounds, _float fCullDistance) const
 {
 	if (nullptr == m_pProxy)
 		return false;
@@ -252,13 +252,13 @@ _bool CFrustum_Manager::Should_CullByDistance(const BoundingBox& WorldBounds, _f
 }
 
 #ifdef _DEBUG
-void CFrustum_Manager::Reset_Stats()
+void CCulling_Manager::Reset_Stats()
 {
 	for (_uint i = 0; i < ETOUI(CULLING_VIEW::END); ++i)
 		Reset_StatsSlot(&m_Stats[i]);
 }
 
-const FRUSTUM_CULLING_STATS& CFrustum_Manager::Get_Stats(CULLING_VIEW eView) const
+const FRUSTUM_CULLING_STATS& CCulling_Manager::Get_Stats(CULLING_VIEW eView) const
 {
 	static FRUSTUM_CULLING_STATS EmptyStats{};
 
@@ -269,13 +269,13 @@ const FRUSTUM_CULLING_STATS& CFrustum_Manager::Get_Stats(CULLING_VIEW eView) con
 }
 #endif
 
-CFrustum_Manager* CFrustum_Manager::Create()
+CCulling_Manager* CCulling_Manager::Create()
 {
-	CFrustum_Manager* pInstance = new CFrustum_Manager();
+	CCulling_Manager* pInstance = new CCulling_Manager();
 
 	if (FAILED(pInstance->Initialize()))
 	{
-		MSG_BOX("Create Failed : CFrustum_Manager");
+		MSG_BOX("Create Failed : CCulling_Manager");
 		Safe_Release(pInstance);
 		return nullptr;
 	}
@@ -283,7 +283,7 @@ CFrustum_Manager* CFrustum_Manager::Create()
 	return pInstance;
 }
 
-void CFrustum_Manager::Free()
+void CCulling_Manager::Free()
 {
 	Invalidate_All();
 

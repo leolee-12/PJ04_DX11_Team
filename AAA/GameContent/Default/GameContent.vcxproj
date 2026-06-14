@@ -55,10 +55,7 @@
     </ClInclude>
     <ClInclude Include="..\Public\Map_EditFile.h" />
     <ClInclude Include="..\Public\Map_EditSession.h" />
-    <ClInclude Include="..\Public\Map_LayerPolicy.h" />
-    <ClInclude Include="..\Public\Map_OverrideStore.h" />
     <ClInclude Include="..\Public\Map_PresetCatalog.h" />
-    <ClInclude Include="..\Public\Map_StageOverrideSerializer.h" />
     <ClInclude Include="..\Public\Movement_Child.h" />
     <ClInclude Include="..\Public\UI_Enums.h" />
     <ClInclude Include="..\Public\Kirby_Sword.h" />
@@ -88,11 +85,9 @@
     <ClInclude Include="..\Public\Map_Defines.h" />
     <ClInclude Include="..\Public\MapStage.h" />
     <ClInclude Include="..\public\MapObject.h" />
-    <ClInclude Include="..\Public\Map_LevelContent.h" />
     <ClInclude Include="..\Public\Map_Loader.h" />
     <ClInclude Include="..\Public\Map_LoadTypes.h" />
     <ClInclude Include="..\Public\Map_ModelResolver.h" />
-    <ClInclude Include="..\Public\Map_Override.h" />
     <ClInclude Include="..\Public\Map_Parser.h" />
     <ClInclude Include="..\Public\Map_ProtoRegister.h" />
     <ClInclude Include="..\Public\Map_Spawner.h" />
@@ -158,10 +153,7 @@
     </ClCompile>
     <ClCompile Include="..\Private\Map_EditFile.cpp" />
     <ClCompile Include="..\Private\Map_EditSession.cpp" />
-    <ClCompile Include="..\Private\Map_LayerPolicy.cpp" />
-    <ClCompile Include="..\Private\Map_OverrideStore.cpp" />
     <ClCompile Include="..\Private\Map_PresetCatalog.cpp" />
-    <ClCompile Include="..\Private\Map_StageOverrideSerializer.cpp" />
     <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />
     <ClCompile Include="..\Private\UI_GaugeBarCom.cpp" />
@@ -184,10 +176,8 @@
     <ClCompile Include="..\Private\MapSection.cpp" />
     <ClCompile Include="..\Private\MapStage.cpp" />
     <ClCompile Include="..\Private\Map_Builder.cpp" />
-    <ClCompile Include="..\Private\Map_LevelContent.cpp" />
     <ClCompile Include="..\Private\Map_Loader.cpp" />
     <ClCompile Include="..\Private\Map_ModelResolver.cpp" />
-    <ClCompile Include="..\Private\Map_Override.cpp" />
     <ClCompile Include="..\Private\Map_Parser.cpp" />
     <ClCompile Include="..\Private\Map_ProtoRegister.cpp" />
     <ClCompile Include="..\Private\Map_Spawner.cpp" />

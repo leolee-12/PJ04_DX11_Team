@@ -21,7 +21,7 @@ HRESULT CLevel_GamePlay::Initialize()
     if (FAILED(Load_LevelManifest(LAUNCHER_LEVEL_PROFILES::LEVEL_TEST, &Manifest)))
         return E_FAIL;
 
-    MAP_LOAD_REPORT MapReport{};
+    MAP_LOAD_RESULT MapReport{};
     CMapStage* pMapStage = nullptr;
 
     if (FAILED(CMap_Loader::Spawn_Map(

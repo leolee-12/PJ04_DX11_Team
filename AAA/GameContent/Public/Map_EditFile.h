@@ -1,6 +1,6 @@
 #pragma once
 #include "Base.h"
-#include "Map_LevelContent.h"
+#include "Map_LoadTypes.h"
 
 NS_BEGIN(Client)
 

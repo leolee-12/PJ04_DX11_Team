@@ -286,7 +286,7 @@ void CImGui_Manager::Draw_Toolbar()
 
     ImGui::SameLine();
 
-    const _uint iMapPreviewPresetCount = CMap_Loader::Get_MapPresetCount();
+    const _uint iMapPreviewPresetCount = CMap_Loader::Get_MapCount();
     static _int s_iMapPreviewPreset = 0;
     if (0 < iMapPreviewPresetCount)
     {
@@ -296,12 +296,12 @@ void CImGui_Manager::Draw_Toolbar()
 
         ImGui::SetNextItemWidth(100.f);
         if (ImGui::BeginCombo("##MapPreviewPreset",
-            CMap_Loader::Get_MapPresetLabel(static_cast<_uint>(s_iMapPreviewPreset))))
+            CMap_Loader::Get_MapName(static_cast<_uint>(s_iMapPreviewPreset))))
         {
             for (_uint i = 0; i < iMapPreviewPresetCount; ++i)
             {
                 const _bool bSelected = (static_cast<_uint>(s_iMapPreviewPreset) == i);
-                if (ImGui::Selectable(CMap_Loader::Get_MapPresetLabel(i), bSelected))
+                if (ImGui::Selectable(CMap_Loader::Get_MapName(i), bSelected))
                     s_iMapPreviewPreset = static_cast<_int>(i);
                 if (bSelected)
                     ImGui::SetItemDefaultFocus();
@@ -332,26 +332,6 @@ void CImGui_Manager::Draw_Toolbar()
         ImGui::SameLine();
         if (ImGui::Button("Clear Env"))
             m_pLevel_Edit->Clear_MapPreviewEnv();
-
-        ImGui::SameLine();
-        if (ImGui::Button("Map Override Save"))
-        {
-            if (FAILED(m_pLevel_Edit->Save_MapOverride()))
-                MSG_BOX("MAP OVERRIDE SAVE FAILED");
-        }
-
-        if (ImGui::IsItemHovered())
-        {
-            _wstring strOverridePath;
-            if (SUCCEEDED(CMap_Loader::Get_MapPresetOverrideAssetPath(
-                static_cast<_uint>(s_iMapPreviewPreset),
-                L"",
-                &strOverridePath)))
-            {
-                const string strTooltip = WstrToStr(strOverridePath);
-                ImGui::SetTooltip("%s", strTooltip.c_str());
-            }
-        }
 
         string strMapPreviewStatus = WstrToStr(m_pLevel_Edit->Get_MapPreviewStatus());
         const string strFullMapPreviewStatus = strMapPreviewStatus;
@@ -641,11 +621,6 @@ void CImGui_Manager::Draw_Hierarchy()
             ImGui::TreePop();
         }
     }
-
-    ImGui::Separator();
-    Draw_MapPreviewDeletedOverrides();
-    ImGui::Separator();
-    Draw_MapPreviewAddedOverrides();
 
     ImGui::End();
     return;
@@ -1483,119 +1458,6 @@ void CImGui_Manager::Draw_MapSectionRenderOptions(CMapSection* pSection)
 
     if (ImGui::Combo("Render Group", &iRenderGroup, RenderGroups, IM_ARRAYSIZE(RenderGroups)))
         pSection->Set_RenderID(FromMapRenderGroupIndex(iRenderGroup));
-}
-
-void CImGui_Manager::Draw_MapPreviewDeletedOverrides()
-{
-    ImGui::TextUnformatted("Deleted Env Overrides");
-
-    const CMap_EditSession* pSession = m_pLevel_Edit->Get_MapPreviewSession();
-    if (nullptr == pSession || 0 == pSession->Get_DeletedEnvCount())
-    {
-        ImGui::TextDisabled("No deleted env overrides.");
-        return;
-    }
-
-    _wstring strRestoreKey;
-    _bool bRestoreAll = false;
-
-    if (ImGui::Button("Restore All"))
-        bRestoreAll = true;
-
-    ImGui::BeginChild("DeletedEnvOverrides", ImVec2(0.f, 140.f), true);
-
-    for (const auto& strKey : pSession->Get_DeletedEnvOrder())
-    {
-        CMap_EditSession::MAP_PREVIEW_ENV_ITEM Item{};
-        if (!pSession->Try_GetDeletedEnvItem(strKey, &Item))
-            continue;
-
-        const string strKeyUtf8 = WstrToStr(strKey);
-        const string strDisplay = WstrToStr(Item.strDisplayName.empty() ? strKey : Item.strDisplayName);
-
-        ImGui::PushID(strKeyUtf8.c_str());
-        ImGui::TextWrapped("%s", strDisplay.c_str());
-        if (ImGui::IsItemHovered())
-            ImGui::SetTooltip("%s", strKeyUtf8.c_str());
-
-        if (ImGui::SmallButton("Restore"))
-            strRestoreKey = strKey;
-
-        ImGui::Separator();
-        ImGui::PopID();
-    }
-
-    ImGui::EndChild();
-
-    if (bRestoreAll)
-        m_pLevel_Edit->Restore_AllDeletedMapPreviewEnv();
-    else if (!strRestoreKey.empty())
-        m_pLevel_Edit->Restore_DeletedMapPreviewEnv(strRestoreKey);
-}
-
-void CImGui_Manager::Draw_MapPreviewAddedOverrides()
-{
-    ImGui::TextUnformatted("Added Map Overrides");
-
-    const CMap_EditSession* pSession = m_pLevel_Edit->Get_MapPreviewSession();
-    if (nullptr == pSession || 0 == pSession->Get_AddedMapObjectCount())
-    {
-        ImGui::TextDisabled("No added map overrides.");
-        return;
-    }
-
-    CGameObject* pSelectObject = nullptr;
-    CGameObject* pDeleteObject = nullptr;
-
-    ImGui::BeginChild("AddedMapOverrides", ImVec2(0.f, 140.f), true);
-
-    for (CGameObject* pObject : pSession->Get_AddedMapObjectOrder())
-    {
-        if (nullptr == pObject)
-            continue;
-
-        CMap_EditSession::MAP_PREVIEW_ADDED_ITEM Item{};
-        if (!pSession->Try_GetAddedMapObjectItem(pObject, &Item))
-            continue;
-
-        const _wstring strDisplayName =
-            Item.strDisplayName.empty()
-            ? (!Item.strObjectTag.empty() ? Item.strObjectTag : Item.strPrototypeTag)
-            : Item.strDisplayName;
-
-        const string strDisplayUtf8 = WstrToStr(strDisplayName);
-        const string strProtoUtf8 = WstrToStr(Item.strPrototypeTag);
-        const string strLayerUtf8 = WstrToStr(Item.strLayerTag);
-        const string strObjectTagUtf8 = WstrToStr(Item.strObjectTag);
-
-        ImGui::PushID(pObject);
-
-        ImGui::TextWrapped("%s", strDisplayUtf8.c_str());
-        if (!strProtoUtf8.empty() || !strLayerUtf8.empty())
-        {
-            ImGui::TextDisabled(
-                "Proto=%s / Layer=%s / Tag=%s",
-                strProtoUtf8.c_str(),
-                strLayerUtf8.c_str(),
-                strObjectTagUtf8.c_str());
-        }
-
-        if (ImGui::Button("Select"))
-            pSelectObject = pObject;
-
-        ImGui::SameLine();
-        if (ImGui::SmallButton("Remove"))
-            pDeleteObject = pObject;
-
-        ImGui::Separator();
-        ImGui::PopID();
-    }
-
-    ImGui::EndChild();
-    {
-        m_RotEditEuler.erase(pDeleteObject);
-        m_pLevel_Edit->Delete_Object(pDeleteObject);
-    }
 }
 
 void CImGui_Manager::Free()

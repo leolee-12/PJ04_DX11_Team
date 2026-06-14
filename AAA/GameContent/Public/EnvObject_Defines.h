@@ -110,7 +110,7 @@ struct ENV_COLLISION_DESC
 
 struct ENV_RENDER_DESC
 {
-	_bool	bShadowMappingCaster = { true };
+	_bool	bShadowMappingCaster = { false };
 	_bool	bUseLodCulling = { false };
 	_bool	bUseNearDistAlpha = { false };
 	_float	fNearDistAlphaLengthRate = { 1.f };

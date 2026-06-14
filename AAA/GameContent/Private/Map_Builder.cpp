@@ -2,7 +2,7 @@
 #include "GameContent_Log.h"
 #include "Map_ModelResolver.h"
 #include "Map_Parser.h"
-#include "Map_Override.h"
+#include "Map_EditFile.h"
 #include "Env_CollisionCatalog.h"
 
 #include "DataLoader.h"
@@ -82,10 +82,10 @@ HRESULT CMap_Builder::Build_FromManifest(const _wstring& strManifestPath, MAP_PA
 
 		MAP_EDIT_CHANGE OverrideDesc{};
 		json jDelta = json::parse(strDeltaContent);
-		if (FAILED(CMap_Override::Deserialize(jDelta, &OverrideDesc)))
+		if (FAILED(CMap_EditFile::Load_Change(jDelta, &OverrideDesc)))
 			return E_FAIL;
 
-		if (FAILED(CMap_Override::Apply(pOutPackage, OverrideDesc)))
+		if (FAILED(CMap_EditFile::Apply_Change(pOutPackage, OverrideDesc)))
 			return E_FAIL;
 	}
 

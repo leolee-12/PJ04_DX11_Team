@@ -70,8 +70,8 @@ protected:
 	BoundingBox		m_LocalBounds = {};
 	BoundingBox		m_WorldBounds = {};
 	_bool			m_bTransformDirty = { true };
-	_bool			m_bVisible = { true };
-	_bool			m_bVisibleShadow = { true };
+	_bool			m_bVisible = { false };
+	_bool			m_bVisibleShadow = { false };
 	_bool			m_bDebugDraw = { false };
 
 private:
