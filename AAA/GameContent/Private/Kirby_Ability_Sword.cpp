@@ -31,6 +31,9 @@ void CKirby_Ability_Sword::Enter_Ability(CKirby* pKirby)
     m_bReqEndAttackState = false;
     m_iSuperSpinSlashCount = 7;
     m_bForceEnterSwordAni = false;
+
+    CKirby_Body* pBody = pKirby->Get_Body();
+    pBody->Set_Eye(KIRBY_EYE_STATE::ANGRY);
 }
 
 ABILITY_UPDATE_RESULT CKirby_Ability_Sword::Update_Ability(CKirby* pKirby, _float fTimeDelta)
@@ -56,6 +59,9 @@ void CKirby_Ability_Sword::Exit_Ability(CKirby* pKirby)
 {
     m_eCurSwordState = SWORD_STATE::NONE;
     m_ePreSwordState = SWORD_STATE::NONE;
+
+    CKirby_Body* pBody = pKirby->Get_Body();
+    pBody->Set_Eye(KIRBY_EYE_STATE::IDLE);
 }
 
 _bool CKirby_Ability_Sword::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -347,10 +353,10 @@ void CKirby_Ability_Sword::Enter_SwordAni(CAnimator* pAnimator, _float fTimeDelt
 
             // Ground
             case SWORD_STATE::SLASH_1:
-                pAnimator->Play("SideSlash", false, false, 0.1f, 1.f);
+                pAnimator->Play("SideSlash", false, false, 0.1f, 1.5);
                 break;
             case SWORD_STATE::SLASH_1_END:
-                pAnimator->Play("SideSlashEnd", false, false, 0.1f, 1.f);
+                pAnimator->Play("SideSlashEnd", false, false, 0.1f, 2.f);
                 break;
             case SWORD_STATE::SLASH_2:
                 pAnimator->Play("MultiswordAttack", false, false, 0.1f, 2.f);

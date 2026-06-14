@@ -124,7 +124,7 @@ void CKirby_GetAbility::Close_Eye(CKirby_Body* pBody, _float fRatio)
 
 void CKirby_GetAbility::Open_Mouse(CKirby_Body* pBody, _float fRatio)
 {
-    if (m_bOpenMouse == false && fRatio >= 0.55f && fRatio < 1.f)
+    if (m_bOpenMouse == false && fRatio >= 0.55f)
     {
         pBody->Set_Mouth(KIRBY_MOUTH_STATE::SMILE_OPEN);
 
