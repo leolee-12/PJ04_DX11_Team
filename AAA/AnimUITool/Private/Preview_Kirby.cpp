@@ -40,16 +40,51 @@ HRESULT CPreview_Kirby::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	m_pModelCom->Set_AnimationIndex(0);
+	//m_pModelCom->Set_AnimationIndex(m_pModelCom->Get_AnimationIndex("Wait"));
+
+	m_pAnimatorCom->Play("Wait");
+
+	m_pAnimatorCom->Set_Mask("Sword_HaveSwordWait", "R_ShoulderJ", true, 1.0f, 0.5f);
 
 	return S_OK;
 }
 
 void CPreview_Kirby::Update(_float fTimeDelta)
 {
-	// 클립이 설정된 뒤에만 진행 (Preview_Actor와 동일 가드)
-	if (m_pAnimatorCom && !m_pAnimatorCom->Get_CurrentAnimName().empty())
-		m_pAnimatorCom->Update(fTimeDelta);
+	if (m_pGameInstance_Proxy->Key_Down(DIK_J))
+	{
+		m_pAnimatorCom->Clear_Mask(0.25f);
+
+		m_pAnimatorCom->Play("Wait");
+	}
+	if (m_pGameInstance_Proxy->Key_Down(DIK_K))
+	{
+		m_pAnimatorCom->Clear_Mask(0.25f);
+
+		m_pAnimatorCom->Play("AbilityDump", false);
+	}
+	//if (m_pGameInstance_Proxy->Key_Down(DIK_L))
+	//{
+	//	m_pAnimatorCom->Set_Mask("HaveSwordWait", "R_ShoulderJ", true, 1.0f, 0.55f);
+	//}
+	if (m_pGameInstance_Proxy->Key_Down(DIK_L))
+	{
+		m_pAnimatorCom->Set_Mask("Sword_HaveSwordWait", "R_ShoulderJ", true, 1.0f, 0.55f);
+	}
+	if (m_pGameInstance_Proxy->Key_Down(DIK_M))
+	{		
+		m_pAnimatorCom->Clear_Mask();
+		m_pAnimatorCom->Play("GetAbilityFirst", false, true, 0.2f, 2.5f);
+	}
+
+	if (m_pModelCom->Get_CurrentAnimName() == "GetAbilityFirst" && m_pAnimatorCom->Is_Finished())
+	{
+		m_pAnimatorCom->Play("Wait", true, true, 0.2f);
+		m_pAnimatorCom->Set_Mask("Sword_HaveSwordWait", "R_ShoulderJ", true, 1.0f, 0.5f);
+	}
+
+	m_pAnimatorCom->Update(fTimeDelta);
+
 }
 
 void CPreview_Kirby::Late_Update(_float fTimeDelta)

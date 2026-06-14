@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Public\BladeKnight_Body.h" />
     <ClInclude Include="..\Public\Camera_AreaData.h" />
     <ClInclude Include="..\public\Camera_AreaCam.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
@@ -56,6 +57,8 @@
     <ClInclude Include="..\Public\Map_OverrideStore.h" />
     <ClInclude Include="..\Public\Map_PresetCatalog.h" />
     <ClInclude Include="..\Public\Map_StageOverrideSerializer.h" />
+    <ClInclude Include="..\Public\BladeKnight.h" />
+    <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\Movement_Child.h" />
     <ClInclude Include="..\Public\Map_DeltaIO.h" />
     <ClInclude Include="..\Public\UI_Enums.h" />
@@ -127,6 +130,7 @@
     <ClInclude Include="..\Public\WalkSmoke.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Private\BladeKnight_Body.cpp" />
     <ClCompile Include="..\Private\Camera_AreaSolver.cpp" />
     <ClCompile Include="..\private\Camera_AreaCam.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
@@ -157,6 +161,8 @@
     <ClCompile Include="..\Private\Map_OverrideStore.cpp" />
     <ClCompile Include="..\Private\Map_PresetCatalog.cpp" />
     <ClCompile Include="..\Private\Map_StageOverrideSerializer.cpp" />
+    <ClCompile Include="..\Private\BladeKnight.cpp" />
+    <ClCompile Include="..\Private\Monster.cpp" />
     <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\Private\Map_DeltaIO.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />

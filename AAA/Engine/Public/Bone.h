@@ -38,8 +38,11 @@ public:
 		XMStoreFloat4x4(&m_TransformationMatrix, TransformationMatrix);
 	}
 
-	
-
+	_matrix Get_TransformationMatrix() const 
+	{ 
+		return XMLoadFloat4x4(&m_TransformationMatrix); 
+	}
+		
 public:
 	HRESULT Initialize(const BONE_DATA& data);
 	void Update_CombinedTransformMatrices(const vector<class CBone*>& Bones, _fmatrix PreTransformMatrix);
