@@ -95,6 +95,11 @@ void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
         pCommand = new ATTACK_Command(KEY_STATE_TYPE::DOWN);
         ProcessCommand(pCommand);
     }
+    if (m_pGameInstance_Proxy->Mouse_Pressing(DIMB::LBUTTON))
+    {
+        pCommand = new ATTACK_Command(KEY_STATE_TYPE::PRESS);
+        ProcessCommand(pCommand);
+    }
     if (m_pGameInstance_Proxy->Mouse_Up(DIMB::LBUTTON))
     {
         pCommand = new ATTACK_Command(KEY_STATE_TYPE::UP);

@@ -20,6 +20,9 @@
 #include "UI_GenericContainer.h"
 #include "UI_PointStar.h"
 #include "UI_KirbyStatus.h"
+#include "UI_FadeOut.h"
+#include "UI_LoadingCurtain.h"
+#include "UI_FadeIn.h"
 
 // UI Parts
 #include "UI_Image.h"
@@ -27,6 +30,12 @@
 #include "UI_Text.h"
 #include "UI_Effect.h"
 #include "UI_GaugeFill.h"
+
+#include "UI_Curtain.h"
+#include "UI_Eraser.h"
+#include "UI_SpriteAnimCurtain.h"
+#include "UI_CurtainTexture.h"
+
 
 // Kirby
 #include "Kirby.h"
@@ -127,6 +136,24 @@ void CGameObject_Factory::Register_UI()
     Register(CUI_GaugeFill::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
         CREATOR(CUI_GaugeFill),
         LOADER());
+
+    Register(CUI_Curtain::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
+        CREATOR(CUI_Curtain),
+        LOADER());
+
+    Register(CUI_Eraser::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
+        CREATOR(CUI_Eraser),
+        LOADER());
+
+    Register(CUI_SpriteAnimCurtain::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
+        CREATOR(CUI_SpriteAnimCurtain),
+        LOADER());
+
+    Register(CUI_CurtainTexture::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
+        CREATOR(CUI_CurtainTexture),
+        LOADER());
+
+
 }
 
 void CGameObject_Factory::Register_Camera()
@@ -142,10 +169,10 @@ void CGameObject_Factory::Register_Test()
         CREATOR(CTestFiona),
         LOADER(
             /*pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/Aligator/aligator.ysh",
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Test/Aligator/aligator.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))))*/
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/Aligator/Aligator_Anim.ysh"
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Test/Test/Aligator/Aligator_Anim.ysh"
                     //, XMMatrixRotationY(XMConvertToRadians(180.f))
                 ))
         )
@@ -157,7 +184,7 @@ void CGameObject_Factory::Register_Test()
         LOADER
         (
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_NonAnim"),
-                CModel::Create(pDevice, pContext, MODEL::MAP, "../../Resources/Models/Test/Marb1e/Land_GsAllBuilding_0.ysh"))
+                CModel::Create(pDevice, pContext, MODEL::MAP, "../../Resources/Test/Test/Marb1e/Land_GsAllBuilding_0.ysh"))
         )
     );
 
@@ -182,7 +209,7 @@ void CGameObject_Factory::Register_Test()
         CREATOR(CTestMarb1e),
         LOADER(
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Marb1e"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/Aligator/Aligator_Anim.ysh"
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Test/Test/Aligator/Aligator_Anim.ysh"
                     //, XMMatrixRotationY(XMConvertToRadians(180.f))
                 ))
         )
@@ -192,7 +219,7 @@ void CGameObject_Factory::Register_Test()
         CREATOR(CTestMarb1eMap),
         LOADER(
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Map"),
-                CModel::Create(pDevice, pContext, MODEL::MAP, "../../Resources/Models/Test/Marb1e/Land_GsAllBuilding_0.ysh"))
+                CModel::Create(pDevice, pContext, MODEL::MAP, "../../Resources/Test/Test/Marb1e/Land_GsAllBuilding_0.ysh"))
         )
     );
 
@@ -200,7 +227,7 @@ void CGameObject_Factory::Register_Test()
         CREATOR(CMaterial_Object),
         LOADER(
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_MaterialObject"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Shader_Test_Object/Model_SmokeSphereOriginal.ysh"))
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Shader_Test_Object/Model_SmokeSphereOriginal.ysh"))
         )
     );
 
@@ -221,17 +248,17 @@ void CGameObject_Factory::Register_Test()
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CSmokeSphereOriginal::PROTOTYPE_TAG,
                 CSmokeSphereOriginal::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
             // SmokeLowPoly
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CSmokeLowPoly::PROTOTYPE_TAG,
                 CSmokeLowPoly::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_SmokeLowPoly"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
             // SmokeTail
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CSmokeTail::PROTOTYPE_TAG,
                 CSmokeTail::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_SmokeTail"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Effect/SmokeTail/Model_SmokeTail.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeTail/Model_SmokeTail.ysh"));
         )
     );
 
@@ -309,7 +336,7 @@ void CGameObject_Factory::Register_Container()
                 CKirby_Body::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Kirby_Body"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Kirby/Kirby.ysh",
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Kirby/Kirby.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
 
             // Sword
@@ -384,6 +411,23 @@ void CGameObject_Factory::Register_UIContainer()
         LOADER()
     );
     
+    Register(CUI_FadeOut::PROTOTYPE_TAG,
+        TEXT("UI_CONTAINER"),
+        CREATOR(CUI_FadeOut),
+        LOADER()
+    );
+
+    Register(CUI_LoadingCurtain::PROTOTYPE_TAG,
+        TEXT("UI_CONTAINER"),
+        CREATOR(CUI_LoadingCurtain),
+        LOADER()
+    );
+
+    Register(CUI_FadeIn::PROTOTYPE_TAG,
+        TEXT("UI_CONTAINER"),
+        CREATOR(CUI_FadeIn),
+        LOADER()
+    );
 }
 
 void CGameObject_Factory::Register_NonAnimObject()

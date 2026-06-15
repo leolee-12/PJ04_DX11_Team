@@ -1,4 +1,5 @@
 #include "Monster_State_Chase.h"
+#include "Monster.h"
 
 CMonster_State_Chase::CMonster_State_Chase()
 {
@@ -16,16 +17,23 @@ MONSTER_STATE_TYPE CMonster_State_Chase::Get_StateType()
 
 void CMonster_State_Chase::Enter(CMonster* pMonster)
 {
+	if (nullptr == pMonster)
+		return;
+
+	pMonster->Play_StateAnimation(MONSTER_STATE_TYPE::CHASE);
 }
 
 void CMonster_State_Chase::Update(CMonster* pMonster, _float fTimeDelta)
 {
+	UNREFERENCED_PARAMETER(fTimeDelta);
+
 	if (nullptr == pMonster)
 		return;
 }
 
 void CMonster_State_Chase::Exit(CMonster* pMonster)
 {
+	UNREFERENCED_PARAMETER(pMonster);
 }
 
 CMonster_State_Chase* CMonster_State_Chase::Create()

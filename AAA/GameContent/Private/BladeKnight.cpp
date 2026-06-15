@@ -47,6 +47,20 @@ void CBladeKnight::Priority_Update(_float fTimeDelta)
 void CBladeKnight::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
+
+#ifdef _DEBUG
+    if (nullptr != m_pGameInstance_Proxy)
+    {
+        if (m_pGameInstance_Proxy->Key_Down(DIK_1))
+            Change_State(MONSTER_STATE_TYPE::IDLE);
+
+        if (m_pGameInstance_Proxy->Key_Down(DIK_2))
+            Change_State(MONSTER_STATE_TYPE::CHASE);
+
+        if (m_pGameInstance_Proxy->Key_Down(DIK_3))
+            Change_State(MONSTER_STATE_TYPE::ATTACK);
+    }
+#endif
 }
 
 void CBladeKnight::Late_Update(_float fTimeDelta)
@@ -90,9 +104,25 @@ void CBladeKnight::Play_StateAnimation(MONSTER_STATE_TYPE eState)
         pSwordAnimator->Play("Thrust", false, false);
         break;
     }
+    case MONSTER_STATE_TYPE::CHASE:
+    {
+        pBodyAnimator->Play("Move", true, false);
+        pSwordAnimator->Play("Thrust", false, false);
+        break;
+    }
+
+    case MONSTER_STATE_TYPE::ATTACK:
+    {
+        pBodyAnimator->Play("Attack", true, false);
+        pSwordAnimator->Play("Thrust", false, false);
+        break;
+    }
 
     default:
+    {
         m_pBody->Get_Animator()->Play("Wait", true, false);
+        pSwordAnimator->Play("Thrust", false, false);
+    }
         break;
     }
 }

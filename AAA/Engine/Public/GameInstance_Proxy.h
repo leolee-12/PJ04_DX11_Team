@@ -5,6 +5,8 @@ NS_BEGIN(physx)
 class PxTriangleMesh;
 class PxRigidStatic;
 class PxController;
+class PxRigidDynamic;
+class PxConvexMesh;
 NS_END
 
 NS_BEGIN(Engine)
@@ -37,6 +39,8 @@ public: // Engine
 
     _float RandomFloat(_float fMin, _float fMax) const;
     _int   RandomInt(_int iMin, _int iMax) const;
+
+    _int64 Get_FrameIndex();
 #pragma endregion
 
 #pragma region GRAPHICDEVICE
@@ -151,6 +155,8 @@ public: // Picking
     HRESULT Add_Font(const _wstring& strFontTag, const _tchar* pFontFilePath);
     HRESULT Draw_Text(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition,
         _fvector vColor = XMVectorSet(1.f, 1.f, 1.f, 1.f), _float fRotation = 0.f, const _float2& vScale = _float2(1.f, 1.f), TEXT_ALIGN eAlign = TEXT_ALIGN::CENTER);
+    HRESULT Draw_Text_Raw(const _wstring& tag, const _tchar* p, const _float2& pos, _fvector col, const _float2& scl,
+        TEXT_ALIGN a);
     _float2 Measure_Text(const _wstring& strFontTag, const _tchar* pText);
 #pragma endregion
 
@@ -237,17 +243,26 @@ public:
       physx::PxRigidStatic* Create_StaticActor(physx::PxTriangleMesh* pMesh, _fmatrix WorldMatrix);
       void                   Remove_StaticActor(physx::PxRigidStatic* pActor);
 
-      physx::PxController* Create_CapsuleController(const _float3& vFootPos, _float fRadius, _float fHeight);
-      void                Release_Controller(physx::PxController* pCtrl);
+      physx::PxController*   Create_CapsuleController(const _float3& vFootPos, _float fRadius, _float fHeight);
+      void                   Release_Controller(physx::PxController* pCtrl);
 
       void  Toggle_PhysXDebug();
       _bool Is_PhysXDebug() const;
       void  Render_PhysXDebug(_fmatrix ViewMatrix, _fmatrix ProjMatrix);
+
+      physx::PxRigidDynamic* Create_DynamicBox(const _float3& vPos, const _float4& qRot, const _float3& vHalfExtents, _float fDensity = 10.f);
+      physx::PxRigidDynamic* Create_DynamicSphere(const _float3& vPos, _float fRadius, _float fDensity = 10.f);
+      physx::PxRigidDynamic* Create_DynamicCapsule(const _float3& vPos, const _float4& qRot, _float fRadius, _float fHalfHeight, _float fDensity = 10.f);
+      physx::PxConvexMesh*   Cook_ConvexMesh(const _float3* pPositions, _uint iNumVertices);
+      physx::PxRigidDynamic* Create_DynamicConvex(physx::PxConvexMesh* pMesh, _fmatrix WorldMatrix, _float fDensity = 10.f);
+      void                   Remove_DynamicActor(physx::PxRigidDynamic* pActor);
 #pragma endregion
 
 #pragma region TEXTURE_HUB
   public:
       HRESULT LoadOrGet_TextureFromHub(const _tchar* pTexturePath, TEXTURE_HANDLE* pOutHandle);
+      HRESULT Register_TextureNameInHub(const _tchar* pTextureName, TEXTURE_HANDLE Handle);
+      HRESULT Get_TextureFromHub(const _tchar* pTextureName, TEXTURE_HANDLE* pOutHandle) const;
       HRESULT Bind_TextureFromHub(class CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle);
       TEXTURE_HUB_STATS Get_TextureHubStats() const;
 #pragma endregion

@@ -33,6 +33,15 @@ HRESULT CFont_Manager::Draw(const _wstring& strFontTag, const _tchar* pText, con
     return pFont->Draw(pText, vPosition, vColor, fRotation, vScale, eAlign);
 }
 
+HRESULT CFont_Manager::Draw_Raw(const _wstring& tag, const _tchar* p, const _float2& pos, _fvector col, const _float2& scl, TEXT_ALIGN a)
+{
+    CCustomFont* pFont = Find_Font(tag);
+    if (nullptr == pFont)
+        return E_FAIL;
+
+    return pFont->Draw_Raw(p, pos, col, scl, a);
+}
+
 _float2 CFont_Manager::Measure(const _wstring& strFontTag, const _tchar* pText)
 {
     CCustomFont* pFont = Find_Font(strFontTag);

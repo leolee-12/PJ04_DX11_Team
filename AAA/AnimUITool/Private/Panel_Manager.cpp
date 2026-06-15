@@ -23,7 +23,8 @@
 
 
 CPanel_Manager::CPanel_Manager(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : m_pDevice(pDevice), m_pContext(pContext), m_pGameInstance_Proxy(CGameInstance::GetProxy())
+    : m_pDevice(pDevice), m_pContext(pContext)
+    , m_pGameInstance_Proxy(CGameInstance::GetProxy())
 {
     Safe_AddRef(m_pDevice);
     Safe_AddRef(m_pContext);
@@ -351,6 +352,26 @@ void CPanel_Manager::Render_ModeBar()
             m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby_AllAbilities.ysh";
         }
     }
+    if (m_bKeyInputEnabled)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.7f, 0.2f, 1.f));
+        if (ImGui::Button("KeyInput [ON]"))
+        {
+            m_bKeyInputEnabled = false;
+            m_pGameInstance_Proxy->Disable_InputDeveice();
+        }
+        ImGui::PopStyleColor();
+    }
+    else
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.f));
+        if (ImGui::Button("KeyInput [OFF]"))
+        {
+            m_bKeyInputEnabled = true;
+            m_pGameInstance_Proxy->Enable_InputDeveice();
+        }
+        ImGui::PopStyleColor();
+    }
 
     ImGui::SameLine();
 
@@ -408,6 +429,7 @@ void CPanel_Manager::Free()
     __super::Free();
 
     Clear_UISelected();
+
 
     Safe_Release(m_pSelected);
 

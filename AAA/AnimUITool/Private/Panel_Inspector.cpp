@@ -18,6 +18,8 @@
 #include "UI_Effect.h"
 #include "UI_GaugeFill.h"
 #include "UIAnimatorCom.h"
+#include "UI_Curtain.h"
+#include "UI_CurtainAnimBase.h"
 
 namespace
 {
@@ -380,6 +382,20 @@ void CPanel_Inspector::Render_Properties(IReflectable* pHolder)
                                                 ETOUI(TOOL_LEVEL::EDIT),
                                                 strProtoTag);
                                     }
+                                    else if (auto* pCurtain =
+                                        dynamic_cast<Client::CUI_Curtain*>(sel.pPart))
+                                    {
+                                        if (prop.strName == L"TextureProtoTag")
+                                            pCurtain->Set_Texture(
+                                                ETOUI(TOOL_LEVEL::EDIT), strProtoTag);
+                                    }
+                                    else if (auto* pEraser =
+                                        dynamic_cast<Client::CUI_CurtainAnimBase*>(sel.pPart))
+                                    {
+                                        if (prop.strName == L"TextureProtoTag")
+                                            pEraser->Set_Texture(
+                                                ETOUI(TOOL_LEVEL::EDIT), strProtoTag);
+                                    }
                                 }
                             }
                         }
@@ -721,6 +737,19 @@ void CPanel_Inspector::Render_UIInspector()
         return;
     }
 
+    _float fTiltX = sel.pContainer->Get_TiltX();
+    _float fTiltY = sel.pContainer->Get_TiltY();
+    _float fDist = sel.pContainer->Get_PerspDistance();
+    bool bDirty = false;
+    bDirty |= ImGui::DragFloat("Tilt X", &fTiltX, 0.5f, -60.f, 60.f, "%.1f deg");
+    bDirty |= ImGui::DragFloat("Tilt Y", &fTiltY, 0.5f, -60.f, 60.f, "%.1f deg");
+    bDirty |= ImGui::DragFloat("Persp Dist", &fDist, 1.f, 0.f, 5000.f, "%.0f (0=off)");
+    if (bDirty) {
+        sel.pContainer->Set_Tilt(fTiltX, fTiltY);
+        sel.pContainer->Set_PerspDistance(fDist);
+        uictx.bDirty = true;
+    }
+
     if (nullptr == sel.pPart)
     {
         std::string strCName = ToUtf8(sel.pContainer->Get_ObjectTag());
@@ -750,6 +779,9 @@ void CPanel_Inspector::Render_UIInspector()
             ImGui::TextDisabled(
                 "RunTime Spawn Class Tag : Save -> json in in !!");
         }
+
+        ImGui::Separator();
+        Render_Properties(sel.pContainer);
         return;
     }
 
@@ -808,7 +840,8 @@ void CPanel_Inspector::Render_UIInspector()
     ImGui::Separator();
 
     struct { RENDERUIID v; const char* n; } layers[] = {
-        { RENDERUIID::BACK, "BACK" }, { RENDERUIID::MIDDLE, "MIDDLE" }, { RENDERUIID::FRONT, "FRONT" }
+        { RENDERUIID::BACK, "BACK" }, { RENDERUIID::MIDDLE, "MIDDLE" }, { RENDERUIID::FRONT, "FRONT" },
+        { RENDERUIID::CURTAIN, "CURTAIN" }
     };
     const char* szCur = "?";
     for (auto& L : layers) if (L.v == pPart->Get_RenderLayer()) szCur = L.n;
@@ -1154,6 +1187,18 @@ float CPanel_Inspector::Get_UIRotationZDeg(CTransform* pT)
     return XMConvertToDegrees(atan2f(XMVectorGetY(vRight), XMVectorGetX(vRight)));
 }
 
+float CPanel_Inspector::Get_UIRotationYDeg(CTransform* pT)
+{
+    _vector vLook = pT->Get_State(STATE::LOOK);
+    return XMConvertToDegrees(atan2f(XMVectorGetX(vLook), XMVectorGetZ(vLook)));
+}
+
+float CPanel_Inspector::Get_UIRotationXDeg(CTransform* pT)
+{
+    _vector vUp = pT->Get_State(STATE::UP);
+    return XMConvertToDegrees(atan2f(XMVectorGetZ(vUp), XMVectorGetY(vUp)));
+}
+
 void CPanel_Inspector::Set_UIRotationZDeg(CTransform* pT, float fDeg)
 {
     _float3 vScale = pT->Get_Scaled();
@@ -1168,6 +1213,44 @@ void CPanel_Inspector::Set_UIRotationZDeg(CTransform* pT, float fDeg)
         XMVector3TransformNormal(XMVectorSet(0.f, vScale.y, 0.f, 0.f), matRot));
 
     pT->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, vScale.z, 0.f));
+    pT->Set_State(STATE::POSITION, vPos);
+}
+
+void	CPanel_Inspector::Set_UIRotationYDeg(CTransform* pT, float fDeg)
+{
+    _float3 vScale = pT->Get_Scaled();
+    _vector vPos = pT->Get_State(STATE::POSITION);
+
+    _matrix matRot = XMMatrixRotationY(XMConvertToRadians(fDeg));
+
+    pT->Set_State(STATE::RIGHT,
+        XMVector3TransformNormal(XMVectorSet(vScale.x, 0.f, 0.f, 0.f), matRot));
+
+    pT->Set_State(STATE::UP,
+        XMVector3TransformNormal(XMVectorSet(0.f, vScale.y, 0.f, 0.f), matRot));
+
+    pT->Set_State(STATE::LOOK,
+        XMVector3TransformNormal(XMVectorSet(0.f, 0.f, vScale.z, 0.f), matRot));
+
+    pT->Set_State(STATE::POSITION, vPos);
+}
+
+void	CPanel_Inspector::Set_UIRotationXDeg(CTransform* pT, float fDeg)
+{
+    _float3 vScale = pT->Get_Scaled();
+    _vector vPos = pT->Get_State(STATE::POSITION);
+
+    _matrix matRot = XMMatrixRotationX(XMConvertToRadians(fDeg));
+
+    pT->Set_State(STATE::RIGHT,
+        XMVector3TransformNormal(XMVectorSet(vScale.x, 0.f, 0.f, 0.f), matRot));
+
+    pT->Set_State(STATE::UP,
+        XMVector3TransformNormal(XMVectorSet(0.f, vScale.y, 0.f, 0.f), matRot));
+
+    pT->Set_State(STATE::LOOK,
+        XMVector3TransformNormal(XMVectorSet(0.f, 0.f, vScale.z, 0.f), matRot));
+
     pT->Set_State(STATE::POSITION, vPos);
 }
 

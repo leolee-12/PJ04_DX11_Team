@@ -1,14 +1,20 @@
-#include <chrono>
-
 #include "MapStage.h"
 
 #include "GameInstance_Proxy.h"
+
+#include <chrono>
+#include <cstring>
 
 NS_BEGIN(Client)
 
 namespace
 {
 	constexpr _bool ENABLE_MAP_SECTION_SHADOW = false;
+
+	_bool Is_SameMatrix(const _float4x4& lhs, const _float4x4& rhs)
+	{
+		return 0 == memcmp(&lhs, &rhs, sizeof(_float4x4));
+	}
 }
 
 CMapStage::CMapStage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -44,6 +50,7 @@ HRESULT CMapStage::Initialize(void* pArg)
 	if (FAILED(Ready_Sections(pDesc)))
 		return E_FAIL;
 
+	m_bSnapshotValid = false;
 	Refresh_SectionTransforms();
 	return S_OK;
 }
@@ -99,38 +106,38 @@ json CMapStage::Serialize() const
 void CMapStage::Deserialize_Internal(const json& j)
 {
 	__super::Deserialize_Internal(j);
-	Refresh_SectionTransforms();
 
 	if (j.contains("StageName") && j["StageName"].is_string())
 		m_strStageName = StrToWstr(j["StageName"].get<string>());
 
-	if (!j.contains("Sections") || !j["Sections"].is_array())
-		return;
-
-	unordered_map<wstring, CMapSection*> SectionByName;
-	for (CMapSection* pSection : m_Sections)
+	if (j.contains("Sections") && j["Sections"].is_array())
 	{
-		if (nullptr == pSection)
-			continue;
+		unordered_map<wstring, CMapSection*> SectionByName;
+		for (CMapSection* pSection : m_Sections)
+		{
+			if (nullptr == pSection)
+				continue;
 
-		SectionByName.emplace(pSection->Get_SectionName(), pSection);
+			SectionByName.emplace(pSection->Get_SectionName(), pSection);
+		}
+
+		for (const auto& jSection : j["Sections"])
+		{
+			if (!jSection.is_object())
+				continue;
+			if (!jSection.contains("SectionName") || !jSection["SectionName"].is_string())
+				continue;
+
+			const wstring strSectionName = StrToWstr(jSection["SectionName"].get<string>());
+			auto iter = SectionByName.find(strSectionName);
+			if (iter == SectionByName.end())
+				continue;
+
+			iter->second->Deserialize_SectionState(jSection);
+		}
 	}
 
-	for (const auto& jSection : j["Sections"])
-	{
-		if (!jSection.is_object())
-			continue;
-		if (!jSection.contains("SectionName") || !jSection["SectionName"].is_string())
-			continue;
-
-		const wstring strSectionName = StrToWstr(jSection["SectionName"].get<string>());
-		auto iter = SectionByName.find(strSectionName);
-		if (iter == SectionByName.end())
-			continue;
-
-		iter->second->Deserialize_SectionState(jSection);
-	}
-
+	m_bSnapshotValid = false;
 	Refresh_SectionTransforms();
 }
 
@@ -155,15 +162,24 @@ HRESULT CMapStage::Ready_Sections(const MAP_STAGE_DESC* pDesc)
 		}
 
 		pSection->Set_ParentMatrix(m_pTransformCom->Get_WorldMatrixPtr());
-		pSection->Refresh_CombinedWorldMatrix();
 		m_Sections.push_back(pSection);
 	}
 
 	return S_OK;
 }
 
-void CMapStage::Refresh_SectionTransforms() const
+void CMapStage::Refresh_SectionTransforms()
 {
+	if(nullptr == m_pTransformCom)
+		return;
+
+	const _float4x4* pCurrentWorld = m_pTransformCom->Get_WorldMatrixPtr();
+	if (nullptr == pCurrentWorld)
+		return;
+
+	if (m_bSnapshotValid && Is_SameMatrix(m_LastWorldMatrix, *pCurrentWorld))
+		return;
+
 	for (CMapSection* pSection : m_Sections)
 	{
 		if (nullptr == pSection)
@@ -171,6 +187,9 @@ void CMapStage::Refresh_SectionTransforms() const
 
 		pSection->Refresh_CombinedWorldMatrix();
 	}
+
+	m_LastWorldMatrix = *pCurrentWorld;
+	m_bSnapshotValid = true;
 }
 
 #ifdef _DEBUG

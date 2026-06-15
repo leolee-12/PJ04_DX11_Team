@@ -39,6 +39,7 @@ void CKirby_GetAbility::Enter(CKirby* pKirby)
 
     m_bPartsOn = false;
     m_bCloseEye = false;
+    m_bOpenMouse = false;
 }
 
 void CKirby_GetAbility::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -68,11 +69,15 @@ void CKirby_GetAbility::Update(CKirby* pKirby, const _float fTimeDelta)
 
     Parts_On(pKirby, fRatio);
     Close_Eye(pBody, fRatio);
+    Open_Mouse(pBody, fRatio);
 }
 
 void CKirby_GetAbility::Exit(CKirby* pKirby)
 {
     __super::Exit(pKirby);
+
+    CKirby_Body* pBody = pKirby->Get_Body();
+    pBody->Set_Mouth(KIRBY_MOUTH_STATE::IDLE);
 }
 
 _bool CKirby_GetAbility::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -114,6 +119,16 @@ void CKirby_GetAbility::Close_Eye(CKirby_Body* pBody, _float fRatio)
         pBody->Set_Eye(KIRBY_EYE_STATE::IDLE);
 
         m_bCloseEye = false;
+    }
+}
+
+void CKirby_GetAbility::Open_Mouse(CKirby_Body* pBody, _float fRatio)
+{
+    if (m_bOpenMouse == false && fRatio >= 0.55f)
+    {
+        pBody->Set_Mouth(KIRBY_MOUTH_STATE::SMILE_OPEN);
+
+        m_bOpenMouse = true;
     }
 }
 

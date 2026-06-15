@@ -105,7 +105,7 @@ HRESULT CTestMarb1e::Ready_Components()
 
     CAnimator::ANIMATOR_DESC AnimDesc{};
     AnimDesc.pModel = m_pModelCom;
-    AnimDesc.strDataFile = TEXT("../Bin/Resources/Models/Test/Marb1e/Marb1e_animevents.json");
+    AnimDesc.strDataFile = TEXT("../Bin/Resources/Test/Test/Marb1e/Marb1e_animevents.json");
 
     m_pAnimatorCom = Add_Component<CAnimator>(
         TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));

@@ -2,6 +2,7 @@
 
 #include "Monster_State_Idle.h"
 #include "Monster_State_Chase.h"
+#include "Monster_State_Attack.h"
 
 CMonster_StateMachine::CMonster_StateMachine()
 {
@@ -14,7 +15,9 @@ HRESULT CMonster_StateMachine::Initialize(CMonster* pMonster)
     if (m_pMonster == nullptr)
         return E_FAIL;
 
-    // 임시로 지정
+    if (FAILED(Init_State()))
+        return E_FAIL;
+
     Change_State(MONSTER_STATE_TYPE::IDLE);
 
     return S_OK;
@@ -34,12 +37,9 @@ void CMonster_StateMachine::Change_State(MONSTER_STATE_TYPE eNewState)
         return;
 
     if (m_pCurState != nullptr)
-    {
         m_pCurState->Exit(m_pMonster);
-        Safe_Release(m_pCurState);
-    }
 
-    m_pCurState = State_Creator(eNewState);
+    m_pCurState = Find_State(eNewState);
     if (m_pCurState == nullptr)
         return;
 
@@ -54,28 +54,37 @@ void	CMonster_StateMachine::Update_StateMachine(_float fTimeDelta)
     m_pCurState->Update(m_pMonster, fTimeDelta);
 }
 
-CMonster_State* CMonster_StateMachine::State_Creator(MONSTER_STATE_TYPE eNewState)
+HRESULT CMonster_StateMachine::Init_State()
 {
-    CMonster_State* pState = nullptr;
+    auto Register_State = [this](MONSTER_STATE_TYPE eType, CMonster_State* pNewState) -> HRESULT
+        {
+            if (nullptr == pNewState)
+                return E_FAIL;
 
-    switch (eNewState)
-    {
-    case MONSTER_STATE_TYPE::IDLE:
-        pState = CMonster_State_Idle::Create();
-        break;
-    case MONSTER_STATE_TYPE::CHASE:
-        pState = CMonster_State_Chase::Create();
-        break;
+            m_States[eType] = pNewState;
+            return S_OK;
+        };
 
-    case MONSTER_STATE_TYPE::ATTACK:
-    case MONSTER_STATE_TYPE::HIT:
-    case MONSTER_STATE_TYPE::CAPTURED:
-    case MONSTER_STATE_TYPE::DEAD:
-    default:
-        break;
-    }
+    if (FAILED(Register_State(MONSTER_STATE_TYPE::IDLE, CMonster_State_Idle::Create())))
+        return E_FAIL;
 
-    return pState;
+    if (FAILED(Register_State(MONSTER_STATE_TYPE::CHASE, CMonster_State_Chase::Create())))
+        return E_FAIL;
+
+    if (FAILED(Register_State(MONSTER_STATE_TYPE::ATTACK, CMonster_State_Attack::Create())))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+CMonster_State* CMonster_StateMachine::Find_State(MONSTER_STATE_TYPE eNewState)
+{
+    auto iter = m_States.find(eNewState);
+
+    if (iter == m_States.end())
+        return nullptr;
+
+    return iter->second;
 }
 
 CMonster_StateMachine* CMonster_StateMachine::Create(CMonster* pMonster)
@@ -93,6 +102,12 @@ CMonster_StateMachine* CMonster_StateMachine::Create(CMonster* pMonster)
 
 void CMonster_StateMachine::Free()
 {
-    Safe_Release(m_pCurState);
+    m_pCurState = nullptr;
+
+    for (auto& Pair : m_States)
+        Safe_Release(Pair.second);
+
+    m_States.clear();
+
     __super::Free();
 }

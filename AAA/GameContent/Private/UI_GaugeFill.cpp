@@ -27,6 +27,11 @@ namespace
             iPass :
             ETOI(UI_EFFECT_PASS::GAUGE_FILL_COLOR);
     }
+
+    static _float4 Lerp4(const _float4& a, const _float4& b, _float t)
+    {
+        return { a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, a.z + (b.z - a.z) * t, a.w + (b.w - a.w) * t };
+    }
 }
 
 CUI_GaugeFill::CUI_GaugeFill(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -41,6 +46,14 @@ CUI_GaugeFill::CUI_GaugeFill(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
     , m_iMaskChannel{ 3 }
     , m_iInvertMask{ 0 }
     , m_iTextureLevel{ ETOUI(LEVEL::STATIC) }
+    , m_fGhostHold{ 1.0f }
+    , m_fGhostDrain{ 0.6f }
+    , m_fBlinkRate{ 5.0f }
+    , m_fFillSpeed{ 2.8f }
+    , m_vGhostColorStart{ 1.f, 0.92f, 0.2f, 1.f }
+    , m_vGhostColorEnd{ 1.f, 1.f,   1.f,  1.f }
+    , m_fHealGray{ 0.4f }
+    , m_fHealBright{ 0.6f }
 {
 }
 
@@ -57,6 +70,14 @@ CUI_GaugeFill::CUI_GaugeFill(const CUI_GaugeFill& Prototype)
     , m_iInvertMask{ Prototype.m_iInvertMask }
     , m_iTextureLevel{ Prototype.m_iTextureLevel }
     , m_strTextureProtoTag{ Prototype.m_strTextureProtoTag }
+    , m_fGhostHold{ Prototype.m_fGhostHold }
+    , m_fGhostDrain{ Prototype.m_fGhostDrain }
+    , m_fBlinkRate{ Prototype.m_fBlinkRate }
+    , m_fFillSpeed{ Prototype.m_fFillSpeed }
+    , m_vGhostColorStart{ Prototype.m_vGhostColorStart }
+    , m_vGhostColorEnd{ Prototype.m_vGhostColorEnd }
+    , m_fHealGray{ Prototype.m_fHealGray }
+    , m_fHealBright{ Prototype.m_fHealBright }
 {
 }
 
@@ -107,6 +128,47 @@ void CUI_GaugeFill::Priority_Update(_float fTimeDelta)
 void CUI_GaugeFill::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
+
+    m_fGhostAlpha = 1.f;
+
+    if (m_eGhostMode == GHOST_MODE::DRAIN)
+    {
+        // ≥Î∂˚°Í»Ú ªˆ ±Ù∫˝
+        m_fBlinkPhase += max(0.f, m_fBlinkRate) * fTimeDelta;
+        const _float t = 0.5f + 0.5f * sinf(m_fBlinkPhase * 6.2831853f);
+        m_vGhostColorCur = Lerp4(m_vGhostColorStart, m_vGhostColorEnd, t);
+
+        m_fGhostHoldAcc += fTimeDelta;
+        if (m_fGhostHoldAcc >= max(0.f, m_fGhostHold))
+        {
+            m_fGhostRatio -= max(0.01f, m_fGhostDrain) * fTimeDelta;
+            if (m_fGhostRatio <= m_fFillRatio)
+            {
+                m_fGhostRatio = m_fFillRatio;
+                m_eGhostMode = GHOST_MODE::NONE;
+            }
+        }
+    }
+    else if (m_eGhostMode == GHOST_MODE::FILL)
+    {
+        m_vGhostColorCur = HealPreview(m_vColor);
+
+        m_fGhostHoldAcc += fTimeDelta;
+        if (m_fGhostHoldAcc >= max(0.f, m_fGhostHold)) 
+        {
+            m_fFillRatio = (m_fFillSpeed <= 0.f)
+                ? m_fGhostRatio
+                : min(m_fFillRatio + m_fFillSpeed * fTimeDelta, m_fGhostRatio);
+
+            if (m_fFillRatio >= m_fGhostRatio - 1e-5f)
+            {
+                m_fFillRatio = m_fGhostRatio;
+                m_eGhostMode = GHOST_MODE::NONE;
+            }
+        }
+    }
+    else
+        m_fGhostRatio = m_fFillRatio;
 }
 
 void CUI_GaugeFill::Late_Update(_float fTimeDelta)
@@ -146,7 +208,7 @@ void CUI_GaugeFill::Deserialize_Internal(const json& j)
     m_iFillDirection = Normalize_FillDirection(m_iFillDirection);
     m_iShaderPass = Normalize_GaugePass(m_iShaderPass);
     m_fMaskPower = max(0.0001f, m_fMaskPower);
-
+    
     if (m_strTextureProtoTag.empty())
         return;
 
@@ -154,6 +216,49 @@ void CUI_GaugeFill::Deserialize_Internal(const json& j)
         return;
 
     m_pTextureCom = Add_Component<CTexture>(static_cast<_uint>(m_iTextureLevel), m_strTextureProtoTag, GAUGE_TEXTURE_COM);
+}
+
+_float4 CUI_GaugeFill::HealPreview(const _float4& c) const
+{
+    const _float lum = 0.299f * c.x + 0.587f * c.y + 0.114f * c.z;   // »÷µµ
+    const _float g = clamp(m_fHealGray, 0.f, 1.f);
+    const _float b = m_fHealBright;
+    return {
+        (c.x * (1.f - g) + lum * g) * b,
+        (c.y * (1.f - g) + lum * g) * b,
+        (c.z * (1.f - g) + lum * g) * b,
+        c.w
+    };
+}
+
+void CUI_GaugeFill::Set_TargetRatio(_float fRatio)
+{
+    fRatio = clamp(fRatio, 0.f, 1.f);
+
+    if (!m_bGaugeInit)
+    {
+        m_fFillRatio = m_fGhostRatio = m_fTargetRatio = fRatio;
+        m_bGaugeInit = true;
+        return;
+    }
+
+    const _float fPrev = m_fFillRatio;
+    m_fTargetRatio = fRatio;
+
+    if (fRatio < fPrev)            // ««∞› °Ê DRAIN
+    {
+        m_fFillRatio = fRatio;                 // «Œ≈© ¡ÔΩ√ °È
+        if (m_eGhostMode != GHOST_MODE::DRAIN || fPrev > m_fGhostRatio)
+            m_fGhostRatio = fPrev;             // ¡˜¿¸ = ¿‹ªÛ ªÛ«—
+        m_eGhostMode = GHOST_MODE::DRAIN;
+        m_fGhostHoldAcc = 0.f;
+    }
+    else if (fRatio > fPrev)       // »˙ °Ê FILL
+    {
+        m_fGhostRatio = fRatio;
+        m_eGhostMode = GHOST_MODE::FILL;
+        m_fGhostHoldAcc = 0.f;
+    }
 }
 
 void CUI_GaugeFill::Set_FillRatio(_float fRatio)
@@ -257,29 +362,24 @@ HRESULT CUI_GaugeFill::Bind_ShaderResources()
     m_iShaderPass = Normalize_GaugePass(m_iShaderPass);
     m_fMaskPower = max(0.0001f, m_fMaskPower);
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &m_vColor, sizeof(m_vColor))))
-        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &m_vColor, sizeof(m_vColor)))) return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(m_fAlpha)))) return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fFillRatio", &m_fFillRatio, sizeof(m_fFillRatio)))) return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fFillSoftness", &m_fFillSoftness, sizeof(m_fFillSoftness)))) return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_iFillDirection", &m_iFillDirection, sizeof(m_iFillDirection)))) return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fMaskPower", &m_fMaskPower, sizeof(m_fMaskPower)))) return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaskChannel", &m_iMaskChannel, sizeof(m_iMaskChannel)))) return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_iInvertMask", &m_iInvertMask, sizeof(m_iInvertMask)))) return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(m_fAlpha))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fFillRatio", &m_fFillRatio, sizeof(m_fFillRatio))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fFillSoftness", &m_fFillSoftness, sizeof(m_fFillSoftness))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_iFillDirection", &m_iFillDirection, sizeof(m_iFillDirection))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fMaskPower", &m_fMaskPower, sizeof(m_fMaskPower))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaskChannel", &m_iMaskChannel, sizeof(m_iMaskChannel))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_iInvertMask", &m_iInvertMask, sizeof(m_iInvertMask))))
-        return E_FAIL;
+    _float3 vScale = m_pTransformCom->Get_Scaled();      
+    const _float fTexAspect = 1.f;                       
+    _float fCapFracU = (vScale.x > 0.0001f)
+        ? (vScale.y / vScale.x) * fTexAspect
+        : 0.2f;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fCapFracU", &fCapFracU, sizeof(_float)))) return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fGhostRatio", &m_fGhostRatio, sizeof(_float))))  return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fGhostAlpha", &m_fGhostAlpha, sizeof(_float))))  return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vGhostColor", &m_vGhostColorCur, sizeof(_float4)))) return E_FAIL;
 
     return S_OK;
 }

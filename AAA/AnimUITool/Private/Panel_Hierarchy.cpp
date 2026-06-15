@@ -7,6 +7,8 @@
 #include "UI_Image.h"
 #include "UI_SpriteAnim.h"
 #include "UI_GaugeFill.h"
+#include "UI_Curtain.h"
+#include "UI_CurtainAnimBase.h"
 
 CPanel_Hierarchy::CPanel_Hierarchy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPanel(pDevice, pContext)
@@ -271,6 +273,34 @@ void CPanel_Hierarchy::Render_UIHierarchy()
                                     }
                                 }
                             }
+                            else if (auto* pGauge = dynamic_cast<CUI_Curtain*>(pPart))
+                            {
+                                if (strExt == ".png" || strExt == ".dds")
+                                {
+                                    _wstring strProtoTag =
+                                        pLevel->Register_TextureProto(StrToWstr(strPath));
+
+                                    if (!strProtoTag.empty() &&
+                                        SUCCEEDED(pGauge->Set_Texture(ETOUI(TOOL_LEVEL::EDIT), strProtoTag)))
+                                    {
+                                        UIContext.bDirty = true;
+                                    }
+                                }
+                            }
+                            else if (auto* pGauge = dynamic_cast<CUI_CurtainAnimBase*>(pPart))
+                            {
+                                if (strExt == ".png" || strExt == ".dds")
+                                {
+                                    _wstring strProtoTag =
+                                        pLevel->Register_TextureProto(StrToWstr(strPath));
+
+                                    if (!strProtoTag.empty() &&
+                                        SUCCEEDED(pGauge->Set_Texture(ETOUI(TOOL_LEVEL::EDIT), strProtoTag)))
+                                    {
+                                        UIContext.bDirty = true;
+                                    }
+                                }
+                            }
                         }
                         ImGui::EndDragDropTarget();
                     }
@@ -325,6 +355,9 @@ const _char* CPanel_Hierarchy::Get_RenderLayerName(RENDERUIID eRenderLayer)
 
     case RENDERUIID::FRONT:
         return "FRONT";
+
+    case RENDERUIID::CURTAIN:
+        return "CURTAIN";
 
     default:
         return "UNKNOWN";

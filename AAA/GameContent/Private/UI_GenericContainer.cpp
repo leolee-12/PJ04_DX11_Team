@@ -37,6 +37,11 @@ HRESULT CUI_GenericContainer::Initialize(void* pArg)
     return S_OK;
 }
 
+void CUI_GenericContainer::Priority_Update(_float fTimeDelta)
+{
+    __super::Priority_Update(fTimeDelta);
+}
+
 void CUI_GenericContainer::Update(_float fTimeDelta)
 {
     if (!m_bActive)
@@ -46,6 +51,11 @@ void CUI_GenericContainer::Update(_float fTimeDelta)
         m_pUIAnimatorCom->Update(fTimeDelta);
 
     __super::Update(fTimeDelta);
+}
+
+void CUI_GenericContainer::Late_Update(_float fTimeDelta)
+{
+    __super::Late_Update(fTimeDelta);
 }
 
 void CUI_GenericContainer::On_Deserialized()

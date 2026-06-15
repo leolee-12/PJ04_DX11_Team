@@ -112,7 +112,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;ENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../Public/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Public/;../Public/PhysX/</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -141,7 +141,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;ENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../Public/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Public/;../Public/PhysX/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -166,12 +166,19 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\public\Animator.h" />
+    <ClInclude Include="..\public\BehaviorTree.h" />
+    <ClInclude Include="..\public\Blackboard.h" />
     <ClInclude Include="..\public\Base.h" />
     <ClInclude Include="..\Public\Bone.h" />
     <ClInclude Include="..\Public\Bounding.h" />
     <ClInclude Include="..\Public\Bounding_AABB.h" />
     <ClInclude Include="..\Public\Bounding_OBB.h" />
     <ClInclude Include="..\Public\Bounding_Sphere.h" />
+    <ClInclude Include="..\Public\BT.h" />
+    <ClInclude Include="..\public\BTComposite.h" />
+    <ClInclude Include="..\public\BTDecorator.h" />
+    <ClInclude Include="..\public\BTNode.h" />
+    <ClInclude Include="..\Public\BT_Defines.h" />
     <ClInclude Include="..\Public\Camera.h" />
     <ClInclude Include="..\public\Camera_Manager.h" />
     <ClInclude Include="..\Public\Cell.h" />
@@ -205,7 +212,7 @@
     <ClInclude Include="..\public\Environment_Manager.h" />
     <ClInclude Include="..\public\EventBus.h" />
     <ClInclude Include="..\Public\Font_Manager.h" />
-    <ClInclude Include="..\Public\Frustum_Manager.h" />
+    <ClInclude Include="..\Public\Culling_Manager.h" />
     <ClInclude Include="..\public\GameInstance.h" />
     <ClInclude Include="..\public\GameInstance_Proxy.h" />
     <ClInclude Include="..\public\GameObject.h" />
@@ -230,6 +237,7 @@
     <ClInclude Include="..\public\Prototype_Manager.h" />
     <ClInclude Include="..\public\Renderer.h" />
     <ClInclude Include="..\Public\RenderTarget.h" />
+    <ClInclude Include="..\Public\RigIdBody.h" />
     <ClInclude Include="..\Public\Shader.h" />
     <ClInclude Include="..\public\ShaderGlobal_Manager.h" />
     <ClInclude Include="..\public\Shadow_Dir.h" />
@@ -258,12 +266,17 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\private\Animator.cpp" />
+    <ClCompile Include="..\private\BehaviorTree.cpp" />
+    <ClCompile Include="..\private\Blackboard.cpp" />
     <ClCompile Include="..\private\Base.cpp" />
     <ClCompile Include="..\Private\Bone.cpp" />
     <ClCompile Include="..\Private\Bounding.cpp" />
     <ClCompile Include="..\Private\Bounding_AABB.cpp" />
     <ClCompile Include="..\Private\Bounding_OBB.cpp" />
     <ClCompile Include="..\Private\Bounding_Sphere.cpp" />
+    <ClCompile Include="..\private\BTComposite.cpp" />
+    <ClCompile Include="..\private\BTDecorator.cpp" />
+    <ClCompile Include="..\private\BTNode.cpp" />
     <ClCompile Include="..\Private\Camera.cpp" />
     <ClCompile Include="..\private\Camera_Manager.cpp" />
     <ClCompile Include="..\Private\Cell.cpp" />
@@ -290,7 +303,7 @@
     <ClCompile Include="..\private\Environment_Manager.cpp" />
     <ClCompile Include="..\private\EventBus.cpp" />
     <ClCompile Include="..\Private\Font_Manager.cpp" />
-    <ClCompile Include="..\Private\Frustum_Manager.cpp" />
+    <ClCompile Include="..\Private\Culling_Manager.cpp" />
     <ClCompile Include="..\private\GameInstance.cpp" />
     <ClCompile Include="..\private\GameInstance_Proxy.cpp" />
     <ClCompile Include="..\private\GameObject.cpp" />
@@ -315,6 +328,7 @@
     <ClCompile Include="..\private\Prototype_Manager.cpp" />
     <ClCompile Include="..\private\Renderer.cpp" />
     <ClCompile Include="..\Private\RenderTarget.cpp" />
+    <ClCompile Include="..\private\RigIdBody.cpp" />
     <ClCompile Include="..\Private\Shader.cpp" />
     <ClCompile Include="..\private\ShaderGlobal_Manager.cpp" />
     <ClCompile Include="..\private\Shadow_Dir.cpp" />

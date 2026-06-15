@@ -16,6 +16,34 @@ float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
 
 uint g_iMaterialID = 0;
 
+uint g_iUVIndex = 0;
+#define ENV_INSTANCE_FLAG_DITHER 0x01
+uint g_iEnvInstanceFlags = 0;
+float g_fDissolve;
+
+static const float Bayer4x4[16] =
+{
+    0.0  / 16.0, 8.0  / 16.0, 2.0  / 16.0, 10.0 / 16.0,
+    12.0 / 16.0, 4.0  / 16.0, 14.0 / 16.0, 6.0  / 16.0,
+    3.0  / 16.0, 11.0 / 16.0, 1.0  / 16.0, 9.0  / 16.0,
+    15.0 / 16.0, 7.0  / 16.0, 13.0 / 16.0, 5.0  / 16.0
+};
+
+void Apply_Dissolve(float4 vScreenPos)
+{
+    float fVisibility = 1.f - g_fDissolve; 
+    int2 px = int2(vScreenPos.xy) & 3;
+    if (fVisibility <= Bayer4x4[px.y * 4 + px.x])
+        discard; 
+}
+
+void Apply_Dither_IfNeeded(float4 vScreenPos)
+{
+    [branch]
+    if (0 != (g_iEnvInstanceFlags & ENV_INSTANCE_FLAG_DITHER))
+        Apply_Dissolve(vScreenPos);
+}
+
 struct VS_IN
 {
     float3 vPosition : POSITION;
@@ -26,7 +54,7 @@ struct VS_IN
     float2 vTexcoord3 : TEXCOORD3;
     
     float4 vTangent : TANGENT;
-    float4 vBinormal : BINORMAL;  
+    float4 vBinormal : BINORMAL;
 };
 
 struct VS_OUT
@@ -76,9 +104,50 @@ VS_OUT VS_MAIN(VS_IN In)
     return Out;
 }
 
-/* w 나누기 연산 : 2차원 투영스페이스로의 변환. */
-/* 뷰포트로의 변환 (윈도우좌표로의 변환) */
-/* 래스터라이즈 (정점정보를 기반으로 해서 픽셀의 정보를 생성한다. ) */
+struct VS_NONINST_OUT
+{
+    float4 vPosition : SV_POSITION;
+    float4 vNormal : NORMAL;
+    float2 vTexcoord : TEXCOORD0;
+
+    float4 vWorldPos : TEXCOORD1;
+    float4 vProjPos : TEXCOORD2;
+    float4 vTangent : TANGENT;
+    float4 vBinormal : BINORMAL;
+};
+
+float2 Select_UV_PS(VS_IN In)
+{
+    [branch] if (1 == g_iUVIndex) return In.vTexcoord1;
+    [branch] if (2 == g_iUVIndex) return In.vTexcoord2;
+    [branch] if (3 == g_iUVIndex) return In.vTexcoord3;
+    return In.vTexcoord;
+}
+
+VS_NONINST_OUT VS_NONINST_MAIN(VS_IN In)
+{
+    VS_NONINST_OUT Out;
+
+    /* 월드변환, 뷰 벼환, 투영변환 */
+    float4      vPosition = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
+    vPosition = mul(vPosition, g_ViewMatrix);
+    vPosition = mul(vPosition, g_ProjMatrix);
+
+    Out.vPosition = vPosition;
+    Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix));
+    Out.vTexcoord = Select_UV_PS(In);
+    Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
+    Out.vProjPos = Out.vPosition;
+
+    float3 T = normalize(In.vTangent.xyz);
+    float3 B = normalize(In.vBinormal.xyz);
+    Out.vTangent = normalize(mul(float4(T, 0.f), g_WorldMatrix));
+    Out.vTangent.w = In.vTangent.w;
+    Out.vBinormal = normalize(mul(float4(B, 0.f), g_WorldMatrix));
+    Out.vBinormal.w = In.vBinormal.w;
+
+    return Out;
+}
 
 struct PS_IN
 {
@@ -107,6 +176,19 @@ struct PS_OUT
 struct PS_BACKOUT
 {
     float4 vDiffuse : SV_TARGET0;
+};
+
+// Non-Instanced
+struct PS_NONINST_IN
+{
+    float4 vPosition : SV_POSITION;
+    float4 vNormal : NORMAL;
+    float2 vTexcoord : TEXCOORD0;
+
+    float4 vWorldPos : TEXCOORD1;
+    float4 vProjPos : TEXCOORD2;
+    float4 vTangent : TANGENT;
+    float4 vBinormal : BINORMAL;
 };
 
 float3 PerturbNormal(float3 N, float3 worldPos, float2 uv, float3 nTS)
@@ -163,6 +245,23 @@ PS_OUT PS_DIFFUSE(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_DIFFUSE_DITHER(PS_IN In)
+{
+    Apply_Dissolve(In.vPosition); // 맨 위에서 디더 판정
+
+    PS_OUT Out;
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (vMtrlDiffuse.a < 0.1f)
+        discard;
+
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
+    return Out;
+}
+
 PS_OUT PS_WHITE(PS_IN In)
 {
     PS_OUT Out;
@@ -203,6 +302,99 @@ PS_SHADOW_OUT PS_SHADOW(VS_SHADOW_OUT In)
     float d = In.vProjPos.z / In.vProjPos.w; // 디퍼드의 pz(=lc.z/lc.w)와 동일 공간
     Out.vLightDepth = float4(d, d, d, 1.f);
     return Out;
+}
+
+/* Non-Instanced */
+PS_OUT PS_DIFF_SAMPLE(PS_NONINST_IN In, float2 vUV)
+{
+    Apply_Dither_IfNeeded(In.vPosition);
+
+    PS_OUT Out;
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, vUV);
+    if (vMtrlDiffuse.a < 0.1f)
+        discard;
+
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
+    return Out;
+}
+
+PS_OUT PS_DMN_SAMPLE(PS_NONINST_IN In, float2 vUV)
+{
+    Apply_Dither_IfNeeded(In.vPosition);
+
+    PS_OUT Out;
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, vUV);
+    if (vMtrlDiffuse.a < 0.1f)
+        discard;
+
+    float3 vMRA = g_MRATexture.Sample(LinearSampler, vUV).rgb;
+
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(vMRA, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
+    return Out;
+}
+
+PS_OUT PS_UKWN_SAMPLE(PS_NONINST_IN In, float2 vUV)
+{
+    Apply_Dither_IfNeeded(In.vPosition);
+
+    PS_OUT Out;
+    vector vMtrlDiffuse = g_UnknownTexture.Sample(LinearSampler, vUV);
+    if (vMtrlDiffuse.a < 0.1f)
+        discard;
+
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
+    return Out;
+}
+
+PS_OUT PS_UMN_SAMPLE(PS_NONINST_IN In, float2 vUV)
+{
+    Apply_Dither_IfNeeded(In.vPosition);
+
+    PS_OUT Out;
+    vector vMtrlDiffuse = g_UnknownTexture.Sample(LinearSampler, vUV);
+    if (vMtrlDiffuse.a < 0.1f)
+        discard;
+
+    float3 vMRA = g_MRATexture.Sample(LinearSampler, vUV).rgb;
+
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(vMRA, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
+    return Out;
+}
+
+PS_OUT PS_DIFF(PS_NONINST_IN In)
+{
+    return PS_DIFF_SAMPLE(In, In.vTexcoord);
+}
+
+PS_OUT PS_DMN(PS_NONINST_IN In)
+{
+    return PS_DMN_SAMPLE(In, In.vTexcoord);
+}
+
+PS_OUT PS_UKWN(PS_NONINST_IN In)
+{
+    return PS_UKWN_SAMPLE(In, In.vTexcoord);
+}
+
+PS_OUT PS_UMN(PS_NONINST_IN In)
+{
+    return PS_UMN_SAMPLE(In, In.vTexcoord);
 }
 
 technique11 DefaultTechnique
@@ -247,5 +439,55 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_WHITE();
+    }
+
+    pass DitherDiffusePass // 4
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DIFFUSE_DITHER();
+    }
+    pass DIFF_Pass	// 5
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_NONINST_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DIFF();
+    }
+    pass DMN_Pass	// 6
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_NONINST_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DMN();
+    }
+    pass UKWN_Pass	// 7
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_NONINST_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_UKWN();
+    }
+    pass UMN_Pass	// 8
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_NONINST_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_UMN();
     }
 }

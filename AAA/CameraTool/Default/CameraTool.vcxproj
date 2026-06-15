@@ -106,7 +106,7 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>../Public/;../../EngineSDK/Inc/;../../ContentSDK/Inc/;../ThirdParty/ImGui/Inc/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Public/;../../EngineSDK/Inc/;../../ContentSDK/Inc/;../ThirdParty/ImGui/Inc/;../../EngineSDK/Inc/PhysX</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

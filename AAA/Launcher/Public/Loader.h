@@ -25,7 +25,7 @@ public:
 	static constexpr _uint	WORKER_COUNT = 4;
 
 public:
-	HRESULT Initialize(LEVEL eNextLevelID);
+	HRESULT Initialize(LEVEL eNextLevelID, _bool Initialzed);
 	HRESULT Loading();
 	_bool isFinished()
 	{
@@ -61,12 +61,12 @@ private:
 
 private:
 	void	Add_Work(function<HRESULT()>&& func);
+	HRESULT Ready_StaticResources();
 	HRESULT Ready_WorkQueue();
-	HRESULT Ready_Resources_For_Lobby();
 	HRESULT Ready_Resources_For_GamePlay();
 
 public:
-	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID);
+	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID, _bool Initialized = true);
 	virtual void Free() override;
 };
 

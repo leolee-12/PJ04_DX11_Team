@@ -28,6 +28,9 @@
     <Filter Include="01. Levels\02. Lobby">
       <UniqueIdentifier>{3c4c7945-9a9e-49a3-9e18-e017f0d706f7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Levels\01. FirstLoading">
+      <UniqueIdentifier>{a7cb1d8a-8375-40c0-b82c-9ca99a2a2d2d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -63,8 +66,11 @@
     <ClInclude Include="..\public\Level_Lobby.h">
       <Filter>01. Levels\02. Lobby</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Launcher_MapProfiles.h">
+    <ClInclude Include="..\Public\Launcher_LevelProfiles.h">
       <Filter>99. Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Level_FirstLoading.h">
+      <Filter>01. Levels\01. FirstLoading</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -101,6 +107,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Level_Lobby.cpp">
       <Filter>01. Levels\02. Lobby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_FirstLoading.cpp">
+      <Filter>01. Levels\01. FirstLoading</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

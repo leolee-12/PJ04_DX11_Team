@@ -32,6 +32,7 @@ protected:
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
+	virtual void	Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_Shadow() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
@@ -43,11 +44,13 @@ public:
 	_bool   Is_Visible_Shadow() const { return m_bVisibleShadow; }
 
 	const ENV_OBJECT_DESC& Get_Desc() const { return m_tDesc; }
+	const BoundingBox& Get_WorldBounds() const { return m_WorldBounds; }
+	_float Get_Dissolve() const { return m_fDissolve; }
 
 	virtual _bool XM_CALLCONV Pick_Ray(_fvector vOrigin,_fvector vDir, _float3* pOutHit, _float* pOutDistance);
 
 protected:
-	HRESULT Ready_RenderComponents(_uint iModelProtoLevel, const wstring& strModelProtoTag);
+	HRESULT Ready_RenderComponents(_uint iModelProtoLevel, const wstring& wstrModelProtoTag);
 	HRESULT Ready_PhysicsActor();
 	HRESULT Ready_PhysicsActor_ModelMesh();
 	void	Release_PhysicsActor();
@@ -69,9 +72,16 @@ protected:
 
 	BoundingBox		m_LocalBounds = {};
 	BoundingBox		m_WorldBounds = {};
-	_bool			m_bVisible = { true };
-	_bool			m_bVisibleShadow = { true };
+	_bool			m_bTransformDirty = { true };
+	_bool			m_bVisible = { false };
+	_bool			m_bVisibleShadow = { false };
 	_bool			m_bDebugDraw = { false };
+
+	// 디더링관련
+	_bool m_bUseCameraDither = { false }; // 객체 디더 사용 여부
+	_float m_fDitherNear = { 4.f };		  // 이보다 가까우면 완전투명 (1)
+	_float m_fDitherFar = { 12.f };		  // 이보다 멀면 디더 없음 (0)
+	_float m_fDissolve = { 0.f };		  // 계산된 디졸브 값 (0~1)
 
 private:
 	void Apply_TransformFromDesc();

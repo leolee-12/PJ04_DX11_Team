@@ -27,6 +27,8 @@ HRESULT CUIContainerObject::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
+    XMStoreFloat4x4(&m_TiltedWorldMatrix, XMMatrixIdentity());
+
     return S_OK;
 }
 
@@ -72,6 +74,8 @@ void CUIContainerObject::Late_Update(_float fTimeDelta)
 {
     if (!m_bActive) 
         return;
+
+    Update_TiltedWorldMatrix();
 
     for (const auto& tag : m_UIPartOrder)
     {
@@ -147,6 +151,9 @@ void CUIContainerObject::Clear_UIPartObjects()
 json CUIContainerObject::Serialize() const
 {
     json j = __super::Serialize();
+    j["TiltX"] = m_fTiltXDeg;
+    j["TiltY"] = m_fTiltYDeg;
+    j["PerspDist"] = m_fPerspDist;
     j["UIPartObjects"] = json::object();
     j["UIPartOrder"] = json::array();
 
@@ -173,6 +180,10 @@ json CUIContainerObject::Serialize() const
 void CUIContainerObject::Deserialize_Internal(const json& j)
 {
     __super::Deserialize_Internal(j);
+
+    if (j.contains("TiltX"))     m_fTiltXDeg = j["TiltX"].get<_float>();
+    if (j.contains("TiltY"))     m_fTiltYDeg = j["TiltY"].get<_float>();
+    if (j.contains("PerspDist")) m_fPerspDist = j["PerspDist"].get<_float>();
 
     Clear_UIPartObjects();
 
@@ -314,7 +325,7 @@ HRESULT CUIContainerObject::Add_UIPartObject(_uint iPrototypeLevelIndex, const _
     if (pArg)
     {
         auto pDesc = static_cast<CUIPartObject::UI_PARTOBJECT_DESC*>(pArg);
-        pDesc->pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+        pDesc->pParentMatrix = &m_TiltedWorldMatrix;
     }
 
     auto pUIPartObject = dynamic_cast<CUIPartObject*>(
@@ -327,7 +338,7 @@ HRESULT CUIContainerObject::Add_UIPartObject(_uint iPrototypeLevelIndex, const _
     if (nullptr == pUIPartObject)
         return E_FAIL;
 
-    pUIPartObject->Set_ParentMatrix(m_pTransformCom->Get_WorldMatrixPtr());
+    pUIPartObject->Set_ParentMatrix(&m_TiltedWorldMatrix);
 
     m_UIPartObjects.emplace(strPartTag, pUIPartObject);
     m_UIPartPrototypeInfos.emplace(strPartTag,
@@ -335,6 +346,38 @@ HRESULT CUIContainerObject::Add_UIPartObject(_uint iPrototypeLevelIndex, const _
     m_UIPartOrder.push_back(strPartTag);
 
     return S_OK;
+}
+
+void CUIContainerObject::Update_TiltedWorldMatrix()
+{
+    _matrix matWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+    if (m_fPerspDist <= 0.f && m_fTiltXDeg == 0.f && m_fTiltYDeg == 0.f)
+    {
+        XMStoreFloat4x4(&m_TiltedWorldMatrix, matWorld);
+        return;
+    }
+
+    _vector vPos = matWorld.r[3];
+    _matrix matLocal = matWorld;
+    matLocal.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+
+    _matrix matTilt = XMMatrixRotationX(XMConvertToRadians(m_fTiltXDeg))
+        * XMMatrixRotationY(XMConvertToRadians(m_fTiltYDeg));
+
+    _matrix matPersp = XMMatrixIdentity();
+    if (m_fPerspDist > 0.f)
+        matPersp.r[2] = XMVectorSet(0.f, 0.f, 1.f, 1.f / m_fPerspDist);  // _33=1 (ฟ๘บน), _34=1/d
+
+    _matrix matTilted = matLocal * matTilt * matPersp
+        * XMMatrixTranslationFromVector(vPos);
+
+    matTilted.r[0] = XMVectorSetZ(matTilted.r[0], XMVectorGetW(matTilted.r[0]));
+    matTilted.r[1] = XMVectorSetZ(matTilted.r[1], XMVectorGetW(matTilted.r[1]));
+    matTilted.r[2] = XMVectorSetZ(matTilted.r[2], XMVectorGetW(matTilted.r[2]));
+    matTilted.r[3] = XMVectorSetZ(matTilted.r[3], XMVectorGetW(matTilted.r[3]));
+
+    XMStoreFloat4x4(&m_TiltedWorldMatrix, matTilted);
 }
 
 void CUIContainerObject::Free()

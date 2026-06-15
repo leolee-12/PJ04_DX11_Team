@@ -58,6 +58,12 @@ void CPhysX_Manager::Simulate(_float fTimeDelta)
 
 void CPhysX_Manager::Reset_For_SceneChange()
 {
+    for (PxRigidDynamic* pActor : m_Dynamics) {
+        if (m_pScene) m_pScene->removeActor(*pActor);
+        pActor->release();
+    }
+    m_Dynamics.clear();
+
     for (PxRigidStatic* pActor : m_StaticActors) {
         if (m_pScene) m_pScene->removeActor(*pActor);
         pActor->release();
@@ -153,6 +159,66 @@ PxRigidStatic* CPhysX_Manager::Cook_StaticMesh(
     return nullptr;
 }
 
+physx::PxRigidDynamic* CPhysX_Manager::Create_DynamicBox(const _float3& vPos, const _float4& qRot, const _float3& vHalfExtents, _float fDensity)
+{
+    PxTransform pose(PxVec3(vPos.x, vPos.y, vPos.z), PxQuat(qRot.x, qRot.y, qRot.z, qRot.w));
+    return Finalize_Dynamic(pose, PxBoxGeometry(vHalfExtents.x, vHalfExtents.y, vHalfExtents.z), fDensity);
+}
+
+physx::PxRigidDynamic* CPhysX_Manager::Create_DynamicSphere(const _float3& vPos, _float fRadius, _float fDensity)
+{
+    PxTransform pose(PxVec3(vPos.x, vPos.y, vPos.z));   // 구는 회전 무의미
+    return Finalize_Dynamic(pose, PxSphereGeometry(fRadius), fDensity);
+}
+
+physx::PxRigidDynamic* CPhysX_Manager::Create_DynamicCapsule(const _float3& vPos, const _float4& qRot, _float fRadius, _float fHalfHeight, _float fDensity)
+{
+    PxTransform pose(PxVec3(vPos.x, vPos.y, vPos.z), PxQuat(qRot.x, qRot.y, qRot.z, qRot.w));
+    PxTransform localUp(PxQuat(PxHalfPi, PxVec3(0.f, 0.f, 1.f)));
+    return Finalize_Dynamic(pose, PxCapsuleGeometry(fRadius, fHalfHeight), fDensity, localUp);
+}
+
+physx::PxConvexMesh* CPhysX_Manager::Cook_ConvexMesh(const _float3* pPositions, _uint iNumVertices)
+{
+    if (nullptr == m_pPhysics || nullptr == pPositions || iNumVertices < 4)
+        return nullptr;
+
+    PxConvexMeshDesc desc;
+    desc.points.count = iNumVertices;
+    desc.points.stride = sizeof(_float3);
+    desc.points.data = pPositions;
+    desc.flags = PxConvexFlag::eCOMPUTE_CONVEX;   // 점군 → 볼록껍질 자동
+
+    PxCookingParams params(m_pPhysics->getTolerancesScale());
+    return PxCreateConvexMesh(params, desc, m_pPhysics->getPhysicsInsertionCallback());
+}
+
+physx::PxRigidDynamic* CPhysX_Manager::Create_DynamicConvex(physx::PxConvexMesh* pMesh, _fmatrix WorldMatrix, _float fDensity)
+{
+    if (nullptr == pMesh) return nullptr;
+
+    XMVECTOR vScale, vQuat, vTrans;
+    if (!XMMatrixDecompose(&vScale, &vQuat, &vTrans, WorldMatrix))
+        return nullptr;
+
+    _float3 vS; XMStoreFloat3(&vS, vScale);
+    _float4 qR; XMStoreFloat4(&qR, vQuat);
+    _float3 vT; XMStoreFloat3(&vT, vTrans);
+
+    PxTransform pose(PxVec3(vT.x, vT.y, vT.z), PxQuat(qR.x, qR.y, qR.z, qR.w));
+    PxConvexMeshGeometry geom(pMesh, PxMeshScale(PxVec3(vS.x, vS.y, vS.z), PxQuat(PxIdentity)));
+    return Finalize_Dynamic(pose, geom, fDensity);
+}
+
+void CPhysX_Manager::Remove_DynamicActor(physx::PxRigidDynamic* pActor)
+{
+    if (nullptr == pActor) return;
+    auto it = find(m_Dynamics.begin(), m_Dynamics.end(), pActor);
+    if (it != m_Dynamics.end()) m_Dynamics.erase(it);
+    if (m_pScene) m_pScene->removeActor(*pActor);
+    pActor->release();
+}
+
 PxController* CPhysX_Manager::Create_CapsuleController(const _float3& vFootPos, _float fRadius, _float fHeight)
 {
     if (nullptr == m_pCCTManager || nullptr == m_pDefaultMtrl)
@@ -228,6 +294,30 @@ void CPhysX_Manager::Toggle_DebugDraw()
         m_pScene->setVisualizationParameter(PxVisualizationParameter::eSCALE, s);
         m_pScene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES, s);
     }
+}
+
+physx::PxRigidDynamic* CPhysX_Manager::Finalize_Dynamic(const physx::PxTransform& pose, const physx::PxGeometry& geom, _float fDensity, const physx::PxTransform& localPose)
+{
+    if (nullptr == m_pPhysics || nullptr == m_pScene)
+        return nullptr;
+
+    PxRigidDynamic* pActor = m_pPhysics->createRigidDynamic(pose);
+    if (nullptr == pActor)
+        return nullptr;
+
+    PxShape* pShape = PxRigidActorExt::createExclusiveShape(*pActor, geom, *m_pDefaultMtrl);
+    if (nullptr == pShape) {
+        pActor->release();
+        return nullptr;
+    }
+    pShape->setLocalPose(localPose);
+
+    // 밀도 → 질량/관성 자동 계산 (질량을 직접 주려면 setMassAndUpdateInertia 사용)
+    PxRigidBodyExt::updateMassAndInertia(*pActor, fDensity);
+
+    m_pScene->addActor(*pActor);
+    m_Dynamics.push_back(pActor);
+    return pActor;
 }
 
 CPhysX_Manager* CPhysX_Manager::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

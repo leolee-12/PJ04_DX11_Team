@@ -10,7 +10,7 @@
 
 namespace Client
 {
-	enum class LEVEL { STATIC, LOADING, LOGO, LOBBY, GAMEPLAY, END };
+	enum class LEVEL { STATIC, FIRST_LOADING, LOADING, GAMEPLAY, END };
 
 	enum class SOUND_CHANNEL : _uint
 	{
@@ -25,6 +25,7 @@ namespace Client
 
 	constexpr _uint CL_PLAYER_SENSOR = 0;
 	constexpr _uint CL_ENV_TRIGGER = 1;
+	constexpr _uint KIRBY_SILHOUETTE_ID = 200;
 
 }
 

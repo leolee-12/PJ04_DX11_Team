@@ -82,10 +82,6 @@ public:	// Map Preview - Public Func
 	const _wstring& Get_MapPreviewStatus() const;
 	const _wstring& Get_LoadedMapPreviewStageName() const;
 	_uint			Get_MapPreviewEnvCreatedCount() const;
-	const CMap_EditSession* Get_MapPreviewSession() const { return m_pMapPreviewSession; }
-	HRESULT Restore_DeletedMapPreviewEnv(const _wstring& strStableKey);
-	HRESULT Restore_AllDeletedMapPreviewEnv();
-	HRESULT Save_MapOverride();
 
 	// Effect
 public:
@@ -124,11 +120,7 @@ private:
 		const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);
 
 	_bool	Should_SkipMapObjectForLevelSave(CGameObject* pObject) const;
-	void	Append_MapLevelData(json* pInOutLevel) const;
-	HRESULT	Load_MapLevelContentFromJson(const json& jLevel);
-	HRESULT	Apply_MapStageOverrideFromJson(const json& jLevel);
 	_bool	Handle_MapSpecificDeletion(CGameObject* pObject);
-	_bool	Try_RegisterAddedMapOverridePlacement(CGameObject* pObject, const _wstring& strObjectTag);
 	void	Try_RegisterLoadedAddedMapObject(CGameObject* pObject, const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);
 
 public:

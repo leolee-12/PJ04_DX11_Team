@@ -97,9 +97,14 @@ private:
 
 	HRESULT Render_NonLight();
 	HRESULT Render_Blend();
+
+	HRESULT Render_Occlusion();
+
 	HRESULT Render_UI_BACK();
 	HRESULT Render_UI_MIDDLE();
 	HRESULT Render_UI_FRONT();
+
+	HRESULT Render_Curtain();
 
 	_uint Render_Width()  const;
 	_uint Render_Height() const;
@@ -113,6 +118,8 @@ private:
 private:
 	HRESULT Render_Debug();
 #endif
+
+	void	Reset_RS();
 
 public:
 	static CRenderer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
