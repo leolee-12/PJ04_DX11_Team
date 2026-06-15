@@ -4,6 +4,8 @@
 #include "Model.h"
 #include "Animator.h"
 #include "UIContainerObject.h"
+#include "ContainerObject.h"
+#include "PartObject.h"
 
 #include "Panel_Hierarchy.h"
 #include "Panel_Viewport.h"
@@ -14,12 +16,16 @@
 #include "Panel_Preview.h"
 
 #include "Panel_Browser.h"
+#include "Panel_Palette.h"
 
 #include "Level_Tool.h"
+
+#include "GameInstance.h"
 
 
 CPanel_Manager::CPanel_Manager(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice(pDevice), m_pContext(pContext)
+    , m_pGameInstance_Proxy(CGameInstance::GetProxy())
 {
     Safe_AddRef(m_pDevice);
     Safe_AddRef(m_pContext);
@@ -49,6 +55,9 @@ HRESULT CPanel_Manager::Initialize()
         return E_FAIL;
 
     if (FAILED(Add_Panel(L"Preview", CPanel_Preview::Create(m_pDevice, m_pContext))))
+        return E_FAIL;
+
+    if (FAILED(Add_Panel(L"Palette", CPanel_Palette::Create(m_pDevice, m_pContext))))
         return E_FAIL;
 
     return S_OK;
@@ -127,7 +136,9 @@ void CPanel_Manager::Bind_Preview(CGameObject* pOwner)
     m_Context.pOwner = pOwner;
     m_Context.pModel = pOwner ? pOwner->Get_Component<CModel>(L"Com_Model") : nullptr;
     m_Context.pAnimator = pOwner ? pOwner->Get_Component<CAnimator>(L"Com_Animator") : nullptr;
-    m_Context.iClip = 0; m_Context.fProgress = 0.f; m_Context.iRootBone = -1;
+    m_Context.iClip = 0;
+    m_Context.fProgress = 0.f;
+    m_Context.iRootBone = -1;
     if (!pOwner)
     {
         m_Context.strName.clear();
@@ -217,6 +228,31 @@ void CPanel_Manager::Load_UI_ByPath(const _wstring& strFullPath)
         m_UIContext.vDesignSize = ds;
 }
 
+void CPanel_Manager::Bind_ForAnim(CGameObject* pObj)
+{
+    if (!pObj) 
+    { 
+        Bind_Preview(nullptr);
+        return; 
+    }
+
+    CGameObject* pAnimSrc = pObj;  
+    if (auto* pCont = dynamic_cast<CContainerObject*>(pObj))
+    {
+        pAnimSrc = nullptr;         
+        for (auto& [tag, pPart] : pCont->Get_PartObjects())
+            if (pPart && pPart->Get_Component<CAnimator>(L"Com_Animator")) { pAnimSrc = pPart; break; }
+    }
+
+    m_Context.pOwner = pObj;
+    m_Context.pModel = pAnimSrc ? pAnimSrc->Get_Component<CModel>(L"Com_Model") : nullptr;
+    m_Context.pAnimator = pAnimSrc ? pAnimSrc->Get_Component<CAnimator>(L"Com_Animator") : nullptr;
+    m_Context.iClip = 0; m_Context.fProgress = 0.f;
+    m_Context.strName = pObj->Get_ObjectTag();
+
+    Set_Selected(pObj);
+}
+
 void CPanel_Manager::Render_DockSpace()
 {
     ImGuiViewport* vp = ImGui::GetMainViewport();
@@ -250,6 +286,7 @@ void CPanel_Manager::Render_DockSpace()
         ImGui::DockBuilderDockWindow("Inspector", left);
         ImGui::DockBuilderDockWindow("Hierarchy", left);
         ImGui::DockBuilderDockWindow("Console", left);
+        ImGui::DockBuilderDockWindow("Palette", left);
         ImGui::DockBuilderDockWindow("Viewport", center);
         ImGui::DockBuilderDockWindow("UICanvas", center);
         ImGui::DockBuilderDockWindow("Animation", bottom);
@@ -291,15 +328,37 @@ void CPanel_Manager::Render_ModeBar()
     if (ImGui::RadioButton("UI", iMode == ETOI(TOOL_MODE::UI)))
         m_eWorkMode = TOOL_MODE::UI;
 
-    ImGui::SameLine();
+    /*ImGui::SameLine();
     if (ImGui::Button("Load Kirby (Test)"))
     {
         if (m_pLevel)
         {
-            Bind_Preview(m_pLevel->Load_Kirby());
+            //Bind_Preview(m_pLevel->Load_Kirby());
+            m_pLevel->Load_Kirby();
             m_Context.strName = L"Kirby";
-            m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby.ysh";
+            //m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby.ysh";
+            m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby_AllAbilities.ysh";
         }
+    }*/
+    if (m_bKeyInputEnabled)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.7f, 0.2f, 1.f));
+        if (ImGui::Button("KeyInput [ON]"))
+        {
+            m_bKeyInputEnabled = false;
+            m_pGameInstance_Proxy->Disable_InputDeveice();
+        }
+        ImGui::PopStyleColor();
+    }
+    else
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.f));
+        if (ImGui::Button("KeyInput [OFF]"))
+        {
+            m_bKeyInputEnabled = true;
+            m_pGameInstance_Proxy->Enable_InputDeveice();
+        }
+        ImGui::PopStyleColor();
     }
 
 
@@ -322,6 +381,9 @@ _bool CPanel_Manager::Is_PanelAllowedInCurrentMode(const _wstring& strPanelTag) 
             return false;
 
         if (strPanelTag == L"Viewport")
+            return false;
+
+        if (strPanelTag == L"Palette")   
             return false;
 
         return true;
@@ -348,12 +410,14 @@ void CPanel_Manager::Free()
 
     Clear_UISelected();
 
+
     Safe_Release(m_pSelected);
 
     for (auto& [tag, pPanel] : m_Panels)
         Safe_Release(pPanel);
     m_Panels.clear();
 
+    Safe_Release(m_pGameInstance_Proxy);
     Safe_Release(m_pDevice);
     Safe_Release(m_pContext);
 }

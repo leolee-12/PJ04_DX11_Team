@@ -19,7 +19,7 @@ HRESULT CKirby_Ability::Initialize()
     _uint iRun = ETOUI(ABILITY_ANI::RUN);
     m_tAniInfos[iRun].strAniName = "Run";
     m_tAniInfos[iRun].fBlend = 0.1f;
-    m_tAniInfos[iRun].fSpeed = 1.8f;
+    m_tAniInfos[iRun].fSpeed = 2.2f;
 
     _uint iFall = ETOUI(ABILITY_ANI::FALL);
     m_tAniInfos[iFall].strAniName = "Fall";

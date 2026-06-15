@@ -126,7 +126,7 @@ namespace
 		if (nullptr == pOutPath)
 			return false;
 
-		const wstring strLegacyPath = L"../../Resources/Models/Test/Stage1-0/" + strSectionName + L".ysh";
+		const wstring strLegacyPath = L"../../ResourcesTest/Stage1-0/" + strSectionName + L".ysh";
 		error_code ErrorCode;
 		if (!exists(path(strLegacyPath), ErrorCode) || ErrorCode)
 			return false;

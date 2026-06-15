@@ -61,6 +61,10 @@ HRESULT CRenderer::Initialize()
     if (FAILED(Ready_DepthStencil_Buffer()))
         return E_FAIL;
 
+    // ui 커튼
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Curtain"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))   // 투명으로 clear
+        return E_FAIL;
+
     /* 만든 렌더타겟들을 장치에 동시에 바인딩되는 기준으로 모은다. */
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Diffuse"))))
         return E_FAIL;
@@ -99,6 +103,9 @@ HRESULT CRenderer::Initialize()
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_SSAO"), TEXT("Target_SSAO"))))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_SSAO_Blur"), TEXT("Target_SSAO_Blur"))))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_Curtain"), TEXT("Target_Curtain"))))
         return E_FAIL;
 
 
@@ -208,6 +215,9 @@ HRESULT CRenderer::Draw()
     if (FAILED(Render_UI_MIDDLE()))
         return E_FAIL;
     if (FAILED(Render_UI_FRONT()))
+        return E_FAIL;
+
+    if (FAILED(Render_Curtain()))
         return E_FAIL;
 
 #ifdef _DEBUG
@@ -882,6 +892,52 @@ HRESULT CRenderer::Render_UI_FRONT()
     m_RenderUIs[ETOUI(RENDERUIID::FRONT)].clear();
 
     return S_OK;
+}
+
+HRESULT CRenderer::Render_Curtain()
+{
+    auto& Curtain = m_RenderUIs[ETOUI(RENDERUIID::CURTAIN)];
+
+    if (Curtain.empty())
+        return S_OK;
+
+    stable_sort(Curtain.begin(), Curtain.end(),
+        [](CUIObject* a, CUIObject* b) { return a->Get_ZOrder() > b->Get_ZOrder(); });
+
+    Change_ViewportDesc(m_iRTWidth, m_iRTHeight);
+
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Curtain"), nullptr, false)))
+        return E_FAIL;
+
+    for (auto& pUI : Curtain)
+    {
+        if (nullptr != pUI)
+            pUI->Render();
+        Safe_Release(pUI);
+    }
+    Curtain.clear();
+
+    if (FAILED(m_pGameInstance_Proxy->End_MRT()))      // 백버퍼로 복귀
+        return E_FAIL;
+
+    // ---- (2) Composite: 커튼 RT 를 백버퍼에 풀스크린 알파오버 ----
+    Change_ViewportDesc(Render_Width(), Render_Height());
+
+    if (FAILED(m_pShaderPost->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix))) return E_FAIL;
+    if (FAILED(m_pShaderPost->Bind_Matrix("g_ViewMatrix",
+        m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::ORTHO)))) return E_FAIL;
+    if (FAILED(m_pShaderPost->Bind_Matrix("g_ProjMatrix",
+        m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::ORTHO)))) return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Curtain"), m_pShaderPost, "g_CurtainTexture")))          
+        return E_FAIL;
+
+    if (FAILED(m_pShaderPost->Begin(ETOUI(POSTPROSESS::CURTAIN_COMPOSITE)))) return E_FAIL;
+    if (FAILED(m_pVIBuffer->Bind_Resources())) return E_FAIL;
+    if (FAILED(m_pVIBuffer->Render())) return E_FAIL;
+
+    return S_OK;
+
 }
 
 _uint CRenderer::Render_Width() const

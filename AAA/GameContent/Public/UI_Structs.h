@@ -48,15 +48,12 @@ typedef struct tagUIGaugeLayoutDesc
 
     _float fFrameZ = { 1.4f };
     _float fBackZ = { 1.3f };
-    _float fGhostZ = { 1.2f };
     _float fHealZ = { 1.1f };
     _float fFillZ = { 1.0f };
 } UI_GAUGE_LAYOUT_DESC;
 
 typedef struct tagUIGaugeMotionDesc
 {
-    _float fGhostDelay = { 0.35f };
-    _float fGhostSpeed = { 1.8f };
     _float fHealSpeed = { 2.8f };
 } UI_GAUGE_MOTION_DESC;
 

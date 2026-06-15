@@ -59,8 +59,8 @@ void CUI_PointStar::Update(_float fTimeDelta)
 
 	m_fVisibleElapsed += fTimeDelta;
 
-	if (!m_bFadeOut && m_fVisibleElapsed >= m_fVisibleDuration)
-		Begin_PointStarFadeOut();
+	//if (!m_bFadeOut && m_fVisibleElapsed >= m_fVisibleDuration)
+	//	Begin_PointStarFadeOut();
 
 	if (m_bFadeOut && (!m_pUIAnimatorCom || !m_pUIAnimatorCom->Is_FadingAny()))
 	{
@@ -166,25 +166,25 @@ void CUI_PointStar::Play_PointStarBounce()
 	if (!m_pUIAnimatorCom)
 		return;
 
-	CUIAnimatorCom::UI_BOUNCE_DESC SparkBounce{};
-	SparkBounce.vDirection = vDir;
-	SparkBounce.fDistance = 10.f;
-	SparkBounce.fDuration = 0.28f;
-	SparkBounce.fWaveCount = 1.f;
-	SparkBounce.fDamping = 1.2f;
-	m_pUIAnimatorCom->Play_Bounce(L"Part_PointStar_SpriteAnim", SparkBounce);
+	//CUIAnimatorCom::UI_BOUNCE_DESC SparkBounce{};
+	//SparkBounce.vDirection = vDir;
+	//SparkBounce.fDistance = 10.f;
+	//SparkBounce.fDuration = 0.28f;
+	//SparkBounce.fWaveCount = 1.f;
+	//SparkBounce.fDamping = 1.2f;
+	//m_pUIAnimatorCom->Play_Bounce(L"Part_PointStar_SpriteAnim", SparkBounce);
 
-	CUIAnimatorCom::UI_BOUNCE_DESC IconBounce{};
-	IconBounce.vDirection = vDir;
-	IconBounce.fDistance = 7.f;
-	IconBounce.fDuration = 0.22f;
-	IconBounce.fWaveCount = 1.f;
-	IconBounce.fDamping = 1.f;
-	m_pUIAnimatorCom->Play_Bounce(L"Part_PointStar_Image", IconBounce);
+	//CUIAnimatorCom::UI_BOUNCE_DESC IconBounce{};
+	//IconBounce.vDirection = vDir;
+	//IconBounce.fDistance = 7.f;
+	//IconBounce.fDuration = 0.22f;
+	//IconBounce.fWaveCount = 1.f;
+	//IconBounce.fDamping = 1.f;
+	//m_pUIAnimatorCom->Play_Bounce(L"Part_PointStar_Image", IconBounce);
 
 	CUIAnimatorCom::UI_BOUNCE_DESC TextBounce{};
 	TextBounce.vDirection = vDir;
-	TextBounce.fDistance = 6.f;
+	TextBounce.fDistance = 10.f;
 	TextBounce.fDuration = 0.22f;
 	TextBounce.fWaveCount = 1.f;
 	TextBounce.fDamping = 1.f;

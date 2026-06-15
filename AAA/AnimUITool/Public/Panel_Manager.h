@@ -6,6 +6,7 @@ NS_BEGIN(Engine)
 class CGameObject;
 class CUIContainerObject;
 class CUIPartObject;
+class CGameInstance_Proxy;
 NS_END
 
 NS_BEGIN(AnimUITool)
@@ -51,6 +52,8 @@ public:
 
 	void						Load_UI_ByPath(const _wstring& strFullPath);
 
+	void						Bind_ForAnim(CGameObject* pObj);
+
 private:
 	ID3D11Device* m_pDevice = { nullptr };
 	ID3D11DeviceContext* m_pContext = { nullptr };
@@ -64,6 +67,10 @@ private:
 	UI_CONTEXT					m_UIContext;
 
 	TOOL_MODE					m_eWorkMode = { TOOL_MODE::ANIMATION };
+
+	CGameInstance_Proxy* m_pGameInstance_Proxy = { nullptr };
+
+	_bool m_bKeyInputEnabled = { false };
 
 private:
 	void						Render_DockSpace();

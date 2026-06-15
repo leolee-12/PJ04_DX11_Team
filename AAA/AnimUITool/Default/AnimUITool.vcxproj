@@ -30,6 +30,7 @@
     <ClCompile Include="..\Private\Panel_Hierarchy.cpp" />
     <ClCompile Include="..\Private\Panel_Inspector.cpp" />
     <ClCompile Include="..\Private\Panel_Manager.cpp" />
+    <ClCompile Include="..\Private\Panel_Palette.cpp" />
     <ClCompile Include="..\Private\Panel_Preview.cpp" />
     <ClCompile Include="..\Private\Panel_UICanvas.cpp" />
     <ClCompile Include="..\Private\Panel_Viewport.cpp" />
@@ -62,6 +63,7 @@
     <ClInclude Include="..\Public\Panel_Hierarchy.h" />
     <ClInclude Include="..\Public\Panel_Inspector.h" />
     <ClInclude Include="..\Public\Panel_Manager.h" />
+    <ClInclude Include="..\Public\Panel_Palette.h" />
     <ClInclude Include="..\Public\Panel_Preview.h" />
     <ClInclude Include="..\Public\Panel_UICanvas.h" />
     <ClInclude Include="..\Public\Panel_Viewport.h" />
@@ -170,7 +172,7 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>../Public/;../../EngineSDK/Inc/;../../ContentSDK/Inc/;../ThirdParty/ImGui/Inc/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Public/;../../EngineSDK/Inc/;../../ContentSDK/Inc/;../ThirdParty/ImGui/Inc/;../../EngineSDK/Inc/PhysX;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -189,7 +191,7 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>../Public/;../../EngineSDK/Inc/;../../ContentSDK/Inc/;../ThirdParty/ImGui/Inc/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Public/;../../EngineSDK/Inc/;../../ContentSDK/Inc/;../ThirdParty/ImGui/Inc/;../../EngineSDK/Inc/PhysX;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>

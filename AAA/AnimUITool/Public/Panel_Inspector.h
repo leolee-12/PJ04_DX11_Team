@@ -43,7 +43,13 @@ private:
 public:
 	static CPanel_Inspector*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	static float				Get_UIRotationZDeg(CTransform* pT);
+	static float				Get_UIRotationYDeg(CTransform* pT);
+	static float				Get_UIRotationXDeg(CTransform* pT);
+
 	static void					Set_UIRotationZDeg(CTransform* pT, float fDeg);
+	static void					Set_UIRotationYDeg(CTransform* pT, float fDeg);
+	static void					Set_UIRotationXDeg(CTransform* pT, float fDeg);
+
 
 protected:
 	virtual void				Free() override;

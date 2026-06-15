@@ -22,11 +22,15 @@
 #include "UI_Text.h"
 #include "UI_Effect.h"
 #include "UI_GaugeFill.h"
+#include "UI_Curtain.h"
+#include "UI_Eraser.h"
+#include "UI_SpriteAnimCurtain.h"
+#include "UI_CurtainTexture.h"
 
 namespace
 {
     constexpr const _char* PREVIEW_MODEL_PATH =
-        "../../Resources/Models/Test/BladeKnight/BladeKnight.ysh";
+        "../../Resources/Test/Test/BladeKnight/BladeKnight.ysh";
 
     MODEL Read_YshType(const _wstring& strPath)
     {
@@ -245,7 +249,7 @@ HRESULT  CLevel_Tool::Save_UIContainer(CGameObject* pContainer, const _float2& v
         j["Textures"] = jTextures;
 
         namespace fs = std::filesystem;
-        fs::path dir = L"../../Resources/CHJ/UI/Containers";
+        fs::path dir = L"../../Resources/YSH/UIs/UIData";
         std::error_code ec; fs::create_directories(dir, ec);
         fs::path path = dir / (strFileName + L"_ui.json");
 
@@ -492,16 +496,51 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
 
     _wstring strProtoTag = L"";
 
-    if (eType == UI_PART_TYPE::IMAGE)
-        strProtoTag = Client::CUI_Image::PROTOTYPE_TAG;
-    else if (eType == UI_PART_TYPE::SPRITEANIM)
-        strProtoTag = Client::CUI_SpriteAnim::PROTOTYPE_TAG;
-    else if (eType == UI_PART_TYPE::TEXT)
-        strProtoTag = Client::CUI_Text::PROTOTYPE_TAG;
-    else if (eType == UI_PART_TYPE::EFFECT)
-        strProtoTag = Client::CUI_Effect::PROTOTYPE_TAG;
-    else if (eType == UI_PART_TYPE::GAUGEFILL)
-        strProtoTag = Client::CUI_GaugeFill::PROTOTYPE_TAG;
+    switch (eType)
+    {
+        case UI_PART_TYPE::IMAGE:
+            strProtoTag = Client::CUI_Image::PROTOTYPE_TAG;
+            break;
+        case UI_PART_TYPE::SPRITEANIM:
+            strProtoTag = Client::CUI_SpriteAnim::PROTOTYPE_TAG;
+            break;
+        case UI_PART_TYPE::TEXT:
+            strProtoTag = Client::CUI_Text::PROTOTYPE_TAG;
+            break;
+        case UI_PART_TYPE::EFFECT:
+            strProtoTag = Client::CUI_Effect::PROTOTYPE_TAG;
+            break;
+        case UI_PART_TYPE::GAUGEFILL:
+            strProtoTag = Client::CUI_GaugeFill::PROTOTYPE_TAG;
+            break;
+
+        case UI_PART_TYPE::CURTAIN:
+            strProtoTag = Client::CUI_Curtain::PROTOTYPE_TAG;
+            break;
+        case UI_PART_TYPE::ERASER:
+            strProtoTag = Client::CUI_Eraser::PROTOTYPE_TAG;
+            break;
+        case UI_PART_TYPE::SPRITECURTAIN:
+            strProtoTag = Client::CUI_SpriteAnimCurtain::PROTOTYPE_TAG;
+            break;
+        case UI_PART_TYPE::TEXTURECURTAIN:
+            strProtoTag = Client::CUI_CurtainTexture::PROTOTYPE_TAG;
+            break;
+
+        default:
+            break;
+    }
+
+    //if (eType == UI_PART_TYPE::IMAGE)
+    //    strProtoTag = Client::CUI_Image::PROTOTYPE_TAG;
+    //else if (eType == UI_PART_TYPE::SPRITEANIM)
+    //    strProtoTag = Client::CUI_SpriteAnim::PROTOTYPE_TAG;
+    //else if (eType == UI_PART_TYPE::TEXT)
+    //    strProtoTag = Client::CUI_Text::PROTOTYPE_TAG;
+    //else if (eType == UI_PART_TYPE::EFFECT)
+    //    strProtoTag = Client::CUI_Effect::PROTOTYPE_TAG;
+    //else if (eType == UI_PART_TYPE::GAUGEFILL)
+    //    strProtoTag = Client::CUI_GaugeFill::PROTOTYPE_TAG;
 
     // 파트 프로토 보장 (SpriteAnim은 컨테이너 로더가 안 올림)
     if (!m_pGameInstance_Proxy->Has_Prototype(iPartProtoLevel, strProtoTag))
@@ -623,7 +662,51 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
             iPartProtoLevel, strProtoTag, strPartTag, &desc);
         break;
     }
+    case UI_PART_TYPE::CURTAIN:
+    {
+        Client::CUI_Curtain::UI_CURTAIN_DESC desc{};
+        desc.iTextureLevel = iTextureLevel;
+        desc.szTextureProtoTag = { nullptr };
+        desc.vPosition = { 0.f, 0.f };
 
+        hr = pUIContainer->Add_Part(iPartProtoLevel, strProtoTag, strPartTag, &desc);
+        break;
+    }
+    case UI_PART_TYPE::ERASER:
+    {
+        Client::CUI_Eraser::UI_ERASER_DESC desc{};  
+        desc.iTextureLevel = iTextureLevel;
+        desc.szTextureProtoTag = { nullptr };
+        desc.vPosition = { 0.f, 0.f };
+
+        hr = pUIContainer->Add_Part(iPartProtoLevel, strProtoTag, strPartTag, &desc);
+        break;
+    }
+    case UI_PART_TYPE::SPRITECURTAIN:
+    {
+        Client::CUI_SpriteAnim::UI_SPRITEANIM_DESC desc{};
+        desc.iTextureLevel = iTextureLevel;
+        desc.szTextureProtoTag = { nullptr };
+        desc.vSize = { 100.f, 100.f };
+        desc.vPosition = { 0.f, 0.f };
+        desc.fDuration = 1.f;
+        desc.fEndDelay = 0.f;
+        desc.bLoop = true;
+        desc.bAutoPlay = true;
+
+        hr = pUIContainer->Add_Part(iPartProtoLevel, strProtoTag, strPartTag, &desc);
+        break;
+    }
+    case UI_PART_TYPE::TEXTURECURTAIN:
+    {
+        Client::CUI_CurtainTexture::UI_CURTAINTEXTURE_DESC desc{};
+        desc.iTextureLevel = iTextureLevel;
+        desc.szTextureProtoTag = { nullptr };
+        desc.vPosition = { 0.f, 0.f };
+
+        hr = pUIContainer->Add_Part(iPartProtoLevel, strProtoTag, strPartTag, &desc);
+        break;
+    }
 
     default:
         hr = E_FAIL;
@@ -996,6 +1079,55 @@ _wstring CLevel_Tool::Register_TextureProto(const _wstring& strTextureProtoTag, 
     return strTextureProtoTag;
 }
 
+CGameObject* CLevel_Tool::Spawn_Object(const _wstring& strProtoTag, const _wstring& strLayerTag, const _wstring& strName, void* pArg)
+{
+    auto* pReg = Client::CGameObject_Factory::GetInstance()->Get_Registration(strProtoTag);
+    if (nullptr == pReg) { Log_Error("Spawn_Object: no registration."); return nullptr; }
+
+    const _uint iLevel = ETOUI(TOOL_LEVEL::EDIT);
+
+    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, strProtoTag))
+    {
+        pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);  
+            m_pGameInstance_Proxy->Add_Prototype(iLevel, strProtoTag,
+                pReg->CreatorFunc(m_pDevice, m_pContext));                        
+    }
+
+    CGameObject* pObj = nullptr;
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pObj,
+        iLevel, strProtoTag,
+        ETOUI(TOOL_LEVEL::EDIT), strLayerTag, strName, pArg)))              
+    {
+        Log_Error("Spawn_Object: Add_GameObject failed.");
+        return nullptr;
+    }
+
+    if (pObj)
+        m_SpawnedObjects.push_back(pObj);
+
+    return pObj;
+}
+
+void CLevel_Tool::Clear_Spawned()
+{
+    for (auto* pObj : m_SpawnedObjects)
+        if (pObj)
+            m_pGameInstance_Proxy->Destroy_GameObject(pObj);
+    m_SpawnedObjects.clear();
+}
+
+void CLevel_Tool::Destroy_Spawned(CGameObject* pObject)
+{
+    if (nullptr == pObject)
+        return;
+
+    auto it = find(m_SpawnedObjects.begin(), m_SpawnedObjects.end(), pObject);
+    if (it != m_SpawnedObjects.end())
+        m_SpawnedObjects.erase(it);
+
+    m_pGameInstance_Proxy->Destroy_GameObject( pObject);
+}
+
 void CLevel_Tool::Update(_float fTimeDelta)
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -1099,7 +1231,7 @@ CGameObject* CLevel_Tool::Load_Kirby()
     if (!m_pGameInstance_Proxy->Has_Prototype(L, L"Proto_Model_Kirby"))
         m_pGameInstance_Proxy->Add_Prototype(L, L"Proto_Model_Kirby",
             CModel::Create(m_pDevice, m_pContext, MODEL::ANIM,
-                "../../Resources/CHJ/AnimModel/Kirby/Kirby.ysh",
+                "../../Resources/CHJ/AnimModel/Kirby/Kirby_AllAbilities.ysh",
                 XMMatrixRotationY(XMConvertToRadians(180.f))));
 
     // 3) Preview_Kirby proto (1회만)

@@ -37,10 +37,13 @@ void CKirby_Attack::Update(CKirby* pKirby, const _float fTimeDelta)
 
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
     // 현재 능력에게 Update 전달
-    pAbility->Update_Ability(pKirby, fTimeDelta);
+    ABILITY_UPDATE_RESULT eUpdateResult= pAbility->Update_Ability(pKirby, fTimeDelta);
+
+    if (eUpdateResult == ABILITY_UPDATE_RESULT::ABILITY_CHANGED)
+        return;
 
     // Ability가 Attack State가 끝났다고 하면 State 전환
-    if (pAbility->IsEndAttack() == true)
+    if (pAbility->ReqEndAttackState() == true)
     {
         Transition_Wait_OR_Run(pKirby);
         // Fall 상태도 전환 필요한듯
@@ -62,18 +65,10 @@ _bool CKirby_Attack::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 
     KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
 
-    switch (eCommandType)
-    {
-        // Attack Up
-        case KIRBY_COMMAND_TYPE::ATTACK:
-        {
-            if (!pCommand->IsUp())
-                return false;
+    //switch (eCommandType)
+    //{
 
-            pKirby->Get_KirbyAbility()->Up_Attack(pKirby);
-            return true;
-        }
-    }
+    //}
 
     // Ability가 Command 처리
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();

@@ -40,6 +40,17 @@ public:
 	HRESULT Remove_Part(const _wstring& strPartTag);
 	HRESULT Rename_Part(const _wstring& strOldTag, const _wstring& strNewTag);
 
+public:
+	void              Set_Tilt(_float fTiltXDeg, _float fTiltYDeg) 
+	{
+		m_fTiltXDeg = fTiltXDeg; m_fTiltYDeg = fTiltYDeg;
+	}
+	void              Set_PerspDistance(_float fDist) { m_fPerspDist = fDist; }
+	_float            Get_TiltX() const { return m_fTiltXDeg; }
+	_float            Get_TiltY() const { return m_fTiltYDeg; }
+	_float            Get_PerspDistance() const { return m_fPerspDist; }
+	const _float4x4* Get_TiltedParentMatrix() const { return &m_TiltedWorldMatrix; }
+
 protected:
 	typedef struct tagUIPartPrototypeInfo
 	{
@@ -52,10 +63,17 @@ protected:
 	vector<_wstring> m_UIPartOrder;
 
 protected:
+	_float    m_fTiltXDeg = { 0.f };
+	_float    m_fTiltYDeg = { 0.f };
+	_float    m_fPerspDist = { 0.f };    
+	_float4x4 m_TiltedWorldMatrix = {};
+
+protected:
 	HRESULT Add_UIPartObject(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag,
 		const _wstring& strPartTag, void* pArg = nullptr);
 
 	virtual void On_UIPartsChanged() {}
+	void    Update_TiltedWorldMatrix();
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

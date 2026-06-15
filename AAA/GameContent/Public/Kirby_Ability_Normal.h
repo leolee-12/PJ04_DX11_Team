@@ -39,13 +39,14 @@ public:
 	virtual KIRBY_ABILITY_TYPE Get_AbilityType() override;
 
 	virtual void Enter_Ability(CKirby* pKirby) override;
-	virtual void Update_Ability(CKirby* pKirby, _float fTimeDelta) override;
+	virtual ABILITY_UPDATE_RESULT Update_Ability(CKirby* pKirby, _float fTimeDelta) override;
 	virtual void Exit_Ability(CKirby* pKirby) override;
 
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
-	virtual void Down_Attack(CKirby* pKirby) override;
-	virtual void Up_Attack(CKirby* pKirby) override;
+	virtual _bool Enter_Attack_KeyDown(CKirby* pKirby) override;
+	virtual _bool Enter_Attack_KeyPress(CKirby* pKirby) override;
+	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) override;
 
 	virtual _bool Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation) override;
 
@@ -60,11 +61,13 @@ private:
 
 	_bool m_bForceEnterSuperInhaleStart{};
 
+	_bool m_bReqInhale{};
+
 private:
 	void Interpolation_Inhale(CAnimator* pAnimator);
 	void Choose_InhaleAniName(_string& strAniName);
 
-	void Change_Ability(CKirby* pKirby);
+	_bool Change_Ability(CKirby* pKirby);
 
 	void Reset_Default(CKirby* pKirby);
 

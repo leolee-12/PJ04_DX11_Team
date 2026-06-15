@@ -1338,7 +1338,7 @@ void CImGui_Manager::Draw_AnimatorEditor(CModel* pModel, CAnimator* pAnimator)
     if (ImGui::Button("Save"))
     {
         pAnimator->Sort_Track(strName);
-        pAnimator->Save_ToFile(TEXT("../../Resources/Models/Test/Marb1e/Marb1e_animevents.json"));
+        pAnimator->Save_ToFile(TEXT("../../Resources/Test/Test/Marb1e/Marb1e_animevents.json"));
     }
 }
 

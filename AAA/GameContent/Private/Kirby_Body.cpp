@@ -120,12 +120,12 @@ HRESULT CKirby_Body::Ready_Components()
         return E_FAIL;
 
     m_pEyeTextureCom = Add_Component<CTexture>(TEXT("Com_EyeTexture"),
-        CTexture::Create(m_pDevice, m_pContext, L"../../Resources/CHJ/AnimModel/Kirby/KirbyEye.%02d.png", ETOUI(KIRBY_EYE_STATE::END)));
+        CTexture::Create(m_pDevice, m_pContext, L"../../Resources/YSE/Kirby/KirbyEye.%02d.png", ETOUI(KIRBY_EYE_STATE::END)));
     if (nullptr == m_pEyeTextureCom)
         return E_FAIL;
 
     m_pEyeMaskTextureCom = Add_Component<CTexture>(TEXT("Com_EyeMaskTexture"),
-        CTexture::Create(m_pDevice, m_pContext, L"../../Resources/CHJ/AnimModel/Kirby/KirbyEyeMask.%02d.png", ETOUI(KIRBY_EYE_STATE::END)));
+        CTexture::Create(m_pDevice, m_pContext, L"../../Resources/YSE/Kirby/KirbyEyeMask.%02d.png", ETOUI(KIRBY_EYE_STATE::END)));
     if (nullptr == m_pEyeMaskTextureCom)
         return E_FAIL;
 
@@ -134,7 +134,7 @@ HRESULT CKirby_Body::Ready_Components()
     /* For.Com_Animator */
     CAnimator::ANIMATOR_DESC AnimDesc{};
     AnimDesc.pModel = m_pModelCom;
-    //AnimDesc.strDataFile = TEXT("../Bin/Resources/Models/Test/Marb1e/Marb1e_animevents.json");
+    //AnimDesc.strDataFile = TEXT("../Bin/Resources/Test/Test/Marb1e/Marb1e_animevents.json");
 
     m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
 

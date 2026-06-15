@@ -253,11 +253,11 @@ void CModel::Seek_Animation(_float fProgress)
 
     m_Animations[idx]->Set_Progress(fProgress);
     m_Animations[idx]->Update_TransformationMatrices(m_Bones, 0.f, false);
-    for (auto& pBone : m_Bones)
-        pBone->Update_CombinedTransformMatrices(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
+
+    Update_Combined();
 }
 
-_bool CModel::Play_Animation(_float fTimeDelta, _float fSpeed)
+_bool CModel::Update_Base(_float fTimeDelta, _float fSpeed)
 {
     _bool isFinished = { false };
 
@@ -282,10 +282,10 @@ _bool CModel::Play_Animation(_float fTimeDelta, _float fSpeed)
 
         unordered_set<_uint> BoneIndices;
 
-        for (auto& [idx, _] : SrcMap) 
+        for (auto& [idx, _] : SrcMap)
             BoneIndices.insert(idx);
 
-        for (auto& [idx, _] : DstMap) 
+        for (auto& [idx, _] : DstMap)
             BoneIndices.insert(idx);
 
         for (_uint boneIdx : BoneIndices)
@@ -328,8 +328,22 @@ _bool CModel::Play_Animation(_float fTimeDelta, _float fSpeed)
         isFinished = m_Animations[m_iCurrentAnimationIndex]->Update_TransformationMatrices(m_Bones, fTimeDelta, m_isAnimLoop, fSpeed);
     }
 
-    for (auto& pBone : m_Bones) 
-        pBone->Update_CombinedTransformMatrices(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
+    return isFinished;
+}
+
+_bool CModel::Play_Animation(_float fTimeDelta, _float fSpeed)
+{
+    _bool isFinished = Update_Base(fTimeDelta, fSpeed);
+    Update_Combined();
+
+    return isFinished;
+}
+
+_bool CModel::Play_Animation(_float fTimeDelta, const _string& strMaskClip, const _string& strRootBone, _float fSpeed, _bool bLoop, _float fMaskWeight)
+{
+    _bool isFinished = Update_Base(fTimeDelta, fSpeed);
+    Apply_Mask(strMaskClip, strRootBone, fTimeDelta, fSpeed, bLoop, fMaskWeight);
+    Update_Combined();
 
     return isFinished;
 }
@@ -346,6 +360,145 @@ HRESULT CModel::Render(_uint iMeshIndex)
         return E_FAIL;
 
     return S_OK;
+}
+
+void CModel::Capture_MaskSnapShot(const _string& strRootBone)
+{
+    m_MaskSnapShot.clear();
+
+    _int iRoot = Get_BoneIndex(strRootBone);
+    if (iRoot < 0)
+        return;
+
+    _uint n = static_cast<_uint>(m_Bones.size());
+    vector<bool> masked(n, false);
+    masked[iRoot] = true;
+    for (_uint i = static_cast<_uint>(iRoot) + 1; i < n; ++i)
+    {
+        _int p = Get_BoneParentIndex(i);
+        if (p >= 0 && masked[p])
+            masked[i] = true;
+    }
+
+    for (_uint i = static_cast<_uint>(iRoot); i < n; ++i)
+    {
+        if (!masked[i])
+            continue;
+        _vector vS, vR, vT;
+        XMMatrixDecompose(&vS, &vR, &vT, m_Bones[i]->Get_TransformationMatrix());
+        KEYFRAME kf{};
+        XMStoreFloat3(&kf.vScale, vS);
+        XMStoreFloat4(&kf.vRotation, vR);
+        XMStoreFloat3(&kf.vTranslation, vT);
+        m_MaskSnapShot[i] = kf;
+    }
+}
+
+void CModel::Apply_Mask(const _string& strClip, const _string& strRootBone, _float fTimeDelta, _float fSpeed, _bool bLoop, _float fMaskWeight)
+{
+    if (fMaskWeight <= 0.f)
+        return;
+
+    _int iIndex = Get_AnimationIndex(strClip);
+    if (iIndex < 0)
+        return;
+
+    unordered_map<_uint, KEYFRAME> poseMap;
+    m_Animations[iIndex]->Compute_BoneKeyFrames(poseMap, fTimeDelta, bLoop, fSpeed);
+
+    auto Blend = [&](_uint iBone, const KEYFRAME& ov)
+        {
+            _vector vS = XMLoadFloat3(&ov.vScale);
+            _vector vR = XMLoadFloat4(&ov.vRotation);
+            _vector vT = XMLoadFloat3(&ov.vTranslation);        
+
+           /* if (fMaskWeight < 1.f)
+            {
+                _vector bS, bR, bT;
+                XMMatrixDecompose(&bS, &bR, &bT, m_Bones[iBone]->Get_TransformationMatrix());
+                if (XMVectorGetX(XMVector4Dot(bR, vR)) < 0.f)
+                    vR = XMVectorNegate(vR);
+                vS = XMVectorLerp(bS, vS, fMaskWeight);
+                vR = XMQuaternionSlerp(bR, vR, fMaskWeight);
+                vT = XMVectorLerp(bT, vT, fMaskWeight);
+            }
+            m_Bones[iBone]->Set_TransformationMatrix(XMMatrixAffineTransformation(
+                vS, XMVectorSet(0, 0, 0, 1), vR, XMVectorSetW(vT, 1.f)));*/
+            if (fMaskWeight < 1.f)
+            {
+                _vector bS, bR, bT;
+                auto itSnap = m_MaskSnapShot.find(iBone);
+                if (itSnap != m_MaskSnapShot.end())     // 스냅샷 있으면 스냅샷에서 출발
+                {
+                    bS = XMLoadFloat3(&itSnap->second.vScale);
+                    bR = XMLoadFloat4(&itSnap->second.vRotation);
+                    bT = XMLoadFloat3(&itSnap->second.vTranslation);
+                }
+                else
+                    XMMatrixDecompose(&bS, &bR, &bT, m_Bones[iBone]->Get_TransformationMatrix());       // 스냅샷 없으면 Base 에서 출발
+
+                if (XMVectorGetX(XMVector4Dot(bR, vR)) < 0.f)
+                    vR = XMVectorNegate(vR);
+                vS = XMVectorLerp(bS, vS, fMaskWeight);
+                vR = XMQuaternionSlerp(bR, vR, fMaskWeight);
+                vT = XMVectorLerp(bT, vT, fMaskWeight);
+            }
+            m_Bones[iBone]->Set_TransformationMatrix(XMMatrixAffineTransformation(
+                vS, XMVectorSet(0, 0, 0, 1), vR, XMVectorSetW(vT, 1.f)));
+        };
+
+    // strRootBone이 비어있을 경우 전체 덮어씀
+    if (strRootBone.empty())
+    {
+        for (auto& [iBone, kf] : poseMap)
+            if (iBone < m_Bones.size())
+                Blend(iBone, kf);
+        return;
+    }
+
+    _int iRoot = Get_BoneIndex(strRootBone);
+    if (iRoot < 0)
+        return;
+
+    // 마스크 루트 본 부터 자식 본들 까지
+    _uint n = static_cast<_uint>(m_Bones.size());
+    vector<bool> masked(n, false);
+    masked[iRoot] = true;
+    for (_uint i = static_cast<_uint>(iRoot) + 1; i < n; ++i)
+    {
+        _int p = Get_BoneParentIndex(i);
+        if (p >= 0 && masked[p])
+            masked[i] = true;
+    }
+
+    for (_uint i = static_cast<_uint>(iRoot); i < n; ++i)
+    {
+        if (!masked[i])
+            continue;
+        auto it = poseMap.find(i);
+        if (it == poseMap.end())
+            continue;
+        Blend(i, it->second);
+    }
+
+ /*   for (_uint i = static_cast<_uint>(iRoot); i < n; ++i)
+    {
+        if (!masked[i])
+            continue;
+        _vector vS, vR, vT;
+        XMMatrixDecompose(&vS, &vR, &vT, m_Bones[i]->Get_TransformationMatrix());
+        KEYFRAME kf{};
+        XMStoreFloat3(&kf.vScale, vS);
+        XMStoreFloat4(&kf.vRotation, vR);
+        XMStoreFloat3(&kf.vTranslation, vT);
+        m_MaskSnapShot[i] = kf;
+    }*/
+}
+
+void CModel::Update_Combined()
+{
+    for (auto& pBone : m_Bones)
+        pBone->Update_CombinedTransformMatrices(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
 }
 
 HRESULT CModel::Bind_Material(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, MTEX_TYPE eType, _uint iIndex)
@@ -700,7 +853,7 @@ CModel* CModel::Create_WithTextureHub(ID3D11Device* pDevice, ID3D11DeviceContext
 
     if (FAILED(pInstance->Initialize_Prototype_WithTextureHub(eType, pModelFilePath, PreTransformMatrix, fcFillter, bCookCollisionMesh)))
     {
-        MSG_BOX("Failed to Created : CModel");
+        MSG_BOX("Failed to Created : CModel - WithTextureHub");
         Safe_Release(pInstance);
     }
 

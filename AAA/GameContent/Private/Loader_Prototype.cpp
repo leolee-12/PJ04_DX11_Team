@@ -14,7 +14,12 @@
 #include "UI_Effect.h"
 #include "UI_GaugeFill.h"
 #include "Effect_Loader.h"
+#include "UI_SpriteAnimCurtain.h"
+#include "UI_Curtain.h"
+#include "UI_Eraser.h"
+#include "UI_CurtainTexture.h"
 #include "Env_InstanceController.h"
+
 
 NS_BEGIN(Client)
 
@@ -30,20 +35,29 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
     // 게임플레이에서 호출 커비 등이 자기 레벨로 스폰
     //CEffect_Loader::GetInstance()->Spawn(L"VacuumContainer", Get_LevelIndex(), vMouthPos, vLook, pParent);
 
-    if (FAILED(pProxy->Add_Prototype(VI_Rect.iLevelID, VI_Rect.szProtoTag,
-        CVIBuffer_Rect::Create(pDevice, pContext))))
-        return E_FAIL;
+    if (!pProxy->Has_Prototype(VI_Rect.iLevelID, VI_Rect.szProtoTag))
+    {
+        if (FAILED(pProxy->Add_Prototype(VI_Rect.iLevelID, VI_Rect.szProtoTag,
+            CVIBuffer_Rect::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
 
-    if (FAILED(pProxy->Add_Prototype(VI_Trail.iLevelID, VI_Trail.szProtoTag,
-        CVIBuffer_Trail::Create(pDevice, pContext))))
-        return E_FAIL;
+    if (!pProxy->Has_Prototype(VI_Trail.iLevelID, VI_Trail.szProtoTag))
+    {
+        if (FAILED(pProxy->Add_Prototype(VI_Trail.iLevelID, VI_Trail.szProtoTag,
+            CVIBuffer_Trail::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
 
-    if (FAILED(pProxy->Add_Prototype(VI_Point.iLevelID, VI_Point.szProtoTag,
-        CVIBuffer_Point::Create(pDevice, pContext))))
-        return E_FAIL;
+    if (!pProxy->Has_Prototype(VI_Point.iLevelID, VI_Point.szProtoTag))
+    {
+        if (FAILED(pProxy->Add_Prototype(VI_Point.iLevelID, VI_Point.szProtoTag,
+            CVIBuffer_Point::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
 
     static const ENV_ENTRY g_EnvTable[] = {
-      { TEXT("Field"), TEXT("../../Resources/Env/Field_Diffuse.dds"), TEXT("../../Resources/Env/Field_Specular.dds"), 0.5f },
+      { TEXT("Field"), TEXT("../../Resources/YSH/Env/Field_Diffuse.dds"), TEXT("../../Resources/YSH/Env/Field_Specular.dds"), 0.5f },
         // 맵 추가 = 행 추가
     };
 
@@ -200,6 +214,31 @@ HRESULT CLIENT_DLL Ready_Prototype_UIPartObjects(CGameInstance_Proxy* pProxy, ID
             return E_FAIL;
     }
 
+    if (!pProxy->Has_Prototype(iLevel, CUI_SpriteAnimCurtain::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_SpriteAnimCurtain::PROTOTYPE_TAG,
+            CUI_SpriteAnimCurtain::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
+
+    if (!pProxy->Has_Prototype(iLevel, CUI_Curtain::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_Curtain::PROTOTYPE_TAG, CUI_Curtain::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
+
+    if (!pProxy->Has_Prototype(iLevel, CUI_Eraser::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_Eraser::PROTOTYPE_TAG, CUI_Eraser::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
+
+    if (!pProxy->Has_Prototype(iLevel, CUI_CurtainTexture::PROTOTYPE_TAG))
+    {
+        if (FAILED(pProxy->Add_Prototype(iLevel, CUI_CurtainTexture::PROTOTYPE_TAG, CUI_CurtainTexture::Create(pDevice, pContext))))
+            return E_FAIL;
+    }
+
     if (!pProxy->Has_Prototype(iLevel, CUI_Text::PROTOTYPE_TAG))
     {
         if (FAILED(pProxy->Add_Prototype(iLevel, CUI_Text::PROTOTYPE_TAG, CUI_Text::Create(pDevice, pContext))))
@@ -221,7 +260,7 @@ HRESULT CLIENT_DLL Ready_Prototype_UIPartObjects(CGameInstance_Proxy* pProxy, ID
     return S_OK;
 }
 
-HRESULT CLIENT_DLL Ready_Level_UIResources(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* strFilePath, _uint iLevelIndex)
+static HRESULT Ready_UIResources_FromBundle(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* strFilePath, _uint iLevelIndex)
 {
     string strFileContent;
     if (FAILED(CDataLoader::Read_Json(strFilePath, &strFileContent)))
@@ -289,7 +328,7 @@ HRESULT CLIENT_DLL Ready_Level_UIResources(CGameInstance_Proxy* pProxy, ID3D11De
     return S_OK;
 }
 
-HRESULT CLIENT_DLL Load_Level_UI(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* strFilePath, _uint iLevelIndex)
+static HRESULT Spawn_UIContainers_FromBundle(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* strFilePath, _uint iLevelIndex)
 {
     const _uint iContProtoLevel = iLevelIndex;      // Container의 Proto도 해당 레벨에 등록했기 때문에 여기서 찾아야함
     const _uint iObjLevel    = iLevelIndex;
@@ -406,6 +445,66 @@ HRESULT CLIENT_DLL Load_Level_UI(CGameInstance_Proxy* pProxy, ID3D11Device* pDev
     }
 
     return S_OK;
+}
+
+HRESULT CLIENT_DLL Ready_Level_UIResources(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* strFilePath, _uint iLevelIndex)
+{
+    string strContent;
+    if (FAILED(CDataLoader::Read_Json(strFilePath, &strContent)))
+        return E_FAIL;
+
+    json jFile;
+    try { jFile = json::parse(strContent); }
+    catch (const std::exception&) { return E_FAIL; }
+
+    // 신규: 레벨 UI 매니페스트(레이어 번들 목록)
+    if (jFile.contains("UILayers") && jFile["UILayers"].is_array())
+    {
+        for (const auto& jLayer : jFile["UILayers"])
+        {
+            const string strLayerPath = jLayer.value("Path", string());
+            if (strLayerPath.empty()) return E_FAIL;
+            if (FAILED(Ready_UIResources_FromBundle(pProxy, pDevice, pContext,
+                StrToWstr(strLayerPath).c_str(), iLevelIndex)))
+                return E_FAIL;
+        }
+        return S_OK;
+    }
+
+    // 하위호환: 예전 단일 번들({"UIContainers":[...]})
+    if (jFile.contains("UIContainers") && jFile["UIContainers"].is_array())
+        return Ready_UIResources_FromBundle(pProxy, pDevice, pContext, strFilePath, iLevelIndex);
+
+    return E_FAIL;
+}
+
+HRESULT CLIENT_DLL Load_Level_UI(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* strFilePath, _uint iLevelIndex)
+{
+    string strContent;
+    if (FAILED(CDataLoader::Read_Json(strFilePath, &strContent)))
+        return E_FAIL;
+
+    json jFile;
+    try { jFile = json::parse(strContent); }
+    catch (const std::exception&) { return E_FAIL; }
+
+    if (jFile.contains("UILayers") && jFile["UILayers"].is_array())
+    {
+        for (const auto& jLayer : jFile["UILayers"])
+        {
+            const string strLayerPath = jLayer.value("Path", string());
+            if (strLayerPath.empty()) return E_FAIL;
+            if (FAILED(Spawn_UIContainers_FromBundle(pProxy, pDevice, pContext,
+                StrToWstr(strLayerPath).c_str(), iLevelIndex)))
+                return E_FAIL;
+        }
+        return S_OK;
+    }
+
+    if (jFile.contains("UIContainers") && jFile["UIContainers"].is_array())
+        return Spawn_UIContainers_FromBundle(pProxy, pDevice, pContext, strFilePath, iLevelIndex);
+
+    return E_FAIL;
 }
 
 NS_END
