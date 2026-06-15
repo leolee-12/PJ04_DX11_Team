@@ -66,6 +66,10 @@
 #include "BladeKnight_Body.h"
 #include "BladeKnight_Sword.h"
 
+// LevelDesign
+#include "LevelDesign_Unsupported.h"
+#include "LevelDesign_Breakable.h"
+
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
 #define CREATOR(CLASS) \
@@ -432,7 +436,11 @@ void CGameObject_Factory::Register_UIContainer()
 
 void CGameObject_Factory::Register_NonAnimObject()
 {
-    
+    Register(CLevelDesign_Unsupported::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Unsupported), LOADER());
+
+    Register(CLevelDesign_Breakable::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Breakable),
+        LOADER(TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CLevelDesign_Breakable::STARBLOCK_MODEL_PROTO_TAG,
+            CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/Star/H1W1.ysh"));));
 }
 
 void CGameObject_Factory::Register_AnimObject()

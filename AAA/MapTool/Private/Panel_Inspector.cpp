@@ -33,6 +33,20 @@ namespace
 		return (t < MTEX_TYPE_MAX) ? names[t] : "?";
 	}
 
+	_bool Is_EnvImportantTexType(MTEX_TYPE eType)
+	{
+		switch (eType)
+		{
+		case MTEX_TYPE::DIFFUSE:
+		case MTEX_TYPE::NORMALS:
+		case MTEX_TYPE::METALNESS:
+		case MTEX_TYPE::UNKNOWN:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	int ToMapRenderGroupIndex(RENDERID eRenderID)
 	{
 		return (eRenderID == RENDERID::BLEND) ? 1 : 0;
@@ -821,13 +835,34 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 
 		for (_uint t = 0; t < MTEX_TYPE_MAX; ++t)
 		{
-			int iCount = (int)pModel->Get_MeshTextureCount((_uint)i, (MTEX_TYPE)t);
-			if (iCount <= 1)
+			const MTEX_TYPE eType = static_cast<MTEX_TYPE>(t);
+			const int iCount = static_cast<int>(pModel->Get_MeshTextureCount((_uint)i, eType));
+			const _uint iLayerIndex = Layer.idx[t];
+			const _bool bImportant = Is_EnvImportantTexType(eType);
+			const _bool bOutOfRange = (iCount > 0) && (iLayerIndex >= static_cast<_uint>(iCount));
+
+			if (0 == iCount)
+			{
+				if (bEnvObjectMeshUi && bImportant)
+				{
+					bAnyField = true;
+					ImGui::TextDisabled("%s: no texture", TexTypeName(t));
+				}
 				continue;
+			}
+
+			if (1 == iCount)
+			{
+				bAnyField = true;
+				ImGui::TextDisabled("%s: single texture (index 0)%s",
+					TexTypeName(t),
+					bOutOfRange ? "  (layer index out of range)" : "");
+				continue;
+			}
 
 			bAnyField = true;
 
-			int iValue = (int)Layer.idx[t];
+			int iValue = static_cast<int>(iLayerIndex);
 			ImGui::SetNextItemWidth(120.f);
 			if (ImGui::InputInt(TexTypeName(t), &iValue))
 			{
@@ -836,7 +871,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 				if (iValue >= iCount)
 					iValue = iCount - 1;
 
-				Layer.idx[t] = (_uint)iValue;
+				Layer.idx[t] = static_cast<_uint>(iValue);
 				bChanged = true;
 			}
 			ImGui::SameLine();
