@@ -224,6 +224,8 @@ HRESULT CRenderer::Draw()
         return E_FAIL;
 
 #ifdef _DEBUG
+    Reset_RS();
+
     if (FAILED(Render_Debug()))
         return E_FAIL;
 
@@ -1126,6 +1128,13 @@ HRESULT CRenderer::Render_Debug()
     return S_OK;
 }
 #endif
+
+void CRenderer::Reset_RS()
+{
+    m_pContext->OMSetBlendState(nullptr, nullptr, 0xffffffff);  // 불투명
+    m_pContext->OMSetDepthStencilState(nullptr, 0);             // 기본 깊이(Less, write)
+    m_pContext->RSSetState(nullptr);
+}
 
 CRenderer* CRenderer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

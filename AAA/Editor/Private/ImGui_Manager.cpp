@@ -433,11 +433,11 @@ void CImGui_Manager::Draw_Toolbar()
 
     ImGui::SameLine();
 
-    // --- Physics Debug Toggle ---
+    // --- PhysX Debug Toggle ---
     {
         bool bOn = m_pGameInstance_Proxy->Is_PhysXDebug();
         if (bOn) ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 1.0f, 1.0f));
-        if (ImGui::Button("Physics Debug"))
+        if (ImGui::Button("PhysX Debug"))
             m_pGameInstance_Proxy->Toggle_PhysXDebug();
         if (bOn) ImGui::PopStyleColor();
     }
