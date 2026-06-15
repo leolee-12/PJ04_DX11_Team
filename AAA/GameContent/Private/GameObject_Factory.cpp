@@ -55,6 +55,7 @@
 // Monster
 #include "BladeKnight.h"
 #include "BladeKnight_Body.h"
+#include "BladeKnight_Sword.h"
 
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
@@ -339,9 +340,15 @@ void CGameObject_Factory::Register_Container()
                 CBladeKnight_Body::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_BladeKnight_Body"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM,  "../../Resources/CHJ/Monster/BladeKnight/BladeKnight.ysh",
-                    XMMatrixRotationY(XMConvertToRadians(180.f))));
-        )
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/BladeKnight/BladeKnight.ysh",
+                XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            // BladeKnight Sword
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CBladeKnight_Sword::PROTOTYPE_TAG, CBladeKnight_Sword::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_BladeKnight_Sword"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/BladeKnight/BladeKnight_Sword.ysh"));
+         )
     );
 }
 

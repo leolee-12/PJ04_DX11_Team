@@ -44,6 +44,7 @@ public:
 public:
 	CAnimator*					Get_Animator() { return m_pAnimatorCom; }
 	CModel*						Get_Model() { return m_pModelCom; }
+	const _float4x4*			Get_BoneMatrixPtr(const _char* pBoneName) const;
 
 private:
 	HRESULT						Ready_Components();

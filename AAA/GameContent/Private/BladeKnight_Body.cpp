@@ -16,6 +16,7 @@ CBladeKnight_Body::CBladeKnight_Body(const CBladeKnight_Body& Prototype)
 HRESULT CBladeKnight_Body::Initialize_Prototype()
 {
     m_eProjType = PROJ_TYPE::PERSPEC;
+
     return S_OK;
 }
 
@@ -31,7 +32,7 @@ HRESULT CBladeKnight_Body::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
-    m_pAnimatorCom->Play("Wait", true, true);
+    m_pAnimatorCom->Play("Thrust", true, true);
 
     return S_OK;
 }
@@ -85,6 +86,14 @@ HRESULT CBladeKnight_Body::Render()
     }
 
     return S_OK;
+}
+
+const _float4x4* CBladeKnight_Body::Get_BoneMatrixPtr(const _char* pBoneName) const
+{
+    if (nullptr == m_pModelCom || nullptr == pBoneName)
+        return nullptr;
+
+    return m_pModelCom->Get_BoneMatrixPtr(pBoneName);
 }
 
 HRESULT CBladeKnight_Body::Ready_Components()

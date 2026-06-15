@@ -10,6 +10,7 @@
 #include "Kirby_Hovering.h"
 #include "Kirby_GetAbility.h"
 #include "Kirby_AbilityDump.h"
+#include "Monster_StateMachine.h"
 
 CKirby_StateMachine::CKirby_StateMachine()
 {

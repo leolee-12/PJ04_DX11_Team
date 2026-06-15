@@ -50,6 +50,7 @@ public: // 재생 제어 (오브젝트/에디터는 오직 이것만 사용)
 
     void    Set_Mask(const _string& strClip, const _string& Bones, _bool bLoop, _float fMaskTarget, _float fMaskBlendTime);
 
+    // 바로 지우고 싶으면 그대로 사용 / 부드럽게 내리고 싶다면 BlendTime 주기
     void    Clear_Mask(_float fMaskBlendTime = 0.f);
 
 public: // 에디터(데이터 편집)

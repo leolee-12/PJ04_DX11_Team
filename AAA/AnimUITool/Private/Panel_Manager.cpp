@@ -6,6 +6,7 @@
 #include "UIContainerObject.h"
 #include "ContainerObject.h"
 #include "PartObject.h"
+#include "GameInstance.h"
 
 #include "Panel_Hierarchy.h"
 #include "Panel_Viewport.h"
@@ -22,7 +23,7 @@
 
 
 CPanel_Manager::CPanel_Manager(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : m_pDevice(pDevice), m_pContext(pContext)
+    : m_pDevice(pDevice), m_pContext(pContext), m_pGameInstance_Proxy(CGameInstance::GetProxy())
 {
     Safe_AddRef(m_pDevice);
     Safe_AddRef(m_pContext);
@@ -124,6 +125,19 @@ void CPanel_Manager::Set_Selected(Engine::CGameObject* pObject)
 
 void CPanel_Manager::Clear_Selected()
 {
+    if (m_Context.pOwner == m_pSelected)
+    {
+        m_Context.pOwner = nullptr;
+        m_Context.pModel = nullptr;
+        m_Context.pAnimator = nullptr;
+        m_Context.strName.clear();
+        m_Context.strModelPath.clear();
+        m_Context.iClip = 0;
+        m_Context.fProgress = 0.f;
+        m_Context.iRootBone = -1;
+        m_Context.iSelBone = -1;
+    }
+
     Safe_Release(m_pSelected);
     m_pSelected = nullptr;
 }
@@ -338,6 +352,14 @@ void CPanel_Manager::Render_ModeBar()
         }
     }
 
+    ImGui::SameLine();
+
+    _bool bEditMode = m_pGameInstance_Proxy->Is_EditMode();
+    if (ImGui::Checkbox("EditMode", &bEditMode))
+    {
+        m_pGameInstance_Proxy->Set_EditMode(bEditMode);
+    }
+
 
     ImGui::EndMainMenuBar();
 }
@@ -392,6 +414,8 @@ void CPanel_Manager::Free()
     for (auto& [tag, pPanel] : m_Panels)
         Safe_Release(pPanel);
     m_Panels.clear();
+
+    Safe_Release(m_pGameInstance_Proxy);
 
     Safe_Release(m_pDevice);
     Safe_Release(m_pContext);
