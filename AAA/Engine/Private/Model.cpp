@@ -574,26 +574,44 @@ HRESULT CModel::Save_MeshLayers() const
     for (size_t i = 0; i < m_MeshLayers.size(); ++i)
     {
         const MESH_LAYER_IDX& m = m_MeshLayers[i];
-
         json jMesh;
 
         if (m.iPass >= 0)
             jMesh["Pass"] = m.iPass;
+
+        if (m.iUVIndex != 0)
+            jMesh["UVIndex"] = m.iUVIndex;
+
+        if (m.iFlags != 0)
+            jMesh["Flags"] = m.iFlags;
 
         for (_uint t = 0; t < MTEX_TYPE_MAX; ++t)
         {
             if (m.idx[t] != 0)
                 jMesh[to_string(t)] = m.idx[t];
         }
-        if (!jMesh.empty())                   
+
+        if (!jMesh.empty())
             j[to_string(i)] = jMesh;
     }
 
     ofstream fout(m_strMeshLayerPath);
     if (!fout.is_open())
         return E_FAIL;
+
     fout << j.dump(2);
     return S_OK;
+}
+
+HRESULT CModel::Render_Instanced(_uint iMeshIndex, ID3D11Buffer* pInstanceBuffer, _uint iInstanceStride, _uint iInstanceCount)
+{
+    if (iMeshIndex >= m_iNumMeshes)
+        return E_FAIL;
+
+    if (FAILED(m_Meshes[iMeshIndex]->Bind_Resources_Instanced(pInstanceBuffer, iInstanceStride)))
+        return E_FAIL;
+
+    return m_Meshes[iMeshIndex]->Render_Instanced(iInstanceCount);
 }
 
 HRESULT CModel::Ready_Meshes(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix)
@@ -625,7 +643,7 @@ HRESULT CModel::Ready_Materials(const vector<MATERIAL_DATA>& materials, const _c
 	return S_OK;
 }
 
-HRESULT CModel::Ready_MaterialsEx(const vector<MATERIAL_DATA>& materials, const _char* pModelFilePath)
+HRESULT CModel::Ready_MaterialsEx(const vector<MATERIAL_DATA>& materials)
 {
     if (!m_Materials.empty() || !m_MaterialsEx.empty())
         return E_FAIL;
@@ -634,7 +652,7 @@ HRESULT CModel::Ready_MaterialsEx(const vector<MATERIAL_DATA>& materials, const 
 
     for (const auto& matData : materials)
     {
-        CMaterialEx* pMaterialEx = CMaterialEx::Create(matData, pModelFilePath);
+        CMaterialEx* pMaterialEx = CMaterialEx::Create(matData);
         if (nullptr == pMaterialEx)
             return E_FAIL;
 
@@ -684,7 +702,7 @@ HRESULT CModel::Ready_NonAnimEx(const _char* pModelFilePath, _fmatrix PreTransfo
             return E_FAIL;
     }
 
-    if (FAILED(Ready_MaterialsEx(modelData.Materials, pModelFilePath)))
+    if (FAILED(Ready_MaterialsEx(modelData.Materials)))
         return E_FAIL;
 
     Load_MeshLayers(pModelFilePath);
@@ -765,18 +783,39 @@ void CModel::Load_MeshLayers(const _char* pModelFilePath)
         catch (...) { continue; }
         if (i >= m_iNumMeshes) continue;
 
-        if (meshItem.value().contains("Pass") && meshItem.value()["Pass"].is_number_integer())
-            m_MeshLayers[i].iPass = meshItem.value()["Pass"].get<int>();
+        const json& jMesh = meshItem.value();
 
-        for (auto& texItem : meshItem.value().items())
+        if (jMesh.contains("Pass") && jMesh["Pass"].is_number_integer())
+            m_MeshLayers[i].iPass = jMesh["Pass"].get<int>();
+
+        if (jMesh.contains("UVIndex") && jMesh["UVIndex"].is_number_integer())
         {
-            if (texItem.key() == "Pass")
+            const int iUVIndex = jMesh["UVIndex"].get<int>();
+            if (0 <= iUVIndex && iUVIndex <= 3)
+                m_MeshLayers[i].iUVIndex = static_cast<_uint>(iUVIndex);
+        }
+
+        if (jMesh.contains("Flags") && jMesh["Flags"].is_number_integer())
+        {
+            const int iFlags = jMesh["Flags"].get<int>();
+            if (0 <= iFlags)
+                m_MeshLayers[i].iFlags = static_cast<_uint>(iFlags);
+        }
+
+        for (auto& texItem : jMesh.items())
+        {
+            if (texItem.key() == "Pass"
+                || texItem.key() == "UVIndex"
+                || texItem.key() == "Flags")
+            {
                 continue;
+            }
 
             _uint t = 0;
             try { t = (_uint)stoul(texItem.key()); }
             catch (...) { continue; }
             if (t >= MTEX_TYPE_MAX) continue;
+
             m_MeshLayers[i].idx[t] = texItem.value().get<_uint>();
         }
     }

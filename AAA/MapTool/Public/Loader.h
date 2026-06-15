@@ -60,7 +60,6 @@ private:
 	void	Add_Work(function<HRESULT()>&& func);
 	HRESULT	Ready_WorkQueue();
 	HRESULT	Ready_Resources_For_Edit();
-	HRESULT	Ready_TexPool_For_Edit();
 
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TOOL_LEVEL eNextLevelID);

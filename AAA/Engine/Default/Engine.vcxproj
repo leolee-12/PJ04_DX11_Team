@@ -212,7 +212,7 @@
     <ClInclude Include="..\public\Environment_Manager.h" />
     <ClInclude Include="..\public\EventBus.h" />
     <ClInclude Include="..\Public\Font_Manager.h" />
-    <ClInclude Include="..\Public\Frustum_Manager.h" />
+    <ClInclude Include="..\Public\Culling_Manager.h" />
     <ClInclude Include="..\public\GameInstance.h" />
     <ClInclude Include="..\public\GameInstance_Proxy.h" />
     <ClInclude Include="..\public\GameObject.h" />
@@ -303,7 +303,7 @@
     <ClCompile Include="..\private\Environment_Manager.cpp" />
     <ClCompile Include="..\private\EventBus.cpp" />
     <ClCompile Include="..\Private\Font_Manager.cpp" />
-    <ClCompile Include="..\Private\Frustum_Manager.cpp" />
+    <ClCompile Include="..\Private\Culling_Manager.cpp" />
     <ClCompile Include="..\private\GameInstance.cpp" />
     <ClCompile Include="..\private\GameInstance_Proxy.cpp" />
     <ClCompile Include="..\private\GameObject.cpp" />

@@ -41,6 +41,25 @@ namespace ShaderPass
 		inline constexpr _uint Shadow = 2;
 		inline constexpr _uint White = 3;
 		inline constexpr _uint Dither = 4;
+		inline constexpr _uint DIFF = 5;
+		inline constexpr _uint DMN = 6;	// Diffuse MRA Normal
+		inline constexpr _uint UKWN = 7;
+		inline constexpr _uint UMN = 8;	// Unkwown MRA Normal
+	}
+
+	namespace EnvInst
+	{
+		inline constexpr _uint SHADOW = 0;
+		inline constexpr _uint WHITE = 1;
+		inline constexpr _uint DIFF = 2;
+		inline constexpr _uint DMN = 3;	// Diffuse MRA Normal
+		inline constexpr _uint UKWN = 4;
+		inline constexpr _uint UMN = 5;	// Unkwown MRA Normal
+	}
+
+	namespace EnvInstFlags
+	{
+		inline constexpr _uint Dither = 1u << 0;
 	}
 }
 
@@ -63,6 +82,7 @@ namespace ProtoDesc
 	inline constexpr SHADER_DESC Shader_AnimMesh_PBR = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_AnimMesh_PBR"), TEXT("../Bin/ShaderFiles/Shader_AnimMesh_PBR.hlsl") };
 	inline constexpr SHADER_DESC Shader_NonAnimMesh_PBR = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_NonAnimMesh_PBR"), TEXT("../Bin/ShaderFiles/Shader_NonAnim_PBR.hlsl") };
 	inline constexpr SHADER_DESC Shader_Map = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Map"), TEXT("../Bin/ShaderFiles/Shader_Map.hlsl") };
+	inline constexpr SHADER_DESC Shader_EnvInstance = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_EnvInstance"), TEXT("../Bin/ShaderFiles/Shader_EnvInstance.hlsl") };
 	inline constexpr SHADER_DESC Shader_SkySphere = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_SkySphere"), TEXT("../Bin/ShaderFiles/Shader_SkySphere.hlsl") };
 
 	inline constexpr SHADER_DESC Shader_UI = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_UI"), TEXT("../Bin/ShaderFiles/Shader_UI.hlsl") };

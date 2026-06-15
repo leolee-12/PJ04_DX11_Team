@@ -53,13 +53,13 @@ HRESULT CMap_ProtoRegister::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, c
 
 	for (const ENV_OBJECT_DESC& Desc : Package.EnvObjectDescs)
 	{
-		if (Desc.strModelProtoTag.empty())
+		if (Desc.wstrModelProtoTag.empty())
 			continue;
 
-		AllEnvModelTags.insert(Desc.strModelProtoTag);
+		AllEnvModelTags.insert(Desc.wstrModelProtoTag);
 
 		if (Needs_EnvModelCollisionCook(Desc))
-			CookRequiredEnvModelTags.insert(Desc.strModelProtoTag);
+			CookRequiredEnvModelTags.insert(Desc.wstrModelProtoTag);
 	}
 
 #ifdef _DEBUG
@@ -106,17 +106,17 @@ HRESULT CMap_ProtoRegister::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, c
 
 	for (const ENV_OBJECT_DESC& Desc : Package.EnvObjectDescs)
 	{
-		if (Desc.strModelProtoTag.empty())
+		if (Desc.wstrModelProtoTag.empty())
 			continue;
 
 		const _bool bCookCollisionMesh =
-			CookRequiredEnvModelTags.find(Desc.strModelProtoTag) != CookRequiredEnvModelTags.end();
+			CookRequiredEnvModelTags.find(Desc.wstrModelProtoTag) != CookRequiredEnvModelTags.end();
 
 		if (FAILED(Ready_EnvModel(Levels.iEnvModelLevel, Desc, bCookCollisionMesh, Levels.bEnableEnvObjectPicking)))
 			return E_FAIL;
 	}
 
-	for (const MAP_ADDED_OBJECT_DESC& Added : Package.AddedObjectDescs)
+	for (const MAP_ADD_OBJECT& Added : Package.AddedObjectDescs)
 	{
 		if (m_pProxy->Has_Prototype(Levels.iObjectLevel, Added.strPrototypeTag))
 			continue;
@@ -190,12 +190,12 @@ HRESULT CMap_ProtoRegister::Ready_MapSectionModel(_uint iModelLevel, const MAP_S
 	if (nullptr == m_pProxy)
 		return E_FAIL;
 
-	if (!m_pProxy->Has_Prototype(iModelLevel, Desc.strModelProtoTag))
+	if (!m_pProxy->Has_Prototype(iModelLevel, Desc.wstrModelProtoTag))
 	{
-		if (Desc.strModelPath.empty())
+		if (Desc.wstrModelPath.empty())
 			return E_FAIL;
 
-		const string strModelPath = WstrToStr(Desc.strModelPath);
+		const string wstrModelPath = WstrToStr(Desc.wstrModelPath);
 		CModel* pModelPrototype = nullptr;
 
 		try
@@ -204,13 +204,13 @@ HRESULT CMap_ProtoRegister::Ready_MapSectionModel(_uint iModelLevel, const MAP_S
 				m_pDevice,
 				m_pContext,
 				MODEL::MAP,
-				strModelPath.c_str());
+				wstrModelPath.c_str());
 		}
 		catch (const std::exception& e)
 		{
 			Log_GameContentWarning(
 				"MapSection model creation exception: section=" + WstrToStr(Desc.strSectionName)
-				+ " path=" + strModelPath
+				+ " path=" + wstrModelPath
 				+ " reason=" + e.what());
 			return E_FAIL;
 		}
@@ -218,7 +218,7 @@ HRESULT CMap_ProtoRegister::Ready_MapSectionModel(_uint iModelLevel, const MAP_S
 		if (nullptr == pModelPrototype)
 			return E_FAIL;
 
-		if (FAILED(m_pProxy->Add_Prototype(iModelLevel, Desc.strModelProtoTag.c_str(),
+		if (FAILED(m_pProxy->Add_Prototype(iModelLevel, Desc.wstrModelProtoTag.c_str(),
 			pModelPrototype)))
 		{
 			Safe_Release(pModelPrototype);
@@ -234,10 +234,10 @@ HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_D
 	if (nullptr == m_pProxy)
 		return E_FAIL;
 
-	if (Desc.strModelProtoTag.empty() || Desc.strModelPath.empty())
+	if (Desc.wstrModelProtoTag.empty() || Desc.wstrModelPath.empty())
 		return S_FALSE;
 
-	if (m_pProxy->Has_Prototype(iModelLevel, Desc.strModelProtoTag))
+	if (m_pProxy->Has_Prototype(iModelLevel, Desc.wstrModelProtoTag))
 		return S_OK;
 
 //#ifdef _DEBUG
@@ -245,17 +245,17 @@ HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_D
 //	{
 //		Log_GameContentInfo(
 //			"[EnvCook] begin object="
-//			+ WstrToStr(Desc.strObjectName)
+//			+ WstrToStr(Desc.wstrObjectName)
 //			+ " protoTag="
-//			+ WstrToStr(Desc.strModelProtoTag)
+//			+ WstrToStr(Desc.wstrModelProtoTag)
 //			+ " path="
-//			+ WstrToStr(Desc.strModelPath)
+//			+ WstrToStr(Desc.wstrModelPath)
 //			+ " apxbin="
 //			+ WstrToStr(Desc.tCollision.strDecorCollisionApxbinName));
 //	}
 //#endif
 
-	const string strModelPath = WstrToStr(Desc.strModelPath);
+	const string wstrModelPath = WstrToStr(Desc.wstrModelPath);
 	CModel* pModelPrototype = nullptr;
 
 	try
@@ -266,7 +266,7 @@ HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_D
 				m_pDevice,
 				m_pContext,
 				MODEL::NONANIM,
-				strModelPath.c_str(),
+				wstrModelPath.c_str(),
 				XMMatrixIdentity(),
 				[](const string&) -> bool
 				{
@@ -280,7 +280,7 @@ HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_D
 				m_pDevice,
 				m_pContext,
 				MODEL::NONANIM,
-				strModelPath.c_str(),
+				wstrModelPath.c_str(),
 				XMMatrixIdentity(),
 				nullptr,
 				bCookCollisionMesh);
@@ -290,9 +290,9 @@ HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_D
 	{
 		Log_GameContentWarning(
 			"EnvObject model creation exception: object="
-			+ WstrToStr(Desc.strObjectName)
+			+ WstrToStr(Desc.wstrObjectName)
 			+ " path="
-			+ strModelPath
+			+ wstrModelPath
 			+ " reason="
 			+ e.what());
 		return E_FAIL;
@@ -303,9 +303,9 @@ HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_D
 //	{
 //		Log_GameContentInfo(
 //			"[EnvCook] end object="
-//			+ WstrToStr(Desc.strObjectName)
+//			+ WstrToStr(Desc.wstrObjectName)
 //			+ " protoTag="
-//			+ WstrToStr(Desc.strModelProtoTag));
+//			+ WstrToStr(Desc.wstrModelProtoTag));
 //	}
 //#endif
 
@@ -314,7 +314,7 @@ HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_D
 
 	if (FAILED(m_pProxy->Add_Prototype(
 		iModelLevel,
-		Desc.strModelProtoTag.c_str(),
+		Desc.wstrModelProtoTag.c_str(),
 		pModelPrototype)))
 	{
 		Safe_Release(pModelPrototype);

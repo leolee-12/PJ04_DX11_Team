@@ -1,43 +1,71 @@
 #include "Map_Loader.h"
-#include "Map_LayerPolicy.h"
 #include "Map_PresetCatalog.h"
-#include "Map_LevelContent.h"
-#include "Map_OverrideStore.h"
-#include "Map_StageOverrideSerializer.h"
+#include "Map_EditFile.h"
 #include "Map_Builder.h"
 #include "Map_ModelResolver.h"
 #include "Map_ProtoRegister.h"
 #include "Map_Spawner.h"
+#include "GameContent_Log.h"
 
 #include "GameInstance.h"
 #include "DataLoader.h"
+#include "Texture_Hub.h"
 
 #include <mutex>
+#include <filesystem>
 
 namespace
 {
-	std::mutex g_MapPackageCacheMutex;
-	std::unordered_map<std::wstring, MAP_PACKAGE> g_MapPackageCache;
+	using namespace std::filesystem;
 
-	std::wstring Make_MapCacheKey(const std::wstring& strManifestPath, _uint iRuntimeLevel)
+	static constexpr const _tchar* kLayerMapStage = L"Layer_MapStage";
+	static constexpr const _tchar* kLayerEnvStatic = L"Layer_EnvStatic";
+	static constexpr const _tchar* kLayerEnvInteract = L"Layer_EnvInteract";
+	static constexpr const _tchar* kLayerEnvEffect = L"Layer_EnvEffect";
+
+	constexpr _tchar kMapTexPoolRoot[] = L"../../Resources/Map/TexPool";
+	_bool g_bMapTexHubReady = false;
+	mutex g_MapTexHubMutex;
+	mutex g_MapPackageCacheMutex;
+	unordered_map<_wstring, MAP_PACKAGE> g_MapPackageCache;
+
+	_bool Is_EnvLayerInternal(const _wstring& strLayerTag)
 	{
-		return std::to_wstring(iRuntimeLevel) + L"|" + strManifestPath;
+		return strLayerTag == kLayerEnvStatic
+			|| strLayerTag == kLayerEnvInteract
+			|| strLayerTag == kLayerEnvEffect;
 	}
 
-	void Store_MapPackage(const std::wstring& strManifestPath, _uint iRuntimeLevel, const MAP_PACKAGE& Package)
+	_bool Is_MapLayerInternal(const _wstring& strLayerTag)
 	{
-		std::lock_guard<std::mutex> lock(g_MapPackageCacheMutex);
+		return strLayerTag == kLayerMapStage
+			|| Is_EnvLayerInternal(strLayerTag);
+	}
+
+	string To_LogPath(const path& FilePath)
+	{
+		return WstrToStr(FilePath.wstring());
+	}
+
+	_wstring Make_MapCacheKey(const _wstring& strManifestPath, _uint iRuntimeLevel)
+	{
+		return to_wstring(iRuntimeLevel) + L"|" + strManifestPath;
+	}
+
+	void Store_MapPackage(const _wstring& strManifestPath, _uint iRuntimeLevel, const MAP_PACKAGE& Package)
+	{
+		lock_guard<mutex> lock(g_MapPackageCacheMutex);
 		g_MapPackageCache[Make_MapCacheKey(strManifestPath, iRuntimeLevel)] = Package;
 	}
 
-	bool Try_GetMapPackage(const std::wstring& strManifestPath,
+	bool Try_GetMapPackage(const _wstring& strManifestPath,
 		_uint iRuntimeLevel,
 		MAP_PACKAGE* pOutPackage)
 	{
 		if (nullptr == pOutPackage)
 			return false;
 
-		std::lock_guard<std::mutex> lock(g_MapPackageCacheMutex);
+		lock_guard<mutex> lock(g_MapPackageCacheMutex);
 
 		const auto iter = g_MapPackageCache.find(Make_MapCacheKey(strManifestPath, iRuntimeLevel));
 		if (iter == g_MapPackageCache.end())
@@ -47,9 +75,7 @@ namespace
 		return true;
 	}
 
-	bool Try_LoadLevelMapContent(
-		const std::wstring& strLevelObjectsPath,
-		Client::MAP_LEVEL_CONTENT_DESC* pOutDesc)
+	bool Try_LoadLevelMapContent(const _wstring& strLevelObjectsPath, MAP_EDIT_DATA* pOutDesc)
 	{
 		if (nullptr == pOutDesc)
 			return false;
@@ -59,14 +85,14 @@ namespace
 		if (strLevelObjectsPath.empty())
 			return false;
 
-		std::string strContent{};
+		_string strContent{};
 		if (FAILED(CDataLoader::Read_Json(strLevelObjectsPath.c_str(), &strContent)))
 			return false;
 
 		try
 		{
 			json jLevel = json::parse(strContent);
-			return SUCCEEDED(Client::CMap_LevelContent::Deserialize(jLevel, pOutDesc));
+			return SUCCEEDED(CMap_EditFile::Load_Data(jLevel, pOutDesc));
 		}
 		catch (const json::exception&)
 		{
@@ -74,16 +100,16 @@ namespace
 		}
 	}
 
-	bool Is_RuntimeLoadContextValid(const Client::MAP_RUNTIME_LOAD_CONTEXT& Context)
+	bool Is_RuntimeLoadContextValid(const MAP_RUNTIME_LOAD_CONTEXT& Context)
 	{
 		return nullptr != Context.pDevice
 			&& nullptr != Context.pContext;
 	}
 
 	void Collect_DeletedEnvDescs(
-		const vector<Client::ENV_OBJECT_DESC>& SourceDescs,
-		const Client::MAP_OVERRIDE_DESC* pOverrideDesc,
-		vector<Client::ENV_OBJECT_DESC>* pOutDeletedEnvDescs)
+		const vector<ENV_OBJECT_DESC>& SourceDescs,
+		const MAP_EDIT_CHANGE* pOverrideDesc,
+		vector<ENV_OBJECT_DESC>* pOutDeletedEnvDescs)
 	{
 		if (nullptr == pOutDeletedEnvDescs)
 			return;
@@ -95,23 +121,23 @@ namespace
 
 		for (const auto& Desc : SourceDescs)
 		{
-			const _wstring strKey = Client::CMap_Override::Build_EnvObjectStableKey(Desc);
+			const _wstring strKey = CMap_EditFile::Make_EnvKey(Desc);
 			if (pOverrideDesc->DeletedEnvObjectKeys.find(strKey) != pOverrideDesc->DeletedEnvObjectKeys.end())
 				pOutDeletedEnvDescs->push_back(Desc);
 		}
 	}
 
 	void Build_RuntimeStageLevels(
-		const Client::MAP_RUNTIME_LOAD_CONTEXT& Context,
-		Client::MAP_RUNTIME_LEVELS* pOutLevels)
+		const MAP_RUNTIME_LOAD_CONTEXT& Context,
+		MAP_RUNTIME_LEVELS* pOutLevels)
 	{
 		if (nullptr == pOutLevels)
 			return;
 
 		*pOutLevels = {};
-		pOutLevels->iObjectLevel = ETOUI(Client::LEVEL::STATIC);
+		pOutLevels->iObjectLevel = ETOUI(LEVEL::STATIC);
 		pOutLevels->iStageModelLevel = Context.iModelLevel;
-		pOutLevels->iEnvModelLevel = ETOUI(Client::LEVEL::STATIC);
+		pOutLevels->iEnvModelLevel = ETOUI(LEVEL::STATIC);
 	}
 
 	void Build_RuntimeEnvLevels(
@@ -133,7 +159,7 @@ namespace
 		const _wstring& strFallbackManifestPath,
 		const _wstring& strLevelObjectsPath,
 		_wstring* pOutManifestPath,
-		MAP_LEVEL_CONTENT_DESC* pOutMapContentDesc,
+		MAP_EDIT_DATA* pOutMapContentDesc,
 		json* pOutMapStageOverride = nullptr,
 		_bool* pOutHasMapStageOverride = nullptr)
 	{
@@ -163,7 +189,7 @@ namespace
 		if (pOutMapContentDesc->strManifestPath.empty())
 			pOutMapContentDesc->strManifestPath = *pOutManifestPath;
 
-		const HRESULT hrAsset = Client::CMap_OverrideStore::Load_OverrideAsset(
+		const HRESULT hrAsset = CMap_EditFile::Load_EditFile(
 			*pOutManifestPath,
 			pOutMapContentDesc,
 			pOutMapStageOverride,
@@ -193,7 +219,7 @@ HRESULT CMap_Loader::Initialize()
 }
 
 HRESULT CMap_Loader::Load_FromManifest(const _wstring& strManifestPath, const MAP_RUNTIME_LEVELS& Levels,
-	const MAP_SPAWN_TARGETS& Targets, MAP_LOAD_REPORT* pOutReport, CMapStage** ppOutStage)
+	const MAP_SPAWN_TARGETS& Targets, MAP_LOAD_RESULT* pOutReport, CMapStage** ppOutStage)
 {
 	MAP_PACKAGE Package{};
 
@@ -241,7 +267,10 @@ HRESULT CMap_Loader::Build_Package(const _wstring& strManifestPath, MAP_PACKAGE*
 
 HRESULT CMap_Loader::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, const MAP_PACKAGE& Package)
 {
-	if (nullptr == m_pDevice || nullptr == m_pContext)
+	if (nullptr == m_pDevice || nullptr == m_pContext || nullptr == m_pProxy)
+		return E_FAIL;
+
+	if (FAILED(Ready_TexHub(m_pProxy)))
 		return E_FAIL;
 
 	CMap_ProtoRegister* pRegister = CMap_ProtoRegister::Create(m_pDevice, m_pContext);
@@ -255,7 +284,7 @@ HRESULT CMap_Loader::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, const MA
 	return hr;
 }
 
-HRESULT CMap_Loader::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST& Request, MAP_LOAD_REPORT* pOutReport)
+HRESULT CMap_Loader::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST& Request, MAP_LOAD_RESULT* pOutReport)
 {
 	CMap_Spawner* pSpawner = CMap_Spawner::Create();
 	if (nullptr == pSpawner)
@@ -303,7 +332,7 @@ HRESULT CMap_Loader::Preload_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 		return E_FAIL;
 
 	_wstring strResolvedManifestPath;
-	MAP_LEVEL_CONTENT_DESC MapContentDesc{};
+	MAP_EDIT_DATA MapContentDesc{};
 	if (FAILED(Resolve_LevelMapRequest(strFallbackManifestPath, strLevelObjectsPath, &strResolvedManifestPath, &MapContentDesc)))
 	{
 		return E_FAIL;
@@ -317,7 +346,7 @@ HRESULT CMap_Loader::Preload_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 	HRESULT hr = pMapLoader->Build_Package(strResolvedManifestPath, &Package);
 
 	if (SUCCEEDED(hr) && MapContentDesc.bHasMapContent)
-		hr = CMap_Override::Apply(&Package, MapContentDesc.OverrideDesc);
+		hr = CMap_EditFile::Apply_Change(&Package, MapContentDesc.OverrideDesc);
 
 	if (SUCCEEDED(hr))
 	{
@@ -334,20 +363,8 @@ HRESULT CMap_Loader::Preload_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 	return hr;
 }
 
-HRESULT CMap_Loader::Preload_MapForLevel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
-const _wstring& strFallbackManifestPath, const _wstring& strLevelObjectsPath, _uint iRuntimeLevel)
-{
-	return Preload_Map(pDevice, pContext, strFallbackManifestPath, strLevelObjectsPath, iRuntimeLevel);
-}
-
 HRESULT CMap_Loader::Spawn_Map(const _wstring& strManifestPath, _uint iRuntimeLevel,
-	MAP_LOAD_REPORT* pOutReport, CMapStage** ppOutStage)
-{
-	return Spawn_Map_WithOverride(strManifestPath, iRuntimeLevel, nullptr, pOutReport, ppOutStage);
-}
-
-HRESULT CMap_Loader::Spawn_Map_WithOverride(const _wstring& strManifestPath, _uint iRuntimeLevel,
-	const MAP_OVERRIDE_DESC* pOverrideDesc, MAP_LOAD_REPORT* pOutReport, CMapStage** ppOutStage)
+	MAP_LOAD_RESULT* pOutReport, CMapStage** ppOutStage)
 {
 	if (strManifestPath.empty())
 		return E_FAIL;
@@ -355,13 +372,6 @@ HRESULT CMap_Loader::Spawn_Map_WithOverride(const _wstring& strManifestPath, _ui
 	MAP_PACKAGE Package{};
 	if (!Try_GetMapPackage(strManifestPath, iRuntimeLevel, &Package))
 		return E_FAIL;
-
-	if (pOverrideDesc != nullptr)
-	{
-		const HRESULT hrApply = CMap_Override::Apply(&Package, *pOverrideDesc);
-		if (FAILED(hrApply))
-			return hrApply;
-	}
 
 	MAP_RUNTIME_LEVELS Levels{};
 	MAP_SPAWN_TARGETS Targets{};
@@ -389,11 +399,11 @@ HRESULT CMap_Loader::Spawn_Map(
 	const _wstring& strFallbackManifestPath,
 	const _wstring& strLevelObjectsPath,
 	_uint iRuntimeLevel,
-	MAP_LOAD_REPORT* pOutReport,
+	MAP_LOAD_RESULT* pOutReport,
 	CMapStage** ppOutStage)
 {
 	_wstring strResolvedManifestPath;
-	MAP_LEVEL_CONTENT_DESC MapContentDesc{};
+	MAP_EDIT_DATA MapContentDesc{};
 	json jMapStageOverride = json::object();
 	_bool bHasMapStageOverride = false;
 
@@ -426,30 +436,15 @@ HRESULT CMap_Loader::Spawn_Map(
 	if (bHasMapStageOverride)
 	{
 		CMapStage* pStageToApply = nullptr != ppOutStage ? *ppOutStage : pLocalStage;
-		if (FAILED(CMap_StageOverrideSerializer::Apply(pStageToApply, jMapStageOverride)))
+		if (FAILED(CMap_EditFile::Apply_Stage(pStageToApply, jMapStageOverride)))
 			return E_FAIL;
 	}
 
 	return S_OK;
 }
 
-HRESULT CMap_Loader::Spawn_MapForLevel(
-	const _wstring& strFallbackManifestPath,
-	const _wstring& strLevelObjectsPath,
-	_uint iRuntimeLevel,
-	MAP_LOAD_REPORT* pOutReport,
-	CMapStage** ppOutStage)
-{
-	return Spawn_Map(
-		strFallbackManifestPath,
-		strLevelObjectsPath,
-		iRuntimeLevel,
-		pOutReport,
-		ppOutStage);
-}
-
 HRESULT CMap_Loader::Load_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
-	const _wstring& strManifestPath, _uint iRuntimeLevel, MAP_LOAD_REPORT* pOutReport, CMapStage** ppOutStage)
+	const _wstring& strManifestPath, _uint iRuntimeLevel, MAP_LOAD_RESULT* pOutReport, CMapStage** ppOutStage)
 {
 	if (nullptr == pDevice || nullptr == pContext || strManifestPath.empty())
 		return E_FAIL;
@@ -493,14 +488,14 @@ HRESULT CMap_Loader::Load_MapStage_Runtime(
 	if (!Is_RuntimeLoadContextValid(Context) || strMapManifestPath.empty())
 		return E_FAIL;
 
-	MAP_LEVEL_CONTENT_DESC MapContentDesc{};
+	MAP_EDIT_DATA MapContentDesc{};
 	json jLocalMapStageOverride = json::object();
 	_bool bLocalHasMapStageOverride = false;
 
 	json* pStageOverride = nullptr != pOutMapStageOverride ? pOutMapStageOverride : &jLocalMapStageOverride;
 	_bool* pHasStageOverride = nullptr != pOutHasMapStageOverride ? pOutHasMapStageOverride : &bLocalHasMapStageOverride;
 
-	const HRESULT hrAsset = CMap_OverrideStore::Load_OverrideAsset(
+	const HRESULT hrAsset = CMap_EditFile::Load_EditFile(
 		strMapManifestPath,
 		&MapContentDesc,
 		pStageOverride,
@@ -515,6 +510,9 @@ HRESULT CMap_Loader::Load_MapStage_Runtime(
 
 	MAP_PACKAGE Package{};
 	HRESULT hr = pMapLoader->Build_Package(strMapManifestPath, &Package);
+
+	if (SUCCEEDED(hr) && MapContentDesc.bHasMapContent)
+		hr = CMap_EditFile::Apply_Change(&Package, MapContentDesc.OverrideDesc);
 
 	if (SUCCEEDED(hr))
 	{
@@ -545,7 +543,7 @@ HRESULT CMap_Loader::Load_MapStage_Runtime(
 			if (SUCCEEDED(hr) && *pHasStageOverride)
 			{
 				CMapStage* pStageToApply = nullptr != ppOutStage ? *ppOutStage : pLocalStage;
-				hr = CMap_StageOverrideSerializer::Apply(pStageToApply, *pStageOverride);
+				hr = CMap_EditFile::Apply_Stage(pStageToApply, *pStageOverride);
 			}
 		}
 	}
@@ -557,8 +555,8 @@ HRESULT CMap_Loader::Load_MapStage_Runtime(
 HRESULT CMap_Loader::Load_Env_Runtime(
 	const MAP_RUNTIME_LOAD_CONTEXT& Context,
 	const _wstring& strMapManifestPath,
-	const MAP_OVERRIDE_DESC* pOverrideDesc,
-	MAP_LOAD_REPORT* pOutReport,
+	const MAP_EDIT_CHANGE* pOverrideDesc,
+	MAP_LOAD_RESULT* pOutReport,
 	vector<ENV_OBJECT_DESC>* pOutDeletedEnvDescs,
 	_bool bEnableEnvObjectPicking)
 {
@@ -571,12 +569,12 @@ HRESULT CMap_Loader::Load_Env_Runtime(
 	if (!Is_RuntimeLoadContextValid(Context) || strMapManifestPath.empty())
 		return E_FAIL;
 
-	MAP_LEVEL_CONTENT_DESC LoadedMapContentDesc{};
-	const MAP_OVERRIDE_DESC* pResolvedOverrideDesc = pOverrideDesc;
+	MAP_EDIT_DATA LoadedMapContentDesc{};
+	const MAP_EDIT_CHANGE* pResolvedOverrideDesc = pOverrideDesc;
 
 	if (nullptr == pResolvedOverrideDesc)
 	{
-		const HRESULT hrAsset = CMap_OverrideStore::Load_OverrideAsset(
+		const HRESULT hrAsset = CMap_EditFile::Load_EditFile(
 			strMapManifestPath,
 			&LoadedMapContentDesc);
 
@@ -605,7 +603,7 @@ HRESULT CMap_Loader::Load_Env_Runtime(
 		SpawnPackage.StageDesc = {};
 
 		if (nullptr != pResolvedOverrideDesc)
-			hr = CMap_Override::Apply(&SpawnPackage, *pResolvedOverrideDesc);
+			hr = CMap_EditFile::Apply_Change(&SpawnPackage, *pResolvedOverrideDesc);
 
 		if (SUCCEEDED(hr))
 		{
@@ -632,64 +630,168 @@ HRESULT CMap_Loader::Load_Env_Runtime(
 	return hr;
 }
 
-_uint CMap_Loader::Get_MapPresetCount()
+_uint CMap_Loader::Get_MapCount()
 {
 	return CMap_PresetCatalog::Get_Count();
 }
 
-const _char* CMap_Loader::Get_MapPresetLabel(_uint iPresetIndex)
+const _char* CMap_Loader::Get_MapName(_uint iMapIndex)
 {
-	return CMap_PresetCatalog::Get_Label(iPresetIndex);
+	return CMap_PresetCatalog::Get_Label(iMapIndex);
 }
 
-HRESULT CMap_Loader::Get_MapPresetManifestPath(_uint iPresetIndex, _wstring* pOutManifestPath)
+HRESULT CMap_Loader::Get_MapManifestPath(_uint iMapIndex, _wstring* pOutManifestPath)
 {
-	return CMap_PresetCatalog::Get_ManifestPath(iPresetIndex, pOutManifestPath);
+	return CMap_PresetCatalog::Get_ManifestPath(iMapIndex, pOutManifestPath);
 }
 
 _bool CMap_Loader::Is_MapLayer(const _wstring& strLayerTag)
 {
-	return CMap_LayerPolicy::Is_MapLayer(strLayerTag);
+	return Is_MapLayerInternal(strLayerTag);
 }
 
-HRESULT CMap_Loader::Get_MapOverrideAssetPath(const _wstring& strManifestPath, _wstring* pOutOverridePath)
+HRESULT CMap_Loader::Get_EditFilePath(const _wstring& strManifestPath, _wstring* pOutEditFilePath)
 {
-	return CMap_OverrideStore::Get_OverrideAssetPath(strManifestPath, pOutOverridePath);
+	return CMap_EditFile::Get_EditFilePath(strManifestPath, pOutEditFilePath);
 }
 
-HRESULT CMap_Loader::Load_MapOverrideAsset(const _wstring& strManifestPath, MAP_LEVEL_CONTENT_DESC* pInOutMapContentDesc, json* pOutMapStageOverride, _bool* pOutHasMapStageOverride)
+HRESULT CMap_Loader::Load_EditFile(const _wstring& strManifestPath, MAP_EDIT_DATA* pInOutData, json* pOutStageEdit, _bool* pOutHasStageEdit)
 {
-	return CMap_OverrideStore::Load_OverrideAsset(strManifestPath, pInOutMapContentDesc, pOutMapStageOverride, pOutHasMapStageOverride);
+	return CMap_EditFile::Load_EditFile(strManifestPath, pInOutData, pOutStageEdit, pOutHasStageEdit);
 }
 
-HRESULT CMap_Loader::Save_MapOverrideAsset(const MAP_LEVEL_CONTENT_DESC& MapContentDesc, const CMapStage* pStage)
+HRESULT CMap_Loader::Save_EditFile(const MAP_EDIT_DATA& Data, const CMapStage* pStage)
 {
-	return CMap_OverrideStore::Save_OverrideAsset(MapContentDesc, pStage);
+	return CMap_EditFile::Save_EditFile(Data, pStage);
 }
 
-HRESULT CMap_Loader::Get_MapPresetOverrideAssetPath(_uint iPresetIndex, const _wstring& strManifestPath, _wstring* pOutOverridePath)
+HRESULT CMap_Loader::Get_PresetEditFilePath(_uint iMapIndex, const _wstring& strManifestPath, _wstring* pOutEditFilePath)
 {
-	return CMap_OverrideStore::Get_PresetOverrideAssetPath(iPresetIndex, strManifestPath, pOutOverridePath);
+	return CMap_EditFile::Get_PresetEditFilePath(iMapIndex, strManifestPath, pOutEditFilePath);
 }
 
-HRESULT CMap_Loader::Load_MapPresetOverrideAsset(_uint iPresetIndex, const _wstring& strManifestPath, MAP_LEVEL_CONTENT_DESC* pInOutMapContentDesc, json* pOutMapStageOverride, _bool* pOutHasMapStageOverride)
+HRESULT CMap_Loader::Load_PresetEditFile(_uint iMapIndex, const _wstring& strManifestPath,
+	MAP_EDIT_DATA* pInOutData, json* pOutStageEdit, _bool* pOutHasStageEdit)
 {
-	return CMap_OverrideStore::Load_PresetOverrideAsset(iPresetIndex, strManifestPath, pInOutMapContentDesc, pOutMapStageOverride, pOutHasMapStageOverride);
+	return CMap_EditFile::Load_PresetEditFile(iMapIndex, strManifestPath, pInOutData, pOutStageEdit, pOutHasStageEdit);
 }
 
-HRESULT CMap_Loader::Save_MapPresetOverrideAsset(_uint iPresetIndex, const MAP_LEVEL_CONTENT_DESC& MapContentDesc, const CMapStage* pStage)
+HRESULT CMap_Loader::Save_PresetEditFile(_uint iMapIndex, const MAP_EDIT_DATA& Data, const CMapStage* pStage)
 {
-	return CMap_OverrideStore::Save_PresetOverrideAsset(iPresetIndex, MapContentDesc, pStage);
+	return CMap_EditFile::Save_PresetEditFile(iMapIndex, Data, pStage);
 }
 
-json CMap_Loader::Serialize_MapStageOverride(const CMapStage* pStage)
+HRESULT CMap_Loader::Ready_TexHub(CGameInstance_Proxy* pProxy)
 {
-	return CMap_StageOverrideSerializer::Serialize(pStage);
-}
+	if (nullptr == pProxy || !pProxy->IsConnected())
+	{
+		Log_GameContentError("Ready_TexHub failed: invalid proxy.");
+		return E_FAIL;
+	}
 
-HRESULT CMap_Loader::Apply_MapStageOverride(CMapStage* pStage, const json& jOverride)
-{
-	return CMap_StageOverrideSerializer::Apply(pStage, jOverride);
+	lock_guard<mutex> Lock(g_MapTexHubMutex);
+
+	if (g_bMapTexHubReady)
+		return S_OK;
+
+	unordered_map<wstring, path> TextureID;
+
+	error_code ErrorCode;
+	const path Root(kMapTexPoolRoot);
+	if (!exists(Root, ErrorCode) || ErrorCode)
+	{
+		Log_GameContentError(
+			"Ready_TexHub failed: TexPool root missing or inaccessible. root="
+			+ To_LogPath(Root));
+		return E_FAIL;
+	}
+
+	for (recursive_directory_iterator Iter(
+		Root,
+		directory_options::skip_permission_denied,
+		ErrorCode), End;
+		Iter != End;
+		Iter.increment(ErrorCode))
+	{
+		if (ErrorCode)
+		{
+			Log_GameContentError(
+				"Ready_TexHub failed: directory iteration error. root="
+				+ To_LogPath(Root));
+			break;
+		}
+
+		if (!Iter->is_regular_file())
+			continue;
+
+		const path FilePath = Iter->path();
+		wstring strExt = FilePath.extension().wstring();
+		transform(strExt.begin(), strExt.end(), strExt.begin(),
+			[](wchar_t ch) { return static_cast<wchar_t>(towlower(ch)); });
+
+		if (L".dds" != strExt && L".png" != strExt)
+			continue;
+
+		const wstring strTextureId =
+			Engine::CTexture_Hub::Normalize_TextureName(FilePath.filename().wstring());
+
+		const auto iter = TextureID.find(strTextureId);
+		if (iter == TextureID.end())
+		{
+			TextureID.emplace(strTextureId, FilePath);
+			continue;
+		}
+
+		const bool bExistingDDS = 0 == _wcsicmp(iter->second.extension().c_str(), L".dds");
+		const bool bCurrentDDS = 0 == _wcsicmp(FilePath.extension().c_str(), L".dds");
+
+		if (bExistingDDS == bCurrentDDS)
+		{
+			Log_GameContentError(
+				"Ready_TexHub failed: duplicate texture id. id="
+				+ WstrToStr(strTextureId)
+				+ " existing="
+				+ To_LogPath(iter->second)
+				+ " incoming="
+				+ To_LogPath(FilePath));
+			return E_FAIL;
+		}
+
+		if (bCurrentDDS)
+			iter->second = FilePath;
+	}
+
+	if (ErrorCode)
+		return E_FAIL;
+
+	for (const auto& Pair : TextureID)
+	{
+		TEXTURE_HANDLE Handle = INVALID_TEXTURE_HANDLE;
+		const HRESULT hrLoad = pProxy->LoadOrGet_TextureFromHub(Pair.second.c_str(), &Handle);
+		if (FAILED(hrLoad))
+		{
+			Log_GameContentError(
+				"Ready_TexHub failed: texture load failed. id="
+				+ WstrToStr(Pair.first)
+				+ " path="
+				+ To_LogPath(Pair.second));
+			return hrLoad;
+		}
+
+		const HRESULT hrRegister = pProxy->Register_TextureNameInHub(Pair.first.c_str(), Handle);
+		if (FAILED(hrRegister))
+		{
+			Log_GameContentError(
+				"Ready_TexHub failed: texture name registration failed. id="
+				+ WstrToStr(Pair.first)
+				+ " path="
+				+ To_LogPath(Pair.second));
+			return hrRegister;
+		}
+	}
+
+	g_bMapTexHubReady = true;
+	return S_OK;
 }
 
 void CMap_Loader::Build_DefaultRuntimeLevels(_uint iRuntimeLevel, MAP_RUNTIME_LEVELS* pOutLevels)
@@ -714,16 +816,16 @@ void CMap_Loader::Build_DefaultRuntimeTargets(_uint iRuntimeLevel, MAP_SPAWN_TAR
 	*pOutTargets = {};
 
 	pOutTargets->Stage.iPlaceLevel = iRuntimeLevel;
-	pOutTargets->Stage.pLayerTag = CMap_LayerPolicy::LAYER_MAP_STAGE;
+	pOutTargets->Stage.pLayerTag = kLayerMapStage;
 
 	pOutTargets->EnvStatic.iPlaceLevel = iRuntimeLevel;
-	pOutTargets->EnvStatic.pLayerTag = CMap_LayerPolicy::LAYER_ENV_STATIC;
+	pOutTargets->EnvStatic.pLayerTag = kLayerEnvStatic;
 
 	pOutTargets->EnvInteract.iPlaceLevel = iRuntimeLevel;
-	pOutTargets->EnvInteract.pLayerTag = CMap_LayerPolicy::LAYER_ENV_INTERACT;
+	pOutTargets->EnvInteract.pLayerTag = kLayerEnvInteract;
 
 	pOutTargets->EnvEffect.iPlaceLevel = iRuntimeLevel;
-	pOutTargets->EnvEffect.pLayerTag = CMap_LayerPolicy::LAYER_ENV_EFFECT;
+	pOutTargets->EnvEffect.pLayerTag = kLayerEnvEffect;
 
 	pOutTargets->pStageObjectTag = L"MapStage";
 }

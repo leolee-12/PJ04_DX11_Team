@@ -112,8 +112,8 @@ HRESULT CTestTriggerBox::Ready_TriggerCollider()
 void CTestTriggerBox::Build_DefaultDesc(ENV_OBJECT_DESC* pOutDesc)
 {
 	pOutDesc->eKind = ENV_OBJECT_KIND::EFFECT;
-	pOutDesc->strObjectName = L"TestEnvTrigger";
-	pOutDesc->strComponentName = L"TestEnvTrigger";
+	pOutDesc->wstrObjectName = L"TestEnvTrigger";
+	pOutDesc->wstrComponentName = L"TestEnvTrigger";
 	pOutDesc->vPosition = { 0.f, 0.f, 0.f };
 	pOutDesc->vRotation = { 0.f, 0.f, 0.f, 1.f };
 	pOutDesc->vScale = { 1.f, 1.f, 1.f };

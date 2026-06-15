@@ -1,7 +1,7 @@
 #include "GameInstance_Proxy.h"
 #include "GameInstance.h"
 #include "Target_Manager.h"
-#include "Frustum_Manager.h"
+#include "Culling_Manager.h"
 #include "Light_Manager.h"
 #include "Renderer.h"
 #include "Shadow_Dir.h"
@@ -77,6 +77,13 @@ _int CGameInstance_Proxy::RandomInt(_int iMin, _int iMax) const
 		return 0;
 
 	return m_pOwner->RandomInt(iMin, iMax);
+}
+_int64 CGameInstance_Proxy::Get_FrameIndex()
+{
+	if (!IsConnected())
+		return 0;
+
+	return m_pOwner->Get_FrameIndex();
 }
 #pragma endregion
 
@@ -891,6 +898,22 @@ HRESULT CGameInstance_Proxy::LoadOrGet_TextureFromHub(const _tchar* pTexturePath
 		return E_FAIL;
 
 	return m_pOwner->LoadOrGet_TextureFromHub(pTexturePath, pOutHandle);
+}
+
+HRESULT CGameInstance_Proxy::Register_TextureNameInHub(const _tchar* pTextureName, TEXTURE_HANDLE Handle)
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->Register_TextureNameInHub(pTextureName, Handle);
+}
+
+HRESULT CGameInstance_Proxy::Get_TextureFromHub(const _tchar* pTextureName, TEXTURE_HANDLE* pOutHandle) const
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->Get_TextureFromHub(pTextureName, pOutHandle);
 }
 
 HRESULT CGameInstance_Proxy::Bind_TextureFromHub(CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle)

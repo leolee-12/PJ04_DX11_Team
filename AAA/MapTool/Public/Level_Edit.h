@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "MapTool_Defines.h"
 #include "Level.h"
-#include "Map_LevelContent.h"
+#include "Map_LoadTypes.h"
 
 NS_BEGIN(Engine)
 class CGameObject;
@@ -11,6 +11,7 @@ NS_END
 NS_BEGIN(Client)
 class CLumia;
 class CMapStage;
+class CMapSection;
 class CMap_EditSession;
 NS_END
 
@@ -73,6 +74,14 @@ public:
 	}
 
 	const CMap_EditSession* Get_MapPreviewSession() const { return m_pMapPreviewSession; }
+
+	_bool Track_EditedMapPreviewEnvObject(CGameObject* pObject, const MAP_ENV_EDITED_DESC& Edit);
+	_bool Clear_EditedMapPreviewEnvObject(CGameObject* pObject);
+	_bool Try_GetMapPreviewEnvEdit(CGameObject* pObject, MAP_ENV_EDITED_DESC* pOutEdit) const;
+	_bool Track_EditedMapPreviewSection(const _wstring& strSectionKey, const MAP_ENV_EDITED_DESC& Edit);
+	_bool Clear_EditedMapPreviewSection(const _wstring& strSectionKey);
+	_bool Try_GetMapPreviewSectionEdit(const _wstring& strSectionKey, MAP_ENV_EDITED_DESC* pOutEdit) const;
+
 	HRESULT Restore_DeletedMapPreviewEnv(const _wstring& strStableKey);
 	HRESULT Restore_AllDeletedMapPreviewEnv();
 	HRESULT Save_MapOverride();
@@ -128,14 +137,13 @@ private:
 	void Clear_MapPreviewLayer(const _wstring& strLayerTag);
 	void Add_MapPreviewObjectHandle(const _wstring& strPrototypeTag, const _wstring& strLayerTag,
 		const _wstring& strObjectTag, CGameObject* pObject);
-	static void On_MapPreviewObjectCreated(void* pContext, CGameObject* pObject,
-		const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);
-	static void On_EnvObjectCreated(void* pContext, CGameObject* pObject,
-		const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);
+	static void On_MapPreviewObjectCreated(void* pContext, CGameObject* pObject, const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);
+	static void On_EnvObjectCreated(void* pContext, CGameObject* pObject, const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);
 
 	HRESULT Prepare_MapContentForPreviewLoad(_uint iPresetIndex, _bool bPresetChanged, _bool bPreserveEnvRuntimeState);
-	MAP_LEVEL_CONTENT_DESC Build_MapPreviewContentDescSnapshot() const;
-	void    Apply_MapPreviewContentDesc(const MAP_LEVEL_CONTENT_DESC& Desc, _bool bPreserveRuntimeState = false);
+	MAP_EDIT_DATA Build_MapPreviewContentDescSnapshot() const;
+	void    Apply_MapPreviewContentDesc(const MAP_EDIT_DATA& Desc, _bool bPreserveRuntimeState = false);
+	_wstring Make_MapPreviewSectionKey(const CMapSection* pSection) const;
 	const _wstring& Get_MapPreviewLoadedStageNameRef() const;
 	_uint   Get_MapPreviewEnvCreatedCountInternal() const;
 	void    Set_MapPreviewStageRuntime(_bool bLoaded, const wstring& strStageName = L"");

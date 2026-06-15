@@ -4,7 +4,7 @@
 NS_BEGIN(Engine)
 class CGameInstance_Proxy;
 
-class ENGINE_DLL CFrustum_Manager final : public CBase
+class ENGINE_DLL CCulling_Manager final : public CBase
 {
 public:
 	struct FRUSTUM_VIEW_STATE
@@ -15,8 +15,8 @@ public:
 	};
 
 private:
-	CFrustum_Manager();
-	virtual ~CFrustum_Manager() = default;
+	CCulling_Manager();
+	virtual ~CCulling_Manager() = default;
 
 public:
 	HRESULT Initialize();
@@ -49,7 +49,7 @@ private:
 #endif
 
 public:
-	static CFrustum_Manager* Create();
+	static CCulling_Manager* Create();
 
 public:
 	virtual void Free() override;

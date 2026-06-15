@@ -175,8 +175,8 @@ HRESULT CMap_ModelResolver::Build_EnvModelCache(const _wstring& strStageFolderNa
 			continue;
 
 		ENV_MODEL_ENTRY Entry{};
-		Entry.strModelPath = FilePath.wstring();
-		Entry.strModelProtoTag = Make_EnvModelProtoTag(Root, FilePath);
+		Entry.wstrModelPath = FilePath.wstring();
+		Entry.wstrModelProtoTag = Make_EnvModelProtoTag(Root, FilePath);
 
 		m_EnvModelCache.emplace(strStem, move(Entry));
 	}
@@ -189,28 +189,28 @@ _bool CMap_ModelResolver::Resolve_EnvObject(ENV_OBJECT_DESC* pDesc)
 	if (nullptr == pDesc)
 		return false;
 
-	pDesc->strModelPath.clear();
-	pDesc->strModelProtoTag.clear();
+	pDesc->wstrModelPath.clear();
+	pDesc->wstrModelProtoTag.clear();
 
-	if (pDesc->strObjectName.empty())
+	if (pDesc->wstrObjectName.empty())
 		return false;
 
-	if (Resolve_EnvByKey(pDesc->strObjectName, pDesc))
+	if (Resolve_EnvByKey(pDesc->wstrObjectName, pDesc))
 		return true;
 
-	if (pDesc->strObjectName.size() > 1 && L'L' == pDesc->strObjectName.back())
+	if (pDesc->wstrObjectName.size() > 1 && L'L' == pDesc->wstrObjectName.back())
 	{
 		const _wstring strTrimmedName =
-			pDesc->strObjectName.substr(0, pDesc->strObjectName.size() - 1);
+			pDesc->wstrObjectName.substr(0, pDesc->wstrObjectName.size() - 1);
 
 		if (Resolve_EnvByKey(strTrimmedName, pDesc))
 		{
-			if (Get_TrimmedResolveLogSet().insert(pDesc->strObjectName).second)
+			if (Get_TrimmedResolveLogSet().insert(pDesc->wstrObjectName).second)
 			{
 				Log_GameContentInfo(
-					"EnvObject trimmed model match: object=" + WstrToStr(pDesc->strObjectName)
+					"EnvObject trimmed model match: object=" + WstrToStr(pDesc->wstrObjectName)
 					+ " model=" + WstrToStr(strTrimmedName)
-					+ " path=" + WstrToStr(pDesc->strModelPath));
+					+ " path=" + WstrToStr(pDesc->wstrModelPath));
 			}
 
 			return true;
@@ -275,8 +275,8 @@ _bool CMap_ModelResolver::Resolve_EnvByKey(const _wstring& strKey, ENV_OBJECT_DE
 	if (Iter == m_EnvModelCache.end())
 		return false;
 
-	pDesc->strModelPath = Iter->second.strModelPath;
-	pDesc->strModelProtoTag = Iter->second.strModelProtoTag;
+	pDesc->wstrModelPath = Iter->second.wstrModelPath;
+	pDesc->wstrModelProtoTag = Iter->second.wstrModelProtoTag;
 	return true;
 }
 

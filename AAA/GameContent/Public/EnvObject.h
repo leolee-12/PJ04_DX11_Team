@@ -44,11 +44,13 @@ public:
 	_bool   Is_Visible_Shadow() const { return m_bVisibleShadow; }
 
 	const ENV_OBJECT_DESC& Get_Desc() const { return m_tDesc; }
+	const BoundingBox& Get_WorldBounds() const { return m_WorldBounds; }
+	_float Get_Dissolve() const { return m_fDissolve; }
 
 	virtual _bool XM_CALLCONV Pick_Ray(_fvector vOrigin,_fvector vDir, _float3* pOutHit, _float* pOutDistance);
 
 protected:
-	HRESULT Ready_RenderComponents(_uint iModelProtoLevel, const wstring& strModelProtoTag);
+	HRESULT Ready_RenderComponents(_uint iModelProtoLevel, const wstring& wstrModelProtoTag);
 	HRESULT Ready_PhysicsActor();
 	HRESULT Ready_PhysicsActor_ModelMesh();
 	void	Release_PhysicsActor();
@@ -70,8 +72,9 @@ protected:
 
 	BoundingBox		m_LocalBounds = {};
 	BoundingBox		m_WorldBounds = {};
-	_bool			m_bVisible = { true };
-	_bool			m_bVisibleShadow = { true };
+	_bool			m_bTransformDirty = { true };
+	_bool			m_bVisible = { false };
+	_bool			m_bVisibleShadow = { false };
 	_bool			m_bDebugDraw = { false };
 
 	// 디더링관련
