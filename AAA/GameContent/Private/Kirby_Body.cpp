@@ -154,6 +154,10 @@ HRESULT CKirby_Body::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
         return E_FAIL;
 
+    _uint iID = KIRBY_SILHOUETTE_ID;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &iID, sizeof(_uint)))) // ¡ç Ãß°¡
+        return E_FAIL;
+
     return S_OK;
 }
 
