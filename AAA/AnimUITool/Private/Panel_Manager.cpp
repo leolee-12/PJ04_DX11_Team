@@ -6,6 +6,7 @@
 #include "UIContainerObject.h"
 #include "ContainerObject.h"
 #include "PartObject.h"
+#include "GameInstance.h"
 
 #include "Panel_Hierarchy.h"
 #include "Panel_Viewport.h"
@@ -19,8 +20,6 @@
 #include "Panel_Palette.h"
 
 #include "Level_Tool.h"
-
-#include "GameInstance.h"
 
 
 CPanel_Manager::CPanel_Manager(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -127,6 +126,19 @@ void CPanel_Manager::Set_Selected(Engine::CGameObject* pObject)
 
 void CPanel_Manager::Clear_Selected()
 {
+    if (m_Context.pOwner == m_pSelected)
+    {
+        m_Context.pOwner = nullptr;
+        m_Context.pModel = nullptr;
+        m_Context.pAnimator = nullptr;
+        m_Context.strName.clear();
+        m_Context.strModelPath.clear();
+        m_Context.iClip = 0;
+        m_Context.fProgress = 0.f;
+        m_Context.iRootBone = -1;
+        m_Context.iSelBone = -1;
+    }
+
     Safe_Release(m_pSelected);
     m_pSelected = nullptr;
 }
@@ -328,7 +340,7 @@ void CPanel_Manager::Render_ModeBar()
     if (ImGui::RadioButton("UI", iMode == ETOI(TOOL_MODE::UI)))
         m_eWorkMode = TOOL_MODE::UI;
 
-    /*ImGui::SameLine();
+    ImGui::SameLine();
     if (ImGui::Button("Load Kirby (Test)"))
     {
         if (m_pLevel)
@@ -339,7 +351,7 @@ void CPanel_Manager::Render_ModeBar()
             //m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby.ysh";
             m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby_AllAbilities.ysh";
         }
-    }*/
+    }
     if (m_bKeyInputEnabled)
     {
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.7f, 0.2f, 1.f));
@@ -359,6 +371,14 @@ void CPanel_Manager::Render_ModeBar()
             m_pGameInstance_Proxy->Enable_InputDeveice();
         }
         ImGui::PopStyleColor();
+    }
+
+    ImGui::SameLine();
+
+    _bool bEditMode = m_pGameInstance_Proxy->Is_EditMode();
+    if (ImGui::Checkbox("EditMode", &bEditMode))
+    {
+        m_pGameInstance_Proxy->Set_EditMode(bEditMode);
     }
 
 
@@ -418,6 +438,7 @@ void CPanel_Manager::Free()
     m_Panels.clear();
 
     Safe_Release(m_pGameInstance_Proxy);
+
     Safe_Release(m_pDevice);
     Safe_Release(m_pContext);
 }

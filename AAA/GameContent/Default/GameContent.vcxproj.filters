@@ -193,12 +193,6 @@
     <Filter Include="99. Defines\Hojun\UI">
       <UniqueIdentifier>{cd0a7659-a8f0-4741-aa44-321f59e15d07}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\UI\Component\Animator">
-      <UniqueIdentifier>{a0cc2fa3-e859-4ce0-bc75-268a9cc6fb1d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\UI\Component\GaugeBar">
-      <UniqueIdentifier>{0319824c-67e9-4142-8520-2c3bc1d47add}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\02. EnvObject\Instance">
       <UniqueIdentifier>{9df9d2af-5f82-4056-9d63-b9f7cc4c1544}</UniqueIdentifier>
     </Filter>
@@ -351,6 +345,39 @@
     </Filter>
     <Filter Include="00. GameObject\06. Monster\Monster">
       <UniqueIdentifier>{7196c9f0-18a4-446e-b8e7-f2b9e35a32f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\Monster\00. System">
+      <UniqueIdentifier>{e318a0dd-87ae-4e91-ab68-74f564cf6724}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\Monster\00. System\Brain">
+      <UniqueIdentifier>{c1437e9b-08e1-4763-a0a8-35f2b12048d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\Monster\00. System\Brain\FSM">
+      <UniqueIdentifier>{94a92ea9-a60f-4600-bf61-99e593e73b26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\Monster\00. System\BlackBoard">
+      <UniqueIdentifier>{60eff175-b76d-44ed-a351-e638ac90bdd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\Monster\01. StateMachine">
+      <UniqueIdentifier>{3d357cde-48bd-488a-95fd-c617d39c5ca9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\Monster\01. StateMachine\State">
+      <UniqueIdentifier>{09d66da9-60df-4b70-88a5-153a30f2860f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\Monster\01. StateMachine\State\Idle">
+      <UniqueIdentifier>{af961803-89ee-48cf-a95d-f5aa43e4dc67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\Monster\01. StateMachine\State\Chase">
+      <UniqueIdentifier>{6da6736c-3c15-42e6-81b1-ace04a07f7a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\98. Component\01. Monster_Movement">
+      <UniqueIdentifier>{0ec1c291-b11e-4b89-9dd5-3440689cb4ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\Monster\01. StateMachine\State\Attack">
+      <UniqueIdentifier>{945dd069-9a1e-4dcf-baa7-c12663e765c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\Monster\01. StateMachine\State\Find">
+      <UniqueIdentifier>{b46f9754-404f-45d1-82fc-a81c412c5842}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -693,6 +720,36 @@
     <ClInclude Include="..\Public\Map_EditFile.h">
       <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Monster_BlackBoard.h">
+      <Filter>00. GameObject\06. Monster\Monster\00. System\BlackBoard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_Brain.h">
+      <Filter>00. GameObject\06. Monster\Monster\00. System\Brain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_Brain_FSM.h">
+      <Filter>00. GameObject\06. Monster\Monster\00. System\Brain\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_State_Idle.h">
+      <Filter>00. GameObject\06. Monster\Monster\01. StateMachine\State\Idle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_State_Chase.h">
+      <Filter>00. GameObject\06. Monster\Monster\01. StateMachine\State\Chase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_State.h">
+      <Filter>00. GameObject\06. Monster\Monster\01. StateMachine\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_StateMachine.h">
+      <Filter>00. GameObject\06. Monster\Monster\01. StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_Movement.h">
+      <Filter>00. GameObject\98. Component\01. Monster_Movement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BladeKnight_Sword.h">
+      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\Parts\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_State_Attack.h">
+      <Filter>00. GameObject\06. Monster\Monster\01. StateMachine\State\Attack</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -979,6 +1036,33 @@
     </ClCompile>
     <ClCompile Include="..\Private\Map_EditFile.cpp">
       <Filter>97. DataSystem\MapLoader\API</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_Brain.cpp">
+      <Filter>00. GameObject\06. Monster\Monster\00. System\Brain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_Brain_FSM.cpp">
+      <Filter>00. GameObject\06. Monster\Monster\00. System\Brain\FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_State_Idle.cpp">
+      <Filter>00. GameObject\06. Monster\Monster\01. StateMachine\State\Idle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_State_Chase.cpp">
+      <Filter>00. GameObject\06. Monster\Monster\01. StateMachine\State\Chase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_State.cpp">
+      <Filter>00. GameObject\06. Monster\Monster\01. StateMachine\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_StateMachine.cpp">
+      <Filter>00. GameObject\06. Monster\Monster\01. StateMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_Movement.cpp">
+      <Filter>00. GameObject\98. Component\01. Monster_Movement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BladeKnight_Sword.cpp">
+      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\Parts\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_State_Attack.cpp">
+      <Filter>00. GameObject\06. Monster\Monster\01. StateMachine\State\Attack</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

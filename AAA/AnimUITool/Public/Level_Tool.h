@@ -8,6 +8,11 @@ class CUIContainerObject;
 class CUIPartObject;
 NS_END
 
+NS_BEGIN(physx)
+class PxTriangleMesh;
+class PxRigidStatic;
+NS_END
+
 NS_BEGIN(AnimUITool)
 
 class CEditCamera;
@@ -65,6 +70,9 @@ public:
 private:
     CEditCamera*                m_pCamera = { nullptr };
     CEdit_Grid*                 m_pGrid = { nullptr };
+    physx::PxTriangleMesh*      m_pTestGroundMesh = { nullptr };
+    physx::PxRigidStatic*       m_pTestGroundActor = { nullptr };
+
     CGameObject*                m_pPreview = { nullptr };
     map<_wstring, _wstring>     m_ModelTags;
     _uint                       m_iTagCounter = { 0 };
@@ -83,6 +91,8 @@ private:
     HRESULT                     Ready_Lights();
     HRESULT                     Ready_Camera();
     HRESULT                     Ready_Grid();
+    HRESULT                     Ready_TestGround();
+    void                        Release_TestGround();
     HRESULT                     Ready_PreviewShaders();
 
     void                        Track_UIContainer(CGameObject* pObject, const _wstring& strPath, const _float2& vDesignSize);

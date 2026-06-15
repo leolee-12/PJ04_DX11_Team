@@ -26,6 +26,7 @@
 #include "UI_Eraser.h"
 #include "UI_SpriteAnimCurtain.h"
 #include "UI_CurtainTexture.h"
+#include "PhysX_Manager.h"
 
 namespace
 {
@@ -66,6 +67,9 @@ HRESULT CLevel_Tool::Initialize()
         return E_FAIL;
 
     if (FAILED(Ready_Grid()))
+        return E_FAIL;
+
+    if (FAILED(Ready_TestGround()))
         return E_FAIL;
 
     if (FAILED(Ready_PreviewShaders()))
@@ -125,6 +129,60 @@ HRESULT CLevel_Tool::Ready_Grid()
 {
     m_pGrid = CEdit_Grid::Create(m_pDevice, m_pContext, 100, 1.f);
     return (m_pGrid == nullptr) ? E_FAIL : S_OK;
+}
+
+HRESULT CLevel_Tool::Ready_TestGround()
+{
+    Release_TestGround();
+
+    const _float fHalfSize = 50.f;
+
+    const _float3 vPositions[] =
+    {
+        { -fHalfSize, 0.f, -fHalfSize },
+        { -fHalfSize, 0.f,  fHalfSize },
+        {  fHalfSize, 0.f,  fHalfSize },
+        {  fHalfSize, 0.f, -fHalfSize },
+    };
+
+    const _uint iIndices[] =
+    {
+        0, 1, 2,
+        0, 2, 3,
+    };
+
+    m_pTestGroundMesh = m_pGameInstance_Proxy->Cook_TriangleMesh(
+        vPositions,
+        static_cast<_uint>(_countof(vPositions)),
+        iIndices,
+        static_cast<_uint>(_countof(iIndices)),
+        false);
+
+    if (nullptr == m_pTestGroundMesh)
+        return E_FAIL;
+
+    m_pTestGroundActor = m_pGameInstance_Proxy->Create_StaticActor(
+        m_pTestGroundMesh,
+        XMMatrixIdentity());
+
+    if (nullptr == m_pTestGroundActor)
+    {
+        PX_RELEASE(m_pTestGroundMesh);
+        return E_FAIL;
+    }
+
+    return S_OK;
+}
+
+void CLevel_Tool::Release_TestGround()
+{
+    if (nullptr != m_pTestGroundActor)
+    {
+        m_pGameInstance_Proxy->Remove_StaticActor(m_pTestGroundActor);
+        m_pTestGroundActor = nullptr;
+    }
+
+    PX_RELEASE(m_pTestGroundMesh);
 }
 
 HRESULT CLevel_Tool::Ready_PreviewShaders()
@@ -1292,6 +1350,8 @@ CLevel_Tool* CLevel_Tool::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 void CLevel_Tool::Free()
 {
+    Release_TestGround();
+
     __super::Free();
 
     m_UIContainers.clear();

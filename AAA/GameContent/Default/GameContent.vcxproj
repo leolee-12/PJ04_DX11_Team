@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\BladeKnight_Body.h" />
+    <ClInclude Include="..\Public\BladeKnight_Sword.h" />
     <ClInclude Include="..\Public\Camera_AreaData.h" />
     <ClInclude Include="..\public\Camera_AreaCam.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
@@ -60,6 +61,15 @@
     <ClInclude Include="..\Public\Map_PresetCatalog.h" />
     <ClInclude Include="..\Public\BladeKnight.h" />
     <ClInclude Include="..\Public\Monster.h" />
+    <ClInclude Include="..\Public\Monster_BlackBoard.h" />
+    <ClInclude Include="..\Public\Monster_Brain.h" />
+    <ClInclude Include="..\Public\Monster_Brain_FSM.h" />
+    <ClInclude Include="..\Public\Monster_Movement.h" />
+    <ClInclude Include="..\Public\Monster_State.h" />
+    <ClInclude Include="..\Public\Monster_StateMachine.h" />
+    <ClInclude Include="..\Public\Monster_State_Attack.h" />
+    <ClInclude Include="..\Public\Monster_State_Chase.h" />
+    <ClInclude Include="..\Public\Monster_State_Idle.h" />
     <ClInclude Include="..\Public\Movement_Child.h" />
     <ClInclude Include="..\public\UI_Curtain.h" />
     <ClInclude Include="..\public\UI_CurtainAnimBase.h" />
@@ -138,6 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\BladeKnight_Body.cpp" />
+    <ClCompile Include="..\Private\BladeKnight_Sword.cpp" />
     <ClCompile Include="..\Private\Camera_AreaSolver.cpp" />
     <ClCompile Include="..\private\Camera_AreaCam.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
@@ -170,6 +181,14 @@
     <ClCompile Include="..\Private\Map_PresetCatalog.cpp" />
     <ClCompile Include="..\Private\BladeKnight.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
+    <ClCompile Include="..\Private\Monster_Brain.cpp" />
+    <ClCompile Include="..\Private\Monster_Brain_FSM.cpp" />
+    <ClCompile Include="..\Private\Monster_Movement.cpp" />
+    <ClCompile Include="..\Private\Monster_State.cpp" />
+    <ClCompile Include="..\Private\Monster_StateMachine.cpp" />
+    <ClCompile Include="..\Private\Monster_State_Attack.cpp" />
+    <ClCompile Include="..\Private\Monster_State_Chase.cpp" />
+    <ClCompile Include="..\Private\Monster_State_Idle.cpp" />
     <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />
     <ClCompile Include="..\private\UI_Curtain.cpp" />
