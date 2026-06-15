@@ -210,6 +210,9 @@ HRESULT CRenderer::Draw()
     if (FAILED(Render_Blend()))
         return E_FAIL;
 
+    if (FAILED(Render_Occlusion()))
+        return E_FAIL;
+
     if (FAILED(Render_UI_BACK()))
         return E_FAIL;
     if (FAILED(Render_UI_MIDDLE()))
@@ -824,6 +827,30 @@ HRESULT CRenderer::Render_Blend()
     }
 
     m_RenderObjects[ETOUI(RENDERID::BLEND)].clear();
+
+    return S_OK;
+}
+
+HRESULT CRenderer::Render_Occlusion()
+{
+    if (FAILED(m_pShaderPost->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+        return E_FAIL;
+    if (FAILED(m_pShaderPost->Bind_Matrix("g_ViewMatrix",
+        m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::ORTHO))))
+        return E_FAIL;
+    if (FAILED(m_pShaderPost->Bind_Matrix("g_ProjMatrix",
+        m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::ORTHO))))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_MRA"), m_pShaderPost, "g_MRATexture")))
+        return E_FAIL;
+
+    if (FAILED(m_pVIBuffer->Bind_Resources()))
+        return E_FAIL;
+    if (FAILED(m_pShaderPost->Begin(ETOUI(POSTPROSESS::OCCLUSION_SILHOUETTE))))
+        return E_FAIL;
+    if (FAILED(m_pVIBuffer->Render()))
+        return E_FAIL;
 
     return S_OK;
 }

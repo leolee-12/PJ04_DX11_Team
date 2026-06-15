@@ -32,6 +32,7 @@ protected:
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
+	virtual void	Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_Shadow() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
@@ -74,6 +75,12 @@ protected:
 	_bool			m_bVisible = { false };
 	_bool			m_bVisibleShadow = { false };
 	_bool			m_bDebugDraw = { false };
+
+	// 디더링관련
+	_bool m_bUseCameraDither = { false }; // 객체 디더 사용 여부
+	_float m_fDitherNear = { 4.f };		  // 이보다 가까우면 완전투명 (1)
+	_float m_fDitherFar = { 12.f };		  // 이보다 멀면 디더 없음 (0)
+	_float m_fDissolve = { 0.f };		  // 계산된 디졸브 값 (0~1)
 
 private:
 	void Apply_TransformFromDesc();

@@ -40,6 +40,7 @@ namespace ShaderPass
 		inline constexpr _uint Diffuse = 1;
 		inline constexpr _uint Shadow = 2;
 		inline constexpr _uint White = 3;
+		inline constexpr _uint Dither = 4;
 	}
 }
 
