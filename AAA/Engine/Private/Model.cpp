@@ -574,24 +574,31 @@ HRESULT CModel::Save_MeshLayers() const
     for (size_t i = 0; i < m_MeshLayers.size(); ++i)
     {
         const MESH_LAYER_IDX& m = m_MeshLayers[i];
-
         json jMesh;
 
         if (m.iPass >= 0)
             jMesh["Pass"] = m.iPass;
+
+        if (m.iUVIndex != 0)
+            jMesh["UVIndex"] = m.iUVIndex;
+
+        if (m.iFlags != 0)
+            jMesh["Flags"] = m.iFlags;
 
         for (_uint t = 0; t < MTEX_TYPE_MAX; ++t)
         {
             if (m.idx[t] != 0)
                 jMesh[to_string(t)] = m.idx[t];
         }
-        if (!jMesh.empty())                   
+
+        if (!jMesh.empty())
             j[to_string(i)] = jMesh;
     }
 
     ofstream fout(m_strMeshLayerPath);
     if (!fout.is_open())
         return E_FAIL;
+
     fout << j.dump(2);
     return S_OK;
 }
@@ -776,18 +783,39 @@ void CModel::Load_MeshLayers(const _char* pModelFilePath)
         catch (...) { continue; }
         if (i >= m_iNumMeshes) continue;
 
-        if (meshItem.value().contains("Pass") && meshItem.value()["Pass"].is_number_integer())
-            m_MeshLayers[i].iPass = meshItem.value()["Pass"].get<int>();
+        const json& jMesh = meshItem.value();
 
-        for (auto& texItem : meshItem.value().items())
+        if (jMesh.contains("Pass") && jMesh["Pass"].is_number_integer())
+            m_MeshLayers[i].iPass = jMesh["Pass"].get<int>();
+
+        if (jMesh.contains("UVIndex") && jMesh["UVIndex"].is_number_integer())
         {
-            if (texItem.key() == "Pass")
+            const int iUVIndex = jMesh["UVIndex"].get<int>();
+            if (0 <= iUVIndex && iUVIndex <= 3)
+                m_MeshLayers[i].iUVIndex = static_cast<_uint>(iUVIndex);
+        }
+
+        if (jMesh.contains("Flags") && jMesh["Flags"].is_number_integer())
+        {
+            const int iFlags = jMesh["Flags"].get<int>();
+            if (0 <= iFlags)
+                m_MeshLayers[i].iFlags = static_cast<_uint>(iFlags);
+        }
+
+        for (auto& texItem : jMesh.items())
+        {
+            if (texItem.key() == "Pass"
+                || texItem.key() == "UVIndex"
+                || texItem.key() == "Flags")
+            {
                 continue;
+            }
 
             _uint t = 0;
             try { t = (_uint)stoul(texItem.key()); }
             catch (...) { continue; }
             if (t >= MTEX_TYPE_MAX) continue;
+
             m_MeshLayers[i].idx[t] = texItem.value().get<_uint>();
         }
     }

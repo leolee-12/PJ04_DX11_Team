@@ -32,6 +32,7 @@ private:
 
 private:
 	void Submit_RenderGroups();
+	_bool Should_BypassMainInstance() const;
 
 public:
 	static CEnvObject_Static* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

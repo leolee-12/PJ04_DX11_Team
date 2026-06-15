@@ -83,6 +83,8 @@ namespace Engine
 	struct MESH_LAYER_IDX
 	{
 		int           iPass = -1;                   // -1 = renderer default
+		unsigned int  iUVIndex = 0;                 // TEXCOORD0 ~ TEXCOORD3
+		unsigned int  iFlags = 0;                   // shader-specific option bits
 		unsigned int  idx[MTEX_TYPE_MAX] = { 0 };   // MTEX_TYPE º° slotArrayIndex
 	};
 

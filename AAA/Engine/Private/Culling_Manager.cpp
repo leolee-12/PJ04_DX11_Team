@@ -80,7 +80,7 @@ void CCulling_Manager::Update()
 	CULLING_VIEW_DESC MainViewDesc{};
 	MainViewDesc.pView = m_pProxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC);
 	MainViewDesc.pProj = m_pProxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
-	MainViewDesc.fCullMargin = 6.f;
+	MainViewDesc.fCullMargin = 12.f;
 	Update_View(CULLING_VIEW::MAIN_CAMERA, MainViewDesc);
 
 	// Shadow_Dir

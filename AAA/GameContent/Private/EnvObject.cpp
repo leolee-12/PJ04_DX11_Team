@@ -27,6 +27,22 @@ namespace
 	}
 #endif
 
+	_uint Resolve_NonAnimEnvPass(const MESH_LAYER_IDX& Layer)
+	{
+		if (Layer.iPass < 0)
+			return ShaderPass::NonAnimPBR::DIFF;
+
+		switch (static_cast<_uint>(Layer.iPass))
+		{
+		case ShaderPass::EnvInst::WHITE:	return ShaderPass::NonAnimPBR::White;
+		case ShaderPass::EnvInst::DIFF:		return ShaderPass::NonAnimPBR::DIFF;
+		case ShaderPass::EnvInst::DMN:		return ShaderPass::NonAnimPBR::DMN;
+		case ShaderPass::EnvInst::UKWN:		return ShaderPass::NonAnimPBR::UKWN;
+		case ShaderPass::EnvInst::UMN:		return ShaderPass::NonAnimPBR::UMN;
+		default:							return ShaderPass::NonAnimPBR::DIFF;
+		}
+	}
+
 	_matrix Build_WorldMatrix_FromTRS(const ENV_OBJECT_DESC& Desc)
 	{
 		const _vector vScale = XMLoadFloat3(&Desc.vScale);
@@ -105,7 +121,7 @@ HRESULT CEnvObject::Initialize(void* pArg)
 	Apply_DescDefaults();
 	Apply_TransformFromDesc();
 
-	m_bUseCameraDither = true;
+	m_bUseCameraDither = m_tDesc.tRender.bUseNearDistAlpha;
 
 	return S_OK;
 }
@@ -164,8 +180,6 @@ _bool XM_CALLCONV CEnvObject::Pick_Ray(_fvector vOrigin, _fvector vDir, _float3*
 		{
 			continue;
 		}
-
-		UNREFERENCED_PARAMETER(fLocalDist);
 
 		const _vector vHitWorld = XMLoadFloat3(&vHit);
 		const _float fWorldDist = XMVectorGetX(
@@ -392,46 +406,39 @@ HRESULT CEnvObject::Render()
 	{
 		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(static_cast<_uint>(i));
 
-		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", static_cast<_uint>(i), MTEX_TYPE::DIFFUSE,
-			Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)])))
+		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", static_cast<_uint>(i), MTEX_TYPE::DIFFUSE, Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)])))
 			int a = 1;/*continue;*/
-		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", static_cast<_uint>(i), MTEX_TYPE::NORMALS,
-			Layer.idx[ETOUI(MTEX_TYPE::NORMALS)])))
+		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", static_cast<_uint>(i), MTEX_TYPE::NORMALS, Layer.idx[ETOUI(MTEX_TYPE::NORMALS)])))
 			int a = 1;/*continue;*/
-		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", static_cast<_uint>(i), MTEX_TYPE::METALNESS,
-			Layer.idx[ETOUI(MTEX_TYPE::METALNESS)])))
+		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", static_cast<_uint>(i), MTEX_TYPE::METALNESS, Layer.idx[ETOUI(MTEX_TYPE::METALNESS)])))
 			int a = 1;/*continue;*/
-		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnknownTexture", static_cast<_uint>(i), MTEX_TYPE::UNKNOWN,
-			Layer.idx[ETOUI(MTEX_TYPE::UNKNOWN)])))
+		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnknownTexture", static_cast<_uint>(i), MTEX_TYPE::UNKNOWN, Layer.idx[ETOUI(MTEX_TYPE::UNKNOWN)])))
 			int a = 1;/*continue;*/
 
-		_uint iPass;
+		const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
+
+		_uint iFlags = Layer.iFlags;
 		if (m_bUseCameraDither)
-		{
-			if (m_fDissolve >= 0.999f)          // 완전히 사라짐 → 그릴 필요 없음
-				continue;
-
-			if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve", &m_fDissolve, sizeof(_float))))
-				return E_FAIL;
-
-			iPass = ShaderPass::NonAnimPBR::Dither;
-		}
+			iFlags |= ShaderPass::EnvInstFlags::Dither;
 		else
-		{
-			iPass = (Layer.iPass >= 0) ? (_uint)Layer.iPass
-				: ShaderPass::NonAnimPBR::Diffuse;
-		}
+			iFlags &= ~ShaderPass::EnvInstFlags::Dither;
+
+		const _bool bUseDither = m_bUseCameraDither;
+
+		if (bUseDither && m_fDissolve >= 0.999f)
+			continue;
+
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint))))
+			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))
+			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve", &m_fDissolve, sizeof(_float))))
+			return E_FAIL;
+
+		const _uint iPass = Resolve_NonAnimEnvPass(Layer);
 
 		if (FAILED(m_pShaderCom->Begin(iPass)))
 			return E_FAIL;
-
-		/* ---- 강제 렌더링 (디버그용) ---- */
-		//if (iPass > ShaderPass::NonAnimPBR::Diffuse)
-		//	iPass = ShaderPass::NonAnimPBR::White;
-		//
-		//if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::White)))
-		//	return E_FAIL;
-		/* -------------------------------- */
 
 		if (FAILED(m_pModelCom->Render(static_cast<_uint>(i))))
 			return E_FAIL;

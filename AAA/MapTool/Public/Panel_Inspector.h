@@ -37,12 +37,15 @@ private:
 	unordered_map<CGameObject*, _float3>	m_RotEditEuler;
 	unordered_map<CGameObject*, _bool>		m_EnvCollisionEditStates;
 	unordered_map<CMapSection*, _bool>		m_SectionCollisionEditStates;
+	unordered_map<CGameObject*, _bool>		m_EnvNearAlphaEditStates;
 
 private:
 	_bool*	Resolve_EnvCollisionEditState(CLevel_Edit* pLevel, CEnvObject* pEnvObject);
 	_bool*	Resolve_SectionCollisionEditState(CLevel_Edit* pLevel, CMapStage* pMapStage, CMapSection* pSection);
+	_bool*	Resolve_EnvNearAlphaEditState(CLevel_Edit* pLevel, CEnvObject* pEnvObject);
 	void	Clear_EnvCollisionEditState(CGameObject* pObject);
 	void	Clear_SectionCollisionEditState(CMapSection* pSection);
+	void	Clear_EnvNearAlphaEditState(CGameObject* pObject);
 
 public:
 	static CPanel_Inspector* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

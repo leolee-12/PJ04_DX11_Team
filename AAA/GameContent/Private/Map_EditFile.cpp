@@ -116,6 +116,7 @@ namespace
 			|| Edit.bHasEnableCulling
 			|| Edit.bHasCastShadow
 			|| Edit.bHasWorldMatrix
+			|| Edit.bHasNearDistAlpha
 			|| Edit.bDisableCollisionMesh;
 	}
 
@@ -145,6 +146,9 @@ namespace
 
 		if (Edit.bDisableCollisionMesh)
 			pOutDesc->tCollision.bInvalidCollision = true;
+
+		if (Edit.bHasNearDistAlpha)
+			pOutDesc->tRender.bUseNearDistAlpha = Edit.bUseNearDistAlpha;
 	}
 
 	void Apply_SectionEditToDesc(MAP_SECTION_DESC* pOutDesc, const MAP_ENV_EDITED_DESC& Edit)
@@ -190,6 +194,9 @@ namespace
 
 		if (Edit.bDisableCollisionMesh)
 			j["CollisionMeshDisabled"] = true;
+
+		if (Edit.bHasNearDistAlpha)
+			j["UseNearDistAlpha"] = static_cast<bool>(Edit.bUseNearDistAlpha);
 
 		return j;
 	}
@@ -250,6 +257,16 @@ namespace
 				return E_FAIL;
 
 			pOutDesc->bDisableCollisionMesh = IterCollisionDisabled->get<bool>();
+		}
+
+		const auto IterNearDistAlpha = jValue.find("UseNearDistAlpha");
+		if (IterNearDistAlpha != jValue.end())
+		{
+			if (!IterNearDistAlpha->is_boolean())
+				return E_FAIL;
+
+			pOutDesc->bHasNearDistAlpha = true;
+			pOutDesc->bUseNearDistAlpha = IterNearDistAlpha->get<bool>();
 		}
 
 		return S_OK;

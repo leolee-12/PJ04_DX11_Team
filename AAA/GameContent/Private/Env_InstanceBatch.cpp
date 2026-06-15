@@ -165,7 +165,6 @@ _bool CEnv_InstanceBatch::Should_Instance() const
 
 	const _uint iMeshCount = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
 	const _uint iSaveDraws = iMeshCount * (iInstanceCount - 1);
-
 	return iSaveDraws >= INSTANCE_MIN_SAVED_DRAWS;
 }
 
@@ -227,9 +226,17 @@ HRESULT CEnv_InstanceBatch::Render_Instanced()
 		m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, Layer.idx[ETOUI(MTEX_TYPE::METALNESS)]);
 		m_pModelCom->Bind_Material(m_pShaderCom, "g_UnknownTexture", i, MTEX_TYPE::UNKNOWN, Layer.idx[ETOUI(MTEX_TYPE::UNKNOWN)]);
 
+		const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
+		const _uint iFlags = Layer.iFlags & ~ShaderPass::EnvInstFlags::Dither;
+
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint))))
+			return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))
+			return E_FAIL;
+
 		const _uint iPass = (Layer.iPass >= 0)
 			? static_cast<_uint>(Layer.iPass)
-			: ShaderPass::NonAnimPBR::Diffuse;
+			: ShaderPass::EnvInst::DIFF;
 
 		if (FAILED(m_pShaderCom->Begin(iPass)))
 			return E_FAIL;
@@ -271,7 +278,7 @@ HRESULT CEnv_InstanceBatch::Render_Shadow_Instanced()
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::Shadow)))
+		if (FAILED(m_pShaderCom->Begin(ShaderPass::EnvInst::SHADOW)))
 			return E_FAIL;
 
 		if(FAILED(m_pModelCom->Render_Instanced(i, m_pInstanceBuffer, sizeof(ENV_INSTANCE_DATA), iInstanceCount)))

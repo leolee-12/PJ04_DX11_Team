@@ -50,6 +50,9 @@ struct MAP_ENV_EDITED_DESC
 	// true일 때만 저장 : 다음 로드 시 충돌 메쉬 생성 X
 	// EnvObject: ENV_OBJECT_DESC.tCollision.bInvalidCollision = true
 	// MapSection: MAP_SECTION_DESC.bCreateCollisionActor = false
+
+	_bool bHasNearDistAlpha = { false };
+	_bool bUseNearDistAlpha = { false };
 };
 
 struct MAP_EDIT_CHANGE

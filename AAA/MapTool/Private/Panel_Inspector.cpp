@@ -3,6 +3,7 @@
 #include "Level_Edit.h"
 #include "Map_EditSession.h"
 
+#include "GameContent_const.h"
 #include "MapStage.h"
 #include "MapSection.h"
 #include "Map_EditFile.h"
@@ -96,6 +97,7 @@ namespace
 			|| Edit.bHasEnableCulling
 			|| Edit.bHasCastShadow
 			|| Edit.bHasWorldMatrix
+			|| Edit.bHasNearDistAlpha
 			|| Edit.bDisableCollisionMesh;
 	}
 
@@ -134,7 +136,7 @@ namespace
 		return true;
 	}
 
-	MAP_ENV_EDITED_DESC Build_EnvEditFromCurrentObject(Client::CEnvObject* pEnvObject)
+	MAP_ENV_EDITED_DESC Build_EnvEditFromCurrentObject(CEnvObject* pEnvObject, _bool bUseNearDistAlpha)
 	{
 		MAP_ENV_EDITED_DESC Edit{};
 		if (nullptr == pEnvObject)
@@ -179,6 +181,13 @@ namespace
 		{
 			Edit.bHasWorldMatrix = true;
 			Edit.matWorld = CurrentWorld;
+		}
+
+		const _bool bBaseUseNearDistAlpha = Desc.tRender.bUseNearDistAlpha;
+		if (bUseNearDistAlpha != bBaseUseNearDistAlpha)
+		{
+			Edit.bHasNearDistAlpha = true;
+			Edit.bUseNearDistAlpha = bUseNearDistAlpha;
 		}
 
 		return Edit;
@@ -253,6 +262,33 @@ namespace
 			Fill_EditWorldMatrix(pSection, &Edit);
 
 		return Edit;
+	}
+
+	int EnvInstPassToComboIndex(int iPass)
+	{
+		switch (iPass)
+		{
+		case -1: return 0;
+		case ShaderPass::EnvInst::WHITE: return 1;
+		case ShaderPass::EnvInst::DIFF:  return 2;
+		case ShaderPass::EnvInst::DMN:   return 3;
+		case ShaderPass::EnvInst::UKWN:  return 4;
+		case ShaderPass::EnvInst::UMN:   return 5;
+		default: return 0;
+		}
+	}
+
+	int ComboIndexToEnvInstPass(int iIndex)
+	{
+		switch (iIndex)
+		{
+		case 1: return ShaderPass::EnvInst::WHITE;
+		case 2: return ShaderPass::EnvInst::DIFF;
+		case 3: return ShaderPass::EnvInst::DMN;
+		case 4: return ShaderPass::EnvInst::UKWN;
+		case 5: return ShaderPass::EnvInst::UMN;
+		default: return -1;
+		}
 	}
 }
 
@@ -521,7 +557,7 @@ _bool CPanel_Inspector::Draw_Transform(CGameObject* pObject, const string& strSu
 
 void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject* pObject)
 {
-	Client::CEnvObject* pEnvObject = dynamic_cast<Client::CEnvObject*>(pObject);
+	Client::CEnvObject* pEnvObject = dynamic_cast<CEnvObject*>(pObject);
 	if (nullptr == pLevel || nullptr == pEnvObject)
 		return;
 
@@ -529,12 +565,11 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 	_bool* pbEnableCulling = FindBoolProperty(pEnvObject, L"Enable Culling", L"EnvObject");
 	_bool* pbCastShadow = FindBoolProperty(pEnvObject, L"Cast Shadow", L"EnvObject");
 	_bool* pbDisableCollisionMesh = Resolve_EnvCollisionEditState(pLevel, pEnvObject);
+	_bool* pbUseNearDistAlpha = Resolve_EnvNearAlphaEditState(pLevel, pEnvObject);
 
-	const _bool bBaseDisableCollisionMesh =
-		pEnvObject->Get_Desc().tCollision.bInvalidCollision;
+	const _bool bBaseDisableCollisionMesh = pEnvObject->Get_Desc().tCollision.bInvalidCollision;
 
-	if (nullptr != pbDisableCollisionMesh && bBaseDisableCollisionMesh)
-		*pbDisableCollisionMesh = true;
+	if (nullptr != pbDisableCollisionMesh && bBaseDisableCollisionMesh) *pbDisableCollisionMesh = true;
 
 	ImGui::TextUnformatted("EnvObject Edit");
 
@@ -557,12 +592,19 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 			"Source env collision is already disabled. Re-enable is not persisted by current override schema.");
 	}
 
+	if (pbUseNearDistAlpha)
+		ImGui::Checkbox("Use Near Dist Alpha##EnvEdit", (bool*)pbUseNearDistAlpha);
+
 	ImGui::TextDisabled("Applied on next env reload.");
 	ImGui::TextDisabled("Restart persistence requires Save Override Now or toolbar Map Edit Save.");
 
 	if (ImGui::Button("Apply Current##EnvEdit"))
 	{
-		MAP_ENV_EDITED_DESC Edit = Build_EnvEditFromCurrentObject(pEnvObject);
+		MAP_ENV_EDITED_DESC Edit = Build_EnvEditFromCurrentObject(
+			pEnvObject,
+			(nullptr != pbUseNearDistAlpha)
+			? *pbUseNearDistAlpha
+			: pEnvObject->Get_Desc().tRender.bUseNearDistAlpha);
 
 		const _bool bDisableCollisionMesh =
 			(nullptr != pbDisableCollisionMesh)
@@ -580,6 +622,7 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 		{
 			pLevel->Clear_EditedMapPreviewEnvObject(pObject);
 			Clear_EnvCollisionEditState(pObject);
+			Clear_EnvNearAlphaEditState(pObject);
 		}
 	}
 
@@ -601,6 +644,7 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 
 		pLevel->Clear_EditedMapPreviewEnvObject(pObject);
 		m_EnvCollisionEditStates.clear();
+		m_EnvNearAlphaEditStates.clear();
 
 		if (0 <= iPresetIndex)
 		{
@@ -721,6 +765,9 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 	if (!ImGui::CollapsingHeader("Mesh Render Settings (per Model)"))
 		return;
 
+	const _bool bEnvObjectMeshUi =
+		nullptr != dynamic_cast<Client::CEnvObject*>(pObject);
+
 	const size_t iNumMeshes = pModel->Get_NumMeshes();
 	for (size_t i = 0; i < iNumMeshes; ++i)
 	{
@@ -732,18 +779,45 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 		_bool bChanged = false;
 		_bool bAnyField = false;
 
-		int iPass = Layer.iPass;
-		ImGui::SetNextItemWidth(120.f);
-		if (ImGui::InputInt("Pass", &iPass))
+		if (bEnvObjectMeshUi)
 		{
-			if (iPass < -1)
-				iPass = -1;
+			static const char* PassItems[] = { "Default", "WHITE", "DIFF", "DMN", "UKWN", "UMN" };
+			int iPassCombo = EnvInstPassToComboIndex(Layer.iPass);
 
-			Layer.iPass = iPass;
-			bChanged = true;
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::Combo("Pass", &iPassCombo, PassItems, IM_ARRAYSIZE(PassItems)))
+			{
+				Layer.iPass = ComboIndexToEnvInstPass(iPassCombo);
+				bChanged = true;
+			}
+
+			static const char* UvItems[] = { "TEXCOORD0", "TEXCOORD1", "TEXCOORD2", "TEXCOORD3" };
+			int iUVIndex = (Layer.iUVIndex <= 3u) ? (int)Layer.iUVIndex : 0;
+
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::Combo("UV", &iUVIndex, UvItems, IM_ARRAYSIZE(UvItems)))
+			{
+				Layer.iUVIndex = (_uint)iUVIndex;
+				bChanged = true;
+			}
+
+			ImGui::TextDisabled("Dither is controlled per object in EnvObject Edit.");
 		}
-		ImGui::SameLine();
-		ImGui::TextDisabled("(-1 = default)");
+		else
+		{
+			int iPass = Layer.iPass;
+			ImGui::SetNextItemWidth(120.f);
+			if (ImGui::InputInt("Pass", &iPass))
+			{
+				if (iPass < -1)
+					iPass = -1;
+
+				Layer.iPass = iPass;
+				bChanged = true;
+			}
+			ImGui::SameLine();
+			ImGui::TextDisabled("(-1 = default)");
+		}
 
 		for (_uint t = 0; t < MTEX_TYPE_MAX; ++t)
 		{
@@ -893,6 +967,28 @@ _bool* CPanel_Inspector::Resolve_SectionCollisionEditState(CLevel_Edit* pLevel, 
 	return &Iter->second;
 }
 
+_bool* CPanel_Inspector::Resolve_EnvNearAlphaEditState(CLevel_Edit* pLevel, CEnvObject* pEnvObject)
+{
+	if (nullptr == pLevel || nullptr == pEnvObject)
+		return nullptr;
+
+	auto Iter = m_EnvNearAlphaEditStates.find(pEnvObject);
+	if (Iter == m_EnvNearAlphaEditStates.end())
+	{
+		MAP_ENV_EDITED_DESC SavedEdit{};
+		const _bool bUseNearDistAlpha =
+			pLevel->Try_GetMapPreviewEnvEdit(pEnvObject, &SavedEdit) && SavedEdit.bHasNearDistAlpha
+			? SavedEdit.bUseNearDistAlpha
+			: pEnvObject->Get_Desc().tRender.bUseNearDistAlpha;
+
+		Iter = m_EnvNearAlphaEditStates.emplace(
+			static_cast<CGameObject*>(pEnvObject),
+			bUseNearDistAlpha).first;
+	}
+
+	return &Iter->second;
+}
+
 void CPanel_Inspector::Clear_EnvCollisionEditState(CGameObject* pObject)
 {
 	if (nullptr != pObject)
@@ -903,6 +999,12 @@ void CPanel_Inspector::Clear_SectionCollisionEditState(CMapSection* pSection)
 {
 	if (nullptr != pSection)
 		m_SectionCollisionEditStates.erase(pSection);
+}
+
+void CPanel_Inspector::Clear_EnvNearAlphaEditState(CGameObject* pObject)
+{
+	if (nullptr != pObject)
+		m_EnvNearAlphaEditStates.erase(pObject);
 }
 
 CPanel_Inspector* CPanel_Inspector::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -41,6 +41,25 @@ namespace ShaderPass
 		inline constexpr _uint Shadow = 2;
 		inline constexpr _uint White = 3;
 		inline constexpr _uint Dither = 4;
+		inline constexpr _uint DIFF = 5;
+		inline constexpr _uint DMN = 6;	// Diffuse MRA Normal
+		inline constexpr _uint UKWN = 7;
+		inline constexpr _uint UMN = 8;	// Unkwown MRA Normal
+	}
+
+	namespace EnvInst
+	{
+		inline constexpr _uint SHADOW = 0;
+		inline constexpr _uint WHITE = 1;
+		inline constexpr _uint DIFF = 2;
+		inline constexpr _uint DMN = 3;	// Diffuse MRA Normal
+		inline constexpr _uint UKWN = 4;
+		inline constexpr _uint UMN = 5;	// Unkwown MRA Normal
+	}
+
+	namespace EnvInstFlags
+	{
+		inline constexpr _uint Dither = 1u << 0;
 	}
 }
 

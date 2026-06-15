@@ -113,12 +113,11 @@ void CEnvObject_Static::Submit_RenderGroups()
 	if (m_bVisible)
 	{
 		_bool bSubmitted = false;
+		const _bool bBypassMainInstance = Should_BypassMainInstance();
 
-		if (Can_RenderInstance() && nullptr != m_pInstanceController)
+		if (!bBypassMainInstance && Can_RenderInstance() && nullptr != m_pInstanceController)
 		{
-			bSubmitted = m_pInstanceController->Submit_Main(
-				m_InstanceBatchHandle.iMainBatchIndex,
-				this);
+			bSubmitted = m_pInstanceController->Submit_Main(m_InstanceBatchHandle.iMainBatchIndex, this);
 		}
 
 		if (!bSubmitted)
@@ -139,6 +138,14 @@ void CEnvObject_Static::Submit_RenderGroups()
 		if (!bSubmittedShadow)
 			m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 	}
+}
+
+_bool CEnvObject_Static::Should_BypassMainInstance() const
+{
+	if (!m_bUseCameraDither)
+		return false;
+
+	return m_fDissolve > 0.0001f;
 }
 
 CEnvObject_Static* CEnvObject_Static::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -45,6 +45,7 @@ public:
 
 	const ENV_OBJECT_DESC& Get_Desc() const { return m_tDesc; }
 	const BoundingBox& Get_WorldBounds() const { return m_WorldBounds; }
+	_float Get_Dissolve() const { return m_fDissolve; }
 
 	virtual _bool XM_CALLCONV Pick_Ray(_fvector vOrigin,_fvector vDir, _float3* pOutHit, _float* pOutDistance);
 
