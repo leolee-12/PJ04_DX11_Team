@@ -16,6 +16,24 @@ float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
 
 uint g_iMaterialID = 0;
 
+float g_fDissolve;
+
+static const float Bayer4x4[16] =
+{
+    0.0  / 16.0, 8.0  / 16.0, 2.0  / 16.0, 10.0 / 16.0,
+    12.0 / 16.0, 4.0  / 16.0, 14.0 / 16.0, 6.0  / 16.0,
+    3.0  / 16.0, 11.0 / 16.0, 1.0  / 16.0, 9.0  / 16.0,
+    15.0 / 16.0, 7.0  / 16.0, 13.0 / 16.0, 5.0  / 16.0
+};
+
+void Apply_Dissolve(float4 vScreenPos)
+{
+    float fVisibility = 1.f - g_fDissolve; 
+    int2 px = int2(vScreenPos.xy) & 3;
+    if (fVisibility <= Bayer4x4[px.y * 4 + px.x])
+        discard; 
+}
+
 struct VS_IN
 {
     float3 vPosition : POSITION;
@@ -163,6 +181,23 @@ PS_OUT PS_DIFFUSE(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_DIFFUSE_DITHER(PS_IN In)
+{
+    Apply_Dissolve(In.vPosition); // 맨 위에서 디더 판정
+
+    PS_OUT Out;
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    if (vMtrlDiffuse.a < 0.1f)
+        discard;
+
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
+    return Out;
+}
+
 PS_OUT PS_WHITE(PS_IN In)
 {
     PS_OUT Out;
@@ -247,5 +282,15 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_WHITE();
+    }
+
+    pass DitherDiffusePass // 4
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DIFFUSE_DITHER();
     }
 }
