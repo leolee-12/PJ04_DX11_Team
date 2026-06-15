@@ -1173,7 +1173,11 @@ void CLevel_Tool::Set_PreviewVisible(_bool bVisible)
 CGameObject* CLevel_Tool::Load_Preview(const _wstring& strYshPath)
 {
     MODEL eType = Read_YshType(strYshPath);
-    if (eType == MODEL::END) { Log_Error("Invalid .ysh header."); return nullptr; }
+    if (eType == MODEL::END) 
+    { 
+        Log_Error("Invalid .ysh header.");
+        return nullptr; 
+    }
 
     Clear_Preview();    // 기존 1개 제거(단일 교체형)
 
@@ -1189,7 +1193,8 @@ CGameObject* CLevel_Tool::Load_Preview(const _wstring& strYshPath)
         if (FAILED(m_pGameInstance_Proxy->Add_Prototype(ETOUI(TOOL_LEVEL::STATIC), strModelTag,
             CModel::Create(m_pDevice, m_pContext, eType, sPath.c_str()))))
         {
-            Log_Error("Model prototype create failed."); return nullptr;
+            Log_Error("Model prototype create failed."); 
+            return nullptr;
         }
         m_ModelTags[strYshPath] = strModelTag;
     }

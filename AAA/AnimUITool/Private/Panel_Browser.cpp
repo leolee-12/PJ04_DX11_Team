@@ -90,6 +90,25 @@ void CPanel_Browser::Render_Breadcrumb()
     }
 }
 
+static wstring Make_RelativeFromAAA(const fs::path& abs)
+{
+    fs::path rel = L"../..";          // 실행파일 기준 ../ == AAA
+    bool bAfterAAA = false;
+
+    for (const auto& part : abs)   // 경로를 컴포넌트 단위로 순회
+    {
+        if (bAfterAAA)
+            rel /= part;           // AAA 뒤부터 이어붙임
+        else if (part == L"AAA")   // 앵커 발견
+            bAfterAAA = true;
+    }
+
+    if (!bAfterAAA)
+        return abs.wstring();      // AAA 없으면 원본 (안전장치)
+
+    return rel.generic_wstring();  // ../Resources/CHJ/Monster/BladeKnight/BladeKnight.ysh
+}
+
 void CPanel_Browser::Render_Contents()
 {
     ImGui::BeginChild("Contents", ImVec2(0, 0), true);
@@ -109,6 +128,8 @@ void CPanel_Browser::Render_Contents()
     // 파일 (.ysh 더블클릭 → 로드)
     for (const auto& file : m_Files)
     {
+        _wstring RelPath = Make_RelativeFromAAA(file.path());
+
         const char* icon = Get_FileIcon(file.path().extension());
         std::string label = std::string(icon) + " " + file.path().filename().string();
         if (ImGui::Selectable(label.c_str(), m_SelectedPath == file.path()))
@@ -125,7 +146,7 @@ void CPanel_Browser::Render_Contents()
 
         if (ToLower(file.path().extension().string()) == ".ysh")
             if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
-                m_pPanel_Manager->Load_Preview(file.path().wstring());
+                m_pPanel_Manager->Load_Preview(RelPath);
     }
 
     ImGui::EndChild();
