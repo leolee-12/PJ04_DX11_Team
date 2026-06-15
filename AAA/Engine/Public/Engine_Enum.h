@@ -52,5 +52,7 @@ namespace Engine
 	enum class CULLING_VIEW { MAIN_CAMERA, SHADOW_DIR, EDITOR_VIEWPORT, END };
 
 	enum class TEXT_ALIGN { LEFT, CENTER, RIGHT, END };
+
+	enum class DEFAULT_TEXTURE { WHITE, BLACK, MAGENTA, FLAT_NORMAL, MRA, END };
 }
 #endif // Engine_Enum_h__

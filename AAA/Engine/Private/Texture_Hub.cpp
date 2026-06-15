@@ -168,7 +168,7 @@ HRESULT CTexture_Hub::LoadOrGet(const _tchar* pTexturePath, TEXTURE_HANDLE* pOut
 	return S_OK;
 }
 
-HRESULT CTexture_Hub::Get(const _tchar* pTextureName, TEXTURE_HANDLE* pOut)
+HRESULT CTexture_Hub::Get(const _tchar* pTextureName, TEXTURE_HANDLE* pOut) const
 {
 	if (nullptr == pOut)
 		return E_FAIL;
@@ -211,6 +211,33 @@ HRESULT CTexture_Hub::Register_TextureName(TEXTURE_HANDLE Handle, const _tchar* 
 HRESULT CTexture_Hub::Bind_ShaderResource(CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle) const
 {
 	if (nullptr == pShader || nullptr == pConstantName)
+		return E_FAIL;
+
+	ID3D11ShaderResourceView* pSRV = Get_SRV(Handle);
+	if (nullptr == pSRV)
+		return E_FAIL;
+
+	return pShader->Bind_SRV(pConstantName, pSRV);
+}
+
+HRESULT CTexture_Hub::Bind_DefaultShaderResource(CShader* pShader, const _char* pConstantName, DEFAULT_TEXTURE eKind) const
+{
+	if (nullptr == pShader || nullptr == pConstantName)
+		return E_FAIL;
+
+	const _tchar* pTextureName = nullptr;
+	switch (eKind)
+	{
+	case DEFAULT_TEXTURE::WHITE:		pTextureName = L"__Default_White";			break;
+	case DEFAULT_TEXTURE::BLACK:		pTextureName = L"__Default_Black";			break;
+	case DEFAULT_TEXTURE::MAGENTA:		pTextureName = L"__Default_Magenta";		break;
+	case DEFAULT_TEXTURE::FLAT_NORMAL:	pTextureName = L"__Default_Flat_Normal";	break;
+	case DEFAULT_TEXTURE::MRA:			pTextureName = L"__Default_MRA";			break;
+	default:	return E_FAIL;
+	}
+
+	TEXTURE_HANDLE Handle = INVALID_TEXTURE_HANDLE;
+	if (FAILED(Get(pTextureName, &Handle)))
 		return E_FAIL;
 
 	ID3D11ShaderResourceView* pSRV = Get_SRV(Handle);
