@@ -322,6 +322,24 @@
     <Filter Include="00. GameObject\06. UI\UIContainer\Sequence\Loading">
       <UniqueIdentifier>{727cb6f0-106b-4ad2-86c4-c021458c69c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster">
+      <UniqueIdentifier>{c69f6e1f-9250-40fa-90bd-8d408e832ff0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29">
+      <UniqueIdentifier>{1138cc00-4713-44ca-a123-2f7be915075c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\Parts">
+      <UniqueIdentifier>{9b1d90f7-0e23-4287-92bd-9c96860e8ee1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\Parts\Body">
+      <UniqueIdentifier>{eb405b39-1a88-4929-bd60-51198f46fce6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\Parts\Weapon">
+      <UniqueIdentifier>{0cf226a6-c19e-4947-98cc-1d33fa4cb266}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\Monster">
+      <UniqueIdentifier>{7196c9f0-18a4-446e-b8e7-f2b9e35a32f5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -663,6 +681,15 @@
     <ClInclude Include="..\public\UI_FadeIn.h">
       <Filter>00. GameObject\06. UI\UIContainer\Sequence\Fade\FadeIn</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BladeKnight.h">
+      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BladeKnight_Body.h">
+      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\Parts\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster.h">
+      <Filter>00. GameObject\06. Monster\Monster</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -949,6 +976,15 @@
     </ClCompile>
     <ClCompile Include="..\private\UI_FadeIn.cpp">
       <Filter>00. GameObject\06. UI\UIContainer\Sequence\Fade\FadeIn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BladeKnight.cpp">
+      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BladeKnight_Body.cpp">
+      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\Parts\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster.cpp">
+      <Filter>00. GameObject\06. Monster\Monster</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

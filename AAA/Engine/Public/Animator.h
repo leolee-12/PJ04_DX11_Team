@@ -48,6 +48,10 @@ public: // 재생 제어 (오브젝트/에디터는 오직 이것만 사용)
 
     void    Set_EventCallback(EventCallback cb) { m_Callback = move(cb); }
 
+    void    Set_Mask(const _string& strClip, const _string& Bones, _bool bLoop, _float fMaskTarget, _float fMaskBlendTime);
+
+    void    Clear_Mask(_float fMaskBlendTime = 0.f);
+
 public: // 에디터(데이터 편집)
     ANIM_EVENT_TRACK& Get_Track(const string& strAnimName);
     const unordered_map<string, ANIM_EVENT_TRACK>& Get_Tracks() const { return m_Tracks; }
@@ -77,14 +81,21 @@ private:
 
     unordered_map<string, ANIM_EVENT_TRACK> m_Tracks;
 
-    _bool   m_bPaused = { false };
-    _bool   m_bFinished = { false };
+    _bool               m_bPaused = { false };
+    _bool               m_bFinished = { false };
 
-    string  m_strPrevAnimName = {};
-    _float  m_fPrevProgress = { 0.f };
-    _float  m_fPlaySpeed = { 1.0f };
-    _float  m_fBlendDuration = { 0.2f };
+    string              m_strPrevAnimName = {};
+    _float              m_fPrevProgress = { 0.f };
+    _float              m_fPlaySpeed = { 1.0f };
+    _float              m_fBlendDuration = { 0.2f };
 
+    _string             m_strMaskClip;
+    _string             m_strMaskRootBone;
+    _bool               m_bMaskLoop = { true };
+
+    _float              m_fMaskWeight = 0.f;
+    _float              m_fMaskTarget = 1.f;
+    _float              m_fMaskBlendTime = 0.5f;
 
 public:
     static CAnimator* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

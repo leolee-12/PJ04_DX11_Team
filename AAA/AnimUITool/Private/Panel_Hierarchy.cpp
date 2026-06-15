@@ -30,41 +30,50 @@ void CPanel_Hierarchy::Render()
 
 void CPanel_Hierarchy::Render_AnimationHierarchy()
 {
-    ANIM_CONTEXT& ctx = m_pPanel_Manager->Get_Context();
+    CLevel_Tool* pLevel = m_pPanel_Manager->Get_Level();
+    if (!pLevel) { ImGui::TextDisabled("(no level)"); return; }
 
-    if (ctx.pOwner)
-    {
-        std::string name(ctx.strName.begin(), ctx.strName.end());
-        if (name.empty())
-            name = "Preview";
-
-        const float fAvail = ImGui::GetContentRegionAvail().x;
-        _bool bSelected = (m_pPanel_Manager->Get_Selected() == ctx.pOwner);
-
-        if (ImGui::Selectable(name.c_str(), bSelected, 0, ImVec2(fAvail - 60.f, 0.f)))
-            m_pPanel_Manager->Set_Selected(ctx.pOwner);
-
-        ImGui::SameLine();
-
-        ImGui::PushID(ctx.pOwner);
-        _bool bDelete = ImGui::SmallButton("Delete");
-        ImGui::PopID();
-
-        if (bSelected && ImGui::IsKeyPressed(ImGuiKey_Delete))
-            bDelete = true;
-
-        if (bDelete)
+    // draw one row, return true if Delete requested
+    auto DrawRow = [&](CGameObject* pObj, const char* szFallback) -> bool
         {
-            m_pPanel_Manager->Clear_Preview();
-            return;
-        }
+            ImGui::PushID(pObj);
+            std::string name = ToUtf8(pObj->Get_ObjectTag());
+            if (name.empty()) name = szFallback;
 
-        if (auto* pv = dynamic_cast<CPreview_Actor*>(ctx.pOwner))
-            ImGui::TextDisabled("Type: %s", pv->Get_Type() == MODEL::ANIM ? "ANIM" : "NONANIM");
+            const _bool bSel = (m_pPanel_Manager->Get_Selected() == pObj);
+            const float fAvail = ImGui::GetContentRegionAvail().x;
+
+            if (ImGui::Selectable(name.c_str(), bSel, 0, ImVec2(fAvail - 60.f, 0.f)))
+                m_pPanel_Manager->Bind_ForAnim(pObj);          // select -> bind into ctx
+
+            ImGui::SameLine();
+            _bool bDel = ImGui::SmallButton("Delete");
+            if (bSel && ImGui::IsKeyPressed(ImGuiKey_Delete)) bDel = true;
+            ImGui::PopID();
+            return bDel;
+        };
+
+    // 1) Preview (raw extracted-model verification)
+    ImGui::SeparatorText("Preview");
+    if (CGameObject* pPreview = pLevel->Get_Preview())
+    {
+        if (DrawRow(pPreview, "Preview")) { m_pPanel_Manager->Clear_Preview(); return; }
     }
     else
-    {
         ImGui::TextDisabled("(no model loaded)");
+
+    // 2) Spawned (palette-placed objects, the vector list)
+    ImGui::SeparatorText("Spawned");
+    CGameObject* pPendingDelete = nullptr;
+    for (auto* pObj : pLevel->Get_SpawnedObjects())
+        if (pObj && DrawRow(pObj, "Object"))
+            pPendingDelete = pObj;
+
+    if (pPendingDelete)
+    {
+        if (m_pPanel_Manager->Get_Selected() == pPendingDelete)
+            m_pPanel_Manager->Clear_Selected();
+        pLevel->Destroy_Spawned(pPendingDelete);
     }
 }
 

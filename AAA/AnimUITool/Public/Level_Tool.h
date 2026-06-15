@@ -31,6 +31,8 @@ public:
     void                        Set_GridVisible(_bool bVisible) { m_bGridVisible = bVisible; }
     void                        Set_PreviewVisible(_bool bVisible);
 
+    CGameObject*                Get_Preview() const { return m_pPreview; }
+
     CGameObject*                Load_Preview(const _wstring& strYshPath);
     CGameObject*                Load_Kirby();
     void                        Clear_Preview();
@@ -54,6 +56,12 @@ public:
     _wstring                    Register_TextureProto(const _wstring& strTexturePath);
     _wstring                    Register_TextureProto(const _wstring& strTextureProtoTag, const _wstring& strTexturePath, _uint iLevelIndex);
 
+    CGameObject*                Spawn_Object(const _wstring& strProtoTag, const _wstring& strLayerTag, const _wstring& strName, void* pArg = nullptr);
+    void                        Clear_Spawned();
+
+    const vector<CGameObject*>& Get_SpawnedObjects() const { return m_SpawnedObjects; }
+    void                        Destroy_Spawned(CGameObject* pObject);
+
 private:
     CEditCamera*                m_pCamera = { nullptr };
     CEdit_Grid*                 m_pGrid = { nullptr };
@@ -67,6 +75,8 @@ private:
     unordered_map<_wstring, _wstring> m_TextureProtoPaths;  // ProtoTag -> Path
     _uint                       m_iUIContainerCounter = { 0 };
     _uint                       m_iUIPartCounter = { 0 };
+
+    vector<CGameObject*>        m_SpawnedObjects;
 
 private:
     virtual HRESULT             Ready_Events() override { return S_OK; }
