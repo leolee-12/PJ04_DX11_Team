@@ -119,6 +119,8 @@ private:
 	HRESULT Render_Debug();
 #endif
 
+	void	Reset_RS();
+
 public:
 	static CRenderer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void Free() override;
