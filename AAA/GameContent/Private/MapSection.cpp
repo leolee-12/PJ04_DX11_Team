@@ -61,6 +61,7 @@ HRESULT CMapSection::Initialize(void* pArg)
 		return E_FAIL;
 
 	const MAP_SECTION_DESC* pDesc = static_cast<const MAP_SECTION_DESC*>(pArg);
+	m_tDesc = *pDesc;
 
 	m_strSectionName = pDesc->strSectionName;
 	m_strModelProtoTag = pDesc->wstrModelProtoTag;

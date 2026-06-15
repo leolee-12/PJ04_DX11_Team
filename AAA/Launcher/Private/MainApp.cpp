@@ -36,8 +36,8 @@ HRESULT CMainApp::Initialize()
 	CGameObject_Factory::GetInstance()->RegisterAll();
 
 
-	//if (FAILED(Load_Fonts(m_pGameInstance_Proxy)))
-	//	return E_FAIL;
+	if (FAILED(Load_Fonts(m_pGameInstance_Proxy)))
+		return E_FAIL;
 
 	if (FAILED(Start_Logo()))
 		return E_FAIL;

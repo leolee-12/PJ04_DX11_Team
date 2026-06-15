@@ -50,6 +50,7 @@ public:
 	void	Set_CollisionActorEnabled(_bool bEnable) { m_bCreateCollisionActor = bEnable; }
 	_bool	Is_CollisionActorEnabled() const { return m_bCreateCollisionActor; }
 
+	const MAP_SECTION_DESC&	Get_Desc() const { return m_tDesc; }
 	const BoundingBox&		Get_WorldBounds() const { return m_WorldBounds; }
 	MAP_SECTION_TYPE		Get_SectionType() const { return m_eSectionType; }
 	RENDERID				Get_RenderID() const { return m_eRenderID; }
@@ -82,6 +83,7 @@ private:
 	BoundingBox			m_WorldBounds = {};
 	const _float4x4*	m_pParentMatrix = {};
 	_float4x4			m_CombinedWorldMatrix = {};
+	MAP_SECTION_DESC	m_tDesc = {};
 	_bool				m_bCreateCollisionActor = { true };
 
 	physx::PxRigidStatic* m_pColliderActor = { nullptr };
