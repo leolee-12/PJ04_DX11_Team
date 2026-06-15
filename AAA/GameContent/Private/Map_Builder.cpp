@@ -140,6 +140,7 @@ HRESULT CMap_Builder::Build_StageDesc(const MAP_MANIFEST_DESC& Manifest, MAP_STA
 		Desc.bRenderable = true;
 		Desc.bCastShadow = true;
 		Desc.bEnableCulling = true;
+		Desc.bSourceCreateCollisionActor = Desc.bCreateCollisionActor;
 
 		pOutStageDesc->SectionDescs.push_back(Desc);
 	}
@@ -174,6 +175,8 @@ HRESULT CMap_Builder::Build_EnvDescs(
 		for (ENV_OBJECT_DESC& Desc : JsonDescs)
 		{
 			m_pResolver->Resolve_EnvObject(&Desc);
+			Desc.tCollision.bSourceInvalidCollision = Desc.tCollision.bInvalidCollision;
+			Desc.tCollision.bSourceHasDecorCollisionApxbin = Desc.tCollision.bHasDecorCollisionApxbin;
 			pOutEnvDescs->push_back(Desc);
 		}
 

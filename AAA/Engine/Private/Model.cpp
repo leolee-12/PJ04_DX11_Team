@@ -177,6 +177,33 @@ _bool CModel::Pick_Mesh(_uint iMeshIndex, _fvector vOrigin, _fvector vDir, _fmat
     return true;
 }
 
+_bool CModel::Pick_Mesh_Ex(_uint iMeshIndex, _fvector vOrigin, _fvector vDir, _fmatrix WorldMatrix, _float3* pOutHit, float* pOutDist, _float fAabbPadding)
+{
+    if (iMeshIndex >= m_iNumMeshes)
+        return false;
+
+    _matrix InvWorld = XMMatrixInverse(nullptr, WorldMatrix);
+
+    _vector vLocalOrigin = XMVector3TransformCoord(vOrigin, InvWorld);
+    _vector vLocalDir = XMVector3TransformNormal(vDir, InvWorld);
+    vLocalDir = XMVector3Normalize(vLocalDir);
+
+    _float3 localHit = {};
+    float dist = 0.f;
+
+    if (!m_Meshes[iMeshIndex]->Ray_AABB_Ex(vLocalOrigin, vLocalDir, fAabbPadding))
+        return false;
+    if (!m_Meshes[iMeshIndex]->Pick(vLocalOrigin, vLocalDir, &localHit, &dist))
+        return false;
+
+    if (pOutHit)
+        XMStoreFloat3(pOutHit, XMVector3TransformCoord(XMLoadFloat3(&localHit), WorldMatrix));
+    if (pOutDist)
+        *pOutDist = dist;
+
+    return true;
+}
+
 HRESULT CModel::Initialize_Prototype(MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter)
 {
     m_eType = eType;

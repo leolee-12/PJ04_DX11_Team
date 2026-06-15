@@ -29,6 +29,43 @@ namespace
 	mutex g_MapPackageCacheMutex;
 	unordered_map<_wstring, MAP_PACKAGE> g_MapPackageCache;
 
+	_bool Is_EnvPickingModelProtoTag(const _wstring& strModelProtoTag)
+	{
+		static const _wstring kSuffix = L"__pick";
+		if (strModelProtoTag.length() < kSuffix.length())
+			return false;
+
+		return 0 == strModelProtoTag.compare(
+			strModelProtoTag.length() - kSuffix.length(),
+			kSuffix.length(),
+			kSuffix);
+	}
+
+	_wstring Make_EnvPickingModelProtoTag(const _wstring& strModelProtoTag)
+	{
+		if (strModelProtoTag.empty())
+			return strModelProtoTag;
+
+		if (Is_EnvPickingModelProtoTag(strModelProtoTag))
+			return strModelProtoTag;
+
+		return strModelProtoTag + L"__pick";
+	}
+
+	void Apply_EnvPickingModelTags(MAP_PACKAGE* pPackage)
+	{
+		if (nullptr == pPackage)
+			return;
+
+		for (ENV_OBJECT_DESC& Desc : pPackage->EnvObjectDescs)
+		{
+			if (Desc.wstrModelProtoTag.empty())
+				continue;
+
+			Desc.wstrModelProtoTag = Make_EnvPickingModelProtoTag(Desc.wstrModelProtoTag);
+		}
+	}
+
 	_bool Is_EnvLayerInternal(const _wstring& strLayerTag)
 	{
 		return strLayerTag == kLayerEnvStatic
@@ -604,6 +641,11 @@ HRESULT CMap_Loader::Load_Env_Runtime(
 
 		if (nullptr != pResolvedOverrideDesc)
 			hr = CMap_EditFile::Apply_Change(&SpawnPackage, *pResolvedOverrideDesc);
+
+		if (SUCCEEDED(hr) && bEnableEnvObjectPicking)
+		{
+			Apply_EnvPickingModelTags(&SpawnPackage);
+		}
 
 		if (SUCCEEDED(hr))
 		{

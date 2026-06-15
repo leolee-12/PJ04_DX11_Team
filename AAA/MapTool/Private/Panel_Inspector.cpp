@@ -105,16 +105,6 @@ namespace
 		pOutEdit->matWorld = *pObject->Get_Transform()->Get_WorldMatrixPtr();
 	}
 
-	_bool Has_AnyMapEnvEdit(const MAP_ENV_EDITED_DESC& Edit)
-	{
-		return Edit.bHasRenderable
-			|| Edit.bHasEnableCulling
-			|| Edit.bHasCastShadow
-			|| Edit.bHasWorldMatrix
-			|| Edit.bHasNearDistAlpha
-			|| Edit.bDisableCollisionMesh;
-	}
-
 	_matrix Build_EnvBaseWorldMatrix(const ENV_OBJECT_DESC& Desc)
 	{
 		if (Desc.bHasWorldMatrix)
@@ -578,12 +568,12 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 	_bool* pbRenderable = FindBoolProperty(pEnvObject, L"Renderable", L"EnvObject");
 	_bool* pbEnableCulling = FindBoolProperty(pEnvObject, L"Enable Culling", L"EnvObject");
 	_bool* pbCastShadow = FindBoolProperty(pEnvObject, L"Cast Shadow", L"EnvObject");
-	_bool* pbDisableCollisionMesh = Resolve_EnvCollisionEditState(pLevel, pEnvObject);
+	_bool* pbCreateCollMesh = Resolve_EnvCollMeshEditState(pLevel, pEnvObject);
 	_bool* pbUseNearDistAlpha = Resolve_EnvNearAlphaEditState(pLevel, pEnvObject);
 
-	const _bool bBaseDisableCollisionMesh = pEnvObject->Get_Desc().tCollision.bInvalidCollision;
-
-	if (nullptr != pbDisableCollisionMesh && bBaseDisableCollisionMesh) *pbDisableCollisionMesh = true;
+	const auto& Collision = pEnvObject->Get_Desc().tCollision;
+	const _bool bSourceCanCreateCollisionMesh =
+		Collision.bSourceHasDecorCollisionApxbin && !Collision.bSourceInvalidCollision;
 
 	ImGui::TextUnformatted("EnvObject Edit");
 
@@ -593,18 +583,15 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 		ImGui::Checkbox("Enable Culling##EnvEdit", (bool*)pbEnableCulling);
 	if (pbCastShadow)
 		ImGui::Checkbox("Cast Shadow##EnvEdit", (bool*)pbCastShadow);
-	if (pbDisableCollisionMesh)
+	if (pbCreateCollMesh)
 	{
-		ImGui::BeginDisabled(bBaseDisableCollisionMesh);
-		ImGui::Checkbox("Disable Collision On Reload##EnvEdit", (bool*)pbDisableCollisionMesh);
+		ImGui::BeginDisabled(!bSourceCanCreateCollisionMesh);
+		ImGui::Checkbox("Create Collision Mesh On Reload##EnvEdit", (bool*)pbCreateCollMesh);
 		ImGui::EndDisabled();
 	}
 
-	if (bBaseDisableCollisionMesh)
-	{
-		ImGui::TextDisabled(
-			"Source env collision is already disabled. Re-enable is not persisted by current override schema.");
-	}
+	if (!bSourceCanCreateCollisionMesh)
+		ImGui::TextDisabled("Source env collision mesh cannot be created for this object.");
 
 	if (pbUseNearDistAlpha)
 		ImGui::Checkbox("Use Near Dist Alpha##EnvEdit", (bool*)pbUseNearDistAlpha);
@@ -620,13 +607,21 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 			? *pbUseNearDistAlpha
 			: pEnvObject->Get_Desc().tRender.bUseNearDistAlpha);
 
-		const _bool bDisableCollisionMesh =
-			(nullptr != pbDisableCollisionMesh)
-			? *pbDisableCollisionMesh
-			: bBaseDisableCollisionMesh;
+		const _bool bCreateCollMesh =
+			(nullptr != pbCreateCollMesh)
+			? *pbCreateCollMesh
+			: bSourceCanCreateCollisionMesh;
 
-		Edit.bDisableCollisionMesh =
-			(!bBaseDisableCollisionMesh && bDisableCollisionMesh);
+		Edit.bHasCollMeshEdited = false;
+		Edit.bCreateCollMesh = true;
+		Edit.bDisableCollMesh = false;
+
+		if (bSourceCanCreateCollisionMesh)
+		{
+			Edit.bHasCollMeshEdited = (bCreateCollMesh != true);
+			Edit.bCreateCollMesh = bCreateCollMesh;
+			Edit.bDisableCollMesh = !bCreateCollMesh;
+		}
 
 		if (Has_AnyMapEnvEdit(Edit))
 		{
@@ -635,7 +630,7 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 		else
 		{
 			pLevel->Clear_EditedMapPreviewEnvObject(pObject);
-			Clear_EnvCollisionEditState(pObject);
+			Clear_EnvCollMeshEditState(pObject);
 			Clear_EnvNearAlphaEditState(pObject);
 		}
 	}
@@ -657,7 +652,7 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 			(nullptr != pSession) ? pSession->Get_EditData().iPresetIndex : -1;
 
 		pLevel->Clear_EditedMapPreviewEnvObject(pObject);
-		m_EnvCollisionEditStates.clear();
+		m_EnvCollMeshEditStates.clear();
 		m_EnvNearAlphaEditStates.clear();
 
 		if (0 <= iPresetIndex)
@@ -682,13 +677,10 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 		pSection->Get_SectionName());
 
 	_bool* pbCreateCollisionActor =
-		Resolve_SectionCollisionEditState(pLevel, pMapStage, pSection);
+		Resolve_MapCollMeshEditState(pLevel, pMapStage, pSection);
 
-	const _bool bBaseCreateCollisionActor =
-		pSection->Get_Desc().bCreateCollisionActor;
-
-	if (nullptr != pbCreateCollisionActor && !bBaseCreateCollisionActor)
-		*pbCreateCollisionActor = false;
+	const _bool bSourceCanCreateCollisionActor =
+		pSection->Get_Desc().bSourceCreateCollisionActor;
 
 	ImGui::TextUnformatted("MapSection Edit");
 
@@ -700,16 +692,13 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 		ImGui::Checkbox("Cast Shadow##SectionEdit", (bool*)pbCastShadow);
 	if (pbCreateCollisionActor)
 	{
-		ImGui::BeginDisabled(!bBaseCreateCollisionActor);
+		ImGui::BeginDisabled(!bSourceCanCreateCollisionActor);
 		ImGui::Checkbox("Create Collision Actor On Reload##SectionEdit", (bool*)pbCreateCollisionActor);
 		ImGui::EndDisabled();
 	}
 
-	if (!bBaseCreateCollisionActor)
-	{
-		ImGui::TextDisabled(
-			"Source section collision actor is already disabled. Re-enable is not persisted by current override schema.");
-	}
+	if (!bSourceCanCreateCollisionActor)
+		ImGui::TextDisabled("Source section collision actor cannot be created for this section.");
 
 	ImGui::TextDisabled("Applied on next stage reload.");
 	ImGui::TextDisabled("Restart persistence requires Save Override Now or toolbar Map Edit Save.");
@@ -721,13 +710,21 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 		const _bool bCreateCollisionActor =
 			(nullptr != pbCreateCollisionActor)
 			? *pbCreateCollisionActor
-			: bBaseCreateCollisionActor;
+			: bSourceCanCreateCollisionActor;
 
-		Edit.bDisableCollisionMesh =
-			(bBaseCreateCollisionActor && !bCreateCollisionActor);
+		Edit.bHasCollMeshEdited = false;
+		Edit.bCreateCollMesh = true;
+		Edit.bDisableCollMesh = false;
+
+		if (bSourceCanCreateCollisionActor)
+		{
+			Edit.bHasCollMeshEdited = (bCreateCollisionActor != true);
+			Edit.bCreateCollMesh = bCreateCollisionActor;
+			Edit.bDisableCollMesh = !bCreateCollisionActor;
+		}
 
 		pSection->Set_CollisionActorEnabled(
-			bBaseCreateCollisionActor ? bCreateCollisionActor : false);
+			bSourceCanCreateCollisionActor ? bCreateCollisionActor : false);
 
 		if (Has_AnyMapEnvEdit(Edit))
 		{
@@ -736,7 +733,7 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 		else
 		{
 			pLevel->Clear_EditedMapPreviewSection(strSectionKey);
-			Clear_SectionCollisionEditState(pSection);
+			Clear_MapCollMeshEditState(pSection);
 		}
 	}
 
@@ -757,7 +754,7 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 			(nullptr != pSession) ? pSession->Get_EditData().iPresetIndex : -1;
 
 		pLevel->Clear_EditedMapPreviewSection(strSectionKey);
-		m_SectionCollisionEditStates.clear();
+		m_MapCollMeshEditStates.clear();
 
 		if (0 <= iPresetIndex)
 		{
@@ -954,47 +951,70 @@ void CPanel_Inspector::Draw_MapSectionRenderOptions(Client::CMapSection* pSectio
 		pSection->Set_RenderID(FromMapRenderGroupIndex(iRenderGroup));
 }
 
-_bool* CPanel_Inspector::Resolve_EnvCollisionEditState(CLevel_Edit* pLevel, Client::CEnvObject* pEnvObject)
+_bool* CPanel_Inspector::Resolve_EnvCollMeshEditState(CLevel_Edit* pLevel, Client::CEnvObject*
+	pEnvObject)
 {
 	if (nullptr == pLevel || nullptr == pEnvObject)
 		return nullptr;
 
-	auto Iter = m_EnvCollisionEditStates.find(pEnvObject);
-	if (Iter == m_EnvCollisionEditStates.end())
+	auto Iter = m_EnvCollMeshEditStates.find(pEnvObject);
+	if (Iter == m_EnvCollMeshEditStates.end())
 	{
 		MAP_ENV_EDITED_DESC SavedEdit{};
-		const _bool bDisableCollisionMesh =
-			pLevel->Try_GetMapPreviewEnvEdit(pEnvObject, &SavedEdit)
-			? SavedEdit.bDisableCollisionMesh
-			: pEnvObject->Get_Desc().tCollision.bInvalidCollision;
+		const auto& Collision = pEnvObject->Get_Desc().tCollision;
+		const _bool bSourceCanCreateCollisionMesh =
+			Collision.bSourceHasDecorCollisionApxbin && !Collision.bSourceInvalidCollision;
 
-		Iter = m_EnvCollisionEditStates.emplace(
+		_bool bCreateCollMesh = bSourceCanCreateCollisionMesh;
+		if (pLevel->Try_GetMapPreviewEnvEdit(pEnvObject, &SavedEdit))
+		{
+			if (SavedEdit.bHasCollMeshEdited)
+				bCreateCollMesh = SavedEdit.bCreateCollMesh;
+			else
+				bCreateCollMesh = !SavedEdit.bDisableCollMesh;
+		}
+
+		if (!bSourceCanCreateCollisionMesh)
+			bCreateCollMesh = false;
+
+		Iter = m_EnvCollMeshEditStates.emplace(
 			static_cast<CGameObject*>(pEnvObject),
-			bDisableCollisionMesh).first;
+			bCreateCollMesh).first;
 	}
 
 	return &Iter->second;
 }
 
-_bool* CPanel_Inspector::Resolve_SectionCollisionEditState(CLevel_Edit* pLevel, CMapStage* pMapStage, CMapSection* pSection)
+_bool* CPanel_Inspector::Resolve_MapCollMeshEditState(CLevel_Edit* pLevel, CMapStage* pMapStage,
+	CMapSection* pSection)
 {
 	if (nullptr == pLevel || nullptr == pMapStage || nullptr == pSection)
 		return nullptr;
 
-	auto Iter = m_SectionCollisionEditStates.find(pSection);
-	if (Iter == m_SectionCollisionEditStates.end())
+	auto Iter = m_MapCollMeshEditStates.find(pSection);
+	if (Iter == m_MapCollMeshEditStates.end())
 	{
 		const _wstring strSectionKey = CMap_EditFile::Make_SectionKey(
 			pMapStage->Get_StageName(),
 			pSection->Get_SectionName());
 
 		MAP_ENV_EDITED_DESC SavedEdit{};
-		const _bool bCreateCollisionActor =
-			pLevel->Try_GetMapPreviewSectionEdit(strSectionKey, &SavedEdit)
-			? !SavedEdit.bDisableCollisionMesh
-			: pSection->Is_CollisionActorEnabled();
+		const _bool bSourceCanCreateCollisionActor =
+			pSection->Get_Desc().bSourceCreateCollisionActor;
 
-		Iter = m_SectionCollisionEditStates.emplace(
+		_bool bCreateCollisionActor = bSourceCanCreateCollisionActor;
+		if (pLevel->Try_GetMapPreviewSectionEdit(strSectionKey, &SavedEdit))
+		{
+			if (SavedEdit.bHasCollMeshEdited)
+				bCreateCollisionActor = SavedEdit.bCreateCollMesh;
+			else
+				bCreateCollisionActor = !SavedEdit.bDisableCollMesh;
+		}
+
+		if (!bSourceCanCreateCollisionActor)
+			bCreateCollisionActor = false;
+
+		Iter = m_MapCollMeshEditStates.emplace(
 			pSection,
 			bCreateCollisionActor).first;
 	}
@@ -1024,16 +1044,16 @@ _bool* CPanel_Inspector::Resolve_EnvNearAlphaEditState(CLevel_Edit* pLevel, CEnv
 	return &Iter->second;
 }
 
-void CPanel_Inspector::Clear_EnvCollisionEditState(CGameObject* pObject)
+void CPanel_Inspector::Clear_EnvCollMeshEditState(CGameObject* pObject)
 {
 	if (nullptr != pObject)
-		m_EnvCollisionEditStates.erase(pObject);
+		m_EnvCollMeshEditStates.erase(pObject);
 }
 
-void CPanel_Inspector::Clear_SectionCollisionEditState(CMapSection* pSection)
+void CPanel_Inspector::Clear_MapCollMeshEditState(CMapSection* pSection)
 {
 	if (nullptr != pSection)
-		m_SectionCollisionEditStates.erase(pSection);
+		m_MapCollMeshEditStates.erase(pSection);
 }
 
 void CPanel_Inspector::Clear_EnvNearAlphaEditState(CGameObject* pObject)

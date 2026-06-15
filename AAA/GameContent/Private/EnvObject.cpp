@@ -14,6 +14,8 @@ namespace
 	constexpr _bool ENABLE_ENV_OBJECT_SHADOW = true;
 	constexpr _float ENV_DISTANCE_CULL_START = 175.f;
 	constexpr _float ENV_SHADOW_DISTANCE_CULL_START = 80.f;
+	constexpr _float ENV_PICK_AABB_PADDING = 0.05f;
+	constexpr _float ENV_PICK_THIN_EXTENT = 0.06f;
 
 	void Log_EnvPhysicsWarning(const string& strMessage)
 	{
@@ -87,6 +89,24 @@ namespace
 			(vMax.z - vMin.z) * 0.5f);
 		return Bounds;
 	}
+
+	_bool Is_ThinBounds(const BoundingBox& Bounds)
+	{
+		return Bounds.Extents.x <= ENV_PICK_THIN_EXTENT
+			|| Bounds.Extents.y <= ENV_PICK_THIN_EXTENT
+			|| Bounds.Extents.z <= ENV_PICK_THIN_EXTENT;
+	}
+
+	_float3 RayPoint(_fvector vOrigin, _fvector vDir, _float fDist)
+	{
+		_float3 vPoint = {};
+
+		const _vector vWorldPoint =
+			XMVectorAdd(vOrigin, XMVectorScale(XMVector3Normalize(vDir), fDist));
+
+		XMStoreFloat3(&vPoint, vWorldPoint);
+		return vPoint;
+	}
 }
 
 CEnvObject::CEnvObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -154,8 +174,18 @@ _bool XM_CALLCONV CEnvObject::Pick_Ray(_fvector vOrigin, _fvector vDir, _float3*
 
 	Refresh_WorldBounds();
 
+	const _bool bThinBounds = Is_ThinBounds(m_WorldBounds);
+
+	BoundingBox PickBounds = m_WorldBounds;
+	if (PickBounds.Extents.x < ENV_PICK_AABB_PADDING)
+		PickBounds.Extents.x = ENV_PICK_AABB_PADDING;
+	if (PickBounds.Extents.y < ENV_PICK_AABB_PADDING)
+		PickBounds.Extents.y = ENV_PICK_AABB_PADDING;
+	if (PickBounds.Extents.z < ENV_PICK_AABB_PADDING)
+		PickBounds.Extents.z = ENV_PICK_AABB_PADDING;
+
 	float fBoundsDist = 0.f;
-	if (!m_WorldBounds.Intersects(vOrigin, vDir, fBoundsDist))
+	if (!PickBounds.Intersects(vOrigin, vDir, fBoundsDist))
 		return false;
 
 	const _matrix WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
@@ -170,13 +200,14 @@ _bool XM_CALLCONV CEnvObject::Pick_Ray(_fvector vOrigin, _fvector vDir, _float3*
 		_float3 vHit = {};
 		float fLocalDist = 0.f;
 
-		if (!m_pModelCom->Pick_Mesh(
+		if (!m_pModelCom->Pick_Mesh_Ex(
 			static_cast<_uint>(i),
 			vOrigin,
 			vDir,
 			WorldMatrix,
 			&vHit,
-			&fLocalDist))
+			&fLocalDist,
+			ENV_PICK_AABB_PADDING))
 		{
 			continue;
 		}
@@ -191,6 +222,13 @@ _bool XM_CALLCONV CEnvObject::Pick_Ray(_fvector vOrigin, _fvector vDir, _float3*
 			vBestHit = vHit;
 			bHit = true;
 		}
+	}
+
+	if (!bHit && bThinBounds)
+	{
+		bHit = true;
+		fBestDist = fBoundsDist;
+		vBestHit = RayPoint(vOrigin, vDir, fBoundsDist);
 	}
 
 	if (!bHit)
