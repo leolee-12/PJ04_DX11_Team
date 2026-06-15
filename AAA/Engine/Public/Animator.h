@@ -12,7 +12,7 @@ public:
     {
         _string strAniName;
         _bool bLoop{ true };
-        _bool bRestrat{ false };
+        _bool bRestart{ false };
         _float fBlend = 0.2f;
         _float fSpeed = 1.f;
     };

@@ -785,9 +785,6 @@
     <ClCompile Include="..\Private\Kirby_Run.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Run</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Kirby_Ability.cpp">
-      <Filter>00. GameObject\05. Kirby\02. Kirby_Ability</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ability_Normal.cpp">
       <Filter>00. GameObject\05. Kirby\02. Kirby_Ability\00. Kirby_Ability_Normal</Filter>
     </ClCompile>
@@ -895,6 +892,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Monster.cpp">
       <Filter>00. GameObject\06. Monster\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Ability.cpp">
+      <Filter>00. GameObject\05. Kirby\02. Kirby_Ability</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

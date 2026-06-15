@@ -16,6 +16,60 @@ HRESULT CKirby_Ability_Sword::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
+    //(ABILITY_ANI eAni, const _string & strBaseAniName, const _string & strOverlayAniName, const _string & strRootBone,
+    //_bool bBaseLoop, _bool bBaseRestart, _float fBaseSpeed,
+    //_bool bOverlayLoop, _bool bOverlayRestart, _float fOverlaySpeed,
+    //_float fBlend)
+
+    Set_OverlayAni(ABILITY_ANI::WAIT, "Wait", "Sword_HaveSwordWait", "R_ShoulderJ",
+        true, false, 1.8f, 0.1f,
+        true, false, 1.8f, 0.1f);
+
+    Set_OverlayAni(ABILITY_ANI::RUN, "Run", "HaveSwordMove", "R_ShoulderJ",
+        true, false, 2.2f, 0.1f,
+        true, false, 2.2f, 0.1f);
+
+    Set_OverlayAni(ABILITY_ANI::FALL, "Fall", "HaveSwordMove", "R_ShoulderJ",
+        false, false, 2.f, 0.1f,
+        false, false, 2.f, 0.1f);
+
+    Set_OverlayAni(ABILITY_ANI::LANDING, "Landing", "HaveSwordMove", "R_ShoulderJ",
+        false, false, 1.f, 0.05f,
+        false, false, 1.f, 0.05f);
+
+    // Jump
+    Set_OverlayAni(ABILITY_ANI::JUMP_L, "JumpL", "HaveSwordMove", "R_ShoulderJ",
+        false, false, 5.f, 0.1f,
+        false, false, 5.f, 0.1f);
+    Set_OverlayAni(ABILITY_ANI::JUMP_R, "JumpR", "HaveSwordMove", "R_ShoulderJ",
+        false, false, 5.f, 0.1f,
+        false, false, 5.f, 0.1f);
+    Set_OverlayAni(ABILITY_ANI::JUMP_END_L, "JumpEndL", "HaveSwordMove", "R_ShoulderJ",
+        false, false, 2.f, 0.1f,
+        false, false, 2.f, 0.1f);
+    Set_OverlayAni(ABILITY_ANI::JUMP_END_R, "JumpEndR", "HaveSwordMove", "R_ShoulderJ",
+        false, false, 2.f, 0.1f,
+        false, false, 2.f, 0.1f);
+
+    // Hovering
+    Set_OverlayAni(ABILITY_ANI::FLIGHT_START, "FlightStart", "HaveSwordWaitFlight", "R_ShoulderJ",
+        false, false, 2.25f, 0.1f,
+        false, false, 2.25f, 0.1f);
+    Set_OverlayAni(ABILITY_ANI::FLIGHT, "Flight", "HaveSwordWaitFlight", "R_ShoulderJ",
+        false, true, 2.f, 0.1f,
+        false, true, 2.f, 0.1f);
+    Set_OverlayAni(ABILITY_ANI::FLIGHT_FALL, "FlightFall", "HaveSwordWaitFlight", "R_ShoulderJ",
+        true, false, 2.f, 0.1f,
+        true, false, 2.f, 0.1f);
+    Set_OverlayAni(ABILITY_ANI::FLIGHT_LANDING, "FlightLanding", "HaveSwordWaitFlight", "R_ShoulderJ",
+        false, false, 2.5f, 0.1f,
+        false, false, 2.5f, 0.1f);
+
+    Set_OverlayAni(ABILITY_ANI::AIR_BALL, "AirBall", "HaveSwordWaitFlight", "R_ShoulderJ",
+        false, false, 5.f, 0.05f,
+        false, false, 5.f, 0.05f);
+
+
     m_fSuperSpinSlashChargeTime = 0.8f;
 
     return S_OK;
@@ -121,7 +175,6 @@ _bool CKirby_Ability_Sword::Handle_Command(CKirby* pKirby, CKirby_Command* pComm
 
             return true;
         }
-
     }
 
     return false;
