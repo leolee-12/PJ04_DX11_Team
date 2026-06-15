@@ -30,7 +30,7 @@
 namespace
 {
     constexpr const _char* PREVIEW_MODEL_PATH =
-        "../../Resources/Models/Test/BladeKnight/BladeKnight.ysh";
+        "../../Resources/Test/Test/BladeKnight/BladeKnight.ysh";
 
     MODEL Read_YshType(const _wstring& strPath)
     {

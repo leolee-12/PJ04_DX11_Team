@@ -142,5 +142,6 @@ CLevel_FirstLoading* CLevel_FirstLoading::Create(ID3D11Device* pDevice, ID3D11De
 
 void CLevel_FirstLoading::Free()
 {
+    Safe_Release(m_pLoader);
     __super::Free();
 }

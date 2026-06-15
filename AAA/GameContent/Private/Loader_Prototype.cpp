@@ -56,7 +56,7 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
     }
 
     static const ENV_ENTRY g_EnvTable[] = {
-      { TEXT("Field"), TEXT("../../Resources/Env/Field_Diffuse.dds"), TEXT("../../Resources/Env/Field_Specular.dds"), 0.5f },
+      { TEXT("Field"), TEXT("../../Resources/YSH/Env/Field_Diffuse.dds"), TEXT("../../Resources/YSH/Env/Field_Specular.dds"), 0.5f },
         // 맵 추가 = 행 추가
     };
 

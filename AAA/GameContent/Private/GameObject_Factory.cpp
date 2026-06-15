@@ -168,10 +168,10 @@ void CGameObject_Factory::Register_Test()
         CREATOR(CTestFiona),
         LOADER(
             /*pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Test/Aligator/aligator.ysh",
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Test/Aligator/aligator.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))))*/
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/Aligator/Aligator_Anim.ysh"
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Test/Test/Aligator/Aligator_Anim.ysh"
                     //, XMMatrixRotationY(XMConvertToRadians(180.f))
                 ))
         )
@@ -183,7 +183,7 @@ void CGameObject_Factory::Register_Test()
         LOADER
         (
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_NonAnim"),
-                CModel::Create(pDevice, pContext, MODEL::MAP, "../../Resources/Models/Test/Marb1e/Land_GsAllBuilding_0.ysh"))
+                CModel::Create(pDevice, pContext, MODEL::MAP, "../../Resources/Test/Test/Marb1e/Land_GsAllBuilding_0.ysh"))
         )
     );
 
@@ -208,7 +208,7 @@ void CGameObject_Factory::Register_Test()
         CREATOR(CTestMarb1e),
         LOADER(
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Marb1e"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Models/Test/Aligator/Aligator_Anim.ysh"
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Test/Test/Aligator/Aligator_Anim.ysh"
                     //, XMMatrixRotationY(XMConvertToRadians(180.f))
                 ))
         )
@@ -218,7 +218,7 @@ void CGameObject_Factory::Register_Test()
         CREATOR(CTestMarb1eMap),
         LOADER(
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Map"),
-                CModel::Create(pDevice, pContext, MODEL::MAP, "../../Resources/Models/Test/Marb1e/Land_GsAllBuilding_0.ysh"))
+                CModel::Create(pDevice, pContext, MODEL::MAP, "../../Resources/Test/Test/Marb1e/Land_GsAllBuilding_0.ysh"))
         )
     );
 
@@ -226,7 +226,7 @@ void CGameObject_Factory::Register_Test()
         CREATOR(CMaterial_Object),
         LOADER(
             pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_MaterialObject"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Shader_Test_Object/Model_SmokeSphereOriginal.ysh"))
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Shader_Test_Object/Model_SmokeSphereOriginal.ysh"))
         )
     );
 
@@ -247,17 +247,17 @@ void CGameObject_Factory::Register_Test()
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CSmokeSphereOriginal::PROTOTYPE_TAG,
                 CSmokeSphereOriginal::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
             // SmokeLowPoly
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CSmokeLowPoly::PROTOTYPE_TAG,
                 CSmokeLowPoly::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_SmokeLowPoly"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
             // SmokeTail
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CSmokeTail::PROTOTYPE_TAG,
                 CSmokeTail::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_SmokeTail"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Models/Effect/SmokeTail/Model_SmokeTail.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeTail/Model_SmokeTail.ysh"));
         )
     );
 
