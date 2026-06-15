@@ -38,7 +38,9 @@ CUI_CurtainTexture* CUI_CurtainTexture::Create(ID3D11Device* pDevice, ID3D11Devi
 CGameObject* CUI_CurtainTexture::Clone(void* pArg)
 {
     CUI_CurtainTexture* p = new CUI_CurtainTexture(*this);
-    if (FAILED(p->Initialize(pArg))) { MSG_BOX("Failed to Cloned : CUI_CurtainTexture"); Safe_Release(p); }
+    if (FAILED(p->Initialize(pArg)))
+    { MSG_BOX("Failed to Cloned : CUI_CurtainTexture"); 
+    Safe_Release(p); }
     return p;
 }
 void CUI_CurtainTexture::Free() { __super::Free(); }

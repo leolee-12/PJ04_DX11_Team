@@ -5,9 +5,8 @@
 #include "DataLoader.h"
 #include "Map_Loader.h"
 #include "Loader_Prototype.h"
-#include "Launcher_MapProfiles.h"
+#include "Launcher_LevelProfiles.h"
 #include <set>
-#include "Loader_Prototype.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice { pDevice }
@@ -31,11 +30,14 @@ unsigned int APIENTRY ThreadMain(void* pArg)
 
 
 
-HRESULT CLoader::Initialize(LEVEL eNextLevelID)
+HRESULT CLoader::Initialize(LEVEL eNextLevelID, _bool Initialized)
 {
     m_eNextLevelID = eNextLevelID;
 
     Ready_WorkQueue();
+
+    if (!Initialized)
+        Ready_StaticResources();
 
     /* eNextLevelID에 필요한 자원을 로딩하는 작업을 수행한다. 누가? 스레드가 */
     //m_hThread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, ThreadMain, this, 0, nullptr));
@@ -94,6 +96,23 @@ void CLoader::Add_Work(function<HRESULT()>&& func)
     ++m_iTotalWorkCount;
 }
 
+HRESULT CLoader::Ready_StaticResources()
+{
+    Add_Work([this]() -> HRESULT
+        {
+            return Ready_Prototype_SharedResources(m_pGameInstance_Proxy, m_pDevice, m_pContext);
+        }
+    );
+
+    Add_Work([this]() -> HRESULT
+        {
+            return Ready_Prototype_Shaders(m_pGameInstance_Proxy, m_pDevice, m_pContext);
+        }
+    );
+
+    return S_OK;
+}
+
 HRESULT CLoader::Ready_WorkQueue()
 {
     switch (m_eNextLevelID)
@@ -101,11 +120,6 @@ HRESULT CLoader::Ready_WorkQueue()
     case Client::LEVEL::STATIC:
         break;
     case Client::LEVEL::LOADING:
-        break;
-    case Client::LEVEL::LOGO:
-        break;
-    case Client::LEVEL::LOBBY:
-        Ready_Resources_For_Lobby();
         break;
     case Client::LEVEL::GAMEPLAY:
         Ready_Resources_For_GamePlay();
@@ -116,36 +130,6 @@ HRESULT CLoader::Ready_WorkQueue()
         break;
     }
     return E_NOTIMPL;
-}
-
-HRESULT CLoader::Ready_Resources_For_Lobby()
-{
-    string strContent;
-    CDataLoader::Read_Json(L"../../Resources/LevelData/Lobby.JSON", &strContent);
-    json jLevel = json::parse(strContent);
-
-    LEVEL eLevel = LEVEL::LOBBY;
-
-    set<wstring> visited;
-    for (auto& jObj : jLevel["Objects"])
-    {
-        wstring wProto = StrToWstr(jObj["Prototype_Tag"].get<string>());
-        if (!visited.insert(wProto).second) continue;
-
-        if (m_pGameInstance_Proxy->Has_Prototype(ETOUI(eLevel), wProto)) continue;
-
-        Add_Work([this, wProto, eLevel]() -> HRESULT
-            {
-                auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(wProto);
-                if (!pReg) return E_FAIL;
-
-                pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
-                m_pGameInstance_Proxy->Add_Prototype(ETOUI(eLevel), wProto.c_str(),
-                    pReg->CreatorFunc(m_pDevice, m_pContext));
-                return S_OK;
-            });
-    }
-    return S_OK;
 }
 
 HRESULT CLoader::Ready_Resources_For_GamePlay()
@@ -207,11 +191,11 @@ HRESULT CLoader::Ready_Resources_For_GamePlay()
     return S_OK;
 }
 
-CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
+CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID, _bool Initialized)
 {
     CLoader* pInstance = new CLoader(pDevice, pContext);
 
-    if (FAILED(pInstance->Initialize(eNextLevelID)))
+    if (FAILED(pInstance->Initialize(eNextLevelID, Initialized)))
     {
         MSG_BOX("Failed to Created : CLoader");
         Safe_Release(pInstance);

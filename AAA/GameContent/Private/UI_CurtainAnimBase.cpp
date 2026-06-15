@@ -9,8 +9,10 @@ CUI_CurtainAnimBase::CUI_CurtainAnimBase(ID3D11Device* pDevice, ID3D11DeviceCont
     : CUIPartObject{ pDevice, pContext }
     , m_fAlpha{ 1.f }, m_iTextureLevel{ ETOUI(LEVEL::STATIC) }
     , m_fStartSize{ 600.f }, m_fEndSize{ 0.f }, m_fShrinkDuration{ 1.2f }, m_fSpinSpeedDeg{ 120.f }
+    , m_bSpinEase{ false }, m_fSpinEaseCycle{ 1.f }, m_fSpinEaseMin{ 0.f }
     , m_fStartDelay{ 0.f }, m_bDisableOnFinish{ true }, m_bShowWhileWaiting{ false }
     , m_bLoop{ false }, m_bPlay{ false }
+    , m_bUseAlphaFade{ false }, m_fStartAlpha{ 1.f }, m_fEndAlpha{ 0.f }, m_bAlphaInOut{ false }
 {
 }
 CUI_CurtainAnimBase::CUI_CurtainAnimBase(const CUI_CurtainAnimBase& Prototype)
@@ -20,8 +22,15 @@ CUI_CurtainAnimBase::CUI_CurtainAnimBase(const CUI_CurtainAnimBase& Prototype)
     , m_bPlay{ Prototype.m_bPlay }, m_bLoop{ Prototype.m_bLoop }
     , m_fStartSize{ Prototype.m_fStartSize }, m_fEndSize{ Prototype.m_fEndSize }
     , m_fShrinkDuration{ Prototype.m_fShrinkDuration }, m_fSpinSpeedDeg{ Prototype.m_fSpinSpeedDeg }
+    , m_bSpinEase{ Prototype.m_bSpinEase }
+    , m_fSpinEaseCycle{ Prototype.m_fSpinEaseCycle }
+    , m_fSpinEaseMin{ Prototype.m_fSpinEaseMin }
     , m_fStartDelay{ Prototype.m_fStartDelay }, m_bDisableOnFinish{ Prototype.m_bDisableOnFinish }
     , m_bShowWhileWaiting{ Prototype.m_bShowWhileWaiting }
+    , m_bUseAlphaFade{ Prototype.m_bUseAlphaFade }
+    , m_fStartAlpha{ Prototype.m_fStartAlpha }
+    , m_fEndAlpha{ Prototype.m_fEndAlpha }
+    , m_bAlphaInOut{ Prototype.m_bAlphaInOut }
 {
 }
 HRESULT CUI_CurtainAnimBase::Initialize_Prototype() { return __super::Initialize_Prototype(); }
@@ -40,8 +49,15 @@ HRESULT CUI_CurtainAnimBase::Initialize(void* pArg)
     m_bPlay = pDesc->bPlay; m_bLoop = pDesc->bLoop;
     m_fStartSize = pDesc->fStartSize; m_fEndSize = pDesc->fEndSize;
     m_fShrinkDuration = pDesc->fShrinkDuration; m_fSpinSpeedDeg = pDesc->fSpinSpeedDeg;
+    m_bSpinEase = pDesc->bSpinEase;
+    m_fSpinEaseCycle = pDesc->fSpinEaseCycle;
+    m_fSpinEaseMin = pDesc->fSpinEaseMin;
     m_fStartDelay = pDesc->fStartDelay; m_bDisableOnFinish = pDesc->bDisableOnFinish;
     m_bShowWhileWaiting = pDesc->bShowWhileWaiting;
+    m_bUseAlphaFade = pDesc->bUseAlphaFade;
+    m_fStartAlpha = pDesc->fStartAlpha;
+    m_fEndAlpha = pDesc->fEndAlpha;
+    m_bAlphaInOut = pDesc->bAlphaInOut;
 
     if (FAILED(__super::Initialize(pDesc)))
         return E_FAIL;
@@ -54,9 +70,10 @@ HRESULT CUI_CurtainAnimBase::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
-    m_fAccTime = 0.f; m_fSpinAngle = 0.f; m_bFinished = false;
+    m_fAccTime = 0.f; m_fSpinAngle = 0.f; m_fSpinPhase = 0.f; m_bFinished = false;
     m_bPrevPlay = false; m_bPrevLoop = m_bLoop;
     m_fDelayAcc = 0.f; m_bArmed = false;
+    if (m_bUseAlphaFade) m_fAlpha = m_fStartAlpha;
     return S_OK;
 }
 
@@ -73,14 +90,45 @@ void CUI_CurtainAnimBase::Update(_float fTimeDelta)
         m_bPlay = true; m_bPrevPlay = false;    // 딜레이 끝 → 재생 시작
     }
 
-    if (m_bPlay && !m_bPrevPlay) { m_fAccTime = 0.f; m_fSpinAngle = 0.f; m_bFinished = false; }
-    if (m_bLoop && !m_bPrevLoop && !m_bPlay) { m_fAccTime = 0.f; m_fSpinAngle = 0.f; m_bFinished = false; m_bPlay = true; }
-    m_bPrevPlay = m_bPlay; m_bPrevLoop = m_bLoop;
+    _bool bJustStarted = false;
+    if (m_bPlay && !m_bPrevPlay) {
+        m_fAccTime = 0.f;  m_fSpinAngle = 0.f;  m_fSpinPhase = 0.f;
+        m_bFinished = false;
+        if (m_bUseAlphaFade) m_fAlpha = m_fStartAlpha;
+        bJustStarted = true;
+    }
+    if (m_bLoop && !m_bPrevLoop && !m_bPlay) {
+        m_fAccTime = 0.f;  m_fSpinAngle = 0.f;  m_fSpinPhase = 0.f;
+        m_bFinished = false;  m_bPlay = true;
+        bJustStarted = true;
+    }
+    m_bPrevPlay = m_bPlay;  m_bPrevLoop = m_bLoop;
 
     if (!m_bPlay) return;
 
+    // 시작 프레임은 t=0(시작 포즈)만 한 번 그리고, 시간 누적은 다음 프레임부터.
+    // → 큰 fTimeDelta가 와도 한 프레임에 통째로 소진(0프레임 렌더)되는 것 방지.
+    if (bJustStarted) {
+        Reset_Tranform();   // 시작 크기/회전 basis 세팅 (이미 클래스에 있는 함수)
+        return;
+    }
+
     m_fAccTime += fTimeDelta;
-    m_fSpinAngle += XMConvertToRadians(m_fSpinSpeedDeg) * fTimeDelta;
+
+    _float fSpeedScale = 1.f;
+    if (m_bSpinEase && m_fSpinEaseCycle > 0.f)
+    {
+        m_fSpinPhase += fTimeDelta;
+        if (m_fSpinPhase >= m_fSpinEaseCycle)
+            m_fSpinPhase = fmodf(m_fSpinPhase, m_fSpinEaseCycle);
+
+        // (1 - cos)/2 : 0 → 1 → 0 으로 부드럽게(느림→빠름→느림)
+        const _float fWave = 0.5f * (1.f - cosf(XM_2PI * (m_fSpinPhase / m_fSpinEaseCycle)));
+        const _float fMin = max(0.f, min(1.f, m_fSpinEaseMin));
+        fSpeedScale = fMin + (1.f - fMin) * fWave;
+    }
+
+    m_fSpinAngle += XMConvertToRadians(m_fSpinSpeedDeg) * fSpeedScale * fTimeDelta;
 
     _float t = 1.f;
     if (m_fShrinkDuration > 0.f)
@@ -94,6 +142,18 @@ void CUI_CurtainAnimBase::Update(_float fTimeDelta)
     }
 
     _float s = m_fStartSize + (m_fEndSize - m_fStartSize) * t;
+    if (m_bUseAlphaFade)
+    {
+        if (m_bAlphaInOut)
+        {
+            const _float fBump = sinf(XM_PI * t);   // 0 → 1 → 0 (t: 0→0.5→1)
+            m_fAlpha = m_fStartAlpha + (m_fEndAlpha - m_fStartAlpha) * fBump;
+        }
+        else
+        {
+            m_fAlpha = m_fStartAlpha + (m_fEndAlpha - m_fStartAlpha) * t;   // 기존 선형
+        }
+    }
     const _float c = cosf(m_fSpinAngle), sn = sinf(m_fSpinAngle);   // s=0서도 복구되게 basis 직접 구성
     m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(c * s, sn * s, 0.f, 0.f));
     m_pTransformCom->Set_State(STATE::UP, XMVectorSet(-sn * s, c * s, 0.f, 0.f));

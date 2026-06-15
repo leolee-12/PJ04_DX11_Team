@@ -21,10 +21,20 @@ class CLIENT_DLL CUI_CurtainAnimBase abstract : public CUIPartObject, public ICu
       PROPERTY(_wstring, m_strTextureProtoTag, L"TextureProtoTag", L"Texture");
       PROPERTY(_bool, m_bPlay, L"Play", L"Anim");
       PROPERTY(_bool, m_bLoop, L"Loop", L"Anim");
+
       PROPERTY(_float, m_fStartSize, L"StartSize", L"Anim");
       PROPERTY(_float, m_fEndSize, L"EndSize", L"Anim");
       PROPERTY(_float, m_fShrinkDuration, L"ShrinkDuration", L"Anim");
+      PROPERTY(_bool, m_bUseAlphaFade, L"UseAlphaFade", L"Anim"); // 쉬링크에 맞춰 알파 보간(off면 기존 동작)
+      PROPERTY(_float, m_fStartAlpha, L"StartAlpha", L"Anim"); // t=0 일 때 알파
+      PROPERTY(_float, m_fEndAlpha, L"EndAlpha", L"Anim"); // t=1 일 때 알파
+      PROPERTY(_bool, m_bAlphaInOut, L"AlphaInOut", L"Anim"); // on: Start→End→Start (sin 험프)
+      
       PROPERTY(_float, m_fSpinSpeedDeg, L"SpinSpeedDeg", L"Anim");
+      PROPERTY(_bool, m_bSpinEase, L"SpinEase", L"Anim"); // 사인 가속 사용 여부
+      PROPERTY(_float, m_fSpinEaseCycle, L"SpinEaseCycle", L"Anim"); // 느림→빠름→느림 한 주기(초)
+      PROPERTY(_float, m_fSpinEaseMin, L"SpinEaseMin", L"Anim"); // 최저 속도 배율(0~1)
+
       PROPERTY(_float, m_fStartDelay, L"StartDelay", L"Anim");
       PROPERTY(_bool, m_bDisableOnFinish, L"DisableOnFinish", L"Anim");
       PROPERTY(_bool, m_bShowWhileWaiting, L"ShowWhileWaiting", L"Anim");
@@ -39,7 +49,16 @@ public:
               _float                  fStartSize = { 600.f };
               _float                  fEndSize = { 0.f };
               _float                  fShrinkDuration = { 1.2f };
+              _bool                   bUseAlphaFade = { false };
+              _float                  fStartAlpha = { 1.f };
+              _float                  fEndAlpha = { 0.f };
+              _bool                   bAlphaInOut = { false };
+
               _float                  fSpinSpeedDeg = { 120.f };
+              _bool                   bSpinEase = { false };
+              _float                  fSpinEaseCycle = { 1.f };
+              _float                  fSpinEaseMin = { 0.f };
+
               _float                  fStartDelay = { 0.f };
               _bool                   bDisableOnFinish = { true };
               _bool                   bPlay = { false };
@@ -77,6 +96,9 @@ public:
       { 
           m_fAccTime = 0.f;
           m_fSpinAngle = 0.f;
+          m_fSpinPhase = 0.f;
+          if (m_bUseAlphaFade) 
+              m_fAlpha = m_fStartAlpha;
           Reset_Tranform();
       }
 
@@ -92,6 +114,7 @@ protected:
 
       _float                  m_fAccTime = { 0.f };
       _float                  m_fSpinAngle = { 0.f };
+      _float                  m_fSpinPhase = { 0.f };
       _bool                   m_bFinished = { false };
       _bool                   m_bPrevPlay = { false };
       _bool                   m_bPrevLoop = { false };

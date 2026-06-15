@@ -178,7 +178,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
-    case WM_ACTIVATE:
+    /*case WM_ACTIVATE:
         if (LOWORD(wParam) != WA_INACTIVE)
         {
             RECT rc;
@@ -197,7 +197,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             ClipCursor(nullptr);
         }
-        break;
+        break;*/
 
     case WM_COMMAND:
     {

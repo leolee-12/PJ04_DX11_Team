@@ -21,6 +21,8 @@
 #include "UI_PointStar.h"
 #include "UI_KirbyStatus.h"
 #include "UI_FadeOut.h"
+#include "UI_LoadingCurtain.h"
+#include "UI_FadeIn.h"
 
 // UI Parts
 #include "UI_Image.h"
@@ -382,6 +384,18 @@ void CGameObject_Factory::Register_UIContainer()
     Register(CUI_FadeOut::PROTOTYPE_TAG,
         TEXT("UI_CONTAINER"),
         CREATOR(CUI_FadeOut),
+        LOADER()
+    );
+
+    Register(CUI_LoadingCurtain::PROTOTYPE_TAG,
+        TEXT("UI_CONTAINER"),
+        CREATOR(CUI_LoadingCurtain),
+        LOADER()
+    );
+
+    Register(CUI_FadeIn::PROTOTYPE_TAG,
+        TEXT("UI_CONTAINER"),
+        CREATOR(CUI_FadeIn),
         LOADER()
     );
 }

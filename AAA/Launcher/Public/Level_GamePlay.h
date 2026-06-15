@@ -19,15 +19,8 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	enum class EEndingPhase { NONE, SLOW, HOLD, RECOVER };
+	_bool	m_bTestLevelChange = { false };
 
-	EEndingPhase m_eEndingPhase = { EEndingPhase::NONE };
-	_float       m_fEndingTimer = { 0.f };
-
-	static constexpr _float SLOWMO_RAMP_TIME = 0.4f;   
-	static constexpr _float SLOWMO_TARGET = 0.2f;
-	static constexpr _float HOLD_TIME = 1.5f;   
-	static constexpr _float RECOVER_RAMP_TIME = 0.6f;
 
 private:
 	virtual HRESULT Ready_Events() override;

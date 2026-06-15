@@ -10,7 +10,7 @@ CUI_SpriteAnim::CUI_SpriteAnim(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 	, m_vColor{ 1.f, 1.f, 1.f, 1.f }, m_fAlpha{ 1.f }
 	, m_iTextureLevel{ ETOUI(LEVEL::STATIC) }
 	, m_fDuration{ 1.f }, m_fEndDelay{ 0.f }, m_bLoop{ true }, m_bAutoPlay{ true }
-	, m_fSpinSpeedDeg{ 0.f }
+	, m_fSpinSpeedDeg{ 0.f }, m_bSpinEase{ false }, m_fSpinEaseCycle{ 1.f }, m_fSpinEaseMin{ 0.f }
 {
 }
 
@@ -22,6 +22,9 @@ CUI_SpriteAnim::CUI_SpriteAnim(const CUI_SpriteAnim& Prototype)
 	, m_fDuration{ Prototype.m_fDuration }, m_fEndDelay{ Prototype.m_fEndDelay }
 	, m_bLoop{ Prototype.m_bLoop }, m_bAutoPlay{ Prototype.m_bAutoPlay }
 	, m_fSpinSpeedDeg{ Prototype.m_fSpinSpeedDeg }
+	, m_bSpinEase{ Prototype.m_bSpinEase }
+	, m_fSpinEaseCycle{ Prototype.m_fSpinEaseCycle }
+	, m_fSpinEaseMin{ Prototype.m_fSpinEaseMin }
 {
 }
 
@@ -45,6 +48,9 @@ HRESULT CUI_SpriteAnim::Initialize(void* pArg)
 	m_bLoop		= pDesc->bLoop;
 	m_bAutoPlay = pDesc->bAutoPlay;
 	m_fSpinSpeedDeg = pDesc->fSpinSpeedDeg;
+	m_bSpinEase = pDesc->bSpinEase;
+	m_fSpinEaseCycle = pDesc->fSpinEaseCycle;
+	m_fSpinEaseMin = pDesc->fSpinEaseMin;
 
 	if (FAILED(__super::Initialize(pDesc)))
 		return E_FAIL;
@@ -157,6 +163,7 @@ void CUI_SpriteAnim::Stop()
 	m_iTexIndex = 0;
 	m_bFinished = false;
 	m_fSpinAngle = 0.f;
+	m_fSpinPhase = 0.f;
 	m_bPrevPlay = false;
 	if (m_fSpinSpeedDeg != 0.f)
 		Apply_Spin();
@@ -305,17 +312,35 @@ void CUI_SpriteAnim::Sync_FrameCount()
 
 void CUI_SpriteAnim::Update_Spin(_float fTimeDelta)
 {
-	if (m_fSpinSpeedDeg == 0.f)        // 회전 데이터 없음 → 트랜스폼 손 안 댐(기존 동작 유지)
+	if (m_fSpinSpeedDeg == 0.f)        // 회전 옵션 꺼짐 → 트랜스폼 건드리지 않음
 		return;
 
-	if (m_bIsPlay && !m_bPrevPlay)     // 재생이 새로 시작되면 각도 0부터
+	if (m_bIsPlay && !m_bPrevPlay)     // 재생이 막 시작되면 각/위상 0으로
+	{
 		m_fSpinAngle = 0.f;
+		m_fSpinPhase = 0.f;
+	}
 	m_bPrevPlay = m_bIsPlay;
 
 	if (!m_bIsPlay)
 		return;
 
-	m_fSpinAngle += XMConvertToRadians(m_fSpinSpeedDeg) * fTimeDelta;
+	_float fSpeedScale = 1.f;
+	if (m_bSpinEase && m_fSpinEaseCycle > 0.f)
+	{
+		m_fSpinPhase += fTimeDelta;
+		if (m_fSpinPhase >= m_fSpinEaseCycle)
+			m_fSpinPhase = fmodf(m_fSpinPhase, m_fSpinEaseCycle);
+
+		// (1 - cos)/2 : 0 → 1 → 0 으로 부드럽게(느림→빠름→느림)
+		const _float fWave = 0.5f * (1.f - cosf(XM_2PI * (m_fSpinPhase / m_fSpinEaseCycle)));
+
+		// 최저 배율 ~ 1.0 사이로 매핑 (0이면 정점에서 잠깐 멈춤 느낌)
+		const _float fMin = max(0.f, min(1.f, m_fSpinEaseMin));
+		fSpeedScale = fMin + (1.f - fMin) * fWave;
+	}
+
+	m_fSpinAngle += XMConvertToRadians(m_fSpinSpeedDeg) * fSpeedScale * fTimeDelta;
 	Apply_Spin();
 }
 

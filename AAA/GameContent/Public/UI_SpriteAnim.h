@@ -25,6 +25,9 @@ class CLIENT_DLL CUI_SpriteAnim : public CUIPartObject
 	PROPERTY(_bool, m_bLoop, L"Loop", L"Anim");
 	PROPERTY(_bool, m_bAutoPlay, L"AutoPlay", L"Anim");
 	PROPERTY(_float, m_fSpinSpeedDeg, L"SpinSpeedDeg", L"Anim");
+	PROPERTY(_bool, m_bSpinEase, L"SpinEase", L"Anim");			   // 사인 가속 사용 여부
+	PROPERTY(_float, m_fSpinEaseCycle, L"SpinEaseCycle", L"Anim"); // 느림→빠름→느림 한 주기(초)
+	PROPERTY(_float, m_fSpinEaseMin, L"SpinEaseMin", L"Anim");     // 최저 속도 배율(0~1)
 
 public:
 	typedef struct tagUISpriteAnimDesc : public CUIPartObject::UI_PARTOBJECT_DESC
@@ -39,6 +42,9 @@ public:
 		_bool           bLoop = { true };
 		_bool           bAutoPlay = { true };
 		_float          fSpinSpeedDeg = { 0.f };
+		_bool           bSpinEase = { false };
+		_float          fSpinEaseCycle = { 1.f };
+		_float          fSpinEaseMin = { 0.f };
 	}UI_SPRITEANIM_DESC;
 
 	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_UI_SpriteAnim";
@@ -95,6 +101,7 @@ protected:
 	_bool					m_bFinished = { false };
 
 	_float                  m_fSpinAngle = { 0.f };   
+	_float                  m_fSpinPhase = { 0.f };
 	_bool                   m_bPrevPlay = { false };
 
 protected:

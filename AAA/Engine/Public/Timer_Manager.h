@@ -27,6 +27,7 @@ public:
 private:
 	unordered_map<_wstring, CTimer*>	m_Timers;
 	_float m_fTimeScale = { 1.f };
+	_float m_fMaxTimeDelta = { 0.1f };
 
 private:
 	CTimer* Find_Timer(const _wstring& strTimerTag);
