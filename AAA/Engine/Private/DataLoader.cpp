@@ -45,7 +45,8 @@ void CDataLoader::Parse_Float4(const json& jArray, _float4* pOutFloat4)
 HRESULT CDataLoader::Read_ysh(const _tchar* pFilePath, MODEL_DATA& out)
 {
     ifstream file(pFilePath, ios::binary);
-    if (!file.is_open()) return E_FAIL;
+    if (!file.is_open()) 
+        return E_FAIL;
 
     uint32_t magic, version, type;
     ReadVal(file, magic);
