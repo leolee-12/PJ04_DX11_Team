@@ -37,7 +37,7 @@ HRESULT CEnvObject_Static::Initialize(void* pArg)
 
 void CEnvObject_Static::Late_Update(_float fTimeDelta)
 {
-	UNREFERENCED_PARAMETER(fTimeDelta);
+	__super::Late_Update(fTimeDelta);
 
 	if (!m_bRenderable || !Has_RenderModel())
 	{

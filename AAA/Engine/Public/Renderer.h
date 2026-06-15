@@ -97,6 +97,9 @@ private:
 
 	HRESULT Render_NonLight();
 	HRESULT Render_Blend();
+
+	HRESULT Render_Occlusion();
+
 	HRESULT Render_UI_BACK();
 	HRESULT Render_UI_MIDDLE();
 	HRESULT Render_UI_FRONT();

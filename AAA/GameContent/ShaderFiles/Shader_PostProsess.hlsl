@@ -409,6 +409,16 @@ float4 PS_CURTAIN_COMPOSITE(PS_IN In) : SV_TARGET0
     return g_CurtainTexture.Sample(LinearSampler, In.vTexcoord);
 }
 
+float4 PS_OCCLUSION_SILHOUETTE(PS_IN In) : SV_TARGET0
+{
+    float fID = g_MRATexture.Sample(PointSampler, In.vTexcoord).a;
+
+    if (round(fID * 255.f) == 200.f)   // == KIRBY_SILHOUETTE_ID
+        discard;
+
+    return float4(0.f, 0.f, 0.f, 0.55f);
+}
+
 
     //============================ Technique ============================
 technique11 DefaultTechnique
@@ -503,5 +513,16 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_CURTAIN_COMPOSITE();
+    }
+
+    pass OcclusionSilhouette // 10
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_StencilEqual, 1); // 스텐실==1 만
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN(); // 기존 풀스크린 쿼드 VS 그대로
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_OCCLUSION_SILHOUETTE();
     }
 }

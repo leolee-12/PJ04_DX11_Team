@@ -104,7 +104,22 @@ HRESULT CEnvObject::Initialize(void* pArg)
 	Apply_DescDefaults();
 	Apply_TransformFromDesc();
 
+	m_bUseCameraDither = true;
+
 	return S_OK;
+}
+
+void CEnvObject::Late_Update(_float fTimeDelta)
+{
+	if (!m_bUseCameraDither) { m_fDissolve = 0.f; return; }
+
+	_vector C = XMLoadFloat4(m_pGameInstance_Proxy->Get_CamPosition());
+	_vector E = XMLoadFloat3(&m_WorldBounds.Center);   // 객체 위치
+	_float  d = XMVectorGetX(XMVector3Length(E - C));  // 객체-카메라 거리
+
+	// near → 1(사라짐),  far → 0(불투명)
+	_float t = (m_fDitherFar - d) / max(m_fDitherFar - m_fDitherNear, 1e-4f);
+	m_fDissolve = t < 0.f ? 0.f : (t > 1.f ? 1.f : t);
 }
 
 void CEnvObject::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
@@ -389,9 +404,22 @@ HRESULT CEnvObject::Render()
 			Layer.idx[ETOUI(MTEX_TYPE::UNKNOWN)])))
 			int a = 1;/*continue;*/
 
-		_uint iPass = (Layer.iPass >= 0)
-			? static_cast<_uint>(Layer.iPass)
-			: ShaderPass::NonAnimPBR::Diffuse;
+		_uint iPass;
+		if (m_bUseCameraDither)
+		{
+			if (m_fDissolve >= 0.999f)          // 완전히 사라짐 → 그릴 필요 없음
+				continue;
+
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve", &m_fDissolve, sizeof(_float))))
+				return E_FAIL;
+
+			iPass = ShaderPass::NonAnimPBR::Dither;
+		}
+		else
+		{
+			iPass = (Layer.iPass >= 0) ? (_uint)Layer.iPass
+				: ShaderPass::NonAnimPBR::Diffuse;
+		}
 
 		if (FAILED(m_pShaderCom->Begin(iPass)))
 			return E_FAIL;
