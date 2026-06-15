@@ -6,7 +6,7 @@ NS_BEGIN(Client)
 
 struct ENV_COLLISION_CATALOG_RECORD
 {
-	wstring strObjectName;
+	wstring wstrObjectName;
 	wstring strApxbinName;
 	wstring strBfresPath;
 };
@@ -18,7 +18,7 @@ public:
 	static void Clear();
 
 	static _bool Is_Loaded();
-	static _bool Try_Find(const _wstring& strObjectName, ENV_COLLISION_CATALOG_RECORD* pOutRecord = nullptr);
+	static _bool Try_Find(const _wstring& wstrObjectName, ENV_COLLISION_CATALOG_RECORD* pOutRecord = nullptr);
 };
 
 NS_END

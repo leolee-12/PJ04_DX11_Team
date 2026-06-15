@@ -2,7 +2,7 @@
 #include "GameContent_Log.h"
 #include "Map_ModelResolver.h"
 #include "Map_Parser.h"
-#include "Map_Override.h"
+#include "Map_EditFile.h"
 #include "Env_CollisionCatalog.h"
 
 #include "DataLoader.h"
@@ -19,11 +19,11 @@ namespace
 
 	_wstring Describe_EnvObject(const ENV_OBJECT_DESC& Desc)
 	{
-		if (!Desc.strObjectName.empty())
-			return Desc.strObjectName;
+		if (!Desc.wstrObjectName.empty())
+			return Desc.wstrObjectName;
 
-		if (!Desc.strEntryKey.empty())
-			return Desc.strEntryKey;
+		if (!Desc.wstrEntryKey.empty())
+			return Desc.wstrEntryKey;
 
 		return L"<unknown>";
 	}
@@ -80,25 +80,19 @@ HRESULT CMap_Builder::Build_FromManifest(const _wstring& strManifestPath, MAP_PA
 		if (FAILED(CDataLoader::Read_Json(Manifest.strDeltaPath.c_str(), &strDeltaContent)))
 			return E_FAIL;
 
-		MAP_OVERRIDE_DESC OverrideDesc{};
+		MAP_EDIT_CHANGE OverrideDesc{};
 		json jDelta = json::parse(strDeltaContent);
-		if (FAILED(CMap_Override::Deserialize(jDelta, &OverrideDesc)))
+		if (FAILED(CMap_EditFile::Load_Change(jDelta, &OverrideDesc)))
 			return E_FAIL;
 
-		if (FAILED(CMap_Override::Apply(pOutPackage, OverrideDesc)))
+		if (FAILED(CMap_EditFile::Apply_Change(pOutPackage, OverrideDesc)))
 			return E_FAIL;
 	}
 
 	return S_OK;
 }
 
-HRESULT CMap_Builder::Build_FromPreset_ForTool(_uint, MAP_PACKAGE*)
-{
-	return E_NOTIMPL;
-}
-
-HRESULT CMap_Builder::Build_StageDesc(const MAP_MANIFEST_DESC& Manifest, MAP_STAGE_DESC*
-	pOutStageDesc)
+HRESULT CMap_Builder::Build_StageDesc(const MAP_MANIFEST_DESC& Manifest, MAP_STAGE_DESC* pOutStageDesc)
 {
 	if (nullptr == pOutStageDesc || nullptr == m_pResolver)
 		return E_FAIL;
@@ -119,14 +113,14 @@ HRESULT CMap_Builder::Build_StageDesc(const MAP_MANIFEST_DESC& Manifest, MAP_STA
 	{
 		const _wstring& strSectionName = Manifest.SectionNames[i];
 
-		_wstring strModelPath;
-		_wstring strModelProtoTag;
+		_wstring wstrModelPath;
+		_wstring wstrModelProtoTag;
 
 		if (FAILED(m_pResolver->Resolve_MapSection(
 			Manifest.strStageFolderName,
 			strSectionName,
-			&strModelPath,
-			&strModelProtoTag)))
+			&wstrModelPath,
+			&wstrModelProtoTag)))
 		{
 			Log_GameContentWarning(
 				"Map builder section model missing: stage="
@@ -138,8 +132,8 @@ HRESULT CMap_Builder::Build_StageDesc(const MAP_MANIFEST_DESC& Manifest, MAP_STA
 
 		MAP_SECTION_DESC Desc{};
 		Desc.strSectionName = strSectionName;
-		Desc.strModelPath = strModelPath;
-		Desc.strModelProtoTag = strModelProtoTag;
+		Desc.wstrModelPath = wstrModelPath;
+		Desc.wstrModelProtoTag = wstrModelProtoTag;
 		Desc.iModelProtoLevel = 0;
 		Desc.eSectionType = Manifest.SectionTypes[i];
 		Desc.eRenderID = Manifest.SectionRenderIDs[i];
@@ -200,7 +194,7 @@ HRESULT CMap_Builder::Validate_And_Filter(MAP_PACKAGE* pPackage)
 	for (const ENV_OBJECT_DESC& Desc : pPackage->EnvObjectDescs)
 	{
 		if (Needs_Model(Desc)
-			&& (Desc.strModelPath.empty() || Desc.strModelProtoTag.empty()))
+			&& (Desc.wstrModelPath.empty() || Desc.wstrModelProtoTag.empty()))
 		{
 			Log_GameContentWarning(
 				"Map builder skipped env without model: object="

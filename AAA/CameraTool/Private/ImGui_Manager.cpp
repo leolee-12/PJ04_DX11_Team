@@ -156,15 +156,15 @@ void CImGui_Manager::Draw_Toolbar()
         solver.Rails().push_back(R);
     }
 
-    _uint nP = CMap_Loader::Get_MapPresetCount();
+    _uint nP = CMap_Loader::Get_MapCount();
     if (nP > 0)
     {
         static int s_p = 0; if (s_p >= (int)nP) s_p = 0;
         ImGui::SetNextItemWidth(220);
-        if (ImGui::BeginCombo("##map", CMap_Loader::Get_MapPresetLabel(s_p)))
+        if (ImGui::BeginCombo("##map", CMap_Loader::Get_MapName(s_p)))
         {
             for (_uint i = 0; i < nP; ++i)
-                if (ImGui::Selectable(CMap_Loader::Get_MapPresetLabel(i), (int)i == s_p)) s_p = i;
+                if (ImGui::Selectable(CMap_Loader::Get_MapName(i), (int)i == s_p)) s_p = i;
             ImGui::EndCombo();
         }
         ImGui::SameLine(); if (ImGui::Button("Load Map"))   m_pLevel_Edit->Load_MapPreview((_uint)s_p);

@@ -19,7 +19,7 @@
 #include "PhysX_Manager.h"
 #include "Environment_Manager.h"
 #include "ShaderGlobal_Manager.h"
-#include "Frustum_Manager.h"
+#include "Culling_Manager.h"
 #include "Texture_Hub.h"
 #include "Effect_Allocator.h"
 
@@ -50,8 +50,8 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pInstance->m_pCamera_Manager)
         return E_FAIL;
 
-    m_pInstance->m_pFrustum_Manager = CFrustum_Manager::Create();   // WY
-    if (nullptr == m_pInstance->m_pFrustum_Manager)
+    m_pInstance->m_pCulling_Manager = CCulling_Manager::Create();   // WY
+    if (nullptr == m_pInstance->m_pCulling_Manager)
         return E_FAIL;
 
     m_pInstance->m_pTimer_Manager = CTimer_Manager::Create();
@@ -139,12 +139,14 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 
 void CGameInstance::Update_Engine(_float fTimeDelta)
 {
+    ++m_iFrameIndex;
+
 	m_pInput_Device->Update();
 
     m_pObject_Manager->Priority_Update(fTimeDelta);
     m_pObject_Manager->Update(fTimeDelta);
 	m_pCamera_Manager->Update();
-    m_pFrustum_Manager->Update();
+    m_pCulling_Manager->Update();
 
     m_pSound_Manager->Set_ListenerPos(*m_pCamera_Manager->Get_CamPosition());
     m_pSound_Manager->Update();
@@ -209,6 +211,10 @@ _int CGameInstance::RandomInt(_int iMin, _int iMax) const
 {
 	uniform_int_distribution<_int> dist(iMin, iMax);
     return dist(m_RandomGenerator);
+}
+_int64 CGameInstance::Get_FrameIndex()
+{
+    return m_iFrameIndex;
 }
 #pragma endregion
 
@@ -556,45 +562,45 @@ HRESULT CGameInstance::Render_RT_Debug(const _wstring& strMRTTag, class CShader*
 
 #pragma endregion
 
-#pragma region FRUSTUM_MANAGER
+#pragma region CULLING_MANAGER
 _bool CGameInstance::Update_CullingView(CULLING_VIEW eView, const CULLING_VIEW_DESC& Desc)
 {
-    if (nullptr == m_pFrustum_Manager)
+    if (nullptr == m_pCulling_Manager)
         return false;
 
-    return m_pFrustum_Manager->Update_View(eView, Desc);
+    return m_pCulling_Manager->Update_View(eView, Desc);
 }
 
 _bool CGameInstance::Should_CullAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const
 {
-    if (nullptr == m_pFrustum_Manager)
+    if (nullptr == m_pCulling_Manager)
         return false;
 
-    return m_pFrustum_Manager->Should_CullAABB(eView, WorldBounds);
+    return m_pCulling_Manager->Should_CullAABB(eView, WorldBounds);
 }
 
 _bool CGameInstance::Should_CullByDistance(const BoundingBox& WorldBounds, _float fCullDistance) const
 {
-    if (nullptr == m_pFrustum_Manager)
+    if (nullptr == m_pCulling_Manager)
         return false;
 
-    return m_pFrustum_Manager->Should_CullByDistance(WorldBounds, fCullDistance);
+    return m_pCulling_Manager->Should_CullByDistance(WorldBounds, fCullDistance);
 }
 
 _bool XM_CALLCONV CGameInstance::IsIn_CullingView_WorldSpace(CULLING_VIEW eView, _fvector vWorldPos, _float fRange) const
 {
-    if (nullptr == m_pFrustum_Manager)
+    if (nullptr == m_pCulling_Manager)
         return true;
 
-    return m_pFrustum_Manager->IsIn_WorldSpace(eView, vWorldPos, fRange);
+    return m_pCulling_Manager->IsIn_WorldSpace(eView, vWorldPos, fRange);
 }
 
 _bool CGameInstance::IsIn_CullingView_AABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const
 {
-    if (nullptr == m_pFrustum_Manager)
+    if (nullptr == m_pCulling_Manager)
         return true;
 
-    return m_pFrustum_Manager->IsIn_WorldSpace_AABB(eView, WorldBounds);
+    return m_pCulling_Manager->IsIn_WorldSpace_AABB(eView, WorldBounds);
 }
 #pragma endregion
 
@@ -605,6 +611,22 @@ HRESULT CGameInstance::LoadOrGet_TextureFromHub(const _tchar* pTexturePath, TEXT
         return E_FAIL;
 
     return m_pTexture_Hub->LoadOrGet(pTexturePath, pOutHandle);
+}
+
+HRESULT CGameInstance::Register_TextureNameInHub(const _tchar* pTextureName, TEXTURE_HANDLE Handle)
+{
+    if (nullptr == m_pTexture_Hub)
+        return E_FAIL;
+
+    return m_pTexture_Hub->Register_TextureName(Handle, pTextureName);
+}
+
+HRESULT CGameInstance::Get_TextureFromHub(const _tchar* pTextureName, TEXTURE_HANDLE* pOutHandle) const
+{
+    if (nullptr == m_pTexture_Hub)
+        return E_FAIL;
+
+    return m_pTexture_Hub->Get(pTextureName, pOutHandle);
 }
 
 HRESULT CGameInstance::Bind_TextureFromHub(CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle)
@@ -707,7 +729,7 @@ void CGameInstance::Free()
 
     Safe_Release(m_pPhysX_Manager);
     Safe_Release(m_pTimer_Manager);
-    Safe_Release(m_pFrustum_Manager);
+    Safe_Release(m_pCulling_Manager);
     Safe_Release(m_pCamera_Manager);
     Safe_Release(m_pGameInstance_Proxy);
     Safe_Release(m_pGraphic_Device);

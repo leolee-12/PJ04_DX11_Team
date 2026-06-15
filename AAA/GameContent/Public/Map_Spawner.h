@@ -15,7 +15,7 @@ private:
 	virtual ~CMap_Spawner() = default;
 
 public:
-	HRESULT Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST& Request, MAP_LOAD_REPORT* pOutReport = nullptr);
+	HRESULT Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST& Request, MAP_LOAD_RESULT* pOutReport = nullptr);
 
 private:
 	CGameInstance_Proxy* m_pProxy = { nullptr };

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "MapObject.h"
 #include "Map_Defines.h"
 
@@ -33,20 +32,25 @@ public:
 	virtual void	Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
 public:
-	void			Refresh_WorldBounds();
-	void			Set_ParentMatrix(const _float4x4* pParentMatrix);
-	void			Refresh_CombinedWorldMatrix();
+	void	Refresh_WorldBounds();
+	void	Set_ParentMatrix(const _float4x4* pParentMatrix);
+	void	Refresh_CombinedWorldMatrix();
+	void	Notify_EditTransformChanged();
+
 #ifdef _DEBUG
-	void			Reset_FrameProfile();
+	void	Reset_FrameProfile();
 #endif
 
 public:
-	json Serialize_SectionState() const;
-	void Deserialize_SectionState(const json& j);
-	void Set_RenderID(RENDERID eRenderID) { m_eRenderID = eRenderID; }
-	void Set_ShadowCaster(_bool bCastShadow) { m_bCastShadow = bCastShadow; }
-	void Set_Culling(_bool bEnableCulling) { m_bEnableCulling = bEnableCulling; }
+	json	Serialize_SectionState() const;
+	void	Deserialize_SectionState(const json& j);
+	void	Set_RenderID(RENDERID eRenderID) { m_eRenderID = eRenderID; }
+	void	Set_ShadowCaster(_bool bCastShadow) { m_bCastShadow = bCastShadow; }
+	void	Set_Culling(_bool bEnableCulling) { m_bEnableCulling = bEnableCulling; }
+	void	Set_CollisionActorEnabled(_bool bEnable) { m_bCreateCollisionActor = bEnable; }
+	_bool	Is_CollisionActorEnabled() const { return m_bCreateCollisionActor; }
 
+	const MAP_SECTION_DESC&	Get_Desc() const { return m_tDesc; }
 	const BoundingBox&		Get_WorldBounds() const { return m_WorldBounds; }
 	MAP_SECTION_TYPE		Get_SectionType() const { return m_eSectionType; }
 	RENDERID				Get_RenderID() const { return m_eRenderID; }
@@ -65,6 +69,7 @@ private:
 	virtual HRESULT			Ready_Events() override { return S_OK; }
 	virtual HRESULT			Bind_WorldMatrix() override;
 	void					Update_LocalBounds();
+	void					Refresh_ColliderActor();
 
 private:
 	_wstring			m_strProtoTag = { PROTOTYPE_TAG };
@@ -78,6 +83,8 @@ private:
 	BoundingBox			m_WorldBounds = {};
 	const _float4x4*	m_pParentMatrix = {};
 	_float4x4			m_CombinedWorldMatrix = {};
+	MAP_SECTION_DESC	m_tDesc = {};
+	_bool				m_bCreateCollisionActor = { true };
 
 	physx::PxRigidStatic* m_pColliderActor = { nullptr };
 

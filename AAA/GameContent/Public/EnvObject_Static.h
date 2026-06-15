@@ -3,6 +3,7 @@
 #include "EnvObject.h"
 
 NS_BEGIN(Client)
+class CEnv_InstanceController;
 
 class CLIENT_DLL CEnvObject_Static final : public CEnvObject
 {
@@ -19,11 +20,23 @@ public:
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render_Shadow() override;
-	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
+
+public:	// Instance
+	void	Set_InstanceController(CEnv_InstanceController* pCtrl);
+	_bool	Can_RenderInstance() const;
+
+private:
+	CEnv_InstanceController* m_pInstanceController = { nullptr };
+	ENV_INSTANCE_BATCH_HANDLE m_InstanceBatchHandle = {};
+
+private:
+	void Submit_RenderGroups();
+	_bool Should_BypassMainInstance() const;
 
 public:
 	static CEnvObject_Static* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	virtual CGameObject* Clone(void* pArg) override;
 
 protected:
 	virtual void Free() override;

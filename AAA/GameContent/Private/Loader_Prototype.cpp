@@ -18,6 +18,7 @@
 #include "UI_Curtain.h"
 #include "UI_Eraser.h"
 #include "UI_CurtainTexture.h"
+#include "Env_InstanceController.h"
 
 
 NS_BEGIN(Client)
@@ -69,6 +70,10 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
     if (FAILED(pProxy->Add_Prototype(Model_SkyTest.iLevelID, Model_SkyTest.szProtoTag,
         CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Sky/Test/Model.ysh"))))
         return E_FAIL;
+
+    if (FAILED(pProxy->Add_Prototype(ETOUI(LEVEL::STATIC),
+        CEnv_InstanceController::PROTOTYPE_TAG, CEnv_InstanceController::Create(pDevice, pContext))))
+        return E_FAIL;
     
     if (FAILED(Ready_Prototype_UIPartObjects(pProxy, pDevice, pContext)))
         return E_FAIL;
@@ -94,6 +99,10 @@ HRESULT Ready_Prototype_Shaders(CGameInstance_Proxy* pProxy, ID3D11Device* pDevi
         CShader::Create(pDevice, pContext, Shader_Map.szFileTag, VTXMAPMESH::Elements, VTXMAPMESH::iNumElements))))
         return E_FAIL;
 
+    if (FAILED(pProxy->Add_Prototype(Shader_EnvInstance.iLevelID, Shader_EnvInstance.szProtoTag,
+        CShader::Create(pDevice, pContext, Shader_EnvInstance.szFileTag, VTXMESH_INSTANCED::Elements, VTXMESH_INSTANCED::iNumElements))))
+        return E_FAIL;
+    
     if (FAILED(pProxy->Add_Prototype(Shader_MtrlTest.iLevelID, Shader_MtrlTest.szProtoTag,
         CShader::Create(pDevice, pContext, Shader_MtrlTest.szFileTag, VTXMESH::Elements, VTXMESH::iNumElements))))
         return E_FAIL;

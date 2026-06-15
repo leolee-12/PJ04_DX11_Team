@@ -45,18 +45,18 @@ namespace
 		return 0 == _wcsicmp(A.c_str(), B);
 	}
 
-	ENV_SIMPLE_SHAPE Resolve_SimpleShapeFromObjectName(const wstring& strObjectName)
+	ENV_SIMPLE_SHAPE Resolve_SimpleShapeFromObjectName(const wstring& wstrObjectName)
 	{
-		if (Is_SameText(strObjectName, L"Cube"))
+		if (Is_SameText(wstrObjectName, L"Cube"))
 			return ENV_SIMPLE_SHAPE::BOX;
 
-		if (Is_SameText(strObjectName, L"Sphere"))
+		if (Is_SameText(wstrObjectName, L"Sphere"))
 			return ENV_SIMPLE_SHAPE::SPHERE;
 
-		if (Is_SameText(strObjectName, L"Cylinder"))
+		if (Is_SameText(wstrObjectName, L"Cylinder"))
 			return ENV_SIMPLE_SHAPE::CYLINDER;
 
-		if (Is_SameText(strObjectName, L"Slope"))
+		if (Is_SameText(wstrObjectName, L"Slope"))
 			return ENV_SIMPLE_SHAPE::SLOPE;
 
 		return ENV_SIMPLE_SHAPE::NONE;
@@ -84,7 +84,7 @@ namespace
 		if (pDesc->eSourceType == ENV_SOURCE_TYPE::TOY_DECOR)
 		{
 			const ENV_SIMPLE_SHAPE eShape =
-				Resolve_SimpleShapeFromObjectName(pDesc->strObjectName);
+				Resolve_SimpleShapeFromObjectName(pDesc->wstrObjectName);
 
 			if (eShape != ENV_SIMPLE_SHAPE::NONE)
 			{
@@ -105,7 +105,7 @@ namespace
 			Collision.bCatalogCollisionChecked = true;
 
 			ENV_COLLISION_CATALOG_RECORD Record{};
-			if (CEnv_CollisionCatalog::Try_Find(pDesc->strObjectName, &Record))
+			if (CEnv_CollisionCatalog::Try_Find(pDesc->wstrObjectName, &Record))
 			{
 				Collision.bHasDecorCollisionApxbin = true;
 				Collision.strDecorCollisionApxbinName = Record.strApxbinName;
@@ -469,8 +469,8 @@ HRESULT CMap_Parser::Parse_EnvRoot(const json& jRoot, vector<ENV_OBJECT_DESC>* p
 	if (nullptr == pOutDescs)
 		return E_FAIL;
 
-	wstring strSourceFile;
-	Try_ReadString(jRoot, "source_file", &strSourceFile);
+	wstring wstrSourceFile;
+	Try_ReadString(jRoot, "source_file", &wstrSourceFile);
 
 	const json* pData = Find_JsonValue(jRoot, "data");
 	if (nullptr == pData || !pData->is_object())
@@ -479,7 +479,7 @@ HRESULT CMap_Parser::Parse_EnvRoot(const json& jRoot, vector<ENV_OBJECT_DESC>* p
 	for (auto Iter = pData->begin(); Iter != pData->end(); ++Iter)
 	{
 		Parse_SectionObject(
-			strSourceFile,
+			wstrSourceFile,
 			StrToWstr(Iter.key()),
 			Iter.value(),
 			pOutDescs);
@@ -489,42 +489,42 @@ HRESULT CMap_Parser::Parse_EnvRoot(const json& jRoot, vector<ENV_OBJECT_DESC>* p
 }
 
 void CMap_Parser::Parse_SectionObject(
-	const wstring& strSourceFile,
-	const wstring& strSection,
+	const wstring& wstrSourceFile,
+	const wstring& wstrSection,
 	const json& jSection,
 	vector<ENV_OBJECT_DESC>* pOutDescs)
 {
 	if (!jSection.is_object() || nullptr == pOutDescs)
 		return;
 
-	const ENV_SOURCE_TYPE eSourceType = Classify_SourceType(strSourceFile);
+	const ENV_SOURCE_TYPE eSourceType = Classify_SourceType(wstrSourceFile);
 
 	for (auto Iter = jSection.begin(); Iter != jSection.end(); ++Iter)
 	{
 		if (!Iter.value().is_object())
 			continue;
 
-		const wstring strEntryKey = StrToWstr(Iter.key());
+		const wstring wstrEntryKey = StrToWstr(Iter.key());
 
 		switch (eSourceType)
 		{
 		case ENV_SOURCE_TYPE::DECOR_DECOR:
 		case ENV_SOURCE_TYPE::TOY_DECOR:
 			Parse_DecorEntry(
-				strSourceFile,
-				strSection,
-				strEntryKey,
+				wstrSourceFile,
+				wstrSection,
+				wstrEntryKey,
 				Iter.value(),
 				pOutDescs);
 			break;
 
 		case ENV_SOURCE_TYPE::TOY_OBJ:
-			if (0 == _wcsicmp(strSection.c_str(), L"Standard"))
+			if (0 == _wcsicmp(wstrSection.c_str(), L"Standard"))
 			{
 				Parse_ToyObjEntry(
-					strSourceFile,
-					strSection,
-					strEntryKey,
+					wstrSourceFile,
+					wstrSection,
+					wstrEntryKey,
 					Iter.value(),
 					pOutDescs);
 			}
@@ -532,9 +532,9 @@ void CMap_Parser::Parse_SectionObject(
 
 		case ENV_SOURCE_TYPE::DECOR_OBJ:
 			Parse_EffectEntry(
-				strSourceFile,
-				strSection,
-				strEntryKey,
+				wstrSourceFile,
+				wstrSection,
+				wstrEntryKey,
 				Iter.value(),
 				pOutDescs);
 			break;
@@ -546,20 +546,20 @@ void CMap_Parser::Parse_SectionObject(
 }
 
 void CMap_Parser::Parse_DecorEntry(
-	const wstring& strSourceFile,
-	const wstring& strSection,
-	const wstring& strEntryKey,
+	const wstring& wstrSourceFile,
+	const wstring& wstrSection,
+	const wstring& wstrEntryKey,
 	const json& jEntry,
 	vector<ENV_OBJECT_DESC>* pOutDescs)
 {
 	if (nullptr == pOutDescs)
 		return;
 
-	ENV_OBJECT_DESC Desc = Make_BaseDesc(strSourceFile, strSection, strEntryKey);
+	ENV_OBJECT_DESC Desc = Make_BaseDesc(wstrSourceFile, wstrSection, wstrEntryKey);
 	Desc.eKind = ENV_OBJECT_KIND::STATIC;
 	Desc.jRawProperties = jEntry;
 
-	if (!Try_ReadString(jEntry, "Basic.ObjectName", &Desc.strObjectName))
+	if (!Try_ReadString(jEntry, "Basic.ObjectName", &Desc.wstrObjectName))
 		return;
 
 	Fill_CommonFlags(jEntry, &Desc);
@@ -571,22 +571,22 @@ void CMap_Parser::Parse_DecorEntry(
 }
 
 void CMap_Parser::Parse_ToyObjEntry(
-	const wstring& strSourceFile,
-	const wstring& strSection,
-	const wstring& strEntryKey,
+	const wstring& wstrSourceFile,
+	const wstring& wstrSection,
+	const wstring& wstrEntryKey,
 	const json& jEntry,
 	vector<ENV_OBJECT_DESC>* pOutDescs)
 {
 	if (nullptr == pOutDescs)
 		return;
 
-	ENV_OBJECT_DESC Desc = Make_BaseDesc(strSourceFile, strSection, strEntryKey);
+	ENV_OBJECT_DESC Desc = Make_BaseDesc(wstrSourceFile, wstrSection, wstrEntryKey);
 	CGameObject::GAMEOBJECT_DESC& BaseDesc = static_cast<CGameObject::GAMEOBJECT_DESC&>(Desc);
 
 	Desc.eKind = ENV_OBJECT_KIND::INTERACT;
 	Desc.jRawProperties = jEntry;
 
-	if (!Try_ReadString(jEntry, "Basic.ObjectName", &Desc.strObjectName))
+	if (!Try_ReadString(jEntry, "Basic.ObjectName", &Desc.wstrObjectName))
 		return;
 
 	Fill_CommonFlags(jEntry, &Desc);
@@ -615,24 +615,24 @@ void CMap_Parser::Parse_ToyObjEntry(
 }
 
 void CMap_Parser::Parse_EffectEntry(
-	const wstring& strSourceFile,
-	const wstring& strSection,
-	const wstring& strEntryKey,
+	const wstring& wstrSourceFile,
+	const wstring& wstrSection,
+	const wstring& wstrEntryKey,
 	const json& jEntry,
 	vector<ENV_OBJECT_DESC>* pOutDescs)
 {
 	if (nullptr == pOutDescs)
 		return;
 
-	ENV_OBJECT_DESC Desc = Make_BaseDesc(strSourceFile, strSection, strEntryKey);
+	ENV_OBJECT_DESC Desc = Make_BaseDesc(wstrSourceFile, wstrSection, wstrEntryKey);
 	CGameObject::GAMEOBJECT_DESC& BaseDesc = static_cast<CGameObject::GAMEOBJECT_DESC&>(Desc);
 
 	Desc.eKind = ENV_OBJECT_KIND::EFFECT;
 	Desc.jRawProperties = jEntry;
 
-	Try_ReadString(jEntry, "Basic.ObjectName", &Desc.strObjectName);
-	Try_ReadString(jEntry, "Basic.BasicInfo.ObjectName", &Desc.strObjectName);
-	Try_ReadString(jEntry, "ComponentName", &Desc.strComponentName);
+	Try_ReadString(jEntry, "Basic.ObjectName", &Desc.wstrObjectName);
+	Try_ReadString(jEntry, "Basic.BasicInfo.ObjectName", &Desc.wstrObjectName);
+	Try_ReadString(jEntry, "ComponentName", &Desc.wstrComponentName);
 
 	Fill_CommonFlags(jEntry, &Desc);
 
@@ -669,25 +669,25 @@ void CMap_Parser::Parse_EffectEntry(
 	if (const json* p = Find_JsonValue(jEntry, "Gimmick.LocalAreaLight.MainComponent"))
 	{
 		pMainComponent = p;
-		Desc.strComponentName = L"LocalAreaLight";
+		Desc.wstrComponentName = L"LocalAreaLight";
 	}
 	else if (const json* p = Find_JsonValue(jEntry, "Gimmick.DecorPartsCullingArea.MainComponent"))
 	{
 		pMainComponent = p;
-		Desc.strComponentName = L"DecorPartsCullingArea";
+		Desc.wstrComponentName = L"DecorPartsCullingArea";
 	}
 	else if (const json* p = Find_JsonValue(jEntry, "Gimmick.ToneMappingArea.MainComponent"))
 	{
 		pMainComponent = p;
-		Desc.strComponentName = L"ToneMappingArea";
+		Desc.wstrComponentName = L"ToneMappingArea";
 	}
 	else if (const json* p = Find_JsonValue(jEntry, "Gimmick.FieldEffect.MainComponent"))
 	{
 		pMainComponent = p;
-		Desc.strComponentName = L"FieldEffect";
+		Desc.wstrComponentName = L"FieldEffect";
 	}
 
-	if (Desc.strComponentName == L"ToneMappingArea")
+	if (Desc.wstrComponentName == L"ToneMappingArea")
 	{
 		Try_ReadFloat3Array(*pMainComponent, "Size", &Desc.tEffect.vAreaSize);
 		Try_ReadFloat(*pMainComponent, "ExposureValue", &Desc.tEffect.fExposureValue);
@@ -696,7 +696,7 @@ void CMap_Parser::Parse_EffectEntry(
 		Desc.tEffect.vAreaRot = Desc.vRotation;
 	}
 
-	Desc.tEffect.eEffectType = Classify_EffectType(Desc.strObjectName, Desc.strComponentName);
+	Desc.tEffect.eEffectType = Classify_EffectType(Desc.wstrObjectName, Desc.wstrComponentName);
 
 	Resolve_EnvColliderKind(&Desc);
 
@@ -704,37 +704,37 @@ void CMap_Parser::Parse_EffectEntry(
 }
 
 ENV_OBJECT_DESC CMap_Parser::Make_BaseDesc(
-	const wstring& strSourceFile,
-	const wstring& strSection,
-	const wstring& strEntryKey)
+	const wstring& wstrSourceFile,
+	const wstring& wstrSection,
+	const wstring& wstrEntryKey)
 {
 	ENV_OBJECT_DESC Desc{};
-	Desc.strSourceFile = strSourceFile;
-	Desc.strSection = strSection;
-	Desc.strEntryKey = strEntryKey;
-	Desc.eSourceType = Classify_SourceType(strSourceFile);
+	Desc.wstrSourceFile = wstrSourceFile;
+	Desc.wstrSection = wstrSection;
+	Desc.wstrEntryKey = wstrEntryKey;
+	Desc.eSourceType = Classify_SourceType(wstrSourceFile);
 	return Desc;
 }
 
-ENV_SOURCE_TYPE CMap_Parser::Classify_SourceType(const wstring& strSourceFile)
+ENV_SOURCE_TYPE CMap_Parser::Classify_SourceType(const wstring& wstrSourceFile)
 {
-	if (0 == _wcsicmp(strSourceFile.c_str(), L"Decor_Decor.bin"))
+	if (0 == _wcsicmp(wstrSourceFile.c_str(), L"Decor_Decor.bin"))
 		return ENV_SOURCE_TYPE::DECOR_DECOR;
-	if (0 == _wcsicmp(strSourceFile.c_str(), L"Toy_Decor.bin"))
+	if (0 == _wcsicmp(wstrSourceFile.c_str(), L"Toy_Decor.bin"))
 		return ENV_SOURCE_TYPE::TOY_DECOR;
-	if (0 == _wcsicmp(strSourceFile.c_str(), L"Toy_Obj.bin"))
+	if (0 == _wcsicmp(wstrSourceFile.c_str(), L"Toy_Obj.bin"))
 		return ENV_SOURCE_TYPE::TOY_OBJ;
-	if (0 == _wcsicmp(strSourceFile.c_str(), L"Decor_Obj.bin"))
+	if (0 == _wcsicmp(wstrSourceFile.c_str(), L"Decor_Obj.bin"))
 		return ENV_SOURCE_TYPE::DECOR_OBJ;
 
 	return ENV_SOURCE_TYPE::UNKNOWN;
 }
 
 ENV_EFFECT_TYPE CMap_Parser::Classify_EffectType(
-	const wstring& strObjectName,
-	const wstring& strComponentName)
+	const wstring& wstrObjectName,
+	const wstring& wstrComponentName)
 {
-	const wstring Combined = strObjectName + L" " + strComponentName;
+	const wstring Combined = wstrObjectName + L" " + wstrComponentName;
 
 	if (wstring::npos != Combined.find(L"LocalAreaLight"))
 		return ENV_EFFECT_TYPE::LOCAL_AREA_LIGHT;

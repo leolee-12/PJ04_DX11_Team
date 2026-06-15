@@ -36,6 +36,8 @@ private:
 	_wstring				m_strProtoTag = { PROTOTYPE_TAG };
 	_wstring				m_strStageName;
 	_uint					m_iSectionProtoLevel = {};
+	_float4x4				m_LastWorldMatrix = {};
+	_bool					m_bSnapshotValid = { false };
 
 #ifdef _DEBUG
 	MAP_STAGE_PROFILE		m_Profile = {};
@@ -44,7 +46,7 @@ private:
 private:
 	virtual HRESULT	Ready_Events() override { return S_OK; }
 	HRESULT			Ready_Sections(const MAP_STAGE_DESC* pDesc);
-	void			Refresh_SectionTransforms() const;
+	void			Refresh_SectionTransforms();
 	void			Submit_VisibleSections();
 
 #ifdef _DEBUG

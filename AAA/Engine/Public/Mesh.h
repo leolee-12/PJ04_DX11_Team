@@ -34,6 +34,10 @@ public:
 	_bool Ray_AABB(_fvector vOrigin, _fvector vDir) const;
 	_bool Pick(_fvector vOrigin, _fvector vDir, _float3* pOutHit, _float* pOutDist = nullptr) const;
 
+	// Instance
+	HRESULT Bind_Resources_Instanced(ID3D11Buffer* pInstanceBuffer, _uint iInstanceStride);
+	HRESULT Render_Instanced(_uint iInstanceCount);
+
 private:
 	string				m_strName = {};	
 	_uint				m_iMaterialIndex = {  };

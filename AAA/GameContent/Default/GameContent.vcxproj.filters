@@ -193,6 +193,18 @@
     <Filter Include="99. Defines\Hojun\UI">
       <UniqueIdentifier>{cd0a7659-a8f0-4741-aa44-321f59e15d07}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\UI\Component\Animator">
+      <UniqueIdentifier>{a0cc2fa3-e859-4ce0-bc75-268a9cc6fb1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\UI\Component\GaugeBar">
+      <UniqueIdentifier>{0319824c-67e9-4142-8520-2c3bc1d47add}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\02. EnvObject\Instance">
+      <UniqueIdentifier>{9df9d2af-5f82-4056-9d63-b9f7cc4c1544}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98. ShaderFiles\Leo">
+      <UniqueIdentifier>{a3345da1-0cb7-4733-ac92-e971f6f0980d}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts">
       <UniqueIdentifier>{ce8838df-6dca-44f5-99b6-21707344efd7}</UniqueIdentifier>
     </Filter>
@@ -579,28 +591,10 @@
     <ClInclude Include="..\public\Effect_Loader.h">
       <Filter>97. DataSystem\EffectLoader</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Map_Override.h">
-      <Filter>97. DataSystem\MapLoader\API</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\TestTriggerBox.h">
       <Filter>00. GameObject\Test\TestRect</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Map_LevelContent.h">
-      <Filter>97. DataSystem\MapLoader\API</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Map_DeltaIO.h">
-      <Filter>97. DataSystem\MapLoader\API</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Env_CollisionCatalog.h">
-      <Filter>97. DataSystem\MapLoader\API</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Map_LayerPolicy.h">
-      <Filter>97. DataSystem\MapLoader\API</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Map_OverrideStore.h">
-      <Filter>97. DataSystem\MapLoader\API</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Map_StageOverrideSerializer.h">
       <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Map_PresetCatalog.h">
@@ -626,6 +620,12 @@
     </ClInclude>
     <ClInclude Include="..\public\UI_GaugeBarCom.h">
       <Filter>00. GameObject\06. UI\Component\GaugeBar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Env_InstanceBatch.h">
+      <Filter>00. GameObject\02. EnvObject\Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Env_InstanceController.h">
+      <Filter>00. GameObject\02. EnvObject\Instance</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Body.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\00. Body</Filter>
@@ -689,6 +689,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Monster.h">
       <Filter>00. GameObject\06. Monster\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Map_EditFile.h">
+      <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -881,28 +884,10 @@
     <ClCompile Include="..\private\Effect_Loader.cpp">
       <Filter>97. DataSystem\EffectLoader</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Map_Override.cpp">
-      <Filter>97. DataSystem\MapLoader\API</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\TestTriggerBox.cpp">
       <Filter>00. GameObject\Test\TestRect</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Map_LevelContent.cpp">
-      <Filter>97. DataSystem\MapLoader\API</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Map_DeltaIO.cpp">
-      <Filter>97. DataSystem\MapLoader\API</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Env_CollisionCatalog.cpp">
-      <Filter>97. DataSystem\MapLoader\API</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Map_LayerPolicy.cpp">
-      <Filter>97. DataSystem\MapLoader\API</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Map_OverrideStore.cpp">
-      <Filter>97. DataSystem\MapLoader\API</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Map_StageOverrideSerializer.cpp">
       <Filter>97. DataSystem\MapLoader\API</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Map_PresetCatalog.cpp">
@@ -922,6 +907,12 @@
     </ClCompile>
     <ClCompile Include="..\private\UI_GaugeBarCom.cpp">
       <Filter>00. GameObject\06. UI\Component\GaugeBar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Env_InstanceBatch.cpp">
+      <Filter>00. GameObject\02. EnvObject\Instance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Env_InstanceController.cpp">
+      <Filter>00. GameObject\02. EnvObject\Instance</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Body.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\00. Body</Filter>
@@ -986,6 +977,9 @@
     <ClCompile Include="..\Private\Monster.cpp">
       <Filter>00. GameObject\06. Monster\Monster</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Map_EditFile.cpp">
+      <Filter>97. DataSystem\MapLoader\API</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl">
@@ -1011,6 +1005,9 @@
     </FxCompile>
     <FxCompile Include="..\ShaderFiles\Shader_SkySphere.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_EnvInstance.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

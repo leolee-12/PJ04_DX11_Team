@@ -110,6 +110,42 @@ _bool CMesh::Pick(_fvector vOrigin, _fvector vDir, _float3* pOutHit, _float* pOu
     );
 }
 
+HRESULT CMesh::Bind_Resources_Instanced(ID3D11Buffer* pInstanceBuffer, _uint iInstanceStride)
+{
+    if (nullptr == pInstanceBuffer)
+        return E_FAIL;
+
+    ID3D11Buffer* pVertexBuffers[] = {
+        m_pVB,
+        pInstanceBuffer
+    };
+
+    _uint		iVertexStrides[] = {
+        m_iVertexStride,
+        iInstanceStride,
+    };
+
+    _uint		iOffsets[] = {
+        0, 0
+    };
+
+    m_pContext->IASetVertexBuffers(0, 2, pVertexBuffers, iVertexStrides, iOffsets);
+    m_pContext->IASetIndexBuffer(m_pIB, m_eIndexFormat, 0);
+    m_pContext->IASetPrimitiveTopology(m_ePrimitiveType);
+
+    return S_OK;
+}
+
+HRESULT CMesh::Render_Instanced(_uint iInstanceCount)
+{
+    if (0 == iInstanceCount)
+        return S_OK;
+
+    m_pContext->DrawIndexedInstanced(m_iNumIndices, iInstanceCount, 0, 0, 0);
+
+    return S_OK;
+}
+
 HRESULT CMesh::Ready_NonAnim(const MESH_DATA& data, _fmatrix PreTransformMatrix)
 {
     m_iMaterialIndex = data.iMaterialIndex;
