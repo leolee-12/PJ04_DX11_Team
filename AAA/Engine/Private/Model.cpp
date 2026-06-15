@@ -842,7 +842,7 @@ CModel* CModel::Create_WithTextureHub(ID3D11Device* pDevice, ID3D11DeviceContext
 
     if (FAILED(pInstance->Initialize_Prototype_WithTextureHub(eType, pModelFilePath, PreTransformMatrix, fcFillter, bCookCollisionMesh)))
     {
-        MSG_BOX("Failed to Created : CModel");
+        MSG_BOX("Failed to Created : CModel - WithTextureHub");
         Safe_Release(pInstance);
     }
 

@@ -49,6 +49,14 @@ public:
     physx::PxScene* Get_Scene()   const { return m_pScene; }
 
 public:
+    physx::PxRigidDynamic* Create_DynamicBox(const _float3& vPos, const _float4& qRot, const _float3& vHalfExtents, _float fDensity = 10.f);
+    physx::PxRigidDynamic* Create_DynamicSphere(const _float3& vPos, _float fRadius, _float fDensity = 10.f);
+    physx::PxRigidDynamic* Create_DynamicCapsule(const _float3& vPos, const _float4& qRot, _float fRadius, _float fHalfHeight, _float fDensity = 10.f);
+    physx::PxConvexMesh*   Cook_ConvexMesh(const _float3* pPositions, _uint iNumVertices);
+    physx::PxRigidDynamic* Create_DynamicConvex(physx::PxConvexMesh* pMesh, _fmatrix WorldMatrix, _float fDensity = 10.f);
+    void                   Remove_DynamicActor(physx::PxRigidDynamic* pActor);
+
+public:
     void  Render_Debug(_fmatrix ViewMatrix, _fmatrix ProjMatrix);   
     void  Toggle_DebugDraw();                                       
     _bool Is_DebugDraw() const { return m_bDebugDraw; }
@@ -63,6 +71,7 @@ private:
 
     vector<physx::PxRigidStatic*> m_StaticActors;
     vector<physx::PxController*> m_Controllers;
+    vector<physx::PxRigidDynamic*> m_Dynamics;
 
     physx::PxDefaultAllocator      m_Allocator;
     physx::PxDefaultErrorCallback  m_ErrorCallback;
@@ -76,6 +85,12 @@ private:
     BasicEffect* m_pEffect = { nullptr };
     ID3D11InputLayout* m_pInputLayout = { nullptr };
     _bool                                m_bDebugDraw = { false };
+
+private:
+    physx::PxRigidDynamic* Finalize_Dynamic(const physx::PxTransform& pose,
+        const physx::PxGeometry& geom, _float fDensity,
+        const physx::PxTransform& localPose =
+        physx::PxTransform(physx::PxIdentity));
 
 public:
     static CPhysX_Manager* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -20,9 +20,12 @@
 
 #include "Level_Tool.h"
 
+#include "GameInstance.h"
+
 
 CPanel_Manager::CPanel_Manager(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice(pDevice), m_pContext(pContext)
+    , m_pGameInstance_Proxy(CGameInstance::GetProxy())
 {
     Safe_AddRef(m_pDevice);
     Safe_AddRef(m_pContext);
@@ -325,7 +328,7 @@ void CPanel_Manager::Render_ModeBar()
     if (ImGui::RadioButton("UI", iMode == ETOI(TOOL_MODE::UI)))
         m_eWorkMode = TOOL_MODE::UI;
 
-    ImGui::SameLine();
+    /*ImGui::SameLine();
     if (ImGui::Button("Load Kirby (Test)"))
     {
         if (m_pLevel)
@@ -336,6 +339,26 @@ void CPanel_Manager::Render_ModeBar()
             //m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby.ysh";
             m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby_AllAbilities.ysh";
         }
+    }*/
+    if (m_bKeyInputEnabled)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.7f, 0.2f, 1.f));
+        if (ImGui::Button("KeyInput [ON]"))
+        {
+            m_bKeyInputEnabled = false;
+            m_pGameInstance_Proxy->Disable_InputDeveice();
+        }
+        ImGui::PopStyleColor();
+    }
+    else
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.f));
+        if (ImGui::Button("KeyInput [OFF]"))
+        {
+            m_bKeyInputEnabled = true;
+            m_pGameInstance_Proxy->Enable_InputDeveice();
+        }
+        ImGui::PopStyleColor();
     }
 
 
@@ -387,12 +410,14 @@ void CPanel_Manager::Free()
 
     Clear_UISelected();
 
+
     Safe_Release(m_pSelected);
 
     for (auto& [tag, pPanel] : m_Panels)
         Safe_Release(pPanel);
     m_Panels.clear();
 
+    Safe_Release(m_pGameInstance_Proxy);
     Safe_Release(m_pDevice);
     Safe_Release(m_pContext);
 }

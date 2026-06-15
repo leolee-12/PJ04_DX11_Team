@@ -1,11 +1,10 @@
 #include "MainApp.h"
 
 #include "GameInstance.h"
-#include "Level_Loading.h"
 
 #include "GameObject_Factory.h"
 #include "Loader_Prototype.h"
-#include "Level_Logo.h"
+#include "Level_FirstLoading.h"
 
 CMainApp::CMainApp()
 {
@@ -30,19 +29,13 @@ HRESULT CMainApp::Initialize()
 	m_pGameInstance_Proxy = CGameInstance::GetProxy();
 	m_pGameInstance_Proxy->Enable_InputDeveice();
 
-	if (FAILED(Ready_Prototype_For_Static()))
-		return E_FAIL;
-
 	CGameObject_Factory::GetInstance()->RegisterAll();
-
 
 	if (FAILED(Load_Fonts(m_pGameInstance_Proxy)))
 		return E_FAIL;
 
 	if (FAILED(Start_Logo()))
 		return E_FAIL;
-
-
 
 	return S_OK;
 }
@@ -92,11 +85,11 @@ HRESULT CMainApp::Start_Logo()
 	//if (FAILED(m_pGameInstance_Proxy->Change_Level(ETOI(LEVEL::LOGO), pLevelLogo)))
 	//	return E_FAIL;
 
-	CLevel* pLevelLoading = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY);
+	CLevel* pLevelLoading = CLevel_FirstLoading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY);
 	if (nullptr == pLevelLoading)
 		return E_FAIL;
 	
-	if (FAILED(m_pGameInstance_Proxy->Change_Level(ETOI(LEVEL::LOADING), pLevelLoading)))
+	if (FAILED(m_pGameInstance_Proxy->Change_Level(ETOI(LEVEL::FIRST_LOADING), pLevelLoading)))
 		return E_FAIL;
 
 	return S_OK;

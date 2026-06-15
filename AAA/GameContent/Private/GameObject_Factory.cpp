@@ -20,6 +20,9 @@
 #include "UI_GenericContainer.h"
 #include "UI_PointStar.h"
 #include "UI_KirbyStatus.h"
+#include "UI_FadeOut.h"
+#include "UI_LoadingCurtain.h"
+#include "UI_FadeIn.h"
 
 // UI Parts
 #include "UI_Image.h"
@@ -27,6 +30,12 @@
 #include "UI_Text.h"
 #include "UI_Effect.h"
 #include "UI_GaugeFill.h"
+
+#include "UI_Curtain.h"
+#include "UI_Eraser.h"
+#include "UI_SpriteAnimCurtain.h"
+#include "UI_CurtainTexture.h"
+
 
 // Kirby
 #include "Kirby.h"
@@ -126,6 +135,24 @@ void CGameObject_Factory::Register_UI()
     Register(CUI_GaugeFill::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
         CREATOR(CUI_GaugeFill),
         LOADER());
+
+    Register(CUI_Curtain::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
+        CREATOR(CUI_Curtain),
+        LOADER());
+
+    Register(CUI_Eraser::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
+        CREATOR(CUI_Eraser),
+        LOADER());
+
+    Register(CUI_SpriteAnimCurtain::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
+        CREATOR(CUI_SpriteAnimCurtain),
+        LOADER());
+
+    Register(CUI_CurtainTexture::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
+        CREATOR(CUI_CurtainTexture),
+        LOADER());
+
+
 }
 
 void CGameObject_Factory::Register_Camera()
@@ -377,6 +404,23 @@ void CGameObject_Factory::Register_UIContainer()
         LOADER()
     );
     
+    Register(CUI_FadeOut::PROTOTYPE_TAG,
+        TEXT("UI_CONTAINER"),
+        CREATOR(CUI_FadeOut),
+        LOADER()
+    );
+
+    Register(CUI_LoadingCurtain::PROTOTYPE_TAG,
+        TEXT("UI_CONTAINER"),
+        CREATOR(CUI_LoadingCurtain),
+        LOADER()
+    );
+
+    Register(CUI_FadeIn::PROTOTYPE_TAG,
+        TEXT("UI_CONTAINER"),
+        CREATOR(CUI_FadeIn),
+        LOADER()
+    );
 }
 
 void CGameObject_Factory::Register_NonAnimObject()

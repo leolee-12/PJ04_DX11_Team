@@ -46,6 +46,7 @@
     <ClInclude Include="..\Public\Kirby_ControllableState.h" />
     <ClInclude Include="..\Public\Kirby_GetAbility.h" />
     <ClInclude Include="..\Public\Kirby_OnOffPart.h" />
+    <ClInclude Include="..\Public\ICurtainPart.h" />
     <ClInclude Include="..\Public\Kirby_Fall.h" />
     <ClInclude Include="..\Public\Kirby_Attack.h" />
     <ClInclude Include="..\Public\Kirby_Hovering.h">
@@ -61,12 +62,19 @@
     <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\Movement_Child.h" />
     <ClInclude Include="..\Public\Map_DeltaIO.h" />
+    <ClInclude Include="..\public\UI_Curtain.h" />
+    <ClInclude Include="..\public\UI_CurtainAnimBase.h" />
+    <ClInclude Include="..\public\UI_CurtainSequenceBase.h" />
+    <ClInclude Include="..\public\UI_CurtainTexture.h" />
     <ClInclude Include="..\Public\UI_Enums.h" />
     <ClInclude Include="..\Public\Kirby_Sword.h" />
     <ClInclude Include="..\Public\Kirby_SwordHat.h" />
+    <ClInclude Include="..\public\UI_Eraser.h" />
+    <ClInclude Include="..\public\UI_FadeIn.h" />
+    <ClInclude Include="..\public\UI_FadeOut.h" />
     <ClInclude Include="..\Public\UI_Fonts.h" />
     <ClInclude Include="..\Public\UIAnimatorCom.h" />
-    <ClInclude Include="..\Public\UI_GaugeBarCom.h" />
+    <ClInclude Include="..\public\UI_GaugeBarCom.h" />
     <ClInclude Include="..\Public\UI_GaugeFill.h" />
     <ClInclude Include="..\Public\UI_GenericContainer.h" />
     <ClInclude Include="..\Public\InhaleEffect.h" />
@@ -119,8 +127,10 @@
     <ClInclude Include="..\Public\TestTriggerBox.h" />
     <ClInclude Include="..\Public\UI_Image.h" />
     <ClInclude Include="..\Public\UI_KirbyStatus.h" />
+    <ClInclude Include="..\public\UI_LoadingCurtain.h" />
     <ClInclude Include="..\Public\UI_PointStar.h" />
     <ClInclude Include="..\Public\UI_SpriteAnim.h" />
+    <ClInclude Include="..\public\UI_SpriteAnimCurtain.h" />
     <ClInclude Include="..\Public\UI_Structs.h" />
     <ClInclude Include="..\Public\UI_TestImageContainer.h" />
     <ClInclude Include="..\Public\UI_Text.h" />
@@ -166,7 +176,14 @@
     <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\Private\Map_DeltaIO.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />
-    <ClCompile Include="..\Private\UI_GaugeBarCom.cpp" />
+    <ClCompile Include="..\private\UI_Curtain.cpp" />
+    <ClCompile Include="..\private\UI_CurtainAnimBase.cpp" />
+    <ClCompile Include="..\private\UI_CurtainSequenceBase.cpp" />
+    <ClCompile Include="..\private\UI_CurtainTexture.cpp" />
+    <ClCompile Include="..\private\UI_Eraser.cpp" />
+    <ClCompile Include="..\private\UI_FadeIn.cpp" />
+    <ClCompile Include="..\private\UI_FadeOut.cpp" />
+    <ClCompile Include="..\private\UI_GaugeBarCom.cpp" />
     <ClCompile Include="..\Private\UI_GaugeFill.cpp" />
     <ClCompile Include="..\Private\Kirby_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_SwordHat.cpp" />
@@ -214,8 +231,10 @@
     <ClCompile Include="..\Private\TestTriggerBox.cpp" />
     <ClCompile Include="..\Private\UI_Image.cpp" />
     <ClCompile Include="..\Private\UI_KirbyStatus.cpp" />
+    <ClCompile Include="..\private\UI_LoadingCurtain.cpp" />
     <ClCompile Include="..\Private\UI_PointStar.cpp" />
     <ClCompile Include="..\Private\UI_SpriteAnim.cpp" />
+    <ClCompile Include="..\private\UI_SpriteAnimCurtain.cpp" />
     <ClCompile Include="..\Private\UI_TestImageContainer.cpp" />
     <ClCompile Include="..\Private\UI_Text.cpp" />
     <ClCompile Include="..\Private\UI_Title.cpp" />
@@ -328,7 +347,7 @@
       <PreprocessorDefinitions>_DEBUG;GAMECONTENT_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>../Public/; ../../EngineSDK/Inc/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Public/;../../EngineSDK/Inc/;../../EngineSDK/Inc/PhysX</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -356,7 +375,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;GAMECONTENT_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../Public/; ../../EngineSDK/Inc/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Public/;../../EngineSDK/Inc/;../../EngineSDK/Inc/PhysX</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>

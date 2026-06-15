@@ -4,8 +4,9 @@
 #include "Camera_Free.h"
 #include "Loader_Prototype.h"
 #include "Map_Loader.h"
-#include "Launcher_MapProfiles.h"
+#include "Launcher_LevelProfiles.h"
 #include "Camera_AreaCam.h"
+#include "Level_Loading.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel { pDevice, pContext }
@@ -56,6 +57,20 @@ HRESULT CLevel_GamePlay::Initialize()
 
 void CLevel_GamePlay::Update(_float fTimeDelta)
 {
+#ifdef  _DEBUG
+    if (m_pGameInstance_Proxy->Key_Down(DIK_F1))
+        m_pGameInstance_Proxy->Publish(TEXT("FadeOut_Start"), nullptr);
+    
+    if (m_bTestLevelChange)
+    {
+        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY);
+        if (pLoadingLevel)
+        {
+            m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
+            return;
+        }
+    }
+#endif //  _DEBUG
 }
 
 HRESULT CLevel_GamePlay::Render()
@@ -68,9 +83,8 @@ HRESULT CLevel_GamePlay::Render()
 
 HRESULT CLevel_GamePlay::Ready_Events()
 {
-    m_pGameInstance_Proxy->Subscribe(TEXT("Boss_Defeated"), [this](void* p) {
-        auto* d = static_cast<BOSS_DEFEATED_DESC*>(p);
-        Start_Ending(d ? d->pBoss : nullptr);
+    m_pGameInstance_Proxy->Subscribe(TEXT("FadeOut_Done"), [this](void* p) {
+        m_bTestLevelChange = true;
         });
     return S_OK;
 }
@@ -256,52 +270,6 @@ void CLevel_GamePlay::Key_Input()
         m_pGameInstance_Proxy->Publish(TEXT("Show_ItemBox_UI"), &desc);
     }
 #endif
-}
-
-void CLevel_GamePlay::Update_EndingSequence(_float fRawDelta)
-{
-    m_fEndingTimer += fRawDelta;
-
-    switch (m_eEndingPhase)
-    {
-        case EEndingPhase::SLOW:
-        {
-            _float t = min(1.f, m_fEndingTimer / SLOWMO_RAMP_TIME);
-            _float scale = 1.f + (SLOWMO_TARGET - 1.f) * t;  
-            m_pGameInstance_Proxy->Set_TimeScale(scale);
-            if (t >= 1.f) {
-                m_eEndingPhase = EEndingPhase::HOLD;
-                m_fEndingTimer = 0.f;
-            }
-            break;
-        }
-        case EEndingPhase::HOLD:
-            if (m_fEndingTimer >= HOLD_TIME) {
-                m_eEndingPhase = EEndingPhase::RECOVER;
-                m_fEndingTimer = 0.f;
-            }
-            break;
-        case EEndingPhase::RECOVER:
-        {
-            _float t = min(1.f, m_fEndingTimer / RECOVER_RAMP_TIME);
-            _float scale = SLOWMO_TARGET + (1.f - SLOWMO_TARGET) * t; 
-            m_pGameInstance_Proxy->Set_TimeScale(scale);
-            if (t >= 1.f) {
-                m_pGameInstance_Proxy->Set_TimeScale(1.f);  
-                m_eEndingPhase = EEndingPhase::NONE;
-                m_fEndingTimer = 0.f;
-            }
-            break;
-        }
-        default: break;
-    }
-}
-
-void CLevel_GamePlay::Start_Ending(CGameObject* pBoss)
-{
-    if (m_eEndingPhase != EEndingPhase::NONE) return;   
-    m_eEndingPhase = EEndingPhase::SLOW;
-    m_fEndingTimer = 0.f;
 }
 
 CLevel_GamePlay* CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
