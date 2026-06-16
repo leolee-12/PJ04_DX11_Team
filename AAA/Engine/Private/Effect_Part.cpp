@@ -69,7 +69,6 @@ void CEffect_Part::Update(_float fTimeDelta)
 
 void CEffect_Part::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
 }
 
 HRESULT CEffect_Part::Render()

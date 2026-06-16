@@ -61,6 +61,7 @@
     <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\Movement_Child.h" />
     <ClInclude Include="..\Public\Map_DeltaIO.h" />
+    <ClInclude Include="..\Public\TestParticle.h" />
     <ClInclude Include="..\Public\UI_Enums.h" />
     <ClInclude Include="..\Public\Kirby_Sword.h" />
     <ClInclude Include="..\Public\Kirby_SwordHat.h" />
@@ -165,6 +166,7 @@
     <ClCompile Include="..\Private\Monster.cpp" />
     <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\Private\Map_DeltaIO.cpp" />
+    <ClCompile Include="..\Private\TestParticle.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />
     <ClCompile Include="..\Private\UI_GaugeBarCom.cpp" />
     <ClCompile Include="..\Private\UI_GaugeFill.cpp" />

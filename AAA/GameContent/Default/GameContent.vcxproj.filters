@@ -307,6 +307,9 @@
     <Filter Include="00. GameObject\06. Monster\Monster">
       <UniqueIdentifier>{7196c9f0-18a4-446e-b8e7-f2b9e35a32f5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\Test\TestParticle">
+      <UniqueIdentifier>{c3b2a3c6-b5a8-4b4a-82ac-7f8fd01b5452}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -627,6 +630,9 @@
     <ClInclude Include="..\Public\Monster.h">
       <Filter>00. GameObject\06. Monster\Monster</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\TestParticle.h">
+      <Filter>00. GameObject\Test\TestParticle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -895,6 +901,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ability.cpp">
       <Filter>00. GameObject\05. Kirby\02. Kirby_Ability</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestParticle.cpp">
+      <Filter>00. GameObject\Test\TestParticle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
