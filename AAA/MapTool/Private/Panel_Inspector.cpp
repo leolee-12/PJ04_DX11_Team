@@ -33,6 +33,14 @@ namespace
 		return (t < MTEX_TYPE_MAX) ? names[t] : "?";
 	}
 
+	const _char* GetMapShaderPassComboItem(void*, _int idx)
+	{
+		if (idx < 0 || idx >= static_cast<_int>(_countof(g_MapShaderPassMetas)))
+			return nullptr;
+
+		return g_MapShaderPassMetas[idx].szName;
+	}
+
 	_bool Is_EnvImportantTexType(MTEX_TYPE eType)
 	{
 		switch (eType)
@@ -762,17 +770,118 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 
 	const _bool bEnvObjectMeshUi =
 		nullptr != dynamic_cast<Client::CEnvObject*>(pObject);
+	const _bool bMapObjectMeshUi =
+		nullptr != dynamic_cast<Client::CMapObject*>(pObject);
+
+	static const char* UvItems[] = { "TEXCOORD0", "TEXCOORD1", "TEXCOORD2", "TEXCOORD3" };
 
 	const size_t iNumMeshes = pModel->Get_NumMeshes();
 	for (size_t i = 0; i < iNumMeshes; ++i)
 	{
-		MESH_LAYER_IDX Layer = pModel->Get_MeshLayer((_uint)i);
+		const _uint iMesh = static_cast<_uint>(i);
+		MESH_LAYER_IDX Layer = pModel->Get_MeshLayer(iMesh);
 
 		ImGui::PushID((int)i);
-		ImGui::Text("%zu: %s", i, pModel->Get_MeshName((_uint)i).c_str());
+		ImGui::Text("%zu: %s", i, pModel->Get_MeshName(iMesh).c_str());
 
 		_bool bChanged = false;
 		_bool bAnyField = false;
+
+		auto DrawUVCombo = [&](const char* pLabel, _uint& iUVIndex)
+			{
+				int iValue = (iUVIndex <= 3u) ? static_cast<int>(iUVIndex) : 0;
+
+				ImGui::SetNextItemWidth(160.f);
+				if (ImGui::Combo(pLabel, &iValue, UvItems, IM_ARRAYSIZE(UvItems)))
+				{
+					iUVIndex = static_cast<_uint>(iValue);
+					bChanged = true;
+				}
+			};
+
+		auto DrawLayerSlot = [&](const char* pLabel, MTEX_TYPE eType)
+			{
+				bAnyField = true;
+
+				const _uint iType = ETOUI(eType);
+				_uint& iLayerIndex = Layer.idx[iType];
+				const int iCount = static_cast<int>(pModel->Get_MeshTextureCount(iMesh, eType));
+				const _bool bOutOfRange = (iCount > 0) && (iLayerIndex >= static_cast<_uint>(iCount));
+
+				if (0 == iCount)
+				{
+					ImGui::TextDisabled("%s: no texture", pLabel);
+					return;
+				}
+
+				if (1 == iCount)
+				{
+					ImGui::TextDisabled("%s: single texture (index 0)%s",
+						pLabel,
+						bOutOfRange ? "  (layer index out of range)" : "");
+					return;
+				}
+
+				int iValue = static_cast<int>(iLayerIndex);
+				ImGui::SetNextItemWidth(120.f);
+				if (ImGui::InputInt(pLabel, &iValue))
+				{
+					if (iValue < 0)
+						iValue = 0;
+					if (iValue >= iCount)
+						iValue = iCount - 1;
+
+					iLayerIndex = static_cast<_uint>(iValue);
+					bChanged = true;
+				}
+				ImGui::SameLine();
+				ImGui::Text("/ %d", iCount);
+			};
+
+		auto DrawExtraBind = [&](const char* pLabel, int& iBindIndex)
+			{
+				bAnyField = true;
+
+				const int iUnknownCount = static_cast<int>(pModel->Get_MeshTextureCount(iMesh, MTEX_TYPE::UNKNOWN));
+
+				if (iUnknownCount <= 0)
+				{
+					if (iBindIndex != -1)
+					{
+						iBindIndex = -1;
+						bChanged = true;
+					}
+
+					ImGui::TextDisabled("%s: no unknown texture (-1)", pLabel);
+					return;
+				}
+
+				if (iBindIndex < -1)
+				{
+					iBindIndex = -1;
+					bChanged = true;
+				}
+				else if (iBindIndex >= iUnknownCount)
+				{
+					iBindIndex = iUnknownCount - 1;
+					bChanged = true;
+				}
+
+				int iValue = iBindIndex;
+				ImGui::SetNextItemWidth(120.f);
+				if (ImGui::InputInt(pLabel, &iValue))
+				{
+					if (iValue < -1)
+						iValue = -1;
+					if (iValue >= iUnknownCount)
+						iValue = iUnknownCount - 1;
+
+					iBindIndex = iValue;
+					bChanged = true;
+				}
+				ImGui::SameLine();
+				ImGui::Text("(-1 ~ %d)", iUnknownCount - 1);
+			};
 
 		if (bEnvObjectMeshUi)
 		{
@@ -789,17 +898,67 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 				bChanged = true;
 			}
 
-			static const char* UvItems[] = { "TEXCOORD0", "TEXCOORD1", "TEXCOORD2", "TEXCOORD3" };
-			int iUVIndex = (Layer.iUVIndex <= 3u) ? (int)Layer.iUVIndex : 0;
+			DrawUVCombo("UV", Layer.iUVIndex);
+			ImGui::TextDisabled("Dither is controlled per object in EnvObject Edit.");
+		}
+		else if (bMapObjectMeshUi)
+		{
+			int iPassCombo = Get_MapShaderPassComboIndex(Layer.iPass);
 
 			ImGui::SetNextItemWidth(160.f);
-			if (ImGui::Combo("UV", &iUVIndex, UvItems, IM_ARRAYSIZE(UvItems)))
+			if (ImGui::Combo("Pass",
+				&iPassCombo,
+				GetMapShaderPassComboItem,
+				nullptr,
+				static_cast<int>(_countof(g_MapShaderPassMetas))))
 			{
-				Layer.iUVIndex = (_uint)iUVIndex;
+				Layer.iPass = Get_MapShaderPassFromComboIndex(iPassCombo);
 				bChanged = true;
 			}
 
-			ImGui::TextDisabled("Dither is controlled per object in EnvObject Edit.");
+			DrawUVCombo("Base UV", Layer.iUVIndex);
+			DrawUVCombo("Unknown UV", Layer.iUnknownUVIndex);
+			DrawUVCombo("Extra R UV", Layer.iExtraUVIndex[0]);
+			DrawUVCombo("Extra G UV", Layer.iExtraUVIndex[1]);
+			DrawUVCombo("Extra B UV", Layer.iExtraUVIndex[2]);
+			DrawUVCombo("Extra A UV", Layer.iExtraUVIndex[3]);
+
+			if (ImGui::Checkbox("Use UV Transform", (bool*)&Layer.bUseUVTransform))
+				bChanged = true;
+
+			ImGui::BeginDisabled(!Layer.bUseUVTransform);
+
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat2("UV Scale", (float*)&Layer.vUVScale, 0.01f))
+				bChanged = true;
+
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat("UV Rotate", &Layer.fUVRotate, 0.01f))
+				bChanged = true;
+
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat2("UV Offset", (float*)&Layer.vUVOffset, 0.01f))
+				bChanged = true;
+
+			ImGui::EndDisabled();
+
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat("Normal Strength", &Layer.fNormalStrength, 0.01f))
+				bChanged = true;
+
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat("Mask Strength", &Layer.fMaskStrength, 0.01f))
+				bChanged = true;
+
+			DrawLayerSlot("Diffuse", MTEX_TYPE::DIFFUSE);
+			DrawLayerSlot("Normal", MTEX_TYPE::NORMALS);
+			DrawLayerSlot("MRA", MTEX_TYPE::METALNESS);
+			DrawLayerSlot("Unknown", MTEX_TYPE::UNKNOWN);
+
+			DrawExtraBind("Extra R Bind", Layer.iExtraBind[0]);
+			DrawExtraBind("Extra G Bind", Layer.iExtraBind[1]);
+			DrawExtraBind("Extra B Bind", Layer.iExtraBind[2]);
+			DrawExtraBind("Extra A Bind", Layer.iExtraBind[3]);
 		}
 		else
 		{
@@ -817,71 +976,74 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			ImGui::TextDisabled("(-1 = default)");
 		}
 
-		if (ImGui::Checkbox("Use UV Transform", (bool*)&Layer.bUseUVTransform))
-			bChanged = true;
-
-		ImGui::BeginDisabled(!Layer.bUseUVTransform);
-
-		ImGui::SetNextItemWidth(160.f);
-		if (ImGui::DragFloat2("UV Scale", (float*)&Layer.vUVScale, 0.01f))
-			bChanged = true;
-
-		ImGui::SetNextItemWidth(160.f);
-		if (ImGui::DragFloat2("UV Offset", (float*)&Layer.vUVOffset, 0.01f))
-			bChanged = true;
-
-		ImGui::EndDisabled();
-
-		for (_uint t = 0; t < MTEX_TYPE_MAX; ++t)
+		if (!bMapObjectMeshUi)
 		{
-			const MTEX_TYPE eType = static_cast<MTEX_TYPE>(t);
-			const int iCount = static_cast<int>(pModel->Get_MeshTextureCount((_uint)i, eType));
-			const _uint iLayerIndex = Layer.idx[t];
-			const _bool bImportant = Is_EnvImportantTexType(eType);
-			const _bool bOutOfRange = (iCount > 0) && (iLayerIndex >= static_cast<_uint>(iCount));
+			if (ImGui::Checkbox("Use UV Transform", (bool*)&Layer.bUseUVTransform))
+				bChanged = true;
 
-			if (0 == iCount)
+			ImGui::BeginDisabled(!Layer.bUseUVTransform);
+
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat2("UV Scale", (float*)&Layer.vUVScale, 0.01f))
+				bChanged = true;
+
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat2("UV Offset", (float*)&Layer.vUVOffset, 0.01f))
+				bChanged = true;
+
+			ImGui::EndDisabled();
+
+			for (_uint t = 0; t < MTEX_TYPE_MAX; ++t)
 			{
-				if (bEnvObjectMeshUi && bImportant)
+				const MTEX_TYPE eType = static_cast<MTEX_TYPE>(t);
+				const int iCount = static_cast<int>(pModel->Get_MeshTextureCount(iMesh, eType));
+				const _uint iLayerIndex = Layer.idx[t];
+				const _bool bImportant = Is_EnvImportantTexType(eType);
+				const _bool bOutOfRange = (iCount > 0) && (iLayerIndex >= static_cast<_uint>(iCount));
+
+				if (0 == iCount)
+				{
+					if (bEnvObjectMeshUi && bImportant)
+					{
+						bAnyField = true;
+						ImGui::TextDisabled("%s: no texture", TexTypeName(t));
+					}
+					continue;
+				}
+
+				if (1 == iCount)
 				{
 					bAnyField = true;
-					ImGui::TextDisabled("%s: no texture", TexTypeName(t));
+					ImGui::TextDisabled("%s: single texture (index 0)%s",
+						TexTypeName(t),
+						bOutOfRange ? "  (layer index out of range)" : "");
+					continue;
 				}
-				continue;
-			}
 
-			if (1 == iCount)
-			{
 				bAnyField = true;
-				ImGui::TextDisabled("%s: single texture (index 0)%s",
-					TexTypeName(t),
-					bOutOfRange ? "  (layer index out of range)" : "");
-				continue;
+
+				int iValue = static_cast<int>(iLayerIndex);
+				ImGui::SetNextItemWidth(120.f);
+				if (ImGui::InputInt(TexTypeName(t), &iValue))
+				{
+					if (iValue < 0)
+						iValue = 0;
+					if (iValue >= iCount)
+						iValue = iCount - 1;
+
+					Layer.idx[t] = static_cast<_uint>(iValue);
+					bChanged = true;
+				}
+				ImGui::SameLine();
+				ImGui::Text("/ %d", iCount);
 			}
-
-			bAnyField = true;
-
-			int iValue = static_cast<int>(iLayerIndex);
-			ImGui::SetNextItemWidth(120.f);
-			if (ImGui::InputInt(TexTypeName(t), &iValue))
-			{
-				if (iValue < 0)
-					iValue = 0;
-				if (iValue >= iCount)
-					iValue = iCount - 1;
-
-				Layer.idx[t] = static_cast<_uint>(iValue);
-				bChanged = true;
-			}
-			ImGui::SameLine();
-			ImGui::Text("/ %d", iCount);
 		}
 
 		if (!bAnyField)
 			ImGui::TextDisabled("  (no texture slot override)");
 
 		if (bChanged)
-			pModel->Set_MeshLayer((_uint)i, Layer);
+			pModel->Set_MeshLayer(iMesh, Layer);
 
 		ImGui::Separator();
 		ImGui::PopID();

@@ -1174,5 +1174,8 @@
     <FxCompile Include="..\ShaderFiles\Shader_EnvInstance.hlsl">
       <Filter>98. ShaderFiles\Leo</Filter>
     </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_MapEx.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
