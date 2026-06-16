@@ -3,6 +3,8 @@
 
 NS_BEGIN(Client)
 
+enum class MAP_PASS : _uint { SHADOW = 0, WHITE, DEFAULT, OVERLAY, TOP, _COUNT };
+
 namespace ShaderPass
 {
 	namespace Map

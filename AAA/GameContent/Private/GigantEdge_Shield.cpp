@@ -32,6 +32,8 @@ HRESULT CGigantEdge_Shield::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
+    m_pAnimatorCom->Play("Reset");
+
     return S_OK;
 }
 

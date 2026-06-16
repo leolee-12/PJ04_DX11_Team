@@ -298,15 +298,6 @@
     <Filter Include="00. GameObject\06. Monster\Monster\01. StateMachine\State\Find">
       <UniqueIdentifier>{b46f9754-404f-45d1-82fc-a81c412c5842}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\07. LevelDesign">
-      <UniqueIdentifier>{df77a93d-c3e5-461c-a155-eb275851d047}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\07. LevelDesign\Breakable">
-      <UniqueIdentifier>{41ac5899-75d9-43ae-ba35-d15a6f693112}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\07. LevelDesign\Unsupported">
-      <UniqueIdentifier>{88670e70-c815-452c-88eb-8a17ac26a72d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="99. Defines\Leo">
       <UniqueIdentifier>{ca69a650-f542-4ef4-9ce8-1c68bc5ca0a6}</UniqueIdentifier>
     </Filter>
@@ -391,23 +382,35 @@
     <Filter Include="00. GameObject\97. UI\Component\GaugeBar">
       <UniqueIdentifier>{0319824c-67e9-4142-8520-2c3bc1d47add}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\08. MiniBoss">
+    <Filter Include="00. GameObject\96. LevelDesign">
+      <UniqueIdentifier>{df77a93d-c3e5-461c-a155-eb275851d047}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Breakable">
+      <UniqueIdentifier>{41ac5899-75d9-43ae-ba35-d15a6f693112}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Unsupported">
+      <UniqueIdentifier>{88670e70-c815-452c-88eb-8a17ac26a72d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. MiniBoss">
       <UniqueIdentifier>{ab830d26-cbd1-45f8-8412-afec3357e9e4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\08. MiniBoss\GigantEdge">
+    <Filter Include="00. GameObject\07. MiniBoss\GigantEdge">
       <UniqueIdentifier>{866eb1da-db6b-42fc-8caa-c617ccadb430}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\08. MiniBoss\GigantEdge\Part">
+    <Filter Include="00. GameObject\07. MiniBoss\GigantEdge\Part">
       <UniqueIdentifier>{36b234a5-5536-4e67-94c1-8fd709cf127a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\08. MiniBoss\GigantEdge\Part\Body">
+    <Filter Include="00. GameObject\07. MiniBoss\GigantEdge\Part\Body">
       <UniqueIdentifier>{0741078a-3c4f-4119-b795-070f6e3f0278}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\08. MiniBoss\GigantEdge\Part\Sword">
+    <Filter Include="00. GameObject\07. MiniBoss\GigantEdge\Part\Sword">
       <UniqueIdentifier>{2467cdb3-b08d-4e58-b9a7-087dc6229e2a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\08. MiniBoss\GigantEdge\Part\Shield">
+    <Filter Include="00. GameObject\07. MiniBoss\GigantEdge\Part\Shield">
       <UniqueIdentifier>{7372f538-6cbc-4eb7-8ea0-bc08a001350e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. MiniBoss\GigantEdge\Brain">
+      <UniqueIdentifier>{eb719185-a163-4056-9c87-941873823803}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -781,34 +784,40 @@
       <Filter>00. GameObject\06. Monster\Monster\01. StateMachine\State\Attack</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesignObject.h">
-      <Filter>00. GameObject\07. LevelDesign</Filter>
+      <Filter>00. GameObject\96. LevelDesign</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_LoadTypes.h">
-      <Filter>00. GameObject\07. LevelDesign</Filter>
+      <Filter>00. GameObject\96. LevelDesign</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Defines.h">
-      <Filter>00. GameObject\07. LevelDesign</Filter>
+      <Filter>00. GameObject\96. LevelDesign</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Breakable.h">
-      <Filter>00. GameObject\07. LevelDesign\Breakable</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Breakable</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Unsupported.h">
-      <Filter>00. GameObject\07. LevelDesign\Unsupported</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Unsupported</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Shader_PassMeta.h">
       <Filter>99. Defines\Leo</Filter>
     </ClInclude>
     <ClInclude Include="..\public\GigantEdge.h">
-      <Filter>00. GameObject\08. MiniBoss\GigantEdge</Filter>
+      <Filter>00. GameObject\07. MiniBoss\GigantEdge</Filter>
     </ClInclude>
     <ClInclude Include="..\public\GigantEdge_Body.h">
-      <Filter>00. GameObject\08. MiniBoss\GigantEdge\Part\Body</Filter>
+      <Filter>00. GameObject\07. MiniBoss\GigantEdge\Part\Body</Filter>
     </ClInclude>
     <ClInclude Include="..\public\GigantEdge_Shield.h">
-      <Filter>00. GameObject\08. MiniBoss\GigantEdge\Part\Shield</Filter>
+      <Filter>00. GameObject\07. MiniBoss\GigantEdge\Part\Shield</Filter>
     </ClInclude>
     <ClInclude Include="..\public\GigantEdge_Sword.h">
-      <Filter>00. GameObject\08. MiniBoss\GigantEdge\Part\Sword</Filter>
+      <Filter>00. GameObject\07. MiniBoss\GigantEdge\Part\Sword</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\MiniBoss.h">
+      <Filter>00. GameObject\07. MiniBoss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GigantEdge_Brain.h">
+      <Filter>00. GameObject\07. MiniBoss\GigantEdge\Brain</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1125,25 +1134,31 @@
       <Filter>00. GameObject\06. Monster\Monster\01. StateMachine\State\Attack</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesignObject.cpp">
-      <Filter>00. GameObject\07. LevelDesign</Filter>
+      <Filter>00. GameObject\96. LevelDesign</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Breakable.cpp">
-      <Filter>00. GameObject\07. LevelDesign\Breakable</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Breakable</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Unsupported.cpp">
-      <Filter>00. GameObject\07. LevelDesign\Unsupported</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Unsupported</Filter>
     </ClCompile>
     <ClCompile Include="..\private\GigantEdge.cpp">
-      <Filter>00. GameObject\08. MiniBoss\GigantEdge</Filter>
+      <Filter>00. GameObject\07. MiniBoss\GigantEdge</Filter>
     </ClCompile>
     <ClCompile Include="..\private\GigantEdge_Body.cpp">
-      <Filter>00. GameObject\08. MiniBoss\GigantEdge\Part\Body</Filter>
+      <Filter>00. GameObject\07. MiniBoss\GigantEdge\Part\Body</Filter>
     </ClCompile>
     <ClCompile Include="..\private\GigantEdge_Shield.cpp">
-      <Filter>00. GameObject\08. MiniBoss\GigantEdge\Part\Shield</Filter>
+      <Filter>00. GameObject\07. MiniBoss\GigantEdge\Part\Shield</Filter>
     </ClCompile>
     <ClCompile Include="..\private\GigantEdge_Sword.cpp">
-      <Filter>00. GameObject\08. MiniBoss\GigantEdge\Part\Sword</Filter>
+      <Filter>00. GameObject\07. MiniBoss\GigantEdge\Part\Sword</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MiniBoss.cpp">
+      <Filter>00. GameObject\07. MiniBoss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GigantEdge_Brain.cpp">
+      <Filter>00. GameObject\07. MiniBoss\GigantEdge\Brain</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

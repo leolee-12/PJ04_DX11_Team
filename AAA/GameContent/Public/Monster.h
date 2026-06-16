@@ -9,10 +9,10 @@ NS_END
 
 NS_BEGIN(Client)
 class CMonster_Movement;
-class IMonsterBrain;
+class CMonsterBrain;
 class CMonster_StateMachine;
 
-class CLIENT_DLL CMonster abstract : public CCharacter
+class CMonster abstract : public CCharacter
 {
 	GENERATED_BODY_ABSTRACT(CMonster)
 	
@@ -69,7 +69,7 @@ protected:
 
 	MONSTER_BLACKBOARD			m_BlackBoard = {};
 
-	IMonsterBrain*				m_pBrain = { nullptr };
+	CMonsterBrain*				m_pBrain = { nullptr };
 	CMonster_StateMachine*		m_pStateMachine = { nullptr };
 
 	// 이번 프레임에 이동하고 싶은 방향
@@ -80,8 +80,13 @@ protected:
 	HRESULT						Ready_Movement();
 	HRESULT						Ready_AI();
 
+	// 윤석현 추가 AI 드라이버 선택 훅 (자식이 오버라이드)
+	virtual CMonsterBrain*		Create_Brain(); //기본: FSM Brain
+	virtual _bool				Use_StateMachine() const { return true; } // BT 전용 몬스터는 false 반환
+
+	//윤석현 수정 
+	virtual void				Update_AI(_float fTimeDelta);
 	void						Perceive(_float fTimeDelta);
-	void						Update_AI(_float fTimeDelta);
 
 protected:
 	virtual void				Free() override;

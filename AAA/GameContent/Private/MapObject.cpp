@@ -55,28 +55,17 @@ HRESULT CMapObject::Render()
 	// 1패스: 베이스 불투명 (Parts 제외)
 	for (size_t i = 0; i < n; ++i)
 	{
-		if (Is_OverlayMesh((_uint)i))
-			continue;
-
 		MESH_LAYER_IDX Layer = m_pModelCom->Get_MeshLayer((_uint)i);
 		_int iPass = (Layer.iPass >= 0)
 			? Layer.iPass
-			: static_cast<_int>(ShaderPass::Map::White);
+			: ETOUI(MAP_PASS::WHITE);
 
-		if (iPass < 0 || iPass > static_cast<_int>(ShaderPass::Map::Shadow))
-			iPass = static_cast<_int>(ShaderPass::Map::White);
+		if (iPass < 0 || iPass > ETOUI(MAP_PASS::_COUNT))
+			iPass = ETOUI(MAP_PASS::WHITE);
 
 		m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", (_uint)i, MTEX_TYPE::DIFFUSE, Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)]);
 		m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", (_uint)i, MTEX_TYPE::NORMALS, Layer.idx[ETOUI(MTEX_TYPE::NORMALS)]);
 		m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", (_uint)i, MTEX_TYPE::METALNESS, Layer.idx[ETOUI(MTEX_TYPE::METALNESS)]);
-
-		_int iZero = 0;
-		m_pShaderCom->Bind_RawValue("g_iHasMoss", &iZero, sizeof(_int));
-		//m_pShaderCom->Bind_RawValue("g_iHasDirt", &iZero, sizeof(_int));
-
-		_int iUseTop = (m_bTopProjection &&
-			m_pModelCom->Get_MeshName((_uint)i).find("Top") != string::npos) ? 1 : 0;
-		m_pShaderCom->Bind_RawValue("g_iUseTopProjection", &iUseTop, sizeof(_int));
 
 		Bind_MeshLayers((_uint)i);
 
@@ -86,28 +75,6 @@ HRESULT CMapObject::Render()
 			return E_FAIL;
 	}
 
-	// 2패스: 오버레이(DirtParts discard) 베이스 위에 얹기
-	for (size_t i = 0; i < n; ++i)
-	{
-		if (!Is_OverlayMesh((_uint)i))
-			continue;
-
-		MESH_LAYER_IDX Layer = m_pModelCom->Get_MeshLayer((_uint)i);
-
-		_int iPass = (Layer.iPass >= 0)
-			? Layer.iPass
-			: static_cast<_int>(ShaderPass::Map::Overlay);
-
-		if (iPass < 0 || iPass > static_cast<_int>(ShaderPass::Map::Shadow))
-			iPass = static_cast<_int>(ShaderPass::Map::Overlay);
-
-		m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", (_uint)i, MTEX_TYPE::DIFFUSE, Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)]);
-
-		if (FAILED(m_pShaderCom->Begin(iPass)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Render((_uint)i)))
-			return E_FAIL;
-	}
 
 	return S_OK;
 }

@@ -85,4 +85,46 @@ void CBTSelector::Free()
 	__super::Free();
 }
 
+BT_STATUS CBTReactiveSelector::Tick(CBlackboard* pBB, _float fDt)
+{
+	for (_uint i = 0; i < m_Children.size(); ++i)
+	{
+		BT_STATUS eStatus = m_Children[i]->Tick(pBB, fDt);
+
+		if (eStatus == BT_STATUS::FAILURE)
+			continue;                       // 다음(더 낮은 우선순위) 후보로
+
+		// i가 이번 틱 승자. 직전에 다른 자식이 돌고 있었으면 그 브랜치 중단
+		if (m_iRunning != INVALID_IDX && m_iRunning != i)
+			m_Children[m_iRunning]->Reset();
+
+		m_iRunning = (eStatus == BT_STATUS::RUNNING) ? i : INVALID_IDX;
+		return eStatus;                     // SUCCESS여도 다음 틱 0부터 재평가됨
+	}
+
+	// 전부 FAILURE
+	if (m_iRunning != INVALID_IDX)
+	{
+		m_Children[m_iRunning]->Reset();
+		m_iRunning = INVALID_IDX;
+	}
+	return BT_STATUS::FAILURE;
+}
+
+void CBTReactiveSelector::Reset()
+{
+	__super::Reset();           // 자식 전부 Reset (base가 m_iRunning=0으로 둠)
+	m_iRunning = INVALID_IDX;
+}
+
+CBTReactiveSelector* CBTReactiveSelector::Create(initializer_list<CBTNode*> C)
+{
+	return new CBTReactiveSelector(C);
+}
+
+void CBTReactiveSelector::Free()
+{
+	__super::Free();
+}
+
 

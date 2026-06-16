@@ -43,8 +43,6 @@ void CGigantEdge_Sword::Update(_float fTimeDelta)
 {
     if (m_pGameInstance_Proxy->Is_EditMode())
         return;
-
-    m_pAnimatorCom->Update(fTimeDelta);
 }
 
 void CGigantEdge_Sword::Late_Update(_float fTimeDelta)
@@ -74,9 +72,6 @@ HRESULT CGigantEdge_Sword::Render()
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
             return E_FAIL;
 
-        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
-            return E_FAIL;
-
         if (FAILED(m_pShaderCom->Begin(1)))
             return E_FAIL;
 
@@ -94,22 +89,14 @@ HRESULT CGigantEdge_Sword::Render_Shadow()
 
 HRESULT CGigantEdge_Sword::Ready_Components()
 {
-    m_pShaderCom = Add_Component<CShader>(Shader_AnimMesh_PBR.iLevelID, Shader_AnimMesh_PBR.szProtoTag,
+    m_pShaderCom = Add_Component<CShader>(Shader_NonAnimMesh_PBR.iLevelID, Shader_NonAnimMesh_PBR.szProtoTag,
         TEXT("Com_Shader"));
     if (m_pShaderCom == nullptr)
         return E_FAIL;
 
-    // TODO: 모델 프로토타입 태그 교체
     m_pModelCom = Add_Component<CModel>(m_iPrototypeLevel, TEXT("Prototype_Component_Model_GigantEdge_Sword"),
         TEXT("Com_Model"));
     if (m_pModelCom == nullptr)
-        return E_FAIL;
-
-    CAnimator::ANIMATOR_DESC AnimDesc{};
-    AnimDesc.pModel = m_pModelCom;
-
-    m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
-    if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
         return E_FAIL;
 
     return S_OK;

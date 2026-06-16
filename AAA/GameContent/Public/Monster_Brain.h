@@ -8,11 +8,11 @@ NS_BEGIN(Client)
 
 class CMonster;
 
-class CLIENT_DLL IMonsterBrain abstract : public CBase
+class CMonsterBrain abstract : public CBase
 {
 protected:
-	IMonsterBrain();
-	virtual ~IMonsterBrain() = default;
+	CMonsterBrain();
+	virtual ~CMonsterBrain() = default;
 
 public:
 	virtual void	Decide(CMonster* pMonster, const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta) = 0;

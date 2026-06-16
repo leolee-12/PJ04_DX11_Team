@@ -42,13 +42,9 @@ public:
         pOutData->strPrototypeTag = PROTOTYPE_TAG;
     }
 
-public:
-    CAnimator * Get_Animator() { return m_pAnimatorCom; }
-
 private:
     CShader* m_pShaderCom = { nullptr };
     CModel* m_pModelCom = { nullptr };
-    CAnimator* m_pAnimatorCom = { nullptr };
 
     const _float4x4* m_pSocketBoneMatrix = { nullptr };
 

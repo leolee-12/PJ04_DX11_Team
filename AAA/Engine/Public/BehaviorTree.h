@@ -7,7 +7,7 @@ class CBTNode;
 class CBlackboard;
 
 // Root + BlackBoard 보유, 매프레임 Tick
-class CBehaviorTree final : public CBase
+class ENGINE_DLL CBehaviorTree final : public CBase
 {
 private:
 	CBehaviorTree() = default;
