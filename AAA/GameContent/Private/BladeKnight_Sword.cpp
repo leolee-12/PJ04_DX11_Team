@@ -37,17 +37,22 @@ HRESULT CBladeKnight_Sword::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
-    m_pAnimatorCom->Play("Thrust", false , true);
+    m_pAnimatorCom->Play("Thrust", false , false);
 
     return S_OK;
 }
 
 void CBladeKnight_Sword::Priority_Update(_float fTimeDelta)
 {
+    if (!m_bActive)
+        return;
 }
 
 void CBladeKnight_Sword::Update(_float fTimeDelta)
 {
+    if (!m_bActive)
+        return;
+
     if (m_pGameInstance_Proxy->Is_EditMode())
         return;
 
@@ -57,6 +62,9 @@ void CBladeKnight_Sword::Update(_float fTimeDelta)
 
 void CBladeKnight_Sword::Late_Update(_float fTimeDelta)
 {
+    if (!m_bActive)
+        return;
+
     if (nullptr == m_pSocketBoneMatrix)
         return;
 

@@ -39,7 +39,6 @@ HRESULT CBladeKnight_Body::Initialize(void* pArg)
 
 void CBladeKnight_Body::Priority_Update(_float fTimeDelta)
 {
-
 }
 
 void CBladeKnight_Body::Update(_float fTimeDelta)

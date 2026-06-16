@@ -29,6 +29,9 @@ void CMonster_State_Attack::Update(CMonster* pMonster, _float fTimeDelta)
 
 	if (nullptr == pMonster)
 		return;
+
+	if (pMonster->Is_StateAnimationFinished())
+		pMonster->Get_BlackBoard().bActionFinished = true;
 }
 
 void CMonster_State_Attack::Exit(CMonster* pMonster)
