@@ -7,6 +7,8 @@
 #include "SmokeLowPoly.h"
 #include "SmokeTail.h"
 
+#include "TestParticle.h"
+
 CWalkSmoke::CWalkSmoke(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Container(pDevice, pContext)
 {
@@ -59,11 +61,18 @@ HRESULT CWalkSmoke::Render()
 
 HRESULT CWalkSmoke::Ready_EffectPartObjects()
 {
-    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CSmokeSphereOriginal::PROTOTYPE_TAG, TEXT("Proto_SmokeSphereOriginal"));
-    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CSmokeLowPoly::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeLowPoly_1"));
-    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CSmokeLowPoly::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeLowPoly_2"));
-    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CSmokeLowPoly::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeLowPoly_3"));
-    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CSmokeTail::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeTail"));
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeSphereOriginal::PROTOTYPE_TAG, TEXT("Proto_SmokeSphereOriginal"))))
+        return E_FAIL;
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeLowPoly::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeLowPoly_1"))))
+        return E_FAIL;
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeLowPoly::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeLowPoly_2"))))
+        return E_FAIL;
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeLowPoly::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeLowPoly_3"))))
+        return E_FAIL;
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeTail::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeTail"))))
+        return E_FAIL;
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CTestParticle::PROTOTYPE_TAG, TEXT("Test_Paticle"))))
+        return E_FAIL;
 
     return S_OK;
 }
@@ -87,7 +96,7 @@ CGameObject* CWalkSmoke::Clone(void* pArg)
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Cloned: CTestEffectQuad");
+        MSG_BOX("Failed to Cloned: CWalkSmoke");
         Safe_Release(pInstance);
     }
 

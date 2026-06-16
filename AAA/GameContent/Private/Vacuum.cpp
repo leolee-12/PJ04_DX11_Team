@@ -24,7 +24,7 @@ HRESULT CVacuum::Initialize(void* pArg)
 {
     VACUUM_DESC tDesc{};
 
-    tDesc.iModelLevel = ETOUI(LEVEL::GAMEPLAY);
+    tDesc.iModelLevel = m_iPrototypeLevel;
     tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Common_00_Vacuum");
 
     tDesc.bUseDiffuseTexture = false;

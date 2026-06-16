@@ -24,7 +24,7 @@ HRESULT CTornadoSpinReverse::Initialize(void* pArg)
 {
     TORNADO_SPIN_REVERSE_DESC tDesc{};
 
-    tDesc.iModelLevel = ETOUI(LEVEL::GAMEPLAY);
+    tDesc.iModelLevel = m_iPrototypeLevel;
     tDesc.wstrModelTag = TEXT("Prototype_Component_Model_TornadoSpinReverse");
 
     tDesc.bUseDiffuseTexture = false;

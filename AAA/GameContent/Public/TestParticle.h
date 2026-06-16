@@ -16,7 +16,7 @@ public:
 
 	};
 
-	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_TestEffectQuad";
+	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_TestParticle";
 
 private:
 	CTestParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
