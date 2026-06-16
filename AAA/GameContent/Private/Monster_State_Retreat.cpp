@@ -25,6 +25,13 @@ void CMonster_State_Retreat::Enter(CMonster* pMonster)
 
 void CMonster_State_Retreat::Update(CMonster* pMonster, _float fTimeDelta)
 {
+	UNREFERENCED_PARAMETER(fTimeDelta);
+
+	if (nullptr == pMonster)
+		return;
+
+	// 임시 작성
+	pMonster->Add_MoveDir(_float3({ 0.f, 0.f, -1.f }));
 }
 
 void CMonster_State_Retreat::Exit(CMonster* pMonster)

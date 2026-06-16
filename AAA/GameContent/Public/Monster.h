@@ -9,13 +9,13 @@ NS_END
 
 NS_BEGIN(Client)
 class CMonster_Movement;
-class IMonsterBrain;
+class CMonsterBrain;
 class CMonster_StateMachine;
 
 class CMonster abstract : public CCharacter
 {
 	GENERATED_BODY_ABSTRACT(CMonster)
-		
+
 protected:
 	CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CMonster(const CMonster& Prototype);
@@ -69,14 +69,14 @@ protected:
 
 	MONSTER_BLACKBOARD			m_BlackBoard = {};
 
-	IMonsterBrain*				m_pBrain = { nullptr };
+	CMonsterBrain*				m_pBrain = { nullptr };
 	CMonster_StateMachine*		m_pStateMachine = { nullptr };
 
 	// 이번 프레임에 이동하고 싶은 방향
 	_float3						m_vWishDir = {};
 
-	_float						m_fMaxHP = { };
-	_float						m_CurHP = {};
+	_float						m_fMaxHP = {};
+	_float						m_fCurHP = {};
 
 protected:
 	// 부모가 관리할 공통 파이프라인

@@ -1,10 +1,10 @@
 #include "Monster_Brain.h"
 
-IMonsterBrain::IMonsterBrain()
+CMonsterBrain::CMonsterBrain()
 {
 }
 
-void IMonsterBrain::Free()
+void CMonsterBrain::Free()
 {
 	__super::Free();
 }

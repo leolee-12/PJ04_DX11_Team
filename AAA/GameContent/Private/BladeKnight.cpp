@@ -1,5 +1,6 @@
 #include "BladeKnight.h"
 #include "GameInstance.h"
+#include "Monster_Movement.h"
 #include "Animator.h"
 
 #include "BladeKnight_Body.h"
@@ -68,8 +69,6 @@ void CBladeKnight::Update(_float fTimeDelta)
 
         if (m_pGameInstance_Proxy->Key_Down(DIK_4))
             Change_State(MONSTER_STATE_TYPE::ATTACK);
-
-
     }
 #endif
 }
@@ -99,7 +98,7 @@ _float CBladeKnight::Get_CapsuleHeight() const
 
 void CBladeKnight::Play_StateAnimation(MONSTER_STATE_TYPE eState)
 {
-    if (nullptr == m_pBody || nullptr == m_pSword)
+    if (nullptr == m_pBody || nullptr == m_pSword || nullptr == m_pMovement)
         return;
 
     CAnimator* pBodyAnimator = m_pBody->Get_Animator();
@@ -125,6 +124,7 @@ void CBladeKnight::Play_StateAnimation(MONSTER_STATE_TYPE eState)
     }
     case MONSTER_STATE_TYPE::CHASE:
     {
+        m_pMovement->Set_MoveSpeed(2.f);
         pBodyAnimator->Play("Move", true, false);
         //pSwordAnimator->Play("Thrust", false, false);
         break;
@@ -146,6 +146,7 @@ void CBladeKnight::Play_StateAnimation(MONSTER_STATE_TYPE eState)
     }
     case MONSTER_STATE_TYPE::RETREAT:
     {
+        m_pMovement->Set_MoveSpeed(2.f);
         AnimInfo.strAniName = "Retreat";
         AnimInfo.bLoop = false;
         pBodyAnimator->Play(&AnimInfo);
@@ -204,7 +205,6 @@ HRESULT CBladeKnight::Ready_PartObjects()
 
 HRESULT	CBladeKnight::Bind_ShaderResources()
 {
-
     return S_OK;
 }
 
