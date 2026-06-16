@@ -1,29 +1,30 @@
-#include "Kirby_SwordHat.h"
+#include "GigantEdge_Sword.h"
 
 #include "GameInstance.h"
-
 #include "GameContent_const.h"
-
 #include "Animator.h"
 
-CKirby_SwordHat::CKirby_SwordHat(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CKirby_OnOffPart(pDevice, pContext)
+CGigantEdge_Sword::CGigantEdge_Sword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+    : CPartObject(pDevice, pContext)
 {
 }
 
-CKirby_SwordHat::CKirby_SwordHat(const CKirby_SwordHat& Prototype)
-    : CKirby_OnOffPart(Prototype) {
+CGigantEdge_Sword::CGigantEdge_Sword(const CGigantEdge_Sword& Prototype)
+    : CPartObject(Prototype)
+{
 }
 
-HRESULT CKirby_SwordHat::Initialize_Prototype()
+HRESULT CGigantEdge_Sword::Initialize_Prototype()
 {
     m_eProjType = PROJ_TYPE::PERSPEC;
     return S_OK;
 }
 
-HRESULT CKirby_SwordHat::Initialize(void* pArg)
+HRESULT CGigantEdge_Sword::Initialize(void* pArg)
 {
-    KIRBY_SWORDHAT_DESC* pDesc = static_cast<KIRBY_SWORDHAT_DESC*>(pArg);
+    GIGANTEDGE_SWORD_DESC* pDesc = static_cast<GIGANTEDGE_SWORD_DESC*>(pArg);
+
+    m_pSocketBoneMatrix = pDesc->pSocketBoneMatrix;
 
     if (FAILED(__super::Initialize(pDesc)))
         return E_FAIL;
@@ -31,62 +32,52 @@ HRESULT CKirby_SwordHat::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
-    m_pAnimatorCom->Play("Deform", true, true);
-
     return S_OK;
 }
 
-void CKirby_SwordHat::Priority_Update(_float fTimeDelta)
+void CGigantEdge_Sword::Priority_Update(_float fTimeDelta)
 {
-    if (m_bOn == false)
-        return;
 }
 
-void CKirby_SwordHat::Update(_float fTimeDelta)
+void CGigantEdge_Sword::Update(_float fTimeDelta)
 {
-    if (m_bOn == false)
-        return;
-
     if (m_pGameInstance_Proxy->Is_EditMode())
         return;
 
     m_pAnimatorCom->Update(fTimeDelta);
 }
 
-void CKirby_SwordHat::Late_Update(_float fTimeDelta)
+void CGigantEdge_Sword::Late_Update(_float fTimeDelta)
 {
-    if (m_bOn == false)
-        return;
-
-    __super::Late_Update(fTimeDelta);
+    // 부모 월드 * 소켓 본
+    __super::Compute_CombinedWorldMatrix(
+        XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()) *
+        XMLoadFloat4x4(m_pSocketBoneMatrix));
 
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 
-HRESULT CKirby_SwordHat::Render()
+HRESULT CGigantEdge_Sword::Render()
 {
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
 
-    size_t iNumMeshes = m_pModelCom->Get_NumMeshes();
+    const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
 
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
-        _uint iPassIdx = 1;
-
+        // TODO: 머티리얼 바인딩
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
             return E_FAIL;
-
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", i, MTEX_TYPE::NORMALS, 0)))
             return E_FAIL;
-
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Begin(iPassIdx)))
+        if (FAILED(m_pShaderCom->Begin(1)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render(i)))
@@ -96,35 +87,38 @@ HRESULT CKirby_SwordHat::Render()
     return S_OK;
 }
 
-HRESULT CKirby_SwordHat::Ready_Components()
+HRESULT CGigantEdge_Sword::Render_Shadow()
 {
-    /* For.Com_Shader */
-    m_pShaderCom = Add_Component<CShader>(Shader_AnimMesh_PBR.iLevelID, Shader_AnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
+    return S_OK;
+}
+
+HRESULT CGigantEdge_Sword::Ready_Components()
+{
+    m_pShaderCom = Add_Component<CShader>(Shader_AnimMesh_PBR.iLevelID, Shader_AnimMesh_PBR.szProtoTag,
+        TEXT("Com_Shader"));
     if (m_pShaderCom == nullptr)
         return E_FAIL;
 
-    /* For.Com_Model */
-    m_pModelCom = Add_Component<CModel>(m_iPrototypeLevel, TEXT("Prototype_Component_Model_SwordHat"), TEXT("Com_Model"));
+    // TODO: 모델 프로토타입 태그 교체
+    m_pModelCom = Add_Component<CModel>(m_iPrototypeLevel, TEXT("Prototype_Component_Model_GigantEdge_Sword"),
+        TEXT("Com_Model"));
     if (m_pModelCom == nullptr)
         return E_FAIL;
 
-    /* For.Com_Animator */
     CAnimator::ANIMATOR_DESC AnimDesc{};
     AnimDesc.pModel = m_pModelCom;
 
     m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
-
     if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
         return E_FAIL;
 
     return S_OK;
 }
 
-HRESULT CKirby_SwordHat::Bind_ShaderResources()
+HRESULT CGigantEdge_Sword::Bind_ShaderResources()
 {
     if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
         return E_FAIL;
-
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
@@ -133,33 +127,33 @@ HRESULT CKirby_SwordHat::Bind_ShaderResources()
     return S_OK;
 }
 
-CKirby_SwordHat* CKirby_SwordHat::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CGigantEdge_Sword* CGigantEdge_Sword::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CKirby_SwordHat* pInstance = new CKirby_SwordHat(pDevice, pContext);
+    CGigantEdge_Sword* pInstance = new CGigantEdge_Sword(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX("Failed to Created: CKirby_SwordHat");
+        MSG_BOX("Failed to Created: CGigantEdge_Sword");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CKirby_SwordHat::Clone(void* pArg)
+CGigantEdge_Sword* CGigantEdge_Sword::Clone(void* pArg)
 {
-    CKirby_SwordHat* pInstance = new CKirby_SwordHat(*this);
+    CGigantEdge_Sword* pInstance = new CGigantEdge_Sword(*this);
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Cloned: CKirby_SwordHat");
+        MSG_BOX("Failed to Cloned: CGigantEdge_Sword");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CKirby_SwordHat::Free()
+void CGigantEdge_Sword::Free()
 {
     __super::Free();
 }

@@ -34,7 +34,7 @@ HRESULT CEffect_Loader::Ready(const _tchar* strManifestPath,
         {
             auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(strProtoTag);
             if (!pReg) continue;
-            pReg->ResourceLoader(pProxy, pDevice, pContext);                 // 파트/컴포넌트(2단계 STATIC)
+            pReg->ResourceLoader(pProxy, pDevice, pContext, ETOUI(LEVEL::STATIC));                 // 파트/컴포넌트(2단계 STATIC)
             pProxy->Add_Prototype(ETOUI(LEVEL::STATIC), strProtoTag.c_str(),
                 pReg->CreatorFunc(pDevice, pContext));       // 메인 컨테이너 프로토 STATIC
         }

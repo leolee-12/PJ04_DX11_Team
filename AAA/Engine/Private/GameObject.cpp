@@ -19,6 +19,7 @@ CGameObject::CGameObject(const CGameObject& Prototype)
     , m_eProjType{ Prototype.m_eProjType }
     , m_bActive{ Prototype.m_bActive }
     , m_iMaterialID{ Prototype.m_iMaterialID }
+    , m_iPrototypeLevel{ Prototype.m_iPrototypeLevel }
 {
     Safe_AddRef(m_pDevice);
     Safe_AddRef(m_pContext);

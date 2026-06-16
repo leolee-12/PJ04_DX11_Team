@@ -125,7 +125,7 @@ HRESULT CMap_ProtoRegister::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, c
 		if (nullptr == pReg)
 			return E_FAIL;
 
-		pReg->ResourceLoader(m_pProxy, m_pDevice, m_pContext);
+		pReg->ResourceLoader(m_pProxy, m_pDevice, m_pContext, Levels.iObjectLevel);
 		if (FAILED(m_pProxy->Add_Prototype(
 			Levels.iObjectLevel,
 			Added.strPrototypeTag.c_str(),

@@ -75,7 +75,7 @@ IMPLEMENT_SINGLETON(CGameObject_Factory)
         }
 
 #define LOADER(...) \
-        [](CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext) { __VA_ARGS__; }
+        [](CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _uint iLevelIndex) { __VA_ARGS__; }
 
 #define TRY_ADD_PROTO(proxy, level, tag, createExpr) \
       if (!proxy->Has_Prototype(level, tag)) { \
@@ -168,10 +168,7 @@ void CGameObject_Factory::Register_Test()
     Register(TEXT("Proto_TestFiona"), TEXT("TEST_OBJECT"),
         CREATOR(CTestFiona),
         LOADER(
-            /*pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Test/Aligator/aligator.ysh",
-                    XMMatrixRotationY(XMConvertToRadians(180.f))))*/
-            pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Fiona"),
+            pProxy->Add_Prototype(iLevelIndex, TEXT("Prototype_Component_Model_Fiona"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Test/Test/Aligator/Aligator_Anim.ysh"
                     //, XMMatrixRotationY(XMConvertToRadians(180.f))
                 ))
@@ -183,7 +180,7 @@ void CGameObject_Factory::Register_Test()
         CREATOR(CTestNonAnim),
         LOADER
         (
-            pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_NonAnim"),
+            pProxy->Add_Prototype(iLevelIndex, TEXT("Prototype_Component_Model_NonAnim"),
                 CModel::Create(pDevice, pContext, MODEL::MAP, "../../Resources/Test/Test/Marb1e/Land_GsAllBuilding_0.ysh"))
         )
     );
@@ -208,7 +205,7 @@ void CGameObject_Factory::Register_Test()
     Register(CTestMarb1e::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
         CREATOR(CTestMarb1e),
         LOADER(
-            pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Marb1e"),
+            pProxy->Add_Prototype(iLevelIndex, TEXT("Prototype_Component_Model_Marb1e"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Test/Test/Aligator/Aligator_Anim.ysh"
                     //, XMMatrixRotationY(XMConvertToRadians(180.f))
                 ))
@@ -218,7 +215,7 @@ void CGameObject_Factory::Register_Test()
     Register(CTestMarb1eMap::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
         CREATOR(CTestMarb1eMap),
         LOADER(
-            pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Map"),
+            pProxy->Add_Prototype(iLevelIndex, TEXT("Prototype_Component_Model_Map"),
                 CModel::Create(pDevice, pContext, MODEL::MAP, "../../Resources/Test/Test/Marb1e/Land_GsAllBuilding_0.ysh"))
         )
     );
@@ -226,7 +223,7 @@ void CGameObject_Factory::Register_Test()
     Register(CMaterial_Object::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
         CREATOR(CMaterial_Object),
         LOADER(
-            pProxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_MaterialObject"),
+            pProxy->Add_Prototype(iLevelIndex, TEXT("Prototype_Component_Model_MaterialObject"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Shader_Test_Object/Model_SmokeSphereOriginal.ysh"))
         )
     );
@@ -245,19 +242,19 @@ void CGameObject_Factory::Register_Test()
         LOADER
         (
             // SmokeSphereOriginal
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CSmokeSphereOriginal::PROTOTYPE_TAG,
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeSphereOriginal::PROTOTYPE_TAG,
                 CSmokeSphereOriginal::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
             // SmokeLowPoly
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CSmokeLowPoly::PROTOTYPE_TAG,
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeLowPoly::PROTOTYPE_TAG,
                 CSmokeLowPoly::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_SmokeLowPoly"),
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeLowPoly"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
             // SmokeTail
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CSmokeTail::PROTOTYPE_TAG,
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeTail::PROTOTYPE_TAG,
                 CSmokeTail::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_SmokeTail"),
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeTail"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeTail/Model_SmokeTail.ysh"));
         )
     );
@@ -267,15 +264,15 @@ void CGameObject_Factory::Register_Test()
         LOADER
         (           
             // Common_Curve03
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CCommon_Curve03::PROTOTYPE_TAG,
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_Curve03::PROTOTYPE_TAG,
                 CCommon_Curve03::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Common_Curve03"),
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_Curve03"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_Curve03/Model_Common_Curve03.ysh"));
             
             //// Common_Circle01
-            //TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CCommon_Circle01::PROTOTYPE_TAG,
+            //TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_Circle01::PROTOTYPE_TAG,
             //    CCommon_Circle01::Create(pDevice, pContext));
-            //TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Common_Circle01"),
+            //TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_Circle01"),
             //    CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_Circle01/Model_Common_Circle01.ysh"));
         )
     );
@@ -286,9 +283,9 @@ void CGameObject_Factory::Register_Test()
         LOADER
         (           
             // InhaleEffect
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CInhaleEffect::PROTOTYPE_TAG,
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CInhaleEffect::PROTOTYPE_TAG,
                 CInhaleEffect::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_InhaleEffect"),
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_InhaleEffect"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/InhaleEffect2M/Common_00_InhaleEffect2M.ysh",
                     XMMatrixRotationX(XMConvertToRadians(90.f))));
             TRY_ADD_PROTO(pProxy, Texture_Wind01.iLevelID, Texture_Wind01.szProtoTag,
@@ -297,9 +294,9 @@ void CGameObject_Factory::Register_Test()
                 CTexture::Create(pDevice, pContext, Texture_Wind02.szFileTag, Texture_Wind02.iNumTex));
 
             // Vacuum
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CVacuum::PROTOTYPE_TAG,
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CVacuum::PROTOTYPE_TAG,
                 CVacuum::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Common_00_Vacuum"),
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_00_Vacuum"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Vacuum/Common_00_Vacuum.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
             
@@ -307,9 +304,9 @@ void CGameObject_Factory::Register_Test()
                 CTexture::Create(pDevice, pContext, Texture_Twincle.szFileTag, Texture_Twincle.iNumTex));
 
             // Tornado Spin Reverse
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CTornadoSpinReverse::PROTOTYPE_TAG,
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CTornadoSpinReverse::PROTOTYPE_TAG,
                 CTornadoSpinReverse::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_TornadoSpinReverse"),
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TornadoSpinReverse"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/TornadoSpinReverse/Tornado_00_TornadoSpinReverse.ysh",
                     XMMatrixRotationX(XMConvertToRadians(90.f))
                 ));
@@ -332,23 +329,23 @@ void CGameObject_Factory::Register_Container()
         LOADER
         (
             // Kirby_Body
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CKirby_Body::PROTOTYPE_TAG,
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_Body::PROTOTYPE_TAG,
                 CKirby_Body::Create(pDevice, pContext));
 
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Kirby_Body"),
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Kirby_Body"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Kirby/Kirby.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
 
             // Sword
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CKirby_Sword::PROTOTYPE_TAG,
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_Sword::PROTOTYPE_TAG,
                 CKirby_Sword::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Sword"),
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Sword"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Sword/Sword.ysh"));
 
             // Sword Hat
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CKirby_SwordHat::PROTOTYPE_TAG,
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_SwordHat::PROTOTYPE_TAG,
                 CKirby_SwordHat::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_SwordHat"),
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SwordHat"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Hat/SwordHat.ysh"));
         )
     ); 
@@ -363,17 +360,17 @@ void CGameObject_Factory::Register_Container()
         LOADER
         (
             // BladeKnight Body
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CBladeKnight_Body::PROTOTYPE_TAG,
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBladeKnight_Body::PROTOTYPE_TAG,
                 CBladeKnight_Body::Create(pDevice, pContext));
 
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_BladeKnight_Body"),
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BladeKnight_Body"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/BladeKnight/BladeKnight.ysh",
                 XMMatrixRotationY(XMConvertToRadians(180.f))));
 
             // BladeKnight Sword
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CBladeKnight_Sword::PROTOTYPE_TAG, CBladeKnight_Sword::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBladeKnight_Sword::PROTOTYPE_TAG, CBladeKnight_Sword::Create(pDevice, pContext));
 
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_BladeKnight_Sword"),
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BladeKnight_Sword"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/BladeKnight/BladeKnight_Sword.ysh"));
          )
     );

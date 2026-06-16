@@ -115,7 +115,7 @@ HRESULT CKirby_Body::Ready_Components()
         return E_FAIL;
 
     /* For.Com_Model */
-    m_pModelCom = Add_Component<CModel>(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Kirby_Body"), TEXT("Com_Model"));
+    m_pModelCom = Add_Component<CModel>(m_iPrototypeLevel, TEXT("Prototype_Component_Model_Kirby_Body"), TEXT("Com_Model"));
     if (m_pModelCom == nullptr)
         return E_FAIL;
 

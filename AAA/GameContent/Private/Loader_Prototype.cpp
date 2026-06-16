@@ -141,7 +141,7 @@ HRESULT CLIENT_DLL Load_Level(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice
 
         if (!pProxy->Has_Prototype(iLevelIndex, wProto))
         {
-            pReg->ResourceLoader(pProxy, pDevice, pContext);
+            pReg->ResourceLoader(pProxy, pDevice, pContext, iLevelIndex);
             pProxy->Add_Prototype(iLevelIndex, wProto.c_str(),
                 pReg->CreatorFunc(pDevice, pContext));
         }
@@ -296,7 +296,7 @@ static HRESULT Ready_UIResources_FromBundle(CGameInstance_Proxy* pProxy, ID3D11D
 
         if (!pProxy->Has_Prototype(iLevelIndex, strContainerProtoTag))
         {
-            pReg->ResourceLoader(pProxy, pDevice, pContext);
+            pReg->ResourceLoader(pProxy, pDevice, pContext, iLevelIndex);
 
             if (FAILED(pProxy->Add_Prototype(iLevelIndex, strContainerProtoTag, pReg->CreatorFunc(pDevice, pContext))))
                 return E_FAIL;

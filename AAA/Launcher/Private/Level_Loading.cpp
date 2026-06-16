@@ -6,10 +6,11 @@
 #include "GameInstance_Proxy.h"
 #include "GameObject_Factory.h"
 #include "GameObject.h"
-#include "Level_GamePlay.h"
 #include "DataLoader.h"
 #include "Loader_Prototype.h"
 
+#include "Level_GamePlay.h"
+#include "Level_Test.h"
 
 CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel{ pDevice, pContext }
@@ -48,6 +49,9 @@ void CLevel_Loading::Update(_float fTimeDelta)
         {
         case LEVEL::GAMEPLAY:
             pNextLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
+            break;
+        case LEVEL::TEST:
+            pNextLevel = CLevel_Test::Create(m_pDevice, m_pContext);
             break;
         }
 
