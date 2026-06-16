@@ -30,8 +30,7 @@ HRESULT CGigantEdge_Body::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
-    // TODO: 기본 애님 재생
-    // m_pAnimatorCom->Play("Wait", true, true);
+    m_pAnimatorCom->Play("Anger", true, true);
 
     return S_OK;
 }
@@ -97,19 +96,16 @@ const _float4x4* CGigantEdge_Body::Get_BoneMatrixPtr(const _char* pBoneName) con
 
 HRESULT CGigantEdge_Body::Ready_Components()
 {
-    /* For.Com_Shader */
     m_pShaderCom = Add_Component<CShader>(Shader_AnimMesh_PBR.iLevelID, Shader_AnimMesh_PBR.szProtoTag,
         TEXT("Com_Shader"));
     if (m_pShaderCom == nullptr)
         return E_FAIL;
 
-    /* For.Com_Model */ // TODO: 모델 프로토타입 태그 교체
     m_pModelCom = Add_Component<CModel>(m_iPrototypeLevel, TEXT("Prototype_Component_Model_GigantEdge_Body"),
         TEXT("Com_Model"));
     if (m_pModelCom == nullptr)
         return E_FAIL;
 
-    /* For.Com_Animator */
     CAnimator::ANIMATOR_DESC AnimDesc{};
     AnimDesc.pModel = m_pModelCom;
 

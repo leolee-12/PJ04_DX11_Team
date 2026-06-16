@@ -5,23 +5,18 @@ float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 Texture2D g_DiffuseTexture;   
 Texture2D g_NormalTexture;    
 Texture2D g_MRATexture;       
+Texture2D g_UnknownTexture;
 
-Texture2D g_MossTexture; 
+float  g_NormalStrength = 1.f;   
+float  g_MaskStrangth   = 1.f;
+float  g_fAOStrength    = 1.f;  
 
-float  g_NormalStrength = 1.f;     
-float  g_fAOStrength    = 1.f;     
-
-int    g_iUseTopProjection = 0;
 float2 g_TopUVScale  = float2(1.f, 1.f);
 float  g_TopUVRotate = 0.f;        
 float2 g_TopUVOffset = float2(0.f, 0.f);
 
 float2 g_vBaseUVScale = float2(0.1f, 0.1f);
 
-int g_iHasMoss = 0;
-float g_fMossAmount = 1.f; // 전역 이끼 강도
-
-float g_fDirtAmount = 1.f;
 
 float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
 
@@ -121,15 +116,18 @@ float2 TopProjectUV(float3 worldPos)
     return p + g_TopUVOffset;
 }
 
+float2 TopProjectUV_V2(float3 worldPos)
+{
+    return worldPos.xz;
+}
+
 PS_OUT PS_MAIN(PS_IN In)
 {
     PS_OUT Out;
 
     // ---- pick UV: uv0(월드XZ)에 타일링 스케일, 또는 Top 투영 ----
-    float2 uv = (g_iUseTopProjection != 0) ? TopProjectUV(In.vWorldPos.xyz)
-                                             : In.vTexcoord * g_vBaseUVScale;
-
- 
+    float2 uv = In.vTexcoord * g_vBaseUVScale;
+                                           
     float4 vBase = g_DiffuseTexture.Sample(LinearSampler, uv);
     if (vBase.a < 0.1f)
         discard;
@@ -151,15 +149,6 @@ PS_OUT PS_MAIN(PS_IN In)
     float ao = lerp(1.f, In.vColor1.r, g_fAOStrength);  
     albedo *= ao;
     mra.b  *= ao;           
-    
-    if (g_iHasMoss != 0)
-    {
-        float w = saturate((1.f - In.vColor.g) * g_fMossAmount); // 마젠타(G=0)=moss
-
-        float3 mossAlbedo = g_MossTexture.Sample(LinearSampler, uv).rgb;
-        albedo = lerp(albedo, mossAlbedo, w);
-        mra.g = lerp(mra.g, 1.f, w);
-    }
 
     Out.vDiffuse = float4(albedo, 1.f);
     Out.vNormal  = float4(Nw * 0.5f + 0.5f, 0.f);
@@ -175,7 +164,7 @@ PS_OUT PS_OVERLAY(PS_IN In)   // DirtParts / Cover 전용
     float2 uv = In.vTexcoord * g_vBaseUVScale;
 
       // c0.r = 때 마스크. (mask 텍스처로 얼룩 깨기는 선택)
-    float coverage = saturate(1.f - In.vColor.r) * g_fDirtAmount;
+    float coverage = saturate(1.f - In.vColor.r);
     if (coverage < 0.5f)
         discard; // 안 칠한 곳은 베이스가 보이게
 
@@ -195,6 +184,44 @@ PS_OUT PS_WHITE(PS_IN In)   // 임시 흰색 출력
     Out.vNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f); // 노멀맵 없음 → 기하노멀
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(0.f, 1.f, 1.f, 1.f); // metal0 / rough1 / ao1 기본
+    Out.vEmissive = float4(0.f, 0.f, 0.f, 1.f);
+    return Out;
+}
+
+PS_OUT PS_TOP(PS_IN In)
+{
+    PS_OUT Out;
+
+    // ---- pick UV: uv0(월드XZ)에 타일링 스케일, 또는 Top 투영 ----
+    float2 uv = TopProjectUV_V2(In.vWorldPos.xyz);
+                                             
+    float4 vBase = g_DiffuseTexture.Sample(LinearSampler, uv);
+    if (vBase.a < 0.1f)
+        discard;
+    float3 albedo = vBase.rgb;
+    float3 mra = g_MRATexture.Sample(LinearSampler, uv).rgb;
+
+    float3 N = normalize(In.vNormal.xyz);
+    float3 T = normalize(In.vTangent.xyz);
+    T = normalize(T - dot(T, N) * N);
+    float3 B = cross(N, T) * In.vTangent.w;
+    float3x3 TBN = float3x3(T, B, N);
+
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, uv).rg * 2.f - 1.f;
+    nrg *= g_NormalStrength;
+    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+    nTS.y = -nTS.y;
+    float3 Nw = normalize(mul(nTS, TBN));
+
+    float ao = lerp(1.f, In.vColor1.r, g_fAOStrength);
+    albedo *= ao;
+    mra.b *= ao;
+
+    Out.vDiffuse = float4(albedo, 1.f);
+    Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(mra, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vBase.a, 1.f);
     return Out;
 }
 
@@ -229,7 +256,27 @@ PS_SHADOW_OUT PS_SHADOW(VS_SHADOW_OUT In)
 
 technique11 DefaultTechnique
 {
-    pass DefaultPass // 0
+    pass ShadowPass // 0
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_SHADOW();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_SHADOW();
+    }
+
+    pass WhitePass // 1
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_WHITE();
+    }
+
+    pass DefaultPass // 2
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -240,7 +287,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 
-    pass OverlayPass // 1
+    pass OverlayPass // 3
     {
         SetRasterizerState(RS_Decal); 
         SetDepthStencilState(DSS_Default, 0);
@@ -250,23 +297,15 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_OVERLAY();
     }
 
-    pass WhitePass // 2
+    pass TopPass // 4
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_WHITE();
+        PixelShader = compile ps_5_0 PS_TOP();
     }
 
-    pass ShadowPass // 3
-    {
-        SetRasterizerState(RS_Cull_None);
-        SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
-        VertexShader = compile vs_5_0 VS_SHADOW();
-        GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_SHADOW();
-    }
 }

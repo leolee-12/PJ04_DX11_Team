@@ -75,6 +75,8 @@ private:
     void Register_AnimObject();
 	void Register_Effect();
 
+    void Register_MiniBoss();
+
 public:
     virtual void Free() override;
 };
