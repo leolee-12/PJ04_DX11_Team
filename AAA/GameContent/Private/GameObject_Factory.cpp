@@ -359,7 +359,7 @@ void CGameObject_Factory::Register_Container()
     // 1. BladeKnight(Sword)
     Register
     (
-        CBladeKnight::PROTOTYPE_TAG, TEXT("BladeKnight"),
+        CBladeKnight::PROTOTYPE_TAG, TEXT("Monster"),
         CREATOR(CBladeKnight),
         LOADER
         (

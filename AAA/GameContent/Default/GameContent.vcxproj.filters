@@ -406,6 +406,18 @@
     <Filter Include="00. GameObject\08. MiniBoss\GigantEdge\Part\Shield">
       <UniqueIdentifier>{7372f538-6cbc-4eb7-8ea0-bc08a001350e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Retreat">
+      <UniqueIdentifier>{b2dbd75a-f514-4253-a7ad-0ac7e5c63113}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Captured">
+      <UniqueIdentifier>{94b901f9-7718-479e-8e5f-459cb0efdb46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Hit">
+      <UniqueIdentifier>{0fa96dc4-3565-49df-bf70-232587a2d8ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Dead">
+      <UniqueIdentifier>{f99af0d6-2986-4b6e-876f-44c64a6df9e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -807,6 +819,9 @@
     <ClInclude Include="..\public\GigantEdge_Sword.h">
       <Filter>00. GameObject\08. MiniBoss\GigantEdge\Part\Sword</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Monster_State_Retreat.h">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Retreat</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1141,6 +1156,9 @@
     </ClCompile>
     <ClCompile Include="..\private\GigantEdge_Sword.cpp">
       <Filter>00. GameObject\08. MiniBoss\GigantEdge\Part\Sword</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_State_Retreat.cpp">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Retreat</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

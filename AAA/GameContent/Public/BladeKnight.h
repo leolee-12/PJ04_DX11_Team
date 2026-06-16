@@ -43,6 +43,9 @@ public:
 	virtual _float				Get_CapsuleHeight() const override;
 	virtual void				Play_StateAnimation(MONSTER_STATE_TYPE eState) override;
 
+	virtual _bool				Is_StateAnimationFinished() const override;
+
+
 public:
 	CBladeKnight_Body*			Get_Body() { return m_pBody; }
 	CBladeKnight_Sword*			Get_Sword() { return m_pSword; }

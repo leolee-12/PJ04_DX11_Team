@@ -3,15 +3,13 @@
 
 NS_BEGIN(Client)
 
-class CMonster;
-
-class CLIENT_DLL CMonster_State_Attack final : public CMonster_State
+class CLIENT_DLL CMonster_State_Retreat final : public CMonster_State
 {
 private:
-	CMonster_State_Attack();
-	virtual ~CMonster_State_Attack() = default;
+	CMonster_State_Retreat();
+	virtual ~CMonster_State_Retreat() = default;
 
-public:
+private:
 	HRESULT							Initialize();
 
 public:
@@ -21,7 +19,7 @@ public:
 	virtual void					Exit(CMonster* pMonster) override;
 
 public:
-	static CMonster_State_Attack*	Create();
+	static CMonster_State_Retreat* Create();
 
 protected:
 	virtual void					Free() override;

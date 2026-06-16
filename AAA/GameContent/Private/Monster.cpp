@@ -97,6 +97,9 @@ void CMonster::Change_State(MONSTER_STATE_TYPE eNewState)
 	if (nullptr == m_pStateMachine)
 		return;
 
+	if (m_pStateMachine->Get_StateType() == eNewState)
+		return;
+
 	m_pStateMachine->Change_State(eNewState);
 }
 
@@ -185,8 +188,8 @@ void CMonster::Update_AI(_float fTimeDelta)
 	Perceive(fTimeDelta);	
 
 	// Brain이 상태 변경 판단
-	if (nullptr != m_pBrain)
-		m_pBrain->Decide(this, m_BlackBoard, fTimeDelta);
+	//if (nullptr != m_pBrain)
+	//	m_pBrain->Decide(this, m_BlackBoard, fTimeDelta);
 
 	// 현재 State 실행
 	if (nullptr != m_pStateMachine)

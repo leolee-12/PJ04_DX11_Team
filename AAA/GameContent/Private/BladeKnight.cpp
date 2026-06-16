@@ -41,11 +41,17 @@ HRESULT CBladeKnight::Initialize(void* pArg)
 
 void CBladeKnight::Priority_Update(_float fTimeDelta)
 {
+    if (!m_bActive)
+        return;
+
     __super::Priority_Update(fTimeDelta);
 }
 
 void CBladeKnight::Update(_float fTimeDelta)
 {
+    if (!m_bActive)
+        return;
+
     __super::Update(fTimeDelta);
 
 #ifdef _DEBUG
@@ -58,13 +64,21 @@ void CBladeKnight::Update(_float fTimeDelta)
             Change_State(MONSTER_STATE_TYPE::CHASE);
 
         if (m_pGameInstance_Proxy->Key_Down(DIK_3))
+            Change_State(MONSTER_STATE_TYPE::RETREAT);
+
+        if (m_pGameInstance_Proxy->Key_Down(DIK_4))
             Change_State(MONSTER_STATE_TYPE::ATTACK);
+
+
     }
 #endif
 }
 
 void CBladeKnight::Late_Update(_float fTimeDelta)
 {
+    if (!m_bActive)
+        return;
+
     __super::Late_Update(fTimeDelta);
 }
 
@@ -96,34 +110,45 @@ void CBladeKnight::Play_StateAnimation(MONSTER_STATE_TYPE eState)
     if (pSwordAnimator == nullptr)
         return;
 
+    CAnimator::ANI_PLAY_INFO AnimInfo{};
+
     switch (eState)
     {
     case MONSTER_STATE_TYPE::IDLE:
     {
-        pBodyAnimator->Play("FindWait", true, false);
-        pSwordAnimator->Play("Thrust", false, false);
+        // IDLE :: FindWait 모션
+        AnimInfo.strAniName = "FindWait";
+        AnimInfo.bLoop = true;
+        pBodyAnimator->Play(&AnimInfo);
+        //pSwordAnimator->Play("Thrust", false, false);
         break;
     }
     case MONSTER_STATE_TYPE::CHASE:
     {
         pBodyAnimator->Play("Move", true, false);
-        pSwordAnimator->Play("Thrust", false, false);
+        //pSwordAnimator->Play("Thrust", false, false);
         break;
     }
 
     case MONSTER_STATE_TYPE::ATTACK:
     {
         // 칼 애니메이션 상태 세팅
-        pSwordAnimator->Play("Thrust", false, false);
+        //pSwordAnimator->Play("Thrust", false, false);
 
-        CAnimator::ANI_PLAY_INFO Info{};
-        Info.strAniName = "AttackStart";
-        Info.bLoop = false;
-        pBodyAnimator->Play(&Info);
+        AnimInfo.strAniName = "AttackStart";
+        AnimInfo.bLoop = false;
+        pBodyAnimator->Play(&AnimInfo);
 
-        Info.strAniName = "Attack";
-        Info.bLoop = false;
-        pBodyAnimator->Enqueue(Info);
+        AnimInfo.strAniName = "Attack";
+        AnimInfo.bLoop = false;
+        pBodyAnimator->Enqueue(AnimInfo);
+        break;
+    }
+    case MONSTER_STATE_TYPE::RETREAT:
+    {
+        AnimInfo.strAniName = "Retreat";
+        AnimInfo.bLoop = false;
+        pBodyAnimator->Play(&AnimInfo);
         break;
     }
 
@@ -134,6 +159,16 @@ void CBladeKnight::Play_StateAnimation(MONSTER_STATE_TYPE eState)
     }
         break;
     }
+}
+
+_bool CBladeKnight::Is_StateAnimationFinished() const
+{
+    if (nullptr == m_pBody)
+        return true;      // 확인 불가면 끝난 걸로 간주해서 true를 반환 ( false로 반환 하게 해두면 해당 상태 못빠져나감 )
+
+    CAnimator* pAnim = m_pBody->Get_Animator();
+
+    return (nullptr == pAnim) ? true : pAnim->Is_Finished();
 }
 
 HRESULT CBladeKnight::Ready_PartObjects()

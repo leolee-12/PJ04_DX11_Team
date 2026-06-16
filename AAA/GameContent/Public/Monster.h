@@ -60,6 +60,9 @@ public:
 	// 공통 State가 구체 몬스터 애니메이션을 호출하는 추상 훅
 	virtual void				Play_StateAnimation(MONSTER_STATE_TYPE eState) = 0;
 
+	// 애니메이션이 끝났는지 노출해주는 함수
+	virtual _bool				Is_StateAnimationFinished() const = 0;
+
 protected:
 	physx::PxController*		m_pController = { nullptr };
 	CMonster_Movement*			m_pMovement = { nullptr };
