@@ -100,7 +100,7 @@ void CBladeKnight::Play_StateAnimation(MONSTER_STATE_TYPE eState)
     {
     case MONSTER_STATE_TYPE::IDLE:
     {
-        pBodyAnimator->Play("Wait", true, false);
+        pBodyAnimator->Play("FindWait", true, false);
         pSwordAnimator->Play("Thrust", false, false);
         break;
     }
@@ -113,8 +113,17 @@ void CBladeKnight::Play_StateAnimation(MONSTER_STATE_TYPE eState)
 
     case MONSTER_STATE_TYPE::ATTACK:
     {
-        pBodyAnimator->Play("Attack", true, false);
+        // 칼 애니메이션 상태 세팅
         pSwordAnimator->Play("Thrust", false, false);
+
+        CAnimator::ANI_PLAY_INFO Info{};
+        Info.strAniName = "AttackStart";
+        Info.bLoop = false;
+        pBodyAnimator->Play(&Info);
+
+        Info.strAniName = "Attack";
+        Info.bLoop = false;
+        pBodyAnimator->Enqueue(Info);
         break;
     }
 

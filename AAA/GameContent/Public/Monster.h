@@ -12,12 +12,9 @@ class CMonster_Movement;
 class IMonsterBrain;
 class CMonster_StateMachine;
 
-class CLIENT_DLL CMonster abstract : public CCharacter
+class CMonster abstract : public CCharacter
 {
 	GENERATED_BODY_ABSTRACT(CMonster)
-	
-	PROPERTY(_float, m_fHP, L"HP", L"Monster")
-	PROPERTY(_float, m_fMaxHP, L"Max HP", L"Monster")
 		
 protected:
 	CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -74,6 +71,9 @@ protected:
 
 	// 이번 프레임에 이동하고 싶은 방향
 	_float3						m_vWishDir = {};
+
+	_float						m_fMaxHP = { };
+	_float						m_CurHP = {};
 
 protected:
 	// 부모가 관리할 공통 파이프라인

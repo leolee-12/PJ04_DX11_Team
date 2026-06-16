@@ -15,6 +15,9 @@ enum class MONSTER_STATE_TYPE
 	IDLE,
 	CHASE,
 	ATTACK,
+	RETREAT,
+
+	// 중간 인터럽트 상태
 	HIT,
 	CAPTURED,
 	DEAD,

@@ -11,7 +11,7 @@ CMonster_StateMachine::CMonster_StateMachine()
 HRESULT CMonster_StateMachine::Initialize(CMonster* pMonster)
 {
     m_pMonster = pMonster;
-
+    
     if (m_pMonster == nullptr)
         return E_FAIL;
 

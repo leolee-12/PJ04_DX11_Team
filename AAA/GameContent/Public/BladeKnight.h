@@ -48,7 +48,6 @@ public:
 	CBladeKnight_Sword*			Get_Sword() { return m_pSword; }
 
 private:
-	HRESULT						Ready_Components();
 	HRESULT						Ready_PartObjects();
 	HRESULT						Bind_ShaderResources();
 

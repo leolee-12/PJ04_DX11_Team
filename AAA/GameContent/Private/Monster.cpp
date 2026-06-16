@@ -6,15 +6,11 @@
 
 CMonster::CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCharacter{ pDevice, pContext }
-	, m_fHP{ 100.f }
-	, m_fMaxHP{ 100.f }
 {
 }
 
 CMonster::CMonster(const CMonster& Prototype)
 	: CCharacter ( Prototype )
-	, m_fHP{ Prototype.m_fHP }
-	, m_fMaxHP{ Prototype.m_fMaxHP }
 {
 }
 
