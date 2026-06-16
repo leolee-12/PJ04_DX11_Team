@@ -15,6 +15,9 @@ enum class MONSTER_STATE_TYPE
 	IDLE,
 	CHASE,
 	ATTACK,
+	RETREAT,
+
+	// 중간 인터럽트 상태
 	HIT,
 	CAPTURED,
 	DEAD,
@@ -30,6 +33,8 @@ struct MONSTER_BLACKBOARD
 
 	_float3					vTargetPos = {};
 	_float3					vLastKnownPos = {};
+
+	_bool					bActionFinished = { false }; // 현재 상태 액션의 행동 완료 신호
 };
 
 NS_END

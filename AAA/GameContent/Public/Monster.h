@@ -9,15 +9,12 @@ NS_END
 
 NS_BEGIN(Client)
 class CMonster_Movement;
-class IMonsterBrain;
+class CMonsterBrain;
 class CMonster_StateMachine;
 
-class CLIENT_DLL CMonster abstract : public CCharacter
+class CMonster abstract : public CCharacter
 {
 	GENERATED_BODY_ABSTRACT(CMonster)
-	
-	PROPERTY(_float, m_fHP, L"HP", L"Monster")
-	PROPERTY(_float, m_fMaxHP, L"Max HP", L"Monster")
 		
 protected:
 	CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -63,25 +60,36 @@ public:
 	// 공통 State가 구체 몬스터 애니메이션을 호출하는 추상 훅
 	virtual void				Play_StateAnimation(MONSTER_STATE_TYPE eState) = 0;
 
+	// 애니메이션이 끝났는지 노출해주는 함수
+	virtual _bool				Is_StateAnimationFinished() const { return true; }
+
 protected:
 	physx::PxController*		m_pController = { nullptr };
 	CMonster_Movement*			m_pMovement = { nullptr };
 
 	MONSTER_BLACKBOARD			m_BlackBoard = {};
 
-	IMonsterBrain*				m_pBrain = { nullptr };
+	CMonsterBrain*				m_pBrain = { nullptr };
 	CMonster_StateMachine*		m_pStateMachine = { nullptr };
 
 	// 이번 프레임에 이동하고 싶은 방향
 	_float3						m_vWishDir = {};
+
+	_float						m_fMaxHP = { };
+	_float						m_fCurHP = {};
 
 protected:
 	// 부모가 관리할 공통 파이프라인
 	HRESULT						Ready_Movement();
 	HRESULT						Ready_AI();
 
+	// 윤석현 추가 AI 드라이버 선택 훅 (자식이 오버라이드)
+	virtual CMonsterBrain*		Create_Brain(); //기본: FSM Brain
+	virtual _bool				Use_StateMachine() const { return true; } // BT 전용 몬스터는 false 반환
+
+	//윤석현 수정 
+	virtual void				Update_AI(_float fTimeDelta);
 	void						Perceive(_float fTimeDelta);
-	void						Update_AI(_float fTimeDelta);
 
 protected:
 	virtual void				Free() override;

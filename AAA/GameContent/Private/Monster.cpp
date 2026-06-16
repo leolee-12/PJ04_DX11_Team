@@ -6,15 +6,11 @@
 
 CMonster::CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCharacter{ pDevice, pContext }
-	, m_fHP{ 100.f }
-	, m_fMaxHP{ 100.f }
 {
 }
 
 CMonster::CMonster(const CMonster& Prototype)
 	: CCharacter ( Prototype )
-	, m_fHP{ Prototype.m_fHP }
-	, m_fMaxHP{ Prototype.m_fMaxHP }
 {
 }
 
@@ -101,6 +97,9 @@ void CMonster::Change_State(MONSTER_STATE_TYPE eNewState)
 	if (nullptr == m_pStateMachine)
 		return;
 
+	if (m_pStateMachine->Get_StateType() == eNewState)
+		return;
+
 	m_pStateMachine->Change_State(eNewState);
 }
 
@@ -136,18 +135,27 @@ HRESULT CMonster::Ready_Movement()
 
 HRESULT CMonster::Ready_AI()
 {
-	m_pBrain = CMonster_Brain_FSM::Create();
+	// 윤석현 수정
+	m_pBrain = Create_Brain();
 	if (nullptr == m_pBrain)
 		return E_FAIL;
 
-	m_pStateMachine = CMonster_StateMachine::Create(this);		// 초기가 IDLE로 세팅
-	if (nullptr == m_pStateMachine)
+	if (Use_StateMachine())
 	{
-		Safe_Release(m_pBrain);		// StateMachine 생성 실패하면 Brain 정리
-		return E_FAIL;
+		m_pStateMachine = CMonster_StateMachine::Create(this);  // 초기 IDLE
+		if (nullptr == m_pStateMachine)
+		{
+			Safe_Release(m_pBrain);
+			return E_FAIL;
+		}
 	}
 
 	return S_OK;
+}
+
+CMonsterBrain* CMonster::Create_Brain()
+{
+	return CMonster_Brain_FSM::Create(); // 기본은 FSM
 }
 
 void CMonster::Perceive(_float fTimeDelta)
@@ -189,8 +197,8 @@ void CMonster::Update_AI(_float fTimeDelta)
 	Perceive(fTimeDelta);	
 
 	// Brain이 상태 변경 판단
-	if (nullptr != m_pBrain)
-		m_pBrain->Decide(this, m_BlackBoard, fTimeDelta);
+	//if (nullptr != m_pBrain)
+	//	m_pBrain->Decide(this, m_BlackBoard, fTimeDelta);
 
 	// 현재 State 실행
 	if (nullptr != m_pStateMachine)
@@ -215,8 +223,6 @@ void CMonster::Update_AI(_float fTimeDelta)
 	{
 		m_pMovement->Move(XMVectorZero(), fTimeDelta);
 	}
-
-
 }
 
 void CMonster::Free()

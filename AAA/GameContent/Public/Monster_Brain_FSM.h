@@ -5,7 +5,7 @@ NS_BEGIN(Client)
 
 class CMonster;
 
-class CLIENT_DLL CMonster_Brain_FSM final : public IMonsterBrain
+class CMonster_Brain_FSM final : public CMonsterBrain
 {
 private:
 	CMonster_Brain_FSM();

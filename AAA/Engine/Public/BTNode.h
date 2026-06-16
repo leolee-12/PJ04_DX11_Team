@@ -22,16 +22,24 @@ class ENGINE_DLL CBTAction final : public CBTNode
 {
 public:
 	using TickFn = function<BT_STATUS(CBlackboard*, _float)>;
+	using ResetFn = function<void()>;
+
 	virtual BT_STATUS Tick(CBlackboard* pBB, _float fDt) override
 	{
 		return m_Fn(pBB, fDt);
 	}
 
+	virtual void Reset() override
+	{
+		if (m_ResetFn) m_ResetFn();
+	}
+
 private:
-	TickFn m_Fn;
+	TickFn  m_Fn;
+	ResetFn m_ResetFn;
 
 public:
-	static CBTAction* Create(TickFn fn);
+	static CBTAction* Create(TickFn fn, ResetFn rfn = nullptr);
 	virtual void Free() override;
 };
 

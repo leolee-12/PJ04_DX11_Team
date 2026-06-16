@@ -1,9 +1,10 @@
 #include "BTNode.h"
 
-CBTAction* CBTAction::Create(TickFn fn)
+CBTAction* CBTAction::Create(TickFn fn, ResetFn rfn)
 {
     CBTAction* pInstance = new CBTAction();
     pInstance->m_Fn = move(fn);
+    pInstance->m_ResetFn = move(rfn);
     return pInstance;
 }
 

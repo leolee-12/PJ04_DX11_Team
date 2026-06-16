@@ -35,35 +35,35 @@ HRESULT CAnimator::Initialize(void* pArg)
 // ── 재생 제어 ──
 void CAnimator::Play(const string& strAnimName, _bool bLoop, _bool bRestart, _float fBlend, _float fSpeed)
 {
-    if (nullptr == m_pModel)
-        return;
-
-    _int iIndex = m_pModel->Get_AnimationIndex(strAnimName);
-
-    if (iIndex < 0)
-        return;
-
-    m_fBlendDuration = fBlend;
-
-    m_pModel->Set_AnimationIndex((_uint)iIndex, bLoop, bRestart, m_fBlendDuration);
-    m_fPlaySpeed = fSpeed;
-    m_bFinished = false;
+    m_PlayQueue.clear();
+    Start_Clip({ strAnimName, bLoop, bRestart, fBlend, fSpeed });
 }
 
 void CAnimator::Play(const ANI_PLAY_INFO* tAniInfo)
 {
-    if (m_pModel == nullptr && tAniInfo == nullptr)
+    if (nullptr == tAniInfo)
         return;
 
-    _int iIndex = m_pModel->Get_AnimationIndex(tAniInfo->strAniName);
+    m_PlayQueue.clear();
 
+    Start_Clip(*tAniInfo);
+}
+
+void CAnimator::Start_Clip(const ANI_PLAY_INFO& Info)
+{
+    if (nullptr == m_pModel)
+        return;
+
+    _int iIndex = m_pModel->Get_AnimationIndex(Info.strAniName);
     if (iIndex < 0)
         return;
 
-    m_fBlendDuration = tAniInfo->fBlend;
+    if (Info.bClearMask)
+        Clear_Mask();
 
-    m_pModel->Set_AnimationIndex((_uint)iIndex, tAniInfo->bLoop, tAniInfo->bRestrat, m_fBlendDuration);
-    m_fPlaySpeed = tAniInfo->fSpeed;
+    m_fBlendDuration = Info.fBlend;
+    m_pModel->Set_AnimationIndex(static_cast<_uint>(iIndex), Info.bLoop, Info.bRestart, m_fBlendDuration);
+    m_fPlaySpeed = Info.fSpeed;
     m_bFinished = false;
 }
 
@@ -117,6 +117,11 @@ void CAnimator::Clear_Mask(_float fMaskBlendTime)
         m_fMaskBlendTime = fMaskBlendTime;
 }
 
+void CAnimator::Enqueue(const ANI_PLAY_INFO& info)
+{
+    m_PlayQueue.push_back(info);
+}
+
 // ── Update: 재생 + 이벤트 판정 ──
 void CAnimator::Update(_float fTimeDelta)
 {
@@ -168,6 +173,13 @@ void CAnimator::Update(_float fTimeDelta)
     }
 
     m_fPrevProgress = fCur;
+
+    if (m_bFinished && !m_PlayQueue.empty())
+    {
+        ANI_PLAY_INFO next = m_PlayQueue.front();
+        m_PlayQueue.pop_front();
+        Start_Clip(next);           // Play 아님, 큐 안 비움
+    }
 }
 
 void CAnimator::Fire_Point(const vector<ANIM_EVENT>& events, _float lo, _float hi)
