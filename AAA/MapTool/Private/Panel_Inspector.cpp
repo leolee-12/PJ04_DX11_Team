@@ -3,7 +3,7 @@
 #include "Level_Edit.h"
 #include "Map_EditSession.h"
 
-#include "GameContent_const.h"
+#include "Shader_PassMeta.h"
 #include "MapStage.h"
 #include "MapSection.h"
 #include "Map_EditFile.h"
@@ -268,31 +268,12 @@ namespace
 		return Edit;
 	}
 
-	int EnvInstPassToComboIndex(int iPass)
+	const _char* GetEnvShaderPassComboItem(void*, _int idx)
 	{
-		switch (iPass)
-		{
-		case -1: return 0;
-		case ShaderPass::EnvInst::WHITE: return 1;
-		case ShaderPass::EnvInst::DIFF:  return 2;
-		case ShaderPass::EnvInst::DMN:   return 3;
-		case ShaderPass::EnvInst::UKWN:  return 4;
-		case ShaderPass::EnvInst::UMN:   return 5;
-		default: return 0;
-		}
-	}
+		if (idx < 0 || idx >= static_cast<int>(_countof(g_EnvShaderPassMetas)))
+			return nullptr;
 
-	int ComboIndexToEnvInstPass(int iIndex)
-	{
-		switch (iIndex)
-		{
-		case 1: return ShaderPass::EnvInst::WHITE;
-		case 2: return ShaderPass::EnvInst::DIFF;
-		case 3: return ShaderPass::EnvInst::DMN;
-		case 4: return ShaderPass::EnvInst::UKWN;
-		case 5: return ShaderPass::EnvInst::UMN;
-		default: return -1;
-		}
+		return g_EnvShaderPassMetas[idx].szName;
 	}
 }
 
@@ -776,6 +757,9 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 	if (!ImGui::CollapsingHeader("Mesh Render Settings (per Model)"))
 		return;
 
+	ImGui::TextDisabled("Mesh Render Settings are saved per model sidecar.");
+	ImGui::TextDisabled("All objects/sections using this model will be affected.");
+
 	const _bool bEnvObjectMeshUi =
 		nullptr != dynamic_cast<Client::CEnvObject*>(pObject);
 
@@ -792,13 +776,16 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 
 		if (bEnvObjectMeshUi)
 		{
-			static const char* PassItems[] = { "Default", "WHITE", "DIFF", "DMN", "UKWN", "UMN" };
-			int iPassCombo = EnvInstPassToComboIndex(Layer.iPass);
+			int iPassCombo = Get_EnvShaderPassComboIndex(Layer.iPass);
 
 			ImGui::SetNextItemWidth(160.f);
-			if (ImGui::Combo("Pass", &iPassCombo, PassItems, IM_ARRAYSIZE(PassItems)))
+			if (ImGui::Combo("Pass",
+				&iPassCombo,
+				GetEnvShaderPassComboItem,
+				nullptr,
+				static_cast<int>(_countof(g_EnvShaderPassMetas))))
 			{
-				Layer.iPass = ComboIndexToEnvInstPass(iPassCombo);
+				Layer.iPass = Get_EnvShaderPassFromComboIndex(iPassCombo);
 				bChanged = true;
 			}
 
@@ -829,6 +816,21 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			ImGui::SameLine();
 			ImGui::TextDisabled("(-1 = default)");
 		}
+
+		if (ImGui::Checkbox("Use UV Transform", (bool*)&Layer.bUseUVTransform))
+			bChanged = true;
+
+		ImGui::BeginDisabled(!Layer.bUseUVTransform);
+
+		ImGui::SetNextItemWidth(160.f);
+		if (ImGui::DragFloat2("UV Scale", (float*)&Layer.vUVScale, 0.01f))
+			bChanged = true;
+
+		ImGui::SetNextItemWidth(160.f);
+		if (ImGui::DragFloat2("UV Offset", (float*)&Layer.vUVOffset, 0.01f))
+			bChanged = true;
+
+		ImGui::EndDisabled();
 
 		for (_uint t = 0; t < MTEX_TYPE_MAX; ++t)
 		{

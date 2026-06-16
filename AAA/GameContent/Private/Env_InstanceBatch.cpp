@@ -1,5 +1,5 @@
 #include "Env_InstanceBatch.h"
-#include "GameContent_const.h"
+#include "Shader_PassMeta.h"
 #include "EnvObject_Static.h"
 
 #include "GameInstance.h"
@@ -248,6 +248,14 @@ HRESULT CEnv_InstanceBatch::Render_Instanced()
 
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint))))
 			return E_FAIL;
+
+		const _float4 vUVTransform = Layer.bUseUVTransform
+			? _float4{ Layer.vUVScale.x, Layer.vUVScale.y, Layer.vUVOffset.x, Layer.vUVOffset.y }
+		: _float4{ 1.f, 1.f, 0.f, 0.f };
+
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_vUVTransform", &vUVTransform, sizeof(vUVTransform))))
+			return E_FAIL;
+
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))
 			return E_FAIL;
 

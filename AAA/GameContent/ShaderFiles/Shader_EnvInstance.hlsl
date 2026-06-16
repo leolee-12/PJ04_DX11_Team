@@ -18,6 +18,7 @@ uint g_iMaterialID = 0;
 
 // 0=TEXCOORD0, 1=TEXCOORD1, 2=TEXCOORD2, 3=TEXCOORD3
 uint g_iUVIndex = 0;
+float4 g_vUVTransform = float4(1.f, 1.f, 0.f, 0.f);
 
 #define ENV_INSTANCE_FLAG_DITHER 0x01
 uint g_iEnvInstanceFlags = 0;
@@ -45,6 +46,11 @@ void Apply_Dither_IfNeeded(float4 vScreenPos)
 	[branch]
 	if (0 != (g_iEnvInstanceFlags & ENV_INSTANCE_FLAG_DITHER))
 		Apply_Dissolve(vScreenPos);
+}
+
+float2 ApplyMeshUVTransform(float2 uv)
+{
+	return uv * g_vUVTransform.xy + g_vUVTransform.zw;
 }
 
 struct VS_IN
@@ -91,7 +97,7 @@ VS_OUT VS_MAIN(VS_IN In)
 
 	Out.vPosition = vPosition;
 	Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), In.WorldMatrix));
-	Out.vTexcoord = Select_UV_VS(In);
+	Out.vTexcoord = ApplyMeshUVTransform(Select_UV_VS(In));
 	Out.vWorldPos = mul(float4(In.vPosition, 1.f), In.WorldMatrix);
 	Out.vProjPos = Out.vPosition;
 

@@ -177,27 +177,74 @@ _bool CModel::Pick_Mesh(_uint iMeshIndex, _fvector vOrigin, _fvector vDir, _fmat
     return true;
 }
 
-_bool CModel::Pick_Mesh_Ex(_uint iMeshIndex, _fvector vOrigin, _fvector vDir, _fmatrix WorldMatrix, _float3* pOutHit, float* pOutDist, _float fAabbPadding)
+_bool CModel::Pick_Mesh_Ex(_uint iMeshIndex, _fvector vOrigin, _fvector vDir, _fmatrix WorldMatrix, _float3* pOutHit, float*
+    pOutDist, _float fAabbPadding)
 {
     if (iMeshIndex >= m_iNumMeshes)
         return false;
 
-    _matrix InvWorld = XMMatrixInverse(nullptr, WorldMatrix);
+    const _vector vDeterminant = XMMatrixDeterminant(WorldMatrix);
+    const float fDeterminant = XMVectorGetX(vDeterminant);
 
-    _vector vLocalOrigin = XMVector3TransformCoord(vOrigin, InvWorld);
+    const _matrix InvWorld = XMMatrixInverse(nullptr, WorldMatrix);
+
+    const _vector vLocalOrigin = XMVector3TransformCoord(vOrigin, InvWorld);
     _vector vLocalDir = XMVector3TransformNormal(vDir, InvWorld);
     vLocalDir = XMVector3Normalize(vLocalDir);
 
+    //char szDbg[256] = {};
+    //::sprintf_s(
+    //    szDbg,
+    //    "[EnvPick][InvWorld] mesh=%u det=%.6f\n",
+    //    iMeshIndex,
+    //    fDeterminant);
+    //::OutputDebugStringA(szDbg);
+
+    const _bool bAabbHit = m_Meshes[iMeshIndex]->Ray_AABB_Ex(vLocalOrigin, vLocalDir, fAabbPadding);
+
+    //::sprintf_s(
+    //    szDbg,
+    //    "[EnvPick][MeshAABB] mesh=%u hit=%d pad=%.3f\n",
+    //    iMeshIndex,
+    //    bAabbHit ? 1 : 0,
+    //    fAabbPadding);
+    //::OutputDebugStringA(szDbg);
+
+    if (!bAabbHit)
+        return false;
+
     _float3 localHit = {};
     float dist = 0.f;
+    const _bool bTriHit = m_Meshes[iMeshIndex]->Pick(vLocalOrigin, vLocalDir, &localHit, &dist);
 
-    if (!m_Meshes[iMeshIndex]->Ray_AABB_Ex(vLocalOrigin, vLocalDir, fAabbPadding))
-        return false;
-    if (!m_Meshes[iMeshIndex]->Pick(vLocalOrigin, vLocalDir, &localHit, &dist))
+    //::sprintf_s(
+    //    szDbg,
+    //    "[EnvPick][Tri] mesh=%u hit=%d localDist=%.3f localHit=(%.3f, %.3f, %.3f)\n",
+    //    iMeshIndex,
+    //    bTriHit ? 1 : 0,
+    //    dist,
+    //    localHit.x,
+    //    localHit.y,
+    //    localHit.z);
+    //::OutputDebugStringA(szDbg);
+
+    if (!bTriHit)
         return false;
 
     if (pOutHit)
+    {
         XMStoreFloat3(pOutHit, XMVector3TransformCoord(XMLoadFloat3(&localHit), WorldMatrix));
+
+        //::sprintf_s(
+        //    szDbg,
+        //    "[EnvPick][WorldHit] mesh=%u hit=(%.3f, %.3f, %.3f)\n",
+        //    iMeshIndex,
+        //    pOutHit->x,
+        //    pOutHit->y,
+        //    pOutHit->z);
+        //::OutputDebugStringA(szDbg);
+    }
+
     if (pOutDist)
         *pOutDist = dist;
 
@@ -612,6 +659,13 @@ HRESULT CModel::Save_MeshLayers() const
         if (m.iFlags != 0)
             jMesh["Flags"] = m.iFlags;
 
+        if (m.bUseUVTransform)
+        {
+            jMesh["UseUVTransform"] = true;
+            jMesh["UVScale"] = { m.vUVScale.x, m.vUVScale.y };
+            jMesh["UVOffset"] = { m.vUVOffset.x, m.vUVOffset.y };
+        }
+
         for (_uint t = 0; t < MTEX_TYPE_MAX; ++t)
         {
             if (m.idx[t] != 0)
@@ -829,11 +883,43 @@ void CModel::Load_MeshLayers(const _char* pModelFilePath)
                 m_MeshLayers[i].iFlags = static_cast<_uint>(iFlags);
         }
 
+        const auto IterUseUVTransform = jMesh.find("UseUVTransform");
+        const auto IterUVScale = jMesh.find("UVScale");
+        const auto IterUVOffset = jMesh.find("UVOffset");
+
+        const _bool bHasUseUVTransform =
+            (IterUseUVTransform != jMesh.end()) && IterUseUVTransform->is_boolean();
+        const _bool bHasUVScale =
+            (IterUVScale != jMesh.end()) && IterUVScale->is_array() && IterUVScale->size() == 2;
+        const _bool bHasUVOffset =
+            (IterUVOffset != jMesh.end()) && IterUVOffset->is_array() && IterUVOffset->size() == 2;
+
+        if (bHasUseUVTransform)
+            m_MeshLayers[i].bUseUVTransform = IterUseUVTransform->get<bool>();
+
+        if (bHasUVScale)
+        {
+            m_MeshLayers[i].vUVScale.x = (*IterUVScale)[0].get<_float>();
+            m_MeshLayers[i].vUVScale.y = (*IterUVScale)[1].get<_float>();
+        }
+
+        if (bHasUVOffset)
+        {
+            m_MeshLayers[i].vUVOffset.x = (*IterUVOffset)[0].get<_float>();
+            m_MeshLayers[i].vUVOffset.y = (*IterUVOffset)[1].get<_float>();
+        }
+
+        if (!bHasUseUVTransform && (bHasUVScale || bHasUVOffset))
+            m_MeshLayers[i].bUseUVTransform = true;
+
         for (auto& texItem : jMesh.items())
         {
             if (texItem.key() == "Pass"
                 || texItem.key() == "UVIndex"
-                || texItem.key() == "Flags")
+                || texItem.key() == "Flags"
+                || texItem.key() == "UseUVTransform"
+                || texItem.key() == "UVScale"
+                || texItem.key() == "UVOffset")
             {
                 continue;
             }

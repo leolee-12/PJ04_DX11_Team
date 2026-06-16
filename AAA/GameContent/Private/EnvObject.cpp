@@ -1,5 +1,5 @@
 #include "EnvObject.h"
-#include "GameContent_const.h"
+#include "Shader_PassMeta.h"
 
 #include "GameInstance_Proxy.h"
 #include "Model.h"
@@ -28,22 +28,6 @@ namespace
 		OutputDebugStringA((strMessage + "\n").c_str());
 	}
 #endif
-
-	_uint Resolve_NonAnimEnvPass(const MESH_LAYER_IDX& Layer)
-	{
-		if (Layer.iPass < 0)
-			return ShaderPass::NonAnimPBR::DIFF;
-
-		switch (static_cast<_uint>(Layer.iPass))
-		{
-		case ShaderPass::EnvInst::WHITE:	return ShaderPass::NonAnimPBR::White;
-		case ShaderPass::EnvInst::DIFF:		return ShaderPass::NonAnimPBR::DIFF;
-		case ShaderPass::EnvInst::DMN:		return ShaderPass::NonAnimPBR::DMN;
-		case ShaderPass::EnvInst::UKWN:		return ShaderPass::NonAnimPBR::UKWN;
-		case ShaderPass::EnvInst::UMN:		return ShaderPass::NonAnimPBR::UMN;
-		default:							return ShaderPass::NonAnimPBR::DIFF;
-		}
-	}
 
 	_matrix Build_WorldMatrix_FromTRS(const ENV_OBJECT_DESC& Desc)
 	{
@@ -95,6 +79,16 @@ namespace
 		return Bounds.Extents.x <= ENV_PICK_THIN_EXTENT
 			|| Bounds.Extents.y <= ENV_PICK_THIN_EXTENT
 			|| Bounds.Extents.z <= ENV_PICK_THIN_EXTENT;
+	}
+
+	_bool Is_ThinObjectBounds(const BoundingBox& LocalBounds, const _float3& vObjectScale)
+	{
+		BoundingBox ScaledBounds = LocalBounds;
+		ScaledBounds.Extents.x *= vObjectScale.x;
+		ScaledBounds.Extents.y *= vObjectScale.y;
+		ScaledBounds.Extents.z *= vObjectScale.z;
+
+		return Is_ThinBounds(ScaledBounds);
 	}
 
 	_float3 RayPoint(_fvector vOrigin, _fvector vDir, _float fDist)
@@ -174,7 +168,11 @@ _bool XM_CALLCONV CEnvObject::Pick_Ray(_fvector vOrigin, _fvector vDir, _float3*
 
 	Refresh_WorldBounds();
 
-	const _bool bThinBounds = Is_ThinBounds(m_WorldBounds);
+	const _float3 vObjectScale = m_pTransformCom->Get_Scaled();
+
+	// 회전된 평면/데칼은 world AABB 기준으로는 얇지 않게 보일 수 있으므로,
+	// fallback 여부는 local bounds * object scale 기준으로 판정한다.
+	const _bool bThinBounds = Is_ThinObjectBounds(m_LocalBounds, vObjectScale);
 
 	BoundingBox PickBounds = m_WorldBounds;
 	if (PickBounds.Extents.x < ENV_PICK_AABB_PADDING)
@@ -185,7 +183,21 @@ _bool XM_CALLCONV CEnvObject::Pick_Ray(_fvector vOrigin, _fvector vDir, _float3*
 		PickBounds.Extents.z = ENV_PICK_AABB_PADDING;
 
 	float fBoundsDist = 0.f;
-	if (!PickBounds.Intersects(vOrigin, vDir, fBoundsDist))
+	const _bool bBoundsHit = PickBounds.Intersects(vOrigin, vDir, fBoundsDist);
+
+	//char szDbg[256] = {};
+	//::sprintf_s(
+	//	szDbg,
+	//	"[EnvPick][ObjBounds] this=%p hit=%d dist=%.3f ext=(%.3f, %.3f, %.3f)\n",
+	//	static_cast<const void*>(this),
+	//	bBoundsHit ? 1 : 0,
+	//	fBoundsDist,
+	//	PickBounds.Extents.x,
+	//	PickBounds.Extents.y,
+	//	PickBounds.Extents.z);
+	//::OutputDebugStringA(szDbg);
+
+	if (!bBoundsHit)
 		return false;
 
 	const _matrix WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
@@ -197,24 +209,46 @@ _bool XM_CALLCONV CEnvObject::Pick_Ray(_fvector vOrigin, _fvector vDir, _float3*
 	const size_t iNumMeshes = m_pModelCom->Get_NumMeshes();
 	for (size_t i = 0; i < iNumMeshes; ++i)
 	{
+		const _uint iMeshIndex = static_cast<_uint>(i);
+
 		_float3 vHit = {};
 		float fLocalDist = 0.f;
 
-		if (!m_pModelCom->Pick_Mesh_Ex(
-			static_cast<_uint>(i),
+		const _bool bMeshHit = m_pModelCom->Pick_Mesh_Ex(
+			iMeshIndex,
 			vOrigin,
 			vDir,
 			WorldMatrix,
 			&vHit,
 			&fLocalDist,
-			ENV_PICK_AABB_PADDING))
-		{
+			ENV_PICK_AABB_PADDING);
+
+		//::sprintf_s(
+		//	szDbg,
+		//	"[EnvPick][MeshTry] this=%p mesh=%u hit=%d localDist=%.3f worldHit=(%.3f, %.3f, %.3f)\n",
+		//	static_cast<const void*>(this),
+		//	iMeshIndex,
+		//	bMeshHit ? 1 : 0,
+		//	fLocalDist,
+		//	vHit.x,
+		//	vHit.y,
+		//	vHit.z);
+		//::OutputDebugStringA(szDbg);
+
+		if (!bMeshHit)
 			continue;
-		}
 
 		const _vector vHitWorld = XMLoadFloat3(&vHit);
 		const _float fWorldDist = XMVectorGetX(
-			XMVector3Length(vHitWorld - vOrigin));
+			XMVector3Length(XMVectorSubtract(vHitWorld, vOrigin)));
+
+		//::sprintf_s(
+		//	szDbg,
+		//	"[EnvPick][MeshHit] this=%p mesh=%u worldDist=%.3f\n",
+		//	static_cast<const void*>(this),
+		//	iMeshIndex,
+		//	fWorldDist);
+		//::OutputDebugStringA(szDbg);
 
 		if (fWorldDist < fBestDist)
 		{
@@ -224,12 +258,33 @@ _bool XM_CALLCONV CEnvObject::Pick_Ray(_fvector vOrigin, _fvector vDir, _float3*
 		}
 	}
 
-	if (!bHit && bThinBounds)
+	if (!bHit && bBoundsHit && bThinBounds)
 	{
 		bHit = true;
 		fBestDist = fBoundsDist;
 		vBestHit = RayPoint(vOrigin, vDir, fBoundsDist);
+
+		//::sprintf_s(
+		//	szDbg,
+		//	"[EnvPick][ThinFallback] this=%p dist=%.3f hit=(%.3f, %.3f, %.3f)\n",
+		//	static_cast<const void*>(this),
+		//	fBestDist,
+		//	vBestHit.x,
+		//	vBestHit.y,
+		//	vBestHit.z);
+		//::OutputDebugStringA(szDbg);
 	}
+
+	//::sprintf_s(
+	//	szDbg,
+	//	"[EnvPick][Result] this=%p hit=%d dist=%.3f hitPos=(%.3f, %.3f, %.3f)\n",
+	//	static_cast<const void*>(this),
+	//	bHit ? 1 : 0,
+	//	bHit ? fBestDist : -1.f,
+	//	vBestHit.x,
+	//	vBestHit.y,
+	//	vBestHit.z);
+	//::OutputDebugStringA(szDbg);
 
 	if (!bHit)
 		return false;
@@ -479,12 +534,25 @@ HRESULT CEnvObject::Render()
 
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint))))
 			return E_FAIL;
+
+		const _float4 vUVTransform = Layer.bUseUVTransform
+			? _float4{ Layer.vUVScale.x, Layer.vUVScale.y, Layer.vUVOffset.x, Layer.vUVOffset.y }
+		: _float4{ 1.f, 1.f, 0.f, 0.f };
+
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_vUVTransform", &vUVTransform, sizeof(vUVTransform))))
+			return E_FAIL;
+
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))
 			return E_FAIL;
+
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve", &m_fDissolve, sizeof(_float))))
 			return E_FAIL;
 
-		const _uint iPass = Resolve_NonAnimEnvPass(Layer);
+		const ENV_SHADER_PASS_META* pMeta = Find_EnvShaderPassMeta(Layer.iPass);
+		const _uint iPass = pMeta->iNonAnimPass;
+
+		if (FAILED(m_pShaderCom->Begin(iPass)))
+			return E_FAIL;
 
 		if (FAILED(m_pShaderCom->Begin(iPass)))
 			return E_FAIL;
