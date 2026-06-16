@@ -61,7 +61,7 @@ public:
 	virtual void				Play_StateAnimation(MONSTER_STATE_TYPE eState) = 0;
 
 	// 애니메이션이 끝났는지 노출해주는 함수
-	virtual _bool				Is_StateAnimationFinished() const = 0;
+	virtual _bool				Is_StateAnimationFinished() const { return true; }
 
 protected:
 	physx::PxController*		m_pController = { nullptr };
@@ -76,7 +76,7 @@ protected:
 	_float3						m_vWishDir = {};
 
 	_float						m_fMaxHP = { };
-	_float						m_CurHP = {};
+	_float						m_fCurHP = {};
 
 protected:
 	// 부모가 관리할 공통 파이프라인
