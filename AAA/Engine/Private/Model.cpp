@@ -177,6 +177,80 @@ _bool CModel::Pick_Mesh(_uint iMeshIndex, _fvector vOrigin, _fvector vDir, _fmat
     return true;
 }
 
+_bool CModel::Pick_Mesh_Ex(_uint iMeshIndex, _fvector vOrigin, _fvector vDir, _fmatrix WorldMatrix, _float3* pOutHit, float*
+    pOutDist, _float fAabbPadding)
+{
+    if (iMeshIndex >= m_iNumMeshes)
+        return false;
+
+    const _vector vDeterminant = XMMatrixDeterminant(WorldMatrix);
+    const float fDeterminant = XMVectorGetX(vDeterminant);
+
+    const _matrix InvWorld = XMMatrixInverse(nullptr, WorldMatrix);
+
+    const _vector vLocalOrigin = XMVector3TransformCoord(vOrigin, InvWorld);
+    _vector vLocalDir = XMVector3TransformNormal(vDir, InvWorld);
+    vLocalDir = XMVector3Normalize(vLocalDir);
+
+    //char szDbg[256] = {};
+    //::sprintf_s(
+    //    szDbg,
+    //    "[EnvPick][InvWorld] mesh=%u det=%.6f\n",
+    //    iMeshIndex,
+    //    fDeterminant);
+    //::OutputDebugStringA(szDbg);
+
+    const _bool bAabbHit = m_Meshes[iMeshIndex]->Ray_AABB_Ex(vLocalOrigin, vLocalDir, fAabbPadding);
+
+    //::sprintf_s(
+    //    szDbg,
+    //    "[EnvPick][MeshAABB] mesh=%u hit=%d pad=%.3f\n",
+    //    iMeshIndex,
+    //    bAabbHit ? 1 : 0,
+    //    fAabbPadding);
+    //::OutputDebugStringA(szDbg);
+
+    if (!bAabbHit)
+        return false;
+
+    _float3 localHit = {};
+    float dist = 0.f;
+    const _bool bTriHit = m_Meshes[iMeshIndex]->Pick(vLocalOrigin, vLocalDir, &localHit, &dist);
+
+    //::sprintf_s(
+    //    szDbg,
+    //    "[EnvPick][Tri] mesh=%u hit=%d localDist=%.3f localHit=(%.3f, %.3f, %.3f)\n",
+    //    iMeshIndex,
+    //    bTriHit ? 1 : 0,
+    //    dist,
+    //    localHit.x,
+    //    localHit.y,
+    //    localHit.z);
+    //::OutputDebugStringA(szDbg);
+
+    if (!bTriHit)
+        return false;
+
+    if (pOutHit)
+    {
+        XMStoreFloat3(pOutHit, XMVector3TransformCoord(XMLoadFloat3(&localHit), WorldMatrix));
+
+        //::sprintf_s(
+        //    szDbg,
+        //    "[EnvPick][WorldHit] mesh=%u hit=(%.3f, %.3f, %.3f)\n",
+        //    iMeshIndex,
+        //    pOutHit->x,
+        //    pOutHit->y,
+        //    pOutHit->z);
+        //::OutputDebugStringA(szDbg);
+    }
+
+    if (pOutDist)
+        *pOutDist = dist;
+
+    return true;
+}
+
 HRESULT CModel::Initialize_Prototype(MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter)
 {
     m_eType = eType;
@@ -574,26 +648,51 @@ HRESULT CModel::Save_MeshLayers() const
     for (size_t i = 0; i < m_MeshLayers.size(); ++i)
     {
         const MESH_LAYER_IDX& m = m_MeshLayers[i];
-
         json jMesh;
 
         if (m.iPass >= 0)
             jMesh["Pass"] = m.iPass;
+
+        if (m.iUVIndex != 0)
+            jMesh["UVIndex"] = m.iUVIndex;
+
+        if (m.iFlags != 0)
+            jMesh["Flags"] = m.iFlags;
+
+        if (m.bUseUVTransform)
+        {
+            jMesh["UseUVTransform"] = true;
+            jMesh["UVScale"] = { m.vUVScale.x, m.vUVScale.y };
+            jMesh["UVOffset"] = { m.vUVOffset.x, m.vUVOffset.y };
+        }
 
         for (_uint t = 0; t < MTEX_TYPE_MAX; ++t)
         {
             if (m.idx[t] != 0)
                 jMesh[to_string(t)] = m.idx[t];
         }
-        if (!jMesh.empty())                   
+
+        if (!jMesh.empty())
             j[to_string(i)] = jMesh;
     }
 
     ofstream fout(m_strMeshLayerPath);
     if (!fout.is_open())
         return E_FAIL;
+
     fout << j.dump(2);
     return S_OK;
+}
+
+HRESULT CModel::Render_Instanced(_uint iMeshIndex, ID3D11Buffer* pInstanceBuffer, _uint iInstanceStride, _uint iInstanceCount)
+{
+    if (iMeshIndex >= m_iNumMeshes)
+        return E_FAIL;
+
+    if (FAILED(m_Meshes[iMeshIndex]->Bind_Resources_Instanced(pInstanceBuffer, iInstanceStride)))
+        return E_FAIL;
+
+    return m_Meshes[iMeshIndex]->Render_Instanced(iInstanceCount);
 }
 
 HRESULT CModel::Ready_Meshes(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix)
@@ -625,7 +724,7 @@ HRESULT CModel::Ready_Materials(const vector<MATERIAL_DATA>& materials, const _c
 	return S_OK;
 }
 
-HRESULT CModel::Ready_MaterialsEx(const vector<MATERIAL_DATA>& materials, const _char* pModelFilePath)
+HRESULT CModel::Ready_MaterialsEx(const vector<MATERIAL_DATA>& materials)
 {
     if (!m_Materials.empty() || !m_MaterialsEx.empty())
         return E_FAIL;
@@ -634,7 +733,7 @@ HRESULT CModel::Ready_MaterialsEx(const vector<MATERIAL_DATA>& materials, const 
 
     for (const auto& matData : materials)
     {
-        CMaterialEx* pMaterialEx = CMaterialEx::Create(matData, pModelFilePath);
+        CMaterialEx* pMaterialEx = CMaterialEx::Create(matData);
         if (nullptr == pMaterialEx)
             return E_FAIL;
 
@@ -684,7 +783,7 @@ HRESULT CModel::Ready_NonAnimEx(const _char* pModelFilePath, _fmatrix PreTransfo
             return E_FAIL;
     }
 
-    if (FAILED(Ready_MaterialsEx(modelData.Materials, pModelFilePath)))
+    if (FAILED(Ready_MaterialsEx(modelData.Materials)))
         return E_FAIL;
 
     Load_MeshLayers(pModelFilePath);
@@ -765,18 +864,71 @@ void CModel::Load_MeshLayers(const _char* pModelFilePath)
         catch (...) { continue; }
         if (i >= m_iNumMeshes) continue;
 
-        if (meshItem.value().contains("Pass") && meshItem.value()["Pass"].is_number_integer())
-            m_MeshLayers[i].iPass = meshItem.value()["Pass"].get<int>();
+        const json& jMesh = meshItem.value();
 
-        for (auto& texItem : meshItem.value().items())
+        if (jMesh.contains("Pass") && jMesh["Pass"].is_number_integer())
+            m_MeshLayers[i].iPass = jMesh["Pass"].get<int>();
+
+        if (jMesh.contains("UVIndex") && jMesh["UVIndex"].is_number_integer())
         {
-            if (texItem.key() == "Pass")
+            const int iUVIndex = jMesh["UVIndex"].get<int>();
+            if (0 <= iUVIndex && iUVIndex <= 3)
+                m_MeshLayers[i].iUVIndex = static_cast<_uint>(iUVIndex);
+        }
+
+        if (jMesh.contains("Flags") && jMesh["Flags"].is_number_integer())
+        {
+            const int iFlags = jMesh["Flags"].get<int>();
+            if (0 <= iFlags)
+                m_MeshLayers[i].iFlags = static_cast<_uint>(iFlags);
+        }
+
+        const auto IterUseUVTransform = jMesh.find("UseUVTransform");
+        const auto IterUVScale = jMesh.find("UVScale");
+        const auto IterUVOffset = jMesh.find("UVOffset");
+
+        const _bool bHasUseUVTransform =
+            (IterUseUVTransform != jMesh.end()) && IterUseUVTransform->is_boolean();
+        const _bool bHasUVScale =
+            (IterUVScale != jMesh.end()) && IterUVScale->is_array() && IterUVScale->size() == 2;
+        const _bool bHasUVOffset =
+            (IterUVOffset != jMesh.end()) && IterUVOffset->is_array() && IterUVOffset->size() == 2;
+
+        if (bHasUseUVTransform)
+            m_MeshLayers[i].bUseUVTransform = IterUseUVTransform->get<bool>();
+
+        if (bHasUVScale)
+        {
+            m_MeshLayers[i].vUVScale.x = (*IterUVScale)[0].get<_float>();
+            m_MeshLayers[i].vUVScale.y = (*IterUVScale)[1].get<_float>();
+        }
+
+        if (bHasUVOffset)
+        {
+            m_MeshLayers[i].vUVOffset.x = (*IterUVOffset)[0].get<_float>();
+            m_MeshLayers[i].vUVOffset.y = (*IterUVOffset)[1].get<_float>();
+        }
+
+        if (!bHasUseUVTransform && (bHasUVScale || bHasUVOffset))
+            m_MeshLayers[i].bUseUVTransform = true;
+
+        for (auto& texItem : jMesh.items())
+        {
+            if (texItem.key() == "Pass"
+                || texItem.key() == "UVIndex"
+                || texItem.key() == "Flags"
+                || texItem.key() == "UseUVTransform"
+                || texItem.key() == "UVScale"
+                || texItem.key() == "UVOffset")
+            {
                 continue;
+            }
 
             _uint t = 0;
             try { t = (_uint)stoul(texItem.key()); }
             catch (...) { continue; }
             if (t >= MTEX_TYPE_MAX) continue;
+
             m_MeshLayers[i].idx[t] = texItem.value().get<_uint>();
         }
     }
@@ -842,7 +994,7 @@ CModel* CModel::Create_WithTextureHub(ID3D11Device* pDevice, ID3D11DeviceContext
 
     if (FAILED(pInstance->Initialize_Prototype_WithTextureHub(eType, pModelFilePath, PreTransformMatrix, fcFillter, bCookCollisionMesh)))
     {
-        MSG_BOX("Failed to Created : CModel");
+        MSG_BOX("Failed to Created : CModel - WithTextureHub");
         Safe_Release(pInstance);
     }
 

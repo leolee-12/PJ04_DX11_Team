@@ -9,34 +9,27 @@ namespace
 {
 	using namespace std::filesystem;
 
-	wstring To_NormalizedTextureKey(const _tchar* pTexturePath)
+	_wstring To_NormalizedTexturePathKey(const _tchar* pTexturePath)
 	{
 		if (nullptr == pTexturePath || 0 == pTexturePath[0])
 			return {};
 
-		error_code ec;
-		path ConcretePath(pTexturePath);
-		path NormalizedPath = weakly_canonical(ConcretePath, ec);
-		if (ec)
-		{
-			ec.clear();
-			NormalizedPath = absolute(ConcretePath, ec);
-			if (ec)
-				return {};
-
-			NormalizedPath = NormalizedPath.lexically_normal();
-		}
-
-		wstring strKey = NormalizedPath.generic_wstring();
+		path TexturePath(pTexturePath);
+		_wstring strKey = TexturePath.lexically_normal().generic_wstring();
 		transform(strKey.begin(), strKey.end(), strKey.begin(),
 			[](wchar_t ch) { return static_cast<wchar_t>(towlower(ch)); });
 		return strKey;
 	}
 
-	HRESULT Create_TextureSRV(
-		ID3D11Device* pDevice,
-		const _tchar* pTexturePath,
-		ID3D11ShaderResourceView** ppOutSRV)
+	_wstring To_NormalizedTextureName(const _tchar* pTextureName)
+	{
+		if (nullptr == pTextureName || 0 == pTextureName[0])
+			return {};
+
+		return CTexture_Hub::Normalize_TextureName(wstring(pTextureName));
+	}
+
+	HRESULT Create_TextureSRV(ID3D11Device* pDevice, const _tchar* pTexturePath, ID3D11ShaderResourceView** ppOutSRV)
 	{
 		if (nullptr == pDevice || nullptr == pTexturePath || nullptr == ppOutSRV)
 			return E_FAIL;
@@ -44,7 +37,7 @@ namespace
 		*ppOutSRV = nullptr;
 
 		path TexturePath(pTexturePath);
-		wstring strExtension = TexturePath.extension().wstring();
+		_wstring strExtension = TexturePath.extension().wstring();
 		transform(strExtension.begin(), strExtension.end(), strExtension.begin(),
 			[](wchar_t ch) { return static_cast<wchar_t>(towlower(ch)); });
 
@@ -65,6 +58,52 @@ CTexture_Hub::CTexture_Hub(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	Safe_AddRef(m_pContext);
 }
 
+_string CTexture_Hub::Normalize_TextureName(const _string& strRaw)
+{
+	if (strRaw.empty())
+		return {};
+
+	_string strKey = strRaw;
+
+	if (const size_t iSlash = strKey.find_last_of("/\\"); iSlash != _string::npos)
+		strKey = strKey.substr(iSlash + 1);
+
+	transform(strKey.begin(), strKey.end(), strKey.begin(),
+		[](_char ch) { return static_cast<_char>(tolower(static_cast<unsigned char>(ch))); });
+
+	if (const size_t iDot = strKey.rfind('.'); iDot != _string::npos)
+	{
+		const _string strExt = strKey.substr(iDot);
+		if (".dds" == strExt || ".png" == strExt)
+			strKey.erase(iDot);
+	}
+
+	return strKey;
+}
+
+_wstring CTexture_Hub::Normalize_TextureName(const _wstring& strRaw)
+{
+	if (strRaw.empty())
+		return {};
+
+	_wstring strKey = strRaw;
+
+	if (const size_t iSlash = strKey.find_last_of(L"/\\"); iSlash != _wstring::npos)
+		strKey = strKey.substr(iSlash + 1);
+
+	transform(strKey.begin(), strKey.end(), strKey.begin(),
+		[](wchar_t ch) { return static_cast<wchar_t>(towlower(ch)); });
+
+	if (const size_t iDot = strKey.rfind(L'.'); iDot != _wstring::npos)
+	{
+		const _wstring strExt = strKey.substr(iDot);
+		if (L".dds" == strExt || L".png" == strExt)
+			strKey.erase(iDot);
+	}
+
+	return strKey;
+}
+
 HRESULT CTexture_Hub::LoadOrGet(const _tchar* pTexturePath, TEXTURE_HANDLE* pOut)
 {
 	if (nullptr == pOut)
@@ -75,9 +114,25 @@ HRESULT CTexture_Hub::LoadOrGet(const _tchar* pTexturePath, TEXTURE_HANDLE* pOut
 	if (nullptr == pTexturePath || 0 == pTexturePath[0] || nullptr == m_pDevice)
 		return E_FAIL;
 
-	const wstring strNormalizedPath = To_NormalizedTextureKey(pTexturePath);
+	const _wstring strNormalizedPath = To_NormalizedTexturePathKey(pTexturePath);
 	if (strNormalizedPath.empty())
 		return E_FAIL;
+
+	{
+		unique_lock<shared_mutex> Lock(m_Mutex);
+
+		const auto iter = m_HandleByNormalizedPath.find(strNormalizedPath);
+		if (iter != m_HandleByNormalizedPath.end())
+		{
+			++m_iCacheHitCount;
+			*pOut = iter->second;
+			return S_OK;
+		}
+	}
+
+	// 파일 로드/디코딩 -> 락 바깥에서 수행
+	ID3D11ShaderResourceView* pSRV = nullptr;
+	const HRESULT hr = Create_TextureSRV(m_pDevice, pTexturePath, &pSRV);
 
 	unique_lock<shared_mutex> Lock(m_Mutex);
 
@@ -86,15 +141,13 @@ HRESULT CTexture_Hub::LoadOrGet(const _tchar* pTexturePath, TEXTURE_HANDLE* pOut
 	{
 		++m_iCacheHitCount;
 		*pOut = iter->second;
+		Safe_Release(pSRV);
 		return S_OK;
 	}
 
-	++m_iCacheMissCount;
-
-	ID3D11ShaderResourceView* pSRV = nullptr;
-	const HRESULT hr = Create_TextureSRV(m_pDevice, pTexturePath, &pSRV);
 	if (FAILED(hr))
 	{
+		++m_iCacheHitCount;
 		++m_iLoadFailureCount;
 		return hr;
 	}
@@ -115,9 +168,76 @@ HRESULT CTexture_Hub::LoadOrGet(const _tchar* pTexturePath, TEXTURE_HANDLE* pOut
 	return S_OK;
 }
 
+HRESULT CTexture_Hub::Get(const _tchar* pTextureName, TEXTURE_HANDLE* pOut) const
+{
+	if (nullptr == pOut)
+		return E_FAIL;
+
+	*pOut = INVALID_TEXTURE_HANDLE;
+
+	const _wstring strKey = To_NormalizedTextureName(pTextureName);
+	if (strKey.empty())
+		return E_FAIL;
+
+	shared_lock<shared_mutex> Lock(m_Mutex);
+
+	const auto iter = m_HandleByTextureName.find(strKey);
+	if (iter == m_HandleByTextureName.end())
+		return E_FAIL;
+
+	*pOut = iter->second;
+	return S_OK;
+}
+
+HRESULT CTexture_Hub::Register_TextureName(TEXTURE_HANDLE Handle, const _tchar* pTextureName)
+{
+	const _wstring strKey = To_NormalizedTextureName(pTextureName);
+	if (strKey.empty())
+		return E_FAIL;
+
+	unique_lock<shared_mutex> Lock(m_Mutex);
+
+	if (Handle >= m_SRVs.size() || nullptr == m_SRVs[Handle])
+		return E_FAIL;
+
+	const auto iter = m_HandleByTextureName.find(strKey);
+	if (iter != m_HandleByTextureName.end())
+		return iter->second == Handle ? S_OK : E_FAIL;
+
+	m_HandleByTextureName.emplace(strKey, Handle);
+	return S_OK;
+}
+
 HRESULT CTexture_Hub::Bind_ShaderResource(CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle) const
 {
 	if (nullptr == pShader || nullptr == pConstantName)
+		return E_FAIL;
+
+	ID3D11ShaderResourceView* pSRV = Get_SRV(Handle);
+	if (nullptr == pSRV)
+		return E_FAIL;
+
+	return pShader->Bind_SRV(pConstantName, pSRV);
+}
+
+HRESULT CTexture_Hub::Bind_DefaultShaderResource(CShader* pShader, const _char* pConstantName, DEFAULT_TEXTURE eKind) const
+{
+	if (nullptr == pShader || nullptr == pConstantName)
+		return E_FAIL;
+
+	const _tchar* pTextureName = nullptr;
+	switch (eKind)
+	{
+	case DEFAULT_TEXTURE::WHITE:		pTextureName = L"__Default_White";			break;
+	case DEFAULT_TEXTURE::BLACK:		pTextureName = L"__Default_Black";			break;
+	case DEFAULT_TEXTURE::MAGENTA:		pTextureName = L"__Default_Magenta";		break;
+	case DEFAULT_TEXTURE::FLAT_NORMAL:	pTextureName = L"__Default_Flat_Normal";	break;
+	case DEFAULT_TEXTURE::MRA:			pTextureName = L"__Default_MRA";			break;
+	default:	return E_FAIL;
+	}
+
+	TEXTURE_HANDLE Handle = INVALID_TEXTURE_HANDLE;
+	if (FAILED(Get(pTextureName, &Handle)))
 		return E_FAIL;
 
 	ID3D11ShaderResourceView* pSRV = Get_SRV(Handle);
@@ -174,15 +294,17 @@ CTexture_Hub* CTexture_Hub::Create(ID3D11Device* pDevice, ID3D11DeviceContext* p
 
 void CTexture_Hub::Free()
 {
-	__super::Free();
-
 	for (auto& pSRV : m_SRVs)
 		Safe_Release(pSRV);
 	m_SRVs.clear();
+
 	m_HandleByNormalizedPath.clear();
+	m_HandleByTextureName.clear();
 
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);
+
+	__super::Free();
 }
 
 NS_END

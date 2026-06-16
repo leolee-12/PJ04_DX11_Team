@@ -241,7 +241,7 @@ HRESULT CKirby::Ready_PartObjects()
     CKirby_Body::KIRBY_BODY_DESC BodyDesc{};
     BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 
-    if (FAILED(Add_PartObject(ETOUI(LEVEL::GAMEPLAY), CKirby_Body::PROTOTYPE_TAG,
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_Body::PROTOTYPE_TAG,
         TEXT("Body"), &BodyDesc)))
         return E_FAIL;
 
@@ -252,7 +252,7 @@ HRESULT CKirby::Ready_PartObjects()
     SwordDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     SwordDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("RHaveL");
 
-    if (FAILED(Add_PartObject(ETOUI(LEVEL::GAMEPLAY), CKirby_Sword::PROTOTYPE_TAG,
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_Sword::PROTOTYPE_TAG,
         CKirby_Sword::Kirby_PartTag, &SwordDesc)))
         return E_FAIL;
 
@@ -261,7 +261,7 @@ HRESULT CKirby::Ready_PartObjects()
     SwordHatDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     SwordHatDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("HatL");
 
-    if (FAILED(Add_PartObject(ETOUI(LEVEL::GAMEPLAY), CKirby_SwordHat::PROTOTYPE_TAG,
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_SwordHat::PROTOTYPE_TAG,
         CKirby_SwordHat::Kirby_PartTag, &SwordHatDesc)))
         return E_FAIL;
 

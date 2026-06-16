@@ -82,8 +82,14 @@ namespace Engine
 
 	struct MESH_LAYER_IDX
 	{
-		int           iPass = -1;                   // -1 = renderer default
-		unsigned int  idx[MTEX_TYPE_MAX] = { 0 };   // MTEX_TYPE º° slotArrayIndex
+		int				iPass = { -1 };                   // -1 = renderer default
+		unsigned int	iUVIndex = { 0 };                 // TEXCOORD0 ~ TEXCOORD3
+		unsigned int	iFlags = { 0 };                   // shader-specific option bits
+		unsigned int	idx[MTEX_TYPE_MAX] = { 0 };   // MTEX_TYPE º° slotArrayIndex
+
+		bool			bUseUVTransform = { false };
+		XMFLOAT2		vUVScale = { 1.f, 1.f };
+		XMFLOAT2		vUVOffset = { 0.f, 0.f };
 	};
 
 	struct TEXTURE_HUB_STATS
@@ -231,6 +237,27 @@ namespace Engine
 			{"BINORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 72, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		};
 	}VTXMESH;
+
+	struct VTXMESH_INSTANCED
+	{
+		static const unsigned int	iNumElements = { 12 };
+
+		static constexpr D3D11_INPUT_ELEMENT_DESC   Elements[] = {
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,	0,  0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT,	0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,		0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 1, DXGI_FORMAT_R32G32_FLOAT,		0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 2, DXGI_FORMAT_R32G32_FLOAT,		0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TEXCOORD", 3, DXGI_FORMAT_R32G32_FLOAT,		0, 48, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"TANGENT",  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 56, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"BINORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 72, D3D11_INPUT_PER_VERTEX_DATA, 0},
+
+			{"WORLD",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1,  0, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"WORLD",    1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"WORLD",    2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+			{"WORLD",    3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+		};
+	};
 
 	typedef struct tagVertexAnimationMesh
 	{

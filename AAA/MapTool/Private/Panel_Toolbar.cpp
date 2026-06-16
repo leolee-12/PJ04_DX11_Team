@@ -14,7 +14,7 @@ namespace
 		if (nullptr == pLevel || nullptr == pInOutPresetIndex)
 			return;
 
-		const _uint iPresetCount = Client::CMap_Loader::Get_MapPresetCount();
+		const _uint iPresetCount = Client::CMap_Loader::Get_MapCount();
 		if (0 == iPresetCount)
 		{
 			ImGui::TextDisabled("Map preset unavailable.");
@@ -27,12 +27,12 @@ namespace
 		ImGui::SetNextItemWidth(120.f);
 		if (ImGui::BeginCombo(
 			"##MapPreviewPreset",
-			Client::CMap_Loader::Get_MapPresetLabel(static_cast<_uint>(*pInOutPresetIndex))))
+			Client::CMap_Loader::Get_MapName(static_cast<_uint>(*pInOutPresetIndex))))
 		{
 			for (_uint i = 0; i < iPresetCount; ++i)
 			{
 				const _bool bSelected = (static_cast<_uint>(*pInOutPresetIndex) == i);
-				if (ImGui::Selectable(CMap_Loader::Get_MapPresetLabel(i), bSelected))
+				if (ImGui::Selectable(CMap_Loader::Get_MapName(i), bSelected))
 					*pInOutPresetIndex = static_cast<_int>(i);
 
 				if (bSelected)
@@ -67,18 +67,18 @@ namespace
 			pLevel->Clear_MapPreviewEnv();
 
 		ImGui::SameLine();
-		if (ImGui::Button("Map Override Save"))
+		if (ImGui::Button("Map Edit Save"))
 		{
 			if (FAILED(pLevel->Save_MapOverride()))
-				MSG_BOX("MAP OVERRIDE SAVE FAILED");
+				MSG_BOX("MAP EDIT SAVE FAILED");
 		}
 
 		if (ImGui::IsItemHovered())
 		{
-			_wstring strOverridePath;
-			if (SUCCEEDED(CMap_Loader::Get_MapPresetOverrideAssetPath(static_cast<_uint>(*pInOutPresetIndex), L"", &strOverridePath)))
+			_wstring strEditFilePath;
+			if (SUCCEEDED(CMap_Loader::Get_PresetEditFilePath(static_cast<_uint>(*pInOutPresetIndex), L"", &strEditFilePath)))
 			{
-				const string strTooltip = WstrToStr(strOverridePath);
+				const string strTooltip = WstrToStr(strEditFilePath);
 				ImGui::SetTooltip("%s", strTooltip.c_str());
 			}
 		}
@@ -89,11 +89,11 @@ namespace
 		if (nullptr == pLevel)
 			return;
 
-		const wstring& strStatus = pLevel->Get_MapPreviewStatus();
-		if (strStatus.empty())
+		const _wstring& wstrStatus = pLevel->Get_MapPreviewStatus();
+		if (wstrStatus.empty())
 			return;
 
-		string strDisplay(strStatus.begin(), strStatus.end());
+		_string strDisplay = WstrToStr(wstrStatus);
 		ImGui::TextDisabled("%s", strDisplay.c_str());
 	}
 }
@@ -147,6 +147,21 @@ void CPanel_Toolbar::Render()
 			m_pGI_Proxy->Enable_InputDeveice();
 		}
 		ImGui::PopStyleColor();
+	}
+
+	ImGui::SameLine();
+
+	{
+		const bool bOn = m_pGI_Proxy->Is_PhysXDebug();
+
+		if (bOn)
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 1.0f, 1.0f));
+
+		if (ImGui::Button("Physics Debug"))
+			m_pGI_Proxy->Toggle_PhysXDebug();
+
+		if (bOn)
+			ImGui::PopStyleColor();
 	}
 
 	ImGui::SameLine();
@@ -224,7 +239,7 @@ void CPanel_Toolbar::Draw_CameraButtons(CLevel_Edit* pLevel)
 		{
 			for (const auto& handle : *pLayer)
 			{
-				string strName(handle.strName.begin(), handle.strName.end());
+				_string strName = WstrToStr(handle.strName);
 				if (ImGui::Selectable(strName.c_str()))
 				{
 					pLevel->Preview_Camera(handle.pObject);

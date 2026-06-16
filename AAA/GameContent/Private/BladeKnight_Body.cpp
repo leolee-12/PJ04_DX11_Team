@@ -16,6 +16,7 @@ CBladeKnight_Body::CBladeKnight_Body(const CBladeKnight_Body& Prototype)
 HRESULT CBladeKnight_Body::Initialize_Prototype()
 {
     m_eProjType = PROJ_TYPE::PERSPEC;
+
     return S_OK;
 }
 
@@ -31,14 +32,13 @@ HRESULT CBladeKnight_Body::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
-    m_pAnimatorCom->Play("Wait", true, true);
+    m_pAnimatorCom->Play("Thrust", true, true);
 
     return S_OK;
 }
 
 void CBladeKnight_Body::Priority_Update(_float fTimeDelta)
 {
-
 }
 
 void CBladeKnight_Body::Update(_float fTimeDelta)
@@ -87,6 +87,14 @@ HRESULT CBladeKnight_Body::Render()
     return S_OK;
 }
 
+const _float4x4* CBladeKnight_Body::Get_BoneMatrixPtr(const _char* pBoneName) const
+{
+    if (nullptr == m_pModelCom || nullptr == pBoneName)
+        return nullptr;
+
+    return m_pModelCom->Get_BoneMatrixPtr(pBoneName);
+}
+
 HRESULT CBladeKnight_Body::Ready_Components()
 {
     // 일반 스킨드 PBR
@@ -94,7 +102,7 @@ HRESULT CBladeKnight_Body::Ready_Components()
     if (nullptr == m_pShaderCom)
         return E_FAIL;
 
-    m_pModelCom = Add_Component<CModel>(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_BladeKnight_Body"), TEXT("Com_Model"));
+    m_pModelCom = Add_Component<CModel>(m_iPrototypeLevel, TEXT("Prototype_Component_Model_BladeKnight_Body"), TEXT("Com_Model"));
     if (nullptr == m_pModelCom)
         return E_FAIL;
 

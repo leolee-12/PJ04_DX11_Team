@@ -1,7 +1,7 @@
 #include "GameInstance_Proxy.h"
 #include "GameInstance.h"
 #include "Target_Manager.h"
-#include "Frustum_Manager.h"
+#include "Culling_Manager.h"
 #include "Light_Manager.h"
 #include "Renderer.h"
 #include "Shadow_Dir.h"
@@ -10,6 +10,8 @@
 #include "Environment_Manager.h"
 #include "ShaderGlobal_Manager.h"
 #include "Camera_Manager.h"
+#include "PhysX_Manager.h"
+#include "Font_Manager.h"
 
 using namespace physx;
 
@@ -75,6 +77,13 @@ _int CGameInstance_Proxy::RandomInt(_int iMin, _int iMax) const
 		return 0;
 
 	return m_pOwner->RandomInt(iMin, iMax);
+}
+_int64 CGameInstance_Proxy::Get_FrameIndex()
+{
+	if (!IsConnected())
+		return 0;
+
+	return m_pOwner->Get_FrameIndex();
 }
 #pragma endregion
 
@@ -536,6 +545,14 @@ HRESULT CGameInstance_Proxy::Draw_Text(const _wstring& strFontTag, const _tchar*
 	return m_pOwner->Draw_Text(strFontTag, pText, vPosition, vColor, fRotation, vScale, eAlign);
 }
 
+HRESULT CGameInstance_Proxy::Draw_Text_Raw(const _wstring& tag, const _tchar* p, const _float2& pos, _fvector col, const _float2& scl, TEXT_ALIGN a)
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->m_pFont_Manager->Draw_Raw(tag, p, pos, col, scl, a);
+}
+
 _float2 CGameInstance_Proxy::Measure_Text(const _wstring& strFontTag, const _tchar* pText)
 {
 	if (!IsConnected())
@@ -883,12 +900,36 @@ HRESULT CGameInstance_Proxy::LoadOrGet_TextureFromHub(const _tchar* pTexturePath
 	return m_pOwner->LoadOrGet_TextureFromHub(pTexturePath, pOutHandle);
 }
 
+HRESULT CGameInstance_Proxy::Register_TextureNameInHub(const _tchar* pTextureName, TEXTURE_HANDLE Handle)
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->Register_TextureNameInHub(pTextureName, Handle);
+}
+
+HRESULT CGameInstance_Proxy::Get_TextureFromHub(const _tchar* pTextureName, TEXTURE_HANDLE* pOutHandle) const
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->Get_TextureFromHub(pTextureName, pOutHandle);
+}
+
 HRESULT CGameInstance_Proxy::Bind_TextureFromHub(CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle)
 {
 	if (!IsConnected())
 		return E_FAIL;
 
 	return m_pOwner->Bind_TextureFromHub(pShader, pConstantName, Handle);
+}
+
+HRESULT CGameInstance_Proxy::Bind_DefaultTextureFromHub(CShader* pShader, const _char* pConstantName, DEFAULT_TEXTURE eKind)
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->Bind_DefaultTextureFromHub(pShader, pConstantName, eKind);
 }
 
 TEXTURE_HUB_STATS CGameInstance_Proxy::Get_TextureHubStats() const
@@ -948,6 +989,37 @@ void CGameInstance_Proxy::Render_PhysXDebug(_fmatrix V, _fmatrix P)
 {
 	if (!IsConnected()) return;
 	m_pOwner->Render_PhysXDebug(V, P);
+}
+
+physx::PxRigidDynamic* CGameInstance_Proxy::Create_DynamicBox(const _float3& vPos, const _float4& qRot, const _float3& vHalfExtents, _float fDensity)
+{
+	if (!IsConnected()) return nullptr;
+	return m_pOwner->m_pPhysX_Manager->Create_DynamicBox(vPos, qRot, vHalfExtents, fDensity);
+}
+physx::PxRigidDynamic* CGameInstance_Proxy::Create_DynamicSphere(const _float3& vPos, _float fRadius, _float fDensity)
+{
+	if (!IsConnected()) return nullptr;
+	return m_pOwner->m_pPhysX_Manager->Create_DynamicSphere(vPos, fRadius, fDensity);
+}
+physx::PxRigidDynamic* CGameInstance_Proxy::Create_DynamicCapsule(const _float3& vPos, const _float4& qRot, _float fRadius, _float fHalfHeight, _float fDensity)
+{
+	if (!IsConnected()) return nullptr;
+	return m_pOwner->m_pPhysX_Manager->Create_DynamicCapsule(vPos, qRot, fRadius, fHalfHeight, fDensity);
+}
+physx::PxConvexMesh*   CGameInstance_Proxy::Cook_ConvexMesh(const _float3* pPositions, _uint iNumVertices)
+{
+	if (!IsConnected()) return nullptr;
+	return m_pOwner->m_pPhysX_Manager->Cook_ConvexMesh(pPositions, iNumVertices);
+}
+physx::PxRigidDynamic* CGameInstance_Proxy::Create_DynamicConvex(physx::PxConvexMesh* pMesh, _fmatrix WorldMatrix, _float fDensity)
+{
+	if (!IsConnected()) return nullptr;
+	return m_pOwner->m_pPhysX_Manager->Create_DynamicConvex(pMesh, WorldMatrix, fDensity);
+}
+void                   CGameInstance_Proxy::Remove_DynamicActor(physx::PxRigidDynamic* pActor)
+{
+	if (!IsConnected()) return;
+	m_pOwner->m_pPhysX_Manager->Remove_DynamicActor(pActor);
 }
 #pragma endregion
 

@@ -15,6 +15,7 @@ public:
         _bool bRestart{ false };
         _float fBlend = 0.2f;
         _float fSpeed = 1.f;
+        _bool bClearMask = { true };
     };
 
 public:
@@ -38,6 +39,7 @@ public:
 public: // 재생 제어 (오브젝트/에디터는 오직 이것만 사용)
     void    Play(const string& strAnimName, _bool bLoop = true, _bool bRestart = false, _float fBlend = 0.2f, _float fSpeed = 1.0f);
     void    Play(const ANI_PLAY_INFO* tAniInfo);
+    void    Start_Clip(const ANI_PLAY_INFO& Info);
     void    Pause() { m_bPaused = true; }
     void    Resume() { m_bPaused = false; }
     void    Seek(_float fProgress);
@@ -50,7 +52,10 @@ public: // 재생 제어 (오브젝트/에디터는 오직 이것만 사용)
 
     void    Set_Mask(const _string& strClip, const _string& Bones, _bool bLoop, _float fMaskTarget, _float fMaskBlendTime);
 
+    // 바로 지우고 싶으면 그대로 사용 / 부드럽게 내리고 싶다면 BlendTime 주기
     void    Clear_Mask(_float fMaskBlendTime = 0.f);
+
+    void    Enqueue(const ANI_PLAY_INFO& info);
 
 public: // 에디터(데이터 편집)
     ANIM_EVENT_TRACK& Get_Track(const string& strAnimName);
@@ -80,6 +85,7 @@ private:
     EventCallback   m_Callback = { nullptr };
 
     unordered_map<string, ANIM_EVENT_TRACK> m_Tracks;
+    deque<ANI_PLAY_INFO> m_PlayQueue;       // 대기 클립들 ( 현재 재생분은 여기에 없음 )
 
     _bool               m_bPaused = { false };
     _bool               m_bFinished = { false };

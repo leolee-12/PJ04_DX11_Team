@@ -86,7 +86,7 @@ namespace
 
         for (const auto& strKey : pSession->Get_DeletedEnvOrder())
         {
-            CMap_EditSession::MAP_PREVIEW_ENV_ITEM Item{};
+            CMap_EditSession::MAP_EDIT_ENV_ITEM Item{};
             if (!pSession->Try_GetDeletedEnvItem(strKey, &Item))
                 continue;
 
@@ -96,9 +96,9 @@ namespace
 
             const string strLayerUtf8 = WstrToStr(Item.strLayerTag);
             const string strObjectTagUtf8 = WstrToStr(Item.strObjectTag);
-            const string strSourceUtf8 = WstrToStr(Item.strSourceFile);
-            const string strSectionUtf8 = WstrToStr(Item.strSection);
-            const string strEntryUtf8 = WstrToStr(Item.strEntryKey);
+            const string strSourceUtf8 = WstrToStr(Item.wstrSourceFile);
+            const string strSectionUtf8 = WstrToStr(Item.wstrSection);
+            const string strEntryUtf8 = WstrToStr(Item.wstrEntryKey);
 
             ImGui::PushID(strKeyUtf8.c_str());
 
@@ -146,7 +146,7 @@ namespace
         const CMap_EditSession* pSession =
             (nullptr != pLevel) ? pLevel->Get_MapPreviewSession() : nullptr;
 
-        if (nullptr == pSession || 0 == pSession->Get_AddedMapObjectCount())
+        if (nullptr == pSession || 0 == pSession->Get_AddedObjectCount())
         {
             ImGui::TextDisabled("No added map overrides.");
             return;
@@ -157,13 +157,13 @@ namespace
 
         ImGui::BeginChild("AddedMapOverrides", ImVec2(0.f, 140.f), true);
 
-        for (CGameObject* pObject : pSession->Get_AddedMapObjectOrder())
+        for (CGameObject* pObject : pSession->Get_AddedObjectOrder())
         {
             if (nullptr == pObject)
                 continue;
 
-            CMap_EditSession::MAP_PREVIEW_ADDED_ITEM Item{};
-            if (!pSession->Try_GetAddedMapObjectItem(pObject, &Item))
+            CMap_EditSession::MAP_EDIT_ADDED_ITEM Item{};
+            if (!pSession->Try_GetAddedObjectItem(pObject, &Item))
                 continue;
 
             const _wstring strDisplayName =
@@ -365,7 +365,7 @@ void CPanel_Hierarchy::Render()
                         const _bool bIsMapPreviewObject =
                             pLevel->Is_MapPreviewObject(pObject);
                         const _bool bIsAddedMapOverride =
-                            (nullptr != pSession) && pSession->Is_AddedMapObject(pObject);
+                            (nullptr != pSession) && pSession->Is_AddedObject(pObject);
 
                         string strDisplayName = ObjectCache.strNameUtf8;
                         if (bIsAddedMapOverride)
@@ -397,8 +397,8 @@ void CPanel_Hierarchy::Render()
                         {
                             if (bIsAddedMapOverride && nullptr != pSession)
                             {
-                                CMap_EditSession::MAP_PREVIEW_ADDED_ITEM Item{};
-                                if (pSession->Try_GetAddedMapObjectItem(pObject, &Item))
+                                CMap_EditSession::MAP_EDIT_ADDED_ITEM Item{};
+                                if (pSession->Try_GetAddedObjectItem(pObject, &Item))
                                 {
                                     const string strProtoUtf8 =
                                         WstrToStr(Item.strPrototypeTag);

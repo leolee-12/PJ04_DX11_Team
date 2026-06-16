@@ -1,5 +1,5 @@
 #include "EnvObject.h"
-#include "GameContent_const.h"
+#include "Shader_PassMeta.h"
 
 #include "GameInstance_Proxy.h"
 #include "Model.h"
@@ -11,8 +11,11 @@ NS_BEGIN(Client)
 
 namespace
 {
-	constexpr _bool ENABLE_ENV_OBJECT_SHADOW = false;
+	constexpr _bool ENABLE_ENV_OBJECT_SHADOW = true;
 	constexpr _float ENV_DISTANCE_CULL_START = 175.f;
+	constexpr _float ENV_SHADOW_DISTANCE_CULL_START = 80.f;
+	constexpr _float ENV_PICK_AABB_PADDING = 0.05f;
+	constexpr _float ENV_PICK_THIN_EXTENT = 0.06f;
 
 	void Log_EnvPhysicsWarning(const string& strMessage)
 	{
@@ -70,6 +73,34 @@ namespace
 			(vMax.z - vMin.z) * 0.5f);
 		return Bounds;
 	}
+
+	_bool Is_ThinBounds(const BoundingBox& Bounds)
+	{
+		return Bounds.Extents.x <= ENV_PICK_THIN_EXTENT
+			|| Bounds.Extents.y <= ENV_PICK_THIN_EXTENT
+			|| Bounds.Extents.z <= ENV_PICK_THIN_EXTENT;
+	}
+
+	_bool Is_ThinObjectBounds(const BoundingBox& LocalBounds, const _float3& vObjectScale)
+	{
+		BoundingBox ScaledBounds = LocalBounds;
+		ScaledBounds.Extents.x *= vObjectScale.x;
+		ScaledBounds.Extents.y *= vObjectScale.y;
+		ScaledBounds.Extents.z *= vObjectScale.z;
+
+		return Is_ThinBounds(ScaledBounds);
+	}
+
+	_float3 RayPoint(_fvector vOrigin, _fvector vDir, _float fDist)
+	{
+		_float3 vPoint = {};
+
+		const _vector vWorldPoint =
+			XMVectorAdd(vOrigin, XMVectorScale(XMVector3Normalize(vDir), fDist));
+
+		XMStoreFloat3(&vPoint, vWorldPoint);
+		return vPoint;
+	}
 }
 
 CEnvObject::CEnvObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -104,7 +135,22 @@ HRESULT CEnvObject::Initialize(void* pArg)
 	Apply_DescDefaults();
 	Apply_TransformFromDesc();
 
+	m_bUseCameraDither = m_tDesc.tRender.bUseNearDistAlpha;
+
 	return S_OK;
+}
+
+void CEnvObject::Late_Update(_float fTimeDelta)
+{
+	if (!m_bUseCameraDither) { m_fDissolve = 0.f; return; }
+
+	_vector C = XMLoadFloat4(m_pGameInstance_Proxy->Get_CamPosition());
+	_vector E = XMLoadFloat3(&m_WorldBounds.Center);   // 객체 위치
+	_float  d = XMVectorGetX(XMVector3Length(E - C));  // 객체-카메라 거리
+
+	// near → 1(사라짐),  far → 0(불투명)
+	_float t = (m_fDitherFar - d) / max(m_fDitherFar - m_fDitherNear, 1e-4f);
+	m_fDissolve = t < 0.f ? 0.f : (t > 1.f ? 1.f : t);
 }
 
 void CEnvObject::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
@@ -122,8 +168,36 @@ _bool XM_CALLCONV CEnvObject::Pick_Ray(_fvector vOrigin, _fvector vDir, _float3*
 
 	Refresh_WorldBounds();
 
+	const _float3 vObjectScale = m_pTransformCom->Get_Scaled();
+
+	// 회전된 평면/데칼은 world AABB 기준으로는 얇지 않게 보일 수 있으므로,
+	// fallback 여부는 local bounds * object scale 기준으로 판정한다.
+	const _bool bThinBounds = Is_ThinObjectBounds(m_LocalBounds, vObjectScale);
+
+	BoundingBox PickBounds = m_WorldBounds;
+	if (PickBounds.Extents.x < ENV_PICK_AABB_PADDING)
+		PickBounds.Extents.x = ENV_PICK_AABB_PADDING;
+	if (PickBounds.Extents.y < ENV_PICK_AABB_PADDING)
+		PickBounds.Extents.y = ENV_PICK_AABB_PADDING;
+	if (PickBounds.Extents.z < ENV_PICK_AABB_PADDING)
+		PickBounds.Extents.z = ENV_PICK_AABB_PADDING;
+
 	float fBoundsDist = 0.f;
-	if (!m_WorldBounds.Intersects(vOrigin, vDir, fBoundsDist))
+	const _bool bBoundsHit = PickBounds.Intersects(vOrigin, vDir, fBoundsDist);
+
+	//char szDbg[256] = {};
+	//::sprintf_s(
+	//	szDbg,
+	//	"[EnvPick][ObjBounds] this=%p hit=%d dist=%.3f ext=(%.3f, %.3f, %.3f)\n",
+	//	static_cast<const void*>(this),
+	//	bBoundsHit ? 1 : 0,
+	//	fBoundsDist,
+	//	PickBounds.Extents.x,
+	//	PickBounds.Extents.y,
+	//	PickBounds.Extents.z);
+	//::OutputDebugStringA(szDbg);
+
+	if (!bBoundsHit)
 		return false;
 
 	const _matrix WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
@@ -135,25 +209,46 @@ _bool XM_CALLCONV CEnvObject::Pick_Ray(_fvector vOrigin, _fvector vDir, _float3*
 	const size_t iNumMeshes = m_pModelCom->Get_NumMeshes();
 	for (size_t i = 0; i < iNumMeshes; ++i)
 	{
+		const _uint iMeshIndex = static_cast<_uint>(i);
+
 		_float3 vHit = {};
 		float fLocalDist = 0.f;
 
-		if (!m_pModelCom->Pick_Mesh(
-			static_cast<_uint>(i),
+		const _bool bMeshHit = m_pModelCom->Pick_Mesh_Ex(
+			iMeshIndex,
 			vOrigin,
 			vDir,
 			WorldMatrix,
 			&vHit,
-			&fLocalDist))
-		{
-			continue;
-		}
+			&fLocalDist,
+			ENV_PICK_AABB_PADDING);
 
-		UNREFERENCED_PARAMETER(fLocalDist);
+		//::sprintf_s(
+		//	szDbg,
+		//	"[EnvPick][MeshTry] this=%p mesh=%u hit=%d localDist=%.3f worldHit=(%.3f, %.3f, %.3f)\n",
+		//	static_cast<const void*>(this),
+		//	iMeshIndex,
+		//	bMeshHit ? 1 : 0,
+		//	fLocalDist,
+		//	vHit.x,
+		//	vHit.y,
+		//	vHit.z);
+		//::OutputDebugStringA(szDbg);
+
+		if (!bMeshHit)
+			continue;
 
 		const _vector vHitWorld = XMLoadFloat3(&vHit);
 		const _float fWorldDist = XMVectorGetX(
-			XMVector3Length(vHitWorld - vOrigin));
+			XMVector3Length(XMVectorSubtract(vHitWorld, vOrigin)));
+
+		//::sprintf_s(
+		//	szDbg,
+		//	"[EnvPick][MeshHit] this=%p mesh=%u worldDist=%.3f\n",
+		//	static_cast<const void*>(this),
+		//	iMeshIndex,
+		//	fWorldDist);
+		//::OutputDebugStringA(szDbg);
 
 		if (fWorldDist < fBestDist)
 		{
@@ -162,6 +257,34 @@ _bool XM_CALLCONV CEnvObject::Pick_Ray(_fvector vOrigin, _fvector vDir, _float3*
 			bHit = true;
 		}
 	}
+
+	if (!bHit && bBoundsHit && bThinBounds)
+	{
+		bHit = true;
+		fBestDist = fBoundsDist;
+		vBestHit = RayPoint(vOrigin, vDir, fBoundsDist);
+
+		//::sprintf_s(
+		//	szDbg,
+		//	"[EnvPick][ThinFallback] this=%p dist=%.3f hit=(%.3f, %.3f, %.3f)\n",
+		//	static_cast<const void*>(this),
+		//	fBestDist,
+		//	vBestHit.x,
+		//	vBestHit.y,
+		//	vBestHit.z);
+		//::OutputDebugStringA(szDbg);
+	}
+
+	//::sprintf_s(
+	//	szDbg,
+	//	"[EnvPick][Result] this=%p hit=%d dist=%.3f hitPos=(%.3f, %.3f, %.3f)\n",
+	//	static_cast<const void*>(this),
+	//	bHit ? 1 : 0,
+	//	bHit ? fBestDist : -1.f,
+	//	vBestHit.x,
+	//	vBestHit.y,
+	//	vBestHit.z);
+	//::OutputDebugStringA(szDbg);
 
 	if (!bHit)
 		return false;
@@ -175,9 +298,9 @@ _bool XM_CALLCONV CEnvObject::Pick_Ray(_fvector vOrigin, _fvector vDir, _float3*
 	return true;
 }
 
-HRESULT CEnvObject::Ready_RenderComponents(_uint iModelProtoLevel, const wstring& strModelProtoTag)
+HRESULT CEnvObject::Ready_RenderComponents(_uint iModelProtoLevel, const wstring& wstrModelProtoTag)
 {
-	if (strModelProtoTag.empty())
+	if (wstrModelProtoTag.empty())
 		return S_OK;
 
 	m_pShaderCom = Add_Component<CShader>(
@@ -189,7 +312,7 @@ HRESULT CEnvObject::Ready_RenderComponents(_uint iModelProtoLevel, const wstring
 
 	m_pModelCom = Add_Component<CModel>(
 		iModelProtoLevel,
-		strModelProtoTag,
+		wstrModelProtoTag,
 		TEXT("Com_Model"));
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
@@ -210,11 +333,11 @@ HRESULT CEnvObject::Ready_PhysicsActor()
 //		{
 //			Log_EnvPhysicsInfo(
 //				"[EnvPhysics] Skip actor: invalid collision. object="
-//				+ WstrToStr(m_tDesc.strObjectName)
+//				+ WstrToStr(m_tDesc.wstrObjectName)
 //				+ " uid="
 //				+ to_string(m_tDesc.iUid)
 //				+ " modelTag="
-//				+ WstrToStr(m_tDesc.strModelProtoTag));
+//				+ WstrToStr(m_tDesc.wstrModelProtoTag));
 //		}
 //#endif
 		return S_OK;
@@ -244,11 +367,11 @@ HRESULT CEnvObject::Ready_PhysicsActor_ModelMesh()
 #ifdef _DEBUG
 		Log_EnvPhysicsInfo(
 			"[EnvPhysics] MODEL_MESH actor skipped: no decor collision apxbin. object="
-			+ WstrToStr(m_tDesc.strObjectName)
+			+ WstrToStr(m_tDesc.wstrObjectName)
 			+ " uid="
 			+ to_string(m_tDesc.iUid)
 			+ " modelTag="
-			+ WstrToStr(m_tDesc.strModelProtoTag));
+			+ WstrToStr(m_tDesc.wstrModelProtoTag));
 #endif
 		return S_OK;
 	}
@@ -287,11 +410,11 @@ HRESULT CEnvObject::Ready_PhysicsActor_ModelMesh()
 #ifdef _DEBUG
 		Log_EnvPhysicsWarning(
 			"[EnvPhysics] MODEL_MESH actor failed: Create_StaticActor returned null. object="
-			+ WstrToStr(m_tDesc.strObjectName)
+			+ WstrToStr(m_tDesc.wstrObjectName)
 			+ " uid="
 			+ to_string(m_tDesc.iUid)
 			+ " modelTag="
-			+ WstrToStr(m_tDesc.strModelProtoTag));
+			+ WstrToStr(m_tDesc.wstrModelProtoTag));
 #endif
 		return E_FAIL;
 	}
@@ -299,13 +422,13 @@ HRESULT CEnvObject::Ready_PhysicsActor_ModelMesh()
 //#ifdef _DEBUG
 //	Log_EnvPhysicsInfo(
 //		"[EnvPhysics] MODEL_MESH actor created. object="
-//		+ WstrToStr(m_tDesc.strObjectName)
+//		+ WstrToStr(m_tDesc.wstrObjectName)
 //		+ " uid="
 //		+ to_string(m_tDesc.iUid)
 //		+ " apxbin="
 //		+ WstrToStr(m_tDesc.tCollision.strDecorCollisionApxbinName)
 //		+ " modelTag="
-//		+ WstrToStr(m_tDesc.strModelProtoTag));
+//		+ WstrToStr(m_tDesc.wstrModelProtoTag));
 //#endif
 
 	return S_OK;
@@ -370,39 +493,69 @@ HRESULT CEnvObject::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	const size_t iNumMeshes = m_pModelCom->Get_NumMeshes();
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
 
-	for (size_t i = 0; i < iNumMeshes; ++i)
+	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(static_cast<_uint>(i));
+		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
 
-		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", static_cast<_uint>(i), MTEX_TYPE::DIFFUSE,
-			Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)])))
-			int a = 1;/*continue;*/
-		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", static_cast<_uint>(i), MTEX_TYPE::NORMALS,
-			Layer.idx[ETOUI(MTEX_TYPE::NORMALS)])))
-			int a = 1;/*continue;*/
-		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", static_cast<_uint>(i), MTEX_TYPE::METALNESS,
-			Layer.idx[ETOUI(MTEX_TYPE::METALNESS)])))
-			int a = 1;/*continue;*/
-		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnknownTexture", static_cast<_uint>(i), MTEX_TYPE::UNKNOWN,
-			Layer.idx[ETOUI(MTEX_TYPE::UNKNOWN)])))
-			int a = 1;/*continue;*/
+		auto BindMaterial = [&](const _char* pConstantName, MTEX_TYPE eType, DEFAULT_TEXTURE eDefaultKind) -> HRESULT
+			{
+				const _uint iLayerIndex = Layer.idx[ETOUI(eType)];
+				const _uint iTextureCount = m_pModelCom->Get_MeshTextureCount(i, eType);
 
-		_uint iPass = (Layer.iPass >= 0)
-			? static_cast<_uint>(Layer.iPass)
-			: ShaderPass::NonAnimPBR::Diffuse;
+				if (iTextureCount > 0u)
+				{
+					const _uint iSafeIndex = (iLayerIndex < iTextureCount) ? iLayerIndex : (iTextureCount - 1u);
+
+					if (SUCCEEDED(m_pModelCom->Bind_Material(m_pShaderCom, pConstantName, i, eType, iSafeIndex)))
+						return S_OK;
+				}
+
+				// 실패 시 Default Texture로 바인딩
+				return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(m_pShaderCom, pConstantName, eDefaultKind);
+			};
+
+		if (FAILED(BindMaterial("g_DiffuseTexture", MTEX_TYPE::DIFFUSE, DEFAULT_TEXTURE::MAGENTA)))		return E_FAIL;
+		if (FAILED(BindMaterial("g_NormalTexture", MTEX_TYPE::NORMALS, DEFAULT_TEXTURE::FLAT_NORMAL)))	return E_FAIL;
+		if (FAILED(BindMaterial("g_MRATexture", MTEX_TYPE::METALNESS, DEFAULT_TEXTURE::MRA)))			return E_FAIL;
+		if (FAILED(BindMaterial("g_UnknownTexture", MTEX_TYPE::UNKNOWN, DEFAULT_TEXTURE::BLACK)))		return E_FAIL;
+
+		const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
+
+		_uint iFlags = Layer.iFlags;
+		if (m_bUseCameraDither)	iFlags |= ShaderPass::EnvInstFlags::Dither;
+		else					iFlags &= ~ShaderPass::EnvInstFlags::Dither;
+
+		const _bool bUseDither = m_bUseCameraDither;
+
+		if (bUseDither && m_fDissolve >= 0.999f)
+			continue;
+
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint))))
+			return E_FAIL;
+
+		const _float4 vUVTransform = Layer.bUseUVTransform
+			? _float4{ Layer.vUVScale.x, Layer.vUVScale.y, Layer.vUVOffset.x, Layer.vUVOffset.y }
+		: _float4{ 1.f, 1.f, 0.f, 0.f };
+
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_vUVTransform", &vUVTransform, sizeof(vUVTransform))))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve", &m_fDissolve, sizeof(_float))))
+			return E_FAIL;
+
+		const ENV_SHADER_PASS_META* pMeta = Find_EnvShaderPassMeta(Layer.iPass);
+		const _uint iPass = pMeta->iNonAnimPass;
 
 		if (FAILED(m_pShaderCom->Begin(iPass)))
 			return E_FAIL;
 
-		/* ---- 강제 렌더링 (디버그용) ---- */
-		//if (iPass > ShaderPass::NonAnimPBR::Diffuse)
-		//	iPass = ShaderPass::NonAnimPBR::White;
-		//
-		//if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::White)))
-		//	return E_FAIL;
-		/* -------------------------------- */
+		if (FAILED(m_pShaderCom->Begin(iPass)))
+			return E_FAIL;
 
 		if (FAILED(m_pModelCom->Render(static_cast<_uint>(i))))
 			return E_FAIL;
@@ -456,15 +609,15 @@ void CEnvObject::Update_LocalBounds()
 
 void CEnvObject::Refresh_WorldBounds()
 {
-	if (nullptr == m_pTransformCom)
+	if (nullptr == m_pTransformCom || !m_bTransformDirty)
 		return;
 
 	m_LocalBounds.Transform(m_WorldBounds, XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+	m_bTransformDirty = false;
 }
 
 void CEnvObject::Check_Visible()
 {
-
 	if (!m_bRenderable || !Has_RenderModel())
 	{
 		m_bVisible = false;
@@ -481,19 +634,30 @@ void CEnvObject::Check_Visible()
 		return;
 	}
 
-	m_bVisible = !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, m_WorldBounds);
-	m_bVisibleShadow = bEnableShadow && !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_WorldBounds);
+	m_bVisible = true;
+	m_bVisibleShadow = bEnableShadow;
 
-	if ((m_bVisible || m_bVisibleShadow) && m_bEnableCulling)
+	// Distance -> Frustum
+	// 1. Main
+	if (m_bEnableCulling &&
+		m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_DISTANCE_CULL_START))
 	{
-		const _bool bDistanceCulled =
-			m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_DISTANCE_CULL_START);
+		m_bVisible = false;
+	}
+	else
+	{
+		m_bVisible = !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, m_WorldBounds);
+	}
 
-		if (bDistanceCulled)
-		{
-			m_bVisible = false;
-			m_bVisibleShadow = false;
-		}
+	// 2. Shadow
+	if (m_bVisibleShadow &&
+		m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_SHADOW_DISTANCE_CULL_START))
+	{
+		m_bVisibleShadow = false;
+	}
+	else if (m_bVisibleShadow)
+	{
+		m_bVisibleShadow = !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_WorldBounds);
 	}
 }
 
@@ -511,12 +675,15 @@ void CEnvObject::Apply_TransformFromDesc()
 		m_pTransformCom->Set_WorldMatrix(Build_WorldMatrix_FromTRS(m_tDesc));
 	}
 
+	m_bTransformDirty = true;
+
 	Refresh_WorldBounds();
 }
 
 void CEnvObject::Apply_DescDefaults()
 {
 	m_bRenderable = !m_tDesc.tCollision.bInvisibleCollision;
+
 	m_bEnableCulling = m_tDesc.tRender.bUseLodCulling;
 	m_bCastShadow = m_tDesc.tRender.bShadowMappingCaster;
 	m_bVisible = true;

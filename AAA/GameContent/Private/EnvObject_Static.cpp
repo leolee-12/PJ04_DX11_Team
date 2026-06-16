@@ -1,4 +1,5 @@
 #include "EnvObject_Static.h"
+#include "Env_InstanceController.h"
 
 #include "GameInstance_Proxy.h"
 
@@ -26,7 +27,7 @@ HRESULT CEnvObject_Static::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Ready_RenderComponents(m_tDesc.iModelProtoLevel, m_tDesc.strModelProtoTag)))
+	if (FAILED(Ready_RenderComponents(m_tDesc.iModelProtoLevel, m_tDesc.wstrModelProtoTag)))
 		return E_FAIL;
 
 	if (FAILED(Ready_PhysicsActor()))
@@ -37,23 +38,18 @@ HRESULT CEnvObject_Static::Initialize(void* pArg)
 
 void CEnvObject_Static::Late_Update(_float fTimeDelta)
 {
-	UNREFERENCED_PARAMETER(fTimeDelta);
+	__super::Late_Update(fTimeDelta);
 
 	if (!m_bRenderable || !Has_RenderModel())
 	{
 		m_bVisible = false;
+		m_bVisibleShadow = false;
 		return;
 	}
 
 	Refresh_WorldBounds();
-
 	Check_Visible();
-
-	if(m_bVisible)
-		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
-	
-	if(m_bVisibleShadow)
-		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
+	Submit_RenderGroups();
 }
 
 HRESULT CEnvObject_Static::Render_Shadow()
@@ -79,22 +75,80 @@ HRESULT CEnvObject_Static::Render_Shadow()
 	return S_OK;
 }
 
-CGameObject* CEnvObject_Static::Clone(void* pArg)
-{
-	CEnvObject_Static* pInstance = new CEnvObject_Static(*this);
-
-	if (FAILED(pInstance->Initialize(pArg)))
-	{
-		MSG_BOX("Failed to Cloned : CEnvObject_Static");
-		Safe_Release(pInstance);
-	}
-
-	return pInstance;
-}
-
 void CEnvObject_Static::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 {
 	__super::Copy_PrototypeName(pOutData);
+}
+
+void CEnvObject_Static::Set_InstanceController(CEnv_InstanceController* pCtrl)
+{
+	Safe_Release(m_pInstanceController);
+	m_pInstanceController = pCtrl;
+	Safe_AddRef(m_pInstanceController);
+
+	m_InstanceBatchHandle = {};
+
+	if (nullptr != m_pInstanceController && Can_RenderInstance())
+	{
+		m_InstanceBatchHandle = m_pInstanceController->Register_BatchesForDesc(m_tDesc);
+	}
+}
+
+_bool CEnvObject_Static::Can_RenderInstance() const
+{
+	if (!m_bRenderable)
+		return false;
+
+	if (!Has_RenderModel())
+		return false;
+
+	if (m_tDesc.wstrModelProtoTag.empty())
+		return false;
+
+	return true;
+}
+
+void CEnvObject_Static::Submit_RenderGroups()
+{
+	if (m_bVisible)
+	{
+		_bool bSubmitted = false;
+		const _bool bBypassMainInstance = Should_BypassMainInstance();
+
+		if (!bBypassMainInstance && Can_RenderInstance() && nullptr != m_pInstanceController)
+		{
+			bSubmitted = m_pInstanceController->Submit_Main(m_InstanceBatchHandle.iMainBatchIndex, this);
+		}
+
+		if (!bSubmitted)
+			m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+	}
+
+	if (m_bVisibleShadow)
+	{
+		_bool bSubmittedShadow = false;
+
+		if (Can_RenderInstance() && nullptr != m_pInstanceController)
+		{
+			bSubmittedShadow = m_pInstanceController->Submit_Shadow(
+				m_InstanceBatchHandle.iShadowBatchIndex,
+				this);
+		}
+
+		if (!bSubmittedShadow)
+			m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
+	}
+}
+
+_bool CEnvObject_Static::Should_BypassMainInstance() const
+{
+	if (m_bEditorForceMainPassNonInstanced)
+		return true;
+
+	if (!m_bUseCameraDither)
+		return false;
+
+	return m_fDissolve > 0.0001f;
 }
 
 CEnvObject_Static* CEnvObject_Static::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -110,8 +164,23 @@ CEnvObject_Static* CEnvObject_Static::Create(ID3D11Device* pDevice, ID3D11Device
 	return pInstance;
 }
 
+CGameObject* CEnvObject_Static::Clone(void* pArg)
+{
+	CEnvObject_Static* pInstance = new CEnvObject_Static(*this);
+
+	if (FAILED(pInstance->Initialize(pArg)))
+	{
+		MSG_BOX("Failed to Cloned : CEnvObject_Static");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
 void CEnvObject_Static::Free()
 {
+	Safe_Release(m_pInstanceController);
+
 	__super::Free();
 }
 

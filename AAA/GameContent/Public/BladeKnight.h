@@ -1,12 +1,13 @@
 #pragma once
 #include "GameContent_Defines.h"
-#include "Character.h"
+#include "Monster.h"
 
 NS_BEGIN(Client)
 
 class CBladeKnight_Body;
+class CBladeKnight_Sword;
 
-class CBladeKnight final : public CCharacter
+class CBladeKnight final : public CMonster
 {
 	GENERATED_BODY(CBladeKnight)
 
@@ -33,16 +34,23 @@ public:
 	virtual void				Late_Update(_float fTimeDelta) override;
 	virtual HRESULT				Render() override;
 
-	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override
+	virtual void				Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override
 	{
 		pOutData->strPrototypeTag = PROTOTYPE_TAG;
 	}
 	
+	virtual _float				Get_CapsuleRadius() const override;
+	virtual _float				Get_CapsuleHeight() const override;
+	virtual void				Play_StateAnimation(MONSTER_STATE_TYPE eState) override;
+
+	virtual _bool				Is_StateAnimationFinished() const override;
+
+
 public:
 	CBladeKnight_Body*			Get_Body() { return m_pBody; }
+	CBladeKnight_Sword*			Get_Sword() { return m_pSword; }
 
 private:
-	HRESULT						Ready_Components();
 	HRESULT						Ready_PartObjects();
 	HRESULT						Bind_ShaderResources();
 
@@ -50,6 +58,7 @@ private:
 
 private:
 	CBladeKnight_Body*			m_pBody = { nullptr };
+	CBladeKnight_Sword*			m_pSword = { nullptr };
 
 
 public:

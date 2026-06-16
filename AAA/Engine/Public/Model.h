@@ -49,6 +49,7 @@ public:
 
 public:
 	_bool Pick_Mesh(_uint iMeshIndex, _fvector vOrigin, _fvector vDir, _fmatrix WorldMatrix, _float3* pOutHit, float* pOutDist = nullptr);
+	_bool Pick_Mesh_Ex(_uint iMeshIndex, _fvector vOrigin, _fvector vDir, _fmatrix WorldMatrix, _float3* pOutHit, float* pOutDist = nullptr, _float fAabbPadding = 0.f);
 	physx::PxTriangleMesh* Get_CollisionMesh() const { return m_pCollisionMesh; }
 
 public:
@@ -85,6 +86,9 @@ public:
 	void  Set_MeshLayer(_uint iMesh, const MESH_LAYER_IDX& v);
 	_uint Get_MeshTextureCount(_uint iMesh, MTEX_TYPE eType) const;
 	HRESULT Save_MeshLayers() const;
+
+public:	// Instance
+	HRESULT Render_Instanced(_uint iMeshIndex, ID3D11Buffer* pInstanceBuffer, _uint iInstanceStride, _uint iInstanceCount);
 
 private:
 	MODEL						m_eType = { MODEL::END };
@@ -126,7 +130,7 @@ private:
 private:
 	HRESULT Ready_Meshes(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix);
 	HRESULT Ready_Materials(const vector<MATERIAL_DATA>& materials, const _char* pModelFilePath);
-	HRESULT Ready_MaterialsEx(const vector<MATERIAL_DATA>& materials, const _char* pModelFilePath);
+	HRESULT Ready_MaterialsEx(const vector<MATERIAL_DATA>& materials);
 	HRESULT Ready_Bones(const vector<BONE_DATA>& bones);
 	HRESULT Ready_Animations(const vector<ANIMATION_DATA>& animations);
 

@@ -192,7 +192,7 @@ HRESULT CLevel_Edit::Ready_Kirby()
     if (nullptr == pFactory) return E_FAIL;
 
     // 1) 커비 바디/모델 프로토타입 등록(로더 실행) 로더가 GAMEPLAY 레벨에 넣음
-    pFactory->LoadResource(Client::CKirby::PROTOTYPE_TAG, m_pGameInstance_Proxy, m_pDevice, m_pContext);
+    pFactory->LoadResource(Client::CKirby::PROTOTYPE_TAG, m_pGameInstance_Proxy, m_pDevice, m_pContext, ETOUI(EDIT_LEVEL::STATIC));
 
     // 2) 커비 프로토타입 등록
     if (!m_pGameInstance_Proxy->Has_Prototype(ETOUI(EDIT_LEVEL::STATIC), Client::CKirby::PROTOTYPE_TAG))
@@ -231,7 +231,7 @@ HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
     Clear_MapPreview();
 
     _wstring strManifestPath;
-    if (FAILED(Client::CMap_Loader::Get_MapPresetManifestPath(iPresetIndex, &strManifestPath)))
+    if (FAILED(Client::CMap_Loader::Get_MapManifestPath(iPresetIndex, &strManifestPath)))
     {
         m_strMapPreviewStatus = L"Map preset load failed.";
         return E_FAIL;
@@ -257,7 +257,7 @@ HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
         return hResult;
     }
 
-    Client::MAP_LOAD_REPORT Report{};
+    Client::MAP_LOAD_RESULT Report{};
     hResult = Client::CMap_Loader::Load_Env_Runtime(
         Context,
         strManifestPath,
@@ -274,7 +274,7 @@ HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
     m_pMapStage = pLoadedStage;
     m_strLoadedMapStageName = nullptr != m_pMapStage ? m_pMapStage->Get_StageName() : L"";
     if (m_strLoadedMapStageName.empty())
-        m_strLoadedMapStageName = StrToWstr(Client::CMap_Loader::Get_MapPresetLabel(iPresetIndex));
+        m_strLoadedMapStageName = StrToWstr(Client::CMap_Loader::Get_MapName(iPresetIndex));
 
     m_iEnvObjCreatedCount = Report.iEnvCreatedCount;
     m_iLoadedMapPresetIndex = static_cast<_int>(iPresetIndex);
@@ -296,7 +296,7 @@ HRESULT CLevel_Edit::Load_MapPreviewStage(_uint iPresetIndex)
     m_iLoadedMapPresetIndex = -1;
 
     _wstring strManifestPath;
-    if (FAILED(Client::CMap_Loader::Get_MapPresetManifestPath(iPresetIndex, &strManifestPath)))
+    if (FAILED(Client::CMap_Loader::Get_MapManifestPath(iPresetIndex, &strManifestPath)))
     {
         m_pMapStage = nullptr;
         m_strLoadedMapStageName.clear();
@@ -333,7 +333,7 @@ HRESULT CLevel_Edit::Load_MapPreviewStage(_uint iPresetIndex)
     m_pMapStage = pLoadedStage;
     m_strLoadedMapStageName = nullptr != m_pMapStage ? m_pMapStage->Get_StageName() : L"";
     if (m_strLoadedMapStageName.empty())
-        m_strLoadedMapStageName = StrToWstr(Client::CMap_Loader::Get_MapPresetLabel(iPresetIndex));
+        m_strLoadedMapStageName = StrToWstr(Client::CMap_Loader::Get_MapName(iPresetIndex));
 
     m_strMapPreviewStatus = L"Map stage preview loaded: " + m_strLoadedMapStageName
         + L" / env=" + to_wstring(m_iEnvObjCreatedCount);
@@ -347,7 +347,7 @@ HRESULT CLevel_Edit::Load_MapPreviewEnv(_uint iPresetIndex)
     m_iLoadedMapPresetIndex = -1;
 
     _wstring strManifestPath;
-    if (FAILED(Client::CMap_Loader::Get_MapPresetManifestPath(iPresetIndex, &strManifestPath)))
+    if (FAILED(Client::CMap_Loader::Get_MapManifestPath(iPresetIndex, &strManifestPath)))
     {
         m_iEnvObjCreatedCount = 0;
         m_strMapPreviewStatus = nullptr != m_pMapStage
@@ -364,7 +364,7 @@ HRESULT CLevel_Edit::Load_MapPreviewEnv(_uint iPresetIndex)
     Context.pCreatedCallback = &On_MapPreviewObjectCreated;
     Context.pCallbackContext = this;
 
-    MAP_LOAD_REPORT Report{};
+    MAP_LOAD_RESULT Report{};
     const HRESULT hResult = CMap_Loader::Load_Env_Runtime(Context, strManifestPath, nullptr, &Report);
 
     if (FAILED(hResult))

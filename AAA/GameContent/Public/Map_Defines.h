@@ -28,14 +28,16 @@ inline constexpr _uint MAP_SECTION_TYPE_COUNT = static_cast<_uint>(MAP_SECTION_T
 struct MAP_SECTION_DESC : public CGameObject::GAMEOBJECT_DESC
 {
 	_wstring			strSectionName;
-	_wstring			strModelProtoTag;
-	_wstring			strModelPath;
+	_wstring			wstrModelProtoTag;
+	_wstring			wstrModelPath;
 	_uint				iModelProtoLevel = {};
 	MAP_SECTION_TYPE	eSectionType = { MAP_SECTION_TYPE::UNKNOWN };
 	RENDERID			eRenderID = { RENDERID::NONBLEND };
 	_bool				bCastShadow = { false };
 	_bool				bEnableCulling = { true };
 	_bool				bRenderable = { true };
+	_bool				bCreateCollisionActor = { true };
+	_bool				bSourceCreateCollisionActor = { true };
 };
 
 struct MAP_STAGE_DESC : public CGameObject::GAMEOBJECT_DESC

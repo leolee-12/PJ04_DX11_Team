@@ -15,7 +15,7 @@ class CLIENT_DLL CGameObject_Factory final : public CBase
 
 public:
 	using Creator			= function<CBase* (ID3D11Device*, ID3D11DeviceContext*)>;
-	using ResourceLoader    = function<void(CGameInstance_Proxy*, ID3D11Device*, ID3D11DeviceContext*)>;
+	using ResourceLoader    = function<void(CGameInstance_Proxy*, ID3D11Device*, ID3D11DeviceContext*, _uint)>;
 
 	typedef struct tagGameObjectRegistration
 	{
@@ -48,13 +48,13 @@ public:
     }
 
     void LoadResource(const wstring& strTag, CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext*
-        pContext)
+        pContext, _uint iLevelIndex)
     {
         auto iter = m_Registrations.find(strTag);
         if (iter == m_Registrations.end())
             return;
 
-        iter->second.ResourceLoader(pProxy, pDevice, pContext);
+        iter->second.ResourceLoader(pProxy, pDevice, pContext, iLevelIndex);
     }
 
     void Copy_RegisteredTags(vector<wstring>* pOutTags);
@@ -74,6 +74,8 @@ private:
 	void Register_NonAnimObject();
     void Register_AnimObject();
 	void Register_Effect();
+
+    void Register_MiniBoss();
 
 public:
     virtual void Free() override;

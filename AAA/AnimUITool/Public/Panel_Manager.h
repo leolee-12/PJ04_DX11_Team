@@ -6,6 +6,7 @@ NS_BEGIN(Engine)
 class CGameObject;
 class CUIContainerObject;
 class CUIPartObject;
+class CGameInstance_Proxy;
 NS_END
 
 NS_BEGIN(AnimUITool)
@@ -66,6 +67,9 @@ private:
 	UI_CONTEXT					m_UIContext;
 
 	TOOL_MODE					m_eWorkMode = { TOOL_MODE::ANIMATION };
+	CGameInstance_Proxy*		m_pGameInstance_Proxy = { nullptr };
+
+	_bool						m_bKeyInputEnabled = { true };
 
 private:
 	void						Render_DockSpace();

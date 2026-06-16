@@ -99,13 +99,13 @@ HRESULT CTestMarb1e::Ready_Components()
     if (nullptr == m_pShaderCom)
         return E_FAIL;
 
-    m_pModelCom = Add_Component<CModel>(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Marb1e"), TEXT("Com_Model"));
+    m_pModelCom = Add_Component<CModel>(m_iPrototypeLevel, TEXT("Prototype_Component_Model_Marb1e"), TEXT("Com_Model"));
     if (nullptr == m_pModelCom)
         return E_FAIL;
 
     CAnimator::ANIMATOR_DESC AnimDesc{};
     AnimDesc.pModel = m_pModelCom;
-    AnimDesc.strDataFile = TEXT("../Bin/Resources/Models/Test/Marb1e/Marb1e_animevents.json");
+    AnimDesc.strDataFile = TEXT("../Bin/Resources/Test/Test/Marb1e/Marb1e_animevents.json");
 
     m_pAnimatorCom = Add_Component<CAnimator>(
         TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));

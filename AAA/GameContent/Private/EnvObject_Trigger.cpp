@@ -26,9 +26,9 @@ HRESULT CEnvObject_Trigger::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (!m_tDesc.strModelProtoTag.empty())
+	if (!m_tDesc.wstrModelProtoTag.empty())
 	{
-		if (FAILED(Ready_RenderComponents(m_tDesc.iModelProtoLevel, m_tDesc.strModelProtoTag)))
+		if (FAILED(Ready_RenderComponents(m_tDesc.iModelProtoLevel, m_tDesc.wstrModelProtoTag)))
 			return E_FAIL;
 	}
 

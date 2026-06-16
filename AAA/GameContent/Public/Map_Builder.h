@@ -13,7 +13,6 @@ private:
 
 public:
 	HRESULT Build_FromManifest(const _wstring& strManifestPath, MAP_PACKAGE* pOutPackage);
-	HRESULT Build_FromPreset_ForTool(_uint iPresetIndex, MAP_PACKAGE* pOutPackage);
 
 private:
 	CMap_ModelResolver* m_pResolver = { nullptr };

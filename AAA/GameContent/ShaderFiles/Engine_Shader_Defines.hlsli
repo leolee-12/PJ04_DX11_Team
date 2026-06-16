@@ -81,6 +81,13 @@ RasterizerState RS_Decal
     SlopeScaledDepthBias = -1.f;
 };
 
+
+
+
+
+
+
+
 DepthStencilState DSS_Default
 {
     DepthEnable = true;
@@ -100,6 +107,53 @@ DepthStencilState DSS_NoWrite
     DepthWriteMask = Zero;
     DepthFunc = less_equal;
 };
+
+DepthStencilState DSS_MarkOccluded
+{
+    DepthEnable = true;
+    DepthWriteMask = All;
+    DepthFunc = less_equal; // DSS_Default와 동일
+
+    StencilEnable = true;
+    StencilReadMask = 0xFF;
+    StencilWriteMask = 0xFF;
+
+    FrontFaceStencilFunc = Always;
+    FrontFaceStencilPass = Keep; // 보이는 부분: 그대로
+    FrontFaceStencilDepthFail = Replace; // ★ 가려진 부분: ref(1) 기록
+    FrontFaceStencilFail = Keep;
+
+    BackFaceStencilFunc = Always;
+    BackFaceStencilPass = Keep;
+    BackFaceStencilDepthFail = Replace;
+    BackFaceStencilFail = Keep;
+};
+
+// 실루엣 합성용: 스텐실 == ref(1) 인 픽셀만 통과, 깊이 무시
+DepthStencilState DSS_StencilEqual
+{
+    DepthEnable = false;
+    DepthWriteMask = Zero;
+
+    StencilEnable = true;
+    StencilReadMask = 0xFF;
+    StencilWriteMask = 0x00; // 읽기만
+
+    FrontFaceStencilFunc = Equal;
+    FrontFaceStencilPass = Keep;
+    FrontFaceStencilFail = Keep;
+    FrontFaceStencilDepthFail = Keep;
+
+    BackFaceStencilFunc = Equal;
+    BackFaceStencilPass = Keep;
+    BackFaceStencilFail = Keep;
+    BackFaceStencilDepthFail = Keep;
+};
+
+
+
+
+
 
 
 BlendState BS_Default
@@ -132,4 +186,28 @@ BlendState BS_Additive
     SrcBlend = Src_Alpha;
     DestBlend = One;
     BlendOp = Add;
+};
+
+// 커튼 RT 용
+BlendState BS_CurtainOver
+{
+    BlendEnable[0] = true;
+    SrcBlend = Src_Alpha;
+    DestBlend = Inv_Src_Alpha;
+    BlendOp = Add;
+    SrcBlendAlpha = One; // dstA = srcA + (1-srcA)*dstA
+    DestBlendAlpha = Inv_Src_Alpha;
+    BlendOpAlpha = Add;
+};
+
+// 지우개: RGB는 그대로, 대상 알파만 별 모양으로 깎음
+BlendState BS_AlphaErase
+{
+    BlendEnable[0] = true;
+    SrcBlend = Zero; // RGB 유지
+    DestBlend = One;
+    BlendOp = Add;
+    SrcBlendAlpha = Zero; // dstA = (1-srcA)*dstA
+    DestBlendAlpha = Inv_Src_Alpha;
+    BlendOpAlpha = Add;
 };

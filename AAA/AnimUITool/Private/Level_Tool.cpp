@@ -10,6 +10,8 @@
 #include "GameContent_const.h"
 #include "GameObject_Factory.h"
 #include "Loader_Prototype.h"
+#include "ContainerObject.h"
+#include "PartObject.h"
 
 #include "UI_Title.h"
 #include "Panel_Manager.h"
@@ -22,11 +24,16 @@
 #include "UI_Text.h"
 #include "UI_Effect.h"
 #include "UI_GaugeFill.h"
+#include "UI_Curtain.h"
+#include "UI_Eraser.h"
+#include "UI_SpriteAnimCurtain.h"
+#include "UI_CurtainTexture.h"
+#include "PhysX_Manager.h"
 
 namespace
 {
     constexpr const _char* PREVIEW_MODEL_PATH =
-        "../../Resources/Models/Test/BladeKnight/BladeKnight.ysh";
+        "../../Resources/Test/Test/BladeKnight/BladeKnight.ysh";
 
     MODEL Read_YshType(const _wstring& strPath)
     {
@@ -62,6 +69,9 @@ HRESULT CLevel_Tool::Initialize()
         return E_FAIL;
 
     if (FAILED(Ready_Grid()))
+        return E_FAIL;
+
+    if (FAILED(Ready_TestGround()))
         return E_FAIL;
 
     if (FAILED(Ready_PreviewShaders()))
@@ -121,6 +131,60 @@ HRESULT CLevel_Tool::Ready_Grid()
 {
     m_pGrid = CEdit_Grid::Create(m_pDevice, m_pContext, 100, 1.f);
     return (m_pGrid == nullptr) ? E_FAIL : S_OK;
+}
+
+HRESULT CLevel_Tool::Ready_TestGround()
+{
+    Release_TestGround();
+
+    const _float fHalfSize = 50.f;
+
+    const _float3 vPositions[] =
+    {
+        { -fHalfSize, 0.f, -fHalfSize },
+        { -fHalfSize, 0.f,  fHalfSize },
+        {  fHalfSize, 0.f,  fHalfSize },
+        {  fHalfSize, 0.f, -fHalfSize },
+    };
+
+    const _uint iIndices[] =
+    {
+        0, 1, 2,
+        0, 2, 3,
+    };
+
+    m_pTestGroundMesh = m_pGameInstance_Proxy->Cook_TriangleMesh(
+        vPositions,
+        static_cast<_uint>(_countof(vPositions)),
+        iIndices,
+        static_cast<_uint>(_countof(iIndices)),
+        false);
+
+    if (nullptr == m_pTestGroundMesh)
+        return E_FAIL;
+
+    m_pTestGroundActor = m_pGameInstance_Proxy->Create_StaticActor(
+        m_pTestGroundMesh,
+        XMMatrixIdentity());
+
+    if (nullptr == m_pTestGroundActor)
+    {
+        PX_RELEASE(m_pTestGroundMesh);
+        return E_FAIL;
+    }
+
+    return S_OK;
+}
+
+void CLevel_Tool::Release_TestGround()
+{
+    if (nullptr != m_pTestGroundActor)
+    {
+        m_pGameInstance_Proxy->Remove_StaticActor(m_pTestGroundActor);
+        m_pTestGroundActor = nullptr;
+    }
+
+    PX_RELEASE(m_pTestGroundMesh);
 }
 
 HRESULT CLevel_Tool::Ready_PreviewShaders()
@@ -245,7 +309,7 @@ HRESULT  CLevel_Tool::Save_UIContainer(CGameObject* pContainer, const _float2& v
         j["Textures"] = jTextures;
 
         namespace fs = std::filesystem;
-        fs::path dir = L"../../Resources/CHJ/UI/Containers";
+        fs::path dir = L"../../Resources/YSH/UIs/UIData";
         std::error_code ec; fs::create_directories(dir, ec);
         fs::path path = dir / (strFileName + L"_ui.json");
 
@@ -346,7 +410,7 @@ CGameObject* CLevel_Tool::Load_UIContainerByPath(const _wstring& strFullPath, _f
         if (!m_pGameInstance_Proxy->Has_Prototype(iContainerProtoLevel, strSpawnTag))
         {
             pReg->ResourceLoader(
-                m_pGameInstance_Proxy, m_pDevice, m_pContext);
+                m_pGameInstance_Proxy, m_pDevice, m_pContext, iContainerProtoLevel);
             m_pGameInstance_Proxy->Add_Prototype(iContainerProtoLevel, strSpawnTag,
                 pReg->CreatorFunc(m_pDevice, m_pContext));
         }
@@ -455,7 +519,7 @@ CGameObject* CLevel_Tool::Add_UIContainer()
 
     if (!m_pGameInstance_Proxy->Has_Prototype(iContainerProtoLevel, strTag))
     {
-        pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
+        pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, iContainerProtoLevel);
         if (FAILED(m_pGameInstance_Proxy->Add_Prototype(iContainerProtoLevel, strTag,
             pReg->CreatorFunc(m_pDevice, m_pContext))))
             return nullptr;
@@ -492,16 +556,51 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
 
     _wstring strProtoTag = L"";
 
-    if (eType == UI_PART_TYPE::IMAGE)
-        strProtoTag = Client::CUI_Image::PROTOTYPE_TAG;
-    else if (eType == UI_PART_TYPE::SPRITEANIM)
-        strProtoTag = Client::CUI_SpriteAnim::PROTOTYPE_TAG;
-    else if (eType == UI_PART_TYPE::TEXT)
-        strProtoTag = Client::CUI_Text::PROTOTYPE_TAG;
-    else if (eType == UI_PART_TYPE::EFFECT)
-        strProtoTag = Client::CUI_Effect::PROTOTYPE_TAG;
-    else if (eType == UI_PART_TYPE::GAUGEFILL)
-        strProtoTag = Client::CUI_GaugeFill::PROTOTYPE_TAG;
+    switch (eType)
+    {
+        case UI_PART_TYPE::IMAGE:
+            strProtoTag = Client::CUI_Image::PROTOTYPE_TAG;
+            break;
+        case UI_PART_TYPE::SPRITEANIM:
+            strProtoTag = Client::CUI_SpriteAnim::PROTOTYPE_TAG;
+            break;
+        case UI_PART_TYPE::TEXT:
+            strProtoTag = Client::CUI_Text::PROTOTYPE_TAG;
+            break;
+        case UI_PART_TYPE::EFFECT:
+            strProtoTag = Client::CUI_Effect::PROTOTYPE_TAG;
+            break;
+        case UI_PART_TYPE::GAUGEFILL:
+            strProtoTag = Client::CUI_GaugeFill::PROTOTYPE_TAG;
+            break;
+
+        case UI_PART_TYPE::CURTAIN:
+            strProtoTag = Client::CUI_Curtain::PROTOTYPE_TAG;
+            break;
+        case UI_PART_TYPE::ERASER:
+            strProtoTag = Client::CUI_Eraser::PROTOTYPE_TAG;
+            break;
+        case UI_PART_TYPE::SPRITECURTAIN:
+            strProtoTag = Client::CUI_SpriteAnimCurtain::PROTOTYPE_TAG;
+            break;
+        case UI_PART_TYPE::TEXTURECURTAIN:
+            strProtoTag = Client::CUI_CurtainTexture::PROTOTYPE_TAG;
+            break;
+
+        default:
+            break;
+    }
+
+    //if (eType == UI_PART_TYPE::IMAGE)
+    //    strProtoTag = Client::CUI_Image::PROTOTYPE_TAG;
+    //else if (eType == UI_PART_TYPE::SPRITEANIM)
+    //    strProtoTag = Client::CUI_SpriteAnim::PROTOTYPE_TAG;
+    //else if (eType == UI_PART_TYPE::TEXT)
+    //    strProtoTag = Client::CUI_Text::PROTOTYPE_TAG;
+    //else if (eType == UI_PART_TYPE::EFFECT)
+    //    strProtoTag = Client::CUI_Effect::PROTOTYPE_TAG;
+    //else if (eType == UI_PART_TYPE::GAUGEFILL)
+    //    strProtoTag = Client::CUI_GaugeFill::PROTOTYPE_TAG;
 
     // 파트 프로토 보장 (SpriteAnim은 컨테이너 로더가 안 올림)
     if (!m_pGameInstance_Proxy->Has_Prototype(iPartProtoLevel, strProtoTag))
@@ -514,7 +613,7 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
                 + WstrToStr(strProtoTag));
             return nullptr;
         }
-        pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
+        pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, iPartProtoLevel);
         if (FAILED(m_pGameInstance_Proxy->Add_Prototype(iPartProtoLevel, strProtoTag, pReg->CreatorFunc(m_pDevice, m_pContext))))
         {
             return nullptr;
@@ -623,7 +722,51 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
             iPartProtoLevel, strProtoTag, strPartTag, &desc);
         break;
     }
+    case UI_PART_TYPE::CURTAIN:
+    {
+        Client::CUI_Curtain::UI_CURTAIN_DESC desc{};
+        desc.iTextureLevel = iTextureLevel;
+        desc.szTextureProtoTag = { nullptr };
+        desc.vPosition = { 0.f, 0.f };
 
+        hr = pUIContainer->Add_Part(iPartProtoLevel, strProtoTag, strPartTag, &desc);
+        break;
+    }
+    case UI_PART_TYPE::ERASER:
+    {
+        Client::CUI_Eraser::UI_ERASER_DESC desc{};  
+        desc.iTextureLevel = iTextureLevel;
+        desc.szTextureProtoTag = { nullptr };
+        desc.vPosition = { 0.f, 0.f };
+
+        hr = pUIContainer->Add_Part(iPartProtoLevel, strProtoTag, strPartTag, &desc);
+        break;
+    }
+    case UI_PART_TYPE::SPRITECURTAIN:
+    {
+        Client::CUI_SpriteAnim::UI_SPRITEANIM_DESC desc{};
+        desc.iTextureLevel = iTextureLevel;
+        desc.szTextureProtoTag = { nullptr };
+        desc.vSize = { 100.f, 100.f };
+        desc.vPosition = { 0.f, 0.f };
+        desc.fDuration = 1.f;
+        desc.fEndDelay = 0.f;
+        desc.bLoop = true;
+        desc.bAutoPlay = true;
+
+        hr = pUIContainer->Add_Part(iPartProtoLevel, strProtoTag, strPartTag, &desc);
+        break;
+    }
+    case UI_PART_TYPE::TEXTURECURTAIN:
+    {
+        Client::CUI_CurtainTexture::UI_CURTAINTEXTURE_DESC desc{};
+        desc.iTextureLevel = iTextureLevel;
+        desc.szTextureProtoTag = { nullptr };
+        desc.vPosition = { 0.f, 0.f };
+
+        hr = pUIContainer->Add_Part(iPartProtoLevel, strProtoTag, strPartTag, &desc);
+        break;
+    }
 
     default:
         hr = E_FAIL;
@@ -839,7 +982,7 @@ HRESULT CLevel_Tool::Load_UIManifest(const _wstring& strManifestPath)
 
         if (!m_pGameInstance_Proxy->Has_Prototype(iContainerProtoLevel, strSpawnTag))
         {
-            pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
+            pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, iContainerProtoLevel);
             if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
                 iContainerProtoLevel,
                 strSpawnTag,
@@ -1005,7 +1148,7 @@ CGameObject* CLevel_Tool::Spawn_Object(const _wstring& strProtoTag, const _wstri
 
     if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, strProtoTag))
     {
-        pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);  
+        pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, iLevel);
             m_pGameInstance_Proxy->Add_Prototype(iLevel, strProtoTag,
                 pReg->CreatorFunc(m_pDevice, m_pContext));                        
     }
@@ -1085,12 +1228,21 @@ void CLevel_Tool::Set_PreviewVisible(_bool bVisible)
 {
     if (m_pPreview)
         m_pPreview->Set_Active(bVisible);
+
+    for (auto& pObj : m_SpawnedObjects)
+    {
+        pObj->Set_Active(bVisible);
+    }
 }
 
 CGameObject* CLevel_Tool::Load_Preview(const _wstring& strYshPath)
 {
     MODEL eType = Read_YshType(strYshPath);
-    if (eType == MODEL::END) { Log_Error("Invalid .ysh header."); return nullptr; }
+    if (eType == MODEL::END) 
+    { 
+        Log_Error("Invalid .ysh header.");
+        return nullptr; 
+    }
 
     Clear_Preview();    // 기존 1개 제거(단일 교체형)
 
@@ -1106,7 +1258,8 @@ CGameObject* CLevel_Tool::Load_Preview(const _wstring& strYshPath)
         if (FAILED(m_pGameInstance_Proxy->Add_Prototype(ETOUI(TOOL_LEVEL::STATIC), strModelTag,
             CModel::Create(m_pDevice, m_pContext, eType, sPath.c_str()))))
         {
-            Log_Error("Model prototype create failed."); return nullptr;
+            Log_Error("Model prototype create failed."); 
+            return nullptr;
         }
         m_ModelTags[strYshPath] = strModelTag;
     }
@@ -1204,6 +1357,8 @@ CLevel_Tool* CLevel_Tool::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 void CLevel_Tool::Free()
 {
+    Release_TestGround();
+
     __super::Free();
 
     m_UIContainers.clear();

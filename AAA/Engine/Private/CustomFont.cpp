@@ -56,6 +56,25 @@ HRESULT CCustomFont::Draw(const _tchar* pText, const _float2& vPosition, _fvecto
 	return S_OK;
 }
 
+HRESULT CCustomFont::Draw_Raw(const _tchar* pText, const _float2& vPixelPos, _fvector vColor, const _float2& vScale, TEXT_ALIGN eAlign)
+{
+	if (!m_pFont || !pText) return E_FAIL;
+
+	XMVECTOR size = m_pFont->MeasureString(pText);
+	_float fW = XMVectorGetX(size);
+
+	_float fOriginX = 0.f;                          // LEFT = ¿ÞÂÊ³¡
+	if (eAlign == TEXT_ALIGN::CENTER) fOriginX = fW * 0.5f;
+	else if (eAlign == TEXT_ALIGN::RIGHT) fOriginX = fW;
+
+	_float2 vOrigin = { fOriginX, 0.f };            // ¼¼·Îµµ top ±âÁØ (Áß¾ÓX)
+
+	m_pBatch->Begin();
+	m_pFont->DrawString(m_pBatch, pText, vPixelPos, vColor, 0.f, vOrigin, vScale);  // ÇÈ¼¿ÁÂÇ¥ Á÷»§
+	m_pBatch->End();
+	return S_OK;
+}
+
 _float2 CCustomFont::Measure(const _tchar* pText) const
 {
 	if (nullptr == m_pFont || nullptr == pText)

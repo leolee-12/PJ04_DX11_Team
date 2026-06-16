@@ -16,6 +16,7 @@ public:
 	HRESULT Initialize(const _tchar* pFontFilePath);
 	HRESULT Draw(const _tchar* pText, const _float2& vPosition,
 		_fvector vColor, _float fRotation, const _float2& vScale, TEXT_ALIGN eAlign = TEXT_ALIGN::CENTER);
+	HRESULT Draw_Raw(const _tchar* pText, const _float2& vPixelPos, _fvector vColor, const _float2& vScale, TEXT_ALIGN eAlign);
 
 	// Font 크기 접근 함수 
 	_float2 Measure(const _tchar* pText) const;

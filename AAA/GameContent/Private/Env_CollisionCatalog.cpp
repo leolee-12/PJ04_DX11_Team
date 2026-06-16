@@ -109,7 +109,7 @@ HRESULT CEnv_CollisionCatalog::Load(const _wstring& strCatalogPath)
 			continue;
 
 		ENV_COLLISION_CATALOG_RECORD Record{};
-		Record.strObjectName = StrToWstr(jItem["objectName"].get<string>());
+		Record.wstrObjectName = StrToWstr(jItem["objectName"].get<string>());
 
 		if (jItem.contains("apxbinName") && jItem["apxbinName"].is_string())
 			Record.strApxbinName = StrToWstr(jItem["apxbinName"].get<string>());
@@ -117,13 +117,13 @@ HRESULT CEnv_CollisionCatalog::Load(const _wstring& strCatalogPath)
 		if (jItem.contains("bfresPath") && jItem["bfresPath"].is_string())
 			Record.strBfresPath = StrToWstr(jItem["bfresPath"].get<string>());
 
-		Add_CandidateKey(Record.strObjectName, Record);
+		Add_CandidateKey(Record.wstrObjectName, Record);
 
 		// 일부 경로에서 ObjectName 끝의 L 제거명을 쓰는 경우에 대비한 보조 키.
-		if (Record.strObjectName.size() > 1 && Record.strObjectName.back() == L'L')
+		if (Record.wstrObjectName.size() > 1 && Record.wstrObjectName.back() == L'L')
 		{
 			const wstring strTrimmed =
-				Record.strObjectName.substr(0, Record.strObjectName.size() - 1);
+				Record.wstrObjectName.substr(0, Record.wstrObjectName.size() - 1);
 			Add_CandidateKey(strTrimmed, Record);
 		}
 	}
@@ -147,13 +147,13 @@ _bool CEnv_CollisionCatalog::Is_Loaded()
 }
 
 _bool CEnv_CollisionCatalog::Try_Find(
-	const _wstring& strObjectName,
+	const _wstring& wstrObjectName,
 	ENV_COLLISION_CATALOG_RECORD* pOutRecord)
 {
-	if (!Get_Loaded() || strObjectName.empty())
+	if (!Get_Loaded() || wstrObjectName.empty())
 		return false;
 
-	const _wstring strKey = NormalizeCatalogKey(strObjectName);
+	const _wstring strKey = NormalizeCatalogKey(wstrObjectName);
 
 	const auto Iter = Get_Records().find(strKey);
 	if (Iter == Get_Records().end())

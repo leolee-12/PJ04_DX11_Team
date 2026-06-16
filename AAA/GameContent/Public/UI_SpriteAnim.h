@@ -10,7 +10,7 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL CUI_SpriteAnim final : public CUIPartObject
+class CLIENT_DLL CUI_SpriteAnim : public CUIPartObject
 {
 	GENERATED_BODY(CUI_SpriteAnim)
 
@@ -24,6 +24,10 @@ class CLIENT_DLL CUI_SpriteAnim final : public CUIPartObject
 	PROPERTY(_float, m_fEndDelay, L"EndDelay", L"Anim");
 	PROPERTY(_bool, m_bLoop, L"Loop", L"Anim");
 	PROPERTY(_bool, m_bAutoPlay, L"AutoPlay", L"Anim");
+	PROPERTY(_float, m_fSpinSpeedDeg, L"SpinSpeedDeg", L"Anim");
+	PROPERTY(_bool, m_bSpinEase, L"SpinEase", L"Anim");			   // 사인 가속 사용 여부
+	PROPERTY(_float, m_fSpinEaseCycle, L"SpinEaseCycle", L"Anim"); // 느림→빠름→느림 한 주기(초)
+	PROPERTY(_float, m_fSpinEaseMin, L"SpinEaseMin", L"Anim");     // 최저 속도 배율(0~1)
 
 public:
 	typedef struct tagUISpriteAnimDesc : public CUIPartObject::UI_PARTOBJECT_DESC
@@ -37,6 +41,10 @@ public:
 		_float          fEndDelay = { 0.f };
 		_bool           bLoop = { true };
 		_bool           bAutoPlay = { true };
+		_float          fSpinSpeedDeg = { 0.f };
+		_bool           bSpinEase = { false };
+		_float          fSpinEaseCycle = { 1.f };
+		_float          fSpinEaseMin = { 0.f };
 	}UI_SPRITEANIM_DESC;
 
 	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_UI_SpriteAnim";
@@ -70,6 +78,7 @@ public: // UIContainerObject 제어 API
 	_int					Get_FrameCount() const { return m_iFrameCount; }
 	_bool					Is_Playing()     const { return m_bIsPlay; }
 	_bool					Is_Finished()    const { return m_bFinished; }
+	_bool					Is_Loop()		 const { return m_bLoop; }
 
 	// 에디터에서 데이터 제작 용도
 	HRESULT					Set_Texture(_int iLevel, const _wstring& strProtoTag);
@@ -77,7 +86,10 @@ public: // UIContainerObject 제어 API
 	void					Seek(_float fRatio);			// 0 ~ 1 위치로 Seek
 	_float					Get_Progress() const;			// 현재 진행도 0 ~ 1
 
-private:
+protected:
+	virtual _uint Render_Pass() const { return 1; }
+
+protected:
 	CShader*				m_pShaderCom = { nullptr };
 	CTexture*				m_pTextureCom = { nullptr };
 	CVIBuffer_Rect*			m_pVIBufferCom = { nullptr };
@@ -88,10 +100,17 @@ private:
 	_bool					m_bIsPlay = { false };
 	_bool					m_bFinished = { false };
 
-private:
+	_float                  m_fSpinAngle = { 0.f };   
+	_float                  m_fSpinPhase = { 0.f };
+	_bool                   m_bPrevPlay = { false };
+
+protected:
 	HRESULT					Ready_Components(UI_SPRITEANIM_DESC* pDesc);
 	HRESULT					Bind_ShaderResources();
 	void					Sync_FrameCount();
+
+	void                    Update_Spin(_float fTimeDelta);   // 회전 진행
+	void                    Apply_Spin();
 
 	virtual void			Deserialize_Internal(const json& j) override;
 

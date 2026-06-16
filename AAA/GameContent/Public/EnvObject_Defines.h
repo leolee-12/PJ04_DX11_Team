@@ -104,13 +104,15 @@ struct ENV_COLLISION_DESC
 	// Ãß°¡
 	_bool	bCatalogCollisionChecked = { false };
 	_bool	bHasDecorCollisionApxbin = { false };
+	_bool   bSourceInvalidCollision = { false };
+	_bool   bSourceHasDecorCollisionApxbin = { false };
 	wstring	strDecorCollisionApxbinName;
 	wstring	strDecorCollisionBfresPath;
 };
 
 struct ENV_RENDER_DESC
 {
-	_bool	bShadowMappingCaster = { true };
+	_bool	bShadowMappingCaster = { false };
 	_bool	bUseLodCulling = { false };
 	_bool	bUseNearDistAlpha = { false };
 	_float	fNearDistAlphaLengthRate = { 1.f };
@@ -152,13 +154,13 @@ struct ENV_OBJECT_DESC : public CGameObject::GAMEOBJECT_DESC
 	ENV_SOURCE_TYPE eSourceType = { ENV_SOURCE_TYPE::UNKNOWN };
 	ENV_INTERACT_TYPE eInteractType = { ENV_INTERACT_TYPE::NONE };
 
-	wstring strSourceFile;
-	wstring strSection;
-	wstring strEntryKey;
-	wstring strObjectName;
-	wstring strComponentName;
-	wstring strModelProtoTag;
-	wstring strModelPath;
+	_wstring wstrSourceFile;
+	_wstring wstrSection;
+	_wstring wstrEntryKey;
+	_wstring wstrObjectName;
+	_wstring wstrComponentName;
+	_wstring wstrModelProtoTag;
+	_wstring wstrModelPath;
 	_uint	iModelProtoLevel = {};
 
 	_uint	iUid = {};
@@ -182,6 +184,44 @@ struct ENV_OBJECT_DESC : public CGameObject::GAMEOBJECT_DESC
 	ENV_EFFECT_DESC tEffect;
 
 	json jRawProperties;
+};
+
+struct ENV_INSTANCE_DATA
+{
+	_float4x4 matWorld = {};
+};
+
+struct ENV_INSTANCE_KEY
+{
+	_uint iModelProtoLevel = { 0 };
+	_wstring wstrModelProtoTag = {};
+	RENDERID eRenderID = { RENDERID::NONBLEND };
+
+	_bool operator==(const ENV_INSTANCE_KEY& rhs) const
+	{
+		return iModelProtoLevel == rhs.iModelProtoLevel
+			&& wstrModelProtoTag == rhs.wstrModelProtoTag
+			&& eRenderID == rhs.eRenderID;
+	}
+};
+
+struct ENV_INSTANCE_KEY_HASH
+{
+	size_t operator()(const ENV_INSTANCE_KEY& key) const
+	{
+		size_t h0 = std::hash<_uint>{}(key.iModelProtoLevel);
+		size_t h1 = std::hash<_wstring>{}(key.wstrModelProtoTag);
+		size_t h2 = std::hash<_uint>{}(ETOUI(key.eRenderID));
+		return h0 ^ (h1 << 1) ^ (h2 << 2);
+	}
+};
+
+constexpr _uint INVALID_INDEX = static_cast<_uint>(-1);
+
+struct ENV_INSTANCE_BATCH_HANDLE
+{
+	_uint iMainBatchIndex = INVALID_INDEX;
+	_uint iShadowBatchIndex = INVALID_INDEX;
 };
 
 NS_END

@@ -145,7 +145,8 @@ void CMovement::Sync_To_Controller()
     if (nullptr == m_pTransform || nullptr == m_pController)
         return;
 
-    _float3 p; XMStoreFloat3(&p, m_pTransform->Get_State(STATE::POSITION));
+    _float3 p;
+    XMStoreFloat3(&p, m_pTransform->Get_State(STATE::POSITION));
     m_pController->setFootPosition(physx::PxExtendedVec3(p.x, p.y, p.z));
 
     m_fVerticalVelocity = 0.f;

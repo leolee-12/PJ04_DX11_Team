@@ -10,7 +10,10 @@ _float CTimer_Manager::Get_TimeDelta(const _wstring& strTimerTag)
 {
 	CTimer* pTimer = Find_Timer(strTimerTag);
 	if (!pTimer) return 0.f;
-	return pTimer->Get_TimeDelta() * m_fTimeScale;
+
+	_float fDelta = pTimer->Get_TimeDelta();
+	fDelta = min(fDelta, m_fMaxTimeDelta);
+	return fDelta * m_fTimeScale;
 }
 
 _float CTimer_Manager::Get_RawTimeDelta(const _wstring& strTimerTag)
@@ -21,8 +24,6 @@ _float CTimer_Manager::Get_RawTimeDelta(const _wstring& strTimerTag)
 
 	return pTimer->Get_TimeDelta();
 }
-
-
 
 HRESULT CTimer_Manager::Add_Timer(const _wstring& strTimerTag)
 {

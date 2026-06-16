@@ -1,15 +1,16 @@
 #include "Level_Loading.h"
 #include "Loader.h"
+#include "Launcher_LevelProfiles.h"
 
 #include "GameInstance.h"
 #include "GameInstance_Proxy.h"
 #include "GameObject_Factory.h"
 #include "GameObject.h"
-#include "Level_Logo.h"
-#include "Level_GamePlay.h"
 #include "DataLoader.h"
 #include "Loader_Prototype.h"
-#include "Level_Lobby.h"
+
+#include "Level_GamePlay.h"
+#include "Level_Test.h"
 
 CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel{ pDevice, pContext }
@@ -21,11 +22,10 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
-    m_eNextLevelID = eNextLevelID;
+    if (FAILED(Load_LoadingLevel()))
+        return E_FAIL;
 
-    /*if (FAILED(Load_Level(m_pGameInstance_Proxy, m_pDevice, m_pContext, 
-        L"../../Resources/LevelData/Loading.JSON", ETOUI(LEVEL::LOADING))))
-        return E_FAIL;*/
+    m_eNextLevelID = eNextLevelID;
 
     m_pLoader = CLoader::Create(m_pDevice, m_pContext, eNextLevelID);
     if (nullptr == m_pLoader)
@@ -40,7 +40,6 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
 void CLevel_Loading::Update(_float fTimeDelta)
 {
     _float fRatio = m_pLoader->Get_Progress();
-    m_pGameInstance_Proxy->Publish(TEXT("Loading_Progress"), &fRatio);
 
     if (true == m_pLoader->isFinished())
     {
@@ -48,14 +47,11 @@ void CLevel_Loading::Update(_float fTimeDelta)
 
         switch (m_eNextLevelID)
         {
-        case LEVEL::LOGO:
-            pNextLevel = CLevel_Logo::Create(m_pDevice, m_pContext);
-            break;
-        case LEVEL::LOBBY:
-            pNextLevel = CLevel_Lobby::Create(m_pDevice, m_pContext);
-            break;
         case LEVEL::GAMEPLAY:
             pNextLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
+            break;
+        case LEVEL::TEST:
+            pNextLevel = CLevel_Test::Create(m_pDevice, m_pContext);
             break;
         }
 
@@ -80,37 +76,21 @@ HRESULT CLevel_Loading::Render()
 
 HRESULT CLevel_Loading::Load_LoadingLevel()
 {
-    string strContent = {};
-    if (FAILED(CDataLoader::Read_Json(L"../../Resources/LevelData/Loading.JSON", &strContent)))
+    LEVEL_MANIFEST Manifest{};
+    if (FAILED(Load_LevelManifest(LAUNCHER_LEVEL_PROFILES::LEVEL_LOADING, &Manifest)))
         return E_FAIL;
 
-    json jLevel = json::parse(strContent);
+    LEVEL eLevel = LEVEL::LOADING;
 
-    for (auto& jObj : jLevel["Objects"])
+    if (!Manifest.strUIFile.empty())
     {
-        wstring wProto = StrToWstr(jObj["Prototype_Tag"].get<string>());
-        wstring wLayer = StrToWstr(jObj["Layer_Tag"].get<string>());
+        wstring strUIFile = Manifest.strUIFile;
+        if (FAILED(Ready_Level_UIResources(m_pGameInstance_Proxy, m_pDevice, m_pContext, strUIFile.c_str(), ETOUI(eLevel))))
+            return E_FAIL;
 
-        auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(wProto);
-        if (!pReg) continue;
-
-        if (!m_pGameInstance_Proxy->Has_Prototype(ETOUI(LEVEL::LOADING), wProto))
-        {
-            pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
-            m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::LOADING), wProto.c_str(),
-                pReg->CreatorFunc(m_pDevice, m_pContext));
-        }
-
-        wstring wObjectName = StrToWstr(jObj["Object_Tag"].get<string>());
-
-        CGameObject* pObj = nullptr;
-        m_pGameInstance_Proxy->Add_GameObject_Return(
-            &pObj,
-            ETOUI(LEVEL::LOADING), wProto.c_str(),
-            ETOUI(LEVEL::LOADING), wLayer.c_str(), wObjectName, nullptr);
-
-        if (pObj)
-            pObj->Deserialize(jObj);
+        if (FAILED(Load_Level_UI(m_pGameInstance_Proxy, m_pDevice, m_pContext,
+            Manifest.strUIFile.c_str(), ETOUI(eLevel))))
+            return E_FAIL;
     }
     return S_OK;
 }

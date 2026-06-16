@@ -49,7 +49,6 @@ public:
 		pOut->strPrototypeTag = PROTOTYPE_TAG;
 	}
 
-
 public:
 	// 실제 텍스트 크기(MeasureString x FontScale)  -> 에디터 선택 박스용 
 	_float2							Get_TextSize() const;
@@ -60,11 +59,29 @@ public:
 	}
 
 	_int							Get_Align() const { return m_iAlign; }
-	void							Set_Align(_int i) { m_iAlign = i; }
+	void							Set_Align(_int i) { m_iAlign = i; m_bTextDirty = true; }
 	const _wstring&					Get_FontTag() const { return m_strFontTag; }
-	void							Set_FontTag(const _wstring& strTag) { m_strFontTag = strTag; }
+	void							Set_FontTag(const _wstring& strTag) { m_strFontTag = strTag; m_bTextDirty = true; }
 
-	void							Set_Text(const _wstring& strText) { m_strText = strText; }
+	void							Set_Text(const _wstring& strText) { m_strText = strText; m_bTextDirty = true; }
+
+	void							Mark_TextDirty() { m_bTextDirty = true; }
+
+private:
+	CShader* m_pShaderCom = { nullptr };
+	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
+
+	ID3D11Texture2D* m_pTextTex = { nullptr };
+	ID3D11RenderTargetView* m_pTextRTV = { nullptr };
+	ID3D11ShaderResourceView* m_pTextSRV = { nullptr };
+	_uint  m_iTexW = { 0 };
+	_uint  m_iTexH = { 0 };
+	_bool  m_bTextDirty = { true };
+
+private:
+	HRESULT Ready_Components();
+	HRESULT Ensure_RT(_uint iW, _uint iH);
+	void    Bake_Text();
 
 public:
 	static CUI_Text*				Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
