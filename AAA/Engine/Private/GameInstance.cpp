@@ -639,6 +639,11 @@ HRESULT CGameInstance::Bind_TextureFromHub(CShader* pShader, const _char* pConst
     return m_pTexture_Hub->Bind_ShaderResource(pShader, pConstantName, Handle);
 }
 
+HRESULT CGameInstance::Bind_DefaultTextureFromHub(CShader* pShader, const _char* pConstantName, DEFAULT_TEXTURE eKind)
+{
+    return m_pTexture_Hub->Bind_DefaultShaderResource(pShader, pConstantName, eKind);
+}
+
 TEXTURE_HUB_STATS CGameInstance::Get_TextureHubStats() const
 {
     if (nullptr == m_pTexture_Hub)

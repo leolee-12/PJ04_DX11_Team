@@ -22,6 +22,9 @@ public:
 	virtual HRESULT Render_Shadow() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
+public: // Editor preview
+	void    Set_EditorForceMainPassNonInstanced(_bool bEnable) { m_bEditorForceMainPassNonInstanced = bEnable; }
+
 public:	// Instance
 	void	Set_InstanceController(CEnv_InstanceController* pCtrl);
 	_bool	Can_RenderInstance() const;
@@ -29,6 +32,8 @@ public:	// Instance
 private:
 	CEnv_InstanceController* m_pInstanceController = { nullptr };
 	ENV_INSTANCE_BATCH_HANDLE m_InstanceBatchHandle = {};
+
+	_bool m_bEditorForceMainPassNonInstanced = { false };
 
 private:
 	void Submit_RenderGroups();

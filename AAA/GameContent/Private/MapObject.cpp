@@ -1,8 +1,7 @@
 #include "MapObject.h"
+#include "Shader_PassMeta.h"
+
 #include "GameInstance.h"
-#include "GameContent_const.h"
-#include "Shader.h"
-#include "Model.h"
 
 CMapObject::CMapObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }

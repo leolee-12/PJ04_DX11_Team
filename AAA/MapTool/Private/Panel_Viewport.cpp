@@ -22,6 +22,49 @@ namespace
         default:                        return ImGuizmo::TRANSLATE;
         }
     }
+
+    _bool Compute_ViewportPickingRay(
+        Engine::CGameInstance_Proxy* pProxy,
+        _float fNdcX,
+        _float fNdcY,
+        _vector* pOutOrigin,
+        _vector* pOutDir,
+        PROJ_TYPE eProjType = PROJ_TYPE::PERSPEC)
+    {
+        if (nullptr == pProxy || nullptr == pOutOrigin || nullptr == pOutDir)
+            return false;
+
+        const _float4x4* pView = pProxy->Get_Matrix(D3DTS::VIEW, eProjType);
+        const _float4x4* pProj = pProxy->Get_Matrix(D3DTS::PROJ, eProjType);
+        if (nullptr == pView || nullptr == pProj)
+            return false;
+
+        const _matrix matInvViewProj =
+            XMMatrixInverse(nullptr, XMLoadFloat4x4(pView) * XMLoadFloat4x4(pProj));
+
+        _vector vNear = XMVector4Transform(
+            XMVectorSet(fNdcX, fNdcY, 0.f, 1.f),
+            matInvViewProj);
+        _vector vFar = XMVector4Transform(
+            XMVectorSet(fNdcX, fNdcY, 1.f, 1.f),
+            matInvViewProj);
+
+        const _float fNearW = XMVectorGetW(vNear);
+        const _float fFarW = XMVectorGetW(vFar);
+
+        if ((fNearW > -1e-6f && fNearW < 1e-6f)
+            || (fFarW > -1e-6f && fFarW < 1e-6f))
+        {
+            return false;
+        }
+
+        vNear = XMVectorScale(vNear, 1.f / fNearW);
+        vFar = XMVectorScale(vFar, 1.f / fFarW);
+
+        *pOutOrigin = XMVectorSetW(vNear, 1.f);
+        *pOutDir = XMVector3Normalize(XMVectorSubtract(vFar, vNear));
+        return true;
+    }
 }
 
 CPanel_Viewport::CPanel_Viewport(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -118,8 +161,20 @@ void CPanel_Viewport::Render()
         _float ndcX = ((mouse.x - vPos.x) / vSize.x) * 2.f - 1.f;
         _float ndcY = 1.f - ((mouse.y - vPos.y) / vSize.y) * 2.f;
 
-        XMVECTOR origin, dir;
-        m_pGI_Proxy->Compute_PickingRay(ndcX, ndcY, &origin, &dir);
+        XMVECTOR origin = XMVectorZero();
+        XMVECTOR dir = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+
+        if (!Compute_ViewportPickingRay(
+            m_pGI_Proxy,
+            ndcX,
+            ndcY,
+            &origin,
+            &dir,
+            PROJ_TYPE::PERSPEC))
+        {
+            // 예외 시 기존 공용 경로 fallback
+            m_pGI_Proxy->Compute_PickingRay(ndcX, ndcY, &origin, &dir);
+        }
 
         // 좌클릭: 배치 모드면 기존 배치, 일반 모드면 EnvObject 선택
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGuizmo::IsUsing())

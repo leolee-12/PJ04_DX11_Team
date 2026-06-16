@@ -11,7 +11,7 @@
 #include "Map_Loader.h"
 #include "MapStage.h"
 #include "MapSection.h"
-#include "EnvObject.h"
+#include "EnvObject_Static.h"
 
 #ifdef _DEBUG
 #include "MapToolProfiler.h"
@@ -913,7 +913,14 @@ void CLevel_Edit::Set_Selected(CGameObject* pSelected)
 	if (m_pSelected == pSelected)
 		return;
 
+	if (auto* pPrevStatic = dynamic_cast<Client::CEnvObject_Static*>(m_pSelected))
+		pPrevStatic->Set_EditorForceMainPassNonInstanced(false);
+
 	m_pSelected = pSelected;
+
+	if (auto* pNewStatic = dynamic_cast<Client::CEnvObject_Static*>(m_pSelected))
+		pNewStatic->Set_EditorForceMainPassNonInstanced(true);
+
 	++m_iSelectionRevision;
 }
 

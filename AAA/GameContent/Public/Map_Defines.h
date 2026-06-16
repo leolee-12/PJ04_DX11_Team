@@ -37,6 +37,7 @@ struct MAP_SECTION_DESC : public CGameObject::GAMEOBJECT_DESC
 	_bool				bEnableCulling = { true };
 	_bool				bRenderable = { true };
 	_bool				bCreateCollisionActor = { true };
+	_bool				bSourceCreateCollisionActor = { true };
 };
 
 struct MAP_STAGE_DESC : public CGameObject::GAMEOBJECT_DESC
