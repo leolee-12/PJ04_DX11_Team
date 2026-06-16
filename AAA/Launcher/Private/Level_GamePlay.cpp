@@ -18,6 +18,8 @@ HRESULT CLevel_GamePlay::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
+    _uint iLevel = ETOUI(LEVEL::GAMEPLAY);
+
     LEVEL_MANIFEST Manifest{};
     if (FAILED(Load_LevelManifest(LAUNCHER_LEVEL_PROFILES::LEVEL_TEST, &Manifest)))
         return E_FAIL;
@@ -28,7 +30,7 @@ HRESULT CLevel_GamePlay::Initialize()
     if (FAILED(CMap_Loader::Spawn_Map(
         Manifest.strMapManifest,
         Manifest.strObjectsFile,
-        ETOUI(LEVEL::GAMEPLAY),
+        iLevel,
         &MapReport,
         &pMapStage)))
     {
@@ -36,13 +38,13 @@ HRESULT CLevel_GamePlay::Initialize()
     }
 
     if (FAILED(Load_Level(m_pGameInstance_Proxy, m_pDevice, m_pContext,
-        Manifest.strObjectsFile.c_str(), ETOUI(LEVEL::GAMEPLAY))))
+        Manifest.strObjectsFile.c_str(), iLevel)))
         return E_FAIL;
 
     if (!Manifest.strUIFile.empty())
     {
         if (FAILED(Load_Level_UI(m_pGameInstance_Proxy, m_pDevice, m_pContext,
-            Manifest.strUIFile.c_str(), ETOUI(LEVEL::GAMEPLAY))))
+            Manifest.strUIFile.c_str(), iLevel)))
             return E_FAIL;
     }
 
@@ -63,7 +65,7 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
     
     if (m_bTestLevelChange)
     {
-        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY);
+        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::TEST);
         if (pLoadingLevel)
         {
             m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);

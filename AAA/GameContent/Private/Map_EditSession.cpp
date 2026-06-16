@@ -4,18 +4,6 @@
 
 #include <algorithm>
 
-namespace
-{
-	_bool Has_AnyMapEnvEdit(const MAP_ENV_EDITED_DESC& Edit)
-	{
-		return Edit.bHasRenderable
-			|| Edit.bHasEnableCulling
-			|| Edit.bHasCastShadow
-			|| Edit.bHasWorldMatrix
-			|| Edit.bDisableCollisionMesh;
-	}
-}
-
 NS_BEGIN(Client)
 
 CMap_EditSession::CMap_EditSession()

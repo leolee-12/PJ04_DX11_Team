@@ -32,6 +32,7 @@
     <ClInclude Include="..\Public\Env_CollisionCatalog.h" />
     <ClInclude Include="..\Public\Env_InstanceBatch.h" />
     <ClInclude Include="..\Public\Env_InstanceController.h" />
+    <ClInclude Include="..\Public\Shader_PassMeta.h" />
     <ClInclude Include="..\Public\GameContent_AnimEvents.h" />
     <ClInclude Include="..\Public\GameContent_const.h" />
     <ClInclude Include="..\Public\GameContent_Defines.h" />
@@ -44,6 +45,10 @@
     <ClInclude Include="..\Public\EnvObject_Static.h" />
     <ClInclude Include="..\Public\GameContrnt_Events.h" />
     <ClInclude Include="..\Public\GameObject_Factory.h" />
+    <ClInclude Include="..\public\GigantEdge.h" />
+    <ClInclude Include="..\public\GigantEdge_Body.h" />
+    <ClInclude Include="..\public\GigantEdge_Shield.h" />
+    <ClInclude Include="..\public\GigantEdge_Sword.h" />
     <ClInclude Include="..\Public\Kirby_AbilityDump.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Sword.h" />
     <ClInclude Include="..\Public\Kirby_ControllableState.h" />
@@ -56,6 +61,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Public\LevelDesignObject.h" />
+    <ClInclude Include="..\Public\LevelDesign_Breakable.h" />
+    <ClInclude Include="..\Public\LevelDesign_Defines.h" />
+    <ClInclude Include="..\Public\LevelDesign_LoadTypes.h" />
+    <ClInclude Include="..\Public\LevelDesign_Unsupported.h" />
     <ClInclude Include="..\Public\Map_EditFile.h" />
     <ClInclude Include="..\Public\Map_EditSession.h" />
     <ClInclude Include="..\Public\Map_PresetCatalog.h" />
@@ -165,6 +175,10 @@
     <ClCompile Include="..\Private\Env_InstanceController.cpp" />
     <ClCompile Include="..\Private\GameContent_Log.cpp" />
     <ClCompile Include="..\Private\GameObject_Factory.cpp" />
+    <ClCompile Include="..\private\GigantEdge.cpp" />
+    <ClCompile Include="..\private\GigantEdge_Body.cpp" />
+    <ClCompile Include="..\private\GigantEdge_Shield.cpp" />
+    <ClCompile Include="..\private\GigantEdge_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
@@ -176,6 +190,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Private\LevelDesignObject.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_Breakable.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_Unsupported.cpp" />
     <ClCompile Include="..\Private\Map_EditFile.cpp" />
     <ClCompile Include="..\Private\Map_EditSession.cpp" />
     <ClCompile Include="..\Private\Map_PresetCatalog.cpp" />

@@ -141,6 +141,8 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 {
     ++m_iFrameIndex;
 
+    m_pLevel_Manager->Apply_ReservedLevel();
+
 	m_pInput_Device->Update();
 
     m_pObject_Manager->Priority_Update(fTimeDelta);
@@ -212,7 +214,7 @@ _int CGameInstance::RandomInt(_int iMin, _int iMax) const
 	uniform_int_distribution<_int> dist(iMin, iMax);
     return dist(m_RandomGenerator);
 }
-_int64 CGameInstance::Get_FrameIndex()
+_uint64 CGameInstance::Get_FrameIndex()
 {
     return m_iFrameIndex;
 }
@@ -635,6 +637,11 @@ HRESULT CGameInstance::Bind_TextureFromHub(CShader* pShader, const _char* pConst
         return E_FAIL;
 
     return m_pTexture_Hub->Bind_ShaderResource(pShader, pConstantName, Handle);
+}
+
+HRESULT CGameInstance::Bind_DefaultTextureFromHub(CShader* pShader, const _char* pConstantName, DEFAULT_TEXTURE eKind)
+{
+    return m_pTexture_Hub->Bind_DefaultShaderResource(pShader, pConstantName, eKind);
 }
 
 TEXTURE_HUB_STATS CGameInstance::Get_TextureHubStats() const

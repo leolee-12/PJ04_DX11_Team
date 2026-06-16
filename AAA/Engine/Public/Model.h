@@ -49,6 +49,7 @@ public:
 
 public:
 	_bool Pick_Mesh(_uint iMeshIndex, _fvector vOrigin, _fvector vDir, _fmatrix WorldMatrix, _float3* pOutHit, float* pOutDist = nullptr);
+	_bool Pick_Mesh_Ex(_uint iMeshIndex, _fvector vOrigin, _fvector vDir, _fmatrix WorldMatrix, _float3* pOutHit, float* pOutDist = nullptr, _float fAabbPadding = 0.f);
 	physx::PxTriangleMesh* Get_CollisionMesh() const { return m_pCollisionMesh; }
 
 public:

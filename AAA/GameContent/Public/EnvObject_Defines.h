@@ -104,6 +104,8 @@ struct ENV_COLLISION_DESC
 	// Ãß°¡
 	_bool	bCatalogCollisionChecked = { false };
 	_bool	bHasDecorCollisionApxbin = { false };
+	_bool   bSourceInvalidCollision = { false };
+	_bool   bSourceHasDecorCollisionApxbin = { false };
 	wstring	strDecorCollisionApxbinName;
 	wstring	strDecorCollisionBfresPath;
 };

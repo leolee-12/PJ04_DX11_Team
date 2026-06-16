@@ -117,7 +117,7 @@ HRESULT CKirby_Sword::Ready_Components()
         return E_FAIL;
 
     /* For.Com_Model */
-    m_pModelCom = Add_Component<CModel>(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Sword"), TEXT("Com_Model"));
+    m_pModelCom = Add_Component<CModel>(m_iPrototypeLevel, TEXT("Prototype_Component_Model_Sword"), TEXT("Com_Model"));
     if (m_pModelCom == nullptr)
         return E_FAIL;
 

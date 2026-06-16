@@ -924,6 +924,14 @@ HRESULT CGameInstance_Proxy::Bind_TextureFromHub(CShader* pShader, const _char* 
 	return m_pOwner->Bind_TextureFromHub(pShader, pConstantName, Handle);
 }
 
+HRESULT CGameInstance_Proxy::Bind_DefaultTextureFromHub(CShader* pShader, const _char* pConstantName, DEFAULT_TEXTURE eKind)
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->Bind_DefaultTextureFromHub(pShader, pConstantName, eKind);
+}
+
 TEXTURE_HUB_STATS CGameInstance_Proxy::Get_TextureHubStats() const
 {
 	if (!IsConnected())

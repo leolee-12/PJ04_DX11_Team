@@ -408,7 +408,7 @@ CGameObject* CLevel_Tool::Load_UIContainerByPath(const _wstring& strFullPath, _f
         if (!m_pGameInstance_Proxy->Has_Prototype(iContainerProtoLevel, strSpawnTag))
         {
             pReg->ResourceLoader(
-                m_pGameInstance_Proxy, m_pDevice, m_pContext);
+                m_pGameInstance_Proxy, m_pDevice, m_pContext, iContainerProtoLevel);
             m_pGameInstance_Proxy->Add_Prototype(iContainerProtoLevel, strSpawnTag,
                 pReg->CreatorFunc(m_pDevice, m_pContext));
         }
@@ -517,7 +517,7 @@ CGameObject* CLevel_Tool::Add_UIContainer()
 
     if (!m_pGameInstance_Proxy->Has_Prototype(iContainerProtoLevel, strTag))
     {
-        pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
+        pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, iContainerProtoLevel);
         if (FAILED(m_pGameInstance_Proxy->Add_Prototype(iContainerProtoLevel, strTag,
             pReg->CreatorFunc(m_pDevice, m_pContext))))
             return nullptr;
@@ -611,7 +611,7 @@ CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eTy
                 + WstrToStr(strProtoTag));
             return nullptr;
         }
-        pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
+        pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, iPartProtoLevel);
         if (FAILED(m_pGameInstance_Proxy->Add_Prototype(iPartProtoLevel, strProtoTag, pReg->CreatorFunc(m_pDevice, m_pContext))))
         {
             return nullptr;
@@ -980,7 +980,7 @@ HRESULT CLevel_Tool::Load_UIManifest(const _wstring& strManifestPath)
 
         if (!m_pGameInstance_Proxy->Has_Prototype(iContainerProtoLevel, strSpawnTag))
         {
-            pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
+            pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, iContainerProtoLevel);
             if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
                 iContainerProtoLevel,
                 strSpawnTag,
@@ -1146,7 +1146,7 @@ CGameObject* CLevel_Tool::Spawn_Object(const _wstring& strProtoTag, const _wstri
 
     if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, strProtoTag))
     {
-        pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);  
+        pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, iLevel);
             m_pGameInstance_Proxy->Add_Prototype(iLevel, strProtoTag,
                 pReg->CreatorFunc(m_pDevice, m_pContext));                        
     }

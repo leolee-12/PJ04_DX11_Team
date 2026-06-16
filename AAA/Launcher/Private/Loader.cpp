@@ -124,6 +124,9 @@ HRESULT CLoader::Ready_WorkQueue()
     case Client::LEVEL::GAMEPLAY:
         Ready_Resources_For_GamePlay();
         break;
+    case Client::LEVEL::TEST:
+        Ready_Resources_For_Test();
+        break;
     case Client::LEVEL::END:
         break;
     default:
@@ -167,7 +170,66 @@ HRESULT CLoader::Ready_Resources_For_GamePlay()
                 auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(wProto);
                 if (!pReg) return E_FAIL;
 
-                pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
+                pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, ETOUI(eLevel));
+                m_pGameInstance_Proxy->Add_Prototype(ETOUI(eLevel), wProto.c_str(),
+                    pReg->CreatorFunc(m_pDevice, m_pContext));
+                return S_OK;
+            });
+    }
+
+    if (!Manifest.strUIFile.empty())
+    {
+        wstring strUIFile = Manifest.strUIFile;
+        Add_Work([this, strUIFile, eLevel]() -> HRESULT
+            {
+                return Ready_Level_UIResources(
+                    m_pGameInstance_Proxy,
+                    m_pDevice,
+                    m_pContext,
+                    strUIFile.c_str(),
+                    ETOUI(eLevel));
+            });
+    }
+
+    return S_OK;
+}
+
+HRESULT CLoader::Ready_Resources_For_Test()
+{
+    LEVEL_MANIFEST Manifest{};
+    if (FAILED(Load_LevelManifest(LAUNCHER_LEVEL_PROFILES::LEVEL_TEST, &Manifest)))
+        return E_FAIL;
+
+    LEVEL eLevel = LEVEL::TEST;
+
+    Add_Work([this, Manifest, eLevel]() -> HRESULT
+        {
+            return CMap_Loader::Preload_Map(
+                m_pDevice,
+                m_pContext,
+                Manifest.strMapManifest,
+                Manifest.strObjectsFile,
+                ETOUI(eLevel));
+        });
+
+    string strContent;
+    CDataLoader::Read_Json(Manifest.strObjectsFile.c_str(), &strContent);
+    json jLevel = json::parse(strContent);
+
+    set<wstring> visited;
+    for (auto& jObj : jLevel["Objects"])
+    {
+        wstring wProto = StrToWstr(jObj["Prototype_Tag"].get<string>());
+        if (!visited.insert(wProto).second) continue;
+
+        if (m_pGameInstance_Proxy->Has_Prototype(ETOUI(eLevel), wProto)) continue;
+
+        Add_Work([this, wProto, eLevel]() -> HRESULT
+            {
+                auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(wProto);
+                if (!pReg) return E_FAIL;
+
+                pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, ETOUI(eLevel));
                 m_pGameInstance_Proxy->Add_Prototype(ETOUI(eLevel), wProto.c_str(),
                     pReg->CreatorFunc(m_pDevice, m_pContext));
                 return S_OK;

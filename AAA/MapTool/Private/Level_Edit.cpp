@@ -11,7 +11,7 @@
 #include "Map_Loader.h"
 #include "MapStage.h"
 #include "MapSection.h"
-#include "EnvObject.h"
+#include "EnvObject_Static.h"
 
 #ifdef _DEBUG
 #include "MapToolProfiler.h"
@@ -202,7 +202,7 @@ CGameObject* CLevel_Edit::Spawn_Object(const wstring& strProtoTag, const wstring
 
 	if (!m_pGameInstance_Proxy->Has_Prototype(ETOUI(TOOL_LEVEL::EDIT), strProtoTag))
 	{
-		pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
+		pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, ETOUI(TOOL_LEVEL::EDIT));
 
 		m_pGameInstance_Proxy->Add_Prototype(ETOUI(TOOL_LEVEL::EDIT), strProtoTag.c_str(),
 			pReg->CreatorFunc(m_pDevice, m_pContext));
@@ -913,7 +913,14 @@ void CLevel_Edit::Set_Selected(CGameObject* pSelected)
 	if (m_pSelected == pSelected)
 		return;
 
+	if (auto* pPrevStatic = dynamic_cast<Client::CEnvObject_Static*>(m_pSelected))
+		pPrevStatic->Set_EditorForceMainPassNonInstanced(false);
+
 	m_pSelected = pSelected;
+
+	if (auto* pNewStatic = dynamic_cast<Client::CEnvObject_Static*>(m_pSelected))
+		pNewStatic->Set_EditorForceMainPassNonInstanced(true);
+
 	++m_iSelectionRevision;
 }
 

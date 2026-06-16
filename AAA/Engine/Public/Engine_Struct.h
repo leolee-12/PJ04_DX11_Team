@@ -82,10 +82,14 @@ namespace Engine
 
 	struct MESH_LAYER_IDX
 	{
-		int           iPass = -1;                   // -1 = renderer default
-		unsigned int  iUVIndex = 0;                 // TEXCOORD0 ~ TEXCOORD3
-		unsigned int  iFlags = 0;                   // shader-specific option bits
-		unsigned int  idx[MTEX_TYPE_MAX] = { 0 };   // MTEX_TYPE º° slotArrayIndex
+		int				iPass = { -1 };                   // -1 = renderer default
+		unsigned int	iUVIndex = { 0 };                 // TEXCOORD0 ~ TEXCOORD3
+		unsigned int	iFlags = { 0 };                   // shader-specific option bits
+		unsigned int	idx[MTEX_TYPE_MAX] = { 0 };   // MTEX_TYPE º° slotArrayIndex
+
+		bool			bUseUVTransform = { false };
+		XMFLOAT2		vUVScale = { 1.f, 1.f };
+		XMFLOAT2		vUVOffset = { 0.f, 0.f };
 	};
 
 	struct TEXTURE_HUB_STATS

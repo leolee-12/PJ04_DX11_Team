@@ -16,11 +16,12 @@ public:
 	static _wstring Normalize_TextureName(const _wstring& strRaw);
 
 	HRESULT LoadOrGet(const _tchar* pTexturePath, TEXTURE_HANDLE* pOut);
-	HRESULT	Get(const _tchar* pTextureKey, TEXTURE_HANDLE* pOut);
+	HRESULT	Get(const _tchar* pTextureKey, TEXTURE_HANDLE* pOut) const;
 	HRESULT Register_TextureName(TEXTURE_HANDLE Handle, const _tchar* pTextureName);
 	HRESULT Bind_ShaderResource(CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle) const;
-	_bool Is_Valid(TEXTURE_HANDLE Handle) const;
-	_bool Is_CompatibleDevice(ID3D11Device* pDevice) const;
+	HRESULT Bind_DefaultShaderResource(CShader* pShader, const _char* pConstantName, DEFAULT_TEXTURE eKind) const;
+	_bool	Is_Valid(TEXTURE_HANDLE Handle) const;
+	_bool	Is_CompatibleDevice(ID3D11Device* pDevice) const;
 	TEXTURE_HUB_STATS Get_Stats() const;
 
 private:

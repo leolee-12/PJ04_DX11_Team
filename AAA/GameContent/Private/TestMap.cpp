@@ -90,7 +90,7 @@ HRESULT CTestMap::Ready_Components()
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
-	m_pModelCom = Add_Component<CModel>(ETOUI(LEVEL::GAMEPLAY), m_wstrModelTag, TEXT("Com_Model"));
+	m_pModelCom = Add_Component<CModel>(m_iPrototypeLevel, m_wstrModelTag, TEXT("Com_Model"));
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
 

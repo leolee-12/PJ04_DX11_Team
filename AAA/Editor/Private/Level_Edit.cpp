@@ -67,7 +67,7 @@ CGameObject* CLevel_Edit::Spawn_Object(const wstring& strProtoTag, const wstring
 
     if (!m_pGameInstance_Proxy->Has_Prototype(ETOUI(EDIT_LEVEL::EDIT), strProtoTag))
     {
-        pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext);
+        pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, ETOUI(EDIT_LEVEL::EDIT));
 
         m_pGameInstance_Proxy->Add_Prototype(ETOUI(EDIT_LEVEL::EDIT), strProtoTag.c_str(),
             pReg->CreatorFunc(m_pDevice, m_pContext));

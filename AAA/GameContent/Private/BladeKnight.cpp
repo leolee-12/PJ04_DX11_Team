@@ -142,7 +142,7 @@ HRESULT CBladeKnight::Ready_PartObjects()
     CBladeKnight_Body::BLADEKNIGHT_BODY_DESC BodyDesc{};
     BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 
-    if (FAILED(Add_PartObject(ETOUI(LEVEL::GAMEPLAY), CBladeKnight_Body::PROTOTYPE_TAG, TEXT("Body"), &BodyDesc)))
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CBladeKnight_Body::PROTOTYPE_TAG, TEXT("Body"), &BodyDesc)))
         return E_FAIL;
 
     m_pBody = dynamic_cast<CBladeKnight_Body*>(m_PartObjects[TEXT("Body")]);
@@ -157,7 +157,7 @@ HRESULT CBladeKnight::Ready_PartObjects()
     if (nullptr == SwordDesc.pSocketBoneMatrix)
         return E_FAIL;
 
-    if (FAILED(Add_PartObject(ETOUI(LEVEL::GAMEPLAY), CBladeKnight_Sword::PROTOTYPE_TAG, CBladeKnight_Sword::PART_TAG, &SwordDesc)))
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CBladeKnight_Sword::PROTOTYPE_TAG, CBladeKnight_Sword::PART_TAG, &SwordDesc)))
         return E_FAIL;
 
     m_pSword = dynamic_cast<CBladeKnight_Sword*>(m_PartObjects[CBladeKnight_Sword::PART_TAG]);

@@ -24,45 +24,6 @@ typedef struct tagTexDesc
 	_uint  iNumTex;
 } TEXTURE_DESC;
 
-namespace ShaderPass
-{
-	namespace Map
-	{
-		inline constexpr _uint Default = 0;
-		inline constexpr _uint Overlay = 1;
-		inline constexpr _uint White = 2;
-		inline constexpr _uint Shadow = 3;
-	}
-
-	namespace NonAnimPBR
-	{
-		inline constexpr _uint Default = 0;
-		inline constexpr _uint Diffuse = 1;
-		inline constexpr _uint Shadow = 2;
-		inline constexpr _uint White = 3;
-		inline constexpr _uint Dither = 4;
-		inline constexpr _uint DIFF = 5;
-		inline constexpr _uint DMN = 6;	// Diffuse MRA Normal
-		inline constexpr _uint UKWN = 7;
-		inline constexpr _uint UMN = 8;	// Unkwown MRA Normal
-	}
-
-	namespace EnvInst
-	{
-		inline constexpr _uint SHADOW = 0;
-		inline constexpr _uint WHITE = 1;
-		inline constexpr _uint DIFF = 2;
-		inline constexpr _uint DMN = 3;	// Diffuse MRA Normal
-		inline constexpr _uint UKWN = 4;
-		inline constexpr _uint UMN = 5;	// Unkwown MRA Normal
-	}
-
-	namespace EnvInstFlags
-	{
-		inline constexpr _uint Dither = 1u << 0;
-	}
-}
-
 namespace ProtoDesc
 {
 	inline constexpr COMPONENT_DESC VI_Rect = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect") };

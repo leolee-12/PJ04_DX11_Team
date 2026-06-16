@@ -68,7 +68,7 @@ private:
 	_float RandomFloat(_float fMin, _float fMax) const;
 	_int   RandomInt(_int iMin, _int iMax) const;
 	
-	_int64 Get_FrameIndex();
+	_uint64 Get_FrameIndex();
 #pragma endregion
 
 #pragma region DEVICE
@@ -224,6 +224,7 @@ private:
 	  HRESULT Register_TextureNameInHub(const _tchar* pTextureName, TEXTURE_HANDLE Handle);
 	  HRESULT Get_TextureFromHub(const _tchar* pTextureName, TEXTURE_HANDLE* pOutHandle) const;
 	  HRESULT Bind_TextureFromHub(class CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle);
+	  HRESULT Bind_DefaultTextureFromHub(class CShader* pShader, const _char* pConstantName, DEFAULT_TEXTURE eKind);
 	  TEXTURE_HUB_STATS Get_TextureHubStats() const;
 #pragma endregion
 
