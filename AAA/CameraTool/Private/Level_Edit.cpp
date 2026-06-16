@@ -192,7 +192,7 @@ HRESULT CLevel_Edit::Ready_Kirby()
     if (nullptr == pFactory) return E_FAIL;
 
     // 1) 커비 바디/모델 프로토타입 등록(로더 실행) 로더가 GAMEPLAY 레벨에 넣음
-    pFactory->LoadResource(Client::CKirby::PROTOTYPE_TAG, m_pGameInstance_Proxy, m_pDevice, m_pContext);
+    pFactory->LoadResource(Client::CKirby::PROTOTYPE_TAG, m_pGameInstance_Proxy, m_pDevice, m_pContext, ETOUI(EDIT_LEVEL::STATIC));
 
     // 2) 커비 프로토타입 등록
     if (!m_pGameInstance_Proxy->Has_Prototype(ETOUI(EDIT_LEVEL::STATIC), Client::CKirby::PROTOTYPE_TAG))

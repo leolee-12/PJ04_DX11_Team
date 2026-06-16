@@ -10,7 +10,7 @@
 
 namespace Client
 {
-	enum class LEVEL { STATIC, FIRST_LOADING, LOADING, GAMEPLAY, END };
+	enum class LEVEL { STATIC, FIRST_LOADING, LOADING, GAMEPLAY, TEST, END };
 
 	enum class SOUND_CHANNEL : _uint
 	{

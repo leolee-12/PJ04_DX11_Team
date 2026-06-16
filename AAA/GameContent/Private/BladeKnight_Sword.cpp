@@ -126,7 +126,7 @@ HRESULT CBladeKnight_Sword::Ready_Components()
         return E_FAIL;
 
     m_pModelCom = Add_Component<CModel>(
-        ETOUI(LEVEL::GAMEPLAY),
+        m_iPrototypeLevel,
         TEXT("Prototype_Component_Model_BladeKnight_Sword"),
         TEXT("Com_Model"));
 

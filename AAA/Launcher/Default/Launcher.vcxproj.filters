@@ -16,9 +16,6 @@
     <Filter Include="01. Levels\00. Loading">
       <UniqueIdentifier>{a79fe858-6a0b-4a57-9a9f-42489aa477a0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Levels\01. Logo">
-      <UniqueIdentifier>{5b60027e-bb0a-4b40-ae62-1996f862b6a5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01. Levels\00. Loading\Loader">
       <UniqueIdentifier>{bbcb6122-f796-4e3c-8b19-46c7fd937361}</UniqueIdentifier>
     </Filter>
@@ -30,6 +27,9 @@
     </Filter>
     <Filter Include="01. Levels\01. FirstLoading">
       <UniqueIdentifier>{a7cb1d8a-8375-40c0-b82c-9ca99a2a2d2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\99. Test">
+      <UniqueIdentifier>{5b60027e-bb0a-4b40-ae62-1996f862b6a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -51,8 +51,8 @@
     <ClInclude Include="..\Public\MainApp.h">
       <Filter>00. MainApp</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Level_Logo.h">
-      <Filter>01. Levels\01. Logo</Filter>
+    <ClInclude Include="..\Public\Level_Test.h">
+      <Filter>01. Levels\99. Test</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Loading.h">
       <Filter>01. Levels\00. Loading</Filter>
@@ -102,8 +102,8 @@
     <ClCompile Include="..\Private\Loader.cpp">
       <Filter>01. Levels\00. Loading\Loader</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Level_Logo.cpp">
-      <Filter>01. Levels\01. Logo</Filter>
+    <ClCompile Include="..\Private\Level_Test.cpp">
+      <Filter>01. Levels\99. Test</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Level_Lobby.cpp">
       <Filter>01. Levels\02. Lobby</Filter>

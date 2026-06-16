@@ -247,87 +247,6 @@
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Hovering">
       <UniqueIdentifier>{7ab702f2-1ea4-4b6f-abc2-0a8e23722ed6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\06. UI">
-      <UniqueIdentifier>{b3062cee-972c-4fb7-87e9-6219b23c53ca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIContainer">
-      <UniqueIdentifier>{5ca0474a-ed3f-4d60-a221-b2411ba793c8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIContainer\Title">
-      <UniqueIdentifier>{6621da30-94ec-4236-908b-f21c296456b0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIContainer\GenericContainer">
-      <UniqueIdentifier>{56dfa7a0-95de-45e5-bb90-e64da2be4597}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIContainer\UI_PointStar">
-      <UniqueIdentifier>{ad08d2a7-25f9-4d4f-bafc-4dbf686ad074}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIContainer\UI_GaugeBar">
-      <UniqueIdentifier>{c6318aa5-ad0e-44a8-adc5-81c167357c13}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIContainer\UI_GaugeBar\KirbyStatus">
-      <UniqueIdentifier>{829f9e0b-7ad3-4093-bd7e-05a27371a58e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIPart">
-      <UniqueIdentifier>{94c38715-2dd9-4f4e-8d6c-9d093835cbe4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIPart\Image">
-      <UniqueIdentifier>{a5a2e4ed-68be-4718-95b0-6b592bbe34a3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIPart\Text">
-      <UniqueIdentifier>{3b5135bf-091a-43f9-a1b4-477f575eacaa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIPart\SpriteAnim">
-      <UniqueIdentifier>{7d5d177d-f408-4ec2-9309-c09bb6f04f26}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIPart\Effect">
-      <UniqueIdentifier>{0be37482-7fe4-4538-a085-a1d70dd6ef22}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIPart\GaugeFill">
-      <UniqueIdentifier>{c26c9ef1-b276-4bc0-9e75-ee3d40797c24}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIPart\Curtain">
-      <UniqueIdentifier>{50e62849-c373-4657-829f-82a1ef120723}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIPart\Curtain\SpriteAnim">
-      <UniqueIdentifier>{4fcbe505-82ee-440a-a5d0-a9ffa573f348}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIPart\Curtain\Anim">
-      <UniqueIdentifier>{1dae57f3-f855-4352-afa2-5ed2eeeee3ce}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIPart\Curtain\Anim\Eraser">
-      <UniqueIdentifier>{9a4d44ca-fd80-4fdb-9d7d-9329be74e4c1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIPart\Curtain\Anim\Texture">
-      <UniqueIdentifier>{b1b94500-8f62-4ab4-b98d-314399c987ff}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIPart\Curtain\Anim\BG">
-      <UniqueIdentifier>{608a4a2a-0e21-4b2b-a250-a9429a4b5c76}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\Component">
-      <UniqueIdentifier>{f8846c37-07a1-47ff-8883-5be2b741a76a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\Component\Animator">
-      <UniqueIdentifier>{a0cc2fa3-e859-4ce0-bc75-268a9cc6fb1d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\Component\GaugeBar">
-      <UniqueIdentifier>{0319824c-67e9-4142-8520-2c3bc1d47add}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIContainer\Sequence">
-      <UniqueIdentifier>{a263c27a-7755-4cd3-9dca-ec5420934708}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIContainer\Sequence\Fade">
-      <UniqueIdentifier>{de591bb6-44ec-4bc9-8d69-d33d28aa6d89}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIContainer\Sequence\Fade\FadeOut">
-      <UniqueIdentifier>{c2ff4b5b-9012-4fb3-932a-63f2808a88f2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIContainer\Sequence\Fade\FadeIn">
-      <UniqueIdentifier>{201bba17-07ba-4c89-9b01-b6f3eb0d319e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. UI\UIContainer\Sequence\Loading">
-      <UniqueIdentifier>{727cb6f0-106b-4ad2-86c4-c021458c69c4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\06. Monster">
       <UniqueIdentifier>{c69f6e1f-9250-40fa-90bd-8d408e832ff0}</UniqueIdentifier>
     </Filter>
@@ -390,6 +309,105 @@
     </Filter>
     <Filter Include="99. Defines\Leo">
       <UniqueIdentifier>{ca69a650-f542-4ef4-9ce8-1c68bc5ca0a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI">
+      <UniqueIdentifier>{b3062cee-972c-4fb7-87e9-6219b23c53ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer">
+      <UniqueIdentifier>{5ca0474a-ed3f-4d60-a221-b2411ba793c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\Title">
+      <UniqueIdentifier>{6621da30-94ec-4236-908b-f21c296456b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\GenericContainer">
+      <UniqueIdentifier>{56dfa7a0-95de-45e5-bb90-e64da2be4597}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\UI_PointStar">
+      <UniqueIdentifier>{ad08d2a7-25f9-4d4f-bafc-4dbf686ad074}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\UI_GaugeBar">
+      <UniqueIdentifier>{c6318aa5-ad0e-44a8-adc5-81c167357c13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\UI_GaugeBar\KirbyStatus">
+      <UniqueIdentifier>{829f9e0b-7ad3-4093-bd7e-05a27371a58e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\Sequence">
+      <UniqueIdentifier>{a263c27a-7755-4cd3-9dca-ec5420934708}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\Sequence\Fade">
+      <UniqueIdentifier>{de591bb6-44ec-4bc9-8d69-d33d28aa6d89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\Sequence\Fade\FadeOut">
+      <UniqueIdentifier>{c2ff4b5b-9012-4fb3-932a-63f2808a88f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\Sequence\Fade\FadeIn">
+      <UniqueIdentifier>{201bba17-07ba-4c89-9b01-b6f3eb0d319e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\Sequence\Loading">
+      <UniqueIdentifier>{727cb6f0-106b-4ad2-86c4-c021458c69c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIPart">
+      <UniqueIdentifier>{94c38715-2dd9-4f4e-8d6c-9d093835cbe4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIPart\Image">
+      <UniqueIdentifier>{a5a2e4ed-68be-4718-95b0-6b592bbe34a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIPart\Text">
+      <UniqueIdentifier>{3b5135bf-091a-43f9-a1b4-477f575eacaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIPart\SpriteAnim">
+      <UniqueIdentifier>{7d5d177d-f408-4ec2-9309-c09bb6f04f26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIPart\Effect">
+      <UniqueIdentifier>{0be37482-7fe4-4538-a085-a1d70dd6ef22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIPart\GaugeFill">
+      <UniqueIdentifier>{c26c9ef1-b276-4bc0-9e75-ee3d40797c24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIPart\Curtain">
+      <UniqueIdentifier>{50e62849-c373-4657-829f-82a1ef120723}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIPart\Curtain\SpriteAnim">
+      <UniqueIdentifier>{4fcbe505-82ee-440a-a5d0-a9ffa573f348}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIPart\Curtain\Anim">
+      <UniqueIdentifier>{1dae57f3-f855-4352-afa2-5ed2eeeee3ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIPart\Curtain\Anim\Eraser">
+      <UniqueIdentifier>{9a4d44ca-fd80-4fdb-9d7d-9329be74e4c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIPart\Curtain\Anim\Texture">
+      <UniqueIdentifier>{b1b94500-8f62-4ab4-b98d-314399c987ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIPart\Curtain\Anim\BG">
+      <UniqueIdentifier>{608a4a2a-0e21-4b2b-a250-a9429a4b5c76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\Component">
+      <UniqueIdentifier>{f8846c37-07a1-47ff-8883-5be2b741a76a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\Component\Animator">
+      <UniqueIdentifier>{a0cc2fa3-e859-4ce0-bc75-268a9cc6fb1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\Component\GaugeBar">
+      <UniqueIdentifier>{0319824c-67e9-4142-8520-2c3bc1d47add}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\08. MiniBoss">
+      <UniqueIdentifier>{ab830d26-cbd1-45f8-8412-afec3357e9e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\08. MiniBoss\GigantEdge">
+      <UniqueIdentifier>{866eb1da-db6b-42fc-8caa-c617ccadb430}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\08. MiniBoss\GigantEdge\Part">
+      <UniqueIdentifier>{36b234a5-5536-4e67-94c1-8fd709cf127a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\08. MiniBoss\GigantEdge\Part\Body">
+      <UniqueIdentifier>{0741078a-3c4f-4119-b795-070f6e3f0278}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\08. MiniBoss\GigantEdge\Part\Sword">
+      <UniqueIdentifier>{2467cdb3-b08d-4e58-b9a7-087dc6229e2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\08. MiniBoss\GigantEdge\Part\Shield">
+      <UniqueIdentifier>{7372f538-6cbc-4eb7-8ea0-bc08a001350e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -457,13 +475,13 @@
       <Filter>00. GameObject\01. Map</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UI_Image.h">
-      <Filter>00. GameObject\06. UI\UIPart\Image</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\Image</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UI_TestImageContainer.h">
       <Filter>00. GameObject\Test\TestImageContainer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UI_Title.h">
-      <Filter>00. GameObject\06. UI\UIContainer\Title</Filter>
+      <Filter>00. GameObject\97. UI\UIContainer\Title</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\WalkSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
@@ -547,22 +565,22 @@
       <Filter>97. DataSystem\MapLoader</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UI_Text.h">
-      <Filter>00. GameObject\06. UI\UIPart\Text</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\Text</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UI_SpriteAnim.h">
-      <Filter>00. GameObject\06. UI\UIPart\SpriteAnim</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\SpriteAnim</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UI_Effect.h">
-      <Filter>00. GameObject\06. UI\UIPart\Effect</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\Effect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UI_GenericContainer.h">
-      <Filter>00. GameObject\06. UI\UIContainer\GenericContainer</Filter>
+      <Filter>00. GameObject\97. UI\UIContainer\GenericContainer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UI_Fonts.h">
       <Filter>99. Defines\Hojun</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UIAnimatorCom.h">
-      <Filter>00. GameObject\06. UI\Component\Animator</Filter>
+      <Filter>00. GameObject\97. UI\Component\Animator</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\InhaleEffect.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\06. InhaleEffect</Filter>
@@ -643,13 +661,13 @@
       <Filter>97. DataSystem\MapLoader</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UI_PointStar.h">
-      <Filter>00. GameObject\06. UI\UIContainer\UI_PointStar</Filter>
+      <Filter>00. GameObject\97. UI\UIContainer\UI_PointStar</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UI_KirbyStatus.h">
-      <Filter>00. GameObject\06. UI\UIContainer\UI_GaugeBar\KirbyStatus</Filter>
+      <Filter>00. GameObject\97. UI\UIContainer\UI_GaugeBar\KirbyStatus</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UI_GaugeFill.h">
-      <Filter>00. GameObject\06. UI\UIPart\GaugeFill</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\GaugeFill</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UI_Structs.h">
       <Filter>99. Defines\Hojun\UI</Filter>
@@ -658,7 +676,7 @@
       <Filter>99. Defines\Hojun\UI</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UI_GaugeBarCom.h">
-      <Filter>00. GameObject\06. UI\Component\GaugeBar</Filter>
+      <Filter>00. GameObject\97. UI\Component\GaugeBar</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Env_InstanceBatch.h">
       <Filter>00. GameObject\02. EnvObject\Instance</Filter>
@@ -691,34 +709,34 @@
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UI_SpriteAnimCurtain.h">
-      <Filter>00. GameObject\06. UI\UIPart\Curtain\SpriteAnim</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\Curtain\SpriteAnim</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UI_Curtain.h">
-      <Filter>00. GameObject\06. UI\UIPart\Curtain\Anim\BG</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\Curtain\Anim\BG</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UI_Eraser.h">
-      <Filter>00. GameObject\06. UI\UIPart\Curtain\Anim\Eraser</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\Curtain\Anim\Eraser</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UI_CurtainAnimBase.h">
-      <Filter>00. GameObject\06. UI\UIPart\Curtain\Anim</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\Curtain\Anim</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UI_CurtainTexture.h">
-      <Filter>00. GameObject\06. UI\UIPart\Curtain\Anim\Texture</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\Curtain\Anim\Texture</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UI_FadeOut.h">
-      <Filter>00. GameObject\06. UI\UIContainer\Sequence\Fade\FadeOut</Filter>
+      <Filter>00. GameObject\97. UI\UIContainer\Sequence\Fade\FadeOut</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ICurtainPart.h">
-      <Filter>00. GameObject\06. UI\UIPart\Curtain</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\Curtain</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UI_LoadingCurtain.h">
-      <Filter>00. GameObject\06. UI\UIContainer\Sequence\Loading</Filter>
+      <Filter>00. GameObject\97. UI\UIContainer\Sequence\Loading</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UI_CurtainSequenceBase.h">
-      <Filter>00. GameObject\06. UI\UIContainer\Sequence</Filter>
+      <Filter>00. GameObject\97. UI\UIContainer\Sequence</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UI_FadeIn.h">
-      <Filter>00. GameObject\06. UI\UIContainer\Sequence\Fade\FadeIn</Filter>
+      <Filter>00. GameObject\97. UI\UIContainer\Sequence\Fade\FadeIn</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BladeKnight.h">
       <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29</Filter>
@@ -780,6 +798,18 @@
     <ClInclude Include="..\Public\Shader_PassMeta.h">
       <Filter>99. Defines\Leo</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\GigantEdge.h">
+      <Filter>00. GameObject\08. MiniBoss\GigantEdge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GigantEdge_Body.h">
+      <Filter>00. GameObject\08. MiniBoss\GigantEdge\Part\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GigantEdge_Shield.h">
+      <Filter>00. GameObject\08. MiniBoss\GigantEdge\Part\Shield</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GigantEdge_Sword.h">
+      <Filter>00. GameObject\08. MiniBoss\GigantEdge\Part\Sword</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -825,13 +855,13 @@
       <Filter>00. GameObject\01. Map</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UI_Image.cpp">
-      <Filter>00. GameObject\06. UI\UIPart\Image</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\Image</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UI_TestImageContainer.cpp">
       <Filter>00. GameObject\Test\TestImageContainer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UI_Title.cpp">
-      <Filter>00. GameObject\06. UI\UIContainer\Title</Filter>
+      <Filter>00. GameObject\97. UI\UIContainer\Title</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\WalkSmoke.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
@@ -903,19 +933,19 @@
       <Filter>97. DataSystem\MapLoader</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UI_Text.cpp">
-      <Filter>00. GameObject\06. UI\UIPart\Text</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\Text</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UI_SpriteAnim.cpp">
-      <Filter>00. GameObject\06. UI\UIPart\SpriteAnim</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\SpriteAnim</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UI_Effect.cpp">
-      <Filter>00. GameObject\06. UI\UIPart\Effect</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\Effect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UI_GenericContainer.cpp">
-      <Filter>00. GameObject\06. UI\UIContainer\GenericContainer</Filter>
+      <Filter>00. GameObject\97. UI\UIContainer\GenericContainer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UIAnimatorCom.cpp">
-      <Filter>00. GameObject\06. UI\Component\Animator</Filter>
+      <Filter>00. GameObject\97. UI\Component\Animator</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\InhaleEffect.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\06. InhaleEffect</Filter>
@@ -984,16 +1014,16 @@
       <Filter>97. DataSystem\MapLoader</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UI_PointStar.cpp">
-      <Filter>00. GameObject\06. UI\UIContainer\UI_PointStar</Filter>
+      <Filter>00. GameObject\97. UI\UIContainer\UI_PointStar</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UI_KirbyStatus.cpp">
-      <Filter>00. GameObject\06. UI\UIContainer\UI_GaugeBar\KirbyStatus</Filter>
+      <Filter>00. GameObject\97. UI\UIContainer\UI_GaugeBar\KirbyStatus</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UI_GaugeFill.cpp">
-      <Filter>00. GameObject\06. UI\UIPart\GaugeFill</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\GaugeFill</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI_GaugeBarCom.cpp">
-      <Filter>00. GameObject\06. UI\Component\GaugeBar</Filter>
+      <Filter>00. GameObject\97. UI\Component\GaugeBar</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Env_InstanceBatch.cpp">
       <Filter>00. GameObject\02. EnvObject\Instance</Filter>
@@ -1029,31 +1059,31 @@
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI_SpriteAnimCurtain.cpp">
-      <Filter>00. GameObject\06. UI\UIPart\Curtain\SpriteAnim</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\Curtain\SpriteAnim</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI_Curtain.cpp">
-      <Filter>00. GameObject\06. UI\UIPart\Curtain\Anim\BG</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\Curtain\Anim\BG</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI_Eraser.cpp">
-      <Filter>00. GameObject\06. UI\UIPart\Curtain\Anim\Eraser</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\Curtain\Anim\Eraser</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI_CurtainAnimBase.cpp">
-      <Filter>00. GameObject\06. UI\UIPart\Curtain\Anim</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\Curtain\Anim</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI_CurtainTexture.cpp">
-      <Filter>00. GameObject\06. UI\UIPart\Curtain\Anim\Texture</Filter>
+      <Filter>00. GameObject\97. UI\UIPart\Curtain\Anim\Texture</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI_FadeOut.cpp">
-      <Filter>00. GameObject\06. UI\UIContainer\Sequence\Fade\FadeOut</Filter>
+      <Filter>00. GameObject\97. UI\UIContainer\Sequence\Fade\FadeOut</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI_LoadingCurtain.cpp">
-      <Filter>00. GameObject\06. UI\UIContainer\Sequence\Loading</Filter>
+      <Filter>00. GameObject\97. UI\UIContainer\Sequence\Loading</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI_CurtainSequenceBase.cpp">
-      <Filter>00. GameObject\06. UI\UIContainer\Sequence</Filter>
+      <Filter>00. GameObject\97. UI\UIContainer\Sequence</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI_FadeIn.cpp">
-      <Filter>00. GameObject\06. UI\UIContainer\Sequence\Fade\FadeIn</Filter>
+      <Filter>00. GameObject\97. UI\UIContainer\Sequence\Fade\FadeIn</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BladeKnight.cpp">
       <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29</Filter>
@@ -1102,6 +1132,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Unsupported.cpp">
       <Filter>00. GameObject\07. LevelDesign\Unsupported</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GigantEdge.cpp">
+      <Filter>00. GameObject\08. MiniBoss\GigantEdge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GigantEdge_Body.cpp">
+      <Filter>00. GameObject\08. MiniBoss\GigantEdge\Part\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GigantEdge_Shield.cpp">
+      <Filter>00. GameObject\08. MiniBoss\GigantEdge\Part\Shield</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GigantEdge_Sword.cpp">
+      <Filter>00. GameObject\08. MiniBoss\GigantEdge\Part\Sword</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

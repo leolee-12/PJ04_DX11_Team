@@ -44,6 +44,9 @@ HRESULT CPrototype_Manager::Add_Prototype(_uint iLevelIndex, const _wstring& str
 		return S_OK;
 	}
 
+	if (auto* pGO = dynamic_cast<CGameObject*>(pPrototype))
+		pGO->m_iPrototypeLevel = iLevelIndex;
+
 	return S_OK;
 }
 
