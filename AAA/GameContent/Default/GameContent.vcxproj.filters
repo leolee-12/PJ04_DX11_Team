@@ -379,6 +379,18 @@
     <Filter Include="00. GameObject\06. Monster\Monster\01. StateMachine\State\Find">
       <UniqueIdentifier>{b46f9754-404f-45d1-82fc-a81c412c5842}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. LevelDesign">
+      <UniqueIdentifier>{df77a93d-c3e5-461c-a155-eb275851d047}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. LevelDesign\Breakable">
+      <UniqueIdentifier>{41ac5899-75d9-43ae-ba35-d15a6f693112}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. LevelDesign\Unsupported">
+      <UniqueIdentifier>{88670e70-c815-452c-88eb-8a17ac26a72d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99. Defines\Leo">
+      <UniqueIdentifier>{ca69a650-f542-4ef4-9ce8-1c68bc5ca0a6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -750,6 +762,24 @@
     <ClInclude Include="..\Public\Monster_State_Attack.h">
       <Filter>00. GameObject\06. Monster\Monster\01. StateMachine\State\Attack</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LevelDesignObject.h">
+      <Filter>00. GameObject\07. LevelDesign</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesign_LoadTypes.h">
+      <Filter>00. GameObject\07. LevelDesign</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesign_Defines.h">
+      <Filter>00. GameObject\07. LevelDesign</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesign_Breakable.h">
+      <Filter>00. GameObject\07. LevelDesign\Breakable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesign_Unsupported.h">
+      <Filter>00. GameObject\07. LevelDesign\Unsupported</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Shader_PassMeta.h">
+      <Filter>99. Defines\Leo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1063,6 +1093,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Monster_State_Attack.cpp">
       <Filter>00. GameObject\06. Monster\Monster\01. StateMachine\State\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelDesignObject.cpp">
+      <Filter>00. GameObject\07. LevelDesign</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelDesign_Breakable.cpp">
+      <Filter>00. GameObject\07. LevelDesign\Breakable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelDesign_Unsupported.cpp">
+      <Filter>00. GameObject\07. LevelDesign\Unsupported</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

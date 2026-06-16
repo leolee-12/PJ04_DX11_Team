@@ -46,10 +46,11 @@ struct MAP_ENV_EDITED_DESC
 	_bool bHasWorldMatrix = { false };
 	_float4x4 matWorld = {};
 
-	_bool bDisableCollisionMesh = { false };
-	// true일 때만 저장 : 다음 로드 시 충돌 메쉬 생성 X
-	// EnvObject: ENV_OBJECT_DESC.tCollision.bInvalidCollision = true
-	// MapSection: MAP_SECTION_DESC.bCreateCollisionActor = false
+	_bool bDisableCollMesh = { false };
+	// Legacy read compatibility only.
+
+	_bool bHasCollMeshEdited = { false };
+	_bool bCreateCollMesh = { true };
 
 	_bool bHasNearDistAlpha = { false };
 	_bool bUseNearDistAlpha = { false };
@@ -140,5 +141,16 @@ struct MAP_LOAD_RESULT
 	_uint iEnvSkippedMissingModel = {};
 	_uint iEnvSkippedCreateFailed = {};
 };
+
+inline _bool Has_AnyMapEnvEdit(const MAP_ENV_EDITED_DESC& Edit)
+{
+	return Edit.bHasRenderable
+		|| Edit.bHasEnableCulling
+		|| Edit.bHasCastShadow
+		|| Edit.bHasWorldMatrix
+		|| Edit.bHasNearDistAlpha
+		|| Edit.bHasCollMeshEdited
+		|| Edit.bDisableCollMesh;
+}
 
 NS_END

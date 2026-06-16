@@ -3,7 +3,7 @@
 #include "Level_Edit.h"
 #include "Map_EditSession.h"
 
-#include "GameContent_const.h"
+#include "Shader_PassMeta.h"
 #include "MapStage.h"
 #include "MapSection.h"
 #include "Map_EditFile.h"
@@ -31,6 +31,20 @@ namespace
 		};
 
 		return (t < MTEX_TYPE_MAX) ? names[t] : "?";
+	}
+
+	_bool Is_EnvImportantTexType(MTEX_TYPE eType)
+	{
+		switch (eType)
+		{
+		case MTEX_TYPE::DIFFUSE:
+		case MTEX_TYPE::NORMALS:
+		case MTEX_TYPE::METALNESS:
+		case MTEX_TYPE::UNKNOWN:
+			return true;
+		default:
+			return false;
+		}
 	}
 
 	int ToMapRenderGroupIndex(RENDERID eRenderID)
@@ -89,16 +103,6 @@ namespace
 
 		pOutEdit->bHasWorldMatrix = true;
 		pOutEdit->matWorld = *pObject->Get_Transform()->Get_WorldMatrixPtr();
-	}
-
-	_bool Has_AnyMapEnvEdit(const MAP_ENV_EDITED_DESC& Edit)
-	{
-		return Edit.bHasRenderable
-			|| Edit.bHasEnableCulling
-			|| Edit.bHasCastShadow
-			|| Edit.bHasWorldMatrix
-			|| Edit.bHasNearDistAlpha
-			|| Edit.bDisableCollisionMesh;
 	}
 
 	_matrix Build_EnvBaseWorldMatrix(const ENV_OBJECT_DESC& Desc)
@@ -264,31 +268,12 @@ namespace
 		return Edit;
 	}
 
-	int EnvInstPassToComboIndex(int iPass)
+	const _char* GetEnvShaderPassComboItem(void*, _int idx)
 	{
-		switch (iPass)
-		{
-		case -1: return 0;
-		case ShaderPass::EnvInst::WHITE: return 1;
-		case ShaderPass::EnvInst::DIFF:  return 2;
-		case ShaderPass::EnvInst::DMN:   return 3;
-		case ShaderPass::EnvInst::UKWN:  return 4;
-		case ShaderPass::EnvInst::UMN:   return 5;
-		default: return 0;
-		}
-	}
+		if (idx < 0 || idx >= static_cast<int>(_countof(g_EnvShaderPassMetas)))
+			return nullptr;
 
-	int ComboIndexToEnvInstPass(int iIndex)
-	{
-		switch (iIndex)
-		{
-		case 1: return ShaderPass::EnvInst::WHITE;
-		case 2: return ShaderPass::EnvInst::DIFF;
-		case 3: return ShaderPass::EnvInst::DMN;
-		case 4: return ShaderPass::EnvInst::UKWN;
-		case 5: return ShaderPass::EnvInst::UMN;
-		default: return -1;
-		}
+		return g_EnvShaderPassMetas[idx].szName;
 	}
 }
 
@@ -564,12 +549,12 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 	_bool* pbRenderable = FindBoolProperty(pEnvObject, L"Renderable", L"EnvObject");
 	_bool* pbEnableCulling = FindBoolProperty(pEnvObject, L"Enable Culling", L"EnvObject");
 	_bool* pbCastShadow = FindBoolProperty(pEnvObject, L"Cast Shadow", L"EnvObject");
-	_bool* pbDisableCollisionMesh = Resolve_EnvCollisionEditState(pLevel, pEnvObject);
+	_bool* pbCreateCollMesh = Resolve_EnvCollMeshEditState(pLevel, pEnvObject);
 	_bool* pbUseNearDistAlpha = Resolve_EnvNearAlphaEditState(pLevel, pEnvObject);
 
-	const _bool bBaseDisableCollisionMesh = pEnvObject->Get_Desc().tCollision.bInvalidCollision;
-
-	if (nullptr != pbDisableCollisionMesh && bBaseDisableCollisionMesh) *pbDisableCollisionMesh = true;
+	const auto& Collision = pEnvObject->Get_Desc().tCollision;
+	const _bool bSourceCanCreateCollisionMesh =
+		Collision.bSourceHasDecorCollisionApxbin && !Collision.bSourceInvalidCollision;
 
 	ImGui::TextUnformatted("EnvObject Edit");
 
@@ -579,18 +564,15 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 		ImGui::Checkbox("Enable Culling##EnvEdit", (bool*)pbEnableCulling);
 	if (pbCastShadow)
 		ImGui::Checkbox("Cast Shadow##EnvEdit", (bool*)pbCastShadow);
-	if (pbDisableCollisionMesh)
+	if (pbCreateCollMesh)
 	{
-		ImGui::BeginDisabled(bBaseDisableCollisionMesh);
-		ImGui::Checkbox("Disable Collision On Reload##EnvEdit", (bool*)pbDisableCollisionMesh);
+		ImGui::BeginDisabled(!bSourceCanCreateCollisionMesh);
+		ImGui::Checkbox("Create Collision Mesh On Reload##EnvEdit", (bool*)pbCreateCollMesh);
 		ImGui::EndDisabled();
 	}
 
-	if (bBaseDisableCollisionMesh)
-	{
-		ImGui::TextDisabled(
-			"Source env collision is already disabled. Re-enable is not persisted by current override schema.");
-	}
+	if (!bSourceCanCreateCollisionMesh)
+		ImGui::TextDisabled("Source env collision mesh cannot be created for this object.");
 
 	if (pbUseNearDistAlpha)
 		ImGui::Checkbox("Use Near Dist Alpha##EnvEdit", (bool*)pbUseNearDistAlpha);
@@ -606,13 +588,21 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 			? *pbUseNearDistAlpha
 			: pEnvObject->Get_Desc().tRender.bUseNearDistAlpha);
 
-		const _bool bDisableCollisionMesh =
-			(nullptr != pbDisableCollisionMesh)
-			? *pbDisableCollisionMesh
-			: bBaseDisableCollisionMesh;
+		const _bool bCreateCollMesh =
+			(nullptr != pbCreateCollMesh)
+			? *pbCreateCollMesh
+			: bSourceCanCreateCollisionMesh;
 
-		Edit.bDisableCollisionMesh =
-			(!bBaseDisableCollisionMesh && bDisableCollisionMesh);
+		Edit.bHasCollMeshEdited = false;
+		Edit.bCreateCollMesh = true;
+		Edit.bDisableCollMesh = false;
+
+		if (bSourceCanCreateCollisionMesh)
+		{
+			Edit.bHasCollMeshEdited = (bCreateCollMesh != true);
+			Edit.bCreateCollMesh = bCreateCollMesh;
+			Edit.bDisableCollMesh = !bCreateCollMesh;
+		}
 
 		if (Has_AnyMapEnvEdit(Edit))
 		{
@@ -621,7 +611,7 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 		else
 		{
 			pLevel->Clear_EditedMapPreviewEnvObject(pObject);
-			Clear_EnvCollisionEditState(pObject);
+			Clear_EnvCollMeshEditState(pObject);
 			Clear_EnvNearAlphaEditState(pObject);
 		}
 	}
@@ -643,7 +633,7 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 			(nullptr != pSession) ? pSession->Get_EditData().iPresetIndex : -1;
 
 		pLevel->Clear_EditedMapPreviewEnvObject(pObject);
-		m_EnvCollisionEditStates.clear();
+		m_EnvCollMeshEditStates.clear();
 		m_EnvNearAlphaEditStates.clear();
 
 		if (0 <= iPresetIndex)
@@ -668,13 +658,10 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 		pSection->Get_SectionName());
 
 	_bool* pbCreateCollisionActor =
-		Resolve_SectionCollisionEditState(pLevel, pMapStage, pSection);
+		Resolve_MapCollMeshEditState(pLevel, pMapStage, pSection);
 
-	const _bool bBaseCreateCollisionActor =
-		pSection->Get_Desc().bCreateCollisionActor;
-
-	if (nullptr != pbCreateCollisionActor && !bBaseCreateCollisionActor)
-		*pbCreateCollisionActor = false;
+	const _bool bSourceCanCreateCollisionActor =
+		pSection->Get_Desc().bSourceCreateCollisionActor;
 
 	ImGui::TextUnformatted("MapSection Edit");
 
@@ -686,16 +673,13 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 		ImGui::Checkbox("Cast Shadow##SectionEdit", (bool*)pbCastShadow);
 	if (pbCreateCollisionActor)
 	{
-		ImGui::BeginDisabled(!bBaseCreateCollisionActor);
+		ImGui::BeginDisabled(!bSourceCanCreateCollisionActor);
 		ImGui::Checkbox("Create Collision Actor On Reload##SectionEdit", (bool*)pbCreateCollisionActor);
 		ImGui::EndDisabled();
 	}
 
-	if (!bBaseCreateCollisionActor)
-	{
-		ImGui::TextDisabled(
-			"Source section collision actor is already disabled. Re-enable is not persisted by current override schema.");
-	}
+	if (!bSourceCanCreateCollisionActor)
+		ImGui::TextDisabled("Source section collision actor cannot be created for this section.");
 
 	ImGui::TextDisabled("Applied on next stage reload.");
 	ImGui::TextDisabled("Restart persistence requires Save Override Now or toolbar Map Edit Save.");
@@ -707,13 +691,21 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 		const _bool bCreateCollisionActor =
 			(nullptr != pbCreateCollisionActor)
 			? *pbCreateCollisionActor
-			: bBaseCreateCollisionActor;
+			: bSourceCanCreateCollisionActor;
 
-		Edit.bDisableCollisionMesh =
-			(bBaseCreateCollisionActor && !bCreateCollisionActor);
+		Edit.bHasCollMeshEdited = false;
+		Edit.bCreateCollMesh = true;
+		Edit.bDisableCollMesh = false;
+
+		if (bSourceCanCreateCollisionActor)
+		{
+			Edit.bHasCollMeshEdited = (bCreateCollisionActor != true);
+			Edit.bCreateCollMesh = bCreateCollisionActor;
+			Edit.bDisableCollMesh = !bCreateCollisionActor;
+		}
 
 		pSection->Set_CollisionActorEnabled(
-			bBaseCreateCollisionActor ? bCreateCollisionActor : false);
+			bSourceCanCreateCollisionActor ? bCreateCollisionActor : false);
 
 		if (Has_AnyMapEnvEdit(Edit))
 		{
@@ -722,7 +714,7 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 		else
 		{
 			pLevel->Clear_EditedMapPreviewSection(strSectionKey);
-			Clear_SectionCollisionEditState(pSection);
+			Clear_MapCollMeshEditState(pSection);
 		}
 	}
 
@@ -743,7 +735,7 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 			(nullptr != pSession) ? pSession->Get_EditData().iPresetIndex : -1;
 
 		pLevel->Clear_EditedMapPreviewSection(strSectionKey);
-		m_SectionCollisionEditStates.clear();
+		m_MapCollMeshEditStates.clear();
 
 		if (0 <= iPresetIndex)
 		{
@@ -765,6 +757,9 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 	if (!ImGui::CollapsingHeader("Mesh Render Settings (per Model)"))
 		return;
 
+	ImGui::TextDisabled("Mesh Render Settings are saved per model sidecar.");
+	ImGui::TextDisabled("All objects/sections using this model will be affected.");
+
 	const _bool bEnvObjectMeshUi =
 		nullptr != dynamic_cast<Client::CEnvObject*>(pObject);
 
@@ -781,13 +776,16 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 
 		if (bEnvObjectMeshUi)
 		{
-			static const char* PassItems[] = { "Default", "WHITE", "DIFF", "DMN", "UKWN", "UMN" };
-			int iPassCombo = EnvInstPassToComboIndex(Layer.iPass);
+			int iPassCombo = Get_EnvShaderPassComboIndex(Layer.iPass);
 
 			ImGui::SetNextItemWidth(160.f);
-			if (ImGui::Combo("Pass", &iPassCombo, PassItems, IM_ARRAYSIZE(PassItems)))
+			if (ImGui::Combo("Pass",
+				&iPassCombo,
+				GetEnvShaderPassComboItem,
+				nullptr,
+				static_cast<int>(_countof(g_EnvShaderPassMetas))))
 			{
-				Layer.iPass = ComboIndexToEnvInstPass(iPassCombo);
+				Layer.iPass = Get_EnvShaderPassFromComboIndex(iPassCombo);
 				bChanged = true;
 			}
 
@@ -819,15 +817,51 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			ImGui::TextDisabled("(-1 = default)");
 		}
 
+		if (ImGui::Checkbox("Use UV Transform", (bool*)&Layer.bUseUVTransform))
+			bChanged = true;
+
+		ImGui::BeginDisabled(!Layer.bUseUVTransform);
+
+		ImGui::SetNextItemWidth(160.f);
+		if (ImGui::DragFloat2("UV Scale", (float*)&Layer.vUVScale, 0.01f))
+			bChanged = true;
+
+		ImGui::SetNextItemWidth(160.f);
+		if (ImGui::DragFloat2("UV Offset", (float*)&Layer.vUVOffset, 0.01f))
+			bChanged = true;
+
+		ImGui::EndDisabled();
+
 		for (_uint t = 0; t < MTEX_TYPE_MAX; ++t)
 		{
-			int iCount = (int)pModel->Get_MeshTextureCount((_uint)i, (MTEX_TYPE)t);
-			if (iCount <= 1)
+			const MTEX_TYPE eType = static_cast<MTEX_TYPE>(t);
+			const int iCount = static_cast<int>(pModel->Get_MeshTextureCount((_uint)i, eType));
+			const _uint iLayerIndex = Layer.idx[t];
+			const _bool bImportant = Is_EnvImportantTexType(eType);
+			const _bool bOutOfRange = (iCount > 0) && (iLayerIndex >= static_cast<_uint>(iCount));
+
+			if (0 == iCount)
+			{
+				if (bEnvObjectMeshUi && bImportant)
+				{
+					bAnyField = true;
+					ImGui::TextDisabled("%s: no texture", TexTypeName(t));
+				}
 				continue;
+			}
+
+			if (1 == iCount)
+			{
+				bAnyField = true;
+				ImGui::TextDisabled("%s: single texture (index 0)%s",
+					TexTypeName(t),
+					bOutOfRange ? "  (layer index out of range)" : "");
+				continue;
+			}
 
 			bAnyField = true;
 
-			int iValue = (int)Layer.idx[t];
+			int iValue = static_cast<int>(iLayerIndex);
 			ImGui::SetNextItemWidth(120.f);
 			if (ImGui::InputInt(TexTypeName(t), &iValue))
 			{
@@ -836,7 +870,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 				if (iValue >= iCount)
 					iValue = iCount - 1;
 
-				Layer.idx[t] = (_uint)iValue;
+				Layer.idx[t] = static_cast<_uint>(iValue);
 				bChanged = true;
 			}
 			ImGui::SameLine();
@@ -919,47 +953,70 @@ void CPanel_Inspector::Draw_MapSectionRenderOptions(Client::CMapSection* pSectio
 		pSection->Set_RenderID(FromMapRenderGroupIndex(iRenderGroup));
 }
 
-_bool* CPanel_Inspector::Resolve_EnvCollisionEditState(CLevel_Edit* pLevel, Client::CEnvObject* pEnvObject)
+_bool* CPanel_Inspector::Resolve_EnvCollMeshEditState(CLevel_Edit* pLevel, Client::CEnvObject*
+	pEnvObject)
 {
 	if (nullptr == pLevel || nullptr == pEnvObject)
 		return nullptr;
 
-	auto Iter = m_EnvCollisionEditStates.find(pEnvObject);
-	if (Iter == m_EnvCollisionEditStates.end())
+	auto Iter = m_EnvCollMeshEditStates.find(pEnvObject);
+	if (Iter == m_EnvCollMeshEditStates.end())
 	{
 		MAP_ENV_EDITED_DESC SavedEdit{};
-		const _bool bDisableCollisionMesh =
-			pLevel->Try_GetMapPreviewEnvEdit(pEnvObject, &SavedEdit)
-			? SavedEdit.bDisableCollisionMesh
-			: pEnvObject->Get_Desc().tCollision.bInvalidCollision;
+		const auto& Collision = pEnvObject->Get_Desc().tCollision;
+		const _bool bSourceCanCreateCollisionMesh =
+			Collision.bSourceHasDecorCollisionApxbin && !Collision.bSourceInvalidCollision;
 
-		Iter = m_EnvCollisionEditStates.emplace(
+		_bool bCreateCollMesh = bSourceCanCreateCollisionMesh;
+		if (pLevel->Try_GetMapPreviewEnvEdit(pEnvObject, &SavedEdit))
+		{
+			if (SavedEdit.bHasCollMeshEdited)
+				bCreateCollMesh = SavedEdit.bCreateCollMesh;
+			else
+				bCreateCollMesh = !SavedEdit.bDisableCollMesh;
+		}
+
+		if (!bSourceCanCreateCollisionMesh)
+			bCreateCollMesh = false;
+
+		Iter = m_EnvCollMeshEditStates.emplace(
 			static_cast<CGameObject*>(pEnvObject),
-			bDisableCollisionMesh).first;
+			bCreateCollMesh).first;
 	}
 
 	return &Iter->second;
 }
 
-_bool* CPanel_Inspector::Resolve_SectionCollisionEditState(CLevel_Edit* pLevel, CMapStage* pMapStage, CMapSection* pSection)
+_bool* CPanel_Inspector::Resolve_MapCollMeshEditState(CLevel_Edit* pLevel, CMapStage* pMapStage,
+	CMapSection* pSection)
 {
 	if (nullptr == pLevel || nullptr == pMapStage || nullptr == pSection)
 		return nullptr;
 
-	auto Iter = m_SectionCollisionEditStates.find(pSection);
-	if (Iter == m_SectionCollisionEditStates.end())
+	auto Iter = m_MapCollMeshEditStates.find(pSection);
+	if (Iter == m_MapCollMeshEditStates.end())
 	{
 		const _wstring strSectionKey = CMap_EditFile::Make_SectionKey(
 			pMapStage->Get_StageName(),
 			pSection->Get_SectionName());
 
 		MAP_ENV_EDITED_DESC SavedEdit{};
-		const _bool bCreateCollisionActor =
-			pLevel->Try_GetMapPreviewSectionEdit(strSectionKey, &SavedEdit)
-			? !SavedEdit.bDisableCollisionMesh
-			: pSection->Is_CollisionActorEnabled();
+		const _bool bSourceCanCreateCollisionActor =
+			pSection->Get_Desc().bSourceCreateCollisionActor;
 
-		Iter = m_SectionCollisionEditStates.emplace(
+		_bool bCreateCollisionActor = bSourceCanCreateCollisionActor;
+		if (pLevel->Try_GetMapPreviewSectionEdit(strSectionKey, &SavedEdit))
+		{
+			if (SavedEdit.bHasCollMeshEdited)
+				bCreateCollisionActor = SavedEdit.bCreateCollMesh;
+			else
+				bCreateCollisionActor = !SavedEdit.bDisableCollMesh;
+		}
+
+		if (!bSourceCanCreateCollisionActor)
+			bCreateCollisionActor = false;
+
+		Iter = m_MapCollMeshEditStates.emplace(
 			pSection,
 			bCreateCollisionActor).first;
 	}
@@ -989,16 +1046,16 @@ _bool* CPanel_Inspector::Resolve_EnvNearAlphaEditState(CLevel_Edit* pLevel, CEnv
 	return &Iter->second;
 }
 
-void CPanel_Inspector::Clear_EnvCollisionEditState(CGameObject* pObject)
+void CPanel_Inspector::Clear_EnvCollMeshEditState(CGameObject* pObject)
 {
 	if (nullptr != pObject)
-		m_EnvCollisionEditStates.erase(pObject);
+		m_EnvCollMeshEditStates.erase(pObject);
 }
 
-void CPanel_Inspector::Clear_SectionCollisionEditState(CMapSection* pSection)
+void CPanel_Inspector::Clear_MapCollMeshEditState(CMapSection* pSection)
 {
 	if (nullptr != pSection)
-		m_SectionCollisionEditStates.erase(pSection);
+		m_MapCollMeshEditStates.erase(pSection);
 }
 
 void CPanel_Inspector::Clear_EnvNearAlphaEditState(CGameObject* pObject)

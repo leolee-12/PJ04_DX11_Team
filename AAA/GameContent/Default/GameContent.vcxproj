@@ -32,6 +32,7 @@
     <ClInclude Include="..\Public\Env_CollisionCatalog.h" />
     <ClInclude Include="..\Public\Env_InstanceBatch.h" />
     <ClInclude Include="..\Public\Env_InstanceController.h" />
+    <ClInclude Include="..\Public\Shader_PassMeta.h" />
     <ClInclude Include="..\Public\GameContent_AnimEvents.h" />
     <ClInclude Include="..\Public\GameContent_const.h" />
     <ClInclude Include="..\Public\GameContent_Defines.h" />
@@ -56,6 +57,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\Public\LevelDesignObject.h" />
+    <ClInclude Include="..\Public\LevelDesign_Breakable.h" />
+    <ClInclude Include="..\Public\LevelDesign_Defines.h" />
+    <ClInclude Include="..\Public\LevelDesign_LoadTypes.h" />
+    <ClInclude Include="..\Public\LevelDesign_Unsupported.h" />
     <ClInclude Include="..\Public\Map_EditFile.h" />
     <ClInclude Include="..\Public\Map_EditSession.h" />
     <ClInclude Include="..\Public\Map_PresetCatalog.h" />
@@ -176,6 +182,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\Private\LevelDesignObject.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_Breakable.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_Unsupported.cpp" />
     <ClCompile Include="..\Private\Map_EditFile.cpp" />
     <ClCompile Include="..\Private\Map_EditSession.cpp" />
     <ClCompile Include="..\Private\Map_PresetCatalog.cpp" />

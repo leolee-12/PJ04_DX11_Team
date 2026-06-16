@@ -142,6 +142,9 @@ void CEnvObject_Static::Submit_RenderGroups()
 
 _bool CEnvObject_Static::Should_BypassMainInstance() const
 {
+	if (m_bEditorForceMainPassNonInstanced)
+		return true;
+
 	if (!m_bUseCameraDither)
 		return false;
 
