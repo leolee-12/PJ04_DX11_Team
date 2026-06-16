@@ -66,6 +66,12 @@
 #include "BladeKnight_Body.h"
 #include "BladeKnight_Sword.h"
 
+//Miniboss
+#include "GigantEdge.h"
+#include "GigantEdge_Body.h"
+#include "GigantEdge_Shield.h"
+#include "GigantEdge_Sword.h"
+
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
 #include "LevelDesign_Breakable.h"
@@ -111,6 +117,7 @@ void CGameObject_Factory::RegisterAll()
     Register_UI();
     Register_Camera();
     Register_Test();
+    Register_MiniBoss();
     Register_Container();
     Register_UIContainer();
     Register_NonAnimObject();
@@ -448,6 +455,32 @@ void CGameObject_Factory::Register_AnimObject()
 void CGameObject_Factory::Register_Effect()
 {
    
+}
+
+void CGameObject_Factory::Register_MiniBoss()
+{
+    Register(CGigantEdge::PROTOTYPE_TAG, TEXT("MiniBoss"),
+        CREATOR(CGigantEdge),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_GigantEdge_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/MiniBoss/GigantEdge/Model/GigantEdge.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_GigantEdge_Shield"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/MiniBoss/GigantEdge/Shield/Shield.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_GigantEdge_Sword"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/MiniBoss/GigantEdge/Sword/Sword.ysh",
+                    XMMatrixTranslation(0.f, 0.f, -2.5f)));
+
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CGigantEdge_Body::PROTOTYPE_TAG,
+                CGigantEdge_Body::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CGigantEdge_Sword::PROTOTYPE_TAG,
+                CGigantEdge_Sword::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CGigantEdge_Shield::PROTOTYPE_TAG,
+                CGigantEdge_Shield::Create(pDevice, pContext));
+        )
+    );
 }
 
 void CGameObject_Factory::Free()
