@@ -10,6 +10,8 @@
 #include "GameContent_const.h"
 #include "GameObject_Factory.h"
 #include "Loader_Prototype.h"
+#include "ContainerObject.h"
+#include "PartObject.h"
 
 #include "UI_Title.h"
 #include "Panel_Manager.h"
@@ -1226,6 +1228,11 @@ void CLevel_Tool::Set_PreviewVisible(_bool bVisible)
 {
     if (m_pPreview)
         m_pPreview->Set_Active(bVisible);
+
+    for (auto& pObj : m_SpawnedObjects)
+    {
+        pObj->Set_Active(bVisible);
+    }
 }
 
 CGameObject* CLevel_Tool::Load_Preview(const _wstring& strYshPath)

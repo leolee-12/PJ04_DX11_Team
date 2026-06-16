@@ -69,7 +69,7 @@ private:
 	TOOL_MODE					m_eWorkMode = { TOOL_MODE::ANIMATION };
 	CGameInstance_Proxy*		m_pGameInstance_Proxy = { nullptr };
 
-	_bool m_bKeyInputEnabled = { false };
+	_bool						m_bKeyInputEnabled = { true };
 
 private:
 	void						Render_DockSpace();

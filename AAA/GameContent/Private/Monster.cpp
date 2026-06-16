@@ -6,15 +6,11 @@
 
 CMonster::CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCharacter{ pDevice, pContext }
-	, m_fHP{ 100.f }
-	, m_fMaxHP{ 100.f }
 {
 }
 
 CMonster::CMonster(const CMonster& Prototype)
 	: CCharacter ( Prototype )
-	, m_fHP{ Prototype.m_fHP }
-	, m_fMaxHP{ Prototype.m_fMaxHP }
 {
 }
 
@@ -99,6 +95,9 @@ void CMonster::Clear_MoveDir()
 void CMonster::Change_State(MONSTER_STATE_TYPE eNewState)
 {
 	if (nullptr == m_pStateMachine)
+		return;
+
+	if (m_pStateMachine->Get_StateType() == eNewState)
 		return;
 
 	m_pStateMachine->Change_State(eNewState);
@@ -189,8 +188,8 @@ void CMonster::Update_AI(_float fTimeDelta)
 	Perceive(fTimeDelta);	
 
 	// Brain이 상태 변경 판단
-	if (nullptr != m_pBrain)
-		m_pBrain->Decide(this, m_BlackBoard, fTimeDelta);
+	//if (nullptr != m_pBrain)
+	//	m_pBrain->Decide(this, m_BlackBoard, fTimeDelta);
 
 	// 현재 State 실행
 	if (nullptr != m_pStateMachine)

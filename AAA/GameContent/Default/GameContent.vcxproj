@@ -32,6 +32,7 @@
     <ClInclude Include="..\Public\Env_CollisionCatalog.h" />
     <ClInclude Include="..\Public\Env_InstanceBatch.h" />
     <ClInclude Include="..\Public\Env_InstanceController.h" />
+    <ClInclude Include="..\Public\Monster_State_Retreat.h" />
     <ClInclude Include="..\Public\Shader_PassMeta.h" />
     <ClInclude Include="..\Public\GameContent_AnimEvents.h" />
     <ClInclude Include="..\Public\GameContent_const.h" />
@@ -206,6 +207,7 @@
     <ClCompile Include="..\Private\Monster_State_Attack.cpp" />
     <ClCompile Include="..\Private\Monster_State_Chase.cpp" />
     <ClCompile Include="..\Private\Monster_State_Idle.cpp" />
+    <ClCompile Include="..\Private\Monster_State_Retreat.cpp" />
     <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />
     <ClCompile Include="..\private\UI_Curtain.cpp" />

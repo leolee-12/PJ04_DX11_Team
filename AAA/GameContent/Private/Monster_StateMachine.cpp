@@ -1,8 +1,10 @@
 #include "Monster_StateMachine.h"
 
+#include "Monster.h"
 #include "Monster_State_Idle.h"
 #include "Monster_State_Chase.h"
 #include "Monster_State_Attack.h"
+#include "Monster_State_Retreat.h"
 
 CMonster_StateMachine::CMonster_StateMachine()
 {
@@ -11,7 +13,7 @@ CMonster_StateMachine::CMonster_StateMachine()
 HRESULT CMonster_StateMachine::Initialize(CMonster* pMonster)
 {
     m_pMonster = pMonster;
-
+    
     if (m_pMonster == nullptr)
         return E_FAIL;
 
@@ -43,6 +45,9 @@ void CMonster_StateMachine::Change_State(MONSTER_STATE_TYPE eNewState)
     if (m_pCurState == nullptr)
         return;
 
+    if (m_pMonster != nullptr)
+        m_pMonster->Get_BlackBoard().bActionFinished = false;       
+
     m_pCurState->Enter(m_pMonster);
 }
 
@@ -71,8 +76,12 @@ HRESULT CMonster_StateMachine::Init_State()
     if (FAILED(Register_State(MONSTER_STATE_TYPE::CHASE, CMonster_State_Chase::Create())))
         return E_FAIL;
 
+    if (FAILED(Register_State(MONSTER_STATE_TYPE::RETREAT, CMonster_State_Retreat::Create())))
+        return E_FAIL;
+
     if (FAILED(Register_State(MONSTER_STATE_TYPE::ATTACK, CMonster_State_Attack::Create())))
         return E_FAIL;
+
 
     return S_OK;
 }
