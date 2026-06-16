@@ -22,15 +22,19 @@ private:
 
 public:
 	HRESULT Change_Level(_int iNewLevelIndex, CLevel* pNewLevel);
-	void Update(_float fTimeDelta);
+	void	Update(_float fTimeDelta);
 	HRESULT Render();
 
+	void    Apply_ReservedLevel();
 
 private:
 	CLevel*					m_pCurrentLevel = { nullptr };
-	//class CGameInstance*	m_pGameInstance = { nullptr };
 	CGameInstance_Proxy*	m_pGameInstance_Proxy = { nullptr };
 	_int					m_iCurrentLevelIndex = { -1 };
+
+	CLevel*					m_pReservedLevel = { nullptr };
+	_int					m_iReservedIndex = { -1 };
+	_bool					m_bLevelReserved = { false };
 
 public:
 	static CLevel_Manager* Create();

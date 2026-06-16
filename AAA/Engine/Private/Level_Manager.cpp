@@ -16,15 +16,19 @@ HRESULT CLevel_Manager::Change_Level(_int iNewLevelIndex, CLevel* pNewLevel)
     if (nullptr == pNewLevel)
         return E_FAIL;
 
-    /* 기존 레벨용 자원을 정리한다. */
-    m_pGameInstance_Proxy->Clear_Resources(m_iCurrentLevelIndex);
+    if (nullptr == m_pCurrentLevel)
+    {
+        m_pCurrentLevel = pNewLevel;
+        m_iCurrentLevelIndex = iNewLevelIndex;
+        return S_OK;
+    }
 
-    Safe_Release(m_pCurrentLevel);
+    if (m_bLevelReserved)
+        Safe_Release(m_pReservedLevel);
 
-    m_pCurrentLevel = pNewLevel;
-
-    m_iCurrentLevelIndex = iNewLevelIndex;
-
+    m_pReservedLevel = pNewLevel;
+    m_iReservedIndex = iNewLevelIndex;
+    m_bLevelReserved = true;
     return S_OK;
 }
 
@@ -42,6 +46,21 @@ HRESULT CLevel_Manager::Render()
         return E_FAIL;
 
     return m_pCurrentLevel->Render();
+}
+
+void CLevel_Manager::Apply_ReservedLevel()
+{
+    if (!m_bLevelReserved)
+        return;
+
+    m_pGameInstance_Proxy->Clear_Resources(m_iCurrentLevelIndex);
+    Safe_Release(m_pCurrentLevel);
+
+    m_pCurrentLevel = m_pReservedLevel;
+    m_iCurrentLevelIndex = m_iReservedIndex;
+
+    m_pReservedLevel = nullptr;
+    m_bLevelReserved = false;
 }
 
 CLevel_Manager* CLevel_Manager::Create()

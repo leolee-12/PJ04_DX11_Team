@@ -141,6 +141,8 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 {
     ++m_iFrameIndex;
 
+    m_pLevel_Manager->Apply_ReservedLevel();
+
 	m_pInput_Device->Update();
 
     m_pObject_Manager->Priority_Update(fTimeDelta);
@@ -212,7 +214,7 @@ _int CGameInstance::RandomInt(_int iMin, _int iMax) const
 	uniform_int_distribution<_int> dist(iMin, iMax);
     return dist(m_RandomGenerator);
 }
-_int64 CGameInstance::Get_FrameIndex()
+_uint64 CGameInstance::Get_FrameIndex()
 {
     return m_iFrameIndex;
 }

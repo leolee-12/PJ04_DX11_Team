@@ -68,7 +68,7 @@ private:
 	_float RandomFloat(_float fMin, _float fMax) const;
 	_int   RandomInt(_int iMin, _int iMax) const;
 	
-	_int64 Get_FrameIndex();
+	_uint64 Get_FrameIndex();
 #pragma endregion
 
 #pragma region DEVICE
