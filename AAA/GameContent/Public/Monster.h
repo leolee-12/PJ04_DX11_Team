@@ -87,6 +87,9 @@ protected:
 	virtual CMonsterBrain*		Create_Brain(); //기본: FSM Brain
 	virtual _bool				Use_StateMachine() const { return true; } // BT 전용 몬스터는 false 반환
 
+	// 윤석현 추가
+	void Enable_Controller(_bool bEnable);
+
 	//윤석현 수정 
 	virtual void				Update_AI(_float fTimeDelta);
 	void						Perceive(_float fTimeDelta);

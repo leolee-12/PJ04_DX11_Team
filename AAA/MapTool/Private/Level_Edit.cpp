@@ -1160,7 +1160,7 @@ _bool XM_CALLCONV CLevel_Edit::Pick_EnvObjectByRay(_fvector vOrigin, _fvector vD
 			_float3 vHit = {};
 			_float fDist = FLT_MAX;
 
-			if (!pEnvObject->Pick_Ray(vOrigin, vDir, &vHit, &fDist))
+			if (!pEnvObject->Pick_Marb1e(vOrigin, vDir, &vHit, &fDist))
 				continue;
 
 			if (fDist < fBestDist)

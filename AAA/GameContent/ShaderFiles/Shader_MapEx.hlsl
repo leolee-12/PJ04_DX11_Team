@@ -23,6 +23,8 @@ float  g_MaskStrength = 1.f;
 float  g_fAOStrength = 1.f;
 
 float4 g_vUVTransform = float4(1.f, 1.f, 0.f, 0.f);
+float4 g_vUVTransformNormal = float4(1.f, 1.f, 0.f, 0.f);
+float4 g_vUVTransformMaterial = float4(1.f, 1.f, 0.f, 0.f);
 float  g_fUVRotate = 0.f;
 float4 g_vExtraEnable = float4(0.f, 0.f, 0.f, 0.f);
 float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
@@ -151,9 +153,9 @@ float2 Select_MapUV(PS_IN In, uint iUVIndex)
 	return In.vTexcoord;
 }
 
-float2 Apply_MapUVTransform(float2 uv)
+float2 Apply_MapUVTransform(float2 uv, float4 Transform)
 {
-	uv *= g_vUVTransform.xy;
+    uv *= Transform.xy;
 
 	float s = sin(g_fUVRotate);
 	float c = cos(g_fUVRotate);
@@ -163,7 +165,7 @@ float2 Apply_MapUVTransform(float2 uv)
 		uv.x * s + uv.y * c
 	);
 
-	uv += g_vUVTransform.zw;
+    uv += Transform.zw;
 	return uv;
 }
 
@@ -181,7 +183,7 @@ PS_OUT PS_WHITE(PS_IN In)
 PS_OUT PS_DIFF(PS_IN In)
 {
 	PS_OUT Out;
-	float2 vBaseUV = Apply_MapUVTransform(Select_MapUV(In, g_iBase_UVIndex));
+    float2 vBaseUV = Apply_MapUVTransform(Select_MapUV(In, g_iBase_UVIndex), g_vUVTransform);
 	float4 vBase = g_DiffuseTexture.Sample(LinearSampler, vBaseUV);
 	if (vBase.a < 0.1f)
 		discard;
@@ -201,7 +203,8 @@ PS_OUT PS_DIFF(PS_IN In)
 PS_OUT PS_DN(PS_IN In)
 {
 	PS_OUT Out;
-	float2 vBaseUV = Apply_MapUVTransform(Select_MapUV(In, g_iBase_UVIndex));
+	float2 vBaseUV = Apply_MapUVTransform(Select_MapUV(In, g_iBase_UVIndex), g_vUVTransform);
+    float2 vNormalUV = Apply_MapUVTransform(Select_MapUV(In, g_iBase_UVIndex), g_vUVTransformNormal);
 	float4 vBase = g_DiffuseTexture.Sample(LinearSampler, vBaseUV);
 	if (vBase.a < 0.1f)
 		discard;
@@ -214,7 +217,7 @@ PS_OUT PS_DN(PS_IN In)
 	float3 B = cross(N, T) * In.vTangent.w;
 	float3x3 TBN = float3x3(T, B, N);
 
-	float2 nrg = g_NormalTexture.Sample(LinearSampler, vBaseUV).rg * 2.f - 1.f;
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, vNormalUV).rg * 2.f - 1.f;
 	nrg *= g_NormalStrength;
 	float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
 	nTS.y = -nTS.y;
@@ -234,13 +237,15 @@ PS_OUT PS_DN(PS_IN In)
 PS_OUT PS_DMN(PS_IN In)
 {
 	PS_OUT Out;
-	float2 vBaseUV = Apply_MapUVTransform(Select_MapUV(In, g_iBase_UVIndex));
+	float2 vBaseUV = Apply_MapUVTransform(Select_MapUV(In, g_iBase_UVIndex), g_vUVTransform);
+    float2 vNormalUV = Apply_MapUVTransform(Select_MapUV(In, g_iBase_UVIndex), g_vUVTransformNormal);
+    float2 vMaterialUV = Apply_MapUVTransform(Select_MapUV(In, g_iBase_UVIndex), g_vUVTransformMaterial);
 	float4 vBase = g_DiffuseTexture.Sample(LinearSampler, vBaseUV);
 	if (vBase.a < 0.1f)
 		discard;
 
 	float3 albedo = vBase.rgb;
-	float3 mra = g_MRATexture.Sample(LinearSampler, vBaseUV).rgb;
+    float3 mra = g_MRATexture.Sample(LinearSampler, vMaterialUV).rgb;
 
 	float3 N = normalize(In.vNormal.xyz);
 	float3 T = normalize(In.vTangent.xyz);
@@ -248,7 +253,7 @@ PS_OUT PS_DMN(PS_IN In)
 	float3 B = cross(N, T) * In.vTangent.w;
 	float3x3 TBN = float3x3(T, B, N);
 
-	float2 nrg = g_NormalTexture.Sample(LinearSampler, vBaseUV).rg * 2.f - 1.f;
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, vNormalUV).rg * 2.f - 1.f;
 	nrg *= g_NormalStrength;
 	float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
 	nTS.y = -nTS.y;
@@ -269,7 +274,7 @@ PS_OUT PS_DMN(PS_IN In)
 PS_OUT PS_DMNU(PS_IN In)
 {
 	PS_OUT Out = PS_DMN(In);
-	float2 vUnknownUV = Apply_MapUVTransform(Select_MapUV(In, g_iUnknown_UVIndex));
+	float2 vUnknownUV = Apply_MapUVTransform(Select_MapUV(In, g_iUnknown_UVIndex), g_vUVTransform);
 	float4 vUnknown = g_UnknownTexture.Sample(LinearSampler, vUnknownUV);
 	return Out;
 }
