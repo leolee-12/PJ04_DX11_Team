@@ -3,7 +3,7 @@
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL CLevelDesign_Unsupported final : public CLevelDesignObject
+class CLevelDesign_Unsupported final : public CLevelDesignObject
 {
 	GENERATED_BODY(CLevelDesign_Unsupported)
 
