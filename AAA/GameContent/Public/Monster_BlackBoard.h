@@ -29,7 +29,7 @@ struct MONSTER_BLACKBOARD
 
 	_float					fDistToTarget = { FLT_MAX };
 	
-	Engine::CGameObject*	pTarget = { nullptr };
+	CGameObject*			pTarget = { nullptr };
 
 	_float3					vTargetPos = {};
 	_float3					vLastKnownPos = {};
