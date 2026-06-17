@@ -683,6 +683,8 @@ HRESULT CModel::Save_MeshLayers() const
 		{
 			jMesh["UseUVTransform"] = true;
 			jMesh["UVScale"] = { m.vUVScale.x, m.vUVScale.y };
+			jMesh["UVScaleNormal"] = { m.vUVScaleNormal.x, m.vUVScaleNormal.y };
+			jMesh["UVScaleMaterial"] = { m.vUVScaleMaterial.x, m.vUVScaleMaterial.y };
 			jMesh["UVRotate"] = m.fUVRotate;
 			jMesh["UVOffset"] = { m.vUVOffset.x, m.vUVOffset.y };
 		}
@@ -963,6 +965,16 @@ void CModel::Load_MeshLayers(const _char* pModelFilePath)
 					Layer.vUVScale.x = jMesh["UVScale"][0].get<_float>();
 					Layer.vUVScale.y = jMesh["UVScale"][1].get<_float>();
 				}
+				if (jMesh.contains("UVScaleNormal") && jMesh["UVScaleNormal"].is_array() && jMesh["UVScaleNormal"].size() == 2)
+				{
+					Layer.vUVScaleNormal.x = jMesh["UVScaleNormal"][0].get<_float>();
+					Layer.vUVScaleNormal.y = jMesh["UVScaleNormal"][1].get<_float>();
+				}
+				if (jMesh.contains("UVScaleMaterial") && jMesh["UVScaleMaterial"].is_array() && jMesh["UVScaleMaterial"].size() == 2)
+				{
+					Layer.vUVScaleMaterial.x = jMesh["UVScaleMaterial"][0].get<_float>();
+					Layer.vUVScaleMaterial.y = jMesh["UVScaleMaterial"][1].get<_float>();
+				}
 
 				if (jMesh.contains("UVRotate") && jMesh["UVRotate"].is_number())
 					Layer.fUVRotate = jMesh["UVRotate"].get<_float>();
@@ -1004,6 +1016,8 @@ void CModel::Load_MeshLayers(const _char* pModelFilePath)
 				|| strKey == "Flags"
 				|| strKey == "UseUVTransform"
 				|| strKey == "UVScale"
+				|| strKey == "UVScaleNormal"
+				|| strKey == "UVScaleMaterial"
 				|| strKey == "UVRotate"
 				|| strKey == "UVOffset"
 				|| strKey == "NormalStrength"

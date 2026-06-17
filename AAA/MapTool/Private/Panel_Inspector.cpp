@@ -1119,6 +1119,14 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			bChanged = true;
 
 		ImGui::SetNextItemWidth(160.f);
+		if (ImGui::DragFloat2("UV ScaleNormal", (float*)&Layer.vUVScaleNormal, 0.01f))
+			bChanged = true;
+
+		ImGui::SetNextItemWidth(160.f);
+		if (ImGui::DragFloat2("UV ScaleMaterial", (float*)&Layer.vUVScaleMaterial, 0.01f))
+			bChanged = true;
+
+		ImGui::SetNextItemWidth(160.f);
 		if (ImGui::DragFloat("UV Rotate", &Layer.fUVRotate, 0.01f))
 			bChanged = true;
 

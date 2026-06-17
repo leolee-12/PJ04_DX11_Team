@@ -86,12 +86,14 @@ namespace Engine
 		unsigned int    iUVIndex = { 0 };					// Base UV: Diffuse / Normal / MRA 공용
 		unsigned int    iUnknownUVIndex = { 0 };			// Unknown 전용
 		unsigned int    iExtraUVIndex[4] = { 0, 0, 0, 0 };	// ExtraR/G/B/A 전용
-		
+
 		unsigned int	iFlags = { 0 };				// shader-specific option bits
 		unsigned int	idx[MTEX_TYPE_MAX] = { 0 };	// MTEX_TYPE 별 slotArrayIndex
 
 		bool			bUseUVTransform = { false };
-		XMFLOAT2		vUVScale = { 1.f, 1.f };
+		XMFLOAT2		vUVScale = { 0.075f, 0.075f };
+		XMFLOAT2		vUVScaleNormal = { 0.075f, 0.075f };
+		XMFLOAT2		vUVScaleMaterial = { 0.075f, 0.075f };
 		float			fUVRotate = 0.f;
 		XMFLOAT2		vUVOffset = { 0.f, 0.f };
 

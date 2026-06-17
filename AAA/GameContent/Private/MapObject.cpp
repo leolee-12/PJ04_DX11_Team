@@ -146,10 +146,37 @@ HRESULT CMapObject::Bind_MapMeshParams(_uint iMesh, const MESH_LAYER_IDX& Layer)
 	const _uint iExtraB_UVIndex = (Layer.iExtraUVIndex[2] <= 3u) ? Layer.iExtraUVIndex[2] : 0u;
 	const _uint iExtraA_UVIndex = (Layer.iExtraUVIndex[3] <= 3u) ? Layer.iExtraUVIndex[3] : 0u;
 
-	const _float4 vUVTransform =
-		Layer.bUseUVTransform
-		? _float4{ Layer.vUVScale.x, Layer.vUVScale.y, Layer.vUVOffset.x, Layer.vUVOffset.y }
-		: _float4{ 1.f, 1.f, 0.f, 0.f };
+	_float4 vUVTransform;
+	_float4 vUVTransformNormal;
+	_float4 vUVTransformMaterial;
+
+	if (Layer.bUseUVTransform)
+	{
+		vUVTransform = _float4{ Layer.vUVScale.x, Layer.vUVScale.y, Layer.vUVOffset.x, Layer.vUVOffset.y };
+		vUVTransformNormal = _float4{ Layer.vUVScaleNormal.x, Layer.vUVScaleNormal.y, Layer.vUVOffset.x, Layer.vUVOffset.y };
+		vUVTransformMaterial = _float4{ Layer.vUVScaleMaterial.x, Layer.vUVScaleMaterial.y, Layer.vUVOffset.x, Layer.vUVOffset.y };
+	}
+	else
+	{
+		vUVTransform = vUVTransformNormal = vUVTransformMaterial = _float4{ 1.f, 1.f, 0.f, 0.f };
+	}
+
+	//const _float4 vUVTransform =
+	//	Layer.bUseUVTransform
+	//	? _float4{ Layer.vUVScale.x, Layer.vUVScale.y, Layer.vUVOffset.x, Layer.vUVOffset.y }
+	//: _float4{ 1.f, 1.f, 0.f, 0.f };
+	//
+	//const _float4 vUVTransformNormal = 
+	//	Layer.bUseUVTransform 
+	//	? _float4{ Layer.vUVScaleNormal.x, Layer.vUVScaleNormal.y, Layer.vUVOffset.x, Layer.vUVOffset.y }
+	//: _float4{ 1.f, 1.f, 0.f, 0.f };
+	//
+	//const _float4 vUVTransformMaterial = 
+	//	Layer.bUseUVTransform
+	//	? _float4{ Layer.vUVScaleMaterial.x, Layer.vUVScaleMaterial.y, Layer.vUVOffset.x, Layer.vUVOffset.y }
+	//: _float4{ 1.f, 1.f, 0.f, 0.f };
+
+
 
 	const _float fUVRotate = Layer.bUseUVTransform ? Layer.fUVRotate : 0.f;
 	const _float fNormalStrength = Layer.fNormalStrength;
@@ -178,6 +205,11 @@ HRESULT CMapObject::Bind_MapMeshParams(_uint iMesh, const MESH_LAYER_IDX& Layer)
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vUVTransform", &vUVTransform, sizeof(_float4))))
 		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vUVTransformNormal", &vUVTransformNormal, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vUVTransformMaterial", &vUVTransformMaterial, sizeof(_float4))))
+		return E_FAIL;
+
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fUVRotate", &fUVRotate, sizeof(_float))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_NormalStrength", &fNormalStrength, sizeof(_float))))
