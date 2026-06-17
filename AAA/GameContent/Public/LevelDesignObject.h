@@ -3,7 +3,7 @@
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL CLevelDesignObject abstract : public CGameObject
+class CLevelDesignObject abstract : public CGameObject
 {
 	GENERATED_BODY_ABSTRACT(CLevelDesignObject)
 

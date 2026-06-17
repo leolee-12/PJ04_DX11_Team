@@ -6,7 +6,7 @@ NS_BEGIN(Client)
 
 enum class EMINIBOSS_LIFE { HIDDEN, INTRO, ACTIVE };
 
-class CLIENT_DLL CMiniBoss abstract : public CMonster
+class CMiniBoss abstract : public CMonster
 {
     GENERATED_BODY_ABSTRACT(CMiniBoss)
 
