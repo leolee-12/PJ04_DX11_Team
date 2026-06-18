@@ -45,6 +45,7 @@ public:
 
 protected:
     virtual void Calc_Vertical(_float fTimeDelta);
+    virtual void Apply_Facing(_fvector vFaceDir, _float fTimeDelta); // 기본 : 이동방향을 바라보게 회전
 
 protected:
     CTransform* m_pTransform = { nullptr };

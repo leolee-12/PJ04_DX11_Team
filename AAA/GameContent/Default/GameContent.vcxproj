@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\BladeKnight_Body.h" />
+    <ClInclude Include="..\Public\BladeKnight_FSM.h" />
     <ClInclude Include="..\Public\BladeKnight_Sword.h" />
     <ClInclude Include="..\Public\Camera_AreaData.h" />
     <ClInclude Include="..\public\Camera_AreaCam.h" />
@@ -32,6 +33,11 @@
     <ClInclude Include="..\Public\Env_CollisionCatalog.h" />
     <ClInclude Include="..\Public\Env_InstanceBatch.h" />
     <ClInclude Include="..\Public\Env_InstanceController.h" />
+    <ClInclude Include="..\Public\Monster_State_Captured.h" />
+    <ClInclude Include="..\Public\Monster_State_Dead.h" />
+    <ClInclude Include="..\Public\Monster_State_Fall.h" />
+    <ClInclude Include="..\Public\Monster_State_Hit.h" />
+    <ClInclude Include="..\Public\Monster_State_Landing.h" />
     <ClInclude Include="..\Public\Monster_State_Retreat.h" />
     <ClInclude Include="..\public\GigantEdge_Brain.h" />
     <ClInclude Include="..\public\MiniBoss.h" />
@@ -161,6 +167,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\BladeKnight_Body.cpp" />
+    <ClCompile Include="..\Private\BladeKnight_FSM.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Sword.cpp" />
     <ClCompile Include="..\Private\Camera_AreaSolver.cpp" />
     <ClCompile Include="..\private\Camera_AreaCam.cpp" />
@@ -209,8 +216,13 @@
     <ClCompile Include="..\Private\Monster_State.cpp" />
     <ClCompile Include="..\Private\Monster_StateMachine.cpp" />
     <ClCompile Include="..\Private\Monster_State_Attack.cpp" />
+    <ClCompile Include="..\Private\Monster_State_Captured.cpp" />
     <ClCompile Include="..\Private\Monster_State_Chase.cpp" />
+    <ClCompile Include="..\Private\Monster_State_Dead.cpp" />
+    <ClCompile Include="..\Private\Monster_State_Fall.cpp" />
+    <ClCompile Include="..\Private\Monster_State_Hit.cpp" />
     <ClCompile Include="..\Private\Monster_State_Idle.cpp" />
+    <ClCompile Include="..\Private\Monster_State_Landing.cpp" />
     <ClCompile Include="..\Private\Monster_State_Retreat.cpp" />
     <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />

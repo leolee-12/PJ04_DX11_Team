@@ -3,13 +3,15 @@
 
 NS_BEGIN(Client)
 
-class CMonster_State_Idle final : public CMonster_State
+class CMonster;
+
+class CMonster_State_Captured final : public CMonster_State
 {
 private:
-	CMonster_State_Idle();
-	virtual ~CMonster_State_Idle() = default;
+	CMonster_State_Captured();
+	virtual ~CMonster_State_Captured() = default;
 
-private:
+public:
 	HRESULT							Initialize();
 
 public:
@@ -19,7 +21,7 @@ public:
 	virtual void					Exit(CMonster* pMonster) override;
 
 public:
-	static CMonster_State_Idle*		Create();
+	static CMonster_State_Captured* Create();
 
 protected:
 	virtual void					Free() override;
