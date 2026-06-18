@@ -32,9 +32,13 @@
     <ClInclude Include="..\Public\Env_CollisionCatalog.h" />
     <ClInclude Include="..\Public\Env_InstanceBatch.h" />
     <ClInclude Include="..\Public\Env_InstanceController.h" />
+    <ClInclude Include="..\Public\LevelDesign_Loader.h" />
+    <ClInclude Include="..\Public\LevelDesign_Parser.h" />
+    <ClInclude Include="..\Public\LevelDesign_Registry.h" />
     <ClInclude Include="..\Public\Monster_State_Retreat.h" />
     <ClInclude Include="..\public\GigantEdge_Brain.h" />
     <ClInclude Include="..\public\MiniBoss.h" />
+    <ClInclude Include="..\Public\Parsing_Utils.h" />
     <ClInclude Include="..\Public\Shader_PassMeta.h" />
     <ClInclude Include="..\Public\GameContent_AnimEvents.h" />
     <ClInclude Include="..\Public\GameContent_const.h" />
@@ -196,6 +200,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesignObject.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Breakable.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_Loader.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_Parser.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_Registry.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Unsupported.cpp" />
     <ClCompile Include="..\Private\Map_EditFile.cpp" />
     <ClCompile Include="..\Private\Map_EditSession.cpp" />

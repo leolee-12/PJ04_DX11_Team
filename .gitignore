@@ -452,6 +452,12 @@ AAA/*.zip
 /AAA/Editor/[Bb]in/ShaderFiles/Shader_Cell.hlsl
 /AAA/Editor/[Bb]in/ShaderFiles/Shader_Deferred.hlsl
 /AAA/Editor/[Bb]in/ShaderFiles/Shader_VtxTex.hlsl
+
+!/AAA/MapTool/[Bb]in/
+/AAA/MapTool/[Bb]in/*
+!/AAA/MapTool/[Bb]in/ShaderFiles/
+/AAA/MapTool/[Bb]in/ShaderFiles/*
+!/AAA/MapTool/[Bb]in/ShaderFiles/Shader_Grid.hlsl
 # Personal workspace files (local only, do not track)
 /명세서/
 /AGENTS.md

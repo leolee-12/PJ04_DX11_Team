@@ -6,15 +6,6 @@
 
 namespace
 {
-	LD_BREAKABLE_TYPE Resolve_BreakableType(const _wstring& strObjectName)
-	{
-		if (0 == _wcsicmp(strObjectName.c_str(), L"StarBlock"))		return Client::LD_BREAKABLE_TYPE::STAR_BLOCK;
-		if (0 == _wcsicmp(strObjectName.c_str(), L"StarBlockBig"))	return Client::LD_BREAKABLE_TYPE::STAR_BLOCK_BIG;
-		if (0 == _wcsicmp(strObjectName.c_str(), L"WoodBox"))		return Client::LD_BREAKABLE_TYPE::WOOD_BOX;
-
-		return Client::LD_BREAKABLE_TYPE::UNKNOWN;
-	}
-
 	void Build_DefaultBreakableDesc(Client::LD_BREAKABLE_OBJECT_DESC* pOutDesc)
 	{
 		if (nullptr == pOutDesc)
@@ -22,7 +13,7 @@ namespace
 
 		*pOutDesc = {};
 
-		pOutDesc->strSourcePath = L"Palette";
+		pOutDesc->wstrSourcePath = L"Palette";
 		pOutDesc->strSourceFile = L"H1W1.ysh";
 		pOutDesc->strSection = L"Palette";
 		pOutDesc->strEntryKey = L"StarBlock_Default";
@@ -30,7 +21,8 @@ namespace
 		pOutDesc->strKind = L"Palette";
 
 		pOutDesc->eCategory = LD_CATEGORY::BREAKABLE;
-		pOutDesc->eBreakableType = LD_BREAKABLE_TYPE::STAR_BLOCK;
+		pOutDesc->eType = LD_BREAKABLE_TYPE::STAR_BLOCK;
+		pOutDesc->wstrModelProtoTag = CLevelDesign_Breakable::STARBLOCK_H1W1_MODEL_PROTO_TAG;
 
 		pOutDesc->fScale = 1.f;
 		pOutDesc->vRight = { 1.f, 0.f, 0.f, 0.f };
@@ -78,8 +70,11 @@ HRESULT CLevelDesign_Breakable::Initialize(void* pArg)
 
 	m_tBreakableDesc.eCategory = LD_CATEGORY::BREAKABLE;
 
-	if (m_tBreakableDesc.eBreakableType == LD_BREAKABLE_TYPE::UNKNOWN)
-		m_tBreakableDesc.eBreakableType = Resolve_BreakableType(m_tBreakableDesc.strObjectName);
+	if (m_tBreakableDesc.eType == LD_BREAKABLE_TYPE::UNKNOWN)
+		return E_FAIL;
+
+	if (m_tBreakableDesc.wstrModelProtoTag.empty())
+		return E_FAIL;
 
 	if (FAILED(__super::Initialize(&m_tBreakableDesc)))
 		return E_FAIL;
@@ -164,7 +159,7 @@ HRESULT CLevelDesign_Breakable::Ready_Components()
 {
 	const _tchar* pModelProtoTag = Resolve_ModelProtoTag();
 	if (nullptr == pModelProtoTag)
-		return S_OK;
+		return E_FAIL;
 
 	m_pShaderCom = Add_Component<CShader>(Shader_NonAnimMesh_PBR.iLevelID, Shader_NonAnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
 	if (nullptr == m_pShaderCom)
@@ -196,12 +191,10 @@ HRESULT CLevelDesign_Breakable::Bind_ShaderResources()
 
 const _tchar* CLevelDesign_Breakable::Resolve_ModelProtoTag() const
 {
-	switch (m_tBreakableDesc.eBreakableType)
-	{
-	case LD_BREAKABLE_TYPE::STAR_BLOCK:	return STARBLOCK_MODEL_PROTO_TAG;
+	if (m_tBreakableDesc.wstrModelProtoTag.empty())
+		return nullptr;
 
-	default:	return nullptr;
-	}
+	return m_tBreakableDesc.wstrModelProtoTag.c_str();
 }
 
 CLevelDesign_Breakable* CLevelDesign_Breakable::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

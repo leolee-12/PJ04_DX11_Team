@@ -14,7 +14,10 @@ class CLevelDesign_Breakable final : public CLevelDesignObject
 
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_LevelDesign_Breakable";
-	static constexpr const _tchar* STARBLOCK_MODEL_PROTO_TAG = L"Prototype_Component_Model_LevelDesign_StarBlock";
+	static constexpr const _tchar* STARBLOCK_H1W1_MODEL_PROTO_TAG = L"Prototype_Component_Model_LevelDesign_Star_H1W1";
+	static constexpr const _tchar* STARBLOCK_H2W2_MODEL_PROTO_TAG = L"Prototype_Component_Model_LevelDesign_Star_H2W2";
+	static constexpr const _tchar* STARBLOCK_H3W3_MODEL_PROTO_TAG = L"Prototype_Component_Model_LevelDesign_Star_H3W3";
+	static constexpr const _tchar* STARBLOCK_MODEL_PROTO_TAG = STARBLOCK_H1W1_MODEL_PROTO_TAG;
 
 private:
 	CLevelDesign_Breakable(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -29,7 +32,7 @@ public:
 	virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
 public:
-	LD_BREAKABLE_TYPE				Get_BreakableType() const { return m_tBreakableDesc.eBreakableType; }
+	LD_BREAKABLE_TYPE				Get_BreakableType() const { return m_tBreakableDesc.eType; }
 	const LD_BREAKABLE_OBJECT_DESC&	Get_BreakableDesc() const { return m_tBreakableDesc; }
 
 protected:

@@ -55,6 +55,10 @@ namespace
 			pLevel->Load_MapPreviewEnv(static_cast<_uint>(*pInOutPresetIndex));
 
 		ImGui::SameLine();
+		if (ImGui::Button("Load LD"))
+			pLevel->Load_LDPreview();
+
+		ImGui::SameLine();
 		if (ImGui::Button("Clear All"))
 			pLevel->Clear_MapPreview();
 

@@ -2,16 +2,18 @@
 #include "Loader.h"
 #include "EditCamera.h"
 #include "Edit_Grid.h"
-#include "Map_EditSession.h"
-#include "Map_EditFile.h"
 
 #include "GameObject_Factory.h"
 #include "GameContent_const.h"
 #include "GameContent_Log.h"
+#include "Map_EditFile.h"
+#include "Map_EditSession.h"
 #include "Map_Loader.h"
 #include "MapStage.h"
 #include "MapSection.h"
 #include "EnvObject_Static.h"
+#include "LevelDesign_Loader.h"
+#include "LevelDesign_Registry.h"
 
 #ifdef _DEBUG
 #include "MapToolProfiler.h"
@@ -44,7 +46,8 @@ namespace
 
 	using namespace std::filesystem;
 
-	constexpr wchar_t kMapModelRoot[] = L"../../Resources/Map";
+	constexpr _tchar kMapModelRoot[] = L"../../Resources/Map";
+	constexpr _tchar kLevelDesignTestPath[] = L"../../Resources/Map/Stage1-1/LevelDesign_Obj_FlipZ.json";
 
 	_bool Equals_NoCase(const wstring& strLeft, const wstring& strRight)
 	{
@@ -684,6 +687,43 @@ HRESULT CLevel_Edit::Load_MapPreviewEnv(_uint iPresetIndex)
 	return S_OK;
 }
 
+HRESULT CLevel_Edit::Load_LDPreview()
+{
+	vector<wstring> LevelDesignLayers;
+	LevelDesignLayers.reserve(m_Layers.size());
+
+	for (const auto& Pair : m_Layers)
+	{
+		if (CLevelDesign_Registry::Is_LevelDesignLayer(Pair.first))
+			LevelDesignLayers.push_back(Pair.first);
+	}
+
+	for (const auto& strLayerTag : LevelDesignLayers)
+		Clear_MapPreviewLayer(strLayerTag);
+
+	LD_RUNTIME_LOAD_CONTEXT Context{};
+	Context.pDevice = m_pDevice;
+	Context.pContext = m_pContext;
+	Context.iPlaceLevel = ETOUI(TOOL_LEVEL::EDIT);
+	Context.iPrototypeLevel = ETOUI(LEVEL::STATIC);
+	Context.pCreatedCallback = &On_MapPreviewObjectCreated;
+	Context.pCallbackContext = this;
+
+	LD_LOAD_RESULT Report{};
+	if (FAILED(CLevelDesign_Loader::Load_LevelDesign_Runtime(Context, kLevelDesignTestPath, &Report)))
+	{
+		Set_MapPreviewStatus(L"LevelDesign test load failed.");
+		return E_FAIL;
+	}
+
+	Set_MapPreviewStatus(
+		L"LevelDesign test loaded: created=" + to_wstring(Report.iCreatedCount)
+		+ L" / fallback=" + to_wstring(Report.iFallbackSpecCount)
+		+ L" / failed=" + to_wstring(Report.iSkippedCreateFailedCount));
+
+	return S_OK;
+}
+
 void CLevel_Edit::Clear_MapPreview()
 {
 	MAP_EDIT_DATA MapContentDesc = Build_MapPreviewContentDescSnapshot();
@@ -693,8 +733,11 @@ void CLevel_Edit::Clear_MapPreview()
 
 	for (const auto& Pair : m_Layers)
 	{
-		if (CMap_Loader::Is_MapLayer(Pair.first))
+		if (CMap_Loader::Is_MapLayer(Pair.first)
+			|| Client::CLevelDesign_Registry::Is_LevelDesignLayer(Pair.first))
+		{
 			MapLayers.push_back(Pair.first);
+		}
 	}
 
 	for (const auto& strLayerTag : MapLayers)
@@ -1038,7 +1081,7 @@ HRESULT CLevel_Edit::Ready_EditCamera()
 
 HRESULT CLevel_Edit::Ready_EditGrid()
 {
-	m_pGrid = CEdit_Grid::Create(m_pDevice, m_pContext, 1000, 1.f);
+	m_pGrid = CEdit_Grid::Create(m_pDevice, m_pContext, 100u, 100.f);
 	return (m_pGrid == nullptr) ? E_FAIL : S_OK;
 }
 

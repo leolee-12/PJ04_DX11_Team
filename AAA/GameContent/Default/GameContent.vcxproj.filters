@@ -421,6 +421,9 @@
     <Filter Include="00. GameObject\07. MiniBoss\GigantEdge\Brain">
       <UniqueIdentifier>{eb719185-a163-4056-9c87-941873823803}</UniqueIdentifier>
     </Filter>
+    <Filter Include="97. DataSystem\LevelDesignLoader">
+      <UniqueIdentifier>{ac90f625-f08a-4a8a-89fd-03d9fa0dc850}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -831,6 +834,18 @@
     <ClInclude Include="..\Public\Monster_State_Retreat.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Retreat</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Parsing_Utils.h">
+      <Filter>99. Defines\Leo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesign_Parser.h">
+      <Filter>97. DataSystem\LevelDesignLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesign_Registry.h">
+      <Filter>97. DataSystem\LevelDesignLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesign_Loader.h">
+      <Filter>97. DataSystem\LevelDesignLoader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1174,6 +1189,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Monster_State_Retreat.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Retreat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelDesign_Parser.cpp">
+      <Filter>97. DataSystem\LevelDesignLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelDesign_Registry.cpp">
+      <Filter>97. DataSystem\LevelDesignLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelDesign_Loader.cpp">
+      <Filter>97. DataSystem\LevelDesignLoader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
