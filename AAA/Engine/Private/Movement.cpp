@@ -70,6 +70,27 @@ void CMovement::Calc_Vertical(_float fTimeDelta)
         m_fVerticalVelocity = m_fMaxFallSpeed;
 }
 
+void CMovement::Apply_Facing(_fvector vFaceDir, _float fTimeDelta)
+{
+    if (nullptr == m_pTransform)
+        return;
+
+    // 방향 없으면 회전 안함
+    if (XMVector3Equal(vFaceDir, XMVectorZero()))
+        return;
+
+    // 입력 방향으로 부드럽게 회전(현재 LOOK 기준)
+    _vector vDir = XMVector3Normalize(XMVectorSetY(vFaceDir, 0.f));
+    _vector vLook = XMVector3Normalize(XMVectorSetY(m_pTransform->Get_State(STATE::LOOK), 0.f));
+    _float  fDot = XMVectorGetX(XMVector3Dot(vLook, vDir));
+    _float  fCross = XMVectorGetZ(vLook) * XMVectorGetX(vDir)
+                    - XMVectorGetX(vLook) * XMVectorGetZ(vDir);
+    _float  fYaw = atan2f(fCross, fDot);
+    _float  fStep = XMConvertToRadians(m_fRotSpeedDeg) * fTimeDelta;
+    _float  fApply = (fabsf(fYaw) <= fStep) ? fYaw : (fYaw > 0.f ? fStep : -fStep);
+    m_pTransform->Rotate(XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fApply));
+}
+
 _bool CMovement::Move(_fvector vWishDir, _float fTimeDelta)
 {
     if (nullptr == m_pTransform || nullptr == m_pController)
@@ -83,15 +104,7 @@ _bool CMovement::Move(_fvector vWishDir, _float fTimeDelta)
         _vector vDir = XMVector3Normalize(XMVectorSetY(vWishDir, 0.f));
         vTargetVel = vDir * m_fMoveSpeed;
 
-        // 입력 방향으로 부드럽게 회전(현재 LOOK 기준)
-        _vector vLook = XMVector3Normalize(XMVectorSetY(m_pTransform->Get_State(STATE::LOOK), 0.f));
-        _float  fDot = XMVectorGetX(XMVector3Dot(vLook, vDir));
-        _float  fCross = XMVectorGetZ(vLook) * XMVectorGetX(vDir)
-            - XMVectorGetX(vLook) * XMVectorGetZ(vDir);
-        _float  fYaw = atan2f(fCross, fDot);
-        _float  fStep = XMConvertToRadians(m_fRotSpeedDeg) * fTimeDelta;
-        _float  fApply = (fabsf(fYaw) <= fStep) ? fYaw : (fYaw > 0.f ? fStep : -fStep);
-        m_pTransform->Rotate(XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fApply));
+        Apply_Facing(vDir, fTimeDelta);
     }
 
     // 현재 속도를 목표로 가속/감속 (MoveTowards)

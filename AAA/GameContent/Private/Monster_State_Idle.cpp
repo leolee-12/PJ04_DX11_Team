@@ -20,6 +20,8 @@ void CMonster_State_Idle::Enter(CMonster* pMonster)
 	if (nullptr == pMonster)
 		return;
 
+	pMonster->Get_BlackBoard().bActionFinished = false;
+	pMonster->Get_BlackBoard().bCanTransition = true;
 	pMonster->Play_StateAnimation(MONSTER_STATE_TYPE::IDLE);
 }
 

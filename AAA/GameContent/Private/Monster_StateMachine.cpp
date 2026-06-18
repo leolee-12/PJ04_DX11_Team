@@ -1,10 +1,6 @@
 #include "Monster_StateMachine.h"
-
 #include "Monster.h"
-#include "Monster_State_Idle.h"
-#include "Monster_State_Chase.h"
-#include "Monster_State_Attack.h"
-#include "Monster_State_Retreat.h"
+#include "Monster_State.h"
 
 CMonster_StateMachine::CMonster_StateMachine()
 {
@@ -12,15 +8,10 @@ CMonster_StateMachine::CMonster_StateMachine()
 
 HRESULT CMonster_StateMachine::Initialize(CMonster* pMonster)
 {
+    if (pMonster == nullptr)
+        return E_FAIL;
+
     m_pMonster = pMonster;
-    
-    if (m_pMonster == nullptr)
-        return E_FAIL;
-
-    if (FAILED(Init_State()))
-        return E_FAIL;
-
-    Change_State(MONSTER_STATE_TYPE::IDLE);
 
     return S_OK;
 }
@@ -33,22 +24,29 @@ MONSTER_STATE_TYPE		CMonster_StateMachine::Get_StateType()
     return m_pCurState->Get_StateType();
 }
 
-void CMonster_StateMachine::Change_State(MONSTER_STATE_TYPE eNewState)
+_bool CMonster_StateMachine::Change_State(MONSTER_STATE_TYPE eNewState)
 {
-    if (m_pCurState && m_pCurState->Get_StateType() == eNewState)
-        return;
+    CMonster_State* pNextState = Find_State(eNewState);
+    if (nullptr == pNextState)
+        return false;
 
-    if (m_pCurState != nullptr)
+    if (m_pCurState == pNextState)
+        return true;
+
+    if (nullptr != m_pCurState)
         m_pCurState->Exit(m_pMonster);
 
-    m_pCurState = Find_State(eNewState);
-    if (m_pCurState == nullptr)
-        return;
+    m_pCurState = pNextState;
 
-    if (m_pMonster != nullptr)
-        m_pMonster->Get_BlackBoard().bActionFinished = false;       
+    if (nullptr != m_pMonster)
+    {
+        m_pMonster->Get_BlackBoard().bActionFinished = false;
+        m_pMonster->Get_BlackBoard().bCanTransition = false;        // 기본값 둘다 false
+    }
 
     m_pCurState->Enter(m_pMonster);
+
+    return true;
 }
 
 void	CMonster_StateMachine::Update_StateMachine(_float fTimeDelta)
@@ -59,31 +57,25 @@ void	CMonster_StateMachine::Update_StateMachine(_float fTimeDelta)
     m_pCurState->Update(m_pMonster, fTimeDelta);
 }
 
-HRESULT CMonster_StateMachine::Init_State()
+HRESULT CMonster_StateMachine::Register_State(MONSTER_STATE_TYPE eType, CMonster_State* pState)
 {
-    auto Register_State = [this](MONSTER_STATE_TYPE eType, CMonster_State* pNewState) -> HRESULT
-        {
-            if (nullptr == pNewState)
-                return E_FAIL;
-
-            m_States[eType] = pNewState;
-            return S_OK;
-        };
-
-    if (FAILED(Register_State(MONSTER_STATE_TYPE::IDLE, CMonster_State_Idle::Create())))
+    if (nullptr == pState)
         return E_FAIL;
 
-    if (FAILED(Register_State(MONSTER_STATE_TYPE::CHASE, CMonster_State_Chase::Create())))
+    if (Has_State(eType))
+    {
+        Safe_Release(pState);
         return E_FAIL;
+    }
 
-    if (FAILED(Register_State(MONSTER_STATE_TYPE::RETREAT, CMonster_State_Retreat::Create())))
-        return E_FAIL;
-
-    if (FAILED(Register_State(MONSTER_STATE_TYPE::ATTACK, CMonster_State_Attack::Create())))
-        return E_FAIL;
-
+    m_States.emplace(eType, pState);
 
     return S_OK;
+}
+
+_bool CMonster_StateMachine::Has_State(MONSTER_STATE_TYPE eType) const
+{
+    return m_States.find(eType) != m_States.end();
 }
 
 CMonster_State* CMonster_StateMachine::Find_State(MONSTER_STATE_TYPE eNewState)
