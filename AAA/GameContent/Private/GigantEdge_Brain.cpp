@@ -31,82 +31,175 @@ void CGigantEdge_Brain::Decide(CMonster* pMonster, const MONSTER_BLACKBOARD& BB,
 HRESULT CGigantEdge_Brain::Initialize()
 {
     constexpr _float fAttackRange = 4.f;
-    constexpr _float fGuardTime = 2.f;
+    constexpr _float fFacingDot = 0.86f;
+    constexpr _float fTurnSpeedDeg = 180.f;
+    constexpr _float fGuardTime = 4.f;
+    constexpr _float fChargeTime = 0.8f;  
+    constexpr _float fThrustCharge = 1.0f; 
+    constexpr _int   iAttackCount = 3;
 
-    // 1회성
-    auto MakeOneShot = [this](const string& strClip) -> CBTAction*
+    auto OneShot = [this](const string& clip, _float fSpeed = 1.f) -> CBTNode*
         {
-            auto bStarted = make_shared<bool>(false);
+            auto started = make_shared<bool>(false);
             return CBTAction::Create(
-                [this, strClip, bStarted](CBlackboard*, _float) -> BT_STATUS
-                {
+                [this, clip, fSpeed, started](CBlackboard*, _float) -> BT_STATUS {
                     auto* a = m_pOwner->Get_Body()->Get_Animator();
-                    if (!*bStarted) { a->Play(strClip, false, true); *bStarted = true; }
-                    if (a->Is_Finished()) { *bStarted = false; return BT_STATUS::SUCCESS; }
+                    if (!*started) { a->Play(clip, false, true, 0.2f, fSpeed); *started = true; }
+                    if (a->Is_Finished()) { *started = false; return BT_STATUS::SUCCESS; }
                     return BT_STATUS::RUNNING;
                 },
-                [bStarted]() { *bStarted = false; });
+                [started]() { *started = false; });
         };
 
-    // 그로기
+    auto HoldLoop = [this](const string& clip, _float fHold, _float fSpeed = 1.f) -> CBTNode*
+        {
+            auto t = make_shared<_float>(0.f);
+            return CBTAction::Create(
+                [this, clip, fHold, fSpeed, t](CBlackboard*, _float dt) -> BT_STATUS {
+                    auto* a = m_pOwner->Get_Body()->Get_Animator();
+                    if (*t == 0.f) a->Play(clip, true, true, 0.2f, fSpeed);
+                    *t += dt;
+                    if (*t >= fHold) { *t = 0.f; return BT_STATUS::SUCCESS; }
+                    return BT_STATUS::RUNNING;
+                },
+                [t]() { *t = 0.f; });
+        };
+
+    auto MakeChargeAttack = [&](const string& p) -> CBTNode*     
+        {
+            return CBTSequence::Create({
+                OneShot(p + "ChargeStart", 2.f),
+                HoldLoop(p + "ChargeWait", fChargeTime),
+                OneShot(p + "Start", 2.f),
+                OneShot(p + "Wait", 2.f),
+                OneShot(p + "End", 2.f),
+                });
+        };
+
+    auto MakeThrust = [&]() -> CBTNode* {
+        return CBTSequence::Create({
+            OneShot("PreThrustStart", 2.f),
+            HoldLoop("PreThrustStartWait", fThrustCharge),
+            OneShot("ThrustStart", 2.f),
+            OneShot("ThrustMove", 2.f),     
+            OneShot("ThrustEnd", 2.f),
+            OneShot("ThrustEndWait", 2.f),
+            OneShot("ThrustEndWaitEnd", 2.f),
+            });
+        };
+
     auto bGroggy = make_shared<bool>(false);
     auto* pGroggy = CBTAction::Create(
-        [this, bGroggy](CBlackboard*, _float) -> BT_STATUS
-        {
+        [this, bGroggy](CBlackboard*, _float) -> BT_STATUS {
             auto* a = m_pOwner->Get_Body()->Get_Animator();
-            if (!*bGroggy) { a->Play("Groggy", false, true); *bGroggy = true; }
+            if (!*bGroggy) { a->Play("ShieldGuardDamage", false, true, 0.2f, 2.f); *bGroggy = true; }
             if (a->Is_Finished()) { *bGroggy = false; m_pOwner->Clear_Groggy(); return BT_STATUS::SUCCESS; }
             return BT_STATUS::RUNNING;
         },
         [bGroggy]() { *bGroggy = false; });
 
-    // 추격 
-    auto bWalk = make_shared<bool>(false);
+    auto bMove = make_shared<bool>(false);
     auto* pChase = CBTAction::Create(
-        [this, bWalk](CBlackboard* pBB, _float) -> BT_STATUS
-        {
-            if (!*bWalk) { m_pOwner->Get_Body()->Get_Animator()->Play("Walk", true, true); *bWalk = true; }
-            _float3 vDir = pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 0.f));
-            m_pOwner->Add_MoveDir(vDir);                 // CMonster가 Move 적용
+        [this, bMove](CBlackboard* pBB, _float) -> BT_STATUS {
+            if (!*bMove) { m_pOwner->Get_Body()->Get_Animator()->Play("Move", true, true, 0.2f, 2.f); *bMove = true; }
+#ifdef _DEBUG
+            if (!m_pOwner->Dbg_WalkInPlace())
+#endif
+                m_pOwner->Add_MoveDir(pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 0.f)));
             return BT_STATUS::RUNNING;
         },
-        [bWalk]() { *bWalk = false; });
+        [bMove]() { *bMove = false; });
 
-    // 공격 선택 3가지
-    auto* pPick = CBTAction::Create([this](CBlackboard* pBB, _float)
-        { pBB->Set<_int>("AttackChoice", (_int)(rand() % 3)); return BT_STATUS::SUCCESS; });
-    auto MakeAttack = [&](_int i, const string& clip) -> CBTNode*
-        {
-            return CBTSequence::Create({
-                CBTCondition::Create([i](CBlackboard* pBB) { return pBB->Get<_int>("AttackChoice", -1) == i; }),
-                MakeOneShot(clip),
-                });
+    auto* pPick = CBTAction::Create([this, iAttackCount](CBlackboard* pBB, _float) {
+        _int iChoice = (_int)(rand() % iAttackCount);
+#ifdef _DEBUG
+        if (m_pOwner->Dbg_ForceAttack() >= 0) iChoice = m_pOwner->Dbg_ForceAttack() % iAttackCount;
+#endif
+        pBB->Set<_int>("AttackChoice", iChoice);
+        return BT_STATUS::SUCCESS;
+        });
+    auto MakeAttackBranch = [&](_int i, CBTNode* pAttack) -> CBTNode* {
+        return CBTSequence::Create({
+            CBTCondition::Create([i](CBlackboard* pBB) { return pBB->Get<_int>("AttackChoice", -1) == i; }),
+            pAttack,
+            });
         };
 
-    // 가드
     auto fGuardT = make_shared<_float>(0.f);
-    auto* pGuard = CBTAction::Create(
-        [this, fGuardT, fGuardTime](CBlackboard*, _float fDt) -> BT_STATUS
-        {
-            if (*fGuardT == 0.f) { m_pOwner->Get_Body()->Get_Animator()->Play("Guard", true, true); m_pOwner->Set_Guarding(true); }
-            *fGuardT += fDt;
+    auto* pGuardHold = CBTAction::Create(
+        [this, fGuardT, fGuardTime](CBlackboard*, _float dt) -> BT_STATUS {
+            auto* a = m_pOwner->Get_Body()->Get_Animator();
+            if (*fGuardT == 0.f) { a->Play("ShieldGuardWait", true, true); m_pOwner->Set_Guarding(true); }
+            *fGuardT += dt;
             if (*fGuardT >= fGuardTime) { *fGuardT = 0.f; m_pOwner->Set_Guarding(false); return BT_STATUS::SUCCESS; }
             return BT_STATUS::RUNNING;
         },
-        [this, fGuardT]() { *fGuardT = 0.f; m_pOwner->Set_Guarding(false); });   // 중단 시 가드 해제
+        [this, fGuardT]() { *fGuardT = 0.f; m_pOwner->Set_Guarding(false); });
+    CBTNode* pGuard = CBTSequence::Create({
+        OneShot("ShieldGuardStart"),
+        pGuardHold,
+        OneShot("ShieldHide"),
+        });
 
-    auto* pInRange = CBTCondition::Create([fAttackRange](CBlackboard* pBB)
-        { return pBB->Get<_float>("DistToTarget", FLT_MAX) <= fAttackRange; });
+    auto* pInRangeDist = CBTCondition::Create([this, fAttackRange](CBlackboard* pBB) {
+#ifdef _DEBUG
+        if (m_pOwner->Dbg_ForceInRange()) return true;
+#endif
+        return pBB->Get<_float>("DistToTarget", FLT_MAX) <= fAttackRange;
+        });
 
-    // 전투: 사거리안 -> 추격 끊고 공격
+    auto* pFacing = CBTCondition::Create([this, fFacingDot](CBlackboard* pBB) {
+#ifdef _DEBUG
+        if (m_pOwner->Dbg_ForceInRange()) return true;
+#endif
+        _float3 vDir = pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 0.f));
+        _vector vToTgt = XMLoadFloat3(&vDir);
+        _vector vLook = XMVector3Normalize(XMVectorSetY(m_pOwner->Get_Transform()->Get_State(STATE::LOOK), 0.f));
+        return XMVectorGetX(XMVector3Dot(vLook, vToTgt)) >= fFacingDot;
+        });
+
+    auto bTurn = make_shared<bool>(false);
+    auto* pTurnToTarget = CBTAction::Create(
+        [this, bTurn, fTurnSpeedDeg, fFacingDot](CBlackboard* pBB, _float fDt) -> BT_STATUS {
+            if (!*bTurn) { m_pOwner->Get_Body()->Get_Animator()->Play("Wait", true, true); *bTurn = true; }
+
+            _float3 vDir = pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 0.f));
+            _vector vToTgt = XMLoadFloat3(&vDir);
+            if (XMVector3Equal(vToTgt, XMVectorZero())) { *bTurn = false; return BT_STATUS::SUCCESS; }
+
+            CTransform* pTf = m_pOwner->Get_Transform();
+            _vector vLook = XMVector3Normalize(XMVectorSetY(pTf->Get_State(STATE::LOOK), 0.f));
+            _float  fDot = XMVectorGetX(XMVector3Dot(vLook, vToTgt));
+            if (fDot >= fFacingDot) { *bTurn = false; return BT_STATUS::SUCCESS; } 
+
+            _float fCross = XMVectorGetZ(vLook) * XMVectorGetX(vToTgt)
+                - XMVectorGetX(vLook) * XMVectorGetZ(vToTgt);
+            _float fYaw = atan2f(fCross, fDot);
+            _float fStep = XMConvertToRadians(fTurnSpeedDeg) * fDt;
+            _float fApply = (fabsf(fYaw) <= fStep) ? fYaw : (fYaw > 0.f ? fStep : -fStep);
+            pTf->Rotate(XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fApply));
+            return BT_STATUS::RUNNING;
+        },
+        [bTurn]() { *bTurn = false; });
+
     CBTNode* pCombat = CBTReactiveSelector::Create({
         CBTSequence::Create({
-            pInRange, pPick,
-            CBTSelector::Create({ MakeAttack(0, "Attack_Slam"), MakeAttack(1, "Attack_Charge"), MakeAttack(2, "Attack_Swing") }),
-            pGuard,
+            pInRangeDist,                              
+            CBTReactiveSelector::Create({
+                CBTSequence::Create({                
+                    pFacing, pPick,
+                    CBTSelector::Create({
+                        MakeAttackBranch(0, MakeChargeAttack("AttackA")),       
+                        MakeAttackBranch(1, MakeChargeAttack("SideAttackA")),   
+                        MakeAttackBranch(2, MakeThrust()),                      
+                    }),
+                    pGuard,
+                }),
+                pTurnToTarget,                         
+            }),
         }),
-        pChase,
-        });
+        pChase,                                        
+    });
 
     CBTNode* pRoot = CBTReactiveSelector::Create({
         CBTSequence::Create({

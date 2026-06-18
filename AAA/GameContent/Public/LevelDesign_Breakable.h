@@ -8,7 +8,7 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL CLevelDesign_Breakable final : public CLevelDesignObject
+class CLevelDesign_Breakable final : public CLevelDesignObject
 {
 	GENERATED_BODY(CLevelDesign_Breakable)
 

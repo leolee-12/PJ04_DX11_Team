@@ -79,6 +79,7 @@ protected:
 	_float						m_fMaxHP = {};
 	_float						m_fCurHP = {};
 
+
 protected:
 	// 부모가 관리할 공통 파이프라인
 	HRESULT						Ready_Movement();
@@ -92,6 +93,10 @@ protected:
 	virtual HRESULT				Ready_State(CMonster_StateMachine* pStateMachine);
 	virtual HRESULT				Ready_AnimEvents() { return S_OK; }		// Bkody의 Animator의 이벤트 콜백 설정함수
 
+	// 윤석현 추가
+	void Enable_Controller(_bool bEnable);
+
+	//윤석현 수정 
 	virtual void				Update_AI(_float fTimeDelta);
 	virtual void				Perceive(_float fTimeDelta);
 

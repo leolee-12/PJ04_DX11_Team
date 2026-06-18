@@ -5,6 +5,16 @@
 #include "Monster_Brain_FSM.h"
 #include "Monster_State_Idle.h"
 
+#pragma warning(push, 0)
+#ifdef new
+#undef new
+#endif
+#include <PhysX/PxPhysicsAPI.h>
+#if defined(_DEBUG) && defined(DBG_NEW)
+#define new DBG_NEW
+#endif
+#pragma warning(pop)
+
 CMonster::CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCharacter{ pDevice, pContext }
 	, m_fMaxHP{ 100.f }
@@ -42,9 +52,9 @@ void CMonster::Priority_Update(_float fTimeDelta)
 
 void CMonster::Update(_float fTimeDelta)
 {
-	__super::Update(fTimeDelta);
-
 	Update_AI(fTimeDelta);
+
+	__super::Update(fTimeDelta);
 }
 
 void CMonster::Late_Update(_float fTimeDelta)
@@ -252,6 +262,30 @@ void CMonster::Perceive(_float fTimeDelta)
 
 	m_BlackBoard.bCanSeeTarget = true;
 	m_BlackBoard.vLastKnownPos = m_BlackBoard.vTargetPos;
+}
+
+void CMonster::Enable_Controller(_bool bEnable)
+{
+	if (nullptr == m_pController)
+		return;
+
+	physx::PxRigidDynamic* pActor = m_pController->getActor();
+	if (nullptr == pActor)
+		return;
+
+	const physx::PxU32 iNum = pActor->getNbShapes();
+	if (0 == iNum)
+		return;
+
+	std::vector<physx::PxShape*> Shapes(iNum);
+	pActor->getShapes(Shapes.data(), iNum);
+	for (physx::PxShape* pShape : Shapes)
+	{
+		if (nullptr == pShape)
+			continue;
+		pShape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, bEnable);  // ¹°¸® ¸·Èû on/off
+		pShape->setFlag(physx::PxShapeFlag::eSCENE_QUERY_SHAPE, bEnable); // ·¹ÀÌ/½ºÀ¬ Äõ¸® on/off
+	}
 }
 
 void CMonster::Update_AI(_float fTimeDelta)
