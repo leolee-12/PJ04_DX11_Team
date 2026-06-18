@@ -108,7 +108,7 @@ HRESULT CBladeKnight_Body::Ready_Components()
 
     CAnimator::ANIMATOR_DESC AnimDesc{};
     AnimDesc.pModel = m_pModelCom;
-
+    AnimDesc.strDataFile = TEXT("../../Resources/CHJ/Monster/BladeKnight/BladeKnight_Anim_Events.json");
     m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
     if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
         return E_FAIL;

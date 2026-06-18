@@ -5,7 +5,7 @@ NS_BEGIN(Client)
 
 class CMonster;
 
-class CLIENT_DLL CMonster_State_Chase final : public CMonster_State
+class CMonster_State_Chase final : public CMonster_State
 {
 private:
 	CMonster_State_Chase();
