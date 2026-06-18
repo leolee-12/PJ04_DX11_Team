@@ -101,6 +101,13 @@ namespace Engine
 		float			fMaskStrength = 1.f;
 
 		int				iExtraBind[4] = { -1, -1, -1, -1 };
+
+		unsigned int    iExtraTexType[4] = {
+				static_cast<unsigned int>(MTEX_TYPE::UNKNOWN),
+				static_cast<unsigned int>(MTEX_TYPE::UNKNOWN),
+				static_cast<unsigned int>(MTEX_TYPE::UNKNOWN),
+				static_cast<unsigned int>(MTEX_TYPE::UNKNOWN)
+		};
 	};
 
 	struct TEXTURE_HUB_STATS
