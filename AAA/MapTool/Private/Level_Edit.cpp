@@ -965,6 +965,24 @@ void CLevel_Edit::Back_To_Edit()
 	Set_CameraActive(true);
 }
 
+void CLevel_Edit::Reset_EditCameraRotation()
+{
+	if (nullptr == m_pCamera)
+		return;
+
+	Back_To_Edit();
+	m_pCamera->Reset_Rotation();
+}
+
+void CLevel_Edit::Jump_EditCamera(_float fForwardDistance, _float fRightDistance)
+{
+	if (nullptr == m_pCamera)
+		return;
+
+	Back_To_Edit();
+	m_pCamera->Jump_Local(fForwardDistance, fRightDistance);
+}
+
 const vector<CLevel_Edit::EDITOR_OBJECT_HANDLE>* CLevel_Edit::Get_CameraLayer() const
 {
 	auto it = m_Layers.find(L"Layer_Camera");

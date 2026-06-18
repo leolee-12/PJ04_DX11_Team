@@ -19,7 +19,6 @@ private:
 
 private:
 	void	Draw_EditButtons(class CLevel_Edit* pLevel);
-	void	Draw_GizmoButtons();
 	void	Draw_CameraButtons(class CLevel_Edit* pLevel);
 
 public:

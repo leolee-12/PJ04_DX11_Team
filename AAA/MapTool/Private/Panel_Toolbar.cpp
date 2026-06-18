@@ -125,9 +125,6 @@ void CPanel_Toolbar::Render()
 	ImGui::SameLine();
 	Draw_MapPreviewButtons(pLevel, &s_iMapPreviewPreset);
 
-	Draw_GizmoButtons();
-	ImGui::SameLine();
-
 	if (m_bKeyInputEnabled)
 	{
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.7f, 0.2f, 1.f));
@@ -199,33 +196,43 @@ void CPanel_Toolbar::Draw_EditButtons(CLevel_Edit* pLevel)
 	}
 }
 
-void CPanel_Toolbar::Draw_GizmoButtons()
-{
-	CEditInstance* pEI = CEditInstance::GetInstance();
-	GIZMO_OP eOp = pEI->Get_GizmoOp();
-
-	auto OpButton = [&](const char* label, GIZMO_OP op)
-		{
-			_bool bActive = (eOp == op);
-			if (bActive)
-				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.6f, 1.0f, 1.0f));
-			if (ImGui::Button(label))
-				pEI->Set_GizmoOp(op);
-			if (bActive)
-				ImGui::PopStyleColor();
-		};
-
-	OpButton("Move", GIZMO_OP::TRANSLATE);
-	ImGui::SameLine();
-	OpButton("Rotate", GIZMO_OP::ROTATE);
-	ImGui::SameLine();
-	OpButton("Scale", GIZMO_OP::SCALE);
-}
-
 void CPanel_Toolbar::Draw_CameraButtons(CLevel_Edit* pLevel)
 {
+	if (nullptr == pLevel)
+		return;
+
+	static _float s_fJumpStep = 25.f;
+
 	if (ImGui::Button("Back to Edit"))
 		pLevel->Back_To_Edit();
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Reset Rot"))
+		pLevel->Reset_EditCameraRotation();
+
+	ImGui::SameLine();
+	ImGui::Text("Step");
+	ImGui::SameLine();
+
+	ImGui::SetNextItemWidth(80.f);
+	ImGui::DragFloat("##CameraJumpStep", &s_fJumpStep, 5.f, 5.f, 500.f, "%.0f");
+
+	ImGui::SameLine();
+	if (ImGui::Button("F"))
+		pLevel->Jump_EditCamera(s_fJumpStep, 0.f);
+
+	ImGui::SameLine();
+	if (ImGui::Button("B"))
+		pLevel->Jump_EditCamera(-s_fJumpStep, 0.f);
+
+	ImGui::SameLine();
+	if (ImGui::Button("L"))
+		pLevel->Jump_EditCamera(0.f, -s_fJumpStep);
+
+	ImGui::SameLine();
+	if (ImGui::Button("R"))
+		pLevel->Jump_EditCamera(0.f, s_fJumpStep);
 
 	ImGui::SameLine();
 

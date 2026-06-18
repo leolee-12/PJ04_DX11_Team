@@ -97,6 +97,8 @@ public:
 
 	void Preview_Camera(CGameObject* pCam);
 	void Back_To_Edit();
+	void Reset_EditCameraRotation();
+	void Jump_EditCamera(_float fForwardDistance, _float fRightDistance);
 
 public:       // Hierarchy
 	_uint Get_HierarchyRevision() const { return m_iHierarchyRevision; }
