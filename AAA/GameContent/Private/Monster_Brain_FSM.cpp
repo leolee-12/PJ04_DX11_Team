@@ -10,33 +10,40 @@ HRESULT CMonster_Brain_FSM::Initialize()
 	return S_OK;
 }
 
+_bool CMonster_Brain_FSM::Can_Decide(CMonster* pMonster, const MONSTER_BLACKBOARD& BlackBoard) const
+{
+    if (nullptr == pMonster)
+        return false;
+
+    MONSTER_STATE_TYPE eCurState = pMonster->Get_StateType();
+
+    if (eCurState == MONSTER_STATE_TYPE::CAPTURED ||
+        eCurState == MONSTER_STATE_TYPE::DEAD)
+        return false;
+
+    if (!BlackBoard.bCanTransition)
+        return false;
+
+
+    return true;
+}
+
 void CMonster_Brain_FSM::Decide(CMonster* pMonster, const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta)
 {
-    MONSTER_STATE_TYPE eCur = pMonster->Get_StateType();
-
-    // [범주 1] - Interrupted 는  제외
-    if (eCur == MONSTER_STATE_TYPE::HIT ||
-        eCur == MONSTER_STATE_TYPE::CAPTURED ||
-        eCur == MONSTER_STATE_TYPE::DEAD)
+    if (nullptr == pMonster)
         return;
 
-    // [범주 2] - '완료'까지 유지 하는 상태 - 끝나기 전에는 안 건드림
-    if (eCur == MONSTER_STATE_TYPE::ATTACK)
-    {
-        if (BlackBoard.bActionFinished)
-        {
-            pMonster->Change_State(MONSTER_STATE_TYPE::RETREAT);
-            return;
-        }
-        else
-            return;
-    }
+    if (!Can_Decide(pMonster, BlackBoard))
+        return;
 
-    // [범주 3] - 자유 재평가
-    if (BlackBoard.bCanSeeTarget && BlackBoard.bActionFinished)
-        pMonster->Change_State(MONSTER_STATE_TYPE::ATTACK);     // 임시로 작성
-    else
-        pMonster->Change_State(MONSTER_STATE_TYPE::IDLE);       // 다 빠져나오면 IDLE 회귀
+    MONSTER_STATE_TYPE eCurState = pMonster->Get_StateType();
+
+    if (eCurState != MONSTER_STATE_TYPE::IDLE &&
+        nullptr == BlackBoard.pTarget &&
+        pMonster->Has_State(MONSTER_STATE_TYPE::IDLE))
+    {
+        pMonster->Change_State(MONSTER_STATE_TYPE::IDLE);
+    }
 }
 
 CMonster_Brain_FSM*  CMonster_Brain_FSM::Create()

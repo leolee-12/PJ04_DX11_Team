@@ -5,14 +5,15 @@ NS_BEGIN(Client)
 
 class CMonster;
 
-class CMonster_Brain_FSM final : public CMonsterBrain
+class CMonster_Brain_FSM : public CMonsterBrain
 {
-private:
+protected:
 	CMonster_Brain_FSM();
 	virtual ~CMonster_Brain_FSM() = default;
 
-private:
+protected:
 	HRESULT						Initialize();
+	_bool						Can_Decide(CMonster* pMonster, const MONSTER_BLACKBOARD& BlackBoard) const;
 
 public: 
 	virtual void				Decide(CMonster* pMonster, const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta) override;

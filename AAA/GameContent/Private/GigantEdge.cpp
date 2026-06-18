@@ -72,8 +72,8 @@ void CGigantEdge::On_Hit(_fvector vAttackerPos, _float fDamage)
 {
     if (!Is_Active()) return;           
 
-    m_fHP -= fDamage;
-    if (m_fHP <= 0.f) { m_fHP = 0.f; /* TODO: 荤噶 贸府 */ return; }
+    m_fCurHP -= fDamage;
+    if (m_fCurHP <= 0.f) { m_fCurHP = 0.f; /* TODO: 荤噶 贸府 */ return; }
 
     if (m_bGuarding)
     {

@@ -20,6 +20,8 @@ void CMonster_State_Attack::Enter(CMonster* pMonster)
 	if (nullptr == pMonster)
 		return;
 
+	pMonster->Get_BlackBoard().bActionFinished = false;
+	pMonster->Get_BlackBoard().bCanTransition = false;
 	pMonster->Play_StateAnimation(MONSTER_STATE_TYPE::ATTACK);
 }
 
@@ -31,7 +33,10 @@ void CMonster_State_Attack::Update(CMonster* pMonster, _float fTimeDelta)
 		return;
 
 	if (pMonster->Is_StateAnimationFinished())
+	{
 		pMonster->Get_BlackBoard().bActionFinished = true;
+		pMonster->Get_BlackBoard().bCanTransition = true;
+	}
 }
 
 void CMonster_State_Attack::Exit(CMonster* pMonster)

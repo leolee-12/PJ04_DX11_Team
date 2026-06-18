@@ -49,7 +49,8 @@ public:
 	void						Clear_MoveDir();
 
 	// Brain이 실행 FSM에 상태 전환을 요청
-	void						Change_State(MONSTER_STATE_TYPE eNewState);
+	_bool						Change_State(MONSTER_STATE_TYPE eNewState);
+	_bool						Has_State(MONSTER_STATE_TYPE eState) const;
 	MONSTER_STATE_TYPE			Get_StateType() const;
 
 public:
@@ -61,7 +62,7 @@ public:
 	virtual void				Play_StateAnimation(MONSTER_STATE_TYPE eState) = 0;
 
 	// 애니메이션이 끝났는지 노출해주는 함수
-	virtual _bool				Is_StateAnimationFinished() const = 0;
+	virtual _bool				Is_StateAnimationFinished() const { return true; }
 
 protected:
 	physx::PxController*		m_pController = { nullptr };
@@ -84,12 +85,15 @@ protected:
 	HRESULT						Ready_AI();
 
 	// 윤석현 추가 AI 드라이버 선택 훅 (자식이 오버라이드)
-	virtual CMonsterBrain*		Create_Brain(); //기본: FSM Brain
+	virtual CMonsterBrain*		Create_Brain();		//기본: FSM Brain
+	virtual HRESULT				Create_Movement();	// 기본 : Monster_Movement - 별도 무브먼트 필요할 때 상속받아서 쓸 것 
 	virtual _bool				Use_StateMachine() const { return true; } // BT 전용 몬스터는 false 반환
 
-	//윤석현 수정 
+	virtual HRESULT				Ready_State(CMonster_StateMachine* pStateMachine);
+	virtual HRESULT				Ready_AnimEvents() { return S_OK; }		// Bkody의 Animator의 이벤트 콜백 설정함수
+
 	virtual void				Update_AI(_float fTimeDelta);
-	void						Perceive(_float fTimeDelta);
+	virtual void				Perceive(_float fTimeDelta);
 
 protected:
 	virtual void				Free() override;
