@@ -42,21 +42,6 @@ HRESULT CEffect_Part::Initialize(void* pArg)
     return S_OK;
 }
 
-void CEffect_Part::MoveUVScroll(const _float fRatio, const _bool bUpdate, const _float2 vScrollCount, const _float2 vBaseUV, _float2& vOutUV)
-{
-    if (bUpdate == false)
-    {
-        vOutUV = vBaseUV;
-        return;
-    }
-
-    vOutUV.x = vBaseUV.x + vScrollCount.x * fRatio;
-    vOutUV.y = vBaseUV.y + vScrollCount.y * fRatio;
-
-    vOutUV.x = fmodf(vOutUV.x, 1.f);
-    vOutUV.y = fmodf(vOutUV.y, 1.f);
-}
-
 void CEffect_Part::Priority_Update(_float fTimeDelta)
 {
 
@@ -292,7 +277,7 @@ void CEffect_Part::Update_Value(const _float fTimeDelta)
     if (m_bIsPlay == false)
         return;  
 
-    m_fAccTime += fTimeDelta;
+    //m_fAccTime += fTimeDelta;
 
     _float fRatio = m_fAccTime / m_fDuration;
     Helper::FloatClamp(fRatio, 0.f, 1.f);
@@ -485,6 +470,21 @@ void CEffect_Part::Update_MoveSin(const _float fTimeDelta, const _float fRatio)
     _vector vCurPos = m_pTransformCom->Get_State(STATE::POSITION);
 
     m_pTransformCom->Set_State(STATE::POSITION, vCurPos + XMVectorSet(0.f, fCurOffsetY, 0.f, 0.f));
+}
+
+void CEffect_Part::MoveUVScroll(const _float fRatio, const _bool bUpdate, const _float2 vScrollCount, const _float2 vBaseUV, _float2& vOutUV)
+{
+    if (bUpdate == false)
+    {
+        vOutUV = vBaseUV;
+        return;
+    }
+
+    vOutUV.x = vBaseUV.x + vScrollCount.x * fRatio;
+    vOutUV.y = vBaseUV.y + vScrollCount.y * fRatio;
+
+    vOutUV.x = fmodf(vOutUV.x, 1.f);
+    vOutUV.y = fmodf(vOutUV.y, 1.f);
 }
 
 void CEffect_Part::Update_UVScroll(const _float fTimeDelta, const _float fRatio)

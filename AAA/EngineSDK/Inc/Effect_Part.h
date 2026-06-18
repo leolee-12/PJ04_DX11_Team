@@ -174,8 +174,6 @@ protected:
     virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void* pArg) override;
 
-    void MoveUVScroll(const _float fRatio, const _bool bUpdate, const _float2 vScrollCount, const _float2 vBaseUV, _float2& vOutUv);
-
 public:
     virtual void    Priority_Update(_float fTimeDelta) override;
     virtual void    Update(_float fTimeDelta) override;
@@ -183,6 +181,7 @@ public:
     virtual HRESULT Render() override;
 
     virtual void    Effect_Start();
+
     void Set_ParentMatrix(const _float4x4* pParentMatrix);
 
     void Update_PlayValue(_bool bIsPlay, _bool bLoop, _float fDuration, _float fAccTime);
@@ -233,6 +232,8 @@ protected:
     void Update_Rot(const _float fTimeDelta, const _float fRatio);
     void Update_Move(const _float fTimeDelta, const _float fRatio);
     void Update_MoveSin(const _float fTimeDelta, const _float fRatio);
+
+    void MoveUVScroll(const _float fRatio, const _bool bUpdate, const _float2 vScrollCount, const _float2 vBaseUV, _float2& vOutUv);
     virtual void Update_UVScroll(const _float fTimeDelta, const _float fRatio);
 
     virtual void Update_EffectPart(const _float fTimeDelta, const _float fRatio);
