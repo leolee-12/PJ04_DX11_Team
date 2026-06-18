@@ -217,14 +217,14 @@ HRESULT CKirby::Ready_Components()
 
     // TriggerSensor(Collider)
     m_pTriggerSensor = Add_Component<CCollider>(TEXT("Com_TriggerSensor"),
-        CCollider::Create(m_pDevice, m_pContext, COLLIDER::AABB));
+        CCollider::Create(m_pDevice, m_pContext, COLLIDER::SPHERE));
     if (m_pTriggerSensor == nullptr)
         return E_FAIL;
 
     CCollider::COLLIDER_DESC ColliderDesc{};
     ColliderDesc.pOwner = this;
-    ColliderDesc.vCenter = _float3(0.f, s_fCCT_Radius + s_fCCT_Height * 0.5f, 0.f);
-    ColliderDesc.vSize = _float3(s_fCCT_Radius * 2.f, s_fCCT_Height + s_fCCT_Radius * 2.f, s_fCCT_Height * 2.f);
+    ColliderDesc.vCenter = _float3(vFootPos.x, vFootPos.y + s_fCCT_Radius, vFootPos.z);
+    ColliderDesc.fRadius = s_fCCT_Radius;
 
     if (FAILED(m_pTriggerSensor->Initialize(&ColliderDesc)))
         return E_FAIL;

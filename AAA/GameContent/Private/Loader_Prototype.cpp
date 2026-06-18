@@ -57,12 +57,18 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
     }
 
     static const ENV_ENTRY g_EnvTable[] = {
-      { TEXT("Field"), TEXT("../../Resources/YSH/Env/Field_Diffuse.dds"), TEXT("../../Resources/YSH/Env/Field_Specular.dds"), 0.5f },
+      { 
+        TEXT("Grass"), 
+        TEXT("../../Resources/YSH/Env/IBL/Grass/Diffuse.dds"), 
+        TEXT("../../Resources/YSH/Env/IBL/Grass/Specular.dds"),
+        TEXT("../../Resources/YSH/Env/LUT/Grass01.dds"),
+        3.f 
+      },
         // 맵 추가 = 행 추가
     };
 
     for (auto& e : g_EnvTable)
-        pProxy->Register_Environment(e.tag, e.diff, e.spec, e.intensity);
+        pProxy->Register_Environment(e.tag, e.diff, e.spec, e.lut, e.intensity);
 
 
     //sky Sphere

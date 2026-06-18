@@ -131,6 +131,13 @@ MONSTER_STATE_TYPE	CMonster::Get_StateType() const
 	return m_pStateMachine->Get_StateType();
 }
 
+HRESULT CMonster::Ready_Collider()
+{
+
+
+	return S_OK;
+}
+
 HRESULT CMonster::Ready_Movement()
 {
 	_float3 vFootPos;

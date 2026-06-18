@@ -7,6 +7,10 @@ NS_BEGIN(physx)
 class PxController;
 NS_END
 
+NS_BEGIN(Engine)
+class CCollider;
+NS_END
+
 NS_BEGIN(Client)
 class CMonster_Movement;
 class CMonsterBrain;
@@ -58,6 +62,8 @@ public:
 	virtual _float				Get_CapsuleRadius() const = 0;
 	virtual _float				Get_CapsuleHeight() const = 0;
 
+	virtual _float				Get_InteractRadius() const = 0;
+
 	// 공통 State가 구체 몬스터 애니메이션을 호출하는 추상 훅
 	virtual void				Play_StateAnimation(MONSTER_STATE_TYPE eState) = 0;
 
@@ -73,6 +79,8 @@ protected:
 	CMonsterBrain*				m_pBrain = { nullptr };
 	CMonster_StateMachine*		m_pStateMachine = { nullptr };
 
+	CCollider*					m_pInteractCollider = { nullptr };
+
 	// 이번 프레임에 이동하고 싶은 방향
 	_float3						m_vWishDir = {};
 
@@ -82,6 +90,7 @@ protected:
 
 protected:
 	// 부모가 관리할 공통 파이프라인
+	HRESULT						Ready_Collider();
 	HRESULT						Ready_Movement();
 	HRESULT						Ready_AI();
 

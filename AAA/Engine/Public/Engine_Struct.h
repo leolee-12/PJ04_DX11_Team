@@ -26,6 +26,7 @@ namespace Engine
 	{
 		ID3D11ShaderResourceView* pDiffuseSRV = { nullptr };  // irradiance cube  (BC6H HDR)
 		ID3D11ShaderResourceView* pSpecularSRV = { nullptr };  // prefiltered cube (BC6H HDR, mip=roughness)
+		ID3D11ShaderResourceView* pColorGradeLUT = { nullptr };  // ¡Ú 3D LUT (R8G8B8A8_UNORM, 16©ø)
 		unsigned int              iSpecularMip = { 1 };        // ½ºÆäÅ§·¯ Å¥ºê ¹Ó ¼ö
 		float                     fIntensity = { 1.f };      // ¸Êº° IBL ¼¼±â
 	}ENVIRONMENT_DESC;

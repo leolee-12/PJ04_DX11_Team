@@ -224,7 +224,7 @@ public:
 
 #pragma region ENVIRONMENT_MANAGER
   public:
-      HRESULT Register_Environment(const _wstring& tag, const _tchar* d, const _tchar* s, _float i = 1.f);
+      HRESULT Register_Environment(const _wstring& tag, const _tchar* d, const _tchar* s, const _tchar* l, _float i = 1.f);
       HRESULT Set_CurrentEnvironment(const _wstring& tag);
       const ENVIRONMENT_DESC& Get_CurrentEnvironment() const;
 #pragma endregion
