@@ -103,6 +103,7 @@ public:
 
 private:
 	HRESULT Ready_Components();
+	void	SetUp_Collider_Callback();
 	HRESULT Ready_PartObjects();
 	HRESULT Ready_System();
 	HRESULT Ready_Ability();
@@ -117,7 +118,7 @@ private:
 	_float3 m_vWishDir{};
 	_bool m_RotationLock{};
 
-	CCollider* m_pTriggerSensor = { nullptr };
+	CCollider* m_pHurtBox = { nullptr };
 
 private:
 	CKirby_InputManager*	m_pKirby_InputManager{};

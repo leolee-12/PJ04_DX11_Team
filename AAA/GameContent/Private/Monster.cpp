@@ -4,6 +4,8 @@
 #include "Monster_Movement.h"
 #include "Monster_Brain_FSM.h"
 #include "Monster_State_Idle.h"
+#include "Collider.h"
+#include "GameContent_const.h"
 
 #pragma warning(push, 0)
 #ifdef new
@@ -42,6 +44,11 @@ HRESULT CMonster::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+	if (FAILED(Ready_InteractCollider()))
+		return E_FAIL;
+
+	SetUp_Collider_CallBack();
+
 	return S_OK;
 }
 
@@ -60,6 +67,14 @@ void CMonster::Update(_float fTimeDelta)
 void CMonster::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
+
+	if (m_pInteractCollider && m_pTransformCom)
+	{
+		m_pInteractCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+#ifdef _DEBUG
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pInteractCollider);
+#endif
+	}
 }
 
 HRESULT CMonster::Render()
@@ -129,6 +144,60 @@ MONSTER_STATE_TYPE	CMonster::Get_StateType() const
 		return MONSTER_STATE_TYPE::IDLE;
 
 	return m_pStateMachine->Get_StateType();
+}
+
+HRESULT CMonster::Ready_InteractCollider()
+{
+	_float fRadius;
+
+	if ((fRadius = Get_InteractRadius()) == 0.f)
+		return S_FALSE;
+
+	_float3 vFootPos;
+	XMStoreFloat3(&vFootPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+
+	CCollider::COLLIDER_DESC ColliderDesc{};
+	ColliderDesc.pOwner = this;
+	ColliderDesc.vCenter = vFootPos;
+	ColliderDesc.fRadius = fRadius;
+
+	// HurtBox(Collider)
+	m_pInteractCollider = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
+		TEXT("InteractCol_Com"), &ColliderDesc);
+	if (m_pInteractCollider == nullptr)
+		return E_FAIL;
+
+	m_pGameInstance_Proxy->Register_Collider(m_pInteractCollider, ETOUI(COLLISION_LAYER::MONSTER_D_RANGE));
+
+	return S_OK;
+}
+
+void CMonster::SetUp_Collider_CallBack()
+{
+	if (m_pInteractCollider)
+	{
+		m_pInteractCollider->Set_OnEnter([this](CCollider* pOther) {
+			if (ETOUI(COLLISION_LAYER::PLAYER_HURT) == pOther->Get_RegisteredGroup())
+				Set_Target(pOther->Get_Owner());
+#ifdef _DEBUG
+			char szBuf[128];
+			sprintf_s(szBuf, "[Monster] Enter <- group %u\n", pOther->Get_RegisteredGroup());
+			OutputDebugStringA(szBuf);
+#endif // _DEBUG
+			});
+		m_pInteractCollider->Set_OnExit([this](CCollider* pOther) {
+			if (ETOUI(COLLISION_LAYER::PLAYER_HURT) == pOther->Get_RegisteredGroup())
+				Set_Target(nullptr);
+#ifdef _DEBUG
+			char szBuf[128];
+			sprintf_s(szBuf, "[Monster] Exit <- group %u\n", pOther->Get_RegisteredGroup());
+			OutputDebugStringA(szBuf);
+#endif // _DEBUG
+			});
+	}
+
+	return;
 }
 
 HRESULT CMonster::Ready_Movement()

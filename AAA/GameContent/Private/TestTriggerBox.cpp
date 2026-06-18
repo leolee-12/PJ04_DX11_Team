@@ -41,6 +41,8 @@ HRESULT CTestTriggerBox::Initialize(void* pArg)
 	if (FAILED(Ready_TriggerCollider()))
 		return E_FAIL;
 
+	SetUp_Collider_Callback();
+
 	return S_OK;
 }
 
@@ -55,33 +57,6 @@ void CTestTriggerBox::Late_Update(_float fTimeDelta)
 		m_pGameInstance_Proxy->Add_DebugComponent(m_pCollider);
 #endif
 	}
-}
-
-void CTestTriggerBox::Enter_Collision(CGameObject* pOther)
-{
-	UNREFERENCED_PARAMETER(pOther);
-
-#ifdef _DEBUG
-	OutputDebugStringA("[EnvTrigger] Enter_Collision\n");
-#endif
-}
-
-void CTestTriggerBox::On_Collision(CGameObject* pOther)
-{
-	UNREFERENCED_PARAMETER(pOther);
-
-#ifdef _DEBUG
-	OutputDebugStringA("[EnvTrigger] On_Collision\n");
-#endif
-}
-
-void CTestTriggerBox::Exit_Collision(CGameObject* pOther)
-{
-	UNREFERENCED_PARAMETER(pOther);
-
-#ifdef _DEBUG
-	OutputDebugStringA("[EnvTrigger] Exit_Collision\n");
-#endif
 }
 
 HRESULT CTestTriggerBox::Ready_TriggerCollider()
@@ -105,8 +80,31 @@ HRESULT CTestTriggerBox::Ready_TriggerCollider()
 	if (FAILED(m_pCollider->Initialize(&Desc)))
 		return E_FAIL;
 
-	m_pGameInstance_Proxy->Register_Collider(m_pCollider, CL_ENV_TRIGGER);
+	m_pGameInstance_Proxy->Register_Collider(m_pCollider, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
 	return S_OK;
+}
+
+void CTestTriggerBox::SetUp_Collider_Callback()
+{
+	if (m_pCollider)
+	{
+		m_pCollider->Set_OnEnter([](CCollider* pOther) {
+			char szBuf[128];
+			sprintf_s(szBuf, "[EnvTrigger] Enter <- group %u\n", pOther->Get_RegisteredGroup());
+			OutputDebugStringA(szBuf);
+			});
+
+		m_pCollider->Set_OnStay([](CCollider* pOther) {
+			UNREFERENCED_PARAMETER(pOther);
+			OutputDebugStringA("[EnvTrigger] Stay\n");
+			});
+
+		m_pCollider->Set_OnExit([](CCollider* pOther) {
+			char szBuf[128];
+			sprintf_s(szBuf, "[EnvTrigger] Exit  <- group %u\n", pOther->Get_RegisteredGroup());
+			OutputDebugStringA(szBuf);
+			});
+	}
 }
 
 void CTestTriggerBox::Build_DefaultDesc(ENV_OBJECT_DESC* pOutDesc)

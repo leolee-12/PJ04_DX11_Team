@@ -62,6 +62,7 @@ public:
 	
 	virtual _float				Get_CapsuleRadius() const override;
 	virtual _float				Get_CapsuleHeight() const override;
+	virtual _float				Get_InteractRadius() const override { return 10.f; }
 	virtual void				Play_StateAnimation(MONSTER_STATE_TYPE eState) override;
 
 	virtual _bool				Is_StateAnimationFinished() const override;

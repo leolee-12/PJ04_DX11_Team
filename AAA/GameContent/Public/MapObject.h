@@ -37,7 +37,6 @@ protected:
 	virtual const _tchar* Get_ModelProtoTag() const = 0;   // 구조물별 .ysh 모델 프로토타입
 	virtual _uint Get_ModelProtoLevel() const = 0;
 	virtual void  Bind_MeshLayers(_uint iMesh) {}          // 베이스: no-op(순수 PBR)
-	virtual _bool Is_OverlayMesh(_uint iMesh) const;       // 기본: 이름에 "Parts"
 	virtual HRESULT Bind_WorldMatrix();
 
 protected:
@@ -48,7 +47,7 @@ protected:
 	HRESULT Bind_MapMeshParams(_uint iMesh, const MESH_LAYER_IDX& Layer);
 	HRESULT Bind_MapMeshTextures(_uint iMesh, const MESH_LAYER_IDX& Layer);
 	HRESULT Bind_MapTextureSafe(_uint iMesh, const _char* pName, MTEX_TYPE eType, _uint iSlot, DEFAULT_TEXTURE eDefault);
-	HRESULT Bind_MapUnknownSlotSafe(_uint iMesh, const _char* pName, int iSlot, DEFAULT_TEXTURE eDefault);
+	HRESULT Bind_MapExtraSlotSafe(_uint iMesh, const _char* pName, int iSlot, MTEX_TYPE eType, DEFAULT_TEXTURE eDefault);
 
 public:
 	virtual void Free() override;

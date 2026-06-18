@@ -18,6 +18,11 @@ uint   g_iExtraG_UVIndex = 0;
 uint   g_iExtraB_UVIndex = 0;
 uint   g_iExtraA_UVIndex = 0;
 
+uint g_iExtraR_MaskCh = 0; 
+uint g_iExtraG_MaskCh = 1; 
+uint g_iExtraB_MaskCh = 2; 
+uint g_iExtraA_MaskCh = 3;
+
 float  g_NormalStrength = 1.f;
 float  g_MaskStrength = 1.f;
 float  g_fAOStrength = 1.f;
@@ -169,6 +174,22 @@ float2 Apply_MapUVTransform(float2 uv, float4 Transform)
 	return uv;
 }
 
+float Select_VtxMask(PS_IN In, uint ch)
+{
+    float4 c = (ch < 4u) ? In.vColor : ((ch < 8u) ? In.vColor1 : In.vColor2);
+    return c[ch & 3u];
+}
+
+void Blend_Extra(inout float3 albedo, PS_IN In, Texture2D tex, float enable, uint uvIdx, float mask)
+{
+    if (enable < 0.5f)
+        return;
+    float m = saturate((1.f - mask) * g_MaskStrength);
+    float2 uv = Apply_MapUVTransform(Select_MapUV(In, uvIdx), g_vUVTransform);
+    float3 o = tex.Sample(LinearSampler, uv).rgb;
+    albedo = lerp(albedo, o, m);
+}
+
 PS_OUT PS_WHITE(PS_IN In)
 {
 	PS_OUT Out;
@@ -279,6 +300,59 @@ PS_OUT PS_DMNU(PS_IN In)
 	return Out;
 }
 
+PS_OUT PS_DMN_TOP(PS_IN In)
+{
+    PS_OUT Out;
+
+    float3 wp = In.vWorldPos.xyz;
+    float2 vBaseUV = Apply_MapUVTransform(wp.xz, g_vUVTransform);
+    float2 vNormalUV = Apply_MapUVTransform(wp.xz, g_vUVTransformNormal);
+    float2 vMaterialUV = Apply_MapUVTransform(wp.xz, g_vUVTransformMaterial);
+
+    float4 vBase = g_DiffuseTexture.Sample(LinearSampler, vBaseUV);
+    if (vBase.a < 0.1f)
+        discard;
+
+    float3 albedo = vBase.rgb;
+    float3 mra = g_MRATexture.Sample(LinearSampler, vMaterialUV).rgb;
+
+    float3 N = normalize(In.vNormal.xyz);
+    float3 T = normalize(cross(float3(0.f, 0.f, 1.f), N));
+    float3 B = cross(N, T);
+    float3x3 TBN = float3x3(T, B, N);
+
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, vNormalUV).rg * 2.f - 1.f;
+    nrg *= g_NormalStrength;
+    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+    nTS.y = -nTS.y;
+    float3 Nw = normalize(mul(nTS, TBN));
+
+    float ao = lerp(1.f, In.vColor1.r, g_fAOStrength);
+    albedo *= ao;
+    mra.b *= ao;
+
+    Out.vDiffuse = float4(albedo, 1.f);
+    Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(mra, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vBase.a, 1.f);
+    return Out;
+}
+
+PS_OUT PS_DMN_MASK(PS_IN In)
+{
+    PS_OUT Out = PS_DMN(In);
+    float3 albedo = Out.vDiffuse.rgb;
+
+    Blend_Extra(albedo, In, g_ExtraRTexture, g_vExtraEnable.x, g_iExtraR_UVIndex, In.vColor.r);
+    Blend_Extra(albedo, In, g_ExtraGTexture, g_vExtraEnable.y, g_iExtraG_UVIndex, In.vColor.g);
+    Blend_Extra(albedo, In, g_ExtraBTexture, g_vExtraEnable.z, g_iExtraB_UVIndex, In.vColor.b);
+    Blend_Extra(albedo, In, g_ExtraATexture, g_vExtraEnable.w, g_iExtraA_UVIndex, In.vColor.a);
+
+    Out.vDiffuse.rgb = albedo;
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
 	pass Shadow // 0
@@ -339,4 +413,24 @@ technique11 DefaultTechnique
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_DMNU();
 	}
+    pass TOP // 6  
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DMN_TOP();
+    }
+
+    pass MASK // 7
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DMN_MASK();
+    }
 }

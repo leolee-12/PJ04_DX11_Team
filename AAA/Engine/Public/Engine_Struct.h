@@ -26,6 +26,7 @@ namespace Engine
 	{
 		ID3D11ShaderResourceView* pDiffuseSRV = { nullptr };  // irradiance cube  (BC6H HDR)
 		ID3D11ShaderResourceView* pSpecularSRV = { nullptr };  // prefiltered cube (BC6H HDR, mip=roughness)
+		ID3D11ShaderResourceView* pColorGradeLUT = { nullptr };  // ¡Ú 3D LUT (R8G8B8A8_UNORM, 16©ø)
 		unsigned int              iSpecularMip = { 1 };        // ½ºÆäÅ§·¯ Å¥ºê ¹Ó ¼ö
 		float                     fIntensity = { 1.f };      // ¸Êº° IBL ¼¼±â
 	}ENVIRONMENT_DESC;
@@ -101,6 +102,13 @@ namespace Engine
 		float			fMaskStrength = 1.f;
 
 		int				iExtraBind[4] = { -1, -1, -1, -1 };
+
+		unsigned int    iExtraTexType[4] = {
+				static_cast<unsigned int>(MTEX_TYPE::UNKNOWN),
+				static_cast<unsigned int>(MTEX_TYPE::UNKNOWN),
+				static_cast<unsigned int>(MTEX_TYPE::UNKNOWN),
+				static_cast<unsigned int>(MTEX_TYPE::UNKNOWN)
+		};
 	};
 
 	struct TEXTURE_HUB_STATS

@@ -47,7 +47,7 @@ public:
 protected:
     virtual HRESULT        Ready_Parts() override;
     virtual CMonsterBrain* Create_Brain() override;
-    virtual const _tchar* Get_AppearEventTag() const override { return TEXT("GigantEdge_Appear"); }
+    virtual const _tchar*  Get_AppearEventTag() const override { return TEXT("GigantEdge_Appear"); }
 
     virtual void           Play_Intro() override;
     virtual _bool          Is_Intro_Finished() const override;
@@ -55,9 +55,10 @@ protected:
     virtual void           Play_DeathLoop() override;
     virtual _bool          Is_Death_Finished() const override;
 
-    virtual _float Get_CapsuleRadius() const override { return s_fCCT_Radius; }
-    virtual _float Get_CapsuleHeight() const override { return s_fCCT_Height; }
-    virtual void   Play_StateAnimation(MONSTER_STATE_TYPE) override {}
+    virtual _float         Get_CapsuleRadius() const override { return s_fCCT_Radius; }
+    virtual _float         Get_CapsuleHeight() const override { return s_fCCT_Height; }
+    virtual _float		   Get_InteractRadius() const override { return 0.f; }
+    virtual void           Play_StateAnimation(MONSTER_STATE_TYPE) override {}
 
 private:
     CGigantEdge_Body* m_pBody = { nullptr };

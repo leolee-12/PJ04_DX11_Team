@@ -54,7 +54,8 @@ float g_fToneMapMode = 1.0f; // 0=Reinhard(기존) / 1=ACES / 2=노출만(커비 litera
 //ui커튼
 Texture2D g_CurtainTexture;
 
-
+Texture3D g_ColorGradingLUT;
+float g_fColorGradeEnable = 0.f;
 
     //============================ Common VS ============================
 struct VS_IN
@@ -166,15 +167,23 @@ float4 PS_COMPOSITE(PS_IN In) : SV_TARGET0
     float3 bloom = g_BloomTexture.Sample(LinearSampler, In.vTexcoord).rgb;
 
     float3 color = scene.rgb + bloom * g_fBloomIntensity;
-    color *= g_fExposure; // ← 노출 (커비 ToneMapping 단계)
+    color *= g_fExposure;
 
-    if (g_fToneMapMode < 0.5f)                  // 0: Reinhard (기존)
-        color = color / (color + 1.f);
-    else if (g_fToneMapMode < 1.5f)             // 1: ACES filmic
-        color = ACESFilm(color);
-      // 2: 노출만(커비 literal) 압축 없이 통과
-
-    color = pow(saturate(color), 1.f / 2.2f); // sRGB 근사 감마
+    if (g_fColorGradeEnable > 0.5f)
+    {
+      // 선형 노출색 → LUT (톤+감마+그레이드 내장). saturate로 하드클립(커비와 동일)
+        float3 uvw = saturate(color) * 0.9375f + 0.03125f;
+        color = g_ColorGradingLUT.SampleLevel(ClampSampler, uvw, 0).rgb;
+    }
+    else
+    {
+      // LUT 없을 때만 자체 톤맵 + 감마
+        if (g_fToneMapMode < 0.5f)
+            color = color / (color + 1.f);
+        else if (g_fToneMapMode < 1.5f)
+            color = ACESFilm(color);
+        color = pow(saturate(color), 1.f / 2.2f);
+    }
     return float4(color, 1.f);
 }
 
@@ -401,7 +410,7 @@ float4 PS_DOF_COMPOSITE(PS_IN In) : SV_TARGET0
     float bled = b.a * 2.f - 1.f; // 번져 들어온 CoC
     float nearBleed = saturate(-bled); // 앞 물체가 위로 번짐
     float tt = max(smoothstep(0.05f, 0.5f, coc), nearBleed);
-    return float4(lerp(sharp.rgb, b.rgb, saturate(tt)), 1.f);
+    return float4(lerp(sharp.rgb, b.rgb, saturate(tt)), sharp.a);
 }
 
 float4 PS_CURTAIN_COMPOSITE(PS_IN In) : SV_TARGET0
