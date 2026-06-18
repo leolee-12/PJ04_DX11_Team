@@ -19,6 +19,7 @@
 #include "UI_Eraser.h"
 #include "UI_CurtainTexture.h"
 #include "Env_InstanceController.h"
+#include "Collider.h"
 
 
 NS_BEGIN(Client)
@@ -55,6 +56,18 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
             CVIBuffer_Point::Create(pDevice, pContext))))
             return E_FAIL;
     }
+
+    if (FAILED(pProxy->Add_Prototype(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
+        CCollider::Create(pDevice, pContext, COLLIDER::SPHERE))))
+        return E_FAIL;
+
+    if (FAILED(pProxy->Add_Prototype(Collider_AABB.iLevelID, Collider_AABB.szProtoTag,
+        CCollider::Create(pDevice, pContext, COLLIDER::AABB))))
+        return E_FAIL;
+
+    if (FAILED(pProxy->Add_Prototype(Collider_OBB.iLevelID, Collider_OBB.szProtoTag,
+        CCollider::Create(pDevice, pContext, COLLIDER::OBB))))
+        return E_FAIL;
 
     static const ENV_ENTRY g_EnvTable[] = {
       { 

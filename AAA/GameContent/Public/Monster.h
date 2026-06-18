@@ -90,7 +90,8 @@ protected:
 
 protected:
 	// 부모가 관리할 공통 파이프라인
-	HRESULT						Ready_Collider();
+	HRESULT						Ready_InteractCollider();
+	void						SetUp_Collider_CallBack();
 	HRESULT						Ready_Movement();
 	HRESULT						Ready_AI();
 
