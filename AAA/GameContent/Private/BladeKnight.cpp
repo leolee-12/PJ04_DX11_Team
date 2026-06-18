@@ -95,13 +95,6 @@ void CBladeKnight::Update(_float fTimeDelta)
             m_pMovement->Launch(XMVectorNegate(vLook), 10.f, 15.f);
         }
 
-        if (m_pGameInstance_Proxy->Key_Down(DIK_7))
-        {
-            CGameObject* pKirby = m_pGameInstance_Proxy->Find_GameObject(Get_LevelIndex(), L"Layer_Object", L"Proto_Kirby_0");
-
-            Set_Target(pKirby);
-        }
-
         if (m_pGameInstance_Proxy->Key_Down(DIK_8))
         {
             Set_Target(nullptr);

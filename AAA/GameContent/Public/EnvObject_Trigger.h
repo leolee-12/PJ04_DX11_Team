@@ -23,15 +23,12 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
-	virtual void Enter_Collision(CGameObject* pOther) override;
-	virtual void On_Collision(CGameObject* pOther) override;
-	virtual void Exit_Collision(CGameObject* pOther) override;
-
 private:
 	CCollider* m_pCollider = { nullptr };
 
 private:
 	HRESULT Ready_TriggerCollider();
+	void	SetUp_Collider_Callback();
 
 public:
 	static CEnvObject_Trigger* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

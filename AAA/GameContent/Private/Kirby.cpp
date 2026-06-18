@@ -92,12 +92,12 @@ void CKirby::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 
-    if (m_pTriggerSensor && m_pTransformCom)
+    if (m_pHurtBox && m_pTransformCom)
     {
-        m_pTriggerSensor->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+        m_pHurtBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
 #ifdef _DEBUG
-        m_pGameInstance_Proxy->Add_DebugComponent(m_pTriggerSensor);
+        m_pGameInstance_Proxy->Add_DebugComponent(m_pHurtBox);
 #endif
     }
 }
@@ -215,24 +215,48 @@ HRESULT CKirby::Ready_Components()
     m_pMovement->Set_Refs(m_pTransformCom, m_pController);
 
 
-    // TriggerSensor(Collider)
-    m_pTriggerSensor = Add_Component<CCollider>(TEXT("Com_TriggerSensor"),
-        CCollider::Create(m_pDevice, m_pContext, COLLIDER::AABB));
-    if (m_pTriggerSensor == nullptr)
-        return E_FAIL;
-
     CCollider::COLLIDER_DESC ColliderDesc{};
     ColliderDesc.pOwner = this;
-    ColliderDesc.vCenter = _float3(0.f, s_fCCT_Radius + s_fCCT_Height * 0.5f, 0.f);
-    ColliderDesc.vSize = _float3(s_fCCT_Radius * 2.f, s_fCCT_Height + s_fCCT_Radius * 2.f, s_fCCT_Height * 2.f);
+    ColliderDesc.vCenter = _float3(vFootPos.x, vFootPos.y + s_fCCT_Radius, vFootPos.z);
+    ColliderDesc.fRadius = s_fCCT_Radius;
 
-    if (FAILED(m_pTriggerSensor->Initialize(&ColliderDesc)))
+    // HurtBox(Collider)
+    m_pHurtBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, 
+        TEXT("HurtBox_Com"), &ColliderDesc);
+    if (m_pHurtBox == nullptr)
         return E_FAIL;
 
-    m_pGameInstance_Proxy->Register_Collider(m_pTriggerSensor, CL_PLAYER_SENSOR);
-    m_pGameInstance_Proxy->Add_CollisionPool(CL_PLAYER_SENSOR, CL_ENV_TRIGGER);
+    
+
+    /*if (FAILED(m_pHurtBox->Initialize(&ColliderDesc)))
+        return E_FAIL;*/
+
+    m_pGameInstance_Proxy->Register_Collider(m_pHurtBox, ETOUI(COLLISION_LAYER::PLAYER_HURT));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HURT));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HIT));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_PROJECTILE));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_D_RANGE));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_TRIGGER));
 
     return S_OK;
+}
+
+void	CKirby::SetUp_Collider_Callback()
+{
+    if (m_pHurtBox)
+    {
+        //m_pHurtBox->Set_OnEnter([](CCollider* pOther) {
+        //      여기에
+        //    });
+        //
+        //m_pHurtBox->Set_OnStay([](CCollider* pOther) {
+        //      콜백을
+        //    });
+        //
+        //m_pHurtBox->Set_OnExit([](CCollider* pOther) {
+        //      넣으시오
+        //    });
+    }
 }
 
 HRESULT CKirby::Ready_PartObjects()

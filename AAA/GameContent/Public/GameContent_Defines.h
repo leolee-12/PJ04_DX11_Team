@@ -23,10 +23,19 @@ namespace Client
 
 	enum class KIRBY_ABILITY_TYPE { NORMAL, SWORD };
 
-	constexpr _uint CL_PLAYER_SENSOR = 0;
-	constexpr _uint CL_ENV_TRIGGER = 1;
-	constexpr _uint KIRBY_SILHOUETTE_ID = 200;
+	enum class COLLISION_LAYER : _uint 
+	{ 
+		PLAYER_HURT, 
+		PLAYER_HIT,
+		PLAYER_PROJECTILE,
+		MONSTER_HURT,
+		MONSTER_HIT,
+		MONSTER_PROJECTILE,
+		MONSTER_D_RANGE,
+		ENV_TRIGGER = 100
+	};
 
+	constexpr _uint KIRBY_SILHOUETTE_ID = 200;
 }
 
 using namespace Client;

@@ -48,9 +48,6 @@ HRESULT CMapObject::Render()
 
 	for (_uint i = 0; i < n; ++i)
 	{
-		if (Is_OverlayMesh(i))
-			continue;
-
 		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
 
 		if (FAILED(Bind_MapMeshParams(i, Layer)))
@@ -74,35 +71,7 @@ HRESULT CMapObject::Render()
 			return E_FAIL;
 	}
 
-	// 2패스: 오버레이(DirtParts discard) 베이스 위에 얹기
-	//for (size_t i = 0; i < n; ++i)
-	//{
-	//	if (!Is_OverlayMesh((_uint)i))
-	//		continue;
-	//
-	//	MESH_LAYER_IDX Layer = m_pModelCom->Get_MeshLayer((_uint)i);
-	//
-	//	_int iPass = (Layer.iPass >= 0)
-	//		? Layer.iPass
-	//		: static_cast<_int>(ShaderPass::Map::Overlay);
-	//
-	//	if (iPass < 0 || iPass > static_cast<_int>(ShaderPass::Map::Shadow))
-	//		iPass = static_cast<_int>(ShaderPass::Map::Overlay);
-	//
-	//	m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", (_uint)i, MTEX_TYPE::DIFFUSE, Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)]);
-	//
-	//	if (FAILED(m_pShaderCom->Begin(iPass)))
-	//		return E_FAIL;
-	//	if (FAILED(m_pModelCom->Render((_uint)i)))
-	//		return E_FAIL;
-	//}
-
 	return S_OK;
-}
-
-_bool CMapObject::Is_OverlayMesh(_uint iMesh) const
-{
-	return m_pModelCom->Get_MeshName(iMesh).find("Parts") != string::npos;
 }
 
 HRESULT CMapObject::Bind_WorldMatrix()
@@ -233,13 +202,17 @@ HRESULT CMapObject::Bind_MapMeshTextures(_uint iMesh, const MESH_LAYER_IDX& Laye
 	if (FAILED(Bind_MapTextureSafe(iMesh, "g_UnknownTexture", MTEX_TYPE::UNKNOWN, Layer.idx[ETOUI(MTEX_TYPE::UNKNOWN)], DEFAULT_TEXTURE::BLACK)))
 		return E_FAIL;
 
-	if (FAILED(Bind_MapUnknownSlotSafe(iMesh, "g_ExtraRTexture", Layer.iExtraBind[0], DEFAULT_TEXTURE::BLACK)))
+	if (FAILED(Bind_MapExtraSlotSafe(iMesh, "g_ExtraRTexture", Layer.iExtraBind[0], (MTEX_TYPE)Layer.iExtraTexType[0],
+DEFAULT_TEXTURE::BLACK)))
 		return E_FAIL;
-	if (FAILED(Bind_MapUnknownSlotSafe(iMesh, "g_ExtraGTexture", Layer.iExtraBind[1], DEFAULT_TEXTURE::BLACK)))
+	if (FAILED(Bind_MapExtraSlotSafe(iMesh, "g_ExtraGTexture", Layer.iExtraBind[1], (MTEX_TYPE)Layer.iExtraTexType[1],
+		DEFAULT_TEXTURE::BLACK)))
 		return E_FAIL;
-	if (FAILED(Bind_MapUnknownSlotSafe(iMesh, "g_ExtraBTexture", Layer.iExtraBind[2], DEFAULT_TEXTURE::BLACK)))
+	if (FAILED(Bind_MapExtraSlotSafe(iMesh, "g_ExtraBTexture", Layer.iExtraBind[2], (MTEX_TYPE)Layer.iExtraTexType[2],
+		DEFAULT_TEXTURE::BLACK)))
 		return E_FAIL;
-	if (FAILED(Bind_MapUnknownSlotSafe(iMesh, "g_ExtraATexture", Layer.iExtraBind[3], DEFAULT_TEXTURE::BLACK)))
+	if (FAILED(Bind_MapExtraSlotSafe(iMesh, "g_ExtraATexture", Layer.iExtraBind[3], (MTEX_TYPE)Layer.iExtraTexType[3],
+		DEFAULT_TEXTURE::BLACK)))
 		return E_FAIL;
 
 	return S_OK;
@@ -260,19 +233,19 @@ HRESULT CMapObject::Bind_MapTextureSafe(_uint iMesh, const _char* pName, MTEX_TY
 	return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(m_pShaderCom, pName, eDefault);
 }
 
-HRESULT CMapObject::Bind_MapUnknownSlotSafe(_uint iMesh, const _char* pName, int iSlot, DEFAULT_TEXTURE eDefault)
+HRESULT CMapObject::Bind_MapExtraSlotSafe(_uint iMesh, const _char* pName, int iSlot, MTEX_TYPE eType, DEFAULT_TEXTURE eDefault)
 {
 	if (iSlot < 0)
 		return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(m_pShaderCom, pName, eDefault);
 
-	const _uint iTextureCount = m_pModelCom->Get_MeshTextureCount(iMesh, MTEX_TYPE::UNKNOWN);
+	const _uint iTextureCount = m_pModelCom->Get_MeshTextureCount(iMesh, eType);
 
 	if (iTextureCount > 0u)
 	{
 		const _uint iBindSlot = static_cast<_uint>(iSlot);
 		const _uint iSafeSlot = (iBindSlot < iTextureCount) ? iBindSlot : (iTextureCount - 1u);
 
-		if (SUCCEEDED(m_pModelCom->Bind_Material(m_pShaderCom, pName, iMesh, MTEX_TYPE::UNKNOWN, iSafeSlot)))
+		if (SUCCEEDED(m_pModelCom->Bind_Material(m_pShaderCom, pName, iMesh, eType, iSafeSlot)))
 			return S_OK;
 	}
 

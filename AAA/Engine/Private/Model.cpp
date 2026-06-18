@@ -695,6 +695,21 @@ HRESULT CModel::Save_MeshLayers() const
 		if (m.fMaskStrength != 1.f)
 			jMesh["MaskStrength"] = m.fMaskStrength;
 
+
+		const unsigned int kUnknown = static_cast<unsigned int>(MTEX_TYPE::UNKNOWN);
+		const _bool bHasExtraType =
+			m.iExtraTexType[0] != kUnknown || m.iExtraTexType[1] != kUnknown ||
+			m.iExtraTexType[2] != kUnknown || m.iExtraTexType[3] != kUnknown;
+
+		if (bHasExtraType)
+		{
+			jMesh["ExtraTexType"] =
+			{
+					m.iExtraTexType[0], m.iExtraTexType[1],
+					m.iExtraTexType[2], m.iExtraTexType[3]
+			};
+		}
+
 		const _bool bHasExtraBind =
 			m.iExtraBind[0] >= 0 ||
 			m.iExtraBind[1] >= 0 ||
@@ -992,6 +1007,15 @@ void CModel::Load_MeshLayers(const _char* pModelFilePath)
 
 		if (jMesh.contains("MaskStrength") && jMesh["MaskStrength"].is_number())
 			Layer.fMaskStrength = jMesh["MaskStrength"].get<_float>();
+
+		if (jMesh.contains("ExtraTexType") && jMesh["ExtraTexType"].is_array() && jMesh["ExtraTexType"].size() == 4)
+		{
+			for (_uint c = 0; c < 4; ++c)
+			{
+				if (jMesh["ExtraTexType"][c].is_number_integer())
+					Layer.iExtraTexType[c] = jMesh["ExtraTexType"][c].get<unsigned int>();
+			}
+		}
 
 		if (jMesh.contains("ExtraBind") && jMesh["ExtraBind"].is_array() && jMesh["ExtraBind"].size() == 4)
 		{
