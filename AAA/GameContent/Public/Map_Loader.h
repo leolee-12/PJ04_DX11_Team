@@ -54,6 +54,14 @@ public:
 		MAP_LOAD_RESULT* pOutReport = nullptr,
 		CMapStage** ppOutStage = nullptr);
 
+	static HRESULT Spawn_Map(
+		ID3D11Device* pDevice,
+		ID3D11DeviceContext* pContext,
+		const _wstring& strManifestPath,
+		_uint iRuntimeLevel,
+		MAP_LOAD_RESULT* pOutReport = nullptr,
+		CMapStage** ppOutStage = nullptr);
+
 	static HRESULT Load_Map(
 		ID3D11Device* pDevice,
 		ID3D11DeviceContext* pContext,
@@ -104,6 +112,11 @@ private:
 		const MAP_SPAWN_TARGETS& Targets,
 		MAP_LOAD_RESULT* pOutReport = nullptr,
 		CMapStage** ppOutStage = nullptr);
+
+	HRESULT Load_LevelDesignEntries(
+		const MAP_PACKAGE& Package,
+		const MAP_SPAWN_REQUEST& Request,
+		MAP_LOAD_RESULT* pOutReport = nullptr);
 
 	HRESULT Build_Package(const _wstring& strManifestPath, MAP_PACKAGE* pOutPackage);
 	HRESULT Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, const MAP_PACKAGE& Package);
