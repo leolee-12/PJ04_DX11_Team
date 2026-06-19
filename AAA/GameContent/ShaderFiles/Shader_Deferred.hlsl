@@ -4,6 +4,9 @@ float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 float4x4 g_ShadowLightViewMatrix, g_ShadowLightProjMatrix;
 float4x4 g_ViewMatrixInverse, g_ProjMatrixInverse;
 
+float3 g_vAmbientColor = float3(0.69f, 0.60f, 0.50f);
+float g_fAmbientSaturation = 0.6f;
+
   /* G-buffer */
 Texture2D g_Texture; // 디버그용
 Texture2D g_DiffuseTexture; // albedo (rgb), alpha
@@ -34,9 +37,6 @@ Texture2D g_SSAOTexture; // SSAO 블러 결과
 Texture3D g_FogVolume; // 적분된 froxel (rgb=inScatter, a=transmittance)
 float4 g_vFogDepthParams;
 float g_fFogEnable;
-
-  /* Combine 전용 앰비언트 (바인딩 안 해도 기본값 사용) */
-vector g_vAmbientColor = float4(0.15f, 0.15f, 0.18f, 1.f);
 
 static const float PI = 3.14159265f;
 
@@ -213,9 +213,13 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     float3 kD = (1.f - kS) * (1.f - metallic);
 
     float3 irradiance = g_IrradianceCube.Sample(LinearSampler, N).rgb;
-    float3 diffuseIBL = irradiance * albedoA.rgb * kD;
 
-      // 스펙큘러 IBL은 SSR 패스로 이전 (반사 중복 제거 + SSR 폴백)
+  // ── 원작 방식: 큐브맵 채도 깎고 → 따뜻하게 틴트 ──
+    float lum = dot(irradiance, float3(0.299f, 0.587f, 0.114f));
+    irradiance = lerp(lum.xxx, irradiance, g_fAmbientSaturation); // 채도 60%
+    irradiance *= g_vAmbientColor; // 따뜻한 탄 틴트
+
+    float3 diffuseIBL = irradiance * albedoA.rgb * kD;
     float ssao = g_SSAOTexture.Sample(LinearSampler, In.vTexcoord).r;
     float3 ambient = diffuseIBL * ao * ssao * g_fIBLIntensity;
     float3 color = light + ambient;

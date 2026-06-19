@@ -36,6 +36,22 @@ public:
 	_bool Intersect(CCollider* pTarget);
 
 public:
+	using CollisionCallback = std::function<void(CCollider* pOther)>;
+	void Set_OnEnter(CollisionCallback fn) { m_OnEnter = std::move(fn); }
+	void Set_OnStay(CollisionCallback fn) { m_OnStay = std::move(fn); }
+	void Set_OnExit(CollisionCallback fn) { m_OnExit = std::move(fn); }
+	void Clear_Callbacks() { m_OnEnter = nullptr; m_OnStay = nullptr; m_OnExit = nullptr; }
+
+	CGameObject* Get_Owner() const { return m_pOwner; }
+	_uint        Get_RegisteredGroup() const { return m_RegisteredGroup; }
+	_bool		 Is_Enabled() const { return m_bEnabled; }
+	void		 Set_Enabled(_bool b)
+	{
+		m_bEnabled = b;
+		if (!b) { m_PrevContacts.clear(); m_CurrContacts.clear(); }
+	}
+
+public:
 	void Notify_Enter(CCollider* pOther);
 	void Notify_Stay(CCollider* pOther);
 	void Notify_Exit(CCollider* pOther);
@@ -62,6 +78,12 @@ private:
 	_bool				m_isColl = { false };
 
 	CGameObject*		m_pOwner = { nullptr };
+
+	CollisionCallback	m_OnEnter;
+	CollisionCallback	m_OnStay;
+	CollisionCallback	m_OnExit;
+
+	_bool m_bEnabled = { true };
 
 private:
 	unordered_set<CCollider*> m_PrevContacts;

@@ -94,6 +94,7 @@ HRESULT CCollider::Initialize(void* pArg)
 
 void CCollider::Update(_fmatrix TransformMatrix)
 {
+    if (!m_bEnabled) return;
     m_pBounding->Update(TransformMatrix);
 }
 
@@ -108,20 +109,20 @@ _bool CCollider::Intersect(CCollider* pTarget)
 
 void CCollider::Notify_Enter(CCollider* pOther)
 {
-    if (m_pOwner && pOther && pOther->m_pOwner)
-        m_pOwner->Enter_Collision(pOther->m_pOwner);
+    if (m_OnEnter) 
+        m_OnEnter(pOther);
 }
 
 void CCollider::Notify_Stay(CCollider* pOther)
 {
-    if (m_pOwner && pOther && pOther->m_pOwner)
-        m_pOwner->On_Collision(pOther->m_pOwner);
+    if (m_OnStay)  
+        m_OnStay(pOther);
 }
 
 void CCollider::Notify_Exit(CCollider* pOther)
 {
-    if (m_pOwner && pOther && pOther->m_pOwner)
-        m_pOwner->Exit_Collision(pOther->m_pOwner);
+    if (m_OnExit)  
+        m_OnExit(pOther);
 }
 
 void CCollider::Swap_ContactFrame()

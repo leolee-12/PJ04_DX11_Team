@@ -96,6 +96,7 @@
     <ClInclude Include="..\public\UI_CurtainAnimBase.h" />
     <ClInclude Include="..\public\UI_CurtainSequenceBase.h" />
     <ClInclude Include="..\public\UI_CurtainTexture.h" />
+    <ClInclude Include="..\Public\TestParticle.h" />
     <ClInclude Include="..\Public\UI_Enums.h" />
     <ClInclude Include="..\Public\Kirby_Sword.h" />
     <ClInclude Include="..\Public\Kirby_SwordHat.h" />
@@ -227,6 +228,7 @@
     <ClCompile Include="..\Private\Monster_State.cpp" />
     <ClCompile Include="..\Private\Monster_StateMachine.cpp" />
     <ClCompile Include="..\Private\Movement_Child.cpp" />
+    <ClCompile Include="..\Private\TestParticle.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />
     <ClCompile Include="..\private\UI_Curtain.cpp" />
     <ClCompile Include="..\private\UI_CurtainAnimBase.cpp" />

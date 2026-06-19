@@ -13,6 +13,7 @@ struct ENV_ENTRY
     const _tchar* tag; 
     const _tchar* diff; 
     const _tchar* spec; 
+    const _tchar* lut;
     float intensity; 
 };
 

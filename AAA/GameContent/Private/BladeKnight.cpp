@@ -56,6 +56,8 @@ HRESULT CBladeKnight::Initialize(void* pArg)
     if (FAILED(Ready_AnimEvents()))
         return E_FAIL;
 
+    m_eCopyAbility = COPY_ABILITY_TYPE::SWORD;
+
     return S_OK;
 }
 
@@ -82,23 +84,9 @@ void CBladeKnight::Update(_float fTimeDelta)
             m_pMovement->Jump();
         }
 
-        if (m_pGameInstance_Proxy->Key_Down(DIK_5))
-        {
-            _vector vLook = m_pTransformCom->Get_State(STATE::LOOK);
-            m_pMovement->Launch(XMVectorNegate(vLook), 2.f, 5.f);
-        }
-
         if (m_pGameInstance_Proxy->Key_Down(DIK_6))
         {
-            _vector vLook = m_pTransformCom->Get_State(STATE::LOOK);
-            m_pMovement->Launch(XMVectorNegate(vLook), 10.f, 15.f);
-        }
-
-        if (m_pGameInstance_Proxy->Key_Down(DIK_7))
-        {
-            CGameObject* pKirby = m_pGameInstance_Proxy->Find_GameObject(Get_LevelIndex(), L"Layer_Object", L"Proto_Kirby_0");
-
-            Set_Target(pKirby);
+            m_pMovement->KO(XMVectorSet(0.f,0.f,0.f,1.f), 10.f);
         }
 
         if (m_pGameInstance_Proxy->Key_Down(DIK_8))
@@ -134,16 +122,6 @@ void CBladeKnight::Late_Update(_float fTimeDelta)
 HRESULT CBladeKnight::Render()
 {
     return S_OK;
-}
-
-_float CBladeKnight::Get_CapsuleRadius() const
-{
-    return 0.5f;
-}
-
-_float CBladeKnight::Get_CapsuleHeight() const
-{
-    return 1.0f;
 }
 
 CMonsterBrain* CBladeKnight::Create_Brain()

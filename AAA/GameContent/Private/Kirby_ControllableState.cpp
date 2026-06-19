@@ -49,8 +49,8 @@ _bool CKirby_ControllableState::Handle_Command(CKirby* pKirby, CKirby_Command* p
             if (!pCommand->IsPress())
                 return false;
 
-            KIRBY_ABILITY_TYPE eAbilityType = pKirby->Get_KirbyAbility()->Get_AbilityType();
-            if (eAbilityType == KIRBY_ABILITY_TYPE::NORMAL)
+            COPY_ABILITY_TYPE eAbilityType = pKirby->Get_KirbyAbility()->Get_AbilityType();
+            if (eAbilityType == COPY_ABILITY_TYPE::NORMAL)
                 return true;
 
             if (pKirby->Can_AbilityDump() == true)

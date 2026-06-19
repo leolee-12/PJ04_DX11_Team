@@ -88,11 +88,6 @@ public: // 프로퍼티함수
 
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) = 0;
 
-public: // Collision 콜백
-	virtual void Enter_Collision(CGameObject* pOther) {};
-	virtual void On_Collision(CGameObject* pOther) {};
-	virtual void Exit_Collision(CGameObject* pOther) {};
-
 protected:
 	_bool   m_bDead		  = { false };
 	_uint   m_iLevelIndex = {};

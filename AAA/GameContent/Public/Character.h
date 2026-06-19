@@ -24,6 +24,18 @@ public:
 	virtual HRESULT Render() override;
 
 public:
+	virtual void On_Hit(_fvector vAttackerPos, _float fDamage);
+
+protected:
+	_float						m_fMaxHP = { 100.f };
+	_float						m_fCurHP = { 100.f };
+
+protected:
+	virtual _bool Block_Hit(_fvector vAttackerPos) { return false; }
+	virtual void  On_Damaged(_fvector vAttackerPos, _float fDamage) {};
+	virtual void  On_Death(_fvector vAttackerPos) {}
+
+public:
 	virtual CGameObject* Clone(void* pArg) = 0;
 protected:
 	virtual void Free() override;

@@ -3,13 +3,13 @@
 #include "GameInstance.h"
 
 CEffect_Quad::CEffect_Quad(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CEffect_Part(pDevice, pContext)
+    : CEffect_NonParticle(pDevice, pContext)
 {
     Init_PropertyValue();
 }
 
 CEffect_Quad::CEffect_Quad(const CEffect_Quad& Prototype)
-    : CEffect_Part(Prototype)
+    : CEffect_NonParticle(Prototype)
 {
     Init_PropertyValue();
 }
@@ -63,7 +63,9 @@ HRESULT CEffect_Quad::Render()
         return E_FAIL;
 
     Helper::IntClamp(m_iShaderPass, ShaderPass::Default, ShaderPass::ShaderPass_End - 1);
-    if (FAILED(m_pShaderCom->Begin(m_iShaderPass)))
+    Helper::IntClamp(m_iMirror, Sampler::DEFAULT, Sampler::SAMPLER_END - 1);
+    _int iPass = m_iShaderPass + (m_iMirror == Sampler::MIRROR ? ShaderPass::ShaderPass_End : 0);
+    if (FAILED(m_pShaderCom->Begin(iPass)))
         return E_FAIL;
 
     if (FAILED(m_pVIBuffer->Bind_Resources()))
@@ -133,11 +135,6 @@ void CEffect_Quad::Update_Core(const _float fTimeDelta, const _float fRatio)
 
     Update_TexSpriteAnimation(fTimeDelta, fRatio);
     Update_MaskSpriteAnimation(fTimeDelta, fRatio);
-}
-
-void CEffect_Quad::Update_UVScroll(const _float fTimeDelta, const _float fRatio)
-{
-    __super::Update_UVScroll(fTimeDelta, fRatio);
 }
 
 void CEffect_Quad::Update_EffectPart(const _float fTimeDelta, const _float fRatio)

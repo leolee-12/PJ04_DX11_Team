@@ -24,7 +24,7 @@ HRESULT CSmokeTail::Initialize(void* pArg)
 {
     SMOKE_TAIL_DESC tDesc{};
 
-    tDesc.iModelLevel = ETOUI(LEVEL::GAMEPLAY);
+    tDesc.iModelLevel = m_iPrototypeLevel;
     tDesc.wstrModelTag = TEXT("Prototype_Component_Model_SmokeTail");
 
     tDesc.bUseDiffuseTexture = false;

@@ -989,46 +989,45 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			}
 		};
 
-	auto DrawCompactBindCell = [&](const char* pLabel, const char* pId, int& iBindIndex)
+	auto DrawCompactExtraCell = [&](const char* pLabel, const char* pIdBase, int& iBindIndex, unsigned int& iTexType)
 		{
 			bAnyField = true;
 
-			const int iUnknownCount =
-				static_cast<int>(pModel->Get_MeshTextureCount(iMesh, MTEX_TYPE::UNKNOWN));
+			static const MTEX_TYPE kTypes[] = { MTEX_TYPE::UNKNOWN, MTEX_TYPE::DIFFUSE };
 
 			ImGui::TextUnformatted(pLabel);
+
+			// --- 소스 타입 콤보 (Unk / Dif) ---
+			int iTypeCombo = (iTexType == ETOUI(MTEX_TYPE::DIFFUSE)) ? 1 : 0;
+			ImGui::SetNextItemWidth(-FLT_MIN);
+			if (ImGui::Combo((string(pIdBase) + "Type").c_str(), &iTypeCombo, "Unk\0Dif\0\0"))
+			{
+				iTexType = ETOUI(kTypes[iTypeCombo]);
+				bChanged = true;
+			}
+
+			const MTEX_TYPE eType = kTypes[iTypeCombo];
+			const int iCount = static_cast<int>(pModel->Get_MeshTextureCount(iMesh, eType));
+
+			// --- 슬롯 콤보 (선택 타입 기준 카운트) ---
 			ImGui::SetNextItemWidth(-FLT_MIN);
 
-			if (iUnknownCount <= 0)
+			if (iCount <= 0)
 			{
 				int iDummy = 0;
-
-				if (iBindIndex != -1)
-				{
-					iBindIndex = -1;
-					bChanged = true;
-				}
-
+				if (iBindIndex != -1) { iBindIndex = -1; bChanged = true; }
 				ImGui::BeginDisabled();
-				ImGui::Combo(pId, &iDummy, "N/A\0\0");
+				ImGui::Combo((string(pIdBase) + "Slot").c_str(), &iDummy, "N/A\0\0");
 				ImGui::EndDisabled();
 				return;
 			}
 
-			if (iBindIndex < -1)
-			{
-				iBindIndex = -1;
-				bChanged = true;
-			}
-			else if (iBindIndex >= iUnknownCount)
-			{
-				iBindIndex = iUnknownCount - 1;
-				bChanged = true;
-			}
+			if (iBindIndex < -1) { iBindIndex = -1;          bChanged = true; }
+			else if (iBindIndex >= iCount) { iBindIndex = iCount - 1;  bChanged = true; }
 
 			int iComboIndex = iBindIndex + 1;
-			const string strItems = BuildCompactComboItems(-1, iUnknownCount - 1);
-			if (ImGui::Combo(pId, &iComboIndex, strItems.c_str()))
+			const string strItems = BuildCompactComboItems(-1, iCount - 1);
+			if (ImGui::Combo((string(pIdBase) + "Slot").c_str(), &iComboIndex, strItems.c_str()))
 			{
 				iBindIndex = iComboIndex - 1;
 				bChanged = true;
@@ -1059,16 +1058,16 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			ImGui::TableNextRow();
 
 			ImGui::TableNextColumn();
-			DrawCompactBindCell("ExR", "##BindR", Layer.iExtraBind[0]);
+			DrawCompactExtraCell("ExR", "##ExR", Layer.iExtraBind[0], Layer.iExtraTexType[0]);
 
 			ImGui::TableNextColumn();
-			DrawCompactBindCell("ExG", "##BindG", Layer.iExtraBind[1]);
+			DrawCompactExtraCell("ExG", "##ExG", Layer.iExtraBind[1], Layer.iExtraTexType[1]);
 
 			ImGui::TableNextColumn();
-			DrawCompactBindCell("ExB", "##BindB", Layer.iExtraBind[2]);
+			DrawCompactExtraCell("ExB", "##ExB", Layer.iExtraBind[2], Layer.iExtraTexType[2]);
 
 			ImGui::TableNextColumn();
-			DrawCompactBindCell("ExA", "##BindA", Layer.iExtraBind[3]);
+			DrawCompactExtraCell("ExA", "##ExA", Layer.iExtraBind[3], Layer.iExtraTexType[3]);
 
 			ImGui::EndTable();
 		};

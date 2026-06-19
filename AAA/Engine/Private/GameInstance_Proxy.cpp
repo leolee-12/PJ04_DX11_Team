@@ -824,12 +824,12 @@ _bool CGameInstance_Proxy::Is_EditMode() const
 #pragma endregion
 
 #pragma region ENVIRONMENT_MANAGER
-HRESULT CGameInstance_Proxy::Register_Environment(const _wstring& tag, const _tchar* d, const _tchar* s, _float i)
+HRESULT CGameInstance_Proxy::Register_Environment(const _wstring& tag, const _tchar* d, const _tchar* s, const _tchar* l, _float i)
 {
 	if (!IsConnected())
 		return E_FAIL;
 
-	return m_pOwner->m_pEnvironment_Manager->Register(tag, d, s, i);
+	return m_pOwner->m_pEnvironment_Manager->Register(tag, d, s, l, i);
 }
 HRESULT CGameInstance_Proxy::Set_CurrentEnvironment(const _wstring& tag)
 {

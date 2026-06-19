@@ -793,6 +793,15 @@ HRESULT CRenderer::Render_Bloom()
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderPost, { "g_fBloomIntensity", "g_fExposure", "g_fToneMapMode" })))
         return E_FAIL;
+    const auto& env = m_pGameInstance_Proxy->Get_CurrentEnvironment();
+    if (env.pColorGradeLUT)
+    {
+        if (FAILED(m_pShaderPost->Bind_SRV("g_ColorGradingLUT", env.pColorGradeLUT)))
+            return E_FAIL;
+        _float on = 1.f;
+        if (FAILED(m_pShaderPost->Bind_RawValue("g_fColorGradeEnable", &on, sizeof(_float))))
+            return E_FAIL;
+    }
     if (FAILED(m_pShaderPost->Begin(ETOUI(POSTPROSESS::COMPSITE))))
         return E_FAIL;
     if (FAILED(m_pVIBuffer->Bind_Resources()))
