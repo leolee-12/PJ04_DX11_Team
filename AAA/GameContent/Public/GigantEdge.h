@@ -57,7 +57,6 @@ protected:
 
     virtual _float Get_CapsuleRadius() const override { return s_fCCT_Radius; }
     virtual _float Get_CapsuleHeight() const override { return s_fCCT_Height; }
-    virtual void   Play_StateAnimation(MONSTER_STATE_TYPE) override {}
 
 private:
     CGigantEdge_Body* m_pBody = { nullptr };

@@ -1,6 +1,7 @@
 #include "Monster_State.h"
 
 CMonster_State::CMonster_State()
+	: m_bIsInterruptible{ false }
 {
 }
 

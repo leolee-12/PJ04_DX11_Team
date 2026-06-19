@@ -1,10 +1,11 @@
 #pragma once
-#include "Monster_Brain_FSM.h"
+#include "Monster_Brain_FSM_T.h"
 
 NS_BEGIN(Client)
 class CMonster;
+class CBladeKnight;
 
-class CBladeKnight_FSM final : public CMonster_Brain_FSM
+class CBladeKnight_FSM final : public CMonster_Brain_FSM_T<CBladeKnight>
 {
 protected:
 	CBladeKnight_FSM();
@@ -13,11 +14,17 @@ protected:
 protected:
 	HRESULT						Initialize();
 
-public:
-	virtual void				Decide(CMonster* pMonster, const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta) override;
+protected:
+	virtual void				On_Decide_Combat(CBladeKnight* pBladeKnight, const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta) override;
 
 public:
 	static CBladeKnight_FSM*	Create();
+
+private:
+	MONSTER_STATE_TYPE			Pick_AttackState(_int iAIType);
+
+private:
+	_uint						m_iAttackIndex = { 0 };
 
 protected:
 	virtual void				Free() override;

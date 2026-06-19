@@ -58,12 +58,6 @@ public:
 	virtual _float				Get_CapsuleRadius() const = 0;
 	virtual _float				Get_CapsuleHeight() const = 0;
 
-	// 공통 State가 구체 몬스터 애니메이션을 호출하는 추상 훅
-	virtual void				Play_StateAnimation(MONSTER_STATE_TYPE eState) = 0;
-
-	// 애니메이션이 끝났는지 노출해주는 함수
-	virtual _bool				Is_StateAnimationFinished() const { return true; }
-
 protected:
 	physx::PxController*		m_pController = { nullptr };
 	CMonster_Movement*			m_pMovement = { nullptr };
@@ -79,13 +73,12 @@ protected:
 	_float						m_fMaxHP = {};
 	_float						m_fCurHP = {};
 
-
 protected:
 	// 부모가 관리할 공통 파이프라인
 	HRESULT						Ready_Movement();
 	HRESULT						Ready_AI();
+	void						Check_AirborneReflex();
 
-	// 윤석현 추가 AI 드라이버 선택 훅 (자식이 오버라이드)
 	virtual CMonsterBrain*		Create_Brain();		//기본: FSM Brain
 	virtual HRESULT				Create_Movement();	// 기본 : Monster_Movement - 별도 무브먼트 필요할 때 상속받아서 쓸 것 
 	virtual _bool				Use_StateMachine() const { return true; } // BT 전용 몬스터는 false 반환
@@ -94,7 +87,7 @@ protected:
 	virtual HRESULT				Ready_AnimEvents() { return S_OK; }		// Bkody의 Animator의 이벤트 콜백 설정함수
 
 	// 윤석현 추가
-	void Enable_Controller(_bool bEnable);
+	void						Enable_Controller(_bool bEnable);
 
 	//윤석현 수정 
 	virtual void				Update_AI(_float fTimeDelta);

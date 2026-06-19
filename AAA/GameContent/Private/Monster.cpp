@@ -3,7 +3,6 @@
 #include "GameInstance.h"
 #include "Monster_Movement.h"
 #include "Monster_Brain_FSM.h"
-#include "Monster_State_Idle.h"
 
 #pragma warning(push, 0)
 #ifdef new
@@ -187,6 +186,24 @@ HRESULT CMonster::Ready_AI()
 	return S_OK;
 }
 
+void CMonster::Check_AirborneReflex()
+{
+	if (nullptr == m_pStateMachine || nullptr == m_pMovement)
+		return;
+
+	if (!Has_State(MONSTER_STATE_TYPE::FALL))
+		return;
+
+	const MONSTER_STATE_TYPE eCurState = Get_StateType();
+	if (eCurState == MONSTER_STATE_TYPE::FALL || eCurState == MONSTER_STATE_TYPE::LANDING ||
+		eCurState == MONSTER_STATE_TYPE::CAPTURED || eCurState == MONSTER_STATE_TYPE::DEAD)
+		return;
+
+	// 테스트로 -2.f로 두고 테스트. 확정되면 상수화 시켜서 사용
+	if (!m_pMovement->Is_Grounded() && m_pMovement->Get_VerticalVelocity() < -2.f)
+		Change_State(MONSTER_STATE_TYPE::FALL);
+}
+
 CMonsterBrain* CMonster::Create_Brain()
 {
 	return CMonster_Brain_FSM::Create(); // 기본은 FSM
@@ -204,12 +221,6 @@ HRESULT CMonster::Create_Movement()
 
 HRESULT CMonster::Ready_State(CMonster_StateMachine* pStateMachine)
 {
-	if (nullptr == pStateMachine)
-		return E_FAIL;
-
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CMonster_State_Idle::Create())))
-		return E_FAIL;
-
 	return S_OK;
 }
 
@@ -295,6 +306,8 @@ void CMonster::Update_AI(_float fTimeDelta)
 
 	// BlackBoard 갱신
 	Perceive(fTimeDelta);	
+
+	Check_AirborneReflex();
 
 	// Brain이 상태 변경 판단
 	if (nullptr != m_pBrain)

@@ -16,6 +16,7 @@ protected:
 
 public:
 	virtual MONSTER_STATE_TYPE	Get_StateType() = 0;
+	_bool						Is_Interruptible() const { return m_bIsInterruptible; }		// 기본 잠금
 
 public:
 	// 상태 진입 시 1회 호출
@@ -33,6 +34,9 @@ public:
 	// 완료/인터럽트(피격 등) 어떤 경로로 나가도 호출되므로 
 	// 떠날 때 반드시 꺼야하는 것의 정리를 여기서 보장
 	virtual void				Exit(CMonster* pMonster);
+
+protected:
+	_bool						m_bIsInterruptible = { false };
 
 protected:
 	virtual void				Free() override;
