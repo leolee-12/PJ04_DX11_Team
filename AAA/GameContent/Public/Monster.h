@@ -54,6 +54,7 @@ public:
 	MONSTER_BLACKBOARD&			Get_BlackBoard() { return m_BlackBoard; }
 	CMonster_Movement*			Get_Movement() { return m_pMovement; }
 	_bool						Has_Trait(MONSTER_TRAIT t) const { return (m_TraitFlags & t) != 0; }
+	COPY_ABILITY_TYPE		    Get_CopyAbility() const { return m_eCopyAbility; }
 	CGameObject*				Get_Captor() const { return m_pCaptor; }
 	void						Be_Captured(CGameObject* pCaptor) 
 	{ 
@@ -106,6 +107,7 @@ protected:
 
 	_uint					    m_TraitFlags = { MT_DEFAULT };
 	CGameObject*			    m_pCaptor = { nullptr };
+	COPY_ABILITY_TYPE			m_eCopyAbility = { COPY_ABILITY_TYPE::NORMAL };
 
 protected:
 	// 부모가 관리할 공통 파이프라인

@@ -21,9 +21,9 @@ HRESULT CKirby_Ability_Normal::Initialize()
     return S_OK;
 }
 
-KIRBY_ABILITY_TYPE CKirby_Ability_Normal::Get_AbilityType()
+COPY_ABILITY_TYPE CKirby_Ability_Normal::Get_AbilityType()
 {
-    return KIRBY_ABILITY_TYPE::NORMAL;
+    return COPY_ABILITY_TYPE::NORMAL;
 }
 
 void CKirby_Ability_Normal::Enter_Ability(CKirby* pKirby)
@@ -261,7 +261,7 @@ _bool CKirby_Ability_Normal::Change_Ability(CKirby* pKirby)
         Reset_Default(pKirby);
 
         // 먹은 오브젝트에서 가져온다.
-        KIRBY_ABILITY_TYPE eAbilityType = KIRBY_ABILITY_TYPE::SWORD;
+        COPY_ABILITY_TYPE eAbilityType = COPY_ABILITY_TYPE::SWORD;
         pKirby->Set_KirbyAbility(eAbilityType);
 
         pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);

@@ -75,9 +75,9 @@ HRESULT CKirby_Ability_Sword::Initialize()
     return S_OK;
 }
 
-KIRBY_ABILITY_TYPE CKirby_Ability_Sword::Get_AbilityType()
+COPY_ABILITY_TYPE CKirby_Ability_Sword::Get_AbilityType()
 {
-    return KIRBY_ABILITY_TYPE::SWORD;
+    return COPY_ABILITY_TYPE::SWORD;
 }
 
 void CKirby_Ability_Sword::Enter_Ability(CKirby* pKirby)

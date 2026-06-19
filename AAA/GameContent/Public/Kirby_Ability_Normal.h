@@ -36,7 +36,7 @@ private:
 	HRESULT Initialize();
 
 public:
-	virtual KIRBY_ABILITY_TYPE Get_AbilityType() override;
+	virtual COPY_ABILITY_TYPE Get_AbilityType() override;
 
 	virtual void Enter_Ability(CKirby* pKirby) override;
 	virtual ABILITY_UPDATE_RESULT Update_Ability(CKirby* pKirby, _float fTimeDelta) override;

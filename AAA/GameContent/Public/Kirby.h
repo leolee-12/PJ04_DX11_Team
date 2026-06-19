@@ -24,7 +24,7 @@ class CKirby_StateMachine;
 class CKirby_Ability;
 
 enum class KIRBY_STATE_TYPE;
-enum class KIRBY_ABILITY_TYPE;
+enum class COPY_ABILITY_TYPE;
 
 class CKirby_Body;
 
@@ -84,7 +84,7 @@ public:
 
 	// Part
 	CKirby_Body* Get_Body() { return m_pBody; }
-	void OnOffParts(KIRBY_ABILITY_TYPE eAbilityType, _bool fOn);
+	void OnOffParts(COPY_ABILITY_TYPE eAbilityType, _bool fOn);
 
 public:
 	// Movement
@@ -98,7 +98,7 @@ public:
 	void Change_State(KIRBY_STATE_TYPE eNewState);
 
 	CKirby_Ability* Get_KirbyAbility();
-	void Set_KirbyAbility(KIRBY_ABILITY_TYPE eAbilityState);
+	void Set_KirbyAbility(COPY_ABILITY_TYPE eAbilityState);
 
 public:
 	// Ability Dump
@@ -146,7 +146,7 @@ private:
 	CKirby_StateMachine*	m_pKirby_StateMachine{};
 	CKirby_Ability*			m_pKirby_Ability{};
 
-	unordered_map<KIRBY_ABILITY_TYPE, CKirby_Ability*> m_Abilities;
+	unordered_map<COPY_ABILITY_TYPE, CKirby_Ability*> m_Abilities;
 
 private:
 	_float m_fAccAbilityDumpCoolTime{};

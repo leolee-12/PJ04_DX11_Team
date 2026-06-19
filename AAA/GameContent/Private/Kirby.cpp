@@ -18,6 +18,7 @@
 #include "Kirby_StateMachine.h"
 
 // Ability
+#include "Kirby_State.h"
 #include "Kirby_Ability_Normal.h"
 #include "Kirby_Ability_Sword.h"
 
@@ -128,7 +129,7 @@ void CKirby::On_Deserialized()
         m_pMovement->Sync_To_Controller();
 }
 
-void CKirby::OnOffParts(KIRBY_ABILITY_TYPE eAbilityType, _bool fOn)
+void CKirby::OnOffParts(COPY_ABILITY_TYPE eAbilityType, _bool fOn)
 {
     auto OnOffPart = [this](const wchar_t* PartTag, _bool bOn)->void
         {
@@ -141,7 +142,7 @@ void CKirby::OnOffParts(KIRBY_ABILITY_TYPE eAbilityType, _bool fOn)
 
     switch (eAbilityType)
     {
-        case KIRBY_ABILITY_TYPE::SWORD:
+        case COPY_ABILITY_TYPE::SWORD:
             OnOffPart(CKirby_Sword::Kirby_PartTag, fOn);
             OnOffPart(CKirby_SwordHat::Kirby_PartTag, fOn);
             break;
@@ -179,7 +180,7 @@ CKirby_Ability* CKirby::Get_KirbyAbility()
     return m_pKirby_Ability;
 }
 
-void CKirby::Set_KirbyAbility(KIRBY_ABILITY_TYPE eAbilityState)
+void CKirby::Set_KirbyAbility(COPY_ABILITY_TYPE eAbilityState)
 {
     auto iter = m_Abilities.find(eAbilityState);
     if (iter == m_Abilities.end())
@@ -364,7 +365,7 @@ HRESULT CKirby::Ready_System()
 
 HRESULT CKirby::Ready_Ability()
 {
-    auto Register_Ability = [this](KIRBY_ABILITY_TYPE eType, CKirby_Ability* pNewAbility) -> HRESULT
+    auto Register_Ability = [this](COPY_ABILITY_TYPE eType, CKirby_Ability* pNewAbility) -> HRESULT
         {
             if (pNewAbility == nullptr)
                 return E_FAIL;
@@ -374,11 +375,11 @@ HRESULT CKirby::Ready_Ability()
             return S_OK;
         };
 
-    if (FAILED(Register_Ability(KIRBY_ABILITY_TYPE::NORMAL, CKirby_Ability_Normal::Create())))            return E_FAIL;
-    if (FAILED(Register_Ability(KIRBY_ABILITY_TYPE::SWORD, CKirby_Ability_Sword::Create())))              return E_FAIL;
+    if (FAILED(Register_Ability(COPY_ABILITY_TYPE::NORMAL, CKirby_Ability_Normal::Create())))            return E_FAIL;
+    if (FAILED(Register_Ability(COPY_ABILITY_TYPE::SWORD, CKirby_Ability_Sword::Create())))              return E_FAIL;
 
 
-    auto iter = m_Abilities.find(KIRBY_ABILITY_TYPE::NORMAL);
+    auto iter = m_Abilities.find(COPY_ABILITY_TYPE::NORMAL);
     if (iter == m_Abilities.end())
         return E_FAIL;
 
@@ -394,9 +395,23 @@ HRESULT CKirby::Bind_ShaderResources()
 
 HRESULT CKirby::Ready_Events()
 {
-    Subscribe_Event(EVT_SWALLOWED, [this](void* /*pData*/) {
+    Subscribe_Event(EVT_SWALLOWED, [this](void* pData) {
+        auto* pEvt = static_cast<SWALLOW_EVENT*>(pData);
         End_Inhale();
-        m_pBody->Set_Body(KIRBY_BODY_STATE::STUFFED);
+
+        COPY_ABILITY_TYPE eCopy = (pEvt && pEvt->pMonster)
+            ? pEvt->pMonster->Get_CopyAbility()
+            : COPY_ABILITY_TYPE::NORMAL;
+
+        if (eCopy != COPY_ABILITY_TYPE::NORMAL)
+        {
+            Set_KirbyAbility(eCopy);                       
+            Change_State(KIRBY_STATE_TYPE::GET_ABILITY);   
+        }
+        else
+        {
+            m_pBody->Set_Body(KIRBY_BODY_STATE::STUFFED);
+        }
         });
 
     return S_OK;
