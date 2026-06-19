@@ -1,5 +1,6 @@
 #include "Movement_Child.h"
 #include "Transform.h"
+#include "Controller.h"
 
 #pragma warning(push, 0)
 #ifdef new
@@ -540,6 +541,7 @@ void CMovement_Child::Move_Controller(_fvector vVelocity, _float fTimeDelta, _ve
 
     physx::PxControllerFilters filters;
     filters.mFilterFlags = physx::PxQueryFlag::eSTATIC | physx::PxQueryFlag::eDYNAMIC;
+    filters.mCCTFilterCallback = &Engine::Get_CCTFilter();
 
     physx::PxControllerCollisionFlags flags = m_pController->move(
         physx::PxVec3(vDisp.x, vDisp.y, vDisp.z),

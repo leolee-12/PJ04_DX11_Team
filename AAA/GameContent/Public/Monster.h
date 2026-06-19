@@ -3,12 +3,9 @@
 #include "Character.h"
 #include "Monster_BlackBoard.h"
 
-NS_BEGIN(physx)
-class PxController;
-NS_END
-
 NS_BEGIN(Engine)
 class CCollider;
+class CController;
 NS_END
 
 NS_BEGIN(Client)
@@ -91,7 +88,7 @@ public:
 	void						On_Swallowed();
 
 protected:
-	physx::PxController*		m_pController = { nullptr };
+	CController*				m_pController = { nullptr };
 	CMonster_Movement*			m_pMovement = { nullptr };
 
 	MONSTER_BLACKBOARD			m_BlackBoard = {};

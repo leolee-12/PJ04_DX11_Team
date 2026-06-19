@@ -4,6 +4,7 @@
 
 #include "PartObject.h"
 #include "Monster.h"
+#include "Controller.h"
 
 #include "GameContent_const.h"
 #include "Movement_Child.h"
@@ -222,13 +223,22 @@ HRESULT CKirby::Ready_Components()
 {
     _float3 vFootPos;
     XMStoreFloat3(&vFootPos, m_pTransformCom->Get_State(STATE::POSITION));
-    m_pController = m_pGameInstance_Proxy->Create_CapsuleController(vFootPos, s_fCCT_Radius, s_fCCT_Height);
+
+    m_pController = Add_Component<CController>(TEXT("Com_Controller"),
+        CController::Create(m_pDevice, m_pContext));
+    if (nullptr == m_pController) return E_FAIL;
+
+    CController::CONTROLLER_DESC ctrlDesc{};
+    ctrlDesc.vFootPos = vFootPos;
+    ctrlDesc.fRadius = s_fCCT_Radius;
+    ctrlDesc.fHeight = s_fCCT_Height;
+    ctrlDesc.pOwner = this;
+    if (FAILED(m_pController->Initialize(&ctrlDesc))) return E_FAIL;
 
     m_pMovement = Add_Component<CMovement_Child>(TEXT("Com_Movement"), CMovement_Child::Create(m_pDevice, m_pContext));
-    if (m_pMovement == nullptr)
-        return E_FAIL;
+    if (m_pMovement == nullptr) return E_FAIL;
 
-    m_pMovement->Set_Refs(m_pTransformCom, m_pController);
+    m_pMovement->Set_Refs(m_pTransformCom, m_pController->Get_Raw());
 
 
     CCollider::COLLIDER_DESC ColliderDesc{};
@@ -265,8 +275,6 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_PROJECTILE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_D_RANGE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_TRIGGER));
-
-
 
     return S_OK;
 }
@@ -478,12 +486,5 @@ void CKirby::Free()
     Safe_Release(m_pKirby_InputManager);
     Safe_Release(m_pKirby_Controller);
     Safe_Release(m_pKirby_StateMachine);
-
-    if (m_pController != nullptr)
-    {
-        m_pGameInstance_Proxy->Release_Controller(m_pController);
-        m_pController = nullptr;
-    }
-
     __super::Free();
 }

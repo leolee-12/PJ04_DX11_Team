@@ -289,6 +289,9 @@
     <Filter Include="05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Quad">
       <UniqueIdentifier>{11914a26-172e-4caa-8ce4-2866473d5ef5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="07. Component\Controller">
+      <UniqueIdentifier>{5b6f3788-200d-4e9d-bddd-72ccf67e55f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -576,6 +579,9 @@
     <ClInclude Include="..\Public\Effect_NonParticle.h">
       <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Controller.h">
+      <Filter>07. Component\Controller</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -835,6 +841,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Effect_NonParticle.cpp">
       <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Controller.cpp">
+      <Filter>07. Component\Controller</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -5,13 +5,10 @@
 #include "GameContent_const.h"
 #include "Kirby_Command.h"
 
-NS_BEGIN(physx)
-class PxController;
-NS_END
-
 NS_BEGIN(Engine)
 class CMovement;
 class CCollider;
+class CController;
 NS_END
 
 NS_BEGIN(Client)
@@ -127,7 +124,7 @@ private:
 private:
 	CKirby_Body* m_pBody{};
 
-	physx::PxController* m_pController{};
+	CController* m_pController{};
 	CMovement_Child* m_pMovement{};
 
 	_float3 m_vWishDir{};
