@@ -40,15 +40,22 @@ struct LD_PORTAL_DESC
     _float3 vRestartAreaSize = {};
 };
 
+struct LD_RAIL_NODE_DESC
+{
+    _float3 vPosition = {};
+    _float fBezierControlLength = 0.f;
+};
+
 struct LD_RAIL_DESC
 {
     _uint iNodeCount = 0;
     _float3 vCenterPos = {};
     _float fRadius = 0.f;
-    _wstring strErpType;
+    _float fBezierControlLength = 0.f;
+    LD_RAIL_TYPE eType = LD_RAIL_TYPE::UNKNOWN;
     _bool bClockwise = false;
     _bool bClose = false;
-    vector<_float3> Nodes;
+    vector<LD_RAIL_NODE_DESC> Nodes;
 };
 
 struct LD_VOLUME_DESC

@@ -60,7 +60,7 @@ public:
 	HRESULT Load_MapPreview(_uint iPresetIndex);
 	HRESULT Load_MapPreviewStage(_uint iPresetIndex);
 	HRESULT Load_MapPreviewEnv(_uint iPresetIndex);
-	HRESULT	Load_LDPreview();
+	HRESULT Load_LDPreview(_uint iPresetIndex);
 	void    Clear_MapPreview();
 	void    Clear_MapPreviewStage();
 	void    Clear_MapPreviewEnv();

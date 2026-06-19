@@ -56,7 +56,7 @@ namespace
 
 		ImGui::SameLine();
 		if (ImGui::Button("Load LD"))
-			pLevel->Load_LDPreview();
+			pLevel->Load_LDPreview(static_cast<_uint>(*pInOutPresetIndex));
 
 		ImGui::SameLine();
 		if (ImGui::Button("Clear All"))

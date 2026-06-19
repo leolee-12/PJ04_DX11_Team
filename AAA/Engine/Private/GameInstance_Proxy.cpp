@@ -276,6 +276,13 @@ void CGameInstance_Proxy::Toggle_DebugRender()
 
 	m_pOwner->m_pRenderer->Toggle_DebugRender();
 }
+_bool CGameInstance_Proxy::IsOn_DebugRender()
+{
+	if (!IsConnected())
+		return false;
+
+	return m_pOwner->m_pRenderer->IsOn_DebugRender();
+}
 #endif
 #pragma endregion
 
@@ -956,7 +963,14 @@ PxRigidStatic* CGameInstance_Proxy::Create_StaticActor(PxTriangleMesh* pMesh, _f
 
 	return m_pOwner->Create_StaticActor(pMesh, W);
 }
-void           CGameInstance_Proxy::Remove_StaticActor(PxRigidStatic* pActor)
+PxRigidStatic* CGameInstance_Proxy::Create_StaticBox(const _float3& vLocalCenter, const _float3& vLocalHalfExtents, _fmatrix WorldMatrix)
+{
+	if (!IsConnected())
+		return nullptr;
+
+	return m_pOwner->Create_StaticBox(vLocalCenter, vLocalHalfExtents, WorldMatrix);
+}
+void CGameInstance_Proxy::Remove_StaticActor(PxRigidStatic* pActor)
 {
 	if (!IsConnected())
 		return;

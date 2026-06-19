@@ -21,6 +21,14 @@ namespace
 			|| Equals_NoCase(strObjectName, L"WoodBox");
 	}
 
+	LD_RAIL_TYPE Resolve_RailType(const _wstring& strErpType)
+	{
+		if (Equals_NoCase(strErpType, L"Line")) return LD_RAIL_TYPE::LINE;
+		if (Equals_NoCase(strErpType, L"Circle")) return LD_RAIL_TYPE::CIRCLE;
+		if (Equals_NoCase(strErpType, L"Bezier")) return LD_RAIL_TYPE::BEZIER;
+		return LD_RAIL_TYPE::UNKNOWN;
+	}
+
 	LD_VOLUME_TYPE Resolve_VolumeType(const _wstring& strObjectName)
 	{
 		if (Equals_NoCase(strObjectName, L"InvisibleCollision"))                return LD_VOLUME_TYPE::INVISIBLE_COLLISION;
@@ -42,6 +50,49 @@ namespace
 		}
 
 		return LD_AUDIO_AREA_TYPE::UNKNOWN;
+	}
+
+	_bool Try_ReadRailNodes(const json& jEntry, _float fDefaultControlLength, vector<LD_RAIL_NODE_DESC>* pOutNodes)
+	{
+		if (nullptr == pOutNodes)
+			return false;
+
+		vector<_float3> LegacyNodes;
+		if (JsonUtils::Try_ReadFloat3List(jEntry, "Nodes", &LegacyNodes))
+		{
+			pOutNodes->clear();
+			pOutNodes->reserve(LegacyNodes.size());
+
+			for (const _float3& vPosition : LegacyNodes)
+				pOutNodes->push_back({ vPosition, fDefaultControlLength });
+
+			return true;
+		}
+
+		const json* pNodeArray = JsonUtils::Find_JsonValue(jEntry, "Node");
+		if (nullptr == pNodeArray || !pNodeArray->is_array())
+			return false;
+
+		vector<LD_RAIL_NODE_DESC> ParsedNodes;
+		ParsedNodes.reserve(pNodeArray->size());
+
+		for (const json& jNode : *pNodeArray)
+		{
+			if (!jNode.is_object())
+				return false;
+
+			LD_RAIL_NODE_DESC Node{};
+			Node.fBezierControlLength = fDefaultControlLength;
+
+			if (!JsonUtils::Try_ReadFloat3Array(jNode, "Pos", &Node.vPosition))
+				return false;
+
+			JsonUtils::Try_ReadFloat(jNode, "BezierControlLength", &Node.fBezierControlLength);
+			ParsedNodes.push_back(Node);
+		}
+
+		*pOutNodes = std::move(ParsedNodes);
+		return true;
 	}
 }
 
@@ -238,16 +289,26 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 	if (Equals_NoCase(strObjectName, L"Rail"))
 	{
 		pDesc->eCategory = LD_CATEGORY::RAIL;
-		JsonUtils::Try_ReadUInt(jEntry, "NodeCount", &pDesc->Rail.iNodeCount);
-		JsonUtils::Try_ReadFloat3Array(jEntry, "Center", &pDesc->Rail.vCenterPos);
+
+		if (!JsonUtils::Try_ReadFloat3Array(jEntry, "CenterPos", &pDesc->Rail.vCenterPos))
+		{
+			JsonUtils::Try_ReadFloat3Array(jEntry, "Center", &pDesc->Rail.vCenterPos);
+		}
+
 		JsonUtils::Try_ReadFloat(jEntry, "Radius", &pDesc->Rail.fRadius);
-		JsonUtils::Try_ReadString(jEntry, "ErpType", &pDesc->Rail.strErpType);
+		JsonUtils::Try_ReadFloat(jEntry, "BezierControlLength", &pDesc->Rail.fBezierControlLength);
+		
+		_wstring strErpType;
+		JsonUtils::Try_ReadString(jEntry, "ErpType", &strErpType);
+		pDesc->Rail.eType = Resolve_RailType(strErpType);
+
 		JsonUtils::Try_ReadBoolFromNumeric(jEntry, "IsClockwise", &pDesc->Rail.bClockwise);
 		JsonUtils::Try_ReadBoolFromNumeric(jEntry, "IsClose", &pDesc->Rail.bClose);
-		JsonUtils::Try_ReadFloat3List(jEntry, "Nodes", &pDesc->Rail.Nodes);
 
-		if (0 == pDesc->Rail.iNodeCount)
-			pDesc->Rail.iNodeCount = static_cast<_uint>(pDesc->Rail.Nodes.size());
+		Try_ReadRailNodes(jEntry, pDesc->Rail.fBezierControlLength, &pDesc->Rail.Nodes);
+
+		// 런타임에서는 실제 파싱된 노드 목록을 기준으로 한다.
+		pDesc->Rail.iNodeCount = static_cast<_uint>(pDesc->Rail.Nodes.size());
 
 		if (0.f == pDesc->Rail.vCenterPos.x
 			&& 0.f == pDesc->Rail.vCenterPos.y
@@ -255,6 +316,7 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 		{
 			pDesc->Rail.vCenterPos = pDesc->vParsedPosition;
 		}
+
 		return;
 	}
 

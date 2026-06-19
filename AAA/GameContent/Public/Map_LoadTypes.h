@@ -1,6 +1,7 @@
 #pragma once
 #include "Map_Defines.h"
 #include "EnvObject_Defines.h"
+#include "LevelDesign_LoadTypes.h"
 
 NS_BEGIN(Engine)
 class CGameObject;
@@ -112,6 +113,14 @@ struct MAP_SPAWN_TARGETS
 	MAP_SPAWN_ROUTE EnvEffect;
 
 	const _tchar* pStageObjectTag = L"MapStage";
+};
+
+struct MAP_LOAD_OPTIONS
+{
+	_bool bLoadStage = true;
+	_bool bLoadEnv = true;
+	_bool bLoadLevelDesign = true;
+	_bool bEnableEnvObjectPicking = false;
 };
 
 struct MAP_SPAWN_OPTIONS

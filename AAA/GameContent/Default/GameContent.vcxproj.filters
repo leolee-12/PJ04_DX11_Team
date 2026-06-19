@@ -433,6 +433,9 @@
     <Filter Include="97. DataSystem\LevelDesignLoader">
       <UniqueIdentifier>{ac90f625-f08a-4a8a-89fd-03d9fa0dc850}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Rail">
+      <UniqueIdentifier>{32387747-e76a-437f-8fc0-28fc7ecd1337}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -807,9 +810,6 @@
     <ClInclude Include="..\Public\LevelDesignObject.h">
       <Filter>00. GameObject\96. LevelDesign</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\LevelDesign_LoadTypes.h">
-      <Filter>00. GameObject\96. LevelDesign</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Defines.h">
       <Filter>00. GameObject\96. LevelDesign</Filter>
     </ClInclude>
@@ -872,6 +872,21 @@
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Loader.h">
       <Filter>97. DataSystem\LevelDesignLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesign_Spawner.h">
+      <Filter>97. DataSystem\LevelDesignLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesign_ProtoRegister.h">
+      <Filter>97. DataSystem\LevelDesignLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesign_LoadTypes.h">
+      <Filter>97. DataSystem\LevelDesignLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesign_Rail.h">
+      <Filter>00. GameObject\96. LevelDesign\Rail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RailDataReceiver.h">
+      <Filter>00. GameObject\96. LevelDesign\Rail</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1243,6 +1258,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Loader.cpp">
       <Filter>97. DataSystem\LevelDesignLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelDesign_Spawner.cpp">
+      <Filter>97. DataSystem\LevelDesignLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelDesign_ProtoRegister.cpp">
+      <Filter>97. DataSystem\LevelDesignLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelDesign_Rail.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Rail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RailDataReceiver.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Rail</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

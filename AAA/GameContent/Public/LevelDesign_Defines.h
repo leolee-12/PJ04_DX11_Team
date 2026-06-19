@@ -49,4 +49,13 @@ enum class LD_AUDIO_AREA_TYPE : _uint
 	END
 };
 
+enum class LD_RAIL_TYPE : _uint
+{
+	LINE,
+	CIRCLE,
+	BEZIER,
+	UNKNOWN,
+	END
+};
+
 NS_END

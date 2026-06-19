@@ -1,6 +1,7 @@
 #include "LevelDesign_Registry.h"
 #include "LevelDesign_Unsupported.h"
 #include "LevelDesign_Breakable.h"
+#include "LevelDesign_Rail.h"
 
 #include <cwctype>
 #include <mutex>
@@ -22,6 +23,21 @@ namespace
 		return Result;
 	}
 
+	CGameObject* Create_UnsupportedPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	{
+		return CLevelDesign_Unsupported::Create(pDevice, pContext);
+	}
+
+	CGameObject* Create_BreakablePrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	{
+		return CLevelDesign_Breakable::Create(pDevice, pContext);
+	}
+
+	CGameObject* Create_RailPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	{
+		return CLevelDesign_Rail::Create(pDevice, pContext);
+	}
+
 	void Register_Unsupported(const _wstring& strObjectName, LD_CATEGORY eCategory, const _tchar* pLayerTag)
 	{
 		if (nullptr == pLayerTag)
@@ -32,6 +48,7 @@ namespace
 		Spec.strPrototypeTag = CLevelDesign_Unsupported::PROTOTYPE_TAG;
 		Spec.strLayerTag = pLayerTag;
 		Spec.eCategory = eCategory;
+		Spec.pPrototypeFactory = &Create_UnsupportedPrototype;
 
 		CLevelDesign_Registry::Register(strObjectName, Spec);
 	}
@@ -48,7 +65,8 @@ void CLevelDesign_Registry::Initialize()
 			g_FallbackSpec.strPrototypeTag = CLevelDesign_Unsupported::PROTOTYPE_TAG;
 			g_FallbackSpec.strLayerTag = L"Layer_LevelDesign_Unsupported";
 			g_FallbackSpec.eCategory = LD_CATEGORY::UNSUPPORTED;
-
+			g_FallbackSpec.pPrototypeFactory = &Create_UnsupportedPrototype;
+			
 			Register_Core();
 			Register_Volumes();
 			Register_GuideAudio();
@@ -62,7 +80,7 @@ _bool CLevelDesign_Registry::Register(const _wstring& strObjectName, const LD_SP
 	if (strObjectName.empty())
 		return false;
 
-	if (Spec.strPrototypeTag.empty() || Spec.strLayerTag.empty())
+	if (Spec.strPrototypeTag.empty() || Spec.strLayerTag.empty() || nullptr == Spec.pPrototypeFactory)
 		return false;
 
 	LD_SPAWN_SPEC SafeSpec = Spec;
@@ -81,6 +99,61 @@ _bool CLevelDesign_Registry::Register(const _wstring& strObjectName, const LD_SP
 #endif
 
 	return Inserted;
+}
+
+_bool CLevelDesign_Registry::Resolve(const LD_PARSED_OBJECT& Desc, LD_RESOLVED_SPAWN* pOutResolved)
+{
+	if (nullptr == pOutResolved)
+		return false;
+
+	*pOutResolved = {};
+
+	const LD_SPAWN_SPEC* pSpec =
+		Find(Desc.strObjectName);
+
+	if (nullptr == pSpec)
+		pSpec = &Get_FallbackSpec();
+
+	if (pSpec->strPrototypeTag ==
+		CLevelDesign_Breakable::PROTOTYPE_TAG)
+	{
+		if (pSpec->eBreakableType ==
+			LD_BREAKABLE_TYPE::UNKNOWN
+			|| pSpec->wstrModelProtoTag.empty())
+		{
+			pSpec = &Get_FallbackSpec();
+		}
+	}
+
+	pOutResolved->Spec = *pSpec;
+	pOutResolved->bFallback =
+		(pSpec == &Get_FallbackSpec());
+
+	if (pSpec->strPrototypeTag ==
+		CLevelDesign_Breakable::PROTOTYPE_TAG)
+	{
+		static_cast<LD_COMMON_DESC&>(
+			pOutResolved->BreakableDesc) =
+			static_cast<const LD_COMMON_DESC&>(Desc);
+
+		pOutResolved->BreakableDesc.eCategory =
+			pSpec->eCategory;
+		pOutResolved->BreakableDesc.eType =
+			pSpec->eBreakableType;
+		pOutResolved->BreakableDesc.wstrModelProtoTag =
+			pSpec->wstrModelProtoTag;
+
+		pOutResolved->bUseBreakableDesc = true;
+	}
+	else
+	{
+		pOutResolved->ParsedDesc = Desc;
+		pOutResolved->ParsedDesc.eCategory =
+			pSpec->eCategory;
+	}
+
+	return !pOutResolved->Spec.strPrototypeTag.empty()
+		&& !pOutResolved->Spec.strLayerTag.empty();
 }
 
 const LD_SPAWN_SPEC* CLevelDesign_Registry::Find(const _wstring& strObjectName)
@@ -119,8 +192,15 @@ _bool CLevelDesign_Registry::Is_LevelDesignLayer(const _wstring& strLayerTag)
 void CLevelDesign_Registry::Register_Core()
 {
 	Register_Unsupported(L"StartPortal", LD_CATEGORY::PORTAL, L"Layer_LevelDesign_Portal");
-	Register_Unsupported(L"Rail", LD_CATEGORY::RAIL, L"Layer_LevelDesign_Rail");
 	Register_Unsupported(L"DoorZone", LD_CATEGORY::DOOR, L"Layer_LevelDesign_Gimmick");
+
+	LD_SPAWN_SPEC RailSpec{};
+	RailSpec.strObjectName = CLevelDesign_Rail::OBJECT_NAME;
+	RailSpec.strPrototypeTag = CLevelDesign_Rail::PROTOTYPE_TAG;
+	RailSpec.strLayerTag = CLevelDesign_Rail::LAYER_TAG;
+	RailSpec.eCategory = LD_CATEGORY::RAIL;
+	RailSpec.pPrototypeFactory = &Create_RailPrototype;
+	Register(CLevelDesign_Rail::OBJECT_NAME, RailSpec);
 }
 
 void CLevelDesign_Registry::Register_Volumes()
@@ -158,15 +238,30 @@ void CLevelDesign_Registry::Register_ItemsAndBreakables()
 	BreakableSpec.strPrototypeTag = CLevelDesign_Breakable::PROTOTYPE_TAG;
 	BreakableSpec.strLayerTag = L"Layer_LevelDesign_Gimmick";
 	BreakableSpec.eCategory = LD_CATEGORY::BREAKABLE;
+	BreakableSpec.eBreakableType = LD_BREAKABLE_TYPE::STAR_BLOCK;
+	BreakableSpec.pPrototypeFactory = &Create_BreakablePrototype;
 
 	BreakableSpec.strObjectName = L"StarBlock";
-	Register(L"StarBlock", BreakableSpec);
+	BreakableSpec.wstrModelProtoTag = CLevelDesign_Breakable::STARBLOCK_H1W1_MODEL_PROTO_TAG;
+	BreakableSpec.ModelRequirements = {
+		{
+			CLevelDesign_Breakable::STARBLOCK_H1W1_MODEL_PROTO_TAG,
+			"../../Resources/Map/Gimmick/Star/H1W1.ysh",
+			ETOUI(LEVEL::GAMEPLAY)
+		}
+	};
+	Register(BreakableSpec.strObjectName, BreakableSpec);
 
 	BreakableSpec.strObjectName = L"StarBlockBig";
-	Register(L"StarBlockBig", BreakableSpec);
-
-	BreakableSpec.strObjectName = L"WoodBox";
-	Register(L"WoodBox", BreakableSpec);
+	BreakableSpec.wstrModelProtoTag = CLevelDesign_Breakable::STARBLOCK_H3W3_MODEL_PROTO_TAG;
+	BreakableSpec.ModelRequirements = {
+		{
+			CLevelDesign_Breakable::STARBLOCK_H3W3_MODEL_PROTO_TAG,
+			"../../Resources/Map/Gimmick/Star/H3W3.ysh",
+			ETOUI(LEVEL::GAMEPLAY)
+		}
+	};
+	Register(BreakableSpec.strObjectName, BreakableSpec);
 
 	Register_Unsupported(L"Bush2BasicS", LD_CATEGORY::FOLIAGE, L"Layer_LevelDesign_Gimmick");
 	Register_Unsupported(L"Bush2BasicM", LD_CATEGORY::FOLIAGE, L"Layer_LevelDesign_Gimmick");

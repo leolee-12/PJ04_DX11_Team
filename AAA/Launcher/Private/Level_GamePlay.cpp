@@ -4,7 +4,6 @@
 #include "Camera_Free.h"
 #include "Loader_Prototype.h"
 #include "Map_Loader.h"
-#include "LevelDesign_Loader.h"
 #include "Launcher_LevelProfiles.h"
 #include "Camera_AreaCam.h"
 #include "Level_Loading.h"
@@ -29,6 +28,8 @@ HRESULT CLevel_GamePlay::Initialize()
     CMapStage* pMapStage = nullptr;
 
     if (FAILED(CMap_Loader::Spawn_Map(
+        m_pDevice,
+        m_pContext,
         Manifest.strMapManifest,
         Manifest.strObjectsFile,
         iLevel,
@@ -42,30 +43,16 @@ HRESULT CLevel_GamePlay::Initialize()
         Manifest.strObjectsFile.c_str(), iLevel)))
         return E_FAIL;
 
-    {
-        static constexpr const _tchar* TEST_LEVELDESIGN_PATH =
-            L"../../Resources/Map/Stage1-1/LevelDesign_Obj_FlipZ.json";
-
-        LD_LOAD_RESULT LevelDesignReport{};
-        if (FAILED(CLevelDesign_Loader::Load_LevelDesign(
-            m_pDevice,
-            m_pContext,
-            TEST_LEVELDESIGN_PATH,
-            iLevel,
-            &LevelDesignReport)))
-        {
-            return E_FAIL;
-        }
-
 #ifdef _DEBUG
-        const _wstring strDebugMessage =
-            L"[LevelDesignTest] parsed=" + to_wstring(LevelDesignReport.iParsedObjectCount) +
-            L", created=" + to_wstring(LevelDesignReport.iCreatedCount) +
-            L", fallback=" + to_wstring(LevelDesignReport.iFallbackSpecCount) +
-            L", failed=" + to_wstring(LevelDesignReport.iSkippedCreateFailedCount) + L"\n";
-        OutputDebugStringW(strDebugMessage.c_str());
+    const _wstring strDebugMessage =
+        L"[MapLoad][LevelDesign] json=" + to_wstring(MapReport.iLevelDesignJsonLoadedCount) +
+        L", parsed=" + to_wstring(MapReport.iLevelDesignParsedObjectCount) +
+        L", created=" + to_wstring(MapReport.iLevelDesignCreatedCount) +
+        L", fallback=" + to_wstring(MapReport.iLevelDesignFallbackSpecCount) +
+        L", failed=" + to_wstring(MapReport.iLevelDesignSkippedCreateFailedCount) + L"\n";
+
+    OutputDebugStringW(strDebugMessage.c_str());
 #endif
-    }
 
     if (!Manifest.strUIFile.empty())
     {

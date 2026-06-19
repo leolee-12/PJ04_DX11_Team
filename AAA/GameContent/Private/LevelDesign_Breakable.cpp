@@ -22,7 +22,7 @@ namespace
 
 		pOutDesc->eCategory = LD_CATEGORY::BREAKABLE;
 		pOutDesc->eType = LD_BREAKABLE_TYPE::STAR_BLOCK;
-		pOutDesc->wstrModelProtoTag = CLevelDesign_Breakable::STARBLOCK_H1W1_MODEL_PROTO_TAG;
+		pOutDesc->wstrModelProtoTag = CLevelDesign_Breakable::STARBLOCK_H2W2_MODEL_PROTO_TAG;
 
 		pOutDesc->fScale = 1.f;
 		pOutDesc->vRight = { 1.f, 0.f, 0.f, 0.f };
@@ -82,6 +82,9 @@ HRESULT CLevelDesign_Breakable::Initialize(void* pArg)
 	Desc().eCategory = LD_CATEGORY::BREAKABLE;
 
 	if (FAILED(Ready_Components()))
+		return E_FAIL;
+
+	if (FAILED(Ready_PhysicsActor_Box()))
 		return E_FAIL;
 
 	return S_OK;
@@ -172,6 +175,54 @@ HRESULT CLevelDesign_Breakable::Ready_Components()
 	return S_OK;
 }
 
+HRESULT CLevelDesign_Breakable::Ready_PhysicsActor_Box()
+{
+	Release_PhysicsActor();
+
+	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom || nullptr == m_pModelCom)
+		return E_FAIL;
+
+	_float3 vMin{};
+	_float3 vMax{};
+	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
+
+	if (vMin.x > vMax.x || vMin.y > vMax.y || vMin.z > vMax.z)
+		return E_FAIL;
+
+	const _float3 vLocalCenter = {
+			(vMin.x + vMax.x) * 0.5f,
+			(vMin.y + vMax.y) * 0.5f,
+			(vMin.z + vMax.z) * 0.5f
+	};
+
+	const _float3 vLocalHalfExtents = {
+			(vMax.x - vMin.x) * 0.5f,
+			(vMax.y - vMin.y) * 0.5f,
+			(vMax.z - vMin.z) * 0.5f
+	};
+
+	m_pPhysicsActor = m_pGameInstance_Proxy->Create_StaticBox(
+		vLocalCenter,
+		vLocalHalfExtents,
+		XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+
+	if (nullptr == m_pPhysicsActor)
+		return E_FAIL;
+
+	return S_OK;
+}
+
+void CLevelDesign_Breakable::Release_PhysicsActor()
+{
+	if (nullptr == m_pPhysicsActor)
+		return;
+
+	if (nullptr != m_pGameInstance_Proxy)
+		m_pGameInstance_Proxy->Remove_StaticActor(m_pPhysicsActor);
+
+	m_pPhysicsActor = nullptr;
+}
+
 HRESULT CLevelDesign_Breakable::Bind_ShaderResources()
 {
 	if (nullptr == m_pShaderCom || nullptr == m_pTransformCom)
@@ -225,6 +276,8 @@ CGameObject* CLevelDesign_Breakable::Clone(void* pArg)
 
 void CLevelDesign_Breakable::Free()
 {
+	Release_PhysicsActor();
+
 	__super::Free();
 }
 

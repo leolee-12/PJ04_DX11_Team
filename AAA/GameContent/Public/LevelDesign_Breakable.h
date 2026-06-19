@@ -6,6 +6,10 @@ class CShader;
 class CModel;
 NS_END
 
+NS_BEGIN(physx)
+class PxRigidStatic;
+NS_END
+
 NS_BEGIN(Client)
 
 class CLevelDesign_Breakable final : public CLevelDesignObject
@@ -40,13 +44,16 @@ protected:
 	LD_BREAKABLE_OBJECT_DESC&		BreakableDesc() { return m_tBreakableDesc; }
 
 private:
-	CShader* m_pShaderCom = nullptr;
-	CModel* m_pModelCom = nullptr;
+	CShader* m_pShaderCom = { nullptr };
+	CModel* m_pModelCom = { nullptr };
+	physx::PxRigidStatic* m_pPhysicsActor = { nullptr };
 
-	LD_BREAKABLE_OBJECT_DESC		m_tBreakableDesc = {};
+	LD_BREAKABLE_OBJECT_DESC m_tBreakableDesc = {};
 
 private:
 	HRESULT			Ready_Components();
+	HRESULT			Ready_PhysicsActor_Box();
+	void			Release_PhysicsActor();
 	HRESULT			Bind_ShaderResources();
 	const _tchar*	Resolve_ModelProtoTag() const;
 
