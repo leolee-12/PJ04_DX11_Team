@@ -132,6 +132,7 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _flo
 
 void CKirby_Ability_Normal::Exit_Ability(CKirby* pKirby)
 {
+    Reset_Default(pKirby);
 }
 
 _bool CKirby_Ability_Normal::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)

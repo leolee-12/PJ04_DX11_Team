@@ -183,9 +183,9 @@ CKirby_Ability* CKirby::Get_KirbyAbility()
 void CKirby::Set_KirbyAbility(COPY_ABILITY_TYPE eAbilityState)
 {
     auto iter = m_Abilities.find(eAbilityState);
-    if (iter == m_Abilities.end())
-        MSG_BOX("KirbyAbility Bug: Kirby.cpp");
+    if (iter == m_Abilities.end()) { MSG_BOX("KirbyAbility Bug"); return; }
 
+    if (m_pKirby_Ability) m_pKirby_Ability->Exit_Ability(this);
     m_pKirby_Ability = iter->second;
 }
 
