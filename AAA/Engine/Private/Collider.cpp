@@ -94,6 +94,7 @@ HRESULT CCollider::Initialize(void* pArg)
 
 void CCollider::Update(_fmatrix TransformMatrix)
 {
+    if (!m_bEnabled) return;
     m_pBounding->Update(TransformMatrix);
 }
 

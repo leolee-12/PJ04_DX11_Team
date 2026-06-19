@@ -24,6 +24,8 @@ HRESULT CMiniBoss::Initialize(void* pArg)
     if (const _tchar* pTag = Get_AppearEventTag())
         Subscribe_Event(pTag, [this](void*) { Appear(); });
 
+    m_TraitFlags = MT_NONE;
+
     return S_OK;
 }
 

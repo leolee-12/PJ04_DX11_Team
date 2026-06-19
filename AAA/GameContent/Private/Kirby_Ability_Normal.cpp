@@ -23,9 +23,9 @@ HRESULT CKirby_Ability_Normal::Initialize()
     return S_OK;
 }
 
-KIRBY_ABILITY_TYPE CKirby_Ability_Normal::Get_AbilityType()
+COPY_ABILITY_TYPE CKirby_Ability_Normal::Get_AbilityType()
 {
-    return KIRBY_ABILITY_TYPE::NORMAL;
+    return COPY_ABILITY_TYPE::NORMAL;
 }
 
 void CKirby_Ability_Normal::Enter_Ability(CKirby* pKirby)
@@ -61,6 +61,8 @@ void CKirby_Ability_Normal::Enter_Ability(CKirby* pKirby)
         pKirby->Get_Transform()->Get_WorldMatrixPtr(),
         &m_pInhaleEffect
     );
+    //윤석현추가
+    pKirby->Begin_Inhale();
 }
 
 ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _float fTimeDelta)
@@ -94,6 +96,7 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _flo
     if (m_eInhaleState != INHALE_STATE::INHALE_END && m_bReqInhale == true)
     {
         m_eInhaleState = INHALE_STATE::INHALE_END;
+        pKirby->End_Inhale();
         pAnimator->Play("InhaleEnd", false, false, 0.1f, 1.5f);
         pMovementCom->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
     }
@@ -141,6 +144,9 @@ void CKirby_Ability_Normal::Exit_Ability(CKirby* pKirby)
 {
     m_pInhaleEffect->EffectContainer_Stop();
     m_pInhaleEffect = nullptr;
+
+    // 윤석현 추가
+    Reset_Default(pKirby);
 }
 
 _bool CKirby_Ability_Normal::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -270,7 +276,7 @@ _bool CKirby_Ability_Normal::Change_Ability(CKirby* pKirby)
         Reset_Default(pKirby);
 
         // 먹은 오브젝트에서 가져온다.
-        KIRBY_ABILITY_TYPE eAbilityType = KIRBY_ABILITY_TYPE::SWORD;
+        COPY_ABILITY_TYPE eAbilityType = COPY_ABILITY_TYPE::SWORD;
         pKirby->Set_KirbyAbility(eAbilityType);
 
         pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
