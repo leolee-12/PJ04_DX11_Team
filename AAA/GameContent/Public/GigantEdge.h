@@ -42,8 +42,6 @@ public:
     _bool Is_GroggyRequested() const { return m_bGroggyRequested; }
     void  Clear_Groggy() { m_bGroggyRequested = false; }
 
-    void  On_Hit(_fvector vAttackerPos, _float fDamage);
-
 protected:
     virtual HRESULT        Ready_Parts() override;
     virtual CMonsterBrain* Create_Brain() override;
@@ -58,15 +56,19 @@ protected:
     virtual _float         Get_CapsuleRadius() const override { return s_fCCT_Radius; }
     virtual _float         Get_CapsuleHeight() const override { return s_fCCT_Height; }
     virtual _float		   Get_InteractRadius() const override { return 0.f; }
+    virtual _float         Get_HurtBoxRadius() const override { return 2.f; }
     virtual void           Play_StateAnimation(MONSTER_STATE_TYPE) override {}
 
 private:
-    CGigantEdge_Body* m_pBody = { nullptr };
-    CGigantEdge_Sword* m_pSword = { nullptr };
+    CGigantEdge_Body*   m_pBody   = { nullptr };
+    CGigantEdge_Sword*  m_pSword  = { nullptr };
     CGigantEdge_Shield* m_pShield = { nullptr };
 
-    _bool m_bGuarding = { false };
+    _bool m_bGuarding        = { false };
     _bool m_bGroggyRequested = { false };
+
+private:
+    virtual _bool Block_Hit(const ATTACK_INFO& tInfo) override;
 
 #ifdef _DEBUG
 public:

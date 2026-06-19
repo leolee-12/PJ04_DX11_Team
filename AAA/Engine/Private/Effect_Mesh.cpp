@@ -3,13 +3,13 @@
 #include "GameInstance.h"
 
 CEffect_Mesh::CEffect_Mesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CEffect_Part(pDevice, pContext)
+    : CEffect_NonParticle(pDevice, pContext)
 {
     Init_PropertyValue();
 }
 
 CEffect_Mesh::CEffect_Mesh(const CEffect_Mesh& Prototype)
-    : CEffect_Part(Prototype)
+    : CEffect_NonParticle(Prototype)
 {
     Init_PropertyValue();
 }
@@ -84,7 +84,11 @@ HRESULT CEffect_Mesh::Render()
         }
 
         Helper::IntClamp(m_iShaderPass, ShaderPass::Default, ShaderPass::ShaderPass_End - 1);
-        if (FAILED(m_pShaderCom->Begin(m_iShaderPass)))
+        Helper::IntClamp(m_iMirror, Sampler::DEFAULT, Sampler::SAMPLER_END - 1);
+
+        _int iPass = m_iShaderPass + (m_iMirror == Sampler::MIRROR ? ShaderPass::ShaderPass_End : 0);
+
+        if (FAILED(m_pShaderCom->Begin(iPass)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render(i)))
@@ -100,6 +104,9 @@ HRESULT CEffect_Mesh::Ready_Components()
         m_pShaderCom = m_pGameInstance_Proxy->Get_MeshShader();
     else
         m_pShaderCom = Add_Component<CShader>(m_iShaderLevel, m_wstrShaderTag, TEXT("Com_Shader"));
+
+    if (m_pShaderCom == nullptr)
+        return E_FAIL;
 
     m_pModelCom = Add_Component<CModel>(m_iModelLevel, m_wstrModelTag, TEXT("Com_Model"));
     if (m_pModelCom == nullptr)
@@ -149,11 +156,6 @@ void CEffect_Mesh::Update_UVScroll(const _float fTimeDelta, const _float fRatio)
     
     MoveUVScroll(fRatio, m_vDiffuseUVScroll, m_vDiffuseUVScrollCount, m_vDiffuseOffset, m_vCurDiffuseUVOffset);
     MoveUVScroll(fRatio, m_vUnknownUVScroll, m_vUnknownUVScrollCount, m_vUnknownOffset, m_vCurUnknownUVOffset);
-}
-
-void CEffect_Mesh::Update_EffectPart(const _float fTimeDelta, const _float fRatio)
-{
-
 }
 
 void CEffect_Mesh::Init_PropertyValue()

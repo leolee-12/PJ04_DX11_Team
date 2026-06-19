@@ -430,6 +430,15 @@
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Landing">
       <UniqueIdentifier>{a0debcb6-560b-4385-8a5c-532db8897abb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\Test\TestParticle">
+      <UniqueIdentifier>{c3b2a3c6-b5a8-4b4a-82ac-7f8fd01b5452}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\95. Interface">
+      <UniqueIdentifier>{3f986a95-5219-485c-8719-2667dcade916}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\95. Interface\Damageable">
+      <UniqueIdentifier>{aa32f8bd-7471-4860-9a7d-c599523a6293}</UniqueIdentifier>
+    </Filter>
     <Filter Include="97. DataSystem\LevelDesignLoader">
       <UniqueIdentifier>{ac90f625-f08a-4a8a-89fd-03d9fa0dc850}</UniqueIdentifier>
     </Filter>
@@ -861,6 +870,12 @@
     <ClInclude Include="..\Public\Monster_State_Landing.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Landing</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\TestParticle.h">
+      <Filter>00. GameObject\Test\TestParticle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Damageable.h">
+      <Filter>00. GameObject\95. Interface\Damageable</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Parsing_Utils.h">
       <Filter>99. Defines\Leo</Filter>
     </ClInclude>
@@ -1045,9 +1060,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Run.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Run</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Kirby_Ability.cpp">
-      <Filter>00. GameObject\05. Kirby\02. Kirby_Ability</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ability_Normal.cpp">
       <Filter>00. GameObject\05. Kirby\02. Kirby_Ability\00. Kirby_Ability_Normal</Filter>
@@ -1249,6 +1261,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Monster_State_Landing.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Landing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Ability.cpp">
+      <Filter>00. GameObject\05. Kirby\02. Kirby_Ability</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestParticle.cpp">
+      <Filter>00. GameObject\Test\TestParticle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Damageable.cpp">
+      <Filter>00. GameObject\95. Interface\Damageable</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Parser.cpp">
       <Filter>97. DataSystem\LevelDesignLoader</Filter>

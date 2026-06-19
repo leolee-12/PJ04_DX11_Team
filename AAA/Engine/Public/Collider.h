@@ -44,6 +44,12 @@ public:
 
 	CGameObject* Get_Owner() const { return m_pOwner; }
 	_uint        Get_RegisteredGroup() const { return m_RegisteredGroup; }
+	_bool		 Is_Enabled() const { return m_bEnabled; }
+	void		 Set_Enabled(_bool b)
+	{
+		m_bEnabled = b;
+		if (!b) { m_PrevContacts.clear(); m_CurrContacts.clear(); }
+	}
 
 public:
 	void Notify_Enter(CCollider* pOther);
@@ -76,6 +82,8 @@ private:
 	CollisionCallback	m_OnEnter;
 	CollisionCallback	m_OnStay;
 	CollisionCallback	m_OnExit;
+
+	_bool m_bEnabled = { true };
 
 private:
 	unordered_set<CCollider*> m_PrevContacts;

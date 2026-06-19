@@ -190,6 +190,7 @@
     <ClInclude Include="..\public\Component.h" />
     <ClInclude Include="..\public\ComputeShader.h" />
     <ClInclude Include="..\Public\ContainerObject.h" />
+    <ClInclude Include="..\public\Controller.h" />
     <ClInclude Include="..\Public\Culling_Util.h" />
     <ClInclude Include="..\Public\CustomFont.h" />
     <ClInclude Include="..\Public\DataExporter.h" />
@@ -198,6 +199,7 @@
     <ClInclude Include="..\public\Effect_Allocator.h" />
     <ClInclude Include="..\public\Effect_Container.h" />
     <ClInclude Include="..\Public\Effect_Mesh.h" />
+    <ClInclude Include="..\Public\Effect_NonParticle.h" />
     <ClInclude Include="..\Public\Effect_Particle.h" />
     <ClInclude Include="..\Public\Effect_Part.h" />
     <ClInclude Include="..\public\Effect_Manager.h" />
@@ -288,6 +290,7 @@
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\private\ComputeShader.cpp" />
     <ClCompile Include="..\Private\ContainerObject.cpp" />
+    <ClCompile Include="..\private\Controller.cpp" />
     <ClCompile Include="..\Private\Culling_Util.cpp" />
     <ClCompile Include="..\Private\CustomFont.cpp" />
     <ClCompile Include="..\Private\DataExporter.cpp" />
@@ -296,6 +299,7 @@
     <ClCompile Include="..\private\Effect_Allocator.cpp" />
     <ClCompile Include="..\private\Effect_Container.cpp" />
     <ClCompile Include="..\Private\Effect_Mesh.cpp" />
+    <ClCompile Include="..\Private\Effect_NonParticle.cpp" />
     <ClCompile Include="..\Private\Effect_Particle.cpp" />
     <ClCompile Include="..\Private\Effect_Part.cpp" />
     <ClCompile Include="..\private\Effect_Manager.cpp" />

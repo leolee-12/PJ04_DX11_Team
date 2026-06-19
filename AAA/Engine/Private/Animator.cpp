@@ -35,6 +35,20 @@ HRESULT CAnimator::Initialize(void* pArg)
 // ── 재생 제어 ──
 void CAnimator::Play(const string& strAnimName, _bool bLoop, _bool bRestart, _float fBlend, _float fSpeed)
 {
+    if (nullptr == m_pModel)
+        return;
+
+    _int iIndex = m_pModel->Get_AnimationIndex(strAnimName);
+
+    if (iIndex < 0)
+        return;
+
+    m_fBlendDuration = fBlend;
+
+    m_pModel->Set_AnimationIndex((_uint)iIndex, bLoop, bRestart, m_fBlendDuration);
+    m_fPlaySpeed = fSpeed;
+    m_bFinished = false;
+
     m_PlayQueue.clear();
     Start_Clip({ strAnimName, bLoop, bRestart, fBlend, fSpeed });
 }
@@ -60,6 +74,7 @@ void CAnimator::Start_Clip(const ANI_PLAY_INFO& Info)
 
     if (Info.bClearMask)
         Clear_Mask();
+
 
     m_fBlendDuration = Info.fBlend;
     m_pModel->Set_AnimationIndex(static_cast<_uint>(iIndex), Info.bLoop, Info.bRestart, m_fBlendDuration);

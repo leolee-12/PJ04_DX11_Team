@@ -24,7 +24,7 @@ HRESULT CInhaleEffect::Initialize(void* pArg)
 {
     INHALE_EFFECT_DESC tDesc{};
 
-    tDesc.iModelLevel = ETOUI(LEVEL::GAMEPLAY);
+    tDesc.iModelLevel = m_iPrototypeLevel;
     tDesc.wstrModelTag = TEXT("Prototype_Component_Model_InhaleEffect");
 
     tDesc.bUseDiffuseTexture = false;

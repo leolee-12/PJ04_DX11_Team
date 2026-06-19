@@ -193,9 +193,6 @@
     <Filter Include="05. GameObject\Effect\EffectPart">
       <UniqueIdentifier>{42b80ec2-d825-4521-b1ae-204abc8fe1cd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Quad">
-      <UniqueIdentifier>{11914a26-172e-4caa-8ce4-2866473d5ef5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="16. PhysX">
       <UniqueIdentifier>{c1fe8712-6c82-4df0-a436-8107d7043445}</UniqueIdentifier>
     </Filter>
@@ -204,9 +201,6 @@
     </Filter>
     <Filter Include="07. Component\Animator">
       <UniqueIdentifier>{a61d4e6d-41e0-4824-8c8c-fbb9a27c36e2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Mesh">
-      <UniqueIdentifier>{bf898bea-9c9c-46cf-a2d9-7b77aadbcb2f}</UniqueIdentifier>
     </Filter>
     <Filter Include="17. Enviroment">
       <UniqueIdentifier>{59b6d5b4-942a-4729-9aa9-9c6fd7a957c2}</UniqueIdentifier>
@@ -285,6 +279,18 @@
     </Filter>
     <Filter Include="21. Behavior Tree\03. BTDecorator.h">
       <UniqueIdentifier>{53cd0484-acde-49c9-aa55-df9dc7373f83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_NoneParticle">
+      <UniqueIdentifier>{3eda837d-3b83-49b9-ac0d-13e217cd8b2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Mesh">
+      <UniqueIdentifier>{bf898bea-9c9c-46cf-a2d9-7b77aadbcb2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Quad">
+      <UniqueIdentifier>{11914a26-172e-4caa-8ce4-2866473d5ef5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="07. Component\Controller">
+      <UniqueIdentifier>{5b6f3788-200d-4e9d-bddd-72ccf67e55f1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -505,7 +511,7 @@
       <Filter>05. GameObject\Effect\EffectPart</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_Quad.h">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Quad</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Quad</Filter>
     </ClInclude>
     <ClInclude Include="..\public\PhysX_Manager.h">
       <Filter>16. PhysX\Manager</Filter>
@@ -514,7 +520,7 @@
       <Filter>07. Component\Animator</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_Mesh.h">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Mesh</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Environment_Manager.h">
       <Filter>17. Enviroment\Manager</Filter>
@@ -569,6 +575,12 @@
     </ClInclude>
     <ClInclude Include="..\public\BehaviorTree.h">
       <Filter>21. Behavior Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_NonParticle.h">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Controller.h">
+      <Filter>07. Component\Controller</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -765,7 +777,7 @@
       <Filter>05. GameObject\Effect\EffectPart</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_Quad.cpp">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Quad</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Quad</Filter>
     </ClCompile>
     <ClCompile Include="..\private\PhysX_Manager.cpp">
       <Filter>16. PhysX\Manager</Filter>
@@ -774,7 +786,7 @@
       <Filter>07. Component\Animator</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_Mesh.cpp">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Mesh</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Mesh</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Environment_Manager.cpp">
       <Filter>17. Enviroment\Manager</Filter>
@@ -826,6 +838,12 @@
     </ClCompile>
     <ClCompile Include="..\private\BehaviorTree.cpp">
       <Filter>21. Behavior Tree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_NonParticle.cpp">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Controller.cpp">
+      <Filter>07. Component\Controller</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

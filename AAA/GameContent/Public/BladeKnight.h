@@ -60,9 +60,10 @@ public:
 		pOutData->strPrototypeTag = PROTOTYPE_TAG;
 	}
 	
-	virtual _float				Get_CapsuleRadius() const override;
-	virtual _float				Get_CapsuleHeight() const override;
+	virtual _float				Get_CapsuleRadius() const override { return 0.5f; }
+	virtual _float				Get_CapsuleHeight() const override { return 1.f; }
 	virtual _float				Get_InteractRadius() const override { return 10.f; }
+	virtual _float				Get_HurtBoxRadius() const override { return 0.75f; }
 	virtual void				Play_StateAnimation(MONSTER_STATE_TYPE eState) override;
 
 	virtual _bool				Is_StateAnimationFinished() const override;

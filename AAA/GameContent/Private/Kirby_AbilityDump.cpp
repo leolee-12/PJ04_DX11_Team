@@ -50,10 +50,16 @@ void CKirby_AbilityDump::Update(CKirby* pKirby, const _float fTimeDelta)
 
     if(pAnimator->Is_Finished())
     {
+
         if (Try_FallState(pKirby) == true)
-            pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::FALL));
+        {
+            CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+            pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::FALL);
+        }
         else
-            Transition_Wait_OR_Run(pKirby);     
+        {
+            Transition_Wait_OR_Run(pKirby);
+        }
 
         return;
     }
@@ -85,7 +91,7 @@ void CKirby_AbilityDump::Parts_Off(CKirby* pKirby, _float fRatio)
     if (m_bPartsOff == false && fRatio >= 0.45f)
     {
         pKirby->OnOffParts(pKirby->Get_KirbyAbility()->Get_AbilityType(), false);
-        pKirby->Set_KirbyAbility(KIRBY_ABILITY_TYPE::NORMAL);
+        pKirby->Set_KirbyAbility(COPY_ABILITY_TYPE::NORMAL);
         m_bPartsOff = true;
     }
 }

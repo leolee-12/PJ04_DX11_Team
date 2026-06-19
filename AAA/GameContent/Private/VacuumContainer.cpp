@@ -60,9 +60,9 @@ HRESULT CVacuumContainer::Render()
 
 HRESULT CVacuumContainer::Ready_EffectPartObjects()
 {
-    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CInhaleEffect::PROTOTYPE_TAG, TEXT("Proto_InhaleEffect"));
-    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CVacuum::PROTOTYPE_TAG, TEXT("Proto_Vacuum"));
-    //Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CTornadoSpinReverse::PROTOTYPE_TAG, TEXT("Proto_TornadoSpinReverse"));
+    Add_Effect_PartObject(m_iPrototypeLevel, CInhaleEffect::PROTOTYPE_TAG, TEXT("Proto_InhaleEffect"));
+    Add_Effect_PartObject(m_iPrototypeLevel, CVacuum::PROTOTYPE_TAG, TEXT("Proto_Vacuum"));
+    //Add_Effect_PartObject(m_iPrototypeLevel, CTornadoSpinReverse::PROTOTYPE_TAG, TEXT("Proto_TornadoSpinReverse"));
 
     return S_OK;
 }
@@ -86,7 +86,7 @@ CGameObject* CVacuumContainer::Clone(void* pArg)
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Cloned: CTestEffectQuad");
+        MSG_BOX("Failed to Cloned: CVacuumContainer");
         Safe_Release(pInstance);
     }
 

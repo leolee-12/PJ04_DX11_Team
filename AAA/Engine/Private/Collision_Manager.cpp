@@ -46,9 +46,11 @@ void CCollision_Manager::Check_Collisions(const _float& fDeltaTime)
 		_bool bSameGroup = (pool.first == pool.second);
 		auto& vA = itA->second; auto& vB = itB->second;
 		for (size_t i = 0; i < vA.size(); ++i) {
-			size_t jStart = bSameGroup ? i + 1 : 0;    // 같은 그룹은 (A,B)만 한 번
+			if (!vA[i]->Is_Enabled()) continue;         
+			size_t jStart = bSameGroup ? i + 1 : 0;
 			for (size_t j = jStart; j < vB.size(); ++j) {
 				if (vA[i] == vB[j]) continue;
+				if (!vB[j]->Is_Enabled()) continue;       
 				if (vA[i]->Intersect(vB[j])) {
 					vA[i]->Add_Contact(vB[j]);
 					vB[j]->Add_Contact(vA[i]);

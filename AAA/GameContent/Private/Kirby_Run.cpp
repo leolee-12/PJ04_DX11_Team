@@ -28,8 +28,8 @@ void CKirby_Run::Enter(CKirby* pKirby)
     __super::Enter(pKirby);
 
     // Ani
-    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
-    pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::RUN));
+    CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+    pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::RUN);
 }
 
 void CKirby_Run::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -41,7 +41,8 @@ void CKirby_Run::Update(CKirby* pKirby, const _float fTimeDelta)
     // Fall
     if (Try_FallState(pKirby) == true)
     {
-        pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::FALL));
+        CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+        pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::FALL);
     }
 
     // Wait
