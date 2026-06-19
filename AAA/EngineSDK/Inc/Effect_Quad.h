@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Effect_Part.h"
+#include "Effect_NoneParticle.h"
 
 NS_BEGIN(Engine)
 
 class CVIBuffer_Rect;
 
-class ENGINE_DLL CEffect_Quad abstract : public CEffect_Part
+class ENGINE_DLL CEffect_Quad abstract : public CEffect_NoneParticle
 {
     GENERATED_BODY_ABSTRACT(CEffect_Quad)
 
@@ -35,7 +35,7 @@ public:
     };
 
 private:
-    enum ShaderPass { Default, AlphaBlend, Additive, Default_Mirror, AlphaBlend_Mirror, Additive_Mirror, ShaderPass_End };
+    enum ShaderPass { Default, AlphaBlend, Additive, ShaderPass_End };
 
 protected:
     CEffect_Quad(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -30,6 +30,9 @@ PROPERTY(_float, m_fParticleAlphaEndValue,      L"End_P",               L"Partic
 PROPERTY(_float, m_fParticleFadeInRatio,        L"Fade In Ratio_P",     L"Particle Alpha");
 PROPERTY(_float, m_fParticleFadeOutRatio,       L"Fade Out Ratio_P",    L"Particle Alpha");
 
+// Particle
+PROPERTY(_uint, m_iParticleCount, L"Count_P", L"Particle");
+
 // Particle Spawn
 PROPERTY(_bool, m_bParticleSpawnRandom, L"Spawn Random_P", L"Particle Spawn");
 PROPERTY(_float, m_fParticleSpawnStartRatio, L"Spawn Start Ratio_P", L"Particle Spawn");
@@ -42,6 +45,24 @@ PROPERTY(_float, m_fParticleStartSpeed, L"Start Speed_P", L"Particle Move");
 PROPERTY(_float, m_fParticleFountainSpread, L"Fountain Spread_P", L"Particle Move");
 PROPERTY(_float, m_fParticleFountainUpBias, L"Fountain Up Bias_P", L"Particle Move");
 PROPERTY(_float, m_fParticleFountainGravity, L"Gravity_P", L"Particle Move");
+
+// Particle Size
+PROPERTY(_float, m_fParticleStartSize, L"Start Size_P", L"Particle Size");
+PROPERTY(_bool, m_bParticleRandomSize, L"Random Size_P", L"Particle Size");
+PROPERTY(_float2, m_vParticleStartSizeRange, L"Size Range_P", L"Particle Size");
+
+PROPERTY(_bool, m_bParticleSizeOverLifeTime, L"Size Over Life_P", L"Particle Size");
+PROPERTY(_float, m_fParticleSizeStartValue, L"Size Start_P", L"Particle Size");
+PROPERTY(_float, m_fParticleSizePeakValue, L"Size Peak_P", L"Particle Size");
+PROPERTY(_float, m_fParticleSizeEndValue, L"Size End_P", L"Particle Size");
+PROPERTY(_float, m_fParticleSizePeakRatio, L"Size Peak Ratio_P", L"Particle Size");
+
+// Particle Color
+PROPERTY(_bool, m_bParticleColorOverLifeTime, L"Color Over Life_P", L"Particle Color");
+PROPERTY(_float3, m_vParticleColorStartValue, L"Color Start_P", L"Particle Color");
+PROPERTY(_float3, m_vParticleColorPeakValue, L"Color Peak_P", L"Particle Color");
+PROPERTY(_float3, m_vParticleColorEndValue, L"Color End_P", L"Particle Color");
+PROPERTY(_float, m_fParticleColorPeakRatio, L"Color Peak Ratio_P", L"Particle Color");
 
 public:
     struct EFFECT_PARTICLE_DESC : public CEffect_Part::EFFECT_PART_DESC
@@ -70,13 +91,17 @@ protected:
         _float fAlphaEndValue{};
         _float fAlpha{ 1.f };
 
+        _float  fBaseSize{ 1.f };
+        _float3 vScale{ 1.f, 1.f, 1.f };
+
+        _float3 vColor{ 1.f, 1.f, 1.f };
+
         _float3 vLocalPos{};
         _float3 vVelocity{};
-        _float3 vScale{ 1.f, 1.f, 1.f };
     };
 
 private:
-    enum ShaderPass { Default, AlphaBlend, Additive, Default_Mirror, AlphaBlend_Mirror, Additive_Mirror, ShaderPass_End };
+    enum ShaderPass { Default, AlphaBlend, Additive, ShaderPass_End };
 
     enum ParticleMoveMode
     {
@@ -127,13 +152,9 @@ private:
     _float2 m_fCurMaskAniSize{};
 
 private:
-    static constexpr _uint PARTICLE_MAX_COUNT = 20;
-
     vector<PARTICLE> m_Particles;
 
-    _uint   m_iParticleCount = PARTICLE_MAX_COUNT;
     _float  m_fParticleLifeTime = 1.f;
-    _float  m_fParticleSize = 0.25f;
 
     _float3 m_fPivot{};
 
@@ -150,6 +171,8 @@ private:
     _vector Make_FountainDirection() const;
 
     void Update_ParticleMove(PARTICLE& Particle, _float fRatio, _float fLocalRatio);
+    void Update_ParticleSize(PARTICLE& Particle, _float fLocalRatio);
+    void Update_ParticleColor(PARTICLE& Particle, _float fLocalRatio);
 
 protected:
     virtual void Free() override;
