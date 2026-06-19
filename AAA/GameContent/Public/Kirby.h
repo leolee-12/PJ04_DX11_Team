@@ -54,6 +54,12 @@ public:
 	static constexpr _float s_fMaxHorizontalSpeed = 8.f;
 	static constexpr _float s_fHoveringMaxHorizontalSpeed = 4.f;
 
+	// À±¼®Çö Ãß°¡ 
+	static constexpr _float s_fInvincibleDur = 2.f;
+	static constexpr _float s_fInhaleFwd = 1.8f;
+	static constexpr _float s_fInhaleUp = 0.5f;
+	static constexpr _float3 s_vInhaleSize = _float3(2.f, 2.f, 4.f);
+
 private:
 	CKirby(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
 	CKirby(const CKirby& Prototype);
@@ -101,6 +107,10 @@ public:
 	_bool Can_AbilityDump();
 	void Req_AbilityDumpCoolDecrease() { m_bDecreaseAbilityDumpCool = true; }
 
+public: // À±¼®Çö Ãß°¡
+	void Begin_Inhale();
+	void End_Inhale();
+
 private:
 	HRESULT Ready_Components();
 	void	SetUp_Collider_Callback();
@@ -108,6 +118,11 @@ private:
 	HRESULT Ready_System();
 	HRESULT Ready_Ability();
 	HRESULT Bind_ShaderResources();
+	virtual HRESULT Ready_Events() override;
+
+	// À±¼®Çö Ãß°¡
+	virtual _bool Block_Hit(_fvector vAttackerPos) override;
+	virtual void  On_Damaged(_fvector vAttackerPos, _float fDamage) override;
 
 private:
 	CKirby_Body* m_pBody{};
@@ -118,7 +133,12 @@ private:
 	_float3 m_vWishDir{};
 	_bool m_RotationLock{};
 
+	//À±¼®Çö Ãß°¡
 	CCollider* m_pHurtBox = { nullptr };
+	CCollider* m_pInhaleBox = { nullptr };
+	_bool	   m_bInhaling = { false };
+	_float	   m_fInvincible = { 0.f };
+
 
 private:
 	CKirby_InputManager*	m_pKirby_InputManager{};

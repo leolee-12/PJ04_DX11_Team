@@ -51,6 +51,9 @@ void CKirby_Ability_Normal::Enter_Ability(CKirby* pKirby)
     // Speed
     CMovement_Child* pMovementCom = pKirby->Get_Movement();
     pMovementCom->Set_MaxHorizontalSpeed(2.f);
+
+    //À±¼®ÇöÃß°¡
+    pKirby->Begin_Inhale();
 }
 
 ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _float fTimeDelta)
@@ -83,6 +86,7 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _flo
     if (m_eInhaleState != INHALE_STATE::INHALE_END && m_bReqInhale == true)
     {
         m_eInhaleState = INHALE_STATE::INHALE_END;
+        pKirby->End_Inhale();
         pAnimator->Play("InhaleEnd", false, false, 0.1f, 1.5f);
         pMovementCom->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
     }

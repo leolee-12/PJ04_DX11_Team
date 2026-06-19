@@ -100,6 +100,22 @@ _bool CGigantEdge::Is_Death_Finished() const
     return m_pBody->Get_Animator()->Is_Finished();
 }
 
+_bool CGigantEdge::Block_Hit(_fvector vAttackerPos)
+{
+    if (!m_bGuarding) return false;
+
+    _vector vForward = XMVector3Normalize(m_pTransformCom->Get_State(STATE::LOOK));
+    _vector vToAtk = XMVector3Normalize(vAttackerPos - m_pTransformCom->Get_State(STATE::POSITION));
+    _bool   bFromBack = (XMVectorGetX(XMVector3Dot(vForward, vToAtk)) < 0.f);
+
+    if (bFromBack) {              
+        m_bGuarding = false;
+        m_bGroggyRequested = true;
+        return false;
+    }
+    return true;
+}
+
 #ifdef _DEBUG
 void CGigantEdge::Debug_KeyInput()
 {
@@ -147,27 +163,6 @@ CGigantEdge* CGigantEdge::Clone(void* pArg)
 void CGigantEdge::Free()
 {
     __super::Free();
-}
-
-void CGigantEdge::On_Hit(_fvector vAttackerPos, _float fDamage)
-{
-    if (!Is_Active()) return;
-
-    if (m_bGuarding)
-    {
-        _vector vForward = XMVector3Normalize(m_pTransformCom->Get_State(STATE::LOOK));
-        _vector vToAtk = XMVector3Normalize(vAttackerPos - m_pTransformCom->Get_State(STATE::POSITION));
-        _bool   bFromBack = (XMVectorGetX(XMVector3Dot(vForward, vToAtk)) < 0.f);
-
-        if (!bFromBack)
-            return;   
-
-        m_bGuarding = false;
-        m_bGroggyRequested = true;
-    }
-
-    m_fCurHP -= fDamage;
-    if (m_fCurHP <= 0.f) { m_fCurHP = 0.f; /* TODO: »ç¸Á Ã³¸® */ }
 }
 
 HRESULT CGigantEdge::Ready_Parts()
