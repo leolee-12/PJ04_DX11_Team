@@ -287,7 +287,12 @@ void	CKirby::SetUp_Collider_Callback()
             if (ETOUI(COLLISION_LAYER::MONSTER_HURT) == pOther->Get_RegisteredGroup())
             {
                 _vector vAtkPos = pOther->Get_Owner()->Get_Transform()->Get_State(STATE::POSITION);
-                On_Hit(vAtkPos, 1.f);
+                ATTACK_INFO atk{};
+                atk.fDamage = 1.f;
+                atk.fKnockback = 6.f;                     
+                XMStoreFloat3(&atk.vAttackerPos, vAtkPos);
+                atk.pAttacker = pOther->Get_Owner();
+                Damaged(atk);
 #ifdef _DEBUG
                 char szBuf[128];
                 sprintf_s(szBuf, "[Kirby] Hurt! HP %.0f/%.0f\n", m_fCurHP, m_fMaxHP);
@@ -425,15 +430,14 @@ HRESULT CKirby::Ready_Events()
     return S_OK;
 }
 
-_bool CKirby::Block_Hit(_fvector vAttackerPos)
-{
-    return m_fInvincible > 0.f;
+_bool CKirby::Block_Hit(const ATTACK_INFO& tInfo) 
+{ 
+    return m_fInvincible > 0.f; 
 }
-
-void CKirby::On_Damaged(_fvector vAttackerPos, _float fDamage)
+void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
 {
     m_fInvincible = s_fInvincibleDur;
-    // TODO: 피격상태 적용 (넉백 + 피격애니매이션 + 능력 떨구기?)
+    // TODO: 넉백/피격애님
 }
 
 void CKirby::Begin_Inhale()

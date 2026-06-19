@@ -226,7 +226,12 @@ void CMonster::SetUp_Collider_CallBack()
 				&& Has_Trait(MT_BODYCHECK_DAMAGE))
 			{
 				_vector vAtkPos = pOther->Get_Owner()->Get_Transform()->Get_State(STATE::POSITION);
-				On_Hit(vAtkPos, 1.f);
+				ATTACK_INFO atk{};
+				atk.fDamage = 1.f;
+				atk.fKnockback = 6.f;
+				XMStoreFloat3(&atk.vAttackerPos, vAtkPos);
+				atk.pAttacker = pOther->Get_Owner();
+				Damaged(atk);
 #ifdef _DEBUG
 				char szBuf[128];
 				sprintf_s(szBuf, "[Monster] Hurt! HP %.0f/%.0f\n", m_fCurHP, m_fMaxHP);
@@ -325,16 +330,16 @@ HRESULT CMonster::Ready_State(CMonster_StateMachine* pStateMachine)
 	return S_OK;
 }
 
-void CMonster::On_Damaged(_fvector vAttackerPos, _float fDamage)
+void CMonster::On_Damaged(const ATTACK_INFO& tInfo)
 {
-	m_pMovement->Knockback(vAttackerPos, 6.f);
-	//Change_State(MONSTER_STATE_TYPE::HIT);
+	m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
+	Change_State(MONSTER_STATE_TYPE::HIT);
 }
 
-void CMonster::On_Death(_fvector vAttackerPos)
+void CMonster::On_Death(const ATTACK_INFO& tInfo)
 {
-	m_pMovement->KO(vAttackerPos, 12.f);
-	//Change_State(MONSTER_STATE_TYPE::DEAD);
+	if (m_pMovement) m_pMovement->KO(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
+	Change_State(MONSTER_STATE_TYPE::DEAD);
 }
 
 void CMonster::Perceive(_float fTimeDelta)

@@ -1,12 +1,12 @@
 #pragma once
 
 #include "GameContent_Defines.h"
-
 #include "ContainerObject.h"
+#include "Damageable.h"
 
 NS_BEGIN(Client)
 
-class CCharacter abstract : public CContainerObject
+class CCharacter abstract : public CContainerObject, public IDamageable
 {
 	GENERATED_BODY_ABSTRACT(CContainerObject)
 
@@ -24,16 +24,16 @@ public:
 	virtual HRESULT Render() override;
 
 public:
-	virtual void On_Hit(_fvector vAttackerPos, _float fDamage);
+	virtual void Damaged(const ATTACK_INFO& tInfo) override;
 
 protected:
 	_float						m_fMaxHP = { 100.f };
 	_float						m_fCurHP = { 100.f };
 
 protected:
-	virtual _bool Block_Hit(_fvector vAttackerPos) { return false; }
-	virtual void  On_Damaged(_fvector vAttackerPos, _float fDamage) {};
-	virtual void  On_Death(_fvector vAttackerPos) {}
+	virtual _bool Block_Hit(const ATTACK_INFO& tInfo) { return false; }
+	virtual void  On_Damaged(const ATTACK_INFO& tInfo) {}
+	virtual void  On_Death(const ATTACK_INFO& tInfo) {}
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

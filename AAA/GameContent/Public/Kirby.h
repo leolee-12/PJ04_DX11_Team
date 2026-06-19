@@ -118,8 +118,8 @@ private:
 	virtual HRESULT Ready_Events() override;
 
 	// À±¼®Çö Ãß°¡
-	virtual _bool Block_Hit(_fvector vAttackerPos) override;
-	virtual void  On_Damaged(_fvector vAttackerPos, _float fDamage) override;
+	virtual _bool Block_Hit(const ATTACK_INFO& tInfo) override;
+	virtual void  On_Damaged(const ATTACK_INFO& tInfo) override;
 
 private:
 	CKirby_Body* m_pBody{};

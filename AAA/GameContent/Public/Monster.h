@@ -120,8 +120,8 @@ protected:
 	virtual HRESULT				Ready_State(CMonster_StateMachine* pStateMachine);
 	virtual HRESULT				Ready_AnimEvents() { return S_OK; }		// Bkody의 Animator의 이벤트 콜백 설정함수
 
-	virtual void				On_Damaged(_fvector vAttackerPos, _float fDamage) override;
-	virtual void				On_Death(_fvector vAttackerPos) override;
+	virtual void				On_Damaged(const ATTACK_INFO& tInfo) override;
+	virtual void				On_Death(const ATTACK_INFO& tInfo) override;
 
 	//윤석현 수정 
 	virtual void				Update_AI(_float fTimeDelta);
