@@ -51,6 +51,8 @@ public:
 
 	virtual _bool Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation) override;
 
+	_bool Change_Ability(CKirby* pKirby, COPY_ABILITY_TYPE eAbility);
+
 private:
 	INHALE_STATE m_eInhaleState{};
 

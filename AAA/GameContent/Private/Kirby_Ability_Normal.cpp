@@ -55,12 +55,12 @@ void CKirby_Ability_Normal::Enter_Ability(CKirby* pKirby)
     pMovementCom->Set_MaxHorizontalSpeed(2.f);
 
 
-    CEffect_Loader::GetInstance()->Spawn(L"VacuumContainer", pKirby->Get_LevelIndex(),
-        //_float3(0.f, 0.6f, 0.4f), _float3(0.f, 0.f, 1.f),
-        _float3(0.f, 0.5f, 0.4f), _float3(0.f, 0.f, 1.f),
-        pKirby->Get_Transform()->Get_WorldMatrixPtr(),
-        &m_pInhaleEffect
-    );
+    //CEffect_Loader::GetInstance()->Spawn(L"VacuumContainer", pKirby->Get_LevelIndex(),
+    //    //_float3(0.f, 0.6f, 0.4f), _float3(0.f, 0.f, 1.f),
+    //    _float3(0.f, 0.5f, 0.4f), _float3(0.f, 0.f, 1.f),
+    //    pKirby->Get_Transform()->Get_WorldMatrixPtr(),
+    //    &m_pInhaleEffect
+    //);
     //윤석현추가
     pKirby->Begin_Inhale();
 }
@@ -83,8 +83,8 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _flo
         m_eCurMoveState = INHALE_MOVE_STATE::WAIT;    
 
     // Test Code
-    //if (Change_Ability(pKirby) == true)
-    //    return ABILITY_UPDATE_RESULT::ABILITY_CHANGED;
+    if (Change_Ability(pKirby) == true)
+        return ABILITY_UPDATE_RESULT::ABILITY_CHANGED;
 
     // Super Inhale Timer
     if (m_AccSuperInHaleTime < m_MaxSuperInHaleTime)
@@ -142,11 +142,11 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _flo
 
 void CKirby_Ability_Normal::Exit_Ability(CKirby* pKirby)
 {
-    m_pInhaleEffect->EffectContainer_Stop();
-    m_pInhaleEffect = nullptr;
+    //m_pInhaleEffect->EffectContainer_Stop();
+    //m_pInhaleEffect = nullptr;
 
-    // 윤석현 추가
-    Reset_Default(pKirby);
+    //// 윤석현 추가
+    //Reset_Default(pKirby);
 }
 
 _bool CKirby_Ability_Normal::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -285,6 +285,18 @@ _bool CKirby_Ability_Normal::Change_Ability(CKirby* pKirby)
     }
 
     return false;
+}
+
+_bool CKirby_Ability_Normal::Change_Ability(CKirby* pKirby, COPY_ABILITY_TYPE eAbility)
+{
+    Reset_Default(pKirby);
+
+    // 먹은 오브젝트에서 가져온다.
+    pKirby->Set_KirbyAbility(eAbility);
+
+    pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
+
+    return true;
 }
 
 void CKirby_Ability_Normal::Reset_Default(CKirby* pKirby)
