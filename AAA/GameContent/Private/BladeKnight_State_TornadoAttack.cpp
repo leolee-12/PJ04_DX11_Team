@@ -19,6 +19,16 @@ void CBladeKnight_State_TornadoAttack::On_Enter(CBladeKnight* pBladeKnight)
 	if (nullptr == pBladeKnight)
 		return;
 
+	const MONSTER_BLACKBOARD& BB = pBladeKnight->Get_BlackBoard();
+	m_vLungeDir = BB.vDirToTargetXZ;
+
+	_vector vDir = XMLoadFloat3(&m_vLungeDir);
+	if (!XMVector3Equal(vDir, XMVectorZero()))
+	{
+		_vector vMyPos = pBladeKnight->Get_Transform()->Get_State(STATE::POSITION);
+		pBladeKnight->Get_Transform()->LookAt(vMyPos + vDir);
+	}
+
 	CBladeKnight_Body* pBody = pBladeKnight->Get_Body();
 	if (pBody == nullptr)
 		return;

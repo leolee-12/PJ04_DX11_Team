@@ -252,7 +252,7 @@ void CMonster::Perceive(_float fTimeDelta)
 	_vector vMyPos = m_pTransformCom->Get_State(STATE::POSITION);
 	_vector vTargetPos = pTargetTransform->Get_State(STATE::POSITION);
 	_vector vToTarget = vTargetPos - vMyPos;
-	_vector vToTargetXZ = XMVectorSetY(vToTarget, 0.f);
+	_vector vToTargetXZ = XMVectorSetY(vToTarget, XMVectorGetY(vMyPos));
 
 	_float fDistXZ = XMVectorGetX(XMVector3Length(vToTargetXZ));
 

@@ -24,6 +24,9 @@ protected:
 public:
 	static CBladeKnight_State_DoubleAttack* Create();
 
+private:
+	_float3								m_vLungeDir = {}; // 공격 시 돌진할 방향 벡터
+
 protected:
 	virtual void						Free() override;
 };

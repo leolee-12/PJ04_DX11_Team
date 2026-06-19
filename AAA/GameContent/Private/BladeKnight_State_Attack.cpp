@@ -19,9 +19,23 @@ void CBladeKnight_State_Attack::On_Enter(CBladeKnight* pBladeKnight)
 	if (nullptr == pBladeKnight)
 		return;
 
+	const MONSTER_BLACKBOARD& BB = pBladeKnight->Get_BlackBoard();
+	m_vLungeDir = BB.vDirToTargetXZ;
+
+	_vector vDir = XMLoadFloat3(&m_vLungeDir);
+	if (!XMVector3Equal(vDir, XMVectorZero()))
+	{
+		_vector vMyPos = pBladeKnight->Get_Transform()->Get_State(STATE::POSITION);
+		pBladeKnight->Get_Transform()->LookAt(vMyPos + vDir);
+	}
+
+	if (CMonster_Movement* pMovement = pBladeKnight->Get_Movement())
+		pMovement->Set_MoveSpeed(3.f);
+
 	CBladeKnight_Body* pBody = pBladeKnight->Get_Body();
 	if (pBody == nullptr)
 		return;
+
 	CAnimator* pAnim = (pBody != nullptr) ? pBody->Get_Animator() : nullptr;
 	if (pAnim != nullptr)
 	{
@@ -45,7 +59,13 @@ void CBladeKnight_State_Attack::On_Update(CBladeKnight* pBladeKnight, _float fTi
 
 	CAnimator* pAnim = pBladeKnight->Get_Body() ? pBladeKnight->Get_Body()->Get_Animator() : nullptr;
 	if (pAnim != nullptr && pAnim->Is_Finished())
+	{
 		pBladeKnight->Change_State(MONSTER_STATE_TYPE::RETREAT);
+		return;
+	}
+
+	if (pAnim && pAnim->Get_CurrentAnimName() != "AttackStart" && !pBladeKnight->Get_BlackBoard().bMoveLocked)
+		pBladeKnight->Add_MoveDir(m_vLungeDir);
 }
 
 void CBladeKnight_State_Attack::On_Exit(CBladeKnight* pBladeKnight)

@@ -24,6 +24,9 @@ protected:
 public:
 	static CBladeKnight_State_TornadoAttack* Create();
 
+private:
+	_float3								m_vLungeDir = {}; 
+
 protected:
 	virtual void						Free() override;
 };
