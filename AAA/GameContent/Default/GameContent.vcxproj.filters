@@ -439,6 +439,9 @@
     <Filter Include="00. GameObject\95. Interface\Damageable">
       <UniqueIdentifier>{aa32f8bd-7471-4860-9a7d-c599523a6293}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\95. Interface\Inhalable">
+      <UniqueIdentifier>{8c9a30b0-316d-445f-9cf9-b015a25e4fc3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -873,6 +876,9 @@
     <ClInclude Include="..\public\Damageable.h">
       <Filter>00. GameObject\95. Interface\Damageable</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Inhalable.h">
+      <Filter>00. GameObject\95. Interface\Inhalable</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1240,6 +1246,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Damageable.cpp">
       <Filter>00. GameObject\95. Interface\Damageable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Inhalable.cpp">
+      <Filter>00. GameObject\95. Interface\Inhalable</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

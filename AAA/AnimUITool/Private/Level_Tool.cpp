@@ -1234,10 +1234,10 @@ void CLevel_Tool::Set_PreviewVisible(_bool bVisible)
     if (m_pPreview)
         m_pPreview->Set_Active(bVisible);
 
-    for (auto& pObj : m_SpawnedObjects)
-    {
-        pObj->Set_Active(bVisible);
-    }
+    //for (auto& pObj : m_SpawnedObjects)
+    //{
+    //    pObj->Set_Active(bVisible);
+    //}
 }
 
 CGameObject* CLevel_Tool::Load_Preview(const _wstring& strYshPath)

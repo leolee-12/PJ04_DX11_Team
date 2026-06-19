@@ -1,10 +1,10 @@
 #include "GigantEdge_Brain.h"
 #include "GigantEdge.h"
 #include "GigantEdge_Body.h"
-
 #include "GameInstance.h"
 #include "Animator.h"
 #include "Transform.h"
+#include "Monster_Movement.h"
 
 #include "BT.h"
 
@@ -77,11 +77,37 @@ HRESULT CGigantEdge_Brain::Initialize()
         };
 
     auto MakeThrust = [&]() -> CBTNode* {
+        auto bLunge = make_shared<bool>(false);
+        auto fBaseSpd = make_shared<_float>(0.f);
+        auto* pLunge = CBTAction::Create(
+            [this, bLunge, fBaseSpd](CBlackboard*, _float) -> BT_STATUS {
+                auto* a = m_pOwner->Get_Body()->Get_Animator();
+                auto* mv = m_pOwner->Get_Movement();
+                if (!*bLunge) {
+                    a->Play("ThrustMove", false, true, 0.1f, 2.f);
+                    *fBaseSpd = mv->Get_MoveSpeed();
+                    mv->Set_MoveSpeed(12.f);          // ← 돌진 속도 (튜닝)
+                    *bLunge = true;
+                }
+                _vector vLook = XMVector3Normalize(XMVectorSetY(
+                    m_pOwner->Get_Transform()->Get_State(STATE::LOOK), 0.f));
+                m_pOwner->Add_MoveDir(vLook);          // 정면 전진
+                if (a->Is_Finished()) {
+                    mv->Set_MoveSpeed(*fBaseSpd);      // 속도 복구
+                    *bLunge = false;
+                    return BT_STATUS::SUCCESS;
+                }
+                return BT_STATUS::RUNNING;
+            },
+            [this, bLunge, fBaseSpd]() {                // 중단 시에도 복구
+                if (*bLunge) { m_pOwner->Get_Movement()->Set_MoveSpeed(*fBaseSpd); *bLunge = false; }
+            });
+
         return CBTSequence::Create({
             OneShot("PreThrustStart", 2.f),
             HoldLoop("PreThrustStartWait", fThrustCharge),
             OneShot("ThrustStart", 2.f),
-            OneShot("ThrustMove", 2.f),     
+            pLunge,                          // ← 기존 OneShot("ThrustMove") 대체
             OneShot("ThrustEnd", 2.f),
             OneShot("ThrustEndWait", 2.f),
             OneShot("ThrustEndWaitEnd", 2.f),
@@ -182,6 +208,35 @@ HRESULT CGigantEdge_Brain::Initialize()
         },
         [bTurn]() { *bTurn = false; });
 
+    const _float fPostAtkDelay = 1.5f;
+    auto fPostAtkT = make_shared<_float>(0.f);
+    auto* pPostAttackDelay = CBTAction::Create(
+        [this, fPostAtkT, fPostAtkDelay, fTurnSpeedDeg](CBlackboard* pBB, _float dt) -> BT_STATUS {
+            if (*fPostAtkT == 0.f)
+                m_pOwner->Get_Body()->Get_Animator()->Play("Wait", true, true);
+            *fPostAtkT += dt;
+
+            // 대기 동안 플레이어 쪽으로 회전 (pTurnToTarget과 동일 로직)
+            _float3 vDir = pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 0.f));
+            _vector vToTgt = XMLoadFloat3(&vDir);
+            if (!XMVector3Equal(vToTgt, XMVectorZero()))
+            {
+                CTransform* pTf = m_pOwner->Get_Transform();
+                _vector vLook = XMVector3Normalize(XMVectorSetY(pTf->Get_State(STATE::LOOK), 0.f));
+                _float  fDot = XMVectorGetX(XMVector3Dot(vLook, vToTgt));
+                _float  fCross = XMVectorGetZ(vLook) * XMVectorGetX(vToTgt)
+                    - XMVectorGetX(vLook) * XMVectorGetZ(vToTgt);
+                _float  fYaw = atan2f(fCross, fDot);
+                _float  fStep = XMConvertToRadians(fTurnSpeedDeg) * dt;
+                _float  fApply = (fabsf(fYaw) <= fStep) ? fYaw : (fYaw > 0.f ? fStep : -fStep);
+                pTf->Rotate(XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fApply));
+            }
+
+            if (*fPostAtkT >= fPostAtkDelay) { *fPostAtkT = 0.f; return BT_STATUS::SUCCESS; }
+            return BT_STATUS::RUNNING;
+        },
+        [fPostAtkT]() { *fPostAtkT = 0.f; });
+
     CBTNode* pCombat = CBTReactiveSelector::Create({
         CBTSequence::Create({
             pInRangeDist,                              
@@ -193,6 +248,7 @@ HRESULT CGigantEdge_Brain::Initialize()
                         MakeAttackBranch(1, MakeChargeAttack("SideAttackA")),   
                         MakeAttackBranch(2, MakeThrust()),                      
                     }),
+                    pPostAttackDelay,
                     pGuard,
                 }),
                 pTurnToTarget,                         
