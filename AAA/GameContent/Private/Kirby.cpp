@@ -186,7 +186,6 @@ void CKirby::Set_KirbyAbility(COPY_ABILITY_TYPE eAbilityState)
     auto iter = m_Abilities.find(eAbilityState);
     if (iter == m_Abilities.end()) { MSG_BOX("KirbyAbility Bug"); return; }
 
-    if (m_pKirby_Ability) m_pKirby_Ability->Exit_Ability(this);
     m_pKirby_Ability = iter->second;
 }
 
@@ -312,15 +311,13 @@ void	CKirby::SetUp_Collider_Callback()
 
     if (m_pInhaleBox)
     {
-        m_pInhaleBox->Set_OnStay([this](CCollider* pOther) {   // Stay로 계속 빨려는 대상 잡기
-            if (ETOUI(COLLISION_LAYER::MONSTER_HURT) != pOther->Get_RegisteredGroup())
-                return;
-            CMonster* pMon = static_cast<CMonster*>(pOther->Get_Owner());
-            if (nullptr == pMon || !pMon->Has_Trait(CMonster::MT_INHALABLE))
-                return;
-            if (pMon->Get_StateType() == MONSTER_STATE_TYPE::CAPTURED)   // 이미 잡힘
-                return;
-            pMon->Be_Captured(this);   // captor = 커비
+        m_pInhaleBox->Set_OnStay([this](CCollider* pOther) {
+            if (auto* pInh = dynamic_cast<IInhalable*>(pOther->Get_Owner()))
+            {
+                INHALE_QUERY q{ Is_SuperInhaling(), this };
+                if (pInh->Can_BeInhaled(q))
+                    pInh->Be_Captured(this);
+            }
             });
     }
 
@@ -418,13 +415,17 @@ HRESULT CKirby::Ready_Events()
 
         if (eCopy != COPY_ABILITY_TYPE::NORMAL)
         {
-            Set_KirbyAbility(eCopy);                       
-            Change_State(KIRBY_STATE_TYPE::GET_ABILITY);   
+            Set_KirbyAbility(eCopy);
+            Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
         }
         else
         {
             m_pBody->Set_Body(KIRBY_BODY_STATE::STUFFED);
         }
+        });
+
+    Subscribe_Event(EVT_QUERY_PLAYER, [this](void* pData) {
+        static_cast<PLAYER_QUERY*>(pData)->pPlayer = this;
         });
 
     return S_OK;
@@ -438,6 +439,13 @@ void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
 {
     m_fInvincible = s_fInvincibleDur;
     // TODO: 넉백/피격애님
+}
+
+_bool CKirby::Is_SuperInhaling() const
+{
+    if (!m_pKirby_Ability || m_pKirby_Ability->Get_AbilityType() != COPY_ABILITY_TYPE::NORMAL)
+        return false;
+    return static_cast<CKirby_Ability_Normal*>(m_pKirby_Ability)->Is_SuperInhale();
 }
 
 void CKirby::Begin_Inhale()

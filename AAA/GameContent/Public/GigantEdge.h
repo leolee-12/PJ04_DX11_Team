@@ -56,7 +56,7 @@ protected:
     virtual _float         Get_CapsuleRadius() const override { return s_fCCT_Radius; }
     virtual _float         Get_CapsuleHeight() const override { return s_fCCT_Height; }
     virtual _float		   Get_InteractRadius() const override { return 0.f; }
-    virtual _float         Get_HurtBoxRadius() const override { return 2.f; }
+    virtual _float         Get_HurtBoxRadius() const override { return 1.5f; }
     virtual void           Play_StateAnimation(MONSTER_STATE_TYPE) override {}
 
 private:
@@ -79,7 +79,7 @@ public:
 private:
     void  Debug_KeyInput();
     _bool m_bDbgInRange     = { false };
-    _bool m_bDbgWalkInPlace = { true };
+    _bool m_bDbgWalkInPlace = { false };
     _int  m_iDbgAttack      = { -1 };
 #endif
 

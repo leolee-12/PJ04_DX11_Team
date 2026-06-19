@@ -29,19 +29,17 @@ public:
     virtual HRESULT Initialize(void* pArg) override;
 
 public:
-    void  Set_Refs(CTransform* pTransform, physx::PxController* pController);
-    void  Set_Stats(_float fMoveSpeed, _float fRotSpeedDeg, _float fGravity, _float fJumpSpeed);
-    void  Set_Acceleration(_float Accel, _float Decel);
+    void            Set_Refs(CTransform* pTransform, physx::PxController* pController);
+    void            Set_Stats(_float fMoveSpeed, _float fRotSpeedDeg, _float fGravity, _float fJumpSpeed);
+    void            Set_Acceleration(_float Accel, _float Decel);
+    void            Set_MoveSpeed(_float fMoveSpeed) { m_fMoveSpeed = fMoveSpeed; }
+    _float          Get_MoveSpeed() const { return m_fMoveSpeed; }
+    _float          Get_VerticalVelocity() { return m_fVerticalVelocity; }
+    _bool           Move(_fvector vWishDir, _float fTimeDelta);
+    void            Jump();
+    _bool           Is_Grounded() const { return m_bGrounded; }
 
-    void  Set_MoveSpeed(_float fMoveSpeed) { m_fMoveSpeed = fMoveSpeed; }
-
-    _float Get_VerticalVelocity() { return m_fVerticalVelocity; }
-
-    _bool Move(_fvector vWishDir, _float fTimeDelta);
-    void  Jump();
-    virtual void  Sync_To_Controller();
-
-    _bool Is_Grounded() const { return m_bGrounded; }
+    virtual void    Sync_To_Controller();
 
 protected:
     virtual void Calc_Vertical(_float fTimeDelta);
