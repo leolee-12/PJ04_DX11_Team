@@ -55,7 +55,7 @@ public:
 protected:
     enum Sampler { DEFAULT, MIRROR, SAMPLER_END };
 
-private:
+protected:
     struct RATIO_VALUE
     {
         _float fRatio{};

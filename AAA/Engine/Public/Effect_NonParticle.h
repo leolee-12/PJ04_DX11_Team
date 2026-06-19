@@ -93,19 +93,6 @@ public:
     {
     };
 
-private:
-    struct RATIO_VALUE
-    {
-        _float fRatio{};
-        _float fValue{};
-    };
-
-    struct RATIO_VALUE_FLOAT3
-    {
-        _float fRatio{};
-        _float3 vValue{};
-    };
-
 protected:
     CEffect_NonParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     CEffect_NonParticle(const CEffect_NonParticle& Prototype);

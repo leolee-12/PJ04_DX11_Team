@@ -22,16 +22,9 @@ PROPERTY(_bool, m_bSpriteAniMask, L"Sprite Animation Mask", L"Sprite Animation")
 PROPERTY(_int, m_iMaskFrameX, L"Frame X_M", L"Sprite Animation");
 PROPERTY(_int, m_iMaskFrameY, L"Frame Y_M", L"Sprite Animation");
 
+
 // Particle
 PROPERTY(_uint, m_iParticleCount, L"Count_P", L"Particle");
-
-// Particle Alpha
-PROPERTY(_bool,  m_bParticleFadeInOut,          L"Fade In Out_P",       L"Particle Alpha");
-PROPERTY(_float, m_fParticleAlphaStartValue,    L"Start_P",             L"Particle Alpha");
-PROPERTY(_float, m_fParticleAlphaPeakValue,     L"Peak_P",              L"Particle Alpha");
-PROPERTY(_float, m_fParticleAlphaEndValue,      L"End_P",               L"Particle Alpha");
-PROPERTY(_float, m_fParticleFadeInRatio,        L"Fade In Ratio_P",     L"Particle Alpha");
-PROPERTY(_float, m_fParticleFadeOutRatio,       L"Fade Out Ratio_P",    L"Particle Alpha");
 
 // Particle Spawn
 PROPERTY(_bool, m_bParticleSpawnRandom, L"Spawn Random_P", L"Particle Spawn");
@@ -46,23 +39,52 @@ PROPERTY(_float, m_fParticleFountainSpread, L"Fountain Spread_P", L"Particle Mov
 PROPERTY(_float, m_fParticleFountainUpBias, L"Fountain Up Bias_P", L"Particle Move");
 PROPERTY(_float, m_fParticleFountainGravity, L"Gravity_P", L"Particle Move");
 
+// Particle Alpha
+PROPERTY(_float, m_fParticleAlpha, L"Alpha_P", L"Particle Alpha");
+
+PROPERTY(_bool, m_bParticleAlphaChange, L"Alpha Change_P", L"Particle Alpha");
+PROPERTY(_float, m_fParticleAlphaStartValue, L"Start_P", L"Particle Alpha");
+PROPERTY(_float, m_fParticleAlphaEndValue, L"End_P", L"Particle Alpha");
+
+PROPERTY(_bool, m_bActive_ParticleAlpha_Ratio_0, L"Active Ratio 0_P", L"Particle Alpha");
+PROPERTY(_float, m_fParticleAlpha_Ratio_0, L"Ratio 0_P", L"Particle Alpha");
+PROPERTY(_float, m_fParticleAlpha_Value_0, L"Value 0_P", L"Particle Alpha");
+
+PROPERTY(_bool, m_bActive_ParticleAlpha_Ratio_1, L"Active Ratio 1_P", L"Particle Alpha");
+PROPERTY(_float, m_fParticleAlpha_Ratio_1, L"Ratio 1_P", L"Particle Alpha");
+PROPERTY(_float, m_fParticleAlpha_Value_1, L"Value 1_P", L"Particle Alpha");
+
 // Particle Size
 PROPERTY(_float, m_fParticleStartSize, L"Start Size_P", L"Particle Size");
 PROPERTY(_bool, m_bParticleRandomSize, L"Random Size_P", L"Particle Size");
 PROPERTY(_float2, m_vParticleStartSizeRange, L"Size Range_P", L"Particle Size");
 
-PROPERTY(_bool, m_bParticleSizeOverLifeTime, L"Size Over Life_P", L"Particle Size");
-PROPERTY(_float, m_fParticleSizeStartValue, L"Size Start_P", L"Particle Size");
-PROPERTY(_float, m_fParticleSizePeakValue, L"Size Peak_P", L"Particle Size");
-PROPERTY(_float, m_fParticleSizeEndValue, L"Size End_P", L"Particle Size");
-PROPERTY(_float, m_fParticleSizePeakRatio, L"Size Peak Ratio_P", L"Particle Size");
+PROPERTY(_bool, m_bParticleSizeChange, L"Size Change_P", L"Particle Size");
+PROPERTY(_float, m_fParticleSizeStartValue, L"Start_P", L"Particle Size");
+PROPERTY(_float, m_fParticleSizeEndValue, L"End_P", L"Particle Size");
+
+PROPERTY(_bool, m_bActive_ParticleSize_Ratio_0, L"Active Ratio 0_P", L"Particle Size");
+PROPERTY(_float, m_fParticleSize_Ratio_0, L"Ratio 0_P", L"Particle Size");
+PROPERTY(_float, m_fParticleSize_Value_0, L"Value 0_P", L"Particle Size");
+
+PROPERTY(_bool, m_bActive_ParticleSize_Ratio_1, L"Active Ratio 1_P", L"Particle Size");
+PROPERTY(_float, m_fParticleSize_Ratio_1, L"Ratio 1_P", L"Particle Size");
+PROPERTY(_float, m_fParticleSize_Value_1, L"Value 1_P", L"Particle Size");
 
 // Particle Color
-PROPERTY(_bool, m_bParticleColorOverLifeTime, L"Color Over Life_P", L"Particle Color");
-PROPERTY(_float3, m_vParticleColorStartValue, L"Color Start_P", L"Particle Color");
-PROPERTY(_float3, m_vParticleColorPeakValue, L"Color Peak_P", L"Particle Color");
-PROPERTY(_float3, m_vParticleColorEndValue, L"Color End_P", L"Particle Color");
-PROPERTY(_float, m_fParticleColorPeakRatio, L"Color Peak Ratio_P", L"Particle Color");
+PROPERTY(_float3, m_vParticleColor, L"Color_P", L"Particle Color");
+
+PROPERTY(_bool, m_bParticleColorChange, L"Color Change_P", L"Particle Color");
+PROPERTY(_float3, m_vParticleColorStartValue, L"Start_P", L"Particle Color");
+PROPERTY(_float3, m_vParticleColorEndValue, L"End_P", L"Particle Color");
+
+PROPERTY(_bool, m_bActive_ParticleColor_Ratio_0, L"Active Ratio 0_P", L"Particle Color");
+PROPERTY(_float, m_fParticleColor_Ratio_0, L"Ratio 0_P", L"Particle Color");
+PROPERTY(_float3, m_vParticleColor_Value_0, L"Value 0_P", L"Particle Color");
+
+PROPERTY(_bool, m_bActive_ParticleColor_Ratio_1, L"Active Ratio 1_P", L"Particle Color");
+PROPERTY(_float, m_fParticleColor_Ratio_1, L"Ratio 1_P", L"Particle Color");
+PROPERTY(_float3, m_vParticleColor_Value_1, L"Value 1_P", L"Particle Color");
 
 public:
     struct EFFECT_PARTICLE_DESC : public CEffect_Part::EFFECT_PART_DESC
@@ -84,11 +106,6 @@ protected:
         _float fStartRatio{};
         _float fEndRatio{ 1.f };
 
-        _float fFadeInRatio{};
-        _float fFadeOutRatio{};
-        _float fAlphaStartValue{};
-        _float fAlphaPeakValue{ 1.f };
-        _float fAlphaEndValue{};
         _float fAlpha{ 1.f };
 
         _float  fBaseSize{ 1.f };
@@ -98,6 +115,19 @@ protected:
 
         _float3 vLocalPos{};
         _float3 vVelocity{};
+    };
+
+protected:
+    struct RATIO_VALUE
+    {
+        _float fRatio{};
+        _float fValue{};
+    };
+
+    struct RATIO_VALUE_FLOAT3
+    {
+        _float fRatio{};
+        _float3 vValue{};
     };
 
 private:
@@ -168,14 +198,26 @@ private:
     _float4x4 Make_ParticleWorldMatrix(const PARTICLE& Particle) const;
 
     void Update_Particles_ByContainerTime(_float fRatio);
-    _float Evaluate_ParticleAlpha(const PARTICLE& Particle, _float fLocalRatio) const;
 
     _vector Make_SpreadDirection3D() const;
     _vector Make_FountainDirection() const;
 
     void Update_ParticleMove(PARTICLE& Particle, _float fRatio, _float fLocalRatio);
+    void Update_ParticleAlpha(PARTICLE& Particle, _float fLocalRatio);
     void Update_ParticleSize(PARTICLE& Particle, _float fLocalRatio);
     void Update_ParticleColor(PARTICLE& Particle, _float fLocalRatio);
+
+    _float Evaluate_ParticleFloatCurve(
+        _float fLocalRatio, _float fFixedValue, _bool bChange,
+        _float fStartValue, _float fEndValue,
+        _bool bActiveRatio0, _float fRatio0, _float fValue0,
+        _bool bActiveRatio1, _float fRatio1, _float fValue1) const;
+
+    _float3 Evaluate_ParticleFloat3Curve(
+        _float fLocalRatio, const _float3& vFixedValue, _bool bChange,
+        const _float3& vStartValue, const _float3& vEndValue,
+        _bool bActiveRatio0, _float fRatio0, const _float3& vValue0,
+        _bool bActiveRatio1, _float fRatio1, const _float3& vValue1) const;
 
 protected:
     virtual void Free() override;

@@ -232,12 +232,19 @@ void CEffect_Particle::Init_PropertyValue()
 	m_fParticleFountainGravity = 9.8f;
 
 	// Particle Alpha
-	m_bParticleFadeInOut = true;
+	m_fParticleAlpha = 1.f;
+
+	m_bParticleAlphaChange = true;
 	m_fParticleAlphaStartValue = 0.f;
-	m_fParticleAlphaPeakValue = 1.f;
 	m_fParticleAlphaEndValue = 0.f;
-	m_fParticleFadeInRatio = 0.3f;
-	m_fParticleFadeOutRatio = 0.5f;
+
+	m_bActive_ParticleAlpha_Ratio_0 = true;
+	m_fParticleAlpha_Ratio_0 = 0.3f;
+	m_fParticleAlpha_Value_0 = 1.f;
+
+	m_bActive_ParticleAlpha_Ratio_1 = true;
+	m_fParticleAlpha_Ratio_1 = 0.7f;
+	m_fParticleAlpha_Value_1 = 1.f;
 
 	// Particle Size
 	m_fParticleStartSize = 0.5f;
@@ -245,18 +252,32 @@ void CEffect_Particle::Init_PropertyValue()
 	m_bParticleRandomSize = false;
 	m_vParticleStartSizeRange = { 0.3f, 0.7f };
 
-	m_bParticleSizeOverLifeTime = true;
+	m_bParticleSizeChange = true;
 	m_fParticleSizeStartValue = 0.1f;
-	m_fParticleSizePeakValue = 1.0f;
 	m_fParticleSizeEndValue = 0.1f;
-	m_fParticleSizePeakRatio = 0.5f;
+
+	m_bActive_ParticleSize_Ratio_0 = true;
+	m_fParticleSize_Ratio_0 = 0.5f;
+	m_fParticleSize_Value_0 = 1.f;
+
+	m_bActive_ParticleSize_Ratio_1 = false;
+	m_fParticleSize_Ratio_1 = 0.75f;
+	m_fParticleSize_Value_1 = 1.f;
 
 	// Particle Color
-	m_bParticleColorOverLifeTime = false;
+	m_vParticleColor = { 1.f, 1.f, 1.f };
+
+	m_bParticleColorChange = false;
 	m_vParticleColorStartValue = { 1.f, 1.f, 1.f };
-	m_vParticleColorPeakValue = { 1.f, 1.f, 1.f };
 	m_vParticleColorEndValue = { 1.f, 1.f, 1.f };
-	m_fParticleColorPeakRatio = 0.5f;
+
+	m_bActive_ParticleColor_Ratio_0 = false;
+	m_fParticleColor_Ratio_0 = 0.5f;
+	m_vParticleColor_Value_0 = { 1.f, 1.f, 1.f };
+
+	m_bActive_ParticleColor_Ratio_1 = false;
+	m_fParticleColor_Ratio_1 = 0.75f;
+	m_vParticleColor_Value_1 = { 1.f, 1.f, 1.f };
 }
 
 void CEffect_Particle::Reset_Particles()
@@ -339,18 +360,10 @@ void CEffect_Particle::Reset_Particles()
 		Particle.vScale = { fParticleSize, fParticleSize, fParticleSize };
 
 		// Alpha
-		Particle.fFadeInRatio = m_fParticleFadeInRatio;
-		Particle.fFadeOutRatio = m_fParticleFadeOutRatio;
-		Particle.fAlphaStartValue = m_fParticleAlphaStartValue;
-		Particle.fAlphaPeakValue = m_fParticleAlphaPeakValue;
-		Particle.fAlphaEndValue = m_fParticleAlphaEndValue;
-		Particle.fAlpha = Particle.fAlphaStartValue;
-
-		Particle.vLocalPos = m_fPivot;
-		XMStoreFloat3(&Particle.vVelocity, vDir * m_fParticleStartSpeed);
+		Particle.fAlpha = m_fParticleAlpha;
 
 		// Color
-		Particle.vColor = m_vParticleColorStartValue;
+		Particle.vColor = m_vParticleColor;
 	}
 }
 
@@ -383,48 +396,10 @@ void CEffect_Particle::Update_Particles_ByContainerTime(_float fRatio)
 		Particle.bAlive = true;
 
 		Update_ParticleMove(Particle, fRatio, fLocalRatio);
+		Update_ParticleAlpha(Particle, fLocalRatio);
 		Update_ParticleSize(Particle, fLocalRatio);
 		Update_ParticleColor(Particle, fLocalRatio);
-
-		Particle.fAlpha = Evaluate_ParticleAlpha(Particle, fLocalRatio);
 	}
-}
-
-_float CEffect_Particle::Evaluate_ParticleAlpha(const PARTICLE& Particle, _float fLocalRatio) const
-{
-	if (m_bParticleFadeInOut == false)
-		return 1.f;
-
-	Helper::FloatClamp(fLocalRatio, 0.f, 1.f);
-
-	_float fFadeInRatio = Particle.fFadeInRatio;
-	_float fFadeOutRatio = Particle.fFadeOutRatio;
-
-	Helper::FloatClamp(fFadeInRatio, 0.f, 1.f);
-	Helper::FloatClamp(fFadeOutRatio, 0.f, 1.f);
-
-	const _float fFadeTotal = fFadeInRatio + fFadeOutRatio;
-	if (fFadeTotal > 1.f)
-	{
-		fFadeInRatio /= fFadeTotal;
-		fFadeOutRatio /= fFadeTotal;
-	}
-
-	_float fAlpha = Particle.fAlphaPeakValue;
-
-	if (fFadeInRatio > Helper::fEpsilon && fLocalRatio < fFadeInRatio)
-	{
-		const _float fStep = Helper::FloatSmoothStep(0.f, fFadeInRatio, fLocalRatio);
-		fAlpha = Particle.fAlphaStartValue + (Particle.fAlphaPeakValue - Particle.fAlphaStartValue) * fStep;
-	}
-	else if (fFadeOutRatio > Helper::fEpsilon && fLocalRatio > 1.f - fFadeOutRatio)
-	{
-		const _float fStep = Helper::FloatSmoothStep(1.f - fFadeOutRatio, 1.f, fLocalRatio);
-		fAlpha = Particle.fAlphaPeakValue + (Particle.fAlphaEndValue - Particle.fAlphaPeakValue) * fStep;
-	}
-
-	Helper::FloatClamp(fAlpha, 0.f, 1.f);
-	return fAlpha;
 }
 
 _vector CEffect_Particle::Make_SpreadDirection3D() const
@@ -473,34 +448,26 @@ void CEffect_Particle::Update_ParticleMove(PARTICLE& Particle, _float fRatio, _f
 		Particle.vLocalPos.y -= 0.5f * m_fParticleFountainGravity * fElapsedTime * fElapsedTime;
 }
 
+void CEffect_Particle::Update_ParticleAlpha(PARTICLE& Particle, _float fLocalRatio)
+{
+	_float fAlpha = Evaluate_ParticleFloatCurve(
+		fLocalRatio, m_fParticleAlpha, m_bParticleAlphaChange,
+		m_fParticleAlphaStartValue, m_fParticleAlphaEndValue,
+		m_bActive_ParticleAlpha_Ratio_0, m_fParticleAlpha_Ratio_0, m_fParticleAlpha_Value_0,
+		m_bActive_ParticleAlpha_Ratio_1, m_fParticleAlpha_Ratio_1, m_fParticleAlpha_Value_1);
+
+	Helper::FloatClamp(fAlpha, 0.f, 1.f);
+
+	Particle.fAlpha = fAlpha;
+}
+
 void CEffect_Particle::Update_ParticleSize(PARTICLE& Particle, _float fLocalRatio)
 {
-	Helper::FloatClamp(fLocalRatio, 0.f, 1.f);
-
-	_float fSizeRatio = 1.f;
-
-	if (m_bParticleSizeOverLifeTime == true)
-	{
-		_float fPeakRatio = m_fParticleSizePeakRatio;
-		Helper::FloatClamp(fPeakRatio, Helper::fEpsilon, 1.f - Helper::fEpsilon);
-
-		if (fLocalRatio < fPeakRatio)
-		{
-			const _float fStep = Helper::FloatSmoothStep(0.f, fPeakRatio, fLocalRatio);
-
-			fSizeRatio =
-				m_fParticleSizeStartValue +
-				(m_fParticleSizePeakValue - m_fParticleSizeStartValue) * fStep;
-		}
-		else
-		{
-			const _float fStep = Helper::FloatSmoothStep(fPeakRatio, 1.f, fLocalRatio);
-
-			fSizeRatio =
-				m_fParticleSizePeakValue +
-				(m_fParticleSizeEndValue - m_fParticleSizePeakValue) * fStep;
-		}
-	}
+	_float fSizeRatio = Evaluate_ParticleFloatCurve(
+		fLocalRatio, 1.f, m_bParticleSizeChange,
+		m_fParticleSizeStartValue, m_fParticleSizeEndValue,
+		m_bActive_ParticleSize_Ratio_0, m_fParticleSize_Ratio_0, m_fParticleSize_Value_0,
+		m_bActive_ParticleSize_Ratio_1, m_fParticleSize_Ratio_1, m_fParticleSize_Value_1);
 
 	_float fSize = Particle.fBaseSize * fSizeRatio;
 
@@ -512,37 +479,122 @@ void CEffect_Particle::Update_ParticleSize(PARTICLE& Particle, _float fLocalRati
 
 void CEffect_Particle::Update_ParticleColor(PARTICLE& Particle, _float fLocalRatio)
 {
-	if (m_bParticleColorOverLifeTime == false)
+	Particle.vColor = Evaluate_ParticleFloat3Curve(
+		fLocalRatio, m_vParticleColor, m_bParticleColorChange,
+		m_vParticleColorStartValue, m_vParticleColorEndValue,
+		m_bActive_ParticleColor_Ratio_0, m_fParticleColor_Ratio_0, m_vParticleColor_Value_0,
+		m_bActive_ParticleColor_Ratio_1, m_fParticleColor_Ratio_1, m_vParticleColor_Value_1);
+}
+
+_float CEffect_Particle::Evaluate_ParticleFloatCurve(_float fLocalRatio, _float fFixedValue, _bool bChange, _float fStartValue, _float fEndValue, _bool bActiveRatio0, _float fRatio0, _float fValue0, _bool bActiveRatio1, _float fRatio1, _float fValue1) const
+{
+	if (bChange == false)
+		return fFixedValue;
+
+	RATIO_VALUE Points[4]{};
+	_uint iCount = 0;
+
+	Points[iCount++] = { 0.f, fStartValue };
+
+	if (bActiveRatio0 == true)
+		Points[iCount++] = { fRatio0, fValue0 };
+
+	if (bActiveRatio1 == true)
+		Points[iCount++] = { fRatio1, fValue1 };
+
+	Points[iCount++] = { 1.f, fEndValue };
+
+	for (_uint i = 0; i < iCount; ++i)
+		Helper::FloatClamp(Points[i].fRatio, 0.f, 1.f);
+
+	for (_uint i = 0; i < iCount; ++i)
 	{
-		Particle.vColor = { 1.f, 1.f, 1.f };
-		return;
+		for (_uint j = i + 1; j < iCount; ++j)
+		{
+			if (Points[j].fRatio < Points[i].fRatio)
+				std::swap(Points[i], Points[j]);
+		}
 	}
 
 	Helper::FloatClamp(fLocalRatio, 0.f, 1.f);
 
-	_float fPeakRatio = m_fParticleColorPeakRatio;
-	Helper::FloatClamp(fPeakRatio, Helper::fEpsilon, 1.f - Helper::fEpsilon);
-
-	_float3 vFrom{};
-	_float3 vTo{};
-	_float fStep = 0.f;
-
-	if (fLocalRatio < fPeakRatio)
+	for (_uint i = 0; i + 1 < iCount; ++i)
 	{
-		fStep = Helper::FloatSmoothStep(0.f, fPeakRatio, fLocalRatio);
-		vFrom = m_vParticleColorStartValue;
-		vTo = m_vParticleColorPeakValue;
-	}
-	else
-	{
-		fStep = Helper::FloatSmoothStep(fPeakRatio, 1.f, fLocalRatio);
-		vFrom = m_vParticleColorPeakValue;
-		vTo = m_vParticleColorEndValue;
+		if (fLocalRatio <= Points[i + 1].fRatio)
+		{
+			const _float fRange = Points[i + 1].fRatio - Points[i].fRatio;
+
+			if (fRange <= Helper::fEpsilon)
+				return Points[i + 1].fValue;
+
+			const _float fStep = Helper::FloatSmoothStep(
+				Points[i].fRatio,
+				Points[i + 1].fRatio,
+				fLocalRatio);
+
+			return Points[i].fValue + (Points[i + 1].fValue - Points[i].fValue) * fStep;
+		}
 	}
 
-	Particle.vColor.x = vFrom.x + (vTo.x - vFrom.x) * fStep;
-	Particle.vColor.y = vFrom.y + (vTo.y - vFrom.y) * fStep;
-	Particle.vColor.z = vFrom.z + (vTo.z - vFrom.z) * fStep;
+	return Points[iCount - 1].fValue;
+}
+
+_float3 CEffect_Particle::Evaluate_ParticleFloat3Curve(_float fLocalRatio, const _float3& vFixedValue, _bool bChange, const _float3& vStartValue, const _float3& vEndValue, _bool bActiveRatio0, _float fRatio0, const _float3& vValue0, _bool bActiveRatio1, _float fRatio1, const _float3& vValue1) const
+{
+	if (bChange == false)
+		return vFixedValue;
+
+	RATIO_VALUE_FLOAT3 Points[4]{};
+	_uint iCount = 0;
+
+	Points[iCount++] = { 0.f, vStartValue };
+
+	if (bActiveRatio0 == true)
+		Points[iCount++] = { fRatio0, vValue0 };
+
+	if (bActiveRatio1 == true)
+		Points[iCount++] = { fRatio1, vValue1 };
+
+	Points[iCount++] = { 1.f, vEndValue };
+
+	for (_uint i = 0; i < iCount; ++i)
+		Helper::FloatClamp(Points[i].fRatio, 0.f, 1.f);
+
+	for (_uint i = 0; i < iCount; ++i)
+	{
+		for (_uint j = i + 1; j < iCount; ++j)
+		{
+			if (Points[j].fRatio < Points[i].fRatio)
+				std::swap(Points[i], Points[j]);
+		}
+	}
+
+	Helper::FloatClamp(fLocalRatio, 0.f, 1.f);
+
+	for (_uint i = 0; i + 1 < iCount; ++i)
+	{
+		if (fLocalRatio <= Points[i + 1].fRatio)
+		{
+			const _float fRange = Points[i + 1].fRatio - Points[i].fRatio;
+
+			if (fRange <= Helper::fEpsilon)
+				return Points[i + 1].vValue;
+
+			const _float fStep = Helper::FloatSmoothStep(
+				Points[i].fRatio,
+				Points[i + 1].fRatio,
+				fLocalRatio);
+
+			_float3 vResult{};
+			vResult.x = Points[i].vValue.x + (Points[i + 1].vValue.x - Points[i].vValue.x) * fStep;
+			vResult.y = Points[i].vValue.y + (Points[i + 1].vValue.y - Points[i].vValue.y) * fStep;
+			vResult.z = Points[i].vValue.z + (Points[i + 1].vValue.z - Points[i].vValue.z) * fStep;
+
+			return vResult;
+		}
+	}
+
+	return Points[iCount - 1].vValue;
 }
 
 void CEffect_Particle::Free()
