@@ -25,6 +25,9 @@ HRESULT CGigantEdge::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
+    m_eCopyAbility = COPY_ABILITY_TYPE::SWORD;
+    m_pMovement->Set_MoveSpeed(4.f);
+
     return S_OK;
 }
 
@@ -78,7 +81,16 @@ CMonsterBrain* CGigantEdge::Create_Brain()
 
 void CGigantEdge::Play_Intro()
 {
-    m_pBody->Get_Animator()->Play("Anger", false, true);
+    CAnimator* pAni = m_pBody->Get_Animator();
+
+    CAnimator::ANI_PLAY_INFO info{};
+    info.strAniName = "DemoAppear1";
+    info.bLoop = false;
+    pAni->Play(&info);
+
+    info.strAniName = "DemoAppear2";
+    info.bLoop = false;
+    pAni->Enqueue(info);
 }
 _bool CGigantEdge::Is_Intro_Finished() const
 {
@@ -98,6 +110,13 @@ void CGigantEdge::Play_DeathLoop()
 _bool CGigantEdge::Is_Death_Finished() const
 {
     return m_pBody->Get_Animator()->Is_Finished();
+}
+
+CGameObject* CMiniBoss::Find_Player() const
+{
+    PLAYER_QUERY q;
+    m_pGameInstance_Proxy->Publish(EVT_QUERY_PLAYER, &q);
+    return q.pPlayer;
 }
 
 _bool CGigantEdge::Block_Hit(const ATTACK_INFO& tInfo)
@@ -123,14 +142,14 @@ void CGigantEdge::Debug_KeyInput()
         return;
 
     if (m_pGameInstance_Proxy->Key_Down(DIK_0)) Appear();                          // HIDDEN→INTRO→ACTIVE
-    if (m_pGameInstance_Proxy->Key_Down(DIK_G)) m_bGroggyRequested = true;         // 그로기 분기 진입
-    if (m_pGameInstance_Proxy->Key_Down(DIK_R)) m_bDbgInRange = !m_bDbgInRange;    // 사거리 토글 (공격↔추격)
-    if (m_pGameInstance_Proxy->Key_Down(DIK_M)) m_bDbgWalkInPlace = !m_bDbgWalkInPlace;
+    //if (m_pGameInstance_Proxy->Key_Down(DIK_G)) m_bGroggyRequested = true;         // 그로기 분기 진입
+    //if (m_pGameInstance_Proxy->Key_Down(DIK_R)) m_bDbgInRange = !m_bDbgInRange;    // 사거리 토글 (공격↔추격)
+    //if (m_pGameInstance_Proxy->Key_Down(DIK_M)) m_bDbgWalkInPlace = !m_bDbgWalkInPlace;
     if (m_pGameInstance_Proxy->Key_Down(DIK_X)) Die();
-    if (m_pGameInstance_Proxy->Key_Down(DIK_1)) m_iDbgAttack = 0;                  // Slam 고정
-    if (m_pGameInstance_Proxy->Key_Down(DIK_2)) m_iDbgAttack = 1;                  // Charge 고정
-    if (m_pGameInstance_Proxy->Key_Down(DIK_3)) m_iDbgAttack = 2;                  // Swing 고정
-    if (m_pGameInstance_Proxy->Key_Down(DIK_4)) m_iDbgAttack = -1;                 // 랜덤 복귀
+    //if (m_pGameInstance_Proxy->Key_Down(DIK_1)) m_iDbgAttack = 0;                  // Slam 고정
+    //if (m_pGameInstance_Proxy->Key_Down(DIK_2)) m_iDbgAttack = 1;                  // Charge 고정
+    //if (m_pGameInstance_Proxy->Key_Down(DIK_3)) m_iDbgAttack = 2;                  // Swing 고정
+    //if (m_pGameInstance_Proxy->Key_Down(DIK_4)) m_iDbgAttack = -1;                 // 랜덤 복귀
 }
 #endif
 

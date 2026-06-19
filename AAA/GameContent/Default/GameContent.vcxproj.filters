@@ -439,6 +439,9 @@
     <Filter Include="00. GameObject\95. Interface\Damageable">
       <UniqueIdentifier>{aa32f8bd-7471-4860-9a7d-c599523a6293}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\95. Interface\Inhalable">
+      <UniqueIdentifier>{8c9a30b0-316d-445f-9cf9-b015a25e4fc3}</UniqueIdentifier>
+    </Filter>
     <Filter Include="97. DataSystem\LevelDesignLoader">
       <UniqueIdentifier>{ac90f625-f08a-4a8a-89fd-03d9fa0dc850}</UniqueIdentifier>
     </Filter>
@@ -876,6 +879,9 @@
     <ClInclude Include="..\public\Damageable.h">
       <Filter>00. GameObject\95. Interface\Damageable</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Inhalable.h">
+      <Filter>00. GameObject\95. Interface\Inhalable</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Parsing_Utils.h">
       <Filter>99. Defines\Leo</Filter>
     </ClInclude>
@@ -1270,6 +1276,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Damageable.cpp">
       <Filter>00. GameObject\95. Interface\Damageable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Inhalable.cpp">
+      <Filter>00. GameObject\95. Interface\Inhalable</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Parser.cpp">
       <Filter>97. DataSystem\LevelDesignLoader</Filter>

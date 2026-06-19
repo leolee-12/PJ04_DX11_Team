@@ -34,6 +34,7 @@
     <ClInclude Include="..\Public\Env_CollisionCatalog.h" />
     <ClInclude Include="..\Public\Env_InstanceBatch.h" />
     <ClInclude Include="..\Public\Env_InstanceController.h" />
+    <ClInclude Include="..\public\Inhalable.h" />
     <ClInclude Include="..\Public\LevelDesign_ProtoRegister.h" />
     <ClInclude Include="..\Public\LevelDesign_Rail.h" />
     <ClInclude Include="..\Public\LevelDesign_Spawner.h" />
@@ -201,6 +202,7 @@
     <ClCompile Include="..\private\GigantEdge_Body.cpp" />
     <ClCompile Include="..\private\GigantEdge_Shield.cpp" />
     <ClCompile Include="..\private\GigantEdge_Sword.cpp" />
+    <ClCompile Include="..\private\Inhalable.cpp" />
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
