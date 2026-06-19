@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Effect_Part.h"
+#include "Effect_NonParticle.h"
 
 NS_BEGIN(Engine)
 
 class CModel;
 
-class ENGINE_DLL CEffect_Mesh abstract : public CEffect_Part
+class ENGINE_DLL CEffect_Mesh abstract : public CEffect_NonParticle
 {
     GENERATED_BODY_ABSTRACT(CEffect_Mesh)
 
@@ -41,7 +41,7 @@ public:
     };
 
 private:
-    enum ShaderPass { Default, AlphaBlend, Additive, Default_Mirror, AlphaBlend_Mirror, Additive_Mirror, ShaderPass_End };
+    enum ShaderPass { Default, AlphaBlend, Additive, ShaderPass_End };
 
 protected:
     CEffect_Mesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -64,7 +64,6 @@ protected:
 
 protected:
     virtual void Update_UVScroll(const _float fTimeDelta, const _float fRatio) override;
-    virtual void Update_EffectPart(const _float fTimeDelta, const _float fRatio) override;
 
 private:
     HRESULT Ready_Components();

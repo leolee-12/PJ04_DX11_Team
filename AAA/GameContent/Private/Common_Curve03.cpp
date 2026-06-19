@@ -24,7 +24,7 @@ HRESULT CCommon_Curve03::Initialize(void* pArg)
 {
     COMMONS_CURVE03_DESC tDesc{};
 
-    tDesc.iModelLevel = ETOUI(LEVEL::GAMEPLAY);
+    tDesc.iModelLevel = m_iPrototypeLevel;
     tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Common_Curve03");
 
     tDesc.bUseDiffuseTexture = false;

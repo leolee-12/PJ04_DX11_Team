@@ -24,7 +24,7 @@ HRESULT CSmokeLowPoly::Initialize(void* pArg)
 {
     SMOKE_LOW_POLY_DESC tDesc{};
 
-    tDesc.iModelLevel = ETOUI(LEVEL::GAMEPLAY);
+    tDesc.iModelLevel = m_iPrototypeLevel;
     tDesc.wstrModelTag = TEXT("Prototype_Component_Model_SmokeLowPoly");
 
     tDesc.bUseDiffuseTexture = false;

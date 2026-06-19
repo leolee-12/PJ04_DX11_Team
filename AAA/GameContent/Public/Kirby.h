@@ -30,7 +30,7 @@ class CKirby_Body;
 
 class CKirby final : public CCharacter
 {
-	GENERATED_BODY(CCharacter)
+	GENERATED_BODY(CKirby)
 
 public:
 	struct KIRBY_BODY_DESC : public CContainerObject::COTAINEROBJECT_DESC

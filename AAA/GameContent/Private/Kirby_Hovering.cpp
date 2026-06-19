@@ -32,7 +32,9 @@ void CKirby_Hovering::Enter(CKirby* pKirby)
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
 
     // Ani
-    pAnimator->Play("FlightStart", false, false, 0.1f, 2.25f);
+    //pAnimator->Play("FlightStart", false, false, 0.1f, 2.25f);
+    CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+    pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::FLIGHT_START);
 
     // State
     m_eHoveringState = HOVERING_STATE::FLIGHT_START;
@@ -140,7 +142,8 @@ _bool CKirby_Hovering::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
                 return true;
 
             m_eHoveringState = HOVERING_STATE::FLIGHT_END;
-            pAnimator->Play("FlightLanding", false, false, 0.1f, 2.5f);
+            CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+            pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::FLIGHT_LANDING);
 
             m_bMoveLock = true;
 
@@ -181,7 +184,8 @@ _bool CKirby_Hovering::Update_HoveringStateMachine(CKirby* pKirby, _float fTimeD
             if (pAnimator->Is_Finished() == true)
             {
                 m_eHoveringState = HOVERING_STATE::SPIT_AIR;
-                pAnimator->Play("AirBall", false, false, 0.0f, 5.f);
+                CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+                pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::AIR_BALL);
 
                 pBody->Set_Body(KIRBY_BODY_STATE::INHALE);
 
@@ -199,7 +203,8 @@ _bool CKirby_Hovering::Update_HoveringStateMachine(CKirby* pKirby, _float fTimeD
                 if (bIsGround == false)
                 {
                     pKirby->Change_State(KIRBY_STATE_TYPE::FALL);
-                    pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::FALL));
+                    CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+                    pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::FALL);
                 }
                 else
                 {
@@ -227,7 +232,8 @@ _bool CKirby_Hovering::Check_Landing(CKirby* pKirby, CAnimator* pAnimator, CMove
     if (bIsGround == true)
     {
         m_eHoveringState = HOVERING_STATE::FLIGHT_END;
-        pAnimator->Play("FlightLanding", false, false, 0.1f, 2.5f);
+        CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+        pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::FLIGHT_LANDING);
 
         Reset_Movement(pMovement);
 
@@ -242,17 +248,19 @@ _bool CKirby_Hovering::Check_Landing(CKirby* pKirby, CAnimator* pAnimator, CMove
 void CKirby_Hovering::Update_LoopState(CKirby* pKirby, _float fTimeDelta)
 {
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+    CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
 
     if (m_bPlayFlightAni == true)
     {
-        pAnimator->Play("Flight", false, true, 0.1f, 2.f);
+        pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::FLIGHT);
+
         m_bPlayFlightAni = false;
     }
     else
     {
         if(pAnimator->Is_Finished())
         {
-            pAnimator->Play("FlightFall", true, false, 0.1f, 2.f);
+            pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::FLIGHT_FALL);
             m_eCurMoveState = HOVERING_MOVE_STATE::FALL;
         }
     }

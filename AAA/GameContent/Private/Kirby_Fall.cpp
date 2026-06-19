@@ -48,7 +48,9 @@ void CKirby_Fall::Update(CKirby* pKirby, const _float fTimeDelta)
         // Fall State
         m_eFallingState = FALL_STATE::LAND_START;
         // Ani
-        pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::LANDING));
+        CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+        pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::LANDING);
+
         // Eye
         pKirby_Body->Set_Eye(KIRBY_EYE_STATE::CLOSE);
     }
