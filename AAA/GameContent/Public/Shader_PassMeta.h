@@ -3,6 +3,15 @@
 
 NS_BEGIN(Client)
 
+#pragma region Map Pass
+enum PASS_TEX_MASK : _uint
+{
+	PASS_TEX_DIFFUSE = 1u << 0,
+	PASS_TEX_NORMAL = 1u << 1,
+	PASS_TEX_MRA = 1u << 2,
+	PASS_TEX_UNKNOWN = 1u << 3,
+};
+
 enum class MAP_PASS : _uint
 {
 	SHADOW = 0,
@@ -16,68 +25,18 @@ enum class MAP_PASS : _uint
 	TOP,
 	MASK,
 
+	UKWN,
+
 	_COUNT
 };
 
 inline constexpr MAP_PASS MAP_DEFAULT_PASS = MAP_PASS::WHITE;
 
-inline _bool Is_ValidMapPassValue(_int iPass)
-{
-	return 0 <= iPass && iPass < ETOI(MAP_PASS::_COUNT);
-}
-
-namespace ShaderPass
-{
-	namespace NonAnimPBR
-	{
-		inline constexpr _uint Default = 0;
-		inline constexpr _uint Diffuse = 1;
-		inline constexpr _uint Shadow = 2;
-		inline constexpr _uint White = 3;
-		inline constexpr _uint Dither = 4;
-		inline constexpr _uint DIFF = 5;
-		inline constexpr _uint DMN = 6;	// Diffuse MRA Normal
-		inline constexpr _uint UKWN = 7;
-		inline constexpr _uint UMN = 8;	// Unkwown MRA Normal
-	}
-
-	namespace EnvInst
-	{
-		inline constexpr _uint SHADOW = 0;
-		inline constexpr _uint WHITE = 1;
-		inline constexpr _uint DIFF = 2;
-		inline constexpr _uint DMN = 3;	// Diffuse MRA Normal
-		inline constexpr _uint UKWN = 4;
-		inline constexpr _uint UMN = 5;	// Unkwown MRA Normal
-	}
-
-	namespace EnvInstFlags
-	{
-		inline constexpr _uint Dither = 1u << 0;
-	}
-}
-
 struct MAP_SHADER_PASS_META
 {
 	MAP_PASS		ePass;
-	const _char*	szName;
+	const _char* szName;
 	_uint			iRequiredTextureMask;
-};
-
-struct ENV_SHADER_PASS_META
-{
-	_int			iEnvPass;
-	_uint			iNonAnimPass;
-	const _char*	szName;
-	_uint			iRequiredTextureMask;
-};
-
-enum PASS_TEX_MASK : _uint
-{
-	PASS_TEX_DIFFUSE	= 1u << 0,
-	PASS_TEX_NORMAL		= 1u << 1,
-	PASS_TEX_MRA		= 1u << 2,
-	PASS_TEX_UNKNOWN	= 1u << 3,
 };
 
 inline constexpr MAP_SHADER_PASS_META g_MapShaderPassMetas[] =
@@ -90,17 +49,13 @@ inline constexpr MAP_SHADER_PASS_META g_MapShaderPassMetas[] =
 	{ MAP_PASS::DMNU,	"DMNU",		PASS_TEX_DIFFUSE | PASS_TEX_NORMAL | PASS_TEX_MRA | PASS_TEX_UNKNOWN },
 	{ MAP_PASS::TOP,    "TOP",      PASS_TEX_DIFFUSE | PASS_TEX_NORMAL | PASS_TEX_MRA },
 	{ MAP_PASS::MASK,   "MASK",     PASS_TEX_DIFFUSE | PASS_TEX_NORMAL | PASS_TEX_MRA },
+	{ MAP_PASS::UKWN,   "UKWN",     PASS_TEX_UNKNOWN },
 };
 
-inline constexpr ENV_SHADER_PASS_META g_EnvShaderPassMetas[] =
+inline _bool Is_ValidMapPassValue(_int iPass)
 {
-	{ -1,                         ShaderPass::NonAnimPBR::DIFF,  "Default", PASS_TEX_DIFFUSE },
-	{ ShaderPass::EnvInst::WHITE, ShaderPass::NonAnimPBR::White, "WHITE",   0 },
-	{ ShaderPass::EnvInst::DIFF,  ShaderPass::NonAnimPBR::DIFF,  "DIFF",    PASS_TEX_DIFFUSE },
-	{ ShaderPass::EnvInst::DMN,   ShaderPass::NonAnimPBR::DMN,   "DMN",     PASS_TEX_DIFFUSE | PASS_TEX_MRA | PASS_TEX_NORMAL },
-	{ ShaderPass::EnvInst::UKWN,  ShaderPass::NonAnimPBR::UKWN,  "UKWN",    PASS_TEX_UNKNOWN },
-	{ ShaderPass::EnvInst::UMN,   ShaderPass::NonAnimPBR::UMN,   "UMN",     PASS_TEX_UNKNOWN | PASS_TEX_MRA | PASS_TEX_NORMAL },
-};
+	return 0 <= iPass && iPass < ETOI(MAP_PASS::_COUNT);
+}
 
 inline const MAP_SHADER_PASS_META* Find_MapShaderPassMeta(_int iPass)
 {
@@ -131,23 +86,94 @@ inline _int Get_MapShaderPassFromComboIndex(_int iIndex)
 
 	return ETOI(g_MapShaderPassMetas[iIndex].ePass);
 }
+#pragma endregion
 
-inline const ENV_SHADER_PASS_META* Find_EnvShaderPassMeta(_int iEnvPass)
+
+
+#pragma region Env Pass
+enum class ENV_PASS : _int
+{
+	DEFAULT = -1,
+	SHADOW,
+	WHITE,
+	DIFF,
+	DMN,
+	UKWN,
+	UMN,
+
+	DMNU,
+	TREESHADOW,
+	GRASS_FUR,
+	MN,
+
+	_COUNT
+};
+
+namespace ShaderPass
+{
+	namespace NonAnimPBR
+	{
+		inline constexpr _uint Default = 0;
+		inline constexpr _uint Diffuse = 1;
+		inline constexpr _uint Shadow = 2;
+		inline constexpr _uint White = 3;
+		inline constexpr _uint Dither = 4;
+		inline constexpr _uint DIFF = 5;
+		inline constexpr _uint DMN = 6;
+		inline constexpr _uint UKWN = 7;
+		inline constexpr _uint UMN = 8;
+
+		inline constexpr _uint DMNU = 9;
+		inline constexpr _uint TREESHADOW = 10;
+		inline constexpr _uint GRASS_FUR = 11;
+		inline constexpr _uint MN = 12;
+	}
+
+	namespace EnvInstFlags
+	{
+		inline constexpr _uint Dither = 1u << 0;
+	}
+}
+
+struct ENV_SHADER_PASS_META
+{
+	ENV_PASS		ePass;
+	_uint			iNonAnimPass;
+	const _char*	szName;
+	_uint			iRequiredTextureMask;
+};
+
+inline constexpr ENV_SHADER_PASS_META g_EnvShaderPassMetas[] =
+{
+	{ ENV_PASS::DEFAULT,	ShaderPass::NonAnimPBR::DIFF,		"Default",		PASS_TEX_DIFFUSE },
+	{ ENV_PASS::WHITE,		ShaderPass::NonAnimPBR::White,		"WHITE",		0 },
+	{ ENV_PASS::DIFF,		ShaderPass::NonAnimPBR::DIFF,		"DIFF",			PASS_TEX_DIFFUSE },
+	{ ENV_PASS::DMN,		ShaderPass::NonAnimPBR::DMN,		"DMN",			PASS_TEX_DIFFUSE | PASS_TEX_MRA | PASS_TEX_NORMAL },
+	{ ENV_PASS::UKWN,		ShaderPass::NonAnimPBR::UKWN,		"UKWN",			PASS_TEX_UNKNOWN },
+	{ ENV_PASS::UMN,		ShaderPass::NonAnimPBR::UMN,		"UMN",			PASS_TEX_UNKNOWN | PASS_TEX_MRA | PASS_TEX_NORMAL },
+
+	{ ENV_PASS::DMNU,		ShaderPass::NonAnimPBR::DMNU,		"DMN",			PASS_TEX_DIFFUSE | PASS_TEX_MRA | PASS_TEX_NORMAL | PASS_TEX_UNKNOWN },
+	{ ENV_PASS::TREESHADOW,	ShaderPass::NonAnimPBR::TREESHADOW,	"TREESHADOW",	PASS_TEX_UNKNOWN },
+	{ ENV_PASS::GRASS_FUR,	ShaderPass::NonAnimPBR::GRASS_FUR,	"GRASS_FUR",	PASS_TEX_UNKNOWN | PASS_TEX_MRA | PASS_TEX_NORMAL },
+	{ ENV_PASS::MN,			ShaderPass::NonAnimPBR::MN,			"MN",			PASS_TEX_MRA | PASS_TEX_NORMAL },
+};
+
+inline const ENV_SHADER_PASS_META* Find_EnvShaderPassMeta(_int iPass)
 {
 	for (const auto& Meta : g_EnvShaderPassMetas)
 	{
-		if (Meta.iEnvPass == iEnvPass)
+		if (ETOI(Meta.ePass) == iPass)
 			return &Meta;
 	}
 
 	return &g_EnvShaderPassMetas[0];
 }
 
-inline _int Get_EnvShaderPassComboIndex(_int iEnvPass)
+inline _int Get_EnvShaderPassComboIndex(_int iPass)
 {
 	for (_uint i = 0; i < _countof(g_EnvShaderPassMetas); ++i)
 	{
-		if (g_EnvShaderPassMetas[i].iEnvPass == iEnvPass)
+		if (ETOI(g_EnvShaderPassMetas[i].ePass) == iPass)
 			return static_cast<_int>(i);
 	}
 
@@ -157,9 +183,10 @@ inline _int Get_EnvShaderPassComboIndex(_int iEnvPass)
 inline _int Get_EnvShaderPassFromComboIndex(_int iIndex)
 {
 	if (iIndex < 0 || iIndex >= static_cast<_int>(_countof(g_EnvShaderPassMetas)))
-		return -1;
+		return ETOI(ENV_PASS::DEFAULT);
 
-	return g_EnvShaderPassMetas[iIndex].iEnvPass;
+	return ETOI(g_EnvShaderPassMetas[iIndex].ePass);
 }
+#pragma endregion
 
 NS_END

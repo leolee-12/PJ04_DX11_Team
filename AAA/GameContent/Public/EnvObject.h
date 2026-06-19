@@ -47,8 +47,6 @@ public:
 	const BoundingBox& Get_WorldBounds() const { return m_WorldBounds; }
 	_float Get_Dissolve() const { return m_fDissolve; }
 
-	virtual _bool XM_CALLCONV Pick_Ray(_fvector vOrigin,_fvector vDir, _float3* pOutHit, _float* pOutDistance);
-
 	_bool Pick_Marb1e(_fvector vRayOrigin, _fvector vRayDir, _float3* pOutHit, _float* fOutDistance);
 
 protected:
