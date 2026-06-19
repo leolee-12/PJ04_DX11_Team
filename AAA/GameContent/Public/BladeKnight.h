@@ -2,6 +2,10 @@
 #include "GameContent_Defines.h"
 #include "Monster.h"
 
+NS_BEGIN(Engine)
+class CAnimator;
+NS_END
+
 NS_BEGIN(Client)
 
 class CBladeKnight_Body;
@@ -44,6 +48,9 @@ public:
 	virtual _float				Get_CapsuleHeight() const override { return 1.f; }
 	virtual _float				Get_InteractRadius() const override { return 10.f; }
 	virtual _float				Get_HurtBoxRadius() const override { return 0.75f; }
+
+	virtual CAnimator*			Get_BodyAnimator() const override;
+
 
 public:
 	CBladeKnight_Body*			Get_Body() { return m_pBody; }

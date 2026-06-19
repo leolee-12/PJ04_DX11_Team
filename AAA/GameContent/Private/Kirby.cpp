@@ -4,6 +4,7 @@
 
 #include "PartObject.h"
 #include "Monster.h"
+#include "Controller.h"
 
 #include "GameContent_const.h"
 #include "Movement_Child.h"
@@ -183,9 +184,9 @@ CKirby_Ability* CKirby::Get_KirbyAbility()
 void CKirby::Set_KirbyAbility(COPY_ABILITY_TYPE eAbilityState)
 {
     auto iter = m_Abilities.find(eAbilityState);
-    if (iter == m_Abilities.end())
-        MSG_BOX("KirbyAbility Bug: Kirby.cpp");
+    if (iter == m_Abilities.end()) { MSG_BOX("KirbyAbility Bug"); return; }
 
+    if (m_pKirby_Ability) m_pKirby_Ability->Exit_Ability(this);
     m_pKirby_Ability = iter->second;
 }
 
@@ -222,13 +223,22 @@ HRESULT CKirby::Ready_Components()
 {
     _float3 vFootPos;
     XMStoreFloat3(&vFootPos, m_pTransformCom->Get_State(STATE::POSITION));
-    m_pController = m_pGameInstance_Proxy->Create_CapsuleController(vFootPos, s_fCCT_Radius, s_fCCT_Height);
+
+    m_pController = Add_Component<CController>(TEXT("Com_Controller"),
+        CController::Create(m_pDevice, m_pContext));
+    if (nullptr == m_pController) return E_FAIL;
+
+    CController::CONTROLLER_DESC ctrlDesc{};
+    ctrlDesc.vFootPos = vFootPos;
+    ctrlDesc.fRadius = s_fCCT_Radius;
+    ctrlDesc.fHeight = s_fCCT_Height;
+    ctrlDesc.pOwner = this;
+    if (FAILED(m_pController->Initialize(&ctrlDesc))) return E_FAIL;
 
     m_pMovement = Add_Component<CMovement_Child>(TEXT("Com_Movement"), CMovement_Child::Create(m_pDevice, m_pContext));
-    if (m_pMovement == nullptr)
-        return E_FAIL;
+    if (m_pMovement == nullptr) return E_FAIL;
 
-    m_pMovement->Set_Refs(m_pTransformCom, m_pController);
+    m_pMovement->Set_Refs(m_pTransformCom, m_pController->Get_Raw());
 
 
     CCollider::COLLIDER_DESC ColliderDesc{};
@@ -266,8 +276,6 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_D_RANGE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_TRIGGER));
 
-
-
     return S_OK;
 }
 
@@ -279,7 +287,12 @@ void	CKirby::SetUp_Collider_Callback()
             if (ETOUI(COLLISION_LAYER::MONSTER_HURT) == pOther->Get_RegisteredGroup())
             {
                 _vector vAtkPos = pOther->Get_Owner()->Get_Transform()->Get_State(STATE::POSITION);
-                On_Hit(vAtkPos, 1.f);
+                ATTACK_INFO atk{};
+                atk.fDamage = 1.f;
+                atk.fKnockback = 6.f;                     
+                XMStoreFloat3(&atk.vAttackerPos, vAtkPos);
+                atk.pAttacker = pOther->Get_Owner();
+                Damaged(atk);
 #ifdef _DEBUG
                 char szBuf[128];
                 sprintf_s(szBuf, "[Kirby] Hurt! HP %.0f/%.0f\n", m_fCurHP, m_fMaxHP);
@@ -417,15 +430,14 @@ HRESULT CKirby::Ready_Events()
     return S_OK;
 }
 
-_bool CKirby::Block_Hit(_fvector vAttackerPos)
-{
-    return m_fInvincible > 0.f;
+_bool CKirby::Block_Hit(const ATTACK_INFO& tInfo) 
+{ 
+    return m_fInvincible > 0.f; 
 }
-
-void CKirby::On_Damaged(_fvector vAttackerPos, _float fDamage)
+void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
 {
     m_fInvincible = s_fInvincibleDur;
-    // TODO: 피격상태 적용 (넉백 + 피격애니매이션 + 능력 떨구기?)
+    // TODO: 넉백/피격애님
 }
 
 void CKirby::Begin_Inhale()
@@ -478,12 +490,5 @@ void CKirby::Free()
     Safe_Release(m_pKirby_InputManager);
     Safe_Release(m_pKirby_Controller);
     Safe_Release(m_pKirby_StateMachine);
-
-    if (m_pController != nullptr)
-    {
-        m_pGameInstance_Proxy->Release_Controller(m_pController);
-        m_pController = nullptr;
-    }
-
     __super::Free();
 }

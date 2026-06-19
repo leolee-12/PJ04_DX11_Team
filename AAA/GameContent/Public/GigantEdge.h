@@ -68,7 +68,7 @@ private:
     _bool m_bGroggyRequested = { false };
 
 private:
-    virtual _bool Block_Hit(_fvector vAttackerPos) override;
+    virtual _bool Block_Hit(const ATTACK_INFO& tInfo) override;
 
 #ifdef _DEBUG
 public:

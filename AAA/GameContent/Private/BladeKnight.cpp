@@ -10,12 +10,15 @@
 
 // 상태
 #include "Monster_StateMachine.h"
-#include "BladeKnight_State_Idle.h"
+#include "Monster_State_Idle.h"
+#include "Monster_State_Detect.h"
+#include "Monster_State_Fall.h"
+#include "Monster_State_Landing.h"
+#include "Monster_State_Captured.h"
 #include "BladeKnight_State_Chase.h"
 #include "BladeKnight_State_Retreat.h"
-#include "BladeKnight_State_Find.h"
-#include "BladeKnight_State_Fall.h"
-#include "BladeKnight_State_Landing.h"
+
+// 전용 상태
 #include "BladeKnight_State_Attack.h"
 #include "BladeKnight_State_DoubleAttack.h"
 #include "BladeKnight_State_TornadoAttack.h"
@@ -96,17 +99,17 @@ void CBladeKnight::Update(_float fTimeDelta)
     }
 
     // 날아가는 넉백 테스트
-    _float fTarget = m_pMovement->Is_Launched() ? 45.f : 0.f;
+    //_float fTarget = m_pMovement->Is_Launched() ? 45.f : 0.f;
 
-    _float fPrev = m_fTiltCurDeg;
-    m_fTiltCurDeg += (fTarget - m_fTiltCurDeg) * m_fTiltLerp * fTimeDelta;      // 목표로 Lerp
-    _float fDelta = m_fTiltCurDeg - fPrev;                                      // 이번 프레임 더할 양
+    //_float fPrev = m_fTiltCurDeg;
+    //m_fTiltCurDeg += (fTarget - m_fTiltCurDeg) * m_fTiltLerp * fTimeDelta;      // 목표로 Lerp
+    //_float fDelta = m_fTiltCurDeg - fPrev;                                      // 이번 프레임 더할 양
 
-    if (fabsf(fDelta) > 1e-5f)
-    {
-        _vector vRight = m_pTransformCom->Get_State(STATE::RIGHT);
-        m_pTransformCom->Rotate(XMQuaternionRotationAxis(vRight, XMConvertToRadians(-fDelta)));
-    }
+    //if (fabsf(fDelta) > 1e-5f)
+    //{
+    //    _vector vRight = m_pTransformCom->Get_State(STATE::RIGHT);
+    //    m_pTransformCom->Rotate(XMQuaternionRotationAxis(vRight, XMConvertToRadians(-fDelta)));
+    //}
 
 #endif
 }
@@ -124,6 +127,11 @@ HRESULT CBladeKnight::Render()
     return S_OK;
 }
 
+CAnimator* CBladeKnight::Get_BodyAnimator() const
+{
+    return m_pBody ? m_pBody->Get_Animator() : nullptr;
+}
+
 CMonsterBrain* CBladeKnight::Create_Brain()
 {
     return CBladeKnight_FSM::Create();
@@ -133,11 +141,47 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
 {
     if (pStateMachine == nullptr)
         return E_FAIL;
+    
+    // 공통 상태에는 사용할 AnimInfo를 넣어줘야 함
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CBladeKnight_State_Idle::Create())))
+    ANI_PLAY_INFO Info{};
+
+    // State Idle
+    Info.strAniName = "FindWait";
+    Info.bLoop = true; 
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CMonster_State_Idle::Create(Info))))
         return E_FAIL;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::FIND, CBladeKnight_State_Find::Create())))
+    // State Detect
+    Info.strAniName = "Find";
+    Info.bLoop = false;
+    Info.fSpeed = 1.25f;
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::DETECT, CMonster_State_Detect::Create(Info))))
+        return E_FAIL;
+
+    // State Fall
+    Info.strAniName = "Fall";
+    Info.bLoop = true;
+    Info.fSpeed = 1.5f;
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::FALL, CMonster_State_Fall::Create(Info))))
+        return E_FAIL;
+
+    // State Landing 
+    Info.strAniName = "Landing";
+    Info.bLoop = false;
+    Info.fSpeed = 1.0f;
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::LANDING, CMonster_State_Landing::Create(Info))))
+        return E_FAIL;
+
+    // State Captured
+    Info.strAniName = "Damage";
+    Info.bLoop = true;
+    Info.fSpeed = 1.25f;
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
         return E_FAIL;
 
     if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CHASE, CBladeKnight_State_Chase::Create())))
@@ -146,13 +190,9 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
     if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::RETREAT, CBladeKnight_State_Retreat::Create())))
         return E_FAIL;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::FALL, CBladeKnight_State_Fall::Create())))
-        return E_FAIL;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::LANDING, CBladeKnight_State_Landing::Create())))
-        return E_FAIL;
+    // Blade Knight 전용 상태 등록
 
-    // TODO ATTACK / DOUBLE_ATTACK / TORNADO_ATTACK 등록
     if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::ATTACK, CBladeKnight_State_Attack::Create())))
         return E_FAIL;
 

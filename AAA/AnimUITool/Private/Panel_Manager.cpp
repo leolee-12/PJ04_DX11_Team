@@ -262,6 +262,12 @@ void CPanel_Manager::Bind_ForAnim(CGameObject* pObj)
     m_Context.iClip = 0; m_Context.fProgress = 0.f;
     m_Context.strName = pObj->Get_ObjectTag();
 
+    m_Context.strModelPath.clear();
+    m_Context.strAnimEventPath.clear();
+
+    if (m_Context.pAnimator)
+        m_Context.strAnimEventPath = m_Context.pAnimator->Get_DataFilePath();
+
     Set_Selected(pObj);
 }
 

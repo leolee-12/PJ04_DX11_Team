@@ -1,11 +1,12 @@
 #include "Monster_State_Captured.h"
 #include "Monster.h"
 
-HRESULT CMonster_State_Captured::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpeed)
+CMonster_State_Captured::CMonster_State_Captured()
 {
-	if (FAILED(__super::Initialize(tInfo, fSpeed)))
-		return E_FAIL;
+}
 
+HRESULT	CMonster_State_Captured::Initialize()
+{
 	return S_OK;
 }
 
@@ -14,29 +15,23 @@ MONSTER_STATE_TYPE CMonster_State_Captured::Get_StateType()
 	return MONSTER_STATE_TYPE::CAPTURED;
 }
 
-void CMonster_State_Captured::On_Enter(CMonster* pMonster)
+void CMonster_State_Captured::Enter(CMonster* pMonster)
 {
-	if (pMonster == nullptr)
-		return;
-
+	if (!pMonster) return;
+	pMonster->Get_BlackBoard().bCanTransition = false;
 	pMonster->Enable_Controller(false);
+	pMonster->Play_StateAnimation(MONSTER_STATE_TYPE::CAPTURED);
 
-	if (CAnimator* pAnim = pMonster->Get_BodyAnimator())
-		pAnim->Play(&m_PlayInfo);
-
-	m_fPullSpeed = s_fPullInitSpeed;
-	m_vBaseScale = pMonster->Get_Transform()->Get_Scaled();
+	m_fPullSpeed = s_fPullInitSpeed;                        
+	m_vBaseScale = pMonster->Get_Transform()->Get_Scaled(); 
 	m_fScaleRatio = 1.f;
 }
 
-void CMonster_State_Captured::On_Update(CMonster* pMonster, _float fTimeDelta)
+void CMonster_State_Captured::Update(CMonster* pMonster, _float fTimeDelta)
 {
-	if (pMonster == nullptr)
-		return;
-
+	if (!pMonster) return;
 	CGameObject* pCaptor = pMonster->Get_Captor();
-	if (pCaptor == nullptr)
-		return;
+	if (!pCaptor) return;
 
 	CTransform* pCapT = pCaptor->Get_Transform();
 	_vector vMouth = pCapT->Get_State(STATE::POSITION)
@@ -46,40 +41,34 @@ void CMonster_State_Captured::On_Update(CMonster* pMonster, _float fTimeDelta)
 	CTransform* pT = pMonster->Get_Transform();
 	_vector vSelf = pT->Get_State(STATE::POSITION);
 	_vector vDir = vMouth - vSelf;
-	_float fDist = XMVectorGetX(XMVector3Length(vDir));
+	_float  fDist = XMVectorGetX(XMVector3Length(vDir));
 
-	if (fDist <= 0.5f) 
-	{ 
-		pMonster->On_Swallowed();
-		return; 
-	}
+	if (fDist <= 0.5f) { pMonster->On_Swallowed(); return; }
 
 	m_fPullSpeed += s_fPullAccel * fTimeDelta;
 	_float fMove = min(m_fPullSpeed * fTimeDelta, fDist);
 	pT->Set_State(STATE::POSITION, vSelf + XMVector3Normalize(vDir) * fMove);
 
 	m_fScaleRatio += (s_fMinScaleRatio - m_fScaleRatio) * min(s_fShrinkLerp * fTimeDelta, 1.f);
-
 	pT->Set_Scale(m_vBaseScale.x * m_fScaleRatio,
 		m_vBaseScale.y * m_fScaleRatio,
 		m_vBaseScale.z * m_fScaleRatio);
 }
 
-void CMonster_State_Captured::On_Exit(CMonster* pMonster)
+void CMonster_State_Captured::Exit(CMonster* pMonster)
 {
-	if (pMonster == nullptr)
-		return;
-
+	if (!pMonster) return;
 	pMonster->Get_Transform()->Set_Scale(m_vBaseScale.x, m_vBaseScale.y, m_vBaseScale.z);
 	pMonster->Enable_Controller(true);
 }
 
-CMonster_State_Captured* CMonster_State_Captured::Create(const ANI_PLAY_INFO& tInfo, _float fSpeed)
+CMonster_State_Captured* CMonster_State_Captured::Create()
 {
-	CMonster_State_Captured* pInstance = new CMonster_State_Captured();
-	if (FAILED(pInstance->Initialize(tInfo, fSpeed)))
+	CMonster_State_Captured* pInstance = new  CMonster_State_Captured();
+
+	if (FAILED(pInstance->Initialize()))
 	{
-		MSG_BOX("Failed to Created : CMonster_State_Captured");
+		MSG_BOX("Failed to Created: CMonster_State_Captured");
 		Safe_Release(pInstance);
 	}
 

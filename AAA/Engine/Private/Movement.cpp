@@ -1,5 +1,6 @@
 #include "Movement.h"
 #include "Transform.h"
+#include "Controller.h"
 
 #pragma warning(push, 0)
 #ifdef new
@@ -131,6 +132,8 @@ _bool CMovement::Move(_fvector vWishDir, _float fTimeDelta)
     // 3) 변위 → CCT 이동 → Transform 위치 반영
     physx::PxControllerFilters filters;
     filters.mFilterFlags = physx::PxQueryFlag::eSTATIC | physx::PxQueryFlag::eDYNAMIC;
+
+    filters.mCCTFilterCallback = &Get_CCTFilter();
 
     physx::PxControllerCollisionFlags flags = m_pController->move(
         physx::PxVec3(vHoriz.x, m_fVerticalVelocity * fTimeDelta, vHoriz.z),

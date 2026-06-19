@@ -11,7 +11,7 @@ private:
 	virtual ~CBladeKnight_State_Idle() = default;
 
 private:
-	HRESULT								Initialize();
+	virtual HRESULT						Initialize() override;
 
 public:
 	virtual MONSTER_STATE_TYPE			Get_StateType() override;

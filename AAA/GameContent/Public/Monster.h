@@ -3,12 +3,10 @@
 #include "Character.h"
 #include "Monster_BlackBoard.h"
 
-NS_BEGIN(physx)
-class PxController;
-NS_END
-
 NS_BEGIN(Engine)
 class CCollider;
+class CController;
+class CAnimator;
 NS_END
 
 NS_BEGIN(Client)
@@ -80,13 +78,15 @@ public:
 	virtual _float				Get_InteractRadius() const = 0;
 	virtual _float				Get_HurtBoxRadius() const = 0;
 
+	virtual CAnimator*			Get_BodyAnimator() const { return nullptr; }
+
 
 	// 윤석현 추가
 	void						Enable_Controller(_bool bEnable);
 	void						On_Swallowed();
 
 protected:
-	physx::PxController*		m_pController = { nullptr };
+	CController*				m_pController = { nullptr };
 	CMonster_Movement*			m_pMovement = { nullptr };
 
 	MONSTER_BLACKBOARD			m_BlackBoard = {};
@@ -118,9 +118,8 @@ protected:
 	virtual HRESULT				Ready_State(CMonster_StateMachine* pStateMachine);
 	virtual HRESULT				Ready_AnimEvents() { return S_OK; }		// Bkody의 Animator의 이벤트 콜백 설정함수
 
-	// 윤석현 추가
-	virtual void				On_Damaged(_fvector vAttackerPos, _float fDamage) override;
-	virtual void				On_Death(_fvector vAttackerPos) override;
+	virtual void				On_Damaged(const ATTACK_INFO& tInfo) override;
+	virtual void				On_Death(const ATTACK_INFO& tInfo) override;
 
 	//윤석현 수정 
 	virtual void				Update_AI(_float fTimeDelta);

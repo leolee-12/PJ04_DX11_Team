@@ -14,6 +14,7 @@ enum class MONSTER_STATE_TYPE
 {
 	IDLE,
 	CHASE,
+	DETECT,
 	FIND,
 
 	ATTACK,

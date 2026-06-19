@@ -1,7 +1,6 @@
 #include "BladeKnight_State_Attack.h"
 #include "BladeKnight.h"
 #include "BladeKnight_Body.h"
-#include "Animator.h"
 #include "Monster_Movement.h"
 
 HRESULT CBladeKnight_State_Attack::Initialize()

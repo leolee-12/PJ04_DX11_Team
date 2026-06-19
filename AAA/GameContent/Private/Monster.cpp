@@ -5,17 +5,18 @@
 #include "Monster_Brain_FSM.h"
 
 #include "Collider.h"
+#include "Controller.h"
 #include "GameContent_const.h"
 
-#pragma warning(push, 0)
-#ifdef new
-#undef new
-#endif
-#include <PhysX/PxPhysicsAPI.h>
-#if defined(_DEBUG) && defined(DBG_NEW)
-#define new DBG_NEW
-#endif
-#pragma warning(pop)
+//#pragma warning(push, 0)
+//#ifdef new
+//#undef new
+//#endif
+//#include <PhysX/PxPhysicsAPI.h>
+//#if defined(_DEBUG) && defined(DBG_NEW)
+//#define new DBG_NEW
+//#endif
+//#pragma warning(pop)
 
 CMonster::CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCharacter{ pDevice, pContext }
@@ -99,12 +100,7 @@ void CMonster::Set_Target(CGameObject* pTarget)
 	m_BlackBoard.pTarget = pTarget;
 
 	if (nullptr == pTarget)
-	{
-		m_BlackBoard.bCanSeeTarget = false;
-		m_BlackBoard.fDistToTarget = FLT_MAX;
-		m_BlackBoard.vTargetPos = {};
-		m_BlackBoard.vLastKnownPos = {};
-	}
+		m_BlackBoard = MONSTER_BLACKBOARD{};
 }
 
 void CMonster::Add_MoveDir(const _float3& vWishDir)
@@ -224,7 +220,12 @@ void CMonster::SetUp_Collider_CallBack()
 				&& Has_Trait(MT_BODYCHECK_DAMAGE))
 			{
 				_vector vAtkPos = pOther->Get_Owner()->Get_Transform()->Get_State(STATE::POSITION);
-				On_Hit(vAtkPos, 1.f);
+				ATTACK_INFO atk{};
+				atk.fDamage = 1.f;
+				atk.fKnockback = 6.f;
+				XMStoreFloat3(&atk.vAttackerPos, vAtkPos);
+				atk.pAttacker = pOther->Get_Owner();
+				Damaged(atk);
 #ifdef _DEBUG
 				char szBuf[128];
 				sprintf_s(szBuf, "[Monster] Hurt! HP %.0f/%.0f\n", m_fCurHP, m_fMaxHP);
@@ -242,19 +243,20 @@ HRESULT CMonster::Ready_Movement()
 	_float3 vFootPos;
 	XMStoreFloat3(&vFootPos, m_pTransformCom->Get_State(STATE::POSITION));
 
-	m_pController = m_pGameInstance_Proxy->Create_CapsuleController(
-		vFootPos,
-		Get_CapsuleRadius(),
-		Get_CapsuleHeight());
+	m_pController = Add_Component<CController>(TEXT("Com_Controller"),
+		CController::Create(m_pDevice, m_pContext));
+	if (nullptr == m_pController) return E_FAIL;
 
-	if (nullptr == m_pController)
-		return E_FAIL;
+	CController::CONTROLLER_DESC ctrlDesc{};
+	ctrlDesc.vFootPos = vFootPos;
+	ctrlDesc.fRadius = Get_CapsuleRadius();
+	ctrlDesc.fHeight = Get_CapsuleHeight();
+	ctrlDesc.pOwner = this;
+	if (FAILED(m_pController->Initialize(&ctrlDesc))) return E_FAIL;
 
-	if (FAILED(Create_Movement()))
-		return E_FAIL;
+	if (FAILED(Create_Movement())) return E_FAIL;
 
-	m_pMovement->Set_Refs(m_pTransformCom, m_pController);
-
+	m_pMovement->Set_Refs(m_pTransformCom, m_pController->Get_Raw());
 	return S_OK;
 }
 
@@ -331,17 +333,16 @@ HRESULT CMonster::Ready_State(CMonster_StateMachine* pStateMachine)
 	return S_OK;
 }
 
-void CMonster::On_Damaged(_fvector vAttackerPos, _float fDamage)
+void CMonster::On_Damaged(const ATTACK_INFO& tInfo)
 {
-
-	m_pMovement->Knockback(vAttackerPos, 6.f);
+	m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
 	//Change_State(MONSTER_STATE_TYPE::HIT);
 }
 
-void CMonster::On_Death(_fvector vAttackerPos)
+void CMonster::On_Death(const ATTACK_INFO& tInfo)
 {
-	m_pMovement->KO(vAttackerPos, 12.f);
-	//Change_State(MONSTER_STATE_TYPE::DEAD);
+	if (m_pMovement) m_pMovement->KO(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
+	Change_State(MONSTER_STATE_TYPE::DEAD);
 }
 
 void CMonster::Perceive(_float fTimeDelta)
@@ -372,7 +373,7 @@ void CMonster::Perceive(_float fTimeDelta)
 	_vector vMyPos = m_pTransformCom->Get_State(STATE::POSITION);
 	_vector vTargetPos = pTargetTransform->Get_State(STATE::POSITION);
 	_vector vToTarget = vTargetPos - vMyPos;
-	_vector vToTargetXZ = XMVectorSetY(vToTarget, XMVectorGetY(vMyPos));
+	_vector vToTargetXZ = XMVectorSetY(vToTarget, 0.f);
 
 	_float fDistXZ = XMVectorGetX(XMVector3Length(vToTargetXZ));
 
@@ -397,26 +398,7 @@ void CMonster::Perceive(_float fTimeDelta)
 
 void CMonster::Enable_Controller(_bool bEnable)
 {
-	if (nullptr == m_pController)
-		return;
-
-	physx::PxRigidDynamic* pActor = m_pController->getActor();
-	if (nullptr == pActor)
-		return;
-
-	const physx::PxU32 iNum = pActor->getNbShapes();
-	if (0 == iNum)
-		return;
-
-	std::vector<physx::PxShape*> Shapes(iNum);
-	pActor->getShapes(Shapes.data(), iNum);
-	for (physx::PxShape* pShape : Shapes)
-	{
-		if (nullptr == pShape)
-			continue;
-		pShape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, bEnable);  // ¹°¸® ¸·Èû on/off
-		pShape->setFlag(physx::PxShapeFlag::eSCENE_QUERY_SHAPE, bEnable); // ·¹ÀÌ/½ºÀ¬ Äõ¸® on/off
-	}
+	if (m_pController) m_pController->Set_Enabled(bEnable);
 }
 
 void CMonster::On_Swallowed()
@@ -476,12 +458,5 @@ void CMonster::Free()
 {
 	Safe_Release(m_pBrain);
 	Safe_Release(m_pStateMachine);
-
-	if (nullptr != m_pController)
-	{
-		m_pGameInstance_Proxy->Release_Controller(m_pController);
-		m_pController = nullptr;
-	}
-
 	__super::Free();
 }

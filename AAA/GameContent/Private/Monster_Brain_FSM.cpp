@@ -48,10 +48,10 @@ void CMonster_Brain_FSM::Decide(CMonster* pMonster, const MONSTER_BLACKBOARD& Bl
     }
 
     // 첫 발견 -> FIND (Find 상태 가진 몬스터만)
-    if (!m_bSpotted && pMonster->Has_State(MONSTER_STATE_TYPE::FIND))
+    if (!m_bSpotted && pMonster->Has_State(MONSTER_STATE_TYPE::DETECT))
     {
         m_bSpotted = true;
-        pMonster->Change_State(MONSTER_STATE_TYPE::FIND);
+        pMonster->Change_State(MONSTER_STATE_TYPE::DETECT);
         return;
     }
 
