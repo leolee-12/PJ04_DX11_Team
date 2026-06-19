@@ -58,8 +58,8 @@ HRESULT CSwordSlash::Render()
 
 HRESULT CSwordSlash::Ready_EffectPartObjects()
 {
-    Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CCommon_Curve03::PROTOTYPE_TAG, TEXT("Proto_Common_Curve03"));
-    //Add_Effect_PartObject(ETOUI(LEVEL::GAMEPLAY), CCommon_Circle01::PROTOTYPE_TAG, TEXT("Proto_Common_Circle01"));
+    Add_Effect_PartObject(m_iPrototypeLevel, CCommon_Curve03::PROTOTYPE_TAG, TEXT("Proto_Common_Curve03"));
+    //Add_Effect_PartObject(m_iPrototypeLevel, CCommon_Circle01::PROTOTYPE_TAG, TEXT("Proto_Common_Circle01"));
 
     return S_OK;
 }
@@ -83,7 +83,7 @@ CGameObject* CSwordSlash::Clone(void* pArg)
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Cloned: CTestEffectQuad");
+        MSG_BOX("Failed to Cloned: CSwordSlash");
         Safe_Release(pInstance);
     }
 

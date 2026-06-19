@@ -38,10 +38,12 @@ void CKirby_Jump::Enter(CKirby* pKirby)
 
     // Ani
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+    CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+
     if (s_bLeft == true)
-        pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::JUMP_L));
+        pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::JUMP_L);
     else
-        pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::JUMP_R));
+        pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::JUMP_R);
 
     // Ground Ignore
     m_fAccGroundIgnoreTime = m_fMaxGroundIgnoreTime;
@@ -77,11 +79,12 @@ void CKirby_Jump::Update(CKirby* pKirby, const _float fTimeDelta)
         if (rand() % 2 == 0)
         {
             CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+            CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
 
             if (s_bLeft == true)
-                pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::JUMP_END_L));
+                pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::JUMP_END_L);
             else
-                pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::JUMP_END_R));
+                pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::JUMP_END_R);
         }
     }      
     // Wair or Run(¹Ù·Î ¶¥)
