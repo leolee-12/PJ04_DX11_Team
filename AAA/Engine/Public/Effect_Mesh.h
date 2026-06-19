@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Effect_NoneParticle.h"
+#include "Effect_NonParticle.h"
 
 NS_BEGIN(Engine)
 
 class CModel;
 
-class ENGINE_DLL CEffect_Mesh abstract : public CEffect_NoneParticle
+class ENGINE_DLL CEffect_Mesh abstract : public CEffect_NonParticle
 {
     GENERATED_BODY_ABSTRACT(CEffect_Mesh)
 

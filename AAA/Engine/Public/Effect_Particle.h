@@ -22,6 +22,9 @@ PROPERTY(_bool, m_bSpriteAniMask, L"Sprite Animation Mask", L"Sprite Animation")
 PROPERTY(_int, m_iMaskFrameX, L"Frame X_M", L"Sprite Animation");
 PROPERTY(_int, m_iMaskFrameY, L"Frame Y_M", L"Sprite Animation");
 
+// Particle
+PROPERTY(_uint, m_iParticleCount, L"Count_P", L"Particle");
+
 // Particle Alpha
 PROPERTY(_bool,  m_bParticleFadeInOut,          L"Fade In Out_P",       L"Particle Alpha");
 PROPERTY(_float, m_fParticleAlphaStartValue,    L"Start_P",             L"Particle Alpha");
@@ -29,9 +32,6 @@ PROPERTY(_float, m_fParticleAlphaPeakValue,     L"Peak_P",              L"Partic
 PROPERTY(_float, m_fParticleAlphaEndValue,      L"End_P",               L"Particle Alpha");
 PROPERTY(_float, m_fParticleFadeInRatio,        L"Fade In Ratio_P",     L"Particle Alpha");
 PROPERTY(_float, m_fParticleFadeOutRatio,       L"Fade Out Ratio_P",    L"Particle Alpha");
-
-// Particle
-PROPERTY(_uint, m_iParticleCount, L"Count_P", L"Particle");
 
 // Particle Spawn
 PROPERTY(_bool, m_bParticleSpawnRandom, L"Spawn Random_P", L"Particle Spawn");
@@ -129,6 +129,9 @@ public:
 
 protected:
     virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;
+
+    virtual void Update_TexSpriteAnimation(const _float fTimeDelta, const _float fRatio);
+    virtual void Update_MaskSpriteAnimation(const _float fTimeDelta, const _float fRatio);
 
 private:
     HRESULT Ready_Components();

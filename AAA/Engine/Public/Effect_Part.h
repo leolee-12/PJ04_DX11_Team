@@ -19,6 +19,7 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
     PROPERTY(_float, m_fStartRatio,     L"Start Ratio",  L"Effect");
     PROPERTY(_float, m_fEndRatio,       L"End Ratio",    L"Effect");
 
+
     // Texture
     PROPERTY(_bool, m_bUseTextureCom,           L"Use TextureCom_T",          L"Texture Com");
     PROPERTY(_float2, m_vTextureTiling,         L"Tiling_T",                  L"Texture Com");
@@ -142,6 +143,9 @@ protected:
 
 protected:
     void Compute_CombinedWorldMatrix();
+
+    virtual void Update_UVScroll(const _float fTimeDelta, const _float fRatio);
+    void MoveUVScroll(const _float fRatio, const _bool bUpdate, const _float2 vScrollCount, const _float2 vBaseUV, _float2& vOutUv);
 
 protected:
     HRESULT Bind_ShaderValue();

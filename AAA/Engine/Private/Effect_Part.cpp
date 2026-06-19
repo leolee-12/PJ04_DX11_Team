@@ -93,6 +93,27 @@ void CEffect_Part::Compute_CombinedWorldMatrix()
     }
 }
 
+void CEffect_Part::Update_UVScroll(const _float fTimeDelta, const _float fRatio)
+{
+    MoveUVScroll(fRatio, m_bTextureUVScroll, m_vTextureUVScrollCount, m_vTextureOffset, m_vCurTextureUVOffset);
+    MoveUVScroll(fRatio, m_bMaskUVScroll, m_vMaskUVScrollCount, m_vMaskOffset, m_vCurMaskUVOffset);
+}
+
+void CEffect_Part::MoveUVScroll(const _float fRatio, const _bool bUpdate, const _float2 vScrollCount, const _float2 vBaseUV, _float2& vOutUV)
+{
+    if (bUpdate == false)
+    {
+        vOutUV = vBaseUV;
+        return;
+    }
+
+    vOutUV.x = vBaseUV.x + vScrollCount.x * fRatio;
+    vOutUV.y = vBaseUV.y + vScrollCount.y * fRatio;
+
+    vOutUV.x = fmodf(vOutUV.x, 1.f);
+    vOutUV.y = fmodf(vOutUV.y, 1.f);
+}
+
 HRESULT CEffect_Part::Bind_ShaderValue()
 {
     // Texture
@@ -226,6 +247,8 @@ void CEffect_Part::Update_Value(const _float fTimeDelta)
 
 void CEffect_Part::Update_Core(const _float fTimeDelta, const _float fRatio)
 {
+    Update_UVScroll(fTimeDelta, fRatio);
+
     Update_EffectPart(fTimeDelta, fRatio);
 }
 

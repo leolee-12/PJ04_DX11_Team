@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Effect_NoneParticle.h"
+#include "Effect_NonParticle.h"
 
 NS_BEGIN(Engine)
 
 class CVIBuffer_Rect;
 
-class ENGINE_DLL CEffect_Quad abstract : public CEffect_NoneParticle
+class ENGINE_DLL CEffect_Quad abstract : public CEffect_NonParticle
 {
     GENERATED_BODY_ABSTRACT(CEffect_Quad)
 
@@ -55,7 +55,6 @@ public:
 protected:
     virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;
 
-    virtual void Update_UVScroll(const _float fTimeDelta, const _float fRatio) override;
     virtual void Update_EffectPart(const _float fTimeDelta, const _float fRatio) override;
 
     virtual void Update_TexSpriteAnimation(const _float fTimeDelta, const _float fRatio);

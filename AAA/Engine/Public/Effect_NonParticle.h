@@ -9,9 +9,9 @@ NS_BEGIN(Engine)
 class CShader;
 class CTexture;
 
-class ENGINE_DLL CEffect_NoneParticle abstract : public CEffect_Part
+class ENGINE_DLL CEffect_NonParticle abstract : public CEffect_Part
 {
-    GENERATED_BODY_ABSTRACT(CEffect_NoneParticle)
+    GENERATED_BODY_ABSTRACT(CEffect_NonParticle)
 
     // Alpha
     PROPERTY(_float, m_fAlpha,               L"Alpha_A",              L"Alpha");
@@ -107,9 +107,9 @@ private:
     };
 
 protected:
-    CEffect_NoneParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-    CEffect_NoneParticle(const CEffect_NoneParticle& Prototype);
-    virtual ~CEffect_NoneParticle() = default;
+    CEffect_NonParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    CEffect_NonParticle(const CEffect_NonParticle& Prototype);
+    virtual ~CEffect_NonParticle() = default;
 
 protected:
     virtual HRESULT Initialize_Prototype() override;
@@ -135,9 +135,6 @@ protected:
     void Update_Rot(const _float fTimeDelta, const _float fRatio);
     void Update_Move(const _float fTimeDelta, const _float fRatio);
     void Update_MoveSin(const _float fTimeDelta, const _float fRatio);
-
-    virtual void Update_UVScroll(const _float fTimeDelta, const _float fRatio);
-    void MoveUVScroll(const _float fRatio, const _bool bUpdate, const _float2 vScrollCount, const _float2 vBaseUV, _float2& vOutUv);
 
 private:
     vector<RATIO_VALUE> m_AlphaRatioValue;

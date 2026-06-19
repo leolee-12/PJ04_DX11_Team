@@ -3,13 +3,13 @@
 #include "GameInstance.h"
 
 CEffect_Quad::CEffect_Quad(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CEffect_NoneParticle(pDevice, pContext)
+    : CEffect_NonParticle(pDevice, pContext)
 {
     Init_PropertyValue();
 }
 
 CEffect_Quad::CEffect_Quad(const CEffect_Quad& Prototype)
-    : CEffect_NoneParticle(Prototype)
+    : CEffect_NonParticle(Prototype)
 {
     Init_PropertyValue();
 }
@@ -135,11 +135,6 @@ void CEffect_Quad::Update_Core(const _float fTimeDelta, const _float fRatio)
 
     Update_TexSpriteAnimation(fTimeDelta, fRatio);
     Update_MaskSpriteAnimation(fTimeDelta, fRatio);
-}
-
-void CEffect_Quad::Update_UVScroll(const _float fTimeDelta, const _float fRatio)
-{
-    __super::Update_UVScroll(fTimeDelta, fRatio);
 }
 
 void CEffect_Quad::Update_EffectPart(const _float fTimeDelta, const _float fRatio)

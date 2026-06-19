@@ -3,13 +3,13 @@
 #include "GameInstance.h"
 
 CEffect_Mesh::CEffect_Mesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CEffect_NoneParticle(pDevice, pContext)
+    : CEffect_NonParticle(pDevice, pContext)
 {
     Init_PropertyValue();
 }
 
 CEffect_Mesh::CEffect_Mesh(const CEffect_Mesh& Prototype)
-    : CEffect_NoneParticle(Prototype)
+    : CEffect_NonParticle(Prototype)
 {
     Init_PropertyValue();
 }

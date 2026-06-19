@@ -63,10 +63,6 @@ HRESULT CEffect_Particle::Render()
 	if (FAILED(Bind_ShaderValue()))
 		return E_FAIL;
 
-	Helper::IntClamp(m_iShaderPass, ShaderPass::Default, ShaderPass::ShaderPass_End - 1);
-	if (FAILED(m_pShaderCom->Begin(m_iShaderPass)))
-		return E_FAIL;
-
 	if (FAILED(m_pVIBuffer->Bind_Resources()))
 		return E_FAIL;
 
@@ -160,7 +156,53 @@ HRESULT CEffect_Particle::Bind_ShaderValue()
 void CEffect_Particle::Update_Core(const _float fTimeDelta, const _float fRatio)
 {
 	__super::Update_Core(fTimeDelta, fRatio);
+
 	Update_Particles_ByContainerTime(fRatio);
+
+	Update_TexSpriteAnimation(fTimeDelta, fRatio);
+	Update_MaskSpriteAnimation(fTimeDelta, fRatio);
+}
+
+void CEffect_Particle::Update_TexSpriteAnimation(const _float fTimeDelta, const _float fRatio)
+{
+	if (m_bSpriteAniTexture == true)
+	{
+		_int iTotalCount = m_iTexFrameX * m_iTexFrameY;
+		_int iCurTexFrameIndex = static_cast<_int>(static_cast<_float>(iTotalCount) * fRatio);
+
+		if (iCurTexFrameIndex >= iTotalCount)
+			iCurTexFrameIndex -= 1;
+
+		_float fCurTexFrameX = static_cast<_float>(iCurTexFrameIndex % m_iTexFrameX);
+		_float fCurTexFrameY = static_cast<_float>(iCurTexFrameIndex / m_iTexFrameX);
+
+		m_fCurTexAniSize.x = 1.f / static_cast<_float>(m_iTexFrameX);
+		m_fCurTexAniSize.y = 1.f / static_cast<_float>(m_iTexFrameY);
+
+		m_fCurTexAniUV.x = m_fCurTexAniSize.x * fCurTexFrameX;
+		m_fCurTexAniUV.y = m_fCurTexAniSize.y * fCurTexFrameY;
+	}
+}
+
+void CEffect_Particle::Update_MaskSpriteAnimation(const _float fTimeDelta, const _float fRatio)
+{
+	if (m_bSpriteAniMask == true)
+	{
+		_int iTotalCount = m_iMaskFrameX * m_iMaskFrameY;
+		_int iCurMaskFrameIndex = static_cast<_int>(static_cast<_float>(iTotalCount) * fRatio);
+
+		if (iCurMaskFrameIndex >= iTotalCount)
+			iCurMaskFrameIndex -= 1;
+
+		_float fCurMaskFrameX = static_cast<_float>(iCurMaskFrameIndex % m_iMaskFrameX);
+		_float fCurMaskFrameY = static_cast<_float>(iCurMaskFrameIndex / m_iMaskFrameX);
+
+		m_fCurMaskAniSize.x = 1.f / static_cast<_float>(m_iMaskFrameX);
+		m_fCurMaskAniSize.y = 1.f / static_cast<_float>(m_iMaskFrameY);
+
+		m_fCurMaskAniUV.x = m_fCurMaskAniSize.x * fCurMaskFrameX;
+		m_fCurMaskAniUV.y = m_fCurMaskAniSize.y * fCurMaskFrameY;
+	}
 }
 
 void CEffect_Particle::Init_PropertyValue()

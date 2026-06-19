@@ -1,25 +1,25 @@
-#include "Effect_NoneParticle.h"
+#include "Effect_NonParticle.h"
 
 #include "GameInstance.h"
 
-CEffect_NoneParticle::CEffect_NoneParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CEffect_NonParticle::CEffect_NonParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Part(pDevice, pContext)
 {
     Init_PropertyValue();
 }
 
-CEffect_NoneParticle::CEffect_NoneParticle(const CEffect_NoneParticle& Prototype)
+CEffect_NonParticle::CEffect_NonParticle(const CEffect_NonParticle& Prototype)
     : CEffect_Part(Prototype)
 {
     Init_PropertyValue();
 }
 
-HRESULT CEffect_NoneParticle::Initialize_Prototype()
+HRESULT CEffect_NonParticle::Initialize_Prototype()
 {
     return S_OK;
 }
 
-HRESULT CEffect_NoneParticle::Initialize(void* pArg)
+HRESULT CEffect_NonParticle::Initialize(void* pArg)
 {
     EFFECT_NONEPARTICLE_DESC* pDesc = static_cast<EFFECT_NONEPARTICLE_DESC*>(pArg);
 
@@ -32,32 +32,32 @@ HRESULT CEffect_NoneParticle::Initialize(void* pArg)
     return S_OK;
 }
 
-void CEffect_NoneParticle::Priority_Update(_float fTimeDelta)
+void CEffect_NonParticle::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 }
 
-void CEffect_NoneParticle::Update(_float fTimeDelta)
+void CEffect_NonParticle::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 }
 
-void CEffect_NoneParticle::Late_Update(_float fTimeDelta)
+void CEffect_NonParticle::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 }
 
-HRESULT CEffect_NoneParticle::Render()
+HRESULT CEffect_NonParticle::Render()
 {
     return S_OK;
 }
 
-void CEffect_NoneParticle::Effect_Start()
+void CEffect_NonParticle::Effect_Start()
 {
     __super::Effect_Start();
 }
 
-HRESULT CEffect_NoneParticle::Bind_ShaderValue()
+HRESULT CEffect_NonParticle::Bind_ShaderValue()
 {
     if (FAILED(__super::Bind_ShaderValue()))
         return E_FAIL;
@@ -72,12 +72,12 @@ HRESULT CEffect_NoneParticle::Bind_ShaderValue()
     return S_OK;
 }
 
-HRESULT CEffect_NoneParticle::Ready_Components()
+HRESULT CEffect_NonParticle::Ready_Components()
 {
     return S_OK;
 }
 
-void CEffect_NoneParticle::Init_PropertyValue()
+void CEffect_NonParticle::Init_PropertyValue()
 {
     // Alpha
     m_fAlpha = { 1.0f };
@@ -156,7 +156,7 @@ void CEffect_NoneParticle::Init_PropertyValue()
     m_fAmplitude = 1.f;
 }
 
-void CEffect_NoneParticle::Update_Core(const _float fTimeDelta, const _float fRatio)
+void CEffect_NonParticle::Update_Core(const _float fTimeDelta, const _float fRatio)
 {
     __super::Update_Core(fTimeDelta, fRatio);
 
@@ -168,11 +168,9 @@ void CEffect_NoneParticle::Update_Core(const _float fTimeDelta, const _float fRa
 
     Update_Move(fTimeDelta, fRatio);       // Move관련 가장 먼저
     Update_MoveSin(fTimeDelta, fRatio);
-
-    Update_UVScroll(fTimeDelta, fRatio);
 }
 
-void CEffect_NoneParticle::Update_Alpha(const _float fTimeDelta, const _float fRatio)
+void CEffect_NonParticle::Update_Alpha(const _float fTimeDelta, const _float fRatio)
 {
     if (m_bFadeInOut == true)
     {
@@ -209,7 +207,7 @@ void CEffect_NoneParticle::Update_Alpha(const _float fTimeDelta, const _float fR
     m_AlphaRatioValue.clear();
 }
 
-void CEffect_NoneParticle::Update_Size(const _float fTimeDelta, const _float fRatio)
+void CEffect_NonParticle::Update_Size(const _float fTimeDelta, const _float fRatio)
 {
     if (m_bSizeChange == true)
     {
@@ -246,7 +244,7 @@ void CEffect_NoneParticle::Update_Size(const _float fTimeDelta, const _float fRa
     m_SizeRatioValue.clear();
 }
 
-void CEffect_NoneParticle::Update_Color(const _float fTimeDelta, const _float fRatio)
+void CEffect_NonParticle::Update_Color(const _float fTimeDelta, const _float fRatio)
 {
     if (m_bColorChange == true)
     {
@@ -280,7 +278,7 @@ void CEffect_NoneParticle::Update_Color(const _float fTimeDelta, const _float fR
     m_ColorRatioValue.clear();
 }
 
-void CEffect_NoneParticle::Update_Rot(const _float fTimeDelta, const _float fRatio)
+void CEffect_NonParticle::Update_Rot(const _float fTimeDelta, const _float fRatio)
 {
     if (m_bRotationChange == false)
         return;
@@ -295,7 +293,7 @@ void CEffect_NoneParticle::Update_Rot(const _float fTimeDelta, const _float fRat
     }
 }
 
-void CEffect_NoneParticle::Update_Move(const _float fTimeDelta, const _float fRatio)
+void CEffect_NonParticle::Update_Move(const _float fTimeDelta, const _float fRatio)
 {
     _vector vBasePos = XMLoadFloat3(&m_vLocalPos);
 
@@ -312,7 +310,7 @@ void CEffect_NoneParticle::Update_Move(const _float fTimeDelta, const _float fRa
     m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(vBasePos, 1.f));
 }
 
-void CEffect_NoneParticle::Update_MoveSin(const _float fTimeDelta, const _float fRatio)
+void CEffect_NonParticle::Update_MoveSin(const _float fTimeDelta, const _float fRatio)
 {
     if (m_bMoveSin == false)
         return;
@@ -324,28 +322,7 @@ void CEffect_NoneParticle::Update_MoveSin(const _float fTimeDelta, const _float 
     m_pTransformCom->Set_State(STATE::POSITION, vCurPos + XMVectorSet(0.f, fCurOffsetY, 0.f, 0.f));
 }
 
-void CEffect_NoneParticle::Update_UVScroll(const _float fTimeDelta, const _float fRatio)
-{
-    MoveUVScroll(fRatio, m_bTextureUVScroll, m_vTextureUVScrollCount, m_vTextureOffset, m_vCurTextureUVOffset);
-    MoveUVScroll(fRatio, m_bMaskUVScroll, m_vMaskUVScrollCount, m_vMaskOffset, m_vCurMaskUVOffset);
-}
-
-void CEffect_NoneParticle::MoveUVScroll(const _float fRatio, const _bool bUpdate, const _float2 vScrollCount, const _float2 vBaseUV, _float2& vOutUV)
-{
-    if (bUpdate == false)
-    {
-        vOutUV = vBaseUV;
-        return;
-    }
-
-    vOutUV.x = vBaseUV.x + vScrollCount.x * fRatio;
-    vOutUV.y = vBaseUV.y + vScrollCount.y * fRatio;
-
-    vOutUV.x = fmodf(vOutUV.x, 1.f);
-    vOutUV.y = fmodf(vOutUV.y, 1.f);
-}
-
-void CEffect_NoneParticle::Free()
+void CEffect_NonParticle::Free()
 {
     __super::Free();
 }

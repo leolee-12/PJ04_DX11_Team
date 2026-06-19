@@ -573,7 +573,7 @@
     <ClInclude Include="..\public\BehaviorTree.h">
       <Filter>21. Behavior Tree</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Effect_NoneParticle.h">
+    <ClInclude Include="..\Public\Effect_NonParticle.h">
       <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle</Filter>
     </ClInclude>
   </ItemGroup>
@@ -833,7 +833,7 @@
     <ClCompile Include="..\private\BehaviorTree.cpp">
       <Filter>21. Behavior Tree</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Effect_NoneParticle.cpp">
+    <ClCompile Include="..\Private\Effect_NonParticle.cpp">
       <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle</Filter>
     </ClCompile>
   </ItemGroup>
