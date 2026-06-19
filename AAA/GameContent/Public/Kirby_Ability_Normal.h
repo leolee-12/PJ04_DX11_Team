@@ -6,6 +6,7 @@
 
 NS_BEGIN(Engine)
 class CAnimator;
+class CEffect_Container;
 NS_END
 
 NS_BEGIN(Client)
@@ -70,6 +71,8 @@ private:
 	_bool Change_Ability(CKirby* pKirby);
 
 	void Reset_Default(CKirby* pKirby);
+
+	CEffect_Container* m_pInhaleEffect{};
 
 public:
 	static CKirby_Ability_Normal* Create();

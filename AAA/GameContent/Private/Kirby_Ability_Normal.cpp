@@ -1,6 +1,8 @@
 #include "Kirby_Ability_Normal.h"
 
 #include "GameInstance.h"
+#include "Effect_Loader.h"
+
 #include "Movement_Child.h"
 
 #include "Kirby.h"
@@ -51,10 +53,20 @@ void CKirby_Ability_Normal::Enter_Ability(CKirby* pKirby)
     // Speed
     CMovement_Child* pMovementCom = pKirby->Get_Movement();
     pMovementCom->Set_MaxHorizontalSpeed(2.f);
+
+
+    CEffect_Loader::GetInstance()->Spawn(L"VacuumContainer", pKirby->Get_LevelIndex(),
+        //_float3(0.f, 0.6f, 0.4f), _float3(0.f, 0.f, 1.f),
+        _float3(0.f, 0.5f, 0.4f), _float3(0.f, 0.f, 1.f),
+        pKirby->Get_Transform()->Get_WorldMatrixPtr(),
+        &m_pInhaleEffect
+    );
 }
 
 ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _float fTimeDelta)
 {
+    CKirby_Body* pKirby_Body = pKirby->Get_Body();
+
     CMovement_Child* pMovementCom = pKirby->Get_Movement();
     _float fYVelocity = pMovementCom->Get_VerticalVelocity();
 
@@ -69,14 +81,13 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _flo
         m_eCurMoveState = INHALE_MOVE_STATE::WAIT;    
 
     // Test Code
-    if (Change_Ability(pKirby) == true)
-        return ABILITY_UPDATE_RESULT::ABILITY_CHANGED;
+    //if (Change_Ability(pKirby) == true)
+    //    return ABILITY_UPDATE_RESULT::ABILITY_CHANGED;
 
     // Super Inhale Timer
     if (m_AccSuperInHaleTime < m_MaxSuperInHaleTime)
         m_AccSuperInHaleTime += fTimeDelta;
 
-    CKirby_Body* pKirby_Body = pKirby->Get_Body();
     CAnimator* pAnimator = pKirby_Body->Get_Animator();
 
     // Inhale Á¾·á
@@ -128,6 +139,8 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _flo
 
 void CKirby_Ability_Normal::Exit_Ability(CKirby* pKirby)
 {
+    m_pInhaleEffect->EffectContainer_Stop();
+    m_pInhaleEffect = nullptr;
 }
 
 _bool CKirby_Ability_Normal::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)

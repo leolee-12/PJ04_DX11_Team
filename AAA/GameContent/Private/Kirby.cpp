@@ -20,6 +20,8 @@
 #include "Kirby_Ability_Normal.h"
 #include "Kirby_Ability_Sword.h"
 
+#include "Effect_Loader.h"
+
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCharacter{ pDevice, pContext }
 {
