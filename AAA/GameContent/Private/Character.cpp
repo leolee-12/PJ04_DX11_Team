@@ -47,16 +47,17 @@ HRESULT CCharacter::Render()
     return S_OK;
 }
 
-void CCharacter::On_Hit(_fvector vAttackerPos, _float fDamage)
+void CCharacter::Damaged(const ATTACK_INFO& tInfo)
 {
     if (!Is_Active()) return;
-    if (Block_Hit(vAttackerPos)) return;     // 무적/가드면 무효
+    if (Block_Hit(tInfo)) return;
 
-    m_fCurHP -= fDamage;
-    if (m_fCurHP <= 0.f) { m_fCurHP = 0.f; On_Death(vAttackerPos); return; }
+    m_fCurHP -= tInfo.fDamage;
+    if (m_fCurHP <= 0.f) { m_fCurHP = 0.f; On_Death(tInfo); return; }
 
-    On_Damaged(vAttackerPos, fDamage);
+    On_Damaged(tInfo);
 }
+
 
 void CCharacter::Free()
 {

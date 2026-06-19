@@ -100,12 +100,12 @@ _bool CGigantEdge::Is_Death_Finished() const
     return m_pBody->Get_Animator()->Is_Finished();
 }
 
-_bool CGigantEdge::Block_Hit(_fvector vAttackerPos)
+_bool CGigantEdge::Block_Hit(const ATTACK_INFO& tInfo)
 {
     if (!m_bGuarding) return false;
 
     _vector vForward = XMVector3Normalize(m_pTransformCom->Get_State(STATE::LOOK));
-    _vector vToAtk = XMVector3Normalize(vAttackerPos - m_pTransformCom->Get_State(STATE::POSITION));
+    _vector vToAtk = XMVector3Normalize(XMLoadFloat3(&tInfo.vAttackerPos) - m_pTransformCom->Get_State(STATE::POSITION));
     _bool   bFromBack = (XMVectorGetX(XMVector3Dot(vForward, vToAtk)) < 0.f);
 
     if (bFromBack) {              

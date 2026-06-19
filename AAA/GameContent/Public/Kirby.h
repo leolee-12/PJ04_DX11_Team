@@ -5,13 +5,10 @@
 #include "GameContent_const.h"
 #include "Kirby_Command.h"
 
-NS_BEGIN(physx)
-class PxController;
-NS_END
-
 NS_BEGIN(Engine)
 class CMovement;
 class CCollider;
+class CController;
 NS_END
 
 NS_BEGIN(Client)
@@ -121,13 +118,13 @@ private:
 	virtual HRESULT Ready_Events() override;
 
 	// À±¼®Çö Ãß°¡
-	virtual _bool Block_Hit(_fvector vAttackerPos) override;
-	virtual void  On_Damaged(_fvector vAttackerPos, _float fDamage) override;
+	virtual _bool Block_Hit(const ATTACK_INFO& tInfo) override;
+	virtual void  On_Damaged(const ATTACK_INFO& tInfo) override;
 
 private:
 	CKirby_Body* m_pBody{};
 
-	physx::PxController* m_pController{};
+	CController* m_pController{};
 	CMovement_Child* m_pMovement{};
 
 	_float3 m_vWishDir{};

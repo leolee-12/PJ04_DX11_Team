@@ -1,5 +1,6 @@
 #include "Monster_Movement.h"
 #include "Transform.h"
+#include "Controller.h"
 
 #pragma warning(push, 0)
 #ifdef new
@@ -77,6 +78,7 @@ _bool CMonster_Movement::Update_Launched(_float fTimeDelta)
 	// 3) CCT 이동  +  위치 반영 - Move와 동일
 	physx::PxControllerFilters filters;
 	filters.mFilterFlags = physx::PxQueryFlag::eSTATIC | physx::PxQueryFlag::eDYNAMIC;
+	filters.mCCTFilterCallback = &Engine::Get_CCTFilter();
 
 	physx::PxControllerCollisionFlags flags = m_pController->move(
 		physx::PxVec3(vHoriz.x, m_fVerticalVelocity * fTimeDelta, vHoriz.z),
