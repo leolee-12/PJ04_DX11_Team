@@ -7,99 +7,22 @@ NS_END
 
 namespace Client
 {
+    class CMonster;
+
     // 호준 테스트용
     namespace EventTag
     {
-        // 커비가 코인 스타 얻었을 때 발화할 이벤트
         inline constexpr const _tchar* Kirby_PointStarGained = L"Kirby.PointStarGained";
-
-        // 커비 HP 변동이 있을 때 
         inline constexpr const _tchar* Kirby_HP_Updated = L"Kirby.HPUpdated";
-
-        // 커비 능력 변경 시
         inline constexpr const _tchar* Kirby_Ability_Changed = L"Kirby.AbilityChanged";
     }
 
-    typedef struct tagUIRButtonProbe {
-        _float2 vNDC;
-        _bool   bConsumed = false;
-    }UI_RBTN_PROBE;
+    inline constexpr const _tchar* EVT_SWALLOWED = L"OnSwallowed";
 
-    typedef struct tagWorldRButtonDown {
-        _float2 vNDC;
-    }WORLD_RBTN_DOWN;
-
-    enum class EClickHitType { NONE, FLOOR, ANIMAL, ITEMBOX };
-
-    typedef struct tagWorldClickProbe {
-        _float2        vNDC;
-        _vector        vRayOrigin;
-        _vector        vRayDir;
-
-        EClickHitType  eHitType = EClickHitType::NONE;
-        _float         fHitDist = FLT_MAX;
-        CGameObject* pHitObject = nullptr;
-        _int           iHitSubIndex = -1;
-        _float3        vHitPos = {};
-    } WORLD_CLICK_PROBE;
-
-    typedef struct tagWorldHoverProbe {
-        _vector       vRayOrigin;
-        _vector       vRayDir;
-
-        _float        fHitDist = FLT_MAX;
-        CGameObject* pHitObject = nullptr;
-        _int          iHitSubIndex = -1;
-    } WORLD_HOVER_PROBE;
-
-    typedef struct tagSkillInput {
-        _vector vRayOrigin;
-        _vector vRayDir;
-        _bool   bHasRay = false;
-    } SKILL_INPUT;
-
-    typedef struct tagAttack {
-        CGameObject* pVictim = { nullptr };
-        CGameObject* pAttacker = { nullptr };
-        _uint        iDmg = { 0 };
-    }ATTACK_DESC;
-
-    typedef struct tagObjectDiedDesc {
-        CGameObject* pObject = { nullptr };
-    }COMBATANT_DIED_DESC;
-
-    typedef struct tagObjectWillDestroy {
-        CGameObject* pObject = { nullptr };
-    }OBJECT_WILL_DESTROY_DESC;
-
-    typedef struct tagShowItemBoxUI {
-        _uint   iBoxIdx;
-        _uint* pContents;
-    } SHOW_ITEMBOX_UI;
-
-    typedef struct tagInventoryTryAdd {
-        _uint   iItemID;
-        _bool* pSuccess;
-    } INVENTORY_TRY_ADD;
-
-    typedef struct tagPlayerPosProbe {
-        _float3* pOutPos = nullptr;
-        _bool    bFilled = false;
-    } PLAYER_POS_PROBE;
-
-    typedef struct tagCraftStarted {
-        _uint   iResultID;
-        _float  fDuration;
-    } CRAFT_STARTED_DESC;
-
-    typedef struct tagCraftFinished {
-        _uint   iResultID;
-        _bool   bSuccess;
-    } CRAFT_FINISHED_DESC;
-
-    typedef struct tagBossDefeated {
-        CGameObject* pBoss = { nullptr };
-    } BOSS_DEFEATED_DESC;
+    struct SWALLOW_EVENT 
+    { 
+        CMonster* pMonster; 
+    };
 
     typedef struct tagKirbyPointStarGained
     {

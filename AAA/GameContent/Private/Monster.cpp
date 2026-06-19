@@ -4,6 +4,7 @@
 #include "Monster_Movement.h"
 #include "Monster_Brain_FSM.h"
 #include "Monster_State_Idle.h"
+#include "Monster_State_Captured.h"
 #include "Collider.h"
 #include "GameContent_const.h"
 
@@ -19,15 +20,11 @@
 
 CMonster::CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCharacter{ pDevice, pContext }
-	, m_fMaxHP{ 100.f }
-	, m_fCurHP{ 100.f }
 {
 }
 
 CMonster::CMonster(const CMonster& Prototype)
 	: CCharacter ( Prototype )
-	, m_fMaxHP{ Prototype.m_fMaxHP }
-	, m_fCurHP{ Prototype.m_fCurHP }
 {
 }
 
@@ -44,7 +41,7 @@ HRESULT CMonster::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Ready_InteractCollider()))
+	if (FAILED(Ready_Collider()))
 		return E_FAIL;
 
 	SetUp_Collider_CallBack();
@@ -68,12 +65,22 @@ void CMonster::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
 
-	if (m_pInteractCollider && m_pTransformCom)
+	if (m_pInteractCollider)
 	{
 		m_pInteractCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 #ifdef _DEBUG
 		m_pGameInstance_Proxy->Add_DebugComponent(m_pInteractCollider);
 #endif
+	}
+
+	if (m_pHurtBox)
+	{
+		{
+			m_pHurtBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+#ifdef _DEBUG
+			m_pGameInstance_Proxy->Add_DebugComponent(m_pHurtBox);
+#endif
+		}
 	}
 }
 
@@ -146,29 +153,43 @@ MONSTER_STATE_TYPE	CMonster::Get_StateType() const
 	return m_pStateMachine->Get_StateType();
 }
 
-HRESULT CMonster::Ready_InteractCollider()
+HRESULT CMonster::Ready_Collider()
 {
 	_float fRadius;
-
-	if ((fRadius = Get_InteractRadius()) == 0.f)
-		return S_FALSE;
 
 	_float3 vFootPos;
 	XMStoreFloat3(&vFootPos, m_pTransformCom->Get_State(STATE::POSITION));
 
+	if ((fRadius = Get_InteractRadius()) != 0.f)
+	{
+		CCollider::COLLIDER_DESC ColliderDesc{};
+		ColliderDesc.pOwner = this;
+		ColliderDesc.vCenter = vFootPos;
+		ColliderDesc.fRadius = fRadius;
 
-	CCollider::COLLIDER_DESC ColliderDesc{};
-	ColliderDesc.pOwner = this;
-	ColliderDesc.vCenter = vFootPos;
-	ColliderDesc.fRadius = fRadius;
+		m_pInteractCollider = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
+			TEXT("InteractCol_Com"), &ColliderDesc);
+		if (m_pInteractCollider == nullptr)
+			return E_FAIL;
 
-	// HurtBox(Collider)
-	m_pInteractCollider = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
-		TEXT("InteractCol_Com"), &ColliderDesc);
-	if (m_pInteractCollider == nullptr)
-		return E_FAIL;
+		m_pGameInstance_Proxy->Register_Collider(m_pInteractCollider, ETOUI(COLLISION_LAYER::MONSTER_D_RANGE));
+	}
 
-	m_pGameInstance_Proxy->Register_Collider(m_pInteractCollider, ETOUI(COLLISION_LAYER::MONSTER_D_RANGE));
+
+	if ((fRadius = Get_HurtBoxRadius()) != 0.f)
+	{
+		CCollider::COLLIDER_DESC HurtDesc{};
+		HurtDesc.pOwner = this;
+		HurtDesc.vCenter = _float3(vFootPos.x, vFootPos.y + fRadius * 0.5f, vFootPos.z);
+		HurtDesc.fRadius = fRadius;
+
+		m_pHurtBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
+			TEXT("MonHurtBox_Com"), &HurtDesc);
+		if (m_pHurtBox == nullptr)
+			return E_FAIL;
+
+		m_pGameInstance_Proxy->Register_Collider(m_pHurtBox, ETOUI(COLLISION_LAYER::MONSTER_HURT));
+	}
 
 	return S_OK;
 }
@@ -195,6 +216,23 @@ void CMonster::SetUp_Collider_CallBack()
 			OutputDebugStringA(szBuf);
 #endif // _DEBUG
 			});
+	}
+
+	if (m_pHurtBox)
+	{
+		m_pHurtBox->Set_OnEnter([this](CCollider* pOther) {
+			if (ETOUI(COLLISION_LAYER::PLAYER_HURT) == pOther->Get_RegisteredGroup()
+				&& Has_Trait(MT_BODYCHECK_DAMAGE))
+			{
+				_vector vAtkPos = pOther->Get_Owner()->Get_Transform()->Get_State(STATE::POSITION);
+				On_Hit(vAtkPos, 1.f);
+#ifdef _DEBUG
+				char szBuf[128];
+				sprintf_s(szBuf, "[Monster] Hurt! HP %.0f/%.0f\n", m_fCurHP, m_fMaxHP);
+				OutputDebugStringA(szBuf);
+#endif
+			}
+		});
 	}
 
 	return;
@@ -279,7 +317,22 @@ HRESULT CMonster::Ready_State(CMonster_StateMachine* pStateMachine)
 	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CMonster_State_Idle::Create())))
 		return E_FAIL;
 
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create())))
+		return E_FAIL;
+
 	return S_OK;
+}
+
+void CMonster::On_Damaged(_fvector vAttackerPos, _float fDamage)
+{
+	m_pMovement->Knockback(vAttackerPos, 6.f);
+	//Change_State(MONSTER_STATE_TYPE::HIT);
+}
+
+void CMonster::On_Death(_fvector vAttackerPos)
+{
+	m_pMovement->KO(vAttackerPos, 12.f);
+	//Change_State(MONSTER_STATE_TYPE::DEAD);
 }
 
 void CMonster::Perceive(_float fTimeDelta)
@@ -357,6 +410,14 @@ void CMonster::Enable_Controller(_bool bEnable)
 	}
 }
 
+void CMonster::On_Swallowed()
+{
+	SWALLOW_EVENT payload{ this };
+	m_pGameInstance_Proxy->Publish(EVT_SWALLOWED, &payload);
+	m_pCaptor = nullptr;
+	Set_Active(false);
+}
+
 void CMonster::Update_AI(_float fTimeDelta)
 {
 	// 이전 프레임 이동 요청 초기화
@@ -376,12 +437,14 @@ void CMonster::Update_AI(_float fTimeDelta)
 	if (nullptr == m_pMovement)
 		return;
 
-	// State가 만든 이동 방향을 Movement에 적용
 	if (m_pGameInstance_Proxy->Is_EditMode())
 	{
 		m_pMovement->Sync_To_Controller();
 		return;
 	}
+
+	if (Get_StateType() == MONSTER_STATE_TYPE::CAPTURED)
+		return;
 
 	if (m_pMovement->Is_Launched())
 	{

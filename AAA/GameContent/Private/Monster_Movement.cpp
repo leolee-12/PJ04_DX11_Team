@@ -50,6 +50,18 @@ void CMonster_Movement::Launch(_fvector vHorizDir, _float fHorizSpeed, _float fU
 	m_bLaunched = true;
 }
 
+void CMonster_Movement::Knockback(_fvector vAttackerPos, _float fStrength)
+{
+	m_bKO = false;
+	Start_Launch(vAttackerPos, fStrength, 0.6f);
+}
+
+void CMonster_Movement::KO(_fvector vAttackerPos, _float fStrength)
+{
+	m_bKO = true;
+	Start_Launch(vAttackerPos, fStrength, 1.2f);
+}
+
 _bool CMonster_Movement::Update_Launched(_float fTimeDelta)
 {
 	if (nullptr == m_pTransform || nullptr == m_pController)
@@ -74,13 +86,10 @@ _bool CMonster_Movement::Update_Launched(_float fTimeDelta)
 	m_pTransform->Set_State(STATE::POSITION,
 		XMVectorSet((_float)foot.x, (_float)foot.y, (_float)foot.z, 1.f));
 
-	// 4) 착지 : 반사(바운스) 
 	m_bGrounded = flags.isSet(physx::PxControllerCollisionFlag::eCOLLISION_DOWN);
 	if (m_bGrounded && m_fVerticalVelocity < 0.f)
 	{
-		_float fBounceUp = -m_fVerticalVelocity * m_fRestitution;		// 뒤집고 반발계수만큼 감쇠
-
-		if (fBounceUp < m_fBounceStopSpeed)
+		if (m_bKO)
 		{
 			m_fVerticalVelocity = 0.f;
 			m_vHorizVel = {};
@@ -88,8 +97,18 @@ _bool CMonster_Movement::Update_Launched(_float fTimeDelta)
 		}
 		else
 		{
-			m_fVerticalVelocity = fBounceUp;
-			XMStoreFloat3(&m_vHorizVel, XMLoadFloat3(&m_vHorizVel) * m_fBounceFriction);
+			_float fBounceUp = -m_fVerticalVelocity * m_fRestitution;
+			if (fBounceUp < m_fBounceStopSpeed)
+			{
+				m_fVerticalVelocity = 0.f;
+				m_vHorizVel = {};
+				m_bLaunched = false;
+			}
+			else
+			{
+				m_fVerticalVelocity = fBounceUp;
+				XMStoreFloat3(&m_vHorizVel, XMLoadFloat3(&m_vHorizVel) * m_fBounceFriction);
+			}
 		}
 	}
 
@@ -128,6 +147,24 @@ void CMonster_Movement::Apply_Facing(_fvector vFaceDir, _float fTimeDelta)
 		return;				
 	
 	__super::Apply_Facing(vFaceDir, fTimeDelta);
+}
+
+void CMonster_Movement::Start_Launch(_fvector vAttackerPos, _float fStrength, _float fUpRatio)
+{
+	if (nullptr == m_pTransform)
+		return;
+
+	_vector vSelf = m_pTransform->Get_State(STATE::POSITION);
+	_vector vAway = XMVectorSetY(XMVectorSubtract(vSelf, vAttackerPos), 0.f);
+
+	if (XMVectorGetX(XMVector3LengthSq(vAway)) < 1e-6f)
+		vAway = XMVectorNegate(m_pTransform->Get_State(STATE::LOOK));
+
+	vAway = XMVector3Normalize(XMVectorSetY(vAway, 0.f));
+
+	XMStoreFloat3(&m_vHorizVel, vAway * fStrength);    
+	m_fVerticalVelocity = fStrength * fUpRatio;        
+	m_bLaunched = true;
 }
 
 void CMonster_Movement::Free()

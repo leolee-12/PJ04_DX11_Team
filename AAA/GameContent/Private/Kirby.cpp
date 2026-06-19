@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 
 #include "PartObject.h"
+#include "Monster.h"
 
 #include "GameContent_const.h"
 #include "Movement_Child.h"
@@ -17,6 +18,7 @@
 #include "Kirby_StateMachine.h"
 
 // Ability
+#include "Kirby_State.h"
 #include "Kirby_Ability_Normal.h"
 #include "Kirby_Ability_Sword.h"
 
@@ -52,6 +54,8 @@ HRESULT CKirby::Initialize(void* pArg)
 
     if (FAILED(Ready_System()))
         return E_FAIL;
+
+    SetUp_Collider_Callback();
   
     return S_OK;
 }
@@ -66,6 +70,9 @@ void CKirby::Update(_float fTimeDelta)
     XMStoreFloat3(&m_vWishDir, XMVectorZero());
 
     __super::Update(fTimeDelta);
+
+    if (m_fInvincible > 0.f)
+        m_fInvincible -= fTimeDelta;
 
     m_pKirby_InputManager->Update_KirbyInput(fTimeDelta);
     m_pKirby_Controller->Update_KirbyController(fTimeDelta);
@@ -100,6 +107,15 @@ void CKirby::Late_Update(_float fTimeDelta)
         m_pGameInstance_Proxy->Add_DebugComponent(m_pHurtBox);
 #endif
     }
+
+    if (m_pInhaleBox && m_pTransformCom)
+    {
+        m_pInhaleBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+#ifdef _DEBUG
+        if (m_pInhaleBox->Is_Enabled())
+            m_pGameInstance_Proxy->Add_DebugComponent(m_pInhaleBox);
+#endif
+    }
 }
 
 HRESULT CKirby::Render()
@@ -113,7 +129,7 @@ void CKirby::On_Deserialized()
         m_pMovement->Sync_To_Controller();
 }
 
-void CKirby::OnOffParts(KIRBY_ABILITY_TYPE eAbilityType, _bool fOn)
+void CKirby::OnOffParts(COPY_ABILITY_TYPE eAbilityType, _bool fOn)
 {
     auto OnOffPart = [this](const wchar_t* PartTag, _bool bOn)->void
         {
@@ -126,7 +142,7 @@ void CKirby::OnOffParts(KIRBY_ABILITY_TYPE eAbilityType, _bool fOn)
 
     switch (eAbilityType)
     {
-        case KIRBY_ABILITY_TYPE::SWORD:
+        case COPY_ABILITY_TYPE::SWORD:
             OnOffPart(CKirby_Sword::Kirby_PartTag, fOn);
             OnOffPart(CKirby_SwordHat::Kirby_PartTag, fOn);
             break;
@@ -164,7 +180,7 @@ CKirby_Ability* CKirby::Get_KirbyAbility()
     return m_pKirby_Ability;
 }
 
-void CKirby::Set_KirbyAbility(KIRBY_ABILITY_TYPE eAbilityState)
+void CKirby::Set_KirbyAbility(COPY_ABILITY_TYPE eAbilityState)
 {
     auto iter = m_Abilities.find(eAbilityState);
     if (iter == m_Abilities.end())
@@ -226,17 +242,31 @@ HRESULT CKirby::Ready_Components()
     if (m_pHurtBox == nullptr)
         return E_FAIL;
 
-    
-
-    /*if (FAILED(m_pHurtBox->Initialize(&ColliderDesc)))
-        return E_FAIL;*/
-
     m_pGameInstance_Proxy->Register_Collider(m_pHurtBox, ETOUI(COLLISION_LAYER::PLAYER_HURT));
+
+    CCollider::COLLIDER_DESC InhaleDesc{};
+    InhaleDesc.pOwner = this;
+    InhaleDesc.vCenter = _float3(0.f, s_fInhaleUp, s_fInhaleFwd);
+    InhaleDesc.vSize = s_vInhaleSize;
+    InhaleDesc.vRadians = _float3(0.f, 0.f, 0.f);
+
+    m_pInhaleBox = Add_Component<CCollider>(Collider_OBB.iLevelID, Collider_OBB.szProtoTag,
+        TEXT("InhaleBox_Com"), &InhaleDesc);
+    if (m_pInhaleBox == nullptr)
+        return E_FAIL;
+
+    m_pInhaleBox->Set_Enabled(false);
+    m_pGameInstance_Proxy->Register_Collider(m_pInhaleBox, ETOUI(COLLISION_LAYER::PLAYER_INHALE));
+
+    //임시
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HIT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_PROJECTILE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_D_RANGE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+
+
 
     return S_OK;
 }
@@ -245,18 +275,42 @@ void	CKirby::SetUp_Collider_Callback()
 {
     if (m_pHurtBox)
     {
-        //m_pHurtBox->Set_OnEnter([](CCollider* pOther) {
-        //      여기에
+        m_pHurtBox->Set_OnEnter([this](CCollider* pOther) {
+            if (ETOUI(COLLISION_LAYER::MONSTER_HURT) == pOther->Get_RegisteredGroup())
+            {
+                _vector vAtkPos = pOther->Get_Owner()->Get_Transform()->Get_State(STATE::POSITION);
+                On_Hit(vAtkPos, 1.f);
+#ifdef _DEBUG
+                char szBuf[128];
+                sprintf_s(szBuf, "[Kirby] Hurt! HP %.0f/%.0f\n", m_fCurHP, m_fMaxHP);
+                OutputDebugStringA(szBuf);
+#endif
+            }
+            });
+        
+        //m_pHurtBox->Set_OnStay([this](CCollider* pOther) {
+        //      여기에 콜백을
         //    });
         //
-        //m_pHurtBox->Set_OnStay([](CCollider* pOther) {
-        //      콜백을
-        //    });
-        //
-        //m_pHurtBox->Set_OnExit([](CCollider* pOther) {
+        //m_pHurtBox->Set_OnExit([this](CCollider* pOther) {
         //      넣으시오
         //    });
     }
+
+    if (m_pInhaleBox)
+    {
+        m_pInhaleBox->Set_OnStay([this](CCollider* pOther) {   // Stay로 계속 빨려는 대상 잡기
+            if (ETOUI(COLLISION_LAYER::MONSTER_HURT) != pOther->Get_RegisteredGroup())
+                return;
+            CMonster* pMon = static_cast<CMonster*>(pOther->Get_Owner());
+            if (nullptr == pMon || !pMon->Has_Trait(CMonster::MT_INHALABLE))
+                return;
+            if (pMon->Get_StateType() == MONSTER_STATE_TYPE::CAPTURED)   // 이미 잡힘
+                return;
+            pMon->Be_Captured(this);   // captor = 커비
+            });
+    }
+
 }
 
 HRESULT CKirby::Ready_PartObjects()
@@ -311,7 +365,7 @@ HRESULT CKirby::Ready_System()
 
 HRESULT CKirby::Ready_Ability()
 {
-    auto Register_Ability = [this](KIRBY_ABILITY_TYPE eType, CKirby_Ability* pNewAbility) -> HRESULT
+    auto Register_Ability = [this](COPY_ABILITY_TYPE eType, CKirby_Ability* pNewAbility) -> HRESULT
         {
             if (pNewAbility == nullptr)
                 return E_FAIL;
@@ -321,11 +375,11 @@ HRESULT CKirby::Ready_Ability()
             return S_OK;
         };
 
-    if (FAILED(Register_Ability(KIRBY_ABILITY_TYPE::NORMAL, CKirby_Ability_Normal::Create())))            return E_FAIL;
-    if (FAILED(Register_Ability(KIRBY_ABILITY_TYPE::SWORD, CKirby_Ability_Sword::Create())))              return E_FAIL;
+    if (FAILED(Register_Ability(COPY_ABILITY_TYPE::NORMAL, CKirby_Ability_Normal::Create())))            return E_FAIL;
+    if (FAILED(Register_Ability(COPY_ABILITY_TYPE::SWORD, CKirby_Ability_Sword::Create())))              return E_FAIL;
 
 
-    auto iter = m_Abilities.find(KIRBY_ABILITY_TYPE::NORMAL);
+    auto iter = m_Abilities.find(COPY_ABILITY_TYPE::NORMAL);
     if (iter == m_Abilities.end())
         return E_FAIL;
 
@@ -337,6 +391,55 @@ HRESULT CKirby::Ready_Ability()
 HRESULT CKirby::Bind_ShaderResources()
 {
     return S_OK;
+}
+
+HRESULT CKirby::Ready_Events()
+{
+    Subscribe_Event(EVT_SWALLOWED, [this](void* pData) {
+        auto* pEvt = static_cast<SWALLOW_EVENT*>(pData);
+        End_Inhale();
+
+        COPY_ABILITY_TYPE eCopy = (pEvt && pEvt->pMonster)
+            ? pEvt->pMonster->Get_CopyAbility()
+            : COPY_ABILITY_TYPE::NORMAL;
+
+        if (eCopy != COPY_ABILITY_TYPE::NORMAL)
+        {
+            Set_KirbyAbility(eCopy);                       
+            Change_State(KIRBY_STATE_TYPE::GET_ABILITY);   
+        }
+        else
+        {
+            m_pBody->Set_Body(KIRBY_BODY_STATE::STUFFED);
+        }
+        });
+
+    return S_OK;
+}
+
+_bool CKirby::Block_Hit(_fvector vAttackerPos)
+{
+    return m_fInvincible > 0.f;
+}
+
+void CKirby::On_Damaged(_fvector vAttackerPos, _float fDamage)
+{
+    m_fInvincible = s_fInvincibleDur;
+    // TODO: 피격상태 적용 (넉백 + 피격애니매이션 + 능력 떨구기?)
+}
+
+void CKirby::Begin_Inhale()
+{
+    if (m_bInhaling) return;
+    m_bInhaling = true;
+    m_pInhaleBox->Set_Enabled(true);
+}
+
+void CKirby::End_Inhale()
+{
+    if (!m_bInhaling) return;
+    m_bInhaling = false;
+    m_pInhaleBox->Set_Enabled(false);
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

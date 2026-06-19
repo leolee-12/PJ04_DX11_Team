@@ -24,7 +24,7 @@ class CKirby_StateMachine;
 class CKirby_Ability;
 
 enum class KIRBY_STATE_TYPE;
-enum class KIRBY_ABILITY_TYPE;
+enum class COPY_ABILITY_TYPE;
 
 class CKirby_Body;
 
@@ -54,6 +54,12 @@ public:
 	static constexpr _float s_fMaxHorizontalSpeed = 8.f;
 	static constexpr _float s_fHoveringMaxHorizontalSpeed = 4.f;
 
+	// À±¼®Çö Ãß°¡ 
+	static constexpr _float s_fInvincibleDur = 2.f;
+	static constexpr _float s_fInhaleFwd = 1.8f;
+	static constexpr _float s_fInhaleUp = 0.5f;
+	static constexpr _float3 s_vInhaleSize = _float3(2.f, 2.f, 4.f);
+
 private:
 	CKirby(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
 	CKirby(const CKirby& Prototype);
@@ -78,7 +84,7 @@ public:
 
 	// Part
 	CKirby_Body* Get_Body() { return m_pBody; }
-	void OnOffParts(KIRBY_ABILITY_TYPE eAbilityType, _bool fOn);
+	void OnOffParts(COPY_ABILITY_TYPE eAbilityType, _bool fOn);
 
 public:
 	// Movement
@@ -92,7 +98,7 @@ public:
 	void Change_State(KIRBY_STATE_TYPE eNewState);
 
 	CKirby_Ability* Get_KirbyAbility();
-	void Set_KirbyAbility(KIRBY_ABILITY_TYPE eAbilityState);
+	void Set_KirbyAbility(COPY_ABILITY_TYPE eAbilityState);
 
 public:
 	// Ability Dump
@@ -101,6 +107,10 @@ public:
 	_bool Can_AbilityDump();
 	void Req_AbilityDumpCoolDecrease() { m_bDecreaseAbilityDumpCool = true; }
 
+public: // À±¼®Çö Ãß°¡
+	void Begin_Inhale();
+	void End_Inhale();
+
 private:
 	HRESULT Ready_Components();
 	void	SetUp_Collider_Callback();
@@ -108,6 +118,11 @@ private:
 	HRESULT Ready_System();
 	HRESULT Ready_Ability();
 	HRESULT Bind_ShaderResources();
+	virtual HRESULT Ready_Events() override;
+
+	// À±¼®Çö Ãß°¡
+	virtual _bool Block_Hit(_fvector vAttackerPos) override;
+	virtual void  On_Damaged(_fvector vAttackerPos, _float fDamage) override;
 
 private:
 	CKirby_Body* m_pBody{};
@@ -118,7 +133,12 @@ private:
 	_float3 m_vWishDir{};
 	_bool m_RotationLock{};
 
+	//À±¼®Çö Ãß°¡
 	CCollider* m_pHurtBox = { nullptr };
+	CCollider* m_pInhaleBox = { nullptr };
+	_bool	   m_bInhaling = { false };
+	_float	   m_fInvincible = { 0.f };
+
 
 private:
 	CKirby_InputManager*	m_pKirby_InputManager{};
@@ -126,7 +146,7 @@ private:
 	CKirby_StateMachine*	m_pKirby_StateMachine{};
 	CKirby_Ability*			m_pKirby_Ability{};
 
-	unordered_map<KIRBY_ABILITY_TYPE, CKirby_Ability*> m_Abilities;
+	unordered_map<COPY_ABILITY_TYPE, CKirby_Ability*> m_Abilities;
 
 private:
 	_float m_fAccAbilityDumpCoolTime{};
