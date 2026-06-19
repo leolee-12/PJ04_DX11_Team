@@ -30,8 +30,7 @@ HRESULT CEnvironment_Manager::Load_Cube(const _tchar* pPath, ID3D11ShaderResourc
     return S_OK;
 }
 
-HRESULT CEnvironment_Manager::Register(const _wstring& strTag, const _tchar* pDiffuseDDS, const _tchar* pSpecularDDS,
-    _float fIntensity)
+HRESULT CEnvironment_Manager::Register(const _wstring& strTag, const _tchar* pDiffuseDDS, const _tchar* pSpecularDDS, const _tchar* pLUTDDS, _float fIntensity)
 {
     if (m_Registry.find(strTag) != m_Registry.end())
         return S_OK; // 이미 등록됨
@@ -48,6 +47,14 @@ HRESULT CEnvironment_Manager::Register(const _wstring& strTag, const _tchar* pDi
         return E_FAIL;
     }
     desc.iSpecularMip = iMipSpec;
+
+    if (pLUTDDS)   // LUT은 3D라 Load_Cube(밉카운트) 말고 직접 로드
+    {
+        ID3D11Resource* pRes = nullptr;
+        if (FAILED(DirectX::CreateDDSTextureFromFile(m_pDevice, pLUTDDS, &pRes, &desc.pColorGradeLUT)))
+            return E_FAIL;
+        Safe_Release(pRes);
+    }
 
     m_Registry.emplace(strTag, desc);
 
@@ -86,6 +93,7 @@ void CEnvironment_Manager::Free()
     {
         Safe_Release(Pair.second.pDiffuseSRV);
         Safe_Release(Pair.second.pSpecularSRV);
+        Safe_Release(Pair.second.pColorGradeLUT);
     }
     m_Registry.clear();
 

@@ -9,7 +9,7 @@ NS_BEGIN(Client)
 class CMonster;
 class CMonster_State;
 
-class CLIENT_DLL CMonster_StateMachine final : public CBase
+class CMonster_StateMachine final : public CBase
 {
 private:
 	CMonster_StateMachine();
@@ -22,8 +22,11 @@ public:
 	MONSTER_STATE_TYPE				Get_StateType();
 
 public:
-	void							Change_State(MONSTER_STATE_TYPE eNewState);
 	void							Update_StateMachine(_float fTimeDelta);
+
+	_bool							Change_State(MONSTER_STATE_TYPE eNewState);
+	HRESULT							Register_State(MONSTER_STATE_TYPE eType, CMonster_State* pState);
+	_bool							Has_State(MONSTER_STATE_TYPE eType) const;
 
 private:
 	CMonster*						m_pMonster = { nullptr };
@@ -32,7 +35,6 @@ private:
 	unordered_map<MONSTER_STATE_TYPE, CMonster_State*> m_States;
 
 private:
-	HRESULT							Init_State();
 	CMonster_State*					Find_State(MONSTER_STATE_TYPE eNewState);
 
 public:

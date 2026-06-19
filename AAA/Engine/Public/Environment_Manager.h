@@ -17,8 +17,7 @@ private:
 
 public:
     // 부팅: 태그로 큐브맵 세트 로드+등록. 같은 태그 재등록은 무시.
-    HRESULT Register(const _wstring& strTag, const _tchar* pDiffuseDDS, const _tchar* pSpecularDDS, _float fIntensity
-        = 1.f);
+    HRESULT Register(const _wstring& strTag, const _tchar* pDiffuseDDS, const _tchar* pSpecularDDS, const _tchar* pLUTDDS, _float fIntensity = 1.f);
 
     // 맵 진입: O(1) 스왑. 없는 태그면 디폴트 유지 + E_FAIL.
     HRESULT Set_Current(const _wstring& strTag);

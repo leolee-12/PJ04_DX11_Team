@@ -22,6 +22,7 @@ private:
 
 public:
     virtual HRESULT Initialize_Prototype() override;
+    virtual HRESULT Initialize(void* pArg) override;
 
 public:
     virtual void    Priority_Update(_float fTimeDelta) override;
@@ -46,13 +47,18 @@ public:
 protected:
     virtual HRESULT        Ready_Parts() override;
     virtual CMonsterBrain* Create_Brain() override;
+    virtual const _tchar*  Get_AppearEventTag() const override { return TEXT("GigantEdge_Appear"); }
+
     virtual void           Play_Intro() override;
     virtual _bool          Is_Intro_Finished() const override;
-    virtual const _tchar* Get_AppearEventTag() const override { return TEXT("GigantEdge_Appear"); }
+    virtual void           Play_Death() override;
+    virtual void           Play_DeathLoop() override;
+    virtual _bool          Is_Death_Finished() const override;
 
-    virtual _float Get_CapsuleRadius() const override { return s_fCCT_Radius; }
-    virtual _float Get_CapsuleHeight() const override { return s_fCCT_Height; }
-    virtual void   Play_StateAnimation(MONSTER_STATE_TYPE) override {}
+    virtual _float         Get_CapsuleRadius() const override { return s_fCCT_Radius; }
+    virtual _float         Get_CapsuleHeight() const override { return s_fCCT_Height; }
+    virtual _float		   Get_InteractRadius() const override { return 0.f; }
+    virtual void           Play_StateAnimation(MONSTER_STATE_TYPE) override {}
 
 private:
     CGigantEdge_Body* m_pBody = { nullptr };
@@ -61,6 +67,19 @@ private:
 
     _bool m_bGuarding = { false };
     _bool m_bGroggyRequested = { false };
+
+#ifdef _DEBUG
+public:
+    _bool Dbg_ForceInRange()  const { return m_bDbgInRange; }
+    _bool Dbg_WalkInPlace()   const { return m_bDbgWalkInPlace; }
+    _int  Dbg_ForceAttack()   const { return m_iDbgAttack; }
+
+private:
+    void  Debug_KeyInput();
+    _bool m_bDbgInRange     = { false };
+    _bool m_bDbgWalkInPlace = { true };
+    _int  m_iDbgAttack      = { -1 };
+#endif
 
 public:
     static CGigantEdge* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

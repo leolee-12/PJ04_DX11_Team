@@ -14,44 +14,43 @@ NS_BEGIN(Client)
 // moss/dirt 같은 구조물별 레이어는 파생에서 Bind_MeshLayers 오버라이드로 추가.
 class CLIENT_DLL CMapObject abstract : public CGameObject
 {
-    GENERATED_BODY_ABSTRACT(CMapObject)
-
-    // 공통 PBR 파라미터 (에디터 노출)
-    PROPERTY(_float, m_fNormalStrength, L"Normal Strength", L"Map")
-    PROPERTY(_float2, m_vBaseUVScale, L"Base UV Scale", L"Map")
-    PROPERTY(_bool, m_bTopProjection, L"Top Projection", L"Map")
+	GENERATED_BODY_ABSTRACT(CMapObject)
 
 protected:
-    CMapObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-    CMapObject(const CMapObject& Prototype);
-    virtual ~CMapObject() = default;
+	CMapObject(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
+	CMapObject(const CMapObject& Prototype);
+	virtual ~CMapObject() = default;
 
 public:
-    virtual HRESULT Initialize_Prototype() override;
-    virtual HRESULT Initialize(void* pArg) override;
-    virtual void    Priority_Update(_float fTimeDelta) override;
-    virtual void    Update(_float fTimeDelta) override;
-    virtual void    Late_Update(_float fTimeDelta) override;
-    virtual HRESULT Render() override;
+	virtual HRESULT Initialize_Prototype() override;
+	virtual HRESULT Initialize(void* pArg) override;
+	virtual void    Priority_Update(_float fTimeDelta) override;
+	virtual void    Update(_float fTimeDelta) override;
+	virtual void    Late_Update(_float fTimeDelta) override;
+	virtual HRESULT Render() override;
 
 protected:
-    CShader* m_pShaderCom = { nullptr };
-    CModel* m_pModelCom = { nullptr };
+	CShader* m_pShaderCom = { nullptr };
+	CModel* m_pModelCom = { nullptr };
 
-    // 파생이 바꾸는 지점
-    virtual const _tchar* Get_ModelProtoTag() const = 0;   // 구조물별 .ysh 모델 프로토타입
-    virtual _uint Get_ModelProtoLevel() const = 0;
-    virtual void  Bind_MeshLayers(_uint iMesh) {}          // 베이스: no-op(순수 PBR)
-    virtual _bool Is_OverlayMesh(_uint iMesh) const;       // 기본: 이름에 "Parts"
-    virtual HRESULT Bind_WorldMatrix();
+	// 파생이 바꾸는 지점
+	virtual const _tchar* Get_ModelProtoTag() const = 0;   // 구조물별 .ysh 모델 프로토타입
+	virtual _uint Get_ModelProtoLevel() const = 0;
+	virtual void  Bind_MeshLayers(_uint iMesh) {}          // 베이스: no-op(순수 PBR)
+	virtual HRESULT Bind_WorldMatrix();
 
 protected:
-    virtual HRESULT Ready_Events() override { return S_OK; }
-    HRESULT Ready_MapComponents();
-    HRESULT Bind_ShaderResources();
+	virtual HRESULT Ready_Events() override { return S_OK; }
+	HRESULT Ready_MapComponents();
+	HRESULT Bind_ShaderResources();
+
+	HRESULT Bind_MapMeshParams(_uint iMesh, const MESH_LAYER_IDX& Layer);
+	HRESULT Bind_MapMeshTextures(_uint iMesh, const MESH_LAYER_IDX& Layer);
+	HRESULT Bind_MapTextureSafe(_uint iMesh, const _char* pName, MTEX_TYPE eType, _uint iSlot, DEFAULT_TEXTURE eDefault);
+	HRESULT Bind_MapExtraSlotSafe(_uint iMesh, const _char* pName, int iSlot, MTEX_TYPE eType, DEFAULT_TEXTURE eDefault);
 
 public:
-    virtual void Free() override;
+	virtual void Free() override;
 };
 
 NS_END

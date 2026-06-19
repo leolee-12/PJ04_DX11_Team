@@ -19,6 +19,7 @@
 #include "UI_Eraser.h"
 #include "UI_CurtainTexture.h"
 #include "Env_InstanceController.h"
+#include "Collider.h"
 
 
 NS_BEGIN(Client)
@@ -56,13 +57,31 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
             return E_FAIL;
     }
 
+    if (FAILED(pProxy->Add_Prototype(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
+        CCollider::Create(pDevice, pContext, COLLIDER::SPHERE))))
+        return E_FAIL;
+
+    if (FAILED(pProxy->Add_Prototype(Collider_AABB.iLevelID, Collider_AABB.szProtoTag,
+        CCollider::Create(pDevice, pContext, COLLIDER::AABB))))
+        return E_FAIL;
+
+    if (FAILED(pProxy->Add_Prototype(Collider_OBB.iLevelID, Collider_OBB.szProtoTag,
+        CCollider::Create(pDevice, pContext, COLLIDER::OBB))))
+        return E_FAIL;
+
     static const ENV_ENTRY g_EnvTable[] = {
-      { TEXT("Field"), TEXT("../../Resources/YSH/Env/Field_Diffuse.dds"), TEXT("../../Resources/YSH/Env/Field_Specular.dds"), 0.5f },
+      { 
+        TEXT("Grass"), 
+        TEXT("../../Resources/YSH/Env/IBL/Grass/Diffuse.dds"), 
+        TEXT("../../Resources/YSH/Env/IBL/Grass/Specular.dds"),
+        TEXT("../../Resources/YSH/Env/LUT/Grass01.dds"),
+        3.f 
+      },
         // 맵 추가 = 행 추가
     };
 
     for (auto& e : g_EnvTable)
-        pProxy->Register_Environment(e.tag, e.diff, e.spec, e.intensity);
+        pProxy->Register_Environment(e.tag, e.diff, e.spec, e.lut, e.intensity);
 
 
     //sky Sphere
@@ -97,6 +116,10 @@ HRESULT Ready_Prototype_Shaders(CGameInstance_Proxy* pProxy, ID3D11Device* pDevi
 
     if (FAILED(pProxy->Add_Prototype(Shader_Map.iLevelID, Shader_Map.szProtoTag,
         CShader::Create(pDevice, pContext, Shader_Map.szFileTag, VTXMAPMESH::Elements, VTXMAPMESH::iNumElements))))
+        return E_FAIL;
+
+    if (FAILED(pProxy->Add_Prototype(Shader_MapEx.iLevelID, Shader_MapEx.szProtoTag,
+        CShader::Create(pDevice, pContext, Shader_MapEx.szFileTag, VTXMAPMESH::Elements, VTXMAPMESH::iNumElements))))
         return E_FAIL;
 
     if (FAILED(pProxy->Add_Prototype(Shader_EnvInstance.iLevelID, Shader_EnvInstance.szProtoTag,

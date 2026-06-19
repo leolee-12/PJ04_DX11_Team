@@ -24,7 +24,7 @@ xcopy			/y /D /s	.\GameContent\ShaderFiles\*.*				.\Editor\Bin\ShaderFiles\
 xcopy			/y /D		.\Engine\Bin\*.dll							.\AnimUITool\Bin\
 xcopy			/y /D		.\Engine\ThirdPartyLib\*.dll				.\AnimUITool\Bin\
 xcopy			/y /D		.\GameContent\Bin\*.dll						.\AnimUITool\Bin\
-xcopy			/y /D /s   .\GameContent\ShaderFiles\*.*				.\AnimUITool\Bin\ShaderFiles\
+xcopy			/y /D /s    .\GameContent\ShaderFiles\*.*				.\AnimUITool\Bin\ShaderFiles\
 
 
 xcopy			/y /D		.\Engine\Bin\*.dll							.\MapTool\Bin\

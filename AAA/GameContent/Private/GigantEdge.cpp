@@ -6,6 +6,7 @@
 #include "GigantEdge_Shield.h"
 #include "GigantEdge_Brain.h"
 #include "Animator.h"
+#include "Monster_Movement.h"
 
 CGigantEdge::CGigantEdge(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMiniBoss(pDevice, pContext) {
@@ -14,14 +15,61 @@ CGigantEdge::CGigantEdge(const CGigantEdge& Prototype)
     : CMiniBoss(Prototype) {
 }
 
-HRESULT CGigantEdge::Initialize_Prototype() { return S_OK; }
+HRESULT CGigantEdge::Initialize_Prototype() 
+{ 
+    return S_OK;
+}
 
-void CGigantEdge::Priority_Update(_float fTimeDelta) { __super::Priority_Update(fTimeDelta); }
-void CGigantEdge::Update(_float fTimeDelta) { __super::Update(fTimeDelta); }  
-void CGigantEdge::Late_Update(_float fTimeDelta) { __super::Late_Update(fTimeDelta); }
-HRESULT CGigantEdge::Render() { return S_OK; }
-void CGigantEdge::On_Deserialized() { __super::On_Deserialized(); }
+HRESULT CGigantEdge::Initialize(void* pArg)
+{
+    if (FAILED(__super::Initialize(pArg)))
+        return E_FAIL;
 
+    return S_OK;
+}
+
+void CGigantEdge::Priority_Update(_float fTimeDelta) 
+{ 
+    if (!m_bActive)
+        return;
+
+    __super::Priority_Update(fTimeDelta); 
+}
+
+void CGigantEdge::Update(_float fTimeDelta) 
+{ 
+#ifdef _DEBUG
+    if (m_pGameInstance_Proxy->Is_EditMode())
+    {
+        m_pMovement->Sync_To_Controller();
+        return;
+    }
+
+    Debug_KeyInput();
+#endif
+    if (!m_bActive)
+        return;
+
+    __super::Update(fTimeDelta); 
+}  
+
+void CGigantEdge::Late_Update(_float fTimeDelta) 
+{
+    if (!m_bActive)
+        return;
+
+    __super::Late_Update(fTimeDelta); 
+}
+
+HRESULT CGigantEdge::Render() 
+{ 
+    return S_OK; 
+}
+
+void CGigantEdge::On_Deserialized() 
+{ 
+    __super::On_Deserialized(); 
+}
 
 CMonsterBrain* CGigantEdge::Create_Brain()
 {
@@ -30,12 +78,45 @@ CMonsterBrain* CGigantEdge::Create_Brain()
 
 void CGigantEdge::Play_Intro()
 {
-    m_pBody->Get_Animator()->Play("Intro", false, true);
+    m_pBody->Get_Animator()->Play("Anger", false, true);
 }
 _bool CGigantEdge::Is_Intro_Finished() const
 {
     return m_pBody->Get_Animator()->Is_Finished();
 }
+
+void CGigantEdge::Play_Death()
+{
+    m_pBody->Get_Animator()->Play("DeathStart", false, true, 0.2f, 2.f);
+}
+
+void CGigantEdge::Play_DeathLoop()
+{
+    m_pBody->Get_Animator()->Play("DeathEndWait", true, true);
+}
+
+_bool CGigantEdge::Is_Death_Finished() const
+{
+    return m_pBody->Get_Animator()->Is_Finished();
+}
+
+#ifdef _DEBUG
+void CGigantEdge::Debug_KeyInput()
+{
+    if (nullptr == m_pGameInstance_Proxy)
+        return;
+
+    if (m_pGameInstance_Proxy->Key_Down(DIK_0)) Appear();                          // HIDDEN→INTRO→ACTIVE
+    if (m_pGameInstance_Proxy->Key_Down(DIK_G)) m_bGroggyRequested = true;         // 그로기 분기 진입
+    if (m_pGameInstance_Proxy->Key_Down(DIK_R)) m_bDbgInRange = !m_bDbgInRange;    // 사거리 토글 (공격↔추격)
+    if (m_pGameInstance_Proxy->Key_Down(DIK_M)) m_bDbgWalkInPlace = !m_bDbgWalkInPlace;
+    if (m_pGameInstance_Proxy->Key_Down(DIK_X)) Die();
+    if (m_pGameInstance_Proxy->Key_Down(DIK_1)) m_iDbgAttack = 0;                  // Slam 고정
+    if (m_pGameInstance_Proxy->Key_Down(DIK_2)) m_iDbgAttack = 1;                  // Charge 고정
+    if (m_pGameInstance_Proxy->Key_Down(DIK_3)) m_iDbgAttack = 2;                  // Swing 고정
+    if (m_pGameInstance_Proxy->Key_Down(DIK_4)) m_iDbgAttack = -1;                 // 랜덤 복귀
+}
+#endif
 
 CGigantEdge* CGigantEdge::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
@@ -70,21 +151,23 @@ void CGigantEdge::Free()
 
 void CGigantEdge::On_Hit(_fvector vAttackerPos, _float fDamage)
 {
-    if (!Is_Active()) return;           
-
-    m_fCurHP -= fDamage;
-    if (m_fCurHP <= 0.f) { m_fCurHP = 0.f; /* TODO: 사망 처리 */ return; }
+    if (!Is_Active()) return;
 
     if (m_bGuarding)
     {
         _vector vForward = XMVector3Normalize(m_pTransformCom->Get_State(STATE::LOOK));
         _vector vToAtk = XMVector3Normalize(vAttackerPos - m_pTransformCom->Get_State(STATE::POSITION));
-        if (XMVectorGetX(XMVector3Dot(vForward, vToAtk)) < 0.f)   
-        {
-            m_bGuarding = false;
-            m_bGroggyRequested = true;
-        }
+        _bool   bFromBack = (XMVectorGetX(XMVector3Dot(vForward, vToAtk)) < 0.f);
+
+        if (!bFromBack)
+            return;   
+
+        m_bGuarding = false;
+        m_bGroggyRequested = true;
     }
+
+    m_fCurHP -= fDamage;
+    if (m_fCurHP <= 0.f) { m_fCurHP = 0.f; /* TODO: 사망 처리 */ }
 }
 
 HRESULT CGigantEdge::Ready_Parts()

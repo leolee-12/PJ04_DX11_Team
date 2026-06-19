@@ -8,7 +8,7 @@ NS_BEGIN(Client)
 
 class CMonster;
 
-class CLIENT_DLL CMonster_State abstract : public CBase
+class CMonster_State abstract : public CBase
 {
 protected:
 	CMonster_State();

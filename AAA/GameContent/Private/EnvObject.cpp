@@ -298,6 +298,50 @@ _bool XM_CALLCONV CEnvObject::Pick_Ray(_fvector vOrigin, _fvector vDir, _float3*
 	return true;
 }
 
+_bool CEnvObject::Pick_Marb1e(_fvector vRayOrigin, _fvector vRayDir, _float3* pOutHit, _float* fOutDistance)
+{
+	if (!m_pModelCom)
+		return false;
+
+	_float3 closestHit = {};
+	float   closestDist = FLT_MAX;
+	bool    bHit = false;
+
+	_fmatrix WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+	float   dist = 0.f;
+
+
+	_uint iCountMeshes = (_uint)m_pModelCom->Get_NumMeshes();
+
+	for (_uint i = 0; i < iCountMeshes; ++i)
+	{
+		_float3 hit = {};
+
+		if (m_pModelCom->Pick_Mesh(i, vRayOrigin, vRayDir, WorldMatrix, &hit, &dist))
+		{
+			string dbg = "HIT Mesh[" + to_string(i) + "]: "
+				+ m_pModelCom->Get_MeshName(i) + "\n";
+			OutputDebugStringA(dbg.c_str());
+
+			if (dist < closestDist)
+			{
+				closestDist = dist;
+				closestHit = hit;
+				bHit = true;
+			}
+		}
+	}
+
+	if (bHit && pOutHit)
+		*pOutHit = closestHit;
+
+	if (dist && fOutDistance)
+		*fOutDistance = closestDist;
+
+	return bHit;
+}
+
 HRESULT CEnvObject::Ready_RenderComponents(_uint iModelProtoLevel, const wstring& wstrModelProtoTag)
 {
 	if (wstrModelProtoTag.empty())

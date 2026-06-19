@@ -3,7 +3,7 @@
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL CMonster_State_Idle final : public CMonster_State
+class CMonster_State_Idle final : public CMonster_State
 {
 private:
 	CMonster_State_Idle();

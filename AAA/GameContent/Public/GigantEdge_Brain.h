@@ -8,7 +8,7 @@ NS_END
 NS_BEGIN(Client)
 class CGigantEdge;
 
-class CLIENT_DLL CGigantEdge_Brain final : public CMonsterBrain
+class CGigantEdge_Brain final : public CMonsterBrain
 {
 private:
     CGigantEdge_Brain() = default;

@@ -5,7 +5,6 @@
 #include "Panel_Palette.h"
 #include "Panel_Viewport.h"
 #include "Panel_Inspector.h"
-#include "Panel_Console.h"
 #ifdef _DEBUG
 #include "Panel_Profiler.h"
 #endif
@@ -27,7 +26,6 @@ HRESULT CPanel_Manager::Initialize()
 	if (FAILED(Add_Panel(L"Palette", CPanel_Palette::Create(m_pDevice, m_pContext))))   return E_FAIL;
 	if (FAILED(Add_Panel(L"Viewport", CPanel_Viewport::Create(m_pDevice, m_pContext))))  return E_FAIL;
 	if (FAILED(Add_Panel(L"Inspector", CPanel_Inspector::Create(m_pDevice, m_pContext)))) return E_FAIL;
-	if (FAILED(Add_Panel(L"Console", CPanel_Console::Create(m_pDevice, m_pContext))))   return E_FAIL;
 #ifdef _DEBUG
 	if (FAILED(Add_Panel(L"Profiler", CPanel_Profiler::Create(m_pDevice, m_pContext))))  return E_FAIL;
 #endif
@@ -112,21 +110,21 @@ void CPanel_Manager::Render_DockSpace()
 		ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
 		ImGui::DockBuilderSetNodeSize(dockspace_id, vp->WorkSize);
 
-		ImGuiID top, rest, left, leftBottom, center, right, bottom;
-		ImGui::DockBuilderSplitNode(dockspace_id,	ImGuiDir_Up,	0.125f,	&top, &rest);
-		ImGui::DockBuilderSplitNode(rest,			ImGuiDir_Left,	0.200f,	&left, &center);
-		ImGui::DockBuilderSplitNode(center,			ImGuiDir_Right,	0.200f,	&right, &center);
-		ImGui::DockBuilderSplitNode(center,			ImGuiDir_Down,	0.125f,	&bottom, &center);
-		ImGui::DockBuilderSplitNode(left,			ImGuiDir_Down,	0.200f,	&leftBottom, &left);
+		ImGuiID mainArea, leftColumn, centerColumn, rightColumn;
+		ImGuiID hierarchyNode, paletteNode, viewportNode, bottomToolsNode;
 
-		ImGui::DockBuilderDockWindow("Toolbar", top);
-		ImGui::DockBuilderDockWindow("Hierarchy", left);
-		ImGui::DockBuilderDockWindow("Palette", leftBottom);
-		ImGui::DockBuilderDockWindow("Viewport", center);
-		ImGui::DockBuilderDockWindow("Inspector", right);
-		ImGui::DockBuilderDockWindow("Console", bottom);
+		ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.36f, &rightColumn, &mainArea);
+		ImGui::DockBuilderSplitNode(mainArea, ImGuiDir_Left, 0.18f, &leftColumn, &centerColumn);
+		ImGui::DockBuilderSplitNode(leftColumn, ImGuiDir_Down, 0.45f, &paletteNode, &hierarchyNode);
+		ImGui::DockBuilderSplitNode(centerColumn, ImGuiDir_Down, 0.34f, &bottomToolsNode, &viewportNode);
+
+		ImGui::DockBuilderDockWindow("Hierarchy", hierarchyNode);
+		ImGui::DockBuilderDockWindow("Palette", paletteNode);
+		ImGui::DockBuilderDockWindow("Viewport", viewportNode);
+		ImGui::DockBuilderDockWindow("Toolbar", bottomToolsNode);
+		ImGui::DockBuilderDockWindow("Inspector", rightColumn);
 #ifdef _DEBUG
-		ImGui::DockBuilderDockWindow("Profiler", left);
+		ImGui::DockBuilderDockWindow("Profiler", hierarchyNode);
 #endif
 		ImGui::DockBuilderFinish(dockspace_id);
 	}
