@@ -32,27 +32,35 @@ public:
 		ID3D11Device* pDevice,
 		ID3D11DeviceContext* pContext,
 		const _wstring& strManifestPath,
-		_uint iRuntimeLevel);
+		_uint iRuntimeLevel,
+		const MAP_LOAD_OPTIONS& Options = MAP_LOAD_OPTIONS{});
 
 	static HRESULT Preload_Map(
 		ID3D11Device* pDevice,
 		ID3D11DeviceContext* pContext,
 		const _wstring& strFallbackManifestPath,
 		const _wstring& strLevelObjectsPath,
-		_uint iRuntimeLevel);
+		_uint iRuntimeLevel,
+		const MAP_LOAD_OPTIONS& Options = MAP_LOAD_OPTIONS{});
 
 	static HRESULT Spawn_Map(
+		ID3D11Device* pDevice,
+		ID3D11DeviceContext* pContext,
 		const _wstring& strManifestPath,
 		_uint iRuntimeLevel,
 		MAP_LOAD_RESULT* pOutReport = nullptr,
-		CMapStage** ppOutStage = nullptr);
+		CMapStage** ppOutStage = nullptr,
+		const MAP_LOAD_OPTIONS& Options = MAP_LOAD_OPTIONS{});
 
 	static HRESULT Spawn_Map(
+		ID3D11Device* pDevice,
+		ID3D11DeviceContext* pContext,
 		const _wstring& strFallbackManifestPath,
 		const _wstring& strLevelObjectsPath,
 		_uint iRuntimeLevel,
 		MAP_LOAD_RESULT* pOutReport = nullptr,
-		CMapStage** ppOutStage = nullptr);
+		CMapStage** ppOutStage = nullptr,
+		const MAP_LOAD_OPTIONS& Options = MAP_LOAD_OPTIONS{});
 
 	static HRESULT Load_Map(
 		ID3D11Device* pDevice,
@@ -60,7 +68,8 @@ public:
 		const _wstring& strManifestPath,
 		_uint iRuntimeLevel,
 		MAP_LOAD_RESULT* pOutReport = nullptr,
-		CMapStage** ppOutStage = nullptr);
+		CMapStage** ppOutStage = nullptr,
+		const MAP_LOAD_OPTIONS& Options = MAP_LOAD_OPTIONS{});
 
 	static HRESULT Load_MapStage_Runtime(
 		const MAP_RUNTIME_LOAD_CONTEXT& Context,
@@ -76,6 +85,11 @@ public:
 		MAP_LOAD_RESULT* pOutReport = nullptr,
 		vector<ENV_OBJECT_DESC>* pOutDeletedEnvDescs = nullptr,
 		_bool bEnableEnvObjectPicking = false);
+
+	static HRESULT Load_LevelDesign_Runtime(
+		const MAP_RUNTIME_LOAD_CONTEXT& Context,
+		const _wstring& strMapManifestPath,
+		MAP_LOAD_RESULT* pOutReport = nullptr);
 
 	static _uint			Get_MapCount();
 	static const _char*		Get_MapName(_uint iMapIndex);
@@ -102,8 +116,18 @@ private:
 		const _wstring& strManifestPath,
 		const MAP_RUNTIME_LEVELS& Levels,
 		const MAP_SPAWN_TARGETS& Targets,
+		const MAP_LOAD_OPTIONS& Options,
 		MAP_LOAD_RESULT* pOutReport = nullptr,
 		CMapStage** ppOutStage = nullptr);
+
+	HRESULT Preload_LevelDesignEntries(
+		const MAP_PACKAGE& Package,
+		const MAP_RUNTIME_LEVELS& Levels);
+
+	HRESULT Load_LevelDesignEntries(
+		const MAP_PACKAGE& Package,
+		const MAP_SPAWN_REQUEST& Request,
+		MAP_LOAD_RESULT* pOutReport = nullptr);
 
 	HRESULT Build_Package(const _wstring& strManifestPath, MAP_PACKAGE* pOutPackage);
 	HRESULT Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, const MAP_PACKAGE& Package);

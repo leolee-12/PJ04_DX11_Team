@@ -404,6 +404,43 @@ PS_OUT PS_UMN(PS_NONINST_IN In)
     return PS_UMN_SAMPLE(In, In.vTexcoord);
 }
 
+PS_OUT PS_DMNU(PS_NONINST_IN In)
+{
+    PS_OUT Out = PS_DIFF_SAMPLE(In, In.vTexcoord);
+	
+    return Out;
+}
+
+PS_OUT PS_TREESHADOW(PS_NONINST_IN In)
+{
+    PS_OUT Out = PS_DIFF_SAMPLE(In, In.vTexcoord);
+	
+    return Out;
+}
+
+PS_OUT PS_GRASS_FUR(PS_NONINST_IN In)
+{
+    PS_OUT Out = PS_DIFF_SAMPLE(In, In.vTexcoord);
+	
+    return Out;
+}
+
+PS_OUT PS_MN(PS_NONINST_IN In)
+{
+    Apply_Dither_IfNeeded(In.vPosition);
+	
+    PS_OUT Out;
+
+    float3 vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
+
+    Out.vDiffuse = vector(0.294f, 0.424f, 0.235f, 1.f);
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(vMRA, g_iMaterialID / 255.f);
+    Out.vEmissive = vector(0.f, 0.f, 0.f, 0.f);
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass DefaultPass // 0
@@ -496,5 +533,45 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_NONINST_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_UMN();
+    }
+    pass DMNU_Pass // 9
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_NONINST_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DMNU();
+    }
+    pass TREESHADOW_Pass // 10
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_NONINST_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_TREESHADOW();
+    }
+    pass GRASS_FUR_Pass // 11
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_NONINST_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_GRASS_FUR();
+    }
+    pass MN_Pass // 12
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_NONINST_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MN();
     }
 }

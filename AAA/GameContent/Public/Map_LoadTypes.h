@@ -1,6 +1,7 @@
 #pragma once
 #include "Map_Defines.h"
 #include "EnvObject_Defines.h"
+#include "LevelDesign_LoadTypes.h"
 
 NS_BEGIN(Engine)
 class CGameObject;
@@ -18,6 +19,7 @@ struct MAP_MANIFEST_DESC
 	vector<MAP_SECTION_TYPE> SectionTypes;
 	vector<RENDERID> SectionRenderIDs;
 	vector<_wstring> EnvJsonPaths;
+	vector<_wstring> LevelDesignJsonPaths;
 	_wstring strDeltaPath;
 	_wstring strDecorCollisionCatalogPath;
 };
@@ -81,6 +83,7 @@ struct MAP_PACKAGE
 	MAP_STAGE_DESC StageDesc;
 	vector<ENV_OBJECT_DESC> EnvObjectDescs;
 	vector<_wstring> EnvJsonPaths;
+	vector<_wstring> LevelDesignJsonPaths;
 	vector<MAP_ADD_OBJECT> AddedObjectDescs;
 };
 
@@ -89,6 +92,9 @@ struct MAP_RUNTIME_LEVELS
 	_uint iObjectLevel = {};
 	_uint iStageModelLevel = {};
 	_uint iEnvModelLevel = {};
+
+	_uint iLevelDesignObjectLevel = {};
+	_uint iLevelDesignPrototypeLevel = {};
 
 	_bool bEnableEnvObjectPicking = { false };
 };
@@ -107,6 +113,14 @@ struct MAP_SPAWN_TARGETS
 	MAP_SPAWN_ROUTE EnvEffect;
 
 	const _tchar* pStageObjectTag = L"MapStage";
+};
+
+struct MAP_LOAD_OPTIONS
+{
+	_bool bLoadStage = true;
+	_bool bLoadEnv = true;
+	_bool bLoadLevelDesign = true;
+	_bool bEnableEnvObjectPicking = false;
 };
 
 struct MAP_SPAWN_OPTIONS
@@ -140,6 +154,12 @@ struct MAP_LOAD_RESULT
 	_uint iEnvCreatedCount = {};
 	_uint iEnvSkippedMissingModel = {};
 	_uint iEnvSkippedCreateFailed = {};
+
+	_uint iLevelDesignJsonLoadedCount = {};
+	_uint iLevelDesignParsedObjectCount = {};
+	_uint iLevelDesignCreatedCount = {};
+	_uint iLevelDesignFallbackSpecCount = {};
+	_uint iLevelDesignSkippedCreateFailedCount = {};
 };
 
 inline _bool Has_AnyMapEnvEdit(const MAP_ENV_EDITED_DESC& Edit)

@@ -59,6 +59,7 @@ HRESULT CMap_Builder::Build_FromManifest(const _wstring& strManifestPath, MAP_PA
 	}
 
 	*pOutPackage = {};
+	pOutPackage->LevelDesignJsonPaths = Manifest.LevelDesignJsonPaths;
 
 	if (FAILED(Build_StageDesc(Manifest, &pOutPackage->StageDesc)))
 		return E_FAIL;
