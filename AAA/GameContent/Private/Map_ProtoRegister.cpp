@@ -104,16 +104,33 @@ HRESULT CMap_ProtoRegister::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, c
 	}
 #endif
 
+	unordered_set<wstring> FailedEnvModelTags;
+
 	for (const ENV_OBJECT_DESC& Desc : Package.EnvObjectDescs)
 	{
 		if (Desc.wstrModelProtoTag.empty())
 			continue;
 
-		const _bool bCookCollisionMesh =
-			CookRequiredEnvModelTags.find(Desc.wstrModelProtoTag) != CookRequiredEnvModelTags.end();
+		if (FailedEnvModelTags.find(Desc.wstrModelProtoTag) != FailedEnvModelTags.end())
+			continue;
 
-		if (FAILED(Ready_EnvModel(Levels.iEnvModelLevel, Desc, bCookCollisionMesh, Levels.bEnableEnvObjectPicking)))
-			return E_FAIL;
+		const _bool bCookCollisionMesh = CookRequiredEnvModelTags.find(Desc.wstrModelProtoTag) != CookRequiredEnvModelTags.end();
+
+		if (FAILED(Ready_EnvModel(
+			Levels.iEnvModelLevel,
+			Desc,
+			bCookCollisionMesh,
+			Levels.bEnableEnvObjectPicking)))
+		{
+			FailedEnvModelTags.insert(Desc.wstrModelProtoTag);
+
+			Log_GameContentWarning(
+				"EnvObject model skipped: object="
+				+ WstrToStr(Desc.wstrObjectName)
+				+ " path=" + WstrToStr(Desc.wstrModelPath));
+
+			continue;
+		}
 	}
 
 	for (const MAP_ADD_OBJECT& Added : Package.AddedObjectDescs)

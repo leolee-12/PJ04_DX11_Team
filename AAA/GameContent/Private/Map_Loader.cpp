@@ -165,9 +165,7 @@ namespace
 		}
 	}
 
-	void Build_RuntimeStageLevels(
-		const MAP_RUNTIME_LOAD_CONTEXT& Context,
-		MAP_RUNTIME_LEVELS* pOutLevels)
+	void Build_RuntimeStageLevels(const MAP_RUNTIME_LOAD_CONTEXT& Context, MAP_RUNTIME_LEVELS* pOutLevels)
 	{
 		if (nullptr == pOutLevels)
 			return;
@@ -178,18 +176,15 @@ namespace
 		pOutLevels->iEnvModelLevel = ETOUI(LEVEL::STATIC);
 	}
 
-	void Build_RuntimeEnvLevels(
-		const Client::MAP_RUNTIME_LOAD_CONTEXT& Context,
-		_bool bEnableEnvObjectPicking,
-		Client::MAP_RUNTIME_LEVELS* pOutLevels)
+	void Build_RuntimeEnvLevels(const MAP_RUNTIME_LOAD_CONTEXT& Context, _bool bEnableEnvObjectPicking, MAP_RUNTIME_LEVELS* pOutLevels)
 	{
 		if (nullptr == pOutLevels)
 			return;
 
 		*pOutLevels = {};
-		pOutLevels->iObjectLevel = ETOUI(Client::LEVEL::STATIC);
-		pOutLevels->iStageModelLevel = ETOUI(Client::LEVEL::STATIC);
-		pOutLevels->iEnvModelLevel = Context.iModelLevel;
+		pOutLevels->iObjectLevel = ETOUI(LEVEL::STATIC);
+		pOutLevels->iStageModelLevel = ETOUI(LEVEL::STATIC);
+		pOutLevels->iEnvModelLevel = ETOUI(LEVEL::STATIC);
 		pOutLevels->bEnableEnvObjectPicking = bEnableEnvObjectPicking;
 	}
 

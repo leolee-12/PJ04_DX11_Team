@@ -135,10 +135,9 @@ HRESULT CMap_ModelResolver::Resolve_MapSection(
 	return E_FAIL;
 }
 
-HRESULT CMap_ModelResolver::Build_EnvModelCache(const _wstring& strStageFolderName)
+HRESULT CMap_ModelResolver::Build_EnvModelCache()
 {
-	const path Root = path(m_strMapRoot) / strStageFolderName / L"Env";
-
+	const path Root = path(m_strMapRoot) / L"Env";
 	if (m_EnvCacheRoot == Root)
 		return S_OK;
 
@@ -146,7 +145,7 @@ HRESULT CMap_ModelResolver::Build_EnvModelCache(const _wstring& strStageFolderNa
 	m_EnvCacheRoot = Root;
 
 	error_code ErrorCode;
-	if (strStageFolderName.empty() || !exists(Root, ErrorCode) || ErrorCode)
+	if (!exists(Root, ErrorCode) || ErrorCode)
 	{
 		Log_GameContentWarning("EnvObject model root missing: " + WstrToStr(Root.wstring()));
 		return S_OK;

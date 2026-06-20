@@ -186,6 +186,24 @@ struct ENV_OBJECT_DESC : public CGameObject::GAMEOBJECT_DESC
 	json jRawProperties;
 };
 
+inline _bool EnvObject_IsSimpleShapeOnly(const ENV_OBJECT_DESC& Desc)
+{
+	return Desc.eSourceType == ENV_SOURCE_TYPE::TOY_DECOR
+		&& Desc.tCollision.eColliderKind == ENV_COLLIDER_KIND::SIMPLE_SHAPE;
+}
+
+inline _bool EnvObject_NeedsModel(const ENV_OBJECT_DESC& Desc)
+{
+	if (Desc.eKind == ENV_OBJECT_KIND::EFFECT)
+		return false;
+
+	if (EnvObject_IsSimpleShapeOnly(Desc))
+		return false;
+
+	return Desc.eKind == ENV_OBJECT_KIND::STATIC
+		|| Desc.eKind == ENV_OBJECT_KIND::INTERACT;
+}
+
 struct ENV_INSTANCE_DATA
 {
 	_float4x4 matWorld = {};
