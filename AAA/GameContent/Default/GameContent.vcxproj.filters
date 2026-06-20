@@ -442,6 +442,9 @@
     <Filter Include="00. GameObject\95. Interface\Inhalable">
       <UniqueIdentifier>{8c9a30b0-316d-445f-9cf9-b015a25e4fc3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\99. Monster_PartBase">
+      <UniqueIdentifier>{de6fdd7b-10fb-45d6-ad3d-ed06421c157b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -879,6 +882,9 @@
     <ClInclude Include="..\public\Inhalable.h">
       <Filter>00. GameObject\95. Interface\Inhalable</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\MonsterPart.h">
+      <Filter>00. GameObject\06. Monster\99. Monster_PartBase</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1249,6 +1255,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Inhalable.cpp">
       <Filter>00. GameObject\95. Interface\Inhalable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MonsterPart.cpp">
+      <Filter>00. GameObject\06. Monster\99. Monster_PartBase</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

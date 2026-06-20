@@ -35,6 +35,7 @@
     <ClInclude Include="..\Public\Env_InstanceBatch.h" />
     <ClInclude Include="..\Public\Env_InstanceController.h" />
     <ClInclude Include="..\public\Inhalable.h" />
+    <ClInclude Include="..\public\MonsterPart.h" />
     <ClInclude Include="..\Public\Monster_State_Captured.h" />
     <ClInclude Include="..\Public\Monster_State_Dead.h" />
     <ClInclude Include="..\Public\Monster_State_Fall.h" />
@@ -218,6 +219,7 @@
     <ClCompile Include="..\Private\Monster_Brain.cpp" />
     <ClCompile Include="..\Private\Monster_Brain_FSM.cpp" />
     <ClCompile Include="..\Private\Monster_Movement.cpp" />
+    <ClCompile Include="..\private\MonsterPart.cpp" />
     <ClCompile Include="..\Private\Monster_State.cpp" />
     <ClCompile Include="..\Private\Monster_StateMachine.cpp" />
     <ClCompile Include="..\Private\Monster_State_Attack.cpp" />

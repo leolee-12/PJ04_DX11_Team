@@ -52,18 +52,20 @@ HRESULT CMonster::Initialize(void* pArg)
 
 void CMonster::Priority_Update(_float fTimeDelta)
 {
+	if (!m_bActive) return;
 	__super::Priority_Update(fTimeDelta);
 }
 
 void CMonster::Update(_float fTimeDelta)
 {
+	if (!m_bActive) return;
 	Update_AI(fTimeDelta);
-
 	__super::Update(fTimeDelta);
 }
 
 void CMonster::Late_Update(_float fTimeDelta)
 {
+	if (!m_bActive) return;
 	__super::Late_Update(fTimeDelta);
 
 	if (m_pInteractCollider)
