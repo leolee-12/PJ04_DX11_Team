@@ -50,7 +50,6 @@ public:
 
 	virtual CAnimator*			Get_BodyAnimator() const override;
 
-
 public:
 	CBladeKnight_Body*			Get_Body() { return m_pBody; }
 	CBladeKnight_Sword*			Get_Sword() { return m_pSword; }

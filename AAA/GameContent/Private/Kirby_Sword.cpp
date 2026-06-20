@@ -6,6 +6,8 @@
 
 #include "Animator.h"
 
+#include "Damageable.h"
+
 CKirby_Sword::CKirby_Sword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CKirby_OnOffPart(pDevice, pContext)
 {
@@ -29,6 +31,9 @@ HRESULT CKirby_Sword::Initialize(void* pArg)
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
+        return E_FAIL;
+
+    if (FAILED(Ready_HitBox()))
         return E_FAIL;
 
     m_pAnimatorCom->Play("Reset", true, true);
@@ -59,6 +64,14 @@ void CKirby_Sword::Late_Update(_float fTimeDelta)
         return;
 
     __super::Late_Update(fTimeDelta);
+
+    if (m_pHitBox && m_pHitBox->Is_Enabled())
+    {
+        m_pHitBox->Update(XMLoadFloat4x4(&m_CombinedWorldMatrix));
+#ifdef _DEBUG
+        m_pGameInstance_Proxy->Add_DebugComponent(m_pHitBox);
+#endif
+    }
 
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
@@ -109,6 +122,13 @@ HRESULT CKirby_Sword::Render()
     return S_OK;
 }
 
+void CKirby_Sword::PartOnOff(_bool bOn)
+{
+    __super::PartOnOff(bOn);
+    if (m_pHitBox)
+        m_pHitBox->Set_Enabled(bOn);
+}
+
 HRESULT CKirby_Sword::Ready_Components()
 {
     /* For.Com_Shader */
@@ -131,6 +151,49 @@ HRESULT CKirby_Sword::Ready_Components()
         return E_FAIL;
 
     return S_OK;
+}
+
+HRESULT CKirby_Sword::Ready_HitBox()
+{
+    CCollider::COLLIDER_DESC desc{};
+    desc.pOwner = this;
+    desc.vCenter = {0.f, 0.f, 0.f};
+    desc.fRadius = {0.25f};
+    desc.fHeight = {1.f};
+    desc.vRadians = { XMConvertToRadians(-90.f), 0.f, 0.f};
+    m_pHitBox = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag,
+        TEXT("HitBox_Com"), &desc);
+    if (nullptr == m_pHitBox) return E_FAIL;
+
+    SetUp_HitBox_Callback();
+    m_pHitBox->Set_Enabled(false);
+    m_pGameInstance_Proxy->Register_Collider(m_pHitBox,
+        ETOUI(COLLISION_LAYER::PLAYER_HIT));
+
+    return S_OK;
+}
+
+void CKirby_Sword::SetUp_HitBox_Callback()
+{
+    m_pHitBox->Set_OnEnter([this](CCollider* pOther)
+        {
+            if (ETOUI(COLLISION_LAYER::MONSTER_HURT) != pOther->Get_RegisteredGroup())
+                return;
+
+            IDamageable* pVictim = dynamic_cast<IDamageable*>(pOther->Get_Owner());
+            if (nullptr == pVictim) return;
+
+            ATTACK_INFO atk{};
+            atk.fDamage = 5.f;
+            atk.fKnockback = 8.f;
+            atk.vAttackerPos = _float3(m_CombinedWorldMatrix._41, m_CombinedWorldMatrix._42, m_CombinedWorldMatrix._43);
+            XMStoreFloat3(&atk.vAttackerPos, m_pTransformCom->Get_State(STATE::POSITION));
+            atk.pAttacker = this;
+            pVictim->Damaged(atk);
+#ifdef _DEBUG
+            OutputDebugStringA("[Kirby_Sword] HIT Monster!\n");
+#endif
+        });
 }
 
 HRESULT CKirby_Sword::Bind_ShaderResources()
