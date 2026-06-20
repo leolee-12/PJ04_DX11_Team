@@ -152,6 +152,17 @@ void CKirby::OnOffParts(COPY_ABILITY_TYPE eAbilityType, _bool fOn)
     }
 }
 
+CKirby_OnOffPart* CKirby::Find_OnOffPart(const wchar_t* PartTag)
+{
+    auto iter = m_PartObjects.find(PartTag);
+    if (iter != m_PartObjects.end())
+    {
+        return dynamic_cast<CKirby_OnOffPart*>(iter->second);
+    }
+
+    return nullptr;
+}
+
 void CKirby::Add_MoveDir(const _float3& vWishDir)
 {
     XMStoreFloat3(&m_vWishDir,

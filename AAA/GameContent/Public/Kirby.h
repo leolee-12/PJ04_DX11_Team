@@ -25,6 +25,8 @@ enum class COPY_ABILITY_TYPE;
 
 class CKirby_Body;
 
+class CKirby_OnOffPart;
+
 class CKirby final : public CCharacter
 {
 	GENERATED_BODY(CKirby)
@@ -84,6 +86,7 @@ public:
 	// Part
 	CKirby_Body* Get_Body() { return m_pBody; }
 	void OnOffParts(COPY_ABILITY_TYPE eAbilityType, _bool fOn);
+	CKirby_OnOffPart* Find_OnOffPart(const wchar_t* PartTag);
 
 	// Movement
 	void Add_MoveDir(const _float3& vWishDir);

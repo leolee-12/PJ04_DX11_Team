@@ -366,15 +366,15 @@ void CKirby_Ability_Normal::On_Swallowed(CKirby* pKirby, CMonster* pMonster)
 
     COPY_ABILITY_TYPE eAbility = pMonster->Get_CopyAbility();
 
-    //if (eAbility != COPY_ABILITY_TYPE::NONE && eAbility != COPY_ABILITY_TYPE::NORMAL)
-    //{
-    //    pKirby->Request_ChangeKirbyAbility(eAbility);
-    //    pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
-    //}
-    //else
-    //{
+    if (eAbility != COPY_ABILITY_TYPE::NONE && eAbility != COPY_ABILITY_TYPE::NORMAL)
+    {
+        pKirby->Request_ChangeKirbyAbility(eAbility);
+        pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
+    }
+    else
+    {
         pKirby->Change_State(KIRBY_STATE_TYPE::FULL);
-  /*  }*/
+    }
 }
 
 _bool CKirby_Ability_Normal::IsSuperInhale()

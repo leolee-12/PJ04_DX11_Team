@@ -238,9 +238,6 @@
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Attack">
       <UniqueIdentifier>{1a16a95c-467c-4517-b7e1-f705d612b308}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\GetAbility">
-      <UniqueIdentifier>{ef199045-e026-474a-9ec3-100f82b3ae9a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\AbilityDump">
       <UniqueIdentifier>{26490427-a373-403b-bd61-8303f0dffa59}</UniqueIdentifier>
     </Filter>
@@ -474,6 +471,9 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Full">
       <UniqueIdentifier>{7aaa2487-4849-48ce-acf4-559797cc9247}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\GetAbility">
+      <UniqueIdentifier>{ef199045-e026-474a-9ec3-100f82b3ae9a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

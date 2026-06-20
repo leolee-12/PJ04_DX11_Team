@@ -122,10 +122,10 @@ HRESULT CKirby_Sword::Render()
     return S_OK;
 }
 
-void CKirby_Sword::Set_HitBox(_bool b)
+void CKirby_Sword::Set_HitBox(_bool bOn)
 {
     if (m_pHitBox)
-        m_pHitBox->Set_Enabled(b);
+        m_pHitBox->Set_Enabled(bOn);
 }
 
 HRESULT CKirby_Sword::Ready_Components()

@@ -43,9 +43,11 @@ public:
 
 public:
 	CAnimator* Get_Animator() { return m_pAnimatorCom; }
+
+public:
 	//윤석현 추가
 	void Reset_HitList() { m_HitTargets.clear(); }
-	void Set_HitBox(_bool b);
+	void Set_HitBox(_bool bOn);
 
 private:
 	HRESULT Ready_Components();
@@ -57,13 +59,15 @@ private:
 	CShader* m_pShaderCom{};
 	CModel* m_pModelCom{};
 	CAnimator* m_pAnimatorCom{};
+
 	CCollider* m_pHitBox{};
 
-	unordered_set<CGameObject*> m_HitTargets;
-
+	// 노란 보석
 	_float4 m_vConstantDiffuse = { 1.f, 0.72f, 0.08f, 1.f };
 	_float3 m_vConstantMRA = { 0.25f, 0.18f, 1.f };
 	_float4 m_vConstantEmissive = { 0.05f, 0.025f, 0.f, 1.f };
+
+	unordered_set<CGameObject*> m_HitTargets;
 
 public:
 	static CKirby_Sword* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
