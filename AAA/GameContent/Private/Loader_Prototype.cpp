@@ -27,12 +27,13 @@ NS_BEGIN(Client)
 HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     // 나중에 이펙트 전체 STATIC으로 로드하면 STATIC으로 바꿀것
-    pProxy->Set_EffectPrototypeLevel(ETOUI(LEVEL::GAMEPLAY));
+    pProxy->Set_EffectPrototypeLevel(ETOUI(LEVEL::STATIC));
 
     // 셰어드 리소스 준비 직후 1회
-    //CEffect_Loader::GetInstance()->Ready(
-    //    TEXT("../../Resources/Effects/effect_manifest.json"),
-    //    pProxy, pDevice, pContext);
+    /*if (FAILED(CEffect_Loader::GetInstance()->Ready(TEXT("../../Resources/Effects/effect_manifest.json"),
+        pProxy, pDevice, pContext)))
+        return E_FAIL;*/
+
     // 게임플레이에서 호출 커비 등이 자기 레벨로 스폰
     //CEffect_Loader::GetInstance()->Spawn(L"VacuumContainer", Get_LevelIndex(), vMouthPos, vLook, pParent);
 

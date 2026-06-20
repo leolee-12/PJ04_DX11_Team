@@ -6,6 +6,7 @@
 
 #include "Loader_Prototype.h"
 #include "GameObject_Factory.h"
+#include "Effect_Loader.h"
 
 CEditorApp::CEditorApp()
 {
@@ -48,10 +49,10 @@ HRESULT CEditorApp::Initialize()
 
     m_pImGui_Manager->ImGui_Initialize(&m_pDevice, &m_pContext, pPreLevel, &m_pSRV);
 
+    CGameObject_Factory::GetInstance()->RegisterAll();
+
     if (FAILED(Ready_SharedResources()))
         return E_FAIL;
-
-    CGameObject_Factory::GetInstance()->RegisterAll();
 
     if (FAILED(Load_Fonts(m_pGameInstance_Proxy)))
         return E_FAIL;
@@ -186,6 +187,8 @@ CEditorApp* CEditorApp::Create()
 void CEditorApp::Free()
 {
     __super::Free();
+
+    CEffect_Loader::DestroyInstance();
     Safe_Release(m_pRTV);
     Safe_Release(m_pSRV);
     Safe_Release(m_pDSV);

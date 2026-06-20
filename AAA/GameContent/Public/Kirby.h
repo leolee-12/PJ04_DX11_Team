@@ -25,11 +25,15 @@ enum class COPY_ABILITY_TYPE;
 
 class CKirby_Body;
 
+class CKirby_OnOffPart;
+
 class CKirby final : public CCharacter
 {
 	GENERATED_BODY(CKirby)
 
 public:
+	enum KIRBY_COLLIDER { HURT_BOX, INHALE_BOX, COLLIDER_END };
+
 	struct KIRBY_BODY_DESC : public CContainerObject::COTAINEROBJECT_DESC
 	{
 	};
@@ -82,31 +86,30 @@ public:
 	// Part
 	CKirby_Body* Get_Body() { return m_pBody; }
 	void OnOffParts(COPY_ABILITY_TYPE eAbilityType, _bool fOn);
+	CKirby_OnOffPart* Find_OnOffPart(const wchar_t* PartTag);
 
-public:
 	// Movement
 	void Add_MoveDir(const _float3& vWishDir);
 	_bool Has_MoveDir();
 	void Set_RotationLock(_bool RotationLock) { m_RotationLock = RotationLock; }
 
-public:
 	//System
 	void Excute_Command(CKirby_Command* pCommand);
 	void Change_State(KIRBY_STATE_TYPE eNewState);
 
+	// Ability
 	CKirby_Ability* Get_KirbyAbility();
-	void Set_KirbyAbility(COPY_ABILITY_TYPE eAbilityState);
+	void Request_ChangeKirbyAbility(COPY_ABILITY_TYPE eAbilityState);
+	void Apply_ChangeKirbyAbility();
 
-public:
 	// Ability Dump
 	void Update_AbilityDumpCool(_float fTimeDelta);
 	void Reset_AbilityDumpCool();
 	_bool Can_AbilityDump();
 	void Req_AbilityDumpCoolDecrease() { m_bDecreaseAbilityDumpCool = true; }
 
-public: // À±¼®Çö Ãß°¡
-	void Begin_Inhale();
-	void End_Inhale();
+	// Collider
+	CCollider* Get_Collider(KIRBY_COLLIDER eKirbyCollider);
 
 private:
 	HRESULT Ready_Components();
@@ -117,37 +120,44 @@ private:
 	HRESULT Bind_ShaderResources();
 	virtual HRESULT Ready_Events() override;
 
+	// Ability
+	void Set_KirbyAbility(COPY_ABILITY_TYPE eAbilityState);
+
 	// À±¼®Çö Ãß°¡
 	virtual _bool Block_Hit(const ATTACK_INFO& tInfo) override;
 	virtual void  On_Damaged(const ATTACK_INFO& tInfo) override;
-	_bool		  Is_SuperInhaling() const;
-
 
 private:
+	// Parts
 	CKirby_Body* m_pBody{};
 
 	CController* m_pController{};
+
+	// Movement
 	CMovement_Child* m_pMovement{};
 
 	_float3 m_vWishDir{};
 	_bool m_RotationLock{};
 
-	//À±¼®Çö Ãß°¡
-	CCollider* m_pHurtBox = { nullptr };
-	CCollider* m_pInhaleBox = { nullptr };
-	_bool	   m_bInhaling = { false };
+	// Collider
+	vector<CCollider*> m_KirbyColliders;
+
 	_float	   m_fInvincible = { 0.f };
 
-
 private:
+	// System
 	CKirby_InputManager*	m_pKirby_InputManager{};
 	CKirby_Controller*		m_pKirby_Controller{};
 	CKirby_StateMachine*	m_pKirby_StateMachine{};
-	CKirby_Ability*			m_pKirby_Ability{};
 
+	// Ability
+	CKirby_Ability*			m_pKirby_Ability{};
 	unordered_map<COPY_ABILITY_TYPE, CKirby_Ability*> m_Abilities;
 
-private:
+	_bool m_bReqChangeAbility{};
+	COPY_ABILITY_TYPE m_eNextAbilityType{};
+
+	// Ability Dump
 	_float m_fAccAbilityDumpCoolTime{};
 	_float m_fMaxAbilityDumpCoolTime{ 0.5f };
 	_bool m_bDecreaseAbilityDumpCool{};

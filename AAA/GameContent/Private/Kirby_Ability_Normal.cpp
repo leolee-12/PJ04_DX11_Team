@@ -1,11 +1,16 @@
 #include "Kirby_Ability_Normal.h"
 
 #include "GameInstance.h"
+#include "Effect_Loader.h"
+
 #include "Movement_Child.h"
 
 #include "Kirby.h"
 #include "Kirby_Body.h"
 #include "Kirby_State.h"
+
+#include "Inhalable.h"
+#include "Monster.h"
 
 CKirby_Ability_Normal::CKirby_Ability_Normal()
 {
@@ -14,6 +19,10 @@ CKirby_Ability_Normal::CKirby_Ability_Normal()
 HRESULT CKirby_Ability_Normal::Initialize()
 {
     if (FAILED(__super::Initialize()))
+        return E_FAIL;
+
+    m_pGameInstance_Proxy = CGameInstance::GetProxy();
+    if (m_pGameInstance_Proxy == nullptr)
         return E_FAIL;
 
     m_MaxSuperInHaleTime = 1.f;
@@ -31,62 +40,58 @@ void CKirby_Ability_Normal::Enter_Ability(CKirby* pKirby)
     // Inhale State
     m_eInhaleState = INHALE_STATE::INHALE_LOOP;
 
+    // State Machine
+    m_bReqEndAttackState = false;
+
     // Super Inhale Timer
     m_AccSuperInHaleTime = 0.f;
 
     // Inhale Animation
     CKirby_Body* pKirby_Body = pKirby->Get_Body();
-    CAnimator* pAnimator = pKirby_Body->Get_Animator();
-    
+    CAnimator* pAnimator = pKirby_Body->Get_Animator();    
     _string strAniName;
     Choose_InhaleAniName(strAniName);
-
     pAnimator->Play(strAniName, true, false, 0.1f, 1.5f);
 
     // Inhale Body
     pKirby_Body->Set_Body(KIRBY_BODY_STATE::INHALE);
 
-    m_bReqEndAttackState = false;
-
     // Speed
     CMovement_Child* pMovementCom = pKirby->Get_Movement();
     pMovementCom->Set_MaxHorizontalSpeed(2.f);
 
-    //윤석현추가
-    pKirby->Begin_Inhale();
+    // Collider
+    Start_InhaleCollider(pKirby);
+    // Event
+    Start_SwallowedEvent(pKirby);
+
+    // Effect
+    //CEffect_Loader::GetInstance()->Spawn(L"VacuumContainer", pKirby->Get_LevelIndex(),
+    //    //_float3(0.f, 0.6f, 0.4f), _float3(0.f, 0.f, 1.f),
+    //    _float3(0.f, 0.5f, 0.4f), _float3(0.f, 0.f, 1.f),
+    //    pKirby->Get_Transform()->Get_WorldMatrixPtr(),
+    //    &m_pInhaleEffect
+    //);
 }
 
 ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _float fTimeDelta)
 {
-    CMovement_Child* pMovementCom = pKirby->Get_Movement();
-    _float fYVelocity = pMovementCom->Get_VerticalVelocity();
-
-    _bool bIsGround = pMovementCom->Is_Grounded();
-
-    //if (bIsGround == false && fYVelocity <= CKirby::s_fFallVelocityY)
-    if (bIsGround == false)
-        m_eCurMoveState = INHALE_MOVE_STATE::FALL;
-    else if (pKirby->Has_MoveDir() == true)
-        m_eCurMoveState = INHALE_MOVE_STATE::WALK;
-    else
-        m_eCurMoveState = INHALE_MOVE_STATE::WAIT;    
-
-    // Test Code
-    if (Change_Ability(pKirby) == true)
-        return ABILITY_UPDATE_RESULT::ABILITY_CHANGED;
-
-    // Super Inhale Timer
-    if (m_AccSuperInHaleTime < m_MaxSuperInHaleTime)
-        m_AccSuperInHaleTime += fTimeDelta;
-
     CKirby_Body* pKirby_Body = pKirby->Get_Body();
+
+    CMovement_Child* pMovementCom = pKirby->Get_Movement();
+    Update_MoveState(pKirby, pMovementCom);
+
+    Update_SuperInhaleTimer(fTimeDelta);
+
     CAnimator* pAnimator = pKirby_Body->Get_Animator();
 
     // Inhale 종료
     if (m_eInhaleState != INHALE_STATE::INHALE_END && m_bReqInhale == true)
     {
         m_eInhaleState = INHALE_STATE::INHALE_END;
-        pKirby->End_Inhale();
+
+        End_InhaleCollider(pKirby);
+
         pAnimator->Play("InhaleEnd", false, false, 0.1f, 1.5f);
         pMovementCom->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
     }
@@ -132,6 +137,15 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _flo
 
 void CKirby_Ability_Normal::Exit_Ability(CKirby* pKirby)
 {
+    //m_pInhaleEffect->EffectContainer_Stop();
+    //m_pInhaleEffect = nullptr;
+
+    // Collider
+    End_InhaleCollider(pKirby);
+    // Event
+    End_SwallowedEvent();
+
+    Reset_Default(pKirby);
 }
 
 _bool CKirby_Ability_Normal::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -200,6 +214,27 @@ _bool CKirby_Ability_Normal::Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation)
     return false;
 }
 
+void CKirby_Ability_Normal::Update_MoveState(CKirby* pKirby, CMovement_Child* pMovement)
+{
+    _bool bIsGround = pMovement->Is_Grounded();
+
+    //_float fYVelocity = pMovementCom->Get_VerticalVelocity();
+    //if (bIsGround == false && fYVelocity <= CKirby::s_fFallVelocityY)
+    if (bIsGround == false)
+        m_eCurMoveState = INHALE_MOVE_STATE::FALL;
+    else if (pKirby->Has_MoveDir() == true)
+        m_eCurMoveState = INHALE_MOVE_STATE::WALK;
+    else
+        m_eCurMoveState = INHALE_MOVE_STATE::WAIT;
+}
+
+void CKirby_Ability_Normal::Update_SuperInhaleTimer(_float fTimeDelta)
+{
+    // Super Inhale Timer
+    if (m_AccSuperInHaleTime < m_MaxSuperInHaleTime)
+        m_AccSuperInHaleTime += fTimeDelta;
+}
+
 void CKirby_Ability_Normal::Interpolation_Inhale(CAnimator* pAnimator)
 {
     if (m_eCurMoveState != m_ePreMoveState)
@@ -253,25 +288,6 @@ void CKirby_Ability_Normal::Choose_InhaleAniName(_string& strAniName)
     }
 }
 
-_bool CKirby_Ability_Normal::Change_Ability(CKirby* pKirby)
-{
-    //Test Code
-    if (GetAsyncKeyState('T') & 0x8000)
-    {
-        Reset_Default(pKirby);
-
-        // 먹은 오브젝트에서 가져온다.
-        COPY_ABILITY_TYPE eAbilityType = COPY_ABILITY_TYPE::SWORD;
-        pKirby->Set_KirbyAbility(eAbilityType);
-
-        pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
-
-        return true;
-    }
-
-    return false;
-}
-
 void CKirby_Ability_Normal::Reset_Default(CKirby* pKirby)
 {
     // Test Code
@@ -282,6 +298,88 @@ void CKirby_Ability_Normal::Reset_Default(CKirby* pKirby)
     CKirby_Body* pKirby_Body = pKirby->Get_Body();
     pKirby_Body->Set_Eye(KIRBY_EYE_STATE::IDLE);
     pKirby_Body->Set_Body(KIRBY_BODY_STATE::NORMAL);
+}
+
+void CKirby_Ability_Normal::Start_InhaleCollider(CKirby* pKirby)
+{
+    CCollider* pInhaleBox = pKirby->Get_Collider(CKirby::KIRBY_COLLIDER::INHALE_BOX);
+
+    pInhaleBox->Set_OnStay
+    (
+        [this, pKirby](CCollider* pOther)
+        {
+            IInhalable* pInh = dynamic_cast<IInhalable*>(pOther->Get_Owner());
+            if (pInh == nullptr)
+                return;
+
+            INHALE_QUERY q{ IsSuperInhale(), pKirby };
+
+            if (pInh->Can_BeInhaled(q))
+                pInh->Be_Captured(pKirby);
+        }
+    );
+
+    pInhaleBox->Set_Enabled(true);
+}
+
+void CKirby_Ability_Normal::End_InhaleCollider(CKirby* pKirby)
+{
+    CCollider* pInhaleBox = pKirby->Get_Collider(CKirby::KIRBY_COLLIDER::INHALE_BOX);
+    pInhaleBox->Set_Enabled(false);
+    pInhaleBox->Set_OnStay(nullptr);
+}
+
+void CKirby_Ability_Normal::Start_SwallowedEvent(CKirby* pKirby)
+{
+    if (m_bSubscribedSwallowedEvent == true)
+        return;
+
+    m_hSwallowedEvent = m_pGameInstance_Proxy->Subscribe(
+        EVT_SWALLOWED,
+        [this, pKirby](void* pData)
+        {
+            SWALLOW_EVENT* pEvent = static_cast<SWALLOW_EVENT*>(pData);
+            if (pEvent == nullptr || pEvent->pMonster == nullptr)
+                return;
+
+            On_Swallowed(pKirby, pEvent->pMonster);
+        }
+    );
+
+    m_bSubscribedSwallowedEvent = true;
+}
+
+void CKirby_Ability_Normal::End_SwallowedEvent()
+{
+    if (m_bSubscribedSwallowedEvent == false)
+        return;
+
+    m_pGameInstance_Proxy->UnSubscribe(m_hSwallowedEvent);
+
+    m_bSubscribedSwallowedEvent = false;
+}
+
+void CKirby_Ability_Normal::On_Swallowed(CKirby* pKirby, CMonster* pMonster)
+{
+    End_InhaleCollider(pKirby);
+    End_SwallowedEvent();
+
+    COPY_ABILITY_TYPE eAbility = pMonster->Get_CopyAbility();
+
+    if (eAbility != COPY_ABILITY_TYPE::NONE && eAbility != COPY_ABILITY_TYPE::NORMAL)
+    {
+        pKirby->Request_ChangeKirbyAbility(eAbility);
+        pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
+    }
+    else
+    {
+        pKirby->Change_State(KIRBY_STATE_TYPE::FULL);
+    }
+}
+
+_bool CKirby_Ability_Normal::IsSuperInhale()
+{
+    return m_eInhaleState == INHALE_STATE::SUPER_INHALE_START || m_eInhaleState == INHALE_STATE::SUPER_INHALE_LOOP;
 }
 
 CKirby_Ability_Normal* CKirby_Ability_Normal::Create()
@@ -299,5 +397,7 @@ CKirby_Ability_Normal* CKirby_Ability_Normal::Create()
 
 void CKirby_Ability_Normal::Free()
 {
+    Safe_Release(m_pGameInstance_Proxy);
+
     __super::Free();
 }

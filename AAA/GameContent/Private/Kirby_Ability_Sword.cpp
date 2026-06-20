@@ -7,6 +7,8 @@
 #include "Kirby_Body.h"
 #include "Kirby_State.h"
 
+#include "Kirby_Sword.h"
+
 CKirby_Ability_Sword::CKirby_Ability_Sword()
 {
 }
@@ -15,11 +17,6 @@ HRESULT CKirby_Ability_Sword::Initialize()
 {
     if (FAILED(__super::Initialize()))
         return E_FAIL;
-
-    //(ABILITY_ANI eAni, const _string & strBaseAniName, const _string & strOverlayAniName, const _string & strRootBone,
-    //_bool bBaseLoop, _bool bBaseRestart, _float fBaseSpeed,
-    //_bool bOverlayLoop, _bool bOverlayRestart, _float fOverlaySpeed,
-    //_float fBlend)
 
     Set_OverlayAni(ABILITY_ANI::WAIT, "Wait", "Sword_HaveSwordWait", "R_ShoulderJ",
         true, false, 1.8f, 0.1f,
@@ -102,7 +99,7 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Sword::Update_Ability(CKirby* pKirby, _floa
     Update_SwordState(pKirby, pAnimator, pMovementCom, fTimeDelta);
     Enter_SwordAni(pAnimator, fTimeDelta);
   
-    Check_EndAttackState(pAnimator, fTimeDelta);
+    Check_EndAttackState(pKirby, pAnimator, fTimeDelta);
 
     // Move
     if (m_bMoveLock == false)
@@ -122,6 +119,11 @@ void CKirby_Ability_Sword::Exit_Ability(CKirby* pKirby)
 
     CKirby_Body* pBody = pKirby->Get_Body();
     pBody->Set_Eye(KIRBY_EYE_STATE::IDLE);
+
+    // Clear Hit List
+    CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_OnOffPart(CKirby_Sword::Kirby_PartTag));
+    pSword->Reset_HitList();
+    pSword->Set_HitBox(false);
 }
 
 _bool CKirby_Ability_Sword::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -224,6 +226,8 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, CAnimator* pAnimato
     _bool bIsAniFinish = pAnimator->Is_Finished();
     _float fRatio = pAnimator->Get_Progress();
 
+    CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_OnOffPart(CKirby_Sword::Kirby_PartTag));
+
     switch (m_eCurSwordState)
     {
         // Charge
@@ -272,6 +276,8 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, CAnimator* pAnimato
         // Spin
         case SWORD_STATE::SPIN_SLASH:
         {
+            pSword->Set_HitBox(true);
+
             if (bIsAniFinish)
                 m_eCurSwordState = SWORD_STATE::SPIN_SLASH_END;
 
@@ -293,6 +299,8 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, CAnimator* pAnimato
         // Super Spin
         case SWORD_STATE::SUPER_SPIN_SLASH_START:
         {
+            pSword->Set_HitBox(true);
+
             // Super Spin Loop
             if (bIsAniFinish == true)
                 m_eCurSwordState = SWORD_STATE::SUPER_SPIN_SLASH_LOOP;
@@ -334,6 +342,8 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, CAnimator* pAnimato
         // Ground
         case SWORD_STATE::SLASH_1:
         {
+            pSword->Set_HitBox(true);
+
             MoveLock_Ratio(fRatio, 0.45f, 1.f);
 
             if (bIsAniFinish)
@@ -363,6 +373,8 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, CAnimator* pAnimato
 
         case SWORD_STATE::SLASH_2:
         {
+            pSword->Set_HitBox(true);
+
             MoveLock_Ratio(fRatio, 0.8f, 1.f);
             SetSpeed_Ratio(fRatio, 0.f, 0.8f, pMovement, CKirby::s_fMaxHorizontalSpeed - 2.f);
 
@@ -379,6 +391,8 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, CAnimator* pAnimato
 
         case SWORD_STATE::SLASH_3:
         {
+            pSword->Set_HitBox(true);
+
             MoveLock_Ratio(fRatio, 0.6f, 1.f);
             SetSpeed_Ratio(fRatio, 0.f, 0.6f, pMovement, CKirby::s_fMaxHorizontalSpeed + 5.f);
 
@@ -395,6 +409,8 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, CAnimator* pAnimato
         // Jump
         case SWORD_STATE::JUMP_SLASH_START:
         {
+            pSword->Set_HitBox(true);
+
             if (bIsAniFinish)
                 m_eCurSwordState = SWORD_STATE::JUMP_SLASH;
 
@@ -487,9 +503,12 @@ void CKirby_Ability_Sword::Enter_SwordAni(CAnimator* pAnimator, _float fTimeDelt
     }
 }
 
-void CKirby_Ability_Sword::Check_EndAttackState(CAnimator* pAnimator, _float fTimeDelta)
+void CKirby_Ability_Sword::Check_EndAttackState(CKirby* pKirby, CAnimator* pAnimator, _float fTimeDelta)
 {
     _bool bIsAniFinish = pAnimator->Is_Finished();
+
+    // Clear Hit List
+    CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_OnOffPart(CKirby_Sword::Kirby_PartTag));
 
     switch (m_eCurSwordState)
     {
@@ -501,6 +520,11 @@ void CKirby_Ability_Sword::Check_EndAttackState(CAnimator* pAnimator, _float fTi
 
         case SWORD_STATE::SLASH_1:
         {
+            if (bIsAniFinish == true)
+            {
+                pSword->Set_HitBox(false);
+                pSword->Reset_HitList();
+            }
             break;
         }
 
@@ -509,7 +533,12 @@ void CKirby_Ability_Sword::Check_EndAttackState(CAnimator* pAnimator, _float fTi
         case SWORD_STATE::SLASH_3:
         {
             if (bIsAniFinish == true)
+            {
                 m_bReqEndAttackState = true;
+
+                pSword->Set_HitBox(false);
+                pSword->Reset_HitList();
+            }
 
             break;
         }
@@ -522,7 +551,12 @@ void CKirby_Ability_Sword::Check_EndAttackState(CAnimator* pAnimator, _float fTi
         case SWORD_STATE::JUMP_SLASH:
         {
             if (bIsAniFinish == true)
+            {
                 m_bReqEndAttackState = true;
+
+                pSword->Set_HitBox(false);
+                pSword->Reset_HitList();
+            }
 
             break;
         }
@@ -542,7 +576,11 @@ void CKirby_Ability_Sword::Check_EndAttackState(CAnimator* pAnimator, _float fTi
         case SWORD_STATE::SPIN_SLASH_END:
         {
             if (bIsAniFinish == true)
+            {
                 m_bReqEndAttackState = true;
+                pSword->Set_HitBox(false);
+                pSword->Reset_HitList();
+            }
 
             break;
         }
@@ -569,7 +607,12 @@ void CKirby_Ability_Sword::Check_EndAttackState(CAnimator* pAnimator, _float fTi
         case SWORD_STATE::SUPER_SPIN_SLASH_END:
         {
             if (bIsAniFinish == true)
+            {
                 m_bReqEndAttackState = true;
+
+                pSword->Set_HitBox(false);
+                pSword->Reset_HitList();
+            }
             break;
         }
     }

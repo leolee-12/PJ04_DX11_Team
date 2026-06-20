@@ -73,7 +73,7 @@ private:
 private:
 	void Update_SwordState(CKirby* pKirby, CAnimator* pAnimator, CMovement_Child* pMovemet, _float fTimeDelta);
 	void Enter_SwordAni(CAnimator* pAnimator, _float fTimeDelta);
-	void Check_EndAttackState(CAnimator* pAnimator, _float fTimeDelta);
+	void Check_EndAttackState(CKirby* pKirby, CAnimator* pAnimator, _float fTimeDelta);
 
 	void Update_ChargeTime(_float fTimeDelta);
 

@@ -23,6 +23,8 @@
 #include "Kirby_Ability_Normal.h"
 #include "Kirby_Ability_Sword.h"
 
+#include "Effect_Loader.h"
+
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCharacter{ pDevice, pContext }
 {
@@ -100,21 +102,21 @@ void CKirby::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 
-    if (m_pHurtBox && m_pTransformCom)
+    if (m_KirbyColliders[KIRBY_COLLIDER::HURT_BOX] && m_pTransformCom)
     {
-        m_pHurtBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+        m_KirbyColliders[KIRBY_COLLIDER::HURT_BOX]->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
 #ifdef _DEBUG
-        m_pGameInstance_Proxy->Add_DebugComponent(m_pHurtBox);
+        m_pGameInstance_Proxy->Add_DebugComponent(m_KirbyColliders[KIRBY_COLLIDER::HURT_BOX]);
 #endif
     }
 
-    if (m_pInhaleBox && m_pTransformCom)
+    if (m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX] && m_pTransformCom)
     {
-        m_pInhaleBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+        m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX]->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 #ifdef _DEBUG
-        if (m_pInhaleBox->Is_Enabled())
-            m_pGameInstance_Proxy->Add_DebugComponent(m_pInhaleBox);
+        if (m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX]->Is_Enabled())
+            m_pGameInstance_Proxy->Add_DebugComponent(m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX]);
 #endif
     }
 }
@@ -148,6 +150,17 @@ void CKirby::OnOffParts(COPY_ABILITY_TYPE eAbilityType, _bool fOn)
             OnOffPart(CKirby_SwordHat::Kirby_PartTag, fOn);
             break;
     }
+}
+
+CKirby_OnOffPart* CKirby::Find_OnOffPart(const wchar_t* PartTag)
+{
+    auto iter = m_PartObjects.find(PartTag);
+    if (iter != m_PartObjects.end())
+    {
+        return dynamic_cast<CKirby_OnOffPart*>(iter->second);
+    }
+
+    return nullptr;
 }
 
 void CKirby::Add_MoveDir(const _float3& vWishDir)
@@ -184,9 +197,35 @@ CKirby_Ability* CKirby::Get_KirbyAbility()
 void CKirby::Set_KirbyAbility(COPY_ABILITY_TYPE eAbilityState)
 {
     auto iter = m_Abilities.find(eAbilityState);
-    if (iter == m_Abilities.end()) { MSG_BOX("KirbyAbility Bug"); return; }
+    if (iter == m_Abilities.end())
+    {
+        MSG_BOX("KirbyAbility Bug");
+        return;
+    }
 
     m_pKirby_Ability = iter->second;
+}
+
+void CKirby::Request_ChangeKirbyAbility(COPY_ABILITY_TYPE eAbilityState)
+{
+    if(m_pKirby_Ability == nullptr)
+        return;
+
+    if (m_pKirby_Ability->Get_AbilityType() == eAbilityState)
+        return;
+
+    m_bReqChangeAbility = true;
+    
+    m_eNextAbilityType = eAbilityState;
+}
+
+void CKirby::Apply_ChangeKirbyAbility()
+{
+    if (m_bReqChangeAbility == false)
+        return;
+
+    m_bReqChangeAbility = false;
+    Set_KirbyAbility(m_eNextAbilityType);
 }
 
 void CKirby::Update_AbilityDumpCool(_float fTimeDelta)
@@ -220,54 +259,63 @@ _bool CKirby::Can_AbilityDump()
 
 HRESULT CKirby::Ready_Components()
 {
+    // Controller
     _float3 vFootPos;
     XMStoreFloat3(&vFootPos, m_pTransformCom->Get_State(STATE::POSITION));
 
     m_pController = Add_Component<CController>(TEXT("Com_Controller"),
         CController::Create(m_pDevice, m_pContext));
-    if (nullptr == m_pController) return E_FAIL;
+    if (m_pController == nullptr)
+        return E_FAIL;
 
     CController::CONTROLLER_DESC ctrlDesc{};
     ctrlDesc.vFootPos = vFootPos;
     ctrlDesc.fRadius = s_fCCT_Radius;
     ctrlDesc.fHeight = s_fCCT_Height;
     ctrlDesc.pOwner = this;
-    if (FAILED(m_pController->Initialize(&ctrlDesc))) return E_FAIL;
+    if (FAILED(m_pController->Initialize(&ctrlDesc)))
+        return E_FAIL;
 
+
+    // Movement
     m_pMovement = Add_Component<CMovement_Child>(TEXT("Com_Movement"), CMovement_Child::Create(m_pDevice, m_pContext));
     if (m_pMovement == nullptr) return E_FAIL;
 
     m_pMovement->Set_Refs(m_pTransformCom, m_pController->Get_Raw());
 
+    // Cllider
+    m_KirbyColliders.resize(COLLIDER_END);
 
+    // Collider HurtBox
     CCollider::COLLIDER_DESC ColliderDesc{};
     ColliderDesc.pOwner = this;
     ColliderDesc.vCenter = _float3(vFootPos.x, vFootPos.y + (s_fCCT_Radius + 0.1f), vFootPos.z);
     ColliderDesc.fRadius = s_fCCT_Radius + 0.1f;
 
-    // HurtBox(Collider)
-    m_pHurtBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, 
+    m_KirbyColliders[KIRBY_COLLIDER::HURT_BOX] = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
         TEXT("HurtBox_Com"), &ColliderDesc);
-    if (m_pHurtBox == nullptr)
+    if (m_KirbyColliders[KIRBY_COLLIDER::HURT_BOX] == nullptr)
         return E_FAIL;
 
-    m_pGameInstance_Proxy->Register_Collider(m_pHurtBox, ETOUI(COLLISION_LAYER::PLAYER_HURT));
+    m_pGameInstance_Proxy->Register_Collider(m_KirbyColliders[KIRBY_COLLIDER::HURT_BOX], ETOUI(COLLISION_LAYER::PLAYER_HURT));
 
+
+    // Collider Inhale
     CCollider::COLLIDER_DESC InhaleDesc{};
     InhaleDesc.pOwner = this;
     InhaleDesc.vCenter = _float3(0.f, s_fInhaleUp, s_fInhaleFwd);
     InhaleDesc.vSize = s_vInhaleSize;
     InhaleDesc.vRadians = _float3(0.f, 0.f, 0.f);
 
-    m_pInhaleBox = Add_Component<CCollider>(Collider_OBB.iLevelID, Collider_OBB.szProtoTag,
+    m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX] = Add_Component<CCollider>(Collider_OBB.iLevelID, Collider_OBB.szProtoTag,
         TEXT("InhaleBox_Com"), &InhaleDesc);
-    if (m_pInhaleBox == nullptr)
+    if (m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX] == nullptr)
         return E_FAIL;
 
-    m_pInhaleBox->Set_Enabled(false);
-    m_pGameInstance_Proxy->Register_Collider(m_pInhaleBox, ETOUI(COLLISION_LAYER::PLAYER_INHALE));
+    m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX]->Set_Enabled(false);
+    m_pGameInstance_Proxy->Register_Collider(m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX], ETOUI(COLLISION_LAYER::PLAYER_INHALE));
 
-    //ÀÓ½Ã
+    //ìž„ì‹œ
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HIT));
@@ -280,49 +328,38 @@ HRESULT CKirby::Ready_Components()
     return S_OK;
 }
 
-void	CKirby::SetUp_Collider_Callback()
+void CKirby::SetUp_Collider_Callback()
 {
-    if (m_pHurtBox)
+    if (m_KirbyColliders[HURT_BOX])
     {
-        m_pHurtBox->Set_OnEnter([this](CCollider* pOther) {
-            if (ETOUI(COLLISION_LAYER::MONSTER_HURT) == pOther->Get_RegisteredGroup())
+        m_KirbyColliders[HURT_BOX]->Set_OnEnter(
+            [this](CCollider* pOther)
             {
-                _vector vAtkPos = pOther->Get_Owner()->Get_Transform()->Get_State(STATE::POSITION);
-                ATTACK_INFO atk{};
-                atk.fDamage = 1.f;
-                atk.fKnockback = 6.f;                     
-                XMStoreFloat3(&atk.vAttackerPos, vAtkPos);
-                atk.pAttacker = pOther->Get_Owner();
-                Damaged(atk);
+                if (ETOUI(COLLISION_LAYER::MONSTER_HURT) == pOther->Get_RegisteredGroup())
+                {
+                    _vector vAtkPos = pOther->Get_Owner()->Get_Transform()->Get_State(STATE::POSITION);
+                    ATTACK_INFO atk{};
+                    atk.fDamage = 1.f;
+                    atk.fKnockback = 6.f;                     
+                    XMStoreFloat3(&atk.vAttackerPos, vAtkPos);
+                    atk.pAttacker = pOther->Get_Owner();
+                    Damaged(atk);
 #ifdef _DEBUG
-                char szBuf[128];
-                sprintf_s(szBuf, "[Kirby] Hurt! HP %.0f/%.0f\n", m_fCurHP, m_fMaxHP);
-                OutputDebugStringA(szBuf);
+                    char szBuf[128];
+                    sprintf_s(szBuf, "[Kirby] Hurt! HP %.0f/%.0f\n", m_fCurHP, m_fMaxHP);
+                    OutputDebugStringA(szBuf);
 #endif
-            }
+                }
             });
         
-        //m_pHurtBox->Set_OnStay([this](CCollider* pOther) {
-        //      ¿©±â¿¡ ÄÝ¹éÀ»
+        //m_KirbyColliders[HURT_BOX]->Set_OnStay([this](CCollider* pOther) {
+        //      ì—¬ê¸°ì— ì½œë°±ì„
         //    });
         //
-        //m_pHurtBox->Set_OnExit([this](CCollider* pOther) {
-        //      ³ÖÀ¸½Ã¿À
+        //m_KirbyColliders[HURT_BOX]->Set_OnExit([this](CCollider* pOther) {
+        //      ë„£ìœ¼ì‹œì˜¤
         //    });
     }
-
-    if (m_pInhaleBox)
-    {
-        m_pInhaleBox->Set_OnStay([this](CCollider* pOther) {
-            if (auto* pInh = dynamic_cast<IInhalable*>(pOther->Get_Owner()))
-            {
-                INHALE_QUERY q{ Is_SuperInhaling(), this };
-                if (pInh->Can_BeInhaled(q))
-                    pInh->Be_Captured(this);
-            }
-            });
-    }
-
 }
 
 HRESULT CKirby::Ready_PartObjects()
@@ -407,28 +444,12 @@ HRESULT CKirby::Bind_ShaderResources()
 
 HRESULT CKirby::Ready_Events()
 {
-    Subscribe_Event(EVT_SWALLOWED, [this](void* pData) {
-        auto* pEvt = static_cast<SWALLOW_EVENT*>(pData);
-        End_Inhale();
-
-        COPY_ABILITY_TYPE eCopy = (pEvt && pEvt->pMonster)
-            ? pEvt->pMonster->Get_CopyAbility()
-            : COPY_ABILITY_TYPE::NORMAL;
-
-        if (eCopy != COPY_ABILITY_TYPE::NORMAL)
+    Subscribe_Event(EVT_QUERY_PLAYER,
+        [this](void* pData)
         {
-            Set_KirbyAbility(eCopy);
-            Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
+            static_cast<PLAYER_QUERY*>(pData)->pPlayer = this;
         }
-        else
-        {
-            m_pBody->Set_Body(KIRBY_BODY_STATE::STUFFED);
-        }
-        });
-
-    Subscribe_Event(EVT_QUERY_PLAYER, [this](void* pData) {
-        static_cast<PLAYER_QUERY*>(pData)->pPlayer = this;
-        });
+    );
 
     return S_OK;
 }
@@ -437,31 +458,16 @@ _bool CKirby::Block_Hit(const ATTACK_INFO& tInfo)
 { 
     return m_fInvincible > 0.f; 
 }
+
 void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
 {
     m_fInvincible = s_fInvincibleDur;
-    // TODO: ³Ë¹é/ÇÇ°Ý¾Ö´Ô
+    // TODO: ë„‰ë°±/í”¼ê²©ì• ë‹˜
 }
 
-_bool CKirby::Is_SuperInhaling() const
+CCollider* CKirby::Get_Collider(KIRBY_COLLIDER eKirbyCollider)
 {
-    if (!m_pKirby_Ability || m_pKirby_Ability->Get_AbilityType() != COPY_ABILITY_TYPE::NORMAL)
-        return false;
-    return static_cast<CKirby_Ability_Normal*>(m_pKirby_Ability)->Is_SuperInhale();
-}
-
-void CKirby::Begin_Inhale()
-{
-    if (m_bInhaling) return;
-    m_bInhaling = true;
-    m_pInhaleBox->Set_Enabled(true);
-}
-
-void CKirby::End_Inhale()
-{
-    if (!m_bInhaling) return;
-    m_bInhaling = false;
-    m_pInhaleBox->Set_Enabled(false);
+    return m_KirbyColliders[eKirbyCollider];
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -497,8 +503,11 @@ void CKirby::Free()
         Safe_Release(pair.second);
     m_Abilities.clear();
 
+    m_KirbyColliders.clear();
+
     Safe_Release(m_pKirby_InputManager);
     Safe_Release(m_pKirby_Controller);
     Safe_Release(m_pKirby_StateMachine);
+
     __super::Free();
 }
