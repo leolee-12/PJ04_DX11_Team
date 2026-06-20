@@ -448,6 +448,9 @@
     <Filter Include="00. GameObject\96. LevelDesign\Rail">
       <UniqueIdentifier>{32387747-e76a-437f-8fc0-28fc7ecd1337}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Full">
+      <UniqueIdentifier>{7aaa2487-4849-48ce-acf4-559797cc9247}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -909,6 +912,9 @@
     <ClInclude Include="..\Public\RailDataReceiver.h">
       <Filter>00. GameObject\96. LevelDesign\Rail</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Stuffed.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Full</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1300,6 +1306,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\RailDataReceiver.cpp">
       <Filter>00. GameObject\96. LevelDesign\Rail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Stuffed.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Full</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

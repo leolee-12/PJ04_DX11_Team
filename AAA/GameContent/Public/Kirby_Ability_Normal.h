@@ -7,12 +7,16 @@
 NS_BEGIN(Engine)
 class CAnimator;
 class CEffect_Container;
+
+class CGameInstance_Proxy;
 NS_END
 
 NS_BEGIN(Client)
 
 class CKirby;
 class CMovement_Child;
+
+class CMonster;
 
 class CLIENT_DLL CKirby_Ability_Normal final : public CKirby_Ability
 {
@@ -69,6 +73,12 @@ private:
 
 	CEffect_Container* m_pInhaleEffect{};
 
+	// Event
+	CGameInstance_Proxy* m_pGameInstance_Proxy{};
+
+	SUBHANDLE m_hSwallowedEvent{};
+	_bool m_bSubscribedSwallowedEvent{};
+
 private:
 	void Interpolation_Inhale(CAnimator* pAnimator);
 	void Choose_InhaleAniName(_string& strAniName);
@@ -78,6 +88,11 @@ private:
 
 	void Start_InhaleCollider(CKirby* pKirby);
 	void End_InhaleCollider(CKirby* pKirby);
+
+	// Event
+	void Start_SwallowedEvent(CKirby* pKirby);
+	void End_SwallowedEvent();
+	void On_Swallowed(CKirby* pKirby, CMonster* pMonster);
 
 public:
 	static CKirby_Ability_Normal* Create();

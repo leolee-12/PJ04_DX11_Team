@@ -431,21 +431,6 @@ HRESULT CKirby::Bind_ShaderResources()
 
 HRESULT CKirby::Ready_Events()
 {
-    Subscribe_Event(EVT_SWALLOWED,
-        [this](void* pData)
-        {
-            auto* pEvt = static_cast<SWALLOW_EVENT*>(pData);
-
-            if (pEvt == nullptr || pEvt->pMonster == nullptr)
-                return;
-
-            COPY_ABILITY_TYPE eCopy = pEvt->pMonster->Get_CopyAbility();
-
-            static_cast<CKirby_Ability_Normal*>(
-                m_Abilities[COPY_ABILITY_TYPE::NORMAL])->Change_Ability(this, eCopy);
-        }
-    );
-
     Subscribe_Event(EVT_QUERY_PLAYER,
         [this](void* pData)
         {

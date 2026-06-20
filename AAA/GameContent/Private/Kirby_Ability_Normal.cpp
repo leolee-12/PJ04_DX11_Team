@@ -10,6 +10,7 @@
 #include "Kirby_State.h"
 
 #include "Inhalable.h"
+#include "Monster.h"
 
 CKirby_Ability_Normal::CKirby_Ability_Normal()
 {
@@ -18,6 +19,10 @@ CKirby_Ability_Normal::CKirby_Ability_Normal()
 HRESULT CKirby_Ability_Normal::Initialize()
 {
     if (FAILED(__super::Initialize()))
+        return E_FAIL;
+
+    m_pGameInstance_Proxy = CGameInstance::GetProxy();
+    if (m_pGameInstance_Proxy == nullptr)
         return E_FAIL;
 
     m_MaxSuperInHaleTime = 1.f;
@@ -65,6 +70,7 @@ void CKirby_Ability_Normal::Enter_Ability(CKirby* pKirby)
     //);
 
     Start_InhaleCollider(pKirby);
+    Start_SwallowedEvent(pKirby);
 }
 
 ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _float fTimeDelta)
@@ -150,7 +156,8 @@ void CKirby_Ability_Normal::Exit_Ability(CKirby* pKirby)
     //m_pInhaleEffect = nullptr;
 
     End_InhaleCollider(pKirby);
-    
+    End_SwallowedEvent();
+
     Reset_Default(pKirby);
 }
 
@@ -346,6 +353,54 @@ void CKirby_Ability_Normal::End_InhaleCollider(CKirby* pKirby)
     pInhaleBox->Set_OnStay(nullptr);
 }
 
+void CKirby_Ability_Normal::Start_SwallowedEvent(CKirby* pKirby)
+{
+    if (m_bSubscribedSwallowedEvent == true)
+        return;
+
+    m_hSwallowedEvent = m_pGameInstance_Proxy->Subscribe(
+        EVT_SWALLOWED,
+        [this, pKirby](void* pData)
+        {
+            SWALLOW_EVENT* pEvent = static_cast<SWALLOW_EVENT*>(pData);
+            if (pEvent == nullptr || pEvent->pMonster == nullptr)
+                return;
+
+            On_Swallowed(pKirby, pEvent->pMonster);
+        }
+    );
+
+    m_bSubscribedSwallowedEvent = true;
+}
+
+void CKirby_Ability_Normal::End_SwallowedEvent()
+{
+    if (m_bSubscribedSwallowedEvent == false)
+        return;
+
+    m_pGameInstance_Proxy->UnSubscribe(m_hSwallowedEvent);
+
+    m_bSubscribedSwallowedEvent = false;
+}
+
+void CKirby_Ability_Normal::On_Swallowed(CKirby* pKirby, CMonster* pMonster)
+{
+    End_InhaleCollider(pKirby);
+    End_SwallowedEvent();
+
+    COPY_ABILITY_TYPE eAbility = pMonster->Get_CopyAbility();
+
+    if (eAbility != COPY_ABILITY_TYPE::NONE && eAbility != COPY_ABILITY_TYPE::NORMAL)
+    {
+        pKirby->Request_ChangeKirbyAbility(eAbility);
+        pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
+    }
+    else
+    {
+        pKirby->Change_State(KIRBY_STATE_TYPE::FULL);
+    }
+}
+
 CKirby_Ability_Normal* CKirby_Ability_Normal::Create()
 {
     CKirby_Ability_Normal* pInstance = new CKirby_Ability_Normal();
@@ -361,5 +416,7 @@ CKirby_Ability_Normal* CKirby_Ability_Normal::Create()
 
 void CKirby_Ability_Normal::Free()
 {
+    Safe_Release(m_pGameInstance_Proxy);
+
     __super::Free();
 }
