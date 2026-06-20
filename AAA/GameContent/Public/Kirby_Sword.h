@@ -41,10 +41,11 @@ public:
 	virtual HRESULT Render() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
-	virtual void PartOnOff(_bool bOn) override;
-
 public:
 	CAnimator* Get_Animator() { return m_pAnimatorCom; }
+	//À±¼®Çö Ãß°¡
+	void Reset_HitList() { m_HitTargets.clear(); }
+	void Set_HitBox(_bool b);
 
 private:
 	HRESULT Ready_Components();
@@ -57,6 +58,8 @@ private:
 	CModel* m_pModelCom{};
 	CAnimator* m_pAnimatorCom{};
 	CCollider* m_pHitBox{};
+
+	unordered_set<CGameObject*> m_HitTargets;
 
 	_float4 m_vConstantDiffuse = { 1.f, 0.72f, 0.08f, 1.f };
 	_float3 m_vConstantMRA = { 0.25f, 0.18f, 1.f };

@@ -122,11 +122,10 @@ HRESULT CKirby_Sword::Render()
     return S_OK;
 }
 
-void CKirby_Sword::PartOnOff(_bool bOn)
+void CKirby_Sword::Set_HitBox(_bool b)
 {
-    __super::PartOnOff(bOn);
     if (m_pHitBox)
-        m_pHitBox->Set_Enabled(bOn);
+        m_pHitBox->Set_Enabled(b);
 }
 
 HRESULT CKirby_Sword::Ready_Components()
@@ -180,18 +179,23 @@ void CKirby_Sword::SetUp_HitBox_Callback()
             if (ETOUI(COLLISION_LAYER::MONSTER_HURT) != pOther->Get_RegisteredGroup())
                 return;
 
-            IDamageable* pVictim = dynamic_cast<IDamageable*>(pOther->Get_Owner());
+            CGameObject* pTarget = pOther->Get_Owner();
+            if (m_HitTargets.count(pTarget))   
+                return;
+
+            IDamageable* pVictim = dynamic_cast<IDamageable*>(pTarget);
             if (nullptr == pVictim) return;
 
             ATTACK_INFO atk{};
             atk.fDamage = 5.f;
             atk.fKnockback = 8.f;
-            atk.vAttackerPos = _float3(m_CombinedWorldMatrix._41, m_CombinedWorldMatrix._42, m_CombinedWorldMatrix._43);
             XMStoreFloat3(&atk.vAttackerPos, m_pTransformCom->Get_State(STATE::POSITION));
             atk.pAttacker = this;
             pVictim->Damaged(atk);
+
+            m_HitTargets.insert(pTarget);   
 #ifdef _DEBUG
-            OutputDebugStringA("[Kirby_Sword] HIT Monster!\n");
+            OutputDebugStringA("[Kirby_Sword] HIT monster!\n");
 #endif
         });
 }
