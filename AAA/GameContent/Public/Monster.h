@@ -80,7 +80,7 @@ public:
 	virtual _float				Get_CapsuleRadius() const = 0;
 	virtual _float				Get_CapsuleHeight() const = 0;
 	virtual _float				Get_InteractRadius() const = 0;
-	virtual _float				Get_HurtBoxRadius() const = 0;
+	virtual _bool				Get_HurtBoxDesc(CAPSULE_DESC& Out) const = 0;
 
 	// 공통 State가 구체 몬스터 애니메이션을 호출하는 추상 훅
 	virtual void				Play_StateAnimation(MONSTER_STATE_TYPE eState) = 0;

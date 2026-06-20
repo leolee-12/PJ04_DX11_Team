@@ -120,6 +120,13 @@ void CBladeKnight::Late_Update(_float fTimeDelta)
     __super::Late_Update(fTimeDelta);
 }
 
+_bool CBladeKnight::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
+{
+    Out.fRadius = { 0.6f };
+    Out.fHeight = { 0.75f };
+    return true;
+}
+
 void CBladeKnight::Play_StateAnimation(MONSTER_STATE_TYPE eState)
 {
     if (nullptr == m_pBody || nullptr == m_pSword || nullptr == m_pMovement)

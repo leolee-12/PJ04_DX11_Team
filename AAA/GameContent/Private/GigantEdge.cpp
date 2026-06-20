@@ -89,6 +89,13 @@ _bool CGigantEdge::Is_Death_Finished() const
     return m_pBody->Get_Animator()->Is_Finished();
 }
 
+_bool CGigantEdge::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
+{
+    Out.fRadius = { s_fCCT_Radius + 0.1f };
+    Out.fHeight = { s_fCCT_Height + 0.1f };
+    return true;
+}
+
 CGameObject* CMiniBoss::Find_Player() const
 {
     PLAYER_QUERY q;
@@ -118,6 +125,11 @@ void CGigantEdge::Debug_KeyInput()
     if (nullptr == m_pGameInstance_Proxy)
         return;
 
+    if (m_pGameInstance_Proxy->Key_Down(DIK_H) && m_pSword)
+    {
+        m_bDbgSwordDrawn = !m_bDbgSwordDrawn;
+        m_pSword->Set_Drawn(m_bDbgSwordDrawn);
+    }
     if (m_pGameInstance_Proxy->Key_Down(DIK_0)) Appear();                          // HIDDEN→INTRO→ACTIVE
     //if (m_pGameInstance_Proxy->Key_Down(DIK_G)) m_bGroggyRequested = true;         // 그로기 분기 진입
     //if (m_pGameInstance_Proxy->Key_Down(DIK_R)) m_bDbgInRange = !m_bDbgInRange;    // 사거리 토글 (공격↔추격)

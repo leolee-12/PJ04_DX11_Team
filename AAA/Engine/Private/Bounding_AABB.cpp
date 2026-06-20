@@ -1,6 +1,7 @@
 #include "Bounding_AABB.h"
 #include "Bounding_OBB.h"
 #include "Bounding_Sphere.h"
+#include "Bounding_Capsule.h"
 #include "DebugDraw.h"
 
 CBounding_AABB::CBounding_AABB(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -46,6 +47,10 @@ _bool CBounding_AABB::Intersect(COLLIDER eTargetType, CBounding* pBounding)
 
     case COLLIDER::SPHERE:
         m_isColl = m_pDesc->Intersects(*static_cast<CBounding_Sphere*>(pBounding)->Get_Desc());
+        break;
+
+    case COLLIDER::CAPSULE:
+        m_isColl = dynamic_cast<CBounding_Capsule*>(pBounding)->Intersects_AABB(m_pDesc);
         break;
     }
 

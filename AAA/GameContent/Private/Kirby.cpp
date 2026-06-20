@@ -242,8 +242,8 @@ HRESULT CKirby::Ready_Components()
 
     CCollider::COLLIDER_DESC ColliderDesc{};
     ColliderDesc.pOwner = this;
-    ColliderDesc.vCenter = _float3(vFootPos.x, vFootPos.y + s_fCCT_Radius, vFootPos.z);
-    ColliderDesc.fRadius = s_fCCT_Radius;
+    ColliderDesc.vCenter = _float3(vFootPos.x, vFootPos.y + (s_fCCT_Radius + 0.1f), vFootPos.z);
+    ColliderDesc.fRadius = s_fCCT_Radius + 0.1f;
 
     // HurtBox(Collider)
     m_pHurtBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, 

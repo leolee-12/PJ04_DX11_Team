@@ -179,7 +179,6 @@ MONSTER_STATE_TYPE	CMonster::Get_StateType() const
 HRESULT CMonster::Ready_Collider()
 {
 	_float fRadius;
-
 	_float3 vFootPos;
 	XMStoreFloat3(&vFootPos, m_pTransformCom->Get_State(STATE::POSITION));
 
@@ -198,15 +197,17 @@ HRESULT CMonster::Ready_Collider()
 		m_pGameInstance_Proxy->Register_Collider(m_pInteractCollider, ETOUI(COLLISION_LAYER::MONSTER_D_RANGE));
 	}
 
-
-	if ((fRadius = Get_HurtBoxRadius()) != 0.f)
+	CAPSULE_DESC Desc{};
+	if (Get_HurtBoxDesc(Desc))
 	{
 		CCollider::COLLIDER_DESC HurtDesc{};
 		HurtDesc.pOwner = this;
-		HurtDesc.vCenter = _float3(vFootPos.x, vFootPos.y + fRadius * 0.5f, vFootPos.z);
-		HurtDesc.fRadius = fRadius;
+		HurtDesc.vCenter = Desc.vCenter;
+		HurtDesc.fRadius = Desc.fRadius;
+		HurtDesc.fHeight = Desc.fHeight;
+		HurtDesc.vRadians = Desc.vRadians;
 
-		m_pHurtBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
+		m_pHurtBox = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag,
 			TEXT("MonHurtBox_Com"), &HurtDesc);
 		if (m_pHurtBox == nullptr)
 			return E_FAIL;

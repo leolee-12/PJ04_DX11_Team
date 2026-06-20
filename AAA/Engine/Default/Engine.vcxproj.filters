@@ -292,6 +292,9 @@
     <Filter Include="07. Component\Controller">
       <UniqueIdentifier>{5b6f3788-200d-4e9d-bddd-72ccf67e55f1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="07. Component\Collider\Bounding\Capsule">
+      <UniqueIdentifier>{0960ac63-c337-4ee7-9f71-004d3044dcfb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -582,6 +585,12 @@
     <ClInclude Include="..\public\Controller.h">
       <Filter>07. Component\Controller</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Bounding_Capsule.h">
+      <Filter>07. Component\Collider\Bounding\Capsule</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DebugCapsule.h">
+      <Filter>07. Component\Collider\DebugDraw</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -844,6 +853,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Controller.cpp">
       <Filter>07. Component\Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Bounding_Capsule.cpp">
+      <Filter>07. Component\Collider\Bounding\Capsule</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

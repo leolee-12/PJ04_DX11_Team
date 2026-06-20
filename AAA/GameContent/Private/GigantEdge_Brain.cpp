@@ -65,14 +65,29 @@ HRESULT CGigantEdge_Brain::Initialize()
                 [t]() { *t = 0.f; });
         };
 
-    auto MakeChargeAttack = [&](const string& p) -> CBTNode*     
+    auto MakeChargeAttack = [&]() -> CBTNode*     
         {
             return CBTSequence::Create({
-                OneShot(p + "ChargeStart", 2.f),
-                HoldLoop(p + "ChargeWait", fChargeTime),
-                OneShot(p + "Start", 2.f),
-                OneShot(p + "Wait", 2.f),
-                OneShot(p + "End", 2.f),
+                OneShot("SwordAppearStart", 2.f),
+                OneShot("SwordAppear", 2.f),
+                //OneShot("AttackAChargeStart", 2.f),
+                HoldLoop("AttackAChargeWait", fChargeTime),
+                OneShot("AttackAStart", 2.f),
+                OneShot("AttackAWait", 2.f),
+                OneShot("AttackAEnd", 2.f),
+                });
+        };
+
+    auto MakeSideAttack = [&]() -> CBTNode*
+        {
+            return CBTSequence::Create({
+                OneShot("SwordAppearStart", 2.f),
+                OneShot("SideSwordAppear", 2.f),
+                //OneShot("SideAttackAChargeStart", 2.f),
+                HoldLoop("SideAttackAChargeWait", fChargeTime),
+                OneShot("SideAttackAStart", 2.f),
+                OneShot("SideAttackAWait", 2.f),
+                OneShot("SideAttackAEnd", 2.f),
                 });
         };
 
@@ -104,6 +119,7 @@ HRESULT CGigantEdge_Brain::Initialize()
             });
 
         return CBTSequence::Create({
+            OneShot("SwordAppearStart", 2.f),
             OneShot("PreThrustStart", 2.f),
             HoldLoop("PreThrustStartWait", fThrustCharge),
             OneShot("ThrustStart", 2.f),
@@ -162,6 +178,7 @@ HRESULT CGigantEdge_Brain::Initialize()
         },
         [this, fGuardT]() { *fGuardT = 0.f; m_pOwner->Set_Guarding(false); });
     CBTNode* pGuard = CBTSequence::Create({
+        OneShot("ShieldAppear", 2.f),
         OneShot("ShieldGuardStart"),
         pGuardHold,
         OneShot("ShieldHide"),
@@ -244,8 +261,8 @@ HRESULT CGigantEdge_Brain::Initialize()
                 CBTSequence::Create({                
                     pFacing, pPick,
                     CBTSelector::Create({
-                        MakeAttackBranch(0, MakeChargeAttack("AttackA")),       
-                        MakeAttackBranch(1, MakeChargeAttack("SideAttackA")),   
+                        MakeAttackBranch(0, MakeChargeAttack()),       
+                        MakeAttackBranch(1, MakeSideAttack()),   
                         MakeAttackBranch(2, MakeThrust()),                      
                     }),
                     pPostAttackDelay,

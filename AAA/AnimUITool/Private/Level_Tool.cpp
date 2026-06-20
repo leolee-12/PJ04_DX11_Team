@@ -1202,6 +1202,11 @@ void CLevel_Tool::Update(_float fTimeDelta)
         Log_Info("Publish: Kirby.PointStarGained");
     }
 
+    if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F1, false))
+    {
+        m_pGameInstance_Proxy->Toggle_PhysXDebug();
+    }
+
     if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F2, false))
     {
         m_pGameInstance_Proxy->Toggle_DebugRender();

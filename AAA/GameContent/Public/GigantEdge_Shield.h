@@ -1,9 +1,9 @@
 #pragma once
-#include "MonsterPart.h"
+#include "MonsterHitPart.h"
 
 NS_BEGIN(Client)
 
-class CGigantEdge_Shield final : public CMonsterPart
+class CGigantEdge_Shield final : public CMonsterHitPart
 {
     GENERATED_BODY(CGigantEdge_Shield)
 
@@ -14,12 +14,10 @@ private:
 
 public:
     struct GIGANTEDGE_SHIELD_DESC : public CMonsterPart::MONSTERPART_DESC {};
-
     static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_GigantEdge_Shield";
     static constexpr const wchar_t* PART_TAG = L"Shield";
 
 public:
-    virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void* pArg) override;
     virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* p) override { p->strPrototypeTag = PROTOTYPE_TAG; }
 

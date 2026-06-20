@@ -4,6 +4,7 @@
 #include "Bounding_AABB.h"
 #include "Bounding_OBB.h"
 #include "Bounding_Sphere.h"
+#include "Bounding_Capsule.h"
 
 NS_BEGIN(Engine)
 
@@ -18,6 +19,7 @@ public:
 		_float3			vSize = { 1.f, 1.f, 1.f };
 		_float3			vRadians = {};
 		_float			fRadius = { 0.5f };
+		_float			fHeight = { 1.f };
 		CGameObject*	pOwner = { nullptr };
 	}COLLIDER_DESC;
 
