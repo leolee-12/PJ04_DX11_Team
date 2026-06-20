@@ -27,6 +27,8 @@ class CKirby_Body;
 
 class CKirby_OnOffPart;
 
+class CMonster;
+
 class CKirby final : public CCharacter
 {
 	GENERATED_BODY(CKirby)
@@ -60,6 +62,8 @@ public:
 	static constexpr _float s_fInhaleFwd = 1.8f;
 	static constexpr _float s_fInhaleUp = 0.5f;
 	static constexpr _float3 s_vInhaleSize = _float3(2.f, 2.f, 4.f);
+
+	static constexpr _float s_fSpitSpeed = 14.f;
 
 private:
 	CKirby(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);
@@ -111,6 +115,11 @@ public:
 	// Collider
 	CCollider* Get_Collider(KIRBY_COLLIDER eKirbyCollider);
 
+	// À± Ãß
+	// Stuffed
+	void  Set_SwallowedMonster(CMonster* pMonster) { m_pSwallowedMonster = pMonster; }
+	void  Spit_SwallowedMonster();
+
 private:
 	HRESULT Ready_Components();
 	void	SetUp_Collider_Callback();
@@ -126,7 +135,7 @@ private:
 	// À±¼®Çö Ãß°¡
 	virtual _bool Block_Hit(const ATTACK_INFO& tInfo) override;
 	virtual void  On_Damaged(const ATTACK_INFO& tInfo) override;
-
+	
 private:
 	// Parts
 	CKirby_Body* m_pBody{};
@@ -143,6 +152,9 @@ private:
 	vector<CCollider*> m_KirbyColliders;
 
 	_float	   m_fInvincible = { 0.f };
+
+	// À± Ãß
+	CMonster* m_pSwallowedMonster{};
 
 private:
 	// System

@@ -315,7 +315,7 @@ HRESULT CKirby::Ready_Components()
     m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX]->Set_Enabled(false);
     m_pGameInstance_Proxy->Register_Collider(m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX], ETOUI(COLLISION_LAYER::PLAYER_INHALE));
 
-    //ìž„ì‹œ
+    //ÀÓ½Ã
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HIT));
@@ -323,7 +323,8 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_D_RANGE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_TRIGGER));
 
-    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT), ETOUI(COLLISION_LAYER::MONSTER_HURT));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT),        ETOUI(COLLISION_LAYER::MONSTER_HURT));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE), ETOUI(COLLISION_LAYER::MONSTER_HURT));
 
     return S_OK;
 }
@@ -353,11 +354,11 @@ void CKirby::SetUp_Collider_Callback()
             });
         
         //m_KirbyColliders[HURT_BOX]->Set_OnStay([this](CCollider* pOther) {
-        //      ì—¬ê¸°ì— ì½œë°±ì„
+        //      ¿©±â¿¡ ÄÝ¹éÀ»
         //    });
         //
         //m_KirbyColliders[HURT_BOX]->Set_OnExit([this](CCollider* pOther) {
-        //      ë„£ìœ¼ì‹œì˜¤
+        //      ³ÖÀ¸½Ã¿À
         //    });
     }
 }
@@ -462,7 +463,22 @@ _bool CKirby::Block_Hit(const ATTACK_INFO& tInfo)
 void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
 {
     m_fInvincible = s_fInvincibleDur;
-    // TODO: ë„‰ë°±/í”¼ê²©ì• ë‹˜
+    // TODO: ³Ë¹é/ÇÇ°Ý¾Ö´Ô
+}
+
+void CKirby::Spit_SwallowedMonster()
+{
+    if (m_pSwallowedMonster == nullptr)
+        return;
+
+    CTransform* pT = m_pTransformCom;
+    _vector vMouth = pT->Get_State(STATE::POSITION)
+        + pT->Get_State(STATE::LOOK) * s_fInhaleFwd
+        + pT->Get_State(STATE::UP) * s_fInhaleUp;
+    _vector vDir = pT->Get_State(STATE::LOOK);
+
+    m_pSwallowedMonster->Be_Spat(vMouth, vDir, s_fSpitSpeed);
+    m_pSwallowedMonster = nullptr;
 }
 
 CCollider* CKirby::Get_Collider(KIRBY_COLLIDER eKirbyCollider)
