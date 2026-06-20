@@ -23,6 +23,7 @@ public:
 
 public:
 	virtual _bool Intersect(COLLIDER eTargetType, CBounding* pBounding) = 0;
+	void Set_Colliding(_bool b) { m_isColl = b; }
 
 #ifdef _DEBUG
 public:

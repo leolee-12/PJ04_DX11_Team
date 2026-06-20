@@ -39,8 +39,8 @@ public:
 	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_Kirby";
 
 	// Controller(Collider: Capsule)
-	static constexpr _float s_fCCT_Radius = 0.75f;
-	static constexpr _float s_fCCT_Height = 0.2f;
+	static constexpr _float s_fCCT_Radius = 0.5f;
+	static constexpr _float s_fCCT_Height = 0.1f;
 
 	static constexpr _float s_fFallVelocityY = -7.f;
 

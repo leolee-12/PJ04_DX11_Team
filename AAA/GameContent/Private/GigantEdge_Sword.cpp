@@ -1,25 +1,28 @@
 #include "GigantEdge_Sword.h"
+#include "GameInstance.h"
+#include "Damageable.h"
 
 CGigantEdge_Sword::CGigantEdge_Sword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CMonsterPart(pDevice, pContext) {
+    : CMonsterHitPart(pDevice, pContext) {
 }
-
 CGigantEdge_Sword::CGigantEdge_Sword(const CGigantEdge_Sword& Prototype)
-    : CMonsterPart(Prototype) {
-}
-
-HRESULT CGigantEdge_Sword::Initialize_Prototype()
-{
-    m_eProjType = PROJ_TYPE::PERSPEC;
-    return S_OK;
+    : CMonsterHitPart(Prototype) {
 }
 
 HRESULT CGigantEdge_Sword::Initialize(void* pArg)
 {
-    if (FAILED(__super::Initialize(pArg))) 
+    if (FAILED(__super::Initialize(pArg)))            return E_FAIL;
+    if (FAILED(Ready_Components()))                   return E_FAIL;
+    CAPSULE_DESC CapsuleDesc{};
+    CapsuleDesc.vCenter = { 0.f, 0.f, 0.f };
+    CapsuleDesc.fHeight = 1.5f;
+    CapsuleDesc.fRadius = 0.6f;
+    CapsuleDesc.vRadians = { XMConvertToRadians(-90.f), 0.f, 0.f};
+    if (FAILED(Ready_HitBox(CapsuleDesc)))
         return E_FAIL;
 
-    return Ready_Components();
+    Set_Drawn(false);                               
+    return S_OK;
 }
 
 HRESULT CGigantEdge_Sword::Ready_Components()
@@ -27,7 +30,7 @@ HRESULT CGigantEdge_Sword::Ready_Components()
     PART_SETUP t{};
     t.tShader = Shader_NonAnimMesh_PBR;
     t.szModelProtoTag = TEXT("Prototype_Component_Model_GigantEdge_Sword");
-    t.bAnimated = false;                              
+    t.bAnimated = false;
     return Ready_MeshPart(t);
 }
 

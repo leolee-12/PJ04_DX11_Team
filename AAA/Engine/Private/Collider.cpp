@@ -82,6 +82,17 @@ HRESULT CCollider::Initialize(void* pArg)
         break;
     }
 
+    case COLLIDER::CAPSULE:
+    {
+        CBounding_Capsule::BOUNDING_CAPSULE_DESC d{};
+        d.vCenter = pColliderDesc->vCenter;
+        d.fRadius = pColliderDesc->fRadius;
+        d.fHeight = pColliderDesc->fHeight;
+        d.vRadians = pColliderDesc->vRadians;
+        m_pBounding = CBounding_Capsule::Create(m_pDevice, m_pContext, &d);
+        break;
+    }
+
     default:
         return E_FAIL;
     }
@@ -173,6 +184,8 @@ HRESULT CCollider::Render()
     m_pEffect->Apply(m_pContext);
 
     m_pBatch->Begin();
+
+    m_pBounding->Set_Colliding(!m_CurrContacts.empty());
 
     if (FAILED(m_pBounding->Render(m_pBatch)))
         return E_FAIL;

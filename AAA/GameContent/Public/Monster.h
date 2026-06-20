@@ -81,7 +81,7 @@ public:
 	virtual _float				Get_CapsuleRadius() const = 0;
 	virtual _float				Get_CapsuleHeight() const = 0;
 	virtual _float				Get_InteractRadius() const = 0;
-	virtual _float				Get_HurtBoxRadius() const = 0;
+	virtual _bool				Get_HurtBoxDesc(CAPSULE_DESC& Out) const = 0;
 
 	virtual CAnimator*			Get_BodyAnimator() const { return nullptr; }
 

@@ -70,6 +70,10 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
         CCollider::Create(pDevice, pContext, COLLIDER::OBB))))
         return E_FAIL;
 
+    if (FAILED(pProxy->Add_Prototype(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag,
+        CCollider::Create(pDevice, pContext, COLLIDER::CAPSULE))))
+        return E_FAIL;
+
     static const ENV_ENTRY g_EnvTable[] = {
       { 
         TEXT("Grass"), 

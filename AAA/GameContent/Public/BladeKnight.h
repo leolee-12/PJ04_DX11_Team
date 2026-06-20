@@ -46,10 +46,9 @@ public:
 	virtual _float				Get_CapsuleRadius() const override { return 0.5f; }
 	virtual _float				Get_CapsuleHeight() const override { return 1.f; }
 	virtual _float				Get_InteractRadius() const override { return 10.f; }
-	virtual _float				Get_HurtBoxRadius() const override { return 0.75f; }
+	virtual _bool				Get_HurtBoxDesc(CAPSULE_DESC& Out) const override;
 
 	virtual CAnimator*			Get_BodyAnimator() const override;
-
 
 public:
 	CBladeKnight_Body*			Get_Body() { return m_pBody; }
