@@ -30,6 +30,7 @@ public:
 #ifdef _DEBUG
 	void Add_DebugComponent(class CComponent* pComponent);
 	void Toggle_DebugRender() { m_bDebugRender = !m_bDebugRender; }
+	_bool IsOn_DebugRender() { return m_bDebugRender; }
 #endif
 
 public:

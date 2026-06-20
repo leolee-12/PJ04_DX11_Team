@@ -60,6 +60,7 @@ public:
 	HRESULT Load_MapPreview(_uint iPresetIndex);
 	HRESULT Load_MapPreviewStage(_uint iPresetIndex);
 	HRESULT Load_MapPreviewEnv(_uint iPresetIndex);
+	HRESULT Load_LDPreview(_uint iPresetIndex);
 	void    Clear_MapPreview();
 	void    Clear_MapPreviewStage();
 	void    Clear_MapPreviewEnv();
@@ -97,6 +98,8 @@ public:
 
 	void Preview_Camera(CGameObject* pCam);
 	void Back_To_Edit();
+	void Reset_EditCameraRotation();
+	void Jump_EditCamera(_float fForwardDistance, _float fRightDistance);
 
 public:       // Hierarchy
 	_uint Get_HierarchyRevision() const { return m_iHierarchyRevision; }

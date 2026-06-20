@@ -97,6 +97,7 @@ public: //Renderer
 #ifdef _DEBUG
     void    Add_DebugComponent(class CComponent* pComponent);
     void    Toggle_DebugRender();
+    _bool   IsOn_DebugRender();
 #endif
 #pragma endregion
 
@@ -240,7 +241,8 @@ public:
 
 #pragma region PHYSIX_MANAGER
       physx::PxTriangleMesh* Cook_TriangleMesh(const _float3* pPositions, _uint iNumVertices, const _uint* pIndices, _uint iNumIndices, _bool bFlipWinding = true);
-      physx::PxRigidStatic* Create_StaticActor(physx::PxTriangleMesh* pMesh, _fmatrix WorldMatrix);
+      physx::PxRigidStatic*  Create_StaticActor(physx::PxTriangleMesh* pMesh, _fmatrix WorldMatrix);
+      physx::PxRigidStatic*  Create_StaticBox(const _float3& vLocalCenter, const _float3& vLocalHalfExtents, _fmatrix WorldMatrix);
       void                   Remove_StaticActor(physx::PxRigidStatic* pActor);
 
       physx::PxController*   Create_CapsuleController(const _float3& vFootPos, _float fRadius, _float fHeight);

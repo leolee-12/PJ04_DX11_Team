@@ -32,7 +32,6 @@ public:
 	HRESULT Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, const vector<CBone*>& Bones);
 
 	_bool Ray_AABB(_fvector vOrigin, _fvector vDir) const;
-	_bool Ray_AABB_Ex(_fvector vOrigin, _fvector vDir, _float fPadding = 0.f) const;
 	_bool Pick(_fvector vOrigin, _fvector vDir, _float3* pOutHit, _float* pOutDist = nullptr) const;
 
 	// Instance

@@ -31,4 +31,31 @@ enum class LD_BREAKABLE_TYPE : _uint
 	END
 };
 
+enum class LD_VOLUME_TYPE : _uint
+{
+	INVISIBLE_COLLISION,
+	INVISIBLE_COLLISION_BOX,
+	FALL_BORDER,
+	WATER_AREA,
+	UNKNOWN,
+	END
+};
+
+enum class LD_AUDIO_AREA_TYPE : _uint
+{
+	BGM_REQUESTOR,
+	AREA_SE,
+	UNKNOWN,
+	END
+};
+
+enum class LD_RAIL_TYPE : _uint
+{
+	LINE,
+	CIRCLE,
+	BEZIER,
+	UNKNOWN,
+	END
+};
+
 NS_END

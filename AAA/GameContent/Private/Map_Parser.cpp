@@ -166,10 +166,7 @@ HRESULT CMap_Parser::Parse_Manifest(const _wstring& strManifestPath, MAP_MANIFES
 	return Parse_ManifestRoot(jRoot, filesystem::path(strManifestPath), pOutManifest);
 }
 
-HRESULT CMap_Parser::Parse_ManifestRoot(
-	const json& jRoot,
-	const filesystem::path& ManifestPath,
-	MAP_MANIFEST_DESC* pOutManifest)
+HRESULT CMap_Parser::Parse_ManifestRoot(const json& jRoot, const filesystem::path& ManifestPath, MAP_MANIFEST_DESC* pOutManifest)
 {
 	if (nullptr == pOutManifest)
 		return E_FAIL;
@@ -206,6 +203,29 @@ HRESULT CMap_Parser::Parse_ManifestRoot(
 
 		for (const _wstring& strRawPath : RawEnvJsonPaths)
 			pOutManifest->EnvJsonPaths.push_back(Resolve_PathFromManifest(ManifestPath, strRawPath));
+	}
+
+	vector<_wstring> RawLevelDesignJsonPaths;
+	if (Try_ReadStringArray(jManifest, "LevelDesignJsonPaths", &RawLevelDesignJsonPaths)
+		|| Try_ReadStringArray(jManifest, "LevelDesignJsons", &RawLevelDesignJsonPaths)
+		|| Try_ReadStringArray(jManifest, "LevelDesignPaths", &RawLevelDesignJsonPaths))
+	{
+		pOutManifest->LevelDesignJsonPaths.clear();
+		pOutManifest->LevelDesignJsonPaths.reserve(RawLevelDesignJsonPaths.size());
+
+		for (const _wstring& strRawPath : RawLevelDesignJsonPaths)
+			pOutManifest->LevelDesignJsonPaths.push_back(Resolve_PathFromManifest(ManifestPath, strRawPath));
+	}
+	else
+	{
+		_wstring strLevelDesignPath;
+		if (Try_ReadString(jManifest, "LevelDesignPath", &strLevelDesignPath)
+			|| Try_ReadString(jManifest, "LevelDesignJsonPath", &strLevelDesignPath)
+			|| Try_ReadString(jManifest, "LevelDesign", &strLevelDesignPath))
+		{
+			pOutManifest->LevelDesignJsonPaths.push_back(
+				Resolve_PathFromManifest(ManifestPath, strLevelDesignPath));
+		}
 	}
 
 	_wstring strDeltaPath;
