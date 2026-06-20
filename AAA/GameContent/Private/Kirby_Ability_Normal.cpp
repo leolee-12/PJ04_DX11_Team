@@ -373,6 +373,7 @@ void CKirby_Ability_Normal::On_Swallowed(CKirby* pKirby, CMonster* pMonster)
     }
     else
     {
+        pKirby->Set_SwallowedMonster(pMonster);
         pKirby->Change_State(KIRBY_STATE_TYPE::FULL);
     }
 }
