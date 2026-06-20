@@ -448,6 +448,9 @@
     <Filter Include="00. GameObject\96. LevelDesign\Rail">
       <UniqueIdentifier>{32387747-e76a-437f-8fc0-28fc7ecd1337}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\99. Monster_PartBase">
+      <UniqueIdentifier>{de6fdd7b-10fb-45d6-ad3d-ed06421c157b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -909,6 +912,9 @@
     <ClInclude Include="..\Public\RailDataReceiver.h">
       <Filter>00. GameObject\96. LevelDesign\Rail</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\MonsterPart.h">
+      <Filter>00. GameObject\06. Monster\99. Monster_PartBase</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1300,6 +1306,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\RailDataReceiver.cpp">
       <Filter>00. GameObject\96. LevelDesign\Rail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MonsterPart.cpp">
+      <Filter>00. GameObject\06. Monster\99. Monster_PartBase</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -53,7 +53,6 @@ public:
 	virtual void				Priority_Update(_float fTimeDelta) override;
 	virtual void				Update(_float fTimeDelta) override;
 	virtual void				Late_Update(_float fTimeDelta) override;
-	virtual HRESULT				Render() override;
 
 	virtual void				Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override
 	{
@@ -86,7 +85,6 @@ protected:
 
 private:
 	HRESULT						Ready_PartObjects();
-	HRESULT						Bind_ShaderResources();
 
 	virtual void				On_Deserialized() override;
 

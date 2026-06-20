@@ -31,14 +31,6 @@ HRESULT CGigantEdge::Initialize(void* pArg)
     return S_OK;
 }
 
-void CGigantEdge::Priority_Update(_float fTimeDelta) 
-{ 
-    if (!m_bActive)
-        return;
-
-    __super::Priority_Update(fTimeDelta); 
-}
-
 void CGigantEdge::Update(_float fTimeDelta) 
 { 
 #ifdef _DEBUG
@@ -50,24 +42,9 @@ void CGigantEdge::Update(_float fTimeDelta)
 
     Debug_KeyInput();
 #endif
-    if (!m_bActive)
-        return;
 
     __super::Update(fTimeDelta); 
 }  
-
-void CGigantEdge::Late_Update(_float fTimeDelta) 
-{
-    if (!m_bActive)
-        return;
-
-    __super::Late_Update(fTimeDelta); 
-}
-
-HRESULT CGigantEdge::Render() 
-{ 
-    return S_OK; 
-}
 
 void CGigantEdge::On_Deserialized() 
 { 
@@ -186,26 +163,19 @@ void CGigantEdge::Free()
 
 HRESULT CGigantEdge::Ready_Parts()
 {
-    CGigantEdge_Body::GIGANTEDGE_BODY_DESC BodyDesc{};
-    BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-    if (FAILED(Add_PartObject(m_iPrototypeLevel, CGigantEdge_Body::PROTOTYPE_TAG, CGigantEdge_Body::PART_TAG, &BodyDesc)))
-        return E_FAIL;
-    m_pBody = dynamic_cast<CGigantEdge_Body*>(m_PartObjects[CGigantEdge_Body::PART_TAG]);
+    m_pBody = Add_MonsterPart<CGigantEdge_Body>(
+        CGigantEdge_Body::PROTOTYPE_TAG, CGigantEdge_Body::PART_TAG);
     if (!m_pBody) return E_FAIL;
 
-    CGigantEdge_Sword::GIGANTEDGE_SWORD_DESC SwordDesc{};
-    SwordDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-    SwordDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("RHaveL");
-    if (FAILED(Add_PartObject(m_iPrototypeLevel, CGigantEdge_Sword::PROTOTYPE_TAG, CGigantEdge_Sword::PART_TAG, &SwordDesc)))
-        return E_FAIL;
-    m_pSword = dynamic_cast<CGigantEdge_Sword*>(m_PartObjects[CGigantEdge_Sword::PART_TAG]);
+    m_pSword = Add_MonsterPart<CGigantEdge_Sword>(
+        CGigantEdge_Sword::PROTOTYPE_TAG, CGigantEdge_Sword::PART_TAG,
+        m_pBody->Get_BoneMatrixPtr("RHaveL"));
+    if (!m_pSword) return E_FAIL;
 
-    CGigantEdge_Shield::GIGANTEDGE_SHIELD_DESC ShieldDesc{};
-    ShieldDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-    ShieldDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("LHaveL");
-    if (FAILED(Add_PartObject(m_iPrototypeLevel, CGigantEdge_Shield::PROTOTYPE_TAG, CGigantEdge_Shield::PART_TAG, &ShieldDesc)))
-        return E_FAIL;
-    m_pShield = dynamic_cast<CGigantEdge_Shield*>(m_PartObjects[CGigantEdge_Shield::PART_TAG]);
+    m_pShield = Add_MonsterPart<CGigantEdge_Shield>(
+        CGigantEdge_Shield::PROTOTYPE_TAG, CGigantEdge_Shield::PART_TAG,
+        m_pBody->Get_BoneMatrixPtr("LHaveL"));
+    if (!m_pShield) return E_FAIL;
 
     return S_OK;
 }

@@ -3,6 +3,7 @@
 #include "Character.h"
 #include "Monster_BlackBoard.h"
 #include "Inhalable.h"
+#include "MonsterPart.h"
 
 NS_BEGIN(Engine)
 class CCollider;
@@ -130,6 +131,20 @@ protected:
 	//À±¼®Çö ¼öÁ¤ 
 	virtual void				Update_AI(_float fTimeDelta);
 	virtual void				Perceive(_float fTimeDelta);
+
+protected:
+	template<class TPart>
+	TPart* Add_MonsterPart(const _tchar* szProtoTag, const _tchar* szPartTag, const _float4x4* pSocketBone = nullptr)
+	{
+		CMonsterPart::MONSTERPART_DESC Desc{};
+		Desc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+		Desc.pSocketBoneMatrix = pSocketBone;
+
+		if (FAILED(Add_PartObject(m_iPrototypeLevel, szProtoTag, szPartTag, &Desc)))
+			return nullptr;
+
+		return dynamic_cast<TPart*>(m_PartObjects[szPartTag]);
+	}
 
 protected:
 	virtual void				Free() override;
