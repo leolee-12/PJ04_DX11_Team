@@ -475,6 +475,9 @@
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\GetAbility">
       <UniqueIdentifier>{ef199045-e026-474a-9ec3-100f82b3ae9a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Spat">
+      <UniqueIdentifier>{81b0629c-516a-4991-8c17-3bfbd6ecf5e9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -960,6 +963,9 @@
     <ClInclude Include="..\Public\Kirby_Stuffed.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Full</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Monster_State_Spat.h">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1369,6 +1375,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Stuffed.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Full</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Monster_State_Spat.cpp">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

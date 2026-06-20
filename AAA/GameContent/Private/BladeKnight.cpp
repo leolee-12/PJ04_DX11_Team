@@ -18,6 +18,7 @@
 #include "Monster_State_Chase.h"
 #include "Monster_State_KnockBack.h"
 #include "Monster_State_KnockOut.h"
+#include "Monster_State_Spat.h"
 
 #include "BladeKnight_State_Retreat.h"
 
@@ -62,7 +63,7 @@ HRESULT CBladeKnight::Initialize(void* pArg)
     if (FAILED(Ready_AnimEvents()))
         return E_FAIL;
 
-    m_eCopyAbility = COPY_ABILITY_TYPE::SWORD;
+    //m_eCopyAbility = COPY_ABILITY_TYPE::SWORD;
 
     return S_OK;
 }
@@ -154,6 +155,14 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
     Info.fSpeed = 1.25f;
 
     if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
+        return E_FAIL;
+
+    // State Spat (¹ß»çÃ¼)
+    Info.strAniName = "Damage";   
+    Info.bLoop = true;
+    Info.fSpeed = 1.f;
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::SPAT, CMonster_State_Spat::Create(Info))))
         return E_FAIL;
 
     // State Chase

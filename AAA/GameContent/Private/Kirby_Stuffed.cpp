@@ -257,6 +257,7 @@ void CKirby_Stuffed::Enter_Animation(CKirby* pKirby, CAnimator* pAnimator)
 
         case STUFFED_STATE::STUFFED_SPIT:
             pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::STUFFED_SPIT);
+            pKirby->Spit_SwallowedMonster(); //임시로 넣음 윤 추
             break;
     }
 }
