@@ -20,8 +20,20 @@ private:
 	_int						m_iSelEvent = { -1 };
 	_char						m_szEventPath[MAX_PATH] = {};
 
+	CModel*						m_pCachedAnimModel = { nullptr };
+	_int						m_iCachedAnimCount = { -1 };
+	_char						m_szAnimSearch[MAX_PATH] = {};
+	string						m_strCachedAnimSearch = {};
+	vector<string>				m_AnimNames;
+	vector<string>				m_AnimNamesLower;
+	vector<_uint>				m_FilteredAnimIndices;
+
+
 private:
 	void						Render_EventTimeline();
+
+	void						Rebuild_AnimNameCache(CModel* pModel);
+	void						Rebuild_AnimFilter();
 
 public:
 	static CPanel_Animation* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

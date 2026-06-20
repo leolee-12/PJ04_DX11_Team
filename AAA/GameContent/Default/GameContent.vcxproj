@@ -22,12 +22,7 @@
     <ClInclude Include="..\Public\BladeKnight_Body.h" />
     <ClInclude Include="..\Public\BladeKnight_FSM.h" />
     <ClInclude Include="..\Public\BladeKnight_State_Attack.h" />
-    <ClInclude Include="..\Public\BladeKnight_State_Chase.h" />
     <ClInclude Include="..\Public\BladeKnight_State_DoubleAttack.h" />
-    <ClInclude Include="..\Public\BladeKnight_State_Fall.h" />
-    <ClInclude Include="..\Public\BladeKnight_State_Find.h" />
-    <ClInclude Include="..\Public\BladeKnight_State_Idle.h" />
-    <ClInclude Include="..\Public\BladeKnight_State_Landing.h" />
     <ClInclude Include="..\Public\BladeKnight_State_Retreat.h" />
     <ClInclude Include="..\Public\BladeKnight_Sword.h" />
     <ClInclude Include="..\Public\BladeKnight_State_TornadoAttack.h" />
@@ -191,12 +186,7 @@
     <ClCompile Include="..\Private\BladeKnight_Body.cpp" />
     <ClCompile Include="..\Private\BladeKnight_FSM.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State_Attack.cpp" />
-    <ClCompile Include="..\Private\BladeKnight_State_Chase.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State_DoubleAttack.cpp" />
-    <ClCompile Include="..\Private\BladeKnight_State_Fall.cpp" />
-    <ClCompile Include="..\Private\BladeKnight_State_Find.cpp" />
-    <ClCompile Include="..\Private\BladeKnight_State_Idle.cpp" />
-    <ClCompile Include="..\Private\BladeKnight_State_Landing.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State_Retreat.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Sword.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State_TornadoAttack.cpp" />

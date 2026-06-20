@@ -4,6 +4,7 @@
 #include "Preview_Actor.h"
 #include "GameInstance_Proxy.h"
 #include "Panel_Manager.h"
+#include "PartObject.h"
 
 using namespace AnimUITool;
 
@@ -44,7 +45,16 @@ void CPanel_Viewport::Render()
         {
             const _float4x4* pView = m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC);
             const _float4x4* pProj = m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
-            const _float4x4* pWorld = ctx.pOwner->Get_Transform()->Get_WorldMatrixPtr();
+            const _float4x4* pWorld = nullptr;
+
+            if (auto* pPart = dynamic_cast<CPartObject*>(ctx.pOwner))
+            {
+                pWorld = pPart->Get_CombinedWorldMatrixPtr();
+            }
+            else if (ctx.pOwner->Get_Transform())
+            {
+                pWorld = ctx.pOwner->Get_Transform()->Get_WorldMatrixPtr();
+            }
 
             if (pView && pProj && pWorld)
             {

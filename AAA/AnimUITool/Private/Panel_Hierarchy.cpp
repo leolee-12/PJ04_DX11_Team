@@ -9,6 +9,10 @@
 #include "UI_GaugeFill.h"
 #include "UI_Curtain.h"
 #include "UI_CurtainAnimBase.h"
+#include "ContainerObject.h"
+#include "PartObject.h"
+#include "Model.h"
+#include "Animator.h"
 
 CPanel_Hierarchy::CPanel_Hierarchy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPanel(pDevice, pContext)
@@ -32,6 +36,8 @@ void CPanel_Hierarchy::Render_AnimationHierarchy()
 {
     CLevel_Tool* pLevel = m_pPanel_Manager->Get_Level();
     if (!pLevel) { ImGui::TextDisabled("(no level)"); return; }
+
+    m_pPanel_Manager->Validate_AnimSelection();
 
     // draw one row, return true if Delete requested
     auto DrawRow = [&](CGameObject* pObj, const char* szFallback) -> bool
@@ -65,14 +71,138 @@ void CPanel_Hierarchy::Render_AnimationHierarchy()
     // 2) Spawned (palette-placed objects, the vector list)
     ImGui::SeparatorText("Spawned");
     CGameObject* pPendingDelete = nullptr;
+
+    auto DrawPartRow = [&](CGameObject* pOwner, const _wstring& strPartTag, CPartObject* pPart)
+        {
+            if (!pPart)
+                return;
+
+            ImGui::PushID(pPart);
+
+            const _bool bHasAnim =
+                pPart->Get_Component<CModel>(L"Com_Model") &&
+                pPart->Get_Component<CAnimator>(L"Com_Animator");
+
+            string strLabel = ToUtf8(strPartTag);
+            if (strLabel.empty())
+                strLabel = "Part";
+
+            if (!bHasAnim)
+                strLabel += "  (no anim)";
+
+            if (!bHasAnim)
+                ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+
+            const _bool bSelected = (m_pPanel_Manager->Get_Selected() == pPart);
+
+            if (ImGui::Selectable(strLabel.c_str(), bSelected, ImGuiSelectableFlags_SpanAvailWidth))
+            {
+                const _wstring strDisplayName = pOwner->Get_ObjectTag() + L"/" + strPartTag;
+                m_pPanel_Manager->Bind_ForAnimSource(pOwner, pPart, strDisplayName);
+            }
+
+            if (!bHasAnim)
+                ImGui::PopStyleColor();
+
+            ImGui::PopID();
+        };
+
+
     for (auto* pObj : pLevel->Get_SpawnedObjects())
-        if (pObj && DrawRow(pObj, "Object"))
-            pPendingDelete = pObj;
+    {
+        if (!pObj)
+            continue;
+
+        if (auto* pContainer = dynamic_cast<CContainerObject*>(pObj))
+        {
+            ImGui::PushID(pObj);
+
+            string strName = ToUtf8(pObj->Get_ObjectTag());
+            if (strName.empty())
+                strName = "Container";
+
+            const _bool bSelected = (m_pPanel_Manager->Get_Selected() == pObj);
+
+            if (ImGui::SmallButton("Delete"))
+                pPendingDelete = pObj;
+            ImGui::SameLine();
+
+            ImGuiTreeNodeFlags flags =
+                ImGuiTreeNodeFlags_OpenOnArrow |
+                ImGuiTreeNodeFlags_SpanAvailWidth;
+
+            if (bSelected)
+                flags |= ImGuiTreeNodeFlags_Selected;
+
+            const _bool bOpen = ImGui::TreeNodeEx(strName.c_str(), flags);
+
+            if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+                m_pPanel_Manager->Bind_ForAnimSource(pObj, nullptr, pObj->Get_ObjectTag());
+
+            if (bSelected && ImGui::IsKeyPressed(ImGuiKey_Delete))
+                pPendingDelete = pObj;
+
+            if (bOpen)
+            {
+                const auto& Parts = pContainer->Get_PartObjects();
+
+                if (Parts.empty())
+                {
+                    ImGui::TextDisabled("(no parts)");
+                }
+                else
+                {
+                    vector<pair<_wstring, CPartObject*>> SortedParts;
+                    SortedParts.reserve(Parts.size());
+
+                    for (const auto& Pair : Parts)
+                    {
+                        if (Pair.second)
+                            SortedParts.emplace_back(Pair.first, Pair.second);
+                    }
+
+                    sort(SortedParts.begin(), SortedParts.end(),
+                        [](const auto& Lhs, const auto& Rhs)
+                        {
+                            return Lhs.first < Rhs.first;
+                        });
+
+                    for (const auto& Pair : SortedParts)
+                        DrawPartRow(pObj, Pair.first, Pair.second);
+                }
+
+                ImGui::TreePop();
+            }
+
+            ImGui::PopID();
+        }
+        else
+        {
+            if (DrawRow(pObj, "Object"))
+                pPendingDelete = pObj;
+        }
+    }
 
     if (pPendingDelete)
     {
-        if (m_pPanel_Manager->Get_Selected() == pPendingDelete)
+        CGameObject* pSelected = m_pPanel_Manager->Get_Selected();
+
+        if (pSelected == pPendingDelete)
+        {
             m_pPanel_Manager->Clear_Selected();
+        }
+        else if (auto* pContainer = dynamic_cast<CContainerObject*>(pPendingDelete))
+        {
+            for (const auto& Pair : pContainer->Get_PartObjects())
+            {
+                if (pSelected == Pair.second)
+                {
+                    m_pPanel_Manager->Clear_Selected();
+                    break;
+                }
+            }
+        }
+
         pLevel->Destroy_Spawned(pPendingDelete);
     }
 }
