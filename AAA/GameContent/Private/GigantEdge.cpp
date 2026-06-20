@@ -56,6 +56,11 @@ CMonsterBrain* CGigantEdge::Create_Brain()
     return CGigantEdge_Brain::Create();
 }
 
+CAnimator* CGigantEdge::Get_BodyAnimator() const
+{
+    return m_pBody ? m_pBody->Get_Animator() : nullptr;
+}
+
 void CGigantEdge::Play_Intro()
 {
     CAnimator* pAni = m_pBody->Get_Animator();
@@ -134,7 +139,8 @@ void CGigantEdge::Debug_KeyInput()
     //if (m_pGameInstance_Proxy->Key_Down(DIK_G)) m_bGroggyRequested = true;         // 그로기 분기 진입
     //if (m_pGameInstance_Proxy->Key_Down(DIK_R)) m_bDbgInRange = !m_bDbgInRange;    // 사거리 토글 (공격↔추격)
     //if (m_pGameInstance_Proxy->Key_Down(DIK_M)) m_bDbgWalkInPlace = !m_bDbgWalkInPlace;
-    if (m_pGameInstance_Proxy->Key_Down(DIK_X)) Die();
+
+    if (m_pGameInstance_Proxy->Key_Down(DIK_9)) Die();                              // 커비 능력 버리는 X 키랑 겹쳐서 수정했음
     //if (m_pGameInstance_Proxy->Key_Down(DIK_1)) m_iDbgAttack = 0;                  // Slam 고정
     //if (m_pGameInstance_Proxy->Key_Down(DIK_2)) m_iDbgAttack = 1;                  // Charge 고정
     //if (m_pGameInstance_Proxy->Key_Down(DIK_3)) m_iDbgAttack = 2;                  // Swing 고정

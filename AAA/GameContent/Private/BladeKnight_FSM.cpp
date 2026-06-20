@@ -14,69 +14,35 @@ HRESULT CBladeKnight_FSM::Initialize()
 	return S_OK;
 }
 
-void CBladeKnight_FSM::Decide(CMonster* pMonster, const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta)
+void CBladeKnight_FSM::On_Decide_Combat(CBladeKnight* pBladeKnight, const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta)
 {
-	if (nullptr == pMonster)
-		return;
-
-	if (!Can_Decide(pMonster, BlackBoard))
-		return;
-
-	// Decide에서 필요한 변수들 지역 변수로 관리
-	const _bool bHasTarget = BlackBoard.pTarget != nullptr;
-	const _float fAbsHeight = fabsf(BlackBoard.fHeightToTarget);
-
-	// 공격 할 수 있는지 : 타겟 있고, XZ 평면 상의 거리, 높이 차이
-	const _bool bTargetAttackable =	bHasTarget && BlackBoard.fDistToTargetXZ <= 2.f && fAbsHeight <= 0.6f;
-
-	// 추격할 수 있는지 : 타겟 있고, 높이 차이, 
-	const _bool bTargetChaseable =	bHasTarget && fAbsHeight <= 1.5f;
-
-	CBladeKnight* pBladeKnight = dynamic_cast<CBladeKnight*>(pMonster);
+	UNREFERENCED_PARAMETER(fTimeDelta);
 
 	if (nullptr == pBladeKnight)
+		return;
+
+	const _float fAbsHeight = fabsf(BlackBoard.fHeightToTarget);
+	const _bool bAttackable = BlackBoard.fDistToTargetXZ <= 2.f && fAbsHeight < 0.6f;
+	const _bool bChaseable = fAbsHeight <= 1.5f;
+
+	const MONSTER_STATE_TYPE eCurState = pBladeKnight->Get_StateType();
+
+	if (bAttackable)
 	{
-		__super::Decide(pMonster, BlackBoard, fTimeDelta);
+		pBladeKnight->Change_State(Pick_AttackState(pBladeKnight->Get_AIType()));
 		return;
 	}
 
-	MONSTER_STATE_TYPE  eCurState = pMonster->Get_StateType();
-
-	if (eCurState == MONSTER_STATE_TYPE::ATTACK)
+	if (bChaseable && pBladeKnight->Get_AIType() == 1)	// 1은 자유 이동형
 	{
-		if (BlackBoard.bActionFinished)
-			pMonster->Change_State(pBladeKnight->Get_AttackNewState());
-
+		if (eCurState != MONSTER_STATE_TYPE::CHASE)
+			pBladeKnight->Change_State(MONSTER_STATE_TYPE::CHASE);
 		return;
 	}
-
-	// 타겟은 있는데 추격이 불가능할 경우 (RETREAT 이후 IDLE로의 전환)
-	if (bHasTarget && !bTargetChaseable)
-	{
-		if (eCurState != MONSTER_STATE_TYPE::IDLE)
-			pMonster->Change_State(MONSTER_STATE_TYPE::IDLE);
-
-		return;
-	}
-
-	if (bHasTarget)
-	{
-		if (bTargetAttackable && pBladeKnight->Try_SelectAttackPattern(BlackBoard.fDistToTargetXZ))
-		{
-			pMonster->Change_State(MONSTER_STATE_TYPE::ATTACK);
-			return;
-		}
-		
-		if (bTargetChaseable && pBladeKnight->Get_AIStyle() == CBladeKnight::BLADEKNIGHT_AI_STYLE::CHASE)
-		{
-			if (eCurState != MONSTER_STATE_TYPE::CHASE)
-				pMonster->Change_State(MONSTER_STATE_TYPE::CHASE);
-
-			return;
-		}
-	}
-
-	__super::Decide(pMonster, BlackBoard, fTimeDelta);
+	
+	// 사거리 밖 추격 안함
+	if (eCurState != MONSTER_STATE_TYPE::IDLE)
+		pBladeKnight->Change_State(MONSTER_STATE_TYPE::IDLE);
 }
 
 CBladeKnight_FSM* CBladeKnight_FSM::Create()
@@ -90,6 +56,31 @@ CBladeKnight_FSM* CBladeKnight_FSM::Create()
 	}
 
 	return pInstance;
+}
+
+MONSTER_STATE_TYPE CBladeKnight_FSM::Pick_AttackState(_int iAIType)
+{
+	static const MONSTER_STATE_TYPE ChasePool[] =
+	{
+		MONSTER_STATE_TYPE::ATTACK, MONSTER_STATE_TYPE::DOUBLE_ATTACK, MONSTER_STATE_TYPE::TORNADO_ATTACK 
+	};
+
+	static const MONSTER_STATE_TYPE StationaryPool[] =
+	{
+		MONSTER_STATE_TYPE::ATTACK, MONSTER_STATE_TYPE::ATTACK, MONSTER_STATE_TYPE::TORNADO_ATTACK 
+	};
+
+	const _bool bChase = (iAIType == 1);
+	const MONSTER_STATE_TYPE* pPool = bChase ? ChasePool : StationaryPool;
+	const _uint iCount = bChase ? _countof(ChasePool) : _countof(StationaryPool);
+
+	if (m_iAttackIndex >= iCount)
+		m_iAttackIndex = 0;
+
+	const MONSTER_STATE_TYPE eAttack = pPool[m_iAttackIndex];
+	++m_iAttackIndex;
+
+	return eAttack;
 }
 
 void CBladeKnight_FSM::Free()

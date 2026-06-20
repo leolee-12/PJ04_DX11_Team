@@ -1,12 +1,13 @@
 #include "Monster_State_Idle.h"
 #include "Monster.h"
 
-CMonster_State_Idle::CMonster_State_Idle()
+HRESULT CMonster_State_Idle::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpeed)
 {
-}
+	if (FAILED(__super::Initialize(tInfo, fSpeed)))
+		return E_FAIL;
 
-HRESULT	CMonster_State_Idle::Initialize()
-{
+	m_bIsInterruptible = true;
+
 	return S_OK;
 }
 
@@ -15,29 +16,31 @@ MONSTER_STATE_TYPE CMonster_State_Idle::Get_StateType()
 	return MONSTER_STATE_TYPE::IDLE;
 }
 
-void CMonster_State_Idle::Enter(CMonster* pMonster)
+void CMonster_State_Idle::On_Enter(CMonster* pMonster)
 {
-	if (nullptr == pMonster)
+	if (pMonster == nullptr)
 		return;
 
-	pMonster->Get_BlackBoard().bActionFinished = false;
-	pMonster->Get_BlackBoard().bCanTransition = true;
-	pMonster->Play_StateAnimation(MONSTER_STATE_TYPE::IDLE);
+	if (CAnimator* pAnim = pMonster->Get_BodyAnimator())
+		pAnim->Play(&m_PlayInfo);
 }
 
-void CMonster_State_Idle::Update(CMonster* pMonster, _float fTimeDelta)
+void CMonster_State_Idle::On_Update(CMonster* pMonster, _float fTimeDelta)
 {
+	if (pMonster == nullptr)
+		return;
 }
 
-void CMonster_State_Idle::Exit(CMonster* pMonster)
+void CMonster_State_Idle::On_Exit(CMonster* pMonster)
 {
+	if (pMonster == nullptr)
+		return;
 }
 
-CMonster_State_Idle* CMonster_State_Idle::Create()
+CMonster_State_Idle* CMonster_State_Idle::Create(const ANI_PLAY_INFO& tInfo, _float fSpeed)
 {
 	CMonster_State_Idle* pInstance = new CMonster_State_Idle();
-
-	if (FAILED(pInstance->Initialize()))
+	if (FAILED(pInstance->Initialize(tInfo, fSpeed)))
 	{
 		MSG_BOX("Failed to Created : CMonster_State_Idle");
 		Safe_Release(pInstance);

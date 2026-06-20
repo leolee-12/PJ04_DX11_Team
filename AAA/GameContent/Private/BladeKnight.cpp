@@ -10,9 +10,21 @@
 
 // 상태
 #include "Monster_StateMachine.h"
-#include "Monster_State_Attack.h"
+#include "Monster_State_Idle.h"
+#include "Monster_State_Detect.h"
+#include "Monster_State_Fall.h"
+#include "Monster_State_Landing.h"
+#include "Monster_State_Captured.h"
 #include "Monster_State_Chase.h"
-#include "Monster_State_Retreat.h"
+#include "Monster_State_KnockBack.h"
+#include "Monster_State_KnockOut.h"
+
+#include "BladeKnight_State_Retreat.h"
+
+// 전용 상태
+#include "BladeKnight_State_Attack.h"
+#include "BladeKnight_State_DoubleAttack.h"
+#include "BladeKnight_State_TornadoAttack.h"
 
 #include "Transform.h"
 
@@ -69,47 +81,6 @@ void CBladeKnight::Update(_float fTimeDelta)
         return;
 
     __super::Update(fTimeDelta);
-
-#ifdef _DEBUG
-    if (nullptr != m_pGameInstance_Proxy)
-    {
-        if (m_pGameInstance_Proxy->Key_Down(DIK_1))
-            Change_State(MONSTER_STATE_TYPE::IDLE);
-
-        if (m_pGameInstance_Proxy->Key_Down(DIK_2))
-            Change_State(MONSTER_STATE_TYPE::CHASE);
-
-        if (m_pGameInstance_Proxy->Key_Down(DIK_3))
-            Change_State(MONSTER_STATE_TYPE::RETREAT);
-
-        if (m_pGameInstance_Proxy->Key_Down(DIK_4))
-            Change_State(MONSTER_STATE_TYPE::ATTACK);
-
-        if (m_pGameInstance_Proxy->Key_Down(DIK_6))
-        {
-            m_pMovement->KO(XMVectorSet(0.f,0.f,0.f,1.f), 10.f);
-        }
-
-        if (m_pGameInstance_Proxy->Key_Down(DIK_8))
-        {
-            Set_Target(nullptr);
-        }
-    }
-
-    // 날아가는 넉백 테스트
-    _float fTarget = m_pMovement->Is_Launched() ? 45.f : 0.f;
-
-    _float fPrev = m_fTiltCurDeg;
-    m_fTiltCurDeg += (fTarget - m_fTiltCurDeg) * m_fTiltLerp * fTimeDelta;      // 목표로 Lerp
-    _float fDelta = m_fTiltCurDeg - fPrev;                                      // 이번 프레임 더할 양
-
-    if (fabsf(fDelta) > 1e-5f)
-    {
-        _vector vRight = m_pTransformCom->Get_State(STATE::RIGHT);
-        m_pTransformCom->Rotate(XMQuaternionRotationAxis(vRight, XMConvertToRadians(-fDelta)));
-    }
-
-#endif
 }
 
 void CBladeKnight::Late_Update(_float fTimeDelta)
@@ -127,146 +98,9 @@ _bool CBladeKnight::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
     return true;
 }
 
-void CBladeKnight::Play_StateAnimation(MONSTER_STATE_TYPE eState)
+CAnimator* CBladeKnight::Get_BodyAnimator() const
 {
-    if (nullptr == m_pBody || nullptr == m_pSword || nullptr == m_pMovement)
-        return;
-
-    CAnimator* pBodyAnimator = m_pBody->Get_Animator();
-    if (pBodyAnimator == nullptr)
-        return;
-
-    CAnimator* pSwordAnimator = m_pSword->Get_Animator();
-    if (pSwordAnimator == nullptr)
-        return;
-
-    CAnimator::ANI_PLAY_INFO AnimInfo{};
-
-    switch (eState)
-    {
-    case MONSTER_STATE_TYPE::IDLE:
-    {
-        // IDLE :: FindWait 모션
-        AnimInfo.strAniName = "FindWait";
-        AnimInfo.bLoop = true;
-        pBodyAnimator->Play(&AnimInfo);
-        //pSwordAnimator->Play("Thrust", false, false);
-        break;
-    }
-    case MONSTER_STATE_TYPE::CHASE:
-    {
-        m_pMovement->Set_MoveSpeed(2.f);
-        pBodyAnimator->Play("Move", true, false);
-        //pSwordAnimator->Play("Thrust", false, false);
-        break;
-    }
-
-    case MONSTER_STATE_TYPE::ATTACK:
-    {
-        AnimInfo.strAniName = "AttackStart";
-        AnimInfo.bLoop = false;
-        pBodyAnimator->Play(&AnimInfo);
-
-        switch (Get_CurrentAttackType())
-        {
-        case BLADEKNIGHT_ATTACK_TYPE::ATTACK:
-        {
-            AnimInfo.strAniName = "Attack";
-            AnimInfo.bLoop = false;
-            pBodyAnimator->Enqueue(AnimInfo);
-            break;
-        }
-        case BLADEKNIGHT_ATTACK_TYPE::DOUBLE_ATTACK:
-        {
-            AnimInfo.strAniName = "DoubleAttack";
-            AnimInfo.bLoop = false;
-            pBodyAnimator->Enqueue(AnimInfo);
-            break;
-        }
-        case BLADEKNIGHT_ATTACK_TYPE::TORNADO_ATTACK:
-        {
-            AnimInfo.strAniName = "TornadoAttack";
-            AnimInfo.bLoop = false;
-            pBodyAnimator->Enqueue(AnimInfo);
-            break;
-        }
-
-        }
-        break;
-    }
-    case MONSTER_STATE_TYPE::RETREAT:
-    {
-        m_pMovement->Set_MoveSpeed(1.f);
-        AnimInfo.strAniName = "Retreat";
-        AnimInfo.bLoop = false;
-        pBodyAnimator->Play(&AnimInfo);
-        break;
-    }
-
-    default:
-    {
-        m_pBody->Get_Animator()->Play("Wait", true, false);
-        pSwordAnimator->Play("Thrust", false, false);
-        break;
-    }
-    }
-}
-
-_bool CBladeKnight::Is_StateAnimationFinished() const
-{
-    if (nullptr == m_pBody)
-        return true;      // 확인 불가면 끝난 걸로 간주해서 true를 반환 ( false로 반환 하게 해두면 해당 상태 못빠져나감 )
-
-    CAnimator* pAnim = m_pBody->Get_Animator();
-
-    return (nullptr == pAnim) ? true : pAnim->Is_Finished();
-}
-
-_bool CBladeKnight::Try_SelectAttackPattern(_float fDistXZ)
-{
-    static const BLADEKNIGHT_ATTACK_PATTERN StationaryPatterns[] =
-    {
-        { BLADEKNIGHT_ATTACK_TYPE::ATTACK,          MONSTER_STATE_TYPE::RETREAT },
-        { BLADEKNIGHT_ATTACK_TYPE::ATTACK,          MONSTER_STATE_TYPE::RETREAT },
-        { BLADEKNIGHT_ATTACK_TYPE::TORNADO_ATTACK,  MONSTER_STATE_TYPE::IDLE },
-    };
-
-    static const BLADEKNIGHT_ATTACK_PATTERN ChasePatterns[] =
-    {
-        { BLADEKNIGHT_ATTACK_TYPE::ATTACK,                  MONSTER_STATE_TYPE::RETREAT },
-        { BLADEKNIGHT_ATTACK_TYPE::DOUBLE_ATTACK,           MONSTER_STATE_TYPE::RETREAT },
-        { BLADEKNIGHT_ATTACK_TYPE::TORNADO_ATTACK,          MONSTER_STATE_TYPE::IDLE },
-    };
-
-    const BLADEKNIGHT_ATTACK_PATTERN* pPatterns = nullptr;
-    _uint iPatternCount = 0;        // 패턴 내부 요소의 개수
-
-    switch (m_eAIStyle)
-    {
-    case BLADEKNIGHT_AI_STYLE::STATIONARY:
-        pPatterns = StationaryPatterns;
-        iPatternCount = _countof(StationaryPatterns);
-        break;
-
-    case BLADEKNIGHT_AI_STYLE::CHASE:
-        if (fDistXZ > 2.f)
-            return false;       // 거리가 주어진 값보다 멀다면 공격 재생 안함
-
-        pPatterns = ChasePatterns;
-        iPatternCount = _countof(ChasePatterns);
-        break;
-    }
-
-    if (nullptr == pPatterns || iPatternCount == 0)
-        return false;
-
-    m_tCurAttackPattern = pPatterns[m_iAttackPatternIndex];
-    ++m_iAttackPatternIndex;
-
-    if (m_iAttackPatternIndex >= iPatternCount)
-        m_iAttackPatternIndex = 0;
-
-    return true;    
+    return m_pBody ? m_pBody->Get_Animator() : nullptr;
 }
 
 CMonsterBrain* CBladeKnight::Create_Brain()
@@ -278,20 +112,89 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
 {
     if (pStateMachine == nullptr)
         return E_FAIL;
+    
+    // 공통 상태에는 사용할 AnimInfo를 넣어줘야 함
 
-    // IDLE 등록 보장
-    if (FAILED(__super::Ready_State(pStateMachine)))
+    ANI_PLAY_INFO Info{};
+
+    // State Idle
+    Info.strAniName = "FindWait";
+    Info.bLoop = true; 
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CMonster_State_Idle::Create(Info))))
         return E_FAIL;
 
-    // BladeKnight 전용 상태 등록
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::ATTACK, CMonster_State_Attack::Create())))
+    // State Detect
+    Info.strAniName = "Find";
+    Info.bLoop = false;
+    Info.fSpeed = 1.25f;
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::DETECT, CMonster_State_Detect::Create(Info))))
         return E_FAIL;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CHASE, CMonster_State_Chase::Create())))
+    // State Fall
+    Info.strAniName = "Fall";
+    Info.bLoop = true;
+    Info.fSpeed = 1.5f;
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::FALL, CMonster_State_Fall::Create(Info))))
         return E_FAIL;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::RETREAT, CMonster_State_Retreat::Create())))
+    // State Landing 
+    Info.strAniName = "Landing";
+    Info.bLoop = false;
+    Info.fSpeed = 1.0f;
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::LANDING, CMonster_State_Landing::Create(Info))))
         return E_FAIL;
+
+    // State Captured
+    Info.strAniName = "Damage";
+    Info.bLoop = true;
+    Info.fSpeed = 1.25f;
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
+        return E_FAIL;
+
+    // State Chase
+    Info.strAniName = "Move";
+    Info.bLoop = true;
+    Info.fSpeed = 1.5f;
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CHASE, CMonster_State_Chase::Create(Info, 3.f))))
+        return E_FAIL;
+
+    // State KnockBack
+    Info.strAniName = "Damage";
+    Info.bLoop = true;
+    Info.fSpeed = 1.25f;
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK, CMonster_State_KnockBack::Create(Info))))
+        return E_FAIL;
+
+    // State KnockOut
+    Info.strAniName = "Damage";
+    Info.bLoop = true;
+    Info.fSpeed = 1.25f;
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_OUT, CMonster_State_KnockOut::Create(Info))))
+        return E_FAIL;
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::RETREAT, CBladeKnight_State_Retreat::Create())))
+        return E_FAIL;
+
+
+    // Blade Knight 전용 상태 등록
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::ATTACK, CBladeKnight_State_Attack::Create())))
+        return E_FAIL;
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::DOUBLE_ATTACK, CBladeKnight_State_DoubleAttack::Create())))
+        return E_FAIL;
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::TORNADO_ATTACK, CBladeKnight_State_TornadoAttack::Create())))
+        return E_FAIL;
+
 
     return S_OK;
 }
@@ -323,6 +226,33 @@ HRESULT CBladeKnight::Ready_AnimEvents()
         });
 
     return S_OK;
+}
+
+void CBladeKnight::On_Damaged(const ATTACK_INFO& tInfo)
+{
+    if (m_pMovement)
+        m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
+
+    Change_State(MONSTER_STATE_TYPE::KNOCK_BACK);
+}
+
+void CBladeKnight::On_Death(const ATTACK_INFO& tInfo)
+{
+    if (tInfo.fDamage >= m_fMaxHP)
+    {
+        if (m_pMovement)
+            m_pMovement->KO(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
+        Change_State(MONSTER_STATE_TYPE::KNOCK_OUT);
+    }
+    else 
+    {
+        if (m_pMovement)
+            m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
+        Change_State(MONSTER_STATE_TYPE::KNOCK_BACK);
+    }
+    
+    // TODO : Set_Dead와 연결
+
 }
 
 HRESULT CBladeKnight::Ready_PartObjects()

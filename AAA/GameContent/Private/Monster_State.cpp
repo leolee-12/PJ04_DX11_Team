@@ -1,7 +1,25 @@
 #include "Monster_State.h"
 
 CMonster_State::CMonster_State()
+	: m_bIsInterruptible{ false }
 {
+}
+
+HRESULT	CMonster_State::Initialize()
+{
+	m_bIsInterruptible = false;
+
+	return S_OK;
+}
+
+HRESULT	CMonster_State::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpeed)
+{
+	m_PlayInfo = tInfo;
+	m_fSpeed = fSpeed;
+
+	m_bIsInterruptible = false;
+
+	return S_OK;
 }
 
 void CMonster_State::Enter(CMonster* pMonster)

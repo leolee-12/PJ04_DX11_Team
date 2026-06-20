@@ -4,11 +4,11 @@
 NS_BEGIN(Client)
 class CMonster;
 
-class CMonster_State_Fall final : public CMonster_StateT<CMonster>
+class CMonster_State_Detect final : public CMonster_StateT<CMonster>
 {
 private:
-	CMonster_State_Fall() = default;
-	virtual ~CMonster_State_Fall() = default;
+	CMonster_State_Detect() = default;
+	virtual ~CMonster_State_Detect() = default;
 
 protected:
 	virtual HRESULT					Initialize(const ANI_PLAY_INFO& tInfo, _float fSpped = 0.f) override;
@@ -20,12 +20,10 @@ public:
 	virtual void					On_Exit(CMonster* pMonster) override;
 
 public:
-	static CMonster_State_Fall* Create(const ANI_PLAY_INFO& tInfo, _float fSpped = 0.f);
+	static CMonster_State_Detect* Create(const ANI_PLAY_INFO& tInfo, _float fSpped = 0.f);
 
 protected:
 	virtual void					Free() override;
-
-
 };
 
 NS_END

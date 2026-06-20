@@ -25,6 +25,13 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+public:
+	// Editor 에서 본 위치 실시간으로 보기 위함
+	const _float4x4* Get_CombinedWorldMatrixPtr() const
+	{
+		return &m_CombinedWorldMatrix;
+	}
+
 protected:
 	const _float4x4*		m_pParentMatrix = {};
 	_float4x4				m_CombinedWorldMatrix = {};
