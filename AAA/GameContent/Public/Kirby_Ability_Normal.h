@@ -50,13 +50,8 @@ public:
 	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) override;
 
 	virtual _bool Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation) override;
-	
-	// À±¼®Çö Ãß°¡
-	_bool Is_SuperInhale() const {
-		return m_eInhaleState == INHALE_STATE::SUPER_INHALE_START
-			|| m_eInhaleState == INHALE_STATE::SUPER_INHALE_LOOP;
-	}
 
+	_bool IsSuperInhale();
 	_bool Change_Ability(CKirby* pKirby, COPY_ABILITY_TYPE eAbility);
 
 private:
@@ -72,15 +67,17 @@ private:
 
 	_bool m_bReqInhale{};
 
+	CEffect_Container* m_pInhaleEffect{};
+
 private:
 	void Interpolation_Inhale(CAnimator* pAnimator);
 	void Choose_InhaleAniName(_string& strAniName);
 
 	_bool Change_Ability(CKirby* pKirby);
-
 	void Reset_Default(CKirby* pKirby);
 
-	CEffect_Container* m_pInhaleEffect{};
+	void Start_InhaleCollider(CKirby* pKirby);
+	void End_InhaleCollider(CKirby* pKirby);
 
 public:
 	static CKirby_Ability_Normal* Create();

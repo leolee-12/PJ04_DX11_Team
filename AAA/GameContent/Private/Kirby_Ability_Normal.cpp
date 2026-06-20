@@ -9,6 +9,8 @@
 #include "Kirby_Body.h"
 #include "Kirby_State.h"
 
+#include "Inhalable.h"
+
 CKirby_Ability_Normal::CKirby_Ability_Normal()
 {
 }
@@ -61,8 +63,8 @@ void CKirby_Ability_Normal::Enter_Ability(CKirby* pKirby)
     //    pKirby->Get_Transform()->Get_WorldMatrixPtr(),
     //    &m_pInhaleEffect
     //);
-    //윤석현추가
-    pKirby->Begin_Inhale();
+
+    Start_InhaleCollider(pKirby);
 }
 
 ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _float fTimeDelta)
@@ -96,7 +98,9 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _flo
     if (m_eInhaleState != INHALE_STATE::INHALE_END && m_bReqInhale == true)
     {
         m_eInhaleState = INHALE_STATE::INHALE_END;
-        pKirby->End_Inhale();
+
+        End_InhaleCollider(pKirby);
+
         pAnimator->Play("InhaleEnd", false, false, 0.1f, 1.5f);
         pMovementCom->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
     }
@@ -145,11 +149,9 @@ void CKirby_Ability_Normal::Exit_Ability(CKirby* pKirby)
     //m_pInhaleEffect->EffectContainer_Stop();
     //m_pInhaleEffect = nullptr;
 
+    End_InhaleCollider(pKirby);
+    
     Reset_Default(pKirby);
-
-    char szBuf[128];
-    sprintf_s(szBuf, "Exit Normal \n");
-    OutputDebugStringA(szBuf);
 }
 
 _bool CKirby_Ability_Normal::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -288,6 +290,11 @@ _bool CKirby_Ability_Normal::Change_Ability(CKirby* pKirby)
     return false;
 }
 
+_bool CKirby_Ability_Normal::IsSuperInhale()
+{
+    return m_eInhaleState == INHALE_STATE::SUPER_INHALE_START || m_eInhaleState == INHALE_STATE::SUPER_INHALE_LOOP;
+}
+
 _bool CKirby_Ability_Normal::Change_Ability(CKirby* pKirby, COPY_ABILITY_TYPE eAbility)
 {
     // 먹은 오브젝트에서 가져온다.
@@ -308,6 +315,35 @@ void CKirby_Ability_Normal::Reset_Default(CKirby* pKirby)
     CKirby_Body* pKirby_Body = pKirby->Get_Body();
     pKirby_Body->Set_Eye(KIRBY_EYE_STATE::IDLE);
     pKirby_Body->Set_Body(KIRBY_BODY_STATE::NORMAL);
+}
+
+void CKirby_Ability_Normal::Start_InhaleCollider(CKirby* pKirby)
+{
+    CCollider* pInhaleBox = pKirby->Get_Collider(CKirby::KIRBY_COLLIDER::INHALE_BOX);
+
+    pInhaleBox->Set_OnStay
+    (
+        [this, pKirby](CCollider* pOther)
+        {
+            IInhalable* pInh = dynamic_cast<IInhalable*>(pOther->Get_Owner());
+            if (pInh == nullptr)
+                return;
+
+            INHALE_QUERY q{ IsSuperInhale(), pKirby };
+
+            if (pInh->Can_BeInhaled(q))
+                pInh->Be_Captured(pKirby);
+        }
+    );
+
+    pInhaleBox->Set_Enabled(true);
+}
+
+void CKirby_Ability_Normal::End_InhaleCollider(CKirby* pKirby)
+{
+    CCollider* pInhaleBox = pKirby->Get_Collider(CKirby::KIRBY_COLLIDER::INHALE_BOX);
+    pInhaleBox->Set_Enabled(false);
+    pInhaleBox->Set_OnStay(nullptr);
 }
 
 CKirby_Ability_Normal* CKirby_Ability_Normal::Create()
