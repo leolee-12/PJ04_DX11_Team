@@ -2,6 +2,8 @@
 
 #include "GameInstance.h"
 
+#include "Kirby.h"
+
 #include "Kirby_Wait.h"
 #include "Kirby_Run.h"
 #include "Kirby_Jump.h"
@@ -44,6 +46,8 @@ void CKirby_StateMachine::Change_State(KIRBY_STATE_TYPE eNewstate)
     {
         m_pCurState->Exit(m_pKirby);
     }
+
+    m_pKirby->Apply_ChangeKirbyAbility();
 
     m_pCurState = Find_State(eNewstate);
 

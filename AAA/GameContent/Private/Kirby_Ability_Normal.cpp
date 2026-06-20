@@ -144,6 +144,12 @@ void CKirby_Ability_Normal::Exit_Ability(CKirby* pKirby)
 {
     //m_pInhaleEffect->EffectContainer_Stop();
     //m_pInhaleEffect = nullptr;
+
+    Reset_Default(pKirby);
+
+    char szBuf[128];
+    sprintf_s(szBuf, "Exit Normal \n");
+    OutputDebugStringA(szBuf);
 }
 
 _bool CKirby_Ability_Normal::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -270,11 +276,9 @@ _bool CKirby_Ability_Normal::Change_Ability(CKirby* pKirby)
     //Test Code
     if (GetAsyncKeyState('T') & 0x8000)
     {
-        Reset_Default(pKirby);
-
         // 먹은 오브젝트에서 가져온다.
         COPY_ABILITY_TYPE eAbilityType = COPY_ABILITY_TYPE::SWORD;
-        pKirby->Set_KirbyAbility(eAbilityType);
+        pKirby->Request_ChangeKirbyAbility(eAbilityType);
 
         pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
 
@@ -286,10 +290,8 @@ _bool CKirby_Ability_Normal::Change_Ability(CKirby* pKirby)
 
 _bool CKirby_Ability_Normal::Change_Ability(CKirby* pKirby, COPY_ABILITY_TYPE eAbility)
 {
-    Reset_Default(pKirby);
-
     // 먹은 오브젝트에서 가져온다.
-    pKirby->Set_KirbyAbility(eAbility);
+    pKirby->Request_ChangeKirbyAbility(eAbility);
 
     pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
 

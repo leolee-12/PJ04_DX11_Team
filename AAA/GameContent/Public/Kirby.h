@@ -94,8 +94,11 @@ public:
 	void Excute_Command(CKirby_Command* pCommand);
 	void Change_State(KIRBY_STATE_TYPE eNewState);
 
+	// Ability
 	CKirby_Ability* Get_KirbyAbility();
-	void Set_KirbyAbility(COPY_ABILITY_TYPE eAbilityState);
+	void Request_ChangeKirbyAbility(COPY_ABILITY_TYPE eAbilityState);
+	void Apply_ChangeKirbyAbility();
+
 
 public:
 	// Ability Dump
@@ -117,11 +120,13 @@ private:
 	HRESULT Bind_ShaderResources();
 	virtual HRESULT Ready_Events() override;
 
+	// Ability
+	void Set_KirbyAbility(COPY_ABILITY_TYPE eAbilityState);
+
 	// À±¼®Çö Ãß°¡
 	virtual _bool Block_Hit(const ATTACK_INFO& tInfo) override;
 	virtual void  On_Damaged(const ATTACK_INFO& tInfo) override;
 	_bool		  Is_SuperInhaling() const;
-
 
 private:
 	CKirby_Body* m_pBody{};
@@ -138,14 +143,17 @@ private:
 	_bool	   m_bInhaling = { false };
 	_float	   m_fInvincible = { 0.f };
 
-
 private:
 	CKirby_InputManager*	m_pKirby_InputManager{};
 	CKirby_Controller*		m_pKirby_Controller{};
 	CKirby_StateMachine*	m_pKirby_StateMachine{};
-	CKirby_Ability*			m_pKirby_Ability{};
 
+	// Ability
+	CKirby_Ability*			m_pKirby_Ability{};
 	unordered_map<COPY_ABILITY_TYPE, CKirby_Ability*> m_Abilities;
+
+	_bool m_bReqChangeAbility{};
+	COPY_ABILITY_TYPE m_eNextAbilityType{};
 
 private:
 	_float m_fAccAbilityDumpCoolTime{};

@@ -122,6 +122,10 @@ void CKirby_Ability_Sword::Exit_Ability(CKirby* pKirby)
 
     CKirby_Body* pBody = pKirby->Get_Body();
     pBody->Set_Eye(KIRBY_EYE_STATE::IDLE);
+
+    char szBuf[128];
+    sprintf_s(szBuf, "Exit Sword \n");
+    OutputDebugStringA(szBuf);
 }
 
 _bool CKirby_Ability_Sword::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)

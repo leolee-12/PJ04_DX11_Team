@@ -195,6 +195,28 @@ void CKirby::Set_KirbyAbility(COPY_ABILITY_TYPE eAbilityState)
     m_pKirby_Ability = iter->second;
 }
 
+void CKirby::Request_ChangeKirbyAbility(COPY_ABILITY_TYPE eAbilityState)
+{
+    if(m_pKirby_Ability == nullptr)
+        return;
+
+    if (m_pKirby_Ability->Get_AbilityType() == eAbilityState)
+        return;
+
+    m_bReqChangeAbility = true;
+    
+    m_eNextAbilityType = eAbilityState;
+}
+
+void CKirby::Apply_ChangeKirbyAbility()
+{
+    if (m_bReqChangeAbility == false)
+        return;
+
+    m_bReqChangeAbility = false;
+    Set_KirbyAbility(m_eNextAbilityType);
+}
+
 void CKirby::Update_AbilityDumpCool(_float fTimeDelta)
 {
     if (m_bDecreaseAbilityDumpCool == true)
