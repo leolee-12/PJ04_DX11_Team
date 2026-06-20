@@ -29,13 +29,15 @@ void CKirby_Stuffed::Enter(CKirby* pKirby)
 {
     __super::Enter(pKirby);
 
-    // Ani
+    // Animation
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
     pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::STUFFED_START));
 
+    // Body
     CKirby_Body* pBody = pKirby->Get_Body();
     pBody->Set_Body(KIRBY_BODY_STATE::STUFFED);
 
+    // State
     m_eCurStuffedState = STUFFED_START;
 }
 

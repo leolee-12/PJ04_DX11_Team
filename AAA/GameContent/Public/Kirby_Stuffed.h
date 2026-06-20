@@ -19,7 +19,7 @@ private:
 	CKirby_Stuffed();
 	virtual ~CKirby_Stuffed() = default;
 
-	enum STUFFED_STATE { STUFFED_START, STUFFED_WAIT, STUFFED_END };
+	enum STUFFED_STATE { STUFFED_START, STUFFED_WAIT, STUFFED_RUN, STUFFED_JUMP, STUFFED_FALL, STUFFED_END };
 
 private:
 	HRESULT Initialize();
