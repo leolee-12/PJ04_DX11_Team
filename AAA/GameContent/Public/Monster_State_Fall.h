@@ -1,28 +1,31 @@
 #pragma once
-#include "Monster_State.h"
+#include "Monster_StateT.h"
 
 NS_BEGIN(Client)
+class CMonster;
 
-class CMonster_State_Fall final : public CMonster_State
+class CMonster_State_Fall final : public CMonster_StateT<CMonster>
 {
 private:
-	CMonster_State_Fall();
+	CMonster_State_Fall() = default;
 	virtual ~CMonster_State_Fall() = default;
 
-private:
-	HRESULT							Initialize();
+protected:
+	virtual HRESULT					Initialize(const ANI_PLAY_INFO& tInfo, _float fSpped = 0.f) override;
 
 public:
 	virtual MONSTER_STATE_TYPE		Get_StateType() override;
-	virtual void					Enter(CMonster* pMonster) override;
-	virtual void					Update(CMonster* pMonster, _float fTimeDelta) override;
-	virtual void					Exit(CMonster* pMonster) override;
+	virtual void					On_Enter(CMonster* pMonster) override;
+	virtual void					On_Update(CMonster* pMonster, _float fTimeDelta) override;
+	virtual void					On_Exit(CMonster* pMonster) override;
 
 public:
-	static CMonster_State_Fall* Create();
+	static CMonster_State_Fall* Create(const ANI_PLAY_INFO& tInfo, _float fSpped = 0.f);
 
 protected:
 	virtual void					Free() override;
+
+
 };
 
 NS_END

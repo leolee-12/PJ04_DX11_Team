@@ -3,8 +3,7 @@
 #include "GameInstance.h"
 #include "Monster_Movement.h"
 #include "Monster_Brain_FSM.h"
-#include "Monster_State_Idle.h"
-#include "Monster_State_Captured.h"
+
 #include "Collider.h"
 #include "Controller.h"
 #include "GameContent_const.h"
@@ -52,18 +51,20 @@ HRESULT CMonster::Initialize(void* pArg)
 
 void CMonster::Priority_Update(_float fTimeDelta)
 {
+	if (!m_bActive) return;
 	__super::Priority_Update(fTimeDelta);
 }
 
 void CMonster::Update(_float fTimeDelta)
 {
+	if (!m_bActive) return;
 	Update_AI(fTimeDelta);
-
 	__super::Update(fTimeDelta);
 }
 
 void CMonster::Late_Update(_float fTimeDelta)
 {
+	if (!m_bActive) return;
 	__super::Late_Update(fTimeDelta);
 
 	if (m_pInteractCollider)
@@ -83,6 +84,14 @@ void CMonster::Late_Update(_float fTimeDelta)
 #endif
 		}
 	}
+
+	if (m_pProjectileBox && m_pProjectileBox->Is_Enabled())
+	{
+		m_pProjectileBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+#ifdef _DEBUG
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pProjectileBox);
+#endif
+	}
 }
 
 HRESULT CMonster::Render()
@@ -101,12 +110,7 @@ void CMonster::Set_Target(CGameObject* pTarget)
 	m_BlackBoard.pTarget = pTarget;
 
 	if (nullptr == pTarget)
-	{
-		m_BlackBoard.bCanSeeTarget = false;
-		m_BlackBoard.fDistToTarget = FLT_MAX;
-		m_BlackBoard.vTargetPos = {};
-		m_BlackBoard.vLastKnownPos = {};
-	}
+		m_BlackBoard = MONSTER_BLACKBOARD{};
 }
 
 _bool CMonster::Can_BeInhaled(const INHALE_QUERY& q) const
@@ -177,7 +181,6 @@ MONSTER_STATE_TYPE	CMonster::Get_StateType() const
 HRESULT CMonster::Ready_Collider()
 {
 	_float fRadius;
-
 	_float3 vFootPos;
 	XMStoreFloat3(&vFootPos, m_pTransformCom->Get_State(STATE::POSITION));
 
@@ -196,20 +199,37 @@ HRESULT CMonster::Ready_Collider()
 		m_pGameInstance_Proxy->Register_Collider(m_pInteractCollider, ETOUI(COLLISION_LAYER::MONSTER_D_RANGE));
 	}
 
-
-	if ((fRadius = Get_HurtBoxRadius()) != 0.f)
+	CAPSULE_DESC Desc{};
+	if (Get_HurtBoxDesc(Desc))
 	{
 		CCollider::COLLIDER_DESC HurtDesc{};
 		HurtDesc.pOwner = this;
-		HurtDesc.vCenter = _float3(vFootPos.x, vFootPos.y + fRadius * 0.5f, vFootPos.z);
-		HurtDesc.fRadius = fRadius;
+		HurtDesc.vCenter = Desc.vCenter;
+		HurtDesc.fRadius = Desc.fRadius;
+		HurtDesc.fHeight = Desc.fHeight;
+		HurtDesc.vRadians = Desc.vRadians;
 
-		m_pHurtBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
+		m_pHurtBox = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag,
 			TEXT("MonHurtBox_Com"), &HurtDesc);
 		if (m_pHurtBox == nullptr)
 			return E_FAIL;
 
 		m_pGameInstance_Proxy->Register_Collider(m_pHurtBox, ETOUI(COLLISION_LAYER::MONSTER_HURT));
+
+		CCollider::COLLIDER_DESC ProjDesc{};
+		ProjDesc.pOwner = this;
+		ProjDesc.vCenter = Desc.vCenter;
+		ProjDesc.fRadius = Desc.fRadius;
+		ProjDesc.fHeight = Desc.fHeight;
+		ProjDesc.vRadians = Desc.vRadians;
+
+		m_pProjectileBox = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag,
+			TEXT("MonProjBox_Com"), &ProjDesc);
+		if (m_pProjectileBox == nullptr)
+			return E_FAIL;
+
+		m_pProjectileBox->Set_Enabled(false);
+		m_pGameInstance_Proxy->Register_Collider(m_pProjectileBox, ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE));
 	}
 
 	return S_OK;
@@ -259,6 +279,29 @@ void CMonster::SetUp_Collider_CallBack()
 #endif
 			}
 		});
+	}
+
+	if (m_pProjectileBox)
+	{
+		m_pProjectileBox->Set_OnEnter([this](CCollider* pOther) {
+			if (ETOUI(COLLISION_LAYER::MONSTER_HURT) != pOther->Get_RegisteredGroup())
+				return;
+			if (pOther->Get_Owner() == this)
+				return;
+
+			IDamageable* pVictim = dynamic_cast<IDamageable*>(pOther->Get_Owner());
+			if (nullptr == pVictim)
+				return;
+
+			ATTACK_INFO atk{};
+			atk.fDamage = s_fSpatDamage;
+			atk.fKnockback = s_fSpatKnockback;
+			XMStoreFloat3(&atk.vAttackerPos, m_pTransformCom->Get_State(STATE::POSITION));
+			atk.pAttacker = this;
+			pVictim->Damaged(atk);
+
+			Despawn_Spat();   // 첫 명중 시 소멸(원작식)
+			});
 	}
 
 	return;
@@ -321,6 +364,24 @@ HRESULT CMonster::Ready_AI()
 	return S_OK;
 }
 
+void CMonster::Check_AirborneReflex()
+{
+	if (nullptr == m_pStateMachine || nullptr == m_pMovement)
+		return;
+
+	if (!Has_State(MONSTER_STATE_TYPE::FALL))
+		return;
+
+	const MONSTER_STATE_TYPE eCurState = Get_StateType();
+	if (eCurState == MONSTER_STATE_TYPE::FALL || eCurState == MONSTER_STATE_TYPE::LANDING ||
+		eCurState == MONSTER_STATE_TYPE::CAPTURED || eCurState == MONSTER_STATE_TYPE::DEATH)
+		return;
+
+	// 테스트로 -2.f로 두고 테스트. 확정되면 상수화 시켜서 사용
+	if (!m_pMovement->Is_Grounded() && m_pMovement->Get_VerticalVelocity() < -2.f)
+		Change_State(MONSTER_STATE_TYPE::FALL);
+}
+
 CMonsterBrain* CMonster::Create_Brain()
 {
 	return CMonster_Brain_FSM::Create(); // 기본은 FSM
@@ -338,28 +399,27 @@ HRESULT CMonster::Create_Movement()
 
 HRESULT CMonster::Ready_State(CMonster_StateMachine* pStateMachine)
 {
-	if (nullptr == pStateMachine)
-		return E_FAIL;
-
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CMonster_State_Idle::Create())))
-		return E_FAIL;
-
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create())))
-		return E_FAIL;
-
 	return S_OK;
 }
 
 void CMonster::On_Damaged(const ATTACK_INFO& tInfo)
 {
 	m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
-	Change_State(MONSTER_STATE_TYPE::HIT);
+	//Change_State(MONSTER_STATE_TYPE::HIT);
 }
 
 void CMonster::On_Death(const ATTACK_INFO& tInfo)
 {
 	if (m_pMovement) m_pMovement->KO(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
-	Change_State(MONSTER_STATE_TYPE::DEAD);
+	Change_State(MONSTER_STATE_TYPE::DEATH);
+}
+
+_bool CMonster::Block_Hit(const ATTACK_INFO& tInfo)
+{
+	if (Get_StateType() == MONSTER_STATE_TYPE::CAPTURED)
+		return true;
+
+	return false;
 }
 
 void CMonster::Perceive(_float fTimeDelta)
@@ -432,6 +492,33 @@ void CMonster::On_Swallowed()
 	Set_Active(false);
 }
 
+void CMonster::Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed)
+{
+	m_pCaptor = nullptr;
+	Set_Active(true);                         
+
+	CTransform* pT = m_pTransformCom;
+	pT->Set_State(STATE::POSITION, vPos);
+	pT->LookAt(XMVectorAdd(vPos, vDir));
+
+	XMStoreFloat3(&m_vSpatVelocity, XMVector3Normalize(vDir) * fSpeed);
+
+	Change_State(MONSTER_STATE_TYPE::SPAT);
+}
+
+void CMonster::Despawn_Spat()
+{
+	Enable_ProjectileBox(false);
+	m_vSpatVelocity = {};
+	Set_Active(false);
+	// TODO: 사운드, 이펙트 
+}
+
+void CMonster::Enable_ProjectileBox(_bool bEnable)
+{
+	if (m_pProjectileBox) m_pProjectileBox->Set_Enabled(bEnable);
+}
+
 void CMonster::Update_AI(_float fTimeDelta)
 {
 	// 이전 프레임 이동 요청 초기화
@@ -439,6 +526,8 @@ void CMonster::Update_AI(_float fTimeDelta)
 
 	// BlackBoard 갱신
 	Perceive(fTimeDelta);	
+
+	Check_AirborneReflex();
 
 	// Brain이 상태 변경 판단
 	if (nullptr != m_pBrain)
@@ -459,6 +548,12 @@ void CMonster::Update_AI(_float fTimeDelta)
 
 	if (Get_StateType() == MONSTER_STATE_TYPE::CAPTURED)
 		return;
+
+	if (Get_StateType() == MONSTER_STATE_TYPE::SPAT)
+	{
+		m_pMovement->Sync_To_Controller();
+		return;
+	}
 
 	if (m_pMovement->Is_Launched())
 	{

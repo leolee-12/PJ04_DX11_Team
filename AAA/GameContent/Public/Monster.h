@@ -3,10 +3,12 @@
 #include "Character.h"
 #include "Monster_BlackBoard.h"
 #include "Inhalable.h"
+#include "MonsterPart.h"
 
 NS_BEGIN(Engine)
 class CCollider;
 class CController;
+class CAnimator;
 NS_END
 
 NS_BEGIN(Client)
@@ -58,9 +60,12 @@ public:
 public: // Inhalable
 	virtual _bool				Can_BeInhaled(const INHALE_QUERY& q) const override;
 	virtual void				Be_Captured(CGameObject* pInhaler) override;
-
 	CGameObject*				Get_Captor() const { return m_pCaptor; }
 	void						On_Swallowed();
+	void						Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed);
+	void						Despawn_Spat();                                
+	const _float3&				Get_SpatVelocity() const { return m_vSpatVelocity; }
+	void						Enable_ProjectileBox(_bool bEnable);
 
 public:
 	// AI가 이동 의도를 쌓는 방식
@@ -79,13 +84,10 @@ public:
 	virtual _float				Get_CapsuleRadius() const = 0;
 	virtual _float				Get_CapsuleHeight() const = 0;
 	virtual _float				Get_InteractRadius() const = 0;
-	virtual _float				Get_HurtBoxRadius() const = 0;
+	virtual _bool				Get_HurtBoxDesc(CAPSULE_DESC& Out) const = 0;
 
-	// 공통 State가 구체 몬스터 애니메이션을 호출하는 추상 훅
-	virtual void				Play_StateAnimation(MONSTER_STATE_TYPE eState) = 0;
+	virtual CAnimator*			Get_BodyAnimator() const { return nullptr; }
 
-	// 애니메이션이 끝났는지 노출해주는 함수
-	virtual _bool				Is_StateAnimationFinished() const { return true; }
 
 	// 윤석현 추가
 	void						Enable_Controller(_bool bEnable);
@@ -102,13 +104,18 @@ protected:
 
 	CCollider*					m_pInteractCollider = { nullptr };
 	CCollider*					m_pHurtBox = { nullptr };
+	CCollider*					m_pProjectileBox = { nullptr };
+	_float3						m_vSpatVelocity = {};
 
 	// 이번 프레임에 이동하고 싶은 방향
 	_float3						m_vWishDir = {};
 
 	_uint					    m_TraitFlags = { MT_DEFAULT };
-	COPY_ABILITY_TYPE			m_eCopyAbility = { COPY_ABILITY_TYPE::NORMAL };
+	COPY_ABILITY_TYPE			m_eCopyAbility = { COPY_ABILITY_TYPE::NONE };
 	CGameObject*			    m_pCaptor = { nullptr };
+
+	static constexpr _float		s_fSpatDamage = 100.f;
+	static constexpr _float		s_fSpatKnockback = 12.f;
 
 protected:
 	// 부모가 관리할 공통 파이프라인
@@ -116,8 +123,8 @@ protected:
 	void						SetUp_Collider_CallBack();
 	HRESULT						Ready_Movement();
 	HRESULT						Ready_AI();
+	void						Check_AirborneReflex();
 
-	// 윤석현 추가 AI 드라이버 선택 훅 (자식이 오버라이드)
 	virtual CMonsterBrain*		Create_Brain();		//기본: FSM Brain
 	virtual HRESULT				Create_Movement();	// 기본 : Monster_Movement - 별도 무브먼트 필요할 때 상속받아서 쓸 것 
 	virtual _bool				Use_StateMachine() const { return true; } // BT 전용 몬스터는 false 반환
@@ -127,9 +134,25 @@ protected:
 	virtual void				On_Damaged(const ATTACK_INFO& tInfo) override;
 	virtual void				On_Death(const ATTACK_INFO& tInfo) override;
 
+	virtual _bool				Block_Hit(const ATTACK_INFO& tInfo) override;
+
 	//윤석현 수정 
 	virtual void				Update_AI(_float fTimeDelta);
 	virtual void				Perceive(_float fTimeDelta);
+
+protected:
+	template<class TPart>
+	TPart* Add_MonsterPart(const _tchar* szProtoTag, const _tchar* szPartTag, const _float4x4* pSocketBone = nullptr)
+	{
+		CMonsterPart::MONSTERPART_DESC Desc{};
+		Desc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+		Desc.pSocketBoneMatrix = pSocketBone;
+
+		if (FAILED(Add_PartObject(m_iPrototypeLevel, szProtoTag, szPartTag, &Desc)))
+			return nullptr;
+
+		return dynamic_cast<TPart*>(m_PartObjects[szPartTag]);
+	}
 
 protected:
 	virtual void				Free() override;

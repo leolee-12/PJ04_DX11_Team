@@ -64,10 +64,8 @@ public:
     virtual void    Late_Update(_float fTimeDelta) override;
     virtual HRESULT Render() override;
 
-    void EffectContainer_Start(
-        const _float3& vSpawnPos,
-        const _float3& vLook = {0.f, 0.f, 0.f},
-        const _float4x4* pParentMatrix = nullptr);
+    void EffectContainer_Start(const _float3& vSpawnPos, const _float3& vLookDir = {0.f, 0.f, 0.f}, const _float4x4* pParentMatrix = nullptr);
+    void EffectContainer_Stop();
 
     void Set_ParentMatrix(const _float4x4* pParentMatrix);
 

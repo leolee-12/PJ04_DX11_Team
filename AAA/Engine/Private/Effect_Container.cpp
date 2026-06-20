@@ -84,10 +84,10 @@ void CEffect_Container::Late_Update(_float fTimeDelta)
     if (!m_bIsPlay)
         return;
 
+    Compute_CombinedWorldMatrix();
+
     for (auto& [tag, pPart] : m_EffestParts)
         pPart->Late_Update(fTimeDelta);
-
-    Compute_CombinedWorldMatrix();
 }
 
 HRESULT CEffect_Container::Render()
@@ -101,10 +101,7 @@ HRESULT CEffect_Container::Render()
     return S_OK;
 }
 
-void CEffect_Container::EffectContainer_Start(
-    const _float3& vSpawnPos,
-    const _float3& vLook,
-    const _float4x4* pParentMatrix)
+void CEffect_Container::EffectContainer_Start(const _float3& vSpawnPos, const _float3& vLookDir, const _float4x4* pParentMatrix)
 {
     for (auto& [tag, pPart] : m_EffestParts)
         pPart->Effect_Start();
@@ -112,13 +109,34 @@ void CEffect_Container::EffectContainer_Start(
     m_bIsPlay = true;
     m_fAccTime = 0.f;
 
-    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&vSpawnPos), 1.f));
+    _vector vPos = XMVectorSetW(XMLoadFloat3(&vSpawnPos), 1.f);
+    m_pTransformCom->Set_State(STATE::POSITION, vPos);
 
-    _vector vDir = XMLoadFloat3(&vLook);
-    if (XMVector3Equal(vDir, XMVectorZero()) == false)
-        m_pTransformCom->LookAt(vDir);
+    _vector vDir = XMLoadFloat3(&vLookDir);
+    
+    if (XMVectorGetX(XMVector3LengthSq(vDir)) > Helper::fEpsilon)
+    {
+        vDir = XMVector3Normalize(vDir);
+        m_pTransformCom->LookAt(vPos + vDir);
+    }
 
     m_pParentMatrix = pParentMatrix;
+}
+
+void CEffect_Container::EffectContainer_Stop()
+{
+    if (m_bIsPlay == false)
+        return;
+
+    m_bIsPlay = false;
+    m_fAccTime = m_fDuration;
+    m_pParentMatrix = nullptr;
+
+    for (auto& [tag, pPart] : m_EffestParts)
+        pPart->Update_PlayValue(false, m_bLoop, m_fDuration, m_fAccTime);
+
+    if (m_pPool)
+        m_pPool->Return(m_iPoolLevel, m_strPoolKey, this);
 }
 
 void CEffect_Container::Set_ParentMatrix(const _float4x4* pParentMatrix)
@@ -175,7 +193,7 @@ HRESULT CEffect_Container::Add_Effect_PartObject(_uint iPrototypeLevelIndex, con
     if (pEffectPart == nullptr)
         return E_FAIL;
 
-    pEffectPart->Set_ParentMatrix(m_pTransformCom->Get_WorldMatrixPtr());
+    pEffectPart->Set_ParentMatrix(&m_CombinedWorldMatrix);
     m_EffestParts.emplace(strPartTag, pEffectPart);
 
     return S_OK;

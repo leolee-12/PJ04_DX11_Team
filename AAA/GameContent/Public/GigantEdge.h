@@ -1,6 +1,10 @@
 #pragma once
 #include "MiniBoss.h"
 
+NS_BEGIN(Engine)
+
+NS_END
+
 NS_BEGIN(Client)
 class CGigantEdge_Body;
 class CGigantEdge_Sword;
@@ -12,8 +16,8 @@ class CGigantEdge final : public CMiniBoss
 
 public:
     static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_GigantEdge";
-    static constexpr _float s_fCCT_Radius = 2.f;
-    static constexpr _float s_fCCT_Height = 2.f;
+    static constexpr _float s_fCCT_Radius = 1.3f;
+    static constexpr _float s_fCCT_Height = 0.5f;
 
 private:
     CGigantEdge(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -25,10 +29,7 @@ public:
     virtual HRESULT Initialize(void* pArg) override;
 
 public:
-    virtual void    Priority_Update(_float fTimeDelta) override;
     virtual void    Update(_float fTimeDelta) override;
-    virtual void    Late_Update(_float fTimeDelta) override;
-    virtual HRESULT Render() override;
     virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* p) override { p->strPrototypeTag = PROTOTYPE_TAG; }
     virtual void    On_Deserialized() override;
 
@@ -47,6 +48,7 @@ protected:
     virtual CMonsterBrain* Create_Brain() override;
     virtual const _tchar*  Get_AppearEventTag() const override { return TEXT("GigantEdge_Appear"); }
 
+    virtual CAnimator*      Get_BodyAnimator() const override;
     virtual void           Play_Intro() override;
     virtual _bool          Is_Intro_Finished() const override;
     virtual void           Play_Death() override;
@@ -56,8 +58,7 @@ protected:
     virtual _float         Get_CapsuleRadius() const override { return s_fCCT_Radius; }
     virtual _float         Get_CapsuleHeight() const override { return s_fCCT_Height; }
     virtual _float		   Get_InteractRadius() const override { return 0.f; }
-    virtual _float         Get_HurtBoxRadius() const override { return 1.5f; }
-    virtual void           Play_StateAnimation(MONSTER_STATE_TYPE) override {}
+    virtual _bool		   Get_HurtBoxDesc(CAPSULE_DESC& Out) const override;
 
 private:
     CGigantEdge_Body*   m_pBody   = { nullptr };
@@ -81,6 +82,7 @@ private:
     _bool m_bDbgInRange     = { false };
     _bool m_bDbgWalkInPlace = { false };
     _int  m_iDbgAttack      = { -1 };
+    _bool m_bDbgSwordDrawn  = { false };
 #endif
 
 public:

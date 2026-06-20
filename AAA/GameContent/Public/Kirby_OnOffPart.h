@@ -38,7 +38,7 @@ public:
 	virtual HRESULT Render() override;
 
 public:
-	void PartOnOff(_bool bOn) { m_bOn = bOn; }
+	virtual void PartOnOff(_bool bOn) { m_bOn = bOn; }
 
 protected:
 	const _float4x4* m_pSocketBoneMatrix{ nullptr };

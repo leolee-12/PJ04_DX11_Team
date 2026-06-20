@@ -20,8 +20,7 @@ namespace Client
 
 	enum class VTXTEX_SHADER { DEFAULT, ALPHABLEND };
 
-
-	enum class COPY_ABILITY_TYPE { NORMAL, SWORD };
+	enum class COPY_ABILITY_TYPE { NONE, NORMAL, SWORD };
 
 	enum class COLLISION_LAYER : _uint 
 	{ 
@@ -34,6 +33,14 @@ namespace Client
 		MONSTER_PROJECTILE,
 		MONSTER_D_RANGE,
 		ENV_TRIGGER = 100
+	};
+
+	struct CAPSULE_DESC
+	{
+		_float3 vCenter = { 0.f, 0.f, 0.f };
+		_float  fRadius = { 0.5f };
+		_float  fHeight = { 1.f };
+		_float3 vRadians = { 0.f, 0.f, 0.f };
 	};
 
 	constexpr _uint KIRBY_SILHOUETTE_ID = 200;

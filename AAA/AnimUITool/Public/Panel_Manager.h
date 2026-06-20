@@ -34,6 +34,9 @@ public:
 	CGameObject* Get_Selected() const { return m_pSelected; }
 	void						Set_Selected(CGameObject* pObject);
 	void						Clear_Selected();
+	void						Clear_Spawned();
+	_bool						Is_Spawned_Object(CGameObject* pObject) const;
+	void						Validate_AnimSelection();
 
 	ANIM_CONTEXT& Get_Context() { return m_Context; }
 	void						Bind_Preview(CGameObject* pOwner);
@@ -53,6 +56,7 @@ public:
 	void						Load_UI_ByPath(const _wstring& strFullPath);
 
 	void						Bind_ForAnim(CGameObject* pObj);
+	void						Bind_ForAnimSource(CGameObject* pOwner, CGameObject* pAnimSource, const _wstring& strDisplayName);
 
 private:
 	ID3D11Device* m_pDevice = { nullptr };

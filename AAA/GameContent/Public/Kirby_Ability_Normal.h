@@ -6,12 +6,17 @@
 
 NS_BEGIN(Engine)
 class CAnimator;
+class CEffect_Container;
+
+class CGameInstance_Proxy;
 NS_END
 
 NS_BEGIN(Client)
 
 class CKirby;
 class CMovement_Child;
+
+class CMonster;
 
 class CLIENT_DLL CKirby_Ability_Normal final : public CKirby_Ability
 {
@@ -49,12 +54,6 @@ public:
 	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) override;
 
 	virtual _bool Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation) override;
-	
-	// À±¼®Çö Ãß°¡
-	_bool Is_SuperInhale() const {
-		return m_eInhaleState == INHALE_STATE::SUPER_INHALE_START
-			|| m_eInhaleState == INHALE_STATE::SUPER_INHALE_LOOP;
-	}
 
 private:
 	INHALE_STATE m_eInhaleState{};
@@ -69,13 +68,33 @@ private:
 
 	_bool m_bReqInhale{};
 
+	CEffect_Container* m_pInhaleEffect{};
+
+	// Event
+	CGameInstance_Proxy* m_pGameInstance_Proxy{};
+
+	SUBHANDLE m_hSwallowedEvent{};
+	_bool m_bSubscribedSwallowedEvent{};
+
 private:
+	void Update_MoveState(CKirby* pKirby, CMovement_Child* pMovement);
+	void Update_SuperInhaleTimer(_float fTimeDelta);
+
 	void Interpolation_Inhale(CAnimator* pAnimator);
 	void Choose_InhaleAniName(_string& strAniName);
 
-	_bool Change_Ability(CKirby* pKirby);
-
 	void Reset_Default(CKirby* pKirby);
+
+	// Inhale Collider
+	void Start_InhaleCollider(CKirby* pKirby);
+	void End_InhaleCollider(CKirby* pKirby);
+
+	// Event
+	void Start_SwallowedEvent(CKirby* pKirby);
+	void End_SwallowedEvent();
+	void On_Swallowed(CKirby* pKirby, CMonster* pMonster);
+
+	_bool IsSuperInhale();
 
 public:
 	static CKirby_Ability_Normal* Create();

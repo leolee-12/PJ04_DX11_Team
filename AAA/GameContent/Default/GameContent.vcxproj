@@ -21,7 +21,11 @@
   <ItemGroup>
     <ClInclude Include="..\Public\BladeKnight_Body.h" />
     <ClInclude Include="..\Public\BladeKnight_FSM.h" />
+    <ClInclude Include="..\Public\BladeKnight_State_Attack.h" />
+    <ClInclude Include="..\Public\BladeKnight_State_DoubleAttack.h" />
+    <ClInclude Include="..\Public\BladeKnight_State_Retreat.h" />
     <ClInclude Include="..\Public\BladeKnight_Sword.h" />
+    <ClInclude Include="..\Public\BladeKnight_State_TornadoAttack.h" />
     <ClInclude Include="..\Public\Camera_AreaData.h" />
     <ClInclude Include="..\public\Camera_AreaCam.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
@@ -34,21 +38,29 @@
     <ClInclude Include="..\Public\Env_CollisionCatalog.h" />
     <ClInclude Include="..\Public\Env_InstanceBatch.h" />
     <ClInclude Include="..\Public\Env_InstanceController.h" />
+    <ClInclude Include="..\Public\Monster_Brain_FSM_T.h" />
+    <ClInclude Include="..\Public\Monster_StateT.h" />
+    <ClInclude Include="..\public\GigantEdge_Brain.h" />
+    <ClInclude Include="..\public\MiniBoss.h" />
     <ClInclude Include="..\public\Inhalable.h" />
+    <ClInclude Include="..\Public\Kirby_Stuffed.h" />
     <ClInclude Include="..\Public\LevelDesign_ProtoRegister.h" />
     <ClInclude Include="..\Public\LevelDesign_Rail.h" />
     <ClInclude Include="..\Public\LevelDesign_Spawner.h" />
+    <ClInclude Include="..\public\MonsterHitPart.h" />
+    <ClInclude Include="..\public\MonsterPart.h" />
     <ClInclude Include="..\Public\Monster_State_Captured.h" />
-    <ClInclude Include="..\Public\Monster_State_Dead.h" />
+    <ClInclude Include="..\Public\Monster_State_Chase.h" />
     <ClInclude Include="..\Public\Monster_State_Fall.h" />
-    <ClInclude Include="..\Public\Monster_State_Hit.h" />
+    <ClInclude Include="..\Public\Monster_State_Detect.h" />
+    <ClInclude Include="..\Public\Monster_State_Idle.h" />
+    <ClInclude Include="..\Public\Monster_State_KnockBack.h" />
+    <ClInclude Include="..\Public\Monster_State_KnockOut.h" />
     <ClInclude Include="..\Public\Monster_State_Landing.h" />
     <ClInclude Include="..\Public\LevelDesign_Loader.h" />
     <ClInclude Include="..\Public\LevelDesign_Parser.h" />
     <ClInclude Include="..\Public\LevelDesign_Registry.h" />
-    <ClInclude Include="..\Public\Monster_State_Retreat.h" />
-    <ClInclude Include="..\public\GigantEdge_Brain.h" />
-    <ClInclude Include="..\public\MiniBoss.h" />
+    <ClInclude Include="..\public\Monster_State_Spat.h" />
     <ClInclude Include="..\Public\Parsing_Utils.h" />
     <ClInclude Include="..\Public\RailDataReceiver.h" />
     <ClInclude Include="..\Public\Shader_PassMeta.h" />
@@ -96,9 +108,6 @@
     <ClInclude Include="..\Public\Monster_Movement.h" />
     <ClInclude Include="..\Public\Monster_State.h" />
     <ClInclude Include="..\Public\Monster_StateMachine.h" />
-    <ClInclude Include="..\Public\Monster_State_Attack.h" />
-    <ClInclude Include="..\Public\Monster_State_Chase.h" />
-    <ClInclude Include="..\Public\Monster_State_Idle.h" />
     <ClInclude Include="..\Public\Movement_Child.h" />
     <ClInclude Include="..\public\UI_Curtain.h" />
     <ClInclude Include="..\public\UI_CurtainAnimBase.h" />
@@ -179,7 +188,11 @@
   <ItemGroup>
     <ClCompile Include="..\Private\BladeKnight_Body.cpp" />
     <ClCompile Include="..\Private\BladeKnight_FSM.cpp" />
+    <ClCompile Include="..\Private\BladeKnight_State_Attack.cpp" />
+    <ClCompile Include="..\Private\BladeKnight_State_DoubleAttack.cpp" />
+    <ClCompile Include="..\Private\BladeKnight_State_Retreat.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Sword.cpp" />
+    <ClCompile Include="..\Private\BladeKnight_State_TornadoAttack.cpp" />
     <ClCompile Include="..\Private\Camera_AreaSolver.cpp" />
     <ClCompile Include="..\private\Camera_AreaCam.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
@@ -206,6 +219,7 @@
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
+    <ClCompile Include="..\Private\Kirby_Stuffed.cpp" />
     <ClCompile Include="..\Private\Kirby_GetAbility.cpp" />
     <ClCompile Include="..\Private\Kirby_OnOffPart.cpp" />
     <ClCompile Include="..\Private\Kirby_Fall.cpp" />
@@ -229,20 +243,22 @@
     <ClCompile Include="..\Private\BladeKnight.cpp" />
     <ClCompile Include="..\private\MiniBoss.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
+    <ClCompile Include="..\private\MonsterHitPart.cpp" />
     <ClCompile Include="..\Private\Monster_Brain.cpp" />
     <ClCompile Include="..\Private\Monster_Brain_FSM.cpp" />
     <ClCompile Include="..\Private\Monster_Movement.cpp" />
+    <ClCompile Include="..\private\MonsterPart.cpp" />
     <ClCompile Include="..\Private\Monster_State.cpp" />
     <ClCompile Include="..\Private\Monster_StateMachine.cpp" />
-    <ClCompile Include="..\Private\Monster_State_Attack.cpp" />
     <ClCompile Include="..\Private\Monster_State_Captured.cpp" />
     <ClCompile Include="..\Private\Monster_State_Chase.cpp" />
-    <ClCompile Include="..\Private\Monster_State_Dead.cpp" />
     <ClCompile Include="..\Private\Monster_State_Fall.cpp" />
-    <ClCompile Include="..\Private\Monster_State_Hit.cpp" />
+    <ClCompile Include="..\Private\Monster_State_Detect.cpp" />
     <ClCompile Include="..\Private\Monster_State_Idle.cpp" />
+    <ClCompile Include="..\Private\Monster_State_KnockBack.cpp" />
+    <ClCompile Include="..\Private\Monster_State_KnockOut.cpp" />
     <ClCompile Include="..\Private\Monster_State_Landing.cpp" />
-    <ClCompile Include="..\Private\Monster_State_Retreat.cpp" />
+    <ClCompile Include="..\private\Monster_State_Spat.cpp" />
     <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\Private\TestParticle.cpp" />
     <ClCompile Include="..\Private\RailDataReceiver.cpp" />
@@ -427,6 +443,7 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>../../EngineSDK/Lib/; ../ThirdPartyLib/;</AdditionalLibraryDirectories>
       <AdditionalDependencies>Engine.Lib;DirectXTKd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <FxCompile>
       <ShaderType>Effect</ShaderType>

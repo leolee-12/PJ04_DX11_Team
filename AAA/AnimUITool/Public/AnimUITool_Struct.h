@@ -26,6 +26,7 @@ namespace AnimUITool
 
         _wstring                    strName = {};           // 모델 표시명 
         _wstring                    strModelPath = {};      // json 경로 파생용
+        _wstring                    strAnimEventPath = {};  // 명시적 anim event json 경로
 
         _int                        iClip = { 0 };
         _bool                       bPlaying = { true };
