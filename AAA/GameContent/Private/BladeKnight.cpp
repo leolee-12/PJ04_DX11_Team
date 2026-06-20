@@ -125,11 +125,6 @@ void CBladeKnight::Late_Update(_float fTimeDelta)
     __super::Late_Update(fTimeDelta);
 }
 
-HRESULT CBladeKnight::Render()
-{
-    return S_OK;
-}
-
 CAnimator* CBladeKnight::Get_BodyAnimator() const
 {
     return m_pBody ? m_pBody->Get_Animator() : nullptr;
@@ -289,40 +284,22 @@ void CBladeKnight::On_Death(const ATTACK_INFO& tInfo)
 
 HRESULT CBladeKnight::Ready_PartObjects()
 {
-    // Body
-    CBladeKnight_Body::BLADEKNIGHT_BODY_DESC BodyDesc{};
-    BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    //body
+    m_pBody = Add_MonsterPart<CBladeKnight_Body>(
+        CBladeKnight_Body::PROTOTYPE_TAG, TEXT("Body"));
+    if (nullptr == m_pBody) return E_FAIL;
 
-    if (FAILED(Add_PartObject(m_iPrototypeLevel, CBladeKnight_Body::PROTOTYPE_TAG, TEXT("Body"), &BodyDesc)))
-        return E_FAIL;
 
-    m_pBody = dynamic_cast<CBladeKnight_Body*>(m_PartObjects[TEXT("Body")]);
-    if (nullptr == m_pBody)
-        return E_FAIL;
+    //sword
+    const _float4x4* pSocket = m_pBody->Get_BoneMatrixPtr("RHaveL");
+    if (nullptr == pSocket) return E_FAIL;
 
-    // Sword
-    CBladeKnight_Sword::BLADEKNIGHT_SWORD_DESC SwordDesc{};
-    SwordDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-    SwordDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("RHaveL");
-
-    if (nullptr == SwordDesc.pSocketBoneMatrix)
-        return E_FAIL;
-
-    if (FAILED(Add_PartObject(m_iPrototypeLevel, CBladeKnight_Sword::PROTOTYPE_TAG, CBladeKnight_Sword::PART_TAG, &SwordDesc)))
-        return E_FAIL;
-
-    m_pSword = dynamic_cast<CBladeKnight_Sword*>(m_PartObjects[CBladeKnight_Sword::PART_TAG]);
-    if (nullptr == m_pSword)
-        return E_FAIL;
+    m_pSword = Add_MonsterPart<CBladeKnight_Sword>(
+        CBladeKnight_Sword::PROTOTYPE_TAG, CBladeKnight_Sword::PART_TAG, pSocket);
+    if (nullptr == m_pSword) return E_FAIL;
 
     return S_OK;
 }
-
-HRESULT	CBladeKnight::Bind_ShaderResources()
-{
-    return S_OK;
-}
-
 
 void CBladeKnight::On_Deserialized()
 {

@@ -12,6 +12,8 @@
 #include "Effect_Container.h"
 #include "Animator.h"
 #include "Movement.h"
+#include "RigIdBody.h"
+#include "Controller.h"
 #include <shared_mutex>
 
 /* 1. 원형객체(CGameObject, CComponent)를 보관한다. */

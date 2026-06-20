@@ -51,18 +51,20 @@ HRESULT CMonster::Initialize(void* pArg)
 
 void CMonster::Priority_Update(_float fTimeDelta)
 {
+	if (!m_bActive) return;
 	__super::Priority_Update(fTimeDelta);
 }
 
 void CMonster::Update(_float fTimeDelta)
 {
+	if (!m_bActive) return;
 	Update_AI(fTimeDelta);
-
 	__super::Update(fTimeDelta);
 }
 
 void CMonster::Late_Update(_float fTimeDelta)
 {
+	if (!m_bActive) return;
 	__super::Late_Update(fTimeDelta);
 
 	if (m_pInteractCollider)
@@ -103,10 +105,30 @@ void CMonster::Set_Target(CGameObject* pTarget)
 		m_BlackBoard = MONSTER_BLACKBOARD{};
 }
 
+_bool CMonster::Can_BeInhaled(const INHALE_QUERY& q) const
+{
+	if (!Has_Trait(MT_INHALABLE))                              return false;
+	if (m_pCaptor != nullptr)                                 return false;
+	if (Has_Trait(MT_STRONG_INHALE_ONLY) && !q.bSuperInhale)  return false;
+	return true;
+}
+
+void CMonster::Be_Captured(CGameObject* pInhaler)
+{
+	m_pCaptor = pInhaler;
+	Change_State(MONSTER_STATE_TYPE::CAPTURED);
+}
+
 void CMonster::Add_MoveDir(const _float3& vWishDir)
 {
 	XMStoreFloat3(&m_vWishDir,
 		XMLoadFloat3(&m_vWishDir) + XMLoadFloat3(&vWishDir));
+}
+
+void CMonster::Add_MoveDir(_fvector vWishDir)
+{
+	XMStoreFloat3(&m_vWishDir,
+		XMLoadFloat3(&m_vWishDir) + vWishDir);
 }
 
 _bool CMonster::Has_MoveDir() const
@@ -407,6 +429,12 @@ void CMonster::Perceive(_float fTimeDelta)
 void CMonster::Enable_Controller(_bool bEnable)
 {
 	if (m_pController) m_pController->Set_Enabled(bEnable);
+}
+
+void CMonster::Enable_Colliders(_bool bEnable)
+{
+	if (m_pInteractCollider) m_pInteractCollider->Set_Enabled(bEnable);
+	if (m_pHurtBox)          m_pHurtBox->Set_Enabled(bEnable);
 }
 
 void CMonster::On_Swallowed()

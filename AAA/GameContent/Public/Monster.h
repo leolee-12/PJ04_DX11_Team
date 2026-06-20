@@ -2,6 +2,8 @@
 #include "GameContent_Defines.h"
 #include "Character.h"
 #include "Monster_BlackBoard.h"
+#include "Inhalable.h"
+#include "MonsterPart.h"
 
 NS_BEGIN(Engine)
 class CCollider;
@@ -14,7 +16,7 @@ class CMonster_Movement;
 class CMonsterBrain;
 class CMonster_StateMachine;
 
-class CMonster abstract : public CCharacter
+class CMonster abstract : public CCharacter, public IInhalable
 {
 	GENERATED_BODY_ABSTRACT(CMonster)
 
@@ -28,6 +30,7 @@ public:
 		MT_NONE				= 0,
 		MT_INHALABLE		= 1 << 0,   
 		MT_BODYCHECK_DAMAGE = 1 << 1,
+		MT_STRONG_INHALE_ONLY = 1 << 2,
 
 		MT_DEFAULT = MT_INHALABLE | MT_BODYCHECK_DAMAGE,
 	};
@@ -53,16 +56,18 @@ public:
 	CMonster_Movement*			Get_Movement() { return m_pMovement; }
 	_bool						Has_Trait(MONSTER_TRAIT t) const { return (m_TraitFlags & t) != 0; }
 	COPY_ABILITY_TYPE		    Get_CopyAbility() const { return m_eCopyAbility; }
+
+public: // Inhalable
+	virtual _bool				Can_BeInhaled(const INHALE_QUERY& q) const override;
+	virtual void				Be_Captured(CGameObject* pInhaler) override;
+
 	CGameObject*				Get_Captor() const { return m_pCaptor; }
-	void						Be_Captured(CGameObject* pCaptor) 
-	{ 
-		m_pCaptor = pCaptor; 
-		Change_State(MONSTER_STATE_TYPE::CAPTURED); 
-	}
+	void						On_Swallowed();
 
 public:
 	// AI가 이동 의도를 쌓는 방식
 	void						Add_MoveDir(const _float3& vWishDir);
+	void						Add_MoveDir(_fvector vWishDir);
 	_bool						Has_MoveDir() const;
 	void						Clear_MoveDir();
 
@@ -83,7 +88,7 @@ public:
 
 	// 윤석현 추가
 	void						Enable_Controller(_bool bEnable);
-	void						On_Swallowed();
+	void						Enable_Colliders(_bool bEnable);
 
 protected:
 	CController*				m_pController = { nullptr };
@@ -101,8 +106,8 @@ protected:
 	_float3						m_vWishDir = {};
 
 	_uint					    m_TraitFlags = { MT_DEFAULT };
-	CGameObject*			    m_pCaptor = { nullptr };
 	COPY_ABILITY_TYPE			m_eCopyAbility = { COPY_ABILITY_TYPE::NORMAL };
+	CGameObject*			    m_pCaptor = { nullptr };
 
 protected:
 	// 부모가 관리할 공통 파이프라인
@@ -126,6 +131,20 @@ protected:
 	//윤석현 수정 
 	virtual void				Update_AI(_float fTimeDelta);
 	virtual void				Perceive(_float fTimeDelta);
+
+protected:
+	template<class TPart>
+	TPart* Add_MonsterPart(const _tchar* szProtoTag, const _tchar* szPartTag, const _float4x4* pSocketBone = nullptr)
+	{
+		CMonsterPart::MONSTERPART_DESC Desc{};
+		Desc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+		Desc.pSocketBoneMatrix = pSocketBone;
+
+		if (FAILED(Add_PartObject(m_iPrototypeLevel, szProtoTag, szPartTag, &Desc)))
+			return nullptr;
+
+		return dynamic_cast<TPart*>(m_PartObjects[szPartTag]);
+	}
 
 protected:
 	virtual void				Free() override;

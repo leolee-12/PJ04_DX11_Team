@@ -11,6 +11,7 @@ private:
 	virtual ~CMonster_State_Captured() = default;
 
 protected:
+	virtual HRESULT					Initialize() override;
 	virtual HRESULT					Initialize(const ANI_PLAY_INFO& tInfo, _float fSpped = 0.f) override;
 
 public:
@@ -31,6 +32,7 @@ private:
 
 public:
 	static CMonster_State_Captured* Create(const ANI_PLAY_INFO& tInfo, _float fSpped = 0.f);
+	static CMonster_State_Captured* Create();
 
 protected:
 	virtual void					Free() override;

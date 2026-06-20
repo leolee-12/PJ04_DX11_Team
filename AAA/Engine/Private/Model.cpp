@@ -177,80 +177,6 @@ _bool CModel::Pick_Mesh(_uint iMeshIndex, _fvector vOrigin, _fvector vDir, _fmat
 	return true;
 }
 
-_bool CModel::Pick_Mesh_Ex(_uint iMeshIndex, _fvector vOrigin, _fvector vDir, _fmatrix WorldMatrix, _float3* pOutHit, float*
-	pOutDist, _float fAabbPadding)
-{
-	if (iMeshIndex >= m_iNumMeshes)
-		return false;
-
-	const _vector vDeterminant = XMMatrixDeterminant(WorldMatrix);
-	const float fDeterminant = XMVectorGetX(vDeterminant);
-
-	const _matrix InvWorld = XMMatrixInverse(nullptr, WorldMatrix);
-
-	const _vector vLocalOrigin = XMVector3TransformCoord(vOrigin, InvWorld);
-	_vector vLocalDir = XMVector3TransformNormal(vDir, InvWorld);
-	vLocalDir = XMVector3Normalize(vLocalDir);
-
-	//char szDbg[256] = {};
-	//::sprintf_s(
-	//    szDbg,
-	//    "[EnvPick][InvWorld] mesh=%u det=%.6f\n",
-	//    iMeshIndex,
-	//    fDeterminant);
-	//::OutputDebugStringA(szDbg);
-
-	const _bool bAabbHit = m_Meshes[iMeshIndex]->Ray_AABB_Ex(vLocalOrigin, vLocalDir, fAabbPadding);
-
-	//::sprintf_s(
-	//    szDbg,
-	//    "[EnvPick][MeshAABB] mesh=%u hit=%d pad=%.3f\n",
-	//    iMeshIndex,
-	//    bAabbHit ? 1 : 0,
-	//    fAabbPadding);
-	//::OutputDebugStringA(szDbg);
-
-	if (!bAabbHit)
-		return false;
-
-	_float3 localHit = {};
-	float dist = 0.f;
-	const _bool bTriHit = m_Meshes[iMeshIndex]->Pick(vLocalOrigin, vLocalDir, &localHit, &dist);
-
-	//::sprintf_s(
-	//    szDbg,
-	//    "[EnvPick][Tri] mesh=%u hit=%d localDist=%.3f localHit=(%.3f, %.3f, %.3f)\n",
-	//    iMeshIndex,
-	//    bTriHit ? 1 : 0,
-	//    dist,
-	//    localHit.x,
-	//    localHit.y,
-	//    localHit.z);
-	//::OutputDebugStringA(szDbg);
-
-	if (!bTriHit)
-		return false;
-
-	if (pOutHit)
-	{
-		XMStoreFloat3(pOutHit, XMVector3TransformCoord(XMLoadFloat3(&localHit), WorldMatrix));
-
-		//::sprintf_s(
-		//    szDbg,
-		//    "[EnvPick][WorldHit] mesh=%u hit=(%.3f, %.3f, %.3f)\n",
-		//    iMeshIndex,
-		//    pOutHit->x,
-		//    pOutHit->y,
-		//    pOutHit->z);
-		//::OutputDebugStringA(szDbg);
-	}
-
-	if (pOutDist)
-		*pOutDist = dist;
-
-	return true;
-}
-
 HRESULT CModel::Initialize_Prototype(MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter)
 {
 	m_eType = eType;
@@ -918,16 +844,17 @@ void CModel::Load_MeshLayers(const _char* pModelFilePath)
 	try { fin >> j; }
 	catch (...) { return; }
 
-	for (auto& meshItem : j.items())
-	{
-		_uint i = 0;
-		try { i = static_cast<_uint>(stoul(meshItem.key())); }
-		catch (...) { continue; }
+	if (!j.is_object())
+		return;
 
-		if (i >= m_iNumMeshes)
+	for (_uint i = 0; i < m_iNumMeshes; ++i)
+	{
+		const auto MeshIter = j.find(to_string(i));
+
+		if (MeshIter == j.end() || !MeshIter->is_object())
 			continue;
 
-		const json& jMesh = meshItem.value();
+		const json& jMesh = *MeshIter;
 		MESH_LAYER_IDX& Layer = m_MeshLayers[i];
 
 		if (jMesh.contains("Pass") && jMesh["Pass"].is_number_integer())
@@ -1029,36 +956,24 @@ void CModel::Load_MeshLayers(const _char* pModelFilePath)
 			}
 		}
 
-		for (auto& texItem : jMesh.items())
+		for (_uint t = 0; t < MTEX_TYPE_MAX; ++t)
 		{
-			const string& strKey = texItem.key();
+			const auto TextureIter = jMesh.find(to_string(t));
 
-			if (strKey == "Pass"
-				|| strKey == "UVIndex"
-				|| strKey == "UnknownUVIndex"
-				|| strKey == "ExtraUVIndex"
-				|| strKey == "Flags"
-				|| strKey == "UseUVTransform"
-				|| strKey == "UVScale"
-				|| strKey == "UVScaleNormal"
-				|| strKey == "UVScaleMaterial"
-				|| strKey == "UVRotate"
-				|| strKey == "UVOffset"
-				|| strKey == "NormalStrength"
-				|| strKey == "MaskStrength"
-				|| strKey == "ExtraBind")
+			if (TextureIter == jMesh.end())
+				continue;
+
+			if (TextureIter->is_number_unsigned())
 			{
-				continue;
+				Layer.idx[t] = TextureIter->get<_uint>();
 			}
+			else if (TextureIter->is_number_integer())
+			{
+				const _int iTextureIndex = TextureIter->get<_int>();
 
-			_uint t = 0;
-			try { t = static_cast<_uint>(stoul(strKey)); }
-			catch (...) { continue; }
-
-			if (t >= MTEX_TYPE_MAX)
-				continue;
-
-			Layer.idx[t] = texItem.value().get<_uint>();
+				if (0 <= iTextureIndex)
+					Layer.idx[t] = static_cast<_uint>(iTextureIndex);
+			}
 		}
 	}
 }

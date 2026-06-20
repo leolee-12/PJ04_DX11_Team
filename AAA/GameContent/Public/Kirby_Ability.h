@@ -61,9 +61,9 @@ public:
 
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) = 0;
 
-	virtual _bool Enter_Attack_KeyDown(CKirby* pKirby) = 0;
+	virtual _bool Enter_Attack_KeyDown(CKirby* pKirby)  = 0;
 	virtual _bool Enter_Attack_KeyPress(CKirby* pKirby) = 0;
-	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) = 0;
+	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby)    = 0;
 
 	virtual _bool Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation);
 

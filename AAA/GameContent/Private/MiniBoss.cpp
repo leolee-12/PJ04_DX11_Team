@@ -1,6 +1,8 @@
 #include "MiniBoss.h"
 #include "GameInstance.h"
 #include "Monster_Movement.h"
+#include "Monster_State.h"
+#include "Monster_State_Captured.h"
 
 CMiniBoss::CMiniBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster(pDevice, pContext) {
@@ -11,7 +13,8 @@ CMiniBoss::CMiniBoss(const CMiniBoss& Prototype)
 
 HRESULT CMiniBoss::Initialize(void* pArg)
 {
-    if (FAILED(__super::Initialize(pArg)))   return E_FAIL;
+    if (FAILED(__super::Initialize(pArg)))   
+        return E_FAIL;
 
     // 파트 → 이동 → AI(brain) 순서
     if (FAILED(Ready_Parts()))      return E_FAIL;   // 자식 구현
@@ -24,6 +27,8 @@ HRESULT CMiniBoss::Initialize(void* pArg)
     if (const _tchar* pTag = Get_AppearEventTag())
         Subscribe_Event(pTag, [this](void*) { Appear(); });
 
+    m_pCaptureState = CMonster_State_Captured::Create();
+
     m_TraitFlags = MT_NONE;
 
     return S_OK;
@@ -35,6 +40,7 @@ void CMiniBoss::Appear()
         return;
 
     Set_Active(true);
+    Set_Target(Find_Player());
     m_eLife = EMINIBOSS_LIFE::INTRO;
 }
 
@@ -44,13 +50,19 @@ void CMiniBoss::Die()
     m_eLife = EMINIBOSS_LIFE::DEAD;
 }
 
+void CMiniBoss::Be_Captured(CGameObject* pInhaler)
+{
+    m_pCaptor = pInhaler;
+    m_pCaptureState->Enter(this);     // CCT off + 초기화 (상태 내부)
+    m_eLife = EMINIBOSS_LIFE::EATEN;
+}
+
 void CMiniBoss::Update_AI(_float fTimeDelta)
 {
     switch (m_eLife)
     {
         case EMINIBOSS_LIFE::HIDDEN:
-            return;                                       // 트리거 전: AI 정지
-
+            return;                                    
         case EMINIBOSS_LIFE::INTRO:
             if (!m_bIntroStarted) 
             { 
@@ -58,23 +70,21 @@ void CMiniBoss::Update_AI(_float fTimeDelta)
                 m_bIntroStarted = true; 
             }
             if (Is_Intro_Finished())
-                m_eLife = EMINIBOSS_LIFE::ACTIVE;         // ★ 여기서부터 움직임 시작
-            // 인트로 중 중력/접지만 유지 (이동 의도 없음)
+                m_eLife = EMINIBOSS_LIFE::ACTIVE;       
             if (m_pMovement && !m_pGameInstance_Proxy->Is_EditMode())
                 m_pMovement->Move(XMVectorZero(), fTimeDelta);
             return;
-
         case EMINIBOSS_LIFE::ACTIVE:
-            __super::Update_AI(fTimeDelta);               // Perceive + brain->Decide(BT) + Move
+            __super::Update_AI(fTimeDelta);          
             break;
-
         case EMINIBOSS_LIFE::DEAD:
-            if (!m_bDeathStarted) { Play_Death(); m_bDeathStarted = true; }   // DeathStart (브레인 정지)
+            if (!m_bDeathStarted) { Play_Death(); m_bDeathStarted = true; } 
 
-            if (!m_bCorpse && Is_Death_Finished())     // 쓰러짐 끝 → 시체 루프 + 링거 시작
+            if (!m_bCorpse && Is_Death_Finished())    
             {
-                Play_DeathLoop();                      // DeathEndWait 루프
+                Play_DeathLoop();                  
                 m_bCorpse = true;
+                m_TraitFlags = MT_INHALABLE | MT_STRONG_INHALE_ONLY;
             }
             if (m_bCorpse)
             {
@@ -83,18 +93,23 @@ void CMiniBoss::Update_AI(_float fTimeDelta)
                 {
                     if (const _tchar* pTag = Get_AppearEventTag())
                         UnSubscribe_Event(pTag);
-                    Enable_Controller(false);   // ← CCT 충돌/쿼리 비활성 (시체 통과 가능)
+                    Enable_Controller(false);
+                    Enable_Colliders(false);
                     Set_Active(false);
-                }   // 5초 뒤 제거(지연 삭제)
+                }  
             }
-
             if (m_pMovement && !m_pGameInstance_Proxy->Is_EditMode())
-                m_pMovement->Move(XMVectorZero(), fTimeDelta);          // 시체 중력만
+                m_pMovement->Move(XMVectorZero(), fTimeDelta);       
+            return;
+
+        case EMINIBOSS_LIFE::EATEN:
+            m_pCaptureState->Update(this, fTimeDelta); 
             return;
     }
 }
 
 void CMiniBoss::Free()
 {
+    Safe_Release(m_pCaptureState);
     __super::Free();
 }

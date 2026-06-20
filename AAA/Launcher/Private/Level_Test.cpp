@@ -28,6 +28,8 @@ HRESULT CLevel_Test::Initialize()
     CMapStage* pMapStage = nullptr;
 
     if (FAILED(CMap_Loader::Spawn_Map(
+        m_pDevice,
+        m_pContext,
         Manifest.strMapManifest,
         Manifest.strObjectsFile,
         iLevel,

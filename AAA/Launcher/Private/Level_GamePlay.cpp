@@ -28,6 +28,8 @@ HRESULT CLevel_GamePlay::Initialize()
     CMapStage* pMapStage = nullptr;
 
     if (FAILED(CMap_Loader::Spawn_Map(
+        m_pDevice,
+        m_pContext,
         Manifest.strMapManifest,
         Manifest.strObjectsFile,
         iLevel,
@@ -40,6 +42,17 @@ HRESULT CLevel_GamePlay::Initialize()
     if (FAILED(Load_Level(m_pGameInstance_Proxy, m_pDevice, m_pContext,
         Manifest.strObjectsFile.c_str(), iLevel)))
         return E_FAIL;
+
+#ifdef _DEBUG
+    const _wstring strDebugMessage =
+        L"[MapLoad][LevelDesign] json=" + to_wstring(MapReport.iLevelDesignJsonLoadedCount) +
+        L", parsed=" + to_wstring(MapReport.iLevelDesignParsedObjectCount) +
+        L", created=" + to_wstring(MapReport.iLevelDesignCreatedCount) +
+        L", fallback=" + to_wstring(MapReport.iLevelDesignFallbackSpecCount) +
+        L", failed=" + to_wstring(MapReport.iLevelDesignSkippedCreateFailedCount) + L"\n";
+
+    OutputDebugStringW(strDebugMessage.c_str());
+#endif
 
     if (!Manifest.strUIFile.empty())
     {
@@ -143,135 +156,6 @@ HRESULT CLevel_GamePlay::Ready_Camera()
     //    return E_FAIL;
 
     return S_OK;
-}
-
-void CLevel_GamePlay::Key_Input()
-{
-    POINT pt = m_pGameInstance_Proxy->Get_MousePos();
-    _float fW = m_pGameInstance_Proxy->Get_WindowWidth();
-    _float fH = m_pGameInstance_Proxy->Get_WindowHeight();
-    _float ndcX = (pt.x / fW) * 2.f - 1.f;
-    _float ndcY = 1.f - (pt.y / fH) * 2.f;
-
-    WORLD_HOVER_PROBE hover{};
-    m_pGameInstance_Proxy->Compute_PickingRay(ndcX, ndcY, &hover.vRayOrigin, &hover.vRayDir);
-
-    m_pGameInstance_Proxy->Publish(TEXT("World_Hover_Probe"), &hover);
-    m_pGameInstance_Proxy->Publish(TEXT("Hover_Result"), &hover);
-
-
-    if (m_pGameInstance_Proxy->Mouse_Down(DIMB::RBUTTON))
-    {
-        POINT pt = m_pGameInstance_Proxy->Get_MousePos();
-        _float fW = m_pGameInstance_Proxy->Get_WindowWidth();
-        _float fH = m_pGameInstance_Proxy->Get_WindowHeight();
-        _float2 vNDC = {
-            (pt.x / fW) * 2.f - 1.f,
-            1.f - (pt.y / fH) * 2.f
-        };
-
-        UI_RBTN_PROBE uiProbe = { vNDC, false };
-        m_pGameInstance_Proxy->Publish(TEXT("UI_RButton_Probe"), &uiProbe);
-        if (uiProbe.bConsumed) return;
-
-        // 월드 probe
-        WORLD_CLICK_PROBE probe{};
-        probe.vNDC = vNDC;
-        m_pGameInstance_Proxy->Compute_PickingRay(
-            vNDC.x, vNDC.y, &probe.vRayOrigin, &probe.vRayDir);
-        
-        m_pGameInstance_Proxy->Publish(TEXT("World_Click_Probe"), &probe);
-
-        // 결과에 따른 분기
-        switch (probe.eHitType)
-        {
-            case EClickHitType::ANIMAL:
-                m_pGameInstance_Proxy->Publish(TEXT("Picked_Animal"), &probe);
-                break;
-            case EClickHitType::ITEMBOX:
-                m_pGameInstance_Proxy->Publish(TEXT("Picked_ItemBox"), &probe);
-                break;
-            case EClickHitType::FLOOR:
-                m_pGameInstance_Proxy->Publish(TEXT("Picked_Floor"), &probe.vHitPos);
-                break;
-            default: break;
-        }
-    }
-
-    if (m_pGameInstance_Proxy->Key_Down(DIK_A))
-    {
-        m_pGameInstance_Proxy->Publish(TEXT("Player_Attack"), nullptr);
-    }
-
-    _uint iWeapon = { 0 };
-    if (m_pGameInstance_Proxy->Key_Down(DIK_1))
-    {
-        iWeapon = 0;
-        m_pGameInstance_Proxy->Publish(TEXT("Player_Switch_Weapon"), &iWeapon);
-    }
-    if (m_pGameInstance_Proxy->Key_Down(DIK_2))
-    {
-        iWeapon = 1;
-        m_pGameInstance_Proxy->Publish(TEXT("Player_Switch_Weapon"), &iWeapon);
-    }
-    if (m_pGameInstance_Proxy->Key_Down(DIK_3))
-    {
-        iWeapon = 2;
-        m_pGameInstance_Proxy->Publish(TEXT("Player_Switch_Weapon"), &iWeapon);
-    }
-
-    auto MakeSkillInput = [this]() -> SKILL_INPUT {
-        POINT pt = m_pGameInstance_Proxy->Get_MousePos();
-        _float fW = m_pGameInstance_Proxy->Get_WindowWidth();
-        _float fH = m_pGameInstance_Proxy->Get_WindowHeight();
-        _float ndcX = (pt.x / fW) * 2.f - 1.f;
-        _float ndcY = 1.f - (pt.y / fH) * 2.f;
-
-        SKILL_INPUT in{};
-        m_pGameInstance_Proxy->Compute_PickingRay(ndcX, ndcY, &in.vRayOrigin, &in.vRayDir);
-        in.bHasRay = true;
-        return in;
-        };
-
-    if (m_pGameInstance_Proxy->Key_Down(DIK_Q))
-    {
-        SKILL_INPUT in = MakeSkillInput();
-        m_pGameInstance_Proxy->Publish(TEXT("Player_Skill1"), &in);
-    }
-    if (m_pGameInstance_Proxy->Key_Down(DIK_W))
-    {
-        SKILL_INPUT in = MakeSkillInput();
-        m_pGameInstance_Proxy->Publish(TEXT("Player_Skill2"), &in);
-    }
-    if (m_pGameInstance_Proxy->Key_Down(DIK_E))
-    {
-        SKILL_INPUT in = MakeSkillInput();
-        m_pGameInstance_Proxy->Publish(TEXT("Player_Skill3"), &in);
-    }
-    if (m_pGameInstance_Proxy->Key_Down(DIK_R))
-    {
-        SKILL_INPUT in = MakeSkillInput();
-        m_pGameInstance_Proxy->Publish(TEXT("Player_Skill4"), &in);
-    }
-
-#ifdef _DEBUG
-    if (m_pGameInstance_Proxy->Key_Down(DIK_O))
-    {
-        static const _uint base[16] = {
-            0,  1,  2,  3,      
-            22, 23, 24, 25,     
-            32, 33, 34, 35,     
-            54, 55, 56, 57      
-        };
-        static _uint dummy[16];
-        for (_uint i = 0; i < 16; ++i) dummy[i] = base[i];
-
-        SHOW_ITEMBOX_UI desc{};
-        desc.iBoxIdx = 0;
-        desc.pContents = dummy;
-        m_pGameInstance_Proxy->Publish(TEXT("Show_ItemBox_UI"), &desc);
-    }
-#endif
 }
 
 CLevel_GamePlay* CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

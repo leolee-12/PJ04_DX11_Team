@@ -6,6 +6,10 @@ class CShader;
 class CModel;
 NS_END
 
+NS_BEGIN(physx)
+class PxRigidStatic;
+NS_END
+
 NS_BEGIN(Client)
 
 class CLevelDesign_Breakable final : public CLevelDesignObject
@@ -14,7 +18,10 @@ class CLevelDesign_Breakable final : public CLevelDesignObject
 
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_LevelDesign_Breakable";
-	static constexpr const _tchar* STARBLOCK_MODEL_PROTO_TAG = L"Prototype_Component_Model_LevelDesign_StarBlock";
+	static constexpr const _tchar* STARBLOCK_H1W1_MODEL_PROTO_TAG = L"Prototype_Component_Model_LevelDesign_Star_H1W1";
+	static constexpr const _tchar* STARBLOCK_H2W2_MODEL_PROTO_TAG = L"Prototype_Component_Model_LevelDesign_Star_H2W2";
+	static constexpr const _tchar* STARBLOCK_H3W3_MODEL_PROTO_TAG = L"Prototype_Component_Model_LevelDesign_Star_H3W3";
+	static constexpr const _tchar* STARBLOCK_MODEL_PROTO_TAG = STARBLOCK_H1W1_MODEL_PROTO_TAG;
 
 private:
 	CLevelDesign_Breakable(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -29,7 +36,7 @@ public:
 	virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
 public:
-	LD_BREAKABLE_TYPE				Get_BreakableType() const { return m_tBreakableDesc.eBreakableType; }
+	LD_BREAKABLE_TYPE				Get_BreakableType() const { return m_tBreakableDesc.eType; }
 	const LD_BREAKABLE_OBJECT_DESC&	Get_BreakableDesc() const { return m_tBreakableDesc; }
 
 protected:
@@ -37,13 +44,16 @@ protected:
 	LD_BREAKABLE_OBJECT_DESC&		BreakableDesc() { return m_tBreakableDesc; }
 
 private:
-	CShader* m_pShaderCom = nullptr;
-	CModel* m_pModelCom = nullptr;
+	CShader* m_pShaderCom = { nullptr };
+	CModel* m_pModelCom = { nullptr };
+	physx::PxRigidStatic* m_pPhysicsActor = { nullptr };
 
-	LD_BREAKABLE_OBJECT_DESC		m_tBreakableDesc = {};
+	LD_BREAKABLE_OBJECT_DESC m_tBreakableDesc = {};
 
 private:
 	HRESULT			Ready_Components();
+	HRESULT			Ready_PhysicsActor_Box();
+	void			Release_PhysicsActor();
 	HRESULT			Bind_ShaderResources();
 	const _tchar*	Resolve_ModelProtoTag() const;
 

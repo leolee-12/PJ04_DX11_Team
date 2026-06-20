@@ -1,6 +1,14 @@
 #include "Monster_State_Captured.h"
 #include "Monster.h"
 
+HRESULT CMonster_State_Captured::Initialize()
+{
+	if (FAILED(__super::Initialize()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 HRESULT CMonster_State_Captured::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpeed)
 {
 	if (FAILED(__super::Initialize(tInfo, fSpeed)))
@@ -20,9 +28,11 @@ void CMonster_State_Captured::On_Enter(CMonster* pMonster)
 		return;
 
 	pMonster->Enable_Controller(false);
+	pMonster->Enable_Colliders(false);
 
-	if (CAnimator* pAnim = pMonster->Get_BodyAnimator())
-		pAnim->Play(&m_PlayInfo);
+	if (!m_PlayInfo.strAniName.empty())
+		if (CAnimator* pAnim = pMonster->Get_BodyAnimator())
+			pAnim->Play(&m_PlayInfo);
 
 	m_fPullSpeed = s_fPullInitSpeed;
 	m_vBaseScale = pMonster->Get_Transform()->Get_Scaled();
@@ -72,12 +82,25 @@ void CMonster_State_Captured::On_Exit(CMonster* pMonster)
 
 	pMonster->Get_Transform()->Set_Scale(m_vBaseScale.x, m_vBaseScale.y, m_vBaseScale.z);
 	pMonster->Enable_Controller(true);
+	pMonster->Enable_Colliders(true);
 }
 
 CMonster_State_Captured* CMonster_State_Captured::Create(const ANI_PLAY_INFO& tInfo, _float fSpeed)
 {
 	CMonster_State_Captured* pInstance = new CMonster_State_Captured();
 	if (FAILED(pInstance->Initialize(tInfo, fSpeed)))
+	{
+		MSG_BOX("Failed to Created : CMonster_State_Captured");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CMonster_State_Captured* CMonster_State_Captured::Create()
+{
+	CMonster_State_Captured* pInstance = new CMonster_State_Captured();
+	if (FAILED(pInstance->Initialize()))
 	{
 		MSG_BOX("Failed to Created : CMonster_State_Captured");
 		Safe_Release(pInstance);

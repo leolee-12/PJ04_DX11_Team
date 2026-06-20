@@ -18,6 +18,12 @@ namespace Client
     }
 
     inline constexpr const _tchar* EVT_SWALLOWED = L"OnSwallowed";
+    inline constexpr const _tchar* EVT_QUERY_PLAYER = L"Query_Player";
+
+    struct PLAYER_QUERY 
+    { 
+        CGameObject* pPlayer = { nullptr }; 
+    };
 
     struct SWALLOW_EVENT 
     { 
