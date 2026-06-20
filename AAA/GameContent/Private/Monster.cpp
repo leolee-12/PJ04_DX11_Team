@@ -305,7 +305,7 @@ void CMonster::Check_AirborneReflex()
 
 	const MONSTER_STATE_TYPE eCurState = Get_StateType();
 	if (eCurState == MONSTER_STATE_TYPE::FALL || eCurState == MONSTER_STATE_TYPE::LANDING ||
-		eCurState == MONSTER_STATE_TYPE::CAPTURED || eCurState == MONSTER_STATE_TYPE::DEAD)
+		eCurState == MONSTER_STATE_TYPE::CAPTURED || eCurState == MONSTER_STATE_TYPE::DEATH)
 		return;
 
 	// 테스트로 -2.f로 두고 테스트. 확정되면 상수화 시켜서 사용
@@ -342,7 +342,15 @@ void CMonster::On_Damaged(const ATTACK_INFO& tInfo)
 void CMonster::On_Death(const ATTACK_INFO& tInfo)
 {
 	if (m_pMovement) m_pMovement->KO(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
-	Change_State(MONSTER_STATE_TYPE::DEAD);
+	Change_State(MONSTER_STATE_TYPE::DEATH);
+}
+
+_bool CMonster::Block_Hit(const ATTACK_INFO& tInfo)
+{
+	if (Get_StateType() == MONSTER_STATE_TYPE::CAPTURED)
+		return true;
+
+	return false;
 }
 
 void CMonster::Perceive(_float fTimeDelta)

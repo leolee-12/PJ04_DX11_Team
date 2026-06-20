@@ -33,7 +33,10 @@ public:
 
 protected:
 	_bool						m_bIsInterruptible = { false };
-	_float						m_fSpeed = { 0.f };
+	_float						m_fSpeed = { 0.f };		// 상태 동안 이동 적용할 속도
+
+	_float						m_fTimer = { 0.f };
+	_float						m_fMaxTime = { 0.f };
 
 	ANI_PLAY_INFO				m_PlayInfo{};
 

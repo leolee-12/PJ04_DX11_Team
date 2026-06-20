@@ -65,6 +65,9 @@ protected:
 	virtual HRESULT				Ready_State(CMonster_StateMachine* pStateMachine) override;
 	virtual HRESULT				Ready_AnimEvents() override;
 
+	virtual void				On_Damaged(const ATTACK_INFO& tInfo) override;
+	virtual void				On_Death(const ATTACK_INFO& tInfo) override;
+
 private:
 	HRESULT						Ready_PartObjects();
 	HRESULT						Bind_ShaderResources();

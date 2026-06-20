@@ -15,7 +15,10 @@
 #include "Monster_State_Fall.h"
 #include "Monster_State_Landing.h"
 #include "Monster_State_Captured.h"
-#include "BladeKnight_State_Chase.h"
+#include "Monster_State_Chase.h"
+#include "Monster_State_KnockBack.h"
+#include "Monster_State_KnockOut.h"
+
 #include "BladeKnight_State_Retreat.h"
 
 // 전용 상태
@@ -165,6 +168,7 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
     Info.strAniName = "Fall";
     Info.bLoop = true;
     Info.fSpeed = 1.5f;
+
     if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::FALL, CMonster_State_Fall::Create(Info))))
         return E_FAIL;
 
@@ -184,7 +188,28 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
     if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
         return E_FAIL;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CHASE, CBladeKnight_State_Chase::Create())))
+    // State Chase
+    Info.strAniName = "Move";
+    Info.bLoop = true;
+    Info.fSpeed = 1.5f;
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CHASE, CMonster_State_Chase::Create(Info, 3.f))))
+        return E_FAIL;
+
+    // State KnockBack
+    Info.strAniName = "Damage";
+    Info.bLoop = true;
+    Info.fSpeed = 1.25f;
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK, CMonster_State_KnockBack::Create(Info))))
+        return E_FAIL;
+
+    // State KnockOut
+    Info.strAniName = "Damage";
+    Info.bLoop = true;
+    Info.fSpeed = 1.25f;
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_OUT, CMonster_State_KnockOut::Create(Info))))
         return E_FAIL;
 
     if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::RETREAT, CBladeKnight_State_Retreat::Create())))
@@ -233,6 +258,33 @@ HRESULT CBladeKnight::Ready_AnimEvents()
         });
 
     return S_OK;
+}
+
+void CBladeKnight::On_Damaged(const ATTACK_INFO& tInfo)
+{
+    if (m_pMovement)
+        m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
+
+    Change_State(MONSTER_STATE_TYPE::KNOCK_BACK);
+}
+
+void CBladeKnight::On_Death(const ATTACK_INFO& tInfo)
+{
+    if (tInfo.fDamage >= m_fMaxHP)
+    {
+        if (m_pMovement)
+            m_pMovement->KO(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
+        Change_State(MONSTER_STATE_TYPE::KNOCK_OUT);
+    }
+    else 
+    {
+        if (m_pMovement)
+            m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
+        Change_State(MONSTER_STATE_TYPE::KNOCK_BACK);
+    }
+    
+    // TODO : Set_Dead와 연결
+
 }
 
 HRESULT CBladeKnight::Ready_PartObjects()

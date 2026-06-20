@@ -18,12 +18,11 @@ _bool CMonster_Brain_FSM::Can_Decide(CMonster* pMonster, const MONSTER_BLACKBOAR
     MONSTER_STATE_TYPE eCurState = pMonster->Get_StateType();
 
     if (eCurState == MONSTER_STATE_TYPE::CAPTURED ||
-        eCurState == MONSTER_STATE_TYPE::DEAD)
+        eCurState == MONSTER_STATE_TYPE::DEATH)
         return false;
 
     if (!BlackBoard.bCanTransition)
         return false;
-
 
     return true;
 }

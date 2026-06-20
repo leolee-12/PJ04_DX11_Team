@@ -121,6 +121,8 @@ protected:
 	virtual void				On_Damaged(const ATTACK_INFO& tInfo) override;
 	virtual void				On_Death(const ATTACK_INFO& tInfo) override;
 
+	virtual _bool				Block_Hit(const ATTACK_INFO& tInfo) override;
+
 	//À±¼®Çö ¼öÁ¤ 
 	virtual void				Update_AI(_float fTimeDelta);
 	virtual void				Perceive(_float fTimeDelta);

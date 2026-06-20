@@ -48,9 +48,12 @@
     <ClInclude Include="..\public\GigantEdge_Brain.h" />
     <ClInclude Include="..\public\MiniBoss.h" />
     <ClInclude Include="..\Public\Monster_State_Captured.h" />
+    <ClInclude Include="..\Public\Monster_State_Chase.h" />
     <ClInclude Include="..\Public\Monster_State_Fall.h" />
     <ClInclude Include="..\Public\Monster_State_Detect.h" />
     <ClInclude Include="..\Public\Monster_State_Idle.h" />
+    <ClInclude Include="..\Public\Monster_State_KnockBack.h" />
+    <ClInclude Include="..\Public\Monster_State_KnockOut.h" />
     <ClInclude Include="..\Public\Monster_State_Landing.h" />
     <ClInclude Include="..\Public\Shader_PassMeta.h" />
     <ClInclude Include="..\Public\GameContent_AnimEvents.h" />
@@ -235,9 +238,12 @@
     <ClCompile Include="..\Private\Monster_State.cpp" />
     <ClCompile Include="..\Private\Monster_StateMachine.cpp" />
     <ClCompile Include="..\Private\Monster_State_Captured.cpp" />
+    <ClCompile Include="..\Private\Monster_State_Chase.cpp" />
     <ClCompile Include="..\Private\Monster_State_Fall.cpp" />
     <ClCompile Include="..\Private\Monster_State_Detect.cpp" />
     <ClCompile Include="..\Private\Monster_State_Idle.cpp" />
+    <ClCompile Include="..\Private\Monster_State_KnockBack.cpp" />
+    <ClCompile Include="..\Private\Monster_State_KnockOut.cpp" />
     <ClCompile Include="..\Private\Monster_State_Landing.cpp" />
     <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\Private\TestParticle.cpp" />
