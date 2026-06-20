@@ -109,6 +109,7 @@
     <ClInclude Include="..\Public\Monster_State.h" />
     <ClInclude Include="..\Public\Monster_StateMachine.h" />
     <ClInclude Include="..\Public\Movement_Child.h" />
+    <ClInclude Include="..\public\UI_BossStatus.h" />
     <ClInclude Include="..\public\UI_Curtain.h" />
     <ClInclude Include="..\public\UI_CurtainAnimBase.h" />
     <ClInclude Include="..\public\UI_CurtainSequenceBase.h" />
@@ -263,6 +264,7 @@
     <ClCompile Include="..\Private\TestParticle.cpp" />
     <ClCompile Include="..\Private\RailDataReceiver.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />
+    <ClCompile Include="..\private\UI_BossStatus.cpp" />
     <ClCompile Include="..\private\UI_Curtain.cpp" />
     <ClCompile Include="..\private\UI_CurtainAnimBase.cpp" />
     <ClCompile Include="..\private\UI_CurtainSequenceBase.cpp" />

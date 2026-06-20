@@ -478,6 +478,9 @@
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Spat">
       <UniqueIdentifier>{81b0629c-516a-4991-8c17-3bfbd6ecf5e9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus">
+      <UniqueIdentifier>{08709ead-b3a1-4623-96c2-e4d2a78ade1e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -966,6 +969,9 @@
     <ClInclude Include="..\public\Monster_State_Spat.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\UI_BossStatus.h">
+      <Filter>00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1378,6 +1384,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Monster_State_Spat.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_BossStatus.cpp">
+      <Filter>00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

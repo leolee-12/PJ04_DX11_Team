@@ -15,6 +15,10 @@ namespace Client
         inline constexpr const _tchar* Kirby_PointStarGained = L"Kirby.PointStarGained";
         inline constexpr const _tchar* Kirby_HP_Updated = L"Kirby.HPUpdated";
         inline constexpr const _tchar* Kirby_Ability_Changed = L"Kirby.AbilityChanged";
+
+        inline constexpr const _tchar* Boss_HP_Updated = L"Boss.HPUpdated"; 
+        inline constexpr const _tchar* Boss_Appeared = L"Boss.Appeared";   
+        inline constexpr const _tchar* Boss_Died = L"Boss.Died";        
     }
 
     inline constexpr const _tchar* EVT_SWALLOWED = L"OnSwallowed";
@@ -40,5 +44,11 @@ namespace Client
         _float fMaxHP = { 100.f };
         _float fCurrHp = { 100.f };
     }KIRBY_HP_UPDATED;
+
+    typedef struct tagBossHPUpdated 
+    {
+        _float fMaxHP = { 100.f };
+        _float fCurrHp = { 100.f };
+    }BOSS_HP_UPDATED;
 
 }

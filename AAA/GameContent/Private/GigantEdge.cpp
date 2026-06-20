@@ -94,6 +94,12 @@ _bool CGigantEdge::Is_Death_Finished() const
     return m_pBody->Get_Animator()->Is_Finished();
 }
 
+void CMiniBoss::On_Damaged(const ATTACK_INFO& tInfo)
+{
+    __super::On_Damaged(tInfo);
+    Publish_HP();
+}
+
 _bool CGigantEdge::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
 {
     Out.fRadius = { s_fCCT_Radius + 0.1f };
@@ -106,6 +112,14 @@ CGameObject* CMiniBoss::Find_Player() const
     PLAYER_QUERY q;
     m_pGameInstance_Proxy->Publish(EVT_QUERY_PLAYER, &q);
     return q.pPlayer;
+}
+
+void CMiniBoss::Publish_HP()
+{
+    BOSS_HP_UPDATED hp{};
+    hp.fMaxHP = m_fMaxHP;
+    hp.fCurrHp = m_fCurHP;
+    m_pGameInstance_Proxy->Publish(EventTag::Boss_HP_Updated, &hp);
 }
 
 _bool CGigantEdge::Block_Hit(const ATTACK_INFO& tInfo)
