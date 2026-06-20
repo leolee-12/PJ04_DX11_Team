@@ -19,7 +19,7 @@ private:
 	CKirby_Stuffed();
 	virtual ~CKirby_Stuffed() = default;
 
-	enum STUFFED_STATE { STUFFED_START, STUFFED_WAIT, STUFFED_RUN, STUFFED_JUMP, STUFFED_FALL, STUFFED_END };
+	enum STUFFED_STATE { STUFFED_START, STUFFED_WAIT, STUFFED_RUN, STUFFED_JUMP, STUFFED_FALL, STUFFED_LANDING, STUFFED_SPIT, STUFFED_END };
 
 private:
 	HRESULT Initialize();
@@ -37,7 +37,12 @@ public:
 
 private:
 	void Update_State(CKirby* pKirby);
+	void Update_MoveState(CKirby* pKirby);
+	void Change_StuffedState(CKirby* pKirby, STUFFED_STATE eNextState);
+
 	void Enter_Animation(CKirby* pKirby, CAnimator* pAnimator);
+
+	void Update_Mouth(CKirby* pKirby);
 
 private:
 	STUFFED_STATE m_eCurStuffedState{};
