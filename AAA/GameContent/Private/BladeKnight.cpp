@@ -81,40 +81,6 @@ void CBladeKnight::Update(_float fTimeDelta)
         return;
 
     __super::Update(fTimeDelta);
-
-#ifdef _DEBUG
-    if (nullptr != m_pGameInstance_Proxy)
-    {
-        if (m_pGameInstance_Proxy->Key_Down(DIK_4))
-        {
-            m_pMovement->Jump();
-        }
-
-        if (m_pGameInstance_Proxy->Key_Down(DIK_6))
-        {
-            m_pMovement->KO(XMVectorSet(0.f,0.f,0.f,1.f), 10.f);
-        }
-
-        if (m_pGameInstance_Proxy->Key_Down(DIK_8))
-        {
-            Set_Target(nullptr);
-        }
-    }
-
-    // 날아가는 넉백 테스트
-    //_float fTarget = m_pMovement->Is_Launched() ? 45.f : 0.f;
-
-    //_float fPrev = m_fTiltCurDeg;
-    //m_fTiltCurDeg += (fTarget - m_fTiltCurDeg) * m_fTiltLerp * fTimeDelta;      // 목표로 Lerp
-    //_float fDelta = m_fTiltCurDeg - fPrev;                                      // 이번 프레임 더할 양
-
-    //if (fabsf(fDelta) > 1e-5f)
-    //{
-    //    _vector vRight = m_pTransformCom->Get_State(STATE::RIGHT);
-    //    m_pTransformCom->Rotate(XMQuaternionRotationAxis(vRight, XMConvertToRadians(-fDelta)));
-    //}
-
-#endif
 }
 
 void CBladeKnight::Late_Update(_float fTimeDelta)

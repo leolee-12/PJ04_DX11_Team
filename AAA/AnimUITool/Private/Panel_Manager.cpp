@@ -126,21 +126,67 @@ void CPanel_Manager::Set_Selected(Engine::CGameObject* pObject)
 
 void CPanel_Manager::Clear_Selected()
 {
-    if (m_Context.pOwner == m_pSelected)
-    {
-        m_Context.pOwner = nullptr;
-        m_Context.pModel = nullptr;
-        m_Context.pAnimator = nullptr;
-        m_Context.strName.clear();
-        m_Context.strModelPath.clear();
-        m_Context.iClip = 0;
-        m_Context.fProgress = 0.f;
-        m_Context.iRootBone = -1;
-        m_Context.iSelBone = -1;
-    }
+    m_Context.pOwner = nullptr;
+    m_Context.pModel = nullptr;
+    m_Context.pAnimator = nullptr;
+    m_Context.strName.clear();
+    m_Context.strModelPath.clear();
+    m_Context.strAnimEventPath.clear();
+    m_Context.iClip = 0;
+    m_Context.fProgress = 0.f;
+    m_Context.iRootBone = -1;
+    m_Context.iSelBone = -1;
 
     Safe_Release(m_pSelected);
     m_pSelected = nullptr;
+}
+
+void CPanel_Manager::Clear_Spawned()
+{
+    if (nullptr == m_pLevel)
+        return;
+
+    if (Is_Spawned_Object(m_pSelected))
+        Clear_Selected();
+
+    m_pLevel->Clear_Spawned();
+}
+
+_bool CPanel_Manager::Is_Spawned_Object(CGameObject* pObject) const
+{
+    if (nullptr == pObject || nullptr == m_pLevel)
+        return false;
+
+    for (auto* pSpawned : m_pLevel->Get_SpawnedObjects())
+    {
+        if (nullptr == pSpawned)
+            continue;
+
+        if (pSpawned == pObject)          
+            return true;
+
+        if (auto* pContainer = dynamic_cast<CContainerObject*>(pSpawned))
+        {
+            for (const auto& Pair : pContainer->Get_PartObjects())
+                if (Pair.second == pObject)   
+                    return true;
+        }
+    }
+    return false;
+}
+
+void CPanel_Manager::Validate_AnimSelection()
+{
+    if (nullptr == m_pSelected)
+        return;
+
+    if (m_pLevel && m_pSelected == m_pLevel->Get_Preview())
+        return;
+
+    if (Is_Spawned_Object(m_pSelected))
+        return;
+
+    Clear_Selected();
 }
 
 void CPanel_Manager::Bind_Preview(CGameObject* pOwner)
@@ -242,7 +288,7 @@ void CPanel_Manager::Load_UI_ByPath(const _wstring& strFullPath)
 
 void CPanel_Manager::Bind_ForAnim(CGameObject* pObj)
 {
-    if (!pObj) 
+   /* if (!pObj) 
     { 
         Bind_Preview(nullptr);
         return; 
@@ -268,7 +314,48 @@ void CPanel_Manager::Bind_ForAnim(CGameObject* pObj)
     if (m_Context.pAnimator)
         m_Context.strAnimEventPath = m_Context.pAnimator->Get_DataFilePath();
 
-    Set_Selected(pObj);
+    Set_Selected(pObj);*/
+
+    if (!pObj)
+    {
+        Bind_Preview(nullptr);
+        return;
+    }
+
+    // 일반 Object는 자기 자신을 Animation Source로 사용.
+    // Container는 Hierarchy에서 Part를 직접 선택하게 하고,
+    // Container 자체 클릭은 선택만 되게 둔다.
+    Bind_ForAnimSource(pObj, pObj, pObj->Get_ObjectTag());
+}
+
+void CPanel_Manager::Bind_ForAnimSource(CGameObject* pOwner, CGameObject* pAnimSource, const _wstring& strDisplayName)
+{
+    if (!pOwner)
+    {
+        Bind_Preview(nullptr);
+        return;
+    }
+
+    CGameObject* pSelectedObject = pAnimSource ? pAnimSource : pOwner;
+
+    m_Context.pOwner = pSelectedObject;
+    m_Context.pModel = pAnimSource ? pAnimSource->Get_Component<CModel>(L"Com_Model") : nullptr;
+    m_Context.pAnimator = pAnimSource ? pAnimSource->Get_Component<CAnimator>(L"Com_Animator") :
+        nullptr;
+
+    m_Context.iClip = 0;
+    m_Context.fProgress = 0.f;
+    m_Context.iRootBone = -1;
+    m_Context.iSelBone = -1;
+
+    m_Context.strName = strDisplayName;
+    m_Context.strModelPath.clear();
+    m_Context.strAnimEventPath.clear();
+
+    if (m_Context.pAnimator)
+        m_Context.strAnimEventPath = m_Context.pAnimator->Get_DataFilePath();
+
+    Set_Selected(pSelectedObject);
 }
 
 void CPanel_Manager::Render_DockSpace()

@@ -22,6 +22,14 @@ namespace
             ImGui::EndCombo();
         }
     }
+
+    static _string ToLowerAscii(string s)
+    {
+        for (char& c : s)
+            c = static_cast<_char>(tolower(static_cast<_ubyte>(c)));
+
+        return s;
+    }
 }
 
 CPanel_Animation::CPanel_Animation(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -42,6 +50,9 @@ void CPanel_Animation::Render()
         m_pPrevActor = ctx.pOwner;
         m_iPrevClip = -1;
         m_szEventPath[0] = '\0';
+        m_szAnimSearch[0] = '\0';
+        m_strCachedAnimSearch.clear();
+        m_pCachedAnimModel = nullptr;
 
         if (!ctx.strAnimEventPath.empty())
         {
@@ -81,18 +92,53 @@ void CPanel_Animation::Render()
     if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_Space, false))
         ctx.bPlaying = !ctx.bPlaying;
 
+    if (m_pCachedAnimModel != pModel || m_iCachedAnimCount != static_cast<_int>(pModel->Get_NumAnimations()))
+        Rebuild_AnimNameCache(pModel);
+
     string strName = pModel->Get_AnimationName((_uint)ctx.iClip);
 
     ImGui::Text("Animation : %u", pModel->Get_NumAnimations());
 
     ImGui::SetNextItemWidth(260.f);
+    if (ImGui::InputTextWithHint("##Anim_Search", "Search Animation...",
+        m_szAnimSearch, sizeof(m_szAnimSearch)))
+        Rebuild_AnimFilter();
+
+    ImGui::SameLine();
+    ImGui::TextDisabled("(%d/%u)",                                  
+        (int)m_FilteredAnimIndices.size(), pModel->Get_NumAnimations());
+
+    ImGui::Separator();                                             
+
+    ImGui::SetNextItemWidth(260.f);
     if (ImGui::BeginCombo("Clip", strName.c_str()))
     {
-        for (_uint i = 0; i <= iMax; ++i)
-            if (ImGui::Selectable(pModel->Get_AnimationName(i).c_str(), (_uint)ctx.iClip == i))
-                ctx.iClip = (_int)i;
+        if (m_FilteredAnimIndices.empty())
+        {
+            ImGui::TextDisabled("No Matches");
+        }
+        else
+        {
+            ImGuiListClipper Clipper;
+            Clipper.Begin(static_cast<int>(m_FilteredAnimIndices.size()));
+            while (Clipper.Step())
+            {
+                for (int row = Clipper.DisplayStart; row < Clipper.DisplayEnd; ++row)
+                {
+                    const _uint iAnimIndex = m_FilteredAnimIndices[row];
+                    const _bool bSelected = ((_uint)ctx.iClip == iAnimIndex);
+
+                    if (ImGui::Selectable(m_AnimNames[iAnimIndex].c_str(), bSelected))
+                        ctx.iClip = static_cast<_int>(iAnimIndex);
+                    if (bSelected)
+                        ImGui::SetItemDefaultFocus();
+                }
+            }
+        }
         ImGui::EndCombo();
     }
+
+    strName = pModel->Get_AnimationName(static_cast<_uint>(ctx.iClip));
 
     if (ctx.iClip != m_iPrevClip)
     {
@@ -299,6 +345,56 @@ void CPanel_Animation::Render_EventTimeline()
             m_iSelEvent = -1;
         }
     }
+}
+
+void CPanel_Animation::Rebuild_AnimNameCache(CModel* pModel)
+{
+    m_pCachedAnimModel = pModel;
+    m_iCachedAnimCount = pModel ? static_cast<_int>(pModel->Get_NumAnimations()) : 0;
+
+    m_AnimNames.clear();
+    m_AnimNamesLower.clear();
+    m_FilteredAnimIndices.clear();
+
+    if (nullptr == pModel)
+        return;
+
+    const _uint iNumAnims = pModel->Get_NumAnimations();
+    m_AnimNames.reserve(iNumAnims);
+    m_AnimNamesLower.reserve(iNumAnims);
+
+    for (_uint i = 0; i < iNumAnims; ++i)
+    {
+        string strName = pModel->Get_AnimationName(i);
+        m_AnimNames.push_back(strName);
+        m_AnimNamesLower.push_back(ToLowerAscii(strName));
+    }
+
+    Rebuild_AnimFilter();
+}
+
+void CPanel_Animation::Rebuild_AnimFilter()
+{
+    m_FilteredAnimIndices.clear();
+
+    const string strSearch = ToLowerAscii(m_szAnimSearch);
+    m_strCachedAnimSearch = strSearch;
+
+    const _bool bShowAll = strSearch.empty();
+
+    for (_uint i = 0; i < static_cast<_uint>(m_AnimNamesLower.size()); ++i)
+    {
+        if (bShowAll || m_AnimNamesLower[i].find(strSearch) != string::npos)
+            m_FilteredAnimIndices.push_back(i);
+    }
+
+    sort(m_FilteredAnimIndices.begin(), m_FilteredAnimIndices.end(),
+        [this](_uint a, _uint b)
+        {
+            if (m_AnimNamesLower[a] != m_AnimNamesLower[b])
+                return m_AnimNamesLower[a] < m_AnimNamesLower[b];   
+            return a < b;                                          
+        });
 }
 
 CPanel_Animation* CPanel_Animation::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
