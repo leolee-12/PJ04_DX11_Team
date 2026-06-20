@@ -44,9 +44,9 @@ private:
 	_bool						m_bKO = { false };
 
 	// 바운스 계수
-	_float						m_fRestitution = { 0.5f };  // 수직 반발 계수 (0~1) : 클수록 높이 튄다
-	_float						m_fBounceFriction = { 0.2f };  // 튕길 때마다 수평 감쇠(0~1)
-	_float						m_fBounceStopSpeed = { 1.0f }; // 반사속도가 이보다 작으면 정착
+	_float						m_fRestitution = { 0.5f };			// 수직 반발 계수 (0~1) : 클수록 높이 튄다
+	_float						m_fBounceFriction = { 0.2f };		// 튕길 때마다 수평 감쇠(0~1)
+	_float						m_fBounceStopSpeed = { 1.0f };		// 반사속도가 이보다 작으면 정착
 
 private:
 	void						Start_Launch(_fvector vAttackerPos, _float fStrength, _float fUpRatio);

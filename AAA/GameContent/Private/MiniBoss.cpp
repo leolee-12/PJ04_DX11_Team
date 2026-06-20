@@ -1,6 +1,7 @@
 #include "MiniBoss.h"
 #include "GameInstance.h"
 #include "Monster_Movement.h"
+#include "Monster_State.h"
 #include "Monster_State_Captured.h"
 
 CMiniBoss::CMiniBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -12,7 +13,8 @@ CMiniBoss::CMiniBoss(const CMiniBoss& Prototype)
 
 HRESULT CMiniBoss::Initialize(void* pArg)
 {
-    if (FAILED(__super::Initialize(pArg)))   return E_FAIL;
+    if (FAILED(__super::Initialize(pArg)))   
+        return E_FAIL;
 
     // 파트 → 이동 → AI(brain) 순서
     if (FAILED(Ready_Parts()))      return E_FAIL;   // 자식 구현

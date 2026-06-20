@@ -3,8 +3,7 @@
 #include "GameInstance.h"
 #include "Monster_Movement.h"
 #include "Monster_Brain_FSM.h"
-#include "Monster_State_Idle.h"
-#include "Monster_State_Captured.h"
+
 #include "Collider.h"
 #include "Controller.h"
 #include "GameContent_const.h"
@@ -52,18 +51,20 @@ HRESULT CMonster::Initialize(void* pArg)
 
 void CMonster::Priority_Update(_float fTimeDelta)
 {
+	if (!m_bActive) return;
 	__super::Priority_Update(fTimeDelta);
 }
 
 void CMonster::Update(_float fTimeDelta)
 {
+	if (!m_bActive) return;
 	Update_AI(fTimeDelta);
-
 	__super::Update(fTimeDelta);
 }
 
 void CMonster::Late_Update(_float fTimeDelta)
 {
+	if (!m_bActive) return;
 	__super::Late_Update(fTimeDelta);
 
 	if (m_pInteractCollider)
@@ -101,12 +102,7 @@ void CMonster::Set_Target(CGameObject* pTarget)
 	m_BlackBoard.pTarget = pTarget;
 
 	if (nullptr == pTarget)
-	{
-		m_BlackBoard.bCanSeeTarget = false;
-		m_BlackBoard.fDistToTarget = FLT_MAX;
-		m_BlackBoard.vTargetPos = {};
-		m_BlackBoard.vLastKnownPos = {};
-	}
+		m_BlackBoard = MONSTER_BLACKBOARD{};
 }
 
 _bool CMonster::Can_BeInhaled(const INHALE_QUERY& q) const
@@ -321,6 +317,24 @@ HRESULT CMonster::Ready_AI()
 	return S_OK;
 }
 
+void CMonster::Check_AirborneReflex()
+{
+	if (nullptr == m_pStateMachine || nullptr == m_pMovement)
+		return;
+
+	if (!Has_State(MONSTER_STATE_TYPE::FALL))
+		return;
+
+	const MONSTER_STATE_TYPE eCurState = Get_StateType();
+	if (eCurState == MONSTER_STATE_TYPE::FALL || eCurState == MONSTER_STATE_TYPE::LANDING ||
+		eCurState == MONSTER_STATE_TYPE::CAPTURED || eCurState == MONSTER_STATE_TYPE::DEATH)
+		return;
+
+	// 테스트로 -2.f로 두고 테스트. 확정되면 상수화 시켜서 사용
+	if (!m_pMovement->Is_Grounded() && m_pMovement->Get_VerticalVelocity() < -2.f)
+		Change_State(MONSTER_STATE_TYPE::FALL);
+}
+
 CMonsterBrain* CMonster::Create_Brain()
 {
 	return CMonster_Brain_FSM::Create(); // 기본은 FSM
@@ -338,28 +352,27 @@ HRESULT CMonster::Create_Movement()
 
 HRESULT CMonster::Ready_State(CMonster_StateMachine* pStateMachine)
 {
-	if (nullptr == pStateMachine)
-		return E_FAIL;
-
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CMonster_State_Idle::Create())))
-		return E_FAIL;
-
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create())))
-		return E_FAIL;
-
 	return S_OK;
 }
 
 void CMonster::On_Damaged(const ATTACK_INFO& tInfo)
 {
 	m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
-	Change_State(MONSTER_STATE_TYPE::HIT);
+	//Change_State(MONSTER_STATE_TYPE::HIT);
 }
 
 void CMonster::On_Death(const ATTACK_INFO& tInfo)
 {
 	if (m_pMovement) m_pMovement->KO(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
-	Change_State(MONSTER_STATE_TYPE::DEAD);
+	Change_State(MONSTER_STATE_TYPE::DEATH);
+}
+
+_bool CMonster::Block_Hit(const ATTACK_INFO& tInfo)
+{
+	if (Get_StateType() == MONSTER_STATE_TYPE::CAPTURED)
+		return true;
+
+	return false;
 }
 
 void CMonster::Perceive(_float fTimeDelta)
@@ -439,6 +452,8 @@ void CMonster::Update_AI(_float fTimeDelta)
 
 	// BlackBoard 갱신
 	Perceive(fTimeDelta);	
+
+	Check_AirborneReflex();
 
 	// Brain이 상태 변경 판단
 	if (nullptr != m_pBrain)

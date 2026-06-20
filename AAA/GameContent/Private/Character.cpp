@@ -49,11 +49,18 @@ HRESULT CCharacter::Render()
 
 void CCharacter::Damaged(const ATTACK_INFO& tInfo)
 {
-    if (!Is_Active()) return;
-    if (Block_Hit(tInfo)) return;
+    if (!Is_Active()) 
+        return;
+    if (Block_Hit(tInfo)) 
+        return;
 
     m_fCurHP -= tInfo.fDamage;
-    if (m_fCurHP <= 0.f) { m_fCurHP = 0.f; On_Death(tInfo); return; }
+    if (m_fCurHP <= 0.f) 
+    {
+        m_fCurHP = 0.f;
+        On_Death(tInfo);
+        return;
+    }
 
     On_Damaged(tInfo);
 }

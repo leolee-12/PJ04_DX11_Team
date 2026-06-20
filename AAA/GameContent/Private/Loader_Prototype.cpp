@@ -78,6 +78,13 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
         TEXT("../../Resources/YSH/Env/LUT/Grass01.dds"),
         3.f 
       },
+        {
+        TEXT("Default"),
+        TEXT("../../Resources/YSH/Env/IBL/Default/Diffuse.dds"),
+        TEXT("../../Resources/YSH/Env/IBL/Default/Specular.dds"),
+        TEXT("../../Resources/YSH/Env/LUT/Default01_01.dds"),
+        3.f
+      },
         // 맵 추가 = 행 추가
     };
 

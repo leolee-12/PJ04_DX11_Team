@@ -49,7 +49,7 @@ void CPanel_Palette::Render()
 
     ImGui::Separator();
     if (ImGui::Button("Clear Spawned"))
-        pLevel->Clear_Spawned();
+        m_pPanel_Manager->Clear_Spawned();
 
     ImGui::End();
 }
