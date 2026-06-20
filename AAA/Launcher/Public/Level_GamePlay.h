@@ -21,7 +21,6 @@ public:
 private:
 	_bool	m_bTestLevelChange = { false };
 
-
 private:
 	virtual HRESULT Ready_Events() override;
 	HRESULT Ready_Lights();

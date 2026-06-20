@@ -2,25 +2,28 @@
 #include "Animator.h"
 
 CGigantEdge_Shield::CGigantEdge_Shield(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CMonsterPart(pDevice, pContext) {
+    : CMonsterHitPart(pDevice, pContext) {
 }
 
 CGigantEdge_Shield::CGigantEdge_Shield(const CGigantEdge_Shield& Prototype)
-    : CMonsterPart(Prototype) {
-}
-
-HRESULT CGigantEdge_Shield::Initialize_Prototype()
-{
-    m_eProjType = PROJ_TYPE::PERSPEC;
-    return S_OK;
+    : CMonsterHitPart(Prototype) {
 }
 
 HRESULT CGigantEdge_Shield::Initialize(void* pArg)
 {
-    if (FAILED(__super::Initialize(pArg))) return E_FAIL;
-    if (FAILED(Ready_Components()))        return E_FAIL;
+    if (FAILED(__super::Initialize(pArg)))            
+        return E_FAIL;
+    if (FAILED(Ready_Components()))                   
+        return E_FAIL;
+
+    CAPSULE_DESC CapsuleDesc{};
+    CapsuleDesc.fHeight = 1.f;
+    CapsuleDesc.fRadius = 0.25f;
+    if (FAILED(Ready_HitBox(CapsuleDesc)))
+        return E_FAIL;
 
     m_pAnimatorCom->Play("Reset");
+    Set_Drawn(false);                     
     return S_OK;
 }
 

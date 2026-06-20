@@ -46,6 +46,7 @@
     <ClInclude Include="..\Public\LevelDesign_ProtoRegister.h" />
     <ClInclude Include="..\Public\LevelDesign_Rail.h" />
     <ClInclude Include="..\Public\LevelDesign_Spawner.h" />
+    <ClInclude Include="..\public\MonsterHitPart.h" />
     <ClInclude Include="..\public\MonsterPart.h" />
     <ClInclude Include="..\Public\Monster_State_Captured.h" />
     <ClInclude Include="..\Public\Monster_State_Chase.h" />
@@ -239,6 +240,7 @@
     <ClCompile Include="..\Private\BladeKnight.cpp" />
     <ClCompile Include="..\private\MiniBoss.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
+    <ClCompile Include="..\private\MonsterHitPart.cpp" />
     <ClCompile Include="..\Private\Monster_Brain.cpp" />
     <ClCompile Include="..\Private\Monster_Brain_FSM.cpp" />
     <ClCompile Include="..\Private\Monster_Movement.cpp" />
@@ -437,6 +439,7 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>../../EngineSDK/Lib/; ../ThirdPartyLib/;</AdditionalLibraryDirectories>
       <AdditionalDependencies>Engine.Lib;DirectXTKd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <FxCompile>
       <ShaderType>Effect</ShaderType>

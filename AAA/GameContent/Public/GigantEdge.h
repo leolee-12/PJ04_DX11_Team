@@ -16,8 +16,8 @@ class CGigantEdge final : public CMiniBoss
 
 public:
     static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_GigantEdge";
-    static constexpr _float s_fCCT_Radius = 2.f;
-    static constexpr _float s_fCCT_Height = 2.f;
+    static constexpr _float s_fCCT_Radius = 1.3f;
+    static constexpr _float s_fCCT_Height = 0.5f;
 
 private:
     CGigantEdge(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -58,7 +58,7 @@ protected:
     virtual _float         Get_CapsuleRadius() const override { return s_fCCT_Radius; }
     virtual _float         Get_CapsuleHeight() const override { return s_fCCT_Height; }
     virtual _float		   Get_InteractRadius() const override { return 0.f; }
-    virtual _float         Get_HurtBoxRadius() const override { return 1.5f; }
+    virtual _bool		   Get_HurtBoxDesc(CAPSULE_DESC& Out) const override;
 
 private:
     CGigantEdge_Body*   m_pBody   = { nullptr };
@@ -82,6 +82,7 @@ private:
     _bool m_bDbgInRange     = { false };
     _bool m_bDbgWalkInPlace = { false };
     _int  m_iDbgAttack      = { -1 };
+    _bool m_bDbgSwordDrawn  = { false };
 #endif
 
 public:

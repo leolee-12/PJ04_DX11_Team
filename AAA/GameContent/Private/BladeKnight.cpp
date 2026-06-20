@@ -91,6 +91,13 @@ void CBladeKnight::Late_Update(_float fTimeDelta)
     __super::Late_Update(fTimeDelta);
 }
 
+_bool CBladeKnight::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
+{
+    Out.fRadius = { 0.6f };
+    Out.fHeight = { 0.75f };
+    return true;
+}
+
 CAnimator* CBladeKnight::Get_BodyAnimator() const
 {
     return m_pBody ? m_pBody->Get_Animator() : nullptr;

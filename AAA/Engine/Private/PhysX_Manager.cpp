@@ -1,4 +1,5 @@
 #include "PhysX_Manager.h"
+#include "DebugCapsule.h"
 
 using namespace physx;
 
@@ -304,6 +305,9 @@ PxController* CPhysX_Manager::Create_CapsuleController(const _float3& vFootPos, 
     if (nullptr == pCtrl)
         return nullptr;
 
+    if (PxRigidActor* pActor = pCtrl->getActor())
+        pActor->setActorFlag(PxActorFlag::eVISUALIZATION, false);
+
     m_Controllers.push_back(pCtrl);
     return pCtrl;
 }
@@ -325,27 +329,44 @@ void CPhysX_Manager::Render_Debug(_fmatrix ViewMatrix, _fmatrix ProjMatrix)
     if (!m_bDebugDraw || nullptr == m_pScene || nullptr == m_pBatch)
         return;
 
-    const PxRenderBuffer& rb = m_pScene->getRenderBuffer();
-    const PxU32 nbLines = rb.getNbLines();
-    if (0 == nbLines)
-        return;
-
     m_pEffect->SetWorld(XMMatrixIdentity());
     m_pEffect->SetView(ViewMatrix);
     m_pEffect->SetProjection(ProjMatrix);
     m_pContext->IASetInputLayout(m_pInputLayout);
     m_pEffect->Apply(m_pContext);
 
-    const PxDebugLine* pLines = rb.getLines();
-
     m_pBatch->Begin();
+
+    // 1) PhysX ·»´õ¹öÆÛ(Á¤Àû/µ¿Àû ¼ÎÀÌÇÁ ¿ÍÀÌ¾î)
+    const PxRenderBuffer& rb = m_pScene->getRenderBuffer();
+    const PxU32 nbLines = rb.getNbLines();
+    const PxDebugLine* pLines = rb.getLines();
     for (PxU32 i = 0; i < nbLines; ++i)
     {
         const PxDebugLine& L = pLines[i];
-        VertexPositionColor v0(XMFLOAT3(L.pos0.x, L.pos0.y, L.pos0.z), XMFLOAT4(0.f, 1.f, 0.f, 1.f));
-        VertexPositionColor v1(XMFLOAT3(L.pos1.x, L.pos1.y, L.pos1.z), XMFLOAT4(0.f, 1.f, 0.f, 1.f));
-        m_pBatch->DrawLine(v0, v1);
+        m_pBatch->DrawLine(
+            VertexPositionColor(XMFLOAT3(L.pos0.x, L.pos0.y, L.pos0.z), XMFLOAT4(0.f, 1.f, 0.f, 1.f)),
+            VertexPositionColor(XMFLOAT3(L.pos1.x, L.pos1.y, L.pos1.z), XMFLOAT4(0.f, 1.f, 0.f, 1.f)));
     }
+
+    // 2) CCT Ä¸½¶À» ¿ì¸® ÇïÆÛ·Î ÃÎÃÎÇÏ°Ô (³ë¶û)
+    XMVECTOR ctrlColor = XMVectorSet(1.f, 1.f, 0.f, 1.f);
+    for (auto* pCtrl : m_Controllers)
+    {
+        if (nullptr == pCtrl || pCtrl->getType() != PxControllerShapeType::eCAPSULE)
+            continue;
+
+        auto* pCap = static_cast<PxCapsuleController*>(pCtrl);
+        float r = pCap->getRadius();
+        float h = pCap->getHeight();              // ¿ø±âµÕ ±æÀÌ(¹Ý±¸Áß½É °£)
+        PxExtendedVec3 c = pCap->getPosition();   // Ä¸½¶ Áß½É
+        PxVec3 upv = pCap->getUpDirection();
+
+        XMVECTOR vc = XMVectorSet((float)c.x, (float)c.y, (float)c.z, 1.f);
+        XMVECTOR vUp = XMVectorSet(upv.x, upv.y, upv.z, 0.f);
+        Debug_DrawCapsule(m_pBatch, vc + vUp * (h * 0.5f), vc - vUp * (h * 0.5f), r, ctrlColor);
+    }
+
     m_pBatch->End();
 }
 
