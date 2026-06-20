@@ -4,6 +4,7 @@
 #include "EnvObject_Interact.h"
 #include "EnvObject_Trigger.h"
 #include "Env_InstanceController.h"
+#include "GameContent_Log.h"
 
 #include "GameInstance.h"
 
@@ -93,6 +94,9 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 			});
 	}
 
+	_uint iEnvCreatedCount = 0;
+	_uint iEnvSkippedCreateFailed = 0;
+
 	if (Options.bSpawnEnv)
 	{
 		const auto iterStaticEnv = find_if(
@@ -152,6 +156,13 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 			ENV_OBJECT_DESC Desc = SrcDesc;
 			Desc.iModelProtoLevel = Levels.iEnvModelLevel;
 
+			if (EnvObject_NeedsModel(SrcDesc) && (Desc.wstrModelProtoTag.empty()
+					|| !m_pProxy->Has_Prototype(Levels.iEnvModelLevel, Desc.wstrModelProtoTag)))
+			{
+				++iEnvSkippedCreateFailed;
+				continue;
+			}
+
 			CGameObject* pCreatedObject = nullptr;
 			const wstring wstrObjectName = Make_EnvObjectName(Desc);
 
@@ -164,17 +175,23 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 				wstrObjectName,
 				&Desc)))
 			{
-				Rollback(CreatedObjects);
-				return E_FAIL;
+				if (nullptr != pCreatedObject)
+					m_pProxy->Destroy_GameObject(pCreatedObject);
+
+				++iEnvSkippedCreateFailed;
+
+				Log_GameContentWarning(
+					"EnvObject spawn skipped: object="
+					+ WstrToStr(Desc.wstrObjectName)
+					+ " model=" + WstrToStr(Desc.wstrModelPath));
+
+				continue;
 			}
 
+			++iEnvCreatedCount;
 			CreatedObjects.push_back(pCreatedObject);
-			PendingCallbacks.push_back({
-				pCreatedObject,
-				pProtoTag,
-				pRoute->pLayerTag,
-				wstrObjectName
-				});
+			PendingCallbacks.push_back({ pCreatedObject, pProtoTag, pRoute->pLayerTag, wstrObjectName });
+
 
 			if (SrcDesc.eKind == ENV_OBJECT_KIND::STATIC)
 			{
@@ -238,7 +255,9 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 		if (Options.bSpawnEnv)
 		{
 			pOutReport->iEnvDescriptorCount = static_cast<_uint>(Package.EnvObjectDescs.size());
-			pOutReport->iEnvCreatedCount = static_cast<_uint>(Package.EnvObjectDescs.size());
+			pOutReport->iEnvCreatedCount = iEnvCreatedCount;
+			pOutReport->iEnvSkippedMissingModel = Package.iEnvSkippedMissingModel;
+			pOutReport->iEnvSkippedCreateFailed = iEnvSkippedCreateFailed;
 			pOutReport->iEnvJsonLoadedCount = static_cast<_uint>(Package.EnvJsonPaths.size());
 		}
 	}
