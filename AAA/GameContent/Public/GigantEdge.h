@@ -1,6 +1,10 @@
 #pragma once
 #include "MiniBoss.h"
 
+NS_BEGIN(Engine)
+
+NS_END
+
 NS_BEGIN(Client)
 class CGigantEdge_Body;
 class CGigantEdge_Sword;
@@ -44,6 +48,7 @@ protected:
     virtual CMonsterBrain* Create_Brain() override;
     virtual const _tchar*  Get_AppearEventTag() const override { return TEXT("GigantEdge_Appear"); }
 
+    virtual CAnimator*      Get_BodyAnimator() const override;
     virtual void           Play_Intro() override;
     virtual _bool          Is_Intro_Finished() const override;
     virtual void           Play_Death() override;
@@ -54,7 +59,6 @@ protected:
     virtual _float         Get_CapsuleHeight() const override { return s_fCCT_Height; }
     virtual _float		   Get_InteractRadius() const override { return 0.f; }
     virtual _float         Get_HurtBoxRadius() const override { return 1.5f; }
-    virtual void           Play_StateAnimation(MONSTER_STATE_TYPE) override {}
 
 private:
     CGigantEdge_Body*   m_pBody   = { nullptr };

@@ -75,6 +75,10 @@ public: // 에디터(데이터 편집)
     void    Set_BlendDuration(_float fDuration) { m_fBlendDuration = fDuration; }
     _float  Get_BlendDuration() { return m_fBlendDuration; }
 
+    const wstring& Get_DataFilePath() const { return m_strDataFilePath; }
+    void Set_DataFilePath(const _wstring& strPath) { m_strDataFilePath = strPath; }
+
+
 private:
     void    Fire_Point(const vector<ANIM_EVENT>& events, _float lo, _float hi);
     void    Process_Range(ANIM_EVENT_TRACK& track, _float fCur);
@@ -102,6 +106,8 @@ private:
     _float              m_fMaskWeight = 0.f;
     _float              m_fMaskTarget = 1.f;
     _float              m_fMaskBlendTime = 0.5f;
+    
+    _wstring            m_strDataFilePath = {};
 
 public:
     static CAnimator* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

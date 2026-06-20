@@ -1105,14 +1105,14 @@ void CImGui_Manager::Draw_Viewport()
 
         if (m_pGameInstance_Proxy->Mouse_Down(DIMB::WHEEL))
         {
-            _float2 vNDC = { ndcX, ndcY };
-            UI_RBTN_PROBE eProbe = { vNDC, false };
-            m_pGameInstance_Proxy->Publish(TEXT("UI_RButton_Probe"), &eProbe);
+            //_float2 vNDC = { ndcX, ndcY };
+            //UI_RBTN_PROBE eProbe = { vNDC, false };
+            //m_pGameInstance_Proxy->Publish(TEXT("UI_RButton_Probe"), &eProbe);
 
-            if (eProbe.bConsumed) return;
+            //if (eProbe.bConsumed) return;
 
-            WORLD_RBTN_DOWN eEvent = { vNDC };
-            m_pGameInstance_Proxy->Publish(TEXT("World_RButton_Click"), &eEvent);
+            //WORLD_RBTN_DOWN eEvent = { vNDC };
+            //m_pGameInstance_Proxy->Publish(TEXT("World_RButton_Click"), &eEvent);
         }
 
         // ESC → 배치 모드 취소

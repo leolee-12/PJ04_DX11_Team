@@ -26,8 +26,10 @@ HRESULT CAnimator::Initialize(void* pArg)
     m_pModel = pDesc->pModel;
     Safe_AddRef(m_pModel);
 
+    m_strDataFilePath = pDesc->strDataFile;     // 불러온 AnimEvent.json 저장 -> 에디터에서 저장 및 로드에 사용
+
     if (!pDesc->strDataFile.empty())
-        Load_FromFile(pDesc->strDataFile);
+        Load_FromFile(m_strDataFilePath);
 
     return S_OK;
 }
@@ -281,8 +283,15 @@ void CAnimator::Deserialize_Internal(const json& j)
 
 HRESULT CAnimator::Load_FromFile(const wstring& strPath)
 {
-    ifstream fin(strPath); if (!fin.is_open()) return E_FAIL;
-    json j; fin >> j; fin.close(); Deserialize(j); return S_OK;
+    ifstream fin(strPath); 
+    if (!fin.is_open()) 
+        return E_FAIL;
+    json j;
+    fin >> j;
+    fin.close(); 
+    Deserialize(j); 
+    m_strDataFilePath = strPath;
+    return S_OK;
 }
 
 HRESULT CAnimator::Save_ToFile(const wstring& strPath) const

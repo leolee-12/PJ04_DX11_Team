@@ -4,7 +4,7 @@
 
 NS_BEGIN(Client)
 
-class CMonster_State_Captured;
+class CMonster_State;
 
 enum class EMINIBOSS_LIFE { HIDDEN, INTRO, ACTIVE, DEAD, EATEN };
 
@@ -37,7 +37,7 @@ protected:
     _bool          m_bCorpse = { false };   
     _float         m_fCorpseTimer = { 0.f };
 
-    CMonster_State_Captured* m_pCaptureState = { nullptr };
+    CMonster_State* m_pCaptureState = { nullptr };
 
 
 protected:

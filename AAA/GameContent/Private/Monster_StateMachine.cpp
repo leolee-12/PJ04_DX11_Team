@@ -41,7 +41,8 @@ _bool CMonster_StateMachine::Change_State(MONSTER_STATE_TYPE eNewState)
     if (nullptr != m_pMonster)
     {
         m_pMonster->Get_BlackBoard().bActionFinished = false;
-        m_pMonster->Get_BlackBoard().bCanTransition = false;        // 기본값 둘다 false
+        m_pMonster->Get_BlackBoard().bCanTransition = m_pCurState->Is_Interruptible();
+        m_pMonster->Get_BlackBoard().bMoveLocked = false;
     }
 
     m_pCurState->Enter(m_pMonster);

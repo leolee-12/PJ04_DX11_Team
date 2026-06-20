@@ -41,8 +41,14 @@ void CPanel_Animation::Render()
     {
         m_pPrevActor = ctx.pOwner;
         m_iPrevClip = -1;
+        m_szEventPath[0] = '\0';
 
-        if (ctx.pOwner && !ctx.strModelPath.empty())
+        if (!ctx.strAnimEventPath.empty())
+        {
+            std::string s = WstrToStr(ctx.strAnimEventPath);
+            strcpy_s(m_szEventPath, s.c_str());
+        }
+        else if (ctx.pOwner && !ctx.strModelPath.empty())
         {
             namespace fs = filesystem;
             fs::path mp(ctx.strModelPath);
@@ -52,8 +58,8 @@ void CPanel_Animation::Render()
             fs::path rel = fs::relative(jp, fs::current_path(), ec);
             std::wstring out = (!ec && !rel.empty()) ? rel.wstring() : jp.wstring();
 
-            std::string js(out.begin(), out.end());
-            strcpy_s(m_szEventPath, js.c_str());
+            std::string s = WstrToStr(out);
+            strcpy_s(m_szEventPath, s.c_str());
         }
     }
 
@@ -219,7 +225,11 @@ void CPanel_Animation::Render_EventTimeline()
         std::wstring ws(s.begin(), s.end());
 
         if (SUCCEEDED(pAnim->Save_ToFile(ws)))
+        {
+            pAnim->Set_DataFilePath(ws);
+            ctx.strAnimEventPath = ws;
             Log_Info("Saved anim events: " + s);
+        }
         else
             Log_Error("Failed to save anim events: " + s);
     }
@@ -230,7 +240,11 @@ void CPanel_Animation::Render_EventTimeline()
         std::wstring ws(s.begin(), s.end());
 
         if (SUCCEEDED(pAnim->Load_FromFile(ws)))
+        {
+            pAnim->Set_DataFilePath(ws);
+            ctx.strAnimEventPath = ws;
             Log_Info("Loaded anim events: " + s);
+        }
         else
             Log_Error("Failed to load anim events: " + s);
 
