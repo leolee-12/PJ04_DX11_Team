@@ -20,6 +20,7 @@ void CMonster_State_Captured::Enter(CMonster* pMonster)
 	if (!pMonster) return;
 	pMonster->Get_BlackBoard().bCanTransition = false;
 	pMonster->Enable_Controller(false);
+	pMonster->Enable_Colliders(false);
 	pMonster->Play_StateAnimation(MONSTER_STATE_TYPE::CAPTURED);
 
 	m_fPullSpeed = s_fPullInitSpeed;                        
@@ -60,6 +61,7 @@ void CMonster_State_Captured::Exit(CMonster* pMonster)
 	if (!pMonster) return;
 	pMonster->Get_Transform()->Set_Scale(m_vBaseScale.x, m_vBaseScale.y, m_vBaseScale.z);
 	pMonster->Enable_Controller(true);
+	pMonster->Enable_Colliders(true);
 }
 
 CMonster_State_Captured* CMonster_State_Captured::Create()

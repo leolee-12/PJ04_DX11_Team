@@ -50,6 +50,12 @@ public:
 	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) override;
 
 	virtual _bool Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation) override;
+	
+	// À±¼®Çö Ãß°¡
+	_bool Is_SuperInhale() const {
+		return m_eInhaleState == INHALE_STATE::SUPER_INHALE_START
+			|| m_eInhaleState == INHALE_STATE::SUPER_INHALE_LOOP;
+	}
 
 	_bool Change_Ability(CKirby* pKirby, COPY_ABILITY_TYPE eAbility);
 

@@ -2,16 +2,17 @@
 #include "Loader.h"
 #include "EditCamera.h"
 #include "Edit_Grid.h"
-#include "Map_EditSession.h"
-#include "Map_EditFile.h"
 
 #include "GameObject_Factory.h"
 #include "GameContent_const.h"
 #include "GameContent_Log.h"
+#include "Map_EditFile.h"
+#include "Map_EditSession.h"
 #include "Map_Loader.h"
 #include "MapStage.h"
 #include "MapSection.h"
 #include "EnvObject_Static.h"
+#include "LevelDesign_Registry.h"
 
 #ifdef _DEBUG
 #include "MapToolProfiler.h"
@@ -44,7 +45,7 @@ namespace
 
 	using namespace std::filesystem;
 
-	constexpr wchar_t kMapModelRoot[] = L"../../Resources/Map";
+	constexpr _tchar kMapModelRoot[] = L"../../Resources/Map";
 
 	_bool Equals_NoCase(const wstring& strLeft, const wstring& strRight)
 	{
@@ -517,13 +518,23 @@ HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
 		return E_FAIL;
 	}
 
+	if (FAILED(Load_LDPreview(iPresetIndex)))
+	{
+		Set_MapPreviewStatus(
+			L"Map preset LevelDesign load failed.");
+		Sync_MapPreviewRuntimeStateToSession();
+		return E_FAIL;
+	}
+
 	const wstring strStageName = Get_MapPreviewLoadedStageNameRef().empty()
 		? StrToWstr(CMap_Loader::Get_MapName(iPresetIndex))
 		: Get_MapPreviewLoadedStageNameRef();
 
 	Set_MapPreviewStatus(
 		L"Map preset loaded: " + strStageName
-		+ L" / env=" + to_wstring(Get_MapPreviewEnvCreatedCountInternal()));
+		+ L" / env="
+		+ to_wstring(Get_MapPreviewEnvCreatedCountInternal())
+		+ L" / levelDesign=loaded");
 
 	if (nullptr != m_pMapPreviewSession)
 		m_pMapPreviewSession->Rebuild_DeletedEnvItems(DeletedEnvDescs);
@@ -684,6 +695,65 @@ HRESULT CLevel_Edit::Load_MapPreviewEnv(_uint iPresetIndex)
 	return S_OK;
 }
 
+HRESULT CLevel_Edit::Load_LDPreview(_uint iPresetIndex)
+{
+	_wstring strManifestPath;
+	if (FAILED(CMap_Loader::Get_MapManifestPath(
+		iPresetIndex,
+		&strManifestPath)))
+	{
+		Set_MapPreviewStatus(
+			L"LevelDesign manifest resolve failed.");
+		return E_FAIL;
+	}
+
+	vector<wstring> LevelDesignLayers;
+	LevelDesignLayers.reserve(m_Layers.size());
+
+	for (const auto& Pair : m_Layers)
+	{
+		if (CLevelDesign_Registry::Is_LevelDesignLayer(
+			Pair.first))
+		{
+			LevelDesignLayers.push_back(Pair.first);
+		}
+	}
+
+	for (const auto& strLayerTag : LevelDesignLayers)
+		Clear_MapPreviewLayer(strLayerTag);
+
+	MAP_RUNTIME_LOAD_CONTEXT Context{};
+	Context.pDevice = m_pDevice;
+	Context.pContext = m_pContext;
+	Context.iPlaceLevel = ETOUI(TOOL_LEVEL::EDIT);
+	Context.iModelLevel = ETOUI(LEVEL::STATIC);
+	Context.pCreatedCallback =
+		&On_MapPreviewObjectCreated;
+	Context.pCallbackContext = this;
+
+	MAP_LOAD_RESULT Report{};
+	if (FAILED(CMap_Loader::Load_LevelDesign_Runtime(
+		Context,
+		strManifestPath,
+		&Report)))
+	{
+		Set_MapPreviewStatus(
+			L"LevelDesign preview load failed.");
+		return E_FAIL;
+	}
+
+	Set_MapPreviewStatus(
+		L"LevelDesign preview loaded: created="
+		+ to_wstring(Report.iLevelDesignCreatedCount)
+		+ L" / fallback="
+		+ to_wstring(Report.iLevelDesignFallbackSpecCount)
+		+ L" / failed="
+		+ to_wstring(
+			Report.iLevelDesignSkippedCreateFailedCount));
+
+	return S_OK;
+}
+
 void CLevel_Edit::Clear_MapPreview()
 {
 	MAP_EDIT_DATA MapContentDesc = Build_MapPreviewContentDescSnapshot();
@@ -693,8 +763,11 @@ void CLevel_Edit::Clear_MapPreview()
 
 	for (const auto& Pair : m_Layers)
 	{
-		if (CMap_Loader::Is_MapLayer(Pair.first))
+		if (CMap_Loader::Is_MapLayer(Pair.first)
+			|| Client::CLevelDesign_Registry::Is_LevelDesignLayer(Pair.first))
+		{
 			MapLayers.push_back(Pair.first);
+		}
 	}
 
 	for (const auto& strLayerTag : MapLayers)
@@ -965,6 +1038,24 @@ void CLevel_Edit::Back_To_Edit()
 	Set_CameraActive(true);
 }
 
+void CLevel_Edit::Reset_EditCameraRotation()
+{
+	if (nullptr == m_pCamera)
+		return;
+
+	Back_To_Edit();
+	m_pCamera->Reset_Rotation();
+}
+
+void CLevel_Edit::Jump_EditCamera(_float fForwardDistance, _float fRightDistance)
+{
+	if (nullptr == m_pCamera)
+		return;
+
+	Back_To_Edit();
+	m_pCamera->Jump_Local(fForwardDistance, fRightDistance);
+}
+
 const vector<CLevel_Edit::EDITOR_OBJECT_HANDLE>* CLevel_Edit::Get_CameraLayer() const
 {
 	auto it = m_Layers.find(L"Layer_Camera");
@@ -1020,7 +1111,7 @@ HRESULT CLevel_Edit::Ready_EditCamera()
 
 HRESULT CLevel_Edit::Ready_EditGrid()
 {
-	m_pGrid = CEdit_Grid::Create(m_pDevice, m_pContext, 1000, 1.f);
+	m_pGrid = CEdit_Grid::Create(m_pDevice, m_pContext, 100u, 100.f);
 	return (m_pGrid == nullptr) ? E_FAIL : S_OK;
 }
 

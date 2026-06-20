@@ -144,9 +144,6 @@ void CKirby_Ability_Normal::Exit_Ability(CKirby* pKirby)
 {
     //m_pInhaleEffect->EffectContainer_Stop();
     //m_pInhaleEffect = nullptr;
-
-    //// À±¼®Çö Ãß°¡
-    //Reset_Default(pKirby);
 }
 
 _bool CKirby_Ability_Normal::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)

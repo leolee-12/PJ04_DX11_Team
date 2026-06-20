@@ -4,7 +4,9 @@
 
 NS_BEGIN(Client)
 
-enum class EMINIBOSS_LIFE { HIDDEN, INTRO, ACTIVE, DEAD };
+class CMonster_State_Captured;
+
+enum class EMINIBOSS_LIFE { HIDDEN, INTRO, ACTIVE, DEAD, EATEN };
 
 class CMiniBoss abstract : public CMonster
 {
@@ -25,12 +27,17 @@ public:
     EMINIBOSS_LIFE  Get_Life() const { return m_eLife; }
     _bool           Is_Active() const { return m_eLife == EMINIBOSS_LIFE::ACTIVE; }
 
+public:
+    virtual void				Be_Captured(CGameObject* pInhaler) override;
+
 protected:
     EMINIBOSS_LIFE m_eLife = { EMINIBOSS_LIFE::HIDDEN };
     _bool          m_bIntroStarted = { false };
     _bool          m_bDeathStarted = { false };    
     _bool          m_bCorpse = { false };   
     _float         m_fCorpseTimer = { 0.f };
+
+    CMonster_State_Captured* m_pCaptureState = { nullptr };
 
 
 protected:
@@ -47,6 +54,8 @@ protected:
     virtual void   Play_DeathLoop() {}
     virtual _bool  Is_Death_Finished() const = 0;
     virtual _float Get_CorpseLinger() const { return 5.f; }
+
+    CGameObject*   Find_Player() const;
 
 protected:
     virtual void Free() override;

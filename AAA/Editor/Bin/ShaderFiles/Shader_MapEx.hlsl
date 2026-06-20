@@ -353,6 +353,26 @@ PS_OUT PS_DMN_MASK(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_UKWN(PS_IN In)
+{
+    PS_OUT Out;
+    float2 vBaseUV = Apply_MapUVTransform(Select_MapUV(In, g_iBase_UVIndex), g_vUVTransform);
+    float4 vBase = g_UnknownTexture.Sample(LinearSampler, vBaseUV);
+    if (vBase.a < 0.1f)
+        discard;
+
+    float3 albedo = vBase.rgb;
+    float ao = lerp(1.f, In.vColor1.r, g_fAOStrength);
+    albedo *= ao;
+
+    Out.vDiffuse = float4(albedo, 1.f);
+    Out.vNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(0.f, 1.f, ao, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vBase.a, 1.f);
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
 	pass Shadow // 0

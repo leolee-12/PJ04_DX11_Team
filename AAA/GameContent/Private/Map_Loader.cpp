@@ -6,6 +6,7 @@
 #include "Map_ProtoRegister.h"
 #include "Map_Spawner.h"
 #include "GameContent_Log.h"
+#include "LevelDesign_Loader.h"
 
 #include "GameInstance.h"
 #include "DataLoader.h"
@@ -255,9 +256,21 @@ HRESULT CMap_Loader::Initialize()
 	return nullptr != m_pProxy ? S_OK : E_FAIL;
 }
 
-HRESULT CMap_Loader::Load_FromManifest(const _wstring& strManifestPath, const MAP_RUNTIME_LEVELS& Levels,
-	const MAP_SPAWN_TARGETS& Targets, MAP_LOAD_RESULT* pOutReport, CMapStage** ppOutStage)
+HRESULT CMap_Loader::Load_FromManifest(
+	const _wstring& strManifestPath,
+	const MAP_RUNTIME_LEVELS& Levels,
+	const MAP_SPAWN_TARGETS& Targets,
+	const MAP_LOAD_OPTIONS& Options,
+	MAP_LOAD_RESULT* pOutReport,
+	CMapStage** ppOutStage)
 {
+	if (!Options.bLoadStage
+		&& !Options.bLoadEnv
+		&& !Options.bLoadLevelDesign)
+	{
+		return E_FAIL;
+	}
+
 	MAP_PACKAGE Package{};
 
 	HRESULT hr = Build_Package(strManifestPath, &Package);
@@ -271,11 +284,90 @@ HRESULT CMap_Loader::Load_FromManifest(const _wstring& strManifestPath, const MA
 	MAP_SPAWN_REQUEST Request{};
 	Request.Levels = Levels;
 	Request.Targets = Targets;
-	Request.Options.bSpawnStage = true;
-	Request.Options.bSpawnEnv = true;
+	Request.Options.bSpawnStage = Options.bLoadStage;
+	Request.Options.bSpawnEnv = Options.bLoadEnv;
 	Request.ppOutStage = ppOutStage;
 
-	return Spawn(Package, Request, pOutReport);
+	if (Options.bLoadStage || Options.bLoadEnv)
+	{
+		hr = Spawn(Package, Request, pOutReport);
+		if (FAILED(hr))
+			return hr;
+	}
+
+	if (Options.bLoadLevelDesign)
+		hr = Load_LevelDesignEntries(Package, Request, pOutReport);
+
+	return hr;
+}
+
+HRESULT CMap_Loader::Preload_LevelDesignEntries(const MAP_PACKAGE& Package, const MAP_RUNTIME_LEVELS& Levels)
+{
+	if (Package.LevelDesignJsonPaths.empty())
+		return S_OK;
+
+	if (nullptr == m_pDevice || nullptr == m_pContext)
+		return E_FAIL;
+
+	for (const _wstring& strJsonPath :
+		Package.LevelDesignJsonPaths)
+	{
+		if (strJsonPath.empty())
+			continue;
+
+		if (FAILED(
+			CLevelDesign_Loader::Preload_LevelDesign(
+				m_pDevice,
+				m_pContext,
+				strJsonPath,
+				Levels.iLevelDesignPrototypeLevel)))
+		{
+			return E_FAIL;
+		}
+	}
+
+	return S_OK;
+}
+
+HRESULT CMap_Loader::Load_LevelDesignEntries(
+	const MAP_PACKAGE& Package,
+	const MAP_SPAWN_REQUEST& Request,
+	MAP_LOAD_RESULT* pOutReport)
+{
+	if (Package.LevelDesignJsonPaths.empty())
+		return S_OK;
+
+	if (nullptr == m_pDevice || nullptr == m_pContext)
+		return E_FAIL;
+
+	for (const _wstring& strJsonPath : Package.LevelDesignJsonPaths)
+	{
+		if (strJsonPath.empty())
+			continue;
+
+		LD_RUNTIME_LOAD_CONTEXT Context{};
+		Context.pDevice = m_pDevice;
+		Context.pContext = m_pContext;
+		Context.iPlaceLevel = Request.Levels.iLevelDesignObjectLevel;
+		Context.iPrototypeLevel = Request.Levels.iLevelDesignPrototypeLevel;
+		Context.pCreatedCallback = Request.pCreatedCallback;
+		Context.pCallbackContext = Request.pCallbackContext;
+
+		LD_LOAD_RESULT LDReport{};
+		if (FAILED(CLevelDesign_Loader::Load_LevelDesign_Runtime(Context, strJsonPath, &LDReport)))
+			return E_FAIL;
+
+		if (nullptr != pOutReport)
+		{
+			++pOutReport->iLevelDesignJsonLoadedCount;
+			pOutReport->iLevelDesignParsedObjectCount += LDReport.iParsedObjectCount;
+			pOutReport->iLevelDesignCreatedCount += LDReport.iCreatedCount;
+			pOutReport->iLevelDesignFallbackSpecCount += LDReport.iFallbackSpecCount;
+			pOutReport->iLevelDesignSkippedCreateFailedCount += LDReport.iSkippedCreateFailedCount;
+		}
+	}
+
+	return S_OK;
 }
 
 HRESULT CMap_Loader::Build_Package(const _wstring& strManifestPath, MAP_PACKAGE* pOutPackage)
@@ -335,10 +427,15 @@ HRESULT CMap_Loader::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST& 
 }
 
 HRESULT CMap_Loader::Preload_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
-	const _wstring& strManifestPath, _uint iRuntimeLevel)
+	const _wstring& strManifestPath, _uint iRuntimeLevel, const MAP_LOAD_OPTIONS& Options)
 {
 	if (nullptr == pDevice || nullptr == pContext || strManifestPath.empty())
 		return E_FAIL;
+
+	if (!Options.bLoadStage && !Options.bLoadEnv && !Options.bLoadLevelDesign)
+	{
+		return E_FAIL;
+	}
 
 	CMap_Loader* pMapLoader = Create(pDevice, pContext);
 	if (nullptr == pMapLoader)
@@ -352,7 +449,18 @@ HRESULT CMap_Loader::Preload_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 		MAP_RUNTIME_LEVELS Levels{};
 		Build_DefaultRuntimeLevels(iRuntimeLevel, &Levels);
 
-		hr = pMapLoader->Ready_Prototypes(Levels, Package);
+		Levels.bEnableEnvObjectPicking =
+			Options.bEnableEnvObjectPicking;
+
+		if (Options.bLoadStage || Options.bLoadEnv)
+		{
+			hr = pMapLoader->Ready_Prototypes(Levels, Package);
+		}
+
+		if (SUCCEEDED(hr) && Options.bLoadLevelDesign)
+		{
+			hr = pMapLoader->Preload_LevelDesignEntries(Package, Levels);
+		}
 	}
 
 	if (SUCCEEDED(hr))
@@ -363,10 +471,15 @@ HRESULT CMap_Loader::Preload_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 }
 
 HRESULT CMap_Loader::Preload_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
-	const _wstring& strFallbackManifestPath, const _wstring& strLevelObjectsPath, _uint iRuntimeLevel)
+	const _wstring& strFallbackManifestPath, const _wstring& strLevelObjectsPath, _uint iRuntimeLevel, const MAP_LOAD_OPTIONS& Options)
 {
 	if (nullptr == pDevice || nullptr == pContext)
 		return E_FAIL;
+
+	if (!Options.bLoadStage && !Options.bLoadEnv && !Options.bLoadLevelDesign)
+	{
+		return E_FAIL;
+	}
 
 	_wstring strResolvedManifestPath;
 	MAP_EDIT_DATA MapContentDesc{};
@@ -390,7 +503,17 @@ HRESULT CMap_Loader::Preload_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 		MAP_RUNTIME_LEVELS Levels{};
 		Build_DefaultRuntimeLevels(iRuntimeLevel, &Levels);
 
-		hr = pMapLoader->Ready_Prototypes(Levels, Package);
+		Levels.bEnableEnvObjectPicking = Options.bEnableEnvObjectPicking;
+
+		if (Options.bLoadStage || Options.bLoadEnv)
+		{
+			hr = pMapLoader->Ready_Prototypes(Levels, Package);
+		}
+
+		if (SUCCEEDED(hr) && Options.bLoadLevelDesign)
+		{
+			hr = pMapLoader->Preload_LevelDesignEntries(Package, Levels);
+		}
 	}
 
 	if (SUCCEEDED(hr))
@@ -400,14 +523,31 @@ HRESULT CMap_Loader::Preload_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 	return hr;
 }
 
-HRESULT CMap_Loader::Spawn_Map(const _wstring& strManifestPath, _uint iRuntimeLevel,
-	MAP_LOAD_RESULT* pOutReport, CMapStage** ppOutStage)
+HRESULT CMap_Loader::Spawn_Map(
+	ID3D11Device* pDevice,
+	ID3D11DeviceContext* pContext,
+	const _wstring& strManifestPath,
+	_uint iRuntimeLevel,
+	MAP_LOAD_RESULT* pOutReport,
+	CMapStage** ppOutStage,
+	const MAP_LOAD_OPTIONS& Options)
 {
-	if (strManifestPath.empty())
+	if (nullptr == pDevice || nullptr == pContext || strManifestPath.empty())
 		return E_FAIL;
+
+	if (!Options.bLoadStage
+		&& !Options.bLoadEnv
+		&& !Options.bLoadLevelDesign)
+	{
+		return E_FAIL;
+	}
 
 	MAP_PACKAGE Package{};
 	if (!Try_GetMapPackage(strManifestPath, iRuntimeLevel, &Package))
+		return E_FAIL;
+
+	CMap_Loader* pMapLoader = Create(pDevice, pContext);
+	if (nullptr == pMapLoader)
 		return E_FAIL;
 
 	MAP_RUNTIME_LEVELS Levels{};
@@ -415,30 +555,40 @@ HRESULT CMap_Loader::Spawn_Map(const _wstring& strManifestPath, _uint iRuntimeLe
 	Build_DefaultRuntimeLevels(iRuntimeLevel, &Levels);
 	Build_DefaultRuntimeTargets(iRuntimeLevel, &Targets);
 
+	Levels.bEnableEnvObjectPicking = Options.bEnableEnvObjectPicking;
+
 	MAP_SPAWN_REQUEST Request{};
 	Request.Levels = Levels;
 	Request.Targets = Targets;
-	Request.Options.bSpawnStage = true;
-	Request.Options.bSpawnEnv = true;
+	Request.Options.bSpawnStage = Options.bLoadStage;
+	Request.Options.bSpawnEnv = Options.bLoadEnv;
 	Request.ppOutStage = ppOutStage;
 
-	CMap_Spawner* pSpawner = CMap_Spawner::Create();
-	if (nullptr == pSpawner)
-		return E_FAIL;
+	HRESULT hr = S_OK;
 
-	const HRESULT hr = pSpawner->Spawn(Package, Request, pOutReport);
+	if (Options.bLoadStage || Options.bLoadEnv)
+		hr = pMapLoader->Spawn(Package, Request, pOutReport);
 
-	Safe_Release(pSpawner);
+	if (SUCCEEDED(hr) && Options.bLoadLevelDesign)
+		hr = pMapLoader->Load_LevelDesignEntries(Package, Request, pOutReport);
+
+	Safe_Release(pMapLoader);
 	return hr;
 }
 
 HRESULT CMap_Loader::Spawn_Map(
+	ID3D11Device* pDevice,
+	ID3D11DeviceContext* pContext,
 	const _wstring& strFallbackManifestPath,
 	const _wstring& strLevelObjectsPath,
 	_uint iRuntimeLevel,
 	MAP_LOAD_RESULT* pOutReport,
-	CMapStage** ppOutStage)
+	CMapStage** ppOutStage,
+	const MAP_LOAD_OPTIONS& Options)
 {
+	if (nullptr == pDevice || nullptr == pContext)
+		return E_FAIL;
+
 	_wstring strResolvedManifestPath;
 	MAP_EDIT_DATA MapContentDesc{};
 	json jMapStageOverride = json::object();
@@ -458,30 +608,49 @@ HRESULT CMap_Loader::Spawn_Map(
 	CMapStage* pLocalStage = nullptr;
 	CMapStage** ppStageForSpawn = ppOutStage;
 
-	if (nullptr == ppStageForSpawn && bHasMapStageOverride)
+	if (Options.bLoadStage
+		&& nullptr == ppStageForSpawn
+		&& bHasMapStageOverride)
+	{
 		ppStageForSpawn = &pLocalStage;
+	}
 
 	const HRESULT hrSpawn = Spawn_Map(
+		pDevice,
+		pContext,
 		strResolvedManifestPath,
 		iRuntimeLevel,
 		pOutReport,
-		ppStageForSpawn);
+		ppStageForSpawn,
+		Options);
 
 	if (FAILED(hrSpawn))
 		return hrSpawn;
 
-	if (bHasMapStageOverride)
+	if (Options.bLoadStage && bHasMapStageOverride)
 	{
-		CMapStage* pStageToApply = nullptr != ppOutStage ? *ppOutStage : pLocalStage;
-		if (FAILED(CMap_EditFile::Apply_Stage(pStageToApply, jMapStageOverride)))
+		CMapStage* pStageToApply =
+			nullptr != ppOutStage ? *ppOutStage : pLocalStage;
+
+		if (FAILED(CMap_EditFile::Apply_Stage(
+			pStageToApply,
+			jMapStageOverride)))
+		{
 			return E_FAIL;
+		}
 	}
 
 	return S_OK;
 }
 
-HRESULT CMap_Loader::Load_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
-	const _wstring& strManifestPath, _uint iRuntimeLevel, MAP_LOAD_RESULT* pOutReport, CMapStage** ppOutStage)
+HRESULT CMap_Loader::Load_Map(
+	ID3D11Device* pDevice,
+	ID3D11DeviceContext* pContext,
+	const _wstring& strManifestPath,
+	_uint iRuntimeLevel,
+	MAP_LOAD_RESULT* pOutReport,
+	CMapStage** ppOutStage,
+	const MAP_LOAD_OPTIONS& Options)
 {
 	if (nullptr == pDevice || nullptr == pContext || strManifestPath.empty())
 		return E_FAIL;
@@ -495,10 +664,13 @@ HRESULT CMap_Loader::Load_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pConte
 	Build_DefaultRuntimeLevels(iRuntimeLevel, &Levels);
 	Build_DefaultRuntimeTargets(iRuntimeLevel, &Targets);
 
+	Levels.bEnableEnvObjectPicking = Options.bEnableEnvObjectPicking;
+
 	const HRESULT hr = pMapLoader->Load_FromManifest(
 		strManifestPath,
 		Levels,
 		Targets,
+		Options,
 		pOutReport,
 		ppOutStage);
 
@@ -666,6 +838,46 @@ HRESULT CMap_Loader::Load_Env_Runtime(
 				hr = pMapLoader->Spawn(SpawnPackage, Request, pOutReport);
 			}
 		}
+	}
+
+	Safe_Release(pMapLoader);
+	return hr;
+}
+
+HRESULT CMap_Loader::Load_LevelDesign_Runtime(
+	const MAP_RUNTIME_LOAD_CONTEXT& Context,
+	const _wstring& strMapManifestPath,
+	MAP_LOAD_RESULT* pOutReport)
+{
+	if (nullptr != pOutReport)
+		*pOutReport = {};
+
+	if (!Is_RuntimeLoadContextValid(Context)
+		|| strMapManifestPath.empty())
+	{
+		return E_FAIL;
+	}
+
+	CMap_Loader* pMapLoader =
+		Create(Context.pDevice, Context.pContext);
+
+	if (nullptr == pMapLoader)
+		return E_FAIL;
+
+	MAP_PACKAGE Package{};
+	HRESULT hr =
+		pMapLoader->Build_Package(strMapManifestPath, &Package);
+
+	if (SUCCEEDED(hr))
+	{
+		MAP_SPAWN_REQUEST Request{};
+		Request.Levels.iLevelDesignObjectLevel = Context.iPlaceLevel;
+		Request.Levels.iLevelDesignPrototypeLevel = Context.iModelLevel;
+
+		Request.pCreatedCallback = Context.pCreatedCallback;
+		Request.pCallbackContext = Context.pCallbackContext;
+
+		hr = pMapLoader->Load_LevelDesignEntries(Package, Request, pOutReport);
 	}
 
 	Safe_Release(pMapLoader);
@@ -842,12 +1054,11 @@ void CMap_Loader::Build_DefaultRuntimeLevels(_uint iRuntimeLevel, MAP_RUNTIME_LE
 		return;
 
 	*pOutLevels = {};
-	//pOutLevels->iObjectLevel = iRuntimeLevel;
-	//pOutLevels->iStageModelLevel = iRuntimeLevel;
-	//pOutLevels->iEnvModelLevel = iRuntimeLevel;
 	pOutLevels->iObjectLevel = ETOUI(LEVEL::STATIC);
 	pOutLevels->iStageModelLevel = ETOUI(LEVEL::STATIC);
 	pOutLevels->iEnvModelLevel = ETOUI(LEVEL::STATIC);
+	pOutLevels->iLevelDesignObjectLevel = iRuntimeLevel;
+	pOutLevels->iLevelDesignPrototypeLevel = iRuntimeLevel;
 }
 
 void CMap_Loader::Build_DefaultRuntimeTargets(_uint iRuntimeLevel, MAP_SPAWN_TARGETS* pOutTargets)

@@ -150,6 +150,70 @@ void CPhysX_Manager::Remove_StaticActor(PxRigidStatic* pActor)
     pActor->release();
 }
 
+PxRigidStatic* CPhysX_Manager::Create_StaticBox(const _float3& vLocalCenter, const _float3& vLocalHalfExtents, _fmatrix WorldMatrix)
+{
+    if (nullptr == m_pPhysics || nullptr == m_pScene || nullptr == m_pDefaultMtrl)
+    {
+        return nullptr;
+    }
+
+    XMVECTOR vScale;
+    XMVECTOR vRotation;
+    XMVECTOR vTranslation;
+
+    if (!XMMatrixDecompose(&vScale, &vRotation, &vTranslation, WorldMatrix))
+    {
+        return nullptr;
+    }
+
+    _float3 vAbsScale{};
+    XMStoreFloat3(&vAbsScale, XMVectorAbs(vScale));
+
+    const _float3 vWorldHalfExtents = {
+        vLocalHalfExtents.x * vAbsScale.x,
+        vLocalHalfExtents.y * vAbsScale.y,
+        vLocalHalfExtents.z * vAbsScale.z
+    };
+
+    const PxBoxGeometry Geometry(
+        vWorldHalfExtents.x,
+        vWorldHalfExtents.y,
+        vWorldHalfExtents.z);
+
+    if (!Geometry.isValid())
+        return nullptr;
+
+    _float3 vWorldCenter{};
+    XMStoreFloat3(&vWorldCenter, XMVector3TransformCoord(XMLoadFloat3(&vLocalCenter), WorldMatrix));
+
+    _float4 qRotation{};
+    XMStoreFloat4(&qRotation, XMQuaternionNormalize(vRotation));
+
+    const PxTransform Pose(
+        PxVec3(vWorldCenter.x, vWorldCenter.y, vWorldCenter.z),
+        PxQuat(qRotation.x, qRotation.y, qRotation.z, qRotation.w));
+
+    if (!Pose.isValid())
+        return nullptr;
+
+    PxRigidStatic* pActor = m_pPhysics->createRigidStatic(Pose);
+    if (nullptr == pActor)
+        return nullptr;
+
+    PxShape* pShape = PxRigidActorExt::createExclusiveShape(*pActor, Geometry, *m_pDefaultMtrl);
+
+    if (nullptr == pShape)
+    {
+        pActor->release();
+        return nullptr;
+    }
+
+    m_pScene->addActor(*pActor);
+    m_StaticActors.push_back(pActor);
+
+    return pActor;
+}
+
 PxRigidStatic* CPhysX_Manager::Cook_StaticMesh(
     const _float3* /*pVertices*/, _uint /*iNumVertices*/,
     const _uint*   /*pIndices*/, _uint /*iNumIndices*/,

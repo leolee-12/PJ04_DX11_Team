@@ -259,11 +259,13 @@ HRESULT CEnv_InstanceBatch::Render_Instanced()
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))
 			return E_FAIL;
 
-		const _uint iPass = (Layer.iPass >= 0)
-			? static_cast<_uint>(Layer.iPass)
-			: ShaderPass::EnvInst::DIFF;
+		const ENV_SHADER_PASS_META* pMeta = Find_EnvShaderPassMeta(Layer.iPass);
 
-		if (FAILED(m_pShaderCom->Begin(iPass)))
+		const ENV_PASS ePass = pMeta->ePass == ENV_PASS::DEFAULT
+			? ENV_PASS::DIFF
+			: pMeta->ePass;
+
+		if (FAILED(m_pShaderCom->Begin(ETOUI(ePass))))
 			return E_FAIL;
 
 		if (FAILED(m_pModelCom->Render_Instanced(i, m_pInstanceBuffer, sizeof(ENV_INSTANCE_DATA), iInstanceCount)))
@@ -303,7 +305,7 @@ HRESULT CEnv_InstanceBatch::Render_Shadow_Instanced()
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		if (FAILED(m_pShaderCom->Begin(ShaderPass::EnvInst::SHADOW)))
+		if (FAILED(m_pShaderCom->Begin(ETOUI(ENV_PASS::SHADOW))))
 			return E_FAIL;
 
 		if(FAILED(m_pModelCom->Render_Instanced(i, m_pInstanceBuffer, sizeof(ENV_INSTANCE_DATA), iInstanceCount)))

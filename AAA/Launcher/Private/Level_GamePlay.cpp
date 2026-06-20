@@ -28,6 +28,8 @@ HRESULT CLevel_GamePlay::Initialize()
     CMapStage* pMapStage = nullptr;
 
     if (FAILED(CMap_Loader::Spawn_Map(
+        m_pDevice,
+        m_pContext,
         Manifest.strMapManifest,
         Manifest.strObjectsFile,
         iLevel,
@@ -40,6 +42,17 @@ HRESULT CLevel_GamePlay::Initialize()
     if (FAILED(Load_Level(m_pGameInstance_Proxy, m_pDevice, m_pContext,
         Manifest.strObjectsFile.c_str(), iLevel)))
         return E_FAIL;
+
+#ifdef _DEBUG
+    const _wstring strDebugMessage =
+        L"[MapLoad][LevelDesign] json=" + to_wstring(MapReport.iLevelDesignJsonLoadedCount) +
+        L", parsed=" + to_wstring(MapReport.iLevelDesignParsedObjectCount) +
+        L", created=" + to_wstring(MapReport.iLevelDesignCreatedCount) +
+        L", fallback=" + to_wstring(MapReport.iLevelDesignFallbackSpecCount) +
+        L", failed=" + to_wstring(MapReport.iLevelDesignSkippedCreateFailedCount) + L"\n";
+
+    OutputDebugStringW(strDebugMessage.c_str());
+#endif
 
     if (!Manifest.strUIFile.empty())
     {

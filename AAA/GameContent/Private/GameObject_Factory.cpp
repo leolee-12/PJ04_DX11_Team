@@ -76,6 +76,7 @@
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
 #include "LevelDesign_Breakable.h"
+#include "LevelDesign_Rail.h"
 
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
@@ -445,6 +446,7 @@ void CGameObject_Factory::Register_UIContainer()
 void CGameObject_Factory::Register_NonAnimObject()
 {
     Register(CLevelDesign_Unsupported::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Unsupported), LOADER());
+    Register(CLevelDesign_Rail::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Rail), LOADER());
 
     Register(CLevelDesign_Breakable::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Breakable),
         LOADER(TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CLevelDesign_Breakable::STARBLOCK_MODEL_PROTO_TAG,

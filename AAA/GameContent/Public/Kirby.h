@@ -120,6 +120,8 @@ private:
 	// À±¼®Çö Ãß°¡
 	virtual _bool Block_Hit(const ATTACK_INFO& tInfo) override;
 	virtual void  On_Damaged(const ATTACK_INFO& tInfo) override;
+	_bool		  Is_SuperInhaling() const;
+
 
 private:
 	CKirby_Body* m_pBody{};

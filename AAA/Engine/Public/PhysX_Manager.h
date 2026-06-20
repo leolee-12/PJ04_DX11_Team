@@ -40,6 +40,7 @@ public:
     physx::PxController* Create_CapsuleController(const _float3& vPos, _float fRadius, _float fHeight);
     void                 Release_Controller(physx::PxController* pCtrl);
 
+    physx::PxRigidStatic* Create_StaticBox(const _float3& vLocalCenter, const _float3& vLocalHalfExtents, _fmatrix WorldMatrix);
     physx::PxRigidStatic* Cook_StaticMesh(
         const _float3* pVertices, _uint iNumVertices,
         const _uint* pIndices, _uint iNumIndices,
