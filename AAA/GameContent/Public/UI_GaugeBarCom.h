@@ -36,6 +36,8 @@ public:
     _float Get_Current() const { return m_fCur; }
     _float Get_Max()     const { return m_fMax; }
 
+    void Appear(_float fCurrent, _float fMax);
+
 private:
     void   Push();
 

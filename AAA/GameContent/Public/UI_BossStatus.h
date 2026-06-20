@@ -6,6 +6,7 @@ NS_BEGIN(Client)
 
 class CUI_GaugeFill;
 class CUI_GaugeBarCom;
+class CUI_Text;
 
 class CLIENT_DLL CUI_BossStatus final : public CUIContainerObject
 {
@@ -39,6 +40,8 @@ private:
 
 private:
     CUI_GaugeBarCom* m_pGaugeBar = { nullptr };
+    CUI_Text* m_pNameText = { nullptr };
+    _wstring  m_strPendingName;
 
     _float m_fDefaultMaxHP = { 100.f };
     _float m_fDefaultCurrHP = { 100.f };
@@ -46,6 +49,7 @@ private:
     _bool  m_bPendingHP = { false };
     _float m_fPendingMax = { 100.f };
     _float m_fPendingCurr = { 100.f };
+    _bool  m_bPendingAppear = { false };
 
 public:
     static CUI_BossStatus* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

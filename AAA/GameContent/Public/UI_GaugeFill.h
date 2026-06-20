@@ -107,6 +107,8 @@ public:
     void                                    Set_Alpha(_float fAlpha) { m_fAlpha = fAlpha; }
     _float                                  Get_Alpha() const { return m_fAlpha; }
 
+    void                                    Play_AppearSweep(_float fTargetRatio, _float fSpeed = 0.8f);
+
 public:
     static CUI_GaugeFill*                   Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual CGameObject*                    Clone(void* pArg) override;
@@ -127,6 +129,9 @@ private:
     _float m_fBlinkPhase = { 0.f };
 
     _float4 m_vGhostColorCur = { 1.f, 0.92f, 0.2f, 1.f };
+
+    _bool  m_bAppearSweep = { false };
+    _float m_fAppearSpeed = { 0.8f };
 
 private:
     HRESULT                                 Ready_Components(UI_GAUGEFILL_DESC* pDesc);

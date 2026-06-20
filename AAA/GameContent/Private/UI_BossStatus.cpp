@@ -1,12 +1,14 @@
 #include "UI_BossStatus.h"
 #include "UI_GaugeFill.h"
 #include "UI_GaugeBarCom.h"
+#include "UI_Text.h"
 #include "GameInstance.h"
 
 namespace
 {
     constexpr const _tchar* COM_GAUGEBAR = TEXT("Com_GaugeBar");
-    constexpr const _tchar* PART_HP_FILL = TEXT("Guage");   // 레벨데이터의 보스 게이지 파트 태그
+    constexpr const _tchar* PART_HP_FILL = TEXT("Guage");   
+    constexpr const _tchar* PART_BOSS_NAME = TEXT("BossName");
 }
 
 CUI_BossStatus::CUI_BossStatus(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -34,6 +36,7 @@ HRESULT CUI_BossStatus::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
+    Set_Active(false);
     return S_OK;
 }
 
@@ -88,7 +91,30 @@ HRESULT CUI_BossStatus::Ready_Events()
             }
         });
 
-    Subscribe_Event(EventTag::Boss_Appeared, [this](void*) { Set_Active(true);  });
+    Subscribe_Event(EventTag::Boss_HP_Appeared,
+        [this](void* pData)
+        {
+            auto* p = static_cast<BOSS_HP_APPEARED*>(pData);
+            if (nullptr == p) return;
+
+            Set_Active(true);                     
+
+            m_strPendingName = p->strBossName;
+            m_fPendingMax = p->fMaxHP;
+            m_fPendingCurr = p->fCurrHp;
+
+            if (m_pGaugeBar && !m_pGaugeBar->Is_Bound())
+                Try_BindGauge();
+
+            if (m_pNameText)                      
+                m_pNameText->Set_Text(p->strBossName);
+
+            if (m_pGaugeBar && m_pGaugeBar->Is_Bound())
+                m_pGaugeBar->Appear(p->fCurrHp, p->fMaxHP);   
+            else
+                m_bPendingAppear = true;           
+        });
+
     Subscribe_Event(EventTag::Boss_Died, [this](void*) { Set_Active(false); });
 
     return S_OK;
@@ -102,7 +128,22 @@ void CUI_BossStatus::Try_BindGauge()
 
     m_pGaugeBar->Bind_Gauge(static_cast<CUI_GaugeFill*>(it->second));
 
-    if (m_bPendingHP)                    
+    if (nullptr == m_pNameText)
+    {
+        auto itName = m_UIPartObjects.find(PART_BOSS_NAME);
+        if (itName != m_UIPartObjects.end())
+            m_pNameText = dynamic_cast<CUI_Text*>(itName->second);
+    }
+    if (m_pNameText && !m_strPendingName.empty())
+        m_pNameText->Set_Text(m_strPendingName);
+
+    if (m_bPendingAppear)
+    {
+        m_pGaugeBar->Appear(m_fPendingCurr, m_fPendingMax);
+        m_bPendingAppear = false;
+        m_bPendingHP = false;
+    }
+    else if (m_bPendingHP)
     {
         m_pGaugeBar->Set_Value(m_fPendingCurr, m_fPendingMax);
         m_bPendingHP = false;
