@@ -79,7 +79,7 @@ COPY_ABILITY_TYPE CKirby_Ability_Sword::Get_AbilityType()
 
 void CKirby_Ability_Sword::Enter_Ability(CKirby* pKirby)
 {
-    SWORD_STATE eStartState = m_eCurSwordState;
+    SWORD_STATE eStartState = m_eSwordState;
 
     if (eStartState == SWORD_STATE::END)
     {
@@ -89,7 +89,7 @@ void CKirby_Ability_Sword::Enter_Ability(CKirby* pKirby)
             eStartState = SWORD_STATE::JUMP_SLASH_START;
     }
 
-    m_eCurSwordState = SWORD_STATE::END;
+    m_eSwordState = SWORD_STATE::END;
 
     m_eCurSwordMoveState = SWORD_MOVE_STATE::MOVE_STATE_NONE;
     m_ePreSwordMoveState = SWORD_MOVE_STATE::MOVE_STATE_NONE;
@@ -120,6 +120,8 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Sword::Update_Ability(CKirby* pKirby, _floa
     Update_ChargeTime(fTimeDelta);
     Update_SwordState(pKirby, fTimeDelta);
 
+    ChargeAnimationOverlay(pKirby);
+
     if (m_bMoveLock == false)
         pKirby->Add_MoveDir(m_vSwordWishDir);
 
@@ -134,7 +136,10 @@ void CKirby_Ability_Sword::Exit_Ability(CKirby* pKirby)
 {
     Change_SwordState(pKirby, SWORD_STATE::END);
 
-    m_eCurSwordState = SWORD_STATE::END;
+    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+    pAnimator->Clear_Mask(0.1f);
+
+    m_eSwordState = SWORD_STATE::END;
 
     m_eCurSwordMoveState = SWORD_MOVE_STATE::MOVE_STATE_NONE;
     m_ePreSwordMoveState = SWORD_MOVE_STATE::MOVE_STATE_NONE;
@@ -190,10 +195,10 @@ _bool CKirby_Ability_Sword::Handle_Command(CKirby* pKirby, CKirby_Command* pComm
         {
             if (pCommand->IsDown())
             {
-                if (m_eCurSwordState == SWORD_STATE::SLASH_3)
+                if (m_eSwordState == SWORD_STATE::SLASH_3)
                     return true;
 
-                if (m_eCurSwordState == SWORD_STATE::JUMP_SLASH)
+                if (m_eSwordState == SWORD_STATE::JUMP_SLASH)
                 {
                     if (pMovement->Is_Grounded() == false)
                         m_bReserveNextAttack = true;
@@ -221,9 +226,9 @@ _bool CKirby_Ability_Sword::Handle_Command(CKirby* pKirby, CKirby_Command* pComm
 _bool CKirby_Ability_Sword::Enter_Attack_KeyDown(CKirby* pKirby)
 {
     if (pKirby->Get_Movement()->Is_Grounded())
-        m_eCurSwordState = SWORD_STATE::SLASH_1;
+        m_eSwordState = SWORD_STATE::SLASH_1;
     else
-        m_eCurSwordState = SWORD_STATE::JUMP_SLASH_START;
+        m_eSwordState = SWORD_STATE::JUMP_SLASH_START;
 
     pKirby->Change_State(KIRBY_STATE_TYPE::ATTACK);
 
@@ -232,7 +237,7 @@ _bool CKirby_Ability_Sword::Enter_Attack_KeyDown(CKirby* pKirby)
 
 _bool CKirby_Ability_Sword::Enter_Attack_KeyPress(CKirby* pKirby)
 {
-    m_eCurSwordState = SWORD_STATE::SPIN_SLASH_CHARGE;
+    m_eSwordState = SWORD_STATE::SPIN_SLASH_CHARGE;
 
     pKirby->Change_State(KIRBY_STATE_TYPE::ATTACK);
 
@@ -260,7 +265,7 @@ _bool CKirby_Ability_Sword::Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation)
 
 void CKirby_Ability_Sword::Update_ChargeTime(_float fTimeDelta)
 {
-    if (m_eCurSwordState == SWORD_STATE::SPIN_SLASH_CHARGE && m_bSpinSlashCharge == true)
+    if (m_eSwordState == SWORD_STATE::SPIN_SLASH_CHARGE && m_bSpinSlashCharge == true)
     {
         m_fAccSuperSpinSlashChargeTime += fTimeDelta;
     }
@@ -288,14 +293,14 @@ void CKirby_Ability_Sword::SetSpeed_Ratio(_float fRatio, _float fRatioStart, _fl
 
 void CKirby_Ability_Sword::Change_SwordState(CKirby* pKirby, SWORD_STATE eNext)
 {
-    if (m_eCurSwordState == eNext)
+    if (m_eSwordState == eNext)
         return;
 
-    Exit_SwordState(pKirby, m_eCurSwordState);
+    Exit_SwordState(pKirby, m_eSwordState);
 
-    m_eCurSwordState = eNext;
+    m_eSwordState = eNext;
 
-    Enter_SwordState(pKirby, m_eCurSwordState);
+    Enter_SwordState(pKirby, m_eSwordState);
 }
 
 void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
@@ -359,12 +364,12 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
 
     case SWORD_STATE::JUMP_SLASH_START:
         BeginHit(true);
-        pAnimator->Play("SwordSpinStart", false, false, 0.1f, 1.5f);
+        pAnimator->Play("SwordSpinStart", false, false, 0.05f, 9.f);
         break;
 
     case SWORD_STATE::JUMP_SLASH:
         BeginHit(true);
-        pAnimator->Play("SwordSpin", false, false, 0.1f, 1.5f);
+        pAnimator->Play("SwordSpin", false, false, 0.0f, 1.5f);
         break;
 
     case SWORD_STATE::SPIN_SLASH_CHARGE:
@@ -372,13 +377,18 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
         pKirby->Set_RotationLock(true);
         pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed - 6.f);
         pAnimator->Play("SpinSlashCharge", false, false, 0.05f, 2.5f);
+
+        if (m_eCurSwordMoveState == SWORD_MOVE_STATE::MOVE)
+            pAnimator->Set_Mask("ShuffleFront", OverlayMasks, std::size(OverlayMasks), true, 1.0f, 0.1f);
         break;
 
     case SWORD_STATE::SPIN_SLASH:
         BeginHit(true);
         pKirby->Set_RotationLock(true);
         pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
-        pAnimator->Play("SpinSlash", false, false, 0.1f, 2.f);
+
+        pAnimator->Play("SpinSlash", false, false, 0.1f, 2.f, false);
+        pAnimator->Clear_Mask(0.1f);
         break;
 
     case SWORD_STATE::SPIN_SLASH_END:
@@ -391,21 +401,23 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
         EndHit();
         pKirby->Set_RotationLock(true);
         pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed - 6.f);
-        pAnimator->Play("SuperSpinSlashChargeStart", false, false, 0.1f, 2.f);
+        pAnimator->Play("SuperSpinSlashChargeStart", false, false, 0.1f, 2.f, false);
         break;
 
     case SWORD_STATE::SUPER_SPIN_SLASH_CHARGE:
         EndHit();
         pKirby->Set_RotationLock(true);
         pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed - 6.f);
-        pAnimator->Play("SuperSpinSlashCharge", true, false, 0.1f, 2.f);
+        pAnimator->Play("SuperSpinSlashCharge", true, false, 0.1f, 2.f, false);
         break;
 
     case SWORD_STATE::SUPER_SPIN_SLASH_START:
         BeginHit(true);
         pKirby->Set_RotationLock(true);
         pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
-        pAnimator->Play("SuperSpinSlashStart", false, false, 0.1f, 2.f);
+
+        pAnimator->Play("SuperSpinSlashStart", false, false, 0.1f, 2.f, false);
+        pAnimator->Clear_Mask(0.1f);
         break;
 
     case SWORD_STATE::SUPER_SPIN_SLASH_LOOP:
@@ -433,7 +445,7 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, _float fTimeDelta)
     _float fRatio = pAnimator->Get_Progress();
     _bool bIsAniFinish = pAnimator->Is_Finished();
 
-    switch (m_eCurSwordState)
+    switch (m_eSwordState)
     {
         case SWORD_STATE::END:
             m_bReqEndAttackState = true;
@@ -591,12 +603,35 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, _float fTimeDelta)
 
 void CKirby_Ability_Sword::Exit_SwordState(CKirby* pKirby, SWORD_STATE eState)
 {
-    (void)eState;
-
     m_bMoveLock = false;
 
     pKirby->Set_RotationLock(false);
     pKirby->Get_Movement()->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
+
+    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+
+    switch (m_eSwordState)
+    {
+        case END:
+        case SLASH_1:
+        case SLASH_1_END:
+        case SLASH_2:
+        case SLASH_3:
+
+        case JUMP_SLASH_START:
+        case JUMP_SLASH:
+
+        case SPIN_SLASH_CHARGE:
+        case SPIN_SLASH:
+        case SPIN_SLASH_END:
+
+        case SUPER_SPIN_SLASH_CHARGE_START:
+        case SUPER_SPIN_SLASH_CHARGE:
+        case SUPER_SPIN_SLASH_START:
+        case SUPER_SPIN_SLASH_LOOP:
+        case SUPER_SPIN_SLASH_END:
+            break;
+    }
 }
 
 _bool CKirby_Ability_Sword::Has_SwordMoveDir()
@@ -615,7 +650,7 @@ void CKirby_Ability_Sword::ChargeAnimationOverlay(CKirby* pKirby)
     {
         CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
 
-        switch (m_eCurSwordState)
+        switch (m_eSwordState)
         {
             case SWORD_STATE::SPIN_SLASH_CHARGE:
             case SWORD_STATE::SUPER_SPIN_SLASH_CHARGE_START:
@@ -626,7 +661,7 @@ void CKirby_Ability_Sword::ChargeAnimationOverlay(CKirby* pKirby)
                 }
                 else if (m_eCurSwordMoveState == SWORD_MOVE_STATE::MOVE)
                 {
-
+                    pAnimator->Set_Mask("ShuffleFront", OverlayMasks, std::size(OverlayMasks), true, 1.0f, 0.1f);
                 }
                 break;
         }

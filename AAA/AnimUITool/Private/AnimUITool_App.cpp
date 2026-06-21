@@ -11,6 +11,8 @@
 #include "Level_Tool.h"
 #include "Loader_Prototype.h"
 
+#include "Effect_Loader.h"
+
 
 CAnimUITool_App::CAnimUITool_App()
 {
@@ -362,6 +364,7 @@ void CAnimUITool_App::Free()
 
 	Safe_Release(m_pPanel_Manager);
 
+	CEffect_Loader::DestroyInstance();
 	Safe_Release(m_pRTV);
 	Safe_Release(m_pSRV);
 	Safe_Release(m_pDSV);

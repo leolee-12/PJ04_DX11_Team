@@ -58,10 +58,30 @@ HRESULT CVacuumContainer::Render()
     return S_OK;
 }
 
+void CVacuumContainer::On_SuperInhale()
+{
+    auto iter = m_EffestParts.find(CInhaleEffect::PROTOTYPE_TAG);
+    if (iter == m_EffestParts.end())
+        return;
+
+    static_cast<CInhaleEffect*>(iter->second)->Set_ColorChange(true);
+}
+
+void CVacuumContainer::Off_SuperInhale()
+{
+    auto iter = m_EffestParts.find(CInhaleEffect::PROTOTYPE_TAG);
+    if (iter == m_EffestParts.end())
+        return;
+
+    CInhaleEffect* pInhaleEffect = static_cast<CInhaleEffect*>(iter->second);
+    pInhaleEffect->Set_ColorChange(false);
+    pInhaleEffect->Set_Color(_float3{ 1.f, 1.f, 1.f });
+}
+
 HRESULT CVacuumContainer::Ready_EffectPartObjects()
 {
-    Add_Effect_PartObject(m_iPrototypeLevel, CInhaleEffect::PROTOTYPE_TAG, TEXT("Proto_InhaleEffect"));
-    Add_Effect_PartObject(m_iPrototypeLevel, CVacuum::PROTOTYPE_TAG, TEXT("Proto_Vacuum"));
+    Add_Effect_PartObject(m_iPrototypeLevel, CInhaleEffect::PROTOTYPE_TAG, CInhaleEffect::PROTOTYPE_TAG);
+    Add_Effect_PartObject(m_iPrototypeLevel, CVacuum::PROTOTYPE_TAG, CVacuum::PROTOTYPE_TAG);
     //Add_Effect_PartObject(m_iPrototypeLevel, CTornadoSpinReverse::PROTOTYPE_TAG, TEXT("Proto_TornadoSpinReverse"));
 
     return S_OK;
