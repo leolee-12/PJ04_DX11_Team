@@ -78,6 +78,10 @@ private:
 	// Effect
 	CEffect_Container* m_pInhaleEffect{};
 
+	_bool m_bSuperInhaleEffectRaised{};
+	_float3 m_vInhaleEffectStartPos{};
+	_float3 m_vInhaleEffectEndPos{};
+
 private:
 	void Change_InhaleState(CKirby* pKirby, INHALE_STATE eNext);
 	void Enter_InhaleState(CKirby* pKirby, INHALE_STATE eState);
@@ -100,6 +104,8 @@ private:
 	void Subscribe_InhaleCapturedEvent(CKirby* pKirby);
 	void Unsubscribe_InhaleCapturedEvent();
 	void Handle_InhaleCaptured(CKirby* pKirby, CMonster* pMonster);
+
+	void Update_SuperInhaleEffectRise(_float fRatio);
 
 public:
 	static CKirby_Ability_Normal* Create();
