@@ -29,6 +29,8 @@ private:
 		SUPER_SPIN_SLASH_START, SUPER_SPIN_SLASH_LOOP, SUPER_SPIN_SLASH_END,
 	};
 
+	enum SWORD_MOVE_STATE { MOVE_STATE_NONE, NONE_MOVE, MOVE };
+
 private:
 	CKirby_Ability_Sword();
 	virtual ~CKirby_Ability_Sword() = default;
@@ -54,6 +56,9 @@ public:
 private:
 	SWORD_STATE m_eCurSwordState{};
 
+	SWORD_MOVE_STATE m_eCurSwordMoveState{};
+	SWORD_MOVE_STATE m_ePreSwordMoveState{};
+
 	_bool m_bReserveNextAttack{};
 
 	// Charge	
@@ -75,8 +80,11 @@ private:
 
 	void Change_SwordState(CKirby* pKirby, SWORD_STATE eNext);
 	void Enter_SwordState(CKirby* pKirby, SWORD_STATE eState);
-	void Update_SwordState(CKirby* pKirby, float dt);
+	void Update_SwordState(CKirby* pKirby, _float fTimeDelta);
 	void Exit_SwordState(CKirby* pKirby, SWORD_STATE eState);
+
+	_bool Has_SwordMoveDir();
+	void ChargeAnimationOverlay(CKirby* pKirby);
 
 public:
 	static CKirby_Ability_Sword* Create();
