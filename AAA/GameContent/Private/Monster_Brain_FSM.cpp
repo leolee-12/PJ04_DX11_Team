@@ -5,17 +5,22 @@ CMonster_Brain_FSM::CMonster_Brain_FSM()
 {
 }
 
-HRESULT CMonster_Brain_FSM::Initialize()
+HRESULT CMonster_Brain_FSM::Initialize(CMonster* pOwner)
 {
+    if (pOwner == nullptr)
+        return E_FAIL;
+
+    m_pOwner = pOwner;
+
 	return S_OK;
 }
 
-_bool CMonster_Brain_FSM::Can_Decide(CMonster* pMonster, const MONSTER_BLACKBOARD& BlackBoard) const
+_bool CMonster_Brain_FSM::Can_Decide(const MONSTER_BLACKBOARD& BlackBoard) const
 {
-    if (nullptr == pMonster)
+    if (nullptr == m_pOwner)
         return false;
 
-    MONSTER_STATE_TYPE eCurState = pMonster->Get_StateType();
+    MONSTER_STATE_TYPE eCurState = m_pOwner->Get_StateType();
 
     if (eCurState == MONSTER_STATE_TYPE::CAPTURED ||
         eCurState == MONSTER_STATE_TYPE::DEATH)
@@ -32,7 +37,7 @@ void CMonster_Brain_FSM::Decide(CMonster* pMonster, const MONSTER_BLACKBOARD& Bl
     if (nullptr == pMonster)
         return;
 
-    if (!Can_Decide(pMonster, BlackBoard))
+    if (!Can_Decide(BlackBoard))
         return;
 
     MONSTER_STATE_TYPE eCurState = pMonster->Get_StateType();
@@ -54,20 +59,7 @@ void CMonster_Brain_FSM::Decide(CMonster* pMonster, const MONSTER_BLACKBOARD& Bl
         return;
     }
 
-    Decide_Combat(pMonster, BlackBoard, fTimeDelta);
-}
-
-CMonster_Brain_FSM*  CMonster_Brain_FSM::Create()
-{
-    CMonster_Brain_FSM* pInstance = new CMonster_Brain_FSM();
-
-    if (FAILED(pInstance->Initialize()))
-    {
-        MSG_BOX("Failed to Created: CMonster_Brain_FSM");
-        Safe_Release(pInstance);
-    }
-
-    return pInstance;
+    Decide_Internal(BlackBoard, fTimeDelta);
 }
 
 void CMonster_Brain_FSM::Free()

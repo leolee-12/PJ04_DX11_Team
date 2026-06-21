@@ -17,39 +17,37 @@ MONSTER_STATE_TYPE CMonster_State_KnockBack::Get_StateType()
 	return MONSTER_STATE_TYPE::KNOCK_BACK;
 }
 
-void CMonster_State_KnockBack::On_Enter(CMonster* pMonster)
+void CMonster_State_KnockBack::Enter()
 {
-	if (pMonster == nullptr)
+	if (m_pOwner == nullptr)
 		return;
 
 	// 재 진입 시 피격마다 리셋되게 
 	m_fTimer = 0.f;
 
-	if (CAnimator* pAnim = pMonster->Get_BodyAnimator())
-		pAnim->Play(&m_PlayInfo);
+	if (m_pAnimator && !m_PlayInfo.strAniName.empty())
+		m_pAnimator->Play(&m_PlayInfo);
 }
 
-void CMonster_State_KnockBack::On_Update(CMonster* pMonster, _float fTimeDelta)
+void CMonster_State_KnockBack::Update(_float fTimeDelta)
 {
-	if (pMonster == nullptr)
+	if (m_pOwner == nullptr)
 		return;
 
 	m_fTimer += fTimeDelta;
 
-	CMonster_Movement* pMove = pMonster->Get_Movement();
-
-	const _bool bLanded = (pMove != nullptr && !pMove->Is_Launched());
+	const _bool bLanded = (m_pMovement && !m_pMovement->Is_Launched());
 	const _bool bTimeOut = (m_fTimer >= m_fMaxTime);
 	if (!bLanded && !bTimeOut)
 		return;					// 런치 + 모든 바운스 동안 루프 유지
 
 	// TODO : 사망 연결 후 IS_Dead() ? Set_Deadt() : 아래 로직
-	pMonster->Change_State(MONSTER_STATE_TYPE::IDLE);
+	m_pOwner->Change_State(MONSTER_STATE_TYPE::IDLE);
 }
 
-void CMonster_State_KnockBack::On_Exit(CMonster* pMonster)
+void CMonster_State_KnockBack::Exit(MONSTER_STATE_TYPE eNextState)
 {
-	if (pMonster == nullptr)
+	if (m_pOwner == nullptr)
 		return;
 }
 

@@ -1,24 +1,23 @@
 #pragma once
-#include "Monster_StateT.h"
+#include "Monster_State.h"
 
 NS_BEGIN(Client)
 class CMonster;
 
-class CMonster_State_Captured final : public CMonster_StateT<CMonster>
+class CMonster_State_Captured : public CMonster_State
 {
-private:
+protected:
 	CMonster_State_Captured() = default;
 	virtual ~CMonster_State_Captured() = default;
 
 protected:
-	virtual HRESULT					Initialize() override;
-	virtual HRESULT					Initialize(const ANI_PLAY_INFO& tInfo, _float fSpped = 0.f) override;
+	virtual HRESULT					Initialize(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f) override;
 
 public:
 	virtual MONSTER_STATE_TYPE		Get_StateType() override;
-	virtual void					On_Enter(CMonster* pMonster) override;
-	virtual void					On_Update(CMonster* pMonster, _float fTimeDelta) override;
-	virtual void					On_Exit(CMonster* pMonster) override;
+	virtual void					Enter() override;
+	virtual void					Update(_float fTimeDelta) override;
+	virtual void					Exit(MONSTER_STATE_TYPE eNextState) override;
 
 private:
 	_float							m_fPullSpeed = { 0.f };
@@ -31,8 +30,7 @@ private:
 	static constexpr _float			s_fShrinkLerp = 2.f;
 
 public:
-	static CMonster_State_Captured* Create(const ANI_PLAY_INFO& tInfo, _float fSpped = 0.f);
-	static CMonster_State_Captured* Create();
+	static CMonster_State_Captured* Create(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f);
 
 protected:
 	virtual void					Free() override;

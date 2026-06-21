@@ -17,35 +17,35 @@ MONSTER_STATE_TYPE CMonster_State_Chase::Get_StateType()
 	return MONSTER_STATE_TYPE::CHASE;
 }
 
-void CMonster_State_Chase::On_Enter(CMonster* pMonster)
+void CMonster_State_Chase::Enter()
 {
-	if (pMonster == nullptr)
+	if (m_pOwner == nullptr)
 		return;
 
-	if (CMonster_Movement* pMove = pMonster->Get_Movement())
-		pMove->Set_MoveSpeed(m_fSpeed);
+	if (m_pMovement)
+		m_pMovement->Set_MoveSpeed(m_fSpeed);
 
-	if (CAnimator* pAnim = pMonster->Get_BodyAnimator())
-		pAnim->Play(&m_PlayInfo);
+	if (m_pAnimator && !m_PlayInfo.strAniName.empty())
+		m_pAnimator->Play(&m_PlayInfo);
 }
 
-void CMonster_State_Chase::On_Update(CMonster* pMonster, _float fTimeDelta)
+void CMonster_State_Chase::Update(_float fTimeDelta)
 {
-	if (pMonster == nullptr)
+	if (m_pOwner == nullptr)
 		return;
 
-	const MONSTER_BLACKBOARD& BB = pMonster->Get_BlackBoard();
+	const MONSTER_BLACKBOARD& BB = m_pOwner->Get_BlackBoard();
 
 	if (BB.pTarget == nullptr)
 		return;
 
 	// TODO : 지평면에서만 움직이는 애들 / 공중에서 추격하는 애들 구분할 것
-	pMonster->Add_MoveDir(BB.vDirToTargetXZ);
+	m_pOwner->Add_MoveDir(BB.vDirToTargetXZ);
 }
 
-void CMonster_State_Chase::On_Exit(CMonster* pMonster)
+void CMonster_State_Chase::Exit(MONSTER_STATE_TYPE eNextState)
 {
-	if (pMonster == nullptr)
+	if (m_pOwner == nullptr)
 		return;
 }
 

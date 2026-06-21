@@ -28,6 +28,10 @@ HRESULT CMiniBoss::Initialize(void* pArg)
         Subscribe_Event(pTag, [this](void*) { Appear(); });
 
     m_pCaptureState = CMonster_State_Captured::Create();
+    if (m_pCaptureState == nullptr)
+        return E_FAIL;
+
+    m_pCaptureState->Set_Owner(this);
 
     m_TraitFlags = MT_NONE;
 
@@ -53,7 +57,7 @@ void CMiniBoss::Die()
 void CMiniBoss::Be_Captured(CGameObject* pInhaler)
 {
     m_pCaptor = pInhaler;
-    m_pCaptureState->Enter(this);     // CCT off + 초기화 (상태 내부)
+    m_pCaptureState->Enter();     // CCT off + 초기화 (상태 내부)
     m_eLife = EMINIBOSS_LIFE::EATEN;
 }
 
@@ -103,7 +107,7 @@ void CMiniBoss::Update_AI(_float fTimeDelta)
             return;
 
         case EMINIBOSS_LIFE::EATEN:
-            m_pCaptureState->Update(this, fTimeDelta); 
+            m_pCaptureState->Update(fTimeDelta); 
             return;
     }
 }

@@ -26,7 +26,7 @@ HRESULT CAnimator::Initialize(void* pArg)
     m_pModel = pDesc->pModel;
     Safe_AddRef(m_pModel);
 
-    m_strDataFilePath = pDesc->strDataFile;     // 불러온 AnimEvent.json 저장 -> 에디터에서 저장 및 로드에 사용
+    m_strDataFilePath = !pDesc->strDataFile.empty() ? pDesc->strDataFile : Make_DefaultDataFilePath();
 
     if (!pDesc->strDataFile.empty())
         Load_FromFile(m_strDataFilePath);
@@ -105,17 +105,34 @@ _float CAnimator::Get_Progress() const
     return m_pModel ? m_pModel->Get_CurrentAnimProgress() : 0.f;
 }
 
-void CAnimator::Set_Mask(const _string& strClip, const _string& strRootBone, _bool bLoop, _float fMaskTarget, _float fMaskBlendTime)
+void CAnimator::Set_Mask(const _char* szClip, const _char* szRootBone, _bool bLoop, _float fMaskTarget, _float fMaskBlendTime)
+{
+    const _char* Roots[] = { szRootBone };
+    Set_Mask(szClip, Roots, 1, bLoop, fMaskTarget, fMaskBlendTime);
+}
+
+void CAnimator::Set_Mask(const _char* szClip, const _char* const* pRoots, _uint iRootCount, _bool bLoop, _float fMaskTarget, _float fMaskBlendTime)
 {
     m_fMaskWeight = 0.f;
-    m_strMaskClip = strClip;
-    m_strMaskRootBone = strRootBone;
+    m_strMaskClip = (szClip != nullptr) ? szClip : "";
+
     m_bMaskLoop = bLoop;
     m_fMaskTarget = fMaskTarget;
     m_fMaskBlendTime = fMaskBlendTime;
 
-    if (m_pModel)
-        m_pModel->Capture_MaskSnapShot(strRootBone);
+    if (nullptr == m_pModel)
+        return;
+
+    vector<_string> Roots;
+    Roots.reserve(iRootCount);
+    for (_uint i = 0; i < iRootCount; ++i)
+    {
+        const _char* sz = pRoots ? pRoots[i] : nullptr;
+        if (sz != nullptr)
+            Roots.emplace_back(sz);
+    }
+
+    m_pModel->Capture_MaskSnapShot(Roots);
 }
 
 void CAnimator::Clear_Mask(_float fMaskBlendTime)
@@ -128,7 +145,6 @@ void CAnimator::Clear_Mask(_float fMaskBlendTime)
     {
         m_fMaskWeight = 0.f;
         m_strMaskClip.clear();
-        m_strMaskRootBone.clear();
     }
     else
         m_fMaskBlendTime = fMaskBlendTime;
@@ -157,7 +173,7 @@ void CAnimator::Update(_float fTimeDelta)
     if (!m_bPaused)
     {
         if (!m_strMaskClip.empty() && m_fMaskWeight > 0.f)
-            m_bFinished = m_pModel->Play_Animation(fTimeDelta, m_strMaskClip, m_strMaskRootBone, m_fPlaySpeed, m_bMaskLoop, m_fMaskWeight);
+            m_bFinished = m_pModel->Play_Animation(fTimeDelta, m_strMaskClip, m_fPlaySpeed, m_bMaskLoop, m_fMaskWeight);
         else
             m_bFinished = m_pModel->Play_Animation(fTimeDelta, m_fPlaySpeed);
     }
@@ -227,6 +243,32 @@ void CAnimator::Reset_RuntimeState(ANIM_EVENT_TRACK* pTrack)
     for (auto& e : pTrack->Events) e.bActive = false;
 }
 
+_wstring CAnimator::Make_DefaultDataFilePath() const
+{
+    if (nullptr == m_pModel)
+        return L"";
+
+    const _wstring& strModelPath = m_pModel->Get_ModelPath();
+    if (strModelPath.empty())
+        return L"";
+
+    filesystem::path ModelPath(strModelPath);
+    filesystem::path EventPath = ModelPath.parent_path() / (ModelPath.stem().wstring() + L"_AnimEvents.json");
+
+    return EventPath.wstring();
+}
+
+_wstring CAnimator::Resolve_DataFilePath(const _wstring& strPath) const
+{
+    if (!strPath.empty())
+        return strPath;
+
+    if (!m_strDataFilePath.empty())
+        return m_strDataFilePath;
+
+    return Make_DefaultDataFilePath();
+}
+
 // ── 에디터 데이터 ──
 ANIM_EVENT_TRACK& CAnimator::Get_Track(const string& strAnimName)
 {
@@ -283,21 +325,40 @@ void CAnimator::Deserialize_Internal(const json& j)
 
 HRESULT CAnimator::Load_FromFile(const wstring& strPath)
 {
-    ifstream fin(strPath); 
+    const _wstring strResolvedPath = Resolve_DataFilePath(strPath);
+    if (strResolvedPath.empty())
+        return E_FAIL;
+
+    ifstream fin(strResolvedPath); 
     if (!fin.is_open()) 
         return E_FAIL;
+
     json j;
     fin >> j;
     fin.close(); 
+
     Deserialize(j); 
-    m_strDataFilePath = strPath;
+    m_strDataFilePath = strResolvedPath;
+
     return S_OK;
 }
 
-HRESULT CAnimator::Save_ToFile(const wstring& strPath) const
+HRESULT CAnimator::Save_ToFile(const wstring& strPath)
 {
-    ofstream fout(strPath); if (!fout.is_open()) return E_FAIL;
-    fout << Serialize().dump(2); fout.close(); return S_OK;
+    const _wstring strResolvedPath = Resolve_DataFilePath(strPath);
+    if (strResolvedPath.empty())
+        return E_FAIL;
+
+    ofstream fout(strResolvedPath);
+    if (!fout.is_open()) 
+        return E_FAIL;
+
+    fout << Serialize().dump(2); 
+    fout.close(); 
+
+    m_strDataFilePath = strResolvedPath;
+
+    return S_OK;
 }
 
 CAnimator* CAnimator::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

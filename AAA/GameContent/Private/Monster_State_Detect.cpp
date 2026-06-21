@@ -14,29 +14,27 @@ MONSTER_STATE_TYPE CMonster_State_Detect::Get_StateType()
 	return MONSTER_STATE_TYPE::DETECT;
 }
 
-void CMonster_State_Detect::On_Enter(CMonster* pMonster)
+void CMonster_State_Detect::Enter()
 {
-	if (pMonster == nullptr)
+	if (m_pOwner == nullptr)
 		return;
 
-	if (CAnimator* pAnim = pMonster->Get_BodyAnimator())
-		pAnim->Play(&m_PlayInfo);
+	if (m_pAnimator && !m_PlayInfo.strAniName.empty())
+		m_pAnimator->Play(&m_PlayInfo);
 }
 
-void CMonster_State_Detect::On_Update(CMonster* pMonster, _float fTimeDelta)
+void CMonster_State_Detect::Update(_float fTimeDelta)
 {
-	if (pMonster == nullptr)
+	if (m_pOwner == nullptr)
 		return;
 
-	CAnimator* pAnim = pMonster->Get_BodyAnimator();
-
-	if (pAnim != nullptr && pAnim->Is_Finished())
-		pMonster->Change_State(MONSTER_STATE_TYPE::IDLE);
+	if (m_pAnimator && m_pAnimator->Is_Finished())
+		m_pOwner->Change_State(MONSTER_STATE_TYPE::IDLE);
 }
 
-void CMonster_State_Detect::On_Exit(CMonster* pMonster)
+void CMonster_State_Detect::Exit(MONSTER_STATE_TYPE eNextState)
 {
-	if (pMonster == nullptr)
+	if (m_pOwner == nullptr)
 		return;
 }
 
