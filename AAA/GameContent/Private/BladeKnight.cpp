@@ -51,7 +51,7 @@ HRESULT CBladeKnight::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
-    //m_eCopyAbility = COPY_ABILITY_TYPE::SWORD;
+    m_eCopyAbility = COPY_ABILITY_TYPE::SWORD;
 
     return S_OK;
 }

@@ -45,10 +45,11 @@ public:
 
 protected:
     virtual HRESULT        Ready_PartObjects() override;
+    virtual HRESULT        Ready_AnimEvents() override;
     virtual CMonsterBrain* Create_Brain() override;
     virtual const _tchar*  Get_AppearEventTag() const override { return TEXT("GigantEdge_Appear"); }
 
-    virtual CAnimator*      Get_BodyAnimator() const override;
+    virtual CAnimator*     Get_BodyAnimator() const override;
     virtual void           Play_Intro() override;
     virtual _bool          Is_Intro_Finished() const override;
     virtual void           Play_Death() override;
@@ -70,6 +71,8 @@ private:
 
 private:
     virtual _bool Block_Hit(const ATTACK_INFO& tInfo) override;
+
+    virtual void On_Death_Reaction(const ATTACK_INFO& tInfo) override;
 
 #ifdef _DEBUG
 public:

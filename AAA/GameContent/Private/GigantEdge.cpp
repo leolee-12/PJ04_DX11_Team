@@ -96,8 +96,15 @@ _bool CGigantEdge::Is_Death_Finished() const
 
 void CMiniBoss::On_Damaged(const ATTACK_INFO& tInfo)
 {
-    __super::On_Damaged(tInfo);
+    On_Hit_Reaction(tInfo);
     Publish_HP();
+}
+
+void CMiniBoss::On_Death(const ATTACK_INFO& tInfo)
+{
+    On_Death_Reaction(tInfo);
+    Publish_HP();
+    Die();
 }
 
 _bool CGigantEdge::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
@@ -138,6 +145,14 @@ _bool CGigantEdge::Block_Hit(const ATTACK_INFO& tInfo)
     return true;
 }
 
+void CGigantEdge::On_Death_Reaction(const ATTACK_INFO& tInfo)
+{
+    if (m_pSword)
+        m_pSword->Set_HitBox(false);
+    if (m_pHurtBox)
+        m_pHurtBox->Set_Enabled(false);
+}
+
 #ifdef _DEBUG
 void CGigantEdge::Debug_KeyInput()
 {
@@ -149,7 +164,8 @@ void CGigantEdge::Debug_KeyInput()
         m_bDbgSwordDrawn = !m_bDbgSwordDrawn;
         m_pSword->Set_Drawn(m_bDbgSwordDrawn);
     }
-    if (m_pGameInstance_Proxy->Key_Down(DIK_0)) Appear();                          // HIDDEN→INTRO→ACTIVE
+    if (m_pGameInstance_Proxy->Key_Down(DIK_0)) 
+        Appear();                          
     //if (m_pGameInstance_Proxy->Key_Down(DIK_G)) m_bGroggyRequested = true;         // 그로기 분기 진입
     //if (m_pGameInstance_Proxy->Key_Down(DIK_R)) m_bDbgInRange = !m_bDbgInRange;    // 사거리 토글 (공격↔추격)
     //if (m_pGameInstance_Proxy->Key_Down(DIK_M)) m_bDbgWalkInPlace = !m_bDbgWalkInPlace;
@@ -208,6 +224,54 @@ HRESULT CGigantEdge::Ready_PartObjects()
         CGigantEdge_Shield::PROTOTYPE_TAG, CGigantEdge_Shield::PART_TAG,
         m_pBody->Get_BoneMatrixPtr("LHaveL"));
     if (!m_pShield) return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT CGigantEdge::Ready_AnimEvents()
+{
+    CAnimator* pAnim = m_pBody->Get_Animator();
+    if (!pAnim)
+        return E_FAIL;
+
+    CAnimator::EventCallback CallBack = [this](const ANIM_EVENT& Event, ANIM_EVENT_PHASE Phase)
+        {
+            OutputDebugStringA(("[AnimEvt] clip=" + m_pBody->Get_Animator()->Get_CurrentAnimName()
+                + " type=" + std::to_string(Event.iEventType)
+                + " p=" + std::to_string(m_pBody->Get_Animator()->Get_Progress()) + "\n").c_str());
+
+            EANIM_EVENT eType = static_cast<EANIM_EVENT>(Event.iEventType);
+            switch (eType)
+            {
+                case EANIM_EVENT::OnOffPart:
+                {
+                    switch (Phase)
+                    {
+                        case ANIM_EVENT_PHASE::POINT:
+                        {
+                            switch (Event.iIntParam)
+                            {
+                                case 0:
+                                    m_pSword->Set_Drawn(true);
+                                    break;
+                                case 1:
+                                {
+                                    m_pSword->Set_Drawn(false);
+                                    m_pShield->Set_Drawn(true);
+                                    break;
+                                }
+                                case 2:
+                                {
+                                    m_pShield->Set_Drawn(false);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        };
+    pAnim->Set_EventCallback(CallBack);
 
     return S_OK;
 }

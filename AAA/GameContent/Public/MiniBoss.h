@@ -52,7 +52,11 @@ protected:
     virtual void   Play_DeathLoop() {}
     virtual _bool  Is_Death_Finished() const = 0;
     virtual _float Get_CorpseLinger() const { return 5.f; }
+
     virtual void   On_Damaged(const ATTACK_INFO& tInfo) override;
+    virtual void   On_Death(const ATTACK_INFO& tInfo) override;   
+    virtual void   On_Hit_Reaction(const ATTACK_INFO& tInfo) {}
+    virtual void   On_Death_Reaction(const ATTACK_INFO& tInfo) {}
 
     CGameObject*   Find_Player() const;
     void           Publish_HP();

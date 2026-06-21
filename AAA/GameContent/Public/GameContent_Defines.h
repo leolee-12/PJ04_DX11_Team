@@ -1,6 +1,7 @@
 #pragma once
 #include "GameContent_enum.h"
 #include "GameContrnt_Events.h"
+#include "GameContent_AnimEvents.h"
 
 #ifdef GAMECONTENT_EXPORTS
 #define CLIENT_DLL __declspec(dllexport)
