@@ -11,6 +11,8 @@ struct LD_MODEL_REQUIREMENT
 	_wstring strPrototypeTag;
 	_string strFilePath;
 	_uint iPrototypeLevel = ETOUI(LEVEL::GAMEPLAY);
+	MODEL eModelType = { MODEL::NONANIM };
+	_bool bCookCollisionMesh = { false };
 };
 
 struct LD_SPAWN_SPEC
@@ -18,12 +20,11 @@ struct LD_SPAWN_SPEC
 	_wstring strObjectName;
 	_wstring strPrototypeTag;
 	_wstring strLayerTag;
-	LD_CATEGORY eCategory = LD_CATEGORY::UNSUPPORTED;
-
-	LD_BREAKABLE_TYPE eBreakableType = LD_BREAKABLE_TYPE::UNKNOWN;
+	LD_CATEGORY eCategory = { LD_CATEGORY::UNSUPPORTED };
 	_wstring wstrModelProtoTag;
+	MODEL eModelType = { MODEL::NONANIM };
 
-	LD_OBJECT_PROTOTYPE_FACTORY pPrototypeFactory = nullptr;
+	LD_OBJECT_PROTOTYPE_FACTORY pPrototypeFactory = { nullptr };
 	vector<LD_MODEL_REQUIREMENT> ModelRequirements;
 };
 

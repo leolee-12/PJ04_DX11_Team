@@ -127,7 +127,6 @@ _bool CLevelDesign_Registry::Resolve(const LD_OBJECT_ENTRY& Desc, LD_RESOLVED_SP
 			std::get_if<LD_BREAKABLE_OBJECT_DESC>(&pOutResolved->ObjectDesc);
 
 		if (nullptr == pBreakableDesc
-			|| pSpec->eBreakableType == LD_BREAKABLE_TYPE::UNKNOWN
 			|| pSpec->wstrModelProtoTag.empty())
 		{
 			pSpec = &Get_FallbackSpec();
@@ -146,7 +145,7 @@ _bool CLevelDesign_Registry::Resolve(const LD_OBJECT_ENTRY& Desc, LD_RESOLVED_SP
 		if (nullptr == pBreakableDesc)
 			return false;
 
-		pBreakableDesc->eType = pSpec->eBreakableType;
+		pBreakableDesc->eModelType = pSpec->eModelType;
 		pBreakableDesc->wstrModelProtoTag = pSpec->wstrModelProtoTag;
 	}
 
@@ -236,7 +235,6 @@ void CLevelDesign_Registry::Register_ItemsAndBreakables()
 	BreakableSpec.strPrototypeTag = CLevelDesign_Breakable::PROTOTYPE_TAG;
 	BreakableSpec.strLayerTag = L"Layer_LevelDesign_Gimmick";
 	BreakableSpec.eCategory = LD_CATEGORY::BREAKABLE;
-	BreakableSpec.eBreakableType = LD_BREAKABLE_TYPE::STAR_BLOCK;
 	BreakableSpec.pPrototypeFactory = &Create_BreakablePrototype;
 
 	BreakableSpec.strObjectName = L"StarBlock";
@@ -259,6 +257,67 @@ void CLevelDesign_Registry::Register_ItemsAndBreakables()
 			ETOUI(LEVEL::GAMEPLAY)
 		}
 	};
+	Register(BreakableSpec.strObjectName, BreakableSpec);
+
+	BreakableSpec.strObjectName = L"WoodBox";
+	BreakableSpec.wstrModelProtoTag = CLevelDesign_Breakable::WOODBOX_MODEL_PROTO_TAG;
+	BreakableSpec.eModelType = MODEL::ANIM;
+	BreakableSpec.ModelRequirements = {
+		{
+			CLevelDesign_Breakable::WOODBOX_MODEL_PROTO_TAG,
+			"../../Resources/Map/Gimmick/Anim/BoxWood/BoxWood.ysh",
+			ETOUI(LEVEL::GAMEPLAY),
+			MODEL::ANIM
+		}
+	};
+	Register(BreakableSpec.strObjectName, BreakableSpec);
+
+	BreakableSpec.strObjectName = L"BoxPlastic";
+	BreakableSpec.wstrModelProtoTag = CLevelDesign_Breakable::PLASTICBOX_MODEL_PROTO_TAG;
+	BreakableSpec.eModelType = MODEL::ANIM;
+	BreakableSpec.ModelRequirements = {
+		{
+			CLevelDesign_Breakable::PLASTICBOX_MODEL_PROTO_TAG,
+			"../../Resources/Map/Gimmick/Anim/BoxPlastic/BoxPlastic.ysh",
+			ETOUI(LEVEL::GAMEPLAY),
+			MODEL::ANIM
+		}
+	};
+	Register(BreakableSpec.strObjectName, BreakableSpec);
+
+	BreakableSpec.strObjectName = L"BreakableRockS";
+	BreakableSpec.wstrModelProtoTag =
+		CLevelDesign_Breakable::BREAKABLE_ROCK_S_MODEL_PROTO_TAG;
+	BreakableSpec.eModelType = MODEL::NONANIM;
+	BreakableSpec.ModelRequirements =
+	{
+		{
+			CLevelDesign_Breakable::BREAKABLE_ROCK_S_MODEL_PROTO_TAG,
+			"../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_S.ysh",
+			ETOUI(LEVEL::GAMEPLAY),
+			MODEL::NONANIM,
+			true
+		}
+	};
+	Register(BreakableSpec.strObjectName, BreakableSpec);
+
+	BreakableSpec.strObjectName = L"BreakableRockM";
+	BreakableSpec.wstrModelProtoTag =
+		CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG;
+	BreakableSpec.eModelType = MODEL::NONANIM;
+	BreakableSpec.ModelRequirements =
+	{
+		{
+			CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG,
+			"../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh",
+			ETOUI(LEVEL::GAMEPLAY),
+			MODEL::NONANIM,
+			true
+		}
+	};
+	Register(BreakableSpec.strObjectName, BreakableSpec);
+
+	BreakableSpec.strObjectName = L"BreakableRockMForBridge";
 	Register(BreakableSpec.strObjectName, BreakableSpec);
 
 	Register_Unsupported(L"Bush2BasicS", LD_CATEGORY::FOLIAGE, L"Layer_LevelDesign_Gimmick");

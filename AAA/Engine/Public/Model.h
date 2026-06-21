@@ -134,6 +134,7 @@ private:
 	HRESULT Ready_Animations(const vector<ANIMATION_DATA>& animations);
 
 	HRESULT Ready_NonAnimEx(const _char* pModelFilePath, _fmatrix PreTransformMatrix);
+	HRESULT Ready_AnimEx(const _char* pModelFilePath, _fmatrix PreTransformMatrix);
 	HRESULT Ready_NonAnim(const _char* pModelFilePath, _fmatrix PreTransformMatrix);
 	HRESULT Ready_Anim(const _char* pModelFilePath, _fmatrix PreTransformMatrix);
 

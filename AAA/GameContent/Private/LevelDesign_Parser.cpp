@@ -183,11 +183,14 @@ void CLevelDesign_Parser::Parse_ObjectSection(
 			continue;
 		}
 
-		if (LD_BREAKABLE_TYPE::UNKNOWN != CLevelDesign_Breakable::Resolve_Breakable(CommonDesc.strObjectName))
+		const LD_BREAKABLE_TYPE eBreakableType =
+			CLevelDesign_Breakable::Resolve_BreakableType(CommonDesc.strObjectName);
+		if (LD_BREAKABLE_TYPE::UNKNOWN != eBreakableType)
 		{
 			LD_BREAKABLE_OBJECT_DESC Desc{};
 			static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
 			Desc.eCategory = LD_CATEGORY::BREAKABLE;
+			Desc.eType = eBreakableType;
 
 			pOutDescs->emplace_back(std::move(Desc));
 			continue;

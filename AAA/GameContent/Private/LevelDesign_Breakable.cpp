@@ -124,16 +124,36 @@ HRESULT CLevelDesign_Breakable::Render()
 		if (FAILED(BindMaterial("g_MRATexture", MTEX_TYPE::METALNESS, DEFAULT_TEXTURE::MRA)))			return E_FAIL;
 		if (FAILED(BindMaterial("g_UnknownTexture", MTEX_TYPE::UNKNOWN, DEFAULT_TEXTURE::BLACK)))		return E_FAIL;
 
-		const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
-		_uint iFlags = Layer.iFlags;
-		_float fDissolve = 0.f;
+		if (MODEL::ANIM == m_tBreakableDesc.eModelType)
+		{
+			if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+				return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint))))			return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))		return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve", &fDissolve, sizeof(_float))))			return E_FAIL;
+			if (FAILED(m_pShaderCom->Begin(0u)))
+				return E_FAIL;
+		}
+		else
+		{
+			const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
+			_uint iFlags = Layer.iFlags;
+			_float fDissolve = 0.f;
 
-		if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::DMN)))
-			return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue(
+				"g_iUVIndex", &iUVIndex, sizeof(_uint))))
+				return E_FAIL;
+
+			if (FAILED(m_pShaderCom->Bind_RawValue(
+				"g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))
+				return E_FAIL;
+
+			if (FAILED(m_pShaderCom->Bind_RawValue(
+				"g_fDissolve", &fDissolve, sizeof(_float))))
+				return E_FAIL;
+
+			if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::DMN)))
+				return E_FAIL;
+		}
+
 		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;
 	}
@@ -149,22 +169,23 @@ void CLevelDesign_Breakable::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
 }
 
-void CLevelDesign_Breakable::Ready_BreakableCatalog()
+LD_BREAKABLE_TYPE CLevelDesign_Breakable::Resolve_BreakableType(const _wstring& wstrObjName)
 {
-	s_BreakableCatalog.push_back({ L"StarBlock",		LD_BREAKABLE_TYPE::STAR_BLOCK });
-	s_BreakableCatalog.push_back({ L"StarBlockBig",		LD_BREAKABLE_TYPE::STAR_BLOCK_BIG });
-	s_BreakableCatalog.push_back({ L"WoodBox",			LD_BREAKABLE_TYPE::WOOD_BOX });
-	s_BreakableCatalog.push_back({ L"PlasticBox",		LD_BREAKABLE_TYPE::PLASTIC_BOX });
-}
-
-LD_BREAKABLE_TYPE CLevelDesign_Breakable::Resolve_Breakable(const _wstring& wstrObjName)
-{
-	for (auto pair : s_BreakableCatalog)
+	static const pair<const _tchar*, LD_BREAKABLE_TYPE> Catalog[] =
 	{
-		if (JsonUtils::Equals_NoCase(pair.first.c_str(), wstrObjName.c_str()))
-		{
-			return pair.second;
-		}
+		{ L"StarBlock",					LD_BREAKABLE_TYPE::STAR_BLOCK },
+		{ L"StarBlockBig",				LD_BREAKABLE_TYPE::STAR_BLOCK_BIG },
+		{ L"WoodBox",					LD_BREAKABLE_TYPE::WOOD_BOX },
+		{ L"BoxPlastic",				LD_BREAKABLE_TYPE::PLASTIC_BOX },
+		{ L"BreakableRockS",			LD_BREAKABLE_TYPE::BREAKABLE_ROCK },
+		{ L"BreakableRockM",			LD_BREAKABLE_TYPE::BREAKABLE_ROCK_BIG },
+		{ L"BreakableRockMForBridge",	LD_BREAKABLE_TYPE::BREAKABLE_ROCK_BIG }
+	};
+
+	for (const auto& [pName, eType] : Catalog)
+	{
+		if (JsonUtils::Equals_NoCase(pName, wstrObjName.c_str()))
+			return eType;
 	}
 
 	return LD_BREAKABLE_TYPE::UNKNOWN;
@@ -187,7 +208,11 @@ HRESULT CLevelDesign_Breakable::Ready_Components()
 	if (nullptr == pModelProtoTag)
 		return E_FAIL;
 
-	m_pShaderCom = Add_Component<CShader>(Shader_NonAnimMesh_PBR.iLevelID, Shader_NonAnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
+	const auto& ShaderDesc = MODEL::ANIM == m_tBreakableDesc.eModelType
+		? Shader_AnimMesh_PBR
+		: Shader_NonAnimMesh_PBR;
+
+	m_pShaderCom = Add_Component<CShader>(ShaderDesc.iLevelID, ShaderDesc.szProtoTag, TEXT("Com_Shader"));
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 

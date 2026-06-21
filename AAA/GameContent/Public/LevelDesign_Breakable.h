@@ -18,9 +18,13 @@ class CLevelDesign_Breakable final : public CLevelDesignObject
 
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_LevelDesign_Breakable";
-	static constexpr const _tchar* STARBLOCK_H1W1_MODEL_PROTO_TAG = L"Prototype_Component_Model_LevelDesign_Star_H1W1";
-	static constexpr const _tchar* STARBLOCK_H2W2_MODEL_PROTO_TAG = L"Prototype_Component_Model_LevelDesign_Star_H2W2";
-	static constexpr const _tchar* STARBLOCK_H3W3_MODEL_PROTO_TAG = L"Prototype_Component_Model_LevelDesign_Star_H3W3";
+	static constexpr const _tchar* STARBLOCK_H1W1_MODEL_PROTO_TAG = L"Prototype_Component_Model_Star_H1W1";
+	static constexpr const _tchar* STARBLOCK_H2W2_MODEL_PROTO_TAG = L"Prototype_Component_Model_Star_H2W2";
+	static constexpr const _tchar* STARBLOCK_H3W3_MODEL_PROTO_TAG = L"Prototype_Component_Model_Star_H3W3";
+	static constexpr const _tchar* WOODBOX_MODEL_PROTO_TAG = L"Prototype_Component_Model_BoxWood";
+	static constexpr const _tchar* PLASTICBOX_MODEL_PROTO_TAG = L"Prototype_Component_Model_BoxPlastic";
+	static constexpr const _tchar* BREAKABLE_ROCK_S_MODEL_PROTO_TAG = L"Prototype_Component_Model_BreakableRock_S";
+	static constexpr const _tchar* BREAKABLE_ROCK_M_MODEL_PROTO_TAG = L"Prototype_Component_Model_BreakableRock_M";
 	static constexpr const _tchar* STARBLOCK_MODEL_PROTO_TAG = STARBLOCK_H1W1_MODEL_PROTO_TAG;
 
 private:
@@ -35,8 +39,7 @@ public:
 	virtual HRESULT Render() override;
 	virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
-	static void					Ready_BreakableCatalog();
-	static LD_BREAKABLE_TYPE	Resolve_Breakable(const _wstring& wstrObjName);
+	static LD_BREAKABLE_TYPE	Resolve_BreakableType(const _wstring& wstrObjName);
 
 public:
 	const LD_BREAKABLE_OBJECT_DESC&	Get_BreakableDesc() const { return m_tBreakableDesc; }
@@ -47,8 +50,6 @@ private:
 	physx::PxRigidStatic* m_pPhysicsActor = { nullptr };
 
 	LD_BREAKABLE_OBJECT_DESC m_tBreakableDesc = {};
-
-	static vector<pair<_wstring, LD_BREAKABLE_TYPE>> s_BreakableCatalog;
 
 private:
 	virtual	HRESULT	Validate_Desc() override;
