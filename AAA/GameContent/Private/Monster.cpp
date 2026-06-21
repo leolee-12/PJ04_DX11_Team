@@ -394,7 +394,7 @@ void CMonster::Check_AirborneReflex()
 
 CMonsterBrain* CMonster::Create_Brain()
 {
-	return CMonster_Brain_FSM::Create(); // 기본은 FSM
+	return nullptr; // 기본은 FSM
 }
 
 HRESULT CMonster::Create_Movement()

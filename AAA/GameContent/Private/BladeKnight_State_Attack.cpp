@@ -3,8 +3,11 @@
 #include "BladeKnight_Body.h"
 #include "Monster_Movement.h"
 
-HRESULT CBladeKnight_State_Attack::Initialize()
+HRESULT CBladeKnight_State_Attack::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpeed)
 {
+	if (FAILED(__super::Initialize(tInfo, fSpeed)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -13,70 +16,65 @@ MONSTER_STATE_TYPE CBladeKnight_State_Attack::Get_StateType()
 	return MONSTER_STATE_TYPE::ATTACK;
 }
 
-void CBladeKnight_State_Attack::On_Enter(CBladeKnight* pBladeKnight)
+void CBladeKnight_State_Attack::Enter()
 {
-	if (nullptr == pBladeKnight)
+	if (nullptr == m_pOwner)
 		return;
 
-	const MONSTER_BLACKBOARD& BB = pBladeKnight->Get_BlackBoard();
+	const MONSTER_BLACKBOARD& BB = m_pOwner->Get_BlackBoard();
+
 	m_vLungeDir = BB.vDirToTargetXZ;
 
 	_vector vDir = XMLoadFloat3(&m_vLungeDir);
 	if (!XMVector3Equal(vDir, XMVectorZero()))
 	{
-		_vector vMyPos = pBladeKnight->Get_Transform()->Get_State(STATE::POSITION);
-		pBladeKnight->Get_Transform()->LookAt(vMyPos + vDir);
+		_vector vMyPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
+		m_pOwner->Get_Transform()->LookAt(vMyPos + vDir);
 	}
 
-	if (CMonster_Movement* pMovement = pBladeKnight->Get_Movement())
-		pMovement->Set_MoveSpeed(3.f);
+	if (m_pMovement)
+		m_pMovement->Set_MoveSpeed(3.f);
 
-	CBladeKnight_Body* pBody = pBladeKnight->Get_Body();
-	if (pBody == nullptr)
-		return;
-
-	CAnimator* pAnim = (pBody != nullptr) ? pBody->Get_Animator() : nullptr;
-	if (pAnim != nullptr)
+	if (m_pAnimator)
 	{
 		CAnimator::ANI_PLAY_INFO AniInfo{};
 		AniInfo.strAniName = "AttackStart";
 		AniInfo.bLoop = false;
 		AniInfo.fSpeed = 1.25f;
-		pAnim->Play(&AniInfo); // Queue 클리어 + 시작
+		m_pAnimator->Play(&AniInfo); // Queue 클리어 + 시작
 
 		AniInfo.strAniName = "Attack";
 		AniInfo.fSpeed = 1.25f;
-		pAnim->Enqueue(AniInfo);
+		m_pAnimator->Enqueue(AniInfo);
 	}
 }
 
-void CBladeKnight_State_Attack::On_Update(CBladeKnight* pBladeKnight, _float fTimeDelta)
+void CBladeKnight_State_Attack::Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
-	if (nullptr == pBladeKnight)
+	if (nullptr == m_pOwner)
 		return;
 
-	CAnimator* pAnim = pBladeKnight->Get_Body() ? pBladeKnight->Get_Body()->Get_Animator() : nullptr;
-	if (pAnim != nullptr && pAnim->Is_Finished())
+	if (m_pAnimator && m_pAnimator->Is_Finished())
 	{
-		pBladeKnight->Change_State(MONSTER_STATE_TYPE::RETREAT);
+		m_pOwner->Change_State(MONSTER_STATE_TYPE::RETREAT);
 		return;
 	}
 
-	if (pAnim && pAnim->Get_CurrentAnimName() != "AttackStart" && !pBladeKnight->Get_BlackBoard().bMoveLocked)
-		pBladeKnight->Add_MoveDir(m_vLungeDir);
+	if (m_pAnimator && m_pAnimator->Get_CurrentAnimName() != "AttackStart" && !m_pOwner->Get_BlackBoard().bMoveLocked)
+		m_pOwner->Add_MoveDir(m_vLungeDir);
 }
 
-void CBladeKnight_State_Attack::On_Exit(CBladeKnight* pBladeKnight)
+void CBladeKnight_State_Attack::Exit(MONSTER_STATE_TYPE eNextState)
 {
-	if (nullptr == pBladeKnight)
+	if (nullptr == m_pOwner)
 		return;
 }
 
-CBladeKnight_State_Attack* CBladeKnight_State_Attack::Create()
+CBladeKnight_State_Attack* CBladeKnight_State_Attack::Create(const ANI_PLAY_INFO& tInfo, _float fSpeed)
 {
 	CBladeKnight_State_Attack* pInstance = new CBladeKnight_State_Attack();
-	if (FAILED(pInstance->Initialize()))
+	if (FAILED(pInstance->Initialize(tInfo, fSpeed)))
 	{
 		MSG_BOX("Failed to Created : CBladeKnight_State_Attack");
 		Safe_Release(pInstance);

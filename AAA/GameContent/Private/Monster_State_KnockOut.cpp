@@ -17,37 +17,35 @@ MONSTER_STATE_TYPE CMonster_State_KnockOut::Get_StateType()
 	return MONSTER_STATE_TYPE::KNOCK_OUT;
 }
 
-void CMonster_State_KnockOut::On_Enter(CMonster* pMonster)
+void CMonster_State_KnockOut::Enter()
 {
-	if (pMonster == nullptr)
+	if (m_pOwner == nullptr)
 		return;
 
 	m_fTimer = 0.f;
 
-	if (CAnimator* pAnim = pMonster->Get_BodyAnimator())
-		pAnim->Play(&m_PlayInfo);
+	if (m_pAnimator && !m_PlayInfo.strAniName.empty())
+		m_pAnimator->Play(&m_PlayInfo);
 }
 
-void CMonster_State_KnockOut::On_Update(CMonster* pMonster, _float fTimeDelta)
+void CMonster_State_KnockOut::Update(_float fTimeDelta)
 {
-	if (pMonster == nullptr)
+	if (m_pOwner == nullptr)
 		return;
 
 	m_fTimer += fTimeDelta;
 
-	CMonster_Movement* pMove = pMonster->Get_Movement();
-
-	const _bool bLanded = (pMove != nullptr && !pMove->Is_Launched());
+	const _bool bLanded = (m_pMovement && !m_pMovement->Is_Launched());
 	const _bool bTimeOut = (m_fTimer >= m_fMaxTime);
 	if (!bLanded && !bTimeOut)
 		return;					// 런치 + 모든 바운스 동안 루프 유지
 
-	pMonster->Change_State(MONSTER_STATE_TYPE::IDLE);
+	m_pOwner->Change_State(MONSTER_STATE_TYPE::IDLE);
 }
 
-void CMonster_State_KnockOut::On_Exit(CMonster* pMonster)
+void CMonster_State_KnockOut::Exit(MONSTER_STATE_TYPE eNextState)
 {
-	if (pMonster == nullptr)
+	if (m_pOwner == nullptr)
 		return;
 }
 

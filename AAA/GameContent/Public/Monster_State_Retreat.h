@@ -4,11 +4,11 @@
 NS_BEGIN(Client)
 class CMonster;
 
-class CMonster_State_Fall  : public CMonster_State
+class CMonster_State_Retreat : public CMonster_State
 {
 protected:
-	CMonster_State_Fall() = default;
-	virtual ~CMonster_State_Fall() = default;
+	CMonster_State_Retreat() = default;
+	virtual ~CMonster_State_Retreat() = default;
 
 protected:
 	virtual HRESULT					Initialize(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f) override;
@@ -20,12 +20,11 @@ public:
 	virtual void					Exit(MONSTER_STATE_TYPE eNextState) override;
 
 public:
-	static CMonster_State_Fall* Create(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f);
+	static CMonster_State_Retreat* Create(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f);
+
 
 protected:
 	virtual void					Free() override;
-
-
 };
 
 NS_END

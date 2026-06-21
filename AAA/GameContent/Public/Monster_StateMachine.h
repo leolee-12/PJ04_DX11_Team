@@ -29,7 +29,7 @@ public:
 	_bool							Has_State(MONSTER_STATE_TYPE eType) const;
 
 private:
-	CMonster*						m_pMonster = { nullptr };
+	CMonster*						m_pOwner = { nullptr };
 	CMonster_State*					m_pCurState = { nullptr };
 
 	unordered_map<MONSTER_STATE_TYPE, CMonster_State*> m_States;
@@ -38,7 +38,7 @@ private:
 	CMonster_State*					Find_State(MONSTER_STATE_TYPE eNewState);
 
 public:
-	static CMonster_StateMachine*	Create(CMonster* pMonster);
+	static CMonster_StateMachine*	Create(CMonster* pOwner);
 
 protected:
 	virtual void					Free() override;
