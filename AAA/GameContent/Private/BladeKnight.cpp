@@ -18,6 +18,7 @@
 #include "Monster_State_Chase.h"
 #include "Monster_State_KnockBack.h"
 #include "Monster_State_KnockOut.h"
+#include "Monster_State_Spat.h"
 #include "Monster_State_Retreat.h"
 
 // 전용 상태
@@ -90,6 +91,13 @@ void CBladeKnight::Late_Update(_float fTimeDelta)
     __super::Late_Update(fTimeDelta);
 }
 
+_bool CBladeKnight::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
+{
+    Out.fRadius = { 0.6f };
+    Out.fHeight = { 0.75f };
+    return true;
+}
+
 CAnimator* CBladeKnight::Get_BodyAnimator() const
 {
     return m_pBody ? m_pBody->Get_Animator() : nullptr;
@@ -146,6 +154,14 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
     Info.fSpeed = 1.25f;
 
     if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
+        return E_FAIL;
+
+    // State Spat (발사체)
+    Info.strAniName = "Damage";   
+    Info.bLoop = true;
+    Info.fSpeed = 1.f;
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::SPAT, CMonster_State_Spat::Create(Info))))
         return E_FAIL;
 
     // State Chase

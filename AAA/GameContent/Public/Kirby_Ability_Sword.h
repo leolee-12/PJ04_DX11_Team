@@ -18,7 +18,7 @@ class CLIENT_DLL CKirby_Ability_Sword final : public CKirby_Ability
 private:
 	enum SWORD_STATE
 	{
-		NONE,
+		END,
 		SLASH_1, SLASH_1_END, SLASH_2, SLASH_3,
 		JUMP_SLASH_START, JUMP_SLASH,
 
@@ -28,6 +28,8 @@ private:
 		SUPER_SPIN_SLASH_CHARGE_START, SUPER_SPIN_SLASH_CHARGE,
 		SUPER_SPIN_SLASH_START, SUPER_SPIN_SLASH_LOOP, SUPER_SPIN_SLASH_END,
 	};
+
+	enum SWORD_MOVE_STATE { MOVE_STATE_NONE, NONE_MOVE, MOVE };
 
 private:
 	CKirby_Ability_Sword();
@@ -53,7 +55,9 @@ public:
 
 private:
 	SWORD_STATE m_eCurSwordState{};
-	SWORD_STATE m_ePreSwordState{};
+
+	SWORD_MOVE_STATE m_eCurSwordMoveState{};
+	SWORD_MOVE_STATE m_ePreSwordMoveState{};
 
 	_bool m_bReserveNextAttack{};
 
@@ -64,22 +68,23 @@ private:
 	_float m_fSuperSpinSlashChargeTime{};
 
 	_uint m_iSuperSpinSlashCount{};
-	_bool m_bForceEnterSwordAni{};
 
 	// Dir
 	_float3 m_vSwordWishDir{};
 	_bool m_bMoveLock{};
 
 private:
-	void Update_SwordState(CKirby* pKirby, CAnimator* pAnimator, CMovement_Child* pMovemet, _float fTimeDelta);
-	void Enter_SwordAni(CAnimator* pAnimator, _float fTimeDelta);
-	void Check_EndAttackState(CAnimator* pAnimator, _float fTimeDelta);
-
 	void Update_ChargeTime(_float fTimeDelta);
-
 	void MoveLock_Ratio(_float fRatio, _float fRatioStart, _float fRatioEnd);
 	void SetSpeed_Ratio(_float fRatio, _float fRatioStart, _float fRatioEnd, CMovement_Child* pMovement, _float fSpeed);
-	void Charge_Start(CKirby* pKirby, CMovement_Child* pMovement);
+
+	void Change_SwordState(CKirby* pKirby, SWORD_STATE eNext);
+	void Enter_SwordState(CKirby* pKirby, SWORD_STATE eState);
+	void Update_SwordState(CKirby* pKirby, _float fTimeDelta);
+	void Exit_SwordState(CKirby* pKirby, SWORD_STATE eState);
+
+	_bool Has_SwordMoveDir();
+	void ChargeAnimationOverlay(CKirby* pKirby);
 
 public:
 	static CKirby_Ability_Sword* Create();

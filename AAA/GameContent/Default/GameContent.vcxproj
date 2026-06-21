@@ -40,9 +40,11 @@
     <ClInclude Include="..\public\GigantEdge_Brain.h" />
     <ClInclude Include="..\public\MiniBoss.h" />
     <ClInclude Include="..\public\Inhalable.h" />
+    <ClInclude Include="..\Public\Kirby_Stuffed.h" />
     <ClInclude Include="..\Public\LevelDesign_ProtoRegister.h" />
     <ClInclude Include="..\Public\LevelDesign_Rail.h" />
     <ClInclude Include="..\Public\LevelDesign_Spawner.h" />
+    <ClInclude Include="..\public\MonsterHitPart.h" />
     <ClInclude Include="..\public\MonsterPart.h" />
     <ClInclude Include="..\Public\Monster_State_Attack.h" />
     <ClInclude Include="..\Public\Monster_State_Captured.h" />
@@ -56,6 +58,7 @@
     <ClInclude Include="..\Public\LevelDesign_Loader.h" />
     <ClInclude Include="..\Public\LevelDesign_Parser.h" />
     <ClInclude Include="..\Public\LevelDesign_Registry.h" />
+    <ClInclude Include="..\public\Monster_State_Spat.h" />
     <ClInclude Include="..\Public\Monster_State_Retreat.h" />
     <ClInclude Include="..\Public\Parsing_Utils.h" />
     <ClInclude Include="..\Public\RailDataReceiver.h" />
@@ -214,6 +217,7 @@
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
+    <ClCompile Include="..\Private\Kirby_Stuffed.cpp" />
     <ClCompile Include="..\Private\Kirby_GetAbility.cpp" />
     <ClCompile Include="..\Private\Kirby_OnOffPart.cpp" />
     <ClCompile Include="..\Private\Kirby_Fall.cpp" />
@@ -237,6 +241,7 @@
     <ClCompile Include="..\Private\BladeKnight.cpp" />
     <ClCompile Include="..\private\MiniBoss.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
+    <ClCompile Include="..\private\MonsterHitPart.cpp" />
     <ClCompile Include="..\Private\Monster_Brain.cpp" />
     <ClCompile Include="..\Private\Monster_Brain_FSM.cpp" />
     <ClCompile Include="..\Private\Monster_Movement.cpp" />
@@ -252,6 +257,7 @@
     <ClCompile Include="..\Private\Monster_State_KnockBack.cpp" />
     <ClCompile Include="..\Private\Monster_State_KnockOut.cpp" />
     <ClCompile Include="..\Private\Monster_State_Landing.cpp" />
+    <ClCompile Include="..\private\Monster_State_Spat.cpp" />
     <ClCompile Include="..\Private\Monster_State_Retreat.cpp" />
     <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\Private\TestParticle.cpp" />
@@ -437,6 +443,7 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>../../EngineSDK/Lib/; ../ThirdPartyLib/;</AdditionalLibraryDirectories>
       <AdditionalDependencies>Engine.Lib;DirectXTKd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <FxCompile>
       <ShaderType>Effect</ShaderType>

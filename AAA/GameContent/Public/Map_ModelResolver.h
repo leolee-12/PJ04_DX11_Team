@@ -12,7 +12,7 @@ private:
 
 public:
 	HRESULT Resolve_MapSection(const _wstring& strStageFolderName, const _wstring& strSectionName, _wstring* pOutModelPath, _wstring* pOutModelProtoTag) const;
-	HRESULT Build_EnvModelCache(const _wstring& strStageFolderName);
+	HRESULT Build_EnvModelCache();
 	_bool Resolve_EnvObject(ENV_OBJECT_DESC* pDesc);
 	void Clear_EnvModelCache();
 

@@ -36,6 +36,14 @@ HRESULT CKirby_Ability::Initialize()
     Set_FullBodyAni(ABILITY_ANI::FLIGHT_LANDING, "FlightLanding", false, false, 0.1f, 2.5f);
     Set_FullBodyAni(ABILITY_ANI::AIR_BALL, "AirBall", false, false, 0.0f, 5.f);
 
+    Set_FullBodyAni(ABILITY_ANI::STUFFED_START, "Stuffed", false, false, 0.1f, 1.5f);
+    Set_FullBodyAni(ABILITY_ANI::STUFFED_WAIT, "StuffedWait", true, false, 0.1f, 2.5f);
+    Set_FullBodyAni(ABILITY_ANI::STUFFED_RUN, "StuffedRun", true, false, 0.1f, 3.f);
+    Set_FullBodyAni(ABILITY_ANI::STUFFED_JUMP, "StuffedJump", false, false, 0.1f, 2.5f);
+    Set_FullBodyAni(ABILITY_ANI::STUFFED_FALL, "StuffedFall", true, false, 0.1f, 1.5f);
+    Set_FullBodyAni(ABILITY_ANI::STUFFED_LANDING, "StuffedLanding", false, false, 0.1f, 1.5f);
+    Set_FullBodyAni(ABILITY_ANI::STUFFED_SPIT, "Spit", false, false, 0.1f, 2.f);
+
     return S_OK;
 }
 

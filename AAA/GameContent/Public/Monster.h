@@ -60,9 +60,12 @@ public:
 public: // Inhalable
 	virtual _bool				Can_BeInhaled(const INHALE_QUERY& q) const override;
 	virtual void				Be_Captured(CGameObject* pInhaler) override;
-
 	CGameObject*				Get_Captor() const { return m_pCaptor; }
 	void						On_Swallowed();
+	void						Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed);
+	void						Despawn_Spat();                                
+	const _float3&				Get_SpatVelocity() const { return m_vSpatVelocity; }
+	void						Enable_ProjectileBox(_bool bEnable);
 
 public:
 	// AI가 이동 의도를 쌓는 방식
@@ -81,7 +84,7 @@ public:
 	virtual _float				Get_CapsuleRadius() const = 0;
 	virtual _float				Get_CapsuleHeight() const = 0;
 	virtual _float				Get_InteractRadius() const = 0;
-	virtual _float				Get_HurtBoxRadius() const = 0;
+	virtual _bool				Get_HurtBoxDesc(CAPSULE_DESC& Out) const = 0;
 
 	virtual CAnimator*			Get_BodyAnimator() const { return nullptr; }
 
@@ -101,13 +104,18 @@ protected:
 
 	CCollider*					m_pInteractCollider = { nullptr };
 	CCollider*					m_pHurtBox = { nullptr };
+	CCollider*					m_pProjectileBox = { nullptr };
+	_float3						m_vSpatVelocity = {};
 
 	// 이번 프레임에 이동하고 싶은 방향
 	_float3						m_vWishDir = {};
 
 	_uint					    m_TraitFlags = { MT_DEFAULT };
-	COPY_ABILITY_TYPE			m_eCopyAbility = { COPY_ABILITY_TYPE::NORMAL };
+	COPY_ABILITY_TYPE			m_eCopyAbility = { COPY_ABILITY_TYPE::NONE };
 	CGameObject*			    m_pCaptor = { nullptr };
+
+	static constexpr _float		s_fSpatDamage = 100.f;
+	static constexpr _float		s_fSpatKnockback = 12.f;
 
 protected:
 	// 부모가 관리할 공통 파이프라인

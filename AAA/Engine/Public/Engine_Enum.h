@@ -25,7 +25,7 @@ namespace Engine
 
 	enum class NAVI_LINE { AB, BC, CA, END };
 
-	enum class COLLIDER { AABB, OBB, SPHERE, END };
+	enum class COLLIDER { AABB, OBB, SPHERE, CAPSULE, END };
 
 	enum class DIMB { LBUTTON, RBUTTON, WHEEL, END };
 

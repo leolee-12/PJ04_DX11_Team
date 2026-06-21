@@ -9,26 +9,6 @@
 
 NS_BEGIN(Client)
 
-namespace
-{
-	_bool Needs_Model(const ENV_OBJECT_DESC& Desc)
-	{
-		return Desc.eKind == ENV_OBJECT_KIND::STATIC
-			|| Desc.eKind == ENV_OBJECT_KIND::INTERACT;
-	}
-
-	_wstring Describe_EnvObject(const ENV_OBJECT_DESC& Desc)
-	{
-		if (!Desc.wstrObjectName.empty())
-			return Desc.wstrObjectName;
-
-		if (!Desc.wstrEntryKey.empty())
-			return Desc.wstrEntryKey;
-
-		return L"<unknown>";
-	}
-}
-
 CMap_Builder::CMap_Builder(CMap_ModelResolver* pResolver)
 	: m_pResolver{ pResolver }
 {
@@ -149,10 +129,7 @@ HRESULT CMap_Builder::Build_StageDesc(const MAP_MANIFEST_DESC& Manifest, MAP_STA
 	return S_OK;
 }
 
-HRESULT CMap_Builder::Build_EnvDescs(
-	const MAP_MANIFEST_DESC& Manifest,
-	vector<ENV_OBJECT_DESC>* pOutEnvDescs,
-	vector<_wstring>* pOutJsonPaths)
+HRESULT CMap_Builder::Build_EnvDescs(const MAP_MANIFEST_DESC& Manifest, vector<ENV_OBJECT_DESC>* pOutEnvDescs, vector<_wstring>* pOutJsonPaths)
 {
 	if (nullptr == pOutEnvDescs || nullptr == pOutJsonPaths || nullptr == m_pResolver)
 		return E_FAIL;
@@ -160,7 +137,7 @@ HRESULT CMap_Builder::Build_EnvDescs(
 	pOutEnvDescs->clear();
 	pOutJsonPaths->clear();
 
-	if (FAILED(m_pResolver->Build_EnvModelCache(Manifest.strStageFolderName)))
+	if (FAILED(m_pResolver->Build_EnvModelCache()))
 		return E_FAIL;
 
 	for (const _wstring& strJsonPath : Manifest.EnvJsonPaths)
@@ -175,7 +152,9 @@ HRESULT CMap_Builder::Build_EnvDescs(
 
 		for (ENV_OBJECT_DESC& Desc : JsonDescs)
 		{
-			m_pResolver->Resolve_EnvObject(&Desc);
+			if (EnvObject_NeedsModel(Desc))
+				m_pResolver->Resolve_EnvObject(&Desc);
+
 			Desc.tCollision.bSourceInvalidCollision = Desc.tCollision.bInvalidCollision;
 			Desc.tCollision.bSourceHasDecorCollisionApxbin = Desc.tCollision.bHasDecorCollisionApxbin;
 			pOutEnvDescs->push_back(Desc);
@@ -195,14 +174,14 @@ HRESULT CMap_Builder::Validate_And_Filter(MAP_PACKAGE* pPackage)
 	vector<ENV_OBJECT_DESC> Filtered;
 	Filtered.reserve(pPackage->EnvObjectDescs.size());
 
+	_uint iSkippedMissingModel = 0;
+
 	for (const ENV_OBJECT_DESC& Desc : pPackage->EnvObjectDescs)
 	{
-		if (Needs_Model(Desc)
+		if (EnvObject_NeedsModel(Desc)
 			&& (Desc.wstrModelPath.empty() || Desc.wstrModelProtoTag.empty()))
 		{
-			Log_GameContentWarning(
-				"Map builder skipped env without model: object="
-				+ WstrToStr(Describe_EnvObject(Desc)));
+			++iSkippedMissingModel;
 			continue;
 		}
 
@@ -210,6 +189,15 @@ HRESULT CMap_Builder::Validate_And_Filter(MAP_PACKAGE* pPackage)
 	}
 
 	pPackage->EnvObjectDescs.swap(Filtered);
+	pPackage->iEnvSkippedMissingModel = iSkippedMissingModel;
+
+	if (0 != iSkippedMissingModel)
+	{
+		Log_GameContentWarning(
+			"Map builder skipped env without model: count="
+			+ to_string(iSkippedMissingModel));
+	}
+
 	return S_OK;
 }
 

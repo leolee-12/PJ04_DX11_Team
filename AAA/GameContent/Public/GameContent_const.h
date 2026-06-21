@@ -73,6 +73,7 @@ namespace ProtoDesc
 	inline constexpr COMPONENT_DESC Collider_Sphere = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Sphere") };
 	inline constexpr COMPONENT_DESC Collider_AABB = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB") };
 	inline constexpr COMPONENT_DESC Collider_OBB = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB") };
+	inline constexpr COMPONENT_DESC Collider_Capsule = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Capsule") };
 }
 
 using namespace ProtoDesc;

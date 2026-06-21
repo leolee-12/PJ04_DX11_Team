@@ -238,9 +238,6 @@
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Attack">
       <UniqueIdentifier>{1a16a95c-467c-4517-b7e1-f705d612b308}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\GetAbility">
-      <UniqueIdentifier>{ef199045-e026-474a-9ec3-100f82b3ae9a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\AbilityDump">
       <UniqueIdentifier>{26490427-a373-403b-bd61-8303f0dffa59}</UniqueIdentifier>
     </Filter>
@@ -465,6 +462,18 @@
     </Filter>
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Find">
       <UniqueIdentifier>{6cd36b1a-1d3e-4d5a-963c-d67b94becb43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\99. Monster_PartBase\MonsterHitPart">
+      <UniqueIdentifier>{52230687-b4b4-4dcb-a790-a6981debf236}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Full">
+      <UniqueIdentifier>{7aaa2487-4849-48ce-acf4-559797cc9247}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\GetAbility">
+      <UniqueIdentifier>{ef199045-e026-474a-9ec3-100f82b3ae9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Spat">
+      <UniqueIdentifier>{81b0629c-516a-4991-8c17-3bfbd6ecf5e9}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Attack">
       <UniqueIdentifier>{765c8d67-517d-476b-ab97-3167b36bc8a1}</UniqueIdentifier>
@@ -945,6 +954,15 @@
     <ClInclude Include="..\public\MonsterPart.h">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\MonsterHitPart.h">
+      <Filter>00. GameObject\06. Monster\99. Monster_PartBase\MonsterHitPart</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Stuffed.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Full</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Monster_State_Spat.h">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Monster_State_Attack.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Attack</Filter>
     </ClInclude>
@@ -1351,6 +1369,15 @@
     </ClCompile>
     <ClCompile Include="..\private\MonsterPart.cpp">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MonsterHitPart.cpp">
+      <Filter>00. GameObject\06. Monster\99. Monster_PartBase\MonsterHitPart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Stuffed.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Full</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Monster_State_Spat.cpp">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Monster_State_Attack.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Attack</Filter>
