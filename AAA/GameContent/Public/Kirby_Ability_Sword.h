@@ -54,7 +54,7 @@ public:
 	virtual _bool Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation) override;
 
 private:
-	SWORD_STATE m_eCurSwordState{};
+	SWORD_STATE m_eSwordState{};
 
 	SWORD_MOVE_STATE m_eCurSwordMoveState{};
 	SWORD_MOVE_STATE m_ePreSwordMoveState{};
