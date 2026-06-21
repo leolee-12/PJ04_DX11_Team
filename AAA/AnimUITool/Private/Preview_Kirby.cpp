@@ -78,7 +78,7 @@ void CPreview_Kirby::Update(_float fTimeDelta)
 	}
 	if (m_pGameInstance_Proxy->Key_Down(DIK_N))
 	{
-		m_pAnimatorCom->Play("SuperSpinSlashCharge", true, true, 0.2f, 2.5f);
+		m_pAnimatorCom->Play("ShuffleRight", true, true, 0.2f, 2.5f);
 
 		const _char* MaskRoots[] = { "L_FootJ", "R_FootJ" };
 		m_pAnimatorCom->Set_Mask("ShuffleRight", MaskRoots, _countof(MaskRoots), true, 1.0f, 0.25f);

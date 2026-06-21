@@ -73,6 +73,8 @@ private:
 	_float3 m_vSwordWishDir{};
 	_bool m_bMoveLock{};
 
+	static constexpr const _char* OverlayMasks[2] = { "L_FootJ", "R_FootJ" };
+
 private:
 	void Update_ChargeTime(_float fTimeDelta);
 	void MoveLock_Ratio(_float fRatio, _float fRatioStart, _float fRatioEnd);
