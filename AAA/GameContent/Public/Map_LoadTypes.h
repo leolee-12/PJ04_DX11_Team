@@ -85,6 +85,7 @@ struct MAP_PACKAGE
 	vector<_wstring> EnvJsonPaths;
 	vector<_wstring> LevelDesignJsonPaths;
 	vector<MAP_ADD_OBJECT> AddedObjectDescs;
+	_uint iEnvSkippedMissingModel = {};
 };
 
 struct MAP_RUNTIME_LEVELS
