@@ -6,30 +6,32 @@ CBladeKnight_FSM::CBladeKnight_FSM()
 {
 }
 
-HRESULT CBladeKnight_FSM::Initialize()
+HRESULT CBladeKnight_FSM::Initialize(CMonster* pOwner)
 {
-	if (FAILED(__super::Initialize()))
+	if (FAILED(__super::Initialize(pOwner)))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-void CBladeKnight_FSM::On_Decide_Combat(CBladeKnight* pBladeKnight, const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta)
+void CBladeKnight_FSM::Decide_Internal(const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
-	if (nullptr == pBladeKnight)
+	if (nullptr == m_pOwner)
 		return;
+
+	CBladeKnight* pBladeKnight = static_cast<CBladeKnight*>(m_pOwner);
 
 	const _float fAbsHeight = fabsf(BlackBoard.fHeightToTarget);
 	const _bool bAttackable = BlackBoard.fDistToTargetXZ <= 2.f && fAbsHeight < 0.6f;
 	const _bool bChaseable = fAbsHeight <= 1.5f;
 
-	const MONSTER_STATE_TYPE eCurState = pBladeKnight->Get_StateType();
+	const MONSTER_STATE_TYPE eCurState = m_pOwner->Get_StateType();
 
 	if (bAttackable)
 	{
-		pBladeKnight->Change_State(Pick_AttackState(pBladeKnight->Get_AIType()));
+		m_pOwner->Change_State(Pick_AttackState(pBladeKnight->Get_AIType()));
 		return;
 	}
 
@@ -45,11 +47,11 @@ void CBladeKnight_FSM::On_Decide_Combat(CBladeKnight* pBladeKnight, const MONSTE
 		pBladeKnight->Change_State(MONSTER_STATE_TYPE::IDLE);
 }
 
-CBladeKnight_FSM* CBladeKnight_FSM::Create()
+CBladeKnight_FSM* CBladeKnight_FSM::Create(CMonster* pMonster)
 {
 	CBladeKnight_FSM* pInstance = new CBladeKnight_FSM();
 
-	if (FAILED(pInstance->Initialize()))
+	if (FAILED(pInstance->Initialize(pMonster)))
 	{
 		MSG_BOX("Failed to Created : CBladeKnight_FSM");
 		Safe_Release(pInstance);

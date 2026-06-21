@@ -30,6 +30,7 @@ CModel::CModel(const CModel& Prototype)
 	, m_iNumAnimations{ Prototype.m_iNumAnimations }
 	, m_MeshLayers{ Prototype.m_MeshLayers }
 	, m_strMeshLayerPath{ Prototype.m_strMeshLayerPath }
+	, m_strModelPath {Prototype.m_strModelPath}
 {
 	for (auto& pPrototypeAnimation : Prototype.m_Animations)
 		m_Animations.push_back(pPrototypeAnimation->Clone());
@@ -181,6 +182,7 @@ HRESULT CModel::Initialize_Prototype(MODEL eType, const _char* pModelFilePath, _
 {
 	m_eType = eType;
 	m_PickableFilter = fcFillter;
+	m_strModelPath = pModelFilePath ? StrToWstr(pModelFilePath) : L"" ;
 
 	return m_eType == MODEL::ANIM ? Ready_Anim(pModelFilePath, PreTransformMatrix) : Ready_NonAnim(pModelFilePath, PreTransformMatrix);
 }
@@ -190,6 +192,7 @@ HRESULT CModel::Initialize_Prototype_WithTextureHub(MODEL eType, const _char* pM
 	m_eType = eType;
 	m_bUseMaterialEx = true;
 	m_PickableFilter = fcFillter;
+	m_strModelPath = pModelFilePath ? StrToWstr(pModelFilePath) : L"";
 	m_bCookCollisionMesh = bCookCollisionMesh;
 
 	return Ready_NonAnimEx(pModelFilePath, PreTransformMatrix);
@@ -339,10 +342,10 @@ _bool CModel::Play_Animation(_float fTimeDelta, _float fSpeed)
 	return isFinished;
 }
 
-_bool CModel::Play_Animation(_float fTimeDelta, const _string& strMaskClip, const _string& strRootBone, _float fSpeed, _bool bLoop, _float fMaskWeight)
+_bool CModel::Play_Animation(_float fTimeDelta, const _string& strMaskClip, _float fSpeed, _bool bLoop, _float fMaskWeight)
 {
 	_bool isFinished = Update_Base(fTimeDelta, fSpeed);
-	Apply_Mask(strMaskClip, strRootBone, fTimeDelta, fSpeed, bLoop, fMaskWeight);
+	Apply_Mask(strMaskClip, fTimeDelta, fSpeed, bLoop, fMaskWeight);
 	Update_Combined();
 
 	return isFinished;
@@ -362,28 +365,51 @@ HRESULT CModel::Render(_uint iMeshIndex)
 	return S_OK;
 }
 
-void CModel::Capture_MaskSnapShot(const _string& strRootBone)
+void CModel::Capture_MaskSnapShot(const vector<_string>& Roots)
 {
+	m_MaskBones.clear();
 	m_MaskSnapShot.clear();
 
-	_int iRoot = Get_BoneIndex(strRootBone);
-	if (iRoot < 0)
+	_uint n = static_cast<_uint>(m_Bones.size());
+	if (0 == n)
 		return;
 
-	_uint n = static_cast<_uint>(m_Bones.size());
-	vector<bool> masked(n, false);
-	masked[iRoot] = true;
-	for (_uint i = static_cast<_uint>(iRoot) + 1; i < n; ++i)
+	// 1) Roots가 비면 전신 마스킹
+	vector<char> masked(n, 0);
+	if (Roots.empty())
 	{
-		_int p = Get_BoneParentIndex(i);
-		if (p >= 0 && masked[p])
-			masked[i] = true;
+		for (_uint i = 0; i < n; ++i)
+			masked[i] = 1;
+	}
+	else
+	{
+		for (const _string& strRoot : Roots)
+		{
+			_int iRoot = Get_BoneIndex(strRoot);
+			if (iRoot >= 0)
+				masked[iRoot] = 1;
+		}
 	}
 
-	for (_uint i = static_cast<_uint>(iRoot); i < n; ++i)
+	// 2) 부모 인덱스 < 자식 인덱스 가정하에 0부터 1패스 - 모든 루트 서브 트리를 동시에 합집합
+	for (_uint i = 0; i < n; ++i)
+	{
+		if (masked[i])
+			continue;
+		_int p = Get_BoneParentIndex(i);
+		if (p >= 0 && masked[p])
+			masked[i] = 1;
+	}
+
+	// 3) 인덱스 리스트로 압축 + 스냅샷 캡처
+	m_MaskBones.reserve(n);
+	for (_uint i = 0; i < n; ++i)
 	{
 		if (!masked[i])
 			continue;
+
+		m_MaskBones.push_back(i);
+
 		_vector vS, vR, vT;
 		XMMatrixDecompose(&vS, &vR, &vT, m_Bones[i]->Get_TransformationMatrix());
 		KEYFRAME kf{};
@@ -394,9 +420,12 @@ void CModel::Capture_MaskSnapShot(const _string& strRootBone)
 	}
 }
 
-void CModel::Apply_Mask(const _string& strClip, const _string& strRootBone, _float fTimeDelta, _float fSpeed, _bool bLoop, _float fMaskWeight)
+void CModel::Apply_Mask(const _string& strClip, _float fTimeDelta, _float fSpeed, _bool bLoop, _float fMaskWeight)
 {
 	if (fMaskWeight <= 0.f)
+		return;
+
+	if (m_MaskBones.empty())
 		return;
 
 	_int iIndex = Get_AnimationIndex(strClip);
@@ -412,18 +441,6 @@ void CModel::Apply_Mask(const _string& strClip, const _string& strRootBone, _flo
 			_vector vR = XMLoadFloat4(&ov.vRotation);
 			_vector vT = XMLoadFloat3(&ov.vTranslation);
 
-			/* if (fMaskWeight < 1.f)
-			 {
-				 _vector bS, bR, bT;
-				 XMMatrixDecompose(&bS, &bR, &bT, m_Bones[iBone]->Get_TransformationMatrix());
-				 if (XMVectorGetX(XMVector4Dot(bR, vR)) < 0.f)
-					 vR = XMVectorNegate(vR);
-				 vS = XMVectorLerp(bS, vS, fMaskWeight);
-				 vR = XMQuaternionSlerp(bR, vR, fMaskWeight);
-				 vT = XMVectorLerp(bT, vT, fMaskWeight);
-			 }
-			 m_Bones[iBone]->Set_TransformationMatrix(XMMatrixAffineTransformation(
-				 vS, XMVectorSet(0, 0, 0, 1), vR, XMVectorSetW(vT, 1.f)));*/
 			if (fMaskWeight < 1.f)
 			{
 				_vector bS, bR, bT;
@@ -447,52 +464,14 @@ void CModel::Apply_Mask(const _string& strClip, const _string& strRootBone, _flo
 				vS, XMVectorSet(0, 0, 0, 1), vR, XMVectorSetW(vT, 1.f)));
 		};
 
-	// strRootBone이 비어있을 경우 전체 덮어씀
-	if (strRootBone.empty())
+	for (_uint iBone : m_MaskBones)
 	{
-		for (auto& [iBone, kf] : poseMap)
-			if (iBone < m_Bones.size())
-				Blend(iBone, kf);
-		return;
-	}
-
-	_int iRoot = Get_BoneIndex(strRootBone);
-	if (iRoot < 0)
-		return;
-
-	// 마스크 루트 본 부터 자식 본들 까지
-	_uint n = static_cast<_uint>(m_Bones.size());
-	vector<bool> masked(n, false);
-	masked[iRoot] = true;
-	for (_uint i = static_cast<_uint>(iRoot) + 1; i < n; ++i)
-	{
-		_int p = Get_BoneParentIndex(i);
-		if (p >= 0 && masked[p])
-			masked[i] = true;
-	}
-
-	for (_uint i = static_cast<_uint>(iRoot); i < n; ++i)
-	{
-		if (!masked[i])
-			continue;
-		auto it = poseMap.find(i);
+		auto it = poseMap.find(iBone);
 		if (it == poseMap.end())
 			continue;
-		Blend(i, it->second);
-	}
 
-	/*   for (_uint i = static_cast<_uint>(iRoot); i < n; ++i)
-	   {
-		   if (!masked[i])
-			   continue;
-		   _vector vS, vR, vT;
-		   XMMatrixDecompose(&vS, &vR, &vT, m_Bones[i]->Get_TransformationMatrix());
-		   KEYFRAME kf{};
-		   XMStoreFloat3(&kf.vScale, vS);
-		   XMStoreFloat4(&kf.vRotation, vR);
-		   XMStoreFloat3(&kf.vTranslation, vT);
-		   m_MaskSnapShot[i] = kf;
-	   }*/
+		Blend(iBone, it->second);
+	}
 }
 
 void CModel::Update_Combined()

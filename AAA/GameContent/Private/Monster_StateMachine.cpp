@@ -6,12 +6,12 @@ CMonster_StateMachine::CMonster_StateMachine()
 {
 }
 
-HRESULT CMonster_StateMachine::Initialize(CMonster* pMonster)
+HRESULT CMonster_StateMachine::Initialize(CMonster* pOwner)
 {
-    if (pMonster == nullptr)
+    if (pOwner == nullptr)
         return E_FAIL;
 
-    m_pMonster = pMonster;
+    m_pOwner = pOwner;
 
     return S_OK;
 }
@@ -34,18 +34,18 @@ _bool CMonster_StateMachine::Change_State(MONSTER_STATE_TYPE eNewState)
         return true;
 
     if (nullptr != m_pCurState)
-        m_pCurState->Exit(m_pMonster);
+        m_pCurState->Exit(eNewState);
 
     m_pCurState = pNextState;
 
-    if (nullptr != m_pMonster)
+    if (nullptr != m_pOwner)
     {
-        m_pMonster->Get_BlackBoard().bActionFinished = false;
-        m_pMonster->Get_BlackBoard().bCanTransition = m_pCurState->Is_Interruptible();
-        m_pMonster->Get_BlackBoard().bMoveLocked = false;
+        m_pOwner->Get_BlackBoard().bActionFinished = false;
+        m_pOwner->Get_BlackBoard().bCanTransition = m_pCurState->Is_Interruptible();
+        m_pOwner->Get_BlackBoard().bMoveLocked = false;
     }
 
-    m_pCurState->Enter(m_pMonster);
+    m_pCurState->Enter();
 
     return true;
 }
@@ -55,7 +55,7 @@ void	CMonster_StateMachine::Update_StateMachine(_float fTimeDelta)
     if (m_pCurState == nullptr)
         return;
 
-    m_pCurState->Update(m_pMonster, fTimeDelta);
+    m_pCurState->Update(fTimeDelta);
 }
 
 HRESULT CMonster_StateMachine::Register_State(MONSTER_STATE_TYPE eType, CMonster_State* pState)
@@ -68,6 +68,9 @@ HRESULT CMonster_StateMachine::Register_State(MONSTER_STATE_TYPE eType, CMonster
         Safe_Release(pState);
         return E_FAIL;
     }
+
+    // StateMachine의 Owner 포인터 주입
+    pState->Set_Owner(m_pOwner);
 
     m_States.emplace(eType, pState);
 
@@ -89,11 +92,11 @@ CMonster_State* CMonster_StateMachine::Find_State(MONSTER_STATE_TYPE eNewState)
     return iter->second;
 }
 
-CMonster_StateMachine* CMonster_StateMachine::Create(CMonster* pMonster)
+CMonster_StateMachine* CMonster_StateMachine::Create(CMonster* pOwner)
 {
     CMonster_StateMachine* pInstance = new CMonster_StateMachine();
 
-    if (FAILED(pInstance->Initialize(pMonster)))
+    if (FAILED(pInstance->Initialize(pOwner)))
     {
         MSG_BOX("Failed to Created : CMonster_StateMachine");
         Safe_Release(pInstance);
