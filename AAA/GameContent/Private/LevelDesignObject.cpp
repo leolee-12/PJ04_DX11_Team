@@ -24,7 +24,7 @@ HRESULT CLevelDesignObject::Initialize(void* pArg)
 	if (nullptr == pArg)
 		return E_FAIL;
 
-	const LD_COMMON_DESC* pDesc = static_cast<const LD_COMMON_DESC*>(pArg);
+	const LD_OBJECT_DESC* pDesc = static_cast<const LD_OBJECT_DESC*>(pArg);
 
 	m_tLevelDesignDesc = *pDesc;
 

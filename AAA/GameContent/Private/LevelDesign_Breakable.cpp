@@ -6,7 +6,7 @@
 
 namespace
 {
-	void Build_DefaultBreakableDesc(Client::LD_BREAKABLE_OBJECT_DESC* pOutDesc)
+	void Build_DefaultBreakableDesc(LD_BREAKABLE_OBJECT_DESC* pOutDesc)
 	{
 		if (nullptr == pOutDesc)
 			return;
@@ -22,7 +22,7 @@ namespace
 
 		pOutDesc->eCategory = LD_CATEGORY::BREAKABLE;
 		pOutDesc->eType = LD_BREAKABLE_TYPE::STAR_BLOCK;
-		pOutDesc->wstrModelProtoTag = CLevelDesign_Breakable::STARBLOCK_H2W2_MODEL_PROTO_TAG;
+		pOutDesc->wstrModelProtoTag = CLevelDesign_Breakable::STARBLOCK_H1W1_MODEL_PROTO_TAG;
 
 		pOutDesc->fScale = 1.f;
 		pOutDesc->vRight = { 1.f, 0.f, 0.f, 0.f };
@@ -56,30 +56,21 @@ HRESULT CLevelDesign_Breakable::Initialize_Prototype()
 
 HRESULT CLevelDesign_Breakable::Initialize(void* pArg)
 {
-	LD_BREAKABLE_OBJECT_DESC DefaultDesc{};
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
 
-	if (nullptr != pArg)
+	if (nullptr == pArg)
 	{
-		m_tBreakableDesc = *static_cast<const LD_BREAKABLE_OBJECT_DESC*>(pArg);
-	}
-	else
-	{
+		LD_BREAKABLE_OBJECT_DESC DefaultDesc{};
 		Build_DefaultBreakableDesc(&DefaultDesc);
 		m_tBreakableDesc = DefaultDesc;
 	}
-
-	m_tBreakableDesc.eCategory = LD_CATEGORY::BREAKABLE;
-
-	if (m_tBreakableDesc.eType == LD_BREAKABLE_TYPE::UNKNOWN)
-		return E_FAIL;
-
-	if (m_tBreakableDesc.wstrModelProtoTag.empty())
-		return E_FAIL;
-
-	if (FAILED(__super::Initialize(&m_tBreakableDesc)))
-		return E_FAIL;
-
-	Desc().eCategory = LD_CATEGORY::BREAKABLE;
+	else
+	{
+		m_tBreakableDesc = *static_cast<const LD_BREAKABLE_OBJECT_DESC*>(pArg);
+		if (FAILED(Validate_Desc()))
+			return E_FAIL;
+	}
 
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
@@ -158,6 +149,17 @@ void CLevelDesign_Breakable::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
 }
 
+HRESULT CLevelDesign_Breakable::Validate_Desc()
+{
+	if (m_tBreakableDesc.eCategory != LD_CATEGORY::BREAKABLE)
+		return E_FAIL;
+	if (m_tBreakableDesc.eType == LD_BREAKABLE_TYPE::UNKNOWN)
+		return E_FAIL;
+	if (m_tBreakableDesc.wstrModelProtoTag.empty())
+		return E_FAIL;
+
+	return S_OK;
+}
 HRESULT CLevelDesign_Breakable::Ready_Components()
 {
 	const _tchar* pModelProtoTag = Resolve_ModelProtoTag();

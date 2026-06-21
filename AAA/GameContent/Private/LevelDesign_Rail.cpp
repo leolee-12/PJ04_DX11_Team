@@ -67,7 +67,7 @@ HRESULT CLevelDesign_Rail::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	Desc().eCategory = LD_CATEGORY::RAIL;
+	m_tLevelDesignDesc.eCategory = LD_CATEGORY::RAIL;
 
 #ifdef _DEBUG
 	if (FAILED(Ready_DebugResources()))

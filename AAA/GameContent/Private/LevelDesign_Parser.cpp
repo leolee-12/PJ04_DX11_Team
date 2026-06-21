@@ -165,7 +165,7 @@ void CLevelDesign_Parser::Parse_ObjectSection(
 	const _wstring& strSourceFile,
 	const _wstring& strSection,
 	const json& jSection,
-	vector<LD_PARSED_OBJECT>* pOutDescs)
+	vector<LD_OBJECT_ENTRY>* pOutDescs)
 {
 	if (nullptr == pOutDescs || !jSection.is_object())
 		return;
@@ -175,17 +175,40 @@ void CLevelDesign_Parser::Parse_ObjectSection(
 		if (!Iter.value().is_object())
 			continue;
 
-		LD_PARSED_OBJECT Desc = Make_BaseDesc(
+		LD_OBJECT_DESC CommonDesc = Make_BaseDesc(
 			wstrSourcePath,
 			strSourceFile,
 			strSection,
 			StrToWstr(Iter.key()),
 			Iter.value());
 
-		Fill_Common(Iter.value(), &Desc);
+		Fill_Common(Iter.value(), &CommonDesc);
+
+		if (Equals_NoCase(CommonDesc.strObjectName, L"Ladder"))
+		{
+			LD_LADDER_DESC Desc{};
+			static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
+			Fill_LadderFields(Iter.value(), &Desc);
+
+			pOutDescs->emplace_back(std::move(Desc));
+			continue;
+		}
+
+		if (Is_BreakableObject(CommonDesc.strObjectName))
+		{
+			LD_BREAKABLE_OBJECT_DESC Desc{};
+			static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
+			Desc.eCategory = LD_CATEGORY::BREAKABLE;
+
+			pOutDescs->emplace_back(std::move(Desc));
+			continue;
+		}
+
+		LD_PARSED_OBJECT Desc{};
+		static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
 		Fill_SpecialFields(Iter.value(), &Desc);
 
-		pOutDescs->push_back(Desc);
+		pOutDescs->emplace_back(std::move(Desc));
 	}
 }
 
@@ -216,7 +239,7 @@ void CLevelDesign_Parser::Parse_StepLinkInfo(
 	}
 }
 
-LD_PARSED_OBJECT CLevelDesign_Parser::Make_BaseDesc(
+LD_OBJECT_DESC CLevelDesign_Parser::Make_BaseDesc(
 	const _wstring& wstrSourcePath,
 	const _wstring& strSourceFile,
 	const _wstring& strSection,
@@ -225,7 +248,7 @@ LD_PARSED_OBJECT CLevelDesign_Parser::Make_BaseDesc(
 {
 	UNREFERENCED_PARAMETER(jEntry);
 
-	LD_PARSED_OBJECT Desc{};
+	LD_OBJECT_DESC Desc{};
 	Desc.wstrSourcePath = wstrSourcePath;
 	Desc.strSourceFile = strSourceFile;
 	Desc.strSection = strSection;
@@ -233,7 +256,7 @@ LD_PARSED_OBJECT CLevelDesign_Parser::Make_BaseDesc(
 	return Desc;
 }
 
-void CLevelDesign_Parser::Fill_Common(const json& jEntry, LD_PARSED_OBJECT* pDesc)
+void CLevelDesign_Parser::Fill_Common(const json& jEntry, LD_OBJECT_DESC* pDesc)
 {
 	if (nullptr == pDesc)
 		return;
@@ -436,16 +459,19 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 		return;
 	}
 
-	if (Is_BreakableObject(strObjectName))
-	{
-		pDesc->eCategory = LD_CATEGORY::BREAKABLE;
-		return;
-	}
-
 	pDesc->eCategory = LD_CATEGORY::UNSUPPORTED;
 }
 
-void CLevelDesign_Parser::Build_TransformDesc(LD_PARSED_OBJECT* pDesc)
+void CLevelDesign_Parser::Fill_LadderFields(const json& jEntry, LD_LADDER_DESC* pDesc)
+{
+	if (nullptr == pDesc)
+		return;
+
+	pDesc->eCategory = LD_CATEGORY::GIMMICK;
+	JsonUtils::Try_ReadUInt(jEntry, "Length", &pDesc->iLength);
+}
+
+void CLevelDesign_Parser::Build_TransformDesc(LD_OBJECT_DESC* pDesc)
 {
 	if (nullptr == pDesc)
 		return;

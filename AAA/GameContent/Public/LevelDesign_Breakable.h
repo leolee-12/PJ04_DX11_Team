@@ -36,12 +36,7 @@ public:
 	virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
 public:
-	LD_BREAKABLE_TYPE				Get_BreakableType() const { return m_tBreakableDesc.eType; }
 	const LD_BREAKABLE_OBJECT_DESC&	Get_BreakableDesc() const { return m_tBreakableDesc; }
-
-protected:
-	const LD_BREAKABLE_OBJECT_DESC&	BreakableDesc() const { return m_tBreakableDesc; }
-	LD_BREAKABLE_OBJECT_DESC&		BreakableDesc() { return m_tBreakableDesc; }
 
 private:
 	CShader* m_pShaderCom = { nullptr };
@@ -51,6 +46,8 @@ private:
 	LD_BREAKABLE_OBJECT_DESC m_tBreakableDesc = {};
 
 private:
+	virtual	HRESULT	Validate_Desc() override;
+
 	HRESULT			Ready_Components();
 	HRESULT			Ready_PhysicsActor_Box();
 	void			Release_PhysicsActor();

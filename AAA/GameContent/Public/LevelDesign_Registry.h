@@ -31,18 +31,26 @@ struct LD_RESOLVED_SPAWN
 {
 	LD_SPAWN_SPEC Spec;
 
-	LD_PARSED_OBJECT ParsedDesc;
+	LD_OBJECT_ENTRY ObjectDesc;
 	LD_BREAKABLE_OBJECT_DESC BreakableDesc;
 
-	_bool bUseBreakableDesc = false;
-	_bool bFallback = false;
+	_bool bUseBreakableDesc = { false };
+	_bool bFallback = { false };
 
 	void* Get_SpawnArgument()
 	{
-		if (bUseBreakableDesc)
-			return &BreakableDesc;
+		if (bUseBreakableDesc) return &BreakableDesc;
 
-		return &ParsedDesc;
+		const auto& fFunc = [](auto& Desc) -> void* { return &Desc; };
+
+		return std::visit(fFunc, ObjectDesc);
+	}
+
+	const LD_OBJECT_DESC& Get_BaseDesc() const
+	{
+		if (bUseBreakableDesc) return BreakableDesc;
+
+		return Get_LDObjectDesc(ObjectDesc);
 	}
 };
 
@@ -58,7 +66,7 @@ public:
 	static const LD_SPAWN_SPEC& Get_FallbackSpec();
 	static _bool Is_LevelDesignLayer(const _wstring& strLayerTag);
 	static _bool Register(const _wstring& strObjectName, const LD_SPAWN_SPEC& Spec);
-	static _bool Resolve(const LD_PARSED_OBJECT& Desc, LD_RESOLVED_SPAWN* pOutResolved);
+	static _bool Resolve(const LD_OBJECT_ENTRY& Desc, LD_RESOLVED_SPAWN* pOutResolved);
 
 private:
 	static void Register_Core();

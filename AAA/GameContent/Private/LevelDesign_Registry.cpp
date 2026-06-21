@@ -2,6 +2,7 @@
 #include "LevelDesign_Unsupported.h"
 #include "LevelDesign_Breakable.h"
 #include "LevelDesign_Rail.h"
+#include "LevelDesign_Ladder.h"
 
 #include <cwctype>
 #include <mutex>
@@ -36,6 +37,11 @@ namespace
 	CGameObject* Create_RailPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	{
 		return CLevelDesign_Rail::Create(pDevice, pContext);
+	}
+
+	CGameObject* Create_LadderPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	{
+		return CLevelDesign_Ladder::Create(pDevice, pContext);
 	}
 
 	void Register_Unsupported(const _wstring& strObjectName, LD_CATEGORY eCategory, const _tchar* pLayerTag)
@@ -101,24 +107,25 @@ _bool CLevelDesign_Registry::Register(const _wstring& strObjectName, const LD_SP
 	return Inserted;
 }
 
-_bool CLevelDesign_Registry::Resolve(const LD_PARSED_OBJECT& Desc, LD_RESOLVED_SPAWN* pOutResolved)
+_bool CLevelDesign_Registry::Resolve(const LD_OBJECT_ENTRY& Desc, LD_RESOLVED_SPAWN* pOutResolved)
 {
 	if (nullptr == pOutResolved)
 		return false;
 
 	*pOutResolved = {};
 
-	const LD_SPAWN_SPEC* pSpec =
-		Find(Desc.strObjectName);
+	const LD_OBJECT_DESC& ObjectDesc = Get_LDObjectDesc(Desc);
 
+	const LD_SPAWN_SPEC* pSpec = Find(ObjectDesc.strObjectName);
 	if (nullptr == pSpec)
 		pSpec = &Get_FallbackSpec();
 
-	if (pSpec->strPrototypeTag ==
-		CLevelDesign_Breakable::PROTOTYPE_TAG)
+	if (pSpec->strPrototypeTag == CLevelDesign_Breakable::PROTOTYPE_TAG)
 	{
-		if (pSpec->eBreakableType ==
-			LD_BREAKABLE_TYPE::UNKNOWN
+		const LD_BREAKABLE_OBJECT_DESC* pBreakableDesc = std::get_if<LD_BREAKABLE_OBJECT_DESC>(&Desc);
+
+		if (nullptr == pBreakableDesc
+			|| pSpec->eBreakableType == LD_BREAKABLE_TYPE::UNKNOWN
 			|| pSpec->wstrModelProtoTag.empty())
 		{
 			pSpec = &Get_FallbackSpec();
@@ -126,30 +133,24 @@ _bool CLevelDesign_Registry::Resolve(const LD_PARSED_OBJECT& Desc, LD_RESOLVED_S
 	}
 
 	pOutResolved->Spec = *pSpec;
-	pOutResolved->bFallback =
-		(pSpec == &Get_FallbackSpec());
+	pOutResolved->bFallback = (pSpec == &Get_FallbackSpec());
 
-	if (pSpec->strPrototypeTag ==
-		CLevelDesign_Breakable::PROTOTYPE_TAG)
+	if (pSpec->strPrototypeTag == CLevelDesign_Breakable::PROTOTYPE_TAG)
 	{
-		static_cast<LD_COMMON_DESC&>(
-			pOutResolved->BreakableDesc) =
-			static_cast<const LD_COMMON_DESC&>(Desc);
+		const LD_BREAKABLE_OBJECT_DESC* pBreakableDesc = std::get_if<LD_BREAKABLE_OBJECT_DESC>(&Desc);
+		if (nullptr == pBreakableDesc)
+			return false;
 
-		pOutResolved->BreakableDesc.eCategory =
-			pSpec->eCategory;
-		pOutResolved->BreakableDesc.eType =
-			pSpec->eBreakableType;
-		pOutResolved->BreakableDesc.wstrModelProtoTag =
-			pSpec->wstrModelProtoTag;
-
+		pOutResolved->BreakableDesc = *pBreakableDesc;
+		pOutResolved->BreakableDesc.eCategory = pSpec->eCategory;
+		pOutResolved->BreakableDesc.eType = pSpec->eBreakableType;
+		pOutResolved->BreakableDesc.wstrModelProtoTag = pSpec->wstrModelProtoTag;
 		pOutResolved->bUseBreakableDesc = true;
 	}
 	else
 	{
-		pOutResolved->ParsedDesc = Desc;
-		pOutResolved->ParsedDesc.eCategory =
-			pSpec->eCategory;
+		pOutResolved->ObjectDesc = Desc;
+		Get_LDObjectDesc(pOutResolved->ObjectDesc).eCategory = pSpec->eCategory;
 	}
 
 	return !pOutResolved->Spec.strPrototypeTag.empty()
@@ -246,7 +247,7 @@ void CLevelDesign_Registry::Register_ItemsAndBreakables()
 	BreakableSpec.ModelRequirements = {
 		{
 			CLevelDesign_Breakable::STARBLOCK_H1W1_MODEL_PROTO_TAG,
-			"../../Resources/Map/Gimmick/Star/H1W1.ysh",
+			"../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh",
 			ETOUI(LEVEL::GAMEPLAY)
 		}
 	};
@@ -257,7 +258,7 @@ void CLevelDesign_Registry::Register_ItemsAndBreakables()
 	BreakableSpec.ModelRequirements = {
 		{
 			CLevelDesign_Breakable::STARBLOCK_H3W3_MODEL_PROTO_TAG,
-			"../../Resources/Map/Gimmick/Star/H3W3.ysh",
+			"../../Resources/Map/Gimmick/NonAnim/Star/H3W3.ysh",
 			ETOUI(LEVEL::GAMEPLAY)
 		}
 	};
@@ -280,7 +281,33 @@ void CLevelDesign_Registry::Register_EnemiesAndGimmicks()
 	Register_Unsupported(L"ChainStarter", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
 	Register_Unsupported(L"BlockChainInvisible", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
 	Register_Unsupported(L"TwinkleSwitch", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
-	Register_Unsupported(L"Ladder", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
+
+	LD_SPAWN_SPEC LadderSpec{};
+	LadderSpec.strObjectName = L"Ladder";
+	LadderSpec.strPrototypeTag = CLevelDesign_Ladder::PROTOTYPE_TAG;
+	LadderSpec.strLayerTag = L"Layer_LevelDesign_Gimmick";
+	LadderSpec.eCategory = LD_CATEGORY::GIMMICK;
+	LadderSpec.pPrototypeFactory = &Create_LadderPrototype;
+	LadderSpec.ModelRequirements =
+	{
+			{
+					CLevelDesign_Ladder::BOT_MODEL_PROTO_TAG,
+					"../../Resources/Map/Gimmick/NonAnim/Ladder/Ladder_Bottom.ysh",
+					ETOUI(LEVEL::GAMEPLAY)
+			},
+			{
+					CLevelDesign_Ladder::MID_MODEL_PROTO_TAG,
+					"../../Resources/Map/Gimmick/NonAnim/Ladder/Ladder_Middle.ysh",
+					ETOUI(LEVEL::GAMEPLAY)
+			},
+			{
+					CLevelDesign_Ladder::TOP_MODEL_PROTO_TAG,
+					"../../Resources/Map/Gimmick/NonAnim/Ladder/Ladder_Top.ysh",
+					ETOUI(LEVEL::GAMEPLAY)
+			}
+	};
+	Register(LadderSpec.strObjectName, LadderSpec);
+
 	Register_Unsupported(L"ArrowBoard", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
 }
 

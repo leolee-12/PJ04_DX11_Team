@@ -21,7 +21,7 @@ HRESULT CLevelDesign_ProtoRegister::Ready_Prototypes(const LD_RUNTIME_LEVELS& Le
 	unordered_set<_wstring> RequiredPrototypes;
 	RequiredPrototypes.reserve(Package.ObjectDescs.size());
 
-	for (const LD_PARSED_OBJECT& Desc : Package.ObjectDescs)
+	for (const LD_OBJECT_ENTRY& Desc : Package.ObjectDescs)
 	{
 		LD_RESOLVED_SPAWN Resolved{};
 
