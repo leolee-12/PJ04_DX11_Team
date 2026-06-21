@@ -193,7 +193,7 @@ void CGigantEdge::Free()
     __super::Free();
 }
 
-HRESULT CGigantEdge::Ready_Parts()
+HRESULT CGigantEdge::Ready_PartObjects()
 {
     m_pBody = Add_MonsterPart<CGigantEdge_Body>(
         CGigantEdge_Body::PROTOTYPE_TAG, CGigantEdge_Body::PART_TAG);

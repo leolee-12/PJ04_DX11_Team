@@ -44,7 +44,7 @@ public:
     void  Clear_Groggy() { m_bGroggyRequested = false; }
 
 protected:
-    virtual HRESULT        Ready_Parts() override;
+    virtual HRESULT        Ready_PartObjects() override;
     virtual CMonsterBrain* Create_Brain() override;
     virtual const _tchar*  Get_AppearEventTag() const override { return TEXT("GigantEdge_Appear"); }
 

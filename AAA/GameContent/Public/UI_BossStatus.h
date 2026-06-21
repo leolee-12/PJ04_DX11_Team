@@ -35,10 +35,6 @@ protected:
     virtual HRESULT Ready_Events() override;
 
 private:
-    HRESULT Ready_Components();
-    void    Try_BindGauge();
-
-private:
     CUI_GaugeBarCom* m_pGaugeBar = { nullptr };
     CUI_Text* m_pNameText = { nullptr };
     _wstring  m_strPendingName;
@@ -50,6 +46,25 @@ private:
     _float m_fPendingMax = { 100.f };
     _float m_fPendingCurr = { 100.f };
     _bool  m_bPendingAppear = { false };
+
+    enum class APPEAR_PHASE { NONE, SLIDING, DONE };
+    APPEAR_PHASE m_eAppearPhase = { APPEAR_PHASE::NONE };
+
+    _float3 m_vHomePos = {};
+    _float m_fSlideTime = { 0.f };
+    _float m_fSlideDuration = { 1.f };
+    _float m_fSlideOffsetX = { 600.f };
+
+private:
+    HRESULT Ready_Components();
+    void    Try_BindGauge();
+    void    Start_SlideIn();
+    void    Update_SlideIn(_float fTimeDelta);
+    static _float Ease_OutCubic(_float t) 
+    { 
+        _float u = 1.f - t;  
+        return 1.f - u * u * u;
+    }
 
 public:
     static CUI_BossStatus* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -129,6 +129,7 @@ protected:
 	virtual HRESULT				Create_Movement();	// 기본 : Monster_Movement - 별도 무브먼트 필요할 때 상속받아서 쓸 것 
 	virtual _bool				Use_StateMachine() const { return true; } // BT 전용 몬스터는 false 반환
 	virtual HRESULT				Ready_State(CMonster_StateMachine* pStateMachine);
+	virtual HRESULT				Ready_PartObjects() { return S_OK; }
 	virtual HRESULT				Ready_AnimEvents() { return S_OK; }		// Bkody의 Animator의 이벤트 콜백 설정함수
 
 	virtual void				On_Damaged(const ATTACK_INFO& tInfo) override;

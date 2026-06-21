@@ -37,6 +37,7 @@ public:
     _float Get_Max()     const { return m_fMax; }
 
     void Appear(_float fCurrent, _float fMax);
+    void Reset_Empty();
 
 private:
     void   Push();

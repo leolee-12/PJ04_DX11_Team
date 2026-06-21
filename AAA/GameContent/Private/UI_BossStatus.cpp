@@ -53,6 +53,8 @@ void CUI_BossStatus::Update(_float fTimeDelta)
     if (m_pGaugeBar && !m_pGaugeBar->Is_Bound())
         Try_BindGauge();
 
+    Update_SlideIn(fTimeDelta);
+
 #ifdef _DEBUG
     if (m_pGaugeBar)
     {
@@ -97,7 +99,7 @@ HRESULT CUI_BossStatus::Ready_Events()
             auto* p = static_cast<BOSS_HP_APPEARED*>(pData);
             if (nullptr == p) return;
 
-            Set_Active(true);                     
+            Set_Active(true);
 
             m_strPendingName = p->strBossName;
             m_fPendingMax = p->fMaxHP;
@@ -106,13 +108,13 @@ HRESULT CUI_BossStatus::Ready_Events()
             if (m_pGaugeBar && !m_pGaugeBar->Is_Bound())
                 Try_BindGauge();
 
-            if (m_pNameText)                      
+            if (m_pNameText)
                 m_pNameText->Set_Text(p->strBossName);
 
             if (m_pGaugeBar && m_pGaugeBar->Is_Bound())
-                m_pGaugeBar->Appear(p->fCurrHp, p->fMaxHP);   
-            else
-                m_bPendingAppear = true;           
+                m_pGaugeBar->Reset_Empty();
+
+            Start_SlideIn();   
         });
 
     Subscribe_Event(EventTag::Boss_Died, [this](void*) { Set_Active(false); });
@@ -147,6 +149,46 @@ void CUI_BossStatus::Try_BindGauge()
     {
         m_pGaugeBar->Set_Value(m_fPendingCurr, m_fPendingMax);
         m_bPendingHP = false;
+    }
+}
+
+void CUI_BossStatus::Start_SlideIn()
+{
+    _vector vHome = m_pTransformCom->Get_State(STATE::POSITION);
+    XMStoreFloat3(&m_vHomePos, vHome);
+
+    _vector vStart = vHome + XMVectorSet(m_fSlideOffsetX, 0.f, 0.f, 0.f);
+    m_pTransformCom->Set_State(STATE::POSITION, vStart);
+
+    m_fSlideTime = 0.f;
+    m_eAppearPhase = APPEAR_PHASE::SLIDING;
+}
+
+void CUI_BossStatus::Update_SlideIn(_float fTimeDelta)
+{
+    if (m_eAppearPhase != APPEAR_PHASE::SLIDING)
+        return;
+
+    m_fSlideTime += fTimeDelta;
+    _float t = (m_fSlideDuration > 0.f) ? (m_fSlideTime / m_fSlideDuration) : 1.f;
+    if (t > 1.f) t = 1.f;
+
+    _float fStartX = m_vHomePos.x + m_fSlideOffsetX;
+    _float fX = fStartX + (m_vHomePos.x - fStartX) * Ease_OutCubic(t);
+
+    _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetX(vPos, fX));
+
+    if (t >= 1.f)
+    {
+        m_pTransformCom->Set_State(STATE::POSITION,
+            XMVectorSet(m_vHomePos.x, m_vHomePos.y, m_vHomePos.z, 1.f));
+        m_eAppearPhase = APPEAR_PHASE::DONE;
+
+        if (m_pGaugeBar && m_pGaugeBar->Is_Bound())
+            m_pGaugeBar->Appear(m_fPendingCurr, m_fPendingMax);
+        else
+            m_bPendingAppear = true;  
     }
 }
 

@@ -108,6 +108,7 @@ public:
     _float                                  Get_Alpha() const { return m_fAlpha; }
 
     void                                    Play_AppearSweep(_float fTargetRatio, _float fSpeed = 0.8f);
+    void                                    Reset_Empty();
 
 public:
     static CUI_GaugeFill*                   Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

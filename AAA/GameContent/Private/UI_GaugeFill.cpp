@@ -407,6 +407,17 @@ void CUI_GaugeFill::Play_AppearSweep(_float fTargetRatio, _float fSpeed)
     m_bAppearSweep = true;
 }
 
+void CUI_GaugeFill::Reset_Empty()
+{
+    m_bAppearSweep = false;
+    m_eGhostMode = GHOST_MODE::NONE;
+    m_fFillRatio = 0.f;
+    m_fGhostRatio = 0.f;     
+    m_fTargetRatio = 0.f;
+    m_fGhostHoldAcc = 0.f;
+    m_bGaugeInit = true;
+}
+
 CUI_GaugeFill* CUI_GaugeFill::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     CUI_GaugeFill* pInstance = new CUI_GaugeFill(pDevice, pContext);

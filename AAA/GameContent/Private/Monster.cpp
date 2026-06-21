@@ -40,11 +40,18 @@ HRESULT CMonster::Initialize(void* pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
-
 	if (FAILED(Ready_Collider()))
 		return E_FAIL;
-
 	SetUp_Collider_CallBack();
+
+	if (FAILED(Ready_PartObjects()))        
+		return E_FAIL;
+	if (FAILED(Ready_Movement()))           
+		return E_FAIL;
+	if (FAILED(Ready_AI()))                 
+		return E_FAIL;
+	if (FAILED(Ready_AnimEvents()))         
+		return E_FAIL;
 
 	return S_OK;
 }

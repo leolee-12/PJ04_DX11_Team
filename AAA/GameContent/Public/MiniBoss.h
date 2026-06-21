@@ -39,11 +39,9 @@ protected:
 
     CMonster_State* m_pCaptureState = { nullptr };
 
-
 protected:
     virtual void    Update_AI(_float fTimeDelta) override; // 라이프사이클 게이팅
 
-    virtual HRESULT        Ready_Parts() = 0;
     virtual CMonsterBrain* Create_Brain() override = 0;
     virtual _bool          Use_StateMachine() const override { return false; }
     virtual const _tchar*  Get_AppearEventTag() const { return nullptr; }
