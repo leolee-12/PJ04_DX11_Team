@@ -404,14 +404,29 @@ HRESULT CMonster::Ready_State(CMonster_StateMachine* pStateMachine)
 
 void CMonster::On_Damaged(const ATTACK_INFO& tInfo)
 {
-	m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
-	//Change_State(MONSTER_STATE_TYPE::HIT);
+	//  Movement 상태 안으로 이전
+	if (m_pMovement)
+		m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
+
+	Change_State(MONSTER_STATE_TYPE::KNOCK_BACK);
 }
 
 void CMonster::On_Death(const ATTACK_INFO& tInfo)
 {
-	if (m_pMovement) m_pMovement->KO(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
-	Change_State(MONSTER_STATE_TYPE::DEATH);
+	//  Movement 상태 안으로 이전
+
+	if (tInfo.fDamage >= m_fMaxHP)
+	{
+		if (m_pMovement)
+			m_pMovement->KO(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
+		Change_State(MONSTER_STATE_TYPE::KNOCK_OUT);
+	}
+	else
+	{
+		if (m_pMovement)
+			m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
+		Change_State(MONSTER_STATE_TYPE::KNOCK_BACK);
+	}
 }
 
 _bool CMonster::Block_Hit(const ATTACK_INFO& tInfo)

@@ -124,7 +124,7 @@ private:
 	_float						m_fBlendElapsed = { };
 	_bool						m_isBlending = { false };
 
-	physx::PxTriangleMesh* m_pCollisionMesh = { nullptr };
+	physx::PxTriangleMesh*		m_pCollisionMesh = { nullptr };
 
 	// юс╫ц
 	vector<MESH_LAYER_IDX>		m_MeshLayers;

@@ -484,6 +484,18 @@
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockBack\Dead">
       <UniqueIdentifier>{f45699c1-0279-42f5-8174-aecc983bb4b3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\NormalEnemy">
+      <UniqueIdentifier>{66444ce9-9787-4e31-94d5-04f968389e66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\NormalEnemy\Parts">
+      <UniqueIdentifier>{c4f801b1-7d7f-4110-a9ba-12258e3f85f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\NormalEnemy\Parts\Body">
+      <UniqueIdentifier>{ec28b6dd-3536-48e9-b482-a120c9f9a36a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\NormalEnemy\Brain">
+      <UniqueIdentifier>{f7593e7a-fc6e-4d1d-ab31-8f45704556ac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -969,6 +981,12 @@
     <ClInclude Include="..\Public\Monster_State_Retreat.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Retreat</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\NormalEnemy.h">
+      <Filter>00. GameObject\06. Monster\NormalEnemy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\NormalEnemy_Body.h">
+      <Filter>00. GameObject\06. Monster\NormalEnemy\Parts\Body</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1384,6 +1402,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Monster_State_Retreat.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Retreat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\NormalEnemy.cpp">
+      <Filter>00. GameObject\06. Monster\NormalEnemy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\NormalEnemy_Body.cpp">
+      <Filter>00. GameObject\06. Monster\NormalEnemy\Parts\Body</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
