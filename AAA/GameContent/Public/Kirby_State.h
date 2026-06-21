@@ -13,13 +13,16 @@ NS_BEGIN(Client)
 
 class CKirby;
 
+struct ATTACK_INFO;
+
 enum class KIRBY_STATE_TYPE
 {
 	WAIT, RUN, JUMP, FALL,
 	ATTACK,
 	HOVERING,
 	GET_ABILITY, ABILITY_DUMP,
-	FULL
+	FULL,
+	DAMAGED
 };
 
 class CLIENT_DLL CKirby_State abstract : public CBase
@@ -39,6 +42,9 @@ public:
 	virtual void Update(CKirby* pKirby, const _float fTimeDelta);
 	virtual void Exit(CKirby* pKirby);
 
+public:
+	virtual void  On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo);
+
 protected:
 	_bool Handle_MoveCommand(CKirby* pKirby, CKirby_Command* pCommand);
 
@@ -48,8 +54,6 @@ protected:
 
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand);
-
-
 
 protected:
 	virtual void Free() override;

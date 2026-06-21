@@ -66,6 +66,11 @@ HRESULT CKirby_Ability_Sword::Initialize()
         false, false, 5.f, 0.05f,
         false, false, 5.f, 0.05f);
 
+    // Damaged
+    //Set_OverlayAni(ABILITY_ANI::DAMAGED, "Damage", "HaveSwordMove", "R_ShoulderJ",
+    //    false, false, 2.f, 0.1f,
+    //    false, false, 2.f, 0.1f);
+
 
     m_fSuperSpinSlashChargeTime = 0.8f;
 

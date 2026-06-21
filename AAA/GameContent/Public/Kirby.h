@@ -135,6 +135,8 @@ private:
 	virtual _bool Block_Hit(const ATTACK_INFO& tInfo) override;
 	virtual void  On_Damaged(const ATTACK_INFO& tInfo) override;
 	
+	void Update_Timer(_float fTimeDelta);
+
 private:
 	// Parts
 	CKirby_Body* m_pBody{};
@@ -153,8 +155,8 @@ private:
 	// Stuffed
 	CMonster* m_pCapturedMonster{};
 
-	// À±¼®Çö Ãß°¡
-	_float	   m_fInvincible = { 0.f };
+	// Invincible Time
+	_float m_fInvincibleTime{};
 
 private:
 	// System

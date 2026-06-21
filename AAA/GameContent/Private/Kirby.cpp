@@ -74,8 +74,7 @@ void CKirby::Update(_float fTimeDelta)
 
     __super::Update(fTimeDelta);
 
-    if (m_fInvincible > 0.f)
-        m_fInvincible -= fTimeDelta;
+    Update_Timer(fTimeDelta);
 
     m_pKirby_InputManager->Update_KirbyInput(fTimeDelta);
     m_pKirby_Controller->Update_KirbyController(fTimeDelta);
@@ -456,13 +455,20 @@ HRESULT CKirby::Ready_Events()
 
 _bool CKirby::Block_Hit(const ATTACK_INFO& tInfo) 
 { 
-    return m_fInvincible > 0.f; 
+    return m_fInvincibleTime > 0.f; 
 }
 
 void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
 {
-    m_fInvincible = s_fInvincibleDur;
-    // TODO: ³Ë¹é/ÇÇ°Ý¾Ö´Ô
+    m_fInvincibleTime = s_fInvincibleDur;
+
+    m_pKirby_StateMachine->On_Damaged_KirbyStateMachine(tInfo);
+}
+
+void CKirby::Update_Timer(_float fTimeDelta)
+{
+    if (m_fInvincibleTime > 0.f)
+        m_fInvincibleTime -= fTimeDelta;
 }
 
 void CKirby::Spit_Monster()

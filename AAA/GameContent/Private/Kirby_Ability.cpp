@@ -44,6 +44,8 @@ HRESULT CKirby_Ability::Initialize()
     Set_FullBodyAni(ABILITY_ANI::STUFFED_LANDING, "StuffedLanding", false, false, 0.1f, 1.5f);
     Set_FullBodyAni(ABILITY_ANI::STUFFED_SPIT, "Spit", false, false, 0.1f, 2.f);
 
+    Set_FullBodyAni(ABILITY_ANI::DAMAGED, "Damage", false, false, 0.1f, 1.5f);
+
     return S_OK;
 }
 
