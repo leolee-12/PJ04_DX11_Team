@@ -63,7 +63,7 @@ HRESULT CBladeKnight::Initialize(void* pArg)
     if (FAILED(Ready_AnimEvents()))
         return E_FAIL;
 
-    //m_eCopyAbility = COPY_ABILITY_TYPE::SWORD;
+    m_eCopyAbility = COPY_ABILITY_TYPE::SWORD;
 
     return S_OK;
 }
