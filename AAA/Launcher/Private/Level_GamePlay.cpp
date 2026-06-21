@@ -21,7 +21,7 @@ HRESULT CLevel_GamePlay::Initialize()
     _uint iLevel = ETOUI(LEVEL::GAMEPLAY);
 
     LEVEL_MANIFEST Manifest{};
-    if (FAILED(Load_LevelManifest(LAUNCHER_LEVEL_PROFILES::LEVEL_TEST, &Manifest)))
+    if (FAILED(Load_LevelManifest(LAUNCHER_LEVEL_PROFILES::LEVEL_STAGE0_STEP1, &Manifest)))
         return E_FAIL;
 
     MAP_LOAD_RESULT MapReport{};
@@ -78,7 +78,7 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
     
     if (m_bTestLevelChange)
     {
-        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::TEST);
+        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::TOWN_STEP1);
         if (pLoadingLevel)
         {
             m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
@@ -106,13 +106,13 @@ HRESULT CLevel_GamePlay::Ready_Events()
 
 HRESULT CLevel_GamePlay::Ready_Lights()
 {
-    LIGHT_DESC      LightDesc{};
+    LIGHT_DESC LightDesc{};
 
     LightDesc.eType = LIGHT::DIRECTIONAL;
-    LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-    LightDesc.vAmbient = _float4(0.2f, 0.2f, 0.2f, 1.f);
+    LightDesc.vDiffuse = _float4(5.0f, 5.5f, 6.0f, 1.f);
+    LightDesc.vAmbient = _float4(0.f, 0.f, 0.f, 1.f);
     LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
-    LightDesc.vDirection = _float4(0.25f, -1.f, 0.25f, 0.f);
+    LightDesc.vDirection = _float4(0.557f, -0.766f, 0.321f, 0.f);
 
     if (FAILED(m_pGameInstance_Proxy->Add_Light(LightDesc)))
         return E_FAIL;
@@ -135,25 +135,6 @@ HRESULT CLevel_GamePlay::Ready_Camera()
     m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::GAMEPLAY),
         TEXT("Prototype_GameObject_Camera_Follow"),
         ETOUI(LEVEL::GAMEPLAY), TEXT("Layer_Camera"), TEXT("CameraFollow"), &CamDesc);
-
-
-    //if (FAILED(m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Camera_Free"), CCamera_Free::Create(m_pDevice, m_pContext))))
-    //    return E_FAIL;
-    //
-    //CCamera_Free::CAMERA_FREE_DESC      CameraDesc{};
-    //
-    //CameraDesc.vEye = _float3(-130.f, 12.f, -70.f);
-    //CameraDesc.vAt = _float3(-130.f, 8.f, -64.f);
-    //CameraDesc.fFovy = XMConvertToRadians(60.f);
-    //CameraDesc.fNear = 0.1f;
-    //CameraDesc.fFar = 500.f;
-    //CameraDesc.fSpeedPerSec = 20.f;
-    //CameraDesc.fRotationPerSec = XMConvertToRadians(180.f);
-    //CameraDesc.fMouseSensor = 0.05f;
-    //
-    //if (FAILED(m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Camera_Free"),
-    //    ETOUI(LEVEL::GAMEPLAY), TEXT("Layer_Camera"), TEXT("CameraFree"), & CameraDesc)))
-    //    return E_FAIL;
 
     return S_OK;
 }

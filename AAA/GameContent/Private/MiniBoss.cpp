@@ -69,7 +69,10 @@ void CMiniBoss::Update_AI(_float fTimeDelta)
                 m_bIntroStarted = true; 
             }
             if (Is_Intro_Finished())
-                m_eLife = EMINIBOSS_LIFE::ACTIVE;       
+            {
+                Publish_Boss_Appeared();
+                m_eLife = EMINIBOSS_LIFE::ACTIVE;
+            }
             if (m_pMovement && !m_pGameInstance_Proxy->Is_EditMode())
                 m_pMovement->Move(XMVectorZero(), fTimeDelta);
             return;

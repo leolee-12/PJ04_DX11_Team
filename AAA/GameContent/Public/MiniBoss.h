@@ -39,6 +39,8 @@ protected:
 
     CMonster_State* m_pCaptureState = { nullptr };
 
+    _wstring        m_strBossName = { L"Boss" };
+
 protected:
     virtual void    Update_AI(_float fTimeDelta) override; // 라이프사이클 게이팅
 
@@ -59,6 +61,7 @@ protected:
     virtual void   On_Death_Reaction(const ATTACK_INFO& tInfo) {}
 
     CGameObject*   Find_Player() const;
+    void           Publish_Boss_Appeared();
     void           Publish_HP();
 
 protected:

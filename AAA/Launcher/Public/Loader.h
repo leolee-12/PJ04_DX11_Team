@@ -65,6 +65,7 @@ private:
 	HRESULT Ready_WorkQueue();
 	HRESULT Ready_Resources_For_GamePlay();
 	HRESULT Ready_Resources_For_Test();
+	HRESULT Ready_Resources_For_TownStep1();
 
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID, _bool Initialized = true);

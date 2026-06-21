@@ -25,6 +25,8 @@ HRESULT CGigantEdge::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
+    m_strBossName = L"기간트 엣지";
+
     m_eCopyAbility = COPY_ABILITY_TYPE::SWORD;
     m_pMovement->Set_MoveSpeed(4.f);
 
@@ -49,6 +51,7 @@ void CGigantEdge::Update(_float fTimeDelta)
 void CGigantEdge::On_Deserialized() 
 { 
     __super::On_Deserialized(); 
+    m_pTransformCom->Set_Scale(2.f, 2.f, 2.f);
 }
 
 CMonsterBrain* CGigantEdge::Create_Brain()
@@ -121,6 +124,15 @@ CGameObject* CMiniBoss::Find_Player() const
     return q.pPlayer;
 }
 
+void CMiniBoss::Publish_Boss_Appeared()
+{
+    BOSS_HP_APPEARED desc{};
+    desc.strBossName = m_strBossName;
+    desc.fMaxHP = m_fMaxHP;         
+    desc.fCurrHp = m_fCurHP;
+    m_pGameInstance_Proxy->Publish(EventTag::Boss_HP_Appeared, &desc);
+}
+
 void CMiniBoss::Publish_HP()
 {
     BOSS_HP_UPDATED hp{};
@@ -159,22 +171,9 @@ void CGigantEdge::Debug_KeyInput()
     if (nullptr == m_pGameInstance_Proxy)
         return;
 
-    if (m_pGameInstance_Proxy->Key_Down(DIK_H) && m_pSword)
-    {
-        m_bDbgSwordDrawn = !m_bDbgSwordDrawn;
-        m_pSword->Set_Drawn(m_bDbgSwordDrawn);
-    }
     if (m_pGameInstance_Proxy->Key_Down(DIK_0)) 
-        Appear();                          
-    //if (m_pGameInstance_Proxy->Key_Down(DIK_G)) m_bGroggyRequested = true;         // 그로기 분기 진입
-    //if (m_pGameInstance_Proxy->Key_Down(DIK_R)) m_bDbgInRange = !m_bDbgInRange;    // 사거리 토글 (공격↔추격)
-    //if (m_pGameInstance_Proxy->Key_Down(DIK_M)) m_bDbgWalkInPlace = !m_bDbgWalkInPlace;
-
-    if (m_pGameInstance_Proxy->Key_Down(DIK_9)) Die();                              // 커비 능력 버리는 X 키랑 겹쳐서 수정했음
-    //if (m_pGameInstance_Proxy->Key_Down(DIK_1)) m_iDbgAttack = 0;                  // Slam 고정
-    //if (m_pGameInstance_Proxy->Key_Down(DIK_2)) m_iDbgAttack = 1;                  // Charge 고정
-    //if (m_pGameInstance_Proxy->Key_Down(DIK_3)) m_iDbgAttack = 2;                  // Swing 고정
-    //if (m_pGameInstance_Proxy->Key_Down(DIK_4)) m_iDbgAttack = -1;                 // 랜덤 복귀
+        Appear();                         
+    if (m_pGameInstance_Proxy->Key_Down(DIK_9)) Die();                            
 }
 #endif
 

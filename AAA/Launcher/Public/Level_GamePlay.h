@@ -5,8 +5,6 @@
 
 NS_BEGIN(Client)
 
-class CLumia;
-
 class CLevel_GamePlay final : public CLevel
 {
 private:
