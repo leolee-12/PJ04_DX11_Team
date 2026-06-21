@@ -15,31 +15,27 @@ MONSTER_STATE_TYPE CMonster_State_Fall::Get_StateType()
 	return MONSTER_STATE_TYPE::FALL;
 }
 
-void CMonster_State_Fall::On_Enter(CMonster* pMonster)
+void CMonster_State_Fall::Enter()
 {
-	if (pMonster == nullptr)
+	if (m_pOwner == nullptr)
 		return;
-
-	if (CAnimator* pAnim = pMonster->Get_BodyAnimator())
-		pAnim->Play(&m_PlayInfo);
+	
+	if (m_pAnimator && !m_PlayInfo.strAniName.empty())
+		m_pAnimator->Play(&m_PlayInfo);
 }
 
-void CMonster_State_Fall::On_Update(CMonster* pMonster, _float fTimeDelta)
+void CMonster_State_Fall::Update(_float fTimeDelta)
 {
-	if (nullptr == pMonster)
+	if (nullptr == m_pOwner)
 		return;
 
-	CMonster_Movement* pMove = pMonster->Get_Movement();
-
-	// TODO : 바운스 도중 Fall - Landing 전환 고려하기
-
-	if (pMove != nullptr && pMove->Is_Grounded())
-		pMonster->Change_State(MONSTER_STATE_TYPE::LANDING);
+	if (m_pMovement && m_pMovement->Is_Grounded())
+		m_pOwner->Change_State(MONSTER_STATE_TYPE::LANDING);
 }
 
-void CMonster_State_Fall::On_Exit(CMonster* pMonster)
+void CMonster_State_Fall::Exit(MONSTER_STATE_TYPE eNextState)
 {
-	if (pMonster == nullptr)
+	if (m_pOwner == nullptr)
 		return;
 }
 

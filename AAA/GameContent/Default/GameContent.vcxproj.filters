@@ -406,9 +406,6 @@
     <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State">
       <UniqueIdentifier>{533932dd-cfb3-4312-9da1-e8b96cec46af}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State\Retreat">
-      <UniqueIdentifier>{89282008-e019-406b-94d9-3d04924e3a49}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State\Attack">
       <UniqueIdentifier>{dd408402-1425-42a3-9147-6956e370fb21}</UniqueIdentifier>
     </Filter>
@@ -468,6 +465,15 @@
     </Filter>
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Find">
       <UniqueIdentifier>{6cd36b1a-1d3e-4d5a-963c-d67b94becb43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Attack">
+      <UniqueIdentifier>{765c8d67-517d-476b-ab97-3167b36bc8a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Retreat">
+      <UniqueIdentifier>{bdf27873-c46b-4fc8-bed7-7d19ef211827}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockBack\Dead">
+      <UniqueIdentifier>{f45699c1-0279-42f5-8174-aecc983bb4b3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -867,12 +873,6 @@
     <ClInclude Include="..\Public\BladeKnight_FSM.h">
       <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\Brain</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Monster_StateT.h">
-      <Filter>00. GameObject\06. Monster\01. StateMachine\State</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\BladeKnight_State_Retreat.h">
-      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\State\Retreat</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\BladeKnight_State_Attack.h">
       <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\State\Attack</Filter>
     </ClInclude>
@@ -881,9 +881,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\BladeKnight_State_TornadoAttack.h">
       <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\State\TornadoAttack</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Monster_Brain_FSM_T.h">
-      <Filter>00. GameObject\06. Monster\00. System\Brain</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TestParticle.h">
       <Filter>00. GameObject\Test\TestParticle</Filter>
@@ -947,6 +944,12 @@
     </ClInclude>
     <ClInclude Include="..\public\MonsterPart.h">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_State_Attack.h">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_State_Retreat.h">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Retreat</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1280,9 +1283,6 @@
     <ClCompile Include="..\Private\BladeKnight_FSM.cpp">
       <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\Brain</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\BladeKnight_State_Retreat.cpp">
-      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\State\Retreat</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\BladeKnight_State_Attack.cpp">
       <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\State\Attack</Filter>
     </ClCompile>
@@ -1351,6 +1351,12 @@
     </ClCompile>
     <ClCompile Include="..\private\MonsterPart.cpp">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_State_Attack.cpp">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_State_Retreat.cpp">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Retreat</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

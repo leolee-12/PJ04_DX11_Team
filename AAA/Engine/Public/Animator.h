@@ -50,7 +50,11 @@ public: // 재생 제어 (오브젝트/에디터는 오직 이것만 사용)
 
     void    Set_EventCallback(EventCallback cb) { m_Callback = move(cb); }
 
-    void    Set_Mask(const _string& strClip, const _string& Bones, _bool bLoop, _float fMaskTarget, _float fMaskBlendTime);
+    // 단일 선언 유지
+    void    Set_Mask(const _char* szClip, const _char* strRootBone, _bool bLoop, _float fMaskTarget, _float fMaskBlendTime);
+
+    // 벡터 선언 추가
+    void    Set_Mask(const _char* szClip, const _char* const* pRoots, _uint iRootCount, _bool bLoop, _float fMaskTarget, _float fMaskBlendTime);
 
     // 바로 지우고 싶으면 그대로 사용 / 부드럽게 내리고 싶다면 BlendTime 주기
     void    Clear_Mask(_float fMaskBlendTime = 0.f);
@@ -63,7 +67,7 @@ public: // 에디터(데이터 편집)
     void    Sort_Track(const string& strAnimName);
 
     HRESULT Load_FromFile(const wstring& strPath);
-    HRESULT Save_ToFile(const wstring& strPath) const;
+    HRESULT Save_ToFile(const wstring& strPath);
 
     virtual json Serialize() const override;
     virtual void Deserialize_Internal(const json& j) override;
@@ -84,6 +88,9 @@ private:
     void    Process_Range(ANIM_EVENT_TRACK& track, _float fCur);
     void    Reset_RuntimeState(ANIM_EVENT_TRACK* pTrack);
 
+    _wstring Make_DefaultDataFilePath() const;
+    _wstring Resolve_DataFilePath(const _wstring& strPath) const;
+
 private:
     CModel* m_pModel = { nullptr };
     EventCallback   m_Callback = { nullptr };
@@ -100,7 +107,6 @@ private:
     _float              m_fBlendDuration = { 0.2f };
 
     _string             m_strMaskClip;
-    _string             m_strMaskRootBone;
     _bool               m_bMaskLoop = { true };
 
     _float              m_fMaskWeight = 0.f;

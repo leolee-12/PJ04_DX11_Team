@@ -5,7 +5,7 @@ NS_BEGIN(Client)
 
 class CMonster;
 
-class CMonster_Brain_FSM : public CMonsterBrain
+class CMonster_Brain_FSM abstract : public CMonsterBrain
 {
 protected:
 	CMonster_Brain_FSM();
@@ -15,14 +15,12 @@ public:
 	virtual void				Decide(CMonster*, const MONSTER_BLACKBOARD&, _float) override;
 
 protected:
-	HRESULT						Initialize();
-	_bool						Can_Decide(CMonster*, const MONSTER_BLACKBOARD&) const;
-	virtual void				Decide_Combat(CMonster*, const MONSTER_BLACKBOARD&, _float) {}
+	virtual HRESULT				Initialize(CMonster* pOwner);
+	_bool						Can_Decide(const MONSTER_BLACKBOARD&) const;
+	virtual void				Decide_Internal(const MONSTER_BLACKBOARD&, _float) {}
 
-public:
-	static CMonster_Brain_FSM*	Create();
-
-private:
+protected:
+	CMonster*					m_pOwner = { nullptr };
 	_bool						m_bSpotted = { false };		// IDLE -> FIND 전이를 위한 변수
 
 protected:

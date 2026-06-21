@@ -4,8 +4,11 @@
 #include "Animator.h"
 #include "Monster_Movement.h"
 
-HRESULT CBladeKnight_State_TornadoAttack::Initialize()
+HRESULT CBladeKnight_State_TornadoAttack::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpeed)
 {
+	if (FAILED(__super::Initialize(tInfo, fSpeed)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -14,60 +17,55 @@ MONSTER_STATE_TYPE CBladeKnight_State_TornadoAttack::Get_StateType()
 	return MONSTER_STATE_TYPE::TORNADO_ATTACK;
 }
 
-void CBladeKnight_State_TornadoAttack::On_Enter(CBladeKnight* pBladeKnight)
+void CBladeKnight_State_TornadoAttack::Enter()
 {
-	if (nullptr == pBladeKnight)
+	if (nullptr == m_pOwner)
 		return;
 
-	const MONSTER_BLACKBOARD& BB = pBladeKnight->Get_BlackBoard();
+	const MONSTER_BLACKBOARD& BB = m_pOwner->Get_BlackBoard();
 	m_vLungeDir = BB.vDirToTargetXZ;
 
 	_vector vDir = XMLoadFloat3(&m_vLungeDir);
 	if (!XMVector3Equal(vDir, XMVectorZero()))
 	{
-		_vector vMyPos = pBladeKnight->Get_Transform()->Get_State(STATE::POSITION);
-		pBladeKnight->Get_Transform()->LookAt(vMyPos + vDir);
+		_vector vMyPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
+		m_pOwner->Get_Transform()->LookAt(vMyPos + vDir);
 	}
 
-	CBladeKnight_Body* pBody = pBladeKnight->Get_Body();
-	if (pBody == nullptr)
-		return;
-	CAnimator* pAnim = (pBody != nullptr) ? pBody->Get_Animator() : nullptr;
-	if (pAnim != nullptr)
+	if (m_pAnimator)
 	{
 		CAnimator::ANI_PLAY_INFO AniInfo{};
 		AniInfo.strAniName = "TornadoAttackCharge";
 		AniInfo.bLoop = false;
 		AniInfo.fSpeed = 1.50f;
-		pAnim->Play(&AniInfo); // Queue 클리어 + 시작
+		m_pAnimator->Play(&AniInfo); // Queue 클리어 + 시작
 
 		AniInfo.strAniName = "TornadoAttack";
 		AniInfo.fSpeed = 1.50f;
-		pAnim->Enqueue(AniInfo);
+		m_pAnimator->Enqueue(AniInfo);
 	}
 }
 
-void CBladeKnight_State_TornadoAttack::On_Update(CBladeKnight* pBladeKnight, _float fTimeDelta)
+void CBladeKnight_State_TornadoAttack::Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
-	if (nullptr == pBladeKnight)
+	if (nullptr == m_pOwner)
 		return;
 
-	CAnimator* pAnim = pBladeKnight->Get_Body() ? pBladeKnight->Get_Body()->Get_Animator() : nullptr;
-	if (pAnim != nullptr && pAnim->Is_Finished())
-		pBladeKnight->Change_State(MONSTER_STATE_TYPE::IDLE);
+	if (m_pAnimator && m_pAnimator->Is_Finished())
+		m_pOwner->Change_State(MONSTER_STATE_TYPE::IDLE);
 }
 
-void CBladeKnight_State_TornadoAttack::On_Exit(CBladeKnight* pBladeKnight)
+void CBladeKnight_State_TornadoAttack::Exit(MONSTER_STATE_TYPE eNextState)
 {
-	if (nullptr == pBladeKnight)
+	if (nullptr == m_pOwner)
 		return;
 }
 
-CBladeKnight_State_TornadoAttack* CBladeKnight_State_TornadoAttack::Create()
+CBladeKnight_State_TornadoAttack* CBladeKnight_State_TornadoAttack::Create(const ANI_PLAY_INFO& tInfo, _float fSpeed)
 {
 	CBladeKnight_State_TornadoAttack* pInstance = new CBladeKnight_State_TornadoAttack();
-	if (FAILED(pInstance->Initialize()))
+	if (FAILED(pInstance->Initialize(tInfo, fSpeed)))
 	{
 		MSG_BOX("Failed to Created : CBladeKnight_State_TornadoAttack");
 		Safe_Release(pInstance);
