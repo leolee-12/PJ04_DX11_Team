@@ -1,8 +1,8 @@
 #include "LevelDesign_Breakable.h"
 #include "Shader_PassMeta.h"
+#include "Parsing_Utils.h"
 
-#include "GameInstance_Proxy.h"
-#include "Model.h"
+#include "GameInstance.h"
 
 namespace
 {
@@ -147,6 +147,27 @@ void CLevelDesign_Breakable::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 		return;
 
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
+}
+
+void CLevelDesign_Breakable::Ready_BreakableCatalog()
+{
+	s_BreakableCatalog.push_back({ L"StarBlock",		LD_BREAKABLE_TYPE::STAR_BLOCK });
+	s_BreakableCatalog.push_back({ L"StarBlockBig",		LD_BREAKABLE_TYPE::STAR_BLOCK_BIG });
+	s_BreakableCatalog.push_back({ L"WoodBox",			LD_BREAKABLE_TYPE::WOOD_BOX });
+	s_BreakableCatalog.push_back({ L"PlasticBox",		LD_BREAKABLE_TYPE::PLASTIC_BOX });
+}
+
+LD_BREAKABLE_TYPE CLevelDesign_Breakable::Resolve_Breakable(const _wstring& wstrObjName)
+{
+	for (auto pair : s_BreakableCatalog)
+	{
+		if (JsonUtils::Equals_NoCase(pair.first.c_str(), wstrObjName.c_str()))
+		{
+			return pair.second;
+		}
+	}
+
+	return LD_BREAKABLE_TYPE::UNKNOWN;
 }
 
 HRESULT CLevelDesign_Breakable::Validate_Desc()

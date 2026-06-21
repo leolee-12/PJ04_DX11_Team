@@ -30,26 +30,19 @@ struct LD_SPAWN_SPEC
 struct LD_RESOLVED_SPAWN
 {
 	LD_SPAWN_SPEC Spec;
-
 	LD_OBJECT_ENTRY ObjectDesc;
-	LD_BREAKABLE_OBJECT_DESC BreakableDesc;
-
-	_bool bUseBreakableDesc = { false };
+	
 	_bool bFallback = { false };
 
 	void* Get_SpawnArgument()
 	{
-		if (bUseBreakableDesc) return &BreakableDesc;
+		const auto& ToSpawnArgument = [](auto& Desc) -> void* { return static_cast<void*>(&Desc);; };
 
-		const auto& fFunc = [](auto& Desc) -> void* { return &Desc; };
-
-		return std::visit(fFunc, ObjectDesc);
+		return std::visit(ToSpawnArgument, ObjectDesc);
 	}
 
 	const LD_OBJECT_DESC& Get_BaseDesc() const
 	{
-		if (bUseBreakableDesc) return BreakableDesc;
-
 		return Get_LDObjectDesc(ObjectDesc);
 	}
 };

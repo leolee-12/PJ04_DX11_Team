@@ -35,6 +35,9 @@ public:
 	virtual HRESULT Render() override;
 	virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
+	static void					Ready_BreakableCatalog();
+	static LD_BREAKABLE_TYPE	Resolve_Breakable(const _wstring& wstrObjName);
+
 public:
 	const LD_BREAKABLE_OBJECT_DESC&	Get_BreakableDesc() const { return m_tBreakableDesc; }
 
@@ -45,6 +48,8 @@ private:
 
 	LD_BREAKABLE_OBJECT_DESC m_tBreakableDesc = {};
 
+	static vector<pair<_wstring, LD_BREAKABLE_TYPE>> s_BreakableCatalog;
+
 private:
 	virtual	HRESULT	Validate_Desc() override;
 
@@ -53,7 +58,7 @@ private:
 	void			Release_PhysicsActor();
 	HRESULT			Bind_ShaderResources();
 	const _tchar*	Resolve_ModelProtoTag() const;
-
+	
 public:
 	static CLevelDesign_Breakable* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

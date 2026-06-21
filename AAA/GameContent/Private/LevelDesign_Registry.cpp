@@ -113,16 +113,18 @@ _bool CLevelDesign_Registry::Resolve(const LD_OBJECT_ENTRY& Desc, LD_RESOLVED_SP
 		return false;
 
 	*pOutResolved = {};
+	pOutResolved->ObjectDesc = Desc;
 
-	const LD_OBJECT_DESC& ObjectDesc = Get_LDObjectDesc(Desc);
+	LD_OBJECT_DESC& ResolvedDesc = Get_LDObjectDesc(pOutResolved->ObjectDesc);
 
-	const LD_SPAWN_SPEC* pSpec = Find(ObjectDesc.strObjectName);
+	const LD_SPAWN_SPEC* pSpec = Find(ResolvedDesc.strObjectName);
 	if (nullptr == pSpec)
 		pSpec = &Get_FallbackSpec();
 
 	if (pSpec->strPrototypeTag == CLevelDesign_Breakable::PROTOTYPE_TAG)
 	{
-		const LD_BREAKABLE_OBJECT_DESC* pBreakableDesc = std::get_if<LD_BREAKABLE_OBJECT_DESC>(&Desc);
+		LD_BREAKABLE_OBJECT_DESC* pBreakableDesc =
+			std::get_if<LD_BREAKABLE_OBJECT_DESC>(&pOutResolved->ObjectDesc);
 
 		if (nullptr == pBreakableDesc
 			|| pSpec->eBreakableType == LD_BREAKABLE_TYPE::UNKNOWN
@@ -134,23 +136,18 @@ _bool CLevelDesign_Registry::Resolve(const LD_OBJECT_ENTRY& Desc, LD_RESOLVED_SP
 
 	pOutResolved->Spec = *pSpec;
 	pOutResolved->bFallback = (pSpec == &Get_FallbackSpec());
+	ResolvedDesc.eCategory = pSpec->eCategory;
 
 	if (pSpec->strPrototypeTag == CLevelDesign_Breakable::PROTOTYPE_TAG)
 	{
-		const LD_BREAKABLE_OBJECT_DESC* pBreakableDesc = std::get_if<LD_BREAKABLE_OBJECT_DESC>(&Desc);
+		LD_BREAKABLE_OBJECT_DESC* pBreakableDesc =
+			std::get_if<LD_BREAKABLE_OBJECT_DESC>(&pOutResolved->ObjectDesc);
+
 		if (nullptr == pBreakableDesc)
 			return false;
 
-		pOutResolved->BreakableDesc = *pBreakableDesc;
-		pOutResolved->BreakableDesc.eCategory = pSpec->eCategory;
-		pOutResolved->BreakableDesc.eType = pSpec->eBreakableType;
-		pOutResolved->BreakableDesc.wstrModelProtoTag = pSpec->wstrModelProtoTag;
-		pOutResolved->bUseBreakableDesc = true;
-	}
-	else
-	{
-		pOutResolved->ObjectDesc = Desc;
-		Get_LDObjectDesc(pOutResolved->ObjectDesc).eCategory = pSpec->eCategory;
+		pBreakableDesc->eType = pSpec->eBreakableType;
+		pBreakableDesc->wstrModelProtoTag = pSpec->wstrModelProtoTag;
 	}
 
 	return !pOutResolved->Spec.strPrototypeTag.empty()

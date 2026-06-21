@@ -21,6 +21,7 @@ private:
 
 	static void Fill_Common(const json& jEntry, LD_OBJECT_DESC* pDesc);
 	static void Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJECT* pDesc);
+	static void Fill_BreakableFields(const json& jEntry, LD_BREAKABLE_OBJECT_DESC* pDesc);
 	static void Fill_LadderFields(const json& jEntry, LD_LADDER_DESC* pDesc);
 
 private:

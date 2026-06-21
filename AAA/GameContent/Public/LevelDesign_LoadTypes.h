@@ -47,6 +47,7 @@ struct LD_PORTAL_DESC
 struct LD_BREAKABLE_OBJECT_DESC : public LD_OBJECT_DESC
 {
 	LD_BREAKABLE_TYPE   eType = LD_BREAKABLE_TYPE::UNKNOWN;
+	MODEL               eModelType = MODEL::NONANIM;
 	_wstring            wstrModelProtoTag;
 };
 #pragma endregion
@@ -137,16 +138,16 @@ using LD_OBJECT_ENTRY = variant<LD_PARSED_OBJECT, LD_BREAKABLE_OBJECT_DESC, LD_L
 
 inline const LD_OBJECT_DESC& Get_LDObjectDesc(const LD_OBJECT_ENTRY& Entry)
 {
-	const auto& fFunc = [](const auto& Desc) -> const LD_OBJECT_DESC& { return Desc; };
+	const auto ToBaseDesc = [](const auto& Desc) -> const LD_OBJECT_DESC& { return static_cast<const LD_OBJECT_DESC&>(Desc);; };
 
-	return std::visit(fFunc, Entry);
+	return std::visit(ToBaseDesc, Entry);
 }
 
 inline LD_OBJECT_DESC& Get_LDObjectDesc(LD_OBJECT_ENTRY& Entry)
 {
-	const auto& fFunc = [](auto& Desc) -> LD_OBJECT_DESC& { return Desc; };
+	const auto ToBaseDesc = [](auto& Desc) -> LD_OBJECT_DESC& { return static_cast<LD_OBJECT_DESC&>(Desc);; };
 
-	return std::visit(fFunc, Entry);
+	return std::visit(ToBaseDesc, Entry);
 }
 
 struct LD_PACKAGE
