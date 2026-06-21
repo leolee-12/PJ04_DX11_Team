@@ -110,6 +110,11 @@ public:
 
     virtual void    Effect_Start() override;
 
+public:
+    // Color
+    void Set_Color(const _float3& vColor) { m_vColor = vColor; }
+    void Set_ColorChange(_bool bColorChange) { m_bColorChange = bColorChange; }
+
 protected:
     HRESULT Bind_ShaderValue();
 

@@ -54,7 +54,7 @@ public:
 	virtual _bool Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation) override;
 
 private:
-	SWORD_STATE m_eCurSwordState{};
+	SWORD_STATE m_eSwordState{};
 
 	SWORD_MOVE_STATE m_eCurSwordMoveState{};
 	SWORD_MOVE_STATE m_ePreSwordMoveState{};
@@ -72,6 +72,8 @@ private:
 	// Dir
 	_float3 m_vSwordWishDir{};
 	_bool m_bMoveLock{};
+
+	static constexpr const _char* OverlayMasks[2] = { "L_FootJ", "R_FootJ" };
 
 private:
 	void Update_ChargeTime(_float fTimeDelta);

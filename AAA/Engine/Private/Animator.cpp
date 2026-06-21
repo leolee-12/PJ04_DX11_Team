@@ -35,7 +35,7 @@ HRESULT CAnimator::Initialize(void* pArg)
 }
 
 // ── 재생 제어 ──
-void CAnimator::Play(const string& strAnimName, _bool bLoop, _bool bRestart, _float fBlend, _float fSpeed)
+void CAnimator::Play(const string& strAnimName, _bool bLoop, _bool bRestart, _float fBlend, _float fSpeed, _bool bClearMask)
 {
     if (nullptr == m_pModel)
         return;
@@ -52,7 +52,7 @@ void CAnimator::Play(const string& strAnimName, _bool bLoop, _bool bRestart, _fl
     m_bFinished = false;
 
     m_PlayQueue.clear();
-    Start_Clip({ strAnimName, bLoop, bRestart, fBlend, fSpeed });
+    Start_Clip({ strAnimName, bLoop, bRestart, fBlend, fSpeed, bClearMask });
 }
 
 void CAnimator::Play(const ANI_PLAY_INFO* tAniInfo)
@@ -138,17 +138,22 @@ void CAnimator::Set_Mask(const _char* szClip, const _char* const* pRoots, _uint 
 
 void CAnimator::Clear_Mask(_float fMaskBlendTime)
 {
+    // 여기 수정
     m_fMaskTarget = 0.f;
-    if (m_pModel)
-        m_pModel->Clear_MaskSnapShot();
 
     if (fMaskBlendTime <= 0.f)
     {
+        m_fMaskBlendTime = 0.f;
         m_fMaskWeight = 0.f;
         m_strMaskClip.clear();
+
+        if (m_pModel)
+            m_pModel->Clear_MaskSnapShot();
+
+        return;
     }
-    else
-        m_fMaskBlendTime = fMaskBlendTime;
+
+    m_fMaskBlendTime = fMaskBlendTime;
 }
 
 void CAnimator::Enqueue(const ANI_PLAY_INFO& info)
@@ -168,8 +173,14 @@ void CAnimator::Update(_float fTimeDelta)
     else
         m_fMaskWeight = max(m_fMaskWeight - fStep, m_fMaskTarget);
 
+    // 여기 수정
     if (!m_strMaskClip.empty() && m_fMaskTarget <= 0.f && m_fMaskWeight <= 0.f)
+    {
         m_strMaskClip.clear();
+
+        if (m_pModel)
+            m_pModel->Clear_MaskSnapShot();
+    }
 
     if (!m_bPaused)
     {
