@@ -13,18 +13,18 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CMovement_Child;
+enum class KIRBY_STATE_TYPE;
+enum class COPY_ABILITY_TYPE;
 
 class CKirby_InputManager;
 class CKirby_Controller;
 class CKirby_StateMachine;
+
+class CMovement_Child;
+
 class CKirby_Ability;
 
-enum class KIRBY_STATE_TYPE;
-enum class COPY_ABILITY_TYPE;
-
 class CKirby_Body;
-
 class CKirby_OnOffPart;
 
 class CMonster;
@@ -115,10 +115,9 @@ public:
 	// Collider
 	CCollider* Get_Collider(KIRBY_COLLIDER eKirbyCollider);
 
-	// À± Ãß
 	// Stuffed
-	void  Set_SwallowedMonster(CMonster* pMonster) { m_pSwallowedMonster = pMonster; }
-	void  Spit_SwallowedMonster();
+	void  Capture_Monster(CMonster* pMonster) { m_pCapturedMonster = pMonster; }
+	void  Spit_Monster();
 
 private:
 	HRESULT Ready_Components();
@@ -140,21 +139,22 @@ private:
 	// Parts
 	CKirby_Body* m_pBody{};
 
+	// Com
 	CController* m_pController{};
-
-	// Movement
 	CMovement_Child* m_pMovement{};
 
+	// Movement
 	_float3 m_vWishDir{};
 	_bool m_RotationLock{};
 
 	// Collider
 	vector<CCollider*> m_KirbyColliders;
 
-	_float	   m_fInvincible = { 0.f };
+	// Stuffed
+	CMonster* m_pCapturedMonster{};
 
-	// À± Ãß
-	CMonster* m_pSwallowedMonster{};
+	// À±¼®Çö Ãß°¡
+	_float	   m_fInvincible = { 0.f };
 
 private:
 	// System
