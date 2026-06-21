@@ -37,7 +37,7 @@ public:
     void    Update(_float fTimeDelta);                 // 재생 + 이벤트 판정 소유
 
 public: // 재생 제어 (오브젝트/에디터는 오직 이것만 사용)
-    void    Play(const string& strAnimName, _bool bLoop = true, _bool bRestart = false, _float fBlend = 0.2f, _float fSpeed = 1.0f);
+    void    Play(const string& strAnimName, _bool bLoop = true, _bool bRestart = false, _float fBlend = 0.2f, _float fSpeed = 1.0f, _bool bClearMask = true);
     void    Play(const ANI_PLAY_INFO* tAniInfo);
     void    Start_Clip(const ANI_PLAY_INFO& Info);
     void    Pause() { m_bPaused = true; }
