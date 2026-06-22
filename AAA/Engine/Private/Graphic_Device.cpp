@@ -23,6 +23,23 @@ HRESULT CGraphic_Device::Initialize(HWND hWnd, WINMODE isWindowed, _uint iWinSiz
 	if (FAILED(D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE, 0, iFlag, nullptr, 0, D3D11_SDK_VERSION, &m_pDevice, &FeatureLV, &m_pDeviceContext)))
 		return E_FAIL;
 
+#ifdef _DEBUG
+	ID3D11InfoQueue* pInfoQueue = nullptr;
+	if (SUCCEEDED(m_pDevice->QueryInterface(__uuidof(ID3D11InfoQueue),
+		reinterpret_cast<void**>(&pInfoQueue))))
+	{
+		D3D11_MESSAGE_ID hide[] =
+		{
+			D3D11_MESSAGE_ID_SETPRIVATEDATA_CHANGINGPARAMS,   // #55: fx11 상태객체 중복 네이밍(양성)
+		};
+		D3D11_INFO_QUEUE_FILTER filter{};
+		filter.DenyList.NumIDs = _countof(hide);
+		filter.DenyList.pIDList = hide;
+		pInfoQueue->AddStorageFilterEntries(&filter);
+		pInfoQueue->Release();
+	}
+#endif
+
 	/* SwapChain : 더블버퍼링. 전면과 후면버퍼를 번갈아가며 화면에 보여준다.(Present) */
 
 

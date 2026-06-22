@@ -58,4 +58,47 @@ inline void Debug_DrawCapsule(
     }
 }
 
+inline void Debug_DrawSphere(
+    DirectX::PrimitiveBatch<DirectX::VertexPositionColor>* pBatch,
+    DirectX::FXMVECTOR center, float r, DirectX::FXMVECTOR color,
+    int radial = 16, int rings = 4)
+{
+    using namespace DirectX;
+
+    XMVECTOR axis = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+    XMVECTOR u = XMVectorSet(1.f, 0.f, 0.f, 0.f);
+    XMVECTOR v = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+
+    auto Line = [&](FXMVECTOR a, FXMVECTOR b)
+        { pBatch->DrawLine(VertexPositionColor(a, color), VertexPositionColor(b, color)); };
+    auto Dir = [&](float ang) { return u * cosf(ang) + v * sinf(ang); };
+
+    // 적도 링
+    XMVECTOR prev = center + Dir(0.f) * r;
+    for (int i = 1; i <= radial; ++i)
+    {
+        XMVECTOR d = Dir(XM_2PI * i / radial);
+        XMVECTOR a = center + d * r;
+        Line(prev, a);
+        prev = a;
+    }
+
+    // 경도선: 적도에서 위/아래 호를 같이 그려 완전한 구
+    for (int j = 0; j < radial; ++j)
+    {
+        XMVECTOR d = Dir(XM_2PI * j / radial);
+        XMVECTOR pt = center + d * r;   // 위쪽 호 시작
+        XMVECTOR pb = center + d * r;   // 아래쪽 호 시작
+        for (int k = 1; k <= rings; ++k)
+        {
+            float t = XM_PIDIV2 * k / rings;
+            float cs = cosf(t), sn = sinf(t);
+            XMVECTOR nt = center + d * (r * cs) + axis * (r * sn);
+            XMVECTOR nb = center + d * (r * cs) - axis * (r * sn);
+            Line(pt, nt); pt = nt;
+            Line(pb, nb); pb = nb;
+        }
+    }
+}
+
 NS_END
