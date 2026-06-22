@@ -6,7 +6,7 @@
 
 #include "BladeKnight_Body.h"
 #include "BladeKnight_Sword.h"
-#include "BladeKnight_FSM.h"
+#include "BladeKnight_Brain.h"
 
 // ป๓ลย
 #include "Monster_StateMachine.h"
@@ -105,7 +105,7 @@ CAnimator* CBladeKnight::Get_BodyAnimator() const
 
 CMonsterBrain* CBladeKnight::Create_Brain()
 {
-    return CBladeKnight_FSM::Create(this);
+    return CBladeKnight_Brain::Create(this);
 }
 
 HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)

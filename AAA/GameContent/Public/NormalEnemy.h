@@ -9,6 +9,7 @@ NS_END
 NS_BEGIN(Client)
 
 // Part 들 전방선언
+class CNormalEnemy_Body;
 
 class CNormalEnemy final : public CMonster
 {
@@ -60,14 +61,14 @@ private:
 
 private:
 	// Body 추가 
-
+	CNormalEnemy_Body*			m_pBody = { nullptr };
 
 public:
 	static CNormalEnemy*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*		Clone(void* pArg) override;
 
 protected:
-	virtual void Free() override;
+	virtual void				Free() override;
 
 };
 

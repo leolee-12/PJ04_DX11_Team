@@ -60,12 +60,12 @@ public:
 public:
 	void			Set_AnimationIndex(_uint iIndex, _bool isLoop = false, _bool isRestart = false, _float fBlendDuration = 0.2f);
 	_int			Get_AnimationIndex(const string& strName) const;
-	const string& Get_CurrentAnimName() const;
+	const string&	Get_CurrentAnimName() const;
 	void			Seek_Animation(_float fProgress);
 
 	_bool			Update_Base(_float fTimeDelta, _float fSpeed = 1.0f);
 	_bool			Play_Animation(_float fTimeDelta, _float fSpeed = 1.0f);
-	_bool			Play_Animation(_float fTimeDelta, const _string& strMaskClip, _float fSpeed = 1.0f, _bool bLoop = true, _float fMaskWeight = 1.f);
+	_bool			Play_Animation(_float fTimeDelta, _float fMaskTimeDelta, const _string& strMaskClip, _float fSpeed = 1.0f, _bool bLoop = true, _float fMaskWeight = 1.f);
 
 	void			Apply_Mask(const _string& strClip, _float fTimeDelta, _float fSpeed = 1.0f, _bool bLoop = true, _float fMaskWeight = 1.f);
 	void			Update_Combined();
@@ -129,7 +129,7 @@ private:
 	// юс╫ц
 	vector<MESH_LAYER_IDX>		m_MeshLayers;
 	string						m_strMeshLayerPath;
-
+	
 	unordered_map<_uint, KEYFRAME> m_MaskSnapShot;
 	vector<_uint>				m_MaskBones;
 

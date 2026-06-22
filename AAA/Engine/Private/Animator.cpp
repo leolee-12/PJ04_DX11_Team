@@ -47,7 +47,7 @@ void CAnimator::Play(const string& strAnimName, _bool bLoop, _bool bRestart, _fl
 
     m_fBlendDuration = fBlend;
 
-    m_pModel->Set_AnimationIndex((_uint)iIndex, bLoop, bRestart, m_fBlendDuration);
+    //m_pModel->Set_AnimationIndex((_uint)iIndex, bLoop, bRestart, m_fBlendDuration);
     m_fPlaySpeed = fSpeed;
     m_bFinished = false;
 
@@ -76,7 +76,6 @@ void CAnimator::Start_Clip(const ANI_PLAY_INFO& Info)
 
     if (Info.bClearMask)
         Clear_Mask();
-
 
     m_fBlendDuration = Info.fBlend;
     m_pModel->Set_AnimationIndex(static_cast<_uint>(iIndex), Info.bLoop, Info.bRestart, m_fBlendDuration);
@@ -184,7 +183,10 @@ void CAnimator::Update(_float fTimeDelta)
     if (!m_bPaused)
     {
         if (!m_strMaskClip.empty() && m_fMaskWeight > 0.f)
-            m_bFinished = m_pModel->Play_Animation(fTimeDelta, m_strMaskClip, m_fPlaySpeed, m_bMaskLoop, m_fMaskWeight);
+        {
+            _float fMaskDelta = m_bMaskPaused ? 0.f : fTimeDelta;       // 마스크만 정지
+            m_bFinished = m_pModel->Play_Animation(fTimeDelta, fMaskDelta, m_strMaskClip, m_fPlaySpeed, m_bMaskLoop, m_fMaskWeight);
+        }
         else
             m_bFinished = m_pModel->Play_Animation(fTimeDelta, m_fPlaySpeed);
     }

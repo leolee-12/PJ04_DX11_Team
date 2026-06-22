@@ -891,7 +891,7 @@
     <ClInclude Include="..\public\GigantEdge_Brain.h">
       <Filter>00. GameObject\07. MiniBoss\GigantEdge\Brain</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BladeKnight_FSM.h">
+    <ClInclude Include="..\Public\BladeKnight_Brain.h">
       <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\Brain</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BladeKnight_State_Attack.h">
@@ -987,6 +987,7 @@
     <ClInclude Include="..\Public\NormalEnemy_Body.h">
       <Filter>00. GameObject\06. Monster\NormalEnemy\Parts\Body</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\NormalEnemy_Brain.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1316,7 +1317,7 @@
     <ClCompile Include="..\private\GigantEdge_Brain.cpp">
       <Filter>00. GameObject\07. MiniBoss\GigantEdge\Brain</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\BladeKnight_FSM.cpp">
+    <ClCompile Include="..\Private\BladeKnight_Brain.cpp">
       <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\Brain</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BladeKnight_State_Attack.cpp">
@@ -1409,6 +1410,7 @@
     <ClCompile Include="..\Private\NormalEnemy_Body.cpp">
       <Filter>00. GameObject\06. Monster\NormalEnemy\Parts\Body</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\NormalEnemy_Brain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl">

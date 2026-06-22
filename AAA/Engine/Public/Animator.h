@@ -40,8 +40,16 @@ public: // 재생 제어 (오브젝트/에디터는 오직 이것만 사용)
     void    Play(const string& strAnimName, _bool bLoop = true, _bool bRestart = false, _float fBlend = 0.2f, _float fSpeed = 1.0f, _bool bClearMask = true);
     void    Play(const ANI_PLAY_INFO* tAniInfo);
     void    Start_Clip(const ANI_PLAY_INFO& Info);
+    
     void    Pause() { m_bPaused = true; }
     void    Resume() { m_bPaused = false; }
+    
+    void    Pause_Mask() { m_bMaskPaused = true; }
+    void    Resume_Mask() { m_bMaskPaused = false; }
+
+    void    Set_MaskPaused(_bool bPaused) { m_bMaskPaused = bPaused; }
+    _bool   Is_MaskPaused() const { return m_bMaskPaused; }
+
     void    Seek(_float fProgress);
     _bool   Is_Finished() const { return m_bFinished; }
     _bool   Is_Paused()   const { return m_bPaused; }
@@ -100,6 +108,8 @@ private:
 
     _bool               m_bPaused = { false };
     _bool               m_bFinished = { false };
+
+    _bool               m_bMaskPaused = { false };
 
     string              m_strPrevAnimName = {};
     _float              m_fPrevProgress = { 0.f };
