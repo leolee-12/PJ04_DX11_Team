@@ -113,7 +113,7 @@ _bool CKirby_Stuffed::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
                 return true;
 
             Change_StuffedState(pKirby, STUFFED_STATE::STUFFED_SPIT);
-            pKirby->Spit_Monster();
+            pKirby->Spit_Inhalable();
             return true;
         }
     }

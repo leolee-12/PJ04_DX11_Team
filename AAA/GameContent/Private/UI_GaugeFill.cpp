@@ -131,6 +131,18 @@ void CUI_GaugeFill::Update(_float fTimeDelta)
 
     m_fGhostAlpha = 1.f;
 
+    if (m_bAppearSweep)
+    {
+        m_fFillRatio = min(m_fFillRatio + m_fAppearSpeed * fTimeDelta, m_fTargetRatio);
+        m_fGhostRatio = m_fFillRatio;
+        if (m_fFillRatio >= m_fTargetRatio - 1e-5f)
+        {
+            m_fFillRatio = m_fGhostRatio = m_fTargetRatio;
+            m_bAppearSweep = false;
+        }
+        return;
+    }
+
     if (m_eGhostMode == GHOST_MODE::DRAIN)
     {
         // ³ë¶û¡êÈò »ö ±ôºý
@@ -382,6 +394,28 @@ HRESULT CUI_GaugeFill::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vGhostColor", &m_vGhostColorCur, sizeof(_float4)))) return E_FAIL;
 
     return S_OK;
+}
+
+void CUI_GaugeFill::Play_AppearSweep(_float fTargetRatio, _float fSpeed)
+{
+    m_bGaugeInit = true;                       // ÀÌÈÄ Set_TargetRatio(ÇÇ°Ý) Á¤»ó µ¿ÀÛ
+    m_eGhostMode = GHOST_MODE::NONE;           // °í½ºÆ® ¹êµå ¾øÀ½
+    m_fFillRatio = 0.f;                        // ºó »óÅÂ¿¡¼­ ½ÃÀÛ
+    m_fGhostRatio = 0.f;
+    m_fTargetRatio = clamp(fTargetRatio, 0.f, 1.f);
+    m_fAppearSpeed = (fSpeed > 0.f) ? fSpeed : m_fFillSpeed;
+    m_bAppearSweep = true;
+}
+
+void CUI_GaugeFill::Reset_Empty()
+{
+    m_bAppearSweep = false;
+    m_eGhostMode = GHOST_MODE::NONE;
+    m_fFillRatio = 0.f;
+    m_fGhostRatio = 0.f;     
+    m_fTargetRatio = 0.f;
+    m_fGhostHoldAcc = 0.f;
+    m_bGaugeInit = true;
 }
 
 CUI_GaugeFill* CUI_GaugeFill::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

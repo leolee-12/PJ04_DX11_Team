@@ -53,6 +53,11 @@ void CMonsterHitPart::Set_Drawn(_bool bDrawn)
     if (m_pHitBox) m_pHitBox->Set_Enabled(bDrawn);
 }
 
+void CMonsterHitPart::Set_HitBox(_bool b)
+{
+    if(m_pHitBox) m_pHitBox->Set_Enabled(b);
+}
+
 HRESULT CMonsterHitPart::Ready_HitBox(const CAPSULE_DESC& Desc, _float fDamage, _float fKnockback)
 {
     m_fDamage = fDamage;        

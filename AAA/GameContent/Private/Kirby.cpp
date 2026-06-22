@@ -360,6 +360,18 @@ void CKirby::SetUp_Collider_Callback()
         //      넣으시오
         //    });
     }
+
+    if (m_KirbyColliders[INHALE_BOX])
+    {
+        m_KirbyColliders[INHALE_BOX]->Set_OnEnter(
+            [this](CCollider* pOther)
+            {
+                if (IInhalable* pInhalable = dynamic_cast<IInhalable*>(pOther->Get_Owner()))
+                {
+                    pInhalable;
+                }
+            });
+    }
 }
 
 HRESULT CKirby::Ready_PartObjects()
@@ -471,9 +483,9 @@ void CKirby::Update_Timer(_float fTimeDelta)
         m_fInvincibleTime -= fTimeDelta;
 }
 
-void CKirby::Spit_Monster()
+void CKirby::Spit_Inhalable()
 {
-    if (m_pCapturedMonster == nullptr)
+    if (m_pCapturedInhalable == nullptr)
         return;
 
     _vector vMouth =
@@ -482,9 +494,9 @@ void CKirby::Spit_Monster()
         + m_pTransformCom->Get_State(STATE::UP) * s_fInhaleUp;
     _vector vDir = m_pTransformCom->Get_State(STATE::LOOK);
 
-    m_pCapturedMonster->Be_Spat(vMouth, vDir, s_fSpitSpeed);
+    m_pCapturedInhalable->Be_Spat(vMouth, vDir, s_fSpitSpeed);
 
-    m_pCapturedMonster = nullptr;
+    m_pCapturedInhalable = nullptr;
 }
 
 CCollider* CKirby::Get_Collider(KIRBY_COLLIDER eKirbyCollider)

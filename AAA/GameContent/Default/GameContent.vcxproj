@@ -109,6 +109,7 @@
     <ClInclude Include="..\Public\Monster_State.h" />
     <ClInclude Include="..\Public\Monster_StateMachine.h" />
     <ClInclude Include="..\Public\Movement_Child.h" />
+    <ClInclude Include="..\public\UI_BossStatus.h" />
     <ClInclude Include="..\public\UI_Curtain.h" />
     <ClInclude Include="..\public\UI_CurtainAnimBase.h" />
     <ClInclude Include="..\public\UI_CurtainSequenceBase.h" />
@@ -198,7 +199,6 @@
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Common_Circle01.cpp" />
     <ClCompile Include="..\Private\Common_Curve03.cpp" />
-    <ClCompile Include="..\private\Damageable.cpp" />
     <ClCompile Include="..\private\Effect_Loader.cpp" />
     <ClCompile Include="..\Private\EnvObject.cpp" />
     <ClCompile Include="..\Private\EnvObject_Trigger.cpp" />
@@ -214,7 +214,6 @@
     <ClCompile Include="..\private\GigantEdge_Body.cpp" />
     <ClCompile Include="..\private\GigantEdge_Shield.cpp" />
     <ClCompile Include="..\private\GigantEdge_Sword.cpp" />
-    <ClCompile Include="..\private\Inhalable.cpp" />
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
@@ -265,6 +264,7 @@
     <ClCompile Include="..\Private\TestParticle.cpp" />
     <ClCompile Include="..\Private\RailDataReceiver.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />
+    <ClCompile Include="..\private\UI_BossStatus.cpp" />
     <ClCompile Include="..\private\UI_Curtain.cpp" />
     <ClCompile Include="..\private\UI_CurtainAnimBase.cpp" />
     <ClCompile Include="..\private\UI_CurtainSequenceBase.cpp" />

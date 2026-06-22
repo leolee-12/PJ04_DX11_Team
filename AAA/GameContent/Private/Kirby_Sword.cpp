@@ -187,9 +187,9 @@ void CKirby_Sword::SetUp_HitBox_Callback()
             if (nullptr == pVictim) return;
 
             ATTACK_INFO atk{};
-            atk.fDamage = 5.f;
+            atk.fDamage = 50.f;
             atk.fKnockback = 8.f;
-            XMStoreFloat3(&atk.vAttackerPos, m_pTransformCom->Get_State(STATE::POSITION));
+            atk.vAttackerPos = _float3(m_CombinedWorldMatrix._41, m_CombinedWorldMatrix._42, m_CombinedWorldMatrix._43);
             atk.pAttacker = this;
             pVictim->Damaged(atk);
 

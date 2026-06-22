@@ -40,11 +40,18 @@ HRESULT CMonster::Initialize(void* pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
-
 	if (FAILED(Ready_Collider()))
 		return E_FAIL;
-
 	SetUp_Collider_CallBack();
+
+	if (FAILED(Ready_PartObjects()))        
+		return E_FAIL;
+	if (FAILED(Ready_Movement()))           
+		return E_FAIL;
+	if (FAILED(Ready_AI()))                 
+		return E_FAIL;
+	if (FAILED(Ready_AnimEvents()))         
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -71,7 +78,8 @@ void CMonster::Late_Update(_float fTimeDelta)
 	{
 		m_pInteractCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 #ifdef _DEBUG
-		m_pGameInstance_Proxy->Add_DebugComponent(m_pInteractCollider);
+		if(m_pInteractCollider->Is_Enabled())
+			m_pGameInstance_Proxy->Add_DebugComponent(m_pInteractCollider);
 #endif
 	}
 
@@ -80,6 +88,7 @@ void CMonster::Late_Update(_float fTimeDelta)
 		{
 			m_pHurtBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 #ifdef _DEBUG
+		if (m_pHurtBox->Is_Enabled())
 			m_pGameInstance_Proxy->Add_DebugComponent(m_pHurtBox);
 #endif
 		}
@@ -89,7 +98,8 @@ void CMonster::Late_Update(_float fTimeDelta)
 	{
 		m_pProjectileBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 #ifdef _DEBUG
-		m_pGameInstance_Proxy->Add_DebugComponent(m_pProjectileBox);
+		if (m_pProjectileBox->Is_Enabled())
+			m_pGameInstance_Proxy->Add_DebugComponent(m_pProjectileBox);
 #endif
 	}
 }

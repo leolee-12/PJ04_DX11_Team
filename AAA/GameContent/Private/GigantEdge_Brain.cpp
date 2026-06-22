@@ -31,6 +31,7 @@ void CGigantEdge_Brain::Decide(CMonster* pMonster, const MONSTER_BLACKBOARD& BB,
 HRESULT CGigantEdge_Brain::Initialize()
 {
     constexpr _float fAttackRange = 4.f;
+    constexpr _float fGuardRange = 4.f;
     constexpr _float fFacingDot = 0.86f;
     constexpr _float fTurnSpeedDeg = 180.f;
     constexpr _float fGuardTime = 4.f;
@@ -177,11 +178,19 @@ HRESULT CGigantEdge_Brain::Initialize()
             return BT_STATUS::RUNNING;
         },
         [this, fGuardT]() { *fGuardT = 0.f; m_pOwner->Set_Guarding(false); });
+
     CBTNode* pGuard = CBTSequence::Create({
         OneShot("ShieldAppear", 2.f),
         OneShot("ShieldGuardStart"),
         pGuardHold,
         OneShot("ShieldHide"),
+        });
+
+    auto* pInGuardRange = CBTCondition::Create([this, fGuardRange](CBlackboard* pBB) {
+#ifdef _DEBUG
+        if (m_pOwner->Dbg_ForceInRange()) return true;
+#endif
+        return pBB->Get<_float>("DistToTarget", FLT_MAX) <= fGuardRange;
         });
 
     auto* pInRangeDist = CBTCondition::Create([this, fAttackRange](CBlackboard* pBB) {
@@ -254,6 +263,11 @@ HRESULT CGigantEdge_Brain::Initialize()
         },
         [fPostAtkT]() { *fPostAtkT = 0.f; });
 
+    CBTNode* pGuardIfInRange = CBTSelector::Create({
+          CBTSequence::Create({ pInGuardRange, pGuard }),
+          CBTAction::Create([](CBlackboard*, _float) { return BT_STATUS::SUCCESS; }),
+        });
+
     CBTNode* pCombat = CBTReactiveSelector::Create({
         CBTSequence::Create({
             pInRangeDist,                              
@@ -266,7 +280,7 @@ HRESULT CGigantEdge_Brain::Initialize()
                         MakeAttackBranch(2, MakeThrust()),                      
                     }),
                     pPostAttackDelay,
-                    pGuard,
+                    pGuardIfInRange,
                 }),
                 pTurnToTarget,                         
             }),
