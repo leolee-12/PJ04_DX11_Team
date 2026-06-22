@@ -16,6 +16,8 @@ class CKirby_State;
 
 enum class KIRBY_STATE_TYPE;
 
+struct ATTACK_INFO;
+
 class CLIENT_DLL CKirby_StateMachine final : public CBase
 {
 private:
@@ -32,6 +34,9 @@ public:
 	void Change_State(KIRBY_STATE_TYPE eNewstate);
 	void Update_StateMachine(const _float fTimeDelta);
 	void Handle_Command(CKirby_Command* pCommand);
+
+public:
+	void  On_Damaged_KirbyStateMachine(const ATTACK_INFO& tInfo);
 
 private:
 	CKirby* m_pKirby{};

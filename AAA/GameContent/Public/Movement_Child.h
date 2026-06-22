@@ -108,6 +108,9 @@ public:
     // È¸Àü
     void Rotate_To_Direction(_fvector vDir, _float fTimeDelta);
 
+    // ³Ë¹é
+    void Apply_Knockback(const _float3& vAttackerPos, _float fHorizontalPower, _float fUpPower);
+
 private:
     void Integrate_Forces(_float fTimeDelta, _vector& vVelocity);
     void Apply_Drag(_float fTimeDelta, _vector& vVelocity);

@@ -28,14 +28,18 @@ private:
 		INHALE_LOOP,
 		SUPER_INHALE_START, SUPER_INHALE_LOOP,
 		INHALE_END,
+		INHALE_EXIT,
 
-		INHALE_EXIT
+		STUFFED_START,
+		STUFFED_SPIT
 	};
 
 	enum class INHALE_MOVE_STATE
 	{
 		WAIT, WALK, FALL
 	};
+
+	enum class MOUTH_STATE { DEFAULT, STUFFFED };
 
 private:
 	CKirby_Ability_Normal();
@@ -63,6 +67,8 @@ private:
 	CGameInstance_Proxy* m_pGameInstance_Proxy{};
 
 	// State
+	MOUTH_STATE m_eMouthState{};
+
 	INHALE_STATE m_eInhaleState{};
 	INHALE_MOVE_STATE m_eCurMoveState{};
 
@@ -90,6 +96,7 @@ private:
 	void Update_InhaleState(CKirby* pKirby, _float fTimeDelta);
 	void Exit_InhaleState(CKirby* pKirby, INHALE_STATE eState);
 
+	void Change_MouthState(MOUTH_STATE eMouthState);
 	void Update_InhaleMoveState(CKirby* pKirby);
 	void Play_InhaleLoopAnimation(CKirby* pKirby);
 

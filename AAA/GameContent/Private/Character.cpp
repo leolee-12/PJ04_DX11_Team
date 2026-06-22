@@ -51,6 +51,7 @@ void CCharacter::Damaged(const ATTACK_INFO& tInfo)
 {
     if (!Is_Active()) 
         return;
+
     if (Block_Hit(tInfo)) 
         return;
 

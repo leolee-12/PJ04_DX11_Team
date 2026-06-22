@@ -44,9 +44,9 @@
     <ClInclude Include="..\Public\Env_InstanceBatch.h" />
     <ClInclude Include="..\Public\Env_InstanceController.h" />
     <ClInclude Include="..\public\GigantEdge_Brain.h" />
+    <ClInclude Include="..\Public\Kirby_Damaged.h" />
     <ClInclude Include="..\public\MiniBoss.h" />
     <ClInclude Include="..\public\Inhalable.h" />
-    <ClInclude Include="..\Public\Kirby_Stuffed.h" />
     <ClInclude Include="..\Public\LevelDesign_ProtoRegister.h" />
     <ClInclude Include="..\Public\LevelDesign_Rail.h" />
     <ClInclude Include="..\Public\LevelDesign_Spawner.h" />
@@ -229,7 +229,7 @@
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
-    <ClCompile Include="..\Private\Kirby_Stuffed.cpp" />
+    <ClCompile Include="..\Private\Kirby_Damaged.cpp" />
     <ClCompile Include="..\Private\Kirby_GetAbility.cpp" />
     <ClCompile Include="..\Private\Kirby_OnOffPart.cpp" />
     <ClCompile Include="..\Private\Kirby_Fall.cpp" />
