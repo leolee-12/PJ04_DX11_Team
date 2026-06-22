@@ -8,6 +8,7 @@ NS_END
 namespace Client
 {
     class CMonster;
+    class IInhalable;
 
     // 호준 테스트용
     namespace EventTag
@@ -31,7 +32,7 @@ namespace Client
 
     struct SWALLOW_EVENT 
     { 
-        CMonster* pMonster; 
+        IInhalable* pInhalable; 
     };
 
     typedef struct tagKirbyPointStarGained

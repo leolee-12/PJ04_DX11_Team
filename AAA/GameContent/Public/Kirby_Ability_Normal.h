@@ -18,6 +18,8 @@ class CMovement_Child;
 
 class CMonster;
 
+class IInhalable;
+
 class CLIENT_DLL CKirby_Ability_Normal final : public CKirby_Ability
 {
 private:
@@ -103,7 +105,7 @@ private:
 	// Event
 	void Subscribe_InhaleCapturedEvent(CKirby* pKirby);
 	void Unsubscribe_InhaleCapturedEvent();
-	void Handle_InhaleCaptured(CKirby* pKirby, CMonster* pMonster);
+	void Handle_InhaleCaptured(CKirby* pKirby, IInhalable* pInhaleable);
 
 	void Update_SuperInhaleEffectRise(_float fRatio);
 

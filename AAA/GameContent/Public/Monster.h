@@ -55,17 +55,19 @@ public:
 	MONSTER_BLACKBOARD&			Get_BlackBoard() { return m_BlackBoard; }
 	CMonster_Movement*			Get_Movement() { return m_pMovement; }
 	_bool						Has_Trait(MONSTER_TRAIT t) const { return (m_TraitFlags & t) != 0; }
-	COPY_ABILITY_TYPE		    Get_CopyAbility() const { return m_eCopyAbility; }
 
 public: // Inhalable
 	virtual _bool				Can_BeInhaled(const INHALE_QUERY& q) const override;
 	virtual void				Be_Captured(CGameObject* pInhaler) override;
-	CGameObject*				Get_Captor() const { return m_pCaptor; }
+	virtual void				Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed) override;
+	virtual COPY_ABILITY_TYPE		    Get_CopyAbility() const override { return m_eCopyAbility; }
+	virtual CGameObject*		Get_GameObject() override final { return this; }
+
 	void						On_Swallowed();
-	void						Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed);
-	void						Despawn_Spat();                                
 	const _float3&				Get_SpatVelocity() const { return m_vSpatVelocity; }
 	void						Enable_ProjectileBox(_bool bEnable);
+	CGameObject*				Get_Captor() const { return m_pCaptor; }
+	void						Despawn_Spat();                                
 
 public:
 	// AI가 이동 의도를 쌓는 방식
