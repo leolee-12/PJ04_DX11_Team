@@ -19,6 +19,20 @@ HRESULT CUI_GaugeBarCom::Initialize(void* pArg)
     return S_OK;
 }
 
+void CUI_GaugeBarCom::Appear(_float fCurrent, _float fMax)
+{
+    m_fMax = max(1.f, fMax);
+    m_fCur = clamp(fCurrent, 0.f, m_fMax);
+    if (m_pGauge) m_pGauge->Play_AppearSweep(m_fCur / m_fMax);
+}
+
+void CUI_GaugeBarCom::Reset_Empty() 
+{ 
+    m_fCur = 0.f; 
+    if (m_pGauge) 
+        m_pGauge->Reset_Empty(); 
+}
+
 void CUI_GaugeBarCom::Push()
 {
     if (m_pGauge)

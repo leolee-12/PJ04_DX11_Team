@@ -64,7 +64,7 @@ protected:
 	virtual HRESULT				Ready_AnimEvents() override;
 
 private:
-	HRESULT						Ready_PartObjects();
+	virtual HRESULT				Ready_PartObjects() override;
 
 	virtual void				On_Deserialized() override;
 

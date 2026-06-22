@@ -11,6 +11,7 @@
 
 #include "Level_GamePlay.h"
 #include "Level_Test.h"
+#include "Town_Step1.h"
 
 CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel{ pDevice, pContext }
@@ -52,6 +53,9 @@ void CLevel_Loading::Update(_float fTimeDelta)
             break;
         case LEVEL::TEST:
             pNextLevel = CLevel_Test::Create(m_pDevice, m_pContext);
+            break;
+        case LEVEL::TOWN_STEP1:
+            pNextLevel = CTown_Step1::Create(m_pDevice, m_pContext);
             break;
         }
 

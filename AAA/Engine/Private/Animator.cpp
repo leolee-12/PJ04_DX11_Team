@@ -81,6 +81,7 @@ void CAnimator::Start_Clip(const ANI_PLAY_INFO& Info)
     m_pModel->Set_AnimationIndex(static_cast<_uint>(iIndex), Info.bLoop, Info.bRestart, m_fBlendDuration);
     m_fPlaySpeed = Info.fSpeed;
     m_bFinished = false;
+    m_bCurLoop = Info.bLoop;
 }
 
 void CAnimator::Seek(_float fProgress)
@@ -206,15 +207,16 @@ void CAnimator::Update(_float fTimeDelta)
     if (it != m_Tracks.end())
     {
         auto& track = it->second;
-        if (fCur < m_fPrevProgress)                 // ·çÇÁ wrap
+        if (fCur < m_fPrevProgress)                 
         {
             Fire_Point(track.Events, m_fPrevProgress, 1.0f);
+            if (m_bCurLoop)                      
+                for (auto& e : track.Events) e.bFired = false;
             Fire_Point(track.Events, -0.0001f, fCur);
         }
         else
-        {
             Fire_Point(track.Events, m_fPrevProgress, fCur);
-        }
+
         Process_Range(track, fCur);
     }
 
@@ -228,13 +230,17 @@ void CAnimator::Update(_float fTimeDelta)
     }
 }
 
-void CAnimator::Fire_Point(const vector<ANIM_EVENT>& events, _float lo, _float hi)
+void CAnimator::Fire_Point(vector<ANIM_EVENT>& events, _float lo, _float hi)
 {
     for (auto& e : events)
     {
         if (e.bIsRange) continue;
         if (e.fTriggerProgress > lo && e.fTriggerProgress <= hi)
+        {
+            if (e.bFired) continue;
+            e.bFired = true;
             if (m_Callback) m_Callback(e, ANIM_EVENT_PHASE::POINT);
+        }
     }
 }
 
@@ -253,7 +259,11 @@ void CAnimator::Process_Range(ANIM_EVENT_TRACK& track, _float fCur)
 void CAnimator::Reset_RuntimeState(ANIM_EVENT_TRACK* pTrack)
 {
     if (!pTrack) return;
-    for (auto& e : pTrack->Events) e.bActive = false;
+    for (auto& e : pTrack->Events) 
+    { 
+        e.bActive = false;
+        e.bFired = false; 
+    }
 }
 
 _wstring CAnimator::Make_DefaultDataFilePath() const

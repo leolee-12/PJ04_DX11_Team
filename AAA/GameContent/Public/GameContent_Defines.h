@@ -1,6 +1,7 @@
 #pragma once
 #include "GameContent_enum.h"
 #include "GameContrnt_Events.h"
+#include "GameContent_AnimEvents.h"
 
 #ifdef GAMECONTENT_EXPORTS
 #define CLIENT_DLL __declspec(dllexport)
@@ -10,7 +11,7 @@
 
 namespace Client
 {
-	enum class LEVEL { STATIC, FIRST_LOADING, LOADING, GAMEPLAY, TEST, END };
+	enum class LEVEL { STATIC, FIRST_LOADING, LOADING, GAMEPLAY, TOWN_STEP1, TEST, END };
 
 	enum class SOUND_CHANNEL : _uint
 	{

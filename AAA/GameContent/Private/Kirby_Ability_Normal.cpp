@@ -432,10 +432,10 @@ void CKirby_Ability_Normal::Subscribe_InhaleCapturedEvent(CKirby* pKirby)
         [this, pKirby](void* pData)
         {
             SWALLOW_EVENT* pEvent = static_cast<SWALLOW_EVENT*>(pData);
-            if (pEvent == nullptr || pEvent->pMonster == nullptr)
+            if (pEvent == nullptr || pEvent->pInhalable == nullptr)
                 return;
 
-            Handle_InhaleCaptured(pKirby, pEvent->pMonster);
+            Handle_InhaleCaptured(pKirby, pEvent->pInhalable);
         }
     );
 
@@ -452,14 +452,26 @@ void CKirby_Ability_Normal::Unsubscribe_InhaleCapturedEvent()
     m_bSubscribedInhaleCapturedEvent = false;
 }
 
-void CKirby_Ability_Normal::Handle_InhaleCaptured(CKirby* pKirby, CMonster* pMonster)
+void CKirby_Ability_Normal::Handle_InhaleCaptured(CKirby* pKirby, IInhalable* pInhaleable)
 {
     End_InhaleCollider(pKirby);
     Unsubscribe_InhaleCapturedEvent();
 
-    COPY_ABILITY_TYPE eAbility = pMonster->Get_CopyAbility();
+    COPY_ABILITY_TYPE eAbility = pInhaleable->Get_CopyAbility();
 
-    if (eAbility != COPY_ABILITY_TYPE::NONE && eAbility != COPY_ABILITY_TYPE::NORMAL)
+
+    if (eAbility == COPY_ABILITY_TYPE::NONE || eAbility == COPY_ABILITY_TYPE::NORMAL)
+    {
+        pKirby->Change_State(KIRBY_STATE_TYPE::FULL);
+        pKirby->Capture_Inhalable(pInhaleable);
+    }
+    else
+    {
+        pKirby->Request_ChangeKirbyAbility(eAbility);
+        pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
+    }
+
+    /*if (eAbility != COPY_ABILITY_TYPE::NONE && eAbility != COPY_ABILITY_TYPE::NORMAL)
     {
         pKirby->Request_ChangeKirbyAbility(eAbility);
         pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
@@ -467,8 +479,8 @@ void CKirby_Ability_Normal::Handle_InhaleCaptured(CKirby* pKirby, CMonster* pMon
     else
     {
         pKirby->Change_State(KIRBY_STATE_TYPE::FULL);
-        pKirby->Capture_Monster(pMonster);
-    }
+        pKirby->Capture_Inhalable(pInhaleable);
+    }*/
 }
 
 void CKirby_Ability_Normal::Update_SuperInhaleEffectRise(_float fRatio)

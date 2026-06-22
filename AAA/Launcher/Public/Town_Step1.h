@@ -5,11 +5,11 @@
 
 NS_BEGIN(Client)
 
-class CLevel_Lobby final : public CLevel
+class CTown_Step1 final : public CLevel
 {
 private:
-	CLevel_Lobby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	virtual ~CLevel_Lobby() = default;
+	CTown_Step1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	virtual ~CTown_Step1() = default;
 
 public:
 	virtual HRESULT Initialize() override;
@@ -17,11 +17,15 @@ public:
 	virtual HRESULT Render() override;
 
 private:
+	_bool	m_bTestLevelChange = { false };
+
+private:
 	virtual HRESULT Ready_Events() override;
 	HRESULT Ready_Lights();
+	HRESULT Ready_Camera();
 
 public:
-	static CLevel_Lobby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CTown_Step1* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void Free() override;
 };
 

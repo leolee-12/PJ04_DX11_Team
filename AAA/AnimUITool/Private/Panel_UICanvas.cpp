@@ -361,7 +361,7 @@ void CPanel_UICanvas::Render()
                     std::string strName = m_szManifestLoadName;
                     std::wstring strFileName = StrToWstr(strName);
 
-                    std::filesystem::path path = L"../../Resources/CHJ/UI/Levels";
+                    std::filesystem::path path = L"../../Resources/YSH/UIs/Manifest/LevelUIManifest";
                     path /= strFileName;
 
                     if (path.extension().empty())

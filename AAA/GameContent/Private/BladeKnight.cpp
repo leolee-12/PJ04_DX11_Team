@@ -50,18 +50,6 @@ HRESULT CBladeKnight::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
-    if (FAILED(Ready_PartObjects()))
-        return E_FAIL;
-
-    if (FAILED(Ready_Movement()))
-        return E_FAIL;
-
-    if (FAILED(Ready_AI()))
-        return E_FAIL;
-
-    if (FAILED(Ready_AnimEvents()))
-        return E_FAIL;
-
     m_eCopyAbility = COPY_ABILITY_TYPE::SWORD;
 
     return S_OK;

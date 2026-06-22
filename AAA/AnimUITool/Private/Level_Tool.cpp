@@ -1201,6 +1201,16 @@ void CLevel_Tool::Update(_float fTimeDelta)
 
         Log_Info("Publish: Kirby.PointStarGained");
     }
+    if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F7, false))
+    {
+        BOSS_HP_APPEARED Desc{};
+        Desc.strBossName = L"테스트 기간트 엣지";
+        Desc.fMaxHP = 100.f;
+        Desc.fCurrHp = 100.f;
+        m_pGameInstance_Proxy->Publish(EventTag::Boss_HP_Appeared, &Desc);
+
+        Log_Info("Publish: BossHP.Appeared");
+    }
 
     if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F1, false))
     {

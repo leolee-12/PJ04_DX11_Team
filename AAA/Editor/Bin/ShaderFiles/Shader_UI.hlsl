@@ -44,12 +44,15 @@ bool g_bUseTexture = true; // 커튼: 텍스처 있으면 곱하고, 없으면 단색
 
 float Remap_BarU(float u)
 {
-    float c = min(g_fCapFracU, 0.5f); 
+    float c = min(g_fCapFracU, 0.5f);
+    float result = 1.0f;
+
     if (u < c)
-        return u / c;
-    if (u > 1.0f - c)
-        return (1.0f - u) / c; 
-    return 1.0f;
+        result = u / c;
+    else if (u > 1.0f - c)
+        result = (1.0f - u) / c;
+
+    return result;
 }
 
 float2 ApplyUVTransform(float2 uv)
@@ -282,14 +285,27 @@ PS_OUT PS_GAUGE_FILL_TEXTURE(PS_IN In)
 {
     PS_OUT Out;
 
-    float fVisible = ComputeGaugeVisible(In.vTexcoord);
-    if (fVisible <= 0.f)
+    float fAxis = In.vTexcoord.x;
+    if (g_iFillDirection == 1)
+        fAxis = 1.f - fAxis;
+
+    float fFill = saturate(g_fFillRatio);
+    float fGhost = max(fFill, saturate(g_fGhostRatio));
+
+    if (fAxis > fGhost)                                   
         discard;
 
     float4 fTex = g_Texture.Sample(UISampler, In.vTexcoord);
 
-    Out.vColor.rgb = fTex.rgb * g_vColor.rgb;
-    Out.vColor.a = fTex.a * g_vColor.a * g_fAlpha * fVisible;
+    float fSoft = max(g_fFillSoftness, 0.f);
+    float fFilled = 1.f - smoothstep(fFill, fFill + fSoft, fAxis);
+
+    float3 col = lerp(g_vGhostColor.rgb, fTex.rgb * g_vColor.rgb, fFilled);
+    float a = fTex.a * g_fAlpha *
+                   lerp(g_vGhostColor.a * g_fGhostAlpha, g_vColor.a, fFilled);
+
+    Out.vColor.rgb = col;
+    Out.vColor.a = a;
 
     if (Out.vColor.a <= 0.f)
         discard;
