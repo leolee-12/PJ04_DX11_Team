@@ -462,6 +462,7 @@ void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
 {
     m_fInvincibleTime = s_fInvincibleDur;
 
+    m_pMovement->Apply_Knockback(tInfo.vAttackerPos, tInfo.fKnockback * 5.f, tInfo.fKnockback * 2.f);
     m_pKirby_StateMachine->On_Damaged_KirbyStateMachine(tInfo);
 }
 

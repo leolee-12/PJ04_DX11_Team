@@ -481,9 +481,6 @@
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Damaged">
       <UniqueIdentifier>{f4dff91e-89fb-4ec2-a836-1510c556d9ab}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Stuffed">
-      <UniqueIdentifier>{7aaa2487-4849-48ce-acf4-559797cc9247}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -701,9 +698,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Hovering.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Hovering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Movement_Child.h">
-      <Filter>00. GameObject\98. Component</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Camera_AreaCam.h">
       <Filter>00. GameObject\00. Camera\AreaCam</Filter>
@@ -951,9 +945,6 @@
     <ClInclude Include="..\public\MonsterHitPart.h">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase\MonsterHitPart</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Kirby_Stuffed.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Stuffed</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\Monster_State_Spat.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
     </ClInclude>
@@ -974,6 +965,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Damaged.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Damaged</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Movement_Child.h">
+      <Filter>00. GameObject\98. Component\00. Movement_Kirby</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1150,9 +1144,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Hovering.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Hovering</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Movement_Child.cpp">
-      <Filter>00. GameObject\98. Component</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Camera_AreaCam.cpp">
       <Filter>00. GameObject\00. Camera\AreaCam</Filter>
@@ -1373,9 +1364,6 @@
     <ClCompile Include="..\private\MonsterHitPart.cpp">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase\MonsterHitPart</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Kirby_Stuffed.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Stuffed</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\Monster_State_Spat.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
     </ClCompile>
@@ -1390,6 +1378,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Damaged.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Damaged</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Movement_Child.cpp">
+      <Filter>00. GameObject\98. Component\00. Movement_Kirby</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
