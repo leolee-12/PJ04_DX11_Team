@@ -978,7 +978,6 @@
     <ClInclude Include="..\Public\NormalEnemy_Body.h">
       <Filter>00. GameObject\06. Monster\NormalEnemy\Parts\Body</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\NormalEnemy_Brain.h" />
     <ClInclude Include="..\public\UI_BossStatus.h">
       <Filter>00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus</Filter>
     </ClInclude>
@@ -987,6 +986,9 @@
     </ClInclude>
     <ClInclude Include="..\public\Damageable.h">
       <Filter>00. GameObject\95. Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\NormalEnemy_Brain.h">
+      <Filter>00. GameObject\06. Monster\01. StateMachine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1404,9 +1406,11 @@
     <ClCompile Include="..\Private\NormalEnemy_Body.cpp">
       <Filter>00. GameObject\06. Monster\NormalEnemy\Parts\Body</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\NormalEnemy_Brain.cpp" />
     <ClCompile Include="..\private\UI_BossStatus.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\NormalEnemy_Brain.cpp">
+      <Filter>00. GameObject\06. Monster\01. StateMachine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

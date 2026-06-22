@@ -29,7 +29,7 @@ HRESULT CNormalEnemy_Body::Initialize(void* pArg)
 		return E_FAIL;
 
 	// 애니메이션 지정
-	m_pAnimatorCom->Play("Thrust", true, true);
+	m_pAnimatorCom->Play("Wait", true, true);
 
 	return S_OK;
 }
@@ -38,7 +38,7 @@ HRESULT CNormalEnemy_Body::Ready_Components()
 {
 	PART_SETUP t{};
 	t.tShader = Shader_AnimMesh_PBR;
-	t.szModelProtoTag = PROTOTYPE_TAG;
+	t.szModelProtoTag = TEXT("Prototype_Component_Model_NormalEnemy_Body");
 	//t.szAnimEventFile = TEXT("../../Resources/CHJ/Monster/BladeKnight/BladeKnight_Anim_Events.json");		// 이거 없어도 Animator에서 자동 로드
 	return Ready_MeshPart(t);
 }

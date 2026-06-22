@@ -43,18 +43,6 @@ HRESULT CNormalEnemy::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Ready_PartObjects()))
-		return E_FAIL;
-
-	if (FAILED(Ready_Movement()))
-		return E_FAIL;
-
-	if (FAILED(Ready_AI()))
-		return E_FAIL;
-
-	if (FAILED(Ready_AnimEvents()))
-		return E_FAIL;
-
 	return S_OK;
 }
 
@@ -101,11 +89,51 @@ CMonsterBrain* CNormalEnemy::Create_Brain()
 
 HRESULT CNormalEnemy::Ready_State(CMonster_StateMachine* pStateMachine)
 {
+	if (m_pStateMachine == nullptr)
+		return E_FAIL;
+
+	// State Idle
+	ANI_PLAY_INFO Info{};
+	Info.strAniName = "Wait";
+	Info.bLoop = true;
+	Info.fSpeed = 2.0f;
+
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CMonster_State_Idle::Create(Info))))
+		return E_FAIL;
+	
+	// State Detect
+	Info.strAniName = "Find";
+	Info.bLoop = true;
+	Info.fSpeed = 1.0f;
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::DETECT, CMonster_State_Idle::Create(Info))))
+		return E_FAIL;
+
+	// State Fall 
+
+	// State Landing
+
+	// State KnockBack
+
+	// State KnockOut
+
+	// State Captured
+
+	// State Spat
+
+
 	return S_OK;
 }
 
 HRESULT CNormalEnemy::Ready_AnimEvents()
 {
+	if (nullptr == m_pBody)
+		return E_FAIL;
+
+	CAnimator* pAnimator = m_pBody->Get_Animator();
+	if (nullptr == pAnimator)
+		return E_FAIL;
+
+
 	return S_OK;
 }
 
