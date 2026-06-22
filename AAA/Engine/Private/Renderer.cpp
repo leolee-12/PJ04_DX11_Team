@@ -128,34 +128,34 @@ HRESULT CRenderer::Initialize()
     XMStoreFloat4x4(&m_WorldMatrix, XMMatrixScaling(static_cast<_float>(m_iRTWidth), static_cast<_float>(m_iRTHeight), 1.f) * XMMatrixTranslation(0.f, 0.f, 0.1f));
 
 #ifdef _DEBUG
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_MRA"), 150.f, 100.f, 300.f, 200.f)))
-    //    return E_FAIL;
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Diffuse"), 150.f, 300.f, 300.f, 200.f)))
-    //    return E_FAIL;
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Depth"), 150.f, 500.f, 300.f, 200.f)))
-    //    return E_FAIL;
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Normal"), 150.f, 700.f, 300.f, 200.f)))
-    //    return E_FAIL;
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Emissive"), 450.f, 100.f, 300.f, 200.f)))
-    //    return E_FAIL;
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_LightDepth"), 450.f, 300.f, 300.f, 200.f)))
-    //    return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_MRA"), 150.f, 100.f, 300.f, 200.f)))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Diffuse"), 150.f, 300.f, 300.f, 200.f)))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Depth"), 150.f, 500.f, 300.f, 200.f)))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Normal"), 150.f, 700.f, 300.f, 200.f)))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Emissive"), 450.f, 100.f, 300.f, 200.f)))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_LightDepth"), 450.f, 300.f, 300.f, 200.f)))
+        return E_FAIL;
 
-    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Light"), 150.f, 100.f, 300.f, 200.f)))
-        return E_FAIL;
-    
-    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Scene"), 150.f, 300.f, 300.f, 200.f)))
-        return E_FAIL;
-    
-    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_BloomA"), 450.f, 100.f, 300.f, 200.f)))
-        return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_BloomB"), 450.f, 300.f, 300.f, 200.f)))
-        return E_FAIL;
-    
-    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_SSAO"), 750.f, 100.f, 300.f, 200.f)))
-        return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_SSAO_Blur"), 750.f, 300.f, 300.f, 200.f)))
-        return E_FAIL;
+    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Light"), 150.f, 100.f, 300.f, 200.f)))
+    //    return E_FAIL;
+    //
+    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Scene"), 150.f, 300.f, 300.f, 200.f)))
+    //    return E_FAIL;
+    //
+    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_BloomA"), 450.f, 100.f, 300.f, 200.f)))
+    //    return E_FAIL;
+    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_BloomB"), 450.f, 300.f, 300.f, 200.f)))
+    //    return E_FAIL;
+    //
+    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_SSAO"), 750.f, 100.f, 300.f, 200.f)))
+    //    return E_FAIL;
+    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_SSAO_Blur"), 750.f, 300.f, 300.f, 200.f)))
+    //    return E_FAIL;
 #endif
 
     if (FAILED(Ready_Froxel_Volumes()))

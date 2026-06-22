@@ -470,17 +470,6 @@ void CKirby_Ability_Normal::Handle_InhaleCaptured(CKirby* pKirby, IInhalable* pI
         pKirby->Request_ChangeKirbyAbility(eAbility);
         pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
     }
-
-    /*if (eAbility != COPY_ABILITY_TYPE::NONE && eAbility != COPY_ABILITY_TYPE::NORMAL)
-    {
-        pKirby->Request_ChangeKirbyAbility(eAbility);
-        pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
-    }
-    else
-    {
-        pKirby->Change_State(KIRBY_STATE_TYPE::FULL);
-        pKirby->Capture_Inhalable(pInhaleable);
-    }*/
 }
 
 void CKirby_Ability_Normal::Update_SuperInhaleEffectRise(_float fRatio)
