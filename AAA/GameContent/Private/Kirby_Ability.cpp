@@ -36,13 +36,16 @@ HRESULT CKirby_Ability::Initialize()
     Set_FullBodyAni(ABILITY_ANI::FLIGHT_LANDING, "FlightLanding", false, false, 0.1f, 2.5f);
     Set_FullBodyAni(ABILITY_ANI::AIR_BALL, "AirBall", false, false, 0.0f, 5.f);
 
-    Set_FullBodyAni(ABILITY_ANI::STUFFED_START, "Stuffed", false, false, 0.1f, 1.5f);
-    Set_FullBodyAni(ABILITY_ANI::STUFFED_WAIT, "StuffedWait", true, false, 0.1f, 2.5f);
-    Set_FullBodyAni(ABILITY_ANI::STUFFED_RUN, "StuffedRun", true, false, 0.1f, 3.f);
-    Set_FullBodyAni(ABILITY_ANI::STUFFED_JUMP, "StuffedJump", false, false, 0.1f, 2.5f);
-    Set_FullBodyAni(ABILITY_ANI::STUFFED_FALL, "StuffedFall", true, false, 0.1f, 1.5f);
-    Set_FullBodyAni(ABILITY_ANI::STUFFED_LANDING, "StuffedLanding", false, false, 0.1f, 1.5f);
-    Set_FullBodyAni(ABILITY_ANI::STUFFED_SPIT, "Spit", false, false, 0.1f, 2.f);
+
+    //Set_FullBodyAni(ABILITY_ANI::STUFFED_START, "Stuffed", false, false, 0.1f, 1.5f);
+    //Set_FullBodyAni(ABILITY_ANI::STUFFED_WAIT, "StuffedWait", true, false, 0.1f, 2.5f);
+    //Set_FullBodyAni(ABILITY_ANI::STUFFED_RUN, "StuffedRun", true, false, 0.1f, 3.f);
+    //Set_FullBodyAni(ABILITY_ANI::STUFFED_JUMP, "StuffedJump", false, false, 0.1f, 2.5f);
+    //Set_FullBodyAni(ABILITY_ANI::STUFFED_FALL, "StuffedFall", true, false, 0.1f, 1.5f);
+    //Set_FullBodyAni(ABILITY_ANI::STUFFED_LANDING, "StuffedLanding", false, false, 0.1f, 1.5f);
+    //Set_FullBodyAni(ABILITY_ANI::STUFFED_SPIT, "Spit", false, false, 0.1f, 2.f);
+
+    Set_FullBodyAni(ABILITY_ANI::DAMAGED, "Damage", false, false, 0.1f, 1.5f);
 
     return S_OK;
 }
@@ -99,7 +102,7 @@ void CKirby_Ability::Set_FullBodyAni(ABILITY_ANI eAni, const _string& strAniName
 }
 
 void CKirby_Ability::Set_OverlayAni(ABILITY_ANI eAni, const _string& strBaseAniName, const _string& strOverlayAniName, const _string& strRootBone,
-    _bool bBaseLoop, _bool bBaseRestart, _float fBaseSpeed, _float fBaseBlend,
+    _bool bBaseLoop, _bool bBaseRestart, _float fBaseSpeed, _float fBaseBlend, _bool bBaseClearMask,
     _bool bOverlayLoop, _bool bOverlayRestart, _float fOverlaySpeed, _float fOverlaysBlend)
 {
     ABILITY_ANI_DESC& desc = m_tAniInfos[ETOUI(eAni)];
@@ -111,12 +114,14 @@ void CKirby_Ability::Set_OverlayAni(ABILITY_ANI eAni, const _string& strBaseAniN
     desc.tBaseAniInfo.bRestart = bBaseRestart;
     desc.tBaseAniInfo.fBlend = fBaseBlend;
     desc.tBaseAniInfo.fSpeed = fBaseSpeed;
+    desc.tBaseAniInfo.bClearMask = bBaseClearMask;
 
     desc.tOverlayAniInfo.strAniName = strOverlayAniName;
     desc.tOverlayAniInfo.bLoop = bOverlayLoop;
     desc.tOverlayAniInfo.bRestart = bOverlayRestart;
     desc.tOverlayAniInfo.fBlend = fOverlaysBlend;
     desc.tOverlayAniInfo.fSpeed = fOverlaySpeed;
+    desc.tOverlayAniInfo.bClearMask = bBaseClearMask;
 
     desc.strOverlayRootBone = strRootBone;
     desc.fOverlayWeight = 1.f;

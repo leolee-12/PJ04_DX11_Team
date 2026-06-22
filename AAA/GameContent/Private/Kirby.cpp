@@ -74,8 +74,7 @@ void CKirby::Update(_float fTimeDelta)
 
     __super::Update(fTimeDelta);
 
-    if (m_fInvincible > 0.f)
-        m_fInvincible -= fTimeDelta;
+    Update_Timer(fTimeDelta);
 
     m_pKirby_InputManager->Update_KirbyInput(fTimeDelta);
     m_pKirby_Controller->Update_KirbyController(fTimeDelta);
@@ -361,18 +360,6 @@ void CKirby::SetUp_Collider_Callback()
         //      ³ÖÀ¸½Ã¿À
         //    });
     }
-
-    if (m_KirbyColliders[INHALE_BOX])
-    {
-        m_KirbyColliders[INHALE_BOX]->Set_OnEnter(
-            [this](CCollider* pOther)
-            {
-                if (IInhalable* pInhalable = dynamic_cast<IInhalable*>(pOther->Get_Owner()))
-                {
-                    pInhalable;
-                }
-            });
-    }
 }
 
 HRESULT CKirby::Ready_PartObjects()
@@ -468,13 +455,21 @@ HRESULT CKirby::Ready_Events()
 
 _bool CKirby::Block_Hit(const ATTACK_INFO& tInfo) 
 { 
-    return m_fInvincible > 0.f; 
+    return m_fInvincibleTime > 0.f; 
 }
 
 void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
 {
-    m_fInvincible = s_fInvincibleDur;
-    // TODO: ³Ë¹é/ÇÇ°Ý¾Ö´Ô
+    m_fInvincibleTime = s_fInvincibleDur;
+
+    m_pMovement->Apply_Knockback(tInfo.vAttackerPos, tInfo.fKnockback * 5.f, tInfo.fKnockback * 2.f);
+    m_pKirby_StateMachine->On_Damaged_KirbyStateMachine(tInfo);
+}
+
+void CKirby::Update_Timer(_float fTimeDelta)
+{
+    if (m_fInvincibleTime > 0.f)
+        m_fInvincibleTime -= fTimeDelta;
 }
 
 void CKirby::Spit_Inhalable()

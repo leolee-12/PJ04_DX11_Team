@@ -13,13 +13,11 @@ NS_BEGIN(Client)
 class CKirby;
 class CKirby_Body;
 
-class CLIENT_DLL CKirby_Stuffed final : public CKirby_State
+class CLIENT_DLL CKirby_Damaged final : public CKirby_State
 {
 private:
-	CKirby_Stuffed();
-	virtual ~CKirby_Stuffed() = default;
-
-	enum STUFFED_STATE { STUFFED_START, STUFFED_WAIT, STUFFED_RUN, STUFFED_JUMP, STUFFED_FALL, STUFFED_LANDING, STUFFED_SPIT, STUFFED_END };
+	CKirby_Damaged();
+	virtual ~CKirby_Damaged() = default;
 
 private:
 	HRESULT Initialize();
@@ -35,20 +33,8 @@ public:
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
-private:
-	void Update_State(CKirby* pKirby);
-	void Update_MoveState(CKirby* pKirby);
-	void Change_StuffedState(CKirby* pKirby, STUFFED_STATE eNextState);
-
-	void Enter_Animation(CKirby* pKirby, CAnimator* pAnimator);
-
-	void Update_Mouth(CKirby* pKirby);
-
-private:
-	STUFFED_STATE m_eCurStuffedState{};
-
 public:
-	static CKirby_Stuffed* Create();
+	static CKirby_Damaged* Create();
 private:
 	virtual void Free() override;
 };

@@ -49,7 +49,7 @@ void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
         _float3 vDir{};
         if (Cal_MoveDir(MOVE_DIR::DOWN, vDir))
         {
-            pCommand = new MoveLeft_Command(KEY_STATE_TYPE::PRESS, vDir);
+            pCommand = new MoveBottom_Command(KEY_STATE_TYPE::PRESS, vDir);
             ProcessCommand(pCommand);
         }
     }
@@ -60,7 +60,7 @@ void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
         _float3 vDir{};
         if (Cal_MoveDir(MOVE_DIR::LEFT, vDir))
         {
-            pCommand = new MoveBottom_Command(KEY_STATE_TYPE::PRESS, vDir);
+            pCommand = new MoveLeft_Command(KEY_STATE_TYPE::PRESS, vDir);
             ProcessCommand(pCommand);
         }
     }

@@ -17,7 +17,7 @@ private:
 	CKirby_Jump();
 	virtual ~CKirby_Jump() = default;
 
-	enum class JUMP_STATE { JUMP_STRAT };
+	enum class JUMP_STATE { JUMP_STRAT, JUMP_END };
 
 private:
 	HRESULT Initialize();
@@ -35,7 +35,7 @@ public:
 
 private:
 	JUMP_STATE m_eJumpType{};
-	static _bool s_bLeft;
+	_bool m_bLeft{};
 
 	_float m_fAccGroundIgnoreTime{};
 	_float m_fMaxGroundIgnoreTime{};
