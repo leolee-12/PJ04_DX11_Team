@@ -71,6 +71,7 @@ void CGigantEdge::Play_Intro()
     CAnimator::ANI_PLAY_INFO info{};
     info.strAniName = "DemoAppear1";
     info.bLoop = false;
+    info.fBlend = 0.f;
     pAni->Play(&info);
 
     info.strAniName = "DemoAppear2";
@@ -102,30 +103,6 @@ _bool CGigantEdge::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
     Out.fRadius = { s_fCCT_Radius + 0.1f };
     Out.fHeight = { s_fCCT_Height + 0.1f };
     return true;
-}
-
-CGameObject* CMiniBoss::Find_Player() const
-{
-    PLAYER_QUERY q;
-    m_pGameInstance_Proxy->Publish(EVT_QUERY_PLAYER, &q);
-    return q.pPlayer;
-}
-
-void CMiniBoss::Publish_Boss_Appeared()
-{
-    BOSS_HP_APPEARED desc{};
-    desc.strBossName = m_strBossName;
-    desc.fMaxHP = m_fMaxHP;         
-    desc.fCurrHp = m_fCurHP;
-    m_pGameInstance_Proxy->Publish(EventTag::Boss_HP_Appeared, &desc);
-}
-
-void CMiniBoss::Publish_HP()
-{
-    BOSS_HP_UPDATED hp{};
-    hp.fMaxHP = m_fMaxHP;
-    hp.fCurrHp = m_fCurHP;
-    m_pGameInstance_Proxy->Publish(EventTag::Boss_HP_Updated, &hp);
 }
 
 _bool CGigantEdge::Block_Hit(const ATTACK_INFO& tInfo)

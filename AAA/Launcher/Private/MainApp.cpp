@@ -5,6 +5,7 @@
 #include "GameObject_Factory.h"
 #include "Loader_Prototype.h"
 #include "Level_FirstLoading.h"
+#include "Effect_Loader.h"
 
 CMainApp::CMainApp()
 {
@@ -111,6 +112,8 @@ CMainApp* CMainApp::Create()
 void CMainApp::Free()
 {
 	__super::Free();
+
+	CEffect_Loader::DestroyInstance();
 
 	Safe_Release(m_pGameInstance_Proxy);
 	Safe_Release(m_pDevice);

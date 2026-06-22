@@ -25,7 +25,9 @@
     <ClInclude Include="..\Public\BladeKnight_State_DoubleAttack.h" />
     <ClInclude Include="..\Public\BladeKnight_Sword.h" />
     <ClInclude Include="..\Public\BladeKnight_State_TornadoAttack.h" />
+    <ClInclude Include="..\public\Boss.h" />
     <ClInclude Include="..\public\BossBase.h" />
+    <ClInclude Include="..\public\Boss_Brain.h" />
     <ClInclude Include="..\Public\Camera_AreaData.h" />
     <ClInclude Include="..\public\Camera_AreaCam.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
@@ -193,7 +195,9 @@
     <ClCompile Include="..\Private\BladeKnight_State_DoubleAttack.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Sword.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State_TornadoAttack.cpp" />
+    <ClCompile Include="..\private\Boss.cpp" />
     <ClCompile Include="..\private\BossBase.cpp" />
+    <ClCompile Include="..\private\Boss_Brain.cpp" />
     <ClCompile Include="..\Private\Camera_AreaSolver.cpp" />
     <ClCompile Include="..\private\Camera_AreaCam.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />

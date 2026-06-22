@@ -51,19 +51,19 @@ namespace ProtoDesc
 
 
 	//Sample
-	inline constexpr TEXTURE_DESC Texture_LoadingUI = { ETOUI(LEVEL::LOADING), TEXT("Prototype_Component_Texture_LoadingUI"), TEXT("../../Resources/Textures/LoadingUI/LoadingUI_%d.png"), 3 };
-	inline constexpr COMPONENT_DESC Model_Slash = { ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Slash") };
+	inline constexpr TEXTURE_DESC Texture_LoadingUI = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingUI"), TEXT("../../Resources/Textures/LoadingUI/LoadingUI_%d.png"), 3 };
+	inline constexpr COMPONENT_DESC Model_Slash = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_Slash") };
 
 	// Sample Mask
-	inline constexpr TEXTURE_DESC Texture_Common_Flash02 = { ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Texture_Common_Flash02"), TEXT("../../Resources/Test/Test/SmokeSphereOriginal/common_flash02.png"), 1 };
-	inline constexpr TEXTURE_DESC Texture_TestMask = { ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Texture_Texture_TestMask"), TEXT("../../Resources/Test/Test/SmokeSphereOriginal/TestMask.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Common_Flash02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_Flash02"), TEXT("../../Resources/Test/Test/SmokeSphereOriginal/common_flash02.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_TestMask = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Texture_TestMask"), TEXT("../../Resources/Test/Test/SmokeSphereOriginal/TestMask.png"), 1 };
 
 
 	// Inhale Mask
-	inline constexpr TEXTURE_DESC Texture_Wind01 = { ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Texture_Wind01"), TEXT("../../Resources/YSE/Effect/InhaleEffect2M/wind01.png"), 1 };
-	inline constexpr TEXTURE_DESC Texture_Wind02 = { ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Texture_Wind02"), TEXT("../../Resources/YSE/Effect/InhaleEffect2M/wind02.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Wind01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Wind01"), TEXT("../../Resources/YSE/Effect/InhaleEffect2M/wind01.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Wind02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Wind02"), TEXT("../../Resources/YSE/Effect/InhaleEffect2M/wind02.png"), 1 };
 
-	inline constexpr TEXTURE_DESC Texture_Twincle = { ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Texture_Twinkle02"), TEXT("../../Resources/YSE/Effect/Vacuum/common_twinkle02.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Twincle = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Twinkle02"), TEXT("../../Resources/YSE/Effect/Vacuum/common_twinkle02.png"), 1 };
 
 
 	//sky
