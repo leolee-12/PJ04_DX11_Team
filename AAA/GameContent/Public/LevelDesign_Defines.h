@@ -61,4 +61,38 @@ enum class LD_RAIL_TYPE : _uint
 	END
 };
 
+enum class LD_FOOD_TYPE : _uint
+{
+	ENERGY_DRINK,
+	DINNER_ROAST_CHICKEN,
+	FRUIT_CHERRY,
+	VEGETABLE_CARROT,
+	SWEETS_DOUGHNUT,
+	FRUIT_BANANA,
+	UNKNOWN,
+	END
+};
+
+enum class LD_POINT_TYPE : _uint
+{
+	YELLOW,
+	BLUE,
+	GREEN,
+	RED,
+	COIN_CLUSTER_S,
+	COIN_CLUSTER_M,
+	COIN_CLUSTER_L,
+	UNKNOWN,
+	END
+};
+
+enum class LD_BUSH_TYPE : _uint
+{
+	BUSH_S,
+	BUSH_M,
+	BUSH_L,
+	UNKNOWN,
+	END
+};
+
 NS_END

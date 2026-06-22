@@ -796,10 +796,7 @@ HRESULT CMap_Loader::Load_Env_Runtime(
 
 	if (SUCCEEDED(hr))
 	{
-		Collect_DeletedEnvDescs(
-			SourcePackage.EnvObjectDescs,
-			pResolvedOverrideDesc,
-			pOutDeletedEnvDescs);
+		Collect_DeletedEnvDescs(SourcePackage.EnvObjectDescs, pResolvedOverrideDesc, pOutDeletedEnvDescs);
 
 		MAP_PACKAGE SpawnPackage = SourcePackage;
 		SpawnPackage.StageDesc = {};

@@ -6,7 +6,7 @@
 
 namespace
 {
-	void Build_DefaultBreakableDesc(LD_BREAKABLE_OBJECT_DESC* pOutDesc)
+	void Build_DefaultBreakableDesc(LD_BREAKABLE_DESC* pOutDesc)
 	{
 		if (nullptr == pOutDesc)
 			return;
@@ -61,13 +61,13 @@ HRESULT CLevelDesign_Breakable::Initialize(void* pArg)
 
 	if (nullptr == pArg)
 	{
-		LD_BREAKABLE_OBJECT_DESC DefaultDesc{};
+		LD_BREAKABLE_DESC DefaultDesc{};
 		Build_DefaultBreakableDesc(&DefaultDesc);
 		m_tBreakableDesc = DefaultDesc;
 	}
 	else
 	{
-		m_tBreakableDesc = *static_cast<const LD_BREAKABLE_OBJECT_DESC*>(pArg);
+		m_tBreakableDesc = *static_cast<const LD_BREAKABLE_DESC*>(pArg);
 		if (FAILED(Validate_Desc()))
 			return E_FAIL;
 	}
@@ -273,9 +273,6 @@ void CLevelDesign_Breakable::Release_PhysicsActor()
 
 HRESULT CLevelDesign_Breakable::Bind_ShaderResources()
 {
-	if (nullptr == m_pShaderCom || nullptr == m_pTransformCom)
-		return E_FAIL;
-
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 

@@ -42,14 +42,14 @@ public:
 	static LD_BREAKABLE_TYPE	Resolve_BreakableType(const _wstring& wstrObjName);
 
 public:
-	const LD_BREAKABLE_OBJECT_DESC&	Get_BreakableDesc() const { return m_tBreakableDesc; }
+	const LD_BREAKABLE_DESC&	Get_BreakableDesc() const { return m_tBreakableDesc; }
 
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
 	physx::PxRigidStatic* m_pPhysicsActor = { nullptr };
 
-	LD_BREAKABLE_OBJECT_DESC m_tBreakableDesc = {};
+	LD_BREAKABLE_DESC m_tBreakableDesc = {};
 
 private:
 	virtual	HRESULT	Validate_Desc() override;

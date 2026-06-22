@@ -3,6 +3,9 @@
 #include "LevelDesign_Breakable.h"
 #include "LevelDesign_Rail.h"
 #include "LevelDesign_Ladder.h"
+#include "LevelDesign_Food.h"
+#include "LevelDesign_Point.h"
+#include "LevelDesign_Bush.h"
 
 #include <cwctype>
 #include <mutex>
@@ -44,6 +47,21 @@ namespace
 		return CLevelDesign_Ladder::Create(pDevice, pContext);
 	}
 
+	CGameObject* Create_FoodPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	{
+		return CLevelDesign_Food::Create(pDevice, pContext);
+	}
+
+	CGameObject* Create_PointPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	{
+		return CLevelDesign_Point::Create(pDevice, pContext);
+	}
+
+	CGameObject* Create_BushPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	{
+		return CLevelDesign_Bush::Create(pDevice, pContext);
+	}
+
 	void Register_Unsupported(const _wstring& strObjectName, LD_CATEGORY eCategory, const _tchar* pLayerTag)
 	{
 		if (nullptr == pLayerTag)
@@ -57,6 +75,80 @@ namespace
 		Spec.pPrototypeFactory = &Create_UnsupportedPrototype;
 
 		CLevelDesign_Registry::Register(strObjectName, Spec);
+	}
+
+	void Append_AllFoodModelRequirements(vector<LD_MODEL_REQUIREMENT>* pOutRequirements)
+	{
+		if (nullptr == pOutRequirements)
+			return;
+
+		struct FOOD_MODEL_RESOURCE
+		{
+			const _tchar* pPrototypeTag;
+			const _char* pFilePath;
+		};
+
+		static const FOOD_MODEL_RESOURCE Catalog[] =
+		{
+				{ L"Proto_Component_Model_Food_Babybottle", "../../Resources/Map/Gimmick/NonAnim/Food/Babybottle.ysh" },
+				{ L"Proto_Component_Model_Food_Banana", "../../Resources/Map/Gimmick/NonAnim/Food/Banana.ysh" },
+				{ L"Proto_Component_Model_Food_BreadB", "../../Resources/Map/Gimmick/NonAnim/Food/BreadB.ysh" },
+				{ L"Proto_Component_Model_Food_Cake", "../../Resources/Map/Gimmick/NonAnim/Food/Cake.ysh" },
+				{ L"Proto_Component_Model_Food_CanJuice_FruitGreen", "../../Resources/Map/Gimmick/NonAnim/Food/CanJuice_FruitGreen.ysh" },
+				{ L"Proto_Component_Model_Food_CanJuice_FruitOrange", "../../Resources/Map/Gimmick/NonAnim/Food/CanJuice_FruitOrange.ysh" },
+				{ L"Proto_Component_Model_Food_CanJuice_FruitPurple", "../../Resources/Map/Gimmick/NonAnim/Food/CanJuice_FruitPurple.ysh" },
+				{ L"Proto_Component_Model_Food_CanJuice_FruitRed", "../../Resources/Map/Gimmick/NonAnim/Food/CanJuice_FruitRed.ysh" },
+				{ L"Proto_Component_Model_Food_CanJuice_FruitYellow", "../../Resources/Map/Gimmick/NonAnim/Food/CanJuice_FruitYellow.ysh" },
+				{ L"Proto_Component_Model_Food_CanJuice_TopL", "../../Resources/Map/Gimmick/NonAnim/Food/CanJuice_TopL.ysh" },
+				{ L"Proto_Component_Model_Food_CanJuiceGear", "../../Resources/Map/Gimmick/NonAnim/Food/CanJuiceGear.ysh" },
+				{ L"Proto_Component_Model_Food_Canned", "../../Resources/Map/Gimmick/NonAnim/Food/Canned.ysh" },
+				{ L"Proto_Component_Model_Food_Carrot", "../../Resources/Map/Gimmick/NonAnim/Food/Carrot.ysh" },
+				{ L"Proto_Component_Model_Food_Cherry", "../../Resources/Map/Gimmick/NonAnim/Food/Cherry.ysh" },
+				{ L"Proto_Component_Model_Food_Chocolate", "../../Resources/Map/Gimmick/NonAnim/Food/Chocolate.ysh" },
+				{ L"Proto_Component_Model_Food_Coffee", "../../Resources/Map/Gimmick/NonAnim/Food/Coffee.ysh" },
+				{ L"Proto_Component_Model_Food_Corn", "../../Resources/Map/Gimmick/NonAnim/Food/Corn.ysh" },
+				{ L"Proto_Component_Model_Food_CupJuiceMall", "../../Resources/Map/Gimmick/NonAnim/Food/CupJuiceMall.ysh" },
+				{ L"Proto_Component_Model_Food_CupJuicePark", "../../Resources/Map/Gimmick/NonAnim/Food/CupJuicePark.ysh" },
+				{ L"Proto_Component_Model_Food_Doughnut", "../../Resources/Map/Gimmick/NonAnim/Food/Doughnut.ysh" },
+				{ L"Proto_Component_Model_Food_EnergyDrink", "../../Resources/Map/Gimmick/NonAnim/Food/EnergyDrink.ysh" },
+				{ L"Proto_Component_Model_Food_Friedegg", "../../Resources/Map/Gimmick/NonAnim/Food/Friedegg.ysh" },
+				{ L"Proto_Component_Model_Food_Greenpepper", "../../Resources/Map/Gimmick/NonAnim/Food/Greenpepper.ysh" },
+				{ L"Proto_Component_Model_Food_Hamburger", "../../Resources/Map/Gimmick/NonAnim/Food/Hamburger.ysh" },
+				{ L"Proto_Component_Model_Food_Hotdog", "../../Resources/Map/Gimmick/NonAnim/Food/Hotdog.ysh" },
+				{ L"Proto_Component_Model_Food_IceCandy", "../../Resources/Map/Gimmick/NonAnim/Food/IceCandy.ysh" },
+				{ L"Proto_Component_Model_Food_IceCream", "../../Resources/Map/Gimmick/NonAnim/Food/IceCream.ysh" },
+				{ L"Proto_Component_Model_Food_InvincibleCandy", "../../Resources/Map/Gimmick/NonAnim/Food/InvincibleCandy.ysh" },
+				{ L"Proto_Component_Model_Food_KirbyCarDessert", "../../Resources/Map/Gimmick/NonAnim/Food/KirbyCarDessert.ysh" },
+				{ L"Proto_Component_Model_Food_KirbyHamburger", "../../Resources/Map/Gimmick/NonAnim/Food/KirbyHamburger.ysh" },
+				{ L"Proto_Component_Model_Food_Makaron", "../../Resources/Map/Gimmick/NonAnim/Food/Makaron.ysh" },
+				{ L"Proto_Component_Model_Food_MaxTomato", "../../Resources/Map/Gimmick/NonAnim/Food/MaxTomato.ysh" },
+				{ L"Proto_Component_Model_Food_Meat", "../../Resources/Map/Gimmick/NonAnim/Food/Meat.ysh" },
+				{ L"Proto_Component_Model_Food_Melon", "../../Resources/Map/Gimmick/NonAnim/Food/Melon.ysh" },
+				{ L"Proto_Component_Model_Food_MelonSoda", "../../Resources/Map/Gimmick/NonAnim/Food/MelonSoda.ysh" },
+				{ L"Proto_Component_Model_Food_Mikan", "../../Resources/Map/Gimmick/NonAnim/Food/Mikan.ysh" },
+				{ L"Proto_Component_Model_Food_MilkPack", "../../Resources/Map/Gimmick/NonAnim/Food/MilkPack.ysh" },
+				{ L"Proto_Component_Model_Food_Omelet", "../../Resources/Map/Gimmick/NonAnim/Food/Omelet.ysh" },
+				{ L"Proto_Component_Model_Food_Onigiri", "../../Resources/Map/Gimmick/NonAnim/Food/Onigiri.ysh" },
+				{ L"Proto_Component_Model_Food_Popcorn", "../../Resources/Map/Gimmick/NonAnim/Food/Popcorn.ysh" },
+				{ L"Proto_Component_Model_Food_Potato", "../../Resources/Map/Gimmick/NonAnim/Food/Potato.ysh" },
+				{ L"Proto_Component_Model_Food_Pudding", "../../Resources/Map/Gimmick/NonAnim/Food/Pudding.ysh" },
+				{ L"Proto_Component_Model_Food_Pumpkin", "../../Resources/Map/Gimmick/NonAnim/Food/Pumpkin.ysh" },
+				{ L"Proto_Component_Model_Food_RoastChicken", "../../Resources/Map/Gimmick/NonAnim/Food/RoastChicken.ysh" },
+				{ L"Proto_Component_Model_Food_SoftCream", "../../Resources/Map/Gimmick/NonAnim/Food/SoftCream.ysh" },
+				{ L"Proto_Component_Model_Food_Steak", "../../Resources/Map/Gimmick/NonAnim/Food/Steak.ysh" },
+				{ L"Proto_Component_Model_Food_Sushi", "../../Resources/Map/Gimmick/NonAnim/Food/Sushi.ysh" },
+				{ L"Proto_Component_Model_Food_Takoyaki", "../../Resources/Map/Gimmick/NonAnim/Food/Takoyaki.ysh" },
+				{ L"Proto_Component_Model_Food_Tomato", "../../Resources/Map/Gimmick/NonAnim/Food/Tomato.ysh" },
+				{ L"Proto_Component_Model_Food_WaterMelon", "../../Resources/Map/Gimmick/NonAnim/Food/WaterMelon.ysh" }
+		};
+
+		pOutRequirements->clear();
+		pOutRequirements->reserve(_countof(Catalog));
+
+		for (const auto& Entry : Catalog)
+		{
+			pOutRequirements->push_back({ Entry.pPrototypeTag, Entry.pFilePath, ETOUI(LEVEL::GAMEPLAY), MODEL::NONANIM });
+		}
 	}
 }
 
@@ -72,7 +164,7 @@ void CLevelDesign_Registry::Initialize()
 			g_FallbackSpec.strLayerTag = L"Layer_LevelDesign_Unsupported";
 			g_FallbackSpec.eCategory = LD_CATEGORY::UNSUPPORTED;
 			g_FallbackSpec.pPrototypeFactory = &Create_UnsupportedPrototype;
-			
+
 			Register_Core();
 			Register_Volumes();
 			Register_GuideAudio();
@@ -123,8 +215,8 @@ _bool CLevelDesign_Registry::Resolve(const LD_OBJECT_ENTRY& Desc, LD_RESOLVED_SP
 
 	if (pSpec->strPrototypeTag == CLevelDesign_Breakable::PROTOTYPE_TAG)
 	{
-		LD_BREAKABLE_OBJECT_DESC* pBreakableDesc =
-			std::get_if<LD_BREAKABLE_OBJECT_DESC>(&pOutResolved->ObjectDesc);
+		LD_BREAKABLE_DESC* pBreakableDesc =
+			std::get_if<LD_BREAKABLE_DESC>(&pOutResolved->ObjectDesc);
 
 		if (nullptr == pBreakableDesc
 			|| pSpec->wstrModelProtoTag.empty())
@@ -139,14 +231,36 @@ _bool CLevelDesign_Registry::Resolve(const LD_OBJECT_ENTRY& Desc, LD_RESOLVED_SP
 
 	if (pSpec->strPrototypeTag == CLevelDesign_Breakable::PROTOTYPE_TAG)
 	{
-		LD_BREAKABLE_OBJECT_DESC* pBreakableDesc =
-			std::get_if<LD_BREAKABLE_OBJECT_DESC>(&pOutResolved->ObjectDesc);
+		LD_BREAKABLE_DESC* pBreakableDesc =
+			std::get_if<LD_BREAKABLE_DESC>(&pOutResolved->ObjectDesc);
 
 		if (nullptr == pBreakableDesc)
 			return false;
 
 		pBreakableDesc->eModelType = pSpec->eModelType;
 		pBreakableDesc->wstrModelProtoTag = pSpec->wstrModelProtoTag;
+	}
+
+	if (pSpec->strPrototypeTag == CLevelDesign_Food::PROTOTYPE_TAG)
+	{
+		LD_FOOD_DESC* pFoodDesc =
+			std::get_if<LD_FOOD_DESC>(&pOutResolved->ObjectDesc);
+
+		if (nullptr == pFoodDesc || pSpec->wstrModelProtoTag.empty())
+			return false;
+
+		pFoodDesc->wstrModelProtoTag = pSpec->wstrModelProtoTag;
+	}
+
+	if (pSpec->strPrototypeTag == CLevelDesign_Point::PROTOTYPE_TAG)
+	{
+		LD_POINT_DESC* pPointDesc =
+			std::get_if<LD_POINT_DESC>(&pOutResolved->ObjectDesc);
+
+		if (nullptr == pPointDesc || pSpec->wstrModelProtoTag.empty())
+			return false;
+
+		pPointDesc->wstrModelProtoTag = pSpec->wstrModelProtoTag;
 	}
 
 	return !pOutResolved->Spec.strPrototypeTag.empty()
@@ -222,14 +336,88 @@ void CLevelDesign_Registry::Register_GuideAudio()
 
 void CLevelDesign_Registry::Register_ItemsAndBreakables()
 {
-	Register_Unsupported(L"PointStarYellow", LD_CATEGORY::ITEM, L"Layer_LevelDesign_Item");
-	Register_Unsupported(L"PointStarBlue", LD_CATEGORY::ITEM, L"Layer_LevelDesign_Item");
-	Register_Unsupported(L"PointStarGreen", LD_CATEGORY::ITEM, L"Layer_LevelDesign_Item");
+	const vector<LD_MODEL_REQUIREMENT> PointModelRequirements =
+	{
+		  { CLevelDesign_Point::YELLOW_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopYellowL.ysh", ETOUI(LEVEL::GAMEPLAY), MODEL::NONANIM },
+		  { CLevelDesign_Point::BLUE_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopBlueL.ysh", ETOUI(LEVEL::GAMEPLAY), MODEL::NONANIM },
+		  { CLevelDesign_Point::GREEN_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopGreenL.ysh", ETOUI(LEVEL::GAMEPLAY),MODEL::NONANIM },
+		  { CLevelDesign_Point::RED_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopRedL.ysh", ETOUI(LEVEL::GAMEPLAY), MODEL::NONANIM },
+		  { CLevelDesign_Point::COIN_CLUSTER_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterSL.ysh", ETOUI(LEVEL::GAMEPLAY), MODEL::NONANIM },
+		  { CLevelDesign_Point::COIN_CLUSTER_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterML.ysh", ETOUI(LEVEL::GAMEPLAY), MODEL::NONANIM },
+		  { CLevelDesign_Point::COIN_CLUSTER_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterLL.ysh", ETOUI(LEVEL::GAMEPLAY), MODEL::NONANIM }
+	};
 
-	Register_Unsupported(L"EnergyDrink", LD_CATEGORY::FOOD, L"Layer_LevelDesign_Item");
-	Register_Unsupported(L"DinnerRoastChicken", LD_CATEGORY::FOOD, L"Layer_LevelDesign_Item");
-	Register_Unsupported(L"FruitCherry", LD_CATEGORY::FOOD, L"Layer_LevelDesign_Item");
-	Register_Unsupported(L"VegetableCarrot", LD_CATEGORY::FOOD, L"Layer_LevelDesign_Item");
+	LD_SPAWN_SPEC PointSpec{};
+	PointSpec.strPrototypeTag = CLevelDesign_Point::PROTOTYPE_TAG;
+	PointSpec.strLayerTag = L"Layer_LevelDesign_Item";
+	PointSpec.eCategory = LD_CATEGORY::ITEM;
+	PointSpec.pPrototypeFactory = &Create_PointPrototype;
+
+	PointSpec.strObjectName = L"PointStarYellow";
+	PointSpec.wstrModelProtoTag = CLevelDesign_Point::YELLOW_MODEL_PROTO_TAG;
+	PointSpec.ModelRequirements = PointModelRequirements;
+	Register(PointSpec.strObjectName, PointSpec);
+
+	PointSpec.strObjectName = L"PointStarBlue";
+	PointSpec.wstrModelProtoTag = CLevelDesign_Point::BLUE_MODEL_PROTO_TAG;
+	PointSpec.ModelRequirements = PointModelRequirements;
+	Register(PointSpec.strObjectName, PointSpec);
+
+	PointSpec.strObjectName = L"PointStarGreen";
+	PointSpec.wstrModelProtoTag = CLevelDesign_Point::GREEN_MODEL_PROTO_TAG;
+	PointSpec.ModelRequirements = PointModelRequirements;
+	Register(PointSpec.strObjectName, PointSpec);
+
+	PointSpec.strObjectName = L"PointStarRed";
+	PointSpec.wstrModelProtoTag = CLevelDesign_Point::RED_MODEL_PROTO_TAG;
+	PointSpec.ModelRequirements = PointModelRequirements;
+	Register(PointSpec.strObjectName, PointSpec);
+
+	PointSpec.strObjectName = L"CoinClusterS";
+	PointSpec.wstrModelProtoTag = CLevelDesign_Point::COIN_CLUSTER_S_MODEL_PROTO_TAG;
+	PointSpec.ModelRequirements = PointModelRequirements;
+	Register(PointSpec.strObjectName, PointSpec);
+
+	PointSpec.strObjectName = L"CoinClusterM";
+	PointSpec.wstrModelProtoTag = CLevelDesign_Point::COIN_CLUSTER_M_MODEL_PROTO_TAG;
+	PointSpec.ModelRequirements = PointModelRequirements;
+	Register(PointSpec.strObjectName, PointSpec);
+	
+	PointSpec.strObjectName = L"CoinClusterL";
+	PointSpec.wstrModelProtoTag = CLevelDesign_Point::COIN_CLUSTER_L_MODEL_PROTO_TAG;
+	PointSpec.ModelRequirements = PointModelRequirements;
+	Register(PointSpec.strObjectName, PointSpec);
+
+	LD_SPAWN_SPEC FoodSpec{};
+	FoodSpec.strPrototypeTag = CLevelDesign_Food::PROTOTYPE_TAG;
+	FoodSpec.strLayerTag = L"Layer_LevelDesign_Item";
+	FoodSpec.eCategory = LD_CATEGORY::FOOD;
+	FoodSpec.pPrototypeFactory = &Create_FoodPrototype;
+	Append_AllFoodModelRequirements(&FoodSpec.ModelRequirements);
+
+	FoodSpec.strObjectName = L"EnergyDrink";
+	FoodSpec.wstrModelProtoTag = CLevelDesign_Food::ENERGY_DRINK_MODEL_PROTO_TAG;
+	Register(FoodSpec.strObjectName, FoodSpec);
+
+	FoodSpec.strObjectName = L"DinnerRoastChicken";
+	FoodSpec.wstrModelProtoTag = CLevelDesign_Food::DINNER_ROAST_CHICKEN_MODEL_PROTO_TAG;
+	Register(FoodSpec.strObjectName, FoodSpec);
+
+	FoodSpec.strObjectName = L"FruitCherry";
+	FoodSpec.wstrModelProtoTag = CLevelDesign_Food::FRUIT_CHERRY_MODEL_PROTO_TAG;
+	Register(FoodSpec.strObjectName, FoodSpec);
+
+	FoodSpec.strObjectName = L"VegetableCarrot";
+	FoodSpec.wstrModelProtoTag = CLevelDesign_Food::VEGETABLE_CARROT_MODEL_PROTO_TAG;
+	Register(FoodSpec.strObjectName, FoodSpec);
+
+	FoodSpec.strObjectName = L"SweetsDoughnut";
+	FoodSpec.wstrModelProtoTag = CLevelDesign_Food::SWEETS_DOUGHNUT_MODEL_PROTO_TAG;
+	Register(FoodSpec.strObjectName, FoodSpec);
+
+	FoodSpec.strObjectName = L"FruitBanana";
+	FoodSpec.wstrModelProtoTag = CLevelDesign_Food::FRUIT_BANANA_MODEL_PROTO_TAG;
+	Register(FoodSpec.strObjectName, FoodSpec);
 
 	LD_SPAWN_SPEC BreakableSpec{};
 	BreakableSpec.strPrototypeTag = CLevelDesign_Breakable::PROTOTYPE_TAG;
@@ -320,9 +508,36 @@ void CLevelDesign_Registry::Register_ItemsAndBreakables()
 	BreakableSpec.strObjectName = L"BreakableRockMForBridge";
 	Register(BreakableSpec.strObjectName, BreakableSpec);
 
-	Register_Unsupported(L"Bush2BasicS", LD_CATEGORY::FOLIAGE, L"Layer_LevelDesign_Gimmick");
-	Register_Unsupported(L"Bush2BasicM", LD_CATEGORY::FOLIAGE, L"Layer_LevelDesign_Gimmick");
-	Register_Unsupported(L"Bush2BasicL", LD_CATEGORY::FOLIAGE, L"Layer_LevelDesign_Gimmick");
+	LD_SPAWN_SPEC BushSpec{};
+	BushSpec.strPrototypeTag = CLevelDesign_Bush::PROTOTYPE_TAG;
+	BushSpec.strLayerTag = L"Layer_LevelDesign_Gimmick";
+	BushSpec.eCategory = LD_CATEGORY::FOLIAGE;
+	BushSpec.pPrototypeFactory = &Create_BushPrototype;
+
+	BushSpec.strObjectName = L"Bush2BasicS";
+	BushSpec.ModelRequirements =
+	{
+		  { CLevelDesign_Bush::BUSH_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/BushS.ysh", ETOUI(LEVEL::GAMEPLAY), MODEL::ANIM },
+		  { CLevelDesign_Bush::CUT_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/CutS.ysh", ETOUI(LEVEL::GAMEPLAY), MODEL::NONANIM }
+	};
+	Register(BushSpec.strObjectName, BushSpec);
+
+	BushSpec.strObjectName = L"Bush2BasicM";
+	BushSpec.ModelRequirements =
+	{
+		  { CLevelDesign_Bush::BUSH_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/BushM.ysh", ETOUI(LEVEL::GAMEPLAY), MODEL::ANIM },
+		  { CLevelDesign_Bush::CUT_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/CutM.ysh", ETOUI(LEVEL::GAMEPLAY), MODEL::NONANIM }
+	};
+	Register(BushSpec.strObjectName, BushSpec);
+
+	BushSpec.strObjectName = L"Bush2BasicL";
+	BushSpec.ModelRequirements =
+	{
+		  { CLevelDesign_Bush::BUSH_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/BushL.ysh", ETOUI(LEVEL::GAMEPLAY), MODEL::ANIM },
+		  { CLevelDesign_Bush::CUT_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/CutL.ysh", ETOUI(LEVEL::GAMEPLAY), MODEL::NONANIM }
+	};
+	Register(BushSpec.strObjectName, BushSpec);
+
 	Register_Unsupported(L"PopFlower", LD_CATEGORY::FOLIAGE, L"Layer_LevelDesign_Gimmick");
 }
 

@@ -44,7 +44,7 @@ struct LD_PORTAL_DESC
 };
 
 #pragma region Breakable
-struct LD_BREAKABLE_OBJECT_DESC : public LD_OBJECT_DESC
+struct LD_BREAKABLE_DESC : public LD_OBJECT_DESC
 {
 	LD_BREAKABLE_TYPE   eType = LD_BREAKABLE_TYPE::UNKNOWN;
 	MODEL               eModelType = MODEL::NONANIM;
@@ -80,6 +80,30 @@ struct LD_LADDER_DESC : public LD_OBJECT_DESC
 #pragma endregion
 
 #pragma region Portal
+#pragma endregion
+
+#pragma region Food
+struct LD_FOOD_DESC : public LD_OBJECT_DESC
+{
+	LD_FOOD_TYPE eType = { LD_FOOD_TYPE::UNKNOWN };
+	_wstring wstrModelProtoTag;
+};
+#pragma endregion
+
+#pragma region Point
+struct LD_POINT_DESC : public LD_OBJECT_DESC
+{
+	LD_POINT_TYPE eType = { LD_POINT_TYPE::UNKNOWN };
+	_wstring wstrModelProtoTag;
+};
+#pragma endregion
+
+#pragma region Bush
+struct LD_BUSH_DESC : public LD_OBJECT_DESC
+{
+	LD_BUSH_TYPE eType = { LD_BUSH_TYPE::UNKNOWN };
+	_bool bGenerateItem = { false };
+};
 #pragma endregion
 
 struct LD_VOLUME_DESC
@@ -134,7 +158,7 @@ struct LD_PARSED_OBJECT : public LD_OBJECT_DESC
 	LD_AUDIO_AREA_DESC AudioArea;
 };
 
-using LD_OBJECT_ENTRY = variant<LD_PARSED_OBJECT, LD_BREAKABLE_OBJECT_DESC, LD_LADDER_DESC>;
+using LD_OBJECT_ENTRY = variant<LD_PARSED_OBJECT, LD_BREAKABLE_DESC, LD_LADDER_DESC, LD_FOOD_DESC, LD_POINT_DESC, LD_BUSH_DESC>;
 
 inline const LD_OBJECT_DESC& Get_LDObjectDesc(const LD_OBJECT_ENTRY& Entry)
 {

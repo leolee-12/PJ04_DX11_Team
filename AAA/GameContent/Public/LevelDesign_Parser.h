@@ -21,8 +21,11 @@ private:
 
 	static void Fill_Common(const json& jEntry, LD_OBJECT_DESC* pDesc);
 	static void Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJECT* pDesc);
-	static void Fill_BreakableFields(const json& jEntry, LD_BREAKABLE_OBJECT_DESC* pDesc);
+	static void Fill_BreakableFields(const json& jEntry, LD_BREAKABLE_DESC* pDesc);
 	static void Fill_LadderFields(const json& jEntry, LD_LADDER_DESC* pDesc);
+	static void Fill_FoodFields(const json& jEntry, LD_FOOD_DESC* pDesc);
+	static void Fill_PointFields(const json& jEntry, LD_POINT_DESC* pDesc);
+	static void Fill_BushFields(const json& jEntry, LD_BUSH_DESC* pDesc);
 
 private:
 	static void Build_TransformDesc(LD_OBJECT_DESC* pDesc);
