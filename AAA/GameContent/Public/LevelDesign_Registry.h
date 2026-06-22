@@ -2,9 +2,10 @@
 #include "LevelDesign_LoadTypes.h"
 
 NS_BEGIN(Client)
+struct LD_SPAWN_SPEC;
 
-using LD_OBJECT_PROTOTYPE_FACTORY =
-CGameObject * (*)(ID3D11Device*, ID3D11DeviceContext*);
+using LD_OBJECT_PROTO_FACTORY = CGameObject* (*)(ID3D11Device*, ID3D11DeviceContext*);
+using LD_DESC_BUILD_FUNC = _bool (*)(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
 
 struct LD_MODEL_REQUIREMENT
 {
@@ -24,7 +25,8 @@ struct LD_SPAWN_SPEC
 	_wstring wstrModelProtoTag;
 	MODEL eModelType = { MODEL::NONANIM };
 
-	LD_OBJECT_PROTOTYPE_FACTORY pPrototypeFactory = { nullptr };
+	LD_OBJECT_PROTO_FACTORY pPrototypeFactory = { nullptr };
+	LD_DESC_BUILD_FUNC pBuildDesc = { nullptr };
 	vector<LD_MODEL_REQUIREMENT> ModelRequirements;
 };
 
@@ -60,6 +62,7 @@ public:
 	static const LD_SPAWN_SPEC& Get_FallbackSpec();
 	static _bool Is_LevelDesignLayer(const _wstring& strLayerTag);
 	static _bool Register(const _wstring& strObjectName, const LD_SPAWN_SPEC& Spec);
+	static _bool Build_Entry(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, LD_OBJECT_ENTRY* pOutEntry);
 	static _bool Resolve(const LD_OBJECT_ENTRY& Desc, LD_RESOLVED_SPAWN* pOutResolved);
 
 private:

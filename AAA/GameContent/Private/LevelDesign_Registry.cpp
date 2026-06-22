@@ -32,11 +32,6 @@ namespace
 		return CLevelDesign_Unsupported::Create(pDevice, pContext);
 	}
 
-	CGameObject* Create_BreakablePrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	{
-		return CLevelDesign_Breakable::Create(pDevice, pContext);
-	}
-
 	CGameObject* Create_RailPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	{
 		return CLevelDesign_Rail::Create(pDevice, pContext);
@@ -60,6 +55,21 @@ namespace
 	CGameObject* Create_BushPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	{
 		return CLevelDesign_Bush::Create(pDevice, pContext);
+	}
+
+	_bool Build_ParsedObjectDesc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
+	{
+		UNREFERENCED_PARAMETER(jEntry);
+
+		if (nullptr == pOutEntry)
+			return false;
+
+		LD_PARSED_OBJECT Desc{};
+		static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
+		Desc.eCategory = Spec.eCategory;
+
+		*pOutEntry = Desc;
+		return true;
 	}
 
 	void Register_Unsupported(const _wstring& strObjectName, LD_CATEGORY eCategory, const _tchar* pLayerTag)
@@ -164,6 +174,7 @@ void CLevelDesign_Registry::Initialize()
 			g_FallbackSpec.strLayerTag = L"Layer_LevelDesign_Unsupported";
 			g_FallbackSpec.eCategory = LD_CATEGORY::UNSUPPORTED;
 			g_FallbackSpec.pPrototypeFactory = &Create_UnsupportedPrototype;
+			g_FallbackSpec.pBuildDesc = &Build_ParsedObjectDesc;
 
 			Register_Core();
 			Register_Volumes();
@@ -199,6 +210,21 @@ _bool CLevelDesign_Registry::Register(const _wstring& strObjectName, const LD_SP
 	return Inserted;
 }
 
+_bool CLevelDesign_Registry::Build_Entry(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, LD_OBJECT_ENTRY* pOutEntry)
+{
+	if (nullptr == pOutEntry)
+		return false;
+
+	const LD_SPAWN_SPEC* pSpec = Find(CommonDesc.strObjectName);
+	if (nullptr == pSpec)
+		pSpec = &Get_FallbackSpec();
+
+	if (nullptr == pSpec->pBuildDesc)
+		return false;
+
+	return pSpec->pBuildDesc(CommonDesc, jEntry, *pSpec, pOutEntry);
+}
+
 _bool CLevelDesign_Registry::Resolve(const LD_OBJECT_ENTRY& Desc, LD_RESOLVED_SPAWN* pOutResolved)
 {
 	if (nullptr == pOutResolved)
@@ -213,38 +239,13 @@ _bool CLevelDesign_Registry::Resolve(const LD_OBJECT_ENTRY& Desc, LD_RESOLVED_SP
 	if (nullptr == pSpec)
 		pSpec = &Get_FallbackSpec();
 
-	if (pSpec->strPrototypeTag == CLevelDesign_Breakable::PROTOTYPE_TAG)
-	{
-		LD_BREAKABLE_DESC* pBreakableDesc =
-			std::get_if<LD_BREAKABLE_DESC>(&pOutResolved->ObjectDesc);
-
-		if (nullptr == pBreakableDesc
-			|| pSpec->wstrModelProtoTag.empty())
-		{
-			pSpec = &Get_FallbackSpec();
-		}
-	}
-
 	pOutResolved->Spec = *pSpec;
 	pOutResolved->bFallback = (pSpec == &Get_FallbackSpec());
 	ResolvedDesc.eCategory = pSpec->eCategory;
 
-	if (pSpec->strPrototypeTag == CLevelDesign_Breakable::PROTOTYPE_TAG)
-	{
-		LD_BREAKABLE_DESC* pBreakableDesc =
-			std::get_if<LD_BREAKABLE_DESC>(&pOutResolved->ObjectDesc);
-
-		if (nullptr == pBreakableDesc)
-			return false;
-
-		pBreakableDesc->eModelType = pSpec->eModelType;
-		pBreakableDesc->wstrModelProtoTag = pSpec->wstrModelProtoTag;
-	}
-
 	if (pSpec->strPrototypeTag == CLevelDesign_Food::PROTOTYPE_TAG)
 	{
-		LD_FOOD_DESC* pFoodDesc =
-			std::get_if<LD_FOOD_DESC>(&pOutResolved->ObjectDesc);
+		LD_FOOD_DESC* pFoodDesc = std::get_if<LD_FOOD_DESC>(&pOutResolved->ObjectDesc);
 
 		if (nullptr == pFoodDesc || pSpec->wstrModelProtoTag.empty())
 			return false;
@@ -254,8 +255,7 @@ _bool CLevelDesign_Registry::Resolve(const LD_OBJECT_ENTRY& Desc, LD_RESOLVED_SP
 
 	if (pSpec->strPrototypeTag == CLevelDesign_Point::PROTOTYPE_TAG)
 	{
-		LD_POINT_DESC* pPointDesc =
-			std::get_if<LD_POINT_DESC>(&pOutResolved->ObjectDesc);
+		LD_POINT_DESC* pPointDesc = std::get_if<LD_POINT_DESC>(&pOutResolved->ObjectDesc);
 
 		if (nullptr == pPointDesc || pSpec->wstrModelProtoTag.empty())
 			return false;
@@ -419,94 +419,7 @@ void CLevelDesign_Registry::Register_ItemsAndBreakables()
 	FoodSpec.wstrModelProtoTag = CLevelDesign_Food::FRUIT_BANANA_MODEL_PROTO_TAG;
 	Register(FoodSpec.strObjectName, FoodSpec);
 
-	LD_SPAWN_SPEC BreakableSpec{};
-	BreakableSpec.strPrototypeTag = CLevelDesign_Breakable::PROTOTYPE_TAG;
-	BreakableSpec.strLayerTag = L"Layer_LevelDesign_Gimmick";
-	BreakableSpec.eCategory = LD_CATEGORY::BREAKABLE;
-	BreakableSpec.pPrototypeFactory = &Create_BreakablePrototype;
-
-	BreakableSpec.strObjectName = L"StarBlock";
-	BreakableSpec.wstrModelProtoTag = CLevelDesign_Breakable::STARBLOCK_H1W1_MODEL_PROTO_TAG;
-	BreakableSpec.ModelRequirements = {
-		{
-			CLevelDesign_Breakable::STARBLOCK_H1W1_MODEL_PROTO_TAG,
-			"../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh",
-			ETOUI(LEVEL::GAMEPLAY)
-		}
-	};
-	Register(BreakableSpec.strObjectName, BreakableSpec);
-
-	BreakableSpec.strObjectName = L"StarBlockBig";
-	BreakableSpec.wstrModelProtoTag = CLevelDesign_Breakable::STARBLOCK_H3W3_MODEL_PROTO_TAG;
-	BreakableSpec.ModelRequirements = {
-		{
-			CLevelDesign_Breakable::STARBLOCK_H3W3_MODEL_PROTO_TAG,
-			"../../Resources/Map/Gimmick/NonAnim/Star/H3W3.ysh",
-			ETOUI(LEVEL::GAMEPLAY)
-		}
-	};
-	Register(BreakableSpec.strObjectName, BreakableSpec);
-
-	BreakableSpec.strObjectName = L"WoodBox";
-	BreakableSpec.wstrModelProtoTag = CLevelDesign_Breakable::WOODBOX_MODEL_PROTO_TAG;
-	BreakableSpec.eModelType = MODEL::ANIM;
-	BreakableSpec.ModelRequirements = {
-		{
-			CLevelDesign_Breakable::WOODBOX_MODEL_PROTO_TAG,
-			"../../Resources/Map/Gimmick/Anim/BoxWood/BoxWood.ysh",
-			ETOUI(LEVEL::GAMEPLAY),
-			MODEL::ANIM
-		}
-	};
-	Register(BreakableSpec.strObjectName, BreakableSpec);
-
-	BreakableSpec.strObjectName = L"BoxPlastic";
-	BreakableSpec.wstrModelProtoTag = CLevelDesign_Breakable::PLASTICBOX_MODEL_PROTO_TAG;
-	BreakableSpec.eModelType = MODEL::ANIM;
-	BreakableSpec.ModelRequirements = {
-		{
-			CLevelDesign_Breakable::PLASTICBOX_MODEL_PROTO_TAG,
-			"../../Resources/Map/Gimmick/Anim/BoxPlastic/BoxPlastic.ysh",
-			ETOUI(LEVEL::GAMEPLAY),
-			MODEL::ANIM
-		}
-	};
-	Register(BreakableSpec.strObjectName, BreakableSpec);
-
-	BreakableSpec.strObjectName = L"BreakableRockS";
-	BreakableSpec.wstrModelProtoTag =
-		CLevelDesign_Breakable::BREAKABLE_ROCK_S_MODEL_PROTO_TAG;
-	BreakableSpec.eModelType = MODEL::NONANIM;
-	BreakableSpec.ModelRequirements =
-	{
-		{
-			CLevelDesign_Breakable::BREAKABLE_ROCK_S_MODEL_PROTO_TAG,
-			"../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_S.ysh",
-			ETOUI(LEVEL::GAMEPLAY),
-			MODEL::NONANIM,
-			true
-		}
-	};
-	Register(BreakableSpec.strObjectName, BreakableSpec);
-
-	BreakableSpec.strObjectName = L"BreakableRockM";
-	BreakableSpec.wstrModelProtoTag =
-		CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG;
-	BreakableSpec.eModelType = MODEL::NONANIM;
-	BreakableSpec.ModelRequirements =
-	{
-		{
-			CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG,
-			"../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh",
-			ETOUI(LEVEL::GAMEPLAY),
-			MODEL::NONANIM,
-			true
-		}
-	};
-	Register(BreakableSpec.strObjectName, BreakableSpec);
-
-	BreakableSpec.strObjectName = L"BreakableRockMForBridge";
-	Register(BreakableSpec.strObjectName, BreakableSpec);
+	CLevelDesign_Breakable::Register_LevelDesignSpecs();
 
 	LD_SPAWN_SPEC BushSpec{};
 	BushSpec.strPrototypeTag = CLevelDesign_Bush::PROTOTYPE_TAG;

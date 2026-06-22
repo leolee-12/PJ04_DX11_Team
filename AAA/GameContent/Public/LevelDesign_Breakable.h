@@ -11,6 +11,7 @@ class PxRigidStatic;
 NS_END
 
 NS_BEGIN(Client)
+struct LD_SPAWN_SPEC;
 
 class CLevelDesign_Breakable final : public CLevelDesignObject
 {
@@ -40,6 +41,9 @@ public:
 	virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
 	static LD_BREAKABLE_TYPE	Resolve_BreakableType(const _wstring& wstrObjName);
+	static void					Register_LevelDesignSpecs();
+	static _bool				Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
+	static CGameObject*			Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
 public:
 	const LD_BREAKABLE_DESC&	Get_BreakableDesc() const { return m_tBreakableDesc; }

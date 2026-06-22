@@ -1,7 +1,7 @@
 #include "LevelDesign_Parser.h"
 #include "DataLoader.h"
 #include "Parsing_Utils.h"
-#include "LevelDesign_Breakable.h"
+#include "LevelDesign_Registry.h"
 #include "LevelDesign_Food.h"
 #include "LevelDesign_Point.h"
 #include "LevelDesign_Bush.h"
@@ -186,15 +186,10 @@ void CLevelDesign_Parser::Parse_ObjectSection(
 			continue;
 		}
 
-		const LD_BREAKABLE_TYPE eBreakableType = CLevelDesign_Breakable::Resolve_BreakableType(CommonDesc.strObjectName);
-		if (LD_BREAKABLE_TYPE::UNKNOWN != eBreakableType)
+		LD_OBJECT_ENTRY BuiltEntry{};
+		if (CLevelDesign_Registry::Build_Entry(CommonDesc, Iter.value(), &BuiltEntry))
 		{
-			LD_BREAKABLE_DESC Desc{};
-			static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
-			Desc.eCategory = LD_CATEGORY::BREAKABLE;
-			Desc.eType = eBreakableType;
-
-			pOutDescs->emplace_back(std::move(Desc));
+			pOutDescs->emplace_back(std::move(BuiltEntry));
 			continue;
 		}
 
@@ -490,10 +485,6 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 	}
 
 	pDesc->eCategory = LD_CATEGORY::UNSUPPORTED;
-}
-
-void CLevelDesign_Parser::Fill_BreakableFields(const json& jEntry, LD_BREAKABLE_DESC* pDesc)
-{
 }
 
 void CLevelDesign_Parser::Fill_LadderFields(const json& jEntry, LD_LADDER_DESC* pDesc)
