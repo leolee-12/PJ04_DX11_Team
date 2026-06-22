@@ -104,11 +104,6 @@ void CMonster::Late_Update(_float fTimeDelta)
 	}
 }
 
-HRESULT CMonster::Render()
-{
-	return S_OK;
-}
-
 void CMonster::On_Deserialized()
 {
 	if (nullptr != m_pMovement)

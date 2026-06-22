@@ -157,6 +157,10 @@ HRESULT Ready_Prototype_Shaders(CGameInstance_Proxy* pProxy, ID3D11Device* pDevi
             return E_FAIL;
     }
 
+    if (FAILED(pProxy->Add_Prototype(Shader_Gorilla.iLevelID, Shader_Gorilla.szProtoTag,
+        CShader::Create(pDevice, pContext, Shader_Gorilla.szFileTag, VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
+        return E_FAIL;
+
     return S_OK;
 }
 

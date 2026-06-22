@@ -3,22 +3,12 @@
 float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 float4x4 g_BoneMatrices[512];
 
-Texture2D g_EyeTexture; // _a0  KirbyEye.0X      (표정 프레임)
-Texture2D g_SkinTexture; // _a1  KirbySkin        (영역 마스크! 알베도 아님)
-Texture2D g_MouthTexture; // _a2  KirbyMouth
-Texture2D g_EyeMaskTexture; // _a3  KirbyEyeMask.0X  (눈 합성 마스크)
-Texture2D g_WetMaskTexture; // _a4  WetMask          (머금기/젖음)
-Texture2D g_WarpTexture; // _a5  Warp             (흡입 왜곡, 옵션/미사용)
-Texture2D g_NormalTexture; // _n0  KirbyEyeNormal.0X
+Texture2D g_DiffuseTexture;
+Texture2D g_BodyMaskTexture;
 
-float4 g_vBodyColor = float4(1.f, 0.45f, 0.55f, 1.f); // 몸  = KirbySkin 검정 영역
-float4 g_vFootColor = float4(1.f, 0.1882353f, 0.3764706f, 1.f); // 발  = G 채널 초록
-float4 g_vBlushColor = float4(1.f, 0.25f, 0.4f, 1.f); // 홍조 = R 채널 빨강
-float4 g_vDamageColor = float4(1.f, 0.f, 0.f, 1.f); // 피격 플래시
-float g_fDamageBlend = 0.f; // 0~1
-float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
+Texture2D g_MRATexture;
 
-float g_fWetStrength = 0.f;
+float4 g_vEmissiveColor;
 uint g_iMaterialID = 0;
 
 static const float3 EYE_WHITE = float3(1.f, 1.f, 1.f);
@@ -120,33 +110,43 @@ PS_OUT PS_BODY(PS_IN In)
 {
     PS_OUT Out;
 
-    float4 vMask = g_SkinTexture.Sample(ClampSampler, In.vTexcoord2);
-    float3 vAlbedo = g_vBodyColor.rgb;
-    vAlbedo = lerp(vAlbedo, g_vFootColor.rgb, vMask.g);
-    vAlbedo = lerp(vAlbedo, g_vBlushColor.rgb, vMask.r);
+    float4 vMask = g_BodyMaskTexture.Sample(ClampSampler, In.vTexcoord);
+    float3 vAlbedo = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord).rgb;
+    vAlbedo = lerp(vAlbedo, vMask.rgb, vMask.a);
     
-    // 2) 눈 합성 (EyeMask 명도 × Eye 알파로 스킨 위에 덮음)
-    float fEyeAlpha = g_EyeTexture.Sample(ClampSampler, In.vTexcoord).r;
-    float3 vEyeMask = g_EyeMaskTexture.Sample(ClampSampler, In.vTexcoord).rgb;
+    float3 vMRA = g_MRATexture.Sample(ClampSampler, In.vTexcoord).rgb;
+    
+   
+    Out.vDiffuse = float4(vAlbedo, 1.f);
+    Out.vNormal = float4(In.vNormal.rgb * 0.5f + 0.5f, 0.f);
+    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(vMRA, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
+    Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+
+    return Out;
+}
+
+PS_OUT PS_EYE(PS_IN In)
+{
+    PS_OUT Out;
+
+    
+    float fEyeAlpha = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord).a;
+    float3 vEyeMask = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord).rgb;
+    
+    float3 vAlbedo = float3(1.f, 1.f, 1.f);
     
     float3 result =
             vEyeMask.r * EYE_WHITE +
             vEyeMask.g * EYE_RIM +
             vEyeMask.b * EYE_BLUE;
-    
-    
-    vAlbedo = lerp(vAlbedo, result, fEyeAlpha);
-    
-    // 3) 입 합성
-    float4 vMouth = g_MouthTexture.Sample(ClampSampler, In.vTexcoord1);
-    vAlbedo = lerp(vAlbedo, vMouth.rgb, vMouth.a);
-    
 
+    vAlbedo = lerp(vAlbedo, result, fEyeAlpha);
+   
     Out.vDiffuse = float4(vAlbedo, 1.f);
-    //Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
     Out.vNormal = float4(In.vNormal.rgb * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    //Out.vMRA = float4(fMetallic, fRoughness, fAO, g_iMaterialID / 255.f);
     Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
@@ -154,16 +154,37 @@ PS_OUT PS_BODY(PS_IN In)
     return Out;
 }
 
-PS_OUT PS_MASK_DEBUG(PS_IN In)
+PS_OUT PS_SKIN(PS_IN In)
 {
-    PS_OUT Out = (PS_OUT) 0;
-    float4 vMask = g_SkinTexture.Sample(LinearSampler, In.vTexcoord1);
-    Out.vDiffuse = float4(vMask.rgb, 1.f);
-    Out.vNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    PS_OUT Out;
+
+    float3 vAlbedo = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord).rgb;
+    float3 vMRA    = g_MRATexture.Sample(ClampSampler, In.vTexcoord).rgb;
+   
+    Out.vDiffuse = float4(vAlbedo, 1.f);
+    Out.vNormal = float4(In.vNormal.rgb * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
+    Out.vMRA = float4(vMRA, g_iMaterialID / 255.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+
+    return Out;
+}
+
+PS_OUT PS_ANCHOR(PS_IN In)
+{
+    PS_OUT Out;
+
+    float3 vAlbedo = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord).rgb;
+    float3 vMRA = g_MRATexture.Sample(ClampSampler, In.vTexcoord).rgb;
+   
+    Out.vDiffuse = float4(vAlbedo, 1.f);
+    Out.vNormal = float4(In.vNormal.rgb * 0.5f + 0.5f, 0.f);
+    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(vMRA, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
+    Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+
     return Out;
 }
 
@@ -172,22 +193,41 @@ technique11 DefaultTechnique
     pass Body // 0
     {
         SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_MarkOccluded, 1);
+        SetDepthStencilState(DSS_Default, 1);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_BODY();
     }
-
-    pass MaskDebug // 1
+    pass Eye // 1
     {
         SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
+        SetDepthStencilState(DSS_Default, 1);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MASK_DEBUG();
+        PixelShader = compile ps_5_0 PS_EYE();
+    }
+    pass Skin // 2
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 1);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_SKIN();
+    }
+    pass Anchor // 3
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 1);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_ANCHOR();
     }
 }

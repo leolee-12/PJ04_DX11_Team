@@ -8,9 +8,9 @@ CShaderGlobal_Manager::CShaderGlobal_Manager()
 HRESULT CShaderGlobal_Manager::Initialize()
 {
     /* 기본 전역 등록 파라미터 추가 시 여기 한 줄 + 셰이더 변수만 늘리면 에디터 UI까지 자동 */
-    Register({ "g_fSSAORadius",     "SSAO Radius",     GVAL::FLOAT, { 0.5f,   0.f, 0.f, 0.f }, { 0.f,  5.f } });
-    Register({ "g_fSSAOBias",       "SSAO Bias",       GVAL::FLOAT, { 0.015f, 0.f, 0.f, 0.f }, { 0.f,  0.1f } });
-    Register({ "g_fSSAOPower",      "SSAO Power",      GVAL::FLOAT, { 1.8f,   0.f, 0.f, 0.f }, { 0.5f, 4.f } });
+    Register({ "g_fSSAORadius",     "SSAO Radius",     GVAL::FLOAT, { 5.f,   0.f, 0.f, 0.f }, { 0.f,  5.f } });
+    Register({ "g_fSSAOBias",       "SSAO Bias",       GVAL::FLOAT, { 0.1f, 0.f, 0.f, 0.f }, { 0.f,  0.1f } });
+    Register({ "g_fSSAOPower",      "SSAO Power",      GVAL::FLOAT, { 2.4f,   0.f, 0.f, 0.f }, { 0.5f, 4.f } });
     Register({ "g_fThreshold",      "Bloom Threshold", GVAL::FLOAT, { 1.f,    0.f, 0.f, 0.f }, { 0.f,  5.f } });
     Register({ "g_fBloomIntensity", "Bloom Intensity", GVAL::FLOAT, { 1.f,    0.f, 0.f, 0.f }, { 0.f,  3.f } });
 

@@ -23,6 +23,8 @@ HRESULT CRenderer::Initialize()
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Normal"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 1.f))))
         return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_GeoNormal"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.5f, 0.5f, 1.f, 0.f))))
+        return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Depth"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_MRA"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 1.f, 1.f, 0.f))))
@@ -76,6 +78,8 @@ HRESULT CRenderer::Initialize()
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Emissive"))))
         return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_GeoNormal"))))
+        return E_FAIL;
 
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Light"))))
         return E_FAIL;
@@ -124,34 +128,34 @@ HRESULT CRenderer::Initialize()
     XMStoreFloat4x4(&m_WorldMatrix, XMMatrixScaling(static_cast<_float>(m_iRTWidth), static_cast<_float>(m_iRTHeight), 1.f) * XMMatrixTranslation(0.f, 0.f, 0.1f));
 
 #ifdef _DEBUG
-    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_MRA"), 150.f, 100.f, 300.f, 200.f)))
-        return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Diffuse"), 150.f, 300.f, 300.f, 200.f)))
-        return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Depth"), 150.f, 500.f, 300.f, 200.f)))
-        return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Normal"), 150.f, 700.f, 300.f, 200.f)))
-        return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Emissive"), 450.f, 100.f, 300.f, 200.f)))
-        return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_LightDepth"), 450.f, 300.f, 300.f, 200.f)))
-        return E_FAIL;
+    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_MRA"), 150.f, 100.f, 300.f, 200.f)))
+    //    return E_FAIL;
+    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Diffuse"), 150.f, 300.f, 300.f, 200.f)))
+    //    return E_FAIL;
+    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Depth"), 150.f, 500.f, 300.f, 200.f)))
+    //    return E_FAIL;
+    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Normal"), 150.f, 700.f, 300.f, 200.f)))
+    //    return E_FAIL;
+    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Emissive"), 450.f, 100.f, 300.f, 200.f)))
+    //    return E_FAIL;
+    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_LightDepth"), 450.f, 300.f, 300.f, 200.f)))
+    //    return E_FAIL;
 
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Light"), 150.f, 100.f, 300.f, 200.f)))
-    //    return E_FAIL;
-    //
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Scene"), 150.f, 300.f, 300.f, 200.f)))
-    //    return E_FAIL;
-    //
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_BloomA"), 450.f, 100.f, 300.f, 200.f)))
-    //    return E_FAIL;
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_BloomB"), 450.f, 300.f, 300.f, 200.f)))
-    //    return E_FAIL;
-    //
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_SSAO"), 750.f, 100.f, 300.f, 200.f)))
-    //    return E_FAIL;
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_SSAO_Blur"), 750.f, 300.f, 300.f, 200.f)))
-    //    return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Light"), 150.f, 100.f, 300.f, 200.f)))
+        return E_FAIL;
+    
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Scene"), 150.f, 300.f, 300.f, 200.f)))
+        return E_FAIL;
+    
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_BloomA"), 450.f, 100.f, 300.f, 200.f)))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_BloomB"), 450.f, 300.f, 300.f, 200.f)))
+        return E_FAIL;
+    
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_SSAO"), 750.f, 100.f, 300.f, 200.f)))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_SSAO_Blur"), 750.f, 300.f, 300.f, 200.f)))
+        return E_FAIL;
 #endif
 
     if (FAILED(Ready_Froxel_Volumes()))
@@ -329,6 +333,8 @@ HRESULT CRenderer::Render_SSAO()
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShaderPost, "g_DepthTexture")))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Normal"), m_pShaderPost, "g_NormalTexture")))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_GeoNormal"), m_pShaderPost, "g_GeoNormalTexture")))
         return E_FAIL;
 
     // 풀스크린 쿼드용 ORTHO
