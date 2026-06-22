@@ -1,8 +1,31 @@
 #include "LevelDesign_Point.h"
+#include "LevelDesign_Registry.h"
 #include "Shader_PassMeta.h"
 #include "Parsing_Utils.h"
 
 #include "GameInstance.h"
+
+namespace
+{
+	struct LD_POINT_CATALOG
+	{
+		const _tchar* pObjectName;
+		const _tchar* pModelProtoTag;
+		const _char* pModelPath;
+		LD_POINT_TYPE eType;
+	};
+
+	static const LD_POINT_CATALOG g_PointCatalog[] =
+	{
+			{ L"PointStarYellow", CLevelDesign_Point::YELLOW_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopYellowL.ysh", LD_POINT_TYPE::YELLOW },
+			{ L"PointStarBlue", CLevelDesign_Point::BLUE_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopBlueL.ysh", LD_POINT_TYPE::BLUE },
+			{ L"PointStarGreen", CLevelDesign_Point::GREEN_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopGreenL.ysh", LD_POINT_TYPE::GREEN },
+			{ L"PointStarRed", CLevelDesign_Point::RED_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopRedL.ysh", LD_POINT_TYPE::RED },
+			{ L"CoinClusterS", CLevelDesign_Point::COIN_CLUSTER_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterSL.ysh", LD_POINT_TYPE::COIN_CLUSTER_S },
+			{ L"CoinClusterM", CLevelDesign_Point::COIN_CLUSTER_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterML.ysh", LD_POINT_TYPE::COIN_CLUSTER_M },
+			{ L"CoinClusterL", CLevelDesign_Point::COIN_CLUSTER_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterLL.ysh", LD_POINT_TYPE::COIN_CLUSTER_L }
+	};
+}
 
 NS_BEGIN(Client)
 
@@ -85,6 +108,55 @@ LD_POINT_TYPE CLevelDesign_Point::Resolve_PointType(const _wstring& wstrObjName)
 	}
 
 	return LD_POINT_TYPE::UNKNOWN;
+}
+
+void CLevelDesign_Point::Register_LevelDesignSpecs()
+{
+	for (const LD_POINT_CATALOG& Entry : g_PointCatalog)
+	{
+		LD_SPAWN_SPEC Spec{};
+		Spec.strObjectName = Entry.pObjectName;
+		Spec.strPrototypeTag = PROTOTYPE_TAG;
+		Spec.strLayerTag = L"Layer_LevelDesign_Item";
+		Spec.eCategory = LD_CATEGORY::ITEM;
+		Spec.wstrModelProtoTag = Entry.pModelProtoTag;
+		Spec.pPrototypeFactory = &Create_Prototype;
+		Spec.pBuildDesc = &Build_Desc;
+		Spec.ModelRequirements =
+		{
+				{ Entry.pModelProtoTag, Entry.pModelPath, ETOUI(LEVEL::GAMEPLAY), MODEL::NONANIM }
+		};
+
+		CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
+	}
+}
+
+_bool CLevelDesign_Point::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
+{
+	UNREFERENCED_PARAMETER(jEntry);
+
+	if (nullptr == pOutEntry)
+		return false;
+
+	const LD_POINT_TYPE eType = Resolve_PointType(CommonDesc.strObjectName);
+	if (LD_POINT_TYPE::UNKNOWN == eType)
+		return false;
+	if (Spec.wstrModelProtoTag.empty())
+		return false;
+
+	LD_POINT_DESC Desc{};
+	static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
+	Desc.eCategory = LD_CATEGORY::ITEM;
+	Desc.eType = eType;
+	Desc.wstrModelProtoTag = Spec.wstrModelProtoTag;
+
+	*pOutEntry = Desc;
+	return true;
+}
+
+CGameObject* CLevelDesign_Point::Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+	return CLevelDesign_Point::Create(pDevice, pContext);
 }
 
 HRESULT CLevelDesign_Point::Validate_Desc()

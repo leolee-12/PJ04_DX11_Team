@@ -7,6 +7,7 @@ class CModel;
 NS_END
 
 NS_BEGIN(Client)
+struct LD_SPAWN_SPEC;
 
 class CLevelDesign_Bush : public CLevelDesignObject
 {
@@ -31,12 +32,15 @@ private:
 
 public:
     virtual HRESULT Initialize_Prototype() override;
-    virtual HRESULT Initialize(void* pArg) override;
+    virtual HRESULT Initialize(void* pArwlsg) override;
     virtual void    Late_Update(_float fTimeDelta) override;
     virtual HRESULT Render() override;
     virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
     static LD_BUSH_TYPE Resolve_BushType(const _wstring& wstrObjName);
+    static void Register_LevelDesignSpecs();
+    static _bool Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
+    static CGameObject* Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
 private:
     CShader* m_pShaderComs[MODEL_SLOT::_COUNT] = { nullptr };

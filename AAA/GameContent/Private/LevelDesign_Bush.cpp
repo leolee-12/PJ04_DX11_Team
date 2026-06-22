@@ -1,8 +1,35 @@
 #include "LevelDesign_Bush.h"
+#include "LevelDesign_Registry.h"
 #include "Shader_PassMeta.h"
 #include "Parsing_Utils.h"
 
 #include "GameInstance.h"
+
+namespace
+{
+	struct LD_BUSH_CATALOG
+	{
+		const _tchar* pObjectName;
+
+		const _tchar* pBasicModelProtoTag;
+		const _char* pBasicModelPath;
+		MODEL eBasicModelType;
+
+		const _tchar* pCutModelProtoTag;
+		const _char* pCutModelPath;
+		MODEL eCutModelType;
+	};
+
+	static const LD_BUSH_CATALOG g_BushCatalog[] =
+	{
+		{ L"Bush2BasicS", CLevelDesign_Bush::BUSH_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/BushS.ysh", MODEL::ANIM,
+		CLevelDesign_Bush::CUT_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/CutS.ysh", MODEL::NONANIM },
+		{ L"Bush2BasicM", CLevelDesign_Bush::BUSH_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/BushM.ysh", MODEL::ANIM,
+		CLevelDesign_Bush::CUT_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/CutM.ysh", MODEL::NONANIM },
+		{ L"Bush2BasicL", CLevelDesign_Bush::BUSH_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/BushL.ysh", MODEL::ANIM,
+		CLevelDesign_Bush::CUT_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/CutL.ysh", MODEL::NONANIM }
+	};
+}
 
 NS_BEGIN(Client)
 
@@ -73,9 +100,9 @@ LD_BUSH_TYPE CLevelDesign_Bush::Resolve_BushType(const _wstring& wstrObjName)
 {
 	static const pair<const _tchar*, LD_BUSH_TYPE> Catalog[] =
 	{
-			{ L"Bush2BasicS", LD_BUSH_TYPE::BUSH_S },
-			{ L"Bush2BasicM", LD_BUSH_TYPE::BUSH_M },
-			{ L"Bush2BasicL", LD_BUSH_TYPE::BUSH_L }
+		{ L"Bush2BasicS", LD_BUSH_TYPE::BUSH_S },
+		{ L"Bush2BasicM", LD_BUSH_TYPE::BUSH_M },
+		{ L"Bush2BasicL", LD_BUSH_TYPE::BUSH_L }
 	};
 
 	for (const auto& [pName, eType] : Catalog)
@@ -86,6 +113,55 @@ LD_BUSH_TYPE CLevelDesign_Bush::Resolve_BushType(const _wstring& wstrObjName)
 
 	return LD_BUSH_TYPE::UNKNOWN;
 }
+
+void CLevelDesign_Bush::Register_LevelDesignSpecs()
+{
+	for (const LD_BUSH_CATALOG& Entry : g_BushCatalog)
+	{
+		LD_SPAWN_SPEC Spec{};
+		Spec.strObjectName = Entry.pObjectName;
+		Spec.strPrototypeTag = PROTOTYPE_TAG;
+		Spec.strLayerTag = L"Layer_LevelDesign_Gimmick";
+		Spec.eCategory = LD_CATEGORY::FOLIAGE;
+		Spec.pPrototypeFactory = &Create_Prototype;
+		Spec.pBuildDesc = &Build_Desc;
+		Spec.ModelRequirements =
+		{
+			{ Entry.pBasicModelProtoTag, Entry.pBasicModelPath, ETOUI(LEVEL::GAMEPLAY), Entry.eBasicModelType },
+			{ Entry.pCutModelProtoTag, Entry.pCutModelPath, ETOUI(LEVEL::GAMEPLAY), Entry.eCutModelType }
+		};
+
+		CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
+	}
+}
+
+_bool CLevelDesign_Bush::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
+{
+	UNREFERENCED_PARAMETER(Spec);
+
+	if (nullptr == pOutEntry)
+		return false;
+
+	const LD_BUSH_TYPE eType = Resolve_BushType(CommonDesc.strObjectName);
+	if (LD_BUSH_TYPE::UNKNOWN == eType)
+		return false;
+
+	LD_BUSH_DESC Desc{};
+	static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
+	Desc.eCategory = LD_CATEGORY::FOLIAGE;
+	Desc.eType = eType;
+
+	JsonUtils::Try_ReadBoolFromNumeric(jEntry, "Gimmick.Bush2.MainComponent.IsGenerateItem", &Desc.bGenerateItem);
+
+	*pOutEntry = Desc;
+	return true;
+}
+
+CGameObject* CLevelDesign_Bush::Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+	return CLevelDesign_Bush::Create(pDevice, pContext);
+}
+
 
 HRESULT CLevelDesign_Bush::Validate_Desc()
 {

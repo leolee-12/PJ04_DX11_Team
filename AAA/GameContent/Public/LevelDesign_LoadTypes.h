@@ -85,7 +85,6 @@ struct LD_LADDER_DESC : public LD_OBJECT_DESC
 #pragma region Food
 struct LD_FOOD_DESC : public LD_OBJECT_DESC
 {
-	LD_FOOD_TYPE eType = { LD_FOOD_TYPE::UNKNOWN };
 	_wstring wstrModelProtoTag;
 };
 #pragma endregion

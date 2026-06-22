@@ -1,8 +1,29 @@
 #include "LevelDesign_Food.h"
+#include "LevelDesign_Registry.h"
 #include "Shader_PassMeta.h"
 #include "Parsing_Utils.h"
 
 #include "GameInstance.h"
+
+namespace
+{
+	struct LD_FOOD_CATALOG
+	{
+		const _tchar* pObjectName;
+		const _tchar* pModelProtoTag;
+		const _char* pModelPath;
+	};
+
+	static const LD_FOOD_CATALOG g_FoodCatalog[] =
+	{
+			{ L"EnergyDrink", CLevelDesign_Food::ENERGY_DRINK_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/EnergyDrink.ysh" },
+			{ L"DinnerRoastChicken", CLevelDesign_Food::DINNER_ROAST_CHICKEN_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/RoastChicken.ysh" },
+			{ L"FruitCherry", CLevelDesign_Food::FRUIT_CHERRY_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/Cherry.ysh"},
+			{ L"VegetableCarrot", CLevelDesign_Food::VEGETABLE_CARROT_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/Carrot.ysh" },
+			{ L"SweetsDoughnut", CLevelDesign_Food::SWEETS_DOUGHNUT_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/Doughnut.ysh" },
+			{ L"FruitBanana", CLevelDesign_Food::FRUIT_BANANA_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/Banana.ysh" }
+	};
+}
 
 NS_BEGIN(Client)
 
@@ -65,31 +86,52 @@ void CLevelDesign_Food::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
 }
 
-LD_FOOD_TYPE CLevelDesign_Food::Resolve_FoodType(const _wstring& wstrObjName)
+void CLevelDesign_Food::Register_LevelDesignSpecs()
 {
-	static const pair<const _tchar*, LD_FOOD_TYPE> Catalog[] =
+	for (const LD_FOOD_CATALOG& Entry : g_FoodCatalog)
 	{
-		{ L"EnergyDrink",			LD_FOOD_TYPE::ENERGY_DRINK },
-		{ L"DinnerRoastChicken",	LD_FOOD_TYPE::DINNER_ROAST_CHICKEN },
-		{ L"FruitCherry",			LD_FOOD_TYPE::FRUIT_CHERRY },
-		{ L"VegetableCarrot",		LD_FOOD_TYPE::VEGETABLE_CARROT },
-		{ L"SweetsDoughnut",		LD_FOOD_TYPE::SWEETS_DOUGHNUT },
-		{ L"FruitBanana",			LD_FOOD_TYPE::FRUIT_BANANA }
-	};
+		LD_SPAWN_SPEC Spec{};
+		Spec.strObjectName = Entry.pObjectName;
+		Spec.strPrototypeTag = PROTOTYPE_TAG;
+		Spec.strLayerTag = L"Layer_LevelDesign_Item";
+		Spec.eCategory = LD_CATEGORY::FOOD;
+		Spec.wstrModelProtoTag = Entry.pModelProtoTag;
+		Spec.pPrototypeFactory = &Create_Prototype;
+		Spec.pBuildDesc = &Build_Desc;
+		Spec.ModelRequirements =
+		{
+				{ Entry.pModelProtoTag, Entry.pModelPath, ETOUI(LEVEL::GAMEPLAY), MODEL::NONANIM }
+		};
 
-	for (const auto& [pName, eType] : Catalog)
-	{
-		if (JsonUtils::Equals_NoCase(pName, wstrObjName.c_str()))
-			return eType;
+		CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
 	}
+}
 
-	return LD_FOOD_TYPE::UNKNOWN;
+_bool CLevelDesign_Food::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
+{
+	UNREFERENCED_PARAMETER(jEntry);
+
+	if (nullptr == pOutEntry)
+		return false;
+	if (Spec.wstrModelProtoTag.empty())
+		return false;
+
+	LD_FOOD_DESC Desc{};
+	static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
+	Desc.eCategory = LD_CATEGORY::FOOD;
+	Desc.wstrModelProtoTag = Spec.wstrModelProtoTag;
+
+	*pOutEntry = Desc;
+	return true;
+}
+
+CGameObject* CLevelDesign_Food::Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+	return CLevelDesign_Food::Create(pDevice, pContext);
 }
 
 HRESULT CLevelDesign_Food::Validate_Desc()
 {
-	if (LD_FOOD_TYPE::UNKNOWN == m_tFoodDesc.eType)
-		return E_FAIL;
 	if (m_tFoodDesc.wstrModelProtoTag.empty())
 		return E_FAIL;
 

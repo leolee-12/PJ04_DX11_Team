@@ -1,8 +1,28 @@
 #include "LevelDesign_Ladder.h"
+#include "LevelDesign_Registry.h"
 #include "Shader_PassMeta.h"
 #include "Parsing_Utils.h"
 
 #include "GameInstance.h"
+
+namespace
+{
+	struct LD_LADDER_CATALOG
+	{
+		const _tchar* pObjectName;
+		const _char* pBotModelPath;
+		const _char* pMidModelPath;
+		const _char* pTopModelPath;
+	};
+
+	static const LD_LADDER_CATALOG g_LadderCatalog =
+	{
+		L"Ladder",
+		"../../Resources/Map/Gimmick/NonAnim/Ladder/Ladder_Bottom.ysh",
+		"../../Resources/Map/Gimmick/NonAnim/Ladder/Ladder_Middle.ysh",
+		"../../Resources/Map/Gimmick/NonAnim/Ladder/Ladder_Top.ysh"
+	};
+}
 
 NS_BEGIN(Client)
 
@@ -89,6 +109,47 @@ void CLevelDesign_Ladder::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 		return;
 
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
+}
+
+void CLevelDesign_Ladder::Register_LevelDesignSpecs()
+{
+	LD_SPAWN_SPEC Spec{};
+	Spec.strObjectName = g_LadderCatalog.pObjectName;
+	Spec.strPrototypeTag = PROTOTYPE_TAG;
+	Spec.strLayerTag = L"Layer_LevelDesign_Gimmick";
+	Spec.eCategory = LD_CATEGORY::GIMMICK;
+	Spec.pPrototypeFactory = &Create_Prototype;
+	Spec.pBuildDesc = &Build_Desc;
+	Spec.ModelRequirements =
+	{
+			{ BOT_MODEL_PROTO_TAG, g_LadderCatalog.pBotModelPath, ETOUI(LEVEL::GAMEPLAY) },
+			{ MID_MODEL_PROTO_TAG, g_LadderCatalog.pMidModelPath, ETOUI(LEVEL::GAMEPLAY) },
+			{ TOP_MODEL_PROTO_TAG, g_LadderCatalog.pTopModelPath, ETOUI(LEVEL::GAMEPLAY) }
+	};
+
+	CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
+}
+
+_bool CLevelDesign_Ladder::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
+{
+	UNREFERENCED_PARAMETER(Spec);
+
+	if (nullptr == pOutEntry)
+		return false;
+
+	LD_LADDER_DESC Desc{};
+	static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
+	Desc.eCategory = LD_CATEGORY::GIMMICK;
+	JsonUtils::Try_ReadUInt(jEntry, "Length", &Desc.iLength);
+
+	*pOutEntry = Desc;
+	return true;
+}
+
+CGameObject* CLevelDesign_Ladder::Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext*
+	pContext)
+{
+	return CLevelDesign_Ladder::Create(pDevice, pContext);
 }
 
 HRESULT CLevelDesign_Ladder::Validate_Desc()

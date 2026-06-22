@@ -4,7 +4,6 @@
 #include "LevelDesign_Registry.h"
 #include "LevelDesign_Food.h"
 #include "LevelDesign_Point.h"
-#include "LevelDesign_Bush.h"
 
 #include <exception>
 #include <filesystem>
@@ -176,56 +175,10 @@ void CLevelDesign_Parser::Parse_ObjectSection(
 
 		Fill_Common(Iter.value(), &CommonDesc);
 
-		if (JsonUtils::Equals_NoCase(CommonDesc.strObjectName.c_str(), L"Ladder"))
-		{
-			LD_LADDER_DESC Desc{};
-			static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
-			Fill_LadderFields(Iter.value(), &Desc);
-
-			pOutDescs->emplace_back(std::move(Desc));
-			continue;
-		}
-
 		LD_OBJECT_ENTRY BuiltEntry{};
 		if (CLevelDesign_Registry::Build_Entry(CommonDesc, Iter.value(), &BuiltEntry))
 		{
 			pOutDescs->emplace_back(std::move(BuiltEntry));
-			continue;
-		}
-
-		const LD_FOOD_TYPE eFoodType = CLevelDesign_Food::Resolve_FoodType(CommonDesc.strObjectName);
-		if (LD_FOOD_TYPE::UNKNOWN != eFoodType)
-		{
-			LD_FOOD_DESC Desc{};
-			static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
-			Desc.eType = eFoodType;
-			Fill_FoodFields(Iter.value(), &Desc);
-
-			pOutDescs->emplace_back(std::move(Desc));
-			continue;
-		}
-
-		const LD_POINT_TYPE ePointType = CLevelDesign_Point::Resolve_PointType(CommonDesc.strObjectName);
-		if (LD_POINT_TYPE::UNKNOWN != ePointType)
-		{
-			LD_POINT_DESC Desc{};
-			static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
-			Desc.eType = ePointType;
-			Fill_PointFields(Iter.value(), &Desc);
-
-			pOutDescs->emplace_back(std::move(Desc));
-			continue;
-		}
-
-		const LD_BUSH_TYPE eBushType = CLevelDesign_Bush::Resolve_BushType(CommonDesc.strObjectName);
-		if (LD_BUSH_TYPE::UNKNOWN != eBushType)
-		{
-			LD_BUSH_DESC Desc{};
-			static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
-			Desc.eType = eBushType;
-			Fill_BushFields(Iter.value(), &Desc);
-
-			pOutDescs->emplace_back(std::move(Desc));
 			continue;
 		}
 
@@ -485,45 +438,6 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 	}
 
 	pDesc->eCategory = LD_CATEGORY::UNSUPPORTED;
-}
-
-void CLevelDesign_Parser::Fill_LadderFields(const json& jEntry, LD_LADDER_DESC* pDesc)
-{
-	if (nullptr == pDesc)
-		return;
-
-	pDesc->eCategory = LD_CATEGORY::GIMMICK;
-	JsonUtils::Try_ReadUInt(jEntry, "Length", &pDesc->iLength);
-}
-
-void CLevelDesign_Parser::Fill_FoodFields(const json& jEntry, LD_FOOD_DESC* pDesc)
-{
-	UNREFERENCED_PARAMETER(jEntry);
-
-	if (nullptr == pDesc)
-		return;
-
-	pDesc->eCategory = LD_CATEGORY::FOOD;
-}
-
-void CLevelDesign_Parser::Fill_PointFields(const json& jEntry, LD_POINT_DESC* pDesc)
-{
-	UNREFERENCED_PARAMETER(jEntry);
-
-	if (nullptr == pDesc)
-		return;
-
-	pDesc->eCategory = LD_CATEGORY::ITEM;
-}
-
-void CLevelDesign_Parser::Fill_BushFields(const json& jEntry, LD_BUSH_DESC* pDesc)
-{
-	if (nullptr == pDesc)
-		return;
-
-	pDesc->eCategory = LD_CATEGORY::FOLIAGE;
-
-	JsonUtils::Try_ReadBoolFromNumeric(jEntry, "Gimmick.Bush2.MainComponent.IsGenerateItem", &pDesc->bGenerateItem);
 }
 
 void CLevelDesign_Parser::Build_TransformDesc(LD_OBJECT_DESC* pDesc)
