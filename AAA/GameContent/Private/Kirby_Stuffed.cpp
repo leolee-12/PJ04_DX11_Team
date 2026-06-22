@@ -113,6 +113,7 @@ _bool CKirby_Stuffed::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
                 return true;
 
             Change_StuffedState(pKirby, STUFFED_STATE::STUFFED_SPIT);
+            pKirby->Spit_Inhalable();
             return true;
         }
     }
@@ -257,7 +258,6 @@ void CKirby_Stuffed::Enter_Animation(CKirby* pKirby, CAnimator* pAnimator)
 
         case STUFFED_STATE::STUFFED_SPIT:
             pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::STUFFED_SPIT);
-            pKirby->Spit_SwallowedMonster(); //임시로 넣음 윤 추
             break;
     }
 }

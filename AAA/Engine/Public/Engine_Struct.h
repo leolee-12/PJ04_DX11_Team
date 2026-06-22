@@ -151,6 +151,7 @@ namespace Engine
 		XMFLOAT3    vOffset = {};
 
 		bool        bActive = false;         // 런타임 전용 (직렬화 X)
+		bool		bFired  = false;
 	}ANIM_EVENT;
 
 	typedef struct tagAnimEventTrack

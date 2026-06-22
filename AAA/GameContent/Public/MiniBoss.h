@@ -39,11 +39,11 @@ protected:
 
     CMonster_State* m_pCaptureState = { nullptr };
 
+    _wstring        m_strBossName = { L"Boss" };
 
 protected:
     virtual void    Update_AI(_float fTimeDelta) override; // 라이프사이클 게이팅
 
-    virtual HRESULT        Ready_Parts() = 0;
     virtual CMonsterBrain* Create_Brain() override = 0;
     virtual _bool          Use_StateMachine() const override { return false; }
     virtual const _tchar*  Get_AppearEventTag() const { return nullptr; }
@@ -55,7 +55,14 @@ protected:
     virtual _bool  Is_Death_Finished() const = 0;
     virtual _float Get_CorpseLinger() const { return 5.f; }
 
+    virtual void   On_Damaged(const ATTACK_INFO& tInfo) override;
+    virtual void   On_Death(const ATTACK_INFO& tInfo) override;   
+    virtual void   On_Hit_Reaction(const ATTACK_INFO& tInfo) {}
+    virtual void   On_Death_Reaction(const ATTACK_INFO& tInfo) {}
+
     CGameObject*   Find_Player() const;
+    void           Publish_Boss_Appeared();
+    void           Publish_HP();
 
 protected:
     virtual void Free() override;

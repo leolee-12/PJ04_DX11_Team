@@ -19,8 +19,7 @@
 #include "Monster_State_KnockBack.h"
 #include "Monster_State_KnockOut.h"
 #include "Monster_State_Spat.h"
-
-#include "BladeKnight_State_Retreat.h"
+#include "Monster_State_Retreat.h"
 
 // 전용 상태
 #include "BladeKnight_State_Attack.h"
@@ -51,19 +50,7 @@ HRESULT CBladeKnight::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
-    if (FAILED(Ready_PartObjects()))
-        return E_FAIL;
-
-    if (FAILED(Ready_Movement()))
-        return E_FAIL;
-
-    if (FAILED(Ready_AI()))
-        return E_FAIL;
-
-    if (FAILED(Ready_AnimEvents()))
-        return E_FAIL;
-
-    //m_eCopyAbility = COPY_ABILITY_TYPE::SWORD;
+    m_eCopyAbility = COPY_ABILITY_TYPE::SWORD;
 
     return S_OK;
 }
@@ -106,7 +93,7 @@ CAnimator* CBladeKnight::Get_BodyAnimator() const
 
 CMonsterBrain* CBladeKnight::Create_Brain()
 {
-    return CBladeKnight_FSM::Create();
+    return CBladeKnight_FSM::Create(this);
 }
 
 HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
@@ -189,7 +176,12 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
     if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_OUT, CMonster_State_KnockOut::Create(Info))))
         return E_FAIL;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::RETREAT, CBladeKnight_State_Retreat::Create())))
+    // State KnockOut
+    Info.strAniName = "Retreat";
+    Info.bLoop = false;
+    Info.fSpeed = 1.50f;
+
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::RETREAT, CMonster_State_Retreat::Create(Info, 2.f))))
         return E_FAIL;
 
 

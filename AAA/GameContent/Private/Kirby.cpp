@@ -361,6 +361,18 @@ void CKirby::SetUp_Collider_Callback()
         //      ³ÖÀ¸½Ã¿À
         //    });
     }
+
+    if (m_KirbyColliders[INHALE_BOX])
+    {
+        m_KirbyColliders[INHALE_BOX]->Set_OnEnter(
+            [this](CCollider* pOther)
+            {
+                if (IInhalable* pInhalable = dynamic_cast<IInhalable*>(pOther->Get_Owner()))
+                {
+                    pInhalable;
+                }
+            });
+    }
 }
 
 HRESULT CKirby::Ready_PartObjects()
@@ -425,9 +437,8 @@ HRESULT CKirby::Ready_Ability()
             return S_OK;
         };
 
-    if (FAILED(Register_Ability(COPY_ABILITY_TYPE::NORMAL, CKirby_Ability_Normal::Create())))            return E_FAIL;
-    if (FAILED(Register_Ability(COPY_ABILITY_TYPE::SWORD, CKirby_Ability_Sword::Create())))              return E_FAIL;
-
+    if (FAILED(Register_Ability(COPY_ABILITY_TYPE::NORMAL, CKirby_Ability_Normal::Create()))) return E_FAIL;
+    if (FAILED(Register_Ability(COPY_ABILITY_TYPE::SWORD, CKirby_Ability_Sword::Create())))   return E_FAIL;
 
     auto iter = m_Abilities.find(COPY_ABILITY_TYPE::NORMAL);
     if (iter == m_Abilities.end())
@@ -466,19 +477,20 @@ void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
     // TODO: ³Ë¹é/ÇÇ°Ý¾Ö´Ô
 }
 
-void CKirby::Spit_SwallowedMonster()
+void CKirby::Spit_Inhalable()
 {
-    if (m_pSwallowedMonster == nullptr)
+    if (m_pCapturedInhalable == nullptr)
         return;
 
-    CTransform* pT = m_pTransformCom;
-    _vector vMouth = pT->Get_State(STATE::POSITION)
-        + pT->Get_State(STATE::LOOK) * s_fInhaleFwd
-        + pT->Get_State(STATE::UP) * s_fInhaleUp;
-    _vector vDir = pT->Get_State(STATE::LOOK);
+    _vector vMouth =
+        m_pTransformCom->Get_State(STATE::POSITION)
+        + m_pTransformCom->Get_State(STATE::LOOK) * s_fInhaleFwd
+        + m_pTransformCom->Get_State(STATE::UP) * s_fInhaleUp;
+    _vector vDir = m_pTransformCom->Get_State(STATE::LOOK);
 
-    m_pSwallowedMonster->Be_Spat(vMouth, vDir, s_fSpitSpeed);
-    m_pSwallowedMonster = nullptr;
+    m_pCapturedInhalable->Be_Spat(vMouth, vDir, s_fSpitSpeed);
+
+    m_pCapturedInhalable = nullptr;
 }
 
 CCollider* CKirby::Get_Collider(KIRBY_COLLIDER eKirbyCollider)

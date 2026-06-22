@@ -18,6 +18,8 @@ class CMovement_Child;
 
 class CMonster;
 
+class IInhalable;
+
 class CLIENT_DLL CKirby_Ability_Normal final : public CKirby_Ability
 {
 private:
@@ -25,7 +27,9 @@ private:
 	{
 		INHALE_LOOP,
 		SUPER_INHALE_START, SUPER_INHALE_LOOP,
-		INHALE_END
+		INHALE_END,
+
+		INHALE_EXIT
 	};
 
 	enum class INHALE_MOVE_STATE
@@ -56,45 +60,54 @@ public:
 	virtual _bool Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation) override;
 
 private:
-	INHALE_STATE m_eInhaleState{};
-
-	INHALE_MOVE_STATE m_eCurMoveState{};
-	INHALE_MOVE_STATE m_ePreMoveState{};
-
-	_float m_MaxSuperInHaleTime{};
-	_float m_AccSuperInHaleTime{};
-
-	_bool m_bForceEnterSuperInhaleStart{};
-
-	_bool m_bReqInhale{};
-
-	CEffect_Container* m_pInhaleEffect{};
-
-	// Event
 	CGameInstance_Proxy* m_pGameInstance_Proxy{};
 
-	SUBHANDLE m_hSwallowedEvent{};
-	_bool m_bSubscribedSwallowedEvent{};
+	// State
+	INHALE_STATE m_eInhaleState{};
+	INHALE_MOVE_STATE m_eCurMoveState{};
+
+	// Timer
+	_float m_fMaxSuperInhaleTime{};
+	_float m_fAccSuperInhaleTime{};
+
+	// ReqEnd
+	_bool m_bReqEndInhale{};
+
+	// Event
+	SUBHANDLE m_hInhaleCapturedEvent{};
+	_bool m_bSubscribedInhaleCapturedEvent{};
+
+	// Effect
+	CEffect_Container* m_pInhaleEffect{};
+
+	_bool m_bSuperInhaleEffectRaised{};
+	_float3 m_vInhaleEffectStartPos{};
+	_float3 m_vInhaleEffectEndPos{};
 
 private:
-	void Update_MoveState(CKirby* pKirby, CMovement_Child* pMovement);
+	void Change_InhaleState(CKirby* pKirby, INHALE_STATE eNext);
+	void Enter_InhaleState(CKirby* pKirby, INHALE_STATE eState);
+	void Update_InhaleState(CKirby* pKirby, _float fTimeDelta);
+	void Exit_InhaleState(CKirby* pKirby, INHALE_STATE eState);
+
+	void Update_InhaleMoveState(CKirby* pKirby);
+	void Play_InhaleLoopAnimation(CKirby* pKirby);
+
+	// Timer
 	void Update_SuperInhaleTimer(_float fTimeDelta);
-
-	void Interpolation_Inhale(CAnimator* pAnimator);
-	void Choose_InhaleAniName(_string& strAniName);
-
-	void Reset_Default(CKirby* pKirby);
+	// Kirby Reset
+	void Restore_KirbyAfterInhale(CKirby* pKirby);
 
 	// Inhale Collider
 	void Start_InhaleCollider(CKirby* pKirby);
 	void End_InhaleCollider(CKirby* pKirby);
 
 	// Event
-	void Start_SwallowedEvent(CKirby* pKirby);
-	void End_SwallowedEvent();
-	void On_Swallowed(CKirby* pKirby, CMonster* pMonster);
+	void Subscribe_InhaleCapturedEvent(CKirby* pKirby);
+	void Unsubscribe_InhaleCapturedEvent();
+	void Handle_InhaleCaptured(CKirby* pKirby, IInhalable* pInhaleable);
 
-	_bool IsSuperInhale();
+	void Update_SuperInhaleEffectRise(_float fRatio);
 
 public:
 	static CKirby_Ability_Normal* Create();

@@ -22,14 +22,32 @@
     <Filter Include="01. Levels\06. GamePlay">
       <UniqueIdentifier>{31f48850-b56a-45e1-8918-8af2971725aa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Levels\02. Lobby">
-      <UniqueIdentifier>{3c4c7945-9a9e-49a3-9e18-e017f0d706f7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01. Levels\01. FirstLoading">
       <UniqueIdentifier>{a7cb1d8a-8375-40c0-b82c-9ca99a2a2d2d}</UniqueIdentifier>
     </Filter>
     <Filter Include="01. Levels\99. Test">
       <UniqueIdentifier>{5b60027e-bb0a-4b40-ae62-1996f862b6a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\02. Stage">
+      <UniqueIdentifier>{865959bb-a7f5-486e-8d7e-80d5c958fbb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\02. Stage\Stage0">
+      <UniqueIdentifier>{af2c614f-8453-4070-b98f-8cfdc429e90f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\02. Stage\Stage0\Step1">
+      <UniqueIdentifier>{c64012a1-fd5f-4469-9bfa-9b5bf29412c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\02. Stage\Stage0\Step2">
+      <UniqueIdentifier>{6d55a08f-131c-4560-a1b6-3bd1f7f8b9ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\02. Stage\Town">
+      <UniqueIdentifier>{81fad0a1-e0d1-4ac4-ae20-35684e0b277a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\02. Stage\Town\Step1">
+      <UniqueIdentifier>{25f4ce75-f72b-478f-9b83-acd4b3d201e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\02. Stage\Town\Step2">
+      <UniqueIdentifier>{1b8c9dca-188a-4f78-8570-33b958d68890}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -63,14 +81,14 @@
     <ClInclude Include="..\Public\Loader.h">
       <Filter>01. Levels\00. Loading\Loader</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Level_Lobby.h">
-      <Filter>01. Levels\02. Lobby</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Launcher_LevelProfiles.h">
       <Filter>99. Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Level_FirstLoading.h">
       <Filter>01. Levels\01. FirstLoading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Town_Step1.h">
+      <Filter>01. Levels\02. Stage\Town\Step1</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -105,11 +123,11 @@
     <ClCompile Include="..\Private\Level_Test.cpp">
       <Filter>01. Levels\99. Test</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Level_Lobby.cpp">
-      <Filter>01. Levels\02. Lobby</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\Level_FirstLoading.cpp">
       <Filter>01. Levels\01. FirstLoading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Town_Step1.cpp">
+      <Filter>01. Levels\02. Stage\Town\Step1</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

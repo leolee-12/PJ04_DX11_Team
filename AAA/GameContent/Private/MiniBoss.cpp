@@ -16,11 +16,6 @@ HRESULT CMiniBoss::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))   
         return E_FAIL;
 
-    // 파트 → 이동 → AI(brain) 순서
-    if (FAILED(Ready_Parts()))      return E_FAIL;   // 자식 구현
-    if (FAILED(Ready_Movement()))   return E_FAIL;   // CMonster
-    if (FAILED(Ready_AI()))         return E_FAIL;   // CMonster → Create_Brain()(자식 BT)
-
     m_eLife = EMINIBOSS_LIFE::HIDDEN;
     Set_Active(false);              // 트리거 전까지 비활성 (없으면 m_bActive=false)
 
@@ -28,6 +23,10 @@ HRESULT CMiniBoss::Initialize(void* pArg)
         Subscribe_Event(pTag, [this](void*) { Appear(); });
 
     m_pCaptureState = CMonster_State_Captured::Create();
+    if (m_pCaptureState == nullptr)
+        return E_FAIL;
+
+    m_pCaptureState->Set_Owner(this);
 
     m_TraitFlags = MT_NONE;
 
@@ -53,7 +52,7 @@ void CMiniBoss::Die()
 void CMiniBoss::Be_Captured(CGameObject* pInhaler)
 {
     m_pCaptor = pInhaler;
-    m_pCaptureState->Enter(this);     // CCT off + 초기화 (상태 내부)
+    m_pCaptureState->Enter();     // CCT off + 초기화 (상태 내부)
     m_eLife = EMINIBOSS_LIFE::EATEN;
 }
 
@@ -70,7 +69,10 @@ void CMiniBoss::Update_AI(_float fTimeDelta)
                 m_bIntroStarted = true; 
             }
             if (Is_Intro_Finished())
-                m_eLife = EMINIBOSS_LIFE::ACTIVE;       
+            {
+                Publish_Boss_Appeared();
+                m_eLife = EMINIBOSS_LIFE::ACTIVE;
+            }
             if (m_pMovement && !m_pGameInstance_Proxy->Is_EditMode())
                 m_pMovement->Move(XMVectorZero(), fTimeDelta);
             return;
@@ -103,7 +105,7 @@ void CMiniBoss::Update_AI(_float fTimeDelta)
             return;
 
         case EMINIBOSS_LIFE::EATEN:
-            m_pCaptureState->Update(this, fTimeDelta); 
+            m_pCaptureState->Update(fTimeDelta); 
             return;
     }
 }

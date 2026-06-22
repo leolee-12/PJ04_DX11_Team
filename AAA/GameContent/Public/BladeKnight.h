@@ -67,7 +67,7 @@ protected:
 	virtual void				On_Death(const ATTACK_INFO& tInfo) override;
 
 private:
-	HRESULT						Ready_PartObjects();
+	virtual HRESULT				Ready_PartObjects() override;
 
 	virtual void				On_Deserialized() override;
 

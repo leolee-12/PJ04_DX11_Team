@@ -397,9 +397,6 @@
     <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State">
       <UniqueIdentifier>{533932dd-cfb3-4312-9da1-e8b96cec46af}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State\Retreat">
-      <UniqueIdentifier>{89282008-e019-406b-94d9-3d04924e3a49}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State\Attack">
       <UniqueIdentifier>{dd408402-1425-42a3-9147-6956e370fb21}</UniqueIdentifier>
     </Filter>
@@ -433,9 +430,6 @@
     <Filter Include="00. GameObject\95. Interface">
       <UniqueIdentifier>{3f986a95-5219-485c-8719-2667dcade916}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\95. Interface\Damageable">
-      <UniqueIdentifier>{aa32f8bd-7471-4860-9a7d-c599523a6293}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Detect">
       <UniqueIdentifier>{6e90fbc0-097a-4226-a7d6-84ffb451aefb}</UniqueIdentifier>
     </Filter>
@@ -444,9 +438,6 @@
     </Filter>
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Death">
       <UniqueIdentifier>{a8a873c7-fcc6-4434-8fdd-b289ad07473c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\95. Interface\Inhalable">
-      <UniqueIdentifier>{8c9a30b0-316d-445f-9cf9-b015a25e4fc3}</UniqueIdentifier>
     </Filter>
     <Filter Include="97. DataSystem\LevelDesignLoader">
       <UniqueIdentifier>{ac90f625-f08a-4a8a-89fd-03d9fa0dc850}</UniqueIdentifier>
@@ -468,6 +459,18 @@
     </Filter>
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Spat">
       <UniqueIdentifier>{81b0629c-516a-4991-8c17-3bfbd6ecf5e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Attack">
+      <UniqueIdentifier>{765c8d67-517d-476b-ab97-3167b36bc8a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Retreat">
+      <UniqueIdentifier>{bdf27873-c46b-4fc8-bed7-7d19ef211827}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockBack\Dead">
+      <UniqueIdentifier>{f45699c1-0279-42f5-8174-aecc983bb4b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus">
+      <UniqueIdentifier>{08709ead-b3a1-4623-96c2-e4d2a78ade1e}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\99. Unsupported">
       <UniqueIdentifier>{88670e70-c815-452c-88eb-8a17ac26a72d}</UniqueIdentifier>
@@ -891,12 +894,6 @@
     <ClInclude Include="..\Public\BladeKnight_FSM.h">
       <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\Brain</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Monster_StateT.h">
-      <Filter>00. GameObject\06. Monster\01. StateMachine\State</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\BladeKnight_State_Retreat.h">
-      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\State\Retreat</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\BladeKnight_State_Attack.h">
       <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\State\Attack</Filter>
     </ClInclude>
@@ -906,14 +903,8 @@
     <ClInclude Include="..\Public\BladeKnight_State_TornadoAttack.h">
       <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\State\TornadoAttack</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Monster_Brain_FSM_T.h">
-      <Filter>00. GameObject\06. Monster\00. System\Brain</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\TestParticle.h">
       <Filter>00. GameObject\Test\TestParticle</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Damageable.h">
-      <Filter>00. GameObject\95. Interface\Damageable</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Monster_State_Idle.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Idle</Filter>
@@ -938,9 +929,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Monster_State_Captured.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Captured</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Inhalable.h">
-      <Filter>00. GameObject\95. Interface\Inhalable</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Parsing_Utils.h">
       <Filter>99. Defines\Leo</Filter>
@@ -980,6 +968,21 @@
     </ClInclude>
     <ClInclude Include="..\public\Monster_State_Spat.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_State_Attack.h">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_State_Retreat.h">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Retreat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_BossStatus.h">
+      <Filter>00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Inhalable.h">
+      <Filter>00. GameObject\95. Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Damageable.h">
+      <Filter>00. GameObject\95. Interface</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Bush.h">
       <Filter>00. GameObject\96. LevelDesign\06. Bush</Filter>
@@ -1328,9 +1331,6 @@
     <ClCompile Include="..\Private\BladeKnight_FSM.cpp">
       <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\Brain</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\BladeKnight_State_Retreat.cpp">
-      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\State\Retreat</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\BladeKnight_State_Attack.cpp">
       <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\State\Attack</Filter>
     </ClCompile>
@@ -1345,9 +1345,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\TestParticle.cpp">
       <Filter>00. GameObject\Test\TestParticle</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Damageable.cpp">
-      <Filter>00. GameObject\95. Interface\Damageable</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Monster_State_Idle.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Idle</Filter>
@@ -1372,9 +1369,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Monster_State_Captured.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Captured</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Inhalable.cpp">
-      <Filter>00. GameObject\95. Interface\Inhalable</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Parser.cpp">
       <Filter>97. DataSystem\LevelDesignLoader</Filter>
@@ -1408,6 +1402,15 @@
     </ClCompile>
     <ClCompile Include="..\private\Monster_State_Spat.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_State_Attack.cpp">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_State_Retreat.cpp">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Retreat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_BossStatus.cpp">
+      <Filter>00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Bush.cpp">
       <Filter>00. GameObject\96. LevelDesign\06. Bush</Filter>

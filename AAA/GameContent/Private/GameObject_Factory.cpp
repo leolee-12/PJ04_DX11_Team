@@ -24,6 +24,7 @@
 #include "UI_FadeOut.h"
 #include "UI_LoadingCurtain.h"
 #include "UI_FadeIn.h"
+#include "UI_BossStatus.h"
 
 // UI Parts
 #include "UI_Image.h"
@@ -439,6 +440,12 @@ void CGameObject_Factory::Register_UIContainer()
     Register(CUI_FadeIn::PROTOTYPE_TAG,
         TEXT("UI_CONTAINER"),
         CREATOR(CUI_FadeIn),
+        LOADER()
+    );
+
+    Register(CUI_BossStatus::PROTOTYPE_TAG,
+        TEXT("UI_CONTAINER"),
+        CREATOR(CUI_BossStatus),
         LOADER()
     );
 }

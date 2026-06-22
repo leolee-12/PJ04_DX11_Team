@@ -23,7 +23,6 @@
     <ClInclude Include="..\Public\BladeKnight_FSM.h" />
     <ClInclude Include="..\Public\BladeKnight_State_Attack.h" />
     <ClInclude Include="..\Public\BladeKnight_State_DoubleAttack.h" />
-    <ClInclude Include="..\Public\BladeKnight_State_Retreat.h" />
     <ClInclude Include="..\Public\BladeKnight_Sword.h" />
     <ClInclude Include="..\Public\BladeKnight_State_TornadoAttack.h" />
     <ClInclude Include="..\Public\Camera_AreaData.h" />
@@ -54,6 +53,7 @@
     <ClInclude Include="..\Public\LevelDesign_Spawner.h" />
     <ClInclude Include="..\public\MonsterHitPart.h" />
     <ClInclude Include="..\public\MonsterPart.h" />
+    <ClInclude Include="..\Public\Monster_State_Attack.h" />
     <ClInclude Include="..\Public\Monster_State_Captured.h" />
     <ClInclude Include="..\Public\Monster_State_Chase.h" />
     <ClInclude Include="..\Public\Monster_State_Fall.h" />
@@ -66,6 +66,7 @@
     <ClInclude Include="..\Public\LevelDesign_Parser.h" />
     <ClInclude Include="..\Public\LevelDesign_Registry.h" />
     <ClInclude Include="..\public\Monster_State_Spat.h" />
+    <ClInclude Include="..\Public\Monster_State_Retreat.h" />
     <ClInclude Include="..\Public\Parsing_Utils.h" />
     <ClInclude Include="..\Public\RailDataReceiver.h" />
     <ClInclude Include="..\Public\Shader_PassMeta.h" />
@@ -114,6 +115,7 @@
     <ClInclude Include="..\Public\Monster_State.h" />
     <ClInclude Include="..\Public\Monster_StateMachine.h" />
     <ClInclude Include="..\Public\Movement_Child.h" />
+    <ClInclude Include="..\public\UI_BossStatus.h" />
     <ClInclude Include="..\public\UI_Curtain.h" />
     <ClInclude Include="..\public\UI_CurtainAnimBase.h" />
     <ClInclude Include="..\public\UI_CurtainSequenceBase.h" />
@@ -195,7 +197,6 @@
     <ClCompile Include="..\Private\BladeKnight_FSM.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State_Attack.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State_DoubleAttack.cpp" />
-    <ClCompile Include="..\Private\BladeKnight_State_Retreat.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Sword.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State_TornadoAttack.cpp" />
     <ClCompile Include="..\Private\Camera_AreaSolver.cpp" />
@@ -204,7 +205,6 @@
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Common_Circle01.cpp" />
     <ClCompile Include="..\Private\Common_Curve03.cpp" />
-    <ClCompile Include="..\private\Damageable.cpp" />
     <ClCompile Include="..\private\Effect_Loader.cpp" />
     <ClCompile Include="..\Private\EnvObject.cpp" />
     <ClCompile Include="..\Private\EnvObject_Trigger.cpp" />
@@ -220,7 +220,6 @@
     <ClCompile Include="..\private\GigantEdge_Body.cpp" />
     <ClCompile Include="..\private\GigantEdge_Shield.cpp" />
     <ClCompile Include="..\private\GigantEdge_Sword.cpp" />
-    <ClCompile Include="..\private\Inhalable.cpp" />
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
@@ -260,6 +259,7 @@
     <ClCompile Include="..\private\MonsterPart.cpp" />
     <ClCompile Include="..\Private\Monster_State.cpp" />
     <ClCompile Include="..\Private\Monster_StateMachine.cpp" />
+    <ClCompile Include="..\Private\Monster_State_Attack.cpp" />
     <ClCompile Include="..\Private\Monster_State_Captured.cpp" />
     <ClCompile Include="..\Private\Monster_State_Chase.cpp" />
     <ClCompile Include="..\Private\Monster_State_Fall.cpp" />
@@ -269,10 +269,12 @@
     <ClCompile Include="..\Private\Monster_State_KnockOut.cpp" />
     <ClCompile Include="..\Private\Monster_State_Landing.cpp" />
     <ClCompile Include="..\private\Monster_State_Spat.cpp" />
+    <ClCompile Include="..\Private\Monster_State_Retreat.cpp" />
     <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\Private\TestParticle.cpp" />
     <ClCompile Include="..\Private\RailDataReceiver.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />
+    <ClCompile Include="..\private\UI_BossStatus.cpp" />
     <ClCompile Include="..\private\UI_Curtain.cpp" />
     <ClCompile Include="..\private\UI_CurtainAnimBase.cpp" />
     <ClCompile Include="..\private\UI_CurtainSequenceBase.cpp" />

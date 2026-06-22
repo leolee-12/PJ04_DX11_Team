@@ -60,21 +60,27 @@ public:
 public:
 	void			Set_AnimationIndex(_uint iIndex, _bool isLoop = false, _bool isRestart = false, _float fBlendDuration = 0.2f);
 	_int			Get_AnimationIndex(const string& strName) const;
-	const string&	Get_CurrentAnimName() const;
+	const string& Get_CurrentAnimName() const;
 	void			Seek_Animation(_float fProgress);
 
 	_bool			Update_Base(_float fTimeDelta, _float fSpeed = 1.0f);
 	_bool			Play_Animation(_float fTimeDelta, _float fSpeed = 1.0f);
-	_bool			Play_Animation(_float fTimeDelta,  const _string& strMaskClip, const _string& strRootBone, _float fSpeed = 1.0f, _bool bLoop = true, _float fMaskWeight = 1.f);
+	_bool			Play_Animation(_float fTimeDelta, const _string& strMaskClip, _float fSpeed = 1.0f, _bool bLoop = true, _float fMaskWeight = 1.f);
 
-	void			Apply_Mask(const _string& strClip, const _string& strRootBone, _float fTimeDelta, _float fSpeed = 1.0f, _bool bLoop = true, _float fMaskWeight = 1.f);
+	void			Apply_Mask(const _string& strClip, _float fTimeDelta, _float fSpeed = 1.0f, _bool bLoop = true, _float fMaskWeight = 1.f);
 	void			Update_Combined();
 
 	HRESULT			Render(_uint iMeshIndex);
 
-	void			Capture_MaskSnapShot(const _string& strRootBone);
+	void			Capture_MaskSnapShot(const vector<_string>& Roots);
 
-	void			Clear_MaskSnapShot() { m_MaskSnapShot.clear(); }
+	void			Clear_MaskSnapShot() 
+	{ 
+		m_MaskSnapShot.clear();
+		m_MaskBones.clear();
+	}
+
+	const _wstring& Get_ModelPath() { return m_strModelPath; }
 
 public:
 	HRESULT Bind_Material(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, MTEX_TYPE eType, _uint iIndex);
@@ -91,6 +97,7 @@ public:	// Instance
 
 private:
 	MODEL						m_eType = { MODEL::END };
+	_wstring					m_strModelPath = {};
 	PickableFilter              m_PickableFilter = { nullptr };
 
 private:
@@ -124,6 +131,7 @@ private:
 	string						m_strMeshLayerPath;
 
 	unordered_map<_uint, KEYFRAME> m_MaskSnapShot;
+	vector<_uint>				m_MaskBones;
 
 
 private:

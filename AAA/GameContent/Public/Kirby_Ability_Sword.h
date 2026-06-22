@@ -29,6 +29,8 @@ private:
 		SUPER_SPIN_SLASH_START, SUPER_SPIN_SLASH_LOOP, SUPER_SPIN_SLASH_END,
 	};
 
+	enum SWORD_MOVE_STATE { MOVE_STATE_NONE, NONE_MOVE, MOVE };
+
 private:
 	CKirby_Ability_Sword();
 	virtual ~CKirby_Ability_Sword() = default;
@@ -52,7 +54,10 @@ public:
 	virtual _bool Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation) override;
 
 private:
-	SWORD_STATE m_eCurSwordState{};
+	SWORD_STATE m_eSwordState{};
+
+	SWORD_MOVE_STATE m_eCurSwordMoveState{};
+	SWORD_MOVE_STATE m_ePreSwordMoveState{};
 
 	_bool m_bReserveNextAttack{};
 
@@ -68,6 +73,8 @@ private:
 	_float3 m_vSwordWishDir{};
 	_bool m_bMoveLock{};
 
+	static constexpr const _char* OverlayMasks[2] = { "L_FootJ", "R_FootJ" };
+
 private:
 	void Update_ChargeTime(_float fTimeDelta);
 	void MoveLock_Ratio(_float fRatio, _float fRatioStart, _float fRatioEnd);
@@ -75,8 +82,11 @@ private:
 
 	void Change_SwordState(CKirby* pKirby, SWORD_STATE eNext);
 	void Enter_SwordState(CKirby* pKirby, SWORD_STATE eState);
-	void Update_SwordState(CKirby* pKirby, float dt);
+	void Update_SwordState(CKirby* pKirby, _float fTimeDelta);
 	void Exit_SwordState(CKirby* pKirby, SWORD_STATE eState);
+
+	_bool Has_SwordMoveDir();
+	void ChargeAnimationOverlay(CKirby* pKirby);
 
 public:
 	static CKirby_Ability_Sword* Create();

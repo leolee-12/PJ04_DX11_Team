@@ -34,6 +34,10 @@ public:
     virtual HRESULT Render() override;
     virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
+public:
+    void On_SuperInhale();
+    void Off_SuperInhale();
+
 private:
     HRESULT Ready_EffectPartObjects();
 

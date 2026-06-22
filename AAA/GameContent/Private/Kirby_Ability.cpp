@@ -76,8 +76,8 @@ void CKirby_Ability::Play_AbilityAni(CKirby* pKirby, ABILITY_ANI eAbilityAni)
     if (tDesc.ePlayType == ABILITY_ANI_PLAY_TYPE::OVERLAY)
     {
         pAnimator->Set_Mask(
-            tDesc.tOverlayAniInfo.strAniName,
-            tDesc.strOverlayRootBone,
+            tDesc.tOverlayAniInfo.strAniName.c_str(),
+            tDesc.strOverlayRootBone.c_str(),
             tDesc.tOverlayAniInfo.bLoop,
             tDesc.fOverlayWeight,
             tDesc.fOverlayBlend
