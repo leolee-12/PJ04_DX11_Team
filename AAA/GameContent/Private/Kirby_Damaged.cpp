@@ -30,10 +30,6 @@ void CKirby_Damaged::Enter(CKirby* pKirby)
     // Ani
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
     pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::DAMAGED);
-
-    char szBuf[128];
-    sprintf_s(szBuf, "Damaged Enter\n");
-    OutputDebugStringA(szBuf);
 }
 
 void CKirby_Damaged::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -50,10 +46,6 @@ void CKirby_Damaged::Update(CKirby* pKirby, const _float fTimeDelta)
 void CKirby_Damaged::Exit(CKirby* pKirby)
 {
     __super::Exit(pKirby);
-
-    char szBuf[128];
-    sprintf_s(szBuf, "Damaged Exit\n");
-    OutputDebugStringA(szBuf);
 }
 
 _bool CKirby_Damaged::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)

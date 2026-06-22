@@ -57,7 +57,7 @@ public:
 	void Set_Eye(KIRBY_EYE_STATE eState) { m_eEye = eState; }
 	void Set_Mouth(KIRBY_MOUTH_STATE eState) { m_eMouth = eState; }
 
-	KIRBY_BODY_STATE Get_Body() const { return m_eBody; }
+	KIRBY_BODY_STATE Get_BodyState() const { return m_eBody; }
 	KIRBY_EYE_STATE Get_Eye() const { return m_eEye; }
 	KIRBY_MOUTH_STATE Get_Mouth() const { return m_eMouth; }
 

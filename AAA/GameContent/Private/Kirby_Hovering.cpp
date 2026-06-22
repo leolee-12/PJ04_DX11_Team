@@ -29,10 +29,6 @@ void CKirby_Hovering::Enter(CKirby* pKirby)
 {
     __super::Enter(pKirby);
 
-    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
-
-    // Ani
-    //pAnimator->Play("FlightStart", false, false, 0.1f, 2.25f);
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
     pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::FLIGHT_START);
 
