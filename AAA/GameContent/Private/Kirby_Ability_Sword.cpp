@@ -19,58 +19,52 @@ HRESULT CKirby_Ability_Sword::Initialize()
         return E_FAIL;
 
     Set_OverlayAni(ABILITY_ANI::WAIT, "Wait", "Sword_HaveSwordWait", "R_ShoulderJ",
-        true, false, 1.8f, 0.1f,
+        true, false, 1.8f, 0.1f, true,
         true, false, 1.8f, 0.1f);
 
     Set_OverlayAni(ABILITY_ANI::RUN, "Run", "HaveSwordMove", "R_ShoulderJ",
-        true, false, 2.2f, 0.1f,
+        true, false, 2.2f, 0.1f, true,
         true, false, 2.2f, 0.1f);
 
     Set_OverlayAni(ABILITY_ANI::FALL, "Fall", "HaveSwordMove", "R_ShoulderJ",
-        false, false, 2.f, 0.1f,
+        false, false, 2.f, 0.1f, true,
         false, false, 2.f, 0.1f);
 
     Set_OverlayAni(ABILITY_ANI::LANDING, "Landing", "HaveSwordMove", "R_ShoulderJ",
-        false, false, 1.f, 0.05f,
+        false, false, 1.f, 0.05f, true,
         false, false, 1.f, 0.05f);
 
     // Jump
     Set_OverlayAni(ABILITY_ANI::JUMP_L, "JumpL", "HaveSwordMove", "R_ShoulderJ",
-        false, false, 5.f, 0.1f,
+        false, false, 5.f, 0.1f, true,
         false, false, 5.f, 0.1f);
     Set_OverlayAni(ABILITY_ANI::JUMP_R, "JumpR", "HaveSwordMove", "R_ShoulderJ",
-        false, false, 5.f, 0.1f,
+        false, false, 5.f, 0.1f, true,
         false, false, 5.f, 0.1f);
     Set_OverlayAni(ABILITY_ANI::JUMP_END_L, "JumpEndL", "HaveSwordMove", "R_ShoulderJ",
-        false, false, 2.f, 0.1f,
+        false, false, 2.f, 0.1f, true,
         false, false, 2.f, 0.1f);
     Set_OverlayAni(ABILITY_ANI::JUMP_END_R, "JumpEndR", "HaveSwordMove", "R_ShoulderJ",
-        false, false, 2.f, 0.1f,
+        false, false, 2.f, 0.1f, true,
         false, false, 2.f, 0.1f);
 
     // Hovering
     Set_OverlayAni(ABILITY_ANI::FLIGHT_START, "FlightStart", "HaveSwordWaitFlight", "R_ShoulderJ",
-        false, false, 2.25f, 0.1f,
+        false, false, 2.25f, 0.1f, true,
         false, false, 2.25f, 0.1f);
     Set_OverlayAni(ABILITY_ANI::FLIGHT, "Flight", "HaveSwordWaitFlight", "R_ShoulderJ",
-        false, true, 2.f, 0.1f,
+        false, true, 2.f, 0.1f, true,
         false, true, 2.f, 0.1f);
     Set_OverlayAni(ABILITY_ANI::FLIGHT_FALL, "FlightFall", "HaveSwordWaitFlight", "R_ShoulderJ",
-        true, false, 2.f, 0.1f,
+        true, false, 2.f, 0.1f, true,
         true, false, 2.f, 0.1f);
     Set_OverlayAni(ABILITY_ANI::FLIGHT_LANDING, "FlightLanding", "HaveSwordWaitFlight", "R_ShoulderJ",
-        false, false, 2.5f, 0.1f,
+        false, false, 2.5f, 0.1f, true,
         false, false, 2.5f, 0.1f);
 
     Set_OverlayAni(ABILITY_ANI::AIR_BALL, "AirBall", "HaveSwordWaitFlight", "R_ShoulderJ",
-        false, false, 5.f, 0.05f,
+        false, false, 5.f, 0.05f, true,
         false, false, 5.f, 0.05f);
-
-    // Damaged
-    //Set_OverlayAni(ABILITY_ANI::DAMAGED, "Damage", "HaveSwordMove", "R_ShoulderJ",
-    //    false, false, 2.f, 0.1f,
-    //    false, false, 2.f, 0.1f);
-
 
     m_fSuperSpinSlashChargeTime = 0.8f;
 

@@ -84,7 +84,7 @@ protected:
 	void Set_FullBodyAni(ABILITY_ANI eAni, const _string& strAniName, _bool bLoop = true, _bool bRestart = false, _float fBlend = 0.1f, _float fSpeed = 1.f);
 
 	void Set_OverlayAni(ABILITY_ANI eAni, const _string& strBaseAniName, const _string& strOverlayAniName, const _string& strRootBone,
-		_bool bBaseLoop = true, _bool bBaseRestart = true, _float fBaseSpeed = 1.f, _float fBaseBlend = 0.1f,
+		_bool bBaseLoop = true, _bool bBaseRestart = true, _float fBaseSpeed = 1.f, _float fBaseBlend = 0.1f, _bool bBaseClearMask = true,
 		_bool bOverlayLoop = true, _bool bOverlayRestart = true, _float fOverlaySpeed = 1.f, _float fOverlayBlend = 0.1f);
 
 protected:

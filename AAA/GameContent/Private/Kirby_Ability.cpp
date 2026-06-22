@@ -101,7 +101,7 @@ void CKirby_Ability::Set_FullBodyAni(ABILITY_ANI eAni, const _string& strAniName
 }
 
 void CKirby_Ability::Set_OverlayAni(ABILITY_ANI eAni, const _string& strBaseAniName, const _string& strOverlayAniName, const _string& strRootBone,
-    _bool bBaseLoop, _bool bBaseRestart, _float fBaseSpeed, _float fBaseBlend,
+    _bool bBaseLoop, _bool bBaseRestart, _float fBaseSpeed, _float fBaseBlend, _bool bBaseClearMask,
     _bool bOverlayLoop, _bool bOverlayRestart, _float fOverlaySpeed, _float fOverlaysBlend)
 {
     ABILITY_ANI_DESC& desc = m_tAniInfos[ETOUI(eAni)];
@@ -113,12 +113,14 @@ void CKirby_Ability::Set_OverlayAni(ABILITY_ANI eAni, const _string& strBaseAniN
     desc.tBaseAniInfo.bRestart = bBaseRestart;
     desc.tBaseAniInfo.fBlend = fBaseBlend;
     desc.tBaseAniInfo.fSpeed = fBaseSpeed;
+    desc.tBaseAniInfo.bClearMask = bBaseClearMask;
 
     desc.tOverlayAniInfo.strAniName = strOverlayAniName;
     desc.tOverlayAniInfo.bLoop = bOverlayLoop;
     desc.tOverlayAniInfo.bRestart = bOverlayRestart;
     desc.tOverlayAniInfo.fBlend = fOverlaysBlend;
     desc.tOverlayAniInfo.fSpeed = fOverlaySpeed;
+    desc.tOverlayAniInfo.bClearMask = bBaseClearMask;
 
     desc.strOverlayRootBone = strRootBone;
     desc.fOverlayWeight = 1.f;

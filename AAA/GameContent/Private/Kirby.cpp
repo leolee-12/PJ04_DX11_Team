@@ -360,18 +360,6 @@ void CKirby::SetUp_Collider_Callback()
         //      넣으시오
         //    });
     }
-
-    if (m_KirbyColliders[INHALE_BOX])
-    {
-        m_KirbyColliders[INHALE_BOX]->Set_OnEnter(
-            [this](CCollider* pOther)
-            {
-                if (IInhalable* pInhalable = dynamic_cast<IInhalable*>(pOther->Get_Owner()))
-                {
-                    pInhalable;
-                }
-            });
-    }
 }
 
 HRESULT CKirby::Ready_PartObjects()

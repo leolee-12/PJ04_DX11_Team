@@ -20,7 +20,7 @@ HRESULT CKirby_Damaged::Initialize()
 
 KIRBY_STATE_TYPE CKirby_Damaged::Get_StateType()
 {
-    return KIRBY_STATE_TYPE::ABILITY_DUMP;
+    return KIRBY_STATE_TYPE::DAMAGED;
 }
 
 void CKirby_Damaged::Enter(CKirby* pKirby)
