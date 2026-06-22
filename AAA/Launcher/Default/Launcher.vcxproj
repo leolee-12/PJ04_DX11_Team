@@ -144,10 +144,10 @@
     <ClInclude Include="..\public\Level_FirstLoading.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
-    <ClInclude Include="..\public\Level_Lobby.h" />
     <ClInclude Include="..\Public\Level_Test.h" />
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\Public\MainApp.h" />
+    <ClInclude Include="..\public\Town_Step1.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Launcher.h" />
     <ClInclude Include="Resource.h" />
@@ -157,10 +157,10 @@
     <ClCompile Include="..\private\Level_FirstLoading.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
-    <ClCompile Include="..\private\Level_Lobby.cpp" />
     <ClCompile Include="..\Private\Level_Test.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
+    <ClCompile Include="..\private\Town_Step1.cpp" />
     <ClCompile Include="Launcher.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -84,7 +84,7 @@ public: // 에디터(데이터 편집)
 
 
 private:
-    void    Fire_Point(const vector<ANIM_EVENT>& events, _float lo, _float hi);
+    void    Fire_Point(vector<ANIM_EVENT>& events, _float lo, _float hi);
     void    Process_Range(ANIM_EVENT_TRACK& track, _float fCur);
     void    Reset_RuntimeState(ANIM_EVENT_TRACK* pTrack);
 
@@ -114,6 +114,8 @@ private:
     _float              m_fMaskBlendTime = 0.5f;
     
     _wstring            m_strDataFilePath = {};
+
+    _bool               m_bCurLoop = { false };
 
 public:
     static CAnimator* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -19,6 +19,8 @@ namespace Client
         SetEye = 8,
         SetMouth = 9,
         SetBody = 10,
+
+        OnOffPart = 11,
         // 추가는 항상 끝에, 기존 값 변경 금지 (저장 데이터 안정성)
     };
 
@@ -36,5 +38,6 @@ namespace Client
         { EANIM_EVENT::SetEye,   "SetEye"   },
         { EANIM_EVENT::SetMouth, "SetMouth" },
         { EANIM_EVENT::SetBody,  "SetBody"  },
+        { EANIM_EVENT::OnOffPart,  "OnOffPart"  },
     };
 }

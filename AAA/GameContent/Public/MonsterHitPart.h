@@ -18,7 +18,8 @@ protected:
 
 public:
     virtual void Late_Update(_float fTimeDelta) override;
-    void         Set_Drawn(_bool bDrawn);                   
+    void         Set_Drawn(_bool bDrawn);
+    void         Set_HitBox(_bool b);
 
 protected:
     HRESULT Ready_HitBox(const CAPSULE_DESC& Desc, _float fDamage = 5.f, _float fKnockback = 8.f);
