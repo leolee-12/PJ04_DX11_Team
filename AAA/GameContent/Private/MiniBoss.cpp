@@ -110,6 +110,19 @@ void CMiniBoss::Update_AI(_float fTimeDelta)
     }
 }
 
+void CMiniBoss::On_Damaged(const ATTACK_INFO& tInfo)
+{
+    On_Hit_Reaction(tInfo);
+    Publish_HP();
+}
+
+void CMiniBoss::On_Death(const ATTACK_INFO& tInfo)
+{
+    On_Death_Reaction(tInfo);
+    Publish_HP();
+    Die();
+}
+
 void CMiniBoss::Free()
 {
     Safe_Release(m_pCaptureState);

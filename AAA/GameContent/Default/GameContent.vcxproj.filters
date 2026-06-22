@@ -481,6 +481,9 @@
     <Filter Include="00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus">
       <UniqueIdentifier>{08709ead-b3a1-4623-96c2-e4d2a78ade1e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. MiniBoss\BossBase">
+      <UniqueIdentifier>{cae64c59-93c9-4338-aedd-6e88b9d1e032}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -969,6 +972,9 @@
     <ClInclude Include="..\public\Damageable.h">
       <Filter>00. GameObject\95. Interface</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\BossBase.h">
+      <Filter>00. GameObject\07. MiniBoss\BossBase</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1381,6 +1387,9 @@
     </ClCompile>
     <ClCompile Include="..\private\UI_BossStatus.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\BossBase.cpp">
+      <Filter>00. GameObject\07. MiniBoss\BossBase</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

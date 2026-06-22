@@ -338,6 +338,10 @@ void CKirby::SetUp_Collider_Callback()
             {
                 if (ETOUI(COLLISION_LAYER::MONSTER_HURT) == pOther->Get_RegisteredGroup())
                 {
+                    CMonster* pMon = dynamic_cast<CMonster*>(pOther->Get_Owner());
+                    if (pMon && !pMon->Is_Touch_Harmful())
+                        return;
+
                     _vector vAtkPos = pOther->Get_Owner()->Get_Transform()->Get_State(STATE::POSITION);
                     ATTACK_INFO atk{};
                     atk.fDamage = 1.f;
@@ -381,8 +385,7 @@ HRESULT CKirby::Ready_PartObjects()
     CKirby_Body::KIRBY_BODY_DESC BodyDesc{};
     BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 
-    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_Body::PROTOTYPE_TAG,
-        TEXT("Body"), &BodyDesc)))
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_Body::PROTOTYPE_TAG, TEXT("Body"), &BodyDesc)))
         return E_FAIL;
 
     m_pBody = dynamic_cast<CKirby_Body*>(m_PartObjects[TEXT("Body")]);
@@ -392,8 +395,7 @@ HRESULT CKirby::Ready_PartObjects()
     SwordDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     SwordDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("RHaveL");
 
-    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_Sword::PROTOTYPE_TAG,
-        CKirby_Sword::Kirby_PartTag, &SwordDesc)))
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_Sword::PROTOTYPE_TAG, CKirby_Sword::Kirby_PartTag, &SwordDesc)))
         return E_FAIL;
 
     // SwordHat

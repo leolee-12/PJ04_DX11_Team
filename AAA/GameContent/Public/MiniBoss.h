@@ -30,6 +30,11 @@ public:
 public:
     virtual void				Be_Captured(CGameObject* pInhaler) override;
 
+    virtual _bool               Is_Touch_Harmful() const override
+    {
+        return m_eLife == EMINIBOSS_LIFE::ACTIVE;
+    }
+
 protected:
     EMINIBOSS_LIFE m_eLife = { EMINIBOSS_LIFE::HIDDEN };
     _bool          m_bIntroStarted = { false };

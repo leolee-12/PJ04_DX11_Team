@@ -97,19 +97,6 @@ _bool CGigantEdge::Is_Death_Finished() const
     return m_pBody->Get_Animator()->Is_Finished();
 }
 
-void CMiniBoss::On_Damaged(const ATTACK_INFO& tInfo)
-{
-    On_Hit_Reaction(tInfo);
-    Publish_HP();
-}
-
-void CMiniBoss::On_Death(const ATTACK_INFO& tInfo)
-{
-    On_Death_Reaction(tInfo);
-    Publish_HP();
-    Die();
-}
-
 _bool CGigantEdge::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
 {
     Out.fRadius = { s_fCCT_Radius + 0.1f };
@@ -161,8 +148,6 @@ void CGigantEdge::On_Death_Reaction(const ATTACK_INFO& tInfo)
 {
     if (m_pSword)
         m_pSword->Set_HitBox(false);
-    if (m_pHurtBox)
-        m_pHurtBox->Set_Enabled(false);
 }
 
 #ifdef _DEBUG

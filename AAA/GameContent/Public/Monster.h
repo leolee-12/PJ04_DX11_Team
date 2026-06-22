@@ -60,7 +60,7 @@ public: // Inhalable
 	virtual _bool				Can_BeInhaled(const INHALE_QUERY& q) const override;
 	virtual void				Be_Captured(CGameObject* pInhaler) override;
 	virtual void				Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed) override;
-	virtual COPY_ABILITY_TYPE		    Get_CopyAbility() const override { return m_eCopyAbility; }
+	virtual COPY_ABILITY_TYPE	Get_CopyAbility() const override { return m_eCopyAbility; }
 	virtual CGameObject*		Get_GameObject() override final { return this; }
 
 	void						On_Swallowed();
@@ -90,6 +90,7 @@ public:
 
 	virtual CAnimator*			Get_BodyAnimator() const { return nullptr; }
 
+	virtual _bool				Is_Touch_Harmful() const { return true; }
 
 	// À±¼®Çö Ãß°¡
 	void						Enable_Controller(_bool bEnable);
