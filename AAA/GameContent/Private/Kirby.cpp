@@ -472,22 +472,6 @@ void CKirby::Update_Timer(_float fTimeDelta)
         m_fInvincibleTime -= fTimeDelta;
 }
 
-void CKirby::Spit_Inhalable()
-{
-    if (m_pCapturedInhalable == nullptr)
-        return;
-
-    _vector vMouth =
-        m_pTransformCom->Get_State(STATE::POSITION)
-        + m_pTransformCom->Get_State(STATE::LOOK) * s_fInhaleFwd
-        + m_pTransformCom->Get_State(STATE::UP) * s_fInhaleUp;
-    _vector vDir = m_pTransformCom->Get_State(STATE::LOOK);
-
-    m_pCapturedInhalable->Be_Spat(vMouth, vDir, s_fSpitSpeed);
-
-    m_pCapturedInhalable = nullptr;
-}
-
 CCollider* CKirby::Get_Collider(KIRBY_COLLIDER eKirbyCollider)
 {
     return m_KirbyColliders[eKirbyCollider];

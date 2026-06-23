@@ -91,6 +91,10 @@ private:
 	_float3 m_vInhaleEffectStartPos{};
 	_float3 m_vInhaleEffectEndPos{};
 
+	// Inhaleable(Stuffed)
+	_bool m_bInhaleCancelLocked{};
+	IInhalable* m_pCapturedInhalable{};
+
 private:
 	void Change_InhaleState(CKirby* pKirby, INHALE_STATE eNext);
 	void Enter_InhaleState(CKirby* pKirby, INHALE_STATE eState);
@@ -116,6 +120,10 @@ private:
 	void Handle_InhaleCaptured(CKirby* pKirby, IInhalable* pInhaleable);
 
 	void Update_SuperInhaleEffectRise(_float fRatio);
+
+	// Inhaleable(Stuffed)
+	void  Capture_Inhalable(IInhalable* pInhalable) { m_pCapturedInhalable = pInhalable; }
+	void  Spit_Inhalable(CKirby* pKirby);
 
 public:
 	static CKirby_Ability_Normal* Create();
