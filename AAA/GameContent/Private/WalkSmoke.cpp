@@ -9,6 +9,7 @@
 
 #include "TestParticle.h"
 #include "TestMeshParticle.h"
+#include "TestMeshEmitter.h"
 
 CWalkSmoke::CWalkSmoke(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Container(pDevice, pContext)
@@ -62,19 +63,21 @@ HRESULT CWalkSmoke::Render()
 
 HRESULT CWalkSmoke::Ready_EffectPartObjects()
 {
-    //if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeSphereOriginal::PROTOTYPE_TAG, TEXT("Proto_SmokeSphereOriginal"))))
-    //    return E_FAIL;
-    //if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeLowPoly::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeLowPoly_1"))))
-    //    return E_FAIL;
-    //if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeLowPoly::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeLowPoly_2"))))
-    //    return E_FAIL;
-    //if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeLowPoly::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeLowPoly_3"))))
-    //    return E_FAIL;
-    //if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeTail::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeTail"))))
-    //    return E_FAIL;
-
-    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CTestParticle::PROTOTYPE_TAG, TEXT("Test_Paticle"))))
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeSphereOriginal::PROTOTYPE_TAG, TEXT("Proto_SmokeSphereOriginal"))))
         return E_FAIL;
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeLowPoly::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeLowPoly_1"))))
+        return E_FAIL;
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeLowPoly::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeLowPoly_2"))))
+        return E_FAIL;
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeLowPoly::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeLowPoly_3"))))
+        return E_FAIL;
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeTail::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeTail"))))
+        return E_FAIL;
+
+    //if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CTestMeshEmitter::PROTOTYPE_TAG, TEXT("Test_MeshEmitter"))))
+    //    return E_FAIL;
+    //if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CTestParticle::PROTOTYPE_TAG, TEXT("Test_Paticle"))))
+    //    return E_FAIL;
     //if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CTestMeshParticle::PROTOTYPE_TAG, TEXT("Test_MeshPaticle"))))
     //    return E_FAIL;
 

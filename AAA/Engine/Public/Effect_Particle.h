@@ -39,7 +39,22 @@ PROPERTY(_float, m_fParticleFountainSpread, L"Spread_P", L"Particle Velocity - F
 PROPERTY(_float, m_fParticleFountainUpBias, L"Up Bias_P", L"Particle Velocity - Fountain");
 
 // Particle Force
+PROPERTY(_bool, m_bParticleUseAcceleration, L"Use Acceleration_P", L"Particle Force");
 PROPERTY(_float3, m_vParticleAcceleration, L"Acceleration_P", L"Particle Force");
+
+// Particle Flutter
+PROPERTY(_bool, m_bParticleUseFlutter, L"Use Flutter_P", L"Particle Flutter");
+PROPERTY(_float, m_fParticleFlutterAmplitude, L"Amplitude_P", L"Particle Flutter");
+PROPERTY(_float, m_fParticleFlutterFrequency, L"Frequency_P", L"Particle Flutter");
+PROPERTY(_float, m_fParticleFlutterRandomRatio, L"Random Ratio_P", L"Particle Flutter");
+
+// Particle Rotation
+PROPERTY(_bool, m_bParticleRandomRotation, L"Random Rotation_P", L"Particle Rotation");
+PROPERTY(_float3, m_vParticleRandomRotationMin, L"Rotation Min_P", L"Particle Rotation");
+PROPERTY(_float3, m_vParticleRandomRotationMax, L"Rotation Max_P", L"Particle Rotation");
+
+PROPERTY(_bool, m_bParticleRotationOverLife, L"Rotation Over Life_P", L"Particle Rotation");
+PROPERTY(_float3, m_vParticleAngularVelocity, L"Angular Velocity_P", L"Particle Rotation");
 
 // Particle Alpha
 PROPERTY(_float, m_fParticleAlpha, L"Alpha_P", L"Particle Alpha");
@@ -88,6 +103,8 @@ PROPERTY(_bool, m_bActive_ParticleColor_Ratio_1, L"Active Ratio 1_P", L"Particle
 PROPERTY(_float, m_fParticleColor_Ratio_1, L"Ratio 1_P", L"Particle Color");
 PROPERTY(_float3, m_vParticleColor_Value_1, L"Value 1_P", L"Particle Color");
 
+
+
 public:
     struct EFFECT_PARTICLE_DESC : public CEffect_Part::EFFECT_PART_DESC
     {
@@ -111,6 +128,15 @@ protected:
         _float3 vLocalPos{};
         _float3 vVelocity{};
         _float3 vSpawnLocalPos{};
+
+        _float fFlutterPhase{};
+        _float fFlutterAmplitude{};
+        _float fFlutterFrequency{};
+        _float3 vFlutterDir{};
+
+        _float3 vBaseRotation{};
+        _float3 vRotation{};
+        _float3 vAngularVelocity{};
     };
 
 protected:

@@ -106,7 +106,22 @@ void CEffect_Particle::Init_PropertyValue()
     m_fParticleFountainUpBias = 1.5f;
 
     // Particle Force
+    m_bParticleUseAcceleration = false;
     m_vParticleAcceleration = { 0.f, 0.f, 0.f };
+
+    // Particle Flutter
+    m_bParticleUseFlutter = false;
+    m_fParticleFlutterAmplitude = 0.3f;
+    m_fParticleFlutterFrequency = 1.5f;
+    m_fParticleFlutterRandomRatio = 0.3f;
+
+    // Particle Rotation
+    m_bParticleRandomRotation = false;
+    m_vParticleRandomRotationMin = { 0.f, 0.f, 0.f };
+    m_vParticleRandomRotationMax = { 0.f, 360.f, 0.f };
+
+    m_bParticleRotationOverLife = false;
+    m_vParticleAngularVelocity = { 0.f, 0.f, 0.f };
 
     // Particle Alpha
     m_fParticleAlpha = 1.f;
@@ -232,6 +247,49 @@ void CEffect_Particle::Reset_Particles()
 
         Particle.fAlpha = m_fParticleAlpha;
         Particle.vColor = m_vParticleColor;
+
+        Particle.fFlutterPhase = m_pGameInstance_Proxy->RandomFloat(0.f, XM_2PI);
+
+        _float fFlutterRandomRatio = m_fParticleFlutterRandomRatio;
+        Helper::FloatClamp(fFlutterRandomRatio, 0.f, 1.f);
+
+        _float fFlutterAmpMin = m_fParticleFlutterAmplitude * (1.f - fFlutterRandomRatio);
+        _float fFlutterAmpMax = m_fParticleFlutterAmplitude * (1.f + fFlutterRandomRatio);
+
+        if (fFlutterAmpMax < fFlutterAmpMin)
+            std::swap(fFlutterAmpMin, fFlutterAmpMax);
+
+        Particle.fFlutterAmplitude = m_pGameInstance_Proxy->RandomFloat(fFlutterAmpMin, fFlutterAmpMax);
+
+        _float fFlutterFreqMin = m_fParticleFlutterFrequency * (1.f - fFlutterRandomRatio);
+        _float fFlutterFreqMax = m_fParticleFlutterFrequency * (1.f + fFlutterRandomRatio);
+
+        if (fFlutterFreqMax < fFlutterFreqMin)
+            std::swap(fFlutterFreqMin, fFlutterFreqMax);
+
+        Particle.fFlutterFrequency = m_pGameInstance_Proxy->RandomFloat(fFlutterFreqMin, fFlutterFreqMax);
+
+        const _float fTheta = m_pGameInstance_Proxy->RandomFloat(0.f, XM_2PI);
+        Particle.vFlutterDir = { cosf(fTheta), 0.f, sinf(fTheta) };
+
+        Particle.vBaseRotation = { 0.f, 0.f, 0.f };
+
+        if (m_bParticleRandomRotation == true)
+        {
+            _float3 vMin = m_vParticleRandomRotationMin;
+            _float3 vMax = m_vParticleRandomRotationMax;
+
+            if (vMax.x < vMin.x) std::swap(vMin.x, vMax.x);
+            if (vMax.y < vMin.y) std::swap(vMin.y, vMax.y);
+            if (vMax.z < vMin.z) std::swap(vMin.z, vMax.z);
+
+            Particle.vBaseRotation.x = m_pGameInstance_Proxy->RandomFloat(vMin.x, vMax.x);
+            Particle.vBaseRotation.y = m_pGameInstance_Proxy->RandomFloat(vMin.y, vMax.y);
+            Particle.vBaseRotation.z = m_pGameInstance_Proxy->RandomFloat(vMin.z, vMax.z);
+        }
+
+        Particle.vRotation = Particle.vBaseRotation;
+        Particle.vAngularVelocity = m_vParticleAngularVelocity;
     }
 }
 
@@ -404,20 +462,47 @@ void CEffect_Particle::Update_ParticleMove(PARTICLE& Particle, _float fRatio, _f
     const _float fElapsedRatio = fRatio - Particle.fStartRatio;
     const _float fElapsedTime = fElapsedRatio * m_fDuration;
 
+    _float3 vAcceleration{};
+
+    if (m_bParticleUseAcceleration == true)
+        vAcceleration = m_vParticleAcceleration;
+
     Particle.vLocalPos.x =
         Particle.vSpawnLocalPos.x +
         Particle.vVelocity.x * fElapsedTime +
-        0.5f * m_vParticleAcceleration.x * fElapsedTime * fElapsedTime;
+        0.5f * vAcceleration.x * fElapsedTime * fElapsedTime;
 
     Particle.vLocalPos.y =
         Particle.vSpawnLocalPos.y +
         Particle.vVelocity.y * fElapsedTime +
-        0.5f * m_vParticleAcceleration.y * fElapsedTime * fElapsedTime;
+        0.5f * vAcceleration.y * fElapsedTime * fElapsedTime;
 
     Particle.vLocalPos.z =
         Particle.vSpawnLocalPos.z +
         Particle.vVelocity.z * fElapsedTime +
-        0.5f * m_vParticleAcceleration.z * fElapsedTime * fElapsedTime;
+        0.5f * vAcceleration.z * fElapsedTime * fElapsedTime;
+
+    if (m_bParticleUseFlutter == true)
+    {
+        const _float fFlutter =
+            (sinf(fElapsedTime * XM_2PI * Particle.fFlutterFrequency + Particle.fFlutterPhase) -
+                sinf(Particle.fFlutterPhase)) *
+            Particle.fFlutterAmplitude;
+
+        Particle.vLocalPos.x += Particle.vFlutterDir.x * fFlutter;
+        Particle.vLocalPos.z += Particle.vFlutterDir.z * fFlutter;
+    }
+
+    if (m_bParticleRotationOverLife == true)
+    {
+        Particle.vRotation.x = Particle.vBaseRotation.x + Particle.vAngularVelocity.x * fElapsedTime;
+        Particle.vRotation.y = Particle.vBaseRotation.y + Particle.vAngularVelocity.y * fElapsedTime;
+        Particle.vRotation.z = Particle.vBaseRotation.z + Particle.vAngularVelocity.z * fElapsedTime;
+    }
+    else
+    {
+        Particle.vRotation = Particle.vBaseRotation;
+    }
 }
 
 void CEffect_Particle::Update_ParticleAlpha(PARTICLE& Particle, _float fLocalRatio)
@@ -575,9 +660,26 @@ _float3 CEffect_Particle::Evaluate_ParticleFloat3Curve(_float fLocalRatio, const
 
 _float4x4 CEffect_Particle::Make_ParticleWorldMatrix(const PARTICLE& Particle) const
 {
-    _matrix matScale = XMMatrixScaling(Particle.vScale.x, Particle.vScale.y, Particle.vScale.z);
-    _matrix matTranslation = XMMatrixTranslation(Particle.vLocalPos.x, Particle.vLocalPos.y, Particle.vLocalPos.z);
-    _matrix matWorld = matScale * matTranslation * XMLoadFloat4x4(&m_CombinedWorldMatrix);
+    _matrix matScale = XMMatrixScaling(
+        Particle.vScale.x,
+        Particle.vScale.y,
+        Particle.vScale.z);
+
+    _matrix matRotation = XMMatrixRotationRollPitchYaw(
+        XMConvertToRadians(Particle.vRotation.x),
+        XMConvertToRadians(Particle.vRotation.y),
+        XMConvertToRadians(Particle.vRotation.z));
+
+    _matrix matTranslation = XMMatrixTranslation(
+        Particle.vLocalPos.x,
+        Particle.vLocalPos.y,
+        Particle.vLocalPos.z);
+
+    _matrix matWorld =
+        matScale *
+        matRotation *
+        matTranslation *
+        XMLoadFloat4x4(&m_CombinedWorldMatrix);
 
     _float4x4 ParticleWorld{};
     XMStoreFloat4x4(&ParticleWorld, matWorld);

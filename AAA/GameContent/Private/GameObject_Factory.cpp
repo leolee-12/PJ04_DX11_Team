@@ -13,6 +13,7 @@
 #include "TestMarb1eMap.h"
 #include "TestTriggerBox.h"
 #include "TestParticle.h"
+#include "TestMeshEmitter.h"
 #include "TestMeshParticle.h"
 #include "Material_Object.h"
 
@@ -283,6 +284,8 @@ void CGameObject_Factory::Register_Test()
                 CTestParticle::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CTestMeshParticle::PROTOTYPE_TAG,
                 CTestMeshParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CTestMeshEmitter::PROTOTYPE_TAG,
+                CTestMeshEmitter::Create(pDevice, pContext));
         )
     );
 

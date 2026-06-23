@@ -301,6 +301,15 @@
     <Filter Include="05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_MeshParticle">
       <UniqueIdentifier>{f3b89464-2504-4b1f-ac6d-3aaa815d6d01}</UniqueIdentifier>
     </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Emitter">
+      <UniqueIdentifier>{f6fe4cd6-259b-4194-b152-6063ffca5787}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_MeshEmitter">
+      <UniqueIdentifier>{572697e9-e334-4ef2-bbaa-686aba5ea8f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_RectEmitter">
+      <UniqueIdentifier>{d49ef37d-8dbc-4fa5-bb4d-69cdb1c95e46}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -603,6 +612,15 @@
     <ClInclude Include="..\Public\Effect_MeshParticle.h">
       <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_MeshParticle</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Effect_Emitter.h">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_MeshEmitter.h">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_MeshEmitter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_RectEmitter.h">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_RectEmitter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -874,6 +892,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Effect_MeshParticle.cpp">
       <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_MeshParticle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_Emitter.cpp">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_MeshEmitter.cpp">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_MeshEmitter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_RectEmitter.cpp">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_RectEmitter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
