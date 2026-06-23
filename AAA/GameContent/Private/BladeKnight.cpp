@@ -6,7 +6,7 @@
 
 #include "BladeKnight_Body.h"
 #include "BladeKnight_Sword.h"
-#include "BladeKnight_FSM.h"
+#include "BladeKnight_Brain.h"
 
 // 상태
 #include "Monster_StateMachine.h"
@@ -50,7 +50,7 @@ HRESULT CBladeKnight::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
-    //m_eCopyAbility = COPY_ABILITY_TYPE::SWORD;
+    m_eCopyAbility = COPY_ABILITY_TYPE::SWORD;
 
     return S_OK;
 }
@@ -69,6 +69,31 @@ void CBladeKnight::Update(_float fTimeDelta)
         return;
 
     __super::Update(fTimeDelta);
+
+    const _bool bIdle = (Get_StateType() == MONSTER_STATE_TYPE::IDLE);
+    if (bIdle != m_bIdleOverlayOn)
+    {
+        if (CAnimator* pAnimator = Get_BodyAnimator())
+        {
+            if (bIdle)
+            {
+                CAnimator::LAYER_PLAY_INFO tOv{};
+                tOv.iSlot = 1;
+                tOv.tAnim.strAniName = "FindWaitSub";
+                tOv.tAnim.bLoop = true;
+                tOv.Roots = { "R_FootJ", "L_FootJ" };
+                tOv.fTargetWeight = 1.f;
+                tOv.fWeightBlend = 0.15f;
+                tOv.tAnim.fSpeed = 2.f;
+                pAnimator->Apply_Overlay(tOv);
+            }
+            else
+            {
+                pAnimator->Clear_Overlay(1, 0.15f);
+            }
+        }
+        m_bIdleOverlayOn = bIdle;
+    }
 }
 
 void CBladeKnight::Late_Update(_float fTimeDelta)
@@ -93,7 +118,7 @@ CAnimator* CBladeKnight::Get_BodyAnimator() const
 
 CMonsterBrain* CBladeKnight::Create_Brain()
 {
-    return CBladeKnight_FSM::Create(this);
+    return CBladeKnight_Brain::Create(this);
 }
 
 HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
@@ -227,33 +252,6 @@ HRESULT CBladeKnight::Ready_AnimEvents()
         });
 
     return S_OK;
-}
-
-void CBladeKnight::On_Damaged(const ATTACK_INFO& tInfo)
-{
-    if (m_pMovement)
-        m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
-
-    Change_State(MONSTER_STATE_TYPE::KNOCK_BACK);
-}
-
-void CBladeKnight::On_Death(const ATTACK_INFO& tInfo)
-{
-    if (tInfo.fDamage >= m_fMaxHP)
-    {
-        if (m_pMovement)
-            m_pMovement->KO(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
-        Change_State(MONSTER_STATE_TYPE::KNOCK_OUT);
-    }
-    else 
-    {
-        if (m_pMovement)
-            m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
-        Change_State(MONSTER_STATE_TYPE::KNOCK_BACK);
-    }
-    
-    // TODO : Set_Dead와 연결
-
 }
 
 HRESULT CBladeKnight::Ready_PartObjects()

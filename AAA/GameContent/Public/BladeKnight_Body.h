@@ -28,7 +28,7 @@ public:
     }
 
 private:
-    HRESULT Ready_Components();
+    virtual HRESULT Ready_Components() override;
 
 public:
     static CBladeKnight_Body* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

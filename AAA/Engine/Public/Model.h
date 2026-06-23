@@ -60,25 +60,22 @@ public:
 public:
 	void			Set_AnimationIndex(_uint iIndex, _bool isLoop = false, _bool isRestart = false, _float fBlendDuration = 0.2f);
 	_int			Get_AnimationIndex(const string& strName) const;
-	const string& Get_CurrentAnimName() const;
+	const string&	Get_CurrentAnimName() const;
 	void			Seek_Animation(_float fProgress);
 
 	_bool			Update_Base(_float fTimeDelta, _float fSpeed = 1.0f);
 	_bool			Play_Animation(_float fTimeDelta, _float fSpeed = 1.0f);
-	_bool			Play_Animation(_float fTimeDelta, const _string& strMaskClip, _float fSpeed = 1.0f, _bool bLoop = true, _float fMaskWeight = 1.f);
+	_bool			Play_Animation(_float fTimeDelta, _float fMaskTimeDelta, _int iMaskIndex, _float& fMaskLocalTime, vector<_uint>& MaskCursors,
+									_float fSpeed = 1.0f, _float fMaskSpeed = 1.0f, _bool bLoop = true, _float fMaskWeight = 1.f, _bool* pbOverlayFinished = nullptr);
 
-	void			Apply_Mask(const _string& strClip, _float fTimeDelta, _float fSpeed = 1.0f, _bool bLoop = true, _float fMaskWeight = 1.f);
+	_bool			Apply_Mask(_int iIndex, _float& fLocalTime, vector<_uint>& Cursors, _float fTimeDelta, _float fSpeed = 1.0f, _bool bLoop = true, _float fMaskWeight = 1.f);
 	void			Update_Combined();
 
 	HRESULT			Render(_uint iMeshIndex);
 
-	void			Capture_MaskSnapShot(const vector<_string>& Roots);
+	void			Build_MaskBones(const vector<_string>& Roots);
 
-	void			Clear_MaskSnapShot() 
-	{ 
-		m_MaskSnapShot.clear();
-		m_MaskBones.clear();
-	}
+	void			Clear_MaskBones() { m_MaskBones.clear(); }
 
 	const _wstring& Get_ModelPath() { return m_strModelPath; }
 
@@ -124,13 +121,12 @@ private:
 	_float						m_fBlendElapsed = { };
 	_bool						m_isBlending = { false };
 
-	physx::PxTriangleMesh* m_pCollisionMesh = { nullptr };
+	physx::PxTriangleMesh*		m_pCollisionMesh = { nullptr };
 
 	// юс╫ц
 	vector<MESH_LAYER_IDX>		m_MeshLayers;
 	string						m_strMeshLayerPath;
-
-	unordered_map<_uint, KEYFRAME> m_MaskSnapShot;
+	
 	vector<_uint>				m_MaskBones;
 
 
