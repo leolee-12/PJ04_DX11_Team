@@ -969,16 +969,28 @@ void CLevel_Edit::On_MapPreviewObjectCreated(
 	if (nullptr == pLevel || nullptr == pObject)
 		return;
 
-	pLevel->Add_MapPreviewObjectHandle(
-		strPrototypeTag,
-		strLayerTag,
-		strObjectTag,
-		pObject);
+#ifdef _DEBUG
+	constexpr _bool bRegisterPreviewHandle = true;
+	constexpr _bool bRegisterProfilerEnv = true;
+#else
+	constexpr _bool bRegisterPreviewHandle = true;
+	constexpr _bool bRegisterProfilerEnv = true;
+#endif
+
+	if (bRegisterPreviewHandle)
+	{
+		pLevel->Add_MapPreviewObjectHandle(
+			strPrototypeTag,
+			strLayerTag,
+			strObjectTag,
+			pObject);
+	}
 
 	if (0 == _wcsicmp(strPrototypeTag.c_str(), Client::CMapStage::PROTOTYPE_TAG))
 		pLevel->m_pMapStage = dynamic_cast<Client::CMapStage*>(pObject);
 
-	On_EnvObjectCreated(pContext, pObject, strPrototypeTag, strLayerTag, strObjectTag);
+	if (bRegisterProfilerEnv)
+		On_EnvObjectCreated(pContext, pObject, strPrototypeTag, strLayerTag, strObjectTag);
 }
 
 void CLevel_Edit::Set_Selected(CGameObject* pSelected)
@@ -1197,16 +1209,40 @@ HRESULT CLevel_Edit::Ready_EnvObjects(vector<ENV_OBJECT_DESC>* pOutDeletedEnvDes
 	Context.pContext = m_pContext;
 	Context.iPlaceLevel = ETOUI(TOOL_LEVEL::EDIT);
 	Context.iModelLevel = ETOUI(LEVEL::STATIC);
-	Context.pCreatedCallback = &On_MapPreviewObjectCreated;
+#ifdef _DEBUG
+	constexpr _bool bEnableCreatedCallback = true;
+#else
+	constexpr _bool bEnableCreatedCallback = true;
+#endif
+
+	Context.pCreatedCallback = bEnableCreatedCallback ? &On_MapPreviewObjectCreated : nullptr;
 	Context.pCallbackContext = this;
 
+#ifdef _DEBUG
+	constexpr _bool bPassOverrideDesc = true;
+	constexpr _bool bPassDeletedEnvDescs = true;
+
+	const std::string strAbiLog =
+		std::string("[MapLoad][ABI][MapTool] sizeof(ENV_OBJECT_DESC)=") + std::to_string(sizeof(ENV_OBJECT_DESC))
+		+ " sizeof(MAP_ENV_EDITED_DESC)=" + std::to_string(sizeof(MAP_ENV_EDITED_DESC))
+		+ " sizeof(MAP_EDIT_CHANGE)=" + std::to_string(sizeof(MAP_EDIT_CHANGE))
+		+ " sizeof(MAP_LOAD_RESULT)=" + std::to_string(sizeof(MAP_LOAD_RESULT))
+		+ " passOverride=" + std::to_string(static_cast<int>(bPassOverrideDesc))
+		+ " passDeleted=" + std::to_string(static_cast<int>(bPassDeletedEnvDescs));
+
+	OutputDebugStringA((strAbiLog + "\n").c_str());
+#else
+	constexpr _bool bPassOverrideDesc = true;
+	constexpr _bool bPassDeletedEnvDescs = true;
+#endif
+
 	MAP_LOAD_RESULT Report{};
-	const HRESULT hr = Client::CMap_Loader::Load_Env_Runtime(
+	const HRESULT hr = CMap_Loader::Load_Env_Runtime(
 		Context,
 		MapContentDesc.strManifestPath,
-		&MapContentDesc.OverrideDesc,
+		bPassOverrideDesc ? &MapContentDesc.OverrideDesc : nullptr,
 		&Report,
-		pOutDeletedEnvDescs,
+		bPassDeletedEnvDescs ? pOutDeletedEnvDescs : nullptr,
 		true);
 
 	if (FAILED(hr))

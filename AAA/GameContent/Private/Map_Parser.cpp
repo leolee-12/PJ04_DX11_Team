@@ -71,6 +71,11 @@ namespace
 
 		Collision.eColliderKind = ENV_COLLIDER_KIND::NONE;
 		Collision.eSimpleShape = ENV_SIMPLE_SHAPE::NONE;
+
+		Collision.bHasCollMesh = false;
+		Collision.bCookCollMesh = false;
+		Collision.bUseCollMesh = false;
+
 		Collision.bCatalogCollisionChecked = false;
 		Collision.bHasDecorCollisionApxbin = false;
 		Collision.strDecorCollisionApxbinName.clear();
@@ -107,6 +112,10 @@ namespace
 			ENV_COLLISION_CATALOG_RECORD Record{};
 			if (CEnv_CollisionCatalog::Try_Find(pDesc->wstrObjectName, &Record))
 			{
+				Collision.bHasCollMesh = true;
+				Collision.bCookCollMesh = true;
+				Collision.bUseCollMesh = false;
+
 				Collision.bHasDecorCollisionApxbin = true;
 				Collision.strDecorCollisionApxbinName = Record.strApxbinName;
 				Collision.strDecorCollisionBfresPath = Record.strBfresPath;
@@ -114,6 +123,9 @@ namespace
 			}
 			else
 			{
+				Collision.bHasCollMesh = false;
+				Collision.bCookCollMesh = false;
+				Collision.bUseCollMesh = false;
 				Collision.eColliderKind = ENV_COLLIDER_KIND::NONE;
 			}
 

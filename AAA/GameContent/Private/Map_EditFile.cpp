@@ -104,10 +104,10 @@ namespace
 		if (nullptr == pOutDesc)
 			return;
 
-		pOutDesc->vRight = _float4(Mat.m[0][0], Mat.m[0][1], Mat.m[0][2], Mat.m[0][3]);
-		pOutDesc->vUp = _float4(Mat.m[1][0], Mat.m[1][1], Mat.m[1][2], Mat.m[1][3]);
-		pOutDesc->vLook = _float4(Mat.m[2][0], Mat.m[2][1], Mat.m[2][2], Mat.m[2][3]);
-		pOutDesc->vPosition = _float4(Mat.m[3][0], Mat.m[3][1], Mat.m[3][2], Mat.m[3][3]);
+		pOutDesc->vRight	= _float4(Mat.m[0][0], Mat.m[0][1], Mat.m[0][2], Mat.m[0][3]);
+		pOutDesc->vUp		= _float4(Mat.m[1][0], Mat.m[1][1], Mat.m[1][2], Mat.m[1][3]);
+		pOutDesc->vLook		= _float4(Mat.m[2][0], Mat.m[2][1], Mat.m[2][2], Mat.m[2][3]);
+		pOutDesc->vPosition	= _float4(Mat.m[3][0], Mat.m[3][1], Mat.m[3][2], Mat.m[3][3]);
 	}
 
 	void Apply_EnvEditToDesc(ENV_OBJECT_DESC* pOutDesc, const MAP_ENV_EDITED_DESC& Edit)
@@ -121,26 +121,46 @@ namespace
 		if (Edit.bHasEnableCulling)
 			pOutDesc->tRender.bUseLodCulling = Edit.bEnableCulling;
 
-		if (Edit.bHasCastShadow)
-			pOutDesc->tRender.bShadowMappingCaster = Edit.bCastShadow;
+		if (Edit.bHasShadow)
+		{
+			pOutDesc->tRender.bUseShadow = pOutDesc->tRender.bHasShadow && Edit.bUseShadow;
+			pOutDesc->tRender.bShadowMappingCaster = pOutDesc->tRender.bUseShadow;
+		}
+		else if (Edit.bHasCastShadow)
+		{
+			pOutDesc->tRender.bUseShadow = pOutDesc->tRender.bHasShadow && Edit.bCastShadow;
+			pOutDesc->tRender.bShadowMappingCaster = pOutDesc->tRender.bUseShadow;
+		}
+		else
+		{
+			pOutDesc->tRender.bUseShadow = false;
+			pOutDesc->tRender.bShadowMappingCaster = false;
+		}
 
 		if (Edit.bHasWorldMatrix)
 		{
 			pOutDesc->bHasWorldMatrix = true;
 			pOutDesc->matWorld = Edit.matWorld;
 
-			CGameObject::GAMEOBJECT_DESC& BaseDesc =
-				static_cast<CGameObject::GAMEOBJECT_DESC&>(*pOutDesc);
+			CGameObject::GAMEOBJECT_DESC& BaseDesc = static_cast<CGameObject::GAMEOBJECT_DESC&>(*pOutDesc);
 			Apply_WorldMatrixToGameObjectDesc(&BaseDesc, Edit.matWorld);
 		}
 
-		if (Edit.bHasCollMeshEdited)
+		if (Edit.bHasCollMesh)
 		{
-			pOutDesc->tCollision.bInvalidCollision = !Edit.bCreateCollMesh;
+			pOutDesc->tCollision.bUseCollMesh = pOutDesc->tCollision.bHasCollMesh && Edit.bUseCollMesh;
+		}
+		else if (Edit.bHasCollMeshEdited)
+		{
+			pOutDesc->tCollision.bUseCollMesh = pOutDesc->tCollision.bHasCollMesh && Edit.bCreateCollMesh;
 		}
 		else if (Edit.bDisableCollMesh)
 		{
-			pOutDesc->tCollision.bInvalidCollision = true;
+			pOutDesc->tCollision.bUseCollMesh = false;
+		}
+		else
+		{
+			pOutDesc->tCollision.bUseCollMesh = false;
 		}
 
 		if (Edit.bHasNearDistAlpha)
@@ -188,13 +208,17 @@ namespace
 		if (Edit.bHasEnableCulling)
 			j["EnableCulling"] = static_cast<bool>(Edit.bEnableCulling);
 
-		if (Edit.bHasCastShadow)
+		if (Edit.bHasShadow)
+			j["UseShadow"] = static_cast<bool>(Edit.bUseShadow);
+		else if (Edit.bHasCastShadow)
 			j["CastShadow"] = static_cast<bool>(Edit.bCastShadow);
 
 		if (Edit.bHasWorldMatrix)
 			j["WorldMatrix"] = Save_Float4x4(Edit.matWorld);
 
-		if (Edit.bHasCollMeshEdited)
+		if (Edit.bHasCollMesh)
+			j["UseCollMesh"] = static_cast<bool>(Edit.bUseCollMesh);
+		else if (Edit.bHasCollMeshEdited)
 		{
 			j["CollisionMesh"] = json::object();
 			j["CollisionMesh"]["Create"] = static_cast<bool>(Edit.bCreateCollMesh);
@@ -236,14 +260,26 @@ namespace
 			pOutDesc->bEnableCulling = IterEnableCulling->get<bool>();
 		}
 
-		const auto IterCastShadow = jValue.find("CastShadow");
-		if (IterCastShadow != jValue.end())
+		const auto IterUseShadow = jValue.find("UseShadow");
+		if (IterUseShadow != jValue.end())
 		{
-			if (!IterCastShadow->is_boolean())
+			if (!IterUseShadow->is_boolean())
 				return E_FAIL;
 
-			pOutDesc->bHasCastShadow = true;
-			pOutDesc->bCastShadow = IterCastShadow->get<bool>();
+			pOutDesc->bHasShadow = true;
+			pOutDesc->bUseShadow = IterUseShadow->get<bool>();
+		}
+		else
+		{
+			const auto IterCastShadow = jValue.find("CastShadow");
+			if (IterCastShadow != jValue.end())
+			{
+				if (!IterCastShadow->is_boolean())
+					return E_FAIL;
+
+				pOutDesc->bHasCastShadow = true;
+				pOutDesc->bCastShadow = IterCastShadow->get<bool>();
+			}
 		}
 
 		const auto IterWorldMatrix = jValue.find("WorldMatrix");
@@ -255,29 +291,41 @@ namespace
 			pOutDesc->bHasWorldMatrix = true;
 		}
 
-		const auto IterCollisionMesh = jValue.find("CollisionMesh");
-		if (IterCollisionMesh != jValue.end() && IterCollisionMesh->is_object())
+		const auto IterUseCollMesh = jValue.find("UseCollMesh");
+		if (IterUseCollMesh != jValue.end())
 		{
-			const auto IterCreate = IterCollisionMesh->find("Create");
-			if (IterCreate != IterCollisionMesh->end() && IterCreate->is_boolean())
-			{
-				pOutDesc->bHasCollMeshEdited = true;
-				pOutDesc->bCreateCollMesh = IterCreate->get<bool>();
-				pOutDesc->bDisableCollMesh = !pOutDesc->bCreateCollMesh;
-			}
+			if (!IterUseCollMesh->is_boolean())
+				return E_FAIL;
+
+			pOutDesc->bHasCollMesh = true;
+			pOutDesc->bUseCollMesh = IterUseCollMesh->get<bool>();
 		}
 		else
 		{
-			const auto IterCollisionDisabled = jValue.find("CollisionMeshDisabled");
-			if (IterCollisionDisabled != jValue.end())
+			const auto IterCollisionMesh = jValue.find("CollisionMesh");
+			if (IterCollisionMesh != jValue.end() && IterCollisionMesh->is_object())
 			{
-				if (!IterCollisionDisabled->is_boolean())
-					return E_FAIL;
+				const auto IterCreate = IterCollisionMesh->find("Create");
+				if (IterCreate != IterCollisionMesh->end() && IterCreate->is_boolean())
+				{
+					pOutDesc->bHasCollMeshEdited = true;
+					pOutDesc->bCreateCollMesh = IterCreate->get<bool>();
+					pOutDesc->bDisableCollMesh = !pOutDesc->bCreateCollMesh;
+				}
+			}
+			else
+			{
+				const auto IterCollisionDisabled = jValue.find("CollisionMeshDisabled");
+				if (IterCollisionDisabled != jValue.end())
+				{
+					if (!IterCollisionDisabled->is_boolean())
+						return E_FAIL;
 
-				const bool bDisabled = IterCollisionDisabled->get<bool>();
-				pOutDesc->bHasCollMeshEdited = true;
-				pOutDesc->bCreateCollMesh = !bDisabled;
-				pOutDesc->bDisableCollMesh = bDisabled;
+					const bool bDisabled = IterCollisionDisabled->get<bool>();
+					pOutDesc->bHasCollMeshEdited = true;
+					pOutDesc->bCreateCollMesh = !bDisabled;
+					pOutDesc->bDisableCollMesh = bDisabled;
+				}
 			}
 		}
 

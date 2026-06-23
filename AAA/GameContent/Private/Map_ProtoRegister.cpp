@@ -18,8 +18,7 @@ namespace
 		const ENV_COLLISION_DESC& Collision = Desc.tCollision;
 
 		return Collision.eColliderKind == ENV_COLLIDER_KIND::MODEL_MESH
-			&& Collision.bHasDecorCollisionApxbin
-			&& !Collision.bInvalidCollision;
+			&& Collision.bCookCollMesh;
 	}
 }
 

@@ -35,19 +35,23 @@ private:
 
 private:
 	unordered_map<CGameObject*, _float3>	m_RotEditEuler;
+	unordered_map<CGameObject*, _bool>		m_EnvShadowEditStates;
 	unordered_map<CGameObject*, _bool>		m_EnvCollMeshEditStates;
 	unordered_map<CMapSection*, _bool>		m_MapCollMeshEditStates;
 	unordered_map<CGameObject*, _bool>		m_EnvNearAlphaEditStates;
 
+
 	CMapSection* m_pFocusedMapSection = { nullptr };
 
 private:
+	_bool*	Resolve_EnvShadowEditState(CLevel_Edit* pLevel, CEnvObject* pEnvObject);
 	_bool*	Resolve_EnvCollMeshEditState(CLevel_Edit* pLevel, CEnvObject* pEnvObject);
 	_bool*	Resolve_MapCollMeshEditState(CLevel_Edit* pLevel, CMapStage* pMapStage, CMapSection* pSection);
 	_bool*	Resolve_EnvNearAlphaEditState(CLevel_Edit* pLevel, CEnvObject* pEnvObject);
-	void	Clear_EnvCollMeshEditState(CGameObject* pObject);
-	void	Clear_MapCollMeshEditState(CMapSection* pSection);
-	void	Clear_EnvNearAlphaEditState(CGameObject* pObject);
+	void    Clear_EnvShadowEditState(CGameObject* pObject);
+	void    Clear_EnvCollMeshEditState(CGameObject* pObject);
+	void    Clear_MapCollMeshEditState(CMapSection* pSection);
+	void    Clear_EnvNearAlphaEditState(CGameObject* pObject);
 
 public:
 	static CPanel_Inspector* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

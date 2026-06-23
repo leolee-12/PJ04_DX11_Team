@@ -42,17 +42,21 @@ struct MAP_ENV_EDITED_DESC
 	_bool bHasEnableCulling = { false };
 	_bool bEnableCulling = { true };
 
-	_bool bHasCastShadow = { false };
-	_bool bCastShadow = { false };
+	_bool bHasShadow = { false }; // Edit JSON contains UseShadow.
+	_bool bUseShadow = { false };
+
+	_bool bHasCastShadow = { false }; // Legacy read compatibility only.
+	_bool bCastShadow = { false };    // Legacy read compatibility only.
 
 	_bool bHasWorldMatrix = { false };
 	_float4x4 matWorld = {};
 
-	_bool bDisableCollMesh = { false };
-	// Legacy read compatibility only.
+	_bool bHasCollMesh = { false }; // Edit JSON contains UseCollMesh.
+	_bool bUseCollMesh = { false };
 
-	_bool bHasCollMeshEdited = { false };
-	_bool bCreateCollMesh = { true };
+	_bool bDisableCollMesh = { false };   // Legacy read compatibility only.
+	_bool bHasCollMeshEdited = { false }; // Legacy read compatibility only.
+	_bool bCreateCollMesh = { true };     // Legacy read compatibility only.
 
 	_bool bHasNearDistAlpha = { false };
 	_bool bUseNearDistAlpha = { false };
@@ -167,9 +171,11 @@ inline _bool Has_AnyMapEnvEdit(const MAP_ENV_EDITED_DESC& Edit)
 {
 	return Edit.bHasRenderable
 		|| Edit.bHasEnableCulling
+		|| Edit.bHasShadow
 		|| Edit.bHasCastShadow
 		|| Edit.bHasWorldMatrix
 		|| Edit.bHasNearDistAlpha
+		|| Edit.bHasCollMesh
 		|| Edit.bHasCollMeshEdited
 		|| Edit.bDisableCollMesh;
 }
