@@ -4,6 +4,8 @@
 
 NS_BEGIN(Client)
 
+class CMultiHitBoxPart;
+
 class CBoss abstract : public CBossBase
 {
     GENERATED_BODY_ABSTRACT(CBoss)
@@ -15,6 +17,9 @@ protected:
 
 public:
     virtual HRESULT Initialize(void* pArg) override;
+
+public:
+    virtual CMultiHitBoxPart* Get_HitBoxPart() const { return nullptr; }
 
     _int  Get_Phase() const { return m_iPhase; }
     _bool Is_PhaseTransitioning() const { return m_bPhaseTransition; }
@@ -30,6 +35,8 @@ protected:
 
     virtual void  On_Enter_Corpse() override;     // ∫∏Ω∫ ªÁ∏¡(»Ì¿‘»≠ X) + Boss_Died
     void          Publish_Boss_Died();
+
+   
 
 private:
     void Check_PhaseTransition();

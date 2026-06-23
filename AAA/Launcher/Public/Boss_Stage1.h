@@ -5,11 +5,11 @@
 
 NS_BEGIN(Client)
 
-class CTown_Step1 final : public CLevel
+class CBoss_Stage1 final : public CLevel
 {
 private:
-	CTown_Step1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	virtual ~CTown_Step1() = default;
+	CBoss_Stage1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	virtual ~CBoss_Stage1() = default;
 
 public:
 	virtual HRESULT Initialize() override;
@@ -22,7 +22,7 @@ private:
 	HRESULT Ready_Camera();
 
 public:
-	static CTown_Step1* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CBoss_Stage1* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void Free() override;
 };
 

@@ -96,55 +96,11 @@ void CLoader::Add_Work(function<HRESULT()>&& func)
     ++m_iTotalWorkCount;
 }
 
-HRESULT CLoader::Ready_StaticResources()
-{
-    Add_Work([this]() -> HRESULT
-        {
-            return Ready_Prototype_SharedResources(m_pGameInstance_Proxy, m_pDevice, m_pContext);
-        }
-    );
-
-    Add_Work([this]() -> HRESULT
-        {
-            return Ready_Prototype_Shaders(m_pGameInstance_Proxy, m_pDevice, m_pContext);
-        }
-    );
-
-    return S_OK;
-}
-
-HRESULT CLoader::Ready_WorkQueue()
-{
-    switch (m_eNextLevelID)
-    {   
-    case Client::LEVEL::STATIC:
-        break;
-    case Client::LEVEL::LOADING:
-        break;
-    case Client::LEVEL::GAMEPLAY:
-        Ready_Resources_For_GamePlay();
-        break;
-    case Client::LEVEL::TEST:
-        Ready_Resources_For_Test();
-        break;
-    case Client::LEVEL::TOWN_STEP1:
-        Ready_Resources_For_TownStep1();
-        break;
-    case Client::LEVEL::END:
-        break;
-    default:
-        break;
-    }
-    return E_NOTIMPL;
-}
-
-HRESULT CLoader::Ready_Resources_For_GamePlay()
+HRESULT CLoader::Read_Manifest(const _tchar* path, const LEVEL eLevel)
 {
     LEVEL_MANIFEST Manifest{};
-    if (FAILED(Load_LevelManifest(LAUNCHER_LEVEL_PROFILES::LEVEL_STAGE0_STEP1, &Manifest)))
+    if (FAILED(Load_LevelManifest(path, &Manifest)))
         return E_FAIL;
-
-    LEVEL eLevel = LEVEL::GAMEPLAY;
 
     Add_Work([this, Manifest, eLevel]() -> HRESULT
         {
@@ -194,6 +150,60 @@ HRESULT CLoader::Ready_Resources_For_GamePlay()
             });
     }
 
+    return S_OK;
+}
+
+HRESULT CLoader::Ready_StaticResources()
+{
+    Add_Work([this]() -> HRESULT
+        {
+            return Ready_Prototype_SharedResources(m_pGameInstance_Proxy, m_pDevice, m_pContext);
+        }
+    );
+
+    Add_Work([this]() -> HRESULT
+        {
+            return Ready_Prototype_Shaders(m_pGameInstance_Proxy, m_pDevice, m_pContext);
+        }
+    );
+
+    return S_OK;
+}
+
+HRESULT CLoader::Ready_WorkQueue()
+{
+    switch (m_eNextLevelID)
+    {   
+    case LEVEL::STATIC:
+        break;
+    case LEVEL::LOADING:
+        break;
+    case LEVEL::GAMEPLAY:
+        if (FAILED(Read_Manifest(LAUNCHER_LEVEL_PROFILES::LEVEL_STAGE0_STEP1, LEVEL::GAMEPLAY)))
+            return E_FAIL;
+        break;
+    case LEVEL::TEST:
+        if (FAILED(Read_Manifest(LAUNCHER_LEVEL_PROFILES::LEVEL_TEST, LEVEL::TEST)))
+            return E_FAIL;
+        break;
+    case LEVEL::TOWN_STEP1:
+        if (FAILED(Read_Manifest(LAUNCHER_LEVEL_PROFILES::LEVEL_TOWN_STEP1, LEVEL::TOWN_STEP1)))
+            return E_FAIL;
+        break;
+    case LEVEL::BOSS_STAGE1:
+        if (FAILED(Read_Manifest(LAUNCHER_LEVEL_PROFILES::LEVEL_BOSS_STAGE1, LEVEL::BOSS_STAGE1)))
+            return E_FAIL;
+        break;
+    case LEVEL::END:
+        break;
+    default:
+        break;
+    }
+    return S_OK;
+}
+
+HRESULT CLoader::Ready_Resources_For_GamePlay()
+{
     return S_OK;
 }
 
@@ -313,6 +323,11 @@ HRESULT CLoader::Ready_Resources_For_TownStep1()
     }
 
     return S_OK;
+}
+
+HRESULT CLoader::Ready_Resources_For_BossStage1()
+{
+    return E_NOTIMPL;
 }
 
 CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID, _bool Initialized)

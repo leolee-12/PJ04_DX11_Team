@@ -48,12 +48,6 @@ void CGigantEdge::Update(_float fTimeDelta)
     __super::Update(fTimeDelta); 
 }  
 
-void CGigantEdge::On_Deserialized() 
-{ 
-    __super::On_Deserialized(); 
-    m_pTransformCom->Set_Scale(2.f, 2.f, 2.f);
-}
-
 CMonsterBrain* CGigantEdge::Create_Brain()
 {
     return CGigantEdge_Brain::Create();
