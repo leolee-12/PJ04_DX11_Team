@@ -51,11 +51,46 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
         };
 
     auto MakeArmSpin = [&]() -> CBTNode* {
+        const _float fSpinDuration = 5.f;     // 스핀 지속 시간
+        const _float fSpinTurnDeg = 120.f;   // 스핀 중 타겟 추적 회전 속도(deg/s)
+        auto fSpinT = make_shared<_float>(0.f);
+        auto bSpin = make_shared<bool>(false);
+
+        auto* pSpinChase = CBTAction::Create(
+            [this, fSpinT, bSpin, fSpinDuration, fSpinTurnDeg, fSpd](CBlackboard* pBB, _float dt) -> BT_STATUS {
+                if (!*bSpin) {
+                    m_pOwner->Get_BodyAnimator()->Play("ArmSpin", true, true, 0.2f, fSpd);
+                    *bSpin = true;
+                }
+                *fSpinT += dt;
+
+                _float3 vDir = pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 0.f));
+                _vector vToTgt = XMLoadFloat3(&vDir);
+                if (!XMVector3Equal(vToTgt, XMVectorZero())) {
+                    m_pOwner->Add_MoveDir(vDir);
+                    CTransform* pTf = m_pOwner->Get_Transform();
+                    _vector vLook = XMVector3Normalize(XMVectorSetY(pTf->Get_State(STATE::LOOK), 0.f));
+                    _float  fDot = XMVectorGetX(XMVector3Dot(vLook, vToTgt));
+                    _float  fCross = XMVectorGetZ(vLook) * XMVectorGetX(vToTgt)
+                        - XMVectorGetX(vLook) * XMVectorGetZ(vToTgt);
+                    _float  fYaw = atan2f(fCross, fDot);
+                    _float  fStep = XMConvertToRadians(fSpinTurnDeg) * dt;
+                    _float  fApply = (fabsf(fYaw) <= fStep) ? fYaw : (fYaw > 0.f ? fStep : -fStep);
+                    pTf->Rotate(XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fApply));
+                }
+
+                if (*fSpinT >= fSpinDuration) { *fSpinT = 0.f; *bSpin = false; return BT_STATUS::SUCCESS; }
+                return BT_STATUS::RUNNING;
+            },
+            [fSpinT, bSpin]() { *fSpinT = 0.f; *bSpin = false; });
+
         return CBTSequence::Create({
             OneShot("ArmSpinChargeStart"),
             HoldLoop("ArmSpinChargeLoop", fChargeTime),
             OneShot("ArmSpinStart"),
-            HoldLoop("ArmSpin", 5.f),
+            HitBox(CBoss_Gorilla_Body::GHB_SPIN, true),
+            pSpinChase,                                  // 기존 HoldLoop("ArmSpin", 5.f) 대체
+            HitBox(CBoss_Gorilla_Body::GHB_SPIN, false),
             OneShot("ArmSpinEnd"),
             });
         };

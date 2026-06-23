@@ -18,6 +18,10 @@ HRESULT CBoss_Gorilla_Body::Initialize(void* pArg)
     Add_HitBox(GHB_RHAND, "RHaveL", COLLIDER::SPHERE, 3.f, 0.f, 15.f, 10.f);
     Add_HitBox(GHB_LHAND, "LHaveL", COLLIDER::SPHERE, 3.f, 0.f, 15.f, 10.f);
 
+    Add_HitBox(GHB_SPIN,  "RotL",   COLLIDER::SPHERE, 15.f, 0.f, 15.f, 10.f);
+
+    //Enable_AllHitBoxes(true);
+
     m_pAnimatorCom->Play("Wait", false);
 
     return S_OK;

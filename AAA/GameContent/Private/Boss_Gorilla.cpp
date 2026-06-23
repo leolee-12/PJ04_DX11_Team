@@ -28,7 +28,7 @@ HRESULT CBoss_Gorilla::Initialize(void* pArg)
 
     m_strBossName = L"고릴라 보스";
     m_fMaxHP = 1000.f;    
-    m_fCurHP = m_fMaxHP;
+    m_fCurHP = 400.f;
 
     if (m_pMovement)
     {

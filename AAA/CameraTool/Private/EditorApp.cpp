@@ -6,6 +6,7 @@
 
 #include "Loader_Prototype.h"
 #include "GameObject_Factory.h"
+#include "Effect_Loader.h"
 
 CEditorApp::CEditorApp()
 {
@@ -34,6 +35,8 @@ HRESULT CEditorApp::Initialize()
     Ready_EditRTV();
     m_pGameInstance_Proxy->Bind_RenderTarget(m_pRTV, m_pDSV, g_iWinSizeX, g_iWinSizeY);
 
+    CGameObject_Factory::GetInstance()->RegisterAll();
+
     if (FAILED(Ready_SharedResources()))
         return E_FAIL;
 
@@ -42,8 +45,6 @@ HRESULT CEditorApp::Initialize()
 
     m_pImGui_Manager = CImGui_Manager::GetInstance();
     Safe_AddRef(m_pImGui_Manager);
-
-    CGameObject_Factory::GetInstance()->RegisterAll();
 
     CLevel_Edit* pPreLevel = CLevel_Edit::Create(m_pDevice, m_pContext);
     if (nullptr == pPreLevel)
@@ -199,6 +200,9 @@ CEditorApp* CEditorApp::Create()
 void CEditorApp::Free()
 {
     __super::Free();
+
+    CEffect_Loader::DestroyInstance();
+
     Safe_Release(m_pRTV);
     Safe_Release(m_pSRV);
     Safe_Release(m_pDSV);

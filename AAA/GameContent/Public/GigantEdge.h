@@ -31,7 +31,6 @@ public:
 public:
     virtual void    Update(_float fTimeDelta) override;
     virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* p) override { p->strPrototypeTag = PROTOTYPE_TAG; }
-    virtual void    On_Deserialized() override;
 
 public:
     CGigantEdge_Body* Get_Body()   const { return m_pBody; }
