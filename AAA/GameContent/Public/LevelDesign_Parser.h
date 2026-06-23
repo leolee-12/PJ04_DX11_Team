@@ -12,18 +12,18 @@ public:
 
 private:
 	static void Parse_ObjectSection(const _wstring& wstrSourcePath, const _wstring& strSourceFile,
-		const _wstring& strSection, const json& jSection, vector<LD_PARSED_OBJECT>* pOutDescs);
+		const _wstring& strSection, const json& jSection, vector<LD_OBJECT_ENTRY>* pOutDescs);
 
 	static void Parse_StepLinkInfo(const json& jArray, vector<LD_STEP_LINK_INFO>* pOutStepLinks);
 
-	static LD_PARSED_OBJECT Make_BaseDesc(const _wstring& wstrSourcePath, const _wstring& strSourceFile,
+	static LD_OBJECT_DESC Make_BaseDesc(const _wstring& wstrSourcePath, const _wstring& strSourceFile,
 		const _wstring& strSection, const _wstring& strEntryKey, const json& jEntry);
 
-	static void Fill_Common(const json& jEntry, LD_PARSED_OBJECT* pDesc);
+	static void Fill_Common(const json& jEntry, LD_OBJECT_DESC* pDesc);
 	static void Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJECT* pDesc);
 
 private:
-	static void Build_TransformDesc(LD_PARSED_OBJECT* pDesc);
+	static void Build_TransformDesc(LD_OBJECT_DESC* pDesc);
 };
 
 NS_END

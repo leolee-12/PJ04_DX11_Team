@@ -481,7 +481,7 @@ void CGameObject_Factory::Register_NonAnimObject()
 
     Register(CLevelDesign_Breakable::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Breakable),
         LOADER(TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CLevelDesign_Breakable::STARBLOCK_MODEL_PROTO_TAG,
-            CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/Star/H1W1.ysh"));));
+            CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh"));));
 }
 
 void CGameObject_Factory::Register_AnimObject()

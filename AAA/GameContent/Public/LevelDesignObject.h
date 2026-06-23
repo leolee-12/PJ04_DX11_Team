@@ -18,22 +18,13 @@ public:
 
 	_wstring		Make_LevelDesignObjectKey() const;
 
-public:
-	const LD_COMMON_DESC&	Get_LevelDesignDesc() const { return m_tLevelDesignDesc; }
-	LD_CATEGORY				Get_LevelDesignCategory() const { return m_tLevelDesignDesc.eCategory; }
-	const _wstring&			Get_LevelDesignObjectName() const { return m_tLevelDesignDesc.strObjectName; }
-	const _wstring&			Get_LevelDesignKind() const { return m_tLevelDesignDesc.strKind; }
-	const _wstring&			Get_LevelDesignSection() const { return m_tLevelDesignDesc.strSection; }
-	const _wstring&			Get_LevelDesignEntryKey() const { return m_tLevelDesignDesc.strEntryKey; }
-	_uint					Get_LevelDesignUid() const { return m_tLevelDesignDesc.iUid; }
-	_uint					Get_TargetRailUid() const { return m_tLevelDesignDesc.iTargetRailUid; }
+	const LD_OBJECT_DESC& Get_LevelDesignDesc() const { return m_tLevelDesignDesc; }
 
 protected:
-	const LD_COMMON_DESC&	Desc() const { return m_tLevelDesignDesc; }
-	LD_COMMON_DESC&			Desc() { return m_tLevelDesignDesc; }
+	LD_OBJECT_DESC	m_tLevelDesignDesc = {};
 
 protected:
-	LD_COMMON_DESC			m_tLevelDesignDesc = {};
+	virtual HRESULT Validate_Desc() { return S_OK; };
 
 protected:
 	virtual void Free() override;

@@ -26,6 +26,7 @@ enum class MAP_PASS : _uint
 	MASK,
 
 	UKWN,
+	DISCARD,
 
 	_COUNT
 };
@@ -41,15 +42,16 @@ struct MAP_SHADER_PASS_META
 
 inline constexpr MAP_SHADER_PASS_META g_MapShaderPassMetas[] =
 {
-	{ MAP_PASS::SHADOW,	"Shadow",	0 },
-	{ MAP_PASS::WHITE,	"White",	0 },
-	{ MAP_PASS::DIFF,	"DIFF",		PASS_TEX_DIFFUSE },
-	{ MAP_PASS::DN,		"DN",		PASS_TEX_DIFFUSE | PASS_TEX_NORMAL },
-	{ MAP_PASS::DMN,	"DMN",		PASS_TEX_DIFFUSE | PASS_TEX_NORMAL | PASS_TEX_MRA },
-	{ MAP_PASS::DMNU,	"DMNU",		PASS_TEX_DIFFUSE | PASS_TEX_NORMAL | PASS_TEX_MRA | PASS_TEX_UNKNOWN },
-	{ MAP_PASS::TOP,    "TOP",      PASS_TEX_DIFFUSE | PASS_TEX_NORMAL | PASS_TEX_MRA },
-	{ MAP_PASS::MASK,   "MASK",     PASS_TEX_DIFFUSE | PASS_TEX_NORMAL | PASS_TEX_MRA },
-	{ MAP_PASS::UKWN,   "UKWN",     PASS_TEX_UNKNOWN },
+	{ MAP_PASS::SHADOW,		"Shadow",	0 },
+	{ MAP_PASS::WHITE,		"White",	0 },
+	{ MAP_PASS::DIFF,		"DIFF",		PASS_TEX_DIFFUSE },
+	{ MAP_PASS::DN,			"DN",		PASS_TEX_DIFFUSE | PASS_TEX_NORMAL },
+	{ MAP_PASS::DMN,		"DMN",		PASS_TEX_DIFFUSE | PASS_TEX_NORMAL | PASS_TEX_MRA },
+	{ MAP_PASS::DMNU,		"DMNU",		PASS_TEX_DIFFUSE | PASS_TEX_NORMAL | PASS_TEX_MRA | PASS_TEX_UNKNOWN },
+	{ MAP_PASS::TOP,		"TOP",		PASS_TEX_DIFFUSE | PASS_TEX_NORMAL | PASS_TEX_MRA },
+	{ MAP_PASS::MASK,		"MASK",		PASS_TEX_DIFFUSE | PASS_TEX_NORMAL | PASS_TEX_MRA },
+	{ MAP_PASS::UKWN,		"UKWN",		PASS_TEX_UNKNOWN },
+	{ MAP_PASS::DISCARD,	"DISCARD",	0 },
 };
 
 inline _bool Is_ValidMapPassValue(_int iPass)
@@ -105,6 +107,7 @@ enum class ENV_PASS : _int
 	TREESHADOW,
 	GRASS_FUR,
 	MN,
+	DISCARD,
 
 	_COUNT
 };
@@ -127,6 +130,7 @@ namespace ShaderPass
 		inline constexpr _uint TREESHADOW = 10;
 		inline constexpr _uint GRASS_FUR = 11;
 		inline constexpr _uint MN = 12;
+		inline constexpr _uint DISCARD = 13;
 	}
 
 	namespace EnvInstFlags
@@ -156,7 +160,43 @@ inline constexpr ENV_SHADER_PASS_META g_EnvShaderPassMetas[] =
 	{ ENV_PASS::TREESHADOW,	ShaderPass::NonAnimPBR::TREESHADOW,	"TREESHADOW",	PASS_TEX_UNKNOWN },
 	{ ENV_PASS::GRASS_FUR,	ShaderPass::NonAnimPBR::GRASS_FUR,	"GRASS_FUR",	PASS_TEX_UNKNOWN | PASS_TEX_MRA | PASS_TEX_NORMAL },
 	{ ENV_PASS::MN,			ShaderPass::NonAnimPBR::MN,			"MN",			PASS_TEX_MRA | PASS_TEX_NORMAL },
+	{ ENV_PASS::DISCARD,	ShaderPass::NonAnimPBR::DISCARD,	"DISCARD",		0 },
 };
+
+enum class ENV_SHADOW_ALPHA_SOURCE : _uint
+{
+	NONE = 0u,
+	DIFFUSE = 1u,
+	UNKNOWN = 2u,
+	DISCARD_ALL = 3u,
+};
+
+inline ENV_SHADOW_ALPHA_SOURCE Resolve_EnvShadowAlphaSource(ENV_PASS ePass)
+{
+	switch (ePass)
+	{
+	case ENV_PASS::DEFAULT:
+	case ENV_PASS::DIFF:
+	case ENV_PASS::DMN:
+	case ENV_PASS::DMNU:
+	case ENV_PASS::TREESHADOW:
+	case ENV_PASS::GRASS_FUR:
+		return ENV_SHADOW_ALPHA_SOURCE::DIFFUSE;
+
+	case ENV_PASS::UKWN:
+	case ENV_PASS::UMN:
+		return ENV_SHADOW_ALPHA_SOURCE::UNKNOWN;
+
+	case ENV_PASS::DISCARD:
+		return ENV_SHADOW_ALPHA_SOURCE::DISCARD_ALL;
+
+	case ENV_PASS::WHITE:
+	case ENV_PASS::MN:
+	case ENV_PASS::SHADOW:
+	default:
+		return ENV_SHADOW_ALPHA_SOURCE::NONE;
+	}
+}
 
 inline const ENV_SHADER_PASS_META* Find_EnvShaderPassMeta(_int iPass)
 {

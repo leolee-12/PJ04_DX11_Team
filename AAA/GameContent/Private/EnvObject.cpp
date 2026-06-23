@@ -11,11 +11,11 @@ NS_BEGIN(Client)
 
 namespace
 {
-	constexpr _bool ENABLE_ENV_OBJECT_SHADOW = true;
-	constexpr _float ENV_DISTANCE_CULL_START = 175.f;
-	constexpr _float ENV_SHADOW_DISTANCE_CULL_START = 80.f;
-	constexpr _float ENV_PICK_AABB_PADDING = 0.05f;
-	constexpr _float ENV_PICK_THIN_EXTENT = 0.06f;
+	constexpr _bool		ENABLE_ENV_OBJECT_SHADOW = false;
+	constexpr _float	ENV_DISTANCE_CULL_START = 175.f;
+	constexpr _float	ENV_SHADOW_DISTANCE_CULL_START = 100.f;
+	constexpr _float	ENV_PICK_AABB_PADDING = 0.05f;
+	constexpr _float	ENV_PICK_THIN_EXTENT = 0.06f;
 
 	void Log_EnvPhysicsWarning(const string& strMessage)
 	{
@@ -105,6 +105,9 @@ namespace
 
 CEnvObject::CEnvObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{pDevice, pContext}
+	, m_bRenderable{false}
+	, m_bEnableCulling{false}
+	, m_bCastShadow{false}
 {
 }
 
@@ -112,6 +115,9 @@ CEnvObject::CEnvObject(const CEnvObject& Prototype)
 	: CGameObject(Prototype)
 	, m_tDesc(Prototype.m_tDesc)
 	, m_strProtoTag(Prototype.m_strProtoTag)
+	, m_bRenderable{ Prototype.m_bRenderable }
+	, m_bEnableCulling{ Prototype.m_bEnableCulling }
+	, m_bCastShadow{ Prototype.m_bCastShadow }
 {
 }
 
@@ -483,9 +489,49 @@ HRESULT CEnvObject::Render_Shadow()
 	size_t n = m_pModelCom->Get_NumMeshes();
 	for (size_t i = 0; i < n; ++i)
 	{
+		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(static_cast<_uint>(i));
+
+		auto BindMaterial = [&](const _char* pConstantName, MTEX_TYPE eType, DEFAULT_TEXTURE eDefaultKind) -> HRESULT
+			{
+				const _uint iLayerIndex = Layer.idx[ETOUI(eType)];
+				const _uint iTextureCount = m_pModelCom->Get_MeshTextureCount(static_cast<_uint>(i), eType);
+
+				if (iTextureCount > 0u)
+				{
+					const _uint iSafeIndex = (iLayerIndex < iTextureCount) ? iLayerIndex : (iTextureCount - 1u);
+
+					if (SUCCEEDED(m_pModelCom->Bind_Material(m_pShaderCom, pConstantName, static_cast<_uint>(i), eType, iSafeIndex)))
+						return S_OK;
+				}
+
+				return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(m_pShaderCom, pConstantName, eDefaultKind);
+			};
+
+		if (FAILED(BindMaterial("g_DiffuseTexture", MTEX_TYPE::DIFFUSE, DEFAULT_TEXTURE::MAGENTA)))
+			return E_FAIL;
+		if (FAILED(BindMaterial("g_UnknownTexture", MTEX_TYPE::UNKNOWN, DEFAULT_TEXTURE::BLACK)))
+			return E_FAIL;
+
+		const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint))))
+			return E_FAIL;
+
+		const _float4 vUVTransform = Layer.bUseUVTransform
+			? _float4{ Layer.vUVScale.x, Layer.vUVScale.y, Layer.vUVOffset.x, Layer.vUVOffset.y }
+		: _float4{ 1.f, 1.f, 0.f, 0.f };
+
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_vUVTransform", &vUVTransform, sizeof(vUVTransform))))
+			return E_FAIL;
+
+		const ENV_SHADER_PASS_META* pMeta = Find_EnvShaderPassMeta(Layer.iPass);
+		const _uint iShadowAlphaSource = static_cast<_uint>(Resolve_EnvShadowAlphaSource(pMeta->ePass));
+
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_iShadowAlphaSource", &iShadowAlphaSource, sizeof(_uint))))
+			return E_FAIL;
+
 		if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::Shadow)))
 			return E_FAIL;
-		if (FAILED(m_pModelCom->Render((_uint)i)))
+		if (FAILED(m_pModelCom->Render(static_cast<_uint>(i))))
 			return E_FAIL;
 	}
 	return S_OK;

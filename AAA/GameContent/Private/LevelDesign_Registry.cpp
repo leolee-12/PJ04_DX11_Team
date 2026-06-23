@@ -2,6 +2,10 @@
 #include "LevelDesign_Unsupported.h"
 #include "LevelDesign_Breakable.h"
 #include "LevelDesign_Rail.h"
+#include "LevelDesign_Ladder.h"
+#include "LevelDesign_Food.h"
+#include "LevelDesign_Point.h"
+#include "LevelDesign_Bush.h"
 
 #include <cwctype>
 #include <mutex>
@@ -28,14 +32,24 @@ namespace
 		return CLevelDesign_Unsupported::Create(pDevice, pContext);
 	}
 
-	CGameObject* Create_BreakablePrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	{
-		return CLevelDesign_Breakable::Create(pDevice, pContext);
-	}
-
 	CGameObject* Create_RailPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	{
 		return CLevelDesign_Rail::Create(pDevice, pContext);
+	}
+
+	_bool Build_ParsedObjectDesc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
+	{
+		UNREFERENCED_PARAMETER(jEntry);
+
+		if (nullptr == pOutEntry)
+			return false;
+
+		LD_PARSED_OBJECT Desc{};
+		static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
+		Desc.eCategory = Spec.eCategory;
+
+		*pOutEntry = Desc;
+		return true;
 	}
 
 	void Register_Unsupported(const _wstring& strObjectName, LD_CATEGORY eCategory, const _tchar* pLayerTag)
@@ -66,7 +80,8 @@ void CLevelDesign_Registry::Initialize()
 			g_FallbackSpec.strLayerTag = L"Layer_LevelDesign_Unsupported";
 			g_FallbackSpec.eCategory = LD_CATEGORY::UNSUPPORTED;
 			g_FallbackSpec.pPrototypeFactory = &Create_UnsupportedPrototype;
-			
+			g_FallbackSpec.pBuildDesc = &Build_ParsedObjectDesc;
+
 			Register_Core();
 			Register_Volumes();
 			Register_GuideAudio();
@@ -101,56 +116,38 @@ _bool CLevelDesign_Registry::Register(const _wstring& strObjectName, const LD_SP
 	return Inserted;
 }
 
-_bool CLevelDesign_Registry::Resolve(const LD_PARSED_OBJECT& Desc, LD_RESOLVED_SPAWN* pOutResolved)
+_bool CLevelDesign_Registry::Build_Entry(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, LD_OBJECT_ENTRY* pOutEntry)
+{
+	if (nullptr == pOutEntry)
+		return false;
+
+	const LD_SPAWN_SPEC* pSpec = Find(CommonDesc.strObjectName);
+	if (nullptr == pSpec)
+		pSpec = &Get_FallbackSpec();
+
+	if (nullptr == pSpec->pBuildDesc)
+		return false;
+
+	return pSpec->pBuildDesc(CommonDesc, jEntry, *pSpec, pOutEntry);
+}
+
+_bool CLevelDesign_Registry::Resolve(const LD_OBJECT_ENTRY& Desc, LD_RESOLVED_SPAWN* pOutResolved)
 {
 	if (nullptr == pOutResolved)
 		return false;
 
 	*pOutResolved = {};
+	pOutResolved->ObjectDesc = Desc;
 
-	const LD_SPAWN_SPEC* pSpec =
-		Find(Desc.strObjectName);
+	LD_OBJECT_DESC& ResolvedDesc = Get_LDObjectDesc(pOutResolved->ObjectDesc);
 
+	const LD_SPAWN_SPEC* pSpec = Find(ResolvedDesc.strObjectName);
 	if (nullptr == pSpec)
 		pSpec = &Get_FallbackSpec();
 
-	if (pSpec->strPrototypeTag ==
-		CLevelDesign_Breakable::PROTOTYPE_TAG)
-	{
-		if (pSpec->eBreakableType ==
-			LD_BREAKABLE_TYPE::UNKNOWN
-			|| pSpec->wstrModelProtoTag.empty())
-		{
-			pSpec = &Get_FallbackSpec();
-		}
-	}
-
 	pOutResolved->Spec = *pSpec;
-	pOutResolved->bFallback =
-		(pSpec == &Get_FallbackSpec());
-
-	if (pSpec->strPrototypeTag ==
-		CLevelDesign_Breakable::PROTOTYPE_TAG)
-	{
-		static_cast<LD_COMMON_DESC&>(
-			pOutResolved->BreakableDesc) =
-			static_cast<const LD_COMMON_DESC&>(Desc);
-
-		pOutResolved->BreakableDesc.eCategory =
-			pSpec->eCategory;
-		pOutResolved->BreakableDesc.eType =
-			pSpec->eBreakableType;
-		pOutResolved->BreakableDesc.wstrModelProtoTag =
-			pSpec->wstrModelProtoTag;
-
-		pOutResolved->bUseBreakableDesc = true;
-	}
-	else
-	{
-		pOutResolved->ParsedDesc = Desc;
-		pOutResolved->ParsedDesc.eCategory =
-			pSpec->eCategory;
-	}
+	pOutResolved->bFallback = (pSpec == &Get_FallbackSpec());
+	ResolvedDesc.eCategory = pSpec->eCategory;
 
 	return !pOutResolved->Spec.strPrototypeTag.empty()
 		&& !pOutResolved->Spec.strLayerTag.empty();
@@ -225,47 +222,11 @@ void CLevelDesign_Registry::Register_GuideAudio()
 
 void CLevelDesign_Registry::Register_ItemsAndBreakables()
 {
-	Register_Unsupported(L"PointStarYellow", LD_CATEGORY::ITEM, L"Layer_LevelDesign_Item");
-	Register_Unsupported(L"PointStarBlue", LD_CATEGORY::ITEM, L"Layer_LevelDesign_Item");
-	Register_Unsupported(L"PointStarGreen", LD_CATEGORY::ITEM, L"Layer_LevelDesign_Item");
+	CLevelDesign_Breakable::Register_LevelDesignSpecs();
+	CLevelDesign_Food::Register_LevelDesignSpecs();
+	CLevelDesign_Point::Register_LevelDesignSpecs();
+	CLevelDesign_Bush::Register_LevelDesignSpecs();
 
-	Register_Unsupported(L"EnergyDrink", LD_CATEGORY::FOOD, L"Layer_LevelDesign_Item");
-	Register_Unsupported(L"DinnerRoastChicken", LD_CATEGORY::FOOD, L"Layer_LevelDesign_Item");
-	Register_Unsupported(L"FruitCherry", LD_CATEGORY::FOOD, L"Layer_LevelDesign_Item");
-	Register_Unsupported(L"VegetableCarrot", LD_CATEGORY::FOOD, L"Layer_LevelDesign_Item");
-
-	LD_SPAWN_SPEC BreakableSpec{};
-	BreakableSpec.strPrototypeTag = CLevelDesign_Breakable::PROTOTYPE_TAG;
-	BreakableSpec.strLayerTag = L"Layer_LevelDesign_Gimmick";
-	BreakableSpec.eCategory = LD_CATEGORY::BREAKABLE;
-	BreakableSpec.eBreakableType = LD_BREAKABLE_TYPE::STAR_BLOCK;
-	BreakableSpec.pPrototypeFactory = &Create_BreakablePrototype;
-
-	BreakableSpec.strObjectName = L"StarBlock";
-	BreakableSpec.wstrModelProtoTag = CLevelDesign_Breakable::STARBLOCK_H1W1_MODEL_PROTO_TAG;
-	BreakableSpec.ModelRequirements = {
-		{
-			CLevelDesign_Breakable::STARBLOCK_H1W1_MODEL_PROTO_TAG,
-			"../../Resources/Map/Gimmick/Star/H1W1.ysh",
-			ETOUI(LEVEL::GAMEPLAY)
-		}
-	};
-	Register(BreakableSpec.strObjectName, BreakableSpec);
-
-	BreakableSpec.strObjectName = L"StarBlockBig";
-	BreakableSpec.wstrModelProtoTag = CLevelDesign_Breakable::STARBLOCK_H3W3_MODEL_PROTO_TAG;
-	BreakableSpec.ModelRequirements = {
-		{
-			CLevelDesign_Breakable::STARBLOCK_H3W3_MODEL_PROTO_TAG,
-			"../../Resources/Map/Gimmick/Star/H3W3.ysh",
-			ETOUI(LEVEL::GAMEPLAY)
-		}
-	};
-	Register(BreakableSpec.strObjectName, BreakableSpec);
-
-	Register_Unsupported(L"Bush2BasicS", LD_CATEGORY::FOLIAGE, L"Layer_LevelDesign_Gimmick");
-	Register_Unsupported(L"Bush2BasicM", LD_CATEGORY::FOLIAGE, L"Layer_LevelDesign_Gimmick");
-	Register_Unsupported(L"Bush2BasicL", LD_CATEGORY::FOLIAGE, L"Layer_LevelDesign_Gimmick");
 	Register_Unsupported(L"PopFlower", LD_CATEGORY::FOLIAGE, L"Layer_LevelDesign_Gimmick");
 }
 
@@ -280,7 +241,9 @@ void CLevelDesign_Registry::Register_EnemiesAndGimmicks()
 	Register_Unsupported(L"ChainStarter", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
 	Register_Unsupported(L"BlockChainInvisible", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
 	Register_Unsupported(L"TwinkleSwitch", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
-	Register_Unsupported(L"Ladder", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
+
+	CLevelDesign_Ladder::Register_LevelDesignSpecs();
+
 	Register_Unsupported(L"ArrowBoard", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
 }
 
