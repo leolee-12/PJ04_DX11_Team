@@ -74,9 +74,6 @@ void CAnimator::Start_Clip(const ANI_PLAY_INFO& Info)
     if (iIndex < 0)
         return;
 
-    if (Info.bClearMask)
-        Clear_Mask();
-
     m_fBlendDuration = Info.fBlend;
     m_pModel->Set_AnimationIndex(static_cast<_uint>(iIndex), Info.bLoop, Info.bRestart, m_fBlendDuration);
     m_fPlaySpeed = Info.fSpeed;
