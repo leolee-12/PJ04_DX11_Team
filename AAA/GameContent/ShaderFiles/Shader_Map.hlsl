@@ -147,9 +147,9 @@ PS_OUT PS_MAIN(PS_IN In)
     nTS.y = -nTS.y;                                  
     float3 Nw = normalize(mul(nTS, TBN));
 
-    float ao = lerp(1.f, In.vColor1.r, g_fAOStrength);  
-    albedo *= ao;
-    mra.b  *= ao;           
+    //float ao = lerp(1.f, In.vColor1.r, g_fAOStrength);  
+    //albedo *= ao;
+    //mra.b  *= ao;           
 
     Out.vDiffuse = float4(albedo, 1.f);
     Out.vNormal  = float4(Nw * 0.5f + 0.5f, 0.f);

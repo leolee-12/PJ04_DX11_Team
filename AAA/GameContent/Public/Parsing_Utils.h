@@ -248,6 +248,11 @@ namespace JsonUtils
 
 		return true;
 	}
+
+	inline _bool Equals_NoCase(const _tchar* strLeft, const _tchar* pRight)
+	{
+		return 0 == _wcsicmp(strLeft, pRight);
+	}
 }
 
 NS_END

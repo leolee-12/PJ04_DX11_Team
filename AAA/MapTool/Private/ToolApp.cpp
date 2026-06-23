@@ -7,6 +7,7 @@
 #endif
 
 #include "GameObject_Factory.h"
+#include "Effect_Loader.h"
 
 #include "GameInstance.h"
 
@@ -174,6 +175,7 @@ void CToolApp::Free()
 	Safe_Release(m_pEditInstance);
 	CEditInstance::DestroyInstance();
 
+	CEffect_Loader::DestroyInstance();
 	Safe_Release(m_pRTV);
 	Safe_Release(m_pSRV);
 	Safe_Release(m_pDSV);

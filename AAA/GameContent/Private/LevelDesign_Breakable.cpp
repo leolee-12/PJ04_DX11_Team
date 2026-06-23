@@ -1,12 +1,44 @@
 #include "LevelDesign_Breakable.h"
+#include "LevelDesign_Registry.h"
 #include "Shader_PassMeta.h"
+#include "Parsing_Utils.h"
 
-#include "GameInstance_Proxy.h"
-#include "Model.h"
+#include "GameInstance.h"
 
 namespace
 {
-	void Build_DefaultBreakableDesc(Client::LD_BREAKABLE_OBJECT_DESC* pOutDesc)
+	struct LD_BREAKABLE_CATALOG
+	{
+		const _tchar* pObjectName;
+		const _tchar* pModelProtoTag;
+		const _char* pModelPath;
+		MODEL eModelType;
+		_bool bCookCollisionMesh;
+	};
+
+	static const LD_BREAKABLE_CATALOG g_BreakableCatalog[] =
+	{
+			{ L"StarBlock", CLevelDesign_Breakable::STARBLOCK_H1W1_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh", MODEL::NONANIM, false },
+			{ L"StarBlockBig", CLevelDesign_Breakable::STARBLOCK_H3W3_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H3W3.ysh", MODEL::NONANIM, false },
+			{ L"WoodBox", CLevelDesign_Breakable::WOODBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxWood/BoxWood.ysh", MODEL::ANIM, false },
+			{ L"BoxPlastic", CLevelDesign_Breakable::PLASTICBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxPlastic/BoxPlastic.ysh", MODEL::ANIM, false },
+			{ L"BreakableRockS", CLevelDesign_Breakable::BREAKABLE_ROCK_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_S.ysh", MODEL::NONANIM, true },
+			{ L"BreakableRockM", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh", MODEL::NONANIM, true },
+			{ L"BreakableRockMForBridge", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh", MODEL::NONANIM, true }
+	};
+
+	static const LD_BREAKABLE_CATALOG* Find_BreakableCatalog(const _wstring& wstrObjName)
+	{
+		for (const LD_BREAKABLE_CATALOG& Entry : g_BreakableCatalog)
+		{
+			if (JsonUtils::Equals_NoCase(Entry.pObjectName, wstrObjName.c_str()))
+				return &Entry;
+		}
+
+		return nullptr;
+	}
+
+	void Build_DefaultBreakableDesc(LD_BREAKABLE_DESC* pOutDesc)
 	{
 		if (nullptr == pOutDesc)
 			return;
@@ -21,8 +53,7 @@ namespace
 		pOutDesc->strKind = L"Palette";
 
 		pOutDesc->eCategory = LD_CATEGORY::BREAKABLE;
-		pOutDesc->eType = LD_BREAKABLE_TYPE::STAR_BLOCK;
-		pOutDesc->wstrModelProtoTag = CLevelDesign_Breakable::STARBLOCK_H2W2_MODEL_PROTO_TAG;
+		pOutDesc->wstrModelProtoTag = CLevelDesign_Breakable::STARBLOCK_H1W1_MODEL_PROTO_TAG;
 
 		pOutDesc->fScale = 1.f;
 		pOutDesc->vRight = { 1.f, 0.f, 0.f, 0.f };
@@ -56,30 +87,21 @@ HRESULT CLevelDesign_Breakable::Initialize_Prototype()
 
 HRESULT CLevelDesign_Breakable::Initialize(void* pArg)
 {
-	LD_BREAKABLE_OBJECT_DESC DefaultDesc{};
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
 
-	if (nullptr != pArg)
+	if (nullptr == pArg)
 	{
-		m_tBreakableDesc = *static_cast<const LD_BREAKABLE_OBJECT_DESC*>(pArg);
-	}
-	else
-	{
+		LD_BREAKABLE_DESC DefaultDesc{};
 		Build_DefaultBreakableDesc(&DefaultDesc);
 		m_tBreakableDesc = DefaultDesc;
 	}
-
-	m_tBreakableDesc.eCategory = LD_CATEGORY::BREAKABLE;
-
-	if (m_tBreakableDesc.eType == LD_BREAKABLE_TYPE::UNKNOWN)
-		return E_FAIL;
-
-	if (m_tBreakableDesc.wstrModelProtoTag.empty())
-		return E_FAIL;
-
-	if (FAILED(__super::Initialize(&m_tBreakableDesc)))
-		return E_FAIL;
-
-	Desc().eCategory = LD_CATEGORY::BREAKABLE;
+	else
+	{
+		m_tBreakableDesc = *static_cast<const LD_BREAKABLE_DESC*>(pArg);
+		if (FAILED(Validate_Desc()))
+			return E_FAIL;
+	}
 
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
@@ -133,16 +155,38 @@ HRESULT CLevelDesign_Breakable::Render()
 		if (FAILED(BindMaterial("g_MRATexture", MTEX_TYPE::METALNESS, DEFAULT_TEXTURE::MRA)))			return E_FAIL;
 		if (FAILED(BindMaterial("g_UnknownTexture", MTEX_TYPE::UNKNOWN, DEFAULT_TEXTURE::BLACK)))		return E_FAIL;
 
-		const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
-		_uint iFlags = Layer.iFlags;
-		_float fDissolve = 0.f;
+		if (MODEL::ANIM == m_tBreakableDesc.eModelType)
+		{
+			if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+				return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint))))			return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))		return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve", &fDissolve, sizeof(_float))))			return E_FAIL;
+			const _uint iBoxPass = 5u;
 
-		if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::DMN)))
-			return E_FAIL;
+			if (FAILED(m_pShaderCom->Begin(iBoxPass)))
+				return E_FAIL;
+		}
+		else
+		{
+			const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
+			_uint iFlags = Layer.iFlags;
+			_float fDissolve = 0.f;
+
+			if (FAILED(m_pShaderCom->Bind_RawValue(
+				"g_iUVIndex", &iUVIndex, sizeof(_uint))))
+				return E_FAIL;
+
+			if (FAILED(m_pShaderCom->Bind_RawValue(
+				"g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))
+				return E_FAIL;
+
+			if (FAILED(m_pShaderCom->Bind_RawValue(
+				"g_fDissolve", &fDissolve, sizeof(_float))))
+				return E_FAIL;
+
+			if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::DMN)))
+				return E_FAIL;
+		}
+
 		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;
 	}
@@ -158,13 +202,75 @@ void CLevelDesign_Breakable::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
 }
 
+void CLevelDesign_Breakable::Register_LevelDesignSpecs()
+{
+	for (const LD_BREAKABLE_CATALOG& Entry : g_BreakableCatalog)
+	{
+		LD_SPAWN_SPEC Spec{};
+		Spec.strObjectName = Entry.pObjectName;
+		Spec.strPrototypeTag = PROTOTYPE_TAG;
+		Spec.strLayerTag = L"Layer_LevelDesign_Gimmick";
+		Spec.eCategory = LD_CATEGORY::BREAKABLE;
+		Spec.wstrModelProtoTag = Entry.pModelProtoTag;
+		Spec.eModelType = Entry.eModelType;
+		Spec.pPrototypeFactory = &Create_Prototype;
+		Spec.pBuildDesc = &Build_Desc;
+		Spec.ModelRequirements =
+		{
+			{ Entry.pModelProtoTag, Entry.pModelPath, ETOUI(LEVEL::GAMEPLAY), Entry.eModelType, Entry.bCookCollisionMesh }
+		};
+
+		CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
+	}
+}
+
+_bool CLevelDesign_Breakable::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
+{
+	UNREFERENCED_PARAMETER(jEntry);
+
+	if (nullptr == pOutEntry)
+		return false;
+	if (nullptr == Find_BreakableCatalog(CommonDesc.strObjectName))
+		return false;
+	if (Spec.eCategory != LD_CATEGORY::BREAKABLE || Spec.wstrModelProtoTag.empty())
+		return false;
+
+	LD_BREAKABLE_DESC Desc{};
+	static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
+	Desc.eCategory = Spec.eCategory;
+	Desc.eModelType = Spec.eModelType;
+	Desc.wstrModelProtoTag = Spec.wstrModelProtoTag;
+
+	*pOutEntry = Desc;
+	return true;
+}
+
+CGameObject* CLevelDesign_Breakable::Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+	return CLevelDesign_Breakable::Create(pDevice, pContext);
+}
+
+HRESULT CLevelDesign_Breakable::Validate_Desc()
+{
+	if (m_tBreakableDesc.eCategory != LD_CATEGORY::BREAKABLE)
+		return E_FAIL;
+	if (m_tBreakableDesc.wstrModelProtoTag.empty())
+		return E_FAIL;
+
+	return S_OK;
+}
+
 HRESULT CLevelDesign_Breakable::Ready_Components()
 {
 	const _tchar* pModelProtoTag = Resolve_ModelProtoTag();
 	if (nullptr == pModelProtoTag)
 		return E_FAIL;
 
-	m_pShaderCom = Add_Component<CShader>(Shader_NonAnimMesh_PBR.iLevelID, Shader_NonAnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
+	const auto& ShaderDesc = MODEL::ANIM == m_tBreakableDesc.eModelType
+		? Shader_AnimMesh_PBR
+		: Shader_NonAnimMesh_PBR;
+
+	m_pShaderCom = Add_Component<CShader>(ShaderDesc.iLevelID, ShaderDesc.szProtoTag, TEXT("Com_Shader"));
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
@@ -225,9 +331,6 @@ void CLevelDesign_Breakable::Release_PhysicsActor()
 
 HRESULT CLevelDesign_Breakable::Bind_ShaderResources()
 {
-	if (nullptr == m_pShaderCom || nullptr == m_pTransformCom)
-		return E_FAIL;
-
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 

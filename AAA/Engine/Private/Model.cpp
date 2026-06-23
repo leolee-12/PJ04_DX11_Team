@@ -195,7 +195,12 @@ HRESULT CModel::Initialize_Prototype_WithTextureHub(MODEL eType, const _char* pM
 	m_strModelPath = pModelFilePath ? StrToWstr(pModelFilePath) : L"";
 	m_bCookCollisionMesh = bCookCollisionMesh;
 
-	return Ready_NonAnimEx(pModelFilePath, PreTransformMatrix);
+	if (MODEL::ANIM == m_eType && m_bCookCollisionMesh)
+		return E_FAIL;	// 현재 CookCollMesh는 NonAnimMesh만 지원
+
+	return MODEL::ANIM == m_eType
+		? Ready_AnimEx(pModelFilePath, PreTransformMatrix)
+		: Ready_NonAnimEx(pModelFilePath, PreTransformMatrix);
 }
 
 HRESULT CModel::Initialize(void* pArg)
@@ -741,6 +746,34 @@ HRESULT CModel::Ready_NonAnimEx(const _char* pModelFilePath, _fmatrix PreTransfo
 		return E_FAIL;
 
 	Load_MeshLayers(pModelFilePath);
+
+	return S_OK;
+}
+
+HRESULT CModel::Ready_AnimEx(const _char* pModelFilePath, _fmatrix PreTransformMatrix)
+{
+	MODEL_DATA modelData;
+
+	if (FAILED(CDataLoader::Read_ysh(StrToWstr(pModelFilePath).c_str(), modelData)))
+	{
+		return E_FAIL;
+	}
+
+	XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
+
+	if (FAILED(Ready_Bones(modelData.Bones)))
+		return E_FAIL;
+
+	if (FAILED(Ready_Meshes(modelData.Meshes, PreTransformMatrix)))
+		return E_FAIL;
+
+	Load_MeshLayers(pModelFilePath);
+
+	if (FAILED(Ready_MaterialsEx(modelData.Materials)))
+		return E_FAIL;
+
+	if (FAILED(Ready_Animations(modelData.Animations)))
+		return E_FAIL;
 
 	return S_OK;
 }

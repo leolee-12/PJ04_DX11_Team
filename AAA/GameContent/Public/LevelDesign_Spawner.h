@@ -21,9 +21,8 @@ private:
 	CGameInstance_Proxy* m_pProxy = { nullptr };
 
 private:
-	HRESULT Spawn_One(const LD_PARSED_OBJECT& Desc, const LD_SPAWN_REQUEST& Request, LD_LOAD_RESULT* pInOutReport, CGameObject** ppOutCreatedObject);
-
-	_wstring Make_ObjectTag(const LD_PARSED_OBJECT& Desc) const;
+	HRESULT Spawn_One(const LD_OBJECT_ENTRY& Desc, const LD_SPAWN_REQUEST& Request, LD_LOAD_RESULT* pInOutReport, CGameObject** ppOutCreatedObject);
+	_wstring Make_ObjectTag(const LD_OBJECT_DESC& Desc) const;
 
 public:
 	static CLevelDesign_Spawner* Create();
