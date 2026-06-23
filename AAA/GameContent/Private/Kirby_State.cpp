@@ -54,7 +54,7 @@ _bool CKirby_State::Handle_MoveCommand(CKirby* pKirby, CKirby_Command* pCommand)
     return false;
 }
 
-_bool CKirby_State::Try_FallState(CKirby* pKirby)
+_bool CKirby_State::Try_Transition_Fall(CKirby* pKirby)
 {
     CMovement_Child* pMovementCom = pKirby->Get_Movement();
     _float fYVelocity = pMovementCom->Get_VerticalVelocity();
@@ -75,7 +75,16 @@ _bool CKirby_State::Transition_Wait_OR_Run(CKirby* pKirby)
         pKirby->Change_State(KIRBY_STATE_TYPE::RUN);
     else
         pKirby->Change_State(KIRBY_STATE_TYPE::WAIT);
+
     return true;
+}
+
+_bool CKirby_State::Transition_Fall_OR_Wait_OR_Run(CKirby* pKirby)
+{
+    if (Try_Transition_Fall(pKirby))
+        return true;
+
+    return Transition_Wait_OR_Run(pKirby);
 }
 
 _bool CKirby_State::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)

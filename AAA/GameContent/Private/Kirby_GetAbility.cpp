@@ -58,16 +58,7 @@ void CKirby_GetAbility::Update(CKirby* pKirby, const _float fTimeDelta)
 
     if(pAnimator->Is_Finished() == true)
     {
-        // Fall
-        if (Try_FallState(pKirby) == true)
-        {
-            CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
-            pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::FALL);
-        }
-        // Wait or Run
-        {
-            Transition_Wait_OR_Run(pKirby);
-        }
+        Transition_Fall_OR_Wait_OR_Run(pKirby);
     }
 
     Parts_On(pKirby, fRatio);

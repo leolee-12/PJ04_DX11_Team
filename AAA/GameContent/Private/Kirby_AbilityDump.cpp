@@ -50,17 +50,7 @@ void CKirby_AbilityDump::Update(CKirby* pKirby, const _float fTimeDelta)
 
     if(pAnimator->Is_Finished())
     {
-
-        if (Try_FallState(pKirby) == true)
-        {
-            CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
-            pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::FALL);
-        }
-        else
-        {
-            Transition_Wait_OR_Run(pKirby);
-        }
-
+        Transition_Fall_OR_Wait_OR_Run(pKirby);
         return;
     }
 }
