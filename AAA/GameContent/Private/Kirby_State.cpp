@@ -30,6 +30,11 @@ void CKirby_State::Exit(CKirby* pKirby)
 {
 }
 
+void CKirby_State::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+    pKirby->Change_State(KIRBY_STATE_TYPE::DAMAGED);
+}
+
 _bool CKirby_State::Handle_MoveCommand(CKirby* pKirby, CKirby_Command* pCommand)
 {
     KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();

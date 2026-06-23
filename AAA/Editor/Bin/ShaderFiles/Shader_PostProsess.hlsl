@@ -14,6 +14,7 @@ float g_fBloomIntensity = 1.0f;
 /* SSAO 입력 (G-buffer) */
 Texture2D g_DepthTexture; // x=z/w, y=viewZ/500
 Texture2D g_NormalTexture; // 월드노멀*0.5+0.5
+Texture2D g_GeoNormalTexture;
 Texture2D g_SSAOTexture; // SSAO 결과 (블러 입력)
 
 float4x4 g_ProjMatrixInverse; // 카메라 역투영 (뷰공간 재구성)
@@ -195,21 +196,29 @@ float4 PS_SSAO(PS_IN In) : SV_TARGET0
         return 1.f.xxxx;
 
     float3 viewPos = ViewPosFromUV(In.vTexcoord, ndcZ);
-    float3 worldN = normalize(g_NormalTexture.Sample(PointSampler, In.vTexcoord).xyz * 2.f - 1.f);
-    float3 viewN = normalize(mul(worldN, (float3x3) g_CamViewMatrix));
+
+    float3 worldGeoN = normalize(g_GeoNormalTexture.Sample(PointSampler, In.vTexcoord).xyz * 2.f - 1.f);
+    float3 viewN = normalize(mul(worldGeoN, (float3x3) g_CamViewMatrix));
+
+      // 원근 보정: 멀수록 반경/바이어스를 키워서 화면상 일정 + 그레이징 자기차폐 방지
+    float depthScale = max(viewPos.z, 1.f) * 0.01f; // 0.01 계수는 디버그뷰 보며 튜닝
+    float radius = g_fSSAORadius * depthScale;
+    float bias = g_fSSAOBias * depthScale;
+
+      // 표면에서 노멀 방향으로 살짝 띄운 원점(노멀/깊이 노이즈로 인한 자기차폐 차단)
+    float3 origin = viewPos + viewN * bias;
 
     const int KERNEL = 16;
     float occlusion = 0.f;
-
       [unroll]
     for (int i = 0; i < KERNEL; ++i)
     {
-        float3 dir = Hash3(In.vTexcoord, (float) i);
+        float3 dir = normalize(Hash3(In.vTexcoord, (float) i)); // 방향 정규화
         if (dot(dir, viewN) < 0.f)
-            dir = -dir; // 반구로
+            dir = -dir;
         float scale = (float) i / KERNEL;
-        scale = lerp(0.1f, 1.f, scale * scale); // 가까운 샘플 밀집
-        float3 samplePos = viewPos + dir * scale * g_fSSAORadius;
+        scale = lerp(0.1f, 1.f, scale * scale);
+        float3 samplePos = origin + dir * scale * radius; // viewPos 대신 띄운 origin 기준
 
         float4 offset = mul(float4(samplePos, 1.f), g_CamProjMatrix);
         offset.xyz /= offset.w;
@@ -218,12 +227,9 @@ float4 PS_SSAO(PS_IN In) : SV_TARGET0
             continue;
 
         float sceneZ = ViewPosFromUV(sUV, g_DepthTexture.Sample(PointSampler, sUV).x).z;
-        float rangeCheck = smoothstep(0.f, 1.f, g_fSSAORadius / max(abs(viewPos.z - sceneZ), 1e-4f));
-        
-        float bias = g_fSSAOBias * g_fSSAORadius;
+        float rangeCheck = smoothstep(0.f, 1.f, radius / max(abs(viewPos.z - sceneZ), 1e-4f));
         occlusion += (sceneZ < samplePos.z - bias ? 1.f : 0.f) * rangeCheck;
     }
-
     float ao = pow(saturate(1.f - occlusion / KERNEL), g_fSSAOPower);
     return ao.xxxx;
 }

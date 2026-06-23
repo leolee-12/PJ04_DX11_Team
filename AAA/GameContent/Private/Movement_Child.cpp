@@ -470,6 +470,24 @@ void CMovement_Child::Rotate_To_Direction(_fvector vDir, _float fTimeDelta)
     );
 }
 
+void CMovement_Child::Apply_Knockback(const _float3& vAttackerPos, _float fHorizontalPower, _float fUpPower)
+{
+    _vector vKnockbackOrigin = XMLoadFloat3(&vAttackerPos);
+
+    _vector vMyPos = m_pTransform->Get_State(STATE::POSITION);
+
+    _vector vDir = vMyPos - vKnockbackOrigin;
+    vDir = XMVectorSetY(vDir, 0.f);
+
+    if (XMVectorGetX(XMVector3LengthSq(vDir)) <= 0.0001f)
+        vDir = XMVectorNegate(m_pTransform->Get_State(STATE::LOOK));
+
+    vDir = XMVector3Normalize(vDir);
+
+    Add_Velocity(vDir * fHorizontalPower);
+    Set_VelocityY(fUpPower);
+}
+
 void CMovement_Child::Integrate_Forces(_float fTimeDelta, _vector& vVelocity)
 {
     if (m_fMass <= EPSILON)

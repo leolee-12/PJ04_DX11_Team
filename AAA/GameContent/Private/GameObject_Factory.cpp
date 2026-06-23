@@ -76,6 +76,10 @@
 #include "GigantEdge_Shield.h"
 #include "GigantEdge_Sword.h"
 
+//MainBoss
+#include "Boss_Gorilla.h"
+#include "Boss_Gorilla_Body.h"
+
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
 #include "LevelDesign_Breakable.h"
@@ -123,6 +127,7 @@ void CGameObject_Factory::RegisterAll()
     Register_Camera();
     Register_Test();
     Register_MiniBoss();
+    Register_MainBoss();
     Register_Container();
     Register_UIContainer();
     Register_NonAnimObject();
@@ -511,6 +516,22 @@ void CGameObject_Factory::Register_MiniBoss()
                 CGigantEdge_Sword::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CGigantEdge_Shield::PROTOTYPE_TAG,
                 CGigantEdge_Shield::Create(pDevice, pContext));
+        )
+    );
+}
+
+void CGameObject_Factory::Register_MainBoss()
+{
+    Register(CBoss_Gorilla::PROTOTYPE_TAG, TEXT("MainBoss"),
+        CREATOR(CBoss_Gorilla),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Boss_Gorilla_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Gorilla/Body/Gorilla.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Gorilla_Body::PROTOTYPE_TAG,
+                CBoss_Gorilla_Body::Create(pDevice, pContext));
         )
     );
 }

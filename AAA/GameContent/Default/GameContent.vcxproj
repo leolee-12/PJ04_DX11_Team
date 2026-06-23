@@ -25,6 +25,12 @@
     <ClInclude Include="..\Public\BladeKnight_State_DoubleAttack.h" />
     <ClInclude Include="..\Public\BladeKnight_Sword.h" />
     <ClInclude Include="..\Public\BladeKnight_State_TornadoAttack.h" />
+    <ClInclude Include="..\public\Boss.h" />
+    <ClInclude Include="..\public\BossBase.h" />
+    <ClInclude Include="..\public\Boss_Brain.h" />
+    <ClInclude Include="..\public\Boss_Gorilla.h" />
+    <ClInclude Include="..\public\Boss_Gorilla_Body.h" />
+    <ClInclude Include="..\public\Boss_Gorilla_Brain.h" />
     <ClInclude Include="..\Public\Camera_AreaData.h" />
     <ClInclude Include="..\public\Camera_AreaCam.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
@@ -38,9 +44,9 @@
     <ClInclude Include="..\Public\Env_InstanceBatch.h" />
     <ClInclude Include="..\Public\Env_InstanceController.h" />
     <ClInclude Include="..\public\GigantEdge_Brain.h" />
+    <ClInclude Include="..\Public\Kirby_Damaged.h" />
     <ClInclude Include="..\public\MiniBoss.h" />
     <ClInclude Include="..\public\Inhalable.h" />
-    <ClInclude Include="..\Public\Kirby_Stuffed.h" />
     <ClInclude Include="..\Public\LevelDesign_ProtoRegister.h" />
     <ClInclude Include="..\Public\LevelDesign_Rail.h" />
     <ClInclude Include="..\Public\LevelDesign_Spawner.h" />
@@ -61,6 +67,7 @@
     <ClInclude Include="..\Public\Monster_State_Patrol.h" />
     <ClInclude Include="..\public\Monster_State_Spat.h" />
     <ClInclude Include="..\Public\Monster_State_Retreat.h" />
+    <ClInclude Include="..\public\MultiHitBoxPart.h" />
     <ClInclude Include="..\Public\NormalEnemy.h" />
     <ClInclude Include="..\Public\NormalEnemy_Body.h" />
     <ClInclude Include="..\Public\NormalEnemy_Brain.h" />
@@ -196,6 +203,12 @@
     <ClCompile Include="..\Private\BladeKnight_State_DoubleAttack.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Sword.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State_TornadoAttack.cpp" />
+    <ClCompile Include="..\private\Boss.cpp" />
+    <ClCompile Include="..\private\BossBase.cpp" />
+    <ClCompile Include="..\private\Boss_Brain.cpp" />
+    <ClCompile Include="..\private\Boss_Gorilla.cpp" />
+    <ClCompile Include="..\private\Boss_Gorilla_Body.cpp" />
+    <ClCompile Include="..\private\Boss_Gorilla_Brain.cpp" />
     <ClCompile Include="..\Private\Camera_AreaSolver.cpp" />
     <ClCompile Include="..\private\Camera_AreaCam.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
@@ -220,7 +233,7 @@
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
-    <ClCompile Include="..\Private\Kirby_Stuffed.cpp" />
+    <ClCompile Include="..\Private\Kirby_Damaged.cpp" />
     <ClCompile Include="..\Private\Kirby_GetAbility.cpp" />
     <ClCompile Include="..\Private\Kirby_OnOffPart.cpp" />
     <ClCompile Include="..\Private\Kirby_Fall.cpp" />
@@ -264,6 +277,7 @@
     <ClCompile Include="..\private\Monster_State_Spat.cpp" />
     <ClCompile Include="..\Private\Monster_State_Retreat.cpp" />
     <ClCompile Include="..\Private\Movement_Child.cpp" />
+    <ClCompile Include="..\private\MultiHitBoxPart.cpp" />
     <ClCompile Include="..\Private\NormalEnemy.cpp" />
     <ClCompile Include="..\Private\NormalEnemy_Body.cpp" />
     <ClCompile Include="..\Private\NormalEnemy_Brain.cpp" />
@@ -338,6 +352,7 @@
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_EnvInstance.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_Gorilla.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Kirby.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Map.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_MapEx.hlsl" />

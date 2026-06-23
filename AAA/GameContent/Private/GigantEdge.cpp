@@ -71,6 +71,7 @@ void CGigantEdge::Play_Intro()
     CAnimator::ANI_PLAY_INFO info{};
     info.strAniName = "DemoAppear1";
     info.bLoop = false;
+    info.fBlend = 0.f;
     pAni->Play(&info);
 
     info.strAniName = "DemoAppear2";
@@ -97,48 +98,11 @@ _bool CGigantEdge::Is_Death_Finished() const
     return m_pBody->Get_Animator()->Is_Finished();
 }
 
-void CMiniBoss::On_Damaged(const ATTACK_INFO& tInfo)
-{
-    On_Hit_Reaction(tInfo);
-    Publish_HP();
-}
-
-void CMiniBoss::On_Death(const ATTACK_INFO& tInfo)
-{
-    On_Death_Reaction(tInfo);
-    Publish_HP();
-    Die();
-}
-
 _bool CGigantEdge::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
 {
     Out.fRadius = { s_fCCT_Radius + 0.1f };
     Out.fHeight = { s_fCCT_Height + 0.1f };
     return true;
-}
-
-CGameObject* CMiniBoss::Find_Player() const
-{
-    PLAYER_QUERY q;
-    m_pGameInstance_Proxy->Publish(EVT_QUERY_PLAYER, &q);
-    return q.pPlayer;
-}
-
-void CMiniBoss::Publish_Boss_Appeared()
-{
-    BOSS_HP_APPEARED desc{};
-    desc.strBossName = m_strBossName;
-    desc.fMaxHP = m_fMaxHP;         
-    desc.fCurrHp = m_fCurHP;
-    m_pGameInstance_Proxy->Publish(EventTag::Boss_HP_Appeared, &desc);
-}
-
-void CMiniBoss::Publish_HP()
-{
-    BOSS_HP_UPDATED hp{};
-    hp.fMaxHP = m_fMaxHP;
-    hp.fCurrHp = m_fCurHP;
-    m_pGameInstance_Proxy->Publish(EventTag::Boss_HP_Updated, &hp);
 }
 
 _bool CGigantEdge::Block_Hit(const ATTACK_INFO& tInfo)
@@ -161,8 +125,6 @@ void CGigantEdge::On_Death_Reaction(const ATTACK_INFO& tInfo)
 {
     if (m_pSword)
         m_pSword->Set_HitBox(false);
-    if (m_pHurtBox)
-        m_pHurtBox->Set_Enabled(false);
 }
 
 #ifdef _DEBUG

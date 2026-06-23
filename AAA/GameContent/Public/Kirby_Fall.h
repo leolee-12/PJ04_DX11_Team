@@ -34,7 +34,12 @@ public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
 private:
-	FALL_STATE m_eFallingState{};
+	void Update_FallState(CKirby* pKirby);
+
+	void Change_FallState(FALL_STATE eNewState);
+
+private:
+	FALL_STATE m_eFallState{};
 
 public:
 	static CKirby_Fall* Create();
