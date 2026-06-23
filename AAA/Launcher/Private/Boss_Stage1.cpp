@@ -18,10 +18,10 @@ HRESULT CBoss_Stage1::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
-    _uint iLevel = ETOUI(LEVEL::TOWN_STEP1);
+    _uint iLevel = ETOUI(LEVEL::BOSS_STAGE1);
 
     LEVEL_MANIFEST Manifest{};
-    if (FAILED(Load_LevelManifest(LAUNCHER_LEVEL_PROFILES::LEVEL_TOWN_STEP1, &Manifest)))
+    if (FAILED(Load_LevelManifest(LAUNCHER_LEVEL_PROFILES::LEVEL_BOSS_STAGE1, &Manifest)))
         return E_FAIL;
 
     MAP_LOAD_RESULT MapReport{};
@@ -81,7 +81,7 @@ void CBoss_Stage1::Update(_float fTimeDelta)
 HRESULT CBoss_Stage1::Render()
 {
 #ifdef _DEBUG
-    SetWindowText(g_hWnd, TEXT("Å¸¿î STEP1."));
+    SetWindowText(g_hWnd, TEXT("BOSS_STEP1."));
 #endif
     return S_OK;
 }
@@ -117,7 +117,7 @@ HRESULT CBoss_Stage1::Ready_Lights()
 
 HRESULT CBoss_Stage1::Ready_Camera()
 {
-    m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::TOWN_STEP1),
+    m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::BOSS_STAGE1),
         TEXT("Prototype_GameObject_Camera_Follow"),
         CCamera_AreaCam::Create(m_pDevice, m_pContext));
 
@@ -127,10 +127,10 @@ HRESULT CBoss_Stage1::Ready_Camera()
     CamDesc.fFovy = XMConvertToRadians(50.f); CamDesc.fNear = 0.1f; CamDesc.fFar = 1000.f;
     CamDesc.strTargetLayer = TEXT("Layer_LiveObject");
     CamDesc.strTargetObj = TEXT("Proto_Kirby_0");
-    CamDesc.strDataPath = TEXT("../../Resources/YSH/CameraData/Town_Step1_cam.json");
-    m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::TOWN_STEP1),
+    CamDesc.strDataPath = TEXT("../../Resources/YSH/CameraData/Level1_Stage5_Step01_cam.json");
+    m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::BOSS_STAGE1),
         TEXT("Prototype_GameObject_Camera_Follow"),
-        ETOUI(LEVEL::TOWN_STEP1), TEXT("Layer_Camera"), TEXT("CameraFollow"), &CamDesc);
+        ETOUI(LEVEL::BOSS_STAGE1), TEXT("Layer_Camera"), TEXT("CameraFollow"), &CamDesc);
 
     return S_OK;
 }

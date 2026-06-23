@@ -17,9 +17,6 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	_bool	m_bTestLevelChange = { false };
-
-private:
 	virtual HRESULT Ready_Events() override;
 	HRESULT Ready_Lights();
 	HRESULT Ready_Camera();
