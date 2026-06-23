@@ -212,8 +212,6 @@ PS_OUT PS_DIFF(PS_IN In)
         discard;
 
     float3 albedo = vBase.rgb;
-	//float ao = lerp(1.f, In.vColor1.r, g_fAOStrength);
-	//albedo *= ao;
 
 	Out.vDiffuse = float4(albedo, 1.f);
 	Out.vNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
@@ -246,9 +244,6 @@ PS_OUT PS_DN(PS_IN In)
     float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
     nTS.y = -nTS.y;
     float3 Nw = normalize(mul(nTS, TBN));
-
-	//float ao = lerp(1.f, In.vColor1.r, g_fAOStrength);
-	//albedo *= ao;
 
 	Out.vDiffuse = float4(albedo, 1.f);
 	Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
@@ -283,10 +278,6 @@ PS_OUT PS_DMN(PS_IN In)
     float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
     nTS.y = -nTS.y;
     float3 Nw = normalize(mul(nTS, TBN));
-
-	//float ao = lerp(1.f, In.vColor1.r, g_fAOStrength);
-	//albedo *= ao;
-	//mra.b *= ao;
 
 	Out.vDiffuse = float4(albedo, 1.f);
 	Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
@@ -332,10 +323,6 @@ PS_OUT PS_DMN_TOP(PS_IN In)
     nTS.y = -nTS.y;
     float3 Nw = normalize(mul(nTS, TBN));
 
-    //float ao = lerp(1.f, In.vColor1.r, g_fAOStrength);
-    //albedo *= ao;
-    //mra.b *= ao;
-
     Out.vDiffuse = float4(albedo, 1.f);
     Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
@@ -368,8 +355,6 @@ PS_OUT PS_UKWN(PS_IN In)
         discard;
 
     float3 albedo = vBase.rgb;
-    //float ao = lerp(1.f, In.vColor1.r, g_fAOStrength);
-    //albedo *= ao;
     
     Out.vDiffuse = float4(albedo, 1.f);
     Out.vNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
@@ -378,6 +363,12 @@ PS_OUT PS_UKWN(PS_IN In)
     Out.vEmissive = float4(g_vEmissiveColor.rgb * vBase.a, 1.f);
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
     return Out;
+}
+
+PS_OUT PS_DISCARD(PS_IN In)
+{
+    discard;
+    return (PS_OUT)0;
 }
 
 technique11 DefaultTechnique
@@ -459,5 +450,14 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DMN_MASK();
+    }
+    pass DISCARD // 8
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DISCARD();
     }
 }

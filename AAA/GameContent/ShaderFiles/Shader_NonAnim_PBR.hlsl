@@ -23,6 +23,12 @@ float4 g_vUVTransform = float4(1.f, 1.f, 0.f, 0.f);
 uint g_iEnvInstanceFlags = 0;
 float g_fDissolve;
 
+#define ENV_SHADOW_ALPHA_NONE 0u
+#define ENV_SHADOW_ALPHA_DIFFUSE 1u
+#define ENV_SHADOW_ALPHA_UNKNOWN 2u
+#define ENV_SHADOW_ALPHA_DISCARD_ALL 3u
+uint g_iShadowAlphaSource = ENV_SHADOW_ALPHA_NONE;
+
 static const float Bayer4x4[16] =
 {
     0.0  / 16.0, 8.0  / 16.0, 2.0  / 16.0, 10.0 / 16.0,
@@ -292,6 +298,7 @@ struct VS_SHADOW_OUT
 {
     float4 vPosition : SV_POSITION;
     float4 vProjPos : TEXCOORD0;
+    float2 vTexcoord : TEXCOORD1;
 };
 
 VS_SHADOW_OUT VS_SHADOW(VS_IN In)
@@ -300,6 +307,7 @@ VS_SHADOW_OUT VS_SHADOW(VS_IN In)
     float4 vWorld = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
     Out.vPosition = mul(mul(vWorld, g_ViewMatrix), g_ProjMatrix);
     Out.vProjPos = Out.vPosition;
+    Out.vTexcoord = ApplyMeshUVTransform(Select_UV_PS(In));
     return Out;
 }
 
@@ -308,8 +316,28 @@ struct PS_SHADOW_OUT
     float4 vLightDepth : SV_TARGET0;
 };
 
+void Apply_ShadowAlphaCut(float2 vUV)
+{
+      [branch]
+    if (ENV_SHADOW_ALPHA_DISCARD_ALL == g_iShadowAlphaSource)
+        discard;
+
+    float fAlpha = 1.f;
+
+      [branch]
+    if (ENV_SHADOW_ALPHA_DIFFUSE == g_iShadowAlphaSource)
+        fAlpha = g_DiffuseTexture.Sample(LinearSampler, vUV).a;
+    else if (ENV_SHADOW_ALPHA_UNKNOWN == g_iShadowAlphaSource)
+        fAlpha = g_UnknownTexture.Sample(LinearSampler, vUV).a;
+
+    if (fAlpha < 0.1f)
+        discard;
+}
+
 PS_SHADOW_OUT PS_SHADOW(VS_SHADOW_OUT In)
 {
+    Apply_ShadowAlphaCut(In.vTexcoord);
+    
     PS_SHADOW_OUT Out;
     float d = In.vProjPos.z / In.vProjPos.w; // 디퍼드의 pz(=lc.z/lc.w)와 동일 공간
     Out.vLightDepth = float4(d, d, d, 1.f);
@@ -451,6 +479,12 @@ PS_OUT PS_MN(PS_NONINST_IN In)
     return Out;
 }
 
+PS_OUT PS_DISCARD(PS_NONINST_IN In)
+{
+    discard;
+    return (PS_OUT) 0;
+}
+
 technique11 DefaultTechnique
 {
     pass DefaultPass // 0
@@ -583,5 +617,15 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_NONINST_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MN();
+    }
+    pass DISCARD_Pass // 13
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_NONINST_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DISCARD();
     }
 }

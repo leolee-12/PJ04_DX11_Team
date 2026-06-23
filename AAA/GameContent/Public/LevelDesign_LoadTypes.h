@@ -46,9 +46,8 @@ struct LD_PORTAL_DESC
 #pragma region Breakable
 struct LD_BREAKABLE_DESC : public LD_OBJECT_DESC
 {
-	LD_BREAKABLE_TYPE   eType = LD_BREAKABLE_TYPE::UNKNOWN;
-	MODEL               eModelType = MODEL::NONANIM;
-	_wstring            wstrModelProtoTag;
+	MODEL		eModelType = MODEL::NONANIM;
+	_wstring	wstrModelProtoTag;
 };
 #pragma endregion
 
@@ -65,7 +64,6 @@ struct LD_RAIL_DESC
 	_float3 vCenterPos = {};
 	_float fRadius = 0.f;
 	_float fBezierControlLength = 0.f;
-	LD_RAIL_TYPE eType = LD_RAIL_TYPE::UNKNOWN;
 	_bool bClockwise = false;
 	_bool bClose = false;
 	vector<LD_RAIL_NODE_DESC> Nodes;
@@ -85,29 +83,32 @@ struct LD_LADDER_DESC : public LD_OBJECT_DESC
 #pragma region Food
 struct LD_FOOD_DESC : public LD_OBJECT_DESC
 {
-	_wstring wstrModelProtoTag;
+	_wstring	wstrModelProtoTag;
+	_float		fHealAmount = { 0.f };
 };
 #pragma endregion
 
 #pragma region Point
 struct LD_POINT_DESC : public LD_OBJECT_DESC
 {
-	LD_POINT_TYPE eType = { LD_POINT_TYPE::UNKNOWN };
-	_wstring wstrModelProtoTag;
+	_wstring	wstrModelProtoTag;
+	_int		iValue = { 0 };
 };
 #pragma endregion
 
 #pragma region Bush
 struct LD_BUSH_DESC : public LD_OBJECT_DESC
 {
-	LD_BUSH_TYPE eType = { LD_BUSH_TYPE::UNKNOWN };
+	_wstring wstrBasicProtoTag;
+	_wstring wstrCutProtoTag;
+	MODEL eBasicType = { MODEL::ANIM };
+	MODEL eCutType = { MODEL::NONANIM };
 	_bool bGenerateItem = { false };
 };
 #pragma endregion
 
 struct LD_VOLUME_DESC
 {
-	LD_VOLUME_TYPE eVolumeType = LD_VOLUME_TYPE::UNKNOWN;
 	_float3 vAreaCenter = {};
 	_float4 qAreaRot = { 0.f, 0.f, 0.f, 1.f };
 	_float3 vAreaSize = {};
@@ -129,7 +130,6 @@ struct LD_GUIDE_AREA_DESC
 
 struct LD_AUDIO_AREA_DESC
 {
-	LD_AUDIO_AREA_TYPE eAudioAreaType = LD_AUDIO_AREA_TYPE::UNKNOWN;
 	_uint iSoundId = 0;
 	_wstring strVariationType;
 	_wstring strShapeType;

@@ -12,19 +12,30 @@ namespace
 		const _tchar* pObjectName;
 		const _tchar* pModelProtoTag;
 		const _char* pModelPath;
-		LD_POINT_TYPE eType;
+		_int iValue;
 	};
 
 	static const LD_POINT_CATALOG g_PointCatalog[] =
 	{
-			{ L"PointStarYellow", CLevelDesign_Point::YELLOW_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopYellowL.ysh", LD_POINT_TYPE::YELLOW },
-			{ L"PointStarBlue", CLevelDesign_Point::BLUE_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopBlueL.ysh", LD_POINT_TYPE::BLUE },
-			{ L"PointStarGreen", CLevelDesign_Point::GREEN_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopGreenL.ysh", LD_POINT_TYPE::GREEN },
-			{ L"PointStarRed", CLevelDesign_Point::RED_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopRedL.ysh", LD_POINT_TYPE::RED },
-			{ L"CoinClusterS", CLevelDesign_Point::COIN_CLUSTER_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterSL.ysh", LD_POINT_TYPE::COIN_CLUSTER_S },
-			{ L"CoinClusterM", CLevelDesign_Point::COIN_CLUSTER_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterML.ysh", LD_POINT_TYPE::COIN_CLUSTER_M },
-			{ L"CoinClusterL", CLevelDesign_Point::COIN_CLUSTER_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterLL.ysh", LD_POINT_TYPE::COIN_CLUSTER_L }
+		{ L"PointStarYellow", CLevelDesign_Point::YELLOW_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopYellowL.ysh", 1 },
+		{ L"PointStarGreen", CLevelDesign_Point::GREEN_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopGreenL.ysh", 5 },
+		{ L"PointStarRed", CLevelDesign_Point::RED_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopRedL.ysh", 10 },
+		{ L"PointStarBlue", CLevelDesign_Point::BLUE_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopBlueL.ysh", 30 },
+		{ L"CoinClusterS", CLevelDesign_Point::COIN_CLUSTER_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterSL.ysh", 100 },
+		{ L"CoinClusterM", CLevelDesign_Point::COIN_CLUSTER_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterML.ysh", 250 },
+		{ L"CoinClusterL", CLevelDesign_Point::COIN_CLUSTER_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterLL.ysh", 500 }
 	};
+
+	static const LD_POINT_CATALOG* Find_PointCatalog(const _wstring& wstrObjName)
+	{
+		for (const LD_POINT_CATALOG& Entry : g_PointCatalog)
+		{
+			if (JsonUtils::Equals_NoCase(Entry.pObjectName, wstrObjName.c_str()))
+				return &Entry;
+		}
+
+		return nullptr;
+	}
 }
 
 NS_BEGIN(Client)
@@ -88,28 +99,6 @@ void CLevelDesign_Point::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
 }
 
-LD_POINT_TYPE CLevelDesign_Point::Resolve_PointType(const _wstring& wstrObjName)
-{
-	static const pair<const _tchar*, LD_POINT_TYPE> Catalog[] =
-	{
-		{ L"PointStarYellow", LD_POINT_TYPE::YELLOW },
-		{ L"PointStarBlue",   LD_POINT_TYPE::BLUE },
-		{ L"PointStarGreen",  LD_POINT_TYPE::GREEN },
-		{ L"PointStarRed",    LD_POINT_TYPE::RED },
-		{ L"CoinClusterS",    LD_POINT_TYPE::COIN_CLUSTER_S },
-		{ L"CoinClusterM",    LD_POINT_TYPE::COIN_CLUSTER_M },
-		{ L"CoinClusterL",    LD_POINT_TYPE::COIN_CLUSTER_L }
-	};
-
-	for (const auto& [pName, eType] : Catalog)
-	{
-		if (JsonUtils::Equals_NoCase(pName, wstrObjName.c_str()))
-			return eType;
-	}
-
-	return LD_POINT_TYPE::UNKNOWN;
-}
-
 void CLevelDesign_Point::Register_LevelDesignSpecs()
 {
 	for (const LD_POINT_CATALOG& Entry : g_PointCatalog)
@@ -137,18 +126,18 @@ _bool CLevelDesign_Point::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const jso
 
 	if (nullptr == pOutEntry)
 		return false;
-
-	const LD_POINT_TYPE eType = Resolve_PointType(CommonDesc.strObjectName);
-	if (LD_POINT_TYPE::UNKNOWN == eType)
-		return false;
 	if (Spec.wstrModelProtoTag.empty())
+		return false;
+
+	const LD_POINT_CATALOG* pCatalog = Find_PointCatalog(CommonDesc.strObjectName);
+	if (nullptr == pCatalog)
 		return false;
 
 	LD_POINT_DESC Desc{};
 	static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
 	Desc.eCategory = LD_CATEGORY::ITEM;
-	Desc.eType = eType;
 	Desc.wstrModelProtoTag = Spec.wstrModelProtoTag;
+	Desc.iValue = pCatalog->iValue;
 
 	*pOutEntry = Desc;
 	return true;
@@ -161,9 +150,9 @@ CGameObject* CLevelDesign_Point::Create_Prototype(ID3D11Device* pDevice, ID3D11D
 
 HRESULT CLevelDesign_Point::Validate_Desc()
 {
-	if (LD_POINT_TYPE::UNKNOWN == m_tPointDesc.eType)
-		return E_FAIL;
 	if (m_tPointDesc.wstrModelProtoTag.empty())
+		return E_FAIL;
+	if (0 >= m_tPointDesc.iValue)
 		return E_FAIL;
 
 	return S_OK;

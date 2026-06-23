@@ -27,6 +27,17 @@ namespace
 			{ L"BreakableRockMForBridge", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh", MODEL::NONANIM, true }
 	};
 
+	static const LD_BREAKABLE_CATALOG* Find_BreakableCatalog(const _wstring& wstrObjName)
+	{
+		for (const LD_BREAKABLE_CATALOG& Entry : g_BreakableCatalog)
+		{
+			if (JsonUtils::Equals_NoCase(Entry.pObjectName, wstrObjName.c_str()))
+				return &Entry;
+		}
+
+		return nullptr;
+	}
+
 	void Build_DefaultBreakableDesc(LD_BREAKABLE_DESC* pOutDesc)
 	{
 		if (nullptr == pOutDesc)
@@ -42,7 +53,6 @@ namespace
 		pOutDesc->strKind = L"Palette";
 
 		pOutDesc->eCategory = LD_CATEGORY::BREAKABLE;
-		pOutDesc->eType = LD_BREAKABLE_TYPE::STAR_BLOCK;
 		pOutDesc->wstrModelProtoTag = CLevelDesign_Breakable::STARBLOCK_H1W1_MODEL_PROTO_TAG;
 
 		pOutDesc->fScale = 1.f;
@@ -150,7 +160,9 @@ HRESULT CLevelDesign_Breakable::Render()
 			if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 				return E_FAIL;
 
-			if (FAILED(m_pShaderCom->Begin(0u)))
+			const _uint iBoxPass = 5u;
+
+			if (FAILED(m_pShaderCom->Begin(iBoxPass)))
 				return E_FAIL;
 		}
 		else
@@ -190,28 +202,6 @@ void CLevelDesign_Breakable::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
 }
 
-LD_BREAKABLE_TYPE CLevelDesign_Breakable::Resolve_BreakableType(const _wstring& wstrObjName)
-{
-	static const pair<const _tchar*, LD_BREAKABLE_TYPE> Catalog[] =
-	{
-		{ L"StarBlock",					LD_BREAKABLE_TYPE::STAR_BLOCK },
-		{ L"StarBlockBig",				LD_BREAKABLE_TYPE::STAR_BLOCK_BIG },
-		{ L"WoodBox",					LD_BREAKABLE_TYPE::WOOD_BOX },
-		{ L"BoxPlastic",				LD_BREAKABLE_TYPE::PLASTIC_BOX },
-		{ L"BreakableRockS",			LD_BREAKABLE_TYPE::BREAKABLE_ROCK },
-		{ L"BreakableRockM",			LD_BREAKABLE_TYPE::BREAKABLE_ROCK_BIG },
-		{ L"BreakableRockMForBridge",	LD_BREAKABLE_TYPE::BREAKABLE_ROCK_BIG }
-	};
-
-	for (const auto& [pName, eType] : Catalog)
-	{
-		if (JsonUtils::Equals_NoCase(pName, wstrObjName.c_str()))
-			return eType;
-	}
-
-	return LD_BREAKABLE_TYPE::UNKNOWN;
-}
-
 void CLevelDesign_Breakable::Register_LevelDesignSpecs()
 {
 	for (const LD_BREAKABLE_CATALOG& Entry : g_BreakableCatalog)
@@ -240,9 +230,7 @@ _bool CLevelDesign_Breakable::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const
 
 	if (nullptr == pOutEntry)
 		return false;
-
-	const LD_BREAKABLE_TYPE eType = Resolve_BreakableType(CommonDesc.strObjectName);
-	if (LD_BREAKABLE_TYPE::UNKNOWN == eType)
+	if (nullptr == Find_BreakableCatalog(CommonDesc.strObjectName))
 		return false;
 	if (Spec.eCategory != LD_CATEGORY::BREAKABLE || Spec.wstrModelProtoTag.empty())
 		return false;
@@ -250,7 +238,6 @@ _bool CLevelDesign_Breakable::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const
 	LD_BREAKABLE_DESC Desc{};
 	static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
 	Desc.eCategory = Spec.eCategory;
-	Desc.eType = eType;
 	Desc.eModelType = Spec.eModelType;
 	Desc.wstrModelProtoTag = Spec.wstrModelProtoTag;
 
@@ -267,13 +254,12 @@ HRESULT CLevelDesign_Breakable::Validate_Desc()
 {
 	if (m_tBreakableDesc.eCategory != LD_CATEGORY::BREAKABLE)
 		return E_FAIL;
-	if (m_tBreakableDesc.eType == LD_BREAKABLE_TYPE::UNKNOWN)
-		return E_FAIL;
 	if (m_tBreakableDesc.wstrModelProtoTag.empty())
 		return E_FAIL;
 
 	return S_OK;
 }
+
 HRESULT CLevelDesign_Breakable::Ready_Components()
 {
 	const _tchar* pModelProtoTag = Resolve_ModelProtoTag();

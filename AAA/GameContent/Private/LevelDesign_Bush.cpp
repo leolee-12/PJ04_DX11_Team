@@ -29,6 +29,17 @@ namespace
 		{ L"Bush2BasicL", CLevelDesign_Bush::BUSH_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/BushL.ysh", MODEL::ANIM,
 		CLevelDesign_Bush::CUT_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/CutL.ysh", MODEL::NONANIM }
 	};
+
+	static const LD_BUSH_CATALOG* Find_BushCatalog(const _wstring& wstrObjName)
+	{
+		for (const LD_BUSH_CATALOG& Entry : g_BushCatalog)
+		{
+			if (JsonUtils::Equals_NoCase(Entry.pObjectName, wstrObjName.c_str()))
+				return &Entry;
+		}
+
+		return nullptr;
+	}
 }
 
 NS_BEGIN(Client)
@@ -66,26 +77,35 @@ HRESULT CLevelDesign_Bush::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
+	m_pAnimatorCom->Play("Wait", true, true);
 	return S_OK;
+}
+
+void CLevelDesign_Bush::Update(_float fTimeDelta)
+{
+	if (BUSH_STATE::BASIC == m_eState)
+	{
+		m_pAnimatorCom->Update(fTimeDelta);
+	}
 }
 
 void CLevelDesign_Bush::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
-	if (nullptr != m_pModelComs[m_eRenderSlot])
+	if (nullptr != m_pModelComs[m_eState])
 		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 
 HRESULT CLevelDesign_Bush::Render()
 {
-	if (nullptr == m_pModelComs[m_eRenderSlot] || nullptr == m_pShaderComs[m_eRenderSlot])
+	if (nullptr == m_pModelComs[m_eState] || nullptr == m_pShaderComs[m_eState])
 		return S_OK;
 
-	if (FAILED(Bind_ShaderResources(m_eRenderSlot)))
+	if (FAILED(Bind_ShaderResources(m_eState)))
 		return E_FAIL;
 
-	return Render_Model(m_eRenderSlot);
+	return Render_Model(m_eState);
 }
 
 void CLevelDesign_Bush::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
@@ -94,24 +114,6 @@ void CLevelDesign_Bush::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 		return;
 
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
-}
-
-LD_BUSH_TYPE CLevelDesign_Bush::Resolve_BushType(const _wstring& wstrObjName)
-{
-	static const pair<const _tchar*, LD_BUSH_TYPE> Catalog[] =
-	{
-		{ L"Bush2BasicS", LD_BUSH_TYPE::BUSH_S },
-		{ L"Bush2BasicM", LD_BUSH_TYPE::BUSH_M },
-		{ L"Bush2BasicL", LD_BUSH_TYPE::BUSH_L }
-	};
-
-	for (const auto& [pName, eType] : Catalog)
-	{
-		if (JsonUtils::Equals_NoCase(pName, wstrObjName.c_str()))
-			return eType;
-	}
-
-	return LD_BUSH_TYPE::UNKNOWN;
 }
 
 void CLevelDesign_Bush::Register_LevelDesignSpecs()
@@ -137,20 +139,20 @@ void CLevelDesign_Bush::Register_LevelDesignSpecs()
 
 _bool CLevelDesign_Bush::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
 {
-	UNREFERENCED_PARAMETER(Spec);
-
 	if (nullptr == pOutEntry)
 		return false;
 
-	const LD_BUSH_TYPE eType = Resolve_BushType(CommonDesc.strObjectName);
-	if (LD_BUSH_TYPE::UNKNOWN == eType)
+	const LD_BUSH_CATALOG* pCatalog = Find_BushCatalog(CommonDesc.strObjectName);
+	if (nullptr == pCatalog)
 		return false;
 
 	LD_BUSH_DESC Desc{};
 	static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
 	Desc.eCategory = LD_CATEGORY::FOLIAGE;
-	Desc.eType = eType;
-
+	Desc.wstrBasicProtoTag = pCatalog->pBasicModelProtoTag;
+	Desc.wstrCutProtoTag = pCatalog->pCutModelProtoTag;
+	Desc.eBasicType = pCatalog->eBasicModelType;
+	Desc.eCutType = pCatalog->eCutModelType;
 	JsonUtils::Try_ReadBoolFromNumeric(jEntry, "Gimmick.Bush2.MainComponent.IsGenerateItem", &Desc.bGenerateItem);
 
 	*pOutEntry = Desc;
@@ -165,7 +167,9 @@ CGameObject* CLevelDesign_Bush::Create_Prototype(ID3D11Device* pDevice, ID3D11De
 
 HRESULT CLevelDesign_Bush::Validate_Desc()
 {
-	if (LD_BUSH_TYPE::UNKNOWN == m_tBushDesc.eType)
+	if (m_tBushDesc.wstrBasicProtoTag.empty())
+		return E_FAIL;
+	if (m_tBushDesc.wstrCutProtoTag.empty())
 		return E_FAIL;
 
 	return S_OK;
@@ -173,9 +177,9 @@ HRESULT CLevelDesign_Bush::Validate_Desc()
 
 HRESULT CLevelDesign_Bush::Ready_Components()
 {
-	for (_uint i = 0; i < MODEL_SLOT::_COUNT; ++i)
+	for (_uint i = 0; i < BUSH_STATE::_COUNT; ++i)
 	{
-		const MODEL_SLOT eSlot = static_cast<MODEL_SLOT>(i);
+		const BUSH_STATE eSlot = static_cast<BUSH_STATE>(i);
 		const _tchar* pModelProtoTag = Resolve_ModelProtoTag(eSlot);
 		if (nullptr == pModelProtoTag)
 			return E_FAIL;
@@ -188,7 +192,7 @@ HRESULT CLevelDesign_Bush::Ready_Components()
 		_tchar szShaderTag[32] = {};
 		_tchar szModelTag[32] = {};
 
-		if (MODEL_SLOT::BASIC == eSlot)
+		if (BUSH_STATE::BASIC == eSlot)
 		{
 			lstrcpy(szShaderTag, TEXT("Com_Shader_Basic"));
 			lstrcpy(szModelTag, TEXT("Com_Model_Basic"));
@@ -208,10 +212,17 @@ HRESULT CLevelDesign_Bush::Ready_Components()
 			return E_FAIL;
 	}
 
+	CAnimator::ANIMATOR_DESC AnimDesc{};
+	AnimDesc.pModel = m_pModelComs[BASIC];
+
+	m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
+	if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
-HRESULT CLevelDesign_Bush::Bind_ShaderResources(MODEL_SLOT eSlot)
+HRESULT CLevelDesign_Bush::Bind_ShaderResources(BUSH_STATE eSlot)
 {
 	CShader* pShader = m_pShaderComs[eSlot];
 	if (nullptr == pShader || nullptr == m_pTransformCom)
@@ -229,7 +240,7 @@ HRESULT CLevelDesign_Bush::Bind_ShaderResources(MODEL_SLOT eSlot)
 	return S_OK;
 }
 
-HRESULT CLevelDesign_Bush::Render_Model(MODEL_SLOT eSlot)
+HRESULT CLevelDesign_Bush::Render_Model(BUSH_STATE eSlot)
 {
 	CModel* pModel = m_pModelComs[eSlot];
 	CShader* pShader = m_pShaderComs[eSlot];
@@ -243,7 +254,7 @@ HRESULT CLevelDesign_Bush::Render_Model(MODEL_SLOT eSlot)
 
 		auto BindMaterial = [&](const _char* pConstantName, MTEX_TYPE eType, DEFAULT_TEXTURE eDefaultKind) -> HRESULT
 			{
-				const _uint iLayerIndex = Layer.idx[ETOUI(eType)];
+				const _uint iLayerIndex = MTEX_TYPE::UNKNOWN == eType ? 3u : Layer.idx[ETOUI(eType)];
 				const _uint iTextureCount = pModel->Get_MeshTextureCount(i, eType);
 
 				if (0u < iTextureCount)
@@ -257,17 +268,19 @@ HRESULT CLevelDesign_Bush::Render_Model(MODEL_SLOT eSlot)
 				return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(pShader, pConstantName, eDefaultKind);
 			};
 
-		if (FAILED(BindMaterial("g_DiffuseTexture", MTEX_TYPE::DIFFUSE, DEFAULT_TEXTURE::MAGENTA)))             return E_FAIL;
-		if (FAILED(BindMaterial("g_NormalTexture", MTEX_TYPE::NORMALS, DEFAULT_TEXTURE::FLAT_NORMAL)))  return E_FAIL;
-		if (FAILED(BindMaterial("g_MRATexture", MTEX_TYPE::METALNESS, DEFAULT_TEXTURE::MRA)))                   return E_FAIL;
-		if (FAILED(BindMaterial("g_UnknownTexture", MTEX_TYPE::UNKNOWN, DEFAULT_TEXTURE::BLACK)))               return E_FAIL;
+		//if (FAILED(BindMaterial("g_DiffuseTexture", MTEX_TYPE::DIFFUSE, DEFAULT_TEXTURE::MAGENTA)))	return E_FAIL;
+		if (FAILED(BindMaterial("g_NormalTexture", MTEX_TYPE::NORMALS, DEFAULT_TEXTURE::FLAT_NORMAL)))	return E_FAIL;
+		//if (FAILED(BindMaterial("g_MRATexture", MTEX_TYPE::METALNESS, DEFAULT_TEXTURE::MRA)))			return E_FAIL;
+		if (FAILED(BindMaterial("g_UnknownTexture", MTEX_TYPE::UNKNOWN, DEFAULT_TEXTURE::BLACK)))		return E_FAIL;
 
 		if (MODEL::ANIM == eModelType)
 		{
 			if (FAILED(pModel->Bind_BoneMatrices(pShader, "g_BoneMatrices", i)))
 				return E_FAIL;
 
-			if (FAILED(pShader->Begin(0u)))
+			const _uint iBushPass = 4u;
+
+			if (FAILED(pShader->Begin(iBushPass)))
 				return E_FAIL;
 		}
 		else
@@ -276,11 +289,11 @@ HRESULT CLevelDesign_Bush::Render_Model(MODEL_SLOT eSlot)
 			_uint iFlags = Layer.iFlags;
 			_float fDissolve = 0.f;
 
-			if (FAILED(pShader->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint))))                     return E_FAIL;
-			if (FAILED(pShader->Bind_RawValue("g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))      return E_FAIL;
-			if (FAILED(pShader->Bind_RawValue("g_fDissolve", &fDissolve, sizeof(_float))))          return E_FAIL;
+			if (FAILED(pShader->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint))))			return E_FAIL;
+			if (FAILED(pShader->Bind_RawValue("g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))	return E_FAIL;
+			if (FAILED(pShader->Bind_RawValue("g_fDissolve", &fDissolve, sizeof(_float))))		return E_FAIL;
 
-			if (FAILED(pShader->Begin(ShaderPass::NonAnimPBR::DMN)))
+			if (FAILED(pShader->Begin(ShaderPass::NonAnimPBR::UMN)))
 				return E_FAIL;
 		}
 
@@ -291,20 +304,20 @@ HRESULT CLevelDesign_Bush::Render_Model(MODEL_SLOT eSlot)
 	return S_OK;
 }
 
-const _tchar* CLevelDesign_Bush::Resolve_ModelProtoTag(MODEL_SLOT eSlot) const
+const _tchar* CLevelDesign_Bush::Resolve_ModelProtoTag(BUSH_STATE eSlot) const
 {
-	switch (m_tBushDesc.eType)
-	{
-	case LD_BUSH_TYPE::BUSH_S:	return MODEL_SLOT::BASIC == eSlot ? BUSH_S_MODEL_PROTO_TAG : CUT_S_MODEL_PROTO_TAG;
-	case LD_BUSH_TYPE::BUSH_M:	return MODEL_SLOT::BASIC == eSlot ? BUSH_M_MODEL_PROTO_TAG : CUT_M_MODEL_PROTO_TAG;
-	case LD_BUSH_TYPE::BUSH_L:	return MODEL_SLOT::BASIC == eSlot ? BUSH_L_MODEL_PROTO_TAG : CUT_L_MODEL_PROTO_TAG;
-	default:					return nullptr;
-	}
+	if (BUSH_STATE::BASIC == eSlot)
+		return m_tBushDesc.wstrBasicProtoTag.empty() ? nullptr : m_tBushDesc.wstrBasicProtoTag.c_str();
+
+	if (BUSH_STATE::CUT == eSlot)
+		return m_tBushDesc.wstrCutProtoTag.empty() ? nullptr : m_tBushDesc.wstrCutProtoTag.c_str();
+
+	return nullptr;
 }
 
-MODEL CLevelDesign_Bush::Resolve_ModelType(MODEL_SLOT eSlot) const
+MODEL CLevelDesign_Bush::Resolve_ModelType(BUSH_STATE eSlot) const
 {
-	return MODEL_SLOT::BASIC == eSlot ? MODEL::ANIM : MODEL::NONANIM;
+	return BUSH_STATE::BASIC == eSlot ? m_tBushDesc.eBasicType : m_tBushDesc.eCutType;
 }
 
 CLevelDesign_Bush* CLevelDesign_Bush::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

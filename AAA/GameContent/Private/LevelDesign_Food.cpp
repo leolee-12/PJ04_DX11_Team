@@ -12,17 +12,29 @@ namespace
 		const _tchar* pObjectName;
 		const _tchar* pModelProtoTag;
 		const _char* pModelPath;
+		_float fHealAmount;
 	};
 
 	static const LD_FOOD_CATALOG g_FoodCatalog[] =
 	{
-			{ L"EnergyDrink", CLevelDesign_Food::ENERGY_DRINK_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/EnergyDrink.ysh" },
-			{ L"DinnerRoastChicken", CLevelDesign_Food::DINNER_ROAST_CHICKEN_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/RoastChicken.ysh" },
-			{ L"FruitCherry", CLevelDesign_Food::FRUIT_CHERRY_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/Cherry.ysh"},
-			{ L"VegetableCarrot", CLevelDesign_Food::VEGETABLE_CARROT_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/Carrot.ysh" },
-			{ L"SweetsDoughnut", CLevelDesign_Food::SWEETS_DOUGHNUT_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/Doughnut.ysh" },
-			{ L"FruitBanana", CLevelDesign_Food::FRUIT_BANANA_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/Banana.ysh" }
+		{ L"EnergyDrink", CLevelDesign_Food::ENERGY_DRINK_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/EnergyDrink.ysh", 10.f },
+		{ L"DinnerRoastChicken", CLevelDesign_Food::DINNER_ROAST_CHICKEN_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/RoastChicken.ysh", 10.f },
+		{ L"FruitCherry", CLevelDesign_Food::FRUIT_CHERRY_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/Cherry.ysh", 10.f },
+		{ L"VegetableCarrot", CLevelDesign_Food::VEGETABLE_CARROT_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/Carrot.ysh", 10.f },
+		{ L"SweetsDoughnut", CLevelDesign_Food::SWEETS_DOUGHNUT_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/Doughnut.ysh", 10.f },
+		{ L"FruitBanana", CLevelDesign_Food::FRUIT_BANANA_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Food/Banana.ysh", 10.f }
 	};
+
+	static const LD_FOOD_CATALOG* Find_FoodCatalog(const _wstring& wstrObjName)
+	{
+		for (const LD_FOOD_CATALOG& Entry : g_FoodCatalog)
+		{
+			if (JsonUtils::Equals_NoCase(Entry.pObjectName, wstrObjName.c_str()))
+				return &Entry;
+		}
+
+		return nullptr;
+	}
 }
 
 NS_BEGIN(Client)
@@ -116,10 +128,15 @@ _bool CLevelDesign_Food::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json
 	if (Spec.wstrModelProtoTag.empty())
 		return false;
 
+	const LD_FOOD_CATALOG* pCatalog = Find_FoodCatalog(CommonDesc.strObjectName);
+	if (nullptr == pCatalog)
+		return false;
+
 	LD_FOOD_DESC Desc{};
 	static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
 	Desc.eCategory = LD_CATEGORY::FOOD;
 	Desc.wstrModelProtoTag = Spec.wstrModelProtoTag;
+	Desc.fHealAmount = pCatalog->fHealAmount;
 
 	*pOutEntry = Desc;
 	return true;

@@ -12,35 +12,28 @@ NS_BEGIN(Client)
 
 namespace
 {
-	LD_RAIL_TYPE Resolve_RailType(const _wstring& strErpType)
+	_string Resolve_VolumeMainPath(const _wstring& strObjectName)
 	{
-		if (JsonUtils::Equals_NoCase(strErpType.c_str(), L"Line")) return LD_RAIL_TYPE::LINE;
-		if (JsonUtils::Equals_NoCase(strErpType.c_str(), L"Circle")) return LD_RAIL_TYPE::CIRCLE;
-		if (JsonUtils::Equals_NoCase(strErpType.c_str(), L"Bezier")) return LD_RAIL_TYPE::BEZIER;
-		return LD_RAIL_TYPE::UNKNOWN;
+		if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"InvisibleCollision"))
+			return "Gimmick.InvisibleCollision.MainComponent";
+
+		if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"InvisibleCollisionBox"))
+			return "Gimmick.InvisibleCollisionBox.MainComponent";
+
+		if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"FallBorder"))
+			return "Gimmick.FallBorder.MainComponent";
+
+		if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"WaterArea"))
+			return "Gimmick.WaterArea.MainComponent";
+
+		return {};
 	}
 
-	LD_VOLUME_TYPE Resolve_VolumeType(const _wstring& strObjectName)
+	_bool Is_AudioAreaObject(const _wstring& strObjectName)
 	{
-		if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"InvisibleCollision"))			return LD_VOLUME_TYPE::INVISIBLE_COLLISION;
-		if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"InvisibleCollisionBox"))		return LD_VOLUME_TYPE::INVISIBLE_COLLISION_BOX;
-		if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"FallBorder"))					return LD_VOLUME_TYPE::FALL_BORDER;
-		if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"WaterArea"))					return LD_VOLUME_TYPE::WATER_AREA;
-		return LD_VOLUME_TYPE::UNKNOWN;
-	}
-
-	LD_AUDIO_AREA_TYPE Resolve_AudioAreaType(const _wstring& strObjectName)
-	{
-		if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaBgmRequestor"))
-			return LD_AUDIO_AREA_TYPE::BGM_REQUESTOR;
-
-		if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaSeJungle")
-			|| JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaSeSeaWave"))
-		{
-			return LD_AUDIO_AREA_TYPE::AREA_SE;
-		}
-
-		return LD_AUDIO_AREA_TYPE::UNKNOWN;
+		return JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaBgmRequestor")
+			|| JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaSeJungle")
+			|| JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaSeSeaWave");
 	}
 
 	_bool Try_ReadRailNodes(const json& jEntry, _float fDefaultControlLength, vector<LD_RAIL_NODE_DESC>* pOutNodes)
@@ -298,10 +291,6 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 
 		JsonUtils::Try_ReadFloat(jEntry, "Radius", &pDesc->Rail.fRadius);
 		JsonUtils::Try_ReadFloat(jEntry, "BezierControlLength", &pDesc->Rail.fBezierControlLength);
-		
-		_wstring strErpType;
-		JsonUtils::Try_ReadString(jEntry, "ErpType", &strErpType);
-		pDesc->Rail.eType = Resolve_RailType(strErpType);
 
 		JsonUtils::Try_ReadBoolFromNumeric(jEntry, "IsClockwise", &pDesc->Rail.bClockwise);
 		JsonUtils::Try_ReadBoolFromNumeric(jEntry, "IsClose", &pDesc->Rail.bClose);
@@ -321,30 +310,10 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 		return;
 	}
 
-	const LD_VOLUME_TYPE eVolumeType = Resolve_VolumeType(strObjectName);
-	if (eVolumeType != LD_VOLUME_TYPE::UNKNOWN)
+	const _string strMainPath = Resolve_VolumeMainPath(strObjectName);
+	if (!strMainPath.empty())
 	{
 		pDesc->eCategory = LD_CATEGORY::VOLUME;
-		pDesc->Volume.eVolumeType = eVolumeType;
-
-		_string strMainPath;
-		switch (eVolumeType)
-		{
-		case LD_VOLUME_TYPE::INVISIBLE_COLLISION:
-			strMainPath = "Gimmick.InvisibleCollision.MainComponent";
-			break;
-		case LD_VOLUME_TYPE::INVISIBLE_COLLISION_BOX:
-			strMainPath = "Gimmick.InvisibleCollisionBox.MainComponent";
-			break;
-		case LD_VOLUME_TYPE::FALL_BORDER:
-			strMainPath = "Gimmick.FallBorder.MainComponent";
-			break;
-		case LD_VOLUME_TYPE::WATER_AREA:
-			strMainPath = "Gimmick.WaterArea.MainComponent";
-			break;
-		default:
-			break;
-		}
 
 		if (!JsonUtils::Try_ReadFloat3Array(jEntry, "AreaCenter", &pDesc->Volume.vAreaCenter))
 		{
@@ -415,11 +384,9 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 		return;
 	}
 
-	const LD_AUDIO_AREA_TYPE eAudioAreaType = Resolve_AudioAreaType(strObjectName);
-	if (eAudioAreaType != LD_AUDIO_AREA_TYPE::UNKNOWN)
+	if (Is_AudioAreaObject(strObjectName))
 	{
 		pDesc->eCategory = LD_CATEGORY::AUDIO_AREA;
-		pDesc->AudioArea.eAudioAreaType = eAudioAreaType;
 
 		JsonUtils::Try_ReadUInt(jEntry, "SoundId", &pDesc->AudioArea.iSoundId);
 		JsonUtils::Try_ReadString(jEntry, "VariationType", &pDesc->AudioArea.strVariationType);
