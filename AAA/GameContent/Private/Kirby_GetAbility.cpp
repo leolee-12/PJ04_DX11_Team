@@ -34,8 +34,9 @@ void CKirby_GetAbility::Enter(CKirby* pKirby)
     __super::Enter(pKirby);
 
     // Ani
-    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
-    pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::GET_ABILITY));
+    CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+    pAbility->Clear_Overlay(pKirby, 1, 0.1f);
+    pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::GET_ABILITY);
 
     m_bPartsOn = false;
     m_bCloseEye = false;

@@ -29,6 +29,7 @@ void CKirby_Damaged::Enter(CKirby* pKirby)
 
     // Ani
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+    pAbility->Clear_Overlay(pKirby, 1, 0.1f);
     pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::DAMAGED);
 }
 
