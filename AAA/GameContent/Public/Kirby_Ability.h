@@ -74,6 +74,7 @@ public:
 	_bool ReqEndAttackState() { return m_bReqEndAttackState; }
 
 	void Play_AbilityAni(CKirby* pKirby, ABILITY_ANI eAbilityAni);
+	void Clear_Overlay(CKirby* pKirby, _uint iSlot = 1, _float fOverlayBlendTime = 0.1f);
 
 protected:
 	_bool m_bReqEndAttackState{ true };

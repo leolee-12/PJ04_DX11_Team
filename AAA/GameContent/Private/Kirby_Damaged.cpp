@@ -29,6 +29,7 @@ void CKirby_Damaged::Enter(CKirby* pKirby)
 
     // Ani
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+    pAbility->Clear_Overlay(pKirby, 1, 0.1f);
     pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::DAMAGED);
 }
 
@@ -39,8 +40,8 @@ void CKirby_Damaged::Update(CKirby* pKirby, const _float fTimeDelta)
     CKirby_Body* pBody = pKirby->Get_Body();
     CAnimator* pAnimator = pBody->Get_Animator();
 
-    if(pAnimator->Get_Progress() >= 0.25f)
-        pKirby->Change_State(KIRBY_STATE_TYPE::WAIT);
+    if (pAnimator->Get_Progress() >= 0.25f)
+        Transition_Fall_OR_Wait_OR_Run(pKirby);
 }
 
 void CKirby_Damaged::Exit(CKirby* pKirby)

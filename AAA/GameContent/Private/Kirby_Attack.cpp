@@ -45,8 +45,8 @@ void CKirby_Attack::Update(CKirby* pKirby, const _float fTimeDelta)
     // Ability가 Attack State가 끝났다고 하면 State 전환
     if (pAbility->ReqEndAttackState() == true)
     {
-        Transition_Wait_OR_Run(pKirby);
-        // Fall 상태도 전환 필요한듯
+        Transition_Fall_OR_Wait_OR_Run(pKirby);
+        return;
     }
 }
 

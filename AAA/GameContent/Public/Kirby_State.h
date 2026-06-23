@@ -48,8 +48,9 @@ protected:
 	_bool Handle_MoveCommand(CKirby* pKirby, CKirby_Command* pCommand);
 
 protected:
-	_bool Try_FallState(CKirby* pKirby);
+	_bool Try_Transition_Fall(CKirby* pKirby);
 	_bool Transition_Wait_OR_Run(CKirby* pKirby);
+	_bool Transition_Fall_OR_Wait_OR_Run(CKirby* pKirby);
 
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand);

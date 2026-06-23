@@ -47,6 +47,7 @@ public:
 
 protected:
     HRESULT         Ready_MeshPart(const PART_SETUP& tSetup);
+    virtual HRESULT Ready_Components() = 0;                     // 모든 구현 클래스에서 본인 Ready_Components 함수 구현 필수
     virtual HRESULT Bind_ShaderResources();
 
 protected:

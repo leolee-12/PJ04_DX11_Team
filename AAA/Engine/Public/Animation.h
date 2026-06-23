@@ -16,12 +16,17 @@ private:
 public:
 	HRESULT Initialize(const ANIMATION_DATA& data, class CModel* pModel);
 	_bool Update_TransformationMatrices(const vector<class CBone*>& Bones, _float fTimeDelta, _bool isLoop, _float fSpeed = 1.0f);
-	void  Compute_BoneKeyFrames(unordered_map<_uint, KEYFRAME>& Out, _float fTimeDelta, _bool isLoop, _float fSpeed = 1.0f);
+	_bool  Compute_BoneKeyFrames(unordered_map<_uint, KEYFRAME>& Out, _float fTimeDelta, _bool isLoop, _float fSpeed = 1.0f);
 	void  Reset_TrackPosition();
 
+	// 트랙 위치/커서를 외부(LAYEr)가 소유 -> CAnimation 내부 상태는 불변
+	_float			Advance_Position(_float fTrackPosition, _float fTimeDelta, _bool isLoop, _float fSpeed, _bool& bFinished) const;
+	void			Sample_Pose(unordered_map<_uint, KEYFRAME>& Out, _float fTrackPosition, vector<_uint>& Cursors) const;
+	_uint			Get_NumChannels() const { return m_iNumChannels; }
+	_float			Get_Duration() const { return m_fDuration; }
 public:
 	void			Get_ChannelBoneIndices(vector<_uint>& Out) const;
-	const string& Get_AnimationName() const { return m_strName; }
+	const string&	Get_AnimationName() const { return m_strName; }
 
 	_float Get_Progress() const
 	{

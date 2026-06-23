@@ -24,7 +24,7 @@ public:
     virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* p) override { p->strPrototypeTag = PROTOTYPE_TAG; }
 
 private:
-    HRESULT Ready_Components();
+    virtual HRESULT Ready_Components() override;
 
 public:
     static CGigantEdge_Body* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -28,8 +28,9 @@ void CKirby_AbilityDump::Enter(CKirby* pKirby)
     __super::Enter(pKirby);
 
     // Ani
-    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
-    pAnimator->Play(pKirby->Get_KirbyAbility()->Get_AniInfo(ABILITY_ANI::ABILITY_DUMP));
+    CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+    pAbility->Clear_Overlay(pKirby, 1, 0.1f);
+    pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::ABILITY_DUMP);
 
     m_bPartsOff = false;
     m_bCloseEye = false;
@@ -50,17 +51,7 @@ void CKirby_AbilityDump::Update(CKirby* pKirby, const _float fTimeDelta)
 
     if(pAnimator->Is_Finished())
     {
-
-        if (Try_FallState(pKirby) == true)
-        {
-            CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
-            pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::FALL);
-        }
-        else
-        {
-            Transition_Wait_OR_Run(pKirby);
-        }
-
+        Transition_Fall_OR_Wait_OR_Run(pKirby);
         return;
     }
 }
