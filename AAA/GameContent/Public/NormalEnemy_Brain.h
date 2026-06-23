@@ -3,13 +3,12 @@
 
 NS_BEGIN(Client)
 class CMonster;
-class CBladeKnight;
 
-class CBladeKnight_FSM final : public CMonster_Brain_FSM
+class CNormalEnemy_Brain final : public CMonster_Brain_FSM
 {
 protected:
-	CBladeKnight_FSM();
-	virtual ~CBladeKnight_FSM() = default;
+	CNormalEnemy_Brain();
+	virtual ~CNormalEnemy_Brain() = default;
 
 protected:
 	virtual HRESULT				Initialize(CMonster* pOwner) override;
@@ -18,16 +17,11 @@ protected:
 	virtual void				Decide_Internal(const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta) override;
 
 public:
-	static CBladeKnight_FSM*	Create(CMonster* pMonster);
-
-private:
-	MONSTER_STATE_TYPE			Pick_AttackState(_int iAIType);
-
-private:
-	_uint						m_iAttackIndex = { 0 };
+	static CNormalEnemy_Brain*	Create(CMonster* pOwner);
 
 protected:
 	virtual void				Free() override;
+
 };
 
 NS_END

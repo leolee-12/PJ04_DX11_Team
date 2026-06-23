@@ -69,14 +69,18 @@ _bool CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bone
 
 }
 
-void CAnimation::Compute_BoneKeyFrames(unordered_map<_uint, KEYFRAME>& Out, _float fTimeDelta, _bool isLoop, _float fSpeed)
+_bool CAnimation::Compute_BoneKeyFrames(unordered_map<_uint, KEYFRAME>& Out, _float fTimeDelta, _bool isLoop, _float fSpeed)
 {
     m_fCurrentTrackPosition += m_fTickPerSecond * fSpeed * fTimeDelta;
 
+    _bool isFinished = false;
     if (m_fCurrentTrackPosition >= m_fDuration)
     {
         if (!isLoop)
+        {
             m_fCurrentTrackPosition = m_fDuration;
+            isFinished = true;
+        }
         else
             m_fCurrentTrackPosition = 0.f;
     }
@@ -88,12 +92,45 @@ void CAnimation::Compute_BoneKeyFrames(unordered_map<_uint, KEYFRAME>& Out, _flo
             m_fCurrentTrackPosition, &m_CurrentKeyFrameIndices[iChannelIndex++]);
         Out[pChannel->Get_BoneIndex()] = kf;
     }
+
+    return isFinished;
 }
 
 void CAnimation::Reset_TrackPosition()
 {
     m_fCurrentTrackPosition = 0.f;
     fill(m_CurrentKeyFrameIndices.begin(), m_CurrentKeyFrameIndices.end(), 0);
+}
+
+_float CAnimation::Advance_Position(_float fTrackPosition, _float fTimeDelta, _bool isLoop, _float fSpeed, _bool& bFinished) const
+{
+    bFinished = false;
+    fTrackPosition += m_fTickPerSecond * fSpeed * fTimeDelta;
+
+    if (fTrackPosition >= m_fDuration)
+    {
+        if (!isLoop)
+        {
+            fTrackPosition = m_fDuration;
+            bFinished = true;
+        }
+        else
+            fTrackPosition = 0.f;
+    }
+    return fTrackPosition;
+}
+
+void CAnimation::Sample_Pose(unordered_map<_uint, KEYFRAME>& Out, _float fTrackPosition, vector<_uint>& Cursors) const
+{
+    if (Cursors.size() < m_Channels.size())
+        Cursors.resize(m_Channels.size(), 0);
+
+    _uint iChannelIndex = {};
+    for (auto& pChannel : m_Channels)
+    {
+        KEYFRAME kf = pChannel->Compute_TransformationMatrix(fTrackPosition, &Cursors[iChannelIndex++]);
+        Out[pChannel->Get_BoneIndex()] = kf;
+    }
 }
 
 void CAnimation::Get_ChannelBoneIndices(vector<_uint>& Out) const

@@ -3,6 +3,7 @@
 #include "Bounding_Sphere.h"
 #include "Bounding_Capsule.h"
 #include "DebugDraw.h"
+#include "DebugCapsule.h"
 
 CBounding_Sphere::CBounding_Sphere(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CBounding { pDevice, pContext }
@@ -55,8 +56,10 @@ _bool CBounding_Sphere::Intersect(COLLIDER eTargetType, CBounding* pBounding)
 HRESULT CBounding_Sphere::Render(PrimitiveBatch<VertexPositionColor>* pBatch)
 {
     
-    DX::Draw(pBatch, *m_pDesc, true == m_isColl ? XMVectorSet(1.f, 0.f, 0.f, 1.f) : XMVectorSet(0.f, 1.f, 1.f, 1.f));
+    XMVECTOR color = m_isColl ? XMVectorSet(1.f, 0.f, 0.f, 1.f)   // 충돌=빨강
+        : XMVectorSet(0.f, 1.f, 1.f, 1.f);  // 평소=시안
 
+    Debug_DrawSphere(pBatch, XMLoadFloat3(&m_pDesc->Center), m_pDesc->Radius, color);
     return S_OK;
 }
 

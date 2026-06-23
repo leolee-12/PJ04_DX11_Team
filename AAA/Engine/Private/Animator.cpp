@@ -47,7 +47,7 @@ void CAnimator::Play(const string& strAnimName, _bool bLoop, _bool bRestart, _fl
 
     m_fBlendDuration = fBlend;
 
-    m_pModel->Set_AnimationIndex((_uint)iIndex, bLoop, bRestart, m_fBlendDuration);
+    //m_pModel->Set_AnimationIndex((_uint)iIndex, bLoop, bRestart, m_fBlendDuration);
     m_fPlaySpeed = fSpeed;
     m_bFinished = false;
 
@@ -76,7 +76,6 @@ void CAnimator::Start_Clip(const ANI_PLAY_INFO& Info)
 
     if (Info.bClearMask)
         Clear_Mask();
-
 
     m_fBlendDuration = Info.fBlend;
     m_pModel->Set_AnimationIndex(static_cast<_uint>(iIndex), Info.bLoop, Info.bRestart, m_fBlendDuration);
@@ -114,46 +113,125 @@ void CAnimator::Set_Mask(const _char* szClip, const _char* szRootBone, _bool bLo
 
 void CAnimator::Set_Mask(const _char* szClip, const _char* const* pRoots, _uint iRootCount, _bool bLoop, _float fMaskTarget, _float fMaskBlendTime)
 {
-    m_fMaskWeight = 0.f;
-    m_strMaskClip = (szClip != nullptr) ? szClip : "";
+    // 임시 브릿지 역할
+    LAYER_PLAY_INFO tInfo;
+    tInfo.iSlot = 1;
+    tInfo.tAnim.strAniName = (szClip != nullptr) ? szClip : "";
+    tInfo.tAnim.bLoop = bLoop;
+    tInfo.fTargetWeight = fMaskTarget;
+    tInfo.fWeightBlend = fMaskBlendTime;
 
-    m_bMaskLoop = bLoop;
-    m_fMaskTarget = fMaskTarget;
-    m_fMaskBlendTime = fMaskBlendTime;
-
-    if (nullptr == m_pModel)
-        return;
-
-    vector<_string> Roots;
-    Roots.reserve(iRootCount);
+    tInfo.Roots.reserve(iRootCount);
     for (_uint i = 0; i < iRootCount; ++i)
     {
         const _char* sz = pRoots ? pRoots[i] : nullptr;
         if (sz != nullptr)
-            Roots.emplace_back(sz);
+            tInfo.Roots.push_back(sz);
     }
 
-    m_pModel->Capture_MaskSnapShot(Roots);
+    Apply_Overlay(tInfo);
 }
 
 void CAnimator::Clear_Mask(_float fMaskBlendTime)
 {
-    // 여기 수정
-    m_fMaskTarget = 0.f;
+    Clear_Overlay(1, fMaskBlendTime);
+}
 
-    if (fMaskBlendTime <= 0.f)
+void CAnimator::Apply_Overlay(const LAYER_PLAY_INFO& tInfo)
+{
+    if (nullptr == m_pModel)
+        return;
+
+    const _uint iSlot = tInfo.iSlot;
+    if (iSlot == 0 || iSlot >= MAX_LAYERS)      // 0번은 Base 
+        return;
+
+    const _string& strClip = tInfo.tAnim.strAniName;
+
+    if (strClip.empty())
+        return;
+
+    const _int iAnimIndex = m_pModel->Get_AnimationIndex(strClip);
+    if (iAnimIndex < 0)      // 없는 클립 무시
+        return;
+
+    LAYER& Layer = m_Layers[iSlot];
+
+    const _bool bActive = !Layer.strClip.empty();                       // 활성화 되었는지
+    const _bool bSameClip = bActive && (Layer.strClip == strClip);       // 같은 클립인지
+
+    if (!bActive)
     {
-        m_fMaskBlendTime = 0.f;
-        m_fMaskWeight = 0.f;
-        m_strMaskClip.clear();
+        // 비활성 슬롯을 활성화 시키겠다라는 의도 0 -> Weight-In
+        Layer.fWeight = 0.f;
+        Layer.strClip = strClip;
+        Layer.iAnimIndex = iAnimIndex;
+        Layer.bLoop = tInfo.tAnim.bLoop;
+        Layer.bFinished = false;
+        Layer.fLocalTime = 0.f;
+        Layer.KeyFrameCursors.clear();
+        m_pModel->Build_MaskBones(tInfo.Roots);     
+    }
+    else if (!bSameClip)
+    {
+        // 이미 활성화 되어있는 슬롯
+        Layer.strClip = strClip;
+        Layer.iAnimIndex = iAnimIndex;
+        Layer.bLoop = tInfo.tAnim.bLoop;
+        Layer.bFinished = false;
+        Layer.fLocalTime = 0.f;
+        Layer.KeyFrameCursors.clear();
+        Layer.fClipBlend = tInfo.tAnim.fBlend;   
+        Layer.fClipBlendElapsed = 0.f;          // 블렌드 시간 초기화
+        m_pModel->Build_MaskBones(tInfo.Roots);
+    }
+    else if (tInfo.tAnim.bRestart)      // 같은 클립 + bRestart true라면 처음부터 재생
+    {
+        Layer.fLocalTime = 0.f;
+        Layer.KeyFrameCursors.clear();
+        Layer.bFinished = false;
+    }
 
+    Layer.fTarget       = tInfo.fTargetWeight;
+    Layer.fWeightBlend  = tInfo.fWeightBlend;
+    Layer.fSpeed        = tInfo.tAnim.fSpeed;       
+}
+
+void CAnimator::Clear_Overlay(_uint iSlot, _float fWeightBlend)
+{
+    if (iSlot == 0 || iSlot >= MAX_LAYERS)
+        return;
+
+    LAYER& Layer = m_Layers[iSlot];
+    if (Layer.strClip.empty())      // 이미 비활성된 슬롯
+        return;
+
+    Layer.fTarget = 0.f;
+
+    if (fWeightBlend <= 0.f)
+    {
+        // 즉시 정리
+        Layer.fWeight = 0.f;
+        Layer.fWeightBlend = 0.f;
+        Layer.strClip.clear();
+        Layer.iAnimIndex = -1;
+        Layer.bFinished = false;
+        Layer.fLocalTime = 0.f;
+        Layer.KeyFrameCursors.clear();
         if (m_pModel)
-            m_pModel->Clear_MaskSnapShot();
-
+            m_pModel->Clear_MaskBones(); 
         return;
     }
 
-    m_fMaskBlendTime = fMaskBlendTime;
+    Layer.fWeightBlend = fWeightBlend;       // Fade Out -> Update에서 Weight 0 도달 시 정리
+}
+
+_bool CAnimator::Is_Overlay_Finished(_uint iSlot) const
+{
+    if (iSlot == 0 || iSlot >= MAX_LAYERS)
+        return false;
+
+    return m_Layers[iSlot].bFinished;       // TODO : Model에서 오버레이 클립 종료 신호 연결
 }
 
 void CAnimator::Enqueue(const ANI_PLAY_INFO& info)
@@ -167,25 +245,37 @@ void CAnimator::Update(_float fTimeDelta)
     if (nullptr == m_pModel)
         return;
 
-    _float fStep = (m_fMaskBlendTime > 0.f) ? (fTimeDelta / m_fMaskBlendTime) : 1.f;
-    if (m_fMaskWeight < m_fMaskTarget)
-        m_fMaskWeight = min(m_fMaskWeight + fStep, m_fMaskTarget);
+    // 단일 오버레이 (슬롯 1) - 임시 검증 버전
+    LAYER& Ov = m_Layers[1];
+
+    _float fStep = (Ov.fWeightBlend > 0.f) ? (fTimeDelta / Ov.fWeightBlend) : 1.f;
+    if (Ov.fWeight < Ov.fTarget)
+        Ov.fWeight = min(Ov.fWeight + fStep, Ov.fTarget);
     else
-        m_fMaskWeight = max(m_fMaskWeight - fStep, m_fMaskTarget);
+        Ov.fWeight = max(Ov.fWeight - fStep, Ov.fTarget);
 
-    // 여기 수정
-    if (!m_strMaskClip.empty() && m_fMaskTarget <= 0.f && m_fMaskWeight <= 0.f)
+    // 완전히 빠지면 오버레이 정리
+    if (!Ov.strClip.empty() && Ov.fTarget <= 0.f && Ov.fWeight <= 0.f)
     {
-        m_strMaskClip.clear();
-
+        Ov.strClip.clear();
+        Ov.bFinished = false;
+        Ov.iAnimIndex = -1;
+        Ov.fLocalTime = 0.f;
+        Ov.KeyFrameCursors.clear();
         if (m_pModel)
-            m_pModel->Clear_MaskSnapShot();
+            m_pModel->Clear_MaskBones();
     }
-
+    
+    // 임시
     if (!m_bPaused)
     {
-        if (!m_strMaskClip.empty() && m_fMaskWeight > 0.f)
-            m_bFinished = m_pModel->Play_Animation(fTimeDelta, m_strMaskClip, m_fPlaySpeed, m_bMaskLoop, m_fMaskWeight);
+        if (!Ov.strClip.empty() && Ov.fWeight > 0.f)
+        {
+            _float fMaskDelta = Ov.bPaused ? 0.f : fTimeDelta;       // 마스크 일시정지
+            _bool bOvFinished = false;
+            m_bFinished = m_pModel->Play_Animation(fTimeDelta, fMaskDelta, Ov.iAnimIndex, Ov.fLocalTime, Ov.KeyFrameCursors, m_fPlaySpeed, Ov.fSpeed, Ov.bLoop, Ov.fWeight, &bOvFinished);
+            Ov.bFinished = bOvFinished;
+        }
         else
             m_bFinished = m_pModel->Play_Animation(fTimeDelta, m_fPlaySpeed);
     }

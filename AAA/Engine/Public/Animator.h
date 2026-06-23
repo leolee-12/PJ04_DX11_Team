@@ -8,15 +8,49 @@ class CModel;
 class ENGINE_DLL CAnimator final : public CComponent
 {
 public:
+    // 기존 방식 보장 (애니메이션 공용 구조체)
     struct ANI_PLAY_INFO
     {
-        _string strAniName;
-        _bool bLoop{ true };
-        _bool bRestart{ false };
-        _float fBlend = 0.2f;
-        _float fSpeed = 1.f;
-        _bool bClearMask = { true };
+        _string     strAniName;
+        _bool       bLoop{ true };
+        _bool       bRestart{ false };
+        _float      fBlend = { 0.2f };
+        _float      fSpeed = { 1.f };
+        _bool       bClearMask = { true };                    // 제거 예정 base Play가 마스크를 건드리는 결합
     };
+
+    struct LAYER_PLAY_INFO
+    {
+        _uint               iSlot           = { 1 };
+        ANI_PLAY_INFO       tAnim;                          // 재생할 클립 코어 
+        vector<_string>     Roots;                          // 마스크 루트 본 (비우면 전신 레이어)
+        _float              fTargetWeight   = { 1.f };      // 목표 가중치 0~1
+        _float              fWeightBlend    = { 0.1f };     // Weight 0 ~ Target 보간 시간
+    };
+
+    // 레이어에 들어온 정보를 풀어 보관 (base는 index 0, weight 1 고정)
+    struct LAYER        
+    {
+        _string         strClip;                                    // 재생 중인 클립 ("" : 비활성)
+        _int            iAnimIndex          = { -1 };                          // 해석된 인덱스 - 매 프레임 Get_AnimtionIndex 제거 
+        _float          fLocalTime          = { 0.f };               // 레이어 자체 재생 
+
+        _float          fClipBlend          = { 0.f };              // crossfade 총 시간
+        _float          fClipBlendElapsed   = { 0.f };              // 경과
+
+        _float          fWeight             = { 0.f };              // Weight Blend 
+        _float          fTarget             = { 1.f };
+        _float          fWeightBlend          = { 0.1f };
+
+        _float          fSpeed              = { 1.f };              // 레이어 독립 속도
+        _bool           bLoop               = { true };             
+        _bool           bPaused             = { false };
+        _bool           bFinished           = { false };            // 레이어 완료 신호
+
+        vector<_uint>   MaskBones;                                  // 해석된 마스크 본 인덱스
+        vector<_uint>   KeyFrameCursors;
+    };
+
 
 public:
     typedef struct tagAnimatorDesc
@@ -40,8 +74,16 @@ public: // 재생 제어 (오브젝트/에디터는 오직 이것만 사용)
     void    Play(const string& strAnimName, _bool bLoop = true, _bool bRestart = false, _float fBlend = 0.2f, _float fSpeed = 1.0f, _bool bClearMask = true);
     void    Play(const ANI_PLAY_INFO* tAniInfo);
     void    Start_Clip(const ANI_PLAY_INFO& Info);
+    
     void    Pause() { m_bPaused = true; }
     void    Resume() { m_bPaused = false; }
+    
+    void    Pause_Mask(_int iSlot = 1) { m_Layers[iSlot].bPaused  = true; }
+    void    Resume_Mask(_int iSlot = 1) { m_Layers[iSlot].bPaused = false; }
+
+    void    Set_MaskPaused(_bool bPaused) { m_Layers[1].bPaused = bPaused; }
+    _bool   Is_MaskPaused() const { return m_Layers[1].bPaused; }
+
     void    Seek(_float fProgress);
     _bool   Is_Finished() const { return m_bFinished; }
     _bool   Is_Paused()   const { return m_bPaused; }
@@ -58,6 +100,12 @@ public: // 재생 제어 (오브젝트/에디터는 오직 이것만 사용)
 
     // 바로 지우고 싶으면 그대로 사용 / 부드럽게 내리고 싶다면 BlendTime 주기
     void    Clear_Mask(_float fMaskBlendTime = 0.f);
+
+    // 리팩토링 중
+    void    Apply_Overlay(const LAYER_PLAY_INFO& tInfo);            // 같은 슬롯 + 같은 Clip 은 유지 / 다른 Clip은 crossfade / 슬롯 비활성 : weight-in
+    void    Clear_Overlay(_uint iSlot, _float fWeightBlend = 0.f);  // Weight->0 Fade 후 슬롯 비활성
+    _bool   Is_Overlay_Finished(_uint iSlot) const;                 // 비루프 Clip 종료시 true 
+
 
     void    Enqueue(const ANI_PLAY_INFO& info);
 
@@ -116,6 +164,9 @@ private:
     _wstring            m_strDataFilePath = {};
 
     _bool               m_bCurLoop = { false };
+
+    static constexpr _uint MAX_LAYERS = 4;      // 최대 Layer 개수 (이후 Enum으로 확장)
+    LAYER               m_Layers[MAX_LAYERS] = {};
 
 public:
     static CAnimator* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -67,12 +67,18 @@
 #include "BladeKnight.h"
 #include "BladeKnight_Body.h"
 #include "BladeKnight_Sword.h"
+#include "NormalEnemy.h"
+#include "NormalEnemy_Body.h"
 
 //Miniboss
 #include "GigantEdge.h"
 #include "GigantEdge_Body.h"
 #include "GigantEdge_Shield.h"
 #include "GigantEdge_Sword.h"
+
+//MainBoss
+#include "Boss_Gorilla.h"
+#include "Boss_Gorilla_Body.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
@@ -121,6 +127,7 @@ void CGameObject_Factory::RegisterAll()
     Register_Camera();
     Register_Test();
     Register_MiniBoss();
+    Register_MainBoss();
     Register_Container();
     Register_UIContainer();
     Register_NonAnimObject();
@@ -391,6 +398,23 @@ void CGameObject_Factory::Register_Container()
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/BladeKnight/BladeKnight_Sword.ysh"));
          )
     );
+
+    // 2. NormalEnemy
+    Register
+    (
+        CNormalEnemy::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CNormalEnemy),
+        LOADER
+        (
+            // NormalEnemy_Body
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CNormalEnemy_Body::PROTOTYPE_TAG,
+                CNormalEnemy_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_NormalEnemy_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/NormalEnemy/NormalEnemy.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
 }
 
 void CGameObject_Factory::Register_UIContainer()
@@ -492,6 +516,22 @@ void CGameObject_Factory::Register_MiniBoss()
                 CGigantEdge_Sword::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CGigantEdge_Shield::PROTOTYPE_TAG,
                 CGigantEdge_Shield::Create(pDevice, pContext));
+        )
+    );
+}
+
+void CGameObject_Factory::Register_MainBoss()
+{
+    Register(CBoss_Gorilla::PROTOTYPE_TAG, TEXT("MainBoss"),
+        CREATOR(CBoss_Gorilla),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Boss_Gorilla_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Gorilla/Body/Gorilla.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Gorilla_Body::PROTOTYPE_TAG,
+                CBoss_Gorilla_Body::Create(pDevice, pContext));
         )
     );
 }
