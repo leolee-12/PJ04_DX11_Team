@@ -1,12 +1,12 @@
-#include "BladeKnight_FSM.h"
+#include "BladeKnight_Brain.h"
 #include "Monster.h"
 #include "BladeKnight.h"
 
-CBladeKnight_FSM::CBladeKnight_FSM()
+CBladeKnight_Brain::CBladeKnight_Brain()
 {
 }
 
-HRESULT CBladeKnight_FSM::Initialize(CMonster* pOwner)
+HRESULT CBladeKnight_Brain::Initialize(CMonster* pOwner)
 {
 	if (FAILED(__super::Initialize(pOwner)))
 		return E_FAIL;
@@ -14,7 +14,7 @@ HRESULT CBladeKnight_FSM::Initialize(CMonster* pOwner)
 	return S_OK;
 }
 
-void CBladeKnight_FSM::Decide_Internal(const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta)
+void CBladeKnight_Brain::Decide_Internal(const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
@@ -47,20 +47,20 @@ void CBladeKnight_FSM::Decide_Internal(const MONSTER_BLACKBOARD& BlackBoard, _fl
 		pBladeKnight->Change_State(MONSTER_STATE_TYPE::IDLE);
 }
 
-CBladeKnight_FSM* CBladeKnight_FSM::Create(CMonster* pMonster)
+CBladeKnight_Brain* CBladeKnight_Brain::Create(CMonster* pMonster)
 {
-	CBladeKnight_FSM* pInstance = new CBladeKnight_FSM();
+	CBladeKnight_Brain* pInstance = new CBladeKnight_Brain();
 
 	if (FAILED(pInstance->Initialize(pMonster)))
 	{
-		MSG_BOX("Failed to Created : CBladeKnight_FSM");
+		MSG_BOX("Failed to Created : CBladeKnight_Brain");
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-MONSTER_STATE_TYPE CBladeKnight_FSM::Pick_AttackState(_int iAIType)
+MONSTER_STATE_TYPE CBladeKnight_Brain::Pick_AttackState(_int iAIType)
 {
 	static const MONSTER_STATE_TYPE ChasePool[] =
 	{
@@ -85,7 +85,7 @@ MONSTER_STATE_TYPE CBladeKnight_FSM::Pick_AttackState(_int iAIType)
 	return eAttack;
 }
 
-void CBladeKnight_FSM::Free()
+void CBladeKnight_Brain::Free()
 {
 	__super::Free();
 }

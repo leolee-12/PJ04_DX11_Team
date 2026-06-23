@@ -20,7 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\BladeKnight_Body.h" />
-    <ClInclude Include="..\Public\BladeKnight_FSM.h" />
+    <ClInclude Include="..\Public\BladeKnight_Brain.h" />
     <ClInclude Include="..\Public\BladeKnight_State_Attack.h" />
     <ClInclude Include="..\Public\BladeKnight_State_DoubleAttack.h" />
     <ClInclude Include="..\Public\BladeKnight_Sword.h" />
@@ -69,9 +69,13 @@
     <ClInclude Include="..\Public\LevelDesign_Loader.h" />
     <ClInclude Include="..\Public\LevelDesign_Parser.h" />
     <ClInclude Include="..\Public\LevelDesign_Registry.h" />
+    <ClInclude Include="..\Public\Monster_State_Patrol.h" />
     <ClInclude Include="..\public\Monster_State_Spat.h" />
     <ClInclude Include="..\Public\Monster_State_Retreat.h" />
     <ClInclude Include="..\public\MultiHitBoxPart.h" />
+    <ClInclude Include="..\Public\NormalEnemy.h" />
+    <ClInclude Include="..\Public\NormalEnemy_Body.h" />
+    <ClInclude Include="..\Public\NormalEnemy_Brain.h" />
     <ClInclude Include="..\Public\Parsing_Utils.h" />
     <ClInclude Include="..\Public\RailDataReceiver.h" />
     <ClInclude Include="..\Public\Shader_PassMeta.h" />
@@ -199,7 +203,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\BladeKnight_Body.cpp" />
-    <ClCompile Include="..\Private\BladeKnight_FSM.cpp" />
+    <ClCompile Include="..\Private\BladeKnight_Brain.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State_Attack.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State_DoubleAttack.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Sword.cpp" />
@@ -279,10 +283,14 @@
     <ClCompile Include="..\Private\Monster_State_KnockBack.cpp" />
     <ClCompile Include="..\Private\Monster_State_KnockOut.cpp" />
     <ClCompile Include="..\Private\Monster_State_Landing.cpp" />
+    <ClCompile Include="..\Private\Monster_State_Patrol.cpp" />
     <ClCompile Include="..\private\Monster_State_Spat.cpp" />
     <ClCompile Include="..\Private\Monster_State_Retreat.cpp" />
     <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\private\MultiHitBoxPart.cpp" />
+    <ClCompile Include="..\Private\NormalEnemy.cpp" />
+    <ClCompile Include="..\Private\NormalEnemy_Body.cpp" />
+    <ClCompile Include="..\Private\NormalEnemy_Brain.cpp" />
     <ClCompile Include="..\Private\TestParticle.cpp" />
     <ClCompile Include="..\Private\RailDataReceiver.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />

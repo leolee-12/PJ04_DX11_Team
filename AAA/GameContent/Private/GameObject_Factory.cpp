@@ -67,6 +67,8 @@
 #include "BladeKnight.h"
 #include "BladeKnight_Body.h"
 #include "BladeKnight_Sword.h"
+#include "NormalEnemy.h"
+#include "NormalEnemy_Body.h"
 
 //Miniboss
 #include "GigantEdge.h"
@@ -395,6 +397,23 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BladeKnight_Sword"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/BladeKnight/BladeKnight_Sword.ysh"));
          )
+    );
+
+    // 2. NormalEnemy
+    Register
+    (
+        CNormalEnemy::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CNormalEnemy),
+        LOADER
+        (
+            // NormalEnemy_Body
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CNormalEnemy_Body::PROTOTYPE_TAG,
+                CNormalEnemy_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_NormalEnemy_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/NormalEnemy/NormalEnemy.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
     );
 }
 

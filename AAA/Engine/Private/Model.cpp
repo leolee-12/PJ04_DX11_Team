@@ -347,10 +347,13 @@ _bool CModel::Play_Animation(_float fTimeDelta, _float fSpeed)
 	return isFinished;
 }
 
-_bool CModel::Play_Animation(_float fTimeDelta, const _string& strMaskClip, _float fSpeed, _bool bLoop, _float fMaskWeight)
+_bool CModel::Play_Animation(_float fTimeDelta, _float fMaskTimeDelta, _int iMaskIndex, _float& fMaskLocalTime, vector<_uint>& MaskCursors, _float fSpeed, _float fMaskSpeed, _bool bLoop , _float fMaskWeight, _bool* pbOverlayFinished)
 {
 	_bool isFinished = Update_Base(fTimeDelta, fSpeed);
-	Apply_Mask(strMaskClip, fTimeDelta, fSpeed, bLoop, fMaskWeight);
+	_bool isOverlayFinished = Apply_Mask(iMaskIndex, fMaskLocalTime, MaskCursors, fMaskTimeDelta, fMaskSpeed, bLoop, fMaskWeight);
+	if (pbOverlayFinished)
+		*pbOverlayFinished = isOverlayFinished;
+
 	Update_Combined();
 
 	return isFinished;
@@ -370,10 +373,9 @@ HRESULT CModel::Render(_uint iMeshIndex)
 	return S_OK;
 }
 
-void CModel::Capture_MaskSnapShot(const vector<_string>& Roots)
+void CModel::Build_MaskBones(const vector<_string>& Roots)
 {
 	m_MaskBones.clear();
-	m_MaskSnapShot.clear();
 
 	_uint n = static_cast<_uint>(m_Bones.size());
 	if (0 == n)
@@ -406,39 +408,31 @@ void CModel::Capture_MaskSnapShot(const vector<_string>& Roots)
 			masked[i] = 1;
 	}
 
-	// 3) ÀÎµ¦½º ¸®½ºÆ®·Î ¾ÐÃà + ½º³À¼¦ Ä¸Ã³
+	// 3) ÀÎµ¦½º ¸®½ºÆ® ¼öÁý 
 	m_MaskBones.reserve(n);
 	for (_uint i = 0; i < n; ++i)
 	{
-		if (!masked[i])
-			continue;
-
-		m_MaskBones.push_back(i);
-
-		_vector vS, vR, vT;
-		XMMatrixDecompose(&vS, &vR, &vT, m_Bones[i]->Get_TransformationMatrix());
-		KEYFRAME kf{};
-		XMStoreFloat3(&kf.vScale, vS);
-		XMStoreFloat4(&kf.vRotation, vR);
-		XMStoreFloat3(&kf.vTranslation, vT);
-		m_MaskSnapShot[i] = kf;
+		if (masked[i])
+			m_MaskBones.push_back(i);
 	}
 }
 
-void CModel::Apply_Mask(const _string& strClip, _float fTimeDelta, _float fSpeed, _bool bLoop, _float fMaskWeight)
+_bool CModel::Apply_Mask(_int iIndex, _float& fLocalTime, vector<_uint>& Cursors, _float fTimeDelta, _float fSpeed, _bool bLoop, _float fMaskWeight)
 {
 	if (fMaskWeight <= 0.f)
-		return;
+		return false;
 
 	if (m_MaskBones.empty())
-		return;
+		return false;
 
-	_int iIndex = Get_AnimationIndex(strClip);
-	if (iIndex < 0)
-		return;
+	if (iIndex < 0 || iIndex >= static_cast<_int>(m_Animations.size()))
+		return false;
+
+	_bool isFinished = false;
+	fLocalTime = m_Animations[iIndex]->Advance_Position(fLocalTime, fTimeDelta, bLoop, fSpeed, isFinished);
 
 	unordered_map<_uint, KEYFRAME> poseMap;
-	m_Animations[iIndex]->Compute_BoneKeyFrames(poseMap, fTimeDelta, bLoop, fSpeed);
+	m_Animations[iIndex]->Sample_Pose(poseMap, fLocalTime, Cursors);
 
 	auto Blend = [&](_uint iBone, const KEYFRAME& ov)
 		{
@@ -449,15 +443,7 @@ void CModel::Apply_Mask(const _string& strClip, _float fTimeDelta, _float fSpeed
 			if (fMaskWeight < 1.f)
 			{
 				_vector bS, bR, bT;
-				auto itSnap = m_MaskSnapShot.find(iBone);
-				if (itSnap != m_MaskSnapShot.end())     // ½º³À¼¦ ÀÖÀ¸¸é ½º³À¼¦¿¡¼­ Ãâ¹ß
-				{
-					bS = XMLoadFloat3(&itSnap->second.vScale);
-					bR = XMLoadFloat4(&itSnap->second.vRotation);
-					bT = XMLoadFloat3(&itSnap->second.vTranslation);
-				}
-				else
-					XMMatrixDecompose(&bS, &bR, &bT, m_Bones[iBone]->Get_TransformationMatrix());       // ½º³À¼¦ ¾øÀ¸¸é Base ¿¡¼­ Ãâ¹ß
+				XMMatrixDecompose(&bS, &bR, &bT, m_Bones[iBone]->Get_TransformationMatrix());			// ½Ç½Ã°£ Base Æ÷Áî ±âÁØ
 
 				if (XMVectorGetX(XMVector4Dot(bR, vR)) < 0.f)
 					vR = XMVectorNegate(vR);
@@ -477,6 +463,8 @@ void CModel::Apply_Mask(const _string& strClip, _float fTimeDelta, _float fSpeed
 
 		Blend(iBone, it->second);
 	}
+
+	return isFinished;
 }
 
 void CModel::Update_Combined()

@@ -1,0 +1,33 @@
+#pragma once
+#include "Monster_Brain_FSM.h"
+
+NS_BEGIN(Client)
+class CMonster;
+class CBladeKnight;
+
+class CBladeKnight_Brain final : public CMonster_Brain_FSM
+{
+protected:
+	CBladeKnight_Brain();
+	virtual ~CBladeKnight_Brain() = default;
+
+protected:
+	virtual HRESULT				Initialize(CMonster* pOwner) override;
+
+protected:
+	virtual void				Decide_Internal(const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta) override;
+
+public:
+	static CBladeKnight_Brain*	Create(CMonster* pMonster);
+
+private:
+	MONSTER_STATE_TYPE			Pick_AttackState(_int iAIType);
+
+private:
+	_uint						m_iAttackIndex = { 0 };
+
+protected:
+	virtual void				Free() override;
+};
+
+NS_END

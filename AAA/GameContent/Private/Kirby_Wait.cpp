@@ -36,7 +36,7 @@ void CKirby_Wait::Update(CKirby* pKirby, const _float fTimeDelta)
     __super::Update(pKirby, fTimeDelta);
 
     // Fall
-    if (Try_FallState(pKirby) == true)
+    if (Try_Transition_Fall(pKirby) == true)
         return;
 }
 

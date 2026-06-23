@@ -10,7 +10,6 @@
 #include "Kirby_State.h"
 
 #include "Inhalable.h"
-#include "Monster.h"
 #include "VacuumContainer.h"
 
 CKirby_Ability_Normal::CKirby_Ability_Normal()
@@ -41,7 +40,7 @@ COPY_ABILITY_TYPE CKirby_Ability_Normal::Get_AbilityType()
 
 void CKirby_Ability_Normal::Enter_Ability(CKirby* pKirby)
 {
-    m_eInhaleState = INHALE_STATE::INHALE_EXIT;
+    m_eInhaleState = INHALE_STATE::NORMAL_EXIT;
 
     m_bReqEndAttackState = false;
     m_bReqEndInhale = false;
@@ -70,8 +69,6 @@ void CKirby_Ability_Normal::Enter_Ability(CKirby* pKirby)
         }
         case MOUTH_STATE::STUFFFED:
         {
-            pKirby->Spit_Inhalable();
-
             Change_InhaleState(pKirby, INHALE_STATE::STUFFED_SPIT);
 
             break;
@@ -135,6 +132,9 @@ _bool CKirby_Ability_Normal::Handle_Command(CKirby* pKirby, CKirby_Command* pCom
             if (m_eMouthState != MOUTH_STATE::DEFAULT)
                 return true;
 
+            if (m_bInhaleCancelLocked == true)
+                return true;
+
             if (m_eInhaleState == INHALE_STATE::INHALE_LOOP ||
                 m_eInhaleState == INHALE_STATE::SUPER_INHALE_START ||
                 m_eInhaleState == INHALE_STATE::SUPER_INHALE_LOOP)
@@ -142,7 +142,6 @@ _bool CKirby_Ability_Normal::Handle_Command(CKirby* pKirby, CKirby_Command* pCom
                 m_bReqEndInhale = true;
             }
 
-            m_bReqEndInhale = true;
             return true;
         }
     }
@@ -242,13 +241,6 @@ void CKirby_Ability_Normal::Enter_InhaleState(CKirby* pKirby, INHALE_STATE eStat
             break;
         }
 
-        case INHALE_STATE::INHALE_EXIT:
-        {
-            pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
-            m_bReqEndAttackState = true;
-            break;
-        }
-
         case INHALE_STATE::STUFFED_START:
         {
             pBody->Set_Eye(KIRBY_EYE_STATE::IDLE);
@@ -257,9 +249,17 @@ void CKirby_Ability_Normal::Enter_InhaleState(CKirby* pKirby, INHALE_STATE eStat
             break;
         }
 
+
         case INHALE_STATE::STUFFED_SPIT:
         {
             pAnimator->Play("Spit", false, false, 0.1f, 2.f, true);
+            break;
+        }
+
+
+        case INHALE_STATE::NORMAL_EXIT:
+        {
+            m_bReqEndAttackState = true;
             break;
         }
     }
@@ -310,24 +310,19 @@ void CKirby_Ability_Normal::Update_InhaleState(CKirby* pKirby, _float fTimeDelta
                 pBody->Set_Body(KIRBY_BODY_STATE::NORMAL);
 
             if (pAnimator->Is_Finished())
-                Change_InhaleState(pKirby, INHALE_STATE::INHALE_EXIT);
+                Change_InhaleState(pKirby, INHALE_STATE::NORMAL_EXIT);
 
-            break;
-        }
-
-        case INHALE_STATE::INHALE_EXIT:
-        {
-            m_bReqEndAttackState = true;
             break;
         }
 
         case INHALE_STATE::STUFFED_START:
         {
             if (pAnimator->Is_Finished())
-                Change_InhaleState(pKirby, INHALE_STATE::INHALE_EXIT);
+                Change_InhaleState(pKirby, INHALE_STATE::NORMAL_EXIT);
 
             break;
         }
+
 
         case INHALE_STATE::STUFFED_SPIT:
         {
@@ -341,6 +336,7 @@ void CKirby_Ability_Normal::Update_InhaleState(CKirby* pKirby, _float fTimeDelta
             else if (fRatio >= 0.1f)
             {
                 pKirby->Get_Body()->Set_Body(KIRBY_BODY_STATE::INHALE);
+                Spit_Inhalable(pKirby);
             }
             else
             {
@@ -348,8 +344,15 @@ void CKirby_Ability_Normal::Update_InhaleState(CKirby* pKirby, _float fTimeDelta
             }
 
             if (pAnimator->Is_Finished())
-                Change_InhaleState(pKirby, INHALE_STATE::INHALE_EXIT);
+                Change_InhaleState(pKirby, INHALE_STATE::NORMAL_EXIT);
 
+            break;
+        }
+
+
+        case INHALE_STATE::NORMAL_EXIT:
+        {
+            m_bReqEndAttackState = true;
             break;
         }
     }
@@ -358,6 +361,7 @@ void CKirby_Ability_Normal::Update_InhaleState(CKirby* pKirby, _float fTimeDelta
 void CKirby_Ability_Normal::Exit_InhaleState(CKirby* pKirby, INHALE_STATE eState)
 {
     CKirby_Body* pBody = pKirby->Get_Body();
+    CMovement_Child* pMovement = pKirby->Get_Movement();
 
     switch (eState)
     {
@@ -373,13 +377,16 @@ void CKirby_Ability_Normal::Exit_InhaleState(CKirby* pKirby, INHALE_STATE eState
             pKirby->Get_Movement()->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
             break;
 
-        case INHALE_STATE::INHALE_EXIT:
+        case INHALE_STATE::STUFFED_START:
+            pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
             break;
 
-        case INHALE_STATE::STUFFED_START:
-            break;
 
         case INHALE_STATE::STUFFED_SPIT:
+            break;
+
+
+        case INHALE_STATE::NORMAL_EXIT:
             break;
     }
 }
@@ -475,9 +482,6 @@ void CKirby_Ability_Normal::Play_InhaleLoopAnimation(CKirby* pKirby)
                 strAniName = "SuperInhaleFall";
             break;
         }
-
-        default:
-            return;
     }
 
     pAnimator->Play(strAniName, true, false, 0.05f, 1.5f);
@@ -506,6 +510,18 @@ void CKirby_Ability_Normal::Start_InhaleCollider(CKirby* pKirby)
 {
     CCollider* pInhaleCollider = pKirby->Get_Collider(CKirby::KIRBY_COLLIDER::INHALE_BOX);
 
+    pInhaleCollider->Set_OnEnter
+    (
+        [this, pKirby](CCollider* pOtherCollider)
+        {
+            IInhalable* pInhalableTarget = dynamic_cast<IInhalable*>(pOtherCollider->Get_Owner());
+            if (pInhalableTarget == nullptr)
+                return;
+            
+            m_bInhaleCancelLocked = true;
+        }
+    );
+
     pInhaleCollider->Set_OnStay
     (
         [this, pKirby](CCollider* pOtherCollider)
@@ -532,6 +548,7 @@ void CKirby_Ability_Normal::End_InhaleCollider(CKirby* pKirby)
 {
     CCollider* pInhaleBox = pKirby->Get_Collider(CKirby::KIRBY_COLLIDER::INHALE_BOX);
     pInhaleBox->Set_Enabled(false);
+    pInhaleBox->Set_OnEnter(nullptr);
     pInhaleBox->Set_OnStay(nullptr);
 }
 
@@ -580,7 +597,7 @@ void CKirby_Ability_Normal::Handle_InhaleCaptured(CKirby* pKirby, IInhalable* pI
 
     if (eAbility == COPY_ABILITY_TYPE::NONE || eAbility == COPY_ABILITY_TYPE::NORMAL)
     {
-        pKirby->Capture_Inhalable(pInhaleable);
+        Capture_Inhalable(pInhaleable);
 
         Change_MouthState(MOUTH_STATE::STUFFFED);
         Change_InhaleState(pKirby, INHALE_STATE::STUFFED_START);
@@ -590,6 +607,8 @@ void CKirby_Ability_Normal::Handle_InhaleCaptured(CKirby* pKirby, IInhalable* pI
         pKirby->Request_ChangeKirbyAbility(eAbility);
         pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
     }
+
+    m_bInhaleCancelLocked = false;
 }
 
 void CKirby_Ability_Normal::Update_SuperInhaleEffectRise(_float fRatio)
@@ -615,6 +634,24 @@ void CKirby_Ability_Normal::Update_SuperInhaleEffectRise(_float fRatio)
 
     vCurPos = XMVectorSetW(vCurPos, 1.f);
     m_pInhaleEffect->Get_Transform()->Set_State(STATE::POSITION, vCurPos);
+}
+
+void CKirby_Ability_Normal::Spit_Inhalable(CKirby* pKirby)
+{
+    if (m_pCapturedInhalable == nullptr)
+        return;
+
+    CTransform* pTransform = pKirby->Get_Transform();
+
+    _vector vMouth =
+        pTransform->Get_State(STATE::POSITION)
+        + pTransform->Get_State(STATE::LOOK) * CKirby::s_fInhaleFwd
+        + pTransform->Get_State(STATE::UP) * CKirby::s_fInhaleUp;
+    _vector vDir = pTransform->Get_State(STATE::LOOK);
+
+    m_pCapturedInhalable->Be_Spat(vMouth, vDir, CKirby::s_fSpitSpeed);
+
+    m_pCapturedInhalable = nullptr;
 }
 
 CKirby_Ability_Normal* CKirby_Ability_Normal::Create()
