@@ -76,6 +76,7 @@ private:
 	void Register_Effect();
 
     void Register_MiniBoss();
+    void Register_MainBoss();
 
 public:
     virtual void Free() override;

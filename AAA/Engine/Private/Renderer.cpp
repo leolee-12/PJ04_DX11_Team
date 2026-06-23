@@ -23,6 +23,8 @@ HRESULT CRenderer::Initialize()
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Normal"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 1.f))))
         return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_GeoNormal"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.5f, 0.5f, 1.f, 0.f))))
+        return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Depth"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_MRA"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 1.f, 1.f, 0.f))))
@@ -75,6 +77,8 @@ HRESULT CRenderer::Initialize()
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_MRA"))))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Emissive"))))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_GeoNormal"))))
         return E_FAIL;
 
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Light"))))
@@ -329,6 +333,8 @@ HRESULT CRenderer::Render_SSAO()
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShaderPost, "g_DepthTexture")))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Normal"), m_pShaderPost, "g_NormalTexture")))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_GeoNormal"), m_pShaderPost, "g_GeoNormalTexture")))
         return E_FAIL;
 
     // 풀스크린 쿼드용 ORTHO
