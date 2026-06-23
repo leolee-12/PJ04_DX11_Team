@@ -768,18 +768,6 @@ HRESULT CMap_Loader::Load_Env_Runtime(
 	if (nullptr != pOutDeletedEnvDescs)
 		pOutDeletedEnvDescs->clear();
 
-#ifdef _DEBUG
-	const std::string strAbiLog =
-		std::string("[MapLoad][ABI][GameContent] sizeof(ENV_OBJECT_DESC)=") + std::to_string(sizeof(ENV_OBJECT_DESC))
-		+ " sizeof(MAP_ENV_EDITED_DESC)=" + std::to_string(sizeof(MAP_ENV_EDITED_DESC))
-		+ " sizeof(MAP_EDIT_CHANGE)=" + std::to_string(sizeof(MAP_EDIT_CHANGE))
-		+ " sizeof(MAP_LOAD_RESULT)=" + std::to_string(sizeof(MAP_LOAD_RESULT))
-		+ " hasOverride=" + std::to_string(static_cast<int>(nullptr != pOverrideDesc))
-		+ " hasDeletedOut=" + std::to_string(static_cast<int>(nullptr != pOutDeletedEnvDescs));
-
-	OutputDebugStringA((strAbiLog + "\n").c_str());
-#endif
-
 	if (!Is_RuntimeLoadContextValid(Context) || strMapManifestPath.empty())
 		return E_FAIL;
 
