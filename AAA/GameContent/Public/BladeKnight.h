@@ -74,9 +74,7 @@ private:
 
 	_int						m_iAIType = { 1 };		// 0은 고정형, 1은 자유 이동형
 
-	// 테스트용 멤버변수
-	_float						m_fTiltCurDeg = { 0.f };		// 현재 누적 기울기 
-	_float						m_fTiltLerp = { 5.0f };			// 클수록 빨리 도달한다.
+	_bool						m_bIdleOverlayOn = { false };
 
 public:
 	static CBladeKnight*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext); 

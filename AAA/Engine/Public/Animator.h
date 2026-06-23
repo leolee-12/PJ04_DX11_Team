@@ -48,6 +48,7 @@ public:
         _bool           bFinished           = { false };            // 레이어 완료 신호
 
         vector<_uint>   MaskBones;                                  // 해석된 마스크 본 인덱스
+        vector<_uint>   KeyFrameCursors;
     };
 
 
@@ -77,11 +78,11 @@ public: // 재생 제어 (오브젝트/에디터는 오직 이것만 사용)
     void    Pause() { m_bPaused = true; }
     void    Resume() { m_bPaused = false; }
     
-    void    Pause_Mask() { m_bMaskPaused = true; }
-    void    Resume_Mask() { m_bMaskPaused = false; }
+    void    Pause_Mask(_int iSlot = 1) { m_Layers[iSlot].bPaused  = true; }
+    void    Resume_Mask(_int iSlot = 1) { m_Layers[iSlot].bPaused = false; }
 
-    void    Set_MaskPaused(_bool bPaused) { m_bMaskPaused = bPaused; }
-    _bool   Is_MaskPaused() const { return m_bMaskPaused; }
+    void    Set_MaskPaused(_bool bPaused) { m_Layers[1].bPaused = bPaused; }
+    _bool   Is_MaskPaused() const { return m_Layers[1].bPaused; }
 
     void    Seek(_float fProgress);
     _bool   Is_Finished() const { return m_bFinished; }
@@ -147,8 +148,6 @@ private:
 
     _bool               m_bPaused = { false };
     _bool               m_bFinished = { false };
-
-    _bool               m_bMaskPaused = { false };
 
     string              m_strPrevAnimName = {};
     _float              m_fPrevProgress = { 0.f };

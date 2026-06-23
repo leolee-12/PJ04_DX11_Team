@@ -65,20 +65,17 @@ public:
 
 	_bool			Update_Base(_float fTimeDelta, _float fSpeed = 1.0f);
 	_bool			Play_Animation(_float fTimeDelta, _float fSpeed = 1.0f);
-	_bool			Play_Animation(_float fTimeDelta, _float fMaskTimeDelta, const _string& strMaskClip, _float fSpeed = 1.0f, _bool bLoop = true, _float fMaskWeight = 1.f);
+	_bool			Play_Animation(_float fTimeDelta, _float fMaskTimeDelta, _int iMaskIndex, _float& fMaskLocalTime, vector<_uint>& MaskCursors,
+									_float fSpeed = 1.0f, _float fMaskSpeed = 1.0f, _bool bLoop = true, _float fMaskWeight = 1.f, _bool* pbOverlayFinished = nullptr);
 
-	void			Apply_Mask(const _string& strClip, _float fTimeDelta, _float fSpeed = 1.0f, _bool bLoop = true, _float fMaskWeight = 1.f);
+	_bool			Apply_Mask(_int iIndex, _float& fLocalTime, vector<_uint>& Cursors, _float fTimeDelta, _float fSpeed = 1.0f, _bool bLoop = true, _float fMaskWeight = 1.f);
 	void			Update_Combined();
 
 	HRESULT			Render(_uint iMeshIndex);
 
-	void			Capture_MaskSnapShot(const vector<_string>& Roots);
+	void			Build_MaskBones(const vector<_string>& Roots);
 
-	void			Clear_MaskSnapShot() 
-	{ 
-		m_MaskSnapShot.clear();
-		m_MaskBones.clear();
-	}
+	void			Clear_MaskBones() { m_MaskBones.clear(); }
 
 	const _wstring& Get_ModelPath() { return m_strModelPath; }
 
@@ -130,7 +127,6 @@ private:
 	vector<MESH_LAYER_IDX>		m_MeshLayers;
 	string						m_strMeshLayerPath;
 	
-	unordered_map<_uint, KEYFRAME> m_MaskSnapShot;
 	vector<_uint>				m_MaskBones;
 
 
