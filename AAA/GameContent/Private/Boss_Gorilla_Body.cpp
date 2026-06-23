@@ -12,13 +12,11 @@ CBoss_Gorilla_Body::CBoss_Gorilla_Body(const CBoss_Gorilla_Body& Prototype)
 
 HRESULT CBoss_Gorilla_Body::Initialize(void* pArg)
 {
-    if (FAILED(__super::Initialize(pArg))) return E_FAIL;   // -> CMonsterPart
-    if (FAILED(Ready_Components()))        return E_FAIL;   // 모델/애님/셰이더 (본 준비됨)
+    if (FAILED(__super::Initialize(pArg))) return E_FAIL;   
+    if (FAILED(Ready_Components()))        return E_FAIL;   
 
-    // 히트박스 1개 or 2개: 한 줄씩 추가. 단일이면 한 줄만 남기면 됨.
-    // TODO: 실제 본 이름 / 크기 / 데미지.
-    Add_HitBox("RHaveL", COLLIDER::SPHERE, 3.f, 0.f, 15.f, 10.f);
-    Add_HitBox("LHaveL", COLLIDER::SPHERE, 3.f, 0.f, 15.f, 10.f);
+    Add_HitBox(GHB_RHAND, "RHaveL", COLLIDER::SPHERE, 3.f, 0.f, 15.f, 10.f);
+    Add_HitBox(GHB_LHAND, "LHaveL", COLLIDER::SPHERE, 3.f, 0.f, 15.f, 10.f);
 
     m_pAnimatorCom->Play("Wait", false);
 

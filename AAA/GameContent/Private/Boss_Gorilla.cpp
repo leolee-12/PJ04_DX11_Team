@@ -7,7 +7,7 @@
 #include "Animator.h"
 
 // 3페이즈: 66%, 33% 에서 전환 (PhaseCount = size()+1 = 3) Brain의 Get_PhaseCount와 일치!
-const vector<_float> CBoss_Gorilla::s_Thresholds = { 0.66f, 0.33f };
+const vector<_float> CBoss_Gorilla::s_Thresholds = { 0.5f };
 
 CBoss_Gorilla::CBoss_Gorilla(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CBoss(pDevice, pContext) {
@@ -23,18 +23,18 @@ HRESULT CBoss_Gorilla::Initialize_Prototype()
 
 HRESULT CBoss_Gorilla::Initialize(void* pArg)
 {
-    if (FAILED(__super::Initialize(pArg)))      // CBoss: 비흡입 트레잇 세팅
+    if (FAILED(__super::Initialize(pArg)))   
         return E_FAIL;
 
     m_strBossName = L"고릴라 보스";
-    m_fMaxHP = 1000.f;                          // TODO: 튜닝
+    m_fMaxHP = 1000.f;    
     m_fCurHP = m_fMaxHP;
 
     if (m_pMovement)
+    {
         m_pMovement->Set_MoveSpeed(3.f);
-
-    //Test
-    Set_Active(true);
+        m_pMovement->Set_RotSpeed(90.f);
+    }
 
     return S_OK;
 }
@@ -48,6 +48,10 @@ void CBoss_Gorilla::Update(_float fTimeDelta)
         return;
     }
 #endif
+
+    if (m_eLife == EBOSS_LIFE::HIDDEN)
+        Appear();
+
     __super::Update(fTimeDelta);
 }
 
@@ -60,6 +64,18 @@ void CBoss_Gorilla::On_Deserialized()
 CMonsterBrain* CBoss_Gorilla::Create_Brain()
 {
     return CBoss_Gorilla_Brain::Create();
+}
+
+void CBoss_Gorilla::Play_PhaseTransition(_int iNewPhase)
+{
+    if (CAnimator* pAnim = Get_BodyAnimator())
+        pAnim->Play("Roar", false, true);
+}
+
+_bool CBoss_Gorilla::Is_PhaseTransition_Finished() const
+{
+    CAnimator* pAnim = Get_BodyAnimator();
+    return pAnim ? pAnim->Is_Finished() : true;
 }
 
 void CBoss_Gorilla::On_PhaseChanged(_int iOldPhase, _int iNewPhase)
@@ -79,6 +95,11 @@ _bool CBoss_Gorilla::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
 CAnimator* CBoss_Gorilla::Get_BodyAnimator() const
 {
     return m_pBody ? m_pBody->Get_Animator() : nullptr;
+}
+
+CMultiHitBoxPart* CBoss_Gorilla::Get_HitBoxPart() const
+{
+    return m_pBody;
 }
 
 HRESULT CBoss_Gorilla::Ready_PartObjects()
