@@ -430,7 +430,7 @@ void CMonster::On_Death(const ATTACK_INFO& tInfo)
 	{
 		if (m_pMovement)
 			m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
-		Change_State(MONSTER_STATE_TYPE::KNOCK_BACK);
+		Change_State(MONSTER_STATE_TYPE::KNOCK_BACK_DEATH);					// KNOCK_BACK_DEATH ·Î ¼öÁ¤
 	}
 }
 

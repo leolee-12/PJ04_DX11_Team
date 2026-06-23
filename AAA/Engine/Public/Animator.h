@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include "Anim_Layer.h"
 
 NS_BEGIN(Engine)
 
@@ -21,36 +22,12 @@ public:
 
     struct LAYER_PLAY_INFO
     {
-        _uint               iSlot           = { 1 };
+        _uint               iSlot = { 1 };
         ANI_PLAY_INFO       tAnim;                          // 재생할 클립 코어 
         vector<_string>     Roots;                          // 마스크 루트 본 (비우면 전신 레이어)
-        _float              fTargetWeight   = { 1.f };      // 목표 가중치 0~1
-        _float              fWeightBlend    = { 0.1f };     // Weight 0 ~ Target 보간 시간
+        _float              fTargetWeight = { 1.f };      // 목표 가중치 0~1
+        _float              fWeightBlend = { 0.1f };     // Weight 0 ~ Target 보간 시간
     };
-
-    // 레이어에 들어온 정보를 풀어 보관 (base는 index 0, weight 1 고정)
-    struct LAYER        
-    {
-        _string         strClip;                                    // 재생 중인 클립 ("" : 비활성)
-        _int            iAnimIndex          = { -1 };                          // 해석된 인덱스 - 매 프레임 Get_AnimtionIndex 제거 
-        _float          fLocalTime          = { 0.f };               // 레이어 자체 재생 
-
-        _float          fClipBlend          = { 0.f };              // crossfade 총 시간
-        _float          fClipBlendElapsed   = { 0.f };              // 경과
-
-        _float          fWeight             = { 0.f };              // Weight Blend 
-        _float          fTarget             = { 1.f };
-        _float          fWeightBlend          = { 0.1f };
-
-        _float          fSpeed              = { 1.f };              // 레이어 독립 속도
-        _bool           bLoop               = { true };             
-        _bool           bPaused             = { false };
-        _bool           bFinished           = { false };            // 레이어 완료 신호
-
-        vector<_uint>   MaskBones;                                  // 해석된 마스크 본 인덱스
-        vector<_uint>   KeyFrameCursors;
-    };
-
 
 public:
     typedef struct tagAnimatorDesc

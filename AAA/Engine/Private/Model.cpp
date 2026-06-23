@@ -342,18 +342,6 @@ _bool CModel::Play_Animation(_float fTimeDelta, _float fSpeed)
 	return isFinished;
 }
 
-_bool CModel::Play_Animation(_float fTimeDelta, _float fMaskTimeDelta, _int iMaskIndex, _float& fMaskLocalTime, vector<_uint>& MaskCursors, _float fSpeed, _float fMaskSpeed, _bool bLoop , _float fMaskWeight, _bool* pbOverlayFinished)
-{
-	_bool isFinished = Update_Base(fTimeDelta, fSpeed);
-	_bool isOverlayFinished = Apply_Mask(iMaskIndex, fMaskLocalTime, MaskCursors, fMaskTimeDelta, fMaskSpeed, bLoop, fMaskWeight);
-	if (pbOverlayFinished)
-		*pbOverlayFinished = isOverlayFinished;
-
-	Update_Combined();
-
-	return isFinished;
-}
-
 HRESULT CModel::Render(_uint iMeshIndex)
 {
 	if (iMeshIndex >= m_iNumMeshes)
@@ -368,9 +356,9 @@ HRESULT CModel::Render(_uint iMeshIndex)
 	return S_OK;
 }
 
-void CModel::Build_MaskBones(const vector<_string>& Roots)
+void CModel::Build_MaskBones(const vector<_string>& Roots, vector<_uint>& OutBones)
 {
-	m_MaskBones.clear();
+	OutBones.clear();
 
 	_uint n = static_cast<_uint>(m_Bones.size());
 	if (0 == n)
@@ -404,59 +392,115 @@ void CModel::Build_MaskBones(const vector<_string>& Roots)
 	}
 
 	// 3) 인덱스 리스트 수집 
-	m_MaskBones.reserve(n);
+	OutBones.reserve(n);
 	for (_uint i = 0; i < n; ++i)
 	{
 		if (masked[i])
-			m_MaskBones.push_back(i);
+			OutBones.push_back(i);
 	}
 }
 
-_bool CModel::Apply_Mask(_int iIndex, _float& fLocalTime, vector<_uint>& Cursors, _float fTimeDelta, _float fSpeed, _bool bLoop, _float fMaskWeight)
+_bool CModel::Apply_Mask(LAYER& animLayer, _float fTimeDelta)
 {
-	if (fMaskWeight <= 0.f)
+	if (animLayer.fWeight <= 0.f)
 		return false;
 
-	if (m_MaskBones.empty())
+	if (animLayer.MaskBones.empty())
 		return false;
 
-	if (iIndex < 0 || iIndex >= static_cast<_int>(m_Animations.size()))
+	if (animLayer.iAnimIndex < 0 || animLayer.iAnimIndex >= static_cast<_int>(m_Animations.size()))
 		return false;
+
+	const _float fDelta = animLayer.bPaused ? 0.f : fTimeDelta;		// pause 흡수
 
 	_bool isFinished = false;
-	fLocalTime = m_Animations[iIndex]->Advance_Position(fLocalTime, fTimeDelta, bLoop, fSpeed, isFinished);
+	animLayer.fLocalTime = m_Animations[animLayer.iAnimIndex]->Advance_Position(animLayer.fLocalTime, fDelta, animLayer.bLoop, animLayer.fSpeed, isFinished);
 
-	unordered_map<_uint, KEYFRAME> poseMap;
-	m_Animations[iIndex]->Sample_Pose(poseMap, fLocalTime, Cursors);
+	unordered_map<_uint, KEYFRAME> curMap;
+	m_Animations[animLayer.iAnimIndex]->Sample_Pose(curMap, animLayer.fLocalTime, animLayer.KeyFrameCursors);
 
-	auto Blend = [&](_uint iBone, const KEYFRAME& ov)
+	const _bool bCrossfade = (animLayer.bClipBlending
+		&& animLayer.iPrevAnimIndex >= 0
+		&& animLayer.iPrevAnimIndex < static_cast<_int>(m_Animations.size()));
+
+	unordered_map<_uint, KEYFRAME> prevMap;
+	_float t = 1.f;
+
+	if (bCrossfade)
+	{
+		_bool prevFin = false;
+		animLayer.fPrevLocalTime = m_Animations[animLayer.iPrevAnimIndex]->Advance_Position(
+			animLayer.fPrevLocalTime, fDelta, animLayer.bPrevLoop, animLayer.fSpeed, prevFin);
+		m_Animations[animLayer.iPrevAnimIndex]->Sample_Pose(prevMap, animLayer.fPrevLocalTime, animLayer.PrevCursors);
+
+		animLayer.fClipBlendElapsed += fDelta;
+		t = (animLayer.fClipBlend > 0.f) ? (animLayer.fClipBlendElapsed / animLayer.fClipBlend) : 1.f;
+		if (t > 1.f)
+			t = 1.f;
+	}
+	
+	// clip crossfade Lerp (Prev -> Cur)
+	auto LerpKF = [](const KEYFRAME& a, const KEYFRAME& b, _float r) -> KEYFRAME
+		{
+			_vector aS = XMLoadFloat3(&a.vScale), bS = XMLoadFloat3(&b.vScale);
+			_vector aR = XMLoadFloat4(&a.vRotation), bR = XMLoadFloat4(&b.vRotation);
+			_vector aT = XMLoadFloat3(&a.vTranslation), bT = XMLoadFloat3(&b.vTranslation);
+
+			if (XMVectorGetX(XMVector4Dot(aR, bR)) < 0.f)
+				bR = XMVectorNegate(bR);
+
+			KEYFRAME o{};
+			XMStoreFloat3(&o.vScale, XMVectorLerp(aS, bS, r));
+			XMStoreFloat4(&o.vRotation, XMQuaternionSlerp(aR, bR, r));
+			XMStoreFloat3(&o.vTranslation, XMVectorLerp(aT, bT, r));
+			return o;
+		};
+
+	// overlay 포즈 -> Base에 Weight 블렌딩으로 마스킹
+
+	auto BlendToBone = [&](_uint iBone, const KEYFRAME& ov)
 		{
 			_vector vS = XMLoadFloat3(&ov.vScale);
 			_vector vR = XMLoadFloat4(&ov.vRotation);
 			_vector vT = XMLoadFloat3(&ov.vTranslation);
 
-			if (fMaskWeight < 1.f)
+			if (animLayer.fWeight < 1.f)
 			{
-				_vector bS, bR, bT;
+				_vector bS, bR, bT;																		// TODO : SRT 중에 선택 받아서 보간 대상 결정하기
 				XMMatrixDecompose(&bS, &bR, &bT, m_Bones[iBone]->Get_TransformationMatrix());			// 실시간 Base 포즈 기준
 
 				if (XMVectorGetX(XMVector4Dot(bR, vR)) < 0.f)
 					vR = XMVectorNegate(vR);
-				vS = XMVectorLerp(bS, vS, fMaskWeight);
-				vR = XMQuaternionSlerp(bR, vR, fMaskWeight);
-				vT = XMVectorLerp(bT, vT, fMaskWeight);
+				vS = XMVectorLerp(bS, vS, animLayer.fWeight);
+				vR = XMQuaternionSlerp(bR, vR, animLayer.fWeight);
+				vT = XMVectorLerp(bT, vT, animLayer.fWeight);
 			}
 			m_Bones[iBone]->Set_TransformationMatrix(XMMatrixAffineTransformation(
 				vS, XMVectorSet(0, 0, 0, 1), vR, XMVectorSetW(vT, 1.f)));
 		};
 
-	for (_uint iBone : m_MaskBones)
+	for (_uint iBone : animLayer.MaskBones)
 	{
-		auto it = poseMap.find(iBone);
-		if (it == poseMap.end())
+		auto it = curMap.find(iBone);
+		if (it == curMap.end())
 			continue;
 
-		Blend(iBone, it->second);
+		KEYFRAME ov = it->second;
+		if (bCrossfade)
+		{
+			auto itp = prevMap.find(iBone);
+			if (itp != prevMap.end())
+				ov = LerpKF(itp->second, ov, t);
+		}
+		BlendToBone(iBone, ov);
+	}
+
+	// Crossfade 완료 -> Prev 폐기
+	if (bCrossfade && t >= 1.f)
+	{
+		animLayer.bClipBlending = false;
+		animLayer.iPrevAnimIndex = -1;
+		animLayer.PrevCursors.clear();
 	}
 
 	return isFinished;

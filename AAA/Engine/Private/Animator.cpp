@@ -74,8 +74,8 @@ void CAnimator::Start_Clip(const ANI_PLAY_INFO& Info)
     if (iIndex < 0)
         return;
 
-    if (Info.bClearMask)
-        Clear_Mask();
+    //if (Info.bClearMask)
+    //    Clear_Mask();
 
     m_fBlendDuration = Info.fBlend;
     m_pModel->Set_AnimationIndex(static_cast<_uint>(iIndex), Info.bLoop, Info.bRestart, m_fBlendDuration);
@@ -170,10 +170,20 @@ void CAnimator::Apply_Overlay(const LAYER_PLAY_INFO& tInfo)
         Layer.bFinished = false;
         Layer.fLocalTime = 0.f;
         Layer.KeyFrameCursors.clear();
-        m_pModel->Build_MaskBones(tInfo.Roots);     
+        Layer.bClipBlending = false;
+        Layer.iPrevAnimIndex = -1;
+        Layer.PrevCursors.clear();
+        m_pModel->Build_MaskBones(tInfo.Roots, Layer.MaskBones);     
     }
     else if (!bSameClip)
     {
+        // 현재 클립을 나가는 쪽으로 이동
+        Layer.iPrevAnimIndex = Layer.iAnimIndex;
+        Layer.fPrevLocalTime = Layer.fLocalTime;
+        Layer.PrevCursors = Layer.KeyFrameCursors;
+        Layer.bPrevLoop = Layer.bLoop;
+        Layer.bClipBlending = true;
+        
         // 이미 활성화 되어있는 슬롯
         Layer.strClip = strClip;
         Layer.iAnimIndex = iAnimIndex;
@@ -181,9 +191,10 @@ void CAnimator::Apply_Overlay(const LAYER_PLAY_INFO& tInfo)
         Layer.bFinished = false;
         Layer.fLocalTime = 0.f;
         Layer.KeyFrameCursors.clear();
+
         Layer.fClipBlend = tInfo.tAnim.fBlend;   
         Layer.fClipBlendElapsed = 0.f;          // 블렌드 시간 초기화
-        m_pModel->Build_MaskBones(tInfo.Roots);
+        m_pModel->Build_MaskBones(tInfo.Roots, Layer.MaskBones);
     }
     else if (tInfo.tAnim.bRestart)      // 같은 클립 + bRestart true라면 처음부터 재생
     {
@@ -218,8 +229,10 @@ void CAnimator::Clear_Overlay(_uint iSlot, _float fWeightBlend)
         Layer.bFinished = false;
         Layer.fLocalTime = 0.f;
         Layer.KeyFrameCursors.clear();
-        if (m_pModel)
-            m_pModel->Clear_MaskBones(); 
+        Layer.MaskBones.clear();
+        Layer.bClipBlending = false;
+        Layer.iPrevAnimIndex = -1;
+        Layer.PrevCursors.clear();
         return;
     }
 
@@ -244,40 +257,46 @@ void CAnimator::Update(_float fTimeDelta)
 {
     if (nullptr == m_pModel)
         return;
-
-    // 단일 오버레이 (슬롯 1) - 임시 검증 버전
-    LAYER& Ov = m_Layers[1];
-
-    _float fStep = (Ov.fWeightBlend > 0.f) ? (fTimeDelta / Ov.fWeightBlend) : 1.f;
-    if (Ov.fWeight < Ov.fTarget)
-        Ov.fWeight = min(Ov.fWeight + fStep, Ov.fTarget);
-    else
-        Ov.fWeight = max(Ov.fWeight - fStep, Ov.fTarget);
-
-    // 완전히 빠지면 오버레이 정리
-    if (!Ov.strClip.empty() && Ov.fTarget <= 0.f && Ov.fWeight <= 0.f)
-    {
-        Ov.strClip.clear();
-        Ov.bFinished = false;
-        Ov.iAnimIndex = -1;
-        Ov.fLocalTime = 0.f;
-        Ov.KeyFrameCursors.clear();
-        if (m_pModel)
-            m_pModel->Clear_MaskBones();
-    }
     
-    // 임시
+    for (_uint iSlot = 1; iSlot < MAX_LAYERS; ++iSlot)
+    {
+        LAYER& Layer = m_Layers[iSlot];
+        if (Layer.strClip.empty() && Layer.fWeight <= 0.f)
+            continue;                                           // 미사용 슬롯은 스킵
+
+        _float fStep = (Layer.fWeightBlend > 0.f) ? (fTimeDelta / Layer.fWeightBlend) : 1.f;
+        if (Layer.fWeight < Layer.fTarget)
+            Layer.fWeight = min(Layer.fWeight + fStep, Layer.fTarget);
+        else
+            Layer.fWeight = max(Layer.fWeight - fStep, Layer.fTarget);
+
+        // 페이드 아웃 완료 -> 슬롯 비활성화
+        if (!Layer.strClip.empty() && Layer.fTarget <= 0.f && Layer.fWeight <= 0.f)
+        {
+            Layer.strClip.clear();
+            Layer.bFinished = false;
+            Layer.iAnimIndex = -1;
+            Layer.fLocalTime = 0.f;
+            Layer.KeyFrameCursors.clear();
+            Layer.MaskBones.clear();
+            Layer.bClipBlending = false;
+            Layer.iPrevAnimIndex = -1;
+            Layer.PrevCursors.clear();
+        }
+    }
+
     if (!m_bPaused)
     {
-        if (!Ov.strClip.empty() && Ov.fWeight > 0.f)
+        m_bFinished = m_pModel->Update_Base(fTimeDelta, m_fPlaySpeed);              // 베이스 재생
+
+        for (_uint iSlot = 1; iSlot < MAX_LAYERS; ++iSlot)
         {
-            _float fMaskDelta = Ov.bPaused ? 0.f : fTimeDelta;       // 마스크 일시정지
-            _bool bOvFinished = false;
-            m_bFinished = m_pModel->Play_Animation(fTimeDelta, fMaskDelta, Ov.iAnimIndex, Ov.fLocalTime, Ov.KeyFrameCursors, m_fPlaySpeed, Ov.fSpeed, Ov.bLoop, Ov.fWeight, &bOvFinished);
-            Ov.bFinished = bOvFinished;
+            LAYER& Layer = m_Layers[iSlot];
+            if (!Layer.strClip.empty() && Layer.fWeight > 0.f)
+                Layer.bFinished = m_pModel->Apply_Mask(Layer, fTimeDelta);          // Base 위에 블렌드
         }
-        else
-            m_bFinished = m_pModel->Play_Animation(fTimeDelta, m_fPlaySpeed);
+
+        m_pModel->Update_Combined();                                                // 모든 레이어 쌓인 뒤에 계층 결합 1회
     }
 
     const string& strCur = m_pModel->Get_CurrentAnimName();

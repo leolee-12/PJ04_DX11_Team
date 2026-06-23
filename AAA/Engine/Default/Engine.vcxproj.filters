@@ -295,6 +295,9 @@
     <Filter Include="07. Component\Collider\Bounding\Capsule">
       <UniqueIdentifier>{0960ac63-c337-4ee7-9f71-004d3044dcfb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="99. Defines\Hojun">
+      <UniqueIdentifier>{1263b5ad-a702-4bba-afb4-f5405210ba86}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -590,6 +593,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\DebugCapsule.h">
       <Filter>07. Component\Collider\DebugDraw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Anim_Layer.h">
+      <Filter>99. Defines\Hojun</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

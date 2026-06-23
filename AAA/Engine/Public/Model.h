@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Component.h"
+#include "Anim_Layer.h"
 
 NS_BEGIN(physx)
 class PxTriangleMesh;
@@ -65,17 +66,15 @@ public:
 
 	_bool			Update_Base(_float fTimeDelta, _float fSpeed = 1.0f);
 	_bool			Play_Animation(_float fTimeDelta, _float fSpeed = 1.0f);
-	_bool			Play_Animation(_float fTimeDelta, _float fMaskTimeDelta, _int iMaskIndex, _float& fMaskLocalTime, vector<_uint>& MaskCursors,
-									_float fSpeed = 1.0f, _float fMaskSpeed = 1.0f, _bool bLoop = true, _float fMaskWeight = 1.f, _bool* pbOverlayFinished = nullptr);
+	//_bool			Play_Animation(_float fTimeDelta, _float fMaskTimeDelta, _int iMaskIndex, _float& fMaskLocalTime, vector<_uint>& MaskCursors,
+	//								_float fSpeed = 1.0f, _float fMaskSpeed = 1.0f, _bool bLoop = true, _float fMaskWeight = 1.f, _bool* pbOverlayFinished = nullptr);
 
-	_bool			Apply_Mask(_int iIndex, _float& fLocalTime, vector<_uint>& Cursors, _float fTimeDelta, _float fSpeed = 1.0f, _bool bLoop = true, _float fMaskWeight = 1.f);
+	_bool			Apply_Mask(LAYER& animLayer, _float fTimeDelta);
 	void			Update_Combined();
 
 	HRESULT			Render(_uint iMeshIndex);
 
-	void			Build_MaskBones(const vector<_string>& Roots);
-
-	void			Clear_MaskBones() { m_MaskBones.clear(); }
+	void			Build_MaskBones(const vector<_string>& Roots, vector<_uint>& OutBones);
 
 	const _wstring& Get_ModelPath() { return m_strModelPath; }
 
@@ -126,9 +125,6 @@ private:
 	// юс╫ц
 	vector<MESH_LAYER_IDX>		m_MeshLayers;
 	string						m_strMeshLayerPath;
-	
-	vector<_uint>				m_MaskBones;
-
 
 private:
 	HRESULT Ready_Meshes(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix);

@@ -34,6 +34,13 @@ HRESULT CNormalEnemy_Body::Initialize(void* pArg)
 	return S_OK;
 }
 
+HRESULT CNormalEnemy_Body::Render()
+{
+
+
+	return S_OK;
+}
+
 HRESULT CNormalEnemy_Body::Ready_Components()
 {
 	PART_SETUP t{};

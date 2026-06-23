@@ -84,12 +84,23 @@ void CBladeKnight::Update(_float fTimeDelta)
                 tOv.Roots = { "R_FootJ", "L_FootJ" };
                 tOv.fTargetWeight = 1.f;
                 tOv.fWeightBlend = 0.15f;
-                tOv.tAnim.fSpeed = 2.f;
+                tOv.tAnim.fSpeed = 1.f;
+                pAnimator->Apply_Overlay(tOv);
+
+                CAnimator::LAYER_PLAY_INFO tOv2{};
+                tOv.iSlot = 2;
+                tOv.tAnim.strAniName = "Attack";
+                tOv.tAnim.bLoop = true;
+                tOv.Roots = {"R_ShoulderJ" };
+                tOv.fTargetWeight = 1.f;
+                tOv.fWeightBlend = 0.15f;
+                tOv.tAnim.fSpeed = 1.f;
                 pAnimator->Apply_Overlay(tOv);
             }
             else
             {
                 pAnimator->Clear_Overlay(1, 0.15f);
+                pAnimator->Clear_Overlay(2, 0.15f);
             }
         }
         m_bIdleOverlayOn = bIdle;
