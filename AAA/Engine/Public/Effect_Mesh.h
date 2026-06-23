@@ -27,7 +27,7 @@ class ENGINE_DLL CEffect_Mesh abstract : public CEffect_NonParticle
     PROPERTY(_float2, m_vUnknownUVScrollCount,      L"UV Scroll Count_U",         L"Unknown");
 
 public:
-    struct EFFECT_MESH_DESC : public CEffect_Part::EFFECT_PART_DESC
+    struct EFFECT_MESH_DESC : public CEffect_NonParticle::EFFECT_NONEPARTICLE_DESC
     {
         // Model ฐüทร
         _uint iModelLevel{};

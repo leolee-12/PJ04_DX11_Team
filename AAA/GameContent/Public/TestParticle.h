@@ -2,18 +2,17 @@
 
 #include "GameContent_Defines.h"
 
-#include "Effect_Particle.h"
+#include "Effect_RectParticle.h"
 
 NS_BEGIN(Client)
 
-class CTestParticle final : public CEffect_Particle
+class CTestParticle final : public CEffect_RectParticle
 {
-	GENERATED_BODY(CEffect_Particle)
+	GENERATED_BODY(CEffect_RectParticle)
 
 public:
-	struct TEST_PARTICLE_DESC : public CEffect_Particle::EFFECT_PARTICLE_DESC
+	struct TEST_PARTICLE_DESC : public CEffect_RectParticle::EFFECT_RECTPARTICLE_DESC
 	{
-
 	};
 
 	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_TestParticle";

@@ -253,9 +253,6 @@
     <Filter Include="07. Component\Movement">
       <UniqueIdentifier>{ee43c8cf-5df2-4924-933f-7f5129d9e351}</UniqueIdentifier>
     </Filter>
-    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Paricle">
-      <UniqueIdentifier>{cac7e3a1-ecdd-4d62-8d22-bae46537c29b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="05. GameObject\Effect\Allocator">
       <UniqueIdentifier>{8fc72b6d-5be3-40cf-9275-b99e11825d1d}</UniqueIdentifier>
     </Filter>
@@ -294,6 +291,12 @@
     </Filter>
     <Filter Include="07. Component\Collider\Bounding\Capsule">
       <UniqueIdentifier>{0960ac63-c337-4ee7-9f71-004d3044dcfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Paricle">
+      <UniqueIdentifier>{bba9c8c0-bbfb-47c4-b9c4-975253e549e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_RectParicle">
+      <UniqueIdentifier>{cac7e3a1-ecdd-4d62-8d22-bae46537c29b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -549,8 +552,8 @@
     <ClInclude Include="..\public\Movement.h">
       <Filter>07. Component\Movement</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Effect_Particle.h">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
+    <ClInclude Include="..\Public\Effect_RectParticle.h">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_RectParicle</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Effect_Allocator.h">
       <Filter>05. GameObject\Effect\Allocator</Filter>
@@ -590,6 +593,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\DebugCapsule.h">
       <Filter>07. Component\Collider\DebugDraw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_Particle.h">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -824,8 +830,8 @@
     <ClCompile Include="..\private\Movement.cpp">
       <Filter>07. Component\Movement</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Effect_Particle.cpp">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
+    <ClCompile Include="..\Private\Effect_RectParticle.cpp">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_RectParicle</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Effect_Allocator.cpp">
       <Filter>05. GameObject\Effect\Allocator</Filter>
@@ -856,6 +862,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Bounding_Capsule.cpp">
       <Filter>07. Component\Collider\Bounding\Capsule</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_Particle.cpp">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

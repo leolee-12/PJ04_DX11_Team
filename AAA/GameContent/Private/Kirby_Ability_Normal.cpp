@@ -518,6 +518,16 @@ void CKirby_Ability_Normal::Start_InhaleCollider(CKirby* pKirby)
             if (pInhalableTarget == nullptr)
                 return;
             
+            // 다시 보기
+            _bool bIsSuperInhale =
+                m_eInhaleState == INHALE_STATE::SUPER_INHALE_START ||
+                m_eInhaleState == INHALE_STATE::SUPER_INHALE_LOOP;
+
+            INHALE_QUERY tInhaleQuery{ bIsSuperInhale, pKirby };
+
+            if (pInhalableTarget->Can_BeInhaled(tInhaleQuery) == false)
+                return;
+
             m_bInhaleCancelLocked = true;
         }
     );

@@ -3,218 +3,81 @@
 #include "GameInstance.h"
 
 CEffect_Particle::CEffect_Particle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CEffect_Part(pDevice, pContext)
+    : CEffect_Part(pDevice, pContext)
 {
-	Init_PropertyValue();
+    Init_PropertyValue();
 }
 
 CEffect_Particle::CEffect_Particle(const CEffect_Particle& Prototype)
-	: CEffect_Part(Prototype)
+    : CEffect_Part(Prototype)
 {
-	Init_PropertyValue();
+    Init_PropertyValue();
 }
 
 HRESULT CEffect_Particle::Initialize_Prototype()
 {
-	return S_OK;
+    return S_OK;
 }
 
 HRESULT CEffect_Particle::Initialize(void* pArg)
 {
-	EFFECT_PARTICLE_DESC* pDesc = static_cast<EFFECT_PARTICLE_DESC*>(pArg);
+    EFFECT_PARTICLE_DESC* pDesc = static_cast<EFFECT_PARTICLE_DESC*>(pArg);
 
-	m_iVIBufferLevel = pDesc->iVIBufferLevel;
-	m_wstrVIBufferTag = pDesc->wstrVIBufferTag;
+    if (FAILED(__super::Initialize(pArg)))
+        return E_FAIL;
 
-	m_bCustomShader = pDesc->bCustomShader;
-	m_iShaderLevel = pDesc->iShaderLevel;
-	m_wstrShaderTag = pDesc->wstrShaderTag;
-
-	if (FAILED(__super::Initialize(pArg)))
-		return E_FAIL;
-
-	if (FAILED(Ready_Components()))
-		return E_FAIL;
+    if (FAILED(Ready_Components()))
+        return E_FAIL;
 
 	Reset_Particles();
 
-	return S_OK;
+    return S_OK;
 }
 
 void CEffect_Particle::Priority_Update(_float fTimeDelta)
 {
+    __super::Priority_Update(fTimeDelta);
 }
 
 void CEffect_Particle::Update(_float fTimeDelta)
 {
-	__super::Update(fTimeDelta);
+    __super::Update(fTimeDelta);
 }
 
 void CEffect_Particle::Late_Update(_float fTimeDelta)
 {
+    __super::Late_Update(fTimeDelta);
+
 	Compute_CombinedWorldMatrix();
 }
 
 HRESULT CEffect_Particle::Render()
 {
-	if (FAILED(Bind_ShaderResources()))
-		return E_FAIL;
-
-	if (FAILED(Bind_ShaderValue()))
-		return E_FAIL;
-
-	if (FAILED(m_pVIBuffer->Bind_Resources()))
-		return E_FAIL;
-
-	for (const PARTICLE& Particle : m_Particles)
-	{
-		if (Particle.bAlive == false)
-			continue;
-
-		_float4x4 ParticleWorld = Make_ParticleWorldMatrix(Particle);
-
-		if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &ParticleWorld)))
-			return E_FAIL;
-
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &Particle.fAlpha, sizeof(Particle.fAlpha))))
-			return E_FAIL;
-
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &Particle.vColor, sizeof(Particle.vColor))))
-			return E_FAIL;
-
-		Helper::IntClamp(m_iShaderPass, ShaderPass::Default, ShaderPass::ShaderPass_End - 1);
-		Helper::IntClamp(m_iMirror, Sampler::DEFAULT, Sampler::SAMPLER_END - 1);
-
-		_int iPass = m_iShaderPass + (m_iMirror == Sampler::MIRROR ? ShaderPass::ShaderPass_End : 0);
-
-		if (FAILED(m_pShaderCom->Begin(iPass)))
-			return E_FAIL;
-
-		if (FAILED(m_pVIBuffer->Render()))
-			return E_FAIL;
-	}
-
-	return S_OK;
+    return S_OK;
 }
 
 void CEffect_Particle::Effect_Start()
 {
-	__super::Effect_Start();
+    __super::Effect_Start();
 
 	Reset_Particles();
 }
 
-HRESULT CEffect_Particle::Ready_Components()
-{
-	if (m_bCustomShader == false)
-		m_pShaderCom = m_pGameInstance_Proxy->Get_2DShader();
-	else
-		m_pShaderCom = Add_Component<CShader>(m_iShaderLevel, m_wstrShaderTag, TEXT("Com_Shader"));
-	if (m_pShaderCom == nullptr)
-		return E_FAIL;
-
-	m_pVIBuffer = Add_Component<CVIBuffer_Rect>(m_iVIBufferLevel, m_wstrVIBufferTag, TEXT("Com_Buffer"));
-	if (m_pVIBuffer == nullptr)
-		return E_FAIL;
-
-	return S_OK;
-}
-
-HRESULT CEffect_Particle::Bind_ShaderResources()
-{
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
-		return E_FAIL;
-
-	return S_OK;
-}
-
 HRESULT CEffect_Particle::Bind_ShaderValue()
 {
-	if (FAILED(__super::Bind_ShaderValue()))
-		return E_FAIL;
+    if (FAILED(__super::Bind_ShaderValue()))
+        return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_bSpriteAniTexture", &m_bSpriteAniTexture, sizeof(m_bSpriteAniTexture))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vSpriteAniTexUV", &m_fCurTexAniUV, sizeof(m_fCurTexAniUV))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vSpriteAniTexSize", &m_fCurTexAniSize, sizeof(m_fCurTexAniSize))))
-		return E_FAIL;
-
-
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_bSpriteAniMask", &m_bSpriteAniMask, sizeof(m_bSpriteAniMask))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vSpriteAniMaskUV", &m_fCurMaskAniUV, sizeof(m_fCurMaskAniUV))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vSpriteAniMaskSize", &m_fCurMaskAniSize, sizeof(m_fCurMaskAniSize))))
-		return E_FAIL;
-
-	return S_OK;
+    return S_OK;
 }
 
-void CEffect_Particle::Update_Core(const _float fTimeDelta, const _float fRatio)
+HRESULT CEffect_Particle::Ready_Components()
 {
-	__super::Update_Core(fTimeDelta, fRatio);
-
-	Update_Particles_ByContainerTime(fRatio);
-
-	Update_TexSpriteAnimation(fTimeDelta, fRatio);
-	Update_MaskSpriteAnimation(fTimeDelta, fRatio);
-}
-
-void CEffect_Particle::Update_TexSpriteAnimation(const _float fTimeDelta, const _float fRatio)
-{
-	if (m_bSpriteAniTexture == true)
-	{
-		_int iTotalCount = m_iTexFrameX * m_iTexFrameY;
-		_int iCurTexFrameIndex = static_cast<_int>(static_cast<_float>(iTotalCount) * fRatio);
-
-		if (iCurTexFrameIndex >= iTotalCount)
-			iCurTexFrameIndex -= 1;
-
-		_float fCurTexFrameX = static_cast<_float>(iCurTexFrameIndex % m_iTexFrameX);
-		_float fCurTexFrameY = static_cast<_float>(iCurTexFrameIndex / m_iTexFrameX);
-
-		m_fCurTexAniSize.x = 1.f / static_cast<_float>(m_iTexFrameX);
-		m_fCurTexAniSize.y = 1.f / static_cast<_float>(m_iTexFrameY);
-
-		m_fCurTexAniUV.x = m_fCurTexAniSize.x * fCurTexFrameX;
-		m_fCurTexAniUV.y = m_fCurTexAniSize.y * fCurTexFrameY;
-	}
-}
-
-void CEffect_Particle::Update_MaskSpriteAnimation(const _float fTimeDelta, const _float fRatio)
-{
-	if (m_bSpriteAniMask == true)
-	{
-		_int iTotalCount = m_iMaskFrameX * m_iMaskFrameY;
-		_int iCurMaskFrameIndex = static_cast<_int>(static_cast<_float>(iTotalCount) * fRatio);
-
-		if (iCurMaskFrameIndex >= iTotalCount)
-			iCurMaskFrameIndex -= 1;
-
-		_float fCurMaskFrameX = static_cast<_float>(iCurMaskFrameIndex % m_iMaskFrameX);
-		_float fCurMaskFrameY = static_cast<_float>(iCurMaskFrameIndex / m_iMaskFrameX);
-
-		m_fCurMaskAniSize.x = 1.f / static_cast<_float>(m_iMaskFrameX);
-		m_fCurMaskAniSize.y = 1.f / static_cast<_float>(m_iMaskFrameY);
-
-		m_fCurMaskAniUV.x = m_fCurMaskAniSize.x * fCurMaskFrameX;
-		m_fCurMaskAniUV.y = m_fCurMaskAniSize.y * fCurMaskFrameY;
-	}
+    return S_OK;
 }
 
 void CEffect_Particle::Init_PropertyValue()
 {
-	m_bSpriteAniTexture = false;
-	m_iTexFrameX = 1;
-	m_iTexFrameY = 1;
-
-	m_bSpriteAniMask = false;
-	m_iMaskFrameX = 1;
-	m_iMaskFrameY = 1;
-
 	// Particle
 	m_iParticleCount = 20;
 
@@ -278,6 +141,13 @@ void CEffect_Particle::Init_PropertyValue()
 	m_bActive_ParticleColor_Ratio_1 = false;
 	m_fParticleColor_Ratio_1 = 0.75f;
 	m_vParticleColor_Value_1 = { 1.f, 1.f, 1.f };
+}
+
+void CEffect_Particle::Update_Core(const _float fTimeDelta, const _float fRatio)
+{
+	__super::Update_Core(fTimeDelta, fRatio);
+
+	Update_Particles_ByContainerTime(fRatio);
 }
 
 void CEffect_Particle::Reset_Particles()
@@ -365,20 +235,6 @@ void CEffect_Particle::Reset_Particles()
 		// Color
 		Particle.vColor = m_vParticleColor;
 	}
-}
-
-_float4x4 CEffect_Particle::Make_ParticleWorldMatrix(const PARTICLE& Particle) const
-{
-	_matrix matScale = XMMatrixScaling(Particle.vScale.x, Particle.vScale.y, Particle.vScale.z);
-
-	_matrix matTranslation = XMMatrixTranslation(Particle.vLocalPos.x, Particle.vLocalPos.y, Particle.vLocalPos.z);
-
-	_matrix matWorld = matScale * matTranslation * XMLoadFloat4x4(&m_CombinedWorldMatrix);
-
-	_float4x4 ParticleWorld{};
-	XMStoreFloat4x4(&ParticleWorld, matWorld);
-
-	return ParticleWorld;
 }
 
 void CEffect_Particle::Update_Particles_ByContainerTime(_float fRatio)
@@ -597,7 +453,21 @@ _float3 CEffect_Particle::Evaluate_ParticleFloat3Curve(_float fLocalRatio, const
 	return Points[iCount - 1].vValue;
 }
 
+_float4x4 CEffect_Particle::Make_ParticleWorldMatrix(const PARTICLE& Particle) const
+{
+	_matrix matScale = XMMatrixScaling(Particle.vScale.x, Particle.vScale.y, Particle.vScale.z);
+
+	_matrix matTranslation = XMMatrixTranslation(Particle.vLocalPos.x, Particle.vLocalPos.y, Particle.vLocalPos.z);
+
+	_matrix matWorld = matScale * matTranslation * XMLoadFloat4x4(&m_CombinedWorldMatrix);
+
+	_float4x4 ParticleWorld{};
+	XMStoreFloat4x4(&ParticleWorld, matWorld);
+
+	return ParticleWorld;
+}
+
 void CEffect_Particle::Free()
 {
-	__super::Free();
+    __super::Free();
 }

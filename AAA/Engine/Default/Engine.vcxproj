@@ -204,6 +204,7 @@
     <ClInclude Include="..\Public\Effect_Mesh.h" />
     <ClInclude Include="..\Public\Effect_NonParticle.h" />
     <ClInclude Include="..\Public\Effect_Particle.h" />
+    <ClInclude Include="..\Public\Effect_RectParticle.h" />
     <ClInclude Include="..\Public\Effect_Part.h" />
     <ClInclude Include="..\public\Effect_Manager.h" />
     <ClInclude Include="..\Public\Effect_Quad.h" />
@@ -305,6 +306,7 @@
     <ClCompile Include="..\Private\Effect_Mesh.cpp" />
     <ClCompile Include="..\Private\Effect_NonParticle.cpp" />
     <ClCompile Include="..\Private\Effect_Particle.cpp" />
+    <ClCompile Include="..\Private\Effect_RectParticle.cpp" />
     <ClCompile Include="..\Private\Effect_Part.cpp" />
     <ClCompile Include="..\private\Effect_Manager.cpp" />
     <ClCompile Include="..\Private\Effect_Quad.cpp" />

@@ -2,26 +2,16 @@
 
 #include "Effect_Part.h"
 
+#include "Effect_Allocator.h"
+
 NS_BEGIN(Engine)
 
-class CVIBuffer_Rect;
+class CShader;
+class CTexture;
 
 class ENGINE_DLL CEffect_Particle abstract : public CEffect_Part
 {
     GENERATED_BODY_ABSTRACT(CEffect_Particle)
-
-// Sprite Animation Texture
-PROPERTY(_bool, m_bSpriteAniTexture, L"Sprite Animation Texture", L"Sprite Animation");
-
-PROPERTY(_int, m_iTexFrameX,     L"Frame X_T",   L"Sprite Animation");
-PROPERTY(_int, m_iTexFrameY,     L"Frame Y_T",   L"Sprite Animation");
-
-// Sprite Animation Mask
-PROPERTY(_bool, m_bSpriteAniMask, L"Sprite Animation Mask", L"Sprite Animation");
-
-PROPERTY(_int, m_iMaskFrameX, L"Frame X_M", L"Sprite Animation");
-PROPERTY(_int, m_iMaskFrameY, L"Frame Y_M", L"Sprite Animation");
-
 
 // Particle
 PROPERTY(_uint, m_iParticleCount, L"Count_P", L"Particle");
@@ -89,13 +79,6 @@ PROPERTY(_float3, m_vParticleColor_Value_1, L"Value 1_P", L"Particle Color");
 public:
     struct EFFECT_PARTICLE_DESC : public CEffect_Part::EFFECT_PART_DESC
     {
-        // Buffer
-        _uint iVIBufferLevel{};
-        _wstring wstrVIBufferTag;
-
-        // Shader
-        _uint iShaderLevel{};
-        _wstring wstrShaderTag;
     };
 
 protected:
@@ -118,19 +101,6 @@ protected:
     };
 
 protected:
-    struct RATIO_VALUE
-    {
-        _float fRatio{};
-        _float fValue{};
-    };
-
-    struct RATIO_VALUE_FLOAT3
-    {
-        _float fRatio{};
-        _float3 vValue{};
-    };
-
-private:
     enum ShaderPass { Default, AlphaBlend, Additive, ShaderPass_End };
 
     enum ParticleMoveMode
@@ -158,47 +128,13 @@ public:
     virtual void    Effect_Start() override;
 
 protected:
-    virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;
-
-    virtual void Update_TexSpriteAnimation(const _float fTimeDelta, const _float fRatio);
-    virtual void Update_MaskSpriteAnimation(const _float fTimeDelta, const _float fRatio);
-
-private:
-    HRESULT Ready_Components();
-    HRESULT Bind_ShaderResources();
     HRESULT Bind_ShaderValue();
 
-private:
-    CVIBuffer_Rect* m_pVIBuffer{};
-
-private:
-    _uint m_iVIBufferLevel{};
-    _wstring m_wstrVIBufferTag;
-
-    _uint m_iShaderLevel{};
-    _wstring m_wstrShaderTag;
-
-    _float2 m_fCurTexAniUV{};
-    _float2 m_fCurTexAniSize{};
-
-    _float2 m_fCurMaskAniUV{};
-    _float2 m_fCurMaskAniSize{};
-
-private:
-    vector<PARTICLE> m_Particles;
-
-    _float  m_fParticleLifeTime = 1.f;
-
-    _float3 m_fPivot{};
-
-private:
-    void Init_PropertyValue();
+protected:
+    virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;
 
     void Reset_Particles();
-    _float4x4 Make_ParticleWorldMatrix(const PARTICLE& Particle) const;
-
     void Update_Particles_ByContainerTime(_float fRatio);
-
     _vector Make_SpreadDirection3D() const;
     _vector Make_FountainDirection() const;
 
@@ -218,6 +154,19 @@ private:
         const _float3& vStartValue, const _float3& vEndValue,
         _bool bActiveRatio0, _float fRatio0, const _float3& vValue0,
         _bool bActiveRatio1, _float fRatio1, const _float3& vValue1) const;
+
+    _float4x4 Make_ParticleWorldMatrix(const PARTICLE& Particle) const;
+
+protected:
+    vector<PARTICLE> m_Particles;
+
+    _float  m_fParticleLifeTime = 1.f;
+
+    _float3 m_fPivot{};
+
+private:
+    HRESULT Ready_Components();
+    void Init_PropertyValue();
 
 protected:
     virtual void Free() override;
