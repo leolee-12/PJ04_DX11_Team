@@ -202,6 +202,7 @@
     <ClInclude Include="..\public\Effect_Allocator.h" />
     <ClInclude Include="..\public\Effect_Container.h" />
     <ClInclude Include="..\Public\Effect_Mesh.h" />
+    <ClInclude Include="..\Public\Effect_MeshParticle.h" />
     <ClInclude Include="..\Public\Effect_NonParticle.h" />
     <ClInclude Include="..\Public\Effect_Particle.h" />
     <ClInclude Include="..\Public\Effect_RectParticle.h" />
@@ -304,6 +305,7 @@
     <ClCompile Include="..\private\Effect_Allocator.cpp" />
     <ClCompile Include="..\private\Effect_Container.cpp" />
     <ClCompile Include="..\Private\Effect_Mesh.cpp" />
+    <ClCompile Include="..\Private\Effect_MeshParticle.cpp" />
     <ClCompile Include="..\Private\Effect_NonParticle.cpp" />
     <ClCompile Include="..\Private\Effect_Particle.cpp" />
     <ClCompile Include="..\Private\Effect_RectParticle.cpp" />

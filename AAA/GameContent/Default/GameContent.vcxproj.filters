@@ -520,6 +520,9 @@
     <Filter Include="00. GameObject\06. Monster\NormalEnemy\State">
       <UniqueIdentifier>{05464a2e-8e96-40b9-b818-54149438e5f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\Test\TestMeshParticle">
+      <UniqueIdentifier>{8cd5923d-467a-464c-b4e8-7f7307487329}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1041,6 +1044,9 @@
     <ClInclude Include="..\Public\Monster_State_Patrol.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Patrol</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\TestMeshParticle.h">
+      <Filter>00. GameObject\Test\TestMeshParticle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1486,6 +1492,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Monster_State_Patrol.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Patrol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestMeshParticle.cpp">
+      <Filter>00. GameObject\Test\TestMeshParticle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

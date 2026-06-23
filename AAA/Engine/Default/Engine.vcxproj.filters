@@ -298,6 +298,9 @@
     <Filter Include="05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_RectParicle">
       <UniqueIdentifier>{cac7e3a1-ecdd-4d62-8d22-bae46537c29b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_MeshParticle">
+      <UniqueIdentifier>{f3b89464-2504-4b1f-ac6d-3aaa815d6d01}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -597,6 +600,9 @@
     <ClInclude Include="..\Public\Effect_Particle.h">
       <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Effect_MeshParticle.h">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_MeshParticle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -865,6 +871,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Effect_Particle.cpp">
       <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_MeshParticle.cpp">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_MeshParticle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

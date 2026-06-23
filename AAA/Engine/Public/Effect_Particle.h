@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Effect_Part.h"
-
 #include "Effect_Allocator.h"
 
 NS_BEGIN(Engine)
@@ -22,12 +21,25 @@ PROPERTY(_float, m_fParticleSpawnStartRatio, L"Spawn Start Ratio_P", L"Particle 
 PROPERTY(_float, m_fParticleSpawnEndRatio, L"Spawn End Ratio_P", L"Particle Spawn");
 PROPERTY(_float, m_fParticleLifeRatio, L"Life Ratio_P", L"Particle Spawn");
 
-// Particle Move
-PROPERTY(_int, m_iParticleMoveMode, L"Move Mode_P", L"Particle Move"); // 0 Spread, 1 Fountain
-PROPERTY(_float, m_fParticleStartSpeed, L"Start Speed_P", L"Particle Move");
-PROPERTY(_float, m_fParticleFountainSpread, L"Fountain Spread_P", L"Particle Move");
-PROPERTY(_float, m_fParticleFountainUpBias, L"Fountain Up Bias_P", L"Particle Move");
-PROPERTY(_float, m_fParticleFountainGravity, L"Gravity_P", L"Particle Move");
+// Particle Shape
+PROPERTY(_int, m_iParticleShapeType, L"Shape Type_P", L"Particle Shape"); // 0 Point, 1 Sphere, 2 Circle, 3 Box
+PROPERTY(_float, m_fParticleShapeRadius, L"Radius_P", L"Particle Shape - Sphere Circle");
+PROPERTY(_bool, m_bParticleShapeRandomRadius, L"Random Radius_P", L"Particle Shape - Sphere Circle");
+
+PROPERTY(_float3, m_vParticleBoxSize, L"Box Size_P", L"Particle Shape - Box");
+PROPERTY(_int, m_iParticleBoxSpawnMode, L"Box Spawn Mode_P", L"Particle Shape - Box"); // 0 Volume, 1 Top
+
+// Particle Velocity
+PROPERTY(_int, m_iParticleVelocityMode, L"Velocity Mode_P", L"Particle Velocity"); // 0 Shape Outward, 1Direction, 2 Fountain
+PROPERTY(_float, m_fParticleStartSpeed, L"Start Speed_P", L"Particle Velocity");
+
+PROPERTY(_float3, m_vParticleVelocityDirection, L"Direction_P", L"Particle Velocity - Direction");
+
+PROPERTY(_float, m_fParticleFountainSpread, L"Spread_P", L"Particle Velocity - Fountain");
+PROPERTY(_float, m_fParticleFountainUpBias, L"Up Bias_P", L"Particle Velocity - Fountain");
+
+// Particle Force
+PROPERTY(_float3, m_vParticleAcceleration, L"Acceleration_P", L"Particle Force");
 
 // Particle Alpha
 PROPERTY(_float, m_fParticleAlpha, L"Alpha_P", L"Particle Alpha");
@@ -98,16 +110,34 @@ protected:
 
         _float3 vLocalPos{};
         _float3 vVelocity{};
+        _float3 vSpawnLocalPos{};
     };
 
 protected:
     enum ShaderPass { Default, AlphaBlend, Additive, ShaderPass_End };
 
-    enum ParticleMoveMode
+    enum ParticleShapeType
     {
-        PARTICLE_MOVE_SPREAD,
-        PARTICLE_MOVE_FOUNTAIN,
-        PARTICLE_MOVE_END
+        PARTICLE_SHAPE_POINT,
+        PARTICLE_SHAPE_SPHERE,
+        PARTICLE_SHAPE_CIRCLE,
+        PARTICLE_SHAPE_BOX,
+        PARTICLE_SHAPE_END
+    };
+
+    enum ParticleBoxSpawnMode
+    {
+        PARTICLE_BOX_VOLUME,
+        PARTICLE_BOX_TOP,
+        PARTICLE_BOX_END
+    };
+
+    enum ParticleVelocityMode
+    {
+        PARTICLE_VELOCITY_SHAPE_OUTWARD,
+        PARTICLE_VELOCITY_DIRECTION,
+        PARTICLE_VELOCITY_FOUNTAIN,
+        PARTICLE_VELOCITY_END
     };
 
 protected:
@@ -135,7 +165,11 @@ protected:
 
     void Reset_Particles();
     void Update_Particles_ByContainerTime(_float fRatio);
-    _vector Make_SpreadDirection3D() const;
+
+    _float3 Make_ParticleSpawnLocalPos() const;
+    _vector Make_ParticleVelocityDirection(const PARTICLE& Particle) const;
+
+    _vector Make_RandomSphereDirection() const;
     _vector Make_FountainDirection() const;
 
     void Update_ParticleMove(PARTICLE& Particle, _float fRatio, _float fLocalRatio);
@@ -161,7 +195,6 @@ protected:
     vector<PARTICLE> m_Particles;
 
     _float  m_fParticleLifeTime = 1.f;
-
     _float3 m_fPivot{};
 
 private:
