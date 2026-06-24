@@ -535,16 +535,14 @@
     <Filter Include="00. GameObject\Test\TestMeshEmitter">
       <UniqueIdentifier>{d07256ff-a017-43f1-a4ae-0d9b7af3dc98}</UniqueIdentifier>
     </Filter>
-<<<<<<< HEAD
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\01. InhaleContainer">
       <UniqueIdentifier>{75fd20ba-5ae3-4c5f-bf95-b21a0b7e20ad}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1">
       <UniqueIdentifier>{bd114556-93e2-4c7f-a452-7483746e046a}</UniqueIdentifier>
-=======
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockBack\KnockBackDeath">
+	</Filter>
+	<Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockBack\KnockBackDeath">
       <UniqueIdentifier>{f45699c1-0279-42f5-8174-aecc983bb4b3}</UniqueIdentifier>
->>>>>>> main
     </Filter>
   </ItemGroup>
   <ItemGroup>
