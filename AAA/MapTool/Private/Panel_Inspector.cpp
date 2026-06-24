@@ -1431,11 +1431,16 @@ _bool* CPanel_Inspector::Resolve_EnvCollMeshEditState(CLevel_Edit* pLevel, Clien
 		if (pLevel->Try_GetMapPreviewEnvEdit(pEnvObject, &SavedEdit))
 		{
 			if (SavedEdit.bHasCollMesh)
+			{
 				bUseCollMesh = SavedEdit.bUseCollMesh;
-			else if (SavedEdit.bHasCollMeshEdited)
-				bUseCollMesh = SavedEdit.bCreateCollMesh;
-			else
-				bUseCollMesh = !SavedEdit.bDisableCollMesh;
+			}
+			else if (SavedEdit.bHasCollMeshEdited || SavedEdit.bDisableCollMesh)
+			{
+				// Legacy compatibility only:
+				// - CollisionMesh.Create
+				// - CollisionMeshDisabled
+				bUseCollMesh = SavedEdit.bCreateCollMesh && !SavedEdit.bDisableCollMesh;
+			}
 		}
 
 		if (!bHasCollMesh)

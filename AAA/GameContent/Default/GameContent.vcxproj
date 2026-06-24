@@ -50,6 +50,7 @@
     <ClInclude Include="..\Public\LevelDesign_Portal.h" />
     <ClInclude Include="..\public\GigantEdge_Brain.h" />
     <ClInclude Include="..\Public\Kirby_Damaged.h" />
+    <ClInclude Include="..\Public\LevelDesign_Starblock.h" />
     <ClInclude Include="..\public\MiniBoss.h" />
     <ClInclude Include="..\public\Inhalable.h" />
     <ClInclude Include="..\Public\LevelDesign_ProtoRegister.h" />
@@ -260,6 +261,7 @@
     <ClCompile Include="..\Private\LevelDesign_Rail.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Registry.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Spawner.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_Starblock.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Unsupported.cpp" />
     <ClCompile Include="..\Private\Map_EditFile.cpp" />
     <ClCompile Include="..\Private\Map_EditSession.cpp" />

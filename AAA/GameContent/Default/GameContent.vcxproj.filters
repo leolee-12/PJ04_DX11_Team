@@ -562,6 +562,9 @@
     <Filter Include="00. GameObject\06. Monster\NormalEnemy\State">
       <UniqueIdentifier>{05464a2e-8e96-40b9-b818-54149438e5f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\07. Starblock">
+      <UniqueIdentifier>{625b2a42-23dd-43f4-bdce-b4f75040938b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1098,6 +1101,9 @@
     <ClInclude Include="..\Public\Monster_State_Patrol.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Patrol</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LevelDesign_Starblock.h">
+      <Filter>00. GameObject\96. LevelDesign\07. Starblock</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1558,6 +1564,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Monster_State_Patrol.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Patrol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelDesign_Starblock.cpp">
+      <Filter>00. GameObject\96. LevelDesign\07. Starblock</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
