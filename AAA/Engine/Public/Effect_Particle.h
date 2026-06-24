@@ -33,10 +33,14 @@ PROPERTY(_int, m_iParticleBoxSpawnMode, L"Box Spawn Mode_P", L"Particle Shape - 
 PROPERTY(_int, m_iParticleVelocityMode, L"Velocity Mode_P", L"Particle Velocity"); // 0 Shape Outward, 1Direction, 2 Fountain
 PROPERTY(_float, m_fParticleStartSpeed, L"Start Speed_P", L"Particle Velocity");
 
+PROPERTY(_float, m_fParticleDirectionRandomStrength, L"Direction Random_P", L"Particle Velocity - Random");
+PROPERTY(_float, m_fParticleStartSpeedRandomRatio, L"Speed Random Ratio_P", L"Particle Velocity - Random");
+
 PROPERTY(_float3, m_vParticleVelocityDirection, L"Direction_P", L"Particle Velocity - Direction");
 
 PROPERTY(_float, m_fParticleFountainSpread, L"Spread_P", L"Particle Velocity - Fountain");
 PROPERTY(_float, m_fParticleFountainUpBias, L"Up Bias_P", L"Particle Velocity - Fountain");
+
 
 // Particle Force
 PROPERTY(_bool, m_bParticleUseAcceleration, L"Use Acceleration_P", L"Particle Force");
@@ -194,6 +198,8 @@ protected:
 
     _float3 Make_ParticleSpawnLocalPos() const;
     _vector Make_ParticleVelocityDirection(const PARTICLE& Particle) const;
+    _vector Apply_ParticleVelocityRandom(_vector vBaseDir) const;
+    _float Make_ParticleRandomSpeed() const;
 
     _vector Make_RandomSphereDirection() const;
     _vector Make_FountainDirection() const;

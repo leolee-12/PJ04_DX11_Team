@@ -125,6 +125,9 @@ void CEffect_Emitter::Init_PropertyValue()
     m_fEmitterFountainSpread = 1.f;
     m_fEmitterFountainUpBias = 1.5f;
 
+    m_fEmitterDirectionRandomStrength = 0.f;
+    m_fEmitterStartSpeedRandomRatio = 0.f;
+
     // Force
     m_bEmitterUseAcceleration = false;
     m_vEmitterAcceleration = { 0.f, 0.f, 0.f };
@@ -307,7 +310,11 @@ _bool CEffect_Emitter::Spawn_EmitterParticle()
     pParticle->vLocalPos = pParticle->vSpawnLocalPos;
 
     _vector vDir = Make_EmitterVelocityDirection(*pParticle);
-    XMStoreFloat3(&pParticle->vVelocity, vDir * m_fEmitterStartSpeed);
+    vDir = Apply_EmitterVelocityRandom(vDir);
+
+    const _float fSpeed = Make_EmitterRandomSpeed();
+
+    XMStoreFloat3(&pParticle->vVelocity, vDir * fSpeed);
 
     _float fParticleSize = m_fEmitterStartSize;
 
@@ -336,7 +343,7 @@ _bool CEffect_Emitter::Spawn_EmitterParticle()
 
     pParticle->fAlpha = m_fEmitterAlpha;
     pParticle->vColor = m_vEmitterColor;
-    const _float fFlutter =
+
     pParticle->fFlutterPhase = m_pGameInstance_Proxy->RandomFloat(0.f, XM_2PI);
 
     _float fRandomRatio = m_fEmitterFlutterRandomRatio;
@@ -498,6 +505,43 @@ _vector CEffect_Emitter::Make_EmitterVelocityDirection(const EMITTER_PARTICLE& P
     }
 }
 
+_vector CEffect_Emitter::Apply_EmitterVelocityRandom(_vector vBaseDir) const
+{
+    _float fRandomStrength = m_fEmitterDirectionRandomStrength;
+    Helper::FloatClamp(fRandomStrength, 0.f, 1.f);
+
+    if (fRandomStrength <= Helper::fEpsilon)
+        return XMVector3Normalize(vBaseDir);
+
+    _vector vRandomDir = Make_RandomSphereDirection();
+
+    _vector vResult = XMVector3Normalize(
+        vBaseDir * (1.f - fRandomStrength) +
+        vRandomDir * fRandomStrength);
+
+    if (XMVectorGetX(XMVector3LengthSq(vResult)) <= Helper::fEpsilon)
+        return XMVector3Normalize(vBaseDir);
+
+    return vResult;
+}
+
+_float CEffect_Emitter::Make_EmitterRandomSpeed() const
+{
+    _float fRandomRatio = m_fEmitterStartSpeedRandomRatio;
+    Helper::FloatClamp(fRandomRatio, 0.f, 1.f);
+
+    if (fRandomRatio <= Helper::fEpsilon)
+        return m_fEmitterStartSpeed;
+
+    _float fMinSpeed = m_fEmitterStartSpeed * (1.f - fRandomRatio);
+    _float fMaxSpeed = m_fEmitterStartSpeed * (1.f + fRandomRatio);
+
+    if (fMaxSpeed < fMinSpeed)
+        std::swap(fMinSpeed, fMaxSpeed);
+
+    return m_pGameInstance_Proxy->RandomFloat(fMinSpeed, fMaxSpeed);
+}
+
 _vector CEffect_Emitter::Make_RandomSphereDirection() const
 {
     const _float fY = m_pGameInstance_Proxy->RandomFloat(-1.f, 1.f);
@@ -609,7 +653,7 @@ _bool CEffect_Emitter::Can_Emit() const
         return true;
 
     if (m_fDuration <= Helper::fEpsilon)
-        return true;
+        return false;
 
     return m_fEmitterElapsedTime <= m_fDuration;
 }

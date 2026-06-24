@@ -54,7 +54,7 @@ HRESULT CTestMeshEmitter::Initialize(void* pArg)
     m_vEmitterLifeTimeRange.x = 10.f;
     m_vEmitterLifeTimeRange.y = 15.f;
 
-    m_iEmitterShapeType = 3.f;
+    m_iEmitterShapeType = 3;
     m_vEmitterBoxSize.x = 30.f;
     m_vEmitterBoxSize.y = 10.f;
     m_vEmitterBoxSize.z = 30.f;
@@ -64,7 +64,10 @@ HRESULT CTestMeshEmitter::Initialize(void* pArg)
     m_iEmitterVelocityMode = 1;
     m_fEmitterStartSpeed = 3.f;
 
-    m_vEmitterVelocityDirection = { 0.2f, -1.f, 0.f };
+    m_vEmitterVelocityDirection = { 0.4f, -1.f, 0.f };
+
+    m_fEmitterDirectionRandomStrength = 0.6f;
+    m_fEmitterStartSpeedRandomRatio = 0.6f;
 
     m_bEmitterUseFlutter = true;
     m_fEmitterFlutterAmplitude = 0.3f;
@@ -72,7 +75,7 @@ HRESULT CTestMeshEmitter::Initialize(void* pArg)
     m_fEmitterFlutterRandomRatio = 1.0f;
 
     m_bEmitterRandomSize = true;
-    m_vEmitterStartSizeRange = { 0.8,1.f };
+    m_vEmitterStartSizeRange = { 0.3f, 0.5f };
 
     m_bEmitterSizeChange = true;
     m_fEmitterSizeStartValue = 0.f;

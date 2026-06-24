@@ -33,6 +33,9 @@ PROPERTY(_int, m_iEmitterBoxSpawnMode, L"Box Spawn Mode_E", L"Emitter Shape - Bo
 PROPERTY(_int, m_iEmitterVelocityMode, L"Velocity Mode_E", L"Emitter Velocity"); // 0 Shape Outward, 1 Direction, 2 Fountain
 PROPERTY(_float, m_fEmitterStartSpeed, L"Start Speed_E", L"Emitter Velocity");
 
+PROPERTY(_float, m_fEmitterDirectionRandomStrength, L"Direction Random_E", L"Emitter Velocity - Random");
+PROPERTY(_float, m_fEmitterStartSpeedRandomRatio, L"Speed Random Ratio_E", L"Emitter Velocity - Random");
+
 PROPERTY(_float3, m_vEmitterVelocityDirection, L"Direction_E", L"Emitter Velocity - Direction");
 
 PROPERTY(_float, m_fEmitterFountainSpread, L"Spread_E", L"Emitter Velocity - Fountain");
@@ -194,6 +197,8 @@ protected:
 
     _float3 Make_EmitterSpawnLocalPos() const;
     _vector Make_EmitterVelocityDirection(const EMITTER_PARTICLE& Particle) const;
+    _vector Apply_EmitterVelocityRandom(_vector vBaseDir) const;
+    _float Make_EmitterRandomSpeed() const;
 
     _vector Make_RandomSphereDirection() const;
     _vector Make_FountainDirection() const;

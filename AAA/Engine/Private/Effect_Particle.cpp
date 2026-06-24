@@ -105,6 +105,9 @@ void CEffect_Particle::Init_PropertyValue()
     m_fParticleFountainSpread = 1.f;
     m_fParticleFountainUpBias = 1.5f;
 
+    m_fParticleDirectionRandomStrength = 0.f;
+    m_fParticleStartSpeedRandomRatio = 0.f;
+
     // Particle Force
     m_bParticleUseAcceleration = false;
     m_vParticleAcceleration = { 0.f, 0.f, 0.f };
@@ -218,7 +221,11 @@ void CEffect_Particle::Reset_Particles()
         Particle.vLocalPos = Particle.vSpawnLocalPos;
 
         _vector vDir = Make_ParticleVelocityDirection(Particle);
-        XMStoreFloat3(&Particle.vVelocity, vDir * m_fParticleStartSpeed);
+        vDir = Apply_ParticleVelocityRandom(vDir);
+
+        const _float fSpeed = Make_ParticleRandomSpeed();
+
+        XMStoreFloat3(&Particle.vVelocity, vDir * fSpeed);
 
         _float fParticleSize = m_fParticleStartSize;
 
@@ -422,6 +429,43 @@ _vector CEffect_Particle::Make_ParticleVelocityDirection(const PARTICLE& Particl
         return XMVector3Normalize(vDir);
     }
     }
+}
+
+_vector CEffect_Particle::Apply_ParticleVelocityRandom(_vector vBaseDir) const
+{
+    _float fRandomStrength = m_fParticleDirectionRandomStrength;
+    Helper::FloatClamp(fRandomStrength, 0.f, 1.f);
+
+    if (fRandomStrength <= Helper::fEpsilon)
+        return XMVector3Normalize(vBaseDir);
+
+    _vector vRandomDir = Make_RandomSphereDirection();
+
+    _vector vResult = XMVector3Normalize(
+        vBaseDir * (1.f - fRandomStrength) +
+        vRandomDir * fRandomStrength);
+
+    if (XMVectorGetX(XMVector3LengthSq(vResult)) <= Helper::fEpsilon)
+        return XMVector3Normalize(vBaseDir);
+
+    return vResult;
+}
+
+_float CEffect_Particle::Make_ParticleRandomSpeed() const
+{
+    _float fRandomRatio = m_fParticleStartSpeedRandomRatio;
+    Helper::FloatClamp(fRandomRatio, 0.f, 1.f);
+
+    if (fRandomRatio <= Helper::fEpsilon)
+        return m_fParticleStartSpeed;
+
+    _float fMinSpeed = m_fParticleStartSpeed * (1.f - fRandomRatio);
+    _float fMaxSpeed = m_fParticleStartSpeed * (1.f + fRandomRatio);
+
+    if (fMaxSpeed < fMinSpeed)
+        std::swap(fMinSpeed, fMaxSpeed);
+
+    return m_pGameInstance_Proxy->RandomFloat(fMinSpeed, fMaxSpeed);
 }
 
 _vector CEffect_Particle::Make_RandomSphereDirection() const
