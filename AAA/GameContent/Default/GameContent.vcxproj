@@ -43,6 +43,11 @@
     <ClInclude Include="..\Public\Env_CollisionCatalog.h" />
     <ClInclude Include="..\Public\Env_InstanceBatch.h" />
     <ClInclude Include="..\Public\Env_InstanceController.h" />
+    <ClInclude Include="..\Public\LevelDesign_Bush.h" />
+    <ClInclude Include="..\Public\LevelDesign_Food.h" />
+    <ClInclude Include="..\Public\LevelDesign_Ladder.h" />
+    <ClInclude Include="..\Public\LevelDesign_Point.h" />
+    <ClInclude Include="..\Public\LevelDesign_Portal.h" />
     <ClInclude Include="..\public\GigantEdge_Brain.h" />
     <ClInclude Include="..\Public\Kirby_Damaged.h" />
     <ClInclude Include="..\public\MiniBoss.h" />
@@ -121,6 +126,8 @@
     <ClInclude Include="..\Public\Monster_State.h" />
     <ClInclude Include="..\Public\Monster_StateMachine.h" />
     <ClInclude Include="..\Public\Movement_Child.h" />
+    <ClInclude Include="..\Public\TestMeshEmitter.h" />
+    <ClInclude Include="..\Public\TestMeshParticle.h" />
     <ClInclude Include="..\public\UI_BossStatus.h" />
     <ClInclude Include="..\public\UI_Curtain.h" />
     <ClInclude Include="..\public\UI_CurtainAnimBase.h" />
@@ -246,8 +253,13 @@
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesignObject.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Breakable.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_Bush.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_Food.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_Ladder.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Loader.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Parser.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_Point.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_Portal.cpp" />
     <ClCompile Include="..\Private\LevelDesign_ProtoRegister.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Rail.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Registry.cpp" />
@@ -285,6 +297,8 @@
     <ClCompile Include="..\Private\NormalEnemy.cpp" />
     <ClCompile Include="..\Private\NormalEnemy_Body.cpp" />
     <ClCompile Include="..\Private\NormalEnemy_Brain.cpp" />
+    <ClCompile Include="..\Private\TestMeshEmitter.cpp" />
+    <ClCompile Include="..\Private\TestMeshParticle.cpp" />
     <ClCompile Include="..\Private\TestParticle.cpp" />
     <ClCompile Include="..\Private\RailDataReceiver.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />

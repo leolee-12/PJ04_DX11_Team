@@ -329,10 +329,7 @@ HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_D
 	if (nullptr == pModelPrototype)
 		return E_FAIL;
 
-	if (FAILED(m_pProxy->Add_Prototype(
-		iModelLevel,
-		Desc.wstrModelProtoTag.c_str(),
-		pModelPrototype)))
+	if (FAILED(m_pProxy->Add_Prototype(iModelLevel, Desc.wstrModelProtoTag.c_str(), pModelPrototype)))
 	{
 		Safe_Release(pModelPrototype);
 		return E_FAIL;

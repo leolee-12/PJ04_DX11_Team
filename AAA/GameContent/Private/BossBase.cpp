@@ -16,7 +16,9 @@ HRESULT CBossBase::Initialize(void* pArg)
         return E_FAIL;
 
     m_eLife = EBOSS_LIFE::HIDDEN;
-    Set_Active(false);                      
+    Set_Active(false);   
+    Enable_Colliders(false);
+    Enable_Controller(false);
 
     if (const _tchar* pTag = Get_AppearEventTag())
         Subscribe_Event(pTag, [this](void*) { Appear(); });
@@ -30,6 +32,8 @@ void CBossBase::Appear()
         return;
 
     Set_Active(true);
+    Enable_Colliders(true);
+    Enable_Controller(true);
     Set_Target(Find_Player());
     m_eLife = EBOSS_LIFE::INTRO;
 }

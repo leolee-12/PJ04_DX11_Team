@@ -31,12 +31,12 @@ public:
 public:
     virtual void    Update(_float fTimeDelta) override;
     virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* p) override { p->strPrototypeTag = PROTOTYPE_TAG; }
-    virtual void    On_Deserialized() override;
 
 public:
     CGigantEdge_Body* Get_Body()   const { return m_pBody; }
     CGigantEdge_Sword* Get_Sword()  const { return m_pSword; }
     CGigantEdge_Shield* Get_Shield() const { return m_pShield; }
+    virtual CAnimator* Get_BodyAnimator() const override;
 
     void  Set_Guarding(_bool b) { m_bGuarding = b; }
     _bool Is_Guarding() const { return m_bGuarding; }
@@ -49,7 +49,6 @@ protected:
     virtual CMonsterBrain* Create_Brain() override;
     virtual const _tchar*  Get_AppearEventTag() const override { return TEXT("GigantEdge_Appear"); }
 
-    virtual CAnimator*     Get_BodyAnimator() const override;
     virtual void           Play_Intro() override;
     virtual _bool          Is_Intro_Finished() const override;
     virtual void           Play_Death() override;

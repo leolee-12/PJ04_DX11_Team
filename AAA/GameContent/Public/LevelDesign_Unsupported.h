@@ -27,7 +27,7 @@ public:
 
 private:
 #ifdef _DEBUG
-	HRESULT Ready_DebugCollider(const LD_PARSED_OBJECT* pParsedDesc);
+	HRESULT Ready_DebugCollider(const LD_OBJECT_DESC* pObjectDesc);
 #endif
 
 private:

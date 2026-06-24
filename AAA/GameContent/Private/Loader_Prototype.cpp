@@ -30,7 +30,7 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
     pProxy->Set_EffectPrototypeLevel(ETOUI(LEVEL::STATIC));
 
     // 셰어드 리소스 준비 직후 1회
-    if (FAILED(CEffect_Loader::GetInstance()->Ready(TEXT("../../Resources/Effects/effect_manifest.json"),
+    if (FAILED(CEffect_Loader::GetInstance()->Ready(TEXT("../../Resources/YSE/EffectContainer/effect_manifest.json"),
         pProxy, pDevice, pContext)))
         return E_FAIL;
 

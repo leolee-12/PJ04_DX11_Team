@@ -21,13 +21,9 @@ void CMultiHitBoxPart::SetUp_HitBox_Callback(_int iIndex)
 
             CGameObject* pVictimObj = pOther->Get_Owner();
             HITBOX& hb = m_HitBoxes[iIndex];
-            if (hb.setHit.count(pVictimObj))   
-                return;
 
             IDamageable* pVictim = dynamic_cast<IDamageable*>(pVictimObj);
             if (nullptr == pVictim) return;
-
-            hb.setHit.insert(pVictimObj);
 
             ATTACK_INFO atk{};
             atk.fDamage = hb.fDamage;
@@ -71,27 +67,31 @@ void CMultiHitBoxPart::Enable_AllHitBoxes(_bool b)
         Enable_HitBox(i, b);
 }
 
-HRESULT CMultiHitBoxPart::Add_HitBox(const _char* szBone, COLLIDER eShape, _float fRadius, _float fHeight, _float fDamage, _float fKnockback, const _float3& vCenter, const _float3& vRadians)
+HRESULT CMultiHitBoxPart::Add_HitBox(_int iIndex, const _char* szBone, COLLIDER eShape, _float fRadius, _float fHeight, _float fDamage, _float fKnockback, const _float3& vCenter, const _float3& vRadians)
 {
+    if (iIndex < 0) return E_FAIL;
+    if (iIndex >= (_int)m_HitBoxes.size())
+        m_HitBoxes.resize(iIndex + 1);     
+
     const COMPONENT_DESC& tProto = (eShape == COLLIDER::SPHERE) ? Collider_Sphere : Collider_Capsule;
 
     CCollider::COLLIDER_DESC desc{};
     desc.pOwner = this;
     desc.vCenter = vCenter;
     desc.fRadius = fRadius;
-    desc.fHeight = fHeight;     // 구면 미사용
+    desc.fHeight = fHeight;
     desc.vRadians = vRadians;
 
     _tchar szTag[64];
-    swprintf_s(szTag, L"HitBox_%d", (_int)m_HitBoxes.size());
+    swprintf_s(szTag, L"HitBox_%d", iIndex);
 
     CCollider* pCol = Add_Component<CCollider>(tProto.iLevelID, tProto.szProtoTag, szTag, &desc);
     if (nullptr == pCol) return E_FAIL;
 
-    //pCol->Set_Enabled(false);
+    pCol->Set_Enabled(false);
     m_pGameInstance_Proxy->Register_Collider(pCol, ETOUI(COLLISION_LAYER::MONSTER_HIT));
 
-    HITBOX& hb = m_HitBoxes.emplace_back();
+    HITBOX& hb = m_HitBoxes[iIndex];
     hb.pCollider = pCol;
     hb.pBoneMatrix = Get_BoneMatrixPtr(szBone);
     hb.fDamage = fDamage;
@@ -99,10 +99,10 @@ HRESULT CMultiHitBoxPart::Add_HitBox(const _char* szBone, COLLIDER eShape, _floa
 
 #ifdef _DEBUG
     if (nullptr == hb.pBoneMatrix)
-        OutputDebugStringA((std::string("[MultiHitBox] 본을 못찾음: ") + szBone + "\n").c_str());
+        OutputDebugStringA((std::string("[MultiHitBox] 본 못찾음: ") + szBone + "\n").c_str());
 #endif
 
-    SetUp_HitBox_Callback((_int)m_HitBoxes.size() - 1);
+    SetUp_HitBox_Callback(iIndex);
     return S_OK;
 }
 

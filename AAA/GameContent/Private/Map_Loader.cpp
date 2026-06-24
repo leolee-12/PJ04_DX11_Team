@@ -301,24 +301,19 @@ HRESULT CMap_Loader::Preload_LevelDesignEntries(const MAP_PACKAGE& Package, cons
 	if (Package.LevelDesignJsonPaths.empty())
 		return S_OK;
 
-	if (nullptr == m_pDevice || nullptr == m_pContext)
+	if (nullptr == m_pDevice || nullptr == m_pContext || nullptr == m_pProxy)
 		return E_FAIL;
 
-	for (const _wstring& strJsonPath :
-		Package.LevelDesignJsonPaths)
+	if (FAILED(Ready_TexHub(m_pProxy)))
+		return E_FAIL;
+
+	for (const _wstring& strJsonPath : Package.LevelDesignJsonPaths)
 	{
 		if (strJsonPath.empty())
 			continue;
 
-		if (FAILED(
-			CLevelDesign_Loader::Preload_LevelDesign(
-				m_pDevice,
-				m_pContext,
-				strJsonPath,
-				Levels.iLevelDesignPrototypeLevel)))
-		{
+		if (FAILED(CLevelDesign_Loader::Preload_LevelDesign(m_pDevice, m_pContext, strJsonPath, Levels.iLevelDesignPrototypeLevel)))
 			return E_FAIL;
-		}
 	}
 
 	return S_OK;
@@ -332,7 +327,10 @@ HRESULT CMap_Loader::Load_LevelDesignEntries(
 	if (Package.LevelDesignJsonPaths.empty())
 		return S_OK;
 
-	if (nullptr == m_pDevice || nullptr == m_pContext)
+	if (nullptr == m_pDevice || nullptr == m_pContext || nullptr == m_pProxy)
+		return E_FAIL;
+
+	if (FAILED(Ready_TexHub(m_pProxy)))
 		return E_FAIL;
 
 	for (const _wstring& strJsonPath : Package.LevelDesignJsonPaths)
@@ -798,10 +796,7 @@ HRESULT CMap_Loader::Load_Env_Runtime(
 
 	if (SUCCEEDED(hr))
 	{
-		Collect_DeletedEnvDescs(
-			SourcePackage.EnvObjectDescs,
-			pResolvedOverrideDesc,
-			pOutDeletedEnvDescs);
+		Collect_DeletedEnvDescs(SourcePackage.EnvObjectDescs, pResolvedOverrideDesc, pOutDeletedEnvDescs);
 
 		MAP_PACKAGE SpawnPackage = SourcePackage;
 		SpawnPackage.StageDesc = {};

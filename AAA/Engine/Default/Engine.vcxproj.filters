@@ -253,9 +253,6 @@
     <Filter Include="07. Component\Movement">
       <UniqueIdentifier>{ee43c8cf-5df2-4924-933f-7f5129d9e351}</UniqueIdentifier>
     </Filter>
-    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Paricle">
-      <UniqueIdentifier>{cac7e3a1-ecdd-4d62-8d22-bae46537c29b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="05. GameObject\Effect\Allocator">
       <UniqueIdentifier>{8fc72b6d-5be3-40cf-9275-b99e11825d1d}</UniqueIdentifier>
     </Filter>
@@ -294,6 +291,24 @@
     </Filter>
     <Filter Include="07. Component\Collider\Bounding\Capsule">
       <UniqueIdentifier>{0960ac63-c337-4ee7-9f71-004d3044dcfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Paricle">
+      <UniqueIdentifier>{bba9c8c0-bbfb-47c4-b9c4-975253e549e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_RectParicle">
+      <UniqueIdentifier>{cac7e3a1-ecdd-4d62-8d22-bae46537c29b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_MeshParticle">
+      <UniqueIdentifier>{f3b89464-2504-4b1f-ac6d-3aaa815d6d01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Emitter">
+      <UniqueIdentifier>{f6fe4cd6-259b-4194-b152-6063ffca5787}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_MeshEmitter">
+      <UniqueIdentifier>{572697e9-e334-4ef2-bbaa-686aba5ea8f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_RectEmitter">
+      <UniqueIdentifier>{d49ef37d-8dbc-4fa5-bb4d-69cdb1c95e46}</UniqueIdentifier>
     </Filter>
     <Filter Include="99. Defines\Hojun">
       <UniqueIdentifier>{1263b5ad-a702-4bba-afb4-f5405210ba86}</UniqueIdentifier>
@@ -552,8 +567,8 @@
     <ClInclude Include="..\public\Movement.h">
       <Filter>07. Component\Movement</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Effect_Particle.h">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
+    <ClInclude Include="..\Public\Effect_RectParticle.h">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_RectParicle</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Effect_Allocator.h">
       <Filter>05. GameObject\Effect\Allocator</Filter>
@@ -593,6 +608,21 @@
     </ClInclude>
     <ClInclude Include="..\Public\DebugCapsule.h">
       <Filter>07. Component\Collider\DebugDraw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_Particle.h">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_MeshParticle.h">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_MeshParticle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_Emitter.h">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_MeshEmitter.h">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_MeshEmitter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_RectEmitter.h">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_RectEmitter</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Anim_Layer.h">
       <Filter>99. Defines\Hojun</Filter>
@@ -830,8 +860,8 @@
     <ClCompile Include="..\private\Movement.cpp">
       <Filter>07. Component\Movement</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Effect_Particle.cpp">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
+    <ClCompile Include="..\Private\Effect_RectParticle.cpp">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_RectParicle</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Effect_Allocator.cpp">
       <Filter>05. GameObject\Effect\Allocator</Filter>
@@ -862,6 +892,21 @@
     </ClCompile>
     <ClCompile Include="..\private\Bounding_Capsule.cpp">
       <Filter>07. Component\Collider\Bounding\Capsule</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_Particle.cpp">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_MeshParticle.cpp">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_MeshParticle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_Emitter.cpp">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_MeshEmitter.cpp">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_MeshEmitter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_RectEmitter.cpp">
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_RectEmitter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

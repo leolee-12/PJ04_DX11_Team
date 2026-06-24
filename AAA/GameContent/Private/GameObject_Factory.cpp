@@ -13,6 +13,8 @@
 #include "TestMarb1eMap.h"
 #include "TestTriggerBox.h"
 #include "TestParticle.h"
+#include "TestMeshEmitter.h"
+#include "TestMeshParticle.h"
 #include "Material_Object.h"
 
 //UI Container
@@ -278,8 +280,12 @@ void CGameObject_Factory::Register_Test()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeTail"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeTail/Model_SmokeTail.ysh"));
 
-            //TRY_ADD_PROTO(pProxy, iLevelIndex, CTestParticle::PROTOTYPE_TAG,
-            //    CTestParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CTestParticle::PROTOTYPE_TAG,
+                CTestParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CTestMeshParticle::PROTOTYPE_TAG,
+                CTestMeshParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CTestMeshEmitter::PROTOTYPE_TAG,
+                CTestMeshEmitter::Create(pDevice, pContext));
         )
     );
 
@@ -481,7 +487,7 @@ void CGameObject_Factory::Register_NonAnimObject()
 
     Register(CLevelDesign_Breakable::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Breakable),
         LOADER(TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CLevelDesign_Breakable::STARBLOCK_MODEL_PROTO_TAG,
-            CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/Star/H1W1.ysh"));));
+            CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh"));));
 }
 
 void CGameObject_Factory::Register_AnimObject()
@@ -502,7 +508,7 @@ void CGameObject_Factory::Register_MiniBoss()
         (
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_GigantEdge_Body"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/MiniBoss/GigantEdge/Model/GigantEdge.ysh",
-                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+                    XMMatrixScaling(1.5f, 1.5f, 1.5f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_GigantEdge_Shield"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/MiniBoss/GigantEdge/Shield/Shield.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_GigantEdge_Sword"),

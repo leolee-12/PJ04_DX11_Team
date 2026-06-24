@@ -10,11 +10,16 @@ private:
     virtual ~CBoss_Gorilla_Brain() = default;
 
 protected:
-    virtual _int     Get_PhaseCount() const override { return 3; }   // ¡Ú s_Thresholds.size()+1 °ú ÀÏÄ¡
+    virtual _int     Get_PhaseCount() const override { return 2; }
     virtual CBTNode* Build_PhaseTree(_int iPhase) override;
+
+private:
+    _int   m_iMeleeSinceThrow = { 0 };
+    _float m_fAtkTimer = { 0.f };
 
 public:
     static CBoss_Gorilla_Brain* Create();
+    virtual void Free() override;
 };
 
 NS_END

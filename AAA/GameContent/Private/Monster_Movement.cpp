@@ -63,6 +63,52 @@ void CMonster_Movement::KO(_fvector vAttackerPos, _float fStrength)
 	Start_Launch(vAttackerPos, fStrength, 1.4f);
 }
 
+void CMonster_Movement::Begin_JumpArc(_fvector vTargetPos, _float fDuration, _float fHeight)
+{
+	if (nullptr == m_pTransform) return;
+	XMStoreFloat3(&m_vJumpStart, m_pTransform->Get_State(STATE::POSITION));
+	XMStoreFloat3(&m_vJumpTarget, vTargetPos);
+	m_fJumpDur = (fDuration > 0.01f) ? fDuration : 0.01f;
+	m_fJumpHeight = fHeight;
+	m_fJumpT = 0.f;
+	m_bJumpArc = true;
+}
+
+_bool CMonster_Movement::Update_JumpArc(_float fTimeDelta)
+{
+	if (!m_bJumpArc || nullptr == m_pController || nullptr == m_pTransform)
+	{
+		m_bJumpArc = false;
+		return true;
+	}
+
+	m_fJumpT += fTimeDelta;
+	_float u = m_fJumpT / m_fJumpDur;
+	if (u > 1.f) u = 1.f;
+
+	_vector vDesired = XMVectorLerp(XMLoadFloat3(&m_vJumpStart), XMLoadFloat3(&m_vJumpTarget), u);
+	_float  fHop = 4.f * m_fJumpHeight * u * (1.f - u);
+	vDesired = XMVectorSetY(vDesired, XMVectorGetY(vDesired) + fHop);
+
+	const physx::PxExtendedVec3& foot = m_pController->getFootPosition();
+	_vector vActual = XMVectorSet((_float)foot.x, (_float)foot.y, (_float)foot.z, 1.f);
+	_vector vDisp = XMVectorSubtract(vDesired, vActual);
+
+	physx::PxControllerFilters filters;
+	filters.mFilterFlags = physx::PxQueryFlag::eSTATIC | physx::PxQueryFlag::eDYNAMIC;
+	filters.mCCTFilterCallback = &Engine::Get_CCTFilter();
+	m_pController->move(
+		physx::PxVec3(XMVectorGetX(vDisp), XMVectorGetY(vDisp), XMVectorGetZ(vDisp)),
+		0.001f, fTimeDelta, filters);
+
+	const physx::PxExtendedVec3& foot2 = m_pController->getFootPosition();
+	m_pTransform->Set_State(STATE::POSITION,
+		XMVectorSet((_float)foot2.x, (_float)foot2.y, (_float)foot2.z, 1.f));
+
+	if (m_fJumpT >= m_fJumpDur) { m_bJumpArc = false; return true; }
+	return false;
+}
+
 _bool CMonster_Movement::Update_Launched(_float fTimeDelta)
 {
 	if (nullptr == m_pTransform || nullptr == m_pController)

@@ -52,29 +52,6 @@ void CEnvObject_Static::Late_Update(_float fTimeDelta)
 	Submit_RenderGroups();
 }
 
-HRESULT CEnvObject_Static::Render_Shadow()
-{
-	if (!m_bRenderable || nullptr == m_pModelCom || nullptr == m_pShaderCom)
-		return S_OK;
-
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
-		return E_FAIL;
-
-	size_t n = m_pModelCom->Get_NumMeshes();
-	for (size_t i = 0; i < n; ++i)
-	{
-		if (FAILED(m_pShaderCom->Begin(2)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Render((_uint)i)))
-			return E_FAIL;
-	}
-	return S_OK;
-}
-
 void CEnvObject_Static::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 {
 	__super::Copy_PrototypeName(pOutData);
