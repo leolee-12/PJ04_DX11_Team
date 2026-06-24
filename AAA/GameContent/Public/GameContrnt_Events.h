@@ -3,6 +3,7 @@
 
 NS_BEGIN(Engine)
 class CGameObject;
+class CAnimator;
 NS_END
 
 namespace Client
@@ -32,7 +33,15 @@ namespace Client
     inline constexpr const _tchar* EVT_QUERY_PLAYER = L"Query_Player";
 
     enum class ECutsceneCam { Cutscene, Boss };
-    struct CUTSCENE_CAMERA_DESC { ECutsceneCam eCam = ECutsceneCam::Cutscene; };
+
+    struct CUTSCENE_CAMERA_DESC
+    {
+        ECutsceneCam       eCam = ECutsceneCam::Cutscene;
+        const _tchar* szTrack = nullptr;                // 컷씬캠일 때 재생 트랙 (예: L"DemoAppear2_camera1")
+        CAnimator* pProgress = nullptr;                 // progress 소스(고릴라 애니메이터)
+        const _float4x4* pAnchorWorld = nullptr;        // 로컬->월드 앵커(고릴라 월드행렬)
+    };
+
     struct CUTSCENE_HANDOFF_DESC { const _float4x4* pFinalWorld = nullptr; };
 
     struct CUTSCENE_GRAB_DESC

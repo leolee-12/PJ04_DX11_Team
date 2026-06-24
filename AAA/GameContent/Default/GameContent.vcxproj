@@ -31,8 +31,10 @@
     <ClInclude Include="..\public\Boss_Gorilla.h" />
     <ClInclude Include="..\public\Boss_Gorilla_Body.h" />
     <ClInclude Include="..\public\Boss_Gorilla_Brain.h" />
+    <ClInclude Include="..\public\CameraDirector.h" />
     <ClInclude Include="..\Public\Camera_AreaData.h" />
     <ClInclude Include="..\public\Camera_AreaCam.h" />
+    <ClInclude Include="..\public\Camera_Cutscene.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\Public\Character.h" />
     <ClInclude Include="..\Public\Character_States.h" />
@@ -220,8 +222,10 @@
     <ClCompile Include="..\private\Boss_Gorilla.cpp" />
     <ClCompile Include="..\private\Boss_Gorilla_Body.cpp" />
     <ClCompile Include="..\private\Boss_Gorilla_Brain.cpp" />
+    <ClCompile Include="..\private\CameraDirector.cpp" />
     <ClCompile Include="..\Private\Camera_AreaSolver.cpp" />
     <ClCompile Include="..\private\Camera_AreaCam.cpp" />
+    <ClCompile Include="..\private\Camera_Cutscene.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Common_Circle01.cpp" />

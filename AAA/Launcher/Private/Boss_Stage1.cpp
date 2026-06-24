@@ -7,6 +7,8 @@
 #include "Launcher_LevelProfiles.h"
 #include "Camera_AreaCam.h"
 #include "Level_Loading.h"
+#include "CameraDirector.h"
+#include "Camera_Cutscene.h"
 
 CBoss_Stage1::CBoss_Stage1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel{ pDevice, pContext }
@@ -75,6 +77,8 @@ void CBoss_Stage1::Update(_float fTimeDelta)
 #ifdef  _DEBUG
     if (m_pGameInstance_Proxy->Key_Down(DIK_F1))
         m_pGameInstance_Proxy->Publish(TEXT("FadeOut_Start"), nullptr);
+    if (m_pGameInstance_Proxy->Key_Down(DIK_F2))
+        m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GorillaAppear, nullptr);
 #endif //  _DEBUG
 }
 
@@ -131,6 +135,20 @@ HRESULT CBoss_Stage1::Ready_Camera()
     m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::BOSS_STAGE1),
         TEXT("Prototype_GameObject_Camera_Follow"),
         ETOUI(LEVEL::BOSS_STAGE1), TEXT("Layer_Camera"), TEXT("CameraFollow"), &CamDesc);
+
+    m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::BOSS_STAGE1),
+        CCamera_Cutscene::PROTOTYPE_TAG, CCamera_Cutscene::Create(m_pDevice, m_pContext));
+    CCamera_Cutscene::CUTSCENECAM_DESC CutDesc{};
+    CutDesc.fFovy = XMConvertToRadians(50.f); CutDesc.fNear = 0.1f; CutDesc.fFar = 1000.f;
+    m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::BOSS_STAGE1),
+        CCamera_Cutscene::PROTOTYPE_TAG,
+        ETOUI(LEVEL::BOSS_STAGE1), TEXT("Layer_Camera"), TEXT("CameraCutscene"), &CutDesc);
+
+    m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::BOSS_STAGE1),
+        CCameraDirector::PROTOTYPE_TAG, CCameraDirector::Create(m_pDevice, m_pContext));
+    m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::BOSS_STAGE1),
+        CCameraDirector::PROTOTYPE_TAG,
+        ETOUI(LEVEL::BOSS_STAGE1), TEXT("Layer_Camera"), TEXT("CameraDirector"));
 
     return S_OK;
 }

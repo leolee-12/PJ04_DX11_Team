@@ -44,9 +44,9 @@ void CCutsceneGorilla::Update(_float fTimeDelta)
         case EPhase::Appearing1:
             if (m_pAnimatorCom->Is_Finished())
             {
-                if (!m_bGrabFired)     
-                    Fire_Grab();
-                Play(CLIP_APPEAR2, false, 0.2f, 1.5f);
+                if (!m_bGrabFired) Fire_Grab();
+                Play(CLIP_APPEAR2, false);
+                Fire_CutsceneCamera();       
                 m_ePhase = EPhase::Appearing2;
             }
             break;
@@ -133,16 +133,21 @@ void CCutsceneGorilla::Begin_Appear()
 
 void CCutsceneGorilla::Fire_Grab()
 {
-    if (m_bGrabFired)
-        return;
+    if (m_bGrabFired) return;
     m_bGrabFired = true;
-
     CUTSCENE_GRAB_DESC grab{};
     grab.pBoneMatrix = Get_BoneMatrixPtr(GRAB_BONE);
     grab.pSourceWorld = Get_Transform()->Get_WorldMatrixPtr();
     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GrabKirby, &grab);
+}
 
-    CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Cutscene };
+void CCutsceneGorilla::Fire_CutsceneCamera()
+{
+    CUTSCENE_CAMERA_DESC cam{};
+    cam.eCam = ECutsceneCam::Cutscene;
+    cam.szTrack = TEXT("DemoAppear2_camera1");
+    cam.pProgress = m_pAnimatorCom;                      
+    cam.pAnchorWorld = m_pTransformCom->Get_WorldMatrixPtr();
     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
 }
 

@@ -37,8 +37,9 @@ protected:
     virtual void    On_AnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE p) override;
 
 private:
-    void Begin_Appear(); 
-    void Fire_Grab();    
+    void Begin_Appear();
+    void Fire_Grab();
+    void Fire_CutsceneCamera();
     void Do_Handoff();
 
 public:
