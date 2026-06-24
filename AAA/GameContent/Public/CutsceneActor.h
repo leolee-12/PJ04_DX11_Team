@@ -43,7 +43,7 @@ public:
     CModel* Get_Model()    const { return m_pModelCom; }
     const _float4x4* Get_BoneMatrixPtr(const _char* pBoneName) const;
 
-    void Play(const _char* szAnim, _bool bLoop = false, _float fBlend = 0.1f);
+    void Play(const _char* szAnim, _bool bLoop = false, _float fBlend = 0.2f, _float fSpeed = 1.f);
 
     void Attach_To(const ATTACH_INFO& tInfo) { m_tAttach = tInfo; m_bAttached = true; }
     void Detach() { m_bAttached = false; }

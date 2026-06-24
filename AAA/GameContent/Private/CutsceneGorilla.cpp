@@ -17,11 +17,11 @@ HRESULT CCutsceneGorilla::Ready_Components()
     VISUAL_SETUP t{};
     t.tShader = Shader_Gorilla;
     t.szModelProtoTag = TEXT("Prototype_Component_Model_Boss_Gorilla_Body");  // 전투 고릴라 메쉬 재사용
-    t.szAnimEventFile = L""; //TEXT("../Bin/DataFiles/Cutscene/Gorilla_Intro.json");
+    t.szAnimEventFile = TEXT("../Bin/DataFiles/Cutscene/Gorilla_Cutscene.json");
     if (FAILED(Ready_Visual(t)))
         return E_FAIL;
 
-    Play(CLIP_READY, true);
+    Play(CLIP_READY, true, 0.2f, 1.5f);
     m_ePhase = EPhase::ReadyWait;
 
     return S_OK;
@@ -46,7 +46,7 @@ void CCutsceneGorilla::Update(_float fTimeDelta)
             {
                 if (!m_bGrabFired)     
                     Fire_Grab();
-                Play(CLIP_APPEAR2, false);
+                Play(CLIP_APPEAR2, false, 0.2f, 1.5f);
                 m_ePhase = EPhase::Appearing2;
             }
             break;
@@ -127,7 +127,7 @@ void CCutsceneGorilla::Begin_Appear()
 {
     if (m_ePhase != EPhase::ReadyWait)
         return;
-    Play(CLIP_APPEAR1, false);
+    Play(CLIP_APPEAR1, false, 0.2f, 1.5f);
     m_ePhase = EPhase::Appearing1;
 }
 
@@ -137,13 +137,11 @@ void CCutsceneGorilla::Fire_Grab()
         return;
     m_bGrabFired = true;
 
-    // 1) 커비 부착 (손 본 행렬 + 고릴라 월드)
     CUTSCENE_GRAB_DESC grab{};
     grab.pBoneMatrix = Get_BoneMatrixPtr(GRAB_BONE);
     grab.pSourceWorld = Get_Transform()->Get_WorldMatrixPtr();
     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GrabKirby, &grab);
 
-    // 2) Area -> 컷씬 카메라
     CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Cutscene };
     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
 }

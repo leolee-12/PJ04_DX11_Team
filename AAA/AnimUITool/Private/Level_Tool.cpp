@@ -1203,13 +1203,9 @@ void CLevel_Tool::Update(_float fTimeDelta)
     }
     if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F7, false))
     {
-        BOSS_HP_APPEARED Desc{};
-        Desc.strBossName = L"테스트 기간트 엣지";
-        Desc.fMaxHP = 100.f;
-        Desc.fCurrHp = 100.f;
-        m_pGameInstance_Proxy->Publish(EventTag::Boss_HP_Appeared, &Desc);
+        m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GorillaAppear, nullptr);
 
-        Log_Info("Publish: BossHP.Appeared");
+        Log_Info("Publish: Cutscene_GorillaAppear");
     }
 
     if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F1, false))

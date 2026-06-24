@@ -95,10 +95,10 @@ const _float4x4* CCutsceneActor::Get_BoneMatrixPtr(const _char* pBoneName) const
     return m_pModelCom->Get_BoneMatrixPtr(pBoneName);
 }
 
-void CCutsceneActor::Play(const _char* szAnim, _bool bLoop, _float fBlend)
+void CCutsceneActor::Play(const _char* szAnim, _bool bLoop, _float fBlend, _float fSpeed)
 {
     if (m_pAnimatorCom)
-        m_pAnimatorCom->Play(szAnim, bLoop, false, fBlend);
+        m_pAnimatorCom->Play(szAnim, bLoop, false, fBlend, fSpeed);
 }
 
 void CCutsceneActor::Free() { __super::Free(); }
