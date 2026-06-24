@@ -32,17 +32,17 @@ public:
 	{
 		return m_fDuration > 0.f ? m_fCurrentTrackPosition / m_fDuration : 1.f;
 	}
-	
+
 public:
 	void	Set_Progress(_float fProgress) { m_fCurrentTrackPosition = fProgress * m_fDuration; }
 
 private:
-	string				m_strName = {};
+	string					m_strName = {};
 
-	_float				m_fDuration = {}; /* 현재 애니메이션트랙 총 길이.  */
-	_float				m_fTickPerSecond = {}; /* 현재 트랙의 초당 재생 속도. */
+	_float					m_fDuration = {}; /* 현재 애니메이션트랙 총 길이.  */
+	_float					m_fTickPerSecond = {}; /* 현재 트랙의 초당 재생 속도. */
 
-	_float				m_fCurrentTrackPosition = {}; /* 현재 재생 위치. */
+	_float					m_fCurrentTrackPosition = {}; /* 현재 재생 위치. */
 
 	_uint					m_iNumChannels = {}; /* 현재 애니메이션의 재생을 위해 상태를 제어해야하는 뼈의 갯수 */
 	vector<CChannel*>		m_Channels;

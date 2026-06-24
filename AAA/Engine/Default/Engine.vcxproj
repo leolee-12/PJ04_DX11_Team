@@ -167,6 +167,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\public\Animator.h" />
+    <ClInclude Include="..\Public\Anim_Layer.h" />
     <ClInclude Include="..\public\BehaviorTree.h" />
     <ClInclude Include="..\public\Blackboard.h" />
     <ClInclude Include="..\public\Base.h" />

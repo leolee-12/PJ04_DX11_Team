@@ -24,6 +24,8 @@ private:
 	virtual HRESULT				Initialize_Prototype() override;
 	virtual HRESULT				Initialize(void* pArg) override;
 
+	virtual HRESULT				Render() override;                  // 특수 렌더 필요 시 자식이 오버라이드
+
 public:
 	virtual void				Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override
 	{

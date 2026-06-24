@@ -54,13 +54,13 @@ void CMonster_Movement::Launch(_fvector vHorizDir, _float fHorizSpeed, _float fU
 void CMonster_Movement::Knockback(_fvector vAttackerPos, _float fStrength)
 {
 	m_bKO = false;
-	Start_Launch(vAttackerPos, fStrength, 0.6f);
+	Start_Launch(vAttackerPos, fStrength, 1.2f);
 }
 
 void CMonster_Movement::KO(_fvector vAttackerPos, _float fStrength)
 {
 	m_bKO = true;
-	Start_Launch(vAttackerPos, fStrength, 1.2f);
+	Start_Launch(vAttackerPos, fStrength, 1.4f);
 }
 
 void CMonster_Movement::Begin_JumpArc(_fvector vTargetPos, _float fDuration, _float fHeight)
@@ -137,11 +137,12 @@ _bool CMonster_Movement::Update_Launched(_float fTimeDelta)
 	m_bGrounded = flags.isSet(physx::PxControllerCollisionFlag::eCOLLISION_DOWN);
 	if (m_bGrounded && m_fVerticalVelocity < 0.f)
 	{
-		if (m_bKO)
+		if (m_bKO || !m_bBouncing)
 		{
 			m_fVerticalVelocity = 0.f;
 			m_vHorizVel = {};
 			m_bLaunched = false;
+			m_bBouncing = false;
 		}
 		else
 		{
@@ -151,11 +152,15 @@ _bool CMonster_Movement::Update_Launched(_float fTimeDelta)
 				m_fVerticalVelocity = 0.f;
 				m_vHorizVel = {};
 				m_bLaunched = false;
+				m_bBouncing = false;
 			}
 			else
 			{
 				m_fVerticalVelocity = fBounceUp;
 				XMStoreFloat3(&m_vHorizVel, XMLoadFloat3(&m_vHorizVel) * m_fBounceFriction);
+
+				if (++m_iBounceCount >= m_iMaxBounce)			// 다음 바운스는 정착 -> 이번이 마지막
+					m_bBouncing = false;
 			}
 		}
 	}
@@ -213,6 +218,8 @@ void CMonster_Movement::Start_Launch(_fvector vAttackerPos, _float fStrength, _f
 	XMStoreFloat3(&m_vHorizVel, vAway * fStrength);    
 	m_fVerticalVelocity = fStrength * fUpRatio;        
 	m_bLaunched = true;
+	m_iBounceCount = 0;
+	m_bBouncing = (m_iMaxBounce > 0);
 }
 
 void CMonster_Movement::Free()
