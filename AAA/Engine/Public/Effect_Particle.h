@@ -1,27 +1,16 @@
 #pragma once
 
 #include "Effect_Part.h"
+#include "Effect_Allocator.h"
 
 NS_BEGIN(Engine)
 
-class CVIBuffer_Rect;
+class CShader;
+class CTexture;
 
 class ENGINE_DLL CEffect_Particle abstract : public CEffect_Part
 {
     GENERATED_BODY_ABSTRACT(CEffect_Particle)
-
-// Sprite Animation Texture
-PROPERTY(_bool, m_bSpriteAniTexture, L"Sprite Animation Texture", L"Sprite Animation");
-
-PROPERTY(_int, m_iTexFrameX,     L"Frame X_T",   L"Sprite Animation");
-PROPERTY(_int, m_iTexFrameY,     L"Frame Y_T",   L"Sprite Animation");
-
-// Sprite Animation Mask
-PROPERTY(_bool, m_bSpriteAniMask, L"Sprite Animation Mask", L"Sprite Animation");
-
-PROPERTY(_int, m_iMaskFrameX, L"Frame X_M", L"Sprite Animation");
-PROPERTY(_int, m_iMaskFrameY, L"Frame Y_M", L"Sprite Animation");
-
 
 // Particle
 PROPERTY(_uint, m_iParticleCount, L"Count_P", L"Particle");
@@ -32,12 +21,44 @@ PROPERTY(_float, m_fParticleSpawnStartRatio, L"Spawn Start Ratio_P", L"Particle 
 PROPERTY(_float, m_fParticleSpawnEndRatio, L"Spawn End Ratio_P", L"Particle Spawn");
 PROPERTY(_float, m_fParticleLifeRatio, L"Life Ratio_P", L"Particle Spawn");
 
-// Particle Move
-PROPERTY(_int, m_iParticleMoveMode, L"Move Mode_P", L"Particle Move"); // 0 Spread, 1 Fountain
-PROPERTY(_float, m_fParticleStartSpeed, L"Start Speed_P", L"Particle Move");
-PROPERTY(_float, m_fParticleFountainSpread, L"Fountain Spread_P", L"Particle Move");
-PROPERTY(_float, m_fParticleFountainUpBias, L"Fountain Up Bias_P", L"Particle Move");
-PROPERTY(_float, m_fParticleFountainGravity, L"Gravity_P", L"Particle Move");
+// Particle Shape
+PROPERTY(_int, m_iParticleShapeType, L"Shape Type_P", L"Particle Shape"); // 0 Point, 1 Sphere, 2 Circle, 3 Box
+PROPERTY(_float, m_fParticleShapeRadius, L"Radius_P", L"Particle Shape - Sphere Circle");
+PROPERTY(_bool, m_bParticleShapeRandomRadius, L"Random Radius_P", L"Particle Shape - Sphere Circle");
+
+PROPERTY(_float3, m_vParticleBoxSize, L"Box Size_P", L"Particle Shape - Box");
+PROPERTY(_int, m_iParticleBoxSpawnMode, L"Box Spawn Mode_P", L"Particle Shape - Box"); // 0 Volume, 1 Top
+
+// Particle Velocity
+PROPERTY(_int, m_iParticleVelocityMode, L"Velocity Mode_P", L"Particle Velocity"); // 0 Shape Outward, 1Direction, 2 Fountain
+PROPERTY(_float, m_fParticleStartSpeed, L"Start Speed_P", L"Particle Velocity");
+
+PROPERTY(_float, m_fParticleDirectionRandomStrength, L"Direction Random_P", L"Particle Velocity - Random");
+PROPERTY(_float, m_fParticleStartSpeedRandomRatio, L"Speed Random Ratio_P", L"Particle Velocity - Random");
+
+PROPERTY(_float3, m_vParticleVelocityDirection, L"Direction_P", L"Particle Velocity - Direction");
+
+PROPERTY(_float, m_fParticleFountainSpread, L"Spread_P", L"Particle Velocity - Fountain");
+PROPERTY(_float, m_fParticleFountainUpBias, L"Up Bias_P", L"Particle Velocity - Fountain");
+
+
+// Particle Force
+PROPERTY(_bool, m_bParticleUseAcceleration, L"Use Acceleration_P", L"Particle Force");
+PROPERTY(_float3, m_vParticleAcceleration, L"Acceleration_P", L"Particle Force");
+
+// Particle Flutter
+PROPERTY(_bool, m_bParticleUseFlutter, L"Use Flutter_P", L"Particle Flutter");
+PROPERTY(_float, m_fParticleFlutterAmplitude, L"Amplitude_P", L"Particle Flutter");
+PROPERTY(_float, m_fParticleFlutterFrequency, L"Frequency_P", L"Particle Flutter");
+PROPERTY(_float, m_fParticleFlutterRandomRatio, L"Random Ratio_P", L"Particle Flutter");
+
+// Particle Rotation
+PROPERTY(_bool, m_bParticleRandomRotation, L"Random Rotation_P", L"Particle Rotation");
+PROPERTY(_float3, m_vParticleRandomRotationMin, L"Rotation Min_P", L"Particle Rotation");
+PROPERTY(_float3, m_vParticleRandomRotationMax, L"Rotation Max_P", L"Particle Rotation");
+
+PROPERTY(_bool, m_bParticleRotationOverLife, L"Rotation Over Life_P", L"Particle Rotation");
+PROPERTY(_float3, m_vParticleAngularVelocity, L"Angular Velocity_P", L"Particle Rotation");
 
 // Particle Alpha
 PROPERTY(_float, m_fParticleAlpha, L"Alpha_P", L"Particle Alpha");
@@ -86,16 +107,11 @@ PROPERTY(_bool, m_bActive_ParticleColor_Ratio_1, L"Active Ratio 1_P", L"Particle
 PROPERTY(_float, m_fParticleColor_Ratio_1, L"Ratio 1_P", L"Particle Color");
 PROPERTY(_float3, m_vParticleColor_Value_1, L"Value 1_P", L"Particle Color");
 
+
+
 public:
     struct EFFECT_PARTICLE_DESC : public CEffect_Part::EFFECT_PART_DESC
     {
-        // Buffer
-        _uint iVIBufferLevel{};
-        _wstring wstrVIBufferTag;
-
-        // Shader
-        _uint iShaderLevel{};
-        _wstring wstrShaderTag;
     };
 
 protected:
@@ -115,29 +131,43 @@ protected:
 
         _float3 vLocalPos{};
         _float3 vVelocity{};
+        _float3 vSpawnLocalPos{};
+
+        _float fFlutterPhase{};
+        _float fFlutterAmplitude{};
+        _float fFlutterFrequency{};
+        _float3 vFlutterDir{};
+
+        _float3 vBaseRotation{};
+        _float3 vRotation{};
+        _float3 vAngularVelocity{};
     };
 
 protected:
-    struct RATIO_VALUE
-    {
-        _float fRatio{};
-        _float fValue{};
-    };
-
-    struct RATIO_VALUE_FLOAT3
-    {
-        _float fRatio{};
-        _float3 vValue{};
-    };
-
-private:
     enum ShaderPass { Default, AlphaBlend, Additive, ShaderPass_End };
 
-    enum ParticleMoveMode
+    enum ParticleShapeType
     {
-        PARTICLE_MOVE_SPREAD,
-        PARTICLE_MOVE_FOUNTAIN,
-        PARTICLE_MOVE_END
+        PARTICLE_SHAPE_POINT,
+        PARTICLE_SHAPE_SPHERE,
+        PARTICLE_SHAPE_CIRCLE,
+        PARTICLE_SHAPE_BOX,
+        PARTICLE_SHAPE_END
+    };
+
+    enum ParticleBoxSpawnMode
+    {
+        PARTICLE_BOX_VOLUME,
+        PARTICLE_BOX_TOP,
+        PARTICLE_BOX_END
+    };
+
+    enum ParticleVelocityMode
+    {
+        PARTICLE_VELOCITY_SHAPE_OUTWARD,
+        PARTICLE_VELOCITY_DIRECTION,
+        PARTICLE_VELOCITY_FOUNTAIN,
+        PARTICLE_VELOCITY_END
     };
 
 protected:
@@ -158,48 +188,20 @@ public:
     virtual void    Effect_Start() override;
 
 protected:
-    virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;
-
-    virtual void Update_TexSpriteAnimation(const _float fTimeDelta, const _float fRatio);
-    virtual void Update_MaskSpriteAnimation(const _float fTimeDelta, const _float fRatio);
-
-private:
-    HRESULT Ready_Components();
-    HRESULT Bind_ShaderResources();
     HRESULT Bind_ShaderValue();
 
-private:
-    CVIBuffer_Rect* m_pVIBuffer{};
-
-private:
-    _uint m_iVIBufferLevel{};
-    _wstring m_wstrVIBufferTag;
-
-    _uint m_iShaderLevel{};
-    _wstring m_wstrShaderTag;
-
-    _float2 m_fCurTexAniUV{};
-    _float2 m_fCurTexAniSize{};
-
-    _float2 m_fCurMaskAniUV{};
-    _float2 m_fCurMaskAniSize{};
-
-private:
-    vector<PARTICLE> m_Particles;
-
-    _float  m_fParticleLifeTime = 1.f;
-
-    _float3 m_fPivot{};
-
-private:
-    void Init_PropertyValue();
+protected:
+    virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;
 
     void Reset_Particles();
-    _float4x4 Make_ParticleWorldMatrix(const PARTICLE& Particle) const;
-
     void Update_Particles_ByContainerTime(_float fRatio);
 
-    _vector Make_SpreadDirection3D() const;
+    _float3 Make_ParticleSpawnLocalPos() const;
+    _vector Make_ParticleVelocityDirection(const PARTICLE& Particle) const;
+    _vector Apply_ParticleVelocityRandom(_vector vBaseDir) const;
+    _float Make_ParticleRandomSpeed() const;
+
+    _vector Make_RandomSphereDirection() const;
     _vector Make_FountainDirection() const;
 
     void Update_ParticleMove(PARTICLE& Particle, _float fRatio, _float fLocalRatio);
@@ -218,6 +220,18 @@ private:
         const _float3& vStartValue, const _float3& vEndValue,
         _bool bActiveRatio0, _float fRatio0, const _float3& vValue0,
         _bool bActiveRatio1, _float fRatio1, const _float3& vValue1) const;
+
+    _float4x4 Make_ParticleWorldMatrix(const PARTICLE& Particle) const;
+
+protected:
+    vector<PARTICLE> m_Particles;
+
+    _float  m_fParticleLifeTime = 1.f;
+    _float3 m_fPivot{};
+
+private:
+    HRESULT Ready_Components();
+    void Init_PropertyValue();
 
 protected:
     virtual void Free() override;

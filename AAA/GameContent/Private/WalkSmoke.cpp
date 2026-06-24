@@ -8,6 +8,8 @@
 #include "SmokeTail.h"
 
 #include "TestParticle.h"
+#include "TestMeshParticle.h"
+#include "TestMeshEmitter.h"
 
 CWalkSmoke::CWalkSmoke(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Container(pDevice, pContext)
@@ -71,7 +73,12 @@ HRESULT CWalkSmoke::Ready_EffectPartObjects()
         return E_FAIL;
     if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeTail::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeTail"))))
         return E_FAIL;
+
+    //if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CTestMeshEmitter::PROTOTYPE_TAG, TEXT("Test_MeshEmitter"))))
+    //    return E_FAIL;
     //if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CTestParticle::PROTOTYPE_TAG, TEXT("Test_Paticle"))))
+    //    return E_FAIL;
+    //if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CTestMeshParticle::PROTOTYPE_TAG, TEXT("Test_MeshPaticle"))))
     //    return E_FAIL;
 
     return S_OK;

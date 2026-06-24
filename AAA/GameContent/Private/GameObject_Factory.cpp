@@ -13,6 +13,8 @@
 #include "TestMarb1eMap.h"
 #include "TestTriggerBox.h"
 #include "TestParticle.h"
+#include "TestMeshEmitter.h"
+#include "TestMeshParticle.h"
 #include "Material_Object.h"
 
 //UI Container
@@ -278,8 +280,12 @@ void CGameObject_Factory::Register_Test()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeTail"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeTail/Model_SmokeTail.ysh"));
 
-            //TRY_ADD_PROTO(pProxy, iLevelIndex, CTestParticle::PROTOTYPE_TAG,
-            //    CTestParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CTestParticle::PROTOTYPE_TAG,
+                CTestParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CTestMeshParticle::PROTOTYPE_TAG,
+                CTestMeshParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CTestMeshEmitter::PROTOTYPE_TAG,
+                CTestMeshEmitter::Create(pDevice, pContext));
         )
     );
 

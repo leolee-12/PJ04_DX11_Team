@@ -4,12 +4,12 @@
 #include "GameContent_const.h"
 
 CTestParticle::CTestParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CEffect_Particle{ pDevice, pContext }
+    : CEffect_RectParticle{ pDevice, pContext }
 {
 }
 
 CTestParticle::CTestParticle(const CTestParticle& Prototype)
-    : CEffect_Particle(Prototype)
+    : CEffect_RectParticle(Prototype)
 {
 }
 

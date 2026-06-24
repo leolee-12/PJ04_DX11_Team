@@ -2,25 +2,25 @@
 
 #include "GameContent_Defines.h"
 
-#include "Effect_RectParticle.h"
+#include "Effect_MeshParticle.h"
 
 NS_BEGIN(Client)
 
-class CTestParticle final : public CEffect_RectParticle
+class CTestMeshParticle final : public CEffect_MeshParticle
 {
-	GENERATED_BODY(CEffect_RectParticle)
+	GENERATED_BODY(CEffect_MeshParticle)
 
 public:
-	struct TEST_PARTICLE_DESC : public CEffect_RectParticle::EFFECT_RECTPARTICLE_DESC
+	struct TEST_MESHPARTICLE_DESC : public CEffect_MeshParticle::EFFECT_MESHPARTICLE_DESC
 	{
 	};
 
-	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_TestParticle";
+	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_TestMeshParticle";
 
 private:
-	CTestParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CTestParticle(const CTestParticle& Prototype);
-	virtual ~CTestParticle() = default;
+	CTestMeshParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CTestMeshParticle(const CTestMeshParticle& Prototype);
+	virtual ~CTestMeshParticle() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -34,7 +34,7 @@ public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
 public:
-	static CTestParticle* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CTestMeshParticle* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 private:
 	virtual void Free();
