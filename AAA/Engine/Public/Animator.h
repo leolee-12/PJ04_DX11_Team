@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include "Anim_Layer.h"
 
 NS_BEGIN(Engine)
 
@@ -21,36 +22,12 @@ public:
 
     struct LAYER_PLAY_INFO
     {
-        _uint               iSlot           = { 1 };
+        _uint               iSlot = { 1 };
         ANI_PLAY_INFO       tAnim;                          // 재생할 클립 코어 
         vector<_string>     Roots;                          // 마스크 루트 본 (비우면 전신 레이어)
-        _float              fTargetWeight   = { 1.f };      // 목표 가중치 0~1
-        _float              fWeightBlend    = { 0.1f };     // Weight 0 ~ Target 보간 시간
+        _float              fTargetWeight = { 1.f };      // 목표 가중치 0~1
+        _float              fWeightBlend = { 0.1f };     // Weight 0 ~ Target 보간 시간
     };
-
-    // 레이어에 들어온 정보를 풀어 보관 (base는 index 0, weight 1 고정)
-    struct LAYER        
-    {
-        _string         strClip;                                    // 재생 중인 클립 ("" : 비활성)
-        _int            iAnimIndex          = { -1 };                          // 해석된 인덱스 - 매 프레임 Get_AnimtionIndex 제거 
-        _float          fLocalTime          = { 0.f };               // 레이어 자체 재생 
-
-        _float          fClipBlend          = { 0.f };              // crossfade 총 시간
-        _float          fClipBlendElapsed   = { 0.f };              // 경과
-
-        _float          fWeight             = { 0.f };              // Weight Blend 
-        _float          fTarget             = { 1.f };
-        _float          fWeightBlend          = { 0.1f };
-
-        _float          fSpeed              = { 1.f };              // 레이어 독립 속도
-        _bool           bLoop               = { true };             
-        _bool           bPaused             = { false };
-        _bool           bFinished           = { false };            // 레이어 완료 신호
-
-        vector<_uint>   MaskBones;                                  // 해석된 마스크 본 인덱스
-        vector<_uint>   KeyFrameCursors;
-    };
-
 
 public:
     typedef struct tagAnimatorDesc
@@ -81,14 +58,21 @@ public: // 재생 제어 (오브젝트/에디터는 오직 이것만 사용)
     void    Pause_Mask(_int iSlot = 1) { m_Layers[iSlot].bPaused  = true; }
     void    Resume_Mask(_int iSlot = 1) { m_Layers[iSlot].bPaused = false; }
 
-    void    Set_MaskPaused(_bool bPaused) { m_Layers[1].bPaused = bPaused; }
-    _bool   Is_MaskPaused() const { return m_Layers[1].bPaused; }
+    void    Set_OverlayPaused(_int iSlot, _bool bPaused) { m_Layers[iSlot].bPaused = bPaused; }
+    _bool   Is_OverlayPaused(_int iSlot = 1) const { return m_Layers[iSlot].bPaused; }
 
     void    Seek(_float fProgress);
     _bool   Is_Finished() const { return m_bFinished; }
     _bool   Is_Paused()   const { return m_bPaused; }
     const string& Get_CurrentAnimName() const;
+
     _float  Get_Progress() const;
+
+    // 애니메이션 동안 특정 횟수만큼 돌리고 싶을 때
+    void    SpinByProgress(const _char* szBone, _float fTurns, _fvector vAxis, _uint iSlot = 0);
+
+    // 애니메이션 동안 특정 각도만큼 돌리고 복귀 시키고 싶을 때
+    void    TiltByProgress(const _char* szBone, _float fPeakDeg, _fvector vAxis, _uint iSlot = 0);
 
     void    Set_EventCallback(EventCallback cb) { m_Callback = move(cb); }
 
@@ -104,10 +88,12 @@ public: // 재생 제어 (오브젝트/에디터는 오직 이것만 사용)
     // 리팩토링 중
     void    Apply_Overlay(const LAYER_PLAY_INFO& tInfo);            // 같은 슬롯 + 같은 Clip 은 유지 / 다른 Clip은 crossfade / 슬롯 비활성 : weight-in
     void    Clear_Overlay(_uint iSlot, _float fWeightBlend = 0.f);  // Weight->0 Fade 후 슬롯 비활성
-    _bool   Is_Overlay_Finished(_uint iSlot) const;                 // 비루프 Clip 종료시 true 
-
+    _bool   Is_Overlay_Finished(_uint iSlot = 0) const;                 // 비루프 Clip 종료시 true 
 
     void    Enqueue(const ANI_PLAY_INFO& info);
+
+    // Progress 직접 사용해서 적용하고 싶을 때 
+    void    SetBoneRotation(const _char* szBone, _float fAngleDeg, _fvector vAxis);
 
 public: // 에디터(데이터 편집)
     ANIM_EVENT_TRACK& Get_Track(const string& strAnimName);
@@ -130,6 +116,7 @@ public: // 에디터(데이터 편집)
     const wstring& Get_DataFilePath() const { return m_strDataFilePath; }
     void Set_DataFilePath(const _wstring& strPath) { m_strDataFilePath = strPath; }
 
+    _float Get_LayerProgress(_uint iSlot = 0) const;
 
 private:
     void    Fire_Point(vector<ANIM_EVENT>& events, _float lo, _float hi);
@@ -153,13 +140,6 @@ private:
     _float              m_fPrevProgress = { 0.f };
     _float              m_fPlaySpeed = { 1.0f };
     _float              m_fBlendDuration = { 0.2f };
-
-    _string             m_strMaskClip;
-    _bool               m_bMaskLoop = { true };
-
-    _float              m_fMaskWeight = 0.f;
-    _float              m_fMaskTarget = 1.f;
-    _float              m_fMaskBlendTime = 0.5f;
     
     _wstring            m_strDataFilePath = {};
 
@@ -167,6 +147,12 @@ private:
 
     static constexpr _uint MAX_LAYERS = 4;      // 최대 Layer 개수 (이후 Enum으로 확장)
     LAYER               m_Layers[MAX_LAYERS] = {};
+
+    // 회전에 필요한 변수
+    _string             m_strRotBone;       // 회전을 적용할 본 이름 "RotL"
+    _float              m_fRotAngle = { 0.f };
+    _float4             m_vRotAxis = { 1.f, 0.f, 0.f, 0.f };
+    _bool               m_bHasRotReq = { false };
 
 public:
     static CAnimator* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

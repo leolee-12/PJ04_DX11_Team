@@ -7,25 +7,9 @@ HRESULT CMonster_State_KnockOut::Initialize(const ANI_PLAY_INFO& tInfo, _float f
 	if (FAILED(__super::Initialize(tInfo, fSpeed)))
 		return E_FAIL;
 
-	m_fMaxTime = 3.f;
+	m_fMaxTime = 1.0f;
 
 	return S_OK;
-}
-
-MONSTER_STATE_TYPE CMonster_State_KnockOut::Get_StateType()
-{
-	return MONSTER_STATE_TYPE::KNOCK_OUT;
-}
-
-void CMonster_State_KnockOut::Enter()
-{
-	if (m_pOwner == nullptr)
-		return;
-
-	m_fTimer = 0.f;
-
-	if (m_pAnimator && !m_PlayInfo.strAniName.empty())
-		m_pAnimator->Play(&m_PlayInfo);
 }
 
 void CMonster_State_KnockOut::Update(_float fTimeDelta)
@@ -33,20 +17,21 @@ void CMonster_State_KnockOut::Update(_float fTimeDelta)
 	if (m_pOwner == nullptr)
 		return;
 
-	m_fTimer += fTimeDelta;
+	__super::Update(fTimeDelta);
 
-	const _bool bLanded = (m_pMovement && !m_pMovement->Is_Launched());
-	const _bool bTimeOut = (m_fTimer >= m_fMaxTime);
-	if (!bLanded && !bTimeOut)
-		return;					// 런치 + 모든 바운스 동안 루프 유지
-
-	m_pOwner->Change_State(MONSTER_STATE_TYPE::IDLE);
+	if (m_pAnimator)
+		m_pAnimator->SpinByProgress("RotL", 1.f, XMVectorSet(1.f, 0.f, 0.f, 0.f));
 }
 
-void CMonster_State_KnockOut::Exit(MONSTER_STATE_TYPE eNextState)
+MONSTER_STATE_TYPE CMonster_State_KnockOut::Get_StateType()
 {
-	if (m_pOwner == nullptr)
-		return;
+	return MONSTER_STATE_TYPE::KNOCK_OUT;
+}
+
+void CMonster_State_KnockOut::Apply_DeathLaunch(_fvector vAttackerPos, _float fStrength)
+{
+	if (m_pMovement)
+		m_pMovement->KO(vAttackerPos, fStrength);
 }
 
 CMonster_State_KnockOut* CMonster_State_KnockOut::Create(const ANI_PLAY_INFO& tInfo, _float fSpeed)

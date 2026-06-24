@@ -1,0 +1,29 @@
+#pragma once
+#include "Monster_State_Death.h"
+
+NS_BEGIN(Client)
+
+class CMonster_State_KnockBackDeath final : public CMonster_State_Death
+{
+protected:
+	CMonster_State_KnockBackDeath() = default;
+	virtual ~CMonster_State_KnockBackDeath() = default;
+
+protected:
+	virtual HRESULT							Initialize(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f) override;
+	virtual void							Update(_float fTimeDelta) override;
+
+public:
+	virtual MONSTER_STATE_TYPE				Get_StateType() override;
+
+protected:
+	virtual void							Apply_DeathLaunch(_fvector vAttackerPos, _float fStrength) override;
+
+public:
+	static CMonster_State_KnockBackDeath*	Create(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f);
+
+protected:
+	virtual void							Free() override;
+};
+
+NS_END
