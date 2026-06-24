@@ -120,7 +120,8 @@ struct ENV_RENDER_DESC
 	_bool   bUseShadow = { false };
 	_bool   bShadowMappingCaster = { false }; // Legacy transitional.
 
-	_bool   bUseLodCulling = { false };
+	_bool   bUseCullDistance = { false };
+	_bool	bUseCullFrustum = { true };
 	_bool   bUseNearDistAlpha = { false };
 	_float  fNearDistAlphaLengthRate = { 1.f };
 	wstring strLayerName;

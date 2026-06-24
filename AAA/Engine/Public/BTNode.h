@@ -61,5 +61,35 @@ public:
 	virtual void Free() override;
 };
 
+class CAnimator;
+
+// 애니매이션 재생만 해줄 노드
+class ENGINE_DLL CBTPlayClip final : public CBTNode
+{
+public:
+	using AnimGetter = function<CAnimator* ()>;
+	struct DESC
+	{
+		string clip;
+		_bool  bLoop = false;   
+		_float fHold = 0.f;     
+		_float fSpeed = 1.f;
+		_float fBlend = 0.2f;
+	};
+
+	virtual BT_STATUS Tick(CBlackboard* pBB, _float fDt) override;
+	virtual void      Reset() override { m_bStarted = false; m_fT = 0.f; }
+
+private:
+	AnimGetter m_Getter;
+	DESC       m_Desc;
+	_bool      m_bStarted = false;
+	_float     m_fT = 0.f;
+
+public:
+	static CBTPlayClip* Create(AnimGetter getter, const DESC& desc);
+	virtual void Free() override;
+};
+
 NS_END
 

@@ -165,13 +165,18 @@ namespace
 			Edit.bRenderable = bRenderable;
 		}
 
-		const _bool bEnableCulling =
-			ReadBoolProperty(pEnvObject, L"Enable Culling", L"EnvObject", true);
-		const _bool bBaseEnableCulling = Desc.tRender.bUseLodCulling;
-		if (bEnableCulling != bBaseEnableCulling)
+		const _bool bUseCullDistance = ReadBoolProperty(pEnvObject, L"Use Distance Culling", L"EnvObject", Desc.tRender.bUseCullDistance);
+		if (bUseCullDistance != Desc.tRender.bUseCullDistance)
 		{
-			Edit.bHasEnableCulling = true;
-			Edit.bEnableCulling = bEnableCulling;
+			Edit.bHasUseCullDistance = true;
+			Edit.bUseCullDistance = bUseCullDistance;
+		}
+
+		const _bool bUseCullFrustum = ReadBoolProperty(pEnvObject, L"Use Frustum Culling", L"EnvObject", Desc.tRender.bUseCullFrustum);
+		if (bUseCullFrustum != Desc.tRender.bUseCullFrustum)
+		{
+			Edit.bHasUseCullFrustum = true;
+			Edit.bUseCullFrustum = bUseCullFrustum;
 		}
 
 		_float4x4 BaseWorld = {};
@@ -546,7 +551,8 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 		return;
 
 	_bool* pbRenderable = FindBoolProperty(pEnvObject, L"Renderable", L"EnvObject");
-	_bool* pbEnableCulling = FindBoolProperty(pEnvObject, L"Enable Culling", L"EnvObject");
+	_bool* pbUseCullDistance = FindBoolProperty(pEnvObject, L"Use Distance Culling", L"EnvObject");
+	_bool* pbUseCullFrustum = FindBoolProperty(pEnvObject, L"Use Frustum Culling", L"EnvObject");
 	_bool* pbUseShadow = Resolve_EnvShadowEditState(pLevel, pEnvObject);
 	_bool* pbUseCollMesh = Resolve_EnvCollMeshEditState(pLevel, pEnvObject);
 	_bool* pbUseNearDistAlpha = Resolve_EnvNearAlphaEditState(pLevel, pEnvObject);
@@ -562,8 +568,10 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 
 	if (pbRenderable)
 		ImGui::Checkbox("Renderable##EnvEdit", (bool*)pbRenderable);
-	if (pbEnableCulling)
-		ImGui::Checkbox("Enable Culling##EnvEdit", (bool*)pbEnableCulling);
+	if (pbUseCullDistance)
+		ImGui::Checkbox("Distance Culling##EnvEdit", (bool*)pbUseCullDistance);
+	if (pbUseCullFrustum)
+		ImGui::Checkbox("Frustum Culling##EnvEdit", (bool*)pbUseCullFrustum);
 
 	if (pbUseShadow)
 	{
@@ -1400,8 +1408,6 @@ _bool* CPanel_Inspector::Resolve_EnvShadowEditState(CLevel_Edit* pLevel, Client:
 		{
 			if (SavedEdit.bHasShadow)
 				bUseShadow = SavedEdit.bUseShadow;
-			else if (SavedEdit.bHasCastShadow)
-				bUseShadow = SavedEdit.bCastShadow;
 		}
 
 		if (!bHasShadow)
@@ -1431,16 +1437,7 @@ _bool* CPanel_Inspector::Resolve_EnvCollMeshEditState(CLevel_Edit* pLevel, Clien
 		if (pLevel->Try_GetMapPreviewEnvEdit(pEnvObject, &SavedEdit))
 		{
 			if (SavedEdit.bHasCollMesh)
-			{
 				bUseCollMesh = SavedEdit.bUseCollMesh;
-			}
-			else if (SavedEdit.bHasCollMeshEdited || SavedEdit.bDisableCollMesh)
-			{
-				// Legacy compatibility only:
-				// - CollisionMesh.Create
-				// - CollisionMeshDisabled
-				bUseCollMesh = SavedEdit.bCreateCollMesh && !SavedEdit.bDisableCollMesh;
-			}
 		}
 
 		if (!bHasCollMesh)

@@ -975,8 +975,8 @@ void CMap_Parser::Fill_CommonFlags(const json& jEntry, ENV_OBJECT_DESC* pDesc)
 	pDesc->tRender.bUseShadow = false;
 	pDesc->tRender.bShadowMappingCaster = pDesc->tRender.bHasShadow; // Legacy transitional.
 
-	if (!Try_ReadBoolFromNumeric(jEntry, "UseLodCulling", &pDesc->tRender.bUseLodCulling))
-		Try_ReadBoolFromNumeric(jEntry, "Basic.Model.UseLodCulling", &pDesc->tRender.bUseLodCulling);
+	if (!Try_ReadBoolFromNumeric(jEntry, "UseLodCulling", &pDesc->tRender.bUseCullDistance))
+		Try_ReadBoolFromNumeric(jEntry, "Basic.Model.UseLodCulling", &pDesc->tRender.bUseCullDistance);
 
 	if (!Try_ReadBoolFromNumeric(jEntry, "UseNearDistAlpha", &pDesc->tRender.bUseNearDistAlpha))
 		Try_ReadBoolFromNumeric(jEntry, "Basic.Model.UseNearDistAlpha", &pDesc->tRender.bUseNearDistAlpha);

@@ -61,11 +61,14 @@ private:
 
 private:
 	void	Add_Work(function<HRESULT()>&& func);
+	HRESULT Read_Manifest(const _tchar* path, const LEVEL eLevel);
+
 	HRESULT Ready_StaticResources();
 	HRESULT Ready_WorkQueue();
 	HRESULT Ready_Resources_For_GamePlay();
 	HRESULT Ready_Resources_For_Test();
 	HRESULT Ready_Resources_For_TownStep1();
+	HRESULT Ready_Resources_For_BossStage1();
 
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID, _bool Initialized = true);

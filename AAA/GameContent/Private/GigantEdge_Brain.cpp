@@ -39,31 +39,16 @@ HRESULT CGigantEdge_Brain::Initialize()
     constexpr _float fThrustCharge = 1.0f; 
     constexpr _int   iAttackCount = 3;
 
-    auto OneShot = [this](const string& clip, _float fSpeed = 1.f) -> CBTNode*
+    auto Anim = [this]() -> CAnimator* { return m_pOwner->Get_BodyAnimator(); };
+
+    auto OneShot = [&](const string& clip, _float fSpeed = 1.f) -> CBTNode*
         {
-            auto started = make_shared<bool>(false);
-            return CBTAction::Create(
-                [this, clip, fSpeed, started](CBlackboard*, _float) -> BT_STATUS {
-                    auto* a = m_pOwner->Get_Body()->Get_Animator();
-                    if (!*started) { a->Play(clip, false, true, 0.2f, fSpeed); *started = true; }
-                    if (a->Is_Finished()) { *started = false; return BT_STATUS::SUCCESS; }
-                    return BT_STATUS::RUNNING;
-                },
-                [started]() { *started = false; });
+            return CBTPlayClip::Create(Anim, { clip, false, 0.f, fSpeed });
         };
 
-    auto HoldLoop = [this](const string& clip, _float fHold, _float fSpeed = 1.f) -> CBTNode*
+    auto HoldLoop = [&](const string& clip, _float fHold, _float fSpeed = 1.f) -> CBTNode*
         {
-            auto t = make_shared<_float>(0.f);
-            return CBTAction::Create(
-                [this, clip, fHold, fSpeed, t](CBlackboard*, _float dt) -> BT_STATUS {
-                    auto* a = m_pOwner->Get_Body()->Get_Animator();
-                    if (*t == 0.f) a->Play(clip, true, true, 0.2f, fSpeed);
-                    *t += dt;
-                    if (*t >= fHold) { *t = 0.f; return BT_STATUS::SUCCESS; }
-                    return BT_STATUS::RUNNING;
-                },
-                [t]() { *t = 0.f; });
+            return CBTPlayClip::Create(Anim, { clip, true, fHold, fSpeed });
         };
 
     auto MakeChargeAttack = [&]() -> CBTNode*     

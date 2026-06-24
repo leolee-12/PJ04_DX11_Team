@@ -17,9 +17,10 @@ class CLIENT_DLL CEnvObject abstract : public CGameObject
 {
 	GENERATED_BODY_ABSTRACT(CEnvObject)
 
-	PROPERTY(_bool, m_bRenderable,          L"Renderable",     L"EnvObject")
-	PROPERTY(_bool, m_bUseDistanceCulling,  L"Enable Culling", L"EnvObject")
-	PROPERTY(_bool, m_bCastShadow,          L"Cast Shadow",    L"EnvObject")
+	PROPERTY(_bool, m_bRenderable,		L"Renderable",				L"EnvObject")
+	PROPERTY(_bool, m_bCastShadow,		L"Cast Shadow",				L"EnvObject")
+	PROPERTY(_bool, m_bUseCullDistance,	L"Use Distance Culling",	L"EnvObject")
+	PROPERTY(_bool, m_bUseCullFrustum,	L"Use Frustum Culling",		L"EnvObject")
 
 public:
 	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_EnvObject";

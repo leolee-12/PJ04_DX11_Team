@@ -115,7 +115,7 @@ void CTestTriggerBox::Build_DefaultDesc(ENV_OBJECT_DESC* pOutDesc)
 	pOutDesc->vPosition = { 0.f, 0.f, 0.f };
 	pOutDesc->vRotation = { 0.f, 0.f, 0.f, 1.f };
 	pOutDesc->vScale = { 1.f, 1.f, 1.f };
-	pOutDesc->tRender.bUseLodCulling = false;
+	pOutDesc->tRender.bUseCullDistance = false;
 	pOutDesc->tRender.bShadowMappingCaster = false;
 	pOutDesc->tCollision.bInvisibleCollision = true;
 }

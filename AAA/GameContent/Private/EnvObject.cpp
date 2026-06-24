@@ -106,8 +106,9 @@ namespace
 CEnvObject::CEnvObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{pDevice, pContext}
 	, m_bRenderable{ false }
-	, m_bUseDistanceCulling{ false }
 	, m_bCastShadow{ false }
+	, m_bUseCullDistance{ true }
+	, m_bUseCullFrustum{ true }
 {
 }
 
@@ -116,8 +117,9 @@ CEnvObject::CEnvObject(const CEnvObject& Prototype)
 	, m_tDesc(Prototype.m_tDesc)
 	, m_strProtoTag(Prototype.m_strProtoTag)
 	, m_bRenderable{ Prototype.m_bRenderable }
-	, m_bUseDistanceCulling{ Prototype.m_bUseDistanceCulling }
 	, m_bCastShadow{ Prototype.m_bCastShadow }
+	, m_bUseCullDistance{ Prototype.m_bUseCullDistance }
+	, m_bUseCullFrustum{ Prototype.m_bUseCullFrustum }
 {
 }
 
@@ -574,7 +576,7 @@ void CEnvObject::Refresh_WorldBounds()
 
 void CEnvObject::Check_Visible()
 {
-	if (!m_bRenderable || !Has_RenderModel())
+	if (!m_bRenderable)
 	{
 		m_bVisible = false;
 		m_bVisibleShadow = false;
@@ -595,25 +597,28 @@ void CEnvObject::Check_Visible()
 
 	// Distance -> Frustum
 	// 1. Main
-	if (m_bUseDistanceCulling &&
-		m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_DISTANCE_CULL_START))
+
+	if (m_bUseCullDistance
+		&& m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_DISTANCE_CULL_START))
 	{
 		m_bVisible = false;
 	}
-	else
+	else if (m_bUseCullFrustum && m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, m_WorldBounds))
 	{
-		m_bVisible = !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, m_WorldBounds);
+		m_bVisible = false;
 	}
 
 	// 2. Shadow
-	if (m_bVisibleShadow && m_bUseDistanceCulling &&
-		m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_SHADOW_DISTANCE_CULL_START))
+	if (m_bVisibleShadow)
 	{
-		m_bVisibleShadow = false;
-	}
-	else if (m_bVisibleShadow)
-	{
-		m_bVisibleShadow = !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_WorldBounds);
+		if (m_bUseCullDistance && m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_SHADOW_DISTANCE_CULL_START))
+		{
+			m_bVisibleShadow = false;
+		}
+		else if (m_bUseCullFrustum && m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_WorldBounds))
+		{
+			m_bVisibleShadow = false;
+		}
 	}
 }
 
@@ -639,7 +644,8 @@ void CEnvObject::Apply_TransformFromDesc()
 void CEnvObject::Apply_DescDefaults()
 {
 	m_bRenderable = !m_tDesc.tCollision.bInvisibleCollision;
-	m_bUseDistanceCulling = m_tDesc.tRender.bUseLodCulling;
+	m_bUseCullDistance = m_tDesc.tRender.bUseCullDistance;
+	m_bUseCullFrustum = m_tDesc.tRender.bUseCullFrustum;
 	m_bCastShadow = m_tDesc.tRender.bHasShadow && m_tDesc.tRender.bUseShadow;
 	m_bVisible = true;
 }

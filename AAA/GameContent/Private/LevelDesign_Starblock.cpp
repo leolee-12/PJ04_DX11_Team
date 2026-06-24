@@ -182,52 +182,39 @@ void CLevelDesign_Starblock::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
 }
 
-void CLevelDesign_Starblock::Register_LevelDesignSpecs()
+#pragma region Damageable
+void CLevelDesign_Starblock::Damaged(const ATTACK_INFO& tInfo)
 {
-	for (const LD_STARBLOCK_CATALOG& Entry : g_BreakableCatalog)
-	{
-		LD_SPAWN_SPEC Spec{};
-		Spec.strObjectName = Entry.pObjectName;
-		Spec.strPrototypeTag = PROTOTYPE_TAG;
-		Spec.strLayerTag = L"Layer_LevelDesign_Gimmick";
-		Spec.eCategory = LD_CATEGORY::BREAKABLE;
-		Spec.wstrModelProtoTag = Entry.pModelProtoTag;
-		Spec.pPrototypeFactory = &Create_Prototype;
-		Spec.pBuildDesc = &Build_Desc;
-		Spec.ModelRequirements =
-		{
-			{ Entry.pModelProtoTag, Entry.pModelPath, ETOUI(LEVEL::GAMEPLAY) }
-		};
-
-		CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
-	}
+	UNREFERENCED_PARAMETER(tInfo);
+	
+	Set_Dead();
 }
+#pragma endregion
 
-_bool CLevelDesign_Starblock::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
+#pragma region Damageable
+_bool CLevelDesign_Starblock::Can_BeInhaled(const INHALE_QUERY& q) const
 {
-	UNREFERENCED_PARAMETER(jEntry);
-
-	if (nullptr == pOutEntry)
-		return false;
-	if (nullptr == Find_BreakableCatalog(CommonDesc.strObjectName))
-		return false;
-	if (Spec.eCategory != LD_CATEGORY::BREAKABLE || Spec.wstrModelProtoTag.empty())
-		return false;
-
-	LD_BREAKABLE_DESC Desc{};
-	static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
-	Desc.eCategory = Spec.eCategory;
-	Desc.eModelType = Spec.eModelType;
-	Desc.wstrModelProtoTag = Spec.wstrModelProtoTag;
-
-	*pOutEntry = Desc;
 	return true;
 }
 
-CGameObject* CLevelDesign_Starblock::Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+void CLevelDesign_Starblock::Be_Captured(CGameObject* pInhaler)
 {
-	return CLevelDesign_Starblock::Create(pDevice, pContext);
 }
+
+COPY_ABILITY_TYPE CLevelDesign_Starblock::Get_CopyAbility() const
+{
+	return COPY_ABILITY_TYPE::NONE;
+}
+
+void CLevelDesign_Starblock::Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed)
+{
+}
+
+CGameObject* CLevelDesign_Starblock::Get_GameObject()
+{
+	return nullptr;
+}
+#pragma endregion
 
 HRESULT CLevelDesign_Starblock::Validate_Desc()
 {
@@ -326,6 +313,53 @@ const _tchar* CLevelDesign_Starblock::Resolve_ModelProtoTag() const
 		return nullptr;
 
 	return m_tBreakableDesc.wstrModelProtoTag.c_str();
+}
+
+void CLevelDesign_Starblock::Register_LevelDesignSpecs()
+{
+	for (const LD_STARBLOCK_CATALOG& Entry : g_BreakableCatalog)
+	{
+		LD_SPAWN_SPEC Spec{};
+		Spec.strObjectName = Entry.pObjectName;
+		Spec.strPrototypeTag = PROTOTYPE_TAG;
+		Spec.strLayerTag = L"Layer_LevelDesign_Gimmick";
+		Spec.eCategory = LD_CATEGORY::BREAKABLE;
+		Spec.wstrModelProtoTag = Entry.pModelProtoTag;
+		Spec.pPrototypeFactory = &Create_Prototype;
+		Spec.pBuildDesc = &Build_Desc;
+		Spec.ModelRequirements =
+		{
+			{ Entry.pModelProtoTag, Entry.pModelPath, ETOUI(LEVEL::GAMEPLAY) }
+		};
+
+		CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
+	}
+}
+
+_bool CLevelDesign_Starblock::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
+{
+	UNREFERENCED_PARAMETER(jEntry);
+
+	if (nullptr == pOutEntry)
+		return false;
+	if (nullptr == Find_BreakableCatalog(CommonDesc.strObjectName))
+		return false;
+	if (Spec.eCategory != LD_CATEGORY::BREAKABLE || Spec.wstrModelProtoTag.empty())
+		return false;
+
+	LD_BREAKABLE_DESC Desc{};
+	static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
+	Desc.eCategory = Spec.eCategory;
+	Desc.eModelType = Spec.eModelType;
+	Desc.wstrModelProtoTag = Spec.wstrModelProtoTag;
+
+	*pOutEntry = Desc;
+	return true;
+}
+
+CGameObject* CLevelDesign_Starblock::Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+	return CLevelDesign_Starblock::Create(pDevice, pContext);
 }
 
 CLevelDesign_Starblock* CLevelDesign_Starblock::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

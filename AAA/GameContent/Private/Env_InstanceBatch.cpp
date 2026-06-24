@@ -262,7 +262,7 @@ HRESULT CEnv_InstanceBatch::Render_Instanced()
 		const ENV_SHADER_PASS_META* pMeta = Find_EnvShaderPassMeta(Layer.iPass);
 
 		const ENV_PASS ePass = pMeta->ePass == ENV_PASS::DEFAULT
-			? ENV_PASS::DIFF
+			? ENV_PASS::DMN
 			: pMeta->ePass;
 
 		if (FAILED(m_pShaderCom->Begin(ETOUI(ePass))))

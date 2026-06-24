@@ -149,7 +149,7 @@ struct ENV_SHADER_PASS_META
 
 inline constexpr ENV_SHADER_PASS_META g_EnvShaderPassMetas[] =
 {
-	{ ENV_PASS::DEFAULT,	ShaderPass::NonAnimPBR::DIFF,		"Default",		PASS_TEX_DIFFUSE },
+	{ ENV_PASS::DEFAULT,	ShaderPass::NonAnimPBR::DMN,		"Default",		PASS_TEX_DIFFUSE | PASS_TEX_MRA | PASS_TEX_NORMAL },
 	{ ENV_PASS::WHITE,		ShaderPass::NonAnimPBR::White,		"WHITE",		0 },
 	{ ENV_PASS::DIFF,		ShaderPass::NonAnimPBR::DIFF,		"DIFF",			PASS_TEX_DIFFUSE },
 	{ ENV_PASS::DMN,		ShaderPass::NonAnimPBR::DMN,		"DMN",			PASS_TEX_DIFFUSE | PASS_TEX_MRA | PASS_TEX_NORMAL },

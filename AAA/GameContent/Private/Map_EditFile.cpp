@@ -118,18 +118,16 @@ namespace
 		if (Edit.bHasRenderable)
 			pOutDesc->tCollision.bInvisibleCollision = !Edit.bRenderable;
 
-		if (Edit.bHasEnableCulling)
-			pOutDesc->tRender.bUseLodCulling = Edit.bEnableCulling;
+		if (Edit.bHasUseCullDistance)
+			pOutDesc->tRender.bUseCullDistance = Edit.bUseCullDistance;
+
+		if (Edit.bHasUseCullFrustum)
+			pOutDesc->tRender.bUseCullFrustum = Edit.bUseCullFrustum;
 
 		if (Edit.bHasShadow)
 		{
 			pOutDesc->tRender.bUseShadow = pOutDesc->tRender.bHasShadow && Edit.bUseShadow;
-			pOutDesc->tRender.bShadowMappingCaster = pOutDesc->tRender.bUseShadow;
-		}
-		else if (Edit.bHasCastShadow)
-		{
-			pOutDesc->tRender.bUseShadow = pOutDesc->tRender.bHasShadow && Edit.bCastShadow;
-			pOutDesc->tRender.bShadowMappingCaster = pOutDesc->tRender.bUseShadow;
+			pOutDesc->tRender.bShadowMappingCaster = pOutDesc->tRender.bUseShadow; // Transitional mirror only.
 		}
 		else
 		{
@@ -149,14 +147,6 @@ namespace
 		if (Edit.bHasCollMesh)
 		{
 			pOutDesc->tCollision.bUseCollMesh = pOutDesc->tCollision.bHasCollMesh && Edit.bUseCollMesh;
-		}
-		else if (Edit.bHasCollMeshEdited)
-		{
-			pOutDesc->tCollision.bUseCollMesh = pOutDesc->tCollision.bHasCollMesh && Edit.bCreateCollMesh;
-		}
-		else if (Edit.bDisableCollMesh)
-		{
-			pOutDesc->tCollision.bUseCollMesh = false;
 		}
 		else
 		{
@@ -198,15 +188,26 @@ namespace
 		}
 	}
 
-	json Save_EditedDesc(const MAP_ENV_EDITED_DESC& Edit)
+	json Save_EditedDesc(const MAP_ENV_EDITED_DESC& Edit, _bool bEnvObjectEdit)
 	{
 		json j = json::object();
 
 		if (Edit.bHasRenderable)
 			j["Renderable"] = static_cast<bool>(Edit.bRenderable);
 
-		if (Edit.bHasEnableCulling)
-			j["EnableCulling"] = static_cast<bool>(Edit.bEnableCulling);
+		if (bEnvObjectEdit)
+		{
+			if (Edit.bHasUseCullDistance)
+				j["UseCullDistance"] = static_cast<bool>(Edit.bUseCullDistance);
+
+			if (Edit.bHasUseCullFrustum)
+				j["UseCullFrustum"] = static_cast<bool>(Edit.bUseCullFrustum);
+		}
+		else
+		{
+			if (Edit.bHasEnableCulling)
+				j["EnableCulling"] = static_cast<bool>(Edit.bEnableCulling);
+		}
 
 		if (Edit.bHasShadow)
 			j["UseShadow"] = static_cast<bool>(Edit.bUseShadow);
@@ -230,12 +231,12 @@ namespace
 		return j;
 	}
 
-	HRESULT Load_EditedDesc(const json& jValue, MAP_ENV_EDITED_DESC* pOutDesc)
+	HRESULT Load_EditedDesc(const json& jValue, MAP_ENV_EDITED_DESC* pOutDesc, _bool bEnvObjectEdit)
 	{
 		if (nullptr == pOutDesc)
 			return E_FAIL;
 
-		*pOutDesc = {};
+		*pOutDesc = {}; 
 
 		if (!jValue.is_object())
 			return E_FAIL;
@@ -250,14 +251,39 @@ namespace
 			pOutDesc->bRenderable = IterRenderable->get<bool>();
 		}
 
-		const auto IterEnableCulling = jValue.find("EnableCulling");
-		if (IterEnableCulling != jValue.end())
+		if (bEnvObjectEdit)
 		{
-			if (!IterEnableCulling->is_boolean())
-				return E_FAIL;
+			const auto IterUseCullDistance = jValue.find("UseCullDistance");
+			if (IterUseCullDistance != jValue.end())
+			{
+				if (!IterUseCullDistance->is_boolean())
+					return E_FAIL;
 
-			pOutDesc->bHasEnableCulling = true;
-			pOutDesc->bEnableCulling = IterEnableCulling->get<bool>();
+				pOutDesc->bHasUseCullDistance = true;
+				pOutDesc->bUseCullDistance = IterUseCullDistance->get<bool>();
+			}
+
+			const auto IterUseCullFrustum = jValue.find("UseCullFrustum");
+			if (IterUseCullFrustum != jValue.end())
+			{
+				if (!IterUseCullFrustum->is_boolean())
+					return E_FAIL;
+
+				pOutDesc->bHasUseCullFrustum = true;
+				pOutDesc->bUseCullFrustum = IterUseCullFrustum->get<bool>();
+			}
+		}
+		else
+		{
+			const auto IterEnableCulling = jValue.find("EnableCulling");
+			if (IterEnableCulling != jValue.end())
+			{
+				if (!IterEnableCulling->is_boolean())
+					return E_FAIL;
+
+				pOutDesc->bHasEnableCulling = true;
+				pOutDesc->bEnableCulling = IterEnableCulling->get<bool>();
+			}
 		}
 
 		const auto IterUseShadow = jValue.find("UseShadow");
@@ -342,7 +368,7 @@ namespace
 		return S_OK;
 	}
 
-	json Save_EditedMap(const unordered_map<_wstring, MAP_ENV_EDITED_DESC>& EditedMap)
+	json Save_EditedMap(const unordered_map<_wstring, MAP_ENV_EDITED_DESC>& EditedMap, _bool bEnvObjectEdit)
 	{
 		vector<_wstring> Keys;
 		for (const auto& Pair : EditedMap)
@@ -360,16 +386,13 @@ namespace
 			if (Iter == EditedMap.end())
 				continue;
 
-			jResult[WstrToStr(strKey)] = Save_EditedDesc(Iter->second);
+			jResult[WstrToStr(strKey)] = Save_EditedDesc(Iter->second, bEnvObjectEdit);
 		}
 
 		return jResult;
 	}
 
-	HRESULT Load_EditedMap(
-		const json& jRoot,
-		const char* pFieldName,
-		unordered_map<_wstring, MAP_ENV_EDITED_DESC>* pOutMap)
+	HRESULT Load_EditedMap(const json& jRoot, const char* pFieldName, unordered_map<_wstring, MAP_ENV_EDITED_DESC>* pOutMap, _bool bEnvObjectEdit)
 	{
 		if (nullptr == pFieldName || nullptr == pOutMap)
 			return E_FAIL;
@@ -390,7 +413,7 @@ namespace
 				continue;
 
 			MAP_ENV_EDITED_DESC Edit{};
-			if (FAILED(Load_EditedDesc(Iter.value(), &Edit)))
+			if (FAILED(Load_EditedDesc(Iter.value(), &Edit, bEnvObjectEdit)))
 				return E_FAIL;
 
 			if (!Has_AnyMapEnvEdit(Edit))
@@ -741,8 +764,8 @@ json CMap_EditFile::Save_Change(const MAP_EDIT_CHANGE& Desc)
 		jDeletedEnvObjects.push_back(WstrToStr(strKey));
 
 	jOverride["DeletedEnvObjects"] = jDeletedEnvObjects;
-	jOverride["EditedEnvObjects"] = Save_EditedMap(Desc.EditedEnvObjects);
-	jOverride["EditedMapSections"] = Save_EditedMap(Desc.EditedMapSections);
+	jOverride["EditedEnvObjects"] = Save_EditedMap(Desc.EditedEnvObjects, true);
+	jOverride["EditedMapSections"] = Save_EditedMap(Desc.EditedMapSections, false);
 
 	jOverride["AddedMapObjects"] = json::array();
 	for (const auto& Added : Desc.AddedMapObjects)
@@ -793,10 +816,10 @@ HRESULT CMap_EditFile::Load_Change(const json& jOverride, MAP_EDIT_CHANGE* pOutD
 		}
 	}
 
-	if (FAILED(Load_EditedMap(jOverride, "EditedEnvObjects", &pOutDesc->EditedEnvObjects)))
+	if (FAILED(Load_EditedMap(jOverride, "EditedEnvObjects", &pOutDesc->EditedEnvObjects, true)))
 		return E_FAIL;
 
-	if (FAILED(Load_EditedMap(jOverride, "EditedMapSections", &pOutDesc->EditedMapSections)))
+	if (FAILED(Load_EditedMap(jOverride, "EditedMapSections", &pOutDesc->EditedMapSections, false)))
 		return E_FAIL;
 
 	const auto IterAdded = jOverride.find("AddedMapObjects");

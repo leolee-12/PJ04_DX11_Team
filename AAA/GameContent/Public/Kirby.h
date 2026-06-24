@@ -59,7 +59,9 @@ public:
 	static constexpr _float s_fInvincibleDur = 2.f;
 	static constexpr _float s_fInhaleFwd = 1.8f;
 	static constexpr _float s_fInhaleUp = 0.5f;
-	static constexpr _float3 s_vInhaleSize = _float3(2.f, 2.f, 4.f);
+	static constexpr _float s_fInhaleRadius = 3.f;
+	static constexpr _float s_fInhaleLength = 2.f;
+
 
 	static constexpr _float s_fSpitSpeed = 14.f;
 

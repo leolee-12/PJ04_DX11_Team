@@ -302,11 +302,12 @@ HRESULT CKirby::Ready_Components()
     // Collider Inhale
     CCollider::COLLIDER_DESC InhaleDesc{};
     InhaleDesc.pOwner = this;
-    InhaleDesc.vCenter = _float3(0.f, s_fInhaleUp, s_fInhaleFwd);
-    InhaleDesc.vSize = s_vInhaleSize;
-    InhaleDesc.vRadians = _float3(0.f, 0.f, 0.f);
+    InhaleDesc.vCenter = _float3(0.f, s_fInhaleUp, 0.f);
+    InhaleDesc.fRadius = s_fInhaleRadius;
+    InhaleDesc.fHeight = s_fInhaleLength;
+    InhaleDesc.vRadians = _float3(XMConvertToRadians(90.f), 0.f, 0.f);
 
-    m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX] = Add_Component<CCollider>(Collider_OBB.iLevelID, Collider_OBB.szProtoTag,
+    m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX] = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag,
         TEXT("InhaleBox_Com"), &InhaleDesc);
     if (m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX] == nullptr)
         return E_FAIL;
