@@ -239,10 +239,9 @@ PS_OUT PS_DN(PS_IN In)
     float3 B = cross(N, T) * In.vTangent.w;
     float3x3 TBN = float3x3(T, B, N);
 
-    float2 nrg = g_NormalTexture.Sample(LinearSampler, vNormalUV).rg * 2.f - 1.f;
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, vNormalUV).rg;
     nrg *= g_NormalStrength;
     float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
-    nTS.y = -nTS.y;
     float3 Nw = normalize(mul(nTS, TBN));
 
 	Out.vDiffuse = float4(albedo, 1.f);
@@ -273,10 +272,9 @@ PS_OUT PS_DMN(PS_IN In)
     float3 B = cross(N, T) * In.vTangent.w;
     float3x3 TBN = float3x3(T, B, N);
 
-    float2 nrg = g_NormalTexture.Sample(LinearSampler, vNormalUV).rg * 2.f - 1.f;
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, vNormalUV).rg;
     nrg *= g_NormalStrength;
     float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
-    nTS.y = -nTS.y;
     float3 Nw = normalize(mul(nTS, TBN));
 
 	Out.vDiffuse = float4(albedo, 1.f);
@@ -317,10 +315,9 @@ PS_OUT PS_DMN_TOP(PS_IN In)
     float3 B = cross(N, T);
     float3x3 TBN = float3x3(T, B, N);
 
-    float2 nrg = g_NormalTexture.Sample(LinearSampler, vNormalUV).rg * 2.f - 1.f;
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, vNormalUV).rg;
     nrg *= g_NormalStrength;
     float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
-    nTS.y = -nTS.y;
     float3 Nw = normalize(mul(nTS, TBN));
 
     Out.vDiffuse = float4(albedo, 1.f);

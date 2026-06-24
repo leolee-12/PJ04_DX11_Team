@@ -4,6 +4,7 @@ float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 float4x4 g_BoneMatrices[512];
 
 Texture2D g_DiffuseTexture;
+Texture2D g_NormalTexture;
 Texture2D g_BodyMaskTexture;
 
 Texture2D g_MRATexture;
