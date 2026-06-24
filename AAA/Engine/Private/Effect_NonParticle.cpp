@@ -135,6 +135,7 @@ void CEffect_NonParticle::Init_PropertyValue()
     m_vColorEndValue = { 1.f, 1.f, 1.f };
 
     // Rot
+    m_vBaseRotationDegree = { 0.f, 0.f, 0.f };
     m_bRotationChange = { false };
     m_fRotationDegree = { 360.f };
     m_vRotationAxis = { 0.f, 1.f, 0.f };
@@ -280,17 +281,42 @@ void CEffect_NonParticle::Update_Color(const _float fTimeDelta, const _float fRa
 
 void CEffect_NonParticle::Update_Rot(const _float fTimeDelta, const _float fRatio)
 {
-    if (m_bRotationChange == false)
-        return;
+    _float fAnimDegree = 0.f;
 
-    if (fRatio >= m_fRot_Start_Ratio && fRatio <= m_fRot_End_Ratio)
+    if (m_bRotationChange == true)
     {
-        _float fSubRatio = (fRatio - m_fRot_Start_Ratio) / (m_fRot_End_Ratio - m_fRot_Start_Ratio);
+        const _float fRotRange = m_fRot_End_Ratio - m_fRot_Start_Ratio;
 
-        _float fCurDegree = m_fRotationDegree * fSubRatio;
-
-        m_pTransformCom->Rotation(XMLoadFloat3(&m_vRotationAxis), XMConvertToRadians(fCurDegree));
+        if (fabsf(fRotRange) > Helper::fEpsilon)
+        {
+            _float fSubRatio = (fRatio - m_fRot_Start_Ratio) / fRotRange;
+            Helper::FloatClamp(fSubRatio, 0.f, 1.f);
+            fAnimDegree = m_fRotationDegree * fSubRatio;
+        }
     }
+
+    _vector vAxis = XMLoadFloat3(&m_vRotationAxis);
+    if (XMVectorGetX(XMVector3LengthSq(vAxis)) <= Helper::fEpsilon)
+        vAxis = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+    else
+        vAxis = XMVector3Normalize(vAxis);
+
+    _float3 vScale = m_pTransformCom->Get_Scaled();
+
+    _matrix matBaseRot = XMMatrixRotationRollPitchYaw(
+        XMConvertToRadians(m_vBaseRotationDegree.x),
+        XMConvertToRadians(m_vBaseRotationDegree.y),
+        XMConvertToRadians(m_vBaseRotationDegree.z));
+
+    _matrix matAnimRot = XMMatrixRotationAxis(
+        vAxis,
+        XMConvertToRadians(fAnimDegree));
+
+    _matrix matRot = matBaseRot * matAnimRot;
+
+    m_pTransformCom->Set_State(STATE::RIGHT, XMVector3Normalize(matRot.r[0]) * vScale.x);
+    m_pTransformCom->Set_State(STATE::UP, XMVector3Normalize(matRot.r[1]) * vScale.y);
+    m_pTransformCom->Set_State(STATE::LOOK, XMVector3Normalize(matRot.r[2]) * vScale.z);
 }
 
 void CEffect_NonParticle::Update_Move(const _float fTimeDelta, const _float fRatio)

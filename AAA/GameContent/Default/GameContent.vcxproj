@@ -177,7 +177,7 @@
     <ClInclude Include="..\Public\SmokeSphereOriginal.h" />
     <ClInclude Include="..\Public\SmokeTail.h" />
     <ClInclude Include="..\Public\Kirby_StateMachine.h" />
-    <ClInclude Include="..\Public\SwordSlash.h" />
+    <ClInclude Include="..\Public\SwordSlash1.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\TestEffectQuad.h" />
     <ClInclude Include="..\Public\TestFiona.h" />
@@ -338,7 +338,7 @@
     <ClCompile Include="..\Private\SmokeSphereOriginal.cpp" />
     <ClCompile Include="..\Private\SmokeTail.cpp" />
     <ClCompile Include="..\Private\Kirby_StateMachine.cpp" />
-    <ClCompile Include="..\Private\SwordSlash.cpp" />
+    <ClCompile Include="..\Private\SwordSlash1.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\TestEffectQuad.cpp" />
     <ClCompile Include="..\Private\TestFiona.cpp" />

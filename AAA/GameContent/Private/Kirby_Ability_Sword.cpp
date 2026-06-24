@@ -9,6 +9,8 @@
 
 #include "Kirby_Sword.h"
 
+#include "Effect_Loader.h"
+
 CKirby_Ability_Sword::CKirby_Ability_Sword()
 {
 }
@@ -365,6 +367,10 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
 
         BeginHit(true);
         pAnimator->Play("SideSlash", false, false, 0.1f, 1.5f);
+
+        CEffect_Loader::GetInstance()->Spawn(L"SwordSlash1", pKirby->Get_LevelIndex(),
+            _float3(0.f, 0.6f, 1.1f), _float3(0.f, 0.f, 1.f),
+            pKirby->Get_Transform()->Get_WorldMatrixPtr());
 
         break;
     }
