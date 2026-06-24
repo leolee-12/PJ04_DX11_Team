@@ -79,6 +79,7 @@
 //MainBoss
 #include "Boss_Gorilla.h"
 #include "Boss_Gorilla_Body.h"
+#include "CutsceneGorilla.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
@@ -134,6 +135,7 @@ void CGameObject_Factory::RegisterAll()
     Register_AnimObject();
     Register_Effect();
 
+    Register_Cutscene();
 }
 
 void CGameObject_Factory::Register_UI()
@@ -532,6 +534,19 @@ void CGameObject_Factory::Register_MainBoss()
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Gorilla_Body::PROTOTYPE_TAG,
                 CBoss_Gorilla_Body::Create(pDevice, pContext));
+        )
+    );
+}
+
+void CGameObject_Factory::Register_Cutscene()
+{
+    Register(CCutsceneGorilla::PROTOTYPE_TAG, TEXT("CutsceneActor"),
+        CREATOR(CCutsceneGorilla),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Boss_Gorilla_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Gorilla/Body/Gorilla.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 }

@@ -20,10 +20,26 @@ namespace Client
         inline constexpr const _tchar* Boss_HP_Appeared = L"Boss.HPAppeared";
         inline constexpr const _tchar* Boss_HP_Updated = L"Boss.HPUpdated";
         inline constexpr const _tchar* Boss_Died = L"Boss.Died";
+
+        inline constexpr const _tchar* Cutscene_GorillaAppear = L"Cutscene.GorillaAppear";   // 트리거 발동
+        inline constexpr const _tchar* Cutscene_GrabKirby = L"Cutscene.GrabKirby";           // 커비 컷씬위치로
+        inline constexpr const _tchar* Cutscene_ReleaseKirby = L"Cutscene.ReleaseKirby";     
+        inline constexpr const _tchar* Cutscene_CameraChange = L"Cutscene.CameraChange";
+        inline constexpr const _tchar* Cutscene_GorillaHandoff = L"Cutscene.GorillaHandoff";
     }
 
     inline constexpr const _tchar* EVT_SWALLOWED = L"OnSwallowed";
     inline constexpr const _tchar* EVT_QUERY_PLAYER = L"Query_Player";
+
+    enum class ECutsceneCam { Cutscene, Boss };
+    struct CUTSCENE_CAMERA_DESC { ECutsceneCam eCam = ECutsceneCam::Cutscene; };
+    struct CUTSCENE_HANDOFF_DESC { const _float4x4* pFinalWorld = nullptr; };
+
+    struct CUTSCENE_GRAB_DESC
+    {
+        const _float4x4* pBoneMatrix = { nullptr }; 
+        const _float4x4* pSourceWorld = { nullptr };
+    };
 
     struct PLAYER_QUERY 
     { 
