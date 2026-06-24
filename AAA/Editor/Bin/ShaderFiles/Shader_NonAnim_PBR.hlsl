@@ -232,10 +232,20 @@ PS_OUT PS_MAIN(PS_IN In)
         discard;
 
     float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord1).rgb;
+    
+    float3 N = normalize(In.vNormal);
+    float3 T = normalize(In.vTangent.xyz);
+    float3 B = normalize(In.vBinormal.xyz);
+  
+    float3x3 TBN = float3x3(T, B, N);
 
-    //Out.vDiffuse = float4(vAlbedo, vBase.a);
-    Out.vDiffuse = float4((In.vTangent.w * 0.5f + 0.5f).rrr, 1.f);
-    Out.vNormal = float4(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, In.vTexcoord1).rg;
+    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+    
+    float3 Nw = mul(nTS, TBN);
+
+    Out.vDiffuse = float4(vAlbedo, vBase.a);
+    Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(mra, g_iMaterialID / 255.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb * vBase.a, 1.f);
@@ -269,9 +279,20 @@ PS_OUT PS_DIFFUSE_DITHER(PS_IN In)
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     if (vMtrlDiffuse.a < 0.1f)
         discard;
+    
+    float3 N = normalize(In.vNormal);
+    float3 T = normalize(In.vTangent.xyz);
+    float3 B = normalize(In.vBinormal.xyz);
+  
+    float3x3 TBN = float3x3(T, B, N);
+
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, In.vTexcoord1).rg;
+    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+    
+    float3 Nw = mul(nTS, TBN);
 
     Out.vDiffuse = vMtrlDiffuse;
-    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vNormal = vector(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
