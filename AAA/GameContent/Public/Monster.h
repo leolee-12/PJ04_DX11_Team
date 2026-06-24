@@ -35,6 +35,13 @@ public:
 		MT_DEFAULT = MT_INHALABLE | MT_BODYCHECK_DAMAGE,
 	};
 
+	struct HIT_REACTION		// 상태에 전달할 피격 정보 
+	{
+		_float3					vAttackerPos = {};
+		_float					fKnockBack = 0.f;
+		_float					fDamage = 0.f;
+	};
+
 public:
 	virtual HRESULT				Initialize_Prototype() override;
 	virtual HRESULT				Initialize(void* pArg) override;
@@ -67,6 +74,7 @@ public: // Inhalable
 	void						Enable_ProjectileBox(_bool bEnable);
 	CGameObject*				Get_Captor() const { return m_pCaptor; }
 	void						Despawn_Spat();                                
+	void						Despawn();
 
 public:
 	// AI가 이동 의도를 쌓는 방식
@@ -79,6 +87,8 @@ public:
 	_bool						Change_State(MONSTER_STATE_TYPE eNewState);
 	_bool						Has_State(MONSTER_STATE_TYPE eState) const;
 	MONSTER_STATE_TYPE			Get_StateType() const;
+
+	HIT_REACTION				Get_LastHit() { return m_LastHit; }
 
 public:
 	// 자식 몬스터가 자기 충돌 크기를 제공
@@ -118,6 +128,8 @@ protected:
 
 	static constexpr _float		s_fSpatDamage = 100.f;
 	static constexpr _float		s_fSpatKnockback = 12.f;
+
+	HIT_REACTION				m_LastHit{};		// 상태에 던질 값들 
 
 protected:
 	// 부모가 관리할 공통 파이프라인

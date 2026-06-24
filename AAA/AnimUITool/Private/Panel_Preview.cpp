@@ -90,7 +90,7 @@ void CPanel_Preview::Render()
     ImVec2 size(static_cast<float>(m_iWidth) * scale,
         static_cast<float>(m_iHeight) * scale);
 
-    ImGui::Image((ImTextureID)m_pSRV, size);
+    Draw_OpaqueImage(m_pSRV, size);
 
     ImGui::End();
 }

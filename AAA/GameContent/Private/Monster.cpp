@@ -273,7 +273,7 @@ void CMonster::SetUp_Collider_CallBack()
 				_vector vAtkPos = pOther->Get_Owner()->Get_Transform()->Get_State(STATE::POSITION);
 				ATTACK_INFO atk{};
 				atk.fDamage = 1.f;
-				atk.fKnockback = 6.f;
+				atk.fKnockback = 8.f;
 				XMStoreFloat3(&atk.vAttackerPos, vAtkPos);
 				atk.pAttacker = pOther->Get_Owner();
 				Damaged(atk);
@@ -377,13 +377,16 @@ void CMonster::Check_AirborneReflex()
 	if (!Has_State(MONSTER_STATE_TYPE::FALL))
 		return;
 
-	const MONSTER_STATE_TYPE eCurState = Get_StateType();
-	if (eCurState == MONSTER_STATE_TYPE::FALL || eCurState == MONSTER_STATE_TYPE::LANDING ||
-		eCurState == MONSTER_STATE_TYPE::CAPTURED || eCurState == MONSTER_STATE_TYPE::DEATH)
+	const MONSTER_STATE_TYPE eState = Get_StateType();
+	if (eState == MONSTER_STATE_TYPE::FALL || eState == MONSTER_STATE_TYPE::LANDING ||
+		eState == MONSTER_STATE_TYPE::CAPTURED || eState == MONSTER_STATE_TYPE::KNOCK_OUT ||
+		eState == MONSTER_STATE_TYPE::KNOCK_BACK_DEATH)
 		return;
 
-	// 테스트로 -2.f로 두고 테스트. 확정되면 상수화 시켜서 사용
-	if (!m_pMovement->Is_Grounded() && m_pMovement->Get_VerticalVelocity() < -2.f)
+	if (m_pMovement->Is_Bouncing())				// 바운스 중 -> FALL 막고 현 상태 유지
+		return;						
+
+	if (!m_pMovement->Is_Grounded() && m_pMovement->Get_VerticalVelocity() < 0.f)
 		Change_State(MONSTER_STATE_TYPE::FALL);
 }
 
@@ -410,8 +413,10 @@ HRESULT CMonster::Ready_State(CMonster_StateMachine* pStateMachine)
 void CMonster::On_Damaged(const ATTACK_INFO& tInfo)
 {
 	//  Movement 상태 안으로 이전
-	if (m_pMovement)
-		m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
+	//if (m_pMovement)
+	//	m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
+
+	m_LastHit = { tInfo.vAttackerPos, tInfo.fKnockback, tInfo.fDamage };
 
 	Change_State(MONSTER_STATE_TYPE::KNOCK_BACK);
 }
@@ -419,18 +424,19 @@ void CMonster::On_Damaged(const ATTACK_INFO& tInfo)
 void CMonster::On_Death(const ATTACK_INFO& tInfo)
 {
 	//  Movement 상태 안으로 이전
+	m_LastHit = { tInfo.vAttackerPos, tInfo.fKnockback, tInfo.fDamage };
 
 	if (tInfo.fDamage >= m_fMaxHP)
 	{
-		if (m_pMovement)
-			m_pMovement->KO(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
+		//if (m_pMovement)
+		//	m_pMovement->KO(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
 		Change_State(MONSTER_STATE_TYPE::KNOCK_OUT);
 	}
 	else
 	{
-		if (m_pMovement)
-			m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
-		Change_State(MONSTER_STATE_TYPE::KNOCK_BACK);
+		//if (m_pMovement)
+		//	m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
+		Change_State(MONSTER_STATE_TYPE::KNOCK_BACK_DEATH);					// KNOCK_BACK_DEATH 로 수정
 	}
 }
 
@@ -534,6 +540,13 @@ void CMonster::Despawn_Spat()
 	// TODO: 사운드, 이펙트 
 }
 
+void CMonster::Despawn()
+{
+	Enable_Colliders(false);
+	Enable_Controller(false);
+	Set_Active(false);
+}
+
 void CMonster::Enable_ProjectileBox(_bool bEnable)
 {
 	if (m_pProjectileBox) m_pProjectileBox->Set_Enabled(bEnable);
@@ -547,7 +560,14 @@ void CMonster::Update_AI(_float fTimeDelta)
 	// BlackBoard 갱신
 	Perceive(fTimeDelta);	
 
-	Check_AirborneReflex();
+	const _bool bEditMode = m_pGameInstance_Proxy->Is_EditMode();
+
+	if (nullptr == m_pMovement)
+		return;
+
+	// Launched 물리 먼저
+	if (m_pMovement->Is_Launched() && !bEditMode)
+		m_pMovement->Update_Launched(fTimeDelta);
 
 	// Brain이 상태 변경 판단
 	if (nullptr != m_pBrain)
@@ -557,10 +577,10 @@ void CMonster::Update_AI(_float fTimeDelta)
 	if (nullptr != m_pStateMachine)
 		m_pStateMachine->Update_StateMachine(fTimeDelta);
 	
-	if (nullptr == m_pMovement)
-		return;
+	// STATE::FALL 로 전환하는 체크 함수
+	Check_AirborneReflex();
 
-	if (m_pGameInstance_Proxy->Is_EditMode())
+	if (bEditMode)
 	{
 		m_pMovement->Sync_To_Controller();
 		return;
@@ -579,18 +599,17 @@ void CMonster::Update_AI(_float fTimeDelta)
 	{
 		m_pMovement->Update_JumpArc(fTimeDelta);
 	}
-	else if (m_pMovement->Is_Launched())
+	else if (!m_pMovement->Is_Launched())
 	{
-		m_pMovement->Update_Launched(fTimeDelta);
-	}
-	else if (Has_MoveDir())
-	{
-		_vector vDir = XMLoadFloat3(&m_vWishDir);
-		m_pMovement->Move(vDir, fTimeDelta);
-	}
-	else
-	{
-		m_pMovement->Move(XMVectorZero(), fTimeDelta);
+		if (Has_MoveDir())
+		{
+			_vector vDir = XMLoadFloat3(&m_vWishDir);
+			m_pMovement->Move(vDir, fTimeDelta);
+		}
+		else
+		{
+			m_pMovement->Move(XMVectorZero(), fTimeDelta);
+		}
 	}
 }
 
