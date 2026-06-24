@@ -25,18 +25,20 @@ HRESULT CLevelDesign_Spawner::Spawn(const LD_PACKAGE& Package, const LD_SPAWN_RE
 
 	vector<pair<IRailDataReceiver*, _uint>> PendingRailBindings;
 
-	for (const LD_PARSED_OBJECT& Desc : Package.ObjectDescs)
+	for (const LD_OBJECT_ENTRY& Desc : Package.ObjectDescs)
 	{
+		const LD_OBJECT_DESC& BaseDesc = Get_LDObjectDesc(Desc);
+
 		CGameObject* pCreatedObject = nullptr;
 		if (FAILED(Spawn_One(Desc, Request, pOutReport, &pCreatedObject)))
 			return E_FAIL;
 
-		if (0 == Desc.iTargetRailUid || nullptr == pCreatedObject)
+		if (0 == BaseDesc.iTargetRailUid || nullptr == pCreatedObject)
 			continue;
 
 		IRailDataReceiver* pReceiver = dynamic_cast<IRailDataReceiver*>(pCreatedObject);
 		if (nullptr != pReceiver)
-			PendingRailBindings.emplace_back(pReceiver, Desc.iTargetRailUid);
+			PendingRailBindings.emplace_back(pReceiver, BaseDesc.iTargetRailUid);
 	}
 
 	for (const auto& [pReceiver, iRailUid] : PendingRailBindings)
@@ -57,7 +59,7 @@ HRESULT CLevelDesign_Spawner::Spawn(const LD_PACKAGE& Package, const LD_SPAWN_RE
 	return S_OK;
 }
 
-HRESULT CLevelDesign_Spawner::Spawn_One(const LD_PARSED_OBJECT& Desc, const LD_SPAWN_REQUEST& Request, LD_LOAD_RESULT* pInOutReport, CGameObject** ppOutCreatedObject)
+HRESULT CLevelDesign_Spawner::Spawn_One(const LD_OBJECT_ENTRY& Desc, const LD_SPAWN_REQUEST& Request, LD_LOAD_RESULT* pInOutReport, CGameObject** ppOutCreatedObject)
 {
 	if (nullptr == m_pProxy)
 		return E_FAIL;
@@ -76,7 +78,7 @@ HRESULT CLevelDesign_Spawner::Spawn_One(const LD_PARSED_OBJECT& Desc, const LD_S
 	if (Resolved.bFallback && nullptr != pInOutReport)
 		++pInOutReport->iFallbackSpecCount;
 
-	const _wstring strObjectTag = Make_ObjectTag(Desc);
+	const _wstring strObjectTag = Make_ObjectTag(Resolved.Get_BaseDesc());
 
 	CGameObject* pCreatedObject = nullptr;
 
@@ -116,7 +118,7 @@ HRESULT CLevelDesign_Spawner::Spawn_One(const LD_PARSED_OBJECT& Desc, const LD_S
 	return S_OK;
 }
 
-_wstring CLevelDesign_Spawner::Make_ObjectTag(const LD_PARSED_OBJECT& Desc) const
+_wstring CLevelDesign_Spawner::Make_ObjectTag(const LD_OBJECT_DESC& Desc) const
 {
 	if (Desc.iUid != 0)
 		return Desc.strObjectName + L"_" + to_wstring(Desc.iUid);

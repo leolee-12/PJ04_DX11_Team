@@ -21,7 +21,7 @@ HRESULT CLevelDesign_ProtoRegister::Ready_Prototypes(const LD_RUNTIME_LEVELS& Le
 	unordered_set<_wstring> RequiredPrototypes;
 	RequiredPrototypes.reserve(Package.ObjectDescs.size());
 
-	for (const LD_PARSED_OBJECT& Desc : Package.ObjectDescs)
+	for (const LD_OBJECT_ENTRY& Desc : Package.ObjectDescs)
 	{
 		LD_RESOLVED_SPAWN Resolved{};
 
@@ -69,12 +69,10 @@ HRESULT CLevelDesign_ProtoRegister::Ensure_Resources(_uint iPrototypeLevel, cons
 	for (const LD_MODEL_REQUIREMENT& Requirement : Spec.ModelRequirements)
 	{
 		if (m_pProxy->Has_Prototype(Requirement.iPrototypeLevel, Requirement.strPrototypeTag))
-		{
 			continue;
-		}
 
-		CBase* pModel = CModel::Create(m_pDevice, m_pContext, MODEL::NONANIM, Requirement.strFilePath.c_str());
-
+		CBase* pModel = CModel::Create_WithTextureHub(m_pDevice, m_pContext, Requirement.eModelType,
+			Requirement.strFilePath.c_str(), XMMatrixIdentity(), nullptr, Requirement.bCookCollisionMesh);
 		if (nullptr == pModel)
 			return E_FAIL;
 

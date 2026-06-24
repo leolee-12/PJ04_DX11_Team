@@ -23,13 +23,16 @@ public:
 
 	// 발사 함수 (넉백 시 사용)
 	void						Launch(_fvector vHorizDir, _float fHorizSpeed, _float fUpSpeed);
+	_bool						Is_Launched() const { return m_bLaunched; }
+	_bool						Update_Launched(_float fTimeDelta);
 	// 윤석현 추가
 	void						Knockback(_fvector vAttackerPos, _float fStrength);
 	void						KO(_fvector vAttackerPos, _float fStrength);
+	void						Begin_JumpArc(_fvector vTargetPos, _float fDuration, _float fHeight);
+	_bool						Is_JumpArc() const { return m_bJumpArc; }
+	_bool						Update_JumpArc(_float fTimeDelta);
 
-	_bool						Is_Launched() const { return m_bLaunched; }
 	_bool						Is_KO()       const { return m_bKO; }
-	_bool						Update_Launched(_float fTimeDelta);
 
 public:
 	static CMonster_Movement*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -47,6 +50,14 @@ private:
 	_float						m_fRestitution = { 0.5f };			// 수직 반발 계수 (0~1) : 클수록 높이 튄다
 	_float						m_fBounceFriction = { 0.2f };		// 튕길 때마다 수평 감쇠(0~1)
 	_float						m_fBounceStopSpeed = { 1.0f };		// 반사속도가 이보다 작으면 정착
+
+	// 시간기반포물선점프
+	_bool						m_bJumpArc = { false };
+	_float3						m_vJumpStart = {};
+	_float3						m_vJumpTarget = {};
+	_float						m_fJumpDur = { 0.f };
+	_float						m_fJumpHeight = { 0.f };
+	_float						m_fJumpT = { 0.f };
 
 private:
 	void						Start_Launch(_fvector vAttackerPos, _float fStrength, _float fUpRatio);

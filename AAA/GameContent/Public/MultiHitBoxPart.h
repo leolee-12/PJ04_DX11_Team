@@ -24,7 +24,7 @@ public:
     _int Get_HitBoxCount() const { return (_int)m_HitBoxes.size(); }
 
 protected:
-    HRESULT Add_HitBox(const _char* szBone, COLLIDER eShape,
+    HRESULT Add_HitBox(_int iIndex, const _char* szBone, COLLIDER eShape,
         _float fRadius, _float fHeight,
         _float fDamage, _float fKnockback,
         const _float3& vCenter = { 0.f, 0.f, 0.f },

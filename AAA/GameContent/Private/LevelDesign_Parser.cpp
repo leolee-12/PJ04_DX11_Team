@@ -1,6 +1,9 @@
 #include "LevelDesign_Parser.h"
 #include "DataLoader.h"
 #include "Parsing_Utils.h"
+#include "LevelDesign_Registry.h"
+#include "LevelDesign_Food.h"
+#include "LevelDesign_Point.h"
 
 #include <exception>
 #include <filesystem>
@@ -9,47 +12,28 @@ NS_BEGIN(Client)
 
 namespace
 {
-	_bool Equals_NoCase(const _wstring& strLeft, const wchar_t* pRight)
+	_string Resolve_VolumeMainPath(const _wstring& strObjectName)
 	{
-		return 0 == _wcsicmp(strLeft.c_str(), pRight);
+		if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"InvisibleCollision"))
+			return "Gimmick.InvisibleCollision.MainComponent";
+
+		if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"InvisibleCollisionBox"))
+			return "Gimmick.InvisibleCollisionBox.MainComponent";
+
+		if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"FallBorder"))
+			return "Gimmick.FallBorder.MainComponent";
+
+		if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"WaterArea"))
+			return "Gimmick.WaterArea.MainComponent";
+
+		return {};
 	}
 
-	_bool Is_BreakableObject(const _wstring& strObjectName)
+	_bool Is_AudioAreaObject(const _wstring& strObjectName)
 	{
-		return Equals_NoCase(strObjectName, L"StarBlock")
-			|| Equals_NoCase(strObjectName, L"StarBlockBig")
-			|| Equals_NoCase(strObjectName, L"WoodBox");
-	}
-
-	LD_RAIL_TYPE Resolve_RailType(const _wstring& strErpType)
-	{
-		if (Equals_NoCase(strErpType, L"Line")) return LD_RAIL_TYPE::LINE;
-		if (Equals_NoCase(strErpType, L"Circle")) return LD_RAIL_TYPE::CIRCLE;
-		if (Equals_NoCase(strErpType, L"Bezier")) return LD_RAIL_TYPE::BEZIER;
-		return LD_RAIL_TYPE::UNKNOWN;
-	}
-
-	LD_VOLUME_TYPE Resolve_VolumeType(const _wstring& strObjectName)
-	{
-		if (Equals_NoCase(strObjectName, L"InvisibleCollision"))                return LD_VOLUME_TYPE::INVISIBLE_COLLISION;
-		if (Equals_NoCase(strObjectName, L"InvisibleCollisionBox"))     return LD_VOLUME_TYPE::INVISIBLE_COLLISION_BOX;
-		if (Equals_NoCase(strObjectName, L"FallBorder"))                                return LD_VOLUME_TYPE::FALL_BORDER;
-		if (Equals_NoCase(strObjectName, L"WaterArea"))                         return LD_VOLUME_TYPE::WATER_AREA;
-		return LD_VOLUME_TYPE::UNKNOWN;
-	}
-
-	LD_AUDIO_AREA_TYPE Resolve_AudioAreaType(const _wstring& strObjectName)
-	{
-		if (Equals_NoCase(strObjectName, L"AreaBgmRequestor"))
-			return LD_AUDIO_AREA_TYPE::BGM_REQUESTOR;
-
-		if (Equals_NoCase(strObjectName, L"AreaSeJungle")
-			|| Equals_NoCase(strObjectName, L"AreaSeSeaWave"))
-		{
-			return LD_AUDIO_AREA_TYPE::AREA_SE;
-		}
-
-		return LD_AUDIO_AREA_TYPE::UNKNOWN;
+		return JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaBgmRequestor")
+			|| JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaSeJungle")
+			|| JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaSeSeaWave");
 	}
 
 	_bool Try_ReadRailNodes(const json& jEntry, _float fDefaultControlLength, vector<LD_RAIL_NODE_DESC>* pOutNodes)
@@ -140,7 +124,7 @@ HRESULT CLevelDesign_Parser::Parse_Root(const json& jRoot, const _wstring& wstrS
 		const _wstring strSection = StrToWstr(Iter.key());
 		const json& jSection = Iter.value();
 
-		if (Equals_NoCase(strSection, L"StepLinkInfo"))
+		if (JsonUtils::Equals_NoCase(strSection.c_str(), L"StepLinkInfo"))
 		{
 			Parse_StepLinkInfo(jSection, &pOutPackage->StepLinks);
 			continue;
@@ -165,7 +149,7 @@ void CLevelDesign_Parser::Parse_ObjectSection(
 	const _wstring& strSourceFile,
 	const _wstring& strSection,
 	const json& jSection,
-	vector<LD_PARSED_OBJECT>* pOutDescs)
+	vector<LD_OBJECT_ENTRY>* pOutDescs)
 {
 	if (nullptr == pOutDescs || !jSection.is_object())
 		return;
@@ -175,17 +159,27 @@ void CLevelDesign_Parser::Parse_ObjectSection(
 		if (!Iter.value().is_object())
 			continue;
 
-		LD_PARSED_OBJECT Desc = Make_BaseDesc(
+		LD_OBJECT_DESC CommonDesc = Make_BaseDesc(
 			wstrSourcePath,
 			strSourceFile,
 			strSection,
 			StrToWstr(Iter.key()),
 			Iter.value());
 
-		Fill_Common(Iter.value(), &Desc);
+		Fill_Common(Iter.value(), &CommonDesc);
+
+		LD_OBJECT_ENTRY BuiltEntry{};
+		if (CLevelDesign_Registry::Build_Entry(CommonDesc, Iter.value(), &BuiltEntry))
+		{
+			pOutDescs->emplace_back(std::move(BuiltEntry));
+			continue;
+		}
+
+		LD_PARSED_OBJECT Desc{};
+		static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
 		Fill_SpecialFields(Iter.value(), &Desc);
 
-		pOutDescs->push_back(Desc);
+		pOutDescs->emplace_back(std::move(Desc));
 	}
 }
 
@@ -216,7 +210,7 @@ void CLevelDesign_Parser::Parse_StepLinkInfo(
 	}
 }
 
-LD_PARSED_OBJECT CLevelDesign_Parser::Make_BaseDesc(
+LD_OBJECT_DESC CLevelDesign_Parser::Make_BaseDesc(
 	const _wstring& wstrSourcePath,
 	const _wstring& strSourceFile,
 	const _wstring& strSection,
@@ -225,7 +219,7 @@ LD_PARSED_OBJECT CLevelDesign_Parser::Make_BaseDesc(
 {
 	UNREFERENCED_PARAMETER(jEntry);
 
-	LD_PARSED_OBJECT Desc{};
+	LD_OBJECT_DESC Desc{};
 	Desc.wstrSourcePath = wstrSourcePath;
 	Desc.strSourceFile = strSourceFile;
 	Desc.strSection = strSection;
@@ -233,7 +227,7 @@ LD_PARSED_OBJECT CLevelDesign_Parser::Make_BaseDesc(
 	return Desc;
 }
 
-void CLevelDesign_Parser::Fill_Common(const json& jEntry, LD_PARSED_OBJECT* pDesc)
+void CLevelDesign_Parser::Fill_Common(const json& jEntry, LD_OBJECT_DESC* pDesc)
 {
 	if (nullptr == pDesc)
 		return;
@@ -275,7 +269,7 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 
 	const _wstring& strObjectName = pDesc->strObjectName;
 
-	if (Equals_NoCase(strObjectName, L"StartPortal"))
+	if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"StartPortal"))
 	{
 		pDesc->eCategory = LD_CATEGORY::PORTAL;
 		JsonUtils::Try_ReadInt(jEntry, "PortalNo", &pDesc->Portal.iPortalNo);
@@ -286,7 +280,7 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 		return;
 	}
 
-	if (Equals_NoCase(strObjectName, L"Rail"))
+	if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"Rail"))
 	{
 		pDesc->eCategory = LD_CATEGORY::RAIL;
 
@@ -297,10 +291,6 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 
 		JsonUtils::Try_ReadFloat(jEntry, "Radius", &pDesc->Rail.fRadius);
 		JsonUtils::Try_ReadFloat(jEntry, "BezierControlLength", &pDesc->Rail.fBezierControlLength);
-		
-		_wstring strErpType;
-		JsonUtils::Try_ReadString(jEntry, "ErpType", &strErpType);
-		pDesc->Rail.eType = Resolve_RailType(strErpType);
 
 		JsonUtils::Try_ReadBoolFromNumeric(jEntry, "IsClockwise", &pDesc->Rail.bClockwise);
 		JsonUtils::Try_ReadBoolFromNumeric(jEntry, "IsClose", &pDesc->Rail.bClose);
@@ -320,30 +310,10 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 		return;
 	}
 
-	const LD_VOLUME_TYPE eVolumeType = Resolve_VolumeType(strObjectName);
-	if (eVolumeType != LD_VOLUME_TYPE::UNKNOWN)
+	const _string strMainPath = Resolve_VolumeMainPath(strObjectName);
+	if (!strMainPath.empty())
 	{
 		pDesc->eCategory = LD_CATEGORY::VOLUME;
-		pDesc->Volume.eVolumeType = eVolumeType;
-
-		_string strMainPath;
-		switch (eVolumeType)
-		{
-		case LD_VOLUME_TYPE::INVISIBLE_COLLISION:
-			strMainPath = "Gimmick.InvisibleCollision.MainComponent";
-			break;
-		case LD_VOLUME_TYPE::INVISIBLE_COLLISION_BOX:
-			strMainPath = "Gimmick.InvisibleCollisionBox.MainComponent";
-			break;
-		case LD_VOLUME_TYPE::FALL_BORDER:
-			strMainPath = "Gimmick.FallBorder.MainComponent";
-			break;
-		case LD_VOLUME_TYPE::WATER_AREA:
-			strMainPath = "Gimmick.WaterArea.MainComponent";
-			break;
-		default:
-			break;
-		}
 
 		if (!JsonUtils::Try_ReadFloat3Array(jEntry, "AreaCenter", &pDesc->Volume.vAreaCenter))
 		{
@@ -395,8 +365,8 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 		return;
 	}
 
-	if (Equals_NoCase(strObjectName, L"GuideMovieArea")
-		|| Equals_NoCase(strObjectName, L"SlideInfoArea"))
+	if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"GuideMovieArea")
+		|| JsonUtils::Equals_NoCase(strObjectName.c_str(), L"SlideInfoArea"))
 	{
 		pDesc->eCategory = LD_CATEGORY::GUIDE_AREA;
 		JsonUtils::Try_ReadString(jEntry, "GuideMovieKind", &pDesc->GuideArea.strGuideMovieKind);
@@ -414,11 +384,9 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 		return;
 	}
 
-	const LD_AUDIO_AREA_TYPE eAudioAreaType = Resolve_AudioAreaType(strObjectName);
-	if (eAudioAreaType != LD_AUDIO_AREA_TYPE::UNKNOWN)
+	if (Is_AudioAreaObject(strObjectName))
 	{
 		pDesc->eCategory = LD_CATEGORY::AUDIO_AREA;
-		pDesc->AudioArea.eAudioAreaType = eAudioAreaType;
 
 		JsonUtils::Try_ReadUInt(jEntry, "SoundId", &pDesc->AudioArea.iSoundId);
 		JsonUtils::Try_ReadString(jEntry, "VariationType", &pDesc->AudioArea.strVariationType);
@@ -436,16 +404,10 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 		return;
 	}
 
-	if (Is_BreakableObject(strObjectName))
-	{
-		pDesc->eCategory = LD_CATEGORY::BREAKABLE;
-		return;
-	}
-
 	pDesc->eCategory = LD_CATEGORY::UNSUPPORTED;
 }
 
-void CLevelDesign_Parser::Build_TransformDesc(LD_PARSED_OBJECT* pDesc)
+void CLevelDesign_Parser::Build_TransformDesc(LD_OBJECT_DESC* pDesc)
 {
 	if (nullptr == pDesc)
 		return;

@@ -34,13 +34,34 @@ namespace
         return Result;
     }
 
-    void Resolve_DebugBoxDesc(const Client::LD_PARSED_OBJECT& Parsed, _float3* pOutCenterLocal, _float3* pOutSize)
+    _bool Is_BreakableObjectName(const _wstring& strObjectName)
+    {
+        return strObjectName == L"StarBlock"
+            || strObjectName == L"StarBlockBig"
+            || strObjectName == L"WoodBox";
+    }
+
+    _bool Uses_ParsedDebugDesc(const Client::LD_OBJECT_DESC& ObjectDesc)
+    {
+        if (ObjectDesc.strObjectName == L"Ladder")
+            return false;
+
+        return !Is_BreakableObjectName(ObjectDesc.strObjectName);
+    }
+
+    void Resolve_DebugBoxDesc(const Client::LD_OBJECT_DESC& ObjectDesc, _float3* pOutCenterLocal, _float3* pOutSize)
     {
         if (nullptr == pOutCenterLocal || nullptr == pOutSize)
             return;
 
         *pOutCenterLocal = { 0.f, 0.f, 0.f };
-        *pOutSize = Make_SafeDebugSize(Parsed.vParsedScale);
+        *pOutSize = Make_SafeDebugSize(ObjectDesc.vParsedScale);
+
+        if (!Uses_ParsedDebugDesc(ObjectDesc))
+            return;
+
+        const Client::LD_PARSED_OBJECT& Parsed =
+            static_cast<const Client::LD_PARSED_OBJECT&>(ObjectDesc);
 
         auto Try_ApplyArea = [&](const _float3& vAreaCenter, const _float3& vAreaSize) -> _bool
             {
@@ -98,7 +119,7 @@ HRESULT CLevelDesign_Unsupported::Initialize(void* pArg)
         return E_FAIL;
 
 #ifdef _DEBUG
-    if (FAILED(Ready_DebugCollider(static_cast<const LD_PARSED_OBJECT*>(pArg))))
+    if (FAILED(Ready_DebugCollider(static_cast<const LD_OBJECT_DESC*>(pArg))))
         return E_FAIL;
 #endif
 
@@ -127,14 +148,14 @@ void CLevelDesign_Unsupported::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 }
 
 #ifdef _DEBUG
-HRESULT CLevelDesign_Unsupported::Ready_DebugCollider(const LD_PARSED_OBJECT* pParsedDesc)
+HRESULT CLevelDesign_Unsupported::Ready_DebugCollider(const LD_OBJECT_DESC* pObjectDesc)
 {
-    if (nullptr == pParsedDesc)
+    if (nullptr == pObjectDesc)
         return S_OK;
 
     _float3 vCenterLocal = {};
     _float3 vSize = {};
-    Resolve_DebugBoxDesc(*pParsedDesc, &vCenterLocal, &vSize);
+    Resolve_DebugBoxDesc(*pObjectDesc, &vCenterLocal, &vSize);
 
     m_pDebugCollider = Add_Component<CCollider>(
         L"Com_DebugCollider",

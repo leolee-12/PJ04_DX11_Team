@@ -575,7 +575,11 @@ void CMonster::Update_AI(_float fTimeDelta)
 		return;
 	}
 
-	if (m_pMovement->Is_Launched())
+	if (m_pMovement->Is_JumpArc())
+	{
+		m_pMovement->Update_JumpArc(fTimeDelta);
+	}
+	else if (m_pMovement->Is_Launched())
 	{
 		m_pMovement->Update_Launched(fTimeDelta);
 	}

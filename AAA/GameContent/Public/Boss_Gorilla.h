@@ -12,7 +12,6 @@ class CBoss_Gorilla final : public CBoss
 public:
     static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_Boss_Gorilla";
 
-    // TODO(∆ƒ√˜ ¥‹∞Ëø°º≠ ∆©¥◊)
     static constexpr _float s_fCCT_Radius = 1.8f;
     static constexpr _float s_fCCT_Height = 1.5f;
 
@@ -28,6 +27,10 @@ public:
     virtual void    On_Deserialized() override;
     virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* p) override { p->strPrototypeTag = PROTOTYPE_TAG; }
 
+public:
+    virtual CAnimator* Get_BodyAnimator() const override;
+    virtual CMultiHitBoxPart* Get_HitBoxPart() const override;
+
 protected:
     // CBossBase ø¨√‚ »≈ (∆ƒ√˜ ¿¸±Ó¡ˆ Ω∫≈”)
     virtual CMonsterBrain* Create_Brain() override;
@@ -38,8 +41,8 @@ protected:
 
     // CBoss ∆‰¿Ã¡Ó ¡§¿«
     virtual const vector<_float>& Get_PhaseThresholds() const override { return s_Thresholds; }
-    virtual void           Play_PhaseTransition(_int iNewPhase) override {} // TODO: ¿¸»Ø ø¨√‚
-    virtual _bool          Is_PhaseTransition_Finished() const override { return true; }
+    virtual void           Play_PhaseTransition(_int iNewPhase) override;
+    virtual _bool          Is_PhaseTransition_Finished() const override;
     virtual void           On_PhaseChanged(_int iOldPhase, _int iNewPhase) override;
 
     // CMonster √Êµπ Ω∫∆Â
@@ -47,8 +50,6 @@ protected:
     virtual _float Get_CapsuleHeight() const override { return s_fCCT_Height; }
     virtual _float Get_InteractRadius() const override { return 0.f; }
     virtual _bool  Get_HurtBoxDesc(CAPSULE_DESC& Out) const override;
-
-    virtual CAnimator* Get_BodyAnimator() const override;
 
     virtual HRESULT Ready_PartObjects() override;
     //virtual HRESULT Ready_AnimEvents() override;
