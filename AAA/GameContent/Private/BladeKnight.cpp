@@ -70,42 +70,6 @@ void CBladeKnight::Update(_float fTimeDelta)
         return;
 
     __super::Update(fTimeDelta);
-
-   /* const _bool bIdle = (Get_StateType() == MONSTER_STATE_TYPE::IDLE);
-    if (bIdle != m_bIdleOverlayOn)
-    {
-        if (CAnimator* pAnimator = Get_BodyAnimator())
-        {
-            if (bIdle)
-            {
-                CAnimator::LAYER_PLAY_INFO tOv{};
-                tOv.iSlot = 1;
-                tOv.tAnim.strAniName = "FindWaitSub";
-                tOv.tAnim.bLoop = true;
-                tOv.Roots = { "R_FootJ", "L_FootJ" };
-                tOv.fTargetWeight = 1.f;
-                tOv.fWeightBlend = 0.15f;
-                tOv.tAnim.fSpeed = 1.f;
-                pAnimator->Apply_Overlay(tOv);
-
-                CAnimator::LAYER_PLAY_INFO tOv2{};
-                tOv.iSlot = 2;
-                tOv.tAnim.strAniName = "Attack";
-                tOv.tAnim.bLoop = true;
-                tOv.Roots = {"R_ShoulderJ" };
-                tOv.fTargetWeight = 1.f;
-                tOv.fWeightBlend = 0.15f;
-                tOv.tAnim.fSpeed = 1.f;
-                pAnimator->Apply_Overlay(tOv);
-            }
-            else
-            {
-                pAnimator->Clear_Overlay(1, 0.15f);
-                pAnimator->Clear_Overlay(2, 0.15f);
-            }
-        }
-        m_bIdleOverlayOn = bIdle;
-    }*/
 }
 
 void CBladeKnight::Late_Update(_float fTimeDelta)
@@ -231,11 +195,12 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
 
 
     // Blade Knight 전용 상태 등록
+    Info = ANI_PLAY_INFO{}; 
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::ATTACK, CBladeKnight_State_Attack::Create())))
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::ATTACK, CBladeKnight_State_Attack::Create(Info, 3.f))))
         return E_FAIL;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::DOUBLE_ATTACK, CBladeKnight_State_DoubleAttack::Create())))
+    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::DOUBLE_ATTACK, CBladeKnight_State_DoubleAttack::Create(Info, 3.f))))
         return E_FAIL;
 
     if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::TORNADO_ATTACK, CBladeKnight_State_TornadoAttack::Create())))
@@ -257,15 +222,23 @@ HRESULT CBladeKnight::Ready_AnimEvents()
     pAnimator->Set_EventCallback(
         [this](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
         {
-            if (ePhase != ANIM_EVENT_PHASE::POINT)
-                return;
-
             switch (static_cast<EANIM_EVENT>(e.iEventType))
             {
-            case EANIM_EVENT::LockMove:
-                Get_BlackBoard().bMoveLocked = true;
+            case EANIM_EVENT::Hitbox:
+                if (m_pSword)
+                {
+                    if (ePhase == ANIM_EVENT_PHASE::BEGIN)
+                        m_pSword->Set_HitBox(true);
+                    else if (ePhase == ANIM_EVENT_PHASE::END)
+                        m_pSword->Set_HitBox(false);
+                }
                 break;
-
+            case EANIM_EVENT::MoveWindow:
+                if (ePhase == ANIM_EVENT_PHASE::BEGIN)
+                    Get_BlackBoard().bCanMove = true;
+                else if (ePhase == ANIM_EVENT_PHASE::END)
+                    Get_BlackBoard().bCanMove = false;
+                break;
             default:
                 break;
             }

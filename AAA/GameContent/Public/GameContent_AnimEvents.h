@@ -21,6 +21,7 @@ namespace Client
         SetBody = 10,
 
         OnOffPart = 11,
+        MoveWindow = 12,
         // 추가는 항상 끝에, 기존 값 변경 금지 (저장 데이터 안정성)
     };
 
@@ -39,5 +40,6 @@ namespace Client
         { EANIM_EVENT::SetMouth, "SetMouth" },
         { EANIM_EVENT::SetBody,  "SetBody"  },
         { EANIM_EVENT::OnOffPart,  "OnOffPart"  },
+        { EANIM_EVENT::MoveWindow, "MoveWindow" },
     };
 }

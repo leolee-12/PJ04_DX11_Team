@@ -42,7 +42,7 @@ _bool CMonster_StateMachine::Change_State(MONSTER_STATE_TYPE eNewState)
     {
         m_pOwner->Get_BlackBoard().bActionFinished = false;
         m_pOwner->Get_BlackBoard().bCanTransition = m_pCurState->Is_Interruptible();
-        m_pOwner->Get_BlackBoard().bMoveLocked = false;
+        m_pOwner->Get_BlackBoard().bCanMove = false;
     }
 
     m_pCurState->Enter();

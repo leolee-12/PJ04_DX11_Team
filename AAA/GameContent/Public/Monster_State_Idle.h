@@ -20,7 +20,7 @@ public:
 	virtual void					Exit(MONSTER_STATE_TYPE eNextState) override;
 
 public:
-	static CMonster_State_Idle* Create(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f);
+	static CMonster_State_Idle*		Create(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f);
 
 protected:
 	virtual void					Free() override;

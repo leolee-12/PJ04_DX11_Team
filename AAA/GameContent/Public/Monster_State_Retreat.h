@@ -1,10 +1,10 @@
 #pragma once
-#include "Monster_State.h"
+#include "Monster_State_Move.h"
 
 NS_BEGIN(Client)
 class CMonster;
 
-class CMonster_State_Retreat : public CMonster_State
+class CMonster_State_Retreat : public CMonster_State_Move
 {
 protected:
 	CMonster_State_Retreat() = default;
@@ -19,8 +19,11 @@ public:
 	virtual void					Update(_float fTimeDelta) override;
 	virtual void					Exit(MONSTER_STATE_TYPE eNextState) override;
 
+protected:
+	virtual void					Apply_Movement(_float fTimeDelta) override;
+
 public:
-	static CMonster_State_Retreat* Create(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f);
+	static CMonster_State_Retreat*	Create(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f);
 
 
 protected:

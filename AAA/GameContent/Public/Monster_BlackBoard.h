@@ -48,8 +48,8 @@ struct MONSTER_BLACKBOARD
 	_float3					vTargetPos = {};
 	_float3					vLastKnownPos = {};
 	_float3					vDirToTargetXZ = {};
+	_bool					bCanMove = { false };
 
-	_bool					bMoveLocked = { false };		// AnimEvent에서 LockMove로 움직임 멈춰야되는 시점 지시
 	_bool					bActionFinished = { false }; // Non-Loop 액션이 끝났는지?
 	_bool					bCanTransition = { true };	// Brain이 일반 상태 전이를 해도 되는지?
 };

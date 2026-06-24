@@ -19,7 +19,10 @@ protected:
 
 public:
 	virtual MONSTER_STATE_TYPE	Get_StateType() = 0;
+	virtual MONSTER_STATE_TYPE  Get_NextState();											// 명시적으로 다음 상태 지정이 필요할 경우 사용
+
 	_bool						Is_Interruptible() const { return m_bIsInterruptible; }		// 기본 잠금
+	_bool						Is_UseMoveWindow() const { return m_bUseMoveWindow; }		// 이동 상태 : false (연속적움직임) + true (AnimEvent Range  동안만 움직임)
 
 protected:
 	virtual HRESULT				Initialize(const ANI_PLAY_INFO& tInfo, _float fSpeed = 0.f);
@@ -46,6 +49,10 @@ protected:
 
 	_float						m_fTimer = { 0.f };
 	_float						m_fMaxTime = { 0.f };
+
+	_bool						m_bUseMoveWindow = { false };
+
+	_float3						m_MoveDir = {};
 
 protected:
 	virtual void				Free() override;
