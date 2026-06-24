@@ -373,9 +373,6 @@
     <Filter Include="00. GameObject\96. LevelDesign\Unsupported">
       <UniqueIdentifier>{88670e70-c815-452c-88eb-8a17ac26a72d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\98. Component\01. Monster_Movement\Normal_Monster">
-      <UniqueIdentifier>{83a598f0-f750-4825-b41b-816b07066be9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\Brain">
       <UniqueIdentifier>{de157200-a056-4301-9a48-587a29b0a7f0}</UniqueIdentifier>
     </Filter>
@@ -451,9 +448,6 @@
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Retreat">
       <UniqueIdentifier>{bdf27873-c46b-4fc8-bed7-7d19ef211827}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockBack\Dead">
-      <UniqueIdentifier>{f45699c1-0279-42f5-8174-aecc983bb4b3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\06. Monster\NormalEnemy">
       <UniqueIdentifier>{66444ce9-9787-4e31-94d5-04f968389e66}</UniqueIdentifier>
     </Filter>
@@ -519,6 +513,9 @@
     </Filter>
     <Filter Include="00. GameObject\06. Monster\NormalEnemy\State">
       <UniqueIdentifier>{05464a2e-8e96-40b9-b818-54149438e5f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockBack\KnockBackDeath">
+      <UniqueIdentifier>{f45699c1-0279-42f5-8174-aecc983bb4b3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1041,6 +1038,12 @@
     <ClInclude Include="..\Public\Monster_State_Patrol.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Patrol</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Monster_State_Death.h">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Death</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_State_KnockBackDeath.h">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\KnockBack\KnockBackDeath</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1486,6 +1489,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Monster_State_Patrol.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Patrol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_State_Death.cpp">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Death</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_State_KnockBackDeath.cpp">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\KnockBack\KnockBackDeath</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

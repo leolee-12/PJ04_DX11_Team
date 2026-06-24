@@ -27,9 +27,6 @@ class CKirby_Ability;
 class CKirby_Body;
 class CKirby_OnOffPart;
 
-class CMonster;
-class IInhalable;
-
 class CKirby final : public CCharacter
 {
 	GENERATED_BODY(CKirby)
@@ -116,10 +113,6 @@ public:
 	// Collider
 	CCollider* Get_Collider(KIRBY_COLLIDER eKirbyCollider);
 
-	// Stuffed
-	void  Capture_Inhalable(IInhalable* pInhalable) { m_pCapturedInhalable = pInhalable; }
-	void  Spit_Inhalable();
-
 private:
 	HRESULT Ready_Components();
 	void	SetUp_Collider_Callback();
@@ -152,9 +145,6 @@ private:
 
 	// Collider
 	vector<CCollider*> m_KirbyColliders;
-
-	// Stuffed
-	IInhalable* m_pCapturedInhalable{};
 
 	// Invincible Time
 	_float m_fInvincibleTime{};

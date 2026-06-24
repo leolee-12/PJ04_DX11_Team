@@ -506,10 +506,29 @@ _bool CModel::Apply_Mask(LAYER& animLayer, _float fTimeDelta)
 	return isFinished;
 }
 
+void CModel::RotateBone(const _char* szBone, _float fAngleDeg, _fvector vAxis)
+{
+	_int iBone = Get_BoneIndex(szBone);
+	if (iBone < 0)
+		return;
+
+	_vector vScale, vRot, vTrans;
+	XMMatrixDecompose(&vScale, &vRot, &vTrans, m_Bones[iBone]->Get_TransformationMatrix());
+	_vector qAdd = XMQuaternionRotationAxis(XMVector3Normalize(vAxis), XMConvertToRadians(fAngleDeg));
+
+	vRot = XMQuaternionNormalize(XMQuaternionMultiply(vRot, qAdd));
+	m_Bones[iBone]->Set_TransformationMatrix(XMMatrixAffineTransformation(vScale, XMVectorSet(0, 0, 0, 1), vRot, XMVectorSetW(vTrans, 1.f)));
+}
+
 void CModel::Update_Combined()
 {
 	for (auto& pBone : m_Bones)
 		pBone->Update_CombinedTransformMatrices(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
+}
+
+_float CModel::Get_AnimationDuration(_uint iIndex) const
+{
+	return iIndex < m_Animations.size() ? m_Animations[iIndex]->Get_Duration() : 0.f;
 }
 
 HRESULT CModel::Bind_Material(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, MTEX_TYPE eType, _uint iIndex)

@@ -66,10 +66,9 @@ public:
 
 	_bool			Update_Base(_float fTimeDelta, _float fSpeed = 1.0f);
 	_bool			Play_Animation(_float fTimeDelta, _float fSpeed = 1.0f);
-	//_bool			Play_Animation(_float fTimeDelta, _float fMaskTimeDelta, _int iMaskIndex, _float& fMaskLocalTime, vector<_uint>& MaskCursors,
-	//								_float fSpeed = 1.0f, _float fMaskSpeed = 1.0f, _bool bLoop = true, _float fMaskWeight = 1.f, _bool* pbOverlayFinished = nullptr);
 
 	_bool			Apply_Mask(LAYER& animLayer, _float fTimeDelta);
+	void			RotateBone(const _char* szBone, _float fAngleDeg, _fvector vAxis);
 	void			Update_Combined();
 
 	HRESULT			Render(_uint iMeshIndex);
@@ -77,6 +76,8 @@ public:
 	void			Build_MaskBones(const vector<_string>& Roots, vector<_uint>& OutBones);
 
 	const _wstring& Get_ModelPath() { return m_strModelPath; }
+
+	_float			Get_AnimationDuration(_uint iIndex) const;
 
 public:
 	HRESULT Bind_Material(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, MTEX_TYPE eType, _uint iIndex);
