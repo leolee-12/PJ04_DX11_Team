@@ -6,22 +6,22 @@ NS_BEGIN(Engine)
 
 class CEffect_Part;
 
-class CVacuumContainer final : public CEffect_Container
+class CInhaleContainer final : public CEffect_Container
 {
-    GENERATED_BODY(CVacuumContainer)
+    GENERATED_BODY(CInhaleContainer)
 
 public:
-    struct VACUUM_CONTAINER_DESC : public CEffect_Container::EFFECT_CONTAINER_DESC
+    struct INHALE_CONTAINER_DESC : public CEffect_Container::EFFECT_CONTAINER_DESC
     {
 
     };
 
-    static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_VacuumContainer";
+    static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_InhaleContainer";
 
 private:
-    CVacuumContainer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-    CVacuumContainer(const CVacuumContainer& Prototype);
-    virtual ~CVacuumContainer() = default;
+    CInhaleContainer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    CInhaleContainer(const CInhaleContainer& Prototype);
+    virtual ~CInhaleContainer() = default;
 
 protected:
     virtual HRESULT Initialize_Prototype() override;
@@ -42,7 +42,7 @@ private:
     HRESULT Ready_EffectPartObjects();
 
 public:
-    static CVacuumContainer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    static CInhaleContainer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual CGameObject* Clone(void* pArg) override;
 private:
     virtual void Free() override;

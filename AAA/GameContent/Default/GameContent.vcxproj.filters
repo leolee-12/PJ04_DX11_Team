@@ -133,9 +133,6 @@
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\03. Vacuum">
       <UniqueIdentifier>{7f2948ff-51eb-4306-96e2-4d6fd2e69ead}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\02. VacuumContainer">
-      <UniqueIdentifier>{75fd20ba-5ae3-4c5f-bf95-b21a0b7e20ad}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\06. InhaleEffect">
       <UniqueIdentifier>{eac9b9b7-bf0c-4d4c-bde8-6fc2eb74c3ed}</UniqueIdentifier>
     </Filter>
@@ -568,6 +565,9 @@
     <Filter Include="00. GameObject\Test\TestMeshEmitter">
       <UniqueIdentifier>{d07256ff-a017-43f1-a4ae-0d9b7af3dc98}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\02. InhaleContainer">
+      <UniqueIdentifier>{75fd20ba-5ae3-4c5f-bf95-b21a0b7e20ad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -699,8 +699,8 @@
     <ClInclude Include="..\Public\Vacuum.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\03. Vacuum</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\VacuumContainer.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\02. VacuumContainer</Filter>
+    <ClInclude Include="..\Public\InhaleContainer.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\02. InhaleContainer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Map_Builder.h">
       <Filter>97. DataSystem\MapLoader\API</Filter>
@@ -1211,8 +1211,8 @@
     <ClCompile Include="..\Private\Vacuum.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\03. Vacuum</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\VacuumContainer.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\02. VacuumContainer</Filter>
+    <ClCompile Include="..\Private\InhaleContainer.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\02. InhaleContainer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Map_Builder.cpp">
       <Filter>97. DataSystem\MapLoader\API</Filter>

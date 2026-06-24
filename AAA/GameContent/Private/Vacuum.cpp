@@ -31,12 +31,12 @@ HRESULT CVacuum::Initialize(void* pArg)
     tDesc.bUseUnKnownTexture = true;
 
     tDesc.bUseTextureCom = false;
-    tDesc.iTextureLevel = Texture_Twincle.iLevelID;
-    tDesc.wstrTextureTag = Texture_Twincle.szProtoTag;
+    tDesc.iTextureLevel = 0;
+    tDesc.wstrTextureTag = L"";
 
     tDesc.bUseMaskCom = false;
-    tDesc.iMaskLevel = Texture_Twincle.iLevelID;
-    tDesc.wstrMaskTag = Texture_Twincle.szProtoTag;
+    tDesc.iMaskLevel = 0;
+    tDesc.wstrMaskTag = L"";
 
     tDesc.bCustomShader = false;
     tDesc.iShaderLevel = 0;

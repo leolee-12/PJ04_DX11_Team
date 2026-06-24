@@ -200,7 +200,7 @@
     <ClInclude Include="..\Public\UI_Text.h" />
     <ClInclude Include="..\Public\UI_Title.h" />
     <ClInclude Include="..\Public\Vacuum.h" />
-    <ClInclude Include="..\Public\VacuumContainer.h" />
+    <ClInclude Include="..\Public\InhaleContainer.h" />
     <ClInclude Include="..\Public\WalkSmoke.h" />
   </ItemGroup>
   <ItemGroup>
@@ -360,7 +360,7 @@
     <ClCompile Include="..\Private\UI_Text.cpp" />
     <ClCompile Include="..\Private\UI_Title.cpp" />
     <ClCompile Include="..\Private\Vacuum.cpp" />
-    <ClCompile Include="..\Private\VacuumContainer.cpp" />
+    <ClCompile Include="..\Private\InhaleContainer.cpp" />
     <ClCompile Include="..\Private\WalkSmoke.cpp" />
   </ItemGroup>
   <ItemGroup>

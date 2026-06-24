@@ -64,9 +64,6 @@ namespace ProtoDesc
 	inline constexpr TEXTURE_DESC Texture_Wind01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Wind01"), TEXT("../../Resources/YSE/Effect/InhaleEffect2M/wind01.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_Wind02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Wind02"), TEXT("../../Resources/YSE/Effect/InhaleEffect2M/wind02.png"), 1 };
 
-	inline constexpr TEXTURE_DESC Texture_Twincle = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Twinkle02"), TEXT("../../Resources/YSE/Effect/Vacuum/common_twinkle02.png"), 1 };
-
-
 	//sky
 	inline constexpr COMPONENT_DESC Model_SkyTest = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_SkyTest") };
 

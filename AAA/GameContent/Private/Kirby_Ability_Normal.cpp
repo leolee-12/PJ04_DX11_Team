@@ -10,7 +10,7 @@
 #include "Kirby_State.h"
 
 #include "Inhalable.h"
-#include "VacuumContainer.h"
+#include "InhaleContainer.h"
 
 CKirby_Ability_Normal::CKirby_Ability_Normal()
 {
@@ -57,11 +57,11 @@ void CKirby_Ability_Normal::Enter_Ability(CKirby* pKirby)
         {
             Subscribe_InhaleCapturedEvent(pKirby);
 
-            CEffect_Loader::GetInstance()->Spawn(L"VacuumContainer", pKirby->Get_LevelIndex(),
+            CEffect_Loader::GetInstance()->Spawn(L"InhaleContainer", pKirby->Get_LevelIndex(),
                 m_vInhaleEffectStartPos, _float3(0.f, 0.f, 1.f),
                 pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pInhaleEffect);
 
-            static_cast<CVacuumContainer*>(m_pInhaleEffect)->Off_SuperInhale();
+            static_cast<CInhaleContainer*>(m_pInhaleEffect)->Off_SuperInhale();
 
             Change_InhaleState(pKirby, INHALE_STATE::INHALE_LOOP);
 
@@ -216,7 +216,7 @@ void CKirby_Ability_Normal::Enter_InhaleState(CKirby* pKirby, INHALE_STATE eStat
             pBody->Set_Eye(KIRBY_EYE_STATE::ANGRY);
             pAnimator->Play("SuperInhaleStart", false, false, 0.1f, 2.5f);
 
-            static_cast<CVacuumContainer*>(m_pInhaleEffect)->On_SuperInhale();
+            static_cast<CInhaleContainer*>(m_pInhaleEffect)->On_SuperInhale();
             break;
         }
 

@@ -50,7 +50,7 @@
 // Effect_Container
 #include "WalkSmoke.h"
 #include "SwordSlash.h"
-#include "VacuumContainer.h"
+#include "InhaleContainer.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -308,8 +308,8 @@ void CGameObject_Factory::Register_Test()
     );
 
 
-    // 2. VacuumContainer
-    Register(CVacuumContainer::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CVacuumContainer),
+    // 2. InhaleContainer
+    Register(CInhaleContainer::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CInhaleContainer),
         LOADER
         (           
             // InhaleEffect
@@ -329,17 +329,14 @@ void CGameObject_Factory::Register_Test()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_00_Vacuum"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Vacuum/Common_00_Vacuum.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
-            
-            TRY_ADD_PROTO(pProxy, Texture_Twincle.iLevelID, Texture_Twincle.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Twincle.szFileTag, Texture_Twincle.iNumTex));
 
-            // Tornado Spin Reverse
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CTornadoSpinReverse::PROTOTYPE_TAG,
-                CTornadoSpinReverse::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TornadoSpinReverse"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/TornadoSpinReverse/Tornado_00_TornadoSpinReverse.ysh",
-                    XMMatrixRotationX(XMConvertToRadians(90.f))
-                ));
+            //// Tornado Spin Reverse
+            //TRY_ADD_PROTO(pProxy, iLevelIndex, CTornadoSpinReverse::PROTOTYPE_TAG,
+            //    CTornadoSpinReverse::Create(pDevice, pContext));
+            //TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TornadoSpinReverse"),
+            //    CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/TornadoSpinReverse/Tornado_00_TornadoSpinReverse.ysh",
+            //        XMMatrixRotationX(XMConvertToRadians(90.f))
+            //    ));
         )
     );
 
