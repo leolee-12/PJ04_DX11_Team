@@ -247,18 +247,6 @@
     <Filter Include="00. GameObject\06. Monster">
       <UniqueIdentifier>{c69f6e1f-9250-40fa-90bd-8d408e832ff0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29">
-      <UniqueIdentifier>{1138cc00-4713-44ca-a123-2f7be915075c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\Parts">
-      <UniqueIdentifier>{9b1d90f7-0e23-4287-92bd-9c96860e8ee1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\Parts\Body">
-      <UniqueIdentifier>{eb405b39-1a88-4929-bd60-51198f46fce6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\Parts\Weapon">
-      <UniqueIdentifier>{0cf226a6-c19e-4947-98cc-1d33fa4cb266}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\98. Component\01. Monster_Movement">
       <UniqueIdentifier>{0ec1c291-b11e-4b89-9dd5-3440689cb4ea}</UniqueIdentifier>
     </Filter>
@@ -373,21 +361,6 @@
     <Filter Include="00. GameObject\96. LevelDesign\Unsupported">
       <UniqueIdentifier>{88670e70-c815-452c-88eb-8a17ac26a72d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\Brain">
-      <UniqueIdentifier>{de157200-a056-4301-9a48-587a29b0a7f0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State">
-      <UniqueIdentifier>{533932dd-cfb3-4312-9da1-e8b96cec46af}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State\Attack">
-      <UniqueIdentifier>{dd408402-1425-42a3-9147-6956e370fb21}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State\DoubleAttack">
-      <UniqueIdentifier>{6e258028-c856-4cd6-b619-4b040505f964}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State\TornadoAttack">
-      <UniqueIdentifier>{2b77b7f8-0c0f-4f0b-9910-b472e7bd25f3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\Test\TestParticle">
       <UniqueIdentifier>{c3b2a3c6-b5a8-4b4a-82ac-7f8fd01b5452}</UniqueIdentifier>
     </Filter>
@@ -441,18 +414,6 @@
     </Filter>
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Retreat">
       <UniqueIdentifier>{bdf27873-c46b-4fc8-bed7-7d19ef211827}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\NormalEnemy">
-      <UniqueIdentifier>{66444ce9-9787-4e31-94d5-04f968389e66}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\NormalEnemy\Parts">
-      <UniqueIdentifier>{c4f801b1-7d7f-4110-a9ba-12258e3f85f3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\NormalEnemy\Parts\Body">
-      <UniqueIdentifier>{ec28b6dd-3536-48e9-b482-a120c9f9a36a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\NormalEnemy\Brain">
-      <UniqueIdentifier>{f7593e7a-fc6e-4d1d-ab31-8f45704556ac}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus">
       <UniqueIdentifier>{08709ead-b3a1-4623-96c2-e4d2a78ade1e}</UniqueIdentifier>
@@ -529,9 +490,6 @@
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Patrol">
       <UniqueIdentifier>{6faebe93-9f2f-4af1-bb44-37b816184f2d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\06. Monster\NormalEnemy\State">
-      <UniqueIdentifier>{05464a2e-8e96-40b9-b818-54149438e5f8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\Test\TestMeshParticle">
       <UniqueIdentifier>{8cd5923d-467a-464c-b4e8-7f7307487329}</UniqueIdentifier>
     </Filter>
@@ -546,6 +504,84 @@
     </Filter>
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Move\Chase">
       <UniqueIdentifier>{b61cc78e-7768-477a-ac11-d29c9f07603b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\03. NormalEnemy">
+      <UniqueIdentifier>{66444ce9-9787-4e31-94d5-04f968389e66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\03. NormalEnemy\Parts">
+      <UniqueIdentifier>{c4f801b1-7d7f-4110-a9ba-12258e3f85f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\03. NormalEnemy\Parts\Body">
+      <UniqueIdentifier>{ec28b6dd-3536-48e9-b482-a120c9f9a36a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\03. NormalEnemy\Brain">
+      <UniqueIdentifier>{f7593e7a-fc6e-4d1d-ab31-8f45704556ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\03. NormalEnemy\State">
+      <UniqueIdentifier>{05464a2e-8e96-40b9-b818-54149438e5f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\02. BladeKnight%28Sword%29">
+      <UniqueIdentifier>{1138cc00-4713-44ca-a123-2f7be915075c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\02. BladeKnight%28Sword%29\Parts">
+      <UniqueIdentifier>{9b1d90f7-0e23-4287-92bd-9c96860e8ee1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\02. BladeKnight%28Sword%29\Parts\Body">
+      <UniqueIdentifier>{eb405b39-1a88-4929-bd60-51198f46fce6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\02. BladeKnight%28Sword%29\Parts\Weapon">
+      <UniqueIdentifier>{0cf226a6-c19e-4947-98cc-1d33fa4cb266}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\02. BladeKnight%28Sword%29\Brain">
+      <UniqueIdentifier>{de157200-a056-4301-9a48-587a29b0a7f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\02. BladeKnight%28Sword%29\State">
+      <UniqueIdentifier>{533932dd-cfb3-4312-9da1-e8b96cec46af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\02. BladeKnight%28Sword%29\State\Attack">
+      <UniqueIdentifier>{dd408402-1425-42a3-9147-6956e370fb21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\02. BladeKnight%28Sword%29\State\DoubleAttack">
+      <UniqueIdentifier>{6e258028-c856-4cd6-b619-4b040505f964}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\02. BladeKnight%28Sword%29\State\TornadoAttack">
+      <UniqueIdentifier>{2b77b7f8-0c0f-4f0b-9910-b472e7bd25f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\04. Cappy">
+      <UniqueIdentifier>{97e41208-ac4e-46f0-888b-1e569bab8da1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\04. Cappy\Brain">
+      <UniqueIdentifier>{dbcf6703-f1d1-4bc8-9956-4cb0543c0065}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\04. Cappy\Parts">
+      <UniqueIdentifier>{8c741221-c202-4a60-ac97-9217757d22e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\04. Cappy\State">
+      <UniqueIdentifier>{463884ea-976f-4e6b-98ee-df70d239bca2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\05. Kabu">
+      <UniqueIdentifier>{dc9773cf-e814-4eba-b515-c84e5077d945}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\05. Kabu\Brain">
+      <UniqueIdentifier>{41c329ba-2fae-4c94-95c2-0e7ccad956a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\05. Kabu\State">
+      <UniqueIdentifier>{88ef981a-a9aa-4f3a-90e9-8ec09e9840c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\05. Kabu\Parts">
+      <UniqueIdentifier>{4fb9aa47-e193-4374-a981-6d09ba0baac0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\06. PoppyBrosJr">
+      <UniqueIdentifier>{735044f7-fb48-41af-bb4d-e6fb94bd6eb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\06. PoppyBrosJr\Brain">
+      <UniqueIdentifier>{4df41b41-c35d-4ebd-b215-fe78accaafcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\06. PoppyBrosJr\Parts">
+      <UniqueIdentifier>{f3cb50b4-76d2-4d39-9425-1a12eee927a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\06. PoppyBrosJr\State">
+      <UniqueIdentifier>{dfac2a20-95a2-43be-86c7-f0f4a96160f1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -874,10 +910,10 @@
       <Filter>00. GameObject\97. UI\UIContainer\Sequence\Fade\FadeIn</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BladeKnight.h">
-      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29</Filter>
+      <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BladeKnight_Body.h">
-      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\Parts\Body</Filter>
+      <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\Parts\Body</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Map_EditFile.h">
       <Filter>97. DataSystem\MapLoader\API</Filter>
@@ -901,7 +937,7 @@
       <Filter>00. GameObject\98. Component\01. Monster_Movement</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BladeKnight_Sword.h">
-      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\Parts\Weapon</Filter>
+      <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\Parts\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Monster.h">
       <Filter>00. GameObject\06. Monster</Filter>
@@ -937,16 +973,16 @@
       <Filter>00. GameObject\07. Boss\MiniBoss\GigantEdge\Brain</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BladeKnight_Brain.h">
-      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\Brain</Filter>
+      <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\Brain</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BladeKnight_State_Attack.h">
-      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\State\Attack</Filter>
+      <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\State\Attack</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BladeKnight_State_DoubleAttack.h">
-      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\State\DoubleAttack</Filter>
+      <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\State\DoubleAttack</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BladeKnight_State_TornadoAttack.h">
-      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\State\TornadoAttack</Filter>
+      <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\State\TornadoAttack</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TestParticle.h">
       <Filter>00. GameObject\Test\TestParticle</Filter>
@@ -1018,10 +1054,10 @@
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Retreat</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\NormalEnemy.h">
-      <Filter>00. GameObject\06. Monster\NormalEnemy</Filter>
+      <Filter>00. GameObject\06. Monster\03. NormalEnemy</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\NormalEnemy_Body.h">
-      <Filter>00. GameObject\06. Monster\NormalEnemy\Parts\Body</Filter>
+      <Filter>00. GameObject\06. Monster\03. NormalEnemy\Parts\Body</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UI_BossStatus.h">
       <Filter>00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus</Filter>
@@ -1077,9 +1113,6 @@
     <ClInclude Include="..\Public\LevelDesign_Portal.h">
       <Filter>00. GameObject\96. LevelDesign\03. Portal</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\NormalEnemy_Brain.h">
-      <Filter>00. GameObject\06. Monster\01. StateMachine</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Monster_State_Patrol.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Patrol</Filter>
     </ClInclude>
@@ -1097,6 +1130,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Monster_State_Move.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Move</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\NormalEnemy_Brain.h">
+      <Filter>00. GameObject\06. Monster\03. NormalEnemy\Brain</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1368,10 +1404,10 @@
       <Filter>00. GameObject\97. UI\UIContainer\Sequence\Fade\FadeIn</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BladeKnight.cpp">
-      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29</Filter>
+      <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BladeKnight_Body.cpp">
-      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\Parts\Body</Filter>
+      <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\Parts\Body</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Map_EditFile.cpp">
       <Filter>97. DataSystem\MapLoader\API</Filter>
@@ -1392,7 +1428,7 @@
       <Filter>00. GameObject\98. Component\01. Monster_Movement</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BladeKnight_Sword.cpp">
-      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\Parts\Weapon</Filter>
+      <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\Parts\Weapon</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Monster.cpp">
       <Filter>00. GameObject\06. Monster</Filter>
@@ -1422,16 +1458,16 @@
       <Filter>00. GameObject\07. Boss\MiniBoss\GigantEdge\Brain</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BladeKnight_Brain.cpp">
-      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\Brain</Filter>
+      <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\Brain</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BladeKnight_State_Attack.cpp">
-      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\State\Attack</Filter>
+      <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\State\Attack</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BladeKnight_State_DoubleAttack.cpp">
-      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\State\DoubleAttack</Filter>
+      <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\State\DoubleAttack</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BladeKnight_State_TornadoAttack.cpp">
-      <Filter>00. GameObject\06. Monster\BladeKnight%28Sword%29\State\TornadoAttack</Filter>
+      <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\State\TornadoAttack</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ability.cpp">
       <Filter>00. GameObject\05. Kirby\02. Kirby_Ability</Filter>
@@ -1500,10 +1536,10 @@
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Retreat</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\NormalEnemy.cpp">
-      <Filter>00. GameObject\06. Monster\NormalEnemy</Filter>
+      <Filter>00. GameObject\06. Monster\03. NormalEnemy</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\NormalEnemy_Body.cpp">
-      <Filter>00. GameObject\06. Monster\NormalEnemy\Parts\Body</Filter>
+      <Filter>00. GameObject\06. Monster\03. NormalEnemy\Parts\Body</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI_BossStatus.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus</Filter>
@@ -1553,9 +1589,6 @@
     <ClCompile Include="..\Private\LevelDesign_Portal.cpp">
       <Filter>00. GameObject\96. LevelDesign\03. Portal</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\NormalEnemy_Brain.cpp">
-      <Filter>00. GameObject\06. Monster\01. StateMachine</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Monster_State_Patrol.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Patrol</Filter>
     </ClCompile>
@@ -1573,6 +1606,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Monster_State_Move.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Move</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\NormalEnemy_Brain.cpp">
+      <Filter>00. GameObject\06. Monster\03. NormalEnemy\Brain</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

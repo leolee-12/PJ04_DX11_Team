@@ -40,7 +40,7 @@ void CMonster_State_Attack::Update(_float fTimeDelta)
 
 	if (m_pAnimator && m_pAnimator->Is_Finished())
 	{
-		m_pOwner->Change_State(Get_NextState());
+		m_pOwner->Change_State(m_eNextState);
 		return;
 	}
 

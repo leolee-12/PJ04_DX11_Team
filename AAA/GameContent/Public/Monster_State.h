@@ -19,7 +19,7 @@ protected:
 
 public:
 	virtual MONSTER_STATE_TYPE	Get_StateType() = 0;
-	virtual MONSTER_STATE_TYPE  Get_NextState();											// 명시적으로 다음 상태 지정이 필요할 경우 사용
+	MONSTER_STATE_TYPE			Get_NextState() const { return m_eNextState; }										// 명시적으로 다음 상태 지정이 필요할 경우 사용
 
 	_bool						Is_Interruptible() const { return m_bIsInterruptible; }		// 기본 잠금
 	_bool						Is_UseMoveWindow() const { return m_bUseMoveWindow; }		// 이동 상태 : false (연속적움직임) + true (AnimEvent Range  동안만 움직임)
@@ -43,6 +43,8 @@ protected:
 	CMonster_Movement*			m_pMovement = { nullptr };
 
 	ANI_PLAY_INFO				m_PlayInfo{};
+
+	MONSTER_STATE_TYPE			m_eNextState = { MONSTER_STATE_TYPE::IDLE };
 
 	_bool						m_bIsInterruptible = { false };		// 중간에 가로챌 수 있는 상태인지
 	_float						m_fSpeed = { 0.f };					// 상태 동안 이동 적용할 속도

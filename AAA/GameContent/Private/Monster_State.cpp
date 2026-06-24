@@ -7,11 +7,6 @@ CMonster_State::CMonster_State()
 {
 }
 
-MONSTER_STATE_TYPE CMonster_State::Get_NextState()
-{
-	return MONSTER_STATE_TYPE::IDLE;
-}
-
 HRESULT	CMonster_State::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpeed)
 {
 	m_PlayInfo = tInfo;

@@ -4,14 +4,19 @@
 #include "Monster_Movement.h"
 #include "BladeKnight_Sword.h"
 
+HRESULT CBladeKnight_State_DoubleAttack::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpeed)
+{
+	if (FAILED(__super::Initialize(tInfo, fSpeed)))
+		return E_FAIL;
+
+	m_eNextState = MONSTER_STATE_TYPE::RETREAT;
+
+	return S_OK;
+}
+
 MONSTER_STATE_TYPE CBladeKnight_State_DoubleAttack::Get_StateType()
 {
 	return MONSTER_STATE_TYPE::DOUBLE_ATTACK;
-}
-
-MONSTER_STATE_TYPE CBladeKnight_State_DoubleAttack::Get_NextState()
-{
-	return MONSTER_STATE_TYPE::RETREAT;
 }
 
 void CBladeKnight_State_DoubleAttack::Exit(MONSTER_STATE_TYPE eNextState)

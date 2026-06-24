@@ -10,9 +10,11 @@ private:
 	CBladeKnight_State_DoubleAttack() = default;
 	virtual ~CBladeKnight_State_DoubleAttack() = default;
 
+protected:
+	virtual HRESULT						Initialize(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f) override;
+
 public:
 	virtual MONSTER_STATE_TYPE			Get_StateType() override;
-	virtual MONSTER_STATE_TYPE			Get_NextState() override;
 
 protected:
 	virtual void						Exit(MONSTER_STATE_TYPE eNextState) override;
