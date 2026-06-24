@@ -126,6 +126,8 @@
     <ClInclude Include="..\Public\Monster_State.h" />
     <ClInclude Include="..\Public\Monster_StateMachine.h" />
     <ClInclude Include="..\Public\Movement_Child.h" />
+    <ClInclude Include="..\Public\TestMeshEmitter.h" />
+    <ClInclude Include="..\Public\TestMeshParticle.h" />
     <ClInclude Include="..\public\UI_BossStatus.h" />
     <ClInclude Include="..\public\UI_Curtain.h" />
     <ClInclude Include="..\public\UI_CurtainAnimBase.h" />
@@ -295,6 +297,8 @@
     <ClCompile Include="..\Private\NormalEnemy.cpp" />
     <ClCompile Include="..\Private\NormalEnemy_Body.cpp" />
     <ClCompile Include="..\Private\NormalEnemy_Brain.cpp" />
+    <ClCompile Include="..\Private\TestMeshEmitter.cpp" />
+    <ClCompile Include="..\Private\TestMeshParticle.cpp" />
     <ClCompile Include="..\Private\TestParticle.cpp" />
     <ClCompile Include="..\Private\RailDataReceiver.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />
