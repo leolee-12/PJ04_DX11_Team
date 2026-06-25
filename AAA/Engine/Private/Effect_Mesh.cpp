@@ -183,6 +183,42 @@ HRESULT CEffect_Mesh::Bind_ShaderValue()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_bCircleUVClockwise_U", &m_bUnknownCircleUVClockwise, sizeof(m_bUnknownCircleUVClockwise))))
         return E_FAIL;
 
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseLinearUVAnim_T", &m_bTextureLinearUVAnim, sizeof(m_bTextureLinearUVAnim))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fLinearUVRatio_T", &m_fTextureLinearUVRatio, sizeof(m_fTextureLinearUVRatio))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_iLinearUVAxis_T", &m_iTextureLinearUVAxis, sizeof(m_iTextureLinearUVAxis))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bLinearUVReverse_T", &m_bTextureLinearUVReverse, sizeof(m_bTextureLinearUVReverse))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseLinearUVAnim_M", &m_bMaskLinearUVAnim, sizeof(m_bMaskLinearUVAnim))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fLinearUVRatio_M", &m_fMaskLinearUVRatio, sizeof(m_fMaskLinearUVRatio))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_iLinearUVAxis_M", &m_iMaskLinearUVAxis, sizeof(m_iMaskLinearUVAxis))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bLinearUVReverse_M", &m_bMaskLinearUVReverse, sizeof(m_bMaskLinearUVReverse))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseLinearUVAnim_D", &m_bDiffuseLinearUVAnim, sizeof(m_bDiffuseLinearUVAnim))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fLinearUVRatio_D", &m_fDiffuseLinearUVRatio, sizeof(m_fDiffuseLinearUVRatio))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_iLinearUVAxis_D", &m_iDiffuseLinearUVAxis, sizeof(m_iDiffuseLinearUVAxis))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bLinearUVReverse_D", &m_bDiffuseLinearUVReverse, sizeof(m_bDiffuseLinearUVReverse))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseLinearUVAnim_U", &m_bUnknownLinearUVAnim, sizeof(m_bUnknownLinearUVAnim))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fLinearUVRatio_U", &m_fUnknownLinearUVRatio, sizeof(m_fUnknownLinearUVRatio))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_iLinearUVAxis_U", &m_iUnknownLinearUVAxis, sizeof(m_iUnknownLinearUVAxis))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bLinearUVReverse_U", &m_bUnknownLinearUVReverse, sizeof(m_bUnknownLinearUVReverse))))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -210,6 +246,11 @@ void CEffect_Mesh::Update_UVScroll(const _float fTimeDelta, const _float fRatio)
     m_fMaskCircleUVRatio = ComputeCircleRatio(fRatio, m_fMaskCircleUVStartRatio, m_fMaskCircleUVEndRatio);
     m_fDiffuseCircleUVRatio = ComputeCircleRatio(fRatio, m_fDiffuseCircleUVStartRatio, m_fDiffuseCircleUVEndRatio);
     m_fUnknownCircleUVRatio = ComputeCircleRatio(fRatio, m_fUnknownCircleUVStartRatio, m_fUnknownCircleUVEndRatio);
+
+    m_fTextureLinearUVRatio = ComputeCircleRatio(fRatio, m_fTextureLinearUVStartRatio, m_fTextureLinearUVEndRatio);
+    m_fMaskLinearUVRatio = ComputeCircleRatio(fRatio, m_fMaskLinearUVStartRatio, m_fMaskLinearUVEndRatio);
+    m_fDiffuseLinearUVRatio = ComputeCircleRatio(fRatio, m_fDiffuseLinearUVStartRatio, m_fDiffuseLinearUVEndRatio);
+    m_fUnknownLinearUVRatio = ComputeCircleRatio(fRatio, m_fUnknownLinearUVStartRatio, m_fUnknownLinearUVEndRatio);
 }
 
 void CEffect_Mesh::Init_PropertyValue()
@@ -258,6 +299,35 @@ void CEffect_Mesh::Init_PropertyValue()
     m_fMaskCircleUVRatio = 1.f;
     m_fDiffuseCircleUVRatio = 1.f;
     m_fUnknownCircleUVRatio = 1.f;
+
+    m_bTextureLinearUVAnim = false;
+    m_iTextureLinearUVAxis = 0;
+    m_bTextureLinearUVReverse = false;
+    m_fTextureLinearUVStartRatio = 0.f;
+    m_fTextureLinearUVEndRatio = 1.f;
+
+    m_bMaskLinearUVAnim = false;
+    m_iMaskLinearUVAxis = 0;
+    m_bMaskLinearUVReverse = false;
+    m_fMaskLinearUVStartRatio = 0.f;
+    m_fMaskLinearUVEndRatio = 1.f;
+
+    m_bDiffuseLinearUVAnim = false;
+    m_iDiffuseLinearUVAxis = 0;
+    m_bDiffuseLinearUVReverse = false;
+    m_fDiffuseLinearUVStartRatio = 0.f;
+    m_fDiffuseLinearUVEndRatio = 1.f;
+
+    m_bUnknownLinearUVAnim = false;
+    m_iUnknownLinearUVAxis = 0;
+    m_bUnknownLinearUVReverse = false;
+    m_fUnknownLinearUVStartRatio = 0.f;
+    m_fUnknownLinearUVEndRatio = 1.f;
+
+    m_fTextureLinearUVRatio = 0.f;
+    m_fMaskLinearUVRatio = 0.f;
+    m_fDiffuseLinearUVRatio = 0.f;
+    m_fUnknownLinearUVRatio = 0.f;
 }
 
 void CEffect_Mesh::Free()

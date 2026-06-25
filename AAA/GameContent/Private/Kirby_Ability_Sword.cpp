@@ -418,7 +418,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
         BeginHit(true);
         pAnimator->Play("SwordSpinStart", false, false, 0.05f, 10.f);
 
-        m_bIsStartEffect[SWORD_EFFECT::JUMPSLASH] = false;
+        pKirby->Set_RotationLock(true);
 
         break;
     }
@@ -426,6 +426,9 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
     {
         BeginHit(true);
         pAnimator->Play("SwordSpin", false, false, 0.05f, 1.5f);
+
+        m_bIsStartEffect[SWORD_EFFECT::JUMPSLASH] = false;
+
         break;
     }
 
@@ -739,7 +742,6 @@ void CKirby_Ability_Sword::Exit_SwordState(CKirby* pKirby, SWORD_STATE eState)
 {
     m_bMoveLock = false;
 
-    pKirby->Set_RotationLock(false);
     pKirby->Get_Movement()->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
 
     CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
@@ -753,7 +755,10 @@ void CKirby_Ability_Sword::Exit_SwordState(CKirby* pKirby, SWORD_STATE eState)
         case SLASH_3:
 
         case JUMP_SLASH_START:
+            break;
         case JUMP_SLASH:
+            pKirby->Set_RotationLock(false);
+            break;
 
         case SPIN_SLASH_CHARGE:
         case SPIN_SLASH:
