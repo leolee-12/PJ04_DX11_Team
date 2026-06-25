@@ -4,6 +4,7 @@
 #include "GameContent_const.h"
 
 #include "Common_JumpSlash.h"
+#include "Common_Curve03.h"
 
 CSword_JumpSlash::CSword_JumpSlash(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Container(pDevice, pContext)
@@ -58,6 +59,7 @@ HRESULT CSword_JumpSlash::Render()
 HRESULT CSword_JumpSlash::Ready_EffectPartObjects()
 {
     Add_Effect_PartObject(m_iPrototypeLevel, CCommon_JumpSlash::PROTOTYPE_TAG, CCommon_JumpSlash::PROTOTYPE_TAG);
+    Add_Effect_PartObject(m_iPrototypeLevel, CCommon_Curve03::PROTOTYPE_TAG, CCommon_Curve03::PROTOTYPE_TAG);
 
     return S_OK;
 }

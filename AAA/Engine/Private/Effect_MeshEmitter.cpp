@@ -174,6 +174,42 @@ HRESULT CEffect_MeshEmitter::Bind_ShaderValue()
         sizeof(m_vCurUnknownUVOffset))))
         return E_FAIL;
 
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseCircleUVAnim_T", &m_bTextureCircleUVAnim, sizeof(m_bTextureCircleUVAnim))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fCircleUVRatio_T", &m_fTextureCircleUVRatio, sizeof(m_fTextureCircleUVRatio))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fCircleUVStartDegree_T", &m_fTextureCircleUVStartDegree, sizeof(m_fTextureCircleUVStartDegree))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bCircleUVClockwise_T", &m_bTextureCircleUVClockwise, sizeof(m_bTextureCircleUVClockwise))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseCircleUVAnim_M", &m_bMaskCircleUVAnim, sizeof(m_bMaskCircleUVAnim))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fCircleUVRatio_M", &m_fMaskCircleUVRatio, sizeof(m_fMaskCircleUVRatio))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fCircleUVStartDegree_M", &m_fMaskCircleUVStartDegree, sizeof(m_fMaskCircleUVStartDegree))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bCircleUVClockwise_M", &m_bMaskCircleUVClockwise, sizeof(m_bMaskCircleUVClockwise))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseCircleUVAnim_D", &m_bDiffuseCircleUVAnim, sizeof(m_bDiffuseCircleUVAnim))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fCircleUVRatio_D", &m_fDiffuseCircleUVRatio, sizeof(m_fDiffuseCircleUVRatio))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fCircleUVStartDegree_D", &m_fDiffuseCircleUVStartDegree, sizeof(m_fDiffuseCircleUVStartDegree))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bCircleUVClockwise_D", &m_bDiffuseCircleUVClockwise, sizeof(m_bDiffuseCircleUVClockwise))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseCircleUVAnim_U", &m_bUnknownCircleUVAnim, sizeof(m_bUnknownCircleUVAnim))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fCircleUVRatio_U", &m_fUnknownCircleUVRatio, sizeof(m_fUnknownCircleUVRatio))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fCircleUVStartDegree_U", &m_fUnknownCircleUVStartDegree, sizeof(m_fUnknownCircleUVStartDegree))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bCircleUVClockwise_U", &m_bUnknownCircleUVClockwise, sizeof(m_bUnknownCircleUVClockwise))))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -183,6 +219,24 @@ void CEffect_MeshEmitter::Update_UVScroll(const _float fTimeDelta, const _float 
 
     MoveUVScroll(fRatio, m_vDiffuseUVScroll, m_vDiffuseUVScrollCount, m_vDiffuseOffset, m_vCurDiffuseUVOffset);
     MoveUVScroll(fRatio, m_vUnknownUVScroll, m_vUnknownUVScrollCount, m_vUnknownOffset, m_vCurUnknownUVOffset);
+
+    const auto ComputeCircleRatio = [](_float fCurRatio, _float fStartRatio, _float fEndRatio)
+        {
+            _float fRange = fEndRatio - fStartRatio;
+
+            if (fabsf(fRange) <= Helper::fEpsilon)
+                return fCurRatio >= fEndRatio ? 1.f : 0.f;
+
+            _float fResult = (fCurRatio - fStartRatio) / fRange;
+            Helper::FloatClamp(fResult, 0.f, 1.f);
+
+            return fResult;
+        };
+
+    m_fTextureCircleUVRatio = ComputeCircleRatio(fRatio, m_fTextureCircleUVStartRatio, m_fTextureCircleUVEndRatio);
+    m_fMaskCircleUVRatio = ComputeCircleRatio(fRatio, m_fMaskCircleUVStartRatio, m_fMaskCircleUVEndRatio);
+    m_fDiffuseCircleUVRatio = ComputeCircleRatio(fRatio, m_fDiffuseCircleUVStartRatio, m_fDiffuseCircleUVEndRatio);
+    m_fUnknownCircleUVRatio = ComputeCircleRatio(fRatio, m_fUnknownCircleUVStartRatio, m_fUnknownCircleUVEndRatio);
 }
 
 void CEffect_MeshEmitter::Init_PropertyValue()
@@ -200,6 +254,35 @@ void CEffect_MeshEmitter::Init_PropertyValue()
 
     m_vUnknownUVScroll = false;
     m_vUnknownUVScrollCount = { 0.f, 0.f };
+
+    m_bTextureCircleUVAnim = false;
+    m_fTextureCircleUVStartDegree = 0.f;
+    m_bTextureCircleUVClockwise = true;
+    m_fTextureCircleUVStartRatio = 0.f;
+    m_fTextureCircleUVEndRatio = 1.f;
+
+    m_bMaskCircleUVAnim = false;
+    m_fMaskCircleUVStartDegree = 0.f;
+    m_bMaskCircleUVClockwise = true;
+    m_fMaskCircleUVStartRatio = 0.f;
+    m_fMaskCircleUVEndRatio = 1.f;
+
+    m_bDiffuseCircleUVAnim = false;
+    m_fDiffuseCircleUVStartDegree = 0.f;
+    m_bDiffuseCircleUVClockwise = true;
+    m_fDiffuseCircleUVStartRatio = 0.f;
+    m_fDiffuseCircleUVEndRatio = 1.f;
+
+    m_bUnknownCircleUVAnim = false;
+    m_fUnknownCircleUVStartDegree = 0.f;
+    m_bUnknownCircleUVClockwise = true;
+    m_fUnknownCircleUVStartRatio = 0.f;
+    m_fUnknownCircleUVEndRatio = 1.f;
+
+    m_fTextureCircleUVRatio = 1.f;
+    m_fMaskCircleUVRatio = 1.f;
+    m_fDiffuseCircleUVRatio = 1.f;
+    m_fUnknownCircleUVRatio = 1.f;
 }
 
 void CEffect_MeshEmitter::Free()

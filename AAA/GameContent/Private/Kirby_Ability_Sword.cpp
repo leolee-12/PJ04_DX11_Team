@@ -416,13 +416,16 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
         Clear_Overlay(pKirby, 1, 0.1f);
 
         BeginHit(true);
-        pAnimator->Play("SwordSpinStart", false, false, 0.05f, 9.f);
+        pAnimator->Play("SwordSpinStart", false, false, 0.05f, 10.f);
+
+        m_bIsStartEffect[SWORD_EFFECT::JUMPSLASH] = false;
+
         break;
     }
     case SWORD_STATE::JUMP_SLASH:
     {
         BeginHit(true);
-        pAnimator->Play("SwordSpin", false, false, 0.0f, 1.5f);
+        pAnimator->Play("SwordSpin", false, false, 0.05f, 1.5f);
         break;
     }
 
@@ -645,6 +648,14 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, _float fTimeDelta)
                     Change_SwordState(pKirby, SWORD_STATE::END);
                 }
             }
+
+            if (CanPlayEffect(SWORD_EFFECT::JUMPSLASH, pAnimator, 0.01f))
+            {
+                CEffect_Loader::GetInstance()->Spawn(L"JumpSlash_1", pKirby->Get_LevelIndex(),
+                    _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 90.f, 0.f),
+                    pKirby->Get_Transform()->Get_WorldMatrixPtr());
+            }
+
             break;
 
         // Charge

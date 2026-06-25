@@ -346,24 +346,22 @@ void CGameObject_Factory::Register_Test()
     Register(CSword_JumpSlash::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSword_JumpSlash),
         LOADER
         (
-            //// Common_Curve03
-            //TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_Curve03::PROTOTYPE_TAG,
-            //    CCommon_Curve03::Create(pDevice, pContext));
-            //TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_Curve03"),
-            //    CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_Curve03/Model_Common_Curve03.ysh",
-            //        XMMatrixRotationY(XMConvertToRadians(90.f)) * XMMatrixRotationX(XMConvertToRadians(-90.f))));
-        
             // Common_JumpSlash
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_JumpSlash::PROTOTYPE_TAG,
                 CCommon_JumpSlash::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_JumpSlash"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_JumpSlash/Model_Common_JumpSlash.ysh"/*,
-                    XMMatrixRotationX(XMConvertToRadians(-90.f))*/));
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_JumpSlash/Model_Common_JumpSlash.ysh"));
             TRY_ADD_PROTO(pProxy, Texture_Common_JumpSlash.iLevelID, Texture_Common_JumpSlash.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_Common_JumpSlash.szFileTag, Texture_Common_JumpSlash.iNumTex));
 
-            //TRY_ADD_PROTO(pProxy, Texture_SwordSlash2.iLevelID, Texture_SwordSlash2.szProtoTag,
-            //    CTexture::Create(pDevice, pContext, Texture_SwordSlash2.szFileTag, Texture_SwordSlash2.iNumTex));
+            // Common_Curve03
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_Curve03::PROTOTYPE_TAG,
+                CCommon_Curve03::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_Curve03"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_Curve03/Model_Common_Curve03.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, Texture_Common_Flash02.iLevelID, Texture_Common_Flash02.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Common_Flash02.szFileTag, Texture_Common_Flash02.iNumTex));
         )
     );
 
