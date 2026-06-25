@@ -39,10 +39,16 @@ HRESULT CPanel_Manager::Add_Panel(const _wstring& strPanelTag, CPanel* pPanel)
 		return E_FAIL;
 
 	if (m_Panels.find(strPanelTag) != m_Panels.end())
+	{
+		Safe_Release(pPanel);
 		return E_FAIL;
+	}
 
 	if (FAILED(pPanel->Initialize(this)))
+	{
+		Safe_Release(pPanel);
 		return E_FAIL;
+	}
 
 	m_Panels.emplace(strPanelTag, pPanel);
 	return S_OK;

@@ -5,6 +5,7 @@
 
 #include "GameInstance.h"
 #include "GameObject.h"
+#include "MapSection.h"
 #include "Transform.h"
 #include "GameContrnt_Events.h"     // UI_RBTN_PROBE / WORLD_RBTN_DOWN
 
@@ -272,6 +273,9 @@ void CPanel_Viewport::Draw_Gizmo(CGameObject* pSelected, const ImVec2& vImagePos
             memcpy(matWorld.m[3], &FixedPos, sizeof(_float3));
         }
         pTransform->Set_WorldMatrix(XMLoadFloat4x4(&matWorld));
+
+        if (CMapSection* pSection = dynamic_cast<CMapSection*>(pSelected))
+            pSection->Notify_EditTransformChanged();
     }
 }
 

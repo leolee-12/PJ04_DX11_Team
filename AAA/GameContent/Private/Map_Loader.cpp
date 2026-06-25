@@ -827,6 +827,7 @@ HRESULT CMap_Loader::Load_Env_Runtime(
 				Request.Options.bSpawnEnv = true;
 				Request.pCreatedCallback = Context.pCreatedCallback;
 				Request.pCallbackContext = Context.pCallbackContext;
+				Request.ppOutEnvInstanceController = Context.ppOutEnvInstanceController;
 
 				hr = pMapLoader->Spawn(SpawnPackage, Request, pOutReport);
 			}

@@ -9,6 +9,7 @@ NS_END
 
 NS_BEGIN(Client)
 class CMapStage;
+class CEnv_InstanceController;
 
 struct MAP_MANIFEST_DESC
 {
@@ -146,6 +147,7 @@ struct MAP_SPAWN_REQUEST
 	MAP_OBJECT_CREATED_CALLBACK pCreatedCallback = nullptr;
 	void* pCallbackContext = nullptr;
 	CMapStage** ppOutStage = nullptr;
+	CEnv_InstanceController** ppOutEnvInstanceController = nullptr;
 };
 
 struct MAP_LOAD_RESULT

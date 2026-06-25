@@ -9,6 +9,50 @@
 
 NS_BEGIN(Client)
 
+namespace
+{
+#ifdef _DEBUG
+	static constexpr _uint ENV_MISSING_MODEL_LOG_LIMIT = 64;
+
+	const char* ToString(ENV_SOURCE_TYPE eSourceType)
+	{
+		switch (eSourceType)
+		{
+		case ENV_SOURCE_TYPE::DECOR_DECOR: return "DECOR_DECOR";
+		case ENV_SOURCE_TYPE::TOY_DECOR: return "TOY_DECOR";
+		case ENV_SOURCE_TYPE::TOY_OBJ: return "TOY_OBJ";
+		case ENV_SOURCE_TYPE::DECOR_OBJ: return "DECOR_OBJ";
+		case ENV_SOURCE_TYPE::UNKNOWN: return "UNKNOWN";
+		default: return "END";
+		}
+	}
+
+	const char* ToString(ENV_OBJECT_KIND eKind)
+	{
+		switch (eKind)
+		{
+		case ENV_OBJECT_KIND::STATIC: return "STATIC";
+		case ENV_OBJECT_KIND::INTERACT: return "INTERACT";
+		case ENV_OBJECT_KIND::EFFECT: return "EFFECT";
+		case ENV_OBJECT_KIND::UNKNOWN: return "UNKNOWN";
+		default: return "END";
+		}
+	}
+
+	void Log_MissingEnvModelDetail(const ENV_OBJECT_DESC& Desc)
+	{
+		Log_GameContentWarning(
+			"Map builder skipped env without model: source="
+			+ WstrToStr(Desc.wstrSourceFile)
+			+ " section=" + WstrToStr(Desc.wstrSection)
+			+ " entry=" + WstrToStr(Desc.wstrEntryKey)
+			+ " uid=" + to_string(Desc.iUid)
+			+ " object=" + WstrToStr(Desc.wstrObjectName)
+			+ " sourceType=" + ToString(Desc.eSourceType)
+			+ " kind=" + ToString(Desc.eKind));
+	}
+#endif
+}
 CMap_Builder::CMap_Builder(CMap_ModelResolver* pResolver)
 	: m_pResolver{ pResolver }
 {
@@ -183,6 +227,9 @@ HRESULT CMap_Builder::Validate_And_Filter(MAP_PACKAGE* pPackage)
 	Filtered.reserve(pPackage->EnvObjectDescs.size());
 
 	_uint iSkippedMissingModel = 0;
+#ifdef _DEBUG
+	_uint iLoggedMissingModel = 0;
+#endif
 
 	for (const ENV_OBJECT_DESC& Desc : pPackage->EnvObjectDescs)
 	{
@@ -190,6 +237,13 @@ HRESULT CMap_Builder::Validate_And_Filter(MAP_PACKAGE* pPackage)
 			&& (Desc.wstrModelPath.empty() || Desc.wstrModelProtoTag.empty()))
 		{
 			++iSkippedMissingModel;
+#ifdef _DEBUG
+			if (iLoggedMissingModel < ENV_MISSING_MODEL_LOG_LIMIT)
+			{
+				Log_MissingEnvModelDetail(Desc);
+				++iLoggedMissingModel;
+			}
+#endif
 			continue;
 		}
 
@@ -204,6 +258,16 @@ HRESULT CMap_Builder::Validate_And_Filter(MAP_PACKAGE* pPackage)
 		Log_GameContentWarning(
 			"Map builder skipped env without model: count="
 			+ to_string(iSkippedMissingModel));
+
+#ifdef _DEBUG
+		if (iSkippedMissingModel > ENV_MISSING_MODEL_LOG_LIMIT)
+		{
+			Log_GameContentWarning(
+				"Map builder skipped env without model: omittedDetail="
+				+ to_string(iSkippedMissingModel - ENV_MISSING_MODEL_LOG_LIMIT)
+				+ " / total=" + to_string(iSkippedMissingModel));
+		}
+#endif
 	}
 
 	return S_OK;

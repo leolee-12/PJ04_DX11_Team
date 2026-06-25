@@ -361,12 +361,6 @@
     <Filter Include="00. GameObject\96. LevelDesign">
       <UniqueIdentifier>{df77a93d-c3e5-461c-a155-eb275851d047}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Breakable">
-      <UniqueIdentifier>{41ac5899-75d9-43ae-ba35-d15a6f693112}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Unsupported">
-      <UniqueIdentifier>{88670e70-c815-452c-88eb-8a17ac26a72d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\07. MiniBoss">
       <UniqueIdentifier>{ab830d26-cbd1-45f8-8412-afec3357e9e4}</UniqueIdentifier>
     </Filter>

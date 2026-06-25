@@ -17,6 +17,7 @@ struct MAP_RUNTIME_LOAD_CONTEXT
 
 	MAP_OBJECT_CREATED_CALLBACK pCreatedCallback = { nullptr };
 	void* pCallbackContext = { nullptr };
+	CEnv_InstanceController** ppOutEnvInstanceController = { nullptr };
 };
 
 class CLIENT_DLL CMap_Loader final : public CBase

@@ -276,18 +276,6 @@ namespace
 			pOutDesc->bHasShadow = true;
 			pOutDesc->bUseShadow = IterUseShadow->get<bool>();
 		}
-		else
-		{
-			const auto IterUseShadow = jValue.find("UseShadow");
-			if (IterUseShadow != jValue.end())
-			{
-				if (!IterUseShadow->is_boolean())
-					return E_FAIL;
-
-				pOutDesc->bHasShadow = true;
-				pOutDesc->bUseShadow = IterUseShadow->get<bool>();
-			}
-		}
 
 		const auto IterWorldMatrix = jValue.find("WorldMatrix");
 		if (IterWorldMatrix != jValue.end())
@@ -306,18 +294,6 @@ namespace
 
 			pOutDesc->bHasCollMesh = true;
 			pOutDesc->bUseCollMesh = IterUseCollMesh->get<bool>();
-		}
-		else
-		{
-			const auto IterUseCollMesh = jValue.find("UseCollMesh");
-			if (IterUseCollMesh != jValue.end())
-			{
-				if (!IterUseCollMesh->is_boolean())
-					return E_FAIL;
-
-				pOutDesc->bHasCollMesh = true;
-				pOutDesc->bUseCollMesh = IterUseCollMesh->get<bool>();
-			}
 		}
 
 		const auto IterNearDistAlpha = jValue.find("UseNearDistAlpha");
