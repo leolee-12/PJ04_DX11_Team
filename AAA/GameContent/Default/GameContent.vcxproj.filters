@@ -121,9 +121,6 @@
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\02. SmokeTail">
       <UniqueIdentifier>{d13a01c7-b84d-40fa-a0a4-51a1b67b7315}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\01. SwordSlash">
-      <UniqueIdentifier>{bd114556-93e2-4c7f-a452-7483746e046a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\04. Common_Circle01">
       <UniqueIdentifier>{29830c83-0212-4f5e-ad0d-0455cb58e043}</UniqueIdentifier>
     </Filter>
@@ -132,9 +129,6 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\03. Vacuum">
       <UniqueIdentifier>{7f2948ff-51eb-4306-96e2-4d6fd2e69ead}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\02. VacuumContainer">
-      <UniqueIdentifier>{75fd20ba-5ae3-4c5f-bf95-b21a0b7e20ad}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\06. InhaleEffect">
       <UniqueIdentifier>{eac9b9b7-bf0c-4d4c-bde8-6fc2eb74c3ed}</UniqueIdentifier>
@@ -361,6 +355,24 @@
     <Filter Include="00. GameObject\96. LevelDesign\Unsupported">
       <UniqueIdentifier>{88670e70-c815-452c-88eb-8a17ac26a72d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\98. Component\01. Monster_Movement\Normal_Monster">
+      <UniqueIdentifier>{83a598f0-f750-4825-b41b-816b07066be9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\Brain">
+      <UniqueIdentifier>{de157200-a056-4301-9a48-587a29b0a7f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State">
+      <UniqueIdentifier>{533932dd-cfb3-4312-9da1-e8b96cec46af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State\Attack">
+      <UniqueIdentifier>{dd408402-1425-42a3-9147-6956e370fb21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State\DoubleAttack">
+      <UniqueIdentifier>{6e258028-c856-4cd6-b619-4b040505f964}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State\TornadoAttack">
+      <UniqueIdentifier>{2b77b7f8-0c0f-4f0b-9910-b472e7bd25f3}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\Test\TestParticle">
       <UniqueIdentifier>{c3b2a3c6-b5a8-4b4a-82ac-7f8fd01b5452}</UniqueIdentifier>
     </Filter>
@@ -490,6 +502,12 @@
     <Filter Include="00. GameObject\Test\TestMeshEmitter">
       <UniqueIdentifier>{d07256ff-a017-43f1-a4ae-0d9b7af3dc98}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\01. InhaleContainer">
+      <UniqueIdentifier>{75fd20ba-5ae3-4c5f-bf95-b21a0b7e20ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1">
+      <UniqueIdentifier>{bd114556-93e2-4c7f-a452-7483746e046a}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockBack\KnockBackDeath">
       <UniqueIdentifier>{f45699c1-0279-42f5-8174-aecc983bb4b3}</UniqueIdentifier>
     </Filter>
@@ -594,6 +612,36 @@
     </Filter>
     <Filter Include="00. GameObject\06. Monster\03. NormalEnemy\State\Chase">
       <UniqueIdentifier>{6d03a521-9743-4bf0-9c6c-3ebe4c879ee1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\08. Common_Ring03">
+      <UniqueIdentifier>{ea802e0e-a008-40c2-8690-c4635c1185e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\09. Common_JumpSlash">
+      <UniqueIdentifier>{a7a58fec-6650-4f57-9df6-0b8c82791b61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash">
+      <UniqueIdentifier>{61c41364-99b2-4864-a87d-85109fe32b06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="08. CutsceneActor">
+      <UniqueIdentifier>{95c0b1f2-ac3e-4446-9bd7-5b1c7b84f2c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="08. CutsceneActor\Gorilla">
+      <UniqueIdentifier>{ef97af82-579e-4774-9fb4-27668458611d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\00. Camera\Cutscene">
+      <UniqueIdentifier>{44ee9036-9fb5-42d3-a001-52dd473415a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="96. CameraDirector">
+      <UniqueIdentifier>{ac2123fc-d03d-4f44-a7a4-a4fc408e20d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\BossNamePlate">
+      <UniqueIdentifier>{58efb2e3-2e8d-46c9-a255-4e907b51f633}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\BossNamePlate\Gorilla">
+      <UniqueIdentifier>{4640c1d8-ee75-4758-a51f-cd0fd9fb282d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\00. Camera\BossCam">
+      <UniqueIdentifier>{2167fc90-1b87-469b-9d86-8fb47e1a8e6d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -714,8 +762,8 @@
     <ClInclude Include="..\Public\Kirby_States.h">
       <Filter>99. Defines\Hojun</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\SwordSlash.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\01. SwordSlash</Filter>
+    <ClInclude Include="..\Public\SwordSlash1.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Common_Curve03.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\05. Common_Curve03</Filter>
@@ -726,8 +774,8 @@
     <ClInclude Include="..\Public\Vacuum.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\03. Vacuum</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\VacuumContainer.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\02. VacuumContainer</Filter>
+    <ClInclude Include="..\Public\InhaleContainer.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\01. InhaleContainer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Map_Builder.h">
       <Filter>97. DataSystem\MapLoader\API</Filter>
@@ -1158,6 +1206,36 @@
     <ClInclude Include="..\Public\NormalEnemy_State_Chase.h">
       <Filter>00. GameObject\06. Monster\03. NormalEnemy\State\Chase</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Common_Ring03.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\08. Common_Ring03</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Common_JumpSlash.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\09. Common_JumpSlash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Sword_JumpSlash.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\CutsceneActor.h">
+      <Filter>08. CutsceneActor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\CutsceneGorilla.h">
+      <Filter>08. CutsceneActor\Gorilla</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Camera_Cutscene.h">
+      <Filter>00. GameObject\00. Camera\Cutscene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\CameraDirector.h">
+      <Filter>96. CameraDirector</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\BossNamePlate.h">
+      <Filter>00. GameObject\07. Boss\BossNamePlate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GorillaNamePlate.h">
+      <Filter>00. GameObject\07. Boss\BossNamePlate\Gorilla</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Camera_Boss.h">
+      <Filter>00. GameObject\00. Camera\BossCam</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1247,8 +1325,8 @@
     <ClCompile Include="..\Private\SkySphere.cpp">
       <Filter>00. GameObject\01. Map\SkySphere</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\SwordSlash.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\01. SwordSlash</Filter>
+    <ClCompile Include="..\Private\SwordSlash1.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Common_Curve03.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\05. Common_Curve03</Filter>
@@ -1259,8 +1337,8 @@
     <ClCompile Include="..\Private\Vacuum.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\03. Vacuum</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\VacuumContainer.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\02. VacuumContainer</Filter>
+    <ClCompile Include="..\Private\InhaleContainer.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\01. InhaleContainer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Map_Builder.cpp">
       <Filter>97. DataSystem\MapLoader\API</Filter>
@@ -1645,6 +1723,36 @@
     </ClCompile>
     <ClCompile Include="..\Private\NormalEnemy_State_Chase.cpp">
       <Filter>00. GameObject\06. Monster\03. NormalEnemy\State\Chase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Common_Ring03.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\08. Common_Ring03</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Common_JumpSlash.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\09. Common_JumpSlash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Sword_JumpSlash.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\CutsceneActor.cpp">
+      <Filter>08. CutsceneActor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\CutsceneGorilla.cpp">
+      <Filter>08. CutsceneActor\Gorilla</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Camera_Cutscene.cpp">
+      <Filter>00. GameObject\00. Camera\Cutscene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\CameraDirector.cpp">
+      <Filter>96. CameraDirector</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\BossNamePlate.cpp">
+      <Filter>00. GameObject\07. Boss\BossNamePlate</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GorillaNamePlate.cpp">
+      <Filter>00. GameObject\07. Boss\BossNamePlate\Gorilla</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Camera_Boss.cpp">
+      <Filter>00. GameObject\00. Camera\BossCam</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

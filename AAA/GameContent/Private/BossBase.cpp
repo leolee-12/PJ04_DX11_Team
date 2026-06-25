@@ -23,6 +23,10 @@ HRESULT CBossBase::Initialize(void* pArg)
     if (const _tchar* pTag = Get_AppearEventTag())
         Subscribe_Event(pTag, [this](void*) { Appear(); });
 
+    Subscribe_Event(EVT_QUERY_BOSS, [this](void* p) {
+        if (auto q = static_cast<BOSS_QUERY*>(p)) q->pBoss = this;
+        });
+
     return S_OK;
 }
 

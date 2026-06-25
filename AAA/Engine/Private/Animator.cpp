@@ -29,7 +29,8 @@ HRESULT CAnimator::Initialize(void* pArg)
     m_strDataFilePath = !pDesc->strDataFile.empty() ? pDesc->strDataFile : Make_DefaultDataFilePath();
 
     if (!pDesc->strDataFile.empty())
-        Load_FromFile(m_strDataFilePath);
+        if (FAILED(Load_FromFile(m_strDataFilePath)))
+            MSG_BOX("NotFound : AnimEvents.json");
 
     return S_OK;
 }
@@ -337,6 +338,7 @@ void CAnimator::Update(_float fTimeDelta)
         Reset_RuntimeState(itPrev != m_Tracks.end() ? &itPrev->second : nullptr);
         m_strPrevAnimName = strCur;
         m_fPrevProgress = 0.f;
+        m_fPrevProgress = -0.0001f;
     }
 
     auto it = m_Tracks.find(strCur);
