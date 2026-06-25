@@ -547,6 +547,12 @@
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\08. Common_Ring03">
       <UniqueIdentifier>{ea802e0e-a008-40c2-8690-c4635c1185e3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\09. Common_JumpSlash">
+      <UniqueIdentifier>{a7a58fec-6650-4f57-9df6-0b8c82791b61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash">
+      <UniqueIdentifier>{61c41364-99b2-4864-a87d-85109fe32b06}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1098,6 +1104,12 @@
     <ClInclude Include="..\Public\Common_Ring03.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\08. Common_Ring03</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Common_JumpSlash.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\09. Common_JumpSlash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Sword_JumpSlash.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1573,6 +1585,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Common_Ring03.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\08. Common_Ring03</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Common_JumpSlash.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\09. Common_JumpSlash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Sword_JumpSlash.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
