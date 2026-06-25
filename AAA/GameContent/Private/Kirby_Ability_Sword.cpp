@@ -618,7 +618,7 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, _float fTimeDelta)
             if (CanPlayEffect(SWORD_EFFECT::SLASH3, pAnimator, 0.38f))
             {
                 CEffect_Loader::GetInstance()->Spawn(L"SwordSlash3", pKirby->Get_LevelIndex(),
-                    _float3(0.5f, 0.7f, 0.f), _float3(0.f, 0.f, 1.f), _float3(0.f, 240.f, 0.f),
+                    _float3(0.5f, 0.8f, 0.f), _float3(0.f, 0.f, 1.f), _float3(0.f, 240.f, 0.f),
                     pKirby->Get_Transform()->Get_WorldMatrixPtr());
             }
 
