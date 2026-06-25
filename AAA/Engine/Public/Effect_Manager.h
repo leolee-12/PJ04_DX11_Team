@@ -70,5 +70,5 @@ public:
 NS_END
 
 //CEffect_Container* pFx = nullptr;
-//pGI->Spawn_Effect(iLevel, L"Proto_VacuumContainer", desc, &pFx); // 휴면 재사용 or 신규
+//pGI->Spawn_Effect(iLevel, L"Proto_InhaleContainer", desc, &pFx); // 휴면 재사용 or 신규
 //if (pFx) pFx->EffectContainer_Start(vPos, vLook, pParentMat);    // m_bIsPlay=true + accTime=0 + 파트 Effect_Start = 초기값 리셋

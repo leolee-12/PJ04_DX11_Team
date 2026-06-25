@@ -176,10 +176,7 @@ void CPanel_UICanvas::Render()
         m_vCanvasMin = { vImagePos.x, vImagePos.y };
         m_vCanvasSize = { vSize.x, vSize.y };
 
-        if (m_pSRV)
-            ImGui::Image((ImTextureID)m_pSRV, vSize);
-        else
-            ImGui::Dummy(vSize);
+        Draw_OpaqueImage(m_pSRV, vSize);
 
         if (ImGui::BeginDragDropTarget())
         {

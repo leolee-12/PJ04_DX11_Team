@@ -111,15 +111,29 @@ PS_OUT PS_BODY(PS_IN In)
 {
     PS_OUT Out;
 
-    float4 vMask = g_BodyMaskTexture.Sample(ClampSampler, In.vTexcoord);
-    float3 vAlbedo = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord).rgb;
-    vAlbedo = lerp(vAlbedo, vMask.rgb, vMask.a);
+    float4 vDiffuse = g_BodyMaskTexture.Sample(ClampSampler, In.vTexcoord);
+    float  fGray = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord).r;
+    
+    float3 vGrayPart = vDiffuse.rgb * fGray;
+    
+    float3 vAlbedo = lerp(vGrayPart, vDiffuse.rgb, vDiffuse.a);
     
     float3 vMRA = g_MRATexture.Sample(ClampSampler, In.vTexcoord).rgb;
     
+    float3 N = normalize(In.vNormal);
+    float3 T = normalize(In.vTangent.xyz);
+    float3 B = normalize(In.vBinormal.xyz);
+  
+    float3x3 TBN = float3x3(T, B, N);
+
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, In.vTexcoord).rg;
+    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+    
+    float3 Nw = mul(nTS, TBN);
+    
    
     Out.vDiffuse = float4(vAlbedo, 1.f);
-    Out.vNormal = float4(In.vNormal.rgb * 0.5f + 0.5f, 0.f);
+    Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(vMRA, g_iMaterialID / 255.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
@@ -144,9 +158,20 @@ PS_OUT PS_EYE(PS_IN In)
             vEyeMask.b * EYE_BLUE;
 
     vAlbedo = lerp(vAlbedo, result, fEyeAlpha);
+    
+    float3 N = normalize(In.vNormal);
+    float3 T = normalize(In.vTangent.xyz);
+    float3 B = normalize(In.vBinormal.xyz);
+  
+    float3x3 TBN = float3x3(T, B, N);
+
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, In.vTexcoord).rg;
+    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+    
+    float3 Nw = mul(nTS, TBN);
    
     Out.vDiffuse = float4(vAlbedo, 1.f);
-    Out.vNormal = float4(In.vNormal.rgb * 0.5f + 0.5f, 0.f);
+    Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
@@ -161,9 +186,20 @@ PS_OUT PS_SKIN(PS_IN In)
 
     float3 vAlbedo = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord).rgb;
     float3 vMRA    = g_MRATexture.Sample(ClampSampler, In.vTexcoord).rgb;
+    
+    float3 N = normalize(In.vNormal);
+    float3 T = normalize(In.vTangent.xyz);
+    float3 B = normalize(In.vBinormal.xyz);
+  
+    float3x3 TBN = float3x3(T, B, N);
+
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, In.vTexcoord).rg;
+    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+    
+    float3 Nw = mul(nTS, TBN);
    
     Out.vDiffuse = float4(vAlbedo, 1.f);
-    Out.vNormal = float4(In.vNormal.rgb * 0.5f + 0.5f, 0.f);
+    Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(vMRA, g_iMaterialID / 255.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
@@ -178,9 +214,20 @@ PS_OUT PS_ANCHOR(PS_IN In)
 
     float3 vAlbedo = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord).rgb;
     float3 vMRA = g_MRATexture.Sample(ClampSampler, In.vTexcoord).rgb;
+    
+    float3 N = normalize(In.vNormal);
+    float3 T = normalize(In.vTangent.xyz);
+    float3 B = normalize(In.vBinormal.xyz);
+  
+    float3x3 TBN = float3x3(T, B, N);
+
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, In.vTexcoord).rg;
+    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+    
+    float3 Nw = mul(nTS, TBN);
    
     Out.vDiffuse = float4(vAlbedo, 1.f);
-    Out.vNormal = float4(In.vNormal.rgb * 0.5f + 0.5f, 0.f);
+    Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(vMRA, g_iMaterialID / 255.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);

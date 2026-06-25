@@ -27,6 +27,12 @@ void CMonster_State_KnockBack::Enter()
 
 	if (m_pAnimator && !m_PlayInfo.strAniName.empty())
 		m_pAnimator->Play(&m_PlayInfo);
+
+	if (m_pMovement)
+	{
+		const CMonster::HIT_REACTION& LastHit = m_pOwner->Get_LastHit();
+		m_pMovement->Knockback(XMLoadFloat3(&LastHit.vAttackerPos), LastHit.fKnockBack);
+	}
 }
 
 void CMonster_State_KnockBack::Update(_float fTimeDelta)
@@ -36,13 +42,19 @@ void CMonster_State_KnockBack::Update(_float fTimeDelta)
 
 	m_fTimer += fTimeDelta;
 
+	if (m_pAnimator == nullptr)
+		return;
+
+	if (m_pAnimator)
+		m_pAnimator->TiltByProgress("RotL", 30.f, XMVectorSet(1.f, 0.f, 0.f, 0.f));
+
 	const _bool bLanded = (m_pMovement && !m_pMovement->Is_Launched());
 	const _bool bTimeOut = (m_fTimer >= m_fMaxTime);
 	if (!bLanded && !bTimeOut)
-		return;					// 런치 + 모든 바운스 동안 루프 유지
+		return;
 
-	// TODO : 사망 연결 후 IS_Dead() ? Set_Deadt() : 아래 로직
 	m_pOwner->Change_State(MONSTER_STATE_TYPE::IDLE);
+
 }
 
 void CMonster_State_KnockBack::Exit(MONSTER_STATE_TYPE eNextState)

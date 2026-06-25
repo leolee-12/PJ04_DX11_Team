@@ -6,22 +6,22 @@ NS_BEGIN(Engine)
 
 class CEffect_Part;
 
-class CVacuumContainer final : public CEffect_Container
+class CSwordSlash1 final : public CEffect_Container
 {
-    GENERATED_BODY(CVacuumContainer)
+    GENERATED_BODY(CSwordSlash1)
 
 public:
-    struct VACUUM_CONTAINER_DESC : public CEffect_Container::EFFECT_CONTAINER_DESC
+    struct SWORD_SLASH1_DESC : public CEffect_Container::EFFECT_CONTAINER_DESC
     {
 
     };
 
-    static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_VacuumContainer";
+    static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_SwordSlash1";
 
 private:
-    CVacuumContainer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-    CVacuumContainer(const CVacuumContainer& Prototype);
-    virtual ~CVacuumContainer() = default;
+    CSwordSlash1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    CSwordSlash1(const CSwordSlash1& Prototype);
+    virtual ~CSwordSlash1() = default;
 
 protected:
     virtual HRESULT Initialize_Prototype() override;
@@ -34,15 +34,11 @@ public:
     virtual HRESULT Render() override;
     virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
-public:
-    void On_SuperInhale();
-    void Off_SuperInhale();
-
 private:
     HRESULT Ready_EffectPartObjects();
 
 public:
-    static CVacuumContainer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    static CSwordSlash1* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual CGameObject* Clone(void* pArg) override;
 private:
     virtual void Free() override;

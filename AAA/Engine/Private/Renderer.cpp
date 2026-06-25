@@ -458,6 +458,10 @@ HRESULT CRenderer::Render_Combined()
     if (FAILED(m_pShaderDeferred->Bind_RawValue("g_fIBLIntensity", &env.fIntensity, sizeof(_float))))
         return E_FAIL;
 
+    if (FAILED(m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderDeferred,
+        { "g_fAmbientIntensity", "g_vAmbientColor", "g_fAmbientSaturation" })))
+        return E_FAIL;
+
     //볼류메트릭포그
     if (FAILED(m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderDeferred, "g_fFogEnable")))
         return E_FAIL;

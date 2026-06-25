@@ -27,22 +27,32 @@
     <ClInclude Include="..\Public\BladeKnight_State_TornadoAttack.h" />
     <ClInclude Include="..\public\Boss.h" />
     <ClInclude Include="..\public\BossBase.h" />
+    <ClInclude Include="..\public\BossNamePlate.h" />
     <ClInclude Include="..\public\Boss_Brain.h" />
     <ClInclude Include="..\public\Boss_Gorilla.h" />
     <ClInclude Include="..\public\Boss_Gorilla_Body.h" />
     <ClInclude Include="..\public\Boss_Gorilla_Brain.h" />
+    <ClInclude Include="..\public\CameraDirector.h" />
     <ClInclude Include="..\Public\Camera_AreaData.h" />
     <ClInclude Include="..\public\Camera_AreaCam.h" />
+    <ClInclude Include="..\public\Camera_Boss.h" />
+    <ClInclude Include="..\public\Camera_Cutscene.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\Public\Character.h" />
     <ClInclude Include="..\Public\Character_States.h" />
     <ClInclude Include="..\Public\Common_Circle01.h" />
     <ClInclude Include="..\Public\Common_Curve03.h" />
+    <ClInclude Include="..\Public\Common_JumpSlash.h" />
+    <ClInclude Include="..\Public\Common_Ring03.h" />
+    <ClInclude Include="..\public\CutsceneActor.h" />
+    <ClInclude Include="..\public\CutsceneGorilla.h" />
     <ClInclude Include="..\public\Damageable.h" />
     <ClInclude Include="..\public\Effect_Loader.h" />
     <ClInclude Include="..\Public\Env_CollisionCatalog.h" />
     <ClInclude Include="..\Public\Env_InstanceBatch.h" />
     <ClInclude Include="..\Public\Env_InstanceController.h" />
+    <ClInclude Include="..\Public\Sword_JumpSlash.h" />
+    <ClInclude Include="..\public\GorillaNamePlate.h" />
     <ClInclude Include="..\Public\LevelDesign_Boundary.h" />
     <ClInclude Include="..\Public\LevelDesign_Bush.h" />
     <ClInclude Include="..\Public\LevelDesign_Food.h" />
@@ -62,10 +72,12 @@
     <ClInclude Include="..\Public\Monster_State_Attack.h" />
     <ClInclude Include="..\Public\Monster_State_Captured.h" />
     <ClInclude Include="..\Public\Monster_State_Chase.h" />
+    <ClInclude Include="..\Public\Monster_State_Death.h" />
     <ClInclude Include="..\Public\Monster_State_Fall.h" />
     <ClInclude Include="..\Public\Monster_State_Detect.h" />
     <ClInclude Include="..\Public\Monster_State_Idle.h" />
     <ClInclude Include="..\Public\Monster_State_KnockBack.h" />
+    <ClInclude Include="..\Public\Monster_State_KnockBackDeath.h" />
     <ClInclude Include="..\Public\Monster_State_KnockOut.h" />
     <ClInclude Include="..\Public\Monster_State_Landing.h" />
     <ClInclude Include="..\Public\LevelDesign_Loader.h" />
@@ -179,7 +191,7 @@
     <ClInclude Include="..\Public\SmokeSphereOriginal.h" />
     <ClInclude Include="..\Public\SmokeTail.h" />
     <ClInclude Include="..\Public\Kirby_StateMachine.h" />
-    <ClInclude Include="..\Public\SwordSlash.h" />
+    <ClInclude Include="..\Public\SwordSlash1.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\TestEffectQuad.h" />
     <ClInclude Include="..\Public\TestFiona.h" />
@@ -202,7 +214,7 @@
     <ClInclude Include="..\Public\UI_Text.h" />
     <ClInclude Include="..\Public\UI_Title.h" />
     <ClInclude Include="..\Public\Vacuum.h" />
-    <ClInclude Include="..\Public\VacuumContainer.h" />
+    <ClInclude Include="..\Public\InhaleContainer.h" />
     <ClInclude Include="..\Public\WalkSmoke.h" />
   </ItemGroup>
   <ItemGroup>
@@ -214,16 +226,24 @@
     <ClCompile Include="..\Private\BladeKnight_State_TornadoAttack.cpp" />
     <ClCompile Include="..\private\Boss.cpp" />
     <ClCompile Include="..\private\BossBase.cpp" />
+    <ClCompile Include="..\private\BossNamePlate.cpp" />
     <ClCompile Include="..\private\Boss_Brain.cpp" />
     <ClCompile Include="..\private\Boss_Gorilla.cpp" />
     <ClCompile Include="..\private\Boss_Gorilla_Body.cpp" />
     <ClCompile Include="..\private\Boss_Gorilla_Brain.cpp" />
+    <ClCompile Include="..\private\CameraDirector.cpp" />
     <ClCompile Include="..\Private\Camera_AreaSolver.cpp" />
     <ClCompile Include="..\private\Camera_AreaCam.cpp" />
+    <ClCompile Include="..\private\Camera_Boss.cpp" />
+    <ClCompile Include="..\private\Camera_Cutscene.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Common_Circle01.cpp" />
     <ClCompile Include="..\Private\Common_Curve03.cpp" />
+    <ClCompile Include="..\Private\Common_JumpSlash.cpp" />
+    <ClCompile Include="..\Private\Common_Ring03.cpp" />
+    <ClCompile Include="..\private\CutsceneActor.cpp" />
+    <ClCompile Include="..\private\CutsceneGorilla.cpp" />
     <ClCompile Include="..\private\Effect_Loader.cpp" />
     <ClCompile Include="..\Private\EnvObject.cpp" />
     <ClCompile Include="..\Private\EnvObject_Trigger.cpp" />
@@ -239,6 +259,8 @@
     <ClCompile Include="..\private\GigantEdge_Body.cpp" />
     <ClCompile Include="..\private\GigantEdge_Shield.cpp" />
     <ClCompile Include="..\private\GigantEdge_Sword.cpp" />
+    <ClCompile Include="..\Private\Sword_JumpSlash.cpp" />
+    <ClCompile Include="..\private\GorillaNamePlate.cpp" />
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
@@ -283,10 +305,12 @@
     <ClCompile Include="..\Private\Monster_State_Attack.cpp" />
     <ClCompile Include="..\Private\Monster_State_Captured.cpp" />
     <ClCompile Include="..\Private\Monster_State_Chase.cpp" />
+    <ClCompile Include="..\Private\Monster_State_Death.cpp" />
     <ClCompile Include="..\Private\Monster_State_Fall.cpp" />
     <ClCompile Include="..\Private\Monster_State_Detect.cpp" />
     <ClCompile Include="..\Private\Monster_State_Idle.cpp" />
     <ClCompile Include="..\Private\Monster_State_KnockBack.cpp" />
+    <ClCompile Include="..\Private\Monster_State_KnockBackDeath.cpp" />
     <ClCompile Include="..\Private\Monster_State_KnockOut.cpp" />
     <ClCompile Include="..\Private\Monster_State_Landing.cpp" />
     <ClCompile Include="..\Private\Monster_State_Patrol.cpp" />
@@ -342,7 +366,7 @@
     <ClCompile Include="..\Private\SmokeSphereOriginal.cpp" />
     <ClCompile Include="..\Private\SmokeTail.cpp" />
     <ClCompile Include="..\Private\Kirby_StateMachine.cpp" />
-    <ClCompile Include="..\Private\SwordSlash.cpp" />
+    <ClCompile Include="..\Private\SwordSlash1.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\TestEffectQuad.cpp" />
     <ClCompile Include="..\Private\TestFiona.cpp" />
@@ -364,7 +388,7 @@
     <ClCompile Include="..\Private\UI_Text.cpp" />
     <ClCompile Include="..\Private\UI_Title.cpp" />
     <ClCompile Include="..\Private\Vacuum.cpp" />
-    <ClCompile Include="..\Private\VacuumContainer.cpp" />
+    <ClCompile Include="..\Private\InhaleContainer.cpp" />
     <ClCompile Include="..\Private\WalkSmoke.cpp" />
   </ItemGroup>
   <ItemGroup>

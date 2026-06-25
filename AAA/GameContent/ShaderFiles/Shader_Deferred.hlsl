@@ -6,6 +6,7 @@ float4x4 g_ViewMatrixInverse, g_ProjMatrixInverse;
 
 float3 g_vAmbientColor = float3(0.69f, 0.60f, 0.50f);
 float g_fAmbientSaturation = 0.6f;
+float g_fAmbientIntensity = 3.f;
 
   /* G-buffer */
 Texture2D g_Texture; // 디버그용

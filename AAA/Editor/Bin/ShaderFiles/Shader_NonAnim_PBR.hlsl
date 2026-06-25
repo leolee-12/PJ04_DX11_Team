@@ -7,6 +7,9 @@ Texture2D g_NormalTexture;
 Texture2D g_UnknownTexture;
 Texture2D g_MRATexture;
 
+float4 g_vColor = float4(1.f, 1.f, 1.f, 1.f);
+float3 g_vMRA = float3(0.f, 1.f, 1.f);
+
 float2 g_vMaskValue;
 float4 g_vBlendColor;
 
@@ -539,6 +542,20 @@ PS_OUT PS_DISCARD(PS_NONINST_IN In)
     return (PS_OUT) 0;
 }
 
+PS_OUT PS_COLOR_MRA_DITHER(PS_IN In)
+{
+    Apply_Dissolve(In.vPosition); // 디더 디졸브
+
+    PS_OUT Out;
+    Out.vDiffuse = g_vColor; // 텍스처 대신 상수 색
+    Out.vNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(g_vMRA, g_iMaterialID / 255.f); // 상수 MRA
+    Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
+    Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass DefaultPass // 0
@@ -681,5 +698,14 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_NONINST_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DISCARD();
+    }
+    pass ColorMRADitherPass // 14
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_COLOR_MRA_DITHER();
     }
 }

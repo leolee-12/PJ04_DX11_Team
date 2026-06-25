@@ -20,7 +20,9 @@ public:
 
     // ¿Ã∆Â∆Æ Ω∫∆˘«ÿ¡‡
     HRESULT Spawn(const _wstring& strEffectId, _uint iTargetLevel,
-        const _float3& vPos, const _float3& vLook = { 0.f,0.f,0.f },
+        const _float3& vPos,
+        const _float3& vLook = { 0.f, 0.f, 0.f },
+        const _float3& vRotDeg = { 0.f, 0.f, 0.f },
         const _float4x4* pParent = nullptr,
         Engine::CEffect_Container** ppOut = nullptr);
 

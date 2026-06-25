@@ -21,23 +21,29 @@ namespace Client
         SetBody = 10,
 
         OnOffPart = 11,
+        CamTrack  = 12,
+        FreezeAnim = 13,
+        PubEvent = 14,
         // 추가는 항상 끝에, 기존 값 변경 금지 (저장 데이터 안정성)
     };
 
     // 에디터 콤보용 이름표 (enum과 같은 곳에서 관리)
     inline const std::pair<EANIM_EVENT, const char*> g_AnimEventNames[] =
     {
-        { EANIM_EVENT::None,     "None"     },
-        { EANIM_EVENT::Fx,       "Fx"       },
-        { EANIM_EVENT::Hitbox,   "Hitbox"   },
-        { EANIM_EVENT::Sound,    "Sound"    },
-        { EANIM_EVENT::Footstep, "Footstep" },
-        { EANIM_EVENT::CamShake, "CamShake" },
-        { EANIM_EVENT::IFrame,   "IFrame"   },
-        { EANIM_EVENT::LockMove, "LockMove" },
-        { EANIM_EVENT::SetEye,   "SetEye"   },
-        { EANIM_EVENT::SetMouth, "SetMouth" },
-        { EANIM_EVENT::SetBody,  "SetBody"  },
-        { EANIM_EVENT::OnOffPart,  "OnOffPart"  },
+        { EANIM_EVENT::None,        "None"     },
+        { EANIM_EVENT::Fx,          "Fx"       },
+        { EANIM_EVENT::Hitbox,      "Hitbox"   },
+        { EANIM_EVENT::Sound,       "Sound"    },
+        { EANIM_EVENT::Footstep,    "Footstep" },
+        { EANIM_EVENT::CamShake,    "CamShake" },
+        { EANIM_EVENT::IFrame,      "IFrame"   },
+        { EANIM_EVENT::LockMove,    "LockMove" },
+        { EANIM_EVENT::SetEye,      "SetEye"   },
+        { EANIM_EVENT::SetMouth,    "SetMouth" },
+        { EANIM_EVENT::SetBody,     "SetBody"  },
+        { EANIM_EVENT::OnOffPart,   "OnOffPart" },
+        { EANIM_EVENT::CamTrack,    "CamTrack"  },
+        { EANIM_EVENT::FreezeAnim,  "FreezeAnim" },
+        { EANIM_EVENT::PubEvent,    "PubEvent"  },
     };
 }
