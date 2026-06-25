@@ -540,9 +540,12 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1">
       <UniqueIdentifier>{bd114556-93e2-4c7f-a452-7483746e046a}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockBack\KnockBackDeath">
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockBack\KnockBackDeath">
       <UniqueIdentifier>{f45699c1-0279-42f5-8174-aecc983bb4b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\08. Common_Ring03">
+      <UniqueIdentifier>{ea802e0e-a008-40c2-8690-c4635c1185e3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1092,6 +1095,9 @@
     <ClInclude Include="..\Public\Monster_State_KnockBackDeath.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\KnockBack\KnockBackDeath</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Common_Ring03.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\08. Common_Ring03</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1564,6 +1570,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Monster_State_KnockBackDeath.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\KnockBack\KnockBackDeath</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Common_Ring03.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\08. Common_Ring03</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

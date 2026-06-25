@@ -62,8 +62,13 @@ namespace ProtoDesc
 	inline constexpr TEXTURE_DESC Texture_Wind01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Wind01"), TEXT("../../Resources/YSE/Effect/InhaleEffect2M/wind01.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_Wind02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Wind02"), TEXT("../../Resources/YSE/Effect/InhaleEffect2M/wind02.png"), 1 };
 
+	inline constexpr TEXTURE_DESC Texture_Common_Flash02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_Flash02"), TEXT("../../Resources/YSE/Effect/Common_Curve03/common_flash02.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Common_Flash03 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_Flash03"), TEXT("../../Resources/YSE/Effect/Common_Curve03/common_flash03.png"), 1 };
+
+
 	// SwordSlash1
-	inline constexpr TEXTURE_DESC Texture_Common_Flash02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_Flash02"), TEXT("../../Resources/Test/Test/SmokeSphereOriginal/common_flash02.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Common_Ring02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_Ring02"), TEXT("../../Resources/YSE/Effect/Common_Ring03/common_ring02.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_SwordSlash2 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SwordSlash2"), TEXT("../../Resources/YSE/Effect/Common_Ring03/SwordSlash2.png"), 1 };
 
 	//sky
 	inline constexpr COMPONENT_DESC Model_SkyTest = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_SkyTest") };

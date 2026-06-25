@@ -58,7 +58,7 @@ void CKirby_Ability_Normal::Enter_Ability(CKirby* pKirby)
             Subscribe_InhaleCapturedEvent(pKirby);
 
             CEffect_Loader::GetInstance()->Spawn(L"InhaleContainer", pKirby->Get_LevelIndex(),
-                m_vInhaleEffectStartPos, _float3(0.f, 0.f, 1.f),
+                m_vInhaleEffectStartPos, _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 0.f),
                 pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pInhaleEffect);
 
             static_cast<CInhaleContainer*>(m_pInhaleEffect)->Off_SuperInhale();

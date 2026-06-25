@@ -368,9 +368,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
         BeginHit(true);
         pAnimator->Play("SideSlash", false, false, 0.1f, 1.5f);
 
-        CEffect_Loader::GetInstance()->Spawn(L"SwordSlash1", pKirby->Get_LevelIndex(),
-            _float3(0.f, 0.6f, 1.1f), _float3(0.f, 0.f, 1.f),
-            pKirby->Get_Transform()->Get_WorldMatrixPtr());
+        m_bIsStartEffect[SWORD_EFFECT::SLASH1] = false;
 
         break;
     }
@@ -391,6 +389,11 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
         BeginHit(true);
         pAnimator->Play("MultiswordAttack", false, false, 0.1f, 2.f);
 
+        m_bIsStartEffect[SWORD_EFFECT::SLASH2_1] = false;
+        m_bIsStartEffect[SWORD_EFFECT::SLASH2_2] = false;
+        m_bIsStartEffect[SWORD_EFFECT::SLASH2_3] = false;
+        m_bIsStartEffect[SWORD_EFFECT::SLASH2_4] = false;
+
         break;
     }
 
@@ -401,6 +404,8 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
 
         BeginHit(true);
         pAnimator->Play("DecisiveSlash", false, false, 0.1f, 2.f);
+
+        m_bIsStartEffect[SWORD_EFFECT::SLASH3] = false;
 
         break;
     }
@@ -537,6 +542,14 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, _float fTimeDelta)
                 else
                     Change_SwordState(pKirby, SWORD_STATE::SLASH_1_END);
             }
+
+            if (CanPlayEffect(SWORD_EFFECT::SLASH1, pAnimator, 0.45f))
+            {
+                CEffect_Loader::GetInstance()->Spawn(L"SwordSlash1", pKirby->Get_LevelIndex(),
+                    _float3(-0.2f, 0.75f, 1.1f), _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 12.f),
+                    pKirby->Get_Transform()->Get_WorldMatrixPtr());
+            }
+
             break;
 
         case SWORD_STATE::SLASH_1_END:
@@ -562,6 +575,32 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, _float fTimeDelta)
                 else
                     Change_SwordState(pKirby, SWORD_STATE::END);
             }
+
+            if (CanPlayEffect(SWORD_EFFECT::SLASH2_1, pAnimator, 0.1f))
+            {
+                CEffect_Loader::GetInstance()->Spawn(L"SwordSlash1", pKirby->Get_LevelIndex(),
+                    _float3(0.1f, 0.55f, 1.3f), _float3(0.f, 0.f, 1.f), _float3(0.f, -10.f, 170.f),
+                    pKirby->Get_Transform()->Get_WorldMatrixPtr());
+            }
+            if (CanPlayEffect(SWORD_EFFECT::SLASH2_2, pAnimator, 0.32f))
+            {
+                CEffect_Loader::GetInstance()->Spawn(L"SwordSlash1", pKirby->Get_LevelIndex(),
+                    _float3(-0.2f, 0.9f, 1.1f), _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 15.f),
+                    pKirby->Get_Transform()->Get_WorldMatrixPtr());
+            }
+            if (CanPlayEffect(SWORD_EFFECT::SLASH2_3, pAnimator, 0.5f))
+            {
+                CEffect_Loader::GetInstance()->Spawn(L"SwordSlash1", pKirby->Get_LevelIndex(),
+                    _float3(0.1f, 0.55f, 1.3f), _float3(0.f, 0.f, 1.f), _float3(0.f, -15.f, 170.f),
+                    pKirby->Get_Transform()->Get_WorldMatrixPtr());
+            }
+            if (CanPlayEffect(SWORD_EFFECT::SLASH2_4, pAnimator, 0.75f))
+            {
+                CEffect_Loader::GetInstance()->Spawn(L"SwordSlash1", pKirby->Get_LevelIndex(),
+                    _float3(-0.2f, 0.9f, 1.1f), _float3(0.f, 0.f, 1.f), _float3(0.f, 20.f, 2.f),
+                    pKirby->Get_Transform()->Get_WorldMatrixPtr());
+            }
+
             break;
 
         case SWORD_STATE::SLASH_3:
@@ -750,6 +789,21 @@ void CKirby_Ability_Sword::ChargeAnimationOverlay(CKirby* pKirby)
 
         m_ePreSwordMoveState = m_eCurSwordMoveState;
     }
+}
+
+_bool CKirby_Ability_Sword::CanPlayEffect(SWORD_EFFECT eSwordEffect, CAnimator* pAnimator, _float fRatio)
+{
+    if (m_bIsStartEffect[eSwordEffect] == true)
+        return false;
+
+    _float fCurAniRatio = pAnimator->Get_Progress();
+
+    if (fCurAniRatio < fRatio)
+        return false;
+
+    m_bIsStartEffect[eSwordEffect] = true;
+
+    return true;
 }
 
 CKirby_Ability_Sword* CKirby_Ability_Sword::Create()

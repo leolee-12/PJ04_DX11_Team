@@ -4,7 +4,7 @@
 #include "GameContent_const.h"
 
 #include "Common_Curve03.h"
-#include "Common_Circle01.h"
+#include "Common_Ring03.h"
 
 CSwordSlash1::CSwordSlash1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Container(pDevice, pContext)
@@ -58,7 +58,7 @@ HRESULT CSwordSlash1::Render()
 
 HRESULT CSwordSlash1::Ready_EffectPartObjects()
 {
-    Add_Effect_PartObject(m_iPrototypeLevel, CCommon_Curve03::PROTOTYPE_TAG, TEXT("Proto_Common_Curve03"));
+    Add_Effect_PartObject(m_iPrototypeLevel, CCommon_Ring03::PROTOTYPE_TAG, TEXT("Proto_Common_Ring03"));
 
     return S_OK;
 }

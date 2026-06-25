@@ -31,6 +31,8 @@ private:
 
 	enum SWORD_MOVE_STATE { NONE_MOVE, MOVE_FRONT, MOVE_RIGHT};
 
+	enum SWORD_EFFECT { SLASH1, SLASH2_1, SLASH2_2, SLASH2_3, SLASH2_4, SLASH3, EFFECT_END};
+
 private:
 	CKirby_Ability_Sword();
 	virtual ~CKirby_Ability_Sword() = default;
@@ -75,6 +77,8 @@ private:
 
 	static constexpr const _char* OverlayMasks[2] = { "L_FootJ", "R_FootJ" };
 
+	_bool m_bIsStartEffect[SWORD_EFFECT::EFFECT_END]{};
+
 private:
 	void Update_ChargeTime(_float fTimeDelta);
 	void MoveLock_Ratio(_float fRatio, _float fRatioStart, _float fRatioEnd);
@@ -87,6 +91,8 @@ private:
 
 	_bool Has_SwordMoveDir();
 	void ChargeAnimationOverlay(CKirby* pKirby);
+
+	_bool CanPlayEffect(SWORD_EFFECT eSwordEffect, CAnimator* pAnimator, _float fRatio);
 
 public:
 	static CKirby_Ability_Sword* Create();
