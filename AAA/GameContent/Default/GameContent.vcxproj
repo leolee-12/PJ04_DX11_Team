@@ -38,11 +38,14 @@
     <ClInclude Include="..\Public\Character_States.h" />
     <ClInclude Include="..\Public\Common_Circle01.h" />
     <ClInclude Include="..\Public\Common_Curve03.h" />
+    <ClInclude Include="..\Public\Common_JumpSlash.h" />
+    <ClInclude Include="..\Public\Common_Ring03.h" />
     <ClInclude Include="..\public\Damageable.h" />
     <ClInclude Include="..\public\Effect_Loader.h" />
     <ClInclude Include="..\Public\Env_CollisionCatalog.h" />
     <ClInclude Include="..\Public\Env_InstanceBatch.h" />
     <ClInclude Include="..\Public\Env_InstanceController.h" />
+    <ClInclude Include="..\Public\Sword_JumpSlash.h" />
     <ClInclude Include="..\Public\LevelDesign_Bush.h" />
     <ClInclude Include="..\Public\LevelDesign_Food.h" />
     <ClInclude Include="..\Public\LevelDesign_Ladder.h" />
@@ -179,7 +182,7 @@
     <ClInclude Include="..\Public\SmokeSphereOriginal.h" />
     <ClInclude Include="..\Public\SmokeTail.h" />
     <ClInclude Include="..\Public\Kirby_StateMachine.h" />
-    <ClInclude Include="..\Public\SwordSlash.h" />
+    <ClInclude Include="..\Public\SwordSlash1.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\TestEffectQuad.h" />
     <ClInclude Include="..\Public\TestFiona.h" />
@@ -202,7 +205,7 @@
     <ClInclude Include="..\Public\UI_Text.h" />
     <ClInclude Include="..\Public\UI_Title.h" />
     <ClInclude Include="..\Public\Vacuum.h" />
-    <ClInclude Include="..\Public\VacuumContainer.h" />
+    <ClInclude Include="..\Public\InhaleContainer.h" />
     <ClInclude Include="..\Public\WalkSmoke.h" />
   </ItemGroup>
   <ItemGroup>
@@ -224,6 +227,8 @@
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Common_Circle01.cpp" />
     <ClCompile Include="..\Private\Common_Curve03.cpp" />
+    <ClCompile Include="..\Private\Common_JumpSlash.cpp" />
+    <ClCompile Include="..\Private\Common_Ring03.cpp" />
     <ClCompile Include="..\private\Effect_Loader.cpp" />
     <ClCompile Include="..\Private\EnvObject.cpp" />
     <ClCompile Include="..\Private\EnvObject_Trigger.cpp" />
@@ -239,6 +244,7 @@
     <ClCompile Include="..\private\GigantEdge_Body.cpp" />
     <ClCompile Include="..\private\GigantEdge_Shield.cpp" />
     <ClCompile Include="..\private\GigantEdge_Sword.cpp" />
+    <ClCompile Include="..\Private\Sword_JumpSlash.cpp" />
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
@@ -342,7 +348,7 @@
     <ClCompile Include="..\Private\SmokeSphereOriginal.cpp" />
     <ClCompile Include="..\Private\SmokeTail.cpp" />
     <ClCompile Include="..\Private\Kirby_StateMachine.cpp" />
-    <ClCompile Include="..\Private\SwordSlash.cpp" />
+    <ClCompile Include="..\Private\SwordSlash1.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\TestEffectQuad.cpp" />
     <ClCompile Include="..\Private\TestFiona.cpp" />
@@ -364,7 +370,7 @@
     <ClCompile Include="..\Private\UI_Text.cpp" />
     <ClCompile Include="..\Private\UI_Title.cpp" />
     <ClCompile Include="..\Private\Vacuum.cpp" />
-    <ClCompile Include="..\Private\VacuumContainer.cpp" />
+    <ClCompile Include="..\Private\InhaleContainer.cpp" />
     <ClCompile Include="..\Private\WalkSmoke.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -31,6 +31,8 @@ void CKirby_Damaged::Enter(CKirby* pKirby)
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
     pAbility->Clear_Overlay(pKirby, 1, 0.1f);
     pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::DAMAGED);
+
+    pKirby->Get_Body()->Set_Eye(KIRBY_EYE_STATE::CLOSE);
 }
 
 void CKirby_Damaged::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -40,12 +42,28 @@ void CKirby_Damaged::Update(CKirby* pKirby, const _float fTimeDelta)
     CKirby_Body* pBody = pKirby->Get_Body();
     CAnimator* pAnimator = pBody->Get_Animator();
 
-    if (pAnimator->Get_Progress() >= 0.25f)
+    const _float fCurRatio = pAnimator->Get_Progress();
+
+    const _float fStartRatio = 0.f;
+    const _float fEndRatio = 0.25f;
+
+    _float fRotRatio = fCurRatio / (fEndRatio - fStartRatio);
+    Helper::FloatClamp(fRotRatio, 0.f, 1.f);
+
+    _vector vAxis = XMVectorSet(1.f, 0.f, 0.f, 0.f);
+    pAnimator->SetBoneRotation("RotL", fRotRatio * 360.f, vAxis);
+
+    if (pAnimator->Get_Progress() >= fEndRatio)
+    {
+        pAnimator->SetBoneRotation("RotL", 0.f, vAxis);
         Transition_Fall_OR_Wait_OR_Run(pKirby);
+    }
 }
 
 void CKirby_Damaged::Exit(CKirby* pKirby)
 {
+    pKirby->Get_Body()->Set_Eye(KIRBY_EYE_STATE::IDLE);
+
     __super::Exit(pKirby);
 }
 

@@ -356,14 +356,6 @@ void CKirby::SetUp_Collider_Callback()
 #endif
                 }
             });
-        
-        //m_KirbyColliders[HURT_BOX]->Set_OnStay([this](CCollider* pOther) {
-        //      여기에 콜백을
-        //    });
-        //
-        //m_KirbyColliders[HURT_BOX]->Set_OnExit([this](CCollider* pOther) {
-        //      넣으시오
-        //    });
     }
 }
 
