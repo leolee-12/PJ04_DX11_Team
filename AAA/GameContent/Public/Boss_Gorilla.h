@@ -24,7 +24,6 @@ public:
     virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void* pArg) override;
     virtual void    Update(_float fTimeDelta) override;
-    virtual void    On_Deserialized() override;
     virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* p) override { p->strPrototypeTag = PROTOTYPE_TAG; }
 
 public:
@@ -32,31 +31,43 @@ public:
     virtual CMultiHitBoxPart* Get_HitBoxPart() const override;
 
 protected:
-    // CBossBase 연출 훅 (파츠 전까지 스텁)
     virtual CMonsterBrain* Create_Brain() override;
-    virtual void           Play_Intro() override {}                         // TODO: 바디 애님
-    virtual _bool          Is_Intro_Finished() const override { return true; }
-    virtual void           Play_Death() override {}                         // TODO
+    virtual void           Play_Intro() override;
+    virtual _bool          Is_Intro_Finished() const override;
+    virtual void           Play_Death() override {}                         
     virtual _bool          Is_Death_Finished() const override { return true; }
 
-    // CBoss 페이즈 정의
     virtual const vector<_float>& Get_PhaseThresholds() const override { return s_Thresholds; }
     virtual void           Play_PhaseTransition(_int iNewPhase) override;
     virtual _bool          Is_PhaseTransition_Finished() const override;
     virtual void           On_PhaseChanged(_int iOldPhase, _int iNewPhase) override;
 
-    // CMonster 충돌 스펙
     virtual _float Get_CapsuleRadius() const override { return s_fCCT_Radius; }
     virtual _float Get_CapsuleHeight() const override { return s_fCCT_Height; }
     virtual _float Get_InteractRadius() const override { return 0.f; }
     virtual _bool  Get_HurtBoxDesc(CAPSULE_DESC& Out) const override;
 
+    virtual const _tchar*  Get_AppearEventTag() const override { return EventTag::Cutscene_GorillaHandoff; }
+    virtual HRESULT        Ready_AnimEvents() override;                       
+
     virtual HRESULT Ready_PartObjects() override;
-    //virtual HRESULT Ready_AnimEvents() override;
 
 private:
     CBoss_Gorilla_Body* m_pBody = { nullptr };
-    static const vector<_float> s_Thresholds;   // HP비율 내림차순 → 3페이즈
+    static const vector<_float> s_Thresholds;
+
+    _int  m_iIntroStep = { -1 };
+    _bool m_bIntroDone = { false };
+    _float m_fFreezeTimer = { 0.f };
+
+    static constexpr const _char* s_Intro[] = {
+          "CatchSuccessB", "CatchSuccessWait", "CatchRelease", "Roar"
+    };
+
+private:
+    void Tick_OpeningCatch();                    
+    void Fire_CatchCamera(const _tchar* szTrack);
+    void Begin_AnimFreeze(_float fSeconds);
 
 public:
     static CBoss_Gorilla* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

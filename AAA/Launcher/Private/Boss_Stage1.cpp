@@ -7,6 +7,9 @@
 #include "Launcher_LevelProfiles.h"
 #include "Camera_AreaCam.h"
 #include "Level_Loading.h"
+#include "CameraDirector.h"
+#include "Camera_Cutscene.h"
+#include "Camera_Boss.h"
 
 CBoss_Stage1::CBoss_Stage1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel{ pDevice, pContext }
@@ -75,6 +78,13 @@ void CBoss_Stage1::Update(_float fTimeDelta)
 #ifdef  _DEBUG
     if (m_pGameInstance_Proxy->Key_Down(DIK_F1))
         m_pGameInstance_Proxy->Publish(TEXT("FadeOut_Start"), nullptr);
+    if (m_pGameInstance_Proxy->Key_Down(DIK_F2))
+    {
+        m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GorillaAppear, nullptr);
+        //CUTSCENE_HANDOFF_DESC ho{};
+        //m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GorillaHandoff, &ho);
+    }
+
 #endif //  _DEBUG
 }
 
@@ -128,9 +138,35 @@ HRESULT CBoss_Stage1::Ready_Camera()
     CamDesc.strTargetLayer = TEXT("Layer_LiveObject");
     CamDesc.strTargetObj = TEXT("Proto_Kirby_0");
     CamDesc.strDataPath = TEXT("../../Resources/YSH/CameraData/Level1_Stage5_Step01_cam.json");
-    m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::BOSS_STAGE1),
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::BOSS_STAGE1),
         TEXT("Prototype_GameObject_Camera_Follow"),
-        ETOUI(LEVEL::BOSS_STAGE1), TEXT("Layer_Camera"), TEXT("CameraFollow"), &CamDesc);
+        ETOUI(LEVEL::BOSS_STAGE1), TEXT("Layer_Camera"), TEXT("CameraFollow"), &CamDesc)))
+        return E_FAIL;
+
+    m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::BOSS_STAGE1),
+        CCamera_Cutscene::PROTOTYPE_TAG, CCamera_Cutscene::Create(m_pDevice, m_pContext));
+    CCamera_Cutscene::CUTSCENECAM_DESC CutDesc{};
+    CutDesc.fFovy = XMConvertToRadians(50.f); CutDesc.fNear = 0.1f; CutDesc.fFar = 1000.f;
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::BOSS_STAGE1),
+        CCamera_Cutscene::PROTOTYPE_TAG,
+        ETOUI(LEVEL::BOSS_STAGE1), TEXT("Layer_Camera"), TEXT("CameraCutscene"), &CutDesc)))
+        return E_FAIL;
+
+    m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::BOSS_STAGE1),
+        CCamera_Boss::PROTOTYPE_TAG, CCamera_Boss::Create(m_pDevice, m_pContext));
+    CCamera_Boss::BOSSCAM_DESC BossDesc{};
+    BossDesc.fFovy = XMConvertToRadians(50.f); BossDesc.fNear = 0.1f; BossDesc.fFar = 1000.f;
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::BOSS_STAGE1),
+        CCamera_Boss::PROTOTYPE_TAG, ETOUI(LEVEL::BOSS_STAGE1),
+        TEXT("Layer_Camera"), TEXT("CameraBoss"), &BossDesc)))
+        return E_FAIL;
+
+    m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::BOSS_STAGE1),
+        CCameraDirector::PROTOTYPE_TAG, CCameraDirector::Create(m_pDevice, m_pContext));
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::BOSS_STAGE1),
+        CCameraDirector::PROTOTYPE_TAG,
+        ETOUI(LEVEL::BOSS_STAGE1), TEXT("Layer_Camera"), TEXT("CameraDirector"))))
+        return E_FAIL;
 
     return S_OK;
 }

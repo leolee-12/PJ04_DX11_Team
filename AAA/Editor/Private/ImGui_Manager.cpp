@@ -705,7 +705,7 @@ void CImGui_Manager::Draw_Inspector()
     auto pModel = pSelected->Get_Component<CModel>(TEXT("Com_Model"));
     auto pAnimator = pSelected->Get_Component<CAnimator>(TEXT("Com_Animator"));
     if (pModel && pAnimator)
-        Draw_AnimatorEditor(pModel, pAnimator);
+        //Draw_AnimatorEditor(pModel, pAnimator);
 
     ImGui::Separator();
 

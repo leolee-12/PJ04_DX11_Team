@@ -39,12 +39,16 @@ HRESULT CBoss_Gorilla_Body::Render()
         {
             if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::UNKNOWN, 0)))
                 return E_FAIL;
+            if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", i, MTEX_TYPE::NORMALS, 0)))
+                return E_FAIL;
         }
         else
         {
             if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
                 return E_FAIL;
             if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
+                return E_FAIL;
+            if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", i, MTEX_TYPE::NORMALS, 0)))
                 return E_FAIL;
         }
 
@@ -113,7 +117,7 @@ HRESULT CBoss_Gorilla_Body::Ready_Components()
     PART_SETUP t{};
     t.tShader = Shader_Gorilla;
     t.szModelProtoTag = TEXT("Prototype_Component_Model_Boss_Gorilla_Body");
-    t.szAnimEventFile = nullptr;        
+    t.szAnimEventFile = TEXT("../../Resources/YSH/Boss/Gorilla/Body/Gorilla_anim_events.json");
     return Ready_MeshPart(t);
 }
 

@@ -48,17 +48,20 @@ void CBoss_Gorilla::Update(_float fTimeDelta)
         return;
     }
 #endif
+    if (m_fFreezeTimer > 0.f)
+    {
+        m_fFreezeTimer -= fTimeDelta;
+        if (m_fFreezeTimer <= 0.f)
+        {
+            m_fFreezeTimer = 0.f;
+            if (CAnimator* pAnim = Get_BodyAnimator()) pAnim->Resume();
+        }
+    }
 
-    if (m_eLife == EBOSS_LIFE::HIDDEN)
-        Appear();
+    if (m_eLife == EBOSS_LIFE::INTRO)
+        Tick_OpeningCatch();
 
     __super::Update(fTimeDelta);
-}
-
-void CBoss_Gorilla::On_Deserialized()
-{
-    __super::On_Deserialized();
-    m_pTransformCom->Set_Scale(3.f, 3.f, 3.f);  // TODO: 튜닝
 }
 
 CMonsterBrain* CBoss_Gorilla::Create_Brain()
@@ -66,10 +69,83 @@ CMonsterBrain* CBoss_Gorilla::Create_Brain()
     return CBoss_Gorilla_Brain::Create();
 }
 
+void CBoss_Gorilla::Play_Intro()
+{
+    m_iIntroStep = 0;
+    m_bIntroDone = false;
+    if (CAnimator* pAnim = Get_BodyAnimator())
+        pAnim->Play(s_Intro[0], false, true, 0.2f, 1.5f);
+}
+
+_bool CBoss_Gorilla::Is_Intro_Finished() const
+{
+    return m_bIntroDone;
+}
+
+HRESULT CBoss_Gorilla::Ready_AnimEvents()
+{
+    CAnimator* pAnim = Get_BodyAnimator();
+    if (!pAnim) return E_FAIL;
+
+    pAnim->Set_EventCallback([this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase) {
+        switch (static_cast<EANIM_EVENT>(e.iEventType))
+        {
+            case EANIM_EVENT::CamTrack:
+            {
+                if (e.strParam.empty())
+                {
+                    CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
+                    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+                }
+                else                      
+                {
+                    wstring w(e.strParam.begin(), e.strParam.end());
+                    Fire_CatchCamera(w.c_str());
+                }
+                break;
+            }
+            case EANIM_EVENT::CamShake:
+                if (e.bIsRange)
+                {
+                    _float lvl = 0.f;
+                    if (phase == ANIM_EVENT_PHASE::BEGIN)
+                        lvl = (e.iIntParam > 0 ? e.iIntParam : 50) / 100.f;
+                    if (phase == ANIM_EVENT_PHASE::BEGIN || phase == ANIM_EVENT_PHASE::END)
+                        m_pGameInstance_Proxy->Publish(EventTag::Camera_Rumble, &lvl);
+                }
+                break;
+
+            case EANIM_EVENT::FreezeAnim:
+            {
+                if (m_eLife != EBOSS_LIFE::INTRO)
+                    break;
+                if (phase == ANIM_EVENT_PHASE::POINT)
+                    Begin_AnimFreeze(e.vOffset.x > 0.f ? e.vOffset.x : 3.f);
+                break;
+            }
+
+            case EANIM_EVENT::PubEvent:
+            {
+                if (m_eLife != EBOSS_LIFE::INTRO)
+                    break;
+                if (phase == ANIM_EVENT_PHASE::POINT && !e.strParam.empty())
+                {
+                    wstring tag(e.strParam.begin(), e.strParam.end());
+                    m_pGameInstance_Proxy->Publish(tag, nullptr);
+                }
+                break;
+            }
+
+            default: break;
+        }
+        });
+    return S_OK;
+}
+
 void CBoss_Gorilla::Play_PhaseTransition(_int iNewPhase)
 {
     if (CAnimator* pAnim = Get_BodyAnimator())
-        pAnim->Play("Roar", false, true);
+        pAnim->Play("Roar", false, true, 0.2f, 1.5f);
 }
 
 _bool CBoss_Gorilla::Is_PhaseTransition_Finished() const
@@ -108,6 +184,43 @@ HRESULT CBoss_Gorilla::Ready_PartObjects()
         CBoss_Gorilla_Body::PROTOTYPE_TAG, CBoss_Gorilla_Body::PART_TAG);
     if (!m_pBody) return E_FAIL;
     return S_OK;
+}
+
+void CBoss_Gorilla::Tick_OpeningCatch()
+{
+    if (m_bIntroDone) return;
+
+    CAnimator* pAnim = Get_BodyAnimator();
+    if (!pAnim) { m_bIntroDone = true; return; }
+    if (!pAnim->Is_Finished()) return;          // 현재 클립 재생 중
+
+    ++m_iIntroStep;
+    constexpr _int iCount = static_cast<_int>(sizeof(s_Intro) / sizeof(s_Intro[0]));
+    if (m_iIntroStep >= iCount)
+    {
+        m_bIntroDone = true;                    // Roar 끝 -> INTRO 종료 -> 베이스가 네임플레이트 publish
+        // 안전망: BT 시작 전 게임플레이 캠 보장(이미 복귀돼 있으면 무해).
+        CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
+        m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+        return;
+    }
+    pAnim->Play(s_Intro[m_iIntroStep], false, true, 0.2f, 1.5f);
+}
+
+void CBoss_Gorilla::Fire_CatchCamera(const _tchar* szTrack)
+{
+    CUTSCENE_CAMERA_DESC cam{};
+    cam.eCam = ECutsceneCam::Cutscene;
+    cam.szTrack = szTrack;
+    cam.pProgress = Get_BodyAnimator();                      // 현재 잡기 클립 진행도
+    cam.pAnchorWorld = m_pTransformCom->Get_WorldMatrixPtr();   // 전투 고릴라 월드(라이브)
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+}
+
+void CBoss_Gorilla::Begin_AnimFreeze(_float fSeconds)
+{
+    if (CAnimator* pAnim = Get_BodyAnimator()) pAnim->Pause();
+    m_fFreezeTimer = fSeconds;
 }
 
 CBoss_Gorilla* CBoss_Gorilla::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -82,13 +82,13 @@ HRESULT CLevel_Tool::Initialize()
 
 HRESULT CLevel_Tool::Ready_Lights()
 {
-    LIGHT_DESC      LightDesc{};
+    LIGHT_DESC LightDesc{};
 
     LightDesc.eType = LIGHT::DIRECTIONAL;
-    LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-    LightDesc.vAmbient = _float4(0.2f, 0.2f, 0.2f, 1.f);
+    LightDesc.vDiffuse = _float4(5.0f, 5.5f, 6.0f, 1.f);
+    LightDesc.vAmbient = _float4(0.f, 0.f, 0.f, 1.f);
     LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
-    LightDesc.vDirection = _float4(0.4f, -1.f, 0.5f, 0.f);
+    LightDesc.vDirection = _float4(0.557f, -0.766f, 0.321f, 0.f);
 
     if (FAILED(m_pGameInstance_Proxy->Add_Light(LightDesc)))
         return E_FAIL;
@@ -1203,13 +1203,26 @@ void CLevel_Tool::Update(_float fTimeDelta)
     }
     if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F7, false))
     {
+        //m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GorillaAppear, nullptr);
+
+        CUTSCENE_HANDOFF_DESC ho{};
+        m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GorillaHandoff, &ho);
+
+        Log_Info("Publish: Cutscene_GorillaAppear");
+    }
+
+
+    if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F6, false))
+    {
+
         BOSS_HP_APPEARED Desc{};
-        Desc.strBossName = L"테스트 기간트 엣지";
+        Desc.strBossName = L"테스트 고르르뭄바";
         Desc.fMaxHP = 100.f;
         Desc.fCurrHp = 100.f;
+
         m_pGameInstance_Proxy->Publish(EventTag::Boss_HP_Appeared, &Desc);
 
-        Log_Info("Publish: BossHP.Appeared");
+        Log_Info("Publish: Boss_HP_Appeared");
     }
 
     if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F3, false))
