@@ -312,17 +312,19 @@ HRESULT CMap_Loader::Preload_LevelDesignEntries(const MAP_PACKAGE& Package, cons
 		if (strJsonPath.empty())
 			continue;
 
-		if (FAILED(CLevelDesign_Loader::Preload_LevelDesign(m_pDevice, m_pContext, strJsonPath, Levels.iLevelDesignPrototypeLevel)))
+		LD_RUNTIME_LEVELS LDLevels{};
+		LDLevels.iObjectLevel = Levels.iLevelDesignObjectLevel;
+		LDLevels.iPrototypeLevel = Levels.iLevelDesignPrototypeLevel;
+		LDLevels.iModelPrototypeLevel = Levels.iLevelDesignModelPrototypeLevel;
+
+		if (FAILED(CLevelDesign_Loader::Preload_LevelDesign(m_pDevice, m_pContext, strJsonPath, LDLevels)))
 			return E_FAIL;
 	}
 
 	return S_OK;
 }
 
-HRESULT CMap_Loader::Load_LevelDesignEntries(
-	const MAP_PACKAGE& Package,
-	const MAP_SPAWN_REQUEST& Request,
-	MAP_LOAD_RESULT* pOutReport)
+HRESULT CMap_Loader::Load_LevelDesignEntries(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST& Request, MAP_LOAD_RESULT* pOutReport)
 {
 	if (Package.LevelDesignJsonPaths.empty())
 		return S_OK;
@@ -343,6 +345,7 @@ HRESULT CMap_Loader::Load_LevelDesignEntries(
 		Context.pContext = m_pContext;
 		Context.iPlaceLevel = Request.Levels.iLevelDesignObjectLevel;
 		Context.iPrototypeLevel = Request.Levels.iLevelDesignPrototypeLevel;
+		Context.iModelPrototypeLevel = Request.Levels.iLevelDesignModelPrototypeLevel;
 		Context.pCreatedCallback = Request.pCreatedCallback;
 		Context.pCallbackContext = Request.pCallbackContext;
 
@@ -863,7 +866,7 @@ HRESULT CMap_Loader::Load_LevelDesign_Runtime(
 		MAP_SPAWN_REQUEST Request{};
 		Request.Levels.iLevelDesignObjectLevel = Context.iPlaceLevel;
 		Request.Levels.iLevelDesignPrototypeLevel = Context.iModelLevel;
-
+		Request.Levels.iLevelDesignModelPrototypeLevel = Context.iModelLevel;
 		Request.pCreatedCallback = Context.pCreatedCallback;
 		Request.pCallbackContext = Context.pCallbackContext;
 
@@ -1049,6 +1052,7 @@ void CMap_Loader::Build_DefaultRuntimeLevels(_uint iRuntimeLevel, MAP_RUNTIME_LE
 	pOutLevels->iEnvModelLevel = ETOUI(LEVEL::STATIC);
 	pOutLevels->iLevelDesignObjectLevel = iRuntimeLevel;
 	pOutLevels->iLevelDesignPrototypeLevel = iRuntimeLevel;
+	pOutLevels->iLevelDesignModelPrototypeLevel = iRuntimeLevel;
 }
 
 void CMap_Loader::Build_DefaultRuntimeTargets(_uint iRuntimeLevel, MAP_SPAWN_TARGETS* pOutTargets)

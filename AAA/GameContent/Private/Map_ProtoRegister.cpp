@@ -18,8 +18,7 @@ namespace
 		const ENV_COLLISION_DESC& Collision = Desc.tCollision;
 
 		return Collision.eColliderKind == ENV_COLLIDER_KIND::MODEL_MESH
-			&& Collision.bHasDecorCollisionApxbin
-			&& !Collision.bInvalidCollision;
+			&& Collision.bCookCollMesh;
 	}
 }
 
@@ -64,39 +63,33 @@ HRESULT CMap_ProtoRegister::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, c
 
 #ifdef _DEBUG
 	{
-		size_t iCatalogCheckedDescCount = 0;
-		size_t iCatalogHitDescCount = 0;
-		size_t iModelMeshDescCount = 0;
-		size_t iModelMeshCookDescCount = 0;
+		size_t iHasCollMeshDescCount = 0;
+		size_t iCookCollMeshDescCount = 0;
+		size_t iUseCollMeshDescCount = 0;
 
 		for (const ENV_OBJECT_DESC& Desc : Package.EnvObjectDescs)
 		{
-			if (Desc.tCollision.bCatalogCollisionChecked)
-				++iCatalogCheckedDescCount;
+			const ENV_COLLISION_DESC& Collision = Desc.tCollision;
 
-			if (Desc.tCollision.bHasDecorCollisionApxbin)
-				++iCatalogHitDescCount;
+			if (Collision.bHasCollMesh)
+				++iHasCollMeshDescCount;
 
-			if (Desc.tCollision.eColliderKind == ENV_COLLIDER_KIND::MODEL_MESH)
-			{
-				++iModelMeshDescCount;
+			if (Collision.bCookCollMesh)
+				++iCookCollMeshDescCount;
 
-				if (Needs_EnvModelCollisionCook(Desc))
-					++iModelMeshCookDescCount;
-			}
+			if (Collision.bUseCollMesh)
+				++iUseCollMeshDescCount;
 		}
 
 		Log_GameContentInfo(
 			"EnvPhysics summary: totalDesc="
 			+ to_string(iTotalEnvDescCount)
-			+ " catalogChecked="
-			+ to_string(iCatalogCheckedDescCount)
-			+ " catalogHit="
-			+ to_string(iCatalogHitDescCount)
-			+ " modelMeshDesc="
-			+ to_string(iModelMeshDescCount)
-			+ " modelMeshCookDesc="
-			+ to_string(iModelMeshCookDescCount)
+			+ " hasCollMesh="
+			+ to_string(iHasCollMeshDescCount)
+			+ " cookCollMesh="
+			+ to_string(iCookCollMeshDescCount)
+			+ " useCollMesh="
+			+ to_string(iUseCollMeshDescCount)
 			+ " totalModelTags="
 			+ to_string(AllEnvModelTags.size())
 			+ " cookModelTags="

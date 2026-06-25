@@ -281,8 +281,7 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 	return S_OK;
 }
 
-const MAP_SPAWN_ROUTE* CMap_Spawner::Resolve_EnvRoute(const MAP_SPAWN_TARGETS& Targets,
-	ENV_OBJECT_KIND eKind) const
+const MAP_SPAWN_ROUTE* CMap_Spawner::Resolve_EnvRoute(const MAP_SPAWN_TARGETS& Targets, ENV_OBJECT_KIND eKind) const
 {
 	switch (eKind)
 	{

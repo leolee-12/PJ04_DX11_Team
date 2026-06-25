@@ -53,6 +53,7 @@
     <ClInclude Include="..\Public\Env_InstanceController.h" />
     <ClInclude Include="..\Public\Sword_JumpSlash.h" />
     <ClInclude Include="..\public\GorillaNamePlate.h" />
+    <ClInclude Include="..\Public\LevelDesign_Boundary.h" />
     <ClInclude Include="..\Public\LevelDesign_Bush.h" />
     <ClInclude Include="..\Public\LevelDesign_Food.h" />
     <ClInclude Include="..\Public\LevelDesign_Ladder.h" />
@@ -60,6 +61,7 @@
     <ClInclude Include="..\Public\LevelDesign_Portal.h" />
     <ClInclude Include="..\public\GigantEdge_Brain.h" />
     <ClInclude Include="..\Public\Kirby_Damaged.h" />
+    <ClInclude Include="..\Public\LevelDesign_Starblock.h" />
     <ClInclude Include="..\public\MiniBoss.h" />
     <ClInclude Include="..\public\Inhalable.h" />
     <ClInclude Include="..\Public\LevelDesign_ProtoRegister.h" />
@@ -272,6 +274,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesignObject.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_Boundary.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Breakable.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Bush.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Food.cpp" />
@@ -284,6 +287,7 @@
     <ClCompile Include="..\Private\LevelDesign_Rail.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Registry.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Spawner.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_Starblock.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Unsupported.cpp" />
     <ClCompile Include="..\Private\Map_EditFile.cpp" />
     <ClCompile Include="..\Private\Map_EditSession.cpp" />

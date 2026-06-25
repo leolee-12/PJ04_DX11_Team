@@ -1,11 +1,13 @@
 #include "LevelDesign_Registry.h"
 #include "LevelDesign_Unsupported.h"
 #include "LevelDesign_Breakable.h"
+#include "LevelDesign_Starblock.h"
 #include "LevelDesign_Rail.h"
 #include "LevelDesign_Ladder.h"
 #include "LevelDesign_Food.h"
 #include "LevelDesign_Point.h"
 #include "LevelDesign_Bush.h"
+#include "LevelDesign_Boundary.h"
 
 #include <cwctype>
 #include <mutex>
@@ -25,6 +27,11 @@ namespace
 			ch = static_cast<wchar_t>(towlower(ch));
 
 		return Result;
+	}
+
+	CGameObject* Create_BoundaryPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	{
+		return CLevelDesign_Boundary::Create(pDevice, pContext);
 	}
 
 	CGameObject* Create_UnsupportedPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -202,8 +209,7 @@ void CLevelDesign_Registry::Register_Core()
 
 void CLevelDesign_Registry::Register_Volumes()
 {
-	Register_Unsupported(L"InvisibleCollision", LD_CATEGORY::VOLUME, L"Layer_LevelDesign_Volume");
-	Register_Unsupported(L"InvisibleCollisionBox", LD_CATEGORY::VOLUME, L"Layer_LevelDesign_Volume");
+	CLevelDesign_Boundary::Register_LevelDesignSpecs();
 	Register_Unsupported(L"FallBorder", LD_CATEGORY::VOLUME, L"Layer_LevelDesign_Volume");
 	Register_Unsupported(L"WaterArea", LD_CATEGORY::VOLUME, L"Layer_LevelDesign_Volume");
 }
@@ -222,6 +228,7 @@ void CLevelDesign_Registry::Register_GuideAudio()
 
 void CLevelDesign_Registry::Register_ItemsAndBreakables()
 {
+	CLevelDesign_Starblock::Register_LevelDesignSpecs();
 	CLevelDesign_Breakable::Register_LevelDesignSpecs();
 	CLevelDesign_Food::Register_LevelDesignSpecs();
 	CLevelDesign_Point::Register_LevelDesignSpecs();

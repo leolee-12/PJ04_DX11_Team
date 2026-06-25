@@ -105,9 +105,10 @@ namespace
 
 CEnvObject::CEnvObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{pDevice, pContext}
-	, m_bRenderable{false}
-	, m_bEnableCulling{false}
-	, m_bCastShadow{false}
+	, m_bRenderable{ false }
+	, m_bCastShadow{ false }
+	, m_bUseCullDistance{ true }
+	, m_bUseCullFrustum{ true }
 {
 }
 
@@ -116,8 +117,9 @@ CEnvObject::CEnvObject(const CEnvObject& Prototype)
 	, m_tDesc(Prototype.m_tDesc)
 	, m_strProtoTag(Prototype.m_strProtoTag)
 	, m_bRenderable{ Prototype.m_bRenderable }
-	, m_bEnableCulling{ Prototype.m_bEnableCulling }
 	, m_bCastShadow{ Prototype.m_bCastShadow }
+	, m_bUseCullDistance{ Prototype.m_bUseCullDistance }
+	, m_bUseCullFrustum{ Prototype.m_bUseCullFrustum }
 {
 }
 
@@ -275,11 +277,11 @@ HRESULT CEnvObject::Ready_PhysicsActor()
 
 HRESULT CEnvObject::Ready_PhysicsActor_ModelMesh()
 {
-	if (!m_tDesc.tCollision.bHasDecorCollisionApxbin)
+	if (!m_tDesc.tCollision.bHasCollMesh)
 	{
 #ifdef _DEBUG
 		Log_EnvPhysicsInfo(
-			"[EnvPhysics] MODEL_MESH actor skipped: no decor collision apxbin. object="
+			"[EnvPhysics] MODEL_MESH actor skipped : no collision mesh capability.object = "
 			+ WstrToStr(m_tDesc.wstrObjectName)
 			+ " uid="
 			+ to_string(m_tDesc.iUid)
@@ -365,8 +367,14 @@ _bool CEnvObject::Should_CreatePhysicsActor() const
 	switch (Collision.eColliderKind)
 	{
 	case ENV_COLLIDER_KIND::MODEL_MESH:
-		// Decor 모델 메쉬 충돌은 카탈로그 hit가 최종 기준이다.
-		return Collision.bHasDecorCollisionApxbin
+		if (m_tDesc.eKind == ENV_OBJECT_KIND::STATIC)
+		{
+			return Collision.bHasCollMesh
+				&& Collision.bUseCollMesh;
+		}
+
+		// Interact 등은 이번 단위에서 기존 정책 유지.
+		return Collision.bHasCollMesh
 			&& !Collision.bInvalidCollision;
 
 	case ENV_COLLIDER_KIND::SIMPLE_SHAPE:
@@ -568,7 +576,7 @@ void CEnvObject::Refresh_WorldBounds()
 
 void CEnvObject::Check_Visible()
 {
-	if (!m_bRenderable || !Has_RenderModel())
+	if (!m_bRenderable)
 	{
 		m_bVisible = false;
 		m_bVisibleShadow = false;
@@ -589,25 +597,28 @@ void CEnvObject::Check_Visible()
 
 	// Distance -> Frustum
 	// 1. Main
-	if (m_bEnableCulling &&
-		m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_DISTANCE_CULL_START))
+
+	if (m_bUseCullDistance
+		&& m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_DISTANCE_CULL_START))
 	{
 		m_bVisible = false;
 	}
-	else
+	else if (m_bUseCullFrustum && m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, m_WorldBounds))
 	{
-		m_bVisible = !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, m_WorldBounds);
+		m_bVisible = false;
 	}
 
 	// 2. Shadow
-	if (m_bVisibleShadow &&
-		m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_SHADOW_DISTANCE_CULL_START))
+	if (m_bVisibleShadow)
 	{
-		m_bVisibleShadow = false;
-	}
-	else if (m_bVisibleShadow)
-	{
-		m_bVisibleShadow = !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_WorldBounds);
+		if (m_bUseCullDistance && m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_SHADOW_DISTANCE_CULL_START))
+		{
+			m_bVisibleShadow = false;
+		}
+		else if (m_bUseCullFrustum && m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_WorldBounds))
+		{
+			m_bVisibleShadow = false;
+		}
 	}
 }
 
@@ -633,9 +644,9 @@ void CEnvObject::Apply_TransformFromDesc()
 void CEnvObject::Apply_DescDefaults()
 {
 	m_bRenderable = !m_tDesc.tCollision.bInvisibleCollision;
-
-	m_bEnableCulling = m_tDesc.tRender.bUseLodCulling;
-	m_bCastShadow = m_tDesc.tRender.bShadowMappingCaster;
+	m_bUseCullDistance = m_tDesc.tRender.bUseCullDistance;
+	m_bUseCullFrustum = m_tDesc.tRender.bUseCullFrustum;
+	m_bCastShadow = m_tDesc.tRender.bHasShadow && m_tDesc.tRender.bUseShadow;
 	m_bVisible = true;
 }
 

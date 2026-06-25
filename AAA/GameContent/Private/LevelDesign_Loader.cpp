@@ -58,8 +58,14 @@ HRESULT CLevelDesign_Loader::Initialize()
 	return S_OK;
 }
 
-HRESULT CLevelDesign_Loader::Preload_LevelDesign(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
-	const _wstring& strJsonPath, _uint iRuntimeLevel)
+HRESULT CLevelDesign_Loader::Preload_LevelDesign(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _wstring& strJsonPath, _uint iRuntimeLevel)
+{
+	LD_RUNTIME_LEVELS Levels{};
+	Build_DefaultRuntimeLevels(iRuntimeLevel, &Levels);
+	return Preload_LevelDesign(pDevice, pContext, strJsonPath, Levels);
+}
+
+HRESULT CLevelDesign_Loader::Preload_LevelDesign(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _wstring& strJsonPath, const LD_RUNTIME_LEVELS& Levels)
 {
 	if (nullptr == pDevice || nullptr == pContext || strJsonPath.empty())
 		return E_FAIL;
@@ -72,11 +78,7 @@ HRESULT CLevelDesign_Loader::Preload_LevelDesign(ID3D11Device* pDevice, ID3D11De
 	HRESULT hr = pLoader->Build_Package(strJsonPath, &Package);
 
 	if (SUCCEEDED(hr))
-	{
-		LD_RUNTIME_LEVELS Levels{};
-		Build_DefaultRuntimeLevels(iRuntimeLevel, &Levels);
 		hr = pLoader->Ready_Prototypes(Levels, Package);
-	}
 
 	Safe_Release(pLoader);
 	return hr;
@@ -102,6 +104,7 @@ HRESULT CLevelDesign_Loader::Load_LevelDesign_Runtime(const LD_RUNTIME_LOAD_CONT
 		LD_RUNTIME_LEVELS Levels{};
 		Levels.iObjectLevel = Context.iPlaceLevel;
 		Levels.iPrototypeLevel = Context.iPrototypeLevel;
+		Levels.iModelPrototypeLevel = Context.iModelPrototypeLevel;
 
 		hr = pLoader->Ready_Prototypes(Levels, Package);
 		if (SUCCEEDED(hr))
@@ -167,14 +170,13 @@ HRESULT CLevelDesign_Loader::Spawn(const LD_PACKAGE& Package, const LD_SPAWN_REQ
 
 void CLevelDesign_Loader::Build_DefaultRuntimeLevels(_uint iRuntimeLevel, LD_RUNTIME_LEVELS* pOutLevels)
 {
-	UNREFERENCED_PARAMETER(iRuntimeLevel);
-
 	if (nullptr == pOutLevels)
 		return;
 
 	*pOutLevels = {};
-	pOutLevels->iObjectLevel = ETOUI(LEVEL::STATIC);
-	pOutLevels->iPrototypeLevel = ETOUI(LEVEL::STATIC);
+	pOutLevels->iObjectLevel = iRuntimeLevel;
+	pOutLevels->iPrototypeLevel = iRuntimeLevel;
+	pOutLevels->iModelPrototypeLevel = iRuntimeLevel;
 }
 
 CLevelDesign_Loader* CLevelDesign_Loader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

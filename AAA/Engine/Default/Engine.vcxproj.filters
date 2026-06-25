@@ -627,6 +627,9 @@
     <ClInclude Include="..\Public\Anim_Layer.h">
       <Filter>99. Defines\Hojun</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MeshLayer_Utils.h">
+      <Filter>07. Component\Model\MaterialEx</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">

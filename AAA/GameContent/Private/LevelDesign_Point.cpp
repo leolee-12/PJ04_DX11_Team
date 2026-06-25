@@ -48,7 +48,6 @@ CLevelDesign_Point::CLevelDesign_Point(ID3D11Device* pDevice, ID3D11DeviceContex
 CLevelDesign_Point::CLevelDesign_Point(const CLevelDesign_Point& Prototype)
 	: CLevelDesignObject(Prototype)
 	, m_tPointDesc(Prototype.m_tPointDesc)
-	, m_iModelProtoLevel(Prototype.m_iModelProtoLevel)
 {
 }
 
@@ -113,7 +112,7 @@ void CLevelDesign_Point::Register_LevelDesignSpecs()
 		Spec.pBuildDesc = &Build_Desc;
 		Spec.ModelRequirements =
 		{
-				{ Entry.pModelProtoTag, Entry.pModelPath, ETOUI(LEVEL::GAMEPLAY), MODEL::NONANIM }
+				{ Entry.pModelProtoTag, Entry.pModelPath, MODEL::NONANIM }
 		};
 
 		CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
@@ -171,7 +170,7 @@ HRESULT CLevelDesign_Point::Ready_Components()
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
-	m_pModelCom = Add_Component<CModel>(m_iModelProtoLevel, pModelProtoTag, TEXT("Com_Model"));
+	m_pModelCom = Add_Component<CModel>(m_tPointDesc.iModelProtoLevel, pModelProtoTag, TEXT("Com_Model"));
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
 

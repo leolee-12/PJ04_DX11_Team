@@ -81,6 +81,23 @@ namespace Engine
 		XMFLOAT4 vGridParams;   
 	}FROXEL_CB;
 
+	static constexpr unsigned int MESH_LAYER_EX_GROUP_COUNT = 5;
+	static constexpr unsigned int MESH_LAYER_EX_ENTRY_COUNT = 4;
+	
+	struct MESH_LAYER_TEX_BIND_EX
+	{
+		bool bEnable = { false };
+
+		unsigned int	iTexType = { 0u };	// 의미 해석은 GameContent/Shader에서
+		int				iSlot = { -1 };	// -1 = 미사용
+
+		unsigned int	iUVIndex = { 0u };
+		XMFLOAT2		vUVScale = { 1.f, 1.f };
+		XMFLOAT2		vUVOffset = { 0.f, 0.f };
+		float			fUVRotate = { 0.f };
+	};
+
+
 	struct MESH_LAYER_IDX
 	{
 		int				iPass = { -1 };						// -1 = default
@@ -109,6 +126,10 @@ namespace Engine
 				static_cast<unsigned int>(MTEX_TYPE::UNKNOWN),
 				static_cast<unsigned int>(MTEX_TYPE::UNKNOWN)
 		};
+
+		// Ex
+		bool	bUseLayerEx = { false };
+		MESH_LAYER_TEX_BIND_EX LayerEx[MESH_LAYER_EX_GROUP_COUNT][MESH_LAYER_EX_ENTRY_COUNT];
 	};
 
 	struct TEXTURE_HUB_STATS

@@ -86,6 +86,34 @@ void CMapStage::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	pOutData->strPrototypeTag = m_strProtoTag;
 }
 
+#ifdef _DEBUG
+void CMapStage::Set_EditorSoloSection(CMapSection* pSection)
+{
+	m_pEditorSoloSection = pSection;
+}
+
+void CMapStage::Clear_EditorSoloSection()
+{
+	m_pEditorSoloSection = nullptr;
+}
+
+_bool CMapStage::Should_RenderSection(const CMapSection* pSection) const
+{
+	if (nullptr == m_pEditorSoloSection)
+		return true;
+
+	return pSection == m_pEditorSoloSection;
+}
+void CMapStage::Clear_EditorSoloMeshAllSections()
+{
+	for (CMapSection* pSection : m_Sections)
+	{
+		if (nullptr != pSection)
+			pSection->Clear_EditorSoloMesh();
+	}
+}
+#endif
+
 json CMapStage::Serialize() const
 {
 	json j = __super::Serialize();
@@ -225,6 +253,11 @@ void CMapStage::Submit_VisibleSections()
 		if (nullptr == pSection)
 			continue;
 
+#ifdef _DEBUG
+		if (!Should_RenderSection(pSection))
+			continue;
+#endif
+
 		if (!pSection->Is_Renderable())
 			continue;
 
@@ -325,6 +358,10 @@ CGameObject* CMapStage::Clone(void* pArg)
 
 void CMapStage::Free()
 {
+#ifdef _DEBUG
+	m_pEditorSoloSection = nullptr;
+#endif
+
 	for (CMapSection*& pSection : m_Sections)
 		Safe_Release(pSection);
 	m_Sections.clear();

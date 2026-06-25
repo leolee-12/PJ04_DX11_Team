@@ -34,7 +34,6 @@ CLevelDesign_Ladder::CLevelDesign_Ladder(ID3D11Device* pDevice, ID3D11DeviceCont
 CLevelDesign_Ladder::CLevelDesign_Ladder(const CLevelDesign_Ladder& Prototype)
 	: CLevelDesignObject(Prototype)
 	, m_tLadderDesc(Prototype.m_tLadderDesc)
-	, m_iModelProtoLevel(Prototype.m_iModelProtoLevel)
 	, m_fSegmentStepY(Prototype.m_fSegmentStepY)
 {
 }
@@ -122,9 +121,9 @@ void CLevelDesign_Ladder::Register_LevelDesignSpecs()
 	Spec.pBuildDesc = &Build_Desc;
 	Spec.ModelRequirements =
 	{
-			{ BOT_MODEL_PROTO_TAG, g_LadderCatalog.pBotModelPath, ETOUI(LEVEL::GAMEPLAY) },
-			{ MID_MODEL_PROTO_TAG, g_LadderCatalog.pMidModelPath, ETOUI(LEVEL::GAMEPLAY) },
-			{ TOP_MODEL_PROTO_TAG, g_LadderCatalog.pTopModelPath, ETOUI(LEVEL::GAMEPLAY) }
+			{ BOT_MODEL_PROTO_TAG, g_LadderCatalog.pBotModelPath },
+			{ MID_MODEL_PROTO_TAG, g_LadderCatalog.pMidModelPath },
+			{ TOP_MODEL_PROTO_TAG, g_LadderCatalog.pTopModelPath }
 	};
 
 	CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
@@ -166,15 +165,15 @@ HRESULT CLevelDesign_Ladder::Ready_Components()
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
-	m_ModelComs[SEGMENT::BOT] = Add_Component<CModel>(m_iModelProtoLevel, BOT_MODEL_PROTO_TAG, TEXT("Com_Model_Bottom"));
+	m_ModelComs[SEGMENT::BOT] = Add_Component<CModel>(m_tLadderDesc.iModelProtoLevel, BOT_MODEL_PROTO_TAG, TEXT("Com_Model_Bottom"));
 	if (nullptr == m_ModelComs[SEGMENT::BOT])
 		return E_FAIL;
 
-	m_ModelComs[SEGMENT::MID] = Add_Component<CModel>(m_iModelProtoLevel, MID_MODEL_PROTO_TAG, TEXT("Com_Model_Middle"));
+	m_ModelComs[SEGMENT::MID] = Add_Component<CModel>(m_tLadderDesc.iModelProtoLevel, MID_MODEL_PROTO_TAG, TEXT("Com_Model_Middle"));
 	if (nullptr == m_ModelComs[SEGMENT::MID])
 		return E_FAIL;
 
-	m_ModelComs[SEGMENT::TOP] = Add_Component<CModel>(m_iModelProtoLevel, TOP_MODEL_PROTO_TAG, TEXT("Com_Model_Top"));
+	m_ModelComs[SEGMENT::TOP] = Add_Component<CModel>(m_tLadderDesc.iModelProtoLevel, TOP_MODEL_PROTO_TAG, TEXT("Com_Model_Top"));
 	if (nullptr == m_ModelComs[SEGMENT::TOP])
 		return E_FAIL;
 
