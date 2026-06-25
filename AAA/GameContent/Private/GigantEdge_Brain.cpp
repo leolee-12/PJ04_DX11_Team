@@ -35,8 +35,6 @@ HRESULT CGigantEdge_Brain::Initialize(CMonster* pOwner)
 
     m_pOwner = pOwner;
 
-    CGigantEdge* pGigantEdge = Owner();
-
     constexpr _float fAttackRange = 4.f;
     constexpr _float fGuardRange = 4.f;
     constexpr _float fFacingDot = 0.86f;
