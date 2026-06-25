@@ -37,39 +37,6 @@ namespace
 	{
 		OutputDebugStringA((strMessage + "\n").c_str());
 	}
-
-#ifdef _DEBUG
-	void Fill_AABBDescFromMinMax(const _float3& vMin, const _float3& vMax, CCollider::COLLIDER_DESC* pOutDesc, CGameObject* pOwner)
-	{
-		if (nullptr == pOutDesc)
-			return;
-
-		pOutDesc->vCenter = _float3(
-			(vMin.x + vMax.x) * 0.5f,
-			(vMin.y + vMax.y) * 0.5f,
-			(vMin.z + vMax.z) * 0.5f);
-
-		pOutDesc->vSize = _float3(
-			max(vMax.x - vMin.x, 0.001f),
-			max(vMax.y - vMin.y, 0.001f),
-			max(vMax.z - vMin.z, 0.001f));
-
-		pOutDesc->pOwner = pOwner;
-	}
-
-	void Fill_AABBDescFromBox(const BoundingBox& Box, CCollider::COLLIDER_DESC* pOutDesc, CGameObject* pOwner)
-	{
-		if (nullptr == pOutDesc)
-			return;
-
-		pOutDesc->vCenter = Box.Center;
-		pOutDesc->vSize = _float3(
-			max(Box.Extents.x * 2.f, 0.001f),
-			max(Box.Extents.y * 2.f, 0.001f),
-			max(Box.Extents.z * 2.f, 0.001f));
-		pOutDesc->pOwner = pOwner;
-	}
-#endif
 }
 
 CMapSection::CMapSection(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

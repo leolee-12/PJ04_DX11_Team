@@ -256,8 +256,8 @@ namespace
 			ReadBoolProperty(pSection, L"Cast Shadow", L"MapSection", Desc.bCastShadow);
 		if (bCastShadow != Desc.bCastShadow)
 		{
-			Edit.bHasCastShadow = true;
-			Edit.bCastShadow = bCastShadow;
+			Edit.bHasShadow = true;
+			Edit.bUseShadow = bCastShadow;
 		}
 
 		_float4x4 BaseWorld = {};
@@ -725,15 +725,15 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 			? *pbCreateCollisionActor
 			: bSourceCanCreateCollisionActor;
 
-		Edit.bHasCollMeshEdited = false;
-		Edit.bCreateCollMesh = true;
-		Edit.bDisableCollMesh = false;
+		const _bool bBaseUseCollMesh = bSourceCanCreateCollisionActor;
 
-		if (bSourceCanCreateCollisionActor)
+		Edit.bHasCollMesh = false;
+		Edit.bUseCollMesh = bBaseUseCollMesh;
+
+		if (bSourceCanCreateCollisionActor && bCreateCollisionActorValue != bBaseUseCollMesh)
 		{
-			Edit.bHasCollMeshEdited = (bCreateCollisionActorValue != true);
-			Edit.bCreateCollMesh = bCreateCollisionActorValue;
-			Edit.bDisableCollMesh = !bCreateCollisionActorValue;
+			Edit.bHasCollMesh = true;
+			Edit.bUseCollMesh = bCreateCollisionActorValue;
 		}
 
 		pSection->Set_CollisionActorEnabled(
@@ -1563,12 +1563,11 @@ _bool* CPanel_Inspector::Resolve_MapCollMeshEditState(CLevel_Edit* pLevel, CMapS
 			pSection->Get_Desc().bSourceCreateCollisionActor;
 
 		_bool bCreateCollisionActor = bSourceCanCreateCollisionActor;
-		if (pLevel->Try_GetMapPreviewSectionEdit(strSectionKey, &SavedEdit))
+		if (pLevel->Try_GetMapPreviewSectionEdit(strSectionKey, &SavedEdit)
+			&& SavedEdit.bHasCollMesh)
 		{
-			if (SavedEdit.bHasCollMeshEdited)
-				bCreateCollisionActor = SavedEdit.bCreateCollMesh;
-			else
-				bCreateCollisionActor = !SavedEdit.bDisableCollMesh;
+			bCreateCollisionActor =
+				bSourceCanCreateCollisionActor && SavedEdit.bUseCollMesh;
 		}
 
 		if (!bSourceCanCreateCollisionActor)

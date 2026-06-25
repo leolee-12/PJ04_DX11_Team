@@ -159,8 +159,8 @@ namespace
 		if (Edit.bHasEnableCulling)
 			pOutDesc->bEnableCulling = Edit.bEnableCulling;
 
-		if (Edit.bHasCastShadow)
-			pOutDesc->bCastShadow = Edit.bCastShadow;
+		if (Edit.bHasShadow)
+			pOutDesc->bCastShadow = Edit.bUseShadow;
 
 		if (Edit.bHasWorldMatrix)
 		{
@@ -169,13 +169,10 @@ namespace
 			Apply_WorldMatrixToGameObjectDesc(&BaseDesc, Edit.matWorld);
 		}
 
-		if (Edit.bHasCollMeshEdited)
+		if (Edit.bHasCollMesh)
 		{
-			pOutDesc->bCreateCollisionActor = Edit.bCreateCollMesh;
-		}
-		else if (Edit.bDisableCollMesh)
-		{
-			pOutDesc->bCreateCollisionActor = false;
+			pOutDesc->bCreateCollisionActor =
+				pOutDesc->bSourceCreateCollisionActor && Edit.bUseCollMesh;
 		}
 	}
 
@@ -202,19 +199,12 @@ namespace
 
 		if (Edit.bHasShadow)
 			j["UseShadow"] = static_cast<bool>(Edit.bUseShadow);
-		else if (Edit.bHasCastShadow)
-			j["CastShadow"] = static_cast<bool>(Edit.bCastShadow);
 
 		if (Edit.bHasWorldMatrix)
 			j["WorldMatrix"] = Save_Float4x4(Edit.matWorld);
 
 		if (Edit.bHasCollMesh)
 			j["UseCollMesh"] = static_cast<bool>(Edit.bUseCollMesh);
-		else if (Edit.bHasCollMeshEdited)
-		{
-			j["CollisionMesh"] = json::object();
-			j["CollisionMesh"]["Create"] = static_cast<bool>(Edit.bCreateCollMesh);
-		}
 
 		if (Edit.bHasNearDistAlpha)
 			j["UseNearDistAlpha"] = static_cast<bool>(Edit.bUseNearDistAlpha);
@@ -288,14 +278,14 @@ namespace
 		}
 		else
 		{
-			const auto IterCastShadow = jValue.find("CastShadow");
-			if (IterCastShadow != jValue.end())
+			const auto IterUseShadow = jValue.find("UseShadow");
+			if (IterUseShadow != jValue.end())
 			{
-				if (!IterCastShadow->is_boolean())
+				if (!IterUseShadow->is_boolean())
 					return E_FAIL;
 
-				pOutDesc->bHasCastShadow = true;
-				pOutDesc->bCastShadow = IterCastShadow->get<bool>();
+				pOutDesc->bHasShadow = true;
+				pOutDesc->bUseShadow = IterUseShadow->get<bool>();
 			}
 		}
 
@@ -319,30 +309,14 @@ namespace
 		}
 		else
 		{
-			const auto IterCollisionMesh = jValue.find("CollisionMesh");
-			if (IterCollisionMesh != jValue.end() && IterCollisionMesh->is_object())
+			const auto IterUseCollMesh = jValue.find("UseCollMesh");
+			if (IterUseCollMesh != jValue.end())
 			{
-				const auto IterCreate = IterCollisionMesh->find("Create");
-				if (IterCreate != IterCollisionMesh->end() && IterCreate->is_boolean())
-				{
-					pOutDesc->bHasCollMeshEdited = true;
-					pOutDesc->bCreateCollMesh = IterCreate->get<bool>();
-					pOutDesc->bDisableCollMesh = !pOutDesc->bCreateCollMesh;
-				}
-			}
-			else
-			{
-				const auto IterCollisionDisabled = jValue.find("CollisionMeshDisabled");
-				if (IterCollisionDisabled != jValue.end())
-				{
-					if (!IterCollisionDisabled->is_boolean())
-						return E_FAIL;
+				if (!IterUseCollMesh->is_boolean())
+					return E_FAIL;
 
-					const bool bDisabled = IterCollisionDisabled->get<bool>();
-					pOutDesc->bHasCollMeshEdited = true;
-					pOutDesc->bCreateCollMesh = !bDisabled;
-					pOutDesc->bDisableCollMesh = bDisabled;
-				}
+				pOutDesc->bHasCollMesh = true;
+				pOutDesc->bUseCollMesh = IterUseCollMesh->get<bool>();
 			}
 		}
 
