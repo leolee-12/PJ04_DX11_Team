@@ -35,7 +35,7 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
         return E_FAIL;
 
     // 게임플레이에서 호출 커비 등이 자기 레벨로 스폰
-    //CEffect_Loader::GetInstance()->Spawn(L"VacuumContainer", Get_LevelIndex(), vMouthPos, vLook, pParent);
+    //CEffect_Loader::GetInstance()->Spawn(L"InhaleContainer", Get_LevelIndex(), vMouthPos, vLook, pParent);
 
     if (!pProxy->Has_Prototype(VI_Rect.iLevelID, VI_Rect.szProtoTag))
     {

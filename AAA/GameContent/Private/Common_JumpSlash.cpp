@@ -1,31 +1,31 @@
-#include "Vacuum.h"
+#include "Common_JumpSlash.h"
 
 #include "GameInstance.h"
 
 #include "GameContent_const.h"
 
-CVacuum::CVacuum(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CCommon_JumpSlash::CCommon_JumpSlash(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Mesh{ pDevice, pContext }
 {
 }
 
-CVacuum::CVacuum(const CVacuum& Prototype)
+CCommon_JumpSlash::CCommon_JumpSlash(const CCommon_JumpSlash& Prototype)
     : CEffect_Mesh(Prototype)
 {
 }
 
-HRESULT CVacuum::Initialize_Prototype()
+HRESULT CCommon_JumpSlash::Initialize_Prototype()
 {
     m_eProjType = PROJ_TYPE::PERSPEC;
     return S_OK;
 }
 
-HRESULT CVacuum::Initialize(void* pArg)
+HRESULT CCommon_JumpSlash::Initialize(void* pArg)
 {
-    VACUUM_DESC tDesc{};
+    COMMON_JUMPSLASH_DESC tDesc{};
 
     tDesc.iModelLevel = m_iPrototypeLevel;
-    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Common_00_Vacuum");
+    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Common_JumpSlash");
 
     tDesc.bUseDiffuseTexture = false;
     tDesc.bUseUnKnownTexture = true;
@@ -48,17 +48,17 @@ HRESULT CVacuum::Initialize(void* pArg)
     return S_OK;
 }
 
-void CVacuum::Priority_Update(_float fTimeDelta)
+void CCommon_JumpSlash::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 }
 
-void CVacuum::Update(_float fTimeDelta)
+void CCommon_JumpSlash::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 }
 
-void CVacuum::Late_Update(_float fTimeDelta)
+void CCommon_JumpSlash::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 
@@ -69,40 +69,40 @@ void CVacuum::Late_Update(_float fTimeDelta)
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::BLEND, this);
 }
 
-HRESULT CVacuum::Render()
+HRESULT CCommon_JumpSlash::Render()
 {
     __super::Render();
 
     return S_OK;
 }
 
-CVacuum* CVacuum::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CCommon_JumpSlash* CCommon_JumpSlash::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CVacuum* pInstance = new CVacuum(pDevice, pContext);
+    CCommon_JumpSlash* pInstance = new CCommon_JumpSlash(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX("Failed to Created: CVacuum");
+        MSG_BOX("Failed to Created: CCommon_JumpSlash");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CVacuum::Clone(void* pArg)
+CGameObject* CCommon_JumpSlash::Clone(void* pArg)
 {
-    CVacuum* pInstance = new CVacuum(*this);
+    CCommon_JumpSlash* pInstance = new CCommon_JumpSlash(*this);
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Cloned: CVacuum");
+        MSG_BOX("Failed to Cloned: CCommon_JumpSlash");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CVacuum::Free()
+void CCommon_JumpSlash::Free()
 {
     __super::Free();
 }

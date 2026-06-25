@@ -6,22 +6,22 @@ NS_BEGIN(Engine)
 
 class CEffect_Part;
 
-class CSwordSlash final : public CEffect_Container
+class CSword_JumpSlash final : public CEffect_Container
 {
-    GENERATED_BODY(CSwordSlash)
+    GENERATED_BODY(CSword_JumpSlash)
 
 public:
-    struct SWORD_SLASH_DESC : public CEffect_Container::EFFECT_CONTAINER_DESC
+    struct SWORD_SLASH1_DESC : public CEffect_Container::EFFECT_CONTAINER_DESC
     {
 
     };
 
-    static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_SwordSlash";
+    static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_Sword_JumpSlash1";
 
 private:
-    CSwordSlash(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-    CSwordSlash(const CSwordSlash& Prototype);
-    virtual ~CSwordSlash() = default;
+    CSword_JumpSlash(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    CSword_JumpSlash(const CSword_JumpSlash& Prototype);
+    virtual ~CSword_JumpSlash() = default;
 
 protected:
     virtual HRESULT Initialize_Prototype() override;
@@ -38,7 +38,7 @@ private:
     HRESULT Ready_EffectPartObjects();
 
 public:
-    static CSwordSlash* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    static CSword_JumpSlash* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual CGameObject* Clone(void* pArg) override;
 private:
     virtual void Free() override;

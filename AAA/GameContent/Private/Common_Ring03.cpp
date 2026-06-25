@@ -1,38 +1,38 @@
-#include "Vacuum.h"
+#include "Common_Ring03.h"
 
 #include "GameInstance.h"
 
 #include "GameContent_const.h"
 
-CVacuum::CVacuum(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CCommon_Ring03::CCommon_Ring03(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Mesh{ pDevice, pContext }
 {
 }
 
-CVacuum::CVacuum(const CVacuum& Prototype)
+CCommon_Ring03::CCommon_Ring03(const CCommon_Ring03& Prototype)
     : CEffect_Mesh(Prototype)
 {
 }
 
-HRESULT CVacuum::Initialize_Prototype()
+HRESULT CCommon_Ring03::Initialize_Prototype()
 {
     m_eProjType = PROJ_TYPE::PERSPEC;
     return S_OK;
 }
 
-HRESULT CVacuum::Initialize(void* pArg)
+HRESULT CCommon_Ring03::Initialize(void* pArg)
 {
-    VACUUM_DESC tDesc{};
+    COMMON_RING03_DESC tDesc{};
 
     tDesc.iModelLevel = m_iPrototypeLevel;
-    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Common_00_Vacuum");
+    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Common_Ring03");
 
     tDesc.bUseDiffuseTexture = false;
     tDesc.bUseUnKnownTexture = true;
 
-    tDesc.bUseTextureCom = false;
-    tDesc.iTextureLevel = 0;
-    tDesc.wstrTextureTag = L"";
+    tDesc.bUseTextureCom = true;
+    tDesc.iTextureLevel = Texture_SwordSlash2.iLevelID;
+    tDesc.wstrTextureTag = Texture_SwordSlash2.szProtoTag;
 
     tDesc.bUseMaskCom = false;
     tDesc.iMaskLevel = 0;
@@ -48,17 +48,17 @@ HRESULT CVacuum::Initialize(void* pArg)
     return S_OK;
 }
 
-void CVacuum::Priority_Update(_float fTimeDelta)
+void CCommon_Ring03::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 }
 
-void CVacuum::Update(_float fTimeDelta)
+void CCommon_Ring03::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 }
 
-void CVacuum::Late_Update(_float fTimeDelta)
+void CCommon_Ring03::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 
@@ -69,40 +69,40 @@ void CVacuum::Late_Update(_float fTimeDelta)
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::BLEND, this);
 }
 
-HRESULT CVacuum::Render()
+HRESULT CCommon_Ring03::Render()
 {
     __super::Render();
 
     return S_OK;
 }
 
-CVacuum* CVacuum::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CCommon_Ring03* CCommon_Ring03::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CVacuum* pInstance = new CVacuum(pDevice, pContext);
+    CCommon_Ring03* pInstance = new CCommon_Ring03(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX("Failed to Created: CVacuum");
+        MSG_BOX("Failed to Created: CCommon_Ring03");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CVacuum::Clone(void* pArg)
+CGameObject* CCommon_Ring03::Clone(void* pArg)
 {
-    CVacuum* pInstance = new CVacuum(*this);
+    CCommon_Ring03* pInstance = new CCommon_Ring03(*this);
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Cloned: CVacuum");
+        MSG_BOX("Failed to Cloned: CCommon_Ring03");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CVacuum::Free()
+void CCommon_Ring03::Free()
 {
     __super::Free();
 }

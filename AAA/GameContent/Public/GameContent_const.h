@@ -56,16 +56,19 @@ namespace ProtoDesc
 	inline constexpr COMPONENT_DESC Model_Slash = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_Slash") };
 
 	// Sample Mask
-	inline constexpr TEXTURE_DESC Texture_Common_Flash02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_Flash02"), TEXT("../../Resources/Test/Test/SmokeSphereOriginal/common_flash02.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_TestMask = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Texture_TestMask"), TEXT("../../Resources/Test/Test/SmokeSphereOriginal/TestMask.png"), 1 };
-
 
 	// Inhale Mask
 	inline constexpr TEXTURE_DESC Texture_Wind01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Wind01"), TEXT("../../Resources/YSE/Effect/InhaleEffect2M/wind01.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_Wind02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Wind02"), TEXT("../../Resources/YSE/Effect/InhaleEffect2M/wind02.png"), 1 };
 
-	inline constexpr TEXTURE_DESC Texture_Twincle = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Twinkle02"), TEXT("../../Resources/YSE/Effect/Vacuum/common_twinkle02.png"), 1 };
+	// SwordSlash1
+	inline constexpr TEXTURE_DESC Texture_Common_Ring02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_Ring02"), TEXT("../../Resources/YSE/Effect/Common_Ring03/common_ring02.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_SwordSlash2 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SwordSlash2"), TEXT("../../Resources/YSE/Effect/Common_Ring03/SwordSlash2.png"), 1 };
 
+	// JumpSlash
+	inline constexpr TEXTURE_DESC Texture_Common_JumpSlash = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_JumpSlash"), TEXT("../../Resources/YSE/Effect/Common_JumpSlash/common_ring02.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Common_Flash02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_Flash02"), TEXT("../../Resources/YSE/Effect/Common_Curve03/common_flash02.png"), 1 };
 
 	//sky
 	inline constexpr COMPONENT_DESC Model_SkyTest = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_SkyTest") };

@@ -51,12 +51,13 @@ HRESULT CEffect_Loader::Ready(const _tchar* strManifestPath, CGameInstance_Proxy
 }
 
 HRESULT CEffect_Loader::Spawn(const _wstring& strEffectId, _uint iTargetLevel,
-    const _float3& vPos, const _float3& vLook, const _float4x4* pParent,
-    Engine::CEffect_Container** ppOut)
+    const _float3& vPos, const _float3& vLook, const _float3& vRotDeg,
+    const _float4x4* pParent, Engine::CEffect_Container** ppOut)
 {
     auto it = m_Assets.find(strEffectId);
     if (it == m_Assets.end())
         return E_FAIL;
+
     auto& asset = it->second;
 
     Engine::CEffect_Container::EFFECT_CONTAINER_DESC desc{};
@@ -67,8 +68,24 @@ HRESULT CEffect_Loader::Spawn(const _wstring& strEffectId, _uint iTargetLevel,
         return E_FAIL;
 
     pFx->EffectContainer_Start(vPos, vLook, pParent);
+
+    if (vRotDeg.x != 0.f || vRotDeg.y != 0.f || vRotDeg.z != 0.f)
+    {
+        _matrix matRot = XMMatrixRotationRollPitchYaw(
+            XMConvertToRadians(vRotDeg.x),
+            XMConvertToRadians(vRotDeg.y),
+            XMConvertToRadians(vRotDeg.z));
+
+        _float3 vScale = pFx->Get_Transform()->Get_Scaled();
+
+        pFx->Get_Transform()->Set_State(STATE::RIGHT, XMVector3Normalize(matRot.r[0]) * vScale.x);
+        pFx->Get_Transform()->Set_State(STATE::UP, XMVector3Normalize(matRot.r[1]) * vScale.y);
+        pFx->Get_Transform()->Set_State(STATE::LOOK, XMVector3Normalize(matRot.r[2]) * vScale.z);
+    }
+
     if (ppOut)
         *ppOut = pFx;
+
     return S_OK;
 }
 

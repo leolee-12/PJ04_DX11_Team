@@ -64,6 +64,8 @@ class ENGINE_DLL CEffect_NonParticle abstract : public CEffect_Part
 
 
     // Rot
+    PROPERTY(_float3, m_vBaseRotationDegree, L"Base Rotation_R", L"Rot");
+
     PROPERTY(_bool, m_bRotationChange,   L"Rotation Change_R",    L"Rot");
 
     PROPERTY(_float, m_fRotationDegree,  L"Rotation Degree_R",    L"Rot");

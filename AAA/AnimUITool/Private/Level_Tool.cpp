@@ -1225,6 +1225,16 @@ void CLevel_Tool::Update(_float fTimeDelta)
         Log_Info("Publish: Boss_HP_Appeared");
     }
 
+    if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F3, false))
+    {
+        m_pGameInstance_Proxy->Set_TimeScale(0.1f);
+    }
+    if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F4, false))
+    {
+        m_pGameInstance_Proxy->Set_TimeScale(1.f);
+    }
+    
+
     if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F1, false))
     {
         m_pGameInstance_Proxy->Toggle_PhysXDebug();
