@@ -46,6 +46,7 @@ struct LD_PORTAL_DESC
 #pragma region Breakable
 struct LD_BREAKABLE_DESC : public LD_OBJECT_DESC
 {
+	_uint		iModelProtoLevel = {};
 	MODEL		eModelType = MODEL::NONANIM;
 	_wstring	wstrModelProtoTag;
 };
@@ -73,6 +74,7 @@ struct LD_RAIL_DESC
 #pragma region Ladder
 struct LD_LADDER_DESC : public LD_OBJECT_DESC
 {
+	_uint iModelProtoLevel = {};
 	_uint iLength = { 0u };
 };
 #pragma endregion
@@ -83,6 +85,7 @@ struct LD_LADDER_DESC : public LD_OBJECT_DESC
 #pragma region Food
 struct LD_FOOD_DESC : public LD_OBJECT_DESC
 {
+	_uint		iModelProtoLevel = {};
 	_wstring	wstrModelProtoTag;
 	_float		fHealAmount = { 0.f };
 };
@@ -91,6 +94,7 @@ struct LD_FOOD_DESC : public LD_OBJECT_DESC
 #pragma region Point
 struct LD_POINT_DESC : public LD_OBJECT_DESC
 {
+	_uint		iModelProtoLevel = {};
 	_wstring	wstrModelProtoTag;
 	_int		iValue = { 0 };
 };
@@ -99,6 +103,7 @@ struct LD_POINT_DESC : public LD_OBJECT_DESC
 #pragma region Bush
 struct LD_BUSH_DESC : public LD_OBJECT_DESC
 {
+	_uint iModelProtoLevel = {};
 	_wstring wstrBasicProtoTag;
 	_wstring wstrCutProtoTag;
 	MODEL eBasicType = { MODEL::ANIM };
@@ -187,6 +192,7 @@ struct LD_RUNTIME_LEVELS
 {
 	_uint iObjectLevel = {};
 	_uint iPrototypeLevel = {};
+	_uint iModelPrototypeLevel = {};
 };
 
 struct LD_SPAWN_REQUEST

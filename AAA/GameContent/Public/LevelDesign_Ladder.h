@@ -44,7 +44,6 @@ private:
 	CModel* m_ModelComs[SEGMENT::_COUNT] = { nullptr };
 
 	LD_LADDER_DESC m_tLadderDesc = {};
-	_uint m_iModelProtoLevel = { ETOUI(LEVEL::GAMEPLAY) };
 	_float m_fSegmentStepY = { 1.f };
 
 private:

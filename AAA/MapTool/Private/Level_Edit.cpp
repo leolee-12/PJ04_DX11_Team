@@ -1201,7 +1201,7 @@ HRESULT CLevel_Edit::Ready_EnvObjects(vector<ENV_OBJECT_DESC>* pOutDeletedEnvDes
 	Context.pCallbackContext = this;
 
 	MAP_LOAD_RESULT Report{};
-	const HRESULT hr = Client::CMap_Loader::Load_Env_Runtime(
+	const HRESULT hr = CMap_Loader::Load_Env_Runtime(
 		Context,
 		MapContentDesc.strManifestPath,
 		&MapContentDesc.OverrideDesc,

@@ -50,7 +50,6 @@ private:
 
     LD_BUSH_DESC m_tBushDesc = {};
     BUSH_STATE m_eState = { BUSH_STATE::BASIC };
-    _uint m_iModelProtoLevel = { ETOUI(LEVEL::GAMEPLAY) };
 
 private:
     virtual HRESULT Validate_Desc() override;

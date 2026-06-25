@@ -47,7 +47,6 @@ CLevelDesign_Food::CLevelDesign_Food(ID3D11Device* pDevice, ID3D11DeviceContext*
 CLevelDesign_Food::CLevelDesign_Food(const CLevelDesign_Food& Prototype)
 	: CLevelDesignObject(Prototype)
 	, m_tFoodDesc(Prototype.m_tFoodDesc)
-	, m_iModelProtoLevel(Prototype.m_iModelProtoLevel)
 {
 }
 
@@ -112,7 +111,7 @@ void CLevelDesign_Food::Register_LevelDesignSpecs()
 		Spec.pBuildDesc = &Build_Desc;
 		Spec.ModelRequirements =
 		{
-				{ Entry.pModelProtoTag, Entry.pModelPath, ETOUI(LEVEL::GAMEPLAY), MODEL::NONANIM }
+				{ Entry.pModelProtoTag, Entry.pModelPath, MODEL::NONANIM }
 		};
 
 		CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
@@ -168,7 +167,7 @@ HRESULT CLevelDesign_Food::Ready_Components()
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
-	m_pModelCom = Add_Component<CModel>(m_iModelProtoLevel, pModelProtoTag, TEXT("Com_Model"));
+	m_pModelCom = Add_Component<CModel>(m_tFoodDesc.iModelProtoLevel, pModelProtoTag, TEXT("Com_Model"));
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
 

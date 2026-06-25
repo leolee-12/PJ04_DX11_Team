@@ -11,6 +11,31 @@ Texture2D g_ExtraGTexture;
 Texture2D g_ExtraBTexture;
 Texture2D g_ExtraATexture;
 
+Texture2D g_TexDiff_Main;
+Texture2D g_TexMRA_Main;
+Texture2D g_TexNorm_Main;
+Texture2D g_TexUkwn_Main;
+
+Texture2D g_TexDiff_R;
+Texture2D g_TexMRA_R;
+Texture2D g_TexNorm_R;
+Texture2D g_TexUkwn_R;
+
+Texture2D g_TexDiff_G;
+Texture2D g_TexMRA_G;
+Texture2D g_TexNorm_G;
+Texture2D g_TexUkwn_G;
+
+Texture2D g_TexDiff_B;
+Texture2D g_TexMRA_B;
+Texture2D g_TexNorm_B;
+Texture2D g_TexUkwn_B;
+
+Texture2D g_TexDiff_A;
+Texture2D g_TexMRA_A;
+Texture2D g_TexNorm_A;
+Texture2D g_TexUkwn_A;
+
 uint g_iBase_UVIndex = 0;
 uint g_iUnknown_UVIndex = 0;
 uint g_iExtraR_UVIndex = 0;
@@ -34,6 +59,14 @@ float g_fUVRotate = 0.f;
 float4 g_vExtraEnable = float4(0.f, 0.f, 0.f, 0.f);
 float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
 uint g_iMaterialID = 0;
+
+uint g_bUseLayerEx = 0;
+
+int4 g_iLayerExUVIndex[5];
+float4 g_vLayerExEnable[5];
+
+float4 g_vLayerExUVScale[20];
+float4 g_vLayerExUVOffsetRotate[20];
 
 struct VS_IN
 {
@@ -143,20 +176,26 @@ struct PS_IN
 
 struct PS_OUT
 {
-	float4 vDiffuse : SV_TARGET0;
-	float4 vNormal : SV_TARGET1;
-	float4 vDepth : SV_TARGET2;
-	float4 vMRA : SV_TARGET3;
-	float4 vEmissive : SV_TARGET4;
+    float4 vDiffuse : SV_TARGET0;
+    float4 vNormal : SV_TARGET1;
+    float4 vDepth : SV_TARGET2;
+    float4 vMRA : SV_TARGET3;
+    float4 vEmissive : SV_TARGET4;
     float4 vGeoNormal : SV_TARGET5;
 };
 
 float2 Select_MapUV(PS_IN In, uint iUVIndex)
 {
-	[branch] if (iUVIndex == 1) return In.vTexcoord1;
-	[branch] if (iUVIndex == 2) return In.vTexcoord2;
-	[branch] if (iUVIndex == 3) return In.vTexcoord3;
-	return In.vTexcoord;
+	[branch]
+    if (iUVIndex == 1)
+        return In.vTexcoord1;
+	[branch]
+    if (iUVIndex == 2)
+        return In.vTexcoord2;
+	[branch]
+    if (iUVIndex == 3)
+        return In.vTexcoord3;
+    return In.vTexcoord;
 }
 
 float2 Apply_MapUVTransform(float2 uv, float4 Transform)
@@ -191,16 +230,176 @@ void Blend_Extra(inout float3 albedo, PS_IN In, Texture2D tex, float enable, uin
     albedo = lerp(albedo, o, m);
 }
 
+float GetLayerExEnable(uint iGroup, uint iEntry)
+{
+    return g_vLayerExEnable[iGroup][iEntry];
+}
+
+float2 Apply_LayerExUVTransform(float2 uv, uint iFlat)
+{
+    uv *= g_vLayerExUVScale[iFlat].xy;
+
+    float fRotate = g_vLayerExUVOffsetRotate[iFlat].z;
+    float s = sin(fRotate);
+    float c = cos(fRotate);
+
+    uv = float2(
+          uv.x * c - uv.y * s,
+          uv.x * s + uv.y * c
+      );
+
+    uv += g_vLayerExUVOffsetRotate[iFlat].xy;
+    return uv;
+}
+
+float2 GetLayerExUV(PS_IN In, uint iGroup, uint iEntry)
+{
+    uint iFlat = iGroup * 4u + iEntry;
+    uint iUVIndex = (uint) g_iLayerExUVIndex[iGroup][iEntry];
+    return Apply_LayerExUVTransform(Select_MapUV(In, iUVIndex), iFlat);
+}
+
+float4 SampleLayerExDiff(uint iGroup, float2 uv)
+{
+    [branch] if (iGroup == 0u) return g_TexDiff_Main.Sample(LinearSampler, uv);
+    [branch] if (iGroup == 1u) return g_TexDiff_R.Sample(LinearSampler, uv);
+    [branch] if (iGroup == 2u) return g_TexDiff_G.Sample(LinearSampler, uv);
+    [branch] if (iGroup == 3u) return g_TexDiff_B.Sample(LinearSampler, uv);
+    return g_TexDiff_A.Sample(LinearSampler, uv);
+}
+
+float4 SampleLayerExMRA(uint iGroup, float2 uv)
+{
+    [branch] if (iGroup == 0u) return g_TexMRA_Main.Sample(LinearSampler, uv);
+    [branch] if (iGroup == 1u) return g_TexMRA_R.Sample(LinearSampler, uv);
+    [branch] if (iGroup == 2u) return g_TexMRA_G.Sample(LinearSampler, uv);
+    [branch] if (iGroup == 3u) return g_TexMRA_B.Sample(LinearSampler, uv);
+    return g_TexMRA_A.Sample(LinearSampler, uv);
+}
+
+float4 SampleLayerExNorm(uint iGroup, float2 uv)
+{
+    [branch] if (iGroup == 0u) return g_TexNorm_Main.Sample(LinearSampler, uv);
+    [branch] if (iGroup == 1u) return g_TexNorm_R.Sample(LinearSampler, uv);
+    [branch] if (iGroup == 2u) return g_TexNorm_G.Sample(LinearSampler, uv);
+    [branch] if (iGroup == 3u) return g_TexNorm_B.Sample(LinearSampler, uv);
+    return g_TexNorm_A.Sample(LinearSampler, uv);
+}
+
+float4 SampleLayerExUkwn(uint iGroup, float2 uv)
+{
+    [branch] if (iGroup == 0u) return g_TexUkwn_Main.Sample(LinearSampler, uv);
+    [branch] if (iGroup == 1u) return g_TexUkwn_R.Sample(LinearSampler, uv);
+    [branch] if (iGroup == 2u) return g_TexUkwn_G.Sample(LinearSampler, uv);
+    [branch] if (iGroup == 3u) return g_TexUkwn_B.Sample(LinearSampler, uv);
+    return g_TexUkwn_A.Sample(LinearSampler, uv);
+}
+
+float GetLayerExBlendAmount(uint iGroup, uint iEntry, float mask)
+{
+    float enable = GetLayerExEnable(iGroup, iEntry);
+    if (enable < 0.5f)
+        return 0.f;
+
+    return saturate((1.f - mask) * g_MaskStrength);
+}
+
+void Blend_LayerExDiff(inout float3 albedo, PS_IN In, uint iGroup, float mask)
+{
+    float m = GetLayerExBlendAmount(iGroup, 0u, mask);
+    if (m <= 0.f)
+        return;
+
+    float2 uv = GetLayerExUV(In, iGroup, 0u);
+    float3 o = SampleLayerExDiff(iGroup, uv).rgb;
+    albedo = lerp(albedo, o, m);
+}
+
+void Blend_LayerExMRA(inout float3 mra, PS_IN In, uint iGroup, float mask)
+{
+    float m = GetLayerExBlendAmount(iGroup, 1u, mask);
+    if (m <= 0.f)
+        return;
+
+    float2 uv = GetLayerExUV(In, iGroup, 1u);
+    float3 o = SampleLayerExMRA(iGroup, uv).rgb;
+    mra = lerp(mra, o, m);
+}
+
+void Blend_LayerExNormRG(inout float2 nrg, PS_IN In, uint iGroup, float mask)
+{
+    float m = GetLayerExBlendAmount(iGroup, 2u, mask);
+    if (m <= 0.f)
+        return;
+
+    float2 uv = GetLayerExUV(In, iGroup, 2u);
+    float2 o = SampleLayerExNorm(iGroup, uv).rg;
+    nrg = lerp(nrg, o, m);
+}
+
+void Blend_LayerExUkwn(inout float3 albedo, PS_IN In, uint iGroup, float mask)
+{
+    float m = GetLayerExBlendAmount(iGroup, 3u, mask);
+    if (m <= 0.f)
+        return;
+
+    float2 uv = GetLayerExUV(In, iGroup, 3u);
+    float3 o = SampleLayerExUkwn(iGroup, uv).rgb;
+    albedo = lerp(albedo, o, m);
+}
+
+void Blend_LayerExMaterial(inout float3 albedo, inout float3 mra, inout float2 nrg, PS_IN In, uint iGroup, float mask)
+{
+    Blend_LayerExDiff(albedo, In, iGroup, mask);
+    Blend_LayerExMRA(mra, In, iGroup, mask);
+    Blend_LayerExNormRG(nrg, In, iGroup, mask);
+}
+
+PS_OUT PS_DMN_LayerEx(PS_IN In)
+{
+    PS_OUT Out;
+
+    float2 vBaseUV = GetLayerExUV(In, 0u, 0u);
+    float2 vMaterialUV = GetLayerExUV(In, 0u, 1u);
+    float2 vNormalUV = GetLayerExUV(In, 0u, 2u);
+
+    float4 vBase = SampleLayerExDiff(0u, vBaseUV);
+    if (vBase.a < 0.1f)
+        discard;
+
+    float3 albedo = vBase.rgb;
+    float3 mra = SampleLayerExMRA(0u, vMaterialUV).rgb;
+
+    float3 N = normalize(In.vNormal.xyz);
+    float3 T = normalize(In.vTangent.xyz);
+    T = normalize(T - dot(T, N) * N);
+    float3 B = cross(N, T) * In.vTangent.w;
+    float3x3 TBN = float3x3(T, B, N);
+
+    float2 nrg = SampleLayerExNorm(0u, vNormalUV).rg;
+    nrg *= g_NormalStrength;
+    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+    float3 Nw = normalize(mul(nTS, TBN));
+
+    Out.vDiffuse = float4(albedo, 1.f);
+    Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(mra, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vBase.a, 1.f);
+    Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    return Out;
+}
+
 PS_OUT PS_WHITE(PS_IN In)
 {
-	PS_OUT Out;
-	Out.vDiffuse = float4(1.f, 1.f, 1.f, 1.f);
-	Out.vNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f); // 노멀맵 없음 → 기하노멀
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-	Out.vMRA = float4(0.f, 1.f, 1.f, 1.f); // metal0 / rough1 / ao1 기본
-	Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
+    PS_OUT Out;
+    Out.vDiffuse = float4(1.f, 1.f, 1.f, 1.f);
+    Out.vNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f); // 노멀맵 없음 → 기하노멀
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(0.f, 1.f, 1.f, 1.f); // metal0 / rough1 / ao1 기본
+    Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
-	return Out;
+    return Out;
 }
 
 PS_OUT PS_DIFF(PS_IN In)
@@ -213,13 +412,13 @@ PS_OUT PS_DIFF(PS_IN In)
 
     float3 albedo = vBase.rgb;
 
-	Out.vDiffuse = float4(albedo, 1.f);
-	Out.vNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-	Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
-	Out.vEmissive = float4(g_vEmissiveColor.rgb * vBase.a, 1.f);
+    Out.vDiffuse = float4(albedo, 1.f);
+    Out.vNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vBase.a, 1.f);
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
-	return Out;
+    return Out;
 }
 
 PS_OUT PS_DN(PS_IN In)
@@ -244,17 +443,20 @@ PS_OUT PS_DN(PS_IN In)
     float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
     float3 Nw = normalize(mul(nTS, TBN));
 
-	Out.vDiffuse = float4(albedo, 1.f);
-	Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-	Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
-	Out.vEmissive = float4(g_vEmissiveColor.rgb * vBase.a, 1.f);
+    Out.vDiffuse = float4(albedo, 1.f);
+    Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vBase.a, 1.f);
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
-	return Out;
+    return Out;
 }
 
 PS_OUT PS_DMN(PS_IN In)
 {
+    if (g_bUseLayerEx != 0u)
+        return PS_DMN_LayerEx(In);
+    
     PS_OUT Out;
     float2 vBaseUV = Apply_MapUVTransform(Select_MapUV(In, g_iBase_UVIndex), g_vUVTransform);
     float2 vNormalUV = Apply_MapUVTransform(Select_MapUV(In, g_iBase_UVIndex), g_vUVTransformNormal);
@@ -277,13 +479,13 @@ PS_OUT PS_DMN(PS_IN In)
     float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
     float3 Nw = normalize(mul(nTS, TBN));
 
-	Out.vDiffuse = float4(albedo, 1.f);
-	Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-	Out.vMRA = float4(mra, g_iMaterialID / 255.f);
-	Out.vEmissive = float4(g_vEmissiveColor.rgb * vBase.a, 1.f);
+    Out.vDiffuse = float4(albedo, 1.f);
+    Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(mra, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vBase.a, 1.f);
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
-	return Out;
+    return Out;
 }
 
 PS_OUT PS_DMNU(PS_IN In)
@@ -329,8 +531,51 @@ PS_OUT PS_DMN_TOP(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_DMN_MASK_LayerEx(PS_IN In)
+{
+    PS_OUT Out;
+
+    float2 vBaseUV = GetLayerExUV(In, 0u, 0u);
+    float2 vMaterialUV = GetLayerExUV(In, 0u, 1u);
+    float2 vNormalUV = GetLayerExUV(In, 0u, 2u);
+
+    float4 vBase = SampleLayerExDiff(0u, vBaseUV);
+    if (vBase.a < 0.1f)
+        discard;
+
+    float3 albedo = vBase.rgb;
+    float3 mra = SampleLayerExMRA(0u, vMaterialUV).rgb;
+    float2 nrg = SampleLayerExNorm(0u, vNormalUV).rg;
+
+    Blend_LayerExMaterial(albedo, mra, nrg, In, 1u, In.vColor.r);
+    Blend_LayerExMaterial(albedo, mra, nrg, In, 2u, In.vColor.g);
+    Blend_LayerExMaterial(albedo, mra, nrg, In, 3u, In.vColor.b);
+    Blend_LayerExMaterial(albedo, mra, nrg, In, 4u, In.vColor.a);
+
+    float3 N = normalize(In.vNormal.xyz);
+    float3 T = normalize(In.vTangent.xyz);
+    T = normalize(T - dot(T, N) * N);
+    float3 B = cross(N, T) * In.vTangent.w;
+    float3x3 TBN = float3x3(T, B, N);
+
+    nrg *= g_NormalStrength;
+    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+    float3 Nw = normalize(mul(nTS, TBN));
+
+    Out.vDiffuse = float4(albedo, 1.f);
+    Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(mra, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vBase.a, 1.f);
+    Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    return Out;
+}
+
 PS_OUT PS_DMN_MASK(PS_IN In)
 {
+    if (g_bUseLayerEx != 0u)
+        return PS_DMN_MASK_LayerEx(In);
+
     PS_OUT Out = PS_DMN(In);
     float3 albedo = Out.vDiffuse.rgb;
 
@@ -343,8 +588,35 @@ PS_OUT PS_DMN_MASK(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_UKWN_LayerEx(PS_IN In)
+{
+    PS_OUT Out;
+    float2 vBaseUV = GetLayerExUV(In, 0u, 3u);
+    float4 vBase = SampleLayerExUkwn(0u, vBaseUV);
+    if (vBase.a < 0.1f)
+        discard;
+
+    float3 albedo = vBase.rgb;
+    
+    Blend_LayerExUkwn(albedo, In, 1u, In.vColor.r);
+    Blend_LayerExUkwn(albedo, In, 2u, In.vColor.g);
+    Blend_LayerExUkwn(albedo, In, 3u, In.vColor.b);
+    Blend_LayerExUkwn(albedo, In, 4u, In.vColor.a);
+
+    Out.vDiffuse = float4(albedo, 1.f);
+    Out.vNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vBase.a, 1.f);
+    Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    return Out;
+}
+
 PS_OUT PS_UKWN(PS_IN In)
 {
+    if (g_bUseLayerEx != 0u)
+        return PS_UKWN_LayerEx(In);
+    
     PS_OUT Out;
     float2 vBaseUV = Apply_MapUVTransform(Select_MapUV(In, g_iBase_UVIndex), g_vUVTransform);
     float4 vBase = g_UnknownTexture.Sample(LinearSampler, vBaseUV);
@@ -365,7 +637,7 @@ PS_OUT PS_UKWN(PS_IN In)
 PS_OUT PS_DISCARD(PS_IN In)
 {
     discard;
-    return (PS_OUT)0;
+    return (PS_OUT) 0;
 }
 
 technique11 DefaultTechnique

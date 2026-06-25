@@ -4,12 +4,25 @@
 NS_BEGIN(Client)
 
 #pragma region Map Pass
-enum PASS_TEX_MASK : _uint
+enum MAP_LAYER_EX_GROUP : _uint { MAIN, R, G, B, A, GROUP_COUNT };
+
+enum MAP_LAYER_EX_ENTRY : _uint
 {
-	PASS_TEX_DIFFUSE = 1u << 0,
-	PASS_TEX_NORMAL = 1u << 1,
-	PASS_TEX_MRA = 1u << 2,
-	PASS_TEX_UNKNOWN = 1u << 3,
+	LAYER_EX_DIFF = 0,
+	LAYER_EX_MRA,
+	LAYER_EX_NORM,
+	LAYER_EX_UKWN,
+	LAYER_EX_ENTRY_COUNT
+};
+
+enum TEX_KIND : _uint
+{
+	DIFF = 1u << 0,
+	NORM = 1u << 1,
+	MRA = 1u << 2,
+	UKWN = 1u << 3,
+
+	TEX_KIND_COUNT
 };
 
 enum class MAP_PASS : _uint
@@ -36,7 +49,7 @@ inline constexpr MAP_PASS MAP_DEFAULT_PASS = MAP_PASS::WHITE;
 struct MAP_SHADER_PASS_META
 {
 	MAP_PASS		ePass;
-	const _char* szName;
+	const _char*	szName;
 	_uint			iRequiredTextureMask;
 };
 
@@ -44,14 +57,23 @@ inline constexpr MAP_SHADER_PASS_META g_MapShaderPassMetas[] =
 {
 	{ MAP_PASS::SHADOW,		"Shadow",	0 },
 	{ MAP_PASS::WHITE,		"White",	0 },
-	{ MAP_PASS::DIFF,		"DIFF",		PASS_TEX_DIFFUSE },
-	{ MAP_PASS::DN,			"DN",		PASS_TEX_DIFFUSE | PASS_TEX_NORMAL },
-	{ MAP_PASS::DMN,		"DMN",		PASS_TEX_DIFFUSE | PASS_TEX_NORMAL | PASS_TEX_MRA },
-	{ MAP_PASS::DMNU,		"DMNU",		PASS_TEX_DIFFUSE | PASS_TEX_NORMAL | PASS_TEX_MRA | PASS_TEX_UNKNOWN },
-	{ MAP_PASS::TOP,		"TOP",		PASS_TEX_DIFFUSE | PASS_TEX_NORMAL | PASS_TEX_MRA },
-	{ MAP_PASS::MASK,		"MASK",		PASS_TEX_DIFFUSE | PASS_TEX_NORMAL | PASS_TEX_MRA },
-	{ MAP_PASS::UKWN,		"UKWN",		PASS_TEX_UNKNOWN },
+	{ MAP_PASS::DIFF,		"DIFF",		DIFF },
+	{ MAP_PASS::DN,			"DN",		DIFF | NORM },
+	{ MAP_PASS::DMN,		"DMN",		DIFF | NORM | MRA },
+	{ MAP_PASS::DMNU,		"DMNU",		DIFF | NORM | MRA | UKWN },
+	{ MAP_PASS::TOP,		"TOP",		DIFF | NORM | MRA },
+	{ MAP_PASS::MASK,		"MASK",		DIFF | NORM | MRA },
+	{ MAP_PASS::UKWN,		"UKWN",		UKWN },
 	{ MAP_PASS::DISCARD,	"DISCARD",	0 },
+};
+
+static const char* kLayerExTextureNames[MESH_LAYER_EX_GROUP_COUNT][MESH_LAYER_EX_ENTRY_COUNT] =
+{
+	  { "g_TexDiff_Main", "g_TexMRA_Main", "g_TexNorm_Main", "g_TexUkwn_Main" },
+	  { "g_TexDiff_R", "g_TexMRA_R", "g_TexNorm_R", "g_TexUkwn_R" },
+	  { "g_TexDiff_G", "g_TexMRA_G", "g_TexNorm_G", "g_TexUkwn_G" },
+	  { "g_TexDiff_B", "g_TexMRA_B", "g_TexNorm_B", "g_TexUkwn_B" },
+	  { "g_TexDiff_A", "g_TexMRA_A", "g_TexNorm_A", "g_TexUkwn_A" }
 };
 
 inline _bool Is_ValidMapPassValue(_int iPass)
@@ -87,6 +109,20 @@ inline _int Get_MapShaderPassFromComboIndex(_int iIndex)
 		return ETOI(MAP_DEFAULT_PASS);
 
 	return ETOI(g_MapShaderPassMetas[iIndex].ePass);
+}
+
+static DEFAULT_TEXTURE GetLayerExDefaultTexture(_uint iEntry)
+{
+	switch (iEntry)
+	{
+	case LAYER_EX_DIFF:	return DEFAULT_TEXTURE::MAGENTA;
+	case LAYER_EX_MRA:	return DEFAULT_TEXTURE::MRA;
+	case LAYER_EX_NORM:	return DEFAULT_TEXTURE::FLAT_NORMAL;
+	
+	case LAYER_EX_UKWN:
+	default:
+		return DEFAULT_TEXTURE::BLACK;
+	}
 }
 #pragma endregion
 
@@ -149,17 +185,17 @@ struct ENV_SHADER_PASS_META
 
 inline constexpr ENV_SHADER_PASS_META g_EnvShaderPassMetas[] =
 {
-	{ ENV_PASS::DEFAULT,	ShaderPass::NonAnimPBR::DIFF,		"Default",		PASS_TEX_DIFFUSE },
+	{ ENV_PASS::DEFAULT,	ShaderPass::NonAnimPBR::DMN,		"Default",		DIFF | MRA | NORM },
 	{ ENV_PASS::WHITE,		ShaderPass::NonAnimPBR::White,		"WHITE",		0 },
-	{ ENV_PASS::DIFF,		ShaderPass::NonAnimPBR::DIFF,		"DIFF",			PASS_TEX_DIFFUSE },
-	{ ENV_PASS::DMN,		ShaderPass::NonAnimPBR::DMN,		"DMN",			PASS_TEX_DIFFUSE | PASS_TEX_MRA | PASS_TEX_NORMAL },
-	{ ENV_PASS::UKWN,		ShaderPass::NonAnimPBR::UKWN,		"UKWN",			PASS_TEX_UNKNOWN },
-	{ ENV_PASS::UMN,		ShaderPass::NonAnimPBR::UMN,		"UMN",			PASS_TEX_UNKNOWN | PASS_TEX_MRA | PASS_TEX_NORMAL },
+	{ ENV_PASS::DIFF,		ShaderPass::NonAnimPBR::DIFF,		"DIFF",			DIFF },
+	{ ENV_PASS::DMN,		ShaderPass::NonAnimPBR::DMN,		"DMN",			DIFF | MRA | NORM },
+	{ ENV_PASS::UKWN,		ShaderPass::NonAnimPBR::UKWN,		"UKWN",			UKWN },
+	{ ENV_PASS::UMN,		ShaderPass::NonAnimPBR::UMN,		"UMN",			UKWN | MRA | NORM },
 
-	{ ENV_PASS::DMNU,		ShaderPass::NonAnimPBR::DMNU,		"DMN",			PASS_TEX_DIFFUSE | PASS_TEX_MRA | PASS_TEX_NORMAL | PASS_TEX_UNKNOWN },
-	{ ENV_PASS::TREESHADOW,	ShaderPass::NonAnimPBR::TREESHADOW,	"TREESHADOW",	PASS_TEX_UNKNOWN },
-	{ ENV_PASS::GRASS_FUR,	ShaderPass::NonAnimPBR::GRASS_FUR,	"GRASS_FUR",	PASS_TEX_UNKNOWN | PASS_TEX_MRA | PASS_TEX_NORMAL },
-	{ ENV_PASS::MN,			ShaderPass::NonAnimPBR::MN,			"MN",			PASS_TEX_MRA | PASS_TEX_NORMAL },
+	{ ENV_PASS::DMNU,		ShaderPass::NonAnimPBR::DMNU,		"DMN",			DIFF | MRA | NORM | UKWN },
+	{ ENV_PASS::TREESHADOW,	ShaderPass::NonAnimPBR::TREESHADOW,	"TREESHADOW",	UKWN },
+	{ ENV_PASS::GRASS_FUR,	ShaderPass::NonAnimPBR::GRASS_FUR,	"GRASS_FUR",	UKWN | MRA | NORM },
+	{ ENV_PASS::MN,			ShaderPass::NonAnimPBR::MN,			"MN",			MRA | NORM },
 	{ ENV_PASS::DISCARD,	ShaderPass::NonAnimPBR::DISCARD,	"DISCARD",		0 },
 };
 

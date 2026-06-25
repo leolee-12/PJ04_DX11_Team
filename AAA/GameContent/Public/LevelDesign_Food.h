@@ -43,7 +43,6 @@ private:
 	CModel*			m_pModelCom = { nullptr };
 
 	LD_FOOD_DESC	m_tFoodDesc = {};
-	_uint			m_iModelProtoLevel = { ETOUI(LEVEL::GAMEPLAY) };
 
 private:
 	virtual HRESULT	Validate_Desc() override;

@@ -237,6 +237,7 @@
     <ClInclude Include="..\Public\Material.h" />
     <ClInclude Include="..\Public\MaterialEx.h" />
     <ClInclude Include="..\Public\Mesh.h" />
+    <ClInclude Include="..\Public\MeshLayer_Utils.h" />
     <ClInclude Include="..\Public\Model.h" />
     <ClInclude Include="..\public\Movement.h" />
     <ClInclude Include="..\Public\Navigation.h" />

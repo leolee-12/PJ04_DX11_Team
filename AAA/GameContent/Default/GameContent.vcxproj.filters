@@ -463,35 +463,55 @@
     <Filter Include="00. GameObject\06. Monster\99. Monster_PartBase\MultiHitBoxPart">
       <UniqueIdentifier>{52e05539-a775-4546-a588-c66fa3116058}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\99. Unsupported">
-      <UniqueIdentifier>{88670e70-c815-452c-88eb-8a17ac26a72d}</UniqueIdentifier>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Patrol">
+      <UniqueIdentifier>{6faebe93-9f2f-4af1-bb44-37b816184f2d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\00. Breakable">
-      <UniqueIdentifier>{41ac5899-75d9-43ae-ba35-d15a6f693112}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\01. Rail">
-      <UniqueIdentifier>{32387747-e76a-437f-8fc0-28fc7ecd1337}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\02. Ladder">
-      <UniqueIdentifier>{a67d90e6-109a-4bab-91c3-7b56e9af8c93}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\03. Portal">
-      <UniqueIdentifier>{f0f1d3be-3b1a-45d2-8dd8-6bb30a3f8bb2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\05. Point">
-      <UniqueIdentifier>{f7c44ded-34a6-49f6-8c65-a83f1cbb7c82}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\06. Bush">
-      <UniqueIdentifier>{963a97ff-c356-4ff8-9881-d0062ea29e71}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\04. Food">
-      <UniqueIdentifier>{edf36201-7c52-4f18-a438-5ecb5876228f}</UniqueIdentifier>
+    <Filter Include="00. GameObject\06. Monster\NormalEnemy\State">
+      <UniqueIdentifier>{05464a2e-8e96-40b9-b818-54149438e5f8}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\Test\TestMeshParticle">
       <UniqueIdentifier>{8cd5923d-467a-464c-b4e8-7f7307487329}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\Test\TestMeshEmitter">
       <UniqueIdentifier>{d07256ff-a017-43f1-a4ae-0d9b7af3dc98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible">
+      <UniqueIdentifier>{0b08cdeb-26e4-425e-938d-9db7546894b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\00. Breakable">
+      <UniqueIdentifier>{41ac5899-75d9-43ae-ba35-d15a6f693112}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\02. Ladder">
+      <UniqueIdentifier>{a67d90e6-109a-4bab-91c3-7b56e9af8c93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\04. Food">
+      <UniqueIdentifier>{edf36201-7c52-4f18-a438-5ecb5876228f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\05. Point">
+      <UniqueIdentifier>{f7c44ded-34a6-49f6-8c65-a83f1cbb7c82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\06. Bush">
+      <UniqueIdentifier>{963a97ff-c356-4ff8-9881-d0062ea29e71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\01. Starblock">
+      <UniqueIdentifier>{625b2a42-23dd-43f4-bdce-b4f75040938b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Invisible">
+      <UniqueIdentifier>{e71e062d-1cfa-4165-bd2e-41ca3c096f4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Invisible\00. Boundary">
+      <UniqueIdentifier>{b1ef2b61-66ce-4384-abdc-9de318e48fdf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Invisible\03. Portal">
+      <UniqueIdentifier>{f0f1d3be-3b1a-45d2-8dd8-6bb30a3f8bb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Invisible\01. Rail">
+      <UniqueIdentifier>{32387747-e76a-437f-8fc0-28fc7ecd1337}</UniqueIdentifier>
+    <Filter Include="00. GameObject\Test\TestMeshParticle">
+      <UniqueIdentifier>{8cd5923d-467a-464c-b4e8-7f7307487329}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Invisible\99. Unsupported">
+      <UniqueIdentifier>{88670e70-c815-452c-88eb-8a17ac26a72d}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\01. InhaleContainer">
       <UniqueIdentifier>{75fd20ba-5ae3-4c5f-bf95-b21a0b7e20ad}</UniqueIdentifier>
@@ -1000,10 +1020,10 @@
       <Filter>00. GameObject\96. LevelDesign</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Breakable.h">
-      <Filter>00. GameObject\96. LevelDesign\00. Breakable</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\00. Breakable</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Unsupported.h">
-      <Filter>00. GameObject\96. LevelDesign\99. Unsupported</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Invisible\99. Unsupported</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Shader_PassMeta.h">
       <Filter>99. Defines\Leo</Filter>
@@ -1084,10 +1104,10 @@
       <Filter>97. DataSystem\LevelDesignLoader</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Rail.h">
-      <Filter>00. GameObject\96. LevelDesign\01. Rail</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\RailDataReceiver.h">
-      <Filter>00. GameObject\96. LevelDesign\01. Rail</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClInclude>
     <ClInclude Include="..\public\MonsterPart.h">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase</Filter>
@@ -1150,19 +1170,19 @@
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase\MultiHitBoxPart</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Bush.h">
-      <Filter>00. GameObject\96. LevelDesign\06. Bush</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\06. Bush</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Food.h">
-      <Filter>00. GameObject\96. LevelDesign\04. Food</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\04. Food</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Ladder.h">
-      <Filter>00. GameObject\96. LevelDesign\02. Ladder</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\02. Ladder</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Point.h">
-      <Filter>00. GameObject\96. LevelDesign\05. Point</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\05. Point</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Portal.h">
-      <Filter>00. GameObject\96. LevelDesign\03. Portal</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Invisible\03. Portal</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Monster_State_Patrol.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Move\Patrol</Filter>
@@ -1226,6 +1246,12 @@
     </ClInclude>
     <ClInclude Include="..\public\Camera_Boss.h">
       <Filter>00. GameObject\00. Camera\BossCam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesign_Starblock.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\01. Starblock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesign_Boundary.h">
+      <Filter>00. GameObject\96. LevelDesign\Invisible\00. Boundary</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1530,10 +1556,10 @@
       <Filter>00. GameObject\96. LevelDesign</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Breakable.cpp">
-      <Filter>00. GameObject\96. LevelDesign\00. Breakable</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\00. Breakable</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Unsupported.cpp">
-      <Filter>00. GameObject\96. LevelDesign\99. Unsupported</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Invisible\99. Unsupported</Filter>
     </ClCompile>
     <ClCompile Include="..\private\GigantEdge.cpp">
       <Filter>00. GameObject\07. Boss\MiniBoss\GigantEdge</Filter>
@@ -1608,10 +1634,10 @@
       <Filter>97. DataSystem\LevelDesignLoader</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Rail.cpp">
-      <Filter>00. GameObject\96. LevelDesign\01. Rail</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\RailDataReceiver.cpp">
-      <Filter>00. GameObject\96. LevelDesign\01. Rail</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClCompile>
     <ClCompile Include="..\private\MonsterPart.cpp">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase</Filter>
@@ -1668,19 +1694,19 @@
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase\MultiHitBoxPart</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Bush.cpp">
-      <Filter>00. GameObject\96. LevelDesign\06. Bush</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\06. Bush</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Food.cpp">
-      <Filter>00. GameObject\96. LevelDesign\04. Food</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\04. Food</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Ladder.cpp">
-      <Filter>00. GameObject\96. LevelDesign\02. Ladder</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\02. Ladder</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Point.cpp">
-      <Filter>00. GameObject\96. LevelDesign\05. Point</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\05. Point</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Portal.cpp">
-      <Filter>00. GameObject\96. LevelDesign\03. Portal</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Invisible\03. Portal</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Monster_State_Patrol.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Move\Patrol</Filter>
@@ -1744,6 +1770,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Camera_Boss.cpp">
       <Filter>00. GameObject\00. Camera\BossCam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelDesign_Starblock.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\01. Starblock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelDesign_Boundary.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Invisible\00. Boundary</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

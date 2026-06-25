@@ -155,8 +155,16 @@ HRESULT CMap_Builder::Build_EnvDescs(const MAP_MANIFEST_DESC& Manifest, vector<E
 			if (EnvObject_NeedsModel(Desc))
 				m_pResolver->Resolve_EnvObject(&Desc);
 
+			Desc.tCollision.bCookCollMesh = Desc.tCollision.bHasCollMesh;
+			Desc.tCollision.bUseCollMesh = false;
+
 			Desc.tCollision.bSourceInvalidCollision = Desc.tCollision.bInvalidCollision;
-			Desc.tCollision.bSourceHasDecorCollisionApxbin = Desc.tCollision.bHasDecorCollisionApxbin;
+			Desc.tCollision.bSourceHasDecorCollisionApxbin = Desc.tCollision.bHasCollMesh;
+			Desc.tCollision.bHasDecorCollisionApxbin = Desc.tCollision.bHasCollMesh; // Legacy transitional.
+
+			Desc.tRender.bUseShadow = false;
+			Desc.tRender.bShadowMappingCaster = Desc.tRender.bHasShadow; // Legacy transitional.
+
 			pOutEnvDescs->push_back(Desc);
 		}
 

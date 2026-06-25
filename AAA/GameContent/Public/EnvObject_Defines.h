@@ -84,40 +84,48 @@ struct ENV_BOUNDS_DESC
 
 struct ENV_COLLISION_DESC
 {
-	_bool	bInvalidCollision = { false };
-	_bool	bInvisibleCollision = { false };
-	_bool	bSlipFallCollision = { false };
-	_bool	bUseObjCollisionReaction = { false };
-	_bool	bNeedUpdateCollisionByAnim = { false };
-	_bool	bOverrideCollisionAttr = { false };
+	_bool   bInvalidCollision = { false };
+	_bool   bInvisibleCollision = { false };
+	_bool   bSlipFallCollision = { false };
+	_bool   bUseObjCollisionReaction = { false };
+	_bool   bNeedUpdateCollisionByAnim = { false };
+	_bool   bOverrideCollisionAttr = { false };
 
-	wstring	strOverrideCollisionType;
-	wstring	strOverrideCollisionTypeInside;
-	wstring	strMapCollType;
+	wstring strOverrideCollisionType;
+	wstring strOverrideCollisionTypeInside;
+	wstring strMapCollType;
 
-	_float	fMapCollRadius = { 0.f };
+	_float  fMapCollRadius = { 0.f };
 	_float3 vSize = {};
 
 	ENV_COLLIDER_KIND eColliderKind = { ENV_COLLIDER_KIND::NONE };
 	ENV_SIMPLE_SHAPE  eSimpleShape = { ENV_SIMPLE_SHAPE::NONE };
 
-	// Ãß°¡
-	_bool	bCatalogCollisionChecked = { false };
-	_bool	bHasDecorCollisionApxbin = { false };
+	_bool   bHasCollMesh = { false };
+	_bool   bCookCollMesh = { false };
+	_bool   bUseCollMesh = { false };
+
+	// Legacy transitional metadata. Do not use these for new collision policy decisions.
+	_bool   bCatalogCollisionChecked = { false };
+	_bool   bHasDecorCollisionApxbin = { false };
 	_bool   bSourceInvalidCollision = { false };
 	_bool   bSourceHasDecorCollisionApxbin = { false };
-	wstring	strDecorCollisionApxbinName;
-	wstring	strDecorCollisionBfresPath;
+	wstring strDecorCollisionApxbinName;
+	wstring strDecorCollisionBfresPath;
 };
 
 struct ENV_RENDER_DESC
 {
-	_bool	bShadowMappingCaster = { false };
-	_bool	bUseLodCulling = { false };
-	_bool	bUseNearDistAlpha = { false };
-	_float	fNearDistAlphaLengthRate = { 1.f };
-	wstring	strLayerName;
-	_uint	iHideFlag = {};
+	_bool   bHasShadow = { false };
+	_bool   bUseShadow = { false };
+	_bool   bShadowMappingCaster = { false }; // Legacy transitional.
+
+	_bool   bUseCullDistance = { false };
+	_bool	bUseCullFrustum = { true };
+	_bool   bUseNearDistAlpha = { false };
+	_float  fNearDistAlphaLengthRate = { 1.f };
+	wstring strLayerName;
+	_uint   iHideFlag = {};
 };
 
 struct ENV_EFFECT_DESC

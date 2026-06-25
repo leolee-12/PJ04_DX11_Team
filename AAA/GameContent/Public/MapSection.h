@@ -61,6 +61,14 @@ public:
 
 #ifdef _DEBUG
 	const MAP_SECTION_PROFILE& Get_Profile() const { return m_Profile; }
+
+	void	Set_EditorSoloMeshIndex(_int iMeshIndex);
+	void	Clear_EditorSoloMesh();
+	_int	Get_EditorSoloMeshIndex() const { return m_iEditorSoloMeshIndex; }
+	_bool	Is_EditorSoloMeshEnabled() const { return m_iEditorSoloMeshIndex >= 0; }
+
+private:
+	virtual _bool	Should_RenderMesh(_uint iMesh) const override;
 #endif
 
 private:
@@ -90,6 +98,8 @@ private:
 
 #ifdef _DEBUG
 	MAP_SECTION_PROFILE	m_Profile = {};
+
+	_int m_iEditorSoloMeshIndex = -1;
 #endif
 
 public:

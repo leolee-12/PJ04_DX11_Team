@@ -71,6 +71,11 @@ namespace
 
 		Collision.eColliderKind = ENV_COLLIDER_KIND::NONE;
 		Collision.eSimpleShape = ENV_SIMPLE_SHAPE::NONE;
+
+		Collision.bHasCollMesh = false;
+		Collision.bCookCollMesh = false;
+		Collision.bUseCollMesh = false;
+
 		Collision.bCatalogCollisionChecked = false;
 		Collision.bHasDecorCollisionApxbin = false;
 		Collision.strDecorCollisionApxbinName.clear();
@@ -107,6 +112,10 @@ namespace
 			ENV_COLLISION_CATALOG_RECORD Record{};
 			if (CEnv_CollisionCatalog::Try_Find(pDesc->wstrObjectName, &Record))
 			{
+				Collision.bHasCollMesh = true;
+				Collision.bCookCollMesh = true;
+				Collision.bUseCollMesh = false;
+
 				Collision.bHasDecorCollisionApxbin = true;
 				Collision.strDecorCollisionApxbinName = Record.strApxbinName;
 				Collision.strDecorCollisionBfresPath = Record.strBfresPath;
@@ -114,6 +123,9 @@ namespace
 			}
 			else
 			{
+				Collision.bHasCollMesh = false;
+				Collision.bCookCollMesh = false;
+				Collision.bUseCollMesh = false;
 				Collision.eColliderKind = ENV_COLLIDER_KIND::NONE;
 			}
 
@@ -958,10 +970,13 @@ void CMap_Parser::Fill_CommonFlags(const json& jEntry, ENV_OBJECT_DESC* pDesc)
 	Try_ReadString(jEntry, "OverrideCollisionType", &pDesc->tCollision.strOverrideCollisionType);
 	Try_ReadString(jEntry, "OverrideCollisionTypeInside", &pDesc->tCollision.strOverrideCollisionTypeInside);
 
-	Try_ReadBoolFromNumeric(jEntry, "IsShadowMappingCaster", &pDesc->tRender.bShadowMappingCaster);
+	Try_ReadBoolFromNumeric(jEntry, "IsShadowMappingCaster", &pDesc->tRender.bHasShadow);
+	// Source capability only. Actual shadow usage is opt-in via map edit.
+	pDesc->tRender.bUseShadow = false;
+	pDesc->tRender.bShadowMappingCaster = pDesc->tRender.bHasShadow; // Legacy transitional.
 
-	if (!Try_ReadBoolFromNumeric(jEntry, "UseLodCulling", &pDesc->tRender.bUseLodCulling))
-		Try_ReadBoolFromNumeric(jEntry, "Basic.Model.UseLodCulling", &pDesc->tRender.bUseLodCulling);
+	if (!Try_ReadBoolFromNumeric(jEntry, "UseLodCulling", &pDesc->tRender.bUseCullDistance))
+		Try_ReadBoolFromNumeric(jEntry, "Basic.Model.UseLodCulling", &pDesc->tRender.bUseCullDistance);
 
 	if (!Try_ReadBoolFromNumeric(jEntry, "UseNearDistAlpha", &pDesc->tRender.bUseNearDistAlpha))
 		Try_ReadBoolFromNumeric(jEntry, "Basic.Model.UseNearDistAlpha", &pDesc->tRender.bUseNearDistAlpha);

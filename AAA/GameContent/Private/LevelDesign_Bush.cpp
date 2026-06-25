@@ -52,7 +52,6 @@ CLevelDesign_Bush::CLevelDesign_Bush(ID3D11Device* pDevice, ID3D11DeviceContext*
 CLevelDesign_Bush::CLevelDesign_Bush(const CLevelDesign_Bush& Prototype)
 	: CLevelDesignObject(Prototype)
 	, m_tBushDesc(Prototype.m_tBushDesc)
-	, m_iModelProtoLevel(Prototype.m_iModelProtoLevel)
 {
 }
 
@@ -129,8 +128,8 @@ void CLevelDesign_Bush::Register_LevelDesignSpecs()
 		Spec.pBuildDesc = &Build_Desc;
 		Spec.ModelRequirements =
 		{
-			{ Entry.pBasicModelProtoTag, Entry.pBasicModelPath, ETOUI(LEVEL::GAMEPLAY), Entry.eBasicModelType },
-			{ Entry.pCutModelProtoTag, Entry.pCutModelPath, ETOUI(LEVEL::GAMEPLAY), Entry.eCutModelType }
+			{ Entry.pBasicModelProtoTag, Entry.pBasicModelPath, Entry.eBasicModelType },
+			{ Entry.pCutModelProtoTag, Entry.pCutModelPath, Entry.eCutModelType }
 		};
 
 		CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
@@ -207,7 +206,7 @@ HRESULT CLevelDesign_Bush::Ready_Components()
 		if (nullptr == m_pShaderComs[eSlot])
 			return E_FAIL;
 
-		m_pModelComs[eSlot] = Add_Component<CModel>(m_iModelProtoLevel, pModelProtoTag, szModelTag);
+		m_pModelComs[eSlot] = Add_Component<CModel>(m_tBushDesc.iModelProtoLevel, pModelProtoTag, szModelTag);
 		if (nullptr == m_pModelComs[eSlot])
 			return E_FAIL;
 	}
