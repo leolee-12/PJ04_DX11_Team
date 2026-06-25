@@ -16,8 +16,8 @@ HRESULT CCutsceneGorilla::Ready_Components()
 {
     VISUAL_SETUP t{};
     t.tShader = Shader_Gorilla;
-    t.szModelProtoTag = TEXT("Prototype_Component_Model_Boss_Gorilla_Body");  // 전투 고릴라 메쉬 재사용
-    t.szAnimEventFile = TEXT("../Bin/DataFiles/Cutscene/Gorilla_Cutscene.json");
+    t.szModelProtoTag = TEXT("Prototype_Component_Model_Boss_Gorilla_Body");
+    t.szAnimEventFile = TEXT("../../Resources/YSH/Boss/Gorilla/Body/Gorilla_Cutscene.json");
     if (FAILED(Ready_Visual(t)))
         return E_FAIL;
 
@@ -153,18 +153,14 @@ void CCutsceneGorilla::Fire_CutsceneCamera()
 
 void CCutsceneGorilla::Do_Handoff()
 {
+    if (m_ePhase == EPhase::Done)
+        return;
     m_ePhase = EPhase::Done;
 
-    // 1) 먼저 보스전 카메라로 컷 -> 하드 스왑을 가림
-    CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
-    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
-
-    // 2) 전투 고릴라에 인계 (보스 매니저가 받아서: 전투 고릴라 활성 + grab 진입 + 커비 소켓 교체)
     CUTSCENE_HANDOFF_DESC ho{};
     ho.pFinalWorld = Get_Transform()->Get_WorldMatrixPtr();
     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GorillaHandoff, &ho);
 
-    // 3) 구독 해제 + 자기 비활성 (삭제 아님, 풀 반납)
     UnSubscribe_Event(EventTag::Cutscene_GorillaAppear);
     Set_Active(false);
 }

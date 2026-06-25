@@ -117,7 +117,7 @@ HRESULT CBoss_Gorilla_Body::Ready_Components()
     PART_SETUP t{};
     t.tShader = Shader_Gorilla;
     t.szModelProtoTag = TEXT("Prototype_Component_Model_Boss_Gorilla_Body");
-    t.szAnimEventFile = nullptr;        
+    t.szAnimEventFile = TEXT("../../Resources/YSH/Boss/Gorilla/Body/Gorilla_anim_events.json");
     return Ready_MeshPart(t);
 }
 

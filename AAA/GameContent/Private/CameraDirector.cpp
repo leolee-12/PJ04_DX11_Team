@@ -1,7 +1,8 @@
 #include "CameraDirector.h"
 #include "GameInstance.h"
-#include "Camera_Cutscene.h"
 #include "GameContrnt_Events.h"
+#include "Camera_Cutscene.h"
+#include "Camera_Boss.h"
 
 CCameraDirector::CCameraDirector(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject(pDevice, pContext) {
@@ -32,9 +33,8 @@ void CCameraDirector::On_CameraChange(void* p)
 
     const _uint lvl = Get_LevelIndex();
     CGameObject* pArea = m_pGameInstance_Proxy->Find_GameObject(lvl, TEXT("Layer_Camera"), TEXT("CameraFollow"));
-    auto         pCut = m_pGameInstance_Proxy->Find_GameObject<CCamera_Cutscene>(lvl, TEXT("Layer_Camera"),
-        TEXT("CameraCutscene"));
-    CGameObject* pBoss = m_pGameInstance_Proxy->Find_GameObject(lvl, TEXT("Layer_Camera"), TEXT("CameraBoss"));
+    auto         pCut = m_pGameInstance_Proxy->Find_GameObject<CCamera_Cutscene>(lvl, TEXT("Layer_Camera"),TEXT("CameraCutscene"));
+    auto         pBoss = m_pGameInstance_Proxy->Find_GameObject<CCamera_Boss>(lvl, TEXT("Layer_Camera"), TEXT("CameraBoss"));
 
     const _bool bCut = (d->eCam == ECutsceneCam::Cutscene);
     const _bool bBoss = (d->eCam == ECutsceneCam::Boss);
@@ -52,7 +52,13 @@ void CCameraDirector::On_CameraChange(void* p)
 
     if (pArea) pArea->Set_Active(!(bCut && bReady) && !bBoss);
     if (pCut)  pCut->Set_Active(bCut && bReady);
-    if (pBoss) pBoss->Set_Active(bBoss);
+    if (bBoss)
+    {
+        if (pCut)  pCut->Set_Active(false);
+        if (pArea) pArea->Set_Active(false);
+        if (pBoss) { pBoss->Snap(); pBoss->Set_Active(true); } 
+        return;
+    }
 
     OutputDebugStringW((L"[CamDir] AFTER area=" + std::to_wstring(pArea ? (int)pArea->Is_Active() : -1)
         + L" cut=" + std::to_wstring(pCut ? (int)pCut->Is_Active() : -1)

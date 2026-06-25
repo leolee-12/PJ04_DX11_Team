@@ -75,16 +75,6 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 #ifdef  _DEBUG
     if (m_pGameInstance_Proxy->Key_Down(DIK_F1))
         m_pGameInstance_Proxy->Publish(TEXT("FadeOut_Start"), nullptr);
-    
-    if (m_bTestLevelChange)
-    {
-        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::TOWN_STEP1);
-        if (pLoadingLevel)
-        {
-            m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
-            return;
-        }
-    }
 #endif //  _DEBUG
 }
 
@@ -99,7 +89,18 @@ HRESULT CLevel_GamePlay::Render()
 HRESULT CLevel_GamePlay::Ready_Events()
 {
     m_pGameInstance_Proxy->Subscribe(TEXT("FadeOut_Done"), [this](void* p) {
-        m_bTestLevelChange = true;
+        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::BOSS_STAGE1);
+        if (pLoadingLevel)
+        {
+            m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
+            return;
+        }
+        //CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::TOWN_STEP1);
+        //if (pLoadingLevel)
+        //{
+        //    m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
+        //    return;
+        //}
         });
     return S_OK;
 }

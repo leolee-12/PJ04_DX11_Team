@@ -1203,10 +1203,14 @@ void CLevel_Tool::Update(_float fTimeDelta)
     }
     if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F7, false))
     {
-        m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GorillaAppear, nullptr);
+        //m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GorillaAppear, nullptr);
+
+        CUTSCENE_HANDOFF_DESC ho{};
+        m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GorillaHandoff, &ho);
 
         Log_Info("Publish: Cutscene_GorillaAppear");
     }
+
 
     if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F6, false))
     {

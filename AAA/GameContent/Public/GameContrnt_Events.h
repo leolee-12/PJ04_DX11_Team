@@ -27,10 +27,17 @@ namespace Client
         inline constexpr const _tchar* Cutscene_ReleaseKirby = L"Cutscene.ReleaseKirby";     
         inline constexpr const _tchar* Cutscene_CameraChange = L"Cutscene.CameraChange";
         inline constexpr const _tchar* Cutscene_GorillaHandoff = L"Cutscene.GorillaHandoff";
+
+        inline constexpr const _tchar* Camera_Shake = L"Camera.Shake";
+        inline constexpr const _tchar* Camera_Rumble = L"Camera.Rumble";
+
+        inline constexpr const _tchar* NamePlate_Appeared = L"Boss.NamePlateOn";
+        inline constexpr const _tchar* FullScreen_Flash = L"Fx.FullScreenFlashOn";
     }
 
     inline constexpr const _tchar* EVT_SWALLOWED = L"OnSwallowed";
     inline constexpr const _tchar* EVT_QUERY_PLAYER = L"Query_Player";
+    inline constexpr const _tchar* EVT_QUERY_BOSS = L"Query_Boss";
 
     enum class ECutsceneCam { Cutscene, Boss };
 
@@ -50,10 +57,8 @@ namespace Client
         const _float4x4* pSourceWorld = { nullptr };
     };
 
-    struct PLAYER_QUERY 
-    { 
-        CGameObject* pPlayer = { nullptr }; 
-    };
+    struct PLAYER_QUERY { CGameObject* pPlayer = { nullptr }; };
+    struct BOSS_QUERY { CGameObject* pBoss = { nullptr }; };
 
     struct SWALLOW_EVENT 
     { 

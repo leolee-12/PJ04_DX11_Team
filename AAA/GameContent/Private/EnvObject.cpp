@@ -11,7 +11,7 @@ NS_BEGIN(Client)
 
 namespace
 {
-	constexpr _bool		ENABLE_ENV_OBJECT_SHADOW = false;
+	constexpr _bool		ENABLE_ENV_OBJECT_SHADOW = true;
 	constexpr _float	ENV_DISTANCE_CULL_START = 175.f;
 	constexpr _float	ENV_SHADOW_DISTANCE_CULL_START = 100.f;
 	constexpr _float	ENV_PICK_AABB_PADDING = 0.05f;

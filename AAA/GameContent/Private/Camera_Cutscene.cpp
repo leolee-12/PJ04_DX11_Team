@@ -67,44 +67,93 @@ _bool CCamera_Cutscene::Play_Track(const _tchar* szTrack, CAnimator* pProgress, 
         }
         it = m_Tracks.emplace(name, move(t)).first;
     }
-    m_pCur = &it->second;
-    m_pProgress = pProgress;
-    m_pAnchor = pAnchorWorld;
+    m_pCur = &it->second; m_pProgress = pProgress; m_pAnchor = pAnchorWorld;
+    m_fTrauma = 0.f; 
+    m_fRumble = 0.f;
+    Apply_Pose(); 
+    Update_PipeLine();
     return true;
 }
 
 void CCamera_Cutscene::Priority_Update(_float fTimeDelta)
 {
     if (!m_bActive) return;
+    if (m_fTrauma > 0.f) m_fTrauma = max(0.f, m_fTrauma - m_fTraumaDecay * fTimeDelta);
+    m_fShakeTime += fTimeDelta;
+    Apply_Pose();
+    __super::Priority_Update(fTimeDelta);
+}
 
-    if (m_pCur && m_pProgress && m_pAnchor)
-    {
-        _float prog = m_pProgress->Get_Progress();
-        _float3 eyeL, atL;
-        m_pCur->Sample(prog, eyeL, atL);
-        eyeL.x = -eyeL.x; 
-        atL.x = -atL.x;
+HRESULT CCamera_Cutscene::Ready_Events()
+{
+    Subscribe_Event(EventTag::Camera_Shake, [this](void* p) {
+        Add_Shake(p ? *static_cast<_float*>(p) : 0.5f); });
 
-        _matrix W = XMLoadFloat4x4(m_pAnchor);
-        _vector eyeW = XMVector3TransformCoord(XMLoadFloat3(&eyeL), W);
-        _vector atW = XMVector3TransformCoord(XMLoadFloat3(&atL), W);
+    Subscribe_Event(EventTag::Camera_Rumble, [this](void* p) {
+        _float lvl = p ? *static_cast<_float*>(p) : 0.f;
+        if (lvl > 0.f) Set_Rumble(lvl);
+        else           Stop_Rumble();
+        });
+    return S_OK;
+}
 
-        _vector vLook = XMVector3Normalize(XMVectorSubtract(atW, eyeW));
-        _vector vRight = XMVector3Normalize(XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLook));
-        _vector vUp = XMVector3Cross(vLook, vRight);
+void CCamera_Cutscene::Apply_Shake(_matrix& CamWorld)
+{
+    _float a = min(1.f, m_fTrauma + m_fRumble); 
+    if (a <= 0.f) return;
 
-        _matrix CamWorld;
-        CamWorld.r[0] = XMVectorSetW(vRight, 0.f);
-        CamWorld.r[1] = XMVectorSetW(vUp, 0.f);
-        CamWorld.r[2] = XMVectorSetW(vLook, 0.f);
-        CamWorld.r[3] = XMVectorSetW(eyeW, 1.f);
-        m_pTransformCom->Set_WorldMatrix(CamWorld);
+    _float s = a * a;
+    _float t = m_fShakeTime * m_fShakeFreq;
 
-        m_fFovy = m_pCur->fovY;
-        Recalculate_ProjMatrix();
-    }
+    _float yaw = m_fShakeYaw * s * sinf(t);
+    _float pitch = m_fShakePitch * s * sinf(t * 1.27f + 7.f);
+    _float roll = m_fShakeRoll * s * sinf(t * 1.63f + 19.f);
 
-    __super::Priority_Update(fTimeDelta);   // 파이프라인 기록 + 섀도우핏
+    _vector eye = CamWorld.r[3];
+    _vector right = CamWorld.r[0];
+    _vector up = CamWorld.r[1];
+
+    _matrix Rot = CamWorld; Rot.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+    _matrix NewRot = XMMatrixRotationRollPitchYaw(pitch, yaw, roll) * Rot;
+
+    _vector posJitter = right * (m_fShakePos * s * sinf(t * 1.11f + 3.f))
+        + up * (m_fShakePos * s * sinf(t * 1.39f + 13.f));
+
+    CamWorld.r[0] = NewRot.r[0];
+    CamWorld.r[1] = NewRot.r[1];
+    CamWorld.r[2] = NewRot.r[2];
+    CamWorld.r[3] = XMVectorSetW(eye + posJitter, 1.f);
+}
+
+void CCamera_Cutscene::Apply_Pose()
+{
+    if (!m_pCur || !m_pProgress || !m_pAnchor)
+        return;
+
+    _float prog = m_pProgress->Get_Progress();
+    _float3 eyeL, atL;
+    m_pCur->Sample(prog, eyeL, atL);
+    eyeL.x = -eyeL.x;
+    atL.x = -atL.x;
+
+    _matrix W = XMLoadFloat4x4(m_pAnchor);
+    _vector eyeW = XMVector3TransformCoord(XMLoadFloat3(&eyeL), W);
+    _vector atW = XMVector3TransformCoord(XMLoadFloat3(&atL), W);
+
+    _vector vLook = XMVector3Normalize(XMVectorSubtract(atW, eyeW));
+    _vector vRight = XMVector3Normalize(XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLook));
+    _vector vUp = XMVector3Cross(vLook, vRight);
+
+    _matrix CamWorld;
+    CamWorld.r[0] = XMVectorSetW(vRight, 0.f);
+    CamWorld.r[1] = XMVectorSetW(vUp, 0.f);
+    CamWorld.r[2] = XMVectorSetW(vLook, 0.f);
+    CamWorld.r[3] = XMVectorSetW(eyeW, 1.f);
+    Apply_Shake(CamWorld);
+    m_pTransformCom->Set_WorldMatrix(CamWorld);
+
+    m_fFovy = m_pCur->fovY;
+    Recalculate_ProjMatrix();
 }
 
 CCamera_Cutscene* CCamera_Cutscene::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

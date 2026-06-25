@@ -24,7 +24,6 @@ public:
     virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void* pArg) override;
     virtual void    Update(_float fTimeDelta) override;
-    virtual void    On_Deserialized() override;
     virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* p) override { p->strPrototypeTag = PROTOTYPE_TAG; }
 
 public:
@@ -33,8 +32,8 @@ public:
 
 protected:
     virtual CMonsterBrain* Create_Brain() override;
-    virtual void           Play_Intro() override {}                         
-    virtual _bool          Is_Intro_Finished() const override { return true; }
+    virtual void           Play_Intro() override;
+    virtual _bool          Is_Intro_Finished() const override;
     virtual void           Play_Death() override {}                         
     virtual _bool          Is_Death_Finished() const override { return true; }
 
@@ -48,12 +47,27 @@ protected:
     virtual _float Get_InteractRadius() const override { return 0.f; }
     virtual _bool  Get_HurtBoxDesc(CAPSULE_DESC& Out) const override;
 
+    virtual const _tchar*  Get_AppearEventTag() const override { return EventTag::Cutscene_GorillaHandoff; }
+    virtual HRESULT        Ready_AnimEvents() override;                       
+
     virtual HRESULT Ready_PartObjects() override;
-    //virtual HRESULT Ready_AnimEvents() override;
 
 private:
     CBoss_Gorilla_Body* m_pBody = { nullptr };
     static const vector<_float> s_Thresholds;
+
+    _int  m_iIntroStep = { -1 };
+    _bool m_bIntroDone = { false };
+    _float m_fFreezeTimer = { 0.f };
+
+    static constexpr const _char* s_Intro[] = {
+          "CatchSuccessB", "CatchSuccessWait", "CatchRelease", "Roar"
+    };
+
+private:
+    void Tick_OpeningCatch();                    
+    void Fire_CatchCamera(const _tchar* szTrack);
+    void Begin_AnimFreeze(_float fSeconds);
 
 public:
     static CBoss_Gorilla* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
