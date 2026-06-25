@@ -12,7 +12,7 @@ HRESULT CMonster_State_Move::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpee
 	return S_OK;
 }
 
-void CMonster_State_Move::Enter()
+void CMonster_State_Move::Enter(MONSTER_STATE_TYPE ePrevState)
 {
 	if (m_pOwner == nullptr)
 		return;

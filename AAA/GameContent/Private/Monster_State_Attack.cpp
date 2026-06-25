@@ -11,7 +11,7 @@ HRESULT CMonster_State_Attack::Initialize(const ANI_PLAY_INFO& tInfo, _float fSp
 	return S_OK;
 }
 
-void CMonster_State_Attack::Enter()
+void CMonster_State_Attack::Enter(MONSTER_STATE_TYPE ePrevState)
 {
 	if (m_pOwner == nullptr)
 		return;

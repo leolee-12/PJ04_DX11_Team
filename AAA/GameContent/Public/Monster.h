@@ -60,6 +60,7 @@ public:
 	const MONSTER_BLACKBOARD&	Get_BlackBoard() const { return m_BlackBoard; }
 	MONSTER_BLACKBOARD&			Get_BlackBoard() { return m_BlackBoard; }
 	CMonster_Movement*			Get_Movement() { return m_pMovement; }
+	const _float3&				Get_BasePos() const { return m_vBasePos; }
 	_bool						Has_Trait(MONSTER_TRAIT t) const { return (m_TraitFlags & t) != 0; }
 
 public: // Inhalable
@@ -130,6 +131,8 @@ protected:
 	static constexpr _float		s_fSpatKnockback = 12.f;
 
 	HIT_REACTION				m_LastHit{};		// 상태에 던질 값들 
+
+	_float3						m_vBasePos = {};
 
 protected:
 	// 부모가 관리할 공통 파이프라인

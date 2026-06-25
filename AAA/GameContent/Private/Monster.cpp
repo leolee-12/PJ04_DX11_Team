@@ -108,6 +108,9 @@ void CMonster::On_Deserialized()
 {
 	if (nullptr != m_pMovement)
 		m_pMovement->Sync_To_Controller();
+
+	// 스폰 위치를 기억해뒀다가 사용
+	XMStoreFloat3(&m_vBasePos, m_pTransformCom->Get_State(STATE::POSITION));
 }
 
 void CMonster::Set_Target(CGameObject* pTarget)
@@ -571,7 +574,7 @@ void CMonster::Update_AI(_float fTimeDelta)
 
 	// Brain이 상태 변경 판단
 	if (nullptr != m_pBrain)
-		m_pBrain->Decide(this, m_BlackBoard, fTimeDelta);
+		m_pBrain->Decide(m_BlackBoard, fTimeDelta);
 
 	// 현재 State 실행
 	if (nullptr != m_pStateMachine)

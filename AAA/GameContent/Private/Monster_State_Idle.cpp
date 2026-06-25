@@ -16,7 +16,7 @@ MONSTER_STATE_TYPE CMonster_State_Idle::Get_StateType()
 	return MONSTER_STATE_TYPE::IDLE;
 }
 
-void CMonster_State_Idle::Enter()
+void CMonster_State_Idle::Enter(MONSTER_STATE_TYPE ePrevState)
 {
 	if (m_pOwner == nullptr)
 		return;

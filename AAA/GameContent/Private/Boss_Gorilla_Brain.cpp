@@ -28,12 +28,12 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
         };
     auto HitBox = [this](_int idx, _bool on) -> CBTNode* {
         return CBTAction::Create([this, idx, on](CBlackboard*, _float) {
-            if (auto* p = m_pOwner->Get_HitBoxPart()) p->Enable_HitBox(idx, on);
+            if (auto* p = static_cast<CBoss*>(m_pOwner)->Get_HitBoxPart()) p->Enable_HitBox(idx, on);
             return BT_STATUS::SUCCESS; });
         };
     auto HitBoxAll = [this](_bool on) -> CBTNode* {
         return CBTAction::Create([this, on](CBlackboard*, _float) {
-            if (auto* p = m_pOwner->Get_HitBoxPart()) p->Enable_AllHitBoxes(on);
+            if (auto* p = static_cast<CBoss*>(m_pOwner)->Get_HitBoxPart()) p->Enable_AllHitBoxes(on);
             return BT_STATUS::SUCCESS; });
         };
 
@@ -341,10 +341,10 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
     return pCombat;
 }
 
-CBoss_Gorilla_Brain* CBoss_Gorilla_Brain::Create()
+CBoss_Gorilla_Brain* CBoss_Gorilla_Brain::Create(CMonster* pOwner)
 {
     CBoss_Gorilla_Brain* pInstance = new CBoss_Gorilla_Brain();
-    if (FAILED(pInstance->Initialize_Trees()))
+    if (FAILED(pInstance->Initialize_Trees(pOwner)))
     {
         MSG_BOX("Failed to Created : CBoss_Gorilla_Brain");
         Safe_Release(pInstance);

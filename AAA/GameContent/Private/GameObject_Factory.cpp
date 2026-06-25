@@ -421,6 +421,9 @@ void CGameObject_Factory::Register_Container()
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
+
+    // 3. Kabu
+
 }
 
 void CGameObject_Factory::Register_UIContainer()

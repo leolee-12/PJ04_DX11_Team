@@ -13,7 +13,7 @@ protected:
 	virtual HRESULT		Initialize(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f) override;
 
 public:
-	virtual void		Enter() override;
+	virtual void		Enter(MONSTER_STATE_TYPE ePrevState = MONSTER_STATE_TYPE::IDLE) override;
 	virtual void		Update(_float fTimeDelta) override;
 	virtual void		Exit(MONSTER_STATE_TYPE eNextState) override;
 

@@ -10,16 +10,16 @@
 
 #include <memory>
 
-void CGigantEdge_Brain::Decide(CMonster* pMonster, const MONSTER_BLACKBOARD& BB, _float fDt)
+void CGigantEdge_Brain::Decide(const MONSTER_BLACKBOARD& BB, _float fDt)
 {
-    m_pOwner = static_cast<CGigantEdge*>(pMonster);
-    if (nullptr == m_pBT) return;
+    if (nullptr == m_pBT || m_pOwner == nullptr) 
+        return;
 
     auto* pBB = m_pBT->Get_Blackboard();
     pBB->Set<_float>("DistToTarget", BB.fDistToTarget);
 
     // 타깃 방향(XZ 평면)
-    _vector vMyPos = pMonster->Get_Transform()->Get_State(STATE::POSITION);
+    _vector vMyPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
     _vector vTgt = XMLoadFloat3(&BB.vTargetPos);
     _vector vDiff = XMVectorSetY(vTgt - vMyPos, 0.f);
     _float3 vDir;  XMStoreFloat3(&vDir, XMVector3Normalize(vDiff));
@@ -28,8 +28,15 @@ void CGigantEdge_Brain::Decide(CMonster* pMonster, const MONSTER_BLACKBOARD& BB,
     m_pBT->Tick(fDt);
 }
 
-HRESULT CGigantEdge_Brain::Initialize()
+HRESULT CGigantEdge_Brain::Initialize(CMonster* pOwner)
 {
+    if (pOwner == nullptr)
+        return E_FAIL;
+
+    m_pOwner = pOwner;
+
+    CGigantEdge* pGigantEdge = Owner();
+
     constexpr _float fAttackRange = 4.f;
     constexpr _float fGuardRange = 4.f;
     constexpr _float fFacingDot = 0.86f;
@@ -82,7 +89,7 @@ HRESULT CGigantEdge_Brain::Initialize()
         auto fBaseSpd = make_shared<_float>(0.f);
         auto* pLunge = CBTAction::Create(
             [this, bLunge, fBaseSpd](CBlackboard*, _float) -> BT_STATUS {
-                auto* a = m_pOwner->Get_Body()->Get_Animator();
+                auto* a = m_pOwner->Get_BodyAnimator();
                 auto* mv = m_pOwner->Get_Movement();
                 if (!*bLunge) {
                     a->Play("ThrustMove", false, true, 0.1f, 2.f);
@@ -119,9 +126,9 @@ HRESULT CGigantEdge_Brain::Initialize()
     auto bGroggy = make_shared<bool>(false);
     auto* pGroggy = CBTAction::Create(
         [this, bGroggy](CBlackboard*, _float) -> BT_STATUS {
-            auto* a = m_pOwner->Get_Body()->Get_Animator();
+            auto* a = m_pOwner->Get_BodyAnimator();
             if (!*bGroggy) { a->Play("ShieldGuardDamage", false, true, 0.2f, 2.f); *bGroggy = true; }
-            if (a->Is_Finished()) { *bGroggy = false; m_pOwner->Clear_Groggy(); return BT_STATUS::SUCCESS; }
+            if (a->Is_Finished()) { *bGroggy = false; Owner()->Clear_Groggy(); return BT_STATUS::SUCCESS; }
             return BT_STATUS::RUNNING;
         },
         [bGroggy]() { *bGroggy = false; });
@@ -129,9 +136,9 @@ HRESULT CGigantEdge_Brain::Initialize()
     auto bMove = make_shared<bool>(false);
     auto* pChase = CBTAction::Create(
         [this, bMove](CBlackboard* pBB, _float) -> BT_STATUS {
-            if (!*bMove) { m_pOwner->Get_Body()->Get_Animator()->Play("Move", true, true, 0.2f, 2.f); *bMove = true; }
+            if (!*bMove) { m_pOwner->Get_BodyAnimator()->Play("Move", true, true, 0.2f, 2.f); *bMove = true; }
 #ifdef _DEBUG
-            if (!m_pOwner->Dbg_WalkInPlace())
+            if (!Owner()->Dbg_WalkInPlace())
 #endif
                 m_pOwner->Add_MoveDir(pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 0.f)));
             return BT_STATUS::RUNNING;
@@ -141,7 +148,7 @@ HRESULT CGigantEdge_Brain::Initialize()
     auto* pPick = CBTAction::Create([this, iAttackCount](CBlackboard* pBB, _float) {
         _int iChoice = (_int)(rand() % iAttackCount);
 #ifdef _DEBUG
-        if (m_pOwner->Dbg_ForceAttack() >= 0) iChoice = m_pOwner->Dbg_ForceAttack() % iAttackCount;
+        if (Owner()->Dbg_ForceAttack() >= 0) iChoice = Owner()->Dbg_ForceAttack() % iAttackCount;
 #endif
         pBB->Set<_int>("AttackChoice", iChoice);
         return BT_STATUS::SUCCESS;
@@ -156,13 +163,13 @@ HRESULT CGigantEdge_Brain::Initialize()
     auto fGuardT = make_shared<_float>(0.f);
     auto* pGuardHold = CBTAction::Create(
         [this, fGuardT, fGuardTime](CBlackboard*, _float dt) -> BT_STATUS {
-            auto* a = m_pOwner->Get_Body()->Get_Animator();
-            if (*fGuardT == 0.f) { a->Play("ShieldGuardWait", true, true); m_pOwner->Set_Guarding(true); }
+            auto* a = m_pOwner->Get_BodyAnimator();
+            if (*fGuardT == 0.f) { a->Play("ShieldGuardWait", true, true); Owner()->Set_Guarding(true); }
             *fGuardT += dt;
-            if (*fGuardT >= fGuardTime) { *fGuardT = 0.f; m_pOwner->Set_Guarding(false); return BT_STATUS::SUCCESS; }
+            if (*fGuardT >= fGuardTime) { *fGuardT = 0.f; Owner()->Set_Guarding(false); return BT_STATUS::SUCCESS; }
             return BT_STATUS::RUNNING;
         },
-        [this, fGuardT]() { *fGuardT = 0.f; m_pOwner->Set_Guarding(false); });
+        [this, fGuardT]() { *fGuardT = 0.f; Owner()->Set_Guarding(false); });
 
     CBTNode* pGuard = CBTSequence::Create({
         OneShot("ShieldAppear", 2.f),
@@ -173,21 +180,21 @@ HRESULT CGigantEdge_Brain::Initialize()
 
     auto* pInGuardRange = CBTCondition::Create([this, fGuardRange](CBlackboard* pBB) {
 #ifdef _DEBUG
-        if (m_pOwner->Dbg_ForceInRange()) return true;
+        if (Owner()->Dbg_ForceInRange()) return true;
 #endif
         return pBB->Get<_float>("DistToTarget", FLT_MAX) <= fGuardRange;
         });
 
     auto* pInRangeDist = CBTCondition::Create([this, fAttackRange](CBlackboard* pBB) {
 #ifdef _DEBUG
-        if (m_pOwner->Dbg_ForceInRange()) return true;
+        if (Owner()->Dbg_ForceInRange()) return true;
 #endif
         return pBB->Get<_float>("DistToTarget", FLT_MAX) <= fAttackRange;
         });
 
     auto* pFacing = CBTCondition::Create([this, fFacingDot](CBlackboard* pBB) {
 #ifdef _DEBUG
-        if (m_pOwner->Dbg_ForceInRange()) return true;
+        if (Owner()->Dbg_ForceInRange()) return true;
 #endif
         _float3 vDir = pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 0.f));
         _vector vToTgt = XMLoadFloat3(&vDir);
@@ -198,7 +205,7 @@ HRESULT CGigantEdge_Brain::Initialize()
     auto bTurn = make_shared<bool>(false);
     auto* pTurnToTarget = CBTAction::Create(
         [this, bTurn, fTurnSpeedDeg, fFacingDot](CBlackboard* pBB, _float fDt) -> BT_STATUS {
-            if (!*bTurn) { m_pOwner->Get_Body()->Get_Animator()->Play("Wait", true, true); *bTurn = true; }
+            if (!*bTurn) { m_pOwner->Get_BodyAnimator()->Play("Wait", true, true); *bTurn = true; }
 
             _float3 vDir = pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 0.f));
             _vector vToTgt = XMLoadFloat3(&vDir);
@@ -224,7 +231,7 @@ HRESULT CGigantEdge_Brain::Initialize()
     auto* pPostAttackDelay = CBTAction::Create(
         [this, fPostAtkT, fPostAtkDelay, fTurnSpeedDeg](CBlackboard* pBB, _float dt) -> BT_STATUS {
             if (*fPostAtkT == 0.f)
-                m_pOwner->Get_Body()->Get_Animator()->Play("Wait", true, true);
+                m_pOwner->Get_BodyAnimator()->Play("Wait", true, true);
             *fPostAtkT += dt;
 
             // 대기 동안 플레이어 쪽으로 회전 (pTurnToTarget과 동일 로직)
@@ -275,7 +282,7 @@ HRESULT CGigantEdge_Brain::Initialize()
 
     CBTNode* pRoot = CBTReactiveSelector::Create({
         CBTSequence::Create({
-            CBTCondition::Create([this](CBlackboard*) { return m_pOwner->Is_GroggyRequested(); }),
+            CBTCondition::Create([this](CBlackboard*) { return Owner()->Is_GroggyRequested(); }),
             pGroggy,
         }),
         pCombat,
@@ -285,10 +292,10 @@ HRESULT CGigantEdge_Brain::Initialize()
     return m_pBT ? S_OK : E_FAIL;
 }
 
-CGigantEdge_Brain* CGigantEdge_Brain::Create()
+CGigantEdge_Brain* CGigantEdge_Brain::Create(CMonster* pOwner)
 {
     CGigantEdge_Brain* pInstance = new CGigantEdge_Brain();
-    if (FAILED(pInstance->Initialize()))
+    if (FAILED(pInstance->Initialize(pOwner)))
     {
         MSG_BOX("Failed to Created : CGigantEdge_Brain");
         Safe_Release(pInstance);
@@ -300,4 +307,9 @@ void CGigantEdge_Brain::Free()
 {
     Safe_Release(m_pBT);
     __super::Free();
+}
+
+CGigantEdge* CGigantEdge_Brain::Owner() const
+{
+    return (m_pOwner != nullptr) ? static_cast<CGigantEdge*>(m_pOwner) : nullptr;
 }

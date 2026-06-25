@@ -19,12 +19,12 @@ MONSTER_STATE_TYPE CMonster_State_Retreat::Get_StateType()
 	return MONSTER_STATE_TYPE::RETREAT;
 }
 
-void CMonster_State_Retreat::Enter()
+void CMonster_State_Retreat::Enter(MONSTER_STATE_TYPE ePrevState)
 {
 	if (m_pOwner == nullptr)
 		return;
 
-	__super::Enter();
+	__super::Enter(ePrevState);
 
 	if (m_pMovement)
 	{
