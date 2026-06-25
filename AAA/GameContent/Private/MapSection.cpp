@@ -37,6 +37,39 @@ namespace
 	{
 		OutputDebugStringA((strMessage + "\n").c_str());
 	}
+
+#ifdef _DEBUG
+	void Fill_AABBDescFromMinMax(const _float3& vMin, const _float3& vMax, CCollider::COLLIDER_DESC* pOutDesc, CGameObject* pOwner)
+	{
+		if (nullptr == pOutDesc)
+			return;
+
+		pOutDesc->vCenter = _float3(
+			(vMin.x + vMax.x) * 0.5f,
+			(vMin.y + vMax.y) * 0.5f,
+			(vMin.z + vMax.z) * 0.5f);
+
+		pOutDesc->vSize = _float3(
+			max(vMax.x - vMin.x, 0.001f),
+			max(vMax.y - vMin.y, 0.001f),
+			max(vMax.z - vMin.z, 0.001f));
+
+		pOutDesc->pOwner = pOwner;
+	}
+
+	void Fill_AABBDescFromBox(const BoundingBox& Box, CCollider::COLLIDER_DESC* pOutDesc, CGameObject* pOwner)
+	{
+		if (nullptr == pOutDesc)
+			return;
+
+		pOutDesc->vCenter = Box.Center;
+		pOutDesc->vSize = _float3(
+			max(Box.Extents.x * 2.f, 0.001f),
+			max(Box.Extents.y * 2.f, 0.001f),
+			max(Box.Extents.z * 2.f, 0.001f));
+		pOutDesc->pOwner = pOwner;
+	}
+#endif
 }
 
 CMapSection::CMapSection(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -120,6 +153,8 @@ HRESULT CMapSection::Render_Shadow()
 	size_t n = m_pModelCom->Get_NumMeshes();
 	for (size_t i = 0; i < n; ++i)
 	{
+		if (!Should_RenderMesh(static_cast<_uint>(i)))
+			continue;
 		if (FAILED(m_pShaderCom->Begin(3))) 
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Render((_uint)i)))
@@ -172,6 +207,39 @@ void CMapSection::Reset_FrameProfile()
 {
 	// Profiling is temporarily disabled during the GameContent migration.
 	m_Profile = {};
+}
+
+void CMapSection::Set_EditorSoloMeshIndex(_int iMeshIndex)
+{
+	if (nullptr == m_pModelCom)
+	{
+		m_iEditorSoloMeshIndex = -1;
+		return;
+	}
+
+	const _int iNumMeshes =
+		static_cast<_int>(m_pModelCom->Get_NumMeshes());
+
+	if (iMeshIndex < 0 || iMeshIndex >= iNumMeshes)
+	{
+		m_iEditorSoloMeshIndex = -1;
+		return;
+	}
+
+	m_iEditorSoloMeshIndex = iMeshIndex;
+}
+
+void CMapSection::Clear_EditorSoloMesh()
+{
+	m_iEditorSoloMeshIndex = -1;
+}
+
+_bool CMapSection::Should_RenderMesh(_uint iMesh) const
+{
+	if (m_iEditorSoloMeshIndex < 0)
+		return true;
+
+	return iMesh == static_cast<_uint>(m_iEditorSoloMeshIndex);
 }
 #endif
 

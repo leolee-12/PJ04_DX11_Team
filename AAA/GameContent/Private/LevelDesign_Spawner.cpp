@@ -5,6 +5,29 @@
 
 #include "GameInstance.h"
 
+namespace
+{
+	void Apply_ModelProtoLevel(LD_OBJECT_ENTRY* pEntry, _uint iModelProtoLevel)
+	{
+		if (nullptr == pEntry)
+			return;
+
+		std::visit([&](auto& Desc)
+			{
+				using T = decay_t<decltype(Desc)>;
+
+				if constexpr (is_same_v<T, LD_BREAKABLE_DESC>
+					|| is_same_v<T, LD_LADDER_DESC>
+					|| is_same_v<T, LD_FOOD_DESC>
+					|| is_same_v<T, LD_POINT_DESC>
+					|| is_same_v<T, LD_BUSH_DESC>)
+				{
+					Desc.iModelProtoLevel = iModelProtoLevel;
+				}
+			}, *pEntry);
+	}
+}
+
 CLevelDesign_Spawner::CLevelDesign_Spawner()
 	: m_pProxy{ CGameInstance::GetProxy() }
 {
@@ -74,11 +97,9 @@ HRESULT CLevelDesign_Spawner::Spawn_One(const LD_OBJECT_ENTRY& Desc, const LD_SP
 	}
 
 	const LD_SPAWN_SPEC& Spec = Resolved.Spec;
-
-	if (Resolved.bFallback && nullptr != pInOutReport)
-		++pInOutReport->iFallbackSpecCount;
-
-	const _wstring strObjectTag = Make_ObjectTag(Resolved.Get_BaseDesc());
+	Apply_ModelProtoLevel(&Resolved.ObjectDesc, Request.Levels.iModelPrototypeLevel);
+	const LD_OBJECT_DESC& SpawnDesc = Get_LDObjectDesc(Resolved.ObjectDesc);
+	const _wstring strObjectTag = Make_ObjectTag(SpawnDesc);
 
 	CGameObject* pCreatedObject = nullptr;
 

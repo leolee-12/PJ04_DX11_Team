@@ -33,6 +33,10 @@ private:
 	void    Draw_MapStageSections(CMapStage* pMapStage);
 	void    Draw_MapSectionRenderOptions(CMapSection* pSection);
 
+#ifdef _DEBUG
+	void	Draw_MapSectionViewFilter(CMapStage* pMapStage, CMapSection* pSection, _int iSelectedMeshIndex);
+#endif
+
 private:
 	unordered_map<CGameObject*, _float3>	m_RotEditEuler;
 	unordered_map<CGameObject*, _bool>		m_EnvShadowEditStates;
@@ -40,8 +44,13 @@ private:
 	unordered_map<CMapSection*, _bool>		m_MapCollMeshEditStates;
 	unordered_map<CGameObject*, _bool>		m_EnvNearAlphaEditStates;
 
-
 	CMapSection* m_pFocusedMapSection = { nullptr };
+
+#ifdef _DEBUG
+private:
+	_bool	m_bEditorSoloSection = false;
+	_bool	m_bEditorSoloMesh = false;
+#endif
 
 private:
 	_bool*	Resolve_EnvShadowEditState(CLevel_Edit* pLevel, CEnvObject* pEnvObject);

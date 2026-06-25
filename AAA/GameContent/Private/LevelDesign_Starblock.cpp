@@ -212,7 +212,7 @@ void CLevelDesign_Starblock::Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed
 
 CGameObject* CLevelDesign_Starblock::Get_GameObject()
 {
-	return nullptr;
+	return this;
 }
 #pragma endregion
 
@@ -238,7 +238,7 @@ HRESULT CLevelDesign_Starblock::Ready_Components()
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
-	m_pModelCom = Add_Component<CModel>(ETOUI(LEVEL::GAMEPLAY), pModelProtoTag, TEXT("Com_Model"));
+	m_pModelCom = Add_Component<CModel>(m_tBreakableDesc.iModelProtoLevel, pModelProtoTag, TEXT("Com_Model"));
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
 
@@ -329,7 +329,7 @@ void CLevelDesign_Starblock::Register_LevelDesignSpecs()
 		Spec.pBuildDesc = &Build_Desc;
 		Spec.ModelRequirements =
 		{
-			{ Entry.pModelProtoTag, Entry.pModelPath, ETOUI(LEVEL::GAMEPLAY) }
+			{ Entry.pModelProtoTag, Entry.pModelPath }
 		};
 
 		CLevelDesign_Registry::Register(Spec.strObjectName, Spec);

@@ -41,6 +41,7 @@ protected:
 
 protected:
 	virtual HRESULT Ready_Events() override { return S_OK; }
+	virtual _bool Should_RenderMesh(_uint iMesh) const { return true; }
 	HRESULT Ready_MapComponents();
 	HRESULT Bind_ShaderResources();
 

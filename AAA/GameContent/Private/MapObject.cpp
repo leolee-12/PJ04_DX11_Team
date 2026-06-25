@@ -48,6 +48,9 @@ HRESULT CMapObject::Render()
 
 	for (_uint i = 0; i < n; ++i)
 	{
+		if (!Should_RenderMesh(i))
+			continue;
+
 		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
 
 		if (FAILED(Bind_MapMeshParams(i, Layer)))

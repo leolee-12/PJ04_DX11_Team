@@ -106,6 +106,7 @@ struct MAP_RUNTIME_LEVELS
 
 	_uint iLevelDesignObjectLevel = {};
 	_uint iLevelDesignPrototypeLevel = {};
+	_uint iLevelDesignModelPrototypeLevel = {};
 
 	_bool bEnableEnvObjectPicking = { false };
 };

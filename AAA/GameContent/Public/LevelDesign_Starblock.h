@@ -16,7 +16,10 @@ NS_END
 NS_BEGIN(Client)
 struct LD_SPAWN_SPEC;
 
-class CLevelDesign_Starblock final : public CLevelDesignObject, IDamageable, IInhalable
+class CLevelDesign_Starblock final
+	: public CLevelDesignObject
+	, public IDamageable
+	, public IInhalable
 {
 	GENERATED_BODY(CLevelDesign_Starblock)
 

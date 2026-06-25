@@ -215,7 +215,7 @@ void CLevelDesign_Breakable::Register_LevelDesignSpecs()
 		Spec.pBuildDesc = &Build_Desc;
 		Spec.ModelRequirements =
 		{
-			{ Entry.pModelProtoTag, Entry.pModelPath, ETOUI(LEVEL::GAMEPLAY), Entry.eModelType, Entry.bCookCollisionMesh }
+			{ Entry.pModelProtoTag, Entry.pModelPath, Entry.eModelType, Entry.bCookCollisionMesh }
 		};
 
 		CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
@@ -272,7 +272,7 @@ HRESULT CLevelDesign_Breakable::Ready_Components()
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
-	m_pModelCom = Add_Component<CModel>(ETOUI(LEVEL::GAMEPLAY), pModelProtoTag, TEXT("Com_Model"));
+	m_pModelCom = Add_Component<CModel>(m_tBreakableDesc.iModelProtoLevel, pModelProtoTag, TEXT("Com_Model"));
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
 

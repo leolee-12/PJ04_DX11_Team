@@ -129,11 +129,6 @@ namespace
 			pOutDesc->tRender.bUseShadow = pOutDesc->tRender.bHasShadow && Edit.bUseShadow;
 			pOutDesc->tRender.bShadowMappingCaster = pOutDesc->tRender.bUseShadow; // Transitional mirror only.
 		}
-		else
-		{
-			pOutDesc->tRender.bUseShadow = false;
-			pOutDesc->tRender.bShadowMappingCaster = false;
-		}
 
 		if (Edit.bHasWorldMatrix)
 		{
@@ -147,10 +142,6 @@ namespace
 		if (Edit.bHasCollMesh)
 		{
 			pOutDesc->tCollision.bUseCollMesh = pOutDesc->tCollision.bHasCollMesh && Edit.bUseCollMesh;
-		}
-		else
-		{
-			pOutDesc->tCollision.bUseCollMesh = false;
 		}
 
 		if (Edit.bHasNearDistAlpha)

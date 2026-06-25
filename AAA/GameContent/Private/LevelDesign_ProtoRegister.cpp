@@ -25,16 +25,12 @@ HRESULT CLevelDesign_ProtoRegister::Ready_Prototypes(const LD_RUNTIME_LEVELS& Le
 	{
 		LD_RESOLVED_SPAWN Resolved{};
 
-		if (!CLevelDesign_Registry::Resolve(
-			Desc,
-			&Resolved))
+		if (!CLevelDesign_Registry::Resolve(Desc, &Resolved))
 		{
 			return E_FAIL;
 		}
 
-		if (FAILED(Ensure_Resources(
-			Levels.iPrototypeLevel,
-			Resolved.Spec)))
+		if (FAILED(Ensure_Resources(Levels, Resolved.Spec)))
 		{
 			return E_FAIL;
 		}
@@ -43,7 +39,7 @@ HRESULT CLevelDesign_ProtoRegister::Ready_Prototypes(const LD_RUNTIME_LEVELS& Le
 	return S_OK;
 }
 
-HRESULT CLevelDesign_ProtoRegister::Ensure_Resources(_uint iPrototypeLevel, const LD_SPAWN_SPEC& Spec)
+HRESULT CLevelDesign_ProtoRegister::Ensure_Resources(const LD_RUNTIME_LEVELS& Levels, const LD_SPAWN_SPEC& Spec)
 {
 	if (nullptr == m_pProxy
 		|| Spec.strPrototypeTag.empty()
@@ -52,14 +48,17 @@ HRESULT CLevelDesign_ProtoRegister::Ensure_Resources(_uint iPrototypeLevel, cons
 		return E_FAIL;
 	}
 
-	if (!m_pProxy->Has_Prototype(iPrototypeLevel, Spec.strPrototypeTag))
+	const _uint iObjectPrototypeLevel = Levels.iPrototypeLevel;
+	const _uint iModelPrototypeLevel = Levels.iModelPrototypeLevel;
+
+	if (!m_pProxy->Has_Prototype(iObjectPrototypeLevel, Spec.strPrototypeTag))
 	{
 		CGameObject* pPrototype = Spec.pPrototypeFactory(m_pDevice, m_pContext);
 
 		if (nullptr == pPrototype)
 			return E_FAIL;
 
-		if (FAILED(m_pProxy->Add_Prototype(iPrototypeLevel, Spec.strPrototypeTag, pPrototype)))
+		if (FAILED(m_pProxy->Add_Prototype(iObjectPrototypeLevel, Spec.strPrototypeTag, pPrototype)))
 		{
 			Safe_Release(pPrototype);
 			return E_FAIL;
@@ -68,7 +67,7 @@ HRESULT CLevelDesign_ProtoRegister::Ensure_Resources(_uint iPrototypeLevel, cons
 
 	for (const LD_MODEL_REQUIREMENT& Requirement : Spec.ModelRequirements)
 	{
-		if (m_pProxy->Has_Prototype(Requirement.iPrototypeLevel, Requirement.strPrototypeTag))
+		if (m_pProxy->Has_Prototype(iModelPrototypeLevel, Requirement.strPrototypeTag))
 			continue;
 
 		CBase* pModel = CModel::Create_WithTextureHub(m_pDevice, m_pContext, Requirement.eModelType,
@@ -76,7 +75,7 @@ HRESULT CLevelDesign_ProtoRegister::Ensure_Resources(_uint iPrototypeLevel, cons
 		if (nullptr == pModel)
 			return E_FAIL;
 
-		if (FAILED(m_pProxy->Add_Prototype(Requirement.iPrototypeLevel, Requirement.strPrototypeTag, pModel)))
+		if (FAILED(m_pProxy->Add_Prototype(iModelPrototypeLevel, Requirement.strPrototypeTag, pModel)))
 		{
 			Safe_Release(pModel);
 			return E_FAIL;

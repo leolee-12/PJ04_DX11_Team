@@ -808,6 +808,16 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 	{
 		s_pFocusedMeshOwner = pObject;
 		s_iFocusedMeshIndex = (iNumMeshes > 0) ? 0 : -1;
+
+#ifdef _DEBUG
+		if (auto* pSection = dynamic_cast<Client::CMapSection*>(pObject))
+		{
+			if (m_bEditorSoloMesh)
+				pSection->Set_EditorSoloMeshIndex(s_iFocusedMeshIndex);
+			else
+				pSection->Clear_EditorSoloMesh();
+		}
+#endif
 	}
 
 	if (0 == iNumMeshes)
@@ -825,6 +835,16 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 	if (s_iFocusedMeshIndex < 0 || s_iFocusedMeshIndex >= static_cast<_int>(iNumMeshes))
 		s_iFocusedMeshIndex = 0;
 
+#ifdef _DEBUG
+	if (auto* pSection = dynamic_cast<Client::CMapSection*>(pObject))
+	{
+		if (m_bEditorSoloMesh)
+			pSection->Set_EditorSoloMeshIndex(s_iFocusedMeshIndex);
+		else
+			pSection->Clear_EditorSoloMesh();
+	}
+#endif
+
 	ImGui::BeginChild("MeshList", ImVec2(0.f, 140.f), true);
 	for (size_t i = 0; i < iNumMeshes; ++i)
 	{
@@ -837,7 +857,17 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 		ImGui::PushID(static_cast<int>(i));
 
 		if (ImGui::Selectable(strLabel.c_str(), bSelected, ImGuiSelectableFlags_SpanAllColumns))
+		{
 			s_iFocusedMeshIndex = static_cast<_int>(i);
+
+#ifdef _DEBUG
+			if (auto* pSection = dynamic_cast<Client::CMapSection*>(pObject))
+			{
+				if (m_bEditorSoloMesh)
+					pSection->Set_EditorSoloMeshIndex(s_iFocusedMeshIndex);
+			}
+#endif
+		}
 
 		ImGui::Indent();
 		ImGui::TextDisabled("Pass:%d  UV:%s",
@@ -859,6 +889,18 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 	ImGui::Text("Editing Mesh: %d: %s",
 		s_iFocusedMeshIndex,
 		pModel->Get_MeshName(iMesh).c_str());
+
+#ifdef _DEBUG
+	if (auto* pSection = dynamic_cast<Client::CMapSection*>(pObject))
+	{
+		if (m_bEditorSoloMesh)
+		{
+			ImGui::TextDisabled(
+				"Solo Mesh: %d",
+				pSection->Get_EditorSoloMeshIndex());
+		}
+	}
+#endif
 
 	_bool bChanged = false;
 	_bool bAnyField = false;
@@ -1311,7 +1353,27 @@ void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
 			const _bool bSelected = (pSection == m_pFocusedMapSection);
 
 			if (ImGui::Selectable(strLabel.c_str(), bSelected, ImGuiSelectableFlags_SpanAllColumns))
+			{
 				m_pFocusedMapSection = pSection;
+
+#ifdef _DEBUG
+				if (nullptr != pMapStage)
+				{
+					if (m_bEditorSoloSection)
+						pMapStage->Set_EditorSoloSection(m_pFocusedMapSection);
+					else
+						pMapStage->Clear_EditorSoloSection();
+				}
+
+				if (nullptr != m_pFocusedMapSection)
+				{
+					if (m_bEditorSoloMesh)
+						m_pFocusedMapSection->Set_EditorSoloMeshIndex(-1);
+					else
+						m_pFocusedMapSection->Clear_EditorSoloMesh();
+				}
+#endif
+			}
 
 			const _bool bRenderable =
 				ReadBoolProperty(pSection, L"Renderable", L"MapSection", pSection->Get_Desc().bRenderable);
@@ -1365,6 +1427,10 @@ void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
 			ImGui::Separator();
 			Draw_MapSectionEditPanel(pLevel, pMapStage, m_pFocusedMapSection);
 			ImGui::Separator();
+#ifdef _DEBUG
+			Draw_MapSectionViewFilter(pMapStage, m_pFocusedMapSection, -1);
+			ImGui::Separator();
+#endif
 			Draw_Properties(m_pFocusedMapSection);
 			ImGui::Separator();
 			Draw_MeshLayerPanel(m_pFocusedMapSection);
@@ -1391,6 +1457,34 @@ void CPanel_Inspector::Draw_MapSectionRenderOptions(Client::CMapSection* pSectio
 	if (ImGui::Combo("Render Group", &iRenderGroup, RenderGroups, IM_ARRAYSIZE(RenderGroups)))
 		pSection->Set_RenderID(FromMapRenderGroupIndex(iRenderGroup));
 }
+
+#ifdef _DEBUG
+void CPanel_Inspector::Draw_MapSectionViewFilter(CMapStage* pMapStage, CMapSection* pSection, _int iSelectedMeshIndex)
+{
+	if (nullptr == pMapStage || nullptr == pSection)
+		return;
+
+	if (!ImGui::CollapsingHeader("View Filter", ImGuiTreeNodeFlags_DefaultOpen))
+		return;
+
+	if (ImGui::Checkbox("Solo Section", (bool*)&m_bEditorSoloSection))
+	{
+		if (m_bEditorSoloSection)
+			pMapStage->Set_EditorSoloSection(pSection);
+		else
+			pMapStage->Clear_EditorSoloSection();
+	}
+
+	if (ImGui::Checkbox("Solo Mesh", (bool*)&m_bEditorSoloMesh))
+	{
+		if (!m_bEditorSoloMesh)
+			pMapStage->Clear_EditorSoloMeshAllSections();
+		// ON인 경우 실제 index는 MeshList 선택 로직에서 즉시 세팅
+	}
+
+	ImGui::TextDisabled("Solo Mesh uses the focused mesh in Mesh Render Settings.");
+}
+#endif
 
 _bool* CPanel_Inspector::Resolve_EnvShadowEditState(CLevel_Edit* pLevel, Client::CEnvObject* pEnvObject)
 {
