@@ -621,6 +621,9 @@
     <ClInclude Include="..\Public\Effect_RectEmitter.h">
       <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_RectEmitter</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MeshLayer_Utils.h">
+      <Filter>07. Component\Model\MaterialEx</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">

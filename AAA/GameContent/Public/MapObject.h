@@ -47,8 +47,13 @@ protected:
 
 	HRESULT Bind_MapMeshParams(_uint iMesh, const MESH_LAYER_IDX& Layer);
 	HRESULT Bind_MapMeshTextures(_uint iMesh, const MESH_LAYER_IDX& Layer);
+	HRESULT Bind_MapMeshParams_Legacy(_uint iMesh, const MESH_LAYER_IDX& Layer);
+	HRESULT Bind_MapMeshTextures_Legacy(_uint iMesh, const MESH_LAYER_IDX& Layer);
+	HRESULT Bind_MapMeshParams_Ex(_uint iMesh, const MESH_LAYER_IDX& Layer);
+	HRESULT Bind_MapMeshTextures_Ex(_uint iMesh, const MESH_LAYER_IDX& Layer);
 	HRESULT Bind_MapTextureSafe(_uint iMesh, const _char* pName, MTEX_TYPE eType, _uint iSlot, DEFAULT_TEXTURE eDefault);
 	HRESULT Bind_MapExtraSlotSafe(_uint iMesh, const _char* pName, int iSlot, MTEX_TYPE eType, DEFAULT_TEXTURE eDefault);
+	HRESULT Bind_MapLayerExTextureSafe(_uint iMesh, const _char* pName, const MESH_LAYER_TEX_BIND_EX& Bind, DEFAULT_TEXTURE eDefault);
 
 public:
 	virtual void Free() override;

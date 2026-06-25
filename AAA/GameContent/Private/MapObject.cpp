@@ -109,7 +109,27 @@ HRESULT CMapObject::Bind_ShaderResources()
 
 HRESULT CMapObject::Bind_MapMeshParams(_uint iMesh, const MESH_LAYER_IDX& Layer)
 {
+	if (Layer.bUseLayerEx)
+		return Bind_MapMeshParams_Ex(iMesh, Layer);
+
+	return Bind_MapMeshParams_Legacy(iMesh, Layer);
+}
+
+HRESULT CMapObject::Bind_MapMeshTextures(_uint iMesh, const MESH_LAYER_IDX& Layer)
+{
+	if (Layer.bUseLayerEx)
+		return Bind_MapMeshTextures_Ex(iMesh, Layer);
+
+	return Bind_MapMeshTextures_Legacy(iMesh, Layer);
+}
+
+HRESULT CMapObject::Bind_MapMeshParams_Legacy(_uint iMesh, const MESH_LAYER_IDX& Layer)
+{
 	UNREFERENCED_PARAMETER(iMesh);
+
+	_uint iUseLayerEx = 0u;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseLayerEx", &iUseLayerEx, sizeof(_uint))))
+		return E_FAIL;
 
 	const _uint iBase_UVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
 	const _uint iUnknown_UVIndex = (Layer.iUnknownUVIndex <= 3u) ? Layer.iUnknownUVIndex : 0u;
@@ -194,7 +214,7 @@ HRESULT CMapObject::Bind_MapMeshParams(_uint iMesh, const MESH_LAYER_IDX& Layer)
 	return S_OK;
 }
 
-HRESULT CMapObject::Bind_MapMeshTextures(_uint iMesh, const MESH_LAYER_IDX& Layer)
+HRESULT CMapObject::Bind_MapMeshTextures_Legacy(_uint iMesh, const MESH_LAYER_IDX& Layer)
 {
 	if (FAILED(Bind_MapTextureSafe(iMesh, "g_DiffuseTexture", MTEX_TYPE::DIFFUSE, Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)], DEFAULT_TEXTURE::MAGENTA)))
 		return E_FAIL;
@@ -217,6 +237,99 @@ DEFAULT_TEXTURE::BLACK)))
 	if (FAILED(Bind_MapExtraSlotSafe(iMesh, "g_ExtraATexture", Layer.iExtraBind[3], (MTEX_TYPE)Layer.iExtraTexType[3],
 		DEFAULT_TEXTURE::BLACK)))
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMapObject::Bind_MapMeshParams_Ex(_uint iMesh, const MESH_LAYER_IDX& Layer)
+{
+	UNREFERENCED_PARAMETER(iMesh);
+
+	_uint iUseLayerEx = Layer.bUseLayerEx ? 1u : 0u;
+
+	_uint iUVIndex[MESH_LAYER_EX_GROUP_COUNT][4] = {};
+	_float4 vEnable[MESH_LAYER_EX_GROUP_COUNT] = {};
+	_float4 vUVScale[MESH_LAYER_EX_GROUP_COUNT * MESH_LAYER_EX_ENTRY_COUNT] = {};
+	_float4 vUVOffsetRotate[MESH_LAYER_EX_GROUP_COUNT * MESH_LAYER_EX_ENTRY_COUNT] = {};
+
+	for (_uint g = 0; g < MESH_LAYER_EX_GROUP_COUNT; ++g)
+	{
+		float EnableValues[4] = {};
+
+		for (_uint e = 0; e < MESH_LAYER_EX_ENTRY_COUNT; ++e)
+		{
+			const MESH_LAYER_TEX_BIND_EX& Bind = Layer.LayerEx[g][e];
+			const _uint iFlat = g * MESH_LAYER_EX_ENTRY_COUNT + e;
+
+			iUVIndex[g][e] = (Bind.iUVIndex <= 3u) ? Bind.iUVIndex : 0u;
+
+			EnableValues[e] = Bind.bEnable ? 1.f : 0.f;
+
+			vUVScale[iFlat] = _float4(
+				Bind.vUVScale.x,
+				Bind.vUVScale.y,
+				0.f,
+				0.f);
+
+			vUVOffsetRotate[iFlat] = _float4(
+				Bind.vUVOffset.x,
+				Bind.vUVOffset.y,
+				Bind.fUVRotate,
+				0.f);
+		}
+
+		vEnable[g] = _float4(
+			EnableValues[0],
+			EnableValues[1],
+			EnableValues[2],
+			EnableValues[3]);
+	}
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseLayerEx", &iUseLayerEx, sizeof(_uint))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_iLayerExUVIndex", iUVIndex, sizeof(iUVIndex))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLayerExEnable", vEnable, sizeof(vEnable))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLayerExUVScale", vUVScale, sizeof(vUVScale))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLayerExUVOffsetRotate", vUVOffsetRotate, sizeof(vUVOffsetRotate))))
+		return E_FAIL;
+
+	const _float fNormalStrength = Layer.fNormalStrength;
+	const _float fMaskStrength = Layer.fMaskStrength;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_NormalStrength", &fNormalStrength, sizeof(_float))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_MaskStrength", &fMaskStrength, sizeof(_float))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMapObject::Bind_MapMeshTextures_Ex(_uint iMesh, const MESH_LAYER_IDX& Layer)
+{
+	for (_uint g = 0; g < MESH_LAYER_EX_GROUP_COUNT; ++g)
+	{
+		for (_uint e = 0; e < MESH_LAYER_EX_ENTRY_COUNT; ++e)
+		{
+			const MESH_LAYER_TEX_BIND_EX& Bind = Layer.LayerEx[g][e];
+
+			if (FAILED(Bind_MapLayerExTextureSafe(
+				iMesh,
+				kLayerExTextureNames[g][e],
+				Bind,
+				GetLayerExDefaultTexture(e))))
+			{
+				return E_FAIL;
+			}
+		}
+	}
 
 	return S_OK;
 }
@@ -246,6 +359,26 @@ HRESULT CMapObject::Bind_MapExtraSlotSafe(_uint iMesh, const _char* pName, int i
 	if (iTextureCount > 0u)
 	{
 		const _uint iBindSlot = static_cast<_uint>(iSlot);
+		const _uint iSafeSlot = (iBindSlot < iTextureCount) ? iBindSlot : (iTextureCount - 1u);
+
+		if (SUCCEEDED(m_pModelCom->Bind_Material(m_pShaderCom, pName, iMesh, eType, iSafeSlot)))
+			return S_OK;
+	}
+
+	return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(m_pShaderCom, pName, eDefault);
+}
+
+HRESULT CMapObject::Bind_MapLayerExTextureSafe(_uint iMesh, const _char* pName, const MESH_LAYER_TEX_BIND_EX& Bind, DEFAULT_TEXTURE eDefault)
+{
+	if (!Bind.bEnable || Bind.iSlot < 0)
+		return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(m_pShaderCom, pName, eDefault);
+
+	const MTEX_TYPE eType = static_cast<MTEX_TYPE>(Bind.iTexType);
+	const _uint iTextureCount = m_pModelCom->Get_MeshTextureCount(iMesh, eType);
+
+	if (iTextureCount > 0u)
+	{
+		const _uint iBindSlot = static_cast<_uint>(Bind.iSlot);
 		const _uint iSafeSlot = (iBindSlot < iTextureCount) ? iBindSlot : (iTextureCount - 1u);
 
 		if (SUCCEEDED(m_pModelCom->Bind_Material(m_pShaderCom, pName, iMesh, eType, iSafeSlot)))

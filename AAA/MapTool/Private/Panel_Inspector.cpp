@@ -65,8 +65,7 @@ namespace
 		return (iIndex == 1) ? RENDERID::BLEND : RENDERID::NONBLEND;
 	}
 
-	_bool* FindBoolProperty(IReflectable* pHolder, const _wstring& strName, const _wstring&
-		strCategory)
+	_bool* FindBoolProperty(IReflectable* pHolder, const _wstring& strName, const _wstring& strCategory)
 	{
 		if (nullptr == pHolder)
 			return nullptr;
@@ -131,10 +130,7 @@ namespace
 			* XMMatrixTranslationFromVector(vPosition);
 	}
 
-	_bool IsNearlyEqualFloat4x4(
-		const _float4x4& A,
-		const _float4x4& B,
-		_float fEpsilon = 0.0001f)
+	_bool IsNearlyEqualFloat4x4(const _float4x4& A, const _float4x4& B, _float fEpsilon = 0.0001f)
 	{
 		for (_uint iRow = 0; iRow < 4; ++iRow)
 		{
@@ -279,6 +275,131 @@ namespace
 
 		return g_EnvShaderPassMetas[idx].szName;
 	}
+
+#pragma region MAP_LAYER_EX
+	static const _char* kLayerExGroupName[MAP_LAYER_EX_GROUP::GROUP_COUNT] =
+	{
+		"Main", "ExtR", "ExtG", "ExtB", "ExtA",
+	};
+
+	static const _char* kLayerExEntryName[MESH_LAYER_EX_ENTRY_COUNT] =
+	{
+		  "DIFF", "MRA", "NORM", "UKWN",
+	};
+
+	static const MTEX_TYPE kLayerExTexType[MESH_LAYER_EX_ENTRY_COUNT] =
+	{
+		  MTEX_TYPE::DIFFUSE,
+		  MTEX_TYPE::METALNESS,
+		  MTEX_TYPE::NORMALS,
+		  MTEX_TYPE::UNKNOWN
+	};
+
+	void Fill_LayerExBind(MESH_LAYER_TEX_BIND_EX& Out, MTEX_TYPE eType, _int iSlot,
+		_uint iUVIndex, const _float2 vScale, const _float2 vOffset, _float fRotate)
+	{
+		Out.bEnable = (iSlot >= 0);
+		Out.iTexType = ETOUI(eType);
+		Out.iSlot = iSlot;
+		Out.iUVIndex = (iUVIndex <= 3u) ? iUVIndex : 0u;
+		Out.vUVScale = vScale;
+		Out.vUVOffset = vOffset;
+		Out.fUVRotate = fRotate;
+	}
+
+	void InitializeLayerExFromLegacy(MESH_LAYER_IDX& Layer)
+	{
+		// Init
+		for (_uint g = 0; g < MESH_LAYER_EX_GROUP_COUNT; ++g)
+		{
+			for (_uint e = 0; e < MESH_LAYER_EX_ENTRY_COUNT; ++e)
+				Layer.LayerEx[g][e] = {};
+		}
+
+		const _float2 vOffset = Layer.vUVOffset;
+		const _float fRotate = Layer.fUVRotate;
+
+		// Main.Diffuse
+		Fill_LayerExBind(
+			Layer.LayerEx[MAIN][LAYER_EX_DIFF],
+			MTEX_TYPE::DIFFUSE,
+			static_cast<_int>(Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)]),
+			Layer.iUVIndex,
+			Layer.bUseUVTransform ? Layer.vUVScale : XMFLOAT2{ 1.f, 1.f },
+			Layer.bUseUVTransform ? vOffset : XMFLOAT2{ 0.f, 0.f },
+			Layer.bUseUVTransform ? fRotate : 0.f);
+
+		// Main.MRA
+		Fill_LayerExBind(
+			Layer.LayerEx[MAIN][LAYER_EX_MRA],
+			MTEX_TYPE::METALNESS,
+			static_cast<_int>(Layer.idx[ETOUI(MTEX_TYPE::METALNESS)]),
+			Layer.iUVIndex,
+			Layer.bUseUVTransform ? Layer.vUVScaleMaterial : XMFLOAT2{ 1.f, 1.f },
+			Layer.bUseUVTransform ? vOffset : XMFLOAT2{ 0.f, 0.f },
+			Layer.bUseUVTransform ? fRotate : 0.f);
+
+		// Main.Normal
+		Fill_LayerExBind(
+			Layer.LayerEx[MAIN][LAYER_EX_NORM],
+			MTEX_TYPE::NORMALS,
+			static_cast<_int>(Layer.idx[ETOUI(MTEX_TYPE::NORMALS)]),
+			Layer.iUVIndex,
+			Layer.bUseUVTransform ? Layer.vUVScaleNormal : XMFLOAT2{ 1.f, 1.f },
+			Layer.bUseUVTransform ? vOffset : XMFLOAT2{ 0.f, 0.f },
+			Layer.bUseUVTransform ? fRotate : 0.f);
+
+		// Main.Unknown
+		Fill_LayerExBind(
+			Layer.LayerEx[MAIN][LAYER_EX_UKWN],
+			MTEX_TYPE::UNKNOWN,
+			static_cast<_int>(Layer.idx[ETOUI(MTEX_TYPE::UNKNOWN)]),
+			Layer.iUnknownUVIndex,
+			Layer.bUseUVTransform ? Layer.vUVScale : XMFLOAT2{ 1.f, 1.f },
+			Layer.bUseUVTransform ? vOffset : XMFLOAT2{ 0.f, 0.f },
+			Layer.bUseUVTransform ? fRotate : 0.f);
+
+		// Extra R/G/B/A → Group 1~4
+		for (_uint c = 0; c < 4; ++c)
+		{
+			const _int iSlot = Layer.iExtraBind[c];
+			if (iSlot < 0)
+				continue;
+
+			const MTEX_TYPE eTexType = static_cast<MTEX_TYPE>(Layer.iExtraTexType[c]);
+
+			_uint iEntry = LAYER_EX_UKWN;
+			XMFLOAT2 vScale = Layer.bUseUVTransform ? Layer.vUVScale : XMFLOAT2{ 1.f, 1.f };
+
+			if (eTexType == MTEX_TYPE::DIFFUSE)
+			{
+				iEntry = LAYER_EX_DIFF;
+				vScale = Layer.bUseUVTransform ? Layer.vUVScale : XMFLOAT2{ 1.f, 1.f };
+			}
+			else if (eTexType == MTEX_TYPE::METALNESS)
+			{
+				iEntry = LAYER_EX_MRA;
+				vScale = Layer.bUseUVTransform ? Layer.vUVScaleMaterial : XMFLOAT2{ 1.f, 1.f };
+			}
+			else if (eTexType == MTEX_TYPE::NORMALS)
+			{
+				iEntry = LAYER_EX_NORM;
+				vScale = Layer.bUseUVTransform ? Layer.vUVScaleNormal : XMFLOAT2{ 1.f, 1.f };
+			}
+
+			Fill_LayerExBind(
+				Layer.LayerEx[c + 1][iEntry],
+				eTexType,
+				iSlot,
+				Layer.iExtraUVIndex[c],
+				vScale,
+				Layer.bUseUVTransform ? vOffset : XMFLOAT2{ 0.f, 0.f },
+				Layer.bUseUVTransform ? fRotate : 0.f);
+		}
+
+		Layer.bUseLayerEx = true;
+	}
+#pragma endregion
 }
 
 CPanel_Inspector::CPanel_Inspector(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -905,6 +1026,44 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 	_bool bChanged = false;
 	_bool bAnyField = false;
 
+	if (bMapObjectMeshUi)
+	{
+		ImGui::SeparatorText("Mode");
+
+		bool bUseLayerEx = Layer.bUseLayerEx;
+		if (ImGui::Checkbox("Advanced Layer##UseLayerEx", &bUseLayerEx))
+		{
+			Layer.bUseLayerEx = bUseLayerEx;
+			bChanged = true;
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Init From Legacy##LayerExInit"))
+		{
+			InitializeLayerExFromLegacy(Layer);
+			bChanged = true;
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Disable##LayerExDisable"))
+		{
+			Layer.bUseLayerEx = false;
+
+			for (_uint g = 0; g < MESH_LAYER_EX_GROUP_COUNT; ++g)
+			{
+				for (_uint e = 0; e < MESH_LAYER_EX_ENTRY_COUNT; ++e)
+					Layer.LayerEx[g][e] = {};
+			}
+
+			bChanged = true;
+		}
+
+		if (Layer.bUseLayerEx)
+			ImGui::TextDisabled("Advanced Layer is active. Settings are saved per model sidecar.");
+	}
+
 	auto DrawUVCombo = [&](const char* pLabel, _uint& iUVIndex)
 		{
 			int iValue = (iUVIndex <= 3u) ? static_cast<int>(iUVIndex) : 0;
@@ -1085,6 +1244,171 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			}
 		};
 
+	auto DrawLayerExSlotCell = [&](const char* pLabel, MESH_LAYER_TEX_BIND_EX& Bind, _uint iEntry)
+		{
+			bAnyField = true;
+
+			ImGui::TextUnformatted(pLabel);
+
+			if (ImGui::Checkbox("##Use", &Bind.bEnable))
+				bChanged = true;
+
+			static const MTEX_TYPE kSelectableTypes[] =
+			{
+				  MTEX_TYPE::DIFFUSE,
+				  MTEX_TYPE::METALNESS,
+				  MTEX_TYPE::NORMALS,
+				  MTEX_TYPE::UNKNOWN
+			};
+
+			int iTypeCombo = 0;
+			for (int i = 0; i < IM_ARRAYSIZE(kSelectableTypes); ++i)
+			{
+				if (Bind.iTexType == ETOUI(kSelectableTypes[i]))
+				{
+					iTypeCombo = i;
+					break;
+				}
+			}
+
+			ImGui::SetNextItemWidth(-FLT_MIN);
+			if (ImGui::Combo("##TexType", &iTypeCombo, "Diff\0MRA\0Norm\0Ukwn\0\0"))
+			{
+				Bind.iTexType = ETOUI(kSelectableTypes[iTypeCombo]);
+				Bind.iSlot = -1;
+				Bind.bEnable = false;
+				bChanged = true;
+			}
+
+			const MTEX_TYPE eType = static_cast<MTEX_TYPE>(Bind.iTexType);
+			const int iCount = static_cast<int>(pModel->Get_MeshTextureCount(iMesh, eType));
+
+			ImGui::SetNextItemWidth(-FLT_MIN);
+
+			if (iCount <= 0)
+			{
+				int iDummy = 0;
+				if (Bind.iSlot != -1) { Bind.iSlot = -1; bChanged = true; }
+				ImGui::BeginDisabled();
+				ImGui::Combo("##Slot", &iDummy, "N/A\0\0");
+				ImGui::EndDisabled();
+				return;
+			}
+
+			if (Bind.iSlot < -1) { Bind.iSlot = -1; bChanged = true; }
+			else if (Bind.iSlot >= iCount) { Bind.iSlot = iCount - 1; bChanged = true; }
+
+			int iComboIndex = Bind.iSlot + 1;
+			const string strItems = BuildCompactComboItems(-1, iCount - 1);
+			if (ImGui::Combo("##Slot", &iComboIndex, strItems.c_str()))
+			{
+				Bind.iSlot = iComboIndex - 1;
+				Bind.bEnable = Bind.iSlot >= 0;
+				bChanged = true;
+			}
+		};
+
+	auto DrawLayerExTextureGrid = [&](_uint iGroup)
+		{
+			ImGui::SeparatorText("Advanced Layer Texture");
+
+			if (!ImGui::BeginTable("LayerExTexGrid", 4, ImGuiTableFlags_SizingStretchSame))
+				return;
+
+			ImGui::TableNextRow();
+
+			for (_uint e = 0; e < MESH_LAYER_EX_ENTRY_COUNT; ++e)
+			{
+				ImGui::TableNextColumn();
+				ImGui::PushID(static_cast<int>(iGroup * 10u + e));
+
+				MESH_LAYER_TEX_BIND_EX& Bind = Layer.LayerEx[iGroup][e];
+				if (Bind.iTexType == 0u)
+					Bind.iTexType = ETOUI(kLayerExTexType[e]);
+
+				DrawLayerExSlotCell(kLayerExEntryName[e], Bind, e);
+
+				ImGui::PopID();
+			}
+
+			ImGui::EndTable();
+		};
+
+	auto DrawLayerExUVCell = [&](const char* pLabel, MESH_LAYER_TEX_BIND_EX& Bind)
+		{
+			bAnyField = true;
+
+			ImGui::TextUnformatted(pLabel);
+			DrawCompactUVCombo("##UV", Bind.iUVIndex);
+
+			ImGui::SetNextItemWidth(-FLT_MIN);
+			if (ImGui::DragFloat2("##Scale", (float*)&Bind.vUVScale, 0.01f))
+				bChanged = true;
+
+			ImGui::SetNextItemWidth(-FLT_MIN);
+			if (ImGui::DragFloat2("##Offset", (float*)&Bind.vUVOffset, 0.01f))
+				bChanged = true;
+
+			ImGui::SetNextItemWidth(-FLT_MIN);
+			if (ImGui::DragFloat("##Rotate", &Bind.fUVRotate, 0.01f))
+				bChanged = true;
+
+			if (ImGui::Button("Reset UV"))
+			{
+				Bind.iUVIndex = 0u;
+				Bind.vUVScale = XMFLOAT2{ 1.f, 1.f };
+				Bind.vUVOffset = XMFLOAT2{ 0.f, 0.f };
+				Bind.fUVRotate = 0.f;
+				bChanged = true;
+			}
+		};
+	
+	auto DrawLayerExUVGrid = [&](_uint iGroup)
+		{
+			ImGui::SeparatorText("Advanced Layer UV");
+
+			if (!ImGui::BeginTable("LayerExUVGrid", 4, ImGuiTableFlags_SizingStretchSame))
+				return;
+
+			ImGui::TableNextRow();
+
+			for (_uint e = 0; e < MESH_LAYER_EX_ENTRY_COUNT; ++e)
+			{
+				ImGui::TableNextColumn();
+				ImGui::PushID(static_cast<int>(100 + iGroup * 10u + e));
+
+				MESH_LAYER_TEX_BIND_EX& Bind = Layer.LayerEx[iGroup][e];
+				DrawLayerExUVCell(kLayerExEntryName[e], Bind);
+
+				ImGui::PopID();
+			}
+
+			ImGui::EndTable();
+		};
+
+	auto DrawLayerExGroupSummary = [&](_uint iGroup)
+		{
+			_uint iEnabledCount = 0;
+			_uint iSlotCount = 0;
+
+			for (_uint e = 0; e < MESH_LAYER_EX_ENTRY_COUNT; ++e)
+			{
+				const MESH_LAYER_TEX_BIND_EX& Bind = Layer.LayerEx[iGroup][e];
+
+				if (Bind.bEnable)
+					++iEnabledCount;
+
+				if (Bind.iSlot >= 0)
+					++iSlotCount;
+			}
+
+			ImGui::TextDisabled(
+				"LayerEx %s: enabled %u / slots %u. Saved per model sidecar.",
+				kLayerExGroupName[iGroup],
+				iEnabledCount,
+				iSlotCount);
+		};
+
 	auto DrawMapTextureCompactGrid = [&]()
 		{
 			ImGui::TextUnformatted("Tex");
@@ -1156,48 +1480,79 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			bChanged = true;
 		}
 
-		ImGui::TextUnformatted("UV Slots");
-		DrawMapUVCompactGrid();
+		if (Layer.bUseLayerEx)
+		{
+			if (ImGui::BeginTabBar("LayerExGroups"))
+			{
+				for (_uint g = 0; g < MESH_LAYER_EX_GROUP_COUNT; ++g)
+				{
+					if (ImGui::BeginTabItem(kLayerExGroupName[g]))
+					{
+						DrawLayerExTextureGrid(g);
+						DrawLayerExUVGrid(g);
+						DrawLayerExGroupSummary(g);
+						ImGui::EndTabItem();
+					}
+				}
 
-		if (ImGui::Checkbox("Use UV Transform", (bool*)&Layer.bUseUVTransform))
-			bChanged = true;
+				ImGui::EndTabBar();
+			}
 
-		ImGui::BeginDisabled(!Layer.bUseUVTransform);
+			ImGui::SeparatorText("Advanced Strength");
 
-		ImGui::SetNextItemWidth(160.f);
-		if (ImGui::DragFloat2("UV Scale", (float*)&Layer.vUVScale, 0.01f))
-			bChanged = true;
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat("Normal Strength##LayerEx", &Layer.fNormalStrength, 0.01f))
+				bChanged = true;
 
-		ImGui::SetNextItemWidth(160.f);
-		if (ImGui::DragFloat2("UV ScaleNormal", (float*)&Layer.vUVScaleNormal, 0.01f))
-			bChanged = true;
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat("Mask Strength##LayerEx", &Layer.fMaskStrength, 0.01f))
+				bChanged = true;
+		}
+		else
+		{
+			ImGui::TextUnformatted("UV Slots");
+			DrawMapUVCompactGrid();
 
-		ImGui::SetNextItemWidth(160.f);
-		if (ImGui::DragFloat2("UV ScaleMaterial", (float*)&Layer.vUVScaleMaterial, 0.01f))
-			bChanged = true;
+			if (ImGui::Checkbox("Use UV Transform", (bool*)&Layer.bUseUVTransform))
+				bChanged = true;
 
-		ImGui::SetNextItemWidth(160.f);
-		if (ImGui::DragFloat("UV Rotate", &Layer.fUVRotate, 0.01f))
-			bChanged = true;
+			ImGui::BeginDisabled(!Layer.bUseUVTransform);
 
-		ImGui::SetNextItemWidth(160.f);
-		if (ImGui::DragFloat2("UV Offset", (float*)&Layer.vUVOffset, 0.01f))
-			bChanged = true;
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat2("UV Scale", (float*)&Layer.vUVScale, 0.01f))
+				bChanged = true;
 
-		ImGui::EndDisabled();
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat2("UV ScaleNormal", (float*)&Layer.vUVScaleNormal, 0.01f))
+				bChanged = true;
 
-		ImGui::SetNextItemWidth(160.f);
-		if (ImGui::DragFloat("Normal Strength", &Layer.fNormalStrength, 0.01f))
-			bChanged = true;
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat2("UV ScaleMaterial", (float*)&Layer.vUVScaleMaterial, 0.01f))
+				bChanged = true;
 
-		ImGui::SetNextItemWidth(160.f);
-		if (ImGui::DragFloat("Mask Strength", &Layer.fMaskStrength, 0.01f))
-			bChanged = true;
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat("UV Rotate", &Layer.fUVRotate, 0.01f))
+				bChanged = true;
 
-		ImGui::Spacing();
-		DrawMapUVCompactGrid();
-		ImGui::Spacing();
-		DrawMapTextureCompactGrid();
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat2("UV Offset", (float*)&Layer.vUVOffset, 0.01f))
+				bChanged = true;
+
+			ImGui::EndDisabled();
+
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat("Normal Strength", &Layer.fNormalStrength, 0.01f))
+				bChanged = true;
+
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat("Mask Strength", &Layer.fMaskStrength, 0.01f))
+				bChanged = true;
+
+			ImGui::Spacing();
+			DrawMapUVCompactGrid();
+			ImGui::Spacing();
+			DrawMapTextureCompactGrid();
+		}
 	}
 	else
 	{
@@ -1333,11 +1688,11 @@ void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
 	}
 
 	const ImVec2 vAvail = ImGui::GetContentRegionAvail();
-	float fListWidth = vAvail.x * 0.26f;
-	if (fListWidth < 180.f)
-		fListWidth = 180.f;
-	else if (fListWidth > 260.f)
-		fListWidth = 260.f;
+	float fListWidth = vAvail.x * 0.18f;
+	if (fListWidth < 140.f)
+		fListWidth = 140.f;
+	else if (fListWidth > 190.f)
+		fListWidth = 190.f;
 
 	ImGui::BeginChild("SectionList", ImVec2(fListWidth, 0.f), true);
 	{
@@ -1389,13 +1744,12 @@ void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
 				? *pbCreateCollisionActor
 				: pSection->Get_Desc().bSourceCreateCollisionActor;
 
-			ImGui::Indent();
-			ImGui::TextDisabled("R:%s  C:%s  S:%s  Coll:%s",
+			ImGui::TextDisabled("R:%s  C:%s",
 				bRenderable ? "On" : "Off",
-				bEnableCulling ? "On" : "Off",
+				bEnableCulling ? "On" : "Off");
+			ImGui::TextDisabled("S:%s  Coll:%s",
 				bCastShadow ? "On" : "Off",
 				bCreateCollision ? "On" : "Off");
-			ImGui::Unindent();
 
 			ImGui::Separator();
 			ImGui::PopID();

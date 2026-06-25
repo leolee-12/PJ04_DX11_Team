@@ -6,6 +6,7 @@
 #include "Bone.h"
 #include "Animation.h"
 #include "Animator.h"
+#include "MeshLayer_Utils.h"
 #include <fstream>
 
 #include "GameInstance.h"
@@ -631,6 +632,11 @@ HRESULT CModel::Save_MeshLayers() const
 				jMesh[to_string(t)] = m.idx[t];
 		}
 
+		if (Has_MeshLayerExValue(m))
+		{
+			jMesh["LayerEx"] = Save_MeshLayerEx(m);
+		}
+
 		if (!jMesh.empty())
 			j[to_string(i)] = jMesh;
 	}
@@ -974,6 +980,12 @@ void CModel::Load_MeshLayers(const _char* pModelFilePath)
 				if (0 <= iTextureIndex)
 					Layer.idx[t] = static_cast<_uint>(iTextureIndex);
 			}
+		}
+
+		const auto IterLayerEx = jMesh.find("LayerEx");
+		if (IterLayerEx != jMesh.end())
+		{
+			Load_MeshLayerEx(*IterLayerEx, &Layer);
 		}
 	}
 }
