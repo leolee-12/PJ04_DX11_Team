@@ -1,9 +1,9 @@
 #pragma once
-#include "MonsterPart.h"
+#include "MonsterHitPart.h"
 
 NS_BEGIN(Client)
 
-class CBladeKnight_Sword final : public CMonsterPart
+class CBladeKnight_Sword final : public CMonsterHitPart
 {
     GENERATED_BODY(CBladeKnight_Sword)
 

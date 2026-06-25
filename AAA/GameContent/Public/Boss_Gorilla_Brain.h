@@ -18,7 +18,7 @@ private:
     _float m_fAtkTimer = { 0.f };
 
 public:
-    static CBoss_Gorilla_Brain* Create();
+    static CBoss_Gorilla_Brain* Create(CMonster* pOwner);
     virtual void Free() override;
 };
 

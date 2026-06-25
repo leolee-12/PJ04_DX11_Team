@@ -4,11 +4,11 @@
 NS_BEGIN(Client)
 class CMonster;
 
-class CMonster_State_Idle  : public CMonster_State
+class CNormalEnemy_State_Find final : public CMonster_State
 {
 protected:
-	CMonster_State_Idle() = default;
-	virtual ~CMonster_State_Idle() = default;
+	CNormalEnemy_State_Find() = default;
+	virtual ~CNormalEnemy_State_Find() = default;
 
 protected:
 	virtual HRESULT					Initialize(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f) override;
@@ -20,7 +20,7 @@ public:
 	virtual void					Exit(MONSTER_STATE_TYPE eNextState) override;
 
 public:
-	static CMonster_State_Idle*		Create(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f);
+	static CNormalEnemy_State_Find* Create(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f);
 
 protected:
 	virtual void					Free() override;

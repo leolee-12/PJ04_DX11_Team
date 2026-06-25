@@ -2,11 +2,11 @@
 #include "GameInstance.h"
 
 CBladeKnight_Sword::CBladeKnight_Sword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CMonsterPart{ pDevice, pContext } {
+    : CMonsterHitPart{ pDevice, pContext } {
 }
 
 CBladeKnight_Sword::CBladeKnight_Sword(const CBladeKnight_Sword& Prototype)
-    : CMonsterPart(Prototype) {
+    : CMonsterHitPart(Prototype) {
 }
 
 HRESULT CBladeKnight_Sword::Initialize_Prototype()
@@ -17,10 +17,27 @@ HRESULT CBladeKnight_Sword::Initialize_Prototype()
 
 HRESULT CBladeKnight_Sword::Initialize(void* pArg)
 {
-    if (nullptr == pArg)                   return E_FAIL;
-    if (FAILED(__super::Initialize(pArg))) return E_FAIL;   // 家南青纺 荐飞
-    if (nullptr == m_pSocketBoneMatrix)    return E_FAIL;   // 家南 鞘荐
-    if (FAILED(Ready_Components()))        return E_FAIL;
+    if (nullptr == pArg)                   
+        return E_FAIL;
+
+    if (FAILED(__super::Initialize(pArg))) 
+        return E_FAIL;   // 家南青纺 荐飞
+
+    if (nullptr == m_pSocketBoneMatrix)    
+        return E_FAIL;   // 家南 鞘荐
+
+    if (FAILED(Ready_Components()))        
+        return E_FAIL;
+
+    CAPSULE_DESC CapsuleDesc{};
+    CapsuleDesc.vCenter = { 0.f, 0.f, -0.5f };
+    CapsuleDesc.fHeight = { 0.8f };
+
+    CapsuleDesc.fRadius = 0.25f;        
+    CapsuleDesc.vRadians = { XMConvertToRadians(-90.f), 0.f, 0.f };
+
+    if (FAILED(Ready_HitBox(CapsuleDesc, 5.f, 8.f)))
+        return E_FAIL;
 
     m_pAnimatorCom->Play("Thrust", false, false);
     return S_OK;

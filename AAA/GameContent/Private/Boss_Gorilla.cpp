@@ -66,7 +66,7 @@ void CBoss_Gorilla::Update(_float fTimeDelta)
 
 CMonsterBrain* CBoss_Gorilla::Create_Brain()
 {
-    return CBoss_Gorilla_Brain::Create();
+    return CBoss_Gorilla_Brain::Create(this);
 }
 
 void CBoss_Gorilla::Play_Intro()

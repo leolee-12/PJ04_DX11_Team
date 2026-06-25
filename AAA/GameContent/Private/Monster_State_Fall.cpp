@@ -15,7 +15,7 @@ MONSTER_STATE_TYPE CMonster_State_Fall::Get_StateType()
 	return MONSTER_STATE_TYPE::FALL;
 }
 
-void CMonster_State_Fall::Enter()
+void CMonster_State_Fall::Enter(MONSTER_STATE_TYPE ePrevState)
 {
 	if (m_pOwner == nullptr)
 		return;

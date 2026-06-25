@@ -8,7 +8,7 @@ HRESULT CMonster_State_Spat::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpee
 
 MONSTER_STATE_TYPE CMonster_State_Spat::Get_StateType() { return MONSTER_STATE_TYPE::SPAT; }
 
-void CMonster_State_Spat::Enter()
+void CMonster_State_Spat::Enter(MONSTER_STATE_TYPE ePrevState)
 {
     if (!m_pOwner)
         return;

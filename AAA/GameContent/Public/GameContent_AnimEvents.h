@@ -24,6 +24,7 @@ namespace Client
         CamTrack  = 12,
         FreezeAnim = 13,
         PubEvent = 14,
+        MoveWindow = 15,
         // 추가는 항상 끝에, 기존 값 변경 금지 (저장 데이터 안정성)
     };
 
@@ -45,5 +46,7 @@ namespace Client
         { EANIM_EVENT::CamTrack,    "CamTrack"  },
         { EANIM_EVENT::FreezeAnim,  "FreezeAnim" },
         { EANIM_EVENT::PubEvent,    "PubEvent"  },
+        { EANIM_EVENT::MoveWindow, "MoveWindow" },
+
     };
 }

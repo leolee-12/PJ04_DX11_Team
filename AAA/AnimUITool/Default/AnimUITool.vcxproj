@@ -52,7 +52,6 @@
     <ClInclude Include="..\Public\AnimUITool_Enum.h" />
     <ClInclude Include="..\Public\AnimUITool_Func.h" />
     <ClInclude Include="..\Public\AnimUITool_Struct.h" />
-    <ClInclude Include="..\Public\Anim_Context.h" />
     <ClInclude Include="..\Public\EditCamera.h" />
     <ClInclude Include="..\Public\Edit_Grid.h" />
     <ClInclude Include="..\Public\Level_Tool.h" />

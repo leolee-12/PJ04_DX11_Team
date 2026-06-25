@@ -70,6 +70,8 @@ public:
 		m_WorldMatrix = Matrix;
 	}
 
+	void Set_RotationPerSec(_float fDegPerSec) { m_fRotationPerSec = fDegPerSec; }
+
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);

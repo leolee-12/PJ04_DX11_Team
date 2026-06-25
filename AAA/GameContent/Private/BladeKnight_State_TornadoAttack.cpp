@@ -3,35 +3,25 @@
 #include "BladeKnight_Body.h"
 #include "Animator.h"
 #include "Monster_Movement.h"
-
-HRESULT CBladeKnight_State_TornadoAttack::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpeed)
-{
-	if (FAILED(__super::Initialize(tInfo, fSpeed)))
-		return E_FAIL;
-
-	return S_OK;
-}
+#include "BladeKnight_Sword.h"
 
 MONSTER_STATE_TYPE CBladeKnight_State_TornadoAttack::Get_StateType()
 {
 	return MONSTER_STATE_TYPE::TORNADO_ATTACK;
 }
 
-void CBladeKnight_State_TornadoAttack::Enter()
+void CBladeKnight_State_TornadoAttack::Exit(MONSTER_STATE_TYPE eNextState)
 {
 	if (nullptr == m_pOwner)
 		return;
 
-	const MONSTER_BLACKBOARD& BB = m_pOwner->Get_BlackBoard();
-	m_vLungeDir = BB.vDirToTargetXZ;
+	if (CBladeKnight* pBK = dynamic_cast<CBladeKnight*>(m_pOwner))
+		if (pBK->Get_Sword())
+			pBK->Get_Sword()->Set_HitBox(false);
+}
 
-	_vector vDir = XMLoadFloat3(&m_vLungeDir);
-	if (!XMVector3Equal(vDir, XMVectorZero()))
-	{
-		_vector vMyPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
-		m_pOwner->Get_Transform()->LookAt(vMyPos + vDir);
-	}
-
+void CBladeKnight_State_TornadoAttack::Play_AttackAnimation()
+{
 	if (m_pAnimator)
 	{
 		CAnimator::ANI_PLAY_INFO AniInfo{};
@@ -44,22 +34,6 @@ void CBladeKnight_State_TornadoAttack::Enter()
 		AniInfo.fSpeed = 1.50f;
 		m_pAnimator->Enqueue(AniInfo);
 	}
-}
-
-void CBladeKnight_State_TornadoAttack::Update(_float fTimeDelta)
-{
-	UNREFERENCED_PARAMETER(fTimeDelta);
-	if (nullptr == m_pOwner)
-		return;
-
-	if (m_pAnimator && m_pAnimator->Is_Finished())
-		m_pOwner->Change_State(MONSTER_STATE_TYPE::IDLE);
-}
-
-void CBladeKnight_State_TornadoAttack::Exit(MONSTER_STATE_TYPE eNextState)
-{
-	if (nullptr == m_pOwner)
-		return;
 }
 
 CBladeKnight_State_TornadoAttack* CBladeKnight_State_TornadoAttack::Create(const ANI_PLAY_INFO& tInfo, _float fSpeed)

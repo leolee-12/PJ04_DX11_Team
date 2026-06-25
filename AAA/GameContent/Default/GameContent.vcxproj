@@ -75,6 +75,8 @@
     <ClInclude Include="..\Public\Monster_State_Death.h" />
     <ClInclude Include="..\Public\Monster_State_Fall.h" />
     <ClInclude Include="..\Public\Monster_State_Detect.h" />
+    <ClInclude Include="..\Public\NormalEnemy_State_Chase.h" />
+    <ClInclude Include="..\Public\NormalEnemy_State_Find.h" />
     <ClInclude Include="..\Public\Monster_State_Idle.h" />
     <ClInclude Include="..\Public\Monster_State_KnockBack.h" />
     <ClInclude Include="..\Public\Monster_State_KnockBackDeath.h" />
@@ -83,6 +85,7 @@
     <ClInclude Include="..\Public\LevelDesign_Loader.h" />
     <ClInclude Include="..\Public\LevelDesign_Parser.h" />
     <ClInclude Include="..\Public\LevelDesign_Registry.h" />
+    <ClInclude Include="..\Public\Monster_State_Move.h" />
     <ClInclude Include="..\Public\Monster_State_Patrol.h" />
     <ClInclude Include="..\public\Monster_State_Spat.h" />
     <ClInclude Include="..\Public\Monster_State_Retreat.h" />
@@ -90,7 +93,9 @@
     <ClInclude Include="..\Public\NormalEnemy.h" />
     <ClInclude Include="..\Public\NormalEnemy_Body.h" />
     <ClInclude Include="..\Public\NormalEnemy_Brain.h" />
+    <ClInclude Include="..\Public\NormalEnemy_State_Brake.h" />
     <ClInclude Include="..\Public\Parsing_Utils.h" />
+    <ClInclude Include="..\Public\PoppyBrosJr.h" />
     <ClInclude Include="..\Public\RailDataReceiver.h" />
     <ClInclude Include="..\Public\Shader_PassMeta.h" />
     <ClInclude Include="..\Public\GameContent_AnimEvents.h" />
@@ -308,11 +313,14 @@
     <ClCompile Include="..\Private\Monster_State_Death.cpp" />
     <ClCompile Include="..\Private\Monster_State_Fall.cpp" />
     <ClCompile Include="..\Private\Monster_State_Detect.cpp" />
+    <ClCompile Include="..\Private\NormalEnemy_State_Chase.cpp" />
+    <ClCompile Include="..\Private\NormalEnemy_State_Find.cpp" />
     <ClCompile Include="..\Private\Monster_State_Idle.cpp" />
     <ClCompile Include="..\Private\Monster_State_KnockBack.cpp" />
     <ClCompile Include="..\Private\Monster_State_KnockBackDeath.cpp" />
     <ClCompile Include="..\Private\Monster_State_KnockOut.cpp" />
     <ClCompile Include="..\Private\Monster_State_Landing.cpp" />
+    <ClCompile Include="..\Private\Monster_State_Move.cpp" />
     <ClCompile Include="..\Private\Monster_State_Patrol.cpp" />
     <ClCompile Include="..\private\Monster_State_Spat.cpp" />
     <ClCompile Include="..\Private\Monster_State_Retreat.cpp" />
@@ -321,6 +329,8 @@
     <ClCompile Include="..\Private\NormalEnemy.cpp" />
     <ClCompile Include="..\Private\NormalEnemy_Body.cpp" />
     <ClCompile Include="..\Private\NormalEnemy_Brain.cpp" />
+    <ClCompile Include="..\Private\NormalEnemy_State_Brake.cpp" />
+    <ClCompile Include="..\Private\PoppyBrosJr.cpp" />
     <ClCompile Include="..\Private\TestMeshEmitter.cpp" />
     <ClCompile Include="..\Private\TestMeshParticle.cpp" />
     <ClCompile Include="..\Private\TestParticle.cpp" />
