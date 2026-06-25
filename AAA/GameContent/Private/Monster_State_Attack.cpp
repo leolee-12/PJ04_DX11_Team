@@ -17,17 +17,15 @@ void CMonster_State_Attack::Enter(MONSTER_STATE_TYPE ePrevState)
 		return;
 
 	// Å¸°Ù ¹æÇâ ½º³À¼¦ 
-	m_MoveDir = m_pOwner->Get_BlackBoard().vDirToTargetXZ;
+	const MONSTER_BLACKBOARD& BB = m_pOwner->Get_BlackBoard();
 
-	_vector vDir = XMLoadFloat3(&m_MoveDir);
-	if (!XMVector3Equal(vDir, XMVectorZero()))
-	{
-		_vector vMyPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
-		m_pOwner->Get_Transform()->LookAt(vMyPos + vDir);
-	}
+	m_MoveDir = BB.vDirToTargetXZ;
 
 	if (m_pMovement)
+	{
+		m_pMovement->Face_Instant(XMLoadFloat3(&BB.vTargetPos));
 		m_pMovement->Set_MoveSpeed(m_fSpeed);
+	}
 
 	if (m_pAnimator)
 		Play_AttackAnimation();

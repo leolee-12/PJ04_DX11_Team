@@ -4,11 +4,11 @@
 NS_BEGIN(Client)
 class CMonster;
 
-class CNormalEnemy_State_Brake final : public CMonster_State_Move
+class CNormalEnemy_State_Chase	final : public CMonster_State_Move
 {
 protected:
-    CNormalEnemy_State_Brake() = default;
-    virtual ~CNormalEnemy_State_Brake() = default;
+    CNormalEnemy_State_Chase() = default;
+    virtual ~CNormalEnemy_State_Chase() = default;
 
 protected:
     virtual HRESULT                     Initialize(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f) override;
@@ -18,18 +18,19 @@ public:
 
     virtual void                        Enter(MONSTER_STATE_TYPE ePrevState = MONSTER_STATE_TYPE::IDLE) override;
     virtual void                        Update(_float fTimeDelta) override;
-    virtual void                        Exit(MONSTER_STATE_TYPE eNextState) override;
 
 protected:
     virtual void                        Apply_Movement(_float fTimeDelta) override;
 
 private:
-    // 감속 시간 - 이 시간동안 m_fSpeed -> 0 
-    // "Brake" 클립 길이와 대략 맞춰야 함
-    static constexpr _float             s_fBrakeTime = 0.5f;
+    // 추적(재조준) 시간 
+    static constexpr _float             s_fTrackTime = 1.25f;
+
+    // 총 추적 시간
+    static constexpr _float             s_fChaseTime = 3.0f;
 
 public:
-    static CNormalEnemy_State_Brake*    Create(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f);
+    static CNormalEnemy_State_Chase*    Create(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f);
 
 protected:
     virtual void                        Free() override;

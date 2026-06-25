@@ -118,7 +118,13 @@ void CMonster::Set_Target(CGameObject* pTarget)
 	m_BlackBoard.pTarget = pTarget;
 
 	if (nullptr == pTarget)
-		m_BlackBoard = MONSTER_BLACKBOARD{};
+	{
+		m_BlackBoard.bCanSeeTarget = false;
+		m_BlackBoard.fDistToTarget = FLT_MAX;
+		m_BlackBoard.fDistToTargetXZ = FLT_MAX;
+		m_BlackBoard.fHeightToTarget = 0.f;
+		m_BlackBoard.vDirToTargetXZ = {};
+	}
 }
 
 _bool CMonster::Can_BeInhaled(const INHALE_QUERY& q) const

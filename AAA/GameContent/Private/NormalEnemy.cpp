@@ -24,6 +24,8 @@
 
 // 전용 상태
 #include "NormalEnemy_State_Find.h"
+#include "NormalEnemy_State_Chase.h"
+#include "NormalEnemy_State_Brake.h"
 
 CNormalEnemy::CNormalEnemy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster { pDevice, pContext }
@@ -51,7 +53,7 @@ HRESULT CNormalEnemy::Initialize(void* pArg)
 	m_iAIType = 1 ;		// 테스트 0 : 고정 (IDLE<->FIND) / 1 : 자유형 (IDLE<->PATROL)
 
 	if (m_pTransformCom)
-		m_pTransformCom->Set_RotationPerSec(180.f);
+		m_pTransformCom->Set_RotationPerSec(360.f);
 
 	// 직렬화 없을 때 사용할 임시 코드 
 	XMStoreFloat3(&m_vBasePos, m_pTransformCom->Get_State(STATE::POSITION));
@@ -179,8 +181,6 @@ HRESULT CNormalEnemy::Ready_State(CMonster_StateMachine* pStateMachine)
 	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::SPAT, CMonster_State_Spat::Create(Info))))
 		return E_FAIL;
 
-	// State Chase ( 얘는 이게 공격임 ) 
-
 	// State Patrol 
 	Info.strAniName = "Walk";
 	Info.bLoop = true;
@@ -190,8 +190,19 @@ HRESULT CNormalEnemy::Ready_State(CMonster_StateMachine* pStateMachine)
 		return E_FAIL;
 
 	// 전용 상태
+	// State Chase 
+	Info.strAniName = "Run";
+	Info.bLoop = true;
+	Info.fSpeed = 1.25f;
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CHASE, CNormalEnemy_State_Chase::Create(Info, 4.0f))))
+		return E_FAIL;
 
-	// State Brake
+	// State Brake (Chase의 이동속도와 동일하게 설정)
+	Info.strAniName = "Brake";
+	Info.bLoop = false;
+	Info.fSpeed = 1.5f;
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::BRAKE, CNormalEnemy_State_Brake::Create(Info, 4.0f))))
+		return E_FAIL;
 
 	// State Find
 	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::FIND, CNormalEnemy_State_Find::Create())))

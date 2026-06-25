@@ -592,6 +592,9 @@
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Move\Patrol">
       <UniqueIdentifier>{6faebe93-9f2f-4af1-bb44-37b816184f2d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\03. NormalEnemy\State\Chase">
+      <UniqueIdentifier>{6d03a521-9743-4bf0-9c6c-3ebe4c879ee1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1152,6 +1155,9 @@
     <ClInclude Include="..\Public\NormalEnemy_State_Find.h">
       <Filter>00. GameObject\06. Monster\03. NormalEnemy\State\Find</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\NormalEnemy_State_Chase.h">
+      <Filter>00. GameObject\06. Monster\03. NormalEnemy\State\Chase</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1636,6 +1642,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\NormalEnemy_State_Find.cpp">
       <Filter>00. GameObject\06. Monster\03. NormalEnemy\State\Find</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\NormalEnemy_State_Chase.cpp">
+      <Filter>00. GameObject\06. Monster\03. NormalEnemy\State\Chase</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

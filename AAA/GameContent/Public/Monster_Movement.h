@@ -20,6 +20,8 @@ public:
 
 public:
 	void						Set_LockFacing(_bool bLock) { m_bLockFacing = bLock; }
+	void						Face_Smooth(_fvector vWorldTarget, _float fTimeDelta);
+	void						Face_Instant(_fvector vWorldTarget);
 
 	// 발사 함수 (넉백 시 사용)
 	void						Launch(_fvector vHorizDir, _float fHorizSpeed, _float fUpSpeed);

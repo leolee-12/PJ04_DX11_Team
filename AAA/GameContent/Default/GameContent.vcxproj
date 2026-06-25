@@ -63,6 +63,7 @@
     <ClInclude Include="..\Public\Monster_State_Death.h" />
     <ClInclude Include="..\Public\Monster_State_Fall.h" />
     <ClInclude Include="..\Public\Monster_State_Detect.h" />
+    <ClInclude Include="..\Public\NormalEnemy_State_Chase.h" />
     <ClInclude Include="..\Public\NormalEnemy_State_Find.h" />
     <ClInclude Include="..\Public\Monster_State_Idle.h" />
     <ClInclude Include="..\Public\Monster_State_KnockBack.h" />
@@ -288,6 +289,7 @@
     <ClCompile Include="..\Private\Monster_State_Death.cpp" />
     <ClCompile Include="..\Private\Monster_State_Fall.cpp" />
     <ClCompile Include="..\Private\Monster_State_Detect.cpp" />
+    <ClCompile Include="..\Private\NormalEnemy_State_Chase.cpp" />
     <ClCompile Include="..\Private\NormalEnemy_State_Find.cpp" />
     <ClCompile Include="..\Private\Monster_State_Idle.cpp" />
     <ClCompile Include="..\Private\Monster_State_KnockBack.cpp" />

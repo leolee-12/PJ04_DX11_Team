@@ -1,5 +1,6 @@
 #include "Monster_State_Detect.h"
 #include "Monster.h"
+#include "Monster_Movement.h"
 
 HRESULT CMonster_State_Detect::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpeed)
 {
@@ -30,8 +31,8 @@ void CMonster_State_Detect::Update(_float fTimeDelta)
 
 	// Å¸°Ù ¹æÇâ ½º³À¼¦ 
 	const MONSTER_BLACKBOARD& BB = m_pOwner->Get_BlackBoard();
-	if (BB.pTarget != nullptr)
-		m_pOwner->Get_Transform()->LookAt_Smooth(XMLoadFloat3(&BB.vTargetPos), fTimeDelta);
+	if (BB.pTarget != nullptr && m_pMovement)
+		m_pMovement->Face_Smooth(XMLoadFloat3(&BB.vTargetPos), fTimeDelta);
 
 	if (m_pAnimator && m_pAnimator->Is_Finished())
 	{
