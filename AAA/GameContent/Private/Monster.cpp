@@ -378,7 +378,7 @@ HRESULT CMonster::Ready_AI()
 	return S_OK;
 }
 
-void CMonster::Check_AirborneReflex()
+void CMonster::Check_AirborneReflex(_float fTimeDelta)
 {
 	if (nullptr == m_pStateMachine || nullptr == m_pMovement)
 		return;
@@ -390,12 +390,25 @@ void CMonster::Check_AirborneReflex()
 	if (eState == MONSTER_STATE_TYPE::FALL || eState == MONSTER_STATE_TYPE::LANDING ||
 		eState == MONSTER_STATE_TYPE::CAPTURED || eState == MONSTER_STATE_TYPE::KNOCK_OUT ||
 		eState == MONSTER_STATE_TYPE::KNOCK_BACK_DEATH)
+	{
+		m_fAirborneTimer = 0.f;
 		return;
+	}
 
-	if (m_pMovement->Is_Bouncing())				// 바운스 중 -> FALL 막고 현 상태 유지
-		return;						
+	if (m_pMovement->Is_Bouncing())                         
+	{
+		m_fAirborneTimer = 0.f;
+		return;
+	}
 
-	if (!m_pMovement->Is_Grounded() && m_pMovement->Get_VerticalVelocity() < 0.f)
+	if (m_pMovement->Is_Grounded() || m_pMovement->Get_VerticalVelocity() >= 0.f)
+	{
+		m_fAirborneTimer = 0.f;
+		return;
+	}
+
+	m_fAirborneTimer += fTimeDelta;
+	if (m_fAirborneTimer >= s_fCoyoteTime)
 		Change_State(MONSTER_STATE_TYPE::FALL);
 }
 
@@ -587,7 +600,7 @@ void CMonster::Update_AI(_float fTimeDelta)
 		m_pStateMachine->Update_StateMachine(fTimeDelta);
 	
 	// STATE::FALL 로 전환하는 체크 함수
-	Check_AirborneReflex();
+	Check_AirborneReflex(fTimeDelta);
 
 	if (bEditMode)
 	{

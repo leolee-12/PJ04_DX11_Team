@@ -134,13 +134,16 @@ protected:
 
 	_float3						m_vBasePos = {};
 
+	_float						m_fAirborneTimer = 0.f;
+	static constexpr _float		s_fCoyoteTime = 0.12f;
+
 protected:
 	// 부모가 관리할 공통 파이프라인
 	HRESULT						Ready_Collider();
 	void						SetUp_Collider_CallBack();
 	HRESULT						Ready_Movement();
 	HRESULT						Ready_AI();
-	void						Check_AirborneReflex();
+	void						Check_AirborneReflex(_float fTimeDelta);
 
 	virtual CMonsterBrain*		Create_Brain();		//기본: FSM Brain
 	virtual HRESULT				Create_Movement();	// 기본 : Monster_Movement - 별도 무브먼트 필요할 때 상속받아서 쓸 것 
