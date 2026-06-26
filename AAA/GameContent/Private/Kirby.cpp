@@ -86,8 +86,6 @@ void CKirby::Update(_float fTimeDelta)
         return;
     }
 
-    Update_Grab();
-
     if(Has_MoveDir())
     {
         _vector vDir = XMLoadFloat3(&m_vWishDir);
@@ -386,8 +384,7 @@ HRESULT CKirby::Ready_PartObjects()
     SwordHatDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     SwordHatDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("HatL");
 
-    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_SwordHat::PROTOTYPE_TAG,
-        CKirby_SwordHat::Kirby_PartTag, &SwordHatDesc)))
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_SwordHat::PROTOTYPE_TAG, CKirby_SwordHat::Kirby_PartTag, &SwordHatDesc)))
         return E_FAIL;
 
     return S_OK;
@@ -451,14 +448,14 @@ HRESULT CKirby::Ready_Events()
     Subscribe_Event(EventTag::Cutscene_GrabKirby,
         [this](void* pData)
         {
-            CUTSCENE_GRAB_DESC* pDesc = static_cast<CUTSCENE_GRAB_DESC*>(pData);
-            Begin_CutsceneGrab(pDesc);
+            Set_CutsceneGrabTarget(static_cast<CUTSCENE_GRAB_DESC*>(pData));
+            m_pKirby_StateMachine->Request_CutsceneGrab();
         });
 
     Subscribe_Event(EventTag::Cutscene_ReleaseKirby,
         [this](void*)
         {
-            End_CutsceneGrab();
+            Clear_CutsceneGrabTarget();
         });
 
     return S_OK;
@@ -473,7 +470,6 @@ void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
 {
     m_fInvincibleTime = s_fInvincibleDur;
 
-    m_pMovement->Apply_Knockback(tInfo.vAttackerPos, tInfo.fKnockback * 5.f, tInfo.fKnockback * 1.5f);
     m_pKirby_StateMachine->On_Damaged_KirbyStateMachine(tInfo);
 }
 
@@ -483,47 +479,32 @@ void CKirby::Update_Timer(_float fTimeDelta)
         m_fInvincibleTime -= fTimeDelta;
 }
 
+void CKirby::Set_CutsceneGrabTarget(CUTSCENE_GRAB_DESC* pGrabDesc)
+{
+    m_pGrabBone = pGrabDesc->pBoneMatrix;
+    m_pGrabOwnerWorld = pGrabDesc->pSourceWorld;
+}
+
+void CKirby::Clear_CutsceneGrabTarget()
+{
+    m_pGrabBone = nullptr;
+    m_pGrabOwnerWorld = nullptr;
+}
+
 CCollider* CKirby::Get_Collider(KIRBY_COLLIDER eKirbyCollider)
 {
     return m_KirbyColliders[eKirbyCollider];
 }
 
-void CKirby::Begin_CutsceneGrab(CUTSCENE_GRAB_DESC* pGrabDesc)
+void CKirby::Update_CutsceneGrabTransform()
 {
-    m_bCutsceneGrabbed = true;
-    m_pGrabBoneMatrix = pGrabDesc->pBoneMatrix;
-    m_pGrabSourceWorld = pGrabDesc->pSourceWorld;
+    if (m_pGrabBone == nullptr || m_pGrabOwnerWorld == nullptr)
+        return;
 
-    Get_Movement()->Stop();
-    Get_Movement()->Set_UseGravity(false);
+    _matrix matGrabTargetWorld = XMLoadFloat4x4(m_pGrabBone) * XMLoadFloat4x4(m_pGrabOwnerWorld);
+    Get_Transform()->Set_WorldMatrix(matGrabTargetWorld);
 
-    Change_State(KIRBY_STATE_TYPE::CUTSCENEGRAB);
-}
-
-void CKirby::End_CutsceneGrab()
-{
-    m_bCutsceneGrabbed = false;
-    m_pGrabBoneMatrix = nullptr;
-    m_pGrabSourceWorld = nullptr;
-
-    Get_Movement()->Set_UseGravity(true);
-    Get_Movement()->Sync_To_Controller();
-
-    Change_State(KIRBY_STATE_TYPE::WAIT);
-}
-
-void CKirby::Update_Grab()
-{
-    if (m_bCutsceneGrabbed)
-    {
-        _matrix handWorld =
-            XMLoadFloat4x4(m_pGrabBoneMatrix) *
-            XMLoadFloat4x4(m_pGrabSourceWorld);
-
-        Get_Transform()->Set_WorldMatrix(handWorld);
-
-        m_pMovement->Sync_To_Controller();
-    }
+    m_pMovement->Sync_To_Controller();
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

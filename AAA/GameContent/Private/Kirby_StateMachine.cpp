@@ -13,7 +13,7 @@
 #include "Kirby_GetAbility.h"
 #include "Kirby_AbilityDump.h"
 #include "Kirby_Damaged.h"
-#include "Kirby_CutSceneGrab.h"
+#include "Kirby_CutSceneGrabbed.h"
 
 CKirby_StateMachine::CKirby_StateMachine()
 {
@@ -75,6 +75,11 @@ void CKirby_StateMachine::On_Damaged_KirbyStateMachine(const ATTACK_INFO& tInfo)
     m_pCurState->On_Damaged_KirbyState(m_pKirby, tInfo);
 }
 
+void CKirby_StateMachine::Request_CutsceneGrab()
+{
+    m_pCurState->Request_CutsceneGrab(m_pKirby);
+}
+
 HRESULT CKirby_StateMachine::Init_State()
 {
     auto Register_State = [this](KIRBY_STATE_TYPE eType, CKirby_State* pNewState) -> HRESULT
@@ -96,7 +101,7 @@ HRESULT CKirby_StateMachine::Init_State()
     if (FAILED(Register_State(KIRBY_STATE_TYPE::GET_ABILITY, CKirby_GetAbility::Create())))     return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::ABILITY_DUMP, CKirby_AbilityDump::Create())))   return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::DAMAGED, CKirby_Damaged::Create())))            return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::CUTSCENEGRAB, CKirby_CutSceneGrab::Create())))  return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::CUTSCENE_GRABBED, CKirby_CutSceneGrabbed::Create())))  return E_FAIL;
 
     return S_OK;
 }

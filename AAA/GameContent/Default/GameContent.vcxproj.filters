@@ -355,15 +355,6 @@
     <Filter Include="00. GameObject\96. LevelDesign\Unsupported">
       <UniqueIdentifier>{88670e70-c815-452c-88eb-8a17ac26a72d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State\Attack">
-      <UniqueIdentifier>{dd408402-1425-42a3-9147-6956e370fb21}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State\DoubleAttack">
-      <UniqueIdentifier>{6e258028-c856-4cd6-b619-4b040505f964}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State\TornadoAttack">
-      <UniqueIdentifier>{2b77b7f8-0c0f-4f0b-9910-b472e7bd25f3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\Test\TestParticle">
       <UniqueIdentifier>{c3b2a3c6-b5a8-4b4a-82ac-7f8fd01b5452}</UniqueIdentifier>
     </Filter>
@@ -465,9 +456,6 @@
     </Filter>
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Patrol">
       <UniqueIdentifier>{6faebe93-9f2f-4af1-bb44-37b816184f2d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\NormalEnemy\State">
-      <UniqueIdentifier>{05464a2e-8e96-40b9-b818-54149438e5f8}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\Test\TestMeshParticle">
       <UniqueIdentifier>{8cd5923d-467a-464c-b4e8-7f7307487329}</UniqueIdentifier>
@@ -1248,10 +1236,10 @@
     <ClInclude Include="..\public\Camera_Boss.h">
       <Filter>00. GameObject\00. Camera\BossCam</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Kirby_CutSceneGrab.h">
+    <ClInclude Include="..\Public\Kirby_CutSceneGrabbed.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutSceneGrab</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\LevelDesign_Starblock.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesign_Starblock.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\01. Starblock</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Boundary.h">
@@ -1775,10 +1763,10 @@
     <ClCompile Include="..\private\Camera_Boss.cpp">
       <Filter>00. GameObject\00. Camera\BossCam</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Kirby_CutSceneGrab.cpp">
+    <ClCompile Include="..\Private\Kirby_CutSceneGrabbed.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutSceneGrab</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\LevelDesign_Starblock.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelDesign_Starblock.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\01. Starblock</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Boundary.cpp">

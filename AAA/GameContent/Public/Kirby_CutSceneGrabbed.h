@@ -13,11 +13,11 @@ NS_BEGIN(Client)
 class CKirby;
 class CKirby_Body;
 
-class CLIENT_DLL CKirby_CutSceneGrab final : public CKirby_State
+class CLIENT_DLL CKirby_CutSceneGrabbed final : public CKirby_State
 {
 private:
-	CKirby_CutSceneGrab();
-	virtual ~CKirby_CutSceneGrab() = default;
+	CKirby_CutSceneGrabbed();
+	virtual ~CKirby_CutSceneGrabbed() = default;
 
 private:
 	HRESULT Initialize();
@@ -34,7 +34,7 @@ public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
 public:
-	static CKirby_CutSceneGrab* Create();
+	static CKirby_CutSceneGrabbed* Create();
 private:
 	virtual void Free() override;
 };

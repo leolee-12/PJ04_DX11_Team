@@ -115,10 +115,8 @@ public:
 	// Collider
 	CCollider* Get_Collider(KIRBY_COLLIDER eKirbyCollider);
 
-	// Test
-	void Begin_CutsceneGrab(CUTSCENE_GRAB_DESC* pGrabDesc);
-	void End_CutsceneGrab();
-	void Update_Grab();
+	// CutScene Grab
+	void Update_CutsceneGrabTransform();
 
 private:
 	HRESULT Ready_Components();
@@ -136,7 +134,12 @@ private:
 	virtual _bool Block_Hit(const ATTACK_INFO& tInfo) override;
 	virtual void  On_Damaged(const ATTACK_INFO& tInfo) override;
 	
+	// Timer
 	void Update_Timer(_float fTimeDelta);
+
+	// CutScene Grab
+	void Set_CutsceneGrabTarget(CUTSCENE_GRAB_DESC* pGrabDesc);
+	void Clear_CutsceneGrabTarget();
 
 private:
 	// Parts
@@ -174,10 +177,9 @@ private:
 	_float m_fMaxAbilityDumpCoolTime{ 0.5f };
 	_bool m_bDecreaseAbilityDumpCool{};
 
-	// CutSceneGrab
-	_bool m_bCutsceneGrabbed = false;
-	const _float4x4* m_pGrabBoneMatrix = nullptr;
-	const _float4x4* m_pGrabSourceWorld = nullptr;
+	// CutScene Grab
+	const _float4x4* m_pGrabBone = nullptr;
+	const _float4x4* m_pGrabOwnerWorld = nullptr;
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
