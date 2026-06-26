@@ -658,6 +658,9 @@
     <Filter Include="00. GameObject\06. Monster\05. Kabu\State\Warp\WarpOut">
       <UniqueIdentifier>{75bbbc71-e0d5-464d-b85f-0d45c844d611}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutSceneGrab">
+      <UniqueIdentifier>{46d69dab-00a6-49b7-ba75-db2ddb5232e3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1251,6 +1254,9 @@
     <ClInclude Include="..\public\Camera_Boss.h">
       <Filter>00. GameObject\00. Camera\BossCam</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_CutSceneGrabbed.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutSceneGrab</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Starblock.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\01. Starblock</Filter>
     </ClInclude>
@@ -1795,6 +1801,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Camera_Boss.cpp">
       <Filter>00. GameObject\00. Camera\BossCam</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_CutSceneGrabbed.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutSceneGrab</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Starblock.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\01. Starblock</Filter>

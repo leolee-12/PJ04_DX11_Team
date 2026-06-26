@@ -37,6 +37,7 @@ public:
 
 public:
 	void  On_Damaged_KirbyStateMachine(const ATTACK_INFO& tInfo);
+	void Request_CutsceneGrab();
 
 private:
 	CKirby* m_pKirby{};

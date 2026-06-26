@@ -58,6 +58,7 @@
     <ClInclude Include="..\Public\Kabu_State_WarpIn.h" />
     <ClInclude Include="..\Public\Kabu_State_WarpOut.h" />
     <ClInclude Include="..\Public\Monster_RailMovement.h" />
+    <ClInclude Include="..\Public\Kirby_CutSceneGrabbed.h" />
     <ClInclude Include="..\Public\Sword_JumpSlash.h" />
     <ClInclude Include="..\public\GorillaNamePlate.h" />
     <ClInclude Include="..\Public\LevelDesign_Boundary.h" />
@@ -278,6 +279,7 @@
     <ClCompile Include="..\Private\Kabu_State_WarpIn.cpp" />
     <ClCompile Include="..\Private\Kabu_State_WarpOut.cpp" />
     <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
+    <ClCompile Include="..\Private\Kirby_CutSceneGrabbed.cpp" />
     <ClCompile Include="..\Private\Sword_JumpSlash.cpp" />
     <ClCompile Include="..\private\GorillaNamePlate.cpp" />
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
