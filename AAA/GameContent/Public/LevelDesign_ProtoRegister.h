@@ -20,7 +20,7 @@ private:
 	CGameInstance_Proxy* m_pProxy = nullptr;
 
 private:
-	HRESULT Ensure_Resources(_uint iPrototypeLevel, const LD_SPAWN_SPEC& Spec);
+	HRESULT Ensure_Resources(const LD_RUNTIME_LEVELS& Levels, const LD_SPAWN_SPEC& Spec);
 
 public:
 	static CLevelDesign_ProtoRegister* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

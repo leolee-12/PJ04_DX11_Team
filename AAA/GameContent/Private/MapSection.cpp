@@ -120,6 +120,8 @@ HRESULT CMapSection::Render_Shadow()
 	size_t n = m_pModelCom->Get_NumMeshes();
 	for (size_t i = 0; i < n; ++i)
 	{
+		if (!Should_RenderMesh(static_cast<_uint>(i)))
+			continue;
 		if (FAILED(m_pShaderCom->Begin(3))) 
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Render((_uint)i)))
@@ -172,6 +174,39 @@ void CMapSection::Reset_FrameProfile()
 {
 	// Profiling is temporarily disabled during the GameContent migration.
 	m_Profile = {};
+}
+
+void CMapSection::Set_EditorSoloMeshIndex(_int iMeshIndex)
+{
+	if (nullptr == m_pModelCom)
+	{
+		m_iEditorSoloMeshIndex = -1;
+		return;
+	}
+
+	const _int iNumMeshes =
+		static_cast<_int>(m_pModelCom->Get_NumMeshes());
+
+	if (iMeshIndex < 0 || iMeshIndex >= iNumMeshes)
+	{
+		m_iEditorSoloMeshIndex = -1;
+		return;
+	}
+
+	m_iEditorSoloMeshIndex = iMeshIndex;
+}
+
+void CMapSection::Clear_EditorSoloMesh()
+{
+	m_iEditorSoloMeshIndex = -1;
+}
+
+_bool CMapSection::Should_RenderMesh(_uint iMesh) const
+{
+	if (m_iEditorSoloMeshIndex < 0)
+		return true;
+
+	return iMesh == static_cast<_uint>(m_iEditorSoloMeshIndex);
 }
 #endif
 

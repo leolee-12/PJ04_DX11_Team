@@ -15,10 +15,12 @@ protected:
     CBoss_Brain() = default;
     virtual ~CBoss_Brain() = default;
 
-    HRESULT Initialize_Trees();
+    HRESULT Initialize_Trees(CMonster* pOwner);
 
 public:
-    virtual void Decide(CMonster* pMonster, const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta) override;
+    virtual void Decide(const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta) override;
+
+    CBoss*          Owner() const;
 
 protected:
     // 구체 보스 브레인이 페이즈별 트리를 만든다
@@ -27,7 +29,6 @@ protected:
 
 protected:
     vector<CBehaviorTree*> m_PhaseBTs;
-    CBoss* m_pOwner = { nullptr };
 
     virtual void Free() override;
 };

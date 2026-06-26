@@ -11,7 +11,6 @@ struct LD_MODEL_REQUIREMENT
 {
 	_wstring strPrototypeTag;
 	_string strFilePath;
-	_uint iPrototypeLevel = ETOUI(LEVEL::GAMEPLAY);
 	MODEL eModelType = { MODEL::NONANIM };
 	_bool bCookCollisionMesh = { false };
 };

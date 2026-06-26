@@ -33,30 +33,30 @@ _bool CMonster_Brain_FSM::Can_Decide(const MONSTER_BLACKBOARD& BlackBoard) const
     return true;
 }
 
-void CMonster_Brain_FSM::Decide(CMonster* pMonster, const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta)
+void CMonster_Brain_FSM::Decide(const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta)
 {
-    if (nullptr == pMonster)
+    if (nullptr == m_pOwner)
         return;
 
     if (!Can_Decide(BlackBoard))
         return;
 
-    MONSTER_STATE_TYPE eCurState = pMonster->Get_StateType();
+    MONSTER_STATE_TYPE eCurState = m_pOwner->Get_StateType();
 
     // 타겟 상실 -> 발견 했었다는 변수 리셋 + IDLE 로 복귀
     if (nullptr == BlackBoard.pTarget)
     {
         m_bSpotted = false; 
-        if (eCurState != MONSTER_STATE_TYPE::IDLE && pMonster->Has_State(MONSTER_STATE_TYPE::IDLE))
-            pMonster->Change_State(MONSTER_STATE_TYPE::IDLE);
+        if (eCurState != MONSTER_STATE_TYPE::IDLE && m_pOwner->Has_State(MONSTER_STATE_TYPE::IDLE))
+            m_pOwner->Change_State(MONSTER_STATE_TYPE::IDLE);
         return;
     }
 
     // 첫 발견 -> FIND (Find 상태 가진 몬스터만)
-    if (!m_bSpotted && pMonster->Has_State(MONSTER_STATE_TYPE::DETECT))
+    if (!m_bSpotted && m_pOwner->Has_State(MONSTER_STATE_TYPE::DETECT))
     {
         m_bSpotted = true;
-        pMonster->Change_State(MONSTER_STATE_TYPE::DETECT);
+        m_pOwner->Change_State(MONSTER_STATE_TYPE::DETECT);
         return;
     }
 

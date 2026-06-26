@@ -1,5 +1,7 @@
 #include "Monster_State_Attack.h"
+#include "Monster_Movement.h"
 #include "Monster.h"
+#include "Transform.h"
 
 HRESULT CMonster_State_Attack::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpeed)
 {
@@ -9,18 +11,24 @@ HRESULT CMonster_State_Attack::Initialize(const ANI_PLAY_INFO& tInfo, _float fSp
 	return S_OK;
 }
 
-MONSTER_STATE_TYPE CMonster_State_Attack::Get_StateType()
-{
-	return MONSTER_STATE_TYPE::ATTACK;
-}
-
-void CMonster_State_Attack::Enter()
+void CMonster_State_Attack::Enter(MONSTER_STATE_TYPE ePrevState)
 {
 	if (m_pOwner == nullptr)
 		return;
 
-	if (m_pAnimator && !m_PlayInfo.strAniName.empty())
-		m_pAnimator->Play(&m_PlayInfo);
+	// Å¸°Ù ¹æÇâ ½º³À¼¦ 
+	const MONSTER_BLACKBOARD& BB = m_pOwner->Get_BlackBoard();
+
+	m_MoveDir = BB.vDirToTargetXZ;
+
+	if (m_pMovement)
+	{
+		m_pMovement->Face_Instant(XMLoadFloat3(&BB.vTargetPos));
+		m_pMovement->Set_MoveSpeed(m_fSpeed);
+	}
+
+	if (m_pAnimator)
+		Play_AttackAnimation();
 }
 
 void CMonster_State_Attack::Update(_float fTimeDelta)
@@ -28,27 +36,20 @@ void CMonster_State_Attack::Update(_float fTimeDelta)
 	if (m_pOwner == nullptr)
 		return;
 
-
 	if (m_pAnimator && m_pAnimator->Is_Finished())
-		m_pOwner->Change_State(MONSTER_STATE_TYPE::IDLE);
+	{
+		m_pOwner->Change_State(m_eNextState);
+		return;
+	}
+
+	if (m_pOwner->Get_BlackBoard().bCanMove)
+		m_pOwner->Add_MoveDir(m_MoveDir);
 }
 
 void CMonster_State_Attack::Exit(MONSTER_STATE_TYPE eNextState)
 {
 	if (m_pOwner == nullptr)
 		return;
-}
-
-CMonster_State_Attack* CMonster_State_Attack::Create(const ANI_PLAY_INFO& tInfo, _float fSpeed)
-{
-	CMonster_State_Attack* pInstance = new CMonster_State_Attack();
-	if (FAILED(pInstance->Initialize(tInfo, fSpeed)))
-	{
-		MSG_BOX("Failed to Created : CMonster_State_Attack");
-		Safe_Release(pInstance);
-	}
-
-	return pInstance;
 }
 
 void CMonster_State_Attack::Free()

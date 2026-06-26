@@ -49,6 +49,9 @@ public:
 
 	virtual CAnimator*			Get_BodyAnimator() const override;
 
+	_int						Get_AIType() const { return m_iAIType; }
+	void						Set_AIType(_int iType) { m_iAIType = iType; }
+
 protected:
 	virtual CMonsterBrain*		Create_Brain() override;
 	virtual HRESULT				Ready_State(CMonster_StateMachine* pStateMachine) override;
@@ -62,6 +65,8 @@ private:
 private:
 	// Body Ãß°¡ 
 	CNormalEnemy_Body*			m_pBody = { nullptr };
+
+	_int						m_iAIType = { 1 };
 
 public:
 	static CNormalEnemy*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

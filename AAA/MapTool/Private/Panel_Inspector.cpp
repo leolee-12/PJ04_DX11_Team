@@ -65,8 +65,7 @@ namespace
 		return (iIndex == 1) ? RENDERID::BLEND : RENDERID::NONBLEND;
 	}
 
-	_bool* FindBoolProperty(IReflectable* pHolder, const _wstring& strName, const _wstring&
-		strCategory)
+	_bool* FindBoolProperty(IReflectable* pHolder, const _wstring& strName, const _wstring& strCategory)
 	{
 		if (nullptr == pHolder)
 			return nullptr;
@@ -131,10 +130,7 @@ namespace
 			* XMMatrixTranslationFromVector(vPosition);
 	}
 
-	_bool IsNearlyEqualFloat4x4(
-		const _float4x4& A,
-		const _float4x4& B,
-		_float fEpsilon = 0.0001f)
+	_bool IsNearlyEqualFloat4x4(const _float4x4& A, const _float4x4& B, _float fEpsilon = 0.0001f)
 	{
 		for (_uint iRow = 0; iRow < 4; ++iRow)
 		{
@@ -165,22 +161,18 @@ namespace
 			Edit.bRenderable = bRenderable;
 		}
 
-		const _bool bEnableCulling =
-			ReadBoolProperty(pEnvObject, L"Enable Culling", L"EnvObject", true);
-		const _bool bBaseEnableCulling = Desc.tRender.bUseLodCulling;
-		if (bEnableCulling != bBaseEnableCulling)
+		const _bool bUseCullDistance = ReadBoolProperty(pEnvObject, L"Use Distance Culling", L"EnvObject", Desc.tRender.bUseCullDistance);
+		if (bUseCullDistance != Desc.tRender.bUseCullDistance)
 		{
-			Edit.bHasEnableCulling = true;
-			Edit.bEnableCulling = bEnableCulling;
+			Edit.bHasUseCullDistance = true;
+			Edit.bUseCullDistance = bUseCullDistance;
 		}
 
-		const _bool bCastShadow =
-			ReadBoolProperty(pEnvObject, L"Cast Shadow", L"EnvObject", false);
-		const _bool bBaseCastShadow = Desc.tRender.bShadowMappingCaster;
-		if (bCastShadow != bBaseCastShadow)
+		const _bool bUseCullFrustum = ReadBoolProperty(pEnvObject, L"Use Frustum Culling", L"EnvObject", Desc.tRender.bUseCullFrustum);
+		if (bUseCullFrustum != Desc.tRender.bUseCullFrustum)
 		{
-			Edit.bHasCastShadow = true;
-			Edit.bCastShadow = bCastShadow;
+			Edit.bHasUseCullFrustum = true;
+			Edit.bUseCullFrustum = bUseCullFrustum;
 		}
 
 		_float4x4 BaseWorld = {};
@@ -260,8 +252,8 @@ namespace
 			ReadBoolProperty(pSection, L"Cast Shadow", L"MapSection", Desc.bCastShadow);
 		if (bCastShadow != Desc.bCastShadow)
 		{
-			Edit.bHasCastShadow = true;
-			Edit.bCastShadow = bCastShadow;
+			Edit.bHasShadow = true;
+			Edit.bUseShadow = bCastShadow;
 		}
 
 		_float4x4 BaseWorld = {};
@@ -283,6 +275,131 @@ namespace
 
 		return g_EnvShaderPassMetas[idx].szName;
 	}
+
+#pragma region MAP_LAYER_EX
+	static const _char* kLayerExGroupName[MAP_LAYER_EX_GROUP::GROUP_COUNT] =
+	{
+		"Main", "ExtR", "ExtG", "ExtB", "ExtA",
+	};
+
+	static const _char* kLayerExEntryName[MESH_LAYER_EX_ENTRY_COUNT] =
+	{
+		  "DIFF", "MRA", "NORM", "UKWN",
+	};
+
+	static const MTEX_TYPE kLayerExTexType[MESH_LAYER_EX_ENTRY_COUNT] =
+	{
+		  MTEX_TYPE::DIFFUSE,
+		  MTEX_TYPE::METALNESS,
+		  MTEX_TYPE::NORMALS,
+		  MTEX_TYPE::UNKNOWN
+	};
+
+	void Fill_LayerExBind(MESH_LAYER_TEX_BIND_EX& Out, MTEX_TYPE eType, _int iSlot,
+		_uint iUVIndex, const _float2 vScale, const _float2 vOffset, _float fRotate)
+	{
+		Out.bEnable = (iSlot >= 0);
+		Out.iTexType = ETOUI(eType);
+		Out.iSlot = iSlot;
+		Out.iUVIndex = (iUVIndex <= 3u) ? iUVIndex : 0u;
+		Out.vUVScale = vScale;
+		Out.vUVOffset = vOffset;
+		Out.fUVRotate = fRotate;
+	}
+
+	void InitializeLayerExFromLegacy(MESH_LAYER_IDX& Layer)
+	{
+		// Init
+		for (_uint g = 0; g < MESH_LAYER_EX_GROUP_COUNT; ++g)
+		{
+			for (_uint e = 0; e < MESH_LAYER_EX_ENTRY_COUNT; ++e)
+				Layer.LayerEx[g][e] = {};
+		}
+
+		const _float2 vOffset = Layer.vUVOffset;
+		const _float fRotate = Layer.fUVRotate;
+
+		// Main.Diffuse
+		Fill_LayerExBind(
+			Layer.LayerEx[MAIN][LAYER_EX_DIFF],
+			MTEX_TYPE::DIFFUSE,
+			static_cast<_int>(Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)]),
+			Layer.iUVIndex,
+			Layer.bUseUVTransform ? Layer.vUVScale : XMFLOAT2{ 1.f, 1.f },
+			Layer.bUseUVTransform ? vOffset : XMFLOAT2{ 0.f, 0.f },
+			Layer.bUseUVTransform ? fRotate : 0.f);
+
+		// Main.MRA
+		Fill_LayerExBind(
+			Layer.LayerEx[MAIN][LAYER_EX_MRA],
+			MTEX_TYPE::METALNESS,
+			static_cast<_int>(Layer.idx[ETOUI(MTEX_TYPE::METALNESS)]),
+			Layer.iUVIndex,
+			Layer.bUseUVTransform ? Layer.vUVScaleMaterial : XMFLOAT2{ 1.f, 1.f },
+			Layer.bUseUVTransform ? vOffset : XMFLOAT2{ 0.f, 0.f },
+			Layer.bUseUVTransform ? fRotate : 0.f);
+
+		// Main.Normal
+		Fill_LayerExBind(
+			Layer.LayerEx[MAIN][LAYER_EX_NORM],
+			MTEX_TYPE::NORMALS,
+			static_cast<_int>(Layer.idx[ETOUI(MTEX_TYPE::NORMALS)]),
+			Layer.iUVIndex,
+			Layer.bUseUVTransform ? Layer.vUVScaleNormal : XMFLOAT2{ 1.f, 1.f },
+			Layer.bUseUVTransform ? vOffset : XMFLOAT2{ 0.f, 0.f },
+			Layer.bUseUVTransform ? fRotate : 0.f);
+
+		// Main.Unknown
+		Fill_LayerExBind(
+			Layer.LayerEx[MAIN][LAYER_EX_UKWN],
+			MTEX_TYPE::UNKNOWN,
+			static_cast<_int>(Layer.idx[ETOUI(MTEX_TYPE::UNKNOWN)]),
+			Layer.iUnknownUVIndex,
+			Layer.bUseUVTransform ? Layer.vUVScale : XMFLOAT2{ 1.f, 1.f },
+			Layer.bUseUVTransform ? vOffset : XMFLOAT2{ 0.f, 0.f },
+			Layer.bUseUVTransform ? fRotate : 0.f);
+
+		// Extra R/G/B/A → Group 1~4
+		for (_uint c = 0; c < 4; ++c)
+		{
+			const _int iSlot = Layer.iExtraBind[c];
+			if (iSlot < 0)
+				continue;
+
+			const MTEX_TYPE eTexType = static_cast<MTEX_TYPE>(Layer.iExtraTexType[c]);
+
+			_uint iEntry = LAYER_EX_UKWN;
+			XMFLOAT2 vScale = Layer.bUseUVTransform ? Layer.vUVScale : XMFLOAT2{ 1.f, 1.f };
+
+			if (eTexType == MTEX_TYPE::DIFFUSE)
+			{
+				iEntry = LAYER_EX_DIFF;
+				vScale = Layer.bUseUVTransform ? Layer.vUVScale : XMFLOAT2{ 1.f, 1.f };
+			}
+			else if (eTexType == MTEX_TYPE::METALNESS)
+			{
+				iEntry = LAYER_EX_MRA;
+				vScale = Layer.bUseUVTransform ? Layer.vUVScaleMaterial : XMFLOAT2{ 1.f, 1.f };
+			}
+			else if (eTexType == MTEX_TYPE::NORMALS)
+			{
+				iEntry = LAYER_EX_NORM;
+				vScale = Layer.bUseUVTransform ? Layer.vUVScaleNormal : XMFLOAT2{ 1.f, 1.f };
+			}
+
+			Fill_LayerExBind(
+				Layer.LayerEx[c + 1][iEntry],
+				eTexType,
+				iSlot,
+				Layer.iExtraUVIndex[c],
+				vScale,
+				Layer.bUseUVTransform ? vOffset : XMFLOAT2{ 0.f, 0.f },
+				Layer.bUseUVTransform ? fRotate : 0.f);
+		}
+
+		Layer.bUseLayerEx = true;
+	}
+#pragma endregion
 }
 
 CPanel_Inspector::CPanel_Inspector(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -555,32 +672,47 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 		return;
 
 	_bool* pbRenderable = FindBoolProperty(pEnvObject, L"Renderable", L"EnvObject");
-	_bool* pbEnableCulling = FindBoolProperty(pEnvObject, L"Enable Culling", L"EnvObject");
-	_bool* pbCastShadow = FindBoolProperty(pEnvObject, L"Cast Shadow", L"EnvObject");
-	_bool* pbCreateCollMesh = Resolve_EnvCollMeshEditState(pLevel, pEnvObject);
+	_bool* pbUseCullDistance = FindBoolProperty(pEnvObject, L"Use Distance Culling", L"EnvObject");
+	_bool* pbUseCullFrustum = FindBoolProperty(pEnvObject, L"Use Frustum Culling", L"EnvObject");
+	_bool* pbUseShadow = Resolve_EnvShadowEditState(pLevel, pEnvObject);
+	_bool* pbUseCollMesh = Resolve_EnvCollMeshEditState(pLevel, pEnvObject);
 	_bool* pbUseNearDistAlpha = Resolve_EnvNearAlphaEditState(pLevel, pEnvObject);
 
-	const auto& Collision = pEnvObject->Get_Desc().tCollision;
-	const _bool bSourceCanCreateCollisionMesh =
-		Collision.bSourceHasDecorCollisionApxbin && !Collision.bSourceInvalidCollision;
+	const ENV_OBJECT_DESC& Desc = pEnvObject->Get_Desc();
+	const auto& Collision = Desc.tCollision;
+	const auto& Render = Desc.tRender;
+
+	const _bool bHasShadow = Render.bHasShadow;
+	const _bool bHasCollMesh = Collision.bHasCollMesh;
 
 	ImGui::TextUnformatted("EnvObject Edit");
 
 	if (pbRenderable)
 		ImGui::Checkbox("Renderable##EnvEdit", (bool*)pbRenderable);
-	if (pbEnableCulling)
-		ImGui::Checkbox("Enable Culling##EnvEdit", (bool*)pbEnableCulling);
-	if (pbCastShadow)
-		ImGui::Checkbox("Cast Shadow##EnvEdit", (bool*)pbCastShadow);
-	if (pbCreateCollMesh)
+	if (pbUseCullDistance)
+		ImGui::Checkbox("Distance Culling##EnvEdit", (bool*)pbUseCullDistance);
+	if (pbUseCullFrustum)
+		ImGui::Checkbox("Frustum Culling##EnvEdit", (bool*)pbUseCullFrustum);
+
+	if (pbUseShadow)
 	{
-		ImGui::BeginDisabled(!bSourceCanCreateCollisionMesh);
-		ImGui::Checkbox("Create Collision Mesh On Reload##EnvEdit", (bool*)pbCreateCollMesh);
+		ImGui::BeginDisabled(!bHasShadow);
+		ImGui::Checkbox("Use Shadow On Reload##EnvEdit", (bool*)pbUseShadow);
 		ImGui::EndDisabled();
 	}
 
-	if (!bSourceCanCreateCollisionMesh)
-		ImGui::TextDisabled("Source env collision mesh cannot be created for this object.");
+	if (pbUseCollMesh)
+	{
+		ImGui::BeginDisabled(!bHasCollMesh);
+		ImGui::Checkbox("Use Collision Mesh On Reload##EnvEdit", (bool*)pbUseCollMesh);
+		ImGui::EndDisabled();
+	}
+
+	if (!bHasShadow)
+		ImGui::TextDisabled("Source data does not provide shadow capability for this object.");
+
+	if (!bHasCollMesh)
+		ImGui::TextDisabled("Source data does not provide collision mesh capability for this object.");
 
 	if (pbUseNearDistAlpha)
 		ImGui::Checkbox("Use Near Dist Alpha##EnvEdit", (bool*)pbUseNearDistAlpha);
@@ -594,22 +726,18 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 			pEnvObject,
 			(nullptr != pbUseNearDistAlpha)
 			? *pbUseNearDistAlpha
-			: pEnvObject->Get_Desc().tRender.bUseNearDistAlpha);
+			: Desc.tRender.bUseNearDistAlpha);
 
-		const _bool bCreateCollMesh =
-			(nullptr != pbCreateCollMesh)
-			? *pbCreateCollMesh
-			: bSourceCanCreateCollisionMesh;
-
-		Edit.bHasCollMeshEdited = false;
-		Edit.bCreateCollMesh = true;
-		Edit.bDisableCollMesh = false;
-
-		if (bSourceCanCreateCollisionMesh)
+		if (bHasShadow)
 		{
-			Edit.bHasCollMeshEdited = (bCreateCollMesh != true);
-			Edit.bCreateCollMesh = bCreateCollMesh;
-			Edit.bDisableCollMesh = !bCreateCollMesh;
+			Edit.bHasShadow = true;
+			Edit.bUseShadow = (nullptr != pbUseShadow) ? *pbUseShadow : false;
+		}
+
+		if (bHasCollMesh)
+		{
+			Edit.bHasCollMesh = true;
+			Edit.bUseCollMesh = (nullptr != pbUseCollMesh) ? *pbUseCollMesh : false;
 		}
 
 		if (Has_AnyMapEnvEdit(Edit))
@@ -619,6 +747,7 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 		else
 		{
 			pLevel->Clear_EditedMapPreviewEnvObject(pObject);
+			Clear_EnvShadowEditState(pObject);
 			Clear_EnvCollMeshEditState(pObject);
 			Clear_EnvNearAlphaEditState(pObject);
 		}
@@ -641,6 +770,7 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 			(nullptr != pSession) ? pSession->Get_EditData().iPresetIndex : -1;
 
 		pLevel->Clear_EditedMapPreviewEnvObject(pObject);
+		m_EnvShadowEditStates.clear();
 		m_EnvCollMeshEditStates.clear();
 		m_EnvNearAlphaEditStates.clear();
 
@@ -716,15 +846,15 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 			? *pbCreateCollisionActor
 			: bSourceCanCreateCollisionActor;
 
-		Edit.bHasCollMeshEdited = false;
-		Edit.bCreateCollMesh = true;
-		Edit.bDisableCollMesh = false;
+		const _bool bBaseUseCollMesh = bSourceCanCreateCollisionActor;
 
-		if (bSourceCanCreateCollisionActor)
+		Edit.bHasCollMesh = false;
+		Edit.bUseCollMesh = bBaseUseCollMesh;
+
+		if (bSourceCanCreateCollisionActor && bCreateCollisionActorValue != bBaseUseCollMesh)
 		{
-			Edit.bHasCollMeshEdited = (bCreateCollisionActorValue != true);
-			Edit.bCreateCollMesh = bCreateCollisionActorValue;
-			Edit.bDisableCollMesh = !bCreateCollisionActorValue;
+			Edit.bHasCollMesh = true;
+			Edit.bUseCollMesh = bCreateCollisionActorValue;
 		}
 
 		pSection->Set_CollisionActorEnabled(
@@ -799,6 +929,16 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 	{
 		s_pFocusedMeshOwner = pObject;
 		s_iFocusedMeshIndex = (iNumMeshes > 0) ? 0 : -1;
+
+#ifdef _DEBUG
+		if (auto* pSection = dynamic_cast<Client::CMapSection*>(pObject))
+		{
+			if (m_bEditorSoloMesh)
+				pSection->Set_EditorSoloMeshIndex(s_iFocusedMeshIndex);
+			else
+				pSection->Clear_EditorSoloMesh();
+		}
+#endif
 	}
 
 	if (0 == iNumMeshes)
@@ -816,6 +956,16 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 	if (s_iFocusedMeshIndex < 0 || s_iFocusedMeshIndex >= static_cast<_int>(iNumMeshes))
 		s_iFocusedMeshIndex = 0;
 
+#ifdef _DEBUG
+	if (auto* pSection = dynamic_cast<Client::CMapSection*>(pObject))
+	{
+		if (m_bEditorSoloMesh)
+			pSection->Set_EditorSoloMeshIndex(s_iFocusedMeshIndex);
+		else
+			pSection->Clear_EditorSoloMesh();
+	}
+#endif
+
 	ImGui::BeginChild("MeshList", ImVec2(0.f, 140.f), true);
 	for (size_t i = 0; i < iNumMeshes; ++i)
 	{
@@ -828,7 +978,17 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 		ImGui::PushID(static_cast<int>(i));
 
 		if (ImGui::Selectable(strLabel.c_str(), bSelected, ImGuiSelectableFlags_SpanAllColumns))
+		{
 			s_iFocusedMeshIndex = static_cast<_int>(i);
+
+#ifdef _DEBUG
+			if (auto* pSection = dynamic_cast<Client::CMapSection*>(pObject))
+			{
+				if (m_bEditorSoloMesh)
+					pSection->Set_EditorSoloMeshIndex(s_iFocusedMeshIndex);
+			}
+#endif
+		}
 
 		ImGui::Indent();
 		ImGui::TextDisabled("Pass:%d  UV:%s",
@@ -851,8 +1011,58 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 		s_iFocusedMeshIndex,
 		pModel->Get_MeshName(iMesh).c_str());
 
+#ifdef _DEBUG
+	if (auto* pSection = dynamic_cast<Client::CMapSection*>(pObject))
+	{
+		if (m_bEditorSoloMesh)
+		{
+			ImGui::TextDisabled(
+				"Solo Mesh: %d",
+				pSection->Get_EditorSoloMeshIndex());
+		}
+	}
+#endif
+
 	_bool bChanged = false;
 	_bool bAnyField = false;
+
+	if (bMapObjectMeshUi)
+	{
+		ImGui::SeparatorText("Mode");
+
+		bool bUseLayerEx = Layer.bUseLayerEx;
+		if (ImGui::Checkbox("Advanced Layer##UseLayerEx", &bUseLayerEx))
+		{
+			Layer.bUseLayerEx = bUseLayerEx;
+			bChanged = true;
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Init From Legacy##LayerExInit"))
+		{
+			InitializeLayerExFromLegacy(Layer);
+			bChanged = true;
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Disable##LayerExDisable"))
+		{
+			Layer.bUseLayerEx = false;
+
+			for (_uint g = 0; g < MESH_LAYER_EX_GROUP_COUNT; ++g)
+			{
+				for (_uint e = 0; e < MESH_LAYER_EX_ENTRY_COUNT; ++e)
+					Layer.LayerEx[g][e] = {};
+			}
+
+			bChanged = true;
+		}
+
+		if (Layer.bUseLayerEx)
+			ImGui::TextDisabled("Advanced Layer is active. Settings are saved per model sidecar.");
+	}
 
 	auto DrawUVCombo = [&](const char* pLabel, _uint& iUVIndex)
 		{
@@ -1034,6 +1244,171 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			}
 		};
 
+	auto DrawLayerExSlotCell = [&](const char* pLabel, MESH_LAYER_TEX_BIND_EX& Bind, _uint iEntry)
+		{
+			bAnyField = true;
+
+			ImGui::TextUnformatted(pLabel);
+
+			if (ImGui::Checkbox("##Use", &Bind.bEnable))
+				bChanged = true;
+
+			static const MTEX_TYPE kSelectableTypes[] =
+			{
+				  MTEX_TYPE::DIFFUSE,
+				  MTEX_TYPE::METALNESS,
+				  MTEX_TYPE::NORMALS,
+				  MTEX_TYPE::UNKNOWN
+			};
+
+			int iTypeCombo = 0;
+			for (int i = 0; i < IM_ARRAYSIZE(kSelectableTypes); ++i)
+			{
+				if (Bind.iTexType == ETOUI(kSelectableTypes[i]))
+				{
+					iTypeCombo = i;
+					break;
+				}
+			}
+
+			ImGui::SetNextItemWidth(-FLT_MIN);
+			if (ImGui::Combo("##TexType", &iTypeCombo, "Diff\0MRA\0Norm\0Ukwn\0\0"))
+			{
+				Bind.iTexType = ETOUI(kSelectableTypes[iTypeCombo]);
+				Bind.iSlot = -1;
+				Bind.bEnable = false;
+				bChanged = true;
+			}
+
+			const MTEX_TYPE eType = static_cast<MTEX_TYPE>(Bind.iTexType);
+			const int iCount = static_cast<int>(pModel->Get_MeshTextureCount(iMesh, eType));
+
+			ImGui::SetNextItemWidth(-FLT_MIN);
+
+			if (iCount <= 0)
+			{
+				int iDummy = 0;
+				if (Bind.iSlot != -1) { Bind.iSlot = -1; bChanged = true; }
+				ImGui::BeginDisabled();
+				ImGui::Combo("##Slot", &iDummy, "N/A\0\0");
+				ImGui::EndDisabled();
+				return;
+			}
+
+			if (Bind.iSlot < -1) { Bind.iSlot = -1; bChanged = true; }
+			else if (Bind.iSlot >= iCount) { Bind.iSlot = iCount - 1; bChanged = true; }
+
+			int iComboIndex = Bind.iSlot + 1;
+			const string strItems = BuildCompactComboItems(-1, iCount - 1);
+			if (ImGui::Combo("##Slot", &iComboIndex, strItems.c_str()))
+			{
+				Bind.iSlot = iComboIndex - 1;
+				Bind.bEnable = Bind.iSlot >= 0;
+				bChanged = true;
+			}
+		};
+
+	auto DrawLayerExTextureGrid = [&](_uint iGroup)
+		{
+			ImGui::SeparatorText("Advanced Layer Texture");
+
+			if (!ImGui::BeginTable("LayerExTexGrid", 4, ImGuiTableFlags_SizingStretchSame))
+				return;
+
+			ImGui::TableNextRow();
+
+			for (_uint e = 0; e < MESH_LAYER_EX_ENTRY_COUNT; ++e)
+			{
+				ImGui::TableNextColumn();
+				ImGui::PushID(static_cast<int>(iGroup * 10u + e));
+
+				MESH_LAYER_TEX_BIND_EX& Bind = Layer.LayerEx[iGroup][e];
+				if (Bind.iTexType == 0u)
+					Bind.iTexType = ETOUI(kLayerExTexType[e]);
+
+				DrawLayerExSlotCell(kLayerExEntryName[e], Bind, e);
+
+				ImGui::PopID();
+			}
+
+			ImGui::EndTable();
+		};
+
+	auto DrawLayerExUVCell = [&](const char* pLabel, MESH_LAYER_TEX_BIND_EX& Bind)
+		{
+			bAnyField = true;
+
+			ImGui::TextUnformatted(pLabel);
+			DrawCompactUVCombo("##UV", Bind.iUVIndex);
+
+			ImGui::SetNextItemWidth(-FLT_MIN);
+			if (ImGui::DragFloat2("##Scale", (float*)&Bind.vUVScale, 0.01f))
+				bChanged = true;
+
+			ImGui::SetNextItemWidth(-FLT_MIN);
+			if (ImGui::DragFloat2("##Offset", (float*)&Bind.vUVOffset, 0.01f))
+				bChanged = true;
+
+			ImGui::SetNextItemWidth(-FLT_MIN);
+			if (ImGui::DragFloat("##Rotate", &Bind.fUVRotate, 0.01f))
+				bChanged = true;
+
+			if (ImGui::Button("Reset UV"))
+			{
+				Bind.iUVIndex = 0u;
+				Bind.vUVScale = XMFLOAT2{ 1.f, 1.f };
+				Bind.vUVOffset = XMFLOAT2{ 0.f, 0.f };
+				Bind.fUVRotate = 0.f;
+				bChanged = true;
+			}
+		};
+	
+	auto DrawLayerExUVGrid = [&](_uint iGroup)
+		{
+			ImGui::SeparatorText("Advanced Layer UV");
+
+			if (!ImGui::BeginTable("LayerExUVGrid", 4, ImGuiTableFlags_SizingStretchSame))
+				return;
+
+			ImGui::TableNextRow();
+
+			for (_uint e = 0; e < MESH_LAYER_EX_ENTRY_COUNT; ++e)
+			{
+				ImGui::TableNextColumn();
+				ImGui::PushID(static_cast<int>(100 + iGroup * 10u + e));
+
+				MESH_LAYER_TEX_BIND_EX& Bind = Layer.LayerEx[iGroup][e];
+				DrawLayerExUVCell(kLayerExEntryName[e], Bind);
+
+				ImGui::PopID();
+			}
+
+			ImGui::EndTable();
+		};
+
+	auto DrawLayerExGroupSummary = [&](_uint iGroup)
+		{
+			_uint iEnabledCount = 0;
+			_uint iSlotCount = 0;
+
+			for (_uint e = 0; e < MESH_LAYER_EX_ENTRY_COUNT; ++e)
+			{
+				const MESH_LAYER_TEX_BIND_EX& Bind = Layer.LayerEx[iGroup][e];
+
+				if (Bind.bEnable)
+					++iEnabledCount;
+
+				if (Bind.iSlot >= 0)
+					++iSlotCount;
+			}
+
+			ImGui::TextDisabled(
+				"LayerEx %s: enabled %u / slots %u. Saved per model sidecar.",
+				kLayerExGroupName[iGroup],
+				iEnabledCount,
+				iSlotCount);
+		};
+
 	auto DrawMapTextureCompactGrid = [&]()
 		{
 			ImGui::TextUnformatted("Tex");
@@ -1105,48 +1480,79 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			bChanged = true;
 		}
 
-		ImGui::TextUnformatted("UV Slots");
-		DrawMapUVCompactGrid();
+		if (Layer.bUseLayerEx)
+		{
+			if (ImGui::BeginTabBar("LayerExGroups"))
+			{
+				for (_uint g = 0; g < MESH_LAYER_EX_GROUP_COUNT; ++g)
+				{
+					if (ImGui::BeginTabItem(kLayerExGroupName[g]))
+					{
+						DrawLayerExTextureGrid(g);
+						DrawLayerExUVGrid(g);
+						DrawLayerExGroupSummary(g);
+						ImGui::EndTabItem();
+					}
+				}
 
-		if (ImGui::Checkbox("Use UV Transform", (bool*)&Layer.bUseUVTransform))
-			bChanged = true;
+				ImGui::EndTabBar();
+			}
 
-		ImGui::BeginDisabled(!Layer.bUseUVTransform);
+			ImGui::SeparatorText("Advanced Strength");
 
-		ImGui::SetNextItemWidth(160.f);
-		if (ImGui::DragFloat2("UV Scale", (float*)&Layer.vUVScale, 0.01f))
-			bChanged = true;
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat("Normal Strength##LayerEx", &Layer.fNormalStrength, 0.01f))
+				bChanged = true;
 
-		ImGui::SetNextItemWidth(160.f);
-		if (ImGui::DragFloat2("UV ScaleNormal", (float*)&Layer.vUVScaleNormal, 0.01f))
-			bChanged = true;
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat("Mask Strength##LayerEx", &Layer.fMaskStrength, 0.01f))
+				bChanged = true;
+		}
+		else
+		{
+			ImGui::TextUnformatted("UV Slots");
+			DrawMapUVCompactGrid();
 
-		ImGui::SetNextItemWidth(160.f);
-		if (ImGui::DragFloat2("UV ScaleMaterial", (float*)&Layer.vUVScaleMaterial, 0.01f))
-			bChanged = true;
+			if (ImGui::Checkbox("Use UV Transform", (bool*)&Layer.bUseUVTransform))
+				bChanged = true;
 
-		ImGui::SetNextItemWidth(160.f);
-		if (ImGui::DragFloat("UV Rotate", &Layer.fUVRotate, 0.01f))
-			bChanged = true;
+			ImGui::BeginDisabled(!Layer.bUseUVTransform);
 
-		ImGui::SetNextItemWidth(160.f);
-		if (ImGui::DragFloat2("UV Offset", (float*)&Layer.vUVOffset, 0.01f))
-			bChanged = true;
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat2("UV Scale", (float*)&Layer.vUVScale, 0.01f))
+				bChanged = true;
 
-		ImGui::EndDisabled();
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat2("UV ScaleNormal", (float*)&Layer.vUVScaleNormal, 0.01f))
+				bChanged = true;
 
-		ImGui::SetNextItemWidth(160.f);
-		if (ImGui::DragFloat("Normal Strength", &Layer.fNormalStrength, 0.01f))
-			bChanged = true;
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat2("UV ScaleMaterial", (float*)&Layer.vUVScaleMaterial, 0.01f))
+				bChanged = true;
 
-		ImGui::SetNextItemWidth(160.f);
-		if (ImGui::DragFloat("Mask Strength", &Layer.fMaskStrength, 0.01f))
-			bChanged = true;
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat("UV Rotate", &Layer.fUVRotate, 0.01f))
+				bChanged = true;
 
-		ImGui::Spacing();
-		DrawMapUVCompactGrid();
-		ImGui::Spacing();
-		DrawMapTextureCompactGrid();
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat2("UV Offset", (float*)&Layer.vUVOffset, 0.01f))
+				bChanged = true;
+
+			ImGui::EndDisabled();
+
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat("Normal Strength", &Layer.fNormalStrength, 0.01f))
+				bChanged = true;
+
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat("Mask Strength", &Layer.fMaskStrength, 0.01f))
+				bChanged = true;
+
+			ImGui::Spacing();
+			DrawMapUVCompactGrid();
+			ImGui::Spacing();
+			DrawMapTextureCompactGrid();
+		}
 	}
 	else
 	{
@@ -1282,11 +1688,11 @@ void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
 	}
 
 	const ImVec2 vAvail = ImGui::GetContentRegionAvail();
-	float fListWidth = vAvail.x * 0.26f;
-	if (fListWidth < 180.f)
-		fListWidth = 180.f;
-	else if (fListWidth > 260.f)
-		fListWidth = 260.f;
+	float fListWidth = vAvail.x * 0.18f;
+	if (fListWidth < 140.f)
+		fListWidth = 140.f;
+	else if (fListWidth > 190.f)
+		fListWidth = 190.f;
 
 	ImGui::BeginChild("SectionList", ImVec2(fListWidth, 0.f), true);
 	{
@@ -1302,7 +1708,27 @@ void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
 			const _bool bSelected = (pSection == m_pFocusedMapSection);
 
 			if (ImGui::Selectable(strLabel.c_str(), bSelected, ImGuiSelectableFlags_SpanAllColumns))
+			{
 				m_pFocusedMapSection = pSection;
+
+#ifdef _DEBUG
+				if (nullptr != pMapStage)
+				{
+					if (m_bEditorSoloSection)
+						pMapStage->Set_EditorSoloSection(m_pFocusedMapSection);
+					else
+						pMapStage->Clear_EditorSoloSection();
+				}
+
+				if (nullptr != m_pFocusedMapSection)
+				{
+					if (m_bEditorSoloMesh)
+						m_pFocusedMapSection->Set_EditorSoloMeshIndex(-1);
+					else
+						m_pFocusedMapSection->Clear_EditorSoloMesh();
+				}
+#endif
+			}
 
 			const _bool bRenderable =
 				ReadBoolProperty(pSection, L"Renderable", L"MapSection", pSection->Get_Desc().bRenderable);
@@ -1318,13 +1744,12 @@ void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
 				? *pbCreateCollisionActor
 				: pSection->Get_Desc().bSourceCreateCollisionActor;
 
-			ImGui::Indent();
-			ImGui::TextDisabled("R:%s  C:%s  S:%s  Coll:%s",
+			ImGui::TextDisabled("R:%s  C:%s",
 				bRenderable ? "On" : "Off",
-				bEnableCulling ? "On" : "Off",
+				bEnableCulling ? "On" : "Off");
+			ImGui::TextDisabled("S:%s  Coll:%s",
 				bCastShadow ? "On" : "Off",
 				bCreateCollision ? "On" : "Off");
-			ImGui::Unindent();
 
 			ImGui::Separator();
 			ImGui::PopID();
@@ -1356,6 +1781,10 @@ void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
 			ImGui::Separator();
 			Draw_MapSectionEditPanel(pLevel, pMapStage, m_pFocusedMapSection);
 			ImGui::Separator();
+#ifdef _DEBUG
+			Draw_MapSectionViewFilter(pMapStage, m_pFocusedMapSection, -1);
+			ImGui::Separator();
+#endif
 			Draw_Properties(m_pFocusedMapSection);
 			ImGui::Separator();
 			Draw_MeshLayerPanel(m_pFocusedMapSection);
@@ -1383,8 +1812,64 @@ void CPanel_Inspector::Draw_MapSectionRenderOptions(Client::CMapSection* pSectio
 		pSection->Set_RenderID(FromMapRenderGroupIndex(iRenderGroup));
 }
 
-_bool* CPanel_Inspector::Resolve_EnvCollMeshEditState(CLevel_Edit* pLevel, Client::CEnvObject*
-	pEnvObject)
+#ifdef _DEBUG
+void CPanel_Inspector::Draw_MapSectionViewFilter(CMapStage* pMapStage, CMapSection* pSection, _int iSelectedMeshIndex)
+{
+	if (nullptr == pMapStage || nullptr == pSection)
+		return;
+
+	if (!ImGui::CollapsingHeader("View Filter", ImGuiTreeNodeFlags_DefaultOpen))
+		return;
+
+	if (ImGui::Checkbox("Solo Section", (bool*)&m_bEditorSoloSection))
+	{
+		if (m_bEditorSoloSection)
+			pMapStage->Set_EditorSoloSection(pSection);
+		else
+			pMapStage->Clear_EditorSoloSection();
+	}
+
+	if (ImGui::Checkbox("Solo Mesh", (bool*)&m_bEditorSoloMesh))
+	{
+		if (!m_bEditorSoloMesh)
+			pMapStage->Clear_EditorSoloMeshAllSections();
+		// ON인 경우 실제 index는 MeshList 선택 로직에서 즉시 세팅
+	}
+
+	ImGui::TextDisabled("Solo Mesh uses the focused mesh in Mesh Render Settings.");
+}
+#endif
+
+_bool* CPanel_Inspector::Resolve_EnvShadowEditState(CLevel_Edit* pLevel, Client::CEnvObject* pEnvObject)
+{
+	if (nullptr == pLevel || nullptr == pEnvObject)
+		return nullptr;
+
+	auto Iter = m_EnvShadowEditStates.find(pEnvObject);
+	if (Iter == m_EnvShadowEditStates.end())
+	{
+		MAP_ENV_EDITED_DESC SavedEdit{};
+		const _bool bHasShadow = pEnvObject->Get_Desc().tRender.bHasShadow;
+
+		_bool bUseShadow = false;
+		if (pLevel->Try_GetMapPreviewEnvEdit(pEnvObject, &SavedEdit))
+		{
+			if (SavedEdit.bHasShadow)
+				bUseShadow = SavedEdit.bUseShadow;
+		}
+
+		if (!bHasShadow)
+			bUseShadow = false;
+
+		Iter = m_EnvShadowEditStates.emplace(
+			static_cast<CGameObject*>(pEnvObject),
+			bUseShadow).first;
+	}
+
+	return &Iter->second;
+}
+
+_bool* CPanel_Inspector::Resolve_EnvCollMeshEditState(CLevel_Edit* pLevel, Client::CEnvObject* pEnvObject)
 {
 	if (nullptr == pLevel || nullptr == pEnvObject)
 		return nullptr;
@@ -1394,24 +1879,21 @@ _bool* CPanel_Inspector::Resolve_EnvCollMeshEditState(CLevel_Edit* pLevel, Clien
 	{
 		MAP_ENV_EDITED_DESC SavedEdit{};
 		const auto& Collision = pEnvObject->Get_Desc().tCollision;
-		const _bool bSourceCanCreateCollisionMesh =
-			Collision.bSourceHasDecorCollisionApxbin && !Collision.bSourceInvalidCollision;
+		const _bool bHasCollMesh = Collision.bHasCollMesh;
 
-		_bool bCreateCollMesh = bSourceCanCreateCollisionMesh;
+		_bool bUseCollMesh = false;
 		if (pLevel->Try_GetMapPreviewEnvEdit(pEnvObject, &SavedEdit))
 		{
-			if (SavedEdit.bHasCollMeshEdited)
-				bCreateCollMesh = SavedEdit.bCreateCollMesh;
-			else
-				bCreateCollMesh = !SavedEdit.bDisableCollMesh;
+			if (SavedEdit.bHasCollMesh)
+				bUseCollMesh = SavedEdit.bUseCollMesh;
 		}
 
-		if (!bSourceCanCreateCollisionMesh)
-			bCreateCollMesh = false;
+		if (!bHasCollMesh)
+			bUseCollMesh = false;
 
 		Iter = m_EnvCollMeshEditStates.emplace(
 			static_cast<CGameObject*>(pEnvObject),
-			bCreateCollMesh).first;
+			bUseCollMesh).first;
 	}
 
 	return &Iter->second;
@@ -1435,12 +1917,11 @@ _bool* CPanel_Inspector::Resolve_MapCollMeshEditState(CLevel_Edit* pLevel, CMapS
 			pSection->Get_Desc().bSourceCreateCollisionActor;
 
 		_bool bCreateCollisionActor = bSourceCanCreateCollisionActor;
-		if (pLevel->Try_GetMapPreviewSectionEdit(strSectionKey, &SavedEdit))
+		if (pLevel->Try_GetMapPreviewSectionEdit(strSectionKey, &SavedEdit)
+			&& SavedEdit.bHasCollMesh)
 		{
-			if (SavedEdit.bHasCollMeshEdited)
-				bCreateCollisionActor = SavedEdit.bCreateCollMesh;
-			else
-				bCreateCollisionActor = !SavedEdit.bDisableCollMesh;
+			bCreateCollisionActor =
+				bSourceCanCreateCollisionActor && SavedEdit.bUseCollMesh;
 		}
 
 		if (!bSourceCanCreateCollisionActor)
@@ -1474,6 +1955,12 @@ _bool* CPanel_Inspector::Resolve_EnvNearAlphaEditState(CLevel_Edit* pLevel, CEnv
 	}
 
 	return &Iter->second;
+}
+
+void CPanel_Inspector::Clear_EnvShadowEditState(CGameObject* pObject)
+{
+	if (nullptr != pObject)
+		m_EnvShadowEditStates.erase(pObject);
 }
 
 void CPanel_Inspector::Clear_EnvCollMeshEditState(CGameObject* pObject)

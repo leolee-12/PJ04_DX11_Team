@@ -21,7 +21,7 @@ namespace Client
 
 	enum class VTXTEX_SHADER { DEFAULT, ALPHABLEND };
 
-	enum class COPY_ABILITY_TYPE { NONE, NORMAL, SWORD };
+	enum class COPY_ABILITY_TYPE { NONE, NORMAL, SWORD, BOMB };
 
 	enum class COLLISION_LAYER : _uint 
 	{ 

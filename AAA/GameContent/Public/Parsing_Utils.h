@@ -209,17 +209,47 @@ namespace JsonUtils
 			return false;
 
 		pOut->clear();
-		pOut->reserve(pValue->size());
 
-		for (const json& jItem : *pValue)
+		if (pValue->empty())
+			return true;
+
+		if ((*pValue)[0].is_array())
 		{
-			if (!jItem.is_array() || jItem.size() < 3)
+			pOut->reserve(pValue->size());
+
+			for (const json& jItem : *pValue)
+			{
+				if (!jItem.is_array() || jItem.size() < 3)
+					return false;
+
+				_float3 Value{};
+				Value.x = jItem[0].get<_float>();
+				Value.y = jItem[1].get<_float>();
+				Value.z = jItem[2].get<_float>();
+				pOut->push_back(Value);
+			}
+
+			return true;
+		}
+
+		if (0 != (pValue->size() % 3u))
+			return false;
+
+		pOut->reserve(pValue->size() / 3u);
+
+		for (size_t i = 0; i < pValue->size(); i += 3u)
+		{
+			if (!(*pValue)[i + 0].is_number()
+				|| !(*pValue)[i + 1].is_number()
+				|| !(*pValue)[i + 2].is_number())
+			{
 				return false;
+			}
 
 			_float3 Value{};
-			Value.x = jItem[0].get<_float>();
-			Value.y = jItem[1].get<_float>();
-			Value.z = jItem[2].get<_float>();
+			Value.x = (*pValue)[i + 0].get<_float>();
+			Value.y = (*pValue)[i + 1].get<_float>();
+			Value.z = (*pValue)[i + 2].get<_float>();
 			pOut->push_back(Value);
 		}
 

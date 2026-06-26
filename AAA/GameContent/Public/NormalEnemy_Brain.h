@@ -14,10 +14,13 @@ protected:
 	virtual HRESULT				Initialize(CMonster* pOwner) override;
 
 protected:
-	virtual void				Decide_Internal(const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta) override;
+	virtual void				Decide(const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta) override;
 
 public:
 	static CNormalEnemy_Brain*	Create(CMonster* pOwner);
+
+private:
+	static constexpr _float		TRANSITION_TIME = 2.5f;
 
 protected:
 	virtual void				Free() override;

@@ -11,6 +11,7 @@ struct LD_RUNTIME_LOAD_CONTEXT
 
 	_uint iPlaceLevel = {};
 	_uint iPrototypeLevel = {};
+	_uint iModelPrototypeLevel = {};
 
 	LD_OBJECT_CREATED_CALLBACK pCreatedCallback = nullptr;
 	void* pCallbackContext = nullptr;
@@ -26,6 +27,7 @@ public:
 	HRESULT Initialize();
 
 	static HRESULT Preload_LevelDesign(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _wstring& strJsonPath, _uint iRuntimeLevel);
+	static HRESULT Preload_LevelDesign(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _wstring& strJsonPath, const LD_RUNTIME_LEVELS& Levels);
 
 	static HRESULT Load_LevelDesign_Runtime(const LD_RUNTIME_LOAD_CONTEXT& Context, const _wstring& strJsonPath, LD_LOAD_RESULT* pOutReport = nullptr);
 

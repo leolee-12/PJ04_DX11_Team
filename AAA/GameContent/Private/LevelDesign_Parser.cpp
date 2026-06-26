@@ -346,9 +346,16 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 		}
 
 		if (!JsonUtils::Try_ReadFloat3Array(jEntry, "AreaSize", &pDesc->Volume.vAreaSize))
+		{
 			if (!JsonUtils::Try_ReadFloat3Array(jEntry, "Size", &pDesc->Volume.vAreaSize))
+			{
 				if (!strMainPath.empty())
-					JsonUtils::Try_ReadFloat3Array(jEntry, strMainPath + ".Size", &pDesc->Volume.vAreaSize);
+				{
+					if (!JsonUtils::Try_ReadFloat3Array(jEntry, strMainPath + ".AreaSize", &pDesc->Volume.vAreaSize))
+						JsonUtils::Try_ReadFloat3Array(jEntry, strMainPath + ".Size", &pDesc->Volume.vAreaSize);
+				}
+			}
+		}
 
 		JsonUtils::Try_ReadFloat(jEntry, "Height", &pDesc->Volume.fHeight);
 		if (!strMainPath.empty() && 0.f == pDesc->Volume.fHeight)

@@ -32,6 +32,8 @@ private:
 	CMonster*						m_pOwner = { nullptr };
 	CMonster_State*					m_pCurState = { nullptr };
 
+	MONSTER_STATE_TYPE				m_PrevState = { MONSTER_STATE_TYPE::IDLE }; // Enter 때 이전 상태가 어떤 타입이었는지 던져줌 
+
 	unordered_map<MONSTER_STATE_TYPE, CMonster_State*> m_States;
 
 private:

@@ -89,7 +89,7 @@
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
-#include "LevelDesign_Breakable.h"
+#include "LevelDesign_Starblock.h"
 #include "LevelDesign_Rail.h"
 
 IMPLEMENT_SINGLETON(CGameObject_Factory)
@@ -446,6 +446,9 @@ void CGameObject_Factory::Register_Container()
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
+
+    // 3. Kabu
+
 }
 
 void CGameObject_Factory::Register_UIContainer()
@@ -510,8 +513,8 @@ void CGameObject_Factory::Register_NonAnimObject()
     Register(CLevelDesign_Unsupported::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Unsupported), LOADER());
     Register(CLevelDesign_Rail::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Rail), LOADER());
 
-    Register(CLevelDesign_Breakable::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Breakable),
-        LOADER(TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CLevelDesign_Breakable::STARBLOCK_MODEL_PROTO_TAG,
+    Register(CLevelDesign_Starblock::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Starblock),
+        LOADER(TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CLevelDesign_Starblock::STARBLOCK_MODEL_PROTO_TAG,
             CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh"));));
 }
 

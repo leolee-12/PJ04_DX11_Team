@@ -39,6 +39,29 @@ HRESULT CMonster_Movement::Initialize(void* pArg)
 	return S_OK;
 }
 
+void CMonster_Movement::Face_Smooth(_fvector vWorldTarget, _float fTimeDelta)
+{
+	if (nullptr == m_pTransform || m_bLockFacing)
+		return;
+
+	m_pTransform->LookAt_Smooth(vWorldTarget, fTimeDelta);
+}
+
+void CMonster_Movement::Face_Instant(_fvector vWorldTarget)
+{
+	if (nullptr == m_pTransform || m_bLockFacing)
+		return;
+
+	_vector vSelf = m_pTransform->Get_State(STATE::POSITION);
+	_vector vDirXZ = XMVectorSetY(XMVectorSubtract(vWorldTarget, vSelf), 0.f);
+
+	if (XMVector3LessOrEqual(XMVector3LengthSq(vDirXZ), XMVectorReplicate(1e-6f)))
+		return;
+
+	_vector vAt = XMVectorSetW(XMVectorAdd(vSelf, vDirXZ), 1.f);
+	m_pTransform->LookAt(vAt);
+}
+
 void CMonster_Movement::Launch(_fvector vHorizDir, _float fHorizSpeed, _float fUpSpeed)
 {
 	// 수평 방향

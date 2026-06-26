@@ -32,7 +32,7 @@ HRESULT CBladeKnight_Body::Ready_Components()
     PART_SETUP t{};
     t.tShader = Shader_AnimMesh_PBR;
     t.szModelProtoTag = TEXT("Prototype_Component_Model_BladeKnight_Body");
-    t.szAnimEventFile = TEXT("../../Resources/CHJ/Monster/BladeKnight/BladeKnight_Anim_Events.json");
+    t.szAnimEventFile = TEXT("../../Resources/CHJ/Monster/BladeKnight/BladeKnight_AnimEvents.json");
     return Ready_MeshPart(t);
 }
 

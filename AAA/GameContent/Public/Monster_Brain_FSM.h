@@ -12,7 +12,7 @@ protected:
 	virtual ~CMonster_Brain_FSM() = default;
 
 public: 
-	virtual void				Decide(CMonster*, const MONSTER_BLACKBOARD&, _float) override;
+	virtual void				Decide(const MONSTER_BLACKBOARD&, _float) override;
 
 protected:
 	virtual HRESULT				Initialize(CMonster* pOwner);
@@ -20,8 +20,9 @@ protected:
 	virtual void				Decide_Internal(const MONSTER_BLACKBOARD&, _float) {}
 
 protected:
-	CMonster*					m_pOwner = { nullptr };
 	_bool						m_bSpotted = { false };		// IDLE -> FIND 전이를 위한 변수
+
+	_float						m_fMaxTime = { 0.f };		
 
 protected:
 	virtual void				Free() override;

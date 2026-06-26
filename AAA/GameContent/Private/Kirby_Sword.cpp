@@ -156,9 +156,9 @@ HRESULT CKirby_Sword::Ready_HitBox()
 {
     CCollider::COLLIDER_DESC desc{};
     desc.pOwner = this;
-    desc.vCenter = {0.f, 0.f, 0.f};
+    desc.vCenter = {0.f, 0.f, -0.5f};
     desc.fRadius = {0.25f};
-    desc.fHeight = {1.f};
+    desc.fHeight = {0.8f};
     desc.vRadians = { XMConvertToRadians(-90.f), 0.f, 0.f};
     m_pHitBox = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag,
         TEXT("HitBox_Com"), &desc);
@@ -187,7 +187,7 @@ void CKirby_Sword::SetUp_HitBox_Callback()
             if (nullptr == pVictim) return;
 
             ATTACK_INFO atk{};
-            atk.fDamage = 100.f;
+            atk.fDamage = 50.f;
             atk.fKnockback = 8.f;
             atk.vAttackerPos = _float3(m_CombinedWorldMatrix._41, m_CombinedWorldMatrix._42, m_CombinedWorldMatrix._43);
             atk.pAttacker = this;

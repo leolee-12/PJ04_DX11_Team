@@ -42,17 +42,20 @@ struct MAP_ENV_EDITED_DESC
 	_bool bHasEnableCulling = { false };
 	_bool bEnableCulling = { true };
 
-	_bool bHasCastShadow = { false };
-	_bool bCastShadow = { false };
+	_bool bHasUseCullDistance = { false };
+	_bool bUseCullDistance = { true };
+
+	_bool bHasUseCullFrustum = { false };
+	_bool bUseCullFrustum = { true };
+
+	_bool bHasShadow = { false }; // Edit JSON contains UseShadow.
+	_bool bUseShadow = { false };
 
 	_bool bHasWorldMatrix = { false };
 	_float4x4 matWorld = {};
 
-	_bool bDisableCollMesh = { false };
-	// Legacy read compatibility only.
-
-	_bool bHasCollMeshEdited = { false };
-	_bool bCreateCollMesh = { true };
+	_bool bHasCollMesh = { false }; // Edit JSON contains UseCollMesh.
+	_bool bUseCollMesh = { false };
 
 	_bool bHasNearDistAlpha = { false };
 	_bool bUseNearDistAlpha = { false };
@@ -60,7 +63,7 @@ struct MAP_ENV_EDITED_DESC
 
 struct MAP_EDIT_CHANGE
 {
-	_uint Version = 3;
+	_uint Version = { 4 };
 	unordered_set<_wstring> DeletedEnvObjectKeys;
 	unordered_map<_wstring, MAP_ENV_EDITED_DESC> EditedEnvObjects;
 	unordered_map<_wstring, MAP_ENV_EDITED_DESC> EditedMapSections;
@@ -96,6 +99,7 @@ struct MAP_RUNTIME_LEVELS
 
 	_uint iLevelDesignObjectLevel = {};
 	_uint iLevelDesignPrototypeLevel = {};
+	_uint iLevelDesignModelPrototypeLevel = {};
 
 	_bool bEnableEnvObjectPicking = { false };
 };
@@ -167,11 +171,12 @@ inline _bool Has_AnyMapEnvEdit(const MAP_ENV_EDITED_DESC& Edit)
 {
 	return Edit.bHasRenderable
 		|| Edit.bHasEnableCulling
-		|| Edit.bHasCastShadow
+		|| Edit.bHasUseCullDistance
+		|| Edit.bHasUseCullFrustum
+		|| Edit.bHasShadow
 		|| Edit.bHasWorldMatrix
 		|| Edit.bHasNearDistAlpha
-		|| Edit.bHasCollMeshEdited
-		|| Edit.bDisableCollMesh;
+		|| Edit.bHasCollMesh;
 }
 
 NS_END

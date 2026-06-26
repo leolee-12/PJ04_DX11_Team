@@ -15,7 +15,10 @@ protected:
 	virtual ~CMonsterBrain() = default;
 
 public:
-	virtual void	Decide(CMonster* pMonster, const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta) = 0;
+	virtual void	Decide(const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta) = 0;
+
+protected:
+	CMonster*		m_pOwner = { nullptr };
 
 protected:
 	virtual void	Free() override;

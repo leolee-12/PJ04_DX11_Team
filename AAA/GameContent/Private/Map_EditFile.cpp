@@ -104,10 +104,10 @@ namespace
 		if (nullptr == pOutDesc)
 			return;
 
-		pOutDesc->vRight = _float4(Mat.m[0][0], Mat.m[0][1], Mat.m[0][2], Mat.m[0][3]);
-		pOutDesc->vUp = _float4(Mat.m[1][0], Mat.m[1][1], Mat.m[1][2], Mat.m[1][3]);
-		pOutDesc->vLook = _float4(Mat.m[2][0], Mat.m[2][1], Mat.m[2][2], Mat.m[2][3]);
-		pOutDesc->vPosition = _float4(Mat.m[3][0], Mat.m[3][1], Mat.m[3][2], Mat.m[3][3]);
+		pOutDesc->vRight	= _float4(Mat.m[0][0], Mat.m[0][1], Mat.m[0][2], Mat.m[0][3]);
+		pOutDesc->vUp		= _float4(Mat.m[1][0], Mat.m[1][1], Mat.m[1][2], Mat.m[1][3]);
+		pOutDesc->vLook		= _float4(Mat.m[2][0], Mat.m[2][1], Mat.m[2][2], Mat.m[2][3]);
+		pOutDesc->vPosition	= _float4(Mat.m[3][0], Mat.m[3][1], Mat.m[3][2], Mat.m[3][3]);
 	}
 
 	void Apply_EnvEditToDesc(ENV_OBJECT_DESC* pOutDesc, const MAP_ENV_EDITED_DESC& Edit)
@@ -118,29 +118,30 @@ namespace
 		if (Edit.bHasRenderable)
 			pOutDesc->tCollision.bInvisibleCollision = !Edit.bRenderable;
 
-		if (Edit.bHasEnableCulling)
-			pOutDesc->tRender.bUseLodCulling = Edit.bEnableCulling;
+		if (Edit.bHasUseCullDistance)
+			pOutDesc->tRender.bUseCullDistance = Edit.bUseCullDistance;
 
-		if (Edit.bHasCastShadow)
-			pOutDesc->tRender.bShadowMappingCaster = Edit.bCastShadow;
+		if (Edit.bHasUseCullFrustum)
+			pOutDesc->tRender.bUseCullFrustum = Edit.bUseCullFrustum;
+
+		if (Edit.bHasShadow)
+		{
+			pOutDesc->tRender.bUseShadow = pOutDesc->tRender.bHasShadow && Edit.bUseShadow;
+			pOutDesc->tRender.bShadowMappingCaster = pOutDesc->tRender.bUseShadow; // Transitional mirror only.
+		}
 
 		if (Edit.bHasWorldMatrix)
 		{
 			pOutDesc->bHasWorldMatrix = true;
 			pOutDesc->matWorld = Edit.matWorld;
 
-			CGameObject::GAMEOBJECT_DESC& BaseDesc =
-				static_cast<CGameObject::GAMEOBJECT_DESC&>(*pOutDesc);
+			CGameObject::GAMEOBJECT_DESC& BaseDesc = static_cast<CGameObject::GAMEOBJECT_DESC&>(*pOutDesc);
 			Apply_WorldMatrixToGameObjectDesc(&BaseDesc, Edit.matWorld);
 		}
 
-		if (Edit.bHasCollMeshEdited)
+		if (Edit.bHasCollMesh)
 		{
-			pOutDesc->tCollision.bInvalidCollision = !Edit.bCreateCollMesh;
-		}
-		else if (Edit.bDisableCollMesh)
-		{
-			pOutDesc->tCollision.bInvalidCollision = true;
+			pOutDesc->tCollision.bUseCollMesh = pOutDesc->tCollision.bHasCollMesh && Edit.bUseCollMesh;
 		}
 
 		if (Edit.bHasNearDistAlpha)
@@ -158,8 +159,8 @@ namespace
 		if (Edit.bHasEnableCulling)
 			pOutDesc->bEnableCulling = Edit.bEnableCulling;
 
-		if (Edit.bHasCastShadow)
-			pOutDesc->bCastShadow = Edit.bCastShadow;
+		if (Edit.bHasShadow)
+			pOutDesc->bCastShadow = Edit.bUseShadow;
 
 		if (Edit.bHasWorldMatrix)
 		{
@@ -168,37 +169,42 @@ namespace
 			Apply_WorldMatrixToGameObjectDesc(&BaseDesc, Edit.matWorld);
 		}
 
-		if (Edit.bHasCollMeshEdited)
+		if (Edit.bHasCollMesh)
 		{
-			pOutDesc->bCreateCollisionActor = Edit.bCreateCollMesh;
-		}
-		else if (Edit.bDisableCollMesh)
-		{
-			pOutDesc->bCreateCollisionActor = false;
+			pOutDesc->bCreateCollisionActor =
+				pOutDesc->bSourceCreateCollisionActor && Edit.bUseCollMesh;
 		}
 	}
 
-	json Save_EditedDesc(const MAP_ENV_EDITED_DESC& Edit)
+	json Save_EditedDesc(const MAP_ENV_EDITED_DESC& Edit, _bool bEnvObjectEdit)
 	{
 		json j = json::object();
 
 		if (Edit.bHasRenderable)
 			j["Renderable"] = static_cast<bool>(Edit.bRenderable);
 
-		if (Edit.bHasEnableCulling)
-			j["EnableCulling"] = static_cast<bool>(Edit.bEnableCulling);
+		if (bEnvObjectEdit)
+		{
+			if (Edit.bHasUseCullDistance)
+				j["UseCullDistance"] = static_cast<bool>(Edit.bUseCullDistance);
 
-		if (Edit.bHasCastShadow)
-			j["CastShadow"] = static_cast<bool>(Edit.bCastShadow);
+			if (Edit.bHasUseCullFrustum)
+				j["UseCullFrustum"] = static_cast<bool>(Edit.bUseCullFrustum);
+		}
+		else
+		{
+			if (Edit.bHasEnableCulling)
+				j["EnableCulling"] = static_cast<bool>(Edit.bEnableCulling);
+		}
+
+		if (Edit.bHasShadow)
+			j["UseShadow"] = static_cast<bool>(Edit.bUseShadow);
 
 		if (Edit.bHasWorldMatrix)
 			j["WorldMatrix"] = Save_Float4x4(Edit.matWorld);
 
-		if (Edit.bHasCollMeshEdited)
-		{
-			j["CollisionMesh"] = json::object();
-			j["CollisionMesh"]["Create"] = static_cast<bool>(Edit.bCreateCollMesh);
-		}
+		if (Edit.bHasCollMesh)
+			j["UseCollMesh"] = static_cast<bool>(Edit.bUseCollMesh);
 
 		if (Edit.bHasNearDistAlpha)
 			j["UseNearDistAlpha"] = static_cast<bool>(Edit.bUseNearDistAlpha);
@@ -206,12 +212,12 @@ namespace
 		return j;
 	}
 
-	HRESULT Load_EditedDesc(const json& jValue, MAP_ENV_EDITED_DESC* pOutDesc)
+	HRESULT Load_EditedDesc(const json& jValue, MAP_ENV_EDITED_DESC* pOutDesc, _bool bEnvObjectEdit)
 	{
 		if (nullptr == pOutDesc)
 			return E_FAIL;
 
-		*pOutDesc = {};
+		*pOutDesc = {}; 
 
 		if (!jValue.is_object())
 			return E_FAIL;
@@ -226,24 +232,61 @@ namespace
 			pOutDesc->bRenderable = IterRenderable->get<bool>();
 		}
 
-		const auto IterEnableCulling = jValue.find("EnableCulling");
-		if (IterEnableCulling != jValue.end())
+		if (bEnvObjectEdit)
 		{
-			if (!IterEnableCulling->is_boolean())
-				return E_FAIL;
+			const auto IterUseCullDistance = jValue.find("UseCullDistance");
+			if (IterUseCullDistance != jValue.end())
+			{
+				if (!IterUseCullDistance->is_boolean())
+					return E_FAIL;
 
-			pOutDesc->bHasEnableCulling = true;
-			pOutDesc->bEnableCulling = IterEnableCulling->get<bool>();
+				pOutDesc->bHasUseCullDistance = true;
+				pOutDesc->bUseCullDistance = IterUseCullDistance->get<bool>();
+			}
+
+			const auto IterUseCullFrustum = jValue.find("UseCullFrustum");
+			if (IterUseCullFrustum != jValue.end())
+			{
+				if (!IterUseCullFrustum->is_boolean())
+					return E_FAIL;
+
+				pOutDesc->bHasUseCullFrustum = true;
+				pOutDesc->bUseCullFrustum = IterUseCullFrustum->get<bool>();
+			}
+		}
+		else
+		{
+			const auto IterEnableCulling = jValue.find("EnableCulling");
+			if (IterEnableCulling != jValue.end())
+			{
+				if (!IterEnableCulling->is_boolean())
+					return E_FAIL;
+
+				pOutDesc->bHasEnableCulling = true;
+				pOutDesc->bEnableCulling = IterEnableCulling->get<bool>();
+			}
 		}
 
-		const auto IterCastShadow = jValue.find("CastShadow");
-		if (IterCastShadow != jValue.end())
+		const auto IterUseShadow = jValue.find("UseShadow");
+		if (IterUseShadow != jValue.end())
 		{
-			if (!IterCastShadow->is_boolean())
+			if (!IterUseShadow->is_boolean())
 				return E_FAIL;
 
-			pOutDesc->bHasCastShadow = true;
-			pOutDesc->bCastShadow = IterCastShadow->get<bool>();
+			pOutDesc->bHasShadow = true;
+			pOutDesc->bUseShadow = IterUseShadow->get<bool>();
+		}
+		else
+		{
+			const auto IterUseShadow = jValue.find("UseShadow");
+			if (IterUseShadow != jValue.end())
+			{
+				if (!IterUseShadow->is_boolean())
+					return E_FAIL;
+
+				pOutDesc->bHasShadow = true;
+				pOutDesc->bUseShadow = IterUseShadow->get<bool>();
+			}
 		}
 
 		const auto IterWorldMatrix = jValue.find("WorldMatrix");
@@ -255,29 +298,25 @@ namespace
 			pOutDesc->bHasWorldMatrix = true;
 		}
 
-		const auto IterCollisionMesh = jValue.find("CollisionMesh");
-		if (IterCollisionMesh != jValue.end() && IterCollisionMesh->is_object())
+		const auto IterUseCollMesh = jValue.find("UseCollMesh");
+		if (IterUseCollMesh != jValue.end())
 		{
-			const auto IterCreate = IterCollisionMesh->find("Create");
-			if (IterCreate != IterCollisionMesh->end() && IterCreate->is_boolean())
-			{
-				pOutDesc->bHasCollMeshEdited = true;
-				pOutDesc->bCreateCollMesh = IterCreate->get<bool>();
-				pOutDesc->bDisableCollMesh = !pOutDesc->bCreateCollMesh;
-			}
+			if (!IterUseCollMesh->is_boolean())
+				return E_FAIL;
+
+			pOutDesc->bHasCollMesh = true;
+			pOutDesc->bUseCollMesh = IterUseCollMesh->get<bool>();
 		}
 		else
 		{
-			const auto IterCollisionDisabled = jValue.find("CollisionMeshDisabled");
-			if (IterCollisionDisabled != jValue.end())
+			const auto IterUseCollMesh = jValue.find("UseCollMesh");
+			if (IterUseCollMesh != jValue.end())
 			{
-				if (!IterCollisionDisabled->is_boolean())
+				if (!IterUseCollMesh->is_boolean())
 					return E_FAIL;
 
-				const bool bDisabled = IterCollisionDisabled->get<bool>();
-				pOutDesc->bHasCollMeshEdited = true;
-				pOutDesc->bCreateCollMesh = !bDisabled;
-				pOutDesc->bDisableCollMesh = bDisabled;
+				pOutDesc->bHasCollMesh = true;
+				pOutDesc->bUseCollMesh = IterUseCollMesh->get<bool>();
 			}
 		}
 
@@ -294,7 +333,7 @@ namespace
 		return S_OK;
 	}
 
-	json Save_EditedMap(const unordered_map<_wstring, MAP_ENV_EDITED_DESC>& EditedMap)
+	json Save_EditedMap(const unordered_map<_wstring, MAP_ENV_EDITED_DESC>& EditedMap, _bool bEnvObjectEdit)
 	{
 		vector<_wstring> Keys;
 		for (const auto& Pair : EditedMap)
@@ -312,16 +351,13 @@ namespace
 			if (Iter == EditedMap.end())
 				continue;
 
-			jResult[WstrToStr(strKey)] = Save_EditedDesc(Iter->second);
+			jResult[WstrToStr(strKey)] = Save_EditedDesc(Iter->second, bEnvObjectEdit);
 		}
 
 		return jResult;
 	}
 
-	HRESULT Load_EditedMap(
-		const json& jRoot,
-		const char* pFieldName,
-		unordered_map<_wstring, MAP_ENV_EDITED_DESC>* pOutMap)
+	HRESULT Load_EditedMap(const json& jRoot, const char* pFieldName, unordered_map<_wstring, MAP_ENV_EDITED_DESC>* pOutMap, _bool bEnvObjectEdit)
 	{
 		if (nullptr == pFieldName || nullptr == pOutMap)
 			return E_FAIL;
@@ -342,7 +378,7 @@ namespace
 				continue;
 
 			MAP_ENV_EDITED_DESC Edit{};
-			if (FAILED(Load_EditedDesc(Iter.value(), &Edit)))
+			if (FAILED(Load_EditedDesc(Iter.value(), &Edit, bEnvObjectEdit)))
 				return E_FAIL;
 
 			if (!Has_AnyMapEnvEdit(Edit))
@@ -693,8 +729,8 @@ json CMap_EditFile::Save_Change(const MAP_EDIT_CHANGE& Desc)
 		jDeletedEnvObjects.push_back(WstrToStr(strKey));
 
 	jOverride["DeletedEnvObjects"] = jDeletedEnvObjects;
-	jOverride["EditedEnvObjects"] = Save_EditedMap(Desc.EditedEnvObjects);
-	jOverride["EditedMapSections"] = Save_EditedMap(Desc.EditedMapSections);
+	jOverride["EditedEnvObjects"] = Save_EditedMap(Desc.EditedEnvObjects, true);
+	jOverride["EditedMapSections"] = Save_EditedMap(Desc.EditedMapSections, false);
 
 	jOverride["AddedMapObjects"] = json::array();
 	for (const auto& Added : Desc.AddedMapObjects)
@@ -745,10 +781,10 @@ HRESULT CMap_EditFile::Load_Change(const json& jOverride, MAP_EDIT_CHANGE* pOutD
 		}
 	}
 
-	if (FAILED(Load_EditedMap(jOverride, "EditedEnvObjects", &pOutDesc->EditedEnvObjects)))
+	if (FAILED(Load_EditedMap(jOverride, "EditedEnvObjects", &pOutDesc->EditedEnvObjects, true)))
 		return E_FAIL;
 
-	if (FAILED(Load_EditedMap(jOverride, "EditedMapSections", &pOutDesc->EditedMapSections)))
+	if (FAILED(Load_EditedMap(jOverride, "EditedMapSections", &pOutDesc->EditedMapSections, false)))
 		return E_FAIL;
 
 	const auto IterAdded = jOverride.find("AddedMapObjects");
