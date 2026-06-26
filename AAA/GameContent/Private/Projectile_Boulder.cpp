@@ -39,27 +39,25 @@ HRESULT CProjectile_Boulder::Ready_Visual()
 void CProjectile_Boulder::On_Launched()
 {
     m_eState = STATE::FLYING;
-    if (m_pAnimatorCom)
-        m_pAnimatorCom->Play("Wait", true, true);    // 항상 도는 베이스 클립(루프)
 }
 
 void CProjectile_Boulder::On_Bounce(_int iCount)
 {
-    if (iCount >= 2)                 // 바닥 2회 -> 파괴
+    if (iCount >= 2)                 
         Enter_Break();
 }
 
 void CProjectile_Boulder::Enter_Break()
 {
     m_eState = STATE::BREAKING;
-    Stop_Flying();                                       // 부모: m_bFlying=false
+    Stop_Flying();                                   
 
     if (m_pController) m_pController->Set_Enabled(false);
     if (m_pMovement)   m_pMovement->Stop();
-    if (m_pHitBox)     m_pHitBox->Set_Enabled(false);    // 데미지 종료
+    if (m_pHitBox)     m_pHitBox->Set_Enabled(false);    
 
     if (m_pAnimatorCom)
-        m_pAnimatorCom->Play("Break", false, true);      // 파괴 클립(파편 메쉬). 클립명은 모델에 맞춰
+        m_pAnimatorCom->Play("Broken", false, true);      
 }
 
 void CProjectile_Boulder::Update_Terminal(_float dt)
@@ -73,15 +71,22 @@ void CProjectile_Boulder::Tick_Visual(_float dt)
 {
     if (!m_pAnimatorCom) return;
 
-    m_pAnimatorCom->Update(dt);                          // Wait/Break 클립 진행 (본 로컬 갱신)
-
-    if (m_eState == STATE::FLYING && m_pModelCom)
+    if (m_bFlying)
     {
-        // 비행 중: LowM 을 매 프레임 누적 회전 -> 돌이 구르는 것처럼.
-        // (Wait 가 LowM 을 건드리지 않는다는 전제. 건드리면 m_fSpinAngle 누적 변수로 전환)
-        m_pModelCom->RotateBone("LowM", SPIN_SPEED_DEG * dt, XMVectorSet(1.f, 0.f, 0.f, 0.f));
-        m_pModelCom->Update_Combined();                  // 회전 반영해 합성행렬 재계산
+        m_fSpinAngle += SPIN_SPEED_DEG * dt;                  
+        if (m_fSpinAngle >= 360.f) m_fSpinAngle = fmodf(m_fSpinAngle, 360.f);
+        m_pAnimatorCom->SetBoneRotation("LowM", m_fSpinAngle, XMVectorSet(1.f, 0.f, 0.f, 0.f));
     }
+
+    m_pAnimatorCom->Update(dt);   // 애님 샘플 + 회전 적용 + 합성 재계산
+}
+
+void CProjectile_Boulder::On_Activated()
+{
+    m_eState = STATE::FLYING;       
+    m_fSpinAngle = 0.f;             
+    if (m_pAnimatorCom)
+        m_pAnimatorCom->Play("Wait", true, true);
 }
 
 HRESULT CProjectile_Boulder::Bind_ShaderResources()
@@ -98,14 +103,18 @@ HRESULT CProjectile_Boulder::Render()
     if (nullptr == m_pModelCom || nullptr == m_pShaderCom) return S_OK;
     if (FAILED(Bind_ShaderResources())) return E_FAIL;
 
+    const _bool bBreaking = (m_eState == STATE::BREAKING);
     const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
+        const _bool bThisMesh = bBreaking ? (i != 0) : (i == 0);
+        if (!bThisMesh) continue;
+
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))   return E_FAIL;
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", i, MTEX_TYPE::NORMALS, 0)))   return E_FAIL;
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0))) return E_FAIL;
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i))) return E_FAIL;
-        if (FAILED(m_pShaderCom->Begin(1))) return E_FAIL;   // AnimMesh_PBR DMN 패스(번호 확인)
+        if (FAILED(m_pShaderCom->Begin(1))) return E_FAIL;
         if (FAILED(m_pModelCom->Render(i))) return E_FAIL;
     }
     return S_OK;

@@ -22,10 +22,8 @@ public:
     void     Return(_uint iLevel, const _wstring& strKey, CProjectile* pProj);
     void     Clear_Level(_uint iLevel);      // 레벨 언로드 시 호출 필수
 
-    void     Set_PrototypeLevel(_uint iLevel) { m_iProtoLevel = iLevel; }
-
 private:
-    CProjectile_Manager();                   // 매크로 GetInstance 가 new 로 호출(인자 없음)
+    CProjectile_Manager();
     virtual ~CProjectile_Manager() = default;
 
     struct POOL_KEY {
@@ -34,12 +32,11 @@ private:
     };
     struct POOL_KEY_HASH {
         size_t operator()(const POOL_KEY& k) const {
-            return std::hash<_wstring>()(k.strKey) ^ (size_t(k.iLevel) * 131);
+            return hash<_wstring>()(k.strKey) ^ (size_t(k.iLevel) * 131);
         }
     };
 
-    Engine::CGameInstance_Proxy* m_pGameInstance_Proxy = { nullptr };
-    _uint m_iProtoLevel = { 0 };
+    CGameInstance_Proxy* m_pGameInstance_Proxy = { nullptr };
     _uint m_iSpawnCounter = { 0 };
     unordered_map<POOL_KEY, vector<CProjectile*>, POOL_KEY_HASH> m_Dormant;
 

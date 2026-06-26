@@ -48,6 +48,8 @@ protected:
     HRESULT         Ready_HitBox();
     virtual HRESULT Ready_Movement() { return S_OK; }
     virtual HRESULT Ready_Visual() { return S_OK; }
+    virtual void    On_Activated() {}
+    virtual void    On_Impact() { Kill(); }
 
     void Update_Socket()
     {

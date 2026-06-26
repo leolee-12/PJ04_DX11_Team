@@ -32,9 +32,9 @@ protected:
     void    Stop_Flying() { m_bFlying = false; }     // 자식이 종료 진입 시 호출
 
 protected:
-    Engine::CController* m_pController = { nullptr };
+    CController* m_pController = { nullptr };
     CProjectile_Movement* m_pMovement = { nullptr };
     _int    m_iBounceCount = { 0 };
-    _bool   m_bFlying = { true };
+    _bool   m_bFlying = { false };
 };
 NS_END

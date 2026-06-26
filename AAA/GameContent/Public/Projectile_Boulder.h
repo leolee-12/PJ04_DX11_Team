@@ -30,6 +30,8 @@ protected:
     virtual void    On_Bounce(_int iCount) override;     
     virtual void    Update_Terminal(_float dt) override; 
     virtual void    Tick_Visual(_float dt) override;     
+    virtual void    On_Activated() override;
+    virtual void    On_Impact() override { Enter_Break(); }
 
 private:
     void    Enter_Break();
@@ -41,10 +43,11 @@ private:
     CAnimator* m_pAnimatorCom = { nullptr };
 
     STATE   m_eState = { STATE::FLYING };
+    _float m_fSpinAngle = { 0.f };
 
     static constexpr _float RESTITUTION = 0.5f;   // 바운스 감쇠
     static constexpr _float HORIZ_DAMP = 0.7f;   // 바운스 수평 마찰
-    static constexpr _float SPIN_SPEED_DEG = 540.f;  // 비행 중 LowM 회전 속도(도/초)
+    static constexpr _float SPIN_SPEED_DEG = 360.f;   // 초당 2바퀴(720도/초)
 
 public:
     static CProjectile_Boulder* Create(ID3D11Device*, ID3D11DeviceContext*);

@@ -35,10 +35,10 @@ HRESULT CShaderGlobal_Manager::Initialize()
     Register({ "g_fFogEnable",          "Fog Enable",        GVAL::BOOL,   { 0.f, 0.f, 0.f, 0.f }, { 0.f, 1.f } });
 
     Register({ "g_fDoFEnable",    "DoF Enable",     GVAL::BOOL,  { 1.f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
-    Register({ "g_fFocusDist",    "DoF FocusDist",  GVAL::FLOAT, { 12.f, 0.f, 0.f, 0.f }, { 0.5f, 100.f } });
+    Register({ "g_fFocusDist",    "DoF FocusDist",  GVAL::FLOAT, { 14.f, 0.f, 0.f, 0.f }, { 0.5f, 100.f } });
     Register({ "g_fAperture",     "DoF Aperture",   GVAL::FLOAT, { 0.1f, 0.f, 0.f, 0.f }, { 0.1f, 8.f } });
     Register({ "g_fDoFMaxCoC",    "DoF MaxBlur",    GVAL::FLOAT, { 1.f, 0.f, 0.f, 0.f }, { 1.f, 40.f } });
-    Register({ "g_fDoFAutoFocus", "DoF AutoFocus",  GVAL::BOOL,  { 1.f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
+    Register({ "g_fDoFAutoFocus", "DoF AutoFocus",  GVAL::BOOL,  { 0.f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
 
     Register({ "g_fExposure",    "Exposure",          GVAL::FLOAT, { 0.5f, 0.f, 0.f, 0.f }, { 0.f, 4.f } });
     Register({ "g_fToneMapMode", "ToneMap 0R/1A/2E",  GVAL::FLOAT, { 1.0f, 0.f, 0.f, 0.f }, { 0.f, 2.f } });

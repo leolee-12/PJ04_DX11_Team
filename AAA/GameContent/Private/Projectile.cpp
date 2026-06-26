@@ -46,21 +46,19 @@ HRESULT CProjectile::Ready_HitBox()
 
     m_pHitBox->Set_OnEnter([this](CCollider* pOther) {
         if (!m_bAlive) return;
-        if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
-            return;
+        if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup()) return;
         if (auto* pVictim = dynamic_cast<IDamageable*>(pOther->Get_Owner()))
         {
             ATTACK_INFO atk{};
-            atk.fDamage = m_fDamage;
-            atk.fKnockback = m_fKnockback;
+            atk.fDamage = m_fDamage; atk.fKnockback = m_fKnockback;
             XMStoreFloat3(&atk.vAttackerPos, m_pTransformCom->Get_State(STATE::POSITION));
             atk.pAttacker = this;
             pVictim->Damaged(atk);
         }
-        Kill();                                   // 명중 시 소멸 + 자기회수
+        On_Impact();
         });
 
-    m_pHitBox->Set_Enabled(false);                // 휴면 시작
+    m_pHitBox->Set_Enabled(false);              
     m_pGameInstance_Proxy->Register_Collider(m_pHitBox, ETOUI(COLLISION_LAYER::MONSTER_PROJECTILE));
     return S_OK;
 }
@@ -69,17 +67,20 @@ void CProjectile::Launch(const _float3& vPos, const _float3& vDir)
 {
     Detach();                    
     m_bAlive = true; m_fAccLife = 0.f;
+    On_Activated();
 
+    m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(1.f, 0.f, 0.f, 0.f));
+    m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, 1.f, 0.f, 0.f));
+    m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, 1.f, 0.f));
     m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&vPos), 1.f));
 
     _vector v = XMLoadFloat3(&vDir);
-    if (XMVectorGetX(XMVector3LengthSq(v)) > 1e-6f)
-        v = XMVector3Normalize(v);
+    if (XMVectorGetX(XMVector3LengthSq(v)) > 1e-6f) v = XMVector3Normalize(v);
     XMStoreFloat3(&m_vVelocity, v * m_fSpeed);
 
     if (m_pHitBox)
     {
-        m_pHitBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr())); // 첫 위치 반영
+        m_pHitBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
         m_pHitBox->Set_Enabled(true);
     }
 }
@@ -119,6 +120,7 @@ void CProjectile::Attach_To_Socket(const _float4x4* pBone, const _float4x4* pOwn
     XMStoreFloat4x4(&m_SocketOffset, matOffset);
     m_bCarried = true; m_bAlive = true;
     if (m_pHitBox) m_pHitBox->Set_Enabled(false);   
+    On_Activated();
 }
 
 void CProjectile::Kill()

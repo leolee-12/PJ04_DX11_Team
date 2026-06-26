@@ -5,9 +5,8 @@
 IMPLEMENT_SINGLETON(CProjectile_Manager)     // m_pInstance / GetInstance / DestroyInstance 정의
 
 CProjectile_Manager::CProjectile_Manager()
-    : m_pGameInstance_Proxy{ CGameInstance::GetProxy() }   // Effect_Manager 와 동일하게 ctor 에서 확보
+    : m_pGameInstance_Proxy{ CGameInstance::GetProxy() } 
 {
-    Safe_AddRef(m_pGameInstance_Proxy);
 }
 
 HRESULT CProjectile_Manager::Spawn(_uint iLevel, const _wstring& strKey,
@@ -26,7 +25,7 @@ HRESULT CProjectile_Manager::Spawn(_uint iLevel, const _wstring& strKey,
     _wstring strObjTag = strKey + L"#" + std::to_wstring(m_iSpawnCounter++);
     CGameObject* pObj = nullptr;                          // 2) STATIC 프로토에서 Clone
     if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(
-        &pObj, m_iProtoLevel, strProtoTag,
+        &pObj, iLevel, strProtoTag,
         iLevel, PROJECTILE_LAYER_TAG, strObjTag, nullptr)))
         return E_FAIL;
 
