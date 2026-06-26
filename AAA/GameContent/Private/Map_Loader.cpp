@@ -368,6 +368,11 @@ HRESULT CMap_Loader::Load_LevelDesignEntries(const MAP_PACKAGE& Package, const M
 
 HRESULT CMap_Loader::Build_Package(const _wstring& strManifestPath, MAP_PACKAGE* pOutPackage)
 {
+	return Build_Package(strManifestPath, MAP_PACKAGE_BUILD_OPTIONS{}, pOutPackage);
+}
+
+HRESULT CMap_Loader::Build_Package(const _wstring& strManifestPath, const MAP_PACKAGE_BUILD_OPTIONS& BuildOptions, MAP_PACKAGE* pOutPackage)
+{
 	if (nullptr == pOutPackage)
 		return E_FAIL;
 
@@ -382,7 +387,7 @@ HRESULT CMap_Loader::Build_Package(const _wstring& strManifestPath, MAP_PACKAGE*
 		return E_FAIL;
 	}
 
-	const HRESULT hr = pBuilder->Build_FromManifest(strManifestPath, pOutPackage);
+	const HRESULT hr = pBuilder->Build_FromManifest(strManifestPath, BuildOptions, pOutPackage);
 
 	Safe_Release(pBuilder);
 	Safe_Release(pResolver);
@@ -713,18 +718,26 @@ HRESULT CMap_Loader::Load_MapStage_Runtime(
 	if (nullptr == pMapLoader)
 		return E_FAIL;
 
+	MAP_PACKAGE_BUILD_OPTIONS BuildOptions{};
+	BuildOptions.bBuildStage = true;
+	BuildOptions.bBuildEnv = false;
+	BuildOptions.bBuildLevelDesignPaths = false;
+	BuildOptions.bApplyDelta = false;
+
 	MAP_PACKAGE Package{};
-	HRESULT hr = pMapLoader->Build_Package(strMapManifestPath, &Package);
+	HRESULT hr = pMapLoader->Build_Package(strMapManifestPath, BuildOptions, &Package);
 
 	if (SUCCEEDED(hr) && MapContentDesc.bHasMapContent)
-		hr = CMap_EditFile::Apply_Change(&Package, MapContentDesc.OverrideDesc);
+	{
+		MAP_EDIT_APPLY_OPTIONS ApplyOptions{};
+		ApplyOptions.bApplyStage = true;
+		ApplyOptions.bApplyEnv = false;
+		ApplyOptions.bApplyAddedObjects = false;
+		hr = CMap_EditFile::Apply_Change(&Package, MapContentDesc.OverrideDesc, ApplyOptions);
+	}
 
 	if (SUCCEEDED(hr))
 	{
-		Package.EnvObjectDescs.clear();
-		Package.EnvJsonPaths.clear();
-		Package.AddedObjectDescs.clear();
-
 		MAP_RUNTIME_LEVELS Levels{};
 		Build_RuntimeStageLevels(Context, &Levels);
 
@@ -794,18 +807,29 @@ HRESULT CMap_Loader::Load_Env_Runtime(
 	if (nullptr == pMapLoader)
 		return E_FAIL;
 
+	MAP_PACKAGE_BUILD_OPTIONS BuildOptions{};
+	BuildOptions.bBuildStage = false;
+	BuildOptions.bBuildEnv = true;
+	BuildOptions.bBuildLevelDesignPaths = false;
+	BuildOptions.bApplyDelta = false;
+
 	MAP_PACKAGE SourcePackage{};
-	HRESULT hr = pMapLoader->Build_Package(strMapManifestPath, &SourcePackage);
+	HRESULT hr = pMapLoader->Build_Package(strMapManifestPath, BuildOptions, &SourcePackage);
 
 	if (SUCCEEDED(hr))
 	{
 		Collect_DeletedEnvDescs(SourcePackage.EnvObjectDescs, pResolvedOverrideDesc, pOutDeletedEnvDescs);
 
 		MAP_PACKAGE SpawnPackage = SourcePackage;
-		SpawnPackage.StageDesc = {};
 
 		if (nullptr != pResolvedOverrideDesc)
-			hr = CMap_EditFile::Apply_Change(&SpawnPackage, *pResolvedOverrideDesc);
+		{
+			MAP_EDIT_APPLY_OPTIONS ApplyOptions{};
+			ApplyOptions.bApplyStage = false;
+			ApplyOptions.bApplyEnv = true;
+			ApplyOptions.bApplyAddedObjects = true;
+			hr = CMap_EditFile::Apply_Change(&SpawnPackage, *pResolvedOverrideDesc, ApplyOptions);
+		}
 
 		if (SUCCEEDED(hr) && bEnableEnvObjectPicking)
 		{
@@ -827,6 +851,7 @@ HRESULT CMap_Loader::Load_Env_Runtime(
 				Request.Options.bSpawnEnv = true;
 				Request.pCreatedCallback = Context.pCreatedCallback;
 				Request.pCallbackContext = Context.pCallbackContext;
+				Request.ppOutEnvInstanceController = Context.ppOutEnvInstanceController;
 
 				hr = pMapLoader->Spawn(SpawnPackage, Request, pOutReport);
 			}
@@ -857,9 +882,15 @@ HRESULT CMap_Loader::Load_LevelDesign_Runtime(
 	if (nullptr == pMapLoader)
 		return E_FAIL;
 
+	MAP_PACKAGE_BUILD_OPTIONS BuildOptions{};
+	BuildOptions.bBuildStage = false;
+	BuildOptions.bBuildEnv = false;
+	BuildOptions.bBuildLevelDesignPaths = true;
+	BuildOptions.bApplyDelta = false;
+
 	MAP_PACKAGE Package{};
 	HRESULT hr =
-		pMapLoader->Build_Package(strMapManifestPath, &Package);
+		pMapLoader->Build_Package(strMapManifestPath, BuildOptions, &Package);
 
 	if (SUCCEEDED(hr))
 	{

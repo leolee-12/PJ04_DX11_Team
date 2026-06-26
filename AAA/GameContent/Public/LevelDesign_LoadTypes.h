@@ -79,6 +79,27 @@ struct LD_LADDER_DESC : public LD_OBJECT_DESC
 };
 #pragma endregion
 
+#pragma region EventObject
+enum class LD_EVENTOBJECT_RENDER_POLICY
+{
+	DEFAULT,
+	LEVEL1_BOSS_DEMO_BG,
+	SLOPEBOARD_A,
+	SLOPEBOARD_C,
+};
+
+inline constexpr _uint LD_ANIM_SLOT_COUNT = 4;
+
+struct LD_EVENTOBJECT_DESC : public LD_OBJECT_DESC
+{
+	_uint           iModelProtoLevel = {};
+	MODEL           eModelType = MODEL::ANIM;
+	_wstring        wstrModelProtoTag;
+	_string         strAnimNames[LD_ANIM_SLOT_COUNT] = {};
+	LD_EVENTOBJECT_RENDER_POLICY eRenderPolicy = LD_EVENTOBJECT_RENDER_POLICY::DEFAULT;
+};
+#pragma endregion
+
 #pragma region Portal
 #pragma endregion
 
@@ -162,7 +183,7 @@ struct LD_PARSED_OBJECT : public LD_OBJECT_DESC
 	LD_AUDIO_AREA_DESC AudioArea;
 };
 
-using LD_OBJECT_ENTRY = variant<LD_PARSED_OBJECT, LD_BREAKABLE_DESC, LD_LADDER_DESC, LD_FOOD_DESC, LD_POINT_DESC, LD_BUSH_DESC>;
+using LD_OBJECT_ENTRY = variant<LD_PARSED_OBJECT, LD_BREAKABLE_DESC, LD_LADDER_DESC, LD_EVENTOBJECT_DESC, LD_FOOD_DESC, LD_POINT_DESC, LD_BUSH_DESC>;
 
 inline const LD_OBJECT_DESC& Get_LDObjectDesc(const LD_OBJECT_ENTRY& Entry)
 {

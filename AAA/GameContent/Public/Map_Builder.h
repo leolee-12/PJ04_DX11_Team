@@ -13,6 +13,7 @@ private:
 
 public:
 	HRESULT Build_FromManifest(const _wstring& strManifestPath, MAP_PACKAGE* pOutPackage);
+	HRESULT Build_FromManifest(const _wstring& strManifestPath, const MAP_PACKAGE_BUILD_OPTIONS& Options, MAP_PACKAGE* pOutPackage);
 
 private:
 	CMap_ModelResolver* m_pResolver = { nullptr };

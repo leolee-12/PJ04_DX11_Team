@@ -276,18 +276,6 @@ namespace
 			pOutDesc->bHasShadow = true;
 			pOutDesc->bUseShadow = IterUseShadow->get<bool>();
 		}
-		else
-		{
-			const auto IterUseShadow = jValue.find("UseShadow");
-			if (IterUseShadow != jValue.end())
-			{
-				if (!IterUseShadow->is_boolean())
-					return E_FAIL;
-
-				pOutDesc->bHasShadow = true;
-				pOutDesc->bUseShadow = IterUseShadow->get<bool>();
-			}
-		}
 
 		const auto IterWorldMatrix = jValue.find("WorldMatrix");
 		if (IterWorldMatrix != jValue.end())
@@ -306,18 +294,6 @@ namespace
 
 			pOutDesc->bHasCollMesh = true;
 			pOutDesc->bUseCollMesh = IterUseCollMesh->get<bool>();
-		}
-		else
-		{
-			const auto IterUseCollMesh = jValue.find("UseCollMesh");
-			if (IterUseCollMesh != jValue.end())
-			{
-				if (!IterUseCollMesh->is_boolean())
-					return E_FAIL;
-
-				pOutDesc->bHasCollMesh = true;
-				pOutDesc->bUseCollMesh = IterUseCollMesh->get<bool>();
-			}
 		}
 
 		const auto IterNearDistAlpha = jValue.find("UseNearDistAlpha");
@@ -418,10 +394,15 @@ _wstring CMap_EditFile::Make_SectionKey(const MAP_STAGE_DESC& StageDesc, const M
 
 HRESULT CMap_EditFile::Apply_Change(MAP_PACKAGE* pInOutPackage, const MAP_EDIT_CHANGE& OverrideDesc)
 {
+	return Apply_Change(pInOutPackage, OverrideDesc, MAP_EDIT_APPLY_OPTIONS{});
+}
+
+HRESULT CMap_EditFile::Apply_Change(MAP_PACKAGE* pInOutPackage, const MAP_EDIT_CHANGE& OverrideDesc, const MAP_EDIT_APPLY_OPTIONS& Options)
+{
 	if (nullptr == pInOutPackage)
 		return E_FAIL;
 
-	if (!OverrideDesc.EditedMapSections.empty())
+	if (Options.bApplyStage && !OverrideDesc.EditedMapSections.empty())
 	{
 		MAP_STAGE_DESC& StageDesc = pInOutPackage->StageDesc;
 		for (MAP_SECTION_DESC& SectionDesc : StageDesc.SectionDescs)
@@ -435,7 +416,7 @@ HRESULT CMap_EditFile::Apply_Change(MAP_PACKAGE* pInOutPackage, const MAP_EDIT_C
 		}
 	}
 
-	if (!OverrideDesc.EditedEnvObjects.empty())
+	if (Options.bApplyEnv && !OverrideDesc.EditedEnvObjects.empty())
 	{
 		for (ENV_OBJECT_DESC& Desc : pInOutPackage->EnvObjectDescs)
 		{
@@ -448,7 +429,7 @@ HRESULT CMap_EditFile::Apply_Change(MAP_PACKAGE* pInOutPackage, const MAP_EDIT_C
 		}
 	}
 
-	if (!OverrideDesc.DeletedEnvObjectKeys.empty())
+	if (Options.bApplyEnv && !OverrideDesc.DeletedEnvObjectKeys.empty())
 	{
 		auto& EnvObjectDescs = pInOutPackage->EnvObjectDescs;
 		EnvObjectDescs.erase(
@@ -464,7 +445,7 @@ HRESULT CMap_EditFile::Apply_Change(MAP_PACKAGE* pInOutPackage, const MAP_EDIT_C
 			EnvObjectDescs.end());
 	}
 
-	if (!OverrideDesc.AddedMapObjects.empty())
+	if (Options.bApplyAddedObjects && !OverrideDesc.AddedMapObjects.empty())
 	{
 		pInOutPackage->AddedObjectDescs.insert(
 			pInOutPackage->AddedObjectDescs.end(),

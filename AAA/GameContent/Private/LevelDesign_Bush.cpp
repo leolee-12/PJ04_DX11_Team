@@ -20,7 +20,7 @@ namespace
 		MODEL eCutModelType;
 	};
 
-	static const LD_BUSH_CATALOG g_BushCatalog[] =
+	static const LD_BUSH_CATALOG g_EventObjectCatalog[] =
 	{
 		{ L"Bush2BasicS", CLevelDesign_Bush::BUSH_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/BushS.ysh", MODEL::ANIM,
 		CLevelDesign_Bush::CUT_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/CutS.ysh", MODEL::NONANIM },
@@ -32,7 +32,7 @@ namespace
 
 	static const LD_BUSH_CATALOG* Find_BushCatalog(const _wstring& wstrObjName)
 	{
-		for (const LD_BUSH_CATALOG& Entry : g_BushCatalog)
+		for (const LD_BUSH_CATALOG& Entry : g_EventObjectCatalog)
 		{
 			if (JsonUtils::Equals_NoCase(Entry.pObjectName, wstrObjName.c_str()))
 				return &Entry;
@@ -117,7 +117,7 @@ void CLevelDesign_Bush::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 
 void CLevelDesign_Bush::Register_LevelDesignSpecs()
 {
-	for (const LD_BUSH_CATALOG& Entry : g_BushCatalog)
+	for (const LD_BUSH_CATALOG& Entry : g_EventObjectCatalog)
 	{
 		LD_SPAWN_SPEC Spec{};
 		Spec.strObjectName = Entry.pObjectName;
