@@ -115,6 +115,11 @@ public:
 	// Collider
 	CCollider* Get_Collider(KIRBY_COLLIDER eKirbyCollider);
 
+	// Test
+	void Begin_CutsceneGrab(CUTSCENE_GRAB_DESC* pGrabDesc);
+	void End_CutsceneGrab();
+	void Update_Grab();
+
 private:
 	HRESULT Ready_Components();
 	void	SetUp_Collider_Callback();
@@ -168,6 +173,11 @@ private:
 	_float m_fAccAbilityDumpCoolTime{};
 	_float m_fMaxAbilityDumpCoolTime{ 0.5f };
 	_bool m_bDecreaseAbilityDumpCool{};
+
+	// CutSceneGrab
+	_bool m_bCutsceneGrabbed = false;
+	const _float4x4* m_pGrabBoneMatrix = nullptr;
+	const _float4x4* m_pGrabSourceWorld = nullptr;
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

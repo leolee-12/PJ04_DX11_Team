@@ -21,7 +21,8 @@ enum class KIRBY_STATE_TYPE
 	ATTACK,
 	HOVERING,
 	GET_ABILITY, ABILITY_DUMP,
-	DAMAGED
+	DAMAGED,
+	CUTSCENEGRAB
 };
 
 class CLIENT_DLL CKirby_State abstract : public CBase
