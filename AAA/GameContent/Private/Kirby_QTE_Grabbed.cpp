@@ -110,10 +110,15 @@ void CKirby_QTE_Grabbed::Enter_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE
             pMovement->Set_UseGravity(true);
             pMovement->Sync_To_Controller();
 
+            _vector vBackDir = -pKirby->Get_Transform()->Get_State(STATE::LOOK);
+            vBackDir = XMVectorSetY(vBackDir, 0.f);
+            vBackDir = XMVector3Normalize(vBackDir);
+            pKirby->Get_Movement()->Set_Velocity(vBackDir * 15.f);
+
             pMovement->Set_VelocityY(22.f);
 
             pKirby->OnOffParts(pKirby->Get_KirbyAbility()->Get_AbilityType(), true, true);
-            pKirby->Get_Body()->Get_Animator()->Play("Damage", true, true, 0.1f, 0.5f, true);
+            pKirby->Get_Body()->Get_Animator()->Play("Damage", true, true, 0.1f, 0.8f, true);
             break;
         }
         case QTE_GRABBED_STATE::GRABBED_STATE_END:
