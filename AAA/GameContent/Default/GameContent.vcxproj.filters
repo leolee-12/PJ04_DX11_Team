@@ -640,6 +640,24 @@
     <Filter Include="00. GameObject\00. Camera\BossCam">
       <UniqueIdentifier>{2167fc90-1b87-469b-9d86-8fb47e1a8e6d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\05. Kabu\Parts\Body">
+      <UniqueIdentifier>{cccc5499-fa04-4e60-9dd2-ec45a9ffb6ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\05. Kabu\State\Idle">
+      <UniqueIdentifier>{5c27208b-4b0b-48c3-bfd4-7a198a1ef21f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\98. Component\01. Monster_Movement\00. Rail">
+      <UniqueIdentifier>{bc260f59-12f2-4b10-855a-455fabc6411e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\05. Kabu\State\Warp">
+      <UniqueIdentifier>{a3aeeed9-2f43-4cb2-a07e-bf62c14bd4e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\05. Kabu\State\Warp\WarpIn">
+      <UniqueIdentifier>{1a28be19-3381-4600-bd24-1eb1876e9b4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\05. Kabu\State\Warp\WarpOut">
+      <UniqueIdentifier>{75bbbc71-e0d5-464d-b85f-0d45c844d611}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutSceneGrab">
       <UniqueIdentifier>{46d69dab-00a6-49b7-ba75-db2ddb5232e3}</UniqueIdentifier>
     </Filter>
@@ -1248,6 +1266,27 @@
     <ClInclude Include="..\Public\LevelDesign_Boundary.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\00. Boundary</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kabu.h">
+      <Filter>00. GameObject\06. Monster\05. Kabu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kabu_Body.h">
+      <Filter>00. GameObject\06. Monster\05. Kabu\Parts\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kabu_Brain.h">
+      <Filter>00. GameObject\06. Monster\05. Kabu\Brain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kabu_State_Idle.h">
+      <Filter>00. GameObject\06. Monster\05. Kabu\State\Idle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_RailMovement.h">
+      <Filter>00. GameObject\98. Component\01. Monster_Movement\00. Rail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kabu_State_WarpIn.h">
+      <Filter>00. GameObject\06. Monster\05. Kabu\State\Warp\WarpIn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kabu_State_WarpOut.h">
+      <Filter>00. GameObject\06. Monster\05. Kabu\State\Warp\WarpOut</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\UI_FlashCurtain.h">
       <Filter>00. GameObject\97. UI\UIContainer\Sequence\Flash</Filter>
     </ClInclude>
@@ -1777,6 +1816,27 @@
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Boundary.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\00. Boundary</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kabu.cpp">
+      <Filter>00. GameObject\06. Monster\05. Kabu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kabu_Body.cpp">
+      <Filter>00. GameObject\06. Monster\05. Kabu\Parts\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kabu_Brain.cpp">
+      <Filter>00. GameObject\06. Monster\05. Kabu\Brain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kabu_State_Idle.cpp">
+      <Filter>00. GameObject\06. Monster\05. Kabu\State\Idle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_RailMovement.cpp">
+      <Filter>00. GameObject\98. Component\01. Monster_Movement\00. Rail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kabu_State_WarpIn.cpp">
+      <Filter>00. GameObject\06. Monster\05. Kabu\State\Warp\WarpIn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kabu_State_WarpOut.cpp">
+      <Filter>00. GameObject\06. Monster\05. Kabu\State\Warp\WarpOut</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UI_FlashCurtain.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\Sequence\Flash</Filter>

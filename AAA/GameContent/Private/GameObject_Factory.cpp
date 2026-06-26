@@ -75,6 +75,8 @@
 #include "BladeKnight_Sword.h"
 #include "NormalEnemy.h"
 #include "NormalEnemy_Body.h"
+#include "Kabu.h"
+#include "Kabu_Body.h"
 
 //Miniboss
 #include "GigantEdge.h"
@@ -447,6 +449,20 @@ void CGameObject_Factory::Register_Container()
     );
 
     // 3. Kabu
+    Register
+    (
+        CKabu::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CKabu),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKabu_Body::PROTOTYPE_TAG, CKabu_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Kabu_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Kabu/Kabu.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
 
 }
 
