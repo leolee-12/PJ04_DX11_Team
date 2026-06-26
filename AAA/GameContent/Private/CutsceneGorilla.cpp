@@ -138,6 +138,7 @@ void CCutsceneGorilla::Fire_Grab()
     CUTSCENE_GRAB_DESC grab{};
     grab.pBoneMatrix = Get_BoneMatrixPtr(GRAB_BONE);
     grab.pSourceWorld = Get_Transform()->Get_WorldMatrixPtr();
+    grab.eType = GRAB_TYPE::GORILLA_SCENE;
     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GrabKirby, &grab);
 }
 

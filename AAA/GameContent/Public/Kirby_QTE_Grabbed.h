@@ -13,11 +13,13 @@ NS_BEGIN(Client)
 class CKirby;
 class CKirby_Body;
 
-class CLIENT_DLL CKirby_CutSceneGrabbed final : public CKirby_State
+class CLIENT_DLL CKirby_QTE_Grabbed final : public CKirby_State
 {
 private:
-	CKirby_CutSceneGrabbed();
-	virtual ~CKirby_CutSceneGrabbed() = default;
+	CKirby_QTE_Grabbed();
+	virtual ~CKirby_QTE_Grabbed() = default;
+
+	enum QTE_GRABBED_STATE { START, ESCAPE, GRABBED_STATE_END };
 
 private:
 	HRESULT Initialize();
@@ -36,8 +38,17 @@ public:
 public:
 	virtual void Request_ReleaseGrabState(CKirby* pKirby, GRAB_TYPE eType) override;
 
+private:
+	void Change_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE eNext);
+	void Enter_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE eState);
+	void Update_QTEGrabbedState(CKirby* pKirby, _float fTimeDelta);
+	void Exit_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE eState);
+
+private:
+	QTE_GRABBED_STATE m_eQTEGrabbedState{ QTE_GRABBED_STATE:: GRABBED_STATE_END };
+
 public:
-	static CKirby_CutSceneGrabbed* Create();
+	static CKirby_QTE_Grabbed* Create();
 private:
 	virtual void Free() override;
 };

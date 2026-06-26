@@ -40,59 +40,15 @@ HRESULT CPreview_Kirby::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	//m_pModelCom->Set_AnimationIndex(m_pModelCom->Get_AnimationIndex("Wait"));
-
-	m_pAnimatorCom->Play("SpinSlashCharge", true, true, 0.2f, 1.0f, false);
-
-	//m_pAnimatorCom->Set_Mask("Sword_HaveSwordWait", "R_ShoulderJ", true, 1.0f, 0.5f);
-
-	const _char* MaskRoots[] = { "L_FootJ", "R_FootJ" };
-	m_pAnimatorCom->Set_Mask("ShuffleRight", MaskRoots, _countof(MaskRoots), true, 1.0f, 0.25f);
-	//m_pAnimatorCom->Set_MaskPaused(true);
+	m_pAnimatorCom->Play("Wait", true, true, 0.2f, 1.0f, false);
+	
 	return S_OK;
 }
 
 void CPreview_Kirby::Update(_float fTimeDelta)
 {
-	/*_bool bMoveInput = m_pGameInstance_Proxy->Key_Pressing(DIK_A) || m_pGameInstance_Proxy->Key_Pressing(DIK_D);
-	m_pAnimatorCom->Set_MaskPaused(!bMoveInput);*/
-
-	/*
-	if (m_pGameInstance_Proxy->Key_Down(DIK_J))
-	{
-		m_pAnimatorCom->Clear_Mask(0.25f);
-
-		m_pAnimatorCom->Play("Wait");
-	}
-	if (m_pGameInstance_Proxy->Key_Down(DIK_K))
-	{
-		m_pAnimatorCom->Clear_Mask(0.25f);
-
-		m_pAnimatorCom->Play("AbilityDump", false);
-	}
-	//if (m_pGameInstance_Proxy->Key_Down(DIK_L))
-	//{
-	//	m_pAnimatorCom->Set_Mask("HaveSwordWait", "R_ShoulderJ", true, 1.0f, 0.55f);
-	//}
-	if (m_pGameInstance_Proxy->Key_Down(DIK_L))
-	{
-		m_pAnimatorCom->Set_Mask("Sword_HaveSwordWait", "R_ShoulderJ", true, 1.0f, 0.55f);
-	}
-	if (m_pGameInstance_Proxy->Key_Down(DIK_M))
-	{		
-		m_pAnimatorCom->Clear_Mask();
-		m_pAnimatorCom->Play("GetAbilityFirst", false, true, 0.2f, 2.5f);
-	}
-	_bool bKeyPressed = m_pGameInstance_Proxy->Key_Pressing(DIK_N);
-
-	m_pAnimatorCom->Set_MaskPaused(!bKeyPressed);
-	
-	if (m_pModelCom->Get_CurrentAnimName() == "GetAbilityFirst" && m_pAnimatorCom->Is_Finished())
-	{
-		m_pAnimatorCom->Play("Wait", true, true, 0.2f);
-		m_pAnimatorCom->Set_Mask("Sword_HaveSwordWait", "R_ShoulderJ", true, 1.0f, 0.5f);
-	}
-	*/
+	if (!m_bActive)
+		return;
 
 	m_pAnimatorCom->Update(fTimeDelta);
 

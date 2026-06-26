@@ -1,23 +1,21 @@
 #pragma once
 
-#include "Kirby_State.h"
+#include "Kirby_ControllableState.h"
 
 #include "GameContent_Defines.h"
 
 NS_BEGIN(Engine)
-class CAnimator;
 NS_END
 
 NS_BEGIN(Client)
 
 class CKirby;
-class CKirby_Body;
 
-class CLIENT_DLL CKirby_CutSceneGrabbed final : public CKirby_State
+class CLIENT_DLL CKirby_Guard final : public CKirby_ControllableState
 {
 private:
-	CKirby_CutSceneGrabbed();
-	virtual ~CKirby_CutSceneGrabbed() = default;
+	CKirby_Guard();
+	virtual ~CKirby_Guard() = default;
 
 private:
 	HRESULT Initialize();
@@ -34,10 +32,7 @@ public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
 public:
-	virtual void Request_ReleaseGrabState(CKirby* pKirby, GRAB_TYPE eType) override;
-
-public:
-	static CKirby_CutSceneGrabbed* Create();
+	static CKirby_Guard* Create();
 private:
 	virtual void Free() override;
 };

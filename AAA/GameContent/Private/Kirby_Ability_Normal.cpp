@@ -82,6 +82,17 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _flo
     Update_SuperInhaleTimer(fTimeDelta);
     Update_InhaleState(pKirby, fTimeDelta);
 
+    if (GetAsyncKeyState('T'))
+    {
+        pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::SWORD);
+        pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
+        if (m_pInhaleEffect)
+        {
+            m_pInhaleEffect->EffectContainer_Stop();
+            m_pInhaleEffect = nullptr;
+        }
+    }
+
     return ABILITY_UPDATE_RESULT::NONE;
 }
 
