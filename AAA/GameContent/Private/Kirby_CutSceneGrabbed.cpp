@@ -35,7 +35,7 @@ void CKirby_CutSceneGrabbed::Enter(CKirby* pKirby)
 
     CKirby_Body* pBody = pKirby->Get_Body();
     CAnimator* pAnimator = pBody->Get_Animator();
-    pAnimator->Play("Run", true, false, 0.1f, 2.2f, true);
+    pAnimator->Play("DemoAppear2", false, false, 0.1f, 1.f, true);
 
     pBody->Set_Eye(KIRBY_EYE_STATE::SURPRISED);
 
