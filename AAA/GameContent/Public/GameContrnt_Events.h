@@ -40,6 +40,7 @@ namespace Client
     inline constexpr const _tchar* EVT_QUERY_BOSS = L"Query_Boss";
 
     enum class ECutsceneCam { Cutscene, Boss };
+    enum class GRAB_TYPE : _uint{ GORILLA_SCENE, GORILLA_COMBAT, _COUNT };
 
     struct CUTSCENE_CAMERA_DESC
     {
@@ -55,6 +56,7 @@ namespace Client
     {
         const _float4x4* pBoneMatrix = { nullptr }; 
         const _float4x4* pSourceWorld = { nullptr };
+        GRAB_TYPE  eType = { GRAB_TYPE::_COUNT };
     };
 
     struct PLAYER_QUERY { CGameObject* pPlayer = { nullptr }; };

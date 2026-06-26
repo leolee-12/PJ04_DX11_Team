@@ -15,6 +15,7 @@
 #include "Kirby_Damaged.h"
 #include "Kirby_Guard.h"
 #include "Kirby_CutSceneGrabbed.h"
+#include "Kirby_QTE_Grabbed.h"
 
 CKirby_StateMachine::CKirby_StateMachine()
 {
@@ -76,9 +77,14 @@ void CKirby_StateMachine::On_Damaged_KirbyStateMachine(const ATTACK_INFO& tInfo)
     m_pCurState->On_Damaged_KirbyState(m_pKirby, tInfo);
 }
 
-void CKirby_StateMachine::Request_CutsceneGrab()
+void CKirby_StateMachine::Request_GrabState_StateMachine(GRAB_TYPE eType)
 {
-    m_pCurState->Request_CutsceneGrab(m_pKirby);
+    m_pCurState->Request_GrabState(m_pKirby, eType);
+}
+
+void CKirby_StateMachine::Request_ReleaseGrabState_StateMachine(GRAB_TYPE eType)
+{
+    m_pCurState->Request_ReleaseGrabState(m_pKirby, eType);
 }
 
 HRESULT CKirby_StateMachine::Init_State()
@@ -104,6 +110,7 @@ HRESULT CKirby_StateMachine::Init_State()
     if (FAILED(Register_State(KIRBY_STATE_TYPE::DAMAGED, CKirby_Damaged::Create())))                    return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::GUARD, CKirby_Guard::Create())))                        return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::CUTSCENE_GRABBED, CKirby_CutSceneGrabbed::Create())))   return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::QTE_GRABBED, CKirby_QTE_Grabbed::Create())))            return E_FAIL;
 
     return S_OK;
 }

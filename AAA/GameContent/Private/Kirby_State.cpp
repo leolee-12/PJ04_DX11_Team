@@ -96,9 +96,25 @@ _bool CKirby_State::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
     return false;
 }
 
-void CKirby_State::Request_CutsceneGrab(CKirby* pKirby)
+void CKirby_State::Request_GrabState(CKirby* pKirby, GRAB_TYPE eType)
 {
-    pKirby->Change_State(KIRBY_STATE_TYPE::CUTSCENE_GRABBED);
+    switch (eType)
+    {
+        case GRAB_TYPE::GORILLA_SCENE:
+        {
+            pKirby->Change_State(KIRBY_STATE_TYPE::CUTSCENE_GRABBED);
+            break;
+        }
+        case GRAB_TYPE::GORILLA_COMBAT:
+        {
+            pKirby->Change_State(KIRBY_STATE_TYPE::QTE_GRABBED);
+            break;
+        }
+    }
+}
+
+void CKirby_State::Request_ReleaseGrabState(CKirby* pKirby, GRAB_TYPE eType)
+{
 }
 
 void CKirby_State::Free()

@@ -132,7 +132,7 @@ void CKirby::On_Deserialized()
         m_pMovement->Sync_To_Controller();
 }
 
-void CKirby::OnOffParts(COPY_ABILITY_TYPE eAbilityType, _bool fOn)
+void CKirby::OnOffParts(COPY_ABILITY_TYPE eAbilityType, _bool bOn, _bool bOnlyWeapon)
 {
     auto OnOffPart = [this](const wchar_t* PartTag, _bool bOn)->void
         {
@@ -146,8 +146,10 @@ void CKirby::OnOffParts(COPY_ABILITY_TYPE eAbilityType, _bool fOn)
     switch (eAbilityType)
     {
         case COPY_ABILITY_TYPE::SWORD:
-            OnOffPart(CKirby_Sword::Kirby_PartTag, fOn);
-            OnOffPart(CKirby_SwordHat::Kirby_PartTag, fOn);
+            if(!bOnlyWeapon)
+                OnOffPart(CKirby_SwordHat::Kirby_PartTag, bOn);
+
+            OnOffPart(CKirby_Sword::Kirby_PartTag, bOn);
             break;
     }
 }
@@ -448,20 +450,23 @@ HRESULT CKirby::Ready_Events()
     Subscribe_Event(EventTag::Cutscene_GrabKirby,
         [this](void* pData)
         {
-            Set_CutsceneGrabTarget(static_cast<CUTSCENE_GRAB_DESC*>(pData));
-            m_pKirby_StateMachine->Request_CutsceneGrab();
-        });
-
-    Subscribe_Event(EventTag::Cutscene_ReleaseKirby,
-        [this](void*)
-        {
-            Clear_CutsceneGrabTarget();
+            CUTSCENE_GRAB_DESC* pDesc = static_cast<CUTSCENE_GRAB_DESC*>(pData);
+            Set_CutsceneGrabTarget(pDesc);
+            m_pKirby_StateMachine->Request_GrabState_StateMachine(pDesc->eType);
         });
 
     Subscribe_Event(EventTag::Cutscene_GorillaHandoff,
         [this](void*)
         {
             Clear_CutsceneGrabTarget();
+            m_pKirby_StateMachine->Request_ReleaseGrabState_StateMachine();
+        });
+
+    Subscribe_Event(EventTag::Cutscene_ReleaseKirby,
+        [this](void*)
+        {
+            Clear_CutsceneGrabTarget();
+            m_pKirby_StateMachine->Request_ReleaseGrabState_StateMachine();
         });
 
     return S_OK;
@@ -493,6 +498,8 @@ void CKirby::Set_CutsceneGrabTarget(CUTSCENE_GRAB_DESC* pGrabDesc)
 
 void CKirby::Clear_CutsceneGrabTarget()
 {
+    m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.f);
+
     m_pGrabBone = nullptr;
     m_pGrabOwnerWorld = nullptr;
 }
@@ -507,7 +514,7 @@ void CKirby::Update_CutsceneGrabTransform()
     if (m_pGrabBone == nullptr || m_pGrabOwnerWorld == nullptr)
         return;
 
-    _matrix matGrabTargetWorld = XMLoadFloat4x4(m_pGrabBone) * XMLoadFloat4x4(m_pGrabOwnerWorld);
+    _matrix matGrabTargetWorld = XMMatrixRotationY(XMConvertToRadians(-180.f)) * XMLoadFloat4x4(m_pGrabBone) * XMLoadFloat4x4(m_pGrabOwnerWorld);
     Get_Transform()->Set_WorldMatrix(matGrabTargetWorld);
 
     m_pMovement->Sync_To_Controller();
