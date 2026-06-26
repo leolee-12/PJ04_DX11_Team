@@ -27,6 +27,7 @@
 #include "UI_LoadingCurtain.h"
 #include "UI_FadeIn.h"
 #include "UI_BossStatus.h"
+#include "UI_FlashCurtain.h"
 
 // UI Parts
 #include "UI_Image.h"
@@ -183,8 +184,6 @@ void CGameObject_Factory::Register_UI()
     Register(CUI_CurtainTexture::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
         CREATOR(CUI_CurtainTexture),
         LOADER());
-
-
 }
 
 void CGameObject_Factory::Register_Camera()
@@ -522,6 +521,11 @@ void CGameObject_Factory::Register_UIContainer()
         CREATOR(CUI_BossStatus),
         LOADER()
     );
+
+    Register(CUI_FlashCurtain::PROTOTYPE_TAG,
+        TEXT("UI_CONTAINER"),
+        CREATOR(CUI_FlashCurtain),
+        LOADER());
 }
 
 void CGameObject_Factory::Register_NonAnimObject()

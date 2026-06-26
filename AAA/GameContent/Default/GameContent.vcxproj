@@ -44,6 +44,7 @@
     <ClInclude Include="..\Public\Common_Curve03.h" />
     <ClInclude Include="..\Public\Common_JumpSlash.h" />
     <ClInclude Include="..\Public\Common_Ring03.h" />
+    <ClInclude Include="..\Public\UI_FlashCurtain.h" />
     <ClInclude Include="..\public\CutsceneActor.h" />
     <ClInclude Include="..\public\CutsceneGorilla.h" />
     <ClInclude Include="..\public\Damageable.h" />
@@ -255,6 +256,7 @@
     <ClCompile Include="..\Private\Common_Curve03.cpp" />
     <ClCompile Include="..\Private\Common_JumpSlash.cpp" />
     <ClCompile Include="..\Private\Common_Ring03.cpp" />
+    <ClCompile Include="..\Private\UI_FlashCurtain.cpp" />
     <ClCompile Include="..\private\CutsceneActor.cpp" />
     <ClCompile Include="..\private\CutsceneGorilla.cpp" />
     <ClCompile Include="..\private\Effect_Loader.cpp" />
