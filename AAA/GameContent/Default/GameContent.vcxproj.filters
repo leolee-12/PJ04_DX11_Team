@@ -661,6 +661,27 @@
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutSceneGrab">
       <UniqueIdentifier>{46d69dab-00a6-49b7-ba75-db2ddb5232e3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\07. BrontoBurt">
+      <UniqueIdentifier>{fc35ec57-639a-48e2-92a5-decb71ece4a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\07. BrontoBurt\Brain">
+      <UniqueIdentifier>{e0a068a8-5c19-40ac-92f7-95669dec6069}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\07. BrontoBurt\Parts">
+      <UniqueIdentifier>{880e6ab3-a65b-4db2-b8c4-1d4e876a08a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\07. BrontoBurt\State">
+      <UniqueIdentifier>{b14e5d4b-e541-461c-bc37-5e4e4711bb0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\07. BrontoBurt\Parts\Body">
+      <UniqueIdentifier>{608af005-998d-4ff9-bd3e-75e2840328d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\07. BrontoBurt\State\Idle">
+      <UniqueIdentifier>{7d169597-3af1-47c4-8cec-1155bc9970ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\07. BrontoBurt\State\Return">
+      <UniqueIdentifier>{1c459d47-b212-490f-a2b8-c351c910c80c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1284,6 +1305,21 @@
     <ClInclude Include="..\Public\Kabu_State_WarpOut.h">
       <Filter>00. GameObject\06. Monster\05. Kabu\State\Warp\WarpOut</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BrontoBurt.h">
+      <Filter>00. GameObject\06. Monster\07. BrontoBurt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BrontoBurt_Body.h">
+      <Filter>00. GameObject\06. Monster\07. BrontoBurt\Parts\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BrontoBurt_State_Idle.h">
+      <Filter>00. GameObject\06. Monster\07. BrontoBurt\State\Idle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BrontoBurt_Brain.h">
+      <Filter>00. GameObject\06. Monster\07. BrontoBurt\Brain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BrontoBurt_State_Return.h">
+      <Filter>00. GameObject\06. Monster\07. BrontoBurt\State\Return</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1831,6 +1867,21 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kabu_State_WarpOut.cpp">
       <Filter>00. GameObject\06. Monster\05. Kabu\State\Warp\WarpOut</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BrontoBurt.cpp">
+      <Filter>00. GameObject\06. Monster\07. BrontoBurt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BrontoBurt_Body.cpp">
+      <Filter>00. GameObject\06. Monster\07. BrontoBurt\Parts\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BrontoBurt_State_Idle.cpp">
+      <Filter>00. GameObject\06. Monster\07. BrontoBurt\State\Idle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BrontoBurt_Brain.cpp">
+      <Filter>00. GameObject\06. Monster\07. BrontoBurt\Brain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BrontoBurt_State_Return.cpp">
+      <Filter>00. GameObject\06. Monster\07. BrontoBurt\State\Return</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
