@@ -458,6 +458,12 @@ HRESULT CKirby::Ready_Events()
             Clear_CutsceneGrabTarget();
         });
 
+    Subscribe_Event(EventTag::Cutscene_GorillaHandoff,
+        [this](void*)
+        {
+            Clear_CutsceneGrabTarget();
+        });
+
     return S_OK;
 }
 

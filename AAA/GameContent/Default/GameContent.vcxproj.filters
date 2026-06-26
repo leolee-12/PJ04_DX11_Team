@@ -619,12 +619,6 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash">
       <UniqueIdentifier>{61c41364-99b2-4864-a87d-85109fe32b06}</UniqueIdentifier>
     </Filter>
-    <Filter Include="08. CutsceneActor">
-      <UniqueIdentifier>{95c0b1f2-ac3e-4446-9bd7-5b1c7b84f2c1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="08. CutsceneActor\Gorilla">
-      <UniqueIdentifier>{ef97af82-579e-4774-9fb4-27668458611d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\00. Camera\Cutscene">
       <UniqueIdentifier>{44ee9036-9fb5-42d3-a001-52dd473415a5}</UniqueIdentifier>
     </Filter>
@@ -663,6 +657,12 @@
     </Filter>
     <Filter Include="00. GameObject\97. UI\UIContainer\Sequence\Flash">
       <UniqueIdentifier>{64c10457-ee8a-4e26-bb8c-7e851d26d956}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\08. CutsceneActor">
+      <UniqueIdentifier>{95c0b1f2-ac3e-4446-9bd7-5b1c7b84f2c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\08. CutsceneActor\Gorilla">
+      <UniqueIdentifier>{ef97af82-579e-4774-9fb4-27668458611d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1237,10 +1237,10 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash</Filter>
     </ClInclude>
     <ClInclude Include="..\public\CutsceneActor.h">
-      <Filter>08. CutsceneActor</Filter>
+      <Filter>00. GameObject\08. CutsceneActor</Filter>
     </ClInclude>
     <ClInclude Include="..\public\CutsceneGorilla.h">
-      <Filter>08. CutsceneActor\Gorilla</Filter>
+      <Filter>00. GameObject\08. CutsceneActor\Gorilla</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Camera_Cutscene.h">
       <Filter>00. GameObject\00. Camera\Cutscene</Filter>
@@ -1788,10 +1788,10 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash</Filter>
     </ClCompile>
     <ClCompile Include="..\private\CutsceneActor.cpp">
-      <Filter>08. CutsceneActor</Filter>
+      <Filter>00. GameObject\08. CutsceneActor</Filter>
     </ClCompile>
     <ClCompile Include="..\private\CutsceneGorilla.cpp">
-      <Filter>08. CutsceneActor\Gorilla</Filter>
+      <Filter>00. GameObject\08. CutsceneActor\Gorilla</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Camera_Cutscene.cpp">
       <Filter>00. GameObject\00. Camera\Cutscene</Filter>
