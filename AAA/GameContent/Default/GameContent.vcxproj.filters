@@ -1295,7 +1295,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\UI_FlashCurtain.h">
       <Filter>00. GameObject\97. UI\UIContainer\Sequence\Flash</Filter>
->>>>>>> main
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1850,7 +1849,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\UI_FlashCurtain.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\Sequence\Flash</Filter>
->>>>>>> main
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
