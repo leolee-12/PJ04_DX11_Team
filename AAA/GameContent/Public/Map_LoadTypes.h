@@ -25,6 +25,14 @@ struct MAP_MANIFEST_DESC
 	_wstring strDecorCollisionCatalogPath;
 };
 
+struct MAP_PACKAGE_BUILD_OPTIONS
+{
+	_bool bBuildStage = true;
+	_bool bBuildEnv = true;
+	_bool bBuildLevelDesignPaths = true;
+	_bool bApplyDelta = true;
+};
+
 struct MAP_ADD_OBJECT
 {
 	_wstring strPrototypeTag;

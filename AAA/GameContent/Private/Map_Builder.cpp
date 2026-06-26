@@ -61,6 +61,11 @@ CMap_Builder::CMap_Builder(CMap_ModelResolver* pResolver)
 
 HRESULT CMap_Builder::Build_FromManifest(const _wstring& strManifestPath, MAP_PACKAGE* pOutPackage)
 {
+	return Build_FromManifest(strManifestPath, MAP_PACKAGE_BUILD_OPTIONS{}, pOutPackage);
+}
+
+HRESULT CMap_Builder::Build_FromManifest(const _wstring& strManifestPath, const MAP_PACKAGE_BUILD_OPTIONS& Options, MAP_PACKAGE* pOutPackage)
+{
 	if (nullptr == pOutPackage || nullptr == m_pResolver)
 		return E_FAIL;
 
@@ -68,7 +73,7 @@ HRESULT CMap_Builder::Build_FromManifest(const _wstring& strManifestPath, MAP_PA
 	if (FAILED(CMap_Parser::Parse_Manifest(strManifestPath, &Manifest)))
 		return E_FAIL;
 
-	if (!Manifest.strDecorCollisionCatalogPath.empty())
+	if (Options.bBuildEnv && !Manifest.strDecorCollisionCatalogPath.empty())
 	{
 		if (FAILED(CEnv_CollisionCatalog::Load(Manifest.strDecorCollisionCatalogPath)))
 		{
@@ -83,23 +88,31 @@ HRESULT CMap_Builder::Build_FromManifest(const _wstring& strManifestPath, MAP_PA
 	}
 
 	*pOutPackage = {};
-	pOutPackage->LevelDesignJsonPaths = Manifest.LevelDesignJsonPaths;
 
-	if (FAILED(Build_StageDesc(Manifest, &pOutPackage->StageDesc)))
-		return E_FAIL;
+	if (Options.bBuildLevelDesignPaths)
+		pOutPackage->LevelDesignJsonPaths = Manifest.LevelDesignJsonPaths;
 
-	if (FAILED(Build_EnvDescs(
-		Manifest,
-		&pOutPackage->EnvObjectDescs,
-		&pOutPackage->EnvJsonPaths)))
+	if (Options.bBuildStage)
 	{
-		return E_FAIL;
+		if (FAILED(Build_StageDesc(Manifest, &pOutPackage->StageDesc)))
+			return E_FAIL;
 	}
 
-	if (FAILED(Validate_And_Filter(pOutPackage)))
-		return E_FAIL;
+	if (Options.bBuildEnv)
+	{
+		if (FAILED(Build_EnvDescs(
+			Manifest,
+			&pOutPackage->EnvObjectDescs,
+			&pOutPackage->EnvJsonPaths)))
+		{
+			return E_FAIL;
+		}
 
-	if (!Manifest.strDeltaPath.empty())
+		if (FAILED(Validate_And_Filter(pOutPackage)))
+			return E_FAIL;
+	}
+
+	if (Options.bApplyDelta && !Manifest.strDeltaPath.empty())
 	{
 		string strDeltaContent;
 		if (FAILED(CDataLoader::Read_Json(Manifest.strDeltaPath.c_str(), &strDeltaContent)))
@@ -110,7 +123,12 @@ HRESULT CMap_Builder::Build_FromManifest(const _wstring& strManifestPath, MAP_PA
 		if (FAILED(CMap_EditFile::Load_Change(jDelta, &OverrideDesc)))
 			return E_FAIL;
 
-		if (FAILED(CMap_EditFile::Apply_Change(pOutPackage, OverrideDesc)))
+		MAP_EDIT_APPLY_OPTIONS ApplyOptions{};
+		ApplyOptions.bApplyStage = Options.bBuildStage;
+		ApplyOptions.bApplyEnv = Options.bBuildEnv;
+		ApplyOptions.bApplyAddedObjects = Options.bBuildEnv;
+
+		if (FAILED(CMap_EditFile::Apply_Change(pOutPackage, OverrideDesc, ApplyOptions)))
 			return E_FAIL;
 	}
 
