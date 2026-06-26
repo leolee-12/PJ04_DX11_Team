@@ -72,7 +72,7 @@ private:
 	CBladeKnight_Body*			m_pBody = { nullptr };
 	CBladeKnight_Sword*			m_pSword = { nullptr };
 
-	_int						m_iAIType = { 0 };		// 0은 고정형, 1은 자유 이동형
+	_int						m_iAIType = { 1 };		// 0은 고정형, 1은 자유 이동형
 
 	_bool						m_bIdleOverlayOn = { false };
 
