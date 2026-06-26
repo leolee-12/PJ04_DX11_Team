@@ -664,6 +664,21 @@
     <Filter Include="00. GameObject\08. CutsceneActor\Gorilla">
       <UniqueIdentifier>{ef97af82-579e-4774-9fb4-27668458611d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Projectile">
+      <UniqueIdentifier>{4eb96df4-f91b-4738-8689-7bb698826703}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Projectile\Manager">
+      <UniqueIdentifier>{d5b80bf8-2797-46a1-83ec-09bb0f887a35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Projectile\Movement">
+      <UniqueIdentifier>{7a315420-3a25-4175-9e01-a1d2ef1c5404}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Projectile\00. PhysicsProjectile">
+      <UniqueIdentifier>{1e839b26-e747-404b-97fa-b9e93e9a2c71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Projectile\00. PhysicsProjectile\00. Boulder">
+      <UniqueIdentifier>{f745a7d5-14c1-44e7-9706-d907f8396f4d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1290,6 +1305,21 @@
     <ClInclude Include="..\Public\UI_FlashCurtain.h">
       <Filter>00. GameObject\97. UI\UIContainer\Sequence\Flash</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Projectile_Manager.h">
+      <Filter>01. Projectile\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Projectile.h">
+      <Filter>01. Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Projectile_Boulder.h">
+      <Filter>01. Projectile\00. PhysicsProjectile\00. Boulder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Projectile_Movement.h">
+      <Filter>01. Projectile\Movement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\PhysicsProjectile.h">
+      <Filter>01. Projectile\00. PhysicsProjectile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1840,6 +1870,21 @@
     </ClCompile>
     <ClCompile Include="..\Private\UI_FlashCurtain.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\Sequence\Flash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Projectile_Manager.cpp">
+      <Filter>01. Projectile\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Projectile.cpp">
+      <Filter>01. Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Projectile_Boulder.cpp">
+      <Filter>01. Projectile\00. PhysicsProjectile\00. Boulder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Projectile_Movement.cpp">
+      <Filter>01. Projectile\Movement</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\PhysicsProjectile.cpp">
+      <Filter>01. Projectile\00. PhysicsProjectile</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
