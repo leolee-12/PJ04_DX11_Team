@@ -51,6 +51,7 @@
     <ClInclude Include="..\Public\Env_CollisionCatalog.h" />
     <ClInclude Include="..\Public\Env_InstanceBatch.h" />
     <ClInclude Include="..\Public\Env_InstanceController.h" />
+    <ClInclude Include="..\Public\Kirby_CutSceneGrabbed.h" />
     <ClInclude Include="..\Public\Sword_JumpSlash.h" />
     <ClInclude Include="..\public\GorillaNamePlate.h" />
     <ClInclude Include="..\Public\LevelDesign_Boundary.h" />
@@ -264,6 +265,7 @@
     <ClCompile Include="..\private\GigantEdge_Body.cpp" />
     <ClCompile Include="..\private\GigantEdge_Shield.cpp" />
     <ClCompile Include="..\private\GigantEdge_Sword.cpp" />
+    <ClCompile Include="..\Private\Kirby_CutSceneGrabbed.cpp" />
     <ClCompile Include="..\Private\Sword_JumpSlash.cpp" />
     <ClCompile Include="..\private\GorillaNamePlate.cpp" />
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
