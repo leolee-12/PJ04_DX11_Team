@@ -26,7 +26,7 @@ void CBladeKnight_Brain::Decide_Internal(const MONSTER_BLACKBOARD& BlackBoard, _
 	const _int iAIType = pBladeKnight->Get_AIType();
 
 	const _float fAbsHeight = fabsf(BlackBoard.fHeightToTarget);
-	const _bool bAttackable = (iAIType == 1) ? (BlackBoard.fDistToTargetXZ <= 2.f && fAbsHeight < 1.f) : fAbsHeight < 3.f;
+	const _bool bAttackable = (iAIType == 1) ? (BlackBoard.fDistToTargetXZ <= 2.f && fAbsHeight < 3.f) : fAbsHeight < 5.f;
 	const _bool bChaseable = (iAIType == 1) ? (fAbsHeight <= 1.5f) : false;
 
 	const MONSTER_STATE_TYPE eCurState = m_pOwner->Get_StateType();

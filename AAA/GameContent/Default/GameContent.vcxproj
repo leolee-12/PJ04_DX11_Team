@@ -44,6 +44,7 @@
     <ClInclude Include="..\Public\Common_Curve03.h" />
     <ClInclude Include="..\Public\Common_JumpSlash.h" />
     <ClInclude Include="..\Public\Common_Ring03.h" />
+    <ClInclude Include="..\Public\UI_FlashCurtain.h" />
     <ClInclude Include="..\public\CutsceneActor.h" />
     <ClInclude Include="..\public\CutsceneGorilla.h" />
     <ClInclude Include="..\public\Damageable.h" />
@@ -51,6 +52,13 @@
     <ClInclude Include="..\Public\Env_CollisionCatalog.h" />
     <ClInclude Include="..\Public\Env_InstanceBatch.h" />
     <ClInclude Include="..\Public\Env_InstanceController.h" />
+    <ClInclude Include="..\Public\Kabu.h" />
+    <ClInclude Include="..\Public\Kabu_Body.h" />
+    <ClInclude Include="..\Public\Kabu_Brain.h" />
+    <ClInclude Include="..\Public\Kabu_State_Idle.h" />
+    <ClInclude Include="..\Public\Kabu_State_WarpIn.h" />
+    <ClInclude Include="..\Public\Kabu_State_WarpOut.h" />
+    <ClInclude Include="..\Public\Monster_RailMovement.h" />
     <ClInclude Include="..\Public\Kirby_CutSceneGrabbed.h" />
     <ClInclude Include="..\Public\Kirby_Guard.h" />
     <ClInclude Include="..\Public\Sword_JumpSlash.h" />
@@ -249,6 +257,7 @@
     <ClCompile Include="..\Private\Common_Curve03.cpp" />
     <ClCompile Include="..\Private\Common_JumpSlash.cpp" />
     <ClCompile Include="..\Private\Common_Ring03.cpp" />
+    <ClCompile Include="..\Private\UI_FlashCurtain.cpp" />
     <ClCompile Include="..\private\CutsceneActor.cpp" />
     <ClCompile Include="..\private\CutsceneGorilla.cpp" />
     <ClCompile Include="..\private\Effect_Loader.cpp" />
@@ -266,6 +275,13 @@
     <ClCompile Include="..\private\GigantEdge_Body.cpp" />
     <ClCompile Include="..\private\GigantEdge_Shield.cpp" />
     <ClCompile Include="..\private\GigantEdge_Sword.cpp" />
+    <ClCompile Include="..\Private\Kabu.cpp" />
+    <ClCompile Include="..\Private\Kabu_Body.cpp" />
+    <ClCompile Include="..\Private\Kabu_Brain.cpp" />
+    <ClCompile Include="..\Private\Kabu_State_Idle.cpp" />
+    <ClCompile Include="..\Private\Kabu_State_WarpIn.cpp" />
+    <ClCompile Include="..\Private\Kabu_State_WarpOut.cpp" />
+    <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
     <ClCompile Include="..\Private\Kirby_CutSceneGrabbed.cpp" />
     <ClCompile Include="..\Private\Kirby_Guard.cpp" />
     <ClCompile Include="..\Private\Sword_JumpSlash.cpp" />

@@ -23,7 +23,7 @@ namespace Client
         inline constexpr const _tchar* Boss_Died = L"Boss.Died";
 
         inline constexpr const _tchar* Cutscene_GorillaAppear = L"Cutscene.GorillaAppear";   // Æ®¸®°Å ¹ßµ¿
-        inline constexpr const _tchar* Cutscene_GrabKirby = L"Cutscene.GrabKirby";           // Ä¿ºñ ÄÆ¾ÀÀ§Ä¡·Î
+        inline constexpr const _tchar* Cutscene_GrabKirby =    L"Cutscene.GrabKirby";           // Ä¿ºñ ÄÆ¾ÀÀ§Ä¡·Î
         inline constexpr const _tchar* Cutscene_ReleaseKirby = L"Cutscene.ReleaseKirby";     
         inline constexpr const _tchar* Cutscene_CameraChange = L"Cutscene.CameraChange";
         inline constexpr const _tchar* Cutscene_GorillaHandoff = L"Cutscene.GorillaHandoff";
