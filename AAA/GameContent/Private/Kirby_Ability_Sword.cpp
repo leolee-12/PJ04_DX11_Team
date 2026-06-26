@@ -68,6 +68,8 @@ HRESULT CKirby_Ability_Sword::Initialize()
         false, false, 5.f, 0.05f, true,
         false, false, 5.f, 0.05f);
 
+    Set_FullBodyAni(ABILITY_ANI::GUARD, "Sword_Guard", true, true, 0.1f, 1.8f);
+
     m_fSuperSpinSlashChargeTime = 0.8f;
 
     return S_OK;

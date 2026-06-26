@@ -643,6 +643,9 @@
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutSceneGrab">
       <UniqueIdentifier>{46d69dab-00a6-49b7-ba75-db2ddb5232e3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Guard">
+      <UniqueIdentifier>{79d635b3-fdb4-4144-aeaa-4d2690b735c9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1245,6 +1248,9 @@
     <ClInclude Include="..\Public\LevelDesign_Boundary.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\00. Boundary</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Guard.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Guard</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1771,6 +1777,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Boundary.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\00. Boundary</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Guard.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Guard</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
