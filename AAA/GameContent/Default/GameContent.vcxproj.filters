@@ -4,9 +4,6 @@
     <Filter Include="99. Defines">
       <UniqueIdentifier>{6dddf281-8a73-4de2-a7d7-35e752969735}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject">
-      <UniqueIdentifier>{998c82c0-2ef5-457f-bbe6-45b63b21e082}</UniqueIdentifier>
-    </Filter>
     <Filter Include="98. ShaderFiles">
       <UniqueIdentifier>{00e30270-76c4-4996-a09e-492e77484cc5}</UniqueIdentifier>
     </Filter>
@@ -16,65 +13,14 @@
     <Filter Include="97. DataSystem\DataLoader">
       <UniqueIdentifier>{65eb43f5-f4ed-41c4-9029-de8eeb174508}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\99. Factory">
-      <UniqueIdentifier>{5114196d-bc6c-4998-93e1-18fd4a2e81f2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\00. Camera">
-      <UniqueIdentifier>{ba0c14f7-6cfd-4471-926f-3cbd3b632e55}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test">
-      <UniqueIdentifier>{89f71a9d-8abf-42de-96db-ec93db453c6f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestFiona">
-      <UniqueIdentifier>{0916bd2f-10ca-4681-a8f8-5b4d19f31718}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\Terrain">
-      <UniqueIdentifier>{61edf243-83b4-4191-9339-07578a04f915}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestNonAnim">
-      <UniqueIdentifier>{cb877a97-6b0e-4817-bb69-d7e6836d721f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\00. Camera\Free">
-      <UniqueIdentifier>{dd2cd863-482a-4286-b3df-f3f050dd4f56}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestRect">
-      <UniqueIdentifier>{e586cfae-6cf8-428a-b68e-29fbbff687e2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="98. ShaderFiles\Marb1e">
       <UniqueIdentifier>{c5ab5b79-8b3c-4a71-af78-735b22243355}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestEffectQuad">
-      <UniqueIdentifier>{0d1ac5b9-9bf3-49d1-848a-61300fc9ce8b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestMap">
-      <UniqueIdentifier>{63727501-0cde-4d54-ba7a-2748b3341edb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestMarb1e">
-      <UniqueIdentifier>{840c0faf-b354-4895-adb2-a5936fb65b71}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestMarb1eMap">
-      <UniqueIdentifier>{867f635d-c832-4d05-b596-a899a327f1a6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\01. Map">
-      <UniqueIdentifier>{52aa1b5e-9f41-4300-b321-d94a31de3ab2}</UniqueIdentifier>
     </Filter>
     <Filter Include="98. ShaderFiles\Hojun">
       <UniqueIdentifier>{a6e24554-9141-4712-87e0-61e01d059777}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\Test\TestImageContainer">
-      <UniqueIdentifier>{7f906e56-5e2d-404b-824c-cb4f519151e7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\02. EnvObject">
-      <UniqueIdentifier>{ce9ba11f-9390-48f8-9a7f-e24b38b55608}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\Shader_Material">
-      <UniqueIdentifier>{8e7d8120-ea3e-4545-ace5-aafa6c62179d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\04. Character">
-      <UniqueIdentifier>{12a38b09-ecf8-45dc-a08f-d9694ed433eb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\01. Map\SkySphere">
-      <UniqueIdentifier>{c77df806-0179-45ff-b02d-ef8c9d34da35}</UniqueIdentifier>
+    <Filter Include="99. Defines\Hojun">
+      <UniqueIdentifier>{88dd6f60-69ca-48bd-96f3-47be9351a468}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect">
       <UniqueIdentifier>{289ff231-82b4-41ae-806c-a6d26b461dfa}</UniqueIdentifier>
@@ -97,8 +43,110 @@
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\02. SmokeTail">
       <UniqueIdentifier>{d13a01c7-b84d-40fa-a0a4-51a1b67b7315}</UniqueIdentifier>
     </Filter>
-    <Filter Include="99. Defines\Hojun">
-      <UniqueIdentifier>{88dd6f60-69ca-48bd-96f3-47be9351a468}</UniqueIdentifier>
+    <Filter Include="97. DataSystem\Header">
+      <UniqueIdentifier>{c91d5dbf-3699-4f2f-88b0-29d981fe9ef4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97. DataSystem\EffectLoader">
+      <UniqueIdentifier>{298374c8-b224-4434-8524-9f3ddac16cd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97. DataSystem\MapLoader">
+      <UniqueIdentifier>{077c1198-d891-486e-b491-c184ad619dd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97. DataSystem\MapLoader\API">
+      <UniqueIdentifier>{09f4e761-18cf-4d6f-a43f-2e1b208fce8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99. Defines\Hojun\UI">
+      <UniqueIdentifier>{cd0a7659-a8f0-4741-aa44-321f59e15d07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98. ShaderFiles\Leo">
+      <UniqueIdentifier>{a3345da1-0cb7-4733-ac92-e971f6f0980d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99. Defines\Leo">
+      <UniqueIdentifier>{ca69a650-f542-4ef4-9ce8-1c68bc5ca0a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97. DataSystem\LevelDesignLoader">
+      <UniqueIdentifier>{ac90f625-f08a-4a8a-89fd-03d9fa0dc850}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="96. CameraDirector">
+      <UniqueIdentifier>{ac2123fc-d03d-4f44-a7a4-a4fc408e20d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject">
+      <UniqueIdentifier>{998c82c0-2ef5-457f-bbe6-45b63b21e082}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\99. Factory">
+      <UniqueIdentifier>{5114196d-bc6c-4998-93e1-18fd4a2e81f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\00. Camera">
+      <UniqueIdentifier>{ba0c14f7-6cfd-4471-926f-3cbd3b632e55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\00. Camera\Free">
+      <UniqueIdentifier>{dd2cd863-482a-4286-b3df-f3f050dd4f56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\00. Camera\AreaCam">
+      <UniqueIdentifier>{712968f4-aac4-4c0d-b936-f670af432abf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\00. Camera\Cutscene">
+      <UniqueIdentifier>{44ee9036-9fb5-42d3-a001-52dd473415a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\00. Camera\BossCam">
+      <UniqueIdentifier>{2167fc90-1b87-469b-9d86-8fb47e1a8e6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test">
+      <UniqueIdentifier>{89f71a9d-8abf-42de-96db-ec93db453c6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\TestFiona">
+      <UniqueIdentifier>{0916bd2f-10ca-4681-a8f8-5b4d19f31718}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\Terrain">
+      <UniqueIdentifier>{61edf243-83b4-4191-9339-07578a04f915}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\TestNonAnim">
+      <UniqueIdentifier>{cb877a97-6b0e-4817-bb69-d7e6836d721f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\TestRect">
+      <UniqueIdentifier>{e586cfae-6cf8-428a-b68e-29fbbff687e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\TestEffectQuad">
+      <UniqueIdentifier>{0d1ac5b9-9bf3-49d1-848a-61300fc9ce8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\TestMap">
+      <UniqueIdentifier>{63727501-0cde-4d54-ba7a-2748b3341edb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\TestMarb1e">
+      <UniqueIdentifier>{840c0faf-b354-4895-adb2-a5936fb65b71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\TestMarb1eMap">
+      <UniqueIdentifier>{867f635d-c832-4d05-b596-a899a327f1a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\TestImageContainer">
+      <UniqueIdentifier>{7f906e56-5e2d-404b-824c-cb4f519151e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\Shader_Material">
+      <UniqueIdentifier>{8e7d8120-ea3e-4545-ace5-aafa6c62179d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\TestParticle">
+      <UniqueIdentifier>{c3b2a3c6-b5a8-4b4a-82ac-7f8fd01b5452}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\TestMeshParticle">
+      <UniqueIdentifier>{8cd5923d-467a-464c-b4e8-7f7307487329}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\Test\TestMeshEmitter">
+      <UniqueIdentifier>{d07256ff-a017-43f1-a4ae-0d9b7af3dc98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\01. Map">
+      <UniqueIdentifier>{52aa1b5e-9f41-4300-b321-d94a31de3ab2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\01. Map\SkySphere">
+      <UniqueIdentifier>{c77df806-0179-45ff-b02d-ef8c9d34da35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\02. EnvObject">
+      <UniqueIdentifier>{ce9ba11f-9390-48f8-9a7f-e24b38b55608}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\02. EnvObject\Instance">
+      <UniqueIdentifier>{9df9d2af-5f82-4056-9d63-b9f7cc4c1544}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\04. Character">
+      <UniqueIdentifier>{12a38b09-ecf8-45dc-a08f-d9694ed433eb}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect">
       <UniqueIdentifier>{289ff231-82b4-41ae-806c-a6d26b461dfa}</UniqueIdentifier>
@@ -108,6 +156,15 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke">
       <UniqueIdentifier>{9f8fcf1c-0b3e-48eb-9310-44093cf6ed7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\01. InhaleContainer">
+      <UniqueIdentifier>{75fd20ba-5ae3-4c5f-bf95-b21a0b7e20ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1">
+      <UniqueIdentifier>{bd114556-93e2-4c7f-a452-7483746e046a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash">
+      <UniqueIdentifier>{61c41364-99b2-4864-a87d-85109fe32b06}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part">
       <UniqueIdentifier>{40aab48f-b6b1-4fe9-80fa-b4ca0ea5dad0}</UniqueIdentifier>
@@ -136,6 +193,12 @@
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\07. TornadoSpinReverse">
       <UniqueIdentifier>{787e47ba-9f50-4b14-8202-9fedb31d5864}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\08. Common_Ring03">
+      <UniqueIdentifier>{ea802e0e-a008-40c2-8690-c4635c1185e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\09. Common_JumpSlash">
+      <UniqueIdentifier>{a7a58fec-6650-4f57-9df6-0b8c82791b61}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\05. Kirby">
       <UniqueIdentifier>{12147d60-e62f-468f-83f3-929d881d4809}</UniqueIdentifier>
     </Filter>
@@ -157,14 +220,38 @@
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State">
       <UniqueIdentifier>{3fb8322f-bbfe-4bc3-963c-2c3d4d80cee2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\00. Camera\AreaCam">
-      <UniqueIdentifier>{712968f4-aac4-4c0d-b936-f670af432abf}</UniqueIdentifier>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState">
+      <UniqueIdentifier>{3ca1c2dd-321f-4630-b372-d441537bdff9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="97. DataSystem\Header">
-      <UniqueIdentifier>{c91d5dbf-3699-4f2f-88b0-29d981fe9ef4}</UniqueIdentifier>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait">
+      <UniqueIdentifier>{8ba40596-ddff-412c-a0bc-883604bd1093}</UniqueIdentifier>
     </Filter>
-    <Filter Include="97. DataSystem\EffectLoader">
-      <UniqueIdentifier>{298374c8-b224-4434-8524-9f3ddac16cd7}</UniqueIdentifier>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Run">
+      <UniqueIdentifier>{9e646af3-48ac-48e3-8513-45d75ec65f43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Jump">
+      <UniqueIdentifier>{3e17907c-bcba-459e-bf79-c4b706ede510}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Fall">
+      <UniqueIdentifier>{90847b7a-deeb-40fd-9d4c-a4fb630d5f56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Hovering">
+      <UniqueIdentifier>{7ab702f2-1ea4-4b6f-abc2-0a8e23722ed6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else">
+      <UniqueIdentifier>{81932a37-a633-4e20-b93d-c5e42826e4f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Attack">
+      <UniqueIdentifier>{1a16a95c-467c-4517-b7e1-f705d612b308}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\AbilityDump">
+      <UniqueIdentifier>{26490427-a373-403b-bd61-8303f0dffa59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\GetAbility">
+      <UniqueIdentifier>{ef199045-e026-474a-9ec3-100f82b3ae9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Damaged">
+      <UniqueIdentifier>{f4dff91e-89fb-4ec2-a836-1510c556d9ab}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\02. Kirby_Ability">
       <UniqueIdentifier>{aec0ec4f-8364-4084-95b0-fba459e158d0}</UniqueIdentifier>
@@ -172,26 +259,8 @@
     <Filter Include="00. GameObject\05. Kirby\02. Kirby_Ability\00. Kirby_Ability_Normal">
       <UniqueIdentifier>{1f1ebec8-785f-4d2a-be62-dc3edc8740d0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\98. Component">
-      <UniqueIdentifier>{fcf4220c-26a5-41a4-910d-b87dadeeb6d4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\98. Component\00. Movement_Kirby">
-      <UniqueIdentifier>{64b46192-c573-43d2-b69c-e80d42acca30}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="97. DataSystem\MapLoader">
-      <UniqueIdentifier>{077c1198-d891-486e-b491-c184ad619dd7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="97. DataSystem\MapLoader\API">
-      <UniqueIdentifier>{09f4e761-18cf-4d6f-a43f-2e1b208fce8b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="99. Defines\Hojun\UI">
-      <UniqueIdentifier>{cd0a7659-a8f0-4741-aa44-321f59e15d07}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\02. EnvObject\Instance">
-      <UniqueIdentifier>{9df9d2af-5f82-4056-9d63-b9f7cc4c1544}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="98. ShaderFiles\Leo">
-      <UniqueIdentifier>{a3345da1-0cb7-4733-ac92-e971f6f0980d}</UniqueIdentifier>
+    <Filter Include="00. GameObject\05. Kirby\02. Kirby_Ability\01. Kirby_Ability_Sword">
+      <UniqueIdentifier>{fcd6a4fd-d852-4910-bb95-c63423f00f06}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts">
       <UniqueIdentifier>{ce8838df-6dca-44f5-99b6-21707344efd7}</UniqueIdentifier>
@@ -208,35 +277,17 @@
     <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat">
       <UniqueIdentifier>{d12eb026-e157-4495-859c-6ae236366e96}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\02. Kirby_Ability\01. Kirby_Ability_Sword">
-      <UniqueIdentifier>{fcd6a4fd-d852-4910-bb95-c63423f00f06}</UniqueIdentifier>
+    <Filter Include="00. GameObject\98. Component">
+      <UniqueIdentifier>{fcf4220c-26a5-41a4-910d-b87dadeeb6d4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState">
-      <UniqueIdentifier>{3ca1c2dd-321f-4630-b372-d441537bdff9}</UniqueIdentifier>
+    <Filter Include="00. GameObject\98. Component\00. Movement_Kirby">
+      <UniqueIdentifier>{64b46192-c573-43d2-b69c-e80d42acca30}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait">
-      <UniqueIdentifier>{8ba40596-ddff-412c-a0bc-883604bd1093}</UniqueIdentifier>
+    <Filter Include="00. GameObject\98. Component\01. Monster_Movement">
+      <UniqueIdentifier>{0ec1c291-b11e-4b89-9dd5-3440689cb4ea}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Run">
-      <UniqueIdentifier>{9e646af3-48ac-48e3-8513-45d75ec65f43}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Jump">
-      <UniqueIdentifier>{3e17907c-bcba-459e-bf79-c4b706ede510}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Fall">
-      <UniqueIdentifier>{90847b7a-deeb-40fd-9d4c-a4fb630d5f56}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else">
-      <UniqueIdentifier>{81932a37-a633-4e20-b93d-c5e42826e4f4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Attack">
-      <UniqueIdentifier>{1a16a95c-467c-4517-b7e1-f705d612b308}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\AbilityDump">
-      <UniqueIdentifier>{26490427-a373-403b-bd61-8303f0dffa59}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Hovering">
-      <UniqueIdentifier>{7ab702f2-1ea4-4b6f-abc2-0a8e23722ed6}</UniqueIdentifier>
+    <Filter Include="00. GameObject\98. Component\01. Monster_Movement\Normal_Monster">
+      <UniqueIdentifier>{83a598f0-f750-4825-b41b-816b07066be9}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster">
       <UniqueIdentifier>{c69f6e1f-9250-40fa-90bd-8d408e832ff0}</UniqueIdentifier>
@@ -253,8 +304,20 @@
     <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\Parts\Weapon">
       <UniqueIdentifier>{0cf226a6-c19e-4947-98cc-1d33fa4cb266}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\98. Component\01. Monster_Movement">
-      <UniqueIdentifier>{0ec1c291-b11e-4b89-9dd5-3440689cb4ea}</UniqueIdentifier>
+    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\Brain">
+      <UniqueIdentifier>{de157200-a056-4301-9a48-587a29b0a7f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State">
+      <UniqueIdentifier>{533932dd-cfb3-4312-9da1-e8b96cec46af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State\Attack">
+      <UniqueIdentifier>{dd408402-1425-42a3-9147-6956e370fb21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State\DoubleAttack">
+      <UniqueIdentifier>{6e258028-c856-4cd6-b619-4b040505f964}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State\TornadoAttack">
+      <UniqueIdentifier>{2b77b7f8-0c0f-4f0b-9910-b472e7bd25f3}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\00. System">
       <UniqueIdentifier>{e318a0dd-87ae-4e91-ab68-74f564cf6724}</UniqueIdentifier>
@@ -274,8 +337,74 @@
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State">
       <UniqueIdentifier>{09d66da9-60df-4b70-88a5-153a30f2860f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="99. Defines\Leo">
-      <UniqueIdentifier>{ca69a650-f542-4ef4-9ce8-1c68bc5ca0a6}</UniqueIdentifier>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Idle">
+      <UniqueIdentifier>{c98b37f0-30aa-4b5a-9fca-09857aa902bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Captured">
+      <UniqueIdentifier>{879257a2-a8e4-4f88-bbb7-30452c0bccde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Fall">
+      <UniqueIdentifier>{5c9cbfda-5036-4183-ad65-eef65efd80d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Landing">
+      <UniqueIdentifier>{0eb470de-c905-4503-be01-b9226fc00a6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockBack">
+      <UniqueIdentifier>{b19624c6-a631-447e-b28c-c98e93b839f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockBack\KnockBackDeath">
+      <UniqueIdentifier>{f45699c1-0279-42f5-8174-aecc983bb4b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockOut">
+      <UniqueIdentifier>{e6dc4f8b-cd12-4921-9312-5328ed43df67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Detect">
+      <UniqueIdentifier>{6e90fbc0-097a-4226-a7d6-84ffb451aefb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Chase">
+      <UniqueIdentifier>{b61cc78e-7768-477a-ac11-d29c9f07603b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Death">
+      <UniqueIdentifier>{a8a873c7-fcc6-4434-8fdd-b289ad07473c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Find">
+      <UniqueIdentifier>{6cd36b1a-1d3e-4d5a-963c-d67b94becb43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Spat">
+      <UniqueIdentifier>{81b0629c-516a-4991-8c17-3bfbd6ecf5e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Attack">
+      <UniqueIdentifier>{765c8d67-517d-476b-ab97-3167b36bc8a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Retreat">
+      <UniqueIdentifier>{bdf27873-c46b-4fc8-bed7-7d19ef211827}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Patrol">
+      <UniqueIdentifier>{6faebe93-9f2f-4af1-bb44-37b816184f2d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\99. Monster_PartBase">
+      <UniqueIdentifier>{de6fdd7b-10fb-45d6-ad3d-ed06421c157b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\99. Monster_PartBase\MonsterHitPart">
+      <UniqueIdentifier>{52230687-b4b4-4dcb-a790-a6981debf236}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\99. Monster_PartBase\MultiHitBoxPart">
+      <UniqueIdentifier>{52e05539-a775-4546-a588-c66fa3116058}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\NormalEnemy">
+      <UniqueIdentifier>{66444ce9-9787-4e31-94d5-04f968389e66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\NormalEnemy\Parts">
+      <UniqueIdentifier>{c4f801b1-7d7f-4110-a9ba-12258e3f85f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\NormalEnemy\Parts\Body">
+      <UniqueIdentifier>{ec28b6dd-3536-48e9-b482-a120c9f9a36a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\NormalEnemy\Brain">
+      <UniqueIdentifier>{f7593e7a-fc6e-4d1d-ab31-8f45704556ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\NormalEnemy\State">
+      <UniqueIdentifier>{05464a2e-8e96-40b9-b818-54149438e5f8}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\97. UI">
       <UniqueIdentifier>{b3062cee-972c-4fb7-87e9-6219b23c53ca}</UniqueIdentifier>
@@ -297,6 +426,9 @@
     </Filter>
     <Filter Include="00. GameObject\97. UI\UIContainer\UI_GaugeBar\KirbyStatus">
       <UniqueIdentifier>{829f9e0b-7ad3-4093-bd7e-05a27371a58e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus">
+      <UniqueIdentifier>{08709ead-b3a1-4623-96c2-e4d2a78ade1e}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\97. UI\UIContainer\Sequence">
       <UniqueIdentifier>{a263c27a-7755-4cd3-9dca-ec5420934708}</UniqueIdentifier>
@@ -361,6 +493,48 @@
     <Filter Include="00. GameObject\96. LevelDesign">
       <UniqueIdentifier>{df77a93d-c3e5-461c-a155-eb275851d047}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible">
+      <UniqueIdentifier>{0b08cdeb-26e4-425e-938d-9db7546894b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\00. Breakable">
+      <UniqueIdentifier>{41ac5899-75d9-43ae-ba35-d15a6f693112}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\02. Ladder">
+      <UniqueIdentifier>{a67d90e6-109a-4bab-91c3-7b56e9af8c93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\04. Food">
+      <UniqueIdentifier>{edf36201-7c52-4f18-a438-5ecb5876228f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\05. Point">
+      <UniqueIdentifier>{f7c44ded-34a6-49f6-8c65-a83f1cbb7c82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\06. Bush">
+      <UniqueIdentifier>{963a97ff-c356-4ff8-9881-d0062ea29e71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\01. Starblock">
+      <UniqueIdentifier>{625b2a42-23dd-43f4-bdce-b4f75040938b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\03. EventObject">
+      <UniqueIdentifier>{cad72eff-ed18-4366-b3fe-facecee465d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Invisible">
+      <UniqueIdentifier>{e71e062d-1cfa-4165-bd2e-41ca3c096f4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Invisible\00. Boundary">
+      <UniqueIdentifier>{b1ef2b61-66ce-4384-abdc-9de318e48fdf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Invisible\03. Portal">
+      <UniqueIdentifier>{f0f1d3be-3b1a-45d2-8dd8-6bb30a3f8bb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Invisible\01. Rail">
+      <UniqueIdentifier>{32387747-e76a-437f-8fc0-28fc7ecd1337}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Invisible\99. Unsupported">
+      <UniqueIdentifier>{88670e70-c815-452c-88eb-8a17ac26a72d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Invisible\02. FallBorder">
+      <UniqueIdentifier>{38e3da55-8b43-4b93-99fb-28d26847d15d}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\07. MiniBoss">
       <UniqueIdentifier>{ab830d26-cbd1-45f8-8412-afec3357e9e4}</UniqueIdentifier>
     </Filter>
@@ -382,98 +556,8 @@
     <Filter Include="00. GameObject\07. MiniBoss\GigantEdge\Brain">
       <UniqueIdentifier>{eb719185-a163-4056-9c87-941873823803}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\98. Component\01. Monster_Movement\Normal_Monster">
-      <UniqueIdentifier>{83a598f0-f750-4825-b41b-816b07066be9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\Brain">
-      <UniqueIdentifier>{de157200-a056-4301-9a48-587a29b0a7f0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State">
-      <UniqueIdentifier>{533932dd-cfb3-4312-9da1-e8b96cec46af}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State\Attack">
-      <UniqueIdentifier>{dd408402-1425-42a3-9147-6956e370fb21}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State\DoubleAttack">
-      <UniqueIdentifier>{6e258028-c856-4cd6-b619-4b040505f964}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\BladeKnight%28Sword%29\State\TornadoAttack">
-      <UniqueIdentifier>{2b77b7f8-0c0f-4f0b-9910-b472e7bd25f3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestParticle">
-      <UniqueIdentifier>{c3b2a3c6-b5a8-4b4a-82ac-7f8fd01b5452}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Idle">
-      <UniqueIdentifier>{c98b37f0-30aa-4b5a-9fca-09857aa902bf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Captured">
-      <UniqueIdentifier>{879257a2-a8e4-4f88-bbb7-30452c0bccde}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Fall">
-      <UniqueIdentifier>{5c9cbfda-5036-4183-ad65-eef65efd80d6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Landing">
-      <UniqueIdentifier>{0eb470de-c905-4503-be01-b9226fc00a6a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockBack">
-      <UniqueIdentifier>{b19624c6-a631-447e-b28c-c98e93b839f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockOut">
-      <UniqueIdentifier>{e6dc4f8b-cd12-4921-9312-5328ed43df67}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\95. Interface">
       <UniqueIdentifier>{3f986a95-5219-485c-8719-2667dcade916}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Detect">
-      <UniqueIdentifier>{6e90fbc0-097a-4226-a7d6-84ffb451aefb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Chase">
-      <UniqueIdentifier>{b61cc78e-7768-477a-ac11-d29c9f07603b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Death">
-      <UniqueIdentifier>{a8a873c7-fcc6-4434-8fdd-b289ad07473c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="97. DataSystem\LevelDesignLoader">
-      <UniqueIdentifier>{ac90f625-f08a-4a8a-89fd-03d9fa0dc850}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\99. Monster_PartBase">
-      <UniqueIdentifier>{de6fdd7b-10fb-45d6-ad3d-ed06421c157b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Find">
-      <UniqueIdentifier>{6cd36b1a-1d3e-4d5a-963c-d67b94becb43}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\99. Monster_PartBase\MonsterHitPart">
-      <UniqueIdentifier>{52230687-b4b4-4dcb-a790-a6981debf236}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\GetAbility">
-      <UniqueIdentifier>{ef199045-e026-474a-9ec3-100f82b3ae9a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Spat">
-      <UniqueIdentifier>{81b0629c-516a-4991-8c17-3bfbd6ecf5e9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Attack">
-      <UniqueIdentifier>{765c8d67-517d-476b-ab97-3167b36bc8a1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Retreat">
-      <UniqueIdentifier>{bdf27873-c46b-4fc8-bed7-7d19ef211827}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\NormalEnemy">
-      <UniqueIdentifier>{66444ce9-9787-4e31-94d5-04f968389e66}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\NormalEnemy\Parts">
-      <UniqueIdentifier>{c4f801b1-7d7f-4110-a9ba-12258e3f85f3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\NormalEnemy\Parts\Body">
-      <UniqueIdentifier>{ec28b6dd-3536-48e9-b482-a120c9f9a36a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\NormalEnemy\Brain">
-      <UniqueIdentifier>{f7593e7a-fc6e-4d1d-ab31-8f45704556ac}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus">
-      <UniqueIdentifier>{08709ead-b3a1-4623-96c2-e4d2a78ade1e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Damaged">
-      <UniqueIdentifier>{f4dff91e-89fb-4ec2-a836-1510c556d9ab}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\07. Boss">
       <UniqueIdentifier>{ab830d26-cbd1-45f8-8412-afec3357e9e4}</UniqueIdentifier>
@@ -514,95 +598,17 @@
     <Filter Include="00. GameObject\07. Boss\Boss\Gorilla\Part\Body">
       <UniqueIdentifier>{dcd3ccef-94f1-455a-a417-3ab2596e5b75}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\06. Monster\99. Monster_PartBase\MultiHitBoxPart">
-      <UniqueIdentifier>{52e05539-a775-4546-a588-c66fa3116058}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Patrol">
-      <UniqueIdentifier>{6faebe93-9f2f-4af1-bb44-37b816184f2d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\NormalEnemy\State">
-      <UniqueIdentifier>{05464a2e-8e96-40b9-b818-54149438e5f8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestMeshParticle">
-      <UniqueIdentifier>{8cd5923d-467a-464c-b4e8-7f7307487329}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestMeshEmitter">
-      <UniqueIdentifier>{d07256ff-a017-43f1-a4ae-0d9b7af3dc98}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Visible">
-      <UniqueIdentifier>{0b08cdeb-26e4-425e-938d-9db7546894b0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Visible\00. Breakable">
-      <UniqueIdentifier>{41ac5899-75d9-43ae-ba35-d15a6f693112}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Visible\02. Ladder">
-      <UniqueIdentifier>{a67d90e6-109a-4bab-91c3-7b56e9af8c93}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Visible\04. Food">
-      <UniqueIdentifier>{edf36201-7c52-4f18-a438-5ecb5876228f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Visible\05. Point">
-      <UniqueIdentifier>{f7c44ded-34a6-49f6-8c65-a83f1cbb7c82}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Visible\06. Bush">
-      <UniqueIdentifier>{963a97ff-c356-4ff8-9881-d0062ea29e71}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Visible\01. Starblock">
-      <UniqueIdentifier>{625b2a42-23dd-43f4-bdce-b4f75040938b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Invisible">
-      <UniqueIdentifier>{e71e062d-1cfa-4165-bd2e-41ca3c096f4a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Invisible\00. Boundary">
-      <UniqueIdentifier>{b1ef2b61-66ce-4384-abdc-9de318e48fdf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Invisible\03. Portal">
-      <UniqueIdentifier>{f0f1d3be-3b1a-45d2-8dd8-6bb30a3f8bb2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Invisible\01. Rail">
-      <UniqueIdentifier>{32387747-e76a-437f-8fc0-28fc7ecd1337}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Invisible\99. Unsupported">
-      <UniqueIdentifier>{88670e70-c815-452c-88eb-8a17ac26a72d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\01. InhaleContainer">
-      <UniqueIdentifier>{75fd20ba-5ae3-4c5f-bf95-b21a0b7e20ad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1">
-      <UniqueIdentifier>{bd114556-93e2-4c7f-a452-7483746e046a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockBack\KnockBackDeath">
-      <UniqueIdentifier>{f45699c1-0279-42f5-8174-aecc983bb4b3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\08. Common_Ring03">
-      <UniqueIdentifier>{ea802e0e-a008-40c2-8690-c4635c1185e3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\09. Common_JumpSlash">
-      <UniqueIdentifier>{a7a58fec-6650-4f57-9df6-0b8c82791b61}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash">
-      <UniqueIdentifier>{61c41364-99b2-4864-a87d-85109fe32b06}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="08. CutsceneActor">
-      <UniqueIdentifier>{95c0b1f2-ac3e-4446-9bd7-5b1c7b84f2c1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="08. CutsceneActor\Gorilla">
-      <UniqueIdentifier>{ef97af82-579e-4774-9fb4-27668458611d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\00. Camera\Cutscene">
-      <UniqueIdentifier>{44ee9036-9fb5-42d3-a001-52dd473415a5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="96. CameraDirector">
-      <UniqueIdentifier>{ac2123fc-d03d-4f44-a7a4-a4fc408e20d9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\07. Boss\BossNamePlate">
       <UniqueIdentifier>{58efb2e3-2e8d-46c9-a255-4e907b51f633}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\07. Boss\BossNamePlate\Gorilla">
       <UniqueIdentifier>{4640c1d8-ee75-4758-a51f-cd0fd9fb282d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\00. Camera\BossCam">
-      <UniqueIdentifier>{2167fc90-1b87-469b-9d86-8fb47e1a8e6d}</UniqueIdentifier>
+    <Filter Include="00. GameObject\08. CutsceneActor">
+      <UniqueIdentifier>{95c0b1f2-ac3e-4446-9bd7-5b1c7b84f2c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\08. CutsceneActor\Gorilla">
+      <UniqueIdentifier>{ef97af82-579e-4774-9fb4-27668458611d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1162,10 +1168,10 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash</Filter>
     </ClInclude>
     <ClInclude Include="..\public\CutsceneActor.h">
-      <Filter>08. CutsceneActor</Filter>
+      <Filter>00. GameObject\08. CutsceneActor</Filter>
     </ClInclude>
     <ClInclude Include="..\public\CutsceneGorilla.h">
-      <Filter>08. CutsceneActor\Gorilla</Filter>
+      <Filter>00. GameObject\08. CutsceneActor\Gorilla</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Camera_Cutscene.h">
       <Filter>00. GameObject\00. Camera\Cutscene</Filter>
@@ -1187,6 +1193,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Boundary.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\00. Boundary</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesign_EventObject.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesign_FallBorder.h">
+      <Filter>00. GameObject\96. LevelDesign\Invisible\02. FallBorder</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1671,10 +1683,10 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash</Filter>
     </ClCompile>
     <ClCompile Include="..\private\CutsceneActor.cpp">
-      <Filter>08. CutsceneActor</Filter>
+      <Filter>00. GameObject\08. CutsceneActor</Filter>
     </ClCompile>
     <ClCompile Include="..\private\CutsceneGorilla.cpp">
-      <Filter>08. CutsceneActor\Gorilla</Filter>
+      <Filter>00. GameObject\08. CutsceneActor\Gorilla</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Camera_Cutscene.cpp">
       <Filter>00. GameObject\00. Camera\Cutscene</Filter>
@@ -1696,6 +1708,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Boundary.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\00. Boundary</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelDesign_EventObject.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelDesign_FallBorder.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Invisible\02. FallBorder</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

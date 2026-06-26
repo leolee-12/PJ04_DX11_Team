@@ -8,6 +8,8 @@
 #include "LevelDesign_Point.h"
 #include "LevelDesign_Bush.h"
 #include "LevelDesign_Boundary.h"
+#include "LevelDesign_FallBorder.h"
+#include "LevelDesign_EventObject.h"
 
 #include <cwctype>
 #include <mutex>
@@ -210,7 +212,7 @@ void CLevelDesign_Registry::Register_Core()
 void CLevelDesign_Registry::Register_Volumes()
 {
 	CLevelDesign_Boundary::Register_LevelDesignSpecs();
-	Register_Unsupported(L"FallBorder", LD_CATEGORY::VOLUME, L"Layer_LevelDesign_Volume");
+	CLevelDesign_FallBorder::Register_LevelDesignSpecs();
 	Register_Unsupported(L"WaterArea", LD_CATEGORY::VOLUME, L"Layer_LevelDesign_Volume");
 }
 
@@ -250,7 +252,7 @@ void CLevelDesign_Registry::Register_EnemiesAndGimmicks()
 	Register_Unsupported(L"TwinkleSwitch", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
 
 	CLevelDesign_Ladder::Register_LevelDesignSpecs();
-
+	CLevelDesign_EventObject::Register_LevelDesignSpecs();
 	Register_Unsupported(L"ArrowBoard", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
 }
 
