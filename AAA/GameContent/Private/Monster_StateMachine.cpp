@@ -34,7 +34,10 @@ _bool CMonster_StateMachine::Change_State(MONSTER_STATE_TYPE eNewState)
         return true;
 
     if (nullptr != m_pCurState)
+    {
         m_pCurState->Exit(eNewState);
+        m_PrevState = m_pCurState->Get_StateType();
+    }
 
     m_pCurState = pNextState;
 
@@ -42,10 +45,10 @@ _bool CMonster_StateMachine::Change_State(MONSTER_STATE_TYPE eNewState)
     {
         m_pOwner->Get_BlackBoard().bActionFinished = false;
         m_pOwner->Get_BlackBoard().bCanTransition = m_pCurState->Is_Interruptible();
-        m_pOwner->Get_BlackBoard().bMoveLocked = false;
+        m_pOwner->Get_BlackBoard().bCanMove = false;
     }
 
-    m_pCurState->Enter();
+    m_pCurState->Enter(m_PrevState);
 
     return true;
 }

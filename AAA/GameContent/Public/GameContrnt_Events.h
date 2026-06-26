@@ -23,7 +23,7 @@ namespace Client
         inline constexpr const _tchar* Boss_Died = L"Boss.Died";
 
         inline constexpr const _tchar* Cutscene_GorillaAppear = L"Cutscene.GorillaAppear";   // Æ®¸®°Å ¹ßµ¿
-        inline constexpr const _tchar* Cutscene_GrabKirby = L"Cutscene.GrabKirby";           // Ä¿ºñ ÄÆ¾ÀÀ§Ä¡·Î
+        inline constexpr const _tchar* Cutscene_GrabKirby =    L"Cutscene.GrabKirby";           // Ä¿ºñ ÄÆ¾ÀÀ§Ä¡·Î
         inline constexpr const _tchar* Cutscene_ReleaseKirby = L"Cutscene.ReleaseKirby";     
         inline constexpr const _tchar* Cutscene_CameraChange = L"Cutscene.CameraChange";
         inline constexpr const _tchar* Cutscene_GorillaHandoff = L"Cutscene.GorillaHandoff";
@@ -40,6 +40,7 @@ namespace Client
     inline constexpr const _tchar* EVT_QUERY_BOSS = L"Query_Boss";
 
     enum class ECutsceneCam { Cutscene, Boss };
+    enum class GRAB_TYPE : _uint{ GORILLA_SCENE, GORILLA_COMBAT, _COUNT };
 
     struct CUTSCENE_CAMERA_DESC
     {
@@ -55,6 +56,7 @@ namespace Client
     {
         const _float4x4* pBoneMatrix = { nullptr }; 
         const _float4x4* pSourceWorld = { nullptr };
+        GRAB_TYPE  eType = { GRAB_TYPE::_COUNT };
     };
 
     struct PLAYER_QUERY { CGameObject* pPlayer = { nullptr }; };

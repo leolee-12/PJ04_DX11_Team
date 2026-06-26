@@ -32,6 +32,8 @@ void CKirby_State::Exit(CKirby* pKirby)
 
 void CKirby_State::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
 {
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Apply_Knockback(tInfo.vAttackerPos, tInfo.fKnockback * 5.f, tInfo.fKnockback * 1.5f);
     pKirby->Change_State(KIRBY_STATE_TYPE::DAMAGED);
 }
 
@@ -92,6 +94,27 @@ _bool CKirby_State::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
     // 전역 처리
 
     return false;
+}
+
+void CKirby_State::Request_GrabState(CKirby* pKirby, GRAB_TYPE eType)
+{
+    switch (eType)
+    {
+        case GRAB_TYPE::GORILLA_SCENE:
+        {
+            pKirby->Change_State(KIRBY_STATE_TYPE::CUTSCENE_GRABBED);
+            break;
+        }
+        case GRAB_TYPE::GORILLA_COMBAT:
+        {
+            pKirby->Change_State(KIRBY_STATE_TYPE::QTE_GRABBED);
+            break;
+        }
+    }
+}
+
+void CKirby_State::Request_ReleaseGrabState(CKirby* pKirby, GRAB_TYPE eType)
+{
 }
 
 void CKirby_State::Free()

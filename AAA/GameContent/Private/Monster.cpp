@@ -108,6 +108,9 @@ void CMonster::On_Deserialized()
 {
 	if (nullptr != m_pMovement)
 		m_pMovement->Sync_To_Controller();
+
+	// 스폰 위치를 기억해뒀다가 사용
+	XMStoreFloat3(&m_vBasePos, m_pTransformCom->Get_State(STATE::POSITION));
 }
 
 void CMonster::Set_Target(CGameObject* pTarget)
@@ -115,7 +118,13 @@ void CMonster::Set_Target(CGameObject* pTarget)
 	m_BlackBoard.pTarget = pTarget;
 
 	if (nullptr == pTarget)
-		m_BlackBoard = MONSTER_BLACKBOARD{};
+	{
+		m_BlackBoard.bCanSeeTarget = false;
+		m_BlackBoard.fDistToTarget = FLT_MAX;
+		m_BlackBoard.fDistToTargetXZ = FLT_MAX;
+		m_BlackBoard.fHeightToTarget = 0.f;
+		m_BlackBoard.vDirToTargetXZ = {};
+	}
 }
 
 _bool CMonster::Can_BeInhaled(const INHALE_QUERY& q) const
@@ -369,7 +378,7 @@ HRESULT CMonster::Ready_AI()
 	return S_OK;
 }
 
-void CMonster::Check_AirborneReflex()
+void CMonster::Check_AirborneReflex(_float fTimeDelta)
 {
 	if (nullptr == m_pStateMachine || nullptr == m_pMovement)
 		return;
@@ -381,12 +390,25 @@ void CMonster::Check_AirborneReflex()
 	if (eState == MONSTER_STATE_TYPE::FALL || eState == MONSTER_STATE_TYPE::LANDING ||
 		eState == MONSTER_STATE_TYPE::CAPTURED || eState == MONSTER_STATE_TYPE::KNOCK_OUT ||
 		eState == MONSTER_STATE_TYPE::KNOCK_BACK_DEATH)
+	{
+		m_fAirborneTimer = 0.f;
 		return;
+	}
 
-	if (m_pMovement->Is_Bouncing())				// 바운스 중 -> FALL 막고 현 상태 유지
-		return;						
+	if (m_pMovement->Is_Bouncing())                         
+	{
+		m_fAirborneTimer = 0.f;
+		return;
+	}
 
-	if (!m_pMovement->Is_Grounded() && m_pMovement->Get_VerticalVelocity() < 0.f)
+	if (m_pMovement->Is_Grounded() || m_pMovement->Get_VerticalVelocity() >= 0.f)
+	{
+		m_fAirborneTimer = 0.f;
+		return;
+	}
+
+	m_fAirborneTimer += fTimeDelta;
+	if (m_fAirborneTimer >= s_fCoyoteTime)
 		Change_State(MONSTER_STATE_TYPE::FALL);
 }
 
@@ -571,14 +593,14 @@ void CMonster::Update_AI(_float fTimeDelta)
 
 	// Brain이 상태 변경 판단
 	if (nullptr != m_pBrain)
-		m_pBrain->Decide(this, m_BlackBoard, fTimeDelta);
+		m_pBrain->Decide(m_BlackBoard, fTimeDelta);
 
 	// 현재 State 실행
 	if (nullptr != m_pStateMachine)
 		m_pStateMachine->Update_StateMachine(fTimeDelta);
 	
 	// STATE::FALL 로 전환하는 체크 함수
-	Check_AirborneReflex();
+	Check_AirborneReflex(fTimeDelta);
 
 	if (bEditMode)
 	{

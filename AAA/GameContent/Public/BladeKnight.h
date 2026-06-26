@@ -45,7 +45,7 @@ public:
 	
 	virtual _float				Get_CapsuleRadius() const override { return 0.5f; }
 	virtual _float				Get_CapsuleHeight() const override { return 1.f; }
-	virtual _float				Get_InteractRadius() const override { return 10.f; }
+	virtual _float				Get_InteractRadius() const override { return (m_iAIType == 0) ? 15.f : 10.f; }
 	virtual _bool				Get_HurtBoxDesc(CAPSULE_DESC& Out) const override;
 
 	virtual CAnimator*			Get_BodyAnimator() const override;
@@ -72,7 +72,7 @@ private:
 	CBladeKnight_Body*			m_pBody = { nullptr };
 	CBladeKnight_Sword*			m_pSword = { nullptr };
 
-	_int						m_iAIType = { 1 };		// 0은 고정형, 1은 자유 이동형
+	_int						m_iAIType = { 0 };		// 0은 고정형, 1은 자유 이동형
 
 	_bool						m_bIdleOverlayOn = { false };
 

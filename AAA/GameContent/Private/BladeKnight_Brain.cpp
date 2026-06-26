@@ -23,19 +23,21 @@ void CBladeKnight_Brain::Decide_Internal(const MONSTER_BLACKBOARD& BlackBoard, _
 
 	CBladeKnight* pBladeKnight = static_cast<CBladeKnight*>(m_pOwner);
 
+	const _int iAIType = pBladeKnight->Get_AIType();
+
 	const _float fAbsHeight = fabsf(BlackBoard.fHeightToTarget);
-	const _bool bAttackable = BlackBoard.fDistToTargetXZ <= 2.f && fAbsHeight < 0.6f;
-	const _bool bChaseable = fAbsHeight <= 1.5f;
+	const _bool bAttackable = (iAIType == 1) ? (BlackBoard.fDistToTargetXZ <= 2.f && fAbsHeight < 3.f) : fAbsHeight < 5.f;
+	const _bool bChaseable = (iAIType == 1) ? (fAbsHeight <= 1.5f) : false;
 
 	const MONSTER_STATE_TYPE eCurState = m_pOwner->Get_StateType();
 
 	if (bAttackable)
 	{
-		m_pOwner->Change_State(Pick_AttackState(pBladeKnight->Get_AIType()));
+		m_pOwner->Change_State(Pick_AttackState(iAIType));
 		return;
 	}
 
-	if (bChaseable && pBladeKnight->Get_AIType() == 1)	// 1은 자유 이동형
+	if (bChaseable && iAIType == 1)	// 1은 자유 이동형
 	{
 		if (eCurState != MONSTER_STATE_TYPE::CHASE)
 			pBladeKnight->Change_State(MONSTER_STATE_TYPE::CHASE);

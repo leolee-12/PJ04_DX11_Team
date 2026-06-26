@@ -21,7 +21,9 @@ enum class KIRBY_STATE_TYPE
 	ATTACK,
 	HOVERING,
 	GET_ABILITY, ABILITY_DUMP,
-	DAMAGED
+	DAMAGED,
+	GUARD,
+	CUTSCENE_GRABBED, QTE_GRABBED,
 };
 
 class CLIENT_DLL CKirby_State abstract : public CBase
@@ -54,6 +56,10 @@ protected:
 
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand);
+
+public:
+	virtual void Request_GrabState(CKirby* pKirby, GRAB_TYPE eType);
+	virtual void Request_ReleaseGrabState(CKirby* pKirby, GRAB_TYPE eType);
 
 protected:
 	virtual void Free() override;

@@ -63,11 +63,13 @@ private:
     static constexpr const _char* s_Intro[] = {
           "CatchSuccessB", "CatchSuccessWait", "CatchRelease", "Roar"
     };
+    static constexpr const _char* GRAB_BONE = "RHaveL";
 
 private:
     void Tick_OpeningCatch();                    
     void Fire_CatchCamera(const _tchar* szTrack);
     void Begin_AnimFreeze(_float fSeconds);
+    void Fire_Grab();
 
 public:
     static CBoss_Gorilla* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

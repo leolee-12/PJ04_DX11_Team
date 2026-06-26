@@ -1,5 +1,6 @@
 #include "Monster_State_Idle.h"
 #include "Monster.h"
+#include "Monster_Movement.h"
 
 HRESULT CMonster_State_Idle::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpeed)
 {
@@ -16,7 +17,7 @@ MONSTER_STATE_TYPE CMonster_State_Idle::Get_StateType()
 	return MONSTER_STATE_TYPE::IDLE;
 }
 
-void CMonster_State_Idle::Enter()
+void CMonster_State_Idle::Enter(MONSTER_STATE_TYPE ePrevState)
 {
 	if (m_pOwner == nullptr)
 		return;
@@ -29,6 +30,12 @@ void CMonster_State_Idle::Update(_float fTimeDelta)
 {
 	if (m_pOwner == nullptr)
 		return;
+
+	const MONSTER_BLACKBOARD& BB = m_pOwner->Get_BlackBoard();
+	if (m_pOwner != nullptr && nullptr != BB.pTarget && BB.fDistToTargetXZ > s_fFaceDeadZoneXZ)
+	{
+		m_pMovement->Face_Smooth(XMLoadFloat3(&BB.vTargetPos), fTimeDelta);
+	}
 }
 
 void CMonster_State_Idle::Exit(MONSTER_STATE_TYPE eNextState)

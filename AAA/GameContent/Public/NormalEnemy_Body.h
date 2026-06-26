@@ -1,6 +1,10 @@
 #pragma once
 #include "MonsterPart.h"
 
+NS_BEGIN(Engine)
+class CTexture;
+NS_END
+
 NS_BEGIN(Client)
 
 class CNormalEnemy_Body final : public CMonsterPart
@@ -24,6 +28,7 @@ private:
 	virtual HRESULT				Initialize_Prototype() override;
 	virtual HRESULT				Initialize(void* pArg) override;
 
+	virtual void				Update(_float fTimeDelta) override;
 	virtual HRESULT				Render() override;                  // 특수 렌더 필요 시 자식이 오버라이드
 
 public:
@@ -32,12 +37,23 @@ public:
 		pOutData->strPrototypeTag = PROTOTYPE_TAG;
 	}
 
+	void						Set_Eye(_uint iIndex) { m_iEyeIndex = (iIndex < EYE_COUNT) ? iIndex : 0; }
+	_uint						Get_Eye() const { return m_iEyeIndex; }
+
 private:
 	virtual HRESULT				Ready_Components() override;
 
 public:
 	static CNormalEnemy_Body*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject*		Clone(void* pArg) override;
+
+private:
+	static constexpr _uint		EYE_COUNT = { 5 };
+	CTexture*					m_pEyeTextureCom = { nullptr };
+	_uint						m_iEyeIndex = { 0 }; // 총 5개 (OPEN, HALF_CLOSED, CLOSED, HIDDEN, SHARPED)
+
+	// 임시 
+	_float                      m_fEyeTestTimer = { 0.f };
 
 protected:
 	virtual void				Free() override;

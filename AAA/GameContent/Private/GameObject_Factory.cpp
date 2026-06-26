@@ -27,6 +27,7 @@
 #include "UI_LoadingCurtain.h"
 #include "UI_FadeIn.h"
 #include "UI_BossStatus.h"
+#include "UI_FlashCurtain.h"
 
 // UI Parts
 #include "UI_Image.h"
@@ -74,6 +75,8 @@
 #include "BladeKnight_Sword.h"
 #include "NormalEnemy.h"
 #include "NormalEnemy_Body.h"
+#include "Kabu.h"
+#include "Kabu_Body.h"
 
 //Miniboss
 #include "GigantEdge.h"
@@ -181,8 +184,6 @@ void CGameObject_Factory::Register_UI()
     Register(CUI_CurtainTexture::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
         CREATOR(CUI_CurtainTexture),
         LOADER());
-
-
 }
 
 void CGameObject_Factory::Register_Camera()
@@ -446,6 +447,23 @@ void CGameObject_Factory::Register_Container()
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
+
+    // 3. Kabu
+    Register
+    (
+        CKabu::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CKabu),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKabu_Body::PROTOTYPE_TAG, CKabu_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Kabu_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Kabu/Kabu.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
+
 }
 
 void CGameObject_Factory::Register_UIContainer()
@@ -503,6 +521,11 @@ void CGameObject_Factory::Register_UIContainer()
         CREATOR(CUI_BossStatus),
         LOADER()
     );
+
+    Register(CUI_FlashCurtain::PROTOTYPE_TAG,
+        TEXT("UI_CONTAINER"),
+        CREATOR(CUI_FlashCurtain),
+        LOADER());
 }
 
 void CGameObject_Factory::Register_NonAnimObject()

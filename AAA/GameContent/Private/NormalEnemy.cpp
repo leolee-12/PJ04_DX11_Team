@@ -19,8 +19,13 @@
 #include "Monster_State_KnockBack.h"
 #include "Monster_State_KnockOut.h"
 #include "Monster_State_Spat.h"
+#include "Monster_State_KnockBackDeath.h"
+#include "Monster_State_Patrol.h"
 
 // 전용 상태
+#include "NormalEnemy_State_Find.h"
+#include "NormalEnemy_State_Chase.h"
+#include "NormalEnemy_State_Brake.h"
 
 CNormalEnemy::CNormalEnemy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster { pDevice, pContext }
@@ -42,6 +47,16 @@ HRESULT CNormalEnemy::Initialize(void* pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
+
+	m_eCopyAbility = COPY_ABILITY_TYPE::NONE;
+
+	m_iAIType = 1 ;		// 테스트 0 : 고정 (IDLE<->FIND) / 1 : 자유형 (IDLE<->PATROL)
+
+	if (m_pTransformCom)
+		m_pTransformCom->Set_RotationPerSec(360.f);
+
+	// 직렬화 없을 때 사용할 임시 코드 
+	XMStoreFloat3(&m_vBasePos, m_pTransformCom->Get_State(STATE::POSITION));
 
 	return S_OK;
 }
@@ -94,6 +109,7 @@ HRESULT CNormalEnemy::Ready_State(CMonster_StateMachine* pStateMachine)
 
 	// State Idle
 	ANI_PLAY_INFO Info{};
+
 	Info.strAniName = "Wait";
 	Info.bLoop = true;
 	Info.fSpeed = 2.0f;
@@ -101,25 +117,96 @@ HRESULT CNormalEnemy::Ready_State(CMonster_StateMachine* pStateMachine)
 	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CMonster_State_Idle::Create(Info))))
 		return E_FAIL;
 	
-	// State Detect
+	// State Detect - 애니메이션 자체에 CHASE로의 전이가 고정되어 있음
 	Info.strAniName = "Find";
-	Info.bLoop = true;
-	Info.fSpeed = 1.0f;
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::DETECT, CMonster_State_Idle::Create(Info))))
+	Info.bLoop = false;
+	Info.fSpeed = 1.25f;
+
+	CMonster_State_Detect* pState = CMonster_State_Detect::Create(Info);
+	if (pState == nullptr)
+		return E_FAIL;
+	pState->Set_NextState(MONSTER_STATE_TYPE::CHASE);
+
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::DETECT, pState)))
 		return E_FAIL;
 
 	// State Fall 
+	Info.strAniName = "Fall";
+	Info.bLoop = true;
+	Info.fSpeed = 1.5f;
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::FALL, CMonster_State_Fall::Create(Info))))
+		return E_FAIL;
 
 	// State Landing
+	Info.strAniName = "Landing";
+	Info.bLoop = false;
+	Info.fSpeed = 1.25f;
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::LANDING, CMonster_State_Landing::Create(Info))))
+		return E_FAIL;
 
 	// State KnockBack
+	Info.strAniName = "Damage";
+	Info.bLoop = false;
+	Info.fSpeed = 2.0f;
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK, CMonster_State_KnockBack::Create(Info))))
+		return E_FAIL;
+
+	// State KnockBackDeath
+	Info.strAniName = "Damage";
+	Info.bLoop = false;
+	Info.fSpeed = 2.0f;
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK_DEATH, CMonster_State_KnockBackDeath::Create(Info))))
+		return E_FAIL;
 
 	// State KnockOut
+	Info.strAniName = "Damage";
+	Info.bLoop = false;
+	Info.fSpeed = 2.0f;
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_OUT, CMonster_State_KnockOut::Create(Info))))
+		return E_FAIL;
 
 	// State Captured
+	Info.strAniName = "Damage";
+	Info.bLoop = true;
+	Info.fSpeed = 1.25f;
+
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
+		return E_FAIL;
 
 	// State Spat
+	Info.strAniName = "Damage";
+	Info.bLoop = true;
+	Info.fSpeed = 1.f;
 
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::SPAT, CMonster_State_Spat::Create(Info))))
+		return E_FAIL;
+
+	// State Patrol 
+	Info.strAniName = "Walk";
+	Info.bLoop = true;
+	Info.fSpeed = 1.5f;
+
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::PATROL, CMonster_State_Patrol::Create(Info, 2.f))))
+		return E_FAIL;
+
+	// 전용 상태
+	// State Chase 
+	Info.strAniName = "Run";
+	Info.bLoop = true;
+	Info.fSpeed = 1.25f;
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CHASE, CNormalEnemy_State_Chase::Create(Info, 4.0f))))
+		return E_FAIL;
+
+	// State Brake (Chase의 이동속도와 동일하게 설정)
+	Info.strAniName = "Brake";
+	Info.bLoop = false;
+	Info.fSpeed = 1.5f;
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::BRAKE, CNormalEnemy_State_Brake::Create(Info, 4.0f))))
+		return E_FAIL;
+
+	// State Find
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::FIND, CNormalEnemy_State_Find::Create())))
+		return E_FAIL;
 
 	return S_OK;
 }

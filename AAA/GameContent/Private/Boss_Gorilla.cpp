@@ -66,7 +66,7 @@ void CBoss_Gorilla::Update(_float fTimeDelta)
 
 CMonsterBrain* CBoss_Gorilla::Create_Brain()
 {
-    return CBoss_Gorilla_Brain::Create();
+    return CBoss_Gorilla_Brain::Create(this);
 }
 
 void CBoss_Gorilla::Play_Intro()
@@ -75,6 +75,8 @@ void CBoss_Gorilla::Play_Intro()
     m_bIntroDone = false;
     if (CAnimator* pAnim = Get_BodyAnimator())
         pAnim->Play(s_Intro[0], false, true, 0.2f, 1.5f);
+
+    Fire_Grab();
 }
 
 _bool CBoss_Gorilla::Is_Intro_Finished() const
@@ -215,6 +217,18 @@ void CBoss_Gorilla::Fire_CatchCamera(const _tchar* szTrack)
     cam.pProgress = Get_BodyAnimator();                      // 현재 잡기 클립 진행도
     cam.pAnchorWorld = m_pTransformCom->Get_WorldMatrixPtr();   // 전투 고릴라 월드(라이브)
     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+}
+
+void CBoss_Gorilla::Fire_Grab()
+{
+    if (nullptr == m_pBody)
+        return;
+
+    CUTSCENE_GRAB_DESC grab{};
+    grab.pBoneMatrix = m_pBody->Get_BoneMatrixPtr(GRAB_BONE);          
+    grab.pSourceWorld = m_pTransformCom->Get_WorldMatrixPtr();         
+    grab.eType = GRAB_TYPE::GORILLA_COMBAT;
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GrabKirby, &grab);
 }
 
 void CBoss_Gorilla::Begin_AnimFreeze(_float fSeconds)

@@ -50,7 +50,7 @@ void CGigantEdge::Update(_float fTimeDelta)
 
 CMonsterBrain* CGigantEdge::Create_Brain()
 {
-    return CGigantEdge_Brain::Create();
+    return CGigantEdge_Brain::Create(this);
 }
 
 CAnimator* CGigantEdge::Get_BodyAnimator() const

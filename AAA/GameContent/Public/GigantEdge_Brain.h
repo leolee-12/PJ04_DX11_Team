@@ -13,17 +13,18 @@ class CGigantEdge_Brain final : public CMonsterBrain
 private:
     CGigantEdge_Brain() = default;
     virtual ~CGigantEdge_Brain() = default;
-    HRESULT Initialize();
+    HRESULT Initialize(CMonster* pOwner);
 
 public:
-    virtual void Decide(CMonster* pMonster, const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta) override;
+    virtual void Decide(const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta) override;
 
 public:
-    static CGigantEdge_Brain* Create();
+    static CGigantEdge_Brain* Create(CMonster* pOwner);
     virtual void Free() override;
+    
+    CGigantEdge* Owner() const;
 
 private:
     CBehaviorTree* m_pBT = { nullptr };
-    CGigantEdge* m_pOwner = { nullptr };
 };
 NS_END
