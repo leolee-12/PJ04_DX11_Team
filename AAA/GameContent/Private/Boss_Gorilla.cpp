@@ -227,6 +227,7 @@ void CBoss_Gorilla::Fire_Grab()
     CUTSCENE_GRAB_DESC grab{};
     grab.pBoneMatrix = m_pBody->Get_BoneMatrixPtr(GRAB_BONE);          
     grab.pSourceWorld = m_pTransformCom->Get_WorldMatrixPtr();         
+    grab.eType = GRAB_TYPE::GORILLA_COMBAT;
     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GrabKirby, &grab);
 }
 

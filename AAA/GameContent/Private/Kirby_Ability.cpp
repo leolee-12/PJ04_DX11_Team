@@ -38,6 +38,8 @@ HRESULT CKirby_Ability::Initialize()
 
     Set_FullBodyAni(ABILITY_ANI::DAMAGED, "Damage", false, false, 0.1f, 1.5f);
 
+    Set_FullBodyAni(ABILITY_ANI::GUARD, "Guard", true, true, 0.1f, 1.8f);
+
     return S_OK;
 }
 

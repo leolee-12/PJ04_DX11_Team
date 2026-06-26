@@ -89,7 +89,7 @@ public:
 
 	// Part
 	CKirby_Body* Get_Body() { return m_pBody; }
-	void OnOffParts(COPY_ABILITY_TYPE eAbilityType, _bool fOn);
+	void OnOffParts(COPY_ABILITY_TYPE eAbilityType, _bool bOn, _bool bOnlyWeapon = false);
 	CKirby_OnOffPart* Find_OnOffPart(const wchar_t* PartTag);
 
 	// Movement

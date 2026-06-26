@@ -37,7 +37,9 @@ public:
 
 public:
 	void  On_Damaged_KirbyStateMachine(const ATTACK_INFO& tInfo);
-	void Request_CutsceneGrab();
+
+	void Request_GrabState_StateMachine(GRAB_TYPE eType);
+	void Request_ReleaseGrabState_StateMachine(GRAB_TYPE eType = GRAB_TYPE::_COUNT);
 
 private:
 	CKirby* m_pKirby{};
