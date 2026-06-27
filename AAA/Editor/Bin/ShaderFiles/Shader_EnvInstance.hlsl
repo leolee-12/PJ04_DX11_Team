@@ -16,6 +16,9 @@ float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
 
 uint g_iMaterialID = 0;
 
+Texture2D g_DepthTexture;
+float g_fDecalAlpha = 1.f;
+
 // 0=TEXCOORD0, 1=TEXCOORD1, 2=TEXCOORD2, 3=TEXCOORD3
 uint g_iUVIndex = 0;
 float4 g_vUVTransform = float4(1.f, 1.f, 0.f, 0.f);
@@ -404,6 +407,20 @@ PS_OUT PS_DISCARD(PS_IN In)
     return (PS_OUT)0;
 }
 
+float4 PS_DECAL(PS_IN In) : SV_TARGET0 // 알베도만
+{
+    float2 suv;
+    suv.x = In.vProjPos.x / In.vProjPos.w * 0.5f + 0.5f;
+    suv.y = In.vProjPos.y / In.vProjPos.w * -0.5f + 0.5f;
+    float decalDepth = In.vProjPos.z / In.vProjPos.w;
+    float sceneDepth = g_DepthTexture.Sample(PointSampler, suv).x;
+    if (decalDepth > sceneDepth + 0.0005f)
+        discard;
+
+    float4 col = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    return float4(col.rgb, col.a * g_fDecalAlpha);
+}
+
 technique11 DefaultTechnique
 {
     pass SHADOW // 0
@@ -515,5 +532,14 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DISCARD();
+    }
+    pass Decal_Pass // 11
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetBlendState(BS_Decal, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN(); // 인스턴스 VS 그대로
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DECAL();
     }
 }

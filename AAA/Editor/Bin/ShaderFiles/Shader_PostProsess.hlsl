@@ -262,7 +262,7 @@ float4 PS_SSR(PS_IN In) : SV_TARGET0
     float ao = mra.b;
     
     uint matID = (uint) round(mra4.a * 255.f);
-    bool bWater = (matID == MAT_WATER);
+    bool bWater = false;
 
     float3 albedo = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord).rgb;
     float3 worldN = normalize(g_NormalTexture.Sample(PointSampler, In.vTexcoord).xyz * 2.f - 1.f);

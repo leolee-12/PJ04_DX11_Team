@@ -112,20 +112,6 @@ float ViewZFromDepth(float2 uv, float ndcZ)
     return p.z / p.w;
 }
 
-// 복원헬퍼
-float3 RecoverWorldPos(float2 uv, float depthZ)
-{
-    float4 p;
-    p.x = uv.x * 2.f - 1.f;
-    p.y = uv.y * -2.f + 1.f;
-    p.z = depthZ; 
-    p.w = 1.f;
-    p = mul(p, g_ProjMatrixInverse); 
-    p /= p.w; 
-    p = mul(float4(p.xyz, 1.f), g_ViewMatrixInverse); 
-    return p.xyz;
-}
-
 float3 CookTorrance(float3 N, float3 V, float3 L, float3 albedo, float metallic, float roughness, float3 radiance)
 {
     roughness = clamp(roughness, 0.04f, 1.f);
@@ -157,9 +143,11 @@ float4 PS_MAIN_DIRECTIONAL(PS_IN In) : SV_TARGET0
     float4 dd = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
     float3 albedo = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord).rgb;
     float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    
+    albedo *= min(mra.b + float3(0.64f, 0.62f, 0.51f), 1.f);
 
     float3 N = normalize(nd.xyz * 2.f - 1.f);
-    float3 wp = RecoverWorldPos(In.vTexcoord, dd.x);
+    float3 wp = RecoverWorldPos(In.vTexcoord, dd.x, g_ProjMatrixInverse, g_ViewMatrixInverse);
     float3 V = normalize(g_vCamPosition.xyz - wp);
     float3 L = normalize(-g_vLightDir.xyz);
 
@@ -174,9 +162,11 @@ float4 PS_MAIN_POINT(PS_IN In) : SV_TARGET0
     float4 dd = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
     float3 albedo = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord).rgb;
     float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    
+    albedo *= min(mra.b + float3(0.64f, 0.62f, 0.51f), 1.f);
 
     float3 N = normalize(nd.xyz * 2.f - 1.f);
-    float3 wp = RecoverWorldPos(In.vTexcoord, dd.x);
+    float3 wp = RecoverWorldPos(In.vTexcoord, dd.x, g_ProjMatrixInverse, g_ViewMatrixInverse);
     float3 V = normalize(g_vCamPosition.xyz - wp);
 
     float3 Lvec = g_vLightPos.xyz - wp;
@@ -203,13 +193,15 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     float4 nd = g_NormalTexture.Sample(LinearSampler, In.vTexcoord);
     float3 N = normalize(nd.xyz * 2.f - 1.f);
     float4 ddA = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
-    float3 wpA = RecoverWorldPos(In.vTexcoord, ddA.x);
+    float3 wpA = RecoverWorldPos(In.vTexcoord, ddA.x, g_ProjMatrixInverse, g_ViewMatrixInverse);
     float3 V = normalize(g_vCamPosition.xyz - wpA);
     float NdotV = saturate(dot(N, V));
 
     float metallic = mra.r;
     float roughness = mra.g;
     float ao = mra.b;
+    
+    albedoA.rgb *= min(mra.b + float3(0.64f, 0.62f, 0.51f), 1.f);
 
     float3 F0 = lerp(0.04f, albedoA.rgb, metallic);
     float3 kS = Fresnel_Rough(F0, NdotV, roughness);
@@ -220,10 +212,7 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     irradiance = lerp(lum.xxx, irradiance, g_fAmbientSaturation);
     float3 skyIBL = irradiance * g_fIBLIntensity;
 
-    float3 warmAmbient = g_vLightAmbient.rgb;
-
-    // 하늘바운스 + 따뜻한앰비언트 를 합쳐서 albedo x kD 에 적용
-    float3 ambientLight = skyIBL + warmAmbient;
+    float3 ambientLight = skyIBL;
     float occ = ao * g_SSAOTexture.Sample(LinearSampler, In.vTexcoord).r;
     float occLifted = lerp(0.2f, 1.f, occ); // 0.2 = 바닥(나중에 글로벌화 가능)
     float3 ambient = albedoA.rgb * kD * ambientLight * occLifted;
@@ -231,7 +220,7 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
 
       /* 그림자 */
     float4 dd = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
-    float3 wp = RecoverWorldPos(In.vTexcoord, dd.x);
+    float3 wp = RecoverWorldPos(In.vTexcoord, dd.x, g_ProjMatrixInverse, g_ViewMatrixInverse);
     float4 lc = mul(float4(wp, 1.f), g_ShadowLightViewMatrix);
     lc = mul(lc, g_ShadowLightProjMatrix);
     float2 suv = float2(lc.x / lc.w * 0.5f + 0.5f, lc.y / lc.w * -0.5f + 0.5f);
