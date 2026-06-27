@@ -123,6 +123,8 @@ struct ENV_RENDER_DESC
 	_bool   bUseCullDistance = { false };
 	_bool	bUseCullFrustum = { true };
 	_bool   bUseNearDistAlpha = { false };
+	_bool	bIsDecal = { false };
+
 	_float  fNearDistAlphaLengthRate = { 1.f };
 	wstring strLayerName;
 	_uint   iHideFlag = {};
@@ -248,6 +250,7 @@ struct ENV_INSTANCE_BATCH_HANDLE
 {
 	_uint iMainBatchIndex = INVALID_INDEX;
 	_uint iShadowBatchIndex = INVALID_INDEX;
+	_uint iDecalBatchIndex = INVALID_INDEX;
 };
 
 NS_END

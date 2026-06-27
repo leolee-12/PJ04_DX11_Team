@@ -21,6 +21,17 @@ ENV_INSTANCE_BATCH_HANDLE CEnv_InstanceController::Register_BatchesForDesc(const
 	if (tDesc.wstrModelProtoTag.empty())
 		return tHandle;
 
+	if (tDesc.tRender.bIsDecal)
+	{
+		ENV_INSTANCE_KEY tDecalKey{};
+		tDecalKey.iModelProtoLevel = tDesc.iModelProtoLevel;
+		tDecalKey.wstrModelProtoTag = tDesc.wstrModelProtoTag;
+		tDecalKey.eRenderID = RENDERID::DECAL;
+		tHandle.iDecalBatchIndex = FindOrCreate_BatchIndex(tDecalKey);
+
+		return tHandle;
+	}
+
 	ENV_INSTANCE_KEY tMainKey{};
 	tMainKey.iModelProtoLevel = tDesc.iModelProtoLevel;
 	tMainKey.wstrModelProtoTag = tDesc.wstrModelProtoTag;
@@ -79,6 +90,30 @@ _bool CEnv_InstanceController::Submit_Shadow(_uint iBatchIndex, CEnvObject_Stati
 	{
 		pBatch->Set_RegisteredThisFrame(true);
 		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pBatch);
+	}
+
+	return true;
+}
+
+_bool CEnv_InstanceController::Submit_Decal(_uint iBatchIndex, CEnvObject_Static* pObj)
+{
+	if (nullptr == pObj)
+		return false;
+
+	if (INVALID_INDEX == iBatchIndex || iBatchIndex >= m_Batches.size())
+		return false;
+
+	CEnv_InstanceBatch* pBatch = m_Batches[iBatchIndex];
+	if (nullptr == pBatch)
+		return false;
+
+	const _uint64 iCurrentFrame = m_pGameInstance_Proxy->Get_FrameIndex();
+	pBatch->Submit(pObj, iCurrentFrame);
+
+	if (!pBatch->Is_RegisteredThisFrame())
+	{
+		pBatch->Set_RegisteredThisFrame(true);
+		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::DECAL, pBatch);
 	}
 
 	return true;
