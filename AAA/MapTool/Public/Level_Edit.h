@@ -13,6 +13,7 @@ class CLumia;
 class CMapStage;
 class CMapSection;
 class CMap_EditSession;
+class CEnv_InstanceController;
 NS_END
 
 NS_BEGIN(MapTool)
@@ -121,6 +122,7 @@ private:
 	// Map
 	unordered_set<CGameObject*> m_MapPreviewObjects;
 	CMapStage* m_pMapStage = { nullptr };
+	CEnv_InstanceController* m_pMapPreviewEnvInstanceController = { nullptr };
 	CMap_EditSession* m_pMapPreviewSession = { nullptr };
 
 	// Hierarchy
@@ -133,11 +135,12 @@ private:
 	HRESULT  Ready_EditCamera();
 	HRESULT  Ready_EditGrid();
 	HRESULT  Ready_MapStage();
-	HRESULT  Ready_EnvObjects(vector<ENV_OBJECT_DESC>* pOutDeletedEnvDescs = nullptr);
+	HRESULT  Ready_EnvObjects(vector<ENV_OBJECT_DESC>* pOutDeletedEnvDescs = nullptr, MAP_LOAD_RESULT* pOutReport = nullptr);
 
 	_bool XM_CALLCONV Pick_EnvObjectByRay(_fvector vOrigin, _fvector vDir, CGameObject** ppOutObject, _float3* pOutHit, _float* pOutDistance);
 
 	void Clear_MapPreviewLayer(const _wstring& strLayerTag);
+	void Clear_MapPreviewEnvInstanceController();
 	void Add_MapPreviewObjectHandle(const _wstring& strPrototypeTag, const _wstring& strLayerTag,
 		const _wstring& strObjectTag, CGameObject* pObject);
 	static void On_MapPreviewObjectCreated(void* pContext, CGameObject* pObject, const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);

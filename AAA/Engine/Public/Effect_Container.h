@@ -69,6 +69,9 @@ public:
 
     void Set_ParentMatrix(const _float4x4* pParentMatrix);
 
+    _bool Set_EffectPartPlay(const _wstring& strPartTag, _bool bPlay);
+    _bool Is_EffectPartPlay(const _wstring& strPartTag) const;
+
 public:
     const unordered_map<_wstring, CEffect_Part*>& Get_EffectPartObject() const { return m_EffestParts; }
 

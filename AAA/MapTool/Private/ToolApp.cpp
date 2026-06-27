@@ -8,6 +8,7 @@
 
 #include "GameObject_Factory.h"
 #include "Effect_Loader.h"
+#include "Projectile_Manager.h"
 
 #include "GameInstance.h"
 
@@ -176,6 +177,7 @@ void CToolApp::Free()
 	CEditInstance::DestroyInstance();
 
 	CEffect_Loader::DestroyInstance();
+	CProjectile_Manager::DestroyInstance();
 	Safe_Release(m_pRTV);
 	Safe_Release(m_pSRV);
 	Safe_Release(m_pDSV);

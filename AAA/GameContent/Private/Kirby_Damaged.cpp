@@ -6,6 +6,8 @@
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
 
+#include "Movement_Child.h"
+
 CKirby_Damaged::CKirby_Damaged()
 {
 }
@@ -33,6 +35,9 @@ void CKirby_Damaged::Enter(CKirby* pKirby)
     pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::DAMAGED);
 
     pKirby->Get_Body()->Set_Eye(KIRBY_EYE_STATE::CLOSE);
+
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Set_MaxHorizontalSpeed(s_fMaxDamagedHorizontalSpeed);
 }
 
 void CKirby_Damaged::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -62,9 +67,12 @@ void CKirby_Damaged::Update(CKirby* pKirby, const _float fTimeDelta)
 
 void CKirby_Damaged::Exit(CKirby* pKirby)
 {
+    __super::Exit(pKirby);
+
     pKirby->Get_Body()->Set_Eye(KIRBY_EYE_STATE::IDLE);
 
-    __super::Exit(pKirby);
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
 }
 
 _bool CKirby_Damaged::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)

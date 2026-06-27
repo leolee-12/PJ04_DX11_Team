@@ -33,11 +33,11 @@ private:
     CGameObject* m_pBoss = { nullptr };
     wstring m_strPlayerLayer, m_strPlayerObj, m_strBossLayer, m_strBossObj;
 
-    _float m_fBackDist = { 8.0f };    // 커비 뒤로
-    _float m_fHeight = { 3.5f };    // 카메라 높이
+    _float m_fBackDist = { 14.0f };    // 커비 뒤로
+    _float m_fHeight = { 4.f };    // 카메라 높이
     _float m_fShoulderOffset = { -1.8f };   // 음수=왼쪽 어깨
     _float m_fAimBias = { 0.65f };   // 0=커비 / 1=보스 쪽을 봄
-    _float m_fAimHeight = { 3.0f };    // 시선 높이(보스가 크니 위로)
+    _float m_fAimHeight = { 6.f };    // 시선 높이(보스가 크니 위로)
     _float m_fSmoothTime = { 0.18f };
     _float m_fFovDeg = { 50.f };
 

@@ -6,6 +6,9 @@
 #include "Boss_Gorilla_Body.h"
 #include "Animator.h"
 
+#include "Projectile_Boulder.h"
+#include "Projectile_Manager.h"
+
 // 3페이즈: 66%, 33% 에서 전환 (PhaseCount = size()+1 = 3) Brain의 Get_PhaseCount와 일치!
 const vector<_float> CBoss_Gorilla::s_Thresholds = { 0.5f };
 
@@ -26,9 +29,9 @@ HRESULT CBoss_Gorilla::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))   
         return E_FAIL;
 
-    m_strBossName = L"고릴라 보스";
+    m_strBossName = L"고르르뭄바";
     m_fMaxHP = 1000.f;    
-    m_fCurHP = 400.f;
+    m_fCurHP = m_fMaxHP;
 
     if (m_pMovement)
     {
@@ -75,6 +78,8 @@ void CBoss_Gorilla::Play_Intro()
     m_bIntroDone = false;
     if (CAnimator* pAnim = Get_BodyAnimator())
         pAnim->Play(s_Intro[0], false, true, 0.2f, 1.5f);
+
+    Fire_Grab();
 }
 
 _bool CBoss_Gorilla::Is_Intro_Finished() const
@@ -132,6 +137,39 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
                 {
                     wstring tag(e.strParam.begin(), e.strParam.end());
                     m_pGameInstance_Proxy->Publish(tag, nullptr);
+                }
+                break;
+            }
+
+            case EANIM_EVENT::Projectile:
+            {
+                if (phase != ANIM_EVENT_PHASE::POINT) break;
+
+                if (e.iIntParam == 0)     
+                {
+                    CProjectile* p = nullptr;
+                    const _wstring strKey = e.strParam.empty()
+                        ? L"Boulder" : _wstring(e.strParam.begin(), e.strParam.end());
+                    CProjectile_Manager::GetInstance()->Spawn(Get_LevelIndex(), strKey,
+                        CProjectile_Boulder::PROTOTYPE_TAG, &p);
+                    if (p)
+                    {
+                        p->Attach_To_Socket(m_pBody->Get_BoneMatrixPtr(THROW_BONE),
+                            m_pTransformCom->Get_WorldMatrixPtr(), XMMatrixIdentity());
+                        m_pHeldRock = p;
+                    }
+                }
+                else                      
+                {
+                    if (m_pHeldRock)
+                    {
+                        _vector vHand = m_pHeldRock->Get_Transform()->Get_State(STATE::POSITION);
+                        _vector vTarget = XMLoadFloat3(&Get_BlackBoard().vTargetPos);
+                        _vector vDir = XMVector3Normalize(vTarget - vHand) + XMVectorSet(0, 0.4f, 0, 0);
+                        _float3 vP, vD; XMStoreFloat3(&vP, vHand); XMStoreFloat3(&vD, vDir);
+                        m_pHeldRock->Launch(vP, vD);
+                        m_pHeldRock = nullptr;
+                    }
                 }
                 break;
             }
@@ -215,6 +253,18 @@ void CBoss_Gorilla::Fire_CatchCamera(const _tchar* szTrack)
     cam.pProgress = Get_BodyAnimator();                      // 현재 잡기 클립 진행도
     cam.pAnchorWorld = m_pTransformCom->Get_WorldMatrixPtr();   // 전투 고릴라 월드(라이브)
     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+}
+
+void CBoss_Gorilla::Fire_Grab()
+{
+    if (nullptr == m_pBody)
+        return;
+
+    CUTSCENE_GRAB_DESC grab{};
+    grab.pBoneMatrix = m_pBody->Get_BoneMatrixPtr(GRAB_BONE);          
+    grab.pSourceWorld = m_pTransformCom->Get_WorldMatrixPtr();         
+    grab.eType = GRAB_TYPE::GORILLA_COMBAT;
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GrabKirby, &grab);
 }
 
 void CBoss_Gorilla::Begin_AnimFreeze(_float fSeconds)

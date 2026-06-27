@@ -33,9 +33,17 @@ void CKirby_CutSceneGrabbed::Enter(CKirby* pKirby)
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
     pAbility->Clear_Overlay(pKirby, 1, 0.1f);
 
+    CKirby_Body* pBody = pKirby->Get_Body();
+    CAnimator* pAnimator = pBody->Get_Animator();
+    pAnimator->Play("DemoAppear2", false, false, 0.1f, 1.f, true);
+
+    pBody->Set_Eye(KIRBY_EYE_STATE::SURPRISED);
+
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Stop();
     pMovement->Set_UseGravity(false);
+
+    pKirby->OnOffParts(pKirby->Get_KirbyAbility()->Get_AbilityType(), false, true);
 }
 
 void CKirby_CutSceneGrabbed::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -52,6 +60,8 @@ void CKirby_CutSceneGrabbed::Exit(CKirby* pKirby)
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_UseGravity(true);
     pMovement->Sync_To_Controller();
+
+    pKirby->Get_Body()->Set_Eye(KIRBY_EYE_STATE::IDLE);
 }
 
 _bool CKirby_CutSceneGrabbed::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -68,6 +78,12 @@ _bool CKirby_CutSceneGrabbed::Handle_Command(CKirby* pKirby, CKirby_Command* pCo
     //}
 
     return false;
+}
+
+void CKirby_CutSceneGrabbed::Request_ReleaseGrabState(CKirby* pKirby, GRAB_TYPE eType)
+{
+    pKirby->OnOffParts(pKirby->Get_KirbyAbility()->Get_AbilityType(), true, true);
+    Transition_Fall_OR_Wait_OR_Run(pKirby);
 }
 
 CKirby_CutSceneGrabbed* CKirby_CutSceneGrabbed::Create()

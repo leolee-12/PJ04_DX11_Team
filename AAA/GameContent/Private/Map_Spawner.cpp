@@ -38,6 +38,7 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 	MAP_OBJECT_CREATED_CALLBACK pCreatedCallback = Request.pCreatedCallback;
 	void* pCallbackContext = Request.pCallbackContext;
 	CMapStage** ppOutStage = Request.ppOutStage;
+	CEnv_InstanceController** ppOutEnvInstanceController = Request.ppOutEnvInstanceController;
 
 	if (!Options.bSpawnStage && !Options.bSpawnEnv)
 		return E_FAIL;
@@ -47,6 +48,9 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 
 	if (nullptr != ppOutStage)
 		*ppOutStage = nullptr;
+
+	if (nullptr != ppOutEnvInstanceController)
+		*ppOutEnvInstanceController = nullptr;
 
 	MAP_STAGE_DESC StageDesc = Package.StageDesc;
 	StageDesc.iSectionProtoLevel = Levels.iObjectLevel;
@@ -264,6 +268,9 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 
 	if (nullptr != ppOutStage && Options.bSpawnStage)
 		*ppOutStage = pStage;
+
+	if (nullptr != ppOutEnvInstanceController && Options.bSpawnEnv)
+		*ppOutEnvInstanceController = pEnvInstanceController;
 
 	if (nullptr != pCreatedCallback)
 	{

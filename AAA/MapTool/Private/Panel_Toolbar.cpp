@@ -189,7 +189,7 @@ void CPanel_Toolbar::Draw_EditButtons(CLevel_Edit* pLevel)
 		ImGui::InputText("##layername", m_szLayerName, BUF_SIZE);
 		if (ImGui::Button("OK"))
 		{
-			wstring strLayerName(m_szLayerName, m_szLayerName + strlen(m_szLayerName));
+			wstring strLayerName = StrToWstr(m_szLayerName);
 			pLevel->Add_Layer(strLayerName);
 			ImGui::CloseCurrentPopup();
 		}

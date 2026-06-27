@@ -39,26 +39,12 @@ void CEffect_Emitter::Priority_Update(_float fTimeDelta)
 
 void CEffect_Emitter::Update(_float fTimeDelta)
 {
-    if (m_bIsPlay == false)
-        return;
+    __super::Update(fTimeDelta);
 
-    m_fEmitterElapsedTime += fTimeDelta;
-
-    _float fRatio = 0.f;
-    if (m_fDuration > Helper::fEpsilon)
-        fRatio = m_fEmitterElapsedTime / m_fDuration;
-
-    Update_Core(fTimeDelta, fRatio);
-
-    if (Can_Emit() == true)
-        Emit_ByRate(fTimeDelta);
-
-    Update_EmitterParticles(fTimeDelta);
-
-    if (m_bLoop == false && Can_Emit() == false && Has_AliveParticle() == false)
+    if (m_bActive == false && m_bEmitterWasActive == true)
     {
-        m_bIsPlay = false;
-        m_bActive = false;
+        Reset_Emitter();
+        m_bEmitterWasActive = false;
     }
 }
 
@@ -79,7 +65,8 @@ void CEffect_Emitter::Effect_Start()
     __super::Effect_Start();
 
     Reset_Emitter();
-    Emit_Particles(m_iEmitterBurstCount);
+    m_fEmitterPreviousRatio = 0.f;
+    m_bEmitterWasActive = false;
 }
 
 HRESULT CEffect_Emitter::Bind_ShaderValue()
@@ -197,7 +184,25 @@ void CEffect_Emitter::Init_PropertyValue()
 
 void CEffect_Emitter::Update_Core(const _float fTimeDelta, const _float fRatio)
 {
+    const _bool bRestart = m_bEmitterWasActive == false ||
+        fRatio + Helper::fEpsilon < m_fEmitterPreviousRatio;
+
+    if (bRestart == true)
+    {
+        Reset_Emitter();
+        Emit_Particles(m_iEmitterBurstCount);
+    }
+
+    m_bEmitterWasActive = true;
+    m_fEmitterPreviousRatio = fRatio;
+    m_fEmitterElapsedTime = fRatio * Get_PartDuration();
+
     __super::Update_Core(fTimeDelta, fRatio);
+
+    if (Can_Emit() == true)
+        Emit_ByRate(fTimeDelta);
+
+    Update_EmitterParticles(fTimeDelta);
 }
 
 void CEffect_Emitter::Reset_Emitter()
@@ -649,13 +654,11 @@ void CEffect_Emitter::Update_EmitterParticleColor(EMITTER_PARTICLE& Particle, _f
 
 _bool CEffect_Emitter::Can_Emit() const
 {
-    if (m_bLoop == true)
-        return true;
-
-    if (m_fDuration <= Helper::fEpsilon)
+    const _float fPartDuration = Get_PartDuration();
+    if (fPartDuration <= Helper::fEpsilon)
         return false;
 
-    return m_fEmitterElapsedTime <= m_fDuration;
+    return m_fEmitterElapsedTime <= fPartDuration;
 }
 
 _bool CEffect_Emitter::Has_AliveParticle() const

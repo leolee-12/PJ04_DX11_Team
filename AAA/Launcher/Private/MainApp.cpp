@@ -6,6 +6,7 @@
 #include "Loader_Prototype.h"
 #include "Level_FirstLoading.h"
 #include "Effect_Loader.h"
+#include "Projectile_Manager.h"
 
 CMainApp::CMainApp()
 {
@@ -114,6 +115,7 @@ void CMainApp::Free()
 	__super::Free();
 
 	CEffect_Loader::DestroyInstance();
+	CProjectile_Manager::DestroyInstance();
 
 	Safe_Release(m_pGameInstance_Proxy);
 	Safe_Release(m_pDevice);

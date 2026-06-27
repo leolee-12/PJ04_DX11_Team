@@ -64,6 +64,7 @@ HRESULT CEffect_Part::Render()
 void CEffect_Part::Effect_Start()
 {
     m_bIsPlay = true;
+    m_bActive = false;
     m_fAccTime = 0.f;
 }
 
@@ -216,17 +217,27 @@ void CEffect_Part::Update_Value(const _float fTimeDelta)
     if (m_bIsPlay == false)
         return;  
 
-    _float fRatio = m_fAccTime / m_fDuration;
-    Helper::FloatClamp(fRatio, 0.f, 1.f);
+    _float fContainerRatio = 0.f;
+    if (m_fDuration > Helper::fEpsilon)
+        fContainerRatio = m_fAccTime / m_fDuration;
 
-    if (fRatio < m_fStartRatio || fRatio > m_fEndRatio)
+    Helper::FloatClamp(fContainerRatio, 0.f, 1.f);
+
+    const _float fPartRange = m_fEndRatio - m_fStartRatio;
+
+    if (fPartRange < 0.f || fContainerRatio < m_fStartRatio || fContainerRatio > m_fEndRatio)
         m_bActive = false;
     else
         m_bActive = true;
 
     if (m_bActive == true)
     {
-        Update_Core(fTimeDelta, fRatio);
+        _float fPartRatio = 0.f;
+        if (fPartRange > Helper::fEpsilon)
+            fPartRatio = (fContainerRatio - m_fStartRatio) / fPartRange;
+
+        Helper::FloatClamp(fPartRatio, 0.f, 1.f);
+        Update_Core(fTimeDelta, fPartRatio);
     }
 
 
@@ -255,6 +266,15 @@ void CEffect_Part::Update_Core(const _float fTimeDelta, const _float fRatio)
 void CEffect_Part::Update_EffectPart(const _float fTimeDelta, const _float fRatio)
 {
 
+}
+
+_float CEffect_Part::Get_PartDuration() const
+{
+    _float fPartRange = m_fEndRatio - m_fStartRatio;
+    if (fPartRange < 0.f)
+        fPartRange = 0.f;
+
+    return m_fDuration * fPartRange;
 }
 
 void CEffect_Part::Free()

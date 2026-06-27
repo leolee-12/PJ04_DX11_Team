@@ -9,6 +9,7 @@ NS_END
 
 NS_BEGIN(Client)
 class CMapStage;
+class CEnv_InstanceController;
 
 struct MAP_MANIFEST_DESC
 {
@@ -22,6 +23,14 @@ struct MAP_MANIFEST_DESC
 	vector<_wstring> LevelDesignJsonPaths;
 	_wstring strDeltaPath;
 	_wstring strDecorCollisionCatalogPath;
+};
+
+struct MAP_PACKAGE_BUILD_OPTIONS
+{
+	_bool bBuildStage = true;
+	_bool bBuildEnv = true;
+	_bool bBuildLevelDesignPaths = true;
+	_bool bApplyDelta = true;
 };
 
 struct MAP_ADD_OBJECT
@@ -146,6 +155,7 @@ struct MAP_SPAWN_REQUEST
 	MAP_OBJECT_CREATED_CALLBACK pCreatedCallback = nullptr;
 	void* pCallbackContext = nullptr;
 	CMapStage** ppOutStage = nullptr;
+	CEnv_InstanceController** ppOutEnvInstanceController = nullptr;
 };
 
 struct MAP_LOAD_RESULT
