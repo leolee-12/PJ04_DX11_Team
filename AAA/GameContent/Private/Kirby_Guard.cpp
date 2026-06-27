@@ -6,6 +6,8 @@
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
 
+#include "Movement_Child.h"
+
 CKirby_Guard::CKirby_Guard()
 {
 }
@@ -32,6 +34,9 @@ void CKirby_Guard::Enter(CKirby* pKirby)
     pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::GUARD);
 
     pKirby->Get_Body()->Set_Eye(KIRBY_EYE_STATE::ANGRY);
+
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Set_GroundFriction(s_fGuardGroundFriction);
 }
 
 void CKirby_Guard::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -44,6 +49,9 @@ void CKirby_Guard::Exit(CKirby* pKirby)
     __super::Exit(pKirby);
 
     pKirby->Get_Body()->Set_Eye(KIRBY_EYE_STATE::IDLE);
+
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Set_GroundFriction(CKirby::s_fGroundFriction);
 }
 
 _bool CKirby_Guard::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -55,45 +63,23 @@ _bool CKirby_Guard::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 
     switch (eCommandType)
     {
-        //// Move Press
-        //case KIRBY_COMMAND_TYPE::MOVE_TOP:
-        //case KIRBY_COMMAND_TYPE::MOVE_DOWN:
-        //case KIRBY_COMMAND_TYPE::MOVE_LEFT:
-        //case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
-        //{
-        //    if (!pCommand->IsPress())
-        //        return false;
+        // Attack
+        case KIRBY_COMMAND_TYPE::ATTACK:
+        {
+            CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+            if (pAbility->Can_Attack(KIRBY_ATTACK_LOCATION::GROUND))
+            {
+                if (pCommand->IsDown())
+                    pAbility->Enter_Attack_KeyDown(pKirby);
+                else if (pCommand->IsPress())
+                    pAbility->Enter_Attack_KeyPress(pKirby);
+                else if (pCommand->IsUp())
+                    pAbility->Enter_Attack_KeyUp(pKirby);
+            }
 
-        //    Handle_MoveCommand(pKirby, pCommand);
-        //    pKirby->Change_State(KIRBY_STATE_TYPE::RUN);
-        //    return true;
-        //}
-        //// Jump Down
-        //case KIRBY_COMMAND_TYPE::JUMP:
-        //{
-        //    if (!pCommand->IsDown())
-        //        return false;
-
-        //    pKirby->Change_State(KIRBY_STATE_TYPE::JUMP);
-        //    return true;
-        //}
-        //// Attack
-        //case KIRBY_COMMAND_TYPE::ATTACK:
-        //{
-        //    CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
-        //    if (pAbility->Can_Attack(KIRBY_ATTACK_LOCATION::GROUND))
-        //    {
-        //        if (pCommand->IsDown())
-        //            pAbility->Enter_Attack_KeyDown(pKirby);
-        //        else if (pCommand->IsPress())
-        //            pAbility->Enter_Attack_KeyPress(pKirby);
-        //        else if (pCommand->IsUp())
-        //            pAbility->Enter_Attack_KeyUp(pKirby);
-        //    }
-
-        //    return true;
-        //}
-        // Guard
+            return true;
+        }
+        // Guard Up
         case KIRBY_COMMAND_TYPE::GUARD:
         {
             if (!pCommand->IsUp())
@@ -105,6 +91,12 @@ _bool CKirby_Guard::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
     }
 
     return false;
+}
+
+void CKirby_Guard::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Apply_Knockback(tInfo.vAttackerPos, 50.f, 0.f);
 }
 
 CKirby_Guard* CKirby_Guard::Create()

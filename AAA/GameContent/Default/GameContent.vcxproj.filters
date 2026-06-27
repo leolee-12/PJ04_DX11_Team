@@ -655,7 +655,13 @@
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\QTE_Grabbed">
       <UniqueIdentifier>{b3d902fb-45c2-4c61-b777-dd904840d9a8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\06. Monster\Kabu">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\10. Common_SpinSlash">
+      <UniqueIdentifier>{5ab4f5f3-211a-454f-82c1-c91e908decbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash">
+      <UniqueIdentifier>{553f3de7-862e-424a-87ee-191f43044a21}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="00. GameObject\06. Monster\Kabu">
       <UniqueIdentifier>{8e2ff95d-c5dd-4f49-9c40-bb2c899a1b04}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\PoppyBrosJr">
@@ -1251,7 +1257,13 @@
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\QTE_Grabbed</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\LevelDesign_EventObject.h">
+    <ClInclude Include="..\Public\Common_SpinSlash.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\10. Common_SpinSlash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Sword_SpinSlash.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
+	</ClInclude>
+	<ClInclude Include="..\Public\LevelDesign_EventObject.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_FallBorder.h">
@@ -1829,7 +1841,13 @@
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\QTE_Grabbed</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\LevelDesign_EventObject.cpp">
+    <ClCompile Include="..\Private\Common_SpinSlash.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\10. Common_SpinSlash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Sword_SpinSlash.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\LevelDesign_EventObject.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_FallBorder.cpp">

@@ -6,6 +6,8 @@
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
 
+#include "Movement_Child.h"
+
 CKirby_Attack::CKirby_Attack()
 {
 }
@@ -45,9 +47,15 @@ void CKirby_Attack::Update(CKirby* pKirby, const _float fTimeDelta)
     // Ability가 Attack State가 끝났다고 하면 State 전환
     if (pAbility->ReqEndAttackState() == true)
     {
-        Transition_Fall_OR_Wait_OR_Run(pKirby);
-        return;
+        CMovement_Child* pMovement = pKirby->Get_Movement();
+        
+        if (m_bGuardReserved && pMovement->Is_Grounded())
+            pKirby->Change_State(KIRBY_STATE_TYPE::GUARD);
+        else
+            Transition_Fall_OR_Wait_OR_Run(pKirby);
     }
+
+    m_bGuardReserved = false;
 }
 
 void CKirby_Attack::Exit(CKirby* pKirby)
@@ -65,10 +73,18 @@ _bool CKirby_Attack::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 
     KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
 
-    //switch (eCommandType)
-    //{
+    switch (eCommandType)
+    {
+        // Guard
+        case KIRBY_COMMAND_TYPE::GUARD:
+        {
+            if (!pCommand->IsPress())
+                return false;
 
-    //}
+            m_bGuardReserved = true;
+            return true;
+        }
+    }
 
     // Ability가 Command 처리
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();

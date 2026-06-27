@@ -16,12 +16,16 @@ class CMovement_Child;
 class CLIENT_DLL CKirby_Hovering final : public CKirby_ControllableState
 {
 private:
+	enum HOVERING_STATE { FLIGHT_START, FLIGHT_LOOP, FLIGHT_END, SPIT_AIR };
+	enum HOVERING_MOVE_STATE { FALL, JUMP};
+
+	static constexpr _float s_fHoveringLinearDrag = 9.f;
+	static constexpr _float s_fHoveringMaxFallVelocity = -1.5f;
+	static constexpr _float s_fHoveringMaxHorizontalSpeed = 4.f;
+
+private:
 	CKirby_Hovering();
 	virtual ~CKirby_Hovering() = default;
-
-	enum HOVERING_STATE { FLIGHT_START, FLIGHT_LOOP, FLIGHT_END, SPIT_AIR };
-	// Loop에서 두 상태로 분기
-	enum HOVERING_MOVE_STATE { FALL, JUMP};
 
 private:
 	HRESULT Initialize();

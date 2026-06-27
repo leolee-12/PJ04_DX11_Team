@@ -44,7 +44,9 @@
     <ClInclude Include="..\Public\Common_Curve03.h" />
     <ClInclude Include="..\Public\Common_JumpSlash.h" />
     <ClInclude Include="..\Public\Common_Ring03.h" />
+    <ClInclude Include="..\Public\Common_SpinSlash.h" />
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h" />
+    <ClInclude Include="..\Public\Sword_SpinSlash.h" />
     <ClInclude Include="..\public\PhysicsProjectile.h" />
     <ClInclude Include="..\public\Projectile.h" />
     <ClInclude Include="..\public\Projectile_Boulder.h" />
@@ -265,7 +267,9 @@
     <ClCompile Include="..\Private\Common_Curve03.cpp" />
     <ClCompile Include="..\Private\Common_JumpSlash.cpp" />
     <ClCompile Include="..\Private\Common_Ring03.cpp" />
+    <ClCompile Include="..\Private\Common_SpinSlash.cpp" />
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp" />
+    <ClCompile Include="..\Private\Sword_SpinSlash.cpp" />
     <ClCompile Include="..\private\PhysicsProjectile.cpp" />
     <ClCompile Include="..\private\Projectile.cpp" />
     <ClCompile Include="..\private\Projectile_Boulder.cpp" />

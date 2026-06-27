@@ -504,7 +504,7 @@ void CEffect_Particle::Update_ParticleMove(PARTICLE& Particle, _float fRatio, _f
     Helper::FloatClamp(fLocalRatio, 0.f, 1.f);
 
     const _float fElapsedRatio = fRatio - Particle.fStartRatio;
-    const _float fElapsedTime = fElapsedRatio * m_fDuration;
+    const _float fElapsedTime = fElapsedRatio * Get_PartDuration();
 
     _float3 vAcceleration{};
 

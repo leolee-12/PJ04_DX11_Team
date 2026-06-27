@@ -484,7 +484,7 @@ void CMovement_Child::Apply_Knockback(const _float3& vAttackerPos, _float fHoriz
 
     vDir = XMVector3Normalize(vDir);
 
-    Add_Velocity(vDir * fHorizontalPower);
+    Set_Velocity(vDir * fHorizontalPower);
     Set_VelocityY(fUpPower);
 }
 

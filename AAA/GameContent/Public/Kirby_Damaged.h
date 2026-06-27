@@ -16,6 +16,9 @@ class CKirby_Body;
 class CLIENT_DLL CKirby_Damaged final : public CKirby_State
 {
 private:
+	static constexpr _float s_fMaxDamagedHorizontalSpeed = 18.f;
+
+private:
 	CKirby_Damaged();
 	virtual ~CKirby_Damaged() = default;
 

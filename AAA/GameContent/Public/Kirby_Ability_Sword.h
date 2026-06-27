@@ -6,6 +6,7 @@
 
 NS_BEGIN(Engine)
 class CAnimator;
+class CEffect_Container;
 NS_END
 
 NS_BEGIN(Client)
@@ -31,7 +32,7 @@ private:
 
 	enum SWORD_MOVE_STATE { NONE_MOVE, MOVE_FRONT, MOVE_RIGHT};
 
-	enum SWORD_EFFECT { SLASH1, SLASH2_1, SLASH2_2, SLASH2_3, SLASH2_4, SLASH3, 
+	enum SWORD_EFFECT { SLASH1, SLASH2_1, SLASH2_2, SLASH2_3, SLASH2_4, SLASH3, SPINSLASH, 
 		JUMPSLASH, EFFECT_END};
 
 private:
@@ -79,6 +80,8 @@ private:
 	static constexpr const _char* OverlayMasks[2] = { "L_FootJ", "R_FootJ" };
 
 	_bool m_bIsStartEffect[SWORD_EFFECT::EFFECT_END]{};
+
+	CEffect_Container* m_pSpinSlash{};
 
 private:
 	void Update_ChargeTime(_float fTimeDelta);

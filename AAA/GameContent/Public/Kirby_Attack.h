@@ -31,6 +31,9 @@ public:
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
+private:
+	_bool m_bGuardReserved{};
+
 public:
 	static CKirby_Attack* Create();
 private:
