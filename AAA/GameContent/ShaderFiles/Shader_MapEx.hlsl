@@ -465,8 +465,7 @@ PS_OUT PS_DMN(PS_IN In)
     if (vBase.a < 0.1f)
         discard;
 
-    //float3 albedo = vBase.rgb;
-    float3 albedo = pow(vBase.rgb, 2.2f);
+    float3 albedo = vBase.rgb;
     float3 mra = g_MRATexture.Sample(LinearSampler, vMaterialUV).rgb;
 
     float3 N = normalize(In.vNormal.xyz);
