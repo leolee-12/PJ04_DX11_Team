@@ -57,7 +57,8 @@ HRESULT CSword_SpinSlash::Render()
 
 HRESULT CSword_SpinSlash::Ready_EffectPartObjects()
 {
-    Add_Effect_PartObject(m_iPrototypeLevel, CCommon_SpinSlash::PROTOTYPE_TAG, CCommon_SpinSlash::PROTOTYPE_TAG);
+    Add_Effect_PartObject(m_iPrototypeLevel, CCommon_SpinSlash::PROTOTYPE_TAG, L"Proto_Common_SpinSlash_1");
+    Add_Effect_PartObject(m_iPrototypeLevel, CCommon_SpinSlash::PROTOTYPE_TAG, L"Proto_Common_SpinSlash_2");
 
     return S_OK;
 }

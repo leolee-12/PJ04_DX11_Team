@@ -30,9 +30,9 @@ HRESULT CCommon_SpinSlash::Initialize(void* pArg)
     tDesc.bUseDiffuseTexture = false;
     tDesc.bUseUnKnownTexture = true;
 
-    tDesc.bUseTextureCom = false;
-    tDesc.iTextureLevel = 0;
-    tDesc.wstrTextureTag = L"";
+    tDesc.bUseTextureCom = true;
+    tDesc.iTextureLevel = Texture_Common_SpinSlash_2.iLevelID;
+    tDesc.wstrTextureTag = Texture_Common_SpinSlash_2.szProtoTag;
 
     tDesc.bUseMaskCom = false;
     tDesc.iMaskLevel = 0;

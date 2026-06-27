@@ -381,8 +381,11 @@ void CGameObject_Factory::Register_Test()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_SpinSlash"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_SpinSlash/Model_Common_SpinSlash.ysh",
                     XMMatrixRotationX(XMConvertToRadians(90.f))));
-            TRY_ADD_PROTO(pProxy, Texture_Common_SpinSlash.iLevelID, Texture_Common_SpinSlash.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Common_SpinSlash.szFileTag, Texture_Common_SpinSlash.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Common_SpinSlash_1.iLevelID, Texture_Common_SpinSlash_1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Common_SpinSlash_1.szFileTag, Texture_Common_SpinSlash_1.iNumTex));
+
+            TRY_ADD_PROTO(pProxy, Texture_Common_SpinSlash_2.iLevelID, Texture_Common_SpinSlash_2.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Common_SpinSlash_2.szFileTag, Texture_Common_SpinSlash_2.iNumTex));
         )
     );
 
