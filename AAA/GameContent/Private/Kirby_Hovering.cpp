@@ -42,9 +42,9 @@ void CKirby_Hovering::Enter(CKirby* pKirby)
     // Movement
     CMovement_Child* pMovementCom = pKirby->Get_Movement();
     pMovementCom->Set_GravityScale(0.6f);
-    pMovementCom->Set_MaxFallVelocity(CKirby::s_fHoveringMaxFallVelocity);
-    pMovementCom->Set_LinearDrag(CKirby::s_fHoveringLinearDrag);
-    pMovementCom->Set_MaxHorizontalSpeed(CKirby::s_fHoveringMaxHorizontalSpeed);
+    pMovementCom->Set_MaxFallVelocity(s_fHoveringMaxFallVelocity);
+    pMovementCom->Set_LinearDrag(s_fHoveringLinearDrag);
+    pMovementCom->Set_MaxHorizontalSpeed(s_fHoveringMaxHorizontalSpeed);
 
     m_eCurMoveState = HOVERING_MOVE_STATE::FALL;
     m_bPlayFlightAni = false;

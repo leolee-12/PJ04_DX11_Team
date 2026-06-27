@@ -33,7 +33,11 @@ void CKirby_State::Exit(CKirby* pKirby)
 void CKirby_State::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
 {
     CMovement_Child* pMovement = pKirby->Get_Movement();
-    pMovement->Apply_Knockback(tInfo.vAttackerPos, tInfo.fKnockback * 5.f, tInfo.fKnockback * 1.5f);
+    pMovement->Apply_Knockback(tInfo.vAttackerPos, 180.f, 9.f);  // Test
+
+    pKirby->Add_HP(-tInfo.fDamage);
+    pKirby->Start_DamageInvincibility();
+
     pKirby->Change_State(KIRBY_STATE_TYPE::DAMAGED);
 }
 

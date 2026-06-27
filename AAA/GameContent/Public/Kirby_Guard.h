@@ -14,6 +14,9 @@ class CKirby;
 class CLIENT_DLL CKirby_Guard final : public CKirby_ControllableState
 {
 private:
+	static constexpr _float s_fGuardGroundFriction = 10.f;
+
+private:
 	CKirby_Guard();
 	virtual ~CKirby_Guard() = default;
 
@@ -30,6 +33,9 @@ public:
 
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
+
+public:
+	virtual void  On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
 
 public:
 	static CKirby_Guard* Create();

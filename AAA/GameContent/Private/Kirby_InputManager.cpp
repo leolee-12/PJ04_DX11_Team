@@ -114,12 +114,6 @@ void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
     }
 
     // Q, E
-    if (m_pGameInstance_Proxy->Key_Down(DIK_Q) ||
-        m_pGameInstance_Proxy->Key_Down(DIK_E))
-    {
-        pCommand = new Guard_Command(KEY_STATE_TYPE::DOWN);
-        ProcessCommand(pCommand);
-    }
     if (m_pGameInstance_Proxy->Key_Pressing(DIK_Q) ||
         m_pGameInstance_Proxy->Key_Pressing(DIK_E))
     {
