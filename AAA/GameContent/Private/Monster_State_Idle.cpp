@@ -32,7 +32,7 @@ void CMonster_State_Idle::Update(_float fTimeDelta)
 		return;
 
 	const MONSTER_BLACKBOARD& BB = m_pOwner->Get_BlackBoard();
-	if (m_pOwner != nullptr && nullptr != BB.pTarget && BB.fDistToTargetXZ > s_fFaceDeadZoneXZ)
+	if (m_pOwner != nullptr && nullptr != BB.pTarget && BB.fDistToTargetXZ > m_fFaceDeadZoneXZ)
 	{
 		m_pMovement->Face_Smooth(XMLoadFloat3(&BB.vTargetPos), fTimeDelta);
 	}

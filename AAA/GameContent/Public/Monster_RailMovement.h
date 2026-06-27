@@ -23,18 +23,21 @@ public:
     _bool                           Has_Rail() const { return m_bHasRail; }
     void                            Set_PathSpeed(_float fSpeed) { m_fPathSpeed = fSpeed; }
     void                            Set_SpinSpeed(_float fDeg) { m_fSpinSpeedDeg = fDeg; }
+    void                            Set_FaceTangent(_bool b) { m_bFaceTangent = b; }
 
-    // call per-frame in IDLE: arc-length constant speed
     _bool                           Update_RailFollow(_float fTimeDelta);
     _bool                           Is_OffPath(_float fThreshold = 0.5f) const;
     void                            Warp_ToRandomPoint();
+    _bool                           Return_TowardPath(_float fTimeDelta, _float fSpeed);
+    void                            Snap_ToPath();
 
 protected:
     virtual void                    Calc_Vertical(_float fTimeDelta) override;
 
 private:
     _float                          Compute_PathLength() const;
-    _bool                           Eval_PathPos(_float fS, _float3* pOut) const;
+    _bool                           Eval_PathPos(_float fS, _float3* pOut, _float3* pOutTangent = nullptr) const;
+    void                            Face_PathDir(const _float3& vPos, const _float3& vTangent, _float fTimeDelta);
 
 private:
     LD_RAIL_DESC                    m_tRailDesc = {};
@@ -47,6 +50,7 @@ private:
 
     _float                          m_fSpinSpeedDeg = { 0.f };
     _float                          m_fSpinAngle = { 0.f };
+    _bool                           m_bFaceTangent = { false };
 
 public:
     static CMonster_RailMovement*   Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

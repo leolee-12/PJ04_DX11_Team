@@ -33,7 +33,7 @@ void CBladeKnight_State_Attack::Play_AttackAnimation()
 {
 	if (m_pAnimator)
 	{
-		CAnimator::ANI_PLAY_INFO AniInfo{};
+		ANI_PLAY_INFO AniInfo{};
 		AniInfo.strAniName = "AttackStart";
 		AniInfo.bLoop = false;
 		AniInfo.fSpeed = 1.25f;

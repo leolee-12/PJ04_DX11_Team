@@ -95,7 +95,7 @@ _bool CKirby_Wait::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
         // Guard
         case KIRBY_COMMAND_TYPE::GUARD:
         {
-            if (!pCommand->IsDown())
+            if (!pCommand->IsPress())
                 return false;
 
             pKirby->Change_State(KIRBY_STATE_TYPE::GUARD);

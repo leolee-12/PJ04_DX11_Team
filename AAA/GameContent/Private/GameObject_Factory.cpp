@@ -52,6 +52,8 @@
 #include "WalkSmoke.h"
 #include "SwordSlash1.h"
 #include "InhaleContainer.h"
+#include "Sword_JumpSlash.h"
+#include "Sword_SpinSlash.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -64,7 +66,7 @@
 #include "TornadoSpinReverse.h"
 #include "Common_Ring03.h"
 #include "Common_JumpSlash.h"
-#include "Sword_JumpSlash.h"
+#include "Common_SpinSlash.h"
 
 //sky
 #include "SkySphere.h"
@@ -77,6 +79,10 @@
 #include "NormalEnemy_Body.h"
 #include "Kabu.h"
 #include "Kabu_Body.h"
+#include "BrontoBurt.h"
+#include "BrontoBurt_Body.h"
+#include "PoppyBrosJr.h"
+#include "PoppyBrosJr_Body.h"
 
 //Miniboss
 #include "GigantEdge.h"
@@ -372,6 +378,24 @@ void CGameObject_Factory::Register_Test()
         )
     );
 
+    // 3. SpinSlash
+    Register(CSword_SpinSlash::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSword_SpinSlash),
+        LOADER
+        (
+            // Common_SpinSlash
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_SpinSlash::PROTOTYPE_TAG,
+                CCommon_SpinSlash::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_SpinSlash"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_SpinSlash/Model_Common_SpinSlash.ysh",
+                    XMMatrixRotationX(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, Texture_Common_SpinSlash_1.iLevelID, Texture_Common_SpinSlash_1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Common_SpinSlash_1.szFileTag, Texture_Common_SpinSlash_1.iNumTex));
+
+            TRY_ADD_PROTO(pProxy, Texture_Common_SpinSlash_2.iLevelID, Texture_Common_SpinSlash_2.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Common_SpinSlash_2.szFileTag, Texture_Common_SpinSlash_2.iNumTex));
+        )
+    );
+
     Register(CTestTriggerBox::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
         CREATOR(CTestTriggerBox),
         LOADER()
@@ -463,6 +487,36 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Kabu_Body"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Kabu/Kabu.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
+    // 4. BrontoBurt
+    Register
+    (
+        CBrontoBurt::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CBrontoBurt),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBrontoBurt_Body::PROTOTYPE_TAG, CBrontoBurt_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BrontoBurt_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/BrontoBurt/BrontoBurt.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
+    // 5. PoppyBrosJr
+    Register
+    (
+        CPoppyBrosJr::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CPoppyBrosJr),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CPoppyBrosJr_Body::PROTOTYPE_TAG, CPoppyBrosJr_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_PoppyBrosJr_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/PoppyBrosJr/Model/PoppyBrosJr.ysh",
+                XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 

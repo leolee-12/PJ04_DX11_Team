@@ -132,6 +132,23 @@ void CKirby::On_Deserialized()
         m_pMovement->Sync_To_Controller();
 }
 
+void CKirby::Damaged(const ATTACK_INFO& tInfo)
+{
+    if (!Is_Active())
+        return;
+
+    if (Block_Hit(tInfo))
+        return;
+
+    On_Damaged(tInfo);
+
+    if (m_fCurHP <= 0.f)
+    {
+        m_fCurHP = 0.f;
+        On_Death(tInfo);
+    }
+}
+
 void CKirby::OnOffParts(COPY_ABILITY_TYPE eAbilityType, _bool bOn, _bool bOnlyWeapon)
 {
     auto OnOffPart = [this](const wchar_t* PartTag, _bool bOn)->void
@@ -479,7 +496,6 @@ _bool CKirby::Block_Hit(const ATTACK_INFO& tInfo)
 
 void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
 {
-    m_fInvincibleTime = s_fInvincibleDur;
 
     m_pKirby_StateMachine->On_Damaged_KirbyStateMachine(tInfo);
 }

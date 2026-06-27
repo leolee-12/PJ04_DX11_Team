@@ -1,0 +1,31 @@
+#pragma once
+#include "Monster_State_Attack.h"
+
+NS_BEGIN(Client)
+
+class CPoppyBrosJr_State_Throw final : public CMonster_State_Attack
+{
+private:
+	CPoppyBrosJr_State_Throw() = default;
+	virtual ~CPoppyBrosJr_State_Throw() = default;
+
+protected:
+	virtual HRESULT						Initialize(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f) override;
+
+public:
+	virtual MONSTER_STATE_TYPE			Get_StateType() override;
+	virtual void						Enter(MONSTER_STATE_TYPE ePrevState = MONSTER_STATE_TYPE::IDLE) override;
+	virtual void						Update(_float fTimeDelta) override;
+
+protected:
+	virtual void						Play_AttackAnimation() override;
+
+public:
+	static CPoppyBrosJr_State_Throw*	Create(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f);
+
+protected:
+	virtual void						Free() override;
+
+};
+
+NS_END

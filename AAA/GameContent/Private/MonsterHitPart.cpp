@@ -25,7 +25,7 @@ void CMonsterHitPart::SetUp_HitBox_Callback()
             ATTACK_INFO atk{};
             atk.fDamage = m_fDamage;
             atk.fKnockback = m_fKnockback;
-            XMStoreFloat3(&atk.vAttackerPos, m_pTransformCom->Get_State(STATE::POSITION));
+            atk.vAttackerPos = _float3(m_pParentMatrix->_41, m_pParentMatrix->_42, m_pParentMatrix->_43);       // 호준 수정 
             atk.pAttacker = this;
             pVictim->Damaged(atk);
 #ifdef _DEBUG

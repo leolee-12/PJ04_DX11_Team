@@ -33,7 +33,11 @@ void CKirby_State::Exit(CKirby* pKirby)
 void CKirby_State::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
 {
     CMovement_Child* pMovement = pKirby->Get_Movement();
-    pMovement->Apply_Knockback(tInfo.vAttackerPos, tInfo.fKnockback * 5.f, tInfo.fKnockback * 1.5f);
+    pMovement->Apply_Knockback(tInfo.vAttackerPos, 180.f, 9.f);  // Test
+
+    pKirby->Add_HP(-tInfo.fDamage);
+    pKirby->Start_DamageInvincibility();
+
     pKirby->Change_State(KIRBY_STATE_TYPE::DAMAGED);
 }
 
@@ -58,10 +62,10 @@ _bool CKirby_State::Handle_MoveCommand(CKirby* pKirby, CKirby_Command* pCommand)
 
 _bool CKirby_State::Try_Transition_Fall(CKirby* pKirby)
 {
-    CMovement_Child* pMovementCom = pKirby->Get_Movement();
-    _float fYVelocity = pMovementCom->Get_VerticalVelocity();
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    _float fYVelocity = pMovement->Get_VerticalVelocity();
 
-    _bool bIsGround = pMovementCom->Is_Grounded();
+    _bool bIsGround = pMovement->Is_Grounded();
     if (bIsGround == false && fYVelocity <= CKirby::s_fFallVelocityY)
     {  
         pKirby->Change_State(KIRBY_STATE_TYPE::FALL);
