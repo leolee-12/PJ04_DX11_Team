@@ -81,6 +81,9 @@ HRESULT CRenderer::Initialize()
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_GeoNormal"))))
         return E_FAIL;
 
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_Decal"),       TEXT("Target_Diffuse"))))
+        return E_FAIL;
+
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Light"))))
         return E_FAIL;
 
@@ -194,6 +197,8 @@ HRESULT CRenderer::Draw()
     if (FAILED(Render_VolumetricFog()))
         return E_FAIL;
     if (FAILED(Render_NonBlend()))
+        return E_FAIL;
+    if (FAILED(Render_Decals()))
         return E_FAIL;
     if (FAILED(Render_SSAO()))
         return E_FAIL;
@@ -319,6 +324,22 @@ HRESULT CRenderer::Render_NonBlend()
         return E_FAIL;
 
     return S_OK;
+}
+
+HRESULT CRenderer::Render_Decals()
+{
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Decal"), nullptr, false, false)))
+        return E_FAIL;
+
+    for (auto& pRenderObject : m_RenderObjects[ETOUI(RENDERID::DECAL)])
+    {
+        if (nullptr != pRenderObject)
+            pRenderObject->Render_Decal();
+        Safe_Release(pRenderObject);
+    }
+    m_RenderObjects[ETOUI(RENDERID::DECAL)].clear();
+
+    return m_pGameInstance_Proxy->End_MRT();
 }
 
 HRESULT CRenderer::Render_SSAO()

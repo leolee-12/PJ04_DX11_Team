@@ -545,6 +545,82 @@ HRESULT CEnvObject::Render_Shadow()
 	return S_OK;
 }
 
+//HRESULT CEnvObject::Render_Decal()
+//{
+//	if (nullptr == m_pModelCom)
+//		return S_OK;
+//	if (FAILED(Bind_ShaderResources()))
+//		return E_FAIL;
+//
+//	// 데칼 전용 추가
+//	m_pShaderCom->Bind_RawValue("g_fDecalAlpha", &m_fDecalAlpha, sizeof(_float));
+//	m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShaderCom, "g_DepthTexture");
+//
+//	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+//	for (_uint i = 0; i < iNumMeshes; ++i)
+//	{
+//		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
+//
+//		auto BindMaterial = [&](const _char* pConstantName, MTEX_TYPE eType, DEFAULT_TEXTURE eDefaultKind) -> HRESULT
+//			{
+//				const _uint iLayerIndex = Layer.idx[ETOUI(eType)];
+//				const _uint iTextureCount = m_pModelCom->Get_MeshTextureCount(i, eType);
+//
+//				if (iTextureCount > 0u)
+//				{
+//					const _uint iSafeIndex = (iLayerIndex < iTextureCount) ? iLayerIndex : (iTextureCount - 1u);
+//
+//					if (SUCCEEDED(m_pModelCom->Bind_Material(m_pShaderCom, pConstantName, i, eType, iSafeIndex)))
+//						return S_OK;
+//				}
+//
+//				// 실패 시 Default Texture로 바인딩
+//				return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(m_pShaderCom, pConstantName, eDefaultKind);
+//			};
+//
+//		if (FAILED(BindMaterial("g_DiffuseTexture", MTEX_TYPE::DIFFUSE, DEFAULT_TEXTURE::MAGENTA)))		return E_FAIL;
+//		if (FAILED(BindMaterial("g_NormalTexture", MTEX_TYPE::NORMALS, DEFAULT_TEXTURE::FLAT_NORMAL)))	return E_FAIL;
+//		if (FAILED(BindMaterial("g_MRATexture", MTEX_TYPE::METALNESS, DEFAULT_TEXTURE::MRA)))			return E_FAIL;
+//		if (FAILED(BindMaterial("g_UnknownTexture", MTEX_TYPE::UNKNOWN, DEFAULT_TEXTURE::BLACK)))		return E_FAIL;
+//
+//		const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
+//
+//		_uint iFlags = Layer.iFlags;
+//		if (m_bUseCameraDither)	iFlags |= ShaderPass::EnvInstFlags::Dither;
+//		else					iFlags &= ~ShaderPass::EnvInstFlags::Dither;
+//
+//		const _bool bUseDither = m_bUseCameraDither;
+//
+//		if (bUseDither && m_fDissolve >= 0.999f)
+//			continue;
+//
+//		if (FAILED(m_pShaderCom->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint))))
+//			return E_FAIL;
+//
+//		const _float4 vUVTransform = Layer.bUseUVTransform
+//			? _float4{ Layer.vUVScale.x, Layer.vUVScale.y, Layer.vUVOffset.x, Layer.vUVOffset.y }
+//		: _float4{ 1.f, 1.f, 0.f, 0.f };
+//
+//		if (FAILED(m_pShaderCom->Bind_RawValue("g_vUVTransform", &vUVTransform, sizeof(vUVTransform))))
+//			return E_FAIL;
+//
+//		if (FAILED(m_pShaderCom->Bind_RawValue("g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))
+//			return E_FAIL;
+//
+//		if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve", &m_fDissolve, sizeof(_float))))
+//			return E_FAIL;
+//
+//		const ENV_SHADER_PASS_META* pMeta = Find_EnvShaderPassMeta(Layer.iPass);
+//		const _uint iPass = pMeta->iNonAnimPass;
+//
+//		if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::DECAL)))
+//			return E_FAIL;
+//		if (FAILED(m_pModelCom->Render(i)))
+//			return E_FAIL;
+//	}
+//	return S_OK;
+//}
+
 void CEnvObject::Update_LocalBounds()
 {
 	if (nullptr == m_pModelCom)

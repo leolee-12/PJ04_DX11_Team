@@ -145,6 +145,8 @@ enum class ENV_PASS : _int
 	MN,
 	DISCARD,
 
+	DECAL = 15,
+
 	_COUNT
 };
 
@@ -167,6 +169,8 @@ namespace ShaderPass
 		inline constexpr _uint GRASS_FUR = 11;
 		inline constexpr _uint MN = 12;
 		inline constexpr _uint DISCARD = 13;
+
+		inline constexpr _uint DECAL = 15;
 	}
 
 	namespace EnvInstFlags

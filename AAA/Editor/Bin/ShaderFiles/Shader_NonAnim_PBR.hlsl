@@ -7,6 +7,9 @@ Texture2D g_NormalTexture;
 Texture2D g_UnknownTexture;
 Texture2D g_MRATexture;
 
+Texture2D g_DepthTexture;       
+float g_fDecalAlpha = 1.f;
+
 float4 g_vColor = float4(1.f, 1.f, 1.f, 1.f);
 float3 g_vMRA = float3(0.f, 1.f, 1.f);
 
@@ -556,6 +559,21 @@ PS_OUT PS_COLOR_MRA_DITHER(PS_IN In)
     return Out;
 }
 
+float4 PS_DECAL(PS_NONINST_IN In) : SV_TARGET0 // 알베도만
+{
+    // 셰이더 깊이테스트 (Target_Depth 도 vProjPos.z/w 저장 -> 직접 비교)
+    float2 suv;
+    suv.x = In.vProjPos.x / In.vProjPos.w * 0.5f + 0.5f;
+    suv.y = In.vProjPos.y / In.vProjPos.w * -0.5f + 0.5f;
+    float decalDepth = In.vProjPos.z / In.vProjPos.w;
+    float sceneDepth = g_DepthTexture.Sample(PointSampler, suv).x;
+    if (decalDepth > sceneDepth + 0.0005f)
+        discard;
+
+    float4 col = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord); // PS_DIFF 와 동일
+    return float4(col.rgb, col.a * g_fDecalAlpha); // 컷아웃 아님, 알파블렌드
+}
+
 technique11 DefaultTechnique
 {
     pass DefaultPass // 0
@@ -707,5 +725,14 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_COLOR_MRA_DITHER();
+    }
+    pass Decal_Pass // 15
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetBlendState(BS_Decal, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_NONINST_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DECAL();
     }
 }
