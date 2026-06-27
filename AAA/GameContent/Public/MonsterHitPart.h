@@ -21,16 +21,20 @@ public:
     void         Set_Drawn(_bool bDrawn);
     void         Set_HitBox(_bool b);
 
+public:
+    void        Set_Damage(_float fDamage) { m_fDamage = fDamage; }     // 호준 추가
+
 protected:
-    HRESULT Ready_HitBox(const CAPSULE_DESC& Desc, _float fDamage = 5.f, _float fKnockback = 8.f);
+    HRESULT     Ready_HitBox(const CAPSULE_DESC& Desc, _float fDamage = 5.f, _float fKnockback = 8.f);
 
 protected:
     CCollider* m_pHitBox = { nullptr };
     _float     m_fDamage = { 5.f };
     _float     m_fKnockback = { 8.f };
 
-private:
-    void SetUp_HitBox_Callback();
+protected:
+    // 호준 수정 
+    virtual void SetUp_HitBox_Callback();       
 
 protected:
     virtual void Free() override;

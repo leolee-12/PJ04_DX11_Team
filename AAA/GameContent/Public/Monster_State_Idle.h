@@ -2,7 +2,6 @@
 #include "Monster_State.h"
 
 NS_BEGIN(Client)
-class CMonster;
 
 class CMonster_State_Idle : public CMonster_State
 {
@@ -22,8 +21,8 @@ public:
 public:
 	static CMonster_State_Idle*		Create(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f);
 
-private:
-	static	constexpr _float		s_fFaceDeadZoneXZ = { 0.5f };
+protected:
+	_float							m_fFaceDeadZoneXZ = { 0.5f };
 
 protected:
 	virtual void					Free() override;

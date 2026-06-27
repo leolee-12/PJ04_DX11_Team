@@ -349,6 +349,31 @@ PS_OUT PS_BOX(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_EYE_WITHOUTNORMAL(PS_IN In)
+{
+    PS_OUT Out;
+    
+    vector vEye = g_UnknownTexture.Sample(ClampSampler, In.vTexcoord);
+    vector vBase = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord1);
+    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord1).rgb;
+    
+    float3 vAlbedo = lerp(vBase.rgb, vEye.rgb, vEye.a);
+    vector vMtrlDiffuse = vector(vAlbedo, vBase.a);
+    if (vMtrlDiffuse.a < 0.1f)
+        discard;
+    
+    float3 N = normalize(In.vNormal.xyz);       // 정점(기하) 노말
+    
+    Out.vDiffuse        = vMtrlDiffuse;
+    Out.vNormal         = float4(N * 0.5f + 0.5f, 0.f); // 노말맵 없이 정점 노말
+    Out.vDepth          = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA            = float4(mra, g_iMaterialID / 255.f);
+    Out.vEmissive       = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
+    Out.vGeoNormal      = float4(N * 0.5f + 0.5f, 0.f);
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass DefaultPass // 0
@@ -413,5 +438,15 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_BOX();
+    }
+    pass EyeWithOutNormalPass // 6
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_EYE_WITHOUTNORMAL();
     }
 }
