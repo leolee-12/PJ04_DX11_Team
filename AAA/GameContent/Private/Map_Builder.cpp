@@ -227,6 +227,19 @@ HRESULT CMap_Builder::Build_EnvDescs(const MAP_MANIFEST_DESC& Manifest, vector<E
 			Desc.tRender.bUseShadow = false;
 			Desc.tRender.bShadowMappingCaster = Desc.tRender.bHasShadow; // Legacy transitional.
 
+			if (Desc.tRender.bIsDecal)
+			{
+				Desc.tRender.bUseShadow = false;
+				Desc.tRender.bShadowMappingCaster = false;
+
+				Desc.tCollision.eColliderKind = ENV_COLLIDER_KIND::NONE;
+				Desc.tCollision.eSimpleShape = ENV_SIMPLE_SHAPE::NONE;
+				Desc.tCollision.bHasCollMesh = false;
+				Desc.tCollision.bCookCollMesh = false;
+				Desc.tCollision.bUseCollMesh = false;
+				Desc.tCollision.bHasDecorCollisionApxbin = false;
+			}
+
 			pOutEnvDescs->push_back(Desc);
 		}
 

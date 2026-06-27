@@ -22,6 +22,7 @@ public:
 	ENV_INSTANCE_BATCH_HANDLE Register_BatchesForDesc(const ENV_OBJECT_DESC& tDesc);
 	_bool Submit_Main(_uint iBatchIndex, CEnvObject_Static* pObj);
 	_bool Submit_Shadow(_uint iBatchIndex, CEnvObject_Static* pObj);
+	_bool Submit_Decal(_uint iBatchIndex, CEnvObject_Static* pObj);
 
 private:
 	vector<CEnv_InstanceBatch*> m_Batches;

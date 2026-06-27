@@ -109,17 +109,21 @@ CEnvObject::CEnvObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	, m_bCastShadow{ false }
 	, m_bUseCullDistance{ true }
 	, m_bUseCullFrustum{ true }
+	, m_bIsDecal{ false }
+	, m_fDecalAlpha{ 1.f }
 {
 }
 
 CEnvObject::CEnvObject(const CEnvObject& Prototype)
 	: CGameObject(Prototype)
-	, m_tDesc(Prototype.m_tDesc)
-	, m_strProtoTag(Prototype.m_strProtoTag)
 	, m_bRenderable{ Prototype.m_bRenderable }
 	, m_bCastShadow{ Prototype.m_bCastShadow }
 	, m_bUseCullDistance{ Prototype.m_bUseCullDistance }
 	, m_bUseCullFrustum{ Prototype.m_bUseCullFrustum }
+	, m_bIsDecal{ Prototype.m_bIsDecal }
+	, m_fDecalAlpha{ Prototype.m_fDecalAlpha }
+	, m_tDesc(Prototype.m_tDesc)
+	, m_strProtoTag(Prototype.m_strProtoTag)
 {
 }
 
@@ -144,6 +148,7 @@ HRESULT CEnvObject::Initialize(void* pArg)
 	Apply_TransformFromDesc();
 
 	m_bUseCameraDither = m_tDesc.tRender.bUseNearDistAlpha;
+	m_bIsDecal = m_tDesc.tRender.bIsDecal;
 
 	return S_OK;
 }
@@ -218,17 +223,11 @@ HRESULT CEnvObject::Ready_RenderComponents(_uint iModelProtoLevel, const wstring
 	if (wstrModelProtoTag.empty())
 		return S_OK;
 
-	m_pShaderCom = Add_Component<CShader>(
-		Shader_NonAnimMesh_PBR.iLevelID,
-		Shader_NonAnimMesh_PBR.szProtoTag,
-		TEXT("Com_Shader"));
+	m_pShaderCom = Add_Component<CShader>(Shader_NonAnimMesh_PBR.iLevelID, Shader_NonAnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
-	m_pModelCom = Add_Component<CModel>(
-		iModelProtoLevel,
-		wstrModelProtoTag,
-		TEXT("Com_Model"));
+	m_pModelCom = Add_Component<CModel>(iModelProtoLevel, wstrModelProtoTag, TEXT("Com_Model"));
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
 
@@ -391,9 +390,6 @@ _bool CEnvObject::Should_CreatePhysicsActor() const
 
 HRESULT CEnvObject::Bind_ShaderResources()
 {
-	if (nullptr == m_pShaderCom || nullptr == m_pTransformCom)
-		return E_FAIL;
-
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 
@@ -408,7 +404,7 @@ HRESULT CEnvObject::Bind_ShaderResources()
 
 HRESULT CEnvObject::Render()
 {
-	if (nullptr == m_pModelCom)
+	if (!m_bRenderable)
 		return S_OK;
 
 	if (FAILED(Bind_ShaderResources()))
@@ -484,7 +480,7 @@ HRESULT CEnvObject::Render()
 
 HRESULT CEnvObject::Render_Shadow()
 {
-	if (!m_bRenderable || nullptr == m_pModelCom || nullptr == m_pShaderCom)
+	if (!m_bRenderable)
 		return S_OK;
 
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
@@ -545,81 +541,97 @@ HRESULT CEnvObject::Render_Shadow()
 	return S_OK;
 }
 
-//HRESULT CEnvObject::Render_Decal()
-//{
-//	if (nullptr == m_pModelCom)
-//		return S_OK;
-//	if (FAILED(Bind_ShaderResources()))
-//		return E_FAIL;
-//
-//	// 데칼 전용 추가
-//	m_pShaderCom->Bind_RawValue("g_fDecalAlpha", &m_fDecalAlpha, sizeof(_float));
-//	m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShaderCom, "g_DepthTexture");
-//
-//	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
-//	for (_uint i = 0; i < iNumMeshes; ++i)
-//	{
-//		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
-//
-//		auto BindMaterial = [&](const _char* pConstantName, MTEX_TYPE eType, DEFAULT_TEXTURE eDefaultKind) -> HRESULT
-//			{
-//				const _uint iLayerIndex = Layer.idx[ETOUI(eType)];
-//				const _uint iTextureCount = m_pModelCom->Get_MeshTextureCount(i, eType);
-//
-//				if (iTextureCount > 0u)
-//				{
-//					const _uint iSafeIndex = (iLayerIndex < iTextureCount) ? iLayerIndex : (iTextureCount - 1u);
-//
-//					if (SUCCEEDED(m_pModelCom->Bind_Material(m_pShaderCom, pConstantName, i, eType, iSafeIndex)))
-//						return S_OK;
-//				}
-//
-//				// 실패 시 Default Texture로 바인딩
-//				return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(m_pShaderCom, pConstantName, eDefaultKind);
-//			};
-//
-//		if (FAILED(BindMaterial("g_DiffuseTexture", MTEX_TYPE::DIFFUSE, DEFAULT_TEXTURE::MAGENTA)))		return E_FAIL;
-//		if (FAILED(BindMaterial("g_NormalTexture", MTEX_TYPE::NORMALS, DEFAULT_TEXTURE::FLAT_NORMAL)))	return E_FAIL;
-//		if (FAILED(BindMaterial("g_MRATexture", MTEX_TYPE::METALNESS, DEFAULT_TEXTURE::MRA)))			return E_FAIL;
-//		if (FAILED(BindMaterial("g_UnknownTexture", MTEX_TYPE::UNKNOWN, DEFAULT_TEXTURE::BLACK)))		return E_FAIL;
-//
-//		const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
-//
-//		_uint iFlags = Layer.iFlags;
-//		if (m_bUseCameraDither)	iFlags |= ShaderPass::EnvInstFlags::Dither;
-//		else					iFlags &= ~ShaderPass::EnvInstFlags::Dither;
-//
-//		const _bool bUseDither = m_bUseCameraDither;
-//
-//		if (bUseDither && m_fDissolve >= 0.999f)
-//			continue;
-//
-//		if (FAILED(m_pShaderCom->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint))))
-//			return E_FAIL;
-//
-//		const _float4 vUVTransform = Layer.bUseUVTransform
-//			? _float4{ Layer.vUVScale.x, Layer.vUVScale.y, Layer.vUVOffset.x, Layer.vUVOffset.y }
-//		: _float4{ 1.f, 1.f, 0.f, 0.f };
-//
-//		if (FAILED(m_pShaderCom->Bind_RawValue("g_vUVTransform", &vUVTransform, sizeof(vUVTransform))))
-//			return E_FAIL;
-//
-//		if (FAILED(m_pShaderCom->Bind_RawValue("g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))
-//			return E_FAIL;
-//
-//		if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve", &m_fDissolve, sizeof(_float))))
-//			return E_FAIL;
-//
-//		const ENV_SHADER_PASS_META* pMeta = Find_EnvShaderPassMeta(Layer.iPass);
-//		const _uint iPass = pMeta->iNonAnimPass;
-//
-//		if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::DECAL)))
-//			return E_FAIL;
-//		if (FAILED(m_pModelCom->Render(i)))
-//			return E_FAIL;
-//	}
-//	return S_OK;
-//}
+HRESULT CEnvObject::Render_Decal()
+{
+	if (!m_bRenderable)
+		return S_OK;
+
+	if (FAILED(Bind_ShaderResources()))
+		return E_FAIL;
+
+	/* -----------------------데칼 전용 추가----------------------- */
+	_float4x4 WorldMatrixInverse{};
+	XMStoreFloat4x4(&WorldMatrixInverse, XMMatrixInverse(nullptr, XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr())));
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrixInverse", &WorldMatrixInverse)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrixInverse", m_pGameInstance_Proxy->Get_InverseMatrix_Prespec(D3DTS::VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrixInverse", m_pGameInstance_Proxy->Get_InverseMatrix_Prespec(D3DTS::PROJ))))
+		return E_FAIL;
+
+	const _float3 vDecalBoundsCenter = m_LocalBounds.Center;
+	const _float3 vDecalBoundsExtents = m_LocalBounds.Extents;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vDecalBoundsCenter", &vDecalBoundsCenter, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vDecalBoundsExtents", &vDecalBoundsExtents, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fDecalAlpha", &m_fDecalAlpha, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShaderCom, "g_DepthTexture")))
+		return E_FAIL;
+	/* ------------------------------------------------------------ */
+
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
+
+		auto BindMaterial = [&](const _char* pConstantName, MTEX_TYPE eType, DEFAULT_TEXTURE eDefaultKind) -> HRESULT
+			{
+				const _uint iLayerIndex = Layer.idx[ETOUI(eType)];
+				const _uint iTextureCount = m_pModelCom->Get_MeshTextureCount(i, eType);
+
+				if (iTextureCount > 0u)
+				{
+					const _uint iSafeIndex = (iLayerIndex < iTextureCount) ? iLayerIndex : (iTextureCount - 1u);
+
+					if (SUCCEEDED(m_pModelCom->Bind_Material(m_pShaderCom, pConstantName, i, eType, iSafeIndex)))
+						return S_OK;
+				}
+
+				// 실패 시 Default Texture로 바인딩
+				return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(m_pShaderCom, pConstantName, eDefaultKind);
+			};
+
+		if (FAILED(BindMaterial("g_DiffuseTexture", MTEX_TYPE::DIFFUSE, DEFAULT_TEXTURE::MAGENTA)))		return E_FAIL;
+		if (FAILED(BindMaterial("g_NormalTexture", MTEX_TYPE::NORMALS, DEFAULT_TEXTURE::FLAT_NORMAL)))	return E_FAIL;
+		if (FAILED(BindMaterial("g_MRATexture", MTEX_TYPE::METALNESS, DEFAULT_TEXTURE::MRA)))			return E_FAIL;
+		if (FAILED(BindMaterial("g_UnknownTexture", MTEX_TYPE::UNKNOWN, DEFAULT_TEXTURE::BLACK)))		return E_FAIL;
+
+		const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
+
+		//_uint iFlags = Layer.iFlags;
+		//if (m_bUseCameraDither)	iFlags |= ShaderPass::EnvInstFlags::Dither;
+		//else					iFlags &= ~ShaderPass::EnvInstFlags::Dither;
+
+		//const _bool bUseDither = m_bUseCameraDither;
+		//
+		//if (bUseDither && m_fDissolve >= 0.999f)
+		//	continue;
+
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint))))
+			return E_FAIL;
+
+		const _float4 vUVTransform = Layer.bUseUVTransform
+			? _float4{ Layer.vUVScale.x, Layer.vUVScale.y, Layer.vUVOffset.x, Layer.vUVOffset.y }
+			: _float4{ 1.f, 1.f, 0.f, 0.f };
+
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_vUVTransform", &vUVTransform, sizeof(vUVTransform))))
+			return E_FAIL;
+		//if (FAILED(m_pShaderCom->Bind_RawValue("g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))
+		//	return E_FAIL;
+		//if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve", &m_fDissolve, sizeof(_float))))
+		//	return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::DECAL)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Render(i)))
+			return E_FAIL;
+	}
+	return S_OK;
+}
 
 void CEnvObject::Update_LocalBounds()
 {
@@ -673,7 +685,6 @@ void CEnvObject::Check_Visible()
 
 	// Distance -> Frustum
 	// 1. Main
-
 	if (m_bUseCullDistance
 		&& m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_DISTANCE_CULL_START))
 	{

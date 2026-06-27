@@ -328,7 +328,7 @@ HRESULT CRenderer::Render_NonBlend()
 
 HRESULT CRenderer::Render_Decals()
 {
-    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Decal"), nullptr, false, false)))
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Decal"), nullptr, true, false)))
         return E_FAIL;
 
     for (auto& pRenderObject : m_RenderObjects[ETOUI(RENDERID::DECAL)])
