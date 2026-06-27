@@ -13,8 +13,8 @@ NS_BEGIN(Client)
 class CLIENT_DLL IRailDataReceiver
 {
 public:
-    virtual ~IRailDataReceiver() = default;
-    virtual void Set_RailDesc(const LD_RAIL_DESC& RailDesc) = 0;
+	virtual ~IRailDataReceiver() = default;
+	virtual void Set_RailDesc(const LD_RAIL_DESC& RailDesc) = 0;
 };
 
 NS_END

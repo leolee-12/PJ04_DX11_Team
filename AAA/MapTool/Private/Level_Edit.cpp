@@ -12,6 +12,7 @@
 #include "MapStage.h"
 #include "MapSection.h"
 #include "EnvObject_Static.h"
+#include "Env_InstanceController.h"
 #include "LevelDesign_Registry.h"
 
 #ifdef _DEBUG
@@ -134,6 +135,17 @@ namespace
 
 		*pOutPath = strLegacyPath;
 		return true;
+	}
+
+	wstring Build_EnvPreviewCountText(const MAP_LOAD_RESULT& Report, _bool bUseCreatedLabel = false)
+	{
+		wstring strStatus = bUseCreatedLabel ? L"created=" : L"env=";
+		strStatus += to_wstring(Report.iEnvCreatedCount);
+		strStatus += L" / desc=" + to_wstring(Report.iEnvDescriptorCount);
+		strStatus += L" / json=" + to_wstring(Report.iEnvJsonLoadedCount);
+		strStatus += L" / missingModel=" + to_wstring(Report.iEnvSkippedMissingModel);
+		strStatus += L" / createFailed=" + to_wstring(Report.iEnvSkippedCreateFailed);
+		return strStatus;
 	}
 }
 
@@ -499,6 +511,7 @@ HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
 	Apply_MapPreviewContentDesc(MapContentDesc, false);
 
 	vector<Client::ENV_OBJECT_DESC> DeletedEnvDescs;
+	MAP_LOAD_RESULT EnvReport{};
 
 	if (FAILED(Ready_MapStage()))
 	{
@@ -507,13 +520,15 @@ HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
 		return E_FAIL;
 	}
 
-	if (FAILED(Ready_EnvObjects(&DeletedEnvDescs)))
+	if (FAILED(Ready_EnvObjects(&DeletedEnvDescs, &EnvReport)))
 	{
 		const wstring strStageName = Get_MapPreviewLoadedStageNameRef().empty()
 			? StrToWstr(CMap_Loader::Get_MapName(iPresetIndex))
 			: Get_MapPreviewLoadedStageNameRef();
 
-		Set_MapPreviewStatus(L"Environment preview load failed. / stage=" + strStageName);
+		Set_MapPreviewStatus(
+			L"Environment preview load failed: stage=" + strStageName
+			+ L" / " + Build_EnvPreviewCountText(EnvReport, true));
 		Sync_MapPreviewRuntimeStateToSession();
 		return E_FAIL;
 	}
@@ -532,8 +547,7 @@ HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
 
 	Set_MapPreviewStatus(
 		L"Map preset loaded: " + strStageName
-		+ L" / env="
-		+ to_wstring(Get_MapPreviewEnvCreatedCountInternal())
+		+ L" / " + Build_EnvPreviewCountText(EnvReport)
 		+ L" / levelDesign=loaded");
 
 	if (nullptr != m_pMapPreviewSession)
@@ -654,8 +668,9 @@ HRESULT CLevel_Edit::Load_MapPreviewEnv(_uint iPresetIndex)
 	Apply_MapPreviewContentDesc(MapContentDesc, false);
 
 	vector<Client::ENV_OBJECT_DESC> DeletedEnvDescs;
+	MAP_LOAD_RESULT EnvReport{};
 
-	if (FAILED(Ready_EnvObjects(&DeletedEnvDescs)))
+	if (FAILED(Ready_EnvObjects(&DeletedEnvDescs, &EnvReport)))
 	{
 		if (nullptr != m_pMapStage)
 		{
@@ -663,19 +678,23 @@ HRESULT CLevel_Edit::Load_MapPreviewEnv(_uint iPresetIndex)
 				? L"(loaded stage)"
 				: Get_MapPreviewLoadedStageNameRef();
 
-			Set_MapPreviewStatus(L"Environment preview load failed. / stage=" + strStageName);
+			Set_MapPreviewStatus(
+				L"Environment preview load failed: stage=" + strStageName
+				+ L" / " + Build_EnvPreviewCountText(EnvReport, true));
 		}
 		else
 		{
-			Set_MapPreviewStatus(L"Environment preview load failed.");
+			Set_MapPreviewStatus(
+				L"Environment preview load failed: "
+				+ Build_EnvPreviewCountText(EnvReport, true));
 		}
 
 		Sync_MapPreviewRuntimeStateToSession();
 		return E_FAIL;
 	}
 
-	wstring strStatus = L"Environment preview loaded: env="
-		+ to_wstring(Get_MapPreviewEnvCreatedCountInternal());
+	wstring strStatus = L"Environment preview loaded: "
+		+ Build_EnvPreviewCountText(EnvReport);
 
 	if (nullptr != m_pMapStage)
 	{
@@ -773,6 +792,8 @@ void CLevel_Edit::Clear_MapPreview()
 	for (const auto& strLayerTag : MapLayers)
 		Clear_MapPreviewLayer(strLayerTag);
 
+	Clear_MapPreviewEnvInstanceController();
+
 #ifdef _DEBUG
 	CMapToolProfiler::GetInstance()->Clear_EnvObjects();
 	CMapToolProfiler::GetInstance()->Set_Stage(nullptr);
@@ -838,6 +859,8 @@ void CLevel_Edit::Clear_MapPreviewEnv()
 
 	for (const auto& strLayerTag : MapLayers)
 		Clear_MapPreviewLayer(strLayerTag);
+
+	Clear_MapPreviewEnvInstanceController();
 
 #ifdef _DEBUG
 	CMapToolProfiler::GetInstance()->Clear_EnvObjects();
@@ -921,6 +944,19 @@ void CLevel_Edit::Clear_MapPreviewLayer(const wstring& strLayerTag)
 
 	if (bLayerChanged)
 		Mark_HierarchyDirty();
+}
+
+void CLevel_Edit::Clear_MapPreviewEnvInstanceController()
+{
+	if (nullptr == m_pMapPreviewEnvInstanceController)
+		return;
+
+	if (m_pSelected == m_pMapPreviewEnvInstanceController)
+		Set_Selected(nullptr);
+
+	m_MapPreviewObjects.erase(m_pMapPreviewEnvInstanceController);
+	m_pGameInstance_Proxy->Destroy_GameObject(m_pMapPreviewEnvInstanceController);
+	m_pMapPreviewEnvInstanceController = nullptr;
 }
 
 void CLevel_Edit::Add_MapPreviewObjectHandle(
@@ -1169,8 +1205,11 @@ HRESULT CLevel_Edit::Ready_MapStage()
 	return S_OK;
 }
 
-HRESULT CLevel_Edit::Ready_EnvObjects(vector<ENV_OBJECT_DESC>* pOutDeletedEnvDescs)
+HRESULT CLevel_Edit::Ready_EnvObjects(vector<ENV_OBJECT_DESC>* pOutDeletedEnvDescs, MAP_LOAD_RESULT* pOutReport)
 {
+	if (nullptr != pOutReport)
+		*pOutReport = {};
+
 	MAP_EDIT_DATA MapContentDesc = Build_MapPreviewContentDescSnapshot();
 
 	if (0 > MapContentDesc.iPresetIndex)
@@ -1199,6 +1238,7 @@ HRESULT CLevel_Edit::Ready_EnvObjects(vector<ENV_OBJECT_DESC>* pOutDeletedEnvDes
 	Context.iModelLevel = ETOUI(LEVEL::STATIC);
 	Context.pCreatedCallback = &On_MapPreviewObjectCreated;
 	Context.pCallbackContext = this;
+	Context.ppOutEnvInstanceController = &m_pMapPreviewEnvInstanceController;
 
 	MAP_LOAD_RESULT Report{};
 	const HRESULT hr = CMap_Loader::Load_Env_Runtime(
@@ -1209,10 +1249,17 @@ HRESULT CLevel_Edit::Ready_EnvObjects(vector<ENV_OBJECT_DESC>* pOutDeletedEnvDes
 		pOutDeletedEnvDescs,
 		true);
 
+	if (nullptr != pOutReport)
+		*pOutReport = Report;
+
 	if (FAILED(hr))
+	{
+		Log_Warning("Environment preview load failed: " + WstrToStr(Build_EnvPreviewCountText(Report, true)));
 		return E_FAIL;
+	}
 
 	Set_MapPreviewEnvRuntime(true, Report.iEnvCreatedCount);
+	Log_Info("Environment preview loaded: " + WstrToStr(Build_EnvPreviewCountText(Report)));
 	return S_OK;
 }
 

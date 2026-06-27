@@ -47,6 +47,11 @@
     <ClInclude Include="..\Public\Common_SpinSlash.h" />
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h" />
     <ClInclude Include="..\Public\Sword_SpinSlash.h" />
+    <ClInclude Include="..\public\PhysicsProjectile.h" />
+    <ClInclude Include="..\public\Projectile.h" />
+    <ClInclude Include="..\public\Projectile_Boulder.h" />
+    <ClInclude Include="..\public\Projectile_Manager.h" />
+    <ClInclude Include="..\public\Projectile_Movement.h" />
     <ClInclude Include="..\Public\UI_FlashCurtain.h" />
     <ClInclude Include="..\public\CutsceneActor.h" />
     <ClInclude Include="..\public\CutsceneGorilla.h" />
@@ -55,6 +60,8 @@
     <ClInclude Include="..\Public\Env_CollisionCatalog.h" />
     <ClInclude Include="..\Public\Env_InstanceBatch.h" />
     <ClInclude Include="..\Public\Env_InstanceController.h" />
+    <ClInclude Include="..\Public\LevelDesign_EventObject.h" />
+    <ClInclude Include="..\Public\LevelDesign_FallBorder.h" />
     <ClInclude Include="..\Public\Kabu.h" />
     <ClInclude Include="..\Public\Kabu_Body.h" />
     <ClInclude Include="..\Public\Kabu_Brain.h" />
@@ -263,6 +270,11 @@
     <ClCompile Include="..\Private\Common_SpinSlash.cpp" />
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlash.cpp" />
+    <ClCompile Include="..\private\PhysicsProjectile.cpp" />
+    <ClCompile Include="..\private\Projectile.cpp" />
+    <ClCompile Include="..\private\Projectile_Boulder.cpp" />
+    <ClCompile Include="..\private\Projectile_Manager.cpp" />
+    <ClCompile Include="..\private\Projectile_Movement.cpp" />
     <ClCompile Include="..\Private\UI_FlashCurtain.cpp" />
     <ClCompile Include="..\private\CutsceneActor.cpp" />
     <ClCompile Include="..\private\CutsceneGorilla.cpp" />
@@ -281,6 +293,8 @@
     <ClCompile Include="..\private\GigantEdge_Body.cpp" />
     <ClCompile Include="..\private\GigantEdge_Shield.cpp" />
     <ClCompile Include="..\private\GigantEdge_Sword.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_EventObject.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_FallBorder.cpp" />
     <ClCompile Include="..\Private\Kabu.cpp" />
     <ClCompile Include="..\Private\Kabu_Body.cpp" />
     <ClCompile Include="..\Private\Kabu_Brain.cpp" />

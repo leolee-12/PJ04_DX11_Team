@@ -17,6 +17,7 @@ struct MAP_RUNTIME_LOAD_CONTEXT
 
 	MAP_OBJECT_CREATED_CALLBACK pCreatedCallback = { nullptr };
 	void* pCallbackContext = { nullptr };
+	CEnv_InstanceController** ppOutEnvInstanceController = { nullptr };
 };
 
 class CLIENT_DLL CMap_Loader final : public CBase
@@ -130,6 +131,7 @@ private:
 		MAP_LOAD_RESULT* pOutReport = nullptr);
 
 	HRESULT Build_Package(const _wstring& strManifestPath, MAP_PACKAGE* pOutPackage);
+	HRESULT Build_Package(const _wstring& strManifestPath, const MAP_PACKAGE_BUILD_OPTIONS& BuildOptions, MAP_PACKAGE* pOutPackage);
 	HRESULT Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, const MAP_PACKAGE& Package);
 	HRESULT Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST& Request, MAP_LOAD_RESULT* pOutReport = nullptr);
 

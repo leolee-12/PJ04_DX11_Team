@@ -80,7 +80,7 @@ void CPanel_Palette::Render()
 
         if (ImGui::Button("OK"))
         {
-            wstring strName(m_szNameBuf, m_szNameBuf + strlen(m_szNameBuf));
+            wstring strName = StrToWstr(m_szNameBuf);
             pLevel->Spawn_Object(m_strPendingTag, L"Default_Layer", strName);
             ImGui::CloseCurrentPopup();
         }

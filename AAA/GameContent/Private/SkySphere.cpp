@@ -59,8 +59,8 @@ HRESULT CSkySphere::Render()
         if (FAILED(m_pSphereModels[m_iModelIndex]->Bind_Material(m_pShaderCom, "g_DiffuseTexture", (_uint)i, MTEX_TYPE::UNKNOWN, 0)))
             continue;
 
-        if (FAILED(m_pSphereModels[m_iModelIndex]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", (_uint)i)))
-            int a = 1;
+        //if (FAILED(m_pSphereModels[m_iModelIndex]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", (_uint)i)))
+        //    int a = 1;
 
         if (FAILED(m_pShaderCom->Begin(0)))
             return E_FAIL;
