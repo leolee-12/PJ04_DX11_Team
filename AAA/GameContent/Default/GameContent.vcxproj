@@ -58,6 +58,8 @@
     <ClInclude Include="..\Public\Env_CollisionCatalog.h" />
     <ClInclude Include="..\Public\Env_InstanceBatch.h" />
     <ClInclude Include="..\Public\Env_InstanceController.h" />
+    <ClInclude Include="..\Public\LevelDesign_EventObject.h" />
+    <ClInclude Include="..\Public\LevelDesign_FallBorder.h" />
     <ClInclude Include="..\Public\Kabu.h" />
     <ClInclude Include="..\Public\Kabu_Body.h" />
     <ClInclude Include="..\Public\Kabu_Brain.h" />
@@ -287,6 +289,8 @@
     <ClCompile Include="..\private\GigantEdge_Body.cpp" />
     <ClCompile Include="..\private\GigantEdge_Shield.cpp" />
     <ClCompile Include="..\private\GigantEdge_Sword.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_EventObject.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_FallBorder.cpp" />
     <ClCompile Include="..\Private\Kabu.cpp" />
     <ClCompile Include="..\Private\Kabu_Body.cpp" />
     <ClCompile Include="..\Private\Kabu_Brain.cpp" />

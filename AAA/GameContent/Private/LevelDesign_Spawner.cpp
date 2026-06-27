@@ -18,6 +18,7 @@ namespace
 
 				if constexpr (is_same_v<T, LD_BREAKABLE_DESC>
 					|| is_same_v<T, LD_LADDER_DESC>
+					|| is_same_v<T, LD_EVENTOBJECT_DESC>
 					|| is_same_v<T, LD_FOOD_DESC>
 					|| is_same_v<T, LD_POINT_DESC>
 					|| is_same_v<T, LD_BUSH_DESC>)

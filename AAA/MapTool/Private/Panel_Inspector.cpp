@@ -650,16 +650,25 @@ _bool CPanel_Inspector::Draw_Transform(CGameObject* pObject, const string& strSu
 
 		_float2 vUIScale = { vScale.x, vScale.y };
 		if (ImGui::DragFloat2(("Scale##" + strSuffix).c_str(), (float*)&vUIScale, 0.1f))
+		{
 			pTransform->Set_Scale(vUIScale.x, vUIScale.y, 1.f);
+			bChanged = true;
+		}
 
 		if (ImGui::DragFloat(("Uniform Scale##" + strSuffix).c_str(), &fRatioScale, 0.01f, 0.01f, 100.f))
+		{
 			pTransform->Set_Scale(fBaseScaleX * fRatioScale, fBaseScaleY * fRatioScale, 1.f);
+			bChanged = true;
+		}
 	}
 	else
 	{
 		_float fUniformScale = vScale.x;
 		if (ImGui::DragFloat(("Scale##" + strSuffix).c_str(), &fUniformScale, 0.1f))
+		{
 			pTransform->Set_Scale(fUniformScale, fUniformScale, fUniformScale);
+			bChanged = true;
+		}
 	}
 
 	return bChanged;
@@ -728,16 +737,18 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 			? *pbUseNearDistAlpha
 			: Desc.tRender.bUseNearDistAlpha);
 
-		if (bHasShadow)
+		const _bool bBaseUseShadow = false;
+		if (bHasShadow && nullptr != pbUseShadow && *pbUseShadow != bBaseUseShadow)
 		{
 			Edit.bHasShadow = true;
-			Edit.bUseShadow = (nullptr != pbUseShadow) ? *pbUseShadow : false;
+			Edit.bUseShadow = *pbUseShadow;
 		}
 
-		if (bHasCollMesh)
+		const _bool bBaseUseCollMesh = false;
+		if (bHasCollMesh && nullptr != pbUseCollMesh && *pbUseCollMesh != bBaseUseCollMesh)
 		{
 			Edit.bHasCollMesh = true;
-			Edit.bUseCollMesh = (nullptr != pbUseCollMesh) ? *pbUseCollMesh : false;
+			Edit.bUseCollMesh = *pbUseCollMesh;
 		}
 
 		if (Has_AnyMapEnvEdit(Edit))
@@ -1855,7 +1866,7 @@ _bool* CPanel_Inspector::Resolve_EnvShadowEditState(CLevel_Edit* pLevel, Client:
 		if (pLevel->Try_GetMapPreviewEnvEdit(pEnvObject, &SavedEdit))
 		{
 			if (SavedEdit.bHasShadow)
-				bUseShadow = SavedEdit.bUseShadow;
+				bUseShadow = bHasShadow && SavedEdit.bUseShadow;
 		}
 
 		if (!bHasShadow)
@@ -1885,7 +1896,7 @@ _bool* CPanel_Inspector::Resolve_EnvCollMeshEditState(CLevel_Edit* pLevel, Clien
 		if (pLevel->Try_GetMapPreviewEnvEdit(pEnvObject, &SavedEdit))
 		{
 			if (SavedEdit.bHasCollMesh)
-				bUseCollMesh = SavedEdit.bUseCollMesh;
+				bUseCollMesh = bHasCollMesh && SavedEdit.bUseCollMesh;
 		}
 
 		if (!bHasCollMesh)
