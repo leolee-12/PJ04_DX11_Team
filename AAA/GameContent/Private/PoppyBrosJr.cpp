@@ -1,0 +1,215 @@
+#include "PoppyBrosJr.h"
+#include "GameInstance.h"
+#include "Animator.h"
+
+#include "PoppyBrosJr_Body.h"
+#include "PoppyBrosJr_Brain.h"
+
+#include "Monster_StateMachine.h"
+#include "Monster_State_Detect.h"
+#include "Monster_State_Chase.h"
+#include "Monster_State_Patrol.h"
+#include "Monster_State_Fall.h"
+#include "Monster_State_Landing.h"
+#include "Monster_State_Spat.h"
+#include "Monster_State_Captured.h"
+#include "Monster_State_KnockBack.h"
+#include "Monster_State_KnockBackDeath.h"
+#include "Monster_State_KnockOut.h"
+
+// Attack ( throw ) 
+#include "PoppyBrosJr_State_Idle.h"
+#include "PoppyBrosJr_State_Throw.h"
+
+CPoppyBrosJr::CPoppyBrosJr(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	: CMonster{ pDevice, pContext }
+{
+}
+
+CPoppyBrosJr::CPoppyBrosJr(const CPoppyBrosJr& Prototype)
+	:CMonster ( Prototype )
+{
+}
+
+HRESULT CPoppyBrosJr::Initialize_Prototype()
+{
+	m_eProjType = PROJ_TYPE::PERSPEC;
+	return S_OK;
+}
+
+HRESULT CPoppyBrosJr::Initialize(void* pArg)
+{
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
+
+	m_eCopyAbility = COPY_ABILITY_TYPE::BOMB;
+
+	if (m_pTransformCom)
+		m_pTransformCom->Set_RotationPerSec(180.f);
+
+	return S_OK;
+}
+
+void CPoppyBrosJr::Priority_Update(_float fTimeDelta)
+{
+	if (!m_bActive)
+		return;
+
+	__super::Priority_Update(fTimeDelta);
+}
+
+void CPoppyBrosJr::Update(_float fTimeDelta)
+{
+	if (!m_bActive)
+		return;
+
+	__super::Update(fTimeDelta);
+}
+
+void CPoppyBrosJr::Late_Update(_float fTimeDelta)
+{
+	if (!m_bActive)
+		return;
+
+	__super::Late_Update(fTimeDelta);
+}
+
+_bool CPoppyBrosJr::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
+{
+	Out.fRadius = { 0.5f };
+	Out.fHeight = { 0.75f };
+
+	return true;
+}
+
+CAnimator* CPoppyBrosJr::Get_BodyAnimator() const
+{
+	return m_pBody ? m_pBody->Get_Animator() : nullptr;
+}
+
+CMonsterBrain* CPoppyBrosJr::Create_Brain()
+{
+	return CPoppyBrosJr_Brain::Create(this);
+}
+
+HRESULT CPoppyBrosJr::Ready_State(CMonster_StateMachine* pStateMachine)
+{
+	if (m_pStateMachine == nullptr)
+		return E_FAIL;
+
+	ANI_PLAY_INFO Info{};
+
+	// IDLE
+	Info.strAniName = "EnemyWait2";
+	Info.bLoop = true;
+	Info.fSpeed = 1.5f;
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CPoppyBrosJr_State_Idle::Create(Info))))
+		return E_FAIL;
+
+	// DETECT
+	Info.strAniName = "Find";
+	Info.bLoop = false;
+	Info.fSpeed = 1.25f;
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::DETECT, CMonster_State_Detect::Create(Info))))
+		return E_FAIL;
+
+	//CHASE
+	Info.strAniName = "Walk";
+	Info.bLoop = true;
+	Info.fSpeed = 1.5f;
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CHASE, CMonster_State_Chase::Create(Info, 3.f))))
+		return E_FAIL;
+
+	// PATROL
+	Info.strAniName = "Walk";
+	Info.bLoop = true;
+	Info.fSpeed = 1.5f;
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::PATROL, CMonster_State_Patrol::Create(Info, 3.f))))
+		return E_FAIL;
+
+	// FALL
+	Info.strAniName = "Fall";
+	Info.bLoop = true;
+	Info.fSpeed = 1.5f;
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::FALL, CMonster_State_Fall::Create(Info))))
+		return E_FAIL;
+
+	// LANDING
+	Info.strAniName = "Landing";
+	Info.bLoop = false;
+	Info.fSpeed = 1.f;
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::LANDING, CMonster_State_Landing::Create(Info))))
+		return E_FAIL;
+
+	// KNOCKBACK
+	Info.strAniName = "Damage";
+	Info.bLoop = false;
+	Info.fSpeed = 2.0f;
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK, CMonster_State_KnockBack::Create(Info))))
+		return E_FAIL;
+
+	// KNOCKBACKDEATH
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK_DEATH, CMonster_State_KnockBackDeath::Create(Info))))
+		return E_FAIL;
+
+	// KNOCKOUT
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_OUT, CMonster_State_KnockOut::Create(Info))))
+		return E_FAIL;
+
+	// CAPTURED
+	Info.bLoop = true;
+	Info.fSpeed = 1.25f;
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
+		return E_FAIL;
+
+	// SPAT
+	Info.fSpeed = 1.f;
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::SPAT, CMonster_State_Spat::Create(Info))))
+		return E_FAIL;
+
+	// ATTACK
+	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::ATTACK, CPoppyBrosJr_State_Throw::Create())))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CPoppyBrosJr::Ready_PartObjects()
+{
+	m_pBody = Add_MonsterPart<CPoppyBrosJr_Body>(CPoppyBrosJr_Body::PROTOTYPE_TAG, TEXT("Body"));
+	if (nullptr == m_pBody)
+		return E_FAIL;
+
+	return S_OK;
+}
+
+CPoppyBrosJr* CPoppyBrosJr::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+	CPoppyBrosJr* pInstance = new CPoppyBrosJr(pDevice, pContext);
+
+	if (FAILED(pInstance->Initialize_Prototype()))
+	{
+		MSG_BOX("Failed to Created : CPoppyBrosJr");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CGameObject* CPoppyBrosJr::Clone(void* pArg)
+{
+	CPoppyBrosJr* pInstance = new CPoppyBrosJr(*this);
+
+	if (FAILED(pInstance->Initialize(pArg)))
+	{
+		MSG_BOX("Failed to Cloned : CPoppyBrosJr");
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+void CPoppyBrosJr::Free()
+{
+	__super::Free();
+}

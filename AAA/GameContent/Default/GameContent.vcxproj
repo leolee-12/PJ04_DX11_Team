@@ -64,6 +64,11 @@
     <ClInclude Include="..\Public\Kabu_State_WarpOut.h" />
     <ClInclude Include="..\Public\Monster_RailMovement.h" />
     <ClInclude Include="..\Public\Kirby_CutSceneGrabbed.h" />
+    <ClInclude Include="..\Public\PoppyBrosJr_Body.h" />
+    <ClInclude Include="..\Public\PoppyBrosJr_Brain.h" />
+    <ClInclude Include="..\Public\PoppyBrosJr_State_Idle.h" />
+    <ClInclude Include="..\Public\PoppyBrosJr_State_Throw.h" />
+    <ClInclude Include="..\Public\RailTrack.h" />
     <ClInclude Include="..\Public\Sword_JumpSlash.h" />
     <ClInclude Include="..\public\GorillaNamePlate.h" />
     <ClInclude Include="..\Public\LevelDesign_Boundary.h" />
@@ -290,6 +295,11 @@
     <ClCompile Include="..\Private\Kabu_State_WarpOut.cpp" />
     <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
     <ClCompile Include="..\Private\Kirby_CutSceneGrabbed.cpp" />
+    <ClCompile Include="..\Private\PoppyBrosJr_Body.cpp" />
+    <ClCompile Include="..\Private\PoppyBrosJr_Brain.cpp" />
+    <ClCompile Include="..\Private\PoppyBrosJr_State_Idle.cpp" />
+    <ClCompile Include="..\Private\PoppyBrosJr_State_Throw.cpp" />
+    <ClCompile Include="..\Private\RailTrack.cpp" />
     <ClCompile Include="..\Private\Sword_JumpSlash.cpp" />
     <ClCompile Include="..\private\GorillaNamePlate.cpp" />
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
