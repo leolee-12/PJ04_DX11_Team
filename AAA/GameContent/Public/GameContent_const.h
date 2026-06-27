@@ -70,6 +70,9 @@ namespace ProtoDesc
 	inline constexpr TEXTURE_DESC Texture_Common_JumpSlash = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_JumpSlash"), TEXT("../../Resources/YSE/Effect/Common_JumpSlash/common_ring02.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_Common_Flash02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_Flash02"), TEXT("../../Resources/YSE/Effect/Common_Curve03/common_flash02.png"), 1 };
 
+	// SpinSlash
+	inline constexpr TEXTURE_DESC Texture_Common_SpinSlash = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_SpinSlash"), TEXT("../../Resources/YSE/Effect/Common_SpinSlash/common_ring02.png"), 1 };
+
 	//sky
 	inline constexpr COMPONENT_DESC Model_SkyTest = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_SkyTest") };
 
