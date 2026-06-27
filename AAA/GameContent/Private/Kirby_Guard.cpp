@@ -63,22 +63,22 @@ _bool CKirby_Guard::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 
     switch (eCommandType)
     {
-        //// Attack
-        //case KIRBY_COMMAND_TYPE::ATTACK:
-        //{
-        //    CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
-        //    if (pAbility->Can_Attack(KIRBY_ATTACK_LOCATION::GROUND))
-        //    {
-        //        if (pCommand->IsDown())
-        //            pAbility->Enter_Attack_KeyDown(pKirby);
-        //        else if (pCommand->IsPress())
-        //            pAbility->Enter_Attack_KeyPress(pKirby);
-        //        else if (pCommand->IsUp())
-        //            pAbility->Enter_Attack_KeyUp(pKirby);
-        //    }
+        // Attack
+        case KIRBY_COMMAND_TYPE::ATTACK:
+        {
+            CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+            if (pAbility->Can_Attack(KIRBY_ATTACK_LOCATION::GROUND))
+            {
+                if (pCommand->IsDown())
+                    pAbility->Enter_Attack_KeyDown(pKirby);
+                else if (pCommand->IsPress())
+                    pAbility->Enter_Attack_KeyPress(pKirby);
+                else if (pCommand->IsUp())
+                    pAbility->Enter_Attack_KeyUp(pKirby);
+            }
 
-        //    return true;
-        //}
+            return true;
+        }
         // Guard Up
         case KIRBY_COMMAND_TYPE::GUARD:
         {
