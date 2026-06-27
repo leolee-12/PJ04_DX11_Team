@@ -111,6 +111,8 @@ public:
     virtual void    Effect_Start();
     void Update_PlayValue(_bool bIsPlay, _bool bLoop, _float fDuration, _float fAccTime);
 
+    _bool Is_EffectPartActive() const { return m_bActive; }
+
     void Set_ParentMatrix(const _float4x4* pParentMatrix);
 
 protected:
@@ -155,6 +157,8 @@ protected:
     
     virtual void Update_Core(const _float fTimeDelta, const _float fRatio);
     virtual void Update_EffectPart(const _float fTimeDelta, const _float fRatio);
+
+    _float Get_PartDuration() const;
 
 private:
     HRESULT Ready_Components();

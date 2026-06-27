@@ -230,6 +230,8 @@ protected:
 
     _float m_fEmitterElapsedTime{};
     _float m_fEmitterSpawnAccumulator{};
+    _float m_fEmitterPreviousRatio{};
+    _bool m_bEmitterWasActive{};
 
     _float3 m_fPivot{};
 

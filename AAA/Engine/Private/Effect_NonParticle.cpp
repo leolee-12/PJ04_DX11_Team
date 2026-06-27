@@ -175,8 +175,8 @@ void CEffect_NonParticle::Update_Alpha(const _float fTimeDelta, const _float fRa
 {
     if (m_bFadeInOut == true)
     {
-        const _float fStartRatio = m_fStartRatio;
-        const _float fEndRatio = m_fEndRatio;
+        const _float fStartRatio = 0.f;
+        const _float fEndRatio = 1.f;
 
         m_AlphaRatioValue.push_back({ fStartRatio, m_fAlphaStartValue });
 
@@ -212,8 +212,8 @@ void CEffect_NonParticle::Update_Size(const _float fTimeDelta, const _float fRat
 {
     if (m_bSizeChange == true)
     {
-        const _float fStartRatio = m_fStartRatio;
-        const _float fEndRatio = m_fEndRatio;
+        const _float fStartRatio = 0.f;
+        const _float fEndRatio = 1.f;
 
         m_SizeRatioValue.push_back({ fStartRatio, m_fSizeStartValue });
 
@@ -249,8 +249,8 @@ void CEffect_NonParticle::Update_Color(const _float fTimeDelta, const _float fRa
 {
     if (m_bColorChange == true)
     {
-        const _float fStartRatio = m_fStartRatio;
-        const _float fEndRatio = m_fEndRatio;
+        const _float fStartRatio = 0.f;
+        const _float fEndRatio = 1.f;
 
         m_ColorRatioValue.push_back({ fStartRatio, m_vColorStartValue });
 
@@ -323,10 +323,12 @@ void CEffect_NonParticle::Update_Move(const _float fTimeDelta, const _float fRat
 {
     _vector vBasePos = XMLoadFloat3(&m_vLocalPos);
 
-    if (m_bMoveChange == true &&
+    const _float fMoveRange = m_fMove_End_Ratio - m_fMove_Start_Ratio;
+
+    if (m_bMoveChange == true && fMoveRange > Helper::fEpsilon &&
         fRatio >= m_fMove_Start_Ratio && fRatio <= m_fMove_End_Ratio)
     {
-        _float fSubRatio = (fRatio - m_fMove_Start_Ratio) / (m_fMove_End_Ratio - m_fMove_Start_Ratio);
+        _float fSubRatio = (fRatio - m_fMove_Start_Ratio) / fMoveRange;
 
         _float fCurDistance = m_fMoveDistance * fSubRatio;
 

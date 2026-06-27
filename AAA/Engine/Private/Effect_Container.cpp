@@ -96,7 +96,10 @@ HRESULT CEffect_Container::Render()
         return S_FALSE;
 
     for (auto& [tag, pPart] : m_EffestParts)
-        pPart->Render();
+    {
+        if (pPart->Is_EffectPartActive() == true)
+            pPart->Render();
+    }
 
     return S_OK;
 }
