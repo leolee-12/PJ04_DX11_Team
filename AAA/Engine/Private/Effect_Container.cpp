@@ -42,7 +42,10 @@ void CEffect_Container::Priority_Update(_float fTimeDelta)
         return;
 
     for (auto& [tag, pPart] : m_EffestParts)
-        pPart->Priority_Update(fTimeDelta);
+    {
+        if (pPart->Get_IsPlay() == true)
+            pPart->Priority_Update(fTimeDelta);
+    }
 }
 
 void CEffect_Container::Update(_float fTimeDelta)
@@ -74,6 +77,9 @@ void CEffect_Container::Update(_float fTimeDelta)
 
     for (auto& [tag, pPart] : m_EffestParts)
     {
+        if (pPart->Get_IsPlay() == false)
+            continue;
+
         pPart->Update_PlayValue(m_bIsPlay, m_bLoop, m_fDuration, m_fAccTime);
         pPart->Update(fTimeDelta);
     }
@@ -87,17 +93,20 @@ void CEffect_Container::Late_Update(_float fTimeDelta)
     Compute_CombinedWorldMatrix();
 
     for (auto& [tag, pPart] : m_EffestParts)
-        pPart->Late_Update(fTimeDelta);
+    {
+        if (pPart->Get_IsPlay() == true)
+            pPart->Late_Update(fTimeDelta);
+    }
 }
 
 HRESULT CEffect_Container::Render()
 {
     if (!m_bIsPlay) 
-        return S_FALSE;
+        return S_OK;
 
     for (auto& [tag, pPart] : m_EffestParts)
     {
-        if (pPart->Is_EffectPartActive() == true)
+        if (pPart->Get_IsPlay() == true && pPart->Is_EffectPartActive() == true)
             pPart->Render();
     }
 
@@ -145,6 +154,25 @@ void CEffect_Container::EffectContainer_Stop()
 void CEffect_Container::Set_ParentMatrix(const _float4x4* pParentMatrix)
 {
     m_pParentMatrix = pParentMatrix;
+}
+
+_bool CEffect_Container::Set_EffectPartPlay(const _wstring& strPartTag, _bool bPlay)
+{
+    auto iter = m_EffestParts.find(strPartTag);
+    if (iter == m_EffestParts.end())
+        return false;
+
+    iter->second->Set_IsPlay(bPlay);
+    return true;
+}
+
+_bool CEffect_Container::Is_EffectPartPlay(const _wstring& strPartTag) const
+{
+    auto iter = m_EffestParts.find(strPartTag);
+    if (iter == m_EffestParts.end())
+        return false;
+
+    return iter->second->Get_IsPlay();
 }
 
 json CEffect_Container::Serialize() const

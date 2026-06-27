@@ -43,6 +43,9 @@ public:
     static CSword_SpinSlash* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual CGameObject* Clone(void* pArg) override;
 private:
+    _bool m_bFadeOutRequested{};
+
+private:
     virtual void Free() override;
 };
 
