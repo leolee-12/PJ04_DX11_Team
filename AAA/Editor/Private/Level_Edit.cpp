@@ -415,7 +415,7 @@ HRESULT CLevel_Edit::Ready_EditLights()
 
     LightDesc.eType = LIGHT::DIRECTIONAL;
     LightDesc.vDiffuse = _float4(5.0f, 5.5f, 6.0f, 1.f);
-    LightDesc.vAmbient = _float4(2.07f, 1.80f, 1.51f, 1.f);
+    LightDesc.vAmbient = _float4(2.07f, 1.80f, 1.50f, 1.f);
     LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
     LightDesc.vDirection = _float4(0.557f, -0.766f, 0.321f, 0.f);
 

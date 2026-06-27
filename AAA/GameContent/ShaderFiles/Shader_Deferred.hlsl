@@ -4,7 +4,6 @@ float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 float4x4 g_ShadowLightViewMatrix, g_ShadowLightProjMatrix;
 float4x4 g_ViewMatrixInverse, g_ProjMatrixInverse;
 
-float3 g_vAmbientColor = float3(0.69f, 0.60f, 0.50f);
 float g_fAmbientSaturation = 0.6f;
 float g_fAmbientIntensity = 3.f;
 
@@ -38,6 +37,9 @@ Texture2D g_SSAOTexture; // SSAO 블러 결과
 Texture3D g_FogVolume; // 적분된 froxel (rgb=inScatter, a=transmittance)
 float4 g_vFogDepthParams;
 float g_fFogEnable;
+
+float3 g_vAtmosColor;
+float g_fAtmosStart, g_fAtmosEnd, g_fAtmosStrength;
 
 static const float PI = 3.14159265f;
 
@@ -214,15 +216,17 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     float3 kD = (1.f - kS) * (1.f - metallic);
 
     float3 irradiance = g_IrradianceCube.Sample(LinearSampler, N).rgb;
-
-  // ── 원작 방식: 큐브맵 채도 깎고 → 따뜻하게 틴트 ──
     float lum = dot(irradiance, float3(0.299f, 0.587f, 0.114f));
-    irradiance = lerp(lum.xxx, irradiance, g_fAmbientSaturation); // 채도 60%
-    irradiance *= g_vAmbientColor; // 따뜻한 탄 틴트
+    irradiance = lerp(lum.xxx, irradiance, g_fAmbientSaturation);
+    float3 skyIBL = irradiance * g_fIBLIntensity;
 
-    float3 diffuseIBL = irradiance * albedoA.rgb * kD;
-    float ssao = g_SSAOTexture.Sample(LinearSampler, In.vTexcoord).r;
-    float3 ambient = diffuseIBL * ao * ssao * g_fIBLIntensity;
+    float3 warmAmbient = g_vLightAmbient.rgb;
+
+    // 하늘바운스 + 따뜻한앰비언트 를 합쳐서 albedo x kD 에 적용
+    float3 ambientLight = skyIBL + warmAmbient;
+    float occ = ao * g_SSAOTexture.Sample(LinearSampler, In.vTexcoord).r;
+    float occLifted = lerp(0.2f, 1.f, occ); // 0.2 = 바닥(나중에 글로벌화 가능)
+    float3 ambient = albedoA.rgb * kD * ambientLight * occLifted;
     float3 color = light + ambient;
 
       /* 그림자 */
@@ -235,9 +239,6 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     float sd = g_LightDepthTexture.Sample(BorderSampler, suv).r;
     if (pz <= 1.f && pz - 0.002f > sd)
         color *= 0.5f;
-    
-    float3 emissive = g_EmissiveTexture.Sample(LinearSampler, In.vTexcoord).rgb;
-    color += emissive;
     
     /* 볼류메트릭 포그 (froxel) */
     if (g_fFogEnable > 0.5f)
