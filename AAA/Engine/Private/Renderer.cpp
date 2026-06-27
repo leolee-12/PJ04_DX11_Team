@@ -19,7 +19,7 @@ HRESULT CRenderer::Initialize()
     m_iRTHeight = static_cast<_uint>(m_pGameInstance_Proxy->Get_WindowHeight());
 
     /* 렌더타겟들을 만든다. */
-    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Diffuse"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Diffuse"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, _float4(0.f, 0.f, 0.f, 0.f))))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Normal"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 1.f))))
         return E_FAIL;
@@ -141,21 +141,21 @@ HRESULT CRenderer::Initialize()
     if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_LightDepth"), 450.f, 300.f, 300.f, 200.f)))
         return E_FAIL;
 
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Light"), 150.f, 100.f, 300.f, 200.f)))
-    //    return E_FAIL;
-    //
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Scene"), 150.f, 300.f, 300.f, 200.f)))
-    //    return E_FAIL;
-    //
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_BloomA"), 450.f, 100.f, 300.f, 200.f)))
-    //    return E_FAIL;
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_BloomB"), 450.f, 300.f, 300.f, 200.f)))
-    //    return E_FAIL;
-    //
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_SSAO"), 750.f, 100.f, 300.f, 200.f)))
-    //    return E_FAIL;
-    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_SSAO_Blur"), 750.f, 300.f, 300.f, 200.f)))
-    //    return E_FAIL;
+   //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Light"), 150.f, 100.f, 300.f, 200.f)))
+   //    return E_FAIL;
+   //
+   //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Scene"), 150.f, 300.f, 300.f, 200.f)))
+   //    return E_FAIL;
+   //
+   //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_BloomA"), 450.f, 100.f, 300.f, 200.f)))
+   //    return E_FAIL;
+   //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_BloomB"), 450.f, 300.f, 300.f, 200.f)))
+   //    return E_FAIL;
+   //
+   //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_SSAO"), 750.f, 100.f, 300.f, 200.f)))
+   //    return E_FAIL;
+   //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_SSAO_Blur"), 750.f, 300.f, 300.f, 200.f)))
+   //    return E_FAIL;
 #endif
 
     if (FAILED(Ready_Froxel_Volumes()))
@@ -459,7 +459,8 @@ HRESULT CRenderer::Render_Combined()
         return E_FAIL;
 
     if (FAILED(m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderDeferred,
-        { "g_fAmbientIntensity", "g_vAmbientColor", "g_fAmbientSaturation" })))
+        { "g_fAmbientIntensity", "g_fAmbientSaturation",
+        "g_vAtmosColor", "g_fAtmosStart", "g_fAtmosEnd", "g_fAtmosStrength", })))
         return E_FAIL;
 
     //볼류메트릭포그
@@ -804,14 +805,17 @@ HRESULT CRenderer::Render_Bloom()
     if (FAILED(m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderPost, { "g_fBloomIntensity", "g_fExposure", "g_fToneMapMode" })))
         return E_FAIL;
     const auto& env = m_pGameInstance_Proxy->Get_CurrentEnvironment();
+    _float fGradeOn = 0.f;
     if (env.pColorGradeLUT)
     {
         if (FAILED(m_pShaderPost->Bind_SRV("g_ColorGradingLUT", env.pColorGradeLUT)))
             return E_FAIL;
-        _float on = 1.f;
-        if (FAILED(m_pShaderPost->Bind_RawValue("g_fColorGradeEnable", &on, sizeof(_float))))
-            return E_FAIL;
+        fGradeOn = 1.f;
     }
+    // LUT 유무와 무관하게 항상 바인딩 (없으면 0 -> ACES 폴백)
+    if (FAILED(m_pShaderPost->Bind_RawValue("g_fColorGradeEnable", &fGradeOn, sizeof(_float))))
+        return E_FAIL;
+
     if (FAILED(m_pShaderPost->Begin(ETOUI(POSTPROSESS::COMPSITE))))
         return E_FAIL;
     if (FAILED(m_pVIBuffer->Bind_Resources()))

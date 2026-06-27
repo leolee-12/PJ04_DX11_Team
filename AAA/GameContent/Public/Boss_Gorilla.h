@@ -4,6 +4,7 @@
 NS_BEGIN(Client)
 
 class CBoss_Gorilla_Body;
+class CProjectile;
 
 class CBoss_Gorilla final : public CBoss
 {
@@ -54,6 +55,7 @@ protected:
 
 private:
     CBoss_Gorilla_Body* m_pBody = { nullptr };
+    CProjectile* m_pHeldRock = { nullptr };
     static const vector<_float> s_Thresholds;
 
     _int  m_iIntroStep = { -1 };
@@ -64,6 +66,7 @@ private:
           "CatchSuccessB", "CatchSuccessWait", "CatchRelease", "Roar"
     };
     static constexpr const _char* GRAB_BONE = "RHaveL";
+    static constexpr const _char* THROW_BONE = "RHaveL";
 
 private:
     void Tick_OpeningCatch();                    

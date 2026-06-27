@@ -15,7 +15,6 @@ HRESULT CShaderGlobal_Manager::Initialize()
     Register({ "g_fBloomIntensity", "Bloom Intensity", GVAL::FLOAT, { 1.f,    0.f, 0.f, 0.f }, { 0.f,  3.f } });
 
     Register({ "g_fAmbientIntensity",  "Ambient Intensity",  GVAL::FLOAT,  { 3.0f, 0.f, 0.f, 0.f }, { 0.f, 5.f } });
-    Register({ "g_vAmbientColor",      "Ambient Color",      GVAL::FLOAT3, { 0.69f, 0.60f, 0.50f, 0.f }, { 0.f, 1.f } });
     Register({ "g_fAmbientSaturation", "Ambient Saturation", GVAL::FLOAT,  { 0.6f, 0.f, 0.f, 0.f }, { 0.f, 1.f } });
 
     Register({ "g_fSSRIntensity",   "SSR Intensity",   GVAL::FLOAT, { 1.0f,  0.f, 0.f, 0.f }, { 0.f,  3.f } });
@@ -35,13 +34,18 @@ HRESULT CShaderGlobal_Manager::Initialize()
     Register({ "g_fFogEnable",          "Fog Enable",        GVAL::BOOL,   { 0.f, 0.f, 0.f, 0.f }, { 0.f, 1.f } });
 
     Register({ "g_fDoFEnable",    "DoF Enable",     GVAL::BOOL,  { 1.f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
-    Register({ "g_fFocusDist",    "DoF FocusDist",  GVAL::FLOAT, { 12.f, 0.f, 0.f, 0.f }, { 0.5f, 100.f } });
+    Register({ "g_fFocusDist",    "DoF FocusDist",  GVAL::FLOAT, { 14.f, 0.f, 0.f, 0.f }, { 0.5f, 100.f } });
     Register({ "g_fAperture",     "DoF Aperture",   GVAL::FLOAT, { 0.1f, 0.f, 0.f, 0.f }, { 0.1f, 8.f } });
     Register({ "g_fDoFMaxCoC",    "DoF MaxBlur",    GVAL::FLOAT, { 1.f, 0.f, 0.f, 0.f }, { 1.f, 40.f } });
-    Register({ "g_fDoFAutoFocus", "DoF AutoFocus",  GVAL::BOOL,  { 1.f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
+    Register({ "g_fDoFAutoFocus", "DoF AutoFocus",  GVAL::BOOL,  { 0.f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
 
     Register({ "g_fExposure",    "Exposure",          GVAL::FLOAT, { 0.5f, 0.f, 0.f, 0.f }, { 0.f, 4.f } });
     Register({ "g_fToneMapMode", "ToneMap 0R/1A/2E",  GVAL::FLOAT, { 1.0f, 0.f, 0.f, 0.f }, { 0.f, 2.f } });
+
+    Register({ "g_vAtmosColor",    "Atmos Color",     GVAL::FLOAT3, { 0.70f, 0.75f, 0.82f, 0.f }, { 0.f, 1.f } });
+    Register({ "g_fAtmosStart",    "Atmos Start",     GVAL::FLOAT,  { 50.f,  0.f, 0.f, 0.f }, { 0.f, 500.f } });
+    Register({ "g_fAtmosEnd",      "Atmos End",       GVAL::FLOAT,  { 300.f, 0.f, 0.f, 0.f }, { 0.f, 1000.f } });
+    Register({ "g_fAtmosStrength", "Atmos Strength",  GVAL::FLOAT,  { 0.5f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
 
     return S_OK;
 }
