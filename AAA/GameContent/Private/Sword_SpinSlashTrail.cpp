@@ -41,6 +41,34 @@ void CSword_SpinSlashTrail::Priority_Update(_float fTimeDelta)
 void CSword_SpinSlashTrail::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
+
+    if (m_bFadeOutRequested == false)
+        return;
+
+    _bool bAllFadeOutFinished = true;
+
+    for (auto& [strTag, pPart] : m_EffestParts)
+    {
+        CCommon_SpinSlashTrail* pSpinSlashTrailPart = dynamic_cast<CCommon_SpinSlashTrail*>(pPart);
+        if (pSpinSlashTrailPart == nullptr)
+            continue;
+
+        if (Is_EffectPartPlay(strTag) == false)
+            continue;
+
+        if (pSpinSlashTrailPart->Is_FadingOut() == false ||
+            pSpinSlashTrailPart->Is_FadeOutFinished() == false)
+        {
+            bAllFadeOutFinished = false;
+            break;
+        }
+    }
+
+    if (bAllFadeOutFinished == true)
+    {
+        m_bFadeOutRequested = false;
+        EffectContainer_Stop();
+    }
 }
 
 void CSword_SpinSlashTrail::Late_Update(_float fTimeDelta)
@@ -60,6 +88,29 @@ HRESULT CSword_SpinSlashTrail::Ready_EffectPartObjects()
     Add_Effect_PartObject(m_iPrototypeLevel, CCommon_SpinSlashTrail::PROTOTYPE_TAG, CCommon_SpinSlashTrail::PROTOTYPE_TAG);
 
     return S_OK;
+}
+
+void CSword_SpinSlashTrail::Start_FadeOut(_float fFadeOutDuration)
+{
+    _bool bFadeOutStarted = false;
+
+    for (auto& [strTag, pPart] : m_EffestParts)
+    {
+        CCommon_SpinSlashTrail* pSpinSlashTrailPart = dynamic_cast<CCommon_SpinSlashTrail*>(pPart);
+        if (pSpinSlashTrailPart == nullptr)
+            continue;
+
+        if (Is_EffectPartPlay(strTag) == false)
+            continue;
+
+        pSpinSlashTrailPart->Start_FadeOut(fFadeOutDuration);
+        bFadeOutStarted = true;
+    }
+
+    m_bFadeOutRequested = bFadeOutStarted;
+
+    if (bFadeOutStarted == false)
+        EffectContainer_Stop();
 }
 
 CSword_SpinSlashTrail* CSword_SpinSlashTrail::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

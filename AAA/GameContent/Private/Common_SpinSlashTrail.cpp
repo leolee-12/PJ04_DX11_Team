@@ -56,6 +56,23 @@ void CCommon_SpinSlashTrail::Priority_Update(_float fTimeDelta)
 void CCommon_SpinSlashTrail::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
+
+	if (m_bFadeOutActive == false || m_bFadeOutFinished == true)
+		return;
+
+	m_fAccFadeOutTime += fTimeDelta;
+
+	_float fFadeOutRatio = m_fAccFadeOutTime / m_fFadeOutDuration;
+	Helper::FloatClamp(fFadeOutRatio, 0.f, 1.f);
+
+	const _float fFadeOutStep = Helper::FloatSmoothStep(0.f, 1.f, fFadeOutRatio);
+	m_fAlpha = m_fFadeOutStartAlpha * (1.f - fFadeOutStep);
+
+	if (fFadeOutRatio >= 1.f)
+	{
+		m_fAlpha = 0.f;
+		m_bFadeOutFinished = true;
+	}
 }
 
 void CCommon_SpinSlashTrail::Late_Update(_float fTimeDelta)
@@ -74,6 +91,42 @@ HRESULT CCommon_SpinSlashTrail::Render()
     __super::Render();
 
     return S_OK;
+}
+
+void CCommon_SpinSlashTrail::Effect_Start()
+{
+	__super::Effect_Start();
+
+	if (m_bInitialAlphaCached == false)
+	{
+		m_fInitialAlpha = m_fAlpha;
+		m_bInitialAlphaCached = true;
+	}
+
+	m_fAlpha = m_fInitialAlpha;
+	m_bFadeOutActive = false;
+	m_bFadeOutFinished = false;
+	m_fFadeOutDuration = 0.3f;
+	m_fAccFadeOutTime = 0.f;
+	m_fFadeOutStartAlpha = m_fInitialAlpha;
+}
+
+void CCommon_SpinSlashTrail::Start_FadeOut(_float fFadeOutDuration)
+{
+	if (m_bFadeOutActive == true)
+		return;
+
+	m_bFadeOutActive = true;
+	m_bFadeOutFinished = false;
+	m_fFadeOutDuration = fFadeOutDuration;
+	m_fAccFadeOutTime = 0.f;
+	m_fFadeOutStartAlpha = m_fAlpha;
+
+	if (m_fFadeOutDuration <= Helper::fEpsilon)
+	{
+		m_fAlpha = 0.f;
+		m_bFadeOutFinished = true;
+	}
 }
 
 CCommon_SpinSlashTrail* CCommon_SpinSlashTrail::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
