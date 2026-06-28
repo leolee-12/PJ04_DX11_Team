@@ -1,7 +1,11 @@
 #include "Preview_DeformCar_Demo.h"
 
+#include "Animator.h"
 #include "GameContent_AnimEvents.h"
 #include "GameInstance_proxy.h"
+#include "Model.h"
+#include "Shader.h"
+#include "Texture.h"
 
 CPreview_DeformCar_Demo::CPreview_DeformCar_Demo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -25,7 +29,7 @@ HRESULT CPreview_DeformCar_Demo::Initialize_Prototype()
 HRESULT CPreview_DeformCar_Demo::Initialize(void* pArg)
 {
 	if (nullptr != pArg)
-		m_Desc = *static_cast<PREVIEW_DEFORMCAR_DESC*>(pArg);
+		m_Desc = *static_cast<PREVIEW_DEFORMCAR_DEMO_DESC*>(pArg);
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -33,7 +37,7 @@ HRESULT CPreview_DeformCar_Demo::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	m_pAnimatorCom->Play("Boost", true, true, 0.2f, 1.f, false);
+	m_pAnimatorCom->Play("Deform", true, true, 0.2f, 1.f, false);
 
 	return S_OK;
 }
@@ -59,19 +63,16 @@ HRESULT CPreview_DeformCar_Demo::Render()
 	if (m_pModelCom->Get_NumMeshes() < MESH_END)
 		return E_FAIL;
 
-	if (FAILED(Bind_CommonResources(m_pPBRShaderCom)))
+	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	if (FAILED(Bind_CommonResources(m_pKirbyShaderCom)))
+	if (FAILED(Render_KirbyMesh(MESH_LIMBS)))
 		return E_FAIL;
 
-	if (FAILED(Render_PBRMesh(MESH_CAR)))
+	if (FAILED(Render_KirbyMesh(MESH_BODY_A)))
 		return E_FAIL;
 
-	if (FAILED(Render_KirbyMesh(MESH_KIRBY)))
-		return E_FAIL;
-
-	if (FAILED(Render_PBRMesh(MESH_TIRES)))
+	if (FAILED(Render_KirbyMesh(MESH_BODY_B)))
 		return E_FAIL;
 
 	return S_OK;
@@ -84,13 +85,6 @@ HRESULT CPreview_DeformCar_Demo::Ready_Components()
 		m_Desc.szKirbyShaderTag,
 		TEXT("Com_Shader_Kirby"));
 	if (nullptr == m_pKirbyShaderCom)
-		return E_FAIL;
-
-	m_pPBRShaderCom = Add_Component<CShader>(
-		m_Desc.iProtoLevel,
-		m_Desc.szPBRShaderTag,
-		TEXT("Com_Shader_PBR"));
-	if (nullptr == m_pPBRShaderCom)
 		return E_FAIL;
 
 	m_pModelCom = Add_Component<CModel>(
@@ -151,63 +145,22 @@ HRESULT CPreview_DeformCar_Demo::Ready_EyeTextures()
 	return S_OK;
 }
 
-HRESULT CPreview_DeformCar_Demo::Bind_CommonResources(CShader* pShader)
+HRESULT CPreview_DeformCar_Demo::Bind_ShaderResources()
 {
-	if (nullptr == pShader)
+	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pKirbyShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(pShader, "g_WorldMatrix")))
-		return E_FAIL;
-
-	if (FAILED(pShader->Bind_Matrix(
+	if (FAILED(m_pKirbyShaderCom->Bind_Matrix(
 		"g_ViewMatrix",
 		m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
 		return E_FAIL;
 
-	if (FAILED(pShader->Bind_Matrix(
+	if (FAILED(m_pKirbyShaderCom->Bind_Matrix(
 		"g_ProjMatrix",
 		m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
 		return E_FAIL;
 
 	return S_OK;
-}
-
-HRESULT CPreview_DeformCar_Demo::Render_PBRMesh(_uint iMeshIndex)
-{
-	if (FAILED(m_pModelCom->Bind_Material(
-		m_pPBRShaderCom,
-		"g_DiffuseTexture",
-		iMeshIndex,
-		MTEX_TYPE::DIFFUSE,
-		0)))
-		return E_FAIL;
-
-	if (FAILED(m_pModelCom->Bind_Material(
-		m_pPBRShaderCom,
-		"g_NormalTexture",
-		iMeshIndex,
-		MTEX_TYPE::NORMALS,
-		0)))
-		return E_FAIL;
-
-	if (FAILED(m_pModelCom->Bind_Material(
-		m_pPBRShaderCom,
-		"g_MRATexture",
-		iMeshIndex,
-		MTEX_TYPE::METALNESS,
-		0)))
-		return E_FAIL;
-
-	if (FAILED(m_pModelCom->Bind_BoneMatrices(
-		m_pPBRShaderCom,
-		"g_BoneMatrices",
-		iMeshIndex)))
-		return E_FAIL;
-
-	if (FAILED(m_pPBRShaderCom->Begin(1)))
-		return E_FAIL;
-
-	return m_pModelCom->Render(iMeshIndex);
 }
 
 HRESULT CPreview_DeformCar_Demo::Render_KirbyMesh(_uint iMeshIndex)
@@ -229,7 +182,7 @@ HRESULT CPreview_DeformCar_Demo::Render_KirbyMesh(_uint iMeshIndex)
 		"g_SkinTexture",
 		iMeshIndex,
 		MTEX_TYPE::UNKNOWN,
-		1)))
+		2)))
 		return E_FAIL;
 
 	if (FAILED(m_pModelCom->Bind_Material(
@@ -237,7 +190,7 @@ HRESULT CPreview_DeformCar_Demo::Render_KirbyMesh(_uint iMeshIndex)
 		"g_MouthTexture",
 		iMeshIndex,
 		MTEX_TYPE::UNKNOWN,
-		2)))
+		0)))
 		return E_FAIL;
 
 	if (FAILED(m_pModelCom->Bind_BoneMatrices(

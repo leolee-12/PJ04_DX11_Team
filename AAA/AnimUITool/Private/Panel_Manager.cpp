@@ -458,6 +458,18 @@ void CPanel_Manager::Render_ModeBar()
         }
     }
 
+    ImGui::SameLine();
+
+    if (ImGui::Button("Load DeformCar_Demo (Test)"))
+    {
+        if (m_pLevel)
+        {
+            Bind_Preview(m_pLevel->Load_DeformCar_Demo());
+            m_Context.strName = L"DeformCar_Demo";
+            m_Context.strModelPath = L"../../Resources/YSE/DeformCar/Demo.ysh";
+        }
+    }
+
     if (m_bKeyInputEnabled)
     {
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.7f, 0.2f, 1.f));

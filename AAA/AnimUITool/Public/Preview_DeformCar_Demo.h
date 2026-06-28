@@ -18,11 +18,11 @@ class CPreview_DeformCar_Demo final : public CGameObject
 	GENERATED_BODY(CPreview_DeformCar_Demo)
 
 public:
-	enum DEFORM_CAR_MESH : _uint
+	enum DEFORM_CAR_DEMO_MESH : _uint
 	{
-		MESH_CAR = 0,
-		MESH_KIRBY = 1,
-		MESH_TIRES = 2,
+		MESH_LIMBS = 0,
+		MESH_BODY_A = 1,
+		MESH_BODY_B = 2,
 		MESH_END
 	};
 
@@ -40,16 +40,15 @@ private:
 	}
 
 public:
-	typedef struct tagPreviewDeformCarDesc : public CGameObject::GAMEOBJECT_DESC
+	typedef struct tagPreviewDeformCarDemoDesc : public CGameObject::GAMEOBJECT_DESC
 	{
 		const _tchar* szKirbyShaderTag = { L"Proto_Shader_Kirby" };
-		const _tchar* szPBRShaderTag = { L"Proto_Shader_AnimMesh" };
-		const _tchar* szModelTag = { L"Proto_Model_DeformCar" };
+		const _tchar* szModelTag = { L"Proto_Model_DeformCar_Demo" };
 		_uint iProtoLevel = { 0 };
 		_wstring strAnimEvents = {};
-	} PREVIEW_DEFORMCAR_DESC;
+	} PREVIEW_DEFORMCAR_DEMO_DESC;
 
-	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_Preview_DeformCar";
+	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_Preview_DeformCar_Demo";
 
 protected:
 	CPreview_DeformCar_Demo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -74,13 +73,12 @@ public:
 
 private:
 	CShader* m_pKirbyShaderCom = { nullptr };
-	CShader* m_pPBRShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
 	CAnimator* m_pAnimatorCom = { nullptr };
 	CTexture* m_pEyeTextureCom = { nullptr };
 	CTexture* m_pEyeMaskTextureCom = { nullptr };
 
-	PREVIEW_DEFORMCAR_DESC m_Desc{};
+	PREVIEW_DEFORMCAR_DEMO_DESC m_Desc{};
 	KIRBY_EYE_STATE m_eEye = { KIRBY_EYE_STATE::IDLE };
 
 	_float4 m_vBodyColor = { 1.f, 0.45f, 0.55f, 1.f };
@@ -90,8 +88,7 @@ private:
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_EyeTextures();
-	HRESULT Bind_CommonResources(CShader* pShader);
-	HRESULT Render_PBRMesh(_uint iMeshIndex);
+	HRESULT Bind_ShaderResources();
 	HRESULT Render_KirbyMesh(_uint iMeshIndex);
 
 public:

@@ -8,6 +8,7 @@
 #include "Preview_Actor.h"
 #include "Preview_Kirby.h"
 #include "Preview_DeformCar_Main.h"
+#include "Preview_DeformCar_Demo.h"
 #include "GameContent_const.h"
 #include "GameObject_Factory.h"
 #include "Loader_Prototype.h"
@@ -1429,6 +1430,69 @@ CGameObject* CLevel_Tool::Load_DeformCar()
         ETOUI(TOOL_LEVEL::EDIT),
         L"Layer_Preview",
         L"Preview_DeformCar",
+        &Desc)))
+        return nullptr;
+
+    m_pPreview = pObject;
+    return pObject;
+}
+
+CGameObject* CLevel_Tool::Load_DeformCar_Demo()
+{
+    const _uint iLevel = ETOUI(TOOL_LEVEL::STATIC);
+
+    Clear_Preview();
+
+    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, L"Proto_Shader_Kirby"))
+    {
+        if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
+            iLevel,
+            L"Proto_Shader_Kirby",
+            CShader::Create(
+                m_pDevice,
+                m_pContext,
+                Shader_Kirby.szFileTag,
+                VTXANIMMESH::Elements,
+                VTXANIMMESH::iNumElements))))
+            return nullptr;
+    }
+
+    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, L"Proto_Model_DeformCar_Demo"))
+    {
+        if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
+            iLevel,
+            L"Proto_Model_DeformCar_Demo",
+            CModel::Create(
+                m_pDevice,
+                m_pContext,
+                MODEL::ANIM,
+                "../../Resources/YSE/DeformCar/Demo.ysh",
+                XMMatrixRotationY(XMConvertToRadians(180.f))))))
+            return nullptr;
+    }
+
+    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, CPreview_DeformCar_Demo::PROTOTYPE_TAG))
+    {
+        if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
+            iLevel,
+            CPreview_DeformCar_Demo::PROTOTYPE_TAG,
+            CPreview_DeformCar_Demo::Create(m_pDevice, m_pContext))))
+            return nullptr;
+    }
+
+    CPreview_DeformCar_Demo::PREVIEW_DEFORMCAR_DEMO_DESC Desc{};
+    Desc.iProtoLevel = iLevel;
+    Desc.szKirbyShaderTag = L"Proto_Shader_Kirby";
+    Desc.szModelTag = L"Proto_Model_DeformCar_Demo";
+
+    CGameObject* pObject = nullptr;
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(
+        &pObject,
+        iLevel,
+        CPreview_DeformCar_Demo::PROTOTYPE_TAG,
+        ETOUI(TOOL_LEVEL::EDIT),
+        L"Layer_Preview",
+        L"Preview_DeformCar_Demo",
         &Desc)))
         return nullptr;
 
