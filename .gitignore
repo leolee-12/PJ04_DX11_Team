@@ -440,7 +440,13 @@ AAA/*.zip
 # PhysX libs - re-include despite [Dd]ebug/ rule above
 !AAA/Engine/ThirdPartyLib/PhysX/
 !AAA/Engine/ThirdPartyLib/PhysX/debug/
-!AAA/Engine/ThirdPartyLib/PhysX/debug/**
+!AAA/Engine/ThirdPartyLib/PhysX/release/
+
+# ThirdPartyLib prebuilt libs (debug/release) - re-include despite [Dd]ebug/, [Rr]elease/
+!AAA/Engine/ThirdPartyLib/debug/
+!AAA/Engine/ThirdPartyLib/release/
+!AAA/GameContent/ThirdPartyLib/debug/
+!AAA/GameContent/ThirdPartyLib/release/
 
 .claude/
 
