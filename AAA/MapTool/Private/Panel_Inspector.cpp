@@ -1,13 +1,16 @@
 ﻿#include "Panel_Inspector.h"
 #include "EditInstance.h"
 #include "Level_Edit.h"
-#include "Map_EditSession.h"
 
 #include "Shader_PassMeta.h"
 #include "MapStage.h"
 #include "MapSection.h"
 #include "Map_EditFile.h"
+#include "Map_EditSession.h"
 #include "EnvObject.h"
+#include "LevelDesign_Starblock.h"
+#include "LevelDesign_Breakable.h"
+#include "LevelDesign_Bush.h"
 
 #include "GameInstance.h"
 #include "GameObject.h"
@@ -21,7 +24,7 @@
 
 namespace
 {
-	const char* TexTypeName(_uint t)
+	const _char* TexTypeName(_uint t)
 	{
 		static const char* names[MTEX_TYPE_MAX] = {
 				"None","Diffuse","Specular","Ambient","Emissive","Height","Normals","Shininess",
@@ -274,6 +277,49 @@ namespace
 			return nullptr;
 
 		return g_EnvShaderPassMetas[idx].szName;
+	}
+
+	struct MESH_LAYER_UI_CONTEXT
+	{
+		CModel* pModel = { nullptr };
+		const _tchar* pModelComponentTag = { L"Com_Model" };
+
+		_bool bEnvObjectMeshUi = { false };
+		_bool bMapObjectMeshUi = { false };
+		_bool bEnvPassMeshUi = { false };
+		_bool bBushMeshUi = { false };
+		_bool bBushBasicMeshUi = { false };
+		_bool bBushCutMeshUi = { false };
+	};
+
+	MESH_LAYER_UI_CONTEXT Resolve_MeshLayerUIContext(CGameObject* pObject, int iBushMeshSlot)
+	{
+		MESH_LAYER_UI_CONTEXT Ctx{};
+
+		if (nullptr == pObject)
+			return Ctx;
+
+		Ctx.bBushMeshUi = nullptr != dynamic_cast<CLevelDesign_Bush*>(pObject);
+		Ctx.bBushBasicMeshUi = Ctx.bBushMeshUi && 0 == iBushMeshSlot;
+		Ctx.bBushCutMeshUi = Ctx.bBushMeshUi && 1 == iBushMeshSlot;
+
+		Ctx.pModelComponentTag = Ctx.bBushMeshUi
+			? (Ctx.bBushBasicMeshUi ? L"Com_Model_Basic" : L"Com_Model_Cut")
+			: L"Com_Model";
+
+		Ctx.pModel = pObject->Get_Component<CModel>(Ctx.pModelComponentTag);
+
+		Ctx.bEnvObjectMeshUi = nullptr != dynamic_cast<CEnvObject*>(pObject);
+		Ctx.bMapObjectMeshUi = nullptr != dynamic_cast<Client::CMapObject*>(pObject);
+
+		const _bool bStarblockMeshUi = nullptr != dynamic_cast<CLevelDesign_Starblock*>(pObject);
+
+		const CLevelDesign_Breakable* pBreakable = dynamic_cast<CLevelDesign_Breakable*>(pObject);
+		const _bool bBreakableNonAnimMeshUi = nullptr != pBreakable && MODEL::NONANIM == pBreakable->Get_BreakableDesc().eModelType;
+
+		Ctx.bEnvPassMeshUi = Ctx.bEnvObjectMeshUi || bStarblockMeshUi || bBreakableNonAnimMeshUi || Ctx.bBushCutMeshUi;
+
+		return Ctx;
 	}
 
 #pragma region MAP_LAYER_EX
@@ -914,7 +960,19 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 	if (nullptr == pObject)
 		return;
 
-	CModel* pModel = pObject->Get_Component<CModel>(L"Com_Model");
+	static CGameObject* s_pBushMeshOwner = nullptr;
+	static int s_iBushMeshSlot = 1;
+
+	const _bool bBushMeshUi = nullptr != dynamic_cast<CLevelDesign_Bush*>(pObject);
+
+	if (bBushMeshUi && s_pBushMeshOwner != pObject)
+	{
+		s_pBushMeshOwner = pObject;
+		s_iBushMeshSlot = 1;
+	}
+
+	MESH_LAYER_UI_CONTEXT Ui = Resolve_MeshLayerUIContext(pObject, s_iBushMeshSlot);
+	CModel* pModel = Ui.pModel;
 	if (nullptr == pModel)
 		return;
 
@@ -924,10 +982,29 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 	ImGui::TextDisabled("Mesh Render Settings are saved per model sidecar.");
 	ImGui::TextDisabled("All objects/sections using this model will be affected.");
 
-	const _bool bEnvObjectMeshUi =
-		nullptr != dynamic_cast<Client::CEnvObject*>(pObject);
-	const _bool bMapObjectMeshUi =
-		nullptr != dynamic_cast<Client::CMapObject*>(pObject);
+	_bool bBushSlotChanged = false;
+
+	if (bBushMeshUi)
+	{
+		int iBushSlot = s_iBushMeshSlot;
+
+		ImGui::SetNextItemWidth(160.f);
+		if (ImGui::Combo("Bush Model", &iBushSlot, "Basic\0Cut\0\0"))
+		{
+			s_iBushMeshSlot = (iBushSlot <= 0) ? 0 : 1;
+			bBushSlotChanged = true;
+
+			Ui = Resolve_MeshLayerUIContext(pObject, s_iBushMeshSlot);
+			pModel = Ui.pModel;
+			if (nullptr == pModel)
+			{
+				ImGui::TextDisabled("Selected Bush model slot is unavailable.");
+				return;
+			}
+		}
+
+		ImGui::TextDisabled((0 == s_iBushMeshSlot) ? "Basic uses fixed anim pass and Bush texture defaults." : "Cut uses ENV_PASS domain and Bush texture defaults.");
+	}
 
 	static const char* UvItems[] = { "TEXCOORD0", "TEXCOORD1", "TEXCOORD2", "TEXCOORD3" };
 
@@ -936,7 +1013,9 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 	static CGameObject* s_pFocusedMeshOwner = nullptr;
 	static _int s_iFocusedMeshIndex = -1;
 
-	if (s_pFocusedMeshOwner != pObject)
+	_bool bFocusedMeshChanged = (s_pFocusedMeshOwner != pObject) || bBushSlotChanged;
+
+	if (bFocusedMeshChanged)
 	{
 		s_pFocusedMeshOwner = pObject;
 		s_iFocusedMeshIndex = (iNumMeshes > 0) ? 0 : -1;
@@ -965,7 +1044,10 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 	}
 
 	if (s_iFocusedMeshIndex < 0 || s_iFocusedMeshIndex >= static_cast<_int>(iNumMeshes))
+	{
 		s_iFocusedMeshIndex = 0;
+		bFocusedMeshChanged = true;
+	}
 
 #ifdef _DEBUG
 	if (auto* pSection = dynamic_cast<Client::CMapSection*>(pObject))
@@ -991,6 +1073,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 		if (ImGui::Selectable(strLabel.c_str(), bSelected, ImGuiSelectableFlags_SpanAllColumns))
 		{
 			s_iFocusedMeshIndex = static_cast<_int>(i);
+			bFocusedMeshChanged = true;
 
 #ifdef _DEBUG
 			if (auto* pSection = dynamic_cast<Client::CMapSection*>(pObject))
@@ -1017,6 +1100,21 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 	const _uint iMesh = static_cast<_uint>(s_iFocusedMeshIndex);
 	MESH_LAYER_IDX Layer = pModel->Get_MeshLayer(iMesh);
 
+	_bool bChanged = false;
+	_bool bAnyField = false;
+
+	const _uint iUnknownType = ETOUI(MTEX_TYPE::UNKNOWN);
+	if (bFocusedMeshChanged && Ui.bBushMeshUi && 0u == Layer.idx[iUnknownType])
+	{
+		const _uint iUnknownTextureCount = pModel->Get_MeshTextureCount(iMesh, MTEX_TYPE::UNKNOWN);
+		if (1u < iUnknownTextureCount)
+		{
+			const _uint iBushDefaultUnknownSlot = (3u < iUnknownTextureCount) ? 3u : (iUnknownTextureCount - 1u);
+			Layer.idx[iUnknownType] = iBushDefaultUnknownSlot;
+			bChanged = true;
+		}
+	}
+
 	ImGui::PushID(s_iFocusedMeshIndex);
 	ImGui::Text("Editing Mesh: %d: %s",
 		s_iFocusedMeshIndex,
@@ -1034,10 +1132,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 	}
 #endif
 
-	_bool bChanged = false;
-	_bool bAnyField = false;
-
-	if (bMapObjectMeshUi)
+	if (Ui.bMapObjectMeshUi)
 	{
 		ImGui::SeparatorText("Mode");
 
@@ -1075,7 +1170,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			ImGui::TextDisabled("Advanced Layer is active. Settings are saved per model sidecar.");
 	}
 
-	auto DrawUVCombo = [&](const char* pLabel, _uint& iUVIndex)
+	auto DrawUVCombo = [&](const _char* pLabel, _uint& iUVIndex)
 		{
 			int iValue = (iUVIndex <= 3u) ? static_cast<int>(iUVIndex) : 0;
 
@@ -1087,7 +1182,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			}
 		};
 
-	auto DrawCompactUVCombo = [&](const char* pLabel, _uint& iUVIndex)
+	auto DrawCompactUVCombo = [&](const _char* pLabel, _uint& iUVIndex)
 		{
 			int iValue = (iUVIndex <= 3u) ? static_cast<int>(iUVIndex) : 0;
 			static const char* CompactUvItems = "0\0""1\0""2\0""3\0\0";
@@ -1100,7 +1195,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			}
 		};
 
-	auto BuildCompactComboItems = [&](int iMinValue, int iMaxValue)
+	auto BuildCompactComboItems = [&](int iMinValue, _int iMaxValue)
 		{
 			string strItems;
 
@@ -1159,7 +1254,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			}
 		};
 
-	auto DrawCompactLayerSlotCell = [&](const char* pLabel, const char* pId, MTEX_TYPE eType)
+	auto DrawCompactLayerSlotCell = [&](const _char* pLabel, const _char* pId, MTEX_TYPE eType)
 		{
 			bAnyField = true;
 
@@ -1210,7 +1305,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			}
 		};
 
-	auto DrawCompactExtraCell = [&](const char* pLabel, const char* pIdBase, int& iBindIndex, unsigned int& iTexType)
+	auto DrawCompactExtraCell = [&](const _char* pLabel, const _char* pIdBase, _int& iBindIndex, _uint& iTexType)
 		{
 			bAnyField = true;
 
@@ -1255,7 +1350,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			}
 		};
 
-	auto DrawLayerExSlotCell = [&](const char* pLabel, MESH_LAYER_TEX_BIND_EX& Bind, _uint iEntry)
+	auto DrawLayerExSlotCell = [&](const _char* pLabel, MESH_LAYER_TEX_BIND_EX& Bind, _uint iEntry)
 		{
 			bAnyField = true;
 
@@ -1345,7 +1440,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			ImGui::EndTable();
 		};
 
-	auto DrawLayerExUVCell = [&](const char* pLabel, MESH_LAYER_TEX_BIND_EX& Bind)
+	auto DrawLayerExUVCell = [&](const _char* pLabel, MESH_LAYER_TEX_BIND_EX& Bind)
 		{
 			bAnyField = true;
 
@@ -1458,7 +1553,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			ImGui::EndTable();
 		};
 
-	if (bEnvObjectMeshUi)
+	if (Ui.bEnvPassMeshUi)
 	{
 		int iPassCombo = Get_EnvShaderPassComboIndex(Layer.iPass);
 
@@ -1473,10 +1568,16 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			bChanged = true;
 		}
 
-		DrawUVCombo("UV", Layer.iUVIndex);
-		ImGui::TextDisabled("Dither is controlled per object in EnvObject Edit.");
+		if (Ui.bEnvObjectMeshUi)
+			ImGui::TextDisabled("Dither is controlled per object in EnvObject Edit.");
+		else
+			ImGui::TextDisabled("NonAnim LevelDesign uses ENV_PASS domain.");
 	}
-	else if (bMapObjectMeshUi)
+	else if (Ui.bBushBasicMeshUi)
+	{
+		ImGui::TextDisabled("Pass is fixed by Bush Basic anim render path.");
+	}
+	else if (Ui.bMapObjectMeshUi)
 	{
 		int iPassCombo = Get_MapShaderPassComboIndex(Layer.iPass);
 
@@ -1581,8 +1682,15 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 		ImGui::TextDisabled("(-1 = default)");
 	}
 
-	if (!bMapObjectMeshUi)
+	if (!Ui.bMapObjectMeshUi)
 	{
+		ImGui::SeparatorText("UV");
+
+		DrawUVCombo("Base UV", Layer.iUVIndex);
+
+		if (Ui.bEnvPassMeshUi)
+			DrawUVCombo("Unknown UV", Layer.iUnknownUVIndex);
+
 		if (ImGui::Checkbox("Use UV Transform", (bool*)&Layer.bUseUVTransform))
 			bChanged = true;
 
@@ -1592,55 +1700,77 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 		if (ImGui::DragFloat2("UV Scale", (float*)&Layer.vUVScale, 0.01f))
 			bChanged = true;
 
+		if (Ui.bEnvPassMeshUi)
+		{
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat2("UV ScaleNormal", (float*)&Layer.vUVScaleNormal, 0.01f))
+				bChanged = true;
+
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat2("UV ScaleMaterial", (float*)&Layer.vUVScaleMaterial, 0.01f))
+				bChanged = true;
+
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat("UV Rotate", &Layer.fUVRotate, 0.01f))
+				bChanged = true;
+		}
+
 		ImGui::SetNextItemWidth(160.f);
 		if (ImGui::DragFloat2("UV Offset", (float*)&Layer.vUVOffset, 0.01f))
 			bChanged = true;
 
 		ImGui::EndDisabled();
 
-		for (_uint t = 0; t < MTEX_TYPE_MAX; ++t)
+		if (Ui.bEnvPassMeshUi)
 		{
-			const MTEX_TYPE eType = static_cast<MTEX_TYPE>(t);
-			const int iCount = static_cast<int>(pModel->Get_MeshTextureCount(iMesh, eType));
-			const _uint iLayerIndex = Layer.idx[t];
-			const _bool bImportant = Is_EnvImportantTexType(eType);
-			const _bool bOutOfRange = (iCount > 0) && (iLayerIndex >= static_cast<_uint>(iCount));
+			ImGui::SeparatorText("Strength");
 
-			if (0 == iCount)
-			{
-				if (bEnvObjectMeshUi && bImportant)
-				{
-					bAnyField = true;
-					ImGui::TextDisabled("%s: no texture", TexTypeName(t));
-				}
-				continue;
-			}
-
-			if (1 == iCount)
-			{
-				bAnyField = true;
-				ImGui::TextDisabled("%s: single texture (index 0)%s",
-					TexTypeName(t),
-					bOutOfRange ? "  (layer index out of range)" : "");
-				continue;
-			}
-
-			bAnyField = true;
-
-			int iValue = static_cast<int>(iLayerIndex);
-			ImGui::SetNextItemWidth(120.f);
-			if (ImGui::InputInt(TexTypeName(t), &iValue))
-			{
-				if (iValue < 0)
-					iValue = 0;
-				if (iValue >= iCount)
-					iValue = iCount - 1;
-
-				Layer.idx[t] = static_cast<_uint>(iValue);
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat("Normal Strength", &Layer.fNormalStrength, 0.01f))
 				bChanged = true;
+
+			ImGui::SetNextItemWidth(160.f);
+			if (ImGui::DragFloat("Mask Strength", &Layer.fMaskStrength, 0.01f))
+				bChanged = true;
+		}
+
+		ImGui::SeparatorText("Texture Slots");
+
+		if (Ui.bBushBasicMeshUi)
+		{
+			if (ImGui::BeginTable("BushBasicTexGrid", 2, ImGuiTableFlags_SizingStretchSame))
+			{
+				ImGui::TableNextRow();
+
+				ImGui::TableNextColumn();
+				DrawCompactLayerSlotCell("Nrm", "##BushBasicTexNormal", MTEX_TYPE::NORMALS);
+
+				ImGui::TableNextColumn();
+				DrawCompactLayerSlotCell("Unk", "##BushBasicTexUnknown", MTEX_TYPE::UNKNOWN);
+
+				ImGui::EndTable();
 			}
-			ImGui::SameLine();
-			ImGui::Text("/ %d", iCount);
+		}
+		else
+		{
+			if (ImGui::BeginTable("EnvMeshTexGrid", 4, ImGuiTableFlags_SizingStretchSame))
+			{
+				ImGui::TableNextRow();
+
+				ImGui::TableNextColumn();
+				DrawCompactLayerSlotCell("Dif", "##EnvTexDiffuse", MTEX_TYPE::DIFFUSE);
+
+				ImGui::TableNextColumn();
+				DrawCompactLayerSlotCell("Nrm", "##EnvTexNormal", MTEX_TYPE::NORMALS);
+
+				ImGui::TableNextColumn();
+				DrawCompactLayerSlotCell("MRA", "##EnvTexMRA", MTEX_TYPE::METALNESS);
+
+				ImGui::TableNextColumn();
+				DrawCompactLayerSlotCell("Unk", "##EnvTexUnknown", MTEX_TYPE::UNKNOWN);
+
+				ImGui::EndTable();
+			}
 		}
 	}
 

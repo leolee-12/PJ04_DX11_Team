@@ -283,9 +283,6 @@
     <Filter Include="00. GameObject\06. Monster">
       <UniqueIdentifier>{c69f6e1f-9250-40fa-90bd-8d408e832ff0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\98. Component\01. Monster_Movement">
-      <UniqueIdentifier>{0ec1c291-b11e-4b89-9dd5-3440689cb4ea}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\06. Monster\00. System">
       <UniqueIdentifier>{e318a0dd-87ae-4e91-ab68-74f564cf6724}</UniqueIdentifier>
     </Filter>
@@ -1354,9 +1351,6 @@
       <Filter>00. GameObject\06. Monster\Kabu\State</Filter>
       <Filter>00. GameObject\06. Monster\05. Kabu\State\Idle</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Monster_RailMovement.h">
-      <Filter>01. Component\01. Monster_Movement\00. Rail</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\Projectile_Manager.h">
       <Filter>01. Projectile\Manager</Filter>
     </ClInclude>
@@ -1470,6 +1464,13 @@
     </ClInclude>
     <ClInclude Include="..\Public\Monster_RailMovement.h">
       <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_RailMovement.h" />
+    <ClInclude Include="..\Public\MeshLayer_Profile.h">
+      <Filter>99. Defines\Leo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MeshLayer_Binder.h">
+      <Filter>99. Defines\Leo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1972,9 +1973,6 @@
       <Filter>00. GameObject\06. Monster\Kabu\State</Filter>
       <Filter>00. GameObject\06. Monster\05. Kabu\State\Idle</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Monster_RailMovement.cpp">
-      <Filter>01. Component\01. Monster_Movement\00. Rail</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\Projectile_Manager.cpp">
       <Filter>01. Projectile\Manager</Filter>
     </ClCompile>
@@ -2088,6 +2086,13 @@
     </ClCompile>
     <ClCompile Include="..\Private\Monster_RailMovement.cpp">
       <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
+    <ClCompile Include="..\Private\MeshLayer_Binder.cpp">
+      <Filter>99. Defines\Leo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MeshLayer_Profile.cpp">
+      <Filter>99. Defines\Leo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

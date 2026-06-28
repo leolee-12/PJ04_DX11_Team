@@ -11,7 +11,7 @@ float2 g_vMaskValue;
 float4 g_vBlendColor;
 
 float g_NormalStrength = 1.f;
-
+float g_MaskStrength = 1.f;
 float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
 
 uint g_iMaterialID = 0;
@@ -25,6 +25,11 @@ float3 g_vMRA = float3(0.f, 1.f, 1.f);
 // 0=TEXCOORD0, 1=TEXCOORD1, 2=TEXCOORD2, 3=TEXCOORD3
 uint g_iUVIndex = 0;
 float4 g_vUVTransform = float4(1.f, 1.f, 0.f, 0.f);
+uint g_iUnknownUVIndex = 0;
+float4 g_vUVTransformNormal = float4(1.f, 1.f, 0.f, 0.f);
+float4 g_vUVTransformMaterial = float4(1.f, 1.f, 0.f, 0.f);
+float4 g_vUVTransformUnknown = float4(1.f, 1.f, 0.f, 0.f);
+float g_fUVRotate = 0.f;
 
 #define ENV_INSTANCE_FLAG_DITHER 0x01
 uint g_iEnvInstanceFlags = 0;
@@ -35,6 +40,8 @@ float g_fDissolve;
 #define ENV_SHADOW_ALPHA_DIFFUSE 1u
 #define ENV_SHADOW_ALPHA_UNKNOWN 2u
 #define ENV_SHADOW_ALPHA_DISCARD_ALL 3u
+#define ENV_SHADOW_ALPHA_DIFFUSE_R 4u
+#define ENV_SHADOW_ALPHA_UNKNOWN_R 5u
 uint g_iShadowAlphaSource = ENV_SHADOW_ALPHA_NONE;
 
 static const float Bayer4x4[16] =
@@ -65,6 +72,11 @@ float2 ApplyMeshUVTransform(float2 uv)
 	return uv * g_vUVTransform.xy + g_vUVTransform.zw;
 }
 
+float2 ApplyUnknownUVTransform(float2 uv)
+{
+    return uv * g_vUVTransformUnknown.xy + g_vUVTransformUnknown.zw;
+}
+
 struct VS_IN
 {
 	float3 vPosition : POSITION;
@@ -81,22 +93,35 @@ struct VS_IN
 
 struct VS_OUT
 {
-	float4 vPosition : SV_POSITION;
-	float4 vNormal : NORMAL;
-	float2 vTexcoord : TEXCOORD0;
+    float4 vPosition : SV_POSITION;
+    float4 vNormal : NORMAL;
+    float2 vTexcoord : TEXCOORD0;
+    float2 vTexcoord1 : TEXCOORD1;
+    float2 vTexcoord2 : TEXCOORD2;
+    float2 vTexcoord3 : TEXCOORD3;
 
-	float4 vWorldPos : TEXCOORD1;
-	float4 vProjPos : TEXCOORD2;
-	float4 vTangent : TANGENT;
-	float4 vBinormal : BINORMAL;
+    float4 vWorldPos : TEXCOORD4;
+    float4 vProjPos : TEXCOORD5;
+    float4 vTangent : TANGENT;
+    float4 vBinormal : BINORMAL;
 };
 
-float2 Select_UV_VS(VS_IN In)
+float2 Select_MeshUV_VS(VS_IN In, uint iUVIndex)
 {
-	[branch]	if (1 == g_iUVIndex)	return In.vTexcoord1;
-	[branch]	if (2 == g_iUVIndex)	return In.vTexcoord2;
-	[branch]	if (3 == g_iUVIndex)	return In.vTexcoord3;
-	return In.vTexcoord;
+      [branch] if (1u == iUVIndex) return In.vTexcoord1;
+      [branch] if (2u == iUVIndex) return In.vTexcoord2;
+      [branch] if (3u == iUVIndex) return In.vTexcoord3;
+      return In.vTexcoord;
+}
+
+float2 Get_BaseUV_VS(VS_IN In)
+{
+      return ApplyMeshUVTransform(Select_MeshUV_VS(In, g_iUVIndex));
+}
+
+float2 Get_UnknownUV_VS(VS_IN In)
+{
+      return ApplyUnknownUVTransform(Select_MeshUV_VS(In, g_iUnknownUVIndex));
 }
 
 VS_OUT VS_MAIN(VS_IN In)
@@ -108,9 +133,12 @@ VS_OUT VS_MAIN(VS_IN In)
 	vPosition = mul(vPosition, g_ProjMatrix);
 
 	Out.vPosition = vPosition;
-	Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), In.WorldMatrix));
-	Out.vTexcoord = ApplyMeshUVTransform(Select_UV_VS(In));
-	Out.vWorldPos = mul(float4(In.vPosition, 1.f), In.WorldMatrix);
+    Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), In.WorldMatrix));
+    Out.vTexcoord = In.vTexcoord;
+    Out.vTexcoord1 = In.vTexcoord1;
+    Out.vTexcoord2 = In.vTexcoord2;
+    Out.vTexcoord3 = In.vTexcoord3;
+    Out.vWorldPos = mul(float4(In.vPosition, 1.f), In.WorldMatrix);
 	Out.vProjPos = Out.vPosition;
 
 	float3 T = normalize(In.vTangent.xyz);
@@ -129,6 +157,8 @@ struct VS_SHADOW_OUT
 	float4 vPosition : SV_POSITION;
 	float4 vProjPos : TEXCOORD0;
 	float2 vTexcoord : TEXCOORD1;
+    float2 vUnknownTexcoord : TEXCOORD2;
+
 };
 
 VS_SHADOW_OUT VS_SHADOW(VS_IN In)
@@ -138,7 +168,8 @@ VS_SHADOW_OUT VS_SHADOW(VS_IN In)
 	float4 vWorld = mul(float4(In.vPosition, 1.f), In.WorldMatrix);
 	Out.vPosition = mul(mul(vWorld, g_ViewMatrix), g_ProjMatrix);
 	Out.vProjPos = Out.vPosition;
-	Out.vTexcoord = ApplyMeshUVTransform(Select_UV_VS(In));
+    Out.vTexcoord = Get_BaseUV_VS(In);
+    Out.vUnknownTexcoord = Get_UnknownUV_VS(In);
 	return Out;
 }
 
@@ -147,7 +178,7 @@ struct PS_SHADOW_OUT
 	float4 vLightDepth : SV_TARGET0;
 };
 
-void Apply_ShadowAlphaCut(float2 vUV)
+void Apply_ShadowAlphaCut(float2 vUV, float2 vUnknownUV)
 {
 	[branch]
 	if (ENV_SHADOW_ALPHA_DISCARD_ALL == g_iShadowAlphaSource)
@@ -156,18 +187,22 @@ void Apply_ShadowAlphaCut(float2 vUV)
 	float fAlpha = 1.f;
 
 	[branch]
-		if (ENV_SHADOW_ALPHA_DIFFUSE == g_iShadowAlphaSource)
-			fAlpha = g_DiffuseTexture.Sample(LinearSampler, vUV).a;
-		else if (ENV_SHADOW_ALPHA_UNKNOWN == g_iShadowAlphaSource)
-			fAlpha = g_UnknownTexture.Sample(LinearSampler, vUV).a;
-
+	if (ENV_SHADOW_ALPHA_DIFFUSE == g_iShadowAlphaSource)
+		fAlpha = g_DiffuseTexture.Sample(LinearSampler, vUV).a;
+	else if (ENV_SHADOW_ALPHA_UNKNOWN == g_iShadowAlphaSource)
+		fAlpha = g_UnknownTexture.Sample(LinearSampler, vUnknownUV).a;
+	else if (ENV_SHADOW_ALPHA_DIFFUSE_R == g_iShadowAlphaSource)
+		fAlpha = g_DiffuseTexture.Sample(LinearSampler, vUV).r;
+    else if (ENV_SHADOW_ALPHA_UNKNOWN_R == g_iShadowAlphaSource)
+        fAlpha = g_UnknownTexture.Sample(LinearSampler, vUnknownUV).r;
+	
 	if (fAlpha < 0.1f)
 		discard;
 }
 
 PS_SHADOW_OUT PS_SHADOW(VS_SHADOW_OUT In)
 {
-	Apply_ShadowAlphaCut(In.vTexcoord);
+    Apply_ShadowAlphaCut(In.vTexcoord, In.vUnknownTexcoord);
 
 	PS_SHADOW_OUT Out;
 	float d = In.vProjPos.z / In.vProjPos.w;
@@ -179,13 +214,16 @@ PS_SHADOW_OUT PS_SHADOW(VS_SHADOW_OUT In)
 struct PS_IN
 {
 	float4 vPosition : SV_POSITION;
-	float4 vNormal : NORMAL;
-	float2 vTexcoord : TEXCOORD0;
+    float4 vNormal : NORMAL;
+    float2 vTexcoord : TEXCOORD0;
+    float2 vTexcoord1 : TEXCOORD1;
+    float2 vTexcoord2 : TEXCOORD2;
+    float2 vTexcoord3 : TEXCOORD3;
 
-	float4 vWorldPos : TEXCOORD1;
-	float4 vProjPos : TEXCOORD2;
-	float4 vTangent : TANGENT;
-	float4 vBinormal : BINORMAL;
+    float4 vWorldPos : TEXCOORD4;
+    float4 vProjPos : TEXCOORD5;
+    float4 vTangent : TANGENT;
+    float4 vBinormal : BINORMAL;
 };
 
 struct PS_OUT
@@ -215,6 +253,31 @@ float3 PerturbNormal(float3 N, float3 worldPos, float2 uv, float3 nTS)
 
 	// 베이스 노멀은 N 그대로, 접선방향 디테일만 더함
 	return normalize(N + (T * inv * nTS.x + B * inv * nTS.y));
+}
+
+float2 Select_MeshUV_PS(PS_IN In, uint iUVIndex)
+{
+      [branch] if (1u == iUVIndex) return In.vTexcoord1;
+      [branch] if (2u == iUVIndex) return In.vTexcoord2;
+      [branch] if (3u == iUVIndex) return In.vTexcoord3;
+      return In.vTexcoord;
+}
+
+float2 Get_BaseUV(PS_IN In)
+{
+    return ApplyMeshUVTransform(Select_MeshUV_PS(In, g_iUVIndex));
+}
+float2 Get_NormalUV(PS_IN In)
+{
+    return Select_MeshUV_PS(In, g_iUVIndex) * g_vUVTransformNormal.xy + g_vUVTransformNormal.zw;
+}
+float2 Get_MaterialUV(PS_IN In)
+{
+    return Select_MeshUV_PS(In, g_iUVIndex) * g_vUVTransformMaterial.xy + g_vUVTransformMaterial.zw;
+}
+float2 Get_UnknownUV(PS_IN In)
+{
+    return ApplyUnknownUVTransform(Select_MeshUV_PS(In, g_iUnknownUVIndex));
 }
 
 PS_OUT PS_WHITE(PS_IN In)
@@ -249,16 +312,16 @@ PS_OUT PS_DIFF_SAMPLE(PS_IN In, float2 vUV)
 	return Out;
 }
 
-PS_OUT PS_DMN_SAMPLE(PS_IN In, float2 vUV)
+PS_OUT PS_DMN_SAMPLE(PS_IN In, float2 vBaseUV, float2 vNormalUV, float2 vMaterialUV)
 {
 	Apply_Dither_IfNeeded(In.vPosition);
 
 	PS_OUT Out;
-	vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, vUV);
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, vBaseUV);
 	if (vMtrlDiffuse.a < 0.1f)
 		discard;
 
-	float3 vMRA = g_MRATexture.Sample(LinearSampler, vUV).rgb;
+    float3 vMRA = g_MRATexture.Sample(LinearSampler, vMaterialUV).rgb;
 
 	float3 N = normalize(In.vNormal);
 	float3 T = normalize(In.vTangent.xyz);
@@ -266,7 +329,7 @@ PS_OUT PS_DMN_SAMPLE(PS_IN In, float2 vUV)
 
 	float3x3 TBN = float3x3(T, B, N);
 
-	float2 nrg = g_NormalTexture.Sample(LinearSampler, In.vTexcoord).rg;
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, vNormalUV).rg;
 	float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
 
 	float3 Nw = mul(nTS, TBN);
@@ -298,16 +361,16 @@ PS_OUT PS_UKWN_SAMPLE(PS_IN In, float2 vUV)
 	return Out;
 }
 
-PS_OUT PS_UMN_SAMPLE(PS_IN In, float2 vUV)
+PS_OUT PS_UMN_SAMPLE(PS_IN In, float2 vUnknownUV, float2 vNormalUV, float2 vMaterialUV)
 {
 	Apply_Dither_IfNeeded(In.vPosition);
 
 	PS_OUT Out;
-	vector vMtrlDiffuse = g_UnknownTexture.Sample(LinearSampler, vUV);
+    vector vMtrlDiffuse = g_UnknownTexture.Sample(LinearSampler, vUnknownUV);
 	if (vMtrlDiffuse.a < 0.1f)
 		discard;
 
-	float3 vMRA = g_MRATexture.Sample(LinearSampler, vUV).rgb;
+    float3 vMRA = g_MRATexture.Sample(LinearSampler, vMaterialUV).rgb;
 
 	float3 N = normalize(In.vNormal);
 	float3 T = normalize(In.vTangent.xyz);
@@ -315,7 +378,7 @@ PS_OUT PS_UMN_SAMPLE(PS_IN In, float2 vUV)
 
 	float3x3 TBN = float3x3(T, B, N);
 
-	float2 nrg = g_NormalTexture.Sample(LinearSampler, In.vTexcoord).rg;
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, vNormalUV).rg;
 	float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
 
 	float3 Nw = mul(nTS, TBN);
@@ -331,41 +394,48 @@ PS_OUT PS_UMN_SAMPLE(PS_IN In, float2 vUV)
 
 PS_OUT PS_DIFF(PS_IN In)
 {
-	return PS_DIFF_SAMPLE(In, In.vTexcoord);
+    return PS_DIFF_SAMPLE(In, Get_BaseUV(In));
 }
 
 PS_OUT PS_DMN(PS_IN In)
 {
-	return PS_DMN_SAMPLE(In, In.vTexcoord);
+    return PS_DMN_SAMPLE(In, Get_BaseUV(In), Get_NormalUV(In), Get_MaterialUV(In));
 }
 
 PS_OUT PS_UKWN(PS_IN In)
 {
-	return PS_UKWN_SAMPLE(In, In.vTexcoord);
+    return PS_UKWN_SAMPLE(In, Get_UnknownUV(In));
 }
 
 PS_OUT PS_UMN(PS_IN In)
 {
-	return PS_UMN_SAMPLE(In, In.vTexcoord);
+    return PS_UMN_SAMPLE(In, Get_UnknownUV(In), Get_NormalUV(In), Get_MaterialUV(In));
 }
 
 PS_OUT PS_DMNU(PS_IN In)
 {
-	PS_OUT Out = PS_DIFF_SAMPLE(In, In.vTexcoord);
+    float fMask = g_UnknownTexture.Sample(LinearSampler, Get_UnknownUV(In)).r;
+    if (fMask < 0.1f)
+        discard;
 
-	return Out;
+	PS_OUT Out = PS_DMN_SAMPLE(In, Get_BaseUV(In), Get_NormalUV(In), Get_MaterialUV(In));
+
+    return Out;
 }
 
 PS_OUT PS_TREESHADOW(PS_IN In)
 {
-	PS_OUT Out = PS_DIFF_SAMPLE(In, In.vTexcoord);
+    float fMask = g_DiffuseTexture.Sample(LinearSampler, Get_UnknownUV(In)).r;
+    if (fMask < 0.1f)
+        discard;
 
-	return Out;
+    PS_OUT Out = PS_DIFF_SAMPLE(In, Get_BaseUV(In));
+    return Out;
 }
 
 PS_OUT PS_GRASS_FUR(PS_IN In)
 {
-	PS_OUT Out = PS_DIFF_SAMPLE(In, In.vTexcoord);
+    PS_OUT Out = PS_DIFF_SAMPLE(In, Get_BaseUV(In));
 
 	return Out;
 }

@@ -51,6 +51,8 @@
     <ClInclude Include="..\Public\Common_Ring03.h" />
     <ClInclude Include="..\Public\Common_SpinSlash.h" />
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h" />
+    <ClInclude Include="..\Public\MeshLayer_Binder.h" />
+    <ClInclude Include="..\Public\MeshLayer_Profile.h" />
     <ClInclude Include="..\Public\Monster_RailMovement.h" />
     <ClInclude Include="..\Public\Sword_SpinSlash.h" />
     <ClInclude Include="..\public\PhysicsProjectile.h" />
@@ -284,6 +286,8 @@
     <ClCompile Include="..\Private\Common_Ring03.cpp" />
     <ClCompile Include="..\Private\Common_SpinSlash.cpp" />
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp" />
+    <ClCompile Include="..\Private\MeshLayer_Binder.cpp" />
+    <ClCompile Include="..\Private\MeshLayer_Profile.cpp" />
     <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlash.cpp" />
     <ClCompile Include="..\private\PhysicsProjectile.cpp" />

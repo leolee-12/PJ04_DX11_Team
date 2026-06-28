@@ -40,13 +40,6 @@ void CEnvObject_Static::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
 
-	if (!m_bRenderable || !Has_RenderModel())
-	{
-		m_bVisible = false;
-		m_bVisibleShadow = false;
-		return;
-	}
-
 	Refresh_WorldBounds();
 	Check_Visible();
 	Submit_RenderGroups();

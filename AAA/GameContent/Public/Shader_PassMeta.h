@@ -196,7 +196,7 @@ inline constexpr ENV_SHADER_PASS_META g_EnvShaderPassMetas[] =
 	{ ENV_PASS::UKWN,			ShaderPass::NonAnimPBR::UKWN,			"UKWN",				UKWN },
 	{ ENV_PASS::UMN,			ShaderPass::NonAnimPBR::UMN,			"UMN",				UKWN | MRA | NORM },
 
-	{ ENV_PASS::DMNU,			ShaderPass::NonAnimPBR::DMNU,			"DMN",				DIFF | MRA | NORM | UKWN },
+	{ ENV_PASS::DMNU,			ShaderPass::NonAnimPBR::DMNU,			"DMNU",				DIFF | MRA | NORM | UKWN },
 	{ ENV_PASS::TREESHADOW,		ShaderPass::NonAnimPBR::TREESHADOW,		"TREESHADOW",		UKWN },
 	{ ENV_PASS::GRASS_FUR,		ShaderPass::NonAnimPBR::GRASS_FUR,		"GRASS_FUR",		UKWN | MRA | NORM },
 	{ ENV_PASS::MN,				ShaderPass::NonAnimPBR::MN,				"MN",				MRA | NORM },
@@ -211,6 +211,8 @@ enum class ENV_SHADOW_ALPHA_SOURCE : _uint
 	DIFFUSE = 1u,
 	UNKNOWN = 2u,
 	DISCARD_ALL = 3u,
+	DIFFUSE_R = 4u,
+	UNKNOWN_R = 5u,
 };
 
 inline ENV_SHADOW_ALPHA_SOURCE Resolve_EnvShadowAlphaSource(ENV_PASS ePass)
@@ -220,14 +222,18 @@ inline ENV_SHADOW_ALPHA_SOURCE Resolve_EnvShadowAlphaSource(ENV_PASS ePass)
 	case ENV_PASS::DEFAULT:
 	case ENV_PASS::DIFF:
 	case ENV_PASS::DMN:
-	case ENV_PASS::DMNU:
-	case ENV_PASS::TREESHADOW:
 	case ENV_PASS::GRASS_FUR:
 		return ENV_SHADOW_ALPHA_SOURCE::DIFFUSE;
+
+	case ENV_PASS::DMNU:
+		return ENV_SHADOW_ALPHA_SOURCE::UNKNOWN_R;
 
 	case ENV_PASS::UKWN:
 	case ENV_PASS::UMN:
 		return ENV_SHADOW_ALPHA_SOURCE::UNKNOWN;
+
+	case ENV_PASS::TREESHADOW:
+		return ENV_SHADOW_ALPHA_SOURCE::DIFFUSE_R;
 
 	case ENV_PASS::DISCARD:
 		return ENV_SHADOW_ALPHA_SOURCE::DISCARD_ALL;
