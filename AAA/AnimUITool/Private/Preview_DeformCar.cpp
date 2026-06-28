@@ -1,11 +1,7 @@
 #include "Preview_DeformCar.h"
 
-#include "Animator.h"
 #include "GameContent_AnimEvents.h"
 #include "GameInstance_proxy.h"
-#include "Model.h"
-#include "Shader.h"
-#include "Texture.h"
 
 CPreview_DeformCar::CPreview_DeformCar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -37,7 +33,7 @@ HRESULT CPreview_DeformCar::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	m_pAnimatorCom->Play("Wait", true, true, 0.2f, 1.f, false);
+	m_pAnimatorCom->Play("Boost", true, true, 0.2f, 1.f, false);
 
 	return S_OK;
 }
