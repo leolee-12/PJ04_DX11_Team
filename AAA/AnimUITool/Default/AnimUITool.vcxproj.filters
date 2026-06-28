@@ -76,6 +76,9 @@
     <Filter Include="02. Objects\PreviewDeformCar">
       <UniqueIdentifier>{e25fb557-88d9-49e2-ab97-98a81dee4b2a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. Objects\Preview_DeformCar_Demo">
+      <UniqueIdentifier>{d4db8ab4-b15b-4088-9d4b-48d09b299337}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Panel.h">
@@ -153,8 +156,11 @@
     <ClInclude Include="..\Public\Level_Tool.h">
       <Filter>01. Levels\Tool</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Preview_DeformCar.h">
+    <ClInclude Include="..\Public\Preview_DeformCar_Main.h">
       <Filter>02. Objects\PreviewDeformCar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Preview_DeformCar_Demo.h">
+      <Filter>02. Objects\Preview_DeformCar_Demo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -236,8 +242,11 @@
     <ClCompile Include="..\Private\Panel_Palette.cpp">
       <Filter>03. Panels\Palette</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Preview_DeformCar.cpp">
+    <ClCompile Include="..\Private\Preview_DeformCar_Main.cpp">
       <Filter>02. Objects\PreviewDeformCar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Preview_DeformCar_Demo.cpp">
+      <Filter>02. Objects\Preview_DeformCar_Demo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,28 +1,28 @@
-#include "Preview_DeformCar.h"
+#include "Preview_DeformCar_Main.h"
 
 #include "GameContent_AnimEvents.h"
 #include "GameInstance_proxy.h"
 
-CPreview_DeformCar::CPreview_DeformCar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CPreview_DeformCar_Main::CPreview_DeformCar_Main(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
 	, m_eEye{ KIRBY_EYE_STATE::IDLE }
 {
 }
 
-CPreview_DeformCar::CPreview_DeformCar(const CPreview_DeformCar& Prototype)
+CPreview_DeformCar_Main::CPreview_DeformCar_Main(const CPreview_DeformCar_Main& Prototype)
 	: CGameObject{ Prototype }
 	, m_eEye{ Prototype.m_eEye }
 {
 }
 
-HRESULT CPreview_DeformCar::Initialize_Prototype()
+HRESULT CPreview_DeformCar_Main::Initialize_Prototype()
 {
 	m_eProjType = PROJ_TYPE::PERSPEC;
 
 	return S_OK;
 }
 
-HRESULT CPreview_DeformCar::Initialize(void* pArg)
+HRESULT CPreview_DeformCar_Main::Initialize(void* pArg)
 {
 	if (nullptr != pArg)
 		m_Desc = *static_cast<PREVIEW_DEFORMCAR_DESC*>(pArg);
@@ -38,7 +38,7 @@ HRESULT CPreview_DeformCar::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CPreview_DeformCar::Update(_float fTimeDelta)
+void CPreview_DeformCar_Main::Update(_float fTimeDelta)
 {
 	if (!m_bActive)
 		return;
@@ -46,7 +46,7 @@ void CPreview_DeformCar::Update(_float fTimeDelta)
 	m_pAnimatorCom->Update(fTimeDelta);
 }
 
-void CPreview_DeformCar::Late_Update(_float fTimeDelta)
+void CPreview_DeformCar_Main::Late_Update(_float fTimeDelta)
 {
 	if (!m_bActive)
 		return;
@@ -54,7 +54,7 @@ void CPreview_DeformCar::Late_Update(_float fTimeDelta)
 	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 
-HRESULT CPreview_DeformCar::Render()
+HRESULT CPreview_DeformCar_Main::Render()
 {
 	if (m_pModelCom->Get_NumMeshes() < MESH_END)
 		return E_FAIL;
@@ -77,7 +77,7 @@ HRESULT CPreview_DeformCar::Render()
 	return S_OK;
 }
 
-HRESULT CPreview_DeformCar::Ready_Components()
+HRESULT CPreview_DeformCar_Main::Ready_Components()
 {
 	m_pKirbyShaderCom = Add_Component<CShader>(
 		m_Desc.iProtoLevel,
@@ -126,7 +126,7 @@ HRESULT CPreview_DeformCar::Ready_Components()
 	return S_OK;
 }
 
-HRESULT CPreview_DeformCar::Ready_EyeTextures()
+HRESULT CPreview_DeformCar_Main::Ready_EyeTextures()
 {
 	m_pEyeTextureCom = Add_Component<CTexture>(
 		TEXT("Com_EyeTexture"),
@@ -151,7 +151,7 @@ HRESULT CPreview_DeformCar::Ready_EyeTextures()
 	return S_OK;
 }
 
-HRESULT CPreview_DeformCar::Bind_CommonResources(CShader* pShader)
+HRESULT CPreview_DeformCar_Main::Bind_CommonResources(CShader* pShader)
 {
 	if (nullptr == pShader)
 		return E_FAIL;
@@ -172,7 +172,7 @@ HRESULT CPreview_DeformCar::Bind_CommonResources(CShader* pShader)
 	return S_OK;
 }
 
-HRESULT CPreview_DeformCar::Render_PBRMesh(_uint iMeshIndex)
+HRESULT CPreview_DeformCar_Main::Render_PBRMesh(_uint iMeshIndex)
 {
 	if (FAILED(m_pModelCom->Bind_Material(
 		m_pPBRShaderCom,
@@ -210,7 +210,7 @@ HRESULT CPreview_DeformCar::Render_PBRMesh(_uint iMeshIndex)
 	return m_pModelCom->Render(iMeshIndex);
 }
 
-HRESULT CPreview_DeformCar::Render_KirbyMesh(_uint iMeshIndex)
+HRESULT CPreview_DeformCar_Main::Render_KirbyMesh(_uint iMeshIndex)
 {
 	if (FAILED(m_pEyeTextureCom->Bind_ShaderResource(
 		m_pKirbyShaderCom,
@@ -270,33 +270,33 @@ HRESULT CPreview_DeformCar::Render_KirbyMesh(_uint iMeshIndex)
 	return m_pModelCom->Render(iMeshIndex);
 }
 
-CPreview_DeformCar* CPreview_DeformCar::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CPreview_DeformCar_Main* CPreview_DeformCar_Main::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CPreview_DeformCar* pInstance = new CPreview_DeformCar(pDevice, pContext);
+	CPreview_DeformCar_Main* pInstance = new CPreview_DeformCar_Main(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created : CPreview_DeformCar");
+		MSG_BOX("Failed to Created : CPreview_DeformCar_Main");
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject* CPreview_DeformCar::Clone(void* pArg)
+CGameObject* CPreview_DeformCar_Main::Clone(void* pArg)
 {
-	CPreview_DeformCar* pInstance = new CPreview_DeformCar(*this);
+	CPreview_DeformCar_Main* pInstance = new CPreview_DeformCar_Main(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX("Failed to Cloned : CPreview_DeformCar");
+		MSG_BOX("Failed to Cloned : CPreview_DeformCar_Main");
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CPreview_DeformCar::Free()
+void CPreview_DeformCar_Main::Free()
 {
 	__super::Free();
 }

@@ -13,9 +13,9 @@ NS_END
 
 NS_BEGIN(AnimUITool)
 
-class CPreview_DeformCar final : public CGameObject
+class CPreview_DeformCar_Main final : public CGameObject
 {
-	GENERATED_BODY(CPreview_DeformCar)
+	GENERATED_BODY(CPreview_DeformCar_Main)
 
 public:
 	enum DEFORM_CAR_MESH : _uint
@@ -52,9 +52,9 @@ public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_Preview_DeformCar";
 
 protected:
-	CPreview_DeformCar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CPreview_DeformCar(const CPreview_DeformCar& Prototype);
-	virtual ~CPreview_DeformCar() = default;
+	CPreview_DeformCar_Main(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CPreview_DeformCar_Main(const CPreview_DeformCar_Main& Prototype);
+	virtual ~CPreview_DeformCar_Main() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -95,7 +95,7 @@ private:
 	HRESULT Render_KirbyMesh(_uint iMeshIndex);
 
 public:
-	static CPreview_DeformCar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CPreview_DeformCar_Main* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 
 protected:
