@@ -2093,9 +2093,6 @@
     <FxCompile Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_Map.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
-    </FxCompile>
     <FxCompile Include="..\ShaderFiles\Shader_UI.hlsl">
       <Filter>98. ShaderFiles\Hojun</Filter>
     </FxCompile>

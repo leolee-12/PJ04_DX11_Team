@@ -204,15 +204,31 @@ BlendState BS_AlphaErase
     BlendOpAlpha = Add;
 };
 
-BlendState BS_Decal   // 알베도 RGB만 블렌드, A(유효마스크) 보존
+BlendState BS_Decal   // 데칼: Diffuse/Normal/MRA 3타깃 알파블렌드, matID는 MRT에 없어 안 건드림
 {
     BlendEnable[0] = true;
-    SrcBlend = Src_Alpha;
-    DestBlend = Inv_Src_Alpha;
-    BlendOp = Add;
-    SrcBlendAlpha = Zero;
-    DestBlendAlpha = One;
-    BlendOpAlpha = Add;
+    SrcBlend[0] = Src_Alpha;
+    DestBlend[0] = Inv_Src_Alpha;
+    BlendOp[0] = Add;
+    SrcBlendAlpha[0] = Zero;
+    DestBlendAlpha[0] = One;
+    BlendOpAlpha[0] = Add;
+
+    BlendEnable[1] = true;
+    SrcBlend[1] = Src_Alpha;
+    DestBlend[1] = Inv_Src_Alpha;
+    BlendOp[1] = Add;
+    SrcBlendAlpha[1] = Zero;
+    DestBlendAlpha[1] = One;
+    BlendOpAlpha[1] = Add;
+
+    BlendEnable[2] = true;
+    SrcBlend[2] = Src_Alpha;
+    DestBlend[2] = Inv_Src_Alpha;
+    BlendOp[2] = Add;
+    SrcBlendAlpha[2] = Zero;
+    DestBlendAlpha[2] = One;
+    BlendOpAlpha[2] = Add;
 };
 
 

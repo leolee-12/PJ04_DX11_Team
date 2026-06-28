@@ -466,7 +466,6 @@
     <FxCompile Include="..\ShaderFiles\Shader_EnvInstance.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Gorilla.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Kirby.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_Map.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_MapEx.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_MaterialTest.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl" />

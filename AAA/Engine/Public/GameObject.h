@@ -15,7 +15,6 @@ class ENGINE_DLL CGameObject abstract : public CBase, public IReflectable
 	friend class CPrototype_Manager;
 
 	GENERATED_BODY_ABSTRACT(CGameObject)
-	PROPERTY(_uint, m_iMaterialID, L"Material_ID(0~255)", L"Material")
 
 public:
 	typedef struct tagGameObjectDesc : public CTransform::TRANSFORM_DESC
@@ -108,6 +107,8 @@ protected:
 	_uint		m_iFlag = {};
 
 	_bool		m_bActive = { true };
+
+	_uint		m_iMaterialID = { 0 };
 
 protected:
 	HRESULT Add_Component_Internal(const wstring& strComTag, CComponent* pComponent);
