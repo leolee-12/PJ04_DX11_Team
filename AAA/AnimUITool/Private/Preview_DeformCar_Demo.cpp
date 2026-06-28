@@ -66,13 +66,13 @@ HRESULT CPreview_DeformCar_Demo::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	if (FAILED(Render_KirbyMesh(MESH_LIMBS)))
+	if (Is_MeshVisible(MESH_LIMBS) && FAILED(Render_KirbyMesh(MESH_LIMBS)))
 		return E_FAIL;
 
-	if (FAILED(Render_KirbyMesh(MESH_BODY_A)))
+	if (Is_MeshVisible(MESH_BODY_A) && FAILED(Render_KirbyMesh(MESH_BODY_A)))
 		return E_FAIL;
 
-	if (FAILED(Render_KirbyMesh(MESH_BODY_B)))
+	if (Is_MeshVisible(MESH_BODY_B) && FAILED(Render_KirbyMesh(MESH_BODY_B)))
 		return E_FAIL;
 
 	return S_OK;
@@ -93,6 +93,8 @@ HRESULT CPreview_DeformCar_Demo::Ready_Components()
 		TEXT("Com_Model"));
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
+
+	m_MeshVisible.assign(m_pModelCom->Get_NumMeshes(), true);
 
 	if (FAILED(Ready_EyeTextures()))
 		return E_FAIL;
@@ -118,6 +120,37 @@ HRESULT CPreview_DeformCar_Demo::Ready_Components()
 		});
 
 	return S_OK;
+}
+
+_bool CPreview_DeformCar_Demo::Is_MeshVisible(_uint iMeshIndex) const
+{
+	if (iMeshIndex >= m_MeshVisible.size())
+		return false;
+
+	return m_MeshVisible[iMeshIndex];
+}
+
+void CPreview_DeformCar_Demo::Set_MeshVisible(_uint iMeshIndex, _bool bVisible)
+{
+	if (iMeshIndex >= m_MeshVisible.size())
+		return;
+
+	m_MeshVisible[iMeshIndex] = bVisible;
+}
+
+void CPreview_DeformCar_Demo::Set_AllMeshVisible(_bool bVisible)
+{
+	for (auto&& bMeshVisible : m_MeshVisible)
+		bMeshVisible = bVisible;
+}
+
+void CPreview_DeformCar_Demo::Set_SoloMesh(_uint iMeshIndex)
+{
+	if (iMeshIndex >= m_MeshVisible.size())
+		return;
+
+	for (_uint i = 0; i < m_MeshVisible.size(); ++i)
+		m_MeshVisible[i] = (i == iMeshIndex);
 }
 
 HRESULT CPreview_DeformCar_Demo::Ready_EyeTextures()

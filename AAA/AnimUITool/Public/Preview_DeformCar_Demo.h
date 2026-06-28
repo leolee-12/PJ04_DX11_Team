@@ -70,6 +70,10 @@ public:
 public:
 	void Set_Eye(KIRBY_EYE_STATE eState) { m_eEye = Clamp_State(eState); }
 	KIRBY_EYE_STATE Get_Eye() const { return m_eEye; }
+	_bool Is_MeshVisible(_uint iMeshIndex) const;
+	void Set_MeshVisible(_uint iMeshIndex, _bool bVisible);
+	void Set_AllMeshVisible(_bool bVisible);
+	void Set_SoloMesh(_uint iMeshIndex);
 
 private:
 	CShader* m_pKirbyShaderCom = { nullptr };
@@ -80,6 +84,7 @@ private:
 
 	PREVIEW_DEFORMCAR_DEMO_DESC m_Desc{};
 	KIRBY_EYE_STATE m_eEye = { KIRBY_EYE_STATE::IDLE };
+	vector<_bool> m_MeshVisible;
 
 	_float4 m_vBodyColor = { 1.f, 0.45f, 0.55f, 1.f };
 	_float4 m_vFootColor = { 1.f, 0.1882353f, 0.3764706f, 1.f };
