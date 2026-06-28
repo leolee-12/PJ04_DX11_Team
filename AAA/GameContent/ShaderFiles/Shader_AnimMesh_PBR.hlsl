@@ -162,35 +162,8 @@ struct PS_OUT
     float4 vMRA : SV_TARGET3;
     float4 vEmissive : SV_TARGET4;
     float4 vGeoNormal : SV_TARGET5;
+    uint   vMaterialID : SV_TARGET6;
 };
-
-//PS_OUT PS_MAIN(PS_IN In)
-//{
-//    PS_OUT Out;
-//
-//    vector vEye = g_UnknownTexture.Sample(ClampSampler, In.vTexcoord);
-//    vector vBase = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord1);
-//    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord1).rgb;
-//
-//    float3 vAlbedo = lerp(vBase.rgb, vEye.rgb, vEye.a);
-//    vector vMtrlDiffuse = vector(vAlbedo, vBase.a);
-//
-//    if (vMtrlDiffuse.a < 0.1f)
-//        discard;
-//    
-//    float3 N = normalize(In.vNormal);
-//    float3 T = normalize(In.vTangent.xyz);
-//    T = normalize(T - dot(T, N) * N);
-//    float3 B = cross(T, N) * In.vBinormal.w;
-//
-//    Out.vDiffuse = vMtrlDiffuse;
-//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-//    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 500.f, 0.f, 0.f);
-//    Out.vMRA = float4(mra, 1.f);
-//    
-//    return Out;
-//}
-    
 
 /* 픽셀셰이더 : 픽셀의 최종적인 색을 결정해준다. */
 PS_OUT PS_MAIN(PS_IN In)
@@ -221,9 +194,10 @@ PS_OUT PS_MAIN(PS_IN In)
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(mra, g_iMaterialID / 255.f);
+    Out.vMRA = float4(mra, 1.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
   
     return Out;
 }
@@ -253,9 +227,10 @@ PS_OUT PS_NONEYE(PS_IN In)
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(mra, g_iMaterialID / 255.f);
+    Out.vMRA = float4(mra, 1.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
     
     return Out;
 }
@@ -267,9 +242,10 @@ PS_OUT PS_CONSTANT_MATERIAL(PS_IN In)
     Out.vDiffuse = g_vConstantDiffuse;
     Out.vNormal = float4(normalize(In.vNormal).xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(g_vConstantMRA, g_iMaterialID / 255.f);
+    Out.vMRA = float4(g_vConstantMRA, 1.f);
     Out.vEmissive = g_vConstantEmissive;
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
 
     return Out;
 }
@@ -281,8 +257,10 @@ PS_OUT PS_TEST(PS_IN In)
     Out.vDiffuse = vector(1.f, 1.f, 1.f, 1.f);
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
+    Out.vMRA = float4(0.f, 1.f, 1.f, 1.f);
+    Out.vEmissive = float4(0.f, 0.f, 0.f, 0.f);
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
     
     return Out;
 }
@@ -310,9 +288,10 @@ PS_OUT PS_BUSH(PS_IN In)
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
+    Out.vMRA = float4(0.f, 1.f, 1.f, 1.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
   
     return Out;
 }
@@ -342,9 +321,10 @@ PS_OUT PS_BOX(PS_IN In)
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(mra, g_iMaterialID / 255.f);
+    Out.vMRA = float4(mra, 1.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
     
     return Out;
 }
@@ -367,9 +347,10 @@ PS_OUT PS_EYE_WITHOUTNORMAL(PS_IN In)
     Out.vDiffuse        = vMtrlDiffuse;
     Out.vNormal         = float4(N * 0.5f + 0.5f, 0.f); // 노말맵 없이 정점 노말
     Out.vDepth          = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA            = float4(mra, g_iMaterialID / 255.f);
+    Out.vMRA            = float4(mra, 1.f);
     Out.vEmissive       = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
     Out.vGeoNormal      = float4(N * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID     = g_iMaterialID;
     
     return Out;
 }

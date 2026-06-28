@@ -105,6 +105,7 @@ struct PS_OUT
     float4 vMRA : SV_TARGET3;
     float4 vEmissive : SV_TARGET4;
     float4 vGeoNormal : SV_TARGET5;
+    uint   vMaterialID : SV_TARGET6;
 };
 
 PS_OUT PS_BODY(PS_IN In)
@@ -135,9 +136,10 @@ PS_OUT PS_BODY(PS_IN In)
     Out.vDiffuse = float4(vAlbedo, 1.f);
     Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(vMRA, g_iMaterialID / 255.f);
+    Out.vMRA = float4(vMRA, 1.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
 
     return Out;
 }
@@ -173,9 +175,10 @@ PS_OUT PS_EYE(PS_IN In)
     Out.vDiffuse = float4(vAlbedo, 1.f);
     Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
+    Out.vMRA = float4(0.f, 1.f, 1.f, 1.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
 
     return Out;
 }
@@ -201,9 +204,10 @@ PS_OUT PS_SKIN(PS_IN In)
     Out.vDiffuse = float4(vAlbedo, 1.f);
     Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(vMRA, g_iMaterialID / 255.f);
+    Out.vMRA = float4(vMRA, 1.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
 
     return Out;
 }
@@ -229,9 +233,10 @@ PS_OUT PS_ANCHOR(PS_IN In)
     Out.vDiffuse = float4(vAlbedo, 1.f);
     Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(vMRA, g_iMaterialID / 255.f);
+    Out.vMRA = float4(vMRA, 1.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
 
     return Out;
 }

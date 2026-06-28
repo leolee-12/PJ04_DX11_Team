@@ -28,6 +28,14 @@ uint g_iMaterialID = 0;
 uint g_iUVIndex = 0;
 float4 g_vUVTransform = float4(1.f, 1.f, 0.f, 0.f);
 
+float g_fDecalHasNormal = 0.f; // µ¥Ä®¿¡ ³ë¸»¸Ê ÀÖÀ¸¸é 1
+float g_fDecalHasMRA = 0.f; // µ¥Ä®¿¡ MRA¸Ê ÀÖÀ¸¸é 1
+
+Texture2D<uint> g_MaterialIDTexture;
+
+int g_iDecalMaskMode = 0; // 0 = Á¦¿Ü ¸ðµå(ÇØ´ç ID¿£ ¾È ¾º¿ò), 1 = ÇÑÁ¤ ¸ðµå(ÇØ´ç ID¿¡¸¸ ¾º¿ò)
+int g_iDecalMaskID = 200;
+
 #define ENV_INSTANCE_FLAG_DITHER 0x01
 uint g_iEnvInstanceFlags = 0;
 float g_fDissolve;
@@ -194,6 +202,7 @@ struct PS_OUT
 	float4 vMRA : SV_TARGET3;
 	float4 vEmissive : SV_TARGET4;
 	float4 vGeoNormal : SV_TARGET5;
+    uint   vMaterialID : SV_TARGET6;
 };
 
 struct PS_BACKOUT
@@ -256,7 +265,8 @@ PS_OUT PS_MAIN(PS_IN In)
 	Out.vDiffuse = float4(vAlbedo, vBase.a);
 	Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-	Out.vMRA = float4(mra, g_iMaterialID / 255.f);
+    Out.vMRA = float4(mra, 1.f);
+    Out.vMaterialID = g_iMaterialID;
 	Out.vEmissive = float4(g_vEmissiveColor.rgb * vBase.a, 1.f);
 	Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
 
@@ -274,9 +284,10 @@ PS_OUT PS_DIFFUSE(PS_IN In)
 	Out.vDiffuse = vMtrlDiffuse;
 	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-	Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
+	Out.vMRA = float4(0.f, 1.f, 1.f, 1.f);
 	Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
 	Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
 	return Out;
 }
 
@@ -303,9 +314,10 @@ PS_OUT PS_DIFFUSE_DITHER(PS_IN In)
 	Out.vDiffuse = vMtrlDiffuse;
 	Out.vNormal = vector(Nw * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-	Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
+	Out.vMRA = float4(0.f, 1.f, 1.f, 1.f);
 	Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
 	Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
 	return Out;
 }
 
@@ -316,9 +328,10 @@ PS_OUT PS_WHITE(PS_IN In)
 	Out.vDiffuse = float4(1.f, 1.f, 1.f, 1.f);
 	Out.vNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-	Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
+	Out.vMRA = float4(0.f, 1.f, 1.f, 1.f);
 	Out.vEmissive = float4(0.f, 0.f, 0.f, 1.f);
 	Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
 
 	return Out;
 }
@@ -387,9 +400,10 @@ PS_OUT PS_DIFF_SAMPLE(PS_NONINST_IN In, float2 vUV)
 	Out.vDiffuse = vMtrlDiffuse;
 	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-	Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
+	Out.vMRA = float4(0.f, 1.f, 1.f, 1.f);
 	Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
 	Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
 	return Out;
 }
 
@@ -418,9 +432,10 @@ PS_OUT PS_DMN_SAMPLE(PS_NONINST_IN In, float2 vUV)
 	Out.vDiffuse = vMtrlDiffuse;
 	Out.vNormal = vector(Nw * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-	Out.vMRA = float4(vMRA, g_iMaterialID / 255.f);
+    Out.vMRA = float4(vMRA, 1.f);
 	Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
 	Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
 	return Out;
 }
 
@@ -436,9 +451,10 @@ PS_OUT PS_UKWN_SAMPLE(PS_NONINST_IN In, float2 vUV)
 	Out.vDiffuse = vMtrlDiffuse;
 	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-	Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
+	Out.vMRA = float4(0.f, 1.f, 1.f, 1.f);
 	Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
 	Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
 	return Out;
 }
 
@@ -467,9 +483,10 @@ PS_OUT PS_UMN_SAMPLE(PS_NONINST_IN In, float2 vUV)
 	Out.vDiffuse = vMtrlDiffuse;
 	Out.vNormal = vector(Nw * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-	Out.vMRA = float4(vMRA, g_iMaterialID / 255.f);
+    Out.vMRA = float4(vMRA, 1.f);
 	Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
 	Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
 	return Out;
 }
 
@@ -536,9 +553,10 @@ PS_OUT PS_MN(PS_NONINST_IN In)
 	Out.vDiffuse = vector(0.294f, 0.424f, 0.235f, 1.f);
 	Out.vNormal = vector(Nw * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-	Out.vMRA = float4(vMRA, g_iMaterialID / 255.f);
+    Out.vMRA = float4(vMRA, 1.f);
 	Out.vEmissive = vector(0.f, 0.f, 0.f, 0.f);
 	Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
 	return Out;
 }
 
@@ -556,58 +574,108 @@ PS_OUT PS_COLOR_MRA_DITHER(PS_IN In)
 	Out.vDiffuse = g_vColor; // ÅØ½ºÃ³ ´ë½Å »ó¼ö »ö
 	Out.vNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-	Out.vMRA = float4(g_vMRA, g_iMaterialID / 255.f); // »ó¼ö MRA
+	Out.vMRA = float4(g_vMRA, 1.f); // »ó¼ö MRA
 	Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
 	Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
 	return Out;
+}
+
+struct PS_DECAL_OUT
+{
+    float4 vDiffuse : SV_TARGET0;
+    float4 vNormal : SV_TARGET1;
+    float4 vMRA : SV_TARGET2;
+};
+
+PS_DECAL_OUT PS_DECAL(PS_NONINST_IN In)
+{
+    PS_DECAL_OUT Out = (PS_DECAL_OUT) 0;
+
+    float2 screenUV;
+    screenUV.x = In.vProjPos.x / In.vProjPos.w * 0.5f + 0.5f;
+    screenUV.y = In.vProjPos.y / In.vProjPos.w * -0.5f + 0.5f;
+
+    float sceneDepth = g_DepthTexture.Sample(PointSampler, screenUV).x;
+    if (sceneDepth <= 0.f)
+        discard;
+
+    float3 worldPosition = RecoverWorldPos(screenUV, sceneDepth, g_ProjMatrixInverse, g_ViewMatrixInverse);
+    float3 decalLocalPosition = mul(float4(worldPosition, 1.f), g_WorldMatrixInverse).xyz;
+    float3 boundsDistance = abs(decalLocalPosition - g_vDecalBoundsCenter);
+    if (any(boundsDistance > g_vDecalBoundsExtents + 0.0001f))
+        discard;
+	
+    uint surfMatID = g_MaterialIDTexture.Load(int3(In.vPosition.xy, 0));
+    if (g_iDecalMaskMode == 0)
+    {
+        if (surfMatID == (uint) g_iDecalMaskID)   // Á¦¿Ü: µ¿Àû°´Ã¼ µî¿£ ¾È ¹¯Èû
+            discard;
+    }
+    else
+    {
+        if (surfMatID != (uint) g_iDecalMaskID)   // ÇÑÁ¤: ÁöÁ¤ ¸é(¿¹: ÁöÇü)¿¡¸¸
+            discard;
+    }
+
+    float2 decalUV = float2(decalLocalPosition.x + 0.5f, 0.5f - decalLocalPosition.z);
+    decalUV = ApplyMeshUVTransform(decalUV);
+
+    float4 col = g_DiffuseTexture.Sample(LinearSampler, decalUV);
+    if (col.a <= 0.f)
+        discard;
+
+    float coverage = col.a * g_fDecalAlpha;
+
+    // Diffuse
+    Out.vDiffuse = float4(col.rgb, coverage);
+
+    // Normal: µ¥Ä® ÅºÁ¨Æ®°ø°£ -> ¿ùµå. µ¥Ä® Åõ¿µÃà = ·ÎÄÃ Y
+    float3 nT = g_NormalTexture.Sample(LinearSampler, decalUV).xyz * 2.f - 1.f;
+    float3 T = normalize(g_WorldMatrix._11_12_13); // ¶ç¿öº¸¸é¼­ Æ©´× 
+    float3 N = normalize(g_WorldMatrix._21_22_23); // ¶ç¿öº¸¸é¼­ Æ©´× 
+    float3 B = -normalize(g_WorldMatrix._31_32_33);// ¶ç¿öº¸¸é¼­ Æ©´× 
+    float3 worldN = normalize(nT.x * T + nT.y * B + nT.z * N);
+    Out.vNormal = float4(worldN * 0.5f + 0.5f, coverage * g_fDecalHasNormal);
+
+    // MRA (rgb = metallic/roughness/ao)
+    float3 mra = g_MRATexture.Sample(LinearSampler, decalUV).rgb;
+    Out.vMRA = float4(mra, coverage * g_fDecalHasMRA);
+
+    return Out;
 }
 
 //float4 PS_DECAL(PS_NONINST_IN In) : SV_TARGET0 // ¾Ëº£µµ¸¸
 //{
-//    // ¼ÎÀÌ´õ ±íÀÌÅ×½ºÆ® (Target_Depth µµ vProjPos.z/w ÀúÀå -> Á÷Á¢ ºñ±³)
-//    float2 suv;
-//    suv.x = In.vProjPos.x / In.vProjPos.w * 0.5f + 0.5f;
-//    suv.y = In.vProjPos.y / In.vProjPos.w * -0.5f + 0.5f;
-//    float decalDepth = In.vProjPos.z / In.vProjPos.w;
-//    float sceneDepth = g_DepthTexture.Sample(PointSampler, suv).x;
-//    if (decalDepth > sceneDepth + 0.0005f)
-//        discard;
+//	float2 screenUV;
+//	screenUV.x = In.vProjPos.x / In.vProjPos.w * 0.5f + 0.5f;
+//	screenUV.y = In.vProjPos.y / In.vProjPos.w * -0.5f + 0.5f;
 //
-//    float4 col = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord); // PS_DIFF ¿Í µ¿ÀÏ
-//    return float4(col.rgb, col.a * g_fDecalAlpha); // ÄÆ¾Æ¿ô ¾Æ´Ô, ¾ËÆÄºí·»µå
+//	float sceneDepth = g_DepthTexture.Sample(PointSampler, screenUV).x;
+//	if (sceneDepth <= 0.f)
+//		  discard;
+//
+//	float3 worldPosition = RecoverWorldPos(
+//		  screenUV,
+//		  sceneDepth,
+//		  g_ProjMatrixInverse,
+//		  g_ViewMatrixInverse);
+//
+//	float3 decalLocalPosition = mul(float4(worldPosition, 1.f), g_WorldMatrixInverse).xyz;
+//	float3 boundsDistance = abs(decalLocalPosition - g_vDecalBoundsCenter);
+//	if (any(boundsDistance > g_vDecalBoundsExtents + 0.0001f))
+//		  discard;
+//
+//	float2 decalUV = float2(decalLocalPosition.x + 0.5f, 0.5f - decalLocalPosition.z);
+//
+//	decalUV = ApplyMeshUVTransform(decalUV);
+//
+//	float4 col = g_DiffuseTexture.Sample(LinearSampler, decalUV);
+//	if (col.a <= 0.f)
+//		  discard;
+//
+//	return float4(col.rgb, col.a * g_fDecalAlpha);
 //}
-
-float4 PS_DECAL(PS_NONINST_IN In) : SV_TARGET0 // ¾Ëº£µµ¸¸
-{
-	float2 screenUV;
-	screenUV.x = In.vProjPos.x / In.vProjPos.w * 0.5f + 0.5f;
-	screenUV.y = In.vProjPos.y / In.vProjPos.w * -0.5f + 0.5f;
-
-	float sceneDepth = g_DepthTexture.Sample(PointSampler, screenUV).x;
-	if (sceneDepth <= 0.f)
-		  discard;
-
-	float3 worldPosition = RecoverWorldPos(
-		  screenUV,
-		  sceneDepth,
-		  g_ProjMatrixInverse,
-		  g_ViewMatrixInverse);
-
-	float3 decalLocalPosition = mul(float4(worldPosition, 1.f), g_WorldMatrixInverse).xyz;
-	float3 boundsDistance = abs(decalLocalPosition - g_vDecalBoundsCenter);
-	if (any(boundsDistance > g_vDecalBoundsExtents + 0.0001f))
-		  discard;
-
-	float2 decalUV = float2(decalLocalPosition.x + 0.5f, 0.5f - decalLocalPosition.z);
-
-	decalUV = ApplyMeshUVTransform(decalUV);
-
-	float4 col = g_DiffuseTexture.Sample(LinearSampler, decalUV);
-	if (col.a <= 0.f)
-		  discard;
-
-	return float4(col.rgb, col.a * g_fDecalAlpha);
-}
 
 technique11 DefaultTechnique
 {

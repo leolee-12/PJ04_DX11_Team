@@ -130,6 +130,7 @@ CEnvObject::CEnvObject(const CEnvObject& Prototype)
 HRESULT CEnvObject::Initialize_Prototype()
 {
 	m_eProjType = PROJ_TYPE::PERSPEC;
+	m_iMaterialID = WORLD_STATIC_ID;
 	return S_OK;
 }
 
@@ -399,6 +400,9 @@ HRESULT CEnvObject::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
 		return E_FAIL;
 
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -571,6 +575,8 @@ HRESULT CEnvObject::Render_Decal()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShaderCom, "g_DepthTexture")))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_MaterialID"), m_pShaderCom, "g_MaterialIDTexture")))
+		return E_FAIL;
 	/* ------------------------------------------------------------ */
 
 	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
@@ -599,6 +605,16 @@ HRESULT CEnvObject::Render_Decal()
 		if (FAILED(BindMaterial("g_NormalTexture", MTEX_TYPE::NORMALS, DEFAULT_TEXTURE::FLAT_NORMAL)))	return E_FAIL;
 		if (FAILED(BindMaterial("g_MRATexture", MTEX_TYPE::METALNESS, DEFAULT_TEXTURE::MRA)))			return E_FAIL;
 		if (FAILED(BindMaterial("g_UnknownTexture", MTEX_TYPE::UNKNOWN, DEFAULT_TEXTURE::BLACK)))		return E_FAIL;
+
+		const _float fHasNormal = (m_pModelCom->Get_MeshTextureCount(i, MTEX_TYPE::NORMALS) > 0u) ? 1.f : 0.f;
+		const _float fHasMRA = (m_pModelCom->Get_MeshTextureCount(i, MTEX_TYPE::METALNESS) > 0u) ? 1.f : 0.f;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fDecalHasNormal", &fHasNormal, sizeof(_float)))) return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_fDecalHasMRA", &fHasMRA, sizeof(_float)))) return E_FAIL;
+
+		const _int iDecalMaskMode = 1;                 // 0=제외, 1=한정 (추후 데칼 desc로 노출 가능)
+		const _int iDecalMaskID = WORLD_STATIC_ID;	   // 1
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_iDecalMaskMode", &iDecalMaskMode, sizeof(_int)))) return E_FAIL;
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_iDecalMaskID", &iDecalMaskID, sizeof(_int)))) return E_FAIL;
 
 		const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
 
