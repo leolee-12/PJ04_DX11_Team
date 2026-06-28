@@ -63,10 +63,7 @@ public:
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
-	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override
-	{
-		pOutData->strPrototypeTag = PROTOTYPE_TAG;
-	}
+	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
 public:
 	void Set_Eye(KIRBY_EYE_STATE eState) { m_eEye = Clamp_State(eState); }
