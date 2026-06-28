@@ -9,7 +9,6 @@ CProjectile::CProjectile(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 }
 CProjectile::CProjectile(const CProjectile& Prototype)
     : CGameObject(Prototype)
-    // 튜닝값은 프로토타입에서 클론으로 복사 (copy ctor 가 PROPERTY 안 옮기면 클론이 미초기화됨)
     , m_fSpeed{ Prototype.m_fSpeed }, m_fLifeTime{ Prototype.m_fLifeTime }
     , m_fDamage{ Prototype.m_fDamage }, m_fKnockback{ Prototype.m_fKnockback }
     , m_fHitRadius{ Prototype.m_fHitRadius } {
