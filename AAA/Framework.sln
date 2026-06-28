@@ -39,6 +39,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MapTool", "MapTool\Default\
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CameraTool", "CameraTool\Default\CameraTool.vcxproj", "{6000C6FD-1F3E-47A6-81E2-8FBF0DF8802C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{24F1C936-38BB-422E-868F-05958F7FC28A} = {24F1C936-38BB-422E-868F-05958F7FC28A}
+		{75252A25-FE5C-4E14-A27B-CB65772242C0} = {75252A25-FE5C-4E14-A27B-CB65772242C0}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

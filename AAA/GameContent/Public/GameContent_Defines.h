@@ -44,7 +44,7 @@ namespace Client
 		_float3 vRadians = { 0.f, 0.f, 0.f };
 	};
 
-	constexpr _uint KIRBY_SILHOUETTE_ID = 200;
+	constexpr _uint WORLD_STATIC_ID = 1;
 }
 
 using namespace Client;

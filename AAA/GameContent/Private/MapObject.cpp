@@ -15,6 +15,7 @@ CMapObject::CMapObject(const CMapObject& Prototype)
 HRESULT CMapObject::Initialize_Prototype()
 {
 	m_eProjType = PROJ_TYPE::PERSPEC;
+	m_iMaterialID = WORLD_STATIC_ID;
 	return S_OK;
 }
 
@@ -106,6 +107,8 @@ HRESULT CMapObject::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
 		return E_FAIL;
 
 	return S_OK;

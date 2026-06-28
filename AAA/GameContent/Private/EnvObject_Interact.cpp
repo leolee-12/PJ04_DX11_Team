@@ -44,12 +44,6 @@ void CEnvObject_Interact::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
-	if (!m_bRenderable || !Has_RenderModel())
-	{
-		m_bVisible = false;
-		return;
-	}
-
 	Refresh_WorldBounds();
 
 	Check_Visible();

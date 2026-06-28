@@ -622,6 +622,7 @@ void CEffect_Emitter::Update_EmitterParticleAlpha(EMITTER_PARTICLE& Particle, _f
         m_bActive_EmitterAlpha_Ratio_0, m_fEmitterAlpha_Ratio_0, m_fEmitterAlpha_Value_0,
         m_bActive_EmitterAlpha_Ratio_1, m_fEmitterAlpha_Ratio_1, m_fEmitterAlpha_Value_1);
 
+    fAlpha *= Get_FadeOutAlpha();
     Helper::FloatClamp(fAlpha, 0.f, 1.f);
 
     Particle.fAlpha = fAlpha;

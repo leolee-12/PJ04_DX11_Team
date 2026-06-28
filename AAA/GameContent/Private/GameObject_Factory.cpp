@@ -54,6 +54,7 @@
 #include "InhaleContainer.h"
 #include "Sword_JumpSlash.h"
 #include "Sword_SpinSlash.h"
+#include "Sword_SpinSlashTrail.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -67,6 +68,7 @@
 #include "Common_Ring03.h"
 #include "Common_JumpSlash.h"
 #include "Common_SpinSlash.h"
+#include "Common_SpinSlashTrail.h"
 
 //sky
 #include "SkySphere.h"
@@ -378,7 +380,7 @@ void CGameObject_Factory::Register_Test()
         )
     );
 
-    // 3. SpinSlash
+    // 4. SpinSlash
     Register(CSword_SpinSlash::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSword_SpinSlash),
         LOADER
         (
@@ -393,6 +395,21 @@ void CGameObject_Factory::Register_Test()
 
             TRY_ADD_PROTO(pProxy, Texture_Common_SpinSlash_2.iLevelID, Texture_Common_SpinSlash_2.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_Common_SpinSlash_2.szFileTag, Texture_Common_SpinSlash_2.iNumTex));
+        )
+    );
+
+    // 5. SpinSlashTrail
+    Register(CSword_SpinSlashTrail::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSword_SpinSlashTrail),
+        LOADER
+        (
+            // Common_SpinSlashTrail
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_SpinSlashTrail::PROTOTYPE_TAG,
+                CCommon_SpinSlashTrail::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_SpinSlashTrail"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_SpinSlashTrail/Model_Common_SpinSlashTrail.ysh",
+                    XMMatrixRotationX(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, Texture_Common_SpinSlashTrail.iLevelID, Texture_Common_SpinSlashTrail.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Common_SpinSlashTrail.szFileTag, Texture_Common_SpinSlashTrail.iNumTex));
         )
     );
 

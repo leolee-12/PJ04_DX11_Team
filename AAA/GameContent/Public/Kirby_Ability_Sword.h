@@ -82,6 +82,7 @@ private:
 	_bool m_bIsStartEffect[SWORD_EFFECT::EFFECT_END]{};
 
 	CEffect_Container* m_pSpinSlash{};
+	CEffect_Container* m_pSpinSlashTrail{};
 
 private:
 	void Update_ChargeTime(_float fTimeDelta);
