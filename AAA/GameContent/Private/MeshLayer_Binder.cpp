@@ -11,7 +11,7 @@ namespace
 	HRESULT Bind_Map(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult);
 	HRESULT Bind_NonAnimPBR(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult);
 	HRESULT Bind_EnvInstance(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult);
-	HRESULT Bind_LDAnimPBR(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult);
+	HRESULT Bind_AnimPBRLimited(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult);
 
 	HRESULT Bind_LegacyMainTextures(const MESH_LAYER_BIND_CONTEXT& Ctx);
 	HRESULT Bind_LegacyCommonParams(const MESH_LAYER_BIND_CONTEXT& Ctx, _bool bBindEnvFlags);
@@ -47,8 +47,8 @@ HRESULT MeshLayerBinder::Bind(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIN
 	case MESH_LAYER_PROFILE::ENV_INSTANCE:
 		return Bind_EnvInstance(Ctx, pOutResult);
 
-	case MESH_LAYER_PROFILE::LD_ANIM_PBR:
-		return Bind_LDAnimPBR(Ctx, pOutResult);
+	case MESH_LAYER_PROFILE::ANIM_PBR_LIMITIED:
+		return Bind_AnimPBRLimited(Ctx, pOutResult);
 
 	default:
 		return E_FAIL;
@@ -91,7 +91,7 @@ _uint MeshLayerBinder::Resolve_Pass(MESH_LAYER_PROFILE eProfile, MESH_LAYER_REND
 	case MESH_LAYER_PROFILE::ENV_INSTANCE:
 		return MeshLayerProfile::Resolve_EnvInstancePass(Layer, iFallbackPass);
 
-	case MESH_LAYER_PROFILE::LD_ANIM_PBR:
+	case MESH_LAYER_PROFILE::ANIM_PBR_LIMITIED:
 	default:
 		return iFallbackPass;
 	}
@@ -249,7 +249,7 @@ namespace
 		}
 	}
 
-	HRESULT Bind_LDAnimPBR(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult)
+	HRESULT Bind_AnimPBRLimited(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult)
 	{
 		if (MESH_LAYER_RENDER_KIND::MAIN != Ctx.eKind)
 			return E_FAIL;

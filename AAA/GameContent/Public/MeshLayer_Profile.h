@@ -9,7 +9,7 @@ enum class MESH_LAYER_PROFILE : _uint
 	MAP,
 	NONANIM_PBR,
 	ENV_INSTANCE,
-	LD_ANIM_PBR
+	ANIM_PBR_LIMITIED
 };
 
 enum class MESH_LAYER_RENDER_KIND : _uint

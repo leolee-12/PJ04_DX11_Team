@@ -40,29 +40,6 @@ namespace
 
 		return nullptr;
 	}
-
-	void Normalize_BushUnknownTextureSlot(CModel* pModel)
-	{
-		if (nullptr == pModel)
-			return;
-
-		const _uint iNumMeshes = static_cast<_uint>(pModel->Get_NumMeshes());
-		const _uint iUnknownType = ETOUI(MTEX_TYPE::UNKNOWN);
-
-		for (_uint i = 0; i < iNumMeshes; ++i)
-		{
-			MESH_LAYER_IDX Layer = pModel->Get_MeshLayer(i);
-			if (0u != Layer.idx[iUnknownType])
-				continue;
-
-			const _uint iTextureCount = pModel->Get_MeshTextureCount(i, MTEX_TYPE::UNKNOWN);
-			if (iTextureCount <= 1u)
-				continue;
-
-			Layer.idx[iUnknownType] = (3u < iTextureCount) ? 3u : (iTextureCount - 1u);
-			pModel->Set_MeshLayer(i, Layer);
-		}
-	}
 }
 
 NS_BEGIN(Client)
@@ -235,8 +212,6 @@ HRESULT CLevelDesign_Bush::Ready_Components()
 		m_pModelComs[eSlot] = Add_Component<CModel>(m_tBushDesc.iModelProtoLevel, pModelProtoTag, szModelTag);
 		if (nullptr == m_pModelComs[eSlot])
 			return E_FAIL;
-
-		Normalize_BushUnknownTextureSlot(m_pModelComs[eSlot]);
 	}
 
 	CAnimator::ANIMATOR_DESC AnimDesc{};

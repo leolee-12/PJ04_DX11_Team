@@ -163,6 +163,163 @@ void CEnvObject::Late_Update(_float fTimeDelta)
 	m_fDissolve = t < 0.f ? 0.f : (t > 1.f ? 1.f : t);
 }
 
+HRESULT CEnvObject::Render()
+{
+	if (!m_bRenderable)
+		return S_OK;
+
+	if (FAILED(Bind_ShaderResources()))
+		return E_FAIL;
+
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		if (m_bUseCameraDither && m_fDissolve >= 0.999f)
+			continue;
+
+		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
+
+		MESH_LAYER_BIND_CONTEXT Ctx{};
+		Ctx.pShader = m_pShaderCom;
+		Ctx.pModel = m_pModelCom;
+		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+		Ctx.iMesh = i;
+		Ctx.pLayer = &Layer;
+		Ctx.eProfile = MESH_LAYER_PROFILE::NONANIM_PBR;
+		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
+		Ctx.iFallbackPass = ShaderPass::NonAnimPBR::DMN;
+		Ctx.fDissolve = m_fDissolve;
+
+		if (m_bUseCameraDither)
+			Ctx.iExtraFlags |= ShaderPass::EnvInstFlags::Dither;
+
+		MESH_LAYER_BIND_RESULT Result{};
+		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
+			return E_FAIL;
+
+		if (Result.bSkipMesh)
+			continue;
+
+		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Render(i)))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+HRESULT CEnvObject::Render_Shadow()
+{
+	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
+		return E_FAIL;
+
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
+
+		MESH_LAYER_BIND_CONTEXT Ctx{};
+		Ctx.pShader = m_pShaderCom;
+		Ctx.pModel = m_pModelCom;
+		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+		Ctx.iMesh = i;
+		Ctx.pLayer = &Layer;
+		Ctx.eProfile = MESH_LAYER_PROFILE::NONANIM_PBR;
+		Ctx.eKind = MESH_LAYER_RENDER_KIND::SHADOW;
+		Ctx.iFallbackPass = ShaderPass::NonAnimPBR::Shadow;
+
+		MESH_LAYER_BIND_RESULT Result{};
+		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
+			return E_FAIL;
+
+		if (Result.bSkipMesh)
+			continue;
+
+		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Render(i)))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+HRESULT CEnvObject::Render_Decal()
+{
+	if (!m_bRenderable)
+		return S_OK;
+
+	if (FAILED(Bind_ShaderResources()))
+		return E_FAIL;
+
+	/* -----------------------데칼 전용 추가----------------------- */
+	_float4x4 WorldMatrixInverse{};
+	XMStoreFloat4x4(&WorldMatrixInverse, XMMatrixInverse(nullptr, XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr())));
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrixInverse", &WorldMatrixInverse)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrixInverse", m_pGameInstance_Proxy->Get_InverseMatrix_Prespec(D3DTS::VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrixInverse", m_pGameInstance_Proxy->Get_InverseMatrix_Prespec(D3DTS::PROJ))))
+		return E_FAIL;
+
+	const _float3 vDecalBoundsCenter = m_LocalBounds.Center;
+	const _float3 vDecalBoundsExtents = m_LocalBounds.Extents;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vDecalBoundsCenter", &vDecalBoundsCenter, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vDecalBoundsExtents", &vDecalBoundsExtents, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fDecalAlpha", &m_fDecalAlpha, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShaderCom, "g_DepthTexture")))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_MaterialID"), m_pShaderCom, "g_MaterialIDTexture")))
+		return E_FAIL;
+
+	const _int iDecalMaskMode = 1;                 // 0=제외, 1=한정 (추후 데칼 desc로 노출 가능)
+	const _int iDecalMaskID = WORLD_STATIC_ID;	   // 1
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_iDecalMaskMode", &iDecalMaskMode, sizeof(_int)))) return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_iDecalMaskID", &iDecalMaskID, sizeof(_int)))) return E_FAIL;
+	/* ------------------------------------------------------------ */
+
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
+
+		MESH_LAYER_BIND_CONTEXT Ctx{};
+		Ctx.pShader = m_pShaderCom;
+		Ctx.pModel = m_pModelCom;
+		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+		Ctx.iMesh = i;
+		Ctx.pLayer = &Layer;
+		Ctx.eProfile = MESH_LAYER_PROFILE::NONANIM_PBR;
+		Ctx.eKind = MESH_LAYER_RENDER_KIND::DECAL;
+		Ctx.iFallbackPass = ShaderPass::NonAnimPBR::DECAL;
+
+		MESH_LAYER_BIND_RESULT Result{};
+		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
+			return E_FAIL;
+		if (Result.bSkipMesh)
+			continue;
+
+		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Render(i)))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
 void CEnvObject::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 {
 	if (nullptr == pOutData)
@@ -218,7 +375,12 @@ _bool CEnvObject::Pick_Marb1e(_fvector vRayOrigin, _fvector vRayDir, _float3* pO
 HRESULT CEnvObject::Ready_RenderComponents(_uint iModelProtoLevel, const wstring& wstrModelProtoTag)
 {
 	if (wstrModelProtoTag.empty())
-		return S_OK;
+	{
+		if(!m_bRenderable)
+			return S_OK;
+
+		return E_FAIL;	// 렌더할 객체가 모델이 없으면 초기화 실패
+	}
 
 	m_pShaderCom = Add_Component<CShader>(Shader_NonAnimMesh_PBR.iLevelID, Shader_NonAnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
 	if (nullptr == m_pShaderCom)
@@ -398,163 +560,6 @@ HRESULT CEnvObject::Bind_ShaderResources()
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
 		return E_FAIL;
-
-	return S_OK;
-}
-
-HRESULT CEnvObject::Render()
-{
-	if (!m_bRenderable)
-		return S_OK;
-
-	if (FAILED(Bind_ShaderResources()))
-		return E_FAIL;
-
-	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
-
-	for (_uint i = 0; i < iNumMeshes; ++i)
-	{
-		if (m_bUseCameraDither && m_fDissolve >= 0.999f)
-			continue;
-
-		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
-
-		MESH_LAYER_BIND_CONTEXT Ctx{};
-		Ctx.pShader = m_pShaderCom;
-		Ctx.pModel = m_pModelCom;
-		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
-		Ctx.iMesh = i;
-		Ctx.pLayer = &Layer;
-		Ctx.eProfile = MESH_LAYER_PROFILE::NONANIM_PBR;
-		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
-		Ctx.iFallbackPass = ShaderPass::NonAnimPBR::DMN;
-		Ctx.fDissolve = m_fDissolve;
-
-		if (m_bUseCameraDither)
-			Ctx.iExtraFlags |= ShaderPass::EnvInstFlags::Dither;
-
-		MESH_LAYER_BIND_RESULT Result{};
-		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-			return E_FAIL;
-
-		if (Result.bSkipMesh)
-			continue;
-
-		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Render(i)))
-			return E_FAIL;
-	}
-
-	return S_OK;
-}
-
-HRESULT CEnvObject::Render_Shadow()
-{
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
-		return E_FAIL;
-
-	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
-
-	for (_uint i = 0; i < iNumMeshes; ++i)
-	{
-		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
-
-		MESH_LAYER_BIND_CONTEXT Ctx{};
-		Ctx.pShader = m_pShaderCom;
-		Ctx.pModel = m_pModelCom;
-		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
-		Ctx.iMesh = i;
-		Ctx.pLayer = &Layer;
-		Ctx.eProfile = MESH_LAYER_PROFILE::NONANIM_PBR;
-		Ctx.eKind = MESH_LAYER_RENDER_KIND::SHADOW;
-		Ctx.iFallbackPass = ShaderPass::NonAnimPBR::Shadow;
-
-		MESH_LAYER_BIND_RESULT Result{};
-		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-			return E_FAIL;
-
-		if (Result.bSkipMesh)
-			continue;
-
-		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Render(i)))
-			return E_FAIL;
-	}
-
-	return S_OK;
-}
-
-HRESULT CEnvObject::Render_Decal()
-{
-	if (!m_bRenderable)
-		return S_OK;
-
-	if (FAILED(Bind_ShaderResources()))
-		return E_FAIL;
-
-	/* -----------------------데칼 전용 추가----------------------- */
-	_float4x4 WorldMatrixInverse{};
-	XMStoreFloat4x4(&WorldMatrixInverse, XMMatrixInverse(nullptr, XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr())));
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrixInverse", &WorldMatrixInverse)))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrixInverse", m_pGameInstance_Proxy->Get_InverseMatrix_Prespec(D3DTS::VIEW))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrixInverse", m_pGameInstance_Proxy->Get_InverseMatrix_Prespec(D3DTS::PROJ))))
-		return E_FAIL;
-
-	const _float3 vDecalBoundsCenter = m_LocalBounds.Center;
-	const _float3 vDecalBoundsExtents = m_LocalBounds.Extents;
-
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vDecalBoundsCenter", &vDecalBoundsCenter, sizeof(_float3))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vDecalBoundsExtents", &vDecalBoundsExtents, sizeof(_float3))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fDecalAlpha", &m_fDecalAlpha, sizeof(_float))))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShaderCom, "g_DepthTexture")))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_MaterialID"), m_pShaderCom, "g_MaterialIDTexture")))
-		return E_FAIL;
-
-	const _int iDecalMaskMode = 1;                 // 0=제외, 1=한정 (추후 데칼 desc로 노출 가능)
-	const _int iDecalMaskID = WORLD_STATIC_ID;	   // 1
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_iDecalMaskMode", &iDecalMaskMode, sizeof(_int)))) return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_iDecalMaskID", &iDecalMaskID, sizeof(_int)))) return E_FAIL;
-	/* ------------------------------------------------------------ */
-
-	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
-	for (_uint i = 0; i < iNumMeshes; ++i)
-	{
-		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
-
-		MESH_LAYER_BIND_CONTEXT Ctx{};
-		Ctx.pShader = m_pShaderCom;
-		Ctx.pModel = m_pModelCom;
-		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
-		Ctx.iMesh = i;
-		Ctx.pLayer = &Layer;
-		Ctx.eProfile = MESH_LAYER_PROFILE::NONANIM_PBR;
-		Ctx.eKind = MESH_LAYER_RENDER_KIND::DECAL;
-		Ctx.iFallbackPass = ShaderPass::NonAnimPBR::DECAL;
-
-		MESH_LAYER_BIND_RESULT Result{};
-		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-			return E_FAIL;
-		if (Result.bSkipMesh)
-			continue;
-
-		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Render(i)))
-			return E_FAIL;
-	}
 
 	return S_OK;
 }

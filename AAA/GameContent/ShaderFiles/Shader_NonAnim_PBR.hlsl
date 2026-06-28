@@ -76,14 +76,30 @@ void Apply_Dither_IfNeeded(float4 vScreenPos)
 		Apply_Dissolve(vScreenPos);
 }
 
+float2 ApplyMeshUVTransformEx(float2 uv, float4 Transform)
+{
+    uv *= Transform.xy;
+
+    float s = sin(g_fUVRotate);
+    float c = cos(g_fUVRotate);
+
+    uv = float2(
+        uv.x * c - uv.y * s,
+        uv.x * s + uv.y * c
+    );
+
+    uv += Transform.zw;
+    return uv;
+}
+
 float2 ApplyMeshUVTransform(float2 uv)
 {
-	return uv * g_vUVTransform.xy + g_vUVTransform.zw;
+    return ApplyMeshUVTransformEx(uv, g_vUVTransform);
 }
 
 float2 ApplyUnknownUVTransform(float2 uv)
 {
-    return uv * g_vUVTransformUnknown.xy + g_vUVTransformUnknown.zw;
+    return ApplyMeshUVTransformEx(uv, g_vUVTransformUnknown);
 }
 
 struct VS_IN
