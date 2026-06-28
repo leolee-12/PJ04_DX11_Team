@@ -72,7 +72,7 @@ void CEffect_Part::Effect_Start()
     m_bFadeOutFinished = false;
     m_fFadeOutDuration = 0.3f;
     m_fAccFadeOutTime = 0.f;
-    m_fFadeOutFactor = 1.f;
+    m_fFadeOutAlpha = 1.f;
 }
 
 void CEffect_Part::Start_FadeOut(_float fFadeOutDuration)
@@ -84,11 +84,11 @@ void CEffect_Part::Start_FadeOut(_float fFadeOutDuration)
     m_bFadeOutFinished = false;
     m_fFadeOutDuration = fFadeOutDuration;
     m_fAccFadeOutTime = 0.f;
-    m_fFadeOutFactor = 1.f;
+    m_fFadeOutAlpha = 1.f;
 
     if (m_fFadeOutDuration <= Helper::fEpsilon)
     {
-        m_fFadeOutFactor = 0.f;
+        m_fFadeOutAlpha = 0.f;
         m_bFadeOutFinished = true;
     }
 }
@@ -224,7 +224,7 @@ void CEffect_Part::Init_PropertyValue()
     m_bFadeOutFinished = false;
     m_fFadeOutDuration = 0.3f;
     m_fAccFadeOutTime = 0.f;
-    m_fFadeOutFactor = 1.f;
+    m_fFadeOutAlpha = 1.f;
 
     // Texture
     m_bUseTextureCom = false;
@@ -253,11 +253,11 @@ void CEffect_Part::Update_FadeOut(_float fTimeDelta)
     _float fFadeOutRatio = m_fAccFadeOutTime / m_fFadeOutDuration;
     Helper::FloatClamp(fFadeOutRatio, 0.f, 1.f);
 
-    m_fFadeOutFactor = 1.f - Helper::FloatSmoothStep(0.f, 1.f, fFadeOutRatio);
+    m_fFadeOutAlpha = 1.f - Helper::FloatSmoothStep(0.f, 1.f, fFadeOutRatio);
 
     if (fFadeOutRatio >= 1.f)
     {
-        m_fFadeOutFactor = 0.f;
+        m_fFadeOutAlpha = 0.f;
         m_bFadeOutFinished = true;
     }
 }

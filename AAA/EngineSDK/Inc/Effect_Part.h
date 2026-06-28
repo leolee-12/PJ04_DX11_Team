@@ -153,7 +153,7 @@ protected:
 protected:
     void Compute_CombinedWorldMatrix();
 
-    _float Get_FadeOutFactor() const { return m_fFadeOutFactor; }
+    _float Get_FadeOutAlpha() const { return m_fFadeOutAlpha; }
 
     virtual void Update_UVScroll(const _float fTimeDelta, const _float fRatio);
     void MoveUVScroll(const _float fRatio, const _bool bUpdate, const _float2 vScrollCount, const _float2 vBaseUV, _float2& vOutUv);
@@ -179,7 +179,7 @@ private:
     _bool m_bFadeOutFinished{};
     _float m_fFadeOutDuration{ 0.3f };
     _float m_fAccFadeOutTime{};
-    _float m_fFadeOutFactor{ 1.f };
+    _float m_fFadeOutAlpha{ 1.f };
 
 protected:
     virtual void Free() override;
