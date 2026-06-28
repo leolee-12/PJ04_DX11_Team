@@ -45,9 +45,9 @@ private:
     STATE   m_eState = { STATE::FLYING };
     _float m_fSpinAngle = { 0.f };
 
-    static constexpr _float RESTITUTION = 0.5f;   // 바운스 감쇠
-    static constexpr _float HORIZ_DAMP = 0.7f;   // 바운스 수평 마찰
-    static constexpr _float SPIN_SPEED_DEG = 360.f;   // 초당 2바퀴(720도/초)
+    static constexpr _float RESTITUTION = 0.3f;         // 바운스 반발
+    static constexpr _float HORIZ_DAMP = 0.7f;          // 바운스 수평 마찰
+    static constexpr _float SPIN_SPEED_DEG = 200.f;     // 초당 바퀴수
 
 public:
     static CProjectile_Boulder* Create(ID3D11Device*, ID3D11DeviceContext*);
