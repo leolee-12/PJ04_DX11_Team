@@ -83,6 +83,8 @@ void CEffect_Container::Update(_float fTimeDelta)
         pPart->Update_PlayValue(m_bIsPlay, m_bLoop, m_fDuration, m_fAccTime);
         pPart->Update(fTimeDelta);
     }
+
+    Update_FadeOut();
 }
 
 void CEffect_Container::Late_Update(_float fTimeDelta)
@@ -115,6 +117,8 @@ HRESULT CEffect_Container::Render()
 
 void CEffect_Container::EffectContainer_Start(const _float3& vSpawnPos, const _float3& vLookDir, const _float4x4* pParentMatrix)
 {
+    m_bFadeOutRequested = false;
+
     for (auto& [tag, pPart] : m_EffestParts)
         pPart->Effect_Start();
 
@@ -137,6 +141,8 @@ void CEffect_Container::EffectContainer_Start(const _float3& vSpawnPos, const _f
 
 void CEffect_Container::EffectContainer_Stop()
 {
+    m_bFadeOutRequested = false;
+
     if (m_bIsPlay == false)
         return;
 
@@ -149,6 +155,25 @@ void CEffect_Container::EffectContainer_Stop()
 
     if (m_pPool)
         m_pPool->Return(m_iPoolLevel, m_strPoolKey, this);
+}
+
+void CEffect_Container::Start_FadeOut(_float fFadeOutDuration)
+{
+    _bool bFadeOutStarted = false;
+
+    for (auto& [tag, pPart] : m_EffestParts)
+    {
+        if (pPart->Get_IsPlay() == false)
+            continue;
+
+        pPart->Start_FadeOut(fFadeOutDuration);
+        bFadeOutStarted = true;
+    }
+
+    m_bFadeOutRequested = bFadeOutStarted;
+
+    if (bFadeOutStarted == false)
+        EffectContainer_Stop();
 }
 
 void CEffect_Container::Set_ParentMatrix(const _float4x4* pParentMatrix)
@@ -200,6 +225,35 @@ void CEffect_Container::Deserialize_Internal(const json& j)
         if (j["EffectPartObjects"].contains(strTag))
             pPart->Deserialize(j["EffectPartObjects"][strTag]);
     }
+}
+
+void CEffect_Container::Set_Pool(CEffect_Manager* pPool, _uint iLevel, const _wstring& strEffectKey) {
+    m_pPool = pPool;
+    m_iPoolLevel = iLevel;
+    m_strPoolKey = strEffectKey;
+}
+
+void CEffect_Container::Update_FadeOut()
+{
+    if (m_bFadeOutRequested == false)
+        return;
+
+    _bool bAllFadeOutFinished = true;
+
+    for (auto& [tag, pPart] : m_EffestParts)
+    {
+        if (pPart->Get_IsPlay() == false)
+            continue;
+
+        if (pPart->Is_FadingOut() == false || pPart->Is_FadeOutFinished() == false)
+        {
+            bAllFadeOutFinished = false;
+            break;
+        }
+    }
+
+    if (bAllFadeOutFinished == true)
+        EffectContainer_Stop();
 }
 
 void CEffect_Container::Debug_ResetPlay()

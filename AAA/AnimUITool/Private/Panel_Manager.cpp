@@ -438,13 +438,26 @@ void CPanel_Manager::Render_ModeBar()
     {
         if (m_pLevel)
         {
-            //Bind_Preview(m_pLevel->Load_Kirby());
-            m_pLevel->Load_Kirby();
+            Bind_Preview(m_pLevel->Load_Kirby());
+            //m_pLevel->Load_Kirby();
             m_Context.strName = L"Kirby";
             //m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby.ysh";
             m_Context.strModelPath = L"../../Resources/CHJ/AnimModel/Kirby/Kirby_AllAbilities.ysh";
         }
     }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Load DeformCar (Test)"))
+    {
+        if (m_pLevel)
+        {
+            Bind_Preview(m_pLevel->Load_DeformCar());
+            m_Context.strName = L"DeformCar";
+            m_Context.strModelPath = L"../../Resources/YSE/DeformCar/DeformCar.ysh";
+        }
+    }
+
     if (m_bKeyInputEnabled)
     {
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.7f, 0.2f, 1.f));

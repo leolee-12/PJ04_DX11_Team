@@ -6,22 +6,22 @@ NS_BEGIN(Engine)
 
 class CEffect_Part;
 
-class CSword_SpinSlash final : public CEffect_Container
+class CSword_SpinSlashTrail final : public CEffect_Container
 {
-    GENERATED_BODY(CSword_SpinSlash)
+    GENERATED_BODY(CSword_SpinSlashTrail)
 
 public:
-    struct SWORD_SPINSLASH_DESC : public CEffect_Container::EFFECT_CONTAINER_DESC
+    struct SWORD_SLASH1_DESC : public CEffect_Container::EFFECT_CONTAINER_DESC
     {
 
     };
 
-    static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_Sword_SpinSlash";
+    static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_Sword_SpinSlashTrail";
 
 private:
-    CSword_SpinSlash(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-    CSword_SpinSlash(const CSword_SpinSlash& Prototype);
-    virtual ~CSword_SpinSlash() = default;
+    CSword_SpinSlashTrail(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    CSword_SpinSlashTrail(const CSword_SpinSlashTrail& Prototype);
+    virtual ~CSword_SpinSlashTrail() = default;
 
 protected:
     virtual HRESULT Initialize_Prototype() override;
@@ -38,7 +38,7 @@ private:
     HRESULT Ready_EffectPartObjects();
 
 public:
-    static CSword_SpinSlash* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    static CSword_SpinSlashTrail* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual CGameObject* Clone(void* pArg) override;
 
 private:

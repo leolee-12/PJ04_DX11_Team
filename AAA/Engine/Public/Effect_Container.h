@@ -66,6 +66,7 @@ public:
 
     void EffectContainer_Start(const _float3& vSpawnPos, const _float3& vLookDir = {0.f, 0.f, 0.f}, const _float4x4* pParentMatrix = nullptr);
     void EffectContainer_Stop();
+    void Start_FadeOut(_float fFadeOutDuration = 0.3f);
 
     void Set_ParentMatrix(const _float4x4* pParentMatrix);
 
@@ -76,16 +77,16 @@ public:
     const unordered_map<_wstring, CEffect_Part*>& Get_EffectPartObject() const { return m_EffestParts; }
 
 public:
+    //À±¼®ÇöÃß°¡
     virtual json Serialize() const override;
     virtual void Deserialize_Internal(const json& j) override;
 
-public: //À±¼®ÇöÃß°¡
-    void Set_Pool(CEffect_Manager* pPool, _uint iLevel, const _wstring& strEffectKey)
-    {
-        m_pPool = pPool;
-        m_iPoolLevel = iLevel;
-        m_strPoolKey = strEffectKey;
-    }
+    void Set_Pool(CEffect_Manager* pPool, _uint iLevel, const _wstring& strEffectKey);
+
+protected:
+    HRESULT Add_Effect_PartObject(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, const _wstring& strPartTag, void* pArg = nullptr);
+
+    void Compute_CombinedWorldMatrix();
 
 protected:
     unordered_map<_wstring, CEffect_Part*> m_EffestParts;
@@ -97,15 +98,14 @@ protected:
     _uint    m_iPoolLevel = {};
     _wstring m_strPoolKey;
 
+    _bool m_bFadeOutRequested{};
+
 private:
+    void Update_FadeOut();
+
     // Debug
     _bool m_bPreResetPlayDoubleCheck{};
     void Debug_ResetPlay();
-
-protected:
-    HRESULT Add_Effect_PartObject(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, const _wstring& strPartTag, void* pArg = nullptr);
-
-    void Compute_CombinedWorldMatrix();
 
 private:
     void Init_PropetyValue();
