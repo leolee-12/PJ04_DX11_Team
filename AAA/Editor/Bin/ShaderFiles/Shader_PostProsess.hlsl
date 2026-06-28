@@ -44,7 +44,7 @@ float g_fDoFAutoFocus = 1.f; // 1=화면 중앙 깊이로 자동 초점
 /* SSR 폴백용 IBL */
 TextureCube g_PrefilteredCube; // 디퍼드와 동일 큐브
 int g_iSpecularMip = 1;
-float g_fIBLIntensity = 1.f;
+float g_fIBLIntensity = 0.f;
 float4x4 g_CamViewMatrixInverse;
 
 //ToneMapping
@@ -362,9 +362,9 @@ float4 PS_SSR(PS_IN In) : SV_TARGET0
         }
     }
 
-      /* --- 단일 합성: SSR(맞으면) ↔ 큐브맵(폴백) --- */
-    float3 reflection = lerp(iblSpec, ssrColor, conf);
-    return float4(scene.rgb + reflection, scene.a);
+    // 변경: iblSpec은 이미 scene에 포함. SSR 맞은 곳만 그쪽으로 교체.
+    //       (iblSpec 계산은 빼주려고 그대로 유지)
+    return float4(scene.rgb + (ssrColor - iblSpec) * conf, scene.a);
 }
 
 // Downsample + CoC → half. rgb=color, a=coc*0.5+0.5 (6)

@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Public\Ancor_WorkingDirectory.h" />
     <ClInclude Include="..\Public\BladeKnight_Body.h" />
     <ClInclude Include="..\Public\BladeKnight_Brain.h" />
     <ClInclude Include="..\Public\BladeKnight_State_Attack.h" />

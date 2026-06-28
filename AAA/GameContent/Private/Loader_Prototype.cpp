@@ -77,8 +77,8 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
     static const ENV_ENTRY g_EnvTable[] = {
       { 
         TEXT("Grass"), 
-        TEXT("../../Resources/YSH/Env/IBL/Grass/Diffuse.dds"), 
-        TEXT("../../Resources/YSH/Env/IBL/Grass/Specular.dds"),
+        TEXT("../../Resources/YSH/Env/IBL/Stage0_Step1/Diffuse.dds"), 
+        TEXT("../../Resources/YSH/Env/IBL/Stage0_Step1/Specular.dds"),
         TEXT("../../Resources/YSH/Env/LUT/Grass01.dds"),
         3.f 
       },

@@ -484,6 +484,10 @@ HRESULT CRenderer::Render_Combined()
     const auto& env = m_pGameInstance_Proxy->Get_CurrentEnvironment();
     if (FAILED(m_pShaderDeferred->Bind_SRV("g_IrradianceCube", env.pDiffuseSRV)))
         return E_FAIL;
+    if (FAILED(m_pShaderDeferred->Bind_SRV("g_PrefilteredCube", env.pSpecularSRV)))
+        return E_FAIL;
+    if (FAILED(m_pShaderDeferred->Bind_RawValue("g_iSpecularMip", &env.iSpecularMip, sizeof(_uint))))
+        return E_FAIL;
     if (FAILED(m_pShaderDeferred->Bind_RawValue("g_fIBLIntensity", &env.fIntensity, sizeof(_float))))
         return E_FAIL;
 

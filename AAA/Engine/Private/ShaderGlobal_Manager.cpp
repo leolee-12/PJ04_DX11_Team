@@ -39,8 +39,8 @@ HRESULT CShaderGlobal_Manager::Initialize()
     Register({ "g_fDoFMaxCoC",    "DoF MaxBlur",    GVAL::FLOAT, { 1.f, 0.f, 0.f, 0.f }, { 1.f, 40.f } });
     Register({ "g_fDoFAutoFocus", "DoF AutoFocus",  GVAL::BOOL,  { 0.f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
 
-    Register({ "g_fExposure",    "Exposure",          GVAL::FLOAT, { 0.5f, 0.f, 0.f, 0.f }, { 0.f, 4.f } });
-    Register({ "g_fToneMapMode", "ToneMap 0R/1A/2E",  GVAL::FLOAT, { 1.0f, 0.f, 0.f, 0.f }, { 0.f, 2.f } });
+    Register({ "g_fExposure",    "Exposure",          GVAL::FLOAT, { 1.f, 0.f, 0.f, 0.f }, { 0.f, 4.f } });
+    Register({ "g_fToneMapMode", "ToneMap 0R/1A/2E",  GVAL::FLOAT, { 0.0f, 0.f, 0.f, 0.f }, { 0.f, 2.f } });
 
     Register({ "g_vAtmosColor",    "Atmos Color",     GVAL::FLOAT3, { 0.70f, 0.75f, 0.82f, 0.f }, { 0.f, 1.f } });
     Register({ "g_fAtmosStart",    "Atmos Start",     GVAL::FLOAT,  { 50.f,  0.f, 0.f, 0.f }, { 0.f, 500.f } });

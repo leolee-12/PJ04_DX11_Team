@@ -2,6 +2,7 @@
 #include "MapTool.h"
 #include "ToolApp.h"
 #include "GameInstance.h"
+#include "Ancor_WorkingDirectory.h"
 
 // ImGui
 #include "imgui_impl_win32.h"
@@ -30,6 +31,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					_In_ int nCmdShow)
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
+	Anchor_WorkingDirectory();
 
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
