@@ -1,4 +1,3 @@
-
 #define MATID_NORM(id)        ((id) / 255.f)
 #define MATID_EQ(sampledA, id) (abs((sampledA) - MATID_NORM(id)) <= (0.5f / 255.f))
 

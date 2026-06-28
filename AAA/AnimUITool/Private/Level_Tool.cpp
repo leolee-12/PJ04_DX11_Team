@@ -1240,10 +1240,12 @@ void CLevel_Tool::Update(_float fTimeDelta)
         m_pGameInstance_Proxy->Toggle_PhysXDebug();
     }
 
+#ifdef _DEBUG
     if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F2, false))
     {
         m_pGameInstance_Proxy->Toggle_DebugRender();
     }
+#endif
 }
 
 HRESULT CLevel_Tool::Render()
