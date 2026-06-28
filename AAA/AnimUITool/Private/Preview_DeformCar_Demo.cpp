@@ -215,14 +215,14 @@ HRESULT CPreview_DeformCar_Demo::Render_KirbyMesh(_uint iMeshIndex)
 		"g_SkinTexture",
 		iMeshIndex,
 		MTEX_TYPE::UNKNOWN,
-		2)))
+		1)))
 		return E_FAIL;
 
 	if (FAILED(m_pModelCom->Bind_Material(
 		m_pKirbyShaderCom,
 		"g_MouthTexture",
 		iMeshIndex,
-		MTEX_TYPE::UNKNOWN,
+		MTEX_TYPE::METALNESS,
 		0)))
 		return E_FAIL;
 
