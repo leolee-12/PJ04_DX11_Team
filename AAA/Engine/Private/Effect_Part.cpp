@@ -49,6 +49,7 @@ void CEffect_Part::Priority_Update(_float fTimeDelta)
 
 void CEffect_Part::Update(_float fTimeDelta)
 {
+    Update_FadeOut(fTimeDelta);
     Update_Value(fTimeDelta);
 }
 
@@ -66,6 +67,30 @@ void CEffect_Part::Effect_Start()
     m_bIsPlay = true;
     m_bActive = false;
     m_fAccTime = 0.f;
+
+    m_bFadeOutActive = false;
+    m_bFadeOutFinished = false;
+    m_fFadeOutDuration = 0.3f;
+    m_fAccFadeOutTime = 0.f;
+    m_fFadeOutFactor = 1.f;
+}
+
+void CEffect_Part::Start_FadeOut(_float fFadeOutDuration)
+{
+    if (m_bFadeOutActive == true)
+        return;
+
+    m_bFadeOutActive = true;
+    m_bFadeOutFinished = false;
+    m_fFadeOutDuration = fFadeOutDuration;
+    m_fAccFadeOutTime = 0.f;
+    m_fFadeOutFactor = 1.f;
+
+    if (m_fFadeOutDuration <= Helper::fEpsilon)
+    {
+        m_fFadeOutFactor = 0.f;
+        m_bFadeOutFinished = true;
+    }
 }
 
 void CEffect_Part::Update_PlayValue(_bool bIsPlay, _bool bLoop, _float fDuration, _float fAccTime)
@@ -195,6 +220,12 @@ void CEffect_Part::Init_PropertyValue()
     m_fStartRatio = { 0.f };
     m_fEndRatio = { 1.f };
 
+    m_bFadeOutActive = false;
+    m_bFadeOutFinished = false;
+    m_fFadeOutDuration = 0.3f;
+    m_fAccFadeOutTime = 0.f;
+    m_fFadeOutFactor = 1.f;
+
     // Texture
     m_bUseTextureCom = false;
     m_vTextureTiling = { 1.f, 1.f };
@@ -210,6 +241,25 @@ void CEffect_Part::Init_PropertyValue()
 
     m_bMaskUVScroll = false;
     m_vMaskUVScrollCount = { 0.f, 0.f };
+}
+
+void CEffect_Part::Update_FadeOut(_float fTimeDelta)
+{
+    if (m_bFadeOutActive == false || m_bFadeOutFinished == true)
+        return;
+
+    m_fAccFadeOutTime += fTimeDelta;
+
+    _float fFadeOutRatio = m_fAccFadeOutTime / m_fFadeOutDuration;
+    Helper::FloatClamp(fFadeOutRatio, 0.f, 1.f);
+
+    m_fFadeOutFactor = 1.f - Helper::FloatSmoothStep(0.f, 1.f, fFadeOutRatio);
+
+    if (fFadeOutRatio >= 1.f)
+    {
+        m_fFadeOutFactor = 0.f;
+        m_bFadeOutFinished = true;
+    }
 }
 
 void CEffect_Part::Update_Value(const _float fTimeDelta)

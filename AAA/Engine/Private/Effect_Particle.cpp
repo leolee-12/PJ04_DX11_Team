@@ -557,6 +557,7 @@ void CEffect_Particle::Update_ParticleAlpha(PARTICLE& Particle, _float fLocalRat
         m_bActive_ParticleAlpha_Ratio_0, m_fParticleAlpha_Ratio_0, m_fParticleAlpha_Value_0,
         m_bActive_ParticleAlpha_Ratio_1, m_fParticleAlpha_Ratio_1, m_fParticleAlpha_Value_1);
 
+    fAlpha *= Get_FadeOutFactor();
     Helper::FloatClamp(fAlpha, 0.f, 1.f);
 
     Particle.fAlpha = fAlpha;

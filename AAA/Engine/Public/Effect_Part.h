@@ -109,6 +109,10 @@ public:
     virtual HRESULT Render() override;
 
     virtual void    Effect_Start();
+    void Start_FadeOut(_float fFadeOutDuration = 0.3f);
+    _bool Is_FadingOut() const { return m_bFadeOutActive; }
+    _bool Is_FadeOutFinished() const { return m_bFadeOutFinished; }
+
     void Update_PlayValue(_bool bIsPlay, _bool bLoop, _float fDuration, _float fAccTime);
 
     _bool Is_EffectPartActive() const { return m_bActive; }
@@ -149,6 +153,8 @@ protected:
 protected:
     void Compute_CombinedWorldMatrix();
 
+    _float Get_FadeOutFactor() const { return m_fFadeOutFactor; }
+
     virtual void Update_UVScroll(const _float fTimeDelta, const _float fRatio);
     void MoveUVScroll(const _float fRatio, const _bool bUpdate, const _float2 vScrollCount, const _float2 vBaseUV, _float2& vOutUv);
 
@@ -166,6 +172,14 @@ protected:
 private:
     HRESULT Ready_Components();
     void Init_PropertyValue();
+    void Update_FadeOut(_float fTimeDelta);
+
+private:
+    _bool m_bFadeOutActive{};
+    _bool m_bFadeOutFinished{};
+    _float m_fFadeOutDuration{ 0.3f };
+    _float m_fAccFadeOutTime{};
+    _float m_fFadeOutFactor{ 1.f };
 
 protected:
     virtual void Free() override;

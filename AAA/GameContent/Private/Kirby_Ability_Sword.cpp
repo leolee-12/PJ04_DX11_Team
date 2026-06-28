@@ -11,9 +11,6 @@
 
 #include "Effect_Loader.h"
 
-#include "Sword_SpinSlash.h"
-#include "Sword_SpinSlashTrail.h"
-
 CKirby_Ability_Sword::CKirby_Ability_Sword()
 {
 }
@@ -795,7 +792,7 @@ void CKirby_Ability_Sword::Exit_SwordState(CKirby* pKirby, SWORD_STATE eState)
         case SPIN_SLASH_CHARGE:
             break;
         case SPIN_SLASH:
-            static_cast<CSword_SpinSlash*>(m_pSpinSlash)->Start_FadeOut(0.2f);
+            m_pSpinSlash->Start_FadeOut(0.2f);
             m_pSpinSlash = nullptr;
             break;
         case SPIN_SLASH_END:
@@ -805,10 +802,10 @@ void CKirby_Ability_Sword::Exit_SwordState(CKirby* pKirby, SWORD_STATE eState)
         case SUPER_SPIN_SLASH_START:
             break;
         case SUPER_SPIN_SLASH_LOOP:
-            static_cast<CSword_SpinSlash*>(m_pSpinSlash)->Start_FadeOut(0.3f);
+            m_pSpinSlash->Start_FadeOut(0.2f);
             m_pSpinSlash = nullptr;
 
-            static_cast<CSword_SpinSlashTrail*>(m_pSpinSlashTrail)->Start_FadeOut(0.3f);
+            m_pSpinSlashTrail->Start_FadeOut(0.2f);
             m_pSpinSlashTrail = nullptr;
             break;
         case SUPER_SPIN_SLASH_END:
