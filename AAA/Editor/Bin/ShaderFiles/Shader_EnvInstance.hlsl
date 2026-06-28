@@ -1,6 +1,7 @@
 #include "Engine_Shader_Defines.hlsli"
 
 float4x4 g_ViewMatrix, g_ProjMatrix;
+float4x4 g_ViewMatrixInverse, g_ProjMatrixInverse;
 
 Texture2D g_DiffuseTexture;
 Texture2D g_NormalTexture;
@@ -16,8 +17,15 @@ float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
 
 uint g_iMaterialID = 0;
 
-//Texture2D g_DepthTexture;
+Texture2D g_DepthTexture;
+Texture2D<uint> g_MaterialIDTexture;
+float3 g_vDecalBoundsCenter;
+float3 g_vDecalBoundsExtents;
 float g_fDecalAlpha = 1.f;
+float g_fDecalHasNormal = 0.f;
+float g_fDecalHasMRA = 0.f;
+int g_iDecalMaskMode = 0;
+int g_iDecalMaskID = 200;
 
 float4 g_vColor = float4(1.f, 1.f, 1.f, 1.f);
 float3 g_vMRA = float3(0.f, 1.f, 1.f);
@@ -496,10 +504,119 @@ PS_OUT PS_COLOR_MRA_DITHER(PS_IN In)
 	return Out;
 }
 
-float4 PS_DECAL(PS_IN In) : SV_TARGET0 // 알베도만
+// Decal
+struct VS_DECAL_OUT
 {
-	  float4 col = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
-	  return float4(col.rgb, col.a * g_fDecalAlpha);
+    float4 vPosition : SV_POSITION;
+    float4 vProjPos : TEXCOORD0;
+
+    nointerpolation float4 vWorldRow0 : TEXCOORD1;
+    nointerpolation float4 vWorldRow1 : TEXCOORD2;
+    nointerpolation float4 vWorldRow2 : TEXCOORD3;
+
+    nointerpolation float4 vWorldInvRow0 : TEXCOORD4;
+    nointerpolation float4 vWorldInvRow1 : TEXCOORD5;
+    nointerpolation float4 vWorldInvRow2 : TEXCOORD6;
+    nointerpolation float4 vWorldInvRow3 : TEXCOORD7;
+};
+
+float3x3 Build_WorldInv3x3(float3 vRow0, float3 vRow1, float3 vRow2)
+{
+    float3 vC0 = cross(vRow1, vRow2);
+    float3 vC1 = cross(vRow2, vRow0);
+    float3 vC2 = cross(vRow0, vRow1);
+    float fDet = dot(vRow0, vC0);
+    float fSafeDet = abs(fDet) < 1e-6f ? (fDet < 0.f ? -1e-6f : 1e-6f) : fDet;
+    float fInvDet = rcp(fSafeDet);
+
+    return float3x3(
+          vC0.x, vC1.x, vC2.x,
+          vC0.y, vC1.y, vC2.y,
+          vC0.z, vC1.z, vC2.z) * fInvDet;
+}
+
+VS_DECAL_OUT VS_DECAL(VS_IN In)
+{
+    VS_DECAL_OUT Out = (VS_DECAL_OUT) 0;
+
+    float4 vWorld = mul(float4(In.vPosition, 1.f), In.WorldMatrix);
+    Out.vPosition = mul(mul(vWorld, g_ViewMatrix), g_ProjMatrix);
+    Out.vProjPos = Out.vPosition;
+
+    float3 vWorldRow0 = In.WorldMatrix[0].xyz;
+    float3 vWorldRow1 = In.WorldMatrix[1].xyz;
+    float3 vWorldRow2 = In.WorldMatrix[2].xyz;
+    float3 vWorldTrans = In.WorldMatrix[3].xyz;
+
+    float3x3 matWorldInv3 = Build_WorldInv3x3(vWorldRow0, vWorldRow1, vWorldRow2);
+    float3 vWorldInvTrans = mul(-vWorldTrans, matWorldInv3);
+
+    Out.vWorldRow0 = In.WorldMatrix[0];
+    Out.vWorldRow1 = In.WorldMatrix[1];
+    Out.vWorldRow2 = In.WorldMatrix[2];
+
+    Out.vWorldInvRow0 = float4(matWorldInv3[0], 0.f);
+    Out.vWorldInvRow1 = float4(matWorldInv3[1], 0.f);
+    Out.vWorldInvRow2 = float4(matWorldInv3[2], 0.f);
+    Out.vWorldInvRow3 = float4(vWorldInvTrans, 1.f);
+
+    return Out;
+}
+
+struct PS_DECAL_OUT
+{
+    float4 vDiffuse : SV_TARGET0;
+    float4 vNormal : SV_TARGET1;
+    float4 vMRA : SV_TARGET2;
+};
+
+PS_DECAL_OUT PS_DECAL(VS_DECAL_OUT In)
+{
+    PS_DECAL_OUT Out = (PS_DECAL_OUT) 0;
+
+    float2 screenUV;
+    screenUV.x = In.vProjPos.x / In.vProjPos.w * 0.5f + 0.5f;
+    screenUV.y = In.vProjPos.y / In.vProjPos.w * -0.5f + 0.5f;
+
+    float sceneDepth = g_DepthTexture.Sample(PointSampler, screenUV).x;
+    if (sceneDepth <= 0.f)
+        discard;
+
+    float3 worldPosition = RecoverWorldPos(screenUV, sceneDepth, g_ProjMatrixInverse, g_ViewMatrixInverse);
+
+    row_major float4x4 matWorldInv = float4x4(In.vWorldInvRow0, In.vWorldInvRow1, In.vWorldInvRow2, In.vWorldInvRow3);
+    float3 decalLocalPosition = mul(float4(worldPosition, 1.f), matWorldInv).xyz;
+
+    float3 boundsDistance = abs(decalLocalPosition - g_vDecalBoundsCenter);
+    if (any(boundsDistance > g_vDecalBoundsExtents + 0.0001f))
+        discard;
+
+    uint surfMatID = g_MaterialIDTexture.Load(int3(In.vPosition.xy, 0));
+    if ((g_iDecalMaskMode == 0 && surfMatID == (uint) g_iDecalMaskID) || (g_iDecalMaskMode != 0 && surfMatID != (uint) g_iDecalMaskID))
+        discard;
+
+    float2 decalUV = float2(decalLocalPosition.x + 0.5f, 0.5f - decalLocalPosition.z);
+    decalUV = ApplyMeshUVTransform(decalUV);
+
+    float4 col = g_DiffuseTexture.Sample(LinearSampler, decalUV);
+    if (col.a <= 0.f)
+        discard;
+
+    float coverage = col.a * g_fDecalAlpha;
+
+    Out.vDiffuse = float4(col.rgb, coverage);
+
+    float3 nT = g_NormalTexture.Sample(LinearSampler, decalUV).xyz * 2.f - 1.f;
+    float3 T = normalize(In.vWorldRow0.xyz);
+    float3 N = normalize(In.vWorldRow1.xyz);
+    float3 B = -normalize(In.vWorldRow2.xyz);
+    float3 worldN = normalize(nT.x * T + nT.y * B + nT.z * N);
+    Out.vNormal = float4(worldN * 0.5f + 0.5f, coverage * g_fDecalHasNormal);
+
+    float3 mra = g_MRATexture.Sample(LinearSampler, decalUV).rgb;
+    Out.vMRA = float4(mra, coverage * g_fDecalHasMRA);
+
+    return Out;
 }
 
 technique11 DefaultTechnique
@@ -628,7 +745,7 @@ technique11 DefaultTechnique
 		SetRasterizerState(RS_Decal);
 		SetDepthStencilState(DSS_NoWrite, 0);
 		SetBlendState(BS_Decal, float4(0, 0, 0, 0), 0xffffffff);
-		VertexShader = compile vs_5_0 VS_MAIN(); // 인스턴스 VS 그대로
+        VertexShader = compile vs_5_0 VS_DECAL(); // 인스턴스 VS 그대로
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_DECAL();
 	}

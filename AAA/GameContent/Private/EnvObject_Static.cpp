@@ -84,21 +84,19 @@ void CEnvObject_Static::Submit_RenderGroups()
 	{
 		if (m_bIsDecal)
 		{
-			//_bool bSubmitted = false;
-			//
-			//if (Can_RenderInstance() && nullptr != m_pInstanceController)
-			//{
-			//	bSubmitted = m_pInstanceController->Submit_Decal(m_InstanceBatchHandle.iDecalBatchIndex, this);
-			//}
-			//
-			//if (!bSubmitted)
+			_bool bSubmitted = false;
+			if (Can_RenderInstance() && nullptr != m_pInstanceController)
+			{
+				bSubmitted = m_pInstanceController->Submit_Decal(m_InstanceBatchHandle.iDecalBatchIndex, this);
+			}
+			
+			if (!bSubmitted)
 				m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::DECAL, this);
 		}
 		else
 		{
 			_bool bSubmitted = false;
 			const _bool bBypassMainInstance = Should_BypassMainInstance();
-
 			if (!bBypassMainInstance && Can_RenderInstance() && nullptr != m_pInstanceController)
 			{
 				bSubmitted = m_pInstanceController->Submit_Main(m_InstanceBatchHandle.iMainBatchIndex, this);

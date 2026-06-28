@@ -220,6 +220,30 @@ namespace
 			return S_OK;
 		}
 
+		case MESH_LAYER_RENDER_KIND::DECAL:
+		{
+			if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_DiffuseTexture", MTEX_TYPE::DIFFUSE,
+				Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)], DEFAULT_TEXTURE::MAGENTA)))
+				return E_FAIL;
+			if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_NormalTexture", MTEX_TYPE::NORMALS,
+				Layer.idx[ETOUI(MTEX_TYPE::NORMALS)], DEFAULT_TEXTURE::FLAT_NORMAL)))
+				return E_FAIL;
+			if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_MRATexture", MTEX_TYPE::METALNESS,
+				Layer.idx[ETOUI(MTEX_TYPE::METALNESS)], DEFAULT_TEXTURE::MRA)))
+				return E_FAIL;
+			if (FAILED(Bind_LegacyCommonParams(Ctx, false)))
+				return E_FAIL;
+
+			const _float fHasNormal = (Ctx.pModel->Get_MeshTextureCount(Ctx.iMesh, MTEX_TYPE::NORMALS) > 0u) ? 1.f : 0.f;
+			const _float fHasMRA = (Ctx.pModel->Get_MeshTextureCount(Ctx.iMesh, MTEX_TYPE::METALNESS) > 0u) ? 1.f : 0.f;
+
+			if (FAILED(Ctx.pShader->Bind_RawValue("g_fDecalHasNormal", &fHasNormal, sizeof(_float)))) return E_FAIL;
+			if (FAILED(Ctx.pShader->Bind_RawValue("g_fDecalHasMRA", &fHasMRA, sizeof(_float)))) return E_FAIL;
+
+			pOutResult->iPass = (0u != Ctx.iFallbackPass) ? Ctx.iFallbackPass : ETOUI(ENV_PASS::DECAL);
+			return S_OK;
+		}
+
 		default:
 			return E_FAIL;
 		}

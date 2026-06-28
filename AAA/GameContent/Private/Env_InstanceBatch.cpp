@@ -284,64 +284,71 @@ HRESULT CEnv_InstanceBatch::Render_Decal_Instanced()
 	if (0 == iInstanceCount)
 		return S_OK;
 
+	CEnvObject_Static* pReferenceObj = m_Submitted.front().pObj;
+	if (nullptr == pReferenceObj)
+		return Render_Decal_NotInstanced();
+
+	const _float fDecalAlpha = pReferenceObj->Get_DecalAlpha();
+	for (const auto& item : m_Submitted)
+	{
+		if (nullptr == item.pObj || fabsf(item.pObj->Get_DecalAlpha() - fDecalAlpha) > 0.0001f)
+			return Render_Decal_NotInstanced();
+	}
+
 	if (FAILED(Update_InstanceBuffer()))
 		return E_FAIL;
 
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	const _float fDecalAlpha = 1.f;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrixInverse", m_pGameInstance_Proxy->Get_InverseMatrix_Prespec(D3DTS::VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrixInverse", m_pGameInstance_Proxy->Get_InverseMatrix_Prespec(D3DTS::PROJ))))
+		return E_FAIL;
+
+	const BoundingBox& LocalBounds = pReferenceObj->Get_LocalBounds();
+	const _float3 vDecalBoundsCenter = LocalBounds.Center;
+	const _float3 vDecalBoundsExtents = LocalBounds.Extents;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vDecalBoundsCenter", &vDecalBoundsCenter, sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vDecalBoundsExtents", &vDecalBoundsExtents, sizeof(_float3))))
+		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fDecalAlpha", &fDecalAlpha, sizeof(_float))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShaderCom, "g_DepthTexture")))
 		return E_FAIL;
+	if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_MaterialID"), m_pShaderCom, "g_MaterialIDTexture")))
+		return E_FAIL;
+
+	const _int iDecalMaskMode = 1;
+	const _int iDecalMaskID = WORLD_STATIC_ID;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_iDecalMaskMode", &iDecalMaskMode, sizeof(_int)))) return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_iDecalMaskID", &iDecalMaskID, sizeof(_int)))) return E_FAIL;
 
 	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
-
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		const MESH_LAYER_IDX Layer = m_pModelCom->Get_MeshLayer(i);
+		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
 
-		auto BindMaterial = [&](const _char* pConstantName, MTEX_TYPE eType, DEFAULT_TEXTURE eDefaultKind) -> HRESULT
-			{
-				const _uint iLayerIndex = Layer.idx[ETOUI(eType)];
-				const _uint iTextureCount = m_pModelCom->Get_MeshTextureCount(i, eType);
+		MESH_LAYER_BIND_CONTEXT Ctx{};
+		Ctx.pShader = m_pShaderCom;
+		Ctx.pModel = m_pModelCom;
+		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+		Ctx.iMesh = i;
+		Ctx.pLayer = &Layer;
+		Ctx.eProfile = MESH_LAYER_PROFILE::ENV_INSTANCE;
+		Ctx.eKind = MESH_LAYER_RENDER_KIND::DECAL;
+		Ctx.iFallbackPass = ETOUI(ENV_PASS::DECAL);
 
-				if (iTextureCount > 0u)
-				{
-					const _uint iSafeIndex = (iLayerIndex < iTextureCount) ? iLayerIndex : (iTextureCount - 1u);
-
-					if (SUCCEEDED(m_pModelCom->Bind_Material(m_pShaderCom, pConstantName, i, eType, iSafeIndex)))
-						return S_OK;
-				}
-
-				return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(m_pShaderCom, pConstantName, eDefaultKind);
-			};
-
-		if (FAILED(BindMaterial("g_DiffuseTexture", MTEX_TYPE::DIFFUSE, DEFAULT_TEXTURE::MAGENTA)))             return E_FAIL;
-		if (FAILED(BindMaterial("g_NormalTexture", MTEX_TYPE::NORMALS, DEFAULT_TEXTURE::FLAT_NORMAL)))			return E_FAIL;
-		if (FAILED(BindMaterial("g_MRATexture", MTEX_TYPE::METALNESS, DEFAULT_TEXTURE::MRA)))                   return E_FAIL;
-		if (FAILED(BindMaterial("g_UnknownTexture", MTEX_TYPE::UNKNOWN, DEFAULT_TEXTURE::BLACK)))               return E_FAIL;
-
-		const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
-		const _uint iFlags = Layer.iFlags & ~ShaderPass::EnvInstFlags::Dither;
-
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint))))
+		MESH_LAYER_BIND_RESULT Result{};
+		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
 			return E_FAIL;
+		if (Result.bSkipMesh)
+			continue;
 
-		const _float4 vUVTransform = Layer.bUseUVTransform
-			? _float4{ Layer.vUVScale.x, Layer.vUVScale.y, Layer.vUVOffset.x, Layer.vUVOffset.y }
-			: _float4{ 1.f, 1.f, 0.f, 0.f };
-
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_vUVTransform", &vUVTransform, sizeof(vUVTransform))))
+		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
 			return E_FAIL;
-
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))
-			return E_FAIL;
-
-		if (FAILED(m_pShaderCom->Begin(ETOUI(ENV_PASS::DECAL))))
-			return E_FAIL;
-
 		if (FAILED(m_pModelCom->Render_Instanced(i, m_pInstanceBuffer, sizeof(ENV_INSTANCE_DATA), iInstanceCount)))
 			return E_FAIL;
 	}
