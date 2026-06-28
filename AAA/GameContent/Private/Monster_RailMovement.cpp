@@ -88,12 +88,17 @@ _bool CMonster_RailMovement::Update_RailFollow(_float fTimeDelta)
     }
 
     _float3 vTarget{};
-    if (!Eval_PathPos(m_fPathS, &vTarget))
+    _float3 vTangent{};
+    if (!Eval_PathPos(m_fPathS, &vTarget, &vTangent))
         return false;
 
     m_pTransform->Set_State(STATE::POSITION, XMVectorSet(vTarget.x, vTarget.y, vTarget.z, 1.f));
 
     Sync_To_Controller();
+
+    if (m_bFaceTangent)
+        Face_PathDir(vTarget, vTangent, fTimeDelta);
+
     return true;
 }
 
@@ -141,6 +146,66 @@ void CMonster_RailMovement::Warp_ToRandomPoint()
     Sync_To_Controller();
 }
 
+_bool CMonster_RailMovement::Return_TowardPath(_float fTimeDelta, _float fSpeed)
+{
+    if (!m_bHasRail || nullptr == m_pTransform)
+        return true;
+    if (m_fPathLength <= 1e-4f)
+        return true;
+
+    _float3 vRail{};
+    if (!Eval_PathPos(m_fPathS, &vRail))
+        return true;
+
+    _float3 vCur{};
+    XMStoreFloat3(&vCur, m_pTransform->Get_State(STATE::POSITION));
+
+    const _float dx = vRail.x - vCur.x;
+    const _float dy = vRail.y - vCur.y;
+    const _float dz = vRail.z - vCur.z;
+    const _float dist = sqrtf(dx * dx + dy * dy + dz * dz);
+
+    const _float fArrive = 0.1f;
+    if (dist <= fArrive)
+    {
+        m_pTransform->Set_State(STATE::POSITION, XMVectorSet(vRail.x, vRail.y, vRail.z, 1.f));
+        Sync_To_Controller();
+        return true;
+    }
+
+    const _float fStep = fSpeed * fTimeDelta;
+    const _float fMove = (fStep < dist) ? fStep : dist;
+    const _float inv = 1.f / dist;
+
+    const _float nx = vCur.x + dx * inv * fMove;
+    const _float ny = vCur.y + dy * inv * fMove;
+    const _float nz = vCur.z + dz * inv * fMove;
+
+    m_pTransform->Set_State(STATE::POSITION, XMVectorSet(nx, ny, nz, 1.f));
+    Sync_To_Controller();
+
+    if (m_bFaceTangent)
+        Face_Smooth(XMVectorSet(vRail.x, ny, vRail.z, 1.f), fTimeDelta);
+
+    return false;
+}
+
+void CMonster_RailMovement::Snap_ToPath()
+{
+    if (!m_bHasRail || nullptr == m_pTransform)
+        return;
+    if (m_fPathLength <= 1e-4f)
+        return;
+
+    _float3 vStart{};
+    if (!Eval_PathPos(m_fPathS, &vStart))
+        return;
+
+    m_pTransform->Set_State(STATE::POSITION,
+        XMVectorSet(vStart.x, vStart.y, vStart.z, 1.f));
+    Sync_To_Controller();
+}
+
 void CMonster_RailMovement::Calc_Vertical(_float fTimeDelta)
 {
     if (!Is_Launched())
@@ -176,7 +241,7 @@ _float  CMonster_RailMovement::Compute_PathLength() const
     return sum;
 }
 
-_bool CMonster_RailMovement::Eval_PathPos(_float fS, _float3* pOut) const
+_bool CMonster_RailMovement::Eval_PathPos(_float fS, _float3* pOut, _float3* pOutTangent) const
 {
     if (nullptr == pOut)
         return false;
@@ -190,7 +255,7 @@ _bool CMonster_RailMovement::Eval_PathPos(_float fS, _float3* pOut) const
         const _float L = XM_2PI * m_tRailDesc.fRadius;
         const _float t = (L > 1e-4f) ? (fS / L) : 0.f;
         return CLevelDesign_Rail::Evaluate_Segment(
-            m_tRailDesc, 0, t, pOut);
+            m_tRailDesc, 0, t, pOut, pOutTangent);
     }
 
     _float rem = fS;
@@ -212,11 +277,28 @@ _bool CMonster_RailMovement::Eval_PathPos(_float fS, _float3* pOut) const
             const _float t =
                 (segLen > 1e-4f) ? (rem / segLen) : 0.f;
             return CLevelDesign_Rail::Evaluate_Segment(
-                m_tRailDesc, i, t, pOut);
+                m_tRailDesc, i, t, pOut, pOutTangent);
         }
         rem -= segLen;
     }
     return false;
+}
+
+void CMonster_RailMovement::Face_PathDir(const _float3& vPos, const _float3& vTangent, _float fTimeDelta)
+{
+    _float3 vDir = vTangent;
+    if (m_iPathDir < 0)        
+    {
+        vDir.x = -vDir.x;
+        vDir.z = -vDir.z;
+    }
+
+    if (fabsf(vDir.x) < 1e-5f && fabsf(vDir.z) < 1e-5f)
+        return;
+
+    XMVECTOR vFaceTarget = XMVectorSet(vPos.x + vDir.x, vPos.y, vPos.z + vDir.z, 1.f);
+
+    Face_Smooth(vFaceTarget, fTimeDelta);
 }
 
 CMonster_RailMovement* CMonster_RailMovement::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -144,6 +144,8 @@ enum class ENV_PASS : _int
 	GRASS_FUR,
 	MN,
 	DISCARD,
+	COLORMRADITHER,
+	DECAL,
 
 	_COUNT
 };
@@ -167,6 +169,8 @@ namespace ShaderPass
 		inline constexpr _uint GRASS_FUR = 11;
 		inline constexpr _uint MN = 12;
 		inline constexpr _uint DISCARD = 13;
+		inline constexpr _uint COLORMRADITHER = 14;
+		inline constexpr _uint DECAL = 15;
 	}
 
 	namespace EnvInstFlags
@@ -185,18 +189,20 @@ struct ENV_SHADER_PASS_META
 
 inline constexpr ENV_SHADER_PASS_META g_EnvShaderPassMetas[] =
 {
-	{ ENV_PASS::DEFAULT,	ShaderPass::NonAnimPBR::DMN,		"Default",		DIFF | MRA | NORM },
-	{ ENV_PASS::WHITE,		ShaderPass::NonAnimPBR::White,		"WHITE",		0 },
-	{ ENV_PASS::DIFF,		ShaderPass::NonAnimPBR::DIFF,		"DIFF",			DIFF },
-	{ ENV_PASS::DMN,		ShaderPass::NonAnimPBR::DMN,		"DMN",			DIFF | MRA | NORM },
-	{ ENV_PASS::UKWN,		ShaderPass::NonAnimPBR::UKWN,		"UKWN",			UKWN },
-	{ ENV_PASS::UMN,		ShaderPass::NonAnimPBR::UMN,		"UMN",			UKWN | MRA | NORM },
+	{ ENV_PASS::DEFAULT,		ShaderPass::NonAnimPBR::DMN,			"Default",			DIFF | MRA | NORM },
+	{ ENV_PASS::WHITE,			ShaderPass::NonAnimPBR::White,			"WHITE",			0 },
+	{ ENV_PASS::DIFF,			ShaderPass::NonAnimPBR::DIFF,			"DIFF",				DIFF },
+	{ ENV_PASS::DMN,			ShaderPass::NonAnimPBR::DMN,			"DMN",				DIFF | MRA | NORM },
+	{ ENV_PASS::UKWN,			ShaderPass::NonAnimPBR::UKWN,			"UKWN",				UKWN },
+	{ ENV_PASS::UMN,			ShaderPass::NonAnimPBR::UMN,			"UMN",				UKWN | MRA | NORM },
 
-	{ ENV_PASS::DMNU,		ShaderPass::NonAnimPBR::DMNU,		"DMN",			DIFF | MRA | NORM | UKWN },
-	{ ENV_PASS::TREESHADOW,	ShaderPass::NonAnimPBR::TREESHADOW,	"TREESHADOW",	UKWN },
-	{ ENV_PASS::GRASS_FUR,	ShaderPass::NonAnimPBR::GRASS_FUR,	"GRASS_FUR",	UKWN | MRA | NORM },
-	{ ENV_PASS::MN,			ShaderPass::NonAnimPBR::MN,			"MN",			MRA | NORM },
-	{ ENV_PASS::DISCARD,	ShaderPass::NonAnimPBR::DISCARD,	"DISCARD",		0 },
+	{ ENV_PASS::DMNU,			ShaderPass::NonAnimPBR::DMNU,			"DMN",				DIFF | MRA | NORM | UKWN },
+	{ ENV_PASS::TREESHADOW,		ShaderPass::NonAnimPBR::TREESHADOW,		"TREESHADOW",		UKWN },
+	{ ENV_PASS::GRASS_FUR,		ShaderPass::NonAnimPBR::GRASS_FUR,		"GRASS_FUR",		UKWN | MRA | NORM },
+	{ ENV_PASS::MN,				ShaderPass::NonAnimPBR::MN,				"MN",				MRA | NORM },
+	{ ENV_PASS::DISCARD,		ShaderPass::NonAnimPBR::DISCARD,		"DISCARD",			0 },
+	{ ENV_PASS::COLORMRADITHER,	ShaderPass::NonAnimPBR::COLORMRADITHER,	"COLORMRADITHER",	0 },
+	{ ENV_PASS::DECAL,			ShaderPass::NonAnimPBR::DECAL,			"DECAL",			0 },
 };
 
 enum class ENV_SHADOW_ALPHA_SOURCE : _uint

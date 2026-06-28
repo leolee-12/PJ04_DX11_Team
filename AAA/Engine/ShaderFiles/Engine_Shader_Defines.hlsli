@@ -1,7 +1,5 @@
-
-#define MAT_DEFAULT 0
-#define MAT_WATER   1
-
+#define MATID_NORM(id)        ((id) / 255.f)
+#define MATID_EQ(sampledA, id) (abs((sampledA) - MATID_NORM(id)) <= (0.5f / 255.f))
 
 SamplerState LinearSampler
 {
@@ -80,12 +78,6 @@ RasterizerState RS_Decal
     DepthBias = -1000; // 카메라 쪽으로 살짝 당겨 z-fighting 방지
     SlopeScaledDepthBias = -1.f;
 };
-
-
-
-
-
-
 
 
 DepthStencilState DSS_Default
@@ -211,3 +203,45 @@ BlendState BS_AlphaErase
     DestBlendAlpha = Inv_Src_Alpha;
     BlendOpAlpha = Add;
 };
+
+BlendState BS_Decal   // 데칼: Diffuse/Normal/MRA 3타깃 알파블렌드, matID는 MRT에 없어 안 건드림
+{
+    BlendEnable[0] = true;
+    SrcBlend[0] = Src_Alpha;
+    DestBlend[0] = Inv_Src_Alpha;
+    BlendOp[0] = Add;
+    SrcBlendAlpha[0] = Zero;
+    DestBlendAlpha[0] = One;
+    BlendOpAlpha[0] = Add;
+
+    BlendEnable[1] = true;
+    SrcBlend[1] = Src_Alpha;
+    DestBlend[1] = Inv_Src_Alpha;
+    BlendOp[1] = Add;
+    SrcBlendAlpha[1] = Zero;
+    DestBlendAlpha[1] = One;
+    BlendOpAlpha[1] = Add;
+
+    BlendEnable[2] = true;
+    SrcBlend[2] = Src_Alpha;
+    DestBlend[2] = Inv_Src_Alpha;
+    BlendOp[2] = Add;
+    SrcBlendAlpha[2] = Zero;
+    DestBlendAlpha[2] = One;
+    BlendOpAlpha[2] = Add;
+};
+
+
+// 헬퍼
+float3 RecoverWorldPos(float2 uv, float depthZ, float4x4 projInv, float4x4 viewInv)
+{
+    float4 p;
+    p.x = uv.x * 2.f - 1.f;
+    p.y = uv.y * -2.f + 1.f;
+    p.z = depthZ;
+    p.w = 1.f;
+    p = mul(p, projInv);
+    p /= p.w;
+    p = mul(float4(p.xyz, 1.f), viewInv);
+    return p.xyz;
+}

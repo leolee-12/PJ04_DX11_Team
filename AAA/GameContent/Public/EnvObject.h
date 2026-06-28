@@ -21,6 +21,8 @@ class CLIENT_DLL CEnvObject abstract : public CGameObject
 	PROPERTY(_bool, m_bCastShadow,		L"Cast Shadow",				L"EnvObject")
 	PROPERTY(_bool, m_bUseCullDistance,	L"Use Distance Culling",	L"EnvObject")
 	PROPERTY(_bool, m_bUseCullFrustum,	L"Use Frustum Culling",		L"EnvObject")
+	PROPERTY(_bool, m_bIsDecal,			L"Decal Obj",				L"EnvObject")
+	PROPERTY(_float, m_fDecalAlpha,		L"DecalAlpha(0 ~ 1)",		L"Decal")
 
 public:
 	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_EnvObject";
@@ -36,6 +38,7 @@ public:
 	virtual void	Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_Shadow() override;
+	virtual HRESULT Render_Decal() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
 public:
@@ -43,6 +46,7 @@ public:
 	_bool   Is_ShadowCaster() const { return m_bCastShadow; }
 	_bool   Is_Visible_Main() const { return m_bVisible; }
 	_bool   Is_Visible_Shadow() const { return m_bVisibleShadow; }
+	_bool   Is_Decal() const { return m_bIsDecal; }
 
 	const ENV_OBJECT_DESC& Get_Desc() const { return m_tDesc; }
 	const BoundingBox& Get_WorldBounds() const { return m_WorldBounds; }

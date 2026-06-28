@@ -32,6 +32,11 @@
     <ClInclude Include="..\public\Boss_Gorilla.h" />
     <ClInclude Include="..\public\Boss_Gorilla_Body.h" />
     <ClInclude Include="..\public\Boss_Gorilla_Brain.h" />
+    <ClInclude Include="..\Public\BrontoBurt.h" />
+    <ClInclude Include="..\Public\BrontoBurt_Body.h" />
+    <ClInclude Include="..\Public\BrontoBurt_Brain.h" />
+    <ClInclude Include="..\Public\BrontoBurt_State_Idle.h" />
+    <ClInclude Include="..\Public\BrontoBurt_State_Return.h" />
     <ClInclude Include="..\public\CameraDirector.h" />
     <ClInclude Include="..\Public\Camera_AreaData.h" />
     <ClInclude Include="..\public\Camera_AreaCam.h" />
@@ -48,6 +53,7 @@
     <ClInclude Include="..\Public\Common_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h" />
     <ClInclude Include="..\Public\Sword_SpinSlashTrail.h" />
+    <ClInclude Include="..\Public\Monster_RailMovement.h" />
     <ClInclude Include="..\Public\Sword_SpinSlash.h" />
     <ClInclude Include="..\public\PhysicsProjectile.h" />
     <ClInclude Include="..\public\Projectile.h" />
@@ -70,8 +76,12 @@
     <ClInclude Include="..\Public\Kabu_State_Idle.h" />
     <ClInclude Include="..\Public\Kabu_State_WarpIn.h" />
     <ClInclude Include="..\Public\Kabu_State_WarpOut.h" />
-    <ClInclude Include="..\Public\Monster_RailMovement.h" />
     <ClInclude Include="..\Public\Kirby_CutSceneGrabbed.h" />
+    <ClInclude Include="..\Public\PoppyBrosJr_Body.h" />
+    <ClInclude Include="..\Public\PoppyBrosJr_Brain.h" />
+    <ClInclude Include="..\Public\PoppyBrosJr_State_Idle.h" />
+    <ClInclude Include="..\Public\PoppyBrosJr_State_Throw.h" />
+    <ClInclude Include="..\Public\RailTrack.h" />
     <ClInclude Include="..\Public\Kirby_Guard.h" />
     <ClInclude Include="..\Public\Sword_JumpSlash.h" />
     <ClInclude Include="..\public\GorillaNamePlate.h" />
@@ -258,6 +268,11 @@
     <ClCompile Include="..\private\Boss_Gorilla.cpp" />
     <ClCompile Include="..\private\Boss_Gorilla_Body.cpp" />
     <ClCompile Include="..\private\Boss_Gorilla_Brain.cpp" />
+    <ClCompile Include="..\Private\BrontoBurt.cpp" />
+    <ClCompile Include="..\Private\BrontoBurt_Body.cpp" />
+    <ClCompile Include="..\Private\BrontoBurt_Brain.cpp" />
+    <ClCompile Include="..\Private\BrontoBurt_State_Idle.cpp" />
+    <ClCompile Include="..\Private\BrontoBurt_State_Return.cpp" />
     <ClCompile Include="..\private\CameraDirector.cpp" />
     <ClCompile Include="..\Private\Camera_AreaSolver.cpp" />
     <ClCompile Include="..\private\Camera_AreaCam.cpp" />
@@ -273,6 +288,7 @@
     <ClCompile Include="..\Private\Common_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp" />
+    <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlash.cpp" />
     <ClCompile Include="..\private\PhysicsProjectile.cpp" />
     <ClCompile Include="..\private\Projectile.cpp" />
@@ -305,8 +321,12 @@
     <ClCompile Include="..\Private\Kabu_State_Idle.cpp" />
     <ClCompile Include="..\Private\Kabu_State_WarpIn.cpp" />
     <ClCompile Include="..\Private\Kabu_State_WarpOut.cpp" />
-    <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
     <ClCompile Include="..\Private\Kirby_CutSceneGrabbed.cpp" />
+    <ClCompile Include="..\Private\PoppyBrosJr_Body.cpp" />
+    <ClCompile Include="..\Private\PoppyBrosJr_Brain.cpp" />
+    <ClCompile Include="..\Private\PoppyBrosJr_State_Idle.cpp" />
+    <ClCompile Include="..\Private\PoppyBrosJr_State_Throw.cpp" />
+    <ClCompile Include="..\Private\RailTrack.cpp" />
     <ClCompile Include="..\Private\Kirby_Guard.cpp" />
     <ClCompile Include="..\Private\Sword_JumpSlash.cpp" />
     <ClCompile Include="..\private\GorillaNamePlate.cpp" />
@@ -450,7 +470,6 @@
     <FxCompile Include="..\ShaderFiles\Shader_EnvInstance.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Gorilla.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Kirby.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_Map.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_MapEx.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_MaterialTest.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl" />
@@ -516,7 +535,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\Bin\</OutDir>
+    <OutDir>..\Bin\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>..\Bin\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -560,7 +582,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>../../EngineSDK/Lib/; ../ThirdPartyLib/;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../EngineSDK/Lib/$(Configuration)/;../ThirdPartyLib/debug/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Engine.Lib;DirectXTKd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -571,7 +593,8 @@
       <ShaderModel>5.0</ShaderModel>
     </FxCompile>
     <PostBuildEvent>
-      <Command>cd /d "$(ProjectDir)..\..\" &amp;&amp; call "UpdateLib.bat"</Command>
+      <Command>cd /d "$(SolutionDir)" 
+call "UpdateLib.bat" $(Configuration)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -590,7 +613,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>../../EngineSDK/Lib/; ../ThirdPartyLib/;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../EngineSDK/Lib/$(Configuration)/;../ThirdPartyLib/release</AdditionalLibraryDirectories>
       <AdditionalDependencies>Engine.Lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
@@ -599,6 +622,10 @@
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
     </FxCompile>
+    <PostBuildEvent>
+      <Command>cd /d "$(SolutionDir)" 
+call "UpdateLib.bat" $(Configuration)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

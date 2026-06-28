@@ -81,6 +81,10 @@
 #include "NormalEnemy_Body.h"
 #include "Kabu.h"
 #include "Kabu_Body.h"
+#include "BrontoBurt.h"
+#include "BrontoBurt_Body.h"
+#include "PoppyBrosJr.h"
+#include "PoppyBrosJr_Body.h"
 
 //Miniboss
 #include "GigantEdge.h"
@@ -500,6 +504,36 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Kabu_Body"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Kabu/Kabu.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
+    // 4. BrontoBurt
+    Register
+    (
+        CBrontoBurt::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CBrontoBurt),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBrontoBurt_Body::PROTOTYPE_TAG, CBrontoBurt_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BrontoBurt_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/BrontoBurt/BrontoBurt.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
+    // 5. PoppyBrosJr
+    Register
+    (
+        CPoppyBrosJr::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CPoppyBrosJr),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CPoppyBrosJr_Body::PROTOTYPE_TAG, CPoppyBrosJr_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_PoppyBrosJr_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/PoppyBrosJr/Model/PoppyBrosJr.ysh",
+                XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 

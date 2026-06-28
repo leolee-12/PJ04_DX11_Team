@@ -27,9 +27,11 @@ HRESULT CRenderer::Initialize()
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Depth"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
         return E_FAIL;
-    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_MRA"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 1.f, 1.f, 0.f))))
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_MRA"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 1.f, 1.f, 1.f))))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Emissive"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_MaterialID"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R8_UINT, _float4(0.f, 0.f, 0.f, 0.f))))
         return E_FAIL;
 
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Light"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f))))
@@ -79,6 +81,15 @@ HRESULT CRenderer::Initialize()
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Emissive"))))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_GeoNormal"))))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_MaterialID"))))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_Decal"),       TEXT("Target_Diffuse"))))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_Decal"),       TEXT("Target_Normal"))))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_Decal"),       TEXT("Target_MRA"))))
         return E_FAIL;
 
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Light"))))
@@ -194,6 +205,8 @@ HRESULT CRenderer::Draw()
     if (FAILED(Render_VolumetricFog()))
         return E_FAIL;
     if (FAILED(Render_NonBlend()))
+        return E_FAIL;
+    if (FAILED(Render_Decals()))
         return E_FAIL;
     if (FAILED(Render_SSAO()))
         return E_FAIL;
@@ -319,6 +332,22 @@ HRESULT CRenderer::Render_NonBlend()
         return E_FAIL;
 
     return S_OK;
+}
+
+HRESULT CRenderer::Render_Decals()
+{
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Decal"), nullptr, true, false)))
+        return E_FAIL;
+
+    for (auto& pRenderObject : m_RenderObjects[ETOUI(RENDERID::DECAL)])
+    {
+        if (nullptr != pRenderObject)
+            pRenderObject->Render_Decal();
+        Safe_Release(pRenderObject);
+    }
+    m_RenderObjects[ETOUI(RENDERID::DECAL)].clear();
+
+    return m_pGameInstance_Proxy->End_MRT();
 }
 
 HRESULT CRenderer::Render_SSAO()
@@ -867,7 +896,7 @@ HRESULT CRenderer::Render_Occlusion()
         m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::ORTHO))))
         return E_FAIL;
 
-    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_MRA"), m_pShaderPost, "g_MRATexture")))
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_MaterialID"), m_pShaderPost, "g_MaterialIDTexture")))
         return E_FAIL;
 
     if (FAILED(m_pVIBuffer->Bind_Resources()))

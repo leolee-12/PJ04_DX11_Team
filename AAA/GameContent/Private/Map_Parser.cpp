@@ -577,12 +577,8 @@ void CMap_Parser::Parse_SectionObject(
 	}
 }
 
-void CMap_Parser::Parse_DecorEntry(
-	const wstring& wstrSourceFile,
-	const wstring& wstrSection,
-	const wstring& wstrEntryKey,
-	const json& jEntry,
-	vector<ENV_OBJECT_DESC>* pOutDescs)
+void CMap_Parser::Parse_DecorEntry(const wstring& wstrSourceFile, const wstring& wstrSection, const wstring& wstrEntryKey,
+	const json& jEntry, vector<ENV_OBJECT_DESC>* pOutDescs)
 {
 	if (nullptr == pOutDescs)
 		return;
@@ -595,6 +591,8 @@ void CMap_Parser::Parse_DecorEntry(
 		return;
 
 	Fill_CommonFlags(jEntry, &Desc);
+	Desc.tRender.bIsDecal = Is_SameText(Desc.tRender.strLayerName, L"Decal");
+
 	Try_BuildWorldMatrixFromArray(jEntry, "WorldMtx", &Desc);
 
 	Resolve_EnvColliderKind(&Desc);
@@ -735,10 +733,7 @@ void CMap_Parser::Parse_EffectEntry(
 	pOutDescs->push_back(Desc);
 }
 
-ENV_OBJECT_DESC CMap_Parser::Make_BaseDesc(
-	const wstring& wstrSourceFile,
-	const wstring& wstrSection,
-	const wstring& wstrEntryKey)
+ENV_OBJECT_DESC CMap_Parser::Make_BaseDesc(const wstring& wstrSourceFile, const wstring& wstrSection, const wstring& wstrEntryKey)
 {
 	ENV_OBJECT_DESC Desc{};
 	Desc.wstrSourceFile = wstrSourceFile;

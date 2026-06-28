@@ -26,42 +26,23 @@ private:
 
 	static HRESULT Parse_EnvRoot(const json& jRoot, vector<ENV_OBJECT_DESC>* pOutDescs);
 
-	static void Parse_SectionObject(
-		const _wstring& wstrSourceFile,
-		const _wstring& wstrSection,
-		const json& jSection,
-		vector<ENV_OBJECT_DESC>* pOutDescs);
+	static void Parse_SectionObject(const _wstring& wstrSourceFile, const _wstring& wstrSection,
+		const json& jSection, vector<ENV_OBJECT_DESC>* pOutDescs);
 
-	static void Parse_DecorEntry(
-		const _wstring& wstrSourceFile,
-		const _wstring& wstrSection,
-		const _wstring& wstrEntryKey,
-		const json& jEntry,
-		vector<ENV_OBJECT_DESC>* pOutDescs);
+	static void Parse_DecorEntry(const _wstring& wstrSourceFile, const _wstring& wstrSection, const _wstring& wstrEntryKey,
+		const json& jEntry, vector<ENV_OBJECT_DESC>* pOutDescs);
 
-	static void Parse_ToyObjEntry(
-		const _wstring& wstrSourceFile,
-		const _wstring& wstrSection,
-		const _wstring& wstrEntryKey,
-		const json& jEntry,
-		vector<ENV_OBJECT_DESC>* pOutDescs);
+	static void Parse_ToyObjEntry(const _wstring& wstrSourceFile, const _wstring& wstrSection, const _wstring& wstrEntryKey,
+		const json& jEntry, vector<ENV_OBJECT_DESC>* pOutDescs);
 
-	static void Parse_EffectEntry(
-		const _wstring& wstrSourceFile,
-		const _wstring& wstrSection,
-		const _wstring& wstrEntryKey,
-		const json& jEntry,
-		vector<ENV_OBJECT_DESC>* pOutDescs);
+	static void Parse_EffectEntry(const _wstring& wstrSourceFile, const _wstring& wstrSection, const _wstring& wstrEntryKey,
+		const json& jEntry, vector<ENV_OBJECT_DESC>* pOutDescs);
 
 private:
-	static ENV_OBJECT_DESC Make_BaseDesc(
-		const _wstring& wstrSourceFile,
-		const _wstring& wstrSection,
-		const _wstring& wstrEntryKey);
+	static ENV_OBJECT_DESC Make_BaseDesc(const _wstring& wstrSourceFile, const _wstring& wstrSection, const _wstring& wstrEntryKey);
 
 	static ENV_SOURCE_TYPE Classify_SourceType(const _wstring& wstrSourceFile);
-	static ENV_EFFECT_TYPE Classify_EffectType(const _wstring& wstrObjectName, const _wstring&
-		wstrComponentName);
+	static ENV_EFFECT_TYPE Classify_EffectType(const _wstring& wstrObjectName, const _wstring& wstrComponentName);
 
 	static const json* Find_JsonValue(const json& jSource, const _string& strPath);
 

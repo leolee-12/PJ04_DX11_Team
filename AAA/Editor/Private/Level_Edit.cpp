@@ -45,8 +45,10 @@ HRESULT CLevel_Edit::Initialize()
 
 void CLevel_Edit::Update(_float fTimeDelta)
 {
+#ifdef _DEBUG
     if (m_pGameInstance_Proxy->Key_Down(DIK_F2))
         m_pGameInstance_Proxy->Toggle_DebugRender();
+#endif
 
     if (m_pGameInstance_Proxy->Key_Down(DIK_F7))
         m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GorillaAppear, nullptr);

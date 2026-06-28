@@ -58,6 +58,8 @@ Texture2D g_CurtainTexture;
 Texture3D g_ColorGradingLUT;
 float g_fColorGradeEnable = 0.f;
 
+Texture2D<uint> g_MaterialIDTexture; // R8_UINT, matID Àü¿ë
+
     //============================ Common VS ============================
 struct VS_IN
 {
@@ -260,9 +262,6 @@ float4 PS_SSR(PS_IN In) : SV_TARGET0
     float metallic = mra.r;
     float roughness = mra.g;
     float ao = mra.b;
-    
-    uint matID = (uint) round(mra4.a * 255.f);
-    bool bWater = (matID == MAT_WATER);
 
     float3 albedo = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord).rgb;
     float3 worldN = normalize(g_NormalTexture.Sample(PointSampler, In.vTexcoord).xyz * 2.f - 1.f);
@@ -426,9 +425,9 @@ float4 PS_CURTAIN_COMPOSITE(PS_IN In) : SV_TARGET0
 
 float4 PS_OCCLUSION_SILHOUETTE(PS_IN In) : SV_TARGET0
 {
-    float fID = g_MRATexture.Sample(PointSampler, In.vTexcoord).a;
+    uint matID = g_MaterialIDTexture.Load(int3(In.vPosition.xy, 0));
 
-    if (round(fID * 255.f) == 200.f)   // == KIRBY_SILHOUETTE_ID
+    if (matID == 0)
         discard;
 
     return float4(0.f, 0.f, 0.f, 0.55f);

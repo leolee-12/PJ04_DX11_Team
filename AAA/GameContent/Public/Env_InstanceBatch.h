@@ -38,6 +38,7 @@ public:
 	HRESULT	Update_InstanceBuffer();
 	virtual	HRESULT Render() override;
 	virtual	HRESULT Render_Shadow() override;
+	virtual HRESULT Render_Decal() override;
 	virtual	void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
 	_bool	Is_RegisteredThisFrame() { return m_bRegisteredThisFrame; }
@@ -69,6 +70,8 @@ private:
 
 	HRESULT Render_Instanced();
 	HRESULT Render_NotInstanced();
+	HRESULT Render_Decal_Instanced();
+	HRESULT Render_Decal_NotInstanced();
 	HRESULT Render_Shadow_Instanced();
 	HRESULT Render_Shadow_NotInstanced();
 

@@ -65,13 +65,40 @@ HRESULT CProjectile::Ready_HitBox()
 
 void CProjectile::Launch(const _float3& vPos, const _float3& vDir)
 {
+    const _bool bWasCarried = m_bCarried;
     Detach();                    
     m_bAlive = true; m_fAccLife = 0.f;
     On_Activated();
 
-    m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(1.f, 0.f, 0.f, 0.f));
-    m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, 1.f, 0.f, 0.f));
-    m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, 1.f, 0.f));
+    if (bWasCarried)
+    {
+        _vector vRight = m_pTransformCom->Get_State(STATE::RIGHT);
+        _vector vUp = m_pTransformCom->Get_State(STATE::UP);
+        _vector vLook = m_pTransformCom->Get_State(STATE::LOOK);
+
+        const _float fScaleX = XMVectorGetX(XMVector3Length(vRight));
+        const _float fScaleY = XMVectorGetX(XMVector3Length(vUp));
+        const _float fScaleZ = XMVectorGetX(XMVector3Length(vLook));
+
+        _vector vFlatLook = XMVectorSetY(vLook, 0.f);
+        if (XMVectorGetX(XMVector3LengthSq(vFlatLook)) < 1e-6f)
+            vFlatLook = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+        vFlatLook = XMVector3Normalize(vFlatLook);
+
+        const _vector vNewUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+        const _vector vNewRight = XMVector3Normalize(XMVector3Cross(vNewUp, vFlatLook));
+
+        m_pTransformCom->Set_State(STATE::RIGHT, vNewRight * fScaleX);
+        m_pTransformCom->Set_State(STATE::UP, vNewUp * fScaleY);
+        m_pTransformCom->Set_State(STATE::LOOK, vFlatLook * fScaleZ);
+    }
+    else
+    {
+        m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(1.f, 0.f, 0.f, 0.f));
+        m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, 1.f, 0.f, 0.f));
+        m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, 1.f, 0.f));
+    }
+
     m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&vPos), 1.f));
 
     _vector v = XMLoadFloat3(&vDir);

@@ -189,7 +189,7 @@ public: // Picking
 #pragma region TARGET_MANAGER
     HRESULT Add_RenderTarget(const _wstring& strTargetTag, _uint iWidth, _uint iHeight, DXGI_FORMAT ePixelFormat, const _float4& vClearColor);
     HRESULT Add_MRT(const _wstring& strMRTTag, const _wstring& strTargetTag);
-    HRESULT Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV = nullptr, _bool bBindDSV = true);
+    HRESULT Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV = nullptr, _bool bBindDSV = true, _bool bClear = true);
     HRESULT End_MRT();
     HRESULT Bind_RT_ShaderResource(const _wstring& strTargetTag, class CShader* pShader, const _char* pConstantName);
     HRESULT Bind_RT_CSResource(const _wstring& strTargetTag, _uint iSlot);
