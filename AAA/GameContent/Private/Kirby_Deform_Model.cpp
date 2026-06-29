@@ -59,6 +59,11 @@ const _float4x4* CKirby_Deform_Model::Get_BoneMatrixPtr(const _char* pBoneName) 
     return m_pModelCom->Get_BoneMatrixPtr(pBoneName);
 }
 
+const _float4x4* CKirby_Deform_Model::Get_HatBoneMatirx()
+{
+    return Get_BoneMatrixPtr("HatL");;
+}
+
 HRESULT CKirby_Deform_Model::Bind_ShaderResources(CShader* pShader)
 {
     if (pShader == nullptr)

@@ -97,6 +97,8 @@ public:
 
 	CKirby_Deform_Model* Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType = KIRBY_DEFORM_MODEL_TYPE::MAIN);
 
+	void Change_HatSocketMatrix(COPY_ABILITY_TYPE eAbilityType, const _float4x4* pBoneMatrix);
+
 	// Movement
 	void Add_MoveDir(const _float3& vWishDir);
 	_bool Has_MoveDir();

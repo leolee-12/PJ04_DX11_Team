@@ -48,6 +48,9 @@ public:
 	void Set_KirbyEye(KIRBY_EYE_STATE eState) { m_eEye = eState; }
 	KIRBY_EYE_STATE Get_KirbyEye() const { return m_eEye; }
 
+public:
+	virtual const _float4x4* Get_HatBoneMatirx();
+
 protected:
 	HRESULT Bind_ShaderResources(CShader* pShader);
 

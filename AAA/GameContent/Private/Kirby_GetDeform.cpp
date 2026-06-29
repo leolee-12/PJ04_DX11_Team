@@ -42,6 +42,8 @@ void CKirby_GetDeform::Enter(CKirby* pKirby)
 
     m_eDeformState = DEFORM_STATE::DEFORM_STATE_END;
     Change_GetDeformState(pKirby, DEFORM_STATE::SUPER_INHALE_START);
+
+    pKirby->Get_KirbyAbility()->Clear_Overlay(pKirby);
 }
 
 void CKirby_GetDeform::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -118,6 +120,11 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
             pDeformModel_Demo->Set_Active(true);
             pDeformModel_Demo->Get_Animator()->Play("Deform", false, false, 0.1f, 1.5f, true);
 
+            pKirby->Get_KirbyAbility()->Get_AbilityType();
+
+            pKirby->Change_HatSocketMatrix(pKirby->Get_KirbyAbility()->Get_AbilityType(),
+                pDeformModel_Demo->Get_HatBoneMatirx());
+
             break;
         }
         case DEFORM_STATE::DEFORM_END:
@@ -127,6 +134,9 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
             pDeformModel_Main->Set_Active(true);
 
             pDeformModel_Main->Get_Animator()->Play("DemoEndFirst", false, false, 0.f, 2.f);
+
+            pKirby->Change_HatSocketMatrix(pKirby->Get_KirbyAbility()->Get_AbilityType(),
+                pDeformModel_Main->Get_HatBoneMatirx());
 
             break;
         }

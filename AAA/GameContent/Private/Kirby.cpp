@@ -218,6 +218,25 @@ CKirby_Deform_Model* CKirby::Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY
     return nullptr;
 }
 
+void CKirby::Change_HatSocketMatrix(COPY_ABILITY_TYPE eAbilityType, const _float4x4* pBoneMatrix)
+{
+    auto Set_HatSocketBoneMatrix = [this, pBoneMatrix](const wchar_t* PartTag)->void
+        {
+            auto iter = m_PartObjects.find(PartTag);
+            if (iter != m_PartObjects.end())
+            {
+                static_cast<CKirby_OnOffPart*>(iter->second)->Set_SocketBoneMatrix(pBoneMatrix);
+            }
+        };
+
+    switch (eAbilityType)
+    {
+    case COPY_ABILITY_TYPE::SWORD:
+        Set_HatSocketBoneMatrix(CKirby_SwordHat::Kirby_PartTag);
+        break;
+    }
+}
+
 void CKirby::Add_MoveDir(const _float3& vWishDir)
 {
     XMStoreFloat3(&m_vWishDir,
