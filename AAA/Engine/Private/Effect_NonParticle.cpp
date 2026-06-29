@@ -63,7 +63,8 @@ HRESULT CEffect_NonParticle::Bind_ShaderValue()
         return E_FAIL;
 
     Helper::FloatClamp(m_fAlpha, 0.f, 1.f);
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(m_fAlpha))))
+    _float fAlpha = m_fAlpha * Get_FadeOutAlpha();
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &fAlpha, sizeof(fAlpha))))
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &m_vColor, sizeof(m_vColor))))

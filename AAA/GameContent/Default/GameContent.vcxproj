@@ -50,9 +50,11 @@
     <ClInclude Include="..\Public\Common_JumpSlash.h" />
     <ClInclude Include="..\Public\Common_Ring03.h" />
     <ClInclude Include="..\Public\Common_SpinSlash.h" />
+    <ClInclude Include="..\Public\Common_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\EnemyBomb.h" />
     <ClInclude Include="..\Public\KirbyBomb.h" />
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h" />
+    <ClInclude Include="..\Public\Sword_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\Monster_RailMovement.h" />
     <ClInclude Include="..\Public\Projectile_Bomb.h" />
     <ClInclude Include="..\Public\Sword_SpinSlash.h" />
@@ -286,9 +288,11 @@
     <ClCompile Include="..\Private\Common_JumpSlash.cpp" />
     <ClCompile Include="..\Private\Common_Ring03.cpp" />
     <ClCompile Include="..\Private\Common_SpinSlash.cpp" />
+    <ClCompile Include="..\Private\Common_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\EnemyBomb.cpp" />
     <ClCompile Include="..\Private\KirbyBomb.cpp" />
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp" />
+    <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
     <ClCompile Include="..\Private\Projectile_Bomb.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlash.cpp" />
@@ -473,7 +477,6 @@
     <FxCompile Include="..\ShaderFiles\Shader_EnvInstance.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Gorilla.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Kirby.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_Map.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_MapEx.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_MaterialTest.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl" />
@@ -539,7 +542,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\Bin\</OutDir>
+    <OutDir>..\Bin\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>..\Bin\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -583,7 +589,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>../../EngineSDK/Lib/; ../ThirdPartyLib/;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../EngineSDK/Lib/$(Configuration)/;../ThirdPartyLib/debug/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Engine.Lib;DirectXTKd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -594,7 +600,8 @@
       <ShaderModel>5.0</ShaderModel>
     </FxCompile>
     <PostBuildEvent>
-      <Command>cd /d "$(ProjectDir)..\..\" &amp;&amp; call "UpdateLib.bat"</Command>
+      <Command>cd /d "$(SolutionDir)" 
+call "UpdateLib.bat" $(Configuration)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -613,7 +620,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>../../EngineSDK/Lib/; ../ThirdPartyLib/;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../EngineSDK/Lib/$(Configuration)/;../ThirdPartyLib/release</AdditionalLibraryDirectories>
       <AdditionalDependencies>Engine.Lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
@@ -622,6 +629,10 @@
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
     </FxCompile>
+    <PostBuildEvent>
+      <Command>cd /d "$(SolutionDir)" 
+call "UpdateLib.bat" $(Configuration)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

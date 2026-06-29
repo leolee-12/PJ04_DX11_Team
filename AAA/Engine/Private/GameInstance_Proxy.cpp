@@ -709,12 +709,12 @@ HRESULT CGameInstance_Proxy::Add_MRT(const _wstring& strMRTTag, const _wstring& 
 
 	return m_pOwner->Add_MRT(strMRTTag, strTargetTag);
 }
-HRESULT CGameInstance_Proxy::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV, _bool bBindDSV)
+HRESULT CGameInstance_Proxy::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV, _bool bBindDSV, _bool bClear)
 {
 	if (!IsConnected())
 		return E_FAIL;
 
-	return m_pOwner->Begin_MRT(strMRTTag, pDSV, bBindDSV);
+	return m_pOwner->Begin_MRT(strMRTTag, pDSV, bBindDSV, bClear);
 }
 HRESULT CGameInstance_Proxy::End_MRT()
 {

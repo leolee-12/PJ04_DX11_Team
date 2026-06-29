@@ -114,6 +114,21 @@ HRESULT CEnv_InstanceBatch::Render_Shadow()
 	return hr;
 }
 
+HRESULT CEnv_InstanceBatch::Render_Decal()
+{
+	if (m_Submitted.empty())
+		return S_OK;
+
+	const HRESULT hr = Should_Instance()
+		? Render_Decal_Instanced()
+		: Render_Decal_NotInstanced();
+
+	Clear_Submissions();
+	m_bRegisteredThisFrame = false;
+
+	return hr;
+}
+
 HRESULT CEnv_InstanceBatch::Initialize(void* pArg)
 {
 	if (nullptr == pArg)
@@ -282,6 +297,91 @@ HRESULT CEnv_InstanceBatch::Render_NotInstanced()
 		if (nullptr != item.pObj)
 		{
 			if (FAILED(item.pObj->Render()))
+				return E_FAIL;
+		}
+	}
+
+	return S_OK;
+}
+
+HRESULT CEnv_InstanceBatch::Render_Decal_Instanced()
+{
+	const _uint iInstanceCount = static_cast<_uint>(m_Submitted.size());
+	if (0 == iInstanceCount)
+		return S_OK;
+
+	if (FAILED(Update_InstanceBuffer()))
+		return E_FAIL;
+
+	if (FAILED(Bind_ShaderResources()))
+		return E_FAIL;
+
+	const _float fDecalAlpha = 1.f;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fDecalAlpha", &fDecalAlpha, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShaderCom, "g_DepthTexture")))
+		return E_FAIL;
+
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		const MESH_LAYER_IDX Layer = m_pModelCom->Get_MeshLayer(i);
+
+		auto BindMaterial = [&](const _char* pConstantName, MTEX_TYPE eType, DEFAULT_TEXTURE eDefaultKind) -> HRESULT
+			{
+				const _uint iLayerIndex = Layer.idx[ETOUI(eType)];
+				const _uint iTextureCount = m_pModelCom->Get_MeshTextureCount(i, eType);
+
+				if (iTextureCount > 0u)
+				{
+					const _uint iSafeIndex = (iLayerIndex < iTextureCount) ? iLayerIndex : (iTextureCount - 1u);
+
+					if (SUCCEEDED(m_pModelCom->Bind_Material(m_pShaderCom, pConstantName, i, eType, iSafeIndex)))
+						return S_OK;
+				}
+
+				return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(m_pShaderCom, pConstantName, eDefaultKind);
+			};
+
+		if (FAILED(BindMaterial("g_DiffuseTexture", MTEX_TYPE::DIFFUSE, DEFAULT_TEXTURE::MAGENTA)))             return E_FAIL;
+		if (FAILED(BindMaterial("g_NormalTexture", MTEX_TYPE::NORMALS, DEFAULT_TEXTURE::FLAT_NORMAL)))			return E_FAIL;
+		if (FAILED(BindMaterial("g_MRATexture", MTEX_TYPE::METALNESS, DEFAULT_TEXTURE::MRA)))                   return E_FAIL;
+		if (FAILED(BindMaterial("g_UnknownTexture", MTEX_TYPE::UNKNOWN, DEFAULT_TEXTURE::BLACK)))               return E_FAIL;
+
+		const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
+		const _uint iFlags = Layer.iFlags & ~ShaderPass::EnvInstFlags::Dither;
+
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint))))
+			return E_FAIL;
+
+		const _float4 vUVTransform = Layer.bUseUVTransform
+			? _float4{ Layer.vUVScale.x, Layer.vUVScale.y, Layer.vUVOffset.x, Layer.vUVOffset.y }
+			: _float4{ 1.f, 1.f, 0.f, 0.f };
+
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_vUVTransform", &vUVTransform, sizeof(vUVTransform))))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Bind_RawValue("g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))
+			return E_FAIL;
+
+		if (FAILED(m_pShaderCom->Begin(ETOUI(ENV_PASS::DECAL))))
+			return E_FAIL;
+
+		if (FAILED(m_pModelCom->Render_Instanced(i, m_pInstanceBuffer, sizeof(ENV_INSTANCE_DATA), iInstanceCount)))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+HRESULT CEnv_InstanceBatch::Render_Decal_NotInstanced()
+{
+	for (auto& item : m_Submitted)
+	{
+		if (nullptr != item.pObj)
+		{
+			if (FAILED(item.pObj->Render_Decal()))
 				return E_FAIL;
 		}
 	}

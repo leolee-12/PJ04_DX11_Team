@@ -542,9 +542,9 @@ HRESULT CGameInstance::Add_MRT(const _wstring& strMRTTag, const _wstring& strTar
 {
     return m_pTarget_Manager->Add_MRT(strMRTTag, strTargetTag);
 }
-HRESULT CGameInstance::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV, _bool bBindDSV)
+HRESULT CGameInstance::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV, _bool bBindDSV, _bool bClear)
 {
-    return m_pTarget_Manager->Begin_MRT(strMRTTag, pDSV, bBindDSV);
+    return m_pTarget_Manager->Begin_MRT(strMRTTag, pDSV, bBindDSV, bClear);
 }
 HRESULT CGameInstance::End_MRT()
 {

@@ -11,7 +11,7 @@
 CProjectile_Boulder::CProjectile_Boulder(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPhysicsProjectile{ pDevice, pContext }
 {
-    m_fSpeed = 16.f; m_fLifeTime = 6.f; m_fDamage = 4.f; m_fKnockback = 11.f; m_fHitRadius = 0.9f;
+    m_fSpeed = 16.f; m_fLifeTime = 6.f; m_fDamage = 4.f; m_fKnockback = 11.f; m_fHitRadius = 5.f;
 }
 CProjectile_Boulder::CProjectile_Boulder(const CProjectile_Boulder& Prototype)
     : CPhysicsProjectile(Prototype) {
@@ -43,7 +43,7 @@ void CProjectile_Boulder::On_Launched()
 
 void CProjectile_Boulder::On_Bounce(_int iCount)
 {
-    if (iCount >= 2)                 
+    if (iCount >= 3)                 
         Enter_Break();
 }
 

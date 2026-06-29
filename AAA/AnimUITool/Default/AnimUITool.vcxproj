@@ -34,6 +34,7 @@
     <ClCompile Include="..\Private\Panel_Preview.cpp" />
     <ClCompile Include="..\Private\Panel_UICanvas.cpp" />
     <ClCompile Include="..\Private\Panel_Viewport.cpp" />
+    <ClCompile Include="..\Private\Preview_DeformCar.cpp" />
     <ClCompile Include="..\Private\Preview_Actor.cpp" />
     <ClCompile Include="..\Private\Preview_Kirby.cpp" />
     <ClCompile Include="..\ThirdParty\ImGui\Src\imgui.cpp" />
@@ -66,6 +67,7 @@
     <ClInclude Include="..\Public\Panel_Preview.h" />
     <ClInclude Include="..\Public\Panel_UICanvas.h" />
     <ClInclude Include="..\Public\Panel_Viewport.h" />
+    <ClInclude Include="..\Public\Preview_DeformCar.h" />
     <ClInclude Include="..\Public\Preview_Actor.h" />
     <ClInclude Include="..\Public\Preview_Kirby.h" />
     <ClInclude Include="AnimUITool.h" />
@@ -133,10 +135,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\Bin\</OutDir>
+    <OutDir>..\Bin\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\Bin\</OutDir>
+    <OutDir>..\Bin\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -177,7 +179,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../EngineSDK/Lib/;../../ContentSDK/Lib/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../EngineSDK/Lib/$(Configuration)/;../../ContentSDK/Lib/$(Configuration)/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Engine.lib;GameContent.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -196,7 +198,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../EngineSDK/Lib/;../../ContentSDK/Lib/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../EngineSDK/Lib/$(Configuration)/;../../ContentSDK/Lib/$(Configuration)/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Engine.lib;GameContent.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

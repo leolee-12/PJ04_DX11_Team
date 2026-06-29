@@ -41,39 +41,6 @@ void CSword_SpinSlash::Priority_Update(_float fTimeDelta)
 void CSword_SpinSlash::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
-
-    if (m_bFadeOutRequested == false)
-        return;
-
-    _bool bAllFadeOutFinished = true;
-
-    for (auto& [strTag, pPart] : m_EffestParts)
-    {
-        CCommon_SpinSlash* pSpinSlashPart = dynamic_cast<CCommon_SpinSlash*>(pPart);
-        if (pSpinSlashPart == nullptr)
-            continue;
-
-        if (Is_EffectPartPlay(strTag) == false)
-            continue;
-
-        if (pSpinSlashPart->Is_FadingOut() == false)
-        {
-            bAllFadeOutFinished = false;
-            break;
-        }
-
-        if (pSpinSlashPart->Is_FadeOutFinished() == false)
-        {
-            bAllFadeOutFinished = false;
-            break;
-        }
-    }
-
-    if (bAllFadeOutFinished == true)
-    {
-        m_bFadeOutRequested = false;
-        EffectContainer_Stop();
-    }
 }
 
 void CSword_SpinSlash::Late_Update(_float fTimeDelta)
@@ -94,26 +61,6 @@ HRESULT CSword_SpinSlash::Ready_EffectPartObjects()
     Add_Effect_PartObject(m_iPrototypeLevel, CCommon_SpinSlash::PROTOTYPE_TAG, L"Proto_Common_SpinSlash_2");
 
     return S_OK;
-}
-
-void CSword_SpinSlash::Start_FadeOut(_float fFadeOutDuration)
-{
-    _bool bStarted = false;
-
-    for (auto& [strTag, pPart] : m_EffestParts)
-    {
-        CCommon_SpinSlash* pSpinSlashPart = dynamic_cast<CCommon_SpinSlash*>(pPart);
-        if (pSpinSlashPart != nullptr && Is_EffectPartPlay(strTag) == true)
-        {
-            pSpinSlashPart->Start_FadeOut(fFadeOutDuration);
-            bStarted = true;
-        }
-    }
-
-    m_bFadeOutRequested = bStarted;
-
-    if (bStarted == false)
-        EffectContainer_Stop();
 }
 
 CSword_SpinSlash* CSword_SpinSlash::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

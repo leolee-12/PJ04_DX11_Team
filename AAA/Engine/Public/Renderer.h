@@ -88,6 +88,7 @@ private:
 	HRESULT Render_Priority();
 	HRESULT Render_Shadow();
 	HRESULT Render_NonBlend();
+	HRESULT Render_Decals();
 	HRESULT Render_SSAO();
 	HRESULT Render_Lights();
 	HRESULT Render_VolumetricFog();

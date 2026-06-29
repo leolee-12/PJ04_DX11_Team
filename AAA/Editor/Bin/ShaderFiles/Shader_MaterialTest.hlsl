@@ -101,6 +101,7 @@ struct PS_OUT
     float4 vMRA : SV_TARGET3;
     float4 vEmissive : SV_TARGET4;
     float4 vGeoNormal : SV_TARGET5;
+    uint   vMaterialID : SV_TARGET6;
 };
 
 struct PS_BACKOUT
@@ -118,9 +119,10 @@ PS_OUT PS_MAIN(PS_IN In)
     Out.vDiffuse = float4(vAlbedo, 1.f);
     Out.vNormal = float4(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(g_vMRA, g_iMaterialID / 255.f);
+    Out.vMRA = float4(g_vMRA, 1.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
     
     return Out;
 }

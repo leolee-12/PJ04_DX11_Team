@@ -577,6 +577,9 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash">
       <UniqueIdentifier>{553f3de7-862e-424a-87ee-191f43044a21}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\Kabu">
+      <UniqueIdentifier>{8e2ff95d-c5dd-4f49-9c40-bb2c899a1b04}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockBack\KnockBackDeath">
       <UniqueIdentifier>{f45699c1-0279-42f5-8174-aecc983bb4b3}</UniqueIdentifier>
     </Filter>
@@ -726,6 +729,12 @@
     </Filter>
     <Filter Include="01. Projectile\00. PhysicsProjectile\00. Boulder">
       <UniqueIdentifier>{f745a7d5-14c1-44e7-9706-d907f8396f4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\11. Common_SpinSlashTrail">
+      <UniqueIdentifier>{7d7b3904-b384-435a-9f16-5d9eaf0cb573}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\05. SpinSlashTrail">
+      <UniqueIdentifier>{f480169f-cb17-4713-8f02-aa942d07a565}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\07. BrontoBurt">
       <UniqueIdentifier>{fc35ec57-639a-48e2-92a5-decb71ece4a4}</UniqueIdentifier>
@@ -1375,6 +1384,12 @@
     <ClInclude Include="..\public\PhysicsProjectile.h">
       <Filter>01. Projectile\00. PhysicsProjectile</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Common_SpinSlashTrail.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\11. Common_SpinSlashTrail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Sword_SpinSlashTrail.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\05. SpinSlashTrail</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\BrontoBurt.h">
       <Filter>00. GameObject\06. Monster\07. BrontoBurt</Filter>
     </ClInclude>
@@ -1484,6 +1499,7 @@
     <ClInclude Include="..\Public\Monster_RailMovement.h">
       <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Monster_RailMovement.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2000,6 +2016,12 @@
     <ClCompile Include="..\private\PhysicsProjectile.cpp">
       <Filter>01. Projectile\00. PhysicsProjectile</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Common_SpinSlashTrail.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\11. Common_SpinSlashTrail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\05. SpinSlashTrail</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\BrontoBurt.cpp">
       <Filter>00. GameObject\06. Monster\07. BrontoBurt</Filter>
     </ClCompile>
@@ -2109,6 +2131,7 @@
     <ClCompile Include="..\Private\Monster_RailMovement.cpp">
       <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl">
@@ -2118,9 +2141,6 @@
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </FxCompile>
     <FxCompile Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_Map.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </FxCompile>
     <FxCompile Include="..\ShaderFiles\Shader_UI.hlsl">

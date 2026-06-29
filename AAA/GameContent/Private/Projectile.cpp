@@ -9,7 +9,6 @@ CProjectile::CProjectile(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 }
 CProjectile::CProjectile(const CProjectile& Prototype)
     : CGameObject(Prototype)
-    // 튜닝값은 프로토타입에서 클론으로 복사 (copy ctor 가 PROPERTY 안 옮기면 클론이 미초기화됨)
     , m_fSpeed{ Prototype.m_fSpeed }, m_fLifeTime{ Prototype.m_fLifeTime }
     , m_fDamage{ Prototype.m_fDamage }, m_fKnockback{ Prototype.m_fKnockback }
     , m_fHitRadius{ Prototype.m_fHitRadius } {
@@ -65,13 +64,40 @@ HRESULT CProjectile::Ready_HitBox()
 
 void CProjectile::Launch(const _float3& vPos, const _float3& vDir)
 {
+    const _bool bWasCarried = m_bCarried;
     Detach();                    
     m_bAlive = true; m_fAccLife = 0.f;
     On_Activated();
 
-    m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(1.f, 0.f, 0.f, 0.f));
-    m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, 1.f, 0.f, 0.f));
-    m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, 1.f, 0.f));
+    if (bWasCarried)
+    {
+        _vector vRight = m_pTransformCom->Get_State(STATE::RIGHT);
+        _vector vUp = m_pTransformCom->Get_State(STATE::UP);
+        _vector vLook = m_pTransformCom->Get_State(STATE::LOOK);
+
+        const _float fScaleX = XMVectorGetX(XMVector3Length(vRight));
+        const _float fScaleY = XMVectorGetX(XMVector3Length(vUp));
+        const _float fScaleZ = XMVectorGetX(XMVector3Length(vLook));
+
+        _vector vFlatLook = XMVectorSetY(vLook, 0.f);
+        if (XMVectorGetX(XMVector3LengthSq(vFlatLook)) < 1e-6f)
+            vFlatLook = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+        vFlatLook = XMVector3Normalize(vFlatLook);
+
+        const _vector vNewUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+        const _vector vNewRight = XMVector3Normalize(XMVector3Cross(vNewUp, vFlatLook));
+
+        m_pTransformCom->Set_State(STATE::RIGHT, vNewRight * fScaleX);
+        m_pTransformCom->Set_State(STATE::UP, vNewUp * fScaleY);
+        m_pTransformCom->Set_State(STATE::LOOK, vFlatLook * fScaleZ);
+    }
+    else
+    {
+        m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(1.f, 0.f, 0.f, 0.f));
+        m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, 1.f, 0.f, 0.f));
+        m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, 1.f, 0.f));
+    }
+
     m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&vPos), 1.f));
 
     _vector v = XMLoadFloat3(&vDir);
