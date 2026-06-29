@@ -270,6 +270,29 @@ _bool CModel::Update_Base(_float fTimeDelta, _float fSpeed)
 {
 	_bool isFinished = { false };
 
+	// 인덱스 잘못되었을 때 가드 추가
+	const _bool bInvalidBase =
+		(m_iCurrentAnimationIndex == (_uint)-1 ||
+			m_iCurrentAnimationIndex >= m_Animations.size());
+	const _bool bInvalidBlend =
+		(m_isBlending &&
+			(m_iBlendTargetAnimIndex == (_uint)-1 ||
+				m_iBlendTargetAnimIndex >= m_Animations.size()));
+
+	if (bInvalidBase || bInvalidBlend)
+	{
+#ifdef _DEBUG
+		static _bool s_bWarned = false;     
+		if (!s_bWarned)
+		{
+			s_bWarned = true;
+			MSG_BOX("CModel::Update_Base: animation index invalid "
+				"(no clip playing). Update skipped.");
+		}
+#endif
+		return false;                        
+	}
+
 	if (m_isBlending)
 	{
 		m_fBlendElapsed += fTimeDelta;

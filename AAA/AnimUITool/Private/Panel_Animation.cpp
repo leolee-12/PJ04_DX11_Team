@@ -6,6 +6,8 @@
 #include "imgui.h"
 #include "GameContent_AnimEvents.h"
 #include "Kirby_States.h"
+#include "Preview_Kirby.h"
+#include "LevelDesign_EventObject.h"
 
 namespace
 {
@@ -185,6 +187,16 @@ void CPanel_Animation::Render()
     Render_EventTimeline();
 
     ImGui::End();
+}
+
+void CPanel_Animation::Update(_float fTimeDelta)
+{
+    ANIM_CONTEXT& ctx = m_pPanel_Manager->Get_Context();
+    if (!ctx.Valid() || !ctx.bPlaying || !ctx.pAnimator)
+        return;
+
+    if (dynamic_cast<CLevelDesignObject*>(ctx.pOwner) && !ctx.pAnimator->Get_CurrentAnimName().empty())
+        ctx.pAnimator->Update(fTimeDelta);
 }
 
 void CPanel_Animation::Render_EventTimeline()

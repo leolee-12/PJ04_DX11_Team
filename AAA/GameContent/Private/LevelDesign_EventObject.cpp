@@ -671,7 +671,7 @@ CGameObject* CLevelDesign_EventObject::Clone(void* pArg)
 		TempDesc.iModelProtoLevel = ETOUI(LEVEL::GAMEPLAY);
 		TempDesc.eModelType = MODEL::ANIM;
 		TempDesc.wstrModelProtoTag = LEVEL1BOSSDEMOBG_MODEL_PROTO_TAG;
-		TempDesc.ePolicy = LD_EVENTOBJECT_POLICY::DEFAULT;
+		TempDesc.ePolicy = LD_EVENTOBJECT_POLICY::LEVEL1_BOSS_DEMO_BG;
 		TempDesc.bUseCollMesh = false;
 		pArg = &TempDesc;
 	}

@@ -48,8 +48,19 @@ protected:
 	virtual void				On_Explode() override;
 
 private:
-	_bool						m_bCaptured = { false };
+	void						Update_Captured(_float fTimeDelta);	
+
+private:
 	CGameObject*				m_pCaptor = { nullptr };
+
+	_bool						m_bCaptured = { false };
+	_float						m_fPullSpeed = { 0.f };
+	_float3						m_vBaseScale = {};
+	_float						m_fScaleRatio = { 1.f };
+
+	static constexpr _float		s_fPullAccel = { 40.f };
+	static constexpr _float		s_fMinScaleRatio = { 0.45f };		// º¸¸é¼­ Æ©´×
+	static constexpr _float		s_fShrinkLerp = { 2.f };
 
 public:
 	static CEnemyBomb*			Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

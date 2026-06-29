@@ -34,6 +34,10 @@ void CEnemyBomb::Be_Captured(CGameObject* pInhaler)
 		m_pHitBox->Set_Enabled(false);     // 피격 off
 	if (m_pAnimatorCom)
 		m_pAnimatorCom->Pause_Mask(1);		// 도화선 애니메이션 멈추기
+
+	m_fPullSpeed = 0.f;
+	m_vBaseScale = m_pTransformCom->Get_Scaled();
+	m_fScaleRatio = 1.f;
 }
 
 void CEnemyBomb::Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed)
@@ -44,6 +48,8 @@ void CEnemyBomb::Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed)
 
 void CEnemyBomb::On_Swallowed()
 {
+	m_pTransformCom->Set_Scale(m_vBaseScale.x, m_vBaseScale.y, m_vBaseScale.z);
+
 	SWALLOW_EVENT payload{ this };          
 	m_pGameInstance_Proxy->Publish(EVT_SWALLOWED, &payload);
 	m_pCaptor = nullptr;
@@ -54,8 +60,7 @@ void CEnemyBomb::Update(_float fTimeDelta)
 {
 	if (m_bAlive && m_bCaptured)		// 흡입 중 : 물리/폭발/피격 off
 	{
-		//if (m_pAnimatorCom)
-		//	m_pAnimatorCom->Update(fTimeDelta);
+		Update_Captured(fTimeDelta);	// 흡입 로직만
 		return;
 	}
 
@@ -135,6 +140,44 @@ void CEnemyBomb::On_Explode()
 
 	// TODO : 폭발 이벤트
 	// TODO 폭발 시 추가 콜라이더 생성 (선택사항)
+}
+
+void CEnemyBomb::Update_Captured(_float fTimeDelta)
+{
+	if (nullptr == m_pCaptor)
+		return;
+
+	CTransform* pCapT = m_pCaptor->Get_Transform();
+	_vector vMouth = pCapT->Get_State(STATE::POSITION)
+						+ pCapT->Get_State(STATE::LOOK) * 0.6f
+						+ pCapT->Get_State(STATE::UP) * 0.6f;
+
+	_vector vSelf = m_pTransformCom->Get_State(STATE::POSITION);
+	_vector vDir = vMouth - vSelf;
+	_float fDist = XMVectorGetX(XMVector3Length(vDir));
+
+	if (fDist <= 0.5f)
+	{
+		On_Swallowed();
+		return;
+	}
+
+	m_fPullSpeed += s_fPullAccel * fTimeDelta;
+	_float fMove = min(m_fPullSpeed * fTimeDelta, fDist);
+	m_pTransformCom->Set_State(STATE::POSITION,
+		vSelf + XMVector3Normalize(vDir) * fMove);
+
+	m_fScaleRatio += (s_fMinScaleRatio - m_fScaleRatio)
+		* min(s_fShrinkLerp * fTimeDelta, 1.f);
+	m_pTransformCom->Set_Scale(m_vBaseScale.x * m_fScaleRatio,
+		m_vBaseScale.y * m_fScaleRatio,
+		m_vBaseScale.z * m_fScaleRatio);
+
+	if (m_pAnimatorCom)
+	{
+		m_pAnimatorCom->SetBoneRotation("RotL", m_fRollAngle, XMLoadFloat3(&m_vRollAxis));		// 회전 유지
+		m_pAnimatorCom->Update(fTimeDelta);
+	}
 }
 
 CEnemyBomb* CEnemyBomb::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
