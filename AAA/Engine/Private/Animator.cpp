@@ -276,6 +276,14 @@ void CAnimator::SetBoneRotation(const _char* szBone, _float fAngleDeg, _fvector 
     m_bHasRotReq = true;
 }
 
+_bool CAnimator::Has_Bone(const _char* szBone) const
+{
+    if (m_pModel == nullptr)
+        return false; 
+
+    return m_pModel->Get_BoneIndex(szBone) >= 0;
+}
+
 // ── Update: 재생 + 이벤트 판정 ──
 void CAnimator::Update(_float fTimeDelta)
 {

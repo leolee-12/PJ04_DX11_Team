@@ -16,6 +16,7 @@ cbuffer FroxelCB : register(b0)
     float4 g_vFogParams; // x=near y=far z=heightFalloff w=baseHeight
     float4 g_vFogParams2; // x=g(이방성) y=ambient z=time w=shadowStrength
     float4 g_vGridParams; // x=W y=H z=D w=jitter
+    float4 g_vFogParams3; // x=fogStart, y=startRange
 };
 
 Texture2D g_ShadowDepth : register(t0); // Target_LightDepth (.r)
@@ -103,6 +104,10 @@ float SampleShadow(float3 worldPos)
     float heightDensity = exp(-g_vFogParams.z * (wp.y - g_vFogParams.w));
     float noise = ValueNoise3D(wp * 0.15f + float3(g_vFogParams2.z * 0.05f, 0.f, g_vFogParams2.z * 0.03f));
     float density = g_vFogScatter.a * saturate(heightDensity) * lerp(0.6f, 1.4f, noise);
+    
+    // 시작 거리 게이트: fogStart 전엔 밀도 0, startRange 동안 램프업
+    float startGate = saturate((viewZ - g_vFogParams3.x) / max(g_vFogParams3.y, 1e-3f));
+    density *= startGate;
 
     float extinction = max(density, 1e-5f);
     float3 scattering = g_vFogScatter.rgb * density;

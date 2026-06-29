@@ -157,7 +157,15 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
                 auto* mv = m_pOwner->Get_Movement();
                 if (!*bAir) {
                     m_pOwner->Get_BodyAnimator()->Play("Jump", false, true, 0.1f, fSpd);
-                    _vector vTgt = XMLoadFloat3(&m_pOwner->Get_BlackBoard().vTargetPos);  // 점프 시작 시점 타겟
+
+                    _vector vSelf = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
+                    _vector vTgt = XMLoadFloat3(&m_pOwner->Get_BlackBoard().vTargetPos);
+
+                    _vector vToTgt = XMVectorSetY(vTgt - vSelf, 0.f);
+                    if (XMVectorGetX(XMVector3LengthSq(vToTgt)) > 1e-6f)
+                        vToTgt = XMVector3Normalize(vToTgt);
+                    vTgt = vTgt - vToTgt * 5.f;
+
                     mv->Begin_JumpArc(vTgt, fJumpTime, fJumpHeight);
                     *bAir = true;
                 }

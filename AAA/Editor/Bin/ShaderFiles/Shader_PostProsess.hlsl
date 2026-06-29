@@ -44,7 +44,7 @@ float g_fDoFAutoFocus = 1.f; // 1=화면 중앙 깊이로 자동 초점
 /* SSR 폴백용 IBL */
 TextureCube g_PrefilteredCube; // 디퍼드와 동일 큐브
 int g_iSpecularMip = 1;
-float g_fIBLIntensity = 1.f;
+float g_fIBLIntensity = 0.f;
 float4x4 g_CamViewMatrixInverse;
 
 //ToneMapping
@@ -57,6 +57,7 @@ Texture2D g_CurtainTexture;
 
 Texture3D g_ColorGradingLUT;
 float g_fColorGradeEnable = 0.f;
+float g_fSaturation = 0.88f;
 
 Texture2D<uint> g_MaterialIDTexture; // R8_UINT, matID 전용
 
@@ -134,6 +135,11 @@ float3 ACESFilm(float3 x) // Narkowicz ACES 근사
 {
     return saturate((x * (2.51f * x + 0.03f)) / (x * (2.43f * x + 0.59f) + 0.14f));
 }
+float3 ApplySaturation(float3 c, float s)
+{
+    float luma = dot(c, float3(0.2126f, 0.7152f, 0.0722f)); //Rec.709
+    return lerp(luma.xxx, c, s);
+}
 
 
   //============================ Bloom Bright (pass 0) ============================
@@ -187,6 +193,8 @@ float4 PS_COMPOSITE(PS_IN In) : SV_TARGET0
             color = ACESFilm(color);
         color = pow(saturate(color), 1.f / 2.2f);
     }
+    color = ApplySaturation(color, g_fSaturation);
+    
     return float4(color, 1.f);
 }
 
@@ -362,9 +370,9 @@ float4 PS_SSR(PS_IN In) : SV_TARGET0
         }
     }
 
-      /* --- 단일 합성: SSR(맞으면) ↔ 큐브맵(폴백) --- */
-    float3 reflection = lerp(iblSpec, ssrColor, conf);
-    return float4(scene.rgb + reflection, scene.a);
+    // 변경: iblSpec은 이미 scene에 포함. SSR 맞은 곳만 그쪽으로 교체.
+    //       (iblSpec 계산은 빼주려고 그대로 유지)
+    return float4(scene.rgb + (ssrColor - iblSpec) * conf, scene.a);
 }
 
 // Downsample + CoC → half. rgb=color, a=coc*0.5+0.5 (6)

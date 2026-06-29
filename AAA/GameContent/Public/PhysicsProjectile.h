@@ -18,6 +18,7 @@ protected:
 public:
     virtual void Update(_float fTimeDelta) override;                 // 비행/종료 디스패치 + 히트박스 추적
     virtual void Launch(const _float3& vPos, const _float3& vDir) override;
+    virtual void Launch_Arc(const _float3& vStart, const _float3& vTarget, _float fDur, _float fHeight) override;
 
 protected:
     virtual HRESULT Ready_Movement() override;       // CCT + 무브먼트 생성/연결
