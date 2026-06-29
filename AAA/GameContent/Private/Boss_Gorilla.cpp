@@ -32,6 +32,10 @@ HRESULT CBoss_Gorilla::Initialize(void* pArg)
     m_strBossName = L"고르르뭄바";
     m_fMaxHP = 1000.f;    
     m_fCurHP = m_fMaxHP;
+    m_TraitFlags &= ~MT_BODYCHECK_DAMAGE;
+
+    if (m_pController) 
+        m_pController->Set_Solid(false);
 
     if (m_pMovement)
     {
@@ -65,6 +69,7 @@ void CBoss_Gorilla::Update(_float fTimeDelta)
         Tick_OpeningCatch();
 
     __super::Update(fTimeDelta);
+    Tick_DeathSequence(fTimeDelta);
 }
 
 CMonsterBrain* CBoss_Gorilla::Create_Brain()
@@ -87,6 +92,34 @@ _bool CBoss_Gorilla::Is_Intro_Finished() const
     return m_bIntroDone;
 }
 
+void CBoss_Gorilla::Play_Death()
+{
+    Enable_Colliders(false);                                       
+    if (auto* p = Get_HitBoxPart())
+    {
+        p->Enable_AllHitBoxes(false);
+    }
+
+    CAnimator* pAnim = Get_BodyAnimator();
+    if (!pAnim) return;
+
+    pAnim->Play("DeathDown", false, true, 0.f, 1.5f);   // HP0 순간 블렌딩 없이 즉시 컷
+
+    m_pGameInstance_Proxy->Publish(EventTag::FullScreen_Flash, nullptr);
+
+    m_bDeathSeq = true;                                   // 포즈 적용 후 정지하도록 예약
+    m_eDeathStep = EDEATH::POSE_WAIT;
+    m_iDeathPoseDelay = 2;
+}
+
+_bool CBoss_Gorilla::Is_Death_Finished() const
+{
+    CAnimator* pAnim = Get_BodyAnimator();
+    if (!pAnim) return true;
+    if (m_bDeathSeq) return false;                       
+    return pAnim->Is_Finished();
+}
+
 HRESULT CBoss_Gorilla::Ready_AnimEvents()
 {
     CAnimator* pAnim = Get_BodyAnimator();
@@ -99,11 +132,15 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
             {
                 if (e.strParam.empty())
                 {
+                    if (m_eLife != EBOSS_LIFE::INTRO)
+                        break;
                     CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
                     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
                 }
                 else                      
                 {
+                    if (m_eLife != EBOSS_LIFE::INTRO && (e.strParam == "Roar_camera"))
+                        break;
                     wstring w(e.strParam.begin(), e.strParam.end());
                     Fire_CatchCamera(w.c_str());
                 }
@@ -271,6 +308,38 @@ void CBoss_Gorilla::Fire_Grab()
     grab.pSourceWorld = m_pTransformCom->Get_WorldMatrixPtr();         
     grab.eType = GRAB_TYPE::GORILLA_COMBAT;
     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GrabKirby, &grab);
+}
+
+void CBoss_Gorilla::Tick_DeathSequence(_float fTimeDelta)
+{
+    if (!m_bDeathSeq) return;
+    CAnimator* pAnim = Get_BodyAnimator();
+    if (!pAnim) { m_bDeathSeq = false; return; }
+
+    switch (m_eDeathStep)
+    {
+        case EDEATH::POSE_WAIT:
+            if (--m_iDeathPoseDelay <= 0)
+            {
+                pAnim->Pause();
+                m_fDeathPauseTimer = DEATH_PAUSE_SEC;
+                CAMERA_SHAKE_DESC shake{ 0.8f, DEATH_SHAKE_SEC }; 
+                m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &shake);
+                m_eDeathStep = EDEATH::PAUSING;
+            }
+            break;
+
+        case EDEATH::PAUSING:
+            m_fDeathPauseTimer -= fTimeDelta;
+            if (m_fDeathPauseTimer <= 0.f)
+            {
+                pAnim->Resume();                            // 애님 재생, DeathDamage 다음 DeathDown까지
+                m_eDeathStep = EDEATH::PLAYING;
+                m_bDeathSeq = false;                        // 이후 Is_Death_Finished에 위임
+            }
+            break;
+        default: break;
+    }
 }
 
 void CBoss_Gorilla::Begin_AnimFreeze(_float fSeconds)

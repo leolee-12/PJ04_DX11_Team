@@ -2,6 +2,25 @@
 
 #include "GameInstance.h"
 
+static _bool Is_IntegerFormat(DXGI_FORMAT eFmt)
+{
+	switch (eFmt)
+	{
+		case DXGI_FORMAT_R8_UINT:           case DXGI_FORMAT_R8_SINT:
+		case DXGI_FORMAT_R16_UINT:          case DXGI_FORMAT_R16_SINT:
+		case DXGI_FORMAT_R32_UINT:          case DXGI_FORMAT_R32_SINT:
+		case DXGI_FORMAT_R8G8_UINT:         case DXGI_FORMAT_R8G8_SINT:
+		case DXGI_FORMAT_R16G16_UINT:       case DXGI_FORMAT_R16G16_SINT:
+		case DXGI_FORMAT_R32G32_UINT:       case DXGI_FORMAT_R32G32_SINT:
+		case DXGI_FORMAT_R8G8B8A8_UINT:     case DXGI_FORMAT_R8G8B8A8_SINT:
+		case DXGI_FORMAT_R10G10B10A2_UINT:
+		case DXGI_FORMAT_R32G32B32A32_UINT: case DXGI_FORMAT_R32G32B32A32_SINT:
+			return true;
+		default:
+			return false;
+	}
+}
+
 CRenderTarget::CRenderTarget(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice { pDevice }
 	, m_pContext { pContext }
@@ -37,6 +56,7 @@ HRESULT CRenderTarget::Initialize(_uint iWidth, _uint iHeight, DXGI_FORMAT ePixe
 		return E_FAIL;
 
 	m_vClearColor = vClearColor;
+	m_eFormat = ePixelFormat;
 
 	return S_OK;
 }
@@ -78,6 +98,9 @@ HRESULT CRenderTarget::Ready_Debug(_float fX, _float fY, _float fSizeX, _float f
 }
 HRESULT CRenderTarget::Render_Debug(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
 {
+	if (Is_IntegerFormat(m_eFormat))   // R8_UINT(matID) 등 정수 타깃은 float Sample 디버그로 못 그림 -> 스킵
+		return S_OK;
+
 	if (FAILED(pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
 		return E_FAIL;
 

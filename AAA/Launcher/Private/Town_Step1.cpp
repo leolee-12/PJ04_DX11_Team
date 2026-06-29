@@ -104,7 +104,8 @@ HRESULT CTown_Step1::Ready_Lights()
     LIGHT_DESC LightDesc{};
 
     LightDesc.eType = LIGHT::DIRECTIONAL;
-    LightDesc.vDiffuse = _float4(5.0f, 5.5f, 6.0f, 1.f);
+    LightDesc.vDiffuse = _float4(6.2f, 6.15f, 5.76f, 1.f);
+    //LightDesc.vAmbient = _float4(1.72f, 0.82f, 0.41f, 1.f);
     LightDesc.vAmbient = _float4(0.f, 0.f, 0.f, 1.f);
     LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
     LightDesc.vDirection = _float4(0.557f, -0.766f, 0.321f, 0.f);

@@ -16,6 +16,7 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
     const _float fChargeTime = 0.5f;
     const _float fSpd = 1.5f;
     const _float fAtkInterval = 2.5f;   
+    const _float fStopRange = 5.f;
 
 
     // ---- 공유 헬퍼 ----
@@ -25,6 +26,32 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
         };
     auto HoldLoop = [&](const string& c, _float fHold) -> CBTNode* {
         return CBTPlayClip::Create(Anim, { c, true, fHold, fSpd });
+        };
+    auto PlayFacing = [&](const string& c) -> CBTNode* {
+        auto bP = make_shared<bool>(false);
+        return CBTAction::Create(
+            [this, bP, c, fSpd, fTurnSpeedDeg](CBlackboard* pBB, _float dt) -> BT_STATUS {
+                CAnimator* pAnim = m_pOwner->Get_BodyAnimator();
+                if (!*bP) { pAnim->Play(c, false, true, 0.1f, fSpd); *bP = true; }
+
+                _float3 vDir = pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 0.f));
+                _vector vToTgt = XMLoadFloat3(&vDir);
+                if (!XMVector3Equal(vToTgt, XMVectorZero())) {
+                    CTransform* pTf = m_pOwner->Get_Transform();
+                    _vector vLook = XMVector3Normalize(XMVectorSetY(pTf->Get_State(STATE::LOOK), 0.f));
+                    _float  fDot = XMVectorGetX(XMVector3Dot(vLook, vToTgt));
+                    _float  fCross = XMVectorGetZ(vLook) * XMVectorGetX(vToTgt)
+                        - XMVectorGetX(vLook) * XMVectorGetZ(vToTgt);
+                    _float  fYaw = atan2f(fCross, fDot);
+                    _float  fStep = XMConvertToRadians(fTurnSpeedDeg) * dt;
+                    _float  fApply = (fabsf(fYaw) <= fStep) ? fYaw : (fYaw > 0.f ? fStep : -fStep);
+                    pTf->Rotate(XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fApply));
+                }
+
+                if (pAnim->Is_Finished()) { *bP = false; return BT_STATUS::SUCCESS; }
+                return BT_STATUS::RUNNING;
+            },
+            [bP]() { *bP = false; });
         };
     auto HitBox = [this](_int idx, _bool on) -> CBTNode* {
         return CBTAction::Create([this, idx, on](CBlackboard*, _float) {
@@ -134,8 +161,8 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
 
     auto MakeThrowRock = [&]() -> CBTNode* {
         return CBTSequence::Create({
-            OneShot("ThrowRockReady"),
-            OneShot("ThrowRock"),
+            PlayFacing("ThrowRockReady"),
+            PlayFacing("ThrowRock"),
             });
         };
 
@@ -240,12 +267,55 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
     // ---- 스캐폴딩 ----
     auto bMove = make_shared<bool>(false);
     auto* pChase = CBTAction::Create(
-        [this, bMove, fSpd](CBlackboard* pBB, _float) -> BT_STATUS {
+        [this, bMove, fSpd, fTurnSpeedDeg](CBlackboard* pBB, _float dt) -> BT_STATUS {
             if (!*bMove) { m_pOwner->Get_BodyAnimator()->Play("Walk", true, true, 0.2f, fSpd); *bMove = true; }
-            m_pOwner->Add_MoveDir(pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 0.f)));
+
+            _float3 vDir = pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 0.f));
+            _vector vToTgt = XMLoadFloat3(&vDir);
+            CTransform* pTf = m_pOwner->Get_Transform();
+
+            _float fDot = 1.f;
+            if (!XMVector3Equal(vToTgt, XMVectorZero())) {           // 타겟 쪽으로 회전
+                _vector vLook = XMVector3Normalize(XMVectorSetY(pTf->Get_State(STATE::LOOK), 0.f));
+                fDot = XMVectorGetX(XMVector3Dot(vLook, vToTgt));
+                _float fCross = XMVectorGetZ(vLook) * XMVectorGetX(vToTgt)
+                    - XMVectorGetX(vLook) * XMVectorGetZ(vToTgt);
+                _float fYaw = atan2f(fCross, fDot);
+                _float fStep = XMConvertToRadians(fTurnSpeedDeg) * dt;
+                _float fApply = (fabsf(fYaw) <= fStep) ? fYaw : (fYaw > 0.f ? fStep : -fStep);
+                pTf->Rotate(XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fApply));
+            }
+
+            if (fDot > 0.3f) {                                       // 대충 정면일 때만 전진
+                _vector vFwd = XMVector3Normalize(XMVectorSetY(pTf->Get_State(STATE::LOOK), 0.f));
+                _float3 vMove; XMStoreFloat3(&vMove, vFwd);
+                m_pOwner->Add_MoveDir(vMove);                        // 바라보는 방향으로 이동
+            }
             return BT_STATUS::RUNNING;
         },
         [bMove]() { *bMove = false; });
+
+    auto bHold = make_shared<bool>(false);
+    auto* pHoldGround = CBTAction::Create(
+        [this, bHold, fTurnSpeedDeg](CBlackboard* pBB, _float dt) -> BT_STATUS {
+            if (!*bHold) { m_pOwner->Get_BodyAnimator()->Play("Wait", true, true); *bHold = true; }
+
+            _float3 vDir = pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 0.f));
+            _vector vToTgt = XMLoadFloat3(&vDir);
+            if (!XMVector3Equal(vToTgt, XMVectorZero())) {            // 이동 없이 바라보기만
+                CTransform* pTf = m_pOwner->Get_Transform();
+                _vector vLook = XMVector3Normalize(XMVectorSetY(pTf->Get_State(STATE::LOOK), 0.f));
+                _float  fDot = XMVectorGetX(XMVector3Dot(vLook, vToTgt));
+                _float  fCross = XMVectorGetZ(vLook) * XMVectorGetX(vToTgt)
+                    - XMVectorGetX(vLook) * XMVectorGetZ(vToTgt);
+                _float  fYaw = atan2f(fCross, fDot);
+                _float  fStep = XMConvertToRadians(fTurnSpeedDeg) * dt;
+                _float  fApply = (fabsf(fYaw) <= fStep) ? fYaw : (fYaw > 0.f ? fStep : -fStep);
+                pTf->Rotate(XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fApply));
+            }
+            return BT_STATUS::RUNNING;                                // 범위 안에선 계속 정지+응시
+        },
+        [bHold]() { *bHold = false; });
 
     auto* pFacing = CBTCondition::Create([this, fFacingDot](CBlackboard* pBB) {
         _float3 vDir = pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 0.f));
@@ -281,25 +351,10 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
     const _float fRecoverTime = 0.8f;
     auto fRecoverT = make_shared<_float>(0.f);
     auto* pPostAttackRecover = CBTAction::Create(
-        [this, fRecoverT, fRecoverTime, fTurnSpeedDeg](CBlackboard* pBB, _float dt) -> BT_STATUS {
+        [this, fRecoverT, fRecoverTime](CBlackboard*, _float dt) -> BT_STATUS {
             if (*fRecoverT == 0.f)
-                m_pOwner->Get_BodyAnimator()->Play("Wait", true, true);
+                m_pOwner->Get_BodyAnimator()->Play("Wait", true, true);   // 회전 없이 정지
             *fRecoverT += dt;
-
-            _float3 vDir = pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 0.f));
-            _vector vToTgt = XMLoadFloat3(&vDir);
-            if (!XMVector3Equal(vToTgt, XMVectorZero())) {
-                CTransform* pTf = m_pOwner->Get_Transform();
-                _vector vLook = XMVector3Normalize(XMVectorSetY(pTf->Get_State(STATE::LOOK), 0.f));
-                _float  fDot = XMVectorGetX(XMVector3Dot(vLook, vToTgt));
-                _float  fCross = XMVectorGetZ(vLook) * XMVectorGetX(vToTgt)
-                    - XMVectorGetX(vLook) * XMVectorGetZ(vToTgt);
-                _float  fYaw = atan2f(fCross, fDot);
-                _float  fStep = XMConvertToRadians(fTurnSpeedDeg) * dt;
-                _float  fApply = (fabsf(fYaw) <= fStep) ? fYaw : (fYaw > 0.f ? fStep : -fStep);
-                pTf->Rotate(XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fApply));
-            }
-
             if (*fRecoverT >= fRecoverTime) { *fRecoverT = 0.f; return BT_STATUS::SUCCESS; }
             return BT_STATUS::RUNNING;
         },
@@ -323,6 +378,12 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
         return false;                                              // 14~40 애매 -> 추적
         });
 
+    auto* pStandStare = CBTSequence::Create({
+       CBTCondition::Create([this, fStopRange](CBlackboard* pBB) {
+           return pBB->Get<_float>("DistToTarget", FLT_MAX) <= fStopRange; }),
+       pHoldGround,
+        });
+
     // ---- 조립: 기본 추적, 쿨다운 차면 거리별 공격 ----
 	CBTNode* pCombat = CBTReactiveSelector::Create({
 		CBTSequence::Create({
@@ -343,7 +404,8 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
 				}),
 			}),
 		}),
-	pChase,
+        pStandStare,
+	    pChase,
 	});
 
     return pCombat;

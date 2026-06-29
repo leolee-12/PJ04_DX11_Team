@@ -26,7 +26,11 @@ public:
 
     void Snap() { m_bInit = false; m_eyeVel = {}; m_atVel = {}; }   // 활성 시 하드컷
 
-    void Add_Shake(_float fTrauma) { m_fTrauma = min(1.f, m_fTrauma + fTrauma); }
+    void Add_Shake(_float fTrauma, _float fDuration = 0.f)
+    {
+        m_fTrauma = min(1.f, m_fTrauma + fTrauma);
+        m_fTraumaDecay = (fDuration > 0.f) ? (m_fTrauma / fDuration) : DEFAULT_TRAUMA_DECAY;
+    }
     void Set_Rumble(_float fLevel) { m_fRumble = max(0.f, min(1.f, fLevel)); }
     void Stop_Rumble() { Add_Shake(m_fRumble); m_fRumble = 0.f; }
 
@@ -56,6 +60,8 @@ private:
     _float m_fShakePitch = { XMConvertToRadians(1.8f) };
     _float m_fShakeRoll = { XMConvertToRadians(1.2f) };
     _float m_fShakePos = { 0.12f };
+
+    static constexpr _float DEFAULT_TRAUMA_DECAY = 1.6f;
 
 public:
     static CCamera_Boss* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

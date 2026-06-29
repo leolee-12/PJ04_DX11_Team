@@ -40,9 +40,10 @@ private:
         unordered_set<class CGameObject*> setHit;
     };
 
-    void SetUp_HitBox_Callback(_int iIndex);
-
     vector<HITBOX> m_HitBoxes;
+
+private:
+    void SetUp_HitBox_Callback(_int iIndex);
 
 protected:
     virtual void Free() override;
