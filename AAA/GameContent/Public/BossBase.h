@@ -25,6 +25,8 @@ public:
     EBOSS_LIFE      Get_Life() const { return m_eLife; }
     _bool           Is_Active() const { return m_eLife == EBOSS_LIFE::ACTIVE; }
 
+    virtual         void Damaged(const ATTACK_INFO& tInfo) override;
+
 protected:
     virtual void           Update_AI(_float fTimeDelta) override;   // 라이프사이클 드라이버
     virtual CMonsterBrain* Create_Brain() override = 0;
@@ -41,6 +43,7 @@ protected:
 
     // ★ 분기 훅: 시체 진입 시 (미니보스=흡입화 / 보스=폭발 등)
     virtual void   On_Enter_Corpse() {}
+
 
     // 피격/사망 (기존 CMiniBoss:: 구현을 그대로 이식)
     virtual void   On_Damaged(const ATTACK_INFO& tInfo) override;
@@ -61,6 +64,9 @@ protected:
     _bool      m_bCorpse = { false };
     _float     m_fCorpseTimer = { 0.f };
     _wstring   m_strBossName = { L"Boss" };
+
+    _float     m_fHitInvuln = { 0.f };
+    static constexpr _float HIT_INVULN_SEC = 0.5f;
 
 protected:
     virtual void Free() override;

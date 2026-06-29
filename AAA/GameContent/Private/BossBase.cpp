@@ -48,8 +48,23 @@ void CBossBase::Die()
     m_eLife = EBOSS_LIFE::DEAD;
 }
 
+void CBossBase::Damaged(const ATTACK_INFO& tInfo)
+{
+    if (m_fHitInvuln > 0.f)
+        return;                          
+
+    const _float fHPBefore = m_fCurHP;
+    __super::Damaged(tInfo);             
+
+    if (m_fCurHP < fHPBefore)            
+        m_fHitInvuln = HIT_INVULN_SEC;
+}
+
 void CBossBase::Update_AI(_float fTimeDelta)
 {
+    if (m_fHitInvuln > 0.f)
+        m_fHitInvuln = max(0.f, m_fHitInvuln - fTimeDelta);
+
     switch (m_eLife)
     {
         case EBOSS_LIFE::HIDDEN:

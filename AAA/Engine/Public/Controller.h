@@ -38,6 +38,7 @@ public:
     // 토글 (셰이프 플래그 + CCT-CCT 솔리드 한 번에)
     void    Set_Enabled(_bool bEnable);
     _bool   Is_Solid() const { return m_bSolid; }      // ★ 전역 필터가 읽음
+    void    Set_Solid(_bool b) { m_bSolid = b; }
 
     void    Controller_Release();                                  // 매니저에서 제거
 

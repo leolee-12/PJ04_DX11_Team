@@ -87,7 +87,11 @@ void CCamera_Cutscene::Priority_Update(_float fTimeDelta)
 HRESULT CCamera_Cutscene::Ready_Events()
 {
     Subscribe_Event(EventTag::Camera_Shake, [this](void* p) {
-        Add_Shake(p ? *static_cast<_float*>(p) : 0.5f); });
+        if (auto* d = static_cast<CAMERA_SHAKE_DESC*>(p))
+            Add_Shake(d->fTrauma, d->fDuration);
+        else
+            Add_Shake(0.5f);
+        });
 
     Subscribe_Event(EventTag::Camera_Rumble, [this](void* p) {
         _float lvl = p ? *static_cast<_float*>(p) : 0.f;

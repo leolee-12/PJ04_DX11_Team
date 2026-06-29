@@ -176,9 +176,6 @@ void CKirby_Sword::SetUp_HitBox_Callback()
 {
     m_pHitBox->Set_OnEnter([this](CCollider* pOther)
         {
-            if (ETOUI(COLLISION_LAYER::MONSTER_HURT) != pOther->Get_RegisteredGroup())
-                return;
-
             CGameObject* pTarget = pOther->Get_Owner();
             if (m_HitTargets.count(pTarget))   
                 return;
@@ -195,7 +192,7 @@ void CKirby_Sword::SetUp_HitBox_Callback()
 
             m_HitTargets.insert(pTarget);   
 #ifdef _DEBUG
-            OutputDebugStringA("[Kirby_Sword] HIT monster!\n");
+            OutputDebugStringA("[Kirby_Sword] HIT Somthing!\n");
 #endif
         });
 }

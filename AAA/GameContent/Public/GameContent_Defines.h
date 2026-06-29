@@ -33,6 +33,7 @@ namespace Client
 		MONSTER_HIT,
 		MONSTER_PROJECTILE,
 		MONSTER_D_RANGE,
+		ENV_HURT,
 		ENV_TRIGGER = 100
 	};
 

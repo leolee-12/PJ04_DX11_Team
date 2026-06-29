@@ -36,6 +36,7 @@ private:
 	ID3D11ShaderResourceView* m_pSRV = { nullptr };
 
 	_float4				m_vClearColor = {};
+	DXGI_FORMAT         m_eFormat = { DXGI_FORMAT_UNKNOWN };
 
 #ifdef _DEBUG
 	_float4x4			m_WorldMatrix = {};
