@@ -204,9 +204,9 @@ CGameObject* CEnemyBomb::Clone(void* pArg)
 	return pInstance;
 }
 
-
-
 void CEnemyBomb::Free()
 {
 	__super::Free();
 }
+
+

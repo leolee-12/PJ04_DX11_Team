@@ -1,7 +1,7 @@
 #pragma once
 #include "LevelDesignObject.h"
 #include "Damageable.h"
-#include "Inhalable.h"
+#include "LDInhalable.h"
 
 NS_BEGIN(Engine)
 class CShader;
@@ -17,9 +17,8 @@ NS_BEGIN(Client)
 struct LD_SPAWN_SPEC;
 
 class CLevelDesign_Starblock final
-	: public CLevelDesignObject
+	: public CLDInhalable
 	, public IDamageable
-	, public IInhalable
 {
 	GENERATED_BODY(CLevelDesign_Starblock)
 
@@ -45,20 +44,12 @@ public:
 	// Damageable
 	virtual void Damaged(const ATTACK_INFO& tInfo) override;
 
-	// Inhalable
-	virtual _bool Can_BeInhaled(const INHALE_QUERY& q) const override;
-	virtual void  Be_Captured(CGameObject* pInhaler) override;
-	virtual COPY_ABILITY_TYPE Get_CopyAbility() const override;
-	virtual void  Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed) override;
-	virtual CGameObject* Get_GameObject() override;
-
 public:
 	const LD_BREAKABLE_DESC& Get_BreakableDesc() const { return m_tBreakableDesc; }
 
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
-	CCollider* m_pCollider = { nullptr };
 	physx::PxRigidStatic* m_pPhysicsActor = { nullptr };
 
 	LD_BREAKABLE_DESC m_tBreakableDesc = {};

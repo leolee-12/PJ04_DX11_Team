@@ -13,8 +13,16 @@ class CBoss_Gorilla final : public CBoss
 public:
     static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_Boss_Gorilla";
 
-    static constexpr _float s_fCCT_Radius = 1.8f;
-    static constexpr _float s_fCCT_Height = 1.5f;
+    static constexpr _float s_fCCT_Radius = 4.f;
+    static constexpr _float s_fCCT_Height = 8.f;
+
+    static constexpr const _char* GRAB_BONE = "RHaveL";
+    static constexpr const _char* THROW_BONE = "RHaveL";
+    static constexpr _float DEATH_PAUSE_SEC = 0.7f;
+    static constexpr _float DEATH_SHAKE_SEC = 0.7f;
+    static constexpr const _char* s_Intro[] = {
+          "CatchSuccessB", "CatchSuccessWait", "CatchRelease", "Roar"
+    };
 
 private:
     CBoss_Gorilla(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -35,8 +43,9 @@ protected:
     virtual CMonsterBrain* Create_Brain() override;
     virtual void           Play_Intro() override;
     virtual _bool          Is_Intro_Finished() const override;
-    virtual void           Play_Death() override {}                         
-    virtual _bool          Is_Death_Finished() const override { return true; }
+    virtual void           Play_Death() override;
+    virtual _bool          Is_Death_Finished() const override;
+    virtual _float         Get_CorpseLinger() const override { return 0.f; }
 
     virtual const vector<_float>& Get_PhaseThresholds() const override { return s_Thresholds; }
     virtual void           Play_PhaseTransition(_int iNewPhase) override;
@@ -47,6 +56,7 @@ protected:
     virtual _float Get_CapsuleHeight() const override { return s_fCCT_Height; }
     virtual _float Get_InteractRadius() const override { return 0.f; }
     virtual _bool  Get_HurtBoxDesc(CAPSULE_DESC& Out) const override;
+    virtual _bool  Is_Touch_Harmful() const override { return false; }
 
     virtual const _tchar*  Get_AppearEventTag() const override { return EventTag::Cutscene_GorillaHandoff; }
     virtual HRESULT        Ready_AnimEvents() override;                       
@@ -62,17 +72,19 @@ private:
     _bool m_bIntroDone = { false };
     _float m_fFreezeTimer = { 0.f };
 
-    static constexpr const _char* s_Intro[] = {
-          "CatchSuccessB", "CatchSuccessWait", "CatchRelease", "Roar"
-    };
-    static constexpr const _char* GRAB_BONE = "RHaveL";
-    static constexpr const _char* THROW_BONE = "RHaveL";
+    enum class EDEATH { POSE_WAIT, PAUSING, PLAYING };
+
+    _bool   m_bDeathSeq = { false };
+    EDEATH  m_eDeathStep = { EDEATH::POSE_WAIT };
+    _int    m_iDeathPoseDelay = { 0 };
+    _float  m_fDeathPauseTimer = { 0.f };
 
 private:
     void Tick_OpeningCatch();                    
     void Fire_CatchCamera(const _tchar* szTrack);
     void Begin_AnimFreeze(_float fSeconds);
     void Fire_Grab();
+    void Tick_DeathSequence(_float fTimeDelta);
 
 public:
     static CBoss_Gorilla* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

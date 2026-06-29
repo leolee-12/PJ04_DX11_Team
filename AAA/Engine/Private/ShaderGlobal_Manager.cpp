@@ -29,7 +29,7 @@ HRESULT CShaderGlobal_Manager::Initialize()
     Register({ "g_fFogBaseHeight",     "Fog BaseHeight",     GVAL::FLOAT,  { 0.00f, 0.f, 0.f, 0.f }, { -50.f, 50.f } });
     Register({ "g_fFogAnisotropy",     "Fog Anisotropy",     GVAL::FLOAT,  { 0.70f, 0.f, 0.f, 0.f }, { -0.9f, 0.9f } });
     Register({ "g_fFogAmbient",        "Fog Ambient",        GVAL::FLOAT,  { 0.02f, 0.f, 0.f, 0.f }, { 0.f, 0.5f } });
-    Register({ "g_fFogShadowStrength", "Fog ShadowStrength", GVAL::FLOAT,  { 1.00f, 0.f, 0.f, 0.f }, { 0.f, 1.f } });
+    Register({ "g_fFogShadowStrength", "Fog ShadowStrength", GVAL::FLOAT,  { 0.0f, 0.f, 0.f, 0.f }, { 0.f, 1.f } });
     Register({ "g_fFogLightIntensity", "Fog LightIntensity", GVAL::FLOAT, { 3.f, 0.f, 0.f, 0.f }, { 0.f, 15.f } });
 
     Register({ "g_fFogEnable",          "Fog Enable",        GVAL::BOOL,   { 1.f, 0.f, 0.f, 0.f }, { 0.f, 1.f } });

@@ -50,9 +50,9 @@ void CProjectile_Boulder::On_Launched()
 
 void CProjectile_Boulder::On_Bounce(_int iCount)
 {
-    _float fTrauma = 0.35f;
-    m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &fTrauma);
-    if (iCount >= 3)                 
+    CAMERA_SHAKE_DESC shake{ 0.35f, 0.f };
+    m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &shake);
+    if (iCount >= 3)
         Enter_Break();
 }
 
@@ -94,7 +94,7 @@ void CProjectile_Boulder::Tick_Visual(_float dt)
 
 void CProjectile_Boulder::On_Activated()
 {
-    m_eState = STATE::FLYING;       
+    m_eState = STATE::FLYING;
     m_fSpinAngle = 0.f;             
     if (m_pAnimatorCom)
         m_pAnimatorCom->Play("Wait", true, true);
