@@ -37,7 +37,7 @@ void CKirby_Hovering::Enter(CKirby* pKirby)
 
     // Mesh
     CKirby_Body* pBody = pKirby->Get_Body();
-    pBody->Set_Body(KIRBY_BODY_STATE::STUFFED);
+    pBody->Set_KirbyBody(KIRBY_BODY_STATE::STUFFED);
 
     // Movement
     CMovement_Child* pMovementCom = pKirby->Get_Movement();
@@ -67,7 +67,7 @@ void CKirby_Hovering::Exit(CKirby* pKirby)
 
     // Mesh
     CKirby_Body* pBody = pKirby->Get_Body();
-    pBody->Set_Body(KIRBY_BODY_STATE::NORMAL);
+    pBody->Set_KirbyBody(KIRBY_BODY_STATE::NORMAL);
 
     CMovement_Child* pMovement = pKirby->Get_Movement();
     Reset_Movement(pMovement);
@@ -183,7 +183,7 @@ _bool CKirby_Hovering::Update_HoveringStateMachine(CKirby* pKirby, _float fTimeD
                 CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
                 pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::AIR_BALL);
 
-                pBody->Set_Body(KIRBY_BODY_STATE::INHALE);
+                pBody->Set_KirbyBody(KIRBY_BODY_STATE::INHALE);
 
                 m_bMoveLock = true;
             }
@@ -207,7 +207,7 @@ _bool CKirby_Hovering::Update_HoveringStateMachine(CKirby* pKirby, _float fTimeD
                     Transition_Wait_OR_Run(pKirby);
                 }
                 
-                pBody->Set_Body(KIRBY_BODY_STATE::NORMAL);
+                pBody->Set_KirbyBody(KIRBY_BODY_STATE::NORMAL);
 
                 Reset_Movement(pMovement);
 

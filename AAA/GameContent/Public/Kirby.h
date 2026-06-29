@@ -27,6 +27,8 @@ class CKirby_Ability;
 class CKirby_Body;
 class CKirby_OnOffPart;
 
+class CKirby_Deform;
+
 class CKirby final : public CCharacter
 {
 	GENERATED_BODY(CKirby)
@@ -127,6 +129,7 @@ private:
 	HRESULT Ready_PartObjects();
 	HRESULT Ready_System();
 	HRESULT Ready_Ability();
+	HRESULT Ready_Deform();
 	HRESULT Bind_ShaderResources();
 	virtual HRESULT Ready_Events() override;
 
@@ -179,6 +182,10 @@ private:
 	_float m_fAccAbilityDumpCoolTime{};
 	_float m_fMaxAbilityDumpCoolTime{ 0.5f };
 	_bool m_bDecreaseAbilityDumpCool{};
+
+	// Deform
+	CKirby_Deform* m_pKirby_Deform{};
+	unordered_map<DEFORM_TYPE, CKirby_Deform*> m_Deformations;
 
 	// CutScene Grab
 	const _float4x4* m_pGrabBone = nullptr;

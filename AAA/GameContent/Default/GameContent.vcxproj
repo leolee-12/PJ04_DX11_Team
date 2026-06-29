@@ -51,6 +51,11 @@
     <ClInclude Include="..\Public\Common_Ring03.h" />
     <ClInclude Include="..\Public\Common_SpinSlash.h" />
     <ClInclude Include="..\Public\Common_SpinSlashTrail.h" />
+    <ClInclude Include="..\Public\Kirby_DeformCar_Demo.h" />
+    <ClInclude Include="..\Public\Kirby_DeformCar_Main.h" />
+    <ClInclude Include="..\Public\Kirby_Deform_Car.h" />
+    <ClInclude Include="..\Public\Kirby_Deform.h" />
+    <ClInclude Include="..\Public\Kirby_Form.h" />
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h" />
     <ClInclude Include="..\Public\Sword_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\Monster_RailMovement.h" />
@@ -286,6 +291,11 @@
     <ClCompile Include="..\Private\Common_Ring03.cpp" />
     <ClCompile Include="..\Private\Common_SpinSlash.cpp" />
     <ClCompile Include="..\Private\Common_SpinSlashTrail.cpp" />
+    <ClCompile Include="..\Private\Kirby_DeformCar_Demo.cpp" />
+    <ClCompile Include="..\Private\Kirby_DeformCar_Main.cpp" />
+    <ClCompile Include="..\Private\Kirby_Deform_Car.cpp" />
+    <ClCompile Include="..\Private\Kirby_Deform.cpp" />
+    <ClCompile Include="..\Private\Kirby_Form.cpp" />
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\Monster_RailMovement.cpp" />

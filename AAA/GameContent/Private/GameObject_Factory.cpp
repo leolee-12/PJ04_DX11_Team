@@ -45,6 +45,7 @@
 // Kirby
 #include "Kirby.h"
 #include "Kirby_Body.h"
+#include "Kirby_DeformCar_Demo.h"
 #include "Kirby_Sword.h"
 #include "Kirby_SwordHat.h"
 
@@ -435,6 +436,16 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Kirby_Body"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Kirby/Kirby.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            // Kirby_DeformCar_Demo
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_DeformCar_Demo::PROTOTYPE_TAG,
+                CKirby_DeformCar_Demo::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Kirby_DeformCar_Demo"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/DeformCar/Demo.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+
 
             // Sword
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_Sword::PROTOTYPE_TAG,

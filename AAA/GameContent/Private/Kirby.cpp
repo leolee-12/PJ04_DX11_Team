@@ -23,6 +23,9 @@
 #include "Kirby_Ability_Normal.h"
 #include "Kirby_Ability_Sword.h"
 
+// Deform
+#include "Kirby_Deform_Car.h"
+
 #include "Effect_Loader.h"
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -53,6 +56,9 @@ HRESULT CKirby::Initialize(void* pArg)
         return E_FAIL;
 
     if (FAILED(Ready_Ability()))
+        return E_FAIL;
+
+    if (FAILED(Ready_Deform()))
         return E_FAIL;
 
     if (FAILED(Ready_System()))
@@ -450,6 +456,23 @@ HRESULT CKirby::Ready_Ability()
     return S_OK;
 }
 
+HRESULT CKirby::Ready_Deform()
+{
+    auto Register_Deform = [this](DEFORM_TYPE eType, CKirby_Deform* pNewDeform) -> HRESULT
+        {
+            if (pNewDeform == nullptr)
+                return E_FAIL;
+
+            m_Deformations[eType] = pNewDeform;
+
+            return S_OK;
+        };
+
+    if (FAILED(Register_Deform(DEFORM_TYPE::CAR, CKirby_Deform_Car::Create()))) return E_FAIL;
+
+    return S_OK;
+}
+
 HRESULT CKirby::Bind_ShaderResources()
 {
     return S_OK;
@@ -568,6 +591,11 @@ void CKirby::Free()
     for (auto pair : m_Abilities)
         Safe_Release(pair.second);
     m_Abilities.clear();
+
+    m_pKirby_Deform = nullptr;
+    for (auto pair : m_Deformations)
+        Safe_Release(pair.second);
+    m_Deformations.clear();
 
     m_KirbyColliders.clear();
 

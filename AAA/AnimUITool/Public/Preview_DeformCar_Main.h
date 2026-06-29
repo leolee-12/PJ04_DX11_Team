@@ -77,9 +77,10 @@ private:
 	CShader* m_pKirbyShaderCom = { nullptr };
 	CShader* m_pPBRShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
-	CAnimator* m_pAnimatorCom = { nullptr };
 	CTexture* m_pEyeTextureCom = { nullptr };
 	CTexture* m_pEyeMaskTextureCom = { nullptr };
+
+	CAnimator* m_pAnimatorCom = { nullptr };
 
 	PREVIEW_DEFORMCAR_DESC m_Desc{};
 	KIRBY_EYE_STATE m_eEye = { KIRBY_EYE_STATE::IDLE };

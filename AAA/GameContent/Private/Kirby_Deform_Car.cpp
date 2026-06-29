@@ -1,0 +1,71 @@
+#include "Kirby_Deform_Car.h"
+
+#include "GameInstance.h"
+
+#include "Kirby.h"
+#include "Kirby_Body.h"
+#include "Kirby_State.h"
+
+CKirby_Deform_Car::CKirby_Deform_Car()
+{
+}
+
+HRESULT CKirby_Deform_Car::Initialize()
+{
+    return S_OK;
+}
+
+DEFORM_TYPE CKirby_Deform_Car::Get_AbilityType()
+{
+    return DEFORM_TYPE::CAR;
+}
+
+void CKirby_Deform_Car::Enter_Ability(CKirby* pKirby)
+{
+}
+
+void CKirby_Deform_Car::Update_Ability(CKirby* pKirby, _float fTimeDelta)
+{
+}
+
+void CKirby_Deform_Car::Exit_Ability(CKirby* pKirby)
+{
+}
+
+_bool CKirby_Deform_Car::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
+{
+    return false;
+}
+
+_bool CKirby_Deform_Car::Enter_Attack_KeyDown(CKirby* pKirby)
+{
+    return false;
+}
+
+_bool CKirby_Deform_Car::Enter_Attack_KeyPress(CKirby* pKirby)
+{
+    return false;
+}
+
+_bool CKirby_Deform_Car::Enter_Attack_KeyUp(CKirby* pKirby)
+{
+    return false;
+}
+
+CKirby_Deform_Car* CKirby_Deform_Car::Create()
+{
+    CKirby_Deform_Car* pInstance = new CKirby_Deform_Car();
+
+    if (FAILED(pInstance->Initialize()))
+    {
+        MSG_BOX("Failed to Created: CKirby_Deform_Car");
+        Safe_Release(pInstance);
+    }
+
+    return pInstance;
+}
+
+void CKirby_Deform_Car::Free()
+{
+    __super::Free();
+}
