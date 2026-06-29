@@ -624,13 +624,9 @@ void CGameObject_Factory::Register_NonAnimObject()
 
 void CGameObject_Factory::Register_AnimObject()
 {
-    Register(CLevelDesign_EventObject::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"),
-        CREATOR(CLevelDesign_EventObject),
-        LOADER(                
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CLevelDesign_EventObject::LEVEL1BOSSDEMOBG_MODEL_PROTO_TAG,
-                CModel::Create_WithTextureHub(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/Level1BossDemoBg/Level1BossDemoBg.ysh"));
-          ));
-
+    Register(CLevelDesign_EventObject::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_EventObject),
+        LOADER(TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CLevelDesign_EventObject::LEVEL1BOSSDEMOBG_MODEL_PROTO_TAG,
+            CModel::Create_WithTextureHub(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/Level1BossDemoBg/Level1BossDemoBg.ysh"));));
 }
 
 void CGameObject_Factory::Register_Effect()

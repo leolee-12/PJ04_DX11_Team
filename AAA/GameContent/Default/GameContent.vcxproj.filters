@@ -1495,12 +1495,19 @@
     <ClInclude Include="..\Public\KirbyBomb.h">
       <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb\KirbyBomb</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Monster_RailMovement.h" />
+    <ClInclude Include="..\Public\Ancor_WorkingDirectory.h">
+      <Filter>97. DataSystem</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Monster_RailMovement.h">
       <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Monster_RailMovement.h" />
-    <ClInclude Include="..\Public\Ancor_WorkingDirectory.h">
-      <Filter>97. DataSystem</Filter>
+    <ClInclude Include="..\Public\MeshLayer_Profile.h">
+      <Filter>99. Defines\Leo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MeshLayer_Binder.h">
+      <Filter>99. Defines\Leo</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Monster_RailMovement.h">
       <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
@@ -2132,10 +2139,17 @@
     <ClCompile Include="..\Private\KirbyBomb.cpp">
       <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb\KirbyBomb</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
     <ClCompile Include="..\Private\Monster_RailMovement.cpp">
       <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
+    <ClCompile Include="..\Private\MeshLayer_Binder.cpp">
+      <Filter>99. Defines\Leo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MeshLayer_Profile.cpp">
+      <Filter>99. Defines\Leo</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Monster_RailMovement.cpp">
       <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
     </ClCompile>

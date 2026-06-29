@@ -80,7 +80,7 @@ struct LD_LADDER_DESC : public LD_OBJECT_DESC
 #pragma endregion
 
 #pragma region EventObject
-enum class LD_EVENTOBJECT_RENDER_POLICY
+enum class LD_EVENTOBJECT_POLICY
 {
 	DEFAULT,
 	LEVEL1_BOSS_DEMO_BG,
@@ -96,7 +96,9 @@ struct LD_EVENTOBJECT_DESC : public LD_OBJECT_DESC
 	MODEL           eModelType = MODEL::ANIM;
 	_wstring        wstrModelProtoTag;
 	_string         strAnimNames[LD_ANIM_SLOT_COUNT] = {};
-	LD_EVENTOBJECT_RENDER_POLICY eRenderPolicy = LD_EVENTOBJECT_RENDER_POLICY::DEFAULT;
+	LD_EVENTOBJECT_POLICY ePolicy = LD_EVENTOBJECT_POLICY::DEFAULT;
+	_bool			bUseCollMesh = true;
+	_wstring        strAnimEventFile;
 };
 #pragma endregion
 
