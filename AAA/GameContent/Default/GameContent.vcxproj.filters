@@ -1486,7 +1486,6 @@
     <ClInclude Include="..\Public\BladeKnight_State_TornadoAttack.h">
       <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\State\TornadoAttack</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Monster_RailMovement.h" />
     <ClInclude Include="..\Public\Projectile_Bomb.h">
       <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb</Filter>
     </ClInclude>
@@ -1502,6 +1501,9 @@
     <ClInclude Include="..\Public\Monster_RailMovement.h" />
     <ClInclude Include="..\Public\Ancor_WorkingDirectory.h">
       <Filter>97. DataSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_RailMovement.h">
+      <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2121,7 +2123,6 @@
     <ClCompile Include="..\Private\BladeKnight_State_TornadoAttack.cpp">
       <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\State\TornadoAttack</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
     <ClCompile Include="..\Private\Projectile_Bomb.cpp">
       <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb</Filter>
     </ClCompile>
@@ -2135,6 +2136,9 @@
       <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
+    <ClCompile Include="..\Private\Monster_RailMovement.cpp">
+      <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl">
