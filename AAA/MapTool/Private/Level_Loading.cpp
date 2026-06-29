@@ -35,6 +35,21 @@ void CLevel_Loading::Update(_float fTimeDelta)
     if (false == m_pLoader->isFinished())
         return;
 
+    if (m_pLoader->Has_Failed())
+    {
+        if (!m_bLoadFailureHandled)
+        {
+            char szMessage[128] = {};
+            sprintf_s(szMessage,
+                "MapTool loading failed. Level transition aborted. failed work count: %u\n",
+                m_pLoader->Get_FailedWorkCount());
+            OutputDebugStringA(szMessage);
+            m_bLoadFailureHandled = true;
+        }
+
+        return;
+    }
+
     CLevel* pNextLevel = { nullptr };
     switch (m_eNextLevelID)
     {

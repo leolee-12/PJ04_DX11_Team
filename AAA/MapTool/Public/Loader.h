@@ -26,6 +26,10 @@ public:
 	{
 		return m_iFinishedWorkCount.load() == m_iTotalWorkCount;
 	}
+	_bool	Has_Failed() const
+	{
+		return 0 != m_iFailedWorkCount.load();
+	}
 	_float	Get_Progress() const
 	{
 		return m_iTotalWorkCount ? (_float)m_iFinishedWorkCount.load() / (_float)m_iTotalWorkCount : 1.f;

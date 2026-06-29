@@ -83,6 +83,7 @@ public:
 	_bool Track_EditedMapPreviewSection(const _wstring& strSectionKey, const MAP_ENV_EDITED_DESC& Edit);
 	_bool Clear_EditedMapPreviewSection(const _wstring& strSectionKey);
 	_bool Try_GetMapPreviewSectionEdit(const _wstring& strSectionKey, MAP_ENV_EDITED_DESC* pOutEdit) const;
+	_bool Commit_MapEditObjectFromCurrentState(CGameObject* pObject);
 
 	HRESULT Restore_DeletedMapPreviewEnv(const _wstring& strStableKey);
 	HRESULT Restore_AllDeletedMapPreviewEnv();
