@@ -7,6 +7,8 @@
 NS_BEGIN(Engine)
 class CGameInstance_Proxy;
 class CAnimator;
+
+class CEffect_Container;
 NS_END
 
 NS_BEGIN(Client)
@@ -17,7 +19,8 @@ class CKirby_Body;
 class CLIENT_DLL CKirby_GetDeform final : public CKirby_State
 {
 private:
-	enum DEFORM_STATE { DEFORM, DEFORM_END };
+	
+	enum DEFORM_STATE { SUPER_INHALE_START, SUPER_INHALE_LOOP, DEFORM, DEFORM_END, DEFORM_STATE_END };
 
 	CKirby_GetDeform();
 	virtual ~CKirby_GetDeform() = default;
@@ -37,9 +40,18 @@ public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
 private:
+	void Change_GetDeformState(CKirby* pKirby, DEFORM_STATE eNext);
+	void Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState);
+	void Update_GetDeformState(CKirby* pKirby, _float fTimeDelta);
+	void Exit_GetDeformState(CKirby* pKirby, DEFORM_STATE eState);
+
+private:
 	CGameInstance_Proxy* m_pGameInstance_Proxy = {};
 
 	DEFORM_STATE m_eDeformState{};
+
+	// Effect
+	CEffect_Container* m_pInhaleEffect{};
 
 public:
 	static CKirby_GetDeform* Create();
