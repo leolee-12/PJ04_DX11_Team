@@ -10,8 +10,11 @@ MONSTER_STATE_TYPE CMonster_State_Spat::Get_StateType() { return MONSTER_STATE_T
 
 void CMonster_State_Spat::Enter(MONSTER_STATE_TYPE ePrevState)
 {
-    if (!m_pOwner)
+    if (!m_pOwner || !m_pAnimator)
         return;
+
+    m_fSpinAngle = 0.f;
+    m_bSpinBone = m_pAnimator->Has_Bone("RotL");
 
     m_pOwner->Enable_Controller(false);
     m_pOwner->Enable_Colliders(false);
@@ -20,23 +23,31 @@ void CMonster_State_Spat::Enter(MONSTER_STATE_TYPE ePrevState)
     m_fLifeTime = s_fMaxLifeTime;
 
     if (!m_PlayInfo.strAniName.empty())
-        if (CAnimator* pAnim = m_pOwner->Get_BodyAnimator())
-            pAnim->Play(&m_PlayInfo);
+        m_pAnimator->Play(&m_PlayInfo);
 }
 
 void CMonster_State_Spat::Update(_float fTimeDelta)
 {
-    if (!m_pOwner)
+    if (!m_pOwner || !m_pAnimator)
         return;
 
     CTransform* pT = m_pOwner->Get_Transform();
     _vector vVel = XMLoadFloat3(&m_pOwner->Get_SpatVelocity());
     pT->Set_State(STATE::POSITION,
         pT->Get_State(STATE::POSITION) + vVel * fTimeDelta);
-
     _vector vLook = pT->Get_State(STATE::LOOK);
-    pT->Rotate(XMQuaternionRotationAxis(vLook,
-        XMConvertToRadians(s_fSpinSpeedDeg) * fTimeDelta));
+
+    m_fSpinAngle += s_fSpinSpeedDeg * fTimeDelta;
+
+    if (m_bSpinBone)
+    {
+        m_pAnimator->SetBoneRotation("RotL", m_fSpinAngle, XMVectorSet(0.f, 0.f, 1.f, 0.f));
+    }
+    else
+    {
+        pT->Rotate(XMQuaternionRotationAxis(vLook,
+            XMConvertToRadians(s_fSpinSpeedDeg) * fTimeDelta));
+    }
 
     m_fLifeTime -= fTimeDelta;
     if (m_fLifeTime <= 0.f)
@@ -48,6 +59,8 @@ void CMonster_State_Spat::Exit(MONSTER_STATE_TYPE eNextState)
 {
     if (!m_pOwner)
         return;
+
+    m_bSpinBone = false;
 
     m_pOwner->Enable_ProjectileBox(false);
 }

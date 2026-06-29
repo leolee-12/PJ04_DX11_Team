@@ -43,7 +43,7 @@ void CPoppyBrosJr_Brain::Decide_Internal(const MONSTER_BLACKBOARD& BlackBoard, _
 	const MONSTER_STATE_TYPE eCurState = m_pOwner->Get_StateType();
 
 	const _float fAbsHeight = fabsf(BlackBoard.fHeightToTarget);
-	const _bool bAttackable = (iAIType == 0) ? true : (BlackBoard.fDistToTargetXZ <= 6.f && fAbsHeight < 3.f);
+	const _bool bAttackable = (iAIType == 0) ? true : (BlackBoard.fDistToTargetXZ <= 9.f && fAbsHeight < 3.f);
 
 
 	if (bAttackable && m_fAttackTimer <= 0.f)

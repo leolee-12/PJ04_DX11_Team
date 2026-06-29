@@ -784,6 +784,15 @@
     <Filter Include="02. Component\01. Monster_Movement\00. Rail">
       <UniqueIdentifier>{bc260f59-12f2-4b10-855a-455fabc6411e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Projectile\00. PhysicsProjectile\01. Bomb">
+      <UniqueIdentifier>{a7cbb794-7713-433a-905e-5aad935b8cd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Projectile\00. PhysicsProjectile\01. Bomb\EnemyBomb">
+      <UniqueIdentifier>{93c4d320-e88e-40bc-9168-bf258b792a6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Projectile\00. PhysicsProjectile\01. Bomb\KirbyBomb">
+      <UniqueIdentifier>{7f0b4568-6d0e-492a-b4d1-6b3a075651e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1477,12 +1486,24 @@
     <ClInclude Include="..\Public\BladeKnight_State_TornadoAttack.h">
       <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\State\TornadoAttack</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Projectile_Bomb.h">
+      <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnemyBomb.h">
+      <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb\EnemyBomb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyBomb.h">
+      <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb\KirbyBomb</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Monster_RailMovement.h">
       <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Monster_RailMovement.h" />
     <ClInclude Include="..\Public\Ancor_WorkingDirectory.h">
       <Filter>97. DataSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_RailMovement.h">
+      <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2102,10 +2123,22 @@
     <ClCompile Include="..\Private\BladeKnight_State_TornadoAttack.cpp">
       <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\State\TornadoAttack</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Projectile_Bomb.cpp">
+      <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnemyBomb.cpp">
+      <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb\EnemyBomb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KirbyBomb.cpp">
+      <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb\KirbyBomb</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Monster_RailMovement.cpp">
       <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
+    <ClCompile Include="..\Private\Monster_RailMovement.cpp">
+      <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl">
@@ -2137,6 +2170,9 @@
     </FxCompile>
     <FxCompile Include="..\ShaderFiles\Shader_Gorilla.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_Bomb.hlsl">
+      <Filter>98. ShaderFiles\Hojun</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

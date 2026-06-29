@@ -20,9 +20,12 @@ public:
     virtual void                Exit(MONSTER_STATE_TYPE eNextState) override;
 
 private:
+    _float                      m_fSpinAngle = { 0.f };
     _float                      m_fLifeTime = { 0.f };
     static constexpr _float     s_fMaxLifeTime = 2.5f;
     static constexpr _float     s_fSpinSpeedDeg = 360.f;
+
+    _bool                       m_bSpinBone = { false };
 
 public:
     static CMonster_State_Spat* Create(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f);

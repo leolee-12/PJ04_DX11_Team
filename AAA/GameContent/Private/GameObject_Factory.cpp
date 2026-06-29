@@ -105,6 +105,7 @@
 
 // Projectile
 #include "Projectile_Boulder.h"
+#include "EnemyBomb.h"
 
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
@@ -503,7 +504,7 @@ void CGameObject_Factory::Register_Container()
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Kabu_Body"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Kabu/Kabu.ysh",
-                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+                    XMMatrixScaling(1.6f, 1.6f, 1.6f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 
@@ -534,6 +535,14 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_PoppyBrosJr_Body"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/PoppyBrosJr/Model/PoppyBrosJr.ysh",
                 XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CEnemyBomb::PROTOTYPE_TAG,
+                CEnemyBomb::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CEnemyBomb::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/PoppyBrosJr/EnemyBomb/EnemyBomb.ysh"
+                    , XMMatrixRotationX(XMConvertToRadians(90.f))* XMMatrixRotationY(XMConvertToRadians(180.f))
+                ));
         )
     );
 
