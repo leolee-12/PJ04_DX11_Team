@@ -4,6 +4,7 @@
 
 #include "MainApp.h"
 #include "GameInstance.h"
+#include "Ancor_WorkingDirectory.h"
 
 #define MAX_LOADSTRING 100
 
@@ -28,6 +29,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 #ifdef _DEBUG
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
+    Anchor_WorkingDirectory();
 
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);

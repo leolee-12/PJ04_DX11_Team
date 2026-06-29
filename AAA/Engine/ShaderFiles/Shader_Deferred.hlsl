@@ -5,7 +5,6 @@ float4x4 g_ShadowLightViewMatrix, g_ShadowLightProjMatrix;
 float4x4 g_ViewMatrixInverse, g_ProjMatrixInverse;
 
 float g_fAmbientSaturation = 0.6f;
-float g_fAmbientIntensity = 3.f;
 
   /* G-buffer */
 Texture2D g_Texture; // 디버그용
@@ -20,6 +19,10 @@ Texture2D g_EmissiveTexture; // 이미시브
 vector g_vCamPosition;
 
 TextureCube g_IrradianceCube; // Diffuse_Cube.dds
+TextureCube g_PrefilteredCube; // Specular.dds
+int g_iSpecularMip = 1;
+float3 g_vLightTint = float3(1.72f, 0.82f, 0.41f);
+
 float g_fIBLIntensity = 1.f;
 
   /* Light */
@@ -102,6 +105,14 @@ float3 Fresnel_Rough(float3 F0, float cosT, float rough)
 {
     float3 Fr = max((1.f - rough).xxx, F0);
     return F0 + (Fr - F0) * pow(1.f - cosT, 5.f);
+}
+float2 EnvBRDFApprox(float rough, float NdotV)
+{
+    const float4 c0 = float4(-1.f, -0.0275f, -0.572f, 0.022f);
+    const float4 c1 = float4(1.f, 0.0425f, 1.04f, -0.04f);
+    float4 r = rough * c0 + c1;
+    float a004 = min(r.x * r.x, exp2(-9.28f * NdotV)) * r.x + r.y;
+    return float2(-1.04f, 1.04f) * a004 + r.zw;
 }
 
 // 픽셀 뷰공간 성형깊이 복원용
@@ -211,12 +222,23 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     float lum = dot(irradiance, float3(0.299f, 0.587f, 0.114f));
     irradiance = lerp(lum.xxx, irradiance, g_fAmbientSaturation);
     float3 skyIBL = irradiance * g_fIBLIntensity;
+    // 디퓨즈 IBL
+    float3 diffuseIBL = albedoA.rgb * kD * skyIBL;
 
-    float3 ambientLight = skyIBL;
+// 스페큘러 IBL (prefiltered + split-sum BRDF) - SSR 패스에서 이전
+    float3 R = reflect(-V, N);
+    float mip = roughness * (g_iSpecularMip - 1);
+    float3 prefiltered = g_PrefilteredCube.SampleLevel(LinearSampler, R, mip).rgb * g_fIBLIntensity;
+    float2 envBRDF = EnvBRDFApprox(roughness, NdotV);
+    float3 iblSpec = prefiltered * (F0 * envBRDF.x + envBRDF.y);
+
+// 원작식: (diffIBL + specIBL) * 워밍틴트 * AO
     float occ = ao * g_SSAOTexture.Sample(LinearSampler, In.vTexcoord).r;
-    float occLifted = lerp(0.2f, 1.f, occ); // 0.2 = 바닥(나중에 글로벌화 가능)
-    float3 ambient = albedoA.rgb * kD * ambientLight * occLifted;
-    float3 color = light + ambient;
+    float occLifted = lerp(0.2f, 1.f, occ);
+    float3 ambient = (diffuseIBL + iblSpec) * g_vLightTint * occLifted;
+
+    float3 color = light + ambient; // 직사광(light)은 무틴트
+    
 
       /* 그림자 */
     float4 dd = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);

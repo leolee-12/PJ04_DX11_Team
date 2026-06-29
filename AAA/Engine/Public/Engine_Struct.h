@@ -79,6 +79,7 @@ namespace Engine
 		XMFLOAT4 vFogParams;    
 		XMFLOAT4 vFogParams2;   
 		XMFLOAT4 vGridParams;   
+		XMFLOAT4 vFogParams3;
 	}FROXEL_CB;
 
 	static constexpr unsigned int MESH_LAYER_EX_GROUP_COUNT = 5;

@@ -77,17 +77,17 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
     static const ENV_ENTRY g_EnvTable[] = {
       { 
         TEXT("Grass"), 
-        TEXT("../../Resources/YSH/Env/IBL/Grass/Diffuse.dds"), 
-        TEXT("../../Resources/YSH/Env/IBL/Grass/Specular.dds"),
+        TEXT("../../Resources/YSH/Env/IBL/Stage0_Step1/Diffuse.dds"), 
+        TEXT("../../Resources/YSH/Env/IBL/Stage0_Step1/Specular.dds"),
         TEXT("../../Resources/YSH/Env/LUT/Grass01.dds"),
-        3.f 
+        1.f 
       },
         {
         TEXT("Default"),
         TEXT("../../Resources/YSH/Env/IBL/Default/Diffuse.dds"),
         TEXT("../../Resources/YSH/Env/IBL/Default/Specular.dds"),
         TEXT("../../Resources/YSH/Env/LUT/Default01_01.dds"),
-        3.f
+        1.f
       },
         // 맵 추가 = 행 추가
     };
