@@ -29,6 +29,8 @@ protected:
 
 	virtual void			On_Bounce(_int iCount) override;
 
+	virtual void			On_Explode() override;
+
 
 public:
 	static CEnemyBomb*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

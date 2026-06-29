@@ -36,6 +36,14 @@ void CPoppyBrosJr_State_Throw::Update(_float fTimeDelta)
 	}
 }
 
+void CPoppyBrosJr_State_Throw::Exit(MONSTER_STATE_TYPE eNextState)
+{
+	__super::Exit(eNextState);
+
+	if (m_pOwner)
+		static_cast<CPoppyBrosJr*>(m_pOwner)->Release_Bomb();
+}
+
 void CPoppyBrosJr_State_Throw::Play_AttackAnimation()
 {
 	if (m_pAnimator)

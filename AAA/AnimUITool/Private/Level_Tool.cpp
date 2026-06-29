@@ -130,7 +130,7 @@ HRESULT CLevel_Tool::Ready_Camera()
 
 HRESULT CLevel_Tool::Ready_Grid()
 {
-    m_pGrid = CEdit_Grid::Create(m_pDevice, m_pContext, 400, 1.f);
+    m_pGrid = CEdit_Grid::Create(m_pDevice, m_pContext, 300, 1.f);
     return (m_pGrid == nullptr) ? E_FAIL : S_OK;
 }
 
@@ -138,7 +138,7 @@ HRESULT CLevel_Tool::Ready_TestGround()
 {
     Release_TestGround();
 
-    const _float fHalfSize = 200.f;
+    const _float fHalfSize = 150.f;
 
     const _float3 vPositions[] =
     {

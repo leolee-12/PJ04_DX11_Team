@@ -20,9 +20,35 @@ HRESULT CProjectile_Bomb::Initialize(void* pArg)
         return E_FAIL;
 
     if (m_pMovement)
-        m_pMovement->Set_Physics(-45.f, 0.5f, 0.2f);
+        m_pMovement->Set_Physics(-45.f, 0.3f, 0.90f);
 
     return S_OK;
+}
+
+void CProjectile_Bomb::Update(_float fTimeDelta)
+{
+    if (!m_bAlive)
+        return;
+
+    if (m_bCarried)
+    {
+        Update_Socket();
+        Tick_Visual(fTimeDelta);
+        return;
+    }
+
+    if (m_bFlying)
+    {
+        if (m_pMovement && m_pMovement->Tick(fTimeDelta))
+            On_Bounce(++m_iBounceCount);
+    }
+    else
+        Update_Terminal(fTimeDelta);
+
+    Tick_Visual(fTimeDelta);
+
+    if (m_pHitBox && m_pHitBox->Is_Enabled())
+        m_pHitBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 }
 
 HRESULT CProjectile_Bomb::Render()
@@ -75,10 +101,24 @@ HRESULT CProjectile_Bomb::Render()
             return E_FAIL;
     }
 
-
-
-
     return S_OK;
+}
+
+void CProjectile_Bomb::Despawn()
+{
+    // 사라질 때 발생하는 이펙트 여기에 작성
+
+    Kill();
+}
+
+void CProjectile_Bomb::Bomb_Explode()
+{
+    if (!m_bAlive)
+        return;
+
+    On_Explode();
+
+    Kill();
 }
 
 HRESULT CProjectile_Bomb::Ready_Visual()
@@ -97,6 +137,14 @@ void CProjectile_Bomb::Tick_Visual(_float fTimeDelta)
 
     if (m_pAnimatorCom)
         m_pAnimatorCom->Update(fTimeDelta);
+
+    if (m_pAnimatorCom && m_pAnimatorCom->Is_Overlay_Finished(1))        // FuseBurning 애니메이션을 Base에 깔기
+        Bomb_Explode();
+}
+
+void CProjectile_Bomb::On_Impact()
+{
+    Bomb_Explode();
 }
 
 void CProjectile_Bomb::Roll_ByMovement(_float fTimeDelta)

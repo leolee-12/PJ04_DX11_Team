@@ -6,8 +6,7 @@
 CEnemyBomb::CEnemyBomb(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CProjectile_Bomb { pDevice , pContext }
 {
-	m_fSpeed = 18.f;
-	m_fLifeTime = 4.f;
+	m_fSpeed = 25.f;
 	m_fDamage = 2.f;
 	m_fKnockback = 4.f;
 	m_fHitRadius = 0.5f;
@@ -45,10 +44,27 @@ void CEnemyBomb::On_Activated()
 
 	m_fRollAngle = 0.f;
 	m_pAnimatorCom->Clear_Overlay(1);
-	m_pAnimatorCom->Play("FuseBurning", true);
+
+	m_pAnimatorCom->Play("FuseBurning", false, true);		// 크래쉬 안나게 설정
+
+	// Overlay Animation 
+	CAnimator::LAYER_PLAY_INFO LayerInfo{};
+	LayerInfo.iSlot = 1;
+	LayerInfo.tAnim.strAniName = "FuseBurning";
+	LayerInfo.tAnim.bLoop = false;		// 해당 애니메이션 끝나면 수명 끝이므로 false
+	LayerInfo.tAnim.bRestart = true;
+	LayerInfo.tAnim.fSpeed = 1.25f;
+	LayerInfo.Roots = { "EffectL" };
+
+	m_pAnimatorCom->Apply_Overlay(LayerInfo);
 
 	if (m_bCarried)
+	{
+		// 점화 이펙트 여기에서 부착
+
+		m_pAnimatorCom->Pause_Mask(1);
 		Update_Socket();
+	}
 }
 
 void CEnemyBomb::On_Bounce(_int iCount)
@@ -57,21 +73,22 @@ void CEnemyBomb::On_Bounce(_int iCount)
 	if (iCount != 1 || nullptr == m_pAnimatorCom)
 		return;
 
+	// Base Animation 
 	CAnimator::ANI_PLAY_INFO AniInfo{};
 	AniInfo.strAniName = "DangerGlow";
-	AniInfo.fSpeed = 1.25f;
 	AniInfo.bLoop = true;
+	AniInfo.fSpeed = 1.25f;
 
-	m_pAnimatorCom->Play(&AniInfo);
+	m_pAnimatorCom->Play(&AniInfo);			// Base 애니메이션 설정
+	m_pAnimatorCom->Resume_Mask(1);
+}
 
-	CAnimator::LAYER_PLAY_INFO Info{};
-	Info.iSlot = 1;
-	Info.tAnim.strAniName = "FuseBurning";
-	Info.tAnim.bLoop = false;
-	Info.tAnim.fSpeed = 1.f;
-	Info.Roots = { "EffectL", "FuseM"};
+void CEnemyBomb::On_Explode()
+{
+	_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
 
-	m_pAnimatorCom->Apply_Overlay(Info);
+	// TODO : 폭발 이벤트
+	// TODO 폭발 시 추가 콜라이더 생성 (선택사항)
 }
 
 CEnemyBomb* CEnemyBomb::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -97,6 +114,8 @@ CGameObject* CEnemyBomb::Clone(void* pArg)
 
 	return pInstance;
 }
+
+
 
 void CEnemyBomb::Free()
 {

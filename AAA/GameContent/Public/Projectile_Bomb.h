@@ -21,25 +21,32 @@ protected:
 
 public:
 	virtual HRESULT			Initialize(void* pArg) override;
+	virtual void			Update(_float fTimeDelta) override;		// 기존 수명 방식이 아닌 애니메이션 종료 여부로 수명 주기 따져야 해서 override 
 	virtual HRESULT			Render() override;
+
+	void					Despawn();
+	void					Bomb_Explode();
 
 protected:
 	virtual HRESULT			Ready_Visual() override;
 	virtual void			Tick_Visual(_float fTimeDelta) override;
+
+	virtual void			On_Explode() {}
+	virtual void			On_Impact() override;
 
 private:
 	HRESULT					Bind_ShaderResources();
 	void					Roll_ByMovement(_float fTimeDelta);
 
 protected:
-	CShader*				m_pShaderCom = { nullptr };
-	CModel*					m_pModelCom = { nullptr };
-	CAnimator*				m_pAnimatorCom = { nullptr };
+	CShader* m_pShaderCom = { nullptr };
+	CModel* m_pModelCom = { nullptr };
+	CAnimator* m_pAnimatorCom = { nullptr };
 
 protected:
 	_float					m_fRollAngle = { 0.f };
 	_float3					m_vRollAxis = { 1.f, 0.f, 0.f };
-	static constexpr _float ROLL_DEG_PER_SPEED = { 90.f };
+	static constexpr _float ROLL_DEG_PER_SPEED = { 45.f };
 
 protected:
 	virtual void			Free() override;

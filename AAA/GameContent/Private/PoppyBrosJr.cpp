@@ -92,6 +92,15 @@ CAnimator* CPoppyBrosJr::Get_BodyAnimator() const
 	return m_pBody ? m_pBody->Get_Animator() : nullptr;
 }
 
+void CPoppyBrosJr::Release_Bomb()
+{
+	if (nullptr == m_pHeldBomb)
+		return;
+
+	static_cast<CProjectile_Bomb*>(m_pHeldBomb)->Despawn();
+	m_pHeldBomb = nullptr;
+}
+
 CMonsterBrain* CPoppyBrosJr::Create_Brain()
 {
 	return CPoppyBrosJr_Brain::Create(this);
