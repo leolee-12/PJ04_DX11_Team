@@ -6,7 +6,7 @@ NS_BEGIN(Client)
 
 // 고릴라 투척 돌. ANIM 모델(파괴 클립 + 파편메쉬 내장).
 // 물리(CCT 바운스/이동/수명)는 부모. 여기선 Wait 루프 + 비행 중 LowM 본 회전 + 2바운스 파괴.
-class CLIENT_DLL CProjectile_Boulder final : public CPhysicsProjectile
+class CProjectile_Boulder final : public CPhysicsProjectile
 {
     GENERATED_BODY(CProjectile_Boulder)
 public:

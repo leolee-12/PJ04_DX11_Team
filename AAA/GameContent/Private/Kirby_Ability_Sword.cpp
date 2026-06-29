@@ -11,8 +11,6 @@
 
 #include "Effect_Loader.h"
 
-#include "Sword_SpinSlash.h"
-
 CKirby_Ability_Sword::CKirby_Ability_Sword()
 {
 }
@@ -512,7 +510,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
     {
         BeginHit(false);
         pKirby->Set_RotationLock(true);
-        pAnimator->Play("SuperSpinSlashLoop", false, true, 0.1f, 2.f);
+        pAnimator->Play("SuperSpinSlashLoop", false, true, 0.f, 2.f);
         break;
     }
     case SWORD_STATE::SUPER_SPIN_SLASH_END:
@@ -693,8 +691,25 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, _float fTimeDelta)
                 CEffect_Loader::GetInstance()->Spawn(L"SpinSlash", pKirby->Get_LevelIndex(),
                     _float3(0.f, 1.f, 0.f), _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 0.f),
                     pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pSpinSlash);
-
                 m_pSpinSlash->Set_EffectPartPlay(L"Proto_Common_SpinSlash_1", false);
+
+                CEffect_Loader::GetInstance()->Spawn(L"SpinSlashTrail", pKirby->Get_LevelIndex(),
+                    _float3(0.f, 1.05f, 0.f), _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 0.f),
+                    pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pSpinSlashTrail);
+            }
+
+            if (pAnimator->Get_Progress() >= 0.78f)
+            {
+                if (m_pSpinSlash != nullptr)
+                {
+                    m_pSpinSlash->Start_FadeOut(0.2f);
+                    m_pSpinSlash = nullptr;
+                }
+                if (m_pSpinSlashTrail != nullptr)
+                {
+                    m_pSpinSlashTrail->Start_FadeOut(0.15f);
+                    m_pSpinSlashTrail = nullptr;
+                }
             }
 
             break;
@@ -727,11 +742,15 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, _float fTimeDelta)
             if (bIsAniFinish)
                 Change_SwordState(pKirby, SWORD_STATE::SUPER_SPIN_SLASH_LOOP);
 
-            if (CanPlayEffect(SWORD_EFFECT::SPINSLASH, pAnimator, 0.01f))
+            if (CanPlayEffect(SWORD_EFFECT::SPINSLASH, pAnimator, 0.15f))
             {
                 CEffect_Loader::GetInstance()->Spawn(L"SpinSlash", pKirby->Get_LevelIndex(),
-                    _float3(0.f, 1.f, 0.f), _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 0.f),
+                    _float3(0.f, 1.05f, 0.f), _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 0.f),
                     pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pSpinSlash);
+
+                CEffect_Loader::GetInstance()->Spawn(L"SpinSlashTrail_Super", pKirby->Get_LevelIndex(),
+                    _float3(0.f, 1.05f, 0.f), _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 0.f),
+                    pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pSpinSlashTrail);
             }
             break;
         }
@@ -790,8 +809,6 @@ void CKirby_Ability_Sword::Exit_SwordState(CKirby* pKirby, SWORD_STATE eState)
         case SPIN_SLASH_CHARGE:
             break;
         case SPIN_SLASH:
-            static_cast<CSword_SpinSlash*>(m_pSpinSlash)->Start_FadeOut(0.3f);
-            m_pSpinSlash = nullptr;
             break;
         case SPIN_SLASH_END:
 
@@ -800,8 +817,16 @@ void CKirby_Ability_Sword::Exit_SwordState(CKirby* pKirby, SWORD_STATE eState)
         case SUPER_SPIN_SLASH_START:
             break;
         case SUPER_SPIN_SLASH_LOOP:
-            static_cast<CSword_SpinSlash*>(m_pSpinSlash)->Start_FadeOut(0.3f);
-            m_pSpinSlash = nullptr;
+            if(m_pSpinSlash != nullptr)
+            {
+                m_pSpinSlash->Start_FadeOut(0.2f);
+                m_pSpinSlash = nullptr;
+            }
+            if (m_pSpinSlashTrail != nullptr)
+            {
+                m_pSpinSlashTrail->Start_FadeOut(0.15f);
+                m_pSpinSlashTrail = nullptr;
+            }
             break;
         case SUPER_SPIN_SLASH_END:
             break;

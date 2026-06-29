@@ -7,6 +7,7 @@
 #include "Model.h"
 #include "Preview_Actor.h"
 #include "Preview_Kirby.h"
+#include "Preview_DeformCar.h"
 #include "GameContent_const.h"
 #include "GameObject_Factory.h"
 #include "Loader_Prototype.h"
@@ -129,7 +130,7 @@ HRESULT CLevel_Tool::Ready_Camera()
 
 HRESULT CLevel_Tool::Ready_Grid()
 {
-    m_pGrid = CEdit_Grid::Create(m_pDevice, m_pContext, 100, 1.f);
+    m_pGrid = CEdit_Grid::Create(m_pDevice, m_pContext, 300, 1.f);
     return (m_pGrid == nullptr) ? E_FAIL : S_OK;
 }
 
@@ -137,7 +138,7 @@ HRESULT CLevel_Tool::Ready_TestGround()
 {
     Release_TestGround();
 
-    const _float fHalfSize = 50.f;
+    const _float fHalfSize = 150.f;
 
     const _float3 vPositions[] =
     {
@@ -1369,6 +1370,70 @@ CGameObject* CLevel_Tool::Load_Kirby()
 
     m_pPreview = pObj;
     return pObj;
+}
+
+CGameObject* CLevel_Tool::Load_DeformCar()
+{
+    const _uint iLevel = ETOUI(TOOL_LEVEL::STATIC);
+
+    Clear_Preview();
+
+    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, L"Proto_Shader_Kirby"))
+    {
+        if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
+            iLevel,
+            L"Proto_Shader_Kirby",
+            CShader::Create(
+                m_pDevice,
+                m_pContext,
+                Shader_Kirby.szFileTag,
+                VTXANIMMESH::Elements,
+                VTXANIMMESH::iNumElements))))
+            return nullptr;
+    }
+
+    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, L"Proto_Model_DeformCar"))
+    {
+        if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
+            iLevel,
+            L"Proto_Model_DeformCar",
+            CModel::Create(
+                m_pDevice,
+                m_pContext,
+                MODEL::ANIM,
+                "../../Resources/YSE/DeformCar/DeformCar.ysh",
+                XMMatrixRotationY(XMConvertToRadians(180.f))))))
+            return nullptr;
+    }
+
+    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, CPreview_DeformCar::PROTOTYPE_TAG))
+    {
+        if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
+            iLevel,
+            CPreview_DeformCar::PROTOTYPE_TAG,
+            CPreview_DeformCar::Create(m_pDevice, m_pContext))))
+            return nullptr;
+    }
+
+    CPreview_DeformCar::PREVIEW_DEFORMCAR_DESC Desc{};
+    Desc.iProtoLevel = iLevel;
+    Desc.szKirbyShaderTag = L"Proto_Shader_Kirby";
+    Desc.szPBRShaderTag = L"Proto_Shader_AnimMesh";
+    Desc.szModelTag = L"Proto_Model_DeformCar";
+
+    CGameObject* pObject = nullptr;
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(
+        &pObject,
+        iLevel,
+        CPreview_DeformCar::PROTOTYPE_TAG,
+        ETOUI(TOOL_LEVEL::EDIT),
+        L"Layer_Preview",
+        L"Preview_DeformCar",
+        &Desc)))
+        return nullptr;
+
+    m_pPreview = pObject;
+    return pObject;
 }
 
 void CLevel_Tool::Clear_Preview()

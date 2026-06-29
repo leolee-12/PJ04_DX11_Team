@@ -51,8 +51,13 @@
     <ClInclude Include="..\Public\Common_JumpSlash.h" />
     <ClInclude Include="..\Public\Common_Ring03.h" />
     <ClInclude Include="..\Public\Common_SpinSlash.h" />
+    <ClInclude Include="..\Public\Common_SpinSlashTrail.h" />
+    <ClInclude Include="..\Public\EnemyBomb.h" />
+    <ClInclude Include="..\Public\KirbyBomb.h" />
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h" />
+    <ClInclude Include="..\Public\Sword_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\Monster_RailMovement.h" />
+    <ClInclude Include="..\Public\Projectile_Bomb.h" />
     <ClInclude Include="..\Public\Sword_SpinSlash.h" />
     <ClInclude Include="..\public\PhysicsProjectile.h" />
     <ClInclude Include="..\public\Projectile.h" />
@@ -284,8 +289,13 @@
     <ClCompile Include="..\Private\Common_JumpSlash.cpp" />
     <ClCompile Include="..\Private\Common_Ring03.cpp" />
     <ClCompile Include="..\Private\Common_SpinSlash.cpp" />
+    <ClCompile Include="..\Private\Common_SpinSlashTrail.cpp" />
+    <ClCompile Include="..\Private\EnemyBomb.cpp" />
+    <ClCompile Include="..\Private\KirbyBomb.cpp" />
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp" />
+    <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
+    <ClCompile Include="..\Private\Projectile_Bomb.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlash.cpp" />
     <ClCompile Include="..\private\PhysicsProjectile.cpp" />
     <ClCompile Include="..\private\Projectile.cpp" />
@@ -464,6 +474,7 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_Bomb.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_EnvInstance.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Gorilla.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Kirby.hlsl" />

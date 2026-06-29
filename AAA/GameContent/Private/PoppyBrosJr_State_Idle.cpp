@@ -10,7 +10,7 @@ void CPoppyBrosJr_State_Idle::Update(_float fTimeDelta)
 	const _int iAIType = static_cast<CPoppyBrosJr*>(m_pOwner)->Get_AIType();
 	const MONSTER_BLACKBOARD& BB = m_pOwner->Get_BlackBoard();
 	const _float fAbsHeight = fabsf(BB.fHeightToTarget);
-	const _bool bLookable =  (BB.fDistToTargetXZ <= 7.f && fAbsHeight < 3.f);
+	const _bool bLookable =  (BB.fDistToTargetXZ <= 10.f && fAbsHeight < 3.f);
 
 	if (iAIType != 0)
 	{
