@@ -1,6 +1,5 @@
 #pragma once
 #include "PhysicsProjectile.h"
-#include "Inhalable.h"
 
 NS_BEGIN(Engine)
 class CShader;

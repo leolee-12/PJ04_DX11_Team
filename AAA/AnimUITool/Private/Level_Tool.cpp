@@ -13,6 +13,7 @@
 #include "Loader_Prototype.h"
 #include "ContainerObject.h"
 #include "PartObject.h"
+#include "Map_Loader.h"
 
 #include "UI_Title.h"
 #include "Panel_Manager.h"
@@ -76,6 +77,9 @@ HRESULT CLevel_Tool::Initialize()
         return E_FAIL;
 
     if (FAILED(Ready_PreviewShaders()))
+        return E_FAIL;
+
+    if (FAILED(CMap_Loader::Ready_TexHub(m_pGameInstance_Proxy)))
         return E_FAIL;
 
     return S_OK;

@@ -1,7 +1,7 @@
 #include "EnemyBomb.h"
-#include "Animator.h"
-#include "Model.h"
+#include "GameInstance.h"
 #include "Projectile_Movement.h"
+#include "GameContrnt_Events.h"
 
 CEnemyBomb::CEnemyBomb(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CProjectile_Bomb { pDevice , pContext }
@@ -15,6 +15,51 @@ CEnemyBomb::CEnemyBomb(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 CEnemyBomb::CEnemyBomb(const CEnemyBomb& Prototype)
 	: CProjectile_Bomb ( Prototype ) 
 {
+}
+
+_bool CEnemyBomb::Can_BeInhaled(const INHALE_QUERY& q) const
+{
+	return m_bAlive && !m_bCaptured && !m_bCarried;
+}
+
+void CEnemyBomb::Be_Captured(CGameObject* pInhaler)
+{
+	if (m_bCaptured)
+		return;
+
+	m_bCaptured = true;
+	m_pCaptor = pInhaler;
+
+	if (m_pHitBox)
+		m_pHitBox->Set_Enabled(false);     // 피격 off
+	if (m_pAnimatorCom)
+		m_pAnimatorCom->Pause_Mask(1);		// 도화선 애니메이션 멈추기
+}
+
+void CEnemyBomb::Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed)
+{
+	m_bCaptured = false;
+	m_pCaptor = nullptr;
+}
+
+void CEnemyBomb::On_Swallowed()
+{
+	SWALLOW_EVENT payload{ this };          
+	m_pGameInstance_Proxy->Publish(EVT_SWALLOWED, &payload);
+	m_pCaptor = nullptr;
+	Despawn();
+}
+
+void CEnemyBomb::Update(_float fTimeDelta)
+{
+	if (m_bAlive && m_bCaptured)		// 흡입 중 : 물리/폭발/피격 off
+	{
+		//if (m_pAnimatorCom)
+		//	m_pAnimatorCom->Update(fTimeDelta);
+		return;
+	}
+
+	__super::Update(fTimeDelta);
 }
 
 HRESULT CEnemyBomb::Ready_Visual()
@@ -42,6 +87,7 @@ void CEnemyBomb::On_Activated()
 	if (nullptr == m_pAnimatorCom)
 		return;
 
+	m_bCaptured = false;
 	m_fRollAngle = 0.f;
 	m_pAnimatorCom->Clear_Overlay(1);
 
