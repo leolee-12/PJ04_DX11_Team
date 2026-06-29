@@ -78,8 +78,8 @@ void CKabu::Late_Update(_float fTimeDelta)
 
 _bool CKabu::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
 {
-    Out.fRadius = { 0.5f };
-    Out.fHeight = { 0.20f };
+    Out.fRadius = { 0.85f };
+    Out.fHeight = { 0.40f };
 
     return true;
 }

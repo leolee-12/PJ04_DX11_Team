@@ -90,7 +90,11 @@ void CProjectile::Update(_float fTimeDelta)
     if (!m_bAlive) return;                        // 휴면 early-out (m_bIsPlay 대응)
 
     m_fAccLife += fTimeDelta;
-    if (m_fAccLife >= m_fLifeTime) { Kill(); return; }   // 수명 만료
+    if (m_fAccLife >= m_fLifeTime) 
+    {
+        Kill(); 
+        return; 
+    }   // 수명 만료
 
     _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
     vPos += XMLoadFloat3(&m_vVelocity) * fTimeDelta;

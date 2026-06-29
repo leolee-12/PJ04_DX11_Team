@@ -1,6 +1,7 @@
 #include "PoppyBrosJr.h"
 #include "GameInstance.h"
 #include "Animator.h"
+#include "GameContent_AnimEvents.h"
 
 #include "PoppyBrosJr_Body.h"
 #include "PoppyBrosJr_Brain.h"
@@ -20,6 +21,10 @@
 // Attack ( throw ) 
 #include "PoppyBrosJr_State_Idle.h"
 #include "PoppyBrosJr_State_Throw.h"
+
+#include "Projectile.h"
+#include "Projectile_Manager.h"
+#include "EnemyBomb.h"
 
 CPoppyBrosJr::CPoppyBrosJr(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -181,6 +186,75 @@ HRESULT CPoppyBrosJr::Ready_PartObjects()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+HRESULT CPoppyBrosJr::Ready_AnimEvents()
+{
+	CAnimator* pAnim = Get_BodyAnimator();
+	if (nullptr == pAnim)
+		return E_FAIL;
+
+	pAnim->Set_EventCallback(
+		[this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase)
+		{
+			switch (static_cast<EANIM_EVENT>(e.iEventType))
+			{
+			case EANIM_EVENT::Projectile:
+				if (phase == ANIM_EVENT_PHASE::BEGIN)
+					Attach_Bomb();
+				else if (phase == ANIM_EVENT_PHASE::END)
+					Throw_Bomb();
+				break;
+			default:
+				break;
+			}
+		});
+	return S_OK;
+}
+
+void CPoppyBrosJr::Attach_Bomb()
+{
+	if (m_pHeldBomb)                       // 이미 들고 있으면 스킵
+		return;
+
+	CProjectile* pBomb = nullptr;
+	CProjectile_Manager::GetInstance()->Spawn(
+		Get_LevelIndex(), L"Bomb", CEnemyBomb::PROTOTYPE_TAG, &pBomb);
+	if (nullptr == pBomb)
+		return;
+
+	_matrix matPre = XMMatrixRotationX(XMConvertToRadians(90.f)) *
+		XMMatrixRotationY(XMConvertToRadians(180.f));
+
+	pBomb->Attach_To_Socket(
+		m_pBody->Get_BoneMatrixPtr("RHaveL"),
+		m_pTransformCom->Get_WorldMatrixPtr(),
+		XMMatrixInverse(nullptr, matPre));						// Bake 되어 있던 PreTransform의 역행렬을 곱함
+	m_pHeldBomb = pBomb;
+}
+
+void CPoppyBrosJr::Throw_Bomb()
+{
+	if (nullptr == m_pHeldBomb)
+		return;
+
+	_matrix matHand =
+		XMLoadFloat4x4(m_pBody->Get_BoneMatrixPtr("RHaveL")) *
+		XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+	//_vector vHand = m_pHeldBomb->Get_Transform()->Get_State(STATE::POSITION);
+
+	_vector vHand = matHand.r[3];
+
+	_vector vDir = m_pTransformCom->Get_State(STATE::LOOK);
+	vDir += XMVectorSet(0.f, 3.f, 0.f, 0.f);		// 포물선 높이
+
+	_float3 vP, vD;
+	XMStoreFloat3(&vP, vHand);
+	XMStoreFloat3(&vD, vDir);
+
+	m_pHeldBomb->Launch(vP, vD);
+	m_pHeldBomb = nullptr;
 }
 
 CPoppyBrosJr* CPoppyBrosJr::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
