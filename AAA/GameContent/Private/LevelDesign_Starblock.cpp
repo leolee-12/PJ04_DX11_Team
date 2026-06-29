@@ -5,6 +5,7 @@
 
 #include "GameInstance.h"
 
+
 namespace
 {
 	struct LD_STARBLOCK_CATALOG
@@ -12,12 +13,13 @@ namespace
 		const _tchar* pObjectName;
 		const _tchar* pModelProtoTag;
 		const _char* pModelPath;
+		const _float fRadius;
 	};
 
 	static const LD_STARBLOCK_CATALOG g_BreakableCatalog[] =
 	{
-		{ L"StarBlock", CLevelDesign_Starblock::STARBLOCK_H1W1_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh" },
-		{ L"StarBlockBig", CLevelDesign_Starblock::STARBLOCK_H3W3_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H3W3.ysh" },
+		{ L"StarBlock", CLevelDesign_Starblock::STARBLOCK_H1W1_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh", 0.25f },
+		{ L"StarBlockBig", CLevelDesign_Starblock::STARBLOCK_H3W3_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H3W3.ysh" , 1.f },
 	};
 
 	static const LD_STARBLOCK_CATALOG* Find_BreakableCatalog(const _wstring& wstrObjName)
@@ -63,12 +65,12 @@ namespace
 NS_BEGIN(Client)
 
 CLevelDesign_Starblock::CLevelDesign_Starblock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CLevelDesignObject(pDevice, pContext)
+	: CLDInhalable(pDevice, pContext)
 {
 }
 
 CLevelDesign_Starblock::CLevelDesign_Starblock(const CLevelDesign_Starblock& Prototype)
-	: CLevelDesignObject(Prototype)
+	: CLDInhalable(Prototype)
 	, m_tBreakableDesc(Prototype.m_tBreakableDesc)
 {
 }
@@ -80,9 +82,6 @@ HRESULT CLevelDesign_Starblock::Initialize_Prototype()
 
 HRESULT CLevelDesign_Starblock::Initialize(void* pArg)
 {
-	if (FAILED(__super::Initialize(pArg)))
-		return E_FAIL;
-
 	if (nullptr == pArg)
 	{
 		LD_BREAKABLE_DESC DefaultDesc{};
@@ -96,6 +95,13 @@ HRESULT CLevelDesign_Starblock::Initialize(void* pArg)
 			return E_FAIL;
 	}
 
+	auto* pCatalog = Find_BreakableCatalog(m_tBreakableDesc.strObjectName);
+
+	m_fColliderRadius = pCatalog->fRadius;
+
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
+
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
@@ -107,7 +113,10 @@ HRESULT CLevelDesign_Starblock::Initialize(void* pArg)
 
 void CLevelDesign_Starblock::Late_Update(_float fTimeDelta)
 {
-	UNREFERENCED_PARAMETER(fTimeDelta);
+	if (!m_bActive)
+		return;
+
+	__super::Late_Update(fTimeDelta);
 
 	if (nullptr != m_pModelCom)
 		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
@@ -115,6 +124,9 @@ void CLevelDesign_Starblock::Late_Update(_float fTimeDelta)
 
 HRESULT CLevelDesign_Starblock::Render()
 {
+	if (!m_bActive)
+		return S_OK;
+
 	if (nullptr == m_pModelCom || nullptr == m_pShaderCom)
 		return S_OK;
 
@@ -187,32 +199,7 @@ void CLevelDesign_Starblock::Damaged(const ATTACK_INFO& tInfo)
 {
 	UNREFERENCED_PARAMETER(tInfo);
 	
-	Set_Dead();
-}
-#pragma endregion
-
-#pragma region Damageable
-_bool CLevelDesign_Starblock::Can_BeInhaled(const INHALE_QUERY& q) const
-{
-	return true;
-}
-
-void CLevelDesign_Starblock::Be_Captured(CGameObject* pInhaler)
-{
-}
-
-COPY_ABILITY_TYPE CLevelDesign_Starblock::Get_CopyAbility() const
-{
-	return COPY_ABILITY_TYPE::NONE;
-}
-
-void CLevelDesign_Starblock::Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed)
-{
-}
-
-CGameObject* CLevelDesign_Starblock::Get_GameObject()
-{
-	return this;
+	Set_Active(false);
 }
 #pragma endregion
 

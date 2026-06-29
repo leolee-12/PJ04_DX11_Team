@@ -14,7 +14,7 @@ Texture2D g_NormalTexture; // _n0  KirbyEyeNormal.0X
 float4 g_vBodyColor = float4(1.f, 0.45f, 0.55f, 1.f); // 몸  = KirbySkin 검정 영역
 float4 g_vFootColor = float4(1.f, 0.1882353f, 0.3764706f, 1.f); // 발  = G 채널 초록
 float4 g_vBlushColor = float4(1.f, 0.25f, 0.4f, 1.f); // 홍조 = R 채널 빨강
-float4 g_vDamageColor = float4(1.f, 0.f, 0.f, 1.f); // 피격 플래시
+float4 g_vDamageColor = float4(1.f, 1.f, 1.f, 1.f); // 피격 플래시
 float g_fDamageBlend = 0.f; // 0~1
 float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
 
@@ -141,6 +141,8 @@ PS_OUT PS_BODY(PS_IN In)
     // 3) 입 합성
     float4 vMouth = g_MouthTexture.Sample(ClampSampler, In.vTexcoord1);
     vAlbedo = lerp(vAlbedo, vMouth.rgb, vMouth.a);
+    
+    // vAlbedo = lerp(vAlbedo, g_vDamageColor.rgb, g_fDamageBlend);
     
 
     Out.vDiffuse = float4(vAlbedo, 1.f);

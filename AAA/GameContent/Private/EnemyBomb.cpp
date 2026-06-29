@@ -91,6 +91,10 @@ void CEnemyBomb::On_Explode()
 	// TODO 폭발 시 추가 콜라이더 생성 (선택사항)
 }
 
+void CEnemyBomb::Be_Captured(CGameObject* pInhaler)
+{
+}
+
 CEnemyBomb* CEnemyBomb::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CEnemyBomb* pInstance = new CEnemyBomb(pDevice, pContext);
@@ -115,9 +119,9 @@ CGameObject* CEnemyBomb::Clone(void* pArg)
 	return pInstance;
 }
 
-
-
 void CEnemyBomb::Free()
 {
 	__super::Free();
 }
+
+

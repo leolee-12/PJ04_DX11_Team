@@ -75,7 +75,12 @@ protected:
     _float m_fLifeTime = { 5.f };
     _float m_fDamage = { 1.f };
     _float m_fKnockback = { 8.f };
+
+    _float m_fHitHeight = { 0.05f };
     _float m_fHitRadius = { 0.5f };
+    _float3 m_vCenterOffset = { 0.f, 0.f, 0.f };
+    _float3 m_vRadians = { 0.f, 0.f, 0.f };
+
 
     _bool m_bCarried = { false };
     const _float4x4* m_pSocketBone = { nullptr };

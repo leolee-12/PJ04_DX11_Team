@@ -182,7 +182,7 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
             {
                 if (phase != ANIM_EVENT_PHASE::POINT) break;
 
-                if (e.iIntParam == 0)     
+                if (e.iIntParam == 0)
                 {
                     CProjectile* p = nullptr;
                     const _wstring strKey = e.strParam.empty()
@@ -196,7 +196,7 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
                         m_pHeldRock = p;
                     }
                 }
-                else                      
+                else
                 {
                     if (m_pHeldRock)
                     {
@@ -206,7 +206,7 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
                         _vector vToKirby = XMVectorSetY(vKirby - vHand, 0.f);
                         if (XMVectorGetX(XMVector3LengthSq(vToKirby)) > 1e-6f)
                             vToKirby = XMVector3Normalize(vToKirby);
-                        const _float fFrontOffset = 5.f;           
+                        const _float fFrontOffset = 5.f;
                         _vector vTarget = vKirby - vToKirby * fFrontOffset;
 
                         _float3 vS, vT; XMStoreFloat3(&vS, vHand); XMStoreFloat3(&vT, vTarget);

@@ -94,7 +94,7 @@ void CProjectile_Boulder::Tick_Visual(_float dt)
 
 void CProjectile_Boulder::On_Activated()
 {
-    m_eState = STATE::FLYING;       
+    m_eState = STATE::FLYING;
     m_fSpinAngle = 0.f;             
     if (m_pAnimatorCom)
         m_pAnimatorCom->Play("Wait", true, true);

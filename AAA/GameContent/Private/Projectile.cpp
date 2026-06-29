@@ -36,9 +36,12 @@ HRESULT CProjectile::Ready_HitBox()
 {
     CCollider::COLLIDER_DESC desc{};
     desc.pOwner = this;
+    desc.fHeight = m_fHitHeight;
     desc.fRadius = m_fHitRadius;
+    desc.vCenter = m_vCenterOffset;
+    desc.vRadians = m_vRadians;
 
-    m_pHitBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
+    m_pHitBox = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag,
         TEXT("Com_HitBox"), &desc);
     if (nullptr == m_pHitBox)
         return E_FAIL;

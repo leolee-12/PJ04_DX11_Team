@@ -55,6 +55,7 @@
     <ClInclude Include="..\Public\EnemyBomb.h" />
     <ClInclude Include="..\Public\KirbyBomb.h" />
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h" />
+    <ClInclude Include="..\public\LDInhalable.h" />
     <ClInclude Include="..\Public\Sword_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\Monster_RailMovement.h" />
     <ClInclude Include="..\Public\Projectile_Bomb.h" />
@@ -293,6 +294,7 @@
     <ClCompile Include="..\Private\EnemyBomb.cpp" />
     <ClCompile Include="..\Private\KirbyBomb.cpp" />
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp" />
+    <ClCompile Include="..\private\LDInhalable.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
     <ClCompile Include="..\Private\Projectile_Bomb.cpp" />
