@@ -81,8 +81,6 @@ void CKirby::Update(_float fTimeDelta)
 {
     XMStoreFloat3(&m_vWishDir, XMVectorZero());
 
-    __super::Update(fTimeDelta);
-
     Update_Timer(fTimeDelta);
 
     m_pKirby_InputManager->Update_KirbyInput(fTimeDelta);
@@ -104,6 +102,8 @@ void CKirby::Update(_float fTimeDelta)
     }
 
     m_pMovement->Update_RigidBody(fTimeDelta);
+
+    __super::Update(fTimeDelta);
 }
 
 void CKirby::Late_Update(_float fTimeDelta)
@@ -191,13 +191,13 @@ CKirby_OnOffPart* CKirby::Find_OnOffPart(const wchar_t* PartTag)
     return nullptr;
 }
 
-CKirby_Form* CKirby::Get_DeformPart(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType)
+CKirby_Deform_Model* CKirby::Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType)
 {
-    auto Find_Form = [this](const wchar_t* PartTag)->CKirby_Form*
+    auto Find_Form = [this](const wchar_t* PartTag)->CKirby_Deform_Model*
         {
             auto iter = m_PartObjects.find(PartTag);
             if (iter != m_PartObjects.end())
-                return dynamic_cast<CKirby_Form*>(iter->second);
+                return dynamic_cast<CKirby_Deform_Model*>(iter->second);
 
             return nullptr;
         };

@@ -1,4 +1,4 @@
-#include "Kirby_Form.h"
+#include "Kirby_Deform_Model.h"
 
 #include "GameInstance.h"
 
@@ -6,22 +6,22 @@
 
 #include "Animator.h"
 
-CKirby_Form::CKirby_Form(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CKirby_Deform_Model::CKirby_Deform_Model(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPartObject(pDevice, pContext)
 {
 }
 
-CKirby_Form::CKirby_Form(const CKirby_Form& Prototype)
+CKirby_Deform_Model::CKirby_Deform_Model(const CKirby_Deform_Model& Prototype)
     : CPartObject(Prototype) {
 }
 
-HRESULT CKirby_Form::Initialize_Prototype()
+HRESULT CKirby_Deform_Model::Initialize_Prototype()
 {
     m_eProjType = PROJ_TYPE::PERSPEC;
     return S_OK;
 }
 
-HRESULT CKirby_Form::Initialize(void* pArg)
+HRESULT CKirby_Deform_Model::Initialize(void* pArg)
 {
     KIRBY_FORM_DESC* pDesc = static_cast<KIRBY_FORM_DESC*>(pArg);
 
@@ -31,24 +31,24 @@ HRESULT CKirby_Form::Initialize(void* pArg)
     return S_OK;
 }
 
-void CKirby_Form::Priority_Update(_float fTimeDelta)
+void CKirby_Deform_Model::Priority_Update(_float fTimeDelta)
 {
 }
 
-void CKirby_Form::Update(_float fTimeDelta)
+void CKirby_Deform_Model::Update(_float fTimeDelta)
 {
 }
 
-void CKirby_Form::Late_Update(_float fTimeDelta)
+void CKirby_Deform_Model::Late_Update(_float fTimeDelta)
 {
 }
 
-HRESULT CKirby_Form::Render()
+HRESULT CKirby_Deform_Model::Render()
 {
     return S_OK;
 }
 
-const _float4x4* CKirby_Form::Get_BoneMatrixPtr(const _char* pBoneName) const
+const _float4x4* CKirby_Deform_Model::Get_BoneMatrixPtr(const _char* pBoneName) const
 {
     if (m_pModelCom == nullptr)
     {
@@ -59,7 +59,7 @@ const _float4x4* CKirby_Form::Get_BoneMatrixPtr(const _char* pBoneName) const
     return m_pModelCom->Get_BoneMatrixPtr(pBoneName);
 }
 
-HRESULT CKirby_Form::Bind_ShaderResources(CShader* pShader)
+HRESULT CKirby_Deform_Model::Bind_ShaderResources(CShader* pShader)
 {
     if (pShader == nullptr)
     {
@@ -80,7 +80,7 @@ HRESULT CKirby_Form::Bind_ShaderResources(CShader* pShader)
     return S_OK;
 }
 
-HRESULT CKirby_Form::Render_PBRMesh(_uint iMeshIndex)
+HRESULT CKirby_Deform_Model::Render_PBRMesh(_uint iMeshIndex)
 {
     if (m_pPBRShaderCom == nullptr)
     {
@@ -109,7 +109,7 @@ HRESULT CKirby_Form::Render_PBRMesh(_uint iMeshIndex)
     return S_OK;
 }
 
-void CKirby_Form::Free()
+void CKirby_Deform_Model::Free()
 {
     __super::Free();
 }

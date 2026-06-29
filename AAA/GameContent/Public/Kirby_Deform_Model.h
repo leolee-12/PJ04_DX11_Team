@@ -15,9 +15,9 @@ NS_BEGIN(Client)
 
 enum class KIRBY_EYE_STATE { IDLE, DOUBT, BLINK, CLOSE, ANGRY, SURPRISED, SADNESS, END };
 
-class CKirby_Form abstract : public CPartObject
+class CKirby_Deform_Model abstract : public CPartObject
 {
-	GENERATED_BODY_ABSTRACT(CKirby_Form)
+	GENERATED_BODY_ABSTRACT(CKirby_Deform_Model)
 
 public:
 	struct KIRBY_FORM_DESC : public CPartObject::PARTOBJECT_DESC
@@ -25,9 +25,9 @@ public:
 	};
 
 protected:
-	CKirby_Form(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CKirby_Form(const CKirby_Form& Prototype);
-	virtual ~CKirby_Form() = default;
+	CKirby_Deform_Model(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CKirby_Deform_Model(const CKirby_Deform_Model& Prototype);
+	virtual ~CKirby_Deform_Model() = default;
 
 protected:
 	virtual HRESULT Initialize_Prototype() override;

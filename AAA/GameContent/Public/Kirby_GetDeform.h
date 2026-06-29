@@ -17,6 +17,8 @@ class CKirby_Body;
 class CLIENT_DLL CKirby_GetDeform final : public CKirby_State
 {
 private:
+	enum DEFORM_STATE { DEFORM, DEFORM_END };
+
 	CKirby_GetDeform();
 	virtual ~CKirby_GetDeform() = default;
 
@@ -36,6 +38,8 @@ public:
 
 private:
 	CGameInstance_Proxy* m_pGameInstance_Proxy = {};
+
+	DEFORM_STATE m_eDeformState{};
 
 public:
 	static CKirby_GetDeform* Create();

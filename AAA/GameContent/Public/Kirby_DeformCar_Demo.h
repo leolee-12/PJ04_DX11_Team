@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Kirby_Form.h"
+#include "Kirby_Deform_Model.h"
 
 NS_BEGIN(Engine)
 class CShader;
@@ -11,12 +11,12 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CKirby_DeformCar_Demo final : public CKirby_Form
+class CKirby_DeformCar_Demo final : public CKirby_Deform_Model
 {
 	GENERATED_BODY(CKirby_DeformCar_Demo)
 
 public:
-	struct KIRBY_DEFORMCAR_DEMO_DESC : public CKirby_Form::KIRBY_FORM_DESC
+	struct KIRBY_DEFORMCAR_DEMO_DESC : public CKirby_Deform_Model::KIRBY_FORM_DESC
 	{
 	};
 
@@ -43,11 +43,13 @@ public:
 
 private:
 	HRESULT Ready_Components();
+	HRESULT Ready_AnimEvents();
 
 	virtual HRESULT Render_KirbyMesh(_uint iMeshIndex) override;
 
 private:
 	_bool m_bBodyAOn{ true };
+	_bool m_bBodyBOn{ false };
 
 public:
 	static CKirby_DeformCar_Demo* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

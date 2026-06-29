@@ -24,7 +24,7 @@ protected:
 	HRESULT Initialize();
 
 public:
-	virtual DEFORM_TYPE Get_AbilityType() = 0;
+	virtual DEFORM_TYPE Get_DeformType() = 0;
 
 	virtual void Enter_Ability(CKirby* pKirby) = 0;
 	virtual void Update_Ability(CKirby* pKirby, _float fTimeDelta) = 0;

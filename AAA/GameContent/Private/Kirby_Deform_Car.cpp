@@ -15,7 +15,7 @@ HRESULT CKirby_Deform_Car::Initialize()
     return S_OK;
 }
 
-DEFORM_TYPE CKirby_Deform_Car::Get_AbilityType()
+DEFORM_TYPE CKirby_Deform_Car::Get_DeformType()
 {
     return DEFORM_TYPE::CAR;
 }

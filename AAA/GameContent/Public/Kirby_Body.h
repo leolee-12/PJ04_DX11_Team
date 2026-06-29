@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Kirby_Form.h"
+#include "Kirby_Deform_Model.h"
 
 NS_BEGIN(Engine)
 class CShader;
@@ -17,12 +17,12 @@ enum class KIRBY_MESH { BODY_BIG, BODY, BODY_VACUUM,
 enum class KIRBY_BODY_STATE { NORMAL, STUFFED, INHALE, END };
 enum class KIRBY_MOUTH_STATE { IDLE, OPEN, ANGRY, SMILE_OPEN, SMILE_CLOSE, END };
 
-class CKirby_Body final : public CKirby_Form
+class CKirby_Body final : public CKirby_Deform_Model
 {
 	GENERATED_BODY(CKirby_Body)
 
 public:
-	struct KIRBY_BODY_DESC : public CKirby_Form::KIRBY_FORM_DESC
+	struct KIRBY_BODY_DESC : public CKirby_Deform_Model::KIRBY_FORM_DESC
 	{
 	};
 
@@ -54,6 +54,7 @@ public:
 
 private:
 	HRESULT Ready_Components();
+	HRESULT Ready_AnimEvents();
 
 	HRESULT Set_VisibleMeshes();
 

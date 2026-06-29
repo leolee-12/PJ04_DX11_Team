@@ -55,7 +55,7 @@
     <ClInclude Include="..\Public\Kirby_DeformCar_Main.h" />
     <ClInclude Include="..\Public\Kirby_Deform_Car.h" />
     <ClInclude Include="..\Public\Kirby_Deform.h" />
-    <ClInclude Include="..\Public\Kirby_Form.h" />
+    <ClInclude Include="..\Public\Kirby_Deform_Model.h" />
     <ClInclude Include="..\Public\Kirby_GetDeform.h" />
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h" />
     <ClInclude Include="..\Public\Sword_SpinSlashTrail.h" />
@@ -296,7 +296,7 @@
     <ClCompile Include="..\Private\Kirby_DeformCar_Main.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform_Car.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform.cpp" />
-    <ClCompile Include="..\Private\Kirby_Form.cpp" />
+    <ClCompile Include="..\Private\Kirby_Deform_Model.cpp" />
     <ClCompile Include="..\Private\Kirby_GetDeform.cpp" />
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp" />

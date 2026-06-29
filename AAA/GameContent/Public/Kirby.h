@@ -27,7 +27,7 @@ class CKirby_Ability;
 class CKirby_Body;
 class CKirby_OnOffPart;
 
-class CKirby_Form;
+class CKirby_Deform_Model;
 class CKirby_Deform;
 
 enum class KIRBY_DEFORM_MODEL_TYPE { DEMO, MAIN };
@@ -95,7 +95,7 @@ public:
 	void OnOffParts(COPY_ABILITY_TYPE eAbilityType, _bool bOn, _bool bOnlyWeapon = false);
 	CKirby_OnOffPart* Find_OnOffPart(const wchar_t* PartTag);
 
-	CKirby_Form* Get_DeformPart(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType);
+	CKirby_Deform_Model* Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType = KIRBY_DEFORM_MODEL_TYPE::MAIN);
 
 	// Movement
 	void Add_MoveDir(const _float3& vWishDir);

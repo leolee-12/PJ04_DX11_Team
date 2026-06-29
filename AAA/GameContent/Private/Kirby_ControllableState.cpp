@@ -64,6 +64,24 @@ _bool CKirby_ControllableState::Handle_Command(CKirby* pKirby, CKirby_Command* p
 
             return true;
         }
+
+        case KIRBY_COMMAND_TYPE::ATTACK:
+        {
+            if (GetAsyncKeyState('F') & 0x8000)
+            {
+                if (!pCommand->IsDown())
+                    return false;
+
+                if (pKirby->Get_KirbyDeform() != nullptr)
+                    return false;
+
+                pKirby->Change_State(KIRBY_STATE_TYPE::GET_DEFORM);
+
+                return true;
+            }
+
+            return false;
+        }
     }
 
     return false;

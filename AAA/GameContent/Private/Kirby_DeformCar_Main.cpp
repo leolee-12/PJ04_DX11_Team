@@ -5,12 +5,12 @@
 #include "GameContent_const.h"
 
 CKirby_DeformCar_Main::CKirby_DeformCar_Main(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CKirby_Form(pDevice, pContext)
+    : CKirby_Deform_Model(pDevice, pContext)
 {
 }
 
 CKirby_DeformCar_Main::CKirby_DeformCar_Main(const CKirby_DeformCar_Main& Prototype)
-    : CKirby_Form(Prototype) {
+    : CKirby_Deform_Model(Prototype) {
 }
 
 HRESULT CKirby_DeformCar_Main::Initialize_Prototype()
@@ -32,8 +32,6 @@ HRESULT CKirby_DeformCar_Main::Initialize(void* pArg)
         return E_FAIL;
 
     m_bActive = false;
-
-    m_pAnimatorCom->Play("Boost", true, true);
 
     return S_OK;
 }

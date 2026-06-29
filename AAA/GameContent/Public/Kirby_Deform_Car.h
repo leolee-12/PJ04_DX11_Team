@@ -19,7 +19,7 @@ private:
 	HRESULT Initialize();
 
 public:
-	virtual DEFORM_TYPE Get_AbilityType() override;
+	virtual DEFORM_TYPE Get_DeformType() override;
 
 	virtual void Enter_Ability(CKirby* pKirby) override;
 	virtual void Update_Ability(CKirby* pKirby, _float fTimeDelta) override;

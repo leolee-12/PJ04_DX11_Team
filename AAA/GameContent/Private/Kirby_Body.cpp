@@ -5,12 +5,12 @@
 #include "GameContent_const.h"
 
 CKirby_Body::CKirby_Body(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CKirby_Form(pDevice, pContext)
+    : CKirby_Deform_Model(pDevice, pContext)
 {
 }
 
 CKirby_Body::CKirby_Body(const CKirby_Body& Prototype)
-    : CKirby_Form(Prototype){
+    : CKirby_Deform_Model(Prototype){
 }
 
 HRESULT CKirby_Body::Initialize_Prototype()
@@ -29,6 +29,9 @@ HRESULT CKirby_Body::Initialize(void* pArg)
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
+        return E_FAIL;
+
+    if (FAILED(Ready_AnimEvents()))
         return E_FAIL;
     
     m_pAnimatorCom->Play("Wait", true, true);
@@ -109,12 +112,59 @@ HRESULT CKirby_Body::Ready_Components()
     /* For.Com_Animator */
     CAnimator::ANIMATOR_DESC AnimDesc{};
     AnimDesc.pModel = m_pModelCom;
-    //AnimDesc.strDataFile = TEXT("../Bin/Resources/Test/Test/Marb1e/Marb1e_animevents.json");
+    AnimDesc.strDataFile = L"../../Resources/YSE/Kirby/Kirby_AnimEvents.json";
 
     m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
 
     if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
         return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT CKirby_Body::Ready_AnimEvents()
+{
+    m_pAnimatorCom->Set_EventCallback(
+        [this](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+        {
+            switch (static_cast<EANIM_EVENT>(e.iEventType))
+            {
+                case EANIM_EVENT::SetEye:
+                {
+                    if (ePhase != ANIM_EVENT_PHASE::POINT)
+                        break;
+
+                    switch (static_cast<KIRBY_EYE_STATE>(e.iIntParam))
+                    {
+                        case KIRBY_EYE_STATE::IDLE:      Set_KirbyEye(KIRBY_EYE_STATE::IDLE);      break;
+                        case KIRBY_EYE_STATE::DOUBT:     Set_KirbyEye(KIRBY_EYE_STATE::DOUBT);     break;
+                        case KIRBY_EYE_STATE::BLINK:     Set_KirbyEye(KIRBY_EYE_STATE::BLINK);     break;
+                        case KIRBY_EYE_STATE::CLOSE:     Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);     break;
+                        case KIRBY_EYE_STATE::ANGRY:     Set_KirbyEye(KIRBY_EYE_STATE::ANGRY);     break;
+                        case KIRBY_EYE_STATE::SURPRISED: Set_KirbyEye(KIRBY_EYE_STATE::SURPRISED); break;
+                        case KIRBY_EYE_STATE::SADNESS:   Set_KirbyEye(KIRBY_EYE_STATE::SADNESS);   break;
+                    }
+
+                    break;
+                }
+
+                case EANIM_EVENT::SetBody:
+                {
+                    if (ePhase != ANIM_EVENT_PHASE::POINT)
+                        break;
+
+                    switch (static_cast<KIRBY_BODY_STATE>(e.iIntParam))
+                    {
+                        case KIRBY_BODY_STATE::NORMAL:  Set_KirbyBody(KIRBY_BODY_STATE::NORMAL);  break;
+                        case KIRBY_BODY_STATE::STUFFED: Set_KirbyBody(KIRBY_BODY_STATE::STUFFED); break;
+                        case KIRBY_BODY_STATE::INHALE:  Set_KirbyBody(KIRBY_BODY_STATE::INHALE);  break;
+                    }
+
+                    break;
+                }
+            }
+        }
+    );
 
     return S_OK;
 }

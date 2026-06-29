@@ -5,12 +5,12 @@
 #include "GameContent_const.h"
 
 CKirby_DeformCar_Demo::CKirby_DeformCar_Demo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CKirby_Form(pDevice, pContext)
+    : CKirby_Deform_Model(pDevice, pContext)
 {
 }
 
 CKirby_DeformCar_Demo::CKirby_DeformCar_Demo(const CKirby_DeformCar_Demo& Prototype)
-    : CKirby_Form(Prototype) {
+    : CKirby_Deform_Model(Prototype) {
 }
 
 HRESULT CKirby_DeformCar_Demo::Initialize_Prototype()
@@ -31,9 +31,10 @@ HRESULT CKirby_DeformCar_Demo::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
-    m_bActive = false;
+    if (FAILED(Ready_AnimEvents()))
+        return E_FAIL;
 
-    m_pAnimatorCom->Play("Deform", true, true);
+    m_bActive = false;
 
     return S_OK;
 }
@@ -79,7 +80,8 @@ HRESULT CKirby_DeformCar_Demo::Render()
         if (FAILED(Render_KirbyMesh(DEFORMCAR_DEMO_MESH::BODY_A)))
             return E_FAIL;
     }
-    else
+
+    if (m_bBodyBOn)
     {
         if (FAILED(Render_KirbyMesh(DEFORMCAR_DEMO_MESH::BODY_B)))
             return E_FAIL;
@@ -114,11 +116,38 @@ HRESULT CKirby_DeformCar_Demo::Ready_Components()
     /* For.Com_Animator */
     CAnimator::ANIMATOR_DESC AnimDesc{};
     AnimDesc.pModel = m_pModelCom;
+    AnimDesc.strDataFile = TEXT("../../Resources/YSE/DeformCar/Demo_AnimEvents.json");
 
     m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
 
     if (m_pAnimatorCom == nullptr || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
         return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT CKirby_DeformCar_Demo::Ready_AnimEvents()
+{
+    m_pAnimatorCom->Set_EventCallback(
+        [this](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+        {
+            switch (static_cast<EANIM_EVENT>(e.iEventType))
+            {
+                case EANIM_EVENT::OnOffMesh:
+                    if(e.iIntParam == 0)
+                    {
+                        m_bBodyAOn = true;
+                        m_bBodyBOn = false;
+                    }
+                    else if (e.iIntParam == 1)
+                    {
+                        m_bBodyAOn = false;
+                        m_bBodyBOn = true;
+                    }
+                    break;
+            }
+        }
+    );
 
     return S_OK;
 }
