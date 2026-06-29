@@ -142,6 +142,7 @@ private:
 private:
 	void Load_MeshLayers(const _char* pModelFilePath);
 	HRESULT Cook_CollisionMesh(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix);
+	HRESULT Cook_CollisionAnimMesh(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix);
 
 public:
 	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix = XMMatrixIdentity(), PickableFilter fcFillter = nullptr);
