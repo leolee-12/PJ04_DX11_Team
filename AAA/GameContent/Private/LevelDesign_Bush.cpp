@@ -1,6 +1,6 @@
 #include "LevelDesign_Bush.h"
 #include "LevelDesign_Registry.h"
-#include "Shader_PassMeta.h"
+#include "MeshLayer_Binder.h"
 #include "Parsing_Utils.h"
 
 #include "GameInstance.h"
@@ -98,9 +98,6 @@ void CLevelDesign_Bush::Late_Update(_float fTimeDelta)
 
 HRESULT CLevelDesign_Bush::Render()
 {
-	if (nullptr == m_pModelComs[m_eState] || nullptr == m_pShaderComs[m_eState])
-		return S_OK;
-
 	if (FAILED(Bind_ShaderResources(m_eState)))
 		return E_FAIL;
 
@@ -166,9 +163,15 @@ CGameObject* CLevelDesign_Bush::Create_Prototype(ID3D11Device* pDevice, ID3D11De
 
 HRESULT CLevelDesign_Bush::Validate_Desc()
 {
+	if (m_tBushDesc.eCategory != LD_CATEGORY::FOLIAGE)
+		return E_FAIL;
 	if (m_tBushDesc.wstrBasicProtoTag.empty())
 		return E_FAIL;
 	if (m_tBushDesc.wstrCutProtoTag.empty())
+		return E_FAIL;
+	if (MODEL::ANIM != m_tBushDesc.eBasicType)
+		return E_FAIL;
+	if (MODEL::NONANIM != m_tBushDesc.eCutType)
 		return E_FAIL;
 
 	return S_OK;
@@ -251,31 +254,29 @@ HRESULT CLevelDesign_Bush::Render_Model(BUSH_STATE eSlot)
 	{
 		const MESH_LAYER_IDX& Layer = pModel->Get_MeshLayer(i);
 
-		auto BindMaterial = [&](const _char* pConstantName, MTEX_TYPE eType, DEFAULT_TEXTURE eDefaultKind) -> HRESULT
-			{
-				const _uint iLayerIndex = MTEX_TYPE::UNKNOWN == eType ? 3u : Layer.idx[ETOUI(eType)];
-				const _uint iTextureCount = pModel->Get_MeshTextureCount(i, eType);
-
-				if (0u < iTextureCount)
-				{
-					const _uint iSafeIndex = (iLayerIndex < iTextureCount) ? iLayerIndex : (iTextureCount - 1u);
-
-					if (SUCCEEDED(pModel->Bind_Material(pShader, pConstantName, i, eType, iSafeIndex)))
-						return S_OK;
-				}
-
-				return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(pShader, pConstantName, eDefaultKind);
-			};
-
-		//if (FAILED(BindMaterial("g_DiffuseTexture", MTEX_TYPE::DIFFUSE, DEFAULT_TEXTURE::MAGENTA)))	return E_FAIL;
-		if (FAILED(BindMaterial("g_NormalTexture", MTEX_TYPE::NORMALS, DEFAULT_TEXTURE::FLAT_NORMAL)))	return E_FAIL;
-		//if (FAILED(BindMaterial("g_MRATexture", MTEX_TYPE::METALNESS, DEFAULT_TEXTURE::MRA)))			return E_FAIL;
-		if (FAILED(BindMaterial("g_UnknownTexture", MTEX_TYPE::UNKNOWN, DEFAULT_TEXTURE::BLACK)))		return E_FAIL;
-
 		if (MODEL::ANIM == eModelType)
 		{
-			if (FAILED(pModel->Bind_BoneMatrices(pShader, "g_BoneMatrices", i)))
-				return E_FAIL;
+			auto BindMaterial = [&](const _char* pConstantName, MTEX_TYPE eType, DEFAULT_TEXTURE eDefaultKind) -> HRESULT
+				{
+					const _uint iLayerIndex = Layer.idx[ETOUI(eType)];
+					const _uint iTextureCount = pModel->Get_MeshTextureCount(i, eType);
+
+					if (0u < iTextureCount)
+					{
+						const _uint iSafeIndex = (iLayerIndex < iTextureCount) ? iLayerIndex : (iTextureCount - 1u);
+
+						if (SUCCEEDED(pModel->Bind_Material(pShader, pConstantName, i, eType, iSafeIndex)))
+							return S_OK;
+					}
+
+					return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(pShader, pConstantName, eDefaultKind);
+				};
+
+			if (FAILED(BindMaterial("g_NormalTexture", MTEX_TYPE::NORMALS, DEFAULT_TEXTURE::FLAT_NORMAL)))	return E_FAIL;
+			if (FAILED(BindMaterial("g_UnknownTexture", MTEX_TYPE::UNKNOWN, DEFAULT_TEXTURE::BLACK)))		return E_FAIL;
+
+				if (FAILED(pModel->Bind_BoneMatrices(pShader, "g_BoneMatrices", i)))
+					return E_FAIL;
 
 			const _uint iBushPass = 4u;
 
@@ -284,15 +285,25 @@ HRESULT CLevelDesign_Bush::Render_Model(BUSH_STATE eSlot)
 		}
 		else
 		{
-			const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
-			_uint iFlags = Layer.iFlags;
-			_float fDissolve = 0.f;
+			MESH_LAYER_BIND_CONTEXT Ctx{};
+			Ctx.pShader = pShader;
+			Ctx.pModel = pModel;
+			Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+			Ctx.iMesh = i;
+			Ctx.pLayer = &Layer;
+			Ctx.eProfile = MESH_LAYER_PROFILE::NONANIM_PBR;
+			Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
+			Ctx.iFallbackPass = ShaderPass::NonAnimPBR::UMN;
+			Ctx.fDissolve = 0.f;
 
-			if (FAILED(pShader->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint))))			return E_FAIL;
-			if (FAILED(pShader->Bind_RawValue("g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))	return E_FAIL;
-			if (FAILED(pShader->Bind_RawValue("g_fDissolve", &fDissolve, sizeof(_float))))		return E_FAIL;
+			MESH_LAYER_BIND_RESULT Result{};
+			if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
+				return E_FAIL;
 
-			if (FAILED(pShader->Begin(ShaderPass::NonAnimPBR::UMN)))
+			if (Result.bSkipMesh)
+				continue;
+
+			if (FAILED(pShader->Begin(Result.iPass)))
 				return E_FAIL;
 		}
 

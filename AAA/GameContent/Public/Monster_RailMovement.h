@@ -15,7 +15,7 @@ protected:
 
 public:
     virtual HRESULT                 Initialize_Prototype() override;
-    virtual HRESULT                 Initialize(void* pArg) override;
+    virtual HRESULT                 Initialize(void* pArg) override; 
 
 public:
     void                            Set_Rail(const LD_RAIL_DESC& Desc);
