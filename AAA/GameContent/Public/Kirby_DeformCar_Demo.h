@@ -21,6 +21,7 @@ public:
 	};
 
 	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_Kirby_DeformCar_Demo";
+	static constexpr const wchar_t* Kirby_PartTag = L"Deform_Car_Demo";
 
 private:
 	enum DEFORMCAR_DEMO_MESH { LIMBS, BODY_A, BODY_B, DEFORMCAR_DEMO_MESH_END };

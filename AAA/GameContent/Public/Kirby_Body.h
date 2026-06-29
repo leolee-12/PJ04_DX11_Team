@@ -27,6 +27,7 @@ public:
 	};
 
 	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_Kirby_Body";
+	static constexpr const wchar_t* Kirby_PartTag = L"Body";
 
 private:
 	CKirby_Body(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

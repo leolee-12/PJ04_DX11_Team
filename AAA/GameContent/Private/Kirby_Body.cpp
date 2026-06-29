@@ -42,6 +42,9 @@ void CKirby_Body::Priority_Update(_float fTimeDelta)
 
 void CKirby_Body::Update(_float fTimeDelta)
 {
+    if (m_bActive == false)
+        return;
+
     if (m_pGameInstance_Proxy->Is_EditMode())
         return;
 
@@ -50,6 +53,9 @@ void CKirby_Body::Update(_float fTimeDelta)
 
 void CKirby_Body::Late_Update(_float fTimeDelta)
 {
+    if (m_bActive == false)
+        return;
+
     CPartObject::Compute_CombinedWorldMatrix(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
@@ -69,33 +75,6 @@ HRESULT CKirby_Body::Render()
     {
         if (i >= m_VisibleMeshes.size() || m_VisibleMeshes[i] == false)
             continue;
-
-        //if (FAILED(m_pEyeTextureCom->Bind_ShaderResource(m_pKirbyShaderCom, "g_EyeTexture", ETOUI(m_eEye))))
-        //    return E_FAIL;
-        //if (FAILED(m_pEyeMaskTextureCom->Bind_ShaderResource(m_pKirbyShaderCom, "g_EyeMaskTexture", ETOUI(m_eEye))))
-        //    return E_FAIL;
-
-        //if (FAILED(m_pModelCom->Bind_Material(m_pKirbyShaderCom, "g_SkinTexture", i, MTEX_TYPE::UNKNOWN, 1)))
-        //    return E_FAIL;
-
-        //if (FAILED(m_pModelCom->Bind_Material(m_pKirbyShaderCom, "g_MouthTexture", i, MTEX_TYPE::UNKNOWN, 2)))
-        //    return E_FAIL;
-
-        //if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pKirbyShaderCom, "g_BoneMatrices", i)))
-        //    return E_FAIL;
-
-        //if (FAILED(m_pKirbyShaderCom->Bind_RawValue("g_vBodyColor", &m_vBodyColor, sizeof(_float4))))
-        //    return E_FAIL;
-        //if (FAILED(m_pKirbyShaderCom->Bind_RawValue("g_vFootColor", &m_vFootColor, sizeof(_float4))))
-        //    return E_FAIL;
-        //if (FAILED(m_pKirbyShaderCom->Bind_RawValue("g_vBlushColor", &m_vBlushColor, sizeof(_float4))))
-        //    return E_FAIL;
-
-        //if (FAILED(m_pKirbyShaderCom->Begin(0)))
-        //    return E_FAIL;
-
-        //if (FAILED(m_pModelCom->Render(i)))
-        //    return E_FAIL;
 
         if (FAILED(Render_KirbyMesh(i)))
             return E_FAIL;

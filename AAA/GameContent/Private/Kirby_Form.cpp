@@ -103,7 +103,10 @@ HRESULT CKirby_Form::Render_PBRMesh(_uint iMeshIndex)
     if (FAILED(m_pPBRShaderCom->Begin(1)))
         return E_FAIL;
 
-    return m_pModelCom->Render(iMeshIndex);
+    if (FAILED(m_pModelCom->Render(iMeshIndex)))
+        return E_FAIL;
+
+    return S_OK;
 }
 
 void CKirby_Form::Free()

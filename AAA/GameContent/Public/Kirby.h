@@ -27,7 +27,10 @@ class CKirby_Ability;
 class CKirby_Body;
 class CKirby_OnOffPart;
 
+class CKirby_Form;
 class CKirby_Deform;
+
+enum class KIRBY_DEFORM_MODEL_TYPE { DEMO, MAIN };
 
 class CKirby final : public CCharacter
 {
@@ -92,6 +95,8 @@ public:
 	void OnOffParts(COPY_ABILITY_TYPE eAbilityType, _bool bOn, _bool bOnlyWeapon = false);
 	CKirby_OnOffPart* Find_OnOffPart(const wchar_t* PartTag);
 
+	CKirby_Form* Get_DeformPart(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType);
+
 	// Movement
 	void Add_MoveDir(const _float3& vWishDir);
 	_bool Has_MoveDir();
@@ -111,6 +116,10 @@ public:
 	void Reset_AbilityDumpCool();
 	_bool Can_AbilityDump();
 	void Req_AbilityDumpCoolDecrease() { m_bDecreaseAbilityDumpCool = true; }
+
+	// Deform
+	CKirby_Deform* Get_KirbyDeform();
+	void Set_KirbyDeform(DEFORM_TYPE eDeformType);
 
 	// Collider
 	CCollider* Get_Collider(KIRBY_COLLIDER eKirbyCollider);

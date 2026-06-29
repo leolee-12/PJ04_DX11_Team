@@ -24,6 +24,7 @@ enum class KIRBY_STATE_TYPE
 	DAMAGED,
 	GUARD,
 	CUTSCENE_GRABBED, QTE_GRABBED,
+	GET_DEFORM,
 };
 
 class CLIENT_DLL CKirby_State abstract : public CBase

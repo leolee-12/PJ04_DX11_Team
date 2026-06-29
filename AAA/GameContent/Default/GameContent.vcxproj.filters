@@ -799,6 +799,9 @@
     <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Form\02. DeformCar_Main">
       <UniqueIdentifier>{30e6faec-8ca3-4f51-a179-3a72f1929f83}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\GetDeform">
+      <UniqueIdentifier>{a75ad0b3-6c7f-486d-9311-5d2ca1cda8e5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1511,6 +1514,9 @@
     <ClInclude Include="..\Public\Kirby_DeformCar_Main.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Form\02. DeformCar_Main</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_GetDeform.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\GetDeform</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2147,6 +2153,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Form.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Form</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_GetDeform.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\GetDeform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

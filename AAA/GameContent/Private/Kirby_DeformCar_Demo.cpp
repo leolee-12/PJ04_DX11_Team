@@ -31,6 +31,8 @@ HRESULT CKirby_DeformCar_Demo::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
+    m_bActive = false;
+
     m_pAnimatorCom->Play("Deform", true, true);
 
     return S_OK;
@@ -42,6 +44,9 @@ void CKirby_DeformCar_Demo::Priority_Update(_float fTimeDelta)
 
 void CKirby_DeformCar_Demo::Update(_float fTimeDelta)
 {
+    if (m_bActive == false)
+        return;
+
     if (m_pGameInstance_Proxy->Is_EditMode())
         return;
 
@@ -50,6 +55,9 @@ void CKirby_DeformCar_Demo::Update(_float fTimeDelta)
 
 void CKirby_DeformCar_Demo::Late_Update(_float fTimeDelta)
 {
+    if (m_bActive == false)
+        return;
+
     CPartObject::Compute_CombinedWorldMatrix(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);

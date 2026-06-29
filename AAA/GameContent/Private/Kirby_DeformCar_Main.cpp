@@ -31,7 +31,9 @@ HRESULT CKirby_DeformCar_Main::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
-    m_pAnimatorCom->Play("Deform", true, true);
+    m_bActive = false;
+
+    m_pAnimatorCom->Play("Boost", true, true);
 
     return S_OK;
 }
@@ -42,6 +44,9 @@ void CKirby_DeformCar_Main::Priority_Update(_float fTimeDelta)
 
 void CKirby_DeformCar_Main::Update(_float fTimeDelta)
 {
+    if (m_bActive == false)
+        return;
+
     if (m_pGameInstance_Proxy->Is_EditMode())
         return;
 
@@ -50,6 +55,9 @@ void CKirby_DeformCar_Main::Update(_float fTimeDelta)
 
 void CKirby_DeformCar_Main::Late_Update(_float fTimeDelta)
 {
+    if (m_bActive == false)
+        return;
+
     CPartObject::Compute_CombinedWorldMatrix(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
@@ -85,12 +93,12 @@ HRESULT CKirby_DeformCar_Main::Ready_Components()
     if (m_pKirbyShaderCom == nullptr)
         return E_FAIL;
 
-    m_pPBRShaderCom = Add_Component<CShader>(Shader_VtxAnimMesh.iLevelID, Shader_VtxAnimMesh.szProtoTag, TEXT("Com_Shader_PBR"));
+    m_pPBRShaderCom = Add_Component<CShader>(Shader_AnimMesh_PBR.iLevelID, Shader_AnimMesh_PBR.szProtoTag, TEXT("Com_Shader_PBR"));
     if (m_pPBRShaderCom == nullptr)
         return E_FAIL;
 
     /* For.Com_Model */
-    m_pModelCom = Add_Component<CModel>(m_iPrototypeLevel, TEXT("Prototype_Component_Model_Kirby_DeformCar_Demo"), TEXT("Com_Model"));
+    m_pModelCom = Add_Component<CModel>(m_iPrototypeLevel, TEXT("Prototype_Component_Model_Kirby_DeformCar_Main"), TEXT("Com_Model"));
     if (m_pModelCom == nullptr)
         return E_FAIL;
 
@@ -148,7 +156,7 @@ HRESULT CKirby_DeformCar_Main::Render_KirbyMesh(_uint iMeshIndex)
     if (FAILED(m_pModelCom->Render(iMeshIndex)))
         return E_FAIL;
 
-    return E_FAIL;
+    return S_OK;
 }
 
 CKirby_DeformCar_Main* CKirby_DeformCar_Main::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
