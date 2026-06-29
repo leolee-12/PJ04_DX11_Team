@@ -749,7 +749,7 @@ void CEnvObject::Apply_DescDefaults()
 	m_bRenderable = !m_tDesc.tCollision.bInvisibleCollision;
 	m_bUseCullDistance = m_tDesc.tRender.bUseCullDistance;
 	m_bUseCullFrustum = m_tDesc.tRender.bUseCullFrustum;
-	m_bCastShadow = m_tDesc.tRender.bHasShadow && m_tDesc.tRender.bUseShadow;
+	m_bCastShadow = m_tDesc.tRender.bHasShadow; //&& m_tDesc.tRender.bUseShadow;
 	m_bVisible = true;
 }
 

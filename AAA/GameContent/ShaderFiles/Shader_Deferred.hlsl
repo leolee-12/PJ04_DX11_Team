@@ -5,7 +5,6 @@ float4x4 g_ShadowLightViewMatrix, g_ShadowLightProjMatrix;
 float4x4 g_ViewMatrixInverse, g_ProjMatrixInverse;
 
 float g_fAmbientSaturation = 0.6f;
-float g_fAmbientIntensity = 3.f;
 
   /* G-buffer */
 Texture2D g_Texture; // 디버그용

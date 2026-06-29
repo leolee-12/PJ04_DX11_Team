@@ -57,6 +57,7 @@ Texture2D g_CurtainTexture;
 
 Texture3D g_ColorGradingLUT;
 float g_fColorGradeEnable = 0.f;
+float g_fSaturation = 0.88f;
 
 Texture2D<uint> g_MaterialIDTexture; // R8_UINT, matID 전용
 
@@ -134,6 +135,11 @@ float3 ACESFilm(float3 x) // Narkowicz ACES 근사
 {
     return saturate((x * (2.51f * x + 0.03f)) / (x * (2.43f * x + 0.59f) + 0.14f));
 }
+float3 ApplySaturation(float3 c, float s)
+{
+    float luma = dot(c, float3(0.2126f, 0.7152f, 0.0722f)); //Rec.709
+    return lerp(luma.xxx, c, s);
+}
 
 
   //============================ Bloom Bright (pass 0) ============================
@@ -187,6 +193,8 @@ float4 PS_COMPOSITE(PS_IN In) : SV_TARGET0
             color = ACESFilm(color);
         color = pow(saturate(color), 1.f / 2.2f);
     }
+    color = ApplySaturation(color, g_fSaturation);
+    
     return float4(color, 1.f);
 }
 
