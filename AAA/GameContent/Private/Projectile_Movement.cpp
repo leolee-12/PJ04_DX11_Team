@@ -19,9 +19,8 @@ _bool CProjectile_Movement::Tick(_float fTimeDelta)
     if (m_bGrounded)                                    // 바닥 바운스 반사
     {
         m_vVelocity.y = -m_vVelocity.y * m_fRestitution;
-        _float fDamp = powf(m_fHorizDamp, fTimeDelta);                      // 기존의 매 프레임마다 곱하던 행위를 시간 기반으로 수정
-        m_vVelocity.x *= fDamp;
-        m_vVelocity.z *= fDamp;
+        m_vVelocity.x *= m_fHorizDamp;
+        m_vVelocity.z *= m_fHorizDamp;
         return true;                                    // 바운스 발생 보고
     }
     return false;
