@@ -37,6 +37,32 @@ void CPhysicsProjectile::Launch(const _float3& vPos, const _float3& vDir)
     On_Launched();
 }
 
+void CPhysicsProjectile::Launch_Arc(const _float3& vStart, const _float3& vTarget, _float fDur, _float fHeight)
+{
+    Detach();
+    m_bAlive = true; m_fAccLife = 0.f;
+    On_Activated();
+
+    m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), 0.f);
+    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&vStart), 1.f));
+
+    _vector vDir = XMLoadFloat3(&vTarget) - XMLoadFloat3(&vStart);
+    vDir = XMVectorSetY(vDir, 0.f);
+    if (XMVectorGetX(XMVector3LengthSq(vDir)) > 1e-6f) vDir = XMVector3Normalize(vDir);
+    XMStoreFloat3(&m_vVelocity, vDir * m_fSpeed);
+
+    if (m_pHitBox)
+    {
+        m_pHitBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+        m_pHitBox->Set_Enabled(true);
+    }
+
+    m_bFlying = true; m_iBounceCount = 0;
+    if (m_pController) { m_pController->Set_Enabled(true); m_pController->Set_FootPosition(XMLoadFloat3(&vStart)); }
+    if (m_pMovement)   m_pMovement->Begin_Arc(XMLoadFloat3(&vStart), XMLoadFloat3(&vTarget), fDur, fHeight);
+    On_Launched();
+}
+
 void CPhysicsProjectile::Update(_float fTimeDelta)
 {
     if (!m_bAlive) return;
@@ -47,7 +73,11 @@ void CPhysicsProjectile::Update(_float fTimeDelta)
     {
         m_fAccLife += fTimeDelta;
         if (m_fAccLife >= m_fLifeTime) { Kill(); return; }
-        if (m_pMovement && m_pMovement->Tick(fTimeDelta)) On_Bounce(++m_iBounceCount);
+        if (m_pMovement && m_pMovement->Tick(fTimeDelta))
+        {
+            if (m_pMovement->Is_Arc()) On_Impact();
+            else                       On_Bounce(++m_iBounceCount);
+        }
     }
     else Update_Terminal(fTimeDelta);
 

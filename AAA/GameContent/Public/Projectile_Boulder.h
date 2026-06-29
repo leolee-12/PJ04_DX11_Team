@@ -31,7 +31,7 @@ protected:
     virtual void    Update_Terminal(_float dt) override; 
     virtual void    Tick_Visual(_float dt) override;     
     virtual void    On_Activated() override;
-    virtual void    On_Impact() override { Enter_Break(); }
+    virtual void    On_Impact() override {}
 
 private:
     void    Enter_Break();
@@ -44,6 +44,7 @@ private:
 
     STATE   m_eState = { STATE::FLYING };
     _float m_fSpinAngle = { 0.f };
+    _float3 m_vSpinAxis = { 1.f, 0.f, 0.f };
 
     static constexpr _float RESTITUTION = 0.3f;         // 바운스 반발
     static constexpr _float HORIZ_DAMP = 0.7f;          // 바운스 수평 마찰

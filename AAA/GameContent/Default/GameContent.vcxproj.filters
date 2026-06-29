@@ -1481,6 +1481,9 @@
       <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Monster_RailMovement.h" />
+    <ClInclude Include="..\Public\Ancor_WorkingDirectory.h">
+      <Filter>97. DataSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">

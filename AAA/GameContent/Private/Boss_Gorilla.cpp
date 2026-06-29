@@ -164,10 +164,16 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
                     if (m_pHeldRock)
                     {
                         _vector vHand = m_pHeldRock->Get_Transform()->Get_State(STATE::POSITION);
-                        _vector vTarget = XMLoadFloat3(&Get_BlackBoard().vTargetPos);
-                        _vector vDir = XMVector3Normalize(vTarget - vHand) + XMVectorSet(0, 0.4f, 0, 0);
-                        _float3 vP, vD; XMStoreFloat3(&vP, vHand); XMStoreFloat3(&vD, vDir);
-                        m_pHeldRock->Launch(vP, vD);
+                        _vector vKirby = XMLoadFloat3(&Get_BlackBoard().vTargetPos);
+
+                        _vector vToKirby = XMVectorSetY(vKirby - vHand, 0.f);
+                        if (XMVectorGetX(XMVector3LengthSq(vToKirby)) > 1e-6f)
+                            vToKirby = XMVector3Normalize(vToKirby);
+                        const _float fFrontOffset = 5.f;           
+                        _vector vTarget = vKirby - vToKirby * fFrontOffset;
+
+                        _float3 vS, vT; XMStoreFloat3(&vS, vHand); XMStoreFloat3(&vT, vTarget);
+                        m_pHeldRock->Launch_Arc(vS, vT, 1.5f, 5.f);
                         m_pHeldRock = nullptr;
                     }
                 }

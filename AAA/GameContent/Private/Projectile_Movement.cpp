@@ -7,7 +7,31 @@ _bool CProjectile_Movement::Tick(_float fTimeDelta)
 {
     if (!m_pController || !m_pTransform) return false;
 
-    m_vVelocity.y += m_fGravity * fTimeDelta;            // 중력 -> 포물선
+    if (m_bArc)
+    {
+        m_fArcT += fTimeDelta;
+        _float u = m_fArcT / m_fArcDur;
+        if (u > 1.f) u = 1.f;
+
+        _vector vDesired = XMVectorLerp(XMLoadFloat3(&m_vArcStart), XMLoadFloat3(&m_vArcTarget), u);
+        _float  fHop = 4.f * m_fArcHeight * u * (1.f - u);
+        vDesired = XMVectorSetY(vDesired, XMVectorGetY(vDesired) + fHop);
+
+        _vector vDisp = vDesired - m_pController->Get_FootPosition();
+        m_pController->Move(vDisp, 0.001f, fTimeDelta);
+        m_pTransform->Set_State(STATE::POSITION, m_pController->Get_FootPosition());
+
+        if (m_fArcT >= m_fArcDur)
+        {
+            _vector vEnd = XMLoadFloat3(&m_vArcTarget) - XMLoadFloat3(&m_vArcStart);
+            vEnd = XMVectorSetY(vEnd, XMVectorGetY(vEnd) - 4.f * m_fArcHeight);
+            XMStoreFloat3(&m_vVelocity, vEnd * (1.f / m_fArcDur));
+            m_bArc = false;  
+        }
+        return false;           
+    }
+
+    m_vVelocity.y += m_fGravity * fTimeDelta;       
 
     _vector vDisp = XMLoadFloat3(&m_vVelocity) * fTimeDelta;
     _uint   iFlags = m_pController->Move(vDisp, 0.001f, fTimeDelta);
@@ -16,12 +40,12 @@ _bool CProjectile_Movement::Tick(_float fTimeDelta)
 
     m_bGrounded = (iFlags & physx::PxControllerCollisionFlag::eCOLLISION_DOWN) != 0;
 
-    if (m_bGrounded)                                    // 바닥 바운스 반사
+    if (m_bGrounded && m_vVelocity.y < 0.f)
     {
         m_vVelocity.y = -m_vVelocity.y * m_fRestitution;
         m_vVelocity.x *= m_fHorizDamp;
         m_vVelocity.z *= m_fHorizDamp;
-        return true;                                    // 바운스 발생 보고
+        return true;
     }
     return false;
 }
