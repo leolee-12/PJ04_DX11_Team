@@ -50,6 +50,8 @@ public:
 
 	const ENV_OBJECT_DESC& Get_Desc() const { return m_tDesc; }
 	const BoundingBox& Get_WorldBounds() const { return m_WorldBounds; }
+	const BoundingBox& Get_LocalBounds() const { return m_LocalBounds; }
+	_float Get_DecalAlpha() const { return m_fDecalAlpha; }
 	_float Get_Dissolve() const { return m_fDissolve; }
 
 	_bool Pick_Marb1e(_fvector vRayOrigin, _fvector vRayDir, _float3* pOutHit, _float* fOutDistance);

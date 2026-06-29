@@ -1,6 +1,6 @@
 #include "LevelDesign_Starblock.h"
 #include "LevelDesign_Registry.h"
-#include "Shader_PassMeta.h"
+#include "MeshLayer_Binder.h"
 #include "Parsing_Utils.h"
 
 #include "GameInstance.h"
@@ -139,46 +139,27 @@ HRESULT CLevelDesign_Starblock::Render()
 	{
 		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
 
-		auto BindMaterial = [&](const _char* pConstantName, MTEX_TYPE eType, DEFAULT_TEXTURE eDefaultKind) -> HRESULT
-			{
-				const _uint iLayerIndex = Layer.idx[ETOUI(eType)];
-				const _uint iTextureCount = m_pModelCom->Get_MeshTextureCount(i, eType);
+		MESH_LAYER_BIND_CONTEXT Ctx{};
+		Ctx.pShader = m_pShaderCom;
+		Ctx.pModel = m_pModelCom;
+		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+		Ctx.iMesh = i;
+		Ctx.pLayer = &Layer;
+		Ctx.eProfile = MESH_LAYER_PROFILE::NONANIM_PBR;
+		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
+		Ctx.iFallbackPass = ShaderPass::NonAnimPBR::DMN;
+		Ctx.fDissolve = 0.f;
 
-				if (0u < iTextureCount)
-				{
-					const _uint iSafeIndex = (iLayerIndex < iTextureCount) ? iLayerIndex : (iTextureCount - 1u);
-
-					if (SUCCEEDED(m_pModelCom->Bind_Material(m_pShaderCom, pConstantName, i, eType, iSafeIndex)))
-						return S_OK;
-				}
-
-				return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(m_pShaderCom, pConstantName, eDefaultKind);
-			};
-
-		if (FAILED(BindMaterial("g_DiffuseTexture", MTEX_TYPE::DIFFUSE, DEFAULT_TEXTURE::MAGENTA)))		return E_FAIL;
-		if (FAILED(BindMaterial("g_NormalTexture", MTEX_TYPE::NORMALS, DEFAULT_TEXTURE::FLAT_NORMAL)))	return E_FAIL;
-		if (FAILED(BindMaterial("g_MRATexture", MTEX_TYPE::METALNESS, DEFAULT_TEXTURE::MRA)))			return E_FAIL;
-		if (FAILED(BindMaterial("g_UnknownTexture", MTEX_TYPE::UNKNOWN, DEFAULT_TEXTURE::BLACK)))		return E_FAIL;
-
-		const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
-		_uint iFlags = Layer.iFlags;
-		_float fDissolve = 0.f;
-
-		if (FAILED(m_pShaderCom->Bind_RawValue(
-			"g_iUVIndex", &iUVIndex, sizeof(_uint))))
+		MESH_LAYER_BIND_RESULT Result{};
+		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
 			return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Bind_RawValue(
-			"g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))
+		if (Result.bSkipMesh)
+			continue;
+
+		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
 			return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Bind_RawValue(
-			"g_fDissolve", &fDissolve, sizeof(_float))))
-			return E_FAIL;
-
-		if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::DMN)))
-			return E_FAIL;
-		
 		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;
 	}

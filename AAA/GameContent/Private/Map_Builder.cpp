@@ -264,7 +264,7 @@ HRESULT CMap_Builder::Validate_And_Filter(MAP_PACKAGE* pPackage)
 
 	for (const ENV_OBJECT_DESC& Desc : pPackage->EnvObjectDescs)
 	{
-		if (EnvObject_NeedsModel(Desc)
+		if ((EnvObject_NeedsModel(Desc) || EnvObject_IsSimpleShapeOnly(Desc))
 			&& (Desc.wstrModelPath.empty() || Desc.wstrModelProtoTag.empty()))
 		{
 			++iSkippedMissingModel;

@@ -57,6 +57,8 @@
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h" />
     <ClInclude Include="..\public\LDInhalable.h" />
     <ClInclude Include="..\Public\Sword_SpinSlashTrail.h" />
+    <ClInclude Include="..\Public\MeshLayer_Binder.h" />
+    <ClInclude Include="..\Public\MeshLayer_Profile.h" />
     <ClInclude Include="..\Public\Monster_RailMovement.h" />
     <ClInclude Include="..\Public\Projectile_Bomb.h" />
     <ClInclude Include="..\Public\Sword_SpinSlash.h" />
@@ -296,6 +298,8 @@
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp" />
     <ClCompile Include="..\private\LDInhalable.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp" />
+    <ClCompile Include="..\Private\MeshLayer_Binder.cpp" />
+    <ClCompile Include="..\Private\MeshLayer_Profile.cpp" />
     <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
     <ClCompile Include="..\Private\Projectile_Bomb.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlash.cpp" />
