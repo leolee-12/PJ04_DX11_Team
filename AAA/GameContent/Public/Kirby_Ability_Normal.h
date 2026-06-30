@@ -42,6 +42,8 @@ private:
 
 	enum class MOUTH_STATE { DEFAULT, STUFFFED };
 
+	static constexpr _float s_fSpitSpeed = 14.f;
+
 private:
 	CKirby_Ability_Normal();
 	virtual ~CKirby_Ability_Normal() = default;

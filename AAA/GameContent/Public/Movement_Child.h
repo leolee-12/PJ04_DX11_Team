@@ -94,7 +94,7 @@ public:
     void Set_UseGravity(_bool bUseGravity);
     void Set_UseGroundFriction(_bool bUseGroundFriction);
     void Set_StopHorizontalOnSideHit(_bool bStop) { m_bStopHorizontalOnSideHit = bStop; }
-
+    void Set_RotationSpeed(_float fDegree) { m_fRotation_Speed_Degree = fDegree; }
     // 정지 / 초기화.
     void Stop();
     void Stop_Horizontal();

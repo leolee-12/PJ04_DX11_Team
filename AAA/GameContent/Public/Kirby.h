@@ -56,14 +56,14 @@ public:
 	static constexpr _float s_fFallVelocityY = -7.f;
 	static constexpr _float s_fMaxFallVelocity = -15.f;
 
+	static constexpr _float s_fRot_Speed_Degree = 720.f;
+
 	// À±¼®Çö Ãß°¡ 
 	static constexpr _float s_fInvincibleDuration = 2.f;
 	static constexpr _float s_fInhaleFwd = 1.8f;
 	static constexpr _float s_fInhaleUp = 0.5f;
 	static constexpr _float s_fInhaleRadius = 3.f;
 	static constexpr _float s_fInhaleLength = 2.f;
-
-	static constexpr _float s_fSpitSpeed = 14.f;
 
 private:
 	CKirby(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);

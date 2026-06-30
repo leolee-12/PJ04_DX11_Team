@@ -602,11 +602,6 @@ void CKirby::Clear_CutsceneGrabTarget()
     m_pGrabOwnerWorld = nullptr;
 }
 
-_bool CKirby::Has_Deform()
-{
-    return _bool();
-}
-
 void CKirby::Set_KirbyDeform(DEFORM_TYPE eDeformType)
 {
     if (eDeformType == DEFORM_TYPE::NONE)

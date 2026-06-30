@@ -18,10 +18,12 @@ class CKirby_Body;
 
 class CLIENT_DLL CKirby_GetDeform final : public CKirby_State
 {
-private:
-	
+private:	
 	enum DEFORM_STATE { SUPER_INHALE_START, SUPER_INHALE_LOOP, DEFORM, DEFORM_END, DEFORM_STATE_END };
 
+	static constexpr _float s_fDeform_End_Rot_Speed_Degree = 560.f;
+
+private:
 	CKirby_GetDeform();
 	virtual ~CKirby_GetDeform() = default;
 
@@ -45,13 +47,20 @@ private:
 	void Update_GetDeformState(CKirby* pKirby, _float fTimeDelta);
 	void Exit_GetDeformState(CKirby* pKirby, DEFORM_STATE eState);
 
+	void Set_RotationDir(CKirby* pKirby);
+
 private:
 	CGameInstance_Proxy* m_pGameInstance_Proxy = {};
 
 	DEFORM_STATE m_eDeformState{};
 
+	// 변신할 타입
+	DEFORM_TYPE m_eDeformType{};
+
 	// Effect
 	CEffect_Container* m_pInhaleEffect{};
+
+	_float3 m_vRotationDir{};
 
 public:
 	static CKirby_GetDeform* Create();

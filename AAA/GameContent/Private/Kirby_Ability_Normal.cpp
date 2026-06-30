@@ -670,7 +670,7 @@ void CKirby_Ability_Normal::Spit_Inhalable(CKirby* pKirby)
         + pTransform->Get_State(STATE::UP) * CKirby::s_fInhaleUp;
     _vector vDir = pTransform->Get_State(STATE::LOOK);
 
-    m_pCapturedInhalable->Be_Spat(vMouth, vDir, CKirby::s_fSpitSpeed);
+    m_pCapturedInhalable->Be_Spat(vMouth, vDir, s_fSpitSpeed);
 
     m_pCapturedInhalable = nullptr;
 }
