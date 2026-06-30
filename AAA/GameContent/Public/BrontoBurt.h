@@ -62,13 +62,10 @@ private:
     virtual HRESULT         Ready_PartObjects() override;
     virtual void			On_Deserialized() override;
 
-    void                    Inject_TestRail();
-
 private:
     CBrontoBurt_Body*       m_pBody = { nullptr };
 
     _int                    m_iAIType = { 0 };      // 0은 레일 이동형 / 1은 범위 내 플레이어 추격형(나중에)
-    _bool                   m_bTestRailInjected = { false };
 
 public:
     static CBrontoBurt*     Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

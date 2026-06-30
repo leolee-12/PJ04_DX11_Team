@@ -32,7 +32,7 @@ void CProjectile_Bomb::Update(_float fTimeDelta)
 
     if (m_bCarried)
     {
-        Update_Socket();
+        //Update_Socket();
         Tick_Visual(fTimeDelta);
         return;
     }
@@ -49,6 +49,14 @@ void CProjectile_Bomb::Update(_float fTimeDelta)
 
     if (m_pHitBox && m_pHitBox->Is_Enabled())
         m_pHitBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+}
+
+void CProjectile_Bomb::Late_Update(_float fTimeDelta)
+{
+    if (m_bAlive && m_bCarried)
+        Update_Socket();
+
+    __super::Late_Update(fTimeDelta);
 }
 
 HRESULT CProjectile_Bomb::Render()
