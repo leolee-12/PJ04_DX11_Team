@@ -158,26 +158,26 @@ void CKirby::Damaged(const ATTACK_INFO& tInfo)
     }
 }
 
-void CKirby::OnOffParts(COPY_ABILITY_TYPE eAbilityType, _bool bOn, _bool bOnlyWeapon)
+void CKirby::Set_AbilityPartsActive(COPY_ABILITY_TYPE eAbilityType, _bool bOn, _bool bOnlyWeapon)
 {
-    auto OnOffPart = [this](const wchar_t* PartTag, _bool bOn)->void
-        {
-            auto iter = m_PartObjects.find(PartTag);
-            if (iter != m_PartObjects.end())
-            {
-                static_cast<CKirby_OnOffPart*>(iter->second)->PartOnOff(bOn);
-            }
-        };
+    CKirby_OnOffPart* pWeapon = Find_WeaponPart(eAbilityType);
+    if (pWeapon != nullptr)
+        pWeapon->PartOnOff(bOn);
 
-    switch (eAbilityType)
+    if (!bOnlyWeapon)
     {
-        case COPY_ABILITY_TYPE::SWORD:
-            if(!bOnlyWeapon)
-                OnOffPart(CKirby_SwordHat::Kirby_PartTag, bOn);
-
-            OnOffPart(CKirby_Sword::Kirby_PartTag, bOn);
-            break;
+        CKirby_OnOffPart* pHat = Find_HatPart(eAbilityType);
+        if (pHat != nullptr)
+            pHat->PartOnOff(bOn);
     }
+}
+
+void CKirby::Change_HatSocketMatrix(COPY_ABILITY_TYPE eAbilityType, const _float4x4* pBoneMatrix)
+{
+    CKirby_OnOffPart* pHat = Find_HatPart(eAbilityType);
+
+    if (pHat != nullptr)
+        pHat->Set_SocketBoneMatrix(pBoneMatrix);
 }
 
 CKirby_OnOffPart* CKirby::Find_OnOffPart(const wchar_t* PartTag)
@@ -191,50 +191,58 @@ CKirby_OnOffPart* CKirby::Find_OnOffPart(const wchar_t* PartTag)
     return nullptr;
 }
 
+CKirby_OnOffPart* CKirby::Find_WeaponPart(COPY_ABILITY_TYPE eType)
+{
+    switch (eType)
+    {
+    case COPY_ABILITY_TYPE::SWORD:
+        return Find_OnOffPart(CKirby_Sword::Kirby_PartTag);
+    }
+
+    return nullptr;
+}
+
+CKirby_OnOffPart* CKirby::Find_HatPart(COPY_ABILITY_TYPE eType)
+{
+    switch (eType)
+    {
+    case COPY_ABILITY_TYPE::SWORD:
+        return Find_OnOffPart(CKirby_SwordHat::Kirby_PartTag);
+    }
+
+    return nullptr;
+}
+
 CKirby_Deform_Model* CKirby::Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType)
 {
-    auto Find_Form = [this](const wchar_t* PartTag)->CKirby_Deform_Model*
-        {
-            auto iter = m_PartObjects.find(PartTag);
-            if (iter != m_PartObjects.end())
-                return dynamic_cast<CKirby_Deform_Model*>(iter->second);
-
-            return nullptr;
-        };
-
-
     switch (eDeformType)
     {
         case DEFORM_TYPE::NONE:
             return m_pBody;
 
         case DEFORM_TYPE::CAR:
-            if (eDeformModelType == KIRBY_DEFORM_MODEL_TYPE::DEMO)
-                return Find_Form(CKirby_DeformCar_Demo::Kirby_PartTag);
-            else if (eDeformModelType == KIRBY_DEFORM_MODEL_TYPE::MAIN)
-                return Find_Form(CKirby_DeformCar_Main::Kirby_PartTag);
+            switch (eDeformModelType)
+            {
+            case KIRBY_DEFORM_MODEL_TYPE::DEMO:
+                return Find_DeformModel(CKirby_DeformCar_Demo::Kirby_PartTag);
+
+            case KIRBY_DEFORM_MODEL_TYPE::MAIN:
+                return Find_DeformModel(CKirby_DeformCar_Main::Kirby_PartTag);
+            }
+            break;
     }
 
     return nullptr;
 }
 
-void CKirby::Change_HatSocketMatrix(COPY_ABILITY_TYPE eAbilityType, const _float4x4* pBoneMatrix)
+CKirby_Deform_Model* CKirby::Find_DeformModel(const wchar_t* pPartTag)
 {
-    auto Set_HatSocketBoneMatrix = [this, pBoneMatrix](const wchar_t* PartTag)->void
-        {
-            auto iter = m_PartObjects.find(PartTag);
-            if (iter != m_PartObjects.end())
-            {
-                static_cast<CKirby_OnOffPart*>(iter->second)->Set_SocketBoneMatrix(pBoneMatrix);
-            }
-        };
+    auto iter = m_PartObjects.find(pPartTag);
 
-    switch (eAbilityType)
-    {
-    case COPY_ABILITY_TYPE::SWORD:
-        Set_HatSocketBoneMatrix(CKirby_SwordHat::Kirby_PartTag);
-        break;
-    }
+    if (iter == m_PartObjects.end())
+        return nullptr;
+
+    return dynamic_cast<CKirby_Deform_Model*>(iter->second);
 }
 
 void CKirby::Add_MoveDir(const _float3& vWishDir)

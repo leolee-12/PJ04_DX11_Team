@@ -159,7 +159,7 @@ void CKirby_Ability_Sword::Exit_Ability(CKirby* pKirby)
     CKirby_Body* pBody = pKirby->Get_Body();
     pBody->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
 
-    CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_OnOffPart(CKirby_Sword::Kirby_PartTag));
+    CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::SWORD));
     if (pSword)
     {
         //pSword->Set_HitBox(false);
@@ -322,7 +322,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
     CKirby_Body* pBody = pKirby->Get_Body();
     CAnimator* pAnimator = pBody->Get_Animator();
     CMovement_Child* pMovement = pKirby->Get_Movement();
-    CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_OnOffPart(CKirby_Sword::Kirby_PartTag));
+    CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::SWORD));
 
     auto BeginHit = [pSword](_bool bReset)
         {

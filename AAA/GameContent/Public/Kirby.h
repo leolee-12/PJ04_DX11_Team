@@ -91,13 +91,17 @@ public:
 	CMovement_Child* Get_Movement() { return m_pMovement; }
 
 	// Part
-	CKirby_Body* Get_Body() { return m_pBody; }
-	void OnOffParts(COPY_ABILITY_TYPE eAbilityType, _bool bOn, _bool bOnlyWeapon = false);
-	CKirby_OnOffPart* Find_OnOffPart(const wchar_t* PartTag);
+	void Set_AbilityPartsActive(COPY_ABILITY_TYPE eAbilityType, _bool bOn, _bool bOnlyWeapon = false);
+	void Change_HatSocketMatrix(COPY_ABILITY_TYPE eAbilityType, const _float4x4* pBoneMatrix);
 
+	CKirby_OnOffPart* Find_OnOffPart(const wchar_t* PartTag);
+	CKirby_OnOffPart* Find_WeaponPart(COPY_ABILITY_TYPE eType);
+	CKirby_OnOffPart* Find_HatPart(COPY_ABILITY_TYPE eType);
+
+	CKirby_Body* Get_Body() { return m_pBody; }
 	CKirby_Deform_Model* Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType = KIRBY_DEFORM_MODEL_TYPE::MAIN);
 
-	void Change_HatSocketMatrix(COPY_ABILITY_TYPE eAbilityType, const _float4x4* pBoneMatrix);
+	CKirby_Deform_Model* Find_DeformModel(const wchar_t* pPartTag);
 
 	// Movement
 	void Add_MoveDir(const _float3& vWishDir);

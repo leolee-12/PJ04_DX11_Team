@@ -102,7 +102,7 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
 
             pBodyAnimator->Play("SuperInhaleStart", false, false, 0.1f, 2.5f);
 
-            pKirby->OnOffParts(pKirby->Get_KirbyAbility()->Get_AbilityType(), false, true);
+            pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), false, true);
 
             break;
         }
