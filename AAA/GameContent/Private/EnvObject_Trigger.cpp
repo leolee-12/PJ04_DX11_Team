@@ -6,12 +6,21 @@ NS_BEGIN(Client)
 
 CEnvObject_Trigger::CEnvObject_Trigger(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CEnvObject(pDevice, pContext)
+	, m_vAreaCenter{ 0.f, 0.f, 0.f }
+	, m_vAreaSize{ 1.f, 1.f, 1.f }
+	, m_vAreaRot{ 0.f, 0.f, 0.f, 1.f }
+	, m_bDebugDrawTrigger{ true }
 {
 	m_strProtoTag = PROTOTYPE_TAG;
 }
 
 CEnvObject_Trigger::CEnvObject_Trigger(const CEnvObject_Trigger& Prototype)
 	: CEnvObject(Prototype)
+	, m_strTriggerId{ Prototype.m_strTriggerId }
+	, m_vAreaCenter{ Prototype.m_vAreaCenter }
+	, m_vAreaSize{ Prototype.m_vAreaSize }
+	, m_vAreaRot{ Prototype.m_vAreaRot }
+	, m_bDebugDrawTrigger{ Prototype.m_bDebugDrawTrigger }
 {
 	m_strProtoTag = PROTOTYPE_TAG;
 }
@@ -25,6 +34,16 @@ HRESULT CEnvObject_Trigger::Initialize(void* pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
+
+	m_strTriggerId = false == m_tDesc.wstrObjectName.empty() ? m_tDesc.wstrObjectName : m_tDesc.wstrComponentName;
+	m_vAreaCenter = m_tDesc.tEffect.vAreaCenter;
+	m_vAreaSize = m_tDesc.tEffect.vAreaSize;
+	m_vAreaRot = m_tDesc.tEffect.vAreaRot;
+
+	m_bRenderable = false;
+	m_bCastShadow = false;
+	m_bUseCullDistance = false;
+	m_bUseCullFrustum = false;
 
 	if (!m_tDesc.wstrModelProtoTag.empty())
 	{
@@ -49,7 +68,8 @@ void CEnvObject_Trigger::Late_Update(_float fTimeDelta)
 		m_pCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
 #ifdef _DEBUG
-		m_pGameInstance_Proxy->Add_DebugComponent(m_pCollider);
+		if (m_bDebugDrawTrigger)
+			m_pGameInstance_Proxy->Add_DebugComponent(m_pCollider);
 #endif
 	}
 }
@@ -61,6 +81,26 @@ void CEnvObject_Trigger::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	__super::Copy_PrototypeName(pOutData);
 }
 
+void CEnvObject_Trigger::OnTriggerEnter(CCollider* pOther)
+{
+	char szBuf[128];
+	sprintf_s(szBuf, "[EnvTrigger] Enter <- group %u\n", pOther->Get_RegisteredGroup());
+	OutputDebugStringA(szBuf);
+}
+
+void CEnvObject_Trigger::OnTriggerStay(CCollider* pOther)
+{
+	UNREFERENCED_PARAMETER(pOther);
+	OutputDebugStringA("[EnvTrigger] Stay\n");
+}
+
+void CEnvObject_Trigger::OnTriggerExit(CCollider* pOther)
+{
+	char szBuf[128];
+	sprintf_s(szBuf, "[EnvTrigger] Exit  <- group %u\n", pOther->Get_RegisteredGroup());
+	OutputDebugStringA(szBuf);
+}
+
 HRESULT CEnvObject_Trigger::Ready_TriggerCollider()
 {
 	const auto AbsAxis = [](_float fValue) -> _float
@@ -70,9 +110,9 @@ HRESULT CEnvObject_Trigger::Ready_TriggerCollider()
 
 	const _float3 vAreaSize =
 	{
-			AbsAxis(m_tDesc.tEffect.vAreaSize.x),
-			AbsAxis(m_tDesc.tEffect.vAreaSize.y),
-			AbsAxis(m_tDesc.tEffect.vAreaSize.z)
+		AbsAxis(m_vAreaSize.x),
+		AbsAxis(m_vAreaSize.y),
+		AbsAxis(m_vAreaSize.z)
 	};
 
 	constexpr _float kMinTriggerAxis = 0.001f;
@@ -95,7 +135,7 @@ HRESULT CEnvObject_Trigger::Ready_TriggerCollider()
 
 	CCollider::COLLIDER_DESC ColliderDesc{};
 	ColliderDesc.pOwner = this;
-	ColliderDesc.vCenter = m_tDesc.tEffect.vAreaCenter;
+	ColliderDesc.vCenter = m_vAreaCenter;
 	ColliderDesc.vSize = vAreaSize;
 
 	if (FAILED(m_pCollider->Initialize(&ColliderDesc)))
@@ -108,51 +148,14 @@ HRESULT CEnvObject_Trigger::Ready_TriggerCollider()
 
 void CEnvObject_Trigger::SetUp_Collider_Callback()
 {
-	if (m_pCollider)
-	{
-		m_pCollider->Set_OnEnter([](CCollider* pOther) {
-			char szBuf[128];
-			sprintf_s(szBuf, "[EnvTrigger] Enter <- group %u\n", pOther->Get_RegisteredGroup());
-			OutputDebugStringA(szBuf); 
-			});
+	if (nullptr == m_pCollider)
+		return;
 
-		m_pCollider->Set_OnStay([](CCollider* pOther) {
-			UNREFERENCED_PARAMETER(pOther);
-			OutputDebugStringA("[EnvTrigger] Stay\n");
-			});
+	m_pCollider->Set_OnEnter([this](CCollider* pOther) { OnTriggerEnter(pOther); });
 
-		m_pCollider->Set_OnExit([](CCollider* pOther) {
-			char szBuf[128];
-			sprintf_s(szBuf, "[EnvTrigger] Exit  <- group %u\n", pOther->Get_RegisteredGroup());
-			OutputDebugStringA(szBuf);
-			});
-	}
-}
+	m_pCollider->Set_OnStay([this](CCollider* pOther) { OnTriggerStay(pOther); });
 
-CEnvObject_Trigger* CEnvObject_Trigger::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-{
-	CEnvObject_Trigger* pInstance = new CEnvObject_Trigger(pDevice, pContext);
-
-	if (FAILED(pInstance->Initialize_Prototype()))
-	{
-		MSG_BOX("Failed to Created : CEnvObject_Trigger");
-		Safe_Release(pInstance);
-	}
-
-	return pInstance;
-}
-
-CGameObject* CEnvObject_Trigger::Clone(void* pArg)
-{
-	CEnvObject_Trigger* pInstance = new CEnvObject_Trigger(*this);
-
-	if (FAILED(pInstance->Initialize(pArg)))
-	{
-		MSG_BOX("Failed to Cloned : CEnvObject_Trigger");
-		Safe_Release(pInstance);
-	}
-
-	return pInstance;
+	m_pCollider->Set_OnExit([this](CCollider* pOther) { OnTriggerExit(pOther); });
 }
 
 void CEnvObject_Trigger::Free()

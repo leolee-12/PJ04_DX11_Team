@@ -22,6 +22,7 @@ private:
 
 private:
 	const MAP_SPAWN_ROUTE* Resolve_EnvRoute(const MAP_SPAWN_TARGETS& Targets, ENV_OBJECT_KIND eKind) const;
+	const _tchar* Get_EnvObjectProtoTag(const ENV_OBJECT_DESC& Desc) const;
 	const _tchar* Get_EnvObjectProtoTag(ENV_OBJECT_KIND eKind) const;
 	_wstring Make_EnvObjectName(const ENV_OBJECT_DESC& Desc) const;
 	void Rollback(const vector<CGameObject*>& CreatedObjects);

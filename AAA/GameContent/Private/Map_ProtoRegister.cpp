@@ -1,8 +1,9 @@
 #include "Map_ProtoRegister.h"
 #include "GameContent_Log.h"
-#include "EnvObject_Trigger.h"
-#include "EnvObject_Interact.h"
 #include "EnvObject_Static.h"
+#include "EnvObject_Interact.h"
+#include "EnvTrigger_Generic.h"
+#include "EnvTrigger_RenderGlobals.h"
 #include "MapSection.h"
 #include "MapStage.h"
 #include "GameObject_Factory.h"
@@ -188,8 +189,16 @@ HRESULT CMap_ProtoRegister::Ready_ObjectPrototypes(_uint iObjectLevel)
 		CEnvObject_Interact::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	if (FAILED(EnsurePrototype(CEnvObject_Trigger::PROTOTYPE_TAG,
-		CEnvObject_Trigger::Create(m_pDevice, m_pContext))))
+	if (FAILED(EnsurePrototype(CEnvTrigger_Generic::LEGACY_PROTOTYPE_TAG,
+		CEnvTrigger_Generic::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(EnsurePrototype(CEnvTrigger_Generic::PROTOTYPE_TAG,
+		CEnvTrigger_Generic::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(EnsurePrototype(CEnvTrigger_RenderGlobals::PROTOTYPE_TAG,
+		CEnvTrigger_RenderGlobals::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	return S_OK;
@@ -337,7 +346,7 @@ const _tchar* CMap_ProtoRegister::Get_EnvObjectProtoTag(ENV_OBJECT_KIND eKind) c
 	{
 	case ENV_OBJECT_KIND::STATIC: return CEnvObject_Static::PROTOTYPE_TAG;
 	case ENV_OBJECT_KIND::INTERACT: return CEnvObject_Interact::PROTOTYPE_TAG;
-	case ENV_OBJECT_KIND::EFFECT: return CEnvObject_Trigger::PROTOTYPE_TAG;
+	case ENV_OBJECT_KIND::EFFECT: return CEnvTrigger_Generic::PROTOTYPE_TAG;
 	default: return nullptr;
 	}
 }

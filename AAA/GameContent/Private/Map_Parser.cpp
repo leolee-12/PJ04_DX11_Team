@@ -722,8 +722,9 @@ void CMap_Parser::Parse_EffectEntry(
 		Try_ReadFloat3Array(*pMainComponent, "Size", &Desc.tEffect.vAreaSize);
 		Try_ReadFloat(*pMainComponent, "ExposureValue", &Desc.tEffect.fExposureValue);
 
-		Desc.tEffect.vAreaCenter = Desc.vPosition;
+		Desc.tEffect.vAreaCenter = { 0.f, 0.f, 0.f };
 		Desc.tEffect.vAreaRot = Desc.vRotation;
+		Desc.vScale = { 1.f, 1.f, 1.f };
 	}
 
 	Desc.tEffect.eEffectType = Classify_EffectType(Desc.wstrObjectName, Desc.wstrComponentName);

@@ -6,6 +6,7 @@
 #include "Kabu.h"
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
+#include "Cappy.h"
 
 NS_BEGIN(Client)
 
@@ -43,13 +44,19 @@ namespace
 		return CPoppyBrosJr::Create(pDevice, pContext);
 	}
 
+	CGameObject* Create_CappyPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	{
+		return CCappy::Create(pDevice, pContext);
+	}
+
 	static const LD_MONSTER_CATALOG g_MonsterCatalog[] =
 	{
-			{ L"BladeKnight", CBladeKnight::PROTOTYPE_TAG, &Create_BladeKnightPrototype },
-			{ L"NormalEnemy", CNormalEnemy::PROTOTYPE_TAG, &Create_NormalEnemyPrototype },
-			{ L"Kabu", CKabu::PROTOTYPE_TAG, &Create_KabuPrototype },
-			{ L"BrontoBurt", CBrontoBurt::PROTOTYPE_TAG, &Create_BrontoBurtPrototype },
-			{ L"PoppyBrosJr", CPoppyBrosJr::PROTOTYPE_TAG, &Create_PoppyBrosJrPrototype },
+			{ L"BladeKnight",	CBladeKnight::PROTOTYPE_TAG,	&Create_BladeKnightPrototype },
+			{ L"NormalEnemy",	CNormalEnemy::PROTOTYPE_TAG,	&Create_NormalEnemyPrototype },
+			{ L"Kabu",			CKabu::PROTOTYPE_TAG,			&Create_KabuPrototype },
+			{ L"BrontoBurt",	CBrontoBurt::PROTOTYPE_TAG,		&Create_BrontoBurtPrototype },
+			{ L"PoppyBrosJr",	CPoppyBrosJr::PROTOTYPE_TAG,	&Create_PoppyBrosJrPrototype },
+			{ L"Cappy",			CCappy::PROTOTYPE_TAG,			&Create_CappyPrototype },
 	};
 }
 
