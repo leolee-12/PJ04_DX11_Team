@@ -243,6 +243,22 @@ _bool CKirby_Ability_Sword::Handle_Command(CKirby* pKirby, CKirby_Command* pComm
 
             return true;
         }
+        // Jump Down
+        case KIRBY_COMMAND_TYPE::JUMP:
+        {
+            if (!pCommand->IsDown())
+                return false;
+
+            if (m_eSwordState == SWORD_STATE::SUPER_SPIN_SLASH_LOOP && pMovement->Is_Grounded())
+            {
+                pMovement->Try_Jump();
+
+                if (m_iSuperSpinSlashCount > 1)
+                    m_iSuperSpinSlashCount = 1;
+            }
+
+            return true;
+        }
     }
 
     return false;
@@ -480,7 +496,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
     {
         BeginHit(false);
         pKirby->Set_RotationLock(true);
-        pAnimator->Play("SpinSlashEnd", false, false, 0.1f, 2.5f);
+        pAnimator->Play("SpinSlashEnd", false, false, 0.1f, 3.f);
 
         break;
     }
@@ -528,7 +544,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
     {
         BeginHit(false);
         pKirby->Set_RotationLock(true);
-        pAnimator->Play("SuperSpinSlashEnd", false, false, 0.1f, 2.5f);
+        pAnimator->Play("SuperSpinSlashEnd", false, false, 0.1f, 3.f);
         break;
     }
     }
