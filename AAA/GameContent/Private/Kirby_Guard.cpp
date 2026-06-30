@@ -33,7 +33,7 @@ void CKirby_Guard::Enter(CKirby* pKirby)
     pAbility->Clear_Overlay(pKirby, 1, 0.1f);
     pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::GUARD);
 
-    pKirby->Get_Body()->Set_Eye(KIRBY_EYE_STATE::ANGRY);
+    pKirby->Get_Body()->Set_KirbyEye(KIRBY_EYE_STATE::ANGRY);
 
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_GroundFriction(s_fGuardGroundFriction);
@@ -48,7 +48,7 @@ void CKirby_Guard::Exit(CKirby* pKirby)
 {
     __super::Exit(pKirby);
 
-    pKirby->Get_Body()->Set_Eye(KIRBY_EYE_STATE::IDLE);
+    pKirby->Get_Body()->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
 
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_GroundFriction(CKirby::s_fGroundFriction);

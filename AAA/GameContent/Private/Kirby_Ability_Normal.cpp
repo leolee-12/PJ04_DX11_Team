@@ -82,7 +82,7 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _flo
     Update_SuperInhaleTimer(fTimeDelta);
     Update_InhaleState(pKirby, fTimeDelta);
 
-    if (GetAsyncKeyState('T'))
+    if (GetAsyncKeyState('T') & 0x8000)
     {
         pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::SWORD);
         pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
@@ -212,8 +212,8 @@ void CKirby_Ability_Normal::Enter_InhaleState(CKirby* pKirby, INHALE_STATE eStat
     {
         case INHALE_STATE::INHALE_LOOP:
         {
-            pBody->Set_Body(KIRBY_BODY_STATE::INHALE);
-            pBody->Set_Eye(KIRBY_EYE_STATE::IDLE);
+            //pBody->Set_KirbyBody(KIRBY_BODY_STATE::INHALE);
+            //pBody->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
 
             pMovement->Set_MaxHorizontalSpeed(2.f);
 
@@ -224,7 +224,7 @@ void CKirby_Ability_Normal::Enter_InhaleState(CKirby* pKirby, INHALE_STATE eStat
 
         case INHALE_STATE::SUPER_INHALE_START:
         {
-            pBody->Set_Eye(KIRBY_EYE_STATE::ANGRY);
+            //pBody->Set_KirbyEye(KIRBY_EYE_STATE::ANGRY);
             pAnimator->Play("SuperInhaleStart", false, false, 0.1f, 2.5f);
 
             static_cast<CInhaleContainer*>(m_pInhaleEffect)->On_SuperInhale();
@@ -233,7 +233,7 @@ void CKirby_Ability_Normal::Enter_InhaleState(CKirby* pKirby, INHALE_STATE eStat
 
         case INHALE_STATE::SUPER_INHALE_LOOP:
         {
-            pBody->Set_Eye(KIRBY_EYE_STATE::CLOSE);
+            //pBody->Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);
             Play_InhaleLoopAnimation(pKirby);
             break;
         }
@@ -254,9 +254,9 @@ void CKirby_Ability_Normal::Enter_InhaleState(CKirby* pKirby, INHALE_STATE eStat
 
         case INHALE_STATE::STUFFED_START:
         {
-            pBody->Set_Eye(KIRBY_EYE_STATE::IDLE);
+            //pBody->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
             pAnimator->Play("Stuffed", false, false, 0.1f, 1.5f, true);
-            pBody->Set_Body(KIRBY_BODY_STATE::STUFFED);
+            //pBody->Set_KirbyBody(KIRBY_BODY_STATE::STUFFED);
             break;
         }
 
@@ -318,7 +318,7 @@ void CKirby_Ability_Normal::Update_InhaleState(CKirby* pKirby, _float fTimeDelta
         case INHALE_STATE::INHALE_END:
         {
             if (pAnimator->Get_Progress() >= 0.5f)
-                pBody->Set_Body(KIRBY_BODY_STATE::NORMAL);
+                //pBody->Set_KirbyBody(KIRBY_BODY_STATE::NORMAL);
 
             if (pAnimator->Is_Finished())
                 Change_InhaleState(pKirby, INHALE_STATE::NORMAL_EXIT);
@@ -341,17 +341,17 @@ void CKirby_Ability_Normal::Update_InhaleState(CKirby* pKirby, _float fTimeDelta
 
             if (fRatio >= 0.4f)
             {
-                pKirby->Get_Body()->Set_Body(KIRBY_BODY_STATE::NORMAL);
+                //pKirby->Get_Body()->Set_KirbyBody(KIRBY_BODY_STATE::NORMAL);
                 Change_MouthState(MOUTH_STATE::DEFAULT);
             }
             else if (fRatio >= 0.1f)
             {
-                pKirby->Get_Body()->Set_Body(KIRBY_BODY_STATE::INHALE);
+                //pKirby->Get_Body()->Set_KirbyBody(KIRBY_BODY_STATE::INHALE);
                 Spit_Inhalable(pKirby);
             }
             else
             {
-                pKirby->Get_Body()->Set_Body(KIRBY_BODY_STATE::STUFFED);
+                //pKirby->Get_Body()->Set_KirbyBody(KIRBY_BODY_STATE::STUFFED);
             }
 
             if (pAnimator->Is_Finished())
@@ -382,8 +382,8 @@ void CKirby_Ability_Normal::Exit_InhaleState(CKirby* pKirby, INHALE_STATE eState
             break;
 
         case INHALE_STATE::INHALE_END:
-            pBody->Set_Eye(KIRBY_EYE_STATE::IDLE);
-            pBody->Set_Body(KIRBY_BODY_STATE::NORMAL);
+            //pBody->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
+            //pBody->Set_KirbyBody(KIRBY_BODY_STATE::NORMAL);
 
             pKirby->Get_Movement()->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
             break;
@@ -513,8 +513,8 @@ void CKirby_Ability_Normal::Restore_KirbyAfterInhale(CKirby* pKirby)
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
 
     CKirby_Body* pBody = pKirby->Get_Body();
-    pBody->Set_Eye(KIRBY_EYE_STATE::IDLE);
-    pBody->Set_Body(KIRBY_BODY_STATE::NORMAL);
+    pBody->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
+    pBody->Set_KirbyBody(KIRBY_BODY_STATE::NORMAL);
 }
 
 void CKirby_Ability_Normal::Start_InhaleCollider(CKirby* pKirby)

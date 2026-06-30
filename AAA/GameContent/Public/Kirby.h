@@ -27,6 +27,11 @@ class CKirby_Ability;
 class CKirby_Body;
 class CKirby_OnOffPart;
 
+class CKirby_Deform_Model;
+class CKirby_Deform;
+
+enum class KIRBY_DEFORM_MODEL_TYPE { DEMO, MAIN };
+
 class CKirby final : public CCharacter
 {
 	GENERATED_BODY(CKirby)
@@ -90,6 +95,10 @@ public:
 	void OnOffParts(COPY_ABILITY_TYPE eAbilityType, _bool bOn, _bool bOnlyWeapon = false);
 	CKirby_OnOffPart* Find_OnOffPart(const wchar_t* PartTag);
 
+	CKirby_Deform_Model* Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType = KIRBY_DEFORM_MODEL_TYPE::MAIN);
+
+	void Change_HatSocketMatrix(COPY_ABILITY_TYPE eAbilityType, const _float4x4* pBoneMatrix);
+
 	// Movement
 	void Add_MoveDir(const _float3& vWishDir);
 	_bool Has_MoveDir();
@@ -110,6 +119,10 @@ public:
 	_bool Can_AbilityDump();
 	void Req_AbilityDumpCoolDecrease() { m_bDecreaseAbilityDumpCool = true; }
 
+	// Deform
+	CKirby_Deform* Get_KirbyDeform();
+	void Set_KirbyDeform(DEFORM_TYPE eDeformType);
+
 	// Collider
 	CCollider* Get_Collider(KIRBY_COLLIDER eKirbyCollider);
 
@@ -127,6 +140,7 @@ private:
 	HRESULT Ready_PartObjects();
 	HRESULT Ready_System();
 	HRESULT Ready_Ability();
+	HRESULT Ready_Deform();
 	HRESULT Bind_ShaderResources();
 	virtual HRESULT Ready_Events() override;
 
@@ -179,6 +193,10 @@ private:
 	_float m_fAccAbilityDumpCoolTime{};
 	_float m_fMaxAbilityDumpCoolTime{ 0.5f };
 	_bool m_bDecreaseAbilityDumpCool{};
+
+	// Deform
+	CKirby_Deform* m_pKirby_Deform{};
+	unordered_map<DEFORM_TYPE, CKirby_Deform*> m_Deformations;
 
 	// CutScene Grab
 	const _float4x4* m_pGrabBone = nullptr;

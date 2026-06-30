@@ -16,6 +16,7 @@
 #include "Kirby_Guard.h"
 #include "Kirby_CutSceneGrabbed.h"
 #include "Kirby_QTE_Grabbed.h"
+#include "Kirby_GetDeform.h"
 
 CKirby_StateMachine::CKirby_StateMachine()
 {
@@ -111,6 +112,7 @@ HRESULT CKirby_StateMachine::Init_State()
     if (FAILED(Register_State(KIRBY_STATE_TYPE::GUARD, CKirby_Guard::Create())))                        return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::CUTSCENE_GRABBED, CKirby_CutSceneGrabbed::Create())))   return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::QTE_GRABBED, CKirby_QTE_Grabbed::Create())))            return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::GET_DEFORM, CKirby_GetDeform::Create())))               return E_FAIL;
 
     return S_OK;
 }

@@ -91,13 +91,13 @@ void CKirby_AbilityDump::Close_Eye(CKirby_Body* pBody, _float fRatio)
 {
     if (m_bCloseEye == false && fRatio >= 0.55f && fRatio < 0.9f)
     {
-        pBody->Set_Eye(KIRBY_EYE_STATE::CLOSE);
+        pBody->Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);
 
         m_bCloseEye = true;
     }
     else if (m_bCloseEye == true && fRatio >= 0.9f)
     {
-        pBody->Set_Eye(KIRBY_EYE_STATE::IDLE);
+        pBody->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
 
         m_bCloseEye = false;
     }

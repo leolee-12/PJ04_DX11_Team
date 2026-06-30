@@ -40,6 +40,8 @@ public:
 public:
 	virtual void PartOnOff(_bool bOn) { m_bOn = bOn; }
 
+	void Set_SocketBoneMatrix(const _float4x4* pSocketBoneMatrix) { m_pSocketBoneMatrix = pSocketBoneMatrix; }
+
 protected:
 	const _float4x4* m_pSocketBoneMatrix{ nullptr };
 

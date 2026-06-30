@@ -45,10 +45,10 @@ void CKirby_Fall::Exit(CKirby* pKirby)
 {
     __super::Exit(pKirby);
 
-    if (pKirby->Get_Body()->Get_BodyState() != KIRBY_BODY_STATE::STUFFED)
+    if (pKirby->Get_Body()->Get_KirbyBody() != KIRBY_BODY_STATE::STUFFED)
     {
         CKirby_Body* pKirby_Body = pKirby->Get_Body();
-        pKirby_Body->Set_Eye(KIRBY_EYE_STATE::IDLE);
+        pKirby_Body->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
     }
 }
 
@@ -82,7 +82,7 @@ _bool CKirby_Fall::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             CMovement_Child* pMovementCom = pKirby->Get_Movement();
             if (pMovementCom->Is_Grounded() == true)
                 pKirby->Change_State(KIRBY_STATE_TYPE::JUMP);
-            else if (pKirby->Get_Body()->Get_BodyState() != KIRBY_BODY_STATE::STUFFED)
+            else if (pKirby->Get_Body()->Get_KirbyBody() != KIRBY_BODY_STATE::STUFFED)
                 pKirby->Change_State(KIRBY_STATE_TYPE::HOVERING);
 
             return true;
@@ -130,8 +130,8 @@ void CKirby_Fall::Update_FallState(CKirby* pKirby)
                 CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
                 pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::LANDING);
 
-                if (pKirby->Get_Body()->Get_BodyState() != KIRBY_BODY_STATE::STUFFED)
-                    pKirby_Body->Set_Eye(KIRBY_EYE_STATE::CLOSE);
+                if (pKirby->Get_Body()->Get_KirbyBody() != KIRBY_BODY_STATE::STUFFED)
+                    pKirby_Body->Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);
             }
             break;
     }
