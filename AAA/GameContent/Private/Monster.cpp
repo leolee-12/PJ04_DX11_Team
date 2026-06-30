@@ -202,7 +202,8 @@ HRESULT CMonster::Ready_Collider()
 	{
 		CCollider::COLLIDER_DESC ColliderDesc{};
 		ColliderDesc.pOwner = this;
-		ColliderDesc.vCenter = vFootPos;
+		//ColliderDesc.vCenter = vFootPos;
+		ColliderDesc.vCenter = _float3{ 0,0,0 };
 		ColliderDesc.fRadius = fRadius;
 
 		m_pInteractCollider = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
