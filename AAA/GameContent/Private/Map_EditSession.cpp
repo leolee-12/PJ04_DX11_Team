@@ -563,15 +563,11 @@ _bool CMap_EditSession::Try_GetAddedObjectItem(
 MAP_EDIT_CHANGE CMap_EditSession::Build_ChangeSnapShot() const
 {
 	MAP_EDIT_CHANGE Snapshot = m_tEditData.OverrideDesc;
-	Snapshot.AddedMapObjects.clear();
 
-	if (!m_tEditData.bLoadEnv)
-	{
-		Snapshot.EditedEnvObjects = m_tEditData.OverrideDesc.EditedEnvObjects;
-		Snapshot.EditedMapSections = m_tEditData.OverrideDesc.EditedMapSections;
-		Snapshot.AddedMapObjects = m_tEditData.OverrideDesc.AddedMapObjects;
+	if (!m_tEditData.bLoadEnv || m_AddedObjectOrder.empty())
 		return Snapshot;
-	}
+
+	Snapshot.AddedMapObjects.clear();
 
 	for (CGameObject* pObject : m_AddedObjectOrder)
 	{

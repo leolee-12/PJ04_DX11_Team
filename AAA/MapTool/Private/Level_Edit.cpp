@@ -50,6 +50,34 @@ namespace
 
 	constexpr _tchar kMapModelRoot[] = L"../../Resources/Map";
 
+	ENV_OBJECT_DESC Make_DefaultEnvTriggerDesc(const wstring& strObjectName, const _float3& vPosition)
+	{
+		ENV_OBJECT_DESC Desc{};
+		Engine::CGameObject::GAMEOBJECT_DESC& BaseDesc =
+			static_cast<Engine::CGameObject::GAMEOBJECT_DESC&>(Desc);
+
+		Desc.eKind = ENV_OBJECT_KIND::EFFECT;
+		Desc.wstrObjectName = strObjectName;
+		Desc.wstrComponentName = strObjectName;
+
+		Desc.vPosition = vPosition;
+		Desc.vRotation = { 0.f, 0.f, 0.f, 1.f };
+		Desc.vScale = { 1.f, 1.f, 1.f };
+
+		BaseDesc.vPosition = _float4(vPosition.x, vPosition.y, vPosition.z, 1.f);
+
+		Desc.tCollision.bInvisibleCollision = true;
+		Desc.tRender.bHasShadow = false;
+		Desc.tRender.bUseCullDistance = false;
+		Desc.tRender.bUseCullFrustum = false;
+
+		Desc.tEffect.vAreaCenter = { 0.f, 0.f, 0.f };
+		Desc.tEffect.vAreaSize = { 1.f, 1.f, 1.f };
+		Desc.tEffect.vAreaRot = { 0.f, 0.f, 0.f, 1.f };
+
+		return Desc;
+	}
+
 	_bool Equals_NoCase(const wstring& strLeft, const wstring& strRight)
 	{
 		return 0 == _wcsicmp(strLeft.c_str(), strRight.c_str());
@@ -283,7 +311,7 @@ HRESULT CLevel_Edit::Render()
 	return S_OK;
 }
 
-CGameObject* CLevel_Edit::Spawn_Object(const wstring& strProtoTag, const wstring& strLayerTag, const wstring& strName, void* pArg)
+CGameObject* CLevel_Edit::Spawn_Object(const _wstring& strProtoTag, const _wstring& strLayerTag, const _wstring& strName, void* pArg)
 {
 	auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(strProtoTag);
 	if (!pReg) return nullptr;
@@ -296,15 +324,28 @@ CGameObject* CLevel_Edit::Spawn_Object(const wstring& strProtoTag, const wstring
 			pReg->CreatorFunc(m_pDevice, m_pContext));
 	}
 
-	wstring strFinalLayer = strLayerTag;
+	_wstring strFinalLayer = strLayerTag;
 	if (pReg->strCategory == L"CAMERA_OBJECT")
 		strFinalLayer = L"Layer_Camera";
 
-	Engine::CGameObject* pObj = { nullptr };
-	m_pGameInstance_Proxy->Add_GameObject_Return(
-		&pObj,
-		ETOUI(TOOL_LEVEL::EDIT), strProtoTag.c_str(),
-		ETOUI(TOOL_LEVEL::EDIT), strFinalLayer.c_str(), strName, pArg);
+	CGameObject* pObj = nullptr;
+	const HRESULT hr = m_pGameInstance_Proxy->
+		Add_GameObject_Return(
+			&pObj,
+			ETOUI(TOOL_LEVEL::EDIT),
+			strProtoTag.c_str(),
+			ETOUI(TOOL_LEVEL::EDIT),
+			strFinalLayer.c_str(),
+			strName,
+			pArg);
+
+	if (FAILED(hr) || nullptr == pObj)
+	{
+		if (nullptr != pObj)
+			m_pGameInstance_Proxy->Destroy_GameObject(pObj);
+
+		return nullptr;
+	}
 
 	Add_Layer(strFinalLayer);
 	m_Layers[strFinalLayer].push_back({ strProtoTag, strName, pObj });
@@ -429,17 +470,30 @@ void CLevel_Edit::Place_Object_At(const _float3& vPos)
 {
 	wstring strName = m_strPendingProto + L"_" + to_wstring(m_iPlaceCount++);
 
-	CGameObject* pObj = Spawn_Object(m_strPendingProto, m_strPendingLayer, strName);
-	if (pObj)
-	{
-		pObj->Get_Transform()->Set_State(
-			STATE::POSITION,
-			XMVectorSet(vPos.x, vPos.y, vPos.z, 1.f)
-		);
-		pObj->Initialize_NaviPlacement();
+	ENV_OBJECT_DESC EnvTriggerDesc{};
+	void* pArg = nullptr;
 
-		Try_RegisterAddedMapOverridePlacement(pObj, strName);
+	auto* pRegistration = CGameObject_Factory::GetInstance()->Get_Registration(m_strPendingProto);
+	if (nullptr != pRegistration && pRegistration->strCategory == L"ENV_TRIGGER")
+	{
+		EnvTriggerDesc = Make_DefaultEnvTriggerDesc(strName, vPos);
+		pArg = &EnvTriggerDesc;
 	}
+
+	CGameObject* pObj = Spawn_Object(m_strPendingProto, m_strPendingLayer, strName, pArg);
+	if (nullptr == pObj)
+	{
+		MapTool::Log_Error("Failed to place object: " + WstrToStr(m_strPendingProto));
+		return;
+	}
+
+	pObj->Get_Transform()->Set_State(
+		STATE::POSITION,
+		XMVectorSet(vPos.x, vPos.y, vPos.z, 1.f)
+	);
+	pObj->Initialize_NaviPlacement();
+
+	Try_RegisterAddedMapOverridePlacement(pObj, strName);
 }
 
 void CLevel_Edit::Begin_PlaceMode(const wstring& strProtoTag, const wstring& strLayerTag)
