@@ -250,6 +250,7 @@ void CKirby_GetDeform::Set_RotationDir(CKirby* pKirby)
     _float fRadian = XMConvertToRadians(15.f);
 
     _vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
     _vector vLeftDir = XMVector3Rotate(-vCamLook, XMQuaternionRotationAxis(vUp, -fRadian));
     _vector vRightDir = XMVector3Rotate(-vCamLook, XMQuaternionRotationAxis(vUp, fRadian));
 

@@ -6,6 +6,8 @@
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
 
+#include "Kirby_Deform.h"
+
 CKirby_Run::CKirby_Run()
 {
 }
@@ -27,8 +29,10 @@ void CKirby_Run::Enter(CKirby* pKirby)
 {
     __super::Enter(pKirby);
 
-    CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
-    pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::RUN);
+    if (pKirby->Has_Deform())
+        pKirby->Get_KirbyDeform()->Play_DeformAni(pKirby, DEFORM_ANI::RUN);
+    else
+        pKirby->Get_KirbyAbility()->Play_AbilityAni(pKirby, ABILITY_ANI::RUN);
 }
 
 void CKirby_Run::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -82,6 +86,10 @@ _bool CKirby_Run::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
         // Attack
         case KIRBY_COMMAND_TYPE::ATTACK:
         {
+            // 임시로 막아둠
+            if (pKirby->Has_Deform())
+                return true;
+
             CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
             if (pAbility->Can_Attack(KIRBY_ATTACK_LOCATION::GROUND))
             {
@@ -100,6 +108,9 @@ _bool CKirby_Run::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
         {
             if (!pCommand->IsPress())
                 return false;
+
+            if (pKirby->Has_Deform())
+                return true;
 
             pKirby->Change_State(KIRBY_STATE_TYPE::GUARD);
             return true;
