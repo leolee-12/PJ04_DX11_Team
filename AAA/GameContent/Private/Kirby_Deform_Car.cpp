@@ -6,6 +6,8 @@
 #include "Kirby_Body.h"
 #include "Kirby_State.h"
 
+#include "Movement_Child.h"
+
 CKirby_Deform_Car::CKirby_Deform_Car()
 {
 }
@@ -34,10 +36,14 @@ DEFORM_TYPE CKirby_Deform_Car::Get_DeformType()
 
 void CKirby_Deform_Car::Enter_Deform(CKirby* pKirby)
 {
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Set_RotationSpeed(s_fDeformCar_Rot_Speed_Degree);
 }
 
 void CKirby_Deform_Car::Exit_Deform(CKirby* pKirby)
 {
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
 }
 
 void CKirby_Deform_Car::Enter_DeformState(CKirby* pKirby)

@@ -602,7 +602,7 @@ void CKirby::Clear_CutsceneGrabTarget()
     m_pGrabOwnerWorld = nullptr;
 }
 
-void CKirby::Set_KirbyDeform(DEFORM_TYPE eDeformType)
+void CKirby::Change_KirbyDeform(DEFORM_TYPE eDeformType)
 {
     if (eDeformType == DEFORM_TYPE::NONE)
     {
@@ -618,6 +618,19 @@ void CKirby::Set_KirbyDeform(DEFORM_TYPE eDeformType)
     }
 
     m_pKirby_Deform = iter->second;
+    m_pKirby_Deform->Enter_Deform(this);
+}
+
+void CKirby::Reset_KirbyDeform()
+{
+    if(m_pKirby_Deform == nullptr)
+    {
+        MSG_BOX("m_pKirby_Deform is nullptr");
+        return;
+    }
+
+    m_pKirby_Deform->Exit_Deform(this);
+    m_pKirby_Deform = nullptr;
 }
 
 CCollider* CKirby::Get_Collider(KIRBY_COLLIDER eKirbyCollider)

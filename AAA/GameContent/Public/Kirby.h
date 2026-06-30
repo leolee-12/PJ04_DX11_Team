@@ -123,7 +123,8 @@ public:
 	// Deform
 	_bool Has_Deform() { return m_pKirby_Deform ? true : false; }
 	CKirby_Deform* Get_KirbyDeform() { return m_pKirby_Deform; }
-	void Set_KirbyDeform(DEFORM_TYPE eDeformType);
+	void Change_KirbyDeform(DEFORM_TYPE eDeformType);
+	void Reset_KirbyDeform();
 
 	// Collider
 	CCollider* Get_Collider(KIRBY_COLLIDER eKirbyCollider);

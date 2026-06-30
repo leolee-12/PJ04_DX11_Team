@@ -12,6 +12,9 @@ class CKirby;
 class CLIENT_DLL CKirby_Deform_Car final : public CKirby_Deform
 {
 private:
+	static constexpr _float s_fDeformCar_Rot_Speed_Degree = 360.f;
+
+private:
 	CKirby_Deform_Car();
 	virtual ~CKirby_Deform_Car() = default;
 

@@ -40,7 +40,7 @@ void CKirby_GetDeform::Enter(CKirby* pKirby)
 
     // 받아와서
     m_eDeformType = DEFORM_TYPE::CAR;
-    pKirby->Set_KirbyDeform(m_eDeformType);
+    pKirby->Change_KirbyDeform(m_eDeformType);
 
     m_eDeformState = DEFORM_STATE::DEFORM_STATE_END;
     Change_GetDeformState(pKirby, DEFORM_STATE::SUPER_INHALE_START);
