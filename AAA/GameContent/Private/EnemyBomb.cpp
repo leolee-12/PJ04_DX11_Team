@@ -9,7 +9,7 @@ CEnemyBomb::CEnemyBomb(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	m_fSpeed = 25.f;
 	m_fDamage = 2.f;
 	m_fKnockback = 4.f;
-	m_fHitRadius = 0.5f;
+	m_fHitRadius = 0.75f;
 }
 
 CEnemyBomb::CEnemyBomb(const CEnemyBomb& Prototype)
@@ -140,6 +140,7 @@ void CEnemyBomb::On_Explode()
 
 	// TODO : 폭발 이벤트
 	// TODO 폭발 시 추가 콜라이더 생성 (선택사항)
+	Despawn();
 }
 
 void CEnemyBomb::Update_Captured(_float fTimeDelta)

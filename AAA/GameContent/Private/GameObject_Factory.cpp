@@ -87,6 +87,8 @@
 #include "BrontoBurt_Body.h"
 #include "PoppyBrosJr.h"
 #include "PoppyBrosJr_Body.h"
+#include "Cappy.h"
+#include "Cappy_Body.h"
 
 //Miniboss
 #include "GigantEdge.h"
@@ -564,6 +566,23 @@ void CGameObject_Factory::Register_Container()
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/PoppyBrosJr/EnemyBomb/EnemyBomb.ysh"
                     , XMMatrixRotationX(XMConvertToRadians(90.f))* XMMatrixRotationY(XMConvertToRadians(180.f))
                 ));
+        )
+    );
+
+    // 6. Cappy
+    Register
+    (
+        CCappy::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CCappy),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCappy_Body::PROTOTYPE_TAG, CCappy_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Cappy_Body"),
+                    CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Cappy/Body/Cappy_Body.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            // TODO : Hat
         )
     );
 

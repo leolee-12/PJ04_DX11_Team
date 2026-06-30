@@ -792,8 +792,8 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Form\01. DeformCar_Demo">
       <UniqueIdentifier>{bf99796d-3273-432e-a337-ddc43bb3ee3e}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="01. Projectile\00. PhysicsProjectile\01. Bomb">
+    </Filter>
+    <Filter Include="01. Projectile\00. PhysicsProjectile\01. Bomb">
       <UniqueIdentifier>{a7cbb794-7713-433a-905e-5aad935b8cd9}</UniqueIdentifier>
     </Filter>
     <Filter Include="01. Projectile\00. PhysicsProjectile\01. Bomb\EnemyBomb">
@@ -1516,8 +1516,8 @@
     <ClInclude Include="..\Public\Monster_RailMovement.h" />
     <ClInclude Include="..\Public\Ancor_WorkingDirectory.h">
       <Filter>97. DataSystem</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\Kirby_Deform.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Deform.h">
       <Filter>00. GameObject\05. Kirby\04. Kirby_Deform</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Deform_Car.h">
@@ -1534,8 +1534,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_GetDeform.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\GetDeform</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\MeshLayer_Profile.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\MeshLayer_Profile.h">
       <Filter>99. Defines\Leo</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MeshLayer_Binder.h">
@@ -1546,6 +1546,15 @@
     </ClInclude>
     <ClInclude Include="..\public\LDInhalable.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Cappy.h">
+      <Filter>00. GameObject\06. Monster\04. Cappy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Cappy_Brain.h">
+      <Filter>00. GameObject\06. Monster\04. Cappy\Brain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Cappy_Body.h">
+      <Filter>00. GameObject\06. Monster\04. Cappy\Parts</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2172,15 +2181,15 @@
       <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb\EnemyBomb</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\KirbyBomb.cpp">
-		<Filter>01. Projectile\00. PhysicsProjectile\01. Bomb\KirbyBomb</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\Monster_RailMovement.cpp">
-		<Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\Kirby_Deform.cpp">
-		<Filter>00. GameObject\05. Kirby\04. Kirby_Deform</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\Kirby_Deform_Car.cpp">
+      <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb\KirbyBomb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_RailMovement.cpp">
+      <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Deform.cpp">
+      <Filter>00. GameObject\05. Kirby\04. Kirby_Deform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Deform_Car.cpp">
       <Filter>00. GameObject\05. Kirby\04. Kirby_Deform\Deform_Car</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_DeformCar_Demo.cpp">
@@ -2194,8 +2203,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_GetDeform.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\GetDeform</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\MeshLayer_Binder.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\MeshLayer_Binder.cpp">
       <Filter>99. Defines\Leo</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MeshLayer_Profile.cpp">
@@ -2206,7 +2215,16 @@
     </ClCompile>
     <ClCompile Include="..\private\LDInhalable.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
-	</ClCompile>
+    </ClCompile>
+    <ClCompile Include="..\Private\Cappy.cpp">
+      <Filter>00. GameObject\06. Monster\04. Cappy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Cappy_Brain.cpp">
+      <Filter>00. GameObject\06. Monster\04. Cappy\Brain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Cappy_Body.cpp">
+      <Filter>00. GameObject\06. Monster\04. Cappy\Parts</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl">
