@@ -53,8 +53,8 @@ void CPhysicsProjectile::Launch_Arc(const _float3& vStart, const _float3& vTarge
 
     if (m_pHitBox)
     {
-        m_pHitBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
         m_pHitBox->Set_Enabled(true);
+        m_pHitBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
     }
 
     m_bFlying = true; m_iBounceCount = 0;

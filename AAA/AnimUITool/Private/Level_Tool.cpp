@@ -80,9 +80,6 @@ HRESULT CLevel_Tool::Initialize()
     if (FAILED(Ready_PreviewShaders()))
         return E_FAIL;
 
-    if (FAILED(Client::Ready_Prototype_Shaders(m_pGameInstance_Proxy, m_pDevice, m_pContext)))
-        return E_FAIL;
-
     if (FAILED(CMap_Loader::Ready_TexHub(m_pGameInstance_Proxy)))
         return E_FAIL;
 

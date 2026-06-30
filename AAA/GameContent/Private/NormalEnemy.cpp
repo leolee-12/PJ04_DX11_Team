@@ -74,6 +74,14 @@ void CNormalEnemy::Update(_float fTimeDelta)
 	if (!m_bActive)
 		return;
 
+#ifdef _DEBUG
+	if (m_pGameInstance_Proxy->Is_EditMode())
+	{
+		if (m_pMovement) m_pMovement->Sync_To_Controller();
+		return;
+	}
+#endif
+
 	__super::Update(fTimeDelta);
 }
 
