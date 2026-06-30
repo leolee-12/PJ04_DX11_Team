@@ -1568,6 +1568,9 @@
     <ClInclude Include="..\Public\Cappy_Hat.h">
       <Filter>00. GameObject\06. Monster\04. Cappy\Parts\Hat</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LevelDesign_MonsterCatalog.h">
+      <Filter>97. DataSystem\LevelDesignLoader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2239,6 +2242,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Cappy_Hat.cpp">
       <Filter>00. GameObject\06. Monster\04. Cappy\Parts\Hat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelDesign_MonsterCatalog.cpp">
+      <Filter>97. DataSystem\LevelDesignLoader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
