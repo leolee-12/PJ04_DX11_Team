@@ -63,7 +63,6 @@ public:
 	static constexpr _float s_fInhaleRadius = 3.f;
 	static constexpr _float s_fInhaleLength = 2.f;
 
-
 	static constexpr _float s_fSpitSpeed = 14.f;
 
 private:
@@ -84,8 +83,6 @@ public:
 
 	virtual void On_Deserialized() override;
 
-	virtual void Damaged(const ATTACK_INFO& tInfo) override;
-
 public:
 	// Com
 	CMovement_Child* Get_Movement() { return m_pMovement; }
@@ -99,7 +96,7 @@ public:
 	CKirby_OnOffPart* Find_HatPart(COPY_ABILITY_TYPE eType);
 
 	CKirby_Body* Get_Body() { return m_pBody; }
-	CKirby_Deform_Model* Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType = KIRBY_DEFORM_MODEL_TYPE::MAIN);
+	CKirby_Deform_Model* Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType);
 
 	CKirby_Deform_Model* Find_DeformModel(const wchar_t* pPartTag);
 
@@ -124,7 +121,8 @@ public:
 	void Req_AbilityDumpCoolDecrease() { m_bDecreaseAbilityDumpCool = true; }
 
 	// Deform
-	CKirby_Deform* Get_KirbyDeform();
+	_bool Has_Deform() { return m_pKirby_Deform ? true : false; }
+	CKirby_Deform* Get_KirbyDeform() { return m_pKirby_Deform; }
 	void Set_KirbyDeform(DEFORM_TYPE eDeformType);
 
 	// Collider
@@ -133,8 +131,8 @@ public:
 	// CutScene Grab
 	void Update_CutsceneGrabTransform();
 
-
 	// Damage
+	virtual void Damaged(const ATTACK_INFO& tInfo) override;
 	void Add_HP(_float fHP) { m_fCurHP += fHP; }
 	void Start_DamageInvincibility() { m_fInvincibleTime = s_fInvincibleDuration; }
 
@@ -151,7 +149,7 @@ private:
 	// Ability
 	void Set_KirbyAbility(COPY_ABILITY_TYPE eAbilityState);
 
-	// À±¼®Çö Ãß°¡
+	// Damage
 	virtual _bool Block_Hit(const ATTACK_INFO& tInfo) override;
 	virtual void  On_Damaged(const ATTACK_INFO& tInfo) override;
 	

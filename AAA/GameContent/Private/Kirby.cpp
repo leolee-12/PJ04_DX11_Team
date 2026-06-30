@@ -141,23 +141,6 @@ void CKirby::On_Deserialized()
         m_pMovement->Sync_To_Controller();
 }
 
-void CKirby::Damaged(const ATTACK_INFO& tInfo)
-{
-    if (!Is_Active())
-        return;
-
-    if (Block_Hit(tInfo))
-        return;
-
-    On_Damaged(tInfo);
-
-    if (m_fCurHP <= 0.f)
-    {
-        m_fCurHP = 0.f;
-        On_Death(tInfo);
-    }
-}
-
 void CKirby::Set_AbilityPartsActive(COPY_ABILITY_TYPE eAbilityType, _bool bOn, _bool bOnlyWeapon)
 {
     CKirby_OnOffPart* pWeapon = Find_WeaponPart(eAbilityType);
@@ -619,9 +602,9 @@ void CKirby::Clear_CutsceneGrabTarget()
     m_pGrabOwnerWorld = nullptr;
 }
 
-CKirby_Deform* CKirby::Get_KirbyDeform()
+_bool CKirby::Has_Deform()
 {
-    return m_pKirby_Deform;
+    return _bool();
 }
 
 void CKirby::Set_KirbyDeform(DEFORM_TYPE eDeformType)
@@ -656,6 +639,23 @@ void CKirby::Update_CutsceneGrabTransform()
     Get_Transform()->Set_WorldMatrix(matGrabTargetWorld);
 
     m_pMovement->Sync_To_Controller();
+}
+
+void CKirby::Damaged(const ATTACK_INFO& tInfo)
+{
+    if (!Is_Active())
+        return;
+
+    if (Block_Hit(tInfo))
+        return;
+
+    On_Damaged(tInfo);
+
+    if (m_fCurHP <= 0.f)
+    {
+        m_fCurHP = 0.f;
+        On_Death(tInfo);
+    }
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
