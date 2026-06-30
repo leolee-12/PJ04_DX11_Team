@@ -68,6 +68,9 @@
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h" />
     <ClInclude Include="..\public\LDInhalable.h" />
     <ClInclude Include="..\Public\LevelDesign_MonsterCatalog.h" />
+    <ClInclude Include="..\public\RockBurst.h" />
+    <ClInclude Include="..\public\RockEffect.h" />
+    <ClInclude Include="..\public\RockFloorEffect.h" />
     <ClInclude Include="..\Public\Sword_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\MeshLayer_Binder.h" />
     <ClInclude Include="..\Public\MeshLayer_Profile.h" />
@@ -321,6 +324,9 @@
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp" />
     <ClCompile Include="..\private\LDInhalable.cpp" />
     <ClCompile Include="..\Private\LevelDesign_MonsterCatalog.cpp" />
+    <ClCompile Include="..\private\RockBurst.cpp" />
+    <ClCompile Include="..\private\RockEffect.cpp" />
+    <ClCompile Include="..\private\RockFloorEffect.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\MeshLayer_Binder.cpp" />
     <ClCompile Include="..\Private\MeshLayer_Profile.cpp" />
@@ -505,6 +511,7 @@
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Bomb.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_EffectRock.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_EnvInstance.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Gorilla.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Kirby.hlsl" />

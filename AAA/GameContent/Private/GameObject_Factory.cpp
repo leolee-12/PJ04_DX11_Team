@@ -57,6 +57,7 @@
 #include "Sword_JumpSlash.h"
 #include "Sword_SpinSlash.h"
 #include "Sword_SpinSlashTrail.h"
+#include "RockBurst.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -71,6 +72,8 @@
 #include "Common_JumpSlash.h"
 #include "Common_SpinSlash.h"
 #include "Common_SpinSlashTrail.h"
+#include "RockEffect.h"
+#include "RockFloorEffect.h"
 
 //sky
 #include "SkySphere.h"
@@ -676,7 +679,16 @@ void CGameObject_Factory::Register_AnimObject()
 
 void CGameObject_Factory::Register_Effect()
 {
-   
+    Register(CRockBurst::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CRockBurst),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRockFloorEffect::PROTOTYPE_TAG,
+                CRockFloorEffect::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRockFloorEffect::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSH/Boss/Gorilla/RockFloorEffect/RockFloorEffectModel.ysh"));
+        )
+    );
 }
 
 void CGameObject_Factory::Register_MiniBoss()
