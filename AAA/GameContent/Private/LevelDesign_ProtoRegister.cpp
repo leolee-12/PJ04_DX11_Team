@@ -1,5 +1,6 @@
 #include "LevelDesign_ProtoRegister.h"
-#include "Model.h"
+#include "GameObject_Factory.h"
+
 #include "GameInstance.h"
 
 CLevelDesign_ProtoRegister::CLevelDesign_ProtoRegister(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -50,6 +51,15 @@ HRESULT CLevelDesign_ProtoRegister::Ensure_Resources(const LD_RUNTIME_LEVELS& Le
 
 	const _uint iObjectPrototypeLevel = Levels.iPrototypeLevel;
 	const _uint iModelPrototypeLevel = Levels.iModelPrototypeLevel;
+
+	if (Spec.bUseFactoryResourceLoader)
+	{
+		auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(Spec.strPrototypeTag);
+		if (nullptr == pReg)
+			return E_FAIL;
+
+		pReg->ResourceLoader(m_pProxy, m_pDevice, m_pContext, iObjectPrototypeLevel);
+	}
 
 	if (!m_pProxy->Has_Prototype(iObjectPrototypeLevel, Spec.strPrototypeTag))
 	{
