@@ -4,6 +4,7 @@
 NS_BEGIN(Client)
 
 class CBoss_Gorilla_Body;
+class CBoss_Gorilla_RockHole;
 class CProjectile;
 
 class CBoss_Gorilla final : public CBoss
@@ -65,6 +66,7 @@ protected:
 
 private:
     CBoss_Gorilla_Body* m_pBody = { nullptr };
+    CBoss_Gorilla_RockHole* m_pRockHole = { nullptr };
     CProjectile* m_pHeldRock = { nullptr };
     static const vector<_float> s_Thresholds;
 

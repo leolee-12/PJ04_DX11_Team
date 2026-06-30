@@ -171,7 +171,8 @@ _bool CLevelDesign_EventObject::Play_EventAnimation(const _string& strAnimName, 
 		return false;
 
 	m_pAnimatorCom->Resume();
-	m_pAnimatorCom->Play(strAnimName, bLoop, true);
+	//m_pAnimatorCom->Play(strAnimName, bLoop, true);
+	m_pAnimatorCom->Play(strAnimName, bLoop, true, 0.f, 1.5f);
 	m_bAnimationActive = true;
 	return true;
 }
@@ -401,7 +402,7 @@ HRESULT CLevelDesign_EventObject::Ready_Events()
 	switch (m_tEventObjectDesc.ePolicy)
 	{
 	case LD_EVENTOBJECT_POLICY::LEVEL1_BOSS_DEMO_BG:
-		Subscribe_Event(EventTag::Cutscene_GorillaAppear, [this](void*){ On_Event(EventTag::Cutscene_GorillaAppear); });	// 이벤트 변경 예정
+		Subscribe_Event(EventTag::Cutscene_GorillaBreak, [this](void*) { On_Event(EventTag::Cutscene_GorillaBreak); });
 		break;
 
 	default:

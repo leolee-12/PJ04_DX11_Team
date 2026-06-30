@@ -99,6 +99,7 @@
 #include "Boss_Gorilla_Body.h"
 #include "CutsceneGorilla.h"
 #include "GorillaNamePlate.h"
+#include "Boss_Gorilla_RockHole.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
@@ -689,16 +690,20 @@ void CGameObject_Factory::Register_MainBoss()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Boss_Gorilla_Body"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Gorilla/Body/Gorilla.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
-
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Gorilla_Body::PROTOTYPE_TAG,
                 CBoss_Gorilla_Body::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Boulder::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Gorilla/Rock_Projectile/Rock_Anim.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
-
             TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Boulder::PROTOTYPE_TAG,
                 CProjectile_Boulder::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Gorilla_RockHole::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Gorilla/RockHole/RockHole_Anim.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Gorilla_RockHole::PROTOTYPE_TAG,
+                CBoss_Gorilla_RockHole::Create(pDevice, pContext));
         )
     );
 
