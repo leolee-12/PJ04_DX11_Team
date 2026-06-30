@@ -18,11 +18,13 @@
 
 CBrontoBurt::CBrontoBurt(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
+	, m_iAIType{ 0 }
 {
 }
 
 CBrontoBurt::CBrontoBurt(const CBrontoBurt& Prototype)
 	: CMonster(Prototype)
+	, m_iAIType{ Prototype.m_iAIType }
 {
 }
 

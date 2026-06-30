@@ -817,6 +817,9 @@
     <Filter Include="00. GameObject\06. Monster\04. Cappy\Parts\Hat">
       <UniqueIdentifier>{14d7107e-0156-4acf-97b5-c3456b029634}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\04. Cappy\State\Hide">
+      <UniqueIdentifier>{df128945-7f07-4cd3-b637-325bb681a823}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">

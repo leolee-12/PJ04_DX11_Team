@@ -15,6 +15,8 @@ class CNormalEnemy final : public CMonster
 {
 	GENERATED_BODY(CNormalEnemy)
 
+	PROPERTY(_int, m_iAIType, L"AI Type", L"AI")		// 0은 제자리 고정 대기형 / 1은 범위 내 순찰(자유 이동)
+
 public:
 	struct NORMALENEMY_DESC : public CContainerObject::COTAINEROBJECT_DESC
 	{
@@ -50,7 +52,6 @@ public:
 	virtual CAnimator*			Get_BodyAnimator() const override;
 
 	_int						Get_AIType() const { return m_iAIType; }
-	void						Set_AIType(_int iType) { m_iAIType = iType; }
 
 protected:
 	virtual CMonsterBrain*		Create_Brain() override;
@@ -65,8 +66,6 @@ private:
 private:
 	// Body 추가 
 	CNormalEnemy_Body*			m_pBody = { nullptr };
-
-	_int						m_iAIType = { 1 };
 
 public:
 	static CNormalEnemy*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

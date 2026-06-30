@@ -16,6 +16,8 @@ class CBladeKnight final : public CMonster
 {
 	GENERATED_BODY(CBladeKnight)
 
+	PROPERTY(_int, m_iAIType, L"AI Type", L"AI") // 0은 고정형, 1은 자유 이동형
+
 public:
 	struct BLADEKNIGHT_DESC : public CContainerObject::COTAINEROBJECT_DESC
 	{
@@ -56,7 +58,6 @@ public:
 
 	// BladeKnight 고정형/자유 이동형 설정
 	_int						Get_AIType() { return m_iAIType; }
-	void						Set_AIType(_int iType) { m_iAIType = iType; }
 
 protected:
 	virtual CMonsterBrain*		Create_Brain() override;
@@ -71,10 +72,6 @@ private:
 private:
 	CBladeKnight_Body*			m_pBody = { nullptr };
 	CBladeKnight_Sword*			m_pSword = { nullptr };
-
-	_int						m_iAIType = { 0 };		// 0은 고정형, 1은 자유 이동형
-
-	_bool						m_bIdleOverlayOn = { false };
 
 public:
 	static CBladeKnight*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext); 

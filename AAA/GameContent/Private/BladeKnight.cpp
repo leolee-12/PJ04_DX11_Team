@@ -31,11 +31,13 @@
 
 CBladeKnight::CBladeKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster{ pDevice, pContext }
+    , m_iAIType{ 0 }
 {
 }
 
 CBladeKnight::CBladeKnight(const CBladeKnight& Prototype)
     : CMonster( Prototype )
+    , m_iAIType{ Prototype.m_iAIType }
 {
 
 }

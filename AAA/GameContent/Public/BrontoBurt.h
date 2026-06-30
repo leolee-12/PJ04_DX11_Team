@@ -14,6 +14,8 @@ class CBrontoBurt final : public CMonster, public IRailDataReceiver
 {
 	GENERATED_BODY(CBrontoBurt)
 
+    PROPERTY(_int, m_iAIType, L"AI Type", L"AI")     // 0은 레일 이동형 / 1은 범위 내 플레이어 추격형(미구현!!!)
+
 public:
     struct BRONTOBURT_DESC : public CContainerObject::COTAINEROBJECT_DESC
     {
@@ -64,8 +66,6 @@ private:
 
 private:
     CBrontoBurt_Body*       m_pBody = { nullptr };
-
-    _int                    m_iAIType = { 0 };      // 0은 레일 이동형 / 1은 범위 내 플레이어 추격형(나중에)
 
 public:
     static CBrontoBurt*     Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
