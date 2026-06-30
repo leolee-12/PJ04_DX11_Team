@@ -184,6 +184,15 @@ void CLevelDesign_Starblock::Damaged(const ATTACK_INFO& tInfo)
 }
 #pragma endregion
 
+#pragma region Inhalable
+void CLevelDesign_Starblock::Be_Captured(CGameObject* pInhaler)
+{
+	Release_PhysicsActor();
+
+	__super::Be_Captured(pInhaler);
+}
+#pragma endregion
+
 HRESULT CLevelDesign_Starblock::Validate_Desc()
 {
 	if (m_tBreakableDesc.eCategory != LD_CATEGORY::BREAKABLE)

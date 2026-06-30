@@ -20,6 +20,7 @@ public:
 private:
 	TOOL_LEVEL	m_eNextLevelID = { TOOL_LEVEL::END };
 	CLoader*	m_pLoader = { nullptr };
+	_bool		m_bLoadFailureHandled = { false };
 
 private:
 	virtual HRESULT Ready_Events() override { return S_OK; }

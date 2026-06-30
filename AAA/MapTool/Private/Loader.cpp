@@ -64,16 +64,11 @@ HRESULT CLoader::Loading()
         }
     }
 
-    if (0 != m_iFailedWorkCount.load())
-    {
-        char szMessage[128] = {};
-        sprintf_s(szMessage, "MapTool Loader failed work count: %u\n", m_iFailedWorkCount.load());
-        OutputDebugStringA(szMessage);
-    }
+    const _bool bFailed = Has_Failed();
 
     CoUninitialize();
 
-    return S_OK;
+    return bFailed ? E_FAIL : S_OK;
 }
 
 #ifdef _DEBUG
