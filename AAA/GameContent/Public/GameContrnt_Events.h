@@ -42,6 +42,12 @@ namespace Client
     enum class ECutsceneCam { Cutscene, Boss };
     enum class GRAB_TYPE : _uint{ GORILLA_SCENE, GORILLA_COMBAT, _COUNT };
 
+    struct CAMERA_SHAKE_DESC
+    {
+        _float fTrauma = { 0.5f };      
+        _float fDuration = { 0.f };     
+    };
+
     struct CUTSCENE_CAMERA_DESC
     {
         ECutsceneCam       eCam = ECutsceneCam::Cutscene;

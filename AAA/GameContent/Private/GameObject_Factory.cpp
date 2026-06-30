@@ -104,9 +104,11 @@
 #include "LevelDesign_Unsupported.h"
 #include "LevelDesign_Starblock.h"
 #include "LevelDesign_Rail.h"
+#include "LevelDesign_EventObject.h"
 
 // Projectile
 #include "Projectile_Boulder.h"
+#include "EnemyBomb.h"
 
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
@@ -523,7 +525,7 @@ void CGameObject_Factory::Register_Container()
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Kabu_Body"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Kabu/Kabu.ysh",
-                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+                    XMMatrixScaling(1.6f, 1.6f, 1.6f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 
@@ -554,6 +556,14 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_PoppyBrosJr_Body"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/PoppyBrosJr/Model/PoppyBrosJr.ysh",
                 XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CEnemyBomb::PROTOTYPE_TAG,
+                CEnemyBomb::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CEnemyBomb::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/PoppyBrosJr/EnemyBomb/EnemyBomb.ysh"
+                    , XMMatrixRotationX(XMConvertToRadians(90.f))* XMMatrixRotationY(XMConvertToRadians(180.f))
+                ));
         )
     );
 
@@ -634,7 +644,9 @@ void CGameObject_Factory::Register_NonAnimObject()
 
 void CGameObject_Factory::Register_AnimObject()
 {
-    
+    Register(CLevelDesign_EventObject::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_EventObject),
+        LOADER(TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CLevelDesign_EventObject::LEVEL1BOSSDEMOBG_MODEL_PROTO_TAG,
+            CModel::Create_WithTextureHub(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/Level1BossDemoBg/Level1BossDemoBg.ysh"));));
 }
 
 void CGameObject_Factory::Register_Effect()

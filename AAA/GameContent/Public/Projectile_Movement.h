@@ -33,13 +33,24 @@ public:
     }
 
     void  Launch(_fvector vVelocity) { XMStoreFloat3(&m_vVelocity, vVelocity); }
-    void  Stop() { m_vVelocity = { 0.f, 0.f, 0.f }; }
 
     // 이동+바운스 1틱. 반환: 이번 프레임 "바닥" 바운스 발생 여부.
     _bool Tick(_float fTimeDelta);
 
     _bool  Is_Grounded() const { return m_bGrounded; }
     _float3 Get_Velocity() const { return m_vVelocity; }
+
+    void  Begin_Arc(_fvector vStart, _fvector vTarget, _float fDur, _float fHeight)
+    {
+        XMStoreFloat3(&m_vArcStart, vStart);
+        XMStoreFloat3(&m_vArcTarget, vTarget);
+        m_fArcDur = (fDur > 0.01f) ? fDur : 0.01f;
+        m_fArcHeight = fHeight; m_fArcT = 0.f; m_bArc = true;
+        m_vVelocity = { 0.f, 0.f, 0.f };
+    }
+    _bool Is_Arc() const { return m_bArc; }
+
+    void  Stop() { m_vVelocity = { 0.f, 0.f, 0.f }; m_bArc = false; }
 
 private:
     CTransform* m_pTransform = { nullptr };
@@ -51,6 +62,13 @@ private:
     _float  m_fGravity = { -45.f };
     _float  m_fRestitution = { 0.5f };
     _float  m_fHorizDamp = { 0.7f };
+
+    _bool   m_bArc = { false };
+    _float3 m_vArcStart = {};
+    _float3 m_vArcTarget = {};
+    _float  m_fArcDur = { 1.f };
+    _float  m_fArcHeight = { 5.f };
+    _float  m_fArcT = { 0.f };
 
 public:
     static  CProjectile_Movement* Create(ID3D11Device*, ID3D11DeviceContext*);

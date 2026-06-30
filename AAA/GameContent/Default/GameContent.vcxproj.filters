@@ -442,17 +442,11 @@
     <Filter Include="00. GameObject\96. LevelDesign\Visible\02. Ladder">
       <UniqueIdentifier>{a67d90e6-109a-4bab-91c3-7b56e9af8c93}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Visible\04. Food">
-      <UniqueIdentifier>{edf36201-7c52-4f18-a438-5ecb5876228f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\Visible\05. Point">
       <UniqueIdentifier>{f7c44ded-34a6-49f6-8c65-a83f1cbb7c82}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\Visible\06. Bush">
       <UniqueIdentifier>{963a97ff-c356-4ff8-9881-d0062ea29e71}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Visible\01. Starblock">
-      <UniqueIdentifier>{625b2a42-23dd-43f4-bdce-b4f75040938b}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\Visible\03. EventObject">
       <UniqueIdentifier>{cad72eff-ed18-4366-b3fe-facecee465d1}</UniqueIdentifier>
@@ -573,9 +567,6 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash">
       <UniqueIdentifier>{553f3de7-862e-424a-87ee-191f43044a21}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\Kabu">
-      <UniqueIdentifier>{8e2ff95d-c5dd-4f49-9c40-bb2c899a1b04}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockBack\KnockBackDeath">
       <UniqueIdentifier>{f45699c1-0279-42f5-8174-aecc983bb4b3}</UniqueIdentifier>
@@ -801,6 +792,24 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Form\01. DeformCar_Demo">
       <UniqueIdentifier>{bf99796d-3273-432e-a337-ddc43bb3ee3e}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="01. Projectile\00. PhysicsProjectile\01. Bomb">
+      <UniqueIdentifier>{a7cbb794-7713-433a-905e-5aad935b8cd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Projectile\00. PhysicsProjectile\01. Bomb\EnemyBomb">
+      <UniqueIdentifier>{93c4d320-e88e-40bc-9168-bf258b792a6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Projectile\00. PhysicsProjectile\01. Bomb\KirbyBomb">
+      <UniqueIdentifier>{7f0b4568-6d0e-492a-b4d1-6b3a075651e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\Inhalable">
+      <UniqueIdentifier>{8a10359e-c77f-49f9-9ed3-900989557393}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\Inhalable\01. Starblock">
+      <UniqueIdentifier>{625b2a42-23dd-43f4-bdce-b4f75040938b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\Inhalable\04. Food">
+      <UniqueIdentifier>{edf36201-7c52-4f18-a438-5ecb5876228f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1291,7 +1300,7 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\06. Bush</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Food.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\04. Food</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable\04. Food</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Ladder.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\02. Ladder</Filter>
@@ -1348,7 +1357,7 @@
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutSceneGrab</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Starblock.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\01. Starblock</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable\01. Starblock</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Boundary.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\00. Boundary</Filter>
@@ -1495,11 +1504,20 @@
     <ClInclude Include="..\Public\BladeKnight_State_TornadoAttack.h">
       <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\State\TornadoAttack</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Monster_RailMovement.h">
-      <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
+    <ClInclude Include="..\Public\Projectile_Bomb.h">
+      <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnemyBomb.h">
+      <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb\EnemyBomb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KirbyBomb.h">
+      <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb\KirbyBomb</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Monster_RailMovement.h" />
-    <ClInclude Include="..\Public\Kirby_Deform.h">
+    <ClInclude Include="..\Public\Ancor_WorkingDirectory.h">
+      <Filter>97. DataSystem</Filter>
+	</ClInclude>
+	<ClInclude Include="..\Public\Kirby_Deform.h">
       <Filter>00. GameObject\05. Kirby\04. Kirby_Deform</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Deform_Car.h">
@@ -1516,6 +1534,18 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_GetDeform.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\GetDeform</Filter>
+	</ClInclude>
+	<ClInclude Include="..\Public\MeshLayer_Profile.h">
+      <Filter>99. Defines\Leo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MeshLayer_Binder.h">
+      <Filter>99. Defines\Leo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_RailMovement.h">
+      <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LDInhalable.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1931,7 +1961,7 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\06. Bush</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Food.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\04. Food</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable\04. Food</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Ladder.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\02. Ladder</Filter>
@@ -1988,7 +2018,7 @@
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutSceneGrab</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Starblock.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\01. Starblock</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable\01. Starblock</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Boundary.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\00. Boundary</Filter>
@@ -2135,14 +2165,22 @@
     <ClCompile Include="..\Private\BladeKnight_State_TornadoAttack.cpp">
       <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\State\TornadoAttack</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Monster_RailMovement.cpp">
-      <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
+    <ClCompile Include="..\Private\Projectile_Bomb.cpp">
+      <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
-    <ClCompile Include="..\Private\Kirby_Deform.cpp">
-      <Filter>00. GameObject\05. Kirby\04. Kirby_Deform</Filter>
+    <ClCompile Include="..\Private\EnemyBomb.cpp">
+      <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb\EnemyBomb</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Kirby_Deform_Car.cpp">
+    <ClCompile Include="..\Private\KirbyBomb.cpp">
+		<Filter>01. Projectile\00. PhysicsProjectile\01. Bomb\KirbyBomb</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\Monster_RailMovement.cpp">
+		<Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\Kirby_Deform.cpp">
+		<Filter>00. GameObject\05. Kirby\04. Kirby_Deform</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\Kirby_Deform_Car.cpp">
       <Filter>00. GameObject\05. Kirby\04. Kirby_Deform\Deform_Car</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_DeformCar_Demo.cpp">
@@ -2156,7 +2194,19 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_GetDeform.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\GetDeform</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\MeshLayer_Binder.cpp">
+      <Filter>99. Defines\Leo</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\MeshLayer_Profile.cpp">
+      <Filter>99. Defines\Leo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_RailMovement.cpp">
+      <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LDInhalable.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
+	</ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl">
@@ -2188,6 +2238,9 @@
     </FxCompile>
     <FxCompile Include="..\ShaderFiles\Shader_Gorilla.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_Bomb.hlsl">
+      <Filter>98. ShaderFiles\Hojun</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

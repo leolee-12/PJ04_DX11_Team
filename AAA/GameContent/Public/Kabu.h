@@ -41,8 +41,8 @@ public:
         pOutData->strPrototypeTag = PROTOTYPE_TAG;
     }
 
-    virtual _float          Get_CapsuleRadius() const override { return 0.5f; }
-    virtual _float          Get_CapsuleHeight() const override { return 0.20f; }
+    virtual _float          Get_CapsuleRadius() const override { return 0.85f; }
+    virtual _float          Get_CapsuleHeight() const override { return 0.40f; }
     virtual _float          Get_InteractRadius() const override { return 0.f; }
     virtual _bool           Get_HurtBoxDesc(CAPSULE_DESC& Out) const override;
 

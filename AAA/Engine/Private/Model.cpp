@@ -196,8 +196,8 @@ HRESULT CModel::Initialize_Prototype_WithTextureHub(MODEL eType, const _char* pM
 	m_strModelPath = pModelFilePath ? StrToWstr(pModelFilePath) : L"";
 	m_bCookCollisionMesh = bCookCollisionMesh;
 
-	if (MODEL::ANIM == m_eType && m_bCookCollisionMesh)
-		return E_FAIL;	// 현재 CookCollMesh는 NonAnimMesh만 지원
+	//if (MODEL::ANIM == m_eType && m_bCookCollisionMesh)
+	//	return E_FAIL;	// 현재 CookCollMesh는 NonAnimMesh만 지원
 
 	return MODEL::ANIM == m_eType
 		? Ready_AnimEx(pModelFilePath, PreTransformMatrix)
@@ -269,6 +269,29 @@ void CModel::Seek_Animation(_float fProgress)
 _bool CModel::Update_Base(_float fTimeDelta, _float fSpeed)
 {
 	_bool isFinished = { false };
+
+	// 인덱스 잘못되었을 때 가드 추가
+	const _bool bInvalidBase =
+		(m_iCurrentAnimationIndex == (_uint)-1 ||
+			m_iCurrentAnimationIndex >= m_Animations.size());
+	const _bool bInvalidBlend =
+		(m_isBlending &&
+			(m_iBlendTargetAnimIndex == (_uint)-1 ||
+				m_iBlendTargetAnimIndex >= m_Animations.size()));
+
+	if (bInvalidBase || bInvalidBlend)
+	{
+#ifdef _DEBUG
+		static _bool s_bWarned = false;     
+		if (!s_bWarned)
+		{
+			s_bWarned = true;
+			MSG_BOX("CModel::Update_Base: animation index invalid "
+				"(no clip playing). Update skipped.");
+		}
+#endif
+		return false;                        
+	}
 
 	if (m_isBlending)
 	{
@@ -836,6 +859,12 @@ HRESULT CModel::Ready_AnimEx(const _char* pModelFilePath, _fmatrix PreTransformM
 	if (FAILED(Ready_Meshes(modelData.Meshes, PreTransformMatrix)))
 		return E_FAIL;
 
+	if (m_bCookCollisionMesh)
+	{
+		if (FAILED(Cook_CollisionAnimMesh(modelData.Meshes, PreTransformMatrix)))
+			return E_FAIL;
+	}
+
 	Load_MeshLayers(pModelFilePath);
 
 	if (FAILED(Ready_MaterialsEx(modelData.Materials)))
@@ -1091,6 +1120,105 @@ HRESULT CModel::Cook_CollisionMesh(const vector<MESH_DATA>& meshes, _fmatrix Pre
 		Indices.data(), (_uint)Indices.size(),
 		false);
 	return (nullptr != m_pCollisionMesh) ? S_OK : E_FAIL;
+}
+
+HRESULT CModel::Cook_CollisionAnimMesh(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix)
+{
+	if (nullptr == m_pGameInstance_Proxy) return S_OK;
+	if (MODEL::ANIM != m_eType) return E_FAIL;
+
+	XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
+	Update_Combined();
+
+	vector<_float3> Positions;
+	vector<_uint> Indices;
+
+	auto BuildMeshBoneMatrices = [&](const MESH_DATA& mesh, vector<_float4x4>* pOutMatrices) -> HRESULT
+		{
+			pOutMatrices->clear();
+
+			if (mesh.Bones.empty())
+			{
+				const _int iBoneIndex = Get_BoneIndex(mesh.strName);
+				if (-1 == iBoneIndex) return E_FAIL;
+
+				_float4x4 BoneMatrix{};
+				XMStoreFloat4x4(&BoneMatrix, XMLoadFloat4x4(m_Bones[iBoneIndex]->Get_CombinedTransformationMatrixPtr()));
+				pOutMatrices->push_back(BoneMatrix);
+				return S_OK;
+			}
+
+			for (const MESH_BONE_DATA& BoneData : mesh.Bones)
+			{
+				const _int iBoneIndex = Get_BoneIndex(BoneData.strName);
+				if (-1 == iBoneIndex) return E_FAIL;
+
+				_float4x4 BoneMatrix{};
+				XMStoreFloat4x4(&BoneMatrix,
+					XMLoadFloat4x4(&BoneData.OffsetMatrix) *
+					XMLoadFloat4x4(m_Bones[iBoneIndex]->Get_CombinedTransformationMatrixPtr()));
+				pOutMatrices->push_back(BoneMatrix);
+			}
+
+			return S_OK;
+		};
+
+	auto TransformSkinnedPosition = [](const VTXANIMMESH_DATA& Vertex, const vector<_float4x4>& BoneMatrices, _float3* pOutPosition) -> _bool
+		{
+			const _uint BlendIndices[4] = { Vertex.vBlendIndex.x, Vertex.vBlendIndex.y, Vertex.vBlendIndex.z, Vertex.vBlendIndex.w };
+			const _float fWeightW = 1.f - (Vertex.vBlendWeight.x + Vertex.vBlendWeight.y + Vertex.vBlendWeight.z);
+			const _float BlendWeights[4] = { Vertex.vBlendWeight.x, Vertex.vBlendWeight.y, Vertex.vBlendWeight.z, fWeightW };
+
+			_vector vSource = XMLoadFloat3(&Vertex.vPosition);
+			_vector vResult = XMVectorZero();
+
+			for (_uint i = 0; i < 4; ++i)
+			{
+				if (fabsf(BlendWeights[i]) <= 1e-6f)
+					continue;
+				if (BlendIndices[i] >= BoneMatrices.size())
+					return false;
+
+				const _vector vSkinned = XMVector3TransformCoord(vSource, XMLoadFloat4x4(&BoneMatrices[BlendIndices[i]]));
+				vResult = XMVectorAdd(vResult, XMVectorScale(vSkinned, BlendWeights[i]));
+			}
+
+			XMStoreFloat3(pOutPosition, vResult);
+			return true;
+		};
+
+	for (const MESH_DATA& mesh : meshes)
+	{
+		vector<_float4x4> MeshBoneMatrices;
+		if (FAILED(BuildMeshBoneMatrices(mesh, &MeshBoneMatrices)))
+			return E_FAIL;
+
+		const _uint iBase = static_cast<_uint>(Positions.size());
+
+		for (const VTXANIMMESH_DATA& Vertex : mesh.AnimVertices)
+		{
+			_float3 vPosition{};
+			if (!TransformSkinnedPosition(Vertex, MeshBoneMatrices, &vPosition))
+				return E_FAIL;
+
+			Positions.push_back(vPosition);
+		}
+
+		if (iBase == static_cast<_uint>(Positions.size()))
+			continue;
+
+		for (_uint iIndex : mesh.Indices)
+			Indices.push_back(iBase + iIndex);
+	}
+
+	if (Positions.empty() || Indices.size() < 3) return S_OK;
+
+	m_pCollisionMesh = m_pGameInstance_Proxy->Cook_TriangleMesh(
+		Positions.data(), static_cast<_uint>(Positions.size()),
+		Indices.data(), static_cast<_uint>(Indices.size()),
+		false);
+
+	return nullptr != m_pCollisionMesh ? S_OK : E_FAIL;
 }
 
 CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter)

@@ -14,6 +14,7 @@
 #include "Loader_Prototype.h"
 #include "ContainerObject.h"
 #include "PartObject.h"
+#include "Map_Loader.h"
 
 #include "UI_Title.h"
 #include "Panel_Manager.h"
@@ -79,6 +80,12 @@ HRESULT CLevel_Tool::Initialize()
     if (FAILED(Ready_PreviewShaders()))
         return E_FAIL;
 
+    if (FAILED(Client::Ready_Prototype_Shaders(m_pGameInstance_Proxy, m_pDevice, m_pContext)))
+        return E_FAIL;
+
+    if (FAILED(CMap_Loader::Ready_TexHub(m_pGameInstance_Proxy)))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -131,7 +138,7 @@ HRESULT CLevel_Tool::Ready_Camera()
 
 HRESULT CLevel_Tool::Ready_Grid()
 {
-    m_pGrid = CEdit_Grid::Create(m_pDevice, m_pContext, 100, 1.f);
+    m_pGrid = CEdit_Grid::Create(m_pDevice, m_pContext, 300, 1.f);
     return (m_pGrid == nullptr) ? E_FAIL : S_OK;
 }
 
@@ -139,7 +146,7 @@ HRESULT CLevel_Tool::Ready_TestGround()
 {
     Release_TestGround();
 
-    const _float fHalfSize = 50.f;
+    const _float fHalfSize = 150.f;
 
     const _float3 vPositions[] =
     {

@@ -39,32 +39,43 @@ HRESULT CProjectile_Boulder::Ready_Visual()
 void CProjectile_Boulder::On_Launched()
 {
     m_eState = STATE::FLYING;
+
+    _vector vAxis = XMVector3Cross(XMLoadFloat3(&m_vVelocity), XMVectorSet(0.f, 1.f, 0.f, 0.f));
+    if (XMVectorGetX(XMVector3LengthSq(vAxis)) < 1e-6f)
+        vAxis = XMVectorSet(1.f, 0.f, 0.f, 0.f);
+    XMStoreFloat3(&m_vSpinAxis, XMVector3Normalize(vAxis));
+
+    m_fSpinAngle = 0.f;
 }
 
 void CProjectile_Boulder::On_Bounce(_int iCount)
 {
-    if (iCount >= 3)                 
+    CAMERA_SHAKE_DESC shake{ 0.35f, 0.f };
+    m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &shake);
+    if (iCount >= 3)
         Enter_Break();
 }
 
 void CProjectile_Boulder::Enter_Break()
 {
     m_eState = STATE::BREAKING;
-    Stop_Flying();                                   
+    Stop_Flying();
+
+    m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), 0.f);
 
     if (m_pController) m_pController->Set_Enabled(false);
     if (m_pMovement)   m_pMovement->Stop();
-    if (m_pHitBox)     m_pHitBox->Set_Enabled(false);    
+    if (m_pHitBox)     m_pHitBox->Set_Enabled(false);
 
     if (m_pAnimatorCom)
-        m_pAnimatorCom->Play("Broken", false, true);      
+        m_pAnimatorCom->Play("Broken", false, true);
 }
 
 void CProjectile_Boulder::Update_Terminal(_float dt)
 {
     UNREFERENCED_PARAMETER(dt);
     if (m_pAnimatorCom && m_pAnimatorCom->Is_Finished())
-        Kill();                                          // ÆÄ±« ¾Ö´Ô ³¡ -> Ç® ¹ÝÈ¯
+        Kill();                                       
 }
 
 void CProjectile_Boulder::Tick_Visual(_float dt)
@@ -73,17 +84,17 @@ void CProjectile_Boulder::Tick_Visual(_float dt)
 
     if (m_bFlying)
     {
-        m_fSpinAngle += SPIN_SPEED_DEG * dt;                  
+        m_fSpinAngle += SPIN_SPEED_DEG * dt;
         if (m_fSpinAngle >= 360.f) m_fSpinAngle = fmodf(m_fSpinAngle, 360.f);
-        m_pAnimatorCom->SetBoneRotation("LowM", m_fSpinAngle, XMVectorSet(1.f, 0.f, 0.f, 0.f));
+        m_pAnimatorCom->SetBoneRotation("LowM", m_fSpinAngle, XMLoadFloat3(&m_vSpinAxis));
     }
 
-    m_pAnimatorCom->Update(dt);   // ¾Ö´Ô »ùÇÃ + È¸Àü Àû¿ë + ÇÕ¼º Àç°è»ê
+    m_pAnimatorCom->Update(dt);   
 }
 
 void CProjectile_Boulder::On_Activated()
 {
-    m_eState = STATE::FLYING;       
+    m_eState = STATE::FLYING;
     m_fSpinAngle = 0.f;             
     if (m_pAnimatorCom)
         m_pAnimatorCom->Play("Wait", true, true);

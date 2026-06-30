@@ -2,11 +2,21 @@
 #include "LevelDesign_Registry.h"
 #include "Shader_PassMeta.h"
 #include "Parsing_Utils.h"
+#include "GameContrnt_Events.h"
 
 #include "GameInstance.h"
 
 namespace
 {
+	void Log_EventObjectPhysicsWarning(const string& strMessage)
+	{
+#ifdef _DEBUG
+		OutputDebugStringA((strMessage + "\n").c_str());
+#else
+		UNREFERENCED_PARAMETER(strMessage);
+#endif
+	}
+
 	inline constexpr _uint EVENTOBJECT_ANIM_DEFAULT_PASS = 1u;
 
 	struct LD_EVENTOBJECT_CATALOG
@@ -16,17 +26,19 @@ namespace
 		const _char* pModelPath;
 		MODEL eModelType;
 		_string strAnimNames[LD_ANIM_SLOT_COUNT] = {};
-		LD_EVENTOBJECT_RENDER_POLICY eRenderPolicy = { LD_EVENTOBJECT_RENDER_POLICY::DEFAULT };
+		LD_EVENTOBJECT_POLICY ePolicy = { LD_EVENTOBJECT_POLICY::DEFAULT };
+		_bool bUseCollMesh = true;
+		const _tchar* pAnimEventFile = L"";
 	};
 
 	static const LD_EVENTOBJECT_CATALOG g_EventObjectCatalog[] =
 	{
 		{ L"Level1BossDemoBg", CLevelDesign_EventObject::LEVEL1BOSSDEMOBG_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Level1BossDemoBg/Level1BossDemoBg.ysh",
-		MODEL::ANIM, { "DemoAppear2", "DemoAppear2AfterWait", "DemoAppear2BeforWait", "" }, LD_EVENTOBJECT_RENDER_POLICY::LEVEL1_BOSS_DEMO_BG },
+		MODEL::ANIM, { "DemoAppear2", "DemoAppear2AfterWait", "DemoAppear2BeforWait", "" }, LD_EVENTOBJECT_POLICY::LEVEL1_BOSS_DEMO_BG, true, L"" },
 		{ L"SlopeBoardA", CLevelDesign_EventObject::SLOPEBOARD_A_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardA.ysh",
-		MODEL::ANIM, { "LandBack", "LandFront", "LandStartFront", "" }, LD_EVENTOBJECT_RENDER_POLICY::SLOPEBOARD_A },
+		MODEL::ANIM, { "LandBack", "LandFront", "LandStartFront", "" }, LD_EVENTOBJECT_POLICY::SLOPEBOARD_A, true, L"" },
 		{ L"SlopeBoardC", CLevelDesign_EventObject::SLOPEBOARD_C_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardC.ysh",
-		MODEL::ANIM, { "FallenWait", "Wait", "", "" }, LD_EVENTOBJECT_RENDER_POLICY::SLOPEBOARD_C },
+		MODEL::ANIM, { "FallenWait", "Wait", "", "" }, LD_EVENTOBJECT_POLICY::SLOPEBOARD_C, true, L"" },
 	};
 
 	static const LD_EVENTOBJECT_CATALOG* Find_EventObjectCatalog(const _wstring& wstrObjName)
@@ -84,56 +96,55 @@ HRESULT CLevelDesign_EventObject::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	switch (m_tEventObjectDesc.eRenderPolicy)
-	{
-	case LD_EVENTOBJECT_RENDER_POLICY::LEVEL1_BOSS_DEMO_BG:
-		if (FAILED(Ready_Level1BossDemoBg())) return E_FAIL;
-		break;
+	if (FAILED(Ready_Policy()))
+		return E_FAIL;
 
-	case LD_EVENTOBJECT_RENDER_POLICY::SLOPEBOARD_A:
-		if (FAILED(Ready_SlopeBoardA())) return E_FAIL;
-		break;
-
-	case LD_EVENTOBJECT_RENDER_POLICY::SLOPEBOARD_C:
-		if (FAILED(Ready_SlopeBoardC())) return E_FAIL;
-		break;
-
-	case LD_EVENTOBJECT_RENDER_POLICY::DEFAULT:
-	default:
-		break;
-	}
+	if (FAILED(Ready_Events_ByPolicy()))
+		return E_FAIL;
 
 	return S_OK;
 }
 
 void CLevelDesign_EventObject::Update(_float fTimeDelta)
 {
-	if (m_pGameInstance_Proxy->Key_Down(DIK_F3)
-		&& LD_EVENTOBJECT_RENDER_POLICY::LEVEL1_BOSS_DEMO_BG == m_tEventObjectDesc.eRenderPolicy)
-	{
-		Play_EventAnimation(0u, false);
-	}
+	if (m_bAnimationActive && m_pAnimatorCom)
+		m_pAnimatorCom->Update(fTimeDelta);
 
-	m_pAnimatorCom->Update(fTimeDelta);
+	Update_Policy(fTimeDelta);
 }
 
 void CLevelDesign_EventObject::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
+	if (!m_bRenderable || nullptr == m_pModelCom)
+		return;
+
 	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 
 HRESULT CLevelDesign_EventObject::Render()
 {
-	switch (m_tEventObjectDesc.eRenderPolicy)
-	{
-	case LD_EVENTOBJECT_RENDER_POLICY::LEVEL1_BOSS_DEMO_BG:
-		return Render_Level1BossDemoBg();
+	if (nullptr == m_pModelCom || nullptr == m_pShaderCom)
+		return S_OK;
 
-	default:
-		return Render_Default();
+	if (FAILED(Bind_ShaderResources()))
+		return E_FAIL;
+
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		if (!Should_RenderMesh_ByPolicy(i))	// 렌더하지 않을 메쉬는 스킵
+			continue;
+
+		const _uint iPass = Resolve_RenderPass_ByPolicy(i);	// 메쉬별 패스 설정
+
+		if (FAILED(Render_Mesh(i, iPass)))
+			return E_FAIL;
 	}
+
+	return S_OK;
 }
 
 void CLevelDesign_EventObject::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
@@ -159,7 +170,9 @@ _bool CLevelDesign_EventObject::Play_EventAnimation(const _string& strAnimName, 
 	if (m_pModelCom->Get_AnimationIndex(strAnimName) < 0)
 		return false;
 
+	m_pAnimatorCom->Resume();
 	m_pAnimatorCom->Play(strAnimName, bLoop, true);
+	m_bAnimationActive = true;
 	return true;
 }
 
@@ -178,7 +191,7 @@ void CLevelDesign_EventObject::Register_LevelDesignSpecs()
 		Spec.pBuildDesc = &Build_Desc;
 		Spec.ModelRequirements =
 		{
-			{ Entry.pModelProtoTag, Entry.pModelPath, Entry.eModelType },
+			  { Entry.pModelProtoTag, Entry.pModelPath, Entry.eModelType, Entry.bUseCollMesh },
 		};
 
 		CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
@@ -207,7 +220,9 @@ _bool CLevelDesign_EventObject::Build_Desc(const LD_OBJECT_DESC& CommonDesc, con
 	for (_uint i = 0; i < LD_ANIM_SLOT_COUNT; ++i)
 		Desc.strAnimNames[i] = pCatalog->strAnimNames[i];
 
-	Desc.eRenderPolicy = pCatalog->eRenderPolicy;
+	Desc.ePolicy = pCatalog->ePolicy;
+	Desc.bUseCollMesh = pCatalog->bUseCollMesh;
+	Desc.strAnimEventFile = pCatalog->pAnimEventFile ? pCatalog->pAnimEventFile : L"";
 
 	*pOutEntry = Desc;
 	return true;
@@ -248,37 +263,317 @@ HRESULT CLevelDesign_EventObject::Ready_Components()
 	{
 		CAnimator::ANIMATOR_DESC AnimDesc{};
 		AnimDesc.pModel = m_pModelCom;
-
+		AnimDesc.strDataFile = m_tEventObjectDesc.strAnimEventFile;
 		m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
 		if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
 			return E_FAIL;
+
+		m_pAnimatorCom->Set_EventCallback(
+			[this](const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase)
+			{
+				On_AnimEvent_ByPolicy(AnimEvent, ePhase);
+			});
 	}
 
 	return S_OK;
 }
 
+HRESULT CLevelDesign_EventObject::Ready_RigidStatic()
+{
+	Release_RigidStatic();
+
+	if (!m_tEventObjectDesc.bUseCollMesh)
+		return S_OK;
+
+	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom || nullptr == m_pModelCom)
+	{
+		Log_EventObjectPhysicsWarning("[LDEventObjectPhysics] RigidStatic skipped: required component is null.");
+		return E_FAIL;
+	}
+
+	auto pCollisionMesh = m_pModelCom->Get_CollisionMesh();
+	if (nullptr == pCollisionMesh)
+	{
+		Log_EventObjectPhysicsWarning("[LDEventObjectPhysics] RigidStatic skipped: cooked collision mesh is null.");
+		return E_FAIL;
+	}
+
+	m_pRigidStatic = m_pGameInstance_Proxy->Create_StaticActor(pCollisionMesh, XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+
+	if (nullptr == m_pRigidStatic)
+	{
+		Log_EventObjectPhysicsWarning("[LDEventObjectPhysics] RigidStatic failed: Create_StaticActor returned null.");
+		return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+void CLevelDesign_EventObject::Release_RigidStatic()
+{
+	if (nullptr == m_pRigidStatic)
+		return;
+
+	if (nullptr != m_pGameInstance_Proxy)
+		m_pGameInstance_Proxy->Remove_StaticActor(m_pRigidStatic);
+
+	m_pRigidStatic = nullptr;
+}
+
+void CLevelDesign_EventObject::Set_RigidStaticEnabled(_bool bEnable)
+{
+	if (!bEnable)
+	{
+		Release_RigidStatic();
+		return;
+	}
+
+	if (nullptr != m_pRigidStatic)
+		return;
+
+	if (FAILED(Ready_RigidStatic()))
+		Release_RigidStatic();
+}
+
+HRESULT CLevelDesign_EventObject::Ready_Policy()
+{
+	if (m_pModelCom)
+		m_MeshVisible.assign(static_cast<_uint>(m_pModelCom->Get_NumMeshes()), true);
+	else
+		m_MeshVisible.clear();
+
+	switch (m_tEventObjectDesc.ePolicy)
+	{
+	case LD_EVENTOBJECT_POLICY::LEVEL1_BOSS_DEMO_BG:
+		return Ready_Level1BossDemoBg();
+
+	case LD_EVENTOBJECT_POLICY::SLOPEBOARD_A:
+		return Ready_SlopeBoardA();
+
+	case LD_EVENTOBJECT_POLICY::SLOPEBOARD_C:
+		return Ready_SlopeBoardC();
+
+	case LD_EVENTOBJECT_POLICY::DEFAULT:
+	default:
+		break;
+	}
+
+	m_eState = EVENTOBJECT_STATE::IDLE;
+	m_bRenderable = true;
+	return S_OK;
+}
+
+void CLevelDesign_EventObject::Update_Policy(_float fTimeDelta)
+{
+	UNREFERENCED_PARAMETER(fTimeDelta);
+
+	if (!m_bAnimationActive || nullptr == m_pAnimatorCom)
+		return;
+
+	if (!m_pAnimatorCom->Is_Finished())
+		return;
+
+	m_bAnimationActive = false;
+
+	switch (m_tEventObjectDesc.ePolicy)
+	{
+	case LD_EVENTOBJECT_POLICY::SLOPEBOARD_A:
+	case LD_EVENTOBJECT_POLICY::SLOPEBOARD_C:
+		if (EVENTOBJECT_STATE::PLAYING == m_eState)
+			m_eState = EVENTOBJECT_STATE::BROKEN;
+		break;
+
+	default:
+		break;
+	}
+}
+
+HRESULT CLevelDesign_EventObject::Ready_Events_ByPolicy()
+{
+	switch (m_tEventObjectDesc.ePolicy)
+	{
+	case LD_EVENTOBJECT_POLICY::LEVEL1_BOSS_DEMO_BG:
+		Subscribe_Event(EventTag::Cutscene_GorillaAppear,
+			[this](void*)
+			{
+				On_Event_ByPolicy(EventTag::Cutscene_GorillaAppear);
+			});
+		break;
+
+	default:
+		break;
+	}
+
+	return S_OK;
+}
+
+void CLevelDesign_EventObject::On_Event_ByPolicy(const _wstring& strEventTag)
+{
+	UNREFERENCED_PARAMETER(strEventTag);
+
+	switch (m_tEventObjectDesc.ePolicy)
+	{
+	case LD_EVENTOBJECT_POLICY::LEVEL1_BOSS_DEMO_BG:
+		m_eState = EVENTOBJECT_STATE::PLAYING;
+		Set_AllMeshesVisible(true);
+		Play_EventAnimation(0u, false);
+		break;
+
+	case LD_EVENTOBJECT_POLICY::SLOPEBOARD_A:
+	case LD_EVENTOBJECT_POLICY::SLOPEBOARD_C:
+		m_eState = EVENTOBJECT_STATE::PLAYING;
+		m_bRenderable = true;
+		Set_AllMeshesVisible(true);
+		Play_EventAnimation(0u, false);
+		Release_RigidStatic();
+		break;
+
+	default:
+		break;
+	}
+}
+
+void CLevelDesign_EventObject::On_AnimEvent_ByPolicy(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase)
+{
+	if (ANIM_EVENT_PHASE::POINT != ePhase)
+		return;
+
+	switch (static_cast<EANIM_EVENT>(AnimEvent.iEventType))
+	{
+	case EANIM_EVENT::PubEvent:
+	{
+		if (AnimEvent.strParam.empty())
+			break;
+
+		const _wstring strEventTag(AnimEvent.strParam.begin(), AnimEvent.strParam.end());
+		m_pGameInstance_Proxy->Publish(strEventTag, nullptr);
+		break;
+	}
+
+	case EANIM_EVENT::OnOffPart:
+	{
+		// OnOffPart + strParam "All" + vOffset.x > 0 : 전체 mesh 표시
+		// OnOffPart + strParam "All" + vOffset.x <= 0 : 전체 mesh 숨김
+		if (AnimEvent.strParam == "All")
+		{
+			Set_AllMeshesVisible(AnimEvent.vOffset.x > 0.f);
+			break;
+		}
+
+		// OnOffPart + strParam "Mesh" + iIntParam mesh index + vOffset.x > 0 : 해당 mesh 표시
+		// OnOffPart + strParam "Mesh" + iIntParam mesh index + vOffset.x <= 0 : 해당 mesh 숨김
+		if (AnimEvent.strParam == "Mesh")
+		{
+			Set_MeshVisible(static_cast<_uint>(AnimEvent.iIntParam), AnimEvent.vOffset.x > 0.f);
+			break;
+		}
+
+		// OnOffPart + strParam "RigidStatic" + vOffset.x > 0 : RigidStatic 생성
+		// OnOffPart + strParam "RigidStatic" + vOffset.x <= 0 : RigidStatic 해제
+		if (AnimEvent.strParam == "RigidStatic")
+		{
+			Set_RigidStaticEnabled(AnimEvent.vOffset.x > 0.f);
+			break;
+		}
+
+		break;
+	}
+
+	default:
+		break;
+	}
+}
+
+void CLevelDesign_EventObject::Set_AllMeshesVisible(_bool bVisible)
+{
+	for (_uint i = 0; i < static_cast<_uint>(m_MeshVisible.size()); ++i)
+		m_MeshVisible[i] = bVisible;
+}
+
+void CLevelDesign_EventObject::Set_MeshVisible(_uint iMeshIndex, _bool bVisible)
+{
+	if (iMeshIndex >= m_MeshVisible.size())
+		return;
+
+	m_MeshVisible[iMeshIndex] = bVisible;
+}
+
+_bool CLevelDesign_EventObject::Should_RenderMesh_ByPolicy(_uint iMeshIndex) const
+{
+	if (iMeshIndex < m_MeshVisible.size() && !m_MeshVisible[iMeshIndex])
+		return false;
+
+	switch (m_tEventObjectDesc.ePolicy)
+	{
+	case LD_EVENTOBJECT_POLICY::LEVEL1_BOSS_DEMO_BG:
+	{
+		if(Is_Level1BossDemoBgGlassMesh(m_pModelCom->Get_MeshName(iMeshIndex))) // temp
+			return false;
+	}
+		return true;
+
+	case LD_EVENTOBJECT_POLICY::SLOPEBOARD_A:
+	case LD_EVENTOBJECT_POLICY::SLOPEBOARD_C:
+		if (EVENTOBJECT_STATE::BROKEN == m_eState)
+			return 0u != iMeshIndex;
+		return true;
+
+	default:
+		return true;
+	}
+}
+
+_uint CLevelDesign_EventObject::Resolve_RenderPass_ByPolicy(_uint iMeshIndex) const
+{
+	if (LD_EVENTOBJECT_POLICY::LEVEL1_BOSS_DEMO_BG == m_tEventObjectDesc.ePolicy
+		&& Is_Level1BossDemoBgGlassMesh(m_pModelCom->Get_MeshName(iMeshIndex)))
+		return LEVEL1_BOSS_DEMO_BG_GLASS_PASS;
+
+	return EVENTOBJECT_ANIM_DEFAULT_PASS;
+}
+
 HRESULT CLevelDesign_EventObject::Ready_Level1BossDemoBg()
 {
+	m_eState = EVENTOBJECT_STATE::IDLE;
+	m_bRenderable = true;
+
+	static _uint PieceIdx[] = { 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46 };
+
+	for (auto idx : PieceIdx)
+		Set_MeshVisible(idx, false);
+
 	if (nullptr != m_pAnimatorCom)
-		Play_EventAnimation(2u, true);
-	
-	return S_OK;
+		Play_EventAnimation(2u, false);
+
+	return Ready_RigidStatic();
 }
 
 HRESULT CLevelDesign_EventObject::Ready_SlopeBoardA()
 {
-	if (nullptr == m_pAnimatorCom)
-		return S_OK;
+	m_eState = EVENTOBJECT_STATE::IDLE;
+	m_bRenderable = true;
 
-	return Play_EventAnimation(2u, false) ? S_OK : E_FAIL;
+	if (nullptr == m_pAnimatorCom)
+		return E_FAIL;
+
+	//if (!Play_EventAnimation(2u, false))
+	//	return E_FAIL;
+
+	return Ready_RigidStatic();
 }
 
 HRESULT CLevelDesign_EventObject::Ready_SlopeBoardC()
 {
-	if (nullptr == m_pAnimatorCom)
-		return S_OK;
+	m_eState = EVENTOBJECT_STATE::IDLE;
+	m_bRenderable = true;
 
-	return Play_EventAnimation(1u, false) ? S_OK : E_FAIL;
+	if (nullptr == m_pAnimatorCom)
+		return E_FAIL;
+
+	//if (!Play_EventAnimation(1u, false))
+	//	return E_FAIL;
+
+	return Ready_RigidStatic();
 }
 
 HRESULT CLevelDesign_EventObject::Bind_ShaderResources()
@@ -293,56 +588,6 @@ HRESULT CLevelDesign_EventObject::Bind_ShaderResources()
 		return E_FAIL;
 
 	return S_OK;
-}
-
-HRESULT CLevelDesign_EventObject::Render_Default()
-{
-	if (FAILED(Bind_ShaderResources()))
-		return E_FAIL;
-
-	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
-
-	for (_uint i = 0; i < iNumMeshes; ++i)
-	{
-		if (FAILED(Render_Mesh(i)))
-			return E_FAIL;
-	}
-
-	return S_OK;
-}
-
-HRESULT CLevelDesign_EventObject::Render_Level1BossDemoBg()
-{
-	if (FAILED(Bind_ShaderResources()))
-		return E_FAIL;
-
-	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
-
-	for (_uint i = 0; i < iNumMeshes; ++i)
-	{
-		if (Is_Level1BossDemoBgGlassMesh(m_pModelCom->Get_MeshName(i)))
-		{
-			//if (FAILED(Render_Mesh(i, LEVEL1_BOSS_DEMO_BG_GLASS_PASS)))
-			//	return E_FAIL;
-		}
-		else
-		{
-			if (FAILED(Render_Mesh(i)))
-				return E_FAIL;
-		}
-	}
-
-	return S_OK;
-}
-
-HRESULT CLevelDesign_EventObject::Render_SlopeBoardA()
-{
-	return E_NOTIMPL;
-}
-
-HRESULT CLevelDesign_EventObject::Render_SlopeBoardC()
-{
-	return E_NOTIMPL;
 }
 
 HRESULT CLevelDesign_EventObject::Render_Mesh(_uint iMeshIndex)
@@ -417,6 +662,20 @@ CGameObject* CLevelDesign_EventObject::Clone(void* pArg)
 {
 	CLevelDesign_EventObject* pInstance = new CLevelDesign_EventObject(*this);
 
+	LD_EVENTOBJECT_DESC TempDesc{};	// Test
+	if (nullptr == pArg)
+	{
+		TempDesc.strObjectName = L"Level1BossDemoBg";
+		TempDesc.strKind = L"Level1BossDemoBg";
+		TempDesc.eCategory = LD_CATEGORY::GIMMICK;
+		TempDesc.iModelProtoLevel = ETOUI(LEVEL::GAMEPLAY);
+		TempDesc.eModelType = MODEL::ANIM;
+		TempDesc.wstrModelProtoTag = LEVEL1BOSSDEMOBG_MODEL_PROTO_TAG;
+		TempDesc.ePolicy = LD_EVENTOBJECT_POLICY::LEVEL1_BOSS_DEMO_BG;
+		TempDesc.bUseCollMesh = false;
+		pArg = &TempDesc;
+	}
+
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Cloned : CLevelDesign_EventObject");
@@ -428,6 +687,8 @@ CGameObject* CLevelDesign_EventObject::Clone(void* pArg)
 
 void CLevelDesign_EventObject::Free()
 {
+	Release_RigidStatic();
+
 	__super::Free();
 }
 

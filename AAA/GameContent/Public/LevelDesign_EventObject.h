@@ -7,6 +7,10 @@ class CModel;
 class CAnimator;
 NS_END
 
+NS_BEGIN(physx)
+class PxRigidStatic;
+NS_END
+
 NS_BEGIN(Client)
 struct LD_SPAWN_SPEC;
 
@@ -40,23 +44,43 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
 	CAnimator* m_pAnimatorCom = { nullptr };
+	physx::PxRigidStatic* m_pRigidStatic = { nullptr };
 
 	LD_EVENTOBJECT_DESC m_tEventObjectDesc = {};
+	
+	enum class EVENTOBJECT_STATE { IDLE, PLAYING, BROKEN, };
+	EVENTOBJECT_STATE m_eState = EVENTOBJECT_STATE::IDLE;
+	_bool m_bRenderable = { true };
+	vector<_bool> m_MeshVisible;
+	_bool m_bAnimationActive = { false };
 
 private:
 	virtual HRESULT Validate_Desc() override;
 
 	HRESULT Ready_Components();
+	HRESULT Ready_RigidStatic();
+	void    Release_RigidStatic();
+	void    Set_RigidStaticEnabled(_bool bEnable);
+
+	HRESULT Ready_Policy();
+	HRESULT Ready_Events_ByPolicy();
+	void    Update_Policy(_float fTimeDelta);
+
+	void    On_Event_ByPolicy(const _wstring& strEventTag);
+	void    On_AnimEvent_ByPolicy(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase);
+
+	void    Set_AllMeshesVisible(_bool bVisible);
+	void    Set_MeshVisible(_uint iMeshIndex, _bool bVisible);
+
 	HRESULT Ready_Level1BossDemoBg();
 	HRESULT Ready_SlopeBoardA();
 	HRESULT Ready_SlopeBoardC();
 
+	_bool   Should_RenderMesh_ByPolicy(_uint iMeshIndex) const;
+	_uint   Resolve_RenderPass_ByPolicy(_uint iMeshIndex) const;
+
 	HRESULT Bind_ShaderResources();
 
-	HRESULT Render_Default();
-	HRESULT Render_Level1BossDemoBg();
-	HRESULT Render_SlopeBoardA(); 
-	HRESULT Render_SlopeBoardC();
 	HRESULT Render_Mesh(_uint iMeshIndex);
 	HRESULT Render_Mesh(_uint iMeshIndex, _uint iAnimPassIndex);
 

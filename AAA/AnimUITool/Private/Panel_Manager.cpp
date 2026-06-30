@@ -288,34 +288,6 @@ void CPanel_Manager::Load_UI_ByPath(const _wstring& strFullPath)
 
 void CPanel_Manager::Bind_ForAnim(CGameObject* pObj)
 {
-   /* if (!pObj) 
-    { 
-        Bind_Preview(nullptr);
-        return; 
-    }
-
-    CGameObject* pAnimSrc = pObj;  
-    if (auto* pCont = dynamic_cast<CContainerObject*>(pObj))
-    {
-        pAnimSrc = nullptr;         
-        for (auto& [tag, pPart] : pCont->Get_PartObjects())
-            if (pPart && pPart->Get_Component<CAnimator>(L"Com_Animator")) { pAnimSrc = pPart; break; }
-    }
-
-    m_Context.pOwner = pObj;
-    m_Context.pModel = pAnimSrc ? pAnimSrc->Get_Component<CModel>(L"Com_Model") : nullptr;
-    m_Context.pAnimator = pAnimSrc ? pAnimSrc->Get_Component<CAnimator>(L"Com_Animator") : nullptr;
-    m_Context.iClip = 0; m_Context.fProgress = 0.f;
-    m_Context.strName = pObj->Get_ObjectTag();
-
-    m_Context.strModelPath.clear();
-    m_Context.strAnimEventPath.clear();
-
-    if (m_Context.pAnimator)
-        m_Context.strAnimEventPath = m_Context.pAnimator->Get_DataFilePath();
-
-    Set_Selected(pObj);*/
-
     if (!pObj)
     {
         Bind_Preview(nullptr);

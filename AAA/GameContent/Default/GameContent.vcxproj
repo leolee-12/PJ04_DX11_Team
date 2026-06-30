@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Public\Ancor_WorkingDirectory.h" />
     <ClInclude Include="..\Public\BladeKnight_Body.h" />
     <ClInclude Include="..\Public\BladeKnight_Brain.h" />
     <ClInclude Include="..\Public\BladeKnight_State_Attack.h" />
@@ -57,9 +58,15 @@
     <ClInclude Include="..\Public\Kirby_Deform.h" />
     <ClInclude Include="..\Public\Kirby_Deform_Model.h" />
     <ClInclude Include="..\Public\Kirby_GetDeform.h" />
+    <ClInclude Include="..\Public\EnemyBomb.h" />
+    <ClInclude Include="..\Public\KirbyBomb.h" />
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h" />
+    <ClInclude Include="..\public\LDInhalable.h" />
     <ClInclude Include="..\Public\Sword_SpinSlashTrail.h" />
+    <ClInclude Include="..\Public\MeshLayer_Binder.h" />
+    <ClInclude Include="..\Public\MeshLayer_Profile.h" />
     <ClInclude Include="..\Public\Monster_RailMovement.h" />
+    <ClInclude Include="..\Public\Projectile_Bomb.h" />
     <ClInclude Include="..\Public\Sword_SpinSlash.h" />
     <ClInclude Include="..\public\PhysicsProjectile.h" />
     <ClInclude Include="..\public\Projectile.h" />
@@ -298,9 +305,15 @@
     <ClCompile Include="..\Private\Kirby_Deform.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform_Model.cpp" />
     <ClCompile Include="..\Private\Kirby_GetDeform.cpp" />
+    <ClCompile Include="..\Private\EnemyBomb.cpp" />
+    <ClCompile Include="..\Private\KirbyBomb.cpp" />
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp" />
+    <ClCompile Include="..\private\LDInhalable.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp" />
+    <ClCompile Include="..\Private\MeshLayer_Binder.cpp" />
+    <ClCompile Include="..\Private\MeshLayer_Profile.cpp" />
     <ClCompile Include="..\Private\Monster_RailMovement.cpp" />
+    <ClCompile Include="..\Private\Projectile_Bomb.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlash.cpp" />
     <ClCompile Include="..\private\PhysicsProjectile.cpp" />
     <ClCompile Include="..\private\Projectile.cpp" />
@@ -479,6 +492,7 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_Bomb.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_EnvInstance.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Gorilla.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_Kirby.hlsl" />

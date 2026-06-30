@@ -30,6 +30,7 @@ private:
 
 
 private:
+	virtual void				Update(_float fTimeDelta) override;
 	void						Render_EventTimeline();
 
 	void						Rebuild_AnimNameCache(CModel* pModel);

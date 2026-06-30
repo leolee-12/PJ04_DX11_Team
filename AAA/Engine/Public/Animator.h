@@ -94,6 +94,7 @@ public: // 재생 제어 (오브젝트/에디터는 오직 이것만 사용)
 
     // Progress 직접 사용해서 적용하고 싶을 때 
     void    SetBoneRotation(const _char* szBone, _float fAngleDeg, _fvector vAxis);
+    _bool   Has_Bone(const _char* szBone) const;
 
 public: // 에디터(데이터 편집)
     ANIM_EVENT_TRACK& Get_Track(const string& strAnimName);

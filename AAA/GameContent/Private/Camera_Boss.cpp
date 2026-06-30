@@ -26,6 +26,9 @@ void CCamera_Boss::Priority_Update(_float fTimeDelta)
 {
     if (!m_bActive) { __super::Priority_Update(fTimeDelta); return; }
 
+    if (m_fTrauma > 0.f) m_fTrauma = max(0.f, m_fTrauma - m_fTraumaDecay * fTimeDelta);
+    m_fShakeTime += fTimeDelta;
+
     // 이벤트 쿼리로 타깃 확보(없을 때만)
     if (!m_pPlayer) { PLAYER_QUERY q{}; m_pGameInstance_Proxy->Publish(EVT_QUERY_PLAYER, &q); m_pPlayer = q.pPlayer; }
     if (!m_pBoss) { BOSS_QUERY   q{}; m_pGameInstance_Proxy->Publish(EVT_QUERY_BOSS, &q); m_pBoss = q.pBoss; }
@@ -70,12 +73,65 @@ void CCamera_Boss::Priority_Update(_float fTimeDelta)
     vR = XMVector3Normalize(vR);
     _vector vU = XMVector3Normalize(XMVector3Cross(vLook, vR));
 
-    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(vE, 1.f));
-    m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSetW(vR, 0.f));
-    m_pTransformCom->Set_State(STATE::UP, XMVectorSetW(vU, 0.f));
-    m_pTransformCom->Set_State(STATE::LOOK, XMVectorSetW(vLook, 0.f));
+    _matrix CamWorld;
+    CamWorld.r[0] = XMVectorSetW(vR, 0.f);
+    CamWorld.r[1] = XMVectorSetW(vU, 0.f);
+    CamWorld.r[2] = XMVectorSetW(vLook, 0.f);
+    CamWorld.r[3] = XMVectorSetW(vE, 1.f);
+
+    Apply_Shake(CamWorld);
+
+    m_pTransformCom->Set_State(STATE::RIGHT, CamWorld.r[0]);
+    m_pTransformCom->Set_State(STATE::UP, CamWorld.r[1]);
+    m_pTransformCom->Set_State(STATE::LOOK, CamWorld.r[2]);
+    m_pTransformCom->Set_State(STATE::POSITION, CamWorld.r[3]);
 
     __super::Priority_Update(fTimeDelta);
+}
+
+HRESULT CCamera_Boss::Ready_Events()
+{
+    Subscribe_Event(EventTag::Camera_Shake, [this](void* p) {
+        if (auto* d = static_cast<CAMERA_SHAKE_DESC*>(p))
+            Add_Shake(d->fTrauma, d->fDuration);
+        else
+            Add_Shake(0.5f);
+        });
+
+    Subscribe_Event(EventTag::Camera_Rumble, [this](void* p) {
+        _float lvl = p ? *static_cast<_float*>(p) : 0.f;
+        if (lvl > 0.f) Set_Rumble(lvl);
+        else           Stop_Rumble();
+        });
+    return S_OK;
+}
+
+void CCamera_Boss::Apply_Shake(_matrix& CamWorld)
+{
+    _float a = min(1.f, m_fTrauma + m_fRumble);
+    if (a <= 0.f) return;
+
+    _float s = a * a;
+    _float t = m_fShakeTime * m_fShakeFreq;
+
+    _float yaw = m_fShakeYaw * s * sinf(t);
+    _float pitch = m_fShakePitch * s * sinf(t * 1.27f + 7.f);
+    _float roll = m_fShakeRoll * s * sinf(t * 1.63f + 19.f);
+
+    _vector eye = CamWorld.r[3];
+    _vector right = CamWorld.r[0];
+    _vector up = CamWorld.r[1];
+
+    _matrix Rot = CamWorld; Rot.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+    _matrix NewRot = XMMatrixRotationRollPitchYaw(pitch, yaw, roll) * Rot;
+
+    _vector posJitter = right * (m_fShakePos * s * sinf(t * 1.11f + 3.f))
+        + up * (m_fShakePos * s * sinf(t * 1.39f + 13.f));
+
+    CamWorld.r[0] = NewRot.r[0];
+    CamWorld.r[1] = NewRot.r[1];
+    CamWorld.r[2] = NewRot.r[2];
+    CamWorld.r[3] = XMVectorSetW(eye + posJitter, 1.f);
 }
 
 CCamera_Boss* CCamera_Boss::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

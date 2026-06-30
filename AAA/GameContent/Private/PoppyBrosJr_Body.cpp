@@ -94,6 +94,7 @@ HRESULT CPoppyBrosJr_Body::Ready_Components()
 	PART_SETUP t{};
 	t.tShader = Shader_AnimMesh_PBR;
 	t.szModelProtoTag = TEXT("Prototype_Component_Model_PoppyBrosJr_Body");
+	t.szAnimEventFile = TEXT("../../Resources/CHJ/Monster/PoppyBrosJr/Model/PoppyBrosJr_AnimEvents.json");
 
 	if (FAILED(Ready_MeshPart(t)))
 		return E_FAIL;

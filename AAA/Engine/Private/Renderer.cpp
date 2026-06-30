@@ -484,11 +484,15 @@ HRESULT CRenderer::Render_Combined()
     const auto& env = m_pGameInstance_Proxy->Get_CurrentEnvironment();
     if (FAILED(m_pShaderDeferred->Bind_SRV("g_IrradianceCube", env.pDiffuseSRV)))
         return E_FAIL;
+    if (FAILED(m_pShaderDeferred->Bind_SRV("g_PrefilteredCube", env.pSpecularSRV)))
+        return E_FAIL;
+    if (FAILED(m_pShaderDeferred->Bind_RawValue("g_iSpecularMip", &env.iSpecularMip, sizeof(_uint))))
+        return E_FAIL;
     if (FAILED(m_pShaderDeferred->Bind_RawValue("g_fIBLIntensity", &env.fIntensity, sizeof(_float))))
         return E_FAIL;
 
     if (FAILED(m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderDeferred,
-        { "g_fAmbientIntensity", "g_fAmbientSaturation",
+        { "g_fAmbientSaturation",
         "g_vAtmosColor", "g_fAtmosStart", "g_fAtmosEnd", "g_fAtmosStrength", })))
         return E_FAIL;
 
@@ -732,6 +736,7 @@ HRESULT CRenderer::Render_VolumetricFog()
     cb->vFogParams2 = _float4(Fog("g_fFogAnisotropy").x, Fog("g_fFogAmbient").x, m_fFogTime,
         Fog("g_fFogShadowStrength").x);
     cb->vGridParams = _float4((_float)FROXEL_W, (_float)FROXEL_H, (_float)FROXEL_D, 0.f);
+    cb->vFogParams3 = _float4(Fog("g_fFogStart").x, Fog("g_fFogStartRange").x, 0.f, 0.f);
 
     m_pContext->Unmap(m_pFroxelCB, 0);
 

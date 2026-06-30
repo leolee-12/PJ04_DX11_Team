@@ -1,9 +1,10 @@
 #include "LevelDesign_Starblock.h"
 #include "LevelDesign_Registry.h"
-#include "Shader_PassMeta.h"
+#include "MeshLayer_Binder.h"
 #include "Parsing_Utils.h"
 
 #include "GameInstance.h"
+
 
 namespace
 {
@@ -12,12 +13,13 @@ namespace
 		const _tchar* pObjectName;
 		const _tchar* pModelProtoTag;
 		const _char* pModelPath;
+		const _float fRadius;
 	};
 
 	static const LD_STARBLOCK_CATALOG g_BreakableCatalog[] =
 	{
-		{ L"StarBlock", CLevelDesign_Starblock::STARBLOCK_H1W1_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh" },
-		{ L"StarBlockBig", CLevelDesign_Starblock::STARBLOCK_H3W3_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H3W3.ysh" },
+		{ L"StarBlock", CLevelDesign_Starblock::STARBLOCK_H1W1_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh", 0.25f },
+		{ L"StarBlockBig", CLevelDesign_Starblock::STARBLOCK_H3W3_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H3W3.ysh" , 1.f },
 	};
 
 	static const LD_STARBLOCK_CATALOG* Find_BreakableCatalog(const _wstring& wstrObjName)
@@ -63,12 +65,12 @@ namespace
 NS_BEGIN(Client)
 
 CLevelDesign_Starblock::CLevelDesign_Starblock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CLevelDesignObject(pDevice, pContext)
+	: CLDInhalable(pDevice, pContext)
 {
 }
 
 CLevelDesign_Starblock::CLevelDesign_Starblock(const CLevelDesign_Starblock& Prototype)
-	: CLevelDesignObject(Prototype)
+	: CLDInhalable(Prototype)
 	, m_tBreakableDesc(Prototype.m_tBreakableDesc)
 {
 }
@@ -80,9 +82,6 @@ HRESULT CLevelDesign_Starblock::Initialize_Prototype()
 
 HRESULT CLevelDesign_Starblock::Initialize(void* pArg)
 {
-	if (FAILED(__super::Initialize(pArg)))
-		return E_FAIL;
-
 	if (nullptr == pArg)
 	{
 		LD_BREAKABLE_DESC DefaultDesc{};
@@ -96,6 +95,13 @@ HRESULT CLevelDesign_Starblock::Initialize(void* pArg)
 			return E_FAIL;
 	}
 
+	auto* pCatalog = Find_BreakableCatalog(m_tBreakableDesc.strObjectName);
+
+	m_fColliderRadius = pCatalog->fRadius;
+
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
+
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
@@ -107,7 +113,10 @@ HRESULT CLevelDesign_Starblock::Initialize(void* pArg)
 
 void CLevelDesign_Starblock::Late_Update(_float fTimeDelta)
 {
-	UNREFERENCED_PARAMETER(fTimeDelta);
+	if (!m_bActive)
+		return;
+
+	__super::Late_Update(fTimeDelta);
 
 	if (nullptr != m_pModelCom)
 		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
@@ -115,6 +124,9 @@ void CLevelDesign_Starblock::Late_Update(_float fTimeDelta)
 
 HRESULT CLevelDesign_Starblock::Render()
 {
+	if (!m_bActive)
+		return S_OK;
+
 	if (nullptr == m_pModelCom || nullptr == m_pShaderCom)
 		return S_OK;
 
@@ -127,46 +139,27 @@ HRESULT CLevelDesign_Starblock::Render()
 	{
 		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
 
-		auto BindMaterial = [&](const _char* pConstantName, MTEX_TYPE eType, DEFAULT_TEXTURE eDefaultKind) -> HRESULT
-			{
-				const _uint iLayerIndex = Layer.idx[ETOUI(eType)];
-				const _uint iTextureCount = m_pModelCom->Get_MeshTextureCount(i, eType);
+		MESH_LAYER_BIND_CONTEXT Ctx{};
+		Ctx.pShader = m_pShaderCom;
+		Ctx.pModel = m_pModelCom;
+		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+		Ctx.iMesh = i;
+		Ctx.pLayer = &Layer;
+		Ctx.eProfile = MESH_LAYER_PROFILE::NONANIM_PBR;
+		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
+		Ctx.iFallbackPass = ShaderPass::NonAnimPBR::DMN;
+		Ctx.fDissolve = 0.f;
 
-				if (0u < iTextureCount)
-				{
-					const _uint iSafeIndex = (iLayerIndex < iTextureCount) ? iLayerIndex : (iTextureCount - 1u);
-
-					if (SUCCEEDED(m_pModelCom->Bind_Material(m_pShaderCom, pConstantName, i, eType, iSafeIndex)))
-						return S_OK;
-				}
-
-				return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(m_pShaderCom, pConstantName, eDefaultKind);
-			};
-
-		if (FAILED(BindMaterial("g_DiffuseTexture", MTEX_TYPE::DIFFUSE, DEFAULT_TEXTURE::MAGENTA)))		return E_FAIL;
-		if (FAILED(BindMaterial("g_NormalTexture", MTEX_TYPE::NORMALS, DEFAULT_TEXTURE::FLAT_NORMAL)))	return E_FAIL;
-		if (FAILED(BindMaterial("g_MRATexture", MTEX_TYPE::METALNESS, DEFAULT_TEXTURE::MRA)))			return E_FAIL;
-		if (FAILED(BindMaterial("g_UnknownTexture", MTEX_TYPE::UNKNOWN, DEFAULT_TEXTURE::BLACK)))		return E_FAIL;
-
-		const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
-		_uint iFlags = Layer.iFlags;
-		_float fDissolve = 0.f;
-
-		if (FAILED(m_pShaderCom->Bind_RawValue(
-			"g_iUVIndex", &iUVIndex, sizeof(_uint))))
+		MESH_LAYER_BIND_RESULT Result{};
+		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
 			return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Bind_RawValue(
-			"g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))
+		if (Result.bSkipMesh)
+			continue;
+
+		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
 			return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Bind_RawValue(
-			"g_fDissolve", &fDissolve, sizeof(_float))))
-			return E_FAIL;
-
-		if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::DMN)))
-			return E_FAIL;
-		
 		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;
 	}
@@ -187,32 +180,7 @@ void CLevelDesign_Starblock::Damaged(const ATTACK_INFO& tInfo)
 {
 	UNREFERENCED_PARAMETER(tInfo);
 	
-	Set_Dead();
-}
-#pragma endregion
-
-#pragma region Damageable
-_bool CLevelDesign_Starblock::Can_BeInhaled(const INHALE_QUERY& q) const
-{
-	return true;
-}
-
-void CLevelDesign_Starblock::Be_Captured(CGameObject* pInhaler)
-{
-}
-
-COPY_ABILITY_TYPE CLevelDesign_Starblock::Get_CopyAbility() const
-{
-	return COPY_ABILITY_TYPE::NONE;
-}
-
-void CLevelDesign_Starblock::Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed)
-{
-}
-
-CGameObject* CLevelDesign_Starblock::Get_GameObject()
-{
-	return this;
+	Set_Active(false);
 }
 #pragma endregion
 
