@@ -2240,7 +2240,6 @@
     <ClCompile Include="..\Private\Cappy_Hat.cpp">
       <Filter>00. GameObject\06. Monster\04. Cappy\Parts\Hat</Filter>
     </ClCompile>
-    </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_MonsterCatalog.cpp">
       <Filter>97. DataSystem\LevelDesignLoader</Filter>
     </ClCompile>
