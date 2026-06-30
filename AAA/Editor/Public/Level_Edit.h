@@ -72,12 +72,15 @@ public:
 	const vector<EDITOR_OBJECT_HANDLE>* Get_CameraLayer() const;
 
 public:	// Map Preview - Public Func
-	HRESULT			Load_MapPreview(_uint iPresetIndex);
-	HRESULT			Load_MapPreviewStage(_uint iPresetIndex);
-	HRESULT			Load_MapPreviewEnv(_uint iPresetIndex);
-	void			Clear_MapPreview();
+	HRESULT         Load_MapPreview(_uint iPresetIndex);
+	HRESULT         Load_MapPreviewStage(_uint iPresetIndex);
+	HRESULT         Load_MapPreviewEnv(_uint iPresetIndex);
+	HRESULT         Load_LDPreview(_uint iPresetIndex);
+	void            Clear_MapPreview();
 	void			Clear_MapPreviewStage();
 	void			Clear_MapPreviewEnv();
+	void            Clear_LDPreview();
+
 	_bool			Is_MapPreviewLoaded() const;
 	const _wstring& Get_MapPreviewStatus() const;
 	const _wstring& Get_LoadedMapPreviewStageName() const;

@@ -21,6 +21,7 @@ protected:
 public:
 	virtual HRESULT			Initialize(void* pArg) override;
 	virtual void			Update(_float fTimeDelta) override;		// 기존 수명 방식이 아닌 애니메이션 종료 여부로 수명 주기 따져야 해서 override 
+	virtual void			Late_Update(_float fTimeDelta) override;
 	virtual HRESULT			Render() override;
 
 	void					Despawn();

@@ -85,8 +85,8 @@ void CProjectile::Launch(const _float3& vPos, const _float3& vDir)
 
     if (m_pHitBox)
     {
-        m_pHitBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
         m_pHitBox->Set_Enabled(true);
+        m_pHitBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
     }
 }
 

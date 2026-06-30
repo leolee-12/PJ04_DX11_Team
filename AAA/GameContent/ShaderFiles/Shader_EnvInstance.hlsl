@@ -625,7 +625,9 @@ PS_DECAL_OUT PS_DECAL(VS_DECAL_OUT In)
 
     Out.vDiffuse = float4(col.rgb, coverage);
 
-    float3 nT = g_NormalTexture.Sample(LinearSampler, decalUV).xyz * 2.f - 1.f;
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, decalUV).rg;
+    nrg *= g_NormalStrength;
+    float3 nT = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
     float3 T = normalize(In.vWorldRow0.xyz);
     float3 N = normalize(In.vWorldRow1.xyz);
     float3 B = -normalize(In.vWorldRow2.xyz);

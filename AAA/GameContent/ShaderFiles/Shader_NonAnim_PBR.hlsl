@@ -716,12 +716,15 @@ PS_DECAL_OUT PS_DECAL(PS_NONINST_IN In)
     // Diffuse
     Out.vDiffuse = float4(col.rgb, coverage);
 
-    // Normal: µ¥Ä® ÅºÁ¨Æ®°ø°£ -> ¿ùµå. µ¥Ä® Åõ¿µÃà = ·ÎÄÃ Y
-    float3 nT = g_NormalTexture.Sample(LinearSampler, decalUV).xyz * 2.f - 1.f;
-    float3 T = normalize(g_WorldMatrix._11_12_13); // ¶ç¿öº¸¸é¼­ Æ©´× 
-    float3 N = normalize(g_WorldMatrix._21_22_23); // ¶ç¿öº¸¸é¼­ Æ©´× 
-    float3 B = -normalize(g_WorldMatrix._31_32_33);// ¶ç¿öº¸¸é¼­ Æ©´× 
+	// Normal
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, decalUV).rg;
+    nrg *= g_NormalStrength;
+    float3 nT = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+    float3 T = normalize(g_WorldMatrix._11_12_13);
+    float3 N = normalize(g_WorldMatrix._21_22_23);
+    float3 B = -normalize(g_WorldMatrix._31_32_33);
     float3 worldN = normalize(nT.x * T + nT.y * B + nT.z * N);
+	
     Out.vNormal = float4(worldN * 0.5f + 0.5f, coverage * g_fDecalHasNormal);
 
     // MRA (rgb = metallic/roughness/ao)
@@ -730,38 +733,6 @@ PS_DECAL_OUT PS_DECAL(PS_NONINST_IN In)
 
     return Out;
 }
-
-//float4 PS_DECAL(PS_NONINST_IN In) : SV_TARGET0 // ¾Ëº£µµ¸¸
-//{
-//	float2 screenUV;
-//	screenUV.x = In.vProjPos.x / In.vProjPos.w * 0.5f + 0.5f;
-//	screenUV.y = In.vProjPos.y / In.vProjPos.w * -0.5f + 0.5f;
-//
-//	float sceneDepth = g_DepthTexture.Sample(PointSampler, screenUV).x;
-//	if (sceneDepth <= 0.f)
-//		  discard;
-//
-//	float3 worldPosition = RecoverWorldPos(
-//		  screenUV,
-//		  sceneDepth,
-//		  g_ProjMatrixInverse,
-//		  g_ViewMatrixInverse);
-//
-//	float3 decalLocalPosition = mul(float4(worldPosition, 1.f), g_WorldMatrixInverse).xyz;
-//	float3 boundsDistance = abs(decalLocalPosition - g_vDecalBoundsCenter);
-//	if (any(boundsDistance > g_vDecalBoundsExtents + 0.0001f))
-//		  discard;
-//
-//	float2 decalUV = float2(decalLocalPosition.x + 0.5f, 0.5f - decalLocalPosition.z);
-//
-//	decalUV = ApplyMeshUVTransform(decalUV);
-//
-//	float4 col = g_DiffuseTexture.Sample(LinearSampler, decalUV);
-//	if (col.a <= 0.f)
-//		  discard;
-//
-//	return float4(col.rgb, col.a * g_fDecalAlpha);
-//}
 
 technique11 DefaultTechnique
 {

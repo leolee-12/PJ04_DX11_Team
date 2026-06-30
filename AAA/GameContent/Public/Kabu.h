@@ -64,8 +64,6 @@ private:
     HRESULT                 Ready_PartObjects();
     virtual void            On_Deserialized() override;
 
-    void                    Inject_TestRail();         // 테스트 코드 
-
 private:
     CKabu_Body*             m_pBody = { nullptr };
 

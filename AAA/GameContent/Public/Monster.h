@@ -70,7 +70,7 @@ public: // Inhalable
 	virtual COPY_ABILITY_TYPE	Get_CopyAbility() const override { return m_eCopyAbility; }
 	virtual CGameObject*		Get_GameObject() override final { return this; }
 
-	void						On_Swallowed();
+	virtual void				On_Swallowed();
 	const _float3&				Get_SpatVelocity() const { return m_vSpatVelocity; }
 	void						Enable_ProjectileBox(_bool bEnable);
 	CGameObject*				Get_Captor() const { return m_pCaptor; }

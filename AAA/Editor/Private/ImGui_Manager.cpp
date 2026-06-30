@@ -322,6 +322,10 @@ void CImGui_Manager::Draw_Toolbar()
             m_pLevel_Edit->Load_MapPreviewEnv(static_cast<_uint>(s_iMapPreviewPreset));
 
         ImGui::SameLine();
+        if (ImGui::Button("Load LD"))
+            m_pLevel_Edit->Load_LDPreview(static_cast<_uint>(s_iMapPreviewPreset));
+
+        ImGui::SameLine();
         if (ImGui::Button("Clear All"))
             m_pLevel_Edit->Clear_MapPreview();
 
@@ -332,6 +336,10 @@ void CImGui_Manager::Draw_Toolbar()
         ImGui::SameLine();
         if (ImGui::Button("Clear Env"))
             m_pLevel_Edit->Clear_MapPreviewEnv();
+
+        ImGui::SameLine();
+        if (ImGui::Button("Clear LD"))
+            m_pLevel_Edit->Clear_LDPreview();
 
         string strMapPreviewStatus = WstrToStr(m_pLevel_Edit->Get_MapPreviewStatus());
         const string strFullMapPreviewStatus = strMapPreviewStatus;
