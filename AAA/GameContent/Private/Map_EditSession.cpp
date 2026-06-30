@@ -144,6 +144,14 @@ void CMap_EditSession::Unregister_PreviewObject(CGameObject* pObject)
 	m_MapPreviewEnvItems.erase(pObject);
 }
 
+_bool CMap_EditSession::Can_DeleteAsEnvOverride(CGameObject* pObject) const
+{
+	if (nullptr == pObject)
+		return false;
+
+	return m_MapPreviewEnvItems.find(pObject) != m_MapPreviewEnvItems.end();
+}
+
 _bool CMap_EditSession::Track_DeletedPreviewObject(CGameObject* pObject)
 {
 	if (nullptr == pObject)
@@ -459,6 +467,27 @@ _bool CMap_EditSession::Unregister_AddedObject(CGameObject* pObject)
 		return false;
 
 	_bool bRemoved = false;
+	_wstring strLayerTag;
+	_wstring strObjectTag;
+
+	const auto AddedIter = m_AddedObjectsByRuntime.find(pObject);
+	if (AddedIter != m_AddedObjectsByRuntime.end())
+	{
+		strLayerTag = AddedIter->second.strLayerTag;
+		strObjectTag = AddedIter->second.strObjectTag;
+	}
+	else
+	{
+		const auto UiIter = m_AddedObjectUiItems.find(pObject);
+		if (UiIter != m_AddedObjectUiItems.end())
+		{
+			strLayerTag = UiIter->second.strLayerTag;
+			strObjectTag = UiIter->second.strObjectTag;
+		}
+	}
+
+	if (Remove_AddedObjectDescByKey(strLayerTag, strObjectTag))
+		bRemoved = true;
 
 	if (0 < m_AddedObjectsByRuntime.erase(pObject))
 		bRemoved = true;
@@ -474,6 +503,28 @@ _bool CMap_EditSession::Unregister_AddedObject(CGameObject* pObject)
 	}
 
 	return bRemoved;
+}
+
+_bool CMap_EditSession::Remove_AddedObjectDescByKey(const _wstring& strLayerTag, const _wstring& strObjectTag)
+{
+	if (strLayerTag.empty() || strObjectTag.empty())
+		return false;
+
+	auto& AddedObjects = m_tEditData.OverrideDesc.AddedMapObjects;
+	const size_t iPreviousSize = AddedObjects.size();
+
+	AddedObjects.erase(
+		remove_if(
+			AddedObjects.begin(),
+			AddedObjects.end(),
+			[&](const MAP_ADD_OBJECT& Desc)
+			{
+				return Desc.strLayerTag == strLayerTag
+					&& Desc.strObjectTag == strObjectTag;
+			}),
+		AddedObjects.end());
+
+	return iPreviousSize != AddedObjects.size();
 }
 
 _bool CMap_EditSession::Is_AddedObject(CGameObject* pObject) const

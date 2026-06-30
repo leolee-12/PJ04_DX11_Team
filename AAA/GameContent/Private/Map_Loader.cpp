@@ -335,6 +335,8 @@ HRESULT CMap_Loader::Load_LevelDesignEntries(const MAP_PACKAGE& Package, const M
 	if (FAILED(Ready_TexHub(m_pProxy)))
 		return E_FAIL;
 
+	HRESULT hrFinal = S_OK;
+
 	for (const _wstring& strJsonPath : Package.LevelDesignJsonPaths)
 	{
 		if (strJsonPath.empty())
@@ -350,8 +352,11 @@ HRESULT CMap_Loader::Load_LevelDesignEntries(const MAP_PACKAGE& Package, const M
 		Context.pCallbackContext = Request.pCallbackContext;
 
 		LD_LOAD_RESULT LDReport{};
-		if (FAILED(CLevelDesign_Loader::Load_LevelDesign_Runtime(Context, strJsonPath, &LDReport)))
-			return E_FAIL;
+		const HRESULT hrLoad = CLevelDesign_Loader::Load_LevelDesign_Runtime(Context, strJsonPath, &LDReport);
+		if (FAILED(hrLoad))
+			return hrLoad;
+		if (S_FALSE == hrLoad)
+			hrFinal = S_FALSE;
 
 		if (nullptr != pOutReport)
 		{
@@ -363,7 +368,7 @@ HRESULT CMap_Loader::Load_LevelDesignEntries(const MAP_PACKAGE& Package, const M
 		}
 	}
 
-	return S_OK;
+	return hrFinal;
 }
 
 HRESULT CMap_Loader::Build_Package(const _wstring& strManifestPath, MAP_PACKAGE* pOutPackage)
@@ -896,7 +901,7 @@ HRESULT CMap_Loader::Load_LevelDesign_Runtime(
 	{
 		MAP_SPAWN_REQUEST Request{};
 		Request.Levels.iLevelDesignObjectLevel = Context.iPlaceLevel;
-		Request.Levels.iLevelDesignPrototypeLevel = Context.iModelLevel;
+		Request.Levels.iLevelDesignPrototypeLevel = Context.iPlaceLevel;
 		Request.Levels.iLevelDesignModelPrototypeLevel = Context.iModelLevel;
 		Request.pCreatedCallback = Context.pCreatedCallback;
 		Request.pCallbackContext = Context.pCallbackContext;

@@ -366,6 +366,21 @@ void CPanel_Hierarchy::Render()
                             pLevel->Is_MapPreviewObject(pObject);
                         const _bool bIsAddedMapOverride =
                             (nullptr != pSession) && pSession->Is_AddedObject(pObject);
+                        const _bool bCanDeleteNormal = !bIsMapPreviewObject;
+                        const _bool bCanRemoveAdded = bIsAddedMapOverride;
+                        const _bool bCanDeleteEnvOverride =
+                            bIsMapPreviewObject
+                            && !bIsAddedMapOverride
+                            && nullptr != pSession
+                            && pSession->Can_DeleteAsEnvOverride(pObject);
+
+                        const char* pDeleteButtonLabel = nullptr;
+                        if (bCanRemoveAdded)
+                            pDeleteButtonLabel = "Remove";
+                        else if (bCanDeleteEnvOverride)
+                            pDeleteButtonLabel = "X";
+                        else if (bCanDeleteNormal)
+                            pDeleteButtonLabel = "X";
 
                         string strDisplayName = ObjectCache.strNameUtf8;
                         if (bIsAddedMapOverride)
@@ -374,6 +389,12 @@ void CPanel_Hierarchy::Render()
                             strDisplayName += " [Preview]";
 
                         const float fAvailWidth = ImGui::GetContentRegionAvail().x;
+                        const float fDeleteButtonWidth = nullptr != pDeleteButtonLabel
+                            ? ImGui::CalcTextSize(pDeleteButtonLabel).x + ImGui::GetStyle().FramePadding.x * 2.f
+                            : 0.f;
+                        const float fSelectableWidth = nullptr != pDeleteButtonLabel
+                            ? max(1.f, fAvailWidth - fDeleteButtonWidth - ImGui::GetStyle().ItemSpacing.x)
+                            : fAvailWidth;
 
                         ImGui::PushID(pObject);
 
@@ -381,7 +402,7 @@ void CPanel_Hierarchy::Render()
                             strDisplayName.c_str(),
                             bSelected,
                             0,
-                            ImVec2(max(1.f, fAvailWidth - 25.f), 0.f)))
+                            ImVec2(fSelectableWidth, 0.f)))
                         {
                             pLevel->Set_Selected(pObject);
                         }
@@ -435,14 +456,17 @@ void CPanel_Hierarchy::Render()
                             ImGui::EndDragDropSource();
                         }
 
-                        ImGui::SameLine();
-
-                        if (ImGui::SmallButton("X"))
+                        if (nullptr != pDeleteButtonLabel)
                         {
-                            pLevel->Delete_Object(pObject);
-                            bHierarchyMutated = true;
-                            ImGui::PopID();
-                            return true;
+                            ImGui::SameLine();
+
+                            if (ImGui::SmallButton(pDeleteButtonLabel))
+                            {
+                                pLevel->Delete_Object(pObject);
+                                bHierarchyMutated = true;
+                                ImGui::PopID();
+                                return true;
+                            }
                         }
 
                         ImGui::PopID();

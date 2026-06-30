@@ -54,6 +54,7 @@ public:
 	void Register_PreviewObject(const _wstring& strLayerTag, const _wstring& strObjectTag, CGameObject* pObject);
 
 	void Unregister_PreviewObject(CGameObject* pObject);
+	_bool Can_DeleteAsEnvOverride(CGameObject* pObject) const;
 	_bool Track_DeletedPreviewObject(CGameObject* pObject);
 
 	_bool Track_EditedPreviewObject(CGameObject* pObject, const MAP_ENV_EDITED_DESC& Edit);
@@ -130,6 +131,7 @@ private:
 	static _bool Is_PreviewEnvLayer(const _wstring& strLayerTag);
 	static _wstring Build_DisplayName(const ENV_OBJECT_DESC& Desc);
 	void Rebuild_DeletedEnvItemsFromWorkingDelta();
+	_bool Remove_AddedObjectDescByKey(const _wstring& strLayerTag, const _wstring& strObjectTag);
 
 public:
 	static CMap_EditSession* Create();
