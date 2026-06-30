@@ -79,7 +79,7 @@ void CKirby_Jump::Update(CKirby* pKirby, const _float fTimeDelta)
             _float fYVelocity = pMovementCom->Get_VerticalVelocity();
             if (fYVelocity <= 0.f)
             {
-                if (pKirby->Get_Body()->Get_BodyState() != KIRBY_BODY_STATE::STUFFED)
+                if (pKirby->Get_Body()->Get_KirbyBody() != KIRBY_BODY_STATE::STUFFED)
                 {
                     if (rand() % 2 == 0)
                     {
@@ -147,7 +147,7 @@ _bool CKirby_Jump::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             if (!pCommand->IsDown())
                 return false;
 
-            if(pKirby->Get_Body()->Get_BodyState() != KIRBY_BODY_STATE::STUFFED)
+            if(pKirby->Get_Body()->Get_KirbyBody() != KIRBY_BODY_STATE::STUFFED)
                 pKirby->Change_State(KIRBY_STATE_TYPE::HOVERING);
 
             return true;

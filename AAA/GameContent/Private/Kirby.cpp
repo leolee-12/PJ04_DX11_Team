@@ -14,6 +14,9 @@
 #include "Kirby_Sword.h"
 #include "Kirby_SwordHat.h"
 
+#include "Kirby_DeformCar_Demo.h"
+#include "Kirby_DeformCar_Main.h"
+
 #include "Kirby_InputManager.h"
 #include "Kirby_Controller.h"
 #include "Kirby_StateMachine.h"
@@ -22,6 +25,9 @@
 #include "Kirby_State.h"
 #include "Kirby_Ability_Normal.h"
 #include "Kirby_Ability_Sword.h"
+
+// Deform
+#include "Kirby_Deform_Car.h"
 
 #include "Effect_Loader.h"
 
@@ -55,6 +61,9 @@ HRESULT CKirby::Initialize(void* pArg)
     if (FAILED(Ready_Ability()))
         return E_FAIL;
 
+    if (FAILED(Ready_Deform()))
+        return E_FAIL;
+
     if (FAILED(Ready_System()))
         return E_FAIL;
 
@@ -71,8 +80,6 @@ void CKirby::Priority_Update(_float fTimeDelta)
 void CKirby::Update(_float fTimeDelta)
 {
     XMStoreFloat3(&m_vWishDir, XMVectorZero());
-
-    __super::Update(fTimeDelta);
 
     Update_Timer(fTimeDelta);
 
@@ -95,6 +102,8 @@ void CKirby::Update(_float fTimeDelta)
     }
 
     m_pMovement->Update_RigidBody(fTimeDelta);
+
+    __super::Update(fTimeDelta);
 }
 
 void CKirby::Late_Update(_float fTimeDelta)
@@ -180,6 +189,52 @@ CKirby_OnOffPart* CKirby::Find_OnOffPart(const wchar_t* PartTag)
     }
 
     return nullptr;
+}
+
+CKirby_Deform_Model* CKirby::Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType)
+{
+    auto Find_Form = [this](const wchar_t* PartTag)->CKirby_Deform_Model*
+        {
+            auto iter = m_PartObjects.find(PartTag);
+            if (iter != m_PartObjects.end())
+                return dynamic_cast<CKirby_Deform_Model*>(iter->second);
+
+            return nullptr;
+        };
+
+
+    switch (eDeformType)
+    {
+        case DEFORM_TYPE::NONE:
+            return m_pBody;
+
+        case DEFORM_TYPE::CAR:
+            if (eDeformModelType == KIRBY_DEFORM_MODEL_TYPE::DEMO)
+                return Find_Form(CKirby_DeformCar_Demo::Kirby_PartTag);
+            else if (eDeformModelType == KIRBY_DEFORM_MODEL_TYPE::MAIN)
+                return Find_Form(CKirby_DeformCar_Main::Kirby_PartTag);
+    }
+
+    return nullptr;
+}
+
+void CKirby::Change_HatSocketMatrix(COPY_ABILITY_TYPE eAbilityType, const _float4x4* pBoneMatrix)
+{
+    auto Set_HatSocketBoneMatrix = [this, pBoneMatrix](const wchar_t* PartTag)->void
+        {
+            auto iter = m_PartObjects.find(PartTag);
+            if (iter != m_PartObjects.end())
+            {
+                static_cast<CKirby_OnOffPart*>(iter->second)->Set_SocketBoneMatrix(pBoneMatrix);
+            }
+        };
+
+    switch (eAbilityType)
+    {
+    case COPY_ABILITY_TYPE::SWORD:
+        Set_HatSocketBoneMatrix(CKirby_SwordHat::Kirby_PartTag);
+        break;
+    }
 }
 
 void CKirby::Add_MoveDir(const _float3& vWishDir)
@@ -390,10 +445,25 @@ HRESULT CKirby::Ready_PartObjects()
     CKirby_Body::KIRBY_BODY_DESC BodyDesc{};
     BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 
-    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_Body::PROTOTYPE_TAG, TEXT("Body"), &BodyDesc)))
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_Body::PROTOTYPE_TAG, CKirby_Body::Kirby_PartTag, &BodyDesc)))
         return E_FAIL;
 
-    m_pBody = dynamic_cast<CKirby_Body*>(m_PartObjects[TEXT("Body")]);
+    m_pBody = dynamic_cast<CKirby_Body*>(m_PartObjects[CKirby_Body::Kirby_PartTag]);
+
+    // DeformCar_Demo
+    CKirby_DeformCar_Demo::KIRBY_DEFORMCAR_DEMO_DESC DeformCar_Demo_Desc{};
+    DeformCar_Demo_Desc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_DeformCar_Demo::PROTOTYPE_TAG, CKirby_DeformCar_Demo::Kirby_PartTag, &DeformCar_Demo_Desc)))
+        return E_FAIL;
+
+    // DeformCar_Main
+    CKirby_DeformCar_Main::KIRBY_DEFORMCAR_MAIN_DESC DeformCar_Main_Desc{};
+    DeformCar_Main_Desc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_DeformCar_Main::PROTOTYPE_TAG, CKirby_DeformCar_Main::Kirby_PartTag, &DeformCar_Main_Desc)))
+        return E_FAIL;
+
 
     // Sword
     CKirby_Sword::KIRBY_SWORD_DESC SwordDesc{};
@@ -455,6 +525,23 @@ HRESULT CKirby::Ready_Ability()
     return S_OK;
 }
 
+HRESULT CKirby::Ready_Deform()
+{
+    auto Register_Deform = [this](DEFORM_TYPE eType, CKirby_Deform* pNewDeform) -> HRESULT
+        {
+            if (pNewDeform == nullptr)
+                return E_FAIL;
+
+            m_Deformations[eType] = pNewDeform;
+
+            return S_OK;
+        };
+
+    if (FAILED(Register_Deform(DEFORM_TYPE::CAR, CKirby_Deform_Car::Create()))) return E_FAIL;
+
+    return S_OK;
+}
+
 HRESULT CKirby::Bind_ShaderResources()
 {
     return S_OK;
@@ -501,7 +588,6 @@ _bool CKirby::Block_Hit(const ATTACK_INFO& tInfo)
 
 void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
 {
-
     m_pKirby_StateMachine->On_Damaged_KirbyStateMachine(tInfo);
 }
 
@@ -523,6 +609,29 @@ void CKirby::Clear_CutsceneGrabTarget()
 
     m_pGrabBone = nullptr;
     m_pGrabOwnerWorld = nullptr;
+}
+
+CKirby_Deform* CKirby::Get_KirbyDeform()
+{
+    return m_pKirby_Deform;
+}
+
+void CKirby::Set_KirbyDeform(DEFORM_TYPE eDeformType)
+{
+    if (eDeformType == DEFORM_TYPE::NONE)
+    {
+        m_pKirby_Deform = nullptr;
+        return;
+    }
+
+    auto iter = m_Deformations.find(eDeformType);
+    if (iter == m_Deformations.end())
+    {
+        MSG_BOX("KirbyDeform Bug");
+        return;
+    }
+
+    m_pKirby_Deform = iter->second;
 }
 
 CCollider* CKirby::Get_Collider(KIRBY_COLLIDER eKirbyCollider)
@@ -573,6 +682,11 @@ void CKirby::Free()
     for (auto pair : m_Abilities)
         Safe_Release(pair.second);
     m_Abilities.clear();
+
+    m_pKirby_Deform = nullptr;
+    for (auto pair : m_Deformations)
+        Safe_Release(pair.second);
+    m_Deformations.clear();
 
     m_KirbyColliders.clear();
 

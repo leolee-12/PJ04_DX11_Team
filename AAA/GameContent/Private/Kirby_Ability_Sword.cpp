@@ -108,7 +108,7 @@ void CKirby_Ability_Sword::Enter_Ability(CKirby* pKirby)
     ZeroMemory(&m_vSwordWishDir, sizeof(m_vSwordWishDir));
 
     CKirby_Body* pBody = pKirby->Get_Body();
-    pBody->Set_Eye(KIRBY_EYE_STATE::ANGRY);
+    pBody->Set_KirbyEye(KIRBY_EYE_STATE::ANGRY);
 
     Change_SwordState(pKirby, eStartState);
 }
@@ -157,7 +157,7 @@ void CKirby_Ability_Sword::Exit_Ability(CKirby* pKirby)
     pKirby->Get_Movement()->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
 
     CKirby_Body* pBody = pKirby->Get_Body();
-    pBody->Set_Eye(KIRBY_EYE_STATE::IDLE);
+    pBody->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
 
     CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_OnOffPart(CKirby_Sword::Kirby_PartTag));
     if (pSword)

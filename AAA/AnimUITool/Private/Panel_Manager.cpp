@@ -420,13 +420,25 @@ void CPanel_Manager::Render_ModeBar()
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Load DeformCar (Test)"))
+    if (ImGui::Button("Load DeformCar_Main (Test)"))
     {
         if (m_pLevel)
         {
             Bind_Preview(m_pLevel->Load_DeformCar());
-            m_Context.strName = L"DeformCar";
-            m_Context.strModelPath = L"../../Resources/YSE/DeformCar/DeformCar.ysh";
+            m_Context.strName = L"DeformCa_Main";
+            m_Context.strModelPath = L"../../Resources/YSE/DeformCar/Main.ysh";
+        }
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Load DeformCar_Demo (Test)"))
+    {
+        if (m_pLevel)
+        {
+            Bind_Preview(m_pLevel->Load_DeformCar_Demo());
+            m_Context.strName = L"DeformCar_Demo";
+            m_Context.strModelPath = L"../../Resources/YSE/DeformCar/Demo.ysh";
         }
     }
 

@@ -4,15 +4,13 @@
 
 #include "GameContent_const.h"
 
-#include "Animator.h"
-
 CKirby_Body::CKirby_Body(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CPartObject(pDevice, pContext)
+    : CKirby_Deform_Model(pDevice, pContext)
 {
 }
 
 CKirby_Body::CKirby_Body(const CKirby_Body& Prototype)
-    : CPartObject(Prototype){
+    : CKirby_Deform_Model(Prototype){
 }
 
 HRESULT CKirby_Body::Initialize_Prototype()
@@ -32,6 +30,9 @@ HRESULT CKirby_Body::Initialize(void* pArg)
 
     if (FAILED(Ready_Components()))
         return E_FAIL;
+
+    if (FAILED(Ready_AnimEvents()))
+        return E_FAIL;
     
     m_pAnimatorCom->Play("Wait", true, true);
 
@@ -44,6 +45,9 @@ void CKirby_Body::Priority_Update(_float fTimeDelta)
 
 void CKirby_Body::Update(_float fTimeDelta)
 {
+    if (m_bActive == false)
+        return;
+
     if (m_pGameInstance_Proxy->Is_EditMode())
         return;
 
@@ -52,7 +56,10 @@ void CKirby_Body::Update(_float fTimeDelta)
 
 void CKirby_Body::Late_Update(_float fTimeDelta)
 {
-    __super::Compute_CombinedWorldMatrix(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+    if (m_bActive == false)
+        return;
+
+    CPartObject::Compute_CombinedWorldMatrix(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
@@ -62,7 +69,7 @@ HRESULT CKirby_Body::Render()
     if (FAILED(Set_VisibleMeshes()))
         return E_FAIL;
 
-    if (FAILED(Bind_ShaderResources()))
+    if (FAILED(Bind_ShaderResources(m_pKirbyShaderCom)))
         return E_FAIL;
 
     const _uint iNumMeshes = (_uint)m_pModelCom->Get_NumMeshes();
@@ -72,46 +79,17 @@ HRESULT CKirby_Body::Render()
         if (i >= m_VisibleMeshes.size() || m_VisibleMeshes[i] == false)
             continue;
 
-        if (FAILED(m_pEyeTextureCom->Bind_ShaderResource(m_pShaderCom, "g_EyeTexture", ETOUI(m_eEye))))
-            return E_FAIL;
-        if (FAILED(m_pEyeMaskTextureCom->Bind_ShaderResource(m_pShaderCom, "g_EyeMaskTexture", ETOUI(m_eEye))))
-            return E_FAIL;
-
-        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_SkinTexture", i, MTEX_TYPE::UNKNOWN, 1)))
-            return E_FAIL;
-
-        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MouthTexture", i, MTEX_TYPE::UNKNOWN, 2)))
-            return E_FAIL;
-
-        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
-            return E_FAIL;
-
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_vBodyColor", &m_vBodyColor, sizeof(_float4))))
-            return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_vFootColor", &m_vFootColor, sizeof(_float4))))
-            return E_FAIL;
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_vBlushColor", &m_vBlushColor, sizeof(_float4))))
-            return E_FAIL;
-
-        if (FAILED(m_pShaderCom->Begin(0)))
-            return E_FAIL;
-
-        if (FAILED(m_pModelCom->Render(i)))
+        if (FAILED(Render_KirbyMesh(i)))
             return E_FAIL;
     }
     return S_OK;
 }
 
-const _float4x4* CKirby_Body::Get_BoneMatrixPtr(const _char* pBoneName) const
-{
-    return m_pModelCom->Get_BoneMatrixPtr(pBoneName);
-}
-
 HRESULT CKirby_Body::Ready_Components()
 {
     /* For.Com_Shader */
-    m_pShaderCom = Add_Component<CShader>(Shader_Kirby.iLevelID, Shader_Kirby.szProtoTag, TEXT("Com_Shader"));
-    if (m_pShaderCom == nullptr)
+    m_pKirbyShaderCom = Add_Component<CShader>(Shader_Kirby.iLevelID, Shader_Kirby.szProtoTag, TEXT("Com_Shader"));
+    if (m_pKirbyShaderCom == nullptr)
         return E_FAIL;
 
     /* For.Com_Model */
@@ -134,7 +112,7 @@ HRESULT CKirby_Body::Ready_Components()
     /* For.Com_Animator */
     CAnimator::ANIMATOR_DESC AnimDesc{};
     AnimDesc.pModel = m_pModelCom;
-    //AnimDesc.strDataFile = TEXT("../Bin/Resources/Test/Test/Marb1e/Marb1e_animevents.json");
+    AnimDesc.strDataFile = L"../../Resources/YSE/Kirby/Kirby_AnimEvents.json";
 
     m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
 
@@ -144,17 +122,49 @@ HRESULT CKirby_Body::Ready_Components()
     return S_OK;
 }
 
-HRESULT CKirby_Body::Bind_ShaderResources()
+HRESULT CKirby_Body::Ready_AnimEvents()
 {
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
-        return E_FAIL;
+    m_pAnimatorCom->Set_EventCallback(
+        [this](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+        {
+            switch (static_cast<EANIM_EVENT>(e.iEventType))
+            {
+                case EANIM_EVENT::SetEye:
+                {
+                    if (ePhase != ANIM_EVENT_PHASE::POINT)
+                        break;
 
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
-        return E_FAIL;
+                    switch (static_cast<KIRBY_EYE_STATE>(e.iIntParam))
+                    {
+                        case KIRBY_EYE_STATE::IDLE:      Set_KirbyEye(KIRBY_EYE_STATE::IDLE);      break;
+                        case KIRBY_EYE_STATE::DOUBT:     Set_KirbyEye(KIRBY_EYE_STATE::DOUBT);     break;
+                        case KIRBY_EYE_STATE::BLINK:     Set_KirbyEye(KIRBY_EYE_STATE::BLINK);     break;
+                        case KIRBY_EYE_STATE::CLOSE:     Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);     break;
+                        case KIRBY_EYE_STATE::ANGRY:     Set_KirbyEye(KIRBY_EYE_STATE::ANGRY);     break;
+                        case KIRBY_EYE_STATE::SURPRISED: Set_KirbyEye(KIRBY_EYE_STATE::SURPRISED); break;
+                        case KIRBY_EYE_STATE::SADNESS:   Set_KirbyEye(KIRBY_EYE_STATE::SADNESS);   break;
+                    }
+
+                    break;
+                }
+
+                case EANIM_EVENT::SetBody:
+                {
+                    if (ePhase != ANIM_EVENT_PHASE::POINT)
+                        break;
+
+                    switch (static_cast<KIRBY_BODY_STATE>(e.iIntParam))
+                    {
+                        case KIRBY_BODY_STATE::NORMAL:  Set_KirbyBody(KIRBY_BODY_STATE::NORMAL);  break;
+                        case KIRBY_BODY_STATE::STUFFED: Set_KirbyBody(KIRBY_BODY_STATE::STUFFED); break;
+                        case KIRBY_BODY_STATE::INHALE:  Set_KirbyBody(KIRBY_BODY_STATE::INHALE);  break;
+                    }
+
+                    break;
+                }
+            }
+        }
+    );
 
     return S_OK;
 }
@@ -192,6 +202,47 @@ HRESULT CKirby_Body::Set_VisibleMeshes()
     }
 
     ShowMesh(KIRBY_MESH::LIMBS);
+
+    return S_OK;
+}
+
+HRESULT CKirby_Body::Render_KirbyMesh(_uint iMeshIndex)
+{
+    if (m_pKirbyShaderCom == nullptr)
+    {
+        MSG_BOX("m_pKirbyShaderCom is nullptr: Kirby_Form");
+        return E_FAIL;
+    }
+
+    if (FAILED(m_pEyeTextureCom->Bind_ShaderResource(m_pKirbyShaderCom, "g_EyeTexture", ETOUI(m_eEye))))
+        return E_FAIL;
+
+    if (FAILED(m_pEyeMaskTextureCom->Bind_ShaderResource(m_pKirbyShaderCom, "g_EyeMaskTexture", ETOUI(m_eEye))))
+        return E_FAIL;
+
+    if (FAILED(m_pModelCom->Bind_Material(m_pKirbyShaderCom, "g_SkinTexture", iMeshIndex, MTEX_TYPE::UNKNOWN, 1)))
+        return E_FAIL;
+
+    if (FAILED(m_pModelCom->Bind_Material(m_pKirbyShaderCom, "g_MouthTexture", iMeshIndex, MTEX_TYPE::UNKNOWN, 2)))
+        return E_FAIL;
+
+    if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pKirbyShaderCom, "g_BoneMatrices", iMeshIndex)))
+        return E_FAIL;
+
+    if (FAILED(m_pKirbyShaderCom->Bind_RawValue("g_vBodyColor", &m_vBodyColor, sizeof(_float4))))
+        return E_FAIL;
+
+    if (FAILED(m_pKirbyShaderCom->Bind_RawValue("g_vFootColor", &m_vFootColor, sizeof(_float4))))
+        return E_FAIL;
+
+    if (FAILED(m_pKirbyShaderCom->Bind_RawValue("g_vBlushColor", &m_vBlushColor, sizeof(_float4))))
+        return E_FAIL;
+
+    if (FAILED(m_pKirbyShaderCom->Begin(0)))
+        return E_FAIL;
+
+    if (FAILED(m_pModelCom->Render(iMeshIndex)))
+        return E_FAIL;
 
     return S_OK;
 }

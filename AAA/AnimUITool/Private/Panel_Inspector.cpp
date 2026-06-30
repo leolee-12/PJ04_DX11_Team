@@ -7,6 +7,8 @@
 #include "Transform.h"
 #include "Property.h"
 #include "Preview_Kirby.h"
+#include "Preview_DeformCar_Main.h"
+#include "Preview_DeformCar_Demo.h"
 #include "Kirby_States.h"
 #include "UIPartObject.h"
 #include "UIContainerObject.h"
@@ -525,10 +527,51 @@ void CPanel_Inspector::Render_Meshs()
     ANIM_CONTEXT& ctx = m_pPanel_Manager->Get_Context();
 
     CPreview_Actor* pActor = dynamic_cast<CPreview_Actor*>(ctx.pOwner);
+    CPreview_DeformCar_Main* pDeformCarMain = dynamic_cast<CPreview_DeformCar_Main*>(ctx.pOwner);
+    CPreview_DeformCar_Demo* pDeformCarDemo = dynamic_cast<CPreview_DeformCar_Demo*>(ctx.pOwner);
     CModel* pModel = ctx.pModel;
 
-    if (!pActor || !pModel)
+    if ((!pActor && !pDeformCarMain && !pDeformCarDemo) || !pModel)
         return;
+
+    auto IsMeshVisible = [pActor, pDeformCarMain, pDeformCarDemo](_uint iMesh)
+        {
+            if (pActor)
+                return pActor->Is_MeshVisible(iMesh);
+            if (pDeformCarMain)
+                return pDeformCarMain->Is_MeshVisible(iMesh);
+            return pDeformCarDemo->Is_MeshVisible(iMesh);
+        };
+
+    auto SetMeshVisible = [pActor, pDeformCarMain, pDeformCarDemo](_uint iMesh, _bool bVisible)
+        {
+            if (pActor)
+                pActor->Set_MeshVisible(iMesh, bVisible);
+            else if (pDeformCarMain)
+                pDeformCarMain->Set_MeshVisible(iMesh, bVisible);
+            else
+                pDeformCarDemo->Set_MeshVisible(iMesh, bVisible);
+        };
+
+    auto SetAllMeshVisible = [pActor, pDeformCarMain, pDeformCarDemo](_bool bVisible)
+        {
+            if (pActor)
+                pActor->Set_AllMeshVisible(bVisible);
+            else if (pDeformCarMain)
+                pDeformCarMain->Set_AllMeshVisible(bVisible);
+            else
+                pDeformCarDemo->Set_AllMeshVisible(bVisible);
+        };
+
+    auto SetSoloMesh = [pActor, pDeformCarMain, pDeformCarDemo](_uint iMesh)
+        {
+            if (pActor)
+                pActor->Set_SoloMesh(iMesh);
+            else if (pDeformCarMain)
+                pDeformCarMain->Set_SoloMesh(iMesh);
+            else
+                pDeformCarDemo->Set_SoloMesh(iMesh);
+        };
 
     if (!ImGui::CollapsingHeader("Meshes", ImGuiTreeNodeFlags_DefaultOpen))
         return;
@@ -538,12 +581,12 @@ void CPanel_Inspector::Render_Meshs()
     ImGui::Text("Mesh Count: %u", iNumMeshes);
 
     if (ImGui::Button("All On"))
-        pActor->Set_AllMeshVisible(true);
+        SetAllMeshVisible(true);
 
     ImGui::SameLine();
 
     if (ImGui::Button("All Off"))
-        pActor->Set_AllMeshVisible(false);
+        SetAllMeshVisible(false);
 
     ImGui::Separator();
 
@@ -553,14 +596,14 @@ void CPanel_Inspector::Render_Meshs()
     {
         ImGui::PushID((int)i);
 
-        bool bVisible = pActor->Is_MeshVisible(i);
+        bool bVisible = IsMeshVisible(i);
         if (ImGui::Checkbox("##visible", &bVisible))
-            pActor->Set_MeshVisible(i, bVisible);
+            SetMeshVisible(i, bVisible);
 
         ImGui::SameLine();
 
         if (ImGui::SmallButton("Solo"))
-            pActor->Set_SoloMesh(i);
+            SetSoloMesh(i);
 
         ImGui::SameLine();
 

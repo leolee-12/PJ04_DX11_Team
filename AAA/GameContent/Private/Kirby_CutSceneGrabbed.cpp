@@ -37,7 +37,7 @@ void CKirby_CutSceneGrabbed::Enter(CKirby* pKirby)
     CAnimator* pAnimator = pBody->Get_Animator();
     pAnimator->Play("DemoAppear2", false, false, 0.1f, 1.f, true);
 
-    pBody->Set_Eye(KIRBY_EYE_STATE::SURPRISED);
+    pBody->Set_KirbyEye(KIRBY_EYE_STATE::SURPRISED);
 
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Stop();
@@ -61,7 +61,7 @@ void CKirby_CutSceneGrabbed::Exit(CKirby* pKirby)
     pMovement->Set_UseGravity(true);
     pMovement->Sync_To_Controller();
 
-    pKirby->Get_Body()->Set_Eye(KIRBY_EYE_STATE::IDLE);
+    pKirby->Get_Body()->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
 }
 
 _bool CKirby_CutSceneGrabbed::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
