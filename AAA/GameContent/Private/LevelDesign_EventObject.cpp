@@ -34,7 +34,7 @@ namespace
 	static const LD_EVENTOBJECT_CATALOG g_EventObjectCatalog[] =
 	{
 		{ L"Level1BossDemoBg", CLevelDesign_EventObject::LEVEL1BOSSDEMOBG_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Level1BossDemoBg/Level1BossDemoBg.ysh",
-		MODEL::ANIM, { "DemoAppear2", "DemoAppear2AfterWait", "DemoAppear2BeforWait", "" }, LD_EVENTOBJECT_POLICY::LEVEL1_BOSS_DEMO_BG, true, L"" },
+		MODEL::ANIM, { "DemoAppear2", "DemoAppear2AfterWait", "DemoAppear2BeforWait", "" }, LD_EVENTOBJECT_POLICY::LEVEL1_BOSS_DEMO_BG, true, L"../../Resources/Map/Gimmick/Anim/Level1BossDemoBg/Level1BossDemoBg_AnimEvents.json" },
 		{ L"SlopeBoardA", CLevelDesign_EventObject::SLOPEBOARD_A_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardA.ysh",
 		MODEL::ANIM, { "LandBack", "LandFront", "LandStartFront", "" }, LD_EVENTOBJECT_POLICY::SLOPEBOARD_A, true, L"" },
 		{ L"SlopeBoardC", CLevelDesign_EventObject::SLOPEBOARD_C_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardC.ysh",
@@ -85,21 +85,21 @@ HRESULT CLevelDesign_EventObject::Initialize(void* pArg)
 	if (nullptr == pArg)
 		return E_FAIL;
 
-	if (FAILED(__super::Initialize(pArg)))
-		return E_FAIL;
-
 	m_tEventObjectDesc = *static_cast<const LD_EVENTOBJECT_DESC*>(pArg);
 
 	if (FAILED(Validate_Desc()))
 		return E_FAIL;
 
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
+
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	if (FAILED(Ready_Policy()))
+	if (FAILED(Ready_AnimEvents()))
 		return E_FAIL;
 
-	if (FAILED(Ready_Events_ByPolicy()))
+	if (FAILED(Ready_Policy()))
 		return E_FAIL;
 
 	return S_OK;
@@ -267,13 +267,21 @@ HRESULT CLevelDesign_EventObject::Ready_Components()
 		m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
 		if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
 			return E_FAIL;
-
-		m_pAnimatorCom->Set_EventCallback(
-			[this](const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase)
-			{
-				On_AnimEvent_ByPolicy(AnimEvent, ePhase);
-			});
 	}
+
+	return S_OK;
+}
+
+HRESULT CLevelDesign_EventObject::Ready_AnimEvents()
+{
+	if (nullptr == m_pAnimatorCom)
+		return S_OK;
+
+	m_pAnimatorCom->Set_EventCallback(
+		[this](const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase)
+		{
+			On_AnimEvent(AnimEvent, ePhase);
+		});
 
 	return S_OK;
 }
@@ -388,16 +396,12 @@ void CLevelDesign_EventObject::Update_Policy(_float fTimeDelta)
 	}
 }
 
-HRESULT CLevelDesign_EventObject::Ready_Events_ByPolicy()
+HRESULT CLevelDesign_EventObject::Ready_Events()
 {
 	switch (m_tEventObjectDesc.ePolicy)
 	{
 	case LD_EVENTOBJECT_POLICY::LEVEL1_BOSS_DEMO_BG:
-		Subscribe_Event(EventTag::Cutscene_GorillaAppear,
-			[this](void*)
-			{
-				On_Event_ByPolicy(EventTag::Cutscene_GorillaAppear);
-			});
+		Subscribe_Event(EventTag::Cutscene_GorillaAppear, [this](void*){ On_Event(EventTag::Cutscene_GorillaAppear); });	// 이벤트 변경 예정
 		break;
 
 	default:
@@ -407,25 +411,17 @@ HRESULT CLevelDesign_EventObject::Ready_Events_ByPolicy()
 	return S_OK;
 }
 
-void CLevelDesign_EventObject::On_Event_ByPolicy(const _wstring& strEventTag)
+void CLevelDesign_EventObject::On_Event(const _wstring& strEventTag)
 {
-	UNREFERENCED_PARAMETER(strEventTag);
-
 	switch (m_tEventObjectDesc.ePolicy)
 	{
 	case LD_EVENTOBJECT_POLICY::LEVEL1_BOSS_DEMO_BG:
-		m_eState = EVENTOBJECT_STATE::PLAYING;
-		Set_AllMeshesVisible(true);
-		Play_EventAnimation(0u, false);
+		On_Event_Level1BossDemoBg(strEventTag);
 		break;
 
 	case LD_EVENTOBJECT_POLICY::SLOPEBOARD_A:
 	case LD_EVENTOBJECT_POLICY::SLOPEBOARD_C:
-		m_eState = EVENTOBJECT_STATE::PLAYING;
-		m_bRenderable = true;
-		Set_AllMeshesVisible(true);
-		Play_EventAnimation(0u, false);
-		Release_RigidStatic();
+		On_Event_SlopeBoard(strEventTag);
 		break;
 
 	default:
@@ -433,7 +429,39 @@ void CLevelDesign_EventObject::On_Event_ByPolicy(const _wstring& strEventTag)
 	}
 }
 
-void CLevelDesign_EventObject::On_AnimEvent_ByPolicy(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase)
+void CLevelDesign_EventObject::On_Event_Level1BossDemoBg(const _wstring& strEventTag)
+{
+	UNREFERENCED_PARAMETER(strEventTag);
+
+	m_eState = EVENTOBJECT_STATE::PLAYING;
+	Play_EventAnimation(0u, false);
+}
+
+void CLevelDesign_EventObject::On_Event_SlopeBoard(const _wstring& strEventTag)
+{
+	UNREFERENCED_PARAMETER(strEventTag);
+
+	m_eState = EVENTOBJECT_STATE::PLAYING;
+	m_bRenderable = true;
+	Set_AllMeshesVisible(true);
+	Play_EventAnimation(0u, false);
+	Release_RigidStatic();
+}
+
+void CLevelDesign_EventObject::On_AnimEvent(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase)
+{
+	switch (m_tEventObjectDesc.ePolicy)
+	{
+	case LD_EVENTOBJECT_POLICY::LEVEL1_BOSS_DEMO_BG:
+		On_AnimEvent_Level1BossDemoBg(AnimEvent, ePhase);
+		break;
+
+	default:
+		break;
+	}
+}
+
+void CLevelDesign_EventObject::On_AnimEvent_Level1BossDemoBg(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase)
 {
 	if (ANIM_EVENT_PHASE::POINT != ePhase)
 		return;
@@ -450,31 +478,13 @@ void CLevelDesign_EventObject::On_AnimEvent_ByPolicy(const ANIM_EVENT& AnimEvent
 		break;
 	}
 
-	case EANIM_EVENT::OnOffPart:
+	case EANIM_EVENT::OnOffMesh:
 	{
-		// OnOffPart + strParam "All" + vOffset.x > 0 : 전체 mesh 표시
-		// OnOffPart + strParam "All" + vOffset.x <= 0 : 전체 mesh 숨김
-		if (AnimEvent.strParam == "All")
-		{
-			Set_AllMeshesVisible(AnimEvent.vOffset.x > 0.f);
-			break;
-		}
+		Set_AllMeshesVisible(true);
 
-		// OnOffPart + strParam "Mesh" + iIntParam mesh index + vOffset.x > 0 : 해당 mesh 표시
-		// OnOffPart + strParam "Mesh" + iIntParam mesh index + vOffset.x <= 0 : 해당 mesh 숨김
-		if (AnimEvent.strParam == "Mesh")
-		{
-			Set_MeshVisible(static_cast<_uint>(AnimEvent.iIntParam), AnimEvent.vOffset.x > 0.f);
-			break;
-		}
-
-		// OnOffPart + strParam "RigidStatic" + vOffset.x > 0 : RigidStatic 생성
-		// OnOffPart + strParam "RigidStatic" + vOffset.x <= 0 : RigidStatic 해제
-		if (AnimEvent.strParam == "RigidStatic")
-		{
-			Set_RigidStaticEnabled(AnimEvent.vOffset.x > 0.f);
-			break;
-		}
+		static const _uint AfterMeshIdx[] = { 47, 48 };
+		for (_uint idx : AfterMeshIdx)
+			Set_MeshVisible(idx, false);
 
 		break;
 	}
@@ -662,19 +672,19 @@ CGameObject* CLevelDesign_EventObject::Clone(void* pArg)
 {
 	CLevelDesign_EventObject* pInstance = new CLevelDesign_EventObject(*this);
 
-	LD_EVENTOBJECT_DESC TempDesc{};	// Test
-	if (nullptr == pArg)
-	{
-		TempDesc.strObjectName = L"Level1BossDemoBg";
-		TempDesc.strKind = L"Level1BossDemoBg";
-		TempDesc.eCategory = LD_CATEGORY::GIMMICK;
-		TempDesc.iModelProtoLevel = ETOUI(LEVEL::GAMEPLAY);
-		TempDesc.eModelType = MODEL::ANIM;
-		TempDesc.wstrModelProtoTag = LEVEL1BOSSDEMOBG_MODEL_PROTO_TAG;
-		TempDesc.ePolicy = LD_EVENTOBJECT_POLICY::LEVEL1_BOSS_DEMO_BG;
-		TempDesc.bUseCollMesh = false;
-		pArg = &TempDesc;
-	}
+	//LD_EVENTOBJECT_DESC TempDesc{};	// Test
+	//if (nullptr == pArg)
+	//{
+	//	TempDesc.strObjectName = L"Level1BossDemoBg";
+	//	TempDesc.strKind = L"Level1BossDemoBg";
+	//	TempDesc.eCategory = LD_CATEGORY::GIMMICK;
+	//	TempDesc.iModelProtoLevel = ETOUI(LEVEL::GAMEPLAY);
+	//	TempDesc.eModelType = MODEL::ANIM;
+	//	TempDesc.wstrModelProtoTag = LEVEL1BOSSDEMOBG_MODEL_PROTO_TAG;
+	//	TempDesc.ePolicy = LD_EVENTOBJECT_POLICY::LEVEL1_BOSS_DEMO_BG;
+	//	TempDesc.bUseCollMesh = false;
+	//	pArg = &TempDesc;
+	//}
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
