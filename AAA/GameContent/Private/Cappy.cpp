@@ -1,8 +1,9 @@
 #include "Cappy.h"
 #include "GameInstance.h"
 
-#include "Cappy_Body.h"
 #include "Cappy_Brain.h"
+#include "Cappy_Hat.h"
+#include "Cappy_Body.h"
 
 #include "Monster_StateMachine.h"
 #include "Monster_State_Idle.h"
@@ -114,6 +115,11 @@ HRESULT CCappy::Ready_PartObjects()
 {
 	m_pBody = Add_MonsterPart<CCappy_Body>(CCappy_Body::PROTOTYPE_TAG, TEXT("Body"));
 	if (nullptr == m_pBody)
+		return E_FAIL;
+
+	m_pHat = Add_MonsterPart<CCappy_Hat>(CCappy_Hat::PROTOTYPE_TAG, TEXT("Hat"),
+							m_pBody->Get_BoneMatrixPtr("CappyHatL"));
+	if (nullptr == m_pHat)
 		return E_FAIL;
 
 	return S_OK;

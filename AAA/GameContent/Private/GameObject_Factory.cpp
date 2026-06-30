@@ -89,6 +89,7 @@
 #include "PoppyBrosJr_Body.h"
 #include "Cappy.h"
 #include "Cappy_Body.h"
+#include "Cappy_Hat.h"
 
 //Miniboss
 #include "GigantEdge.h"
@@ -580,9 +581,13 @@ void CGameObject_Factory::Register_Container()
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Cappy_Body"),
                     CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Cappy/Body/Cappy_Body.ysh",
-                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+                        XMMatrixRotationY(XMConvertToRadians(180.f))));
 
-            // TODO : Hat
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCappy_Hat::PROTOTYPE_TAG, CCappy_Hat::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Cappy_Hat"),
+                    CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Cappy/Hat/Cappy_Hat.ysh",
+                        XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 

@@ -47,6 +47,7 @@
     <ClInclude Include="..\Public\Cappy.h" />
     <ClInclude Include="..\Public\Cappy_Body.h" />
     <ClInclude Include="..\Public\Cappy_Brain.h" />
+    <ClInclude Include="..\Public\Cappy_Hat.h" />
     <ClInclude Include="..\Public\Character.h" />
     <ClInclude Include="..\Public\Character_States.h" />
     <ClInclude Include="..\Public\Common_Circle01.h" />
@@ -298,6 +299,7 @@
     <ClCompile Include="..\Private\Cappy.cpp" />
     <ClCompile Include="..\Private\Cappy_Body.cpp" />
     <ClCompile Include="..\Private\Cappy_Brain.cpp" />
+    <ClCompile Include="..\Private\Cappy_Hat.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Common_Circle01.cpp" />
     <ClCompile Include="..\Private\Common_Curve03.cpp" />
