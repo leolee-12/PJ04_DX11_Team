@@ -43,12 +43,6 @@ HRESULT CKabu::Initialize(void* pArg)
 
     m_eCopyAbility = COPY_ABILITY_TYPE::NONE;
 
-    // 직렬화 적용 없을 때 로직에서 사용하기 위한 임시 코드
-    XMStoreFloat3(&m_vBasePos,
-        m_pTransformCom->Get_State(STATE::POSITION));
-
-    Inject_TestRail();
-
     return S_OK;
 }
 
@@ -212,35 +206,6 @@ HRESULT  CKabu::Ready_PartObjects()
 void CKabu::On_Deserialized()
 {
     __super::On_Deserialized();
-}
-
-void CKabu::Inject_TestRail()
-{
-    LD_RAIL_DESC tDesc = {};
-
-    // circle mock around spawn pos
-    //tDesc.iNodeCount = 0;
-    //tDesc.vCenterPos = m_vBasePos;
-    //tDesc.fRadius = 3.0f;
-    //tDesc.bClockwise = false;
-    //tDesc.bClose = true;
-
-    // line mock (round-trip) - swap if needed:
-    LD_RAIL_NODE_DESC a{};
-    LD_RAIL_NODE_DESC b{};
-    a.vPosition = { m_vBasePos.x + 3.f,
-                    m_vBasePos.y,
-                    m_vBasePos.z - 3.f };
-    b.vPosition = { m_vBasePos.x + 3.f,
-                    m_vBasePos.y,
-                    m_vBasePos.z + 3.f };
-    tDesc.iNodeCount = 2;
-    tDesc.Nodes.push_back(a);
-    tDesc.Nodes.push_back(b);
-    tDesc.fRadius = 0.f;     // 0 = 직선
-    tDesc.bClose = false;   // false = 왕복
-
-    Set_RailDesc(tDesc);
 }
 
 CKabu* CKabu::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

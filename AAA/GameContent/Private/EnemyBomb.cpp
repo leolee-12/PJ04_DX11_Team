@@ -9,7 +9,7 @@ CEnemyBomb::CEnemyBomb(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	m_fSpeed = 25.f;
 	m_fDamage = 2.f;
 	m_fKnockback = 4.f;
-	m_fHitRadius = 0.75f;
+	m_fHitRadius = 0.60f;
 }
 
 CEnemyBomb::CEnemyBomb(const CEnemyBomb& Prototype)

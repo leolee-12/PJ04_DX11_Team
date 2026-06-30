@@ -50,16 +50,6 @@ void CBrontoBurt::Priority_Update(_float fTimeDelta)
 	if (!m_bActive)
 		return;
 
-	if (!m_bTestRailInjected)
-	{
-		m_bTestRailInjected = true;
-
-		XMStoreFloat3(&m_vBasePos,
-			m_pTransformCom->Get_State(STATE::POSITION));
-
-		Inject_TestRail();
-	}
-
 	__super::Priority_Update(fTimeDelta);
 }
 
@@ -189,29 +179,6 @@ HRESULT CBrontoBurt::Ready_PartObjects()
 void CBrontoBurt::On_Deserialized()
 { 
 	__super::On_Deserialized();
-}
-
-void CBrontoBurt::Inject_TestRail()
-{
-	LD_RAIL_DESC tDesc{};
-
-	// mock: 배치점에서 시작하는 공중 직선 왕복
-	LD_RAIL_NODE_DESC a{};
-	LD_RAIL_NODE_DESC b{};
-	const _float fLift = 2.f;
-	a.vPosition = { m_vBasePos.x,
-					m_vBasePos.y + fLift,
-					m_vBasePos.z };
-	b.vPosition = { m_vBasePos.x + 8.f,
-					m_vBasePos.y + fLift,
-					m_vBasePos.z };
-	tDesc.iNodeCount = 2;
-	tDesc.Nodes.push_back(a);
-	tDesc.Nodes.push_back(b);
-	tDesc.fRadius = 0.f;     // 0 = 직선
-	tDesc.bClose = false;    // false = 왕복
-
-	Set_RailDesc(tDesc);
 }
 
 CBrontoBurt* CBrontoBurt::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
