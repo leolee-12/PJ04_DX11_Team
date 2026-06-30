@@ -42,9 +42,12 @@ protected:
 public:
 	virtual DEFORM_TYPE Get_DeformType() = 0;
 
-	virtual void Enter_Ability(CKirby* pKirby) = 0;
-	virtual void Update_Ability(CKirby* pKirby, _float fTimeDelta) = 0;
-	virtual void Exit_Ability(CKirby* pKirby) = 0;
+	virtual void Enter_Deform(CKirby* pKirby) = 0;
+	virtual void Exit_Deform(CKirby* pKirby) = 0;
+
+	virtual void Enter_DeformState(CKirby* pKirby) = 0;
+	virtual void Update_DeformState(CKirby* pKirby, _float fTimeDelta) = 0;
+	virtual void Exit_DeformState(CKirby* pKirby) = 0;
 
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) = 0;
 

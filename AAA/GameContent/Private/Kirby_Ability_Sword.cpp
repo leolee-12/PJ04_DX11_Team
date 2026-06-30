@@ -80,7 +80,7 @@ COPY_ABILITY_TYPE CKirby_Ability_Sword::Get_AbilityType()
     return COPY_ABILITY_TYPE::SWORD;
 }
 
-void CKirby_Ability_Sword::Enter_Ability(CKirby* pKirby)
+void CKirby_Ability_Sword::Enter_AbilityState(CKirby* pKirby)
 {
     SWORD_STATE eStartState = m_eSwordState;
 
@@ -113,7 +113,7 @@ void CKirby_Ability_Sword::Enter_Ability(CKirby* pKirby)
     Change_SwordState(pKirby, eStartState);
 }
 
-ABILITY_UPDATE_RESULT CKirby_Ability_Sword::Update_Ability(CKirby* pKirby, _float fTimeDelta)
+ABILITY_UPDATE_RESULT CKirby_Ability_Sword::Update_AbilityState(CKirby* pKirby, _float fTimeDelta)
 {
     Update_ChargeTime(fTimeDelta);
     Update_SwordState(pKirby, fTimeDelta);
@@ -132,7 +132,7 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Sword::Update_Ability(CKirby* pKirby, _floa
     return ABILITY_UPDATE_RESULT::NONE;
 }
 
-void CKirby_Ability_Sword::Exit_Ability(CKirby* pKirby)
+void CKirby_Ability_Sword::Exit_AbilityState(CKirby* pKirby)
 {
     Change_SwordState(pKirby, SWORD_STATE::END);
 

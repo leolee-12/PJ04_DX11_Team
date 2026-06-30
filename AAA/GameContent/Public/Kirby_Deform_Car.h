@@ -21,9 +21,12 @@ private:
 public:
 	virtual DEFORM_TYPE Get_DeformType() override;
 
-	virtual void Enter_Ability(CKirby* pKirby) override;
-	virtual void Update_Ability(CKirby* pKirby, _float fTimeDelta) override;
-	virtual void Exit_Ability(CKirby* pKirby) override;
+	virtual void Enter_Deform(CKirby* pKirby) override;
+	virtual void Exit_Deform(CKirby* pKirby) override;
+
+	virtual void Enter_DeformState(CKirby* pKirby) override;
+	virtual void Update_DeformState(CKirby* pKirby, _float fTimeDelta) override;
+	virtual void Exit_DeformState(CKirby* pKirby) override;
 
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 

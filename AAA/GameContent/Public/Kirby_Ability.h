@@ -58,9 +58,9 @@ protected:
 public:
 	virtual COPY_ABILITY_TYPE Get_AbilityType() = 0;
 
-	virtual void Enter_Ability(CKirby* pKirby) = 0;
-	virtual ABILITY_UPDATE_RESULT Update_Ability(CKirby* pKirby, _float fTimeDelta) = 0;
-	virtual void Exit_Ability(CKirby* pKirby) = 0;
+	virtual void Enter_AbilityState(CKirby* pKirby) = 0;
+	virtual ABILITY_UPDATE_RESULT Update_AbilityState(CKirby* pKirby, _float fTimeDelta) = 0;
+	virtual void Exit_AbilityState(CKirby* pKirby) = 0;
 
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) = 0;
 

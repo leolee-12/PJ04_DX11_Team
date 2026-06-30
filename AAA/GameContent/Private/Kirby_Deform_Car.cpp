@@ -32,15 +32,23 @@ DEFORM_TYPE CKirby_Deform_Car::Get_DeformType()
     return DEFORM_TYPE::CAR;
 }
 
-void CKirby_Deform_Car::Enter_Ability(CKirby* pKirby)
+void CKirby_Deform_Car::Enter_Deform(CKirby* pKirby)
 {
 }
 
-void CKirby_Deform_Car::Update_Ability(CKirby* pKirby, _float fTimeDelta)
+void CKirby_Deform_Car::Exit_Deform(CKirby* pKirby)
 {
 }
 
-void CKirby_Deform_Car::Exit_Ability(CKirby* pKirby)
+void CKirby_Deform_Car::Enter_DeformState(CKirby* pKirby)
+{
+}
+
+void CKirby_Deform_Car::Update_DeformState(CKirby* pKirby, _float fTimeDelta)
+{
+}
+
+void CKirby_Deform_Car::Exit_DeformState(CKirby* pKirby)
 {
 }
 

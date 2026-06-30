@@ -38,7 +38,7 @@ COPY_ABILITY_TYPE CKirby_Ability_Normal::Get_AbilityType()
     return COPY_ABILITY_TYPE::NORMAL;
 }
 
-void CKirby_Ability_Normal::Enter_Ability(CKirby* pKirby)
+void CKirby_Ability_Normal::Enter_AbilityState(CKirby* pKirby)
 {
     m_eInhaleState = INHALE_STATE::NORMAL_EXIT;
 
@@ -76,7 +76,7 @@ void CKirby_Ability_Normal::Enter_Ability(CKirby* pKirby)
     }
 }
 
-ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _float fTimeDelta)
+ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_AbilityState(CKirby* pKirby, _float fTimeDelta)
 {
     Update_InhaleMoveState(pKirby);
     Update_SuperInhaleTimer(fTimeDelta);
@@ -96,7 +96,7 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_Ability(CKirby* pKirby, _flo
     return ABILITY_UPDATE_RESULT::NONE;
 }
 
-void CKirby_Ability_Normal::Exit_Ability(CKirby* pKirby)
+void CKirby_Ability_Normal::Exit_AbilityState(CKirby* pKirby)
 {
     switch (m_eMouthState)
     {

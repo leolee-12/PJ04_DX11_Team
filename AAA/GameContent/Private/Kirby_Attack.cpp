@@ -30,7 +30,7 @@ void CKirby_Attack::Enter(CKirby* pKirby)
     __super::Enter(pKirby);
 
     // 현재 능력에게 Enter 전달
-    pKirby->Get_KirbyAbility()->Enter_Ability(pKirby);
+    pKirby->Get_KirbyAbility()->Enter_AbilityState(pKirby);
 }
 
 void CKirby_Attack::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -39,7 +39,7 @@ void CKirby_Attack::Update(CKirby* pKirby, const _float fTimeDelta)
 
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
     // 현재 능력에게 Update 전달
-    ABILITY_UPDATE_RESULT eUpdateResult= pAbility->Update_Ability(pKirby, fTimeDelta);
+    ABILITY_UPDATE_RESULT eUpdateResult= pAbility->Update_AbilityState(pKirby, fTimeDelta);
 
     if (eUpdateResult == ABILITY_UPDATE_RESULT::ABILITY_CHANGED)
         return;
@@ -63,7 +63,7 @@ void CKirby_Attack::Exit(CKirby* pKirby)
     __super::Exit(pKirby);
 
     // 현재 능력에게 Exit 전달
-    pKirby->Get_KirbyAbility()->Exit_Ability(pKirby);
+    pKirby->Get_KirbyAbility()->Exit_AbilityState(pKirby);
 }
 
 _bool CKirby_Attack::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
