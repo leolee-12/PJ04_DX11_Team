@@ -10,6 +10,7 @@
 #include "LevelDesign_Boundary.h"
 #include "LevelDesign_FallBorder.h"
 #include "LevelDesign_EventObject.h"
+#include "LevelDesign_MonsterCatalog.h"
 
 #include <cwctype>
 #include <mutex>
@@ -241,11 +242,8 @@ void CLevelDesign_Registry::Register_ItemsAndBreakables()
 
 void CLevelDesign_Registry::Register_EnemiesAndGimmicks()
 {
-	Register_Unsupported(L"Kabu", LD_CATEGORY::ENEMY, L"Layer_LevelDesign_Enemy");
+	CLevelDesign_MonsterCatalog::Register_LevelDesignSpecs();
 	Register_Unsupported(L"Cappy", LD_CATEGORY::ENEMY, L"Layer_LevelDesign_Enemy");
-	Register_Unsupported(L"BrontoBurt", LD_CATEGORY::ENEMY, L"Layer_LevelDesign_Enemy");
-	Register_Unsupported(L"BladeKnight", LD_CATEGORY::ENEMY, L"Layer_LevelDesign_Enemy");
-	Register_Unsupported(L"PoppyBrosJr", LD_CATEGORY::ENEMY, L"Layer_LevelDesign_Enemy");
 
 	Register_Unsupported(L"ChainStarter", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
 	Register_Unsupported(L"BlockChainInvisible", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
