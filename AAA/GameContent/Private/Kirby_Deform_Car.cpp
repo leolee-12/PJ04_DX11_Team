@@ -78,6 +78,7 @@ void CKirby_Deform_Car::Exit_DeformState(CKirby* pKirby)
 
 void CKirby_Deform_Car::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
 {
+    // 崔副 锭 面倒贸府
 }
 
 _bool CKirby_Deform_Car::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -97,10 +98,24 @@ _bool CKirby_Deform_Car::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand
 
             Move_Command* pMoveCommand = static_cast<Move_Command*>(pCommand);
 
-            _vector vWishDir = XMLoadFloat3(&m_vRotDir);
-            vWishDir += XMLoadFloat3(&pMoveCommand->Get_Dir());
+            if (m_eDeformCar_State == DEFORM_CAR_STATE::BOOST_END)
+            {
+                pKirby->Add_MoveDir(pMoveCommand->Get_Dir());
 
-            XMStoreFloat3(&m_vRotDir, vWishDir);
+                pKirby->Change_State(KIRBY_STATE_TYPE::RUN);
+                return true;
+            }
+
+            if (m_eDeformCar_State == DEFORM_CAR_STATE::BOOST)
+            {
+                _vector vWishDir = XMLoadFloat3(&m_vRotDir);
+                vWishDir += XMLoadFloat3(&pMoveCommand->Get_Dir());
+
+                XMStoreFloat3(&m_vRotDir, vWishDir);
+
+                return true;
+            }
+
             return true;
         }
 

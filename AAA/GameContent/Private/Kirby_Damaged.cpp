@@ -32,7 +32,9 @@ void CKirby_Damaged::Enter(CKirby* pKirby)
 
     if(pKirby->Has_Deform())
     {
-        pKirby->Get_KirbyDeform()->Play_DeformAni(pKirby, DEFORM_ANI::DAMAGE);
+        CKirby_Deform* pDeform = pKirby->Get_KirbyDeform();
+        pDeform->Play_DeformAni(pKirby, DEFORM_ANI::DAMAGE);
+        pKirby->Get_DeformPart_Model(pDeform->Get_DeformType())->Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);
     }
     else
     {
@@ -87,7 +89,8 @@ void CKirby_Damaged::Exit(CKirby* pKirby)
 
     if(pKirby->Has_Deform())
     {
-
+        CKirby_Deform* pDeform = pKirby->Get_KirbyDeform();
+        pKirby->Get_DeformPart_Model(pDeform->Get_DeformType())->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
     }
     else
     {
