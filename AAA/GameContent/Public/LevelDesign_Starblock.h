@@ -44,6 +44,9 @@ public:
 	// Damageable
 	virtual void Damaged(const ATTACK_INFO& tInfo) override;
 
+	// Inhalable
+	virtual void Be_Captured(CGameObject* pInhaler) override;
+
 public:
 	const LD_BREAKABLE_DESC& Get_BreakableDesc() const { return m_tBreakableDesc; }
 
