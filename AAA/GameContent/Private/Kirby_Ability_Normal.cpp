@@ -86,11 +86,7 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_AbilityState(CKirby* pKirby,
     {
         pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::SWORD);
         pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
-        if (m_pInhaleEffect)
-        {
-            m_pInhaleEffect->EffectContainer_Stop();
-            m_pInhaleEffect = nullptr;
-        }
+        Off_InhaleEffect();
     }
 
     return ABILITY_UPDATE_RESULT::NONE;
@@ -112,6 +108,13 @@ void CKirby_Ability_Normal::Exit_AbilityState(CKirby* pKirby)
         case MOUTH_STATE::STUFFFED:
             break;
     }
+}
+
+void CKirby_Ability_Normal::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+    End_InhaleCollider(pKirby);
+    Off_InhaleEffect();
+    __super::On_Damaged_KirbyState(pKirby, tInfo);
 }
 
 _bool CKirby_Ability_Normal::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -241,12 +244,7 @@ void CKirby_Ability_Normal::Enter_InhaleState(CKirby* pKirby, INHALE_STATE eStat
         case INHALE_STATE::INHALE_END:
         {
             End_InhaleCollider(pKirby);
-
-            if (m_pInhaleEffect)
-            {
-                m_pInhaleEffect->EffectContainer_Stop();
-                m_pInhaleEffect = nullptr;
-            }
+            Off_InhaleEffect();
 
             pAnimator->Play("InhaleEnd", false, false, 0.1f, 1.5f);
             break;
@@ -609,12 +607,7 @@ void CKirby_Ability_Normal::Handle_InhaleCaptured(CKirby* pKirby, IInhalable* pI
     Unsubscribe_InhaleCapturedEvent();
 
     COPY_ABILITY_TYPE eAbility = pInhaleable->Get_CopyAbility();
-
-    if (m_pInhaleEffect)
-    {
-        m_pInhaleEffect->EffectContainer_Stop();
-        m_pInhaleEffect = nullptr;
-    }
+    Off_InhaleEffect();
 
     if (eAbility == COPY_ABILITY_TYPE::NONE || eAbility == COPY_ABILITY_TYPE::NORMAL)
     {
@@ -673,6 +666,15 @@ void CKirby_Ability_Normal::Spit_Inhalable(CKirby* pKirby)
     m_pCapturedInhalable->Be_Spat(vMouth, vDir, s_fSpitSpeed);
 
     m_pCapturedInhalable = nullptr;
+}
+
+void CKirby_Ability_Normal::Off_InhaleEffect()
+{
+    if (m_pInhaleEffect)
+    {
+        m_pInhaleEffect->EffectContainer_Stop();
+        m_pInhaleEffect = nullptr;
+    }
 }
 
 CKirby_Ability_Normal* CKirby_Ability_Normal::Create()

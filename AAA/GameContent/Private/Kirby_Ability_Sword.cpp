@@ -167,6 +167,17 @@ void CKirby_Ability_Sword::Exit_AbilityState(CKirby* pKirby)
     }
 }
 
+void CKirby_Ability_Sword::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+    m_bSpinSlashCharge = false;
+    m_fAccSuperSpinSlashChargeTime = 0.f;
+    m_bReserveNextAttack = false;
+
+    ZeroMemory(&m_vSwordWishDir, sizeof(m_vSwordWishDir));
+
+    __super::On_Damaged_KirbyState(pKirby, tInfo);
+}
+
 _bool CKirby_Ability_Sword::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
     CMovement_Child* pMovement = pKirby->Get_Movement();

@@ -78,6 +78,14 @@ void CKirby_Attack::Exit(CKirby* pKirby)
         pKirby->Get_KirbyAbility()->Exit_AbilityState(pKirby);
 }
 
+void CKirby_Attack::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+    if (pKirby->Has_Deform())
+        pKirby->Get_KirbyDeform()->On_Damaged_KirbyState(pKirby, tInfo);
+    else
+        pKirby->Get_KirbyAbility()->On_Damaged_KirbyState(pKirby, tInfo);
+}
+
 _bool CKirby_Attack::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
     if (__super::Handle_Command(pKirby, pCommand))

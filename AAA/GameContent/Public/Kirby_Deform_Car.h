@@ -38,6 +38,10 @@ public:
 	virtual void Update_DeformState(CKirby* pKirby, _float fTimeDelta) override;
 	virtual void Exit_DeformState(CKirby* pKirby) override;
 
+public:
+	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
+
+public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
 	virtual _bool Enter_Attack_KeyDown(CKirby* pKirby) override;

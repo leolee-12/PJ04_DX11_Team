@@ -13,11 +13,13 @@ NS_END
 NS_BEGIN(Client)
 
 class CKirby;
+struct ATTACK_INFO;
 
 enum class DEFORM_ANI
 {
 	WAIT, RUN, FALL, LANDING,
 	JUMP_START, JUMP,
+	DAMAGE,
 	END
 };
 
@@ -49,8 +51,13 @@ public:
 	virtual void Update_DeformState(CKirby* pKirby, _float fTimeDelta) = 0;
 	virtual void Exit_DeformState(CKirby* pKirby) = 0;
 
+public:
+	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo);
+
+public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) = 0;
 
+public:
 	virtual _bool Enter_Attack_KeyDown(CKirby* pKirby) = 0;
 	virtual _bool Enter_Attack_KeyPress(CKirby* pKirby) = 0;
 	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) = 0;

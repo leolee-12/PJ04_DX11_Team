@@ -26,6 +26,8 @@ HRESULT CKirby_Deform_Car::Initialize()
     Set_FullBodyAni(DEFORM_ANI::JUMP_START, "JumpStart", false, false, 0.1f, 1.5f);
     Set_FullBodyAni(DEFORM_ANI::JUMP, "Jump", false, false, 0.1f, 1.5f);
 
+    Set_FullBodyAni(DEFORM_ANI::DAMAGE, "Damage", false, false, 0.1f, 1.5f);
+
     m_fMaxBoostTime = 0.5f;
 
     return S_OK;
@@ -72,6 +74,10 @@ void CKirby_Deform_Car::Exit_DeformState(CKirby* pKirby)
 {
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pKirby->Get_Movement()->Set_MaxHorizontalSpeed(s_fCarSpeed);
+}
+
+void CKirby_Deform_Car::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
 }
 
 _bool CKirby_Deform_Car::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
