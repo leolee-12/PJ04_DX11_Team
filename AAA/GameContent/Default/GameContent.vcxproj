@@ -33,6 +33,7 @@
     <ClInclude Include="..\public\Boss_Gorilla.h" />
     <ClInclude Include="..\public\Boss_Gorilla_Body.h" />
     <ClInclude Include="..\public\Boss_Gorilla_Brain.h" />
+    <ClInclude Include="..\public\Boss_Gorilla_RockHole.h" />
     <ClInclude Include="..\Public\BrontoBurt.h" />
     <ClInclude Include="..\Public\BrontoBurt_Body.h" />
     <ClInclude Include="..\Public\BrontoBurt_Brain.h" />
@@ -286,6 +287,7 @@
     <ClCompile Include="..\private\Boss_Gorilla.cpp" />
     <ClCompile Include="..\private\Boss_Gorilla_Body.cpp" />
     <ClCompile Include="..\private\Boss_Gorilla_Brain.cpp" />
+    <ClCompile Include="..\private\Boss_Gorilla_RockHole.cpp" />
     <ClCompile Include="..\Private\BrontoBurt.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_Body.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_Brain.cpp" />

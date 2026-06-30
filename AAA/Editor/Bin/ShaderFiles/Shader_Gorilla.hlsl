@@ -4,10 +4,12 @@ float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 float4x4 g_BoneMatrices[512];
 
 Texture2D g_DiffuseTexture;
+Texture2D g_MRATexture;
 Texture2D g_NormalTexture;
 Texture2D g_BodyMaskTexture;
+Texture2D g_RockHoleMaskTexture;
 
-Texture2D g_MRATexture;
+float g_fDissolve;
 
 float4 g_vEmissiveColor;
 uint g_iMaterialID = 0;
@@ -15,6 +17,22 @@ uint g_iMaterialID = 0;
 static const float3 EYE_WHITE = float3(1.f, 1.f, 1.f);
 static const float3 EYE_BLUE = float3(0.12f, 0.45f, 1.f);
 static const float3 EYE_RIM = float3(0.1f, 0.1f, 0.1f);
+
+static const float Bayer4x4[16] =
+{
+    0.0 / 16.0, 8.0 / 16.0, 2.0 / 16.0, 10.0 / 16.0,
+	12.0 / 16.0, 4.0 / 16.0, 14.0 / 16.0, 6.0 / 16.0,
+	3.0 / 16.0, 11.0 / 16.0, 1.0 / 16.0, 9.0 / 16.0,
+	15.0 / 16.0, 7.0 / 16.0, 13.0 / 16.0, 5.0 / 16.0
+};
+
+void Apply_Dissolve(float4 vScreenPos)
+{
+    float fVisibility = 1.f - g_fDissolve;
+    int2 px = int2(vScreenPos.xy) & 3;
+    if (fVisibility <= Bayer4x4[px.y * 4 + px.x])
+        discard;
+}
 
 struct VS_IN
 {
@@ -241,6 +259,40 @@ PS_OUT PS_ANCHOR(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_ROCKHOLE(PS_IN In)
+{
+    PS_OUT Out;
+    
+    Apply_Dissolve(In.vPosition);
+
+    float3 vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    float3 vMask = g_RockHoleMaskTexture.Sample(ClampSampler, In.vTexcoord1).rgb;
+    float3 vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    
+    float3 vAlbedo = mul(vDiffuse, vMask);
+    
+    float3 N = normalize(In.vNormal);
+    float3 T = normalize(In.vTangent.xyz);
+    float3 B = normalize(In.vBinormal.xyz);
+  
+    float3x3 TBN = float3x3(T, B, N);
+
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, In.vTexcoord).rg;
+    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+    
+    float3 Nw = mul(nTS, TBN);
+   
+    Out.vDiffuse = float4(vAlbedo, 1.f);
+    Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
+    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(vMRA, 1.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
+    Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
+
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass Body // 0
@@ -283,4 +335,15 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_ANCHOR();
     }
+    pass RockHole // 4
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 1);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_ROCKHOLE();
+    }
+
 }
