@@ -83,19 +83,28 @@ _bool CKirby_Wait::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
         // Attack
         case KIRBY_COMMAND_TYPE::ATTACK:
         {
-            // 임시로 막아둠
             if (pKirby->Has_Deform())
-                return true;
-
-            CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
-            if (pAbility->Can_Attack(KIRBY_ATTACK_LOCATION::GROUND))
             {
+                CKirby_Deform* pDeform = pKirby->Get_KirbyDeform();
                 if (pCommand->IsDown())
-                    pAbility->Enter_Attack_KeyDown(pKirby);
+                    pDeform->Enter_Attack_KeyDown(pKirby);
                 else if (pCommand->IsPress())
-                    pAbility->Enter_Attack_KeyPress(pKirby);
+                    pDeform->Enter_Attack_KeyPress(pKirby);
                 else if (pCommand->IsUp())
-                    pAbility->Enter_Attack_KeyUp(pKirby);
+                    pDeform->Enter_Attack_KeyUp(pKirby);
+            }
+            else
+            {
+                CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+                if (pAbility->Can_Attack(KIRBY_ATTACK_LOCATION::GROUND))
+                {
+                    if (pCommand->IsDown())
+                        pAbility->Enter_Attack_KeyDown(pKirby);
+                    else if (pCommand->IsPress())
+                        pAbility->Enter_Attack_KeyPress(pKirby);
+                    else if (pCommand->IsUp())
+                        pAbility->Enter_Attack_KeyUp(pKirby);
+                }
             }
 
             return true;

@@ -40,7 +40,6 @@ void CKirby_GetDeform::Enter(CKirby* pKirby)
 
     // 받아와서
     m_eDeformType = DEFORM_TYPE::CAR;
-    pKirby->Change_KirbyDeform(m_eDeformType);
 
     m_eDeformState = DEFORM_STATE::DEFORM_STATE_END;
     Change_GetDeformState(pKirby, DEFORM_STATE::SUPER_INHALE_START);
@@ -234,6 +233,9 @@ void CKirby_GetDeform::Exit_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
         {
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
+
+            pKirby->Change_KirbyDeform(m_eDeformType);
+
             break;
         }
         case DEFORM_STATE::DEFORM_STATE_END:

@@ -53,7 +53,6 @@ public:
     virtual HRESULT Initialize(void* pArg) override;
 
 public:
-    // Rigidbody 메인 업데이트. 외부 입력 방향을 인자로 받지 않는다.
     _bool Update_RigidBody(_float fTimeDelta);
 
     _bool Check_GroundBelow();

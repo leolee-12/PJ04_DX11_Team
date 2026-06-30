@@ -26,6 +26,8 @@ HRESULT CKirby_Deform_Car::Initialize()
     Set_FullBodyAni(DEFORM_ANI::JUMP_START, "JumpStart", false, false, 0.1f, 1.5f);
     Set_FullBodyAni(DEFORM_ANI::JUMP, "Jump", false, false, 0.1f, 1.5f);
 
+    m_fMaxBoostTime = 0.5f;
+
     return S_OK;
 }
 
@@ -38,44 +40,322 @@ void CKirby_Deform_Car::Enter_Deform(CKirby* pKirby)
 {
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_RotationSpeed(s_fDeformCar_Rot_Speed_Degree);
+    pMovement->Set_MaxHorizontalSpeed(s_fCarSpeed);
 }
 
 void CKirby_Deform_Car::Exit_Deform(CKirby* pKirby)
 {
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
+    pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
 }
 
 void CKirby_Deform_Car::Enter_DeformState(CKirby* pKirby)
 {
+    m_fAccBoostTime = m_fMaxBoostTime;
+    m_bReqEndAttackState = false;
+
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Set_MaxHorizontalSpeed(s_fMaxBoostSpeed);
+
+    m_eBoostJumpState = BOOST_JUMP_STATE::GROUND;
+    m_eDeformCar_State = DEFORM_CAR_STATE::DEFORM_CAR_END;
+    Change_DeformCarState(pKirby, DEFORM_CAR_STATE::BOOST);
 }
 
 void CKirby_Deform_Car::Update_DeformState(CKirby* pKirby, _float fTimeDelta)
 {
+    Update_DeformCarState(pKirby, fTimeDelta);
 }
 
 void CKirby_Deform_Car::Exit_DeformState(CKirby* pKirby)
 {
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pKirby->Get_Movement()->Set_MaxHorizontalSpeed(s_fCarSpeed);
 }
 
 _bool CKirby_Deform_Car::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
+    KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
+    //m_vRotDir
+    switch (eCommandType)
+    {
+        // Move Press
+        case KIRBY_COMMAND_TYPE::MOVE_TOP:
+        case KIRBY_COMMAND_TYPE::MOVE_DOWN:
+        case KIRBY_COMMAND_TYPE::MOVE_LEFT:
+        case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
+        {
+            if (!pCommand->IsPress())
+                return false;
+
+            Move_Command* pMoveCommand = static_cast<Move_Command*>(pCommand);
+
+            _vector vWishDir = XMLoadFloat3(&m_vRotDir);
+            vWishDir += XMLoadFloat3(&pMoveCommand->Get_Dir());
+
+            XMStoreFloat3(&m_vRotDir, vWishDir);
+            return true;
+        }
+
+        // Attack
+        case KIRBY_COMMAND_TYPE::ATTACK:
+        {
+            if (!pCommand->IsPress())
+                return false;
+
+            m_fAccBoostTime = m_fMaxBoostTime;
+            return true;
+        }
+
+        // Jump Down
+        case KIRBY_COMMAND_TYPE::JUMP:
+        {
+            if (!pCommand->IsDown())
+                return false;
+
+            if (m_eDeformCar_State == DEFORM_CAR_STATE::BOOST_END)
+            {
+                pKirby->Change_State(KIRBY_STATE_TYPE::JUMP);
+                return true;
+            }
+
+            if (m_eDeformCar_State == DEFORM_CAR_STATE::BOOST)
+            {
+                CMovement_Child* pMovement = pKirby->Get_Movement();
+
+                if (pMovement->Try_Jump())
+                    Change_BoostJumpState(pKirby, BOOST_JUMP_STATE::JUMP_START);
+
+                return true;
+            }
+
+            return true;
+        }
+    }
+
     return false;
 }
 
 _bool CKirby_Deform_Car::Enter_Attack_KeyDown(CKirby* pKirby)
 {
-    return false;
+    pKirby->Change_State(KIRBY_STATE_TYPE::ATTACK);
+    return true;
 }
 
 _bool CKirby_Deform_Car::Enter_Attack_KeyPress(CKirby* pKirby)
 {
-    return false;
+    // 무시
+    return true;
 }
 
 _bool CKirby_Deform_Car::Enter_Attack_KeyUp(CKirby* pKirby)
 {
-    return false;
+    // 무시
+    return true;
+}
+
+void CKirby_Deform_Car::Change_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eNext)
+{
+    if (m_eDeformCar_State == eNext)
+        return;
+
+    Exit_DeformCarState(pKirby, m_eDeformCar_State);
+
+    m_eDeformCar_State = eNext;
+
+    Enter_DeformCarState(pKirby, m_eDeformCar_State);
+}
+
+void CKirby_Deform_Car::Enter_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eState)
+{
+    CKirby_Deform_Model* pModel = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR);
+
+    switch (m_eDeformCar_State)
+    {
+        case DEFORM_CAR_STATE::BOOST:
+        {
+            pModel->Get_Animator()->Play("Boost", true, false, 0.1f, 1.5f);
+
+            pModel->Set_KirbyEye(KIRBY_EYE_STATE::ANGRY);
+
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Set_MaxHorizontalSpeed(s_fMaxBoostSpeed);
+            break;
+        }
+        case DEFORM_CAR_STATE::BOOST_END:
+            pModel->Get_Animator()->Play("BoostEnd", false, false, 0.1f, 1.5f);
+            break;
+        case DEFORM_CAR_STATE::CRUSH:
+            break;
+        case DEFORM_CAR_STATE::DEFORM_CAR_END:
+            m_bReqEndAttackState = true;
+            break;
+    }
+}
+
+void CKirby_Deform_Car::Update_DeformCarState(CKirby* pKirby, _float fTimeDelta)
+{
+    CKirby_Deform_Model* pModel = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR);
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+
+    switch (m_eDeformCar_State)
+    {
+        case DEFORM_CAR_STATE::BOOST:
+        {
+            Update_BoostJumpState(pKirby, fTimeDelta);
+
+            // 회전
+            _vector vRotDir = XMLoadFloat3(&m_vRotDir);
+            if (XMVectorGetX(XMVector3LengthSq(vRotDir)) > Helper::fEpsilon)
+                pMovement->Rotate_To_Direction(vRotDir, fTimeDelta);
+
+            // 이동
+            _vector vLook = pKirby->Get_Transform()->Get_State(STATE::LOOK);
+            vLook = XMVector3Normalize(XMVectorSetY(vLook, 0.f));
+
+            const _float3 vCurVelocity = pMovement->Get_Velocity();
+
+            _vector vBoostAcceleration = vLook * s_fBoostAcceleration;
+            pMovement->Add_Acceleration(vBoostAcceleration);
+
+            m_fAccBoostTime -= fTimeDelta;
+
+            if (m_eBoostJumpState != BOOST_JUMP_STATE::GROUND)
+                break;
+
+            if (m_fAccBoostTime <= 0.f)
+            {
+                m_fAccBoostTime = 0.f;
+                Change_DeformCarState(pKirby, DEFORM_CAR_STATE::BOOST_END);
+            }
+            break;
+        }
+        case DEFORM_CAR_STATE::BOOST_END:
+        {
+            // 회전
+            _vector vRotDir = XMLoadFloat3(&m_vRotDir);
+            if (XMVectorGetX(XMVector3LengthSq(vRotDir)) > Helper::fEpsilon)
+                pMovement->Rotate_To_Direction(vRotDir, fTimeDelta);
+
+            if (pModel->Get_Animator()->Is_Finished())
+                Change_DeformCarState(pKirby, DEFORM_CAR_STATE::DEFORM_CAR_END);
+            break;
+        }
+        case DEFORM_CAR_STATE::CRUSH:
+            break;
+        case DEFORM_CAR_STATE::DEFORM_CAR_END:
+            break;
+    }
+
+    m_vRotDir = {};
+}
+
+void CKirby_Deform_Car::Exit_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eStaten)
+{
+    CKirby_Deform_Model* pModel = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR);
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    
+    switch (m_eDeformCar_State)
+    {
+        case DEFORM_CAR_STATE::BOOST:
+            pModel->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
+            break;
+        case DEFORM_CAR_STATE::BOOST_END:
+            pMovement->Set_MaxHorizontalSpeed(s_fCarSpeed);
+            break;
+        case DEFORM_CAR_STATE::CRUSH:
+            break;
+        case DEFORM_CAR_STATE::DEFORM_CAR_END:
+            break;
+    }
+}
+
+void CKirby_Deform_Car::Change_BoostJumpState(CKirby* pKirby, BOOST_JUMP_STATE eNext)
+{
+    if (m_eBoostJumpState == eNext)
+        return;
+
+    Exit_BoostJumpState(pKirby, m_eBoostJumpState);
+
+    m_eBoostJumpState = eNext;
+
+    Enter_BoostJumpState(pKirby, m_eBoostJumpState);
+}
+
+void CKirby_Deform_Car::Enter_BoostJumpState(CKirby* pKirby, BOOST_JUMP_STATE eState)
+{
+    switch (m_eBoostJumpState)
+    {
+        case BOOST_JUMP_STATE::GROUND:
+        {
+            CKirby_Deform_Model* pModel = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR);
+            pModel->Get_Animator()->Play("Boost", true, false, 0.1f, 1.5f);
+            pModel->Set_KirbyEye(KIRBY_EYE_STATE::ANGRY);
+            break;
+        }
+        case BOOST_JUMP_STATE::JUMP_START:
+        {
+            CKirby_Deform_Model* pModel = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR);
+            Play_DeformAni(pKirby, DEFORM_ANI::JUMP_START);
+            pModel->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
+        }
+            break;
+
+        case BOOST_JUMP_STATE::JUMP:
+            Play_DeformAni(pKirby, DEFORM_ANI::JUMP);
+            break;
+
+        case BOOST_JUMP_STATE::FALL:
+            Play_DeformAni(pKirby, DEFORM_ANI::FALL);
+            break;
+    }
+}
+
+void CKirby_Deform_Car::Update_BoostJumpState(CKirby* pKirby, _float fTimeDelta)
+{
+    CKirby_Deform_Model* pModel = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR);
+    CAnimator* pAnimator = pModel->Get_Animator();
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+
+    switch (m_eBoostJumpState)
+    {
+    case BOOST_JUMP_STATE::GROUND:
+        break;
+
+    case BOOST_JUMP_STATE::JUMP_START:
+        if (pAnimator->Is_Finished())
+            Change_BoostJumpState(pKirby, BOOST_JUMP_STATE::JUMP);
+        break;
+
+    case BOOST_JUMP_STATE::JUMP:
+        if (pMovement->Get_VerticalVelocity() <= 0.f)
+            Change_BoostJumpState(pKirby, BOOST_JUMP_STATE::FALL);
+        break;
+
+    case BOOST_JUMP_STATE::FALL:
+        if (pMovement->Is_Grounded())
+            Change_BoostJumpState(pKirby, BOOST_JUMP_STATE::GROUND);
+        break;
+    }
+}
+
+void CKirby_Deform_Car::Exit_BoostJumpState(CKirby* pKirby, BOOST_JUMP_STATE eStaten)
+{
+    switch (m_eBoostJumpState)
+    {
+    case BOOST_JUMP_STATE::GROUND:
+        break;
+
+    case BOOST_JUMP_STATE::JUMP_START:
+        break;
+
+    case BOOST_JUMP_STATE::JUMP:
+        break;
+
+    case BOOST_JUMP_STATE::FALL:
+        break;
+    }
 }
 
 CKirby_Deform_Car* CKirby_Deform_Car::Create()
