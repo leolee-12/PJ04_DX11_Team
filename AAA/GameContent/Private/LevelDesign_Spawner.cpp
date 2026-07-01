@@ -48,6 +48,7 @@ HRESULT CLevelDesign_Spawner::Spawn(const LD_PACKAGE& Package, const LD_SPAWN_RE
 	}
 
 	vector<pair<IRailDataReceiver*, _uint>> PendingRailBindings;
+	HRESULT hrFinal = S_OK;
 
 	for (const LD_OBJECT_ENTRY& Desc : Package.ObjectDescs)
 	{
@@ -55,7 +56,10 @@ HRESULT CLevelDesign_Spawner::Spawn(const LD_PACKAGE& Package, const LD_SPAWN_RE
 
 		CGameObject* pCreatedObject = nullptr;
 		if (FAILED(Spawn_One(Desc, Request, pOutReport, &pCreatedObject)))
-			return E_FAIL;
+		{
+			hrFinal = S_FALSE;
+			continue;
+		}
 
 		if (0 == BaseDesc.iTargetRailUid || nullptr == pCreatedObject)
 			continue;
@@ -80,7 +84,7 @@ HRESULT CLevelDesign_Spawner::Spawn(const LD_PACKAGE& Package, const LD_SPAWN_RE
 #endif
 	}
 
-	return S_OK;
+	return hrFinal;
 }
 
 HRESULT CLevelDesign_Spawner::Spawn_One(const LD_OBJECT_ENTRY& Desc, const LD_SPAWN_REQUEST& Request, LD_LOAD_RESULT* pInOutReport, CGameObject** ppOutCreatedObject)
@@ -94,6 +98,9 @@ HRESULT CLevelDesign_Spawner::Spawn_One(const LD_OBJECT_ENTRY& Desc, const LD_SP
 	LD_RESOLVED_SPAWN Resolved{};
 	if (!CLevelDesign_Registry::Resolve(Desc, &Resolved))
 	{
+		if (nullptr != pInOutReport)
+			++pInOutReport->iSkippedCreateFailedCount;
+
 		return E_FAIL;
 	}
 

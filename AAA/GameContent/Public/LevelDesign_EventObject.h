@@ -56,18 +56,23 @@ private:
 
 private:
 	virtual HRESULT Validate_Desc() override;
+	virtual HRESULT Ready_Events() override;
 
 	HRESULT Ready_Components();
+	HRESULT Ready_AnimEvents();
 	HRESULT Ready_RigidStatic();
 	void    Release_RigidStatic();
 	void    Set_RigidStaticEnabled(_bool bEnable);
 
 	HRESULT Ready_Policy();
-	HRESULT Ready_Events_ByPolicy();
 	void    Update_Policy(_float fTimeDelta);
 
-	void    On_Event_ByPolicy(const _wstring& strEventTag);
-	void    On_AnimEvent_ByPolicy(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase);
+	void    On_Event(const _wstring& strEventTag);
+	void    On_Event_Level1BossDemoBg(const _wstring& strEventTag);
+	void    On_Event_SlopeBoard(const _wstring& strEventTag);
+
+	void    On_AnimEvent(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase);
+	void    On_AnimEvent_Level1BossDemoBg(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase);
 
 	void    Set_AllMeshesVisible(_bool bVisible);
 	void    Set_MeshVisible(_uint iMeshIndex, _bool bVisible);

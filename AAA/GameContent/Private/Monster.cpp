@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 #include "Monster_Movement.h"
 #include "Monster_Brain_FSM.h"
+#include "LevelDesign_LoadTypes.h"
 
 #include "Collider.h"
 #include "Controller.h"
@@ -40,6 +41,14 @@ HRESULT CMonster::Initialize(void* pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
+
+	if (nullptr != pArg)
+	{
+		const LD_OBJECT_DESC* pDesc = static_cast<const LD_OBJECT_DESC*>(pArg);
+		if (!pDesc->strAIVariation.empty())
+			Apply_AIVariation(pDesc->strAIVariation);
+	}
+
 	if (FAILED(Ready_Collider()))
 		return E_FAIL;
 	SetUp_Collider_CallBack();
@@ -202,7 +211,8 @@ HRESULT CMonster::Ready_Collider()
 	{
 		CCollider::COLLIDER_DESC ColliderDesc{};
 		ColliderDesc.pOwner = this;
-		ColliderDesc.vCenter = vFootPos;
+		//ColliderDesc.vCenter = vFootPos;
+		ColliderDesc.vCenter = _float3{ 0,0,0 };
 		ColliderDesc.fRadius = fRadius;
 
 		m_pInteractCollider = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
@@ -359,7 +369,7 @@ HRESULT CMonster::Ready_AI()
 			return E_FAIL;
 		}
 
-		if (FAILED(Ready_State(m_pStateMachine)))
+		if (FAILED(Ready_State()))
 		{
 			Safe_Release(m_pStateMachine);
 			Safe_Release(m_pBrain);
@@ -427,7 +437,7 @@ HRESULT CMonster::Create_Movement()
 	return S_OK;
 }
 
-HRESULT CMonster::Ready_State(CMonster_StateMachine* pStateMachine)
+HRESULT CMonster::Ready_State()
 {
 	return S_OK;
 }

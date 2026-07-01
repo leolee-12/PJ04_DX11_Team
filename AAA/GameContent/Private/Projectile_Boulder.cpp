@@ -28,7 +28,6 @@ HRESULT CProjectile_Boulder::Ready_Visual()
 
     CAnimator::ANIMATOR_DESC ad{};
     ad.pModel = m_pModelCom;
-    ad.strDataFile = TEXT("");
     m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
     if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&ad))) return E_FAIL;
 

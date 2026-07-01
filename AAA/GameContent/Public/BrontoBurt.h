@@ -50,25 +50,22 @@ public:
     // IRailDataReceiver
     virtual void            Set_RailDesc(const LD_RAIL_DESC& Desc) override;
 
-    _int                    Get_AIType() const { return m_iAIType; }
-
 protected:
     virtual CMonsterBrain*  Create_Brain() override;
     virtual HRESULT         Create_Movement() override;
-    virtual HRESULT         Ready_State(CMonster_StateMachine* pStateMachine) override;
+    virtual HRESULT         Ready_State() override;
     virtual HRESULT         Ready_AnimEvents() override;
+
+    virtual void            Apply_AIVariation(const _wstring& strVariation) override;
+
+    virtual void            On_Exit(MONSTER_STATE_TYPE eNextState) override;
 
 private:
     virtual HRESULT         Ready_PartObjects() override;
     virtual void			On_Deserialized() override;
 
-    void                    Inject_TestRail();
-
 private:
     CBrontoBurt_Body*       m_pBody = { nullptr };
-
-    _int                    m_iAIType = { 0 };      // 0은 레일 이동형 / 1은 범위 내 플레이어 추격형(나중에)
-    _bool                   m_bTestRailInjected = { false };
 
 public:
     static CBrontoBurt*     Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

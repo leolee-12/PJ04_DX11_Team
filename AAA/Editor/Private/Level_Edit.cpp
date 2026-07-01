@@ -12,6 +12,7 @@
 #include "MapStage.h"
 #include "Map_Loader.h"
 #include "Map_EditSession.h"
+#include "LevelDesign_Registry.h"
 #include "Effect_Container.h"
 
 CLevel_Edit::CLevel_Edit(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -686,6 +687,13 @@ HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
         return hResult;
     }
 
+    if (FAILED(Load_LDPreview(iPresetIndex)))
+    {
+        if (nullptr != m_pMapPreviewSession)
+            m_pMapPreviewSession->Set_PreviewStatus(L"Map preset LevelDesign load failed.");
+        return E_FAIL;
+    }
+
     m_pMapStage = pLoadedStage;
 
     if (nullptr != m_pMapPreviewSession)
@@ -706,7 +714,8 @@ HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
         m_pMapPreviewSession->Set_EnvCreatedCount(Report.iEnvCreatedCount);
 
         _wstring strStatus = L"Map preset loaded: " + strStageName
-            + L" / env=" + to_wstring(Report.iEnvCreatedCount);
+            + L" / env=" + to_wstring(Report.iEnvCreatedCount)
+            + L" / levelDesign=loaded";
 
         if (S_OK == hSavedOverride)
             strStatus += L" / edit-file";
@@ -979,8 +988,52 @@ HRESULT CLevel_Edit::Load_MapPreviewEnv(_uint iPresetIndex)
     return hResult;
 }
 
+HRESULT CLevel_Edit::Load_LDPreview(_uint iPresetIndex)
+{
+    _wstring strManifestPath;
+    if (FAILED(CMap_Loader::Get_MapManifestPath(iPresetIndex, &strManifestPath)))
+    {
+        if (nullptr != m_pMapPreviewSession)
+            m_pMapPreviewSession->Set_PreviewStatus(L"LevelDesign manifest resolve failed.");
+        return E_FAIL;
+    }
+
+    Clear_LDPreview();
+
+    Client::MAP_RUNTIME_LOAD_CONTEXT Context{};
+    Context.pDevice = m_pDevice;
+    Context.pContext = m_pContext;
+    Context.iPlaceLevel = ETOUI(EDIT_LEVEL::EDIT);
+    Context.iModelLevel = ETOUI(LEVEL::STATIC);
+    Context.pCreatedCallback = &On_MapPreviewObjectCreated;
+    Context.pCallbackContext = this;
+
+    Client::MAP_LOAD_RESULT Report{};
+    if (FAILED(CMap_Loader::Load_LevelDesign_Runtime(Context, strManifestPath, &Report)))
+    {
+        if (nullptr != m_pMapPreviewSession)
+            m_pMapPreviewSession->Set_PreviewStatus(L"LevelDesign preview load failed.");
+        return E_FAIL;
+    }
+
+    if (nullptr != m_pMapPreviewSession)
+    {
+        m_pMapPreviewSession->Set_PreviewStatus(
+            L"LevelDesign preview loaded: created="
+            + to_wstring(Report.iLevelDesignCreatedCount)
+            + L" / fallback="
+            + to_wstring(Report.iLevelDesignFallbackSpecCount)
+            + L" / failed="
+            + to_wstring(Report.iLevelDesignSkippedCreateFailedCount));
+    }
+
+    return S_OK;
+}
+
 void CLevel_Edit::Clear_MapPreview()
 {
+    Clear_LDPreview();
+
     vector<wstring> MapLayers;
     MapLayers.reserve(m_Layers.size());
 
@@ -1055,6 +1108,44 @@ void CLevel_Edit::Clear_MapPreviewEnv()
         else
         {
             m_pMapPreviewSession->Set_PreviewStatus(L"Map preset not loaded.");
+        }
+    }
+}
+
+void CLevel_Edit::Clear_LDPreview()
+{
+    vector<wstring> LevelDesignLayers;
+    LevelDesignLayers.reserve(m_Layers.size());
+
+    for (const auto& Pair : m_Layers)
+    {
+        if (CLevelDesign_Registry::Is_LevelDesignLayer(Pair.first))
+            LevelDesignLayers.push_back(Pair.first);
+    }
+
+    for (const wstring& strLayerTag : LevelDesignLayers)
+        Clear_MapPreviewLayer(strLayerTag);
+
+    if (nullptr != m_pMapPreviewSession)
+    {
+        const _uint iEnvCount = m_pMapPreviewSession->Get_EnvCreatedCount();
+        const _wstring strStageName = m_pMapPreviewSession->Get_LoadedStageName();
+
+        if (nullptr != m_pMapStage)
+        {
+            const _wstring strDisplayStageName = strStageName.empty() ? L"(loaded stage)" : strStageName;
+            m_pMapPreviewSession->Set_PreviewStatus(
+                L"Map preview loaded without LevelDesign: stage=" + strDisplayStageName
+                + L" / env=" + to_wstring(iEnvCount));
+        }
+        else if (0 < iEnvCount)
+        {
+            m_pMapPreviewSession->Set_PreviewStatus(
+                L"Environment preview loaded only. / env=" + to_wstring(iEnvCount));
+        }
+        else
+        {
+            m_pMapPreviewSession->Set_PreviewStatus(L"LevelDesign preview cleared.");
         }
     }
 }

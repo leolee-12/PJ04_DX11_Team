@@ -43,12 +43,6 @@ HRESULT CKabu::Initialize(void* pArg)
 
     m_eCopyAbility = COPY_ABILITY_TYPE::NONE;
 
-    // 직렬화 적용 없을 때 로직에서 사용하기 위한 임시 코드
-    XMStoreFloat3(&m_vBasePos,
-        m_pTransformCom->Get_State(STATE::POSITION));
-
-    Inject_TestRail();
-
     return S_OK;
 }
 
@@ -65,6 +59,14 @@ void CKabu::Update(_float fTimeDelta)
     if (!m_bActive)
         return;
 
+#ifdef _DEBUG
+    if (m_pGameInstance_Proxy->Is_EditMode())
+    {
+        if (m_pMovement) m_pMovement->Sync_To_Controller();
+        return;
+    }
+#endif
+
     __super::Update(fTimeDelta);
 }
 
@@ -78,7 +80,7 @@ void CKabu::Late_Update(_float fTimeDelta)
 
 _bool CKabu::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
 {
-    Out.fRadius = { 0.85f };
+    Out.fRadius = { 0.75f };
     Out.fHeight = { 0.40f };
 
     return true;
@@ -121,7 +123,7 @@ HRESULT CKabu::Create_Movement()
     return S_OK;
 }
 
-HRESULT CKabu::Ready_State(CMonster_StateMachine* pStateMachine)
+HRESULT CKabu::Ready_State()
 {
     if (m_pStateMachine == nullptr)
         return E_FAIL;
@@ -132,54 +134,54 @@ HRESULT CKabu::Ready_State(CMonster_StateMachine* pStateMachine)
     Info.strAniName = "Wait";
     Info.bLoop = true;
     Info.fSpeed = 1.0f;
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CKabu_State_Idle::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CKabu_State_Idle::Create(Info))))
         return E_FAIL;
 
     // Fall
     Info.strAniName = "Fall";
     Info.bLoop = true;
     Info.fSpeed = 1.5f;
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::FALL, CMonster_State_Fall::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::FALL, CMonster_State_Fall::Create(Info))))
         return E_FAIL;
 
     // Landing
     Info.strAniName = "Landing";
     Info.bLoop = false;
     Info.fSpeed = 1.0f;
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::LANDING, CMonster_State_Landing::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::LANDING, CMonster_State_Landing::Create(Info))))
         return E_FAIL;
 
     Info.strAniName = "Damage";
     Info.bLoop = false;
     Info.fSpeed = 1.5f;
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK, CMonster_State_KnockBack::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK, CMonster_State_KnockBack::Create(Info))))
         return E_FAIL;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK_DEATH, CMonster_State_KnockBackDeath::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK_DEATH, CMonster_State_KnockBackDeath::Create(Info))))
         return E_FAIL;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_OUT, CMonster_State_KnockOut::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_OUT, CMonster_State_KnockOut::Create(Info))))
         return E_FAIL;
 
     // Captured / Spat → Damage(loop)
     Info.bLoop = true;
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
         return E_FAIL;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::SPAT, CMonster_State_Spat::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::SPAT, CMonster_State_Spat::Create(Info))))
         return E_FAIL;
 
     // Warp_Out 
     Info.strAniName = "Warp1";
     Info.bLoop = false;
     Info.fSpeed = 1.5f;
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::WARPOUT, CKabu_State_WarpOut::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::WARPOUT, CKabu_State_WarpOut::Create(Info))))
         return E_FAIL;
 
     Info.strAniName = "Warp2";
     Info.bLoop = false;
     Info.fSpeed = 1.5f;
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::WARPIN, CKabu_State_WarpIn::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::WARPIN, CKabu_State_WarpIn::Create(Info))))
         return E_FAIL;
 
     return S_OK;
@@ -204,35 +206,6 @@ HRESULT  CKabu::Ready_PartObjects()
 void CKabu::On_Deserialized()
 {
     __super::On_Deserialized();
-}
-
-void CKabu::Inject_TestRail()
-{
-    LD_RAIL_DESC tDesc = {};
-
-    // circle mock around spawn pos
-    //tDesc.iNodeCount = 0;
-    //tDesc.vCenterPos = m_vBasePos;
-    //tDesc.fRadius = 3.0f;
-    //tDesc.bClockwise = false;
-    //tDesc.bClose = true;
-
-    // line mock (round-trip) - swap if needed:
-    LD_RAIL_NODE_DESC a{};
-    LD_RAIL_NODE_DESC b{};
-    a.vPosition = { m_vBasePos.x + 3.f,
-                    m_vBasePos.y,
-                    m_vBasePos.z - 3.f };
-    b.vPosition = { m_vBasePos.x + 3.f,
-                    m_vBasePos.y,
-                    m_vBasePos.z + 3.f };
-    tDesc.iNodeCount = 2;
-    tDesc.Nodes.push_back(a);
-    tDesc.Nodes.push_back(b);
-    tDesc.fRadius = 0.f;     // 0 = 직선
-    tDesc.bClose = false;   // false = 왕복
-
-    Set_RailDesc(tDesc);
 }
 
 CKabu* CKabu::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

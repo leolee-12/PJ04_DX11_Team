@@ -37,7 +37,6 @@ CBladeKnight::CBladeKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 CBladeKnight::CBladeKnight(const CBladeKnight& Prototype)
     : CMonster( Prototype )
 {
-
 }
 
 HRESULT CBladeKnight::Initialize_Prototype()
@@ -72,6 +71,14 @@ void CBladeKnight::Update(_float fTimeDelta)
     if (!m_bActive)
         return;
 
+#ifdef _DEBUG
+    if (m_pGameInstance_Proxy->Is_EditMode())
+    {
+        if (m_pMovement) m_pMovement->Sync_To_Controller();
+        return;
+    }
+#endif
+
     __super::Update(fTimeDelta);
 }
 
@@ -100,9 +107,9 @@ CMonsterBrain* CBladeKnight::Create_Brain()
     return CBladeKnight_Brain::Create(this);
 }
 
-HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
+HRESULT CBladeKnight::Ready_State()
 {
-    if (pStateMachine == nullptr)
+    if (m_pStateMachine == nullptr)
         return E_FAIL;
     
     // 공통 상태에는 사용할 AnimInfo를 넣어줘야 함
@@ -113,7 +120,7 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
     Info.strAniName = "FindWait";
     Info.bLoop = true; 
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CMonster_State_Idle::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CMonster_State_Idle::Create(Info))))
         return E_FAIL;
 
     // State Detect
@@ -121,7 +128,7 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
     Info.bLoop = false;
     Info.fSpeed = 1.25f;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::DETECT, CMonster_State_Detect::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::DETECT, CMonster_State_Detect::Create(Info))))
         return E_FAIL;
 
     // State Fall
@@ -129,7 +136,7 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
     Info.bLoop = true;
     Info.fSpeed = 1.5f;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::FALL, CMonster_State_Fall::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::FALL, CMonster_State_Fall::Create(Info))))
         return E_FAIL;
 
     // State Landing 
@@ -137,7 +144,7 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
     Info.bLoop = false;
     Info.fSpeed = 1.0f;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::LANDING, CMonster_State_Landing::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::LANDING, CMonster_State_Landing::Create(Info))))
         return E_FAIL;
 
     // State Captured
@@ -145,7 +152,7 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
     Info.bLoop = true;
     Info.fSpeed = 1.25f;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
         return E_FAIL;
 
     // State Spat (발사체)
@@ -153,7 +160,7 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
     Info.bLoop = true;
     Info.fSpeed = 1.f;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::SPAT, CMonster_State_Spat::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::SPAT, CMonster_State_Spat::Create(Info))))
         return E_FAIL;
 
     // State Chase
@@ -161,7 +168,7 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
     Info.bLoop = true;
     Info.fSpeed = 1.5f;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CHASE, CMonster_State_Chase::Create(Info, 3.f))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::CHASE, CMonster_State_Chase::Create(Info, 3.f))))
         return E_FAIL;
 
     // State KnockBack
@@ -169,7 +176,7 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
     Info.bLoop = false;
     Info.fSpeed = 2.0f;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK, CMonster_State_KnockBack::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK, CMonster_State_KnockBack::Create(Info))))
         return E_FAIL;
 
     // State KnockBackDeath
@@ -177,7 +184,7 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
     Info.bLoop = false;
     Info.fSpeed = 2.0f;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK_DEATH, CMonster_State_KnockBackDeath::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK_DEATH, CMonster_State_KnockBackDeath::Create(Info))))
         return E_FAIL;
 
     // State KnockOut
@@ -185,7 +192,7 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
     Info.bLoop = false;
     Info.fSpeed = 2.0f;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_OUT, CMonster_State_KnockOut::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_OUT, CMonster_State_KnockOut::Create(Info))))
         return E_FAIL;
 
     // State KnockOut
@@ -193,20 +200,20 @@ HRESULT CBladeKnight::Ready_State(CMonster_StateMachine* pStateMachine)
     Info.bLoop = false;
     Info.fSpeed = 1.50f;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::RETREAT, CMonster_State_Retreat::Create(Info, 2.f))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::RETREAT, CMonster_State_Retreat::Create(Info, 2.f))))
         return E_FAIL;
 
 
     // Blade Knight 전용 상태 등록
     Info = ANI_PLAY_INFO{}; 
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::ATTACK, CBladeKnight_State_Attack::Create(Info, 3.f))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::ATTACK, CBladeKnight_State_Attack::Create(Info, 3.f))))
         return E_FAIL;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::DOUBLE_ATTACK, CBladeKnight_State_DoubleAttack::Create(Info, 3.f))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::DOUBLE_ATTACK, CBladeKnight_State_DoubleAttack::Create(Info, 3.f))))
         return E_FAIL;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::TORNADO_ATTACK, CBladeKnight_State_TornadoAttack::Create())))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::TORNADO_ATTACK, CBladeKnight_State_TornadoAttack::Create())))
         return E_FAIL;
 
 
@@ -237,17 +244,31 @@ HRESULT CBladeKnight::Ready_AnimEvents()
                 }
                 break;
             case EANIM_EVENT::MoveWindow:
+            {
+                auto& BB = Get_BlackBoard();
                 if (ePhase == ANIM_EVENT_PHASE::BEGIN)
-                    Get_BlackBoard().bCanMove = true;
+                {
+                    BB.bCanMove = true;
+                    BB.fMoveWinLo = e.fTriggerProgress;
+                    BB.fMoveWinHi = e.fEndProgress;
+                }
                 else if (ePhase == ANIM_EVENT_PHASE::END)
-                    Get_BlackBoard().bCanMove = false;
+                    BB.bCanMove = false;
                 break;
+            }
             default:
                 break;
             }
         });
 
     return S_OK;
+}
+
+void CBladeKnight::Apply_AIVariation(const _wstring& strVariation)
+{
+    if (strVariation == L"Wait")             m_iAIType = 0;  // 제자리
+    else if (strVariation == L"WaitPursuit") m_iAIType = 1;  // 추적
+    else                                     m_iAIType = 0;
 }
 
 HRESULT CBladeKnight::Ready_PartObjects()

@@ -2,11 +2,14 @@
 #include "GameInstance.h"
 #include "Animator.h"
 #include "GameContent_AnimEvents.h"
+#include "LevelDesign_LoadTypes.h"
 
+#include "Monster_Movement.h"
 #include "PoppyBrosJr_Body.h"
 #include "PoppyBrosJr_Brain.h"
 
 #include "Monster_StateMachine.h"
+#include "Monster_State_Idle.h"
 #include "Monster_State_Detect.h"
 #include "Monster_State_Chase.h"
 #include "Monster_State_Patrol.h"
@@ -21,6 +24,8 @@
 // Attack ( throw ) 
 #include "PoppyBrosJr_State_Idle.h"
 #include "PoppyBrosJr_State_Throw.h"
+
+#include "PoppyBrosJr_State_WindUp.h"
 
 #include "Projectile.h"
 #include "Projectile_Manager.h"
@@ -52,6 +57,9 @@ HRESULT CPoppyBrosJr::Initialize(void* pArg)
 	if (m_pTransformCom)
 		m_pTransformCom->Set_RotationPerSec(180.f);
 
+	if (nullptr != pArg)
+		Set_ThrowLevel(static_cast<const LD_OBJECT_DESC*>(pArg)->strThrowLv);
+
 	return S_OK;
 }
 
@@ -67,6 +75,14 @@ void CPoppyBrosJr::Update(_float fTimeDelta)
 {
 	if (!m_bActive)
 		return;
+
+#ifdef _DEBUG
+	if (m_pGameInstance_Proxy->Is_EditMode())
+	{
+		if (m_pMovement) m_pMovement->Sync_To_Controller();
+		return;
+	}
+#endif
 
 	__super::Update(fTimeDelta);
 }
@@ -106,7 +122,7 @@ CMonsterBrain* CPoppyBrosJr::Create_Brain()
 	return CPoppyBrosJr_Brain::Create(this);
 }
 
-HRESULT CPoppyBrosJr::Ready_State(CMonster_StateMachine* pStateMachine)
+HRESULT CPoppyBrosJr::Ready_State()
 {
 	if (m_pStateMachine == nullptr)
 		return E_FAIL;
@@ -117,72 +133,76 @@ HRESULT CPoppyBrosJr::Ready_State(CMonster_StateMachine* pStateMachine)
 	Info.strAniName = "EnemyWait2";
 	Info.bLoop = true;
 	Info.fSpeed = 1.5f;
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CPoppyBrosJr_State_Idle::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CMonster_State_Idle::Create(Info))))
 		return E_FAIL;
 
 	// DETECT
 	Info.strAniName = "Find";
 	Info.bLoop = false;
 	Info.fSpeed = 1.25f;
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::DETECT, CMonster_State_Detect::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::DETECT, CMonster_State_Detect::Create(Info))))
 		return E_FAIL;
 
 	//CHASE
 	Info.strAniName = "Walk";
 	Info.bLoop = true;
 	Info.fSpeed = 1.5f;
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CHASE, CMonster_State_Chase::Create(Info, 3.f))))
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::CHASE, CMonster_State_Chase::Create(Info, 3.f))))
 		return E_FAIL;
 
 	// PATROL
 	Info.strAniName = "Walk";
 	Info.bLoop = true;
 	Info.fSpeed = 1.5f;
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::PATROL, CMonster_State_Patrol::Create(Info, 3.f))))
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::PATROL, CMonster_State_Patrol::Create(Info, 3.f))))
 		return E_FAIL;
 
 	// FALL
 	Info.strAniName = "Fall";
 	Info.bLoop = true;
 	Info.fSpeed = 1.5f;
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::FALL, CMonster_State_Fall::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::FALL, CMonster_State_Fall::Create(Info))))
 		return E_FAIL;
 
 	// LANDING
 	Info.strAniName = "Landing";
 	Info.bLoop = false;
 	Info.fSpeed = 1.f;
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::LANDING, CMonster_State_Landing::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::LANDING, CMonster_State_Landing::Create(Info))))
 		return E_FAIL;
 
 	// KNOCKBACK
 	Info.strAniName = "Damage";
 	Info.bLoop = false;
 	Info.fSpeed = 2.0f;
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK, CMonster_State_KnockBack::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK, CMonster_State_KnockBack::Create(Info))))
 		return E_FAIL;
 
 	// KNOCKBACKDEATH
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK_DEATH, CMonster_State_KnockBackDeath::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK_DEATH, CMonster_State_KnockBackDeath::Create(Info))))
 		return E_FAIL;
 
 	// KNOCKOUT
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_OUT, CMonster_State_KnockOut::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_OUT, CMonster_State_KnockOut::Create(Info))))
 		return E_FAIL;
 
 	// CAPTURED
 	Info.bLoop = true;
 	Info.fSpeed = 1.25f;
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
 		return E_FAIL;
 
 	// SPAT
 	Info.fSpeed = 1.f;
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::SPAT, CMonster_State_Spat::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::SPAT, CMonster_State_Spat::Create(Info))))
 		return E_FAIL;
 
 	// ATTACK
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::ATTACK, CPoppyBrosJr_State_Throw::Create())))
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::ATTACK, CPoppyBrosJr_State_Throw::Create())))
+		return E_FAIL;
+
+	// WINDUP
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::WINDUP, CPoppyBrosJr_State_WindUp::Create())))
 		return E_FAIL;
 
 	return S_OK;
@@ -214,11 +234,24 @@ HRESULT CPoppyBrosJr::Ready_AnimEvents()
 				else if (phase == ANIM_EVENT_PHASE::END)
 					Throw_Bomb();
 				break;
+			case EANIM_EVENT::SetEye:
+				if (phase == ANIM_EVENT_PHASE::POINT)
+					m_pBody->Set_Eye((_uint)e.iIntParam);
+				break;
 			default:
 				break;
 			}
 		});
 	return S_OK;
+}
+
+void CPoppyBrosJr::Apply_AIVariation(const _wstring& strVariation)
+{
+	// Wait=0(고정 발사) / WaitSearch=1(플레이어 조준)
+	if (strVariation == L"WaitSearch")
+		m_iAIType = 1;
+	else
+		m_iAIType = 0;
 }
 
 void CPoppyBrosJr::Attach_Bomb()
@@ -262,8 +295,16 @@ void CPoppyBrosJr::Throw_Bomb()
 	XMStoreFloat3(&vP, vHand);
 	XMStoreFloat3(&vD, vDir);
 
+	m_pHeldBomb->Set_Speed((m_iThrowLv >= 2) ? 22.f : 18.f);
+
 	m_pHeldBomb->Launch(vP, vD);
 	m_pHeldBomb = nullptr;
+}
+
+void CPoppyBrosJr::Set_ThrowLevel(const _wstring& strThrowLv)
+{
+	m_iThrowLv = (strThrowLv.size() > 2) ? _wtoi(strThrowLv.c_str() + 2) : 1;
+	if (m_iThrowLv < 1) m_iThrowLv = 1;
 }
 
 CPoppyBrosJr* CPoppyBrosJr::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

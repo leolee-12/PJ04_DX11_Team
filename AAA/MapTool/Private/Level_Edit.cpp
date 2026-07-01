@@ -21,6 +21,8 @@
 
 #include "GameInstance.h"
 
+#include <cmath>
+
 namespace
 {
 	void Forward_GameContentLog(Client::GAMECONTENT_LOG_LEVEL eLevel, const char* pMessage)
@@ -51,6 +53,76 @@ namespace
 	_bool Equals_NoCase(const wstring& strLeft, const wstring& strRight)
 	{
 		return 0 == _wcsicmp(strLeft.c_str(), strRight.c_str());
+	}
+
+	_bool IsNearlyEqualFloat4x4(const _float4x4& A, const _float4x4& B, _float fEpsilon = 0.0001f)
+	{
+		for (_uint iRow = 0; iRow < 4; ++iRow)
+		{
+			for (_uint iCol = 0; iCol < 4; ++iCol)
+			{
+				if (fabsf(A.m[iRow][iCol] - B.m[iRow][iCol]) > fEpsilon)
+					return false;
+			}
+		}
+
+		return true;
+	}
+
+	_matrix Build_EnvBaseWorldMatrix(const ENV_OBJECT_DESC& Desc)
+	{
+		if (Desc.bHasWorldMatrix)
+			return XMLoadFloat4x4(&Desc.matWorld);
+
+		const _vector vScale = XMLoadFloat3(&Desc.vScale);
+		const _vector vRotation = XMLoadFloat4(&Desc.vRotation);
+		const _vector vPosition = XMVectorSet(Desc.vPosition.x, Desc.vPosition.y, Desc.vPosition.z, 1.f);
+
+		return XMMatrixScalingFromVector(vScale)
+			* XMMatrixRotationQuaternion(vRotation)
+			* XMMatrixTranslationFromVector(vPosition);
+	}
+
+	_matrix Build_SectionBaseWorldMatrix(const MAP_SECTION_DESC& Desc)
+	{
+		_float4x4 Mat{};
+		Mat.m[0][0] = Desc.vRight.x;
+		Mat.m[0][1] = Desc.vRight.y;
+		Mat.m[0][2] = Desc.vRight.z;
+		Mat.m[0][3] = Desc.vRight.w;
+		Mat.m[1][0] = Desc.vUp.x;
+		Mat.m[1][1] = Desc.vUp.y;
+		Mat.m[1][2] = Desc.vUp.z;
+		Mat.m[1][3] = Desc.vUp.w;
+		Mat.m[2][0] = Desc.vLook.x;
+		Mat.m[2][1] = Desc.vLook.y;
+		Mat.m[2][2] = Desc.vLook.z;
+		Mat.m[2][3] = Desc.vLook.w;
+		Mat.m[3][0] = Desc.vPosition.x;
+		Mat.m[3][1] = Desc.vPosition.y;
+		Mat.m[3][2] = Desc.vPosition.z;
+		Mat.m[3][3] = Desc.vPosition.w;
+		return XMLoadFloat4x4(&Mat);
+	}
+
+	void Update_WorldMatrixEdit(const _float4x4& CurrentWorld, _matrix BaseWorldMatrix, MAP_ENV_EDITED_DESC* pInOutEdit)
+	{
+		if (nullptr == pInOutEdit)
+			return;
+
+		_float4x4 BaseWorld{};
+		XMStoreFloat4x4(&BaseWorld, BaseWorldMatrix);
+
+		if (pInOutEdit->bHasWorldMatrix || !IsNearlyEqualFloat4x4(CurrentWorld, BaseWorld))
+		{
+			pInOutEdit->bHasWorldMatrix = true;
+			pInOutEdit->matWorld = CurrentWorld;
+		}
+		else
+		{
+			pInOutEdit->bHasWorldMatrix = false;
+			pInOutEdit->matWorld = {};
+		}
 	}
 
 	void Add_UniqueCandidate(const wstring& strCandidate, vector<wstring>* pOutCandidates)
@@ -303,6 +375,9 @@ void CLevel_Edit::Delete_Object(CGameObject* pObject)
 	if (!pObject)
 		return;
 
+	if (Is_MapPreviewObject(pObject) && !Handle_MapSpecificDeletion(pObject))
+		return;
+
 	if (m_pSelected == pObject)
 		Set_Selected(nullptr);
 
@@ -312,8 +387,6 @@ void CLevel_Edit::Delete_Object(CGameObject* pObject)
 		{
 			if (iter->pObject == pObject)
 			{
-				Handle_MapSpecificDeletion(pObject);
-
 				Objects.erase(iter);
 				Mark_HierarchyDirty();
 				m_pGameInstance_Proxy->Destroy_GameObject(pObject);
@@ -438,6 +511,43 @@ _bool CLevel_Edit::Try_GetMapPreviewSectionEdit(const _wstring& strSectionKey, M
 		return false;
 
 	return m_pMapPreviewSession->Try_GetEditedMapSection(strSectionKey, pOutEdit);
+}
+
+_bool CLevel_Edit::Commit_MapEditObjectFromCurrentState(CGameObject* pObject)
+{
+	if (nullptr == pObject || nullptr == m_pMapPreviewSession)
+		return false;
+
+	if (CEnvObject* pEnvObject = dynamic_cast<CEnvObject*>(pObject))
+	{
+		if (m_pMapPreviewSession->Is_AddedObject(pObject))
+			return true;
+		if (!m_pMapPreviewSession->Can_DeleteAsEnvOverride(pObject))
+			return false;
+
+		MAP_ENV_EDITED_DESC Edit{};
+		Try_GetMapPreviewEnvEdit(pObject, &Edit);
+
+		const _float4x4& CurrentWorld = *pEnvObject->Get_Transform()->Get_WorldMatrixPtr();
+		Update_WorldMatrixEdit(CurrentWorld, Build_EnvBaseWorldMatrix(pEnvObject->Get_Desc()), &Edit);
+		return Track_EditedMapPreviewEnvObject(pObject, Edit);
+	}
+
+	if (CMapSection* pSection = dynamic_cast<CMapSection*>(pObject))
+	{
+		const _wstring strSectionKey = Make_MapPreviewSectionKey(pSection);
+		if (strSectionKey.empty())
+			return false;
+
+		MAP_ENV_EDITED_DESC Edit{};
+		Try_GetMapPreviewSectionEdit(strSectionKey, &Edit);
+
+		const _float4x4& CurrentWorld = *pSection->Get_Transform()->Get_WorldMatrixPtr();
+		Update_WorldMatrixEdit(CurrentWorld, Build_SectionBaseWorldMatrix(pSection->Get_Desc()), &Edit);
+		return Track_EditedMapPreviewSection(strSectionKey, Edit);
+	}
+
+	return false;
 }
 
 HRESULT CLevel_Edit::Restore_DeletedMapPreviewEnv(const _wstring& strStableKey)
@@ -1535,6 +1645,11 @@ _bool CLevel_Edit::Handle_MapSpecificDeletion(CGameObject* pObject)
 
 	if (!bWasMapPreviewObject)
 		return false;
+	if (nullptr == m_pMapPreviewSession
+		|| !m_pMapPreviewSession->Can_DeleteAsEnvOverride(pObject))
+	{
+		return false;
+	}
 
 	_bool bTrackedDeletedEnv = false;
 	if (nullptr != m_pMapPreviewSession)

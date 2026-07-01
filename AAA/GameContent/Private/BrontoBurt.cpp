@@ -2,6 +2,7 @@
 #include "GameInstance.h"
 #include "Monster_RailMovement.h"
 #include "Animator.h"
+#include "GameContent_AnimEvents.h"
 #include "Monster_StateMachine.h"
 
 #include "BrontoBurt_Body.h"
@@ -50,16 +51,6 @@ void CBrontoBurt::Priority_Update(_float fTimeDelta)
 	if (!m_bActive)
 		return;
 
-	if (!m_bTestRailInjected)
-	{
-		m_bTestRailInjected = true;
-
-		XMStoreFloat3(&m_vBasePos,
-			m_pTransformCom->Get_State(STATE::POSITION));
-
-		Inject_TestRail();
-	}
-
 	__super::Priority_Update(fTimeDelta);
 }
 
@@ -67,6 +58,14 @@ void CBrontoBurt::Update(_float fTimeDelta)
 {
 	if (!m_bActive)
 		return;
+
+#ifdef _DEBUG
+	if (m_pGameInstance_Proxy->Is_EditMode())
+	{
+		if (m_pMovement) m_pMovement->Sync_To_Controller();
+		return;
+	}
+#endif
 
 	__super::Update(fTimeDelta);
 }
@@ -120,7 +119,7 @@ HRESULT CBrontoBurt::Create_Movement()
 	return S_OK;
 }
 
-HRESULT CBrontoBurt::Ready_State(CMonster_StateMachine* pStateMachine)
+HRESULT CBrontoBurt::Ready_State()
 {
 	ANI_PLAY_INFO Info{};
 
@@ -128,36 +127,36 @@ HRESULT CBrontoBurt::Ready_State(CMonster_StateMachine* pStateMachine)
 	Info.strAniName = "Fly";
 	Info.bLoop = true;
 	Info.fSpeed = 1.0f;
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CBrontoBurt_State_Idle::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CBrontoBurt_State_Idle::Create(Info))))
 		return E_FAIL;
 
 	// KNOCKBACK
 	Info.strAniName = "Damage";
 	Info.bLoop = false;
 	Info.fSpeed = 1.5f;
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK, CMonster_State_KnockBack::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK, CMonster_State_KnockBack::Create(Info))))
 		return E_FAIL;
 
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK_DEATH, CMonster_State_KnockBackDeath::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK_DEATH, CMonster_State_KnockBackDeath::Create(Info))))
 		return E_FAIL;
 
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_OUT, CMonster_State_KnockOut::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_OUT, CMonster_State_KnockOut::Create(Info))))
 		return E_FAIL;
 
 	// CAPTURED
 	Info.bLoop = true;
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
 		return E_FAIL;
 
 	// SPAT
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::SPAT, CMonster_State_Spat::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::SPAT, CMonster_State_Spat::Create(Info))))
 		return E_FAIL;
 
 	// RETURN
 	Info.strAniName = "Fly";
 	Info.bLoop = true;
 	Info.fSpeed = 1.0f;
-	if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::RETURN, CBrontoBurt_State_Return::Create(Info))))
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::RETURN, CBrontoBurt_State_Return::Create(Info))))
 		return E_FAIL;
 
 	return S_OK;
@@ -165,7 +164,56 @@ HRESULT CBrontoBurt::Ready_State(CMonster_StateMachine* pStateMachine)
 
 HRESULT CBrontoBurt::Ready_AnimEvents()
 {
+	if (nullptr == m_pBody)
+		return E_FAIL;
+
+	CAnimator* pAnim = m_pBody->Get_Animator();
+	if (nullptr == pAnim)
+		return E_FAIL;
+
+	pAnim->Set_EventCallback(
+		[this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase)
+		{
+			if (phase != ANIM_EVENT_PHASE::POINT)
+				return;
+
+			switch (static_cast<EANIM_EVENT>(e.iEventType))
+			{
+			case EANIM_EVENT::SetEye:
+				m_pBody->Set_Eye((_uint)e.iIntParam);
+				break;
+			default:
+				break;
+			}
+		});
+
 	return S_OK;
+}
+
+void CBrontoBurt::Apply_AIVariation(const _wstring& strVariation)
+{
+	if (strVariation == L"MoveOnRail") m_iAIType = 0;  // 레일 이동
+	else if (strVariation == L"Wait")  m_iAIType = 0;  // 제자리(공중)
+	else                               m_iAIType = 0;
+}
+
+void CBrontoBurt::On_Exit(MONSTER_STATE_TYPE eNextState)
+{
+	if (nullptr == m_pBody)
+		return;
+
+	switch (eNextState)
+	{
+	case MONSTER_STATE_TYPE::KNOCK_BACK:
+	case MONSTER_STATE_TYPE::KNOCK_BACK_DEATH:
+	case MONSTER_STATE_TYPE::KNOCK_OUT:
+	case MONSTER_STATE_TYPE::CAPTURED:
+	case MONSTER_STATE_TYPE::SPAT:
+		break;                    
+	default:
+		m_pBody->Set_Eye(0);      
+		break;
+	}
 }
 
 HRESULT CBrontoBurt::Ready_PartObjects()
@@ -181,29 +229,6 @@ HRESULT CBrontoBurt::Ready_PartObjects()
 void CBrontoBurt::On_Deserialized()
 { 
 	__super::On_Deserialized();
-}
-
-void CBrontoBurt::Inject_TestRail()
-{
-	LD_RAIL_DESC tDesc{};
-
-	// mock: 배치점에서 시작하는 공중 직선 왕복
-	LD_RAIL_NODE_DESC a{};
-	LD_RAIL_NODE_DESC b{};
-	const _float fLift = 2.f;
-	a.vPosition = { m_vBasePos.x,
-					m_vBasePos.y + fLift,
-					m_vBasePos.z };
-	b.vPosition = { m_vBasePos.x + 8.f,
-					m_vBasePos.y + fLift,
-					m_vBasePos.z };
-	tDesc.iNodeCount = 2;
-	tDesc.Nodes.push_back(a);
-	tDesc.Nodes.push_back(b);
-	tDesc.fRadius = 0.f;     // 0 = 직선
-	tDesc.bClose = false;    // false = 왕복
-
-	Set_RailDesc(tDesc);
 }
 
 CBrontoBurt* CBrontoBurt::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

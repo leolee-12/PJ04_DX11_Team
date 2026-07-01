@@ -33,6 +33,7 @@
     <ClInclude Include="..\public\Boss_Gorilla.h" />
     <ClInclude Include="..\public\Boss_Gorilla_Body.h" />
     <ClInclude Include="..\public\Boss_Gorilla_Brain.h" />
+    <ClInclude Include="..\public\Boss_Gorilla_RockHole.h" />
     <ClInclude Include="..\Public\BrontoBurt.h" />
     <ClInclude Include="..\Public\BrontoBurt_Body.h" />
     <ClInclude Include="..\Public\BrontoBurt_Brain.h" />
@@ -44,6 +45,10 @@
     <ClInclude Include="..\public\Camera_Boss.h" />
     <ClInclude Include="..\public\Camera_Cutscene.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
+    <ClInclude Include="..\Public\Cappy.h" />
+    <ClInclude Include="..\Public\Cappy_Body.h" />
+    <ClInclude Include="..\Public\Cappy_Brain.h" />
+    <ClInclude Include="..\Public\Cappy_Hat.h" />
     <ClInclude Include="..\Public\Character.h" />
     <ClInclude Include="..\Public\Character_States.h" />
     <ClInclude Include="..\Public\Common_Circle01.h" />
@@ -62,6 +67,8 @@
     <ClInclude Include="..\Public\KirbyBomb.h" />
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h" />
     <ClInclude Include="..\public\LDInhalable.h" />
+    <ClInclude Include="..\Public\LevelDesign_MonsterCatalog.h" />
+    <ClInclude Include="..\Public\PoppyBrosJr_State_WindUp.h" />
     <ClInclude Include="..\Public\Sword_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\MeshLayer_Binder.h" />
     <ClInclude Include="..\Public\MeshLayer_Profile.h" />
@@ -281,6 +288,7 @@
     <ClCompile Include="..\private\Boss_Gorilla.cpp" />
     <ClCompile Include="..\private\Boss_Gorilla_Body.cpp" />
     <ClCompile Include="..\private\Boss_Gorilla_Brain.cpp" />
+    <ClCompile Include="..\private\Boss_Gorilla_RockHole.cpp" />
     <ClCompile Include="..\Private\BrontoBurt.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_Body.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_Brain.cpp" />
@@ -292,6 +300,10 @@
     <ClCompile Include="..\private\Camera_Boss.cpp" />
     <ClCompile Include="..\private\Camera_Cutscene.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
+    <ClCompile Include="..\Private\Cappy.cpp" />
+    <ClCompile Include="..\Private\Cappy_Body.cpp" />
+    <ClCompile Include="..\Private\Cappy_Brain.cpp" />
+    <ClCompile Include="..\Private\Cappy_Hat.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Common_Circle01.cpp" />
     <ClCompile Include="..\Private\Common_Curve03.cpp" />
@@ -309,6 +321,8 @@
     <ClCompile Include="..\Private\KirbyBomb.cpp" />
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp" />
     <ClCompile Include="..\private\LDInhalable.cpp" />
+    <ClCompile Include="..\Private\LevelDesign_MonsterCatalog.cpp" />
+    <ClCompile Include="..\Private\PoppyBrosJr_State_WindUp.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\MeshLayer_Binder.cpp" />
     <ClCompile Include="..\Private\MeshLayer_Profile.cpp" />

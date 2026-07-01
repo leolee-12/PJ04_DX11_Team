@@ -26,6 +26,7 @@ struct LD_SPAWN_SPEC
 
 	LD_OBJECT_PROTO_FACTORY pPrototypeFactory = { nullptr };
 	LD_DESC_BUILD_FUNC pBuildDesc = { nullptr };
+	_bool bUseFactoryResourceLoader = { false };
 	vector<LD_MODEL_REQUIREMENT> ModelRequirements;
 };
 

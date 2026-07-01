@@ -32,6 +32,9 @@ void CKabu_State_Idle::Update(_float fTimeDelta)
 	if (m_pOwner == nullptr || nullptr == m_pMovement)
 		return;
 
+	if (!static_cast<CKabu*>(m_pOwner)->Is_Visible())
+		return;
+
 	static_cast<CMonster_RailMovement*>(m_pMovement)->Update_RailFollow(fTimeDelta);	
 }
 

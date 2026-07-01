@@ -63,6 +63,8 @@ public:
 	const _float3&				Get_BasePos() const { return m_vBasePos; }
 	_bool						Has_Trait(MONSTER_TRAIT t) const { return (m_TraitFlags & t) != 0; }
 
+	_int						Get_AIType() const { return m_iAIType; }
+
 public: // Inhalable
 	virtual _bool				Can_BeInhaled(const INHALE_QUERY& q) const override;
 	virtual void				Be_Captured(CGameObject* pInhaler) override;
@@ -70,7 +72,8 @@ public: // Inhalable
 	virtual COPY_ABILITY_TYPE	Get_CopyAbility() const override { return m_eCopyAbility; }
 	virtual CGameObject*		Get_GameObject() override final { return this; }
 
-	void						On_Swallowed();
+	virtual void				On_Swallowed();
+	virtual void				On_Exit(MONSTER_STATE_TYPE eNextState) {}
 	const _float3&				Get_SpatVelocity() const { return m_vSpatVelocity; }
 	void						Enable_ProjectileBox(_bool bEnable);
 	CGameObject*				Get_Captor() const { return m_pCaptor; }
@@ -137,6 +140,8 @@ protected:
 	_float						m_fAirborneTimer = 0.f;
 	static constexpr _float		s_fCoyoteTime = 0.12f;
 
+	_int						m_iAIType = { 0 };
+
 protected:
 	// 부모가 관리할 공통 파이프라인
 	HRESULT						Ready_Collider();
@@ -148,7 +153,7 @@ protected:
 	virtual CMonsterBrain*		Create_Brain();		//기본: FSM Brain
 	virtual HRESULT				Create_Movement();	// 기본 : Monster_Movement - 별도 무브먼트 필요할 때 상속받아서 쓸 것 
 	virtual _bool				Use_StateMachine() const { return true; } // BT 전용 몬스터는 false 반환
-	virtual HRESULT				Ready_State(CMonster_StateMachine* pStateMachine);
+	virtual HRESULT				Ready_State();
 	virtual HRESULT				Ready_PartObjects() { return S_OK; }
 	virtual HRESULT				Ready_AnimEvents() { return S_OK; }		// Bkody의 Animator의 이벤트 콜백 설정함수
 
@@ -160,6 +165,8 @@ protected:
 	//윤석현 수정 
 	virtual void				Update_AI(_float fTimeDelta);
 	virtual void				Perceive(_float fTimeDelta);
+
+	virtual void				Apply_AIVariation(const _wstring& strVariation) {}
 
 protected:
 	template<class TPart>

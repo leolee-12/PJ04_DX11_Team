@@ -41,8 +41,8 @@ public:
         pOutData->strPrototypeTag = PROTOTYPE_TAG;
     }
 
-    virtual _float          Get_CapsuleRadius() const override { return 0.85f; }
-    virtual _float          Get_CapsuleHeight() const override { return 0.40f; }
+    virtual _float          Get_CapsuleRadius() const override { return 0.75f; }
+    virtual _float          Get_CapsuleHeight() const override { return 0.35f; }
     virtual _float          Get_InteractRadius() const override { return 0.f; }
     virtual _bool           Get_HurtBoxDesc(CAPSULE_DESC& Out) const override;
 
@@ -57,14 +57,12 @@ public:
 protected:
     virtual CMonsterBrain*  Create_Brain() override; 
     virtual HRESULT         Create_Movement() override;
-    virtual HRESULT         Ready_State(CMonster_StateMachine* pStateMachine) override;
+    virtual HRESULT         Ready_State() override;
     virtual HRESULT         Ready_AnimEvents() override;
 
 private:
     HRESULT                 Ready_PartObjects();
     virtual void            On_Deserialized() override;
-
-    void                    Inject_TestRail();         // 테스트 코드 
 
 private:
     CKabu_Body*             m_pBody = { nullptr };

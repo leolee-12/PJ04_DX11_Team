@@ -20,7 +20,8 @@ HRESULT CPartObject::Initialize(void* pArg)
 {
 	auto		pDesc = static_cast<PARTOBJECT_DESC*>(pArg);
 
-	m_pParentMatrix = pDesc->pParentMatrix;
+	if (pDesc)
+		m_pParentMatrix = pDesc->pParentMatrix;
 	
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;

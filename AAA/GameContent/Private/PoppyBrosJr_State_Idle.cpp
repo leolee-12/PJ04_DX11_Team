@@ -7,7 +7,7 @@ void CPoppyBrosJr_State_Idle::Update(_float fTimeDelta)
 	if (m_pOwner == nullptr)
 		return;
 
-	const _int iAIType = static_cast<CPoppyBrosJr*>(m_pOwner)->Get_AIType();
+	const _int iAIType = m_pOwner->Get_AIType();
 	const MONSTER_BLACKBOARD& BB = m_pOwner->Get_BlackBoard();
 	const _float fAbsHeight = fabsf(BB.fHeightToTarget);
 	const _bool bLookable =  (BB.fDistToTargetXZ <= 10.f && fAbsHeight < 3.f);
