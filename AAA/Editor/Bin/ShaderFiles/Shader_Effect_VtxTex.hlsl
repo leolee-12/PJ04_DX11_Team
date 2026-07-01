@@ -1,6 +1,7 @@
 #include "Engine_Shader_Defines.hlsli"
 
 float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
+bool g_bBillboard = { false };
 
 Texture2D g_Texture;
 bool g_bUseTexture = { false };
@@ -51,10 +52,27 @@ struct VS_OUT
 VS_OUT VS_MAIN(VS_IN In)
 {
     VS_OUT Out;
-    
-    float4 vPosition = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
-    vPosition = mul(vPosition, g_ViewMatrix);
-    vPosition = mul(vPosition, g_ProjMatrix);
+
+    float4 vPosition;
+
+    if (g_bBillboard == true)
+    {
+        float3 vScale;
+        vScale.x = length(mul(float4(1.f, 0.f, 0.f, 0.f), g_WorldMatrix).xyz);
+        vScale.y = length(mul(float4(0.f, 1.f, 0.f, 0.f), g_WorldMatrix).xyz);
+        vScale.z = length(mul(float4(0.f, 0.f, 1.f, 0.f), g_WorldMatrix).xyz);
+
+        vPosition = mul(float4(0.f, 0.f, 0.f, 1.f), g_WorldMatrix);
+        vPosition = mul(vPosition, g_ViewMatrix);
+        vPosition.xyz += In.vPosition * vScale;
+        vPosition = mul(vPosition, g_ProjMatrix);
+    }
+    else
+    {
+        vPosition = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
+        vPosition = mul(vPosition, g_ViewMatrix);
+        vPosition = mul(vPosition, g_ProjMatrix);
+    }
     
     Out.vPosition = vPosition;
     Out.vTexcoord = In.vTexcoord;

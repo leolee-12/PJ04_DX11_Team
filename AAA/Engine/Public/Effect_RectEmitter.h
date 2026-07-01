@@ -10,6 +10,8 @@ class ENGINE_DLL CEffect_RectEmitter abstract : public CEffect_Emitter
 {
     GENERATED_BODY_ABSTRACT(CEffect_RectEmitter)
 
+PROPERTY(_bool, m_bBillboard, L"Billboard", L"Rendering");
+
 // Sprite Animation Texture
 PROPERTY(_bool, m_bSpriteAniTexture, L"Sprite Animation Texture", L"Sprite Animation");
 
