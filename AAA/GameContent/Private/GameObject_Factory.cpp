@@ -63,6 +63,8 @@
 #include "RockPull.h"
 #include "RockPush.h"
 #include "Gorilla_Swing.h"
+#include "Gorilla_Ring.h"
+
 #include "DespawnEffect.h"
 
 #include "BoostGas.h"
@@ -86,6 +88,7 @@
 #include "SpinWind.h"
 #include "StarParticle.h"
 #include "Swing_Smoke.h"
+#include "Shockwave.h"
 
 //sky
 #include "SkySphere.h"
@@ -781,7 +784,16 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
-
+    Register(CGorilla_Ring::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CGorilla_Ring),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CShockwave::PROTOTYPE_TAG,
+                CShockwave::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CShockwave::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Gorilla/Shockwave/BossGorilla_00_Donut.ysh"
+                    , XMMatrixScaling(10.f, 10.f, 10.f)));
+        )
+    );
 
     // 1
     Register(CBoostGas::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CBoostGas),

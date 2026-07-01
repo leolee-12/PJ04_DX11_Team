@@ -63,6 +63,7 @@
     <ClInclude Include="..\Public\EnvTrigger_EventPublisher.h" />
     <ClInclude Include="..\Public\EnvTrigger_Generic.h" />
     <ClInclude Include="..\Public\EnvTrigger_RenderGlobals.h" />
+    <ClInclude Include="..\public\Gorilla_Ring.h" />
     <ClInclude Include="..\public\Gorilla_Swing.h" />
     <ClInclude Include="..\Public\Kirby_DeformCar_Demo.h" />
     <ClInclude Include="..\Public\Kirby_DeformCar_Main.h" />
@@ -83,6 +84,7 @@
     <ClInclude Include="..\public\RockFloorEffect.h" />
     <ClInclude Include="..\public\RockPull.h" />
     <ClInclude Include="..\public\RockPush.h" />
+    <ClInclude Include="..\public\Shockwave.h" />
     <ClInclude Include="..\Public\SmokeParticle.h" />
     <ClInclude Include="..\Public\StarParticle.h" />
     <ClInclude Include="..\public\SpinWind.h" />
@@ -335,6 +337,7 @@
     <ClCompile Include="..\Private\DespawnEffect.cpp" />
     <ClCompile Include="..\private\DeathSmoke.cpp" />
     <ClCompile Include="..\Private\EnvTrigger_Generic.cpp" />
+    <ClCompile Include="..\private\Gorilla_Ring.cpp" />
     <ClCompile Include="..\private\Gorilla_Swing.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCar_Demo.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCar_Main.cpp" />
@@ -355,6 +358,7 @@
     <ClCompile Include="..\private\RockFloorEffect.cpp" />
     <ClCompile Include="..\private\RockPull.cpp" />
     <ClCompile Include="..\private\RockPush.cpp" />
+    <ClCompile Include="..\private\Shockwave.cpp" />
     <ClCompile Include="..\Private\SmokeParticle.cpp" />
     <ClCompile Include="..\Private\StarParticle.cpp" />
     <ClCompile Include="..\private\SpinWind.cpp" />

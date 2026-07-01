@@ -877,6 +877,12 @@
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SwingEffect">
       <UniqueIdentifier>{29efe63d-79c4-449b-a474-052109dc93dd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\06. Gorilla_Ring">
+      <UniqueIdentifier>{c9f6dfc2-48b9-4927-8563-c108eb1ab4de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\Shockwave">
+      <UniqueIdentifier>{8b96a12e-2bca-49bc-8a21-8793a67b9ee5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1686,6 +1692,12 @@
     <ClInclude Include="..\public\Swing_Smoke.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SwingEffect</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Shockwave.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\Shockwave</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Gorilla_Ring.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\06. Gorilla_Ring</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2416,6 +2428,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Swing_Smoke.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SwingEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Shockwave.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\Shockwave</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Gorilla_Ring.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\06. Gorilla_Ring</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
