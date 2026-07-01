@@ -97,4 +97,14 @@ namespace Client
         _float fCurrHp = { 100.f };
     }BOSS_HP_APPEARED;
 
+
+    /* ----------------------- Leo ---------------------- */
+    struct TRIGGER_EVENT_PAYLOAD
+    {
+        CGameObject* pTriggerObject = { nullptr };
+        _wstring strTriggerId;
+        _wstring strEventTag;
+        _wstring strPayload;
+    };
+    /* -------------------------------------------------- */
 }

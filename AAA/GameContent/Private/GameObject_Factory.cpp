@@ -112,6 +112,7 @@
 // EnvObject
 #include "EnvTrigger_Generic.h"
 #include "EnvTrigger_RenderGlobals.h"
+#include "EnvTrigger_EventPublisher.h"
 
 // Projectile
 #include "Projectile_Boulder.h"
@@ -664,6 +665,7 @@ void CGameObject_Factory::Register_NonAnimObject()
 {
     Register(CEnvTrigger_Generic::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvTrigger_Generic), LOADER());
     Register(CEnvTrigger_RenderGlobals::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvTrigger_RenderGlobals), LOADER());
+    Register(CEnvTrigger_EventPublisher::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvTrigger_EventPublisher), LOADER());
 
     Register(CLevelDesign_Unsupported::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Unsupported), LOADER());
     Register(CLevelDesign_Rail::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Rail), LOADER());

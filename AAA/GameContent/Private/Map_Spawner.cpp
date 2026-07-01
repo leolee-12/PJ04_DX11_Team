@@ -4,6 +4,7 @@
 #include "EnvObject_Interact.h"
 #include "EnvTrigger_Generic.h"
 #include "EnvTrigger_RenderGlobals.h"
+#include "EnvTrigger_EventPublisher.h"
 #include "Env_InstanceController.h"
 #include "GameContent_Log.h"
 #include "Parsing_Utils.h"
@@ -27,7 +28,8 @@ namespace
 	{
 		return strPrototypeTag == CEnvTrigger_Generic::PROTOTYPE_TAG
 			|| strPrototypeTag == CEnvTrigger_Generic::LEGACY_PROTOTYPE_TAG
-			|| strPrototypeTag == CEnvTrigger_RenderGlobals::PROTOTYPE_TAG;
+			|| strPrototypeTag == CEnvTrigger_RenderGlobals::PROTOTYPE_TAG
+			|| strPrototypeTag == CEnvTrigger_EventPublisher::PROTOTYPE_TAG;
 	}
 
 	ENV_OBJECT_DESC Make_AddedEnvTriggerDesc(const MAP_ADD_OBJECT& Added)

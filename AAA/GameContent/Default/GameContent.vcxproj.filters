@@ -1577,6 +1577,9 @@
     <ClInclude Include="..\Public\EnvTrigger_RenderGlobals.h">
       <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\EnvTrigger_EventPublisher.h">
+      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2256,6 +2259,9 @@
       <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnvTrigger_RenderGlobals.cpp">
+      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvTrigger_EventPublisher.cpp">
       <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
     </ClCompile>
   </ItemGroup>

@@ -4,6 +4,7 @@
 #include "EnvObject_Interact.h"
 #include "EnvTrigger_Generic.h"
 #include "EnvTrigger_RenderGlobals.h"
+#include "EnvTrigger_EventPublisher.h"
 #include "MapSection.h"
 #include "MapStage.h"
 #include "GameObject_Factory.h"
@@ -199,6 +200,10 @@ HRESULT CMap_ProtoRegister::Ready_ObjectPrototypes(_uint iObjectLevel)
 
 	if (FAILED(EnsurePrototype(CEnvTrigger_RenderGlobals::PROTOTYPE_TAG,
 		CEnvTrigger_RenderGlobals::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(EnsurePrototype(CEnvTrigger_EventPublisher::PROTOTYPE_TAG,
+		CEnvTrigger_EventPublisher::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	return S_OK;

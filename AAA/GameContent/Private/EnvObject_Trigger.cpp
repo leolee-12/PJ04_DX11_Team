@@ -63,9 +63,33 @@ void CEnvObject_Trigger::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
-	if (m_pCollider && m_pTransformCom)
+	const auto AbsAxis = [](_float fValue) -> _float
+		{
+			return fValue < 0.f ? -fValue : fValue;
+		};
+
+	const _float3 vAreaSize =
 	{
-		m_pCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+			AbsAxis(m_vAreaSize.x),
+			AbsAxis(m_vAreaSize.y),
+			AbsAxis(m_vAreaSize.z)
+	};
+
+	constexpr _float kMinTriggerAxis = 0.001f;
+	const _bool bValidArea =
+		vAreaSize.x > kMinTriggerAxis &&
+		vAreaSize.y > kMinTriggerAxis &&
+		vAreaSize.z > kMinTriggerAxis;
+
+	m_pCollider->Set_Enabled(bValidArea);
+
+	if (bValidArea)
+	{
+		const _matrix TriggerLocalMatrix =
+			XMMatrixScaling(vAreaSize.x, vAreaSize.y, vAreaSize.z) *
+			XMMatrixTranslation(m_vAreaCenter.x, m_vAreaCenter.y, m_vAreaCenter.z);
+
+		m_pCollider->Update(TriggerLocalMatrix * XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
 #ifdef _DEBUG
 		if (m_bDebugDrawTrigger)
@@ -73,7 +97,6 @@ void CEnvObject_Trigger::Late_Update(_float fTimeDelta)
 #endif
 	}
 }
-
 
 
 void CEnvObject_Trigger::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
@@ -103,29 +126,6 @@ void CEnvObject_Trigger::OnTriggerExit(CCollider* pOther)
 
 HRESULT CEnvObject_Trigger::Ready_TriggerCollider()
 {
-	const auto AbsAxis = [](_float fValue) -> _float
-		{
-			return fValue < 0.f ? -fValue : fValue;
-		};
-
-	const _float3 vAreaSize =
-	{
-		AbsAxis(m_vAreaSize.x),
-		AbsAxis(m_vAreaSize.y),
-		AbsAxis(m_vAreaSize.z)
-	};
-
-	constexpr _float kMinTriggerAxis = 0.001f;
-	if (vAreaSize.x <= kMinTriggerAxis ||
-		vAreaSize.y <= kMinTriggerAxis ||
-		vAreaSize.z <= kMinTriggerAxis)
-	{
-//#ifdef _DEBUG
-//		OutputDebugStringA("[EnvTrigger] Skip collider creation due to invalid AreaSize.\n");
-//#endif
-		return S_OK;
-	}
-
 	m_pCollider = Add_Component<CCollider>(
 		L"Com_TriggerCollider",
 		CCollider::Create(m_pDevice, m_pContext, COLLIDER::AABB));
@@ -135,8 +135,8 @@ HRESULT CEnvObject_Trigger::Ready_TriggerCollider()
 
 	CCollider::COLLIDER_DESC ColliderDesc{};
 	ColliderDesc.pOwner = this;
-	ColliderDesc.vCenter = m_vAreaCenter;
-	ColliderDesc.vSize = vAreaSize;
+	ColliderDesc.vCenter = { 0.f, 0.f, 0.f };
+	ColliderDesc.vSize = { 1.f, 1.f, 1.f };
 
 	if (FAILED(m_pCollider->Initialize(&ColliderDesc)))
 		return E_FAIL;
