@@ -45,10 +45,14 @@ private:
 public:
 	virtual COPY_ABILITY_TYPE Get_AbilityType() override;
 
-	virtual void Enter_Ability(CKirby* pKirby) override;
-	virtual ABILITY_UPDATE_RESULT Update_Ability(CKirby* pKirby, _float fTimeDelta) override;
-	virtual void Exit_Ability(CKirby* pKirby) override;
+	virtual void Enter_AbilityState(CKirby* pKirby) override;
+	virtual ABILITY_UPDATE_RESULT Update_AbilityState(CKirby* pKirby, _float fTimeDelta) override;
+	virtual void Exit_AbilityState(CKirby* pKirby) override;
 
+public:
+	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
+
+public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
 	virtual _bool Enter_Attack_KeyDown(CKirby* pKirby) override;

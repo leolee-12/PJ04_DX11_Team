@@ -17,7 +17,7 @@ private:
 	CKirby_Jump();
 	virtual ~CKirby_Jump() = default;
 
-	enum class JUMP_STATE { JUMP_STRAT, JUMP_END };
+	enum class JUMP_STATE { JUMP_START, JUMP, JUMP_END };
 
 private:
 	HRESULT Initialize();

@@ -450,24 +450,15 @@ void CMovement_Child::Rotate_To_Direction(_fvector vDir, _float fTimeDelta)
 
     _float fDot = XMVectorGetX(XMVector3Dot(vLook, vTargetDir));
 
-    _float fCross =
-        XMVectorGetZ(vLook) * XMVectorGetX(vTargetDir) -
-        XMVectorGetX(vLook) * XMVectorGetZ(vTargetDir);
+    _float fCross = XMVectorGetZ(vLook) * XMVectorGetX(vTargetDir) - XMVectorGetX(vLook) * XMVectorGetZ(vTargetDir);
 
     _float fYaw = atan2f(fCross, fDot);
 
     _float fStep = XMConvertToRadians(m_fRotation_Speed_Degree) * fTimeDelta;
 
-    _float fApply = fabsf(fYaw) <= fStep
-        ? fYaw
-        : (fYaw > 0.f ? fStep : -fStep);
+    _float fApply = fabsf(fYaw) <= fStep ? fYaw : (fYaw > 0.f ? fStep : -fStep);
 
-    m_pTransform->Rotate(
-        XMQuaternionRotationAxis(
-            XMVectorSet(0.f, 1.f, 0.f, 0.f),
-            fApply
-        )
-    );
+    m_pTransform->Rotate(XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fApply));
 }
 
 void CMovement_Child::Apply_Knockback(const _float3& vAttackerPos, _float fHorizontalPower, _float fUpPower)

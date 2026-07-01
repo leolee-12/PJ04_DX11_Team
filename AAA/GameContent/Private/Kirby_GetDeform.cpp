@@ -38,7 +38,8 @@ void CKirby_GetDeform::Enter(CKirby* pKirby)
 {
     __super::Enter(pKirby);
 
-    pKirby->Set_KirbyDeform(DEFORM_TYPE::CAR);
+    // 받아와서
+    m_eDeformType = DEFORM_TYPE::CAR;
 
     m_eDeformState = DEFORM_STATE::DEFORM_STATE_END;
     Change_GetDeformState(pKirby, DEFORM_STATE::SUPER_INHALE_START);
@@ -102,7 +103,7 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
 
             pBodyAnimator->Play("SuperInhaleStart", false, false, 0.1f, 2.5f);
 
-            pKirby->OnOffParts(pKirby->Get_KirbyAbility()->Get_AbilityType(), false, true);
+            pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), false, true);
 
             break;
         }
@@ -129,8 +130,7 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
         }
         case DEFORM_STATE::DEFORM_END:
         {
-            DEFORM_TYPE eDeformType = pKirby->Get_KirbyDeform()->Get_DeformType();
-            CKirby_Deform_Model* pDeformModel_Main = pKirby->Get_DeformPart_Model(eDeformType, KIRBY_DEFORM_MODEL_TYPE::MAIN);
+            CKirby_Deform_Model* pDeformModel_Main = pKirby->Get_DeformPart_Model(m_eDeformType, KIRBY_DEFORM_MODEL_TYPE::MAIN);
             pDeformModel_Main->Set_Active(true);
 
             pDeformModel_Main->Get_Animator()->Play("DemoEndFirst", false, false, 0.f, 2.f);
@@ -138,10 +138,14 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
             pKirby->Change_HatSocketMatrix(pKirby->Get_KirbyAbility()->Get_AbilityType(),
                 pDeformModel_Main->Get_HatBoneMatirx());
 
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Set_RotationSpeed(s_fDeform_End_Rot_Speed_Degree);
+            Set_RotationDir(pKirby);
             break;
         }
         case DEFORM_STATE::DEFORM_STATE_END:
         {
+            pKirby->Change_State(KIRBY_STATE_TYPE::WAIT);
             break;
         }
     }
@@ -149,7 +153,6 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
 
 void CKirby_GetDeform::Update_GetDeformState(CKirby* pKirby, _float fTimeDelta)
 {
-
     switch (m_eDeformState)
     {
         case DEFORM_STATE::SUPER_INHALE_START:
@@ -173,17 +176,27 @@ void CKirby_GetDeform::Update_GetDeformState(CKirby* pKirby, _float fTimeDelta)
         }
         case DEFORM_STATE::DEFORM:
         {
-            DEFORM_TYPE eDeformType = pKirby->Get_KirbyDeform()->Get_DeformType();
-            CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(eDeformType, KIRBY_DEFORM_MODEL_TYPE::DEMO);
-            CAnimator* pAnimator = pDeformModel_Demo->Get_Animator();
+            CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(m_eDeformType, KIRBY_DEFORM_MODEL_TYPE::DEMO);
+            CAnimator* pDemoAnimator = pDeformModel_Demo->Get_Animator();
 
-            if (pAnimator->Is_Finished())
+            if (pDemoAnimator->Is_Finished())
                 Change_GetDeformState(pKirby, DEFORM_STATE::DEFORM_END);
 
             break;
         }
         case DEFORM_STATE::DEFORM_END:
         {
+            _vector vCamLook = XMVectorSetY(XMLoadFloat4(m_pGameInstance_Proxy->Get_CamLook()), 0.f);
+
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Rotate_To_Direction(XMLoadFloat3(&m_vRotationDir), fTimeDelta);
+
+            CKirby_Deform_Model* pDeformModel_Main = pKirby->Get_DeformPart_Model(m_eDeformType, KIRBY_DEFORM_MODEL_TYPE::MAIN);
+            CAnimator* pMainAnimator = pDeformModel_Main->Get_Animator();
+
+            if (pMainAnimator->Is_Finished())
+                Change_GetDeformState(pKirby, DEFORM_STATE::DEFORM_STATE_END);
+
             break;
         }
         case DEFORM_STATE::DEFORM_STATE_END:
@@ -212,13 +225,17 @@ void CKirby_GetDeform::Exit_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
         }
         case DEFORM_STATE::DEFORM:
         {
-            DEFORM_TYPE eDeformType = pKirby->Get_KirbyDeform()->Get_DeformType();
-            CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(eDeformType, KIRBY_DEFORM_MODEL_TYPE::DEMO);
+            CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(m_eDeformType, KIRBY_DEFORM_MODEL_TYPE::DEMO);
             pDeformModel_Demo->Set_Active(false);
             break;
         }
         case DEFORM_STATE::DEFORM_END:
         {
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
+
+            pKirby->Change_KirbyDeform(m_eDeformType);
+
             break;
         }
         case DEFORM_STATE::DEFORM_STATE_END:
@@ -226,6 +243,29 @@ void CKirby_GetDeform::Exit_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
             break;
         }
     }
+}
+
+void CKirby_GetDeform::Set_RotationDir(CKirby* pKirby)
+{
+    _vector vCamLook = XMVectorSetY(XMLoadFloat4(m_pGameInstance_Proxy->Get_CamLook()), 0.f);
+
+    _float fRadian = XMConvertToRadians(15.f);
+
+    _vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+    _vector vLeftDir = XMVector3Rotate(-vCamLook, XMQuaternionRotationAxis(vUp, -fRadian));
+    _vector vRightDir = XMVector3Rotate(-vCamLook, XMQuaternionRotationAxis(vUp, fRadian));
+
+    _vector vCurLook = XMVectorSetY(pKirby->Get_Transform()->Get_State(STATE::LOOK), 0.f);
+    vCurLook = XMVector3Normalize(vCurLook);
+
+    _float fLeftDot = XMVectorGetX(XMVector3Dot(vCurLook, vLeftDir));
+    _float fRightDot = XMVectorGetX(XMVector3Dot(vCurLook, vRightDir));
+
+    if (fLeftDot > fRightDot)
+         XMStoreFloat3(&m_vRotationDir, vLeftDir);
+    else
+        XMStoreFloat3(&m_vRotationDir, vRightDir);
 }
 
 CKirby_GetDeform* CKirby_GetDeform::Create()

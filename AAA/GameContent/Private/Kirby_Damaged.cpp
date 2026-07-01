@@ -5,6 +5,7 @@
 #include "Kirby.h"
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
+#include "Kirby_Deform.h"
 
 #include "Movement_Child.h"
 
@@ -29,50 +30,75 @@ void CKirby_Damaged::Enter(CKirby* pKirby)
 {
     __super::Enter(pKirby);
 
-    // Ani
-    CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
-    pAbility->Clear_Overlay(pKirby, 1, 0.1f);
-    pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::DAMAGED);
+    if(pKirby->Has_Deform())
+    {
+        CKirby_Deform* pDeform = pKirby->Get_KirbyDeform();
+        pDeform->Play_DeformAni(pKirby, DEFORM_ANI::DAMAGE);
+        pKirby->Get_DeformPart_Model(pDeform->Get_DeformType())->Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);
+    }
+    else
+    {
+        CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+        pAbility->Clear_Overlay(pKirby, 1, 0.1f);
+        pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::DAMAGED);
 
-    pKirby->Get_Body()->Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);
+        pKirby->Get_Body()->Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);
 
-    CMovement_Child* pMovement = pKirby->Get_Movement();
-    pMovement->Set_MaxHorizontalSpeed(s_fMaxDamagedHorizontalSpeed);
+        CMovement_Child* pMovement = pKirby->Get_Movement();
+        pMovement->Set_MaxHorizontalSpeed(s_fMaxDamagedHorizontalSpeed);
+    }
 }
 
 void CKirby_Damaged::Update(CKirby* pKirby, const _float fTimeDelta)
 {
     __super::Update(pKirby, fTimeDelta);
 
-    CKirby_Body* pBody = pKirby->Get_Body();
-    CAnimator* pAnimator = pBody->Get_Animator();
-
-    const _float fCurRatio = pAnimator->Get_Progress();
-
-    const _float fStartRatio = 0.f;
-    const _float fEndRatio = 0.25f;
-
-    _float fRotRatio = fCurRatio / (fEndRatio - fStartRatio);
-    Helper::FloatClamp(fRotRatio, 0.f, 1.f);
-
-    _vector vAxis = XMVectorSet(1.f, 0.f, 0.f, 0.f);
-    pAnimator->SetBoneRotation("RotL", fRotRatio * 360.f, vAxis);
-
-    if (pAnimator->Get_Progress() >= fEndRatio)
+    if (pKirby->Has_Deform())
     {
-        pAnimator->SetBoneRotation("RotL", 0.f, vAxis);
-        Transition_Fall_OR_Wait_OR_Run(pKirby);
+        CKirby_Deform_Model* pDeformModel = pKirby->Get_DeformPart_Model(pKirby->Get_KirbyDeform()->Get_DeformType());
+        if (pDeformModel->Get_Animator()->Is_Finished())
+            Transition_Fall_OR_Wait_OR_Run(pKirby);
     }
+    else
+    {
+        CKirby_Body* pBody = pKirby->Get_Body();
+        CAnimator* pAnimator = pBody->Get_Animator();
+
+        const _float fCurRatio = pAnimator->Get_Progress();
+
+        const _float fStartRatio = 0.f;
+        const _float fEndRatio = 0.25f;
+
+        _float fRotRatio = fCurRatio / (fEndRatio - fStartRatio);
+        Helper::FloatClamp(fRotRatio, 0.f, 1.f);
+
+        _vector vAxis = XMVectorSet(1.f, 0.f, 0.f, 0.f);
+        pAnimator->SetBoneRotation("RotL", fRotRatio * 360.f, vAxis);
+
+        if (pAnimator->Get_Progress() >= fEndRatio)
+        {
+            pAnimator->SetBoneRotation("RotL", 0.f, vAxis);
+            Transition_Fall_OR_Wait_OR_Run(pKirby);
+        }
+    }  
 }
 
 void CKirby_Damaged::Exit(CKirby* pKirby)
 {
     __super::Exit(pKirby);
 
-    pKirby->Get_Body()->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
+    if(pKirby->Has_Deform())
+    {
+        CKirby_Deform* pDeform = pKirby->Get_KirbyDeform();
+        pKirby->Get_DeformPart_Model(pDeform->Get_DeformType())->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
+    }
+    else
+    {
+        pKirby->Get_Body()->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
 
-    CMovement_Child* pMovement = pKirby->Get_Movement();
-    pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
+        CMovement_Child* pMovement = pKirby->Get_Movement();
+        pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
+    }
 }
 
 _bool CKirby_Damaged::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)

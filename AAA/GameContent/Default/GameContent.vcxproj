@@ -68,6 +68,7 @@
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h" />
     <ClInclude Include="..\public\LDInhalable.h" />
     <ClInclude Include="..\Public\LevelDesign_MonsterCatalog.h" />
+    <ClInclude Include="..\Public\PoppyBrosJr_State_WindUp.h" />
     <ClInclude Include="..\public\RockBurst.h" />
     <ClInclude Include="..\public\RockEffect.h" />
     <ClInclude Include="..\public\RockFloorEffect.h" />
@@ -324,6 +325,7 @@
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp" />
     <ClCompile Include="..\private\LDInhalable.cpp" />
     <ClCompile Include="..\Private\LevelDesign_MonsterCatalog.cpp" />
+    <ClCompile Include="..\Private\PoppyBrosJr_State_WindUp.cpp" />
     <ClCompile Include="..\private\RockBurst.cpp" />
     <ClCompile Include="..\private\RockEffect.cpp" />
     <ClCompile Include="..\private\RockFloorEffect.cpp" />

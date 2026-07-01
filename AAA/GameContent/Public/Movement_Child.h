@@ -53,7 +53,6 @@ public:
     virtual HRESULT Initialize(void* pArg) override;
 
 public:
-    // Rigidbody 메인 업데이트. 외부 입력 방향을 인자로 받지 않는다.
     _bool Update_RigidBody(_float fTimeDelta);
 
     _bool Check_GroundBelow();
@@ -94,7 +93,7 @@ public:
     void Set_UseGravity(_bool bUseGravity);
     void Set_UseGroundFriction(_bool bUseGroundFriction);
     void Set_StopHorizontalOnSideHit(_bool bStop) { m_bStopHorizontalOnSideHit = bStop; }
-
+    void Set_RotationSpeed(_float fDegree) { m_fRotation_Speed_Degree = fDegree; }
     // 정지 / 초기화.
     void Stop();
     void Stop_Horizontal();

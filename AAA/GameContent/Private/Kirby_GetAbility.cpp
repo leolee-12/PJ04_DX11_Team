@@ -95,7 +95,7 @@ void CKirby_GetAbility::Parts_On(CKirby* pKirby, _float fRatio)
 {
     if (m_bPartsOn == false && fRatio >= 0.3f)
     {
-        pKirby->OnOffParts(pKirby->Get_KirbyAbility()->Get_AbilityType(), true);
+        pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), true);
 
         m_bPartsOn = true;
     }

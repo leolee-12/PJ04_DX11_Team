@@ -81,7 +81,7 @@ void CKirby_AbilityDump::Parts_Off(CKirby* pKirby, _float fRatio)
 {
     if (m_bPartsOff == false && fRatio >= 0.45f)
     {
-        pKirby->OnOffParts(pKirby->Get_KirbyAbility()->Get_AbilityType(), false);
+        pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), false);
         pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::NORMAL);
         m_bPartsOff = true;
     }
