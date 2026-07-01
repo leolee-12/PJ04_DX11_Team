@@ -75,6 +75,7 @@
     <ClInclude Include="..\public\RockEffect.h" />
     <ClInclude Include="..\public\RockFloorEffect.h" />
     <ClInclude Include="..\Public\SmokeParticle.h" />
+    <ClInclude Include="..\Public\StarParticle.h" />
     <ClInclude Include="..\Public\Sword_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\MeshLayer_Binder.h" />
     <ClInclude Include="..\Public\MeshLayer_Profile.h" />
@@ -335,6 +336,7 @@
     <ClCompile Include="..\private\RockEffect.cpp" />
     <ClCompile Include="..\private\RockFloorEffect.cpp" />
     <ClCompile Include="..\Private\SmokeParticle.cpp" />
+    <ClCompile Include="..\Private\StarParticle.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\MeshLayer_Binder.cpp" />
     <ClCompile Include="..\Private\MeshLayer_Profile.cpp" />

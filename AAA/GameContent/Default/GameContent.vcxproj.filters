@@ -1620,6 +1620,9 @@
     <ClInclude Include="..\Public\BoostGas.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. BoostGas</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\StarParticle.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. StarParticle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2314,6 +2317,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\BoostGas.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. BoostGas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\StarParticle.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. StarParticle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
