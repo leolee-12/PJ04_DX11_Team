@@ -50,6 +50,8 @@
     <ClInclude Include="..\Public\Cappy_Body.h" />
     <ClInclude Include="..\Public\Cappy_Brain.h" />
     <ClInclude Include="..\Public\Cappy_Hat.h" />
+    <ClInclude Include="..\Public\CarMilkyWay.h" />
+    <ClInclude Include="..\Public\Car_00_MilkyWay.h" />
     <ClInclude Include="..\Public\Character.h" />
     <ClInclude Include="..\Public\Character_States.h" />
     <ClInclude Include="..\Public\Common_Circle01.h" />
@@ -314,6 +316,8 @@
     <ClCompile Include="..\Private\Cappy_Body.cpp" />
     <ClCompile Include="..\Private\Cappy_Brain.cpp" />
     <ClCompile Include="..\Private\Cappy_Hat.cpp" />
+    <ClCompile Include="..\Private\CarMilkyWay.cpp" />
+    <ClCompile Include="..\Private\Car_00_MilkyWay.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Common_Circle01.cpp" />
     <ClCompile Include="..\Private\Common_Curve03.cpp" />

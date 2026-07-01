@@ -61,6 +61,7 @@
 #include "DespawnEffect.h"
 
 #include "BoostGas.h"
+#include "CarMilkyWay.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -80,6 +81,7 @@
 #include "SmokeParticle.h"
 #include "SmokeEmitter.h"
 #include "SpinWind.h"
+#include "Car_00_MilkyWay.h"
 
 //sky
 #include "SkySphere.h"
@@ -314,13 +316,6 @@ void CGameObject_Factory::Register_Test()
                 CSmokeTail::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeTail"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeTail/Model_SmokeTail.ysh"));
-
-            //TRY_ADD_PROTO(pProxy, iLevelIndex, CTestParticle::PROTOTYPE_TAG,
-            //    CTestParticle::Create(pDevice, pContext));
-            //TRY_ADD_PROTO(pProxy, iLevelIndex, CTestMeshParticle::PROTOTYPE_TAG,
-            //    CTestMeshParticle::Create(pDevice, pContext));
-            //TRY_ADD_PROTO(pProxy, iLevelIndex, CTestMeshEmitter::PROTOTYPE_TAG,
-            //    CTestMeshEmitter::Create(pDevice, pContext));
         )
     );
 
@@ -721,6 +716,17 @@ void CGameObject_Factory::Register_Effect()
                 CSmokeEmitter::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    // 2
+    Register(CCarMilkyWay::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CCarMilkyWay),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCar_00_MilkyWay::PROTOTYPE_TAG,
+                CCar_00_MilkyWay::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Car_00_MilkyWay"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/CarMilkyWay/Car_00_MilkyWay.ysh"));
         )
     );
 
