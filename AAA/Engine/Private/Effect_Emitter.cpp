@@ -39,9 +39,17 @@ void CEffect_Emitter::Priority_Update(_float fTimeDelta)
 
 void CEffect_Emitter::Update(_float fTimeDelta)
 {
+    m_bEmitterParticlesUpdatedThisFrame = false;
+
     __super::Update(fTimeDelta);
 
-    if (m_bActive == false && m_bEmitterWasActive == true)
+    if (m_bEmissionEnabled == false && m_bEmitterParticlesUpdatedThisFrame == false)
+    {
+        Update_EmitterParticles(fTimeDelta);
+        m_bActive = Has_AliveParticle();
+    }
+
+    if (m_bEmissionEnabled == true && m_bActive == false && m_bEmitterWasActive == true)
     {
         Reset_Emitter();
         m_bEmitterWasActive = false;
@@ -67,6 +75,19 @@ void CEffect_Emitter::Effect_Start()
     Reset_Emitter();
     m_fEmitterPreviousRatio = 0.f;
     m_bEmitterWasActive = false;
+    m_bEmissionEnabled = true;
+    m_bEmitterParticlesUpdatedThisFrame = false;
+}
+
+void CEffect_Emitter::Stop_Emission()
+{
+    m_bEmissionEnabled = false;
+    m_fEmitterSpawnAccumulator = 0.f;
+}
+
+_bool CEffect_Emitter::Is_EmissionFinished() const
+{
+    return m_bEmissionEnabled == false && Has_AliveParticle() == false;
 }
 
 HRESULT CEffect_Emitter::Bind_ShaderValue()
@@ -188,12 +209,12 @@ void CEffect_Emitter::Update_Core(const _float fTimeDelta, const _float fRatio)
     const _bool bLoopRestart = m_bEmitterWasActive == true &&
         fRatio + Helper::fEpsilon < m_fEmitterPreviousRatio;
 
-    if (bFirstActivation == true)
+    if (m_bEmissionEnabled == true && bFirstActivation == true)
     {
         Reset_Emitter();
         Emit_Particles(m_iEmitterBurstCount);
     }
-    else if (bLoopRestart == true)
+    else if (m_bEmissionEnabled == true && bLoopRestart == true)
     {
         Emit_Particles(m_iEmitterBurstCount);
     }
@@ -208,6 +229,7 @@ void CEffect_Emitter::Update_Core(const _float fTimeDelta, const _float fRatio)
         Emit_ByRate(fTimeDelta);
 
     Update_EmitterParticles(fTimeDelta);
+    m_bEmitterParticlesUpdatedThisFrame = true;
 }
 
 void CEffect_Emitter::Reset_Emitter()
@@ -660,6 +682,9 @@ void CEffect_Emitter::Update_EmitterParticleColor(EMITTER_PARTICLE& Particle, _f
 
 _bool CEffect_Emitter::Can_Emit() const
 {
+    if (m_bEmissionEnabled == false)
+        return false;
+
     const _float fPartDuration = Get_PartDuration();
     if (fPartDuration <= Helper::fEpsilon)
         return false;

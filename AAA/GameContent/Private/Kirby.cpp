@@ -634,7 +634,7 @@ HRESULT CKirby::Ready_AnimEvents()
 
                     _float3 fPos{};
                     XMStoreFloat3(&fPos, m_pTransformCom->Get_State(STATE::POSITION) + XMVectorSet(0.f, 0.2f, 0.f, 0.f) +
-                        vBackDir * fBackOffset + vRightDir * fSideOffset * e.iIntParam);
+                        vBackDir * fBackOffset + vRightDir * fSideOffset * static_cast<_float>(e.iIntParam));
 
                     _float3 vSpawnLook{};
                     XMStoreFloat3(&vSpawnLook, vBackDir);

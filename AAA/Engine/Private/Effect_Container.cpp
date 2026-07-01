@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 
 #include "Effect_Part.h"
+#include "Effect_Emitter.h"
 
 #include "Effect_Manager.h"
 
@@ -55,9 +56,10 @@ void CEffect_Container::Update(_float fTimeDelta)
     if (m_bIsPlay == false)
         return;
 
-    m_fAccTime += fTimeDelta;
+    if (m_bWaitForEmitters == false)
+        m_fAccTime += fTimeDelta;
 
-    if (m_fAccTime >= m_fDuration)
+    if (m_bWaitForEmitters == false && m_fAccTime >= m_fDuration)
     {
         if (m_bLoop == true)
         {
@@ -80,10 +82,11 @@ void CEffect_Container::Update(_float fTimeDelta)
         if (pPart->Get_IsPlay() == false)
             continue;
 
-        pPart->Update_PlayValue(m_bIsPlay, m_bLoop, m_fDuration, m_fAccTime);
+        pPart->Update_PlayValue(m_bIsPlay, m_bWaitForEmitters == true ? true : m_bLoop, m_fDuration, m_fAccTime);
         pPart->Update(fTimeDelta);
     }
 
+    Update_WaitForEmitters();
     Update_FadeOut();
 }
 
@@ -118,6 +121,7 @@ HRESULT CEffect_Container::Render()
 void CEffect_Container::EffectContainer_Start(const _float3& vSpawnPos, const _float3& vLookDir, const _float4x4* pParentMatrix)
 {
     m_bFadeOutRequested = false;
+    m_bWaitForEmitters = false;
 
     for (auto& [tag, pPart] : m_EffestParts)
         pPart->Effect_Start();
@@ -155,6 +159,39 @@ void CEffect_Container::EffectContainer_Stop()
 
     if (m_pPool)
         m_pPool->Return(m_iPoolLevel, m_strPoolKey, this);
+}
+
+void CEffect_Container::EffectContainer_StopAfterEmission()
+{
+    if (m_bIsPlay == false)
+        return;
+
+    m_bFadeOutRequested = false;
+
+    _bool bHasEmitter = false;
+
+    for (auto& [tag, pPart] : m_EffestParts)
+    {
+        CEffect_Emitter* pEmitter = dynamic_cast<CEffect_Emitter*>(pPart);
+        if (pEmitter != nullptr)
+        {
+            pEmitter->Stop_Emission();
+            pEmitter->Update_PlayValue(true, true, m_fDuration, m_fAccTime);
+            bHasEmitter = true;
+            continue;
+        }
+
+        pPart->Update_PlayValue(false, m_bLoop, m_fDuration, m_fAccTime);
+    }
+
+    if (bHasEmitter == false)
+    {
+        EffectContainer_Stop();
+        return;
+    }
+
+    m_bWaitForEmitters = true;
+    Update_WaitForEmitters();
 }
 
 void CEffect_Container::Start_FadeOut(_float fFadeOutDuration)
@@ -256,6 +293,22 @@ void CEffect_Container::Update_FadeOut()
         EffectContainer_Stop();
 }
 
+void CEffect_Container::Update_WaitForEmitters()
+{
+    if (m_bWaitForEmitters == false)
+        return;
+
+    for (auto& [tag, pPart] : m_EffestParts)
+    {
+        CEffect_Emitter* pEmitter = dynamic_cast<CEffect_Emitter*>(pPart);
+        if (pEmitter != nullptr && pEmitter->Is_EmissionFinished() == false)
+            return;
+    }
+
+    m_bWaitForEmitters = false;
+    EffectContainer_Stop();
+}
+
 void CEffect_Container::Debug_ResetPlay()
 {
     if (m_bPreResetPlayDoubleCheck == false && m_bResetPlayDoubleCheck == true)
@@ -302,6 +355,7 @@ void CEffect_Container::Init_PropetyValue()
     m_bResetPlayDoubleCheck = { false };
 
     m_bIsPlay = { true };
+    m_bWaitForEmitters = false;
 
     m_bLoop = { true };
 

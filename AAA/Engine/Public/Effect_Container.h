@@ -66,6 +66,7 @@ public:
 
     void EffectContainer_Start(const _float3& vSpawnPos, const _float3& vLookDir = {0.f, 0.f, 0.f}, const _float4x4* pParentMatrix = nullptr);
     void EffectContainer_Stop();
+    void EffectContainer_StopAfterEmission();
     void Start_FadeOut(_float fFadeOutDuration = 0.3f);
 
     void Set_ParentMatrix(const _float4x4* pParentMatrix);
@@ -99,9 +100,11 @@ protected:
     _wstring m_strPoolKey;
 
     _bool m_bFadeOutRequested{};
+    _bool m_bWaitForEmitters{};
 
 private:
     void Update_FadeOut();
+    void Update_WaitForEmitters();
 
     // Debug
     _bool m_bPreResetPlayDoubleCheck{};

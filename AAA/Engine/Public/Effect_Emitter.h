@@ -182,6 +182,9 @@ public:
 
     virtual void    Effect_Start() override;
 
+    void Stop_Emission();
+    _bool Is_EmissionFinished() const;
+
 protected:
     HRESULT Bind_ShaderValue();
 
@@ -232,6 +235,8 @@ protected:
     _float m_fEmitterSpawnAccumulator{};
     _float m_fEmitterPreviousRatio{};
     _bool m_bEmitterWasActive{};
+    _bool m_bEmissionEnabled{ true };
+    _bool m_bEmitterParticlesUpdatedThisFrame{};
 
     _float3 m_fPivot{};
 
