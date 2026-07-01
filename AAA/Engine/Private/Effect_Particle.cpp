@@ -63,6 +63,12 @@ void CEffect_Particle::Effect_Start()
     Reset_Particles();
 }
 
+void CEffect_Particle::On_Deserialized()
+{
+    __super::On_Deserialized();
+    Reset_Particles();
+}
+
 HRESULT CEffect_Particle::Bind_ShaderValue()
 {
     if (FAILED(__super::Bind_ShaderValue()))

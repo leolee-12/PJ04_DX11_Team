@@ -27,7 +27,7 @@ namespace Client
         MoveWindow = 15,
         Projectile = 16,
         OnOffMesh = 17,
-        KirbySetEye = 18,
+        WalkSmoke = 18,
         // 추가는 항상 끝에, 기존 값 변경 금지 (저장 데이터 안정성)
     };
 
@@ -52,6 +52,6 @@ namespace Client
         { EANIM_EVENT::MoveWindow,  "MoveWindow" },
         { EANIM_EVENT::Projectile,  "Projectile" },
         { EANIM_EVENT::OnOffMesh,   "OnOffMesh" },
-        { EANIM_EVENT::KirbySetEye, "KirbySetEye" },
+        { EANIM_EVENT::WalkSmoke, "WalkSmoke" },
     };
 }

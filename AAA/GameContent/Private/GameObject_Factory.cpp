@@ -60,6 +60,8 @@
 #include "RockBurst.h"
 #include "DespawnEffect.h"
 
+#include "BoostGas.h"
+
 // Effect_Part
 #include "SmokeSphereOriginal.h"
 #include "SmokeLowPoly.h"
@@ -426,6 +428,8 @@ void CGameObject_Factory::Register_Test()
         )
     );
 
+
+
     Register(CTestTriggerBox::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
         CREATOR(CTestTriggerBox),
         LOADER()
@@ -681,6 +685,7 @@ void CGameObject_Factory::Register_AnimObject()
 
 void CGameObject_Factory::Register_Effect()
 {
+    // 0
     Register(CRockBurst::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CRockBurst),
         LOADER
         (
@@ -692,6 +697,20 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
+
+
+    // 1
+    Register(CBoostGas::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CBoostGas),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeSphereOriginal::PROTOTYPE_TAG,
+                CSmokeSphereOriginal::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    // 2
     Register(CDespawnEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), 
         CREATOR(CDespawnEffect),
         LOADER

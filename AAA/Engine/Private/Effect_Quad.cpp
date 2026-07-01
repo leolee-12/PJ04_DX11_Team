@@ -111,6 +111,9 @@ HRESULT CEffect_Quad::Bind_ShaderValue()
     if (FAILED(__super::Bind_ShaderValue()))
         return E_FAIL;
 
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bBillboard", &m_bBillboard, sizeof(m_bBillboard))))
+        return E_FAIL;
+
     if (FAILED(m_pShaderCom->Bind_RawValue("g_bSpriteAniTexture", &m_bSpriteAniTexture, sizeof(m_bSpriteAniTexture))))
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vSpriteAniTexUV", &m_fCurTexAniUV, sizeof(m_fCurTexAniUV))))
@@ -185,6 +188,8 @@ void CEffect_Quad::Update_MaskSpriteAnimation(const _float fTimeDelta, const _fl
 
 void CEffect_Quad::Init_PropertyValue()
 {
+    m_bBillboard = false;
+
     m_bSpriteAniTexture = false;
     m_iTexFrameX = 1;
     m_iTexFrameY = 1;

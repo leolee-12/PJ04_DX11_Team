@@ -26,6 +26,7 @@
     <ClInclude Include="..\Public\BladeKnight_State_DoubleAttack.h" />
     <ClInclude Include="..\Public\BladeKnight_Sword.h" />
     <ClInclude Include="..\Public\BladeKnight_State_TornadoAttack.h" />
+    <ClInclude Include="..\Public\BoostGas.h" />
     <ClInclude Include="..\public\Boss.h" />
     <ClInclude Include="..\public\BossBase.h" />
     <ClInclude Include="..\public\BossNamePlate.h" />
@@ -286,6 +287,7 @@
     <ClCompile Include="..\Private\BladeKnight_State_DoubleAttack.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Sword.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State_TornadoAttack.cpp" />
+    <ClCompile Include="..\Private\BoostGas.cpp" />
     <ClCompile Include="..\private\Boss.cpp" />
     <ClCompile Include="..\private\BossBase.cpp" />
     <ClCompile Include="..\private\BossNamePlate.cpp" />

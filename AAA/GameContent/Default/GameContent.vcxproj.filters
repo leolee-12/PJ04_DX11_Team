@@ -844,6 +844,9 @@
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\14. StarParticle">
       <UniqueIdentifier>{792d854b-212f-4720-bb96-6f9577206865}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\08. BoostGas">
+      <UniqueIdentifier>{f3d3b293-2e65-42ed-b5f1-fd201a943c21}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1614,6 +1617,9 @@
     <ClInclude Include="..\Public\SmokeParticle.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\13. SmokeParticle</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BoostGas.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. BoostGas</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2305,6 +2311,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\SmokeParticle.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\13. SmokeParticle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BoostGas.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. BoostGas</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
