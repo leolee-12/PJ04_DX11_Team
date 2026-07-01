@@ -62,6 +62,14 @@ void CMonster_Movement::Face_Instant(_fvector vWorldTarget)
 	m_pTransform->LookAt(vAt);
 }
 
+void CMonster_Movement::Set_WindowMoveSpeed(_float fPeak, _float p01)
+{
+	if (p01 < 0.f) p01 = 0.f;
+	else if (p01 > 1.f) p01 = 1.f;
+
+	Set_MoveSpeed(fPeak * sinf(XM_PI * p01));
+}
+
 void CMonster_Movement::Launch(_fvector vHorizDir, _float fHorizSpeed, _float fUpSpeed)
 {
 	// 수평 방향

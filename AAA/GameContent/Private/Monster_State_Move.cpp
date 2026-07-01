@@ -29,9 +29,28 @@ void CMonster_State_Move::Update(_float fTimeDelta)
 	if (m_pOwner == nullptr)
 		return;
 
-	// MoveWindow를 쓰는 상태라면  bCanMove여야 한다라는 의미
-	if (!Is_UseMoveWindow() || m_pOwner->Get_BlackBoard().bCanMove)
+	// 일반 이동 : 고정 속도 그대로
+	if (!Is_UseMoveWindow())
+	{
 		Apply_Movement(fTimeDelta);
+		return;
+	}
+
+	const auto& bb = m_pOwner->Get_BlackBoard();
+	if (!bb.bCanMove)
+		return;
+
+	_float lo = bb.fMoveWinLo;
+	_float span = bb.fMoveWinHi - lo;
+	_float p = 0.5f;
+
+	if (span > 1e-4f && m_pAnimator)
+		p = (m_pAnimator->Get_Progress() - lo) / span;
+
+	if (m_pMovement)
+		m_pMovement->Set_WindowMoveSpeed(m_fSpeed, p);
+
+	Apply_Movement(fTimeDelta);
 }
 
 void CMonster_State_Move::Exit(MONSTER_STATE_TYPE eNextState)

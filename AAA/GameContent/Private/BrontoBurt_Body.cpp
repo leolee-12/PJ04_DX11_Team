@@ -80,6 +80,7 @@ HRESULT CBrontoBurt_Body::Ready_Components()
     t.tShader = Shader_AnimMesh_PBR;
     t.szModelProtoTag =
         TEXT("Prototype_Component_Model_BrontoBurt_Body");
+    t.szAnimEventFile = TEXT("../../Resources/CHJ/Monster/BrontoBurt/BrontoBurt_AnimEvents.json");
 
     if (FAILED(Ready_MeshPart(t)))
         return E_FAIL;

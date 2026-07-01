@@ -35,18 +35,6 @@ HRESULT CNormalEnemy_Body::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CNormalEnemy_Body::Update(_float fTimeDelta)
-{
-	__super::Update(fTimeDelta);
-
-	m_fEyeTestTimer += fTimeDelta;
-	if (m_fEyeTestTimer >= 1.2f)
-	{
-		m_fEyeTestTimer = 0.f;
-		Set_Eye((m_iEyeIndex + 1) % EYE_COUNT);
-	}
-}
-
 HRESULT CNormalEnemy_Body::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
@@ -90,7 +78,7 @@ HRESULT CNormalEnemy_Body::Ready_Components()
 	PART_SETUP t{};
 	t.tShader = Shader_AnimMesh_PBR;
 	t.szModelProtoTag = TEXT("Prototype_Component_Model_NormalEnemy_Body");
-
+	t.szAnimEventFile =	TEXT("../../Resources/CHJ/Monster/NormalEnemy/NormalEnemy_AnimEvents.json");
 	if (FAILED(Ready_MeshPart(t)))
 		return E_FAIL;
 

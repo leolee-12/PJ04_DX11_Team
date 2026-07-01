@@ -14,8 +14,6 @@ class CBrontoBurt final : public CMonster, public IRailDataReceiver
 {
 	GENERATED_BODY(CBrontoBurt)
 
-    PROPERTY(_int, m_iAIType, L"AI Type", L"AI")     // 0은 레일 이동형 / 1은 범위 내 플레이어 추격형(미구현!!!)
-
 public:
     struct BRONTOBURT_DESC : public CContainerObject::COTAINEROBJECT_DESC
     {
@@ -52,13 +50,15 @@ public:
     // IRailDataReceiver
     virtual void            Set_RailDesc(const LD_RAIL_DESC& Desc) override;
 
-    _int                    Get_AIType() const { return m_iAIType; }
-
 protected:
     virtual CMonsterBrain*  Create_Brain() override;
     virtual HRESULT         Create_Movement() override;
-    virtual HRESULT         Ready_State(CMonster_StateMachine* pStateMachine) override;
+    virtual HRESULT         Ready_State() override;
     virtual HRESULT         Ready_AnimEvents() override;
+
+    virtual void            Apply_AIVariation(const _wstring& strVariation) override;
+
+    virtual void            On_Exit(MONSTER_STATE_TYPE eNextState) override;
 
 private:
     virtual HRESULT         Ready_PartObjects() override;

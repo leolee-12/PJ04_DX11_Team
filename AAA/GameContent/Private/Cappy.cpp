@@ -11,13 +11,11 @@
 
 CCappy::CCappy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
-	, m_iAIType{ 0 }
 {
 }
 
 CCappy::CCappy(const CCappy& Prototype)
 	: CMonster ( Prototype )
-	, m_iAIType{ Prototype.m_iAIType }
 {
 }
 
@@ -90,7 +88,7 @@ CMonsterBrain* CCappy::Create_Brain()
 	return CCappy_Brain::Create(this);
 }
 
-HRESULT CCappy::Ready_State(CMonster_StateMachine* pStateMachine)
+HRESULT CCappy::Ready_State()
 {
 	if (nullptr == m_pStateMachine)
 		return E_FAIL;
@@ -111,6 +109,15 @@ HRESULT CCappy::Ready_State(CMonster_StateMachine* pStateMachine)
 HRESULT CCappy::Ready_AnimEvents()
 {
 	return S_OK;
+}
+
+void CCappy::Apply_AIVariation(const _wstring& strVariation)
+{
+	// Wait=0(제자리) / WaitPursuit=1(추격) / MoveTurnCliff=순찰(엔진 대응 타입 없음)
+	if (strVariation == L"WaitPursuit")
+		m_iAIType = 1;
+	else
+		m_iAIType = 0;		 // Wait + MoveTurnCliff(일단 0)
 }
 
 HRESULT CCappy::Ready_PartObjects()

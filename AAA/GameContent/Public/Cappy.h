@@ -15,8 +15,6 @@ class CCappy final : public CMonster
 {
 	GENERATED_BODY(CCappy)
 
-	PROPERTY(_int, m_iAIType, L"AI Type", L"AI")	// 0은 고정형 / 1은 플레이어 추격형
-
 public:
 	struct CAPPY_DESC : public CContainerObject::COTAINEROBJECT_DESC
 	{
@@ -55,12 +53,12 @@ public:
 	CCappy_Body*				Get_Body() { return m_pBody; }
 	CCappy_Hat*					Get_Hat() { return m_pHat; }
 
-	_int						Get_AIType() { return m_iAIType; }
-
 protected:
 	virtual CMonsterBrain*		Create_Brain() override;
-	virtual HRESULT				Ready_State(CMonster_StateMachine* pStateMachine) override;
+	virtual HRESULT				Ready_State() override;
 	virtual HRESULT				Ready_AnimEvents() override;
+
+	virtual void				Apply_AIVariation(const _wstring& strVariation) override;
 
 private:
 	virtual HRESULT				Ready_PartObjects() override;

@@ -19,6 +19,10 @@ struct LD_OBJECT_DESC : public CGameObject::GAMEOBJECT_DESC
 	_wstring strObjectName;
 	_wstring strKind;
 
+	// 호준 추가
+	_wstring strAIVariation;
+	_wstring strThrowLv;
+
 	_uint iUid = 0;
 	_uint iEventReceiverId = LD_INVALID_ID;
 	_uint iEventSenderId = LD_INVALID_ID;

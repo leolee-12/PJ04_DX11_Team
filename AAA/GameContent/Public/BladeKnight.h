@@ -16,8 +16,6 @@ class CBladeKnight final : public CMonster
 {
 	GENERATED_BODY(CBladeKnight)
 
-	PROPERTY(_int, m_iAIType, L"AI Type", L"AI") // 0은 고정형, 1은 자유 이동형
-
 public:
 	struct BLADEKNIGHT_DESC : public CContainerObject::COTAINEROBJECT_DESC
 	{
@@ -47,7 +45,7 @@ public:
 	
 	virtual _float				Get_CapsuleRadius() const override { return 0.5f; }
 	virtual _float				Get_CapsuleHeight() const override { return 0.75f; }
-	virtual _float				Get_InteractRadius() const override { return (m_iAIType == 0) ? 15.f : 10.f; }
+	virtual _float				Get_InteractRadius() const override { return 15.f; }
 	virtual _bool				Get_HurtBoxDesc(CAPSULE_DESC& Out) const override;
 
 	virtual CAnimator*			Get_BodyAnimator() const override;
@@ -56,13 +54,12 @@ public:
 	CBladeKnight_Body*			Get_Body() { return m_pBody; }
 	CBladeKnight_Sword*			Get_Sword() { return m_pSword; }
 
-	// BladeKnight 고정형/자유 이동형 설정
-	_int						Get_AIType() { return m_iAIType; }
-
 protected:
 	virtual CMonsterBrain*		Create_Brain() override;
-	virtual HRESULT				Ready_State(CMonster_StateMachine* pStateMachine) override;
+	virtual HRESULT				Ready_State() override;
 	virtual HRESULT				Ready_AnimEvents() override;
+
+	virtual void				Apply_AIVariation(const _wstring& strVariation) override;
 
 private:
 	virtual HRESULT				Ready_PartObjects() override;

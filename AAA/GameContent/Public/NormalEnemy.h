@@ -15,8 +15,6 @@ class CNormalEnemy final : public CMonster
 {
 	GENERATED_BODY(CNormalEnemy)
 
-	PROPERTY(_int, m_iAIType, L"AI Type", L"AI")		// 0은 제자리 고정 대기형 / 1은 범위 내 순찰(자유 이동)
-
 public:
 	struct NORMALENEMY_DESC : public CContainerObject::COTAINEROBJECT_DESC
 	{
@@ -46,17 +44,19 @@ public:
 
 	virtual _float				Get_CapsuleRadius() const override { return 0.5f; }
 	virtual _float				Get_CapsuleHeight() const override { return 1.f; }
-	virtual _float				Get_InteractRadius() const override { return 10.f; }
+	virtual _float				Get_InteractRadius() const override { return 14.f; }
 	virtual _bool				Get_HurtBoxDesc(CAPSULE_DESC& Out) const override;
 
 	virtual CAnimator*			Get_BodyAnimator() const override;
 
-	_int						Get_AIType() const { return m_iAIType; }
-
 protected:
 	virtual CMonsterBrain*		Create_Brain() override;
-	virtual HRESULT				Ready_State(CMonster_StateMachine* pStateMachine) override;
+	virtual HRESULT				Ready_State() override;
 	virtual HRESULT				Ready_AnimEvents() override;
+
+	virtual void				Apply_AIVariation(const _wstring& strVariation) override;
+
+	virtual void				On_Exit(MONSTER_STATE_TYPE eNextState) override;
 
 private:
 	HRESULT						Ready_PartObjects();
