@@ -2473,5 +2473,8 @@
     <FxCompile Include="..\ShaderFiles\Shader_EffectRock.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_Monster.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

@@ -553,6 +553,7 @@
     <FxCompile Include="..\ShaderFiles\Shader_Kirby.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_MapEx.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_MaterialTest.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_Monster.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_SkySphere.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_UI.hlsl">

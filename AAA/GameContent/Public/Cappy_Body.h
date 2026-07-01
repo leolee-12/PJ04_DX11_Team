@@ -23,7 +23,6 @@ private:
     virtual HRESULT         Initialize_Prototype() override;
     virtual HRESULT         Initialize(void* pArg) override;
     virtual void            Update(_float fTimeDelta) override;
-    virtual HRESULT         Render() override;
 
 public:
     virtual void            Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override
