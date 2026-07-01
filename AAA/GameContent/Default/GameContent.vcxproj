@@ -59,6 +59,7 @@
     <ClInclude Include="..\Public\Common_SpinSlash.h" />
     <ClInclude Include="..\Public\Common_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\DespawnEffect.h" />
+    <ClInclude Include="..\public\Gorilla_DeathSmoke.h" />
     <ClInclude Include="..\Public\Kirby_DeformCar_Demo.h" />
     <ClInclude Include="..\Public\Kirby_DeformCar_Main.h" />
     <ClInclude Include="..\Public\Kirby_Deform_Car.h" />
@@ -76,6 +77,7 @@
     <ClInclude Include="..\public\RockFloorEffect.h" />
     <ClInclude Include="..\Public\SmokeParticle.h" />
     <ClInclude Include="..\Public\StarParticle.h" />
+    <ClInclude Include="..\public\SpinWind.h" />
     <ClInclude Include="..\Public\Sword_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\MeshLayer_Binder.h" />
     <ClInclude Include="..\Public\MeshLayer_Profile.h" />
@@ -320,6 +322,7 @@
     <ClCompile Include="..\Private\Common_SpinSlash.cpp" />
     <ClCompile Include="..\Private\Common_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\DespawnEffect.cpp" />
+    <ClCompile Include="..\private\Gorilla_DeathSmoke.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCar_Demo.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCar_Main.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform_Car.cpp" />
@@ -337,6 +340,7 @@
     <ClCompile Include="..\private\RockFloorEffect.cpp" />
     <ClCompile Include="..\Private\SmokeParticle.cpp" />
     <ClCompile Include="..\Private\StarParticle.cpp" />
+    <ClCompile Include="..\private\SpinWind.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\MeshLayer_Binder.cpp" />
     <ClCompile Include="..\Private\MeshLayer_Profile.cpp" />

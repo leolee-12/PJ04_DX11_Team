@@ -40,7 +40,7 @@ void IReflectable::Deserialize_Internal(const json& j)
         switch (prop.eType)
         {
             case PROP_TYPE::INT:   *(int*)pData = j[strKey].get<int>();   break;
-            case PROP_TYPE::UINT:  *(_uint*)pData = j[strKey].get<int>();   break;
+            case PROP_TYPE::UINT:   *(_uint*)pData = j[strKey].get<_uint>();   break;
             case PROP_TYPE::FLOAT: *(float*)pData = j[strKey].get<float>(); break;
             case PROP_TYPE::BOOL:  *(bool*)pData = j[strKey].get<bool>();  break;
             case PROP_TYPE::FLOAT2:
