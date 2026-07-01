@@ -10,6 +10,8 @@
 #include "Projectile_Boulder.h"
 #include "Projectile_Manager.h"
 
+#include "Effect_Loader.h"
+
 // 3페이즈: 66%, 33% 에서 전환 (PhaseCount = size()+1 = 3) Brain의 Get_PhaseCount와 일치!
 const vector<_float> CBoss_Gorilla::s_Thresholds = { 0.5f };
 
@@ -129,6 +131,16 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
     pAnim->Set_EventCallback([this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase) {
         switch (static_cast<EANIM_EVENT>(e.iEventType))
         {
+            case EANIM_EVENT::Fx:
+            {
+                if (!e.strParam.empty())
+                {
+                    _float3 vPos{};
+                    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+                    CEffect_Loader::GetInstance()->Spawn(StrToWstr(e.strParam), m_iPrototypeLevel, vPos);
+                }
+                break;
+            }
             case EANIM_EVENT::CamTrack:
             {
                 if (e.strParam.empty())
