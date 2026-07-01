@@ -14,9 +14,8 @@ class CLIENT_DLL CEffect_Loader final : public CBase
     DECLARE_SINGLETON(CEffect_Loader)
 
 public:
-    // 시작 시 1회: 매니페스트 읽어 STATIC 프로토 등록 + 작성값 캐시
-    HRESULT Ready(const _tchar* strManifestPath,
-        CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    // 시작 시 1회: STATIC 프로토 등록 + 작성값 캐시
+    HRESULT Ready(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
     // 이펙트 스폰해줘
     HRESULT Spawn(const _wstring& strEffectId, _uint iTargetLevel,
