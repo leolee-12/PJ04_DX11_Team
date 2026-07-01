@@ -67,11 +67,11 @@ PROPERTY(_bool, m_bParticleAlphaChange, L"Alpha Change_P", L"Particle Alpha");
 PROPERTY(_float, m_fParticleAlphaStartValue, L"Alpha_Start_P", L"Particle Alpha");
 PROPERTY(_float, m_fParticleAlphaEndValue, L"Alpha_End_P", L"Particle Alpha");
 
-PROPERTY(_bool, m_bActive_ParticleAlpha_Ratio_0, L"Active Ratio 0_P", L"Particle Alpha");
+PROPERTY(_bool, m_bActive_ParticleAlpha_Ratio_0, L"Alpha_Active Ratio 0_P", L"Particle Alpha");
 PROPERTY(_float, m_fParticleAlpha_Ratio_0, L"Alpha_Ratio 0_P", L"Particle Alpha");
 PROPERTY(_float, m_fParticleAlpha_Value_0, L"Alpha_Value 0_P", L"Particle Alpha");
 
-PROPERTY(_bool, m_bActive_ParticleAlpha_Ratio_1, L"Active Ratio 1_P", L"Particle Alpha");
+PROPERTY(_bool, m_bActive_ParticleAlpha_Ratio_1, L"Alpha_Active Ratio 1_P", L"Particle Alpha");
 PROPERTY(_float, m_fParticleAlpha_Ratio_1, L"Alpha_Ratio 1_P", L"Particle Alpha");
 PROPERTY(_float, m_fParticleAlpha_Value_1, L"Alpha_Value 1_P", L"Particle Alpha");
 
@@ -84,11 +84,11 @@ PROPERTY(_bool, m_bParticleSizeChange, L"Size Change_P", L"Particle Size");
 PROPERTY(_float, m_fParticleSizeStartValue, L"Size_Start_P", L"Particle Size");
 PROPERTY(_float, m_fParticleSizeEndValue, L"Size_End_P", L"Particle Size");
 
-PROPERTY(_bool, m_bActive_ParticleSize_Ratio_0, L"Active Ratio 0_P", L"Particle Size");
-PROPERTY(_float, m_fParticleSize_Ratio_0, L"Ratio 0_P", L"Particle Size");
-PROPERTY(_float, m_fParticleSize_Value_0, L"Value 0_P", L"Particle Size");
+PROPERTY(_bool, m_bActive_ParticleSize_Ratio_0, L"Size_Active Ratio 0_P", L"Particle Size");
+PROPERTY(_float, m_fParticleSize_Ratio_0, L"Size_Ratio 0_P", L"Particle Size");
+PROPERTY(_float, m_fParticleSize_Value_0, L"Size_Value 0_P", L"Particle Size");
 
-PROPERTY(_bool, m_bActive_ParticleSize_Ratio_1, L"Active Ratio 1_P", L"Particle Size");
+PROPERTY(_bool, m_bActive_ParticleSize_Ratio_1, L"Size_Active Ratio 1_P", L"Particle Size");
 PROPERTY(_float, m_fParticleSize_Ratio_1, L"Size_Ratio 1_P", L"Particle Size");
 PROPERTY(_float, m_fParticleSize_Value_1, L"Size_Value 1_P", L"Particle Size");
 
@@ -99,13 +99,13 @@ PROPERTY(_bool, m_bParticleColorChange, L"Color Change_P", L"Particle Color");
 PROPERTY(_float3, m_vParticleColorStartValue, L"Color_Start_P", L"Particle Color");
 PROPERTY(_float3, m_vParticleColorEndValue, L"Color_End_P", L"Particle Color");
 
-PROPERTY(_bool, m_bActive_ParticleColor_Ratio_0, L"Active Ratio 0_P", L"Particle Color");
-PROPERTY(_float, m_fParticleColor_Ratio_0, L"Ratio 0_P", L"Particle Color");
-PROPERTY(_float3, m_vParticleColor_Value_0, L"Value 0_P", L"Particle Color");
+PROPERTY(_bool, m_bActive_ParticleColor_Ratio_0, L"Color_Active Ratio 0_P", L"Particle Color");
+PROPERTY(_float, m_fParticleColor_Ratio_0, L"Color_Ratio 0_P", L"Particle Color");
+PROPERTY(_float3, m_vParticleColor_Value_0, L"Color_Value 0_P", L"Particle Color");
 
-PROPERTY(_bool, m_bActive_ParticleColor_Ratio_1, L"Active Ratio 1_P", L"Particle Color");
-PROPERTY(_float, m_fParticleColor_Ratio_1, L"Ratio 1_P", L"Particle Color");
-PROPERTY(_float3, m_vParticleColor_Value_1, L"Value 1_P", L"Particle Color");
+PROPERTY(_bool, m_bActive_ParticleColor_Ratio_1, L"Color_Active Ratio 1_P", L"Particle Color");
+PROPERTY(_float, m_fParticleColor_Ratio_1, L"Color_Ratio 1_P", L"Particle Color");
+PROPERTY(_float3, m_vParticleColor_Value_1, L"Color_Value 1_P", L"Particle Color");
 
 
 
