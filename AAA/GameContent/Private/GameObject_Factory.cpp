@@ -62,6 +62,7 @@
 #include "RockBounce.h"
 #include "RockPull.h"
 #include "RockPush.h"
+#include "Gorilla_Swing.h"
 #include "DespawnEffect.h"
 
 #include "BoostGas.h"
@@ -84,6 +85,7 @@
 #include "SmokeParticle.h"
 #include "SpinWind.h"
 #include "StarParticle.h"
+#include "Swing_Smoke.h"
 
 //sky
 #include "SkySphere.h"
@@ -752,6 +754,22 @@ void CGameObject_Factory::Register_Effect()
                 CSmokeParticle::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    Register(CGorilla_Swing::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CGorilla_Swing),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwing_Smoke::PROTOTYPE_TAG,
+                CSwing_Smoke::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpinWind::PROTOTYPE_TAG,
+                CSpinWind::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpinWind::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSH/Boss/Gorilla/ArmSpinWind/BossGorilla_00_TornadoPieceMedium.ysh"));
         )
     );
 

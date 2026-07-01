@@ -32,6 +32,8 @@ namespace
         { TEXT("RockPush"),              TEXT("../../Resources/YSH/Effects/Proto_RockPush_0.json") },
         { TEXT("RockPull"),              TEXT("../../Resources/YSH/Effects/Proto_RockPull_1.json") },
         { TEXT("RockBounce"),            TEXT("../../Resources/YSH/Effects/Proto_RockBounce_2.json") },
+        { TEXT("Gorilla_SwingR"),        TEXT("../../Resources/YSH/Effects/SwingR.json") },
+        { TEXT("Gorilla_SwingL"),        TEXT("../../Resources/YSH/Effects/SwingL.json") },
     };
 }
 

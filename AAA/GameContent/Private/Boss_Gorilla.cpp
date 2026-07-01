@@ -170,6 +170,14 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
                             CEffect_Loader::GetInstance()->Spawn(StrToWstr(e.strParam), m_iPrototypeLevel, vPos);
                             break;
                         }
+                        case 2:
+                        {
+                            _float3 vPos{}, vLook{};
+                            XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+                            XMStoreFloat3(&vLook, m_pTransformCom->Get_State(STATE::LOOK));
+                            CEffect_Loader::GetInstance()->Spawn(StrToWstr(e.strParam), m_iPrototypeLevel, vPos, vLook);
+                            break;
+                        }
                     }
                 }
                 break;
