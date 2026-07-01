@@ -191,6 +191,7 @@ protected:
     HRESULT Bind_ShaderValue();
 
 protected:
+    virtual void On_Deserialized() override;
     virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;
 
     void Reset_Particles();

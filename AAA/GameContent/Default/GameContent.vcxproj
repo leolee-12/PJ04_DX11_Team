@@ -26,6 +26,7 @@
     <ClInclude Include="..\Public\BladeKnight_State_DoubleAttack.h" />
     <ClInclude Include="..\Public\BladeKnight_Sword.h" />
     <ClInclude Include="..\Public\BladeKnight_State_TornadoAttack.h" />
+    <ClInclude Include="..\Public\BoostGas.h" />
     <ClInclude Include="..\public\Boss.h" />
     <ClInclude Include="..\public\BossBase.h" />
     <ClInclude Include="..\public\BossNamePlate.h" />
@@ -57,6 +58,7 @@
     <ClInclude Include="..\Public\Common_Ring03.h" />
     <ClInclude Include="..\Public\Common_SpinSlash.h" />
     <ClInclude Include="..\Public\Common_SpinSlashTrail.h" />
+    <ClInclude Include="..\Public\DespawnEffect.h" />
     <ClInclude Include="..\public\Gorilla_DeathSmoke.h" />
     <ClInclude Include="..\Public\Kirby_DeformCar_Demo.h" />
     <ClInclude Include="..\Public\Kirby_DeformCar_Main.h" />
@@ -73,6 +75,7 @@
     <ClInclude Include="..\public\RockBurst.h" />
     <ClInclude Include="..\public\RockEffect.h" />
     <ClInclude Include="..\public\RockFloorEffect.h" />
+    <ClInclude Include="..\Public\SmokeParticle.h" />
     <ClInclude Include="..\public\SpinWind.h" />
     <ClInclude Include="..\Public\Sword_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\MeshLayer_Binder.h" />
@@ -286,6 +289,7 @@
     <ClCompile Include="..\Private\BladeKnight_State_DoubleAttack.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Sword.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State_TornadoAttack.cpp" />
+    <ClCompile Include="..\Private\BoostGas.cpp" />
     <ClCompile Include="..\private\Boss.cpp" />
     <ClCompile Include="..\private\BossBase.cpp" />
     <ClCompile Include="..\private\BossNamePlate.cpp" />
@@ -316,6 +320,7 @@
     <ClCompile Include="..\Private\Common_Ring03.cpp" />
     <ClCompile Include="..\Private\Common_SpinSlash.cpp" />
     <ClCompile Include="..\Private\Common_SpinSlashTrail.cpp" />
+    <ClCompile Include="..\Private\DespawnEffect.cpp" />
     <ClCompile Include="..\private\Gorilla_DeathSmoke.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCar_Demo.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCar_Main.cpp" />
@@ -332,6 +337,7 @@
     <ClCompile Include="..\private\RockBurst.cpp" />
     <ClCompile Include="..\private\RockEffect.cpp" />
     <ClCompile Include="..\private\RockFloorEffect.cpp" />
+    <ClCompile Include="..\Private\SmokeParticle.cpp" />
     <ClCompile Include="..\private\SpinWind.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\MeshLayer_Binder.cpp" />

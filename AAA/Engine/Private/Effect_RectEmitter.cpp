@@ -140,6 +140,9 @@ HRESULT CEffect_RectEmitter::Bind_ShaderValue(_float fLocalRatio)
     if (FAILED(__super::Bind_ShaderValue()))
         return E_FAIL;
 
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bBillboard", &m_bBillboard, sizeof(m_bBillboard))))
+        return E_FAIL;
+
     Update_TexSpriteAnimation(fLocalRatio);
     Update_MaskSpriteAnimation(fLocalRatio);
 
@@ -239,6 +242,8 @@ void CEffect_RectEmitter::Update_MaskSpriteAnimation(_float fRatio)
 
 void CEffect_RectEmitter::Init_PropertyValue()
 {
+    m_bBillboard = false;
+
     m_bSpriteAniTexture = false;
     m_iTexFrameX = 1;
     m_iTexFrameY = 1;

@@ -54,7 +54,6 @@ public:
 
 private:
 	HRESULT Ready_Components();
-	HRESULT Ready_AnimEvents();
 
 	HRESULT Set_VisibleMeshes();
 

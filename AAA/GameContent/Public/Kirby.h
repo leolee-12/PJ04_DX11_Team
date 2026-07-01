@@ -146,6 +146,7 @@ private:
 	HRESULT Ready_Deform();
 	HRESULT Bind_ShaderResources();
 	virtual HRESULT Ready_Events() override;
+	HRESULT Ready_AnimEvents();
 
 	// Ability
 	void Set_KirbyAbility(COPY_ABILITY_TYPE eAbilityState);
