@@ -150,9 +150,27 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
             {
                 if (!e.strParam.empty())
                 {
-                    _float3 vPos{};
-                    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
-                    CEffect_Loader::GetInstance()->Spawn(StrToWstr(e.strParam), m_iPrototypeLevel, vPos);
+                    switch (e.iIntParam)
+                    {
+                        case 0:
+                        {
+                            _float3 vPos{};
+                            XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+                            CEffect_Loader::GetInstance()->Spawn(StrToWstr(e.strParam), m_iPrototypeLevel, vPos);
+                            break;
+                        }
+                        case 1:
+                        {
+                            _matrix BoneMatrix = XMLoadFloat4x4(m_pBody->Get_BoneMatrixPtr(THROW_BONE));
+                            _matrix Combindmat = XMMatrixMultiply(BoneMatrix, XMLoadFloat4x4(Get_Transform()->Get_WorldMatrixPtr()));
+                            Combindmat.r[3].m128_f32[1] = Get_Transform()->Get_State(STATE::POSITION).m128_f32[1];
+
+                            _float3 vPos{};
+                            XMStoreFloat3(&vPos, Combindmat.r[3]);
+                            CEffect_Loader::GetInstance()->Spawn(StrToWstr(e.strParam), m_iPrototypeLevel, vPos);
+                            break;
+                        }
+                    }
                 }
                 break;
             }

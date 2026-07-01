@@ -59,6 +59,9 @@
 #include "Sword_SpinSlashTrail.h"
 #include "RockBurst.h"
 #include "DeathSmoke.h"
+#include "RockBounce.h"
+#include "RockPull.h"
+#include "RockPush.h"
 #include "DespawnEffect.h"
 
 #include "BoostGas.h"
@@ -712,6 +715,36 @@ void CGameObject_Factory::Register_Effect()
     );
 
     Register(CDeathSmoke::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CDeathSmoke),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
+                CSmokeParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    Register(CRockBounce::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CRockBounce),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
+                CSmokeParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    Register(CRockPull::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CRockPull),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
+                CSmokeParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    Register(CRockPush::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CRockPush),
         LOADER
         (
             TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,

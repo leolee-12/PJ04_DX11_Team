@@ -856,6 +856,15 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\08. BoostGas">
       <UniqueIdentifier>{f3d3b293-2e65-42ed-b5f1-fd201a943c21}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\02. Gorilla_RockPush">
+      <UniqueIdentifier>{53dd3b59-90ba-4e75-835b-bab9a309f981}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\03. Gorilla_RockPull">
+      <UniqueIdentifier>{b803ddbf-3030-4582-92d7-db756d1af7cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\04. Gorilla_RockBounce">
+      <UniqueIdentifier>{59ccb4ac-2007-45f9-b03a-35c3dbb07621}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1635,6 +1644,15 @@
     <ClInclude Include="..\Public\BoostGas.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. BoostGas</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\RockPush.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\02. Gorilla_RockPush</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RockPull.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\03. Gorilla_RockPull</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RockBounce.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\04. Gorilla_RockBounce</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2335,6 +2353,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\BoostGas.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. BoostGas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RockPush.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\02. Gorilla_RockPush</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RockPull.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\03. Gorilla_RockPull</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RockBounce.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\04. Gorilla_RockBounce</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
