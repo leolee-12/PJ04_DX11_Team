@@ -68,7 +68,10 @@ HRESULT CKirby::Initialize(void* pArg)
         return E_FAIL;
 
     SetUp_Collider_Callback();
-  
+
+    if (FAILED(Ready_AnimEvents()))
+        return E_FAIL;  
+
     return S_OK;
 }
 
@@ -568,6 +571,67 @@ HRESULT CKirby::Ready_Events()
             Clear_CutsceneGrabTarget();
             m_pKirby_StateMachine->Request_ReleaseGrabState_StateMachine();
         });
+
+    return S_OK;
+}
+
+HRESULT CKirby::Ready_AnimEvents()
+{
+    CAnimator* pBodyAnimator = m_pBody->Get_Animator();
+
+    pBodyAnimator->Set_EventCallback(
+        [this](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+        {
+            switch (static_cast<EANIM_EVENT>(e.iEventType))
+            {
+            case EANIM_EVENT::SetEye:
+            {
+                if (ePhase != ANIM_EVENT_PHASE::POINT)
+                    break;
+
+                switch (static_cast<KIRBY_EYE_STATE>(e.iIntParam))
+                {
+                case KIRBY_EYE_STATE::IDLE:      m_pBody->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);      break;
+                case KIRBY_EYE_STATE::DOUBT:     m_pBody->Set_KirbyEye(KIRBY_EYE_STATE::DOUBT);     break;
+                case KIRBY_EYE_STATE::BLINK:     m_pBody->Set_KirbyEye(KIRBY_EYE_STATE::BLINK);     break;
+                case KIRBY_EYE_STATE::CLOSE:     m_pBody->Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);     break;
+                case KIRBY_EYE_STATE::ANGRY:     m_pBody->Set_KirbyEye(KIRBY_EYE_STATE::ANGRY);     break;
+                case KIRBY_EYE_STATE::SURPRISED: m_pBody->Set_KirbyEye(KIRBY_EYE_STATE::SURPRISED); break;
+                case KIRBY_EYE_STATE::SADNESS:   m_pBody->Set_KirbyEye(KIRBY_EYE_STATE::SADNESS);   break;
+                }
+
+                break;
+            }
+
+            case EANIM_EVENT::SetBody:
+            {
+                if (ePhase != ANIM_EVENT_PHASE::POINT)
+                    break;
+
+                switch (static_cast<KIRBY_BODY_STATE>(e.iIntParam))
+                {
+                case KIRBY_BODY_STATE::NORMAL:  m_pBody->Set_KirbyBody(KIRBY_BODY_STATE::NORMAL);  break;
+                case KIRBY_BODY_STATE::STUFFED: m_pBody->Set_KirbyBody(KIRBY_BODY_STATE::STUFFED); break;
+                case KIRBY_BODY_STATE::INHALE:  m_pBody->Set_KirbyBody(KIRBY_BODY_STATE::INHALE);  break;
+                }
+
+                break;
+            }
+
+            case EANIM_EVENT::WalkSmoke:
+            {
+                if (ePhase != ANIM_EVENT_PHASE::POINT)
+                    break;
+
+                CEffect_Loader::GetInstance()->Spawn(L"WalkSmoke", Get_LevelIndex(),
+                    _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 1.f), _float3(0.f, 180.f, 1.f),
+                    m_pTransformCom->Get_WorldMatrixPtr());
+
+                break;
+            }
+            }
+        }
+    );
 
     return S_OK;
 }

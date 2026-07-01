@@ -10,6 +10,8 @@ class ENGINE_DLL CEffect_RectParticle abstract : public CEffect_Particle
 {
     GENERATED_BODY_ABSTRACT(CEffect_RectParticle)
 
+PROPERTY(_bool, m_bBillboard, L"Billboard", L"Rendering");
+
 // Sprite Animation Texture
 PROPERTY(_bool, m_bSpriteAniTexture, L"Sprite Animation Texture", L"Sprite Animation");
 
