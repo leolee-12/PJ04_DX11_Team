@@ -1568,6 +1568,13 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			bChanged = true;
 		}
 
+		if (Layer.iPass == ETOI(ENV_PASS::COLOR))
+		{
+			ImGui::SetNextItemWidth(180.f);
+			if (ImGui::ColorEdit4("Render Color##MeshLayer", (float*)&Layer.vRenderColor))
+				bChanged = true;
+		}
+
 		if (Ui.bEnvObjectMeshUi)
 			ImGui::TextDisabled("Dither is controlled per object in EnvObject Edit.");
 		else

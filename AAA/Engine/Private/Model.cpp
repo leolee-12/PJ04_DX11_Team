@@ -680,6 +680,8 @@ HRESULT CModel::Save_MeshLayers() const
 		if (m.fMaskStrength != 1.f)
 			jMesh["MaskStrength"] = m.fMaskStrength;
 
+		if (m.vRenderColor.x != 1.f || m.vRenderColor.y != 1.f || m.vRenderColor.z != 1.f || m.vRenderColor.w != 1.f)
+			jMesh["RenderColor"] = { m.vRenderColor.x, m.vRenderColor.y, m.vRenderColor.z, m.vRenderColor.w };
 
 		const unsigned int kUnknown = static_cast<unsigned int>(MTEX_TYPE::UNKNOWN);
 		const _bool bHasExtraType =
@@ -992,6 +994,22 @@ void CModel::Load_MeshLayers(const _char* pModelFilePath)
 			const int iFlags = jMesh["Flags"].get<int>();
 			if (0 <= iFlags)
 				Layer.iFlags = static_cast<_uint>(iFlags);
+		}
+
+		if (jMesh.contains("RenderColor")
+			&& jMesh["RenderColor"].is_array()
+			&& jMesh["RenderColor"].size() == 4)
+		{
+			if (jMesh["RenderColor"][0].is_number()
+				&& jMesh["RenderColor"][1].is_number()
+				&& jMesh["RenderColor"][2].is_number()
+				&& jMesh["RenderColor"][3].is_number())
+			{
+				Layer.vRenderColor.x = jMesh["RenderColor"][0].get<_float>();
+				Layer.vRenderColor.y = jMesh["RenderColor"][1].get<_float>();
+				Layer.vRenderColor.z = jMesh["RenderColor"][2].get<_float>();
+				Layer.vRenderColor.w = jMesh["RenderColor"][3].get<_float>();
+			}
 		}
 
 		if (jMesh.contains("UseUVTransform") && jMesh["UseUVTransform"].is_boolean())

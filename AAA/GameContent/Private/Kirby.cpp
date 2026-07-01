@@ -730,6 +730,13 @@ void CKirby::Damaged(const ATTACK_INFO& tInfo)
     }
 }
 
+void CKirby::Add_HP(_float fHP)
+{
+    m_fCurHP += fHP;
+
+    Helper::FloatClamp(m_fCurHP, 0.f, m_fMaxHP);
+}
+
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     CKirby* pInstance = new CKirby(pDevice, pContext);
