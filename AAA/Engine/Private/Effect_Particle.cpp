@@ -49,6 +49,7 @@ void CEffect_Particle::Late_Update(_float fTimeDelta)
     __super::Late_Update(fTimeDelta);
 
     Compute_CombinedWorldMatrix();
+    Update_ParticleParentMatrices();
 }
 
 HRESULT CEffect_Particle::Render()
@@ -86,6 +87,8 @@ void CEffect_Particle::Init_PropertyValue()
 {
     // Particle
     m_iParticleCount = 20;
+    m_bParticleDetachParent = false;
+    m_fParticleDetachParentRatio = 1.f;
 
     // Particle Spawn
     m_bParticleSpawnRandom = true;
@@ -199,6 +202,11 @@ void CEffect_Particle::Reset_Particles()
     for (_uint i = 0; i < m_iParticleCount; ++i)
     {
         PARTICLE& Particle = m_Particles[i];
+
+        Particle.bParentDetached = false;
+        Particle.bParentDetachPending = false;
+        Particle.fPreviousLocalRatio = -1.f;
+        XMStoreFloat4x4(&Particle.DetachedParentWorldMatrix, XMMatrixIdentity());
 
         _float fLifeRatio = m_fParticleLifeRatio;
         Helper::FloatClamp(fLifeRatio, Helper::fEpsilon, 1.f);
@@ -315,15 +323,50 @@ void CEffect_Particle::Update_Particles_ByContainerTime(_float fRatio)
         if (fLocalRatio < 0.f || fLocalRatio > 1.f)
         {
             Particle.bAlive = false;
+            Particle.bParentDetached = false;
+            Particle.bParentDetachPending = false;
+            Particle.fPreviousLocalRatio = -1.f;
             continue;
         }
 
+        if (Particle.bAlive == false ||
+            fLocalRatio + Helper::fEpsilon < Particle.fPreviousLocalRatio)
+        {
+            Particle.bParentDetached = false;
+            Particle.bParentDetachPending = false;
+        }
+
         Particle.bAlive = true;
+        Particle.fPreviousLocalRatio = fLocalRatio;
+
+        if (m_bParticleDetachParent == true &&
+            Particle.bParentDetached == false &&
+            Particle.bParentDetachPending == false)
+        {
+            _float fDetachRatio = m_fParticleDetachParentRatio;
+            Helper::FloatClamp(fDetachRatio, 0.f, 1.f);
+
+            if (fLocalRatio >= fDetachRatio)
+                Particle.bParentDetachPending = true;
+        }
 
         Update_ParticleMove(Particle, fRatio, fLocalRatio);
         Update_ParticleAlpha(Particle, fLocalRatio);
         Update_ParticleSize(Particle, fLocalRatio);
         Update_ParticleColor(Particle, fLocalRatio);
+    }
+}
+
+void CEffect_Particle::Update_ParticleParentMatrices()
+{
+    for (PARTICLE& Particle : m_Particles)
+    {
+        if (Particle.bAlive == false || Particle.bParentDetachPending == false)
+            continue;
+
+        Particle.DetachedParentWorldMatrix = m_CombinedWorldMatrix;
+        Particle.bParentDetached = true;
+        Particle.bParentDetachPending = false;
     }
 }
 
@@ -726,11 +769,16 @@ _float4x4 CEffect_Particle::Make_ParticleWorldMatrix(const PARTICLE& Particle) c
         Particle.vLocalPos.y,
         Particle.vLocalPos.z);
 
+    const _float4x4& ParentWorldMatrix =
+        Particle.bParentDetached == true
+        ? Particle.DetachedParentWorldMatrix
+        : m_CombinedWorldMatrix;
+
     _matrix matWorld =
         matScale *
         matRotation *
         matTranslation *
-        XMLoadFloat4x4(&m_CombinedWorldMatrix);
+        XMLoadFloat4x4(&ParentWorldMatrix);
 
     _float4x4 ParticleWorld{};
     XMStoreFloat4x4(&ParticleWorld, matWorld);

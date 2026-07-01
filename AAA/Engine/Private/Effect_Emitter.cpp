@@ -61,6 +61,7 @@ void CEffect_Emitter::Late_Update(_float fTimeDelta)
     __super::Late_Update(fTimeDelta);
 
     Compute_CombinedWorldMatrix();
+    Update_EmitterParticleParentMatrices();
 }
 
 HRESULT CEffect_Emitter::Render()
@@ -109,6 +110,8 @@ void CEffect_Emitter::Init_PropertyValue()
     m_iEmitterMaxParticleCount = 100;
     m_fEmitterRateOverTime = 20.f;
     m_iEmitterBurstCount = 0;
+    m_bEmitterDetachParent = false;
+    m_fEmitterDetachParentRatio = 1.f;
 
     // Lifetime
     m_fEmitterLifeTime = 2.f;
@@ -262,6 +265,17 @@ void CEffect_Emitter::Update_EmitterParticles(_float fTimeDelta)
         _float fLocalRatio = Particle.fAge / Particle.fLifeTime;
         Helper::FloatClamp(fLocalRatio, 0.f, 1.f);
 
+        if (m_bEmitterDetachParent == true &&
+            Particle.bParentDetached == false &&
+            Particle.bParentDetachPending == false)
+        {
+            _float fDetachRatio = m_fEmitterDetachParentRatio;
+            Helper::FloatClamp(fDetachRatio, 0.f, 1.f);
+
+            if (fLocalRatio >= fDetachRatio)
+                Particle.bParentDetachPending = true;
+        }
+
         Update_EmitterParticleMove(Particle);
 
         if (m_bEmitterRotationOverLife == true)
@@ -274,6 +288,19 @@ void CEffect_Emitter::Update_EmitterParticles(_float fTimeDelta)
         Update_EmitterParticleAlpha(Particle, fLocalRatio);
         Update_EmitterParticleSize(Particle, fLocalRatio);
         Update_EmitterParticleColor(Particle, fLocalRatio);
+    }
+}
+
+void CEffect_Emitter::Update_EmitterParticleParentMatrices()
+{
+    for (EMITTER_PARTICLE& Particle : m_EmitterParticles)
+    {
+        if (Particle.bAlive == false || Particle.bParentDetachPending == false)
+            continue;
+
+        Particle.DetachedParentWorldMatrix = m_CombinedWorldMatrix;
+        Particle.bParentDetached = true;
+        Particle.bParentDetachPending = false;
     }
 }
 
@@ -310,6 +337,9 @@ _bool CEffect_Emitter::Spawn_EmitterParticle()
 
     pParticle->bAlive = true;
     pParticle->fAge = 0.f;
+    pParticle->bParentDetached = false;
+    pParticle->bParentDetachPending = false;
+    XMStoreFloat4x4(&pParticle->DetachedParentWorldMatrix, XMMatrixIdentity());
 
     _float fLifeTime = m_fEmitterLifeTime;
 
@@ -836,11 +866,16 @@ _float4x4 CEffect_Emitter::Make_EmitterParticleWorldMatrix(const EMITTER_PARTICL
         Particle.vLocalPos.y,
         Particle.vLocalPos.z);
 
+    const _float4x4& ParentWorldMatrix =
+        Particle.bParentDetached == true
+        ? Particle.DetachedParentWorldMatrix
+        : m_CombinedWorldMatrix;
+
     _matrix matWorld =
         matScale *
         matRotation *
         matTranslation *
-        XMLoadFloat4x4(&m_CombinedWorldMatrix);
+        XMLoadFloat4x4(&ParentWorldMatrix);
 
     _float4x4 ParticleWorld{};
     XMStoreFloat4x4(&ParticleWorld, matWorld);

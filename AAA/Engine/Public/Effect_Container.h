@@ -107,7 +107,6 @@ private:
     void Update_WaitForEmitters();
 
     // Debug
-    _bool m_bPreResetPlayDoubleCheck{};
     void Debug_ResetPlay();
 
 private:

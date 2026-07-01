@@ -16,6 +16,8 @@ class ENGINE_DLL CEffect_Emitter abstract : public CEffect_Part
 PROPERTY(_uint, m_iEmitterMaxParticleCount, L"Max Count_E", L"Emitter - Emission");
 PROPERTY(_float, m_fEmitterRateOverTime, L"Rate Over Time_E", L"Emitter - Emission");
 PROPERTY(_uint, m_iEmitterBurstCount, L"Burst Count_E", L"Emitter - Emission");
+PROPERTY(_bool, m_bEmitterDetachParent, L"Detach Parent_E", L"Emitter Parent");
+PROPERTY(_float, m_fEmitterDetachParentRatio, L"Detach Parent Ratio_E", L"Emitter Parent");
 
 PROPERTY(_float, m_fEmitterLifeTime, L"Life Time_E", L"Emitter - Lifetime");
 PROPERTY(_bool, m_bEmitterRandomLifeTime, L"Random Life Time_E", L"Emitter - Lifetime");
@@ -136,6 +138,10 @@ protected:
 
         _float3 vRotation{};
         _float3 vAngularVelocity{};
+
+        _bool bParentDetached{};
+        _bool bParentDetachPending{};
+        _float4x4 DetachedParentWorldMatrix{};
     };
 
 protected:
@@ -193,6 +199,7 @@ protected:
 
     void Reset_Emitter();
     void Update_EmitterParticles(_float fTimeDelta);
+    void Update_EmitterParticleParentMatrices();
     void Emit_ByRate(_float fTimeDelta);
     void Emit_Particles(_uint iEmitCount);
     _bool Spawn_EmitterParticle();

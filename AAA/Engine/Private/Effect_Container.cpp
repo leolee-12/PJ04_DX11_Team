@@ -311,16 +311,11 @@ void CEffect_Container::Update_WaitForEmitters()
 
 void CEffect_Container::Debug_ResetPlay()
 {
-    if (m_bPreResetPlayDoubleCheck == false && m_bResetPlayDoubleCheck == true)
-    {
-        m_bPreResetPlayDoubleCheck = true;
-        EffectContainer_Start(_float3{ 0.f, 0.f, 0.f });
-    }
+    if (m_bResetPlayDoubleCheck == false)
+        return;
 
-    if (m_bPreResetPlayDoubleCheck == true && m_bResetPlayDoubleCheck == false)
-    {
-        m_bPreResetPlayDoubleCheck = false;
-    }
+    m_bResetPlayDoubleCheck = false;
+    EffectContainer_Start(_float3{ 0.f, 0.f, 0.f });
 }
 
 HRESULT CEffect_Container::Add_Effect_PartObject(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, const _wstring& strPartTag, void* pArg)

@@ -14,6 +14,8 @@ class ENGINE_DLL CEffect_Particle abstract : public CEffect_Part
 
 // Particle
 PROPERTY(_uint, m_iParticleCount, L"Count_P", L"Particle");
+PROPERTY(_bool, m_bParticleDetachParent, L"Detach Parent_P", L"Particle Parent");
+PROPERTY(_float, m_fParticleDetachParentRatio, L"Detach Parent Ratio_P", L"Particle Parent");
 
 // Particle Spawn
 PROPERTY(_bool, m_bParticleSpawnRandom, L"Spawn Random_P", L"Particle Spawn");
@@ -141,6 +143,11 @@ protected:
         _float3 vBaseRotation{};
         _float3 vRotation{};
         _float3 vAngularVelocity{};
+
+        _bool bParentDetached{};
+        _bool bParentDetachPending{};
+        _float fPreviousLocalRatio{ -1.f };
+        _float4x4 DetachedParentWorldMatrix{};
     };
 
 protected:
@@ -196,6 +203,7 @@ protected:
 
     void Reset_Particles();
     void Update_Particles_ByContainerTime(_float fRatio);
+    void Update_ParticleParentMatrices();
 
     _float3 Make_ParticleSpawnLocalPos() const;
     _vector Make_ParticleVelocityDirection(const PARTICLE& Particle) const;
