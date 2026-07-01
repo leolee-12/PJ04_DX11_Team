@@ -169,6 +169,15 @@ void CMapSection::Notify_EditTransformChanged()
 	Refresh_CombinedWorldMatrix();
 }
 
+void CMapSection::Set_RuntimeCollisionActorEnabled(_bool bEnable)
+{
+	if (m_bCreateCollisionActor == bEnable)
+		return;
+
+	m_bCreateCollisionActor = bEnable;
+	Refresh_ColliderActor();
+}
+
 #ifdef _DEBUG
 void CMapSection::Reset_FrameProfile()
 {

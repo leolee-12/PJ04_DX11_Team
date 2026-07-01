@@ -60,6 +60,9 @@
     <ClInclude Include="..\Public\Common_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\DespawnEffect.h" />
     <ClInclude Include="..\public\DeathSmoke.h" />
+    <ClInclude Include="..\Public\EnvTrigger_EventPublisher.h" />
+    <ClInclude Include="..\Public\EnvTrigger_Generic.h" />
+    <ClInclude Include="..\Public\EnvTrigger_RenderGlobals.h" />
     <ClInclude Include="..\public\Gorilla_Swing.h" />
     <ClInclude Include="..\Public\Kirby_DeformCar_Demo.h" />
     <ClInclude Include="..\Public\Kirby_DeformCar_Main.h" />
@@ -72,6 +75,7 @@
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h" />
     <ClInclude Include="..\public\LDInhalable.h" />
     <ClInclude Include="..\Public\LevelDesign_MonsterCatalog.h" />
+    <ClInclude Include="..\Public\MapBreakSection.h" />
     <ClInclude Include="..\Public\PoppyBrosJr_State_WindUp.h" />
     <ClInclude Include="..\public\RockBounce.h" />
     <ClInclude Include="..\public\RockBurst.h" />
@@ -319,6 +323,8 @@
     <ClCompile Include="..\Private\Cappy_Body.cpp" />
     <ClCompile Include="..\Private\Cappy_Brain.cpp" />
     <ClCompile Include="..\Private\Cappy_Hat.cpp" />
+    <ClCompile Include="..\Private\EnvTrigger_EventPublisher.cpp" />
+    <ClCompile Include="..\Private\EnvTrigger_RenderGlobals.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
     <ClCompile Include="..\Private\Common_Circle01.cpp" />
     <ClCompile Include="..\Private\Common_Curve03.cpp" />
@@ -328,6 +334,7 @@
     <ClCompile Include="..\Private\Common_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\DespawnEffect.cpp" />
     <ClCompile Include="..\private\DeathSmoke.cpp" />
+    <ClCompile Include="..\Private\EnvTrigger_Generic.cpp" />
     <ClCompile Include="..\private\Gorilla_Swing.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCar_Demo.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCar_Main.cpp" />
@@ -340,6 +347,7 @@
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp" />
     <ClCompile Include="..\private\LDInhalable.cpp" />
     <ClCompile Include="..\Private\LevelDesign_MonsterCatalog.cpp" />
+    <ClCompile Include="..\Private\MapBreakSection.cpp" />
     <ClCompile Include="..\Private\PoppyBrosJr_State_WindUp.cpp" />
     <ClCompile Include="..\private\RockBounce.cpp" />
     <ClCompile Include="..\private\RockBurst.cpp" />

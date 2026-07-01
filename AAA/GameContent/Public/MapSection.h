@@ -48,6 +48,8 @@ public:
 	void	Set_ShadowCaster(_bool bCastShadow) { m_bCastShadow = bCastShadow; }
 	void	Set_Culling(_bool bEnableCulling) { m_bEnableCulling = bEnableCulling; }
 	void	Set_CollisionActorEnabled(_bool bEnable) { m_bCreateCollisionActor = bEnable; }
+	void	Set_Renderable(_bool bRenderable) { m_bRenderable = bRenderable; }
+	void	Set_RuntimeCollisionActorEnabled(_bool bEnable);
 	_bool	Is_CollisionActorEnabled() const { return m_bCreateCollisionActor; }
 
 	const MAP_SECTION_DESC&	Get_Desc() const { return m_tDesc; }

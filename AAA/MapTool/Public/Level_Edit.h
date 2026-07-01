@@ -168,6 +168,11 @@ private:
   private:	// Hierarchy
 		void Mark_HierarchyDirty() { ++m_iHierarchyRevision; }
 
+#ifdef _DEBUG
+		HRESULT  Ready_DebugMapBreakSection_Stage12();
+		void     Hide_DebugMapBreakWall_Stage12();
+#endif
+
 public:
 	static CLevel_Edit* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual void Free() override;
