@@ -80,7 +80,7 @@ COPY_ABILITY_TYPE CKirby_Ability_Sword::Get_AbilityType()
     return COPY_ABILITY_TYPE::SWORD;
 }
 
-void CKirby_Ability_Sword::Enter_Ability(CKirby* pKirby)
+void CKirby_Ability_Sword::Enter_AbilityState(CKirby* pKirby)
 {
     SWORD_STATE eStartState = m_eSwordState;
 
@@ -113,7 +113,7 @@ void CKirby_Ability_Sword::Enter_Ability(CKirby* pKirby)
     Change_SwordState(pKirby, eStartState);
 }
 
-ABILITY_UPDATE_RESULT CKirby_Ability_Sword::Update_Ability(CKirby* pKirby, _float fTimeDelta)
+ABILITY_UPDATE_RESULT CKirby_Ability_Sword::Update_AbilityState(CKirby* pKirby, _float fTimeDelta)
 {
     Update_ChargeTime(fTimeDelta);
     Update_SwordState(pKirby, fTimeDelta);
@@ -132,7 +132,7 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Sword::Update_Ability(CKirby* pKirby, _floa
     return ABILITY_UPDATE_RESULT::NONE;
 }
 
-void CKirby_Ability_Sword::Exit_Ability(CKirby* pKirby)
+void CKirby_Ability_Sword::Exit_AbilityState(CKirby* pKirby)
 {
     Change_SwordState(pKirby, SWORD_STATE::END);
 
@@ -159,12 +159,23 @@ void CKirby_Ability_Sword::Exit_Ability(CKirby* pKirby)
     CKirby_Body* pBody = pKirby->Get_Body();
     pBody->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
 
-    CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_OnOffPart(CKirby_Sword::Kirby_PartTag));
+    CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::SWORD));
     if (pSword)
     {
         //pSword->Set_HitBox(false);
         pSword->Reset_HitList();
     }
+}
+
+void CKirby_Ability_Sword::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+    m_bSpinSlashCharge = false;
+    m_fAccSuperSpinSlashChargeTime = 0.f;
+    m_bReserveNextAttack = false;
+
+    ZeroMemory(&m_vSwordWishDir, sizeof(m_vSwordWishDir));
+
+    __super::On_Damaged_KirbyState(pKirby, tInfo);
 }
 
 _bool CKirby_Ability_Sword::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -228,6 +239,22 @@ _bool CKirby_Ability_Sword::Handle_Command(CKirby* pKirby, CKirby_Command* pComm
             }
             else if (pCommand->IsUp())
             {
+            }
+
+            return true;
+        }
+        // Jump Down
+        case KIRBY_COMMAND_TYPE::JUMP:
+        {
+            if (!pCommand->IsDown())
+                return false;
+
+            if (m_eSwordState == SWORD_STATE::SUPER_SPIN_SLASH_LOOP && pMovement->Is_Grounded())
+            {
+                pMovement->Try_Jump();
+
+                if (m_iSuperSpinSlashCount > 1)
+                    m_iSuperSpinSlashCount = 1;
             }
 
             return true;
@@ -322,7 +349,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
     CKirby_Body* pBody = pKirby->Get_Body();
     CAnimator* pAnimator = pBody->Get_Animator();
     CMovement_Child* pMovement = pKirby->Get_Movement();
-    CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_OnOffPart(CKirby_Sword::Kirby_PartTag));
+    CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::SWORD));
 
     auto BeginHit = [pSword](_bool bReset)
         {
@@ -469,7 +496,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
     {
         BeginHit(false);
         pKirby->Set_RotationLock(true);
-        pAnimator->Play("SpinSlashEnd", false, false, 0.1f, 2.5f);
+        pAnimator->Play("SpinSlashEnd", false, false, 0.1f, 3.f);
 
         break;
     }
@@ -517,7 +544,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
     {
         BeginHit(false);
         pKirby->Set_RotationLock(true);
-        pAnimator->Play("SuperSpinSlashEnd", false, false, 0.1f, 2.5f);
+        pAnimator->Play("SuperSpinSlashEnd", false, false, 0.1f, 3.f);
         break;
     }
     }

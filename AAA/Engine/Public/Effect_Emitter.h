@@ -54,16 +54,16 @@ PROPERTY(_float, m_fEmitterFlutterRandomRatio, L"Random Ratio_E", L"Emitter Flut
 PROPERTY(_float, m_fEmitterAlpha, L"Alpha_E", L"Emitter Alpha");
 
 PROPERTY(_bool, m_bEmitterAlphaChange, L"Alpha Change_E", L"Emitter Alpha");
-PROPERTY(_float, m_fEmitterAlphaStartValue, L"Start_E", L"Emitter Alpha");
-PROPERTY(_float, m_fEmitterAlphaEndValue, L"End_E", L"Emitter Alpha");
+PROPERTY(_float, m_fEmitterAlphaStartValue, L"Alpha_Start_E", L"Emitter Alpha");
+PROPERTY(_float, m_fEmitterAlphaEndValue, L"Alpha_End_E", L"Emitter Alpha");
 
-PROPERTY(_bool, m_bActive_EmitterAlpha_Ratio_0, L"Active Ratio 0_E", L"Emitter Alpha");
-PROPERTY(_float, m_fEmitterAlpha_Ratio_0, L"Ratio 0_E", L"Emitter Alpha");
-PROPERTY(_float, m_fEmitterAlpha_Value_0, L"Value 0_E", L"Emitter Alpha");
+PROPERTY(_bool, m_bActive_EmitterAlpha_Ratio_0, L"Alpha_Active Ratio 0_E", L"Emitter Alpha");
+PROPERTY(_float, m_fEmitterAlpha_Ratio_0, L"Alpha_Ratio 0_E", L"Emitter Alpha");
+PROPERTY(_float, m_fEmitterAlpha_Value_0, L"Alpha_Value 0_E", L"Emitter Alpha");
 
-PROPERTY(_bool, m_bActive_EmitterAlpha_Ratio_1, L"Active Ratio 1_E", L"Emitter Alpha");
-PROPERTY(_float, m_fEmitterAlpha_Ratio_1, L"Ratio 1_E", L"Emitter Alpha");
-PROPERTY(_float, m_fEmitterAlpha_Value_1, L"Value 1_E", L"Emitter Alpha");
+PROPERTY(_bool, m_bActive_EmitterAlpha_Ratio_1, L"Alpha_Active Ratio 1_E", L"Emitter Alpha");
+PROPERTY(_float, m_fEmitterAlpha_Ratio_1, L"Alpha_Ratio 1_E", L"Emitter Alpha");
+PROPERTY(_float, m_fEmitterAlpha_Value_1, L"Alpha_Value 1_E", L"Emitter Alpha");
 
 // Emitter Size
 PROPERTY(_float, m_fEmitterStartSize, L"Start Size_E", L"Emitter Size");
@@ -71,31 +71,31 @@ PROPERTY(_bool, m_bEmitterRandomSize, L"Random Size_E", L"Emitter Size");
 PROPERTY(_float2, m_vEmitterStartSizeRange, L"Size Range_E", L"Emitter Size");
 
 PROPERTY(_bool, m_bEmitterSizeChange, L"Size Change_E", L"Emitter Size");
-PROPERTY(_float, m_fEmitterSizeStartValue, L"Start_E", L"Emitter Size");
-PROPERTY(_float, m_fEmitterSizeEndValue, L"End_E", L"Emitter Size");
+PROPERTY(_float, m_fEmitterSizeStartValue, L"Size_Start_E", L"Emitter Size");
+PROPERTY(_float, m_fEmitterSizeEndValue, L"Size_End_E", L"Emitter Size");
 
-PROPERTY(_bool, m_bActive_EmitterSize_Ratio_0, L"Active Ratio 0_E", L"Emitter Size");
-PROPERTY(_float, m_fEmitterSize_Ratio_0, L"Ratio 0_E", L"Emitter Size");
-PROPERTY(_float, m_fEmitterSize_Value_0, L"Value 0_E", L"Emitter Size");
+PROPERTY(_bool, m_bActive_EmitterSize_Ratio_0, L"Size_Active Ratio 0_E", L"Emitter Size");
+PROPERTY(_float, m_fEmitterSize_Ratio_0, L"Size_Ratio 0_E", L"Emitter Size");
+PROPERTY(_float, m_fEmitterSize_Value_0, L"Size_Value 0_E", L"Emitter Size");
 
-PROPERTY(_bool, m_bActive_EmitterSize_Ratio_1, L"Active Ratio 1_E", L"Emitter Size");
-PROPERTY(_float, m_fEmitterSize_Ratio_1, L"Ratio 1_E", L"Emitter Size");
-PROPERTY(_float, m_fEmitterSize_Value_1, L"Value 1_E", L"Emitter Size");
+PROPERTY(_bool, m_bActive_EmitterSize_Ratio_1, L"Size_Active Ratio 1_E", L"Emitter Size");
+PROPERTY(_float, m_fEmitterSize_Ratio_1, L"Size_Ratio 1_E", L"Emitter Size");
+PROPERTY(_float, m_fEmitterSize_Value_1, L"Size_Value 1_E", L"Emitter Size");
 
 // Emitter Color
 PROPERTY(_float3, m_vEmitterColor, L"Color_E", L"Emitter Color");
 
 PROPERTY(_bool, m_bEmitterColorChange, L"Color Change_E", L"Emitter Color");
-PROPERTY(_float3, m_vEmitterColorStartValue, L"Start_E", L"Emitter Color");
-PROPERTY(_float3, m_vEmitterColorEndValue, L"End_E", L"Emitter Color");
+PROPERTY(_float3, m_vEmitterColorStartValue, L"Color_Start_E", L"Emitter Color");
+PROPERTY(_float3, m_vEmitterColorEndValue, L"Color_End_E", L"Emitter Color");
 
-PROPERTY(_bool, m_bActive_EmitterColor_Ratio_0, L"Active Ratio 0_E", L"Emitter Color");
-PROPERTY(_float, m_fEmitterColor_Ratio_0, L"Ratio 0_E", L"Emitter Color");
-PROPERTY(_float3, m_vEmitterColor_Value_0, L"Value 0_E", L"Emitter Color");
+PROPERTY(_bool, m_bActive_EmitterColor_Ratio_0, L"Color_Active Ratio 0_E", L"Emitter Color");
+PROPERTY(_float, m_fEmitterColor_Ratio_0, L"Color_Ratio 0_E", L"Emitter Color");
+PROPERTY(_float3, m_vEmitterColor_Value_0, L"Color_Value 0_E", L"Emitter Color");
 
-PROPERTY(_bool, m_bActive_EmitterColor_Ratio_1, L"Active Ratio 1_E", L"Emitter Color");
-PROPERTY(_float, m_fEmitterColor_Ratio_1, L"Ratio 1_E", L"Emitter Color");
-PROPERTY(_float3, m_vEmitterColor_Value_1, L"Value 1_E", L"Emitter Color");
+PROPERTY(_bool, m_bActive_EmitterColor_Ratio_1, L"Color_Active Ratio 1_E", L"Emitter Color");
+PROPERTY(_float, m_fEmitterColor_Ratio_1, L"Color_Ratio 1_E", L"Emitter Color");
+PROPERTY(_float3, m_vEmitterColor_Value_1, L"Color_Value 1_E", L"Emitter Color");
 
 // Emitter Rotation
 PROPERTY(_bool, m_bEmitterRandomRotation, L"Random Rotation_E", L"Emitter Rotation");

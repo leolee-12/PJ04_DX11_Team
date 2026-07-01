@@ -7,6 +7,7 @@
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
 #include "Cappy.h"
+#include "Parsing_Utils.h"
 
 NS_BEGIN(Client)
 
@@ -79,8 +80,6 @@ void CLevelDesign_MonsterCatalog::Register_LevelDesignSpecs()
 
 _bool CLevelDesign_MonsterCatalog::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
 {
-	UNREFERENCED_PARAMETER(jEntry);
-
 	if (nullptr == pOutEntry)
 		return false;
 	if (Spec.eCategory != LD_CATEGORY::ENEMY)
@@ -89,6 +88,12 @@ _bool CLevelDesign_MonsterCatalog::Build_Desc(const LD_OBJECT_DESC& CommonDesc, 
 	LD_PARSED_OBJECT Desc{};
 	static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
 	Desc.eCategory = Spec.eCategory;
+
+	const _string strBase = "Chara." + WstrToStr(Spec.strObjectName) + ".Variation.";
+	if (!JsonUtils::Try_ReadString(jEntry, strBase + "VariationType", &Desc.strAIVariation))
+		JsonUtils::Try_ReadString(jEntry, strBase + "TypeStr", &Desc.strAIVariation);
+
+	JsonUtils::Try_ReadString(jEntry, strBase + "ThrowLv", &Desc.strThrowLv);
 
 	XMStoreFloat4(&Desc.vRight, XMVectorNegate(XMLoadFloat4(&Desc.vRight)));
 	XMStoreFloat4(&Desc.vLook, XMVectorNegate(XMLoadFloat4(&Desc.vLook)));

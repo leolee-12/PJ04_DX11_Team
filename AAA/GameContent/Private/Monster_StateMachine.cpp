@@ -36,6 +36,10 @@ _bool CMonster_StateMachine::Change_State(MONSTER_STATE_TYPE eNewState)
     if (nullptr != m_pCurState)
     {
         m_pCurState->Exit(eNewState);
+
+        if (nullptr != m_pOwner)
+            m_pOwner->On_Exit(eNewState);
+
         m_PrevState = m_pCurState->Get_StateType();
     }
 

@@ -45,7 +45,7 @@ void CNormalEnemy_Brain::Decide(const MONSTER_BLACKBOARD& BlackBoard, _float fTi
 
 			MONSTER_STATE_TYPE eNext = MONSTER_STATE_TYPE::FIND;
 
-			const _int iAIType = static_cast<CNormalEnemy*>(m_pOwner)->Get_AIType();
+			const _int iAIType = m_pOwner->Get_AIType();
 			const _bool bHasPatrol = m_pOwner->Has_State(MONSTER_STATE_TYPE::PATROL);
 
 			// 자유형(1) : FIND  / PATROL 랜덤 선택

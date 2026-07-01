@@ -57,6 +57,7 @@
 #include "Sword_JumpSlash.h"
 #include "Sword_SpinSlash.h"
 #include "Sword_SpinSlashTrail.h"
+#include "RockBurst.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -71,6 +72,8 @@
 #include "Common_JumpSlash.h"
 #include "Common_SpinSlash.h"
 #include "Common_SpinSlashTrail.h"
+#include "RockEffect.h"
+#include "RockFloorEffect.h"
 
 //sky
 #include "SkySphere.h"
@@ -102,6 +105,7 @@
 #include "Boss_Gorilla_Body.h"
 #include "CutsceneGorilla.h"
 #include "GorillaNamePlate.h"
+#include "Boss_Gorilla_RockHole.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
@@ -533,7 +537,7 @@ void CGameObject_Factory::Register_Container()
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Kabu_Body"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Kabu/Kabu.ysh",
-                    XMMatrixScaling(1.6f, 1.6f, 1.6f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
+                    XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 
@@ -683,7 +687,16 @@ void CGameObject_Factory::Register_AnimObject()
 
 void CGameObject_Factory::Register_Effect()
 {
-   
+    Register(CRockBurst::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CRockBurst),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRockFloorEffect::PROTOTYPE_TAG,
+                CRockFloorEffect::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRockFloorEffect::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSH/Boss/Gorilla/RockFloorEffect/RockFloorEffectModel.ysh"));
+        )
+    );
 }
 
 void CGameObject_Factory::Register_MiniBoss()
@@ -721,16 +734,20 @@ void CGameObject_Factory::Register_MainBoss()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Boss_Gorilla_Body"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Gorilla/Body/Gorilla.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
-
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Gorilla_Body::PROTOTYPE_TAG,
                 CBoss_Gorilla_Body::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Boulder::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Gorilla/Rock_Projectile/Rock_Anim.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
-
             TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Boulder::PROTOTYPE_TAG,
                 CProjectile_Boulder::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Gorilla_RockHole::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Gorilla/RockHole/RockHole_Anim.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Gorilla_RockHole::PROTOTYPE_TAG,
+                CBoss_Gorilla_RockHole::Create(pDevice, pContext));
         )
     );
 

@@ -20,6 +20,7 @@ void CPoppyBrosJr_State_Throw::Enter(MONSTER_STATE_TYPE ePrevState)
 	if (m_pOwner == nullptr)
 		return;
 
+
 	if (m_pAnimator)
 		Play_AttackAnimation();
 }
@@ -31,7 +32,10 @@ void CPoppyBrosJr_State_Throw::Update(_float fTimeDelta)
 
 	if (m_pAnimator && m_pAnimator->Is_Finished())
 	{
-		m_pOwner->Change_State(m_eNextState);
+		const MONSTER_BLACKBOARD& BB = m_pOwner->Get_BlackBoard();
+		m_pOwner->Change_State((nullptr != BB.pTarget)
+			? MONSTER_STATE_TYPE::WINDUP    // 타겟 유지 → 재차지
+			: MONSTER_STATE_TYPE::IDLE);    // 상실 → 대기
 		return;
 	}
 }

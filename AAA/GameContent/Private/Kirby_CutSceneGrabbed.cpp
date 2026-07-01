@@ -43,7 +43,7 @@ void CKirby_CutSceneGrabbed::Enter(CKirby* pKirby)
     pMovement->Stop();
     pMovement->Set_UseGravity(false);
 
-    pKirby->OnOffParts(pKirby->Get_KirbyAbility()->Get_AbilityType(), false, true);
+    pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), false, true);
 }
 
 void CKirby_CutSceneGrabbed::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -82,7 +82,7 @@ _bool CKirby_CutSceneGrabbed::Handle_Command(CKirby* pKirby, CKirby_Command* pCo
 
 void CKirby_CutSceneGrabbed::Request_ReleaseGrabState(CKirby* pKirby, GRAB_TYPE eType)
 {
-    pKirby->OnOffParts(pKirby->Get_KirbyAbility()->Get_AbilityType(), true, true);
+    pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), true, true);
     Transition_Fall_OR_Wait_OR_Run(pKirby);
 }
 

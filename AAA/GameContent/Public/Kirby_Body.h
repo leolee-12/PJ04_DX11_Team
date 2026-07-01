@@ -69,7 +69,7 @@ private:
 public:
 	static CKirby_Body* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
-protected:
+private:
 	virtual void Free();
 };
 

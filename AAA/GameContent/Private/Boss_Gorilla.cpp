@@ -4,10 +4,13 @@
 #include "Boss_Gorilla_Brain.h"
 
 #include "Boss_Gorilla_Body.h"
+#include "Boss_Gorilla_RockHole.h"
 #include "Animator.h"
 
 #include "Projectile_Boulder.h"
 #include "Projectile_Manager.h"
+
+#include "Effect_Loader.h"
 
 // 3페이즈: 66%, 33% 에서 전환 (PhaseCount = size()+1 = 3) Brain의 Get_PhaseCount와 일치!
 const vector<_float> CBoss_Gorilla::s_Thresholds = { 0.5f };
@@ -128,6 +131,16 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
     pAnim->Set_EventCallback([this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase) {
         switch (static_cast<EANIM_EVENT>(e.iEventType))
         {
+            case EANIM_EVENT::Fx:
+            {
+                if (!e.strParam.empty())
+                {
+                    _float3 vPos{};
+                    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+                    CEffect_Loader::GetInstance()->Spawn(StrToWstr(e.strParam), m_iPrototypeLevel, vPos);
+                }
+                break;
+            }
             case EANIM_EVENT::CamTrack:
             {
                 if (e.strParam.empty())
@@ -189,12 +202,19 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
                         ? L"Boulder" : _wstring(e.strParam.begin(), e.strParam.end());
                     CProjectile_Manager::GetInstance()->Spawn(Get_LevelIndex(), strKey,
                         CProjectile_Boulder::PROTOTYPE_TAG, &p);
+
                     if (p)
                     {
                         p->Attach_To_Socket(m_pBody->Get_BoneMatrixPtr(THROW_BONE),
                             m_pTransformCom->Get_WorldMatrixPtr(), XMMatrixIdentity());
                         m_pHeldRock = p;
                     }
+
+                    _matrix BoneMatrix = XMLoadFloat4x4(m_pBody->Get_BoneMatrixPtr(THROW_BONE));
+                    _matrix Combindmat = XMMatrixMultiply(BoneMatrix, XMLoadFloat4x4(Get_Transform()->Get_WorldMatrixPtr()));
+                    Combindmat.r[3].m128_f32[1] = Get_Transform()->Get_State(STATE::POSITION).m128_f32[1];
+                    m_pRockHole->Active_Effect(Combindmat.r[3]);
+
                 }
                 else
                 {
@@ -264,6 +284,12 @@ HRESULT CBoss_Gorilla::Ready_PartObjects()
     m_pBody = Add_MonsterPart<CBoss_Gorilla_Body>(
         CBoss_Gorilla_Body::PROTOTYPE_TAG, CBoss_Gorilla_Body::PART_TAG);
     if (!m_pBody) return E_FAIL;
+
+    Add_PartObject(m_iPrototypeLevel, CBoss_Gorilla_RockHole::PROTOTYPE_TAG, CBoss_Gorilla_RockHole::PART_TAG);
+    m_pRockHole = dynamic_cast<CBoss_Gorilla_RockHole*>(m_PartObjects[CBoss_Gorilla_RockHole::PART_TAG]);
+    if (!m_pRockHole)
+        return E_FAIL;
+
     return S_OK;
 }
 

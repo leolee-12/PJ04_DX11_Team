@@ -53,13 +53,12 @@ public:
 	CCappy_Body*				Get_Body() { return m_pBody; }
 	CCappy_Hat*					Get_Hat() { return m_pHat; }
 
-	_int						Get_AIType() { return m_iAIType; }
-	void						Set_AIType(_int iType) { m_iAIType = iType; }
-
 protected:
 	virtual CMonsterBrain*		Create_Brain() override;
-	virtual HRESULT				Ready_State(CMonster_StateMachine* pStateMachine) override;
+	virtual HRESULT				Ready_State() override;
 	virtual HRESULT				Ready_AnimEvents() override;
+
+	virtual void				Apply_AIVariation(const _wstring& strVariation) override;
 
 private:
 	virtual HRESULT				Ready_PartObjects() override;
@@ -71,8 +70,6 @@ private:
 private:
 	CCappy_Body*				m_pBody = { nullptr };
 	CCappy_Hat*					m_pHat = { nullptr };
-
-	_int						m_iAIType = { 0 }; // 0은 고정형 / 1은 플레이어 추격형
 
 public:
 	static CCappy*				Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

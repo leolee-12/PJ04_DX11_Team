@@ -38,7 +38,8 @@ enum class MONSTER_STATE_TYPE
 	BRAKE,
 	WARPIN,
 	WARPOUT,
-	RETURN
+	RETURN,
+	WINDUP
 };
 
 struct MONSTER_BLACKBOARD
@@ -54,7 +55,11 @@ struct MONSTER_BLACKBOARD
 	_float3					vTargetPos = {};
 	_float3					vLastKnownPos = {};
 	_float3					vDirToTargetXZ = {};
+	
 	_bool					bCanMove = { false };
+	// Move Window 정보 
+	_float					fMoveWinLo = { 0.f };				// MoveWindow 시작
+	_float					fMoveWinHi = { 1.f };				// MoveWindow 종료
 
 	_bool					bActionFinished = { false }; // Non-Loop 액션이 끝났는지?
 	_bool					bCanTransition = { true };	// Brain이 일반 상태 전이를 해도 되는지?

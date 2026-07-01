@@ -62,12 +62,24 @@ HRESULT CLevelDesign_Ladder::Initialize(void* pArg)
 	if (FAILED(Resolve_SegmentStepY()))
 		return E_FAIL;
 
+	if (FAILED(Ready_LadderCollider()))
+		return E_FAIL;
+
 	return S_OK;
 }
 
 void CLevelDesign_Ladder::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
+
+	if (m_pCollider && m_pCollider->Is_Enabled())
+	{
+		m_pCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+#ifdef _DEBUG
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pCollider);
+#endif // _DEBUG
+
+	}
 
 	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
@@ -176,6 +188,22 @@ HRESULT CLevelDesign_Ladder::Ready_Components()
 	m_ModelComs[SEGMENT::TOP] = Add_Component<CModel>(m_tLadderDesc.iModelProtoLevel, TOP_MODEL_PROTO_TAG, TEXT("Com_Model_Top"));
 	if (nullptr == m_ModelComs[SEGMENT::TOP])
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Ladder::Ready_LadderCollider()
+{
+	CCollider::COLLIDER_DESC Desc{};
+	Desc.fHeight = (_float)m_tLadderDesc.iLength * m_fSegmentStepY;
+	Desc.fRadius = 0.75f;
+	Desc.vCenter = _float3(0.f, -0.75f, -1.f);
+
+	m_pCollider = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag, TEXT("Com_Collider"), &Desc);
+	if (nullptr == m_pCollider)
+		return E_FAIL;
+
+	m_pGameInstance_Proxy->Register_Collider(m_pCollider, ETOUI(COLLISION_LAYER::ENV_LADDER));
 
 	return S_OK;
 }

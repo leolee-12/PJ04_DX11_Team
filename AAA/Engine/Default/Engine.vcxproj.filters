@@ -244,73 +244,73 @@
     <Filter Include="99. Defines\Hojun">
       <UniqueIdentifier>{1263b5ad-a702-4bba-afb4-f5405210ba86}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject">
+    <Filter Include="05. GameObject">
       <UniqueIdentifier>{3901bc1e-e6e4-4c81-adbf-1f8210f5ab2d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\UIObject">
+    <Filter Include="05. GameObject\UIObject">
       <UniqueIdentifier>{0a49a345-16ef-454a-b1fe-989539b230d3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\Camera">
+    <Filter Include="05. GameObject\Camera">
       <UniqueIdentifier>{420fb5b2-806e-4e5e-b440-426800386a01}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\ContainerObject">
+    <Filter Include="05. GameObject\ContainerObject">
       <UniqueIdentifier>{08c9bf08-2582-4840-9cb1-738f4a8951f3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\ContainerObject\PartObject">
+    <Filter Include="05. GameObject\ContainerObject\PartObject">
       <UniqueIdentifier>{7e4c07e6-c6a7-4dbd-90e1-6e6d49cc45ba}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\00. Manager">
+    <Filter Include="05. GameObject\00. Manager">
       <UniqueIdentifier>{e121f329-2ccc-4c30-9963-675350ecad2c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\00. Manager\Layer">
+    <Filter Include="05. GameObject\00. Manager\Layer">
       <UniqueIdentifier>{8c63fe16-4f8d-479a-89df-b5e4272ec1c5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\01. Property">
+    <Filter Include="05. GameObject\01. Property">
       <UniqueIdentifier>{47e74b98-d11e-415a-a3ef-14b9e02a3c38}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\UIContainerObject">
+    <Filter Include="05. GameObject\UIContainerObject">
       <UniqueIdentifier>{8ab3291b-c14f-4f8b-ae07-3fd8166a2487}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\UIContainerObject\UIPartObject">
+    <Filter Include="05. GameObject\UIContainerObject\UIPartObject">
       <UniqueIdentifier>{4786b946-e212-4ef5-b7ab-37bf3767058d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\Effect">
+    <Filter Include="05. GameObject\Effect">
       <UniqueIdentifier>{bde8fa62-2764-4199-baab-2e0d93651819}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\Effect\Manager">
+    <Filter Include="05. GameObject\Effect\Manager">
       <UniqueIdentifier>{e435d7f0-3a1d-4e62-950d-122e3a3dfb16}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\Effect\EffectPart">
+    <Filter Include="05. GameObject\Effect\EffectPart">
       <UniqueIdentifier>{42b80ec2-d825-4521-b1ae-204abc8fe1cd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\Effect\EffectPart\Effect_NoneParticle">
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_NoneParticle">
       <UniqueIdentifier>{3eda837d-3b83-49b9-ac0d-13e217cd8b2c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Mesh">
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Mesh">
       <UniqueIdentifier>{bf898bea-9c9c-46cf-a2d9-7b77aadbcb2f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Quad">
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Quad">
       <UniqueIdentifier>{11914a26-172e-4caa-8ce4-2866473d5ef5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\Effect\EffectPart\Effect_Paricle">
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Paricle">
       <UniqueIdentifier>{bba9c8c0-bbfb-47c4-b9c4-975253e549e9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_RectParicle">
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_RectParicle">
       <UniqueIdentifier>{cac7e3a1-ecdd-4d62-8d22-bae46537c29b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_MeshParticle">
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_MeshParticle">
       <UniqueIdentifier>{f3b89464-2504-4b1f-ac6d-3aaa815d6d01}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\Effect\EffectPart\Effect_Emitter">
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Emitter">
       <UniqueIdentifier>{f6fe4cd6-259b-4194-b152-6063ffca5787}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_MeshEmitter">
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_MeshEmitter">
       <UniqueIdentifier>{572697e9-e334-4ef2-bbaa-686aba5ea8f2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_RectEmitter">
+    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_RectEmitter">
       <UniqueIdentifier>{d49ef37d-8dbc-4fa5-bb4d-69cdb1c95e46}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Prototype\05. GameObject\Effect\Allocator">
+    <Filter Include="05. GameObject\Effect\Allocator">
       <UniqueIdentifier>{8fc72b6d-5be3-40cf-9275-b99e11825d1d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -358,13 +358,13 @@
       <Filter>04. Prototype\Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\public\GameObject.h">
-      <Filter>04. Prototype\05. GameObject</Filter>
+      <Filter>05. GameObject</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Object_Manager.h">
-      <Filter>04. Prototype\05. GameObject\00. Manager</Filter>
+      <Filter>05. GameObject\00. Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Layer.h">
-      <Filter>04. Prototype\05. GameObject\00. Manager\Layer</Filter>
+      <Filter>05. GameObject\00. Manager\Layer</Filter>
     </ClInclude>
     <ClInclude Include="..\public\GameInstance_Proxy.h">
       <Filter>00. GameInstance\Proxy</Filter>
@@ -391,16 +391,16 @@
       <Filter>07. Component\Texture</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UIObject.h">
-      <Filter>04. Prototype\05. GameObject\UIObject</Filter>
+      <Filter>05. GameObject\UIObject</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Camera_Manager.h">
       <Filter>08. Camera_Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Camera.h">
-      <Filter>04. Prototype\05. GameObject\Camera</Filter>
+      <Filter>05. GameObject\Camera</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Property.h">
-      <Filter>04. Prototype\05. GameObject\01. Property</Filter>
+      <Filter>05. GameObject\01. Property</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Input_Device.h">
       <Filter>01. Device\Input</Filter>
@@ -445,10 +445,10 @@
       <Filter>96. Utils</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ContainerObject.h">
-      <Filter>04. Prototype\05. GameObject\ContainerObject</Filter>
+      <Filter>05. GameObject\ContainerObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PartObject.h">
-      <Filter>04. Prototype\05. GameObject\ContainerObject\PartObject</Filter>
+      <Filter>05. GameObject\ContainerObject\PartObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\CustomFont.h">
       <Filter>10. Fonts</Filter>
@@ -469,10 +469,10 @@
       <Filter>07. Component\VIBuffer\Cell</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UIPartObject.h">
-      <Filter>04. Prototype\05. GameObject\UIContainerObject\UIPartObject</Filter>
+      <Filter>05. GameObject\UIContainerObject\UIPartObject</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UIContainerObject.h">
-      <Filter>04. Prototype\05. GameObject\UIContainerObject</Filter>
+      <Filter>05. GameObject\UIContainerObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Collider.h">
       <Filter>07. Component\Collider</Filter>
@@ -523,16 +523,16 @@
       <Filter>07. Component\VIBuffer\Point</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Effect_Container.h">
-      <Filter>04. Prototype\05. GameObject\Effect</Filter>
+      <Filter>05. GameObject\Effect</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Effect_Manager.h">
-      <Filter>04. Prototype\05. GameObject\Effect\Manager</Filter>
+      <Filter>05. GameObject\Effect\Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_Part.h">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart</Filter>
+      <Filter>05. GameObject\Effect\EffectPart</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_Quad.h">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Quad</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Quad</Filter>
     </ClInclude>
     <ClInclude Include="..\public\PhysX_Manager.h">
       <Filter>16. PhysX\Manager</Filter>
@@ -541,7 +541,7 @@
       <Filter>07. Component\Animator</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_Mesh.h">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Mesh</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Environment_Manager.h">
       <Filter>17. Enviroment\Manager</Filter>
@@ -568,10 +568,10 @@
       <Filter>07. Component\Movement</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_RectParticle.h">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_RectParicle</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_RectParicle</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Effect_Allocator.h">
-      <Filter>04. Prototype\05. GameObject\Effect\Allocator</Filter>
+      <Filter>05. GameObject\Effect\Allocator</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\RigIdBody.h">
       <Filter>07. Component\RigidBody</Filter>
@@ -598,7 +598,7 @@
       <Filter>21. Behavior Tree</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_NonParticle.h">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart\Effect_NoneParticle</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Controller.h">
       <Filter>07. Component\Controller</Filter>
@@ -610,19 +610,19 @@
       <Filter>07. Component\Collider\DebugDraw</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_Particle.h">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_MeshParticle.h">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_MeshParticle</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_MeshParticle</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_Emitter.h">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart\Effect_Emitter</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_MeshEmitter.h">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_MeshEmitter</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_MeshEmitter</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_RectEmitter.h">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_RectEmitter</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_RectEmitter</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Anim_Layer.h">
       <Filter>99. Defines\Hojun</Filter>
@@ -657,13 +657,13 @@
       <Filter>04. Prototype\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\private\GameObject.cpp">
-      <Filter>04. Prototype\05. GameObject</Filter>
+      <Filter>05. GameObject</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Object_Manager.cpp">
-      <Filter>04. Prototype\05. GameObject\00. Manager</Filter>
+      <Filter>05. GameObject\00. Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Layer.cpp">
-      <Filter>04. Prototype\05. GameObject\00. Manager\Layer</Filter>
+      <Filter>05. GameObject\00. Manager\Layer</Filter>
     </ClCompile>
     <ClCompile Include="..\private\GameInstance_Proxy.cpp">
       <Filter>00. GameInstance\Proxy</Filter>
@@ -690,13 +690,13 @@
       <Filter>07. Component\Texture</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UIObject.cpp">
-      <Filter>04. Prototype\05. GameObject\UIObject</Filter>
+      <Filter>05. GameObject\UIObject</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Camera_Manager.cpp">
       <Filter>08. Camera_Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Camera.cpp">
-      <Filter>04. Prototype\05. GameObject\Camera</Filter>
+      <Filter>05. GameObject\Camera</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Input_Device.cpp">
       <Filter>01. Device\Input</Filter>
@@ -738,10 +738,10 @@
       <Filter>96. Utils</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\ContainerObject.cpp">
-      <Filter>04. Prototype\05. GameObject\ContainerObject</Filter>
+      <Filter>05. GameObject\ContainerObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PartObject.cpp">
-      <Filter>04. Prototype\05. GameObject\ContainerObject\PartObject</Filter>
+      <Filter>05. GameObject\ContainerObject\PartObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CustomFont.cpp">
       <Filter>10. Fonts</Filter>
@@ -762,10 +762,10 @@
       <Filter>07. Component\VIBuffer\Cell</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UIPartObject.cpp">
-      <Filter>04. Prototype\05. GameObject\UIContainerObject\UIPartObject</Filter>
+      <Filter>05. GameObject\UIContainerObject\UIPartObject</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UIContainerObject.cpp">
-      <Filter>04. Prototype\05. GameObject\UIContainerObject</Filter>
+      <Filter>05. GameObject\UIContainerObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Collider.cpp">
       <Filter>07. Component\Collider</Filter>
@@ -816,16 +816,16 @@
       <Filter>07. Component\VIBuffer\Point</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Effect_Manager.cpp">
-      <Filter>04. Prototype\05. GameObject\Effect\Manager</Filter>
+      <Filter>05. GameObject\Effect\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Property.cpp">
-      <Filter>04. Prototype\05. GameObject\01. Property</Filter>
+      <Filter>05. GameObject\01. Property</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_Part.cpp">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart</Filter>
+      <Filter>05. GameObject\Effect\EffectPart</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_Quad.cpp">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Quad</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Quad</Filter>
     </ClCompile>
     <ClCompile Include="..\private\PhysX_Manager.cpp">
       <Filter>16. PhysX\Manager</Filter>
@@ -834,13 +834,13 @@
       <Filter>07. Component\Animator</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_Mesh.cpp">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Mesh</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Mesh</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Environment_Manager.cpp">
       <Filter>17. Enviroment\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Effect_Container.cpp">
-      <Filter>04. Prototype\05. GameObject\Effect</Filter>
+      <Filter>05. GameObject\Effect</Filter>
     </ClCompile>
     <ClCompile Include="..\private\ShaderGlobal_Manager.cpp">
       <Filter>18. ShaderGlobal</Filter>
@@ -864,10 +864,10 @@
       <Filter>07. Component\Movement</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_RectParticle.cpp">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_RectParicle</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_RectParicle</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Effect_Allocator.cpp">
-      <Filter>04. Prototype\05. GameObject\Effect\Allocator</Filter>
+      <Filter>05. GameObject\Effect\Allocator</Filter>
     </ClCompile>
     <ClCompile Include="..\private\RigIdBody.cpp">
       <Filter>07. Component\RigidBody</Filter>
@@ -888,7 +888,7 @@
       <Filter>21. Behavior Tree</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_NonParticle.cpp">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart\Effect_NoneParticle</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Controller.cpp">
       <Filter>07. Component\Controller</Filter>
@@ -897,19 +897,19 @@
       <Filter>07. Component\Collider\Bounding\Capsule</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_Particle.cpp">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_MeshParticle.cpp">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_MeshParticle</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_MeshParticle</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_Emitter.cpp">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart\Effect_Emitter</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_MeshEmitter.cpp">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_MeshEmitter</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_MeshEmitter</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_RectEmitter.cpp">
-      <Filter>04. Prototype\05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_RectEmitter</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_RectEmitter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

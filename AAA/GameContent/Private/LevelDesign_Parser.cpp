@@ -295,6 +295,25 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 		JsonUtils::Try_ReadBoolFromNumeric(jEntry, "IsClockwise", &pDesc->Rail.bClockwise);
 		JsonUtils::Try_ReadBoolFromNumeric(jEntry, "IsClose", &pDesc->Rail.bClose);
 
+		_wstring strErp;
+		JsonUtils::Try_ReadString(jEntry, "ErpType", &strErp);
+		const _tchar* szErp = strErp.c_str();
+
+		_bool bLine =
+			JsonUtils::Equals_NoCase(szErp, L"Line");
+		_bool bCircle =
+			JsonUtils::Equals_NoCase(szErp, L"Circle");
+
+		if (bLine)
+		{
+			pDesc->Rail.fRadius = 0.f;
+			pDesc->Rail.fBezierControlLength = 0.f;
+		}
+		else if (bCircle)
+		{
+			pDesc->Rail.fBezierControlLength = 0.f;
+		}
+
 		Try_ReadRailNodes(jEntry, pDesc->Rail.fBezierControlLength, &pDesc->Rail.Nodes);
 
 		// 런타임에서는 실제 파싱된 노드 목록을 기준으로 한다.

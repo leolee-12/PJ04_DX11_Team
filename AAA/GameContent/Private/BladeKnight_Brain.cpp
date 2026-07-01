@@ -21,13 +21,14 @@ void CBladeKnight_Brain::Decide_Internal(const MONSTER_BLACKBOARD& BlackBoard, _
 	if (nullptr == m_pOwner)
 		return;
 
-	CBladeKnight* pBladeKnight = static_cast<CBladeKnight*>(m_pOwner);
 
-	const _int iAIType = pBladeKnight->Get_AIType();
+	const _int iAIType = m_pOwner->Get_AIType();
 
 	const _float fAbsHeight = fabsf(BlackBoard.fHeightToTarget);
-	const _bool bAttackable = (iAIType == 1) ? (BlackBoard.fDistToTargetXZ <= 2.f && fAbsHeight < 3.f) : fAbsHeight < 5.f;
-	const _bool bChaseable = (iAIType == 1) ? (fAbsHeight <= 1.5f) : false;
+	const _bool bAttackable = (iAIType == 1)
+		? (BlackBoard.fDistToTargetXZ <= 2.5f && fAbsHeight < 3.f)
+		: (fAbsHeight < 7.f);
+	const _bool bChaseable = (iAIType == 1) ? (fAbsHeight <= 5.f) : false;
 
 	const MONSTER_STATE_TYPE eCurState = m_pOwner->Get_StateType();
 
@@ -40,13 +41,13 @@ void CBladeKnight_Brain::Decide_Internal(const MONSTER_BLACKBOARD& BlackBoard, _
 	if (bChaseable && iAIType == 1)	// 1은 자유 이동형
 	{
 		if (eCurState != MONSTER_STATE_TYPE::CHASE)
-			pBladeKnight->Change_State(MONSTER_STATE_TYPE::CHASE);
+			m_pOwner->Change_State(MONSTER_STATE_TYPE::CHASE);
 		return;
 	}
 	
 	// 사거리 밖 추격 안함
 	if (eCurState != MONSTER_STATE_TYPE::IDLE)
-		pBladeKnight->Change_State(MONSTER_STATE_TYPE::IDLE);
+		m_pOwner->Change_State(MONSTER_STATE_TYPE::IDLE);
 }
 
 CBladeKnight_Brain* CBladeKnight_Brain::Create(CMonster* pMonster)
