@@ -7,6 +7,7 @@
 #include "Controller.h"
 #include "Collider.h"
 #include "Projectile_Movement.h"
+#include "Effect_Loader.h"
 
 CProjectile_Boulder::CProjectile_Boulder(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPhysicsProjectile{ pDevice, pContext }
@@ -51,6 +52,9 @@ void CProjectile_Boulder::On_Bounce(_int iCount)
 {
     CAMERA_SHAKE_DESC shake{ 0.35f, 0.f };
     m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &shake);
+    _float3 vPos{};
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(Engine::STATE::POSITION));
+    CEffect_Loader::GetInstance()->Spawn(TEXT("RockBounce"), m_iLevelIndex, vPos);
     if (iCount >= 3)
         Enter_Break();
 }

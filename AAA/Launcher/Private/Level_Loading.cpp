@@ -33,7 +33,7 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
     if (nullptr == m_pLoader)
         return E_FAIL;
 
-    m_pGameInstance_Proxy->Stop_Sound(ETOUI(SOUND_CHANNEL::BGM));
+    m_pGameInstance_Proxy->Stop_BGM();
     m_pGameInstance_Proxy->Clear_Lights();
 
     return S_OK;
