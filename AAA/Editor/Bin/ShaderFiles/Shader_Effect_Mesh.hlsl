@@ -12,6 +12,12 @@ bool g_bUseUnknownTexture = { false };
 float2 g_vUnknownTiling = { 1.f, 1.f };
 float2 g_vUnknownOffset = { 0.f, 0.f };
 
+Texture2D g_NormalTexture;
+bool g_bUseNormalTexture = { false };
+
+Texture2D g_MRATexture;
+bool g_bUseMRATexture = { false };
+
 Texture2D g_Texture;
 bool g_bUseTexture = { false };
 float2 g_vTextureTiling = { 1.f, 1.f };

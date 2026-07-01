@@ -58,6 +58,7 @@
 #include "Sword_SpinSlash.h"
 #include "Sword_SpinSlashTrail.h"
 #include "RockBurst.h"
+#include "DespawnEffect.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -74,6 +75,7 @@
 #include "Common_SpinSlashTrail.h"
 #include "RockEffect.h"
 #include "RockFloorEffect.h"
+#include "SmokeParticle.h"
 
 //sky
 #include "SkySphere.h"
@@ -687,6 +689,17 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CRockFloorEffect::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM,
                     "../../Resources/YSH/Boss/Gorilla/RockFloorEffect/RockFloorEffectModel.ysh"));
+        )
+    );
+
+    Register(CDespawnEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), 
+        CREATOR(CDespawnEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
+                CSmokeParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
         )
     );
 }
