@@ -865,6 +865,12 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\04. Gorilla_RockBounce">
       <UniqueIdentifier>{59ccb4ac-2007-45f9-b03a-35c3dbb07621}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\02. EnvObject\Trigger">
+      <UniqueIdentifier>{f61d97f4-06b5-4b44-8a89-c4328f90ddfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\01. Map\Section">
+      <UniqueIdentifier>{ec37b494-e272-4b95-b84e-14f77ae35aef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -881,9 +887,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Loader_Prototype.h">
       <Filter>97. DataSystem\DataLoader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\MapSection.h">
-      <Filter>00. GameObject\01. Map</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Map_Defines.h">
       <Filter>00. GameObject\01. Map</Filter>
@@ -949,9 +952,6 @@
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EnvObject_Defines.h">
-      <Filter>00. GameObject\02. EnvObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\EnvObject_Trigger.h">
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EnvObject_Interact.h">
@@ -1656,6 +1656,24 @@
     <ClInclude Include="..\public\RockBounce.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\04. Gorilla_RockBounce</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\EnvObject_Trigger.h">
+      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvTrigger_Generic.h">
+      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvTrigger_RenderGlobals.h">
+      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvTrigger_EventPublisher.h">
+      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapSection.h">
+      <Filter>00. GameObject\01. Map\Section</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapBreakSection.h">
+      <Filter>00. GameObject\01. Map\Section</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -1666,9 +1684,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Loader_Prototype.cpp">
       <Filter>97. DataSystem\DataLoader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\MapSection.cpp">
-      <Filter>00. GameObject\01. Map</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MapStage.cpp">
       <Filter>00. GameObject\01. Map</Filter>
@@ -1719,9 +1734,6 @@
       <Filter>00. GameObject\Test\TestMap</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnvObject.cpp">
-      <Filter>00. GameObject\02. EnvObject</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\EnvObject_Trigger.cpp">
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnvObject_Interact.cpp">
@@ -2368,6 +2380,24 @@
     </ClCompile>
     <ClCompile Include="..\private\RockBounce.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\04. Gorilla_RockBounce</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvObject_Trigger.cpp">
+      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvTrigger_Generic.cpp">
+      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvTrigger_RenderGlobals.cpp">
+      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvTrigger_EventPublisher.cpp">
+      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapSection.cpp">
+      <Filter>00. GameObject\01. Map\Section</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapBreakSection.cpp">
+      <Filter>00. GameObject\01. Map\Section</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
