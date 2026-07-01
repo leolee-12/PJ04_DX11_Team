@@ -34,6 +34,9 @@ namespace Client
 
         inline constexpr const _tchar* NamePlate_Appeared = L"Boss.NamePlateOn";
         inline constexpr const _tchar* FullScreen_Flash = L"Fx.FullScreenFlashOn";
+
+        inline constexpr const _tchar* CarBreakWall = L"Stage1-2.CarBreakWall";
+        inline constexpr const _tchar* CarBreakWall2 = L"Stage1-2.CarBreakWall2";
     }
 
     inline constexpr const _tchar* EVT_SWALLOWED = L"OnSwallowed";
