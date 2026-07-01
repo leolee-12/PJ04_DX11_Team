@@ -45,7 +45,7 @@ void CCutsceneGorilla::Update(_float fTimeDelta)
             if (m_pAnimatorCom->Is_Finished())
             {
                 if (!m_bGrabFired) Fire_Grab();
-                Play(CLIP_APPEAR2, false);
+                Play(CLIP_APPEAR2, false, 0.2f, 1.5f);
                 Fire_CutsceneCamera();       
                 m_ePhase = EPhase::Appearing2;
             }
@@ -110,6 +110,16 @@ void CCutsceneGorilla::On_AnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE p)
             if (e.strParam == "GrabKirby")
                 Fire_Grab();
             break;
+
+        case EANIM_EVENT::PubEvent:
+        {
+            if (p == ANIM_EVENT_PHASE::POINT && !e.strParam.empty())
+            {
+                wstring tag(e.strParam.begin(), e.strParam.end());
+                m_pGameInstance_Proxy->Publish(tag, nullptr);
+            }
+            break;
+        }
 
         default: break;
     }
