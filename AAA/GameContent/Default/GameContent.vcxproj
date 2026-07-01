@@ -79,6 +79,7 @@
     <ClInclude Include="..\public\RockPull.h" />
     <ClInclude Include="..\public\RockPush.h" />
     <ClInclude Include="..\Public\SmokeParticle.h" />
+    <ClInclude Include="..\Public\StarParticle.h" />
     <ClInclude Include="..\public\SpinWind.h" />
     <ClInclude Include="..\Public\Sword_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\MeshLayer_Binder.h" />
@@ -344,6 +345,7 @@
     <ClCompile Include="..\private\RockPull.cpp" />
     <ClCompile Include="..\private\RockPush.cpp" />
     <ClCompile Include="..\Private\SmokeParticle.cpp" />
+    <ClCompile Include="..\Private\StarParticle.cpp" />
     <ClCompile Include="..\private\SpinWind.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\MeshLayer_Binder.cpp" />

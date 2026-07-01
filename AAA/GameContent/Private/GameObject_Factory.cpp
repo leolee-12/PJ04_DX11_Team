@@ -83,6 +83,7 @@
 #include "RockFloorEffect.h"
 #include "SmokeParticle.h"
 #include "SpinWind.h"
+#include "StarParticle.h"
 
 //sky
 #include "SkySphere.h"
@@ -776,8 +777,13 @@ void CGameObject_Factory::Register_Effect()
                 CSmokeParticle::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
-        )
-    );
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CStarParticle::PROTOTYPE_TAG,
+                CStarParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StarSmooth"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Star/Common_00_Common_StarSmooth2.ysh"));
+         
+        ));
 }
 
 void CGameObject_Factory::Register_MiniBoss()

@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 #include "GameContent_const.h"
 #include "SmokeParticle.h"
+#include "StarParticle.h"
 
 CDespawnEffect::CDespawnEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Container(pDevice, pContext)
@@ -59,6 +60,8 @@ HRESULT CDespawnEffect::Ready_EffectPartObjects()
     if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeParticle::PROTOTYPE_TAG, TEXT("Proto_SmokeParticle"))))
         return E_FAIL;
 
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CStarParticle::PROTOTYPE_TAG, TEXT("Proto_StarParticle"))))
+        return E_FAIL;
 
     return S_OK;
 }

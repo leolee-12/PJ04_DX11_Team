@@ -1644,6 +1644,9 @@
     <ClInclude Include="..\Public\BoostGas.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. BoostGas</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\StarParticle.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. StarParticle</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\RockPush.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\02. Gorilla_RockPush</Filter>
     </ClInclude>
@@ -2353,6 +2356,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\BoostGas.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. BoostGas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\StarParticle.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. StarParticle</Filter>
     </ClCompile>
     <ClCompile Include="..\private\RockPush.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\02. Gorilla_RockPush</Filter>
