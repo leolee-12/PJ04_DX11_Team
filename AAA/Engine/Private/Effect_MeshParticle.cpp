@@ -27,6 +27,8 @@ HRESULT CEffect_MeshParticle::Initialize(void* pArg)
     m_wstrModelTag = pDesc->wstrModelTag;
     m_bUseDiffuseTexture = pDesc->bUseDiffuseTexture;
     m_bUseUnknownTexture = pDesc->bUseUnKnownTexture;
+    m_bUseNormalTexture = pDesc->bUseNormalTexture;
+    m_bUseMRATexture = pDesc->bUseMRATexture;
 
     m_bCustomShader = pDesc->bCustomShader;
     m_iShaderLevel = pDesc->iShaderLevel;
@@ -89,7 +91,16 @@ HRESULT CEffect_MeshParticle::Render()
                 if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
                     return E_FAIL;
             }
-
+            if (m_bUseNormalTexture == true)
+            {
+                if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", i, MTEX_TYPE::NORMALS, 0)))
+                    return E_FAIL;
+            }
+            if (m_bUseMRATexture == true)
+            {
+                if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
+                    return E_FAIL;
+            }
             if (m_bUseUnknownTexture == true)
             {
                 if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnknownTexture", i, MTEX_TYPE::UNKNOWN, 0)))
@@ -166,6 +177,12 @@ HRESULT CEffect_MeshParticle::Bind_ShaderValue()
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vUnknownOffset", &m_vCurUnknownUVOffset, sizeof(m_vCurUnknownUVOffset))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseNormalTexture", &m_bUseNormalTexture, sizeof(m_bUseNormalTexture))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseMRATexture", &m_bUseMRATexture, sizeof(m_bUseMRATexture))))
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseCircleUVAnim_T", &m_bTextureCircleUVAnim, sizeof(m_bTextureCircleUVAnim))))

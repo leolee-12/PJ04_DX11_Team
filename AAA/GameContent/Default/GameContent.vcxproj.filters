@@ -823,6 +823,18 @@
     <Filter Include="00. GameObject\07. Boss\Boss\Gorilla\Part\RockHole">
       <UniqueIdentifier>{aa2f0431-38a5-4836-b306-ff8619edda25}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect">
+      <UniqueIdentifier>{dd57bfb0-711b-4c59-a37c-801cd5dcb276}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\RockEffect">
+      <UniqueIdentifier>{c54f78de-34eb-4aef-8a0a-b4535d96b23c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\RockFloorEffect">
+      <UniqueIdentifier>{b5b527aa-e1f8-44e7-92a9-c2a17868f3c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_Spin">
+      <UniqueIdentifier>{13c5e493-c88f-4698-9992-84bcc7718354}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1578,6 +1590,15 @@
     <ClInclude Include="..\public\Boss_Gorilla_RockHole.h">
       <Filter>00. GameObject\07. Boss\Boss\Gorilla\Part\RockHole</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\RockEffect.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\RockEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RockFloorEffect.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\RockFloorEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RockBurst.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_Spin</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2255,6 +2276,15 @@
     <ClCompile Include="..\private\Boss_Gorilla_RockHole.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Gorilla\Part\RockHole</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\RockEffect.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\RockEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RockFloorEffect.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\RockFloorEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RockBurst.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_Spin</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl">
@@ -2289,6 +2319,9 @@
     </FxCompile>
     <FxCompile Include="..\ShaderFiles\Shader_Bomb.hlsl">
       <Filter>98. ShaderFiles\Hojun</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_EffectRock.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
