@@ -80,7 +80,7 @@ void CKabu::Late_Update(_float fTimeDelta)
 
 _bool CKabu::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
 {
-    Out.fRadius = { 0.85f };
+    Out.fRadius = { 0.75f };
     Out.fHeight = { 0.40f };
 
     return true;
@@ -123,7 +123,7 @@ HRESULT CKabu::Create_Movement()
     return S_OK;
 }
 
-HRESULT CKabu::Ready_State(CMonster_StateMachine* pStateMachine)
+HRESULT CKabu::Ready_State()
 {
     if (m_pStateMachine == nullptr)
         return E_FAIL;
@@ -134,54 +134,54 @@ HRESULT CKabu::Ready_State(CMonster_StateMachine* pStateMachine)
     Info.strAniName = "Wait";
     Info.bLoop = true;
     Info.fSpeed = 1.0f;
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CKabu_State_Idle::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CKabu_State_Idle::Create(Info))))
         return E_FAIL;
 
     // Fall
     Info.strAniName = "Fall";
     Info.bLoop = true;
     Info.fSpeed = 1.5f;
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::FALL, CMonster_State_Fall::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::FALL, CMonster_State_Fall::Create(Info))))
         return E_FAIL;
 
     // Landing
     Info.strAniName = "Landing";
     Info.bLoop = false;
     Info.fSpeed = 1.0f;
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::LANDING, CMonster_State_Landing::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::LANDING, CMonster_State_Landing::Create(Info))))
         return E_FAIL;
 
     Info.strAniName = "Damage";
     Info.bLoop = false;
     Info.fSpeed = 1.5f;
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK, CMonster_State_KnockBack::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK, CMonster_State_KnockBack::Create(Info))))
         return E_FAIL;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK_DEATH, CMonster_State_KnockBackDeath::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK_DEATH, CMonster_State_KnockBackDeath::Create(Info))))
         return E_FAIL;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_OUT, CMonster_State_KnockOut::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_OUT, CMonster_State_KnockOut::Create(Info))))
         return E_FAIL;
 
     // Captured / Spat ¡æ Damage(loop)
     Info.bLoop = true;
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
         return E_FAIL;
 
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::SPAT, CMonster_State_Spat::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::SPAT, CMonster_State_Spat::Create(Info))))
         return E_FAIL;
 
     // Warp_Out 
     Info.strAniName = "Warp1";
     Info.bLoop = false;
     Info.fSpeed = 1.5f;
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::WARPOUT, CKabu_State_WarpOut::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::WARPOUT, CKabu_State_WarpOut::Create(Info))))
         return E_FAIL;
 
     Info.strAniName = "Warp2";
     Info.bLoop = false;
     Info.fSpeed = 1.5f;
-    if (FAILED(pStateMachine->Register_State(MONSTER_STATE_TYPE::WARPIN, CKabu_State_WarpIn::Create(Info))))
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::WARPIN, CKabu_State_WarpIn::Create(Info))))
         return E_FAIL;
 
     return S_OK;

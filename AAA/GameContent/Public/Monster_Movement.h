@@ -23,6 +23,8 @@ public:
 	void						Face_Smooth(_fvector vWorldTarget, _float fTimeDelta);
 	void						Face_Instant(_fvector vWorldTarget);
 
+	void						Set_WindowMoveSpeed(_float fPeak, _float p01);
+
 	// 발사 함수 (넉백 시 사용)
 	void						Launch(_fvector vHorizDir, _float fHorizSpeed, _float fUpSpeed);
 	_bool						Is_Launched() const { return m_bLaunched; }

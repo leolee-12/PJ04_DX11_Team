@@ -19,10 +19,6 @@ protected:
 public:
 	static CPoppyBrosJr_Brain*	Create(CMonster* pOwner);
 
-private:
-	_float						m_fAttackTimer = 0.f;
-	static constexpr _float		s_fAttackCoolTime = { 4.f };
-
 protected:
 	virtual void				Free() override;
 };

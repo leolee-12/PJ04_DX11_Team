@@ -42,8 +42,21 @@ void CMonster_State_Attack::Update(_float fTimeDelta)
 		return;
 	}
 
-	if (m_pOwner->Get_BlackBoard().bCanMove)
-		m_pOwner->Add_MoveDir(m_MoveDir);
+	const auto& bb = m_pOwner->Get_BlackBoard();
+	if (!bb.bCanMove)
+		return;
+
+	_float lo = bb.fMoveWinLo;
+	_float span = bb.fMoveWinHi - lo;
+	_float p = 0.5f;
+
+	if (span > 1e-4f && m_pAnimator)
+		p = (m_pAnimator->Get_Progress() - lo) / span;
+
+	if (m_pMovement)
+		m_pMovement->Set_WindowMoveSpeed(m_fSpeed, p);
+
+	m_pOwner->Add_MoveDir(m_MoveDir);
 }
 
 void CMonster_State_Attack::Exit(MONSTER_STATE_TYPE eNextState)

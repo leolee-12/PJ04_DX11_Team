@@ -817,6 +817,12 @@
     <Filter Include="00. GameObject\06. Monster\04. Cappy\Parts\Hat">
       <UniqueIdentifier>{14d7107e-0156-4acf-97b5-c3456b029634}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\04. Cappy\State\Hide">
+      <UniqueIdentifier>{df128945-7f07-4cd3-b637-325bb681a823}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\06. PoppyBrosJr\State\WindUp">
+      <UniqueIdentifier>{c1e07d83-aa5d-4967-ba16-a10e1f3306e1}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\07. Boss\Boss\Gorilla\Part\RockHole">
       <UniqueIdentifier>{aa2f0431-38a5-4836-b306-ff8619edda25}</UniqueIdentifier>
     </Filter>
@@ -1571,6 +1577,9 @@
     <ClInclude Include="..\Public\LevelDesign_MonsterCatalog.h">
       <Filter>97. DataSystem\LevelDesignLoader</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\PoppyBrosJr_State_WindUp.h">
+      <Filter>00. GameObject\06. Monster\06. PoppyBrosJr\State\WindUp</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Boss_Gorilla_RockHole.h">
       <Filter>00. GameObject\07. Boss\Boss\Gorilla\Part\RockHole</Filter>
     </ClInclude>
@@ -2248,6 +2257,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_MonsterCatalog.cpp">
       <Filter>97. DataSystem\LevelDesignLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PoppyBrosJr_State_WindUp.cpp">
+      <Filter>00. GameObject\06. Monster\06. PoppyBrosJr\State\WindUp</Filter>
     </ClCompile>
     </ClCompile>
     <ClCompile Include="..\private\Boss_Gorilla_RockHole.cpp">

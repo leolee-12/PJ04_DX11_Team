@@ -34,9 +34,6 @@ void CKabu_Brain::Decide(const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta
     if (pRailMove == nullptr)
         return;
 
-    if (!pRailMove->Is_OffPath())
-        return;
-
     CKabu* pKabu = static_cast<CKabu*>(m_pOwner);
 
     if (!pKabu->Is_Visible())
@@ -45,6 +42,9 @@ void CKabu_Brain::Decide(const MONSTER_BLACKBOARD& BlackBoard, _float fTimeDelta
             m_pOwner->Change_State(MONSTER_STATE_TYPE::WARPIN);
         return;
     }
+
+    if (!pRailMove->Is_OffPath())
+        return;
 
     if (pRailMove->Is_OffPath())
         m_pOwner->Change_State(MONSTER_STATE_TYPE::WARPOUT);

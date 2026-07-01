@@ -28,7 +28,6 @@ private:
 	virtual HRESULT				Initialize_Prototype() override;
 	virtual HRESULT				Initialize(void* pArg) override;
 
-	virtual void				Update(_float fTimeDelta) override;
 	virtual HRESULT				Render() override;                  // 특수 렌더 필요 시 자식이 오버라이드
 
 public:
@@ -51,9 +50,6 @@ private:
 	static constexpr _uint		EYE_COUNT = { 5 };
 	CTexture*					m_pEyeTextureCom = { nullptr };
 	_uint						m_iEyeIndex = { 0 }; // 총 5개 (OPEN, HALF_CLOSED, CLOSED, HIDDEN, SHARPED)
-
-	// 임시 
-	_float                      m_fEyeTestTimer = { 0.f };
 
 protected:
 	virtual void				Free() override;

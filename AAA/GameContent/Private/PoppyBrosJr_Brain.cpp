@@ -34,29 +34,7 @@ void CPoppyBrosJr_Brain::Decide_Internal(const MONSTER_BLACKBOARD& BlackBoard, _
 	if (m_pOwner == nullptr)
 		return;
 
-	if (m_fAttackTimer > 0.f)
-		m_fAttackTimer -= fTimeDelta;
-
-	CPoppyBrosJr* pPBJ = static_cast<CPoppyBrosJr*>(m_pOwner);
-
-	const _int iAIType = pPBJ->Get_AIType();	
-	const MONSTER_STATE_TYPE eCurState = m_pOwner->Get_StateType();
-
-	const _float fAbsHeight = fabsf(BlackBoard.fHeightToTarget);
-	const _bool bAttackable = (iAIType == 0) ? true : (BlackBoard.fDistToTargetXZ <= 9.f && fAbsHeight < 3.f);
-
-
-	if (bAttackable && m_fAttackTimer <= 0.f)
-	{
-		m_pOwner->Change_State(MONSTER_STATE_TYPE::ATTACK);
-		m_fAttackTimer = s_fAttackCoolTime;
-		return;
-	}
-
-
-	// 사거리 밖 추격 안함
-	if (eCurState != MONSTER_STATE_TYPE::IDLE)
-		m_pOwner->Change_State(MONSTER_STATE_TYPE::IDLE);
+	m_pOwner->Change_State(MONSTER_STATE_TYPE::WINDUP);
 }
 
 CPoppyBrosJr_Brain* CPoppyBrosJr_Brain::Create(CMonster* pOwner)
