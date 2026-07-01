@@ -43,7 +43,7 @@ void CKirby_QTE_Grabbed::Enter(CKirby* pKirby)
     pMovement->Stop();
     pMovement->Set_UseGravity(false);
 
-    pKirby->OnOffParts(pKirby->Get_KirbyAbility()->Get_AbilityType(), false, true);
+    pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), false, true);
 
     Change_QTEGrabbedState(pKirby, QTE_GRABBED_STATE::START);
 }
@@ -117,7 +117,7 @@ void CKirby_QTE_Grabbed::Enter_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE
 
             pMovement->Set_VelocityY(22.f);
 
-            pKirby->OnOffParts(pKirby->Get_KirbyAbility()->Get_AbilityType(), true, true);
+            pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), true, true);
             pKirby->Get_Body()->Get_Animator()->Play("Damage", true, true, 0.1f, 0.8f, true);
             break;
         }

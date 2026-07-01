@@ -6,6 +6,8 @@
 #include "Kirby_Body.h"
 #include "Kirby_State.h"
 
+#include "Movement_Child.h"
+
 CKirby_Ability::CKirby_Ability()
 {
 }
@@ -129,4 +131,15 @@ void CKirby_Ability::Set_OverlayAni(ABILITY_ANI eAni, const _string& strBaseAniN
 void CKirby_Ability::Free()
 {
     __super::Free();
+}
+
+void CKirby_Ability::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Apply_Knockback(tInfo.vAttackerPos, 180.f, 9.f);  // Test
+
+    pKirby->Add_HP(-tInfo.fDamage);
+    pKirby->Start_DamageInvincibility();
+
+    pKirby->Change_State(KIRBY_STATE_TYPE::DAMAGED);
 }

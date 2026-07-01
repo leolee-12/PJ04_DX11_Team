@@ -229,9 +229,6 @@
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Run">
       <UniqueIdentifier>{9e646af3-48ac-48e3-8513-45d75ec65f43}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Jump">
-      <UniqueIdentifier>{3e17907c-bcba-459e-bf79-c4b706ede510}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Fall">
       <UniqueIdentifier>{90847b7a-deeb-40fd-9d4c-a4fb630d5f56}</UniqueIdentifier>
     </Filter>
@@ -333,9 +330,6 @@
     </Filter>
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Retreat">
       <UniqueIdentifier>{bdf27873-c46b-4fc8-bed7-7d19ef211827}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Patrol">
-      <UniqueIdentifier>{6faebe93-9f2f-4af1-bb44-37b816184f2d}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\99. Monster_PartBase">
       <UniqueIdentifier>{de6fdd7b-10fb-45d6-ad3d-ed06421c157b}</UniqueIdentifier>
@@ -810,6 +804,9 @@
     </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\Visible\Inhalable\04. Food">
       <UniqueIdentifier>{edf36201-7c52-4f18-a438-5ecb5876228f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Jump">
+      <UniqueIdentifier>{3e17907c-bcba-459e-bf79-c4b706ede510}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\04. Cappy\Parts\Body">
       <UniqueIdentifier>{971ac30c-c94c-400a-bc80-3e0ed9850f60}</UniqueIdentifier>
@@ -1399,7 +1396,6 @@
       <Filter>00. GameObject\96. LevelDesign\Invisible\02. FallBorder</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kabu_State_Idle.h">
-      <Filter>00. GameObject\06. Monster\Kabu\State</Filter>
       <Filter>00. GameObject\06. Monster\05. Kabu\State\Idle</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Projectile_Manager.h">
@@ -1528,7 +1524,6 @@
     <ClInclude Include="..\Public\KirbyBomb.h">
       <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb\KirbyBomb</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Monster_RailMovement.h" />
     <ClInclude Include="..\Public\Ancor_WorkingDirectory.h">
       <Filter>97. DataSystem</Filter>
     </ClInclude>
@@ -2081,7 +2076,6 @@
       <Filter>00. GameObject\96. LevelDesign\Invisible\02. FallBorder</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kabu_State_Idle.cpp">
-      <Filter>00. GameObject\06. Monster\Kabu\State</Filter>
       <Filter>00. GameObject\06. Monster\05. Kabu\State\Idle</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Projectile_Manager.cpp">
@@ -2210,9 +2204,6 @@
     <ClCompile Include="..\Private\KirbyBomb.cpp">
       <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb\KirbyBomb</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Monster_RailMovement.cpp">
-      <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Kirby_Deform.cpp">
       <Filter>00. GameObject\05. Kirby\04. Kirby_Deform</Filter>
     </ClCompile>
@@ -2260,7 +2251,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\PoppyBrosJr_State_WindUp.cpp">
       <Filter>00. GameObject\06. Monster\06. PoppyBrosJr\State\WindUp</Filter>
-    </ClCompile>
     </ClCompile>
     <ClCompile Include="..\private\Boss_Gorilla_RockHole.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Gorilla\Part\RockHole</Filter>

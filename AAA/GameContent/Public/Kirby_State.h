@@ -45,7 +45,7 @@ public:
 	virtual void Exit(CKirby* pKirby);
 
 public:
-	virtual void  On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo);
+	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo);
 
 protected:
 	_bool Handle_MoveCommand(CKirby* pKirby, CKirby_Command* pCommand);
