@@ -8,6 +8,7 @@
 #include "Collider.h"
 #include "Controller.h"
 #include "GameContent_const.h"
+#include "Effect_Loader.h"
 
 //#pragma warning(push, 0)
 //#ifdef new
@@ -574,6 +575,13 @@ void CMonster::Despawn_Spat()
 
 void CMonster::Despawn()
 {
+	_float3	vPos{};
+	XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+	CEffect_Loader::GetInstance()->Spawn(L"DespawnEffect", Get_LevelIndex(),
+		vPos, _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+		nullptr);
+
 	Enable_Colliders(false);
 	Enable_Controller(false);
 	Set_Active(false);
