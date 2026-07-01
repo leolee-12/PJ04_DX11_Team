@@ -184,12 +184,17 @@ void CEffect_Emitter::Init_PropertyValue()
 
 void CEffect_Emitter::Update_Core(const _float fTimeDelta, const _float fRatio)
 {
-    const _bool bRestart = m_bEmitterWasActive == false ||
+    const _bool bFirstActivation = m_bEmitterWasActive == false;
+    const _bool bLoopRestart = m_bEmitterWasActive == true &&
         fRatio + Helper::fEpsilon < m_fEmitterPreviousRatio;
 
-    if (bRestart == true)
+    if (bFirstActivation == true)
     {
         Reset_Emitter();
+        Emit_Particles(m_iEmitterBurstCount);
+    }
+    else if (bLoopRestart == true)
+    {
         Emit_Particles(m_iEmitterBurstCount);
     }
 

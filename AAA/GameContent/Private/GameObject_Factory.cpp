@@ -78,6 +78,7 @@
 #include "RockEffect.h"
 #include "RockFloorEffect.h"
 #include "SmokeParticle.h"
+#include "SmokeEmitter.h"
 #include "SpinWind.h"
 
 //sky
@@ -716,8 +717,8 @@ void CGameObject_Factory::Register_Effect()
     Register(CBoostGas::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CBoostGas),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeSphereOriginal::PROTOTYPE_TAG,
-                CSmokeSphereOriginal::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeEmitter::PROTOTYPE_TAG,
+                CSmokeEmitter::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
         )

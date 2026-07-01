@@ -3,7 +3,7 @@
 #include "GameInstance.h"
 #include "GameContent_const.h"
 
-#include "SmokeSphereOriginal.h"
+#include "SmokeEmitter.h"
 
 CBoostGas::CBoostGas(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Container(pDevice, pContext)
@@ -57,7 +57,7 @@ HRESULT CBoostGas::Render()
 
 HRESULT CBoostGas::Ready_EffectPartObjects()
 {
-    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeSphereOriginal::PROTOTYPE_TAG, CSmokeSphereOriginal::PROTOTYPE_TAG)))
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeEmitter::PROTOTYPE_TAG, CSmokeEmitter::PROTOTYPE_TAG)))
         return E_FAIL;
  
     return S_OK;

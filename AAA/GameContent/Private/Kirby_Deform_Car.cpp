@@ -6,6 +6,8 @@
 #include "Kirby_Body.h"
 #include "Kirby_State.h"
 
+#include "Effect_Loader.h"
+
 #include "Movement_Child.h"
 
 CKirby_Deform_Car::CKirby_Deform_Car()
@@ -202,6 +204,15 @@ void CKirby_Deform_Car::Enter_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eS
 
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Set_MaxHorizontalSpeed(s_fMaxBoostSpeed);
+
+            CEffect_Loader::GetInstance()->Spawn(L"BoostGas", pKirby->Get_LevelIndex(),
+                _float3(1.f, 0.5f, -2.8f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                pKirby->Get_Transform()->Get_WorldMatrixPtr());
+
+            CEffect_Loader::GetInstance()->Spawn(L"BoostGas", pKirby->Get_LevelIndex(),
+                _float3(-1.f, 0.5f, -2.8f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+                pKirby->Get_Transform()->Get_WorldMatrixPtr());
+
             break;
         }
         case DEFORM_CAR_STATE::BOOST_END:
