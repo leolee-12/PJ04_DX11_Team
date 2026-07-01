@@ -58,6 +58,13 @@
 #include "Sword_SpinSlash.h"
 #include "Sword_SpinSlashTrail.h"
 #include "RockBurst.h"
+#include "DeathSmoke.h"
+#include "RockBounce.h"
+#include "RockPull.h"
+#include "RockPush.h"
+#include "DespawnEffect.h"
+
+#include "BoostGas.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -74,6 +81,9 @@
 #include "Common_SpinSlashTrail.h"
 #include "RockEffect.h"
 #include "RockFloorEffect.h"
+#include "SmokeParticle.h"
+#include "SpinWind.h"
+#include "StarParticle.h"
 
 //sky
 #include "SkySphere.h"
@@ -429,6 +439,8 @@ void CGameObject_Factory::Register_Test()
         )
     );
 
+
+
     Register(CTestTriggerBox::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
         CREATOR(CTestTriggerBox),
         LOADER()
@@ -687,6 +699,7 @@ void CGameObject_Factory::Register_AnimObject()
 
 void CGameObject_Factory::Register_Effect()
 {
+    // 0
     Register(CRockBurst::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CRockBurst),
         LOADER
         (
@@ -695,8 +708,90 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CRockFloorEffect::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM,
                     "../../Resources/YSH/Boss/Gorilla/RockFloorEffect/RockFloorEffectModel.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRockEffect::PROTOTYPE_TAG,
+                CRockEffect::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRockEffect::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSH/Boss/Gorilla/RockEffect/RockEffectModel.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpinWind::PROTOTYPE_TAG,
+                CSpinWind::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpinWind::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSH/Boss/Gorilla/ArmSpinWind/BossGorilla_00_TornadoPieceMedium.ysh"));
         )
     );
+
+    Register(CDeathSmoke::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CDeathSmoke),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
+                CSmokeParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    Register(CRockBounce::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CRockBounce),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
+                CSmokeParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    Register(CRockPull::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CRockPull),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
+                CSmokeParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    Register(CRockPush::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CRockPush),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
+                CSmokeParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+
+
+    // 1
+    Register(CBoostGas::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CBoostGas),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeSphereOriginal::PROTOTYPE_TAG,
+                CSmokeSphereOriginal::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    // 2
+    Register(CDespawnEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), 
+        CREATOR(CDespawnEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
+                CSmokeParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CStarParticle::PROTOTYPE_TAG,
+                CStarParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StarSmooth"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Star/Common_00_Common_StarSmooth2.ysh"));
+         
+        ));
 }
 
 void CGameObject_Factory::Register_MiniBoss()

@@ -832,8 +832,38 @@
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\RockFloorEffect">
       <UniqueIdentifier>{b5b527aa-e1f8-44e7-92a9-c2a17868f3c1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_Spin">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SpinWind">
+      <UniqueIdentifier>{62409eab-c56c-4d68-a4a5-734967b6cc72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer">
+      <UniqueIdentifier>{5c7dcb8c-5052-4597-972e-075193a50383}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\01. Gorilla_DeathSmoke">
+      <UniqueIdentifier>{6cf3c543-1f63-4c9d-87b8-b3aa7c030834}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\00. Gorilla_Spin">
       <UniqueIdentifier>{13c5e493-c88f-4698-9992-84bcc7718354}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\07. DespawnEffect">
+      <UniqueIdentifier>{e4898539-8c43-4e25-9225-88d7fe38505a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\13. SmokeParticle">
+      <UniqueIdentifier>{edf7a60d-c353-4b44-83af-c72b7da910cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\14. StarParticle">
+      <UniqueIdentifier>{792d854b-212f-4720-bb96-6f9577206865}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\08. BoostGas">
+      <UniqueIdentifier>{f3d3b293-2e65-42ed-b5f1-fd201a943c21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\02. Gorilla_RockPush">
+      <UniqueIdentifier>{53dd3b59-90ba-4e75-835b-bab9a309f981}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\03. Gorilla_RockPull">
+      <UniqueIdentifier>{b803ddbf-3030-4582-92d7-db756d1af7cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\04. Gorilla_RockBounce">
+      <UniqueIdentifier>{59ccb4ac-2007-45f9-b03a-35c3dbb07621}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\02. EnvObject\Trigger">
       <UniqueIdentifier>{f61d97f4-06b5-4b44-8a89-c4328f90ddfb}</UniqueIdentifier>
@@ -1597,7 +1627,34 @@
       <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\RockFloorEffect</Filter>
     </ClInclude>
     <ClInclude Include="..\public\RockBurst.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_Spin</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\00. Gorilla_Spin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\SpinWind.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SpinWind</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\DeathSmoke.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\01. Gorilla_DeathSmoke</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DespawnEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\07. DespawnEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SmokeParticle.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\13. SmokeParticle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BoostGas.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. BoostGas</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\StarParticle.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. StarParticle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RockPush.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\02. Gorilla_RockPush</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RockPull.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\03. Gorilla_RockPull</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RockBounce.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\04. Gorilla_RockBounce</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EnvObject_Trigger.h">
       <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
@@ -2295,7 +2352,34 @@
       <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\RockFloorEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\private\RockBurst.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_Spin</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\00. Gorilla_Spin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\SpinWind.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SpinWind</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\DeathSmoke.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\01. Gorilla_DeathSmoke</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DespawnEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\07. DespawnEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SmokeParticle.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\13. SmokeParticle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BoostGas.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\08. BoostGas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\StarParticle.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. StarParticle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RockPush.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\02. Gorilla_RockPush</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RockPull.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\03. Gorilla_RockPull</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RockBounce.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\04. Gorilla_RockBounce</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnvObject_Trigger.cpp">
       <Filter>00. GameObject\02. EnvObject\Trigger</Filter>

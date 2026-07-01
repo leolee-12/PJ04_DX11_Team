@@ -6,25 +6,45 @@
 
 IMPLEMENT_SINGLETON(CEffect_Loader)
 
-HRESULT CEffect_Loader::Ready(const _tchar* strManifestPath, CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+namespace
+{
+    struct EFFECT_DB_ENTRY
+    {
+        const _tchar* szEffectId;    // 스폰 키
+        const _tchar* szConfigPath;  // 튜닝 json (데이터로 유지)
+    };
+
+    // === 이펙트 DB : 새 이펙트는 여기에 한 줄 추가 ===
+    static constexpr EFFECT_DB_ENTRY s_EffectDB[] =
+    {
+        { TEXT("WalkSmoke"),             TEXT("../../Resources/YSE/EffectContainer/WalkSmoke_6_19.json") },
+        { TEXT("InhaleContainer"),       TEXT("../../Resources/YSE/EffectContainer/Inhale_6_24.json") },
+        { TEXT("SwordSlash1"),           TEXT("../../Resources/YSE/EffectContainer/SwordSlash1_Alpha_Color.json") },
+        { TEXT("SwordSlash3"),           TEXT("../../Resources/YSE/EffectContainer/SwordSlash3.json") },
+        { TEXT("JumpSlash_1"),           TEXT("../../Resources/YSE/EffectContainer/JumpSlash_1.json") },
+        { TEXT("SpinSlash"),             TEXT("../../Resources/YSE/EffectContainer/SpinSlash.json") },
+        { TEXT("SpinSlashTrail"),        TEXT("../../Resources/YSE/EffectContainer/SpinSlashTrail.json") },
+        { TEXT("SpinSlashTrail_Super"),  TEXT("../../Resources/YSE/EffectContainer/SpinSlashTrail_Super.json") },
+        { TEXT("RockFloor"),             TEXT("../../Resources/YSE/EffectContainer/RockFloor.json") },
+        { TEXT("DespawnEffect"),         TEXT("../../Resources/CHJ/Effect/DespawnEffect.JSON")},
+        { TEXT("RockFloor"),             TEXT("../../Resources/YSH/Effects/Proto_RockBurst_0.json") },
+        { TEXT("DeathSmoke"),            TEXT("../../Resources/YSH/Effects/Proto_DeathSmoke_0.json") },
+        { TEXT("RockPush"),              TEXT("../../Resources/YSH/Effects/Proto_RockPush_0.json") },
+        { TEXT("RockPull"),              TEXT("../../Resources/YSH/Effects/Proto_RockPull_1.json") },
+        { TEXT("RockBounce"),            TEXT("../../Resources/YSH/Effects/Proto_RockBounce_2.json") },
+    };
+}
+
+HRESULT CEffect_Loader::Ready(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     m_pProxy = pProxy;
 
-    string strManifest;
-    if (FAILED(CDataLoader::Read_Json(strManifestPath, &strManifest)))
-        return E_FAIL;
-
-    json jManifest = json::parse(strManifest);
-    if (!jManifest.contains("Effects"))
-        return E_FAIL;
-
-    for (auto& [strId, jPath] : jManifest["Effects"].items())
+    for (const auto& tEntry : s_EffectDB)
     {
-        const _wstring strEffectId = StrToWstr(strId);
-        const _wstring strJsonPath = StrToWstr(jPath.get<string>());
+        const _wstring strEffectId = tEntry.szEffectId;
 
         string strContent;
-        if (FAILED(CDataLoader::Read_Json(strJsonPath.c_str(), &strContent)))
+        if (FAILED(CDataLoader::Read_Json(tEntry.szConfigPath, &strContent)))
             continue;
 
         json jEffect = json::parse(strContent);
@@ -33,15 +53,15 @@ HRESULT CEffect_Loader::Ready(const _tchar* strManifestPath, CGameInstance_Proxy
 
         const _wstring strProtoTag = StrToWstr(jEffect["Prototype_Tag"].get<string>());
 
-        // 프로토 STATIC 1회 등록 (팩토리 경유)
+        // 프로토타입 STATIC 1회 등록
         if (!pProxy->Has_Prototype(ETOUI(LEVEL::STATIC), strProtoTag))
         {
             auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(strProtoTag);
             if (!pReg)
                 continue;
-            pReg->ResourceLoader(pProxy, pDevice, pContext, ETOUI(LEVEL::STATIC));                 // 파트/컴포넌트(2단계 STATIC)
+            pReg->ResourceLoader(pProxy, pDevice, pContext, ETOUI(LEVEL::STATIC));
             pProxy->Add_Prototype(ETOUI(LEVEL::STATIC), strProtoTag.c_str(),
-                pReg->CreatorFunc(pDevice, pContext));       // 메인 컨테이너 프로토 STATIC
+                pReg->CreatorFunc(pDevice, pContext));
         }
 
         m_Assets[strEffectId] = EFFECT_ASSET{ strProtoTag, std::move(jEffect) };

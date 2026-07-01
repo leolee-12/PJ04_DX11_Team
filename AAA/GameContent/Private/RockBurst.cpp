@@ -4,6 +4,8 @@
 #include "GameContent_const.h"
 
 #include "RockFloorEffect.h"
+#include "RockEffect.h"
+#include "SpinWind.h"
 
 CRockBurst::CRockBurst(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Container(pDevice, pContext) {
@@ -33,8 +35,13 @@ HRESULT CRockBurst::Render() { __super::Render(); return S_OK; }
 
 HRESULT CRockBurst::Ready_EffectPartObjects()
 {
-    // partTag "RockFloor" = json EffectPartObjects 키와 매칭(지금은 json 비워서 코드 기본값 사용)
     if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRockFloorEffect::PROTOTYPE_TAG, TEXT("RockFloor"))))
+        return E_FAIL;
+
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRockEffect::PROTOTYPE_TAG, TEXT("RockEffect"))))
+        return E_FAIL;
+
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSpinWind::PROTOTYPE_TAG, TEXT("SpinWind"))))
         return E_FAIL;
 
     return S_OK;

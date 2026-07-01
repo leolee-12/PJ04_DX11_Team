@@ -650,47 +650,40 @@ void	CGameInstance_Proxy::Clear_CollisionPool()
 #pragma endregion
 
 #pragma region SOUND_MANAGER
-void CGameInstance_Proxy::Play_Sound(const TCHAR* pSoundKey, _uint iChannelIndex, float fVolume)
+void CGameInstance_Proxy::Play_SFX(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus)
 {
-	if (!IsConnected())
-		return;
-
-	m_pOwner->Play_Sound(pSoundKey, iChannelIndex, fVolume);
+	if (!IsConnected()) return;
+	m_pOwner->Play_SFX(pSoundKey, fVolume, eBus);
 }
-void CGameInstance_Proxy::Play_Sound3D(const TCHAR* pSoundKey, _uint iChannelIndex, float fVolume, _fvector vSoundPos)
+void CGameInstance_Proxy::Play_SFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume, ESoundBus eBus)
 {
-	if (!IsConnected())
-		return;
-
-	m_pOwner->Play_Sound3D(pSoundKey, iChannelIndex, fVolume, vSoundPos);
+	if (!IsConnected()) return;
+	m_pOwner->Play_SFX3D(pSoundKey, vSoundPos, fVolume, eBus);
 }
-void CGameInstance_Proxy::Play_BGM(const TCHAR* pSoundKey, _uint iChannelIndex, float fVolume)
+void CGameInstance_Proxy::Play_BGM(const TCHAR* pSoundKey, float fVolume, bool bLoop)
 {
-	if (!IsConnected())
-		return;
-
-	m_pOwner->Play_BGM(pSoundKey, iChannelIndex, fVolume);
+	if (!IsConnected()) return;
+	m_pOwner->Play_BGM(pSoundKey, fVolume, bLoop);
 }
-void CGameInstance_Proxy::Stop_Sound(_uint iChannelIndex)
+void CGameInstance_Proxy::Stop_BGM()
 {
-	if (!IsConnected())
-		return;
-
-	m_pOwner->Stop_Sound(iChannelIndex);
+	if (!IsConnected()) return;
+	m_pOwner->Stop_BGM();
+}
+void CGameInstance_Proxy::Set_BusVolume(ESoundBus eBus, float fVolume)
+{
+	if (!IsConnected()) return;
+	m_pOwner->Set_BusVolume(eBus, fVolume);
+}
+void CGameInstance_Proxy::Stop_Bus(ESoundBus eBus)
+{
+	if (!IsConnected()) return;
+	m_pOwner->Stop_Bus(eBus);
 }
 void CGameInstance_Proxy::Stop_SoundAll()
 {
-	if (!IsConnected())
-		return;
-
+	if (!IsConnected()) return;
 	m_pOwner->Stop_SoundAll();
-}
-void CGameInstance_Proxy::Set_Channel_Volume(_uint iChannelIndex, float fVolume)
-{
-	if (!IsConnected())
-		return;
-
-	m_pOwner->Set_Channel_Volume(iChannelIndex, fVolume);
 }
 #pragma endregion
 
