@@ -507,29 +507,33 @@ void	CGameInstance::Clear_CollisionPool()
 #pragma endregion
 
 #pragma region SOUND_MANAGER
-void CGameInstance::Play_Sound(const TCHAR* pSoundKey, _uint iChannelIndex, float fVolume)
+void CGameInstance::Play_SFX(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus)
 {
-    m_pSound_Manager->Play(pSoundKey, iChannelIndex, fVolume);
+    m_pSound_Manager->PlaySFX(pSoundKey, fVolume, eBus);
 }
-void CGameInstance::Play_Sound3D(const TCHAR* pSoundKey, _uint iChannelIndex, float fVolume, _fvector vSoundPos)
+void CGameInstance::Play_SFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume, ESoundBus eBus)
 {
-    m_pSound_Manager->PlaySound3D(pSoundKey, iChannelIndex, fVolume, vSoundPos);
+    m_pSound_Manager->PlaySFX3D(pSoundKey, vSoundPos, fVolume, eBus);
 }
-void CGameInstance::Play_BGM(const TCHAR* pSoundKey, _uint iChannelIndex, float fVolume)
+void CGameInstance::Play_BGM(const TCHAR* pSoundKey, float fVolume, bool bLoop)
 {
-    m_pSound_Manager->PlayBGM(pSoundKey, iChannelIndex, fVolume);
+    m_pSound_Manager->PlayBGM(pSoundKey, fVolume, bLoop);
 }
-void CGameInstance::Stop_Sound(_uint iChannelIndex)
+void CGameInstance::Stop_BGM()
 {
-    m_pSound_Manager->StopSound(iChannelIndex);
+    m_pSound_Manager->StopBGM();
+}
+void CGameInstance::Set_BusVolume(ESoundBus eBus, float fVolume)
+{
+    m_pSound_Manager->SetBusVolume(eBus, fVolume);
+}
+void CGameInstance::Stop_Bus(ESoundBus eBus)
+{
+    m_pSound_Manager->StopBus(eBus);
 }
 void CGameInstance::Stop_SoundAll()
 {
     m_pSound_Manager->StopAll();
-}
-void CGameInstance::Set_Channel_Volume(_uint iChannelIndex, float fVolume)
-{
-    m_pSound_Manager->SetChannelVolume(iChannelIndex, fVolume);
 }
 #pragma endregion
 

@@ -59,7 +59,7 @@
     <ClInclude Include="..\Public\Common_SpinSlash.h" />
     <ClInclude Include="..\Public\Common_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\DespawnEffect.h" />
-    <ClInclude Include="..\public\Gorilla_DeathSmoke.h" />
+    <ClInclude Include="..\public\DeathSmoke.h" />
     <ClInclude Include="..\Public\Kirby_DeformCar_Demo.h" />
     <ClInclude Include="..\Public\Kirby_DeformCar_Main.h" />
     <ClInclude Include="..\Public\Kirby_Deform_Car.h" />
@@ -72,9 +72,12 @@
     <ClInclude Include="..\public\LDInhalable.h" />
     <ClInclude Include="..\Public\LevelDesign_MonsterCatalog.h" />
     <ClInclude Include="..\Public\PoppyBrosJr_State_WindUp.h" />
+    <ClInclude Include="..\public\RockBounce.h" />
     <ClInclude Include="..\public\RockBurst.h" />
     <ClInclude Include="..\public\RockEffect.h" />
     <ClInclude Include="..\public\RockFloorEffect.h" />
+    <ClInclude Include="..\public\RockPull.h" />
+    <ClInclude Include="..\public\RockPush.h" />
     <ClInclude Include="..\Public\SmokeParticle.h" />
     <ClInclude Include="..\Public\StarParticle.h" />
     <ClInclude Include="..\public\SpinWind.h" />
@@ -322,7 +325,7 @@
     <ClCompile Include="..\Private\Common_SpinSlash.cpp" />
     <ClCompile Include="..\Private\Common_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\DespawnEffect.cpp" />
-    <ClCompile Include="..\private\Gorilla_DeathSmoke.cpp" />
+    <ClCompile Include="..\private\DeathSmoke.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCar_Demo.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCar_Main.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform_Car.cpp" />
@@ -335,9 +338,12 @@
     <ClCompile Include="..\private\LDInhalable.cpp" />
     <ClCompile Include="..\Private\LevelDesign_MonsterCatalog.cpp" />
     <ClCompile Include="..\Private\PoppyBrosJr_State_WindUp.cpp" />
+    <ClCompile Include="..\private\RockBounce.cpp" />
     <ClCompile Include="..\private\RockBurst.cpp" />
     <ClCompile Include="..\private\RockEffect.cpp" />
     <ClCompile Include="..\private\RockFloorEffect.cpp" />
+    <ClCompile Include="..\private\RockPull.cpp" />
+    <ClCompile Include="..\private\RockPush.cpp" />
     <ClCompile Include="..\Private\SmokeParticle.cpp" />
     <ClCompile Include="..\Private\StarParticle.cpp" />
     <ClCompile Include="..\private\SpinWind.cpp" />

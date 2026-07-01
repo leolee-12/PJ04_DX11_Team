@@ -5,32 +5,50 @@
 CSound_Manager::CSound_Manager()
 	: m_pSystem(nullptr)
 {
-	ZeroMemory(m_pChannels, sizeof(m_pChannels));
 }
 
 HRESULT CSound_Manager::Initialize()
 {
-	FMOD_RESULT result;
-
-	// FMOD 시스템 생성
-	result = FMOD::System_Create(&m_pSystem);
-	if (result != FMOD_OK)
-	{
-		// 에러 처리
+	if (FMOD::System_Create(&m_pSystem) != FMOD_OK)
 		return E_FAIL;
-	}
 
-	// FMOD 시스템 초기화
-	// 매개변수: (최대 채널 수, 초기화 플래그, 추가 드라이버 데이터)
-	result = m_pSystem->init(SOUND_MAX_CHANNEL, FMOD_INIT_NORMAL, nullptr);
-	if (result != FMOD_OK)
-	{
-		// 에러 처리
+	if (m_pSystem->init(SOUND_MAX_CHANNEL, FMOD_INIT_NORMAL, nullptr) != FMOD_OK)
 		return E_FAIL;
-	}
 
-	// 사운드 파일 로드
+	if (FAILED(Ready_Buses()))
+		return E_FAIL;
+
 	return LoadSoundFile();
+}
+
+HRESULT CSound_Manager::Ready_Buses()
+{
+	static const char* s_szBusName[] = { "BGM", "SFX", "UI", "VOICE" };
+
+	FMOD::ChannelGroup* pMaster = nullptr;
+	m_pSystem->getMasterChannelGroup(&pMaster);
+
+	for (_uint i = 0; i < ETOUI(ESoundBus::END); ++i)
+	{
+		if (m_pSystem->createChannelGroup(s_szBusName[i], &m_pBuses[i]) != FMOD_OK)
+			return E_FAIL;
+		if (pMaster)
+			pMaster->addGroup(m_pBuses[i]);
+	}
+	return S_OK;
+}
+
+FMOD::Sound* CSound_Manager::Find_Sound(const TCHAR* pSoundKey) const
+{
+	auto it = m_mapSound.find(pSoundKey);
+	if (it == m_mapSound.end())
+	{
+		OutputDebugString(L"[Sound] not found: ");
+		OutputDebugString(pSoundKey);
+		OutputDebugString(L"\n");
+		return nullptr;
+	}
+	return it->second;
 }
 
 void CSound_Manager::Update()
@@ -42,165 +60,79 @@ void CSound_Manager::Update()
 	}
 }
 
-void CSound_Manager::Play(const TCHAR* pSoundKey, _uint iChannelIndex, float fVolume)
+FMOD::Channel* CSound_Manager::PlayInternal(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus, bool bLoop)
 {
-	if (iChannelIndex >= SOUND_MAX_CHANNEL) return;
+	FMOD::Sound* pSound = Find_Sound(pSoundKey);
+	if (!pSound)
+		return nullptr;
 
-	auto iter = m_mapSound.find(pSoundKey);
+	FMOD::Channel* pChannel = nullptr;
+	// paused=true 로 시작 -> 세팅 후 재생(팝 방지). 채널 할당은 FMOD가 처리.
+	if (m_pSystem->playSound(pSound, m_pBuses[ETOUI(eBus)], true, &pChannel) != FMOD_OK || !pChannel)
+		return nullptr;
 
-	if (iter == m_mapSound.end())
-	{
-		OutputDebugString(L"[사운드 매니저] 사운드를 찾을 수 없음: ");
-		OutputDebugString(pSoundKey);
-		OutputDebugString(L"\n");
-		return;
-	}
-
-	OutputDebugString(L"[사운드 매니저] 재생 시도: ");
-	OutputDebugString(pSoundKey);
-	OutputDebugString(L"\n");
-
-	bool bPlaying = false;
-	if (m_pChannels[iChannelIndex])
-	{
-		m_pChannels[iChannelIndex]->isPlaying(&bPlaying);
-	}
-
-	// 해당 채널에서 재생 중이면 정지
-	if (bPlaying)
-	{
-		m_pChannels[iChannelIndex]->stop();
-	}
-
-	// 사운드 재생
-	FMOD_RESULT result = m_pSystem->playSound(iter->second, nullptr, true, &m_pChannels[iChannelIndex]);
-
-	if (result == FMOD_OK)
-	{
-		OutputDebugString(L"[사운드 매니저] 재생 성공!\n");
-		// 볼륨 설정 (0.0 ~ 1.0)
-		m_pChannels[iChannelIndex]->setVolume(fVolume);
-		m_pChannels[iChannelIndex]->setPaused(false);
-	}
-	else
-	{
-		OutputDebugString(L"[사운드 매니저] 재생 실패!\n");
-	}
+	pChannel->setVolume(fVolume);
+	pChannel->setMode(bLoop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
+	pChannel->setPaused(false);
+	return pChannel;
 }
 
-void CSound_Manager::PlaySound3D(const TCHAR* pSoundKey, _uint iChannelIndex, float fVolume, _fvector vSoundPos)
+FMOD::Channel* CSound_Manager::PlaySFX(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus)
 {
-	if (iChannelIndex >= SOUND_MAX_CHANNEL) return;
-	//if (vSoundPos.z < m_vListenerPos.z) { return; }
+	return PlayInternal(pSoundKey, fVolume, eBus, false);
+}
 
+FMOD::Channel* CSound_Manager::PlaySFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume, ESoundBus eBus)
+{
 	_vector vDir = vSoundPos - XMLoadFloat3(&m_vListenerPos);
 	_float fDistance = XMVectorGetX(XMVector3Length(vDir));
 
-	_float fAttenuation = 1.f - (fDistance / m_fMaxDistance);
-	fAttenuation = max(0.f, fAttenuation);
+	_float fAtten = 1.f - (fDistance / m_fMaxDistance);
+	fAtten = max(0.f, fAtten);
+	if (fAtten < 0.001f)
+		return nullptr;
 
-	if (fAttenuation < 0.001f) { return; }
+	return PlayInternal(pSoundKey, fVolume * fAtten, eBus, false);
+}
 
-	_float fFinalVolume = fVolume * fAttenuation;
+void CSound_Manager::PlayBGM(const TCHAR* pSoundKey, float fVolume, bool bLoop)
+{
+	StopBGM();   // 기존 BGM 교체(겹침 방지)
+	m_pBGMChannel = PlayInternal(pSoundKey, fVolume, ESoundBus::BGM, bLoop);
+}
 
-	auto iter = m_mapSound.find(pSoundKey);
-
-	if (iter == m_mapSound.end())
+void CSound_Manager::StopBGM()
+{
+	if (m_pBGMChannel)
 	{
-		OutputDebugString(L"[사운드 매니저] 사운드를 찾을 수 없음: ");
-		OutputDebugString(pSoundKey);
-		OutputDebugString(L"\n");
-		return;
-	}
-
-	OutputDebugString(L"[사운드 매니저] 재생 시도: ");
-	OutputDebugString(pSoundKey);
-	OutputDebugString(L"\n");
-
-	bool bPlaying = false;
-	if (m_pChannels[iChannelIndex])
-	{
-		m_pChannels[iChannelIndex]->isPlaying(&bPlaying);
-	}
-
-	// 해당 채널에서 재생 중이면 정지
-	if (bPlaying)
-	{
-		m_pChannels[iChannelIndex]->stop();
-	}
-
-	// 사운드 재생
-	FMOD_RESULT result = m_pSystem->playSound(iter->second, nullptr, true, &m_pChannels[iChannelIndex]);
-
-	if (result == FMOD_OK)
-	{
-		OutputDebugString(L"[사운드 매니저] 재생 성공!\n");
-		// 볼륨 설정 (0.0 ~ 1.0)
-		m_pChannels[iChannelIndex]->setVolume(fFinalVolume);
-		m_pChannels[iChannelIndex]->setPaused(false);
-	}
-	else
-	{
-		OutputDebugString(L"[사운드 매니저] 재생 실패!\n");
+		bool bPlaying = false;
+		m_pBGMChannel->isPlaying(&bPlaying);   
+		if (bPlaying)
+			m_pBGMChannel->stop();
+		m_pBGMChannel = nullptr;
 	}
 }
 
-void CSound_Manager::PlayBGM(const TCHAR* pSoundKey, _uint iChannelIndex, float fVolume)
+void CSound_Manager::SetBusVolume(ESoundBus eBus, float fVolume)
 {
-	if (iChannelIndex >= SOUND_MAX_CHANNEL) return;
-
-	auto iter = m_mapSound.find(pSoundKey);
-	if (iter == m_mapSound.end()) return;
-
-	bool bPlaying = false;
-	if (m_pChannels[iChannelIndex])
-	{
-	    m_pChannels[iChannelIndex]->isPlaying(&bPlaying);
-	    if (bPlaying)
-	            m_pChannels[iChannelIndex]->stop();
-	}
-
-	FMOD_RESULT result = m_pSystem->playSound(iter->second, nullptr, true, &m_pChannels[iChannelIndex]);
-
-	if (result == FMOD_OK)
-	{
-		OutputDebugString(L"[사운드 매니저] 재생 성공!\n");
-		// 볼륨 설정 (0.0 ~ 1.0)
-		m_pChannels[iChannelIndex]->setVolume(fVolume);
-		m_pChannels[iChannelIndex]->setMode(FMOD_LOOP_NORMAL);
-		m_pChannels[iChannelIndex]->setPaused(false);
-	}
-	else
-	{
-		OutputDebugString(L"[사운드 매니저] 재생 실패!\n");
-	}
+	if (m_pBuses[ETOUI(eBus)])
+		m_pBuses[ETOUI(eBus)]->setVolume(fVolume);
 }
 
-void CSound_Manager::StopSound(_uint iChannelIndex)
+void CSound_Manager::StopBus(ESoundBus eBus)
 {
-	if (m_pChannels[iChannelIndex])
-	{
-		m_pChannels[iChannelIndex]->stop();
-	}
+	if (m_pBuses[ETOUI(eBus)])
+		m_pBuses[ETOUI(eBus)]->stop();
+	if (eBus == ESoundBus::BGM)
+		m_pBGMChannel = nullptr;
 }
 
 void CSound_Manager::StopAll()
 {
-	for (int i = 0; i < SOUND_MAX_CHANNEL; ++i)
-	{
-		if (m_pChannels[i])
-		{
-			m_pChannels[i]->stop();
-		}
-	}
-}
-
-void CSound_Manager::SetChannelVolume(_uint iChannelIndex, float fVolume)
-{
-	if (m_pChannels[iChannelIndex])
-	{
-		m_pChannels[iChannelIndex]->setVolume(fVolume);
-	}
+	for (_uint i = 0; i < ETOUI(ESoundBus::END); ++i)
+		if (m_pBuses[i])
+			m_pBuses[i]->stop();
+	m_pBGMChannel = nullptr;
 }
 
 HRESULT CSound_Manager::LoadSoundFile()
@@ -302,21 +234,20 @@ CSound_Manager* CSound_Manager::Create()
 void CSound_Manager::Free()
 {
 	__super::Free();
-	// 모든 사운드 정지
+
 	StopAll();
 
-	// 사운드 리소스 해제
 	for (auto& pair : m_mapSound)
 	{
-		if (pair.second)
-		{
-			pair.second->release();
-			pair.second = nullptr;
-		}
+		if (pair.second) { pair.second->release(); pair.second = nullptr; }
 	}
 	m_mapSound.clear();
 
-	// FMOD 시스템 종료 및 해제
+	for (_uint i = 0; i < ETOUI(ESoundBus::END); ++i)
+	{
+		if (m_pBuses[i]) { m_pBuses[i]->release(); m_pBuses[i] = nullptr; }
+	}
+
 	if (m_pSystem)
 	{
 		m_pSystem->close();
