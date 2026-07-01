@@ -7,7 +7,6 @@ class CLIENT_DLL CEnvTrigger_RenderGlobals final : public CEnvObject_Trigger
 {
 	GENERATED_BODY(CEnvTrigger_RenderGlobals)
 
-	PROPERTY(_int, m_iPriority, L"Priority", L"Render Globals")
 	PROPERTY(_float, m_fInTransitionSec, L"In Transition Sec", L"Render Globals")
 	PROPERTY(_float, m_fOutTransitionSec, L"Out Transition Sec", L"Render Globals")
 
@@ -64,21 +63,12 @@ public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
 private:
-	_bool m_bActiveRenderGlobals = { false };
-
-private:
 	virtual void OnTriggerEnter(CCollider* pOther) override;
 	virtual void OnTriggerStay(CCollider* pOther) override;
 	virtual void OnTriggerExit(CCollider* pOther) override;
 
 	void Apply_RenderGlobals();
-	void Activate_RenderGlobals();
-	void Deactivate_RenderGlobals();
-	void Save_BaseRenderGlobals();
-	void Restore_BaseRenderGlobals();
-	void Resolve_RenderGlobals();
 	_bool Is_TriggerActivator(CCollider* pOther) const;
-	static CEnvTrigger_RenderGlobals* Get_ActiveRenderGlobals();
 
 public:
 	static CEnvTrigger_RenderGlobals* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

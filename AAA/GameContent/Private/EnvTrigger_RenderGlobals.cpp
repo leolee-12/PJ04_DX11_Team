@@ -2,54 +2,10 @@
 
 #include "GameInstance.h"
 
-namespace
-{
-	const char* RENDER_GLOBAL_NAMES[] =
-	{
-			"g_fSSAORadius",
-			"g_fSSAOBias",
-			"g_fSSAOPower",
-			"g_fThreshold",
-			"g_fBloomIntensity",
-			"g_fSSRIntensity",
-			"g_fSSRMaxDistance",
-			"g_fSSRThickness",
-			"g_fDoFEnable",
-			"g_fFocusDist",
-			"g_fAperture",
-			"g_fDoFMaxCoC",
-			"g_fDoFAutoFocus",
-			"g_fExposure",
-			"g_fToneMapMode",
-			"g_fAmbientSaturation",
-			"g_fFogEnable",
-			"g_fFogDensity",
-			"g_vFogColor",
-			"g_fFogFar",
-			"g_fFogStart",
-			"g_fFogStartRange",
-			"g_fFogHeightFalloff",
-			"g_fFogBaseHeight",
-			"g_fFogAnisotropy",
-			"g_fFogAmbient",
-			"g_fFogShadowStrength",
-			"g_fFogLightIntensity",
-			"g_vAtmosColor",
-			"g_fAtmosStart",
-			"g_fAtmosEnd",
-			"g_fAtmosStrength",
-	};
-
-	vector<Client::CEnvTrigger_RenderGlobals*> g_ActiveRenderGlobalTriggers;
-	unordered_map<string, _float4> g_BaseRenderGlobals;
-	Client::CEnvTrigger_RenderGlobals* g_pAppliedRenderGlobalTrigger = { nullptr };
-}
-
 NS_BEGIN(Client)
 
 CEnvTrigger_RenderGlobals::CEnvTrigger_RenderGlobals(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CEnvObject_Trigger(pDevice, pContext)
-	, m_iPriority{ 0 }
 	, m_fInTransitionSec{ 0.f }
 	, m_fOutTransitionSec{ 0.f }
 	, m_fSSAORadius{ 5.f }
@@ -90,7 +46,6 @@ CEnvTrigger_RenderGlobals::CEnvTrigger_RenderGlobals(ID3D11Device* pDevice, ID3D
 
 CEnvTrigger_RenderGlobals::CEnvTrigger_RenderGlobals(const CEnvTrigger_RenderGlobals& Prototype)
 	: CEnvObject_Trigger(Prototype)
-	, m_iPriority{ Prototype.m_iPriority }
 	, m_fInTransitionSec{ Prototype.m_fInTransitionSec }
 	, m_fOutTransitionSec{ Prototype.m_fOutTransitionSec }
 	, m_fSSAORadius{ Prototype.m_fSSAORadius }
@@ -156,33 +111,22 @@ void CEnvTrigger_RenderGlobals::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 
 void CEnvTrigger_RenderGlobals::OnTriggerEnter(CCollider* pOther)
 {
-	if (false == Is_TriggerActivator(pOther) || true == m_bActiveRenderGlobals)
+	if (false == Is_TriggerActivator(pOther))
 		return;
 
-	Activate_RenderGlobals();
+	Apply_RenderGlobals();
 
-	OutputDebugStringA("[EnvTrigger_RenderGlobals] Activate RenderGlobals\n");
+	OutputDebugStringA("[EnvTrigger_RenderGlobals] Apply RenderGlobals\n");
 }
 
 void CEnvTrigger_RenderGlobals::OnTriggerStay(CCollider* pOther)
 {
-	if (false == Is_TriggerActivator(pOther) || false == m_bActiveRenderGlobals)
-		return;
-
-	if (Get_ActiveRenderGlobals() != this)
-		return;
-
-	Apply_RenderGlobals();
+	UNREFERENCED_PARAMETER(pOther);
 }
 
 void CEnvTrigger_RenderGlobals::OnTriggerExit(CCollider* pOther)
 {
-	if (false == Is_TriggerActivator(pOther) || false == m_bActiveRenderGlobals)
-		return;
-
-	Deactivate_RenderGlobals();
-
-	OutputDebugStringA("[EnvTrigger_RenderGlobals] Deactivate RenderGlobals\n");
+	UNREFERENCED_PARAMETER(pOther);
 }
 
 void CEnvTrigger_RenderGlobals::Apply_RenderGlobals()
@@ -247,90 +191,6 @@ _bool CEnvTrigger_RenderGlobals::Is_TriggerActivator(CCollider* pOther) const
 	return nullptr != pOther && ETOUI(COLLISION_LAYER::PLAYER_HURT) == pOther->Get_RegisteredGroup();
 }
 
-void CEnvTrigger_RenderGlobals::Activate_RenderGlobals()
-{
-	if (g_ActiveRenderGlobalTriggers.empty())
-		Save_BaseRenderGlobals();
-
-	g_ActiveRenderGlobalTriggers.push_back(this);
-	m_bActiveRenderGlobals = true;
-
-	Resolve_RenderGlobals();
-}
-
-void CEnvTrigger_RenderGlobals::Deactivate_RenderGlobals()
-{
-	for (auto iter = g_ActiveRenderGlobalTriggers.begin(); iter != g_ActiveRenderGlobalTriggers.end(); ++iter)
-	{
-		if (*iter == this)
-		{
-			g_ActiveRenderGlobalTriggers.erase(iter);
-			break;
-		}
-	}
-
-	if (g_pAppliedRenderGlobalTrigger == this)
-		g_pAppliedRenderGlobalTrigger = nullptr;
-
-	m_bActiveRenderGlobals = false;
-
-	Resolve_RenderGlobals();
-}
-
-void CEnvTrigger_RenderGlobals::Save_BaseRenderGlobals()
-{
-	g_BaseRenderGlobals.clear();
-
-	for (const char* pName : RENDER_GLOBAL_NAMES)
-	{
-		const _float4* pValue = m_pGameInstance_Proxy->Get_ShaderGlobal(pName);
-		if (nullptr != pValue)
-			g_BaseRenderGlobals.emplace(pName, *pValue);
-	}
-}
-
-void CEnvTrigger_RenderGlobals::Restore_BaseRenderGlobals()
-{
-	for (const auto& Pair : g_BaseRenderGlobals)
-		m_pGameInstance_Proxy->Set_ShaderGlobal(Pair.first, Pair.second);
-
-	g_BaseRenderGlobals.clear();
-}
-
-void CEnvTrigger_RenderGlobals::Resolve_RenderGlobals()
-{
-	CEnvTrigger_RenderGlobals* pActiveTrigger = Get_ActiveRenderGlobals();
-
-	if (nullptr == pActiveTrigger)
-	{
-		Restore_BaseRenderGlobals();
-		g_pAppliedRenderGlobalTrigger = nullptr;
-		return;
-	}
-
-	if (g_pAppliedRenderGlobalTrigger == pActiveTrigger)
-		return;
-
-	pActiveTrigger->Apply_RenderGlobals();
-	g_pAppliedRenderGlobalTrigger = pActiveTrigger;
-}
-
-CEnvTrigger_RenderGlobals* CEnvTrigger_RenderGlobals::Get_ActiveRenderGlobals()
-{
-	CEnvTrigger_RenderGlobals* pActiveTrigger = nullptr;
-
-	for (CEnvTrigger_RenderGlobals* pTrigger : g_ActiveRenderGlobalTriggers)
-	{
-		if (nullptr == pTrigger)
-			continue;
-
-		if (nullptr == pActiveTrigger || pActiveTrigger->m_iPriority <= pTrigger->m_iPriority)
-			pActiveTrigger = pTrigger;
-	}
-
-	return pActiveTrigger;
-}
-
 CEnvTrigger_RenderGlobals* CEnvTrigger_RenderGlobals::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CEnvTrigger_RenderGlobals* pInstance = new CEnvTrigger_RenderGlobals(pDevice, pContext);
@@ -359,9 +219,6 @@ CGameObject* CEnvTrigger_RenderGlobals::Clone(void* pArg)
 
 void CEnvTrigger_RenderGlobals::Free()
 {
-	if (true == m_bActiveRenderGlobals)
-		Deactivate_RenderGlobals();
-
 	__super::Free();
 }
 
