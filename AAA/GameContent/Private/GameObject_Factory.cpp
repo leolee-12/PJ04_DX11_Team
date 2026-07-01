@@ -58,6 +58,7 @@
 #include "Sword_SpinSlash.h"
 #include "Sword_SpinSlashTrail.h"
 #include "RockBurst.h"
+#include "DeathSmoke.h"
 #include "DespawnEffect.h"
 
 #include "BoostGas.h"
@@ -707,6 +708,16 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CSpinWind::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM,
                     "../../Resources/YSH/Boss/Gorilla/ArmSpinWind/BossGorilla_00_TornadoPieceMedium.ysh"));
+        )
+    );
+
+    Register(CDeathSmoke::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CDeathSmoke),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
+                CSmokeParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
         )
     );
 

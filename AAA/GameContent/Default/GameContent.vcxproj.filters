@@ -1623,7 +1623,7 @@
     <ClInclude Include="..\public\SpinWind.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SpinWind</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Gorilla_DeathSmoke.h">
+    <ClInclude Include="..\public\DeathSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\01. Gorilla_DeathSmoke</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\DespawnEffect.h">
@@ -2324,7 +2324,7 @@
     <ClCompile Include="..\private\SpinWind.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SpinWind</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Gorilla_DeathSmoke.cpp">
+    <ClCompile Include="..\private\DeathSmoke.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\01. Gorilla_DeathSmoke</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\DespawnEffect.cpp">

@@ -123,6 +123,21 @@ _bool CBoss_Gorilla::Is_Death_Finished() const
     return pAnim->Is_Finished();
 }
 
+void CBoss_Gorilla::On_Enter_Corpse()
+{
+    __super::On_Enter_Corpse();
+
+    _vector vPosV = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vLookV = XMVector3Normalize(m_pTransformCom->Get_State(STATE::LOOK));
+
+    vPosV -= vLookV * 5.f;
+    vPosV.m128_f32[1] += 1.f;
+
+    _float3 vPos{};
+    XMStoreFloat3(&vPos, vPosV);
+    CEffect_Loader::GetInstance()->Spawn(L"DeathSmoke", m_iPrototypeLevel, vPos);
+}
+
 HRESULT CBoss_Gorilla::Ready_AnimEvents()
 {
     CAnimator* pAnim = Get_BodyAnimator();
