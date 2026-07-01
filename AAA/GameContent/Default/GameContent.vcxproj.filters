@@ -835,6 +835,9 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_Spin">
       <UniqueIdentifier>{13c5e493-c88f-4698-9992-84bcc7718354}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SpinWind">
+      <UniqueIdentifier>{62409eab-c56c-4d68-a4a5-734967b6cc72}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1599,6 +1602,9 @@
     <ClInclude Include="..\public\RockBurst.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_Spin</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\SpinWind.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SpinWind</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2284,6 +2290,9 @@
     </ClCompile>
     <ClCompile Include="..\private\RockBurst.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_Spin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\SpinWind.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SpinWind</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
