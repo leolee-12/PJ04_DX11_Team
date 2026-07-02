@@ -76,7 +76,7 @@ HRESULT CNormalEnemy_Body::Render()
 HRESULT CNormalEnemy_Body::Ready_Components()
 {
 	PART_SETUP t{};
-	t.tShader = Shader_AnimMesh_PBR;
+	t.tShader = Shader_Monster;
 	t.szModelProtoTag = TEXT("Prototype_Component_Model_NormalEnemy_Body");
 	t.szAnimEventFile =	TEXT("../../Resources/CHJ/Monster/NormalEnemy/NormalEnemy_AnimEvents.json");
 	if (FAILED(Ready_MeshPart(t)))

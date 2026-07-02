@@ -44,9 +44,10 @@ float g_fFogEnable;
 float3 g_vAtmosColor;
 float g_fAtmosStart, g_fAtmosEnd, g_fAtmosStrength;
 
+float g_fESMConst = 80.f;
+float g_fESMBleed = 0.2f;
+
 static const float PI = 3.14159265f;
-
-
 
   //============================ Common VS ============================
 struct VS_IN
@@ -247,9 +248,14 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     lc = mul(lc, g_ShadowLightProjMatrix);
     float2 suv = float2(lc.x / lc.w * 0.5f + 0.5f, lc.y / lc.w * -0.5f + 0.5f);
     float pz = lc.z / lc.w;
-    float sd = g_LightDepthTexture.Sample(BorderSampler, suv).r;
-    if (pz <= 1.f && pz - 0.002f > sd)
-        color *= 0.5f;
+    [branch]
+    if (pz <= 1.f)
+    {
+        float esm = g_LightDepthTexture.Sample(BorderSampler, suv).r;
+        float shadow = saturate(exp(-g_fESMConst * pz) * esm);
+        shadow = saturate((shadow - g_fESMBleed) / (1.f - g_fESMBleed));
+        color *= lerp(0.5f, 1.f, shadow);
+    }
     
     /* 볼류메트릭 포그 (froxel) */
     if (g_fFogEnable > 0.5f)

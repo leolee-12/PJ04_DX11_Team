@@ -9,7 +9,7 @@
 #include "UI_Curtain.h"
 #include "UI_CurtainTexture.h"
 #include "Loader.h"
-#include "Level_GamePlay.h"
+#include "Stage0_Step1.h"
 
 
 CLevel_FirstLoading::CLevel_FirstLoading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -47,8 +47,8 @@ void CLevel_FirstLoading::Update(_float fTimeDelta)
 
         switch (m_eNextLevelID)
         {
-            case LEVEL::GAMEPLAY:
-                pNextLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
+            case LEVEL::STAGE0_STEP1:
+                pNextLevel = CStage0_Step1::Create(m_pDevice, m_pContext);
                 break;
         }
 

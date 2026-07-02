@@ -104,19 +104,19 @@ DepthStencilState DSS_MarkOccluded
 {
     DepthEnable = true;
     DepthWriteMask = All;
-    DepthFunc = less_equal; // DSS_Default와 동일
+    DepthFunc = less_equal;
 
     StencilEnable = true;
     StencilReadMask = 0xFF;
     StencilWriteMask = 0xFF;
 
     FrontFaceStencilFunc = Always;
-    FrontFaceStencilPass = Keep; // 보이는 부분: 그대로
-    FrontFaceStencilDepthFail = Replace; // ★ 가려진 부분: ref(1) 기록
+    FrontFaceStencilPass = Replace; // 보이는 커비도 기록 (Keep 에서 변경)
+    FrontFaceStencilDepthFail = Replace; // 가려진 커비도 기록 (기존)
     FrontFaceStencilFail = Keep;
 
     BackFaceStencilFunc = Always;
-    BackFaceStencilPass = Keep;
+    BackFaceStencilPass = Replace; // 변경
     BackFaceStencilDepthFail = Replace;
     BackFaceStencilFail = Keep;
 };
@@ -137,6 +137,26 @@ DepthStencilState DSS_StencilEqual
     FrontFaceStencilDepthFail = Keep;
 
     BackFaceStencilFunc = Equal;
+    BackFaceStencilPass = Keep;
+    BackFaceStencilFail = Keep;
+    BackFaceStencilDepthFail = Keep;
+};
+
+DepthStencilState DSS_SpotlightDarken
+{
+    DepthEnable = false;
+    DepthWriteMask = Zero;
+
+    StencilEnable = true;
+    StencilReadMask = 0xFF;
+    StencilWriteMask = 0x00;
+
+    FrontFaceStencilFunc = Not_Equal; // stencil != ref(1) => 배경/월드
+    FrontFaceStencilPass = Keep;
+    FrontFaceStencilFail = Keep;
+    FrontFaceStencilDepthFail = Keep;
+
+    BackFaceStencilFunc = Not_Equal;
     BackFaceStencilPass = Keep;
     BackFaceStencilFail = Keep;
     BackFaceStencilDepthFail = Keep;
