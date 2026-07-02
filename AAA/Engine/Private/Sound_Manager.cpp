@@ -95,6 +95,32 @@ FMOD::Channel* CSound_Manager::PlaySFX3D(const TCHAR* pSoundKey, _fvector vSound
 	return PlayInternal(pSoundKey, fVolume * fAtten, eBus, false);
 }
 
+FMOD::Channel* CSound_Manager::PlaySFXLoop(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus)
+{
+	return PlayInternal(pSoundKey, fVolume, eBus, true);
+}
+
+FMOD::Channel* CSound_Manager::PlaySFX3DLoop(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume, ESoundBus eBus)
+{
+	_vector vDir = vSoundPos - XMLoadFloat3(&m_vListenerPos);
+	_float fDist = XMVectorGetX(XMVector3Length(vDir));
+	_float fAtten = max(0.f, 1.f - fDist / m_fMaxDistance);
+	return PlayInternal(pSoundKey, fVolume * fAtten, eBus, true);
+}
+
+void CSound_Manager::StopChannel(FMOD::Channel*& pChannel)
+{
+	if (!pChannel)
+		return;
+
+	bool bPlaying = false;
+
+	if (pChannel->isPlaying(&bPlaying) == FMOD_OK && bPlaying)
+		pChannel->stop();
+
+	pChannel = nullptr;
+}
+
 void CSound_Manager::PlayBGM(const TCHAR* pSoundKey, float fVolume, bool bLoop)
 {
 	StopBGM();   // 기존 BGM 교체(겹침 방지)

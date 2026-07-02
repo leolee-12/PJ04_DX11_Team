@@ -650,15 +650,34 @@ void	CGameInstance_Proxy::Clear_CollisionPool()
 #pragma endregion
 
 #pragma region SOUND_MANAGER
-void CGameInstance_Proxy::Play_SFX(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus)
+FMOD::Channel* CGameInstance_Proxy::Play_SFX(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus)
 {
-	if (!IsConnected()) return;
-	m_pOwner->Play_SFX(pSoundKey, fVolume, eBus);
+	if (!IsConnected()) 
+		return nullptr;
+	return m_pOwner->Play_SFX(pSoundKey, fVolume, eBus);
 }
-void CGameInstance_Proxy::Play_SFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume, ESoundBus eBus)
+FMOD::Channel* CGameInstance_Proxy::Play_SFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume, ESoundBus eBus)
+{
+	if (!IsConnected()) 
+		return nullptr;
+	return m_pOwner->Play_SFX3D(pSoundKey, vSoundPos, fVolume, eBus);
+}
+FMOD::Channel* CGameInstance_Proxy::Play_SFX_Loop(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus)
+{
+	if (!IsConnected()) 
+		return nullptr;
+	return m_pOwner->Play_SFX_Loop(pSoundKey, fVolume, eBus);
+}
+FMOD::Channel* CGameInstance_Proxy::Play_SFX3D_Loop(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume, ESoundBus eBus)
+{
+	if (!IsConnected()) 
+		return nullptr;
+	return m_pOwner->Play_SFX3D_Loop(pSoundKey, vSoundPos, fVolume, eBus);
+}
+void CGameInstance_Proxy::Stop_Channel(FMOD::Channel*& pChannel)
 {
 	if (!IsConnected()) return;
-	m_pOwner->Play_SFX3D(pSoundKey, vSoundPos, fVolume, eBus);
+	m_pOwner->Stop_Channel(pChannel);
 }
 void CGameInstance_Proxy::Play_BGM(const TCHAR* pSoundKey, float fVolume, bool bLoop)
 {

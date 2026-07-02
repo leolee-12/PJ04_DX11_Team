@@ -553,7 +553,9 @@ _bool CMonster::Handle_SharedAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePh
 			return true;
 
 		string strKey = e.strParam;
-		if (strKey.find('.') == string::npos)
+		const size_t iLen = strKey.size();
+		if (iLen < 4 ||	
+			strKey.compare(iLen - 4, 4, ".wav") != 0)
 			strKey += ".wav";
 
 		_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
