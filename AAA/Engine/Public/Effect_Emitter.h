@@ -87,6 +87,14 @@ PROPERTY(_float, m_fEmitterSize_Value_1, L"Size_Value 1_E", L"Emitter Size");
 // Emitter Color
 PROPERTY(_float3, m_vEmitterColor, L"Color_E", L"Emitter Color");
 
+PROPERTY(_bool, m_bEmitterRandomColor, L"Random Color_E", L"Emitter Color - Random");
+PROPERTY(_uint, m_iEmitterRandomColorCount, L"Random Color Count_E", L"Emitter Color - Random");
+PROPERTY(_float3, m_vEmitterRandomColor_0, L"Random Color 0_E", L"Emitter Color - Random");
+PROPERTY(_float3, m_vEmitterRandomColor_1, L"Random Color 1_E", L"Emitter Color - Random");
+PROPERTY(_float3, m_vEmitterRandomColor_2, L"Random Color 2_E", L"Emitter Color - Random");
+PROPERTY(_float3, m_vEmitterRandomColor_3, L"Random Color 3_E", L"Emitter Color - Random");
+PROPERTY(_float3, m_vEmitterRandomColor_4, L"Random Color 4_E", L"Emitter Color - Random");
+
 PROPERTY(_bool, m_bEmitterColorChange, L"Color Change_E", L"Emitter Color");
 PROPERTY(_float3, m_vEmitterColorStartValue, L"Color_Start_E", L"Emitter Color");
 PROPERTY(_float3, m_vEmitterColorEndValue, L"Color_End_E", L"Emitter Color");
@@ -126,6 +134,7 @@ protected:
         _float3 vScale{ 1.f, 1.f, 1.f };
 
         _float3 vColor{ 1.f, 1.f, 1.f };
+        _float3 vRandomColor{ 1.f, 1.f, 1.f };
 
         _float3 vLocalPos{};
         _float3 vVelocity{};
@@ -212,6 +221,7 @@ protected:
 
     _vector Make_RandomSphereDirection() const;
     _vector Make_FountainDirection() const;
+    _float3 Select_EmitterRandomColor() const;
 
     void Update_EmitterParticleMove(EMITTER_PARTICLE& Particle);
     void Update_EmitterParticleAlpha(EMITTER_PARTICLE& Particle, _float fLocalRatio);

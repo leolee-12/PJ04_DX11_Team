@@ -185,6 +185,14 @@ void CEffect_Emitter::Init_PropertyValue()
     // Color
     m_vEmitterColor = { 1.f, 1.f, 1.f };
 
+    m_bEmitterRandomColor = false;
+    m_iEmitterRandomColorCount = 5;
+    m_vEmitterRandomColor_0 = { 1.f, 1.f, 1.f };
+    m_vEmitterRandomColor_1 = { 1.f, 1.f, 1.f };
+    m_vEmitterRandomColor_2 = { 1.f, 1.f, 1.f };
+    m_vEmitterRandomColor_3 = { 1.f, 1.f, 1.f };
+    m_vEmitterRandomColor_4 = { 1.f, 1.f, 1.f };
+
     m_bEmitterColorChange = false;
     m_vEmitterColorStartValue = { 1.f, 1.f, 1.f };
     m_vEmitterColorEndValue = { 1.f, 1.f, 1.f };
@@ -405,6 +413,9 @@ _bool CEffect_Emitter::Spawn_EmitterParticle()
 
     pParticle->fAlpha = m_fEmitterAlpha;
     pParticle->vColor = m_vEmitterColor;
+    pParticle->vRandomColor = m_bEmitterRandomColor == true
+        ? Select_EmitterRandomColor()
+        : _float3{ 1.f, 1.f, 1.f };
 
     pParticle->fFlutterPhase = m_pGameInstance_Proxy->RandomFloat(0.f, XM_2PI);
 
@@ -635,6 +646,31 @@ _vector CEffect_Emitter::Make_FountainDirection() const
     return XMVector3Normalize(XMVectorSet(fX, fUpBias, fZ, 0.f));
 }
 
+_float3 CEffect_Emitter::Select_EmitterRandomColor() const
+{
+    _uint iColorCount = m_iEmitterRandomColorCount;
+    if (iColorCount < 1)
+        iColorCount = 1;
+    if (iColorCount > 5)
+        iColorCount = 5;
+
+    _uint iColorIndex = static_cast<_uint>(
+        m_pGameInstance_Proxy->RandomFloat(0.f, static_cast<_float>(iColorCount)));
+
+    if (iColorIndex >= iColorCount)
+        iColorIndex = iColorCount - 1;
+
+    switch (iColorIndex)
+    {
+    case 0: return m_vEmitterRandomColor_0;
+    case 1: return m_vEmitterRandomColor_1;
+    case 2: return m_vEmitterRandomColor_2;
+    case 3: return m_vEmitterRandomColor_3;
+    case 4: return m_vEmitterRandomColor_4;
+    default: return m_vEmitterRandomColor_0;
+    }
+}
+
 void CEffect_Emitter::Update_EmitterParticleMove(EMITTER_PARTICLE& Particle)
 {
     const _float fTime = Particle.fAge;
@@ -703,11 +739,26 @@ void CEffect_Emitter::Update_EmitterParticleSize(EMITTER_PARTICLE& Particle, _fl
 
 void CEffect_Emitter::Update_EmitterParticleColor(EMITTER_PARTICLE& Particle, _float fLocalRatio)
 {
-    Particle.vColor = Evaluate_EmitterFloat3Curve(
+    if (m_bEmitterRandomColor == true && m_bEmitterColorChange == false)
+    {
+        Particle.vColor = Particle.vRandomColor;
+        return;
+    }
+
+    _float3 vColor = Evaluate_EmitterFloat3Curve(
         fLocalRatio, m_vEmitterColor, m_bEmitterColorChange,
         m_vEmitterColorStartValue, m_vEmitterColorEndValue,
         m_bActive_EmitterColor_Ratio_0, m_fEmitterColor_Ratio_0, m_vEmitterColor_Value_0,
         m_bActive_EmitterColor_Ratio_1, m_fEmitterColor_Ratio_1, m_vEmitterColor_Value_1);
+
+    if (m_bEmitterRandomColor == true)
+    {
+        vColor.x *= Particle.vRandomColor.x;
+        vColor.y *= Particle.vRandomColor.y;
+        vColor.z *= Particle.vRandomColor.z;
+    }
+
+    Particle.vColor = vColor;
 }
 
 _bool CEffect_Emitter::Can_Emit() const

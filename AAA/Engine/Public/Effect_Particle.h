@@ -97,6 +97,14 @@ PROPERTY(_float, m_fParticleSize_Value_1, L"Size_Value 1_P", L"Particle Size");
 // Particle Color
 PROPERTY(_float3, m_vParticleColor, L"Color_P", L"Particle Color");
 
+PROPERTY(_bool, m_bParticleRandomColor, L"Random Color_P", L"Particle Color - Random");
+PROPERTY(_uint, m_iParticleRandomColorCount, L"Random Color Count_P", L"Particle Color - Random");
+PROPERTY(_float3, m_vParticleRandomColor_0, L"Random Color 0_P", L"Particle Color - Random");
+PROPERTY(_float3, m_vParticleRandomColor_1, L"Random Color 1_P", L"Particle Color - Random");
+PROPERTY(_float3, m_vParticleRandomColor_2, L"Random Color 2_P", L"Particle Color - Random");
+PROPERTY(_float3, m_vParticleRandomColor_3, L"Random Color 3_P", L"Particle Color - Random");
+PROPERTY(_float3, m_vParticleRandomColor_4, L"Random Color 4_P", L"Particle Color - Random");
+
 PROPERTY(_bool, m_bParticleColorChange, L"Color Change_P", L"Particle Color");
 PROPERTY(_float3, m_vParticleColorStartValue, L"Color_Start_P", L"Particle Color");
 PROPERTY(_float3, m_vParticleColorEndValue, L"Color_End_P", L"Particle Color");
@@ -130,6 +138,7 @@ protected:
         _float3 vScale{ 1.f, 1.f, 1.f };
 
         _float3 vColor{ 1.f, 1.f, 1.f };
+        _float3 vRandomColor{ 1.f, 1.f, 1.f };
 
         _float3 vLocalPos{};
         _float3 vVelocity{};
@@ -212,6 +221,7 @@ protected:
 
     _vector Make_RandomSphereDirection() const;
     _vector Make_FountainDirection() const;
+    _float3 Select_ParticleRandomColor() const;
 
     void Update_ParticleMove(PARTICLE& Particle, _float fRatio, _float fLocalRatio);
     void Update_ParticleAlpha(PARTICLE& Particle, _float fLocalRatio);
