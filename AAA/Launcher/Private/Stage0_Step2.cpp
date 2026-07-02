@@ -132,6 +132,7 @@ HRESULT CStage0_Step2::Ready_Camera()
     CamDesc.fFovy = XMConvertToRadians(50.f); CamDesc.fNear = 0.1f; CamDesc.fFar = 1000.f;
     CamDesc.strTargetLayer = TEXT("Layer_LiveObject");
     CamDesc.strTargetObj = TEXT("Proto_Kirby_0");
+    CamDesc.strDataPath = TEXT("../../Resources/YSH/CameraData/Level0_Stage1_Step02_cam.json");
     m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::STAGE0_STEP2),
         TEXT("Prototype_GameObject_Camera_Follow"),
         ETOUI(LEVEL::STAGE0_STEP2), TEXT("Layer_Camera"), TEXT("CameraFollow"), &CamDesc);
