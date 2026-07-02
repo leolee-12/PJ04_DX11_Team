@@ -66,7 +66,8 @@
 #include "Gorilla_Ring.h"
 
 #include "DespawnEffect.h"
-
+#include "GetAbilityEffect.h"
+#include "SwordChargeEffect.h"
 #include "BoostGas.h"
 #include "CarMilkyWay.h"
 
@@ -90,6 +91,8 @@
 #include "SpinWind.h"
 #include "Car_00_MilkyWay.h"
 #include "StarParticle.h"
+#include "Star2DParticle.h"
+#include "SwordCharge.h"
 #include "Swing_Smoke.h"
 #include "Shockwave.h"
 
@@ -791,29 +794,47 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
-    // 1
+
+    // BoostGas
     Register(CBoostGas::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CBoostGas),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeEmitter::PROTOTYPE_TAG,
-                CSmokeEmitter::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeEmitter::PROTOTYPE_TAG, CSmokeEmitter::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
         )
     );
-
-    // 2
+    
+    // CarMilkyWay
     Register(CCarMilkyWay::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CCarMilkyWay),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CCar_00_MilkyWay::PROTOTYPE_TAG,
-                CCar_00_MilkyWay::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCar_00_MilkyWay::PROTOTYPE_TAG, CCar_00_MilkyWay::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Car_00_MilkyWay"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/CarMilkyWay/Car_00_MilkyWay.ysh"));
         )
     );
 
-    // 2
+    // GetAbilityEffect
+    Register(CGetAbilityEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CGetAbilityEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CStar2DParticle::PROTOTYPE_TAG, CStar2DParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_Star2D.iLevelID, Texture_Star2D.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Star2D.szFileTag, Texture_Star2D.iNumTex));
+        )
+    );
+
+    // SwordChargeEffect
+    Register(CSwordChargeEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSwordChargeEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordCharge::PROTOTYPE_TAG, CSwordCharge::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SwordCharge"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/SwordCharge/Model_Common_Ring03.ysh"));
+        )
+    );
+
     Register(CDespawnEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), 
         CREATOR(CDespawnEffect),
         LOADER
