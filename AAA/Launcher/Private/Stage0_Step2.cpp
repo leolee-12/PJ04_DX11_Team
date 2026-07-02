@@ -89,19 +89,13 @@ HRESULT CStage0_Step2::Render()
 
 HRESULT CStage0_Step2::Ready_Events()
 {
-    m_pGameInstance_Proxy->Subscribe(TEXT("FadeOut_Done"), [this](void* p) {
-        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::BOSS_STAGE1);
+    Subscribe_Event(TEXT("FadeOut_Done"), [this](void* p) {
+        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::TOWN_STEP1);
         if (pLoadingLevel)
         {
             m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
             return;
         }
-        //CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::TOWN_STEP1);
-        //if (pLoadingLevel)
-        //{
-        //    m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
-        //    return;
-        //}
         });
     return S_OK;
 }
@@ -135,6 +129,7 @@ HRESULT CStage0_Step2::Ready_Camera()
     CamDesc.fFovy = XMConvertToRadians(50.f); CamDesc.fNear = 0.1f; CamDesc.fFar = 1000.f;
     CamDesc.strTargetLayer = TEXT("Layer_LiveObject");
     CamDesc.strTargetObj = TEXT("Proto_Kirby_0");
+    CamDesc.strDataPath = TEXT("../../Resources/YSH/CameraData/Level0_Stage1_Step02_cam.json");
     m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::STAGE0_STEP2),
         TEXT("Prototype_GameObject_Camera_Follow"),
         ETOUI(LEVEL::STAGE0_STEP2), TEXT("Layer_Camera"), TEXT("CameraFollow"), &CamDesc);

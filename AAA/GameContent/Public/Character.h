@@ -26,9 +26,17 @@ public:
 public:
 	virtual void Damaged(const ATTACK_INFO& tInfo) override;
 
+	const _float* Get_HitFlashPtr()      const { return &m_fHitFlashCur; }
+	const _float3* Get_HitFlashColorPtr() const { return &m_vHitFlashColor; }
+
 protected:
 	_float						m_fMaxHP = { 100.f };
 	_float						m_fCurHP = { 100.f };
+
+	_float  m_fHitFlashCur = { 0.f };          // 현재 강도 0..1
+	_float  m_fHitFlashTime = { 0.f };          // 원샷 잔여시간(몬스터)
+	_float  m_fHitFlashDuration = { 0.12f };        // 원샷 1회 길이
+	_float3 m_vHitFlashColor = { 1.f, 1.f, 1.f };// 흰색
 
 protected:
 	virtual _bool Block_Hit(const ATTACK_INFO& tInfo) { return false; }

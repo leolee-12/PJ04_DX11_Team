@@ -115,6 +115,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pInstance->m_pShadow_Dir)
         return E_FAIL;
 
+    m_pInstance->m_pShadow_Blob = CShadow_Dir::Create();
+    if (nullptr == m_pInstance->m_pShadow_Blob)
+        return E_FAIL;
+
     m_pInstance->m_pEffect_Manager = CEffect_Manager::Create(*ppDevice, *ppContext);
     if (nullptr == m_pInstance->m_pEffect_Manager)
         return E_FAIL;
@@ -131,18 +135,12 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pInstance->m_pShaderGlobal_Manager)
         return E_FAIL;
 
-
-    
-
-    
-
     m_pInstance->m_RandomGenerator.seed(random_device{}());
-    
 
     return S_OK;
 }
 
-void CGameInstance::Update_Engine(_float fTimeDelta)
+void CGameInstance::Update_Engine(_float fTimeDelta, _float fRawTimeDelta)
 {
     ++m_iFrameIndex;
 
@@ -153,7 +151,9 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 
 	m_pInput_Device->Update();
 
-    m_pShaderGlobal_Manager->Tick(fTimeDelta);
+    // 전역상수값들은 현재 연출로만쓰고있어서 언스케일 시간
+    // 물결이나 실제 타임스케일 영향받아야하면 그때 추가 ㅇㅇ
+    m_pShaderGlobal_Manager->Tick(fRawTimeDelta);
 
     m_pObject_Manager->Priority_Update(fTimeDelta);
     m_pObject_Manager->Update(fTimeDelta);
@@ -753,6 +753,7 @@ void CGameInstance::Free()
     Safe_Release(m_pShaderGlobal_Manager);
     Safe_Release(m_pEnvironment_Manager);
     Safe_Release(m_pShadow_Dir);
+    Safe_Release(m_pShadow_Blob);
     Safe_Release(m_pTarget_Manager);
     Safe_Release(m_pSound_Manager);
     Safe_Release(m_pCollision_Manager);

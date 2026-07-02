@@ -16,12 +16,12 @@
 using namespace physx;
 
 #pragma region ENGINE
-void CGameInstance_Proxy::Update_Engine(_float fTimeDelta)
+void CGameInstance_Proxy::Update_Engine(_float fTimeDelta, _float fRawTimeDelta)
 {
 	if (m_pOwner == nullptr)
 		return;
 
-	m_pOwner->Update_Engine(fTimeDelta);
+	m_pOwner->Update_Engine(fTimeDelta, fRawTimeDelta);
 }
 
 HRESULT CGameInstance_Proxy::Begin_Draw()
@@ -793,6 +793,20 @@ HRESULT CGameInstance_Proxy::Update_ShadowLight(const SHADOW_LIGHT_DESC& ShadowD
 		return E_FAIL;
 
 	return m_pOwner->m_pShadow_Dir->Add_ShadowLight(ShadowDesc);
+}
+HRESULT CGameInstance_Proxy::Update_BlobShadow(const SHADOW_LIGHT_DESC& d)
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->m_pShadow_Blob->Update_ShadowLight(d);
+}
+const _float4x4* CGameInstance_Proxy::Get_BlobShadow_Transform(D3DTS e) const
+{
+	if (!IsConnected())
+		return nullptr;
+
+	return m_pOwner->m_pShadow_Blob->Get_Transform(e);
 }
 #pragma endregion
 

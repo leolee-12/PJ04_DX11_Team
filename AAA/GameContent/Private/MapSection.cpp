@@ -107,8 +107,8 @@ void CMapSection::Late_Update(_float fTimeDelta)
 
 HRESULT CMapSection::Render_Shadow()
 {
-	if (!m_bRenderable || !m_bCastShadow || nullptr == m_pModelCom || nullptr == m_pShaderCom)
-		return S_OK;
+	/*if (!m_bRenderable || !m_bCastShadow || nullptr == m_pModelCom || nullptr == m_pShaderCom)
+		return S_OK;*/
 
 	if (FAILED(Bind_WorldMatrix()))
 		return E_FAIL;
@@ -122,7 +122,7 @@ HRESULT CMapSection::Render_Shadow()
 	{
 		if (!Should_RenderMesh(static_cast<_uint>(i)))
 			continue;
-		if (FAILED(m_pShaderCom->Begin(3))) 
+		if (FAILED(m_pShaderCom->Begin(0))) 
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Render((_uint)i)))
 			return E_FAIL;

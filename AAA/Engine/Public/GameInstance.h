@@ -60,7 +60,7 @@ public:
 	}
 
 private:
-	void Update_Engine(_float fTimeDelta);
+	void Update_Engine(_float fTimeDelta, _float fRawTimeDelta);
 	HRESULT Begin_Draw();
 	HRESULT Draw();
 	HRESULT End_Draw();
@@ -266,6 +266,7 @@ private:
 	CSound_Manager*				m_pSound_Manager = { nullptr };
 	CTarget_Manager*			m_pTarget_Manager = { nullptr };
 	CShadow_Dir*				m_pShadow_Dir = { nullptr };
+	CShadow_Dir*				m_pShadow_Blob = { nullptr };
 	CEffect_Manager*			m_pEffect_Manager = { nullptr };
 	CPhysX_Manager*				m_pPhysX_Manager = { nullptr };
 	CEnvironment_Manager*		m_pEnvironment_Manager = { nullptr };

@@ -297,32 +297,20 @@ void CMapStage::Submit_VisibleSections()
 #endif
 		}
 
-		if (!ENABLE_MAP_SECTION_SHADOW)
-			continue;
+		//if (!ENABLE_MAP_SECTION_SHADOW)
+		//	continue;
 
-		if (!pSection->Is_ShadowCaster())
-			continue;
+		//if (!pSection->Is_ShadowCaster())
+		//	continue;
 
-		const _bool bVisibleShadow =
-			!m_pGameInstance_Proxy->Should_CullAABB(
-				CULLING_VIEW::SHADOW_DIR,
-				pSection->Get_WorldBounds());
+		//const _bool bVisibleShadow =
+		//	!m_pGameInstance_Proxy->Should_CullAABB(
+		//		CULLING_VIEW::SHADOW_DIR,
+		//		pSection->Get_WorldBounds());
 
-		if (bVisibleShadow)
-		{
+		//if (bVisibleShadow)
+		//{
 			m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pSection);
-
-#ifdef _DEBUG
-			++m_Profile.iShadowVisibleSections;
-			++m_Profile.iShadowSubmittedSections;
-#endif
-		}
-		else
-		{
-#ifdef _DEBUG
-			++m_Profile.iShadowCulledSections;
-#endif
-		}
 	}
 }
 

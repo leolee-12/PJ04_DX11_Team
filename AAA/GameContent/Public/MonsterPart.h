@@ -18,6 +18,8 @@ public:
     struct MONSTERPART_DESC : public CPartObject::PARTOBJECT_DESC
     {
         const _float4x4* pSocketBoneMatrix = { nullptr }; // 소켓 부착 파츠만 사용(없으면 부모행렬)
+        const _float* pHitFlash = { nullptr }; 
+        const _float3* pHitFlashColor = { nullptr };
     };
 
 protected:
@@ -39,6 +41,7 @@ public:
     virtual void    Update(_float fTimeDelta) override;
     virtual void    Late_Update(_float fTimeDelta) override;
     virtual HRESULT Render() override;                  // 특수 렌더 필요 시 자식이 오버라이드
+    virtual HRESULT Render_Shadow() override;
 
 public:
     CAnimator*          Get_Animator() const { return m_pAnimatorCom; }
@@ -55,6 +58,9 @@ protected:
     CModel* m_pModelCom = { nullptr };
     CAnimator* m_pAnimatorCom = { nullptr };
     const _float4x4* m_pSocketBoneMatrix = { nullptr };
+
+    const _float* m_pHitFlash = { nullptr };
+    const _float3* m_pHitFlashColor = { nullptr };
 
 protected:
     virtual void Free() override;

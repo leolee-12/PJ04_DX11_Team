@@ -70,6 +70,7 @@ HRESULT CRenderer::Initialize()
     if (FAILED(Ready_DepthStencil_Buffer()))
         return E_FAIL;
 
+
     // ui 커튼
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Curtain"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))   // 투명으로 clear
         return E_FAIL;
@@ -160,7 +161,9 @@ HRESULT CRenderer::Initialize()
     if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Emissive"), 450.f, 100.f, 300.f, 200.f)))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_LightDepth"), 450.f, 300.f, 300.f, 200.f)))
-        return E_FAIL;
+      return E_FAIL;
+    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_ESM"), 450.f, 300.f, 300.f, 200.f)))
+    //    return E_FAIL;
 
    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Light"), 150.f, 100.f, 300.f, 200.f)))
    //    return E_FAIL;
@@ -265,6 +268,8 @@ HRESULT CRenderer::Draw()
         return E_FAIL;
     if (FAILED(Render_DoF()))
         return E_FAIL;
+    if (FAILED(Render_Effect_HDR()))
+        return E_FAIL;
     if (FAILED(Render_Bloom()))
         return E_FAIL;
 
@@ -363,7 +368,7 @@ HRESULT CRenderer::Render_Shadow()
 
 HRESULT CRenderer::Render_ShadowBlur()
 {
-    _float2 vTexel = { 1.f / g_iShadowMapSize, 1.f / g_iShadowMapSize };
+    _float2 vTexel = { 2.f / g_iShadowMapSize, 2.f / g_iShadowMapSize };
 
     Change_ViewportDesc(g_iShadowMapSize, g_iShadowMapSize);
 
@@ -798,6 +803,26 @@ HRESULT CRenderer::Render_DoF()
         return E_FAIL;
 
     return S_OK;
+}
+
+HRESULT CRenderer::Render_Effect_HDR()
+{
+    if (m_RenderObjects[ETOUI(RENDERID::BLEND_HDR)].empty())
+        return S_OK;
+
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Scene_DoF"), nullptr, false, false)))
+        return E_FAIL;
+
+    for (auto& pRenderObject : m_RenderObjects[ETOUI(RENDERID::BLEND_HDR)])
+    {
+        if (nullptr != pRenderObject)
+            pRenderObject->Render();
+
+        Safe_Release(pRenderObject);
+    }
+    m_RenderObjects[ETOUI(RENDERID::BLEND_HDR)].clear();
+
+    return m_pGameInstance_Proxy->End_MRT();
 }
 
 HRESULT CRenderer::Render_VolumetricFog()
