@@ -9,6 +9,7 @@ class CLIENT_DLL CCamera_AreaCam final : public CCamera
     GENERATED_BODY(CCamera_AreaCam)
 public:
     static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_CameraAreaCam";
+    static constexpr const _float4  s_vSpotlightDarken = { 0.8f, 0.f, 0.f, 0.f };
     typedef struct tagAreaCamDesc final : public CCamera::CAMERA_DESC {
         wstring strTargetLayer = L"Layer_Player";
         wstring strTargetObj = L"Kirby";
@@ -24,8 +25,14 @@ public:
     virtual void    Priority_Update(_float fTimeDelta) override;
     virtual void    Update(_float fTimeDelta) override {}
     virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* p) override { p->strPrototypeTag = PROTOTYPE_TAG; }
+
+public:
+    void    Begin_TransformZoom() { m_bTransZoom = true; }
+    void    End_TransformZoom() { m_bTransZoom = false; }
+    _bool   Is_TransformZoom() const { return m_bTransZoom; }
+
 private:
-    virtual HRESULT Ready_Events() override { return S_OK; }
+    virtual HRESULT Ready_Events() override;
 private:
     CAreaCameraSolver m_solver;
     CGameObject* m_pTarget = nullptr;
@@ -39,6 +46,14 @@ private:
     _float m_blendTimer = { 0.f };
     _int m_lastArea = { -1 };
     _bool   m_bInit = { false };
+
+    // ==== 변신 줌인 상태 ====
+    _bool   m_bTransZoom = { false };  // 변신 중 여부(외부 토글)
+    _float  m_transWeight = { 0.f };   // 0=평상, 1=완전 줌인
+    _float  m_transInDur = { 0.5f };   // 줌인 걸리는 시간(초)
+    _float  m_transOutDur = { 0.6f };  // 원위치 복귀 시간(초)
+    _float  m_transFov = { 40.f };     // 줌인 목표 fov(도), 작을수록 확대
+    _float  m_transAimY = { 0.6f };    // 커비 발밑 위로 시선 올릴 오프셋
 
 public:
     static CCamera_AreaCam* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -88,6 +88,27 @@ void CCamera_AreaCam::Priority_Update(_float fTimeDelta)
     }
     _vector vAt = XMVectorAdd(vEye, vFwd);
 
+    // ===== 커비 변신 줌인 =====
+    // 목표 weight를 향해 램프(줌인/복귀 시간 분리) 후 smoothstep 이징.
+    _float wTarget = m_bTransZoom ? 1.f : 0.f;
+    _float wRate = m_bTransZoom
+        ? (m_transInDur > 0.f ? 1.f / m_transInDur : 1e9f)
+        : (m_transOutDur > 0.f ? 1.f / m_transOutDur : 1e9f);
+    if (m_transWeight < wTarget) m_transWeight = min(wTarget, m_transWeight + wRate * fTimeDelta);
+    else                         m_transWeight = max(wTarget, m_transWeight - wRate * fTimeDelta);
+    _float wEase = m_transWeight * m_transWeight * (3.f - 2.f * m_transWeight); // smoothstep
+
+    _float fFovDeg = pose.fov;
+    if (wEase > 0.f && m_pTarget)
+    {
+        // position(eye)은 그대로 두고 시선(at)만 커비로 회전 + fov 축소.
+        _vector vAim = XMVectorAdd(vKirby, XMVectorSet(0.f, m_transAimY, 0.f, 0.f));
+        vAim = XMVectorSetW(vAim, 1.f);
+        vAt = XMVectorLerp(vAt, vAim, wEase);
+        fFovDeg = pose.fov + (m_transFov - pose.fov) * wEase;
+    }
+    // ==========================
+
     if (!m_bInit) { XMStoreFloat3(&m_eyeCur, vEye); XMStoreFloat3(&m_atCur, vAt); m_bInit = true; }
 
     _vector eVel = XMLoadFloat3(&m_eyeVel), aVel = XMLoadFloat3(&m_atVel);
@@ -95,7 +116,7 @@ void CCamera_AreaCam::Priority_Update(_float fTimeDelta)
     XMStoreFloat3(&m_atCur, SmoothDampV(XMLoadFloat3(&m_atCur), vAt, aVel, smoothT, fTimeDelta));
     XMStoreFloat3(&m_eyeVel, eVel); XMStoreFloat3(&m_atVel, aVel);
 
-    m_fFovy = XMConvertToRadians(pose.fov);
+    m_fFovy = XMConvertToRadians(fFovDeg);
     Recalculate_ProjMatrix();
 
     _vector vE = XMLoadFloat3(&m_eyeCur);
@@ -116,6 +137,21 @@ void CCamera_AreaCam::Priority_Update(_float fTimeDelta)
     m_pTransformCom->Set_State(STATE::LOOK, XMVectorSetW(vLook, 0.f));
 
     __super::Priority_Update(fTimeDelta);
+}
+
+HRESULT CCamera_AreaCam::Ready_Events()
+{
+    Subscribe_Event(EventTag::Kirby_Ability_Changed, [this](void* pData)
+        {
+            _bool bBegin = pData ? static_cast<KIRBY_ABILITY_CHANGED*>(pData)->bBegin : true;
+            m_bTransZoom = bBegin;   // Priority_Update에서 weight가 알아서 램프/복귀
+
+            if (bBegin)
+                m_pGameInstance_Proxy->Tween_ShaderGlobal("g_fSpotlightDarken", s_vSpotlightDarken, 0.5f);
+            else
+                m_pGameInstance_Proxy->Tween_ShaderGlobal("g_fSpotlightDarken", _float4(0.f, 0.f, 0.f, 0.f), 0.5f);
+        });
+    return S_OK;
 }
 
 CCamera_AreaCam* CCamera_AreaCam::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
