@@ -175,6 +175,9 @@ void CKirby_Ability_Sword::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_IN
 
     ZeroMemory(&m_vSwordWishDir, sizeof(m_vSwordWishDir));
 
+    End_SpinSlashEffect(m_pSpinSlash, 0.2f);
+    End_SpinSlashEffect(m_pSpinSlashTrail, 0.15f);
+
     __super::On_Damaged_KirbyState(pKirby, tInfo);
 }
 
@@ -727,16 +730,8 @@ void CKirby_Ability_Sword::Update_SwordState(CKirby* pKirby, _float fTimeDelta)
 
             if (pAnimator->Get_Progress() >= 0.78f)
             {
-                if (m_pSpinSlash != nullptr)
-                {
-                    m_pSpinSlash->Start_FadeOut(0.2f);
-                    m_pSpinSlash = nullptr;
-                }
-                if (m_pSpinSlashTrail != nullptr)
-                {
-                    m_pSpinSlashTrail->Start_FadeOut(0.15f);
-                    m_pSpinSlashTrail = nullptr;
-                }
+                End_SpinSlashEffect(m_pSpinSlash, 0.2f);
+                End_SpinSlashEffect(m_pSpinSlashTrail, 0.15f);
             }
 
             break;
@@ -844,16 +839,8 @@ void CKirby_Ability_Sword::Exit_SwordState(CKirby* pKirby, SWORD_STATE eState)
         case SUPER_SPIN_SLASH_START:
             break;
         case SUPER_SPIN_SLASH_LOOP:
-            if(m_pSpinSlash != nullptr)
-            {
-                m_pSpinSlash->Start_FadeOut(0.2f);
-                m_pSpinSlash = nullptr;
-            }
-            if (m_pSpinSlashTrail != nullptr)
-            {
-                m_pSpinSlashTrail->Start_FadeOut(0.15f);
-                m_pSpinSlashTrail = nullptr;
-            }
+            End_SpinSlashEffect(m_pSpinSlash, 0.2f);
+            End_SpinSlashEffect(m_pSpinSlashTrail, 0.15f);
             break;
         case SUPER_SPIN_SLASH_END:
             break;
@@ -915,6 +902,15 @@ _bool CKirby_Ability_Sword::CanPlayEffect(SWORD_EFFECT eSwordEffect, CAnimator* 
     m_bIsStartEffect[eSwordEffect] = true;
 
     return true;
+}
+
+void CKirby_Ability_Sword::End_SpinSlashEffect(CEffect_Container*& pEffectContainer, _float fFadeOutDuration)
+{
+    if (pEffectContainer != nullptr)
+    {
+        pEffectContainer->Start_FadeOut(fFadeOutDuration);
+        pEffectContainer = nullptr;
+    }
 }
 
 CKirby_Ability_Sword* CKirby_Ability_Sword::Create()
