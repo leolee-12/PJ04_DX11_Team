@@ -18,10 +18,6 @@
 #include "Env_InstanceController.h"
 #include "LevelDesign_Registry.h"
 
-#ifdef _DEBUG
-#include "MapToolProfiler.h"
-#endif
-
 #include "GameInstance.h"
 
 #include <cmath>
@@ -306,17 +302,8 @@ void CLevel_Edit::Update(_float fTimeDelta)
 	}
 #endif //  _DEBUG
 
-
 	if (m_pGameInstance_Proxy->Key_Down(DIK_ESCAPE))
 		m_pGameInstance_Proxy->Publish(TEXT("Return_Lobby"), nullptr);
-
-#ifdef _DEBUG
-	CMapToolProfiler* pProfiler = CMapToolProfiler::GetInstance();
-	if (m_pGameInstance_Proxy->Key_Down(DIK_1))
-		pProfiler->Toggle_Enabled();
-
-	pProfiler->Update(fTimeDelta);
-#endif
 }
 
 HRESULT CLevel_Edit::Render()
@@ -327,10 +314,6 @@ HRESULT CLevel_Edit::Render()
 		const _float4x4* pProj = m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
 		m_pGrid->Render(pView, pProj);
 	}
-
-#ifdef _DEBUG
-	CMapToolProfiler::GetInstance()->Capture_Frame();
-#endif
 
 	return S_OK;
 }
@@ -986,11 +969,6 @@ void CLevel_Edit::Clear_MapPreview()
 	Clear_MapPreviewLayer(CMapBreakSection::LAYER_TAG);
 	Clear_MapPreviewEnvInstanceController();
 
-#ifdef _DEBUG
-	CMapToolProfiler::GetInstance()->Clear_EnvObjects();
-	CMapToolProfiler::GetInstance()->Set_Stage(nullptr);
-#endif
-
 	m_pMapStage = nullptr;
 	Set_MapPreviewStageRuntime(false, L"");
 	Set_MapPreviewEnvRuntime(false, 0);
@@ -1012,8 +990,6 @@ void CLevel_Edit::Clear_MapPreviewStage()
 
 #ifdef _DEBUG
 	Clear_MapPreviewLayer(CMapBreakSection::LAYER_TAG);
-
-	CMapToolProfiler::GetInstance()->Set_Stage(nullptr);
 #endif
 
 	m_pMapStage = nullptr;
@@ -1055,10 +1031,6 @@ void CLevel_Edit::Clear_MapPreviewEnv()
 		Clear_MapPreviewLayer(strLayerTag);
 
 	Clear_MapPreviewEnvInstanceController();
-
-#ifdef _DEBUG
-	CMapToolProfiler::GetInstance()->Clear_EnvObjects();
-#endif
 
 	Set_MapPreviewEnvRuntime(false, 0);
 	MapContentDesc.bLoadEnv = false;
@@ -1207,8 +1179,6 @@ void CLevel_Edit::On_MapPreviewObjectCreated(
 
 	if (0 == _wcsicmp(strPrototypeTag.c_str(), Client::CMapStage::PROTOTYPE_TAG))
 		pLevel->m_pMapStage = dynamic_cast<Client::CMapStage*>(pObject);
-
-	On_EnvObjectCreated(pContext, pObject, strPrototypeTag, strLayerTag, strObjectTag);
 }
 
 void CLevel_Edit::Set_Selected(CGameObject* pSelected)
@@ -1396,8 +1366,6 @@ HRESULT CLevel_Edit::Ready_MapStage()
 	Set_MapPreviewStageRuntime(true, strLoadedStageName);
 
 #ifdef _DEBUG
-	CMapToolProfiler::GetInstance()->Set_Stage(m_pMapStage);
-
 	if (Is_DebugMapBreakStage12(MapContentDesc.strManifestPath))
 	{
 		if (FAILED(Ready_DebugMapBreakSection_Stage12()))
@@ -1516,10 +1484,6 @@ HRESULT CLevel_Edit::Ready_EnvObjects(vector<ENV_OBJECT_DESC>* pOutDeletedEnvDes
 		Apply_MapPreviewContentDesc(MapContentDesc, true);
 	}
 
-#ifdef _DEBUG
-	CMapToolProfiler::GetInstance()->Clear_EnvObjects();
-#endif
-
 	MAP_RUNTIME_LOAD_CONTEXT Context{};
 	Context.pDevice = m_pDevice;
 	Context.pContext = m_pContext;
@@ -1613,36 +1577,6 @@ _bool XM_CALLCONV CLevel_Edit::Pick_EnvObjectByRay(_fvector vOrigin, _fvector vD
 		*pOutDistance = fBestDist;
 
 	return true;
-}
-
-void CLevel_Edit::On_EnvObjectCreated(
-	void* pContext,
-	CGameObject* pObject,
-	const wstring& strPrototypeTag,
-	const wstring& strLayerTag,
-	const wstring& strObjectTag)
-{
-	UNREFERENCED_PARAMETER(strPrototypeTag);
-	UNREFERENCED_PARAMETER(strObjectTag);
-
-#ifdef _DEBUG
-	CLevel_Edit* pLevel = static_cast<CLevel_Edit*>(pContext);
-	if (nullptr == pLevel || nullptr == pObject)
-		return;
-
-	if (strLayerTag != L"Layer_EnvStatic" && strLayerTag != L"Layer_EnvInteract")
-		return;
-
-	Client::CEnvObject* pEnvObject = dynamic_cast<Client::CEnvObject*>(pObject);
-	if (nullptr == pEnvObject)
-		return;
-
-	CMapToolProfiler::GetInstance()->Register_EnvObject(pEnvObject);
-#else
-	UNREFERENCED_PARAMETER(pContext);
-	UNREFERENCED_PARAMETER(pObject);
-	UNREFERENCED_PARAMETER(strLayerTag);
-#endif
 }
 
 HRESULT CLevel_Edit::Prepare_MapContentForPreviewLoad(_uint iPresetIndex, _bool bPresetChanged, _bool bPreserveEnvRuntimeState)
@@ -1840,10 +1774,6 @@ _bool CLevel_Edit::Handle_MapSpecificDeletion(CGameObject* pObject)
 	{
 		m_pMapStage = nullptr;
 		Set_MapPreviewStageRuntime(false, L"");
-
-#ifdef _DEBUG
-		CMapToolProfiler::GetInstance()->Set_Stage(nullptr);
-#endif
 	}
 	else if (0 < Get_MapPreviewEnvCreatedCountInternal())
 	{
@@ -1858,9 +1788,6 @@ _bool CLevel_Edit::Handle_MapSpecificDeletion(CGameObject* pObject)
 #ifdef _DEBUG
 	if (bTrackedDeletedEnv)
 	{
-		CMapToolProfiler* pProfiler = CMapToolProfiler::GetInstance();
-		pProfiler->Clear_EnvObjects();
-
 		for (const auto& [strCurrentLayer, CurrentObjects] : m_Layers)
 		{
 			if (strCurrentLayer != L"Layer_EnvStatic"
@@ -1876,8 +1803,6 @@ _bool CLevel_Edit::Handle_MapSpecificDeletion(CGameObject* pObject)
 
 				Client::CEnvObject* pEnvObject =
 					dynamic_cast<Client::CEnvObject*>(Handle.pObject);
-				if (nullptr != pEnvObject)
-					pProfiler->Register_EnvObject(pEnvObject);
 			}
 		}
 	}
@@ -2002,11 +1927,6 @@ CLevel_Edit* CLevel_Edit::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 void CLevel_Edit::Free()
 {
-#ifdef _DEBUG
-	CMapToolProfiler::GetInstance()->Clear_EnvObjects();
-	CMapToolProfiler::GetInstance()->Set_Stage(nullptr);
-#endif
-
 	m_pMapStage = nullptr;
 
 	Safe_Release(m_pGrid);

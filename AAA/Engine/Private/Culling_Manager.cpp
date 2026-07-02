@@ -1,8 +1,7 @@
 #include "Culling_Manager.h"
 #include "Culling_Util.h"
-
+#include "Profiler_Manager.h"
 #include "GameInstance.h"
-#include "GameInstance_Proxy.h"
 #include <cmath>
 
 NS_BEGIN(Engine)
@@ -221,6 +220,8 @@ _bool CCulling_Manager::Should_CullAABB(CULLING_VIEW eView, const BoundingBox& W
 {
 	if (!m_bEnableFrustumCulling)
 	{
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_DISABLED_POLICY, 1);
+
 #ifdef _DEBUG
 		if (Is_ValidViewIndex(eView))
 			++const_cast<FRUSTUM_CULLING_STATS&>(m_Stats[ETOUI(eView)]).iDisabledPolicy;
@@ -228,11 +229,43 @@ _bool CCulling_Manager::Should_CullAABB(CULLING_VIEW eView, const BoundingBox& W
 		return false;
 	}
 
+	if (!Is_ValidViewIndex(eView))
+	{
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_FAIL_OPEN_INVALID_VIEW, 1);
+		return false;
+	}
+
+	if (!m_ViewStates[ETOUI(eView)].bValid)
+	{
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_FAIL_OPEN_INVALID_VIEW, 1);
+
+#ifdef _DEBUG
+		++const_cast<FRUSTUM_CULLING_STATS&>(m_Stats[ETOUI(eView)]).iInvalidViewFailOpen;
+#endif
+		return false;
+	}
+
+	if (!Is_ValidBoundingBox(WorldBounds))
+	{
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_FAIL_OPEN_INVALID_BOUNDS, 1);
+
+#ifdef _DEBUG
+		++const_cast<FRUSTUM_CULLING_STATS&>(m_Stats[ETOUI(eView)]).iInvalidBoundsFailOpen;
+#endif
+		return false;
+	}
+
+	PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_TESTED, 1);
+
 	const _bool bVisible = IsIn_WorldSpace_AABB(eView, WorldBounds);
 	const _bool bCull = !bVisible;
 
+	PROFILE_COUNTER_ADD(
+		bVisible ? EPROFILE_COUNTER::FRUSTUM_VISIBLE : EPROFILE_COUNTER::FRUSTUM_CULLED,
+		1);
+
 #ifdef _DEBUG
-	if (bCull && Is_ValidViewIndex(eView))
+	if (bCull)
 		++const_cast<FRUSTUM_CULLING_STATS&>(m_Stats[ETOUI(eView)]).iCulledAABB;
 #endif
 
@@ -242,13 +275,42 @@ _bool CCulling_Manager::Should_CullAABB(CULLING_VIEW eView, const BoundingBox& W
 _bool CCulling_Manager::Should_CullByDistance(const BoundingBox& WorldBounds, _float fCullDistance) const
 {
 	if (nullptr == m_pProxy)
+	{
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_FAIL_OPEN_INVALID_CAMERA, 1);
 		return false;
+	}
 
-	const _float4* pCamPos= m_pProxy->Get_CamPosition();
-	if (nullptr == pCamPos)
+	const _float4* pCamPos = m_pProxy->Get_CamPosition();
+	if (nullptr == pCamPos
+		|| !Is_FiniteFloat(pCamPos->x)
+		|| !Is_FiniteFloat(pCamPos->y)
+		|| !Is_FiniteFloat(pCamPos->z))
+	{
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_FAIL_OPEN_INVALID_CAMERA, 1);
 		return false;
+	}
 
-	return CCulling_Util::Check_CullByDistance(WorldBounds, *pCamPos, fCullDistance);
+	if (!Is_FiniteFloat(fCullDistance) || fCullDistance < 0.f)
+	{
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_FAIL_OPEN_INVALID_DISTANCE, 1);
+		return false;
+	}
+
+	if (!Is_ValidFloat3(WorldBounds.Center) || !Is_ValidFloat3(WorldBounds.Extents))
+	{
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_FAIL_OPEN_INVALID_BOUNDS, 1);
+		return false;
+	}
+
+	PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_TESTED, 1);
+
+	const _bool bCull = CCulling_Util::Check_CullByDistance(WorldBounds, *pCamPos, fCullDistance);
+
+	PROFILE_COUNTER_ADD(
+		bCull ? EPROFILE_COUNTER::DISTANCE_CULLED : EPROFILE_COUNTER::DISTANCE_VISIBLE,
+		1);
+
+	return bCull;
 }
 
 #ifdef _DEBUG

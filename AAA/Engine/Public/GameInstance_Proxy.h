@@ -268,7 +268,6 @@ public:
       HRESULT Get_TextureFromHub(const _tchar* pTextureName, TEXTURE_HANDLE* pOutHandle) const;
       HRESULT Bind_TextureFromHub(class CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle);
       HRESULT Bind_DefaultTextureFromHub(class CShader* pShader, const _char* pConstantName, DEFAULT_TEXTURE eKind);
-      TEXTURE_HUB_STATS Get_TextureHubStats() const;
 #pragma endregion
 
 private:

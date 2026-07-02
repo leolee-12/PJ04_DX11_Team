@@ -8,11 +8,6 @@
 
 namespace
 {
-	inline constexpr const _char* s_strSlopeBoardA_PlatformMeshName = "PlateM__BoardC";
-	inline constexpr const _char* s_strSlopeBoardA_PlatformBoneName = "PlateM__BoardC";
-	inline constexpr _float s_strSlopeBoardA_TriggerMargin = 0.f;
-	inline constexpr _float s_strSlopeBoardA_MinHalfExtent = 0.01f;
-
 	void Log_EventObjectPhysicsWarning(const string& strMessage)
 	{
 #ifdef _DEBUG
@@ -41,7 +36,7 @@ namespace
 		{ L"Level1BossDemoBg", CLevelDesign_EventObject::LEVEL1BOSSDEMOBG_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Level1BossDemoBg/Level1BossDemoBg.ysh",
 		MODEL::ANIM, { "DemoAppear2", "DemoAppear2AfterWait", "DemoAppear2BeforWait", "" }, LD_EVENTOBJECT_POLICY::LEVEL1_BOSS_DEMO_BG, true, L"../../Resources/Map/Gimmick/Anim/Level1BossDemoBg/Level1BossDemoBg_AnimEvents.json" },
 		{ L"SlopeBoardA", CLevelDesign_EventObject::SLOPEBOARD_A_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardA.ysh",
-		MODEL::ANIM, { "LandBack", "LandFront", "LandStartFront", "" }, LD_EVENTOBJECT_POLICY::SLOPEBOARD_A, true, L"" },
+		MODEL::ANIM, { "LandBack", "LandFront", "LandStartFront", "" }, LD_EVENTOBJECT_POLICY::SLOPEBOARD_A, false, L"" },
 		{ L"SlopeBoardC", CLevelDesign_EventObject::SLOPEBOARD_C_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardC.ysh",
 		MODEL::ANIM, { "FallenWait", "Wait", "", "" }, LD_EVENTOBJECT_POLICY::SLOPEBOARD_C, true, L"" },
 	};
@@ -63,6 +58,22 @@ namespace
 	_bool Is_Level1BossDemoBgGlassMesh(const string& strMeshName)
 	{
 		return "GlassSideM__MlBossGlassC" == strMeshName || "GlassM__MlBossGlassC" == strMeshName;
+	}
+#pragma endregion
+
+#pragma region SLOPEBOARD_A
+	inline constexpr const _char* s_strSlopeBoardA_PlatformMeshName = "PlateM__BoardC";
+	inline constexpr const _char* s_strSlopeBoardA_PlatformBoneName = "FrontAnimL";
+	inline constexpr _float s_strSlopeBoardA_TriggerMargin = 0.f;
+	inline constexpr _float s_strSlopeBoardA_MinHalfExtent = 0.01f;
+
+	_matrix RemoveScale_ForSlopeBoardBox(_fmatrix WorldMatrix)
+	{
+		XMVECTOR vScale{}, vRotation{}, vTranslation{};
+		if (!XMMatrixDecompose(&vScale, &vRotation, &vTranslation, WorldMatrix))
+			return WorldMatrix;
+
+		return XMMatrixRotationQuaternion(XMQuaternionNormalize(vRotation)) * XMMatrixTranslationFromVector(vTranslation);
 	}
 #pragma endregion
 }
@@ -127,7 +138,16 @@ void CLevelDesign_EventObject::Late_Update(_float fTimeDelta)
 
 	if (m_pInteractionTrigger && m_pInteractionTrigger->Is_Enabled())
 	{
-		m_pInteractionTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+		_matrix TriggerWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+		if (LD_EVENTOBJECT_POLICY::SLOPEBOARD_A == m_tEventObjectDesc.ePolicy && nullptr != m_pModelCom)
+		{
+			const _float4x4* pBoneMatrix = m_pModelCom->Get_BoneMatrixPtr(s_strSlopeBoardA_PlatformBoneName);
+			if (nullptr != pBoneMatrix)
+				TriggerWorld = RemoveScale_ForSlopeBoardBox(XMLoadFloat4x4(pBoneMatrix) * TriggerWorld);
+		}
+
+		m_pInteractionTrigger->Update(TriggerWorld);
 #ifdef _DEBUG
 		m_pGameInstance_Proxy->Add_DebugComponent(m_pInteractionTrigger);
 #endif
@@ -415,13 +435,6 @@ HRESULT CLevelDesign_EventObject::Ready_RigidStatic_FromMeshAABB(const _string& 
 		return E_FAIL;
 	}
 
-	const _float4x4* pBoneMatrix = m_pModelCom->Get_BoneMatrixPtr(strBoneName);
-	if (nullptr == pBoneMatrix)
-	{
-		Log_EventObjectPhysicsWarning("[LDEventObjectPhysics] bone not found: " + strBoneName);
-		return E_FAIL;
-	}
-
 	_float3 vMin{}, vMax{};
 	m_pModelCom->Get_MeshAABB(static_cast<_uint>(iMeshIndex), &vMin, &vMax);
 
@@ -438,10 +451,24 @@ HRESULT CLevelDesign_EventObject::Ready_RigidStatic_FromMeshAABB(const _string& 
 	vLocalHalfExtents.y = max(vLocalHalfExtents.y, s_strSlopeBoardA_MinHalfExtent);
 	vLocalHalfExtents.z = max(vLocalHalfExtents.z, s_strSlopeBoardA_MinHalfExtent);
 
-	const _matrix MeshWorld = XMLoadFloat4x4(pBoneMatrix) * XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
-	m_pRigidStatic = m_pGameInstance_Proxy->Create_StaticBox(vLocalCenter, vLocalHalfExtents, MeshWorld);
+	_matrix MeshWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
 
-	return nullptr == m_pRigidStatic ? E_FAIL : S_OK;
+	const _float4x4* pBoneMatrix = m_pModelCom->Get_BoneMatrixPtr(strBoneName);
+	if (nullptr != pBoneMatrix)
+		MeshWorld = XMLoadFloat4x4(pBoneMatrix) * MeshWorld;
+	else
+		Log_EventObjectPhysicsWarning("[LDEventObjectPhysics] bone not found. Use object world: " + strBoneName);
+
+	MeshWorld = RemoveScale_ForSlopeBoardBox(MeshWorld);
+
+	m_pRigidStatic = m_pGameInstance_Proxy->Create_StaticBox(vLocalCenter, vLocalHalfExtents, MeshWorld);
+	if (nullptr == m_pRigidStatic)
+	{
+		Log_EventObjectPhysicsWarning("[LDEventObjectPhysics] Create_StaticBox failed: " + strMeshName);
+		return E_FAIL;
+	}
+
+	return S_OK;
 }
 
 HRESULT CLevelDesign_EventObject::Ready_SlopeBoardTrigger()
@@ -449,17 +476,21 @@ HRESULT CLevelDesign_EventObject::Ready_SlopeBoardTrigger()
 	if (nullptr == m_pModelCom || nullptr == m_pGameInstance_Proxy)
 		return E_FAIL;
 
+	const _int iMeshIndex = Find_MeshIndex_ByName(s_strSlopeBoardA_PlatformMeshName);
+	if (0 > iMeshIndex)
+		return E_FAIL;
+
 	_float3 vMin{}, vMax{};
-	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
+	m_pModelCom->Get_MeshAABB(static_cast<_uint>(iMeshIndex), &vMin, &vMax);
 
 	if (vMin.x > vMax.x || vMin.y > vMax.y || vMin.z > vMax.z)
 		return E_FAIL;
 
 	const _float3 vCenter = { (vMin.x + vMax.x) * 0.5f, (vMin.y + vMax.y) * 0.5f, (vMin.z + vMax.z) * 0.5f };
 	const _float3 vSize = {
-			(vMax.x - vMin.x) + s_strSlopeBoardA_TriggerMargin * 2.f,
-			(vMax.y - vMin.y) + s_strSlopeBoardA_TriggerMargin * 2.f,
-			(vMax.z - vMin.z) + s_strSlopeBoardA_TriggerMargin * 2.f
+		  (vMax.x - vMin.x) + s_strSlopeBoardA_TriggerMargin * 2.f,
+		  (vMax.y - vMin.y) + s_strSlopeBoardA_TriggerMargin * 2.f,
+		  (vMax.z - vMin.z) + s_strSlopeBoardA_TriggerMargin * 2.f
 	};
 
 	CCollider::COLLIDER_DESC ColliderDesc{};
@@ -760,11 +791,7 @@ HRESULT CLevelDesign_EventObject::Ready_SlopeBoardA()
 #endif
 
 	if (FAILED(Ready_RigidStatic_FromMeshAABB(s_strSlopeBoardA_PlatformMeshName, s_strSlopeBoardA_PlatformBoneName)))
-	{
-		Log_EventObjectPhysicsWarning("[LDEventObjectPhysics] SlopeBoardA initial platform box failed. Fallback to cooked collision mesh.");
-		if (FAILED(Ready_RigidStatic()))
-			return E_FAIL;
-	}
+		Log_EventObjectPhysicsWarning("[LDEventObjectPhysics] SlopeBoardA initial platform box failed.");
 
 	if (FAILED(Ready_SlopeBoardTrigger()))
 		return E_FAIL;

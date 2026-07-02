@@ -3,6 +3,7 @@
 #include "EnvObject_Static.h"
 
 #include "GameInstance.h"
+#include "Profiler_Manager.h"
 
 namespace
 {
@@ -89,9 +90,21 @@ HRESULT CEnv_InstanceBatch::Render()
 	if (m_Submitted.empty())
 		return S_OK;
 
-	HRESULT hr = Should_Instance()
+	const _uint iInstanceCount = static_cast<_uint>(m_Submitted.size());
+	const _bool bUseInstancing = Should_Instance();
+
+	HRESULT hr = bUseInstancing
 		? Render_Instanced()
 		: Render_NotInstanced();
+
+	if (SUCCEEDED(hr))
+	{
+		PROFILE_COUNTER_ADD(
+			bUseInstancing
+			? Engine::EPROFILE_COUNTER::ENV_INSTANCE_RENDERED
+			: Engine::EPROFILE_COUNTER::ENV_INSTANCE_FALLBACK,
+			iInstanceCount);
+	}
 
 	Clear_Submissions();
 	m_bRegisteredThisFrame = false;
@@ -104,9 +117,21 @@ HRESULT CEnv_InstanceBatch::Render_Shadow()
 	if (m_Submitted.empty())
 		return S_OK;
 
-	HRESULT hr = Should_Instance()
+	const _uint iInstanceCount = static_cast<_uint>(m_Submitted.size());
+	const _bool bUseInstancing = Should_Instance();
+
+	HRESULT hr = bUseInstancing
 		? Render_Shadow_Instanced()
 		: Render_Shadow_NotInstanced();
+
+	if (SUCCEEDED(hr))
+	{
+		PROFILE_COUNTER_ADD(
+			bUseInstancing
+			? Engine::EPROFILE_COUNTER::ENV_INSTANCE_RENDERED
+			: Engine::EPROFILE_COUNTER::ENV_INSTANCE_FALLBACK,
+			iInstanceCount);
+	}
 
 	Clear_Submissions();
 	m_bRegisteredThisFrame = false;
@@ -119,9 +144,21 @@ HRESULT CEnv_InstanceBatch::Render_Decal()
 	if (m_Submitted.empty())
 		return S_OK;
 
-	const HRESULT hr = Should_Instance()
+	const _uint iInstanceCount = static_cast<_uint>(m_Submitted.size());
+	const _bool bUseInstancing = Should_Instance();
+
+	const HRESULT hr = bUseInstancing
 		? Render_Decal_Instanced()
 		: Render_Decal_NotInstanced();
+
+	if (SUCCEEDED(hr))
+	{
+		PROFILE_COUNTER_ADD(
+			bUseInstancing
+			? Engine::EPROFILE_COUNTER::ENV_INSTANCE_RENDERED
+			: Engine::EPROFILE_COUNTER::ENV_INSTANCE_FALLBACK,
+			iInstanceCount);
+	}
 
 	Clear_Submissions();
 	m_bRegisteredThisFrame = false;
