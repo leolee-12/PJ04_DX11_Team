@@ -26,6 +26,13 @@ public:
     FMOD::Channel* PlaySFX(const TCHAR* pSoundKey, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
     FMOD::Channel* PlaySFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
 
+    // Loop SFX : 상태 코드에서 재생 필요할 때 사용
+    FMOD::Channel* PlaySFXLoop(const TCHAR* pSoundKey, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
+    FMOD::Channel* PlaySFX3DLoop(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
+
+    // 멈추기 위해서는 재생 인스턴스를 갖고 있다가 멈춰야함
+    void StopChannel(FMOD::Channel*& pChannel);
+
     // BGM: 소유 핸들로 교체(기존 정지 후 재생)
     void PlayBGM(const TCHAR* pSoundKey, float fVolume = 1.f, bool bLoop = true);
     void StopBGM();

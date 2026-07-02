@@ -541,6 +541,33 @@ void CMonster::Perceive(_float fTimeDelta)
 	m_BlackBoard.vLastKnownPos = m_BlackBoard.vTargetPos;
 }
 
+_bool CMonster::Handle_SharedAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+{
+	switch (static_cast<EANIM_EVENT>(e.iEventType))
+	{
+	case EANIM_EVENT::Sound:
+	{
+		if (ePhase != ANIM_EVENT_PHASE::POINT)
+			return true;
+		if (e.strParam.empty())
+			return true;
+
+		string strKey = e.strParam;
+		const size_t iLen = strKey.size();
+		if (iLen < 4 ||	
+			strKey.compare(iLen - 4, 4, ".wav") != 0)
+			strKey += ".wav";
+
+		_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+		m_pGameInstance_Proxy->Play_SFX3D(
+			StrToWstr(strKey).c_str(), vPos);
+		return true;
+	}
+	default:
+		return false;		// 몬스터 고유 이벤트로 넘김
+	}
+}
+
 void CMonster::Enable_Controller(_bool bEnable)
 {
 	if (m_pController) m_pController->Set_Enabled(bEnable);

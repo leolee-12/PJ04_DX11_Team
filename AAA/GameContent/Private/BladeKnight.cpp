@@ -232,6 +232,9 @@ HRESULT CBladeKnight::Ready_AnimEvents()
     pAnimator->Set_EventCallback(
         [this](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
         {
+            if (Handle_SharedAnimEvent(e, ePhase))
+                return;
+
             switch (static_cast<EANIM_EVENT>(e.iEventType))
             {
             case EANIM_EVENT::Hitbox:

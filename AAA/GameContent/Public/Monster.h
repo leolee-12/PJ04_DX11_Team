@@ -168,6 +168,8 @@ protected:
 
 	virtual void				Apply_AIVariation(const _wstring& strVariation) {}
 
+	_bool						Handle_SharedAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
+
 protected:
 	template<class TPart>
 	TPart* Add_MonsterPart(const _tchar* szProtoTag, const _tchar* szPartTag, const _float4x4* pSocketBone = nullptr)

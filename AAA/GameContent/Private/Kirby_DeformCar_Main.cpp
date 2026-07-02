@@ -92,6 +92,9 @@ HRESULT CKirby_DeformCar_Main::Ready_AnimEvents(CKirby* pKirby)
         {
             if (Handle_AnimEventEye(e, ePhase) == true)
                 return;
+
+            if (Handle_AnimEventSound(e, ePhase) == true)
+                return;
         }
     );
 
@@ -127,6 +130,7 @@ HRESULT CKirby_DeformCar_Main::Ready_Components()
     /* For.Com_Animator */
     CAnimator::ANIMATOR_DESC AnimDesc{};
     AnimDesc.pModel = m_pModelCom;
+    AnimDesc.strDataFile = TEXT("../../Resources/YSE/DeformCar/Main_AnimEvents.json");
 
     m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
 

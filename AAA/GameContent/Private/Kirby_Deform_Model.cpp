@@ -92,6 +92,23 @@ _bool CKirby_Deform_Model::Handle_AnimEventEye(const ANIM_EVENT& e, ANIM_EVENT_P
     return true;
 }
 
+_bool CKirby_Deform_Model::Handle_AnimEventSound(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+{
+    if (static_cast<EANIM_EVENT>(e.iEventType) != EANIM_EVENT::Sound)
+        return false;
+
+    if (ePhase != ANIM_EVENT_PHASE::POINT)
+        return true;
+
+    if (e.strParam.empty())
+        return true;
+
+    const _wstring strSoundKey = StrToWstr(e.strParam);
+    m_pGameInstance_Proxy->Play_SFX(strSoundKey.c_str(), e.vOffset.x);
+
+    return true;
+}
+
 HRESULT CKirby_Deform_Model::Bind_ShaderResources(CShader* pShader)
 {
     if (pShader == nullptr)

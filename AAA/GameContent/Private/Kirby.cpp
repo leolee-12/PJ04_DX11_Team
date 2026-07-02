@@ -29,6 +29,9 @@
 // Deform
 #include "Kirby_Deform_Car.h"
 
+// Ladder
+#include "LevelDesign_Ladder.h"
+
 #include "Effect_Loader.h"
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -435,6 +438,7 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_PROJECTILE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_D_RANGE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_LADDER));
 
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT),        ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE), ETOUI(COLLISION_LAYER::MONSTER_HURT));
@@ -455,7 +459,9 @@ void CKirby::SetUp_Collider_Callback()
         m_KirbyColliders[HURT_BOX]->Set_OnEnter(
             [this](CCollider* pOther)
             {
-                if (ETOUI(COLLISION_LAYER::MONSTER_HURT) == pOther->Get_RegisteredGroup())
+                const _uint iGroup = pOther->Get_RegisteredGroup();
+
+                if (iGroup == ETOUI(COLLISION_LAYER::MONSTER_HURT))
                 {
                     CMonster* pMon = dynamic_cast<CMonster*>(pOther->Get_Owner());
                     if (pMon && !pMon->Is_Touch_Harmful())
@@ -474,8 +480,30 @@ void CKirby::SetUp_Collider_Callback()
                     OutputDebugStringA(szBuf);
 #endif
                 }
-            });
+
+                else if (iGroup == ETOUI(COLLISION_LAYER::ENV_LADDER))
+                {
+                    CLevelDesign_Ladder* pLadder = dynamic_cast<CLevelDesign_Ladder*>(pOther->Get_Owner());
+                    if (pLadder == nullptr)
+                        return;
+
+                    Set_Ladder(pLadder);
+                }
+            }
+        );
     }
+
+    m_KirbyColliders[HURT_BOX]->Set_OnExit(
+        [this](CCollider* pOther)
+        {
+            const _uint iGroup = pOther->Get_RegisteredGroup();
+
+            if (iGroup == ETOUI(COLLISION_LAYER::ENV_LADDER))
+            {
+                Clear_Ladder();
+                return;
+            }
+        });
 }
 
 HRESULT CKirby::Ready_PartObjects()
