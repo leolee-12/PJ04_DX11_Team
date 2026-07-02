@@ -234,8 +234,6 @@ HRESULT CBladeKnight::Ready_AnimEvents()
         {
             if (Handle_SharedAnimEvent(e, ePhase))
                 return;
-            if (ePhase != ANIM_EVENT_PHASE::POINT)
-                return;
 
             switch (static_cast<EANIM_EVENT>(e.iEventType))
             {

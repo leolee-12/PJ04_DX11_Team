@@ -560,14 +560,12 @@ _bool CMonster::Handle_SharedAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePh
 
 		_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
 		m_pGameInstance_Proxy->Play_SFX3D(
-			StrToWstr(e.strParam).c_str(), vPos);
+			StrToWstr(strKey).c_str(), vPos);
 		return true;
 	}
 	default:
 		return false;		// 몬스터 고유 이벤트로 넘김
 	}
-
-	return _bool();
 }
 
 void CMonster::Enable_Controller(_bool bEnable)
