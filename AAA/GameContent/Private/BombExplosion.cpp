@@ -2,7 +2,7 @@
 
 #include "GameInstance.h"
 #include "GameContent_const.h"
-#include "SmokeSphereOriginal.h""
+#include "SmokeSphereOriginal.h"
 #include "SmokeParticle.h"
 #include "SphereParticle.h"
 #include "Common_SphereNoise.h"
