@@ -56,6 +56,8 @@ private:
 	_bool m_bRenderable = { true };
 	vector<_bool> m_MeshVisible;
 	_bool m_bAnimationActive = { false };
+	_float m_fElapsed = { 0.f };
+	_bool m_bSlopeBoardAEndAnimPlayed = { false };
 
 private:
 	virtual HRESULT Validate_Desc() override;
@@ -66,25 +68,20 @@ private:
 
 	HRESULT Ready_RigidStatic();
 	void    Release_RigidStatic();
-	void    Set_RigidStaticEnabled(_bool bEnable);
 
-	HRESULT Ready_RigidStatic_FromMeshAABB(const _string& strMeshName, const _string& strBoneName);
+	HRESULT Ready_RigidStatic_FromMeshAABB(const _string& strMeshName, const _string& strBoneName, _bool bApplyFallenPose = false);
 	HRESULT Ready_SlopeBoardTrigger();
 	void    SetUp_SlopeBoardTriggerCallback();
 	void    Handle_SlopeBoardTrigger(CCollider* pOther);
 	void    Unregister_SlopeBoardTrigger(_bool bImmediate);
 	_int    Find_MeshIndex_ByName(const _string& strMeshName) const;
 
-#ifdef _DEBUG
-	void    Debug_DumpSlopeBoardPlatformBinding();
-#endif
-
 	HRESULT Ready_Policy();
-	void    Update_Policy(_float fTimeDelta);
+	void    Update_Policy();
 
 	void    On_Event(const _wstring& strEventTag);
 	void    On_Event_Level1BossDemoBg(const _wstring& strEventTag);
-	void    On_Event_SlopeBoard(const _wstring& strEventTag);
+	void    On_Event_SlopeBoard();
 
 	void    On_AnimEvent(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase);
 	void    On_AnimEvent_Level1BossDemoBg(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase);
