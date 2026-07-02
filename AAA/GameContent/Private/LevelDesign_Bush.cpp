@@ -76,6 +76,9 @@ HRESULT CLevelDesign_Bush::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
+	if (FAILED(Ready_HurtBox()))
+		return E_FAIL;
+
 	m_pAnimatorCom->Play("Wait", true, true);
 	return S_OK;
 }
@@ -91,6 +94,14 @@ void CLevelDesign_Bush::Update(_float fTimeDelta)
 void CLevelDesign_Bush::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
+
+	if (BUSH_STATE::BASIC == m_eState && m_pHurtBoxCom->Is_Enabled())
+	{
+		m_pHurtBoxCom->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+#ifdef _DEBUG
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pHurtBoxCom);
+#endif
+	}
 
 	if (nullptr != m_pModelComs[m_eState])
 		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
@@ -110,6 +121,17 @@ void CLevelDesign_Bush::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 		return;
 
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
+}
+
+void CLevelDesign_Bush::Damaged(const ATTACK_INFO& tInfo)
+{
+	UNREFERENCED_PARAMETER(tInfo);
+
+	if (BUSH_STATE::CUT == m_eState)
+		return;
+
+	m_eState = BUSH_STATE::CUT;
+	m_pHurtBoxCom->Set_Enabled(false);
 }
 
 void CLevelDesign_Bush::Register_LevelDesignSpecs()
@@ -224,6 +246,35 @@ HRESULT CLevelDesign_Bush::Ready_Components()
 	return S_OK;
 }
 
+HRESULT CLevelDesign_Bush::Ready_HurtBox()
+{
+	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pModelComs[BUSH_STATE::BASIC])
+		return E_FAIL;
+
+	_float3 vMin{};
+	_float3 vMax{};
+	m_pModelComs[BUSH_STATE::BASIC]->Get_ModelAABB(&vMin, &vMax);
+
+	if (vMin.x > vMax.x || vMin.y > vMax.y || vMin.z > vMax.z)
+		return E_FAIL;
+
+	const _float3 vSize = { vMax.x - vMin.x, vMax.y - vMin.y, vMax.z - vMin.z };
+
+	CCollider::COLLIDER_DESC ColliderDesc{};
+	ColliderDesc.pOwner = this;
+	ColliderDesc.vCenter = { (vMin.x + vMax.x) * 0.5f, (vMin.y + vMax.y) * 0.5f, (vMin.z + vMax.z) * 0.5f };
+	ColliderDesc.fRadius = max(max(vSize.x, vSize.y), vSize.z) * 0.5f;
+
+	m_pHurtBoxCom = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, TEXT("Com_HurtBox"),
+		&ColliderDesc);
+	if (nullptr == m_pHurtBoxCom)
+		return E_FAIL;
+
+	m_pGameInstance_Proxy->Register_Collider(m_pHurtBoxCom, ETOUI(COLLISION_LAYER::ENV_HURT));
+
+	return S_OK;
+}
+
 HRESULT CLevelDesign_Bush::Bind_ShaderResources(BUSH_STATE eSlot)
 {
 	CShader* pShader = m_pShaderComs[eSlot];
@@ -237,6 +288,9 @@ HRESULT CLevelDesign_Bush::Bind_ShaderResources(BUSH_STATE eSlot)
 		return E_FAIL;
 
 	if (FAILED(pShader->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
+		return E_FAIL;
+
+	if (FAILED(pShader->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
 		return E_FAIL;
 
 	return S_OK;

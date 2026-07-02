@@ -149,6 +149,9 @@ void CLevelDesign_EventObject::Update(_float fTimeDelta)
 		{
 			m_bSlopeBoardAEndAnimPlayed = true;
 
+			if (FAILED(Ready_RigidStatic_FromMeshAABB(s_strSlopeBoardA_PlatformMeshName, s_strSlopeBoardA_PlatformBoneName, true)))
+				Log_EventObjectPhysicsWarning("[LDEventObjectPhysics] SlopeBoardA fallen platform box failed.");
+
 			if (!Play_EventAnimation(0u, false))
 				m_eState = EVENTOBJECT_STATE::BROKEN;
 		}
@@ -510,7 +513,7 @@ void CLevelDesign_EventObject::Handle_SlopeBoardTrigger(CCollider* pOther)
 		return;
 	if (LD_EVENTOBJECT_POLICY::SLOPEBOARD_A != m_tEventObjectDesc.ePolicy)
 		return;
-	if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
+	if (ETOUI(COLLISION_LAYER::CAR_BOOST) != pOther->Get_RegisteredGroup())
 		return;
 
 	On_Event_SlopeBoard();
@@ -650,9 +653,6 @@ void CLevelDesign_EventObject::On_Event_SlopeBoard()
 	{
 		m_fElapsed = 0.f;
 		m_bSlopeBoardAEndAnimPlayed = false;
-
-		if (FAILED(Ready_RigidStatic_FromMeshAABB(s_strSlopeBoardA_PlatformMeshName, s_strSlopeBoardA_PlatformBoneName, true)))
-			Log_EventObjectPhysicsWarning("[LDEventObjectPhysics] SlopeBoardA start platform box failed.");
 	}
 	else
 	{
@@ -818,6 +818,9 @@ HRESULT CLevelDesign_EventObject::Bind_ShaderResources()
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
 		return E_FAIL;
 
 	return S_OK;
