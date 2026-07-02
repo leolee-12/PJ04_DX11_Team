@@ -10,6 +10,10 @@ class CWalkSmoke final : public CEffect_Container
 {
     GENERATED_BODY(CWalkSmoke)
 
+    PROPERTY(_float, m_fWalkSmokeMoveSpeed, L"WalkSmoke Move Speed", L"WalkSmoke Move");
+    PROPERTY(_float, m_fWalkSmokeMoveStartRatio, L"WalkSmoke Move Start Ratio", L"WalkSmoke Move");
+    PROPERTY(_float, m_fWalkSmokeMoveEndRatio, L"WalkSmoke Move End Ratio", L"WalkSmoke Move");
+
 public:
     struct WALK_SMOKE_DESC : public CEffect_Container::EFFECT_CONTAINER_DESC
     {
@@ -36,6 +40,8 @@ public:
 
 private:
     HRESULT Ready_EffectPartObjects();
+    void Update_Move(_float fTimeDelta);
+    void Init_PropertyValue();
 
 public:
     static CWalkSmoke* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

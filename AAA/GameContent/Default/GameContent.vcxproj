@@ -50,6 +50,8 @@
     <ClInclude Include="..\Public\Cappy_Body.h" />
     <ClInclude Include="..\Public\Cappy_Brain.h" />
     <ClInclude Include="..\Public\Cappy_Hat.h" />
+    <ClInclude Include="..\Public\CarMilkyWay.h" />
+    <ClInclude Include="..\Public\Car_00_MilkyWay.h" />
     <ClInclude Include="..\Public\Character.h" />
     <ClInclude Include="..\Public\Character_States.h" />
     <ClInclude Include="..\Public\Common_Circle01.h" />
@@ -80,6 +82,7 @@
     <ClInclude Include="..\public\RockBurst.h" />
     <ClInclude Include="..\public\RockEffect.h" />
     <ClInclude Include="..\public\RockFloorEffect.h" />
+    <ClInclude Include="..\Public\SmokeEmitter.h" />
     <ClInclude Include="..\public\RockPull.h" />
     <ClInclude Include="..\public\RockPush.h" />
     <ClInclude Include="..\Public\SmokeParticle.h" />
@@ -321,6 +324,8 @@
     <ClCompile Include="..\Private\Cappy_Body.cpp" />
     <ClCompile Include="..\Private\Cappy_Brain.cpp" />
     <ClCompile Include="..\Private\Cappy_Hat.cpp" />
+    <ClCompile Include="..\Private\CarMilkyWay.cpp" />
+    <ClCompile Include="..\Private\Car_00_MilkyWay.cpp" />
     <ClCompile Include="..\Private\EnvTrigger_EventPublisher.cpp" />
     <ClCompile Include="..\Private\EnvTrigger_RenderGlobals.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
@@ -350,6 +355,7 @@
     <ClCompile Include="..\private\RockBurst.cpp" />
     <ClCompile Include="..\private\RockEffect.cpp" />
     <ClCompile Include="..\private\RockFloorEffect.cpp" />
+    <ClCompile Include="..\Private\SmokeEmitter.cpp" />
     <ClCompile Include="..\private\RockPull.cpp" />
     <ClCompile Include="..\private\RockPush.cpp" />
     <ClCompile Include="..\Private\SmokeParticle.cpp" />

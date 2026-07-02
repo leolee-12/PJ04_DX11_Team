@@ -3,6 +3,7 @@
 #include "Kirby_Deform.h"
 
 NS_BEGIN(Engine)
+class CEffect_Container;
 NS_END
 
 NS_BEGIN(Client)
@@ -57,6 +58,10 @@ private:
 
 	_float3 m_vRotDir{};
 
+	CEffect_Container* m_pBoostGas1{};
+	CEffect_Container* m_pBoostGas2{};
+	CEffect_Container* m_pBoostWind{};
+
 private:
 	void Change_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eNext);
 	void Enter_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eState);
@@ -67,6 +72,9 @@ private:
 	void Enter_BoostJumpState(CKirby* pKirby, BOOST_JUMP_STATE eState);
 	void Update_BoostJumpState(CKirby* pKirby, _float fTimeDelta);
 	void Exit_BoostJumpState(CKirby* pKirby, BOOST_JUMP_STATE eStaten);
+
+	void BoostEffectStart(CKirby* pKirby, CEffect_Container*& pContainer1, CEffect_Container*& pContainer2, const _tchar* EffectTag);
+	void BoostEffectStop(CEffect_Container*& pContainer1, CEffect_Container*& pContainer2);
 
 public:
 	static CKirby_Deform_Car* Create();
