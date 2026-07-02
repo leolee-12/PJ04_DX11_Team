@@ -37,7 +37,7 @@ class CKirby final : public CCharacter
 	GENERATED_BODY(CKirby)
 
 public:
-	enum KIRBY_COLLIDER { HURT_BOX, INHALE_BOX, COLLIDER_END };
+	enum KIRBY_COLLIDER { HURT_BOX, INHALE_BOX, CAR_BOOST_COLLIDER ,COLLIDER_END };
 
 	struct KIRBY_BODY_DESC : public CContainerObject::COTAINEROBJECT_DESC
 	{
@@ -64,6 +64,9 @@ public:
 	static constexpr _float s_fInhaleUp = 0.5f;
 	static constexpr _float s_fInhaleRadius = 3.f;
 	static constexpr _float s_fInhaleLength = 2.f;
+
+	static constexpr _float3 s_vCarBoostCenter = { 0.f, 1.f, 0.f };
+	static constexpr _float s_fCarBoostRadius = 2.f;
 
 private:
 	CKirby(ID3D11Device * pDevice, ID3D11DeviceContext * pContext);

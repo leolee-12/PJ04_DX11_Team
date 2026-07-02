@@ -114,23 +114,19 @@ void CKirby::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 
-    if (m_KirbyColliders[KIRBY_COLLIDER::HURT_BOX] && m_pTransformCom)
+    if (m_pTransformCom)
     {
-        m_KirbyColliders[KIRBY_COLLIDER::HURT_BOX]->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+        const auto WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+        for (auto* pCollider : m_KirbyColliders)
+        {
+            pCollider->Update(WorldMatrix);
 
 #ifdef _DEBUG
-        m_pGameInstance_Proxy->Add_DebugComponent(m_KirbyColliders[KIRBY_COLLIDER::HURT_BOX]);
+            if (pCollider->Is_Enabled())
+                m_pGameInstance_Proxy->Add_DebugComponent(pCollider);
 #endif
-    }
-
-    if (m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX] && m_pTransformCom)
-    {
-        m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX]->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
-
-#ifdef _DEBUG
-        if (m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX]->Is_Enabled())
-            m_pGameInstance_Proxy->Add_DebugComponent(m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX]);
-#endif
+        }
     }
 }
 
@@ -385,6 +381,20 @@ HRESULT CKirby::Ready_Components()
     m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX]->Set_Enabled(false);
     m_pGameInstance_Proxy->Register_Collider(m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX], ETOUI(COLLISION_LAYER::PLAYER_INHALE));
 
+    // Wall Breaker Collider
+    CCollider::COLLIDER_DESC WallBreakerDesc{};
+    WallBreakerDesc.pOwner = this;
+    WallBreakerDesc.vCenter = _float3(0.f, 1.5f, 1.3f);
+    WallBreakerDesc.fRadius = 2.f;
+
+    m_KirbyColliders[KIRBY_COLLIDER::CAR_BOOST_COLLIDER] = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
+        TEXT("WallBreakerCollider_Com"), &WallBreakerDesc);
+    if (m_KirbyColliders[KIRBY_COLLIDER::CAR_BOOST_COLLIDER] == nullptr)
+        return E_FAIL;
+
+    m_KirbyColliders[KIRBY_COLLIDER::CAR_BOOST_COLLIDER]->Set_Enabled(false);
+     m_pGameInstance_Proxy->Register_Collider(m_KirbyColliders[KIRBY_COLLIDER::CAR_BOOST_COLLIDER], ETOUI(COLLISION_LAYER::CAR_BOOST));
+
     //юс╫ц
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::MONSTER_PROJECTILE));
@@ -400,6 +410,8 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE),     ETOUI(COLLISION_LAYER::ENV_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT),        ETOUI(COLLISION_LAYER::ENV_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE), ETOUI(COLLISION_LAYER::ENV_HURT));
+
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::CAR_BOOST), ETOUI(COLLISION_LAYER::ENV_TRIGGER));
 
     return S_OK;
 }
