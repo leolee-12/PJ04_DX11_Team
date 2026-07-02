@@ -69,6 +69,7 @@ HRESULT CKirby::Initialize(void* pArg)
 
     SetUp_Collider_Callback();
 
+    // Part 생성된 후
     if (FAILED(Ready_AnimEvents()))
         return E_FAIL;  
 
@@ -577,75 +578,14 @@ HRESULT CKirby::Ready_Events()
 
 HRESULT CKirby::Ready_AnimEvents()
 {
-    CAnimator* pBodyAnimator = m_pBody->Get_Animator();
+    if(FAILED(m_pBody->Ready_AnimEvents(this)))
+        return E_FAIL;
 
-    pBodyAnimator->Set_EventCallback(
-        [this](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
-        {
-            switch (static_cast<EANIM_EVENT>(e.iEventType))
-            {
-                case EANIM_EVENT::SetEye:
-                {
-                    if (ePhase != ANIM_EVENT_PHASE::POINT)
-                        break;
+    if (FAILED(Get_DeformPart_Model(DEFORM_TYPE::CAR, KIRBY_DEFORM_MODEL_TYPE::DEMO)->Ready_AnimEvents(this)))
+        return E_FAIL;
 
-                    switch (static_cast<KIRBY_EYE_STATE>(e.iIntParam))
-                    {
-                    case KIRBY_EYE_STATE::IDLE:      m_pBody->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);      break;
-                    case KIRBY_EYE_STATE::DOUBT:     m_pBody->Set_KirbyEye(KIRBY_EYE_STATE::DOUBT);     break;
-                    case KIRBY_EYE_STATE::BLINK:     m_pBody->Set_KirbyEye(KIRBY_EYE_STATE::BLINK);     break;
-                    case KIRBY_EYE_STATE::CLOSE:     m_pBody->Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);     break;
-                    case KIRBY_EYE_STATE::ANGRY:     m_pBody->Set_KirbyEye(KIRBY_EYE_STATE::ANGRY);     break;
-                    case KIRBY_EYE_STATE::SURPRISED: m_pBody->Set_KirbyEye(KIRBY_EYE_STATE::SURPRISED); break;
-                    case KIRBY_EYE_STATE::SADNESS:   m_pBody->Set_KirbyEye(KIRBY_EYE_STATE::SADNESS);   break;
-                    }
-
-                    break;
-                }
-
-                case EANIM_EVENT::SetBody:
-                {
-                    if (ePhase != ANIM_EVENT_PHASE::POINT)
-                        break;
-
-                    switch (static_cast<KIRBY_BODY_STATE>(e.iIntParam))
-                    {
-                    case KIRBY_BODY_STATE::NORMAL:  m_pBody->Set_KirbyBody(KIRBY_BODY_STATE::NORMAL);  break;
-                    case KIRBY_BODY_STATE::STUFFED: m_pBody->Set_KirbyBody(KIRBY_BODY_STATE::STUFFED); break;
-                    case KIRBY_BODY_STATE::INHALE:  m_pBody->Set_KirbyBody(KIRBY_BODY_STATE::INHALE);  break;
-                    }
-
-                    break;
-                }
-
-                case EANIM_EVENT::WalkSmoke:
-                {
-                    if (ePhase != ANIM_EVENT_PHASE::POINT)
-                        break;
-
-                    const _float fBackOffset = 1.f;
-                    const _float fSideOffset = 0.25f;
-
-                    _vector vBackDir = -XMVector3Normalize(
-                        XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f));
-
-                    _vector vRightDir = XMVector3Normalize(
-                        XMVectorSetY(m_pTransformCom->Get_State(STATE::RIGHT), 0.f));
-
-                    _float3 fPos{};
-                    XMStoreFloat3(&fPos, m_pTransformCom->Get_State(STATE::POSITION) + XMVectorSet(0.f, 0.2f, 0.f, 0.f) +
-                        vBackDir * fBackOffset + vRightDir * fSideOffset * static_cast<_float>(e.iIntParam));
-
-                    _float3 vSpawnLook{};
-                    XMStoreFloat3(&vSpawnLook, vBackDir);
-
-                    CEffect_Loader::GetInstance()->Spawn(L"WalkSmoke", Get_LevelIndex(), fPos, vSpawnLook, _float3(0.f, 0.f, 0.f));
-
-                    break;
-                }
-            }
-        }
-    );
+    if (FAILED(Get_DeformPart_Model(DEFORM_TYPE::CAR, KIRBY_DEFORM_MODEL_TYPE::MAIN)->Ready_AnimEvents(this)))
+        return E_FAIL;
 
     return S_OK;
 }

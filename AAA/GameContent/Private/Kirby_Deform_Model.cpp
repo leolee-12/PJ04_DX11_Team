@@ -64,6 +64,28 @@ const _float4x4* CKirby_Deform_Model::Get_HatBoneMatirx()
     return Get_BoneMatrixPtr("HatL");;
 }
 
+_bool CKirby_Deform_Model::Handle_AnimEventEye(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+{
+    if (static_cast<EANIM_EVENT>(e.iEventType) != EANIM_EVENT::SetEye)
+        return false;
+
+    if (ePhase != ANIM_EVENT_PHASE::POINT)
+        return true;
+
+    switch (static_cast<KIRBY_EYE_STATE>(e.iIntParam))
+    {
+        case KIRBY_EYE_STATE::IDLE:      Set_KirbyEye(KIRBY_EYE_STATE::IDLE);      break;
+        case KIRBY_EYE_STATE::DOUBT:     Set_KirbyEye(KIRBY_EYE_STATE::DOUBT);     break;
+        case KIRBY_EYE_STATE::BLINK:     Set_KirbyEye(KIRBY_EYE_STATE::BLINK);     break;
+        case KIRBY_EYE_STATE::CLOSE:     Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);     break;
+        case KIRBY_EYE_STATE::ANGRY:     Set_KirbyEye(KIRBY_EYE_STATE::ANGRY);     break;
+        case KIRBY_EYE_STATE::SURPRISED: Set_KirbyEye(KIRBY_EYE_STATE::SURPRISED); break;
+        case KIRBY_EYE_STATE::SADNESS:   Set_KirbyEye(KIRBY_EYE_STATE::SADNESS);   break;
+    }
+
+    return true;
+}
+
 HRESULT CKirby_Deform_Model::Bind_ShaderResources(CShader* pShader)
 {
     if (pShader == nullptr)

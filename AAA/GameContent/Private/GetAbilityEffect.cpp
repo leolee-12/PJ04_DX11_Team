@@ -57,7 +57,26 @@ HRESULT CGetAbilityEffect::Render()
 
 HRESULT CGetAbilityEffect::Ready_EffectPartObjects()
 {
-    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CStar2DParticle::PROTOTYPE_TAG, CStar2DParticle::PROTOTYPE_TAG)))
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CStar2DParticle::PROTOTYPE_TAG, L"BigStar1")))
+        return E_FAIL;
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CStar2DParticle::PROTOTYPE_TAG, L"BigStar2")))
+        return E_FAIL;
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CStar2DParticle::PROTOTYPE_TAG, L"BigStar3")))
+        return E_FAIL;
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CStar2DParticle::PROTOTYPE_TAG, L"BigStar4")))
+        return E_FAIL;
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CStar2DParticle::PROTOTYPE_TAG, L"BigStar5")))
+        return E_FAIL;
+
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CStar2DParticle::PROTOTYPE_TAG, L"SmallStar1")))
+        return E_FAIL;                                                                    
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CStar2DParticle::PROTOTYPE_TAG, L"SmallStar2")))
+        return E_FAIL;                                                                    
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CStar2DParticle::PROTOTYPE_TAG, L"SmallStar3")))
+        return E_FAIL;                                                                    
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CStar2DParticle::PROTOTYPE_TAG, L"SmallStar4")))
+        return E_FAIL;                                                                    
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CStar2DParticle::PROTOTYPE_TAG, L"SmallStar5")))
         return E_FAIL;
 
     return S_OK;

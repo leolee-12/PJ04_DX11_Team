@@ -45,6 +45,8 @@ public:
 	virtual HRESULT Render() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
+	virtual HRESULT Ready_AnimEvents(CKirby* pKirby) override;
+
 public:
 	void Set_KirbyBody(KIRBY_BODY_STATE eState) { m_eBody = eState; }
 	void Set_KirbyMouth(KIRBY_MOUTH_STATE eState) { m_eMouth = eState; }
