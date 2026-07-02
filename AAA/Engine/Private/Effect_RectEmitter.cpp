@@ -64,8 +64,11 @@ HRESULT CEffect_RectEmitter::Render()
 
     Helper::IntClamp(m_iShaderPass, ShaderPass::Default, ShaderPass::ShaderPass_End - 1);
     Helper::IntClamp(m_iMirror, Sampler::DEFAULT, Sampler::SAMPLER_END - 1);
+    Helper::IntClamp(m_iDepthIgnore, DepthMode::DEPTH_DEFAULT, DepthMode::DEPTH_MODE_END - 1);
 
-    _int iPass = m_iShaderPass + (m_iMirror == Sampler::MIRROR ? ShaderPass::ShaderPass_End : 0);
+    _int iPass = m_iShaderPass +
+        (m_iMirror == Sampler::MIRROR ? ShaderPass::ShaderPass_End : 0) +
+        (m_iDepthIgnore == DepthMode::DEPTH_IGNORE ? ShaderPass::ShaderPass_End * Sampler::SAMPLER_END : 0);
 
     for (const EMITTER_PARTICLE& Particle : m_EmitterParticles)
     {
