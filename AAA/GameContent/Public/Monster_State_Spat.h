@@ -25,6 +25,9 @@ private:
     static constexpr _float     s_fMaxLifeTime = 2.5f;
     static constexpr _float     s_fSpinSpeedDeg = 360.f;
 
+    const _float4x4*            m_pBoneMat = { nullptr };  
+    _float4x4                   m_SocketWorld = {};
+
     _bool                       m_bSpinBone = { false };
 
 public:

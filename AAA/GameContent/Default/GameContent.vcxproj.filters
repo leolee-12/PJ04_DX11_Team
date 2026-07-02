@@ -148,15 +148,6 @@
     <Filter Include="00. GameObject\04. Character">
       <UniqueIdentifier>{12a38b09-ecf8-45dc-a08f-d9694ed433eb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect">
-      <UniqueIdentifier>{289ff231-82b4-41ae-806c-a6d26b461dfa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer">
-      <UniqueIdentifier>{48e671a4-0884-4bc5-9390-1d1119d15de8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke">
-      <UniqueIdentifier>{9f8fcf1c-0b3e-48eb-9310-44093cf6ed7a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\01. InhaleContainer">
       <UniqueIdentifier>{75fd20ba-5ae3-4c5f-bf95-b21a0b7e20ad}</UniqueIdentifier>
     </Filter>
@@ -165,18 +156,6 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash">
       <UniqueIdentifier>{61c41364-99b2-4864-a87d-85109fe32b06}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part">
-      <UniqueIdentifier>{40aab48f-b6b1-4fe9-80fa-b4ca0ea5dad0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\00. SmokeSphereOriginal">
-      <UniqueIdentifier>{362df019-e5fa-4be5-9f18-eea43e8e277e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\01. SmokeLowPoly">
-      <UniqueIdentifier>{ff5efbd2-0596-453b-abf9-11fce4e0e720}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\02. SmokeTail">
-      <UniqueIdentifier>{d13a01c7-b84d-40fa-a0a4-51a1b67b7315}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\04. Common_Circle01">
       <UniqueIdentifier>{29830c83-0212-4f5e-ad0d-0455cb58e043}</UniqueIdentifier>
@@ -240,9 +219,6 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Attack">
       <UniqueIdentifier>{1a16a95c-467c-4517-b7e1-f705d612b308}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="97. DataSystem\MapLoader">
-      <UniqueIdentifier>{077c1198-d891-486e-b491-c184ad619dd7}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\AbilityDump">
       <UniqueIdentifier>{26490427-a373-403b-bd61-8303f0dffa59}</UniqueIdentifier>
@@ -460,27 +436,6 @@
     <Filter Include="00. GameObject\96. LevelDesign\Invisible\99. Unsupported">
       <UniqueIdentifier>{88670e70-c815-452c-88eb-8a17ac26a72d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\Test\TestParticle">
-      <UniqueIdentifier>{c3b2a3c6-b5a8-4b4a-82ac-7f8fd01b5452}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Idle">
-      <UniqueIdentifier>{c98b37f0-30aa-4b5a-9fca-09857aa902bf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Captured">
-      <UniqueIdentifier>{879257a2-a8e4-4f88-bbb7-30452c0bccde}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Fall">
-      <UniqueIdentifier>{5c9cbfda-5036-4183-ad65-eef65efd80d6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Landing">
-      <UniqueIdentifier>{0eb470de-c905-4503-be01-b9226fc00a6a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockBack">
-      <UniqueIdentifier>{b19624c6-a631-447e-b28c-c98e93b839f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockOut">
-      <UniqueIdentifier>{e6dc4f8b-cd12-4921-9312-5328ed43df67}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\Invisible\02. FallBorder">
       <UniqueIdentifier>{38e3da55-8b43-4b93-99fb-28d26847d15d}</UniqueIdentifier>
     </Filter>
@@ -547,12 +502,6 @@
     <Filter Include="00. GameObject\97. UI\UIContainer\Sequence\Flash">
       <UniqueIdentifier>{64c10457-ee8a-4e26-bb8c-7e851d26d956}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\08. CutsceneActor">
-      <UniqueIdentifier>{95c0b1f2-ac3e-4446-9bd7-5b1c7b84f2c1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\08. CutsceneActor\Gorilla">
-      <UniqueIdentifier>{ef97af82-579e-4774-9fb4-27668458611d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\QTE_Grabbed">
       <UniqueIdentifier>{b3d902fb-45c2-4c61-b777-dd904840d9a8}</UniqueIdentifier>
     </Filter>
@@ -561,9 +510,6 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash">
       <UniqueIdentifier>{553f3de7-862e-424a-87ee-191f43044a21}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\KnockBack\KnockBackDeath">
-      <UniqueIdentifier>{f45699c1-0279-42f5-8174-aecc983bb4b3}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Move">
       <UniqueIdentifier>{e1c8aef1-1afc-4735-803c-676e4dfe7362}</UniqueIdentifier>
@@ -663,30 +609,6 @@
     </Filter>
     <Filter Include="00. GameObject\06. Monster\03. NormalEnemy\State\Chase">
       <UniqueIdentifier>{6d03a521-9743-4bf0-9c6c-3ebe4c879ee1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\08. Common_Ring03">
-      <UniqueIdentifier>{ea802e0e-a008-40c2-8690-c4635c1185e3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\09. Common_JumpSlash">
-      <UniqueIdentifier>{a7a58fec-6650-4f57-9df6-0b8c82791b61}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash">
-      <UniqueIdentifier>{61c41364-99b2-4864-a87d-85109fe32b06}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\00. Camera\Cutscene">
-      <UniqueIdentifier>{44ee9036-9fb5-42d3-a001-52dd473415a5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="96. CameraDirector">
-      <UniqueIdentifier>{ac2123fc-d03d-4f44-a7a4-a4fc408e20d9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\07. Boss\BossNamePlate">
-      <UniqueIdentifier>{58efb2e3-2e8d-46c9-a255-4e907b51f633}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\07. Boss\BossNamePlate\Gorilla">
-      <UniqueIdentifier>{4640c1d8-ee75-4758-a51f-cd0fd9fb282d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\00. Camera\BossCam">
-      <UniqueIdentifier>{2167fc90-1b87-469b-9d86-8fb47e1a8e6d}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\05. Kabu\Parts\Body">
       <UniqueIdentifier>{cccc5499-fa04-4e60-9dd2-ec45a9ffb6ef}</UniqueIdentifier>
@@ -850,9 +772,6 @@
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\13. SmokeParticle">
       <UniqueIdentifier>{edf7a60d-c353-4b44-83af-c72b7da910cd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\14. StarParticle">
-      <UniqueIdentifier>{792d854b-212f-4720-bb96-6f9577206865}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\08. BoostGas">
       <UniqueIdentifier>{f3d3b293-2e65-42ed-b5f1-fd201a943c21}</UniqueIdentifier>
     </Filter>
@@ -906,6 +825,48 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\Shockwave">
       <UniqueIdentifier>{8b96a12e-2bca-49bc-8a21-8793a67b9ee5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion">
+      <UniqueIdentifier>{485a73df-26e0-4a27-a49d-295d417d941b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\16. Common_SphereNoise">
+      <UniqueIdentifier>{669cbc33-14dd-4636-ae1e-9df27f94568e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\10. CommonHit">
+      <UniqueIdentifier>{5724edbd-da90-41e3-8da0-0abb4bf70071}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\11. SpitObject">
+      <UniqueIdentifier>{67c8b5ca-3d52-4622-a89d-948c3a95df05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\15. Sphere">
+      <UniqueIdentifier>{a8895ff1-a371-4585-ac71-38ee6197d341}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\15. Sphere\MeshParticle">
+      <UniqueIdentifier>{b1a2f5cc-ae00-41cb-b647-f98698bbbf86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\15. Sphere\Mesh">
+      <UniqueIdentifier>{771af8b6-b922-49ce-b2cf-fc329fe45188}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\14. Star">
+      <UniqueIdentifier>{792d854b-212f-4720-bb96-6f9577206865}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\14. Star\MeshParticle">
+      <UniqueIdentifier>{35016b5e-260b-4a74-a291-ba9775ec2d10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\14. Star\Mesh">
+      <UniqueIdentifier>{4967c70d-f3e5-4aee-a299-904aa520e889}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect">
+      <UniqueIdentifier>{74bc5f52-4870-4683-9341-fc939a30c8ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\HitMark">
+      <UniqueIdentifier>{77605aed-77ee-41ea-9d31-348d80a1bdf8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\Bubble">
+      <UniqueIdentifier>{09e21467-1e49-47a3-9e68-417e07b45c06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\14. Star\Emitter">
+      <UniqueIdentifier>{2a99a782-1b06-4ca2-bcec-3900ae1eb0e7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1674,9 +1635,6 @@
     <ClInclude Include="..\Public\DespawnEffect.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\07. DespawnEffect</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\SmokeParticle.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\13. SmokeParticle</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\BoostGas.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. BoostGas</Filter>
     </ClInclude>
@@ -1688,9 +1646,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\CarMilkyWay.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\99. CarMilkyWay</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\StarParticle.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. StarParticle</Filter>
     </ClInclude>
     <ClInclude Include="..\public\RockPush.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\02. Gorilla_RockPush</Filter>
@@ -1742,6 +1697,39 @@
     </ClInclude>
     <ClInclude Include="..\public\Gorilla_Ring.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\06. Gorilla_Ring</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BombExplosion.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Common_SphereNoise.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\16. Common_SphereNoise</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CommonHit.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\10. CommonHit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SpitObject.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\11. SpitObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SphereParticle.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\15. Sphere\MeshParticle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SmokeParticle.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\13. SmokeParticle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SphereMesh.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\15. Sphere\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\StarParticle.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. Star\MeshParticle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HitMark.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\HitMark</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bubble.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\Bubble</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\StarEmitter.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. Star\Emitter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2432,9 +2420,6 @@
     <ClCompile Include="..\Private\DespawnEffect.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\07. DespawnEffect</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\SmokeParticle.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\13. SmokeParticle</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\BoostGas.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. BoostGas</Filter>
     </ClCompile>
@@ -2446,9 +2431,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\CarMilkyWay.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\99. CarMilkyWay</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\StarParticle.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. StarParticle</Filter>
     </ClCompile>
     <ClCompile Include="..\private\RockPush.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\02. Gorilla_RockPush</Filter>
@@ -2500,6 +2482,39 @@
     </ClCompile>
     <ClCompile Include="..\private\Gorilla_Ring.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\06. Gorilla_Ring</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BombExplosion.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Common_SphereNoise.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\16. Common_SphereNoise</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CommonHit.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\10. CommonHit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SpitObject.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\11. SpitObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SphereParticle.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\15. Sphere\MeshParticle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SmokeParticle.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\13. SmokeParticle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SphereMesh.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\15. Sphere\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\StarParticle.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. Star\MeshParticle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HitMark.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\HitMark</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bubble.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\Bubble</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\StarEmitter.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. Star\Emitter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

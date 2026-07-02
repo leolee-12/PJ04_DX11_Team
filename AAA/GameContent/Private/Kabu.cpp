@@ -104,6 +104,10 @@ void  CKabu::Set_Visible(_bool bVisible)
     m_bVisible = bVisible;
     if (m_pBody)
         m_pBody->Set_Visible(bVisible);
+
+    // 안보일 때 히트박스 Off
+    Enable_Colliders(bVisible);
+    Enable_Controller(bVisible);
 }
 
 CMonsterBrain* CKabu::Create_Brain()
