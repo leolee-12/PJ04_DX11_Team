@@ -11,6 +11,8 @@ class CLIENT_DLL CMapBreakSection final : public CMapObject
 {
 	GENERATED_BODY(CMapBreakSection)
 
+	PROPERTY(_bool, m_bRenderable, L"Renderable", L"MapSection")
+
 public:
 	enum class MAP_BREAK_STATE
 	{
@@ -70,6 +72,11 @@ public:
 	virtual HRESULT Render() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
+	const MAP_BREAK_SECTION_DESC& Get_Desc() const { return m_tBreakDesc; }
+	const _wstring& Get_SectionName() const { return m_strSectionName; }
+	_bool Is_Renderable() const { return m_bRenderable; }
+	void Set_Renderable(_bool bRenderable) { m_bRenderable = bRenderable; }
+
 private:
 	virtual const _tchar* Get_ModelProtoTag() const override;
 	virtual _uint Get_ModelProtoLevel() const override;
@@ -92,7 +99,6 @@ private:
 	_wstring m_strModelProtoTag;
 	_uint m_iModelProtoLevel = {};
 
-	_bool m_bRenderable = true;
 	_bool m_bCastShadow = false;
 
 	vector<MAP_BREAK_FRAGMENT> m_Fragments;

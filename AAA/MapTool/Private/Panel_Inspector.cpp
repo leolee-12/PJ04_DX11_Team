@@ -5,6 +5,7 @@
 #include "Shader_PassMeta.h"
 #include "MapStage.h"
 #include "MapSection.h"
+#include "MapBreakSection.h"
 #include "Map_EditFile.h"
 #include "Map_EditSession.h"
 #include "EnvObject.h"
@@ -487,6 +488,12 @@ void CPanel_Inspector::Render()
 		Draw_EnvObjectEditPanel(pLevel, pSelected);
 	}
 
+	if (dynamic_cast<CMapBreakSection*>(pSelected))
+	{
+		ImGui::Separator();
+		Draw_MapSectionEditPanel(pLevel, nullptr, pSelected);
+	}
+
 	ImGui::Separator();
 	Draw_MeshLayerPanel(pSelected);
 
@@ -569,7 +576,8 @@ _bool CPanel_Inspector::Draw_Properties(IReflectable* pHolder)
 	const _bool bSkipEnvObjectCategory =
 		nullptr != dynamic_cast<CEnvObject*>(pHolder);
 	const _bool bSkipMapSectionCategory =
-		nullptr != dynamic_cast<CMapSection*>(pHolder);
+		nullptr != dynamic_cast<CMapSection*>(pHolder)
+		|| nullptr != dynamic_cast<CMapBreakSection*>(pHolder);
 
 	for (auto& prop : pHolder->Get_Properties())
 	{
@@ -863,31 +871,54 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 	}
 }
 
-void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* pMapStage, CMapSection* pSection)
+void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* pMapStage, CGameObject* pObject)
 {
-	if (nullptr == pLevel || nullptr == pMapStage || nullptr == pSection)
+	if (nullptr == pLevel || nullptr == pObject)
 		return;
 
-	_bool* pbRenderable = FindBoolProperty(pSection, L"Renderable", L"MapSection");
-	_bool* pbEnableCulling = FindBoolProperty(pSection, L"Enable Culling", L"MapSection");
-	_bool* pbCastShadow = FindBoolProperty(pSection, L"Cast Shadow", L"MapSection");
+	CMapSection* pMapSection = dynamic_cast<CMapSection*>(pObject);
+	CMapBreakSection* pBreakSection = dynamic_cast<CMapBreakSection*>(pObject);
 
-	const _wstring strSectionKey = CMap_EditFile::Make_SectionKey(
-		pMapStage->Get_StageName(),
-		pSection->Get_SectionName());
+	if (nullptr == pMapSection && nullptr == pBreakSection)
+		return;
+	if (nullptr != pMapSection && nullptr == pMapStage)
+		return;
 
-	_bool* pbCreateCollisionActor =
-		Resolve_MapCollMeshEditState(pLevel, pMapStage, pSection);
+	_bool* pbRenderable = FindBoolProperty(pObject, L"Renderable", L"MapSection");
+	_bool* pbEnableCulling = nullptr;
+	_bool* pbCastShadow = nullptr;
+	_bool* pbCreateCollisionActor = nullptr;
+	_bool bSourceCanCreateCollisionActor = false;
 
-	const _bool bSourceCanCreateCollisionActor =
-		pSection->Get_Desc().bSourceCreateCollisionActor;
+	_wstring strStageName;
+	_wstring strSectionName;
 
-	const string strStageName = WstrToStr(pMapStage->Get_StageName());
-	const string strSectionName = WstrToStr(pSection->Get_SectionName());
+	if (nullptr != pMapSection)
+	{
+		pbEnableCulling = FindBoolProperty(pMapSection, L"Enable Culling", L"MapSection");
+		pbCastShadow = FindBoolProperty(pMapSection, L"Cast Shadow", L"MapSection");
+		pbCreateCollisionActor = Resolve_MapCollMeshEditState(pLevel, pMapStage, pMapSection);
+		bSourceCanCreateCollisionActor = pMapSection->Get_Desc().bSourceCreateCollisionActor;
+		strStageName = pMapStage->Get_StageName();
+		strSectionName = pMapSection->Get_SectionName();
+	}
+	else
+	{
+		const CMap_EditSession* pSession = pLevel->Get_MapPreviewSession();
+		strStageName = (nullptr != pSession && !pSession->Get_LoadedStageName().empty())
+			? pSession->Get_LoadedStageName()
+			: CMapBreakSection::STAGE12_STAGE_NAME;
+		strSectionName = pBreakSection->Get_SectionName();
+	}
+
+	const string strStageNameText = WstrToStr(strStageName);
+	const string strSectionNameText = WstrToStr(strSectionName);
 
 	ImGui::TextUnformatted("MapSection Edit");
-	ImGui::TextDisabled("Stage: %s", strStageName.empty() ? "<Unnamed Stage>" : strStageName.c_str());
-	ImGui::TextDisabled("Section: %s", strSectionName.empty() ? "<Unnamed Section>" : strSectionName.c_str());
+	if (nullptr != pBreakSection)
+		ImGui::TextDisabled("Type: MapBreakSection");
+	ImGui::TextDisabled("Stage: %s", strStageNameText.empty() ? "<Unnamed Stage>" : strStageNameText.c_str());
+	ImGui::TextDisabled("Section: %s", strSectionNameText.empty() ? "<Unnamed Section>" : strSectionNameText.c_str());
 
 	if (ImGui::CollapsingHeader("Section Flags", ImGuiTreeNodeFlags_DefaultOpen))
 	{
@@ -898,29 +929,42 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 			ImGui::Checkbox("Cast Shadow##SectionEdit", (bool*)pbCastShadow);
 		ImGui::EndGroup();
 
-		ImGui::SameLine(0.f, 20.f);
-
-		ImGui::BeginGroup();
-		if (pbEnableCulling)
-			ImGui::Checkbox("Enable Culling##SectionEdit", (bool*)pbEnableCulling);
-		if (pbCreateCollisionActor)
+		if (nullptr != pMapSection)
 		{
-			ImGui::BeginDisabled(!bSourceCanCreateCollisionActor);
-			ImGui::Checkbox("Create Collision Actor##SectionEdit", (bool*)pbCreateCollisionActor);
-			ImGui::EndDisabled();
+			ImGui::SameLine(0.f, 20.f);
+
+			ImGui::BeginGroup();
+			if (pbEnableCulling)
+				ImGui::Checkbox("Enable Culling##SectionEdit", (bool*)pbEnableCulling);
+			if (pbCreateCollisionActor)
+			{
+				ImGui::BeginDisabled(!bSourceCanCreateCollisionActor);
+				ImGui::Checkbox("Create Collision Actor##SectionEdit", (bool*)pbCreateCollisionActor);
+				ImGui::EndDisabled();
+			}
+			ImGui::EndGroup();
+
+			if (!bSourceCanCreateCollisionActor)
+				ImGui::TextDisabled("Coll actor unavailable.");
+
+			ImGui::TextDisabled("Apply on reload.");
+			ImGui::TextDisabled("Save to persist.");
 		}
-		ImGui::EndGroup();
-
-		if (!bSourceCanCreateCollisionActor)
-			ImGui::TextDisabled("Coll actor unavailable.");
-
-		ImGui::TextDisabled("Apply on reload.");
-		ImGui::TextDisabled("Save to persist.");
+		else
+		{
+			ImGui::TextDisabled("Transform and Renderable affect the current preview.");
+			ImGui::TextDisabled("Culling, shadow, and section collision actor are not used by MapBreakSection.");
+		}
 	}
+
+	if (nullptr != pBreakSection)
+		return;
+
+	const _wstring strSectionKey = CMap_EditFile::Make_SectionKey(strStageName, strSectionName);
 
 	if (ImGui::Button("Apply##SectionEdit"))
 	{
-		MAP_ENV_EDITED_DESC Edit = Build_SectionEditFromCurrentSection(pSection);
+		MAP_ENV_EDITED_DESC Edit = Build_SectionEditFromCurrentSection(pMapSection);
 
 		const _bool bCreateCollisionActorValue =
 			(nullptr != pbCreateCollisionActor)
@@ -938,7 +982,7 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 			Edit.bUseCollMesh = bCreateCollisionActorValue;
 		}
 
-		pSection->Set_CollisionActorEnabled(
+		pMapSection->Set_CollisionActorEnabled(
 			bSourceCanCreateCollisionActor ? bCreateCollisionActorValue : false);
 
 		if (Has_AnyMapEnvEdit(Edit))
@@ -948,7 +992,7 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 		else
 		{
 			pLevel->Clear_EditedMapPreviewSection(strSectionKey);
-			Clear_MapCollMeshEditState(pSection);
+			Clear_MapCollMeshEditState(pMapSection);
 		}
 	}
 

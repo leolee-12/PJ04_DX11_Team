@@ -95,7 +95,7 @@ void CMapBreakSection::Late_Update(_float fTimeDelta)
 {
 	if (nullptr != m_pBoostTrigger && MAP_BREAK_STATE::INTACT == m_eBreakState)
 	{
-		m_pBoostTrigger->Update(XMMatrixIdentity());
+		m_pBoostTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
 #ifdef _DEBUG
 		m_pGameInstance_Proxy->Add_DebugComponent(m_pBoostTrigger);
@@ -138,7 +138,16 @@ void CMapBreakSection::Late_Update(_float fTimeDelta)
 			XMStoreFloat4(&Fragment.vRotation, vRotation);
 		}
 
-		const _float fWorldY = Fragment.vPivot.y + Fragment.vOffset.y;
+		const _float3 vEnginePivot = { Fragment.vPivot.x, Fragment.vPivot.y, -Fragment.vPivot.z };
+		const _vector vWorldPosition = XMVector3TransformCoord(
+			XMVectorSet(
+				vEnginePivot.x + Fragment.vOffset.x,
+				vEnginePivot.y + Fragment.vOffset.y,
+				vEnginePivot.z + Fragment.vOffset.z,
+				1.f),
+			XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+
+		const _float fWorldY = XMVectorGetY(vWorldPosition);
 		if (fWorldY < 15.f)
 		{
 			Fragment.bActive = false;
@@ -173,6 +182,7 @@ HRESULT CMapBreakSection::Render()
 		return E_FAIL;
 
 	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+	const _matrix BreakSectionWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
@@ -191,7 +201,7 @@ HRESULT CMapBreakSection::Render()
 			vEnginePivot.z + pFragment->vOffset.z);
 
 		_float4x4 WorldMatrix{};
-		XMStoreFloat4x4(&WorldMatrix, Rotation * Translation);
+		XMStoreFloat4x4(&WorldMatrix, Rotation * Translation * BreakSectionWorld);
 
 		if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &WorldMatrix)))
 			return E_FAIL;
