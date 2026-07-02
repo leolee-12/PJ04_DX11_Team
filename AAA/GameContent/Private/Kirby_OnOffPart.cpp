@@ -33,6 +33,8 @@ HRESULT CKirby_OnOffPart::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
+    m_iShadowPass = 3;
+
     return S_OK;
 }
 
@@ -62,10 +64,32 @@ void CKirby_OnOffPart::Late_Update(_float fTimeDelta)
 
     Compute_CombinedWorldMatrix(LocalWorld);          
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
 
 HRESULT CKirby_OnOffPart::Render()
 {
+    return S_OK;
+}
+
+HRESULT CKirby_OnOffPart::Render_Shadow()
+{
+    if (!m_bOn || m_iShadowPass < 0 || nullptr == m_pModelCom)
+        return S_OK;
+
+    m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix);
+    m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW));
+    m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ));
+
+    const _uint iNumMeshes = (_uint)m_pModelCom->Get_NumMeshes();
+    for (_uint i = 0; i < iNumMeshes; ++i)
+    {
+        if (m_pAnimatorCom)
+            m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
+        if (FAILED(m_pShaderCom->Begin(m_iShadowPass)))
+            return E_FAIL;
+        m_pModelCom->Render(i);
+    }
     return S_OK;
 }
 

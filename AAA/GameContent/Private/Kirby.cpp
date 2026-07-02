@@ -149,6 +149,16 @@ void CKirby::Late_Update(_float fTimeDelta)
                 m_pGameInstance_Proxy->Add_DebugComponent(pCollider);
 #endif
         }
+
+        // BlobShadow °»½Å
+        _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+        const _float H = 5.f, fSize = 3.5f;
+        SHADOW_LIGHT_DESC d{};
+        XMStoreFloat4(&d.vEye, vPos + XMVectorSet(0.f, H, 0.f, 0.f));
+        XMStoreFloat4(&d.vAt, XMVectorSetW(vPos, 1.f));
+        d.fWidth = d.fHeight = fSize;
+        d.fNear = 0.1f; d.fFar = H + 3.f;
+        m_pGameInstance_Proxy->Update_BlobShadow(d);
     }
 }
 

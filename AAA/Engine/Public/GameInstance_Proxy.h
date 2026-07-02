@@ -206,6 +206,8 @@ public:
     const _float4x4* Get_Shadow_Transform(D3DTS eState) const;
     HRESULT Add_ShadowLight(const SHADOW_LIGHT_DESC& ShadowDesc);
     HRESULT Update_ShadowLight(const SHADOW_LIGHT_DESC& Desc);
+    HRESULT          Update_BlobShadow(const SHADOW_LIGHT_DESC& d);     
+    const _float4x4* Get_BlobShadow_Transform(D3DTS e) const;
 #pragma endregion
 
 #pragma region EFFECT_MANAGER

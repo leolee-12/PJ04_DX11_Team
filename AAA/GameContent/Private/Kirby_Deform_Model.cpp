@@ -32,6 +32,8 @@ HRESULT CKirby_Deform_Model::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
+    m_iShadowPass = 3;
+
     return S_OK;
 }
 

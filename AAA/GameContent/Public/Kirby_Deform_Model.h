@@ -80,6 +80,8 @@ protected:
 	const _float* m_pHitFlash = { nullptr };
 	const _float3* m_pHitFlashColor = { nullptr };
 
+	_int  m_iShadowPass = { -1 };
+
 protected:
 	_float4 m_vBodyColor = { 1.f, 0.1882353f, 0.3764706f, 1.f };
 	_float4 m_vFootColor = { 0.67f, 0.f, 0.f, 1.f };

@@ -59,6 +59,7 @@ void CKirby_DeformCar_Main::Late_Update(_float fTimeDelta)
     CPartObject::Compute_CombinedWorldMatrix(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
 
 HRESULT CKirby_DeformCar_Main::Render()

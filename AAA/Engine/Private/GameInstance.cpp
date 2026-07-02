@@ -110,6 +110,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pInstance->m_pShadow_Dir)
         return E_FAIL;
 
+    m_pInstance->m_pShadow_Blob = CShadow_Dir::Create();
+    if (nullptr == m_pInstance->m_pShadow_Blob)
+        return E_FAIL;
+
     m_pInstance->m_pEffect_Manager = CEffect_Manager::Create(*ppDevice, *ppContext);
     if (nullptr == m_pInstance->m_pEffect_Manager)
         return E_FAIL;
@@ -724,6 +728,7 @@ void CGameInstance::Free()
     Safe_Release(m_pShaderGlobal_Manager);
     Safe_Release(m_pEnvironment_Manager);
     Safe_Release(m_pShadow_Dir);
+    Safe_Release(m_pShadow_Blob);
     Safe_Release(m_pTarget_Manager);
     Safe_Release(m_pSound_Manager);
     Safe_Release(m_pCollision_Manager);

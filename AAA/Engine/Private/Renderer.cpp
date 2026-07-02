@@ -69,6 +69,7 @@ HRESULT CRenderer::Initialize()
     if (FAILED(Ready_DepthStencil_Buffer()))
         return E_FAIL;
 
+
     // ui 커튼
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_Curtain"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))   // 투명으로 clear
         return E_FAIL;

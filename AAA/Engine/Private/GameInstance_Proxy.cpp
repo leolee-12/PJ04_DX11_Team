@@ -775,6 +775,20 @@ HRESULT CGameInstance_Proxy::Update_ShadowLight(const SHADOW_LIGHT_DESC& ShadowD
 
 	return m_pOwner->m_pShadow_Dir->Add_ShadowLight(ShadowDesc);
 }
+HRESULT CGameInstance_Proxy::Update_BlobShadow(const SHADOW_LIGHT_DESC& d)
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->m_pShadow_Blob->Update_ShadowLight(d);
+}
+const _float4x4* CGameInstance_Proxy::Get_BlobShadow_Transform(D3DTS e) const
+{
+	if (!IsConnected())
+		return nullptr;
+
+	return m_pOwner->m_pShadow_Blob->Get_Transform(e);
+}
 #pragma endregion
 
 #pragma region EFFECT_MANAGER

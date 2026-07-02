@@ -38,6 +38,7 @@ public:
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+	virtual HRESULT Render_Shadow() override;
 
 public:
 	virtual void PartOnOff(_bool bOn) { m_bOn = bOn; }
@@ -61,6 +62,8 @@ protected:
 
 	const _float* m_pHitFlash = { nullptr };
 	const _float3* m_pHitFlashColor = { nullptr };
+
+	_int	m_iShadowPass = { -1 };
 
 	_bool m_bOn{};
 

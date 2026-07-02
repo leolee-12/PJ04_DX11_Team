@@ -63,6 +63,7 @@ void CKirby_Body::Late_Update(_float fTimeDelta)
     CPartObject::Compute_CombinedWorldMatrix(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
 
 HRESULT CKirby_Body::Render()
@@ -82,6 +83,33 @@ HRESULT CKirby_Body::Render()
 
         if (FAILED(Render_KirbyMesh(i)))
             return E_FAIL;
+    }
+    return S_OK;
+}
+
+HRESULT CKirby_Body::Render_Shadow()
+{
+    if (!m_bActive || m_iShadowPass < 0 || nullptr == m_pModelCom)
+        return S_OK;
+
+    if (FAILED(Set_VisibleMeshes()))
+        return E_FAIL;
+
+    if (FAILED(Bind_ShaderResources(m_pKirbyShaderCom)))
+        return E_FAIL;
+
+    if (FAILED(m_pKirbyShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
+        return E_FAIL;
+    m_pKirbyShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW));
+    m_pKirbyShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ));
+
+    const _uint iNumMeshes = (_uint)m_pModelCom->Get_NumMeshes();
+    for (_uint i = 0; i < iNumMeshes; ++i)
+    {
+        m_pModelCom->Bind_BoneMatrices(m_pKirbyShaderCom, "g_BoneMatrices", i);
+        if (FAILED(m_pKirbyShaderCom->Begin(m_iShadowPass)))
+            return E_FAIL;
+        m_pModelCom->Render(i);
     }
     return S_OK;
 }

@@ -49,6 +49,10 @@ float g_fESMBleed = 0.2f;
 
 static const float PI = 3.14159265f;
 
+Texture2D g_BlobShadowTexture;
+float4x4 g_BlobShadowView, g_BlobShadowProj;
+float g_fBlobShadowDarkness = 0.15f;
+
   //============================ Common VS ============================
 struct VS_IN
 {
