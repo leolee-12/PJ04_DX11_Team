@@ -5,6 +5,7 @@
 #include "GameContent_Defines.h"
 
 NS_BEGIN(Engine)
+class CGameInstance_Proxy;
 NS_END
 
 NS_BEGIN(Client)
@@ -36,6 +37,9 @@ public:
 
 public:
 	virtual void  On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
+
+private:
+	CGameInstance_Proxy* m_pGameInstance_Proxy{};
 
 public:
 	static CKirby_Guard* Create();
