@@ -1,5 +1,6 @@
 #include "Map_Spawner.h"
 #include "MapStage.h"
+#include "MapBreakSection.h"
 #include "EnvObject_Static.h"
 #include "EnvObject_Interact.h"
 #include "EnvTrigger_Generic.h"
@@ -129,6 +130,38 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 			Targets.Stage.pLayerTag,
 			Targets.pStageObjectTag
 			});
+
+		if (StageDesc.strStageName == CMapBreakSection::STAGE12_STAGE_NAME)
+		{
+			CMapBreakSection::MAP_BREAK_SECTION_DESC Desc{};
+			Desc.strSectionName = CMapBreakSection::STAGE12_SECTION_NAME;
+			Desc.wstrModelProtoTag = CMapBreakSection::STAGE12_MODEL_PROTO_TAG;
+			Desc.iModelProtoLevel = Levels.iStageModelLevel;
+			Desc.bRenderable = true;
+			Desc.bCastShadow = false;
+
+			CGameObject* pBreakObject = nullptr;
+			if (FAILED(m_pProxy->Add_GameObject_Return(
+				&pBreakObject,
+				Levels.iObjectLevel,
+				CMapBreakSection::PROTOTYPE_TAG,
+				Targets.Stage.iPlaceLevel,
+				CMapBreakSection::LAYER_TAG,
+				CMapBreakSection::STAGE12_OBJECT_TAG,
+				&Desc)))
+			{
+				Rollback(CreatedObjects);
+				return E_FAIL;
+			}
+
+			CreatedObjects.push_back(pBreakObject);
+			PendingCallbacks.push_back({
+					pBreakObject,
+					CMapBreakSection::PROTOTYPE_TAG,
+					CMapBreakSection::LAYER_TAG,
+					CMapBreakSection::STAGE12_OBJECT_TAG
+				});
+		}
 	}
 
 	_uint iEnvCreatedCount = 0;

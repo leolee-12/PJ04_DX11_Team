@@ -5,6 +5,7 @@
 #include "Map_ModelResolver.h"
 #include "Map_ProtoRegister.h"
 #include "Map_Spawner.h"
+#include "MapBreakSection.h"
 #include "GameContent_Log.h"
 #include "LevelDesign_Loader.h"
 
@@ -77,7 +78,14 @@ namespace
 	_bool Is_MapLayerInternal(const _wstring& strLayerTag)
 	{
 		return strLayerTag == kLayerMapStage
+			|| strLayerTag == CMapBreakSection::LAYER_TAG
 			|| Is_EnvLayerInternal(strLayerTag);
+	}
+
+	_bool Is_MapStageLayerInternal(const _wstring& strLayerTag)
+	{
+		return strLayerTag == kLayerMapStage
+			|| strLayerTag == CMapBreakSection::LAYER_TAG;
 	}
 
 	string To_LogPath(const path& FilePath)
@@ -931,6 +939,16 @@ HRESULT CMap_Loader::Get_MapManifestPath(_uint iMapIndex, _wstring* pOutManifest
 _bool CMap_Loader::Is_MapLayer(const _wstring& strLayerTag)
 {
 	return Is_MapLayerInternal(strLayerTag);
+}
+
+_bool CMap_Loader::Is_MapStageLayer(const _wstring& strLayerTag)
+{
+	return Is_MapStageLayerInternal(strLayerTag);
+}
+
+_bool CMap_Loader::Is_MapEnvLayer(const _wstring& strLayerTag)
+{
+	return Is_EnvLayerInternal(strLayerTag);
 }
 
 HRESULT CMap_Loader::Get_EditFilePath(const _wstring& strManifestPath, _wstring* pOutEditFilePath)

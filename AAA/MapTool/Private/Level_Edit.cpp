@@ -6,13 +6,11 @@
 #include "GameObject_Factory.h"
 #include "GameContent_const.h"
 #include "GameContent_Log.h"
-#include "GameContrnt_Events.h"
 #include "Map_EditFile.h"
 #include "Map_EditSession.h"
 #include "Map_Loader.h"
 #include "MapStage.h"
 #include "MapSection.h"
-#include "MapBreakSection.h"
 #include "EnvObject_Static.h"
 #include "EnvTrigger_RenderGlobals.h"
 #include "Env_InstanceController.h"
@@ -24,18 +22,6 @@
 
 namespace
 {
-#ifdef _DEBUG
-	constexpr const _tchar* kDebugMapBreakSectionModelProtoTag = L"Prototype_Component_Model_MapBreakSection_Stage1-2_GsDefault_4";
-	constexpr const _char* kDebugMapBreakSectionModelPath = "../../Resources/Map/Stage1-2/Section/GsDefault_4.ysh";
-	constexpr const _tchar* kDebugMapBreakSectionObjectTag = L"Debug_MapBreakSection_GsDefault_4";
-	constexpr const _tchar* kDebugMapBreakWallSectionName = L"GsDefault_2";
-
-	_bool Is_DebugMapBreakStage12(const wstring& strManifestPath)
-	{
-		return strManifestPath.find(L"Stage1-2") != wstring::npos;
-	}
-#endif
-
 	void Forward_GameContentLog(Client::GAMECONTENT_LOG_LEVEL eLevel, const char* pMessage)
 	{
 		const string strMessage = (nullptr != pMessage) ? pMessage : "";
@@ -289,21 +275,9 @@ HRESULT CLevel_Edit::Initialize()
 void CLevel_Edit::Update(_float fTimeDelta)
 {
 #ifdef _DEBUG
-	if (m_pGameInstance_Proxy->Key_Down(DIK_F1))
-		m_pGameInstance_Proxy->Publish(EventTag::CarBreakWall, nullptr);
-
 	if (m_pGameInstance_Proxy->Key_Down(DIK_F2))
 		m_pGameInstance_Proxy->Toggle_DebugRender();
-
-	if (m_pGameInstance_Proxy->Key_Down(DIK_F3))
-	{
-		Hide_DebugMapBreakWall_Stage12();
-		m_pGameInstance_Proxy->Publish(EventTag::CarBreakWall2, nullptr);
-	}
 #endif //  _DEBUG
-
-	if (m_pGameInstance_Proxy->Key_Down(DIK_ESCAPE))
-		m_pGameInstance_Proxy->Publish(TEXT("Return_Lobby"), nullptr);
 }
 
 HRESULT CLevel_Edit::Render()
@@ -952,8 +926,7 @@ void CLevel_Edit::Clear_MapPreview()
 
 	for (const auto& strLayerTag : MapLayers)
 		Clear_MapPreviewLayer(strLayerTag);
-	
-	Clear_MapPreviewLayer(CMapBreakSection::LAYER_TAG);
+
 	Clear_MapPreviewEnvInstanceController();
 
 	m_pMapStage = nullptr;
@@ -973,11 +946,17 @@ void CLevel_Edit::Clear_MapPreviewStage()
 {
 	MAP_EDIT_DATA MapContentDesc = Build_MapPreviewContentDescSnapshot();
 
-	Clear_MapPreviewLayer(L"Layer_MapStage");
+	vector<wstring> MapStageLayers;
+	MapStageLayers.reserve(m_Layers.size());
 
-#ifdef _DEBUG
-	Clear_MapPreviewLayer(CMapBreakSection::LAYER_TAG);
-#endif
+	for (const auto& Pair : m_Layers)
+	{
+		if (CMap_Loader::Is_MapStageLayer(Pair.first))
+			MapStageLayers.push_back(Pair.first);
+	}
+
+	for (const auto& strLayerTag : MapStageLayers)
+		Clear_MapPreviewLayer(strLayerTag);
 
 	m_pMapStage = nullptr;
 	Set_MapPreviewStageRuntime(false, L"");
@@ -1007,10 +986,7 @@ void CLevel_Edit::Clear_MapPreviewEnv()
 
 	for (const auto& Pair : m_Layers)
 	{
-		if (Pair.first == L"Layer_MapStage")
-			continue;
-
-		if (Client::CMap_Loader::Is_MapLayer(Pair.first))
+		if (CMap_Loader::Is_MapEnvLayer(Pair.first))
 			MapLayers.push_back(Pair.first);
 	}
 
@@ -1396,102 +1372,8 @@ HRESULT CLevel_Edit::Ready_MapStage()
 
 	Set_MapPreviewStageRuntime(true, strLoadedStageName);
 
-#ifdef _DEBUG
-	if (Is_DebugMapBreakStage12(MapContentDesc.strManifestPath))
-	{
-		if (FAILED(Ready_DebugMapBreakSection_Stage12()))
-			return E_FAIL;
-	}
-#endif
 	return S_OK;
 }
-
-#ifdef _DEBUG
-HRESULT CLevel_Edit::Ready_DebugMapBreakSection_Stage12()
-{
-	const _uint iObjectLevel = ETOUI(TOOL_LEVEL::EDIT);
-	const _uint iModelLevel = ETOUI(LEVEL::STATIC);
-
-	if (!m_pGameInstance_Proxy->Has_Prototype(iModelLevel, kDebugMapBreakSectionModelProtoTag))
-	{
-		CModel* pModelPrototype = CModel::Create_WithTextureHub(
-			m_pDevice,
-			m_pContext,
-			MODEL::MAP,
-			kDebugMapBreakSectionModelPath);
-
-		if (nullptr == pModelPrototype)
-			return E_FAIL;
-
-		if (FAILED(m_pGameInstance_Proxy->Add_Prototype(iModelLevel, kDebugMapBreakSectionModelProtoTag, pModelPrototype)))
-		{
-			Safe_Release(pModelPrototype);
-			return E_FAIL;
-		}
-	}
-
-	if (!m_pGameInstance_Proxy->Has_Prototype(iObjectLevel, CMapBreakSection::PROTOTYPE_TAG))
-	{
-		if (FAILED(m_pGameInstance_Proxy->Add_Prototype(iObjectLevel, CMapBreakSection::PROTOTYPE_TAG,
-			CMapBreakSection::Create(m_pDevice, m_pContext))))
-		{
-			return E_FAIL;
-		}
-	}
-
-	CMapBreakSection::MAP_BREAK_SECTION_DESC Desc{};
-	Desc.strSectionName = L"GsDefault_4";
-	Desc.wstrModelProtoTag = kDebugMapBreakSectionModelProtoTag;
-	Desc.iModelProtoLevel = iModelLevel;
-	Desc.wstrBreakEventTag = EventTag::CarBreakWall2;
-	Desc.bRenderable = true;
-	Desc.bCastShadow = false;
-	Desc.bUseRigidStatic = false;
-	Desc.bRigidStaticEnabledAtStart = false;
-
-	CGameObject* pObject = nullptr;
-	if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(
-		&pObject,
-		iObjectLevel,
-		CMapBreakSection::PROTOTYPE_TAG,
-		iObjectLevel,
-		CMapBreakSection::LAYER_TAG,
-		kDebugMapBreakSectionObjectTag,
-		&Desc)))
-	{
-		return E_FAIL;
-	}
-
-	Add_MapPreviewObjectHandle(
-		CMapBreakSection::PROTOTYPE_TAG,
-		CMapBreakSection::LAYER_TAG,
-		kDebugMapBreakSectionObjectTag,
-		pObject);
-
-	OutputDebugStringA("[MapBreakSection] Stage1-2 GsDefault_4 debug object spawned. Event=CarBreakWall2\n");
-
-	return S_OK;
-}
-
-void CLevel_Edit::Hide_DebugMapBreakWall_Stage12()
-{
-	if (nullptr == m_pMapStage)
-		return;
-
-	for (CMapSection* pSection : m_pMapStage->Get_Sections())
-	{
-		if (nullptr == pSection)
-			continue;
-
-		if (0 != _wcsicmp(pSection->Get_SectionName().c_str(), kDebugMapBreakWallSectionName))
-			continue;
-
-		pSection->Set_Renderable(false);
-		pSection->Set_RuntimeCollisionActorEnabled(false);
-		return;
-	}
-}
-#endif
 
 HRESULT CLevel_Edit::Ready_EnvObjects(vector<ENV_OBJECT_DESC>* pOutDeletedEnvDescs, MAP_LOAD_RESULT* pOutReport)
 {

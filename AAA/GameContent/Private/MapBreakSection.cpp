@@ -79,16 +79,13 @@ HRESULT CMapBreakSection::Initialize(void* pArg)
 	if (m_strModelProtoTag.empty())
 		return E_FAIL;
 
-	if (m_tBreakDesc.wstrBreakEventTag.empty())
-		m_tBreakDesc.wstrBreakEventTag = EventTag::CarBreakWall;
-
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	if (FAILED(Ready_Fragments()))
 		return E_FAIL;
 
-	if (FAILED(Ready_RigidStatic()))
+	if (FAILED(Ready_BoostTrigger()))
 		return E_FAIL;
 
 	return S_OK;
@@ -96,8 +93,23 @@ HRESULT CMapBreakSection::Initialize(void* pArg)
 
 void CMapBreakSection::Late_Update(_float fTimeDelta)
 {
+	if (nullptr != m_pBoostTrigger && MAP_BREAK_STATE::INTACT == m_eBreakState)
+	{
+		m_pBoostTrigger->Update(XMMatrixIdentity());
+
+#ifdef _DEBUG
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pBoostTrigger);
+#endif
+	}
+
 	if (!m_bRenderable)
 		return;
+
+	if (MAP_BREAK_STATE::INTACT == m_eBreakState)
+	{
+		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+		return;
+	}
 
 	if (MAP_BREAK_STATE::BREAKING != m_eBreakState)
 		return;
@@ -147,8 +159,11 @@ void CMapBreakSection::Late_Update(_float fTimeDelta)
 
 HRESULT CMapBreakSection::Render()
 {
-	if (MAP_BREAK_STATE::BREAKING != m_eBreakState)
+	if (MAP_BREAK_STATE::INTACT != m_eBreakState
+		&& MAP_BREAK_STATE::BREAKING != m_eBreakState)
+	{
 		return S_OK;
+	}
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
 		return E_FAIL;
@@ -164,7 +179,7 @@ HRESULT CMapBreakSection::Render()
 		const MAP_BREAK_FRAGMENT* pFragment = Find_Fragment(i);
 		if (nullptr == pFragment)
 			continue;
-		if (!pFragment->bActive)
+		if (MAP_BREAK_STATE::BREAKING == m_eBreakState && !pFragment->bActive)
 			continue;
 
 		const _float3 vEnginePivot = { pFragment->vPivot.x, pFragment->vPivot.y, -pFragment->vPivot.z };
@@ -230,31 +245,15 @@ _uint CMapBreakSection::Get_ModelProtoLevel() const
 	return m_iModelProtoLevel;
 }
 
-HRESULT CMapBreakSection::Ready_Events()
-{
-	if (m_tBreakDesc.wstrBreakEventTag.empty())
-		return S_OK;
-
-	Subscribe_Event(m_tBreakDesc.wstrBreakEventTag,
-		[this](void* pData)
-		{
-			UNREFERENCED_PARAMETER(pData);
-			Break_Debug();
-		});
-
-#ifdef _DEBUG
-	OutputDebugStringW((L"[MapBreakSection] Subscribe event: " + m_tBreakDesc.wstrBreakEventTag + L"\n").c_str());
-#endif
-
-	return S_OK;
-}
-
 _bool CMapBreakSection::Should_RenderMesh(_uint iMesh) const
 {
-	if (MAP_BREAK_STATE::BREAKING != m_eBreakState)
-		return false;
+	if (MAP_BREAK_STATE::INTACT == m_eBreakState)
+		return true;
 
-	return Is_FragmentMesh(iMesh);
+	if (MAP_BREAK_STATE::BREAKING == m_eBreakState)
+		return Is_FragmentMesh(iMesh);
+
+	return false;
 }
 
 HRESULT CMapBreakSection::Ready_Fragments()
@@ -338,57 +337,100 @@ _bool CMapBreakSection::Is_FragmentMesh(_uint iMesh) const
 	return iMesh < m_FragmentMeshFlags.size() && m_FragmentMeshFlags[iMesh];
 }
 
-HRESULT CMapBreakSection::Ready_RigidStatic()
+HRESULT CMapBreakSection::Ready_BoostTrigger()
 {
-	Release_RigidStatic();
-
-	if (!m_tBreakDesc.bUseRigidStatic || !m_tBreakDesc.bRigidStaticEnabledAtStart)
+	if (m_Fragments.empty())
 		return S_OK;
 
-	if (nullptr == m_pModelCom || nullptr == m_pTransformCom)
+	const _float3 vFirstPivot = {
+			m_Fragments.front().vPivot.x,
+			m_Fragments.front().vPivot.y,
+			-m_Fragments.front().vPivot.z
+	};
+
+	_float3 vMin = vFirstPivot;
+	_float3 vMax = vFirstPivot;
+
+	for (const MAP_BREAK_FRAGMENT& Fragment : m_Fragments)
+	{
+		const _float3 vPivot = {
+				Fragment.vPivot.x,
+				Fragment.vPivot.y,
+				-Fragment.vPivot.z
+		};
+
+		vMin.x = min(vMin.x, vPivot.x);
+		vMin.y = min(vMin.y, vPivot.y);
+		vMin.z = min(vMin.z, vPivot.z);
+
+		vMax.x = max(vMax.x, vPivot.x);
+		vMax.y = max(vMax.y, vPivot.y);
+		vMax.z = max(vMax.z, vPivot.z);
+	}
+
+	constexpr _float fPadding = 2.f;
+
+	CCollider::COLLIDER_DESC ColliderDesc{};
+	ColliderDesc.pOwner = this;
+	ColliderDesc.vCenter = {
+			(vMin.x + vMax.x) * 0.5f,
+			(vMin.y + vMax.y) * 0.5f,
+			(vMin.z + vMax.z) * 0.5f
+	};
+	ColliderDesc.vSize = {
+			(vMax.x - vMin.x) + fPadding * 2.f,
+			(vMax.y - vMin.y) + fPadding * 2.f,
+			(vMax.z - vMin.z) + fPadding * 2.f
+	};
+
+	m_pBoostTrigger = Add_Component<CCollider>(
+		L"Com_BoostTrigger",
+		CCollider::Create(m_pDevice, m_pContext, COLLIDER::AABB));
+
+	if (nullptr == m_pBoostTrigger)
 		return E_FAIL;
 
-	if (nullptr == m_pModelCom->Get_CollisionMesh())
-	{
-#ifdef _DEBUG
-		OutputDebugStringA("[MapBreakSection] Collision mesh is null.\n");
-#endif
-		return S_OK;
-	}
+	if (FAILED(m_pBoostTrigger->Initialize(&ColliderDesc)))
+		return E_FAIL;
 
-	m_pRigidStatic = m_pGameInstance_Proxy->Create_StaticActor(
-		m_pModelCom->Get_CollisionMesh(),
-		XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+	m_pBoostTrigger->Set_OnEnter(
+		[this](CCollider* pOther)
+		{
+			On_BoostTriggerEnter(pOther);
+		});
 
-	if (nullptr == m_pRigidStatic)
-	{
-#ifdef _DEBUG
-		OutputDebugStringA("[MapBreakSection] Create_StaticActor failed.\n");
-#endif
-		return S_OK;
-	}
+	m_pGameInstance_Proxy->Register_Collider(
+		m_pBoostTrigger,
+		ETOUI(COLLISION_LAYER::ENV_TRIGGER));
 
 	return S_OK;
 }
 
-void CMapBreakSection::Release_RigidStatic()
+void CMapBreakSection::On_BoostTriggerEnter(CCollider* pOther)
 {
-	if (nullptr == m_pRigidStatic)
+	if (nullptr == pOther)
 		return;
 
-	if (nullptr != m_pGameInstance_Proxy)
-		m_pGameInstance_Proxy->Remove_StaticActor(m_pRigidStatic);
+	if (ETOUI(COLLISION_LAYER::CAR_BOOST) != pOther->Get_RegisteredGroup())
+		return;
 
-	m_pRigidStatic = nullptr;
+	Start_Break();
 }
 
-void CMapBreakSection::Break_Debug()
+void CMapBreakSection::Start_Break()
 {
 	if (MAP_BREAK_STATE::INTACT != m_eBreakState)
 		return;
 
 	m_eBreakState = MAP_BREAK_STATE::BREAKING;
-	Release_RigidStatic();
+
+	if (nullptr != m_pBoostTrigger)
+		m_pBoostTrigger->Set_Enabled(false);
+
+	m_pGameInstance_Proxy->Publish(EventTag::Stage12_CarBreakWall, nullptr);
+
+	CAMERA_SHAKE_DESC ShakeDesc{ 0.6f, 0.4f };
+	m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &ShakeDesc);
 
 	for (_uint i = 0; i < static_cast<_uint>(m_Fragments.size()); ++i)
 	{
@@ -409,7 +451,7 @@ void CMapBreakSection::Break_Debug()
 
 
 #ifdef _DEBUG
-	OutputDebugStringW((L"[MapBreakSection] Break event received: " + m_tBreakDesc.wstrBreakEventTag + L"\n").c_str());
+	OutputDebugStringA("[MapBreakSection] Break started.\n");
 #endif
 }
 
@@ -441,8 +483,6 @@ CGameObject* CMapBreakSection::Clone(void* pArg)
 
 void CMapBreakSection::Free()
 {
-	Release_RigidStatic();
-
 	__super::Free();
 }
 
