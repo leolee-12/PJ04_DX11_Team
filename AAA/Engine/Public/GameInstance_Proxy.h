@@ -178,12 +178,13 @@ public: // Picking
 #pragma endregion
 
 #pragma region SOUND_MANAGER
-    void Play_Sound(const TCHAR* pSoundKey, _uint iChannelIndex, float fVolume);
-    void Play_Sound3D(const TCHAR* pSoundKey, _uint iChannelIndex, float fVolume, _fvector vSoundPos);
-    void Play_BGM(const TCHAR* pSoundKey, _uint iChannelIndex, float fVolume);
-    void Stop_Sound(_uint iChannelIndex);
+    void Play_SFX(const TCHAR* pSoundKey, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
+    void Play_SFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
+    void Play_BGM(const TCHAR* pSoundKey, float fVolume = 1.f, bool bLoop = true);
+    void Stop_BGM();
+    void Set_BusVolume(ESoundBus eBus, float fVolume);
+    void Stop_Bus(ESoundBus eBus);
     void Stop_SoundAll();
-    void Set_Channel_Volume(_uint iChannelIndex, float fVolume);
 #pragma endregion
 
 #pragma region TARGET_MANAGER

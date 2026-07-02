@@ -2,12 +2,12 @@
 #include "Engine_Defines.h"
 #include "Base.h"
 
-// FMOD 전방 선언
 namespace FMOD
 {
-	class Sound;
-	class Channel;
-	class System;
+    class Sound;
+    class Channel;
+    class ChannelGroup;
+    class System;
 }
 
 NS_BEGIN(Engine)
@@ -15,43 +15,52 @@ NS_BEGIN(Engine)
 class CSound_Manager : public CBase
 {
 private:
-	CSound_Manager();
-	virtual ~CSound_Manager() = default;
+    CSound_Manager();
+    virtual ~CSound_Manager() = default;
+
 public:
-	void Update(); // FMOD 시스템 업데이트 (매 프레임 호출 필요)
+    void Update();
+
 public:
-	void Play(const TCHAR* pSoundKey, _uint iChannelIndex, float fVolume);
-	void PlaySound3D(const TCHAR* pSoundKey, _uint iChannelIndex, float fVolume, _fvector vSoundPos);
-	void PlayBGM(const TCHAR* pSoundKey, _uint iChannelIndex, float fVolume);
-	void StopSound(_uint iChannelIndex);
-	void StopAll();
-	void SetChannelVolume(_uint iChannelIndex, float fVolume);
+    // 원샷 SFX: 채널 지정 없음. FMOD가 빈 채널 할당 + 핸들 반환(fire-and-forget면 무시)
+    FMOD::Channel* PlaySFX(const TCHAR* pSoundKey, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
+    FMOD::Channel* PlaySFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
 
-	void Set_ListenerPos(const _float3& vListnerPos) { m_vListenerPos = vListnerPos; }
-	void Set_ListenerPos(const _float4& vListnerPos) { 
-		m_vListenerPos.x = vListnerPos.x; m_vListenerPos.y = vListnerPos.y; m_vListenerPos.z = vListnerPos.z;
-	}
-private:
-	// 사운드 리소스 정보를 갖는 객체 (64비트 FMOD::Sound 포인터)
-	std::map<std::wstring, FMOD::Sound*> m_mapSound;
+    // BGM: 소유 핸들로 교체(기존 정지 후 재생)
+    void PlayBGM(const TCHAR* pSoundKey, float fVolume = 1.f, bool bLoop = true);
+    void StopBGM();
 
-	// FMOD::Channel : 재생하고 있는 사운드를 관리할 객체
-	FMOD::Channel* m_pChannels[SOUND_MAX_CHANNEL];
+    // 버스(카테고리) 단위 제어
+    void SetBusVolume(ESoundBus eBus, float fVolume);
+    void StopBus(ESoundBus eBus);
+    void StopAll();
 
-	// 사운드, 채널 객체 및 장치를 관리하는 객체 (64비트 FMOD::System)
-	FMOD::System* m_pSystem;
-
-	_float3		  m_vListenerPos;
-	static constexpr _float	m_fMaxDistance = 20.f;
+    void Set_ListenerPos(const _float3& v) { m_vListenerPos = v; }
+    void Set_ListenerPos(const _float4& v) { m_vListenerPos = { v.x, v.y, v.z }; }
 
 private:
-	HRESULT Initialize();
-	HRESULT LoadSoundFile();
-	HRESULT LoadSoundFileRecursive(const char* pPath);
+    FMOD::Channel* PlayInternal(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus, bool bLoop);
+    FMOD::Sound* Find_Sound(const TCHAR* pSoundKey) const;
+
+private:
+    std::map<std::wstring, FMOD::Sound*> m_mapSound;
+    FMOD::System* m_pSystem = nullptr;
+
+    FMOD::ChannelGroup* m_pBuses[ETOUI(ESoundBus::END)] = {};
+    FMOD::Channel* m_pBGMChannel = nullptr;   // BGM 소유 핸들
+
+    _float3 m_vListenerPos = {};
+    static constexpr _float m_fMaxDistance = 20.f;
+
+private:
+    HRESULT Initialize();
+    HRESULT Ready_Buses();
+    HRESULT LoadSoundFile();
+    HRESULT LoadSoundFileRecursive(const char* pPath);
 
 public:
-	static CSound_Manager* Create();
-	virtual void Free() override;
+    static CSound_Manager* Create();
+    virtual void Free() override;
 };
 
 NS_END

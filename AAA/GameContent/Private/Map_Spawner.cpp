@@ -2,9 +2,12 @@
 #include "MapStage.h"
 #include "EnvObject_Static.h"
 #include "EnvObject_Interact.h"
-#include "EnvObject_Trigger.h"
+#include "EnvTrigger_Generic.h"
+#include "EnvTrigger_RenderGlobals.h"
+#include "EnvTrigger_EventPublisher.h"
 #include "Env_InstanceController.h"
 #include "GameContent_Log.h"
+#include "Parsing_Utils.h"
 
 #include "GameInstance.h"
 
@@ -20,6 +23,36 @@ namespace
 		_wstring		strLayerTag;
 		_wstring		strObjectTag;
 	};
+
+	_bool Is_AddedEnvTriggerPrototype(const _wstring& strPrototypeTag)
+	{
+		return strPrototypeTag == CEnvTrigger_Generic::PROTOTYPE_TAG
+			|| strPrototypeTag == CEnvTrigger_Generic::LEGACY_PROTOTYPE_TAG
+			|| strPrototypeTag == CEnvTrigger_RenderGlobals::PROTOTYPE_TAG
+			|| strPrototypeTag == CEnvTrigger_EventPublisher::PROTOTYPE_TAG;
+	}
+
+	ENV_OBJECT_DESC Make_AddedEnvTriggerDesc(const MAP_ADD_OBJECT& Added)
+	{
+		ENV_OBJECT_DESC Desc{};
+		Desc.eKind = ENV_OBJECT_KIND::EFFECT;
+		Desc.wstrObjectName = Added.strObjectTag;
+		Desc.wstrComponentName = Added.strObjectTag;
+		Desc.vScale = { 1.f, 1.f, 1.f };
+		Desc.vRotation = { 0.f, 0.f, 0.f, 1.f };
+		Desc.tCollision.bInvisibleCollision = true;
+		Desc.tRender.bUseCullDistance = false;
+		Desc.tRender.bUseCullFrustum = false;
+		Desc.tRender.bHasShadow = false;
+
+		JsonUtils::Try_ReadFloat3Array(Added.jObject, "Area Center", &Desc.tEffect.vAreaCenter);
+		if (false == JsonUtils::Try_ReadFloat3Array(Added.jObject, "Area Size", &Desc.tEffect.vAreaSize))
+			Desc.tEffect.vAreaSize = { 1.f, 1.f, 1.f };
+
+		JsonUtils::Try_ReadFloat4Array(Added.jObject, "Area Rotation", &Desc.tEffect.vAreaRot);
+
+		return Desc;
+	}
 }
 
 CMap_Spawner::CMap_Spawner()
@@ -150,7 +183,7 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 				return E_FAIL;
 			}
 
-			const _tchar* pProtoTag = Get_EnvObjectProtoTag(SrcDesc.eKind);
+			const _tchar* pProtoTag = Get_EnvObjectProtoTag(SrcDesc);
 			if (nullptr == pProtoTag)
 			{
 				Rollback(CreatedObjects);
@@ -220,6 +253,15 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 		{
 			CGameObject* pCreatedObject = nullptr;
 
+			ENV_OBJECT_DESC AddedEnvTriggerDesc{};
+			void* pArg = nullptr;
+
+			if (Is_AddedEnvTriggerPrototype(Added.strPrototypeTag))
+			{
+				AddedEnvTriggerDesc = Make_AddedEnvTriggerDesc(Added);
+				pArg = &AddedEnvTriggerDesc;
+			}
+
 			if (FAILED(m_pProxy->Add_GameObject_Return(
 				&pCreatedObject,
 				Levels.iObjectLevel,
@@ -227,7 +269,7 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 				Levels.iObjectLevel,
 				Added.strLayerTag.c_str(),
 				Added.strObjectTag,
-				nullptr)))
+				pArg)))
 			{
 				Rollback(CreatedObjects);
 				return E_FAIL;
@@ -299,13 +341,28 @@ const MAP_SPAWN_ROUTE* CMap_Spawner::Resolve_EnvRoute(const MAP_SPAWN_TARGETS& T
 	}
 }
 
+const _tchar* CMap_Spawner::Get_EnvObjectProtoTag(const ENV_OBJECT_DESC& Desc) const
+{
+	if (Desc.eKind != ENV_OBJECT_KIND::EFFECT)
+		return Get_EnvObjectProtoTag(Desc.eKind);
+
+	switch (Desc.tEffect.eEffectType)
+	{
+	case ENV_EFFECT_TYPE::TONE_MAPPING_AREA:
+		return CEnvTrigger_RenderGlobals::PROTOTYPE_TAG;
+
+	default:
+		return CEnvTrigger_Generic::PROTOTYPE_TAG;
+	}
+}
+
 const _tchar* CMap_Spawner::Get_EnvObjectProtoTag(ENV_OBJECT_KIND eKind) const
 {
 	switch (eKind)
 	{
 	case ENV_OBJECT_KIND::STATIC: return CEnvObject_Static::PROTOTYPE_TAG;
 	case ENV_OBJECT_KIND::INTERACT: return CEnvObject_Interact::PROTOTYPE_TAG;
-	case ENV_OBJECT_KIND::EFFECT: return CEnvObject_Trigger::PROTOTYPE_TAG;
+	case ENV_OBJECT_KIND::EFFECT: return CEnvTrigger_Generic::PROTOTYPE_TAG;
 	default: return nullptr;
 	}
 }

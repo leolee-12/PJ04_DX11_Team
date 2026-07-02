@@ -13,12 +13,6 @@ namespace Client
 {
 	enum class LEVEL { STATIC, FIRST_LOADING, LOADING, GAMEPLAY, TOWN_STEP1, BOSS_STAGE1, TEST, END };
 
-	enum class SOUND_CHANNEL : _uint
-	{
-		BGM = 0, 
-		END = 32
-	};
-
 	enum class VTXTEX_SHADER { DEFAULT, ALPHABLEND };
 
 	enum class COPY_ABILITY_TYPE { NONE, NORMAL, SWORD, BOMB };

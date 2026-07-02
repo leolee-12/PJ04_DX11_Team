@@ -243,7 +243,6 @@ void CLevelDesign_Registry::Register_ItemsAndBreakables()
 void CLevelDesign_Registry::Register_EnemiesAndGimmicks()
 {
 	CLevelDesign_MonsterCatalog::Register_LevelDesignSpecs();
-	Register_Unsupported(L"Cappy", LD_CATEGORY::ENEMY, L"Layer_LevelDesign_Enemy");
 
 	Register_Unsupported(L"ChainStarter", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
 	Register_Unsupported(L"BlockChainInvisible", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
