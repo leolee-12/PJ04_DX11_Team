@@ -35,8 +35,6 @@ private:
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
-	virtual void Priority_Update(_float fTimeDelta) override;
-	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
@@ -53,13 +51,8 @@ private:
 	HRESULT Ready_Components();
 	HRESULT Ready_HitBox();
 	void	SetUp_HitBox_Callback();
-	HRESULT Bind_ShaderResources();
 
 private:
-	CShader* m_pShaderCom{};
-	CModel* m_pModelCom{};
-	CAnimator* m_pAnimatorCom{};
-
 	CCollider* m_pHitBox{};
 
 	// 노란 보석

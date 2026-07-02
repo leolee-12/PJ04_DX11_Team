@@ -31,6 +31,7 @@ public:
 
 private:
     HRESULT Ready_EffectPartObjects();
+    _float Resolve_TimeDelta(_float fTimeDelta);
 
 public:
     static CGetAbilityEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

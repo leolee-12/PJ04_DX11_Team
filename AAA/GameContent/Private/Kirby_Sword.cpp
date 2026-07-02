@@ -41,23 +41,6 @@ HRESULT CKirby_Sword::Initialize(void* pArg)
     return S_OK;
 }
 
-void CKirby_Sword::Priority_Update(_float fTimeDelta)
-{
-    if (m_bOn == false)
-        return;
-}
-
-void CKirby_Sword::Update(_float fTimeDelta)
-{
-    if (m_bOn == false)
-        return;
-
-    if (m_pGameInstance_Proxy->Is_EditMode())
-        return;
-
-    m_pAnimatorCom->Update(fTimeDelta);
-}
-
 void CKirby_Sword::Late_Update(_float fTimeDelta)
 {
     if (m_bOn == false)
@@ -72,8 +55,6 @@ void CKirby_Sword::Late_Update(_float fTimeDelta)
         m_pGameInstance_Proxy->Add_DebugComponent(m_pHitBox);
 #endif
     }
-
-    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 
 HRESULT CKirby_Sword::Render()
@@ -130,26 +111,11 @@ void CKirby_Sword::Set_HitBox(_bool bOn)
 
 HRESULT CKirby_Sword::Ready_Components()
 {
-    /* For.Com_Shader */
-    m_pShaderCom = Add_Component<CShader>(Shader_Kirby.iLevelID, Shader_Kirby.szProtoTag, TEXT("Com_Shader"));
-    if (m_pShaderCom == nullptr)
-        return E_FAIL;
-
-    /* For.Com_Model */
-    m_pModelCom = Add_Component<CModel>(m_iPrototypeLevel, TEXT("Prototype_Component_Model_Sword"), TEXT("Com_Model"));
-    if (m_pModelCom == nullptr)
-        return E_FAIL;
-
-    /* For.Com_Animator */
-    CAnimator::ANIMATOR_DESC AnimDesc{};
-    AnimDesc.pModel = m_pModelCom;
-
-    m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
-
-    if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
-        return E_FAIL;
-
-    return S_OK;
+    PART_SETUP t{};
+    t.tShader = Shader_Kirby;
+    t.szModelProtoTag = TEXT("Prototype_Component_Model_Sword");
+    t.bAnimated = true;
+    return Ready_MeshPart(t);
 }
 
 HRESULT CKirby_Sword::Ready_HitBox()
@@ -195,19 +161,6 @@ void CKirby_Sword::SetUp_HitBox_Callback()
             OutputDebugStringA("[Kirby_Sword] HIT Somthing!\n");
 #endif
         });
-}
-
-HRESULT CKirby_Sword::Bind_ShaderResources()
-{
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
-        return E_FAIL;
-
-    return S_OK;
 }
 
 CKirby_Sword* CKirby_Sword::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

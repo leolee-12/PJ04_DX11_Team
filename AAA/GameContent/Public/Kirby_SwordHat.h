@@ -5,7 +5,6 @@
 #include "Kirby_OnOffPart.h"
 
 NS_BEGIN(Engine)
-class CShader;
 class CModel;
 class CAnimator;
 NS_END
@@ -34,9 +33,6 @@ private:
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
-	virtual void Priority_Update(_float fTimeDelta) override;
-	virtual void Update(_float fTimeDelta) override;
-	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
@@ -45,12 +41,6 @@ public:
 
 private:
 	HRESULT Ready_Components();
-	HRESULT Bind_ShaderResources();
-
-private:
-	CShader* m_pShaderCom{};
-	CModel* m_pModelCom{};
-	CAnimator* m_pAnimatorCom{};
 
 public:
 	static CKirby_SwordHat* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

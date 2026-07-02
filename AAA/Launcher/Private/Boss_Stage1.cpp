@@ -98,14 +98,14 @@ HRESULT CBoss_Stage1::Render()
 
 HRESULT CBoss_Stage1::Ready_Events()
 {
-    m_pGameInstance_Proxy->Subscribe(TEXT("FadeOut_Done"), [this](void* p) {
+    Subscribe_Event(TEXT("FadeOut_Done"), [this](void* p) {
         CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::TEST);
         if (pLoadingLevel)
         {
             m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
             return;
         }
-    });
+        });
     return S_OK;
 }
 

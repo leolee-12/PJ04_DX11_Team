@@ -111,6 +111,23 @@ void CKirby::Update(_float fTimeDelta)
     m_pMovement->Update_RigidBody(fTimeDelta);
 
     __super::Update(fTimeDelta);
+
+    if (m_fInvincibleTime > 0.f)
+    {
+        _float fElapsed = s_fInvincibleDuration - m_fInvincibleTime;
+        if (fElapsed < 0.12f)
+        {
+            m_fHitFlashCur = 1.f;
+        }
+        else
+        {
+            const _float fBlinkHz = 8.f;
+            _float fBlink = (fmodf(m_fInvincibleTime * fBlinkHz, 1.f) < 0.5f) ? 1.f : 0.f;
+            m_fHitFlashCur = fBlink * 0.1f;
+        }
+    }
+    else
+        m_fHitFlashCur = 0.f;
 }
 
 void CKirby::Late_Update(_float fTimeDelta)
@@ -456,6 +473,8 @@ HRESULT CKirby::Ready_PartObjects()
     // Body
     CKirby_Body::KIRBY_BODY_DESC BodyDesc{};
     BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    BodyDesc.pHitFlash = Get_HitFlashPtr();       
+    BodyDesc.pHitFlashColor = Get_HitFlashColorPtr();
 
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_Body::PROTOTYPE_TAG, CKirby_Body::Kirby_PartTag, &BodyDesc)))
         return E_FAIL;
@@ -465,6 +484,8 @@ HRESULT CKirby::Ready_PartObjects()
     // DeformCar_Demo
     CKirby_DeformCar_Demo::KIRBY_DEFORMCAR_DEMO_DESC DeformCar_Demo_Desc{};
     DeformCar_Demo_Desc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    DeformCar_Demo_Desc.pHitFlash = Get_HitFlashPtr();
+    DeformCar_Demo_Desc.pHitFlashColor = Get_HitFlashColorPtr();
 
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_DeformCar_Demo::PROTOTYPE_TAG, CKirby_DeformCar_Demo::Kirby_PartTag, &DeformCar_Demo_Desc)))
         return E_FAIL;
@@ -472,6 +493,8 @@ HRESULT CKirby::Ready_PartObjects()
     // DeformCar_Main
     CKirby_DeformCar_Main::KIRBY_DEFORMCAR_MAIN_DESC DeformCar_Main_Desc{};
     DeformCar_Main_Desc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    DeformCar_Main_Desc.pHitFlash = Get_HitFlashPtr();
+    DeformCar_Main_Desc.pHitFlashColor = Get_HitFlashColorPtr();
 
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_DeformCar_Main::PROTOTYPE_TAG, CKirby_DeformCar_Main::Kirby_PartTag, &DeformCar_Main_Desc)))
         return E_FAIL;
@@ -481,6 +504,8 @@ HRESULT CKirby::Ready_PartObjects()
     CKirby_Sword::KIRBY_SWORD_DESC SwordDesc{};
     SwordDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     SwordDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("RHaveL");
+    SwordDesc.pHitFlash = Get_HitFlashPtr();
+    SwordDesc.pHitFlashColor = Get_HitFlashColorPtr();
 
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_Sword::PROTOTYPE_TAG, CKirby_Sword::Kirby_PartTag, &SwordDesc)))
         return E_FAIL;
@@ -489,6 +514,8 @@ HRESULT CKirby::Ready_PartObjects()
     CKirby_SwordHat::KIRBY_SWORDHAT_DESC SwordHatDesc{};
     SwordHatDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     SwordHatDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("HatL");
+    SwordHatDesc.pHitFlash = Get_HitFlashPtr();
+    SwordHatDesc.pHitFlashColor = Get_HitFlashColorPtr();
 
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_SwordHat::PROTOTYPE_TAG, CKirby_SwordHat::Kirby_PartTag, &SwordHatDesc)))
         return E_FAIL;

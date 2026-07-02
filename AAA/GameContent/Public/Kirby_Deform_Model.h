@@ -23,6 +23,8 @@ class CKirby_Deform_Model abstract : public CPartObject
 public:
 	struct KIRBY_FORM_DESC : public CPartObject::PARTOBJECT_DESC
 	{
+		const _float* pHitFlash = { nullptr };
+		const _float3* pHitFlashColor = { nullptr };
 	};
 
 protected:
@@ -74,6 +76,9 @@ protected:
 	CTexture* m_pEyeMaskTextureCom{};
 
 	KIRBY_EYE_STATE m_eEye{};
+
+	const _float* m_pHitFlash = { nullptr };
+	const _float3* m_pHitFlashColor = { nullptr };
 
 protected:
 	_float4 m_vBodyColor = { 1.f, 0.1882353f, 0.3764706f, 1.f };

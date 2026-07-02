@@ -259,7 +259,7 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
         float edge = saturate((max(e.x, e.y) - 0.85f) / 0.15f);
         shadow = lerp(shadow, 1.f, edge);
 
-        color *= lerp(0.5f, 1.f, shadow);
+        color *= lerp(0.25f, 1.f, shadow);
     }
     
     /* 볼류메트릭 포그 (froxel) */
@@ -272,6 +272,9 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
         float4 fog = g_FogVolume.SampleLevel(ClampSampler, float3(In.vTexcoord, fogW), 0);
         color = color * fog.a + fog.rgb;
     }
+    
+    float3 emissive = g_EmissiveTexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    color += emissive;
 
     return float4(color, 1.f);
 }

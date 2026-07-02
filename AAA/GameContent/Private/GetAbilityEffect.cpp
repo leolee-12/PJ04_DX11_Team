@@ -35,16 +35,19 @@ HRESULT CGetAbilityEffect::Initialize(void* pArg)
 
 void CGetAbilityEffect::Priority_Update(_float fTimeDelta)
 {
+    fTimeDelta = Resolve_TimeDelta(fTimeDelta);
     __super::Priority_Update(fTimeDelta);
 }
 
 void CGetAbilityEffect::Update(_float fTimeDelta)
 {
+    fTimeDelta = Resolve_TimeDelta(fTimeDelta);
     __super::Update(fTimeDelta);
 }
 
 void CGetAbilityEffect::Late_Update(_float fTimeDelta)
 {
+    fTimeDelta = Resolve_TimeDelta(fTimeDelta);
     __super::Late_Update(fTimeDelta);
 }
 
@@ -80,6 +83,11 @@ HRESULT CGetAbilityEffect::Ready_EffectPartObjects()
         return E_FAIL;
 
     return S_OK;
+}
+
+_float CGetAbilityEffect::Resolve_TimeDelta(_float fTimeDelta)
+{
+    return m_pGameInstance_Proxy->Get_RawTimeDelta(TEXT("Timer_60"));
 }
 
 CGetAbilityEffect* CGetAbilityEffect::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

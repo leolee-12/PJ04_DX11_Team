@@ -233,6 +233,8 @@ HRESULT CRenderer::Draw()
         return E_FAIL;
     if (FAILED(Render_DoF()))
         return E_FAIL;
+    if (FAILED(Render_Effect_HDR()))
+        return E_FAIL;
     if (FAILED(Render_Bloom()))
         return E_FAIL;
 
@@ -767,6 +769,26 @@ HRESULT CRenderer::Render_DoF()
         return E_FAIL;
 
     return S_OK;
+}
+
+HRESULT CRenderer::Render_Effect_HDR()
+{
+    if (m_RenderObjects[ETOUI(RENDERID::BLEND_HDR)].empty())
+        return S_OK;
+
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Scene_DoF"), nullptr, false, false)))
+        return E_FAIL;
+
+    for (auto& pRenderObject : m_RenderObjects[ETOUI(RENDERID::BLEND_HDR)])
+    {
+        if (nullptr != pRenderObject)
+            pRenderObject->Render();
+
+        Safe_Release(pRenderObject);
+    }
+    m_RenderObjects[ETOUI(RENDERID::BLEND_HDR)].clear();
+
+    return m_pGameInstance_Proxy->End_MRT();
 }
 
 HRESULT CRenderer::Render_VolumetricFog()

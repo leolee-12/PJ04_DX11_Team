@@ -175,6 +175,8 @@ protected:
 		CMonsterPart::MONSTERPART_DESC Desc{};
 		Desc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 		Desc.pSocketBoneMatrix = pSocketBone;
+		Desc.pHitFlash = Get_HitFlashPtr();
+		Desc.pHitFlashColor = Get_HitFlashColorPtr();
 
 		if (FAILED(Add_PartObject(m_iPrototypeLevel, szProtoTag, szPartTag, &Desc)))
 			return nullptr;

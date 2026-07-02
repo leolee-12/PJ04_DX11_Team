@@ -88,7 +88,7 @@ HRESULT CTown_Step1::Render()
 
 HRESULT CTown_Step1::Ready_Events()
 {
-    m_pGameInstance_Proxy->Subscribe(TEXT("FadeOut_Done"), [this](void* p) {
+    Subscribe_Event(TEXT("FadeOut_Done"), [this](void* p) {
         CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::BOSS_STAGE1);
         if (pLoadingLevel)
         {

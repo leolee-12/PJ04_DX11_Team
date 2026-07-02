@@ -23,9 +23,13 @@ HRESULT CKirby_Deform_Model::Initialize_Prototype()
 
 HRESULT CKirby_Deform_Model::Initialize(void* pArg)
 {
-    KIRBY_FORM_DESC* pDesc = static_cast<KIRBY_FORM_DESC*>(pArg);
+    if (auto pDesc = static_cast<KIRBY_FORM_DESC*>(pArg))
+    {
+        m_pHitFlash = pDesc->pHitFlash;
+        m_pHitFlashColor = pDesc->pHitFlashColor;
+    };
 
-    if (FAILED(__super::Initialize(pDesc)))
+    if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
     return S_OK;
@@ -104,6 +108,13 @@ HRESULT CKirby_Deform_Model::Bind_ShaderResources(CShader* pShader)
     if (FAILED(pShader->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
         return E_FAIL;
 
+    // 피격 플래시
+    _float  fFlash = m_pHitFlash ? *m_pHitFlash : 0.f;
+    _float3 vFlashCol = m_pHitFlashColor ? *m_pHitFlashColor : _float3(1.f, 1.f, 1.f);
+    if (FAILED(pShader->Bind_RawValue("g_fHitFlash", &fFlash, sizeof(_float))))
+        return E_FAIL;
+    if (FAILED(pShader->Bind_RawValue("g_vHitFlashColor", &vFlashCol, sizeof(_float3))))
+        return E_FAIL;
     return S_OK;
 }
 
