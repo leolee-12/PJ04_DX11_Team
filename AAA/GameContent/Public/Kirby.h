@@ -172,6 +172,9 @@ private:
 	void Set_CutsceneGrabTarget(CUTSCENE_GRAB_DESC* pGrabDesc);
 	void Clear_CutsceneGrabTarget();
 
+	// Time
+	_float Resolve_TimeDelta(_float fTimeDelta);
+
 private:
 	// Parts
 	CKirby_Body* m_pBody{};

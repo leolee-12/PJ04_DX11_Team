@@ -29,7 +29,7 @@ public:
 
 #pragma region ENGINE
 public: // Engine
-    void Update_Engine(_float fTimeDelta);
+    void Update_Engine(_float fTimeDelta, _float fRawTimeDelta);
     HRESULT Begin_Draw();
     HRESULT Draw();
     HRESULT End_Draw();
@@ -212,6 +212,8 @@ public:
     const _float4x4* Get_Shadow_Transform(D3DTS eState) const;
     HRESULT Add_ShadowLight(const SHADOW_LIGHT_DESC& ShadowDesc);
     HRESULT Update_ShadowLight(const SHADOW_LIGHT_DESC& Desc);
+    HRESULT          Update_BlobShadow(const SHADOW_LIGHT_DESC& d);     
+    const _float4x4* Get_BlobShadow_Transform(D3DTS e) const;
 #pragma endregion
 
 #pragma region EFFECT_MANAGER

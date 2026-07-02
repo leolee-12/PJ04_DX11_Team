@@ -18,6 +18,8 @@ class ENGINE_DLL CEffect_Container abstract : public CGameObject
 
     PROPERTY(_bool, m_bLoop,                    L"Loop",                    L"Effect_Container");
 
+    PROPERTY(_bool, m_bContinerBillboard,       L"Container_Billboarding",  L"Effect_Container");
+
     PROPERTY(_float, m_fDuration,               L"Duration",                L"Effect_Container");
     PROPERTY(_float, m_fAccTime,                L"AccTime",                 L"Effect_Container");
     
@@ -105,6 +107,7 @@ protected:
 private:
     void Update_FadeOut();
     void Update_WaitForEmitters();
+    void Compute_Billboard();
 
     // Debug
     void Debug_ResetPlay();

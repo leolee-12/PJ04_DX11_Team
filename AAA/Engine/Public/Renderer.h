@@ -97,6 +97,7 @@ private:
 	HRESULT Render_SpotlightDarken();
 	HRESULT Render_SSR();
 	HRESULT Render_DoF();
+	HRESULT Render_Effect_HDR();
 	HRESULT Render_Bloom();
 
 	HRESULT Render_NonLight();

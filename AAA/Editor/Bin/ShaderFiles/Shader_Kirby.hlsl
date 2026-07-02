@@ -32,6 +32,9 @@ static const float3 EYE_WHITE = float3(1.f, 1.f, 1.f);
 static const float3 EYE_BLUE = float3(0.12f, 0.45f, 1.f);
 static const float3 EYE_RIM = float3(0.1f, 0.1f, 0.1f);
 
+float g_fHitFlash = 0.f;
+float3 g_vHitFlashColor = float3(1.f, 1.f, 1.f);
+
 struct VS_IN
 {
     float3 vPosition : POSITION;
@@ -97,6 +100,40 @@ VS_OUT VS_MAIN(VS_IN In)
 
     return Out;
 }
+//======== Shadow (depth-only, skinned) ========
+struct VS_SHADOW_OUT
+{
+    float4 vPosition : SV_POSITION;
+    float4 vProjPos : TEXCOORD0;
+};
+
+VS_SHADOW_OUT VS_SHADOW(VS_IN In)
+{
+    VS_SHADOW_OUT Out;
+    float fW = 1.f - (In.vBlendWeight.x + In.vBlendWeight.y + In.vBlendWeight.z);
+    float4x4 Bone = g_BoneMatrices[In.vBlendIndex.x] * In.vBlendWeight.x
+                  + g_BoneMatrices[In.vBlendIndex.y] * In.vBlendWeight.y
+                  + g_BoneMatrices[In.vBlendIndex.z] * In.vBlendWeight.z
+                  + g_BoneMatrices[In.vBlendIndex.w] * fW;
+    float4 vPos = mul(float4(In.vPosition, 1.f), Bone);
+    float4 vWorld = mul(vPos, g_WorldMatrix);
+    Out.vPosition = mul(mul(vWorld, g_ViewMatrix), g_ProjMatrix);
+    Out.vProjPos = Out.vPosition;
+    return Out;
+}
+
+struct PS_SHADOW_OUT
+{
+    float4 vLightDepth : SV_TARGET0;
+};
+
+PS_SHADOW_OUT PS_SHADOW(VS_SHADOW_OUT In)
+{
+    PS_SHADOW_OUT Out;
+    float d = In.vProjPos.z / In.vProjPos.w;
+    Out.vLightDepth = float4(d, d, d, 1.f);
+    return Out;
+}
 
 struct PS_IN
 {
@@ -157,6 +194,7 @@ PS_OUT PS_BODY(PS_IN In)
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(0.f, 0.7f, 1.f, 1.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
+    Out.vEmissive.rgb += g_vHitFlashColor * g_fHitFlash;
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
     Out.vMaterialID = g_iMaterialID;
 
@@ -190,6 +228,7 @@ PS_OUT PS_PART(PS_IN In)
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(mra, 1.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
+    Out.vEmissive.rgb += g_vHitFlashColor * g_fHitFlash;
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
     Out.vMaterialID = g_iMaterialID;
     
@@ -205,6 +244,7 @@ PS_OUT PS_CONSTANT_MATERIAL(PS_IN In)
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(g_vConstantMRA, 1.f);
     Out.vEmissive = g_vConstantEmissive;
+    Out.vEmissive.rgb += g_vHitFlashColor * g_fHitFlash;
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
     Out.vMaterialID = g_iMaterialID;
 
@@ -242,5 +282,14 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_CONSTANT_MATERIAL();
+    }
+    pass ShadowPass // 3
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_SHADOW();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_SHADOW();
     }
 }

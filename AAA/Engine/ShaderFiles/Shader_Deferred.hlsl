@@ -49,6 +49,10 @@ float g_fESMBleed = 0.2f;
 
 static const float PI = 3.14159265f;
 
+Texture2D g_BlobShadowTexture;
+float4x4 g_BlobShadowView, g_BlobShadowProj;
+float g_fBlobShadowDarkness = 0.15f;
+
   //============================ Common VS ============================
 struct VS_IN
 {
@@ -249,12 +253,17 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     float2 suv = float2(lc.x / lc.w * 0.5f + 0.5f, lc.y / lc.w * -0.5f + 0.5f);
     float pz = lc.z / lc.w;
     [branch]
-    if (pz <= 1.f)
+    if (pz <= 1.f && suv.x >= 0.f && suv.x <= 1.f && suv.y >= 0.f && suv.y <= 1.f)
     {
         float esm = g_LightDepthTexture.Sample(BorderSampler, suv).r;
         float shadow = saturate(exp(-g_fESMConst * pz) * esm);
         shadow = saturate((shadow - g_fESMBleed) / (1.f - g_fESMBleed));
-        color *= lerp(0.5f, 1.f, shadow);
+
+        float2 e = abs(suv - 0.5f) * 2.f;
+        float edge = saturate((max(e.x, e.y) - 0.85f) / 0.15f);
+        shadow = lerp(shadow, 1.f, edge);
+
+        color *= lerp(0.25f, 1.f, shadow);
     }
     
     /* 볼류메트릭 포그 (froxel) */
@@ -267,6 +276,9 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
         float4 fog = g_FogVolume.SampleLevel(ClampSampler, float3(In.vTexcoord, fogW), 0);
         color = color * fog.a + fog.rgb;
     }
+    
+    float3 emissive = g_EmissiveTexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    color += emissive;
 
     return float4(color, 1.f);
 }
