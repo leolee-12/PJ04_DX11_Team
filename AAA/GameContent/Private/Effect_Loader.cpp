@@ -17,7 +17,7 @@ namespace
     // === 이펙트 DB : 새 이펙트는 여기에 한 줄 추가 ===
     static constexpr EFFECT_DB_ENTRY s_EffectDB[] =
     {
-        { TEXT("WalkSmoke"),             TEXT("../../Resources/YSE/EffectContainer/WalkSmoke_6_19.json") },
+        { TEXT("WalkSmoke"),             TEXT("../../Resources/YSE/EffectContainer/WalkSmoke_7_01.json") },
         { TEXT("InhaleContainer"),       TEXT("../../Resources/YSE/EffectContainer/Inhale_6_24.json") },
         { TEXT("SwordSlash1"),           TEXT("../../Resources/YSE/EffectContainer/SwordSlash1_Alpha_Color.json") },
         { TEXT("SwordSlash3"),           TEXT("../../Resources/YSE/EffectContainer/SwordSlash3.json") },
@@ -26,6 +26,8 @@ namespace
         { TEXT("SpinSlashTrail"),        TEXT("../../Resources/YSE/EffectContainer/SpinSlashTrail.json") },
         { TEXT("SpinSlashTrail_Super"),  TEXT("../../Resources/YSE/EffectContainer/SpinSlashTrail_Super.json") },
         { TEXT("RockFloor"),             TEXT("../../Resources/YSE/EffectContainer/RockFloor.json") },
+        { TEXT("BoostGas"),             TEXT("../../Resources/YSE/EffectContainer/BoostGas.json") },
+        { TEXT("CarMilkyWay"),             TEXT("../../Resources/YSE/EffectContainer/CarMilkyWay2.json") },
         { TEXT("DespawnEffect"),         TEXT("../../Resources/CHJ/Effect/DespawnEffect.JSON")},
         { TEXT("RockFloor"),             TEXT("../../Resources/YSH/Effects/Proto_RockBurst_0.json") },
         { TEXT("DeathSmoke"),            TEXT("../../Resources/YSH/Effects/Proto_DeathSmoke_0.json") },

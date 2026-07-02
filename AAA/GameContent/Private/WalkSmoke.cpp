@@ -14,11 +14,13 @@
 CWalkSmoke::CWalkSmoke(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Container(pDevice, pContext)
 {
+    Init_PropertyValue();
 }
 
 CWalkSmoke::CWalkSmoke(const CWalkSmoke& Prototype)
     : CEffect_Container(Prototype)
 {
+    Init_PropertyValue();
 }
 
 HRESULT CWalkSmoke::Initialize_Prototype()
@@ -46,6 +48,7 @@ void CWalkSmoke::Priority_Update(_float fTimeDelta)
 
 void CWalkSmoke::Update(_float fTimeDelta)
 {
+    Update_Move(fTimeDelta);
     __super::Update(fTimeDelta);
 }
 
@@ -82,6 +85,60 @@ HRESULT CWalkSmoke::Ready_EffectPartObjects()
     //    return E_FAIL;
 
     return S_OK;
+}
+
+void CWalkSmoke::Update_Move(_float fTimeDelta)
+{
+    if (m_bIsPlay == false || m_fDuration <= Helper::fEpsilon ||
+        fabsf(m_fWalkSmokeMoveSpeed) <= Helper::fEpsilon || fTimeDelta <= 0.f)
+        return;
+
+    _float fStartRatio = std::clamp(m_fWalkSmokeMoveStartRatio, 0.f, 1.f);
+    _float fEndRatio = std::clamp(m_fWalkSmokeMoveEndRatio, 0.f, 1.f);
+
+    if (fStartRatio > fEndRatio)
+        std::swap(fStartRatio, fEndRatio);
+
+    const _float fMoveStartTime = fStartRatio * m_fDuration;
+    const _float fMoveEndTime = fEndRatio * m_fDuration;
+    const _float fFrameStartTime = std::clamp(m_fAccTime, 0.f, m_fDuration);
+    const _float fFrameEndTime = (std::min)(fFrameStartTime + fTimeDelta, m_fDuration);
+
+    const _float fActiveStartTime = (std::max)(fFrameStartTime, fMoveStartTime);
+    const _float fActiveEndTime = (std::min)(fFrameEndTime, fMoveEndTime);
+    const _float fActiveDelta = (std::max)(0.f, fActiveEndTime - fActiveStartTime);
+
+    if (fActiveDelta <= 0.f)
+        return;
+
+    const _float fMoveDuration = fMoveEndTime - fMoveStartTime;
+    if (fMoveDuration <= Helper::fEpsilon)
+        return;
+
+    const _float fLocalStartRatio = (fActiveStartTime - fMoveStartTime) / fMoveDuration;
+    const _float fLocalEndRatio = (fActiveEndTime - fMoveStartTime) / fMoveDuration;
+    const _float fLocalMidRatio = (fLocalStartRatio + fLocalEndRatio) * 0.5f;
+
+    const _float fStartSpeedScale = 1.f - Helper::FloatSmoothStep(0.f, 1.f, fLocalStartRatio);
+    const _float fMidSpeedScale = 1.f - Helper::FloatSmoothStep(0.f, 1.f, fLocalMidRatio);
+    const _float fEndSpeedScale = 1.f - Helper::FloatSmoothStep(0.f, 1.f, fLocalEndRatio);
+    const _float fSmoothedDelta = fActiveDelta *
+        (fStartSpeedScale + 4.f * fMidSpeedScale + fEndSpeedScale) / 6.f;
+
+    _vector vLook = m_pTransformCom->Get_State(STATE::LOOK);
+    if (XMVectorGetX(XMVector3LengthSq(vLook)) <= Helper::fEpsilon)
+        return;
+
+    _vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
+    vPosition += XMVector3Normalize(vLook) * m_fWalkSmokeMoveSpeed * fSmoothedDelta;
+    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(vPosition, 1.f));
+}
+
+void CWalkSmoke::Init_PropertyValue()
+{
+    m_fWalkSmokeMoveSpeed = 0.f;
+    m_fWalkSmokeMoveStartRatio = 0.f;
+    m_fWalkSmokeMoveEndRatio = 1.f;
 }
 
 CWalkSmoke* CWalkSmoke::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

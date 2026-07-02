@@ -39,9 +39,17 @@ void CEffect_Emitter::Priority_Update(_float fTimeDelta)
 
 void CEffect_Emitter::Update(_float fTimeDelta)
 {
+    m_bEmitterParticlesUpdatedThisFrame = false;
+
     __super::Update(fTimeDelta);
 
-    if (m_bActive == false && m_bEmitterWasActive == true)
+    if (m_bEmissionEnabled == false && m_bEmitterParticlesUpdatedThisFrame == false)
+    {
+        Update_EmitterParticles(fTimeDelta);
+        m_bActive = Has_AliveParticle();
+    }
+
+    if (m_bEmissionEnabled == true && m_bActive == false && m_bEmitterWasActive == true)
     {
         Reset_Emitter();
         m_bEmitterWasActive = false;
@@ -53,6 +61,7 @@ void CEffect_Emitter::Late_Update(_float fTimeDelta)
     __super::Late_Update(fTimeDelta);
 
     Compute_CombinedWorldMatrix();
+    Update_EmitterParticleParentMatrices();
 }
 
 HRESULT CEffect_Emitter::Render()
@@ -67,6 +76,19 @@ void CEffect_Emitter::Effect_Start()
     Reset_Emitter();
     m_fEmitterPreviousRatio = 0.f;
     m_bEmitterWasActive = false;
+    m_bEmissionEnabled = true;
+    m_bEmitterParticlesUpdatedThisFrame = false;
+}
+
+void CEffect_Emitter::Stop_Emission()
+{
+    m_bEmissionEnabled = false;
+    m_fEmitterSpawnAccumulator = 0.f;
+}
+
+_bool CEffect_Emitter::Is_EmissionFinished() const
+{
+    return m_bEmissionEnabled == false && Has_AliveParticle() == false;
 }
 
 HRESULT CEffect_Emitter::Bind_ShaderValue()
@@ -88,6 +110,8 @@ void CEffect_Emitter::Init_PropertyValue()
     m_iEmitterMaxParticleCount = 100;
     m_fEmitterRateOverTime = 20.f;
     m_iEmitterBurstCount = 0;
+    m_bEmitterDetachParent = false;
+    m_fEmitterDetachParentRatio = 1.f;
 
     // Lifetime
     m_fEmitterLifeTime = 2.f;
@@ -161,6 +185,14 @@ void CEffect_Emitter::Init_PropertyValue()
     // Color
     m_vEmitterColor = { 1.f, 1.f, 1.f };
 
+    m_bEmitterRandomColor = false;
+    m_iEmitterRandomColorCount = 5;
+    m_vEmitterRandomColor_0 = { 1.f, 1.f, 1.f };
+    m_vEmitterRandomColor_1 = { 1.f, 1.f, 1.f };
+    m_vEmitterRandomColor_2 = { 1.f, 1.f, 1.f };
+    m_vEmitterRandomColor_3 = { 1.f, 1.f, 1.f };
+    m_vEmitterRandomColor_4 = { 1.f, 1.f, 1.f };
+
     m_bEmitterColorChange = false;
     m_vEmitterColorStartValue = { 1.f, 1.f, 1.f };
     m_vEmitterColorEndValue = { 1.f, 1.f, 1.f };
@@ -184,12 +216,17 @@ void CEffect_Emitter::Init_PropertyValue()
 
 void CEffect_Emitter::Update_Core(const _float fTimeDelta, const _float fRatio)
 {
-    const _bool bRestart = m_bEmitterWasActive == false ||
+    const _bool bFirstActivation = m_bEmitterWasActive == false;
+    const _bool bLoopRestart = m_bEmitterWasActive == true &&
         fRatio + Helper::fEpsilon < m_fEmitterPreviousRatio;
 
-    if (bRestart == true)
+    if (m_bEmissionEnabled == true && bFirstActivation == true)
     {
         Reset_Emitter();
+        Emit_Particles(m_iEmitterBurstCount);
+    }
+    else if (m_bEmissionEnabled == true && bLoopRestart == true)
+    {
         Emit_Particles(m_iEmitterBurstCount);
     }
 
@@ -203,6 +240,7 @@ void CEffect_Emitter::Update_Core(const _float fTimeDelta, const _float fRatio)
         Emit_ByRate(fTimeDelta);
 
     Update_EmitterParticles(fTimeDelta);
+    m_bEmitterParticlesUpdatedThisFrame = true;
 }
 
 void CEffect_Emitter::Reset_Emitter()
@@ -235,6 +273,17 @@ void CEffect_Emitter::Update_EmitterParticles(_float fTimeDelta)
         _float fLocalRatio = Particle.fAge / Particle.fLifeTime;
         Helper::FloatClamp(fLocalRatio, 0.f, 1.f);
 
+        if (m_bEmitterDetachParent == true &&
+            Particle.bParentDetached == false &&
+            Particle.bParentDetachPending == false)
+        {
+            _float fDetachRatio = m_fEmitterDetachParentRatio;
+            Helper::FloatClamp(fDetachRatio, 0.f, 1.f);
+
+            if (fLocalRatio >= fDetachRatio)
+                Particle.bParentDetachPending = true;
+        }
+
         Update_EmitterParticleMove(Particle);
 
         if (m_bEmitterRotationOverLife == true)
@@ -247,6 +296,19 @@ void CEffect_Emitter::Update_EmitterParticles(_float fTimeDelta)
         Update_EmitterParticleAlpha(Particle, fLocalRatio);
         Update_EmitterParticleSize(Particle, fLocalRatio);
         Update_EmitterParticleColor(Particle, fLocalRatio);
+    }
+}
+
+void CEffect_Emitter::Update_EmitterParticleParentMatrices()
+{
+    for (EMITTER_PARTICLE& Particle : m_EmitterParticles)
+    {
+        if (Particle.bAlive == false || Particle.bParentDetachPending == false)
+            continue;
+
+        Particle.DetachedParentWorldMatrix = m_CombinedWorldMatrix;
+        Particle.bParentDetached = true;
+        Particle.bParentDetachPending = false;
     }
 }
 
@@ -283,6 +345,9 @@ _bool CEffect_Emitter::Spawn_EmitterParticle()
 
     pParticle->bAlive = true;
     pParticle->fAge = 0.f;
+    pParticle->bParentDetached = false;
+    pParticle->bParentDetachPending = false;
+    XMStoreFloat4x4(&pParticle->DetachedParentWorldMatrix, XMMatrixIdentity());
 
     _float fLifeTime = m_fEmitterLifeTime;
 
@@ -348,6 +413,9 @@ _bool CEffect_Emitter::Spawn_EmitterParticle()
 
     pParticle->fAlpha = m_fEmitterAlpha;
     pParticle->vColor = m_vEmitterColor;
+    pParticle->vRandomColor = m_bEmitterRandomColor == true
+        ? Select_EmitterRandomColor()
+        : _float3{ 1.f, 1.f, 1.f };
 
     pParticle->fFlutterPhase = m_pGameInstance_Proxy->RandomFloat(0.f, XM_2PI);
 
@@ -578,6 +646,31 @@ _vector CEffect_Emitter::Make_FountainDirection() const
     return XMVector3Normalize(XMVectorSet(fX, fUpBias, fZ, 0.f));
 }
 
+_float3 CEffect_Emitter::Select_EmitterRandomColor() const
+{
+    _uint iColorCount = m_iEmitterRandomColorCount;
+    if (iColorCount < 1)
+        iColorCount = 1;
+    if (iColorCount > 5)
+        iColorCount = 5;
+
+    _uint iColorIndex = static_cast<_uint>(
+        m_pGameInstance_Proxy->RandomFloat(0.f, static_cast<_float>(iColorCount)));
+
+    if (iColorIndex >= iColorCount)
+        iColorIndex = iColorCount - 1;
+
+    switch (iColorIndex)
+    {
+    case 0: return m_vEmitterRandomColor_0;
+    case 1: return m_vEmitterRandomColor_1;
+    case 2: return m_vEmitterRandomColor_2;
+    case 3: return m_vEmitterRandomColor_3;
+    case 4: return m_vEmitterRandomColor_4;
+    default: return m_vEmitterRandomColor_0;
+    }
+}
+
 void CEffect_Emitter::Update_EmitterParticleMove(EMITTER_PARTICLE& Particle)
 {
     const _float fTime = Particle.fAge;
@@ -646,15 +739,33 @@ void CEffect_Emitter::Update_EmitterParticleSize(EMITTER_PARTICLE& Particle, _fl
 
 void CEffect_Emitter::Update_EmitterParticleColor(EMITTER_PARTICLE& Particle, _float fLocalRatio)
 {
-    Particle.vColor = Evaluate_EmitterFloat3Curve(
+    if (m_bEmitterRandomColor == true && m_bEmitterColorChange == false)
+    {
+        Particle.vColor = Particle.vRandomColor;
+        return;
+    }
+
+    _float3 vColor = Evaluate_EmitterFloat3Curve(
         fLocalRatio, m_vEmitterColor, m_bEmitterColorChange,
         m_vEmitterColorStartValue, m_vEmitterColorEndValue,
         m_bActive_EmitterColor_Ratio_0, m_fEmitterColor_Ratio_0, m_vEmitterColor_Value_0,
         m_bActive_EmitterColor_Ratio_1, m_fEmitterColor_Ratio_1, m_vEmitterColor_Value_1);
+
+    if (m_bEmitterRandomColor == true)
+    {
+        vColor.x *= Particle.vRandomColor.x;
+        vColor.y *= Particle.vRandomColor.y;
+        vColor.z *= Particle.vRandomColor.z;
+    }
+
+    Particle.vColor = vColor;
 }
 
 _bool CEffect_Emitter::Can_Emit() const
 {
+    if (m_bEmissionEnabled == false)
+        return false;
+
     const _float fPartDuration = Get_PartDuration();
     if (fPartDuration <= Helper::fEpsilon)
         return false;
@@ -806,11 +917,16 @@ _float4x4 CEffect_Emitter::Make_EmitterParticleWorldMatrix(const EMITTER_PARTICL
         Particle.vLocalPos.y,
         Particle.vLocalPos.z);
 
+    const _float4x4& ParentWorldMatrix =
+        Particle.bParentDetached == true
+        ? Particle.DetachedParentWorldMatrix
+        : m_CombinedWorldMatrix;
+
     _matrix matWorld =
         matScale *
         matRotation *
         matTranslation *
-        XMLoadFloat4x4(&m_CombinedWorldMatrix);
+        XMLoadFloat4x4(&ParentWorldMatrix);
 
     _float4x4 ParticleWorld{};
     XMStoreFloat4x4(&ParticleWorld, matWorld);

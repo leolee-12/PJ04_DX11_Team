@@ -472,7 +472,7 @@ PS_OUT PS_GRASS_FUR(PS_IN In)
 	return Out;
 }
 
-PS_OUT PS_MN(PS_IN In)
+PS_OUT PS_COLOR(PS_IN In)
 {
 	Apply_Dither_IfNeeded(In.vPosition);
 
@@ -492,11 +492,11 @@ PS_OUT PS_MN(PS_IN In)
 
 	float3 Nw = mul(nTS, TBN);
 
-	Out.vDiffuse = vector(0.294f, 0.424f, 0.235f, 1.f);
-	Out.vNormal = vector(Nw * 0.5f + 0.5f, 0.f);
-	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vDiffuse = g_vColor;
+    Out.vNormal = vector(Nw * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(vMRA, 1.f);
-	Out.vEmissive = vector(0.f, 0.f, 0.f, 0.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * g_vColor.a, 1.f);
 	Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
     Out.vMaterialID = g_iMaterialID;
 	return Out;
@@ -732,7 +732,7 @@ technique11 DefaultTechnique
 		GeometryShader = NULL;
 		PixelShader = compile ps_5_0 PS_GRASS_FUR();
 	}
-	pass MN_Pass // 9
+	pass COLOR_Pass // 9
 	{
 		SetRasterizerState(RS_Cull_None);
 		SetDepthStencilState(DSS_Default, 0);
@@ -740,7 +740,7 @@ technique11 DefaultTechnique
 
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
-		PixelShader = compile ps_5_0 PS_MN();
+		PixelShader = compile ps_5_0 PS_COLOR();
 	}
 	pass DISCARD_Pass // 10
 	{

@@ -49,6 +49,7 @@ void CEffect_Particle::Late_Update(_float fTimeDelta)
     __super::Late_Update(fTimeDelta);
 
     Compute_CombinedWorldMatrix();
+    Update_ParticleParentMatrices();
 }
 
 HRESULT CEffect_Particle::Render()
@@ -86,6 +87,8 @@ void CEffect_Particle::Init_PropertyValue()
 {
     // Particle
     m_iParticleCount = 20;
+    m_bParticleDetachParent = false;
+    m_fParticleDetachParentRatio = 1.f;
 
     // Particle Spawn
     m_bParticleSpawnRandom = true;
@@ -168,6 +171,14 @@ void CEffect_Particle::Init_PropertyValue()
     // Particle Color
     m_vParticleColor = { 1.f, 1.f, 1.f };
 
+    m_bParticleRandomColor = false;
+    m_iParticleRandomColorCount = 5;
+    m_vParticleRandomColor_0 = { 1.f, 1.f, 1.f };
+    m_vParticleRandomColor_1 = { 1.f, 1.f, 1.f };
+    m_vParticleRandomColor_2 = { 1.f, 1.f, 1.f };
+    m_vParticleRandomColor_3 = { 1.f, 1.f, 1.f };
+    m_vParticleRandomColor_4 = { 1.f, 1.f, 1.f };
+
     m_bParticleColorChange = false;
     m_vParticleColorStartValue = { 1.f, 1.f, 1.f };
     m_vParticleColorEndValue = { 1.f, 1.f, 1.f };
@@ -199,6 +210,11 @@ void CEffect_Particle::Reset_Particles()
     for (_uint i = 0; i < m_iParticleCount; ++i)
     {
         PARTICLE& Particle = m_Particles[i];
+
+        Particle.bParentDetached = false;
+        Particle.bParentDetachPending = false;
+        Particle.fPreviousLocalRatio = -1.f;
+        XMStoreFloat4x4(&Particle.DetachedParentWorldMatrix, XMMatrixIdentity());
 
         _float fLifeRatio = m_fParticleLifeRatio;
         Helper::FloatClamp(fLifeRatio, Helper::fEpsilon, 1.f);
@@ -260,6 +276,9 @@ void CEffect_Particle::Reset_Particles()
 
         Particle.fAlpha = m_fParticleAlpha;
         Particle.vColor = m_vParticleColor;
+        Particle.vRandomColor = m_bParticleRandomColor == true
+            ? Select_ParticleRandomColor()
+            : _float3{ 1.f, 1.f, 1.f };
 
         Particle.fFlutterPhase = m_pGameInstance_Proxy->RandomFloat(0.f, XM_2PI);
 
@@ -315,15 +334,50 @@ void CEffect_Particle::Update_Particles_ByContainerTime(_float fRatio)
         if (fLocalRatio < 0.f || fLocalRatio > 1.f)
         {
             Particle.bAlive = false;
+            Particle.bParentDetached = false;
+            Particle.bParentDetachPending = false;
+            Particle.fPreviousLocalRatio = -1.f;
             continue;
         }
 
+        if (Particle.bAlive == false ||
+            fLocalRatio + Helper::fEpsilon < Particle.fPreviousLocalRatio)
+        {
+            Particle.bParentDetached = false;
+            Particle.bParentDetachPending = false;
+        }
+
         Particle.bAlive = true;
+        Particle.fPreviousLocalRatio = fLocalRatio;
+
+        if (m_bParticleDetachParent == true &&
+            Particle.bParentDetached == false &&
+            Particle.bParentDetachPending == false)
+        {
+            _float fDetachRatio = m_fParticleDetachParentRatio;
+            Helper::FloatClamp(fDetachRatio, 0.f, 1.f);
+
+            if (fLocalRatio >= fDetachRatio)
+                Particle.bParentDetachPending = true;
+        }
 
         Update_ParticleMove(Particle, fRatio, fLocalRatio);
         Update_ParticleAlpha(Particle, fLocalRatio);
         Update_ParticleSize(Particle, fLocalRatio);
         Update_ParticleColor(Particle, fLocalRatio);
+    }
+}
+
+void CEffect_Particle::Update_ParticleParentMatrices()
+{
+    for (PARTICLE& Particle : m_Particles)
+    {
+        if (Particle.bAlive == false || Particle.bParentDetachPending == false)
+            continue;
+
+        Particle.DetachedParentWorldMatrix = m_CombinedWorldMatrix;
+        Particle.bParentDetached = true;
+        Particle.bParentDetachPending = false;
     }
 }
 
@@ -505,6 +559,31 @@ _vector CEffect_Particle::Make_FountainDirection() const
     return XMVector3Normalize(XMVectorSet(fX, fUpBias, fZ, 0.f));
 }
 
+_float3 CEffect_Particle::Select_ParticleRandomColor() const
+{
+    _uint iColorCount = m_iParticleRandomColorCount;
+    if (iColorCount < 1)
+        iColorCount = 1;
+    if (iColorCount > 5)
+        iColorCount = 5;
+
+    _uint iColorIndex = static_cast<_uint>(
+        m_pGameInstance_Proxy->RandomFloat(0.f, static_cast<_float>(iColorCount)));
+
+    if (iColorIndex >= iColorCount)
+        iColorIndex = iColorCount - 1;
+
+    switch (iColorIndex)
+    {
+    case 0: return m_vParticleRandomColor_0;
+    case 1: return m_vParticleRandomColor_1;
+    case 2: return m_vParticleRandomColor_2;
+    case 3: return m_vParticleRandomColor_3;
+    case 4: return m_vParticleRandomColor_4;
+    default: return m_vParticleRandomColor_0;
+    }
+}
+
 void CEffect_Particle::Update_ParticleMove(PARTICLE& Particle, _float fRatio, _float fLocalRatio)
 {
     Helper::FloatClamp(fLocalRatio, 0.f, 1.f);
@@ -587,11 +666,26 @@ void CEffect_Particle::Update_ParticleSize(PARTICLE& Particle, _float fLocalRati
 
 void CEffect_Particle::Update_ParticleColor(PARTICLE& Particle, _float fLocalRatio)
 {
-    Particle.vColor = Evaluate_ParticleFloat3Curve(
+    if (m_bParticleRandomColor == true && m_bParticleColorChange == false)
+    {
+        Particle.vColor = Particle.vRandomColor;
+        return;
+    }
+
+    _float3 vColor = Evaluate_ParticleFloat3Curve(
         fLocalRatio, m_vParticleColor, m_bParticleColorChange,
         m_vParticleColorStartValue, m_vParticleColorEndValue,
         m_bActive_ParticleColor_Ratio_0, m_fParticleColor_Ratio_0, m_vParticleColor_Value_0,
         m_bActive_ParticleColor_Ratio_1, m_fParticleColor_Ratio_1, m_vParticleColor_Value_1);
+
+    if (m_bParticleRandomColor == true)
+    {
+        vColor.x *= Particle.vRandomColor.x;
+        vColor.y *= Particle.vRandomColor.y;
+        vColor.z *= Particle.vRandomColor.z;
+    }
+
+    Particle.vColor = vColor;
 }
 
 _float CEffect_Particle::Evaluate_ParticleFloatCurve(_float fLocalRatio, _float fFixedValue, _bool bChange, _float
@@ -726,11 +820,16 @@ _float4x4 CEffect_Particle::Make_ParticleWorldMatrix(const PARTICLE& Particle) c
         Particle.vLocalPos.y,
         Particle.vLocalPos.z);
 
+    const _float4x4& ParentWorldMatrix =
+        Particle.bParentDetached == true
+        ? Particle.DetachedParentWorldMatrix
+        : m_CombinedWorldMatrix;
+
     _matrix matWorld =
         matScale *
         matRotation *
         matTranslation *
-        XMLoadFloat4x4(&m_CombinedWorldMatrix);
+        XMLoadFloat4x4(&ParentWorldMatrix);
 
     _float4x4 ParticleWorld{};
     XMStoreFloat4x4(&ParticleWorld, matWorld);
