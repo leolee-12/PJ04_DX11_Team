@@ -305,6 +305,10 @@ void CEffect_MeshParticle::Init_PropertyValue()
     m_vDiffuseUVScroll = false;
     m_vDiffuseUVScrollCount = { 0.f, 0.f };
 
+    m_bUseNormalTexture = false;
+
+    m_bUseMRATexture = false;
+
     m_bUseUnknownTexture = false;
     m_vUnknownTiling = { 1.f, 1.f };
     m_vUnknownOffset = { 0.f, 0.f };

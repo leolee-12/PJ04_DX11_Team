@@ -6,6 +6,8 @@
 #include "Kirby_Body.h"
 #include "Kirby_State.h"
 
+#include "Effect_Loader.h"
+
 #include "Movement_Child.h"
 
 CKirby_Deform_Car::CKirby_Deform_Car()
@@ -202,6 +204,13 @@ void CKirby_Deform_Car::Enter_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eS
 
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Set_MaxHorizontalSpeed(s_fMaxBoostSpeed);
+
+            BoostEffectStart(pKirby, m_pBoostGas1, m_pBoostGas2, L"BoostGas");
+
+            CEffect_Loader::GetInstance()->Spawn(L"CarMilkyWay", pKirby->Get_LevelIndex(),
+                _float3(0.f, 1.3f, 2.4f), _float3(0.f, 0.f, 0.f), _float3(0.f, 180.f, 0.f),
+                pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pBoostWind);
+
             break;
         }
         case DEFORM_CAR_STATE::BOOST_END:
@@ -281,6 +290,14 @@ void CKirby_Deform_Car::Exit_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eSt
     {
         case DEFORM_CAR_STATE::BOOST:
             pModel->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
+            BoostEffectStop(m_pBoostGas1, m_pBoostGas2);
+
+            if (m_pBoostWind != nullptr)
+            {
+                m_pBoostWind->EffectContainer_Stop();
+                m_pBoostWind = nullptr;
+            }
+
             break;
         case DEFORM_CAR_STATE::BOOST_END:
             pMovement->Set_MaxHorizontalSpeed(s_fCarSpeed);
@@ -376,6 +393,32 @@ void CKirby_Deform_Car::Exit_BoostJumpState(CKirby* pKirby, BOOST_JUMP_STATE eSt
 
     case BOOST_JUMP_STATE::FALL:
         break;
+    }
+}
+
+void CKirby_Deform_Car::BoostEffectStart(CKirby* pKirby, CEffect_Container*& pContainer1, CEffect_Container*& pContainer2, const _tchar* EffectTag)
+{
+    CEffect_Loader::GetInstance()->Spawn(EffectTag, pKirby->Get_LevelIndex(),
+        _float3(1.f, 0.5f, -2.8f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+        pKirby->Get_Transform()->Get_WorldMatrixPtr(), &pContainer1);
+
+    CEffect_Loader::GetInstance()->Spawn(EffectTag, pKirby->Get_LevelIndex(),
+        _float3(-1.f, 0.5f, -2.8f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+        pKirby->Get_Transform()->Get_WorldMatrixPtr(), &pContainer2);
+}
+
+void CKirby_Deform_Car::BoostEffectStop(CEffect_Container*& pContainer1, CEffect_Container*& pContainer2)
+{
+    if (pContainer1 != nullptr)
+    {
+        pContainer1->EffectContainer_StopAfterEmission();
+        pContainer1 = nullptr;
+    }
+
+    if (pContainer2 != nullptr)
+    {
+        pContainer2->EffectContainer_StopAfterEmission();
+        pContainer2 = nullptr;
     }
 }
 
