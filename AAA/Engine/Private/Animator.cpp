@@ -75,9 +75,21 @@ void CAnimator::Start_Clip(const ANI_PLAY_INFO& Info)
     if (iIndex < 0)
         return;
 
+    const _bool bRestartSameClip = Info.bRestart && m_pModel->Get_CurrentAnimName() == Info.strAniName;
+
+    if (bRestartSameClip)
+    {
+        auto it = m_Tracks.find(Info.strAniName);
+
+        if (it != m_Tracks.end())
+            Reset_RuntimeState(&it->second);
+
+        m_fPrevProgress = -0.0001f;
+    }
 
     m_fBlendDuration = Info.fBlend;
     m_pModel->Set_AnimationIndex(static_cast<_uint>(iIndex), Info.bLoop, Info.bRestart, m_fBlendDuration);
+
     m_fPlaySpeed = Info.fSpeed;
     m_bFinished = false;
     m_bCurLoop = Info.bLoop;

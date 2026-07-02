@@ -91,6 +91,9 @@ HRESULT CKirby_DeformCar_Main::Ready_AnimEvents(CKirby* pKirby)
         {
             if (Handle_AnimEventEye(e, ePhase) == true)
                 return;
+
+            if (Handle_AnimEventSound(e, ePhase) == true)
+                return;
         }
     );
 
