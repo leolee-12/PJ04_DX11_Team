@@ -90,6 +90,8 @@
     <ClInclude Include="..\Public\Star2DParticle.h" />
     <ClInclude Include="..\Public\StarParticle.h" />
     <ClInclude Include="..\public\SpinWind.h" />
+    <ClInclude Include="..\Public\SwordCharge.h" />
+    <ClInclude Include="..\Public\SwordChargeEffect.h" />
     <ClInclude Include="..\Public\Sword_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\MeshLayer_Binder.h" />
     <ClInclude Include="..\Public\MeshLayer_Profile.h" />
@@ -365,6 +367,8 @@
     <ClCompile Include="..\Private\Star2DParticle.cpp" />
     <ClCompile Include="..\Private\StarParticle.cpp" />
     <ClCompile Include="..\private\SpinWind.cpp" />
+    <ClCompile Include="..\Private\SwordCharge.cpp" />
+    <ClCompile Include="..\Private\SwordChargeEffect.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\MeshLayer_Binder.cpp" />
     <ClCompile Include="..\Private\MeshLayer_Profile.cpp" />

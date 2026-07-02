@@ -64,7 +64,7 @@
 #include "RockPush.h"
 #include "DespawnEffect.h"
 #include "GetAbilityEffect.h"
-
+#include "SwordChargeEffect.h"
 #include "BoostGas.h"
 #include "CarMilkyWay.h"
 
@@ -89,6 +89,7 @@
 #include "Car_00_MilkyWay.h"
 #include "StarParticle.h"
 #include "Star2DParticle.h"
+#include "SwordCharge.h"
 
 //sky
 #include "SkySphere.h"
@@ -788,6 +789,16 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CStar2DParticle::PROTOTYPE_TAG, CStar2DParticle::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, Texture_Star2D.iLevelID, Texture_Star2D.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_Star2D.szFileTag, Texture_Star2D.iNumTex));
+        )
+    );
+
+    // SwordChargeEffect
+    Register(CSwordChargeEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSwordChargeEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordCharge::PROTOTYPE_TAG, CSwordCharge::Create(pDevice, pContext));
+    TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SwordCharge"),
+        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/SwordCharge/Model_Common_Ring01.ysh"));
         )
     );
 
