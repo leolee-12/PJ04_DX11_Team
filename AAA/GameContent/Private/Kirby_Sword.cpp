@@ -106,7 +106,7 @@ HRESULT CKirby_Sword::Render()
             m_pShaderCom->Bind_RawValue("g_vConstantMRA",       &m_vConstantMRA, sizeof(_float3));
             m_pShaderCom->Bind_RawValue("g_vConstantEmissive",  &m_vConstantEmissive, sizeof(_float4));
 
-            iPassIdx = 3;
+            iPassIdx = 2;
         }
 
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
@@ -131,7 +131,7 @@ void CKirby_Sword::Set_HitBox(_bool bOn)
 HRESULT CKirby_Sword::Ready_Components()
 {
     /* For.Com_Shader */
-    m_pShaderCom = Add_Component<CShader>(Shader_AnimMesh_PBR.iLevelID, Shader_AnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
+    m_pShaderCom = Add_Component<CShader>(Shader_Kirby.iLevelID, Shader_Kirby.szProtoTag, TEXT("Com_Shader"));
     if (m_pShaderCom == nullptr)
         return E_FAIL;
 

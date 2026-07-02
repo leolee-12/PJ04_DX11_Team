@@ -84,6 +84,19 @@ HRESULT CKirby_DeformCar_Main::Render()
     return S_OK;
 }
 
+HRESULT CKirby_DeformCar_Main::Ready_AnimEvents(CKirby* pKirby)
+{
+    m_pAnimatorCom->Set_EventCallback(
+        [this](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+        {
+            if (Handle_AnimEventEye(e, ePhase) == true)
+                return;
+        }
+    );
+
+    return S_OK;
+}
+
 HRESULT CKirby_DeformCar_Main::Ready_Components()
 {
     /* For.Com_Shader */

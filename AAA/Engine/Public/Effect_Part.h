@@ -13,6 +13,7 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
 
     PROPERTY(_int, m_iShaderPass,       L"Shader Pass", L"Effect");
     PROPERTY(_int, m_iMirror,           L"Mirror",      L"Effect");
+    PROPERTY(_int, m_iDepthIgnore,      L"Depth Ignore", L"Effect");
 
     PROPERTY(_float3, m_vLocalPos,      L"Local Pos",   L"Effect");
 
@@ -54,6 +55,7 @@ public:
 
 protected:
     enum Sampler { DEFAULT, MIRROR, SAMPLER_END };
+    enum DepthMode { DEPTH_DEFAULT, DEPTH_IGNORE, DEPTH_MODE_END };
 
 protected:
     struct RATIO_VALUE

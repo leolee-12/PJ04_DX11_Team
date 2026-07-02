@@ -19,9 +19,6 @@
     <Filter Include="01. Levels\00. Loading\Loader">
       <UniqueIdentifier>{bbcb6122-f796-4e3c-8b19-46c7fd937361}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Levels\06. GamePlay">
-      <UniqueIdentifier>{31f48850-b56a-45e1-8918-8af2971725aa}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01. Levels\01. FirstLoading">
       <UniqueIdentifier>{a7cb1d8a-8375-40c0-b82c-9ca99a2a2d2d}</UniqueIdentifier>
     </Filter>
@@ -81,9 +78,6 @@
     <ClInclude Include="..\Public\Level_Loading.h">
       <Filter>01. Levels\00. Loading</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Level_GamePlay.h">
-      <Filter>01. Levels\06. GamePlay</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Loader.h">
       <Filter>01. Levels\00. Loading\Loader</Filter>
     </ClInclude>
@@ -98,6 +92,12 @@
     </ClInclude>
     <ClInclude Include="..\public\Boss_Stage1.h">
       <Filter>01. Levels\02. Stage\Boss\BossStage1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Stage0_Step1.h">
+      <Filter>01. Levels\02. Stage\Stage0\Step1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Stage0_Step2.h">
+      <Filter>01. Levels\02. Stage\Stage0\Step2</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -120,9 +120,6 @@
     <ClCompile Include="..\Private\MainApp.cpp">
       <Filter>00. MainApp</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Level_GamePlay.cpp">
-      <Filter>01. Levels\06. GamePlay</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Level_Loading.cpp">
       <Filter>01. Levels\00. Loading</Filter>
     </ClCompile>
@@ -140,6 +137,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Boss_Stage1.cpp">
       <Filter>01. Levels\02. Stage\Boss\BossStage1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Stage0_Step1.cpp">
+      <Filter>01. Levels\02. Stage\Stage0\Step1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Stage0_Step2.cpp">
+      <Filter>01. Levels\02. Stage\Stage0\Step2</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

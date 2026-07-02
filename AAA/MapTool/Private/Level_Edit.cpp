@@ -14,6 +14,7 @@
 #include "MapSection.h"
 #include "MapBreakSection.h"
 #include "EnvObject_Static.h"
+#include "EnvTrigger_RenderGlobals.h"
 #include "Env_InstanceController.h"
 #include "LevelDesign_Registry.h"
 
@@ -1215,13 +1216,16 @@ void CLevel_Edit::Set_Selected(CGameObject* pSelected)
 	if (m_pSelected == pSelected)
 		return;
 
-	if (auto* pPrevStatic = dynamic_cast<Client::CEnvObject_Static*>(m_pSelected))
+	if (auto* pPrevStatic = dynamic_cast<CEnvObject_Static*>(m_pSelected))
 		pPrevStatic->Set_EditorForceMainPassNonInstanced(false);
 
 	m_pSelected = pSelected;
 
-	if (auto* pNewStatic = dynamic_cast<Client::CEnvObject_Static*>(m_pSelected))
+	if (auto* pNewStatic = dynamic_cast<CEnvObject_Static*>(m_pSelected))
 		pNewStatic->Set_EditorForceMainPassNonInstanced(true);
+
+	if (auto* pRenderGlobals = dynamic_cast<CEnvTrigger_RenderGlobals*>(m_pSelected))
+		pRenderGlobals->Apply_RenderGlobals();
 
 	++m_iSelectionRevision;
 }

@@ -8,6 +8,11 @@
 
 namespace
 {
+	inline constexpr const _char* s_strSlopeBoardA_PlatformMeshName = "PlateM__BoardC";
+	inline constexpr const _char* s_strSlopeBoardA_PlatformBoneName = "PlateM__BoardC";
+	inline constexpr _float s_strSlopeBoardA_TriggerMargin = 0.f;
+	inline constexpr _float s_strSlopeBoardA_MinHalfExtent = 0.01f;
+
 	void Log_EventObjectPhysicsWarning(const string& strMessage)
 	{
 #ifdef _DEBUG
@@ -117,8 +122,16 @@ void CLevelDesign_EventObject::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
-	if (!m_bRenderable || nullptr == m_pModelCom)
+	if (!m_bRenderable)
 		return;
+
+	if (m_pInteractionTrigger && m_pInteractionTrigger->Is_Enabled())
+	{
+		m_pInteractionTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+#ifdef _DEBUG
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pInteractionTrigger);
+#endif
+	}
 
 	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
@@ -344,6 +357,167 @@ void CLevelDesign_EventObject::Set_RigidStaticEnabled(_bool bEnable)
 		Release_RigidStatic();
 }
 
+_int CLevelDesign_EventObject::Find_MeshIndex_ByName(const _string& strMeshName) const
+{
+	if (nullptr == m_pModelCom)
+		return -1;
+
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		if (m_pModelCom->Get_MeshName(i) == strMeshName)
+			return static_cast<_int>(i);
+	}
+
+	return -1;
+}
+
+#ifdef _DEBUG
+void CLevelDesign_EventObject::Debug_DumpSlopeBoardPlatformBinding()
+{
+	if (LD_EVENTOBJECT_POLICY::SLOPEBOARD_A != m_tEventObjectDesc.ePolicy || nullptr == m_pModelCom)
+		return;
+
+	const _int iMeshIndex = Find_MeshIndex_ByName(s_strSlopeBoardA_PlatformMeshName);
+	const _int iBoneIndex = m_pModelCom->Get_BoneIndex(s_strSlopeBoardA_PlatformBoneName);
+
+	string strHeader = "[SlopeBoardA] platform mesh=" + string(s_strSlopeBoardA_PlatformMeshName) +
+		" meshIndex=" + to_string(iMeshIndex) + " bone=" + string(s_strSlopeBoardA_PlatformBoneName) +
+		" boneIndex=" + to_string(iBoneIndex) + "\n";
+	OutputDebugStringA(strHeader.c_str());
+
+	for (_uint i = 0; i < static_cast<_uint>(m_pModelCom->Get_NumMeshes()); ++i)
+	{
+		string strLine = "[SlopeBoardA] mesh[" + to_string(i) + "] " + m_pModelCom->Get_MeshName(i) + "\n";
+		OutputDebugStringA(strLine.c_str());
+	}
+
+	for (_uint i = 0; i < m_pModelCom->Get_NumBones(); ++i)
+	{
+		string strLine = "[SlopeBoardA] bone[" + to_string(i) + "] " + m_pModelCom->Get_BoneName(i) + "\n";
+		OutputDebugStringA(strLine.c_str());
+	}
+}
+#endif
+
+HRESULT CLevelDesign_EventObject::Ready_RigidStatic_FromMeshAABB(const _string& strMeshName, const _string& strBoneName)
+{
+	Release_RigidStatic();
+
+	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom || nullptr == m_pModelCom)
+		return E_FAIL;
+
+	const _int iMeshIndex = Find_MeshIndex_ByName(strMeshName);
+	if (0 > iMeshIndex)
+	{
+		Log_EventObjectPhysicsWarning("[LDEventObjectPhysics] mesh not found: " + strMeshName);
+		return E_FAIL;
+	}
+
+	const _float4x4* pBoneMatrix = m_pModelCom->Get_BoneMatrixPtr(strBoneName);
+	if (nullptr == pBoneMatrix)
+	{
+		Log_EventObjectPhysicsWarning("[LDEventObjectPhysics] bone not found: " + strBoneName);
+		return E_FAIL;
+	}
+
+	_float3 vMin{}, vMax{};
+	m_pModelCom->Get_MeshAABB(static_cast<_uint>(iMeshIndex), &vMin, &vMax);
+
+	if (vMin.x > vMax.x || vMin.y > vMax.y || vMin.z > vMax.z)
+	{
+		Log_EventObjectPhysicsWarning("[LDEventObjectPhysics] invalid mesh AABB: " + strMeshName);
+		return E_FAIL;
+	}
+
+	const _float3 vLocalCenter = { (vMin.x + vMax.x) * 0.5f, (vMin.y + vMax.y) * 0.5f, (vMin.z + vMax.z) * 0.5f };
+	_float3 vLocalHalfExtents = { (vMax.x - vMin.x) * 0.5f, (vMax.y - vMin.y) * 0.5f, (vMax.z - vMin.z) * 0.5f };
+
+	vLocalHalfExtents.x = max(vLocalHalfExtents.x, s_strSlopeBoardA_MinHalfExtent);
+	vLocalHalfExtents.y = max(vLocalHalfExtents.y, s_strSlopeBoardA_MinHalfExtent);
+	vLocalHalfExtents.z = max(vLocalHalfExtents.z, s_strSlopeBoardA_MinHalfExtent);
+
+	const _matrix MeshWorld = XMLoadFloat4x4(pBoneMatrix) * XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+	m_pRigidStatic = m_pGameInstance_Proxy->Create_StaticBox(vLocalCenter, vLocalHalfExtents, MeshWorld);
+
+	return nullptr == m_pRigidStatic ? E_FAIL : S_OK;
+}
+
+HRESULT CLevelDesign_EventObject::Ready_SlopeBoardTrigger()
+{
+	if (nullptr == m_pModelCom || nullptr == m_pGameInstance_Proxy)
+		return E_FAIL;
+
+	_float3 vMin{}, vMax{};
+	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
+
+	if (vMin.x > vMax.x || vMin.y > vMax.y || vMin.z > vMax.z)
+		return E_FAIL;
+
+	const _float3 vCenter = { (vMin.x + vMax.x) * 0.5f, (vMin.y + vMax.y) * 0.5f, (vMin.z + vMax.z) * 0.5f };
+	const _float3 vSize = {
+			(vMax.x - vMin.x) + s_strSlopeBoardA_TriggerMargin * 2.f,
+			(vMax.y - vMin.y) + s_strSlopeBoardA_TriggerMargin * 2.f,
+			(vMax.z - vMin.z) + s_strSlopeBoardA_TriggerMargin * 2.f
+	};
+
+	CCollider::COLLIDER_DESC ColliderDesc{};
+	ColliderDesc.pOwner = this;
+	ColliderDesc.vCenter = vCenter;
+	ColliderDesc.vSize = vSize;
+
+	m_pInteractionTrigger = Add_Component<CCollider>(Collider_OBB.iLevelID, Collider_OBB.szProtoTag, TEXT("Com_SlopeBoardTrigger"),
+		&ColliderDesc);
+	if (nullptr == m_pInteractionTrigger)
+		return E_FAIL;
+
+	SetUp_SlopeBoardTriggerCallback();
+	m_pGameInstance_Proxy->Register_Collider(m_pInteractionTrigger, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+	m_bInteractionTriggerRegistered = true;
+
+	return S_OK;
+}
+
+void CLevelDesign_EventObject::SetUp_SlopeBoardTriggerCallback()
+{
+	if (nullptr == m_pInteractionTrigger)
+		return;
+
+	m_pInteractionTrigger->Set_OnEnter([this](CCollider* pOther) { Handle_SlopeBoardTrigger(pOther); });
+}
+
+void CLevelDesign_EventObject::Handle_SlopeBoardTrigger(CCollider* pOther)
+{
+	if (nullptr == pOther)
+		return;
+	if (LD_EVENTOBJECT_POLICY::SLOPEBOARD_A != m_tEventObjectDesc.ePolicy)
+		return;
+	if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
+		return;
+
+	On_Event_SlopeBoard(L"");
+}
+
+void CLevelDesign_EventObject::Unregister_SlopeBoardTrigger(_bool bImmediate)
+{
+	if (nullptr == m_pInteractionTrigger)
+		return;
+
+	m_pInteractionTrigger->Set_Enabled(false);
+
+	if (!m_bInteractionTriggerRegistered)
+		return;
+
+	const _uint iGroup = ETOUI(COLLISION_LAYER::ENV_TRIGGER);
+	if (bImmediate)
+		m_pGameInstance_Proxy->Immediate_Unregister(m_pInteractionTrigger, iGroup);
+	else
+		m_pGameInstance_Proxy->Request_Unregister(m_pInteractionTrigger, iGroup);
+
+	m_bInteractionTriggerRegistered = false;
+}
+
 HRESULT CLevelDesign_EventObject::Ready_Policy()
 {
 	if (m_pModelCom)
@@ -387,6 +561,14 @@ void CLevelDesign_EventObject::Update_Policy(_float fTimeDelta)
 	switch (m_tEventObjectDesc.ePolicy)
 	{
 	case LD_EVENTOBJECT_POLICY::SLOPEBOARD_A:
+		if (EVENTOBJECT_STATE::PLAYING == m_eState)
+		{
+			m_eState = EVENTOBJECT_STATE::BROKEN;
+			if (FAILED(Ready_RigidStatic_FromMeshAABB(s_strSlopeBoardA_PlatformMeshName, s_strSlopeBoardA_PlatformBoneName)))
+				Log_EventObjectPhysicsWarning("[LDEventObjectPhysics] SlopeBoardA platform box failed.");
+		}
+		break;
+
 	case LD_EVENTOBJECT_POLICY::SLOPEBOARD_C:
 		if (EVENTOBJECT_STATE::PLAYING == m_eState)
 			m_eState = EVENTOBJECT_STATE::BROKEN;
@@ -442,10 +624,16 @@ void CLevelDesign_EventObject::On_Event_SlopeBoard(const _wstring& strEventTag)
 {
 	UNREFERENCED_PARAMETER(strEventTag);
 
+	if (EVENTOBJECT_STATE::IDLE != m_eState)
+		return;
+
+	if (!Play_EventAnimation(0u, false))
+		return;
+
 	m_eState = EVENTOBJECT_STATE::PLAYING;
 	m_bRenderable = true;
 	Set_AllMeshesVisible(true);
-	Play_EventAnimation(0u, false);
+	Unregister_SlopeBoardTrigger(false);
 	Release_RigidStatic();
 }
 
@@ -567,10 +755,21 @@ HRESULT CLevelDesign_EventObject::Ready_SlopeBoardA()
 	if (nullptr == m_pAnimatorCom)
 		return E_FAIL;
 
-	//if (!Play_EventAnimation(2u, false))
-	//	return E_FAIL;
+#ifdef _DEBUG
+	Debug_DumpSlopeBoardPlatformBinding();
+#endif
 
-	return Ready_RigidStatic();
+	if (FAILED(Ready_RigidStatic_FromMeshAABB(s_strSlopeBoardA_PlatformMeshName, s_strSlopeBoardA_PlatformBoneName)))
+	{
+		Log_EventObjectPhysicsWarning("[LDEventObjectPhysics] SlopeBoardA initial platform box failed. Fallback to cooked collision mesh.");
+		if (FAILED(Ready_RigidStatic()))
+			return E_FAIL;
+	}
+
+	if (FAILED(Ready_SlopeBoardTrigger()))
+		return E_FAIL;
+
+	return S_OK;
 }
 
 HRESULT CLevelDesign_EventObject::Ready_SlopeBoardC()
@@ -698,6 +897,7 @@ CGameObject* CLevelDesign_EventObject::Clone(void* pArg)
 
 void CLevelDesign_EventObject::Free()
 {
+	Unregister_SlopeBoardTrigger(true);
 	Release_RigidStatic();
 
 	__super::Free();

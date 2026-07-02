@@ -46,7 +46,7 @@ HRESULT CBladeKnight_Sword::Initialize(void* pArg)
 HRESULT CBladeKnight_Sword::Ready_Components()
 {
     PART_SETUP t{};
-    t.tShader = Shader_AnimMesh_PBR;
+    t.tShader = Shader_Monster;
     t.szModelProtoTag = TEXT("Prototype_Component_Model_BladeKnight_Sword");
     return Ready_MeshPart(t);
 }
@@ -72,7 +72,7 @@ HRESULT CBladeKnight_Sword::Render()
             m_pShaderCom->Bind_RawValue("g_vConstantDiffuse", &m_vConstantDiffuse, sizeof(_float4));
             m_pShaderCom->Bind_RawValue("g_vConstantMRA", &m_vConstantMRA, sizeof(_float3));
             m_pShaderCom->Bind_RawValue("g_vConstantEmissive", &m_vConstantEmissive, sizeof(_float4));
-            iPassIdx = 3;
+            iPassIdx = 2;
         }
 
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))

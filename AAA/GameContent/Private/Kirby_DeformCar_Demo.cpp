@@ -4,6 +4,8 @@
 
 #include "GameContent_const.h"
 
+#include "Kirby.h"
+
 CKirby_DeformCar_Demo::CKirby_DeformCar_Demo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CKirby_Deform_Model(pDevice, pContext)
 {
@@ -29,9 +31,6 @@ HRESULT CKirby_DeformCar_Demo::Initialize(void* pArg)
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
-        return E_FAIL;
-
-    if (FAILED(Ready_AnimEvents()))
         return E_FAIL;
 
     m_bActive = false;
@@ -91,6 +90,35 @@ HRESULT CKirby_DeformCar_Demo::Render()
     return S_OK;
 }
 
+HRESULT CKirby_DeformCar_Demo::Ready_AnimEvents(CKirby* pKirby)
+{
+    m_pAnimatorCom->Set_EventCallback(
+        [this](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+        {
+            if (Handle_AnimEventEye(e, ePhase) == true)
+                return;
+
+            switch (static_cast<EANIM_EVENT>(e.iEventType))
+            {
+            case EANIM_EVENT::OnOffMesh:
+                if (e.iIntParam == 0)
+                {
+                    m_bBodyAOn = true;
+                    m_bBodyBOn = false;
+                }
+                else if (e.iIntParam == 1)
+                {
+                    m_bBodyAOn = false;
+                    m_bBodyBOn = true;
+                }
+                break;
+            }
+        }
+    );
+
+    return S_OK;
+}
+
 HRESULT CKirby_DeformCar_Demo::Ready_Components()
 {
     /* For.Com_Shader */
@@ -122,32 +150,6 @@ HRESULT CKirby_DeformCar_Demo::Ready_Components()
 
     if (m_pAnimatorCom == nullptr || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
         return E_FAIL;
-
-    return S_OK;
-}
-
-HRESULT CKirby_DeformCar_Demo::Ready_AnimEvents()
-{
-    m_pAnimatorCom->Set_EventCallback(
-        [this](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
-        {
-            switch (static_cast<EANIM_EVENT>(e.iEventType))
-            {
-                case EANIM_EVENT::OnOffMesh:
-                    if(e.iIntParam == 0)
-                    {
-                        m_bBodyAOn = true;
-                        m_bBodyBOn = false;
-                    }
-                    else if (e.iIntParam == 1)
-                    {
-                        m_bBodyAOn = false;
-                        m_bBodyBOn = true;
-                    }
-                    break;
-            }
-        }
-    );
 
     return S_OK;
 }

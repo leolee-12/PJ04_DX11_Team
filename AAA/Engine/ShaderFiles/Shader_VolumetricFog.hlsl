@@ -82,8 +82,8 @@ float SampleShadow(float3 worldPos)
     float pz = lc.z / lc.w;
     if (suv.x < 0.f || suv.x > 1.f || suv.y < 0.f || suv.y > 1.f || pz > 1.f)
         return 1.f;
-    float sd = g_ShadowDepth.SampleLevel(g_ShadowSampler, suv, 0).r;
-    return (pz - 0.003f > sd) ? 0.f : 1.f;
+    float esm = g_ShadowDepth.SampleLevel(g_ShadowSampler, suv, 0).r;
+    return saturate(exp(-80.f * pz) * esm);
 }
 
   //============================================================

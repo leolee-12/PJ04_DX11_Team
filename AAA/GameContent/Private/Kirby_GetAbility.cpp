@@ -54,8 +54,12 @@ void CKirby_GetAbility::Update(CKirby* pKirby, const _float fTimeDelta)
 
     const _float fRatio = pAnimator->Get_Progress();
 
-    _vector vCamLook = XMVectorSetY(XMLoadFloat4(m_pGameInstance_Proxy->Get_CamLook()), 0.f);
-    pMovement->Rotate_To_Direction(-vCamLook, fTimeDelta);
+    _vector vCamPos = XMLoadFloat4(m_pGameInstance_Proxy->Get_CamPosition());
+    _vector vPlayerPos = pKirby->Get_Transform()->Get_State(STATE::POSITION);
+    _vector vDir = XMVectorSetY(vCamPos - vPlayerPos, 0.f);
+    vDir = XMVector3Normalize(vDir);
+
+    pMovement->Rotate_To_Direction(vDir, fTimeDelta);
 
     if(pAnimator->Is_Finished() == true)
     {

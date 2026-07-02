@@ -62,7 +62,11 @@
 #include "RockBounce.h"
 #include "RockPull.h"
 #include "RockPush.h"
+#include "Gorilla_Swing.h"
+#include "Gorilla_Ring.h"
 #include "DespawnEffect.h"
+#include "GetAbilityEffect.h"
+#include "SwordChargeEffect.h"
 #include "BombExplosion.h"
 #include "BoostGas.h"
 #include "CarMilkyWay.h"
@@ -90,6 +94,10 @@
 #include "SpinWind.h"
 #include "Car_00_MilkyWay.h"
 #include "StarParticle.h"
+#include "Star2DParticle.h"
+#include "SwordCharge.h"
+#include "Swing_Smoke.h"
+#include "Shockwave.h"
 #include "SphereParticle.h"
 #include "SphereMesh.h"
 #include "Common_SphereNoise.h"
@@ -691,14 +699,14 @@ void CGameObject_Factory::Register_NonAnimObject()
     Register(CLevelDesign_Unsupported::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Unsupported), LOADER());
     Register(CLevelDesign_Rail::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Rail), LOADER());
     Register(CLevelDesign_Starblock::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Starblock),
-        LOADER(TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CLevelDesign_Starblock::STARBLOCK_MODEL_PROTO_TAG,
+        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLevelDesign_Starblock::STARBLOCK_MODEL_PROTO_TAG,
             CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh"));));
 }
 
 void CGameObject_Factory::Register_AnimObject()
 {
     Register(CLevelDesign_EventObject::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_EventObject),
-        LOADER(TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CLevelDesign_EventObject::LEVEL1BOSSDEMOBG_MODEL_PROTO_TAG,
+        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLevelDesign_EventObject::LEVEL1BOSSDEMOBG_MODEL_PROTO_TAG,
             CModel::Create_WithTextureHub(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/Level1BossDemoBg/Level1BossDemoBg.ysh"));));
 }
 
@@ -768,31 +776,74 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
+    Register(CGorilla_Swing::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CGorilla_Swing),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwing_Smoke::PROTOTYPE_TAG,
+                CSwing_Smoke::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpinWind::PROTOTYPE_TAG,
+                CSpinWind::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpinWind::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSH/Boss/Gorilla/ArmSpinWind/BossGorilla_00_TornadoPieceMedium.ysh"));
+        )
+    );
+
+    Register(CGorilla_Ring::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CGorilla_Ring),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CShockwave::PROTOTYPE_TAG,
+                CShockwave::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CShockwave::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Gorilla/Shockwave/BossGorilla_00_Donut.ysh"
+                    , XMMatrixScaling(10.f, 10.f, 10.f)));
+        )
+    );
 
 
-    // 1
+    // BoostGas
     Register(CBoostGas::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CBoostGas),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeEmitter::PROTOTYPE_TAG,
-                CSmokeEmitter::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeEmitter::PROTOTYPE_TAG, CSmokeEmitter::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
         )
     );
-
-    // 2
+    
+    // CarMilkyWay
     Register(CCarMilkyWay::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CCarMilkyWay),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CCar_00_MilkyWay::PROTOTYPE_TAG,
-                CCar_00_MilkyWay::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCar_00_MilkyWay::PROTOTYPE_TAG, CCar_00_MilkyWay::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Car_00_MilkyWay"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/CarMilkyWay/Car_00_MilkyWay.ysh"));
         )
     );
 
-    // 2
+    // GetAbilityEffect
+    Register(CGetAbilityEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CGetAbilityEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CStar2DParticle::PROTOTYPE_TAG, CStar2DParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_Star2D.iLevelID, Texture_Star2D.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Star2D.szFileTag, Texture_Star2D.iNumTex));
+        )
+    );
+
+    // SwordChargeEffect
+    Register(CSwordChargeEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSwordChargeEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordCharge::PROTOTYPE_TAG, CSwordCharge::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SwordCharge"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/SwordCharge/Model_Common_Ring03.ysh"));
+        )
+    );
+
     Register(CDespawnEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), 
         CREATOR(CDespawnEffect),
         LOADER

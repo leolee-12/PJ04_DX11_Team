@@ -5,6 +5,7 @@ NS_BEGIN(Engine)
 class CShader;
 class CModel;
 class CAnimator;
+class CCollider;
 NS_END
 
 NS_BEGIN(physx)
@@ -45,6 +46,8 @@ private:
 	CModel* m_pModelCom = { nullptr };
 	CAnimator* m_pAnimatorCom = { nullptr };
 	physx::PxRigidStatic* m_pRigidStatic = { nullptr };
+	CCollider* m_pInteractionTrigger = { nullptr };
+	_bool m_bInteractionTriggerRegistered = { false };
 
 	LD_EVENTOBJECT_DESC m_tEventObjectDesc = {};
 	
@@ -60,9 +63,21 @@ private:
 
 	HRESULT Ready_Components();
 	HRESULT Ready_AnimEvents();
+
 	HRESULT Ready_RigidStatic();
 	void    Release_RigidStatic();
 	void    Set_RigidStaticEnabled(_bool bEnable);
+
+	HRESULT Ready_RigidStatic_FromMeshAABB(const _string& strMeshName, const _string& strBoneName);
+	HRESULT Ready_SlopeBoardTrigger();
+	void    SetUp_SlopeBoardTriggerCallback();
+	void    Handle_SlopeBoardTrigger(CCollider* pOther);
+	void    Unregister_SlopeBoardTrigger(_bool bImmediate);
+	_int    Find_MeshIndex_ByName(const _string& strMeshName) const;
+
+#ifdef _DEBUG
+	void    Debug_DumpSlopeBoardPlatformBinding();
+#endif
 
 	HRESULT Ready_Policy();
 	void    Update_Policy(_float fTimeDelta);

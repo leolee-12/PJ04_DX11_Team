@@ -6,6 +6,8 @@ Texture2D g_SceneTexture; // HDR 씬
 Texture2D g_BloomTexture; // 블룸 결과
 float2 g_vBlurDir; // (1,0)=H, (0,1)=V
 float2 g_vTexelSize; // 1/해상도 (블룸 타겟 기준)
+Texture2D g_LightDepthTexture; // Target_LightDepth (raw depth .r)
+float g_fESMConst = 80.f;
 
 // Bloom Global
 float g_fThreshold = 1.0f;
@@ -60,6 +62,8 @@ float g_fColorGradeEnable = 0.f;
 float g_fSaturation = 0.88f;
 
 Texture2D<uint> g_MaterialIDTexture; // R8_UINT, matID 전용
+
+float g_fSpotlightDarken;
 
     //============================ Common VS ============================
 struct VS_IN
@@ -441,6 +445,17 @@ float4 PS_OCCLUSION_SILHOUETTE(PS_IN In) : SV_TARGET0
     return float4(0.f, 0.f, 0.f, 0.55f);
 }
 
+float4 PS_SPOTLIGHT_DARKEN(PS_IN In) : SV_TARGET0
+{
+    return float4(0.f, 0.f, 0.f, g_fSpotlightDarken);
+}
+
+float4 PS_ESM_RESOLVE(PS_IN In) : SV_TARGET0
+{
+    float d = g_LightDepthTexture.Sample(LinearSampler, In.vTexcoord).r;
+    return float4(exp(g_fESMConst * d), 0.f, 0.f, 1.f);
+}
+
 
     //============================ Technique ============================
 technique11 DefaultTechnique
@@ -546,5 +561,24 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN(); // 기존 풀스크린 쿼드 VS 그대로
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_OCCLUSION_SILHOUETTE();
+    }
+
+    pass SpotlightDarken // 11
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_SpotlightDarken, 1); // ref=1, stencil!=1 인 곳만 통과
+        SetBlendState(BS_AlphaBlend, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_SPOTLIGHT_DARKEN();
+    }
+    pass ESM_Resolve // 12 (enum ESM_RESOLVE)
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_ESM_RESOLVE();
     }
 }
