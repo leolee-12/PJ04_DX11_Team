@@ -87,7 +87,7 @@ HRESULT CMainApp::Start_Logo()
 	//if (FAILED(m_pGameInstance_Proxy->Change_Level(ETOI(LEVEL::LOGO), pLevelLogo)))
 	//	return E_FAIL;
 
-	CLevel* pLevelLoading = CLevel_FirstLoading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY);
+	CLevel* pLevelLoading = CLevel_FirstLoading::Create(m_pDevice, m_pContext, LEVEL::STAGE0_STEP1);
 	if (nullptr == pLevelLoading)
 		return E_FAIL;
 	

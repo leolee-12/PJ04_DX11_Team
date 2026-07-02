@@ -62,6 +62,10 @@ HRESULT CRenderer::Initialize()
 
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_LightDepth"), g_iShadowMapSize, g_iShadowMapSize, DXGI_FORMAT_R32_FLOAT, _float4(1.f, 1.f, 1.f, 1.f))))
         return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_ESM"), g_iShadowMapSize, g_iShadowMapSize, DXGI_FORMAT_R32_FLOAT, _float4(1.f, 1.f, 1.f, 1.f))))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_ESM_Blur"), g_iShadowMapSize, g_iShadowMapSize, DXGI_FORMAT_R32_FLOAT, _float4(1.f, 1.f, 1.f, 1.f))))
+        return E_FAIL;
     if (FAILED(Ready_DepthStencil_Buffer()))
         return E_FAIL;
 
@@ -96,6 +100,11 @@ HRESULT CRenderer::Initialize()
         return E_FAIL;
 
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_ShadowObjects"), TEXT("Target_LightDepth"))))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_ESM"), TEXT("Target_ESM"))))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_ESM_Blur"), TEXT("Target_ESM_Blur"))))
         return E_FAIL;
 
     if (FAILED(m_pGameInstance_Proxy->Add_MRT(TEXT("MRT_Scene"), TEXT("Target_Scene"))))
@@ -202,6 +211,8 @@ HRESULT CRenderer::Draw()
         return E_FAIL;
     if (FAILED(Render_Shadow()))
         return E_FAIL;
+    if (FAILED(Render_ShadowBlur()))
+        return E_FAIL;
     if (FAILED(Render_VolumetricFog()))
         return E_FAIL;
     if (FAILED(Render_NonBlend()))
@@ -213,6 +224,8 @@ HRESULT CRenderer::Draw()
     if (FAILED(Render_Lights()))
         return E_FAIL;
     if (FAILED(Render_Combined()))
+        return E_FAIL;
+    if (FAILED(Render_SpotlightDarken()))
         return E_FAIL;
     if (FAILED(Render_SSR()))
         return E_FAIL;
@@ -312,6 +325,65 @@ HRESULT CRenderer::Render_Shadow()
 
     Change_ViewportDesc(Render_Width(), Render_Height());
 
+    return S_OK;
+}
+
+HRESULT CRenderer::Render_ShadowBlur()
+{
+    _float2 vTexel = { 1.f / g_iShadowMapSize, 1.f / g_iShadowMapSize };
+
+    Change_ViewportDesc(g_iShadowMapSize, g_iShadowMapSize);
+
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_ESM"), nullptr, false)))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_LightDepth"), m_pShaderPost, "g_LightDepthTexture")))
+        return E_FAIL;
+    if (FAILED(m_pVIBuffer->Bind_Resources()))
+        return E_FAIL;
+    if (FAILED(m_pShaderPost->Begin(ETOUI(POSTPROSESS::ESM_RESOLVE))))
+        return E_FAIL;
+    if (FAILED(m_pVIBuffer->Render()))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->End_MRT()))
+        return E_FAIL;
+
+    _float2 dirH = { 1.f, 0.f };
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_ESM_Blur"), nullptr, false)))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_ESM"), m_pShaderPost, "g_BloomTexture")))
+        return E_FAIL;
+    if (FAILED(m_pShaderPost->Bind_RawValue("g_vBlurDir", &dirH, sizeof(_float2))))
+        return E_FAIL;
+    if (FAILED(m_pShaderPost->Bind_RawValue("g_vTexelSize", &vTexel, sizeof(_float2))))
+        return E_FAIL;
+    if (FAILED(m_pVIBuffer->Bind_Resources()))
+        return E_FAIL;
+    if (FAILED(m_pShaderPost->Begin(ETOUI(POSTPROSESS::BLUR))))
+        return E_FAIL;
+    if (FAILED(m_pVIBuffer->Render()))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->End_MRT()))
+        return E_FAIL;
+
+    _float2 dirV = { 0.f, 1.f };
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_ESM"), nullptr, false)))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_ESM_Blur"), m_pShaderPost, "g_BloomTexture")))
+        return E_FAIL;
+    if (FAILED(m_pShaderPost->Bind_RawValue("g_vBlurDir", &dirV, sizeof(_float2))))
+        return E_FAIL;
+    if (FAILED(m_pShaderPost->Bind_RawValue("g_vTexelSize", &vTexel, sizeof(_float2))))
+        return E_FAIL;
+    if (FAILED(m_pVIBuffer->Bind_Resources()))
+        return E_FAIL;
+    if (FAILED(m_pShaderPost->Begin(ETOUI(POSTPROSESS::BLUR))))
+        return E_FAIL;
+    if (FAILED(m_pVIBuffer->Render()))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->End_MRT()))
+        return E_FAIL;
+
+    Change_ViewportDesc(Render_Width(), Render_Height());
     return S_OK;
 }
 
@@ -465,7 +537,7 @@ HRESULT CRenderer::Render_Combined()
         return E_FAIL;
     if(FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShaderDeferred, "g_DepthTexture")))
         return E_FAIL;
-    if(FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_LightDepth"), m_pShaderDeferred, "g_LightDepthTexture")))
+    if(FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_ESM"), m_pShaderDeferred, "g_LightDepthTexture")))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_SSAO_Blur"), m_pShaderDeferred, "g_SSAOTexture")))
         return E_FAIL;
@@ -524,6 +596,27 @@ HRESULT CRenderer::Render_Combined()
         return E_FAIL;
 
     return S_OK;
+}
+
+HRESULT CRenderer::Render_SpotlightDarken()
+{
+    if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_Scene"), nullptr, true, false)))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderPost, "g_fSpotlightDarken")))
+        return E_FAIL;
+    if (FAILED(m_pShaderPost->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+        return E_FAIL;
+    if (FAILED(m_pShaderPost->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::ORTHO))))
+        return E_FAIL;
+    if (FAILED(m_pShaderPost->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::ORTHO))))
+        return E_FAIL;
+    if (FAILED(m_pVIBuffer->Bind_Resources()))
+        return E_FAIL;
+    if (FAILED(m_pShaderPost->Begin(ETOUI(POSTPROSESS::SPOTLIGHT_DARKEN))))
+        return E_FAIL;
+    if (FAILED(m_pVIBuffer->Render()))
+        return E_FAIL;
+    return m_pGameInstance_Proxy->End_MRT();
 }
 
 HRESULT CRenderer::Render_SSR()
@@ -745,7 +838,7 @@ HRESULT CRenderer::Render_VolumetricFog()
     /* 3) Inject 디스패치 - 셰도우맵은 매니저가 t0에 바인딩 */
     m_pCSInject->Bind();
     m_pCSInject->Bind_CBV(0, m_pFroxelCB);
-    m_pGameInstance_Proxy->Bind_RT_CSResource(TEXT("Target_LightDepth"), 0); // t0
+    m_pGameInstance_Proxy->Bind_RT_CSResource(TEXT("Target_ESM"), 0);       // t0
     m_pContext->CSSetSamplers(0, 1, &m_pShadowSampler);                       // s0
     m_pCSInject->Bind_UAV(0, m_pScatterUAV);                                  // u0
     m_pCSInject->Dispatch((FROXEL_W + 7) / 8, (FROXEL_H + 7) / 8, (FROXEL_D + 7) / 8);

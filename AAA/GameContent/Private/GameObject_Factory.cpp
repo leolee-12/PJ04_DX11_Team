@@ -691,14 +691,14 @@ void CGameObject_Factory::Register_NonAnimObject()
     Register(CLevelDesign_Unsupported::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Unsupported), LOADER());
     Register(CLevelDesign_Rail::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Rail), LOADER());
     Register(CLevelDesign_Starblock::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Starblock),
-        LOADER(TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CLevelDesign_Starblock::STARBLOCK_MODEL_PROTO_TAG,
+        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLevelDesign_Starblock::STARBLOCK_MODEL_PROTO_TAG,
             CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh"));));
 }
 
 void CGameObject_Factory::Register_AnimObject()
 {
     Register(CLevelDesign_EventObject::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_EventObject),
-        LOADER(TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::GAMEPLAY), CLevelDesign_EventObject::LEVEL1BOSSDEMOBG_MODEL_PROTO_TAG,
+        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLevelDesign_EventObject::LEVEL1BOSSDEMOBG_MODEL_PROTO_TAG,
             CModel::Create_WithTextureHub(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/Level1BossDemoBg/Level1BossDemoBg.ysh"));));
 }
 

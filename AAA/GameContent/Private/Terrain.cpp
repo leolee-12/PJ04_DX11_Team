@@ -71,11 +71,11 @@ HRESULT CTerrain::Ready_Components()
     if (nullptr == m_pShaderCom)
         return E_FAIL;
 
-    m_pVIBufferCom = Add_Component<CVIBuffer_Terrain>(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_VIBuffer_Terrain"), TEXT("Com_VIBuffer"));
+    m_pVIBufferCom = Add_Component<CVIBuffer_Terrain>(ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Terrain"), TEXT("Com_VIBuffer"));
     if (nullptr == m_pShaderCom)
         return E_FAIL;
 
-    m_pTextureCom = Add_Component<CTexture>(ETOUI(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Texture_Terrain"), TEXT("Com_Texture"));
+    m_pTextureCom = Add_Component<CTexture>(ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Terrain"), TEXT("Com_Texture"));
     if (nullptr == m_pShaderCom)
         return E_FAIL;
 

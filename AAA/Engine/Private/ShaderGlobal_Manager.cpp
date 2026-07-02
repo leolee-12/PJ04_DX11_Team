@@ -48,7 +48,7 @@ HRESULT CShaderGlobal_Manager::Initialize()
     Register({ "g_fAtmosEnd",      "Atmos End",       GVAL::FLOAT,  { 300.f, 0.f, 0.f, 0.f }, { 0.f, 1000.f } });
     Register({ "g_fAtmosStrength", "Atmos Strength",  GVAL::FLOAT,  { 0.5f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
 
-    Register({ "g_fSpotlightDarken", "Spotlight Darken",  GVAL::FLOAT,  { 1.f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
+    Register({ "g_fSpotlightDarken", "Spotlight Darken",  GVAL::FLOAT,  { 0.f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
 
     
 

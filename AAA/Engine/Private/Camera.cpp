@@ -183,8 +183,9 @@ void CCamera::Update_ShadowFit()
 	}
 	if (nullptr == pDir) return;
 
+	_float4 vShadowDir = _float4(m_vShadowDir.x, m_vShadowDir.y, m_vShadowDir.z, 0.f);
 	SHADOW_LIGHT_DESC desc = Make_CameraFit_Shadow(
-		pDir->vDirection, m_fShadowRange, m_fShadowPadding, m_iShadowRes);
+		vShadowDir, m_fShadowRange, m_fShadowPadding, m_iShadowRes);
 	m_pGameInstance_Proxy->Update_ShadowLight(desc);
 }
 

@@ -87,12 +87,14 @@ private:
 private:
 	HRESULT Render_Priority();
 	HRESULT Render_Shadow();
+	HRESULT Render_ShadowBlur();
 	HRESULT Render_NonBlend();
 	HRESULT Render_Decals();
 	HRESULT Render_SSAO();
 	HRESULT Render_Lights();
 	HRESULT Render_VolumetricFog();
 	HRESULT Render_Combined();
+	HRESULT Render_SpotlightDarken();
 	HRESULT Render_SSR();
 	HRESULT Render_DoF();
 	HRESULT Render_Bloom();
