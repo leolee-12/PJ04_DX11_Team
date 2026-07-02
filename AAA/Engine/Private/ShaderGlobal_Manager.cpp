@@ -17,7 +17,7 @@ HRESULT CShaderGlobal_Manager::Initialize()
     Register({ "g_fAmbientSaturation", "Ambient Saturation", GVAL::FLOAT,  { 0.6f, 0.f, 0.f, 0.f }, { 0.f, 1.f } });
 
     Register({ "g_fSSRIntensity",   "SSR Intensity",   GVAL::FLOAT, { 1.0f,  0.f, 0.f, 0.f }, { 0.f,  3.f } });
-    Register({ "g_fSSRMaxDistance", "SSR MaxDistance", GVAL::FLOAT, { 30.0f, 0.f, 0.f, 0.f }, { 1.f, 100.f } });
+    Register({ "g_fSSRMaxDistance", "SSR MaxDistance", GVAL::FLOAT, { 12.0f, 0.f, 0.f, 0.f }, { 1.f, 100.f } });
     Register({ "g_fSSRThickness",   "SSR Thickness",   GVAL::FLOAT, { 0.5f,  0.f, 0.f, 0.f }, { 0.05f, 5.f } });
 
     Register({ "g_fFogDensity",        "Fog Density",        GVAL::FLOAT,  { 0.04f, 0.f, 0.f, 0.f }, { 0.f, 0.3f } });
