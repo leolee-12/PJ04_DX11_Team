@@ -13,6 +13,7 @@ NS_END
 
 NS_BEGIN(Client)
 
+class CKirby;
 enum class KIRBY_EYE_STATE { IDLE, DOUBT, BLINK, CLOSE, ANGRY, SURPRISED, SADNESS, END };
 
 class CKirby_Deform_Model abstract : public CPartObject
@@ -39,6 +40,8 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+	virtual HRESULT Ready_AnimEvents(CKirby* pKirby) = 0;
+
 public:
 	const _float4x4* Get_BoneMatrixPtr(const _char* pBoneName) const;
 
@@ -52,6 +55,8 @@ public:
 	virtual const _float4x4* Get_HatBoneMatirx();
 
 protected:
+	_bool Handle_AnimEventEye(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
+
 	HRESULT Bind_ShaderResources(CShader* pShader);
 
 	virtual HRESULT Render_PBRMesh(_uint iMeshIndex);

@@ -64,11 +64,15 @@
 #include "RockPush.h"
 #include "Gorilla_Swing.h"
 #include "Gorilla_Ring.h"
-
 #include "DespawnEffect.h"
-
+#include "GetAbilityEffect.h"
+#include "SwordChargeEffect.h"
+#include "BombExplosion.h"
 #include "BoostGas.h"
 #include "CarMilkyWay.h"
+#include "CommonHit.h"
+#include "SpitObject.h"
+
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -90,8 +94,16 @@
 #include "SpinWind.h"
 #include "Car_00_MilkyWay.h"
 #include "StarParticle.h"
+#include "Star2DParticle.h"
+#include "SwordCharge.h"
 #include "Swing_Smoke.h"
 #include "Shockwave.h"
+#include "SphereParticle.h"
+#include "SphereMesh.h"
+#include "Common_SphereNoise.h"
+#include "HitMark.h"
+#include "Bubble.h"
+#include "StarEmitter.h"
 
 //sky
 #include "SkySphere.h"
@@ -791,29 +803,47 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
-    // 1
+
+    // BoostGas
     Register(CBoostGas::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CBoostGas),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeEmitter::PROTOTYPE_TAG,
-                CSmokeEmitter::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeEmitter::PROTOTYPE_TAG, CSmokeEmitter::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
         )
     );
-
-    // 2
+    
+    // CarMilkyWay
     Register(CCarMilkyWay::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CCarMilkyWay),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CCar_00_MilkyWay::PROTOTYPE_TAG,
-                CCar_00_MilkyWay::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCar_00_MilkyWay::PROTOTYPE_TAG, CCar_00_MilkyWay::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Car_00_MilkyWay"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/CarMilkyWay/Car_00_MilkyWay.ysh"));
         )
     );
 
-    // 2
+    // GetAbilityEffect
+    Register(CGetAbilityEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CGetAbilityEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CStar2DParticle::PROTOTYPE_TAG, CStar2DParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_Star2D.iLevelID, Texture_Star2D.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Star2D.szFileTag, Texture_Star2D.iNumTex));
+        )
+    );
+
+    // SwordChargeEffect
+    Register(CSwordChargeEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSwordChargeEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordCharge::PROTOTYPE_TAG, CSwordCharge::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SwordCharge"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/SwordCharge/Model_Common_Ring03.ysh"));
+        )
+    );
+
     Register(CDespawnEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), 
         CREATOR(CDespawnEffect),
         LOADER
@@ -829,6 +859,64 @@ void CGameObject_Factory::Register_Effect()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Star/Common_00_Common_StarSmooth2.ysh"));
          
         ));
+
+    // 3
+    Register(CBombExplosion::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CBombExplosion),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
+                CSmokeParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSphereParticle::PROTOTYPE_TAG,
+                CSphereParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_CommonSphere"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Bomb/Sphere/Common_00_Common_Sphere02.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_SphereNoise::PROTOTYPE_TAG,
+                CCommon_SphereNoise::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SphereNoise"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Bomb/SphereNoise/Common_00_Common_SphereNoise.ysh"));
+        ));
+
+    // 4 
+    Register(CCommonHit::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CCommonHit),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CStarParticle::PROTOTYPE_TAG, CStarParticle::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StarSmooth"),
+                            CModel::Create(pDevice, pContext, MODEL::NONANIM,  "../../Resources/CHJ/Effect/Star/Common_00_Common_StarSmooth.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CHitMark::PROTOTYPE_TAG, CHitMark::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_CommonHit01.iLevelID, Texture_CommonHit01.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_CommonHit01.szFileTag,
+                    Texture_CommonHit01.iNumTex));
+        ));
+
+    // 5 
+
+    Register(CSpitObject::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CSpitObject),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBubble::PROTOTYPE_TAG, CBubble::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, Texture_CommonRing01.iLevelID, Texture_CommonRing01.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_CommonRing01.szFileTag,
+                Texture_CommonRing01.iNumTex));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CStarEmitter::PROTOTYPE_TAG, CStarEmitter::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StarSmooth"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Star/Common_00_Common_StarSmooth.ysh"));
+
+
+        ));
+
 }
 
 void CGameObject_Factory::Register_MiniBoss()

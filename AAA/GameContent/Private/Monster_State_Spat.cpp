@@ -52,7 +52,6 @@ void CMonster_State_Spat::Update(_float fTimeDelta)
     m_fLifeTime -= fTimeDelta;
     if (m_fLifeTime <= 0.f)
         m_pOwner->Despawn_Spat();
-    // TODO(선택): 벽/맵 충돌 시에도 Despawn_Spat()
 }
 
 void CMonster_State_Spat::Exit(MONSTER_STATE_TYPE eNextState)
