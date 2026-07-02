@@ -2,11 +2,15 @@
 #include "LevelDesign_Registry.h"
 #include "Shader_PassMeta.h"
 #include "Parsing_Utils.h"
+#include "Kirby.h"
 
 #include "GameInstance.h"
 
 namespace
 {
+	constexpr _float s_fFoodFloatHeight = 0.25f;
+	constexpr _float s_fFoodRotationPerSec = 360.f;
+
 	struct LD_FOOD_CATALOG
 	{
 		const _tchar* pObjectName;
@@ -64,6 +68,9 @@ HRESULT CLevelDesign_Food::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_tFoodDesc = *static_cast<const LD_FOOD_DESC*>(pArg);
+	
+	m_pTransformCom->Set_RotationPerSec(s_fFoodRotationPerSec);
+	m_pTransformCom->Set_State(STATE::POSITION, XMVectorAdd(m_pTransformCom->Get_State(STATE::POSITION), XMVectorSet(0.f, s_fFoodFloatHeight, 0.f, 0.f)));
 
 	if (FAILED(Validate_Desc()))
 		return E_FAIL;
@@ -76,7 +83,18 @@ HRESULT CLevelDesign_Food::Initialize(void* pArg)
 
 void CLevelDesign_Food::Late_Update(_float fTimeDelta)
 {
-	UNREFERENCED_PARAMETER(fTimeDelta);
+	if (!m_bActive || Is_Dead())
+		return;
+
+	m_pTransformCom->Turn(XMVector3Normalize(XMVectorSet(0.f, 1.f, 0.f, 0.f)), fTimeDelta);
+
+	if (m_pPickupCollider && m_pPickupCollider->Is_Enabled())
+	{
+		m_pPickupCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+#ifdef _DEBUG
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pPickupCollider);
+#endif
+	}
 
 	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
@@ -171,6 +189,11 @@ HRESULT CLevelDesign_Food::Ready_Components()
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
 
+	if (FAILED(Ready_PickupCollider()))
+		return E_FAIL;
+
+	SetUp_Collider_Callback();
+
 	return S_OK;
 }
 
@@ -239,6 +262,79 @@ const _tchar* CLevelDesign_Food::Resolve_ModelProtoTag() const
 	return m_tFoodDesc.wstrModelProtoTag.c_str();
 }
 
+HRESULT CLevelDesign_Food::Ready_PickupCollider()
+{
+	_float3 vMin = {};
+	_float3 vMax = {};
+	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
+
+	if (vMin.x > vMax.x || vMin.y > vMax.y || vMin.z > vMax.z)
+		return E_FAIL;
+
+	const _float3 vCenter = { (vMin.x + vMax.x) * 0.5f, (vMin.y + vMax.y) * 0.5f, (vMin.z + vMax.z) * 0.5f };
+	const _float3 vHalfExtents = { (vMax.x - vMin.x) * 0.5f, (vMax.y - vMin.y) * 0.5f, (vMax.z - vMin.z) * 0.5f };
+	const _float fBoundsRadius = XMVectorGetX(XMVector3Length(XMVectorSet(vHalfExtents.x, vHalfExtents.y, vHalfExtents.z, 0.f)));
+
+	CCollider::COLLIDER_DESC ColliderDesc{};
+	ColliderDesc.pOwner = this;
+	ColliderDesc.vCenter = vCenter;
+	ColliderDesc.fRadius = fBoundsRadius;
+
+	m_pPickupCollider = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, TEXT("Com_PickupCollider"),
+		&ColliderDesc);
+	if (nullptr == m_pPickupCollider)
+		return E_FAIL;
+
+	m_pGameInstance_Proxy->Register_Collider(m_pPickupCollider, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+	m_bPickupColliderRegistered = true;
+
+	return S_OK;
+}
+
+void CLevelDesign_Food::SetUp_Collider_Callback()
+{
+	if (nullptr == m_pPickupCollider)
+		return;
+
+	m_pPickupCollider->Set_OnEnter([this](CCollider* pOther) { Handle_Pickup(pOther); });
+}
+
+void CLevelDesign_Food::Handle_Pickup(CCollider* pOther)
+{
+	if (nullptr == pOther)
+		return;
+	if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
+		return;
+	if (Is_Dead())
+		return;
+
+	CKirby* pKirby = dynamic_cast<CKirby*>(pOther->Get_Owner());
+	if (nullptr == pKirby)
+		return;
+
+	pKirby->Add_HP(m_tFoodDesc.fHealAmount);
+
+	if (m_pPickupCollider)
+		m_pPickupCollider->Set_Enabled(false);
+
+	Unregister_PickupCollider(false);
+	Set_Active(false);
+	m_pGameInstance_Proxy->Destroy_GameObject(this);
+}
+
+void CLevelDesign_Food::Unregister_PickupCollider(_bool bImmediate)
+{
+	if (nullptr == m_pPickupCollider || !m_bPickupColliderRegistered)
+		return;
+
+	const _uint iGroup = ETOUI(COLLISION_LAYER::ENV_TRIGGER);
+	if (bImmediate)
+		m_pGameInstance_Proxy->Immediate_Unregister(m_pPickupCollider, iGroup);
+	else
+		m_pGameInstance_Proxy->Request_Unregister(m_pPickupCollider, iGroup);
+
+	m_bPickupColliderRegistered = false;
+}
 
 CLevelDesign_Food* CLevelDesign_Food::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
@@ -268,6 +364,8 @@ CGameObject* CLevelDesign_Food::Clone(void* pArg)
 
 void CLevelDesign_Food::Free()
 {
+	Unregister_PickupCollider(true);
+
 	__super::Free();
 }
 

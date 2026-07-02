@@ -142,7 +142,7 @@ enum class ENV_PASS : _int
 	DMNU,
 	TREESHADOW,
 	GRASS_FUR,
-	MN,
+	COLOR,
 	DISCARD,
 	COLORMRADITHER,
 	DECAL,
@@ -167,7 +167,7 @@ namespace ShaderPass
 		inline constexpr _uint DMNU = 9;
 		inline constexpr _uint TREESHADOW = 10;
 		inline constexpr _uint GRASS_FUR = 11;
-		inline constexpr _uint MN = 12;
+		inline constexpr _uint COLOR = 12;
 		inline constexpr _uint DISCARD = 13;
 		inline constexpr _uint COLORMRADITHER = 14;
 		inline constexpr _uint DECAL = 15;
@@ -199,7 +199,7 @@ inline constexpr ENV_SHADER_PASS_META g_EnvShaderPassMetas[] =
 	{ ENV_PASS::DMNU,			ShaderPass::NonAnimPBR::DMNU,			"DMNU",				DIFF | MRA | NORM | UKWN },
 	{ ENV_PASS::TREESHADOW,		ShaderPass::NonAnimPBR::TREESHADOW,		"TREESHADOW",		UKWN },
 	{ ENV_PASS::GRASS_FUR,		ShaderPass::NonAnimPBR::GRASS_FUR,		"GRASS_FUR",		UKWN | MRA | NORM },
-	{ ENV_PASS::MN,				ShaderPass::NonAnimPBR::MN,				"MN",				MRA | NORM },
+	{ ENV_PASS::COLOR,			ShaderPass::NonAnimPBR::COLOR,			"COLOR",			MRA | NORM },
 	{ ENV_PASS::DISCARD,		ShaderPass::NonAnimPBR::DISCARD,		"DISCARD",			0 },
 	{ ENV_PASS::COLORMRADITHER,	ShaderPass::NonAnimPBR::COLORMRADITHER,	"COLORMRADITHER",	0 },
 	{ ENV_PASS::DECAL,			ShaderPass::NonAnimPBR::DECAL,			"DECAL",			0 },
@@ -239,7 +239,7 @@ inline ENV_SHADOW_ALPHA_SOURCE Resolve_EnvShadowAlphaSource(ENV_PASS ePass)
 		return ENV_SHADOW_ALPHA_SOURCE::DISCARD_ALL;
 
 	case ENV_PASS::WHITE:
-	case ENV_PASS::MN:
+	case ENV_PASS::COLOR:
 	case ENV_PASS::SHADOW:
 	default:
 		return ENV_SHADOW_ALPHA_SOURCE::NONE;

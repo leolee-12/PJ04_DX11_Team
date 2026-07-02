@@ -62,12 +62,13 @@ public:
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
+	void Apply_RenderGlobals();
+
 private:
 	virtual void OnTriggerEnter(CCollider* pOther) override;
 	virtual void OnTriggerStay(CCollider* pOther) override;
 	virtual void OnTriggerExit(CCollider* pOther) override;
 
-	void Apply_RenderGlobals();
 	_bool Is_TriggerActivator(CCollider* pOther) const;
 
 public:

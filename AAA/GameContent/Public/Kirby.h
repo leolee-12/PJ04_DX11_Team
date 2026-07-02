@@ -134,7 +134,7 @@ public:
 
 	// Damage
 	virtual void Damaged(const ATTACK_INFO& tInfo) override;
-	void Add_HP(_float fHP) { m_fCurHP += fHP; }
+	void Add_HP(_float fHP);
 	void Start_DamageInvincibility() { m_fInvincibleTime = s_fInvincibleDuration; }
 
 private:

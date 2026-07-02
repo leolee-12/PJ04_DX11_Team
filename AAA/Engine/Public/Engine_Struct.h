@@ -119,8 +119,9 @@ namespace Engine
 		float			fNormalStrength = 1.f;
 		float			fMaskStrength = 1.f;
 
-		int				iExtraBind[4] = { -1, -1, -1, -1 };
+		XMFLOAT4		vRenderColor = { 1.f, 1.f, 1.f, 1.f };
 
+		int				iExtraBind[4] = { -1, -1, -1, -1 };
 		unsigned int    iExtraTexType[4] = {
 				static_cast<unsigned int>(MTEX_TYPE::UNKNOWN),
 				static_cast<unsigned int>(MTEX_TYPE::UNKNOWN),
