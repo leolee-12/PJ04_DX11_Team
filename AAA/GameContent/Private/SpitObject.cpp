@@ -61,7 +61,10 @@ HRESULT CSpitObject::Ready_EffectPartObjects()
     if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CBubble::PROTOTYPE_TAG, TEXT("Bubble"))))
         return E_FAIL;
 
-    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CStarEmitter::PROTOTYPE_TAG, TEXT("StarEmitter"))))
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CStarEmitter::PROTOTYPE_TAG, TEXT("StarEmitter00"))))
+        return E_FAIL;
+
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CStarEmitter::PROTOTYPE_TAG, TEXT("StarEmitter01"))))
         return E_FAIL;
 
     return S_OK;
