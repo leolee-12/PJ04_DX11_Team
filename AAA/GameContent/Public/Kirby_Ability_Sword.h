@@ -103,6 +103,8 @@ private:
 
 	_bool CanPlayEffect(SWORD_EFFECT eSwordEffect, CAnimator* pAnimator, _float fRatio);
 
+	void End_SpinSlashEffect(CEffect_Container*& pEffectContainer, _float fFadeOutDuration);
+
 public:
 	static CKirby_Ability_Sword* Create();
 private:

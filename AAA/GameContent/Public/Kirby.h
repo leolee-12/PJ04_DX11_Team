@@ -30,6 +30,8 @@ class CKirby_OnOffPart;
 class CKirby_Deform_Model;
 class CKirby_Deform;
 
+class CLevelDesign_Ladder;
+
 enum class KIRBY_DEFORM_MODEL_TYPE { DEMO, MAIN };
 
 class CKirby final : public CCharacter
@@ -140,6 +142,11 @@ public:
 	void Add_HP(_float fHP);
 	void Start_DamageInvincibility() { m_fInvincibleTime = s_fInvincibleDuration; }
 
+	// Ladder
+	void Set_Ladder(CLevelDesign_Ladder* pLadder) { m_pLadder = pLadder; }
+	void Clear_Ladder() { m_pLadder = nullptr; };
+	_bool IsLadder() { return m_pLadder ? true : false; }
+
 private:
 	HRESULT Ready_Components();
 	void	SetUp_Collider_Callback();
@@ -208,6 +215,9 @@ private:
 	// CutScene Grab
 	const _float4x4* m_pGrabBone = nullptr;
 	const _float4x4* m_pGrabOwnerWorld = nullptr;
+
+	// Ladder
+	CLevelDesign_Ladder* m_pLadder{};
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

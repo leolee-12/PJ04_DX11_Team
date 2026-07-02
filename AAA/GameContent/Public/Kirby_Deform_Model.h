@@ -56,6 +56,7 @@ public:
 
 protected:
 	_bool Handle_AnimEventEye(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
+	_bool Handle_AnimEventSound(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
 
 	HRESULT Bind_ShaderResources(CShader* pShader);
 
