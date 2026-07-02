@@ -864,8 +864,8 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\99. CarMilkyWay">
       <UniqueIdentifier>{88986c88-48f9-45f5-8a25-875b592353d2}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\02. Gorilla_RockPush">
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\02. Gorilla_RockPush">
       <UniqueIdentifier>{53dd3b59-90ba-4e75-835b-bab9a309f981}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\03. Gorilla_RockPull">
@@ -879,6 +879,12 @@
     </Filter>
     <Filter Include="00. GameObject\01. Map\Section">
       <UniqueIdentifier>{ec37b494-e272-4b95-b84e-14f77ae35aef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\98. GetAbilityEffect">
+      <UniqueIdentifier>{94eefdbc-2090-4d48-a274-d094d76d72a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\97. Star2DParticle">
+      <UniqueIdentifier>{45484847-3690-4ecf-b25d-b0b39459f33e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1661,8 +1667,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\CarMilkyWay.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\99. CarMilkyWay</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\StarParticle.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\StarParticle.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\14. StarParticle</Filter>
     </ClInclude>
     <ClInclude Include="..\public\RockPush.h">
@@ -1691,6 +1697,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\MapBreakSection.h">
       <Filter>00. GameObject\01. Map\Section</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Star2DParticle.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\97. Star2DParticle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\GetAbilityEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\98. GetAbilityEffect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2395,8 +2407,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\CarMilkyWay.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\99. CarMilkyWay</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\StarParticle.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\StarParticle.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\14. StarParticle</Filter>
     </ClCompile>
     <ClCompile Include="..\private\RockPush.cpp">
@@ -2425,7 +2437,13 @@
     </ClCompile>
     <ClCompile Include="..\Private\MapBreakSection.cpp">
       <Filter>00. GameObject\01. Map\Section</Filter>
-	</ClCompile>
+    </ClCompile>
+    <ClCompile Include="..\Private\Star2DParticle.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\97. Star2DParticle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\GetAbilityEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\98. GetAbilityEffect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl">
