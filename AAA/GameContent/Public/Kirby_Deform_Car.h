@@ -60,6 +60,7 @@ private:
 
 	CEffect_Container* m_pBoostGas1{};
 	CEffect_Container* m_pBoostGas2{};
+	CEffect_Container* m_pBoostWind{};
 
 private:
 	void Change_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eNext);

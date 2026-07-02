@@ -207,6 +207,10 @@ void CKirby_Deform_Car::Enter_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eS
 
             BoostEffectStart(pKirby, m_pBoostGas1, m_pBoostGas2, L"BoostGas");
 
+            CEffect_Loader::GetInstance()->Spawn(L"CarMilkyWay", pKirby->Get_LevelIndex(),
+                _float3(0.f, 1.3f, 2.4f), _float3(0.f, 0.f, 0.f), _float3(0.f, 180.f, 0.f),
+                pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pBoostWind);
+
             break;
         }
         case DEFORM_CAR_STATE::BOOST_END:
@@ -287,6 +291,13 @@ void CKirby_Deform_Car::Exit_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eSt
         case DEFORM_CAR_STATE::BOOST:
             pModel->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
             BoostEffectStop(m_pBoostGas1, m_pBoostGas2);
+
+            if (m_pBoostWind != nullptr)
+            {
+                m_pBoostWind->EffectContainer_Stop();
+                m_pBoostWind = nullptr;
+            }
+
             break;
         case DEFORM_CAR_STATE::BOOST_END:
             pMovement->Set_MaxHorizontalSpeed(s_fCarSpeed);

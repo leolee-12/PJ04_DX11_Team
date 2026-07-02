@@ -27,8 +27,8 @@ HRESULT CCar_00_MilkyWay::Initialize(void* pArg)
     tDesc.iModelLevel = m_iPrototypeLevel;
     tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Car_00_MilkyWay");
 
-    tDesc.bUseDiffuseTexture = false;
-    tDesc.bUseUnKnownTexture = true;
+    tDesc.bUseDiffuseTexture = true;
+    tDesc.bUseUnKnownTexture = false;
 
     tDesc.bUseTextureCom = false;
     tDesc.iTextureLevel = 0;
@@ -66,7 +66,7 @@ void CCar_00_MilkyWay::Late_Update(_float fTimeDelta)
         return;
 
     Compute_CombinedWorldMatrix();
-    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::BLEND, this);
 }
 
 HRESULT CCar_00_MilkyWay::Render()
