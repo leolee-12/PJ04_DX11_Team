@@ -173,7 +173,7 @@ PS_OUT PS_MAIN_MIRROR(PS_IN In)
         else
             vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling;
         
-        Out.vColor *= g_Texture.Sample(LinearSampler, vUV);
+        Out.vColor *= g_Texture.Sample(MirrorSampler, vUV);
     }
     
     if (g_bUseMask == true)
@@ -185,7 +185,7 @@ PS_OUT PS_MAIN_MIRROR(PS_IN In)
         else
             vUV = g_vMaskOffset + In.vTexcoord * g_vMaskTiling;
         
-        Out.vColor *= g_Mask.Sample(LinearSampler, vUV);
+        Out.vColor *= g_Mask.Sample(MirrorSampler, vUV);
     }
     
     Out.vColor.xyz *= g_vColor;

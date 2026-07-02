@@ -26,6 +26,7 @@
     <ClInclude Include="..\Public\BladeKnight_State_DoubleAttack.h" />
     <ClInclude Include="..\Public\BladeKnight_Sword.h" />
     <ClInclude Include="..\Public\BladeKnight_State_TornadoAttack.h" />
+    <ClInclude Include="..\Public\BombExplosion.h" />
     <ClInclude Include="..\Public\BoostGas.h" />
     <ClInclude Include="..\public\Boss.h" />
     <ClInclude Include="..\public\BossBase.h" />
@@ -40,6 +41,7 @@
     <ClInclude Include="..\Public\BrontoBurt_Brain.h" />
     <ClInclude Include="..\Public\BrontoBurt_State_Idle.h" />
     <ClInclude Include="..\Public\BrontoBurt_State_Return.h" />
+    <ClInclude Include="..\Public\Bubble.h" />
     <ClInclude Include="..\public\CameraDirector.h" />
     <ClInclude Include="..\Public\Camera_AreaData.h" />
     <ClInclude Include="..\public\Camera_AreaCam.h" />
@@ -54,10 +56,14 @@
     <ClInclude Include="..\Public\Car_00_MilkyWay.h" />
     <ClInclude Include="..\Public\Character.h" />
     <ClInclude Include="..\Public\Character_States.h" />
+    <ClInclude Include="..\Public\CommonHit.h" />
     <ClInclude Include="..\Public\Common_Circle01.h" />
     <ClInclude Include="..\Public\Common_Curve03.h" />
     <ClInclude Include="..\Public\Common_JumpSlash.h" />
     <ClInclude Include="..\Public\Common_Ring03.h" />
+    <ClInclude Include="..\Public\SphereMesh.h" />
+    <ClInclude Include="..\Public\SphereParticle.h" />
+    <ClInclude Include="..\Public\Common_SphereNoise.h" />
     <ClInclude Include="..\Public\Common_SpinSlash.h" />
     <ClInclude Include="..\Public\Common_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\DespawnEffect.h" />
@@ -68,6 +74,7 @@
     <ClInclude Include="..\Public\GetAbilityEffect.h" />
     <ClInclude Include="..\public\Gorilla_Ring.h" />
     <ClInclude Include="..\public\Gorilla_Swing.h" />
+    <ClInclude Include="..\Public\HitMark.h" />
     <ClInclude Include="..\Public\Kirby_DeformCar_Demo.h" />
     <ClInclude Include="..\Public\Kirby_DeformCar_Main.h" />
     <ClInclude Include="..\Public\Kirby_Deform_Car.h" />
@@ -92,6 +99,8 @@
     <ClInclude Include="..\public\Shockwave.h" />
     <ClInclude Include="..\Public\SmokeParticle.h" />
     <ClInclude Include="..\Public\Star2DParticle.h" />
+    <ClInclude Include="..\Public\SpitObject.h" />
+    <ClInclude Include="..\Public\StarEmitter.h" />
     <ClInclude Include="..\Public\StarParticle.h" />
     <ClInclude Include="..\public\SpinWind.h" />
     <ClInclude Include="..\Public\SwordCharge.h" />
@@ -309,6 +318,7 @@
     <ClCompile Include="..\Private\BladeKnight_State_DoubleAttack.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Sword.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State_TornadoAttack.cpp" />
+    <ClCompile Include="..\Private\BombExplosion.cpp" />
     <ClCompile Include="..\Private\BoostGas.cpp" />
     <ClCompile Include="..\private\Boss.cpp" />
     <ClCompile Include="..\private\BossBase.cpp" />
@@ -323,6 +333,7 @@
     <ClCompile Include="..\Private\BrontoBurt_Brain.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_State_Idle.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_State_Return.cpp" />
+    <ClCompile Include="..\Private\Bubble.cpp" />
     <ClCompile Include="..\private\CameraDirector.cpp" />
     <ClCompile Include="..\Private\Camera_AreaSolver.cpp" />
     <ClCompile Include="..\private\Camera_AreaCam.cpp" />
@@ -335,6 +346,7 @@
     <ClCompile Include="..\Private\Cappy_Hat.cpp" />
     <ClCompile Include="..\Private\CarMilkyWay.cpp" />
     <ClCompile Include="..\Private\Car_00_MilkyWay.cpp" />
+    <ClCompile Include="..\Private\CommonHit.cpp" />
     <ClCompile Include="..\Private\EnvTrigger_EventPublisher.cpp" />
     <ClCompile Include="..\Private\EnvTrigger_RenderGlobals.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
@@ -342,6 +354,9 @@
     <ClCompile Include="..\Private\Common_Curve03.cpp" />
     <ClCompile Include="..\Private\Common_JumpSlash.cpp" />
     <ClCompile Include="..\Private\Common_Ring03.cpp" />
+    <ClCompile Include="..\Private\SphereMesh.cpp" />
+    <ClCompile Include="..\Private\SphereParticle.cpp" />
+    <ClCompile Include="..\Private\Common_SphereNoise.cpp" />
     <ClCompile Include="..\Private\Common_SpinSlash.cpp" />
     <ClCompile Include="..\Private\Common_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\DespawnEffect.cpp" />
@@ -350,6 +365,7 @@
     <ClCompile Include="..\Private\GetAbilityEffect.cpp" />
     <ClCompile Include="..\private\Gorilla_Ring.cpp" />
     <ClCompile Include="..\private\Gorilla_Swing.cpp" />
+    <ClCompile Include="..\Private\HitMark.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCar_Demo.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCar_Main.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform_Car.cpp" />
@@ -374,6 +390,8 @@
     <ClCompile Include="..\private\Shockwave.cpp" />
     <ClCompile Include="..\Private\SmokeParticle.cpp" />
     <ClCompile Include="..\Private\Star2DParticle.cpp" />
+    <ClCompile Include="..\Private\SpitObject.cpp" />
+    <ClCompile Include="..\Private\StarEmitter.cpp" />
     <ClCompile Include="..\Private\StarParticle.cpp" />
     <ClCompile Include="..\private\SpinWind.cpp" />
     <ClCompile Include="..\Private\SwordCharge.cpp" />

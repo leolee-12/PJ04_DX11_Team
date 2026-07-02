@@ -1,35 +1,35 @@
-#include "StarParticle.h"
+#include "SphereMesh.h"
 
 #include "GameInstance.h"
 
 #include "GameContent_const.h"
 
-CStarParticle::CStarParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CEffect_MeshParticle{ pDevice, pContext }
+CSphereMesh::CSphereMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+    : CEffect_Mesh{ pDevice, pContext }
 {
 }
 
-CStarParticle::CStarParticle(const CStarParticle& Prototype)
-    : CEffect_MeshParticle(Prototype)
+CSphereMesh::CSphereMesh(const CSphereMesh& Prototype)
+    : CEffect_Mesh(Prototype)
 {
 }
 
-HRESULT CStarParticle::Initialize_Prototype()
+HRESULT CSphereMesh::Initialize_Prototype()
 {
     m_eProjType = PROJ_TYPE::PERSPEC;
     return S_OK;
 }
 
-HRESULT CStarParticle::Initialize(void* pArg)
+HRESULT CSphereMesh::Initialize(void* pArg)
 {
-    STAR_PARTICLE_DESC tDesc{};
+    SPHERE_MESH_DESC tDesc{};
 
     tDesc.iModelLevel = m_iPrototypeLevel;
-    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_StarSmooth");
+    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_CommonSphere");
 
     if (pArg != nullptr)
     {
-        auto pIn = static_cast<STAR_PARTICLE_DESC*>(pArg);
+        auto pIn = static_cast<SPHERE_MESH_DESC*>(pArg);
         if (!pIn->wstrModelTag.empty())
             tDesc.wstrModelTag = pIn->wstrModelTag;
     }
@@ -55,17 +55,17 @@ HRESULT CStarParticle::Initialize(void* pArg)
     return S_OK;
 }
 
-void CStarParticle::Priority_Update(_float fTimeDelta)
+void CSphereMesh::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 }
 
-void CStarParticle::Update(_float fTimeDelta)
+void CSphereMesh::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 }
 
-void CStarParticle::Late_Update(_float fTimeDelta)
+void CSphereMesh::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 
@@ -73,43 +73,44 @@ void CStarParticle::Late_Update(_float fTimeDelta)
         return;
 
     Compute_CombinedWorldMatrix();
-    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::BLEND, this);      
 }
 
-HRESULT CStarParticle::Render()
+HRESULT CSphereMesh::Render()
 {
     __super::Render();
 
     return S_OK;
 }
 
-CStarParticle* CStarParticle::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSphereMesh* CSphereMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CStarParticle* pInstance = new CStarParticle(pDevice, pContext);
+    CSphereMesh* pInstance = new CSphereMesh(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX("Failed to Created: CStarParticle");
+        MSG_BOX("Failed to Created: CSphereMesh");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CStarParticle::Clone(void* pArg)
+CGameObject* CSphereMesh::Clone(void* pArg)
 {
-    CStarParticle* pInstance = new CStarParticle(*this);
+    CSphereMesh* pInstance = new CSphereMesh(*this);
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Cloned: CStarParticle");
+        MSG_BOX("Failed to Cloned: CSphereMesh");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CStarParticle::Free()
+void CSphereMesh::Free()
 {
     __super::Free();
 }

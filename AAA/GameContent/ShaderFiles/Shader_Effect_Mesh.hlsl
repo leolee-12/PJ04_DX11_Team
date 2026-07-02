@@ -197,7 +197,7 @@ float4 ComposeEffectColor_Linear(float2 vTexcoord)
     {
         Apply_CircleUVAnim(vTexcoord, g_bUseCircleUVAnim_D, g_fCircleUVRatio_D, g_fCircleUVStartDegree_D, g_bCircleUVClockwise_D);
         Apply_LinearUVAnim(vTexcoord, g_bUseLinearUVAnim_D, g_fLinearUVRatio_D, g_iLinearUVAxis_D, g_bLinearUVReverse_D);
-
+        
         float2 vUV = g_vDiffuseOffset + vTexcoord * g_vDiffuseTiling;
         vColor *= g_DiffuseTexture.Sample(LinearSampler, vUV);
     }

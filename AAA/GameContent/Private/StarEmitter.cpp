@@ -1,35 +1,35 @@
-#include "StarParticle.h"
+#include "StarEmitter.h"
 
 #include "GameInstance.h"
 
 #include "GameContent_const.h"
 
-CStarParticle::CStarParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CEffect_MeshParticle{ pDevice, pContext }
+CStarEmitter::CStarEmitter(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+    : CEffect_MeshEmitter{ pDevice, pContext }
 {
 }
 
-CStarParticle::CStarParticle(const CStarParticle& Prototype)
-    : CEffect_MeshParticle(Prototype)
+CStarEmitter::CStarEmitter(const CStarEmitter& Prototype)
+    : CEffect_MeshEmitter(Prototype)
 {
 }
 
-HRESULT CStarParticle::Initialize_Prototype()
+HRESULT CStarEmitter::Initialize_Prototype()
 {
     m_eProjType = PROJ_TYPE::PERSPEC;
     return S_OK;
 }
 
-HRESULT CStarParticle::Initialize(void* pArg)
+HRESULT CStarEmitter::Initialize(void* pArg)
 {
-    STAR_PARTICLE_DESC tDesc{};
+    STAR_EMITTER_DESC tDesc{};
 
     tDesc.iModelLevel = m_iPrototypeLevel;
     tDesc.wstrModelTag = TEXT("Prototype_Component_Model_StarSmooth");
 
     if (pArg != nullptr)
     {
-        auto pIn = static_cast<STAR_PARTICLE_DESC*>(pArg);
+        auto pIn = static_cast<STAR_EMITTER_DESC*>(pArg);
         if (!pIn->wstrModelTag.empty())
             tDesc.wstrModelTag = pIn->wstrModelTag;
     }
@@ -55,17 +55,17 @@ HRESULT CStarParticle::Initialize(void* pArg)
     return S_OK;
 }
 
-void CStarParticle::Priority_Update(_float fTimeDelta)
+void CStarEmitter::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 }
 
-void CStarParticle::Update(_float fTimeDelta)
+void CStarEmitter::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 }
 
-void CStarParticle::Late_Update(_float fTimeDelta)
+void CStarEmitter::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 
@@ -76,40 +76,40 @@ void CStarParticle::Late_Update(_float fTimeDelta)
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 
-HRESULT CStarParticle::Render()
+HRESULT CStarEmitter::Render()
 {
     __super::Render();
 
     return S_OK;
 }
 
-CStarParticle* CStarParticle::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CStarEmitter* CStarEmitter::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CStarParticle* pInstance = new CStarParticle(pDevice, pContext);
+    CStarEmitter* pInstance = new CStarEmitter(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX("Failed to Created: CStarParticle");
+        MSG_BOX("Failed to Created: CStarEmitter");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CStarParticle::Clone(void* pArg)
+CGameObject* CStarEmitter::Clone(void* pArg)
 {
-    CStarParticle* pInstance = new CStarParticle(*this);
+    CStarEmitter* pInstance = new CStarEmitter(*this);
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Cloned: CStarParticle");
+        MSG_BOX("Failed to Cloned: CStarEmitter");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CStarParticle::Free()
+void CStarEmitter::Free()
 {
     __super::Free();
 }

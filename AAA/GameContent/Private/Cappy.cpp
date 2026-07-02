@@ -8,6 +8,13 @@
 #include "Monster_StateMachine.h"
 #include "Monster_State_Idle.h"
 #include "Monster_Movement.h"
+#include "Monster_State_Fall.h"
+#include "Monster_State_Landing.h"
+#include "Monster_State_Spat.h"
+#include "Monster_State_Captured.h"
+#include "Monster_State_KnockBack.h"
+#include "Monster_State_KnockBackDeath.h"
+#include "Monster_State_KnockOut.h"
 
 CCappy::CCappy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -101,6 +108,46 @@ HRESULT CCappy::Ready_State()
 	Info.bLoop = true;
 	Info.fSpeed = 1.5f;
 	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CMonster_State_Idle::Create(Info))))
+		return E_FAIL;
+
+	// FALL
+	Info.strAniName = "Fall";
+	Info.bLoop = true;
+	Info.fSpeed = 1.5f;
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::FALL, CMonster_State_Fall::Create(Info))))
+		return E_FAIL;
+
+	// LANDING
+	Info.strAniName = "Landing";
+	Info.bLoop = false;
+	Info.fSpeed = 1.f;
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::LANDING, CMonster_State_Landing::Create(Info))))
+		return E_FAIL;
+
+	// KNOCKBACK
+	Info.strAniName = "Damage";
+	Info.bLoop = false;
+	Info.fSpeed = 2.0f;
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK, CMonster_State_KnockBack::Create(Info))))
+		return E_FAIL;
+
+	// KNOCKBACKDEATH
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_BACK_DEATH, CMonster_State_KnockBackDeath::Create(Info))))
+		return E_FAIL;
+
+	// KNOCKOUT
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::KNOCK_OUT, CMonster_State_KnockOut::Create(Info))))
+		return E_FAIL;
+
+	// CAPTURED
+	Info.bLoop = true;
+	Info.fSpeed = 1.25f;
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::CAPTURED, CMonster_State_Captured::Create(Info))))
+		return E_FAIL;
+
+	// SPAT
+	Info.fSpeed = 1.f;
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::SPAT, CMonster_State_Spat::Create(Info))))
 		return E_FAIL;
 
 	return S_OK;
