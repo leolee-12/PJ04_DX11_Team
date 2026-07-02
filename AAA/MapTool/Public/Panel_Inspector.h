@@ -25,8 +25,8 @@ public:
 	virtual void	Render() override;
 
 private:
-	void    Draw_Properties(IReflectable* pHolder);
-	_bool   Draw_Transform(CGameObject* pObject, const string& strSuffix = "");
+	_bool   Draw_Properties(IReflectable* pHolder);
+	_bool   Draw_Transform(CGameObject* pObject, const string & strSuffix = "");
 	void    Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject* pObject);
 	void    Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* pMapStage, CMapSection* pSection);
 	void    Draw_MeshLayerPanel(CGameObject* pObject);
