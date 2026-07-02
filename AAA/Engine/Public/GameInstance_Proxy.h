@@ -108,13 +108,13 @@ public: // InputDevice
     _long	Get_DIMouseMove(DIMM eMouseState);
     void	Disable_InputDeveice();
     void	Enable_InputDeveice();
-    _bool Key_Down(_ubyte byKeyID);
-    _bool Key_Up(_ubyte byKeyID);
-    _bool Key_Pressing(_ubyte byKeyID);
-    _bool Mouse_Down(DIMB eMouse);
-    _bool Mouse_Up(DIMB eMouse);
-    _bool Mouse_Pressing(DIMB eMouse);
-    POINT Get_MousePos();
+    _bool   Key_Down(_ubyte byKeyID);
+    _bool   Key_Up(_ubyte byKeyID);
+    _bool   Key_Pressing(_ubyte byKeyID);
+    _bool   Mouse_Down(DIMB eMouse);
+    _bool   Mouse_Up(DIMB eMouse);
+    _bool   Mouse_Pressing(DIMB eMouse);
+    POINT   Get_MousePos();
 #pragma endregion
 
 #pragma region CAMERAMANAGER
@@ -236,6 +236,9 @@ public:
       HRESULT Bind_ShaderGlobals(class CShader* pShader, const string& strName);
       HRESULT Bind_ShaderGlobals(class CShader* pShader, initializer_list<const _char*> Names);
       void    Set_ShaderGlobal(const string& strName, const _float4& vValue);
+      void    Tween_ShaderGlobal(const string& strName, const _float4& vTarget, _float fDuration);
+      void    Stop_ShaderGlobalTween(const string& strName);
+      _bool   Is_ShaderGlobalTweening(const string& strName) const;
       vector<GLOBAL_DESC>& Get_ShaderGlobals();
       const _float4* Get_ShaderGlobal(const string& strName) const;
 #pragma endregion

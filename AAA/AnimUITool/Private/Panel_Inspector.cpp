@@ -884,7 +884,7 @@ void CPanel_Inspector::Render_UIInspector()
 
     struct { RENDERUIID v; const char* n; } layers[] = {
         { RENDERUIID::BACK, "BACK" }, { RENDERUIID::MIDDLE, "MIDDLE" }, { RENDERUIID::FRONT, "FRONT" },
-        { RENDERUIID::CURTAIN, "CURTAIN" }
+        { RENDERUIID::CURTAIN, "CURTAIN" }, {RENDERUIID::FLASH, "FLASH"}
     };
     const char* szCur = "?";
     for (auto& L : layers) if (L.v == pPart->Get_RenderLayer()) szCur = L.n;

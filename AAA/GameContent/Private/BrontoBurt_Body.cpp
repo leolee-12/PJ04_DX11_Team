@@ -64,7 +64,7 @@ HRESULT CBrontoBurt_Body::Render()
                 return E_FAIL;
         }
 
-        if (FAILED(m_pShaderCom->Begin(0)))   // eye pass
+        if (FAILED(m_pShaderCom->Begin(1)))   // eye pass
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render(i)))
@@ -77,7 +77,7 @@ HRESULT CBrontoBurt_Body::Render()
 HRESULT CBrontoBurt_Body::Ready_Components()
 {
     PART_SETUP t{};
-    t.tShader = Shader_AnimMesh_PBR;
+    t.tShader = Shader_Monster;
     t.szModelProtoTag =
         TEXT("Prototype_Component_Model_BrontoBurt_Body");
     t.szAnimEventFile = TEXT("../../Resources/CHJ/Monster/BrontoBurt/BrontoBurt_AnimEvents.json");

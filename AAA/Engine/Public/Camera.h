@@ -46,7 +46,7 @@ public:
 protected:	
 	_float4x4		m_ProjMatrix = {};
 
-	class CPipeLine* m_pPipeLine = { nullptr };
+	_float3 m_vShadowDir = { 0.071f, -0.940f, 0.335f };
 
 protected:
 	void Update_PipeLine();

@@ -65,6 +65,8 @@
     <ClInclude Include="..\Public\EnvTrigger_EventPublisher.h" />
     <ClInclude Include="..\Public\EnvTrigger_Generic.h" />
     <ClInclude Include="..\Public\EnvTrigger_RenderGlobals.h" />
+    <ClInclude Include="..\public\Gorilla_Ring.h" />
+    <ClInclude Include="..\public\Gorilla_Swing.h" />
     <ClInclude Include="..\Public\Kirby_DeformCar_Demo.h" />
     <ClInclude Include="..\Public\Kirby_DeformCar_Main.h" />
     <ClInclude Include="..\Public\Kirby_Deform_Car.h" />
@@ -85,9 +87,11 @@
     <ClInclude Include="..\Public\SmokeEmitter.h" />
     <ClInclude Include="..\public\RockPull.h" />
     <ClInclude Include="..\public\RockPush.h" />
+    <ClInclude Include="..\public\Shockwave.h" />
     <ClInclude Include="..\Public\SmokeParticle.h" />
     <ClInclude Include="..\Public\StarParticle.h" />
     <ClInclude Include="..\public\SpinWind.h" />
+    <ClInclude Include="..\public\Swing_Smoke.h" />
     <ClInclude Include="..\Public\Sword_SpinSlashTrail.h" />
     <ClInclude Include="..\Public\MeshLayer_Binder.h" />
     <ClInclude Include="..\Public\MeshLayer_Profile.h" />
@@ -338,6 +342,8 @@
     <ClCompile Include="..\Private\DespawnEffect.cpp" />
     <ClCompile Include="..\private\DeathSmoke.cpp" />
     <ClCompile Include="..\Private\EnvTrigger_Generic.cpp" />
+    <ClCompile Include="..\private\Gorilla_Ring.cpp" />
+    <ClCompile Include="..\private\Gorilla_Swing.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCar_Demo.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCar_Main.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform_Car.cpp" />
@@ -358,9 +364,11 @@
     <ClCompile Include="..\Private\SmokeEmitter.cpp" />
     <ClCompile Include="..\private\RockPull.cpp" />
     <ClCompile Include="..\private\RockPush.cpp" />
+    <ClCompile Include="..\private\Shockwave.cpp" />
     <ClCompile Include="..\Private\SmokeParticle.cpp" />
     <ClCompile Include="..\Private\StarParticle.cpp" />
     <ClCompile Include="..\private\SpinWind.cpp" />
+    <ClCompile Include="..\private\Swing_Smoke.cpp" />
     <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp" />
     <ClCompile Include="..\Private\MeshLayer_Binder.cpp" />
     <ClCompile Include="..\Private\MeshLayer_Profile.cpp" />
@@ -551,6 +559,7 @@
     <FxCompile Include="..\ShaderFiles\Shader_Kirby.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_MapEx.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_MaterialTest.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_Monster.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_SkySphere.hlsl" />
     <FxCompile Include="..\ShaderFiles\Shader_UI.hlsl">

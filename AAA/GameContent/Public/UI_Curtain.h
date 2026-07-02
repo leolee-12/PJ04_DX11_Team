@@ -14,6 +14,7 @@ class CLIENT_DLL CUI_Curtain final : public CUI_CurtainAnimBase
     GENERATED_BODY(CUI_Curtain)
 
     PROPERTY(_float4, m_vColor, L"Color", L"UI");
+    PROPERTY(_bool, m_bAdditive, L"Additive", L"UI")
 
 public:
     typedef struct tagUICurtainDesc : public CUI_CurtainAnimBase::UI_CURTAINANIM_DESC
@@ -33,7 +34,7 @@ public:
     virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOut) override { pOut->strPrototypeTag = PROTOTYPE_TAG; }
 
 protected:
-    virtual _uint   Render_Pass() const override { return 8; }      // CurtainFill
+    virtual _uint   Render_Pass() const override { return m_bAdditive ? 11 : 8; }      // CurtainFill
     virtual HRESULT Bind_Material(CShader* pShader) override;
 
 public:

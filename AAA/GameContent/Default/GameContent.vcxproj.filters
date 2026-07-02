@@ -880,6 +880,18 @@
     <Filter Include="00. GameObject\01. Map\Section">
       <UniqueIdentifier>{ec37b494-e272-4b95-b84e-14f77ae35aef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\05. Gorilla_Swing">
+      <UniqueIdentifier>{56174e45-60e7-49aa-8781-81edf97becf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SwingEffect">
+      <UniqueIdentifier>{29efe63d-79c4-449b-a474-052109dc93dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\06. Gorilla_Ring">
+      <UniqueIdentifier>{c9f6dfc2-48b9-4927-8563-c108eb1ab4de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\Shockwave">
+      <UniqueIdentifier>{8b96a12e-2bca-49bc-8a21-8793a67b9ee5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1692,6 +1704,18 @@
     <ClInclude Include="..\Public\MapBreakSection.h">
       <Filter>00. GameObject\01. Map\Section</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Gorilla_Swing.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\05. Gorilla_Swing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Swing_Smoke.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SwingEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Shockwave.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\Shockwave</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Gorilla_Ring.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\06. Gorilla_Ring</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2425,7 +2449,19 @@
     </ClCompile>
     <ClCompile Include="..\Private\MapBreakSection.cpp">
       <Filter>00. GameObject\01. Map\Section</Filter>
-	</ClCompile>
+    </ClCompile>
+    <ClCompile Include="..\private\Gorilla_Swing.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\05. Gorilla_Swing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Swing_Smoke.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SwingEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Shockwave.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\Shockwave</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Gorilla_Ring.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\06. Gorilla_Ring</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl">
@@ -2462,6 +2498,9 @@
       <Filter>98. ShaderFiles\Hojun</Filter>
     </FxCompile>
     <FxCompile Include="..\ShaderFiles\Shader_EffectRock.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_Monster.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </FxCompile>
   </ItemGroup>

@@ -99,7 +99,7 @@ HRESULT CKirby_SwordHat::Render()
 HRESULT CKirby_SwordHat::Ready_Components()
 {
     /* For.Com_Shader */
-    m_pShaderCom = Add_Component<CShader>(Shader_AnimMesh_PBR.iLevelID, Shader_AnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
+    m_pShaderCom = Add_Component<CShader>(Shader_Kirby.iLevelID, Shader_Kirby.szProtoTag, TEXT("Com_Shader"));
     if (m_pShaderCom == nullptr)
         return E_FAIL;
 

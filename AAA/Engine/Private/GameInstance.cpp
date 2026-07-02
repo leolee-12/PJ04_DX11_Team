@@ -153,6 +153,8 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 
 	m_pInput_Device->Update();
 
+    m_pShaderGlobal_Manager->Tick(fTimeDelta);
+
     m_pObject_Manager->Priority_Update(fTimeDelta);
     m_pObject_Manager->Update(fTimeDelta);
 	m_pCamera_Manager->Update();
@@ -173,7 +175,7 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 
 HRESULT CGameInstance::Begin_Draw()
 {
-    _float4     vColor = _float4(0.f, 0.f, 0.f, 1.f);
+    _float4     vColor = _float4(0.f, 1.f, 0.f, 1.f);
 
     if (FAILED(m_pGraphic_Device->Bind_BackBuffer()))
 		return E_FAIL;

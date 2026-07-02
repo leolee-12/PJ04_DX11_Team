@@ -872,6 +872,27 @@ void CGameInstance_Proxy::Set_ShaderGlobal(const string& strName, const _float4&
 
 	m_pOwner->m_pShaderGlobal_Manager->Set(strName, vValue);
 }
+void CGameInstance_Proxy::Tween_ShaderGlobal(const string& strName, const _float4& vTarget, _float fDuration)
+{
+	if (!IsConnected())
+		return;
+
+	m_pOwner->m_pShaderGlobal_Manager->Tween(strName, vTarget, fDuration);
+}
+void CGameInstance_Proxy::Stop_ShaderGlobalTween(const string& strName)
+{
+	if (!IsConnected())
+		return;
+
+	m_pOwner->m_pShaderGlobal_Manager->Stop_Tween(strName);
+}
+_bool CGameInstance_Proxy::Is_ShaderGlobalTweening(const string& strName) const
+{
+	if (!IsConnected())
+		return false;
+
+	return m_pOwner->m_pShaderGlobal_Manager->Is_Tweening(strName);
+}
 vector<GLOBAL_DESC>& CGameInstance_Proxy::Get_ShaderGlobals()
 {
 	if (!IsConnected())
