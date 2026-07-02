@@ -3,10 +3,14 @@
 #include "Texture.h"
 
 CUI_CurtainTexture::CUI_CurtainTexture(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CUI_CurtainAnimBase{ pDevice, pContext }, m_vColor{ 1.f, 1.f, 1.f, 1.f } {
+    : CUI_CurtainAnimBase{ pDevice, pContext }, m_vColor{ 1.f, 1.f, 1.f, 1.f } 
+    , m_bAdditive{ false } 
+{
 }
 CUI_CurtainTexture::CUI_CurtainTexture(const CUI_CurtainTexture& Prototype)
-    : CUI_CurtainAnimBase(Prototype), m_vColor{ Prototype.m_vColor } {
+    : CUI_CurtainAnimBase(Prototype), m_vColor{ Prototype.m_vColor } 
+    , m_bAdditive{ Prototype.m_bAdditive } 
+{
 }
 
 HRESULT CUI_CurtainTexture::Initialize(void* pArg)

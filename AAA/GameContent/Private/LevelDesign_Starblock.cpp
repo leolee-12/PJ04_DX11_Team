@@ -179,7 +179,8 @@ void CLevelDesign_Starblock::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 void CLevelDesign_Starblock::Damaged(const ATTACK_INFO& tInfo)
 {
 	UNREFERENCED_PARAMETER(tInfo);
-	
+
+	Release_PhysicsActor();
 	Set_Active(false);
 }
 #pragma endregion

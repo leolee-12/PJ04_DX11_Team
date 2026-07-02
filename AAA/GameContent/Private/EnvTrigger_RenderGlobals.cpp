@@ -133,17 +133,17 @@ void CEnvTrigger_RenderGlobals::Apply_RenderGlobals()
 {
 	const auto SetBool = [this](const string& strName, _bool bValue)
 		{
-			m_pGameInstance_Proxy->Set_ShaderGlobal(strName, _float4(bValue ? 1.f : 0.f, 0.f, 0.f, 0.f));
+			m_pGameInstance_Proxy->Tween_ShaderGlobal(strName, _float4(bValue ? 1.f : 0.f, 0.f, 0.f, 0.f), m_fInTransitionSec);
 		};
 
 	const auto SetFloat = [this](const string& strName, _float fValue)
 		{
-			m_pGameInstance_Proxy->Set_ShaderGlobal(strName, _float4(fValue, 0.f, 0.f, 0.f));
+			m_pGameInstance_Proxy->Tween_ShaderGlobal(strName, _float4(fValue, 0.f, 0.f, 0.f), m_fInTransitionSec);
 		};
 
 	const auto SetFloat3 = [this](const string& strName, const _float3& vValue)
 		{
-			m_pGameInstance_Proxy->Set_ShaderGlobal(strName, _float4(vValue.x, vValue.y, vValue.z, 0.f));
+			m_pGameInstance_Proxy->Tween_ShaderGlobal(strName, _float4(vValue.x, vValue.y, vValue.z, 0.f), m_fInTransitionSec);
 		};
 
 	SetFloat("g_fSSAORadius", m_fSSAORadius);

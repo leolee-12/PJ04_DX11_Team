@@ -11,6 +11,9 @@ Texture2D g_WetMaskTexture; // _a4  WetMask          (¸Ó±Ý±â/Á¥À½)
 Texture2D g_WarpTexture; // _a5  Warp             (ÈíÀÔ ¿Ö°î, ¿É¼Ç/¹Ì»ç¿ë)
 Texture2D g_NormalTexture; // _n0  KirbyEyeNormal.0X
 
+Texture2D g_DiffuseTexture;
+Texture2D g_MRATexture;
+
 float4 g_vBodyColor = float4(1.f, 0.45f, 0.55f, 1.f); // ¸ö  = KirbySkin °ËÁ¤ ¿µ¿ª
 float4 g_vFootColor = float4(1.f, 0.1882353f, 0.3764706f, 1.f); // ¹ß  = G Ã¤³Î ÃÊ·Ï
 float4 g_vBlushColor = float4(1.f, 0.25f, 0.4f, 1.f); // È«Á¶ = R Ã¤³Î »¡°­
@@ -20,6 +23,10 @@ float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
 
 float g_fWetStrength = 0.f;
 uint g_iMaterialID = 0;
+
+float4 g_vConstantDiffuse = float4(1.f, 1.f, 1.f, 1.f);
+float3 g_vConstantMRA = float3(0.f, 1.f, 1.f);
+float4 g_vConstantEmissive = float4(0.f, 0.f, 0.f, 1.f);
 
 static const float3 EYE_WHITE = float3(1.f, 1.f, 1.f);
 static const float3 EYE_BLUE = float3(0.12f, 0.45f, 1.f);
@@ -156,17 +163,51 @@ PS_OUT PS_BODY(PS_IN In)
     return Out;
 }
 
-PS_OUT PS_MASK_DEBUG(PS_IN In)
+PS_OUT PS_PART(PS_IN In)
 {
-    PS_OUT Out = (PS_OUT) 0;
-    float4 vMask = g_SkinTexture.Sample(LinearSampler, In.vTexcoord1);
-    Out.vDiffuse = float4(vMask.rgb, 1.f);
-    Out.vNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
-    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(0.f, 1.f, 1.f, 1.f);
-    Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
+    PS_OUT Out;
+
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    
+    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    
+    float3 N = normalize(In.vNormal);
+    float3 T = normalize(In.vTangent.xyz);
+    float3 B = normalize(In.vBinormal.xyz);
+  
+    float3x3 TBN = float3x3(T, B, N);
+
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, In.vTexcoord1).rg;
+    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+    
+    float3 Nw = mul(nTS, TBN);
+
+    if (vMtrlDiffuse.a < 0.1f)
+        discard;
+
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(Nw * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(mra, 1.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vMtrlDiffuse.a, 1.f);
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
     Out.vMaterialID = g_iMaterialID;
+    
+    return Out;
+}
+
+PS_OUT PS_CONSTANT_MATERIAL(PS_IN In)
+{
+    PS_OUT Out;
+
+    Out.vDiffuse = g_vConstantDiffuse;
+    Out.vNormal = float4(normalize(In.vNormal).xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(g_vConstantMRA, 1.f);
+    Out.vEmissive = g_vConstantEmissive;
+    Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
+
     return Out;
 }
 
@@ -182,15 +223,24 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_BODY();
     }
-
-    pass MaskDebug // 1
+    pass Part // 1
     {
         SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
+        SetDepthStencilState(DSS_MarkOccluded, 1);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MASK_DEBUG();
+        PixelShader = compile ps_5_0 PS_PART();
+    }
+    pass Constant_Material // 2
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_MarkOccluded, 1);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_CONSTANT_MATERIAL();
     }
 }

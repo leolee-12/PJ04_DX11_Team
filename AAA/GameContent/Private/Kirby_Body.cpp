@@ -252,6 +252,9 @@ HRESULT CKirby_Body::Render_KirbyMesh(_uint iMeshIndex)
     if (FAILED(m_pEyeTextureCom->Bind_ShaderResource(m_pKirbyShaderCom, "g_EyeTexture", ETOUI(m_eEye))))
         return E_FAIL;
 
+    if (FAILED(m_pEyeTextureCom->Bind_ShaderResource(m_pKirbyShaderCom, "g_NormalTexture", ETOUI(m_eEye))))
+        return E_FAIL;
+
     if (FAILED(m_pEyeMaskTextureCom->Bind_ShaderResource(m_pKirbyShaderCom, "g_EyeMaskTexture", ETOUI(m_eEye))))
         return E_FAIL;
 

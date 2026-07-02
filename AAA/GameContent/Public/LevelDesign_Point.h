@@ -4,6 +4,7 @@
 NS_BEGIN(Engine)
 class CShader;
 class CModel;
+class CCollider; 
 NS_END
 
 NS_BEGIN(Client)
@@ -42,8 +43,12 @@ public:
 private:
 	CShader*	m_pShaderCom = nullptr;
 	CModel*		m_pModelCom = nullptr;
+	CCollider*	m_pPickupCollider = nullptr;
+	_bool		m_bPickupColliderRegistered = { false };
 
 	LD_POINT_DESC	m_tPointDesc = {};
+	_float4			m_vRenderColor = { 1.f, 1.f, 1.f, 1.f };
+	_bool			m_bRotate = { false };
 
 private:
 	virtual HRESULT	Validate_Desc() override;
@@ -52,6 +57,11 @@ private:
 	HRESULT			Bind_ShaderResources();
 	HRESULT			Render_Model();
 	const _tchar*	Resolve_ModelProtoTag() const;
+
+	HRESULT			Ready_PickupCollider();
+	void			SetUp_Collider_Callback();
+	void			Handle_Pickup(CCollider* pOther);
+	void			Unregister_PickupCollider(_bool bImmediate);
 
 public:
 	static CLevelDesign_Point* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

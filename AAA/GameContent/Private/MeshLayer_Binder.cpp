@@ -307,6 +307,7 @@ namespace
 		const _float fUVRotate = Layer.bUseUVTransform ? Layer.fUVRotate : 0.f;
 		const _float fNormalStrength = Layer.fNormalStrength;
 		const _float fMaskStrength = Layer.fMaskStrength;
+		const _bool bBindRenderColor = Ctx.eProfile == MESH_LAYER_PROFILE::NONANIM_PBR || Ctx.eProfile == MESH_LAYER_PROFILE::ENV_INSTANCE;
 
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint)))) return E_FAIL;
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iUnknownUVIndex", &iUnknownUVIndex, sizeof(_uint)))) return E_FAIL;
@@ -317,6 +318,11 @@ namespace
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_fUVRotate", &fUVRotate, sizeof(_float)))) return E_FAIL;
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_NormalStrength", &fNormalStrength, sizeof(_float)))) return E_FAIL;
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_MaskStrength", &fMaskStrength, sizeof(_float)))) return E_FAIL;
+
+		if (bBindRenderColor)
+		{
+			if (FAILED(Ctx.pShader->Bind_RawValue("g_vColor", &Layer.vRenderColor, sizeof(_float4)))) return E_FAIL;
+		}
 
 		if (bBindEnvFlags)
 		{

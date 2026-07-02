@@ -9,8 +9,9 @@
 #include "DataLoader.h"
 #include "Loader_Prototype.h"
 
-#include "Level_GamePlay.h"
 #include "Level_Test.h"
+#include "Stage0_Step1.h"
+#include "Stage0_Step2.h"
 #include "Town_Step1.h"
 #include "Boss_Stage1.h"
 
@@ -49,8 +50,11 @@ void CLevel_Loading::Update(_float fTimeDelta)
 
         switch (m_eNextLevelID)
         {
-        case LEVEL::GAMEPLAY:
-            pNextLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
+        case LEVEL::STAGE0_STEP1:
+            pNextLevel = CStage0_Step1::Create(m_pDevice, m_pContext);
+            break;
+        case LEVEL::STAGE0_STEP2:
+            pNextLevel = CStage0_Step2::Create(m_pDevice, m_pContext);
             break;
         case LEVEL::TEST:
             pNextLevel = CLevel_Test::Create(m_pDevice, m_pContext);

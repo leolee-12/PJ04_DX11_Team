@@ -178,8 +178,12 @@ HRESULT CLoader::Ready_WorkQueue()
         break;
     case LEVEL::LOADING:
         break;
-    case LEVEL::GAMEPLAY:
-        if (FAILED(Read_Manifest(LAUNCHER_LEVEL_PROFILES::LEVEL_STAGE0_STEP1, LEVEL::GAMEPLAY)))
+    case LEVEL::STAGE0_STEP1:
+        if (FAILED(Read_Manifest(LAUNCHER_LEVEL_PROFILES::LEVEL_STAGE0_STEP1, LEVEL::STAGE0_STEP1)))
+            return E_FAIL;
+        break;
+    case LEVEL::STAGE0_STEP2:
+        if (FAILED(Read_Manifest(LAUNCHER_LEVEL_PROFILES::LEVEL_STAGE0_STEP2, LEVEL::STAGE0_STEP2)))
             return E_FAIL;
         break;
     case LEVEL::TEST:

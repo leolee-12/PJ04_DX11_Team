@@ -8,6 +8,7 @@
 #include "Map_EditFile.h"
 #include "Map_EditSession.h"
 #include "EnvObject.h"
+#include "EnvTrigger_RenderGlobals.h"
 #include "LevelDesign_Starblock.h"
 #include "LevelDesign_Breakable.h"
 #include "LevelDesign_Bush.h"
@@ -476,9 +477,11 @@ void CPanel_Inspector::Render()
 		return;
 	}
 
+	_bool bRenderGlobalsDirty = false;
+
 	Draw_Transform(pSelected);
 
-	if (dynamic_cast<Client::CEnvObject*>(pSelected))
+	if (dynamic_cast<CEnvObject*>(pSelected))
 	{
 		ImGui::Separator();
 		Draw_EnvObjectEditPanel(pLevel, pSelected);
@@ -486,9 +489,15 @@ void CPanel_Inspector::Render()
 
 	ImGui::Separator();
 	Draw_MeshLayerPanel(pSelected);
+
 	ImGui::Separator();
-	ImGui::Separator();
-	Draw_Properties(pSelected);
+	bRenderGlobalsDirty |= Draw_Properties(pSelected);
+
+	if (bRenderGlobalsDirty)
+	{
+		if (auto* pRenderGlobals = dynamic_cast<Client::CEnvTrigger_RenderGlobals*>(pSelected))
+			pRenderGlobals->Apply_RenderGlobals();
+	}
 
 	for (auto& [tag, pComponent] : pSelected->Get_Components())
 	{
@@ -552,14 +561,15 @@ void CPanel_Inspector::Render()
 	End_Panel();
 }
 
-void CPanel_Inspector::Draw_Properties(IReflectable* pHolder)
+_bool CPanel_Inspector::Draw_Properties(IReflectable* pHolder)
 {
+	_bool bChanged = false;
 	string strCurrentCategory = {};
 
 	const _bool bSkipEnvObjectCategory =
-		nullptr != dynamic_cast<Client::CEnvObject*>(pHolder);
+		nullptr != dynamic_cast<CEnvObject*>(pHolder);
 	const _bool bSkipMapSectionCategory =
-		nullptr != dynamic_cast<Client::CMapSection*>(pHolder);
+		nullptr != dynamic_cast<CMapSection*>(pHolder);
 
 	for (auto& prop : pHolder->Get_Properties())
 	{
@@ -585,27 +595,33 @@ void CPanel_Inspector::Draw_Properties(IReflectable* pHolder)
 		{
 		case PROP_TYPE::INT:
 			ImGui::Text(strPropName.c_str());
-			ImGui::InputInt(("##" + strPropName).c_str(), (int*)pData);
+			if (ImGui::InputInt(("##" + strPropName).c_str(), (int*)pData))
+				bChanged = true;
 			break;
 		case PROP_TYPE::FLOAT:
 			ImGui::Text(strPropName.c_str());
-			ImGui::DragFloat(("##" + strPropName).c_str(), (float*)pData, 0.1f);
+			if (ImGui::DragFloat(("##" + strPropName).c_str(), (float*)pData, 0.1f))
+				bChanged = true;
 			break;
 		case PROP_TYPE::BOOL:
 			ImGui::Text(strPropName.c_str());
-			ImGui::Checkbox(("##" + strPropName).c_str(), (bool*)pData);
+			if (ImGui::Checkbox(("##" + strPropName).c_str(), (bool*)pData))
+				bChanged = true;
 			break;
 		case PROP_TYPE::FLOAT2:
 			ImGui::Text(strPropName.c_str());
-			ImGui::DragFloat2(("##" + strPropName).c_str(), (float*)pData, 0.1f);
+			if (ImGui::DragFloat2(("##" + strPropName).c_str(), (float*)pData, 0.1f))
+				bChanged = true;
 			break;
 		case PROP_TYPE::FLOAT3:
 			ImGui::Text(strPropName.c_str());
-			ImGui::DragFloat3(("##" + strPropName).c_str(), (float*)pData, 0.1f);
+			if (ImGui::DragFloat3(("##" + strPropName).c_str(), (float*)pData, 0.1f))
+				bChanged = true;
 			break;
 		case PROP_TYPE::FLOAT4:
 			ImGui::Text(strPropName.c_str());
-			ImGui::DragFloat4(("##" + strPropName).c_str(), (float*)pData, 0.1f);
+			if (ImGui::DragFloat4(("##" + strPropName).c_str(), (float*)pData, 0.1f))
+				bChanged = true;
 			break;
 		case PROP_TYPE::ANIM_INDEX:
 		{
@@ -623,7 +639,10 @@ void CPanel_Inspector::Draw_Properties(IReflectable* pHolder)
 			ImGui::Text(strPropName.c_str());
 			ImGui::PushID(strPropName.c_str());
 			if (ImGui::Combo(("##" + strPropName).c_str(), &iVal, strItems.c_str()))
+			{
 				*(_uint*)pData = (_uint)iVal;
+				bChanged = true;
+			}
 			ImGui::PopID();
 			break;
 		}
@@ -634,11 +653,16 @@ void CPanel_Inspector::Draw_Properties(IReflectable* pHolder)
 			char buf[256] = {};
 			strcpy_s(buf, str.c_str());
 			if (ImGui::InputText(("##" + strPropName).c_str(), buf, sizeof(buf)))
+			{
 				*pWstr = StrToWstr(buf);
+				bChanged = true;
+			}
 			break;
 		}
 		}
 	}
+
+	return bChanged;
 }
 
 _bool CPanel_Inspector::Draw_Transform(CGameObject* pObject, const string& strSuffix)
@@ -1566,6 +1590,13 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 		{
 			Layer.iPass = Get_EnvShaderPassFromComboIndex(iPassCombo);
 			bChanged = true;
+		}
+
+		if (Layer.iPass == ETOI(ENV_PASS::COLOR))
+		{
+			ImGui::SetNextItemWidth(180.f);
+			if (ImGui::ColorEdit4("Render Color##MeshLayer", (float*)&Layer.vRenderColor))
+				bChanged = true;
 		}
 
 		if (Ui.bEnvObjectMeshUi)
