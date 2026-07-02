@@ -41,6 +41,8 @@ public:
 	virtual HRESULT Render() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
+	virtual HRESULT Ready_AnimEvents(CKirby* pKirby) override;
+
 private:
 	HRESULT Ready_Components();
 

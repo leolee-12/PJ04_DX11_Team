@@ -42,6 +42,7 @@ namespace ProtoDesc
 	inline constexpr SHADER_DESC Shader_Monster = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Monster"), TEXT("../Bin/ShaderFiles/Shader_Monster.hlsl") };
 	inline constexpr SHADER_DESC Shader_Bomb = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Bomb"), TEXT("../Bin/ShaderFiles/Shader_Bomb.hlsl") };
 	inline constexpr SHADER_DESC Shader_EffectRock = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_EffectRock"), TEXT("../Bin/ShaderFiles/Shader_EffectRock.hlsl") };
+	inline constexpr SHADER_DESC Shader_Ring = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Ring"), TEXT("../Bin/ShaderFiles/Shader_Ring.hlsl") };
 
 
 	inline constexpr SHADER_DESC Shader_AnimMesh_PBR = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_AnimMesh_PBR"), TEXT("../Bin/ShaderFiles/Shader_AnimMesh_PBR.hlsl") };
@@ -78,6 +79,9 @@ namespace ProtoDesc
 	inline constexpr TEXTURE_DESC Texture_Common_SpinSlash_2 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_SpinSlash_2"), TEXT("../../Resources/YSE/Effect/Common_SpinSlash/SpinSlash_2.png"), 1 };
 	// SpinSlashTrail
 	inline constexpr TEXTURE_DESC Texture_Common_SpinSlashTrail = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_SpinSlashTrail"), TEXT("../../Resources/YSE/Effect/Common_SpinSlashTrail/common_ring02.png"), 1 };
+
+	// Star2D
+	inline constexpr TEXTURE_DESC Texture_Star2D = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Star2D"), TEXT("../../Resources/YSE/Effect/Star2D/common_star01.png"), 1 };
 
 	//sky
 	inline constexpr COMPONENT_DESC Model_SkyTest = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_SkyTest") };
