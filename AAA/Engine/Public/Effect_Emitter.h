@@ -16,6 +16,8 @@ class ENGINE_DLL CEffect_Emitter abstract : public CEffect_Part
 PROPERTY(_uint, m_iEmitterMaxParticleCount, L"Max Count_E", L"Emitter - Emission");
 PROPERTY(_float, m_fEmitterRateOverTime, L"Rate Over Time_E", L"Emitter - Emission");
 PROPERTY(_uint, m_iEmitterBurstCount, L"Burst Count_E", L"Emitter - Emission");
+PROPERTY(_bool, m_bEmitterDetachParent, L"Detach Parent_E", L"Emitter Parent");
+PROPERTY(_float, m_fEmitterDetachParentRatio, L"Detach Parent Ratio_E", L"Emitter Parent");
 
 PROPERTY(_float, m_fEmitterLifeTime, L"Life Time_E", L"Emitter - Lifetime");
 PROPERTY(_bool, m_bEmitterRandomLifeTime, L"Random Life Time_E", L"Emitter - Lifetime");
@@ -85,6 +87,14 @@ PROPERTY(_float, m_fEmitterSize_Value_1, L"Size_Value 1_E", L"Emitter Size");
 // Emitter Color
 PROPERTY(_float3, m_vEmitterColor, L"Color_E", L"Emitter Color");
 
+PROPERTY(_bool, m_bEmitterRandomColor, L"Random Color_E", L"Emitter Color - Random");
+PROPERTY(_uint, m_iEmitterRandomColorCount, L"Random Color Count_E", L"Emitter Color - Random");
+PROPERTY(_float3, m_vEmitterRandomColor_0, L"Random Color 0_E", L"Emitter Color - Random");
+PROPERTY(_float3, m_vEmitterRandomColor_1, L"Random Color 1_E", L"Emitter Color - Random");
+PROPERTY(_float3, m_vEmitterRandomColor_2, L"Random Color 2_E", L"Emitter Color - Random");
+PROPERTY(_float3, m_vEmitterRandomColor_3, L"Random Color 3_E", L"Emitter Color - Random");
+PROPERTY(_float3, m_vEmitterRandomColor_4, L"Random Color 4_E", L"Emitter Color - Random");
+
 PROPERTY(_bool, m_bEmitterColorChange, L"Color Change_E", L"Emitter Color");
 PROPERTY(_float3, m_vEmitterColorStartValue, L"Color_Start_E", L"Emitter Color");
 PROPERTY(_float3, m_vEmitterColorEndValue, L"Color_End_E", L"Emitter Color");
@@ -124,6 +134,7 @@ protected:
         _float3 vScale{ 1.f, 1.f, 1.f };
 
         _float3 vColor{ 1.f, 1.f, 1.f };
+        _float3 vRandomColor{ 1.f, 1.f, 1.f };
 
         _float3 vLocalPos{};
         _float3 vVelocity{};
@@ -136,6 +147,10 @@ protected:
 
         _float3 vRotation{};
         _float3 vAngularVelocity{};
+
+        _bool bParentDetached{};
+        _bool bParentDetachPending{};
+        _float4x4 DetachedParentWorldMatrix{};
     };
 
 protected:
@@ -182,6 +197,9 @@ public:
 
     virtual void    Effect_Start() override;
 
+    void Stop_Emission();
+    _bool Is_EmissionFinished() const;
+
 protected:
     HRESULT Bind_ShaderValue();
 
@@ -190,6 +208,7 @@ protected:
 
     void Reset_Emitter();
     void Update_EmitterParticles(_float fTimeDelta);
+    void Update_EmitterParticleParentMatrices();
     void Emit_ByRate(_float fTimeDelta);
     void Emit_Particles(_uint iEmitCount);
     _bool Spawn_EmitterParticle();
@@ -202,6 +221,7 @@ protected:
 
     _vector Make_RandomSphereDirection() const;
     _vector Make_FountainDirection() const;
+    _float3 Select_EmitterRandomColor() const;
 
     void Update_EmitterParticleMove(EMITTER_PARTICLE& Particle);
     void Update_EmitterParticleAlpha(EMITTER_PARTICLE& Particle, _float fLocalRatio);
@@ -232,6 +252,8 @@ protected:
     _float m_fEmitterSpawnAccumulator{};
     _float m_fEmitterPreviousRatio{};
     _bool m_bEmitterWasActive{};
+    _bool m_bEmissionEnabled{ true };
+    _bool m_bEmitterParticlesUpdatedThisFrame{};
 
     _float3 m_fPivot{};
 
