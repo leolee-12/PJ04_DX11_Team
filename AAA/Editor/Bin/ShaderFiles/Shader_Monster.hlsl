@@ -163,9 +163,9 @@ PS_OUT PS_NONEYE(PS_IN In)
 {
     PS_OUT Out;
 
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord1);
     
-    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord1).rgb;
     
     float3 N = normalize(In.vNormal);
     float3 T = normalize(In.vTangent.xyz);
@@ -237,9 +237,9 @@ PS_OUT PS_NONEYE_WITHOUTNORMAL(PS_IN In)
 {
     PS_OUT Out;
 
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord1);
     
-    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord1).rgb;
     
     float3 N = normalize(In.vNormal);
 

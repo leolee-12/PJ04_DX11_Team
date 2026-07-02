@@ -249,11 +249,16 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     float2 suv = float2(lc.x / lc.w * 0.5f + 0.5f, lc.y / lc.w * -0.5f + 0.5f);
     float pz = lc.z / lc.w;
     [branch]
-    if (pz <= 1.f)
+    if (pz <= 1.f && suv.x >= 0.f && suv.x <= 1.f && suv.y >= 0.f && suv.y <= 1.f)
     {
         float esm = g_LightDepthTexture.Sample(BorderSampler, suv).r;
         float shadow = saturate(exp(-g_fESMConst * pz) * esm);
         shadow = saturate((shadow - g_fESMBleed) / (1.f - g_fESMBleed));
+
+        float2 e = abs(suv - 0.5f) * 2.f;
+        float edge = saturate((max(e.x, e.y) - 0.85f) / 0.15f);
+        shadow = lerp(shadow, 1.f, edge);
+
         color *= lerp(0.5f, 1.f, shadow);
     }
     

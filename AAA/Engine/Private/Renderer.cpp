@@ -159,7 +159,9 @@ HRESULT CRenderer::Initialize()
     if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Emissive"), 450.f, 100.f, 300.f, 200.f)))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_LightDepth"), 450.f, 300.f, 300.f, 200.f)))
-        return E_FAIL;
+      return E_FAIL;
+    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_ESM"), 450.f, 300.f, 300.f, 200.f)))
+    //    return E_FAIL;
 
    //if (FAILED(m_pGameInstance_Proxy->Ready_RT_Debug(TEXT("Target_Light"), 150.f, 100.f, 300.f, 200.f)))
    //    return E_FAIL;
@@ -330,7 +332,7 @@ HRESULT CRenderer::Render_Shadow()
 
 HRESULT CRenderer::Render_ShadowBlur()
 {
-    _float2 vTexel = { 1.f / g_iShadowMapSize, 1.f / g_iShadowMapSize };
+    _float2 vTexel = { 2.f / g_iShadowMapSize, 2.f / g_iShadowMapSize };
 
     Change_ViewportDesc(g_iShadowMapSize, g_iShadowMapSize);
 
