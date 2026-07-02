@@ -13,12 +13,9 @@ public:
 	virtual void	Render() override;
 
 private:
-	static constexpr _uint	BUF_SIZE = { 64 };
-	_char					m_szLayerName[BUF_SIZE] = {};
-	_bool					m_bKeyInputEnabled = { false };
+	_bool	m_bKeyInputEnabled = { false };
 
 private:
-	void	Draw_EditButtons(class CLevel_Edit* pLevel);
 	void	Draw_CameraButtons(class CLevel_Edit* pLevel);
 
 public:

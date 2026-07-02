@@ -900,20 +900,7 @@ HRESULT CLevel_Edit::Load_LDPreview(_uint iPresetIndex)
 		return E_FAIL;
 	}
 
-	vector<wstring> LevelDesignLayers;
-	LevelDesignLayers.reserve(m_Layers.size());
-
-	for (const auto& Pair : m_Layers)
-	{
-		if (CLevelDesign_Registry::Is_LevelDesignLayer(
-			Pair.first))
-		{
-			LevelDesignLayers.push_back(Pair.first);
-		}
-	}
-
-	for (const auto& strLayerTag : LevelDesignLayers)
-		Clear_MapPreviewLayer(strLayerTag);
+	Clear_LDPreview();
 
 	MAP_RUNTIME_LOAD_CONTEXT Context{};
 	Context.pDevice = m_pDevice;
@@ -1049,6 +1036,41 @@ void CLevel_Edit::Clear_MapPreviewEnv()
 	}
 
 	Apply_MapPreviewContentDesc(MapContentDesc, false);
+	Sync_MapPreviewRuntimeStateToSession();
+}
+
+void CLevel_Edit::Clear_LDPreview()
+{
+	vector<wstring> LevelDesignLayers;
+	LevelDesignLayers.reserve(m_Layers.size());
+
+	for (const auto& Pair : m_Layers)
+	{
+		if (CLevelDesign_Registry::Is_LevelDesignLayer(Pair.first))
+			LevelDesignLayers.push_back(Pair.first);
+	}
+
+	for (const wstring& strLayerTag : LevelDesignLayers)
+		Clear_MapPreviewLayer(strLayerTag);
+
+	if (Is_MapStageLoaded())
+	{
+		const wstring strStageName = Get_MapPreviewLoadedStageNameRef().empty()
+			? L"(loaded stage)"
+			: Get_MapPreviewLoadedStageNameRef();
+
+		Set_MapPreviewStatus(L"Map preview loaded without LevelDesign: stage=" + strStageName + L" / env=" +
+			to_wstring(Get_MapPreviewEnvCreatedCountInternal()));
+	}
+	else if (Is_MapEnvLoaded())
+	{
+		Set_MapPreviewStatus(L"Environment preview loaded only. / env=" + to_wstring(Get_MapPreviewEnvCreatedCountInternal()));
+	}
+	else
+	{
+		Set_MapPreviewStatus(L"LevelDesign preview cleared.");
+	}
+
 	Sync_MapPreviewRuntimeStateToSession();
 }
 
@@ -1257,6 +1279,15 @@ void CLevel_Edit::Jump_EditCamera(_float fForwardDistance, _float fRightDistance
 
 	Back_To_Edit();
 	m_pCamera->Jump_Local(fForwardDistance, fRightDistance);
+}
+
+void CLevel_Edit::Teleport_EditCamera(const _float3& vPosition)
+{
+	if (nullptr == m_pCamera)
+		return;
+
+	Back_To_Edit();
+	m_pCamera->Get_Transform()->Set_State(STATE::POSITION, XMVectorSet(vPosition.x, vPosition.y, vPosition.z, 1.f));
 }
 
 const vector<CLevel_Edit::EDITOR_OBJECT_HANDLE>* CLevel_Edit::Get_CameraLayer() const

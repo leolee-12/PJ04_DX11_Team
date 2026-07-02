@@ -79,9 +79,6 @@ void CLevel_Test::Update(_float fTimeDelta)
 
 HRESULT CLevel_Test::Render()
 {
-#ifdef _DEBUG
-
-#endif
     return S_OK;
 }
 

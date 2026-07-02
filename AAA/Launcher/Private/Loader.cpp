@@ -85,7 +85,7 @@ HRESULT CLoader::Loading()
 
 void CLoader::Show()
 {
-    SetWindowText(g_hWnd, m_szLoadingText);
+    //SetWindowText(g_hWnd, m_szLoadingText);
 }
 
 #endif

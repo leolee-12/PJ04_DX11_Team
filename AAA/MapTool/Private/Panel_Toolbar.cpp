@@ -71,6 +71,10 @@ namespace
 			pLevel->Clear_MapPreviewEnv();
 
 		ImGui::SameLine();
+		if (ImGui::Button("Clear LD"))
+			pLevel->Clear_LDPreview();
+
+		ImGui::SameLine();
 		if (ImGui::Button("Map Edit Save"))
 		{
 			if (FAILED(pLevel->Save_MapOverride()))
@@ -125,8 +129,6 @@ void CPanel_Toolbar::Render()
 
 	static _int s_iMapPreviewPreset = 0;
 
-	Draw_EditButtons(pLevel);
-	ImGui::SameLine();
 	Draw_MapPreviewButtons(pLevel, &s_iMapPreviewPreset);
 
 	if (m_bKeyInputEnabled)
@@ -173,39 +175,13 @@ void CPanel_Toolbar::Render()
 	End_Panel();
 }
 
-void CPanel_Toolbar::Draw_EditButtons(CLevel_Edit* pLevel)
-{
-	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-
-	if (ImGui::Button("Add Layer"))
-	{
-		memset(m_szLayerName, 0, sizeof(m_szLayerName));
-		ImGui::OpenPopup("Add Layer Name");
-	}
-	ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-	if (ImGui::BeginPopupModal("Add Layer Name", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-	{
-		ImGui::Text("Name:");
-		ImGui::InputText("##layername", m_szLayerName, BUF_SIZE);
-		if (ImGui::Button("OK"))
-		{
-			wstring strLayerName = StrToWstr(m_szLayerName);
-			pLevel->Add_Layer(strLayerName);
-			ImGui::CloseCurrentPopup();
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Cancel"))
-			ImGui::CloseCurrentPopup();
-		ImGui::EndPopup();
-	}
-}
-
 void CPanel_Toolbar::Draw_CameraButtons(CLevel_Edit* pLevel)
 {
 	if (nullptr == pLevel)
 		return;
 
 	static _float s_fJumpStep = 25.f;
+	static _float3 s_vTeleportPos = { 0.f, 5.f, -10.f };
 
 	if (ImGui::Button("Back to Edit"))
 		pLevel->Back_To_Edit();
@@ -239,31 +215,15 @@ void CPanel_Toolbar::Draw_CameraButtons(CLevel_Edit* pLevel)
 		pLevel->Jump_EditCamera(0.f, s_fJumpStep);
 
 	ImGui::SameLine();
+	ImGui::Text("Pos");
+	ImGui::SameLine();
 
-	if (ImGui::Button("Cameras"))
-		ImGui::OpenPopup("CamerasPopup");
+	ImGui::SetNextItemWidth(180.f);
+	ImGui::DragFloat3("##CameraTeleportPos", (float*)&s_vTeleportPos, 1.f, 0.f, 0.f, "%.1f");
 
-	if (ImGui::BeginPopup("CamerasPopup"))
-	{
-		const auto* pLayer = pLevel->Get_CameraLayer();
-		if (pLayer && !pLayer->empty())
-		{
-			for (const auto& handle : *pLayer)
-			{
-				_string strName = WstrToStr(handle.strName);
-				if (ImGui::Selectable(strName.c_str()))
-				{
-					pLevel->Preview_Camera(handle.pObject);
-					ImGui::CloseCurrentPopup();
-				}
-			}
-		}
-		else
-		{
-			ImGui::TextDisabled("(No cameras)");
-		}
-		ImGui::EndPopup();
-	}
+	ImGui::SameLine();
+	if (ImGui::Button("Teleport"))
+		pLevel->Teleport_EditCamera(s_vTeleportPos);
 }
 
 CPanel_Toolbar* CPanel_Toolbar::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

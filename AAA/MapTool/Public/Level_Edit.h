@@ -65,6 +65,7 @@ public:
 	void    Clear_MapPreview();
 	void    Clear_MapPreviewStage();
 	void    Clear_MapPreviewEnv();
+	void    Clear_LDPreview();
 
 	const _wstring& Get_MapPreviewStatus() const;
 	_bool   Is_MapStageLoaded() const;
@@ -102,6 +103,7 @@ public:
 	void Back_To_Edit();
 	void Reset_EditCameraRotation();
 	void Jump_EditCamera(_float fForwardDistance, _float fRightDistance);
+	void Teleport_EditCamera(const _float3& vPosition);
 
 public:       // Hierarchy
 	_uint Get_HierarchyRevision() const { return m_iHierarchyRevision; }

@@ -84,9 +84,6 @@ void CStage0_Step1::Update(_float fTimeDelta)
 
 HRESULT CStage0_Step1::Render()
 {
-#ifdef _DEBUG
-    SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
-#endif
     return S_OK;
 }
 
