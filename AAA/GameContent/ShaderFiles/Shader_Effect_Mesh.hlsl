@@ -1,4 +1,8 @@
- #include "Engine_Shader_Defines.hlsli"
+#include "Engine_Shader_Defines.hlsli"
+
+#ifndef EFFECT_MESH_VERTEX_POSITION
+#define EFFECT_MESH_VERTEX_POSITION(vPosition) (vPosition)
+#endif
 
 float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
@@ -97,7 +101,8 @@ VS_OUT VS_MAIN(VS_IN In)
 {
     VS_OUT Out;
 
-    float4 vWorld = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
+    float3 vLocalPosition = EFFECT_MESH_VERTEX_POSITION(In.vPosition);
+    float4 vWorld = mul(float4(vLocalPosition, 1.f), g_WorldMatrix);
     float4 vView = mul(vWorld, g_ViewMatrix);
     float4 vProj = mul(vView, g_ProjMatrix);
 

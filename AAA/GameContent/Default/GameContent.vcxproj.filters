@@ -892,6 +892,9 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\97. SwordChargeEffect">
       <UniqueIdentifier>{337bfefa-886b-4153-b3e4-87d81d98e19b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="98. ShaderFiles\Ring">
+      <UniqueIdentifier>{e216c804-3688-4394-920e-d1effa7ea6ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -2464,9 +2467,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl">
-      <Filter>98. ShaderFiles</Filter>
-    </FxCompile>
     <FxCompile Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </FxCompile>
@@ -2499,6 +2499,9 @@
     </FxCompile>
     <FxCompile Include="..\ShaderFiles\Shader_EffectRock.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_Ring.hlsl">
+      <Filter>98. ShaderFiles\Ring</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

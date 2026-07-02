@@ -10,6 +10,11 @@ class CSwordCharge final : public CEffect_Mesh
 {
 	GENERATED_BODY(CSwordCharge)
 
+	PROPERTY(_bool, m_bUseRingDeform, L"Use Ring Deform_R", L"Ring");
+	PROPERTY(_float, m_fRingHeight, L"Ring Height_R", L"Ring");
+	PROPERTY(_float, m_fRingStartRadius, L"Ring Start Radius_R", L"Ring");
+	PROPERTY(_float, m_fRingEndRadius, L"Ring End Radius_R", L"Ring");
+
 public:
 	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_SwordCharge";
 
