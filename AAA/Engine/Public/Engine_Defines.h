@@ -38,6 +38,8 @@ using namespace DirectX;
 
 using namespace std;
 
+namespace FMOD { class Channel; }
+
 #include "Engine_Enum.h"
 #include "Engine_Macro.h"
 #include "Engine_Struct.h"

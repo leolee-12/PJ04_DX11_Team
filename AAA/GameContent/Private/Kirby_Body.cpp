@@ -94,6 +94,9 @@ HRESULT CKirby_Body::Ready_AnimEvents(CKirby* pKirby)
             if (Handle_AnimEventEye(e, ePhase) == true)
                 return;
 
+            if (Handle_AnimEventSound(e, ePhase) == true)
+                return;
+
             switch (static_cast<EANIM_EVENT>(e.iEventType))
             { 
                 case EANIM_EVENT::Fx:

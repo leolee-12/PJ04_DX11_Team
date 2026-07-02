@@ -195,6 +195,7 @@ HRESULT CLevelDesign_Ladder::Ready_Components()
 HRESULT CLevelDesign_Ladder::Ready_LadderCollider()
 {
 	CCollider::COLLIDER_DESC Desc{};
+	Desc.pOwner = this;
 	Desc.fHeight = (_float)m_tLadderDesc.iLength * m_fSegmentStepY;
 	Desc.fRadius = 0.75f;
 	Desc.vCenter = _float3(0.f, -0.75f, -1.f);
