@@ -2,10 +2,6 @@
 #include "EditInstance.h"
 #include "Level_Loading.h"
 
-#ifdef _DEBUG
-#include "MapToolProfiler.h"
-#endif
-
 #include "GameObject_Factory.h"
 #include "Effect_Loader.h"
 #include "Projectile_Manager.h"
@@ -188,9 +184,6 @@ void CToolApp::Free()
 
 	CGameInstance::DestroyInstance();
 	CGameObject_Factory::DestroyInstance();
-#ifdef _DEBUG
-	CMapToolProfiler::DestroyInstance();
-#endif
 
 	__super::Free();
 }

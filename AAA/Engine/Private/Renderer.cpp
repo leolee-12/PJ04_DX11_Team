@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "UIObject.h"
 #include "ComputeShader.h"
+#include "Profiler_Manager.h"
 
 CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice { pDevice }
@@ -192,12 +193,45 @@ void CRenderer::Add_RenderGroup(RENDERID eGroupID, CGameObject* pGameObject)
     m_RenderObjects[ETOUI(eGroupID)].push_back(pGameObject);
 
     Safe_AddRef(pGameObject);
+
+#pragma region profiling
+    PROFILE_COUNTER_ADD(EPROFILE_COUNTER::RENDER_SUBMITTED_TOTAL, 1);
+
+    switch (eGroupID)
+    {
+    case RENDERID::PRIORITY:
+        PROFILE_COUNTER_ADD(EPROFILE_COUNTER::RENDER_SUBMITTED_PRIORITY, 1);
+        break;
+    case RENDERID::SHADOW:
+        PROFILE_COUNTER_ADD(EPROFILE_COUNTER::RENDER_SUBMITTED_SHADOW, 1);
+        break;
+    case RENDERID::NONBLEND:
+        PROFILE_COUNTER_ADD(EPROFILE_COUNTER::RENDER_SUBMITTED_NONBLEND, 1);
+        break;
+    case RENDERID::DECAL:
+        PROFILE_COUNTER_ADD(EPROFILE_COUNTER::RENDER_SUBMITTED_DECAL, 1);
+        break;
+    case RENDERID::NONLIGHT:
+        PROFILE_COUNTER_ADD(EPROFILE_COUNTER::RENDER_SUBMITTED_NONLIGHT, 1);
+        break;
+    case RENDERID::BLEND:
+        PROFILE_COUNTER_ADD(EPROFILE_COUNTER::RENDER_SUBMITTED_BLEND, 1);
+        break;
+    default:
+        break;
+    }
+#pragma endregion
 }
 
 void CRenderer::Add_RenderGroup_UI(RENDERUIID eGroupID, CUIObject* pUIObject)
 {
     m_RenderUIs[ETOUI(eGroupID)].push_back(pUIObject);
     Safe_AddRef(pUIObject);
+
+#pragma region profiling
+    PROFILE_COUNTER_ADD(EPROFILE_COUNTER::RENDER_SUBMITTED_TOTAL, 1);
+    PROFILE_COUNTER_ADD(EPROFILE_COUNTER::RENDER_SUBMITTED_UI, 1);
+#pragma endregion
 }
 
 HRESULT CRenderer::Draw()
@@ -239,7 +273,6 @@ HRESULT CRenderer::Draw()
     if (FAILED(Render_Bloom()))
         return E_FAIL;
 
-    
     if (FAILED(Render_NonLight()))
         return E_FAIL;
     if (FAILED(Render_Blend()))

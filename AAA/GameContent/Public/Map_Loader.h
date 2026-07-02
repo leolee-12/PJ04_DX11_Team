@@ -95,7 +95,10 @@ public:
 	static _uint			Get_MapCount();
 	static const _char*		Get_MapName(_uint iMapIndex);
 	static HRESULT			Get_MapManifestPath(_uint iMapIndex, _wstring* pOutManifestPath);
+	
 	static _bool			Is_MapLayer(const _wstring& strLayerTag);
+	static _bool			Is_MapStageLayer(const _wstring& strLayerTag);
+	static _bool			Is_MapEnvLayer(const _wstring& strLayerTag);
 
 	static HRESULT			Get_EditFilePath(const _wstring& strManifestPath, _wstring* pOutEditFilePath);
 	static HRESULT			Load_EditFile(const _wstring& strManifestPath, MAP_EDIT_DATA* pInOutData, json* pOutStageEdit = nullptr, _bool* pOutHasStageEdit = nullptr);

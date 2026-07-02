@@ -80,8 +80,13 @@ HRESULT CLevelDesign_ProtoRegister::Ensure_Resources(const LD_RUNTIME_LEVELS& Le
 		if (m_pProxy->Has_Prototype(iModelPrototypeLevel, Requirement.strPrototypeTag))
 			continue;
 
-		CBase* pModel = CModel::Create_WithTextureHub(m_pDevice, m_pContext, Requirement.eModelType,
-			Requirement.strFilePath.c_str(), XMMatrixIdentity(), nullptr, Requirement.bCookCollisionMesh);
+		CModel::MODEL_LOAD_DESC ModelDesc{};
+		ModelDesc.eType = Requirement.eModelType;
+		ModelDesc.pModelFilePath = Requirement.strFilePath.c_str();
+		XMStoreFloat4x4(&ModelDesc.PreTransformMatrix, XMMatrixIdentity());
+		ModelDesc.bCookCollisionMesh = Requirement.bCookCollisionMesh;
+
+		CBase* pModel = CModel::Create_WithTextureHub(m_pDevice, m_pContext, ModelDesc);
 		if (nullptr == pModel)
 			return E_FAIL;
 

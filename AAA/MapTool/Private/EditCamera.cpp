@@ -37,6 +37,10 @@ void CEditCamera::Priority_Update(_float fTimeDelta)
 	{
 		ImGuiIO& io = ImGui::GetIO();
 
+		const _float fBaseMoveScale = 2.f;
+		const _float fShiftMoveScale = io.KeyShift ? 3.f : 1.f;
+		const _float fMoveTimeDelta = fTimeDelta * fBaseMoveScale * fShiftMoveScale;
+
 		if (io.MouseDown[1])   // 우클릭 드래그 = 회전
 		{
 			if (io.MouseDelta.x)
@@ -46,14 +50,14 @@ void CEditCamera::Priority_Update(_float fTimeDelta)
 		}
 
 		if (io.MouseWheel != 0.f)   // 휠 = 전후진
-			m_pTransformCom->Go_Straight(fTimeDelta * io.MouseWheel);
+			m_pTransformCom->Go_Straight(fMoveTimeDelta * io.MouseWheel);
 
 		if (io.MouseDown[1])        // 우클릭 중 WASD
 		{
-			if (ImGui::IsKeyDown(ImGuiKey_W)) m_pTransformCom->Go_Straight(fTimeDelta);
-			if (ImGui::IsKeyDown(ImGuiKey_S)) m_pTransformCom->Go_Backward(fTimeDelta);
-			if (ImGui::IsKeyDown(ImGuiKey_A)) m_pTransformCom->Go_Left(fTimeDelta);
-			if (ImGui::IsKeyDown(ImGuiKey_D)) m_pTransformCom->Go_Right(fTimeDelta);
+			if (ImGui::IsKeyDown(ImGuiKey_W)) m_pTransformCom->Go_Straight(fMoveTimeDelta);
+			if (ImGui::IsKeyDown(ImGuiKey_S)) m_pTransformCom->Go_Backward(fMoveTimeDelta);
+			if (ImGui::IsKeyDown(ImGuiKey_A)) m_pTransformCom->Go_Left(fMoveTimeDelta);
+			if (ImGui::IsKeyDown(ImGuiKey_D)) m_pTransformCom->Go_Right(fMoveTimeDelta);
 		}
 	}
 	__super::Priority_Update(fTimeDelta);

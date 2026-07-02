@@ -52,10 +52,12 @@ private:
 #endif
 
 private:
-	virtual HRESULT	Ready_Events() override { return S_OK; }
+	virtual HRESULT	Ready_Events() override;
 	HRESULT			Ready_Sections(const MAP_STAGE_DESC* pDesc);
 	void			Refresh_SectionTransforms();
 	void			Submit_VisibleSections();
+
+	void			Stage12_CarBreakWall();
 
 #ifdef _DEBUG
 	void    Reset_ProfileFrame();

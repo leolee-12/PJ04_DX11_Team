@@ -2,6 +2,7 @@
 #include "MeshLayer_Binder.h"
 
 #include "GameInstance.h"
+#include "Profiler_Manager.h"
 
 NS_BEGIN(Client)
 
@@ -630,6 +631,14 @@ void CEnvObject::Check_Visible()
 			m_bVisibleShadow = false;
 		}
 	}
+
+#pragma region Profiling
+	if (m_bVisible)
+		PROFILE_COUNTER_ADD(Engine::EPROFILE_COUNTER::ENV_VISIBLE_MAIN, 1);
+
+	if (m_bVisibleShadow)
+		PROFILE_COUNTER_ADD(Engine::EPROFILE_COUNTER::ENV_VISIBLE_SHADOW, 1);
+#pragma endregion
 }
 
 void CEnvObject::Apply_TransformFromDesc()

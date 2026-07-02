@@ -30,8 +30,9 @@ private:
 	vector<ID3D11ShaderResourceView*> m_SRVs;
 	unordered_map<_wstring, TEXTURE_HANDLE> m_HandleByNormalizedPath;
 	unordered_map<_wstring, TEXTURE_HANDLE> m_HandleByTextureName;
+
 	mutable shared_mutex m_Mutex;
-	_uint m_iCacheHitCount = {};
+	mutable _uint m_iCacheHitCount = {};
 	_uint m_iCacheMissCount = {};
 	_uint m_iLoadFailureCount = {};
 

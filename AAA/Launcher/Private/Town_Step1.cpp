@@ -80,9 +80,6 @@ void CTown_Step1::Update(_float fTimeDelta)
 
 HRESULT CTown_Step1::Render()
 {
-#ifdef _DEBUG
-    SetWindowText(g_hWnd, TEXT("Å¸¿î STEP1."));
-#endif
     return S_OK;
 }
 

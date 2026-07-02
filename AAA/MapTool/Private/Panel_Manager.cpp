@@ -5,9 +5,7 @@
 #include "Panel_Palette.h"
 #include "Panel_Viewport.h"
 #include "Panel_Inspector.h"
-#ifdef _DEBUG
 #include "Panel_Profiler.h"
-#endif
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -26,9 +24,7 @@ HRESULT CPanel_Manager::Initialize()
 	if (FAILED(Add_Panel(L"Palette", CPanel_Palette::Create(m_pDevice, m_pContext))))   return E_FAIL;
 	if (FAILED(Add_Panel(L"Viewport", CPanel_Viewport::Create(m_pDevice, m_pContext))))  return E_FAIL;
 	if (FAILED(Add_Panel(L"Inspector", CPanel_Inspector::Create(m_pDevice, m_pContext)))) return E_FAIL;
-#ifdef _DEBUG
 	if (FAILED(Add_Panel(L"Profiler", CPanel_Profiler::Create(m_pDevice, m_pContext))))  return E_FAIL;
-#endif
 
 	return S_OK;
 }
@@ -129,9 +125,11 @@ void CPanel_Manager::Render_DockSpace()
 		ImGui::DockBuilderDockWindow("Viewport", viewportNode);
 		ImGui::DockBuilderDockWindow("Toolbar", bottomToolsNode);
 		ImGui::DockBuilderDockWindow("Inspector", rightColumn);
-#ifdef _DEBUG
-		ImGui::DockBuilderDockWindow("Profiler", hierarchyNode);
-#endif
+		ImGui::DockBuilderDockWindow("Profiler", rightColumn);
+
+		if (ImGuiDockNode* pRightNode = ImGui::DockBuilderGetNode(rightColumn))
+			pRightNode->SelectedTabId = ImHashStr("Inspector");
+
 		ImGui::DockBuilderFinish(dockspace_id);
 	}
 

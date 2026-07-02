@@ -1,16 +1,20 @@
 #pragma once
 #include "LevelDesignObject.h"
+#include "Damageable.h"
 
 NS_BEGIN(Engine)
 class CShader;
 class CModel;
 class CAnimator;
+class CCollider;
 NS_END
 
 NS_BEGIN(Client)
 struct LD_SPAWN_SPEC;
 
-class CLevelDesign_Bush : public CLevelDesignObject
+class CLevelDesign_Bush
+    : public CLevelDesignObject
+    , public IDamageable
 {
     GENERATED_BODY(CLevelDesign_Bush);
 
@@ -39,6 +43,8 @@ public:
     virtual HRESULT Render() override;
     virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
+    virtual void Damaged(const ATTACK_INFO& tInfo) override;
+
     static void Register_LevelDesignSpecs();
     static _bool Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
     static CGameObject* Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -47,6 +53,7 @@ private:
     CShader* m_pShaderComs[BUSH_STATE::_COUNT] = { nullptr };
     CModel* m_pModelComs[BUSH_STATE::_COUNT] = { nullptr };
     CAnimator* m_pAnimatorCom = { nullptr };
+    CCollider* m_pHurtBoxCom = { nullptr };
 
     LD_BUSH_DESC m_tBushDesc = {};
     BUSH_STATE m_eState = { BUSH_STATE::BASIC };
@@ -55,6 +62,8 @@ private:
     virtual HRESULT Validate_Desc() override;
 
     HRESULT Ready_Components();
+    HRESULT Ready_HurtBox();
+
     HRESULT Bind_ShaderResources(BUSH_STATE eSlot);
     HRESULT Render_Model(BUSH_STATE eSlot);
     const _tchar* Resolve_ModelProtoTag(BUSH_STATE eSlot) const;

@@ -985,14 +985,6 @@ HRESULT CGameInstance_Proxy::Bind_DefaultTextureFromHub(CShader* pShader, const 
 
 	return m_pOwner->Bind_DefaultTextureFromHub(pShader, pConstantName, eKind);
 }
-
-TEXTURE_HUB_STATS CGameInstance_Proxy::Get_TextureHubStats() const
-{
-	if (!IsConnected())
-		return {};
-
-	return m_pOwner->Get_TextureHubStats();
-}
 #pragma endregion
 
 #pragma region PHYSIX_MANAGER

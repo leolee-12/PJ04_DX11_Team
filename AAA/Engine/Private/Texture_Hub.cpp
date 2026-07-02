@@ -1,6 +1,6 @@
 #include "Texture_Hub.h"
 #include "Shader.h"
-
+#include "Profiler_Defines.h"
 #include <cwctype>
 #include <filesystem>
 #include <mutex>
@@ -124,10 +124,15 @@ HRESULT CTexture_Hub::LoadOrGet(const _tchar* pTexturePath, TEXTURE_HANDLE* pOut
 		const auto iter = m_HandleByNormalizedPath.find(strNormalizedPath);
 		if (iter != m_HandleByNormalizedPath.end())
 		{
-			++m_iCacheHitCount;
+			if constexpr (0 != PROFILE_ENABLE)
+				++m_iCacheHitCount;
+
 			*pOut = iter->second;
 			return S_OK;
 		}
+
+		if constexpr (0 != PROFILE_ENABLE)
+			++m_iCacheMissCount;
 	}
 
 	// 파일 로드/디코딩 -> 락 바깥에서 수행
@@ -139,7 +144,6 @@ HRESULT CTexture_Hub::LoadOrGet(const _tchar* pTexturePath, TEXTURE_HANDLE* pOut
 	const auto iter = m_HandleByNormalizedPath.find(strNormalizedPath);
 	if (iter != m_HandleByNormalizedPath.end())
 	{
-		++m_iCacheHitCount;
 		*pOut = iter->second;
 		Safe_Release(pSRV);
 		return S_OK;
@@ -147,8 +151,9 @@ HRESULT CTexture_Hub::LoadOrGet(const _tchar* pTexturePath, TEXTURE_HANDLE* pOut
 
 	if (FAILED(hr))
 	{
-		++m_iCacheHitCount;
-		++m_iLoadFailureCount;
+		if constexpr (0 != PROFILE_ENABLE)
+			++m_iLoadFailureCount;
+		
 		return hr;
 	}
 
@@ -161,6 +166,9 @@ HRESULT CTexture_Hub::LoadOrGet(const _tchar* pTexturePath, TEXTURE_HANDLE* pOut
 	}
 	catch (...)
 	{
+		if constexpr (0 != PROFILE_ENABLE)
+			++m_iLoadFailureCount;
+		
 		Safe_Release(pSRV);
 		return E_FAIL;
 	}
@@ -179,12 +187,17 @@ HRESULT CTexture_Hub::Get(const _tchar* pTextureName, TEXTURE_HANDLE* pOut) cons
 	if (strKey.empty())
 		return E_FAIL;
 
-	shared_lock<shared_mutex> Lock(m_Mutex);
+	using GetLock = std::conditional_t<0 != PROFILE_ENABLE, unique_lock<shared_mutex>, shared_lock<shared_mutex>>;
+
+	GetLock Lock(m_Mutex);
 
 	const auto iter = m_HandleByTextureName.find(strKey);
 	if (iter == m_HandleByTextureName.end())
 		return E_FAIL;
 
+	if constexpr (0 != PROFILE_ENABLE)
+		++m_iCacheHitCount;
+	
 	*pOut = iter->second;
 	return S_OK;
 }

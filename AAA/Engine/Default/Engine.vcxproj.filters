@@ -313,6 +313,9 @@
     <Filter Include="05. GameObject\Effect\Allocator">
       <UniqueIdentifier>{8fc72b6d-5be3-40cf-9275-b99e11825d1d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="94. Profiler">
+      <UniqueIdentifier>{ccb61082-a7fa-4a7e-93b5-3f67bc16f3fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -630,6 +633,12 @@
     <ClInclude Include="..\Public\MeshLayer_Utils.h">
       <Filter>07. Component\Model\MaterialEx</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Profiler_Manager.h">
+      <Filter>94. Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Profiler_Defines.h">
+      <Filter>94. Profiler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -910,6 +919,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Effect_RectEmitter.cpp">
       <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_RectEmitter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Profiler_Manager.cpp">
+      <Filter>94. Profiler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

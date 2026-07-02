@@ -37,6 +37,7 @@ class CEnvironment_Manager;
 class CShaderGlobal_Manager;
 class CCulling_Manager;
 class CTexture_Hub;
+class CProfiler_Manager;
 
 class ENGINE_DLL CGameInstance 
 {
@@ -230,7 +231,6 @@ private:
 	  HRESULT Get_TextureFromHub(const _tchar* pTextureName, TEXTURE_HANDLE* pOutHandle) const;
 	  HRESULT Bind_TextureFromHub(class CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle);
 	  HRESULT Bind_DefaultTextureFromHub(class CShader* pShader, const _char* pConstantName, DEFAULT_TEXTURE eKind);
-	  TEXTURE_HUB_STATS Get_TextureHubStats() const;
 #pragma endregion
 
 #pragma region PHYSIX_MANAGER
@@ -273,6 +273,7 @@ private:
 	CShaderGlobal_Manager*		m_pShaderGlobal_Manager = { nullptr };
 	CCulling_Manager*			m_pCulling_Manager = { nullptr };
 	CTexture_Hub*				m_pTexture_Hub = { nullptr };
+	CProfiler_Manager*			m_pProfiler_Manager = { nullptr };
 
 	mutable mt19937             m_RandomGenerator;
 	_bool						m_bEditMode = { false };

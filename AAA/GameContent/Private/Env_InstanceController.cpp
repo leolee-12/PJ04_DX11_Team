@@ -3,6 +3,7 @@
 #include "Env_InstanceBatch.h"
 
 #include "GameInstance_Proxy.h"
+#include "Profiler_Manager.h"
 
 CEnv_InstanceController::CEnv_InstanceController(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject{ pDevice, pContext }
@@ -61,11 +62,13 @@ _bool CEnv_InstanceController::Submit_Main(_uint iBatchIndex, CEnvObject_Static*
 
 	const _uint64 iCurrentFrame = m_pGameInstance_Proxy->Get_FrameIndex();
 	pBatch->Submit(pObj, iCurrentFrame);
+	PROFILE_COUNTER_ADD(Engine::EPROFILE_COUNTER::ENV_INSTANCE_SUBMITTED, 1);
 
 	if (!pBatch->Is_RegisteredThisFrame())
 	{
 		pBatch->Set_RegisteredThisFrame(true);
 		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, pBatch);
+		PROFILE_COUNTER_ADD(Engine::EPROFILE_COUNTER::ENV_INSTANCE_BATCH_SUBMITTED, 1);
 	}
 
 	return true;
@@ -85,11 +88,13 @@ _bool CEnv_InstanceController::Submit_Shadow(_uint iBatchIndex, CEnvObject_Stati
 
 	const _uint64 iCurrentFrame = m_pGameInstance_Proxy->Get_FrameIndex();
 	pBatch->Submit(pObj, iCurrentFrame);
+	PROFILE_COUNTER_ADD(Engine::EPROFILE_COUNTER::ENV_INSTANCE_SUBMITTED, 1);
 
 	if (!pBatch->Is_RegisteredThisFrame())
 	{
 		pBatch->Set_RegisteredThisFrame(true);
 		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pBatch);
+		PROFILE_COUNTER_ADD(Engine::EPROFILE_COUNTER::ENV_INSTANCE_BATCH_SUBMITTED, 1);
 	}
 
 	return true;
@@ -109,11 +114,13 @@ _bool CEnv_InstanceController::Submit_Decal(_uint iBatchIndex, CEnvObject_Static
 
 	const _uint64 iCurrentFrame = m_pGameInstance_Proxy->Get_FrameIndex();
 	pBatch->Submit(pObj, iCurrentFrame);
+	PROFILE_COUNTER_ADD(Engine::EPROFILE_COUNTER::ENV_INSTANCE_SUBMITTED, 1);
 
 	if (!pBatch->Is_RegisteredThisFrame())
 	{
 		pBatch->Set_RegisteredThisFrame(true);
 		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::DECAL, pBatch);
+		PROFILE_COUNTER_ADD(Engine::EPROFILE_COUNTER::ENV_INSTANCE_BATCH_SUBMITTED, 1);
 	}
 
 	return true;

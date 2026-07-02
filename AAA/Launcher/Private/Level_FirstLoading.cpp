@@ -66,7 +66,7 @@ void CLevel_FirstLoading::Update(_float fTimeDelta)
 HRESULT CLevel_FirstLoading::Render()
 {
 #ifdef _DEBUG
-    m_pLoader->Show();
+    //m_pLoader->Show();
 #endif
     return S_OK;
 }

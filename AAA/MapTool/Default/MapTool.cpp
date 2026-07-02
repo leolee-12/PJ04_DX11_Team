@@ -92,7 +92,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			pApp->Update(pProxy->Get_TimeDelta(TEXT("Timer_60")), pProxy->Get_RawTimeDelta(TEXT("Timer_60")));
 			pApp->Render();
 
-			fTimeAcc -= fFrameTime;
+			fTimeAcc = min(fTimeAcc - fFrameTime, fFrameTime);
 		}
 	}
 

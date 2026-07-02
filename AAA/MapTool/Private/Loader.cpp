@@ -105,13 +105,11 @@ HRESULT CLoader::Ready_Resources_For_Edit()
     // (실제 배치 오브젝트의 프로토타입은 팩토리가 배치 시점에 온디맨드로 생성)
     Add_Work([this]() -> HRESULT
         {
-            lstrcpy(m_szLoadingText, TEXT("Loading SharedResources..."));
             return Client::Ready_Prototype_SharedResources(m_pGameInstance_Proxy, m_pDevice, m_pContext);
         });
 
     Add_Work([this]() -> HRESULT
         {
-            lstrcpy(m_szLoadingText, TEXT("Loading Shaders..."));
             return Client::Ready_Prototype_Shaders(m_pGameInstance_Proxy, m_pDevice, m_pContext);
         });
 
@@ -121,17 +119,10 @@ HRESULT CLoader::Ready_Resources_For_Edit()
     //        return Client::Load_Fonts(m_pGameInstance_Proxy);
     //    });
 
-
     Add_Work([this]() -> HRESULT
         {
-            lstrcpy(m_szLoadingText, TEXT("Loading Map TexHub..."));
             return CMap_Loader::Ready_TexHub(m_pGameInstance_Proxy);
         });
-
-    lstrcpy(m_szLoadingText, TEXT("Map TexPool is Loaded"));
-
-    return S_OK;
-
 
     return S_OK;
 }

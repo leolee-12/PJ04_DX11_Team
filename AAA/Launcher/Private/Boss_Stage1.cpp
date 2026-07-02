@@ -90,9 +90,6 @@ void CBoss_Stage1::Update(_float fTimeDelta)
 
 HRESULT CBoss_Stage1::Render()
 {
-#ifdef _DEBUG
-    SetWindowText(g_hWnd, TEXT("BOSS_STEP1."));
-#endif
     return S_OK;
 }
 
