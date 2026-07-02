@@ -87,7 +87,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
             {
                 pProxy->Compute_Timer(TEXT("Timer_60"));
 
-                pApp->Update(pProxy->Get_TimeDelta(TEXT("Timer_60")));
+                pApp->Update(pProxy->Get_TimeDelta(TEXT("Timer_60")), pProxy->Get_RawTimeDelta(TEXT("Timer_60")));
                 pApp->Render();
 
                 fTimeAcc = { 0.f };

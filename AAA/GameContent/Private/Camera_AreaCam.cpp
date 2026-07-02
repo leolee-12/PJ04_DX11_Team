@@ -41,6 +41,7 @@ HRESULT CCamera_AreaCam::Initialize(void* pArg)
 
 void CCamera_AreaCam::Priority_Update(_float fTimeDelta)
 {
+    fTimeDelta = Resolve_TimeDelta(fTimeDelta);
     if (!m_bActive) { __super::Priority_Update(fTimeDelta); return; }
     if (!m_pTarget)
         m_pTarget = m_pGameInstance_Proxy->Find_GameObject(Get_LevelIndex(), m_strTargetLayer, m_strTargetObj);
@@ -152,6 +153,14 @@ HRESULT CCamera_AreaCam::Ready_Events()
                 m_pGameInstance_Proxy->Tween_ShaderGlobal("g_fSpotlightDarken", _float4(0.f, 0.f, 0.f, 0.f), 0.5f);
         });
     return S_OK;
+}
+
+_float CCamera_AreaCam::Resolve_TimeDelta(_float fTimeDelta)
+{
+    if (m_bTransZoom)
+        return m_pGameInstance_Proxy->Get_RawTimeDelta(L"Timer_60");
+    else
+        return fTimeDelta;
 }
 
 CCamera_AreaCam* CCamera_AreaCam::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -16,12 +16,12 @@
 using namespace physx;
 
 #pragma region ENGINE
-void CGameInstance_Proxy::Update_Engine(_float fTimeDelta)
+void CGameInstance_Proxy::Update_Engine(_float fTimeDelta, _float fRawTimeDelta)
 {
 	if (m_pOwner == nullptr)
 		return;
 
-	m_pOwner->Update_Engine(fTimeDelta);
+	m_pOwner->Update_Engine(fTimeDelta, fRawTimeDelta);
 }
 
 HRESULT CGameInstance_Proxy::Begin_Draw()

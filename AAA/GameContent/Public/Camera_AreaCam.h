@@ -23,7 +23,6 @@ public:
     virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void* pArg) override;
     virtual void    Priority_Update(_float fTimeDelta) override;
-    virtual void    Update(_float fTimeDelta) override {}
     virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* p) override { p->strPrototypeTag = PROTOTYPE_TAG; }
 
 public:
@@ -33,6 +32,7 @@ public:
 
 private:
     virtual HRESULT Ready_Events() override;
+    _float Resolve_TimeDelta(_float fTimeDelta);
 private:
     CAreaCameraSolver m_solver;
     CGameObject* m_pTarget = nullptr;

@@ -100,7 +100,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             {
                 pGameInstance_Proxy->Compute_Timer(TEXT("Timer_60"));
 
-                pEditorApp->Update(pGameInstance_Proxy->Get_TimeDelta(TEXT("Timer_60")));
+                pEditorApp->Update(pGameInstance_Proxy->Get_TimeDelta(TEXT("Timer_60")), pGameInstance_Proxy->Get_RawTimeDelta(TEXT("Timer_60")));
                 pEditorApp->Render();
 
                 fTimeAcc = 0.f;

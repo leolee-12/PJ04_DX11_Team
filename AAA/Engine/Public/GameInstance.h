@@ -59,7 +59,7 @@ public:
 	}
 
 private:
-	void Update_Engine(_float fTimeDelta);
+	void Update_Engine(_float fTimeDelta, _float fRawTimeDelta);
 	HRESULT Begin_Draw();
 	HRESULT Draw();
 	HRESULT End_Draw();

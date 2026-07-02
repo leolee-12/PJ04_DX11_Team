@@ -78,11 +78,14 @@ HRESULT CKirby::Initialize(void* pArg)
 
 void CKirby::Priority_Update(_float fTimeDelta)
 {
+    fTimeDelta = Resolve_TimeDelta(fTimeDelta);
     __super::Priority_Update(fTimeDelta);
 }
 
 void CKirby::Update(_float fTimeDelta)
 {
+    fTimeDelta = Resolve_TimeDelta(fTimeDelta);
+
     XMStoreFloat3(&m_vWishDir, XMVectorZero());
 
     Update_Timer(fTimeDelta);
@@ -112,6 +115,8 @@ void CKirby::Update(_float fTimeDelta)
 
 void CKirby::Late_Update(_float fTimeDelta)
 {
+    fTimeDelta = Resolve_TimeDelta(fTimeDelta);
+
     __super::Late_Update(fTimeDelta);
 
     if (m_pTransformCom)
@@ -630,6 +635,15 @@ void CKirby::Clear_CutsceneGrabTarget()
 
     m_pGrabBone = nullptr;
     m_pGrabOwnerWorld = nullptr;
+}
+
+_float CKirby::Resolve_TimeDelta(_float fTimeDelta)
+{
+    KIRBY_STATE_TYPE eType = m_pKirby_StateMachine->Get_StateType();
+    if (eType == KIRBY_STATE_TYPE::GET_ABILITY)
+        return m_pGameInstance_Proxy->Get_RawTimeDelta(L"Timer_60");
+    else
+        return fTimeDelta;
 }
 
 void CKirby::Change_KirbyDeform(DEFORM_TYPE eDeformType)

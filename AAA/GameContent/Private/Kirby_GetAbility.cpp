@@ -41,6 +41,7 @@ void CKirby_GetAbility::Enter(CKirby* pKirby)
     //À±¼®ÇöÃß°¡
     KIRBY_ABILITY_CHANGED Desc{};
     m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &Desc);
+    m_pGameInstance_Proxy->Set_TimeScale(0.f);
 
     m_bPartsOn = false;
     m_bCloseEye = false;
@@ -83,6 +84,7 @@ void CKirby_GetAbility::Exit(CKirby* pKirby)
     KIRBY_ABILITY_CHANGED Desc{};
     Desc.bBegin = false;
     m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &Desc);
+    m_pGameInstance_Proxy->Set_TimeScale(1.f);
 
     CKirby_Body* pBody = pKirby->Get_Body();
     pBody->Set_KirbyMouth(KIRBY_MOUTH_STATE::IDLE);
