@@ -252,7 +252,10 @@ void CPanel_Animation::Render_EventTimeline()
             if (d < fBest) { fBest = d; m_iSelEvent = i; }
         }
     }
-    if (ImGui::IsItemActive() && m_iSelEvent >= 0 && m_iSelEvent < (int)track.Events.size())
+    if (ImGui::IsItemActive()
+        && ImGui::IsMouseDragging(ImGuiMouseButton_Left)
+        && m_iSelEvent >= 0
+        && m_iSelEvent < (int)track.Events.size())
         track.Events[m_iSelEvent].fTriggerProgress = mProg;   // 드래그 이동
 
     // 마커 그리기
@@ -311,6 +314,30 @@ void CPanel_Animation::Render_EventTimeline()
     ImGui::SetNextItemWidth(-1.f);
     ImGui::InputText("##json", m_szEventPath, sizeof(m_szEventPath));
 
+    // --- Event list (select w/o timeline) ---
+    ImGui::BeginChild("##evlist",
+        ImVec2(170.f, 0.f), true);
+    for (int i = 0; i < (int)track.Events.size(); ++i)
+    {
+        const ANIM_EVENT& e = track.Events[i];
+        const char* szType = "None";
+        for (auto& [v, n] : Client::g_AnimEventNames)
+            if ((int)v == e.iEventType) szType = n;
+
+        char label[96];
+        sprintf_s(label, "%02d %-9s %.3f##ev%d",
+            i, szType, e.fTriggerProgress, i);
+
+        if (ImGui::Selectable(label, i == m_iSelEvent))
+            m_iSelEvent = i;
+    }
+    ImGui::EndChild();
+    ImGui::SameLine();
+
+    // --- Inspector beside the list ---
+    ImGui::BeginChild("##evinsp",
+        ImVec2(0.f, 0.f), false);
+
     // ── 선택 이벤트 편집 ──
     if (m_iSelEvent >= 0 && m_iSelEvent < (int)track.Events.size())
     {
@@ -325,9 +352,10 @@ void CPanel_Animation::Render_EventTimeline()
                 if (ImGui::Selectable(n, (int)v == e.iEventType)) e.iEventType = (int)v;
             ImGui::EndCombo();
         }
-        ImGui::SliderFloat("Start", &e.fTriggerProgress, 0.f, 1.f);
+        ImGui::DragFloat("Start", &e.fTriggerProgress, 0.001f, 0.f, 1.f, "%.3f");
         ImGui::Checkbox("Range", &e.bIsRange);
-        if (e.bIsRange) ImGui::SliderFloat("End", &e.fEndProgress, 0.f, 1.f);
+        if (e.bIsRange)
+            ImGui::DragFloat("End", &e.fEndProgress, 0.001f, 0.f, 1.f, "%.3f");
 
         char buf[128]; strcpy_s(buf, e.strParam.c_str());
         if (ImGui::InputText("Param", buf, sizeof(buf))) e.strParam = buf;
@@ -357,6 +385,8 @@ void CPanel_Animation::Render_EventTimeline()
             m_iSelEvent = -1;
         }
     }
+
+    ImGui::EndChild();
 }
 
 void CPanel_Animation::Rebuild_AnimNameCache(CModel* pModel)
