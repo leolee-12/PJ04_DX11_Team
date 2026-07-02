@@ -78,6 +78,10 @@ namespace ProtoDesc
 	// SpinSlashTrail
 	inline constexpr TEXTURE_DESC Texture_Common_SpinSlashTrail = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_SpinSlashTrail"), TEXT("../../Resources/YSE/Effect/Common_SpinSlashTrail/common_ring02.png"), 1 };
 
+	// Hit 
+	inline constexpr TEXTURE_DESC Texture_CommonHit01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonHit01"), TEXT("../../Resources/CHJ/Effect/Damage/common_hit01.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_CommonRing01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonRing01"), TEXT("../../Resources/CHJ/Effect/Common/common_ring01.dds"), 1 };
+
 	//sky
 	inline constexpr COMPONENT_DESC Model_SkyTest = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_SkyTest") };
 

@@ -34,7 +34,9 @@ namespace
         { TEXT("RockPush"),              TEXT("../../Resources/YSH/Effects/Proto_RockPush_0.json") },
         { TEXT("RockPull"),              TEXT("../../Resources/YSH/Effects/Proto_RockPull_1.json") },
         { TEXT("RockBounce"),            TEXT("../../Resources/YSH/Effects/Proto_RockBounce_2.json") },
-        { TEXT("BombExplosion"),         TEXT("../../Resources/CHJ/Effect/BombExplosion.JSON")}
+        { TEXT("BombExplosion"),         TEXT("../../Resources/CHJ/Effect/BombExplosion.JSON")},
+        { TEXT("CommonHit"),             TEXT("../../Resources/CHJ/Effect/CommonHit.JSON")},
+        { TEXT("SpitObject"),             TEXT("../../Resources/CHJ/Effect/SpitObject.JSON")}
     };
 }
 

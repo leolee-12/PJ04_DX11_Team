@@ -4,7 +4,7 @@
 #include "GameContent_const.h"
 #include "SmokeSphereOriginal.h""
 #include "SmokeParticle.h"
-#include "Common_Sphere02.h"
+#include "SphereParticle.h"
 #include "Common_SphereNoise.h"
 
 CBombExplosion::CBombExplosion(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -62,7 +62,7 @@ HRESULT CBombExplosion::Ready_EffectPartObjects()
     if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeParticle::PROTOTYPE_TAG, TEXT("Proto_SmokeParticle"))))
         return E_FAIL;
 
-    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CCommon_Sphere02::PROTOTYPE_TAG, TEXT("Proto_CommonSphere"))))
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSphereParticle::PROTOTYPE_TAG, TEXT("Proto_SphereParticle"))))
         return E_FAIL;
 
     if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CCommon_SphereNoise::PROTOTYPE_TAG, TEXT("Proto_SphereNoise"))))

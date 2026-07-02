@@ -1,31 +1,38 @@
-#include "Common_Sphere02.h"
+#include "StarEmitter.h"
 
 #include "GameInstance.h"
 
 #include "GameContent_const.h"
 
-CCommon_Sphere02::CCommon_Sphere02(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CEffect_MeshParticle{ pDevice, pContext }
+CStarEmitter::CStarEmitter(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+    : CEffect_MeshEmitter{ pDevice, pContext }
 {
 }
 
-CCommon_Sphere02::CCommon_Sphere02(const CCommon_Sphere02& Prototype)
-    : CEffect_MeshParticle(Prototype)
+CStarEmitter::CStarEmitter(const CStarEmitter& Prototype)
+    : CEffect_MeshEmitter(Prototype)
 {
 }
 
-HRESULT CCommon_Sphere02::Initialize_Prototype()
+HRESULT CStarEmitter::Initialize_Prototype()
 {
     m_eProjType = PROJ_TYPE::PERSPEC;
     return S_OK;
 }
 
-HRESULT CCommon_Sphere02::Initialize(void* pArg)
+HRESULT CStarEmitter::Initialize(void* pArg)
 {
-    COMMON_SPHERE_DESC tDesc{};
+    STAR_EMITTER_DESC tDesc{};
 
     tDesc.iModelLevel = m_iPrototypeLevel;
-    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_CommonSphere");
+    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_StarSmooth");
+
+    if (pArg != nullptr)
+    {
+        auto pIn = static_cast<STAR_EMITTER_DESC*>(pArg);
+        if (!pIn->wstrModelTag.empty())
+            tDesc.wstrModelTag = pIn->wstrModelTag;
+    }
 
     tDesc.bUseDiffuseTexture = false;
     tDesc.bUseUnKnownTexture = true;
@@ -48,17 +55,17 @@ HRESULT CCommon_Sphere02::Initialize(void* pArg)
     return S_OK;
 }
 
-void CCommon_Sphere02::Priority_Update(_float fTimeDelta)
+void CStarEmitter::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 }
 
-void CCommon_Sphere02::Update(_float fTimeDelta)
+void CStarEmitter::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 }
 
-void CCommon_Sphere02::Late_Update(_float fTimeDelta)
+void CStarEmitter::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 
@@ -69,40 +76,40 @@ void CCommon_Sphere02::Late_Update(_float fTimeDelta)
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 
-HRESULT CCommon_Sphere02::Render()
+HRESULT CStarEmitter::Render()
 {
     __super::Render();
 
     return S_OK;
 }
 
-CCommon_Sphere02* CCommon_Sphere02::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CStarEmitter* CStarEmitter::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CCommon_Sphere02* pInstance = new CCommon_Sphere02(pDevice, pContext);
+    CStarEmitter* pInstance = new CStarEmitter(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX("Failed to Created: CCommon_Sphere02");
+        MSG_BOX("Failed to Created: CStarEmitter");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CCommon_Sphere02::Clone(void* pArg)
+CGameObject* CStarEmitter::Clone(void* pArg)
 {
-    CCommon_Sphere02* pInstance = new CCommon_Sphere02(*this);
+    CStarEmitter* pInstance = new CStarEmitter(*this);
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Cloned: CCommon_Sphere02");
+        MSG_BOX("Failed to Cloned: CStarEmitter");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CCommon_Sphere02::Free()
+void CStarEmitter::Free()
 {
     __super::Free();
 }

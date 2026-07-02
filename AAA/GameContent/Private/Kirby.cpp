@@ -419,7 +419,7 @@ void CKirby::SetUp_Collider_Callback()
                     _vector vAtkPos = pOther->Get_Owner()->Get_Transform()->Get_State(STATE::POSITION);
                     ATTACK_INFO atk{};
                     atk.fDamage = 1.f;
-                    atk.fKnockback = 6.f;                     
+                    atk.fKnockback = 2.f;                     
                     XMStoreFloat3(&atk.vAttackerPos, vAtkPos);
                     atk.pAttacker = pOther->Get_Owner();
                     Damaged(atk);
