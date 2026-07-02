@@ -47,6 +47,10 @@ void CPanel_Palette::Render()
                         memset(m_szNameBuf, 0, sizeof(m_szNameBuf));
                         m_bOpenNamePopup = true;
                     }
+                    else if (category == L"ENV_TRIGGER")
+                    {
+                        pLevel->Begin_PlaceMode(strTag, L"Layer_EnvEffect");
+                    }
                     else
                     {
                         pLevel->Begin_PlaceMode(strTag, L"Default_Layer");

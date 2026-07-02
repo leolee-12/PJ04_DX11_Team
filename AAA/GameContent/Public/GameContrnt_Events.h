@@ -34,6 +34,9 @@ namespace Client
 
         inline constexpr const _tchar* NamePlate_Appeared = L"Boss.NamePlateOn";
         inline constexpr const _tchar* FullScreen_Flash = L"Fx.FullScreenFlashOn";
+
+        inline constexpr const _tchar* CarBreakWall = L"Stage1-2.CarBreakWall";
+        inline constexpr const _tchar* CarBreakWall2 = L"Stage1-2.CarBreakWall2";
     }
 
     inline constexpr const _tchar* EVT_SWALLOWED = L"OnSwallowed";
@@ -98,4 +101,14 @@ namespace Client
         _float fCurrHp = { 100.f };
     }BOSS_HP_APPEARED;
 
+
+    /* ----------------------- Leo ---------------------- */
+    struct TRIGGER_EVENT_PAYLOAD
+    {
+        CGameObject* pTriggerObject = { nullptr };
+        _wstring strTriggerId;
+        _wstring strEventTag;
+        _wstring strPayload;
+    };
+    /* -------------------------------------------------- */
 }

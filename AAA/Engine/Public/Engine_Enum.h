@@ -54,5 +54,7 @@ namespace Engine
 	enum class TEXT_ALIGN { LEFT, CENTER, RIGHT, END };
 
 	enum class DEFAULT_TEXTURE { WHITE, BLACK, MAGENTA, FLAT_NORMAL, MRA, END };
+
+	enum class ESoundBus { BGM, SFX, UI, VOICE, END };
 }
 #endif // Engine_Enum_h__

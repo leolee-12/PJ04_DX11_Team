@@ -46,6 +46,7 @@ protected:
     virtual _bool          Is_Intro_Finished() const override;
     virtual void           Play_Death() override;
     virtual _bool          Is_Death_Finished() const override;
+    virtual void           On_Enter_Corpse() override;
     virtual _float         Get_CorpseLinger() const override { return 0.f; }
 
     virtual const vector<_float>& Get_PhaseThresholds() const override { return s_Thresholds; }

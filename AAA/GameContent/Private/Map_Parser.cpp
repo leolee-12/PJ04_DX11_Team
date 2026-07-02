@@ -644,12 +644,8 @@ void CMap_Parser::Parse_ToyObjEntry(
 	pOutDescs->push_back(Desc);
 }
 
-void CMap_Parser::Parse_EffectEntry(
-	const wstring& wstrSourceFile,
-	const wstring& wstrSection,
-	const wstring& wstrEntryKey,
-	const json& jEntry,
-	vector<ENV_OBJECT_DESC>* pOutDescs)
+void CMap_Parser::Parse_EffectEntry(const _wstring& wstrSourceFile, const _wstring& wstrSection, const _wstring& wstrEntryKey,
+	const json& jEntry, vector<ENV_OBJECT_DESC>* pOutDescs)
 {
 	if (nullptr == pOutDescs)
 		return;
@@ -717,13 +713,21 @@ void CMap_Parser::Parse_EffectEntry(
 		Desc.wstrComponentName = L"FieldEffect";
 	}
 
+	if (nullptr != pMainComponent)
+	{
+		Try_ReadFloat(*pMainComponent, "TransitionSec", &Desc.tEffect.fTransitionSec);
+		Try_ReadFloat(*pMainComponent, "InTransitionSec", &Desc.tEffect.fInTransitionSec);
+		Try_ReadFloat(*pMainComponent, "OutTransitionSec", &Desc.tEffect.fOutTransitionSec);
+	}
+
 	if (Desc.wstrComponentName == L"ToneMappingArea")
 	{
 		Try_ReadFloat3Array(*pMainComponent, "Size", &Desc.tEffect.vAreaSize);
 		Try_ReadFloat(*pMainComponent, "ExposureValue", &Desc.tEffect.fExposureValue);
 
-		Desc.tEffect.vAreaCenter = Desc.vPosition;
+		Desc.tEffect.vAreaCenter = { 0.f, 0.f, 0.f };
 		Desc.tEffect.vAreaRot = Desc.vRotation;
+		Desc.vScale = { 1.f, 1.f, 1.f };
 	}
 
 	Desc.tEffect.eEffectType = Classify_EffectType(Desc.wstrObjectName, Desc.wstrComponentName);

@@ -864,6 +864,21 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\99. CarMilkyWay">
       <UniqueIdentifier>{88986c88-48f9-45f5-8a25-875b592353d2}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\02. Gorilla_RockPush">
+      <UniqueIdentifier>{53dd3b59-90ba-4e75-835b-bab9a309f981}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\03. Gorilla_RockPull">
+      <UniqueIdentifier>{b803ddbf-3030-4582-92d7-db756d1af7cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\04. Gorilla_RockBounce">
+      <UniqueIdentifier>{59ccb4ac-2007-45f9-b03a-35c3dbb07621}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\02. EnvObject\Trigger">
+      <UniqueIdentifier>{f61d97f4-06b5-4b44-8a89-c4328f90ddfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\01. Map\Section">
+      <UniqueIdentifier>{ec37b494-e272-4b95-b84e-14f77ae35aef}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -881,9 +896,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Loader_Prototype.h">
       <Filter>97. DataSystem\DataLoader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\MapSection.h">
-      <Filter>00. GameObject\01. Map</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Map_Defines.h">
       <Filter>00. GameObject\01. Map</Filter>
@@ -949,9 +961,6 @@
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EnvObject_Defines.h">
-      <Filter>00. GameObject\02. EnvObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\EnvObject_Trigger.h">
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EnvObject_Interact.h">
@@ -1632,7 +1641,7 @@
     <ClInclude Include="..\public\SpinWind.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SpinWind</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Gorilla_DeathSmoke.h">
+    <ClInclude Include="..\public\DeathSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\01. Gorilla_DeathSmoke</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\DespawnEffect.h">
@@ -1652,6 +1661,36 @@
     </ClInclude>
     <ClInclude Include="..\Public\CarMilkyWay.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\99. CarMilkyWay</Filter>
+	</ClInclude>
+	<ClInclude Include="..\Public\StarParticle.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. StarParticle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RockPush.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\02. Gorilla_RockPush</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RockPull.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\03. Gorilla_RockPull</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RockBounce.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\04. Gorilla_RockBounce</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvObject_Trigger.h">
+      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvTrigger_Generic.h">
+      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvTrigger_RenderGlobals.h">
+      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvTrigger_EventPublisher.h">
+      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapSection.h">
+      <Filter>00. GameObject\01. Map\Section</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapBreakSection.h">
+      <Filter>00. GameObject\01. Map\Section</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1663,9 +1702,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Loader_Prototype.cpp">
       <Filter>97. DataSystem\DataLoader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\MapSection.cpp">
-      <Filter>00. GameObject\01. Map</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MapStage.cpp">
       <Filter>00. GameObject\01. Map</Filter>
@@ -1716,9 +1752,6 @@
       <Filter>00. GameObject\Test\TestMap</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnvObject.cpp">
-      <Filter>00. GameObject\02. EnvObject</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\EnvObject_Trigger.cpp">
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnvObject_Interact.cpp">
@@ -2342,7 +2375,7 @@
     <ClCompile Include="..\private\SpinWind.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SpinWind</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Gorilla_DeathSmoke.cpp">
+    <ClCompile Include="..\private\DeathSmoke.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\01. Gorilla_DeathSmoke</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\DespawnEffect.cpp">
@@ -2362,7 +2395,37 @@
     </ClCompile>
     <ClCompile Include="..\Private\CarMilkyWay.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\99. CarMilkyWay</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\StarParticle.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. StarParticle</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\RockPush.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\02. Gorilla_RockPush</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RockPull.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\03. Gorilla_RockPull</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RockBounce.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\04. Gorilla_RockBounce</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvObject_Trigger.cpp">
+      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvTrigger_Generic.cpp">
+      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvTrigger_RenderGlobals.cpp">
+      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvTrigger_EventPublisher.cpp">
+      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapSection.cpp">
+      <Filter>00. GameObject\01. Map\Section</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapBreakSection.cpp">
+      <Filter>00. GameObject\01. Map\Section</Filter>
+	</ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\ShaderFiles\Shader_VtxTex.hlsl">
