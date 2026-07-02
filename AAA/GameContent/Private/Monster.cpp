@@ -297,6 +297,19 @@ void CMonster::SetUp_Collider_CallBack()
 				XMStoreFloat3(&atk.vAttackerPos, vAtkPos);
 				atk.pAttacker = pOther->Get_Owner();
 				Damaged(atk);
+
+				// 몬스터 피격 이펙트 (임시 연결)
+				const _float4* pCamLook = m_pGameInstance_Proxy->Get_CamLook();
+
+				_float3 vFaceCam{};
+				XMStoreFloat3(&vFaceCam, XMVectorNegate(XMLoadFloat4(pCamLook)));  
+				
+				_float3	vPos{};
+				XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+				CEffect_Loader::GetInstance()->Spawn(L"CommonHit", Get_LevelIndex(),
+					vPos, vFaceCam, _float3(0.f, 0.f, 0.f),
+					nullptr);
 #ifdef _DEBUG
 				char szBuf[128];
 				sprintf_s(szBuf, "[Monster] Hurt! HP %.0f/%.0f\n", m_fCurHP, m_fMaxHP);
@@ -445,10 +458,6 @@ HRESULT CMonster::Ready_State()
 
 void CMonster::On_Damaged(const ATTACK_INFO& tInfo)
 {
-	//  Movement 상태 안으로 이전
-	//if (m_pMovement)
-	//	m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
-
 	m_LastHit = { tInfo.vAttackerPos, tInfo.fKnockback, tInfo.fDamage };
 
 	Change_State(MONSTER_STATE_TYPE::KNOCK_BACK);
