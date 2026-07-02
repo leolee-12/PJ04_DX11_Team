@@ -27,6 +27,7 @@ namespace
         { TEXT("SpinSlashTrail_Super"),  TEXT("../../Resources/YSE/EffectContainer/SpinSlashTrail_Super.json") },
         { TEXT("RockFloor"),             TEXT("../../Resources/YSE/EffectContainer/RockFloor.json") },
         { TEXT("DespawnEffect"),         TEXT("../../Resources/CHJ/Effect/DespawnEffect.JSON")},
+        { TEXT("BombExplosion"),         TEXT("../../Resources/CHJ/Effect/BombExplosion.JSON")}
     };
 }
 

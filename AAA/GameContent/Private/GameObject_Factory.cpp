@@ -59,7 +59,7 @@
 #include "Sword_SpinSlashTrail.h"
 #include "RockBurst.h"
 #include "DespawnEffect.h"
-
+#include "BombExplosion.h"
 #include "BoostGas.h"
 
 // Effect_Part
@@ -80,6 +80,8 @@
 #include "SmokeParticle.h"
 #include "SpinWind.h"
 #include "StarParticle.h"
+#include "Common_Sphere02.h"
+#include "Common_SphereNoise.h"
 
 //sky
 #include "SkySphere.h"
@@ -739,6 +741,27 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StarSmooth"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Star/Common_00_Common_StarSmooth2.ysh"));
          
+        ));
+
+    // 3
+    Register(CBombExplosion::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CBombExplosion),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeParticle::PROTOTYPE_TAG,
+                CSmokeParticle::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_Sphere02::PROTOTYPE_TAG,
+                CCommon_Sphere02::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_CommonSphere"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Bomb/Sphere/Common_00_Common_Sphere02.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_SphereNoise::PROTOTYPE_TAG,
+                CCommon_SphereNoise::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SphereNoise"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Bomb/SphereNoise/Common_00_Common_SphereNoise.ysh"));
         ));
 }
 

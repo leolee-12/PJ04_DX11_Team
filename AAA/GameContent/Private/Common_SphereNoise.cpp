@@ -1,31 +1,31 @@
-#include "StarParticle.h"
+#include "Common_SphereNoise.h"
 
 #include "GameInstance.h"
 
 #include "GameContent_const.h"
 
-CStarParticle::CStarParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CCommon_SphereNoise::CCommon_SphereNoise(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_MeshParticle{ pDevice, pContext }
 {
 }
 
-CStarParticle::CStarParticle(const CStarParticle& Prototype)
+CCommon_SphereNoise::CCommon_SphereNoise(const CCommon_SphereNoise& Prototype)
     : CEffect_MeshParticle(Prototype)
 {
 }
 
-HRESULT CStarParticle::Initialize_Prototype()
+HRESULT CCommon_SphereNoise::Initialize_Prototype()
 {
     m_eProjType = PROJ_TYPE::PERSPEC;
     return S_OK;
 }
 
-HRESULT CStarParticle::Initialize(void* pArg)
+HRESULT CCommon_SphereNoise::Initialize(void* pArg)
 {
-    STAR_PARTICLE_DESC tDesc{};
+    SPHERE_NOISE_DESC tDesc{};
 
     tDesc.iModelLevel = m_iPrototypeLevel;
-    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_StarSmooth");
+    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_SphereNoise");
 
     tDesc.bUseDiffuseTexture = false;
     tDesc.bUseUnKnownTexture = true;
@@ -48,17 +48,17 @@ HRESULT CStarParticle::Initialize(void* pArg)
     return S_OK;
 }
 
-void CStarParticle::Priority_Update(_float fTimeDelta)
+void CCommon_SphereNoise::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 }
 
-void CStarParticle::Update(_float fTimeDelta)
+void CCommon_SphereNoise::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 }
 
-void CStarParticle::Late_Update(_float fTimeDelta)
+void CCommon_SphereNoise::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 
@@ -69,40 +69,40 @@ void CStarParticle::Late_Update(_float fTimeDelta)
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::BLEND, this);
 }
 
-HRESULT CStarParticle::Render()
+HRESULT CCommon_SphereNoise::Render()
 {
     __super::Render();
 
     return S_OK;
 }
 
-CStarParticle* CStarParticle::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CCommon_SphereNoise* CCommon_SphereNoise::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CStarParticle* pInstance = new CStarParticle(pDevice, pContext);
+    CCommon_SphereNoise* pInstance = new CCommon_SphereNoise(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX("Failed to Created: CStarParticle");
+        MSG_BOX("Failed to Created: CCommon_SphereNoise");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CStarParticle::Clone(void* pArg)
+CGameObject* CCommon_SphereNoise::Clone(void* pArg)
 {
-    CStarParticle* pInstance = new CStarParticle(*this);
+    CCommon_SphereNoise* pInstance = new CCommon_SphereNoise(*this);
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Cloned: CStarParticle");
+        MSG_BOX("Failed to Cloned: CCommon_SphereNoise");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CStarParticle::Free()
+void CCommon_SphereNoise::Free()
 {
     __super::Free();
 }

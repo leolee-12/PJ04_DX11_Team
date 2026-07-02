@@ -2,6 +2,7 @@
 #include "GameInstance.h"
 #include "Projectile_Movement.h"
 #include "GameContrnt_Events.h"
+#include "Effect_Loader.h"
 
 CEnemyBomb::CEnemyBomb(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CProjectile_Bomb { pDevice , pContext }
@@ -136,10 +137,15 @@ void CEnemyBomb::On_Bounce(_int iCount)
 
 void CEnemyBomb::On_Explode()
 {
-	_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+	_float3 vPos{};
+	XMStoreFloat3(&vPos,
+		m_pTransformCom->Get_State(STATE::POSITION));
 
-	// TODO : 폭발 이벤트
-	// TODO 폭발 시 추가 콜라이더 생성 (선택사항)
+	CEffect_Loader::GetInstance()->Spawn(
+		L"BombExplosion", Get_LevelIndex(),
+		vPos, _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+		nullptr);
+
 	Despawn();
 }
 

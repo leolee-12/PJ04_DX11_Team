@@ -1,31 +1,31 @@
-#include "StarParticle.h"
+#include "Common_Sphere02.h"
 
 #include "GameInstance.h"
 
 #include "GameContent_const.h"
 
-CStarParticle::CStarParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CCommon_Sphere02::CCommon_Sphere02(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_MeshParticle{ pDevice, pContext }
 {
 }
 
-CStarParticle::CStarParticle(const CStarParticle& Prototype)
+CCommon_Sphere02::CCommon_Sphere02(const CCommon_Sphere02& Prototype)
     : CEffect_MeshParticle(Prototype)
 {
 }
 
-HRESULT CStarParticle::Initialize_Prototype()
+HRESULT CCommon_Sphere02::Initialize_Prototype()
 {
     m_eProjType = PROJ_TYPE::PERSPEC;
     return S_OK;
 }
 
-HRESULT CStarParticle::Initialize(void* pArg)
+HRESULT CCommon_Sphere02::Initialize(void* pArg)
 {
-    STAR_PARTICLE_DESC tDesc{};
+    COMMON_SPHERE_DESC tDesc{};
 
     tDesc.iModelLevel = m_iPrototypeLevel;
-    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_StarSmooth");
+    tDesc.wstrModelTag = TEXT("Prototype_Component_Model_CommonSphere");
 
     tDesc.bUseDiffuseTexture = false;
     tDesc.bUseUnKnownTexture = true;
@@ -48,17 +48,17 @@ HRESULT CStarParticle::Initialize(void* pArg)
     return S_OK;
 }
 
-void CStarParticle::Priority_Update(_float fTimeDelta)
+void CCommon_Sphere02::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 }
 
-void CStarParticle::Update(_float fTimeDelta)
+void CCommon_Sphere02::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 }
 
-void CStarParticle::Late_Update(_float fTimeDelta)
+void CCommon_Sphere02::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 
@@ -66,43 +66,43 @@ void CStarParticle::Late_Update(_float fTimeDelta)
         return;
 
     Compute_CombinedWorldMatrix();
-    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::BLEND, this);
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 
-HRESULT CStarParticle::Render()
+HRESULT CCommon_Sphere02::Render()
 {
     __super::Render();
 
     return S_OK;
 }
 
-CStarParticle* CStarParticle::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CCommon_Sphere02* CCommon_Sphere02::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CStarParticle* pInstance = new CStarParticle(pDevice, pContext);
+    CCommon_Sphere02* pInstance = new CCommon_Sphere02(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX("Failed to Created: CStarParticle");
+        MSG_BOX("Failed to Created: CCommon_Sphere02");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CStarParticle::Clone(void* pArg)
+CGameObject* CCommon_Sphere02::Clone(void* pArg)
 {
-    CStarParticle* pInstance = new CStarParticle(*this);
+    CCommon_Sphere02* pInstance = new CCommon_Sphere02(*this);
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Cloned: CStarParticle");
+        MSG_BOX("Failed to Cloned: CCommon_Sphere02");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CStarParticle::Free()
+void CCommon_Sphere02::Free()
 {
     __super::Free();
 }
