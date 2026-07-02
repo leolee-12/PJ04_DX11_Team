@@ -60,7 +60,7 @@ HRESULT CRenderer::Initialize()
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_SSAO_Blur"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R8_UNORM, _float4(1.f, 1.f, 1.f, 1.f))))
         return E_FAIL;
 
-    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_LightDepth"), g_iMaxWidth, g_iMaxHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(1.f, 1.f, 1.f, 1.f))))
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_LightDepth"), g_iShadowMapSize, g_iShadowMapSize, DXGI_FORMAT_R32_FLOAT, _float4(1.f, 1.f, 1.f, 1.f))))
         return E_FAIL;
     if (FAILED(Ready_DepthStencil_Buffer()))
         return E_FAIL;
@@ -294,7 +294,7 @@ HRESULT CRenderer::Render_Shadow()
     if (FAILED(m_pGameInstance_Proxy->Begin_MRT(TEXT("MRT_ShadowObjects"), m_pMaxDSV)))
         return E_FAIL;
 
-    Change_ViewportDesc(g_iMaxWidth, g_iMaxHeight);
+    Change_ViewportDesc(g_iShadowMapSize, g_iShadowMapSize);
 
 
     for (auto& pRenderObject : m_RenderObjects[ETOUI(RENDERID::SHADOW)])
@@ -1061,8 +1061,8 @@ HRESULT CRenderer::Ready_DepthStencil_Buffer()
     ID3D11Texture2D* pMaxDSTexture = { nullptr };
 
     D3D11_TEXTURE2D_DESC	MaxTextureDesc{};
-    MaxTextureDesc.Width = g_iMaxWidth;
-    MaxTextureDesc.Height = g_iMaxHeight;
+    MaxTextureDesc.Width = g_iShadowMapSize;
+    MaxTextureDesc.Height = g_iShadowMapSize;
     MaxTextureDesc.MipLevels = 1;
     MaxTextureDesc.ArraySize = 1;
     MaxTextureDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;

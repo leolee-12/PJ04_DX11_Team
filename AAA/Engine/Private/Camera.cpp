@@ -10,7 +10,7 @@ CCamera::CCamera(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	, m_vAt(0.f, 0.f, 0.f)
 	, m_fShadowRange(60.f)     
 	, m_fShadowPadding(50.f)   
-	, m_iShadowRes(g_iMaxWidth)
+	, m_iShadowRes(g_iShadowMapSize)
 	, m_bDriveShadowFit(true)
 {
 }
