@@ -61,6 +61,8 @@ float g_fSaturation = 0.88f;
 
 Texture2D<uint> g_MaterialIDTexture; // R8_UINT, matID 전용
 
+float g_fSpotlightDarken;
+
     //============================ Common VS ============================
 struct VS_IN
 {
@@ -441,6 +443,11 @@ float4 PS_OCCLUSION_SILHOUETTE(PS_IN In) : SV_TARGET0
     return float4(0.f, 0.f, 0.f, 0.55f);
 }
 
+float4 PS_SPOTLIGHT_DARKEN(PS_IN In) : SV_TARGET0
+{
+    return float4(0.f, 0.f, 0.f, g_fSpotlightDarken);
+}
+
 
     //============================ Technique ============================
 technique11 DefaultTechnique
@@ -546,5 +553,15 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN(); // 기존 풀스크린 쿼드 VS 그대로
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_OCCLUSION_SILHOUETTE();
+    }
+
+    pass SpotlightDarken // 11
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_SpotlightDarken, 1); // ref=1, stencil!=1 인 곳만 통과
+        SetBlendState(BS_AlphaBlend, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_SPOTLIGHT_DARKEN();
     }
 }

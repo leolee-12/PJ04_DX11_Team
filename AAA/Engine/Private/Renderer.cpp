@@ -239,7 +239,9 @@ HRESULT CRenderer::Draw()
 
     if (FAILED(Render_Curtain()))
         return E_FAIL;
-
+    if (FAILED(Render_Flash()))
+        return E_FAIL;
+  
 #ifdef _DEBUG
     Reset_RS();
 
@@ -1024,6 +1026,24 @@ HRESULT CRenderer::Render_Curtain()
 
     return S_OK;
 
+}
+
+HRESULT CRenderer::Render_Flash()
+{
+    auto& Flash = m_RenderUIs[ETOUI(RENDERUIID::FLASH)];
+
+    stable_sort(Flash.begin(), Flash.end(),
+        [](CUIObject* a, CUIObject* b) { return a->Get_ZOrder() > b->Get_ZOrder(); });
+
+    for (auto& pUI : Flash)
+    {
+        if (nullptr != pUI)
+            pUI->Render();  
+        Safe_Release(pUI);
+    }
+    Flash.clear();
+
+    return S_OK;
 }
 
 _uint CRenderer::Render_Width() const

@@ -48,6 +48,10 @@ HRESULT CShaderGlobal_Manager::Initialize()
     Register({ "g_fAtmosEnd",      "Atmos End",       GVAL::FLOAT,  { 300.f, 0.f, 0.f, 0.f }, { 0.f, 1000.f } });
     Register({ "g_fAtmosStrength", "Atmos Strength",  GVAL::FLOAT,  { 0.5f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
 
+    Register({ "g_fSpotlightDarken", "Spotlight Darken",  GVAL::FLOAT,  { 1.f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
+
+    
+
     return S_OK;
 }
 
@@ -77,6 +81,71 @@ const _float4* CShaderGlobal_Manager::Get(const string& strName) const
     if (it == m_Index.end())
         return nullptr;
     return &m_Globals[it->second].vValue;
+}
+
+void CShaderGlobal_Manager::Tween(const string& strName, const _float4& vTarget, _float fDuration)
+{
+    auto it = m_Index.find(strName);
+    if (it == m_Index.end())
+        return;
+
+    _uint iIdx = it->second;
+
+    // 즉시 세팅: 진행 중이던 보간도 정리
+    if (fDuration <= 0.f)
+    {
+        m_Globals[iIdx].vValue = vTarget;
+        m_Tweens.erase(iIdx);
+        return;
+    }
+
+    TWEEN tw;
+    tw.vStart = m_Globals[iIdx].vValue;   // 현재값에서 시작
+    tw.vTarget = vTarget;
+    tw.fElapsed = 0.f;
+    tw.fDuration = fDuration;
+    m_Tweens[iIdx] = tw;
+}
+
+void CShaderGlobal_Manager::Stop_Tween(const string& strName)
+{
+    auto it = m_Index.find(strName);
+    if (it == m_Index.end())
+        return;
+    m_Tweens.erase(it->second);
+}
+
+_bool CShaderGlobal_Manager::Is_Tweening(const string& strName) const
+{
+    auto it = m_Index.find(strName);
+    if (it == m_Index.end())
+        return false;
+    return m_Tweens.find(it->second) != m_Tweens.end();
+}
+
+void CShaderGlobal_Manager::Tick(_float fTimeDelta)
+{
+    if (m_Tweens.empty())
+        return;
+
+    for (auto it = m_Tweens.begin(); it != m_Tweens.end(); )
+    {
+        TWEEN& tw = it->second;
+        tw.fElapsed += fTimeDelta;
+
+        _float t = tw.fElapsed / tw.fDuration;
+        _bool  bDone = (t >= 1.f);
+        if (bDone) t = 1.f;
+
+        _float4& v = m_Globals[it->first].vValue;
+        XMStoreFloat4(&v,
+            XMVectorLerp(XMLoadFloat4(&tw.vStart), XMLoadFloat4(&tw.vTarget), t));
+
+        if (bDone)
+            it = m_Tweens.erase(it);
+        else
+            ++it;
+    }
 }
 
 HRESULT CShaderGlobal_Manager::Bind(CShader* pShader, const string& strName)

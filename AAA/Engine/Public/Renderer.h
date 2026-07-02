@@ -108,6 +108,8 @@ private:
 
 	HRESULT Render_Curtain();
 
+	HRESULT Render_Flash();
+
 	_uint Render_Width()  const;
 	_uint Render_Height() const;
 
