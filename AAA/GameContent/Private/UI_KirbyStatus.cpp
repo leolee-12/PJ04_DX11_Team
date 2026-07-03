@@ -80,8 +80,15 @@ void CUI_KirbyStatus::Late_Update(_float fTimeDelta)
 
 HRESULT CUI_KirbyStatus::Ready_Events()
 {
-    if (FAILED(__super::Ready_Events()))
-        return E_FAIL;
+    Subscribe_Event(EventTag::Kirby_HP_Updated, [this](void* pData)
+        {
+            if (auto pDesc = static_cast<KIRBY_HP_UPDATED*>(pData))
+            {
+                _float fDeltaHp = pDesc->fCurrHp - m_fDefaultCurrHP;
+                m_pGaugeBar->Add_Value(fDeltaHp);
+                m_fDefaultCurrHP = pDesc->fCurrHp;
+            }
+        });
 
     return S_OK;
 }
