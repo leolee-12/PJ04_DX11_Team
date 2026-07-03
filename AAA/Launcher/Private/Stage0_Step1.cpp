@@ -90,18 +90,18 @@ HRESULT CStage0_Step1::Render()
 HRESULT CStage0_Step1::Ready_Events()
 {
     Subscribe_Event(TEXT("FadeOut_Done"), [this](void* p) {
-        //CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::STAGE0_STEP2);
-        //if (pLoadingLevel)
-        //{
-        //    m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
-        //    return;
-        //}
-        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::BOSS_STAGE1);
+        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::STAGE0_STEP2);
         if (pLoadingLevel)
         {
             m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
             return;
         }
+        //CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::BOSS_STAGE1);
+        //if (pLoadingLevel)
+        //{
+        //    m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
+        //    return;
+        //}
         });
     return S_OK;
 }

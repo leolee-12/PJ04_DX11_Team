@@ -780,6 +780,11 @@ void CKirby::Add_HP(_float fHP)
     m_fCurHP += fHP;
 
     Helper::FloatClamp(m_fCurHP, 0.f, m_fMaxHP);
+
+    KIRBY_HP_UPDATED eDesc{};
+    eDesc.fCurrHp = m_fCurHP;
+    eDesc.fMaxHP = m_fMaxHP;
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_HP_Updated, &eDesc);
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

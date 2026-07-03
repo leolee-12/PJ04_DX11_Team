@@ -59,8 +59,8 @@ void CUI_PointStar::Update(_float fTimeDelta)
 
 	m_fVisibleElapsed += fTimeDelta;
 
-	//if (!m_bFadeOut && m_fVisibleElapsed >= m_fVisibleDuration)
-	//	Begin_PointStarFadeOut();
+	if (!m_bFadeOut && m_fVisibleElapsed >= m_fVisibleDuration)
+		Begin_PointStarFadeOut();
 
 	if (m_bFadeOut && (!m_pUIAnimatorCom || !m_pUIAnimatorCom->Is_FadingAny()))
 	{
