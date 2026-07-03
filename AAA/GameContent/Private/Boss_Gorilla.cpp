@@ -395,6 +395,11 @@ void CBoss_Gorilla::Tick_DeathSequence(_float fTimeDelta)
             {
                 pAnim->Pause();
                 m_fDeathPauseTimer = DEATH_PAUSE_SEC;
+
+                m_pGameInstance_Proxy->Stop_BGM();
+                Play_OneShotSFX(
+                    TEXT("CharaBasic_DeadBigEnemy.wav"));
+
                 CAMERA_SHAKE_DESC shake{ 0.8f, DEATH_SHAKE_SEC }; 
                 m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &shake);
                 m_eDeathStep = EDEATH::PAUSING;

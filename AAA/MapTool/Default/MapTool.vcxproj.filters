@@ -25,9 +25,6 @@
     <Filter Include="01. API\00. EditInstance">
       <UniqueIdentifier>{dba9231c-6a69-48a3-a36d-b2a67c3dab61}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. API\01. Profiler">
-      <UniqueIdentifier>{ca47b2f8-828c-492e-a221-b4ec0ee698ec}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. Levels">
       <UniqueIdentifier>{35e7a30f-47e6-4264-9b5d-7769a6aa3c11}</UniqueIdentifier>
     </Filter>
@@ -52,9 +49,6 @@
     <Filter Include="04. Panels">
       <UniqueIdentifier>{8cd65a44-7542-4a0f-be36-60fc2d99138f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Panels\Manager">
-      <UniqueIdentifier>{59c1a732-144c-4530-9d03-93792c200f41}</UniqueIdentifier>
-    </Filter>
     <Filter Include="04. Panels\Hierarchy">
       <UniqueIdentifier>{9df3c044-1638-4c5e-b8cd-0125b13d0e80}</UniqueIdentifier>
     </Filter>
@@ -70,13 +64,16 @@
     <Filter Include="04. Panels\Profiler">
       <UniqueIdentifier>{1cfcb692-1664-4e2a-9477-1731a2118f9c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="04. Panels\00. Manager">
+      <UniqueIdentifier>{59c1a732-144c-4530-9d03-93792c200f41}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Panel.h">
       <Filter>04. Panels</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Panel_Manager.h">
-      <Filter>04. Panels\Manager</Filter>
+      <Filter>04. Panels\00. Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Panel_Inspector.h">
       <Filter>04. Panels\Inspector</Filter>
@@ -141,9 +138,6 @@
     <ClInclude Include="..\Public\Loader.h">
       <Filter>02. Levels\Loader</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\MapToolProfiler.h">
-      <Filter>01. API\01. Profiler</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Panel_Profiler.h">
       <Filter>04. Panels\Profiler</Filter>
     </ClInclude>
@@ -180,7 +174,7 @@
       <Filter>04. Panels</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Panel_Manager.cpp">
-      <Filter>04. Panels\Manager</Filter>
+      <Filter>04. Panels\00. Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Panel_Inspector.cpp">
       <Filter>04. Panels\Inspector</Filter>
@@ -223,9 +217,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Loader.cpp">
       <Filter>02. Levels\Loader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\MapToolProfiler.cpp">
-      <Filter>01. API\01. Profiler</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Panel_Profiler.cpp">
       <Filter>04. Panels\Profiler</Filter>

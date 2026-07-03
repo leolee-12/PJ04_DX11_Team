@@ -40,12 +40,11 @@ HRESULT CMapStage::Initialize(void* pArg)
 		return E_FAIL;
 
 	const MAP_STAGE_DESC* pDesc = static_cast<const MAP_STAGE_DESC*>(pArg);
+	m_strStageName = pDesc->strStageName;
+	m_iSectionProtoLevel = pDesc->iSectionProtoLevel;
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
-
-	m_strStageName = pDesc->strStageName;
-	m_iSectionProtoLevel = pDesc->iSectionProtoLevel;
 
 	if (FAILED(Ready_Sections(pDesc)))
 		return E_FAIL;
@@ -169,6 +168,22 @@ void CMapStage::Deserialize_Internal(const json& j)
 	Refresh_SectionTransforms();
 }
 
+HRESULT CMapStage::Ready_Events()
+{
+	if (L"Stage1-2_MapStage" == m_strStageName)
+	{
+		Subscribe_Event(EventTag::Stage12_CarBreakWall,
+			[this](void* pData)
+			{
+				UNREFERENCED_PARAMETER(pData);
+				Stage12_CarBreakWall();
+			});
+	}
+
+	return S_OK;
+}
+
+
 HRESULT CMapStage::Ready_Sections(const MAP_STAGE_DESC* pDesc)
 {
 	if (nullptr == pDesc)
@@ -282,32 +297,36 @@ void CMapStage::Submit_VisibleSections()
 #endif
 		}
 
-		if (!ENABLE_MAP_SECTION_SHADOW)
-			continue;
+		//if (!ENABLE_MAP_SECTION_SHADOW)
+		//	continue;
 
-		if (!pSection->Is_ShadowCaster())
-			continue;
+		//if (!pSection->Is_ShadowCaster())
+		//	continue;
 
-		const _bool bVisibleShadow =
-			!m_pGameInstance_Proxy->Should_CullAABB(
-				CULLING_VIEW::SHADOW_DIR,
-				pSection->Get_WorldBounds());
+		//const _bool bVisibleShadow =
+		//	!m_pGameInstance_Proxy->Should_CullAABB(
+		//		CULLING_VIEW::SHADOW_DIR,
+		//		pSection->Get_WorldBounds());
 
-		if (bVisibleShadow)
-		{
+		//if (bVisibleShadow)
+		//{
 			m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pSection);
+	}
+}
 
-#ifdef _DEBUG
-			++m_Profile.iShadowVisibleSections;
-			++m_Profile.iShadowSubmittedSections;
-#endif
-		}
-		else
-		{
-#ifdef _DEBUG
-			++m_Profile.iShadowCulledSections;
-#endif
-		}
+void CMapStage::Stage12_CarBreakWall()
+{
+	for (CMapSection* pSection : m_Sections)
+	{
+		if (nullptr == pSection)
+			continue;
+
+		if (L"GsDefault_2" != pSection->Get_SectionName())
+			continue;
+
+		pSection->Set_Renderable(false);
+		pSection->Set_RuntimeCollisionActorEnabled(false);
+		return;
 	}
 }
 

@@ -37,6 +37,7 @@ class CEnvironment_Manager;
 class CShaderGlobal_Manager;
 class CCulling_Manager;
 class CTexture_Hub;
+class CProfiler_Manager;
 
 class ENGINE_DLL CGameInstance 
 {
@@ -59,7 +60,7 @@ public:
 	}
 
 private:
-	void Update_Engine(_float fTimeDelta);
+	void Update_Engine(_float fTimeDelta, _float fRawTimeDelta);
 	HRESULT Begin_Draw();
 	HRESULT Draw();
 	HRESULT End_Draw();
@@ -230,7 +231,6 @@ private:
 	  HRESULT Get_TextureFromHub(const _tchar* pTextureName, TEXTURE_HANDLE* pOutHandle) const;
 	  HRESULT Bind_TextureFromHub(class CShader* pShader, const _char* pConstantName, TEXTURE_HANDLE Handle);
 	  HRESULT Bind_DefaultTextureFromHub(class CShader* pShader, const _char* pConstantName, DEFAULT_TEXTURE eKind);
-	  TEXTURE_HUB_STATS Get_TextureHubStats() const;
 #pragma endregion
 
 #pragma region PHYSIX_MANAGER
@@ -266,12 +266,14 @@ private:
 	CSound_Manager*				m_pSound_Manager = { nullptr };
 	CTarget_Manager*			m_pTarget_Manager = { nullptr };
 	CShadow_Dir*				m_pShadow_Dir = { nullptr };
+	CShadow_Dir*				m_pShadow_Blob = { nullptr };
 	CEffect_Manager*			m_pEffect_Manager = { nullptr };
 	CPhysX_Manager*				m_pPhysX_Manager = { nullptr };
 	CEnvironment_Manager*		m_pEnvironment_Manager = { nullptr };
 	CShaderGlobal_Manager*		m_pShaderGlobal_Manager = { nullptr };
 	CCulling_Manager*			m_pCulling_Manager = { nullptr };
 	CTexture_Hub*				m_pTexture_Hub = { nullptr };
+	CProfiler_Manager*			m_pProfiler_Manager = { nullptr };
 
 	mutable mt19937             m_RandomGenerator;
 	_bool						m_bEditMode = { false };

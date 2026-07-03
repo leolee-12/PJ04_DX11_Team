@@ -2,6 +2,7 @@
 #include "LevelDesign_Registry.h"
 #include "MeshLayer_Binder.h"
 #include "Parsing_Utils.h"
+#include "Effect_Loader.h"
 
 #include "GameInstance.h"
 
@@ -13,16 +14,18 @@ namespace
 		const _tchar* pModelProtoTag;
 		const _char* pModelPath;
 		MODEL eModelType;
+		_uint iBreakAnimIndex;
+		const _char* pBaseMeshName;
 		_bool bCookCollisionMesh;
 	};
 
 	static const LD_BREAKABLE_CATALOG g_BreakableCatalog[] =
 	{
-		{ L"WoodBox", CLevelDesign_Breakable::WOODBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxWood/BoxWood.ysh", MODEL::ANIM, false },
-		{ L"BoxPlastic", CLevelDesign_Breakable::PLASTICBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxPlastic/BoxPlastic.ysh", MODEL::ANIM, false },
-		{ L"BreakableRockS", CLevelDesign_Breakable::BREAKABLE_ROCK_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_S.ysh", MODEL::NONANIM, true },
-		{ L"BreakableRockM", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh", MODEL::NONANIM, true },
-		{ L"BreakableRockMForBridge", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh", MODEL::NONANIM, true }
+		{ L"WoodBox", CLevelDesign_Breakable::WOODBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxWood/BoxWood.ysh", MODEL::ANIM, 2u, "WoodBoxM__BoxWoodC", false},
+		{ L"BoxPlastic", CLevelDesign_Breakable::PLASTICBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxPlastic/BoxPlastic.ysh", MODEL::ANIM, 0u, "BoxPlasticM__BoxPlasticC", false},
+		{ L"BreakableRockS", CLevelDesign_Breakable::BREAKABLE_ROCK_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_S.ysh", MODEL::NONANIM, LD_INVALID_ID, nullptr, true },
+		{ L"BreakableRockM", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh", MODEL::NONANIM, LD_INVALID_ID, nullptr, true },
+		{ L"BreakableRockMForBridge", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh", MODEL::NONANIM, LD_INVALID_ID, nullptr, true }
 	};
 
 	static const LD_BREAKABLE_CATALOG* Find_BreakableCatalog(const _wstring& wstrObjName)
@@ -104,22 +107,49 @@ HRESULT CLevelDesign_Breakable::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
+	if (FAILED(Ready_HurtBox()))
+		return E_FAIL;
+
 	if (FAILED(Ready_PhysicsActor_Box()))
 		return E_FAIL;
 
 	return S_OK;
 }
 
+void CLevelDesign_Breakable::Update(_float fTimeDelta)
+{
+	if (MODEL::ANIM == m_tBreakableDesc.eModelType && BREAKABLE_STATE::BREAKING == m_eState)
+	{
+		m_pAnimatorCom->Update(fTimeDelta);
+
+		if (m_pAnimatorCom->Is_Finished())
+			m_eState = BREAKABLE_STATE::DESTROYED;
+	}
+}
+
 void CLevelDesign_Breakable::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
-	if (nullptr != m_pModelCom)
-		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+	if (BREAKABLE_STATE::DESTROYED == m_eState)
+		return;
+
+	if (BREAKABLE_STATE::INTACT == m_eState)
+	{
+		m_pHurtBoxCom->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+#ifdef _DEBUG
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pHurtBoxCom);
+#endif
+	}
+
+	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 
 HRESULT CLevelDesign_Breakable::Render()
 {
+	if (BREAKABLE_STATE::DESTROYED == m_eState)
+		return S_OK;
+
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -127,6 +157,9 @@ HRESULT CLevelDesign_Breakable::Render()
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
+		if (BREAKABLE_STATE::BREAKING == m_eState && i == m_iBaseMeshIndex)
+			continue;
+
 		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
 
 		if (MODEL::ANIM == m_tBreakableDesc.eModelType)
@@ -199,6 +232,37 @@ void CLevelDesign_Breakable::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
 }
 
+void CLevelDesign_Breakable::Damaged(const ATTACK_INFO& tInfo)
+{
+	UNREFERENCED_PARAMETER(tInfo);
+
+	if (BREAKABLE_STATE::INTACT != m_eState)
+		return;
+
+	const _float4* pCamLook = m_pGameInstance_Proxy->Get_CamLook();
+
+	_float3 vFaceCam{};
+	XMStoreFloat3(&vFaceCam, XMVectorNegate(XMLoadFloat4(pCamLook)));
+
+	_float3 vPos{};
+	XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+	CEffect_Loader::GetInstance()->Spawn(L"CommonHit", Get_LevelIndex(), vPos, vFaceCam, _float3(0.f, 0.f, 0.f), nullptr);
+
+	Release_PhysicsActor();
+	m_pHurtBoxCom->Set_Enabled(false);
+
+	if (MODEL::ANIM == m_tBreakableDesc.eModelType)
+	{
+		m_eState = BREAKABLE_STATE::BREAKING;
+		m_pAnimatorCom->Set_PlaySpeed(1.5f);
+		m_pModelCom->Set_AnimationIndex(m_iBreakAnimIndex, false, true, 0.f);
+		return;
+	}
+
+	m_eState = BREAKABLE_STATE::DESTROYED;
+}
+
 void CLevelDesign_Breakable::Register_LevelDesignSpecs()
 {
 	for (const LD_BREAKABLE_CATALOG& Entry : g_BreakableCatalog)
@@ -261,6 +325,10 @@ HRESULT CLevelDesign_Breakable::Validate_Desc()
 
 HRESULT CLevelDesign_Breakable::Ready_Components()
 {
+	const LD_BREAKABLE_CATALOG* pCatalog = Find_BreakableCatalog(m_tBreakableDesc.strObjectName);
+	if (nullptr == pCatalog || pCatalog->eModelType != m_tBreakableDesc.eModelType)
+		return E_FAIL;
+
 	const _tchar* pModelProtoTag = Resolve_ModelProtoTag();
 	if (nullptr == pModelProtoTag)
 		return E_FAIL;
@@ -276,6 +344,76 @@ HRESULT CLevelDesign_Breakable::Ready_Components()
 	m_pModelCom = Add_Component<CModel>(m_tBreakableDesc.iModelProtoLevel, pModelProtoTag, TEXT("Com_Model"));
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
+
+	if (MODEL::ANIM == m_tBreakableDesc.eModelType)
+	{
+		m_iBreakAnimIndex = pCatalog->iBreakAnimIndex;
+
+		const _uint iNumAnimations = m_pModelCom->Get_NumAnimations();
+		if (LD_INVALID_ID == m_iBreakAnimIndex || m_iBreakAnimIndex >= iNumAnimations)
+			return E_FAIL;
+		if (m_pModelCom->Get_AnimationName(m_iBreakAnimIndex) != "Break")
+			return E_FAIL;
+		if (nullptr == pCatalog->pBaseMeshName)
+			return E_FAIL;
+
+		const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+		for (_uint i = 0; i < iNumMeshes; ++i)
+		{
+			if (m_pModelCom->Get_MeshName(i) == pCatalog->pBaseMeshName)
+			{
+				m_iBaseMeshIndex = i;
+				break;
+			}
+		}
+
+		if (LD_INVALID_ID == m_iBaseMeshIndex)
+			return E_FAIL;
+
+		CAnimator::ANIMATOR_DESC AnimDesc{};
+		AnimDesc.pModel = m_pModelCom;
+
+		m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
+		if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
+			return E_FAIL;
+
+		m_pModelCom->Update_Combined();
+	}
+
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Breakable::Ready_HurtBox()
+{
+	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pModelCom)
+		return E_FAIL;
+
+	_float3 vMin{};
+	_float3 vMax{};
+	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
+
+	if (vMin.x > vMax.x || vMin.y > vMax.y || vMin.z > vMax.z)
+		return E_FAIL;
+
+	const _float3 vSize = { vMax.x - vMin.x, vMax.y - vMin.y, vMax.z - vMin.z };
+
+	_float fRadius = vSize.x;
+	if (fRadius < vSize.y)
+		fRadius = vSize.y;
+	if (fRadius < vSize.z)
+		fRadius = vSize.z;
+
+	CCollider::COLLIDER_DESC ColliderDesc{};
+	ColliderDesc.pOwner = this;
+	ColliderDesc.vCenter = { (vMin.x + vMax.x) * 0.5f, (vMin.y + vMax.y) * 0.5f, (vMin.z + vMax.z) * 0.5f };
+	ColliderDesc.fRadius = fRadius * 0.5f;
+
+	m_pHurtBoxCom = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, TEXT("Com_HurtBox"),
+		&ColliderDesc);
+	if (nullptr == m_pHurtBoxCom)
+		return E_FAIL;
+
+	m_pGameInstance_Proxy->Register_Collider(m_pHurtBoxCom, ETOUI(COLLISION_LAYER::ENV_HURT));
 
 	return S_OK;
 }
@@ -337,6 +475,9 @@ HRESULT CLevelDesign_Breakable::Bind_ShaderResources()
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
 		return E_FAIL;
 
 	return S_OK;

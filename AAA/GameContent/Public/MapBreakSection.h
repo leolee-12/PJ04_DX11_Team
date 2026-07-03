@@ -1,8 +1,8 @@
 #pragma once
 #include "MapObject.h"
 
-NS_BEGIN(physx)
-class PxRigidStatic;
+NS_BEGIN(Engine)
+class CCollider;
 NS_END
 
 NS_BEGIN(Client)
@@ -10,6 +10,8 @@ NS_BEGIN(Client)
 class CLIENT_DLL CMapBreakSection final : public CMapObject
 {
 	GENERATED_BODY(CMapBreakSection)
+
+	PROPERTY(_bool, m_bRenderable, L"Renderable", L"MapSection")
 
 public:
 	enum class MAP_BREAK_STATE
@@ -19,6 +21,12 @@ public:
 		BROKEN,
 		HIDDEN,
 	};
+
+	static constexpr const _tchar* STAGE12_STAGE_NAME = L"Stage1-2_MapStage";
+	static constexpr const _tchar* STAGE12_SECTION_NAME = L"GsDefault_4";
+	static constexpr const _tchar* STAGE12_MODEL_PROTO_TAG = L"Prototype_Component_Model_MapBreakSection_Stage1-2_GsDefault_4";
+	static constexpr const _tchar* STAGE12_MODEL_PATH = L"../../Resources/Map/Stage1-2/Section/GsDefault_4.ysh";
+	static constexpr const _tchar* STAGE12_OBJECT_TAG = L"MapBreakSection_Stage1-2_GsDefault_4";
 
 	struct MAP_BREAK_SECTION_DESC : public CGameObject::GAMEOBJECT_DESC
 	{
@@ -30,9 +38,6 @@ public:
 
 		_bool bRenderable = true;
 		_bool bCastShadow = false;
-
-		_bool bUseRigidStatic = true;
-		_bool bRigidStaticEnabledAtStart = true;
 	};
 
 	struct MAP_BREAK_FRAGMENT
@@ -67,16 +72,20 @@ public:
 	virtual HRESULT Render() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
+	const MAP_BREAK_SECTION_DESC& Get_Desc() const { return m_tBreakDesc; }
+	const _wstring& Get_SectionName() const { return m_strSectionName; }
+	_bool Is_Renderable() const { return m_bRenderable; }
+	void Set_Renderable(_bool bRenderable) { m_bRenderable = bRenderable; }
+
 private:
 	virtual const _tchar* Get_ModelProtoTag() const override;
 	virtual _uint Get_ModelProtoLevel() const override;
-	virtual HRESULT Ready_Events() override;
 	virtual _bool Should_RenderMesh(_uint iMesh) const override;
 
 private:
-	HRESULT Ready_RigidStatic();
-	void Release_RigidStatic();
-	void Break_Debug();
+	HRESULT Ready_BoostTrigger();
+	void On_BoostTriggerEnter(CCollider* pOther);
+	void Start_Break();
 	HRESULT Ready_Fragments();
 	MAP_BREAK_FRAGMENT* Find_Fragment(_uint iMesh);
 	const MAP_BREAK_FRAGMENT* Find_Fragment(_uint iMesh) const;
@@ -90,13 +99,12 @@ private:
 	_wstring m_strModelProtoTag;
 	_uint m_iModelProtoLevel = {};
 
-	_bool m_bRenderable = true;
 	_bool m_bCastShadow = false;
 
 	vector<MAP_BREAK_FRAGMENT> m_Fragments;
 	vector<_bool> m_FragmentMeshFlags;
 
-	physx::PxRigidStatic* m_pRigidStatic = nullptr;
+	CCollider* m_pBoostTrigger = nullptr;
 
 public:
 	static CMapBreakSection* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

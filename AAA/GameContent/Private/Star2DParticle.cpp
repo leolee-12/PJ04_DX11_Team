@@ -72,7 +72,7 @@ void CStar2DParticle::Late_Update(_float fTimeDelta)
         return;
 
     Compute_CombinedWorldMatrix();
-    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::BLEND, this);
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::BLEND_HDR, this);
 }
 
 HRESULT CStar2DParticle::Render()

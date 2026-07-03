@@ -2,9 +2,9 @@
 #include "LevelDesign_Registry.h"
 #include "MeshLayer_Binder.h"
 #include "Parsing_Utils.h"
+#include "Effect_Loader.h"
 
 #include "GameInstance.h"
-
 
 namespace
 {
@@ -18,8 +18,8 @@ namespace
 
 	static const LD_STARBLOCK_CATALOG g_BreakableCatalog[] =
 	{
-		{ L"StarBlock", CLevelDesign_Starblock::STARBLOCK_H1W1_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh", 0.25f },
-		{ L"StarBlockBig", CLevelDesign_Starblock::STARBLOCK_H3W3_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H3W3.ysh" , 1.f },
+		{ L"StarBlock", CLevelDesign_Starblock::STARBLOCK_H1W1_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh", 0.5f },
+		{ L"StarBlockBig", CLevelDesign_Starblock::STARBLOCK_H3W3_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H3W3.ysh" , 1.5f },
 	};
 
 	static const LD_STARBLOCK_CATALOG* Find_BreakableCatalog(const _wstring& wstrObjName)
@@ -180,6 +180,16 @@ void CLevelDesign_Starblock::Damaged(const ATTACK_INFO& tInfo)
 {
 	UNREFERENCED_PARAMETER(tInfo);
 
+	const _float4* pCamLook = m_pGameInstance_Proxy->Get_CamLook();
+
+	_float3 vFaceCam{};
+	XMStoreFloat3(&vFaceCam, XMVectorNegate(XMLoadFloat4(pCamLook)));
+
+	_float3 vPos{};
+	XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+	CEffect_Loader::GetInstance()->Spawn(L"CommonHit", Get_LevelIndex(), vPos, vFaceCam, _float3(0.f, 0.f, 0.f), nullptr);
+
 	Release_PhysicsActor();
 	Set_Active(false);
 }
@@ -218,6 +228,9 @@ HRESULT CLevelDesign_Starblock::Ready_Components()
 
 	m_pModelCom = Add_Component<CModel>(m_tBreakableDesc.iModelProtoLevel, pModelProtoTag, TEXT("Com_Model"));
 	if (nullptr == m_pModelCom)
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
 		return E_FAIL;
 
 	return S_OK;

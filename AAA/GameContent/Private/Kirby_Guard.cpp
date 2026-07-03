@@ -17,6 +17,10 @@ HRESULT CKirby_Guard::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
+    m_pGameInstance_Proxy = CGameInstance::GetProxy();
+    if (m_pGameInstance_Proxy == nullptr)
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -37,6 +41,8 @@ void CKirby_Guard::Enter(CKirby* pKirby)
 
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_GroundFriction(s_fGuardGroundFriction);
+
+    m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_Guard.wav", 0.5f);
 }
 
 void CKirby_Guard::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -114,5 +120,7 @@ CKirby_Guard* CKirby_Guard::Create()
 
 void CKirby_Guard::Free()
 {
+    Safe_Release(m_pGameInstance_Proxy);
+
     __super::Free();
 }

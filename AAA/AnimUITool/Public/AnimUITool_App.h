@@ -21,7 +21,7 @@ private:
 
 public:
 	HRESULT						Initialize();
-	void						Update(_float fTimeDelta);
+	void						Update(_float fTimeDelta, _float fRawTimeDelta);
 	HRESULT						Render();
 
 	void						OnResize(_uint iWidth, _uint iHeight);

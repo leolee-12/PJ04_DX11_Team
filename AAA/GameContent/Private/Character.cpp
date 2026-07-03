@@ -35,6 +35,15 @@ void CCharacter::Priority_Update(_float fTimeDelta)
 void CCharacter::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
+
+    // 기본(몬스터) = 원샷 1회 페이드. 커비는 이 값을 자기 Update에서 덮어씀.
+    if (m_fHitFlashTime > 0.f)
+    {
+        m_fHitFlashTime = max(0.f, m_fHitFlashTime - fTimeDelta);
+        m_fHitFlashCur = m_fHitFlashTime / m_fHitFlashDuration; // 1 -> 0
+    }
+    else
+        m_fHitFlashCur = 0.f;
 }
 
 void CCharacter::Late_Update(_float fTimeDelta)
@@ -57,6 +66,8 @@ void CCharacter::Damaged(const ATTACK_INFO& tInfo)
 
     m_pGameInstance_Proxy->Play_SFX(
         TEXT("CharaBasic_DamageReact_Normal.wav"));
+
+    m_fHitFlashTime = m_fHitFlashDuration;
 
     m_fCurHP -= tInfo.fDamage;
     if (m_fCurHP <= 0.f) 

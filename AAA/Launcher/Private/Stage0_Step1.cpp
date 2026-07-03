@@ -87,27 +87,24 @@ void CStage0_Step1::Update(_float fTimeDelta)
 
 HRESULT CStage0_Step1::Render()
 {
-#ifdef _DEBUG
-    SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
-#endif
     return S_OK;
 }
 
 HRESULT CStage0_Step1::Ready_Events()
 {
-    m_pGameInstance_Proxy->Subscribe(TEXT("FadeOut_Done"), [this](void* p) {
+    Subscribe_Event(TEXT("FadeOut_Done"), [this](void* p) {
+        //CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::STAGE0_STEP2);
+        //if (pLoadingLevel)
+        //{
+        //    m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
+        //    return;
+        //}
         CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::BOSS_STAGE1);
         if (pLoadingLevel)
         {
             m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
             return;
         }
-        //CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::TOWN_STEP1);
-        //if (pLoadingLevel)
-        //{
-        //    m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
-        //    return;
-        //}
         });
     return S_OK;
 }

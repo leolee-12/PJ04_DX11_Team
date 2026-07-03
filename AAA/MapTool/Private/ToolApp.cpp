@@ -2,10 +2,6 @@
 #include "EditInstance.h"
 #include "Level_Loading.h"
 
-#ifdef _DEBUG
-#include "MapToolProfiler.h"
-#endif
-
 #include "GameObject_Factory.h"
 #include "Effect_Loader.h"
 #include "Projectile_Manager.h"
@@ -48,9 +44,9 @@ HRESULT CToolApp::Initialize()
 	return S_OK;
 }
 
-void CToolApp::Update(_float fTimeDelta)
+void CToolApp::Update(_float fTimeDelta, _float fRawTimeDelta)
 {
-	m_pGI_Proxy->Update_Engine(fTimeDelta);
+	m_pGI_Proxy->Update_Engine(fTimeDelta, fRawTimeDelta);
 
 	if (!m_pEditInstance->Is_Loading())
 		m_pEditInstance->Update_Panels(fTimeDelta);
@@ -188,9 +184,6 @@ void CToolApp::Free()
 
 	CGameInstance::DestroyInstance();
 	CGameObject_Factory::DestroyInstance();
-#ifdef _DEBUG
-	CMapToolProfiler::DestroyInstance();
-#endif
 
 	__super::Free();
 }

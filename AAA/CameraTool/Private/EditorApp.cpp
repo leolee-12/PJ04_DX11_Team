@@ -60,9 +60,9 @@ HRESULT CEditorApp::Initialize()
     return S_OK;
 }
 
-void CEditorApp::Update(_float fTimeDelta)
+void CEditorApp::Update(_float fTimeDelta, _float fRawTimeDelta)
 {
-    m_pGameInstance_Proxy->Update_Engine(fTimeDelta);
+    m_pGameInstance_Proxy->Update_Engine(fTimeDelta, fRawTimeDelta);
 }
 
 HRESULT CEditorApp::Render()

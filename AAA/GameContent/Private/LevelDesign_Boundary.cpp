@@ -64,8 +64,8 @@ HRESULT CLevelDesign_Boundary::Initialize(void* pArg)
 	if (FAILED(Validate_Desc()))
 		return E_FAIL;
 
-	//if (FAILED(Ready_PhysicsActor(*static_cast<const LD_PARSED_OBJECT*>(pArg))))
-	//	return E_FAIL;
+	if (FAILED(Ready_PhysicsActor(*static_cast<const LD_PARSED_OBJECT*>(pArg))))
+		return E_FAIL;
 
 	return S_OK;
 }

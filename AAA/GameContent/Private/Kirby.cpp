@@ -29,6 +29,9 @@
 // Deform
 #include "Kirby_Deform_Car.h"
 
+// Ladder
+#include "LevelDesign_Ladder.h"
+
 #include "Effect_Loader.h"
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -78,11 +81,14 @@ HRESULT CKirby::Initialize(void* pArg)
 
 void CKirby::Priority_Update(_float fTimeDelta)
 {
+    fTimeDelta = Resolve_TimeDelta(fTimeDelta);
     __super::Priority_Update(fTimeDelta);
 }
 
 void CKirby::Update(_float fTimeDelta)
 {
+    fTimeDelta = Resolve_TimeDelta(fTimeDelta);
+
     XMStoreFloat3(&m_vWishDir, XMVectorZero());
 
     Update_Timer(fTimeDelta);
@@ -108,10 +114,29 @@ void CKirby::Update(_float fTimeDelta)
     m_pMovement->Update_RigidBody(fTimeDelta);
 
     __super::Update(fTimeDelta);
+
+    if (m_fInvincibleTime > 0.f)
+    {
+        _float fElapsed = s_fInvincibleDuration - m_fInvincibleTime;
+        if (fElapsed < 0.12f)
+        {
+            m_fHitFlashCur = 1.f;
+        }
+        else
+        {
+            const _float fBlinkHz = 8.f;
+            _float fBlink = (fmodf(m_fInvincibleTime * fBlinkHz, 1.f) < 0.5f) ? 1.f : 0.f;
+            m_fHitFlashCur = fBlink * 0.1f;
+        }
+    }
+    else
+        m_fHitFlashCur = 0.f;
 }
 
 void CKirby::Late_Update(_float fTimeDelta)
 {
+    fTimeDelta = Resolve_TimeDelta(fTimeDelta);
+
     __super::Late_Update(fTimeDelta);
 
     if (m_pTransformCom)
@@ -127,6 +152,16 @@ void CKirby::Late_Update(_float fTimeDelta)
                 m_pGameInstance_Proxy->Add_DebugComponent(pCollider);
 #endif
         }
+
+        // BlobShadow °»½Å
+        _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+        const _float H = 5.f, fSize = 3.5f;
+        SHADOW_LIGHT_DESC d{};
+        XMStoreFloat4(&d.vEye, vPos + XMVectorSet(0.f, H, 0.f, 0.f));
+        XMStoreFloat4(&d.vAt, XMVectorSetW(vPos, 1.f));
+        d.fWidth = d.fHeight = fSize;
+        d.fNear = 0.1f; d.fFar = H + 3.f;
+        m_pGameInstance_Proxy->Update_BlobShadow(d);
     }
 }
 
@@ -403,6 +438,7 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_PROJECTILE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_D_RANGE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_LADDER));
 
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT),        ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE), ETOUI(COLLISION_LAYER::MONSTER_HURT));
@@ -423,7 +459,9 @@ void CKirby::SetUp_Collider_Callback()
         m_KirbyColliders[HURT_BOX]->Set_OnEnter(
             [this](CCollider* pOther)
             {
-                if (ETOUI(COLLISION_LAYER::MONSTER_HURT) == pOther->Get_RegisteredGroup())
+                const _uint iGroup = pOther->Get_RegisteredGroup();
+
+                if (iGroup == ETOUI(COLLISION_LAYER::MONSTER_HURT))
                 {
                     CMonster* pMon = dynamic_cast<CMonster*>(pOther->Get_Owner());
                     if (pMon && !pMon->Is_Touch_Harmful())
@@ -442,8 +480,30 @@ void CKirby::SetUp_Collider_Callback()
                     OutputDebugStringA(szBuf);
 #endif
                 }
-            });
+
+                else if (iGroup == ETOUI(COLLISION_LAYER::ENV_LADDER))
+                {
+                    CLevelDesign_Ladder* pLadder = dynamic_cast<CLevelDesign_Ladder*>(pOther->Get_Owner());
+                    if (pLadder == nullptr)
+                        return;
+
+                    Set_Ladder(pLadder);
+                }
+            }
+        );
     }
+
+    m_KirbyColliders[HURT_BOX]->Set_OnExit(
+        [this](CCollider* pOther)
+        {
+            const _uint iGroup = pOther->Get_RegisteredGroup();
+
+            if (iGroup == ETOUI(COLLISION_LAYER::ENV_LADDER))
+            {
+                Clear_Ladder();
+                return;
+            }
+        });
 }
 
 HRESULT CKirby::Ready_PartObjects()
@@ -451,6 +511,8 @@ HRESULT CKirby::Ready_PartObjects()
     // Body
     CKirby_Body::KIRBY_BODY_DESC BodyDesc{};
     BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    BodyDesc.pHitFlash = Get_HitFlashPtr();       
+    BodyDesc.pHitFlashColor = Get_HitFlashColorPtr();
 
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_Body::PROTOTYPE_TAG, CKirby_Body::Kirby_PartTag, &BodyDesc)))
         return E_FAIL;
@@ -460,6 +522,8 @@ HRESULT CKirby::Ready_PartObjects()
     // DeformCar_Demo
     CKirby_DeformCar_Demo::KIRBY_DEFORMCAR_DEMO_DESC DeformCar_Demo_Desc{};
     DeformCar_Demo_Desc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    DeformCar_Demo_Desc.pHitFlash = Get_HitFlashPtr();
+    DeformCar_Demo_Desc.pHitFlashColor = Get_HitFlashColorPtr();
 
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_DeformCar_Demo::PROTOTYPE_TAG, CKirby_DeformCar_Demo::Kirby_PartTag, &DeformCar_Demo_Desc)))
         return E_FAIL;
@@ -467,6 +531,8 @@ HRESULT CKirby::Ready_PartObjects()
     // DeformCar_Main
     CKirby_DeformCar_Main::KIRBY_DEFORMCAR_MAIN_DESC DeformCar_Main_Desc{};
     DeformCar_Main_Desc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    DeformCar_Main_Desc.pHitFlash = Get_HitFlashPtr();
+    DeformCar_Main_Desc.pHitFlashColor = Get_HitFlashColorPtr();
 
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_DeformCar_Main::PROTOTYPE_TAG, CKirby_DeformCar_Main::Kirby_PartTag, &DeformCar_Main_Desc)))
         return E_FAIL;
@@ -476,6 +542,8 @@ HRESULT CKirby::Ready_PartObjects()
     CKirby_Sword::KIRBY_SWORD_DESC SwordDesc{};
     SwordDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     SwordDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("RHaveL");
+    SwordDesc.pHitFlash = Get_HitFlashPtr();
+    SwordDesc.pHitFlashColor = Get_HitFlashColorPtr();
 
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_Sword::PROTOTYPE_TAG, CKirby_Sword::Kirby_PartTag, &SwordDesc)))
         return E_FAIL;
@@ -484,6 +552,8 @@ HRESULT CKirby::Ready_PartObjects()
     CKirby_SwordHat::KIRBY_SWORDHAT_DESC SwordHatDesc{};
     SwordHatDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     SwordHatDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("HatL");
+    SwordHatDesc.pHitFlash = Get_HitFlashPtr();
+    SwordHatDesc.pHitFlashColor = Get_HitFlashColorPtr();
 
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_SwordHat::PROTOTYPE_TAG, CKirby_SwordHat::Kirby_PartTag, &SwordHatDesc)))
         return E_FAIL;
@@ -630,6 +700,15 @@ void CKirby::Clear_CutsceneGrabTarget()
 
     m_pGrabBone = nullptr;
     m_pGrabOwnerWorld = nullptr;
+}
+
+_float CKirby::Resolve_TimeDelta(_float fTimeDelta)
+{
+    KIRBY_STATE_TYPE eType = m_pKirby_StateMachine->Get_StateType();
+    if (eType == KIRBY_STATE_TYPE::GET_ABILITY)
+        return m_pGameInstance_Proxy->Get_RawTimeDelta(L"Timer_60");
+    else
+        return fTimeDelta;
 }
 
 void CKirby::Change_KirbyDeform(DEFORM_TYPE eDeformType)

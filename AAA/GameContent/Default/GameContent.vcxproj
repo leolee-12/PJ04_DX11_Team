@@ -83,6 +83,7 @@
     <ClInclude Include="..\Public\Kirby_GetDeform.h" />
     <ClInclude Include="..\Public\EnemyBomb.h" />
     <ClInclude Include="..\Public\KirbyBomb.h" />
+    <ClInclude Include="..\Public\Kirby_Ladder.h" />
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h" />
     <ClInclude Include="..\public\LDInhalable.h" />
     <ClInclude Include="..\Public\LevelDesign_MonsterCatalog.h" />
@@ -373,6 +374,7 @@
     <ClCompile Include="..\Private\Kirby_GetDeform.cpp" />
     <ClCompile Include="..\Private\EnemyBomb.cpp" />
     <ClCompile Include="..\Private\KirbyBomb.cpp" />
+    <ClCompile Include="..\Private\Kirby_Ladder.cpp" />
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp" />
     <ClCompile Include="..\private\LDInhalable.cpp" />
     <ClCompile Include="..\Private\LevelDesign_MonsterCatalog.cpp" />

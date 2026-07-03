@@ -47,6 +47,7 @@ protected:
 	_float4x4		m_ProjMatrix = {};
 
 	_float3 m_vShadowDir = { 0.071f, -0.940f, 0.335f };
+	_float  m_fShadowMaxRadius = { 80.f };
 
 protected:
 	void Update_PipeLine();

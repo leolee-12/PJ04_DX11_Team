@@ -250,6 +250,8 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClInclude Include="..\Public\PartObject.h" />
     <ClInclude Include="..\public\PhysX_Manager.h" />
     <ClInclude Include="..\public\Picking_Utils.h" />
+    <ClInclude Include="..\Public\Profiler_Defines.h" />
+    <ClInclude Include="..\Public\Profiler_Manager.h" />
     <ClInclude Include="..\Public\Property.h" />
     <ClInclude Include="..\public\Prototype_Manager.h" />
     <ClInclude Include="..\public\Renderer.h" />
@@ -350,6 +352,7 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClCompile Include="..\Private\PartObject.cpp" />
     <ClCompile Include="..\private\PhysX_Manager.cpp" />
     <ClCompile Include="..\private\Picking_Utils.cpp" />
+    <ClCompile Include="..\Private\Profiler_Manager.cpp" />
     <ClCompile Include="..\Private\Property.cpp" />
     <ClCompile Include="..\private\Prototype_Manager.cpp" />
     <ClCompile Include="..\private\Renderer.cpp" />

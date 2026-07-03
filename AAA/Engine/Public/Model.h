@@ -17,8 +17,26 @@ class CAnimation;
 
 class ENGINE_DLL CModel final : public CComponent
 {
+public:
+	using MeshNameFilter = function<bool(const string&)>;
+
+	struct MODEL_LOAD_DESC
+	{
+		MODEL eType = { MODEL::END };
+		const _char* pModelFilePath = { nullptr };
+		_float4x4 PreTransformMatrix = {};
+		MeshNameFilter fcPickableFilter = { nullptr };
+		_bool bCookCollisionMesh = { false };
+		MeshNameFilter fcCollisionCookFilter = { nullptr };
+
+		MODEL_LOAD_DESC()
+		{
+			XMStoreFloat4x4(&PreTransformMatrix, XMMatrixIdentity());
+		}
+	};
+
 private:
-	using PickableFilter = function<bool(const string&)>;
+	using PickableFilter = MeshNameFilter;
 
 private:
 	CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -54,8 +72,7 @@ public:
 
 public:
 	virtual HRESULT Initialize_Prototype(MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter = nullptr);
-	virtual HRESULT Initialize_Prototype_WithTextureHub(MODEL eType, const _char* pModelFilePath,
-		_fmatrix PreTransformMatrix, PickableFilter fcFillter = nullptr, _bool bCookCollisionMesh = false);
+	virtual HRESULT Initialize_Prototype_WithTextureHub(const MODEL_LOAD_DESC& Desc);
 	virtual HRESULT Initialize(void* pArg);
 
 public:
@@ -96,6 +113,7 @@ private:
 	MODEL						m_eType = { MODEL::END };
 	_wstring					m_strModelPath = {};
 	PickableFilter              m_PickableFilter = { nullptr };
+	PickableFilter              m_CollisionCookFilter = { nullptr };
 
 private:
 	size_t						m_iNumMeshes = {};
@@ -141,13 +159,13 @@ private:
 
 private:
 	void Load_MeshLayers(const _char* pModelFilePath);
+	_bool Should_CookCollisionMesh(const string& strMeshName) const;
 	HRESULT Cook_CollisionMesh(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix);
 	HRESULT Cook_CollisionAnimMesh(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix);
 
 public:
 	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix = XMMatrixIdentity(), PickableFilter fcFillter = nullptr);
-	static CModel* Create_WithTextureHub(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath,
-		_fmatrix PreTransformMatrix = XMMatrixIdentity(), PickableFilter fcFillter = nullptr, _bool bCookCollisionMesh = false);
+	static CModel* Create_WithTextureHub(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const MODEL_LOAD_DESC& Desc);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

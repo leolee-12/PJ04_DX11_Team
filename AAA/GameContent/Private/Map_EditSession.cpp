@@ -103,10 +103,7 @@ _wstring CMap_EditSession::Build_DisplayName(const ENV_OBJECT_DESC& Desc)
 	return strDisplayName;
 }
 
-void CMap_EditSession::Register_PreviewObject(
-	const _wstring& strLayerTag,
-	const _wstring& strObjectTag,
-	CGameObject* pObject)
+void CMap_EditSession::Register_PreviewObject(const _wstring& strLayerTag, const _wstring& strObjectTag, CGameObject* pObject)
 {
 	if (nullptr == pObject)
 		return;

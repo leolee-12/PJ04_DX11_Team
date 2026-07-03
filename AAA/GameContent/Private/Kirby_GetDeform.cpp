@@ -186,8 +186,6 @@ void CKirby_GetDeform::Update_GetDeformState(CKirby* pKirby, _float fTimeDelta)
         }
         case DEFORM_STATE::DEFORM_END:
         {
-            _vector vCamLook = XMVectorSetY(XMLoadFloat4(m_pGameInstance_Proxy->Get_CamLook()), 0.f);
-
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Rotate_To_Direction(XMLoadFloat3(&m_vRotationDir), fTimeDelta);
 
@@ -247,14 +245,17 @@ void CKirby_GetDeform::Exit_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
 
 void CKirby_GetDeform::Set_RotationDir(CKirby* pKirby)
 {
-    _vector vCamLook = XMVectorSetY(XMLoadFloat4(m_pGameInstance_Proxy->Get_CamLook()), 0.f);
+    _vector vCamPos = XMLoadFloat4(m_pGameInstance_Proxy->Get_CamPosition());
+    _vector vPlayerPos = pKirby->Get_Transform()->Get_State(STATE::POSITION);
+    _vector vDir = XMVectorSetY(vCamPos - vPlayerPos, 0.f);
+    vDir = XMVector3Normalize(vDir);
 
     _float fRadian = XMConvertToRadians(15.f);
 
     _vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 
-    _vector vLeftDir = XMVector3Rotate(-vCamLook, XMQuaternionRotationAxis(vUp, -fRadian));
-    _vector vRightDir = XMVector3Rotate(-vCamLook, XMQuaternionRotationAxis(vUp, fRadian));
+    _vector vLeftDir = XMVector3Rotate(vDir, XMQuaternionRotationAxis(vUp, -fRadian));
+    _vector vRightDir = XMVector3Rotate(vDir, XMQuaternionRotationAxis(vUp, fRadian));
 
     _vector vCurLook = XMVectorSetY(pKirby->Get_Transform()->Get_State(STATE::LOOK), 0.f);
     vCurLook = XMVector3Normalize(vCurLook);

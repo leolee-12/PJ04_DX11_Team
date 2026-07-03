@@ -21,6 +21,7 @@
 #include "ShaderGlobal_Manager.h"
 #include "Culling_Manager.h"
 #include "Texture_Hub.h"
+#include "Profiler_Manager.h"
 #include "Effect_Allocator.h"
 
 CGameInstance* CGameInstance::m_pInstance = { nullptr };
@@ -42,6 +43,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pGameInstance_Proxy)
         return E_FAIL;
 
+    m_pInstance->m_pProfiler_Manager = CProfiler_Manager::Create({ EngineDesc.hWnd });  // Leo
+    if (nullptr == m_pInstance->m_pProfiler_Manager)
+        return E_FAIL;
+
     m_pInstance->m_pGraphic_Device = CGraphic_Device::Create(EngineDesc.hWnd, EngineDesc.eWinMode, EngineDesc.iViewportWidth, EngineDesc.iViewportHeight, ppDevice, ppContext);
     if (nullptr == m_pInstance->m_pGraphic_Device)
         return E_FAIL;    
@@ -50,7 +55,7 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pInstance->m_pCamera_Manager)
         return E_FAIL;
 
-    m_pInstance->m_pCulling_Manager = CCulling_Manager::Create();   // WY
+    m_pInstance->m_pCulling_Manager = CCulling_Manager::Create();   // Leo
     if (nullptr == m_pInstance->m_pCulling_Manager)
         return E_FAIL;
 
@@ -66,7 +71,7 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pInstance->m_pPrototype_Manager)
         return E_FAIL;
 
-    m_pInstance->m_pTexture_Hub = CTexture_Hub::Create(*ppDevice, *ppContext);    // WY
+    m_pInstance->m_pTexture_Hub = CTexture_Hub::Create(*ppDevice, *ppContext);    // Leo
     if (nullptr == m_pInstance->m_pTexture_Hub)
         return E_FAIL;
 
@@ -110,6 +115,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pInstance->m_pShadow_Dir)
         return E_FAIL;
 
+    m_pInstance->m_pShadow_Blob = CShadow_Dir::Create();
+    if (nullptr == m_pInstance->m_pShadow_Blob)
+        return E_FAIL;
+
     m_pInstance->m_pEffect_Manager = CEffect_Manager::Create(*ppDevice, *ppContext);
     if (nullptr == m_pInstance->m_pEffect_Manager)
         return E_FAIL;
@@ -126,26 +135,25 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pInstance->m_pShaderGlobal_Manager)
         return E_FAIL;
 
-
-    
-
-    
-
     m_pInstance->m_RandomGenerator.seed(random_device{}());
-    
 
     return S_OK;
 }
 
-void CGameInstance::Update_Engine(_float fTimeDelta)
+void CGameInstance::Update_Engine(_float fTimeDelta, _float fRawTimeDelta)
 {
     ++m_iFrameIndex;
+
+    PROFILE_FRAME_BEGIN(fTimeDelta, m_iFrameIndex);
+    PROFILE_CPU_SCOPE(EPROFILE_CPU_SECTION::UPDATE);
 
     m_pLevel_Manager->Apply_ReservedLevel();
 
 	m_pInput_Device->Update();
 
-    m_pShaderGlobal_Manager->Tick(fTimeDelta);
+    // 전역상수값들은 현재 연출로만쓰고있어서 언스케일 시간
+    // 물결이나 실제 타임스케일 영향받아야하면 그때 추가 ㅇㅇ
+    m_pShaderGlobal_Manager->Tick(fRawTimeDelta);
 
     m_pObject_Manager->Priority_Update(fTimeDelta);
     m_pObject_Manager->Update(fTimeDelta);
@@ -183,6 +191,8 @@ HRESULT CGameInstance::Begin_Draw()
 
 HRESULT CGameInstance::Draw()
 {
+    PROFILE_CPU_SCOPE(EPROFILE_CPU_SECTION::RENDER_TOTAL);
+
     if (FAILED(m_pRenderer->Draw()))
         return E_FAIL;
 
@@ -194,7 +204,18 @@ HRESULT CGameInstance::Draw()
 
 HRESULT CGameInstance::End_Draw()
 {
-    return m_pGraphic_Device->Present();    
+    HRESULT hr = S_OK;
+
+    {
+        PROFILE_CPU_SCOPE(EPROFILE_CPU_SECTION::PRESENT);
+        hr = m_pGraphic_Device->Present();
+    }
+
+    PROFILE_TEXTURE_HUB_STATS(m_pTexture_Hub->Get_Stats());
+
+    PROFILE_FRAME_END();
+
+    return hr;
 }
 
 void CGameInstance::Clear_Resources(_int iLevelIndex)
@@ -661,14 +682,6 @@ HRESULT CGameInstance::Bind_DefaultTextureFromHub(CShader* pShader, const _char*
 {
     return m_pTexture_Hub->Bind_DefaultShaderResource(pShader, pConstantName, eKind);
 }
-
-TEXTURE_HUB_STATS CGameInstance::Get_TextureHubStats() const
-{
-    if (nullptr == m_pTexture_Hub)
-        return {};
-
-    return m_pTexture_Hub->Get_Stats();
-}
 #pragma endregion
 
 #pragma region PHYSIX_MANAGER
@@ -740,6 +753,7 @@ void CGameInstance::Free()
     Safe_Release(m_pShaderGlobal_Manager);
     Safe_Release(m_pEnvironment_Manager);
     Safe_Release(m_pShadow_Dir);
+    Safe_Release(m_pShadow_Blob);
     Safe_Release(m_pTarget_Manager);
     Safe_Release(m_pSound_Manager);
     Safe_Release(m_pCollision_Manager);
@@ -760,6 +774,7 @@ void CGameInstance::Free()
     Safe_Release(m_pTimer_Manager);
     Safe_Release(m_pCulling_Manager);
     Safe_Release(m_pCamera_Manager);
+    Safe_Release(m_pProfiler_Manager);
     Safe_Release(m_pGameInstance_Proxy);
     Safe_Release(m_pGraphic_Device);
 }

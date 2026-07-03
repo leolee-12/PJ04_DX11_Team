@@ -49,14 +49,24 @@ HRESULT CBrontoBurt_Body::Render()
 
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
-        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
-            return E_FAIL;
-
-        if (FAILED(m_pEyeTextureCom->Bind_ShaderResource(m_pShaderCom, "g_UnknownTexture", m_iEyeIndex)))
-            return E_FAIL;
-
-        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
-            return E_FAIL;
+        _uint iPass = 3;
+        if (i == 0)
+        {
+            if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
+                return E_FAIL;
+            if (FAILED(m_pEyeTextureCom->Bind_ShaderResource(m_pShaderCom, "g_UnknownTexture", m_iEyeIndex)))
+                return E_FAIL;
+            if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
+                return E_FAIL;
+        }
+        else
+        {
+            if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
+                return E_FAIL;
+            if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
+                return E_FAIL;
+            iPass = 4;
+        }
 
         if (m_pAnimatorCom)
         {
@@ -64,7 +74,7 @@ HRESULT CBrontoBurt_Body::Render()
                 return E_FAIL;
         }
 
-        if (FAILED(m_pShaderCom->Begin(1)))   // eye pass
+        if (FAILED(m_pShaderCom->Begin(iPass)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render(i)))

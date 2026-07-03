@@ -61,6 +61,7 @@ void CKirby_DeformCar_Demo::Late_Update(_float fTimeDelta)
     CPartObject::Compute_CombinedWorldMatrix(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
 
 HRESULT CKirby_DeformCar_Demo::Render()
@@ -96,6 +97,9 @@ HRESULT CKirby_DeformCar_Demo::Ready_AnimEvents(CKirby* pKirby)
         [this](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
         {
             if (Handle_AnimEventEye(e, ePhase) == true)
+                return;
+
+            if (Handle_AnimEventSound(e, ePhase) == true)
                 return;
 
             switch (static_cast<EANIM_EVENT>(e.iEventType))

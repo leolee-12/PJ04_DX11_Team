@@ -91,29 +91,29 @@ void CBoss_Stage1::Update(_float fTimeDelta)
 
 HRESULT CBoss_Stage1::Render()
 {
-#ifdef _DEBUG
-    SetWindowText(g_hWnd, TEXT("BOSS_STEP1."));
-#endif
     return S_OK;
 }
 
 HRESULT CBoss_Stage1::Ready_Events()
 {
-    m_pGameInstance_Proxy->Subscribe(TEXT("FadeOut_Done"), [this](void* p) {
+    Subscribe_Event(TEXT("FadeOut_Done"), [this](void* p) {
         CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::TEST);
         if (pLoadingLevel)
         {
             m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
             return;
         }
+
     });
 
-    m_pGameInstance_Proxy->Subscribe(EventTag::Cutscene_GorillaAppear, [this](void* p) {
+    Subscribe_Event(EventTag::Cutscene_GorillaAppear, [this](void* p) {
         m_pGameInstance_Proxy->Play_BGM(L"K15_Boss1.marker.wav");
         });
 
     return S_OK;
-}
+
+    };
+
 
 HRESULT CBoss_Stage1::Ready_Lights()
 {

@@ -28,7 +28,7 @@ private:
 	_bool   Draw_Properties(IReflectable* pHolder);
 	_bool   Draw_Transform(CGameObject* pObject, const string & strSuffix = "");
 	void    Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject* pObject);
-	void    Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* pMapStage, CMapSection* pSection);
+	void    Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* pMapStage, CGameObject* pObject);
 	void    Draw_MeshLayerPanel(CGameObject* pObject);
 	void    Draw_MapStageSections(CMapStage* pMapStage);
 	void    Draw_MapSectionRenderOptions(CMapSection* pSection);

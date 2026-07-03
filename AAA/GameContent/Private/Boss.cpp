@@ -15,6 +15,8 @@ HRESULT CBoss::Initialize(void* pArg)
         return E_FAIL;
 
     m_TraitFlags = MT_BODYCHECK_DAMAGE;      // MT_INHALABLE 제외 → 완전 비흡입
+    m_vHitFlashColor = _float3(0.4f, 0.4f, 0.4f);
+
     return S_OK;
 }
 

@@ -42,9 +42,9 @@ HRESULT CMainApp::Initialize()
 	return S_OK;
 }
 
-void CMainApp::Update(_float fTimeDelta)
+void CMainApp::Update(_float fTimeDelta, _float fRawTimeDelta)
 {
-	m_pGameInstance_Proxy->Update_Engine(fTimeDelta);
+	m_pGameInstance_Proxy->Update_Engine(fTimeDelta, fRawTimeDelta);
 }
 
 HRESULT CMainApp::Render()

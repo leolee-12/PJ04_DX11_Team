@@ -66,7 +66,7 @@ HRESULT CPreview_Actor::Render()
     const _bool bUsingAnimShader = (m_pShaderCom == m_pAnimShaderCom);
     const _uint iPass = Get_ResolvedPassIndex();
 
-    const _uint iNum = m_pModelCom->Get_NumMeshes();
+    const size_t iNum = m_pModelCom->Get_NumMeshes();
     for (_uint i = 0; i < iNum; ++i)
     {
         if (!Is_MeshVisible((_uint)i))
@@ -134,7 +134,7 @@ _uint CPreview_Actor::Get_ResolvedPassIndex() const
 
 void CPreview_Actor::Reset_MeshVisibility()
 {
-    const _uint iNumMeshes = m_pModelCom ? m_pModelCom->Get_NumMeshes() : 0;
+    const size_t iNumMeshes = m_pModelCom ? m_pModelCom->Get_NumMeshes() : 0;
     m_MeshVisible.assign(iNumMeshes, true);
 }
 

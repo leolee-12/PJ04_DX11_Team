@@ -169,6 +169,19 @@ IMPLEMENT_SINGLETON(CGameObject_Factory)
           proxy->Add_Prototype(level, tag, createExpr); \
       }
 
+namespace
+{
+    CModel* Create_TextureHubModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath)
+    {
+        CModel::MODEL_LOAD_DESC Desc{};
+        Desc.eType = eType;
+        Desc.pModelFilePath = pModelFilePath;
+        XMStoreFloat4x4(&Desc.PreTransformMatrix, XMMatrixIdentity());
+
+        return CModel::Create_WithTextureHub(pDevice, pContext, Desc);
+    }
+}
+
 void CGameObject_Factory::Copy_RegisteredTags(vector<wstring>* pOutTags)
 {
     if (nullptr == pOutTags)
@@ -707,7 +720,7 @@ void CGameObject_Factory::Register_AnimObject()
 {
     Register(CLevelDesign_EventObject::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_EventObject),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLevelDesign_EventObject::LEVEL1BOSSDEMOBG_MODEL_PROTO_TAG,
-            CModel::Create_WithTextureHub(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/Level1BossDemoBg/Level1BossDemoBg.ysh"));));
+            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/Level1BossDemoBg/Level1BossDemoBg.ysh"));));
 }
 
 void CGameObject_Factory::Register_Effect()
