@@ -180,6 +180,9 @@ void CLevelDesign_Starblock::Damaged(const ATTACK_INFO& tInfo)
 {
 	UNREFERENCED_PARAMETER(tInfo);
 
+	if (!m_bActive)
+		return;
+
 	const _float4* pCamLook = m_pGameInstance_Proxy->Get_CamLook();
 
 	_float3 vFaceCam{};
@@ -190,6 +193,7 @@ void CLevelDesign_Starblock::Damaged(const ATTACK_INFO& tInfo)
 
 	CEffect_Loader::GetInstance()->Spawn(L"CommonHit", Get_LevelIndex(), vPos, vFaceCam, _float3(0.f, 0.f, 0.f), nullptr);
 
+	Enable_Colliders(false);
 	Release_PhysicsActor();
 	Set_Active(false);
 }
@@ -295,6 +299,10 @@ HRESULT CLevelDesign_Starblock::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
 		return E_FAIL;
 
+	const _float4 vEmissiveColor = { 0.f, 0.f, 0.f, 0.f };
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vEmissiveColor", &vEmissiveColor, sizeof(_float4))))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -304,6 +312,26 @@ const _tchar* CLevelDesign_Starblock::Resolve_ModelProtoTag() const
 		return nullptr;
 
 	return m_tBreakableDesc.wstrModelProtoTag.c_str();
+}
+
+void CLevelDesign_Starblock::SetUp_Collider_CallBack()
+{
+	__super::SetUp_Collider_CallBack();
+
+	if (m_pHurtBox)
+	{
+		m_pHurtBox->Set_OnEnter([this](CCollider* pOther)
+			{
+				if (nullptr == pOther)
+					return;
+				if (ETOUI(COLLISION_LAYER::CAR_BOOST) != pOther->Get_RegisteredGroup())
+					return;
+
+				ATTACK_INFO AttackInfo{};
+				AttackInfo.pAttacker = pOther->Get_Owner();
+				Damaged(AttackInfo);
+			});
+	}
 }
 
 void CLevelDesign_Starblock::Register_LevelDesignSpecs()

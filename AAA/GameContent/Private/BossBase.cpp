@@ -27,6 +27,9 @@ HRESULT CBossBase::Initialize(void* pArg)
         if (auto q = static_cast<BOSS_QUERY*>(p)) q->pBoss = this;
         });
 
+    // 보스들은 사운드 효과 감쇠 X
+    m_bSFX2D = true;
+
     return S_OK;
 }
 

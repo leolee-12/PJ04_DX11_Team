@@ -42,10 +42,8 @@ void CEnvObject_Interact::Update(_float fTimeDelta)
 
 void CEnvObject_Interact::Late_Update(_float fTimeDelta)
 {
-	UNREFERENCED_PARAMETER(fTimeDelta);
-
 	Refresh_WorldBounds();
-
+	__super::Late_Update(fTimeDelta);
 	Check_Visible();
 
 	if (m_bVisible)

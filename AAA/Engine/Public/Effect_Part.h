@@ -14,6 +14,7 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
     PROPERTY(_int, m_iShaderPass,       L"Shader Pass", L"Effect");
     PROPERTY(_int, m_iMirror,           L"Mirror",      L"Effect");
     PROPERTY(_int, m_iDepthIgnore,      L"Depth Ignore", L"Effect");
+    PROPERTY(_float, m_fEffectIntensity, L"Effect Intensity_E", L"Effect");
 
     PROPERTY(_float3, m_vLocalPos,      L"Local Pos",   L"Effect");
 
@@ -37,6 +38,13 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
     PROPERTY(_bool, m_bMaskUVScroll,        L"UV Scroll     _M",          L"Mask Com");
     PROPERTY(_float2, m_vMaskUVScrollCount, L"UV Scroll Count_M",         L"Mask Com");
 
+    PROPERTY(_int, m_iMaskBlendMode,               L"Blend Mode_M",                 L"Mask Com");
+    PROPERTY(_int, m_iMaskChannel,                 L"Channel_M",                    L"Mask Com");
+    PROPERTY(_bool, m_bMaskInvert,                 L"Invert_M",                     L"Mask Com");
+    PROPERTY(_float, m_fMaskStrength,              L"Strength_M",                   L"Mask Com");
+    PROPERTY(_bool, m_bUseMaskUVDistortion,        L"Use UV Distortion_M",          L"Mask Com");
+    PROPERTY(_float2, m_vMaskUVDistortionStrength, L"UV Distortion Strength_M",     L"Mask Com");
+
 public:
     struct EFFECT_PART_DESC : public CGameObject::GAMEOBJECT_DESC
     {
@@ -56,6 +64,8 @@ public:
 protected:
     enum Sampler { DEFAULT, MIRROR, SAMPLER_END };
     enum DepthMode { DEPTH_DEFAULT, DEPTH_IGNORE, DEPTH_MODE_END };
+    enum MaskBlendMode { MASK_MULTIPLY, MASK_ADD, MASK_SUBTRACT, MASK_REPLACE, MASK_BLEND_END };
+    enum MaskChannel { MASK_RGBA, MASK_RED, MASK_GREEN, MASK_BLUE, MASK_ALPHA, MASK_CHANNEL_END };
 
 protected:
     struct RATIO_VALUE

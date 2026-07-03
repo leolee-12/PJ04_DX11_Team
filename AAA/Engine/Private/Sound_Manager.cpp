@@ -77,12 +77,12 @@ FMOD::Channel* CSound_Manager::PlayInternal(const TCHAR* pSoundKey, float fVolum
 	return pChannel;
 }
 
-FMOD::Channel* CSound_Manager::PlaySFX(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus)
+CSound_Handle CSound_Manager::PlaySFX(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus)
 {
-	return PlayInternal(pSoundKey, fVolume, eBus, false);
+	return CSound_Handle(PlayInternal(pSoundKey, fVolume, eBus, false));
 }
 
-FMOD::Channel* CSound_Manager::PlaySFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume, ESoundBus eBus)
+CSound_Handle CSound_Manager::PlaySFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume, ESoundBus eBus)
 {
 	_vector vDir = vSoundPos - XMLoadFloat3(&m_vListenerPos);
 	_float fDistance = XMVectorGetX(XMVector3Length(vDir));
@@ -90,35 +90,22 @@ FMOD::Channel* CSound_Manager::PlaySFX3D(const TCHAR* pSoundKey, _fvector vSound
 	_float fAtten = 1.f - (fDistance / m_fMaxDistance);
 	fAtten = max(0.f, fAtten);
 	if (fAtten < 0.001f)
-		return nullptr;
+		return CSound_Handle();
 
-	return PlayInternal(pSoundKey, fVolume * fAtten, eBus, false);
+	return CSound_Handle(PlayInternal(pSoundKey, fVolume * fAtten, eBus, false));
 }
 
-FMOD::Channel* CSound_Manager::PlaySFXLoop(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus)
+CSound_Handle CSound_Manager::PlaySFXLoop(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus)
 {
-	return PlayInternal(pSoundKey, fVolume, eBus, true);
+	return CSound_Handle(PlayInternal(pSoundKey, fVolume, eBus, true));
 }
 
-FMOD::Channel* CSound_Manager::PlaySFX3DLoop(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume, ESoundBus eBus)
+CSound_Handle CSound_Manager::PlaySFX3DLoop(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume, ESoundBus eBus)
 {
 	_vector vDir = vSoundPos - XMLoadFloat3(&m_vListenerPos);
 	_float fDist = XMVectorGetX(XMVector3Length(vDir));
 	_float fAtten = max(0.f, 1.f - fDist / m_fMaxDistance);
-	return PlayInternal(pSoundKey, fVolume * fAtten, eBus, true);
-}
-
-void CSound_Manager::StopChannel(FMOD::Channel*& pChannel)
-{
-	if (!pChannel)
-		return;
-
-	bool bPlaying = false;
-
-	if (pChannel->isPlaying(&bPlaying) == FMOD_OK && bPlaying)
-		pChannel->stop();
-
-	pChannel = nullptr;
+	return CSound_Handle(PlayInternal(pSoundKey, fVolume * fAtten, eBus, true));
 }
 
 void CSound_Manager::PlayBGM(const TCHAR* pSoundKey, float fVolume, bool bLoop)
@@ -137,6 +124,33 @@ void CSound_Manager::StopBGM()
 			m_pBGMChannel->stop();
 		m_pBGMChannel = nullptr;
 	}
+}
+
+void CSound_Manager::PlayBGM_Section(const TCHAR* pSoundKey, float fStart01, float fEnd01, float fVolume)
+{
+	FMOD::Sound* pSound = Find_Sound(pSoundKey);
+	if (!pSound)
+		return;
+
+	_uint iLenMs = 0;
+	pSound->getLength(&iLenMs, FMOD_TIMEUNIT_MS);
+
+	StopBGM();
+	m_pBGMChannel = PlayInternal(pSoundKey, fVolume, ESoundBus::BGM, true);
+	if (!m_pBGMChannel || 0 == iLenMs)
+		return;
+
+	fStart01 = max(0.f, min(fStart01, 1.f));
+	fEnd01 = max(0.f, min(fEnd01, 1.f));
+	if (fEnd01 <= fStart01)
+		return;
+
+	_uint iStartMs = (_uint)(iLenMs * fStart01);
+	_uint iEndMs = (_uint)(iLenMs * fEnd01);
+	if (iEndMs >= iLenMs)
+		iEndMs = iLenMs - 1;
+
+	m_pBGMChannel->setLoopPoints(iStartMs, FMOD_TIMEUNIT_MS, iEndMs, FMOD_TIMEUNIT_MS);
 }
 
 void CSound_Manager::SetBusVolume(ESoundBus eBus, float fVolume)

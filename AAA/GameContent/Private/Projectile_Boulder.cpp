@@ -57,6 +57,10 @@ void CProjectile_Boulder::On_Bounce(_int iCount)
     CEffect_Loader::GetInstance()->Spawn(TEXT("RockBounce"), m_iLevelIndex, vPos);
     if (iCount >= 3)
         Enter_Break();
+    else
+    {
+       m_pGameInstance_Proxy->Play_SFX(L"CharaBossGorilla_RockBound.wav");
+    }
 }
 
 void CProjectile_Boulder::Enter_Break()
@@ -72,6 +76,8 @@ void CProjectile_Boulder::Enter_Break()
 
     if (m_pAnimatorCom)
         m_pAnimatorCom->Play("Broken", false, true);
+
+    m_pGameInstance_Proxy->Play_SFX(L"CharaBossGorilla_RockBreak.wav");
 }
 
 void CProjectile_Boulder::Update_Terminal(_float dt)

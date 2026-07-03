@@ -144,6 +144,9 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
     if (!pAnim) return E_FAIL;
 
     pAnim->Set_EventCallback([this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase) {
+        if (Handle_SharedAnimEvent(e, phase))
+            return;
+
         switch (static_cast<EANIM_EVENT>(e.iEventType))
         {
             case EANIM_EVENT::Fx:
@@ -201,6 +204,7 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
                 break;
             }
             case EANIM_EVENT::CamShake:
+            {
                 if (e.bIsRange)
                 {
                     _float lvl = 0.f;
@@ -215,6 +219,7 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
                     m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &shake);
                 }
                 break;
+            }
 
             case EANIM_EVENT::FreezeAnim:
             {
@@ -282,8 +287,8 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
                 }
                 break;
             }
-
-            default: break;
+            default: 
+                break;
         }
         });
     return S_OK;
@@ -395,6 +400,11 @@ void CBoss_Gorilla::Tick_DeathSequence(_float fTimeDelta)
             {
                 pAnim->Pause();
                 m_fDeathPauseTimer = DEATH_PAUSE_SEC;
+
+                m_pGameInstance_Proxy->Stop_BGM();
+                Play_OneShotSFX(
+                    TEXT("CharaBasic_DeadBigEnemy.wav"));
+
                 CAMERA_SHAKE_DESC shake{ 0.8f, DEATH_SHAKE_SEC }; 
                 m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &shake);
                 m_eDeathStep = EDEATH::PAUSING;

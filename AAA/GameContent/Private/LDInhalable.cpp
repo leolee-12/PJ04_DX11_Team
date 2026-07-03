@@ -85,7 +85,7 @@ HRESULT	CLDInhalable::Ready_Collider()
 	m_pProjectileBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, TEXT("Com_ProjectileBox"), &Desc);
 	if (nullptr == m_pProjectileBox)
 		return E_FAIL;
-
+	m_pProjectileBox->Set_Enabled(false);
 	m_pGameInstance_Proxy->Register_Collider(m_pProjectileBox, ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE));
 
 	SetUp_Collider_CallBack();
@@ -124,19 +124,23 @@ void CLDInhalable::On_Swallowed()
 	SWALLOW_EVENT payload{ this };
 	m_pGameInstance_Proxy->Publish(EVT_SWALLOWED, &payload);
 	m_pCaptor = nullptr;
+	Enable_Colliders(false);
 	Set_Active(false);
 }
 
-void   CLDInhalable::Enable_Colliders(_bool b)
+void CLDInhalable::Enable_Colliders(_bool b)
 {
 	if (m_pHurtBox)
 		m_pHurtBox->Set_Enabled(b);
+
+	// ProjectileBox는 SPAT 상태에서만 별도로 활성화한다.
+	if (m_pProjectileBox)
+		m_pProjectileBox->Set_Enabled(false);
 }
 
-void   CLDInhalable::Despawn_Spat()
+void CLDInhalable::Despawn_Spat()
 {
-	if(m_pProjectileBox)
-		m_pProjectileBox->Set_Enabled(false);
+	Enable_Colliders(false);
 	m_vSpatVelocity = {};
 	Set_Active(false);
 }

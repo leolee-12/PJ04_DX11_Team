@@ -970,9 +970,9 @@ void CMap_Parser::Fill_CommonFlags(const json& jEntry, ENV_OBJECT_DESC* pDesc)
 	Try_ReadString(jEntry, "OverrideCollisionTypeInside", &pDesc->tCollision.strOverrideCollisionTypeInside);
 
 	Try_ReadBoolFromNumeric(jEntry, "IsShadowMappingCaster", &pDesc->tRender.bHasShadow);
-	// Source capability only. Actual shadow usage is opt-in via map edit.
-	pDesc->tRender.bUseShadow = false;
-	pDesc->tRender.bShadowMappingCaster = pDesc->tRender.bHasShadow; // Legacy transitional.
+	// Source capability defaults to active shadow usage. Map edit override may disable it later.
+	pDesc->tRender.bUseShadow = pDesc->tRender.bHasShadow;
+	pDesc->tRender.bShadowMappingCaster = pDesc->tRender.bUseShadow; // Legacy transitional.
 
 	if (!Try_ReadBoolFromNumeric(jEntry, "UseLodCulling", &pDesc->tRender.bUseCullDistance))
 		Try_ReadBoolFromNumeric(jEntry, "Basic.Model.UseLodCulling", &pDesc->tRender.bUseCullDistance);

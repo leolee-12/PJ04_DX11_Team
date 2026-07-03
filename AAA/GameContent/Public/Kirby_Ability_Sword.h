@@ -87,6 +87,8 @@ private:
 
 	CEffect_Container* m_pSpinSlash{};
 	CEffect_Container* m_pSpinSlashTrail{};
+	CEffect_Container* m_pSwordChargeEffect{};
+	CEffect_Container* m_pSwordSuperChargeEffect{};
 
 private:
 	void Update_ChargeTime(_float fTimeDelta);

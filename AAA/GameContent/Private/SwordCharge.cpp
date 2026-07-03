@@ -42,9 +42,9 @@ HRESULT CSwordCharge::Initialize(void* pArg)
     tDesc.iTextureLevel = 0;
     tDesc.wstrTextureTag = L"";
 
-    tDesc.bUseMaskCom = false;
-    tDesc.iMaskLevel = 0;
-    tDesc.wstrMaskTag = L"";
+    tDesc.bUseMaskCom = true;
+    tDesc.iMaskLevel = Texture_ChargeNoise.iLevelID;
+    tDesc.wstrMaskTag = Texture_ChargeNoise.szProtoTag;
 
     tDesc.bCustomShader = true;
     tDesc.iShaderLevel = Shader_Ring.iLevelID;

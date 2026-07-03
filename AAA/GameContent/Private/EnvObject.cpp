@@ -335,39 +335,32 @@ _bool CEnvObject::Pick_Marb1e(_fvector vRayOrigin, _fvector vRayDir, _float3* pO
 		return false;
 
 	_float3 closestHit = {};
-	float   closestDist = FLT_MAX;
-	bool    bHit = false;
+	_float closestDist = FLT_MAX;
+	_bool bHit = false;
 
 	_fmatrix WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
-
-	float   dist = 0.f;
-
-
 	_uint iCountMeshes = (_uint)m_pModelCom->Get_NumMeshes();
 
 	for (_uint i = 0; i < iCountMeshes; ++i)
 	{
 		_float3 hit = {};
 
-		if (m_pModelCom->Pick_Mesh(i, vRayOrigin, vRayDir, WorldMatrix, &hit, &dist))
-		{
-			string dbg = "HIT Mesh[" + to_string(i) + "]: "
-				+ m_pModelCom->Get_MeshName(i) + "\n";
-			OutputDebugStringA(dbg.c_str());
+		if (!m_pModelCom->Pick_Mesh(i, vRayOrigin, vRayDir, WorldMatrix, &hit))
+			continue;
 
-			if (dist < closestDist)
-			{
-				closestDist = dist;
-				closestHit = hit;
-				bHit = true;
-			}
+		const _float fHitDistance = XMVectorGetX(XMVector3Length(XMLoadFloat3(&hit) - vRayOrigin));
+		if (fHitDistance < closestDist)
+		{
+			closestDist = fHitDistance;
+			closestHit = hit;
+			bHit = true;
 		}
 	}
 
 	if (bHit && pOutHit)
 		*pOutHit = closestHit;
 
-	if (dist && fOutDistance)
+	if (bHit && fOutDistance)
 		*fOutDistance = closestDist;
 
 	return bHit;
@@ -665,7 +658,7 @@ void CEnvObject::Apply_DescDefaults()
 	m_bRenderable = !m_tDesc.tCollision.bInvisibleCollision;
 	m_bUseCullDistance = m_tDesc.tRender.bUseCullDistance;
 	m_bUseCullFrustum = m_tDesc.tRender.bUseCullFrustum;
-	m_bCastShadow = m_tDesc.tRender.bHasShadow; //&& m_tDesc.tRender.bUseShadow;
+	m_bCastShadow = m_tDesc.tRender.bHasShadow && m_tDesc.tRender.bUseShadow;
 	m_bVisible = true;
 }
 

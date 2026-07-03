@@ -12,8 +12,7 @@ class CLIENT_DLL CMapSection final : public CMapObject
 {
 	GENERATED_BODY(CMapSection)
 
-	PROPERTY(_bool, m_bRenderable, L"Renderable", L"MapSection")
-	PROPERTY(_bool, m_bCastShadow, L"Cast Shadow", L"MapSection");
+	PROPERTY(_bool, m_bRenderable, L"Renderable", L"MapSection");
 	PROPERTY(_bool, m_bEnableCulling, L"Enable Culling", L"MapSection");
 
 public:
@@ -45,7 +44,6 @@ public:
 	json	Serialize_SectionState() const;
 	void	Deserialize_SectionState(const json& j);
 	void	Set_RenderID(RENDERID eRenderID) { m_eRenderID = eRenderID; }
-	void	Set_ShadowCaster(_bool bCastShadow) { m_bCastShadow = bCastShadow; }
 	void	Set_Culling(_bool bEnableCulling) { m_bEnableCulling = bEnableCulling; }
 	void	Set_CollisionActorEnabled(_bool bEnable) { m_bCreateCollisionActor = bEnable; }
 	void	Set_Renderable(_bool bRenderable) { m_bRenderable = bRenderable; }
@@ -56,7 +54,6 @@ public:
 	const BoundingBox&		Get_WorldBounds() const { return m_WorldBounds; }
 	MAP_SECTION_TYPE		Get_SectionType() const { return m_eSectionType; }
 	RENDERID				Get_RenderID() const { return m_eRenderID; }
-	_bool					Is_ShadowCaster() const { return m_bCastShadow; }
 	_bool					Is_Culling() const { return m_bEnableCulling; }
 	_bool					Is_Renderable() const { return m_bRenderable; }
 	const _wstring&			Get_SectionName() const { return m_strSectionName; }

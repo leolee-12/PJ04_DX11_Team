@@ -823,6 +823,10 @@ HRESULT CLevelDesign_EventObject::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
 		return E_FAIL;
 
+	const _float4 vEmissiveColor = { 0.f, 0.f, 0.f, 0.f };
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vEmissiveColor", &vEmissiveColor, sizeof(_float4))))
+		return E_FAIL;
+
 	return S_OK;
 }
 
