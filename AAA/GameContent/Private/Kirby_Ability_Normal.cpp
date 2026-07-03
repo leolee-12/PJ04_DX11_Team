@@ -411,7 +411,7 @@ void CKirby_Ability_Normal::Change_MouthState(MOUTH_STATE eMouthState)
     {
         case MOUTH_STATE::DEFAULT:
             Set_FullBodyAni(ABILITY_ANI::WAIT, "Wait", true, false, 0.1f, 1.8f);
-            Set_FullBodyAni(ABILITY_ANI::RUN, "Run", true, false, 0.1f, 2.2f);
+            Set_FullBodyAni(ABILITY_ANI::RUN, "Run", true, false, 0.1f, 3.5f);
             Set_FullBodyAni(ABILITY_ANI::JUMP_L, "JumpL", false, false, 0.1f, 5.f);
             Set_FullBodyAni(ABILITY_ANI::JUMP_R, "JumpR", false, false, 0.1f, 5.f);
             Set_FullBodyAni(ABILITY_ANI::FALL, "Fall", false, false, 0.1f, 2.f);
@@ -421,7 +421,7 @@ void CKirby_Ability_Normal::Change_MouthState(MOUTH_STATE eMouthState)
 
         case MOUTH_STATE::STUFFFED:
             Set_FullBodyAni(ABILITY_ANI::WAIT, "StuffedWait", true, false, 0.1f, 2.5f);
-            Set_FullBodyAni(ABILITY_ANI::RUN, "StuffedRun", true, false, 0.1f, 3.f);
+            Set_FullBodyAni(ABILITY_ANI::RUN, "StuffedRun", true, false, 0.1f, 3.5f);
             Set_FullBodyAni(ABILITY_ANI::JUMP_L, "StuffedJump", false, false, 0.1f, 2.5f);
             Set_FullBodyAni(ABILITY_ANI::JUMP_R, "StuffedJump", false, false, 0.1f, 2.5f);
             Set_FullBodyAni(ABILITY_ANI::FALL, "StuffedFall", true, false, 0.1f, 1.5f);
