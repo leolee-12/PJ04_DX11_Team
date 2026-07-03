@@ -180,6 +180,9 @@ void CLevelDesign_Starblock::Damaged(const ATTACK_INFO& tInfo)
 {
 	UNREFERENCED_PARAMETER(tInfo);
 
+	if (!m_bActive)
+		return;
+
 	const _float4* pCamLook = m_pGameInstance_Proxy->Get_CamLook();
 
 	_float3 vFaceCam{};
@@ -190,6 +193,7 @@ void CLevelDesign_Starblock::Damaged(const ATTACK_INFO& tInfo)
 
 	CEffect_Loader::GetInstance()->Spawn(L"CommonHit", Get_LevelIndex(), vPos, vFaceCam, _float3(0.f, 0.f, 0.f), nullptr);
 
+	Enable_Colliders(false);
 	Release_PhysicsActor();
 	Set_Active(false);
 }

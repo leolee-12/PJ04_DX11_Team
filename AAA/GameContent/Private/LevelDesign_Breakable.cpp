@@ -157,8 +157,14 @@ HRESULT CLevelDesign_Breakable::Render()
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		if (BREAKABLE_STATE::BREAKING == m_eState && i == m_iBaseMeshIndex)
-			continue;
+		if (MODEL::ANIM == m_tBreakableDesc.eModelType)
+		{
+			if (BREAKABLE_STATE::INTACT == m_eState && i != m_iBaseMeshIndex)
+				continue;
+
+			if (BREAKABLE_STATE::BREAKING == m_eState && i == m_iBaseMeshIndex)
+				continue;
+		}
 
 		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
 

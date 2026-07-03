@@ -181,7 +181,6 @@ HRESULT CMap_Builder::Build_StageDesc(const MAP_MANIFEST_DESC& Manifest, MAP_STA
 		Desc.eSectionType = Manifest.SectionTypes[i];
 		Desc.eRenderID = Manifest.SectionRenderIDs[i];
 		Desc.bRenderable = true;
-		Desc.bCastShadow = true;
 		Desc.bEnableCulling = true;
 		Desc.bSourceCreateCollisionActor = Desc.bCreateCollisionActor;
 
@@ -224,8 +223,8 @@ HRESULT CMap_Builder::Build_EnvDescs(const MAP_MANIFEST_DESC& Manifest, vector<E
 			Desc.tCollision.bSourceHasDecorCollisionApxbin = Desc.tCollision.bHasCollMesh;
 			Desc.tCollision.bHasDecorCollisionApxbin = Desc.tCollision.bHasCollMesh; // Legacy transitional.
 
-			Desc.tRender.bUseShadow = false;
-			Desc.tRender.bShadowMappingCaster = Desc.tRender.bHasShadow; // Legacy transitional.
+			Desc.tRender.bUseShadow = Desc.tRender.bHasShadow;
+			Desc.tRender.bShadowMappingCaster = Desc.tRender.bUseShadow; // Legacy transitional.
 
 			if (Desc.tRender.bIsDecal)
 			{
