@@ -834,6 +834,8 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CCar_00_MilkyWay::PROTOTYPE_TAG, CCar_00_MilkyWay::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Car_00_MilkyWay"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/CarMilkyWay/Car_00_MilkyWay.ysh"));
+            TRY_ADD_PROTO(pProxy, Texture_MilkyWayMask.iLevelID, Texture_MilkyWayMask.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_MilkyWayMask.szFileTag, Texture_MilkyWayMask.iNumTex));
         )
     );
 
@@ -854,6 +856,8 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordCharge::PROTOTYPE_TAG, CSwordCharge::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SwordCharge"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/SwordCharge/Model_Common_Ring03.ysh"));
+            TRY_ADD_PROTO(pProxy, Texture_ChargeNoise.iLevelID, Texture_ChargeNoise.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_ChargeNoise.szFileTag, Texture_ChargeNoise.iNumTex));
         )
     );
 

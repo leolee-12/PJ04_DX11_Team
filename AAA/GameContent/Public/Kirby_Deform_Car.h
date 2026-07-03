@@ -15,7 +15,7 @@ class CLIENT_DLL CKirby_Deform_Car final : public CKirby_Deform
 private:
 	static constexpr _float s_fDeformCar_Rot_Speed_Degree = 480.f;
 
-	static constexpr _float s_fCarSpeed = 16.f;
+	static constexpr _float s_fCarSpeed = 13.f;
 	static constexpr _float s_fMaxBoostSpeed = 20.f;
 	static constexpr _float s_fBoostAcceleration = 180.f;
 

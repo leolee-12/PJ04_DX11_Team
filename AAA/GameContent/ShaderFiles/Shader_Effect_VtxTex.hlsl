@@ -16,6 +16,12 @@ Texture2D g_Mask;
 bool g_bUseMask = { false };
 float2 g_vMaskTiling = { 1.f, 1.f };
 float2 g_vMaskOffset = { 0.f, 0.f };
+int g_iMaskBlendMode = { 0 };
+int g_iMaskChannel = { 0 };
+bool g_bMaskInvert = { false };
+float g_fMaskStrength = { 1.f };
+bool g_bUseMaskUVDistortion = { false };
+float2 g_vMaskUVDistortionStrength = { 0.f, 0.f };
 
 bool g_bSpriteAniMask = { false };
 float2 g_vSpriteAniMaskUV = { 0.f, 0.f };
@@ -25,6 +31,7 @@ bool g_bFlipX = { false };
 bool g_bFlipY = { false };
 float3 g_vColor = { 1.f, 1.f, 1.f };
 float g_fAlpha = { 1 };
+float g_fEffectIntensity = { 1.f };
 
 bool g_bAlphaTest = { false };
 float g_fTestAlpha = { 0.f };
@@ -91,6 +98,40 @@ struct PS_OUT
     float4 vColor : SV_TARGET0;
 };
 
+float4 ResolveMaskValue(float4 vMaskSample)
+{
+    if (g_iMaskChannel == 1)
+        vMaskSample = vMaskSample.rrrr;
+    else if (g_iMaskChannel == 2)
+        vMaskSample = vMaskSample.gggg;
+    else if (g_iMaskChannel == 3)
+        vMaskSample = vMaskSample.bbbb;
+    else if (g_iMaskChannel == 4)
+        vMaskSample = vMaskSample.aaaa;
+
+    if (g_bMaskInvert == true)
+        vMaskSample = 1.f - vMaskSample;
+
+    return vMaskSample;
+}
+
+float4 ApplyMaskBlend(float4 vColor, float4 vMaskValue)
+{
+    float fStrength = max(g_fMaskStrength, 0.f);
+
+    if (g_iMaskBlendMode == 1)
+    {
+        vColor.rgb += vColor.rgb * vMaskValue.rgb * fStrength;
+        return vColor;
+    }
+    if (g_iMaskBlendMode == 2)
+        return max(vColor - vMaskValue * fStrength, 0.f);
+    if (g_iMaskBlendMode == 3)
+        return lerp(vColor, vMaskValue, saturate(fStrength));
+
+    return vColor * lerp(float4(1.f, 1.f, 1.f, 1.f), vMaskValue, saturate(fStrength));
+}
+
 PS_OUT PS_MAIN(PS_IN In)
 {
     PS_OUT Out;
@@ -108,32 +149,41 @@ PS_OUT PS_MAIN(PS_IN In)
         In.vTexcoord.y = -In.vTexcoord.y + 1.f;
     
     Out.vColor = float4(1.f, 1.f, 1.f, 1.f);
+
+    float4 vMaskValue = float4(1.f, 1.f, 1.f, 1.f);
+    float2 vUVDistortion = float2(0.f, 0.f);
+
+    if (g_bUseMask == true)
+    {
+        float2 vUV = float2(0.f, 0.f);
+
+        if (g_bSpriteAniMask == true)
+            vUV = In.vTexcoord * g_vSpriteAniMaskSize + g_vSpriteAniMaskUV;
+        else
+            vUV = g_vMaskOffset + In.vTexcoord * g_vMaskTiling;
+
+        vMaskValue = ResolveMaskValue(g_Mask.Sample(LinearSampler, vUV));
+
+        if (g_bUseMaskUVDistortion == true)
+            vUVDistortion = (vMaskValue.rr * 2.f - 1.f) * g_vMaskUVDistortionStrength;
+    }
     
     if (g_bUseTexture == true)
     {
         float2 vUV = float2(0.f, 0.f);
         
         if (g_bSpriteAniTexture == true)
-            vUV = In.vTexcoord * g_vSpriteAniTexSize + g_vSpriteAniTexUV;
+            vUV = In.vTexcoord * g_vSpriteAniTexSize + g_vSpriteAniTexUV + vUVDistortion;
         else
-            vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling;
+            vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling + vUVDistortion;
         
         Out.vColor *= g_Texture.Sample(LinearSampler, vUV);
     }
     
     if (g_bUseMask == true)
-    {
-        float2 vUV = float2(0.f, 0.f);
-        
-        if (g_bSpriteAniMask == true)
-            vUV = In.vTexcoord * g_vSpriteAniMaskSize + g_vSpriteAniMaskUV;
-        else
-            vUV = g_vMaskOffset + In.vTexcoord * g_vMaskTiling;
-        
-        Out.vColor *= g_Mask.Sample(LinearSampler, vUV);
-    }
+        Out.vColor = ApplyMaskBlend(Out.vColor, vMaskValue);
     
-    Out.vColor.xyz *= g_vColor;
+    Out.vColor.xyz *= g_vColor * g_fEffectIntensity;
     Out.vColor.a *= g_fAlpha;
     
     if (g_bAlphaTest == true && Out.vColor.a <= g_fTestAlpha)
@@ -163,32 +213,41 @@ PS_OUT PS_MAIN_MIRROR(PS_IN In)
         In.vTexcoord.y = -In.vTexcoord.y + 1.f;
     
     Out.vColor = float4(1.f, 1.f, 1.f, 1.f);
+
+    float4 vMaskValue = float4(1.f, 1.f, 1.f, 1.f);
+    float2 vUVDistortion = float2(0.f, 0.f);
+
+    if (g_bUseMask == true)
+    {
+        float2 vUV = float2(0.f, 0.f);
+
+        if (g_bSpriteAniMask == true)
+            vUV = In.vTexcoord * g_vSpriteAniMaskSize + g_vSpriteAniMaskUV;
+        else
+            vUV = g_vMaskOffset + In.vTexcoord * g_vMaskTiling;
+
+        vMaskValue = ResolveMaskValue(g_Mask.Sample(MirrorSampler, vUV));
+
+        if (g_bUseMaskUVDistortion == true)
+            vUVDistortion = (vMaskValue.rr * 2.f - 1.f) * g_vMaskUVDistortionStrength;
+    }
     
     if (g_bUseTexture == true)
     {
         float2 vUV = float2(0.f, 0.f);
         
         if (g_bSpriteAniTexture == true)
-            vUV = In.vTexcoord * g_vSpriteAniTexSize + g_vSpriteAniTexUV;
+            vUV = In.vTexcoord * g_vSpriteAniTexSize + g_vSpriteAniTexUV + vUVDistortion;
         else
-            vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling;
+            vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling + vUVDistortion;
         
         Out.vColor *= g_Texture.Sample(MirrorSampler, vUV);
     }
     
     if (g_bUseMask == true)
-    {
-        float2 vUV = float2(0.f, 0.f);
-        
-        if (g_bSpriteAniMask == true)
-            vUV = In.vTexcoord * g_vSpriteAniMaskSize + g_vSpriteAniMaskUV;
-        else
-            vUV = g_vMaskOffset + In.vTexcoord * g_vMaskTiling;
-        
-        Out.vColor *= g_Mask.Sample(MirrorSampler, vUV);
-    }
+        Out.vColor = ApplyMaskBlend(Out.vColor, vMaskValue);
     
-    Out.vColor.xyz *= g_vColor;
+    Out.vColor.xyz *= g_vColor * g_fEffectIntensity;
     Out.vColor.a *= g_fAlpha;
     
     if (g_bAlphaTest == true && Out.vColor.a <= g_fTestAlpha)
