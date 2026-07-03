@@ -293,7 +293,7 @@ void CMonster::SetUp_Collider_CallBack()
 			{
 				_vector vAtkPos = pOther->Get_Owner()->Get_Transform()->Get_State(STATE::POSITION);
 				ATTACK_INFO atk{};
-				atk.fDamage = 1.f;
+				atk.fDamage = 10.f;
 				atk.fKnockback = 8.f;
 				XMStoreFloat3(&atk.vAttackerPos, vAtkPos);
 				atk.pAttacker = pOther->Get_Owner();

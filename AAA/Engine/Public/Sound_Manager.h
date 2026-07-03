@@ -58,7 +58,7 @@ private:
     FMOD::Channel* m_pBGMChannel = nullptr;   // BGM 소유 핸들
 
     _float3 m_vListenerPos = {};
-    static constexpr _float m_fMaxDistance = 20.f;
+    static constexpr _float m_fMaxDistance = 50.f;
 
 private:
     HRESULT Initialize();
