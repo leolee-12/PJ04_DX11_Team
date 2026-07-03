@@ -62,7 +62,11 @@ void CKirby_Deform_Car::Enter_DeformState(CKirby* pKirby)
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_MaxHorizontalSpeed(s_fMaxBoostSpeed);
 
-    m_eBoostJumpState = BOOST_JUMP_STATE::GROUND;
+    if(pMovement->Is_Grounded())
+        m_eBoostJumpState = BOOST_JUMP_STATE::GROUND;
+    else
+        m_eBoostJumpState = BOOST_JUMP_STATE::FALL;
+
     m_eDeformCar_State = DEFORM_CAR_STATE::DEFORM_CAR_END;
     Change_DeformCarState(pKirby, DEFORM_CAR_STATE::BOOST);
 }
@@ -351,6 +355,10 @@ void CKirby_Deform_Car::Enter_BoostJumpState(CKirby* pKirby, BOOST_JUMP_STATE eS
         case BOOST_JUMP_STATE::FALL:
             Play_DeformAni(pKirby, DEFORM_ANI::FALL);
             break;
+
+        case BOOST_JUMP_STATE::LANDING:
+            Play_DeformAni(pKirby, DEFORM_ANI::LANDING);
+            break;
     }
 }
 
@@ -377,6 +385,11 @@ void CKirby_Deform_Car::Update_BoostJumpState(CKirby* pKirby, _float fTimeDelta)
 
     case BOOST_JUMP_STATE::FALL:
         if (pMovement->Is_Grounded())
+            Change_BoostJumpState(pKirby, BOOST_JUMP_STATE::LANDING);
+        break;
+
+    case BOOST_JUMP_STATE::LANDING:
+        if (pAnimator->Is_Finished())
             Change_BoostJumpState(pKirby, BOOST_JUMP_STATE::GROUND);
         break;
     }
@@ -396,6 +409,9 @@ void CKirby_Deform_Car::Exit_BoostJumpState(CKirby* pKirby, BOOST_JUMP_STATE eSt
         break;
 
     case BOOST_JUMP_STATE::FALL:
+        break;
+
+    case BOOST_JUMP_STATE::LANDING:
         break;
     }
 }

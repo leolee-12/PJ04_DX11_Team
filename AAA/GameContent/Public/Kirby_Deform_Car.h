@@ -20,7 +20,7 @@ private:
 	static constexpr _float s_fBoostAcceleration = 180.f;
 
 	enum DEFORM_CAR_STATE { BOOST, BOOST_END, CRUSH, DEFORM_CAR_END };
-	enum BOOST_JUMP_STATE { GROUND, JUMP_START, JUMP, FALL };
+	enum BOOST_JUMP_STATE { GROUND, JUMP_START, JUMP, FALL, LANDING };
 
 private:
 	CKirby_Deform_Car();
