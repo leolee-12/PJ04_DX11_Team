@@ -292,6 +292,10 @@ HRESULT CLevelDesign_Bush::Bind_ShaderResources(BUSH_STATE eSlot)
 
 	if (FAILED(pShader->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
 		return E_FAIL;
+	
+	const _float4 vEmissiveColor = { 0.f, 0.f, 0.f, 0.f };
+	if (FAILED(pShader->Bind_RawValue("g_vEmissiveColor", &vEmissiveColor, sizeof(_float4))))
+		return E_FAIL;
 
 	return S_OK;
 }

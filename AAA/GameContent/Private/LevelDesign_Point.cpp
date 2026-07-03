@@ -21,13 +21,13 @@ namespace
 
 	static const LD_POINT_CATALOG g_PointCatalog[] =
 	{
-		{ L"PointStarYellow", CLevelDesign_Point::YELLOW_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopYellowL.ysh", 1, { 1.f, 0.843f, 0.f, 1.f }, true },
+		{ L"PointStarYellow", CLevelDesign_Point::YELLOW_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopYellowL.ysh", 1, { 1.f, 0.68f, 0.05f, 1.f }, true },
 		{ L"PointStarGreen", CLevelDesign_Point::GREEN_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopGreenL.ysh", 5, { 0.2f, 0.85f, 0.25f, 1.f }, true },
 		{ L"PointStarRed", CLevelDesign_Point::RED_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopRedL.ysh", 10, { 1.f, 0.2f, 0.18f, 1.f }, true },
 		{ L"PointStarBlue", CLevelDesign_Point::BLUE_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopBlueL.ysh", 30, { 0.2f, 0.42f, 1.f, 1.f }, true },
-		{ L"CoinClusterS", CLevelDesign_Point::COIN_CLUSTER_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterSL.ysh", 100, { 1.f, 0.843f, 0.f, 1.f }, false },
-		{ L"CoinClusterM", CLevelDesign_Point::COIN_CLUSTER_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterML.ysh", 250, { 1.f, 0.843f, 0.f, 1.f }, false },
-		{ L"CoinClusterL", CLevelDesign_Point::COIN_CLUSTER_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterLL.ysh", 500, { 1.f, 0.843f, 0.f, 1.f }, false }
+		{ L"CoinClusterS", CLevelDesign_Point::COIN_CLUSTER_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterSL.ysh", 100, { 1.f, 0.68f, 0.05f, 1.f }, false },
+		{ L"CoinClusterM", CLevelDesign_Point::COIN_CLUSTER_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterML.ysh", 250, { 1.f, 0.68f, 0.05f, 1.f }, false },
+		{ L"CoinClusterL", CLevelDesign_Point::COIN_CLUSTER_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterLL.ysh", 500, { 1.f, 0.68f, 0.05f, 1.f }, false }
 	};
 
 	static const LD_POINT_CATALOG* Find_PointCatalog(const _wstring& wstrObjName)
@@ -268,8 +268,8 @@ HRESULT CLevelDesign_Point::Render_Model()
 		_uint iPass = ShaderPass::NonAnimPBR::DMN;
 		if (bUseColorPass)
 		{
-			const _float3 vMRA = { 1.f, 0.f, 1.f };
-			const _float4 vEmissiveColor = { 0.f, 0.f, 0.f, 0.f };
+			const _float3 vMRA = { 0.65f, 0.3f, 1.0f };
+			const _float4 vEmissiveColor = { 0.30f, 0.14f, 0.02f, 1.0f };
 			if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &m_vRenderColor, sizeof(_float4)))) return E_FAIL;
 			if (FAILED(m_pShaderCom->Bind_RawValue("g_vMRA", &vMRA, sizeof(_float3)))) return E_FAIL;
 			if (FAILED(m_pShaderCom->Bind_RawValue("g_vEmissiveColor", &vEmissiveColor, sizeof(_float4)))) return E_FAIL;

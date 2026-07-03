@@ -66,6 +66,8 @@ private:
 	HRESULT			Bind_ShaderResources();
 	const _tchar*	Resolve_ModelProtoTag() const;
 
+	virtual void    SetUp_Collider_CallBack() override;
+
 public:
 	static void			Register_LevelDesignSpecs();
 	static _bool		Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);

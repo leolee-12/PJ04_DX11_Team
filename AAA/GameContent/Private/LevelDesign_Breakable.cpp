@@ -157,8 +157,14 @@ HRESULT CLevelDesign_Breakable::Render()
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		if (BREAKABLE_STATE::BREAKING == m_eState && i == m_iBaseMeshIndex)
-			continue;
+		if (MODEL::ANIM == m_tBreakableDesc.eModelType)
+		{
+			if (BREAKABLE_STATE::INTACT == m_eState && i != m_iBaseMeshIndex)
+				continue;
+
+			if (BREAKABLE_STATE::BREAKING == m_eState && i == m_iBaseMeshIndex)
+				continue;
+		}
 
 		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
 
@@ -415,6 +421,18 @@ HRESULT CLevelDesign_Breakable::Ready_HurtBox()
 
 	m_pGameInstance_Proxy->Register_Collider(m_pHurtBoxCom, ETOUI(COLLISION_LAYER::ENV_HURT));
 
+	m_pHurtBoxCom->Set_OnEnter([this](CCollider* pOther)
+		{
+			if (nullptr == pOther)
+				return;
+			if (ETOUI(COLLISION_LAYER::CAR_BOOST) != pOther->Get_RegisteredGroup())
+				return;
+
+			ATTACK_INFO AttackInfo{};
+			AttackInfo.pAttacker = pOther->Get_Owner();
+			Damaged(AttackInfo);
+		});
+
 	return S_OK;
 }
 
@@ -478,6 +496,10 @@ HRESULT CLevelDesign_Breakable::Bind_ShaderResources()
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
+		return E_FAIL;
+
+	const _float4 vEmissiveColor = { 0.f, 0.f, 0.f, 0.f };
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vEmissiveColor", &vEmissiveColor, sizeof(_float4))))
 		return E_FAIL;
 
 	return S_OK;

@@ -19,7 +19,6 @@ public:
 		INTACT,
 		BREAKING,
 		BROKEN,
-		HIDDEN,
 	};
 
 	static constexpr const _tchar* STAGE12_STAGE_NAME = L"Stage1-2_MapStage";
@@ -34,16 +33,12 @@ public:
 		_wstring wstrModelProtoTag;
 		_uint iModelProtoLevel = {};
 
-		_wstring wstrBreakEventTag;
-
 		_bool bRenderable = true;
-		_bool bCastShadow = false;
 	};
 
 	struct MAP_BREAK_FRAGMENT
 	{
 		string strFragmentName;
-		string strLocatorName;
 
 		_float3 vPivot = {};
 		vector<_uint> MeshIndices;
@@ -78,6 +73,21 @@ public:
 	void Set_Renderable(_bool bRenderable) { m_bRenderable = bRenderable; }
 
 private:
+	MAP_BREAK_SECTION_DESC m_tBreakDesc = {};
+	MAP_BREAK_STATE m_eBreakState = MAP_BREAK_STATE::INTACT;
+
+	_wstring m_strSectionName;
+	_wstring m_strModelProtoTag;
+	_uint m_iModelProtoLevel = {};
+
+	vector<MAP_BREAK_FRAGMENT> m_Fragments;
+	vector<_uint> m_MeshFragmentIndices;
+
+	CCollider* m_pBoostTrigger = nullptr;
+
+	static constexpr _uint INVALID_FRAGMENT_INDEX = static_cast<_uint>(-1);
+
+private:
 	virtual const _tchar* Get_ModelProtoTag() const override;
 	virtual _uint Get_ModelProtoLevel() const override;
 	virtual _bool Should_RenderMesh(_uint iMesh) const override;
@@ -87,24 +97,8 @@ private:
 	void On_BoostTriggerEnter(CCollider* pOther);
 	void Start_Break();
 	HRESULT Ready_Fragments();
-	MAP_BREAK_FRAGMENT* Find_Fragment(_uint iMesh);
 	const MAP_BREAK_FRAGMENT* Find_Fragment(_uint iMesh) const;
 	_bool Is_FragmentMesh(_uint iMesh) const;
-
-private:
-	MAP_BREAK_SECTION_DESC m_tBreakDesc = {};
-	MAP_BREAK_STATE m_eBreakState = MAP_BREAK_STATE::INTACT;
-
-	_wstring m_strSectionName;
-	_wstring m_strModelProtoTag;
-	_uint m_iModelProtoLevel = {};
-
-	_bool m_bCastShadow = false;
-
-	vector<MAP_BREAK_FRAGMENT> m_Fragments;
-	vector<_bool> m_FragmentMeshFlags;
-
-	CCollider* m_pBoostTrigger = nullptr;
 
 public:
 	static CMapBreakSection* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
