@@ -26,6 +26,9 @@ static const float Bayer4x4[16] =
 	15.0 / 16.0, 7.0 / 16.0, 13.0 / 16.0, 5.0 / 16.0
 };
 
+float g_fHitFlash = 0.f;
+float3 g_vHitFlashColor = float3(1.f, 1.f, 1.f);
+
 void Apply_Dissolve(float4 vScreenPos)
 {
     float fVisibility = 1.f - g_fDissolve;
@@ -156,6 +159,7 @@ PS_OUT PS_BODY(PS_IN In)
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(vMRA, 1.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
+    Out.vEmissive.rgb += g_vHitFlashColor * g_fHitFlash;
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
     Out.vMaterialID = g_iMaterialID;
 
@@ -195,6 +199,7 @@ PS_OUT PS_EYE(PS_IN In)
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(0.f, 1.f, 1.f, 1.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
+    Out.vEmissive.rgb += g_vHitFlashColor * g_fHitFlash;
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
     Out.vMaterialID = g_iMaterialID;
 
@@ -224,6 +229,7 @@ PS_OUT PS_SKIN(PS_IN In)
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(vMRA, 1.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
+    Out.vEmissive.rgb += g_vHitFlashColor * g_fHitFlash;
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
     Out.vMaterialID = g_iMaterialID;
 
@@ -253,6 +259,7 @@ PS_OUT PS_ANCHOR(PS_IN In)
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(vMRA, 1.f);
     Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
+    Out.vEmissive.rgb += g_vHitFlashColor * g_fHitFlash;
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
     Out.vMaterialID = g_iMaterialID;
 

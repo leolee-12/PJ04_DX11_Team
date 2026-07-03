@@ -32,9 +32,10 @@ float g_fSSAOPower = 1.8f;
 Texture2D g_MRATexture; // r=metallic, g=roughness, b=ao
 Texture2D g_DiffuseTexture; // albedo (F0)
 float g_fSSRIntensity = 1.0f;
-float g_fSSRMaxDistance = 30.0f;
+float g_fSSRMaxDistance = 12.0f;
 float g_fSSRThickness = 0.5f;
-static const int SSR_STEPS = 64;
+float g_fSSRBias = 0.15f;
+static const int SSR_STEPS = 128;
 
 //DoF
 float g_fDoFEnable = 0.f;
@@ -299,7 +300,7 @@ float4 PS_SSR(PS_IN In) : SV_TARGET0
 
     if (roughness <= 0.8f)
     {
-        float3 rayStart = viewPos + viewN * 0.05f;
+        float3 rayStart = viewPos + viewN * 0.1f;
         float3 rayEnd = rayStart + R_view * g_fSSRMaxDistance;
 
         const float zNear = 0.1f;
@@ -338,7 +339,7 @@ float4 PS_SSR(PS_IN In) : SV_TARGET0
             float sceneZ = ViewPosFromUV(uv, sNdc).z;
 
             float diff = rayZ - sceneZ;
-            if (diff > 0.f && diff < g_fSSRThickness)
+            if (diff > g_fSSRBias && diff < g_fSSRThickness)
             {
                 float a = prevT, b = t;
                     [unroll]

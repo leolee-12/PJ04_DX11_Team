@@ -198,6 +198,10 @@ BlendState BS_Additive
     SrcBlend = Src_Alpha;
     DestBlend = One;
     BlendOp = Add;
+
+    SrcBlendAlpha = Src_Alpha; // 스타 커버리지를 알파에 더함
+    DestBlendAlpha = One; // 기존 씬 알파(지형=1)를 절대 깎지 않음
+    BlendOpAlpha = Add; // dstA = srcA + dstA
 };
 
 // 커튼 RT 용

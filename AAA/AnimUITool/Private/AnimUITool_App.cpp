@@ -132,7 +132,7 @@ HRESULT CAnimUITool_App::Init_ImGui()
 	return S_OK;
 }
 
-void CAnimUITool_App::Update(_float fTimeDelta)
+void CAnimUITool_App::Update(_float fTimeDelta, _float fRawTimeDelta)
 {
 	if (m_pToolLevel && m_pPanel_Manager)
 	{
@@ -149,7 +149,7 @@ void CAnimUITool_App::Update(_float fTimeDelta)
 		m_pToolLevel->Set_PreviewVisible(bAnimationMode);
 	}
 
-	m_pGameInstance_Proxy->Update_Engine(fTimeDelta);
+	m_pGameInstance_Proxy->Update_Engine(fTimeDelta, fRawTimeDelta);
 	m_pPanel_Manager->Update(fTimeDelta);
 }
 

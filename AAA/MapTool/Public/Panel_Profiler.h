@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#ifdef _DEBUG
-
 #include "Panel.h"
 
 NS_BEGIN(MapTool)
@@ -23,5 +21,3 @@ protected:
 };
 
 NS_END
-
-#endif

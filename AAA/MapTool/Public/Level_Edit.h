@@ -65,6 +65,7 @@ public:
 	void    Clear_MapPreview();
 	void    Clear_MapPreviewStage();
 	void    Clear_MapPreviewEnv();
+	void    Clear_LDPreview();
 
 	const _wstring& Get_MapPreviewStatus() const;
 	_bool   Is_MapStageLoaded() const;
@@ -102,6 +103,7 @@ public:
 	void Back_To_Edit();
 	void Reset_EditCameraRotation();
 	void Jump_EditCamera(_float fForwardDistance, _float fRightDistance);
+	void Teleport_EditCamera(const _float3& vPosition);
 
 public:       // Hierarchy
 	_uint Get_HierarchyRevision() const { return m_iHierarchyRevision; }
@@ -145,7 +147,6 @@ private:
 	void Add_MapPreviewObjectHandle(const _wstring& strPrototypeTag, const _wstring& strLayerTag,
 		const _wstring& strObjectTag, CGameObject* pObject);
 	static void On_MapPreviewObjectCreated(void* pContext, CGameObject* pObject, const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);
-	static void On_EnvObjectCreated(void* pContext, CGameObject* pObject, const _wstring& strPrototypeTag, const _wstring& strLayerTag, const _wstring& strObjectTag);
 
 	HRESULT Prepare_MapContentForPreviewLoad(_uint iPresetIndex, _bool bPresetChanged, _bool bPreserveEnvRuntimeState);
 	MAP_EDIT_DATA Build_MapPreviewContentDescSnapshot() const;
@@ -167,11 +168,6 @@ private:
 
   private:	// Hierarchy
 		void Mark_HierarchyDirty() { ++m_iHierarchyRevision; }
-
-#ifdef _DEBUG
-		HRESULT  Ready_DebugMapBreakSection_Stage12();
-		void     Hide_DebugMapBreakWall_Stage12();
-#endif
 
 public:
 	static CLevel_Edit* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

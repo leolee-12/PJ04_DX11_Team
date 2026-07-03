@@ -6,21 +6,15 @@
 #include "GameObject_Factory.h"
 #include "GameContent_const.h"
 #include "GameContent_Log.h"
-#include "GameContrnt_Events.h"
 #include "Map_EditFile.h"
 #include "Map_EditSession.h"
 #include "Map_Loader.h"
 #include "MapStage.h"
 #include "MapSection.h"
-#include "MapBreakSection.h"
 #include "EnvObject_Static.h"
 #include "EnvTrigger_RenderGlobals.h"
 #include "Env_InstanceController.h"
 #include "LevelDesign_Registry.h"
-
-#ifdef _DEBUG
-#include "MapToolProfiler.h"
-#endif
 
 #include "GameInstance.h"
 
@@ -28,18 +22,6 @@
 
 namespace
 {
-#ifdef _DEBUG
-	constexpr const _tchar* kDebugMapBreakSectionModelProtoTag = L"Prototype_Component_Model_MapBreakSection_Stage1-2_GsDefault_4";
-	constexpr const _char* kDebugMapBreakSectionModelPath = "../../Resources/Map/Stage1-2/Section/GsDefault_4.ysh";
-	constexpr const _tchar* kDebugMapBreakSectionObjectTag = L"Debug_MapBreakSection_GsDefault_4";
-	constexpr const _tchar* kDebugMapBreakWallSectionName = L"GsDefault_2";
-
-	_bool Is_DebugMapBreakStage12(const wstring& strManifestPath)
-	{
-		return strManifestPath.find(L"Stage1-2") != wstring::npos;
-	}
-#endif
-
 	void Forward_GameContentLog(Client::GAMECONTENT_LOG_LEVEL eLevel, const char* pMessage)
 	{
 		const string strMessage = (nullptr != pMessage) ? pMessage : "";
@@ -293,30 +275,9 @@ HRESULT CLevel_Edit::Initialize()
 void CLevel_Edit::Update(_float fTimeDelta)
 {
 #ifdef _DEBUG
-	if (m_pGameInstance_Proxy->Key_Down(DIK_F1))
-		m_pGameInstance_Proxy->Publish(EventTag::CarBreakWall, nullptr);
-
 	if (m_pGameInstance_Proxy->Key_Down(DIK_F2))
 		m_pGameInstance_Proxy->Toggle_DebugRender();
-
-	if (m_pGameInstance_Proxy->Key_Down(DIK_F3))
-	{
-		Hide_DebugMapBreakWall_Stage12();
-		m_pGameInstance_Proxy->Publish(EventTag::CarBreakWall2, nullptr);
-	}
 #endif //  _DEBUG
-
-
-	if (m_pGameInstance_Proxy->Key_Down(DIK_ESCAPE))
-		m_pGameInstance_Proxy->Publish(TEXT("Return_Lobby"), nullptr);
-
-#ifdef _DEBUG
-	CMapToolProfiler* pProfiler = CMapToolProfiler::GetInstance();
-	if (m_pGameInstance_Proxy->Key_Down(DIK_1))
-		pProfiler->Toggle_Enabled();
-
-	pProfiler->Update(fTimeDelta);
-#endif
 }
 
 HRESULT CLevel_Edit::Render()
@@ -327,10 +288,6 @@ HRESULT CLevel_Edit::Render()
 		const _float4x4* pProj = m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
 		m_pGrid->Render(pView, pProj);
 	}
-
-#ifdef _DEBUG
-	CMapToolProfiler::GetInstance()->Capture_Frame();
-#endif
 
 	return S_OK;
 }
@@ -917,20 +874,7 @@ HRESULT CLevel_Edit::Load_LDPreview(_uint iPresetIndex)
 		return E_FAIL;
 	}
 
-	vector<wstring> LevelDesignLayers;
-	LevelDesignLayers.reserve(m_Layers.size());
-
-	for (const auto& Pair : m_Layers)
-	{
-		if (CLevelDesign_Registry::Is_LevelDesignLayer(
-			Pair.first))
-		{
-			LevelDesignLayers.push_back(Pair.first);
-		}
-	}
-
-	for (const auto& strLayerTag : LevelDesignLayers)
-		Clear_MapPreviewLayer(strLayerTag);
+	Clear_LDPreview();
 
 	MAP_RUNTIME_LOAD_CONTEXT Context{};
 	Context.pDevice = m_pDevice;
@@ -982,14 +926,8 @@ void CLevel_Edit::Clear_MapPreview()
 
 	for (const auto& strLayerTag : MapLayers)
 		Clear_MapPreviewLayer(strLayerTag);
-	
-	Clear_MapPreviewLayer(CMapBreakSection::LAYER_TAG);
-	Clear_MapPreviewEnvInstanceController();
 
-#ifdef _DEBUG
-	CMapToolProfiler::GetInstance()->Clear_EnvObjects();
-	CMapToolProfiler::GetInstance()->Set_Stage(nullptr);
-#endif
+	Clear_MapPreviewEnvInstanceController();
 
 	m_pMapStage = nullptr;
 	Set_MapPreviewStageRuntime(false, L"");
@@ -1008,13 +946,17 @@ void CLevel_Edit::Clear_MapPreviewStage()
 {
 	MAP_EDIT_DATA MapContentDesc = Build_MapPreviewContentDescSnapshot();
 
-	Clear_MapPreviewLayer(L"Layer_MapStage");
+	vector<wstring> MapStageLayers;
+	MapStageLayers.reserve(m_Layers.size());
 
-#ifdef _DEBUG
-	Clear_MapPreviewLayer(CMapBreakSection::LAYER_TAG);
+	for (const auto& Pair : m_Layers)
+	{
+		if (CMap_Loader::Is_MapStageLayer(Pair.first))
+			MapStageLayers.push_back(Pair.first);
+	}
 
-	CMapToolProfiler::GetInstance()->Set_Stage(nullptr);
-#endif
+	for (const auto& strLayerTag : MapStageLayers)
+		Clear_MapPreviewLayer(strLayerTag);
 
 	m_pMapStage = nullptr;
 	Set_MapPreviewStageRuntime(false, L"");
@@ -1044,10 +986,7 @@ void CLevel_Edit::Clear_MapPreviewEnv()
 
 	for (const auto& Pair : m_Layers)
 	{
-		if (Pair.first == L"Layer_MapStage")
-			continue;
-
-		if (Client::CMap_Loader::Is_MapLayer(Pair.first))
+		if (CMap_Loader::Is_MapEnvLayer(Pair.first))
 			MapLayers.push_back(Pair.first);
 	}
 
@@ -1055,10 +994,6 @@ void CLevel_Edit::Clear_MapPreviewEnv()
 		Clear_MapPreviewLayer(strLayerTag);
 
 	Clear_MapPreviewEnvInstanceController();
-
-#ifdef _DEBUG
-	CMapToolProfiler::GetInstance()->Clear_EnvObjects();
-#endif
 
 	Set_MapPreviewEnvRuntime(false, 0);
 	MapContentDesc.bLoadEnv = false;
@@ -1077,6 +1012,41 @@ void CLevel_Edit::Clear_MapPreviewEnv()
 	}
 
 	Apply_MapPreviewContentDesc(MapContentDesc, false);
+	Sync_MapPreviewRuntimeStateToSession();
+}
+
+void CLevel_Edit::Clear_LDPreview()
+{
+	vector<wstring> LevelDesignLayers;
+	LevelDesignLayers.reserve(m_Layers.size());
+
+	for (const auto& Pair : m_Layers)
+	{
+		if (CLevelDesign_Registry::Is_LevelDesignLayer(Pair.first))
+			LevelDesignLayers.push_back(Pair.first);
+	}
+
+	for (const wstring& strLayerTag : LevelDesignLayers)
+		Clear_MapPreviewLayer(strLayerTag);
+
+	if (Is_MapStageLoaded())
+	{
+		const wstring strStageName = Get_MapPreviewLoadedStageNameRef().empty()
+			? L"(loaded stage)"
+			: Get_MapPreviewLoadedStageNameRef();
+
+		Set_MapPreviewStatus(L"Map preview loaded without LevelDesign: stage=" + strStageName + L" / env=" +
+			to_wstring(Get_MapPreviewEnvCreatedCountInternal()));
+	}
+	else if (Is_MapEnvLoaded())
+	{
+		Set_MapPreviewStatus(L"Environment preview loaded only. / env=" + to_wstring(Get_MapPreviewEnvCreatedCountInternal()));
+	}
+	else
+	{
+		Set_MapPreviewStatus(L"LevelDesign preview cleared.");
+	}
+
 	Sync_MapPreviewRuntimeStateToSession();
 }
 
@@ -1207,8 +1177,6 @@ void CLevel_Edit::On_MapPreviewObjectCreated(
 
 	if (0 == _wcsicmp(strPrototypeTag.c_str(), Client::CMapStage::PROTOTYPE_TAG))
 		pLevel->m_pMapStage = dynamic_cast<Client::CMapStage*>(pObject);
-
-	On_EnvObjectCreated(pContext, pObject, strPrototypeTag, strLayerTag, strObjectTag);
 }
 
 void CLevel_Edit::Set_Selected(CGameObject* pSelected)
@@ -1287,6 +1255,15 @@ void CLevel_Edit::Jump_EditCamera(_float fForwardDistance, _float fRightDistance
 
 	Back_To_Edit();
 	m_pCamera->Jump_Local(fForwardDistance, fRightDistance);
+}
+
+void CLevel_Edit::Teleport_EditCamera(const _float3& vPosition)
+{
+	if (nullptr == m_pCamera)
+		return;
+
+	Back_To_Edit();
+	m_pCamera->Get_Transform()->Set_State(STATE::POSITION, XMVectorSet(vPosition.x, vPosition.y, vPosition.z, 1.f));
 }
 
 const vector<CLevel_Edit::EDITOR_OBJECT_HANDLE>* CLevel_Edit::Get_CameraLayer() const
@@ -1395,104 +1372,8 @@ HRESULT CLevel_Edit::Ready_MapStage()
 
 	Set_MapPreviewStageRuntime(true, strLoadedStageName);
 
-#ifdef _DEBUG
-	CMapToolProfiler::GetInstance()->Set_Stage(m_pMapStage);
-
-	if (Is_DebugMapBreakStage12(MapContentDesc.strManifestPath))
-	{
-		if (FAILED(Ready_DebugMapBreakSection_Stage12()))
-			return E_FAIL;
-	}
-#endif
 	return S_OK;
 }
-
-#ifdef _DEBUG
-HRESULT CLevel_Edit::Ready_DebugMapBreakSection_Stage12()
-{
-	const _uint iObjectLevel = ETOUI(TOOL_LEVEL::EDIT);
-	const _uint iModelLevel = ETOUI(LEVEL::STATIC);
-
-	if (!m_pGameInstance_Proxy->Has_Prototype(iModelLevel, kDebugMapBreakSectionModelProtoTag))
-	{
-		CModel* pModelPrototype = CModel::Create_WithTextureHub(
-			m_pDevice,
-			m_pContext,
-			MODEL::MAP,
-			kDebugMapBreakSectionModelPath);
-
-		if (nullptr == pModelPrototype)
-			return E_FAIL;
-
-		if (FAILED(m_pGameInstance_Proxy->Add_Prototype(iModelLevel, kDebugMapBreakSectionModelProtoTag, pModelPrototype)))
-		{
-			Safe_Release(pModelPrototype);
-			return E_FAIL;
-		}
-	}
-
-	if (!m_pGameInstance_Proxy->Has_Prototype(iObjectLevel, CMapBreakSection::PROTOTYPE_TAG))
-	{
-		if (FAILED(m_pGameInstance_Proxy->Add_Prototype(iObjectLevel, CMapBreakSection::PROTOTYPE_TAG,
-			CMapBreakSection::Create(m_pDevice, m_pContext))))
-		{
-			return E_FAIL;
-		}
-	}
-
-	CMapBreakSection::MAP_BREAK_SECTION_DESC Desc{};
-	Desc.strSectionName = L"GsDefault_4";
-	Desc.wstrModelProtoTag = kDebugMapBreakSectionModelProtoTag;
-	Desc.iModelProtoLevel = iModelLevel;
-	Desc.wstrBreakEventTag = EventTag::CarBreakWall2;
-	Desc.bRenderable = true;
-	Desc.bCastShadow = false;
-	Desc.bUseRigidStatic = false;
-	Desc.bRigidStaticEnabledAtStart = false;
-
-	CGameObject* pObject = nullptr;
-	if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(
-		&pObject,
-		iObjectLevel,
-		CMapBreakSection::PROTOTYPE_TAG,
-		iObjectLevel,
-		CMapBreakSection::LAYER_TAG,
-		kDebugMapBreakSectionObjectTag,
-		&Desc)))
-	{
-		return E_FAIL;
-	}
-
-	Add_MapPreviewObjectHandle(
-		CMapBreakSection::PROTOTYPE_TAG,
-		CMapBreakSection::LAYER_TAG,
-		kDebugMapBreakSectionObjectTag,
-		pObject);
-
-	OutputDebugStringA("[MapBreakSection] Stage1-2 GsDefault_4 debug object spawned. Event=CarBreakWall2\n");
-
-	return S_OK;
-}
-
-void CLevel_Edit::Hide_DebugMapBreakWall_Stage12()
-{
-	if (nullptr == m_pMapStage)
-		return;
-
-	for (CMapSection* pSection : m_pMapStage->Get_Sections())
-	{
-		if (nullptr == pSection)
-			continue;
-
-		if (0 != _wcsicmp(pSection->Get_SectionName().c_str(), kDebugMapBreakWallSectionName))
-			continue;
-
-		pSection->Set_Renderable(false);
-		pSection->Set_RuntimeCollisionActorEnabled(false);
-		return;
-	}
-}
-#endif
 
 HRESULT CLevel_Edit::Ready_EnvObjects(vector<ENV_OBJECT_DESC>* pOutDeletedEnvDescs, MAP_LOAD_RESULT* pOutReport)
 {
@@ -1515,10 +1396,6 @@ HRESULT CLevel_Edit::Ready_EnvObjects(vector<ENV_OBJECT_DESC>* pOutDeletedEnvDes
 
 		Apply_MapPreviewContentDesc(MapContentDesc, true);
 	}
-
-#ifdef _DEBUG
-	CMapToolProfiler::GetInstance()->Clear_EnvObjects();
-#endif
 
 	MAP_RUNTIME_LOAD_CONTEXT Context{};
 	Context.pDevice = m_pDevice;
@@ -1613,36 +1490,6 @@ _bool XM_CALLCONV CLevel_Edit::Pick_EnvObjectByRay(_fvector vOrigin, _fvector vD
 		*pOutDistance = fBestDist;
 
 	return true;
-}
-
-void CLevel_Edit::On_EnvObjectCreated(
-	void* pContext,
-	CGameObject* pObject,
-	const wstring& strPrototypeTag,
-	const wstring& strLayerTag,
-	const wstring& strObjectTag)
-{
-	UNREFERENCED_PARAMETER(strPrototypeTag);
-	UNREFERENCED_PARAMETER(strObjectTag);
-
-#ifdef _DEBUG
-	CLevel_Edit* pLevel = static_cast<CLevel_Edit*>(pContext);
-	if (nullptr == pLevel || nullptr == pObject)
-		return;
-
-	if (strLayerTag != L"Layer_EnvStatic" && strLayerTag != L"Layer_EnvInteract")
-		return;
-
-	Client::CEnvObject* pEnvObject = dynamic_cast<Client::CEnvObject*>(pObject);
-	if (nullptr == pEnvObject)
-		return;
-
-	CMapToolProfiler::GetInstance()->Register_EnvObject(pEnvObject);
-#else
-	UNREFERENCED_PARAMETER(pContext);
-	UNREFERENCED_PARAMETER(pObject);
-	UNREFERENCED_PARAMETER(strLayerTag);
-#endif
 }
 
 HRESULT CLevel_Edit::Prepare_MapContentForPreviewLoad(_uint iPresetIndex, _bool bPresetChanged, _bool bPreserveEnvRuntimeState)
@@ -1840,10 +1687,6 @@ _bool CLevel_Edit::Handle_MapSpecificDeletion(CGameObject* pObject)
 	{
 		m_pMapStage = nullptr;
 		Set_MapPreviewStageRuntime(false, L"");
-
-#ifdef _DEBUG
-		CMapToolProfiler::GetInstance()->Set_Stage(nullptr);
-#endif
 	}
 	else if (0 < Get_MapPreviewEnvCreatedCountInternal())
 	{
@@ -1858,9 +1701,6 @@ _bool CLevel_Edit::Handle_MapSpecificDeletion(CGameObject* pObject)
 #ifdef _DEBUG
 	if (bTrackedDeletedEnv)
 	{
-		CMapToolProfiler* pProfiler = CMapToolProfiler::GetInstance();
-		pProfiler->Clear_EnvObjects();
-
 		for (const auto& [strCurrentLayer, CurrentObjects] : m_Layers)
 		{
 			if (strCurrentLayer != L"Layer_EnvStatic"
@@ -1876,8 +1716,6 @@ _bool CLevel_Edit::Handle_MapSpecificDeletion(CGameObject* pObject)
 
 				Client::CEnvObject* pEnvObject =
 					dynamic_cast<Client::CEnvObject*>(Handle.pObject);
-				if (nullptr != pEnvObject)
-					pProfiler->Register_EnvObject(pEnvObject);
 			}
 		}
 	}
@@ -2002,11 +1840,6 @@ CLevel_Edit* CLevel_Edit::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 void CLevel_Edit::Free()
 {
-#ifdef _DEBUG
-	CMapToolProfiler::GetInstance()->Clear_EnvObjects();
-	CMapToolProfiler::GetInstance()->Set_Stage(nullptr);
-#endif
-
 	m_pMapStage = nullptr;
 
 	Safe_Release(m_pGrid);

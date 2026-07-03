@@ -6,6 +6,7 @@
 #include "EnvTrigger_RenderGlobals.h"
 #include "EnvTrigger_EventPublisher.h"
 #include "MapSection.h"
+#include "MapBreakSection.h"
 #include "MapStage.h"
 #include "GameObject_Factory.h"
 
@@ -21,6 +22,23 @@ namespace
 
 		return Collision.eColliderKind == ENV_COLLIDER_KIND::MODEL_MESH
 			&& Collision.bCookCollMesh;
+	}
+
+	string ToLower_ASCII(string strValue)
+	{
+		for (char& ch : strValue)
+		{
+			if ('A' <= ch && ch <= 'Z')
+				ch = ch - 'A' + 'a';
+		}
+
+		return strValue;
+	}
+
+	_bool Should_CookMapCollisionMesh(const string& strMeshName)
+	{
+		const string strLowerName = ToLower_ASCII(strMeshName);
+		return strLowerName.find("moco") == string::npos;
 	}
 }
 
@@ -43,6 +61,18 @@ HRESULT CMap_ProtoRegister::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, c
 
 	for (const MAP_SECTION_DESC& Desc : Package.StageDesc.SectionDescs)
 	{
+		if (FAILED(Ready_MapSectionModel(Levels.iStageModelLevel, Desc)))
+			return E_FAIL;
+	}
+
+	if (Package.StageDesc.strStageName == CMapBreakSection::STAGE12_STAGE_NAME)
+	{
+		MAP_SECTION_DESC Desc{};
+		Desc.strSectionName = CMapBreakSection::STAGE12_SECTION_NAME;
+		Desc.wstrModelProtoTag = CMapBreakSection::STAGE12_MODEL_PROTO_TAG;
+		Desc.wstrModelPath = CMapBreakSection::STAGE12_MODEL_PATH;
+		Desc.iModelProtoLevel = Levels.iStageModelLevel;
+
 		if (FAILED(Ready_MapSectionModel(Levels.iStageModelLevel, Desc)))
 			return E_FAIL;
 	}
@@ -179,6 +209,9 @@ HRESULT CMap_ProtoRegister::Ready_ObjectPrototypes(_uint iObjectLevel)
 		m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(EnsurePrototype(CMapBreakSection::PROTOTYPE_TAG, CMapBreakSection::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	if (FAILED(EnsurePrototype(CMapStage::PROTOTYPE_TAG, CMapStage::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
@@ -224,11 +257,12 @@ HRESULT CMap_ProtoRegister::Ready_MapSectionModel(_uint iModelLevel, const MAP_S
 
 		try
 		{
-			pModelPrototype = CModel::Create_WithTextureHub(
-				m_pDevice,
-				m_pContext,
-				MODEL::MAP,
-				wstrModelPath.c_str());
+			CModel::MODEL_LOAD_DESC ModelDesc{};
+			ModelDesc.eType = MODEL::MAP;
+			ModelDesc.pModelFilePath = wstrModelPath.c_str();
+			XMStoreFloat4x4(&ModelDesc.PreTransformMatrix, XMMatrixIdentity());
+			ModelDesc.fcCollisionCookFilter = &Should_CookMapCollisionMesh;
+			pModelPrototype = CModel::Create_WithTextureHub(m_pDevice, m_pContext, ModelDesc);
 		}
 		catch (const std::exception& e)
 		{
@@ -284,31 +318,21 @@ HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_D
 
 	try
 	{
+		CModel::MODEL_LOAD_DESC ModelDesc{};
+		ModelDesc.eType = MODEL::NONANIM;
+		ModelDesc.pModelFilePath = wstrModelPath.c_str();
+		XMStoreFloat4x4(&ModelDesc.PreTransformMatrix, XMMatrixIdentity());
+		ModelDesc.bCookCollisionMesh = bCookCollisionMesh;
+
 		if (bEnablePickingData)
 		{
-			pModelPrototype = CModel::Create_WithTextureHub(
-				m_pDevice,
-				m_pContext,
-				MODEL::NONANIM,
-				wstrModelPath.c_str(),
-				XMMatrixIdentity(),
-				[](const string&) -> bool
+			ModelDesc.fcPickableFilter = [](const string&) -> bool
 				{
 					return true;
-				},
-				bCookCollisionMesh);
+				};
 		}
-		else
-		{
-			pModelPrototype = CModel::Create_WithTextureHub(
-				m_pDevice,
-				m_pContext,
-				MODEL::NONANIM,
-				wstrModelPath.c_str(),
-				XMMatrixIdentity(),
-				nullptr,
-				bCookCollisionMesh);
-		}
+
+		pModelPrototype = CModel::Create_WithTextureHub(m_pDevice, m_pContext, ModelDesc);
 	}
 	catch (const std::exception& e)
 	{

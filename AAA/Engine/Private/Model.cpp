@@ -27,6 +27,7 @@ CModel::CModel(const CModel& Prototype)
 	, m_bUseMaterialEx{ Prototype.m_bUseMaterialEx }
 	, m_MaterialsEx{ Prototype.m_MaterialsEx }
 	, m_bCookCollisionMesh{ Prototype.m_bCookCollisionMesh }
+	, m_CollisionCookFilter{ Prototype.m_CollisionCookFilter }
 	, m_PreTransformMatrix{ Prototype.m_PreTransformMatrix }
 	, m_iNumAnimations{ Prototype.m_iNumAnimations }
 	, m_MeshLayers{ Prototype.m_MeshLayers }
@@ -188,20 +189,23 @@ HRESULT CModel::Initialize_Prototype(MODEL eType, const _char* pModelFilePath, _
 	return m_eType == MODEL::ANIM ? Ready_Anim(pModelFilePath, PreTransformMatrix) : Ready_NonAnim(pModelFilePath, PreTransformMatrix);
 }
 
-HRESULT CModel::Initialize_Prototype_WithTextureHub(MODEL eType, const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter, _bool bCookCollisionMesh)
+HRESULT CModel::Initialize_Prototype_WithTextureHub(const CModel::MODEL_LOAD_DESC& Desc)
 {
-	m_eType = eType;
+	m_eType = Desc.eType;
 	m_bUseMaterialEx = true;
-	m_PickableFilter = fcFillter;
-	m_strModelPath = pModelFilePath ? StrToWstr(pModelFilePath) : L"";
-	m_bCookCollisionMesh = bCookCollisionMesh;
+	m_PickableFilter = Desc.fcPickableFilter;
+	m_strModelPath = Desc.pModelFilePath ? StrToWstr(Desc.pModelFilePath) : L"";
+	m_bCookCollisionMesh = MODEL::MAP == m_eType ? false : Desc.bCookCollisionMesh;
+	m_CollisionCookFilter = Desc.fcCollisionCookFilter;
 
 	//if (MODEL::ANIM == m_eType && m_bCookCollisionMesh)
-	//	return E_FAIL;	// 현재 CookCollMesh는 NonAnimMesh만 지원
+	//      return E_FAIL;  // 현재 CookCollMesh는 NonAnimMesh만 지원
+
+	const _matrix PreTransformMatrix = XMLoadFloat4x4(&Desc.PreTransformMatrix);
 
 	return MODEL::ANIM == m_eType
-		? Ready_AnimEx(pModelFilePath, PreTransformMatrix)
-		: Ready_NonAnimEx(pModelFilePath, PreTransformMatrix);
+		? Ready_AnimEx(Desc.pModelFilePath, PreTransformMatrix)
+		: Ready_NonAnimEx(Desc.pModelFilePath, PreTransformMatrix);
 }
 
 HRESULT CModel::Initialize(void* pArg)
@@ -1100,6 +1104,14 @@ void CModel::Load_MeshLayers(const _char* pModelFilePath)
 	}
 }
 
+_bool CModel::Should_CookCollisionMesh(const string& strMeshName) const
+{
+	if (MODEL::MAP != m_eType)
+		return true;
+
+	return !m_CollisionCookFilter || m_CollisionCookFilter(strMeshName);
+}
+
 HRESULT CModel::Cook_CollisionMesh(const vector<MESH_DATA>& meshes, _fmatrix PreTransformMatrix)
 {
 	if (nullptr == m_pGameInstance_Proxy) return S_OK;
@@ -1122,6 +1134,9 @@ HRESULT CModel::Cook_CollisionMesh(const vector<MESH_DATA>& meshes, _fmatrix Pre
 	else
 	{
 		for (const auto& mesh : meshes) {
+			if (!Should_CookCollisionMesh(mesh.strName))
+				continue;
+
 			const _uint iBase = (_uint)Positions.size();
 			for (const auto& v : mesh.MapVertices) {     // MAP은 MapVertices
 				_float3 p;
@@ -1252,12 +1267,11 @@ CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MOD
 	return pInstance;
 }
 
-CModel* CModel::Create_WithTextureHub(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType,
-	const _char* pModelFilePath, _fmatrix PreTransformMatrix, PickableFilter fcFillter, _bool bCookCollisionMesh)
+CModel* CModel::Create_WithTextureHub(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const CModel::MODEL_LOAD_DESC& Desc)
 {
 	CModel* pInstance = new CModel(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype_WithTextureHub(eType, pModelFilePath, PreTransformMatrix, fcFillter, bCookCollisionMesh)))
+	if (FAILED(pInstance->Initialize_Prototype_WithTextureHub(Desc)))
 	{
 		MSG_BOX("Failed to Created : CModel - WithTextureHub");
 		Safe_Release(pInstance);

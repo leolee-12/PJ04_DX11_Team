@@ -96,6 +96,7 @@ void CEffect_Container::Late_Update(_float fTimeDelta)
         return;
 
     Compute_CombinedWorldMatrix();
+    Compute_Billboard();
 
     for (auto& [tag, pPart] : m_EffestParts)
     {
@@ -309,6 +310,34 @@ void CEffect_Container::Update_WaitForEmitters()
     EffectContainer_Stop();
 }
 
+void CEffect_Container::Compute_Billboard()
+{
+    if (!m_bContinerBillboard)
+        return;
+
+    if (m_pParentMatrix)
+    {
+        _matrix ComMatrix = XMLoadFloat4x4(&m_CombinedWorldMatrix);
+        _vector         vLook = XMLoadFloat4(m_pGameInstance_Proxy->Get_CamPosition()) - ComMatrix.r[3];
+        _vector         vRight = XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLook);
+        _vector         vUp = XMVector3Cross(vLook, vRight);
+
+        _float3         vScaled = {
+            XMVectorGetX(XMVector3Length(ComMatrix.r[0])),
+            XMVectorGetX(XMVector3Length(ComMatrix.r[1])),
+            XMVectorGetX(XMVector3Length(ComMatrix.r[2]))
+        };
+
+        ComMatrix.r[0] = XMVector3Normalize(vRight) * vScaled.x;
+        ComMatrix.r[1] = XMVector3Normalize(vUp) * vScaled.y;
+        ComMatrix.r[2] = XMVector3Normalize(vLook) * vScaled.z;
+    }
+    else
+    {
+        m_pTransformCom->LookAt(XMLoadFloat4(m_pGameInstance_Proxy->Get_CamPosition()));
+    }
+}
+
 void CEffect_Container::Debug_ResetPlay()
 {
     if (m_bResetPlayDoubleCheck == false)
@@ -356,6 +385,7 @@ void CEffect_Container::Init_PropetyValue()
 
     m_fDuration = { 1.f };
     m_fAccTime = { 0.f };
+    m_bContinerBillboard = { false };
 }
 
 void CEffect_Container::Free()

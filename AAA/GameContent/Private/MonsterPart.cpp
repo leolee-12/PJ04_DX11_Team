@@ -13,7 +13,11 @@ CMonsterPart::CMonsterPart(const CMonsterPart& Prototype)
 HRESULT CMonsterPart::Initialize(void* pArg)
 {
     if (auto pDesc = static_cast<MONSTERPART_DESC*>(pArg))
+    {
         m_pSocketBoneMatrix = pDesc->pSocketBoneMatrix;
+        m_pHitFlash = pDesc->pHitFlash;        
+        m_pHitFlashColor = pDesc->pHitFlashColor;  
+    }
 
     return __super::Initialize(pArg);
 }
@@ -38,6 +42,7 @@ void CMonsterPart::Late_Update(_float fTimeDelta)
 
     Compute_CombinedWorldMatrix(LocalWorld);          // 내부에서 부모행렬까지 곱함
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
 
 HRESULT CMonsterPart::Render()
@@ -67,6 +72,31 @@ HRESULT CMonsterPart::Render()
             return E_FAIL;
     }
 
+    return S_OK;
+}
+
+HRESULT CMonsterPart::Render_Shadow()
+{
+    if (!m_bActive || nullptr == m_pModelCom)
+        return S_OK;
+
+    if(FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
+        return E_FAIL;
+    if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
+        return E_FAIL;
+
+    const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+    for (_uint i = 0; i < iNumMeshes; ++i)
+    {
+        if (m_pAnimatorCom)
+            m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
+        if (FAILED(m_pShaderCom->Begin(7)))
+            return E_FAIL;
+        if (FAILED(m_pModelCom->Render(i)))
+            return E_FAIL;
+    }
     return S_OK;
 }
 
@@ -112,6 +142,13 @@ HRESULT CMonsterPart::Bind_ShaderResources()
         m_eProjType))))
         return E_FAIL;
 
+    // 피격 플래시
+    _float  fFlash = m_pHitFlash ? *m_pHitFlash : 0.f;
+    _float3 vFlashCol = m_pHitFlashColor ? *m_pHitFlashColor : _float3(1.f, 1.f, 1.f);
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fHitFlash", &fFlash, sizeof(_float))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vHitFlashColor", &vFlashCol, sizeof(_float3))))
+        return E_FAIL;
     return S_OK;
 }
 

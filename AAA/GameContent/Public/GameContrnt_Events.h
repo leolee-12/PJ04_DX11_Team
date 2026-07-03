@@ -35,13 +35,18 @@ namespace Client
         inline constexpr const _tchar* NamePlate_Appeared = L"Boss.NamePlateOn";
         inline constexpr const _tchar* FullScreen_Flash = L"Fx.FullScreenFlashOn";
 
-        inline constexpr const _tchar* CarBreakWall = L"Stage1-2.CarBreakWall";
-        inline constexpr const _tchar* CarBreakWall2 = L"Stage1-2.CarBreakWall2";
+        inline constexpr const _tchar* Stage12_CarBreakWall = L"Stage1-2.CarBreakWall";
+        inline constexpr const _tchar* Stage12_CarBreakWall2 = L"Stage1-2.CarBreakWall2";
     }
 
     inline constexpr const _tchar* EVT_SWALLOWED = L"OnSwallowed";
     inline constexpr const _tchar* EVT_QUERY_PLAYER = L"Query_Player";
     inline constexpr const _tchar* EVT_QUERY_BOSS = L"Query_Boss";
+
+    struct KIRBY_ABILITY_CHANGED
+    {
+        _bool bBegin = { true }; // true=변신 시작(줌인), false=변신 끝(복귀)
+    };
 
     enum class ECutsceneCam { Cutscene, Boss };
     enum class GRAB_TYPE : _uint{ GORILLA_SCENE, GORILLA_COMBAT, _COUNT };

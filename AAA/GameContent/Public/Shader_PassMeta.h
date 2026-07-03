@@ -171,6 +171,7 @@ namespace ShaderPass
 		inline constexpr _uint DISCARD = 13;
 		inline constexpr _uint COLORMRADITHER = 14;
 		inline constexpr _uint DECAL = 15;
+		inline constexpr _uint COLOR2 = 16;
 	}
 
 	namespace EnvInstFlags

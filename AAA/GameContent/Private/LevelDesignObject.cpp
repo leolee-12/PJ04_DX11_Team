@@ -31,6 +31,8 @@ HRESULT CLevelDesignObject::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+	m_iMaterialID = 0;
+
 	return S_OK;
 }
 

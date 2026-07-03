@@ -1,8 +1,8 @@
 #pragma once
 
 #include "GameContent_Defines.h"
-
 #include "PartObject.h"
+#include "GameContent_const.h"
 
 NS_BEGIN(Engine)
 class CShader;
@@ -20,6 +20,8 @@ public:
 	struct KIRBY_ONONFFPART_DESC : public CPartObject::PARTOBJECT_DESC
 	{
 		const _float4x4* pSocketBoneMatrix{ nullptr };
+		const _float* pHitFlash = { nullptr };
+		const _float3* pHitFlashColor = { nullptr };
 	};
 
 protected:
@@ -36,6 +38,7 @@ public:
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+	virtual HRESULT Render_Shadow() override;
 
 public:
 	virtual void PartOnOff(_bool bOn) { m_bOn = bOn; }
@@ -43,9 +46,30 @@ public:
 	void Set_SocketBoneMatrix(const _float4x4* pSocketBoneMatrix) { m_pSocketBoneMatrix = pSocketBoneMatrix; }
 
 protected:
+	struct PART_SETUP
+	{
+		SHADER_DESC   tShader;                       
+		const _tchar* szModelProtoTag = nullptr;
+		_bool         bAnimated = true;              // 애니 파츠 여부의 단일 기준(정적이면 false)
+		const _tchar* szAnimEventFile = nullptr;     // 옵션: 이벤트 트랙 json 경로(생성 여부엔 무관)
+	};
+
+	CShader* m_pShaderCom{};
+	CModel* m_pModelCom = { nullptr };
+	CAnimator* m_pAnimatorCom = { nullptr };
+
 	const _float4x4* m_pSocketBoneMatrix{ nullptr };
 
+	const _float* m_pHitFlash = { nullptr };
+	const _float3* m_pHitFlashColor = { nullptr };
+
+	_int	m_iShadowPass = { -1 };
+
 	_bool m_bOn{};
+
+protected:
+	HRESULT Ready_MeshPart(const PART_SETUP& tSetup);
+	HRESULT Bind_ShaderResources();
 
 protected:
 	virtual void Free();
