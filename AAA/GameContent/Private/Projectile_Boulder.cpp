@@ -50,7 +50,7 @@ void CProjectile_Boulder::On_Launched()
 
 void CProjectile_Boulder::On_Bounce(_int iCount)
 {
-    CAMERA_SHAKE_DESC shake{ 0.35f, 0.f };
+    CAMERA_SHAKE_DESC shake{ 0.5f, 0.f };
     m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &shake);
     _float3 vPos{};
     XMStoreFloat3(&vPos, m_pTransformCom->Get_State(Engine::STATE::POSITION));

@@ -209,6 +209,11 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
                     if (phase == ANIM_EVENT_PHASE::BEGIN || phase == ANIM_EVENT_PHASE::END)
                         m_pGameInstance_Proxy->Publish(EventTag::Camera_Rumble, &lvl);
                 }
+                else
+                {
+                    CAMERA_SHAKE_DESC shake{ 0.25f, 0.f };
+                    m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &shake);
+                }
                 break;
 
             case EANIM_EVENT::FreezeAnim:

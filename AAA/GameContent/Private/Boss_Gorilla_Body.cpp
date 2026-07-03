@@ -24,6 +24,8 @@ HRESULT CBoss_Gorilla_Body::Initialize(void* pArg)
 
     m_pAnimatorCom->Play("Wait", false);
 
+    m_iShadowPassIdx = 5;
+
     return S_OK;
 }
 
