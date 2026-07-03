@@ -253,14 +253,6 @@ namespace
 			Edit.bEnableCulling = bEnableCulling;
 		}
 
-		const _bool bCastShadow =
-			ReadBoolProperty(pSection, L"Cast Shadow", L"MapSection", Desc.bCastShadow);
-		if (bCastShadow != Desc.bCastShadow)
-		{
-			Edit.bHasShadow = true;
-			Edit.bUseShadow = bCastShadow;
-		}
-
 		_float4x4 BaseWorld = {};
 		XMStoreFloat4x4(&BaseWorld, Build_SectionBaseWorldMatrix(Desc));
 
@@ -784,7 +776,7 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 	if (pbUseShadow)
 	{
 		ImGui::BeginDisabled(!bHasShadow);
-		ImGui::Checkbox("Use Shadow On Reload##EnvEdit", (bool*)pbUseShadow);
+		ImGui::Checkbox("Cast Shadow##EnvEdit", (bool*)pbUseShadow);
 		ImGui::EndDisabled();
 	}
 
@@ -815,7 +807,7 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 			? *pbUseNearDistAlpha
 			: Desc.tRender.bUseNearDistAlpha);
 
-		const _bool bBaseUseShadow = false;
+		const _bool bBaseUseShadow = bHasShadow;
 		if (bHasShadow && nullptr != pbUseShadow && *pbUseShadow != bBaseUseShadow)
 		{
 			Edit.bHasShadow = true;
@@ -886,7 +878,6 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 
 	_bool* pbRenderable = FindBoolProperty(pObject, L"Renderable", L"MapSection");
 	_bool* pbEnableCulling = nullptr;
-	_bool* pbCastShadow = nullptr;
 	_bool* pbCreateCollisionActor = nullptr;
 	_bool bSourceCanCreateCollisionActor = false;
 
@@ -896,7 +887,6 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 	if (nullptr != pMapSection)
 	{
 		pbEnableCulling = FindBoolProperty(pMapSection, L"Enable Culling", L"MapSection");
-		pbCastShadow = FindBoolProperty(pMapSection, L"Cast Shadow", L"MapSection");
 		pbCreateCollisionActor = Resolve_MapCollMeshEditState(pLevel, pMapStage, pMapSection);
 		bSourceCanCreateCollisionActor = pMapSection->Get_Desc().bSourceCreateCollisionActor;
 		strStageName = pMapStage->Get_StageName();
@@ -925,8 +915,6 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 		ImGui::BeginGroup();
 		if (pbRenderable)
 			ImGui::Checkbox("Renderable##SectionEdit", (bool*)pbRenderable);
-		if (pbCastShadow)
-			ImGui::Checkbox("Cast Shadow##SectionEdit", (bool*)pbCastShadow);
 		ImGui::EndGroup();
 
 		if (nullptr != pMapSection)
@@ -947,6 +935,7 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 			if (!bSourceCanCreateCollisionActor)
 				ImGui::TextDisabled("Coll actor unavailable.");
 
+			ImGui::TextDisabled("Shadow depth is always submitted.");
 			ImGui::TextDisabled("Apply on reload.");
 			ImGui::TextDisabled("Save to persist.");
 		}
@@ -965,6 +954,17 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 	if (ImGui::Button("Apply##SectionEdit"))
 	{
 		MAP_ENV_EDITED_DESC Edit = Build_SectionEditFromCurrentSection(pMapSection);
+
+		if (!Edit.bHasWorldMatrix)
+		{
+			MAP_ENV_EDITED_DESC SavedEdit{};
+			if (pLevel->Try_GetMapPreviewSectionEdit(strSectionKey, &SavedEdit)
+				&& SavedEdit.bHasWorldMatrix)
+			{
+				Edit.bHasWorldMatrix = true;
+				Edit.matWorld = SavedEdit.matWorld;
+			}
+		}
 
 		const _bool bCreateCollisionActorValue =
 			(nullptr != pbCreateCollisionActor)
@@ -1950,8 +1950,6 @@ void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
 				ReadBoolProperty(pSection, L"Renderable", L"MapSection", pSection->Get_Desc().bRenderable);
 			const _bool bEnableCulling =
 				ReadBoolProperty(pSection, L"Enable Culling", L"MapSection", pSection->Get_Desc().bEnableCulling);
-			const _bool bCastShadow =
-				ReadBoolProperty(pSection, L"Cast Shadow", L"MapSection", pSection->Get_Desc().bCastShadow);
 			_bool* pbCreateCollisionActor =
 				Resolve_MapCollMeshEditState(pLevel, pMapStage, pSection);
 
@@ -1963,8 +1961,7 @@ void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
 			ImGui::TextDisabled("R:%s  C:%s",
 				bRenderable ? "On" : "Off",
 				bEnableCulling ? "On" : "Off");
-			ImGui::TextDisabled("S:%s  Coll:%s",
-				bCastShadow ? "On" : "Off",
+			ImGui::TextDisabled("Shadow: Forced  Coll:%s",
 				bCreateCollision ? "On" : "Off");
 
 			ImGui::Separator();
@@ -2067,7 +2064,7 @@ _bool* CPanel_Inspector::Resolve_EnvShadowEditState(CLevel_Edit* pLevel, Client:
 		MAP_ENV_EDITED_DESC SavedEdit{};
 		const _bool bHasShadow = pEnvObject->Get_Desc().tRender.bHasShadow;
 
-		_bool bUseShadow = false;
+		_bool bUseShadow = bHasShadow;
 		if (pLevel->Try_GetMapPreviewEnvEdit(pEnvObject, &SavedEdit))
 		{
 			if (SavedEdit.bHasShadow)

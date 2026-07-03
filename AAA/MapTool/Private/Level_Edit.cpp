@@ -622,8 +622,18 @@ HRESULT CLevel_Edit::Save_MapOverride()
 	if (nullptr == m_pMapPreviewSession)
 		return E_FAIL;
 
-	const Client::MAP_EDIT_DATA MapContentDesc
-		= m_pMapPreviewSession->Build_EditDataSnapShot();
+	if (nullptr != m_pMapStage)
+	{
+		for (CMapSection* pSection : m_pMapStage->Get_Sections())
+		{
+			if (nullptr == pSection)
+				continue;
+
+			Commit_MapEditObjectFromCurrentState(pSection);
+		}
+	}
+
+	const MAP_EDIT_DATA MapContentDesc = m_pMapPreviewSession->Build_EditDataSnapShot();
 
 	if (!MapContentDesc.bHasMapContent || 0 > MapContentDesc.iPresetIndex)
 		return E_FAIL;
@@ -1431,13 +1441,19 @@ HRESULT CLevel_Edit::Ready_EnvObjects(vector<ENV_OBJECT_DESC>* pOutDeletedEnvDes
 
 _bool XM_CALLCONV CLevel_Edit::Pick_EnvObjectByRay(_fvector vOrigin, _fvector vDir, CGameObject** ppOutObject, _float3* pOutHit, _float* pOutDistance)
 {
+	struct ENV_PICK_RESULT
+	{
+		_bool bHit = false;
+		_float fDistance = FLT_MAX;
+		_float3 vHit = {};
+		CGameObject* pObject = nullptr;
+	};
+
 	if (nullptr != ppOutObject)
 		*ppOutObject = nullptr;
 
-	_bool bHitAny = false;
-	_float fBestDist = FLT_MAX;
-	_float3 vBestHit = {};
-	CGameObject* pBestObject = nullptr;
+	ENV_PICK_RESULT NormalHit{};
+	ENV_PICK_RESULT DecalHit{};
 
 	const auto IsEnvLayer = [](const wstring& strLayerTag) -> _bool
 		{
@@ -1457,37 +1473,39 @@ _bool XM_CALLCONV CLevel_Edit::Pick_EnvObjectByRay(_fvector vOrigin, _fvector vD
 			if (nullptr == pObject || pObject->Is_Dead() || !pObject->Is_Active())
 				continue;
 
-			Client::CEnvObject* pEnvObject = dynamic_cast<Client::CEnvObject*>(pObject);
+			CEnvObject* pEnvObject = dynamic_cast<CEnvObject*>(pObject);
 			if (nullptr == pEnvObject)
 				continue;
 
 			_float3 vHit = {};
-			_float fDist = FLT_MAX;
+			_float fDistance = FLT_MAX;
 
-			if (!pEnvObject->Pick_Marb1e(vOrigin, vDir, &vHit, &fDist))
+			if (!pEnvObject->Pick_Marb1e(vOrigin, vDir, &vHit, &fDistance))
 				continue;
 
-			if (fDist < fBestDist)
+			ENV_PICK_RESULT& BestHit = pEnvObject->Is_Decal() ? DecalHit : NormalHit;
+			if (fDistance < BestHit.fDistance)
 			{
-				fBestDist = fDist;
-				vBestHit = vHit;
-				pBestObject = pObject;
-				bHitAny = true;
+				BestHit.bHit = true;
+				BestHit.fDistance = fDistance;
+				BestHit.vHit = vHit;
+				BestHit.pObject = pObject;
 			}
 		}
 	}
 
-	if (!bHitAny)
+	const ENV_PICK_RESULT& BestHit = NormalHit.bHit ? NormalHit : DecalHit;
+	if (!BestHit.bHit)
 		return false;
 
 	if (nullptr != ppOutObject)
-		*ppOutObject = pBestObject;
+		*ppOutObject = BestHit.pObject;
 
 	if (nullptr != pOutHit)
-		*pOutHit = vBestHit;
+		*pOutHit = BestHit.vHit;
 
 	if (nullptr != pOutDistance)
-		*pOutDistance = fBestDist;
+		*pOutDistance = BestHit.fDistance;
 
 	return true;
 }

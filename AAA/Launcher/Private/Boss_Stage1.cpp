@@ -73,6 +73,8 @@ HRESULT CBoss_Stage1::Initialize()
 
     m_pGameInstance_Proxy->Play_BGM(L"K15_PreBoss.marker.wav", 0.8f);
 
+    m_pGameInstance_Proxy->Set_ShaderGlobal("g_fFogEnable", _float4(0.f, 0.f, 0.f, 0.f));
+
     return S_OK;
 }
 

@@ -17,7 +17,7 @@ HRESULT CKirby_Ability::Initialize()
     m_tAniInfos.resize(ETOUI(ABILITY_ANI::END));
 
     Set_FullBodyAni(ABILITY_ANI::WAIT, "Wait", true, false, 0.1f, 1.8f);
-    Set_FullBodyAni(ABILITY_ANI::RUN, "Run", true, false, 0.1f, 2.5f);
+    Set_FullBodyAni(ABILITY_ANI::RUN, "Run", true, false, 0.1f, 3.5f);
 
     Set_FullBodyAni(ABILITY_ANI::FALL, "Fall", false, false, 0.1f, 2.f);
 

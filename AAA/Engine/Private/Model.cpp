@@ -228,6 +228,7 @@ void CModel::Set_AnimationIndex(_uint iIndex, _bool isLoop, _bool isRestart, _fl
 	{
 		m_iCurrentAnimationIndex = iIndex;
 		m_isAnimLoop = isLoop;
+		m_isBlending = false;
 		m_Animations[iIndex]->Reset_TrackPosition();
 		return;
 	}

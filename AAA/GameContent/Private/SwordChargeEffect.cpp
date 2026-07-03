@@ -59,7 +59,7 @@ HRESULT CSwordChargeEffect::Ready_EffectPartObjects()
 {
     if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSwordCharge::PROTOTYPE_TAG, L"SwordCharge1")))
         return E_FAIL;
-    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSwordCharge::PROTOTYPE_TAG, L"SwordCharge2")))
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSwordCharge::PROTOTYPE_TAG, L"SwordCharge3")))
         return E_FAIL;
 
     return S_OK;

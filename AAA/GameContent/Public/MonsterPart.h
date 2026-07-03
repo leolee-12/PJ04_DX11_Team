@@ -62,6 +62,8 @@ protected:
     const _float* m_pHitFlash = { nullptr };
     const _float3* m_pHitFlashColor = { nullptr };
 
+    _int m_iShadowPassIdx = { -1 };
+
 protected:
     virtual void Free() override;
 };

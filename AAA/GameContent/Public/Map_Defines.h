@@ -33,7 +33,6 @@ struct MAP_SECTION_DESC : public CGameObject::GAMEOBJECT_DESC
 	_uint				iModelProtoLevel = {};
 	MAP_SECTION_TYPE	eSectionType = { MAP_SECTION_TYPE::UNKNOWN };
 	RENDERID			eRenderID = { RENDERID::NONBLEND };
-	_bool				bCastShadow = { false };
 	_bool				bEnableCulling = { true };
 	_bool				bRenderable = { true };
 	_bool				bCreateCollisionActor = { true };

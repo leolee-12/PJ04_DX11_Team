@@ -9,29 +9,28 @@ namespace
 	struct BREAK_FRAGMENT_BIND
 	{
 		const _char* pFragmentName = nullptr;
-		const _char* pLocatorName = nullptr;
 		_float3 vPivot = {};
 	};
 
 	static const BREAK_FRAGMENT_BIND g_GsDefault4BreakBinds[] =
 	{
-		{ "GsDefault_10", "locator1",	{ 147.14450f, 27.23368f, 1306.22900f } },
-		{ "GsDefault_11", "locator2",	{ 147.42530f, 28.35020f, 1310.04500f } },
-		{ "GsDefault_12", "locator3",	{ 148.33050f, 26.39541f, 1307.77400f } },
-		{ "GsDefault_13", "locator4",	{ 148.99160f, 25.69413f, 1301.43300f } },
-		{ "GsDefault_14", "locator5",	{ 142.27910f, 26.67553f, 1302.79100f } },
-		{ "GsDefault_15", "locator6",	{ 143.78630f, 25.83631f, 1303.03300f } },
-		{ "GsDefault_16", "locator7",	{ 148.54220f, 26.77026f, 1302.02500f } },
-		{ "GsDefault_17", "locator8",	{ 149.38960f, 24.72021f, 1302.92300f } },
-		{ "GsDefault_18", "locator9",	{ 148.40590f, 28.09056f, 1303.71700f } },
-		{ "GsDefault_19", "locator10",	{ 143.31180f, 27.06821f, 1306.50100f } },
-		{ "GsDefault_20", "locator11",	{ 142.75370f, 28.40662f, 1303.28600f } },
-		{ "GsDefault_21", "locator12",	{ 144.59510f, 25.78181f, 1307.17300f } },
-		{ "GsDefault_22", "locator13",	{ 147.40860f, 26.11647f, 1308.86000f } },
-		{ "GsDefault_23", "locator14",	{ 140.99720f, 25.34992f, 1305.69600f } },
-		{ "GsDefault_24", "locator15",	{ 140.85890f, 27.90112f, 1310.78600f } },
-		{ "GsDefault_25", "locator16",	{ 141.34510f, 25.55193f, 1310.50000f } },
-		{ "GsDefault_26", "locator17",	{ 145.46370f, 26.66180f, 1310.14300f } },
+		  { "GsDefault_10", { 147.14450f, 27.23368f, 1306.22900f } },
+		  { "GsDefault_11", { 147.42530f, 28.35020f, 1310.04500f } },
+		  { "GsDefault_12", { 148.33050f, 26.39541f, 1307.77400f } },
+		  { "GsDefault_13", { 148.99160f, 25.69413f, 1301.43300f } },
+		  { "GsDefault_14", { 142.27910f, 26.67553f, 1302.79100f } },
+		  { "GsDefault_15", { 143.78630f, 25.83631f, 1303.03300f } },
+		  { "GsDefault_16", { 148.54220f, 26.77026f, 1302.02500f } },
+		  { "GsDefault_17", { 149.38960f, 24.72021f, 1302.92300f } },
+		  { "GsDefault_18", { 148.40590f, 28.09056f, 1303.71700f } },
+		  { "GsDefault_19", { 143.31180f, 27.06821f, 1306.50100f } },
+		  { "GsDefault_20", { 142.75370f, 28.40662f, 1303.28600f } },
+		  { "GsDefault_21", { 144.59510f, 25.78181f, 1307.17300f } },
+		  { "GsDefault_22", { 147.40860f, 26.11647f, 1308.86000f } },
+		  { "GsDefault_23", { 140.99720f, 25.34992f, 1305.69600f } },
+		  { "GsDefault_24", { 140.85890f, 27.90112f, 1310.78600f } },
+		  { "GsDefault_25", { 141.34510f, 25.55193f, 1310.50000f } },
+		  { "GsDefault_26", { 145.46370f, 26.66180f, 1310.14300f } },
 	};
 
 	string Get_FragmentNameFromMeshName(const string& strMeshName)
@@ -74,7 +73,6 @@ HRESULT CMapBreakSection::Initialize(void* pArg)
 	m_strModelProtoTag = pDesc->wstrModelProtoTag;
 	m_iModelProtoLevel = pDesc->iModelProtoLevel;
 	m_bRenderable = pDesc->bRenderable;
-	m_bCastShadow = pDesc->bCastShadow;
 
 	if (m_strModelProtoTag.empty())
 		return E_FAIL;
@@ -269,7 +267,7 @@ _bool CMapBreakSection::Should_RenderMesh(_uint iMesh) const
 HRESULT CMapBreakSection::Ready_Fragments()
 {
 	m_Fragments.clear();
-	m_FragmentMeshFlags.clear();
+	m_MeshFragmentIndices.clear();
 
 	if (L"GsDefault_4" != m_strSectionName)
 		return S_OK;
@@ -278,14 +276,13 @@ HRESULT CMapBreakSection::Ready_Fragments()
 		return E_FAIL;
 
 	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
-	m_FragmentMeshFlags.assign(iNumMeshes, false);
+	m_MeshFragmentIndices.assign(iNumMeshes, INVALID_FRAGMENT_INDEX);
 	m_Fragments.reserve(_countof(g_GsDefault4BreakBinds));
 
 	for (const BREAK_FRAGMENT_BIND& Bind : g_GsDefault4BreakBinds)
 	{
 		MAP_BREAK_FRAGMENT Fragment{};
 		Fragment.strFragmentName = Bind.pFragmentName;
-		Fragment.strLocatorName = Bind.pLocatorName;
 		Fragment.vPivot = Bind.vPivot;
 		m_Fragments.push_back(Fragment);
 	}
@@ -302,8 +299,9 @@ HRESULT CMapBreakSection::Ready_Fragments()
 		if (m_Fragments.end() == iter)
 			continue;
 
+		const _uint iFragment = static_cast<_uint>(iter - m_Fragments.begin());
 		iter->MeshIndices.push_back(i);
-		m_FragmentMeshFlags[i] = true;
+		m_MeshFragmentIndices[i] = iFragment;
 	}
 
 	for (const MAP_BREAK_FRAGMENT& Fragment : m_Fragments)
@@ -320,31 +318,21 @@ HRESULT CMapBreakSection::Ready_Fragments()
 	return S_OK;
 }
 
-CMapBreakSection::MAP_BREAK_FRAGMENT* CMapBreakSection::Find_Fragment(_uint iMesh)
-{
-	for (MAP_BREAK_FRAGMENT& Fragment : m_Fragments)
-	{
-		if (Fragment.MeshIndices.end() != find(Fragment.MeshIndices.begin(), Fragment.MeshIndices.end(), iMesh))
-			return &Fragment;
-	}
-
-	return nullptr;
-}
-
 const CMapBreakSection::MAP_BREAK_FRAGMENT* CMapBreakSection::Find_Fragment(_uint iMesh) const
 {
-	for (const MAP_BREAK_FRAGMENT& Fragment : m_Fragments)
-	{
-		if (Fragment.MeshIndices.end() != find(Fragment.MeshIndices.begin(), Fragment.MeshIndices.end(), iMesh))
-			return &Fragment;
-	}
+	if (iMesh >= static_cast<_uint>(m_MeshFragmentIndices.size()))
+		return nullptr;
 
-	return nullptr;
+	const _uint iFragment = m_MeshFragmentIndices[iMesh];
+	if (INVALID_FRAGMENT_INDEX == iFragment || iFragment >= static_cast<_uint>(m_Fragments.size()))
+		return nullptr;
+
+	return &m_Fragments[iFragment];
 }
 
 _bool CMapBreakSection::Is_FragmentMesh(_uint iMesh) const
 {
-	return iMesh < m_FragmentMeshFlags.size() && m_FragmentMeshFlags[iMesh];
+	return nullptr != Find_Fragment(iMesh);
 }
 
 HRESULT CMapBreakSection::Ready_BoostTrigger()
@@ -433,6 +421,7 @@ void CMapBreakSection::Start_Break()
 		return;
 
 	m_eBreakState = MAP_BREAK_STATE::BREAKING;
+	m_bRenderable = true;
 
 	if (nullptr != m_pBoostTrigger)
 		m_pBoostTrigger->Set_Enabled(false);
