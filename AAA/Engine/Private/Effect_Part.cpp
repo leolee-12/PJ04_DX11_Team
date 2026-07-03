@@ -142,6 +142,9 @@ void CEffect_Part::MoveUVScroll(const _float fRatio, const _bool bUpdate, const 
 
 HRESULT CEffect_Part::Bind_ShaderValue()
 {
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fEffectIntensity", &m_fEffectIntensity, sizeof(m_fEffectIntensity))))
+        return E_FAIL;
+
     // Texture
     if (m_pTextureCom != nullptr && m_bUseTextureCom == true)
     {
@@ -173,6 +176,22 @@ HRESULT CEffect_Part::Bind_ShaderValue()
         if (FAILED(m_pShaderCom->Bind_RawValue("g_vMaskTiling", &m_vMaskTiling, sizeof(m_vMaskTiling))))
             return E_FAIL;
         if (FAILED(m_pShaderCom->Bind_RawValue("g_vMaskOffset", &m_vCurMaskUVOffset, sizeof(m_vCurMaskUVOffset))))
+            return E_FAIL;
+
+        Helper::IntClamp(m_iMaskBlendMode, MaskBlendMode::MASK_MULTIPLY, MaskBlendMode::MASK_BLEND_END - 1);
+        Helper::IntClamp(m_iMaskChannel, MaskChannel::MASK_RGBA, MaskChannel::MASK_CHANNEL_END - 1);
+
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaskBlendMode", &m_iMaskBlendMode, sizeof(m_iMaskBlendMode))))
+            return E_FAIL;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaskChannel", &m_iMaskChannel, sizeof(m_iMaskChannel))))
+            return E_FAIL;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_bMaskInvert", &m_bMaskInvert, sizeof(m_bMaskInvert))))
+            return E_FAIL;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_fMaskStrength", &m_fMaskStrength, sizeof(m_fMaskStrength))))
+            return E_FAIL;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseMaskUVDistortion", &m_bUseMaskUVDistortion, sizeof(m_bUseMaskUVDistortion))))
+            return E_FAIL;
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_vMaskUVDistortionStrength", &m_vMaskUVDistortionStrength, sizeof(m_vMaskUVDistortionStrength))))
             return E_FAIL;
     }
     else
@@ -208,6 +227,7 @@ void CEffect_Part::Init_PropertyValue()
     m_iShaderPass = { 0 };
     m_iMirror = Sampler::DEFAULT;
     m_iDepthIgnore = DepthMode::DEPTH_DEFAULT;
+    m_fEffectIntensity = 1.f;
 
     m_vLocalPos = { 0.f, 0.f, 0.f };
 
@@ -242,6 +262,13 @@ void CEffect_Part::Init_PropertyValue()
 
     m_bMaskUVScroll = false;
     m_vMaskUVScrollCount = { 0.f, 0.f };
+
+    m_iMaskBlendMode = MaskBlendMode::MASK_MULTIPLY;
+    m_iMaskChannel = MaskChannel::MASK_RGBA;
+    m_bMaskInvert = false;
+    m_fMaskStrength = 1.f;
+    m_bUseMaskUVDistortion = false;
+    m_vMaskUVDistortionStrength = { 0.f, 0.f };
 }
 
 void CEffect_Part::Update_FadeOut(_float fTimeDelta)

@@ -17,36 +17,44 @@ namespace
     // === 이펙트 DB : 새 이펙트는 여기에 한 줄 추가 ===
     static constexpr EFFECT_DB_ENTRY s_EffectDB[] =
     {
-        { TEXT("WalkSmoke"),             TEXT("../../Resources/YSE/EffectContainer/WalkSmoke_7_01.json") },
-        { TEXT("InhaleContainer"),       TEXT("../../Resources/YSE/EffectContainer/Inhale_6_24.json") },
-        { TEXT("SwordSlash1"),           TEXT("../../Resources/YSE/EffectContainer/SwordSlash1_Alpha_Color.json") },
-        { TEXT("SwordSlash3"),           TEXT("../../Resources/YSE/EffectContainer/SwordSlash3.json") },
-        { TEXT("JumpSlash_1"),           TEXT("../../Resources/YSE/EffectContainer/JumpSlash_1.json") },
-        { TEXT("SpinSlash"),             TEXT("../../Resources/YSE/EffectContainer/SpinSlash.json") },
-        { TEXT("SpinSlashTrail"),        TEXT("../../Resources/YSE/EffectContainer/SpinSlashTrail.json") },
-        { TEXT("SpinSlashTrail_Super"),  TEXT("../../Resources/YSE/EffectContainer/SpinSlashTrail_Super.json") },
-        { TEXT("RockFloor"),             TEXT("../../Resources/YSE/EffectContainer/RockFloor.json") },
-        { TEXT("BoostGas"),              TEXT("../../Resources/YSE/EffectContainer/BoostGas.json") },
-        { TEXT("CarMilkyWay"),           TEXT("../../Resources/YSE/EffectContainer/CarMilkyWay2.json") },
-        { TEXT("GetAbilityEffect"),      TEXT("../../Resources/YSH/Effects/GetAbilityEffect.json") },
-        { TEXT("DespawnEffect"),         TEXT("../../Resources/CHJ/Effect/DespawnEffect.JSON")},
-        { TEXT("RockFloor"),             TEXT("../../Resources/YSH/Effects/Proto_RockBurst_0.json") },
-        { TEXT("DeathSmoke"),            TEXT("../../Resources/YSH/Effects/Proto_DeathSmoke_0.json") },
-        { TEXT("RockPush"),              TEXT("../../Resources/YSH/Effects/Proto_RockPush_0.json") },
-        { TEXT("RockPull"),              TEXT("../../Resources/YSH/Effects/Proto_RockPull_1.json") },
-        { TEXT("RockBounce"),            TEXT("../../Resources/YSH/Effects/Proto_RockBounce_2.json") },
-        { TEXT("Gorilla_SwingR"),        TEXT("../../Resources/YSH/Effects/SwingR.json") },
-        { TEXT("Gorilla_SwingL"),        TEXT("../../Resources/YSH/Effects/SwingL.json") },
-        { TEXT("Gorilla_Landing"),       TEXT("../../Resources/YSH/Effects/Gorilla_Landing.json") },
-        { TEXT("StampR"),                TEXT("../../Resources/YSH/Effects/StampR.json") },
-        { TEXT("StampL"),                TEXT("../../Resources/YSH/Effects/StampL.json") },
-        { TEXT("Big_ShockWave"),         TEXT("../../Resources/YSH/Effects/Big_ShockWave.json") },
-        { TEXT("Stamp_RingR"),           TEXT("../../Resources/YSH/Effects/Stamp_RingR.json") },
-        { TEXT("Stamp_RingL"),           TEXT("../../Resources/YSH/Effects/Stamp_RingL.json") },
-        { TEXT("BombExplosion"),         TEXT("../../Resources/YSH/Effects/BombExplosion.JSON")},
-        { TEXT("CommonHit"),             TEXT("../../Resources/CHJ/Effect/CommonHit.JSON")},
-        { TEXT("SpitObject"),            TEXT("../../Resources/CHJ/Effect/SpitObject.JSON")},
-        { TEXT("SpitAir"),               TEXT("../../Resources/YSH/Effects/Spit_Air.JSON") }
+        { TEXT("WalkSmoke"),              TEXT("../../Resources/YSE/EffectContainer/WalkSmoke_7_01.json") },
+        { TEXT("InhaleContainer"),        TEXT("../../Resources/YSE/EffectContainer/Inhale_6_24.json") },
+
+        { TEXT("SwordSlash1"),            TEXT("../../Resources/YSE/EffectContainer/SwordSlash1_Alpha_Color.json") },
+        { TEXT("SwordSlash3"),            TEXT("../../Resources/YSE/EffectContainer/SwordSlash3.json") },
+        { TEXT("JumpSlash_1"),            TEXT("../../Resources/YSE/EffectContainer/JumpSlash_1.json") },
+        { TEXT("SpinSlash"),              TEXT("../../Resources/YSE/EffectContainer/SpinSlash.json") },
+        { TEXT("SpinSlashTrail"),         TEXT("../../Resources/YSE/EffectContainer/SpinSlashTrail.json") },
+        { TEXT("SpinSlashTrail_Super"),   TEXT("../../Resources/YSE/EffectContainer/SpinSlashTrail_Super.json") },
+        { TEXT("SwordChargeEffect"),      TEXT("../../Resources/YSE/EffectContainer/SwordChargeEffect.json") },
+        { TEXT("SwordSuperChargeEffect"), TEXT("../../Resources/YSE/EffectContainer/SwordSuperChargeEffect.json") },
+
+        { TEXT("RockFloor"),              TEXT("../../Resources/YSH/Effects/Proto_RockBurst_0.json") },
+        { TEXT("BoostGas"),               TEXT("../../Resources/YSE/EffectContainer/BoostGas.json") },
+        { TEXT("CarMilkyWay"),            TEXT("../../Resources/YSE/EffectContainer/CarMilkyWay_Final.json") },
+
+        { TEXT("GetAbilityEffect"),       TEXT("../../Resources/YSH/Effects/GetAbilityEffect.json") },
+        { TEXT("DespawnEffect"),          TEXT("../../Resources/CHJ/Effect/DespawnEffect.JSON") },
+
+        { TEXT("DeathSmoke"),             TEXT("../../Resources/YSH/Effects/Proto_DeathSmoke_0.json") },
+        { TEXT("RockPush"),               TEXT("../../Resources/YSH/Effects/Proto_RockPush_0.json") },
+        { TEXT("RockPull"),               TEXT("../../Resources/YSH/Effects/Proto_RockPull_1.json") },
+        { TEXT("RockBounce"),             TEXT("../../Resources/YSH/Effects/Proto_RockBounce_2.json") },
+
+        { TEXT("Gorilla_SwingR"),         TEXT("../../Resources/YSH/Effects/SwingR.json") },
+        { TEXT("Gorilla_SwingL"),         TEXT("../../Resources/YSH/Effects/SwingL.json") },
+        { TEXT("Gorilla_Landing"),        TEXT("../../Resources/YSH/Effects/Gorilla_Landing.json") },
+
+        { TEXT("StampR"),                 TEXT("../../Resources/YSH/Effects/StampR.json") },
+        { TEXT("StampL"),                 TEXT("../../Resources/YSH/Effects/StampL.json") },
+        { TEXT("Big_ShockWave"),          TEXT("../../Resources/YSH/Effects/Big_ShockWave.json") },
+        { TEXT("Stamp_RingR"),            TEXT("../../Resources/YSH/Effects/Stamp_RingR.json") },
+        { TEXT("Stamp_RingL"),            TEXT("../../Resources/YSH/Effects/Stamp_RingL.json") },
+
+        { TEXT("BombExplosion"),          TEXT("../../Resources/YSH/Effects/BombExplosion.JSON") },
+        { TEXT("CommonHit"),              TEXT("../../Resources/CHJ/Effect/CommonHit.JSON") },
+        { TEXT("SpitObject"),             TEXT("../../Resources/CHJ/Effect/SpitObject.JSON") },
+        { TEXT("SpitAir"),                TEXT("../../Resources/YSH/Effects/Spit_Air.JSON") }
     };
 }
 

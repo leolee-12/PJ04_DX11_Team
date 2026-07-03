@@ -61,6 +61,11 @@ void CKirby_AbilityDump::Exit(CKirby* pKirby)
     __super::Exit(pKirby);
 }
 
+void CKirby_AbilityDump::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+
+}
+
 _bool CKirby_AbilityDump::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
     if (__super::Handle_Command(pKirby, pCommand))
