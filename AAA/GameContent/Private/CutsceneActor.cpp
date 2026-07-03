@@ -36,6 +36,7 @@ void CCutsceneActor::Late_Update(_float fTimeDelta)
     m_RenderWorld = *m_pTransformCom->Get_WorldMatrixPtr();
 
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
 
 HRESULT CCutsceneActor::Ready_Visual(const VISUAL_SETUP& t)
@@ -85,6 +86,31 @@ HRESULT CCutsceneActor::Render()
         m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
         if (FAILED(m_pShaderCom->Begin(0))) return E_FAIL;
         if (FAILED(m_pModelCom->Render(i)))  return E_FAIL;
+    }
+    return S_OK;
+}
+
+HRESULT CCutsceneActor::Render_Shadow()
+{
+    if (!m_bActive || nullptr == m_pModelCom)
+        return S_OK;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_RenderWorld)))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
+        return E_FAIL;
+
+    const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+    for (_uint i = 0; i < iNumMeshes; ++i)
+    {
+        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+            return E_FAIL;
+        if (FAILED(m_pShaderCom->Begin(5)))       
+            return E_FAIL;
+        if (FAILED(m_pModelCom->Render(i)))
+            return E_FAIL;
     }
     return S_OK;
 }

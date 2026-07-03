@@ -298,23 +298,9 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
 
     auto bHold = make_shared<bool>(false);
     auto* pHoldGround = CBTAction::Create(
-        [this, bHold, fTurnSpeedDeg](CBlackboard* pBB, _float dt) -> BT_STATUS {
+        [this, bHold](CBlackboard*, _float) -> BT_STATUS {
             if (!*bHold) { m_pOwner->Get_BodyAnimator()->Play("Wait", true, true); *bHold = true; }
-
-            _float3 vDir = pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 0.f));
-            _vector vToTgt = XMLoadFloat3(&vDir);
-            if (!XMVector3Equal(vToTgt, XMVectorZero())) {            // 이동 없이 바라보기만
-                CTransform* pTf = m_pOwner->Get_Transform();
-                _vector vLook = XMVector3Normalize(XMVectorSetY(pTf->Get_State(STATE::LOOK), 0.f));
-                _float  fDot = XMVectorGetX(XMVector3Dot(vLook, vToTgt));
-                _float  fCross = XMVectorGetZ(vLook) * XMVectorGetX(vToTgt)
-                    - XMVectorGetX(vLook) * XMVectorGetZ(vToTgt);
-                _float  fYaw = atan2f(fCross, fDot);
-                _float  fStep = XMConvertToRadians(fTurnSpeedDeg) * dt;
-                _float  fApply = (fabsf(fYaw) <= fStep) ? fYaw : (fYaw > 0.f ? fStep : -fStep);
-                pTf->Rotate(XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fApply));
-            }
-            return BT_STATUS::RUNNING;                                // 범위 안에선 계속 정지+응시
+            return BT_STATUS::RUNNING;                                // 근접 시 회전 없이 그냥 대기
         },
         [bHold]() { *bHold = false; });
 
@@ -379,9 +365,16 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
         return false;                                              // 14~40 애매 -> 추적
         });
 
+    auto bHeld = make_shared<bool>(false);   // 현재 정지 상태 유지 중인가
     auto* pStandStare = CBTSequence::Create({
-       CBTCondition::Create([this, fStopRange](CBlackboard* pBB) {
-           return pBB->Get<_float>("DistToTarget", FLT_MAX) <= fStopRange; }),
+       CBTCondition::Create([this, fStopRange, bHeld](CBlackboard* pBB) {
+           _float d = pBB->Get<_float>("DistToTarget", FLT_MAX);
+           _float fEnter = fStopRange;          // 5f 이내면 정지 시작
+           _float fExit = fStopRange + 2.f;    // 7f 넘어야 정지 해제(추격 복귀)
+           _bool bStay = *bHeld ? (d <= fExit) : (d <= fEnter);
+           *bHeld = bStay;
+           return bStay;
+           }),
        pHoldGround,
         });
 

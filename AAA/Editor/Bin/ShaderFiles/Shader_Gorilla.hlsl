@@ -14,6 +14,8 @@ float g_fDissolve;
 float4 g_vEmissiveColor;
 uint g_iMaterialID = 0;
 
+float g_fShadowDepthBias = 0.075f;
+
 static const float3 EYE_WHITE = float3(1.f, 1.f, 1.f);
 static const float3 EYE_BLUE = float3(0.12f, 0.45f, 1.f);
 static const float3 EYE_RIM = float3(0.1f, 0.1f, 0.1f);
@@ -100,6 +102,42 @@ VS_OUT VS_MAIN(VS_IN In)
     Out.vBinormal = normalize(mul(vBinormal, g_WorldMatrix));
     Out.vBinormal.w = In.vBinormal.w;
 
+    return Out;
+}
+
+//======== Shadow (depth-only, skinned) ========
+struct VS_SHADOW_OUT
+{
+    float4 vPosition : SV_POSITION;
+    float4 vProjPos : TEXCOORD0;
+};
+
+VS_SHADOW_OUT VS_SHADOW(VS_IN In)
+{
+    VS_SHADOW_OUT Out;
+    float fW = 1.f - (In.vBlendWeight.x + In.vBlendWeight.y + In.vBlendWeight.z);
+    float4x4 Bone = g_BoneMatrices[In.vBlendIndex.x] * In.vBlendWeight.x
+                  + g_BoneMatrices[In.vBlendIndex.y] * In.vBlendWeight.y
+                  + g_BoneMatrices[In.vBlendIndex.z] * In.vBlendWeight.z
+                  + g_BoneMatrices[In.vBlendIndex.w] * fW;
+    float4 vPos = mul(float4(In.vPosition, 1.f), Bone);
+    float4 vWorld = mul(vPos, g_WorldMatrix);
+    Out.vPosition = mul(mul(vWorld, g_ViewMatrix), g_ProjMatrix);
+    Out.vProjPos = Out.vPosition;
+    return Out;
+}
+
+struct PS_SHADOW_OUT
+{
+    float4 vLightDepth : SV_TARGET0;
+};
+
+PS_SHADOW_OUT PS_SHADOW(VS_SHADOW_OUT In)
+{
+    PS_SHADOW_OUT Out;
+    float d = In.vProjPos.z / In.vProjPos.w;
+    d += g_fShadowDepthBias; // 오클루더를 광원에서 살짝 밀어 self-shadow 제거
+    Out.vLightDepth = float4(d, d, d, 1.f);
     return Out;
 }
 
@@ -352,5 +390,13 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_ROCKHOLE();
     }
-
+    pass ShadowPass // 5
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_SHADOW();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_SHADOW();
+    }
 }

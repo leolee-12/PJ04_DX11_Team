@@ -71,6 +71,8 @@ HRESULT CBoss_Stage1::Initialize()
     if (FAILED(Ready_Lights()))
         return E_FAIL;
 
+    m_pGameInstance_Proxy->Set_ShaderGlobal("g_fFogEnable", _float4(0.f, 0.f, 0.f, 0.f));
+
     return S_OK;
 }
 

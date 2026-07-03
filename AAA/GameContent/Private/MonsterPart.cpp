@@ -19,6 +19,8 @@ HRESULT CMonsterPart::Initialize(void* pArg)
         m_pHitFlashColor = pDesc->pHitFlashColor;  
     }
 
+    m_iShadowPassIdx = 7;
+
     return __super::Initialize(pArg);
 }
 
@@ -92,7 +94,7 @@ HRESULT CMonsterPart::Render_Shadow()
     {
         if (m_pAnimatorCom)
             m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
-        if (FAILED(m_pShaderCom->Begin(7)))
+        if (FAILED(m_pShaderCom->Begin(m_iShadowPassIdx)))
             return E_FAIL;
         if (FAILED(m_pModelCom->Render(i)))
             return E_FAIL;

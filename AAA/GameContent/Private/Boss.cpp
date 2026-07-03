@@ -22,12 +22,13 @@ HRESULT CBoss::Initialize(void* pArg)
 
 void CBoss::Update_AI(_float fTimeDelta)
 {
-    if (m_bPhaseTransition)                   // 전환 연출 중엔 BT 정지(무적/연출 전용)
+    if (m_bPhaseTransition && m_eLife != EBOSS_LIFE::DEAD)  
     {
         if (Is_PhaseTransition_Finished())
             m_bPhaseTransition = false;
         return;
     }
+    m_bPhaseTransition = false;
 
     __super::Update_AI(fTimeDelta);           // CBossBase 라이프사이클(+ACTIVE면 Brain Decide)
 
