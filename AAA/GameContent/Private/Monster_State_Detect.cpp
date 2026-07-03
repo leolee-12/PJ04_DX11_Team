@@ -22,6 +22,8 @@ void CMonster_State_Detect::Enter(MONSTER_STATE_TYPE ePrevState)
 
 	if (m_pAnimator && !m_PlayInfo.strAniName.empty())
 		m_pAnimator->Play(&m_PlayInfo);
+
+	m_pOwner->Play_OneShotSFX(L"CharaBasic_Find.wav");
 }
 
 void CMonster_State_Detect::Update(_float fTimeDelta)

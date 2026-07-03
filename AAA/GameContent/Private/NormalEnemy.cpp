@@ -229,14 +229,19 @@ HRESULT CNormalEnemy::Ready_AnimEvents()
 	pAnim->Set_EventCallback(
 		[this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase)
 		{
-			if (phase != ANIM_EVENT_PHASE::POINT)
+			if (Handle_SharedAnimEvent(e, phase))
 				return;
 
 			switch (static_cast<EANIM_EVENT>(e.iEventType))
 			{
 			case EANIM_EVENT::SetEye:
-				m_pBody->Set_Eye((_uint)e.iIntParam);
+			{
+				if (phase == ANIM_EVENT_PHASE::POINT)
+				{
+					m_pBody->Set_Eye((_uint)e.iIntParam);
+				}
 				break;
+			}
 			default:
 				break;
 			}
