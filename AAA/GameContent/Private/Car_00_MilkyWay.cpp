@@ -34,9 +34,9 @@ HRESULT CCar_00_MilkyWay::Initialize(void* pArg)
     tDesc.iTextureLevel = 0;
     tDesc.wstrTextureTag = L"";
 
-    tDesc.bUseMaskCom = false;
-    tDesc.iMaskLevel = 0;
-    tDesc.wstrMaskTag = L"";
+    tDesc.bUseMaskCom = true;
+    tDesc.iMaskLevel = Texture_MilkyWayMask.iLevelID;
+    tDesc.wstrMaskTag = Texture_MilkyWayMask.szProtoTag;
 
     tDesc.bCustomShader = false;
     //tDesc.iShaderLevel = 0;

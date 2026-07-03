@@ -30,6 +30,7 @@ float2 g_vMaskOffset = { 0.f, 0.f };
 
 float3 g_vColor = { 1.f, 1.f, 1.f };
 float g_fAlpha = { 1.f };
+float g_fEffectIntensity = { 1.f };
 
 float3 g_vEffectMRA = { 0.f, 1.f, 1.f }; // metallic, roughness, ao
 float g_fAlphaClip = { 0.01f };
@@ -220,7 +221,7 @@ float4 ComposeEffectColor_Linear(float2 vTexcoord)
         vColor *= g_UnknownTexture.Sample(LinearSampler, vUV);
     }
 
-    vColor.rgb *= g_vColor;
+    vColor.rgb *= g_vColor * g_fEffectIntensity;
     vColor.a *= g_fAlpha;
 
     return vColor;
@@ -266,7 +267,7 @@ float4 ComposeEffectColor_Mirror(float2 vTexcoord)
         vColor *= g_UnknownTexture.Sample(MirrorSampler, vUV);
     }
 
-    vColor.rgb *= g_vColor;
+    vColor.rgb *= g_vColor * g_fEffectIntensity;
     vColor.a *= g_fAlpha;
 
     return vColor;

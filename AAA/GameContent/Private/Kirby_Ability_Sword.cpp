@@ -178,6 +178,16 @@ void CKirby_Ability_Sword::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_IN
     End_SpinSlashEffect(m_pSpinSlash, 0.2f);
     End_SpinSlashEffect(m_pSpinSlashTrail, 0.15f);
 
+    if (m_pSwordChargeEffect != nullptr)
+    {
+        m_pSwordChargeEffect->EffectContainer_Stop();
+        m_pSwordChargeEffect = nullptr;
+    }
+    if (m_pSwordSuperChargeEffect != nullptr)
+    {
+        m_pSwordSuperChargeEffect->EffectContainer_Stop();
+        m_pSwordSuperChargeEffect = nullptr;
+    }
     __super::On_Damaged_KirbyState(pKirby, tInfo);
 }
 
@@ -481,6 +491,10 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
 
         m_bIsStartEffect[SWORD_EFFECT::SPINSLASH] = false;
 
+        CEffect_Loader::GetInstance()->Spawn(L"SwordChargeEffect", pKirby->Get_LevelIndex(),
+            _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+            pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pSwordChargeEffect);
+
         break;
     }
     case SWORD_STATE::SPIN_SLASH:
@@ -510,6 +524,10 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
         pKirby->Set_RotationLock(true);
         pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed - 6.f);
         pAnimator->Play("SuperSpinSlashChargeStart", false, false, 0.1f, 2.f, false);
+
+        CEffect_Loader::GetInstance()->Spawn(L"SwordSuperChargeEffect", pKirby->Get_LevelIndex(),
+            _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+            pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pSwordSuperChargeEffect);
 
         break;
     }
@@ -821,6 +839,7 @@ void CKirby_Ability_Sword::Exit_SwordState(CKirby* pKirby, SWORD_STATE eState)
         case SLASH_1_END:
         case SLASH_2:
         case SLASH_3:
+            break;
 
         case JUMP_SLASH_START:
             break;
@@ -829,13 +848,25 @@ void CKirby_Ability_Sword::Exit_SwordState(CKirby* pKirby, SWORD_STATE eState)
             break;
 
         case SPIN_SLASH_CHARGE:
+            if (m_pSwordChargeEffect != nullptr)
+            {
+                m_pSwordChargeEffect->EffectContainer_Stop();
+                m_pSwordChargeEffect = nullptr; 
+            }
             break;
         case SPIN_SLASH:
             break;
         case SPIN_SLASH_END:
-
+            break;
         case SUPER_SPIN_SLASH_CHARGE_START:
+            break;
         case SUPER_SPIN_SLASH_CHARGE:
+            if (m_pSwordSuperChargeEffect != nullptr)
+            {
+                m_pSwordSuperChargeEffect->EffectContainer_Stop();
+                m_pSwordSuperChargeEffect = nullptr;
+            }
+            break;
         case SUPER_SPIN_SLASH_START:
             break;
         case SUPER_SPIN_SLASH_LOOP:

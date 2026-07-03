@@ -90,6 +90,10 @@ void CKirby_GetAbility::Exit(CKirby* pKirby)
     pBody->Set_KirbyMouth(KIRBY_MOUTH_STATE::IDLE);
 }
 
+void CKirby_GetAbility::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+}
+
 _bool CKirby_GetAbility::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
     if (__super::Handle_Command(pKirby, pCommand))
