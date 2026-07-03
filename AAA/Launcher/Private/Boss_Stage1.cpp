@@ -71,6 +71,8 @@ HRESULT CBoss_Stage1::Initialize()
     if (FAILED(Ready_Lights()))
         return E_FAIL;
 
+    m_pGameInstance_Proxy->Play_BGM(L"K15_PreBoss.marker.wav", 0.8f);
+
     m_pGameInstance_Proxy->Set_ShaderGlobal("g_fFogEnable", _float4(0.f, 0.f, 0.f, 0.f));
 
     return S_OK;
@@ -108,7 +110,7 @@ HRESULT CBoss_Stage1::Ready_Events()
 
     });
 
-    Subscribe_Event(EventTag::Cutscene_GorillaAppear, [this](void* p) {
+    Subscribe_Event(EventTag::Cutscene_GrabKirby, [this](void* p) {
         m_pGameInstance_Proxy->Play_BGM(L"K15_Boss1.marker.wav");
         });
 
