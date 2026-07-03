@@ -25,8 +25,8 @@ HRESULT CKirby_Ability_Sword::Initialize()
         true, false, 1.8f, 0.1f);
 
     Set_OverlayAni(ABILITY_ANI::RUN, "Run", "HaveSwordMove", "R_ShoulderJ",
-        true, false, 2.2f, 0.1f, true,
-        true, false, 2.2f, 0.1f);
+        true, false, 3.5f, 0.1f, true,
+        true, false, 3.5f, 0.1f);
 
     Set_OverlayAni(ABILITY_ANI::FALL, "Fall", "HaveSwordMove", "R_ShoulderJ",
         false, false, 2.f, 0.1f, true,
