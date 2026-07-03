@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Engine_Defines.h"
 #include "Base.h"
+#include "Sound_Handle.h"
 
 namespace FMOD
 {
@@ -23,19 +24,19 @@ public:
 
 public:
     // 원샷 SFX: 채널 지정 없음. FMOD가 빈 채널 할당 + 핸들 반환(fire-and-forget면 무시)
-    FMOD::Channel* PlaySFX(const TCHAR* pSoundKey, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
-    FMOD::Channel* PlaySFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
+    CSound_Handle PlaySFX(const TCHAR* pSoundKey, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
+    CSound_Handle PlaySFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
 
     // Loop SFX : 상태 코드에서 재생 필요할 때 사용
-    FMOD::Channel* PlaySFXLoop(const TCHAR* pSoundKey, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
-    FMOD::Channel* PlaySFX3DLoop(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
-
-    // 멈추기 위해서는 재생 인스턴스를 갖고 있다가 멈춰야함
-    void StopChannel(FMOD::Channel*& pChannel);
+    CSound_Handle PlaySFXLoop(const TCHAR* pSoundKey, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
+    CSound_Handle PlaySFX3DLoop(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
 
     // BGM: 소유 핸들로 교체(기존 정지 후 재생)
     void PlayBGM(const TCHAR* pSoundKey, float fVolume = 1.f, bool bLoop = true);
     void StopBGM();
+
+    // 구간 반복 BGM: 0부터 재생, 이후 fStart01~fEnd01(0~1) 구간 반복
+    void PlayBGM_Section(const TCHAR* pSoundKey, float fStart01, float fEnd01, float fVolume = 1.f);
 
     // 버스(카테고리) 단위 제어
     void SetBusVolume(ESoundBus eBus, float fVolume);
@@ -57,7 +58,7 @@ private:
     FMOD::Channel* m_pBGMChannel = nullptr;   // BGM 소유 핸들
 
     _float3 m_vListenerPos = {};
-    static constexpr _float m_fMaxDistance = 20.f;
+    static constexpr _float m_fMaxDistance = 50.f;
 
 private:
     HRESULT Initialize();

@@ -193,6 +193,26 @@ HRESULT CKabu::Ready_State()
 
 HRESULT CKabu::Ready_AnimEvents()
 {
+    if (nullptr == m_pBody)
+        return E_FAIL;
+
+    CAnimator* pAnimator = m_pBody->Get_Animator();
+    if (nullptr == pAnimator)
+        return E_FAIL;
+
+    pAnimator->Set_EventCallback(
+        [this](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+        {
+            if (Handle_SharedAnimEvent(e, ePhase))
+                return;
+
+            switch (static_cast<EANIM_EVENT>(e.iEventType))
+            {
+            default:
+                break;
+            }
+        });
+
     return S_OK;
 }
 

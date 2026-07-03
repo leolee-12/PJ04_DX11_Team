@@ -82,6 +82,7 @@ HRESULT CKabu_Body::Ready_Components()
     PART_SETUP t{};
     t.tShader = Shader_Monster;
     t.szModelProtoTag = TEXT("Prototype_Component_Model_Kabu_Body");
+    t.szAnimEventFile = TEXT("../../Resources/CHJ/Monster/Kabu/Kabu_AnimEvents.json");
 
     if (FAILED(Ready_MeshPart(t)))
         return E_FAIL;

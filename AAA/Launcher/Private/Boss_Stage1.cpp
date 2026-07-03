@@ -10,6 +10,7 @@
 #include "CameraDirector.h"
 #include "Camera_Cutscene.h"
 #include "Camera_Boss.h"
+#include "GameContrnt_Events.h"
 
 CBoss_Stage1::CBoss_Stage1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel{ pDevice, pContext }
@@ -102,9 +103,17 @@ HRESULT CBoss_Stage1::Ready_Events()
             m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
             return;
         }
+
+    });
+
+    Subscribe_Event(EventTag::Cutscene_GorillaAppear, [this](void* p) {
+        m_pGameInstance_Proxy->Play_BGM(L"K15_Boss1.marker.wav");
         });
+
     return S_OK;
-}
+
+    };
+
 
 HRESULT CBoss_Stage1::Ready_Lights()
 {
