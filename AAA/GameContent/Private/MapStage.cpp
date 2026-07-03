@@ -9,8 +9,6 @@ NS_BEGIN(Client)
 
 namespace
 {
-	constexpr _bool ENABLE_MAP_SECTION_SHADOW = false;
-
 	_bool Is_SameMatrix(const _float4x4& lhs, const _float4x4& rhs)
 	{
 		return 0 == memcmp(&lhs, &rhs, sizeof(_float4x4));
@@ -252,9 +250,7 @@ void CMapStage::Reset_ProfileFrame()
 			continue;
 
 		++m_Profile.iMainCandidateSections;
-
-		if (pSection->Is_ShadowCaster())
-			++m_Profile.iShadowCandidateSections;
+		++m_Profile.iShadowCandidateSections;
 
 		pSection->Reset_FrameProfile();
 	}
@@ -277,7 +273,10 @@ void CMapStage::Submit_VisibleSections()
 			continue;
 
 		const _bool bVisibleMain =
-			!m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, pSection->Get_WorldBounds());
+			!pSection->Is_Culling()
+			|| !m_pGameInstance_Proxy->Should_CullAABB(
+				CULLING_VIEW::MAIN_CAMERA,
+				pSection->Get_WorldBounds());
 
 		if (bVisibleMain)
 		{
@@ -297,20 +296,13 @@ void CMapStage::Submit_VisibleSections()
 #endif
 		}
 
-		//if (!ENABLE_MAP_SECTION_SHADOW)
-		//	continue;
+		// Map sections always submit their complete depth to LightDepth RT.
+		// Main-camera culling intentionally affects only the main pass.
+		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pSection);
 
-		//if (!pSection->Is_ShadowCaster())
-		//	continue;
-
-		//const _bool bVisibleShadow =
-		//	!m_pGameInstance_Proxy->Should_CullAABB(
-		//		CULLING_VIEW::SHADOW_DIR,
-		//		pSection->Get_WorldBounds());
-
-		//if (bVisibleShadow)
-		//{
-			m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pSection);
+#ifdef _DEBUG
+		++m_Profile.iShadowSubmittedSections;
+#endif
 	}
 }
 

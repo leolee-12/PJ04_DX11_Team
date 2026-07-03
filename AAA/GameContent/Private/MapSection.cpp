@@ -1,4 +1,5 @@
 #include "MapSection.h"
+#include "Shader_PassMeta.h"
 
 #include "GameInstance.h"
 
@@ -69,30 +70,17 @@ HRESULT CMapSection::Initialize(void* pArg)
 	m_iModelProtoLevel = pDesc->iModelProtoLevel;
 	m_eSectionType = pDesc->eSectionType;
 	m_eRenderID = pDesc->eRenderID;
-	m_bCastShadow = pDesc->bCastShadow;
 	m_bEnableCulling = pDesc->bEnableCulling;
 	m_bRenderable = pDesc->bRenderable;
 	m_bCreateCollisionActor = pDesc->bCreateCollisionActor;
 
-	if (m_bRenderable)
-	{
-		if (FAILED(__super::Initialize(pArg)))
-			return E_FAIL;
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
 
-		m_CombinedWorldMatrix = *m_pTransformCom->Get_WorldMatrixPtr();
-		Update_LocalBounds();
-		Refresh_WorldBounds();
-		Refresh_ColliderActor();
-	}
-	else
-	{
-		if (FAILED(CGameObject::Initialize(pArg)))
-			return E_FAIL;
-
-		m_CombinedWorldMatrix = *m_pTransformCom->Get_WorldMatrixPtr();
-		m_LocalBounds = Make_DefaultAABB();
-		m_WorldBounds = m_LocalBounds;
-	}
+	m_CombinedWorldMatrix = *m_pTransformCom->Get_WorldMatrixPtr();
+	Update_LocalBounds();
+	Refresh_WorldBounds();
+	Refresh_ColliderActor();
 
 	return S_OK;
 }
@@ -107,9 +95,6 @@ void CMapSection::Late_Update(_float fTimeDelta)
 
 HRESULT CMapSection::Render_Shadow()
 {
-	/*if (!m_bRenderable || !m_bCastShadow || nullptr == m_pModelCom || nullptr == m_pShaderCom)
-		return S_OK;*/
-
 	if (FAILED(Bind_WorldMatrix()))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
@@ -117,16 +102,18 @@ HRESULT CMapSection::Render_Shadow()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
 		return E_FAIL;
 
-	size_t n = m_pModelCom->Get_NumMeshes();
-	for (size_t i = 0; i < n; ++i)
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		if (!Should_RenderMesh(static_cast<_uint>(i)))
+		if (!Should_RenderMesh(i))
 			continue;
-		if (FAILED(m_pShaderCom->Begin(0))) 
+
+		if (FAILED(m_pShaderCom->Begin(ETOI(MAP_PASS::SHADOW))))
 			return E_FAIL;
-		if (FAILED(m_pModelCom->Render((_uint)i)))
+		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;
 	}
+
 	return S_OK;
 }
 

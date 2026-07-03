@@ -137,8 +137,7 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 			Desc.strSectionName = CMapBreakSection::STAGE12_SECTION_NAME;
 			Desc.wstrModelProtoTag = CMapBreakSection::STAGE12_MODEL_PROTO_TAG;
 			Desc.iModelProtoLevel = Levels.iStageModelLevel;
-			Desc.bRenderable = true;
-			Desc.bCastShadow = false;
+			Desc.bRenderable = false;
 
 			CGameObject* pBreakObject = nullptr;
 			if (FAILED(m_pProxy->Add_GameObject_Return(

@@ -159,9 +159,6 @@ namespace
 		if (Edit.bHasEnableCulling)
 			pOutDesc->bEnableCulling = Edit.bEnableCulling;
 
-		if (Edit.bHasShadow)
-			pOutDesc->bCastShadow = Edit.bUseShadow;
-
 		if (Edit.bHasWorldMatrix)
 		{
 			CGameObject::GAMEOBJECT_DESC& BaseDesc =
@@ -196,9 +193,6 @@ namespace
 			if (Edit.bHasEnableCulling)
 				j["EnableCulling"] = static_cast<bool>(Edit.bEnableCulling);
 		}
-
-		if (Edit.bHasShadow)
-			j["UseShadow"] = static_cast<bool>(Edit.bUseShadow);
 
 		if (Edit.bHasWorldMatrix)
 			j["WorldMatrix"] = Save_Float4x4(Edit.matWorld);
@@ -267,14 +261,17 @@ namespace
 			}
 		}
 
-		const auto IterUseShadow = jValue.find("UseShadow");
-		if (IterUseShadow != jValue.end())
+		if (bEnvObjectEdit)
 		{
-			if (!IterUseShadow->is_boolean())
-				return E_FAIL;
+			const auto IterUseShadow = jValue.find("UseShadow");
+			if (IterUseShadow != jValue.end())
+			{
+				if (!IterUseShadow->is_boolean())
+					return E_FAIL;
 
-			pOutDesc->bHasShadow = true;
-			pOutDesc->bUseShadow = IterUseShadow->get<bool>();
+				pOutDesc->bHasShadow = true;
+				pOutDesc->bUseShadow = IterUseShadow->get<bool>();
+			}
 		}
 
 		const auto IterWorldMatrix = jValue.find("WorldMatrix");
