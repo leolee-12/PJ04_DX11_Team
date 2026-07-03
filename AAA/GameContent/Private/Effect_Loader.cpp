@@ -43,9 +43,10 @@ namespace
         { TEXT("Big_ShockWave"),         TEXT("../../Resources/YSH/Effects/Big_ShockWave.json") },
         { TEXT("Stamp_RingR"),           TEXT("../../Resources/YSH/Effects/Stamp_RingR.json") },
         { TEXT("Stamp_RingL"),           TEXT("../../Resources/YSH/Effects/Stamp_RingL.json") },
-        { TEXT("BombExplosion"),         TEXT("../../Resources/CHJ/Effect/BombExplosion.JSON")},
+        { TEXT("BombExplosion"),         TEXT("../../Resources/YSH/Effects/BombExplosion.JSON")},
         { TEXT("CommonHit"),             TEXT("../../Resources/CHJ/Effect/CommonHit.JSON")},
-        { TEXT("SpitObject"),             TEXT("../../Resources/CHJ/Effect/SpitObject.JSON")}
+        { TEXT("SpitObject"),            TEXT("../../Resources/CHJ/Effect/SpitObject.JSON")},
+        { TEXT("SpitAir"),               TEXT("../../Resources/YSH/Effects/Spit_Air.JSON") }
     };
 }
 

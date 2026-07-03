@@ -145,6 +145,17 @@ HRESULT CKirby_Body::Ready_AnimEvents(CKirby* pKirby)
                             CEffect_Loader::GetInstance()->Spawn(StrToWstr(e.strParam), pKirby->Get_LevelIndex(), vPos);
                             break;
                         }
+                        case 10: // Spit Air 조동아리 앞 오프셋 이펙트
+                        {
+                            _float3 vPos{}, vLook{};
+                            _vector vNormLook = XMVector3Normalize(pKirby->Get_Transform()->Get_State(STATE::LOOK));
+                            XMStoreFloat3(&vLook, vNormLook);
+                            vNormLook *= 2.f;
+                            vNormLook.m128_f32[1] = 0.6f;
+                            XMStoreFloat3(&vPos, pKirby->Get_Transform()->Get_State(STATE::POSITION) + vNormLook);
+                            CEffect_Loader::GetInstance()->Spawn(StrToWstr(e.strParam), pKirby->Get_LevelIndex(), vPos, vLook);
+                            break;
+                        }
                     }
 
                     break;
