@@ -67,8 +67,6 @@ HRESULT CStage0_Step1::Initialize()
     if (FAILED(Ready_Lights()))
         return E_FAIL;
 
-    // 나중에 트리거박스로 이관
-    m_pGameInstance_Proxy->Play_BGM(L"K15_Grassland1.marker.wav", 0.65f);
 
     return S_OK;
 }
@@ -83,6 +81,12 @@ void CStage0_Step1::Update(_float fTimeDelta)
         m_pGameInstance_Proxy->Toggle_DebugRender();
     }
 #endif //  _DEBUG
+
+    if (m_pGameInstance_Proxy->Key_Down(DIK_F3))
+    {
+        m_pGameInstance_Proxy->Play_BGM(L"K15_Grassland1.marker.wav", 0.65f);
+    }
+
 }
 
 HRESULT CStage0_Step1::Render()

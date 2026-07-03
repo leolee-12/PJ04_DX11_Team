@@ -1,5 +1,8 @@
 #include "Monster_State_Spat.h"
 #include "Monster.h"
+#include "GameInstance.h"
+#include "Animator.h"
+#include "Effect_Loader.h"
 
 HRESULT CMonster_State_Spat::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpeed)
 {
@@ -24,6 +27,30 @@ void CMonster_State_Spat::Enter(MONSTER_STATE_TYPE ePrevState)
 
     if (!m_PlayInfo.strAniName.empty())
         m_pAnimator->Play(&m_PlayInfo);
+
+    //const _char* szBone = "CenterL";
+
+    //m_bSpinBone ? szBone = "RotL" : szBone;
+
+    //const auto& Parts = m_pOwner->Get_PartObjects();
+    //auto it = Parts.find(L"Body");
+    //if (it != Parts.end())
+    //{
+    //    if (CMonsterPart* pBody =
+    //        dynamic_cast<CMonsterPart*>(it->second))
+    //    {
+    //        const _float4x4* pBone =
+    //            pBody->Get_BoneMatrixPtr(szBone);
+    //        if (pBone)
+    //            CEffect_Loader::GetInstance()->Spawn(
+    //                L"SpitObject", m_pOwner->Get_LevelIndex(),
+    //                _float3(0.f, 0.f, 0.f),
+    //                _float3(0.f, 0.f, 1.f),
+    //                _float3(0.f, 0.f, 0.f),
+    //                pBone, &m_pSpitFx);
+    //    }
+    //}
+
 }
 
 void CMonster_State_Spat::Update(_float fTimeDelta)
@@ -51,7 +78,9 @@ void CMonster_State_Spat::Update(_float fTimeDelta)
 
     m_fLifeTime -= fTimeDelta;
     if (m_fLifeTime <= 0.f)
+    {
         m_pOwner->Despawn_Spat();
+    }
 }
 
 void CMonster_State_Spat::Exit(MONSTER_STATE_TYPE eNextState)

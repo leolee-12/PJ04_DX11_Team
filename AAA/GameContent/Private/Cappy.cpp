@@ -168,11 +168,11 @@ HRESULT CCappy::Ready_AnimEvents()
 			if (Handle_SharedAnimEvent(e, ePhase))
 				return;
 
-			switch (static_cast<EANIM_EVENT>(e.iEventType))
-			{
-			default:
-				break;
-			}
+			//switch (static_cast<EANIM_EVENT>(e.iEventType))
+			//{
+			//default:
+			//	break;
+			//}
 		});
 
 	return S_OK;
