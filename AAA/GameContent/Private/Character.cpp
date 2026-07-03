@@ -55,6 +55,9 @@ void CCharacter::Damaged(const ATTACK_INFO& tInfo)
     if (Block_Hit(tInfo)) 
         return;
 
+    m_pGameInstance_Proxy->Play_SFX(
+        TEXT("CharaBasic_DamageReact_Normal.wav"));
+
     m_fCurHP -= tInfo.fDamage;
     if (m_fCurHP <= 0.f) 
     {

@@ -194,13 +194,13 @@ private:
 #pragma endregion
 	
 #pragma region SOUND_MANAGER
-	FMOD::Channel* Play_SFX(const TCHAR* pSoundKey, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
-	FMOD::Channel* Play_SFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
-	FMOD::Channel* Play_SFX_Loop(const TCHAR* pSoundKey, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
-	FMOD::Channel* Play_SFX3D_Loop(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f,	ESoundBus eBus = ESoundBus::SFX);
+	CSound_Handle Play_SFX(const TCHAR* pSoundKey, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
+	CSound_Handle Play_SFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
+	CSound_Handle Play_SFX_Loop(const TCHAR* pSoundKey, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
+	CSound_Handle Play_SFX3D_Loop(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f,	ESoundBus eBus = ESoundBus::SFX);
 
-	void Stop_Channel(FMOD::Channel*& pChannel);
 	void Play_BGM(const TCHAR* pSoundKey, float fVolume = 1.f, bool bLoop = true);
+	void Play_BGM_Section(const TCHAR* pSoundKey, float fStart01, float fEnd01, float fVolume = 1.f);
 	void Stop_BGM();
 	void Set_BusVolume(ESoundBus eBus, float fVolume);
 	void Stop_Bus(ESoundBus eBus);

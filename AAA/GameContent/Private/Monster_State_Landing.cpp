@@ -21,6 +21,8 @@ void CMonster_State_Landing::Enter(MONSTER_STATE_TYPE ePrevState)
 
 	if (m_pAnimator && !m_PlayInfo.strAniName.empty())
 		m_pAnimator->Play(&m_PlayInfo);
+
+	m_pOwner->Play_OneShotSFX(L"CharaBasic_Landing.wav", 0.6f);
 }
 
 void CMonster_State_Landing::Update(_float fTimeDelta)

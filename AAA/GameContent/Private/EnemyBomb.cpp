@@ -141,6 +141,8 @@ void CEnemyBomb::On_Explode()
 	XMStoreFloat3(&vPos,
 		m_pTransformCom->Get_State(STATE::POSITION));
 
+	m_pGameInstance_Proxy->Play_SFX3D(L"CharaPoppyBrosJr_BombExplode.wav", XMLoadFloat3(&vPos));
+
 	CEffect_Loader::GetInstance()->Spawn(
 		L"BombExplosion", Get_LevelIndex(),
 		vPos, _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),

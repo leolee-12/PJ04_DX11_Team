@@ -313,6 +313,9 @@
     <Filter Include="05. GameObject\Effect\Allocator">
       <UniqueIdentifier>{8fc72b6d-5be3-40cf-9275-b99e11825d1d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="13. Sound\Handler">
+      <UniqueIdentifier>{071d0a53-c568-4414-b241-79a02c5230e2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -630,6 +633,9 @@
     <ClInclude Include="..\Public\MeshLayer_Utils.h">
       <Filter>07. Component\Model\MaterialEx</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Sound_Handle.h">
+      <Filter>13. Sound\Handler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -910,6 +916,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Effect_RectEmitter.cpp">
       <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_RectEmitter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Sound_Handle.cpp">
+      <Filter>13. Sound\Handler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

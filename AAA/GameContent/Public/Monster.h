@@ -4,11 +4,13 @@
 #include "Monster_BlackBoard.h"
 #include "Inhalable.h"
 #include "MonsterPart.h"
+#include "Sound_Handle.h"
 
 NS_BEGIN(Engine)
 class CCollider;
 class CController;
 class CAnimator;
+class CSound_Handle;
 NS_END
 
 NS_BEGIN(Client)
@@ -109,6 +111,11 @@ public:
 	void						Enable_Controller(_bool bEnable);
 	void						Enable_Colliders(_bool bEnable);
 
+	void						Play_ActionLoopSFX(const _tchar* pKey);
+	void						Stop_ActionLoopSFX();
+	void						Play_OneShotSFX(const _tchar* pKey, _float fVolume = 1.0f, ESoundBus eBus = ESoundBus::SFX);
+	void						Play_OneShotSFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
+
 protected:
 	CController*				m_pController = { nullptr };
 	CMonster_Movement*			m_pMovement = { nullptr };
@@ -122,6 +129,8 @@ protected:
 	CCollider*					m_pHurtBox = { nullptr };
 	CCollider*					m_pProjectileBox = { nullptr };
 	_float3						m_vSpatVelocity = {};
+	
+	CSound_Handle				m_ActionLoopSnd;
 
 	// 이번 프레임에 이동하고 싶은 방향
 	_float3						m_vWishDir = {};
@@ -141,6 +150,7 @@ protected:
 	static constexpr _float		s_fCoyoteTime = 0.12f;
 
 	_int						m_iAIType = { 0 };
+	_bool						m_bSFX2D = { false };
 
 protected:
 	// 부모가 관리할 공통 파이프라인
@@ -169,6 +179,7 @@ protected:
 	virtual void				Apply_AIVariation(const _wstring& strVariation) {}
 
 	_bool						Handle_SharedAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
+	void						Play_DeathFX();
 
 protected:
 	template<class TPart>

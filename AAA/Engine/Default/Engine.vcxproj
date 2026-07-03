@@ -259,6 +259,7 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClInclude Include="..\public\ShaderGlobal_Manager.h" />
     <ClInclude Include="..\public\Shadow_Dir.h" />
     <ClInclude Include="..\Public\Sound_Manager.h" />
+    <ClInclude Include="..\Public\Sound_Handle.h" />
     <ClInclude Include="..\Public\Target_Manager.h" />
     <ClInclude Include="..\Public\Texture.h" />
     <ClInclude Include="..\Public\Texture_Hub.h" />
@@ -358,6 +359,7 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClCompile Include="..\private\ShaderGlobal_Manager.cpp" />
     <ClCompile Include="..\private\Shadow_Dir.cpp" />
     <ClCompile Include="..\Private\Sound_Manager.cpp" />
+    <ClCompile Include="..\Private\Sound_Handle.cpp" />
     <ClCompile Include="..\Private\Target_Manager.cpp" />
     <ClCompile Include="..\Private\Texture.cpp" />
     <ClCompile Include="..\Private\Texture_Hub.cpp" />

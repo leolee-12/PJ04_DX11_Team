@@ -509,29 +509,29 @@ void	CGameInstance::Clear_CollisionPool()
 #pragma endregion
 
 #pragma region SOUND_MANAGER
-FMOD::Channel* CGameInstance::Play_SFX(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus)
+CSound_Handle CGameInstance::Play_SFX(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus)
 {
     return m_pSound_Manager->PlaySFX(pSoundKey, fVolume, eBus);
 }
-FMOD::Channel* CGameInstance::Play_SFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume, ESoundBus eBus)
+CSound_Handle CGameInstance::Play_SFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume, ESoundBus eBus)
 {
     return m_pSound_Manager->PlaySFX3D(pSoundKey, vSoundPos, fVolume, eBus);
 }
-FMOD::Channel* CGameInstance::Play_SFX_Loop(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus)
+CSound_Handle CGameInstance::Play_SFX_Loop(const TCHAR* pSoundKey, float fVolume, ESoundBus eBus)
 {
     return m_pSound_Manager->PlaySFXLoop(pSoundKey, fVolume, eBus);
 }
-FMOD::Channel* CGameInstance::Play_SFX3D_Loop(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume, ESoundBus eBus)
+CSound_Handle CGameInstance::Play_SFX3D_Loop(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume, ESoundBus eBus)
 {
     return m_pSound_Manager->PlaySFX3DLoop(pSoundKey, vSoundPos, fVolume, eBus);
-}
-void CGameInstance::Stop_Channel(FMOD::Channel*& pChannel)
-{
-    m_pSound_Manager->StopChannel(pChannel);
 }
 void CGameInstance::Play_BGM(const TCHAR* pSoundKey, float fVolume, bool bLoop)
 {
     m_pSound_Manager->PlayBGM(pSoundKey, fVolume, bLoop);
+}
+void CGameInstance::Play_BGM_Section(const TCHAR* pSoundKey, float fStart01, float fEnd01, float fVolume)
+{
+    m_pSound_Manager->PlayBGM_Section(pSoundKey, fStart01, fEnd01, fVolume);
 }
 void CGameInstance::Stop_BGM()
 {

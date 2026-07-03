@@ -4,6 +4,7 @@
 #include "Monster_Movement.h"
 #include "Monster_Brain_FSM.h"
 #include "LevelDesign_LoadTypes.h"
+#include "Sound_Handle.h"
 
 #include "Collider.h"
 #include "Controller.h"
@@ -297,19 +298,6 @@ void CMonster::SetUp_Collider_CallBack()
 				XMStoreFloat3(&atk.vAttackerPos, vAtkPos);
 				atk.pAttacker = pOther->Get_Owner();
 				Damaged(atk);
-
-				// 몬스터 피격 이펙트 (임시 연결)
-				const _float4* pCamLook = m_pGameInstance_Proxy->Get_CamLook();
-
-				_float3 vFaceCam{};
-				XMStoreFloat3(&vFaceCam, XMVectorNegate(XMLoadFloat4(pCamLook)));  
-				
-				_float3	vPos{};
-				XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
-
-				CEffect_Loader::GetInstance()->Spawn(L"CommonHit", Get_LevelIndex(),
-					vPos, vFaceCam, _float3(0.f, 0.f, 0.f),
-					nullptr);
 #ifdef _DEBUG
 				char szBuf[128];
 				sprintf_s(szBuf, "[Monster] Hurt! HP %.0f/%.0f\n", m_fCurHP, m_fMaxHP);
@@ -460,6 +448,21 @@ void CMonster::On_Damaged(const ATTACK_INFO& tInfo)
 {
 	m_LastHit = { tInfo.vAttackerPos, tInfo.fKnockback, tInfo.fDamage };
 
+	//Play_OneShotSFX(L"CharaBasic_DamageReact_Normal.wav", 0.8f);
+
+	// 몬스터 피격 이펙트
+	const _float4* pCamLook = m_pGameInstance_Proxy->Get_CamLook();
+
+	_float3 vFaceCam{};
+	XMStoreFloat3(&vFaceCam, XMVectorNegate(XMLoadFloat4(pCamLook)));
+
+	_float3	vPos{};
+	XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+	CEffect_Loader::GetInstance()->Spawn(L"CommonHit", Get_LevelIndex(),
+		vPos, vFaceCam, _float3(0.f, 0.f, 0.f),
+		nullptr);
+
 	Change_State(MONSTER_STATE_TYPE::KNOCK_BACK);
 }
 
@@ -470,15 +473,11 @@ void CMonster::On_Death(const ATTACK_INFO& tInfo)
 
 	if (tInfo.fDamage >= m_fMaxHP)
 	{
-		//if (m_pMovement)
-		//	m_pMovement->KO(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
 		Change_State(MONSTER_STATE_TYPE::KNOCK_OUT);
 	}
 	else
 	{
-		//if (m_pMovement)
-		//	m_pMovement->Knockback(XMLoadFloat3(&tInfo.vAttackerPos), tInfo.fKnockback);
-		Change_State(MONSTER_STATE_TYPE::KNOCK_BACK_DEATH);					// KNOCK_BACK_DEATH 로 수정
+		Change_State(MONSTER_STATE_TYPE::KNOCK_BACK_DEATH);					
 	}
 }
 
@@ -558,14 +557,58 @@ _bool CMonster::Handle_SharedAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePh
 			strKey.compare(iLen - 4, 4, ".wav") != 0)
 			strKey += ".wav";
 
-		_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
-		m_pGameInstance_Proxy->Play_SFX3D(
-			StrToWstr(strKey).c_str(), vPos);
+		if (m_bSFX2D)
+		{
+			m_pGameInstance_Proxy->Play_SFX(StrToWstr(strKey).c_str(), e.vOffset.x);
+		}
+		else
+		{
+			_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+			m_pGameInstance_Proxy->Play_SFX3D(StrToWstr(strKey).c_str(), vPos, e.vOffset.x);
+		}
 		return true;
 	}
 	default:
 		return false;		// 몬스터 고유 이벤트로 넘김
 	}
+}
+
+void CMonster::Play_DeathFX()
+{
+	Play_OneShotSFX(L"CharaBasic_Dead.wav", 0.6f);
+
+	const _float4* pCamLook = m_pGameInstance_Proxy->Get_CamLook();
+	_float3 vFaceCam{};
+	XMStoreFloat3(&vFaceCam,
+		XMVectorNegate(XMLoadFloat4(pCamLook)));
+	_float3 vPos{};
+	XMStoreFloat3(&vPos,
+		m_pTransformCom->Get_State(STATE::POSITION));
+
+	CEffect_Loader::GetInstance()->Spawn(
+		L"DespawnEffect", Get_LevelIndex(),
+		vPos, vFaceCam, _float3(0.f, 0.f, 0.f), nullptr);
+}
+
+void CMonster::Play_ActionLoopSFX(const _tchar* pKey)
+{
+	m_ActionLoopSnd.Stop();
+	m_ActionLoopSnd = m_pGameInstance_Proxy->Play_SFX_Loop(pKey);
+}
+
+void CMonster::Stop_ActionLoopSFX()
+{
+	m_ActionLoopSnd.Stop();
+}
+
+void CMonster::Play_OneShotSFX(const _tchar* pKey, _float fVolume, ESoundBus eBus)
+{
+	m_pGameInstance_Proxy->Play_SFX(pKey, fVolume, eBus);
+}
+
+void CMonster::Play_OneShotSFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume, ESoundBus eBus)
+{
+	m_pGameInstance_Proxy->Play_SFX3D(pSoundKey, vSoundPos, fVolume, eBus);
 }
 
 void CMonster::Enable_Controller(_bool bEnable)
@@ -603,20 +646,17 @@ void CMonster::Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed)
 
 void CMonster::Despawn_Spat()
 {
+	// TODO: 사운드, 이펙트 
+	Play_DeathFX();
+
 	Enable_ProjectileBox(false);
 	m_vSpatVelocity = {};
 	Set_Active(false);
-	// TODO: 사운드, 이펙트 
 }
 
 void CMonster::Despawn()
 {
-	_float3	vPos{};
-	XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
-
-	CEffect_Loader::GetInstance()->Spawn(L"DespawnEffect", Get_LevelIndex(),
-		vPos, _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
-		nullptr);
+	Play_DeathFX();
 
 	Enable_Colliders(false);
 	Enable_Controller(false);
@@ -691,6 +731,8 @@ void CMonster::Update_AI(_float fTimeDelta)
 
 void CMonster::Free()
 {
+	Stop_ActionLoopSFX();
+
 	Safe_Release(m_pBrain);
 	Safe_Release(m_pStateMachine);
 	__super::Free();
