@@ -316,6 +316,9 @@
     <Filter Include="94. Profiler">
       <UniqueIdentifier>{ccb61082-a7fa-4a7e-93b5-3f67bc16f3fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="13. Sound\Handler">
+      <UniqueIdentifier>{071d0a53-c568-4414-b241-79a02c5230e2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -639,6 +642,9 @@
     <ClInclude Include="..\Public\Profiler_Defines.h">
       <Filter>94. Profiler</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Sound_Handle.h">
+      <Filter>13. Sound\Handler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -922,6 +928,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Profiler_Manager.cpp">
       <Filter>94. Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Sound_Handle.cpp">
+      <Filter>13. Sound\Handler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

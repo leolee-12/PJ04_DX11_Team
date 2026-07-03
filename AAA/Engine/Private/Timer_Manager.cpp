@@ -22,7 +22,9 @@ _float CTimer_Manager::Get_RawTimeDelta(const _wstring& strTimerTag)
 	if (nullptr == pTimer)
 		return 0.f;
 
-	return pTimer->Get_TimeDelta();
+	_float fDelta = pTimer->Get_TimeDelta();
+	fDelta = min(fDelta, m_fMaxTimeDelta);
+	return fDelta;
 }
 
 HRESULT CTimer_Manager::Add_Timer(const _wstring& strTimerTag)

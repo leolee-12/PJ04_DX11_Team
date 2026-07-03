@@ -11,7 +11,6 @@ namespace Client
     class CMonster;
     class IInhalable;
 
-    // 호준 테스트용
     namespace EventTag
     {
         inline constexpr const _tchar* Kirby_PointStarGained = L"Kirby.PointStarGained";

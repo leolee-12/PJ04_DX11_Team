@@ -87,6 +87,7 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
             [this, fSpinT, bSpin, fSpinDuration, fSpinTurnDeg, fSpd](CBlackboard* pBB, _float dt) -> BT_STATUS {
                 if (!*bSpin) {
                     m_pOwner->Get_BodyAnimator()->Play("ArmSpin", true, true, 0.2f, fSpd);
+                    m_pOwner->Play_ActionLoopSFX(TEXT("CharaBossGorilla_ArmSpin.wav"));
                     *bSpin = true;
                 }
                 *fSpinT += dt;
@@ -106,10 +107,10 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
                     pTf->Rotate(XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fApply));
                 }
 
-                if (*fSpinT >= fSpinDuration) { *fSpinT = 0.f; *bSpin = false; return BT_STATUS::SUCCESS; }
+                if (*fSpinT >= fSpinDuration) { m_pOwner->Stop_ActionLoopSFX(); *fSpinT = 0.f; *bSpin = false; return BT_STATUS::SUCCESS; }
                 return BT_STATUS::RUNNING;
             },
-            [fSpinT, bSpin]() { *fSpinT = 0.f; *bSpin = false; });
+            [this, fSpinT, bSpin]() { *fSpinT = 0.f; *bSpin = false; m_pOwner->Stop_ActionLoopSFX(); });
 
         return CBTSequence::Create({
             OneShot("ArmSpinChargeStart"),
