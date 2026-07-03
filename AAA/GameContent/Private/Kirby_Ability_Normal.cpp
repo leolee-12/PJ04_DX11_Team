@@ -82,7 +82,7 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_AbilityState(CKirby* pKirby,
     Update_SuperInhaleTimer(fTimeDelta);
     Update_InhaleState(pKirby, fTimeDelta);
 
-    if (GetAsyncKeyState('T') & 0x8000)
+    if (m_pGameInstance_Proxy->Key_Down(DIK_T))
     {
         pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::SWORD);
         pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
