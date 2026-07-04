@@ -81,13 +81,16 @@ HRESULT CKirby::Initialize(void* pArg)
 
 void CKirby::Priority_Update(_float fTimeDelta)
 {
-    fTimeDelta = Resolve_TimeDelta(fTimeDelta);
+    if (m_pKirby_StateMachine->Ignore_TimeScale_StateMachine())
+        fTimeDelta = m_pGameInstance_Proxy->Get_RawTimeDelta(L"Timer_60");
+
     __super::Priority_Update(fTimeDelta);
 }
 
 void CKirby::Update(_float fTimeDelta)
 {
-    fTimeDelta = Resolve_TimeDelta(fTimeDelta);
+    if (m_pKirby_StateMachine->Ignore_TimeScale_StateMachine())
+        fTimeDelta = m_pGameInstance_Proxy->Get_RawTimeDelta(L"Timer_60");
 
     XMStoreFloat3(&m_vWishDir, XMVectorZero());
 
@@ -115,54 +118,29 @@ void CKirby::Update(_float fTimeDelta)
 
     __super::Update(fTimeDelta);
 
-    if (m_fInvincibleTime > 0.f)
-    {
-        _float fElapsed = s_fInvincibleDuration - m_fInvincibleTime;
-        if (fElapsed < 0.12f)
-        {
-            m_fHitFlashCur = 1.f;
-        }
-        else
-        {
-            const _float fBlinkHz = 8.f;
-            _float fBlink = (fmodf(m_fInvincibleTime * fBlinkHz, 1.f) < 0.5f) ? 1.f : 0.f;
-            m_fHitFlashCur = fBlink * 0.1f;
-        }
-    }
-    else
-        m_fHitFlashCur = 0.f;
+    Update_InvincibilityHitFlash();
 }
 
 void CKirby::Late_Update(_float fTimeDelta)
 {
-    fTimeDelta = Resolve_TimeDelta(fTimeDelta);
+    if (m_pKirby_StateMachine->Ignore_TimeScale_StateMachine())
+        fTimeDelta = m_pGameInstance_Proxy->Get_RawTimeDelta(L"Timer_60");
 
     __super::Late_Update(fTimeDelta);
 
-    if (m_pTransformCom)
-    {
-        const auto WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+    const _matrix WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
 
-        for (auto* pCollider : m_KirbyColliders)
-        {
-            pCollider->Update(WorldMatrix);
+    for (auto* pCollider : m_KirbyColliders)
+    {
+        pCollider->Update(WorldMatrix);
 
 #ifdef _DEBUG
-            if (pCollider->Is_Enabled())
-                m_pGameInstance_Proxy->Add_DebugComponent(pCollider);
+        if (pCollider->Is_Enabled())
+            m_pGameInstance_Proxy->Add_DebugComponent(pCollider);
 #endif
-        }
-
-        // BlobShadow °»½Å
-        _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
-        const _float H = 5.f, fSize = 3.5f;
-        SHADOW_LIGHT_DESC d{};
-        XMStoreFloat4(&d.vEye, vPos + XMVectorSet(0.f, H, 0.f, 0.f));
-        XMStoreFloat4(&d.vAt, XMVectorSetW(vPos, 1.f));
-        d.fWidth = d.fHeight = fSize;
-        d.fNear = 0.1f; d.fFar = H + 3.f;
-        m_pGameInstance_Proxy->Update_BlobShadow(d);
     }
+
+    Update_BlobShadow();
 }
 
 HRESULT CKirby::Render()
@@ -224,8 +202,8 @@ CKirby_OnOffPart* CKirby::Find_HatPart(COPY_ABILITY_TYPE eType)
 {
     switch (eType)
     {
-    case COPY_ABILITY_TYPE::SWORD:
-        return Find_OnOffPart(CKirby_SwordHat::Kirby_PartTag);
+        case COPY_ABILITY_TYPE::SWORD:
+            return Find_OnOffPart(CKirby_SwordHat::Kirby_PartTag);
     }
 
     return nullptr;
@@ -712,13 +690,51 @@ void CKirby::Clear_CutsceneGrabTarget()
     m_pGrabOwnerWorld = nullptr;
 }
 
-_float CKirby::Resolve_TimeDelta(_float fTimeDelta)
+void CKirby::Update_BlobShadow()
 {
-    KIRBY_STATE_TYPE eType = m_pKirby_StateMachine->Get_StateType();
-    if (eType == KIRBY_STATE_TYPE::GET_ABILITY)
-        return m_pGameInstance_Proxy->Get_RawTimeDelta(L"Timer_60");
-    else
-        return fTimeDelta;
+    constexpr _float fLightHeight = 5.f;
+    constexpr _float fProjectionSize = 3.5f;
+    constexpr _float fNearPlane = 0.1f;
+    constexpr _float fFarPlanePadding = 3.f;
+
+    const _vector vKirbyPosition = m_pTransformCom->Get_State(STATE::POSITION);
+    const _vector vLightPosition = vKirbyPosition + XMVectorSet(0.f, fLightHeight, 0.f, 0.f);
+
+    SHADOW_LIGHT_DESC ShadowDesc{};
+
+    XMStoreFloat4(&ShadowDesc.vEye, vLightPosition);
+    XMStoreFloat4(&ShadowDesc.vAt, XMVectorSetW(vKirbyPosition, 1.f));
+
+    ShadowDesc.fWidth = fProjectionSize;
+    ShadowDesc.fHeight = fProjectionSize;
+    ShadowDesc.fNear = fNearPlane;
+    ShadowDesc.fFar = fLightHeight + fFarPlanePadding;
+
+    m_pGameInstance_Proxy->Update_BlobShadow(ShadowDesc);
+}
+
+void CKirby::Update_InvincibilityHitFlash()
+{
+    if (m_fInvincibleTime <= 0.f)
+    {
+        m_fHitFlashCur = 0.f;
+        return;
+    }
+
+    const _float fInvincibilityElapsedTime = s_fInvincibleDuration - m_fInvincibleTime;
+
+    constexpr _float fInitialFlashDuration = 0.12f;
+    if (fInvincibilityElapsedTime < fInitialFlashDuration)
+    {
+        m_fHitFlashCur = 1.f;
+        return;
+    }
+
+    constexpr _float fBlinkFrequency = 8.f;
+    const _float fBlinkPhase = fmodf(m_fInvincibleTime * fBlinkFrequency, 1.f);
+
+    constexpr _float fBlinkIntensity = 0.1f;
+    m_fHitFlashCur = fBlinkPhase < 0.5f ? fBlinkIntensity : 0.f;
 }
 
 void CKirby::Change_KirbyDeform(DEFORM_TYPE eDeformType)
@@ -791,10 +807,10 @@ void CKirby::Add_HP(_float fHP)
 
     Helper::FloatClamp(m_fCurHP, 0.f, m_fMaxHP);
 
-    KIRBY_HP_UPDATED eDesc{};
-    eDesc.fCurrHp = m_fCurHP;
-    eDesc.fMaxHP = m_fMaxHP;
-    m_pGameInstance_Proxy->Publish(EventTag::Kirby_HP_Updated, &eDesc);
+    KIRBY_HP_UPDATED tDesc{};
+    tDesc.fCurrHp = m_fCurHP;
+    tDesc.fMaxHP = m_fMaxHP;
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_HP_Updated, &tDesc);
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

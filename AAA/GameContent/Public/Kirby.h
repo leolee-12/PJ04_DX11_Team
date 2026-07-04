@@ -175,9 +175,6 @@ private:
 	void Set_CutsceneGrabTarget(CUTSCENE_GRAB_DESC* pGrabDesc);
 	void Clear_CutsceneGrabTarget();
 
-	// Time
-	_float Resolve_TimeDelta(_float fTimeDelta);
-
 private:
 	// Parts
 	CKirby_Body* m_pBody{};
@@ -195,6 +192,9 @@ private:
 
 	// Invincible Time
 	_float m_fInvincibleTime{};
+
+	void Update_BlobShadow();
+	void Update_InvincibilityHitFlash();
 
 private:
 	// System

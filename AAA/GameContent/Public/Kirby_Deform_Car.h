@@ -74,7 +74,6 @@ private:
 	void Exit_BoostJumpState(CKirby* pKirby, BOOST_JUMP_STATE eStaten);
 
 	void BoostEffectStart(CKirby* pKirby, CEffect_Container*& pContainer1, CEffect_Container*& pContainer2, const _tchar* EffectTag);
-	void BoostEffectStop(CEffect_Container*& pContainer1, CEffect_Container*& pContainer2);
 
 public:
 	static CKirby_Deform_Car* Create();

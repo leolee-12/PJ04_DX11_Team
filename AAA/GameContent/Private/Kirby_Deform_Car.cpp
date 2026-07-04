@@ -424,12 +424,6 @@ void CKirby_Deform_Car::BoostEffectStart(CKirby* pKirby, CEffect_Container*& pCo
         pKirby->Get_Transform()->Get_WorldMatrixPtr(), &pContainer2);
 }
 
-void CKirby_Deform_Car::BoostEffectStop(CEffect_Container*& pContainer1, CEffect_Container*& pContainer2)
-{
-    Effect_Stop(pContainer1);
-    Effect_Stop(pContainer2);
-}
-
 CKirby_Deform_Car* CKirby_Deform_Car::Create()
 {
     CKirby_Deform_Car* pInstance = new CKirby_Deform_Car();

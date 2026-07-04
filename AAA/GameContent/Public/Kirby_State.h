@@ -63,6 +63,8 @@ public:
 	virtual void Request_GrabState(CKirby* pKirby, GRAB_TYPE eType);
 	virtual void Request_ReleaseGrabState(CKirby* pKirby, GRAB_TYPE eType);
 
+	virtual _bool Ignore_TimeScale() { return false; }
+
 protected:
 	virtual void Free() override;
 };

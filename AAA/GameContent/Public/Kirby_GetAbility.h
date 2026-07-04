@@ -37,6 +37,9 @@ public:
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
+public:
+	virtual _bool Ignore_TimeScale() { return true; }
+
 private:
 	CGameInstance_Proxy* m_pGameInstance_Proxy = {};
 
