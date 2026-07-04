@@ -20,7 +20,7 @@ private:
 	static constexpr _float s_fBoostAcceleration = 180.f;
 
 	enum DEFORM_CAR_STATE { BOOST, BOOST_END, CRUSH, DEFORM_CAR_END };
-	enum BOOST_JUMP_STATE { GROUND, JUMP_START, JUMP, FALL };
+	enum BOOST_JUMP_STATE { GROUND, JUMP_START, JUMP, FALL, LANDING };
 
 private:
 	CKirby_Deform_Car();
@@ -35,9 +35,9 @@ public:
 	virtual void Enter_Deform(CKirby* pKirby) override;
 	virtual void Exit_Deform(CKirby* pKirby) override;
 
-	virtual void Enter_DeformState(CKirby* pKirby) override;
-	virtual void Update_DeformState(CKirby* pKirby, _float fTimeDelta) override;
-	virtual void Exit_DeformState(CKirby* pKirby) override;
+	virtual void Enter_AttackState(CKirby* pKirby) override;
+	virtual void Update_AttackState(CKirby* pKirby, _float fTimeDelta) override;
+	virtual void Exit_AttackState(CKirby* pKirby) override;
 
 public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
@@ -74,7 +74,6 @@ private:
 	void Exit_BoostJumpState(CKirby* pKirby, BOOST_JUMP_STATE eStaten);
 
 	void BoostEffectStart(CKirby* pKirby, CEffect_Container*& pContainer1, CEffect_Container*& pContainer2, const _tchar* EffectTag);
-	void BoostEffectStop(CEffect_Container*& pContainer1, CEffect_Container*& pContainer2);
 
 public:
 	static CKirby_Deform_Car* Create();

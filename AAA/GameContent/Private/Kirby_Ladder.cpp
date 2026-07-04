@@ -51,31 +51,31 @@ _bool CKirby_Ladder::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 
     KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
 
-    switch (eCommandType)
-    {
-        //// Move Press
-        //case KIRBY_COMMAND_TYPE::MOVE_TOP:
-        //case KIRBY_COMMAND_TYPE::MOVE_DOWN:
-        //case KIRBY_COMMAND_TYPE::MOVE_LEFT:
-        //case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
-        //{
-        //    if (!pCommand->IsPress())
-        //        return false;
+    //switch (eCommandType)
+    //{
+    //    // Move Press
+    //    case KIRBY_COMMAND_TYPE::MOVE_TOP:
+    //    case KIRBY_COMMAND_TYPE::MOVE_DOWN:
+    //    case KIRBY_COMMAND_TYPE::MOVE_LEFT:
+    //    case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
+    //    {
+    //        if (!pCommand->IsPress())
+    //            return false;
 
-        //    Handle_MoveCommand(pKirby, pCommand);
-        //    pKirby->Change_State(KIRBY_STATE_TYPE::RUN);
-        //    return true;
-        //}
-        //// Jump Down
-        //case KIRBY_COMMAND_TYPE::JUMP:
-        //{
-        //    if (!pCommand->IsDown())
-        //        return false;
+    //        Handle_MoveCommand(pKirby, pCommand);
+    //        pKirby->Change_State(KIRBY_STATE_TYPE::RUN);
+    //        return true;
+    //    }
+    //    // Jump Down
+    //    case KIRBY_COMMAND_TYPE::JUMP:
+    //    {
+    //        if (!pCommand->IsDown())
+    //            return false;
 
-        //    pKirby->Change_State(KIRBY_STATE_TYPE::JUMP);
-        //    return true;
-        //}
-    }
+    //        pKirby->Change_State(KIRBY_STATE_TYPE::JUMP);
+    //        return true;
+    //    }
+    //}
 
     return false;
 }

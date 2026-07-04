@@ -1,12 +1,8 @@
 #pragma once
 
-#include "GameContent_Defines.h"
-
 #include "Kirby_OnOffPart.h"
 
 NS_BEGIN(Engine)
-class CModel;
-class CAnimator;
 NS_END
 
 NS_BEGIN(Client)
@@ -35,9 +31,6 @@ private:
 public:
 	virtual HRESULT Render() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
-
-public:
-	CAnimator* Get_Animator() { return m_pAnimatorCom; }
 
 private:
 	HRESULT Ready_Components();

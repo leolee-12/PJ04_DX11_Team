@@ -2,8 +2,6 @@
 
 #include "GameInstance.h"
 
-#include "GameContent_const.h"
-
 #include "Effect_Loader.h"
 
 #include "kirby.h"
@@ -27,8 +25,6 @@ HRESULT CKirby_Body::Initialize(void* pArg)
 {
     KIRBY_BODY_DESC* pDesc = static_cast<KIRBY_BODY_DESC*>(pArg);
 
-    pDesc->fSpeedPerSec = 1.f;
-
     if (FAILED(__super::Initialize(pDesc)))
         return E_FAIL;
 
@@ -40,38 +36,12 @@ HRESULT CKirby_Body::Initialize(void* pArg)
     return S_OK;
 }
 
-void CKirby_Body::Priority_Update(_float fTimeDelta)
-{
-}
-
-void CKirby_Body::Update(_float fTimeDelta)
-{
-    if (m_bActive == false)
-        return;
-
-    if (m_pGameInstance_Proxy->Is_EditMode())
-        return;
-
-    m_pAnimatorCom->Update(fTimeDelta);
-}
-
-void CKirby_Body::Late_Update(_float fTimeDelta)
-{
-    if (m_bActive == false)
-        return;
-
-    CPartObject::Compute_CombinedWorldMatrix(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
-
-    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
-    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
-}
-
 HRESULT CKirby_Body::Render()
 {
     if (FAILED(Set_VisibleMeshes()))
         return E_FAIL;
 
-    if (FAILED(Bind_ShaderResources(m_pKirbyShaderCom)))
+    if (FAILED(Bind_CommonShaderResources(m_pKirbyShaderCom)))
         return E_FAIL;
 
     const _uint iNumMeshes = (_uint)m_pModelCom->Get_NumMeshes();
@@ -89,26 +59,28 @@ HRESULT CKirby_Body::Render()
 
 HRESULT CKirby_Body::Render_Shadow()
 {
-    if (!m_bActive || m_iShadowPass < 0 || nullptr == m_pModelCom)
-        return S_OK;
-
     if (FAILED(Set_VisibleMeshes()))
         return E_FAIL;
 
-    if (FAILED(Bind_ShaderResources(m_pKirbyShaderCom)))
+    if (FAILED(Bind_CommonShaderResources(m_pKirbyShaderCom)))
         return E_FAIL;
 
     if (FAILED(m_pKirbyShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
         return E_FAIL;
+
     m_pKirbyShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW));
+
     m_pKirbyShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ));
 
-    const _uint iNumMeshes = (_uint)m_pModelCom->Get_NumMeshes();
+    const size_t iNumMeshes = m_pModelCom->Get_NumMeshes();
+
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
         m_pModelCom->Bind_BoneMatrices(m_pKirbyShaderCom, "g_BoneMatrices", i);
-        if (FAILED(m_pKirbyShaderCom->Begin(m_iShadowPass)))
+
+        if (FAILED(m_pKirbyShaderCom->Begin(ETOUI(KIRBY_SHADER_PASS::ANIM_SHADOW))))
             return E_FAIL;
+
         m_pModelCom->Render(i);
     }
     return S_OK;
@@ -293,29 +265,22 @@ HRESULT CKirby_Body::Render_KirbyMesh(_uint iMeshIndex)
 
     if (FAILED(m_pEyeTextureCom->Bind_ShaderResource(m_pKirbyShaderCom, "g_EyeTexture", ETOUI(m_eEye))))
         return E_FAIL;
-
-    if (FAILED(m_pEyeTextureCom->Bind_ShaderResource(m_pKirbyShaderCom, "g_NormalTexture", ETOUI(m_eEye))))
-        return E_FAIL;
-
     if (FAILED(m_pEyeMaskTextureCom->Bind_ShaderResource(m_pKirbyShaderCom, "g_EyeMaskTexture", ETOUI(m_eEye))))
         return E_FAIL;
 
     if (FAILED(m_pModelCom->Bind_Material(m_pKirbyShaderCom, "g_SkinTexture", iMeshIndex, MTEX_TYPE::UNKNOWN, 1)))
         return E_FAIL;
-
     if (FAILED(m_pModelCom->Bind_Material(m_pKirbyShaderCom, "g_MouthTexture", iMeshIndex, MTEX_TYPE::UNKNOWN, 2)))
         return E_FAIL;
 
     if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pKirbyShaderCom, "g_BoneMatrices", iMeshIndex)))
         return E_FAIL;
 
-    if (FAILED(m_pKirbyShaderCom->Bind_RawValue("g_vBodyColor", &m_vBodyColor, sizeof(_float4))))
+    if (FAILED(m_pKirbyShaderCom->Bind_RawValue("g_vBodyColor", &s_vBodyColor, sizeof(_float4))))
         return E_FAIL;
-
-    if (FAILED(m_pKirbyShaderCom->Bind_RawValue("g_vFootColor", &m_vFootColor, sizeof(_float4))))
+    if (FAILED(m_pKirbyShaderCom->Bind_RawValue("g_vFootColor", &s_vFootColor, sizeof(_float4))))
         return E_FAIL;
-
-    if (FAILED(m_pKirbyShaderCom->Bind_RawValue("g_vBlushColor", &m_vBlushColor, sizeof(_float4))))
+    if (FAILED(m_pKirbyShaderCom->Bind_RawValue("g_vBlushColor", &s_vBlushColor, sizeof(_float4))))
         return E_FAIL;
 
     if (FAILED(m_pKirbyShaderCom->Begin(0)))

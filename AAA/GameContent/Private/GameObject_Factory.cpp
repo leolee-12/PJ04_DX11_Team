@@ -836,6 +836,8 @@ void CGameObject_Factory::Register_Effect()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/CarMilkyWay/Car_00_MilkyWay.ysh"));
             TRY_ADD_PROTO(pProxy, Texture_MilkyWayMask.iLevelID, Texture_MilkyWayMask.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_MilkyWayMask.szFileTag, Texture_MilkyWayMask.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Gradiant.iLevelID, Texture_Gradiant.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Gradiant.szFileTag, Texture_Gradiant.iNumTex));
         )
     );
 

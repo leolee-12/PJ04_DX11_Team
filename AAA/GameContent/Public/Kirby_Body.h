@@ -3,17 +3,16 @@
 #include "Kirby_Deform_Model.h"
 
 NS_BEGIN(Engine)
-class CShader;
-class CModel;
-class CAnimator;
-class CTexture;
 NS_END
 
 NS_BEGIN(Client)
 
-enum class KIRBY_MESH { BODY_BIG, BODY, BODY_VACUUM,
+enum class KIRBY_MESH
+{
+	BODY_BIG, BODY, BODY_VACUUM,
 	MOUTH_ANGRY, MOUTH_NORMAL, MOUTH_OPEN, MOUTH_SMILE_CLOSE, MOUTH_SMILE_OPEN,
-	LIMBS };
+	LIMBS
+};
 enum class KIRBY_BODY_STATE { NORMAL, STUFFED, INHALE, END };
 enum class KIRBY_MOUTH_STATE { IDLE, OPEN, ANGRY, SMILE_OPEN, SMILE_CLOSE, END };
 
@@ -39,9 +38,6 @@ private:
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
-	virtual void Priority_Update(_float fTimeDelta) override;
-	virtual void Update(_float fTimeDelta) override;
-	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_Shadow() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
@@ -59,8 +55,7 @@ private:
 	HRESULT Ready_Components();
 
 	HRESULT Set_VisibleMeshes();
-
-	virtual HRESULT Render_KirbyMesh(_uint iMeshIndex) override;
+	virtual HRESULT Render_KirbyMesh(_uint iMeshIndex);
 
 private:
 	vector<_bool>	m_VisibleMeshes;

@@ -80,7 +80,7 @@ COPY_ABILITY_TYPE CKirby_Ability_Sword::Get_AbilityType()
     return COPY_ABILITY_TYPE::SWORD;
 }
 
-void CKirby_Ability_Sword::Enter_AbilityState(CKirby* pKirby)
+void CKirby_Ability_Sword::Enter_AttackState(CKirby* pKirby)
 {
     SWORD_STATE eStartState = m_eSwordState;
 
@@ -113,7 +113,7 @@ void CKirby_Ability_Sword::Enter_AbilityState(CKirby* pKirby)
     Change_SwordState(pKirby, eStartState);
 }
 
-ABILITY_UPDATE_RESULT CKirby_Ability_Sword::Update_AbilityState(CKirby* pKirby, _float fTimeDelta)
+void CKirby_Ability_Sword::Update_AttackState(CKirby* pKirby, _float fTimeDelta)
 {
     Update_ChargeTime(fTimeDelta);
     Update_SwordState(pKirby, fTimeDelta);
@@ -128,11 +128,9 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Sword::Update_AbilityState(CKirby* pKirby, 
     m_bSpinSlashCharge = false;
 
     m_eCurSwordMoveState = SWORD_MOVE_STATE::NONE_MOVE;
-
-    return ABILITY_UPDATE_RESULT::NONE;
 }
 
-void CKirby_Ability_Sword::Exit_AbilityState(CKirby* pKirby)
+void CKirby_Ability_Sword::Exit_AttackState(CKirby* pKirby)
 {
     Change_SwordState(pKirby, SWORD_STATE::END);
 
@@ -178,16 +176,9 @@ void CKirby_Ability_Sword::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_IN
     End_SpinSlashEffect(m_pSpinSlash, 0.2f);
     End_SpinSlashEffect(m_pSpinSlashTrail, 0.15f);
 
-    if (m_pSwordChargeEffect != nullptr)
-    {
-        m_pSwordChargeEffect->EffectContainer_Stop();
-        m_pSwordChargeEffect = nullptr;
-    }
-    if (m_pSwordSuperChargeEffect != nullptr)
-    {
-        m_pSwordSuperChargeEffect->EffectContainer_Stop();
-        m_pSwordSuperChargeEffect = nullptr;
-    }
+    Effect_Stop(m_pSwordChargeEffect);
+    Effect_Stop(m_pSwordSuperChargeEffect);
+
     __super::On_Damaged_KirbyState(pKirby, tInfo);
 }
 
@@ -304,17 +295,6 @@ _bool CKirby_Ability_Sword::Enter_Attack_KeyUp(CKirby* pKirby)
 {
     // ¹«½Ã
     return true;
-}
-
-_bool CKirby_Ability_Sword::Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation)
-{
-    switch (eAttackLocation)
-    {
-        case KIRBY_ATTACK_LOCATION::GROUND:     return true;
-        case KIRBY_ATTACK_LOCATION::AIR:        return true;
-    }
-
-    return false;
 }
 
 void CKirby_Ability_Sword::Update_ChargeTime(_float fTimeDelta)
@@ -848,11 +828,7 @@ void CKirby_Ability_Sword::Exit_SwordState(CKirby* pKirby, SWORD_STATE eState)
             break;
 
         case SPIN_SLASH_CHARGE:
-            if (m_pSwordChargeEffect != nullptr)
-            {
-                m_pSwordChargeEffect->EffectContainer_Stop();
-                m_pSwordChargeEffect = nullptr; 
-            }
+            Effect_Stop(m_pSwordChargeEffect);
             break;
         case SPIN_SLASH:
             break;
@@ -861,11 +837,7 @@ void CKirby_Ability_Sword::Exit_SwordState(CKirby* pKirby, SWORD_STATE eState)
         case SUPER_SPIN_SLASH_CHARGE_START:
             break;
         case SUPER_SPIN_SLASH_CHARGE:
-            if (m_pSwordSuperChargeEffect != nullptr)
-            {
-                m_pSwordSuperChargeEffect->EffectContainer_Stop();
-                m_pSwordSuperChargeEffect = nullptr;
-            }
+            Effect_Stop(m_pSwordSuperChargeEffect);
             break;
         case SUPER_SPIN_SLASH_START:
             break;

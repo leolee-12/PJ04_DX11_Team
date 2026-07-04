@@ -30,9 +30,9 @@ HRESULT CCar_00_MilkyWay::Initialize(void* pArg)
     tDesc.bUseDiffuseTexture = true;
     tDesc.bUseUnKnownTexture = false;
 
-    tDesc.bUseTextureCom = false;
-    tDesc.iTextureLevel = 0;
-    tDesc.wstrTextureTag = L"";
+    tDesc.bUseTextureCom = true;
+    tDesc.iTextureLevel = Texture_Gradiant.iLevelID;
+    tDesc.wstrTextureTag = Texture_Gradiant.szProtoTag;
 
     tDesc.bUseMaskCom = true;
     tDesc.iMaskLevel = Texture_MilkyWayMask.iLevelID;
