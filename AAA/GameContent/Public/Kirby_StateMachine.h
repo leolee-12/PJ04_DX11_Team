@@ -38,8 +38,11 @@ public:
 public:
 	void  On_Damaged_KirbyStateMachine(const ATTACK_INFO& tInfo);
 
+public:
 	void Request_GrabState_StateMachine(GRAB_TYPE eType);
 	void Request_ReleaseGrabState_StateMachine(GRAB_TYPE eType = GRAB_TYPE::_COUNT);
+
+	_bool Ignore_TimeScale_StateMachine();
 
 private:
 	CKirby* m_pKirby{};

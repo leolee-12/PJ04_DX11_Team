@@ -28,11 +28,6 @@ void CKirby_Deform::Play_DeformAni(CKirby* pKirby, DEFORM_ANI eDeformAni)
     // Overlay 있으면 추가
 }
 
-void CKirby_Deform::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
-{
-
-}
-
 void CKirby_Deform::Set_FullBodyAni(DEFORM_ANI eAni, const _string& strAniName, _bool bLoop, _bool bRestart, _float fBlend, _float fSpeed)
 {
     DEFORM_ANI_DESC& desc = m_tDeformAniInfos[ETOUI(eAni)];

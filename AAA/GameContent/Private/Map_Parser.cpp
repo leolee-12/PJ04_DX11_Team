@@ -449,7 +449,7 @@ _bool CMap_Parser::Try_ParseRenderID(const json& jValue, RENDERID* pOut)
 	const string strValue = To_UpperCopy(jValue.get<string>());
 
 	if (strValue == "PRIORITY") { *pOut = RENDERID::PRIORITY; return true; }
-	if (strValue == "SHADOW") { *pOut = RENDERID::SHADOW; return true; }
+	if (strValue == "ANIM_SHADOW") { *pOut = RENDERID::SHADOW; return true; }
 	if (strValue == "NONBLEND") { *pOut = RENDERID::NONBLEND; return true; }
 	if (strValue == "NONLIGHT") { *pOut = RENDERID::NONLIGHT; return true; }
 	if (strValue == "BLEND") { *pOut = RENDERID::BLEND; return true; }

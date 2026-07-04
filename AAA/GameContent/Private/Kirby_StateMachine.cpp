@@ -89,6 +89,11 @@ void CKirby_StateMachine::Request_ReleaseGrabState_StateMachine(GRAB_TYPE eType)
     m_pCurState->Request_ReleaseGrabState(m_pKirby, eType);
 }
 
+_bool CKirby_StateMachine::Ignore_TimeScale_StateMachine()
+{
+    return m_pCurState->Ignore_TimeScale();
+}
+
 HRESULT CKirby_StateMachine::Init_State()
 {
     auto Register_State = [this](KIRBY_STATE_TYPE eType, CKirby_State* pNewState) -> HRESULT

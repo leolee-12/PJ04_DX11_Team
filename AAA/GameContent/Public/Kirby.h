@@ -22,13 +22,13 @@ class CKirby_StateMachine;
 
 class CMovement_Child;
 
+class CKirby_AttackMode;
 class CKirby_Ability;
+class CKirby_Deform;
 
 class CKirby_Body;
 class CKirby_OnOffPart;
-
 class CKirby_Deform_Model;
-class CKirby_Deform;
 
 class CLevelDesign_Ladder;
 
@@ -114,6 +114,9 @@ public:
 	void Excute_Command(CKirby_Command* pCommand);
 	void Change_State(KIRBY_STATE_TYPE eNewState);
 
+	// Attack Mode
+	CKirby_AttackMode* Get_ActiveAttackMode();
+
 	// Ability
 	CKirby_Ability* Get_KirbyAbility();
 	void Request_ChangeKirbyAbility(COPY_ABILITY_TYPE eAbilityState);
@@ -172,9 +175,6 @@ private:
 	void Set_CutsceneGrabTarget(CUTSCENE_GRAB_DESC* pGrabDesc);
 	void Clear_CutsceneGrabTarget();
 
-	// Time
-	_float Resolve_TimeDelta(_float fTimeDelta);
-
 private:
 	// Parts
 	CKirby_Body* m_pBody{};
@@ -192,6 +192,9 @@ private:
 
 	// Invincible Time
 	_float m_fInvincibleTime{};
+
+	void Update_BlobShadow();
+	void Update_InvincibilityHitFlash();
 
 private:
 	// System

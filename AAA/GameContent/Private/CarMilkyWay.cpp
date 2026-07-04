@@ -61,6 +61,10 @@ HRESULT CCarMilkyWay::Ready_EffectPartObjects()
         return E_FAIL;
     if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CCar_00_MilkyWay::PROTOTYPE_TAG, TEXT("BoostWind2"))))
         return E_FAIL;
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CCar_00_MilkyWay::PROTOTYPE_TAG, TEXT("BoostWind3"))))
+        return E_FAIL;
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CCar_00_MilkyWay::PROTOTYPE_TAG, TEXT("BoostWind4"))))
+        return E_FAIL;
 
     return S_OK;
 }

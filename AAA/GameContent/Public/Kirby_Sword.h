@@ -1,13 +1,8 @@
 #pragma once
 
-#include "GameContent_Defines.h"
-
 #include "Kirby_OnOffPart.h"
 
 NS_BEGIN(Engine)
-class CShader;
-class CModel;
-class CAnimator;
 class CCollider;
 NS_END
 
@@ -40,9 +35,6 @@ public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
 public:
-	CAnimator* Get_Animator() { return m_pAnimatorCom; }
-
-public:
 	//윤석현 추가
 	void Reset_HitList() { m_HitTargets.clear(); }
 	void Set_HitBox(_bool bOn);
@@ -54,11 +46,6 @@ private:
 
 private:
 	CCollider* m_pHitBox{};
-
-	// 노란 보석
-	_float4 m_vConstantDiffuse = { 1.f, 0.72f, 0.08f, 1.f };
-	_float3 m_vConstantMRA = { 0.25f, 0.18f, 1.f };
-	_float4 m_vConstantEmissive = { 0.05f, 0.025f, 0.f, 1.f };
 
 	unordered_set<CGameObject*> m_HitTargets;
 
