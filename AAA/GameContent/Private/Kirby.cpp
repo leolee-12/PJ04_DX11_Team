@@ -289,6 +289,14 @@ void CKirby::Change_State(KIRBY_STATE_TYPE eNewState)
     m_pKirby_StateMachine->Change_State(eNewState);
 }
 
+CKirby_AttackMode* CKirby::Get_ActiveAttackMode()
+{
+    if (m_pKirby_Deform != nullptr)
+        return m_pKirby_Deform;
+    else
+        return m_pKirby_Ability;
+}
+
 CKirby_Ability* CKirby::Get_KirbyAbility()
 {
     return m_pKirby_Ability;

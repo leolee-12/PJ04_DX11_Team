@@ -22,13 +22,13 @@ class CKirby_StateMachine;
 
 class CMovement_Child;
 
+class CKirby_AttackMode;
 class CKirby_Ability;
+class CKirby_Deform;
 
 class CKirby_Body;
 class CKirby_OnOffPart;
-
 class CKirby_Deform_Model;
-class CKirby_Deform;
 
 class CLevelDesign_Ladder;
 
@@ -113,6 +113,9 @@ public:
 	//System
 	void Excute_Command(CKirby_Command* pCommand);
 	void Change_State(KIRBY_STATE_TYPE eNewState);
+
+	// Attack Mode
+	CKirby_AttackMode* Get_ActiveAttackMode();
 
 	// Ability
 	CKirby_Ability* Get_KirbyAbility();

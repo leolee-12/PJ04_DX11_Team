@@ -35,9 +35,9 @@ public:
 	virtual void Enter_Deform(CKirby* pKirby) override;
 	virtual void Exit_Deform(CKirby* pKirby) override;
 
-	virtual void Enter_DeformState(CKirby* pKirby) override;
-	virtual void Update_DeformState(CKirby* pKirby, _float fTimeDelta) override;
-	virtual void Exit_DeformState(CKirby* pKirby) override;
+	virtual void Enter_AttackState(CKirby* pKirby) override;
+	virtual void Update_AttackState(CKirby* pKirby, _float fTimeDelta) override;
+	virtual void Exit_AttackState(CKirby* pKirby) override;
 
 public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;

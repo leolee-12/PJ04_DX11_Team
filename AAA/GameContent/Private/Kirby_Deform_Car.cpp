@@ -54,7 +54,7 @@ void CKirby_Deform_Car::Exit_Deform(CKirby* pKirby)
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
 }
 
-void CKirby_Deform_Car::Enter_DeformState(CKirby* pKirby)
+void CKirby_Deform_Car::Enter_AttackState(CKirby* pKirby)
 {
     m_fAccBoostTime = m_fMaxBoostTime;
     m_bReqEndAttackState = false;
@@ -71,12 +71,12 @@ void CKirby_Deform_Car::Enter_DeformState(CKirby* pKirby)
     Change_DeformCarState(pKirby, DEFORM_CAR_STATE::BOOST);
 }
 
-void CKirby_Deform_Car::Update_DeformState(CKirby* pKirby, _float fTimeDelta)
+void CKirby_Deform_Car::Update_AttackState(CKirby* pKirby, _float fTimeDelta)
 {
     Update_DeformCarState(pKirby, fTimeDelta);
 }
 
-void CKirby_Deform_Car::Exit_DeformState(CKirby* pKirby)
+void CKirby_Deform_Car::Exit_AttackState(CKirby* pKirby)
 {
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pKirby->Get_Movement()->Set_MaxHorizontalSpeed(s_fCarSpeed);
@@ -299,12 +299,9 @@ void CKirby_Deform_Car::Exit_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eSt
 
             pKirby->Get_Collider(CKirby::KIRBY_COLLIDER::CAR_BOOST_COLLIDER)->Set_Enabled(false);
 
-            BoostEffectStop(m_pBoostGas1, m_pBoostGas2);
-            if (m_pBoostWind != nullptr)
-            {
-                m_pBoostWind->EffectContainer_Stop();
-                m_pBoostWind = nullptr;
-            }
+            Effect_Stop(m_pBoostGas1);
+            Effect_Stop(m_pBoostGas2);
+            Effect_Stop(m_pBoostWind);
 
             break;
         case DEFORM_CAR_STATE::BOOST_END:
@@ -429,17 +426,8 @@ void CKirby_Deform_Car::BoostEffectStart(CKirby* pKirby, CEffect_Container*& pCo
 
 void CKirby_Deform_Car::BoostEffectStop(CEffect_Container*& pContainer1, CEffect_Container*& pContainer2)
 {
-    if (pContainer1 != nullptr)
-    {
-        pContainer1->EffectContainer_StopAfterEmission();
-        pContainer1 = nullptr;
-    }
-
-    if (pContainer2 != nullptr)
-    {
-        pContainer2->EffectContainer_StopAfterEmission();
-        pContainer2 = nullptr;
-    }
+    Effect_Stop(pContainer1);
+    Effect_Stop(pContainer2);
 }
 
 CKirby_Deform_Car* CKirby_Deform_Car::Create()

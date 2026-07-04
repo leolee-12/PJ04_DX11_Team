@@ -30,32 +30,17 @@ void CKirby_Attack::Enter(CKirby* pKirby)
 {
     __super::Enter(pKirby);
 
-    if (pKirby->Has_Deform())
-        pKirby->Get_KirbyDeform()->Enter_DeformState(pKirby);
-    else
-        pKirby->Get_KirbyAbility()->Enter_AbilityState(pKirby);
+    pKirby->Get_ActiveAttackMode()->Enter_AttackState(pKirby);
 }
 
 void CKirby_Attack::Update(CKirby* pKirby, const _float fTimeDelta)
 {
     __super::Update(pKirby, fTimeDelta);
 
-    _bool bReqEndAttackState{};
+    CKirby_AttackMode* pAttackMode = pKirby->Get_ActiveAttackMode();
+    pAttackMode->Update_AttackState(pKirby, fTimeDelta);
 
-    if (pKirby->Has_Deform())
-    {
-        CKirby_Deform* pDeform = pKirby->Get_KirbyDeform();
-        pDeform->Update_DeformState(pKirby, fTimeDelta);
-        bReqEndAttackState = pDeform->ReqEndAttackState();
-    }
-    else
-    {
-        CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
-        pAbility->Update_AbilityState(pKirby, fTimeDelta);
-        bReqEndAttackState = pAbility->ReqEndAttackState();
-    }
-
-    if (bReqEndAttackState == true)
+    if (pAttackMode->ReqEndAttackState() == true)
     {
         CMovement_Child* pMovement = pKirby->Get_Movement();
         
@@ -72,18 +57,12 @@ void CKirby_Attack::Exit(CKirby* pKirby)
 {
     __super::Exit(pKirby);
 
-    if (pKirby->Has_Deform())
-        pKirby->Get_KirbyDeform()->Exit_DeformState(pKirby);
-    else
-        pKirby->Get_KirbyAbility()->Exit_AbilityState(pKirby);
+    pKirby->Get_ActiveAttackMode()->Exit_AttackState(pKirby);
 }
 
 void CKirby_Attack::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
 {
-    if (pKirby->Has_Deform())
-        pKirby->Get_KirbyDeform()->On_Damaged_KirbyState(pKirby, tInfo);
-    else
-        pKirby->Get_KirbyAbility()->On_Damaged_KirbyState(pKirby, tInfo);
+        pKirby->Get_ActiveAttackMode()->On_Damaged_KirbyState(pKirby, tInfo);
 }
 
 _bool CKirby_Attack::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -109,18 +88,8 @@ _bool CKirby_Attack::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
         }
     }
 
-    if (pKirby->Has_Deform())
-    {
-        CKirby_Deform* pDeform = pKirby->Get_KirbyDeform();
-        if (pDeform->Handle_Command(pKirby, pCommand) == true)
-            return true;
-    }
-    else
-    {
-        CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
-        if (pAbility->Handle_Command(pKirby, pCommand) == true)
-            return true;
-    }
+    if (pKirby->Get_ActiveAttackMode()->Handle_Command(pKirby, pCommand))
+        return true;
 
     return false;
 }

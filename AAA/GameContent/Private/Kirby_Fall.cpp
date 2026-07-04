@@ -94,28 +94,15 @@ _bool CKirby_Fall::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
         // Attack
         case KIRBY_COMMAND_TYPE::ATTACK:
         {
-            if (pKirby->Has_Deform())
+            CKirby_AttackMode* pAttackMode = pKirby->Get_ActiveAttackMode();
+            if (pAttackMode->Can_Attack(KIRBY_ATTACK_LOCATION::AIR))
             {
-                CKirby_Deform* pDeform = pKirby->Get_KirbyDeform();
                 if (pCommand->IsDown())
-                    pDeform->Enter_Attack_KeyDown(pKirby);
+                    pAttackMode->Enter_Attack_KeyDown(pKirby);
                 else if (pCommand->IsPress())
-                    pDeform->Enter_Attack_KeyPress(pKirby);
+                    pAttackMode->Enter_Attack_KeyPress(pKirby);
                 else if (pCommand->IsUp())
-                    pDeform->Enter_Attack_KeyUp(pKirby);
-            }
-            else
-            {
-                CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
-                if (pAbility->Can_Attack(KIRBY_ATTACK_LOCATION::GROUND))
-                {
-                    if (pCommand->IsDown())
-                        pAbility->Enter_Attack_KeyDown(pKirby);
-                    else if (pCommand->IsPress())
-                        pAbility->Enter_Attack_KeyPress(pKirby);
-                    else if (pCommand->IsUp())
-                        pAbility->Enter_Attack_KeyUp(pKirby);
-                }
+                    pAttackMode->Enter_Attack_KeyUp(pKirby);
             }
 
             return true;
@@ -127,46 +114,54 @@ _bool CKirby_Fall::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 
 void CKirby_Fall::Update_FallState(CKirby* pKirby)
 {
-    CKirby_Body* pKirby_Body = pKirby->Get_Body();
-    CMovement_Child* pMovement = pKirby->Get_Movement();
-
     switch (m_eFallState)
     {
         case FALL_STATE::LAND_START:
+        {
+            CAnimator* pAnimator{};
+
             if (pKirby->Has_Deform())
             {
                 CKirby_Deform* pKirbyDeform = pKirby->Get_KirbyDeform();
                 CKirby_Deform_Model* pDeformModel = pKirby->Get_DeformPart_Model(pKirbyDeform->Get_DeformType());
-                if (pDeformModel->Get_Animator()->Is_Finished())
-               
-                    Transition_Wait_OR_Run(pKirby);
+                pAnimator = pDeformModel->Get_Animator();
             }
             else
             {
-                CAnimator* pAnimator = pKirby_Body->Get_Animator();
-                if (pAnimator->Is_Finished())
-                    Transition_Wait_OR_Run(pKirby);
-            }   
+                CKirby_Body* pKirby_Body = pKirby->Get_Body();
+                pAnimator = pKirby_Body->Get_Animator();
+            }
+
+            if (pAnimator->Is_Finished())
+                Transition_Wait_OR_Run(pKirby);
+
             break;
+        }
 
         case FALL_STATE::FALLING:
-            if (pMovement->Is_Grounded() == true)
+        {
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+
+            if (pMovement->Is_Grounded() == false)
+                break;
+
+            if (pKirby->Has_Deform())
             {
-                if (pKirby->Has_Deform())
-                {
-                    pKirby->Get_KirbyDeform()->Play_DeformAni(pKirby, DEFORM_ANI::LANDING);
-                }
-                else
-                {
-                    pKirby->Get_KirbyAbility()->Play_AbilityAni(pKirby, ABILITY_ANI::LANDING);
-
-                    if (pKirby->Get_Body()->Get_KirbyBody() != KIRBY_BODY_STATE::STUFFED)
-                        pKirby_Body->Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);
-                }
-
-                Change_FallState(FALL_STATE::LAND_START);
+                pKirby->Get_KirbyDeform()->Play_DeformAni(pKirby, DEFORM_ANI::LANDING);
             }
+            else
+            {
+                pKirby->Get_KirbyAbility()->Play_AbilityAni(pKirby, ABILITY_ANI::LANDING);
+
+                CKirby_Body* pKirby_Body = pKirby->Get_Body();
+                if (pKirby->Get_Body()->Get_KirbyBody() != KIRBY_BODY_STATE::STUFFED)
+                    pKirby_Body->Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);
+            }
+
+            Change_FallState(FALL_STATE::LAND_START);
+            
             break;
+        }
     }
 }
 
