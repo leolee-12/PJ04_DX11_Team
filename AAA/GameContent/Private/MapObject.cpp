@@ -30,6 +30,17 @@ HRESULT CMapObject::Initialize(void* pArg)
 	return S_OK;
 }
 
+HRESULT CMapObject::Validate_Initialized()
+{
+	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom)
+		return E_FAIL;
+
+	if (nullptr == m_pShaderCom || nullptr == m_pModelCom)
+		return E_FAIL;
+
+	return S_OK;
+}
+
 void CMapObject::Priority_Update(_float fTimeDelta) {}
 void CMapObject::Update(_float fTimeDelta) {}
 

@@ -828,8 +828,8 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Ladder">
       <UniqueIdentifier>{3c116748-f8e5-401b-b934-04a16a0781f3}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion">
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion">
       <UniqueIdentifier>{485a73df-26e0-4a27-a49d-295d417d941b}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\16. Common_SphereNoise">
@@ -1674,7 +1674,7 @@
     <ClInclude Include="..\Public\MapSection.h">
       <Filter>00. GameObject\01. Map\Section</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\MapBreakSection.h">
+    <ClInclude Include="..\Public\MapEvent_BreakWall.h">
       <Filter>00. GameObject\01. Map\Section</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Star2DParticle.h">
@@ -1703,8 +1703,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Ladder.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Ladder</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\BombExplosion.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\BombExplosion.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Common_SphereNoise.h">
@@ -2462,7 +2462,7 @@
     <ClCompile Include="..\Private\MapSection.cpp">
       <Filter>00. GameObject\01. Map\Section</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\MapBreakSection.cpp">
+    <ClCompile Include="..\Private\MapEvent_BreakWall.cpp">
       <Filter>00. GameObject\01. Map\Section</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Star2DParticle.cpp">
@@ -2491,8 +2491,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ladder.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Ladder</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\BombExplosion.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\BombExplosion.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Common_SphereNoise.cpp">

@@ -5,7 +5,7 @@
 #include "Map_ModelResolver.h"
 #include "Map_ProtoRegister.h"
 #include "Map_Spawner.h"
-#include "MapBreakSection.h"
+#include "MapEvent_BreakWall.h"
 #include "GameContent_Log.h"
 #include "LevelDesign_Loader.h"
 
@@ -78,14 +78,14 @@ namespace
 	_bool Is_MapLayerInternal(const _wstring& strLayerTag)
 	{
 		return strLayerTag == kLayerMapStage
-			|| strLayerTag == CMapBreakSection::LAYER_TAG
+			|| strLayerTag == CMapEvent_BreakWall::LAYER_TAG
 			|| Is_EnvLayerInternal(strLayerTag);
 	}
 
 	_bool Is_MapStageLayerInternal(const _wstring& strLayerTag)
 	{
 		return strLayerTag == kLayerMapStage
-			|| strLayerTag == CMapBreakSection::LAYER_TAG;
+			|| strLayerTag == CMapEvent_BreakWall::LAYER_TAG;
 	}
 
 	string To_LogPath(const path& FilePath)

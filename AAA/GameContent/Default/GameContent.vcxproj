@@ -87,7 +87,7 @@
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h" />
     <ClInclude Include="..\public\LDInhalable.h" />
     <ClInclude Include="..\Public\LevelDesign_MonsterCatalog.h" />
-    <ClInclude Include="..\Public\MapBreakSection.h" />
+    <ClInclude Include="..\Public\MapEvent_BreakWall.h" />
     <ClInclude Include="..\Public\PoppyBrosJr_State_WindUp.h" />
     <ClInclude Include="..\public\RockBounce.h" />
     <ClInclude Include="..\public\RockBurst.h" />
@@ -378,7 +378,7 @@
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp" />
     <ClCompile Include="..\private\LDInhalable.cpp" />
     <ClCompile Include="..\Private\LevelDesign_MonsterCatalog.cpp" />
-    <ClCompile Include="..\Private\MapBreakSection.cpp" />
+    <ClCompile Include="..\Private\MapEvent_BreakWall.cpp" />
     <ClCompile Include="..\Private\PoppyBrosJr_State_WindUp.cpp" />
     <ClCompile Include="..\private\RockBounce.cpp" />
     <ClCompile Include="..\private\RockBurst.cpp" />

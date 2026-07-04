@@ -555,6 +555,8 @@ _bool CLevel_Edit::Commit_MapEditObjectFromCurrentState(CGameObject* pObject)
 
 	if (CEnvObject* pEnvObject = dynamic_cast<CEnvObject*>(pObject))
 	{
+		if (FAILED(pEnvObject->Refresh()))
+			return false;
 		if (m_pMapPreviewSession->Is_AddedObject(pObject))
 			return true;
 		if (!m_pMapPreviewSession->Can_DeleteAsEnvOverride(pObject))
@@ -622,16 +624,7 @@ HRESULT CLevel_Edit::Save_MapOverride()
 	if (nullptr == m_pMapPreviewSession)
 		return E_FAIL;
 
-	if (nullptr != m_pMapStage)
-	{
-		for (CMapSection* pSection : m_pMapStage->Get_Sections())
-		{
-			if (nullptr == pSection)
-				continue;
-
-			Commit_MapEditObjectFromCurrentState(pSection);
-		}
-	}
+	Commit_MapEditObjectFromCurrentState(m_pSelected);
 
 	const MAP_EDIT_DATA MapContentDesc = m_pMapPreviewSession->Build_EditDataSnapShot();
 

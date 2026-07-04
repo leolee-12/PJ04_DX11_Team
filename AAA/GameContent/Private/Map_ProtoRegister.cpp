@@ -6,7 +6,7 @@
 #include "EnvTrigger_RenderGlobals.h"
 #include "EnvTrigger_EventPublisher.h"
 #include "MapSection.h"
-#include "MapBreakSection.h"
+#include "MapEvent_BreakWall.h"
 #include "MapStage.h"
 #include "GameObject_Factory.h"
 
@@ -65,12 +65,12 @@ HRESULT CMap_ProtoRegister::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, c
 			return E_FAIL;
 	}
 
-	if (Package.StageDesc.strStageName == CMapBreakSection::STAGE12_STAGE_NAME)
+	if (Package.StageDesc.strStageName == CMapEvent_BreakWall::STAGE12_STAGE_NAME)
 	{
 		MAP_SECTION_DESC Desc{};
-		Desc.strSectionName = CMapBreakSection::STAGE12_SECTION_NAME;
-		Desc.wstrModelProtoTag = CMapBreakSection::STAGE12_MODEL_PROTO_TAG;
-		Desc.wstrModelPath = CMapBreakSection::STAGE12_MODEL_PATH;
+		Desc.strSectionName = CMapEvent_BreakWall::STAGE12_SECTION_NAME;
+		Desc.wstrModelProtoTag = CMapEvent_BreakWall::STAGE12_MODEL_PROTO_TAG;
+		Desc.wstrModelPath = CMapEvent_BreakWall::STAGE12_MODEL_PATH;
 		Desc.iModelProtoLevel = Levels.iStageModelLevel;
 
 		if (FAILED(Ready_MapSectionModel(Levels.iStageModelLevel, Desc)))
@@ -209,7 +209,7 @@ HRESULT CMap_ProtoRegister::Ready_ObjectPrototypes(_uint iObjectLevel)
 		m_pContext))))
 		return E_FAIL;
 
-	if (FAILED(EnsurePrototype(CMapBreakSection::PROTOTYPE_TAG, CMapBreakSection::Create(m_pDevice, m_pContext))))
+	if (FAILED(EnsurePrototype(CMapEvent_BreakWall::PROTOTYPE_TAG, CMapEvent_BreakWall::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	if (FAILED(EnsurePrototype(CMapStage::PROTOTYPE_TAG, CMapStage::Create(m_pDevice, m_pContext))))

@@ -33,11 +33,6 @@ namespace
 
 		return BoundingBox(vCenter, vExtents);
 	}
-
-	void Log_MapSectionWarning(const string& strMessage)
-	{
-		OutputDebugStringA((strMessage + "\n").c_str());
-	}
 }
 
 CMapSection::CMapSection(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -47,7 +42,6 @@ CMapSection::CMapSection(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 CMapSection::CMapSection(const CMapSection& Prototype)
 	: CMapObject(Prototype)
-	, m_strProtoTag { Prototype.m_strProtoTag }
 {
 }
 
@@ -66,7 +60,6 @@ HRESULT CMapSection::Initialize(void* pArg)
 
 	m_strSectionName = pDesc->strSectionName;
 	m_strModelProtoTag = pDesc->wstrModelProtoTag;
-	m_strModelPath = pDesc->wstrModelPath;
 	m_iModelProtoLevel = pDesc->iModelProtoLevel;
 	m_eSectionType = pDesc->eSectionType;
 	m_eRenderID = pDesc->eRenderID;
@@ -81,6 +74,24 @@ HRESULT CMapSection::Initialize(void* pArg)
 	Update_LocalBounds();
 	Refresh_WorldBounds();
 	Refresh_ColliderActor();
+
+	if (FAILED(Validate_Initialized()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMapSection::Validate_Initialized()
+{
+	if (FAILED(__super::Validate_Initialized()))
+		return E_FAIL;
+
+	if (m_strSectionName.empty() || m_strModelProtoTag.empty())
+		return E_FAIL;
+	if (ETOUI(m_eSectionType) >= MAP_SECTION_TYPE_COUNT)
+		return E_FAIL;
+	if (ETOUI(m_eRenderID) >= ETOUI(RENDERID::END))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -122,7 +133,7 @@ void CMapSection::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	if (nullptr == pOutData)
 		return;
 
-	pOutData->strPrototypeTag = m_strProtoTag;
+	pOutData->strPrototypeTag = PROTOTYPE_TAG;
 }
 
 void CMapSection::Refresh_WorldBounds()
@@ -139,9 +150,6 @@ void CMapSection::Set_ParentMatrix(const _float4x4* pParentMatrix)
 
 void CMapSection::Refresh_CombinedWorldMatrix()
 {
-	if (nullptr == m_pTransformCom)
-		return;
-
 	_matrix CombinedWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
 	if (nullptr != m_pParentMatrix)
 		CombinedWorld *= XMLoadFloat4x4(m_pParentMatrix);
@@ -156,15 +164,6 @@ void CMapSection::Notify_EditTransformChanged()
 	Refresh_CombinedWorldMatrix();
 }
 
-void CMapSection::Set_RuntimeCollisionActorEnabled(_bool bEnable)
-{
-	if (m_bCreateCollisionActor == bEnable)
-		return;
-
-	m_bCreateCollisionActor = bEnable;
-	Refresh_ColliderActor();
-}
-
 #ifdef _DEBUG
 void CMapSection::Reset_FrameProfile()
 {
@@ -174,14 +173,7 @@ void CMapSection::Reset_FrameProfile()
 
 void CMapSection::Set_EditorSoloMeshIndex(_int iMeshIndex)
 {
-	if (nullptr == m_pModelCom)
-	{
-		m_iEditorSoloMeshIndex = -1;
-		return;
-	}
-
-	const _int iNumMeshes =
-		static_cast<_int>(m_pModelCom->Get_NumMeshes());
+	const _int iNumMeshes = static_cast<_int>(m_pModelCom->Get_NumMeshes());
 
 	if (iMeshIndex < 0 || iMeshIndex >= iNumMeshes)
 	{
@@ -225,8 +217,25 @@ void CMapSection::Deserialize_SectionState(const json& j)
 		const json& jRender = j["SectionRender"];
 
 		if (jRender.contains("RenderID") && jRender["RenderID"].is_number_integer())
-			m_eRenderID = static_cast<RENDERID>(jRender["RenderID"].get<_int>());
+			Set_RenderID(static_cast<RENDERID>(jRender["RenderID"].get<_int>()));
 	}
+}
+
+void CMapSection::Set_RenderID(RENDERID eRenderID)
+{
+	if (ETOUI(eRenderID) >= ETOUI(RENDERID::END))
+		return;
+
+	m_eRenderID = eRenderID;
+}
+
+void CMapSection::Set_CollisionActorEnabled(_bool bEnable)
+{
+	if (m_bCreateCollisionActor == bEnable)
+		return;
+
+	m_bCreateCollisionActor = bEnable;
+	Refresh_ColliderActor();
 }
 
 const _tchar* CMapSection::Get_ModelProtoTag() const
@@ -246,12 +255,6 @@ HRESULT CMapSection::Bind_WorldMatrix()
 
 void CMapSection::Update_LocalBounds()
 {
-	if (nullptr == m_pModelCom)
-	{
-		m_LocalBounds = Make_DefaultAABB();
-		return;
-	}
-
 	_float3 vMin{}, vMax{};
 	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
 
@@ -273,9 +276,6 @@ void CMapSection::Refresh_ColliderActor()
 	}
 
 	if (!m_bCreateCollisionActor)
-		return;
-
-	if (nullptr == m_pModelCom)
 		return;
 
 	if (nullptr == m_pModelCom->Get_CollisionMesh())
@@ -314,13 +314,13 @@ CGameObject* CMapSection::Clone(void* pArg)
 
 void CMapSection::Free()
 {
-	__super::Free();
-
 	if (m_pColliderActor)
 	{ 
 		m_pGameInstance_Proxy->Remove_StaticActor(m_pColliderActor);
 		m_pColliderActor = nullptr;
 	}
+
+	__super::Free();
 }
 
 NS_END
