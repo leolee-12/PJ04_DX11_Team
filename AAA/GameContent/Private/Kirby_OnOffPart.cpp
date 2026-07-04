@@ -8,7 +8,8 @@ CKirby_OnOffPart::CKirby_OnOffPart(ID3D11Device* pDevice, ID3D11DeviceContext* p
 }
 
 CKirby_OnOffPart::CKirby_OnOffPart(const CKirby_OnOffPart& Prototype)
-    : CPartObject(Prototype) {
+    : CPartObject(Prototype)
+{
 }
 
 HRESULT CKirby_OnOffPart::Initialize_Prototype()
@@ -57,15 +58,13 @@ void CKirby_OnOffPart::Late_Update(_float fTimeDelta)
         matLocalWorld = matLocalWorld * XMLoadFloat4x4(m_pSocketBoneMatrix);
 
     Compute_CombinedWorldMatrix(matLocalWorld);
+
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
 
 HRESULT CKirby_OnOffPart::Render_Shadow()
 {
-    if (m_pModelCom == nullptr)
-        return S_OK;
-    
     if(FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
         return E_FAIL;
 
@@ -83,8 +82,14 @@ HRESULT CKirby_OnOffPart::Render_Shadow()
             if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
                 return E_FAIL;
         }
+        else
+        {
+            // Animator가 없으면 Shadow Render에 문제 생길 수 있음. 뼈 행렬
+            MSG_BOX("m_pAnimatorCom is nullptr: Kirby_OnOffPart");
+            return E_FAIL;
+        }
 
-        if (FAILED(m_pShaderCom->Begin(ETOUI(KIRBY_SHADER_PASS::SHADOW))))
+        if (FAILED(m_pShaderCom->Begin(ETOUI(KIRBY_SHADER_PASS::ANIM_SHADOW))))
             return E_FAIL;
 
         m_pModelCom->Render(i);
@@ -129,12 +134,13 @@ HRESULT CKirby_OnOffPart::Bind_ShaderResources()
         return E_FAIL;
 
     const _float fIntensity = m_pHitFlashIntensity ? *m_pHitFlashIntensity : 0.f;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fHitFlash", &fIntensity, sizeof(_float))))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fHitFlash", &fIntensity, sizeof(fIntensity))))
         return E_FAIL;
 
     const _float3 vColor = m_pHitFlashColor ? *m_pHitFlashColor : _float3(1.f, 1.f, 1.f);
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vHitFlashColor", &vColor, sizeof(_float3))))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vHitFlashColor", &vColor, sizeof(vColor))))
         return E_FAIL;
+
     return S_OK;
 }
 

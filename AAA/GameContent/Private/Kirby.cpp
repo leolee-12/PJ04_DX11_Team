@@ -513,7 +513,7 @@ HRESULT CKirby::Ready_PartObjects()
     // Body
     CKirby_Body::KIRBY_BODY_DESC BodyDesc{};
     BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-    BodyDesc.pHitFlash = Get_HitFlashPtr();       
+    BodyDesc.pHitFlashIntensity = Get_HitFlashPtr();       
     BodyDesc.pHitFlashColor = Get_HitFlashColorPtr();
 
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_Body::PROTOTYPE_TAG, CKirby_Body::Kirby_PartTag, &BodyDesc)))
@@ -524,7 +524,7 @@ HRESULT CKirby::Ready_PartObjects()
     // DeformCar_Demo
     CKirby_DeformCar_Demo::KIRBY_DEFORMCAR_DEMO_DESC DeformCar_Demo_Desc{};
     DeformCar_Demo_Desc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-    DeformCar_Demo_Desc.pHitFlash = Get_HitFlashPtr();
+    DeformCar_Demo_Desc.pHitFlashIntensity = Get_HitFlashPtr();
     DeformCar_Demo_Desc.pHitFlashColor = Get_HitFlashColorPtr();
 
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_DeformCar_Demo::PROTOTYPE_TAG, CKirby_DeformCar_Demo::Kirby_PartTag, &DeformCar_Demo_Desc)))
@@ -533,7 +533,7 @@ HRESULT CKirby::Ready_PartObjects()
     // DeformCar_Main
     CKirby_DeformCar_Main::KIRBY_DEFORMCAR_MAIN_DESC DeformCar_Main_Desc{};
     DeformCar_Main_Desc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-    DeformCar_Main_Desc.pHitFlash = Get_HitFlashPtr();
+    DeformCar_Main_Desc.pHitFlashIntensity = Get_HitFlashPtr();
     DeformCar_Main_Desc.pHitFlashColor = Get_HitFlashColorPtr();
 
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_DeformCar_Main::PROTOTYPE_TAG, CKirby_DeformCar_Main::Kirby_PartTag, &DeformCar_Main_Desc)))

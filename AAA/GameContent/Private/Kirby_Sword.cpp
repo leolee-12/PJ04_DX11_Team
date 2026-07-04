@@ -77,7 +77,7 @@ HRESULT CKirby_Sword::Render()
             if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
                 return E_FAIL;
 
-            iPassIndex = ETOUI(KIRBY_SHADER_PASS::PART);
+            iPassIndex = ETOUI(KIRBY_SHADER_PASS::ANIM_TEXTURED_PBR);
         }
         else
         {
@@ -93,7 +93,7 @@ HRESULT CKirby_Sword::Render()
             if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantEmissive", &vConstantEmissive, sizeof(_float4))))
                 return E_FAIL;
 
-            iPassIndex = ETOUI(KIRBY_SHADER_PASS::CONSTANT_PART);
+            iPassIndex = ETOUI(KIRBY_SHADER_PASS::ANIM_CONSTANT_PBR);
         }
 
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))

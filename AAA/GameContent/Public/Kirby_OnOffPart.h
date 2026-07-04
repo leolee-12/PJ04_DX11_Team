@@ -50,7 +50,7 @@ protected:
 	{
 		SHADER_DESC   tShaderDesc{};
 		const _tchar* szModelProtoTag{};
-		_bool         bCreateAnimator{};	// Animator가 없으면 Shadow Render에 문제 생길 수 있음.
+		_bool         bCreateAnimator{};
 		const _tchar* szAnimEventFile{};
 	};
 
