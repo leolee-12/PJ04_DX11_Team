@@ -47,6 +47,8 @@ void CBossNamePlate::Activate()
     m_eState = EState::Hold;
     m_fTimer = 0.f;
     m_fDissolve = 0.f;
+
+    m_pGameInstance_Proxy->Play_SFX(L"CharaBossBasic_DemoFlash.wav", 1.f, ESoundBus::UI);
 }
 
 void CBossNamePlate::Update(_float fTimeDelta)
