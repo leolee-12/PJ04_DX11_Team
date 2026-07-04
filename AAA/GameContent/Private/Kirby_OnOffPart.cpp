@@ -2,10 +2,6 @@
 
 #include "GameInstance.h"
 
-#include "GameContent_const.h"
-
-#include "Animator.h"
-
 CKirby_OnOffPart::CKirby_OnOffPart(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPartObject(pDevice, pContext)
 {
@@ -23,25 +19,22 @@ HRESULT CKirby_OnOffPart::Initialize_Prototype()
 
 HRESULT CKirby_OnOffPart::Initialize(void* pArg)
 {
-    if (auto pDesc = static_cast<KIRBY_ONONFFPART_DESC*>(pArg))
+    if (pArg == nullptr)
     {
-        m_pSocketBoneMatrix = pDesc->pSocketBoneMatrix;
-        m_pHitFlash = pDesc->pHitFlash;
-        m_pHitFlashColor = pDesc->pHitFlashColor;
+        MSG_BOX("pArg is nullptr: Kirby_OnOffPart");
+        return E_FAIL;
     }
+
+    KIRBY_ONONFFPART_DESC* pDesc = static_cast<KIRBY_ONONFFPART_DESC*>(pArg);
+
+    m_pSocketBoneMatrix = pDesc->pSocketBoneMatrix;
+    m_pHitFlashIntensity = pDesc->pHitFlashIntensity;
+    m_pHitFlashColor = pDesc->pHitFlashColor;
 
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
-    m_iShadowPass = 3;
-
     return S_OK;
-}
-
-void CKirby_OnOffPart::Priority_Update(_float fTimeDelta)
-{
-    if (!m_bOn)
-        return;
 }
 
 void CKirby_OnOffPart::Update(_float fTimeDelta)
@@ -58,58 +51,66 @@ void CKirby_OnOffPart::Late_Update(_float fTimeDelta)
     if (!m_bOn)
         return;
 
-    _matrix LocalWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
-    if (m_pSocketBoneMatrix)                          
-        LocalWorld = LocalWorld * XMLoadFloat4x4(m_pSocketBoneMatrix);
+    _matrix matLocalWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
 
-    Compute_CombinedWorldMatrix(LocalWorld);          
+    if (m_pSocketBoneMatrix)                          
+        matLocalWorld = matLocalWorld * XMLoadFloat4x4(m_pSocketBoneMatrix);
+
+    Compute_CombinedWorldMatrix(matLocalWorld);
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
 
-HRESULT CKirby_OnOffPart::Render()
-{
-    return S_OK;
-}
-
 HRESULT CKirby_OnOffPart::Render_Shadow()
 {
-    if (!m_bOn || m_iShadowPass < 0 || nullptr == m_pModelCom)
+    if (m_pModelCom == nullptr)
         return S_OK;
+    
+    if(FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
+        return E_FAIL;
 
-    m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix);
-    m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW));
-    m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ));
+    if(FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
+        return E_FAIL;
 
-    const _uint iNumMeshes = (_uint)m_pModelCom->Get_NumMeshes();
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
+        return E_FAIL;
+
+    const size_t iNumMeshes = m_pModelCom->Get_NumMeshes();
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
         if (m_pAnimatorCom)
-            m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
-        if (FAILED(m_pShaderCom->Begin(m_iShadowPass)))
+        {
+            if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+                return E_FAIL;
+        }
+
+        if (FAILED(m_pShaderCom->Begin(ETOUI(KIRBY_SHADER_PASS::SHADOW))))
             return E_FAIL;
+
         m_pModelCom->Render(i);
     }
+
     return S_OK;
 }
 
-HRESULT CKirby_OnOffPart::Ready_MeshPart(const PART_SETUP& t)
+HRESULT CKirby_OnOffPart::Ready_PartComponents(const KIRBY_PART_COMPONENT_DESC가& tDesc)
 {
-    m_pShaderCom = Add_Component<CShader>(t.tShader.iLevelID, t.tShader.szProtoTag, TEXT("Com_Shader"));
-    if (nullptr == m_pShaderCom) return E_FAIL;
+    m_pShaderCom = Add_Component<CShader>(tDesc.tShaderDesc.iLevelID, tDesc.tShaderDesc.szProtoTag, TEXT("Com_Shader"));
+    if (m_pShaderCom == nullptr)
+        return E_FAIL;
 
-    m_pModelCom = Add_Component<CModel>(m_iPrototypeLevel, t.szModelProtoTag, TEXT("Com_Model"));
-    if (nullptr == m_pModelCom)  return E_FAIL;
+    m_pModelCom = Add_Component<CModel>(m_iPrototypeLevel, tDesc.szModelProtoTag, TEXT("Com_Model"));
+    if (m_pModelCom == nullptr)  
+        return E_FAIL;
 
-    // 애니메이터 생성 여부는 오직 bAnimated 로만 결정 (경로와 무관)
-    if (t.bAnimated)
+    if (tDesc.bCreateAnimator)
     {
         CAnimator::ANIMATOR_DESC AnimDesc{};
         AnimDesc.pModel = m_pModelCom;
-        AnimDesc.strDataFile = t.szAnimEventFile ? t.szAnimEventFile : TEXT(""); // 경로는 옵션
+        AnimDesc.strDataFile = tDesc.szAnimEventFile ? tDesc.szAnimEventFile : TEXT("");
 
         m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
-        if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
+        if (m_pAnimatorCom == nullptr || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
             return E_FAIL;
     }
 
@@ -123,15 +124,16 @@ HRESULT CKirby_OnOffPart::Bind_ShaderResources()
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
         return E_FAIL;
+
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
         return E_FAIL;
 
-    // 피격 플래시
-    _float  fFlash = m_pHitFlash ? *m_pHitFlash : 0.f;
-    _float3 vFlashCol = m_pHitFlashColor ? *m_pHitFlashColor : _float3(1.f, 1.f, 1.f);
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fHitFlash", &fFlash, sizeof(_float))))
+    const _float fIntensity = m_pHitFlashIntensity ? *m_pHitFlashIntensity : 0.f;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fHitFlash", &fIntensity, sizeof(_float))))
         return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vHitFlashColor", &vFlashCol, sizeof(_float3))))
+
+    const _float3 vColor = m_pHitFlashColor ? *m_pHitFlashColor : _float3(1.f, 1.f, 1.f);
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vHitFlashColor", &vColor, sizeof(_float3))))
         return E_FAIL;
     return S_OK;
 }

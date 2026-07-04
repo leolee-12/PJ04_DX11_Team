@@ -544,7 +544,7 @@ HRESULT CKirby::Ready_PartObjects()
     CKirby_Sword::KIRBY_SWORD_DESC SwordDesc{};
     SwordDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     SwordDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("RHaveL");
-    SwordDesc.pHitFlash = Get_HitFlashPtr();
+    SwordDesc.pHitFlashIntensity = Get_HitFlashPtr();
     SwordDesc.pHitFlashColor = Get_HitFlashColorPtr();
 
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_Sword::PROTOTYPE_TAG, CKirby_Sword::Kirby_PartTag, &SwordDesc)))
@@ -554,7 +554,7 @@ HRESULT CKirby::Ready_PartObjects()
     CKirby_SwordHat::KIRBY_SWORDHAT_DESC SwordHatDesc{};
     SwordHatDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     SwordHatDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("HatL");
-    SwordHatDesc.pHitFlash = Get_HitFlashPtr();
+    SwordHatDesc.pHitFlashIntensity = Get_HitFlashPtr();
     SwordHatDesc.pHitFlashColor = Get_HitFlashColorPtr();
 
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_SwordHat::PROTOTYPE_TAG, CKirby_SwordHat::Kirby_PartTag, &SwordHatDesc)))

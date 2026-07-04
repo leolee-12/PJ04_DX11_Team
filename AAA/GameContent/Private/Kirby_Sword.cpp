@@ -2,10 +2,6 @@
 
 #include "GameInstance.h"
 
-#include "GameContent_const.h"
-
-#include "Animator.h"
-
 #include "Damageable.h"
 
 CKirby_Sword::CKirby_Sword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -43,10 +39,10 @@ HRESULT CKirby_Sword::Initialize(void* pArg)
 
 void CKirby_Sword::Late_Update(_float fTimeDelta)
 {
-    if (m_bOn == false)
-        return;
-
     __super::Late_Update(fTimeDelta);
+
+    if (!m_bOn)
+        return;
 
     if (m_pHitBox && m_pHitBox->Is_Enabled())
     {
@@ -62,13 +58,15 @@ HRESULT CKirby_Sword::Render()
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
 
-    size_t iNumMeshes = m_pModelCom->Get_NumMeshes();
+    const size_t iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+    static constexpr _uint iJewelMeshIndex = 1;
 
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
-        _uint iPassIdx{};
+        _uint iPassIndex{};
 
-        if (i != 1) {
+        if (i != iJewelMeshIndex) {
 
             if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
                 return E_FAIL;
@@ -79,21 +77,29 @@ HRESULT CKirby_Sword::Render()
             if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
                 return E_FAIL;
 
-            iPassIdx = 1;
+            iPassIndex = ETOUI(KIRBY_SHADER_PASS::PART);
         }
         else
         {
-            m_pShaderCom->Bind_RawValue("g_vConstantDiffuse",   &m_vConstantDiffuse, sizeof(_float4));
-            m_pShaderCom->Bind_RawValue("g_vConstantMRA",       &m_vConstantMRA, sizeof(_float3));
-            m_pShaderCom->Bind_RawValue("g_vConstantEmissive",  &m_vConstantEmissive, sizeof(_float4));
+            static constexpr _float4 vConstantDiffuse = { 1.f, 0.72f, 0.08f, 1.f };
+            if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantDiffuse", &vConstantDiffuse, sizeof(_float4))))
+                return E_FAIL;
 
-            iPassIdx = 2;
+            static constexpr _float3 vConstantMRA = { 0.25f, 0.18f, 1.f };
+            if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantMRA", &vConstantMRA, sizeof(_float3))))
+                return E_FAIL;
+
+            static constexpr _float4 vConstantEmissive = { 0.05f, 0.025f, 0.f, 1.f };
+            if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantEmissive", &vConstantEmissive, sizeof(_float4))))
+                return E_FAIL;
+
+            iPassIndex = ETOUI(KIRBY_SHADER_PASS::CONSTANT_PART);
         }
 
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Begin(iPassIdx)))
+        if (FAILED(m_pShaderCom->Begin(iPassIndex)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render(i)))
@@ -111,11 +117,15 @@ void CKirby_Sword::Set_HitBox(_bool bOn)
 
 HRESULT CKirby_Sword::Ready_Components()
 {
-    PART_SETUP t{};
-    t.tShader = Shader_Kirby;
-    t.szModelProtoTag = TEXT("Prototype_Component_Model_Sword");
-    t.bAnimated = true;
-    return Ready_MeshPart(t);
+    KIRBY_PART_COMPONENT_DESC°¡ tDesc{};
+    tDesc.tShaderDesc = Shader_Kirby;
+    tDesc.szModelProtoTag = TEXT("Prototype_Component_Model_Sword");
+    tDesc.bCreateAnimator = true;
+
+    if (FAILED(Ready_PartComponents(tDesc)))
+        return E_FAIL;
+
+    return S_OK;
 }
 
 HRESULT CKirby_Sword::Ready_HitBox()

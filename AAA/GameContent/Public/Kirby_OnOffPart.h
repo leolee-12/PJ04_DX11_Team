@@ -1,7 +1,7 @@
 #pragma once
 
-#include "GameContent_Defines.h"
 #include "PartObject.h"
+
 #include "GameContent_const.h"
 
 NS_BEGIN(Engine)
@@ -19,9 +19,9 @@ class CKirby_OnOffPart abstract : public CPartObject
 public:
 	struct KIRBY_ONONFFPART_DESC : public CPartObject::PARTOBJECT_DESC
 	{
-		const _float4x4* pSocketBoneMatrix{ nullptr };
-		const _float* pHitFlash = { nullptr };
-		const _float3* pHitFlashColor = { nullptr };
+		const _float4x4* pSocketBoneMatrix{};
+		const _float* pHitFlashIntensity{};
+		const _float3* pHitFlashColor{};
 	};
 
 protected:
@@ -34,41 +34,39 @@ protected:
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
-	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
-	virtual HRESULT Render() override;
 	virtual HRESULT Render_Shadow() override;
 
 public:
-	virtual void PartOnOff(_bool bOn) { m_bOn = bOn; }
+	CAnimator* Get_Animator() { return m_pAnimatorCom; }
 
 	void Set_SocketBoneMatrix(const _float4x4* pSocketBoneMatrix) { m_pSocketBoneMatrix = pSocketBoneMatrix; }
 
+	void PartOnOff(_bool bOn) { m_bOn = bOn; }
+
 protected:
-	struct PART_SETUP
+	struct KIRBY_PART_COMPONENT_DESC가
 	{
-		SHADER_DESC   tShader;                       
-		const _tchar* szModelProtoTag = nullptr;
-		_bool         bAnimated = true;              // 애니 파츠 여부의 단일 기준(정적이면 false)
-		const _tchar* szAnimEventFile = nullptr;     // 옵션: 이벤트 트랙 json 경로(생성 여부엔 무관)
+		SHADER_DESC   tShaderDesc{};
+		const _tchar* szModelProtoTag{};
+		_bool         bCreateAnimator{};	// Animator가 없으면 Shadow Render에 문제 생길 수 있음.
+		const _tchar* szAnimEventFile{};
 	};
 
 	CShader* m_pShaderCom{};
-	CModel* m_pModelCom = { nullptr };
-	CAnimator* m_pAnimatorCom = { nullptr };
+	CModel* m_pModelCom{};
+	CAnimator* m_pAnimatorCom{};
 
-	const _float4x4* m_pSocketBoneMatrix{ nullptr };
+	const _float4x4* m_pSocketBoneMatrix{};
 
-	const _float* m_pHitFlash = { nullptr };
-	const _float3* m_pHitFlashColor = { nullptr };
-
-	_int	m_iShadowPass = { -1 };
+	const _float* m_pHitFlashIntensity{};
+	const _float3* m_pHitFlashColor{};
 
 	_bool m_bOn{};
 
 protected:
-	HRESULT Ready_MeshPart(const PART_SETUP& tSetup);
+	HRESULT Ready_PartComponents(const KIRBY_PART_COMPONENT_DESC가& tDesc);
 	HRESULT Bind_ShaderResources();
 
 protected:

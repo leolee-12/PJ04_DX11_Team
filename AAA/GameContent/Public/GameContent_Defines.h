@@ -15,6 +15,7 @@ namespace Client
 
 	enum class VTXTEX_SHADER { DEFAULT, ALPHABLEND };
 
+	enum class KIRBY_SHADER_PASS { KIRBY, PART, CONSTANT_PART, SHADOW };
 	enum class COPY_ABILITY_TYPE { NONE, NORMAL, SWORD, BOMB };
 	enum class DEFORM_TYPE { NONE, CAR };
 

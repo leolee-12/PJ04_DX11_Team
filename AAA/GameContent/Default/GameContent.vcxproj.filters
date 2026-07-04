@@ -238,18 +238,6 @@
     <Filter Include="00. GameObject\05. Kirby\02. Kirby_Ability\01. Kirby_Ability_Sword">
       <UniqueIdentifier>{fcd6a4fd-d852-4910-bb95-c63423f00f06}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts">
-      <UniqueIdentifier>{ce8838df-6dca-44f5-99b6-21707344efd7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts">
-      <UniqueIdentifier>{8c7ca4c1-aab7-415a-8406-92a604372a55}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\00. Sword">
-      <UniqueIdentifier>{a70f7f84-5af6-4248-aa3c-e98abf86eb57}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat">
-      <UniqueIdentifier>{d12eb026-e157-4495-859c-6ae236366e96}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\06. Monster">
       <UniqueIdentifier>{c69f6e1f-9250-40fa-90bd-8d408e832ff0}</UniqueIdentifier>
     </Filter>
@@ -688,26 +676,8 @@
     <Filter Include="02. Component\01. Monster_Movement\00. Rail">
       <UniqueIdentifier>{bc260f59-12f2-4b10-855a-455fabc6411e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\04. Kirby_Deform">
-      <UniqueIdentifier>{f560c2aa-8eeb-4595-83ed-635fdbd73ecd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\04. Kirby_Deform\Deform_Car">
-      <UniqueIdentifier>{b600ded8-bf65-4554-b846-776c35549114}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Form">
-      <UniqueIdentifier>{ebb46de8-d6ad-448c-8168-0c70ffe30019}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Form\00. Body">
-      <UniqueIdentifier>{81d949c1-1101-4e64-aa3f-d769238287d9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Form\02. DeformCar_Main">
-      <UniqueIdentifier>{30e6faec-8ca3-4f51-a179-3a72f1929f83}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\GetDeform">
       <UniqueIdentifier>{a75ad0b3-6c7f-486d-9311-5d2ca1cda8e5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Form\01. DeformCar_Demo">
-      <UniqueIdentifier>{bf99796d-3273-432e-a337-ddc43bb3ee3e}</UniqueIdentifier>
     </Filter>
     <Filter Include="01. Projectile\00. PhysicsProjectile\01. Bomb">
       <UniqueIdentifier>{a7cbb794-7713-433a-905e-5aad935b8cd9}</UniqueIdentifier>
@@ -828,8 +798,8 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Ladder">
       <UniqueIdentifier>{3c116748-f8e5-401b-b934-04a16a0781f3}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion">
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion">
       <UniqueIdentifier>{485a73df-26e0-4a27-a49d-295d417d941b}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\16. Common_SphereNoise">
@@ -870,6 +840,36 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\14. Star\Emitter">
       <UniqueIdentifier>{2a99a782-1b06-4ca2-bcec-3900ae1eb0e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Kirby_Deform">
+      <UniqueIdentifier>{f560c2aa-8eeb-4595-83ed-635fdbd73ecd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Kirby_Deform\Deform_Car">
+      <UniqueIdentifier>{b600ded8-bf65-4554-b846-776c35549114}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\04. Parts">
+      <UniqueIdentifier>{ce8838df-6dca-44f5-99b6-21707344efd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\04. Parts\KirbyOnOffParts">
+      <UniqueIdentifier>{8c7ca4c1-aab7-415a-8406-92a604372a55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\04. Parts\KirbyOnOffParts\00. Sword">
+      <UniqueIdentifier>{a70f7f84-5af6-4248-aa3c-e98abf86eb57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\04. Parts\KirbyOnOffParts\01. SwordHat">
+      <UniqueIdentifier>{d12eb026-e157-4495-859c-6ae236366e96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\04. Parts\Kirby_Form">
+      <UniqueIdentifier>{ebb46de8-d6ad-448c-8168-0c70ffe30019}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\04. Parts\Kirby_Form\00. Body">
+      <UniqueIdentifier>{81d949c1-1101-4e64-aa3f-d769238287d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\04. Parts\Kirby_Form\02. DeformCar_Main">
+      <UniqueIdentifier>{30e6faec-8ca3-4f51-a179-3a72f1929f83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\04. Parts\Kirby_Form\01. DeformCar_Demo">
+      <UniqueIdentifier>{bf99796d-3273-432e-a337-ddc43bb3ee3e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1138,16 +1138,16 @@
       <Filter>00. GameObject\02. EnvObject\Instance</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Body.h">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Form\00. Body</Filter>
+      <Filter>00. GameObject\05. Kirby\04. Parts\Kirby_Form\00. Body</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Sword.h">
-      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\00. Sword</Filter>
+      <Filter>00. GameObject\05. Kirby\04. Parts\KirbyOnOffParts\00. Sword</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_SwordHat.h">
-      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat</Filter>
+      <Filter>00. GameObject\05. Kirby\04. Parts\KirbyOnOffParts\01. SwordHat</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_OnOffPart.h">
-      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts</Filter>
+      <Filter>00. GameObject\05. Kirby\04. Parts\KirbyOnOffParts</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_GetAbility.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\GetAbility</Filter>
@@ -1570,19 +1570,19 @@
       <Filter>97. DataSystem</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Deform.h">
-      <Filter>00. GameObject\05. Kirby\04. Kirby_Deform</Filter>
+      <Filter>00. GameObject\05. Kirby\03. Kirby_Deform</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Deform_Car.h">
-      <Filter>00. GameObject\05. Kirby\04. Kirby_Deform\Deform_Car</Filter>
+      <Filter>00. GameObject\05. Kirby\03. Kirby_Deform\Deform_Car</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Deform_Model.h">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Form</Filter>
+      <Filter>00. GameObject\05. Kirby\04. Parts\Kirby_Form</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_DeformCar_Demo.h">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Form\01. DeformCar_Demo</Filter>
+      <Filter>00. GameObject\05. Kirby\04. Parts\Kirby_Form\01. DeformCar_Demo</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_DeformCar_Main.h">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Form\02. DeformCar_Main</Filter>
+      <Filter>00. GameObject\05. Kirby\04. Parts\Kirby_Form\02. DeformCar_Main</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_GetDeform.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\GetDeform</Filter>
@@ -1703,8 +1703,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Ladder.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Ladder</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\BombExplosion.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\BombExplosion.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Common_SphereNoise.h">
@@ -1947,16 +1947,16 @@
       <Filter>00. GameObject\02. EnvObject\Instance</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Body.cpp">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Form\00. Body</Filter>
+      <Filter>00. GameObject\05. Kirby\04. Parts\Kirby_Form\00. Body</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Sword.cpp">
-      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\00. Sword</Filter>
+      <Filter>00. GameObject\05. Kirby\04. Parts\KirbyOnOffParts\00. Sword</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_SwordHat.cpp">
-      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat</Filter>
+      <Filter>00. GameObject\05. Kirby\04. Parts\KirbyOnOffParts\01. SwordHat</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_OnOffPart.cpp">
-      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts</Filter>
+      <Filter>00. GameObject\05. Kirby\04. Parts\KirbyOnOffParts</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_GetAbility.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\GetAbility</Filter>
@@ -2358,19 +2358,19 @@
       <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb\KirbyBomb</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Deform.cpp">
-      <Filter>00. GameObject\05. Kirby\04. Kirby_Deform</Filter>
+      <Filter>00. GameObject\05. Kirby\03. Kirby_Deform</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Deform_Car.cpp">
-      <Filter>00. GameObject\05. Kirby\04. Kirby_Deform\Deform_Car</Filter>
+      <Filter>00. GameObject\05. Kirby\03. Kirby_Deform\Deform_Car</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_DeformCar_Demo.cpp">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Form\01. DeformCar_Demo</Filter>
+      <Filter>00. GameObject\05. Kirby\04. Parts\Kirby_Form\01. DeformCar_Demo</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_DeformCar_Main.cpp">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Form\02. DeformCar_Main</Filter>
+      <Filter>00. GameObject\05. Kirby\04. Parts\Kirby_Form\02. DeformCar_Main</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Deform_Model.cpp">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Form</Filter>
+      <Filter>00. GameObject\05. Kirby\04. Parts\Kirby_Form</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_GetDeform.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\GetDeform</Filter>
@@ -2491,8 +2491,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ladder.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Ladder</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\BombExplosion.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\BombExplosion.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Common_SphereNoise.cpp">
