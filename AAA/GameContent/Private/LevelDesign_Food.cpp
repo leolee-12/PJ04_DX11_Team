@@ -64,18 +64,45 @@ HRESULT CLevelDesign_Food::Initialize(void* pArg)
 	if (nullptr == pArg)
 		return E_FAIL;
 
+	m_tFoodDesc = *static_cast<const LD_FOOD_DESC*>(pArg);
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	m_tFoodDesc = *static_cast<const LD_FOOD_DESC*>(pArg);
-	
 	m_pTransformCom->Set_RotationPerSec(s_fFoodRotationPerSec);
-	m_pTransformCom->Set_State(STATE::POSITION, XMVectorAdd(m_pTransformCom->Get_State(STATE::POSITION), XMVectorSet(0.f, s_fFoodFloatHeight, 0.f, 0.f)));
-
-	if (FAILED(Validate_Desc()))
-		return E_FAIL;
+	m_pTransformCom->Set_State(STATE::POSITION,
+		XMVectorAdd(m_pTransformCom->Get_State(STATE::POSITION), XMVectorSet(0.f, s_fFoodFloatHeight, 0.f, 0.f)));
 
 	if (FAILED(Ready_Components()))
+		return E_FAIL;
+
+	if (FAILED(Validate_Initialized()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Food::Validate_Initialized()
+{
+	if (FAILED(__super::Validate_Initialized()))
+		return E_FAIL;
+
+	if (m_tFoodDesc.eCategory != LD_CATEGORY::FOOD)
+		return E_FAIL;
+	if (m_tFoodDesc.wstrModelProtoTag.empty())
+		return E_FAIL;
+	if (m_tFoodDesc.fHealAmount < 0.f)
+		return E_FAIL;
+
+	const LD_FOOD_CATALOG* pCatalog = Find_FoodCatalog(m_tFoodDesc.strObjectName);
+	if (nullptr == pCatalog)
+		return E_FAIL;
+	if (nullptr == pCatalog->pModelProtoTag || m_tFoodDesc.wstrModelProtoTag != pCatalog->pModelProtoTag)
+		return E_FAIL;
+
+	if (nullptr == m_pShaderCom || nullptr == m_pModelCom || nullptr == m_pPickupCollider)
+		return E_FAIL;
+	if (!m_bPickupColliderRegistered)
 		return E_FAIL;
 
 	return S_OK;
@@ -88,7 +115,7 @@ void CLevelDesign_Food::Late_Update(_float fTimeDelta)
 
 	m_pTransformCom->Turn(XMVector3Normalize(XMVectorSet(0.f, 1.f, 0.f, 0.f)), fTimeDelta);
 
-	if (m_pPickupCollider && m_pPickupCollider->Is_Enabled())
+	if (m_pPickupCollider->Is_Enabled())
 	{
 		m_pPickupCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 #ifdef _DEBUG
@@ -164,35 +191,32 @@ CGameObject* CLevelDesign_Food::Create_Prototype(ID3D11Device* pDevice, ID3D11De
 	return CLevelDesign_Food::Create(pDevice, pContext);
 }
 
-HRESULT CLevelDesign_Food::Validate_Desc()
-{
-	if (m_tFoodDesc.wstrModelProtoTag.empty())
-		return E_FAIL;
-
-	return S_OK;
-}
-
 HRESULT CLevelDesign_Food::Ready_Components()
 {
-	const _tchar* pModelProtoTag = Resolve_ModelProtoTag();
-	if (nullptr == pModelProtoTag)
-		return E_FAIL;
-
-	m_pShaderCom = Add_Component<CShader>(
-		Shader_NonAnimMesh_PBR.iLevelID,
-		Shader_NonAnimMesh_PBR.szProtoTag,
-		TEXT("Com_Shader"));
-	if (nullptr == m_pShaderCom)
-		return E_FAIL;
-
-	m_pModelCom = Add_Component<CModel>(m_tFoodDesc.iModelProtoLevel, pModelProtoTag, TEXT("Com_Model"));
-	if (nullptr == m_pModelCom)
+	if (FAILED(Ready_RenderComponents()))
 		return E_FAIL;
 
 	if (FAILED(Ready_PickupCollider()))
 		return E_FAIL;
 
 	SetUp_Collider_Callback();
+
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Food::Ready_RenderComponents()
+{
+	const _tchar* pModelProtoTag = Resolve_ModelProtoTag();
+	if (nullptr == pModelProtoTag)
+		return E_FAIL;
+
+	m_pShaderCom = Add_Component<CShader>(Shader_NonAnimMesh_PBR.iLevelID, Shader_NonAnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
+	if (nullptr == m_pShaderCom)
+		return E_FAIL;
+
+	m_pModelCom = Add_Component<CModel>(m_tFoodDesc.iModelProtoLevel, pModelProtoTag, TEXT("Com_Model"));
+	if (nullptr == m_pModelCom)
+		return E_FAIL;
 
 	return S_OK;
 }

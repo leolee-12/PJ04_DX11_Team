@@ -16,15 +16,15 @@ namespace
 		const _float fRadius;
 	};
 
-	static const LD_STARBLOCK_CATALOG g_BreakableCatalog[] =
+	static const LD_STARBLOCK_CATALOG g_StarblockCatalog[] =
 	{
 		{ L"StarBlock", CLevelDesign_Starblock::STARBLOCK_H1W1_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh", 0.5f },
 		{ L"StarBlockBig", CLevelDesign_Starblock::STARBLOCK_H3W3_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H3W3.ysh" , 1.5f },
 	};
 
-	static const LD_STARBLOCK_CATALOG* Find_BreakableCatalog(const _wstring& wstrObjName)
+	static const LD_STARBLOCK_CATALOG* Find_StarblockCatalog(const _wstring& wstrObjName)
 	{
-		for (const LD_STARBLOCK_CATALOG& Entry : g_BreakableCatalog)
+		for (const LD_STARBLOCK_CATALOG& Entry : g_StarblockCatalog)
 		{
 			if (JsonUtils::Equals_NoCase(Entry.pObjectName, wstrObjName.c_str()))
 				return &Entry;
@@ -33,7 +33,7 @@ namespace
 		return nullptr;
 	}
 
-	void Build_DefaultBreakableDesc(LD_BREAKABLE_DESC* pOutDesc)
+	void Build_DefaultStarblockDesc(LD_BREAKABLE_DESC* pOutDesc)
 	{
 		if (nullptr == pOutDesc)
 			return;
@@ -48,6 +48,7 @@ namespace
 		pOutDesc->strKind = L"Palette";
 
 		pOutDesc->eCategory = LD_CATEGORY::BREAKABLE;
+		pOutDesc->eModelType = MODEL::NONANIM;
 		pOutDesc->wstrModelProtoTag = CLevelDesign_Starblock::STARBLOCK_H1W1_MODEL_PROTO_TAG;
 
 		pOutDesc->fScale = 1.f;
@@ -65,12 +66,12 @@ namespace
 NS_BEGIN(Client)
 
 CLevelDesign_Starblock::CLevelDesign_Starblock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CLDInhalable(pDevice, pContext)
+	: CLD_Inhalable(pDevice, pContext)
 {
 }
 
 CLevelDesign_Starblock::CLevelDesign_Starblock(const CLevelDesign_Starblock& Prototype)
-	: CLDInhalable(Prototype)
+	: CLD_Inhalable(Prototype)
 	, m_tBreakableDesc(Prototype.m_tBreakableDesc)
 {
 }
@@ -82,20 +83,18 @@ HRESULT CLevelDesign_Starblock::Initialize_Prototype()
 
 HRESULT CLevelDesign_Starblock::Initialize(void* pArg)
 {
+	LD_BREAKABLE_DESC DefaultDesc{};
 	if (nullptr == pArg)
 	{
-		LD_BREAKABLE_DESC DefaultDesc{};
-		Build_DefaultBreakableDesc(&DefaultDesc);
-		m_tBreakableDesc = DefaultDesc;
-	}
-	else
-	{
-		m_tBreakableDesc = *static_cast<const LD_BREAKABLE_DESC*>(pArg);
-		if (FAILED(Validate_Desc()))
-			return E_FAIL;
+		Build_DefaultStarblockDesc(&DefaultDesc);
+		pArg = &DefaultDesc;
 	}
 
-	auto* pCatalog = Find_BreakableCatalog(m_tBreakableDesc.strObjectName);
+	m_tBreakableDesc = *static_cast<const LD_BREAKABLE_DESC*>(pArg);
+
+	const LD_STARBLOCK_CATALOG* pCatalog = Find_StarblockCatalog(m_tBreakableDesc.strObjectName);
+	if (nullptr == pCatalog)
+		return E_FAIL;
 
 	m_fColliderRadius = pCatalog->fRadius;
 
@@ -105,7 +104,32 @@ HRESULT CLevelDesign_Starblock::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	if (FAILED(Ready_PhysicsActor_Box()))
+	if (FAILED(Validate_Initialized()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Starblock::Validate_Initialized()
+{
+	if (FAILED(__super::Validate_Initialized()))
+		return E_FAIL;
+
+	if (nullptr == m_pShaderCom || nullptr == m_pModelCom || nullptr == m_pPhysicsActor)
+		return E_FAIL;
+
+	if (m_tBreakableDesc.eCategory != LD_CATEGORY::BREAKABLE)
+		return E_FAIL;
+	if (MODEL::NONANIM != m_tBreakableDesc.eModelType)
+		return E_FAIL;
+	if (m_tBreakableDesc.wstrModelProtoTag.empty())
+		return E_FAIL;
+
+	const LD_STARBLOCK_CATALOG* pCatalog = Find_StarblockCatalog(m_tBreakableDesc.strObjectName);
+	if (nullptr == pCatalog)
+		return E_FAIL;
+	if (nullptr == pCatalog->pModelProtoTag || m_tBreakableDesc.wstrModelProtoTag !=
+		pCatalog->pModelProtoTag)
 		return E_FAIL;
 
 	return S_OK;
@@ -117,17 +141,13 @@ void CLevelDesign_Starblock::Late_Update(_float fTimeDelta)
 		return;
 
 	__super::Late_Update(fTimeDelta);
-
-	if (nullptr != m_pModelCom)
-		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+	
+	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 
 HRESULT CLevelDesign_Starblock::Render()
 {
 	if (!m_bActive)
-		return S_OK;
-
-	if (nullptr == m_pModelCom || nullptr == m_pShaderCom)
 		return S_OK;
 
 	if (FAILED(Bind_ShaderResources()))
@@ -208,39 +228,41 @@ void CLevelDesign_Starblock::Be_Captured(CGameObject* pInhaler)
 }
 #pragma endregion
 
-HRESULT CLevelDesign_Starblock::Validate_Desc()
-{
-	if (m_tBreakableDesc.eCategory != LD_CATEGORY::BREAKABLE)
-		return E_FAIL;
-	if (m_tBreakableDesc.wstrModelProtoTag.empty())
-		return E_FAIL;
-
-	return S_OK;
-}
-
 HRESULT CLevelDesign_Starblock::Ready_Components()
 {
+	const LD_STARBLOCK_CATALOG* pCatalog = Find_StarblockCatalog(m_tBreakableDesc.strObjectName);
+	if (nullptr == pCatalog)
+		return E_FAIL;
+	if (nullptr == pCatalog->pModelProtoTag || m_tBreakableDesc.wstrModelProtoTag !=
+		pCatalog->pModelProtoTag)
+		return E_FAIL;
+
 	const _tchar* pModelProtoTag = Resolve_ModelProtoTag();
 	if (nullptr == pModelProtoTag)
 		return E_FAIL;
 
 	const auto& ShaderDesc = Shader_NonAnimMesh_PBR;
 
-	m_pShaderCom = Add_Component<CShader>(ShaderDesc.iLevelID, ShaderDesc.szProtoTag, TEXT("Com_Shader"));
+	m_pShaderCom = Add_Component<CShader>(ShaderDesc.iLevelID, ShaderDesc.szProtoTag,
+		TEXT("Com_Shader"));
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
-	m_pModelCom = Add_Component<CModel>(m_tBreakableDesc.iModelProtoLevel, pModelProtoTag, TEXT("Com_Model"));
+	m_pModelCom = Add_Component<CModel>(m_tBreakableDesc.iModelProtoLevel, pModelProtoTag,
+		TEXT("Com_Model"));
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
 		return E_FAIL;
 
+	if (FAILED(Ready_PhysicsActor()))
+		return E_FAIL;
+
 	return S_OK;
 }
 
-HRESULT CLevelDesign_Starblock::Ready_PhysicsActor_Box()
+HRESULT CLevelDesign_Starblock::Ready_PhysicsActor()
 {
 	Release_PhysicsActor();
 
@@ -336,7 +358,7 @@ void CLevelDesign_Starblock::SetUp_Collider_CallBack()
 
 void CLevelDesign_Starblock::Register_LevelDesignSpecs()
 {
-	for (const LD_STARBLOCK_CATALOG& Entry : g_BreakableCatalog)
+	for (const LD_STARBLOCK_CATALOG& Entry : g_StarblockCatalog)
 	{
 		LD_SPAWN_SPEC Spec{};
 		Spec.strObjectName = Entry.pObjectName;
@@ -361,7 +383,7 @@ _bool CLevelDesign_Starblock::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const
 
 	if (nullptr == pOutEntry)
 		return false;
-	if (nullptr == Find_BreakableCatalog(CommonDesc.strObjectName))
+	if (nullptr == Find_StarblockCatalog(CommonDesc.strObjectName))
 		return false;
 	if (Spec.eCategory != LD_CATEGORY::BREAKABLE || Spec.wstrModelProtoTag.empty())
 		return false;

@@ -41,6 +41,7 @@ public:
     void                 Release_Controller(physx::PxController* pCtrl);
 
     physx::PxRigidStatic* Create_StaticBox(const _float3& vLocalCenter, const _float3& vLocalHalfExtents, _fmatrix WorldMatrix);
+    HRESULT Refresh_StaticBoxPose(physx::PxRigidStatic* pActor, const _float3& vLocalCenter, _fmatrix WorldMatrix);
     physx::PxRigidStatic* Cook_StaticMesh(
         const _float3* pVertices, _uint iNumVertices,
         const _uint* pIndices, _uint iNumIndices,

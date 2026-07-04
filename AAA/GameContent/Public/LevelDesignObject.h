@@ -12,19 +12,16 @@ protected:
 	CLevelDesignObject(const CLevelDesignObject& Prototype);
 	virtual ~CLevelDesignObject() = default;
 
+	virtual		HRESULT Initialize_Prototype() override;
+	virtual		HRESULT Initialize(void* pArg) override;
+	virtual		HRESULT Validate_Initialized();
+	_wstring	Make_LevelDesignObjectKey() const;
+
 public:
-	virtual HRESULT Initialize_Prototype() override;
-	virtual HRESULT Initialize(void* pArg) override;
-
-	_wstring		Make_LevelDesignObjectKey() const;
-
 	const LD_OBJECT_DESC& Get_LevelDesignDesc() const { return m_tLevelDesignDesc; }
 
 protected:
 	LD_OBJECT_DESC	m_tLevelDesignDesc = {};
-
-protected:
-	virtual HRESULT Validate_Desc() { return S_OK; };
 
 protected:
 	virtual void Free() override;

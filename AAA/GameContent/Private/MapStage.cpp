@@ -1,4 +1,5 @@
 #include "MapStage.h"
+#include "MapEvent_BreakWall.h"
 
 #include "GameInstance_Proxy.h"
 
@@ -9,6 +10,8 @@ NS_BEGIN(Client)
 
 namespace
 {
+	constexpr const _tchar* STAGE12_BREAK_WALL_BASE_SECTION_NAME = L"GsDefault_2";
+
 	_bool Is_SameMatrix(const _float4x4& lhs, const _float4x4& rhs)
 	{
 		return 0 == memcmp(&lhs, &rhs, sizeof(_float4x4));
@@ -22,7 +25,6 @@ CMapStage::CMapStage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 CMapStage::CMapStage(const CMapStage& Prototype)
 	: CGameObject(Prototype)
-	, m_strProtoTag { Prototype.m_strProtoTag }
 {
 }
 
@@ -39,7 +41,6 @@ HRESULT CMapStage::Initialize(void* pArg)
 
 	const MAP_STAGE_DESC* pDesc = static_cast<const MAP_STAGE_DESC*>(pArg);
 	m_strStageName = pDesc->strStageName;
-	m_iSectionProtoLevel = pDesc->iSectionProtoLevel;
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -49,6 +50,36 @@ HRESULT CMapStage::Initialize(void* pArg)
 
 	m_bSnapshotValid = false;
 	Refresh_SectionTransforms();
+
+	if (FAILED(Validate_Initialized()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMapStage::Validate_Initialized()
+{
+	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom)
+		return E_FAIL;
+	if (m_strStageName.empty())
+		return E_FAIL;
+	if (!m_bSnapshotValid)
+		return E_FAIL;
+
+	_bool bHasStage12BreakWallBaseSection = false;
+
+	for (CMapSection* pSection : m_Sections)
+	{
+		if (nullptr == pSection)
+			return E_FAIL;
+
+		if (STAGE12_BREAK_WALL_BASE_SECTION_NAME == pSection->Get_SectionName())
+			bHasStage12BreakWallBaseSection = true;
+	}
+
+	if (CMapEvent_BreakWall::STAGE12_STAGE_NAME == m_strStageName && !bHasStage12BreakWallBaseSection)
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -80,7 +111,7 @@ void CMapStage::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	if (nullptr == pOutData)
 		return;
 
-	pOutData->strPrototypeTag = m_strProtoTag;
+	pOutData->strPrototypeTag = PROTOTYPE_TAG;
 }
 
 #ifdef _DEBUG
@@ -105,8 +136,7 @@ void CMapStage::Clear_EditorSoloMeshAllSections()
 {
 	for (CMapSection* pSection : m_Sections)
 	{
-		if (nullptr != pSection)
-			pSection->Clear_EditorSoloMesh();
+		pSection->Clear_EditorSoloMesh();
 	}
 }
 #endif
@@ -119,9 +149,6 @@ json CMapStage::Serialize() const
 
 	for (const CMapSection* pSection : m_Sections)
 	{
-		if (nullptr == pSection)
-			continue;
-
 		j["Sections"].push_back(pSection->Serialize_SectionState());
 	}
 
@@ -130,19 +157,23 @@ json CMapStage::Serialize() const
 
 void CMapStage::Deserialize_Internal(const json& j)
 {
-	__super::Deserialize_Internal(j);
+	const auto IterStageName = j.find("StageName");
+	if (IterStageName != j.end())
+	{
+		if (!IterStageName->is_string())
+			return;
 
-	if (j.contains("StageName") && j["StageName"].is_string())
-		m_strStageName = StrToWstr(j["StageName"].get<string>());
+		if (StrToWstr(IterStageName->get<string>()) != m_strStageName)
+			return;
+	}
+
+	__super::Deserialize_Internal(j);
 
 	if (j.contains("Sections") && j["Sections"].is_array())
 	{
 		unordered_map<wstring, CMapSection*> SectionByName;
 		for (CMapSection* pSection : m_Sections)
 		{
-			if (nullptr == pSection)
-				continue;
-
 			SectionByName.emplace(pSection->Get_SectionName(), pSection);
 		}
 
@@ -168,13 +199,13 @@ void CMapStage::Deserialize_Internal(const json& j)
 
 HRESULT CMapStage::Ready_Events()
 {
-	if (L"Stage1-2_MapStage" == m_strStageName)
+	if (CMapEvent_BreakWall::STAGE12_STAGE_NAME == m_strStageName)
 	{
 		Subscribe_Event(EventTag::Stage12_CarBreakWall,
 			[this](void* pData)
 			{
 				UNREFERENCED_PARAMETER(pData);
-				Stage12_CarBreakWall();
+				On_Stage12CarBreakWall();
 			});
 	}
 
@@ -211,23 +242,13 @@ HRESULT CMapStage::Ready_Sections(const MAP_STAGE_DESC* pDesc)
 
 void CMapStage::Refresh_SectionTransforms()
 {
-	if(nullptr == m_pTransformCom)
-		return;
-
 	const _float4x4* pCurrentWorld = m_pTransformCom->Get_WorldMatrixPtr();
-	if (nullptr == pCurrentWorld)
-		return;
 
 	if (m_bSnapshotValid && Is_SameMatrix(m_LastWorldMatrix, *pCurrentWorld))
 		return;
 
 	for (CMapSection* pSection : m_Sections)
-	{
-		if (nullptr == pSection)
-			continue;
-
 		pSection->Refresh_CombinedWorldMatrix();
-	}
 
 	m_LastWorldMatrix = *pCurrentWorld;
 	m_bSnapshotValid = true;
@@ -243,9 +264,6 @@ void CMapStage::Reset_ProfileFrame()
 
 	for (CMapSection* pSection : m_Sections)
 	{
-		if (nullptr == pSection)
-			continue;
-
 		if (!pSection->Is_Renderable())
 			continue;
 
@@ -261,9 +279,6 @@ void CMapStage::Submit_VisibleSections()
 {
 	for (CMapSection* pSection : m_Sections)
 	{
-		if (nullptr == pSection)
-			continue;
-
 #ifdef _DEBUG
 		if (!Should_RenderSection(pSection))
 			continue;
@@ -306,18 +321,15 @@ void CMapStage::Submit_VisibleSections()
 	}
 }
 
-void CMapStage::Stage12_CarBreakWall()
+void CMapStage::On_Stage12CarBreakWall()
 {
 	for (CMapSection* pSection : m_Sections)
 	{
-		if (nullptr == pSection)
-			continue;
-
-		if (L"GsDefault_2" != pSection->Get_SectionName())
+		if (STAGE12_BREAK_WALL_BASE_SECTION_NAME != pSection->Get_SectionName())
 			continue;
 
 		pSection->Set_Renderable(false);
-		pSection->Set_RuntimeCollisionActorEnabled(false);
+		pSection->Set_CollisionActorEnabled(false);
 		return;
 	}
 }

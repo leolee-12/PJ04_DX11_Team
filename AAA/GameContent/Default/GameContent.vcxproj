@@ -62,6 +62,9 @@
     <ClInclude Include="..\Public\Common_JumpSlash.h" />
     <ClInclude Include="..\Public\Common_Ring03.h" />
     <ClInclude Include="..\Public\Kirby_AttackMode.h" />
+    <ClInclude Include="..\Public\LD_SlopeBoardA.h" />
+    <ClInclude Include="..\Public\LD_SlopeBoardC.h" />
+    <ClInclude Include="..\Public\LD_Stage1BossDemo.h" />
     <ClInclude Include="..\Public\SphereMesh.h" />
     <ClInclude Include="..\Public\SphereParticle.h" />
     <ClInclude Include="..\Public\Common_SphereNoise.h" />
@@ -86,9 +89,9 @@
     <ClInclude Include="..\Public\KirbyBomb.h" />
     <ClInclude Include="..\Public\Kirby_Ladder.h" />
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h" />
-    <ClInclude Include="..\public\LDInhalable.h" />
+    <ClInclude Include="..\public\LD_Inhalable.h" />
     <ClInclude Include="..\Public\LevelDesign_MonsterCatalog.h" />
-    <ClInclude Include="..\Public\MapBreakSection.h" />
+    <ClInclude Include="..\Public\MapEvent_BreakWall.h" />
     <ClInclude Include="..\Public\PoppyBrosJr_State_WindUp.h" />
     <ClInclude Include="..\public\RockBounce.h" />
     <ClInclude Include="..\public\RockBurst.h" />
@@ -126,7 +129,7 @@
     <ClInclude Include="..\Public\Env_CollisionCatalog.h" />
     <ClInclude Include="..\Public\Env_InstanceBatch.h" />
     <ClInclude Include="..\Public\Env_InstanceController.h" />
-    <ClInclude Include="..\Public\LevelDesign_EventObject.h" />
+    <ClInclude Include="..\Public\LD_EventObject.h" />
     <ClInclude Include="..\Public\LevelDesign_FallBorder.h" />
     <ClInclude Include="..\Public\Kabu.h" />
     <ClInclude Include="..\Public\Kabu_Body.h" />
@@ -186,7 +189,7 @@
     <ClInclude Include="..\Public\NormalEnemy_State_Brake.h" />
     <ClInclude Include="..\Public\Parsing_Utils.h" />
     <ClInclude Include="..\Public\PoppyBrosJr.h" />
-    <ClInclude Include="..\Public\RailDataReceiver.h" />
+    <ClInclude Include="..\Public\RailRideable.h" />
     <ClInclude Include="..\Public\Shader_PassMeta.h" />
     <ClInclude Include="..\Public\GameContent_AnimEvents.h" />
     <ClInclude Include="..\Public\GameContent_const.h" />
@@ -356,6 +359,9 @@
     <ClCompile Include="..\Private\Common_JumpSlash.cpp" />
     <ClCompile Include="..\Private\Common_Ring03.cpp" />
     <ClCompile Include="..\Private\Kirby_AttackMode.cpp" />
+    <ClCompile Include="..\Private\LD_SlopeBoardA.cpp" />
+    <ClCompile Include="..\Private\LD_SlopeBoardC.cpp" />
+    <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp" />
     <ClCompile Include="..\Private\SphereMesh.cpp" />
     <ClCompile Include="..\Private\SphereParticle.cpp" />
     <ClCompile Include="..\Private\Common_SphereNoise.cpp" />
@@ -378,9 +384,9 @@
     <ClCompile Include="..\Private\KirbyBomb.cpp" />
     <ClCompile Include="..\Private\Kirby_Ladder.cpp" />
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp" />
-    <ClCompile Include="..\private\LDInhalable.cpp" />
+    <ClCompile Include="..\private\LD_Inhalable.cpp" />
     <ClCompile Include="..\Private\LevelDesign_MonsterCatalog.cpp" />
-    <ClCompile Include="..\Private\MapBreakSection.cpp" />
+    <ClCompile Include="..\Private\MapEvent_BreakWall.cpp" />
     <ClCompile Include="..\Private\PoppyBrosJr_State_WindUp.cpp" />
     <ClCompile Include="..\private\RockBounce.cpp" />
     <ClCompile Include="..\private\RockBurst.cpp" />
@@ -428,7 +434,7 @@
     <ClCompile Include="..\private\GigantEdge_Body.cpp" />
     <ClCompile Include="..\private\GigantEdge_Shield.cpp" />
     <ClCompile Include="..\private\GigantEdge_Sword.cpp" />
-    <ClCompile Include="..\Private\LevelDesign_EventObject.cpp" />
+    <ClCompile Include="..\Private\LD_EventObject.cpp" />
     <ClCompile Include="..\Private\LevelDesign_FallBorder.cpp" />
     <ClCompile Include="..\Private\Kabu.cpp" />
     <ClCompile Include="..\Private\Kabu_Body.cpp" />
@@ -513,7 +519,7 @@
     <ClCompile Include="..\Private\TestMeshEmitter.cpp" />
     <ClCompile Include="..\Private\TestMeshParticle.cpp" />
     <ClCompile Include="..\Private\TestParticle.cpp" />
-    <ClCompile Include="..\Private\RailDataReceiver.cpp" />
+    <ClCompile Include="..\Private\RailRideable.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />
     <ClCompile Include="..\private\UI_BossStatus.cpp" />
     <ClCompile Include="..\private\UI_Curtain.cpp" />

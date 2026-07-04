@@ -58,13 +58,36 @@ HRESULT CLevelDesign_Boundary::Initialize(void* pArg)
 	if (nullptr == pArg)
 		return E_FAIL;
 
+	const LD_PARSED_OBJECT* pParsedDesc = static_cast<const LD_PARSED_OBJECT*>(pArg);
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Validate_Desc()))
+	if (FAILED(Ready_Components(*pParsedDesc)))
 		return E_FAIL;
 
-	if (FAILED(Ready_PhysicsActor(*static_cast<const LD_PARSED_OBJECT*>(pArg))))
+	if (FAILED(Validate_Initialized()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Boundary::Validate_Initialized()
+{
+	if (FAILED(__super::Validate_Initialized()))
+		return E_FAIL;
+
+	if (m_tLevelDesignDesc.eCategory != LD_CATEGORY::VOLUME)
+		return E_FAIL;
+
+	const _wstring& strObjectName = m_tLevelDesignDesc.strObjectName;
+	if (strObjectName != L"InvisibleCollision"
+		&& strObjectName != L"InvisibleCollisionBox")
+	{
+		return E_FAIL;
+	}
+
+	if (nullptr == m_pPhysicsActor)
 		return E_FAIL;
 
 	return S_OK;
@@ -78,17 +101,10 @@ void CLevelDesign_Boundary::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
 }
 
-HRESULT CLevelDesign_Boundary::Validate_Desc()
+HRESULT CLevelDesign_Boundary::Ready_Components(const LD_PARSED_OBJECT& Desc)
 {
-	if (m_tLevelDesignDesc.eCategory != LD_CATEGORY::VOLUME)
+	if (FAILED(Ready_PhysicsActor(Desc)))
 		return E_FAIL;
-
-	const _wstring& strObjectName = m_tLevelDesignDesc.strObjectName;
-	if (strObjectName != L"InvisibleCollision"
-		&& strObjectName != L"InvisibleCollisionBox")
-	{
-		return E_FAIL;
-	}
 
 	return S_OK;
 }

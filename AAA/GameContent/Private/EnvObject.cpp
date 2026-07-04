@@ -366,6 +366,17 @@ _bool CEnvObject::Pick_Marb1e(_fvector vRayOrigin, _fvector vRayDir, _float3* pO
 	return bHit;
 }
 
+HRESULT CEnvObject::Refresh()
+{
+	m_bTransformDirty = true;
+	Refresh_WorldBounds();
+
+	if (FAILED(Ready_PhysicsActor()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 HRESULT CEnvObject::Ready_RenderComponents(_uint iModelProtoLevel, const wstring& wstrModelProtoTag)
 {
 	if (wstrModelProtoTag.empty())
