@@ -661,9 +661,6 @@
     <Filter Include="00. GameObject\06. Monster\07. BrontoBurt\State\Return">
       <UniqueIdentifier>{1c459d47-b212-490f-a2b8-c351c910c80c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\RailTrack">
-      <UniqueIdentifier>{4f01bdcc-60a5-4b64-b19d-985bfe489406}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\06. Monster\06. PoppyBrosJr\State\Throw">
       <UniqueIdentifier>{f759dab8-b2df-4c10-b6e1-5094af1c3fc9}</UniqueIdentifier>
     </Filter>
@@ -1293,7 +1290,7 @@
     <ClInclude Include="..\Public\LevelDesign_Rail.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\RailDataReceiver.h">
+    <ClInclude Include="..\Public\RailRideable.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClInclude>
     <ClInclude Include="..\public\MonsterPart.h">
@@ -1431,7 +1428,7 @@
     <ClInclude Include="..\Public\Sword_SpinSlash.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\LevelDesign_EventObject.h">
+    <ClInclude Include="..\Public\LD_EventObject.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_FallBorder.h">
@@ -1475,9 +1472,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\BrontoBurt_State_Return.h">
       <Filter>00. GameObject\06. Monster\07. BrontoBurt\State\Return</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\RailTrack.h">
-      <Filter>00. GameObject\96. LevelDesign\RailTrack</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PoppyBrosJr_Body.h">
       <Filter>00. GameObject\06. Monster\06. PoppyBrosJr\Parts\Body</Filter>
@@ -1596,7 +1590,7 @@
     <ClInclude Include="..\Public\Monster_RailMovement.h">
       <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\LDInhalable.h">
+    <ClInclude Include="..\public\LD_Inhalable.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Cappy.h">
@@ -1736,6 +1730,18 @@
     </ClInclude>
     <ClInclude Include="..\Public\StarEmitter.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\14. Star\Emitter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_Stage1BossDemo.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_SlopeBoardA.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_SlopeBoardC.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RailTrack.h">
+      <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2090,7 +2096,7 @@
     <ClCompile Include="..\Private\LevelDesign_Rail.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\RailDataReceiver.cpp">
+    <ClCompile Include="..\Private\RailRideable.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClCompile>
     <ClCompile Include="..\private\MonsterPart.cpp">
@@ -2222,7 +2228,7 @@
     <ClCompile Include="..\Private\Sword_SpinSlash.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\LevelDesign_EventObject.cpp">
+    <ClCompile Include="..\Private\LD_EventObject.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_FallBorder.cpp">
@@ -2266,9 +2272,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\BrontoBurt_State_Return.cpp">
       <Filter>00. GameObject\06. Monster\07. BrontoBurt\State\Return</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\RailTrack.cpp">
-      <Filter>00. GameObject\96. LevelDesign\RailTrack</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PoppyBrosJr_Body.cpp">
       <Filter>00. GameObject\06. Monster\06. PoppyBrosJr\Parts\Body</Filter>
@@ -2384,7 +2387,7 @@
     <ClCompile Include="..\Private\Monster_RailMovement.cpp">
       <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\LDInhalable.cpp">
+    <ClCompile Include="..\private\LD_Inhalable.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Cappy.cpp">
@@ -2524,6 +2527,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\StarEmitter.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\14. Star\Emitter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_SlopeBoardA.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_SlopeBoardC.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RailTrack.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

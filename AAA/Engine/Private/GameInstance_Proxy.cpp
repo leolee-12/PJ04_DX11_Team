@@ -1002,6 +1002,13 @@ PxRigidStatic* CGameInstance_Proxy::Create_StaticActor(PxTriangleMesh* pMesh, _f
 
 	return m_pOwner->Create_StaticActor(pMesh, W);
 }
+HRESULT CGameInstance_Proxy::Refresh_StaticBoxPose(physx::PxRigidStatic* pActor, const _float3& vLocalCenter, _fmatrix WorldMatrix)
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->Refresh_StaticBoxPose(pActor, vLocalCenter, WorldMatrix);
+}
 PxRigidStatic* CGameInstance_Proxy::Create_StaticBox(const _float3& vLocalCenter, const _float3& vLocalHalfExtents, _fmatrix WorldMatrix)
 {
 	if (!IsConnected())

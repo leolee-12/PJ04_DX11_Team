@@ -8,15 +8,17 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CLDInhalable abstract : public CLevelDesignObject, public IInhalable
+class CLD_Inhalable abstract : public CLevelDesignObject, public IInhalable
 {
 protected:
-	CLDInhalable(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CLDInhalable(const CLevelDesignObject& Prototype);
-	virtual ~CLDInhalable() = default;
+	CLD_Inhalable(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CLD_Inhalable(const CLevelDesignObject& Prototype);
+	virtual ~CLD_Inhalable() = default;
+
+	virtual HRESULT Initialize(void* pArg) override;
+	virtual HRESULT	Validate_Initialized() override;
 
 public:
-	virtual HRESULT Initialize(void* pArg) override;
 	virtual void	Update(_float fTimeDelta) override;
 	virtual void	Late_Update(_float fTimeDelta) override;
 
@@ -60,12 +62,12 @@ protected:
 	static constexpr _float     s_fSpinSpeedDeg = 360.f;
 
 protected:
-	HRESULT		   Ready_Collider();
-	virtual void   SetUp_Collider_CallBack();
+	HRESULT			Ready_Collider();
+	virtual void	SetUp_Collider_CallBack();
 
-	virtual void   On_Swallowed();
-	virtual void   Enable_Colliders(_bool b);
-	virtual void   Despawn_Spat();
+	virtual void	On_Swallowed();
+	virtual void	Enable_Colliders(_bool b);
+	virtual void	Despawn_Spat();
 
 private:
 	void Update_Captured(_float fTimeDelta);

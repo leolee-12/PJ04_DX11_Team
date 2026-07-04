@@ -35,9 +35,11 @@ private:
     CLevelDesign_Bush(const CLevelDesign_Bush& Prototype);
     virtual ~CLevelDesign_Bush() = default;
 
-public:
     virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void* pArwlsg) override;
+    virtual HRESULT Validate_Initialized() override;
+
+public:
     virtual void    Update(_float fTimeDelta) override;
     virtual void    Late_Update(_float fTimeDelta) override;
     virtual HRESULT Render() override;
@@ -59,9 +61,8 @@ private:
     BUSH_STATE m_eState = { BUSH_STATE::BASIC };
 
 private:
-    virtual HRESULT Validate_Desc() override;
-
     HRESULT Ready_Components();
+    HRESULT Ready_RenderComponents();
     HRESULT Ready_HurtBox();
 
     HRESULT Bind_ShaderResources(BUSH_STATE eSlot);

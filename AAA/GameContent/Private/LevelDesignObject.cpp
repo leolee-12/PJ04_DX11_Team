@@ -36,6 +36,18 @@ HRESULT CLevelDesignObject::Initialize(void* pArg)
 	return S_OK;
 }
 
+HRESULT CLevelDesignObject::Validate_Initialized()
+{
+	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom)
+		return E_FAIL;
+	if (m_tLevelDesignDesc.strObjectName.empty())
+		return E_FAIL;
+	if (ETOUI(m_tLevelDesignDesc.eCategory) >= ETOUI(LD_CATEGORY::END))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 _wstring CLevelDesignObject::Make_LevelDesignObjectKey() const
 {
 	if (m_tLevelDesignDesc.iUid != 0)

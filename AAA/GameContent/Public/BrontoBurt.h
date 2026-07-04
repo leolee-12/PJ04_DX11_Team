@@ -1,7 +1,7 @@
 #pragma once
 #include "GameContent_Defines.h"
 #include "Monster.h"
-#include "RailDataReceiver.h"
+#include "RailRideable.h"
 
 NS_BEGIN(Engine)
 class CAnimator;
@@ -10,7 +10,7 @@ NS_END
 NS_BEGIN(Client)
 class CBrontoBurt_Body;
 
-class CBrontoBurt final : public CMonster, public IRailDataReceiver
+class CBrontoBurt final : public CMonster, public IRailRideable
 {
 	GENERATED_BODY(CBrontoBurt)
 
@@ -47,7 +47,7 @@ public:
 
     virtual CAnimator*      Get_BodyAnimator() const override;
 
-    // IRailDataReceiver
+    // IRailRideable
     virtual void            Set_RailDesc(const LD_RAIL_DESC& Desc) override;
 
 protected:

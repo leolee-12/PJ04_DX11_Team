@@ -21,9 +21,11 @@ private:
 	CLevelDesign_FallBorder(const CLevelDesign_FallBorder& Prototype);
 	virtual ~CLevelDesign_FallBorder() = default;
 
-public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
+	virtual HRESULT Validate_Initialized() override;
+
+public:
 	virtual void    Late_Update(_float fTimeDelta) override;
 	virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
@@ -31,7 +33,6 @@ private:
 	CCollider* m_pColliderCom = { nullptr };
 
 private:
-	virtual HRESULT Validate_Desc() override;
 	HRESULT Ready_Components(const LD_PARSED_OBJECT& Desc);
 	void    SetUp_Collider_Callback();
 	void    Handle_Fall(CGameObject* pPlayer);

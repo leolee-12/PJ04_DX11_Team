@@ -47,14 +47,15 @@ namespace
 		*pOutDesc = {};
 
 		pOutDesc->wstrSourcePath = L"Palette";
-		pOutDesc->strSourceFile = L"H1W1.ysh";
+		pOutDesc->strSourceFile = L"BoxWood.ysh";
 		pOutDesc->strSection = L"Palette";
-		pOutDesc->strEntryKey = L"StarBlock_Default";
-		pOutDesc->strObjectName = L"StarBlock";
+		pOutDesc->strEntryKey = L"WoodBox_Default";
+		pOutDesc->strObjectName = L"WoodBox";
 		pOutDesc->strKind = L"Palette";
 
 		pOutDesc->eCategory = LD_CATEGORY::BREAKABLE;
-		pOutDesc->wstrModelProtoTag = CLevelDesign_Breakable::STARBLOCK_H1W1_MODEL_PROTO_TAG;
+		pOutDesc->eModelType = MODEL::ANIM;
+		pOutDesc->wstrModelProtoTag = CLevelDesign_Breakable::WOODBOX_MODEL_PROTO_TAG;
 
 		pOutDesc->fScale = 1.f;
 		pOutDesc->vRight = { 1.f, 0.f, 0.f, 0.f };
@@ -88,30 +89,67 @@ HRESULT CLevelDesign_Breakable::Initialize_Prototype()
 
 HRESULT CLevelDesign_Breakable::Initialize(void* pArg)
 {
-	if (FAILED(__super::Initialize(pArg)))
-		return E_FAIL;
-
+	LD_BREAKABLE_DESC DefaultDesc{};
 	if (nullptr == pArg)
 	{
-		LD_BREAKABLE_DESC DefaultDesc{};
 		Build_DefaultBreakableDesc(&DefaultDesc);
-		m_tBreakableDesc = DefaultDesc;
+		pArg = &DefaultDesc;
 	}
-	else
-	{
-		m_tBreakableDesc = *static_cast<const LD_BREAKABLE_DESC*>(pArg);
-		if (FAILED(Validate_Desc()))
-			return E_FAIL;
-	}
+
+	m_tBreakableDesc = *static_cast<const LD_BREAKABLE_DESC*>(pArg);
+
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
 
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	if (FAILED(Ready_HurtBox()))
+	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
 
-	if (FAILED(Ready_PhysicsActor_Box()))
+	m_pGameInstance_Proxy->Register_Collider(m_pHurtBoxCom, ETOUI(COLLISION_LAYER::ENV_HURT));
+
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Breakable::Validate_Initialized()
+{
+	if (FAILED(__super::Validate_Initialized()))
 		return E_FAIL;
+
+	if (nullptr == m_pShaderCom || nullptr == m_pModelCom || nullptr == m_pHurtBoxCom || nullptr == m_pPhysicsActor)
+		return E_FAIL;
+
+	if (m_tBreakableDesc.eCategory != LD_CATEGORY::BREAKABLE)
+		return E_FAIL;
+	if (m_tBreakableDesc.wstrModelProtoTag.empty())
+		return E_FAIL;
+	if (MODEL::ANIM != m_tBreakableDesc.eModelType && MODEL::NONANIM != m_tBreakableDesc.eModelType)
+		return E_FAIL;
+	if (BREAKABLE_STATE::INTACT != m_eState && BREAKABLE_STATE::BREAKING != m_eState &&
+		BREAKABLE_STATE::DESTROYED != m_eState)
+		return E_FAIL;
+
+	const LD_BREAKABLE_CATALOG* pCatalog = Find_BreakableCatalog(m_tBreakableDesc.strObjectName);
+	if (nullptr == pCatalog)
+		return E_FAIL;
+	if (pCatalog->eModelType != m_tBreakableDesc.eModelType)
+		return E_FAIL;
+	if (nullptr == pCatalog->pModelProtoTag || m_tBreakableDesc.wstrModelProtoTag !=
+		pCatalog->pModelProtoTag)
+		return E_FAIL;
+
+	if (MODEL::ANIM == m_tBreakableDesc.eModelType)
+	{
+		if (nullptr == m_pAnimatorCom)
+			return E_FAIL;
+		if (nullptr == pCatalog->pBaseMeshName)
+			return E_FAIL;
+
+		const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+		if (LD_INVALID_ID == m_iBaseMeshIndex || m_iBaseMeshIndex >= iNumMeshes)
+			return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -317,18 +355,6 @@ CGameObject* CLevelDesign_Breakable::Create_Prototype(ID3D11Device* pDevice, ID3
 	return CLevelDesign_Breakable::Create(pDevice, pContext);
 }
 
-HRESULT CLevelDesign_Breakable::Validate_Desc()
-{
-	if (m_tBreakableDesc.eCategory != LD_CATEGORY::BREAKABLE)
-		return E_FAIL;
-	if (m_tBreakableDesc.wstrModelProtoTag.empty())
-		return E_FAIL;
-	if (MODEL::ANIM != m_tBreakableDesc.eModelType && MODEL::NONANIM != m_tBreakableDesc.eModelType)
-		return E_FAIL;
-
-	return S_OK;
-}
-
 HRESULT CLevelDesign_Breakable::Ready_Components()
 {
 	const LD_BREAKABLE_CATALOG* pCatalog = Find_BreakableCatalog(m_tBreakableDesc.strObjectName);
@@ -343,11 +369,13 @@ HRESULT CLevelDesign_Breakable::Ready_Components()
 		? Shader_AnimMesh_PBR
 		: Shader_NonAnimMesh_PBR;
 
-	m_pShaderCom = Add_Component<CShader>(ShaderDesc.iLevelID, ShaderDesc.szProtoTag, TEXT("Com_Shader"));
+	m_pShaderCom = Add_Component<CShader>(ShaderDesc.iLevelID, ShaderDesc.szProtoTag,
+		TEXT("Com_Shader"));
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
-	m_pModelCom = Add_Component<CModel>(m_tBreakableDesc.iModelProtoLevel, pModelProtoTag, TEXT("Com_Model"));
+	m_pModelCom = Add_Component<CModel>(m_tBreakableDesc.iModelProtoLevel, pModelProtoTag,
+		TEXT("Com_Model"));
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
 
@@ -379,12 +407,19 @@ HRESULT CLevelDesign_Breakable::Ready_Components()
 		CAnimator::ANIMATOR_DESC AnimDesc{};
 		AnimDesc.pModel = m_pModelCom;
 
-		m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
+		m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice,
+			m_pContext));
 		if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
 			return E_FAIL;
 
 		m_pModelCom->Update_Combined();
 	}
+
+	if (FAILED(Ready_HurtBox()))
+		return E_FAIL;
+
+	if (FAILED(Ready_PhysicsActor()))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -419,8 +454,6 @@ HRESULT CLevelDesign_Breakable::Ready_HurtBox()
 	if (nullptr == m_pHurtBoxCom)
 		return E_FAIL;
 
-	m_pGameInstance_Proxy->Register_Collider(m_pHurtBoxCom, ETOUI(COLLISION_LAYER::ENV_HURT));
-
 	m_pHurtBoxCom->Set_OnEnter([this](CCollider* pOther)
 		{
 			if (nullptr == pOther)
@@ -436,7 +469,7 @@ HRESULT CLevelDesign_Breakable::Ready_HurtBox()
 	return S_OK;
 }
 
-HRESULT CLevelDesign_Breakable::Ready_PhysicsActor_Box()
+HRESULT CLevelDesign_Breakable::Ready_PhysicsActor()
 {
 	Release_PhysicsActor();
 
