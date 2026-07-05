@@ -545,7 +545,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
     {
         BeginHit(false);
         pKirby->Set_RotationLock(true);
-        pAnimator->Play("SuperSpinSlashEnd", false, false, 0.1f, 3.f);
+        pAnimator->Play("SuperSpinSlashEnd", false, false, 0.f, 3.f);
         break;
     }
     }
