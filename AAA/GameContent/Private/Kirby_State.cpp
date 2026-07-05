@@ -120,7 +120,7 @@ void CKirby_State::Request_GrabState(CKirby* pKirby, CUTSCENE_KIRBY_TYPE eType)
         }
         case CUTSCENE_KIRBY_TYPE::DEFORM_CAR_GET_FIRST:
         {
-            //pKirby->Change_State(KIRBY_STATE_TYPE::QTE_GRABBED);
+            pKirby->Change_State(KIRBY_STATE_TYPE::CAR_FIRST_BREAK_WALL);
             break;
         }
     }

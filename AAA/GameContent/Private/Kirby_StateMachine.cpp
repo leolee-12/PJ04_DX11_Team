@@ -15,9 +15,11 @@
 #include "Kirby_Damaged.h"
 #include "Kirby_Guard.h"
 #include "Kirby_Ladder.h"
+#include "Kirby_GetDeform.h"
+
 #include "Kirby_CutSceneGrabbed.h"
 #include "Kirby_QTE_Grabbed.h"
-#include "Kirby_GetDeform.h"
+#include "Kirby_CarFirstBreakWall.h"
 
 CKirby_StateMachine::CKirby_StateMachine()
 {
@@ -106,20 +108,21 @@ HRESULT CKirby_StateMachine::Init_State()
             return S_OK;
         };
 
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::WAIT, CKirby_Wait::Create())))                          return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::RUN, CKirby_Run::Create())))                            return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::JUMP, CKirby_Jump::Create())))                          return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::FALL, CKirby_Fall::Create())))                          return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::ATTACK, CKirby_Attack::Create())))                      return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::HOVERING, CKirby_Hovering::Create())))                  return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::GET_ABILITY, CKirby_GetAbility::Create())))             return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::ABILITY_DUMP, CKirby_AbilityDump::Create())))           return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::DAMAGED, CKirby_Damaged::Create())))                    return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::GUARD, CKirby_Guard::Create())))                        return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::LADDER, CKirby_Ladder::Create())))                      return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::CUTSCENE_GRABBED, CKirby_CutSceneGrabbed::Create())))   return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::QTE_GRABBED, CKirby_QTE_Grabbed::Create())))            return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::GET_DEFORM, CKirby_GetDeform::Create())))               return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::WAIT, CKirby_Wait::Create())))                              return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::RUN, CKirby_Run::Create())))                                return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::JUMP, CKirby_Jump::Create())))                              return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::FALL, CKirby_Fall::Create())))                              return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::ATTACK, CKirby_Attack::Create())))                          return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::HOVERING, CKirby_Hovering::Create())))                      return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::GET_ABILITY, CKirby_GetAbility::Create())))                 return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::ABILITY_DUMP, CKirby_AbilityDump::Create())))               return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::DAMAGED, CKirby_Damaged::Create())))                        return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::GUARD, CKirby_Guard::Create())))                            return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::LADDER, CKirby_Ladder::Create())))                          return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::CUTSCENE_GRABBED, CKirby_CutSceneGrabbed::Create())))       return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::QTE_GRABBED, CKirby_QTE_Grabbed::Create())))                return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::GET_DEFORM, CKirby_GetDeform::Create())))                   return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::CAR_FIRST_BREAK_WALL, CKirby_CarFirstBreakWall::Create()))) return E_FAIL;
 
     return S_OK;
 }

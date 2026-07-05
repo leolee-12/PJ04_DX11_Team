@@ -92,6 +92,14 @@ void CKirby::Update(_float fTimeDelta)
     if (m_pKirby_StateMachine->Ignore_TimeScale_StateMachine())
         fTimeDelta = m_pGameInstance_Proxy->Get_RawTimeDelta(L"Timer_60");
 
+    if (m_pGameInstance_Proxy->Key_Down(DIK_F3))
+    {
+        CUTSCENE_GRAB_DESC desc{};
+        desc.eType = CUTSCENE_KIRBY_TYPE::DEFORM_CAR_GET_FIRST;
+
+        m_pGameInstance_Proxy->Publish(EventTag::Cutscene_KirbyStart, &desc);
+    }
+
     XMStoreFloat3(&m_vWishDir, XMVectorZero());
 
     Update_Timer(fTimeDelta);
