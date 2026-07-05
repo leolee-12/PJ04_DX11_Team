@@ -93,6 +93,9 @@ HRESULT CLevelDesign_Rail::Initialize(void* pArg)
 		return E_FAIL;
 #endif
 
+	if (FAILED(Validate_Initialized()))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -249,6 +252,37 @@ _bool CLevelDesign_Rail::Evaluate_Segment(const LD_RAIL_DESC& RailDesc, _uint iS
 	return false;
 }
 
+HRESULT CLevelDesign_Rail::Validate_Initialized()
+{
+	if (FAILED(__super::Validate_Initialized()))
+		return E_FAIL;
+
+	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom)
+		return E_FAIL;
+	if (LD_CATEGORY::RAIL != m_tLevelDesignDesc.eCategory)
+		return E_FAIL;
+	if (m_tLevelDesignDesc.strObjectName.empty())
+		return E_FAIL;
+
+	if (m_tRailDesc.fRadius < 0.f || m_tRailDesc.fBezierControlLength < 0.f)
+		return E_FAIL;
+	if (0 == Get_SegmentCount(m_tRailDesc))
+		return E_FAIL;
+
+	for (const LD_RAIL_NODE_DESC& Node : m_tRailDesc.Nodes)
+	{
+		if (Node.fBezierControlLength < 0.f)
+			return E_FAIL;
+	}
+
+#ifdef _DEBUG
+	if (nullptr == m_pBatch || nullptr == m_pEffect || nullptr == m_pInputLayout)
+		return E_FAIL;
+#endif
+
+	return S_OK;
+}
+
 #ifdef _DEBUG
 
 HRESULT CLevelDesign_Rail::Ready_DebugResources()
@@ -281,13 +315,8 @@ HRESULT CLevelDesign_Rail::Ready_DebugResources()
 
 HRESULT CLevelDesign_Rail::Render_Rail()
 {
-	if (nullptr == m_pBatch
-		|| nullptr == m_pEffect
-		|| nullptr == m_pInputLayout
-		|| m_tRailDesc.Nodes.size() < 2)
-	{
+	if (m_tRailDesc.Nodes.size() < 2)
 		return S_OK;
-	}
 
 	const _float4x4* pView = m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC);
 

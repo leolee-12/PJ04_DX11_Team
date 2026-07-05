@@ -141,7 +141,9 @@
 #include "LevelDesign_Unsupported.h"
 #include "LevelDesign_Starblock.h"
 #include "LevelDesign_Rail.h"
-#include "LevelDesign_EventObject.h"
+#include "LD_Stage1BossDemo.h"
+#include "LD_SlopeBoardA.h"
+#include "LD_SlopeBoardC.h"
 
 // EnvObject
 #include "EnvTrigger_Generic.h"
@@ -151,6 +153,7 @@
 // Projectile
 #include "Projectile_Boulder.h"
 #include "EnemyBomb.h"
+#include "Spit_Projectile.h"
 
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
@@ -171,11 +174,12 @@ IMPLEMENT_SINGLETON(CGameObject_Factory)
 
 namespace
 {
-    CModel* Create_TextureHubModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath)
+    CModel* Create_TextureHubModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath, _bool bCookCollisionMesh)
     {
         CModel::MODEL_LOAD_DESC Desc{};
         Desc.eType = eType;
         Desc.pModelFilePath = pModelFilePath;
+        Desc.bCookCollisionMesh = bCookCollisionMesh;
         XMStoreFloat4x4(&Desc.PreTransformMatrix, XMMatrixIdentity());
 
         return CModel::Create_WithTextureHub(pDevice, pContext, Desc);
@@ -519,6 +523,10 @@ void CGameObject_Factory::Register_Container()
                 CKirby_SwordHat::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SwordHat"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Hat/SwordHat.ysh"));
+
+            //Kirby_Projectile
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpit_Projectile::PROTOTYPE_TAG,
+                CSpit_Projectile::Create(pDevice, pContext));
         )
     ); 
 
@@ -718,9 +726,17 @@ void CGameObject_Factory::Register_NonAnimObject()
 
 void CGameObject_Factory::Register_AnimObject()
 {
-    Register(CLevelDesign_EventObject::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_EventObject),
-        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLevelDesign_EventObject::LEVEL1BOSSDEMOBG_MODEL_PROTO_TAG,
-            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/Level1BossDemoBg/Level1BossDemoBg.ysh"));));
+    Register(CLD_Stage1BossDemo::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_Stage1BossDemo),
+        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_Stage1BossDemo::MODEL_PROTO_TAG,
+            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/Level1BossDemoBg/Level1BossDemoBg.ysh", true));));
+
+    Register(CLD_SlopeBoardA::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_SlopeBoardA),
+        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_SlopeBoardA::MODEL_PROTO_TAG,
+            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardA.ysh", false));));
+
+    Register(CLD_SlopeBoardC::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_SlopeBoardC),
+        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_SlopeBoardC::MODEL_PROTO_TAG,
+            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardC.ysh", true));));
 }
 
 void CGameObject_Factory::Register_Effect()
@@ -836,6 +852,8 @@ void CGameObject_Factory::Register_Effect()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/CarMilkyWay/Car_00_MilkyWay.ysh"));
             TRY_ADD_PROTO(pProxy, Texture_MilkyWayMask.iLevelID, Texture_MilkyWayMask.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_MilkyWayMask.szFileTag, Texture_MilkyWayMask.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Gradiant.iLevelID, Texture_Gradiant.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Gradiant.szFileTag, Texture_Gradiant.iNumTex));
         )
     );
 

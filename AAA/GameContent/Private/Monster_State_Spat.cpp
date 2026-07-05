@@ -15,71 +15,19 @@ void CMonster_State_Spat::Enter(MONSTER_STATE_TYPE ePrevState)
     if (!m_pOwner || !m_pAnimator)
         return;
 
-    m_fSpinAngle = 0.f;
-    if (m_pAnimator->Has_Bone("CenterL"))   
-    {
-        m_bSpinBone = true;
-        m_szSpinBone = "CenterL";
-    }
-    else if (m_pAnimator->Has_Bone("RotL")) 
-    {
-        m_bSpinBone = true;
-        m_szSpinBone = "RotL";
-    }
-    else
-    {
-        m_bSpinBone = false;
-        m_szSpinBone = nullptr;
-    }
-
-    m_pOwner->Enable_Controller(false);
-    m_pOwner->Enable_Colliders(false);
-    m_pOwner->Enable_ProjectileBox(true);
-
-    m_fLifeTime = s_fMaxLifeTime;
-
+    // 비행/프로젝타일박스는 CSpit_Projectile 소유. 여기선 애님만 재생
     if (!m_PlayInfo.strAniName.empty())
         m_pAnimator->Play(&m_PlayInfo);
 }
 
 void CMonster_State_Spat::Update(_float fTimeDelta)
 {
-    if (!m_pOwner || !m_pAnimator)
-        return;
-
-    CTransform* pT = m_pOwner->Get_Transform();
-    _vector vVel = XMLoadFloat3(&m_pOwner->Get_SpatVelocity());
-    pT->Set_State(STATE::POSITION,
-        pT->Get_State(STATE::POSITION) + vVel * fTimeDelta);
-    _vector vLook = pT->Get_State(STATE::LOOK);
-
-    m_fSpinAngle += s_fSpinSpeedDeg * fTimeDelta;
-
-    if (m_bSpinBone)
-    {
-        m_pAnimator->SetBoneRotation(m_szSpinBone, m_fSpinAngle, XMVectorSet(0.f, 0.f, 1.f, 0.f));
-    }
-    else
-    {
-        pT->Rotate(XMQuaternionRotationAxis(vLook,
-            XMConvertToRadians(s_fSpinSpeedDeg) * fTimeDelta));
-    }
-
-    m_fLifeTime -= fTimeDelta;
-    if (m_fLifeTime <= 0.f)
-    {
-        m_pOwner->Despawn_Spat();
-    }
+    UNREFERENCED_PARAMETER(fTimeDelta);
 }
 
 void CMonster_State_Spat::Exit(MONSTER_STATE_TYPE eNextState)
 {
-    if (!m_pOwner)
-        return;
-
-    m_bSpinBone = false;
-
-    m_pOwner->Enable_ProjectileBox(false);
+    UNREFERENCED_PARAMETER(eNextState);
 }
 
 CMonster_State_Spat* CMonster_State_Spat::Create(const ANI_PLAY_INFO& tInfo, _float fSpeed)

@@ -9,7 +9,9 @@
 #include "LevelDesign_Bush.h"
 #include "LevelDesign_Boundary.h"
 #include "LevelDesign_FallBorder.h"
-#include "LevelDesign_EventObject.h"
+#include "LD_Stage1BossDemo.h"
+#include "LD_SlopeBoardA.h"
+#include "LD_SlopeBoardC.h"
 #include "LevelDesign_MonsterCatalog.h"
 
 #include <cwctype>
@@ -249,7 +251,9 @@ void CLevelDesign_Registry::Register_EnemiesAndGimmicks()
 	Register_Unsupported(L"TwinkleSwitch", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
 
 	CLevelDesign_Ladder::Register_LevelDesignSpecs();
-	CLevelDesign_EventObject::Register_LevelDesignSpecs();
+	CLD_Stage1BossDemo::Register_LevelDesignSpecs();
+	CLD_SlopeBoardA::Register_LevelDesignSpecs();
+	CLD_SlopeBoardC::Register_LevelDesignSpecs();
 	Register_Unsupported(L"ArrowBoard", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
 }
 

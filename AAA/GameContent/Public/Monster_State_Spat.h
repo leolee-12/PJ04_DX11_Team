@@ -19,18 +19,6 @@ public:
     virtual void                Update(_float fTimeDelta) override;
     virtual void                Exit(MONSTER_STATE_TYPE eNextState) override;
 
-private:
-    _float                      m_fSpinAngle = { 0.f };
-    _float                      m_fLifeTime = { 0.f };
-    static constexpr _float     s_fMaxLifeTime = 2.5f;
-    static constexpr _float     s_fSpinSpeedDeg = 360.f;
-
-    const _float4x4*            m_pBoneMat = { nullptr };  
-    _float4x4                   m_SocketWorld = {};
-
-    _bool                       m_bSpinBone = { false };
-    const _char*                m_szSpinBone = { nullptr };
-
 public:
     static CMonster_State_Spat* Create(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f);
 

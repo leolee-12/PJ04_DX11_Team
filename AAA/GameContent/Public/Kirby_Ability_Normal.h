@@ -54,9 +54,9 @@ private:
 public:
 	virtual COPY_ABILITY_TYPE Get_AbilityType() override;
 
-	virtual void Enter_AbilityState(CKirby* pKirby) override;
-	virtual ABILITY_UPDATE_RESULT Update_AbilityState(CKirby* pKirby, _float fTimeDelta) override;
-	virtual void Exit_AbilityState(CKirby* pKirby) override;
+	virtual void Enter_AttackState(CKirby* pKirby) override;
+	virtual void Update_AttackState(CKirby* pKirby, _float fTimeDelta) override;
+	virtual void Exit_AttackState(CKirby* pKirby) override;
 
 public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
@@ -67,8 +67,6 @@ public:
 	virtual _bool Enter_Attack_KeyDown(CKirby* pKirby) override;
 	virtual _bool Enter_Attack_KeyPress(CKirby* pKirby) override;
 	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) override;
-
-	virtual _bool Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation) override;
 
 private:
 	CGameInstance_Proxy* m_pGameInstance_Proxy{};
@@ -99,7 +97,16 @@ private:
 
 	// Inhaleable(Stuffed)
 	_bool m_bInhaleCancelLocked{};
-	IInhalable* m_pCapturedInhalable{};
+
+	//윤석현 수정 *변수/상수 위치 원하는 위치로 옮기세용*
+	//IInhalable* m_pCapturedInhalable{};
+	static constexpr _uint  s_iMaxCaptured = 3;
+	IInhalable* m_CapturedInhalables[s_iMaxCaptured]{};
+	_uint       m_iCapturedCount{};
+
+	static constexpr _uint  s_iMaxCandidates = 8;
+	IInhalable* m_FrameCandidates[s_iMaxCandidates]{};
+	_uint        m_iFrameCandidateCount{};
 
 private:
 	void Change_InhaleState(CKirby* pKirby, INHALE_STATE eNext);
@@ -128,8 +135,12 @@ private:
 	void Update_SuperInhaleEffectRise(_float fRatio);
 
 	// Inhaleable(Stuffed)
-	void  Capture_Inhalable(IInhalable* pInhalable) { m_pCapturedInhalable = pInhalable; }
+	_bool Capture_Inhalable(IInhalable* pInhalable);
 	void  Spit_Inhalable(CKirby* pKirby);
+	void  Add_Candidate(IInhalable* p);
+	void  Resolve_Captures(CKirby* pKirby);
+	void  Clear_Captured();
+	void  Clear_Candidates();
 
 	void Off_InhaleEffect();
 

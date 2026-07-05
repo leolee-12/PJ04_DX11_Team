@@ -33,6 +33,9 @@ public:
 private:
 	LD_RAIL_DESC m_tRailDesc = {};
 
+private:
+	virtual HRESULT Validate_Initialized() override;
+
 #ifdef _DEBUG
 private:
 	PrimitiveBatch<VertexPositionColor>* m_pBatch = nullptr;

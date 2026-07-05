@@ -61,7 +61,7 @@ HRESULT CRenderer::Initialize()
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_SSAO_Blur"), m_iRTWidth, m_iRTHeight, DXGI_FORMAT_R8_UNORM, _float4(1.f, 1.f, 1.f, 1.f))))
         return E_FAIL;
 
-    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_LightDepth"), g_iShadowMapSize, g_iShadowMapSize, DXGI_FORMAT_R32_FLOAT, _float4(1.f, 1.f, 1.f, 1.f))))
+    if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_LightDepth"), g_iShadowMapSize, g_iShadowMapSize, DXGI_FORMAT_R32G32_FLOAT, _float4(1.f, 0.f, 0.f, 0.f))))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Add_RenderTarget(TEXT("Target_ESM"), g_iShadowMapSize, g_iShadowMapSize, DXGI_FORMAT_R32_FLOAT, _float4(1.f, 1.f, 1.f, 1.f))))
         return E_FAIL;
@@ -580,6 +580,10 @@ HRESULT CRenderer::Render_Combined()
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_SSAO_Blur"), m_pShaderDeferred, "g_SSAOTexture")))
         return E_FAIL;
     if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_Emissive"), m_pShaderDeferred, "g_EmissiveTexture")))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_MaterialID"), m_pShaderDeferred, "g_MaterialIDTexture")))
+        return E_FAIL;
+    if (FAILED(m_pGameInstance_Proxy->Bind_RT_ShaderResource(TEXT("Target_LightDepth"), m_pShaderDeferred, "g_ShadowRawTexture")))
         return E_FAIL;
 
     if (FAILED(m_pShaderDeferred->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))

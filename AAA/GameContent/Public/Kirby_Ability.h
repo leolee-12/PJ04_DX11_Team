@@ -1,18 +1,13 @@
 #pragma once
 
-#include "Base.h"
+#include "Kirby_AttackMode.h"
+
 #include "Animator.h"
-
-#include "GameContent_Defines.h"
-
-#include "Kirby_Command.h"
 
 NS_BEGIN(Engine)
 NS_END
 
 NS_BEGIN(Client)
-
-enum class KIRBY_ATTACK_LOCATION { GROUND, AIR };
 
 class CKirby;
 struct ATTACK_INFO;
@@ -30,9 +25,7 @@ enum class ABILITY_ANI
 	END
 };
 
-enum class ABILITY_UPDATE_RESULT { NONE, ABILITY_CHANGED };
-
-class CLIENT_DLL CKirby_Ability abstract : public CBase
+class CLIENT_DLL CKirby_Ability abstract : public CKirby_AttackMode
 {
 protected:
 	enum ABILITY_ANI_PLAY_TYPE { FULL_BODY, OVERLAY };
@@ -59,33 +52,13 @@ protected:
 public:
 	virtual COPY_ABILITY_TYPE Get_AbilityType() = 0;
 
-	virtual void Enter_AbilityState(CKirby* pKirby) = 0;
-	virtual ABILITY_UPDATE_RESULT Update_AbilityState(CKirby* pKirby, _float fTimeDelta) = 0;
-	virtual void Exit_AbilityState(CKirby* pKirby) = 0;
-
 public:
-	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo);
-
-public:
-	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) = 0;
-
-public:
-	virtual _bool Enter_Attack_KeyDown(CKirby* pKirby)  = 0;
-	virtual _bool Enter_Attack_KeyPress(CKirby* pKirby) = 0;
-	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby)    = 0;
-
-	virtual _bool Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation);
-
 	const CAnimator::ANI_PLAY_INFO* Get_AniInfo(ABILITY_ANI eAbilityAni);
-
-	_bool ReqEndAttackState() { return m_bReqEndAttackState; }
 
 	void Play_AbilityAni(CKirby* pKirby, ABILITY_ANI eAbilityAni);
 	void Clear_Overlay(CKirby* pKirby, _uint iSlot = 1, _float fOverlayBlendTime = 0.1f);
 
 protected:
-	_bool m_bReqEndAttackState{ true };
-
 	vector<ABILITY_ANI_DESC> m_tAniInfos;
 
 protected:

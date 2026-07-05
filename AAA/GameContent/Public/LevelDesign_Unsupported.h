@@ -19,20 +19,19 @@ private:
 	CLevelDesign_Unsupported(const CLevelDesign_Unsupported& Prototype);
 	virtual ~CLevelDesign_Unsupported() = default;
 
-public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
+	virtual HRESULT Validate_Initialized() override;
+
+public:
 	virtual void    Late_Update(_float fTimeDelta) override;
 	virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
-private:
 #ifdef _DEBUG
-	HRESULT Ready_DebugCollider(const LD_OBJECT_DESC* pObjectDesc);
-#endif
-
 private:
-#ifdef _DEBUG
 	CCollider* m_pDebugCollider = nullptr;
+
+	HRESULT Ready_DebugCollider(const LD_OBJECT_DESC* pObjectDesc);
 #endif
 
 public:

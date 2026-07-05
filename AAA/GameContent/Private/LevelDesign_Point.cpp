@@ -67,24 +67,51 @@ HRESULT CLevelDesign_Point::Initialize(void* pArg)
 	if (nullptr == pArg)
 		return E_FAIL;
 
-	if (FAILED(__super::Initialize(pArg)))
-		return E_FAIL;
-
 	m_tPointDesc = *static_cast<const LD_POINT_DESC*>(pArg);
 
-	if (const LD_POINT_CATALOG* pCatalog = Find_PointCatalog(m_tPointDesc.strObjectName))
-	{
-		m_vRenderColor = pCatalog->vRenderColor;
-		m_bRotate = pCatalog->bRotate;
-	}
+	const LD_POINT_CATALOG* pCatalog = Find_PointCatalog(m_tPointDesc.strObjectName);
+	if (nullptr == pCatalog)
+		return E_FAIL;
+
+	m_vRenderColor = pCatalog->vRenderColor;
+	m_bRotate = pCatalog->bRotate;
+
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
 
 	if (m_bRotate)
 		m_pTransformCom->Set_RotationPerSec(s_fPointRotationPerSec);
 
-	if (FAILED(Validate_Desc()))
+	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	if (FAILED(Ready_Components()))
+	if (FAILED(Validate_Initialized()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Point::Validate_Initialized()
+{
+	if (FAILED(__super::Validate_Initialized()))
+		return E_FAIL;
+
+	if (m_tPointDesc.eCategory != LD_CATEGORY::ITEM)
+		return E_FAIL;
+	if (m_tPointDesc.wstrModelProtoTag.empty())
+		return E_FAIL;
+	if (m_tPointDesc.iValue <= 0)
+		return E_FAIL;
+
+	const LD_POINT_CATALOG* pCatalog = Find_PointCatalog(m_tPointDesc.strObjectName);
+	if (nullptr == pCatalog)
+		return E_FAIL;
+	if (nullptr == pCatalog->pModelProtoTag || m_tPointDesc.wstrModelProtoTag != pCatalog->pModelProtoTag)
+		return E_FAIL;
+
+	if (nullptr == m_pShaderCom || nullptr == m_pModelCom || nullptr == m_pPickupCollider)
+		return E_FAIL;
+	if (!m_bPickupColliderRegistered)
 		return E_FAIL;
 
 	return S_OK;
@@ -98,7 +125,7 @@ void CLevelDesign_Point::Late_Update(_float fTimeDelta)
 	if (m_bRotate)
 		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
 
-	if (m_pPickupCollider && m_pPickupCollider->Is_Enabled())
+	if (m_pPickupCollider->Is_Enabled())
 	{
 		m_pPickupCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 #ifdef _DEBUG
@@ -174,37 +201,32 @@ CGameObject* CLevelDesign_Point::Create_Prototype(ID3D11Device* pDevice, ID3D11D
 	return CLevelDesign_Point::Create(pDevice, pContext);
 }
 
-HRESULT CLevelDesign_Point::Validate_Desc()
-{
-	if (m_tPointDesc.wstrModelProtoTag.empty())
-		return E_FAIL;
-	if (0 >= m_tPointDesc.iValue)
-		return E_FAIL;
-
-	return S_OK;
-}
-
 HRESULT CLevelDesign_Point::Ready_Components()
 {
-	const _tchar* pModelProtoTag = Resolve_ModelProtoTag();
-	if (nullptr == pModelProtoTag)
-		return E_FAIL;
-
-	m_pShaderCom = Add_Component<CShader>(
-		Shader_NonAnimMesh_PBR.iLevelID,
-		Shader_NonAnimMesh_PBR.szProtoTag,
-		TEXT("Com_Shader"));
-	if (nullptr == m_pShaderCom)
-		return E_FAIL;
-
-	m_pModelCom = Add_Component<CModel>(m_tPointDesc.iModelProtoLevel, pModelProtoTag, TEXT("Com_Model"));
-	if (nullptr == m_pModelCom)
+	if (FAILED(Ready_RenderComponents()))
 		return E_FAIL;
 
 	if (FAILED(Ready_PickupCollider()))
 		return E_FAIL;
 
 	SetUp_Collider_Callback();
+
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Point::Ready_RenderComponents()
+{
+	const _tchar* pModelProtoTag = Resolve_ModelProtoTag();
+	if (nullptr == pModelProtoTag)
+		return E_FAIL;
+
+	m_pShaderCom = Add_Component<CShader>(Shader_NonAnimMesh_PBR.iLevelID, Shader_NonAnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
+	if (nullptr == m_pShaderCom)
+		return E_FAIL;
+
+	m_pModelCom = Add_Component<CModel>(m_tPointDesc.iModelProtoLevel, pModelProtoTag, TEXT("Com_Model"));
+	if (nullptr == m_pModelCom)
+		return E_FAIL;
 
 	return S_OK;
 }

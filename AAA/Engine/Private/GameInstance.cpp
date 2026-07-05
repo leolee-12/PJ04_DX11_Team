@@ -706,6 +706,10 @@ PxRigidStatic* CGameInstance::Create_StaticActor(PxTriangleMesh* pMesh, _fmatrix
 {
     return m_pPhysX_Manager->Create_StaticActor(pMesh, W);
 }
+HRESULT CGameInstance::Refresh_StaticBoxPose(physx::PxRigidStatic* pActor, const _float3& vLocalCenter, _fmatrix WorldMatrix)
+{
+    return m_pPhysX_Manager->Refresh_StaticBoxPose(pActor, vLocalCenter, WorldMatrix);
+}
 PxRigidStatic* CGameInstance::Create_StaticBox(const _float3& vLocalCenter, const _float3& vLocalHalfExtents, _fmatrix WorldMatrix)
 {
     return m_pPhysX_Manager->Create_StaticBox(vLocalCenter, vLocalHalfExtents, WorldMatrix);

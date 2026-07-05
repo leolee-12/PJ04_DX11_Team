@@ -45,18 +45,6 @@ HRESULT CKirby_Ability::Initialize()
     return S_OK;
 }
 
-_bool CKirby_Ability::Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation)
-{
-    switch (eAttackLocation)
-    {
-        case KIRBY_ATTACK_LOCATION::GROUND:
-        case KIRBY_ATTACK_LOCATION::AIR:
-            return true;
-    }
-
-    return false;
-}
-
 const CAnimator::ANI_PLAY_INFO* CKirby_Ability::Get_AniInfo(ABILITY_ANI eAbilityAni)
 {
     return &m_tAniInfos[ETOUI(eAbilityAni)].tBaseAniInfo;
@@ -131,15 +119,4 @@ void CKirby_Ability::Set_OverlayAni(ABILITY_ANI eAni, const _string& strBaseAniN
 void CKirby_Ability::Free()
 {
     __super::Free();
-}
-
-void CKirby_Ability::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
-{
-    CMovement_Child* pMovement = pKirby->Get_Movement();
-    pMovement->Apply_Knockback(tInfo.vAttackerPos, 180.f, 9.f);  // Test
-
-    pKirby->Add_HP(-tInfo.fDamage);
-    pKirby->Start_DamageInvincibility();
-
-    pKirby->Change_State(KIRBY_STATE_TYPE::DAMAGED);
 }

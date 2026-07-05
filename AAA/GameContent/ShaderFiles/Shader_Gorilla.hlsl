@@ -14,7 +14,7 @@ float g_fDissolve;
 float4 g_vEmissiveColor;
 uint g_iMaterialID = 0;
 
-float g_fShadowDepthBias = 0.075f;
+float g_fShadowDepthBias = 0.001f;
 
 static const float3 EYE_WHITE = float3(1.f, 1.f, 1.f);
 static const float3 EYE_BLUE = float3(0.12f, 0.45f, 1.f);
@@ -137,7 +137,7 @@ PS_SHADOW_OUT PS_SHADOW(VS_SHADOW_OUT In)
     PS_SHADOW_OUT Out;
     float d = In.vProjPos.z / In.vProjPos.w;
     d += g_fShadowDepthBias; // 오클루더를 광원에서 살짝 밀어 self-shadow 제거
-    Out.vLightDepth = float4(d, d, d, 1.f);
+    Out.vLightDepth = float4(d, 1.f, 0.f, 1.f);
     return Out;
 }
 

@@ -7,7 +7,7 @@
 #include "GameContent_AnimEvents.h"
 #include "Kirby_States.h"
 #include "Preview_Kirby.h"
-#include "LevelDesign_EventObject.h"
+#include "LD_EventObject.h"
 
 namespace
 {

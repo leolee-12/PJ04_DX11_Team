@@ -41,12 +41,6 @@ void CEnemyBomb::Be_Captured(CGameObject* pInhaler)
 	m_fScaleRatio = 1.f;
 }
 
-void CEnemyBomb::Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed)
-{
-	m_bCaptured = false;
-	m_pCaptor = nullptr;
-}
-
 void CEnemyBomb::On_Swallowed()
 {
 	m_pTransformCom->Set_Scale(m_vBaseScale.x, m_vBaseScale.y, m_vBaseScale.z);

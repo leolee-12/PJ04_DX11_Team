@@ -38,14 +38,14 @@ void CKirby_GetAbility::Enter(CKirby* pKirby)
     pAbility->Clear_Overlay(pKirby, 1, 0.1f);
     pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::GET_ABILITY);
 
-    //À±¼®ÇöÃß°¡
-    KIRBY_ABILITY_CHANGED Desc{};
-    m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &Desc);
-    m_pGameInstance_Proxy->Set_TimeScale(0.f);
-
     m_bPartsOn = false;
     m_bCloseEye = false;
     m_bOpenMouse = false;
+
+    KIRBY_ABILITY_CHANGED tDesc{};
+    tDesc.bBegin = true;
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &tDesc);
+    m_pGameInstance_Proxy->Set_TimeScale(0.f);
 }
 
 void CKirby_GetAbility::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -80,14 +80,13 @@ void CKirby_GetAbility::Exit(CKirby* pKirby)
 {
     __super::Exit(pKirby);
 
-    //À±¼®ÇöÃß°¡
+    CKirby_Body* pBody = pKirby->Get_Body();
+    pBody->Set_KirbyMouth(KIRBY_MOUTH_STATE::IDLE);
+
     KIRBY_ABILITY_CHANGED Desc{};
     Desc.bBegin = false;
     m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &Desc);
     m_pGameInstance_Proxy->Set_TimeScale(1.f);
-
-    CKirby_Body* pBody = pKirby->Get_Body();
-    pBody->Set_KirbyMouth(KIRBY_MOUTH_STATE::IDLE);
 }
 
 void CKirby_GetAbility::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)

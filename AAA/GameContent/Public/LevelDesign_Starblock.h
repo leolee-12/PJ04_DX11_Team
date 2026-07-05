@@ -1,7 +1,7 @@
 #pragma once
 #include "LevelDesignObject.h"
 #include "Damageable.h"
-#include "LDInhalable.h"
+#include "LD_Inhalable.h"
 
 NS_BEGIN(Engine)
 class CShader;
@@ -17,7 +17,7 @@ NS_BEGIN(Client)
 struct LD_SPAWN_SPEC;
 
 class CLevelDesign_Starblock final
-	: public CLDInhalable
+	: public CLD_Inhalable
 	, public IDamageable
 {
 	GENERATED_BODY(CLevelDesign_Starblock)
@@ -34,9 +34,11 @@ private:
 	CLevelDesign_Starblock(const CLevelDesign_Starblock& Prototype);
 	virtual ~CLevelDesign_Starblock() = default;
 
-public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
+	virtual	HRESULT	Validate_Initialized() override;
+
+public:
 	virtual void    Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
@@ -46,6 +48,7 @@ public:
 
 	// Inhalable
 	virtual void Be_Captured(CGameObject* pInhaler) override;
+	virtual _float3 Get_SpatPivotOffset() const override { return m_vSpatPivot; }
 
 public:
 	const LD_BREAKABLE_DESC& Get_BreakableDesc() const { return m_tBreakableDesc; }
@@ -57,14 +60,15 @@ private:
 
 	LD_BREAKABLE_DESC m_tBreakableDesc = {};
 
-private:
-	virtual	HRESULT	Validate_Desc() override;
+	_float3 m_vSpatPivot{};
 
+private:
 	HRESULT			Ready_Components();
-	HRESULT			Ready_PhysicsActor_Box();
+	HRESULT			Ready_PhysicsActor();
 	void			Release_PhysicsActor();
 	HRESULT			Bind_ShaderResources();
 	const _tchar*	Resolve_ModelProtoTag() const;
+	void			Compute_SpatPivot();
 
 	virtual void    SetUp_Collider_CallBack() override;
 

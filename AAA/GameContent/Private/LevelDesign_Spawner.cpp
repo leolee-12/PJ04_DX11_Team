@@ -1,7 +1,7 @@
 #include "LevelDesign_Spawner.h"
 #include "LevelDesign_Registry.h"
 #include "LevelDesign_Rail.h"
-#include "RailDataReceiver.h"
+#include "RailRideable.h"
 
 #include "GameInstance.h"
 
@@ -47,7 +47,7 @@ HRESULT CLevelDesign_Spawner::Spawn(const LD_PACKAGE& Package, const LD_SPAWN_RE
 		pOutReport->iSpawnCandidateCount = static_cast<_uint>(Package.ObjectDescs.size());
 	}
 
-	vector<pair<IRailDataReceiver*, _uint>> PendingRailBindings;
+	vector<pair<IRailRideable*, _uint>> PendingRailBindings;
 	HRESULT hrFinal = S_OK;
 
 	for (const LD_OBJECT_ENTRY& Desc : Package.ObjectDescs)
@@ -64,7 +64,7 @@ HRESULT CLevelDesign_Spawner::Spawn(const LD_PACKAGE& Package, const LD_SPAWN_RE
 		if (0 == BaseDesc.iTargetRailUid || nullptr == pCreatedObject)
 			continue;
 
-		IRailDataReceiver* pReceiver = dynamic_cast<IRailDataReceiver*>(pCreatedObject);
+		IRailRideable* pReceiver = dynamic_cast<IRailRideable*>(pCreatedObject);
 		if (nullptr != pReceiver)
 			PendingRailBindings.emplace_back(pReceiver, BaseDesc.iTargetRailUid);
 	}

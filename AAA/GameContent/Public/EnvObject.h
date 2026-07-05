@@ -55,6 +55,7 @@ public:
 	_float Get_Dissolve() const { return m_fDissolve; }
 
 	_bool Pick_Marb1e(_fvector vRayOrigin, _fvector vRayDir, _float3* pOutHit, _float* fOutDistance);
+	HRESULT Refresh();
 
 protected:
 	HRESULT Ready_RenderComponents(_uint iModelProtoLevel, const wstring& wstrModelProtoTag);

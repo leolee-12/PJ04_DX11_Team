@@ -25,7 +25,9 @@ public:
 
 	virtual _bool				Can_BeInhaled(const INHALE_QUERY& q) const override;
 	virtual void				Be_Captured(CGameObject* pInhaler) override;
-	virtual void				Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed) override;
+	virtual void				On_SpatBegin() override {}
+	virtual void				On_SpatEnd()   override {}
+
 
 	virtual COPY_ABILITY_TYPE	Get_CopyAbility() const override
 	{
