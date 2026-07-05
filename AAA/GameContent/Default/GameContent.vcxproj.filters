@@ -874,6 +874,12 @@
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Spat">
       <UniqueIdentifier>{dcb1512b-4270-4d45-88e6-fa87ac86dc6e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard">
+      <UniqueIdentifier>{746fae67-6a99-4b4e-bef8-b91f1b3b2cd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo">
+      <UniqueIdentifier>{028348be-a282-4c6e-b35f-c23a77b2027c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">

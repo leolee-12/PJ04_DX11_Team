@@ -9,13 +9,12 @@
 CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
 {
     const _float fCloseRange = 6.f;  
-    const _float fSwingRange = 20.f;
-    const _float fThrowRange = 40.f;
+    const _float fSwingRange = 25.f;
     const _float fFacingDot = 0.86f;
     const _float fTurnSpeedDeg = 90.f;
-    const _float fChargeTime = 0.5f;
+    const _float fChargeTime = 0.2f;
     const _float fSpd = 1.5f;
-    const _float fAtkInterval = 2.5f;   
+    const _float fAtkInterval = 2.f;   
     const _float fStopRange = 5.f;
 
 
@@ -78,7 +77,7 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
         };
 
     auto MakeArmSpin = [&]() -> CBTNode* {
-        const _float fSpinDuration = 5.f;     // 스핀 지속 시간
+        const _float fSpinDuration = 10.f;     // 스핀 지속 시간
         const _float fSpinTurnDeg = 120.f;   // 스핀 중 타겟 추적 회전 속도(deg/s)
         auto fSpinT = make_shared<_float>(0.f);
         auto bSpin = make_shared<bool>(false);
@@ -258,8 +257,8 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
         }),
             // 4) (P0 한정) 그 외 먼 거리: 돌던지기
         CBTSequence::Create({
-            CBTCondition::Create([iPhase, fThrowRange](CBlackboard* pBB) {
-                  return iPhase == 0 && pBB->Get<_float>("DistToTarget", FLT_MAX) >= fThrowRange; }),
+            CBTCondition::Create([iPhase, fSwingRange](CBlackboard* pBB) {
+                  return iPhase == 0 && pBB->Get<_float>("DistToTarget", FLT_MAX) > fSwingRange; }),
             MakeThrowRock(),
             MeleeCount(),
         }),
@@ -335,19 +334,6 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
         },
         [bTurn]() { *bTurn = false; });
 
-    const _float fRecoverTime = 0.8f;
-    auto fRecoverT = make_shared<_float>(0.f);
-    auto* pPostAttackRecover = CBTAction::Create(
-        [this, fRecoverT, fRecoverTime](CBlackboard*, _float dt) -> BT_STATUS {
-            if (*fRecoverT == 0.f)
-                m_pOwner->Get_BodyAnimator()->Play("Wait", true, true);   // 회전 없이 정지
-            *fRecoverT += dt;
-            if (*fRecoverT >= fRecoverTime) { *fRecoverT = 0.f; return BT_STATUS::SUCCESS; }
-            return BT_STATUS::RUNNING;
-        },
-        [fRecoverT]() { *fRecoverT = 0.f; });
-
-
     // 공격 쿨다운: 매 프레임 dt 누적, 차면 SUCCESS / 아니면 FAILURE
     auto* pCooldownGate = CBTAction::Create([this, fAtkInterval](CBlackboard*, _float dt) -> BT_STATUS {
         m_fAtkTimer += dt;
@@ -356,13 +342,12 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
     auto* pResetTimer = CBTAction::Create([this](CBlackboard*, _float) {
         m_fAtkTimer = 0.f; return BT_STATUS::SUCCESS;
         });
-    // 현재 거리에 맞는 공격이 있나? 없으면(애매한 거리) -> 공격 분기 실패 -> 추적
-    auto* pAttackable = CBTCondition::Create([this, fSwingRange, fThrowRange, iPhase](CBlackboard* pBB) {
-        if (m_iMeleeSinceThrow >= 3) return true;                  // 점프/스핀: 거리 무관
+    auto* pAttackable = CBTCondition::Create([this, fSwingRange, iPhase](CBlackboard* pBB) {
+        if (m_iMeleeSinceThrow >= 3) return true;
         _float d = pBB->Get<_float>("DistToTarget", FLT_MAX);
-        if (d <= fSwingRange) return true;                         // 근접/휘두르기
-        if (iPhase == 0 && d >= fThrowRange) return true;          // 던지기(P0)
-        return false;                                              // 14~40 애매 -> 추적
+        if (d <= fSwingRange) return true;                 // 근접/휘두르기
+        if (iPhase == 0 && d > fSwingRange) return true;   // 던지기(P0): 근접 밖 전부
+        return false;
         });
 
     auto bHeld = make_shared<bool>(false);   // 현재 정지 상태 유지 중인가

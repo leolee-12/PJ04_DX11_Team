@@ -76,6 +76,8 @@ HRESULT CKirby::Initialize(void* pArg)
     if (FAILED(Ready_AnimEvents()))
         return E_FAIL;  
 
+    m_fInvincibleDuration = 2.f;
+
     return S_OK;
 }
 
@@ -663,7 +665,7 @@ HRESULT CKirby::Ready_AnimEvents()
 
 _bool CKirby::Block_Hit(const ATTACK_INFO& tInfo) 
 { 
-    return m_fInvincibleTime > 0.f; 
+    return Is_Invincible();
 }
 
 void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
@@ -722,7 +724,7 @@ void CKirby::Update_InvincibilityHitFlash()
         return;
     }
 
-    const _float fInvincibilityElapsedTime = s_fInvincibleDuration - m_fInvincibleTime;
+    const _float fInvincibilityElapsedTime = m_fInvincibleDuration - m_fInvincibleTime;
 
     constexpr _float fInitialFlashDuration = 0.12f;
     if (fInvincibilityElapsedTime < fInitialFlashDuration)

@@ -46,38 +46,6 @@ HRESULT CBrontoBurt::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CBrontoBurt::Priority_Update(_float fTimeDelta)
-{
-	if (!m_bActive)
-		return;
-
-	__super::Priority_Update(fTimeDelta);
-}
-
-void CBrontoBurt::Update(_float fTimeDelta)
-{
-	if (!m_bActive)
-		return;
-
-#ifdef _DEBUG
-	if (m_pGameInstance_Proxy->Is_EditMode())
-	{
-		if (m_pMovement) m_pMovement->Sync_To_Controller();
-		return;
-	}
-#endif
-
-	__super::Update(fTimeDelta);
-}
-
-void CBrontoBurt::Late_Update(_float fTimeDelta)
-{
-	if (!m_bActive)
-		return;
-
-	__super::Late_Update(fTimeDelta);
-}
-
 _bool CBrontoBurt::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
 {
 	Out.fRadius = { 0.5f };

@@ -28,7 +28,7 @@ void CMultiHitBoxPart::SetUp_HitBox_Callback(_int iIndex)
             ATTACK_INFO atk{};
             atk.fDamage = hb.fDamage;
             atk.fKnockback = hb.fKnockback;
-            XMStoreFloat3(&atk.vAttackerPos, m_pTransformCom->Get_State(STATE::POSITION));
+            atk.vAttackerPos = _float3(m_CombinedWorldMatrix._41, m_CombinedWorldMatrix._42, m_CombinedWorldMatrix._43);
             atk.pAttacker = this;
             pVictim->Damaged(atk);
         });
