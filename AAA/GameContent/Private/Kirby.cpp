@@ -631,7 +631,7 @@ HRESULT CKirby::Ready_Events()
         }
     );
 
-    Subscribe_Event(EventTag::Cutscene_GrabKirby,
+    Subscribe_Event(EventTag::Cutscene_KirbyStart,
         [this](void* pData)
         {
             CUTSCENE_GRAB_DESC* pDesc = static_cast<CUTSCENE_GRAB_DESC*>(pData);
