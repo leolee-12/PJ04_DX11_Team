@@ -84,8 +84,6 @@ struct MAP_STAGE_PROFILE
 	_uint   iMainSubmittedBlend = {};
 
 	_uint   iShadowCandidateSections = {};
-	_uint   iShadowVisibleSections = {};
-	_uint   iShadowCulledSections = {};
 	_uint   iShadowSubmittedSections = {};
 
 	double  dCullingCpuMs = {};

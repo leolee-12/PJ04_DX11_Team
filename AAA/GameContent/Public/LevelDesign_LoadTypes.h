@@ -84,25 +84,16 @@ struct LD_LADDER_DESC : public LD_OBJECT_DESC
 #pragma endregion
 
 #pragma region EventObject
-enum class LD_EVENTOBJECT_POLICY
-{
-	DEFAULT,
-	LEVEL1_BOSS_DEMO_BG,
-	SLOPEBOARD_A,
-	SLOPEBOARD_C,
-};
-
 inline constexpr _uint LD_ANIM_SLOT_COUNT = 4;
 
 struct LD_EVENTOBJECT_DESC : public LD_OBJECT_DESC
 {
-	_uint           iModelProtoLevel = {};
-	MODEL           eModelType = MODEL::ANIM;
-	_wstring        wstrModelProtoTag;
-	_string         strAnimNames[LD_ANIM_SLOT_COUNT] = {};
-	LD_EVENTOBJECT_POLICY ePolicy = LD_EVENTOBJECT_POLICY::DEFAULT;
-	_bool			bUseCollMesh = true;
-	_wstring        strAnimEventFile;
+	_uint		iModelProtoLevel = {};
+	MODEL		eModelType = MODEL::ANIM;
+	_wstring	wstrModelProtoTag;
+	_string		strAnimNames[LD_ANIM_SLOT_COUNT] = {};
+	_bool		bUseCollMesh = true;
+	_wstring	strAnimEventFile;
 };
 #pragma endregion
 

@@ -3,10 +3,6 @@
 #include "Kirby_Deform_Model.h"
 
 NS_BEGIN(Engine)
-class CShader;
-class CModel;
-class CAnimator;
-class CTexture;
 NS_END
 
 NS_BEGIN(Client)
@@ -35,9 +31,6 @@ private:
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
-	virtual void Priority_Update(_float fTimeDelta) override;
-	virtual void Update(_float fTimeDelta) override;
-	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
@@ -46,11 +39,9 @@ public:
 private:
 	HRESULT Ready_Components();
 
-	virtual HRESULT Render_KirbyMesh(_uint iMeshIndex) override;
-
 private:
-	_bool m_bBodyAOn{ true };
-	_bool m_bBodyBOn{ false };
+	_bool m_bBodyAOn{};
+	_bool m_bBodyBOn{};
 
 public:
 	static CKirby_DeformCar_Demo* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -41,6 +41,9 @@ public:
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
+public:
+	virtual _bool Ignore_TimeScale() { return true; }
+
 private:
 	void Change_GetDeformState(CKirby* pKirby, DEFORM_STATE eNext);
 	void Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState);

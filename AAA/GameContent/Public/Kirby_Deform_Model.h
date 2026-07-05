@@ -2,7 +2,7 @@
 
 #include "PartObject.h"
 
-#include "GameContent_Defines.h"
+#include "GameContent_const.h"
 
 NS_BEGIN(Engine)
 class CShader;
@@ -14,6 +14,7 @@ NS_END
 NS_BEGIN(Client)
 
 class CKirby;
+
 enum class KIRBY_EYE_STATE { IDLE, DOUBT, BLINK, CLOSE, ANGRY, SURPRISED, SADNESS, END };
 
 class CKirby_Deform_Model abstract : public CPartObject
@@ -23,8 +24,8 @@ class CKirby_Deform_Model abstract : public CPartObject
 public:
 	struct KIRBY_FORM_DESC : public CPartObject::PARTOBJECT_DESC
 	{
-		const _float* pHitFlash = { nullptr };
-		const _float3* pHitFlashColor = { nullptr };
+		const _float* pHitFlashIntensity{};
+		const _float3* pHitFlashColor{};
 	};
 
 protected:
@@ -37,37 +38,28 @@ protected:
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
-	virtual void Priority_Update(_float fTimeDelta) override;
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
-	virtual HRESULT Render() override;
+
+public:
+	const _float4x4* Get_BoneMatrixPtr(const _char* pBoneName) const;
+	virtual const _float4x4* Get_HatBoneMatirx();
+
+	CAnimator* Get_Animator() { return m_pAnimatorCom; }
 
 	virtual HRESULT Ready_AnimEvents(CKirby* pKirby) = 0;
 
 public:
-	const _float4x4* Get_BoneMatrixPtr(const _char* pBoneName) const;
-
-	CAnimator* Get_Animator() { return m_pAnimatorCom; }
-
-public:
 	void Set_KirbyEye(KIRBY_EYE_STATE eState) { m_eEye = eState; }
-	KIRBY_EYE_STATE Get_KirbyEye() const { return m_eEye; }
-
-public:
-	virtual const _float4x4* Get_HatBoneMatirx();
 
 protected:
 	_bool Handle_AnimEventEye(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
 	_bool Handle_AnimEventSound(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
 
-	HRESULT Bind_ShaderResources(CShader* pShader);
-
-	virtual HRESULT Render_PBRMesh(_uint iMeshIndex);
-	virtual HRESULT Render_KirbyMesh(_uint iMeshIndex) = 0;
+	HRESULT Bind_CommonShaderResources(CShader* pShader);
 
 protected:
 	CShader* m_pKirbyShaderCom{};
-	CShader* m_pPBRShaderCom = { nullptr };
 
 	CModel* m_pModelCom{};
 
@@ -78,15 +70,13 @@ protected:
 
 	KIRBY_EYE_STATE m_eEye{};
 
-	const _float* m_pHitFlash = { nullptr };
-	const _float3* m_pHitFlashColor = { nullptr };
-
-	_int  m_iShadowPass = { -1 };
+	const _float* m_pHitFlashIntensity{};
+	const _float3* m_pHitFlashColor{};
 
 protected:
-	_float4 m_vBodyColor = { 1.f, 0.1882353f, 0.3764706f, 1.f };
-	_float4 m_vFootColor = { 0.67f, 0.f, 0.f, 1.f };
-	_float4 m_vBlushColor = { 1.f, 0.05f, 0.12f, 1.f };
+	static constexpr _float4 s_vBodyColor{ 1.f, 0.1882353f, 0.3764706f, 1.f };
+	static constexpr _float4 s_vFootColor{ 0.67f, 0.f, 0.f, 1.f };
+	static constexpr _float4 s_vBlushColor{ 1.f, 0.05f, 0.12f, 1.f };
 
 protected:
 	virtual void Free();

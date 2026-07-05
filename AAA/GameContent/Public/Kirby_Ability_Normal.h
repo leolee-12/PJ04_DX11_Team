@@ -54,9 +54,9 @@ private:
 public:
 	virtual COPY_ABILITY_TYPE Get_AbilityType() override;
 
-	virtual void Enter_AbilityState(CKirby* pKirby) override;
-	virtual ABILITY_UPDATE_RESULT Update_AbilityState(CKirby* pKirby, _float fTimeDelta) override;
-	virtual void Exit_AbilityState(CKirby* pKirby) override;
+	virtual void Enter_AttackState(CKirby* pKirby) override;
+	virtual void Update_AttackState(CKirby* pKirby, _float fTimeDelta) override;
+	virtual void Exit_AttackState(CKirby* pKirby) override;
 
 public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
@@ -67,8 +67,6 @@ public:
 	virtual _bool Enter_Attack_KeyDown(CKirby* pKirby) override;
 	virtual _bool Enter_Attack_KeyPress(CKirby* pKirby) override;
 	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) override;
-
-	virtual _bool Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation) override;
 
 private:
 	CGameInstance_Proxy* m_pGameInstance_Proxy{};

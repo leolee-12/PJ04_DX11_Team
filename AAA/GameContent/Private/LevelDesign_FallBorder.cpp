@@ -53,13 +53,29 @@ HRESULT CLevelDesign_FallBorder::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Validate_Desc()))
-		return E_FAIL;
-
 	if (FAILED(Ready_Components(*pParsedDesc)))
 		return E_FAIL;
 
-	SetUp_Collider_Callback();
+	if (FAILED(Validate_Initialized()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevelDesign_FallBorder::Validate_Initialized()
+{
+	if (FAILED(__super::Validate_Initialized()))
+		return E_FAIL;
+
+	if (m_tLevelDesignDesc.eCategory != LD_CATEGORY::VOLUME)
+		return E_FAIL;
+
+	const _wstring& strObjectName = m_tLevelDesignDesc.strObjectName;
+	if (strObjectName != L"FallBorder")
+		return E_FAIL;
+
+	if (nullptr == m_pColliderCom)
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -68,14 +84,11 @@ void CLevelDesign_FallBorder::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
-	if (m_pColliderCom && m_pTransformCom)
-	{
-		m_pColliderCom->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+	m_pColliderCom->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
 #ifdef _DEBUG
-		m_pGameInstance_Proxy->Add_DebugComponent(m_pColliderCom);
+	m_pGameInstance_Proxy->Add_DebugComponent(m_pColliderCom);
 #endif
-	}
 }
 
 void CLevelDesign_FallBorder::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
@@ -84,20 +97,6 @@ void CLevelDesign_FallBorder::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 		return;
 
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
-}
-
-HRESULT CLevelDesign_FallBorder::Validate_Desc()
-{
-	if (m_tLevelDesignDesc.eCategory != LD_CATEGORY::VOLUME)
-		return E_FAIL;
-
-	const _wstring& strObjectName = m_tLevelDesignDesc.strObjectName;
-	if (strObjectName != L"FallBorder")
-	{
-		return E_FAIL;
-	}
-
-	return S_OK;
 }
 
 HRESULT CLevelDesign_FallBorder::Ready_Components(const LD_PARSED_OBJECT& Desc)
@@ -119,6 +118,8 @@ HRESULT CLevelDesign_FallBorder::Ready_Components(const LD_PARSED_OBJECT& Desc)
 		return E_FAIL;
 
 	m_pGameInstance_Proxy->Register_Collider(m_pColliderCom, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+
+	SetUp_Collider_Callback();
 
 	return S_OK;
 }

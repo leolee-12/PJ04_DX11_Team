@@ -5,7 +5,7 @@
 #include "Shader_PassMeta.h"
 #include "MapStage.h"
 #include "MapSection.h"
-#include "MapBreakSection.h"
+#include "MapEvent_BreakWall.h"
 #include "Map_EditFile.h"
 #include "Map_EditSession.h"
 #include "EnvObject.h"
@@ -480,7 +480,7 @@ void CPanel_Inspector::Render()
 		Draw_EnvObjectEditPanel(pLevel, pSelected);
 	}
 
-	if (dynamic_cast<CMapBreakSection*>(pSelected))
+	if (dynamic_cast<CMapEvent_BreakWall*>(pSelected))
 	{
 		ImGui::Separator();
 		Draw_MapSectionEditPanel(pLevel, nullptr, pSelected);
@@ -569,7 +569,7 @@ _bool CPanel_Inspector::Draw_Properties(IReflectable* pHolder)
 		nullptr != dynamic_cast<CEnvObject*>(pHolder);
 	const _bool bSkipMapSectionCategory =
 		nullptr != dynamic_cast<CMapSection*>(pHolder)
-		|| nullptr != dynamic_cast<CMapBreakSection*>(pHolder);
+		|| nullptr != dynamic_cast<CMapEvent_BreakWall*>(pHolder);
 
 	for (auto& prop : pHolder->Get_Properties())
 	{
@@ -869,14 +869,19 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 		return;
 
 	CMapSection* pMapSection = dynamic_cast<CMapSection*>(pObject);
-	CMapBreakSection* pBreakSection = dynamic_cast<CMapBreakSection*>(pObject);
+	CMapEvent_BreakWall* pBreakWall = dynamic_cast<CMapEvent_BreakWall*>(pObject);
 
-	if (nullptr == pMapSection && nullptr == pBreakSection)
+	if (nullptr == pMapSection && nullptr == pBreakWall)
 		return;
 	if (nullptr != pMapSection && nullptr == pMapStage)
 		return;
 
-	_bool* pbRenderable = FindBoolProperty(pObject, L"Renderable", L"MapSection");
+	_bool* pbRenderable = nullptr;
+	if (nullptr != pMapSection)
+		pbRenderable = FindBoolProperty(pMapSection, L"Renderable", L"MapSection");
+	else
+		pbRenderable = FindBoolProperty(pBreakWall, L"Renderable", L"MapEvent_BreakWall");
+
 	_bool* pbEnableCulling = nullptr;
 	_bool* pbCreateCollisionActor = nullptr;
 	_bool bSourceCanCreateCollisionActor = false;
@@ -897,24 +902,27 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 		const CMap_EditSession* pSession = pLevel->Get_MapPreviewSession();
 		strStageName = (nullptr != pSession && !pSession->Get_LoadedStageName().empty())
 			? pSession->Get_LoadedStageName()
-			: CMapBreakSection::STAGE12_STAGE_NAME;
-		strSectionName = pBreakSection->Get_SectionName();
+			: CMapEvent_BreakWall::STAGE12_STAGE_NAME;
+		strSectionName = pBreakWall->Get_SectionName();
 	}
 
 	const string strStageNameText = WstrToStr(strStageName);
 	const string strSectionNameText = WstrToStr(strSectionName);
 
-	ImGui::TextUnformatted("MapSection Edit");
-	if (nullptr != pBreakSection)
-		ImGui::TextDisabled("Type: MapBreakSection");
+	ImGui::TextUnformatted(nullptr != pBreakWall ? "MapEvent_BreakWall Edit" : "MapSection Edit");
+	if (nullptr != pBreakWall)
+		ImGui::TextDisabled("Type: MapEvent_BreakWall");
 	ImGui::TextDisabled("Stage: %s", strStageNameText.empty() ? "<Unnamed Stage>" : strStageNameText.c_str());
 	ImGui::TextDisabled("Section: %s", strSectionNameText.empty() ? "<Unnamed Section>" : strSectionNameText.c_str());
 
-	if (ImGui::CollapsingHeader("Section Flags", ImGuiTreeNodeFlags_DefaultOpen))
+	const _char* pFlagsHeader = nullptr != pBreakWall ? "MapEvent_BreakWall Flags" : "Section Flags";
+	const _char* pRenderableLabel = nullptr != pBreakWall ? "Renderable##MapEventBreakWallEdit" : "Renderable##SectionEdit";
+
+	if (ImGui::CollapsingHeader(pFlagsHeader, ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::BeginGroup();
 		if (pbRenderable)
-			ImGui::Checkbox("Renderable##SectionEdit", (bool*)pbRenderable);
+			ImGui::Checkbox(pRenderableLabel, (bool*)pbRenderable);
 		ImGui::EndGroup();
 
 		if (nullptr != pMapSection)
@@ -942,11 +950,11 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 		else
 		{
 			ImGui::TextDisabled("Transform and Renderable affect the current preview.");
-			ImGui::TextDisabled("Culling, shadow, and section collision actor are not used by MapBreakSection.");
+			ImGui::TextDisabled("Culling, shadow, and section collision actor are not used by MapEvent_BreakWall.");
 		}
 	}
 
-	if (nullptr != pBreakSection)
+	if (nullptr != pBreakWall)
 		return;
 
 	const _wstring strSectionKey = CMap_EditFile::Make_SectionKey(strStageName, strSectionName);
@@ -1000,6 +1008,8 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 
 	if (ImGui::Button("Save##SectionEdit"))
 	{
+		pLevel->Commit_MapEditObjectFromCurrentState(pMapSection);
+
 		if (FAILED(pLevel->Save_MapOverride()))
 			MSG_BOX("MAP EDIT SAVE FAILED");
 	}
