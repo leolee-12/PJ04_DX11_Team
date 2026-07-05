@@ -34,7 +34,8 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
     if (nullptr == m_pLoader)
         return E_FAIL;
 
-    m_pGameInstance_Proxy->Stop_BGM();
+    // FadeOut UI에서 BGM FadeOut을 호출함
+    //m_pGameInstance_Proxy->Stop_BGM();
     m_pGameInstance_Proxy->Clear_Lights();
 
     return S_OK;

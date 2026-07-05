@@ -81,12 +81,6 @@ void CStage0_Step1::Update(_float fTimeDelta)
         m_pGameInstance_Proxy->Toggle_DebugRender();
     }
 #endif //  _DEBUG
-
-    if (m_pGameInstance_Proxy->Key_Down(DIK_F3))
-    {
-        m_pGameInstance_Proxy->Play_BGM(L"K15_Grassland1.marker.wav", 0.65f);
-    }
-
 }
 
 HRESULT CStage0_Step1::Render()
@@ -97,19 +91,31 @@ HRESULT CStage0_Step1::Render()
 HRESULT CStage0_Step1::Ready_Events()
 {
     Subscribe_Event(TEXT("FadeOut_Done"), [this](void* p) {
-        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::STAGE0_STEP2);
-        if (pLoadingLevel)
-        {
-            m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
-            return;
-        }
-        //CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::BOSS_STAGE1);
+        //CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::STAGE0_STEP2);
         //if (pLoadingLevel)
         //{
         //    m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
         //    return;
         //}
+        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::BOSS_STAGE1);
+        if (pLoadingLevel)
+        {
+            m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
+            return;
+        }
         });
+
+    //Subscribe_Event(TEXT("Debug Level Change"), [this](void* p) {
+    //     Ä³½ºÆÃ
+    //    
+    //    CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::eLevel);
+    //    if (pLoadingLevel)
+    //    {
+    //        m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
+    //        return;
+    //    }
+    //    });
+
     return S_OK;
 }
 

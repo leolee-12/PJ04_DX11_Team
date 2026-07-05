@@ -72,8 +72,12 @@ void CMonster_State_Captured::Exit(MONSTER_STATE_TYPE eNextState)
 		return;
 
 	m_pOwner->Get_Transform()->Set_Scale(m_vBaseScale.x, m_vBaseScale.y, m_vBaseScale.z);
-	m_pOwner->Enable_Controller(true);
-	m_pOwner->Enable_Colliders(true);
+
+	if (eNextState != MONSTER_STATE_TYPE::SPAT)
+	{
+		m_pOwner->Enable_Controller(true);
+		m_pOwner->Enable_Colliders(true);
+	}
 }
 
 CMonster_State_Captured* CMonster_State_Captured::Create(const ANI_PLAY_INFO& tInfo, _float fSpeed)

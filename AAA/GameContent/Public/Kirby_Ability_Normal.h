@@ -97,7 +97,16 @@ private:
 
 	// Inhaleable(Stuffed)
 	_bool m_bInhaleCancelLocked{};
-	IInhalable* m_pCapturedInhalable{};
+
+	//윤석현 수정 *변수/상수 위치 원하는 위치로 옮기세용*
+	//IInhalable* m_pCapturedInhalable{};
+	static constexpr _uint  s_iMaxCaptured = 3;
+	IInhalable* m_CapturedInhalables[s_iMaxCaptured]{};
+	_uint       m_iCapturedCount{};
+
+	static constexpr _uint  s_iMaxCandidates = 8;
+	IInhalable* m_FrameCandidates[s_iMaxCandidates]{};
+	_uint        m_iFrameCandidateCount{};
 
 private:
 	void Change_InhaleState(CKirby* pKirby, INHALE_STATE eNext);
@@ -126,8 +135,12 @@ private:
 	void Update_SuperInhaleEffectRise(_float fRatio);
 
 	// Inhaleable(Stuffed)
-	void  Capture_Inhalable(IInhalable* pInhalable) { m_pCapturedInhalable = pInhalable; }
+	_bool Capture_Inhalable(IInhalable* pInhalable);
 	void  Spit_Inhalable(CKirby* pKirby);
+	void  Add_Candidate(IInhalable* p);
+	void  Resolve_Captures(CKirby* pKirby);
+	void  Clear_Captured();
+	void  Clear_Candidates();
 
 	void Off_InhaleEffect();
 

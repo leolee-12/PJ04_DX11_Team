@@ -26,18 +26,16 @@ public:
 	virtual _bool Can_BeInhaled(const INHALE_QUERY& q) const override { return true; }
 	virtual void Be_Captured(CGameObject* pInhaler) override;
 	virtual COPY_ABILITY_TYPE Get_CopyAbility() const override { return COPY_ABILITY_TYPE::NONE; }
-	virtual void Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed) override;
 	virtual CGameObject* Get_GameObject() override { return this; }
-
+	virtual void On_SpatBegin() override;
+	virtual void On_SpatEnd()   override;
 
 protected:
-	enum class LD_STATE { IDLE, CAPTURED, SPAT };
+	enum class LD_STATE { IDLE, CAPTURED };
 
 	LD_STATE m_eState = { LD_STATE::IDLE };
 
 	CCollider* m_pHurtBox = { nullptr };
-	CCollider* m_pProjectileBox = { nullptr };
-	_float3	   m_vSpatVelocity = {};
 
 	_float	   m_fColliderRadius = { 1.f };
 
@@ -70,7 +68,6 @@ protected:
 
 private:
 	void Update_Captured(_float fTimeDelta);
-	void Update_Spat(_float fTimeDelta);
 };
 
 NS_END

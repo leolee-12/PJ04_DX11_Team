@@ -277,9 +277,6 @@
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Death">
       <UniqueIdentifier>{a8a873c7-fcc6-4434-8fdd-b289ad07473c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Spat">
-      <UniqueIdentifier>{81b0629c-516a-4991-8c17-3bfbd6ecf5e9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Attack">
       <UniqueIdentifier>{765c8d67-517d-476b-ab97-3167b36bc8a1}</UniqueIdentifier>
     </Filter>
@@ -871,6 +868,12 @@
     <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\00. Deform_Car">
       <UniqueIdentifier>{b600ded8-bf65-4554-b846-776c35549114}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Projectile\01. Kirby_Spit">
+      <UniqueIdentifier>{13343d6f-6325-403c-a289-3544da5b6a8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Spat">
+      <UniqueIdentifier>{dcb1512b-4270-4d45-88e6-fa87ac86dc6e}</UniqueIdentifier>
+    </Filter>
     <Filter Include="99. Defines\Leo\Utils">
       <UniqueIdentifier>{6cf11970-9a27-43c8-9ee8-94532478608e}</UniqueIdentifier>
     </Filter>
@@ -1301,9 +1304,6 @@
     </ClInclude>
     <ClInclude Include="..\public\MonsterHitPart.h">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase\MonsterHitPart</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Monster_State_Spat.h">
-      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Monster_State_Attack.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Attack</Filter>
@@ -1749,6 +1749,12 @@
     <ClInclude Include="..\Public\RailTrack.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Spit_Projectile.h">
+      <Filter>01. Projectile\01. Kirby_Spit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_State_Spat.h">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Parsing_Utils.h">
       <Filter>99. Defines\Leo\Utils</Filter>
     </ClInclude>
@@ -2122,9 +2128,6 @@
     </ClCompile>
     <ClCompile Include="..\private\MonsterHitPart.cpp">
       <Filter>00. GameObject\06. Monster\99. Monster_PartBase\MonsterHitPart</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Monster_State_Spat.cpp">
-      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Monster_State_Attack.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Attack</Filter>
@@ -2560,6 +2563,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\RailTrack.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Spit_Projectile.cpp">
+      <Filter>01. Projectile\01. Kirby_Spit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_State_Spat.cpp">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_DeformCarBreakWall.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>

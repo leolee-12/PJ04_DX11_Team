@@ -173,7 +173,7 @@ PS_SHADOW_OUT PS_SHADOW(VS_SHADOW_OUT In)
 {
     PS_SHADOW_OUT Out;
     float d = In.vProjPos.z / In.vProjPos.w;
-    Out.vLightDepth = float4(d, d, d, 1.f);
+    Out.vLightDepth = float4(d, 1.f, 0.f, 1.f);
     return Out;
 }
 

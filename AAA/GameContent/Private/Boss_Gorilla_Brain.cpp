@@ -390,7 +390,6 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
                         CBTSequence::Create({ 
                             pFacing, 
                             pAttackDecision, 
-                            pPostAttackRecover,
                             pResetTimer,
                             }),
 				            pTurnToTarget,

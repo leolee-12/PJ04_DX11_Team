@@ -108,6 +108,36 @@ CSound_Handle CSound_Manager::PlaySFX3DLoop(const TCHAR* pSoundKey, _fvector vSo
 	return CSound_Handle(PlayInternal(pSoundKey, fVolume * fAtten, eBus, true));
 }
 
+CSound_Handle CSound_Manager::PlaySFXSectionLoop(const TCHAR* pSoundKey, float _fLoopStart, float fLoopEnd, float fVolume, ESoundBus eBus)
+{
+	FMOD::Sound* pSound = Find_Sound(pSoundKey);
+	if (!pSound)
+		return CSound_Handle();
+
+	_uint iLenMs = 0;
+	pSound->getLength(&iLenMs, FMOD_TIMEUNIT_MS);
+
+	FMOD::Channel* pCh =
+		PlayInternal(pSoundKey, fVolume, eBus, true);
+	if (!pCh || 0 == iLenMs)
+		return CSound_Handle(pCh);
+
+	_fLoopStart = max(0.f, min(_fLoopStart, 1.f));
+	fLoopEnd = max(0.f, min(fLoopEnd, 1.f));
+	if (fLoopEnd <= _fLoopStart)
+		return CSound_Handle(pCh);   // 잘못된 구간 -> 전체 반복(기본)
+
+	_uint iStartMs = (_uint)(iLenMs * _fLoopStart);
+	_uint iEndMs = (_uint)(iLenMs * fLoopEnd);
+	if (iEndMs >= iLenMs)
+		iEndMs = iLenMs - 1;
+
+	pCh->setLoopPoints(
+		iStartMs, FMOD_TIMEUNIT_MS,
+		iEndMs, FMOD_TIMEUNIT_MS);
+	return CSound_Handle(pCh);
+}
+
 void CSound_Manager::PlayBGM(const TCHAR* pSoundKey, float fVolume, bool bLoop)
 {
 	StopBGM();   // 기존 BGM 교체(겹침 방지)
@@ -151,6 +181,27 @@ void CSound_Manager::PlayBGM_Section(const TCHAR* pSoundKey, float fStart01, flo
 		iEndMs = iLenMs - 1;
 
 	m_pBGMChannel->setLoopPoints(iStartMs, FMOD_TIMEUNIT_MS, iEndMs, FMOD_TIMEUNIT_MS);
+}
+
+void CSound_Manager::Fade_BGM_Out(_float fSec)
+{
+	if (!m_pBGMChannel)
+		return;
+
+	Fade_BGM_Channel(m_pBGMChannel, 1.f, 0.f, fSec, true);
+	m_pBGMChannel = nullptr; 
+}
+
+void CSound_Manager::Play_BGM_Fade(const TCHAR* pSoundKey, float fSec, float fVolume)
+{
+	Fade_BGM_Out(fSec);
+
+	m_pBGMChannel = PlayInternal(pSoundKey, fVolume, ESoundBus::BGM, true);
+
+	if (!m_pBGMChannel)
+		return;
+
+	Fade_BGM_Channel(m_pBGMChannel, 0.f, 1.f, fSec, false);
 }
 
 void CSound_Manager::SetBusVolume(ESoundBus eBus, float fVolume)
@@ -254,6 +305,36 @@ HRESULT CSound_Manager::LoadSoundFileRecursive(const char* pPath)
 
 	_findclose(handle);
 	return S_OK;
+}
+
+void CSound_Manager::Fade_BGM_Channel(FMOD::Channel* pCh, float fFrom, float fTo, float fSeconds, bool bStopAtEnd)
+{
+	if (!pCh)
+		return;
+
+	FMOD::System* pSys = nullptr;
+	if (pCh->getSystemObject(&pSys) != FMOD_OK || !pSys)
+		return;
+
+	int iRate = 48000;
+	if (pSys->getSoftwareFormat(
+		&iRate, nullptr, nullptr) != FMOD_OK)
+		return;
+
+	unsigned long long clk = 0;
+	if (pCh->getDSPClock(nullptr, &clk) != FMOD_OK)
+		return;
+
+	if (fSeconds < 0.f)
+		fSeconds = 0.f;
+	unsigned long long fade =
+		(unsigned long long)((double)iRate * fSeconds);
+
+	pCh->removeFadePoints(0, ~0ull);
+	pCh->addFadePoint(clk, fFrom);
+	pCh->addFadePoint(clk + fade, fTo);
+	if (bStopAtEnd)
+		pCh->setDelay(0, clk + fade, true);
 }
 
 CSound_Manager* CSound_Manager::Create()

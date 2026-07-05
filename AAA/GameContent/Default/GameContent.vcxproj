@@ -68,6 +68,7 @@
     <ClInclude Include="..\Public\LD_SlopeBoardC.h" />
     <ClInclude Include="..\Public\LD_Stage1BossDemo.h" />
     <ClInclude Include="..\Public\Math_Utils.h" />
+    <ClInclude Include="..\Public\Monster_State_Spat.h" />
     <ClInclude Include="..\Public\SphereMesh.h" />
     <ClInclude Include="..\Public\SphereParticle.h" />
     <ClInclude Include="..\Public\Common_SphereNoise.h" />
@@ -105,6 +106,7 @@
     <ClInclude Include="..\public\RockPush.h" />
     <ClInclude Include="..\public\Shockwave.h" />
     <ClInclude Include="..\Public\SmokeParticle.h" />
+    <ClInclude Include="..\public\Spit_Projectile.h" />
     <ClInclude Include="..\Public\Star2DParticle.h" />
     <ClInclude Include="..\Public\SpitObject.h" />
     <ClInclude Include="..\Public\StarEmitter.h" />
@@ -183,7 +185,6 @@
     <ClInclude Include="..\Public\LevelDesign_Registry.h" />
     <ClInclude Include="..\Public\Monster_State_Move.h" />
     <ClInclude Include="..\Public\Monster_State_Patrol.h" />
-    <ClInclude Include="..\public\Monster_State_Spat.h" />
     <ClInclude Include="..\Public\Monster_State_Retreat.h" />
     <ClInclude Include="..\public\MultiHitBoxPart.h" />
     <ClInclude Include="..\Public\NormalEnemy.h" />
@@ -366,6 +367,7 @@
     <ClCompile Include="..\Private\LD_SlopeBoardA.cpp" />
     <ClCompile Include="..\Private\LD_SlopeBoardC.cpp" />
     <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp" />
+    <ClCompile Include="..\Private\Monster_State_Spat.cpp" />
     <ClCompile Include="..\Private\SphereMesh.cpp" />
     <ClCompile Include="..\Private\SphereParticle.cpp" />
     <ClCompile Include="..\Private\Common_SphereNoise.cpp" />
@@ -401,6 +403,7 @@
     <ClCompile Include="..\private\RockPush.cpp" />
     <ClCompile Include="..\private\Shockwave.cpp" />
     <ClCompile Include="..\Private\SmokeParticle.cpp" />
+    <ClCompile Include="..\private\Spit_Projectile.cpp" />
     <ClCompile Include="..\Private\Star2DParticle.cpp" />
     <ClCompile Include="..\Private\SpitObject.cpp" />
     <ClCompile Include="..\Private\StarEmitter.cpp" />
@@ -511,7 +514,6 @@
     <ClCompile Include="..\Private\Monster_State_Landing.cpp" />
     <ClCompile Include="..\Private\Monster_State_Move.cpp" />
     <ClCompile Include="..\Private\Monster_State_Patrol.cpp" />
-    <ClCompile Include="..\private\Monster_State_Spat.cpp" />
     <ClCompile Include="..\Private\Monster_State_Retreat.cpp" />
     <ClCompile Include="..\Private\Movement_Child.cpp" />
     <ClCompile Include="..\private\MultiHitBoxPart.cpp" />

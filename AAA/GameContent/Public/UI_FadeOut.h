@@ -19,6 +19,7 @@ public:
     virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOut) override { pOut->strPrototypeTag = PROTOTYPE_TAG; }
 
 protected:
+    virtual void On_SequenceStart() override;
     virtual void On_SequenceDone() override;   // 페이드아웃 완료 신호
 
 public:
