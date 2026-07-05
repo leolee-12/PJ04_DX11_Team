@@ -32,8 +32,8 @@ private:
 	unordered_map<_wstring, TEXTURE_HANDLE> m_HandleByTextureName;
 
 	mutable shared_mutex m_Mutex;
-	mutable _uint m_iCacheHitCount = {};
-	_uint m_iCacheMissCount = {};
+	_uint m_iDedupedLoadRequestCount = {};
+	_uint m_iFirstLoadRequestCount = {};
 	_uint m_iLoadFailureCount = {};
 
 private:

@@ -125,14 +125,14 @@ HRESULT CTexture_Hub::LoadOrGet(const _tchar* pTexturePath, TEXTURE_HANDLE* pOut
 		if (iter != m_HandleByNormalizedPath.end())
 		{
 			if constexpr (0 != PROFILE_ENABLE)
-				++m_iCacheHitCount;
+				++m_iDedupedLoadRequestCount;
 
 			*pOut = iter->second;
 			return S_OK;
 		}
 
 		if constexpr (0 != PROFILE_ENABLE)
-			++m_iCacheMissCount;
+			++m_iFirstLoadRequestCount;
 	}
 
 	// 파일 로드/디코딩 -> 락 바깥에서 수행
@@ -189,15 +189,12 @@ HRESULT CTexture_Hub::Get(const _tchar* pTextureName, TEXTURE_HANDLE* pOut) cons
 
 	using GetLock = std::conditional_t<0 != PROFILE_ENABLE, unique_lock<shared_mutex>, shared_lock<shared_mutex>>;
 
-	GetLock Lock(m_Mutex);
+	shared_lock<shared_mutex> Lock(m_Mutex);
 
 	const auto iter = m_HandleByTextureName.find(strKey);
 	if (iter == m_HandleByTextureName.end())
 		return E_FAIL;
 
-	if constexpr (0 != PROFILE_ENABLE)
-		++m_iCacheHitCount;
-	
 	*pOut = iter->second;
 	return S_OK;
 }
@@ -277,8 +274,8 @@ TEXTURE_HUB_STATS CTexture_Hub::Get_Stats() const
 
 	TEXTURE_HUB_STATS Stats{};
 	Stats.iCachedSRVCount = static_cast<_uint>(m_SRVs.size());
-	Stats.iCacheReuseCount = m_iCacheHitCount;
-	Stats.iFirstLoadRequestCount = m_iCacheMissCount;
+	Stats.iCacheReuseCount = m_iDedupedLoadRequestCount;
+	Stats.iFirstLoadRequestCount = m_iFirstLoadRequestCount;
 	Stats.iLoadFailCount = m_iLoadFailureCount;
 	return Stats;
 }
