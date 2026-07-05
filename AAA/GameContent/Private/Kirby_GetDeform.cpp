@@ -125,7 +125,7 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
 
             CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR, KIRBY_DEFORM_MODEL_TYPE::DEMO);
             pDeformModel_Demo->Set_Active(true);
-            pDeformModel_Demo->Get_Animator()->Play("Deform", false, false, 0.1f, 1.5f, true);
+            pDeformModel_Demo->Get_Animator()->Play("Deform", false, false, 0.1f, 1.5f);
 
             pKirby->Get_KirbyAbility()->Get_AbilityType();
 

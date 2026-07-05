@@ -17,7 +17,6 @@ public:
         _bool       bRestart{ false };
         _float      fBlend = { 0.2f };
         _float      fSpeed = { 1.f };
-        _bool       bClearMask = { true };                    // 제거 예정 base Play가 마스크를 건드리는 결합
     };
 
     struct LAYER_PLAY_INFO
@@ -48,7 +47,7 @@ public:
     void    Update(_float fTimeDelta);                 // 재생 + 이벤트 판정 소유
 
 public: // 재생 제어 (오브젝트/에디터는 오직 이것만 사용)
-    void    Play(const string& strAnimName, _bool bLoop = true, _bool bRestart = false, _float fBlend = 0.2f, _float fSpeed = 1.0f, _bool bClearMask = true);
+    void    Play(const string& strAnimName, _bool bLoop = true, _bool bRestart = false, _float fBlend = 0.2f, _float fSpeed = 1.0f);
     void    Play(const ANI_PLAY_INFO* tAniInfo);
     void    Start_Clip(const ANI_PLAY_INFO& Info);
     
@@ -77,10 +76,12 @@ public: // 재생 제어 (오브젝트/에디터는 오직 이것만 사용)
     void    Set_EventCallback(EventCallback cb) { m_Callback = move(cb); }
 
     // 단일 선언 유지
-    void    Set_Mask(const _char* szClip, const _char* strRootBone, _bool bLoop, _float fMaskTarget, _float fMaskBlendTime);
+    void Set_Mask(const _char* szClip, const _char* szRootBone, _bool bLoop,
+        _float fTargetWeight, _float fWeightBlend, _float fClipBlend = 0.2f);
 
     // 벡터 선언 추가
-    void    Set_Mask(const _char* szClip, const _char* const* pRoots, _uint iRootCount, _bool bLoop, _float fMaskTarget, _float fMaskBlendTime);
+    void Set_Mask(const _char* szClip, const _char* const* pRoots, _uint iRootCount, _bool bLoop,
+        _float fTargetWeight, _float fWeightBlend, _float fClipBlend = 0.2f);
 
     // 바로 지우고 싶으면 그대로 사용 / 부드럽게 내리고 싶다면 BlendTime 주기
     void    Clear_Mask(_float fMaskBlendTime = 0.f);

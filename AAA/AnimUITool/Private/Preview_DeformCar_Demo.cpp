@@ -37,7 +37,7 @@ HRESULT CPreview_DeformCar_Demo::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	m_pAnimatorCom->Play("Deform", true, true, 0.2f, 1.f, false);
+	m_pAnimatorCom->Play("Deform", true, true, 0.2f, 1.f);
 
 	return S_OK;
 }
