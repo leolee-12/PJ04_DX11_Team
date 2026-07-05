@@ -81,6 +81,10 @@ _bool CKirby_GetDeform::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
     return false;
 }
 
+void CKirby_GetDeform::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+}
+
 void CKirby_GetDeform::Change_GetDeformState(CKirby* pKirby, DEFORM_STATE eNext)
 {
     if (m_eDeformState == eNext)

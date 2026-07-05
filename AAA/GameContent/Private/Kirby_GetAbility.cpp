@@ -85,10 +85,6 @@ void CKirby_GetAbility::Exit(CKirby* pKirby)
     m_pGameInstance_Proxy->Set_TimeScale(1.f);
 }
 
-void CKirby_GetAbility::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
-{
-}
-
 _bool CKirby_GetAbility::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
     if (__super::Handle_Command(pKirby, pCommand))
@@ -103,6 +99,10 @@ _bool CKirby_GetAbility::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand
     //}
 
     return false;
+}
+
+void CKirby_GetAbility::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
 }
 
 void CKirby_GetAbility::Parts_On(CKirby* pKirby, _float fRatio)
