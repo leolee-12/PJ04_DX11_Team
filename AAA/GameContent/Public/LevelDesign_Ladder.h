@@ -40,6 +40,11 @@ public:
 	static _bool Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
 	static CGameObject* Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
+public:
+	_vector Get_NearestRungWorld(_fvector vWorldPosition) const;
+	_vector Get_TopClimbWorld() const;
+	_vector Get_BottomClimbWorld() const;
+
 private:
 	CShader* m_pShaderCom = nullptr;
 	CModel* m_ModelComs[SEGMENT::_COUNT] = { nullptr };
@@ -47,6 +52,11 @@ private:
 
 	LD_LADDER_DESC m_tLadderDesc = {};
 	_float m_fSegmentStepY = { 1.f };
+
+private:
+	_float m_fClimbOffsetZ = -1.f;
+	_float m_fRungSpacing = 0.5f;
+	_float m_fBottomLocalY = 0.f;
 
 private:
 	virtual HRESULT	Validate_Desc() override;

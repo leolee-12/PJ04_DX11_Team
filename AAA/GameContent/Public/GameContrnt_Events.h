@@ -22,9 +22,11 @@ namespace Client
         inline constexpr const _tchar* Boss_Died = L"Boss.Died";
 
         inline constexpr const _tchar* Cutscene_GorillaAppear = L"Cutscene.GorillaAppear";   // 트리거 발동
-        inline constexpr const _tchar* Cutscene_GrabKirby =    L"Cutscene.GrabKirby";           // 커비 컷씬위치로
         inline constexpr const _tchar* Cutscene_ReleaseKirby = L"Cutscene.ReleaseKirby";     
         inline constexpr const _tchar* Cutscene_CameraChange = L"Cutscene.CameraChange";
+
+        //
+        inline constexpr const _tchar* Cutscene_KirbyStart =    L"Cutscene.KirbyStart";           // 커비 컷씬위치로
         inline constexpr const _tchar* Cutscene_GorillaHandoff = L"Cutscene.GorillaHandoff";
         inline constexpr const _tchar* Cutscene_GorillaBreak = L"Cutscene.GorillaBreak";  // 고릴라 환경 부수기 이벤트
 
@@ -48,7 +50,7 @@ namespace Client
     };
 
     enum class ECutsceneCam { Cutscene, Boss };
-    enum class GRAB_TYPE : _uint{ GORILLA_SCENE, GORILLA_COMBAT, _COUNT };
+    enum class CUTSCENE_KIRBY_TYPE : _uint{ GORILLA_SCENE, GORILLA_COMBAT, DEFORM_CAR_GET_FIRST, _COUNT };
 
     struct CAMERA_SHAKE_DESC
     {
@@ -70,7 +72,7 @@ namespace Client
     {
         const _float4x4* pBoneMatrix = { nullptr }; 
         const _float4x4* pSourceWorld = { nullptr };
-        GRAB_TYPE  eType = { GRAB_TYPE::_COUNT };
+        CUTSCENE_KIRBY_TYPE  eType = { CUTSCENE_KIRBY_TYPE::_COUNT };
     };
 
     struct PLAYER_QUERY { CGameObject* pPlayer = { nullptr }; };

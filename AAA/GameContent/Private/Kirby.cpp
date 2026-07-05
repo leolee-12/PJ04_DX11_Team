@@ -468,20 +468,29 @@ void CKirby::SetUp_Collider_Callback()
                     OutputDebugStringA(szBuf);
 #endif
                 }
-
-                else if (iGroup == ETOUI(COLLISION_LAYER::ENV_LADDER))
-                {
-                    CLevelDesign_Ladder* pLadder = dynamic_cast<CLevelDesign_Ladder*>(pOther->Get_Owner());
-                    if (pLadder == nullptr)
-                        return;
-
-                    Set_Ladder(pLadder);
-                }
             }
         );
     }
 
-    m_KirbyColliders[HURT_BOX]->Set_OnExit(
+    m_KirbyColliders[HURT_BOX]->Set_OnStay
+    (
+        [this](CCollider* pOther)
+        {
+            const _uint iGroup = pOther->Get_RegisteredGroup();
+
+            if (iGroup == ETOUI(COLLISION_LAYER::ENV_LADDER))
+            {
+                CLevelDesign_Ladder* pLadder = dynamic_cast<CLevelDesign_Ladder*>(pOther->Get_Owner());
+                if (pLadder == nullptr)
+                    return;
+
+                Set_Ladder(pLadder);
+            }
+        }
+    );
+
+    m_KirbyColliders[HURT_BOX]->Set_OnExit
+    (
         [this](CCollider* pOther)
         {
             const _uint iGroup = pOther->Get_RegisteredGroup();
@@ -491,7 +500,8 @@ void CKirby::SetUp_Collider_Callback()
                 Clear_Ladder();
                 return;
             }
-        });
+        }
+    );
 }
 
 HRESULT CKirby::Ready_PartObjects()
