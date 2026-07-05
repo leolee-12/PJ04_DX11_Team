@@ -871,6 +871,9 @@
     <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\00. Deform_Car">
       <UniqueIdentifier>{b600ded8-bf65-4554-b846-776c35549114}</UniqueIdentifier>
     </Filter>
+    <Filter Include="99. Defines\Leo\Utils">
+      <UniqueIdentifier>{6cf11970-9a27-43c8-9ee8-94532478608e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1268,9 +1271,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Monster_State_Captured.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Captured</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Parsing_Utils.h">
-      <Filter>99. Defines\Leo</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Parser.h">
       <Filter>97. DataSystem\LevelDesignLoader</Filter>
@@ -1748,6 +1748,18 @@
     </ClInclude>
     <ClInclude Include="..\Public\RailTrack.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Parsing_Utils.h">
+      <Filter>99. Defines\Leo\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Math_Utils.h">
+      <Filter>99. Defines\Leo\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Geometry_Utils.h">
+      <Filter>99. Defines\Leo\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_DeformCarBreakWall.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2548,6 +2560,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\RailTrack.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_DeformCarBreakWall.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

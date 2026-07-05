@@ -21,21 +21,21 @@ namespace Client
         inline constexpr const _tchar* Boss_HP_Updated = L"Boss.HPUpdated";
         inline constexpr const _tchar* Boss_Died = L"Boss.Died";
 
+        inline constexpr const _tchar* Cutscene_DeformCarBreakWall = L"Cutscene.DeformCarBreakWall";
+
         inline constexpr const _tchar* Cutscene_GorillaAppear = L"Cutscene.GorillaAppear";   // 트리거 발동
         inline constexpr const _tchar* Cutscene_GrabKirby =    L"Cutscene.GrabKirby";           // 커비 컷씬위치로
         inline constexpr const _tchar* Cutscene_ReleaseKirby = L"Cutscene.ReleaseKirby";     
         inline constexpr const _tchar* Cutscene_CameraChange = L"Cutscene.CameraChange";
         inline constexpr const _tchar* Cutscene_GorillaHandoff = L"Cutscene.GorillaHandoff";
         inline constexpr const _tchar* Cutscene_GorillaBreak = L"Cutscene.GorillaBreak";  // 고릴라 환경 부수기 이벤트
-
         inline constexpr const _tchar* Camera_Shake = L"Camera.Shake";
         inline constexpr const _tchar* Camera_Rumble = L"Camera.Rumble";
 
         inline constexpr const _tchar* NamePlate_Appeared = L"Boss.NamePlateOn";
         inline constexpr const _tchar* FullScreen_Flash = L"Fx.FullScreenFlashOn";
 
-        inline constexpr const _tchar* Stage12_CarBreakWall = L"Stage1-2.CarBreakWall";
-        inline constexpr const _tchar* Stage12_CarBreakWall2 = L"Stage1-2.CarBreakWall2";
+        inline constexpr const _tchar* Stage1_Step2_CarBreakMap = L"Stage1-2.CarBreakMap";
     }
 
     inline constexpr const _tchar* EVT_SWALLOWED = L"OnSwallowed";

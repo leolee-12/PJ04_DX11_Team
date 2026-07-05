@@ -84,6 +84,9 @@ public:
 	_bool Track_EditedMapPreviewSection(const _wstring& strSectionKey, const MAP_ENV_EDITED_DESC& Edit);
 	_bool Clear_EditedMapPreviewSection(const _wstring& strSectionKey);
 	_bool Try_GetMapPreviewSectionEdit(const _wstring& strSectionKey, MAP_ENV_EDITED_DESC* pOutEdit) const;
+	_bool Track_EditedMapPreviewLevelDesignObject(CGameObject* pObject, const MAP_LD_EDITED_DESC& Edit);
+	_bool Clear_EditedMapPreviewLevelDesignObject(CGameObject* pObject);
+	_bool Try_GetMapPreviewLevelDesignEdit(CGameObject* pObject, MAP_LD_EDITED_DESC* pOutEdit) const;
 	_bool Commit_MapEditObjectFromCurrentState(CGameObject* pObject);
 
 	HRESULT Restore_DeletedMapPreviewEnv(const _wstring& strStableKey);

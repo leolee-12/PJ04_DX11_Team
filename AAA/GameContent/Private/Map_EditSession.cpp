@@ -1,6 +1,7 @@
 #include "Map_EditSession.h"
 #include "Map_EditFile.h"
 #include "EnvObject.h"
+#include "LevelDesignObject.h"
 
 #include <algorithm>
 
@@ -14,6 +15,7 @@ void CMap_EditSession::Reset()
 {
 	m_tEditData = {};
 	m_MapPreviewEnvItems.clear();
+	m_MapPreviewLDItems.clear();
 	m_DeletedMapPreviewEnvItems.clear();
 	m_DeletedMapPreviewEnvOrder.clear();
 	m_AddedObjectsByRuntime.clear();
@@ -31,6 +33,7 @@ void CMap_EditSession::Set_EditData(const MAP_EDIT_DATA& Desc)
 		|| !Desc.strManifestPath.empty();
 
 	m_MapPreviewEnvItems.clear();
+	m_MapPreviewLDItems.clear();
 	m_AddedObjectsByRuntime.clear();
 	m_AddedObjectUiItems.clear();
 	m_AddedObjectOrder.clear();
@@ -103,34 +106,78 @@ _wstring CMap_EditSession::Build_DisplayName(const ENV_OBJECT_DESC& Desc)
 	return strDisplayName;
 }
 
+_wstring CMap_EditSession::Build_LevelDesignDisplayName(const LD_OBJECT_DESC& Desc)
+{
+	_wstring strDisplayName = Desc.strObjectName;
+
+	if (strDisplayName.empty())
+	{
+		strDisplayName = Desc.strSection;
+		if (!Desc.strEntryKey.empty())
+		{
+			if (!strDisplayName.empty())
+				strDisplayName += L":";
+			strDisplayName += Desc.strEntryKey;
+		}
+	}
+
+	if (strDisplayName.empty())
+		strDisplayName = L"(LevelDesignObject)";
+
+	strDisplayName += L" / Uid=" + to_wstring(Desc.iUid);
+	return strDisplayName;
+}
+
 void CMap_EditSession::Register_PreviewObject(const _wstring& strLayerTag, const _wstring& strObjectTag, CGameObject* pObject)
 {
 	if (nullptr == pObject)
 		return;
 
-	if (!Is_PreviewEnvLayer(strLayerTag))
+	if (Is_PreviewEnvLayer(strLayerTag))
+	{
+		CEnvObject* pEnvObject = dynamic_cast<CEnvObject*>(pObject);
+		if (nullptr == pEnvObject)
+			return;
+
+		const ENV_OBJECT_DESC& Desc = pEnvObject->Get_Desc();
+
+		MAP_EDIT_ENV_ITEM Item{};
+		Item.strStableKey = CMap_EditFile::Make_EnvKey(Desc);
+		Item.strDisplayName = Build_DisplayName(Desc);
+		if (Item.strDisplayName.empty())
+			Item.strDisplayName = strObjectTag;
+
+		Item.strLayerTag = strLayerTag;
+		Item.strObjectTag = strObjectTag;
+		Item.wstrSourceFile = Desc.wstrSourceFile;
+		Item.wstrSection = Desc.wstrSection;
+		Item.wstrEntryKey = Desc.wstrEntryKey;
+		Item.iUid = Desc.iUid;
+
+		m_MapPreviewEnvItems[pObject] = Item;
+		return;
+	}
+
+	CLevelDesignObject* pLDObject = dynamic_cast<CLevelDesignObject*>(pObject);
+	if (nullptr == pLDObject)
 		return;
 
-	CEnvObject* pEnvObject = dynamic_cast<CEnvObject*>(pObject);
-	if (nullptr == pEnvObject)
-		return;
+	const LD_OBJECT_DESC& Desc = pLDObject->Get_LevelDesignDesc();
 
-	const ENV_OBJECT_DESC& Desc = pEnvObject->Get_Desc();
-
-	MAP_EDIT_ENV_ITEM Item{};
-	Item.strStableKey = CMap_EditFile::Make_EnvKey(Desc);
-	Item.strDisplayName = Build_DisplayName(Desc);
+	MAP_EDIT_LD_ITEM Item{};
+	Item.strStableKey = CMap_EditFile::Make_LevelDesignKey(Desc);
+	Item.strDisplayName = Build_LevelDesignDisplayName(Desc);
 	if (Item.strDisplayName.empty())
 		Item.strDisplayName = strObjectTag;
 
 	Item.strLayerTag = strLayerTag;
 	Item.strObjectTag = strObjectTag;
-	Item.wstrSourceFile = Desc.wstrSourceFile;
-	Item.wstrSection = Desc.wstrSection;
-	Item.wstrEntryKey = Desc.wstrEntryKey;
+	Item.wstrSourceFile = Desc.strSourceFile;
+	Item.wstrSection = Desc.strSection;
+	Item.wstrEntryKey = Desc.strEntryKey;
 	Item.iUid = Desc.iUid;
 
-	m_MapPreviewEnvItems[pObject] = Item;
+	m_MapPreviewLDItems[pObject] = Item;
 }
 
 void CMap_EditSession::Unregister_PreviewObject(CGameObject* pObject)
@@ -139,6 +186,7 @@ void CMap_EditSession::Unregister_PreviewObject(CGameObject* pObject)
 		return;
 
 	m_MapPreviewEnvItems.erase(pObject);
+	m_MapPreviewLDItems.erase(pObject);
 }
 
 _bool CMap_EditSession::Can_DeleteAsEnvOverride(CGameObject* pObject) const
@@ -279,9 +327,7 @@ _bool CMap_EditSession::Clear_EditedMapSection(const _wstring& strSectionKey)
 	return 0 < iErased;
 }
 
-_bool CMap_EditSession::Try_GetEditedMapSection(
-	const _wstring& strSectionKey,
-	MAP_ENV_EDITED_DESC* pOutEdit) const
+_bool CMap_EditSession::Try_GetEditedMapSection(const _wstring& strSectionKey, MAP_ENV_EDITED_DESC* pOutEdit) const
 {
 	if (nullptr == pOutEdit || strSectionKey.empty())
 		return false;
@@ -294,9 +340,75 @@ _bool CMap_EditSession::Try_GetEditedMapSection(
 	return true;
 }
 
-_bool CMap_EditSession::Try_GetDeletedEnvItem(
-	const _wstring& strStableKey,
-	MAP_EDIT_ENV_ITEM* pOutItem) const
+_bool CMap_EditSession::Track_EditedLevelDesignObject(CGameObject* pObject, const MAP_LD_EDITED_DESC& Edit)
+{
+	if (nullptr == pObject)
+		return false;
+
+	const auto IterItem = m_MapPreviewLDItems.find(pObject);
+	if (IterItem == m_MapPreviewLDItems.end())
+		return false;
+
+	const _wstring& strStableKey = IterItem->second.strStableKey;
+	if (strStableKey.empty())
+		return false;
+
+	if (!Has_AnyMapLDEdit(Edit))
+	{
+		m_tEditData.OverrideDesc.EditedLevelDesignObjects.erase(strStableKey);
+	}
+	else
+	{
+		MAP_LD_EDITED_DESC StoredEdit = Edit;
+		StoredEdit.strStableKey = strStableKey;
+		m_tEditData.OverrideDesc.EditedLevelDesignObjects[strStableKey] = StoredEdit;
+	}
+
+	m_tEditData.bHasMapContent = true;
+	return true;
+}
+
+_bool CMap_EditSession::Clear_EditedLevelDesignObject(CGameObject* pObject)
+{
+	if (nullptr == pObject)
+		return false;
+
+	const auto IterItem = m_MapPreviewLDItems.find(pObject);
+	if (IterItem == m_MapPreviewLDItems.end())
+		return false;
+
+	const _wstring& strStableKey = IterItem->second.strStableKey;
+	if (strStableKey.empty())
+		return false;
+
+	const size_t iErased = m_tEditData.OverrideDesc.EditedLevelDesignObjects.erase(strStableKey);
+
+	m_tEditData.bHasMapContent = true;
+	return 0 < iErased;
+}
+
+_bool CMap_EditSession::Try_GetEditedLevelDesignObject(CGameObject* pObject, MAP_LD_EDITED_DESC* pOutEdit) const
+{
+	if (nullptr == pObject || nullptr == pOutEdit)
+		return false;
+
+	const auto IterItem = m_MapPreviewLDItems.find(pObject);
+	if (IterItem == m_MapPreviewLDItems.end())
+		return false;
+
+	const _wstring& strStableKey = IterItem->second.strStableKey;
+	if (strStableKey.empty())
+		return false;
+
+	const auto Iter = m_tEditData.OverrideDesc.EditedLevelDesignObjects.find(strStableKey);
+	if (Iter == m_tEditData.OverrideDesc.EditedLevelDesignObjects.end())
+		return false;
+
+	*pOutEdit = Iter->second;
+	return true;
+}
+
+_bool CMap_EditSession::Try_GetDeletedEnvItem(const _wstring& strStableKey, MAP_EDIT_ENV_ITEM* pOutItem) const
 {
 	if (nullptr == pOutItem)
 		return false;

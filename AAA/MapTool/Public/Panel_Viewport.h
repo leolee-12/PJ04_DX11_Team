@@ -29,7 +29,6 @@ private:
 	static constexpr _float	m_fTargetAspect = { 1600.f / 900.f };
 	ID3D11BlendState*		m_pViewportOpaqueBlend = { nullptr };
 	VIEWPORT_DRAW_DESC		m_ViewportDrawDesc = {};
-	_bool						m_bWasGizmoUsing = { false };
 
 private:
 	static void	Viewport_DisableBlend(const ImDrawList*, const ImDrawCmd* cmd);

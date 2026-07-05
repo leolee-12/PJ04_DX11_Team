@@ -51,7 +51,8 @@ public:
 		_uint iRuntimeLevel,
 		MAP_LOAD_RESULT* pOutReport = nullptr,
 		CMapStage** ppOutStage = nullptr,
-		const MAP_LOAD_OPTIONS& Options = MAP_LOAD_OPTIONS{});
+		const MAP_LOAD_OPTIONS& Options = MAP_LOAD_OPTIONS{},
+		const MAP_EDIT_CHANGE* pLevelDesignOverrideDesc = nullptr);
 
 	static HRESULT Spawn_Map(
 		ID3D11Device* pDevice,
@@ -90,7 +91,8 @@ public:
 	static HRESULT Load_LevelDesign_Runtime(
 		const MAP_RUNTIME_LOAD_CONTEXT& Context,
 		const _wstring& strMapManifestPath,
-		MAP_LOAD_RESULT* pOutReport = nullptr);
+		MAP_LOAD_RESULT* pOutReport = nullptr,
+		const MAP_EDIT_CHANGE* pOverrideDesc = nullptr);
 
 	static _uint			Get_MapCount();
 	static const _char*		Get_MapName(_uint iMapIndex);
@@ -131,7 +133,8 @@ private:
 	HRESULT Load_LevelDesignEntries(
 		const MAP_PACKAGE& Package,
 		const MAP_SPAWN_REQUEST& Request,
-		MAP_LOAD_RESULT* pOutReport = nullptr);
+		MAP_LOAD_RESULT* pOutReport = nullptr,
+		const MAP_EDIT_CHANGE* pOverrideDesc = nullptr);
 
 	HRESULT Build_Package(const _wstring& strManifestPath, MAP_PACKAGE* pOutPackage);
 	HRESULT Build_Package(const _wstring& strManifestPath, const MAP_PACKAGE_BUILD_OPTIONS& BuildOptions, MAP_PACKAGE* pOutPackage);

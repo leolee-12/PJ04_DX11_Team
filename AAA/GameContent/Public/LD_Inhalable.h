@@ -47,7 +47,6 @@ protected:
 	_float3						m_vBaseScale = {};
 	_float						m_fScaleRatio = { 1.f };
 
-	_float                      m_fSpinAngle = { 0.f };
 	_float                      m_fLifeTime = { 0.f };
 
 	_float					    s_fSpatDamage = { 50.f };

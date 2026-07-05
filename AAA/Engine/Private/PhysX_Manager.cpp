@@ -151,6 +151,35 @@ void CPhysX_Manager::Remove_StaticActor(PxRigidStatic* pActor)
     pActor->release();
 }
 
+HRESULT CPhysX_Manager::Refresh_StaticActorPose(physx::PxRigidStatic* pActor, _fmatrix WorldMatrix)
+{
+    if (nullptr == pActor)
+        return E_FAIL;
+
+    if (m_StaticActors.end() == find(m_StaticActors.begin(), m_StaticActors.end(), pActor))
+        return E_FAIL;
+
+    XMVECTOR vScale{}, vRotation{}, vTranslation{};
+    if (!XMMatrixDecompose(&vScale, &vRotation, &vTranslation, WorldMatrix))
+        return E_FAIL;
+
+    _float3 vWorldPosition{};
+    XMStoreFloat3(&vWorldPosition, vTranslation);
+
+    _float4 vRotationQuaternion{};
+    XMStoreFloat4(&vRotationQuaternion, XMQuaternionNormalize(vRotation));
+
+    const physx::PxTransform Pose(
+        physx::PxVec3(vWorldPosition.x, vWorldPosition.y, vWorldPosition.z),
+        physx::PxQuat(vRotationQuaternion.x, vRotationQuaternion.y, vRotationQuaternion.z, vRotationQuaternion.w));
+
+    if (!Pose.isValid())
+        return E_FAIL;
+
+    pActor->setGlobalPose(Pose, false);
+    return S_OK;
+}
+
 PxRigidStatic* CPhysX_Manager::Create_StaticBox(const _float3& vLocalCenter, const _float3& vLocalHalfExtents, _fmatrix WorldMatrix)
 {
     if (nullptr == m_pPhysics || nullptr == m_pScene || nullptr == m_pDefaultMtrl)

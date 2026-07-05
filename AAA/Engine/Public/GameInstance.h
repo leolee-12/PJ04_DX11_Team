@@ -237,6 +237,7 @@ private:
 	  physx::PxTriangleMesh* Cook_TriangleMesh(const _float3* pPositions, _uint iNumVertices, const _uint* pIndices, _uint iNumIndices, _bool bFlipWinding = true);
 	  physx::PxRigidStatic*  Create_StaticActor(physx::PxTriangleMesh* pMesh, _fmatrix WorldMatrix);
 	  HRESULT				 Refresh_StaticBoxPose(physx::PxRigidStatic* pActor, const _float3& vLocalCenter, _fmatrix WorldMatrix);
+	  HRESULT				 Refresh_StaticActorPose(physx::PxRigidStatic* pActor, _fmatrix WorldMatrix);
 	  physx::PxRigidStatic*	 Create_StaticBox(const _float3& vLocalCenter, const _float3& vLocalHalfExtents, _fmatrix WorldMatrix);
 	  void                   Remove_StaticActor(physx::PxRigidStatic* pActor);
 

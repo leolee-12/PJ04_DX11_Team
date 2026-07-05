@@ -200,9 +200,6 @@ void CLD_Inhalable::Update_Spat(_float fTimeDelta)
 	pT->Set_State(STATE::POSITION,
 		pT->Get_State(STATE::POSITION) + vVel * fTimeDelta);
 	_vector vUp = pT->Get_State(STATE::UP);
-
-	m_fSpinAngle += s_fSpinSpeedDeg * fTimeDelta;
-
 	pT->Rotate(XMQuaternionRotationAxis(vUp,
 		XMConvertToRadians(s_fSpinSpeedDeg) * fTimeDelta));
 
@@ -237,8 +234,6 @@ void CLD_Inhalable::Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed)
 	Get_Transform()->Set_Scale(m_vBaseScale.x, m_vBaseScale.y, m_vBaseScale.z);
 
 	m_eState = LD_STATE::SPAT;
-
-	m_fSpinAngle = 0.f;
 
 	Enable_Colliders(false);
 	m_pProjectileBox->Set_Enabled(true);

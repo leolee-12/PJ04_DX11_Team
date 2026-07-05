@@ -1,6 +1,5 @@
 #include "MapEvent_BreakWall.h"
 #include "GameContrnt_Events.h"
-#include "MeshLayer_Binder.h"
 
 #include "GameInstance.h"
 
@@ -12,7 +11,10 @@ namespace
 		_float3 vPivot = {};
 	};
 
-	static const BREAK_FRAGMENT_BIND g_GsDefault4BreakBinds[] =
+	// Unique data table for CMapEvent_BreakWall.
+	// This is intentionally kept as a constant table instead of JSON.
+	// Generic map classes should be data-driven; unique event classes may keep fixed data here.
+	static const BREAK_FRAGMENT_BIND g_Stage12GsDefault4BreakFragments[] =
 	{
 		  { "GsDefault_10", { 147.14450f, 27.23368f, 1306.22900f } },
 		  { "GsDefault_11", { 147.42530f, 28.35020f, 1310.04500f } },
@@ -232,34 +234,7 @@ HRESULT CMapEvent_BreakWall::Render()
 		_float4x4 WorldMatrix{};
 		XMStoreFloat4x4(&WorldMatrix, Rotation * Translation * BreakWallWorld);
 
-		if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &WorldMatrix)))
-			return E_FAIL;
-
-		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
-
-		MESH_LAYER_BIND_CONTEXT Ctx{};
-		Ctx.pShader = m_pShaderCom;
-		Ctx.pModel = m_pModelCom;
-		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
-		Ctx.iMesh = i;
-		Ctx.pLayer = &Layer;
-		Ctx.eProfile = MESH_LAYER_PROFILE::MAP;
-		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
-		Ctx.iFallbackPass = ETOI(MAP_DEFAULT_PASS);
-		Ctx.bUseLayerEx = true;
-
-		MESH_LAYER_BIND_RESULT Result{};
-		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-			return E_FAIL;
-
-		if (Result.bSkipMesh)
-			continue;
-
-		Bind_MeshLayers(i);
-
-		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Render(i)))
+		if (FAILED(Render_MapMesh(i, &WorldMatrix)))
 			return E_FAIL;
 	}
 
@@ -294,9 +269,9 @@ HRESULT CMapEvent_BreakWall::Ready_Fragments()
 
 	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
 	m_MeshFragmentIndices.assign(iNumMeshes, INVALID_FRAGMENT_INDEX);
-	m_Fragments.reserve(_countof(g_GsDefault4BreakBinds));
+	m_Fragments.reserve(_countof(g_Stage12GsDefault4BreakFragments));
 
-	for (const BREAK_FRAGMENT_BIND& Bind : g_GsDefault4BreakBinds)
+	for (const BREAK_FRAGMENT_BIND& Bind : g_Stage12GsDefault4BreakFragments)
 	{
 		BREAK_FRAGMENT Fragment{};
 		Fragment.strFragmentName = Bind.pFragmentName;
@@ -426,7 +401,7 @@ void CMapEvent_BreakWall::Start_Break()
 
 	m_pBoostTrigger->Set_Enabled(false);
 
-	m_pGameInstance_Proxy->Publish(EventTag::Stage12_CarBreakWall, nullptr);
+	m_pGameInstance_Proxy->Publish(EventTag::Stage1_Step2_CarBreakMap, nullptr);
 
 	CAMERA_SHAKE_DESC ShakeDesc{ 0.6f, 0.4f };
 	m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &ShakeDesc);

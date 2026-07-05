@@ -2,6 +2,7 @@
 #include "LevelDesign_Parser.h"
 #include "LevelDesign_Spawner.h"
 #include "LevelDesign_ProtoRegister.h"
+#include "Map_EditFile.h"
 
 #include <mutex>
 
@@ -84,7 +85,8 @@ HRESULT CLevelDesign_Loader::Preload_LevelDesign(ID3D11Device* pDevice, ID3D11De
 	return hr;
 }
 
-HRESULT CLevelDesign_Loader::Load_LevelDesign_Runtime(const LD_RUNTIME_LOAD_CONTEXT& Context, const _wstring& strJsonPath, LD_LOAD_RESULT* pOutReport)
+HRESULT CLevelDesign_Loader::Load_LevelDesign_Runtime(const LD_RUNTIME_LOAD_CONTEXT& Context, const _wstring& strJsonPath,
+	LD_LOAD_RESULT* pOutReport, const MAP_EDIT_CHANGE* pOverrideDesc)
 {
 	if (nullptr != pOutReport)
 		*pOutReport = {};
@@ -98,6 +100,9 @@ HRESULT CLevelDesign_Loader::Load_LevelDesign_Runtime(const LD_RUNTIME_LOAD_CONT
 
 	LD_PACKAGE Package{};
 	HRESULT hr = pLoader->Build_Package(strJsonPath, &Package);
+
+	if (SUCCEEDED(hr) && nullptr != pOverrideDesc)
+		hr = CMap_EditFile::Apply_LevelDesignChange(&Package, *pOverrideDesc);
 
 	if (SUCCEEDED(hr))
 	{

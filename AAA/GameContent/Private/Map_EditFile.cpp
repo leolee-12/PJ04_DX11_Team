@@ -15,9 +15,7 @@ namespace
 {
 	using namespace std::filesystem;
 
-	HRESULT Resolve_EditFilePathFromManifest_Impl(
-		const _wstring& strManifestPath,
-		_wstring* pOutEditFilePath)
+	HRESULT Resolve_EditFilePathFromManifest_Impl(const _wstring& strManifestPath, _wstring* pOutEditFilePath)
 	{
 		if (nullptr == pOutEditFilePath || strManifestPath.empty())
 			return E_FAIL;
@@ -35,10 +33,7 @@ namespace
 		return S_OK;
 	}
 
-	HRESULT Resolve_PresetManifestPathForEditFile(
-		_uint iPresetIndex,
-		const _wstring& strManifestPath,
-		_wstring* pOutManifestPath)
+	HRESULT Resolve_PresetManifestPathForEditFile(_uint iPresetIndex, const _wstring& strManifestPath, _wstring* pOutManifestPath)
 	{
 		if (nullptr == pOutManifestPath)
 			return E_FAIL;
@@ -97,9 +92,7 @@ namespace
 		return S_OK;
 	}
 
-	void Apply_WorldMatrixToGameObjectDesc(
-		CGameObject::GAMEOBJECT_DESC* pOutDesc,
-		const _float4x4& Mat)
+	void Apply_WorldMatrixToGameObjectDesc(CGameObject::GAMEOBJECT_DESC* pOutDesc, const _float4x4& Mat)
 	{
 		if (nullptr == pOutDesc)
 			return;
@@ -363,6 +356,74 @@ namespace
 
 		return S_OK;
 	}
+
+	json Save_LDEditedMap(const unordered_map<_wstring, MAP_LD_EDITED_DESC>& EditedMap)
+	{
+		vector<_wstring> Keys;
+		for (const auto& Pair : EditedMap)
+		{
+			if (!Pair.first.empty() && Has_AnyMapLDEdit(Pair.second))
+				Keys.push_back(Pair.first);
+		}
+
+		sort(Keys.begin(), Keys.end());
+
+		json jResult = json::object();
+		for (const auto& strKey : Keys)
+		{
+			const auto Iter = EditedMap.find(strKey);
+			if (Iter == EditedMap.end())
+				continue;
+
+			json jEdit = json::object();
+			if (Iter->second.bHasWorldMatrix)
+				jEdit["WorldMatrix"] = Save_Float4x4(Iter->second.matWorld);
+
+			jResult[WstrToStr(strKey)] = jEdit;
+		}
+
+		return jResult;
+	}
+
+	HRESULT Load_LDEditedMap(const json& jRoot, const char* pFieldName, unordered_map<_wstring, MAP_LD_EDITED_DESC>* pOutMap)
+	{
+		if (nullptr == pFieldName || nullptr == pOutMap)
+			return E_FAIL;
+
+		pOutMap->clear();
+
+		const auto IterField = jRoot.find(pFieldName);
+		if (IterField == jRoot.end())
+			return S_OK;
+
+		if (!IterField->is_object())
+			return E_FAIL;
+
+		for (auto Iter = IterField->begin(); Iter != IterField->end(); ++Iter)
+		{
+			const _wstring strKey = StrToWstr(Iter.key());
+			if (strKey.empty() || !Iter.value().is_object())
+				continue;
+
+			MAP_LD_EDITED_DESC Edit{};
+			const auto IterWorldMatrix = Iter.value().find("WorldMatrix");
+			if (IterWorldMatrix != Iter.value().end())
+			{
+				if (FAILED(Load_Float4x4(*IterWorldMatrix, &Edit.matWorld)))
+					return E_FAIL;
+
+				Edit.bHasWorldMatrix = true;
+			}
+
+			if (!Has_AnyMapLDEdit(Edit))
+				continue;
+
+			Edit.strStableKey = strKey;
+			(*pOutMap)[strKey] = Edit;
+		}
+
+		return S_OK;
+	}
 }
 
 _wstring CMap_EditFile::Make_EnvKey(const ENV_OBJECT_DESC& Desc)
@@ -387,6 +448,14 @@ _wstring CMap_EditFile::Make_SectionKey(const _wstring& strStageName, const _wst
 _wstring CMap_EditFile::Make_SectionKey(const MAP_STAGE_DESC& StageDesc, const MAP_SECTION_DESC& SectionDesc)
 {
 	return Make_SectionKey(StageDesc.strStageName, SectionDesc.strSectionName);
+}
+
+_wstring CMap_EditFile::Make_LevelDesignKey(const LD_OBJECT_DESC& Desc)
+{
+	return Desc.strSourceFile + L"|"
+		+ Desc.strSection + L"|"
+		+ Desc.strEntryKey + L"|"
+		+ to_wstring(Desc.iUid);
 }
 
 HRESULT CMap_EditFile::Apply_Change(MAP_PACKAGE* pInOutPackage, const MAP_EDIT_CHANGE& OverrideDesc)
@@ -448,6 +517,32 @@ HRESULT CMap_EditFile::Apply_Change(MAP_PACKAGE* pInOutPackage, const MAP_EDIT_C
 			pInOutPackage->AddedObjectDescs.end(),
 			OverrideDesc.AddedMapObjects.begin(),
 			OverrideDesc.AddedMapObjects.end());
+	}
+
+	return S_OK;
+}
+
+HRESULT CMap_EditFile::Apply_LevelDesignChange(LD_PACKAGE* pInOutPackage, const MAP_EDIT_CHANGE& OverrideDesc)
+{
+	if (nullptr == pInOutPackage)
+		return E_FAIL;
+
+	if (OverrideDesc.EditedLevelDesignObjects.empty())
+		return S_OK;
+
+	for (LD_OBJECT_ENTRY& Entry : pInOutPackage->ObjectDescs)
+	{
+		LD_OBJECT_DESC& Desc = Get_LDObjectDesc(Entry);
+		const _wstring strKey = Make_LevelDesignKey(Desc);
+		const auto Iter = OverrideDesc.EditedLevelDesignObjects.find(strKey);
+		if (Iter == OverrideDesc.EditedLevelDesignObjects.end())
+			continue;
+
+		if (Iter->second.bHasWorldMatrix)
+		{
+			CGameObject::GAMEOBJECT_DESC& BaseDesc = static_cast<CGameObject::GAMEOBJECT_DESC&>(Desc);
+			Apply_WorldMatrixToGameObjectDesc(&BaseDesc, Iter->second.matWorld);
+		}
 	}
 
 	return S_OK;
@@ -709,6 +804,7 @@ json CMap_EditFile::Save_Change(const MAP_EDIT_CHANGE& Desc)
 	jOverride["DeletedEnvObjects"] = jDeletedEnvObjects;
 	jOverride["EditedEnvObjects"] = Save_EditedMap(Desc.EditedEnvObjects, true);
 	jOverride["EditedMapSections"] = Save_EditedMap(Desc.EditedMapSections, false);
+	jOverride["EditedLevelDesignObjects"] = Save_LDEditedMap(Desc.EditedLevelDesignObjects);
 
 	jOverride["AddedMapObjects"] = json::array();
 	for (const auto& Added : Desc.AddedMapObjects)
@@ -763,6 +859,9 @@ HRESULT CMap_EditFile::Load_Change(const json& jOverride, MAP_EDIT_CHANGE* pOutD
 		return E_FAIL;
 
 	if (FAILED(Load_EditedMap(jOverride, "EditedMapSections", &pOutDesc->EditedMapSections, false)))
+		return E_FAIL;
+
+	if (FAILED(Load_LDEditedMap(jOverride, "EditedLevelDesignObjects", &pOutDesc->EditedLevelDesignObjects)))
 		return E_FAIL;
 
 	const auto IterAdded = jOverride.find("AddedMapObjects");
