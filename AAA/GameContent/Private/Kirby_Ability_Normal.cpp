@@ -12,6 +12,9 @@
 #include "Inhalable.h"
 #include "InhaleContainer.h"
 
+#include "Spit_Projectile.h"
+#include "Projectile_Manager.h"
+
 CKirby_Ability_Normal::CKirby_Ability_Normal()
 {
 }
@@ -232,6 +235,7 @@ void CKirby_Ability_Normal::Enter_InhaleState(CKirby* pKirby, INHALE_STATE eStat
         {
             End_InhaleCollider(pKirby);
             Off_InhaleEffect();
+            Clear_Captured();
 
             pAnimator->Play("InhaleEnd", false, false, 0.1f, 1.5f);
             break;
@@ -265,6 +269,11 @@ void CKirby_Ability_Normal::Update_InhaleState(CKirby* pKirby, _float fTimeDelta
 {
     CKirby_Body* pBody = pKirby->Get_Body();
     CAnimator* pAnimator = pBody->Get_Animator();
+
+    if (m_eInhaleState == INHALE_STATE::INHALE_LOOP ||
+        m_eInhaleState == INHALE_STATE::SUPER_INHALE_START ||
+        m_eInhaleState == INHALE_STATE::SUPER_INHALE_LOOP)
+        Resolve_Captures(pKirby);
 
     if (m_bReqEndInhale &&
         (m_eInhaleState == INHALE_STATE::INHALE_LOOP ||
@@ -504,6 +513,7 @@ void CKirby_Ability_Normal::Restore_KirbyAfterInhale(CKirby* pKirby)
 
 void CKirby_Ability_Normal::Start_InhaleCollider(CKirby* pKirby)
 {
+    Clear_Candidates();
     CCollider* pInhaleCollider = pKirby->Get_Collider(CKirby::KIRBY_COLLIDER::INHALE_BOX);
 
     pInhaleCollider->Set_OnEnter
@@ -543,7 +553,7 @@ void CKirby_Ability_Normal::Start_InhaleCollider(CKirby* pKirby)
             INHALE_QUERY tInhaleQuery{ bIsSuperInhale, pKirby };
 
             if (pInhalableTarget->Can_BeInhaled(tInhaleQuery))
-                pInhalableTarget->Be_Captured(pKirby);
+                Add_Candidate(pInhalableTarget);
         }
     );
 
@@ -556,6 +566,8 @@ void CKirby_Ability_Normal::End_InhaleCollider(CKirby* pKirby)
     pInhaleBox->Set_Enabled(false);
     pInhaleBox->Set_OnEnter(nullptr);
     pInhaleBox->Set_OnStay(nullptr);
+
+    Clear_Candidates();
 }
 
 void CKirby_Ability_Normal::Subscribe_InhaleCapturedEvent(CKirby* pKirby)
@@ -607,6 +619,7 @@ void CKirby_Ability_Normal::Handle_InhaleCaptured(CKirby* pKirby, IInhalable* pI
     {
         pKirby->Request_ChangeKirbyAbility(eAbility);
         pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
+        Clear_Captured();
     }
 
     m_bInhaleCancelLocked = false;
@@ -637,22 +650,108 @@ void CKirby_Ability_Normal::Update_SuperInhaleEffectRise(_float fRatio)
     m_pInhaleEffect->Get_Transform()->Set_State(STATE::POSITION, vCurPos);
 }
 
+_bool CKirby_Ability_Normal::Capture_Inhalable(IInhalable* pInhalable)
+{
+    if (pInhalable == nullptr)
+        return false;
+
+    for (_uint i = 0; i < m_iCapturedCount; ++i)
+        if (m_CapturedInhalables[i] == pInhalable)
+            return true;
+
+    if (m_iCapturedCount >= s_iMaxCaptured)
+        return false;
+
+    m_CapturedInhalables[m_iCapturedCount++] = pInhalable;
+    return true;
+}
+
 void CKirby_Ability_Normal::Spit_Inhalable(CKirby* pKirby)
 {
-    if (m_pCapturedInhalable == nullptr)
+    if (m_iCapturedCount == 0)
         return;
 
     CTransform* pTransform = pKirby->Get_Transform();
-
     _vector vMouth =
         pTransform->Get_State(STATE::POSITION)
         + pTransform->Get_State(STATE::LOOK) * CKirby::s_fInhaleFwd
         + pTransform->Get_State(STATE::UP) * CKirby::s_fInhaleUp;
     _vector vDir = pTransform->Get_State(STATE::LOOK);
 
-    m_pCapturedInhalable->Be_Spat(vMouth, vDir, s_fSpitSpeed);
+    _float3 vP, vD;
+    XMStoreFloat3(&vP, vMouth);
+    XMStoreFloat3(&vD, vDir);
 
-    m_pCapturedInhalable = nullptr;
+    CProjectile* pProj = nullptr;
+    CProjectile_Manager::GetInstance()->Spawn(
+        pKirby->Get_LevelIndex(), L"Spit", CSpit_Projectile::PROTOTYPE_TAG, &pProj);
+
+    if (auto* pSpit = static_cast<CSpit_Projectile*>(pProj))
+    {
+        pSpit->Set_Speed(s_fSpitSpeed);
+        pSpit->Fire(m_CapturedInhalables, m_iCapturedCount, vP, vD);
+    }
+
+    Clear_Captured();
+}
+
+void CKirby_Ability_Normal::Clear_Captured()
+{
+    for (_uint i = 0; i < m_iCapturedCount; ++i)
+        m_CapturedInhalables[i] = nullptr;
+    m_iCapturedCount = 0;
+}
+
+void CKirby_Ability_Normal::Clear_Candidates()
+{
+    for (_uint i = 0; i < m_iFrameCandidateCount; ++i)
+        m_FrameCandidates[i] = nullptr;
+    m_iFrameCandidateCount = 0;
+}
+
+void CKirby_Ability_Normal::Add_Candidate(IInhalable* p)
+{
+    if (p == nullptr || m_iFrameCandidateCount >= s_iMaxCandidates)
+        return;
+    for (_uint i = 0; i < m_iFrameCandidateCount; ++i)
+        if (m_FrameCandidates[i] == p) return;
+    m_FrameCandidates[m_iFrameCandidateCount++] = p;
+}
+
+void CKirby_Ability_Normal::Resolve_Captures(CKirby* pKirby)
+{
+    if (m_iFrameCandidateCount == 0)
+        return;
+
+    _vector vKirby = pKirby->Get_Transform()->Get_State(STATE::POSITION);
+    auto DistSq = [&](IInhalable* p) {
+        _vector v = p->Get_GameObject()->Get_Transform()->Get_State(STATE::POSITION);
+        return XMVectorGetX(XMVector3LengthSq(v - vKirby));
+        };
+    auto Already = [&](IInhalable* c) {
+        for (_uint j = 0; j < m_iCapturedCount; ++j)
+            if (m_CapturedInhalables[j] == c) return true;
+        return false;
+        };
+
+    while (m_iCapturedCount < s_iMaxCaptured)
+    {
+        IInhalable* pBest = nullptr;
+        _float fBestSq = FLT_MAX;
+        for (_uint i = 0; i < m_iFrameCandidateCount; ++i)
+        {
+            IInhalable* c = m_FrameCandidates[i];
+            if (c == nullptr || Already(c)) continue;
+            _float d = DistSq(c);
+            if (d < fBestSq) { fBestSq = d; pBest = c; }
+        }
+        if (pBest == nullptr) break;
+
+        m_CapturedInhalables[m_iCapturedCount++] = pBest;
+        pBest->Be_Captured(pKirby);
+    }
+
+    Clear_Candidates(); 
 }
 
 void CKirby_Ability_Normal::Off_InhaleEffect()

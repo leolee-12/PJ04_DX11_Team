@@ -153,6 +153,7 @@
 // Projectile
 #include "Projectile_Boulder.h"
 #include "EnemyBomb.h"
+#include "Spit_Projectile.h"
 
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
@@ -522,6 +523,10 @@ void CGameObject_Factory::Register_Container()
                 CKirby_SwordHat::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SwordHat"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Hat/SwordHat.ysh"));
+
+            //Kirby_Projectile
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpit_Projectile::PROTOTYPE_TAG,
+                CSpit_Projectile::Create(pDevice, pContext));
         )
     ); 
 
