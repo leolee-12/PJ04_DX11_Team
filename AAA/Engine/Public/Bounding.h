@@ -20,6 +20,7 @@ protected:
 public:
 	virtual HRESULT Initialize(const CBounding::BOUNDING_DESC* pBoundingDesc);
 	virtual void Update(_fmatrix TransformMatrix) = 0;
+	virtual void Reset_Desc(const BOUNDING_DESC* pDesc) = 0;
 
 public:
 	virtual _bool Intersect(COLLIDER eTargetType, CBounding* pBounding) = 0;

@@ -109,6 +109,51 @@ void CCollider::Update(_fmatrix TransformMatrix)
     m_pBounding->Update(TransformMatrix);
 }
 
+void CCollider::Reset_Bounding(const COLLIDER_DESC& Desc)
+{
+    switch (m_eType)
+    {
+        case COLLIDER::AABB:
+        {
+            CBounding_AABB::BOUNDING_AABB_DESC BoundingDesc{};
+            BoundingDesc.vCenter = Desc.vCenter;
+            BoundingDesc.vSize = Desc.vSize;
+            m_pBounding->Reset_Desc(&BoundingDesc);
+            break;
+        }
+
+        case COLLIDER::OBB:
+        {
+            CBounding_OBB::BOUNDING_OBB_DESC BoundingDesc{};
+            BoundingDesc.vCenter = Desc.vCenter; 
+            BoundingDesc.vSize = Desc.vSize;
+            BoundingDesc.vRadians = Desc.vRadians;
+            m_pBounding->Reset_Desc(&BoundingDesc);
+            break;
+        }
+
+        case COLLIDER::SPHERE:
+        {
+            CBounding_Sphere::BOUNDING_SPHERE_DESC BoundingDesc{};
+            BoundingDesc.vCenter = Desc.vCenter;
+            BoundingDesc.fRadius = Desc.fRadius;
+            m_pBounding->Reset_Desc(&BoundingDesc);
+            break;
+        }
+
+        case COLLIDER::CAPSULE:
+        {
+            CBounding_Capsule::BOUNDING_CAPSULE_DESC BoundingDesc{};
+            BoundingDesc.vCenter = Desc.vCenter;
+            BoundingDesc.fRadius = Desc.fRadius;
+            BoundingDesc.fHeight = Desc.fHeight;
+            BoundingDesc.vRadians = Desc.vRadians;
+            m_pBounding->Reset_Desc(&BoundingDesc);
+            break;
+        }
+    }
+}
+
 _bool CCollider::Intersect(CCollider* pTarget)
 {
     m_isColl = false;

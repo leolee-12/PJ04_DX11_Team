@@ -29,6 +29,7 @@ public:
 public:
 	virtual HRESULT Initialize(const CBounding::BOUNDING_DESC* pBoundingDesc) override;
 	virtual void Update(_fmatrix TransformMatrix) override;
+	virtual void Reset_Desc(const CBounding::BOUNDING_DESC* pDesc) override;
 
 public:
 	virtual _bool Intersect(COLLIDER eTargetType, CBounding* pBounding) override;
