@@ -2,7 +2,6 @@
 #include "Monster.h"
 #include "GameInstance.h"
 #include "Animator.h"
-#include "Effect_Loader.h"
 
 HRESULT CMonster_State_Spat::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpeed)
 {

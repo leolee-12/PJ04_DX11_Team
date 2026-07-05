@@ -546,6 +546,10 @@ CSound_Handle CGameInstance::Play_SFX3D_Loop(const TCHAR* pSoundKey, _fvector vS
 {
     return m_pSound_Manager->PlaySFX3DLoop(pSoundKey, vSoundPos, fVolume, eBus);
 }
+CSound_Handle CGameInstance::Play_SFX_Section_Loop(const TCHAR* pSoundKey, float fLoopStart, float fLoopEnd, float fVolume, ESoundBus eBus)
+{
+    return m_pSound_Manager->PlaySFXSectionLoop(pSoundKey, fLoopStart, fLoopEnd, fVolume, eBus);
+}
 void CGameInstance::Play_BGM(const TCHAR* pSoundKey, float fVolume, bool bLoop)
 {
     m_pSound_Manager->PlayBGM(pSoundKey, fVolume, bLoop);
@@ -553,6 +557,14 @@ void CGameInstance::Play_BGM(const TCHAR* pSoundKey, float fVolume, bool bLoop)
 void CGameInstance::Play_BGM_Section(const TCHAR* pSoundKey, float fStart01, float fEnd01, float fVolume)
 {
     m_pSound_Manager->PlayBGM_Section(pSoundKey, fStart01, fEnd01, fVolume);
+}
+void CGameInstance::Fade_BGM_Out(float fSeconds)
+{
+    m_pSound_Manager->Fade_BGM_Out(fSeconds);
+}
+void CGameInstance::Play_BGM_Fade(const TCHAR* pSoundKey, float fSeconds, float fVolume)
+{
+    m_pSound_Manager->Play_BGM_Fade(pSoundKey, fSeconds, fVolume);
 }
 void CGameInstance::Stop_BGM()
 {

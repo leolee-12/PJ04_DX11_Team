@@ -1,10 +1,6 @@
 #pragma once
 #include "Monster_State.h"
 
-NS_BEGIN(Engine)
-class CEffect_Container;
-NS_END
-
 NS_BEGIN(Client)
 class CMonster;
 
