@@ -2,7 +2,6 @@
 #include "Monster.h"
 #include "GameInstance.h"
 #include "Animator.h"
-#include "Effect_Loader.h"
 
 HRESULT CMonster_State_Spat::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpeed)
 {
@@ -17,7 +16,21 @@ void CMonster_State_Spat::Enter(MONSTER_STATE_TYPE ePrevState)
         return;
 
     m_fSpinAngle = 0.f;
-    m_bSpinBone = m_pAnimator->Has_Bone("RotL");
+    if (m_pAnimator->Has_Bone("CenterL"))   
+    {
+        m_bSpinBone = true;
+        m_szSpinBone = "CenterL";
+    }
+    else if (m_pAnimator->Has_Bone("RotL")) 
+    {
+        m_bSpinBone = true;
+        m_szSpinBone = "RotL";
+    }
+    else
+    {
+        m_bSpinBone = false;
+        m_szSpinBone = nullptr;
+    }
 
     m_pOwner->Enable_Controller(false);
     m_pOwner->Enable_Colliders(false);
@@ -27,30 +40,6 @@ void CMonster_State_Spat::Enter(MONSTER_STATE_TYPE ePrevState)
 
     if (!m_PlayInfo.strAniName.empty())
         m_pAnimator->Play(&m_PlayInfo);
-
-    //const _char* szBone = "CenterL";
-
-    //m_bSpinBone ? szBone = "RotL" : szBone;
-
-    //const auto& Parts = m_pOwner->Get_PartObjects();
-    //auto it = Parts.find(L"Body");
-    //if (it != Parts.end())
-    //{
-    //    if (CMonsterPart* pBody =
-    //        dynamic_cast<CMonsterPart*>(it->second))
-    //    {
-    //        const _float4x4* pBone =
-    //            pBody->Get_BoneMatrixPtr(szBone);
-    //        if (pBone)
-    //            CEffect_Loader::GetInstance()->Spawn(
-    //                L"SpitObject", m_pOwner->Get_LevelIndex(),
-    //                _float3(0.f, 0.f, 0.f),
-    //                _float3(0.f, 0.f, 1.f),
-    //                _float3(0.f, 0.f, 0.f),
-    //                pBone, &m_pSpitFx);
-    //    }
-    //}
-
 }
 
 void CMonster_State_Spat::Update(_float fTimeDelta)
@@ -68,7 +57,7 @@ void CMonster_State_Spat::Update(_float fTimeDelta)
 
     if (m_bSpinBone)
     {
-        m_pAnimator->SetBoneRotation("RotL", m_fSpinAngle, XMVectorSet(0.f, 0.f, 1.f, 0.f));
+        m_pAnimator->SetBoneRotation(m_szSpinBone, m_fSpinAngle, XMVectorSet(0.f, 0.f, 1.f, 0.f));
     }
     else
     {

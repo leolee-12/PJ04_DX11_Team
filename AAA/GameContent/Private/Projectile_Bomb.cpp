@@ -57,6 +57,8 @@ void CProjectile_Bomb::Late_Update(_float fTimeDelta)
         Update_Socket();
 
     __super::Late_Update(fTimeDelta);
+
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
 
 HRESULT CProjectile_Bomb::Render()
@@ -109,6 +111,31 @@ HRESULT CProjectile_Bomb::Render()
             return E_FAIL;
     }
 
+    return S_OK;
+}
+
+HRESULT CProjectile_Bomb::Render_Shadow()
+{
+    if (!m_bAlive || nullptr == m_pModelCom || nullptr == m_pShaderCom)
+        return S_OK;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldMatrixPtr())))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
+        return E_FAIL;
+
+    const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+    for (_uint i = 0; i < iNumMeshes; ++i)
+    {
+        if (m_pAnimatorCom)
+            m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i);
+        if (FAILED(m_pShaderCom->Begin(2)))
+            return E_FAIL;
+        if (FAILED(m_pModelCom->Render(i)))
+            return E_FAIL;
+    }
     return S_OK;
 }
 

@@ -16,8 +16,13 @@ public:
     explicit CSound_Handle(FMOD::Channel* pChannel);
 
     void    Stop();
+
+    // 루프 모드를 껐을 때 사운드 끝(1.0)까지 끝까지 재생하고 종료하고 싶을 때 사용
+    void    Release_Loop();             
+
     void    Set_Paused(_bool bPause);
     void    Set_Volume(_float fVolume);
+
     _bool   Is_Playing() const;
     _bool   Is_Valid() const { return nullptr != m_pChannel; }
 

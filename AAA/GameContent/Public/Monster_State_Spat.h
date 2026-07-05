@@ -1,10 +1,6 @@
 #pragma once
 #include "Monster_State.h"
 
-NS_BEGIN(Engine)
-class CEffect_Container;
-NS_END
-
 NS_BEGIN(Client)
 class CMonster;
 
@@ -33,8 +29,7 @@ private:
     _float4x4                   m_SocketWorld = {};
 
     _bool                       m_bSpinBone = { false };
-
-    //CEffect_Container*          m_pSpitFx = { nullptr };
+    const _char*                m_szSpinBone = { nullptr };
 
 public:
     static CMonster_State_Spat* Create(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f);

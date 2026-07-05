@@ -674,6 +674,11 @@ CSound_Handle CGameInstance_Proxy::Play_SFX3D_Loop(const TCHAR* pSoundKey, _fvec
 		return CSound_Handle();
 	return m_pOwner->Play_SFX3D_Loop(pSoundKey, vSoundPos, fVolume, eBus);
 }
+CSound_Handle CGameInstance_Proxy::Play_SFX_Section_Loop(const TCHAR* pSoundKey, float fLoopStart, float fLoopEnd, float fVolume, ESoundBus eBus)
+{
+	if (!IsConnected()) return CSound_Handle();
+	return m_pOwner->Play_SFX_Section_Loop(pSoundKey, fLoopStart, fLoopEnd, fVolume, eBus);
+}
 void CGameInstance_Proxy::Play_BGM(const TCHAR* pSoundKey, float fVolume, bool bLoop)
 {
 	if (!IsConnected()) return;
@@ -683,6 +688,17 @@ void CGameInstance_Proxy::Play_BGM_Section(const TCHAR* pSoundKey, float fStart0
 {
 	if (!IsConnected()) return;
 	m_pOwner->Play_BGM_Section(pSoundKey, fStart01, fEnd01, fVolume);
+}
+void CGameInstance_Proxy::Fade_BGM_Out(float fSeconds)
+{
+	if (!IsConnected()) return;
+	m_pOwner->Fade_BGM_Out(fSeconds);
+}
+void CGameInstance_Proxy::Play_BGM_Fade(const TCHAR* pSoundKey, float fSeconds, float fVolume)
+{
+	if (!IsConnected()) return;
+	m_pOwner->Play_BGM_Fade(
+		pSoundKey, fSeconds, fVolume);
 }
 void CGameInstance_Proxy::Stop_BGM()
 {

@@ -91,6 +91,8 @@ void CUI_CurtainSequenceBase::Play()
     m_fLoopAcc = 0.f;
     for (auto* fp : m_Parts)
         fp->Begin_Delayed();
+
+    On_SequenceStart();
 }
 
 void CUI_CurtainSequenceBase::Stop()
