@@ -68,9 +68,6 @@ public:
 	virtual _bool Enter_Attack_KeyPress(CKirby* pKirby) override;
 	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) override;
 
-private:
-	CGameInstance_Proxy* m_pGameInstance_Proxy{};
-
 	// State
 	MOUTH_STATE m_eMouthState{};
 

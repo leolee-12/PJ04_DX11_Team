@@ -7,6 +7,7 @@
 #include "Kirby_Command.h"
 
 NS_BEGIN(Engine)
+class CGameInstance_Proxy;
 class CEffect_Container;
 NS_END
 
@@ -22,6 +23,9 @@ class CLIENT_DLL CKirby_AttackMode abstract : public CBase
 protected:
 	CKirby_AttackMode();
 	virtual ~CKirby_AttackMode() = default;
+
+protected:
+	HRESULT Initialize();
 
 public:
 	virtual void Enter_AttackState(CKirby* pKirby) = 0;
@@ -49,6 +53,8 @@ protected:
 
 protected:
 	_bool m_bReqEndAttackState{ true };
+
+	CGameInstance_Proxy* m_pGameInstance_Proxy{};
 
 protected:
 	virtual void Free() override;

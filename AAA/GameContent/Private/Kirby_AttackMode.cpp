@@ -12,6 +12,15 @@ CKirby_AttackMode::CKirby_AttackMode()
 {
 }
 
+HRESULT CKirby_AttackMode::Initialize()
+{
+    m_pGameInstance_Proxy = CGameInstance::GetProxy();
+    if (m_pGameInstance_Proxy == nullptr)
+        return E_FAIL;
+
+    return S_OK;
+}
+
 void CKirby_AttackMode::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
 {
     CMovement_Child* pMovement = pKirby->Get_Movement();
@@ -46,5 +55,7 @@ void CKirby_AttackMode::Effect_Stop(CEffect_Container*& pContainer)
 
 void CKirby_AttackMode::Free()
 {
+    Safe_Release(m_pGameInstance_Proxy);
+
     __super::Free();
 }

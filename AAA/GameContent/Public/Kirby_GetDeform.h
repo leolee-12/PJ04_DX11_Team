@@ -2,8 +2,6 @@
 
 #include "Kirby_State.h"
 
-#include "GameContent_Defines.h"
-
 NS_BEGIN(Engine)
 class CGameInstance_Proxy;
 class CAnimator;
@@ -53,8 +51,6 @@ private:
 	void Set_RotationDir(CKirby* pKirby);
 
 private:
-	CGameInstance_Proxy* m_pGameInstance_Proxy = {};
-
 	DEFORM_STATE m_eDeformState{};
 
 	// 변신할 타입

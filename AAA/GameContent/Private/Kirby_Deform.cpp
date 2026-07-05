@@ -12,6 +12,9 @@ CKirby_Deform::CKirby_Deform()
 
 HRESULT CKirby_Deform::Initialize()
 {   
+    if (FAILED(__super::Initialize()))
+        return E_FAIL;
+
     m_tDeformAniInfos.resize(ETOUI(DEFORM_ANI::END));
 
     return S_OK;

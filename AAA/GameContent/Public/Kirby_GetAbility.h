@@ -2,8 +2,6 @@
 
 #include "Kirby_State.h"
 
-#include "GameContent_Defines.h"
-
 NS_BEGIN(Engine)
 class CGameInstance_Proxy;
 class CAnimator;
@@ -39,9 +37,6 @@ public:
 
 public:
 	virtual _bool Ignore_TimeScale() { return true; }
-
-private:
-	CGameInstance_Proxy* m_pGameInstance_Proxy = {};
 
 private:
 	_bool m_bPartsOn{};

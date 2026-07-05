@@ -14,6 +14,9 @@ CKirby_Ability::CKirby_Ability()
 
 HRESULT CKirby_Ability::Initialize()
 {
+    if (FAILED(__super::Initialize()))
+        return E_FAIL;
+
     m_tAniInfos.resize(ETOUI(ABILITY_ANI::END));
 
     Set_FullBodyAni(ABILITY_ANI::WAIT, "Wait", true, false, 0.1f, 1.8f);

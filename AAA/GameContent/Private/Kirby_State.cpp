@@ -1,11 +1,12 @@
 #include "Kirby_State.h"
 
 #include "GameInstance.h"
-#include "Movement_Child.h"
 
 #include "Kirby.h"
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
+
+#include "Movement_Child.h"
 
 CKirby_State::CKirby_State()
 {
@@ -13,6 +14,9 @@ CKirby_State::CKirby_State()
 
 HRESULT CKirby_State::Initialize()
 {
+    m_pGameInstance_Proxy = CGameInstance::GetProxy();
+    if (m_pGameInstance_Proxy == nullptr)
+        return E_FAIL;
 
     return S_OK;
 }
@@ -123,5 +127,7 @@ void CKirby_State::Request_ReleaseGrabState(CKirby* pKirby, GRAB_TYPE eType)
 
 void CKirby_State::Free()
 {
+    Safe_Release(m_pGameInstance_Proxy);
+
     __super::Free();
 }

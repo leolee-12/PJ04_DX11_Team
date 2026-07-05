@@ -2,8 +2,6 @@
 
 #include "Kirby_State.h"
 
-#include "GameContent_Defines.h"
-
 NS_BEGIN(Engine)
 class CAnimator;
 NS_END

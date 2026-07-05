@@ -21,10 +21,6 @@ HRESULT CKirby_Ability_Normal::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
-    m_pGameInstance_Proxy = CGameInstance::GetProxy();
-    if (m_pGameInstance_Proxy == nullptr)
-        return E_FAIL;
-
     m_fMaxSuperInhaleTime = 1.f;
 
     m_vInhaleEffectStartPos = { 0.f, 0.63f, 0.6f };
@@ -676,8 +672,6 @@ CKirby_Ability_Normal* CKirby_Ability_Normal::Create()
 void CKirby_Ability_Normal::Free()
 {
     Unsubscribe_InhaleCapturedEvent();
-
-    Safe_Release(m_pGameInstance_Proxy);
 
     __super::Free();
 }

@@ -2,11 +2,12 @@
 
 #include "Base.h"
 
-#include "GameContent_Defines.h"
+#include "GameContent_const.h"
 
 #include "Kirby_Command.h"
 
 NS_BEGIN(Engine)
+class CGameInstance_Proxy;
 NS_END
 
 NS_BEGIN(Client)
@@ -55,6 +56,9 @@ protected:
 	_bool Try_Transition_Fall(CKirby* pKirby);
 	_bool Transition_Wait_OR_Run(CKirby* pKirby);
 	_bool Transition_Fall_OR_Wait_OR_Run(CKirby* pKirby);
+
+protected:
+	CGameInstance_Proxy* m_pGameInstance_Proxy{};
 
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand);
