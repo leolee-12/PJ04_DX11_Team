@@ -1,11 +1,8 @@
 #pragma once
 
-#include "Base.h"
+#include "Kirby_AttackMode.h"
+
 #include "Animator.h"
-
-#include "GameContent_Defines.h"
-
-#include "Kirby_Command.h"
 
 NS_BEGIN(Engine)
 NS_END
@@ -23,7 +20,7 @@ enum class DEFORM_ANI
 	END
 };
 
-class CLIENT_DLL CKirby_Deform abstract : public CBase
+class CLIENT_DLL CKirby_Deform abstract : public CKirby_AttackMode
 {
 protected:
 	enum DEFORM_ANI_PLAY_TYPE { FULL_BODY, OVERLAY };
@@ -47,28 +44,10 @@ public:
 	virtual void Enter_Deform(CKirby* pKirby) = 0;
 	virtual void Exit_Deform(CKirby* pKirby) = 0;
 
-	virtual void Enter_DeformState(CKirby* pKirby) = 0;
-	virtual void Update_DeformState(CKirby* pKirby, _float fTimeDelta) = 0;
-	virtual void Exit_DeformState(CKirby* pKirby) = 0;
-
 public:
-	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo);
-
-public:
-	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) = 0;
-
-public:
-	virtual _bool Enter_Attack_KeyDown(CKirby* pKirby) = 0;
-	virtual _bool Enter_Attack_KeyPress(CKirby* pKirby) = 0;
-	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) = 0;
-
-	_bool ReqEndAttackState() { return m_bReqEndAttackState; }
-
 	void Play_DeformAni(CKirby* pKirby, DEFORM_ANI eDeformAni);
 
 protected:
-	_bool m_bReqEndAttackState{ true };
-
 	vector<DEFORM_ANI_DESC> m_tDeformAniInfos;
 
 protected:

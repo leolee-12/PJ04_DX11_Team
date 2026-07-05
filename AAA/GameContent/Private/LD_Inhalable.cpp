@@ -1,20 +1,20 @@
-#include "LDInhalable.h"
+#include "LD_Inhalable.h"
 #include "GameContent_const.h"
 #include "Damageable.h"
 
 #include "GameInstance.h"
 
-CLDInhalable::CLDInhalable(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CLD_Inhalable::CLD_Inhalable(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevelDesignObject(pDevice, pContext)
 {
 }
 
-CLDInhalable::CLDInhalable(const CLevelDesignObject& Prototype)
+CLD_Inhalable::CLD_Inhalable(const CLevelDesignObject& Prototype)
 	: CLevelDesignObject(Prototype)
 {
 }
 
-HRESULT CLDInhalable::Initialize(void* pArg)
+HRESULT CLD_Inhalable::Initialize(void* pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -25,7 +25,22 @@ HRESULT CLDInhalable::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CLDInhalable::Update(_float fTimeDelta)
+HRESULT CLD_Inhalable::Validate_Initialized()
+{
+	if (FAILED(__super::Validate_Initialized()))
+		return E_FAIL;
+
+	if (nullptr == m_pHurtBox || nullptr == m_pProjectileBox)
+		return E_FAIL;
+	if (m_fColliderRadius <= 0.f)
+		return E_FAIL;
+	if (LD_STATE::IDLE != m_eState && LD_STATE::CAPTURED != m_eState && LD_STATE::SPAT != m_eState)
+		return E_FAIL;
+
+	return S_OK;
+}
+
+void CLD_Inhalable::Update(_float fTimeDelta)
 {
 	if (!m_bActive)
 		return;
@@ -43,12 +58,12 @@ void CLDInhalable::Update(_float fTimeDelta)
 	}
 }
 
-void CLDInhalable::Late_Update(_float fTimeDelta)
+void CLD_Inhalable::Late_Update(_float fTimeDelta)
 {
 	if (!m_bActive)
 		return;
 
-	if (m_pHurtBox && m_pHurtBox->Is_Enabled())
+	if (m_pHurtBox->Is_Enabled())
 	{
 		m_pHurtBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 #ifdef _DEBUG
@@ -56,7 +71,7 @@ void CLDInhalable::Late_Update(_float fTimeDelta)
 #endif
 	}
 
-	if (m_pProjectileBox && m_pProjectileBox->Is_Enabled())
+	if (m_pProjectileBox->Is_Enabled())
 	{
 		m_pProjectileBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 #ifdef _DEBUG
@@ -65,10 +80,12 @@ void CLDInhalable::Late_Update(_float fTimeDelta)
 	}
 }
 
-HRESULT	CLDInhalable::Ready_Collider()
+HRESULT CLD_Inhalable::Ready_Collider()
 {
 	if (m_fColliderRadius <= 0.f)
-		return S_OK;
+		return E_FAIL;
+	if (nullptr == m_pGameInstance_Proxy)
+		return E_FAIL;
 
 	CCollider::COLLIDER_DESC Desc{};
 	Desc.pOwner = this;
@@ -93,7 +110,7 @@ HRESULT	CLDInhalable::Ready_Collider()
 	return S_OK;
 }
 
-void CLDInhalable::SetUp_Collider_CallBack()
+void CLD_Inhalable::SetUp_Collider_CallBack()
 {
 	if (m_pProjectileBox)
 	{
@@ -119,7 +136,7 @@ void CLDInhalable::SetUp_Collider_CallBack()
 	}
 }
 
-void CLDInhalable::On_Swallowed()
+void CLD_Inhalable::On_Swallowed()
 {
 	SWALLOW_EVENT payload{ this };
 	m_pGameInstance_Proxy->Publish(EVT_SWALLOWED, &payload);
@@ -128,24 +145,22 @@ void CLDInhalable::On_Swallowed()
 	Set_Active(false);
 }
 
-void CLDInhalable::Enable_Colliders(_bool b)
+void CLD_Inhalable::Enable_Colliders(_bool b)
 {
-	if (m_pHurtBox)
-		m_pHurtBox->Set_Enabled(b);
+	m_pHurtBox->Set_Enabled(b);
 
 	// ProjectileBox는 SPAT 상태에서만 별도로 활성화한다.
-	if (m_pProjectileBox)
-		m_pProjectileBox->Set_Enabled(false);
+	m_pProjectileBox->Set_Enabled(false);
 }
 
-void CLDInhalable::Despawn_Spat()
+void CLD_Inhalable::Despawn_Spat()
 {
 	Enable_Colliders(false);
 	m_vSpatVelocity = {};
 	Set_Active(false);
 }
 
-void CLDInhalable::Update_Captured(_float fTimeDelta)
+void CLD_Inhalable::Update_Captured(_float fTimeDelta)
 {
 	if (!m_pCaptor)
 		return;
@@ -178,7 +193,7 @@ void CLDInhalable::Update_Captured(_float fTimeDelta)
 		m_vBaseScale.z * m_fScaleRatio);
 }
 
-void CLDInhalable::Update_Spat(_float fTimeDelta)
+void CLD_Inhalable::Update_Spat(_float fTimeDelta)
 {
 	CTransform* pT = Get_Transform();
 	_vector vVel = XMLoadFloat3(&m_vSpatVelocity);
@@ -196,7 +211,7 @@ void CLDInhalable::Update_Spat(_float fTimeDelta)
 		Despawn_Spat();
 }
 
-void CLDInhalable::Be_Captured(CGameObject* pInhaler)
+void CLD_Inhalable::Be_Captured(CGameObject* pInhaler)
 {
 	m_pCaptor = pInhaler;
 	m_eState = LD_STATE::CAPTURED;
@@ -207,7 +222,7 @@ void CLDInhalable::Be_Captured(CGameObject* pInhaler)
 	m_fScaleRatio = 1.f;
 }
 
-void CLDInhalable::Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed)
+void CLD_Inhalable::Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed)
 {
 	m_pCaptor = nullptr;
 	Set_Active(true);
@@ -226,8 +241,7 @@ void CLDInhalable::Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed)
 	m_fSpinAngle = 0.f;
 
 	Enable_Colliders(false);
-	if (m_pProjectileBox)
-		m_pProjectileBox->Set_Enabled(true);
+	m_pProjectileBox->Set_Enabled(true);
 
 	m_fLifeTime = s_fMaxLifeTime;
 }

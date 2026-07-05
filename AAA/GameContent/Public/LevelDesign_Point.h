@@ -29,9 +29,11 @@ private:
 	CLevelDesign_Point(const CLevelDesign_Point& Prototype);
 	virtual ~CLevelDesign_Point() = default;
 
-public:
 	virtual HRESULT	Initialize_Prototype() override;
 	virtual HRESULT	Initialize(void* pArg) override;
+	virtual HRESULT	Validate_Initialized() override;
+
+public:
 	virtual void	Late_Update(_float fTimeDelta) override;
 	virtual HRESULT	Render() override;
 	virtual void	Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
@@ -51,9 +53,8 @@ private:
 	_bool			m_bRotate = { false };
 
 private:
-	virtual HRESULT	Validate_Desc() override;
-
 	HRESULT			Ready_Components();
+	HRESULT			Ready_RenderComponents();
 	HRESULT			Bind_ShaderResources();
 	HRESULT			Render_Model();
 	const _tchar*	Resolve_ModelProtoTag() const;

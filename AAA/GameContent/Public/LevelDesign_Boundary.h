@@ -22,9 +22,11 @@ private:
 	CLevelDesign_Boundary(const CLevelDesign_Boundary& Prototype);
 	virtual ~CLevelDesign_Boundary() = default;
 
-public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
+	virtual HRESULT Validate_Initialized() override;
+
+public:
 	virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
 private:
@@ -32,8 +34,7 @@ private:
 	physx::PxTriangleMesh* m_pCollisionMesh = { nullptr };
 
 private:
-	virtual HRESULT Validate_Desc() override;
-
+	HRESULT Ready_Components(const LD_PARSED_OBJECT& Desc);
 	HRESULT Ready_PhysicsActor(const LD_PARSED_OBJECT& Desc);
 	HRESULT Ready_PhysicsActor_FromPoints(const LD_PARSED_OBJECT& Desc);
 	HRESULT Ready_PhysicsActor_FromBox(const LD_PARSED_OBJECT& Desc);

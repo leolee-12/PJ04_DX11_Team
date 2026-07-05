@@ -13,9 +13,11 @@ private:
 	CMapStage(const CMapStage& Prototype);
 	virtual ~CMapStage() = default;
 
-public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
+	HRESULT			Validate_Initialized();
+
+public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
@@ -40,9 +42,7 @@ public:
 
 private:
 	vector<CMapSection*>	m_Sections;
-	_wstring				m_strProtoTag = { PROTOTYPE_TAG };
 	_wstring				m_strStageName;
-	_uint					m_iSectionProtoLevel = {};
 	_float4x4				m_LastWorldMatrix = {};
 	_bool					m_bSnapshotValid = { false };
 
@@ -57,7 +57,7 @@ private:
 	void			Refresh_SectionTransforms();
 	void			Submit_VisibleSections();
 
-	void			Stage12_CarBreakWall();
+	void			On_Stage12CarBreakWall();
 
 #ifdef _DEBUG
 	void    Reset_ProfileFrame();

@@ -83,6 +83,7 @@ namespace ProtoDesc
 	inline constexpr TEXTURE_DESC Texture_ChargeNoise = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_ChargeNoise"), TEXT("../../Resources/YSE/Effect/SwordCharge/ChargeNoise.png"), 1 };
 	// MilkyWayMask
 	inline constexpr TEXTURE_DESC Texture_MilkyWayMask = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_MilkyWayMask"), TEXT("../../Resources/YSE/Effect/CarMilkyWay/MilkyWayMask.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_Gradiant = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Gradiant"), TEXT("../../Resources/YSE/Effect/CarMilkyWay/Gradiant.png"), 1 };
 
 	// Star2D
 	inline constexpr TEXTURE_DESC Texture_Star2D = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Star2D"), TEXT("../../Resources/YSE/Effect/Star2D/common_star01.png"), 1 };

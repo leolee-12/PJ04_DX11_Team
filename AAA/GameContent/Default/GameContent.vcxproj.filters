@@ -229,27 +229,6 @@
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Damaged">
       <UniqueIdentifier>{f4dff91e-89fb-4ec2-a836-1510c556d9ab}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\02. Kirby_Ability">
-      <UniqueIdentifier>{aec0ec4f-8364-4084-95b0-fba459e158d0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\02. Kirby_Ability\00. Kirby_Ability_Normal">
-      <UniqueIdentifier>{1f1ebec8-785f-4d2a-be62-dc3edc8740d0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\02. Kirby_Ability\01. Kirby_Ability_Sword">
-      <UniqueIdentifier>{fcd6a4fd-d852-4910-bb95-c63423f00f06}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts">
-      <UniqueIdentifier>{ce8838df-6dca-44f5-99b6-21707344efd7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts">
-      <UniqueIdentifier>{8c7ca4c1-aab7-415a-8406-92a604372a55}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\00. Sword">
-      <UniqueIdentifier>{a70f7f84-5af6-4248-aa3c-e98abf86eb57}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat">
-      <UniqueIdentifier>{d12eb026-e157-4495-859c-6ae236366e96}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\06. Monster">
       <UniqueIdentifier>{c69f6e1f-9250-40fa-90bd-8d408e832ff0}</UniqueIdentifier>
     </Filter>
@@ -661,9 +640,6 @@
     <Filter Include="00. GameObject\06. Monster\07. BrontoBurt\State\Return">
       <UniqueIdentifier>{1c459d47-b212-490f-a2b8-c351c910c80c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\RailTrack">
-      <UniqueIdentifier>{4f01bdcc-60a5-4b64-b19d-985bfe489406}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\06. Monster\06. PoppyBrosJr\State\Throw">
       <UniqueIdentifier>{f759dab8-b2df-4c10-b6e1-5094af1c3fc9}</UniqueIdentifier>
     </Filter>
@@ -688,26 +664,8 @@
     <Filter Include="02. Component\01. Monster_Movement\00. Rail">
       <UniqueIdentifier>{bc260f59-12f2-4b10-855a-455fabc6411e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\04. Kirby_Deform">
-      <UniqueIdentifier>{f560c2aa-8eeb-4595-83ed-635fdbd73ecd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\04. Kirby_Deform\Deform_Car">
-      <UniqueIdentifier>{b600ded8-bf65-4554-b846-776c35549114}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Form">
-      <UniqueIdentifier>{ebb46de8-d6ad-448c-8168-0c70ffe30019}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Form\00. Body">
-      <UniqueIdentifier>{81d949c1-1101-4e64-aa3f-d769238287d9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Form\02. DeformCar_Main">
-      <UniqueIdentifier>{30e6faec-8ca3-4f51-a179-3a72f1929f83}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\GetDeform">
       <UniqueIdentifier>{a75ad0b3-6c7f-486d-9311-5d2ca1cda8e5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Form\01. DeformCar_Demo">
-      <UniqueIdentifier>{bf99796d-3273-432e-a337-ddc43bb3ee3e}</UniqueIdentifier>
     </Filter>
     <Filter Include="01. Projectile\00. PhysicsProjectile\01. Bomb">
       <UniqueIdentifier>{a7cbb794-7713-433a-905e-5aad935b8cd9}</UniqueIdentifier>
@@ -828,8 +786,8 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Ladder">
       <UniqueIdentifier>{3c116748-f8e5-401b-b934-04a16a0781f3}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion">
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion">
       <UniqueIdentifier>{485a73df-26e0-4a27-a49d-295d417d941b}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\16. Common_SphereNoise">
@@ -870,6 +828,48 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\14. Star\Emitter">
       <UniqueIdentifier>{2a99a782-1b06-4ca2-bcec-3900ae1eb0e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\02. AttackMode">
+      <UniqueIdentifier>{f7025869-2de7-4073-80a0-ae5abb5cd5fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts">
+      <UniqueIdentifier>{ce8838df-6dca-44f5-99b6-21707344efd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts">
+      <UniqueIdentifier>{8c7ca4c1-aab7-415a-8406-92a604372a55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\00. Sword">
+      <UniqueIdentifier>{a70f7f84-5af6-4248-aa3c-e98abf86eb57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat">
+      <UniqueIdentifier>{d12eb026-e157-4495-859c-6ae236366e96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform">
+      <UniqueIdentifier>{ebb46de8-d6ad-448c-8168-0c70ffe30019}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\00. Body">
+      <UniqueIdentifier>{81d949c1-1101-4e64-aa3f-d769238287d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\02. DeformCar_Main">
+      <UniqueIdentifier>{30e6faec-8ca3-4f51-a179-3a72f1929f83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\01. DeformCar_Demo">
+      <UniqueIdentifier>{bf99796d-3273-432e-a337-ddc43bb3ee3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability">
+      <UniqueIdentifier>{aec0ec4f-8364-4084-95b0-fba459e158d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\00. Kirby_Ability_Normal">
+      <UniqueIdentifier>{1f1ebec8-785f-4d2a-be62-dc3edc8740d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword">
+      <UniqueIdentifier>{fcd6a4fd-d852-4910-bb95-c63423f00f06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform">
+      <UniqueIdentifier>{f560c2aa-8eeb-4595-83ed-635fdbd73ecd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\00. Deform_Car">
+      <UniqueIdentifier>{b600ded8-bf65-4554-b846-776c35549114}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1066,10 +1066,10 @@
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Run</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Ability.h">
-      <Filter>00. GameObject\05. Kirby\02. Kirby_Ability</Filter>
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Ability_Normal.h">
-      <Filter>00. GameObject\05. Kirby\02. Kirby_Ability\00. Kirby_Ability_Normal</Filter>
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\00. Kirby_Ability_Normal</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Jump.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Jump</Filter>
@@ -1138,7 +1138,7 @@
       <Filter>00. GameObject\02. EnvObject\Instance</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Body.h">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Form\00. Body</Filter>
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\00. Body</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Sword.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\00. Sword</Filter>
@@ -1153,7 +1153,7 @@
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\GetAbility</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Ability_Sword.h">
-      <Filter>00. GameObject\05. Kirby\02. Kirby_Ability\01. Kirby_Ability_Sword</Filter>
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_AbilityDump.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\AbilityDump</Filter>
@@ -1293,7 +1293,7 @@
     <ClInclude Include="..\Public\LevelDesign_Rail.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\RailDataReceiver.h">
+    <ClInclude Include="..\Public\RailRideable.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClInclude>
     <ClInclude Include="..\public\MonsterPart.h">
@@ -1431,7 +1431,7 @@
     <ClInclude Include="..\Public\Sword_SpinSlash.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\LevelDesign_EventObject.h">
+    <ClInclude Include="..\Public\LD_EventObject.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_FallBorder.h">
@@ -1475,9 +1475,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\BrontoBurt_State_Return.h">
       <Filter>00. GameObject\06. Monster\07. BrontoBurt\State\Return</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\RailTrack.h">
-      <Filter>00. GameObject\96. LevelDesign\RailTrack</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PoppyBrosJr_Body.h">
       <Filter>00. GameObject\06. Monster\06. PoppyBrosJr\Parts\Body</Filter>
@@ -1570,19 +1567,19 @@
       <Filter>97. DataSystem</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Deform.h">
-      <Filter>00. GameObject\05. Kirby\04. Kirby_Deform</Filter>
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Deform_Car.h">
-      <Filter>00. GameObject\05. Kirby\04. Kirby_Deform\Deform_Car</Filter>
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\00. Deform_Car</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Deform_Model.h">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Form</Filter>
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_DeformCar_Demo.h">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Form\01. DeformCar_Demo</Filter>
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\01. DeformCar_Demo</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_DeformCar_Main.h">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Form\02. DeformCar_Main</Filter>
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\02. DeformCar_Main</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_GetDeform.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\GetDeform</Filter>
@@ -1596,7 +1593,7 @@
     <ClInclude Include="..\Public\Monster_RailMovement.h">
       <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\LDInhalable.h">
+    <ClInclude Include="..\public\LD_Inhalable.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Cappy.h">
@@ -1674,7 +1671,7 @@
     <ClInclude Include="..\Public\MapSection.h">
       <Filter>00. GameObject\01. Map\Section</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\MapBreakSection.h">
+    <ClInclude Include="..\Public\MapEvent_BreakWall.h">
       <Filter>00. GameObject\01. Map\Section</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Star2DParticle.h">
@@ -1703,8 +1700,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Ladder.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Ladder</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\BombExplosion.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\BombExplosion.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Common_SphereNoise.h">
@@ -1736,6 +1733,21 @@
     </ClInclude>
     <ClInclude Include="..\Public\StarEmitter.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\14. Star\Emitter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_AttackMode.h">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_Stage1BossDemo.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_SlopeBoardA.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_SlopeBoardC.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RailTrack.h">
+      <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1890,7 +1902,7 @@
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Run</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ability_Normal.cpp">
-      <Filter>00. GameObject\05. Kirby\02. Kirby_Ability\00. Kirby_Ability_Normal</Filter>
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\00. Kirby_Ability_Normal</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Jump.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Jump</Filter>
@@ -1947,7 +1959,7 @@
       <Filter>00. GameObject\02. EnvObject\Instance</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Body.cpp">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Form\00. Body</Filter>
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\00. Body</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Sword.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\00. Sword</Filter>
@@ -1965,7 +1977,7 @@
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp">
-      <Filter>00. GameObject\05. Kirby\02. Kirby_Ability\01. Kirby_Ability_Sword</Filter>
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\AbilityDump</Filter>
@@ -2046,7 +2058,7 @@
       <Filter>00. GameObject\07. Boss\MiniBoss\GigantEdge\Brain</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ability.cpp">
-      <Filter>00. GameObject\05. Kirby\02. Kirby_Ability</Filter>
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TestParticle.cpp">
       <Filter>00. GameObject\Test\TestParticle</Filter>
@@ -2090,7 +2102,7 @@
     <ClCompile Include="..\Private\LevelDesign_Rail.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\RailDataReceiver.cpp">
+    <ClCompile Include="..\Private\RailRideable.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClCompile>
     <ClCompile Include="..\private\MonsterPart.cpp">
@@ -2222,7 +2234,7 @@
     <ClCompile Include="..\Private\Sword_SpinSlash.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\LevelDesign_EventObject.cpp">
+    <ClCompile Include="..\Private\LD_EventObject.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_FallBorder.cpp">
@@ -2266,9 +2278,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\BrontoBurt_State_Return.cpp">
       <Filter>00. GameObject\06. Monster\07. BrontoBurt\State\Return</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\RailTrack.cpp">
-      <Filter>00. GameObject\96. LevelDesign\RailTrack</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PoppyBrosJr_Body.cpp">
       <Filter>00. GameObject\06. Monster\06. PoppyBrosJr\Parts\Body</Filter>
@@ -2358,19 +2367,19 @@
       <Filter>01. Projectile\00. PhysicsProjectile\01. Bomb\KirbyBomb</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Deform.cpp">
-      <Filter>00. GameObject\05. Kirby\04. Kirby_Deform</Filter>
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Deform_Car.cpp">
-      <Filter>00. GameObject\05. Kirby\04. Kirby_Deform\Deform_Car</Filter>
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\00. Deform_Car</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_DeformCar_Demo.cpp">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Form\01. DeformCar_Demo</Filter>
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\01. DeformCar_Demo</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_DeformCar_Main.cpp">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Form\02. DeformCar_Main</Filter>
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\02. DeformCar_Main</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Deform_Model.cpp">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Form</Filter>
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_GetDeform.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\GetDeform</Filter>
@@ -2384,7 +2393,7 @@
     <ClCompile Include="..\Private\Monster_RailMovement.cpp">
       <Filter>02. Component\01. Monster_Movement\00. Rail</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\LDInhalable.cpp">
+    <ClCompile Include="..\private\LD_Inhalable.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Cappy.cpp">
@@ -2462,7 +2471,7 @@
     <ClCompile Include="..\Private\MapSection.cpp">
       <Filter>00. GameObject\01. Map\Section</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\MapBreakSection.cpp">
+    <ClCompile Include="..\Private\MapEvent_BreakWall.cpp">
       <Filter>00. GameObject\01. Map\Section</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Star2DParticle.cpp">
@@ -2491,8 +2500,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ladder.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Ladder</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\BombExplosion.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\BombExplosion.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Common_SphereNoise.cpp">
@@ -2524,6 +2533,21 @@
     </ClCompile>
     <ClCompile Include="..\Private\StarEmitter.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\14. Star\Emitter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_AttackMode.cpp">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_SlopeBoardA.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_SlopeBoardC.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RailTrack.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -123,6 +123,22 @@ HRESULT CLevelDesign_Unsupported::Initialize(void* pArg)
         return E_FAIL;
 #endif
 
+    if (FAILED(Validate_Initialized()))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT CLevelDesign_Unsupported::Validate_Initialized()
+{
+    if (FAILED(__super::Validate_Initialized()))
+        return E_FAIL;
+
+#ifdef _DEBUG
+    if (nullptr == m_pDebugCollider)
+        return E_FAIL;
+#endif
+
     return S_OK;
 }
 
@@ -131,11 +147,8 @@ void CLevelDesign_Unsupported::Late_Update(_float fTimeDelta)
     UNREFERENCED_PARAMETER(fTimeDelta);
 
 #ifdef _DEBUG
-    if (m_pDebugCollider && m_pTransformCom)
-    {
-        m_pDebugCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
-        m_pGameInstance_Proxy->Add_DebugComponent(m_pDebugCollider);
-    }
+    m_pDebugCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+    m_pGameInstance_Proxy->Add_DebugComponent(m_pDebugCollider);
 #endif
 }
 
@@ -151,7 +164,7 @@ void CLevelDesign_Unsupported::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 HRESULT CLevelDesign_Unsupported::Ready_DebugCollider(const LD_OBJECT_DESC* pObjectDesc)
 {
     if (nullptr == pObjectDesc)
-        return S_OK;
+        return E_FAIL;
 
     _float3 vCenterLocal = {};
     _float3 vSize = {};

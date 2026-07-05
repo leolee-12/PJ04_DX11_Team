@@ -38,7 +38,7 @@ COPY_ABILITY_TYPE CKirby_Ability_Normal::Get_AbilityType()
     return COPY_ABILITY_TYPE::NORMAL;
 }
 
-void CKirby_Ability_Normal::Enter_AbilityState(CKirby* pKirby)
+void CKirby_Ability_Normal::Enter_AttackState(CKirby* pKirby)
 {
     m_eInhaleState = INHALE_STATE::NORMAL_EXIT;
 
@@ -76,7 +76,7 @@ void CKirby_Ability_Normal::Enter_AbilityState(CKirby* pKirby)
     }
 }
 
-ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_AbilityState(CKirby* pKirby, _float fTimeDelta)
+void CKirby_Ability_Normal::Update_AttackState(CKirby* pKirby, _float fTimeDelta)
 {
     Update_InhaleMoveState(pKirby);
     Update_SuperInhaleTimer(fTimeDelta);
@@ -88,11 +88,9 @@ ABILITY_UPDATE_RESULT CKirby_Ability_Normal::Update_AbilityState(CKirby* pKirby,
         pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY);
         Off_InhaleEffect();
     }
-
-    return ABILITY_UPDATE_RESULT::NONE;
 }
 
-void CKirby_Ability_Normal::Exit_AbilityState(CKirby* pKirby)
+void CKirby_Ability_Normal::Exit_AttackState(CKirby* pKirby)
 {
     switch (m_eMouthState)
     {
@@ -180,17 +178,6 @@ _bool CKirby_Ability_Normal::Enter_Attack_KeyUp(CKirby* pKirby)
 {
     // ¹«½Ã
     return true;
-}
-
-_bool CKirby_Ability_Normal::Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation)
-{
-    switch (eAttackLocation)
-    {
-        case KIRBY_ATTACK_LOCATION::GROUND:     return true;
-        case KIRBY_ATTACK_LOCATION::AIR:        return true;
-    }
-
-    return false;
 }
 
 void CKirby_Ability_Normal::Change_InhaleState(CKirby* pKirby, INHALE_STATE eNext)
@@ -670,11 +657,7 @@ void CKirby_Ability_Normal::Spit_Inhalable(CKirby* pKirby)
 
 void CKirby_Ability_Normal::Off_InhaleEffect()
 {
-    if (m_pInhaleEffect)
-    {
-        m_pInhaleEffect->EffectContainer_Stop();
-        m_pInhaleEffect = nullptr;
-    }
+    Effect_Stop(m_pInhaleEffect);
 }
 
 CKirby_Ability_Normal* CKirby_Ability_Normal::Create()

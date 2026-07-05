@@ -28,9 +28,11 @@ private:
 	CLevelDesign_Food(const CLevelDesign_Food& Prototype);
 	virtual ~CLevelDesign_Food() = default;
 
-public:
 	virtual HRESULT	Initialize_Prototype() override;
 	virtual HRESULT	Initialize(void* pArg) override;
+	virtual HRESULT	Validate_Initialized() override;
+
+public:
 	virtual void	Late_Update(_float fTimeDelta) override;
 	virtual HRESULT	Render() override;
 	virtual void	Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
@@ -48,9 +50,8 @@ private:
 	LD_FOOD_DESC	m_tFoodDesc = {};
 
 private:
-	virtual HRESULT	Validate_Desc() override;
-
 	HRESULT			Ready_Components();
+	HRESULT			Ready_RenderComponents();
 	HRESULT			Bind_ShaderResources();
 	HRESULT			Render_Model();
 	const _tchar*	Resolve_ModelProtoTag() const;

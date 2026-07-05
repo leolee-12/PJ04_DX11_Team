@@ -215,6 +215,39 @@ PxRigidStatic* CPhysX_Manager::Create_StaticBox(const _float3& vLocalCenter, con
     return pActor;
 }
 
+HRESULT CPhysX_Manager::Refresh_StaticBoxPose(physx::PxRigidStatic* pActor, const _float3& vLocalCenter, _fmatrix WorldMatrix)
+{
+    if (nullptr == pActor)
+        return E_FAIL;
+
+    if (m_StaticActors.end() == find(m_StaticActors.begin(), m_StaticActors.end(), pActor))
+        return E_FAIL;
+
+    XMVECTOR vScale{}, vRotation{}, vTranslation{};
+    if (!XMMatrixDecompose(&vScale, &vRotation, &vTranslation, WorldMatrix))
+        return E_FAIL;
+
+    _float3 vWorldCenter{};
+    XMStoreFloat3(&vWorldCenter, XMVector3TransformCoord(XMLoadFloat3(&vLocalCenter), WorldMatrix));
+
+    _float4 vRotationQuaternion{};
+    XMStoreFloat4(&vRotationQuaternion, XMQuaternionNormalize(vRotation));
+
+    const PxTransform Pose(
+        PxVec3(vWorldCenter.x, vWorldCenter.y, vWorldCenter.z),
+        PxQuat(
+            vRotationQuaternion.x,
+            vRotationQuaternion.y,
+            vRotationQuaternion.z,
+            vRotationQuaternion.w));
+
+    if (!Pose.isValid())
+        return E_FAIL;
+
+    pActor->setGlobalPose(Pose, false);
+    return S_OK;
+}
+
 PxRigidStatic* CPhysX_Manager::Cook_StaticMesh(
     const _float3* /*pVertices*/, _uint /*iNumVertices*/,
     const _uint*   /*pIndices*/, _uint /*iNumIndices*/,

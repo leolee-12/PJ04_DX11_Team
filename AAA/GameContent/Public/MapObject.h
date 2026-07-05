@@ -21,9 +21,11 @@ protected:
 	CMapObject(const CMapObject& Prototype);
 	virtual ~CMapObject() = default;
 
+	virtual HRESULT	Initialize_Prototype() override;
+	virtual HRESULT	Initialize(void* pArg) override;
+	virtual HRESULT	Validate_Initialized();
+
 public:
-	virtual HRESULT Initialize_Prototype() override;
-	virtual HRESULT Initialize(void* pArg) override;
 	virtual void    Priority_Update(_float fTimeDelta) override;
 	virtual void    Update(_float fTimeDelta) override;
 	virtual void    Late_Update(_float fTimeDelta) override;

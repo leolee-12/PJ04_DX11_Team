@@ -65,21 +65,76 @@ HRESULT CLevelDesign_Bush::Initialize(void* pArg)
 	if (nullptr == pArg)
 		return E_FAIL;
 
-	if (FAILED(__super::Initialize(pArg)))
-		return E_FAIL;
-
 	m_tBushDesc = *static_cast<const LD_BUSH_DESC*>(pArg);
 
-	if (FAILED(Validate_Desc()))
+	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	if (FAILED(Ready_HurtBox()))
+	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
 
-	m_pAnimatorCom->Play("Wait", true, true);
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Bush::Validate_Initialized()
+{
+	if (FAILED(__super::Validate_Initialized()))
+		return E_FAIL;
+
+	if (m_tBushDesc.eCategory != LD_CATEGORY::FOLIAGE)
+		return E_FAIL;
+	if (m_tBushDesc.wstrBasicProtoTag.empty())
+		return E_FAIL;
+	if (m_tBushDesc.wstrCutProtoTag.empty())
+		return E_FAIL;
+	if (MODEL::ANIM != m_tBushDesc.eBasicType)
+		return E_FAIL;
+	if (MODEL::NONANIM != m_tBushDesc.eCutType)
+		return E_FAIL;
+
+	const LD_BUSH_CATALOG* pCatalog = Find_BushCatalog(m_tBushDesc.strObjectName);
+	if (nullptr == pCatalog)
+		return E_FAIL;
+	if (nullptr == pCatalog->pBasicModelProtoTag || m_tBushDesc.wstrBasicProtoTag !=
+		pCatalog->pBasicModelProtoTag)
+		return E_FAIL;
+	if (nullptr == pCatalog->pCutModelProtoTag || m_tBushDesc.wstrCutProtoTag !=
+		pCatalog->pCutModelProtoTag)
+		return E_FAIL;
+	if (m_tBushDesc.eBasicType != pCatalog->eBasicModelType || m_tBushDesc.eCutType !=
+		pCatalog->eCutModelType)
+		return E_FAIL;
+
+	const _uint iState = static_cast<_uint>(m_eState);
+	if (iState >= BUSH_STATE::_COUNT)
+		return E_FAIL;
+
+	for (_uint i = 0; i < BUSH_STATE::_COUNT; ++i)
+	{
+		if (nullptr == m_pShaderComs[i] || nullptr == m_pModelComs[i])
+			return E_FAIL;
+	}
+
+	if (nullptr == m_pAnimatorCom || nullptr == m_pHurtBoxCom)
+		return E_FAIL;
+
+	_bool bHasWaitAnim = false;
+	const _uint iNumAnimations = m_pModelComs[BUSH_STATE::BASIC]->Get_NumAnimations();
+	for (_uint i = 0; i < iNumAnimations; ++i)
+	{
+		if (m_pModelComs[BUSH_STATE::BASIC]->Get_AnimationName(i) == "Wait")
+		{
+			bHasWaitAnim = true;
+			break;
+		}
+	}
+
+	if (!bHasWaitAnim)
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -103,8 +158,7 @@ void CLevelDesign_Bush::Late_Update(_float fTimeDelta)
 #endif
 	}
 
-	if (nullptr != m_pModelComs[m_eState])
-		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 
 HRESULT CLevelDesign_Bush::Render()
@@ -182,24 +236,18 @@ CGameObject* CLevelDesign_Bush::Create_Prototype(ID3D11Device* pDevice, ID3D11De
 	return CLevelDesign_Bush::Create(pDevice, pContext);
 }
 
-
-HRESULT CLevelDesign_Bush::Validate_Desc()
+HRESULT CLevelDesign_Bush::Ready_Components()
 {
-	if (m_tBushDesc.eCategory != LD_CATEGORY::FOLIAGE)
+	if (FAILED(Ready_RenderComponents()))
 		return E_FAIL;
-	if (m_tBushDesc.wstrBasicProtoTag.empty())
-		return E_FAIL;
-	if (m_tBushDesc.wstrCutProtoTag.empty())
-		return E_FAIL;
-	if (MODEL::ANIM != m_tBushDesc.eBasicType)
-		return E_FAIL;
-	if (MODEL::NONANIM != m_tBushDesc.eCutType)
+
+	if (FAILED(Ready_HurtBox()))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CLevelDesign_Bush::Ready_Components()
+HRESULT CLevelDesign_Bush::Ready_RenderComponents()
 {
 	for (_uint i = 0; i < BUSH_STATE::_COUNT; ++i)
 	{
@@ -239,9 +287,12 @@ HRESULT CLevelDesign_Bush::Ready_Components()
 	CAnimator::ANIMATOR_DESC AnimDesc{};
 	AnimDesc.pModel = m_pModelComs[BASIC];
 
-	m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
+	m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice,
+		m_pContext));
 	if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
 		return E_FAIL;
+
+	m_pAnimatorCom->Play("Wait", true, true);
 
 	return S_OK;
 }
@@ -278,8 +329,6 @@ HRESULT CLevelDesign_Bush::Ready_HurtBox()
 HRESULT CLevelDesign_Bush::Bind_ShaderResources(BUSH_STATE eSlot)
 {
 	CShader* pShader = m_pShaderComs[eSlot];
-	if (nullptr == pShader || nullptr == m_pTransformCom)
-		return E_FAIL;
 
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(pShader, "g_WorldMatrix")))
 		return E_FAIL;

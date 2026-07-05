@@ -2,17 +2,14 @@
 
 #include "GameInstance.h"
 
-#include "GameContent_const.h"
-
-#include "Animator.h"
-
 CKirby_Deform_Model::CKirby_Deform_Model(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPartObject(pDevice, pContext)
 {
 }
 
 CKirby_Deform_Model::CKirby_Deform_Model(const CKirby_Deform_Model& Prototype)
-    : CPartObject(Prototype) {
+    : CPartObject(Prototype)
+{
 }
 
 HRESULT CKirby_Deform_Model::Initialize_Prototype()
@@ -23,35 +20,42 @@ HRESULT CKirby_Deform_Model::Initialize_Prototype()
 
 HRESULT CKirby_Deform_Model::Initialize(void* pArg)
 {
-    if (auto pDesc = static_cast<KIRBY_FORM_DESC*>(pArg))
+    if (pArg == nullptr)
     {
-        m_pHitFlash = pDesc->pHitFlash;
-        m_pHitFlashColor = pDesc->pHitFlashColor;
-    };
+        MSG_BOX("pArg is nullptr: CKirby_Deform_Model");
+        return E_FAIL;
+    }
+
+    KIRBY_FORM_DESC* pDesc = static_cast<KIRBY_FORM_DESC*>(pArg);
+
+    m_pHitFlashIntensity = pDesc->pHitFlashIntensity;
+    m_pHitFlashColor = pDesc->pHitFlashColor;
+
+    pDesc->fSpeedPerSec = 1.f;
 
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
-    m_iShadowPass = 3;
-
     return S_OK;
-}
-
-void CKirby_Deform_Model::Priority_Update(_float fTimeDelta)
-{
 }
 
 void CKirby_Deform_Model::Update(_float fTimeDelta)
 {
+    if (m_bActive == false || m_pGameInstance_Proxy->Is_EditMode())
+        return;
+
+    m_pAnimatorCom->Update(fTimeDelta);
 }
 
 void CKirby_Deform_Model::Late_Update(_float fTimeDelta)
 {
-}
+    if (m_bActive == false)
+        return;
 
-HRESULT CKirby_Deform_Model::Render()
-{
-    return S_OK;
+    CPartObject::Compute_CombinedWorldMatrix(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+    m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
 
 const _float4x4* CKirby_Deform_Model::Get_BoneMatrixPtr(const _char* pBoneName) const
@@ -109,7 +113,7 @@ _bool CKirby_Deform_Model::Handle_AnimEventSound(const ANIM_EVENT& e, ANIM_EVENT
     return true;
 }
 
-HRESULT CKirby_Deform_Model::Bind_ShaderResources(CShader* pShader)
+HRESULT CKirby_Deform_Model::Bind_CommonShaderResources(CShader* pShader)
 {
     if (pShader == nullptr)
     {
@@ -127,40 +131,12 @@ HRESULT CKirby_Deform_Model::Bind_ShaderResources(CShader* pShader)
     if (FAILED(pShader->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
         return E_FAIL;
 
-    // 피격 플래시
-    _float  fFlash = m_pHitFlash ? *m_pHitFlash : 0.f;
-    _float3 vFlashCol = m_pHitFlashColor ? *m_pHitFlashColor : _float3(1.f, 1.f, 1.f);
-    if (FAILED(pShader->Bind_RawValue("g_fHitFlash", &fFlash, sizeof(_float))))
-        return E_FAIL;
-    if (FAILED(pShader->Bind_RawValue("g_vHitFlashColor", &vFlashCol, sizeof(_float3))))
-        return E_FAIL;
-    return S_OK;
-}
-
-HRESULT CKirby_Deform_Model::Render_PBRMesh(_uint iMeshIndex)
-{
-    if (m_pPBRShaderCom == nullptr)
-    {
-        MSG_BOX("m_pPBRShaderCom is nullptr: Kirby_Form");
-        return E_FAIL;
-    }
-
-    if (FAILED(m_pModelCom->Bind_Material(m_pPBRShaderCom, "g_DiffuseTexture", iMeshIndex, MTEX_TYPE::DIFFUSE, 0)))
+    const _float fIntensity = m_pHitFlashIntensity ? *m_pHitFlashIntensity : 0.f;
+    if (FAILED(pShader->Bind_RawValue("g_fHitFlash", &fIntensity, sizeof(fIntensity))))
         return E_FAIL;
 
-    if (FAILED(m_pModelCom->Bind_Material(m_pPBRShaderCom, "g_NormalTexture", iMeshIndex, MTEX_TYPE::NORMALS, 0)))
-        return E_FAIL;
-
-    if (FAILED(m_pModelCom->Bind_Material(m_pPBRShaderCom, "g_MRATexture", iMeshIndex, MTEX_TYPE::METALNESS, 0)))
-        return E_FAIL;
-
-    if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pPBRShaderCom, "g_BoneMatrices", iMeshIndex)))
-        return E_FAIL;
-
-    if (FAILED(m_pPBRShaderCom->Begin(1)))
-        return E_FAIL;
-
-    if (FAILED(m_pModelCom->Render(iMeshIndex)))
+    const _float3 vColor = m_pHitFlashColor ? *m_pHitFlashColor : _float3(1.f, 1.f, 1.f);
+    if (FAILED(pShader->Bind_RawValue("g_vHitFlashColor", &vColor, sizeof(vColor))))
         return E_FAIL;
 
     return S_OK;

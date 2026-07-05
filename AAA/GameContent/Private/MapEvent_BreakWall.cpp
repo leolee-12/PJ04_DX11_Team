@@ -1,4 +1,4 @@
-#include "MapBreakSection.h"
+#include "MapEvent_BreakWall.h"
 #include "GameContrnt_Events.h"
 #include "MeshLayer_Binder.h"
 
@@ -45,37 +45,29 @@ namespace
 
 NS_BEGIN(Client)
 
-CMapBreakSection::CMapBreakSection(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CMapEvent_BreakWall::CMapEvent_BreakWall(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMapObject{ pDevice, pContext }
 {
 }
 
-CMapBreakSection::CMapBreakSection(const CMapBreakSection& Prototype)
+CMapEvent_BreakWall::CMapEvent_BreakWall(const CMapEvent_BreakWall& Prototype)
 	: CMapObject(Prototype)
-	, m_tBreakDesc(Prototype.m_tBreakDesc)
 {
 }
 
-HRESULT CMapBreakSection::Initialize_Prototype()
+HRESULT CMapEvent_BreakWall::Initialize_Prototype()
 {
 	return __super::Initialize_Prototype();
 }
 
-HRESULT CMapBreakSection::Initialize(void* pArg)
+HRESULT CMapEvent_BreakWall::Initialize(void* pArg)
 {
 	if (nullptr == pArg)
 		return E_FAIL;
 
-	const MAP_BREAK_SECTION_DESC* pDesc = static_cast<const MAP_BREAK_SECTION_DESC*>(pArg);
-	m_tBreakDesc = *pDesc;
-
-	m_strSectionName = pDesc->strSectionName;
-	m_strModelProtoTag = pDesc->wstrModelProtoTag;
+	const MAP_EVENT_BREAK_WALL_DESC* pDesc = static_cast<const MAP_EVENT_BREAK_WALL_DESC*>(pArg);
 	m_iModelProtoLevel = pDesc->iModelProtoLevel;
 	m_bRenderable = pDesc->bRenderable;
-
-	if (m_strModelProtoTag.empty())
-		return E_FAIL;
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -86,12 +78,51 @@ HRESULT CMapBreakSection::Initialize(void* pArg)
 	if (FAILED(Ready_BoostTrigger()))
 		return E_FAIL;
 
+	if (FAILED(Validate_Initialized()))
+		return E_FAIL;
+
 	return S_OK;
 }
 
-void CMapBreakSection::Late_Update(_float fTimeDelta)
+HRESULT CMapEvent_BreakWall::Validate_Initialized()
 {
-	if (nullptr != m_pBoostTrigger && MAP_BREAK_STATE::INTACT == m_eBreakState)
+	if (FAILED(__super::Validate_Initialized()))
+		return E_FAIL;
+
+	if (nullptr == m_pBoostTrigger)
+		return E_FAIL;
+	if (BREAK_STATE::INTACT != m_eBreakState)
+		return E_FAIL;
+	if (m_Fragments.empty())
+		return E_FAIL;
+
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+	if (m_MeshFragmentIndices.size() != iNumMeshes)
+		return E_FAIL;
+
+	const _uint iNumFragments = static_cast<_uint>(m_Fragments.size());
+	for (const _uint iFragment : m_MeshFragmentIndices)
+	{
+		if (INVALID_FRAGMENT_INDEX == iFragment)
+			continue;
+		if (iFragment >= iNumFragments)
+			return E_FAIL;
+	}
+
+	for (const BREAK_FRAGMENT& Fragment : m_Fragments)
+	{
+		if (Fragment.strFragmentName.empty())
+			return E_FAIL;
+		if (Fragment.MeshIndices.empty())
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+void CMapEvent_BreakWall::Late_Update(_float fTimeDelta)
+{
+	if (BREAK_STATE::INTACT == m_eBreakState)
 	{
 		m_pBoostTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
@@ -103,19 +134,19 @@ void CMapBreakSection::Late_Update(_float fTimeDelta)
 	if (!m_bRenderable)
 		return;
 
-	if (MAP_BREAK_STATE::INTACT == m_eBreakState)
+	if (BREAK_STATE::INTACT == m_eBreakState)
 	{
 		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 		return;
 	}
 
-	if (MAP_BREAK_STATE::BREAKING != m_eBreakState)
+	if (BREAK_STATE::BREAKING != m_eBreakState)
 		return;
 
 	constexpr _float fGravity = -15.f;
 	_bool bAnyActive = false;
 
-	for (MAP_BREAK_FRAGMENT& Fragment : m_Fragments)
+	for (BREAK_FRAGMENT& Fragment : m_Fragments)
 	{
 		if (!Fragment.bActive)
 			continue;
@@ -157,17 +188,17 @@ void CMapBreakSection::Late_Update(_float fTimeDelta)
 
 	if (!bAnyActive)
 	{
-		m_eBreakState = MAP_BREAK_STATE::BROKEN;
+		m_eBreakState = BREAK_STATE::BROKEN;
 		return;
 	}
 
 	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 
-HRESULT CMapBreakSection::Render()
+HRESULT CMapEvent_BreakWall::Render()
 {
-	if (MAP_BREAK_STATE::INTACT != m_eBreakState
-		&& MAP_BREAK_STATE::BREAKING != m_eBreakState)
+	if (BREAK_STATE::INTACT != m_eBreakState
+		&& BREAK_STATE::BREAKING != m_eBreakState)
 	{
 		return S_OK;
 	}
@@ -180,14 +211,14 @@ HRESULT CMapBreakSection::Render()
 		return E_FAIL;
 
 	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
-	const _matrix BreakSectionWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+	const _matrix BreakWallWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		const MAP_BREAK_FRAGMENT* pFragment = Find_Fragment(i);
+		const BREAK_FRAGMENT* pFragment = Find_Fragment(i);
 		if (nullptr == pFragment)
 			continue;
-		if (MAP_BREAK_STATE::BREAKING == m_eBreakState && !pFragment->bActive)
+		if (BREAK_STATE::BREAKING == m_eBreakState && !pFragment->bActive)
 			continue;
 
 		const _float3 vEnginePivot = { pFragment->vPivot.x, pFragment->vPivot.y, -pFragment->vPivot.z };
@@ -199,7 +230,7 @@ HRESULT CMapBreakSection::Render()
 			vEnginePivot.z + pFragment->vOffset.z);
 
 		_float4x4 WorldMatrix{};
-		XMStoreFloat4x4(&WorldMatrix, Rotation * Translation * BreakSectionWorld);
+		XMStoreFloat4x4(&WorldMatrix, Rotation * Translation * BreakWallWorld);
 
 		if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &WorldMatrix)))
 			return E_FAIL;
@@ -235,7 +266,7 @@ HRESULT CMapBreakSection::Render()
 	return S_OK;
 }
 
-void CMapBreakSection::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
+void CMapEvent_BreakWall::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 {
 	if (nullptr == pOutData)
 		return;
@@ -243,34 +274,20 @@ void CMapBreakSection::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
 }
 
-const _tchar* CMapBreakSection::Get_ModelProtoTag() const
+const _tchar* CMapEvent_BreakWall::Get_ModelProtoTag() const
 {
-	return m_strModelProtoTag.c_str();
+	return STAGE12_MODEL_PROTO_TAG;
 }
 
-_uint CMapBreakSection::Get_ModelProtoLevel() const
+_uint CMapEvent_BreakWall::Get_ModelProtoLevel() const
 {
 	return m_iModelProtoLevel;
 }
 
-_bool CMapBreakSection::Should_RenderMesh(_uint iMesh) const
-{
-	if (MAP_BREAK_STATE::INTACT == m_eBreakState)
-		return true;
-
-	if (MAP_BREAK_STATE::BREAKING == m_eBreakState)
-		return Is_FragmentMesh(iMesh);
-
-	return false;
-}
-
-HRESULT CMapBreakSection::Ready_Fragments()
+HRESULT CMapEvent_BreakWall::Ready_Fragments()
 {
 	m_Fragments.clear();
 	m_MeshFragmentIndices.clear();
-
-	if (L"GsDefault_4" != m_strSectionName)
-		return S_OK;
 
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
@@ -281,7 +298,7 @@ HRESULT CMapBreakSection::Ready_Fragments()
 
 	for (const BREAK_FRAGMENT_BIND& Bind : g_GsDefault4BreakBinds)
 	{
-		MAP_BREAK_FRAGMENT Fragment{};
+		BREAK_FRAGMENT Fragment{};
 		Fragment.strFragmentName = Bind.pFragmentName;
 		Fragment.vPivot = Bind.vPivot;
 		m_Fragments.push_back(Fragment);
@@ -291,7 +308,7 @@ HRESULT CMapBreakSection::Ready_Fragments()
 	{
 		const string strFragmentName = Get_FragmentNameFromMeshName(m_pModelCom->Get_MeshName(i));
 		auto iter = find_if(m_Fragments.begin(), m_Fragments.end(),
-			[&](const MAP_BREAK_FRAGMENT& Fragment)->_bool
+			[&](const BREAK_FRAGMENT& Fragment)->_bool
 			{
 				return Fragment.strFragmentName == strFragmentName;
 			});
@@ -304,13 +321,13 @@ HRESULT CMapBreakSection::Ready_Fragments()
 		m_MeshFragmentIndices[i] = iFragment;
 	}
 
-	for (const MAP_BREAK_FRAGMENT& Fragment : m_Fragments)
+	for (const BREAK_FRAGMENT& Fragment : m_Fragments)
 	{
 		if (!Fragment.MeshIndices.empty())
 			continue;
 
 #ifdef _DEBUG
-		OutputDebugStringA(("[MapBreakSection] Missing fragment mesh group: " + Fragment.strFragmentName + "\n").c_str());
+		OutputDebugStringA(("[MapEvent_BreakWall] Missing fragment mesh group: " + Fragment.strFragmentName + "\n").c_str());
 #endif
 		return E_FAIL;
 	}
@@ -318,27 +335,19 @@ HRESULT CMapBreakSection::Ready_Fragments()
 	return S_OK;
 }
 
-const CMapBreakSection::MAP_BREAK_FRAGMENT* CMapBreakSection::Find_Fragment(_uint iMesh) const
+const CMapEvent_BreakWall::BREAK_FRAGMENT* CMapEvent_BreakWall::Find_Fragment(_uint iMesh) const
 {
-	if (iMesh >= static_cast<_uint>(m_MeshFragmentIndices.size()))
-		return nullptr;
-
 	const _uint iFragment = m_MeshFragmentIndices[iMesh];
-	if (INVALID_FRAGMENT_INDEX == iFragment || iFragment >= static_cast<_uint>(m_Fragments.size()))
+	if (INVALID_FRAGMENT_INDEX == iFragment)
 		return nullptr;
 
 	return &m_Fragments[iFragment];
 }
 
-_bool CMapBreakSection::Is_FragmentMesh(_uint iMesh) const
-{
-	return nullptr != Find_Fragment(iMesh);
-}
-
-HRESULT CMapBreakSection::Ready_BoostTrigger()
+HRESULT CMapEvent_BreakWall::Ready_BoostTrigger()
 {
 	if (m_Fragments.empty())
-		return S_OK;
+		return E_FAIL;
 
 	const _float3 vFirstPivot = {
 			m_Fragments.front().vPivot.x,
@@ -349,7 +358,7 @@ HRESULT CMapBreakSection::Ready_BoostTrigger()
 	_float3 vMin = vFirstPivot;
 	_float3 vMax = vFirstPivot;
 
-	for (const MAP_BREAK_FRAGMENT& Fragment : m_Fragments)
+	for (const BREAK_FRAGMENT& Fragment : m_Fragments)
 	{
 		const _float3 vPivot = {
 				Fragment.vPivot.x,
@@ -381,9 +390,7 @@ HRESULT CMapBreakSection::Ready_BoostTrigger()
 			(vMax.z - vMin.z) + fPadding * 2.f
 	};
 
-	m_pBoostTrigger = Add_Component<CCollider>(
-		L"Com_BoostTrigger",
-		CCollider::Create(m_pDevice, m_pContext, COLLIDER::AABB));
+	m_pBoostTrigger = Add_Component<CCollider>(L"Com_BoostTrigger", CCollider::Create(m_pDevice, m_pContext, COLLIDER::AABB));
 
 	if (nullptr == m_pBoostTrigger)
 		return E_FAIL;
@@ -391,20 +398,14 @@ HRESULT CMapBreakSection::Ready_BoostTrigger()
 	if (FAILED(m_pBoostTrigger->Initialize(&ColliderDesc)))
 		return E_FAIL;
 
-	m_pBoostTrigger->Set_OnEnter(
-		[this](CCollider* pOther)
-		{
-			On_BoostTriggerEnter(pOther);
-		});
+	m_pBoostTrigger->Set_OnEnter([this](CCollider* pOther) { On_BoostTriggerEnter(pOther); });
 
-	m_pGameInstance_Proxy->Register_Collider(
-		m_pBoostTrigger,
-		ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+	m_pGameInstance_Proxy->Register_Collider(m_pBoostTrigger, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
 
 	return S_OK;
 }
 
-void CMapBreakSection::On_BoostTriggerEnter(CCollider* pOther)
+void CMapEvent_BreakWall::On_BoostTriggerEnter(CCollider* pOther)
 {
 	if (nullptr == pOther)
 		return;
@@ -415,16 +416,15 @@ void CMapBreakSection::On_BoostTriggerEnter(CCollider* pOther)
 	Start_Break();
 }
 
-void CMapBreakSection::Start_Break()
+void CMapEvent_BreakWall::Start_Break()
 {
-	if (MAP_BREAK_STATE::INTACT != m_eBreakState)
+	if (BREAK_STATE::INTACT != m_eBreakState)
 		return;
 
-	m_eBreakState = MAP_BREAK_STATE::BREAKING;
+	m_eBreakState = BREAK_STATE::BREAKING;
 	m_bRenderable = true;
 
-	if (nullptr != m_pBoostTrigger)
-		m_pBoostTrigger->Set_Enabled(false);
+	m_pBoostTrigger->Set_Enabled(false);
 
 	m_pGameInstance_Proxy->Publish(EventTag::Stage12_CarBreakWall, nullptr);
 
@@ -433,7 +433,7 @@ void CMapBreakSection::Start_Break()
 
 	for (_uint i = 0; i < static_cast<_uint>(m_Fragments.size()); ++i)
 	{
-		MAP_BREAK_FRAGMENT& Fragment = m_Fragments[i];
+		BREAK_FRAGMENT& Fragment = m_Fragments[i];
 
 		const _float fAngle = static_cast<_float>(i) * 0.73f;
 		const _float fSpeed = 8.f + static_cast<_float>(i % 5) * 2.4f;
@@ -450,37 +450,37 @@ void CMapBreakSection::Start_Break()
 
 
 #ifdef _DEBUG
-	OutputDebugStringA("[MapBreakSection] Break started.\n");
+	OutputDebugStringA("[MapEvent_BreakWall] Break started.\n");
 #endif
 }
 
-CMapBreakSection* CMapBreakSection::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CMapEvent_BreakWall* CMapEvent_BreakWall::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CMapBreakSection* pInstance = new CMapBreakSection(pDevice, pContext);
+	CMapEvent_BreakWall* pInstance = new CMapEvent_BreakWall(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created : CMapBreakSection");
+		MSG_BOX("Failed to Created : CMapEvent_BreakWall");
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject* CMapBreakSection::Clone(void* pArg)
+CGameObject* CMapEvent_BreakWall::Clone(void* pArg)
 {
-	CMapBreakSection* pInstance = new CMapBreakSection(*this);
+	CMapEvent_BreakWall* pInstance = new CMapEvent_BreakWall(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX("Failed to Cloned : CMapBreakSection");
+		MSG_BOX("Failed to Cloned : CMapEvent_BreakWall");
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CMapBreakSection::Free()
+void CMapEvent_BreakWall::Free()
 {
 	__super::Free();
 }

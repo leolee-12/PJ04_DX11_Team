@@ -2,10 +2,6 @@
 
 #include "GameInstance.h"
 
-#include "GameContent_const.h"
-
-#include "Animator.h"
-
 CKirby_SwordHat::CKirby_SwordHat(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CKirby_OnOffPart(pDevice, pContext)
 {
@@ -45,7 +41,7 @@ HRESULT CKirby_SwordHat::Render()
 
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
-        _uint iPassIdx = 1;
+        _uint iPassIndex = ETOUI(KIRBY_SHADER_PASS::ANIM_TEXTURED_PBR);
 
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
             return E_FAIL;
@@ -59,7 +55,7 @@ HRESULT CKirby_SwordHat::Render()
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Begin(iPassIdx)))
+        if (FAILED(m_pShaderCom->Begin(iPassIndex)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render(i)))
@@ -71,11 +67,15 @@ HRESULT CKirby_SwordHat::Render()
 
 HRESULT CKirby_SwordHat::Ready_Components()
 {
-    PART_SETUP t{};
-    t.tShader = Shader_Kirby;
-    t.szModelProtoTag = TEXT("Prototype_Component_Model_SwordHat");
-    t.bAnimated = true;
-    return Ready_MeshPart(t);
+    KIRBY_PART_COMPONENT_DESC°¡ tDesc{};
+    tDesc.tShaderDesc = Shader_Kirby;
+    tDesc.szModelProtoTag = TEXT("Prototype_Component_Model_SwordHat");
+    tDesc.bCreateAnimator = true;
+
+    if (FAILED(Ready_PartComponents(tDesc)))
+        return E_FAIL;
+
+    return S_OK;
 }
 
 CKirby_SwordHat* CKirby_SwordHat::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
