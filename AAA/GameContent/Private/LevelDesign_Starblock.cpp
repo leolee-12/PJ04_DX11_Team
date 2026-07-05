@@ -107,6 +107,8 @@ HRESULT CLevelDesign_Starblock::Initialize(void* pArg)
 	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
 
+	Compute_SpatPivot();
+
 	return S_OK;
 }
 
@@ -334,6 +336,17 @@ const _tchar* CLevelDesign_Starblock::Resolve_ModelProtoTag() const
 		return nullptr;
 
 	return m_tBreakableDesc.wstrModelProtoTag.c_str();
+}
+
+void CLevelDesign_Starblock::Compute_SpatPivot()
+{
+	_float3 vMin, vMax;
+	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
+
+	m_vSpatPivot = _float3(
+		(vMin.x + vMax.x) * 0.5f,
+		(vMin.y + vMax.y) * 0.5f,
+		(vMin.z + vMax.z) * 0.5f);
 }
 
 void CLevelDesign_Starblock::SetUp_Collider_CallBack()

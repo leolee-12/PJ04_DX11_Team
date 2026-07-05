@@ -70,16 +70,15 @@ public:
 public: // Inhalable
 	virtual _bool				Can_BeInhaled(const INHALE_QUERY& q) const override;
 	virtual void				Be_Captured(CGameObject* pInhaler) override;
-	virtual void				Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed) override;
 	virtual COPY_ABILITY_TYPE	Get_CopyAbility() const override { return m_eCopyAbility; }
 	virtual CGameObject*		Get_GameObject() override final { return this; }
+	virtual _float3				Get_SpatPivotOffset() const override { return m_vSpatPivot; }
 
 	virtual void				On_Swallowed();
+	virtual void				On_SpatBegin() override;
+	virtual void				On_SpatEnd() override;
 	virtual void				On_Exit(MONSTER_STATE_TYPE eNextState) {}
-	const _float3&				Get_SpatVelocity() const { return m_vSpatVelocity; }
-	void						Enable_ProjectileBox(_bool bEnable);
 	CGameObject*				Get_Captor() const { return m_pCaptor; }
-	void						Despawn_Spat();                                
 	void						Despawn();
 
 public:
@@ -127,8 +126,6 @@ protected:
 
 	CCollider*					m_pInteractCollider = { nullptr };
 	CCollider*					m_pHurtBox = { nullptr };
-	CCollider*					m_pProjectileBox = { nullptr };
-	_float3						m_vSpatVelocity = {};
 	
 	CSound_Handle				m_ActionLoopSnd;
 
@@ -139,9 +136,6 @@ protected:
 	COPY_ABILITY_TYPE			m_eCopyAbility = { COPY_ABILITY_TYPE::NONE };
 	CGameObject*			    m_pCaptor = { nullptr };
 
-	static constexpr _float		s_fSpatDamage = 100.f;
-	static constexpr _float		s_fSpatKnockback = 12.f;
-
 	HIT_REACTION				m_LastHit{};		// 상태에 던질 값들 
 
 	_float3						m_vBasePos = {};
@@ -151,6 +145,8 @@ protected:
 
 	_int						m_iAIType = { 0 };
 	_bool						m_bSFX2D = { false };
+
+	_float3						m_vSpatPivot = { 0.f, 0.f, 0.f };
 
 protected:
 	// 부모가 관리할 공통 파이프라인
@@ -180,6 +176,7 @@ protected:
 
 	_bool						Handle_SharedAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
 	void						Play_DeathFX();
+	void						Compute_SpatPivot();
 
 protected:
 	template<class TPart>

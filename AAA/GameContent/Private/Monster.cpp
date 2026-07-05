@@ -64,6 +64,8 @@ HRESULT CMonster::Initialize(void* pArg)
 	if (FAILED(Ready_AnimEvents()))         
 		return E_FAIL;
 
+	Compute_SpatPivot();
+
 	return S_OK;
 }
 
@@ -103,15 +105,6 @@ void CMonster::Late_Update(_float fTimeDelta)
 			m_pGameInstance_Proxy->Add_DebugComponent(m_pHurtBox);
 #endif
 		}
-	}
-
-	if (m_pProjectileBox && m_pProjectileBox->Is_Enabled())
-	{
-		m_pProjectileBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
-#ifdef _DEBUG
-		if (m_pProjectileBox->Is_Enabled())
-			m_pGameInstance_Proxy->Add_DebugComponent(m_pProjectileBox);
-#endif
 	}
 }
 
@@ -241,21 +234,6 @@ HRESULT CMonster::Ready_Collider()
 			return E_FAIL;
 
 		m_pGameInstance_Proxy->Register_Collider(m_pHurtBox, ETOUI(COLLISION_LAYER::MONSTER_HURT));
-
-		CCollider::COLLIDER_DESC ProjDesc{};
-		ProjDesc.pOwner = this;
-		ProjDesc.vCenter = Desc.vCenter;
-		ProjDesc.fRadius = Desc.fRadius;
-		ProjDesc.fHeight = Desc.fHeight;
-		ProjDesc.vRadians = Desc.vRadians;
-
-		m_pProjectileBox = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag,
-			TEXT("MonProjBox_Com"), &ProjDesc);
-		if (m_pProjectileBox == nullptr)
-			return E_FAIL;
-
-		m_pProjectileBox->Set_Enabled(false);
-		m_pGameInstance_Proxy->Register_Collider(m_pProjectileBox, ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE));
 	}
 
 	return S_OK;
@@ -305,29 +283,6 @@ void CMonster::SetUp_Collider_CallBack()
 #endif
 			}
 		});
-	}
-
-	if (m_pProjectileBox)
-	{
-		m_pProjectileBox->Set_OnEnter([this](CCollider* pOther) {
-			if (ETOUI(COLLISION_LAYER::MONSTER_HURT) != pOther->Get_RegisteredGroup())
-				return;
-			if (pOther->Get_Owner() == this)
-				return;
-
-			IDamageable* pVictim = dynamic_cast<IDamageable*>(pOther->Get_Owner());
-			if (nullptr == pVictim)
-				return;
-
-			ATTACK_INFO atk{};
-			atk.fDamage = s_fSpatDamage;
-			atk.fKnockback = s_fSpatKnockback;
-			XMStoreFloat3(&atk.vAttackerPos, m_pTransformCom->Get_State(STATE::POSITION));
-			atk.pAttacker = this;
-			pVictim->Damaged(atk);
-
-			Despawn_Spat();   // 첫 명중 시 소멸(원작식)
-			});
 	}
 
 	return;
@@ -590,6 +545,29 @@ void CMonster::Play_DeathFX()
 		vPos, vFaceCam, _float3(0.f, 0.f, 0.f), nullptr);
 }
 
+void CMonster::Compute_SpatPivot()
+{
+	auto it = m_PartObjects.find(L"Body");
+	if (it == m_PartObjects.end())
+		return;
+
+	CMonsterPart* pBody = dynamic_cast<CMonsterPart*>(it->second);
+	if (nullptr == pBody)
+		return;
+
+	CModel* pModel = pBody->Get_Model();
+	if (nullptr == pModel)
+		return;
+
+	_float3 vMin, vMax;
+	pModel->Get_ModelAABB(&vMin, &vMax);
+
+	m_vSpatPivot = _float3(
+		(vMin.x + vMax.x) * 0.5f,
+		(vMin.y + vMax.y) * 0.5f,
+		(vMin.z + vMax.z) * 0.5f);
+}
+
 void CMonster::Play_ActionLoopSFX(const _tchar* pKey)
 {
 	m_ActionLoopSnd.Stop();
@@ -630,28 +608,19 @@ void CMonster::On_Swallowed()
 	Set_Active(false);
 }
 
-void CMonster::Be_Spat(_fvector vPos, _fvector vDir, _float fSpeed)
+void CMonster::On_SpatBegin()
 {
 	m_pCaptor = nullptr;
-	Set_Active(true);                         
-
-	CTransform* pT = m_pTransformCom;
-	pT->Set_State(STATE::POSITION, vPos);
-	pT->LookAt(XMVectorAdd(vPos, vDir));
-
-	XMStoreFloat3(&m_vSpatVelocity, XMVector3Normalize(vDir) * fSpeed);
-
+	Set_Active(true);
+	
+	Enable_Controller(false);
+	Enable_Colliders(false);
 	Change_State(MONSTER_STATE_TYPE::SPAT);
 }
 
-void CMonster::Despawn_Spat()
+void CMonster::On_SpatEnd()
 {
-	// TODO: 사운드, 이펙트 
-	Play_DeathFX();
-
-	Enable_ProjectileBox(false);
-	m_vSpatVelocity = {};
-	Set_Active(false);
+	Despawn();
 }
 
 void CMonster::Despawn()
@@ -661,11 +630,6 @@ void CMonster::Despawn()
 	Enable_Colliders(false);
 	Enable_Controller(false);
 	Set_Active(false);
-}
-
-void CMonster::Enable_ProjectileBox(_bool bEnable)
-{
-	if (m_pProjectileBox) m_pProjectileBox->Set_Enabled(bEnable);
 }
 
 void CMonster::Update_AI(_float fTimeDelta)

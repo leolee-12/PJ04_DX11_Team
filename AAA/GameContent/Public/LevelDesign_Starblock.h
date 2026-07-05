@@ -48,6 +48,7 @@ public:
 
 	// Inhalable
 	virtual void Be_Captured(CGameObject* pInhaler) override;
+	virtual _float3 Get_SpatPivotOffset() const override { return m_vSpatPivot; }
 
 public:
 	const LD_BREAKABLE_DESC& Get_BreakableDesc() const { return m_tBreakableDesc; }
@@ -59,12 +60,15 @@ private:
 
 	LD_BREAKABLE_DESC m_tBreakableDesc = {};
 
+	_float3 m_vSpatPivot{};
+
 private:
 	HRESULT			Ready_Components();
 	HRESULT			Ready_PhysicsActor();
 	void			Release_PhysicsActor();
 	HRESULT			Bind_ShaderResources();
 	const _tchar*	Resolve_ModelProtoTag() const;
+	void			Compute_SpatPivot();
 
 	virtual void    SetUp_Collider_CallBack() override;
 

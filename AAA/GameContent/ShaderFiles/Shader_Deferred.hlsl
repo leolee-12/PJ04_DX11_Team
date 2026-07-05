@@ -15,6 +15,8 @@ Texture2D g_MRATexture; // r=metallic, g=roughness, b=ao
 Texture2D g_LightTexture; // HDR 광량 누적 (Combine 입력)
 Texture2D g_LightDepthTexture; // 그림자맵
 Texture2D g_EmissiveTexture; // 이미시브
+Texture2D<uint> g_MaterialIDTexture;
+Texture2D       g_ShadowRawTexture;
 
 vector g_vCamPosition;
 
@@ -244,8 +246,8 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
 
     float3 color = light + ambient; // 직사광(light)은 무틴트
     
+    uint recvMatID = g_MaterialIDTexture.Load(int3(In.vPosition.xy, 0));
 
-      /* 그림자 */
     float4 dd = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
     float3 wp = RecoverWorldPos(In.vTexcoord, dd.x, g_ProjMatrixInverse, g_ViewMatrixInverse);
     float4 lc = mul(float4(wp, 1.f), g_ShadowLightViewMatrix);
@@ -262,6 +264,10 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
         float2 e = abs(suv - 0.5f) * 2.f;
         float edge = saturate((max(e.x, e.y) - 0.85f) / 0.15f);
         shadow = lerp(shadow, 1.f, edge);
+
+        float casterClass = g_ShadowRawTexture.Sample(ClampSampler, suv).g;
+        if (recvMatID == 0 && casterClass > 0.5f)
+            shadow = 1.f;
 
         color *= lerp(0.25f, 1.f, shadow);
     }
