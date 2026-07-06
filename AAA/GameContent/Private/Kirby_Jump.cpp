@@ -167,15 +167,27 @@ _bool CKirby_Jump::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
     {
         // Move Press
         case KIRBY_COMMAND_TYPE::MOVE_TOP:
+        {
+            if (!pCommand->IsPress())
+                return false;
+
+            if (Try_Transition_Ladder_CommandUp(pKirby))
+                return true;
+
+            Handle_MoveCommand(pKirby, pCommand);
+            return true;
+        }
         case KIRBY_COMMAND_TYPE::MOVE_DOWN:
         {
-            if (pKirby->IsLadder() && pCommand->IsPress())
-            {
-                pKirby->Change_State(KIRBY_STATE_TYPE::LADDER);
-                return true;
-            }
-        }
+            if (!pCommand->IsPress())
+                return false;
 
+            if (Try_Transition_Ladder_CommandDown(pKirby))
+                return true;
+
+            Handle_MoveCommand(pKirby, pCommand);
+            return true;
+        }
         case KIRBY_COMMAND_TYPE::MOVE_LEFT:
         case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
         {

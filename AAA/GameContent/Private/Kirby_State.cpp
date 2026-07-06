@@ -8,6 +8,8 @@
 
 #include "Movement_Child.h"
 
+#include "LevelDesign_Ladder.h"
+
 CKirby_State::CKirby_State()
 {
 }
@@ -97,6 +99,42 @@ _bool CKirby_State::Transition_Fall_OR_Wait_OR_Run(CKirby* pKirby)
         return true;
 
     return Transition_Wait_OR_Run(pKirby);
+}
+
+_bool CKirby_State::Try_Transition_Ladder_CommandUp(CKirby* pKirby)
+{
+    // 있으면 충돌
+    CLevelDesign_Ladder* pLadder = pKirby->Get_Ladder();
+    if (pLadder == nullptr)
+        return false;
+
+    CTransform* pTransform = pKirby->Get_Transform();
+    _vector vPos = pTransform->Get_State(STATE::POSITION);
+
+    _int iCellIndex = pLadder->Get_NearestCellIndex(vPos);
+    if (pLadder->Is_TopCell(iCellIndex))
+        return false;
+
+    pKirby->Change_State(KIRBY_STATE_TYPE::LADDER);
+    return true;
+}
+
+_bool CKirby_State::Try_Transition_Ladder_CommandDown(CKirby* pKirby)
+{
+    // 있으면 충돌
+    CLevelDesign_Ladder* pLadder = pKirby->Get_Ladder();
+    if (pLadder == nullptr)
+        return false;
+
+    CTransform* pTransform = pKirby->Get_Transform();
+    _vector vPos = pTransform->Get_State(STATE::POSITION);
+
+    _int iCellIndex = pLadder->Get_NearestCellIndex(vPos);
+    if (pLadder->Is_BottomCell(iCellIndex))
+        return false;
+
+    pKirby->Change_State(KIRBY_STATE_TYPE::LADDER);
+    return true;
 }
 
 _bool CKirby_State::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)

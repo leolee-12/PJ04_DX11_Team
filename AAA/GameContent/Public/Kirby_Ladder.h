@@ -35,7 +35,8 @@ public:
 private:
 	LADDER_STATE m_eLadderState{};
 
-	_float m_fClimbUpDown{};
+	_int m_iCurLadderIndex{};
+	_int m_iNextLadderIndex{};
 
 private:
 	void Change_LadderState(CKirby* pKirby, LADDER_STATE eNext);
