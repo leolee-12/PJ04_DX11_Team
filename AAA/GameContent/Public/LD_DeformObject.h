@@ -35,10 +35,10 @@ public:
 	static CGameObject* Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
 public:
-	DEFORM_TYPE	Get_DeformType() const { return m_tDeformObjectDesc.eDeformType; }	// 머금기 타입 받아오기
-	_bool		Is_Available() const { return m_bAvailable; }						// 활성화 여부 (먹혔을 때 OFF / 뱉었을 떄 ON)
-	HRESULT		On_DeformAcquired();												// 먹힐 때 발동
-	HRESULT		On_DeformReleased(const _float3& vWorldPosition);					// 뱉을 때 발동
+	DEFORM_TYPE	Get_DeformType() const { return m_tDeformObjectDesc.eDeformType; }	// 머금기 타입 확인
+	_bool		Is_Available() const { return m_bAvailable; }						// 흡입 가능한 상태인지?
+	HRESULT		On_DeformAcquired();												// 먹힐 때 발동 (객체 비활성)
+	HRESULT		On_DeformReleased(const _float3& vWorldPosition);					// 뱉을 때 발동 (객체 활성)
 
 private:
 	LD_DEFORMOBJECT_DESC m_tDeformObjectDesc = {};

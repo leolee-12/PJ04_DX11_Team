@@ -883,9 +883,6 @@
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Spat">
       <UniqueIdentifier>{dcb1512b-4270-4d45-88e6-fa87ac86dc6e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Visible\Inhalable\00. CopyBubble">
-      <UniqueIdentifier>{deec2911-da93-47a7-9cc7-c861c4ab2bb7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\Visible\03. EventObject\ForStage1-2">
       <UniqueIdentifier>{1accfe0f-f5c1-4443-96d0-fc2ebc97200d}</UniqueIdentifier>
     </Filter>
@@ -894,6 +891,9 @@
     </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\Visible\03. EventObject\DeformObject">
       <UniqueIdentifier>{db4dd2aa-6b1a-46ff-9ea0-6febeafe9851}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\01. PopFlower">
+      <UniqueIdentifier>{8c057022-a123-4cb3-b8da-192c9d35aeda}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1770,9 +1770,6 @@
     <ClInclude Include="..\Public\LD_DeformObject.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\DeformObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\LD_CopyBubble.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable\00. CopyBubble</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\LD_DeformCarBreakWall.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\ForStage1-2</Filter>
     </ClInclude>
@@ -1784,6 +1781,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\LD_Stage1BossDemo.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\ForBossMap1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_PopFlower.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\01. PopFlower</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2585,9 +2585,6 @@
     <ClCompile Include="..\Private\LD_DeformObject.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\DeformObject</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\LD_CopyBubble.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable\00. CopyBubble</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\LD_DeformCarBreakWall.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\ForStage1-2</Filter>
     </ClCompile>
@@ -2599,6 +2596,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\ForBossMap1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_PopFlower.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\01. PopFlower</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

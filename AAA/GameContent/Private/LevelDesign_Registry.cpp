@@ -7,6 +7,7 @@
 #include "LevelDesign_Food.h"
 #include "LevelDesign_Point.h"
 #include "LevelDesign_Bush.h"
+#include "LD_PopFlower.h"
 #include "LevelDesign_Boundary.h"
 #include "LevelDesign_FallBorder.h"
 #include "LD_DeformObject.h"
@@ -240,8 +241,7 @@ void CLevelDesign_Registry::Register_ItemsAndBreakables()
 	CLevelDesign_Food::Register_LevelDesignSpecs();
 	CLevelDesign_Point::Register_LevelDesignSpecs();
 	CLevelDesign_Bush::Register_LevelDesignSpecs();
-
-	Register_Unsupported(L"PopFlower", LD_CATEGORY::FOLIAGE, L"Layer_LevelDesign_Gimmick");
+	CLD_PopFlower::Register_LevelDesignSpecs();
 }
 
 void CLevelDesign_Registry::Register_EnemiesAndGimmicks()
