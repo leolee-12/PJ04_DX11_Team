@@ -16,6 +16,7 @@ CCharacter::CCharacter(const CCharacter& Prototype)
 
 HRESULT CCharacter::Initialize_Prototype()
 {
+    m_eProjType = PROJ_TYPE::PERSPEC;
     return S_OK;
 }
 

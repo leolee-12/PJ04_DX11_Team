@@ -42,6 +42,10 @@ void CKirby_GetAbility::Enter(CKirby* pKirby)
     tDesc.bBegin = true;
     m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &tDesc);
     m_pGameInstance_Proxy->Set_TimeScale(0.f);
+
+    KIRBY_NAME_UPDATED tNameDesc{};
+    tNameDesc.strAtkModeName = pKirby->Get_ActiveAttackMode()->Get_AttackModeName();
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_Name_Updated, &tNameDesc);
 }
 
 void CKirby_GetAbility::Update(CKirby* pKirby, const _float fTimeDelta)

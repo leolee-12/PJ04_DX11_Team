@@ -6,6 +6,7 @@ NS_BEGIN(Client)
 class CBoss_Gorilla_Body;
 class CBoss_Gorilla_RockHole;
 class CProjectile;
+class CBoss_Cage;
 
 class CBoss_Gorilla final : public CBoss
 {
@@ -34,11 +35,13 @@ public:
     virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void* pArg) override;
     virtual void    Update(_float fTimeDelta) override;
+    virtual void    Late_Update(_float fTimeDelta) override;
     virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* p) override { p->strPrototypeTag = PROTOTYPE_TAG; }
 
 public:
     virtual CAnimator* Get_BodyAnimator() const override;
     virtual CMultiHitBoxPart* Get_HitBoxPart() const override;
+    virtual void              Set_Active(_bool b) override;
 
 public:
     void                   Reset_CatchHit() { m_bCatchHit = false; }
@@ -77,6 +80,7 @@ protected:
 private:
     CBoss_Gorilla_Body* m_pBody = { nullptr };
     CBoss_Gorilla_RockHole* m_pRockHole = { nullptr };
+    CBoss_Cage* m_pCage = { nullptr };
     CProjectile* m_pHeldRock = { nullptr };
     static const vector<_float> s_Thresholds;
 
