@@ -40,6 +40,9 @@ public:
 	virtual void Deserialize_Internal(const json& j) override;
 
 public:
+	float Get_Fovy() const { return m_fFovy; }
+
+public:
 	void Recalculate_ProjMatrix();
 	SHADOW_LIGHT_DESC Make_CameraFit_Shadow(const _float4& vLightDir, _float fRange, _float fPadding, _uint iRes) const;
 

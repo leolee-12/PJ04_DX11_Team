@@ -48,6 +48,7 @@
     <ClInclude Include="..\public\Camera_Boss.h" />
     <ClInclude Include="..\public\Camera_Cutscene.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
+    <ClInclude Include="..\public\Camera_Shakeable.h" />
     <ClInclude Include="..\Public\Cappy.h" />
     <ClInclude Include="..\Public\Cappy_Body.h" />
     <ClInclude Include="..\Public\Cappy_Brain.h" />
@@ -346,6 +347,7 @@
     <ClCompile Include="..\private\Camera_Boss.cpp" />
     <ClCompile Include="..\private\Camera_Cutscene.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
+    <ClCompile Include="..\private\Camera_Shakeable.cpp" />
     <ClCompile Include="..\Private\Cappy.cpp" />
     <ClCompile Include="..\Private\Cappy_Body.cpp" />
     <ClCompile Include="..\Private\Cappy_Brain.cpp" />

@@ -28,6 +28,19 @@ void CBounding_OBB::Update(_fmatrix TransformMatrix)
     m_pOriginalDesc->Transform(*m_pDesc, TransformMatrix);
 }
 
+void CBounding_OBB::Reset_Desc(const CBounding::BOUNDING_DESC* pDesc)
+{
+    auto pOBBDesc = static_cast<const BOUNDING_OBB_DESC*>(pDesc);
+
+    _float4         vQuaternion = {};
+    XMStoreFloat4(&vQuaternion, XMQuaternionRotationRollPitchYaw(pOBBDesc->vRadians.x, pOBBDesc->vRadians.y, pOBBDesc->vRadians.z));
+
+    m_pOriginalDesc->Center = pOBBDesc->vCenter;
+    m_pOriginalDesc->Extents = _float3(pOBBDesc->vSize.x * 0.5f, pOBBDesc->vSize.y * 0.5f, pOBBDesc->vSize.z * 0.5f);
+    m_pOriginalDesc->Orientation = vQuaternion;
+    *m_pDesc = *m_pOriginalDesc;
+}
+
 _bool CBounding_OBB::Intersect(COLLIDER eTargetType, CBounding* pBounding)
 {
     m_isColl = false;

@@ -85,6 +85,26 @@ void CBounding_Capsule::Update(_fmatrix M)
     m_fWorldRadius = m_fRadius * max(sx, sz);     // 측면 스케일 반영
 }
 
+void CBounding_Capsule::Reset_Desc(const CBounding::BOUNDING_DESC* pDesc)
+{
+    auto pCapDesc = static_cast<const BOUNDING_CAPSULE_DESC*>(pDesc);
+
+    m_fRadius = pCapDesc->fRadius;
+    _float fCyl = pCapDesc->fHeight;
+
+    XMVECTOR q = XMQuaternionRotationRollPitchYaw(pCapDesc->vRadians.x, pCapDesc->vRadians.y, pCapDesc->vRadians.z);
+    XMVECTOR axis = XMVector3Rotate(XMVectorSet(0.f, 1.f, 0.f, 0.f), q);
+    XMVECTOR foot = XMLoadFloat3(&pCapDesc->vCenter);
+
+    XMVECTOR pBottom = foot + axis * m_fRadius;
+    XMVECTOR pTop = foot + axis * (m_fRadius + fCyl);
+
+    XMStoreFloat3(&m_vLocalP0, pTop);
+    XMStoreFloat3(&m_vLocalP1, pBottom);
+
+    m_vP0 = m_vLocalP0; m_vP1 = m_vLocalP1; m_fWorldRadius = m_fRadius;
+}
+
 _bool CBounding_Capsule::Intersects_Sphere(const BoundingSphere* pSphere) const
 {
     _float dSq = Sq_Dist_Point_Segment(XMLoadFloat3(&pSphere->Center),

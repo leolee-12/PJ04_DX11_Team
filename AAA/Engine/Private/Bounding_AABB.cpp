@@ -30,6 +30,15 @@ void CBounding_AABB::Update(_fmatrix TransformMatrix)
     m_pOriginalDesc->Transform(*m_pDesc, Matrix);
 }
 
+void CBounding_AABB::Reset_Desc(const CBounding::BOUNDING_DESC* pDesc)
+{
+    auto pAABBDesc = static_cast<const BOUNDING_AABB_DESC*>(pDesc);
+
+    m_pOriginalDesc->Center = pAABBDesc->vCenter;
+    m_pOriginalDesc->Extents = _float3(pAABBDesc->vSize.x * 0.5f, pAABBDesc->vSize.y * 0.5f, pAABBDesc->vSize.z * 0.5f);
+    *m_pDesc = *m_pOriginalDesc;
+}
+
 _bool CBounding_AABB::Intersect(COLLIDER eTargetType, CBounding* pBounding)
 {
     m_isColl = false;

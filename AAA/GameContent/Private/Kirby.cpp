@@ -76,6 +76,8 @@ HRESULT CKirby::Initialize(void* pArg)
     if (FAILED(Ready_AnimEvents()))
         return E_FAIL;  
 
+    m_fInvincibleDuration = 2.f;
+
     return S_OK;
 }
 
@@ -101,8 +103,6 @@ void CKirby::Update(_float fTimeDelta)
     }
 
     XMStoreFloat3(&m_vWishDir, XMVectorZero());
-
-    Update_Timer(fTimeDelta);
 
     m_pKirby_InputManager->Update_KirbyInput(fTimeDelta);
     m_pKirby_Controller->Update_KirbyController(fTimeDelta);
@@ -148,7 +148,7 @@ void CKirby::Late_Update(_float fTimeDelta)
 #endif
     }
 
-    Update_BlobShadow();
+    //Update_BlobShadow();
 }
 
 HRESULT CKirby::Render()
@@ -664,7 +664,7 @@ HRESULT CKirby::Ready_Events()
         });
 
     Subscribe_Event(EventTag::Cutscene_ReleaseKirby,
-        [this](void*)
+        [this](void* pData)
         {
             Clear_CutsceneGrabTarget();
             m_pKirby_StateMachine->Request_ReleaseGrabState_StateMachine();
@@ -689,7 +689,7 @@ HRESULT CKirby::Ready_AnimEvents()
 
 _bool CKirby::Block_Hit(const ATTACK_INFO& tInfo) 
 { 
-    return m_fInvincibleTime > 0.f; 
+    return Is_Invincible();
 }
 
 void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
@@ -697,21 +697,27 @@ void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
     m_pKirby_StateMachine->On_Damaged_KirbyStateMachine(tInfo);
 }
 
-void CKirby::Update_Timer(_float fTimeDelta)
-{
-    if (m_fInvincibleTime > 0.f)
-        m_fInvincibleTime -= fTimeDelta;
-}
-
 void CKirby::Set_CutsceneGrabTarget(CUTSCENE_GRAB_DESC* pGrabDesc)
 {
+    //if (pGrabDesc->eType == CUTSCENE_KIRBY_TYPE::DEFORM_CAR_GET_FIRST)
+    //{
+    //    CUTSCENE_CAMERA_DESC cam{};
+    //    cam.eCam = ECutsceneCam::Cutscene;
+    //    cam.szTrack = L"DeformCarGetFirst_camera1";
+    //    cam.pProgress = Get_DeformPart_Model(DEFORM_TYPE::CAR)->Get_Animator();
+    //    cam.pAnchorWorld = m_pTransformCom->Get_WorldMatrixPtr();
+    //    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+    //}
+    m_vBaseScale = Get_Transform()->Get_Scaled();
     m_pGrabBone = pGrabDesc->pBoneMatrix;
     m_pGrabOwnerWorld = pGrabDesc->pSourceWorld;
 }
 
 void CKirby::Clear_CutsceneGrabTarget()
 {
-    m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.f);
+    m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(m_vBaseScale.x, 0.f, 0.f, 0.f));
+    m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, m_vBaseScale.y, 0.f, 0.f));
+    m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, m_vBaseScale.z, 0.f));
 
     m_pGrabBone = nullptr;
     m_pGrabOwnerWorld = nullptr;
@@ -748,7 +754,7 @@ void CKirby::Update_InvincibilityHitFlash()
         return;
     }
 
-    const _float fInvincibilityElapsedTime = s_fInvincibleDuration - m_fInvincibleTime;
+    const _float fInvincibilityElapsedTime = m_fInvincibleDuration - m_fInvincibleTime;
 
     constexpr _float fInitialFlashDuration = 0.12f;
     if (fInvincibilityElapsedTime < fInitialFlashDuration)
@@ -805,7 +811,8 @@ void CKirby::Update_CutsceneGrabTransform()
     if (m_pGrabBone == nullptr || m_pGrabOwnerWorld == nullptr)
         return;
 
-    _matrix matGrabTargetWorld = XMMatrixRotationY(XMConvertToRadians(-180.f)) * XMLoadFloat4x4(m_pGrabBone) * XMLoadFloat4x4(m_pGrabOwnerWorld);
+    _matrix matGrabTargetWorld = XMMatrixRotationY(XMConvertToRadians(-180.f))
+        * XMLoadFloat4x4(m_pGrabBone) * XMLoadFloat4x4(m_pGrabOwnerWorld);
     Get_Transform()->Set_WorldMatrix(matGrabTargetWorld);
 
     m_pMovement->Sync_To_Controller();
