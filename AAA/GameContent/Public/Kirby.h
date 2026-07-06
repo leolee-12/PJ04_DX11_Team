@@ -222,6 +222,9 @@ private:
 	// Ladder
 	CLevelDesign_Ladder* m_pLadder{};
 
+	// À±¼®Çö Ãß°¡
+	_float3 m_vBaseScale = { 1.f, 1.f, 1.f };
+
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

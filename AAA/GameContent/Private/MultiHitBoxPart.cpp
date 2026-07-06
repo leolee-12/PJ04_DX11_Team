@@ -67,6 +67,12 @@ void CMultiHitBoxPart::Enable_AllHitBoxes(_bool b)
         Enable_HitBox(i, b);
 }
 
+void CMultiHitBoxPart::Set_HitBox_OnEnter(_int iIndex, std::function<void(CCollider*)> fn)
+{
+    if (iIndex < 0 || iIndex >= (_int)m_HitBoxes.size()) return;
+    m_HitBoxes[iIndex].pCollider->Set_OnEnter(std::move(fn));
+}
+
 HRESULT CMultiHitBoxPart::Add_HitBox(_int iIndex, const _char* szBone, COLLIDER eShape, _float fRadius, _float fHeight, _float fDamage, _float fKnockback, const _float3& vCenter, const _float3& vRadians)
 {
     if (iIndex < 0) return E_FAIL;

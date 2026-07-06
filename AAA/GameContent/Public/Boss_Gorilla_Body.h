@@ -8,7 +8,7 @@ class CBoss_Gorilla_Body final : public CMultiHitBoxPart
     GENERATED_BODY(CBoss_Gorilla_Body)
 
 public:
-    enum GORILLA_HITBOX { GHB_RHAND, GHB_LHAND, GHB_SPIN, GHB_END };
+    enum GORILLA_HITBOX { GHB_RHAND, GHB_LHAND, GHB_SPIN, GHB_CATCH, GHB_END };
 
 private:
     CBoss_Gorilla_Body(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

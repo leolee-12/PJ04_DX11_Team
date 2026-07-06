@@ -82,15 +82,6 @@
     <Filter Include="00. GameObject\00. Camera\Free">
       <UniqueIdentifier>{dd2cd863-482a-4286-b3df-f3f050dd4f56}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\00. Camera\AreaCam">
-      <UniqueIdentifier>{712968f4-aac4-4c0d-b936-f670af432abf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\00. Camera\Cutscene">
-      <UniqueIdentifier>{44ee9036-9fb5-42d3-a001-52dd473415a5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\00. Camera\BossCam">
-      <UniqueIdentifier>{2167fc90-1b87-469b-9d86-8fb47e1a8e6d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\Test">
       <UniqueIdentifier>{89f71a9d-8abf-42de-96db-ec93db453c6f}</UniqueIdentifier>
     </Filter>
@@ -876,8 +867,8 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall">
       <UniqueIdentifier>{3538ca96-894c-436a-9f2f-5c4bf121451d}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="01. Projectile\01. Kirby_Spit">
+    </Filter>
+    <Filter Include="01. Projectile\01. Kirby_Spit">
       <UniqueIdentifier>{13343d6f-6325-403c-a289-3544da5b6a8f}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Spat">
@@ -888,6 +879,18 @@
     </Filter>
     <Filter Include="00. GameObject\07. Boss\Boss\Armadillo">
       <UniqueIdentifier>{028348be-a282-4c6e-b35f-c23a77b2027c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\00. Camera\Shakeable">
+      <UniqueIdentifier>{a058e30c-82c8-43aa-9581-c881970a14c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\00. Camera\Shakeable\AreaCam">
+      <UniqueIdentifier>{712968f4-aac4-4c0d-b936-f670af432abf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\00. Camera\Shakeable\BossCam">
+      <UniqueIdentifier>{2167fc90-1b87-469b-9d86-8fb47e1a8e6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\00. Camera\Shakeable\Cutscene">
+      <UniqueIdentifier>{44ee9036-9fb5-42d3-a001-52dd473415a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1102,10 +1105,10 @@
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Hovering</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Camera_AreaCam.h">
-      <Filter>00. GameObject\00. Camera\AreaCam</Filter>
+      <Filter>00. GameObject\00. Camera\Shakeable\AreaCam</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Camera_AreaData.h">
-      <Filter>00. GameObject\00. Camera\AreaCam</Filter>
+      <Filter>00. GameObject\00. Camera\Shakeable\AreaCam</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ResourceData.h">
       <Filter>97. DataSystem\Header</Filter>
@@ -1405,7 +1408,7 @@
       <Filter>00. GameObject\08. CutsceneActor\Gorilla</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Camera_Cutscene.h">
-      <Filter>00. GameObject\00. Camera\Cutscene</Filter>
+      <Filter>00. GameObject\00. Camera\Shakeable\Cutscene</Filter>
     </ClInclude>
     <ClInclude Include="..\public\CameraDirector.h">
       <Filter>96. CameraDirector</Filter>
@@ -1417,7 +1420,7 @@
       <Filter>00. GameObject\07. Boss\BossNamePlate\Gorilla</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Camera_Boss.h">
-      <Filter>00. GameObject\00. Camera\BossCam</Filter>
+      <Filter>00. GameObject\00. Camera\Shakeable\BossCam</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_CutSceneGrabbed.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\CutSceneGrab</Filter>
@@ -1751,8 +1754,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_CarFirstBreakWall.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\LD_Stage1BossDemo.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_Stage1BossDemo.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_SlopeBoardA.h">
@@ -1772,6 +1775,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\LD_DeformCarBreakWall.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Camera_Shakeable.h">
+      <Filter>00. GameObject\00. Camera\Shakeable</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1944,10 +1950,10 @@
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Hovering</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Camera_AreaCam.cpp">
-      <Filter>00. GameObject\00. Camera\AreaCam</Filter>
+      <Filter>00. GameObject\00. Camera\Shakeable\AreaCam</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Camera_AreaSolver.cpp">
-      <Filter>00. GameObject\00. Camera\AreaCam</Filter>
+      <Filter>00. GameObject\00. Camera\Shakeable\AreaCam</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Effect_Loader.cpp">
       <Filter>97. DataSystem\EffectLoader</Filter>
@@ -2217,7 +2223,7 @@
       <Filter>00. GameObject\08. CutsceneActor\Gorilla</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Camera_Cutscene.cpp">
-      <Filter>00. GameObject\00. Camera\Cutscene</Filter>
+      <Filter>00. GameObject\00. Camera\Shakeable\Cutscene</Filter>
     </ClCompile>
     <ClCompile Include="..\private\CameraDirector.cpp">
       <Filter>96. CameraDirector</Filter>
@@ -2229,7 +2235,7 @@
       <Filter>00. GameObject\07. Boss\BossNamePlate\Gorilla</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Camera_Boss.cpp">
-      <Filter>00. GameObject\00. Camera\BossCam</Filter>
+      <Filter>00. GameObject\00. Camera\Shakeable\BossCam</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_CutSceneGrabbed.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\CutSceneGrab</Filter>
@@ -2560,8 +2566,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_CarFirstBreakWall.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\LD_Stage1BossDemo.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_SlopeBoardA.cpp">
@@ -2581,6 +2587,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\LD_DeformCarBreakWall.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Camera_Shakeable.cpp">
+      <Filter>00. GameObject\00. Camera\Shakeable</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

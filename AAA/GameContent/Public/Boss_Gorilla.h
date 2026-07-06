@@ -40,6 +40,15 @@ public:
     virtual CAnimator* Get_BodyAnimator() const override;
     virtual CMultiHitBoxPart* Get_HitBoxPart() const override;
 
+public:
+    void                   Reset_CatchHit() { m_bCatchHit = false; }
+    _bool                  Is_CatchHit() const { return m_bCatchHit; }
+                           
+    void                   Begin_QTE(_float fSeconds) { m_bQTEEscaped = false; m_fQTETimer = fSeconds; }
+    _bool                  Is_QTEEscaped() const { return m_bQTEEscaped; }
+    _bool                  Tick_QTETimer(_float fDt) { m_fQTETimer -= fDt; return m_fQTETimer <= 0.f; }
+    void                   Fire_Release(GRAB_RELEASE_TYPE eType);
+
 protected:
     virtual CMonsterBrain* Create_Brain() override;
     virtual void           Play_Intro() override;
@@ -81,6 +90,10 @@ private:
     EDEATH  m_eDeathStep = { EDEATH::POSE_WAIT };
     _int    m_iDeathPoseDelay = { 0 };
     _float  m_fDeathPauseTimer = { 0.f };
+
+    _bool   m_bCatchHit = { false };
+    _bool   m_bQTEEscaped = { false };
+    _float  m_fQTETimer = { 0.f };
 
 private:
     void Tick_OpeningCatch();                    

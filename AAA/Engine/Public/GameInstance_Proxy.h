@@ -60,6 +60,8 @@ public: //TimerManager
     _float Get_RawTimeDelta(const _wstring& strTimerTag);
     void   Set_TimeScale(_float fScale);
     _float Get_TimeScale() const;
+    void   Lerp_TimeScale(_float fFrom, _float fTo, _float fDuration);
+    void   Pulse_TimeScale(_float fScale, _float fHold, _float fBlendIn = 0.f, _float fBlendOut = 0.f);
 #pragma endregion
 
 #pragma region LEVELMANAGER
