@@ -85,6 +85,7 @@ void CEnvObject_Trigger::Late_Update(_float fTimeDelta)
 
 	if (bValidArea)
 	{
+		// 트리거는 현재 AABB만 지원 : AreaRot 무시(추후 OBB 지원할 때 받기)
 		const _matrix TriggerLocalMatrix =
 			XMMatrixScaling(vAreaSize.x, vAreaSize.y, vAreaSize.z) *
 			XMMatrixTranslation(m_vAreaCenter.x, m_vAreaCenter.y, m_vAreaCenter.z);
@@ -106,22 +107,17 @@ void CEnvObject_Trigger::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 
 void CEnvObject_Trigger::OnTriggerEnter(CCollider* pOther)
 {
-	char szBuf[128];
-	sprintf_s(szBuf, "[EnvTrigger] Enter <- group %u\n", pOther->Get_RegisteredGroup());
-	OutputDebugStringA(szBuf);
+	UNREFERENCED_PARAMETER(pOther);
 }
 
 void CEnvObject_Trigger::OnTriggerStay(CCollider* pOther)
 {
 	UNREFERENCED_PARAMETER(pOther);
-	OutputDebugStringA("[EnvTrigger] Stay\n");
 }
 
 void CEnvObject_Trigger::OnTriggerExit(CCollider* pOther)
 {
-	char szBuf[128];
-	sprintf_s(szBuf, "[EnvTrigger] Exit  <- group %u\n", pOther->Get_RegisteredGroup());
-	OutputDebugStringA(szBuf);
+	UNREFERENCED_PARAMETER(pOther);
 }
 
 HRESULT CEnvObject_Trigger::Ready_TriggerCollider()
@@ -148,9 +144,6 @@ HRESULT CEnvObject_Trigger::Ready_TriggerCollider()
 
 void CEnvObject_Trigger::SetUp_Collider_Callback()
 {
-	if (nullptr == m_pCollider)
-		return;
-
 	m_pCollider->Set_OnEnter([this](CCollider* pOther) { OnTriggerEnter(pOther); });
 
 	m_pCollider->Set_OnStay([this](CCollider* pOther) { OnTriggerStay(pOther); });

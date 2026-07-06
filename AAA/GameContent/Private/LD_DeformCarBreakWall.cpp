@@ -61,7 +61,7 @@ HRESULT CLD_DeformCarBreakWall::Validate_Initialized()
 	if (STATE::IDLE != m_eState)
 		return E_FAIL;
 
-	if (nullptr == m_pBoostTrigger || !m_bBoostTriggerRegistered)
+	if (nullptr == m_pBoostTrigger)
 		return E_FAIL;
 
 	return S_OK;
@@ -104,7 +104,7 @@ void CLD_DeformCarBreakWall::Update(_float fTimeDelta)
 
 void CLD_DeformCarBreakWall::Late_Update(_float fTimeDelta)
 {
-	if (STATE::IDLE == m_eState && nullptr != m_pBoostTrigger && m_pBoostTrigger->Is_Enabled())
+	if (STATE::IDLE == m_eState && m_pBoostTrigger->Is_Enabled())
 	{
 		m_pBoostTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
@@ -267,7 +267,6 @@ HRESULT CLD_DeformCarBreakWall::Ready_BoostTrigger(const BoundingBox& LocalBound
 	SetUp_BoostTriggerCallback();
 
 	m_pGameInstance_Proxy->Register_Collider(m_pBoostTrigger, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
-	m_bBoostTriggerRegistered = true;
 
 	return S_OK;
 }
@@ -309,46 +308,21 @@ void CLD_DeformCarBreakWall::On_Event()
 	m_pGameInstance_Proxy->Lerp_TimeScale(0.1f, 1.f, 3.f);
 
 	Release_RigidStatic();
-	Unregister_BoostTrigger(false);
+
+	m_pBoostTrigger->Set_Enabled(false);
 }
 
 void CLD_DeformCarBreakWall::SetUp_BoostTriggerCallback()
 {
-	if (nullptr == m_pBoostTrigger)
-		return;
-
 	m_pBoostTrigger->Set_OnEnter([this](CCollider* pOther) { Handle_BoostTrigger(pOther); });
 }
 
 void CLD_DeformCarBreakWall::Handle_BoostTrigger(CCollider* pOther)
 {
-	if (nullptr == pOther)
-		return;
-
 	if (ETOUI(COLLISION_LAYER::CAR_BOOST) != pOther->Get_RegisteredGroup())
 		return;
 
 	On_Event();
-}
-
-void CLD_DeformCarBreakWall::Unregister_BoostTrigger(_bool bImmediate)
-{
-	if (nullptr == m_pBoostTrigger)
-		return;
-
-	m_pBoostTrigger->Set_Enabled(false);
-
-	if (!m_bBoostTriggerRegistered)
-		return;
-
-	const _uint iGroup = ETOUI(COLLISION_LAYER::ENV_TRIGGER);
-
-	if (bImmediate)
-		m_pGameInstance_Proxy->Immediate_Unregister(m_pBoostTrigger, iGroup);
-	else
-		m_pGameInstance_Proxy->Request_Unregister(m_pBoostTrigger, iGroup);
-
-	m_bBoostTriggerRegistered = false;
 }
 
 CLD_DeformCarBreakWall* CLD_DeformCarBreakWall::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -397,8 +371,6 @@ CGameObject* CLD_DeformCarBreakWall::Clone(void* pArg)
 
 void CLD_DeformCarBreakWall::Free()
 {
-	Unregister_BoostTrigger(true);
-
 	__super::Free();
 }
 

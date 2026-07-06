@@ -433,40 +433,20 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 		JsonUtils::Try_ReadUInt(jEntry, "SoundId", &pDesc->AudioArea.iSoundId);
 
 		if (!JsonUtils::Try_ReadString(jEntry, "VariationType", &pDesc->AudioArea.strVariationType) && !strMainPath.empty())
-			JsonUtils::Try_ReadString(jEntry, strMainPath + ".VariationType", &pDesc->AudioArea.strVariationType);
+			JsonUtils::Try_ReadString(jEntry, strMainPath + ".VariationType",
+				&pDesc->AudioArea.strVariationType);
 
 		if (!JsonUtils::Try_ReadString(jEntry, "ShapeType", &pDesc->AudioArea.strShapeType) && !strMainPath.empty())
 			JsonUtils::Try_ReadString(jEntry, strMainPath + ".ShapeType", &pDesc->AudioArea.strShapeType);
 
-		_bool bReadAreaCenter = JsonUtils::Try_ReadFloat3Array(jEntry, "AreaCenter", &pDesc->AudioArea.vAreaCenter);
-		_bool bReadAreaRot = JsonUtils::Try_ReadFloat4Array(jEntry, "AreaRot", &pDesc->AudioArea.qAreaRot);
-		_bool bReadAreaSize = JsonUtils::Try_ReadFloat3Array(jEntry, "AreaSize", &pDesc->AudioArea.vAreaSize);
-
 		const _string strShapePrefix = Resolve_AudioAreaShapePrefix(pDesc->AudioArea.strShapeType);
-		if (!strMainPath.empty() && !strShapePrefix.empty())
+		if (!JsonUtils::Try_ReadFloat3Array(jEntry, "AreaSize", &pDesc->AudioArea.vAreaSize)
+			&& !strMainPath.empty()
+			&& !strShapePrefix.empty())
 		{
-			const _string strAreaPath = strMainPath + "." + strShapePrefix;
-
-			if (!bReadAreaCenter)
-			{
-				bReadAreaCenter = JsonUtils::Try_ReadFloat3Array(jEntry, strAreaPath + "Center", &pDesc->AudioArea.vAreaCenter);
-
-				if (bReadAreaCenter && JsonUtils::Equals_NoCase(pDesc->AudioArea.strShapeType.c_str(), L"Rectangular"))
-					pDesc->AudioArea.eCenterSpace = LD_AUDIO_AREA_CENTER_SPACE::LOCAL;
-			}
-
-			if (!bReadAreaRot)
-				bReadAreaRot = JsonUtils::Try_ReadFloat4Array(jEntry, strAreaPath + "Rot", &pDesc->AudioArea.qAreaRot);
-
-			if (!bReadAreaSize)
-				bReadAreaSize = JsonUtils::Try_ReadFloat3Array(jEntry, strAreaPath + "Size", &pDesc->AudioArea.vAreaSize);
+			const _string strAreaSizePath = strMainPath + "." + strShapePrefix + "Size";
+			JsonUtils::Try_ReadFloat3Array(jEntry, strAreaSizePath, &pDesc->AudioArea.vAreaSize);
 		}
-
-		if (!bReadAreaCenter)
-			pDesc->AudioArea.vAreaCenter = pDesc->vParsedPosition;
-
-		if (!bReadAreaRot)
-			pDesc->AudioArea.qAreaRot = pDesc->qParsedRotation;
 
 		JsonUtils::Try_ReadUInt(jEntry, "FadeInFrame", &pDesc->AudioArea.iFadeInFrame);
 		JsonUtils::Try_ReadUInt(jEntry, "InactivateFrame", &pDesc->AudioArea.iInactivateFrame);

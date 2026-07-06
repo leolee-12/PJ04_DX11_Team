@@ -82,8 +82,11 @@ namespace
         if (Try_ApplyArea(Parsed.GuideArea.vAreaCenter, Parsed.GuideArea.vAreaSize))
             return;
 
-        if (Try_ApplyArea(Parsed.AudioArea.vAreaCenter, Parsed.AudioArea.vAreaSize))
+        if (Has_UsableDebugSize(Parsed.AudioArea.vAreaSize))
+        {
+            *pOutSize = Make_SafeDebugSize(Parsed.AudioArea.vAreaSize);
             return;
+        }
 
         if (Has_UsableDebugSize(Parsed.Portal.vRestartAreaSize))
         {

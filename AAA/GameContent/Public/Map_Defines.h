@@ -35,8 +35,7 @@ struct MAP_SECTION_DESC : public CGameObject::GAMEOBJECT_DESC
 	RENDERID			eRenderID = { RENDERID::NONBLEND };
 	_bool				bEnableCulling = { true };
 	_bool				bRenderable = { true };
-	_bool				bCreateCollisionActor = { true };
-	_bool				bSourceCreateCollisionActor = { true };
+	_bool				bUseCollMesh = { true };
 };
 
 struct MAP_STAGE_DESC : public CGameObject::GAMEOBJECT_DESC
