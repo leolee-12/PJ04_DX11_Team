@@ -20,53 +20,55 @@ HRESULT CKirby_Ability_Sword::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
+    m_wstrAttackModeName = L"스워드";
+
     Set_OverlayAni(ABILITY_ANI::WAIT, "Wait", "Sword_HaveSwordWait", "R_ShoulderJ",
-        true, false, 1.8f, 0.1f, true,
-        true, false, 1.8f, 0.1f);
+        true, false, 1.8f, 0.1f,
+        true, false, 1.8f, 1.f, 0.1f, 0.1f);
 
     Set_OverlayAni(ABILITY_ANI::RUN, "Run", "HaveSwordMove", "R_ShoulderJ",
-        true, false, 3.5f, 0.1f, true,
-        true, false, 3.5f, 0.1f);
+        true, false, 3.5f, 0.1f,
+        true, false, 3.5f, 1.f, 0.1f, 0.1f);
 
     Set_OverlayAni(ABILITY_ANI::FALL, "Fall", "HaveSwordMove", "R_ShoulderJ",
-        false, false, 2.f, 0.1f, true,
-        false, false, 2.f, 0.1f);
+        false, false, 2.f, 0.1f,
+        false, false, 2.f, 1.f, 0.1f, 0.1f);
 
     Set_OverlayAni(ABILITY_ANI::LANDING, "Landing", "HaveSwordMove", "R_ShoulderJ",
-        false, false, 1.f, 0.05f, true,
-        false, false, 1.f, 0.05f);
+        false, false, 1.f, 0.05f,
+        false, false, 1.f, 1.f, 0.05f, 0.1f);
 
     // Jump
     Set_OverlayAni(ABILITY_ANI::JUMP_L, "JumpL", "HaveSwordMove", "R_ShoulderJ",
-        false, false, 5.f, 0.1f, true,
-        false, false, 5.f, 0.1f);
+        false, false, 5.f, 0.1f,
+        false, false, 5.f, 1.f, 0.1f, 0.1f);
     Set_OverlayAni(ABILITY_ANI::JUMP_R, "JumpR", "HaveSwordMove", "R_ShoulderJ",
-        false, false, 5.f, 0.1f, true,
-        false, false, 5.f, 0.1f);
+        false, false, 5.f, 0.1f,
+        false, false, 5.f, 1.f, 0.1f, 0.1f);
     Set_OverlayAni(ABILITY_ANI::JUMP_END_L, "JumpEndL", "HaveSwordMove", "R_ShoulderJ",
-        false, false, 2.f, 0.1f, true,
-        false, false, 2.f, 0.1f);
+        false, false, 2.f, 0.1f,
+        false, false, 2.f, 1.f, 0.1f, 0.1f);
     Set_OverlayAni(ABILITY_ANI::JUMP_END_R, "JumpEndR", "HaveSwordMove", "R_ShoulderJ",
-        false, false, 2.f, 0.1f, true,
-        false, false, 2.f, 0.1f);
+        false, false, 2.f, 0.1f,
+        false, false, 2.f, 1.f, 0.1f, 0.1f);
 
     // Hovering
     Set_OverlayAni(ABILITY_ANI::FLIGHT_START, "FlightStart", "HaveSwordWaitFlight", "R_ShoulderJ",
-        false, false, 2.25f, 0.1f, true,
-        false, false, 2.25f, 0.1f);
+        false, false, 2.25f, 0.1f,
+        false, false, 2.25f, 1.f, 0.1f, 0.1f);
     Set_OverlayAni(ABILITY_ANI::FLIGHT, "Flight", "HaveSwordWaitFlight", "R_ShoulderJ",
-        false, true, 2.f, 0.1f, true,
-        false, true, 2.f, 0.1f);
+        false, true, 2.f, 0.1f,
+        false, true, 2.f, 1.f, 0.1f, 0.1f);
     Set_OverlayAni(ABILITY_ANI::FLIGHT_FALL, "FlightFall", "HaveSwordWaitFlight", "R_ShoulderJ",
-        true, false, 2.f, 0.1f, true,
-        true, false, 2.f, 0.1f);
+        true, false, 2.f, 0.1f,
+        true, false, 2.f, 1.f, 0.1f, 0.1f);
     Set_OverlayAni(ABILITY_ANI::FLIGHT_LANDING, "FlightLanding", "HaveSwordWaitFlight", "R_ShoulderJ",
-        false, false, 2.5f, 0.1f, true,
-        false, false, 2.5f, 0.1f);
+        false, false, 2.5f, 0.1f,
+        false, false, 2.5f, 1.f, 0.1f, 0.1f);
 
     Set_OverlayAni(ABILITY_ANI::AIR_BALL, "AirBall", "HaveSwordWaitFlight", "R_ShoulderJ",
-        false, false, 5.f, 0.05f, true,
-        false, false, 5.f, 0.05f);
+        false, false, 5.f, 0.05f,
+        false, false, 5.f, 1.f, 0.05f, 0.1f);
 
     Set_FullBodyAni(ABILITY_ANI::GUARD, "Sword_Guard", true, true, 0.1f, 1.8f);
 
@@ -163,23 +165,6 @@ void CKirby_Ability_Sword::Exit_AttackState(CKirby* pKirby)
         //pSword->Set_HitBox(false);
         pSword->Reset_HitList();
     }
-}
-
-void CKirby_Ability_Sword::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
-{
-    m_bSpinSlashCharge = false;
-    m_fAccSuperSpinSlashChargeTime = 0.f;
-    m_bReserveNextAttack = false;
-
-    ZeroMemory(&m_vSwordWishDir, sizeof(m_vSwordWishDir));
-
-    End_SpinSlashEffect(m_pSpinSlash, 0.2f);
-    End_SpinSlashEffect(m_pSpinSlashTrail, 0.15f);
-
-    Effect_Stop(m_pSwordChargeEffect);
-    Effect_Stop(m_pSwordSuperChargeEffect);
-
-    __super::On_Damaged_KirbyState(pKirby, tInfo);
 }
 
 _bool CKirby_Ability_Sword::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -295,6 +280,23 @@ _bool CKirby_Ability_Sword::Enter_Attack_KeyUp(CKirby* pKirby)
 {
     // 무시
     return true;
+}
+
+void CKirby_Ability_Sword::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+    m_bSpinSlashCharge = false;
+    m_fAccSuperSpinSlashChargeTime = 0.f;
+    m_bReserveNextAttack = false;
+
+    ZeroMemory(&m_vSwordWishDir, sizeof(m_vSwordWishDir));
+
+    End_SpinSlashEffect(m_pSpinSlash, 0.2f);
+    End_SpinSlashEffect(m_pSpinSlashTrail, 0.15f);
+
+    Effect_Stop(m_pSwordChargeEffect);
+    Effect_Stop(m_pSwordSuperChargeEffect);
+
+    __super::On_Damaged_KirbyState(pKirby, tInfo);
 }
 
 void CKirby_Ability_Sword::Update_ChargeTime(_float fTimeDelta)
@@ -465,9 +467,9 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
         pAnimator->Play("SpinSlashCharge", false, false, 0.05f, 2.5f);
 
         if (m_eCurSwordMoveState == SWORD_MOVE_STATE::MOVE_FRONT)
-            pAnimator->Set_Mask("ShuffleFront", OverlayMasks, std::size(OverlayMasks), true, 1.0f, 0.1f);
+            pAnimator->Set_Mask("ShuffleFront", OverlayMasks, std::size(OverlayMasks), true, 1.0f, 0.1f, 0.2f);
         else if (m_eCurSwordMoveState == SWORD_MOVE_STATE::MOVE_RIGHT)
-            pAnimator->Set_Mask("ShuffleRight", OverlayMasks, std::size(OverlayMasks), true, 1.0f, 0.1f);
+            pAnimator->Set_Mask("ShuffleRight", OverlayMasks, std::size(OverlayMasks), true, 1.0f, 0.1f, 0.2f);
 
         m_bIsStartEffect[SWORD_EFFECT::SPINSLASH] = false;
 
@@ -486,7 +488,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
         pKirby->Set_RotationLock(true);
         pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
 
-        pAnimator->Play("SpinSlash", false, false, 0.1f, 2.f, false);
+        pAnimator->Play("SpinSlash", false, false, 0.1f, 2.f);
         break;
     }
     case SWORD_STATE::SPIN_SLASH_END:
@@ -503,7 +505,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
         EndHit();
         pKirby->Set_RotationLock(true);
         pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed - 6.f);
-        pAnimator->Play("SuperSpinSlashChargeStart", false, false, 0.1f, 2.f, false);
+        pAnimator->Play("SuperSpinSlashChargeStart", false, false, 0.1f, 2.f);
 
         CEffect_Loader::GetInstance()->Spawn(L"SwordSuperChargeEffect", pKirby->Get_LevelIndex(),
             _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
@@ -516,7 +518,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
         EndHit();
         pKirby->Set_RotationLock(true);
         pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed - 6.f);
-        pAnimator->Play("SuperSpinSlashCharge", true, false, 0.1f, 2.f, false);
+        pAnimator->Play("SuperSpinSlashCharge", true, false, 0.1f, 2.f);
 
         break;
     }
@@ -530,7 +532,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
         pKirby->Set_RotationLock(true);
         pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
 
-        pAnimator->Play("SuperSpinSlashStart", false, false, 0.1f, 2.f, false);
+        pAnimator->Play("SuperSpinSlashStart", false, false, 0.1f, 2.f);
 
         break;
     }
@@ -545,7 +547,7 @@ void CKirby_Ability_Sword::Enter_SwordState(CKirby* pKirby, SWORD_STATE eState)
     {
         BeginHit(false);
         pKirby->Set_RotationLock(true);
-        pAnimator->Play("SuperSpinSlashEnd", false, false, 0.1f, 3.f);
+        pAnimator->Play("SuperSpinSlashEnd", false, false, 0.f, 3.f);
         break;
     }
     }
@@ -877,12 +879,12 @@ void CKirby_Ability_Sword::ChargeAnimationOverlay(CKirby* pKirby)
                 }
                 else if (m_eCurSwordMoveState == SWORD_MOVE_STATE::MOVE_FRONT)
                 {
-                    pAnimator->Set_Mask("ShuffleFront", OverlayMasks, std::size(OverlayMasks), true, 1.0f, 0.1f);
+                    pAnimator->Set_Mask("ShuffleFront", OverlayMasks, std::size(OverlayMasks), true, 1.0f, 0.1f, 0.2f);
                     pAnimator->Resume_Mask();
                 }
                 else if (m_eCurSwordMoveState == SWORD_MOVE_STATE::MOVE_RIGHT)
                 {
-                    pAnimator->Set_Mask("ShuffleRight", OverlayMasks, std::size(OverlayMasks), true, 1.0f, 0.1f);
+                    pAnimator->Set_Mask("ShuffleRight", OverlayMasks, std::size(OverlayMasks), true, 1.0f, 0.1f, 0.2f);
                     pAnimator->Resume_Mask();
                 }
                 break;

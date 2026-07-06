@@ -181,8 +181,8 @@ void CProfiler_Manager::Set_TextureHubStats(const TEXTURE_HUB_STATS& Stats)
 			return iCurrent >= iPrevious ? iCurrent - iPrevious : iCurrent;
 		};
 
-	const _uint iReuse = Delta(Stats.iCacheReuseCount, m_PrevTextureHubStats.iCacheReuseCount);
-	const _uint iMiss = Delta(Stats.iFirstLoadRequestCount, m_PrevTextureHubStats.iFirstLoadRequestCount);
+	const _uint iDeduped = Delta(Stats.iCacheReuseCount, m_PrevTextureHubStats.iCacheReuseCount);
+	const _uint iFirstLoad = Delta(Stats.iFirstLoadRequestCount, m_PrevTextureHubStats.iFirstLoadRequestCount);
 	const _uint iFailed = Delta(Stats.iLoadFailCount, m_PrevTextureHubStats.iLoadFailCount);
 
 	m_PrevTextureHubStats = Stats;
@@ -191,9 +191,9 @@ void CProfiler_Manager::Set_TextureHubStats(const TEXTURE_HUB_STATS& Stats)
 		return;
 
 	m_WorkingSnapshot.iTextureHubCached = Stats.iCachedSRVCount;
-	AddCounter(EPROFILE_COUNTER::TEXTUREHUB_REQUEST, iReuse + iMiss);
-	AddCounter(EPROFILE_COUNTER::TEXTUREHUB_REUSE, iReuse);
-	AddCounter(EPROFILE_COUNTER::TEXTUREHUB_MISS, iMiss);
+	AddCounter(EPROFILE_COUNTER::TEXTUREHUB_REQUEST, iDeduped + iFirstLoad);
+	AddCounter(EPROFILE_COUNTER::TEXTUREHUB_DEDUPED, iDeduped);
+	AddCounter(EPROFILE_COUNTER::TEXTUREHUB_FIRST_LOAD_REQUEST, iFirstLoad);
 	AddCounter(EPROFILE_COUNTER::TEXTUREHUB_FAILED, iFailed);
 }
 

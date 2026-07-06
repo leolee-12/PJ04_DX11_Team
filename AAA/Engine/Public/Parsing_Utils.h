@@ -1,9 +1,9 @@
 #pragma once
-#include "Base.h"
+#include "Engine_Defines.h"
 
 #include <functional>
 
-NS_BEGIN(Client)
+NS_BEGIN(Engine)
 
 namespace JsonUtils
 {

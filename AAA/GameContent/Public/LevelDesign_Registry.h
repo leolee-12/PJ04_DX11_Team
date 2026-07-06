@@ -39,7 +39,7 @@ struct LD_RESOLVED_SPAWN
 
 	void* Get_SpawnArgument()
 	{
-		const auto& ToSpawnArgument = [](auto& Desc) -> void* { return static_cast<void*>(&Desc);; };
+		const auto& ToSpawnArgument = [](auto& Desc) -> void* { return static_cast<void*>(&Desc); };
 
 		return std::visit(ToSpawnArgument, ObjectDesc);
 	}

@@ -2,8 +2,6 @@
 
 #include "Kirby_State.h"
 
-#include "GameContent_Defines.h"
-
 NS_BEGIN(Engine)
 class CAnimator;
 NS_END
@@ -34,7 +32,7 @@ public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
 public:
-	virtual void Request_ReleaseGrabState(CKirby* pKirby, GRAB_TYPE eType) override;
+	virtual void Request_ReleaseGrabState(CKirby* pKirby, CUTSCENE_KIRBY_TYPE eType) override;
 
 public:
 	static CKirby_CutSceneGrabbed* Create();

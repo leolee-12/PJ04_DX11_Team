@@ -61,7 +61,6 @@ public:
 	static constexpr _float s_fRot_Speed_Degree = 720.f;
 
 	// À±¼®Çö Ãß°¡ 
-	static constexpr _float s_fInvincibleDuration = 2.f;
 	static constexpr _float s_fInhaleFwd = 1.8f;
 	static constexpr _float s_fInhaleUp = 0.5f;
 	static constexpr _float s_fInhaleRadius = 3.f;
@@ -117,6 +116,9 @@ public:
 	// Attack Mode
 	CKirby_AttackMode* Get_ActiveAttackMode();
 
+	// Model
+	CKirby_Deform_Model* Get_CurrentDeformModel();
+
 	// Ability
 	CKirby_Ability* Get_KirbyAbility();
 	void Request_ChangeKirbyAbility(COPY_ABILITY_TYPE eAbilityState);
@@ -143,9 +145,10 @@ public:
 	// Damage
 	virtual void Damaged(const ATTACK_INFO& tInfo) override;
 	void Add_HP(_float fHP);
-	void Start_DamageInvincibility() { m_fInvincibleTime = s_fInvincibleDuration; }
+	void Start_DamageInvincibility() { Start_Invincibility(); }
 
 	// Ladder
+	CLevelDesign_Ladder* Get_Ladder() { return m_pLadder; }
 	void Set_Ladder(CLevelDesign_Ladder* pLadder) { m_pLadder = pLadder; }
 	void Clear_Ladder() { m_pLadder = nullptr; };
 	_bool IsLadder() { return m_pLadder ? true : false; }
@@ -169,7 +172,7 @@ private:
 	virtual void  On_Damaged(const ATTACK_INFO& tInfo) override;
 	
 	// Timer
-	void Update_Timer(_float fTimeDelta);
+	//void Update_Timer(_float fTimeDelta);
 
 	// CutScene Grab
 	void Set_CutsceneGrabTarget(CUTSCENE_GRAB_DESC* pGrabDesc);
@@ -189,9 +192,6 @@ private:
 
 	// Collider
 	vector<CCollider*> m_KirbyColliders;
-
-	// Invincible Time
-	_float m_fInvincibleTime{};
 
 	void Update_BlobShadow();
 	void Update_InvincibilityHitFlash();
@@ -224,6 +224,9 @@ private:
 
 	// Ladder
 	CLevelDesign_Ladder* m_pLadder{};
+
+	// À±¼®Çö Ãß°¡
+	_float3 m_vBaseScale = { 1.f, 1.f, 1.f };
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

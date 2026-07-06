@@ -33,6 +33,8 @@
     <ClInclude Include="..\public\BossBase.h" />
     <ClInclude Include="..\public\BossNamePlate.h" />
     <ClInclude Include="..\public\Boss_Brain.h" />
+    <ClInclude Include="..\public\Boss_Cage.h" />
+    <ClInclude Include="..\public\Boss_Cage_Body.h" />
     <ClInclude Include="..\public\Boss_Gorilla.h" />
     <ClInclude Include="..\public\Boss_Gorilla_Body.h" />
     <ClInclude Include="..\public\Boss_Gorilla_Brain.h" />
@@ -49,6 +51,7 @@
     <ClInclude Include="..\public\Camera_Boss.h" />
     <ClInclude Include="..\public\Camera_Cutscene.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
+    <ClInclude Include="..\public\Camera_Shakeable.h" />
     <ClInclude Include="..\Public\Cappy.h" />
     <ClInclude Include="..\Public\Cappy_Body.h" />
     <ClInclude Include="..\Public\Cappy_Brain.h" />
@@ -66,6 +69,8 @@
     <ClInclude Include="..\Public\Common_JumpSlash.h" />
     <ClInclude Include="..\Public\Common_Ring03.h" />
     <ClInclude Include="..\Public\Kirby_AttackMode.h" />
+    <ClInclude Include="..\Public\Kirby_CarFirstBreakWall.h" />
+    <ClInclude Include="..\Public\LD_DeformCarBreakWall.h" />
     <ClInclude Include="..\Public\LD_SlopeBoardA.h" />
     <ClInclude Include="..\Public\LD_SlopeBoardC.h" />
     <ClInclude Include="..\Public\LD_Stage1BossDemo.h" />
@@ -194,7 +199,6 @@
     <ClInclude Include="..\Public\NormalEnemy_Body.h" />
     <ClInclude Include="..\Public\NormalEnemy_Brain.h" />
     <ClInclude Include="..\Public\NormalEnemy_State_Brake.h" />
-    <ClInclude Include="..\Public\Parsing_Utils.h" />
     <ClInclude Include="..\Public\PoppyBrosJr.h" />
     <ClInclude Include="..\Public\RailRideable.h" />
     <ClInclude Include="..\Public\Shader_PassMeta.h" />
@@ -336,6 +340,8 @@
     <ClCompile Include="..\private\BossBase.cpp" />
     <ClCompile Include="..\private\BossNamePlate.cpp" />
     <ClCompile Include="..\private\Boss_Brain.cpp" />
+    <ClCompile Include="..\private\Boss_Cage.cpp" />
+    <ClCompile Include="..\private\Boss_Cage_Body.cpp" />
     <ClCompile Include="..\private\Boss_Gorilla.cpp" />
     <ClCompile Include="..\private\Boss_Gorilla_Body.cpp" />
     <ClCompile Include="..\private\Boss_Gorilla_Brain.cpp" />
@@ -352,6 +358,7 @@
     <ClCompile Include="..\private\Camera_Boss.cpp" />
     <ClCompile Include="..\private\Camera_Cutscene.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
+    <ClCompile Include="..\private\Camera_Shakeable.cpp" />
     <ClCompile Include="..\Private\Cappy.cpp" />
     <ClCompile Include="..\Private\Cappy_Body.cpp" />
     <ClCompile Include="..\Private\Cappy_Brain.cpp" />
@@ -370,6 +377,8 @@
     <ClCompile Include="..\Private\Common_JumpSlash.cpp" />
     <ClCompile Include="..\Private\Common_Ring03.cpp" />
     <ClCompile Include="..\Private\Kirby_AttackMode.cpp" />
+    <ClCompile Include="..\Private\Kirby_CarFirstBreakWall.cpp" />
+    <ClCompile Include="..\Private\LD_DeformCarBreakWall.cpp" />
     <ClCompile Include="..\Private\LD_SlopeBoardA.cpp" />
     <ClCompile Include="..\Private\LD_SlopeBoardC.cpp" />
     <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp" />

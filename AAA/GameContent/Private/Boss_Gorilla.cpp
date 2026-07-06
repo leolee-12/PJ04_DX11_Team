@@ -10,6 +10,8 @@
 #include "Projectile_Boulder.h"
 #include "Projectile_Manager.h"
 
+#include "Boss_Cage.h"
+
 #include "Effect_Loader.h"
 
 // 3페이즈: 66%, 33% 에서 전환 (PhaseCount = size()+1 = 3) Brain의 Get_PhaseCount와 일치!
@@ -46,11 +48,27 @@ HRESULT CBoss_Gorilla::Initialize(void* pArg)
         m_pMovement->Set_RotSpeed(90.f);
     }
 
+    m_pBody->Set_HitBox_OnEnter(CBoss_Gorilla_Body::GHB_CATCH,
+        [this](CCollider* pOther)
+        {
+            if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
+                return;
+            if (m_bCatchHit)
+                return;
+
+            m_bCatchHit = true;
+            m_pBody->Enable_HitBox(CBoss_Gorilla_Body::GHB_CATCH, false);
+            Fire_Grab();       
+            Begin_QTE(s_fQTE_GorillaLimit);
+        });
+
+    Subscribe_Event(EventTag::QTE_Success, [this](void*) { m_bQTEEscaped = true; });
+
     return S_OK;
 }
 
 void CBoss_Gorilla::Update(_float fTimeDelta)
-{
+{ 
 #ifdef _DEBUG
     if (m_pGameInstance_Proxy->Is_EditMode())
     {
@@ -73,6 +91,14 @@ void CBoss_Gorilla::Update(_float fTimeDelta)
 
     __super::Update(fTimeDelta);
     Tick_DeathSequence(fTimeDelta);
+
+    m_pCage->Update(fTimeDelta);
+}
+
+void CBoss_Gorilla::Late_Update(_float fTimeDelta)
+{
+    __super::Late_Update(fTimeDelta);
+    m_pCage->Late_Update(fTimeDelta);
 }
 
 CMonsterBrain* CBoss_Gorilla::Create_Brain()
@@ -189,8 +215,6 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
             {
                 if (e.strParam.empty())
                 {
-                    if (m_eLife != EBOSS_LIFE::INTRO)
-                        break;
                     CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
                     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
                 }
@@ -330,6 +354,14 @@ CMultiHitBoxPart* CBoss_Gorilla::Get_HitBoxPart() const
     return m_pBody;
 }
 
+void CBoss_Gorilla::Set_Active(_bool b)
+{
+    __super::Set_Active(b);
+
+    if (m_pCage)
+        m_pCage->Set_Active(b);
+}
+
 HRESULT CBoss_Gorilla::Ready_PartObjects()
 {
     m_pBody = Add_MonsterPart<CBoss_Gorilla_Body>(
@@ -340,6 +372,12 @@ HRESULT CBoss_Gorilla::Ready_PartObjects()
     m_pRockHole = dynamic_cast<CBoss_Gorilla_RockHole*>(m_PartObjects[CBoss_Gorilla_RockHole::PART_TAG]);
     if (!m_pRockHole)
         return E_FAIL;
+
+    m_pCage = static_cast<CBoss_Cage*>(m_pGameInstance_Proxy->Clone_Prototype(PROTOTYPE::GAMEOBJECT, m_iPrototypeLevel, CBoss_Cage::PROTOTYPE_TAG));
+    if (nullptr == m_pCage)
+        return E_FAIL;
+        
+    m_pCage->Attach_To_Bone(m_pBody->Get_BoneMatrixPtr("C_Anchor2J"), m_pTransformCom->Get_WorldMatrixPtr());
 
     return S_OK;
 }
@@ -383,8 +421,14 @@ void CBoss_Gorilla::Fire_Grab()
     CUTSCENE_GRAB_DESC grab{};
     grab.pBoneMatrix = m_pBody->Get_BoneMatrixPtr(GRAB_BONE);          
     grab.pSourceWorld = m_pTransformCom->Get_WorldMatrixPtr();         
-    grab.eType = GRAB_TYPE::GORILLA_COMBAT;
-    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GrabKirby, &grab);
+    grab.eType = CUTSCENE_KIRBY_TYPE::GORILLA_COMBAT;
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_KirbyStart, &grab);
+}
+
+void CBoss_Gorilla::Fire_Release(GRAB_RELEASE_TYPE eType)
+{
+    CUTSCENE_RELEASE_DESC desc{ eType };
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_ReleaseKirby, &desc);
 }
 
 void CBoss_Gorilla::Tick_DeathSequence(_float fTimeDelta)
@@ -454,5 +498,6 @@ CBoss_Gorilla* CBoss_Gorilla::Clone(void* pArg)
 
 void CBoss_Gorilla::Free()
 {
+    Safe_Release(m_pCage);
     __super::Free();
 }

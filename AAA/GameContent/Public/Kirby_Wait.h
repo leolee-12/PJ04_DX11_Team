@@ -2,8 +2,6 @@
 
 #include "Kirby_ControllableState.h"
 
-#include "GameContent_Defines.h"
-
 NS_BEGIN(Engine)
 NS_END
 

@@ -19,6 +19,8 @@ HRESULT CKirby_Deform_Car::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
+    m_wstrAttackModeName = L"자동차 머금기";
+
     Set_FullBodyAni(DEFORM_ANI::WAIT, "Idling", true, false, 0.1f, 1.5f);
     Set_FullBodyAni(DEFORM_ANI::RUN, "Moving", true, false, 0.1f, 1.5f);
 
@@ -28,7 +30,7 @@ HRESULT CKirby_Deform_Car::Initialize()
     Set_FullBodyAni(DEFORM_ANI::JUMP_START, "JumpStart", false, false, 0.1f, 1.5f);
     Set_FullBodyAni(DEFORM_ANI::JUMP, "Jump", false, false, 0.1f, 1.5f);
 
-    Set_FullBodyAni(DEFORM_ANI::DAMAGE, "Damage", false, false, 0.1f, 1.5f);
+    Set_FullBodyAni(DEFORM_ANI::DAMAGED, "Damage", false, false, 0.1f, 1.5f);
 
     m_fMaxBoostTime = 0.5f;
 
@@ -80,11 +82,10 @@ void CKirby_Deform_Car::Exit_AttackState(CKirby* pKirby)
 {
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pKirby->Get_Movement()->Set_MaxHorizontalSpeed(s_fCarSpeed);
-}
 
-void CKirby_Deform_Car::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
-{
-    // 달릴 때 충돌처리
+    Effect_Stop(m_pBoostGas1);
+    Effect_Stop(m_pBoostGas2);
+    Effect_Stop(m_pBoostWind);
 }
 
 _bool CKirby_Deform_Car::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -182,6 +183,11 @@ _bool CKirby_Deform_Car::Enter_Attack_KeyUp(CKirby* pKirby)
     return true;
 }
 
+void CKirby_Deform_Car::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+    // 달릴 때 충돌처리
+}
+
 void CKirby_Deform_Car::Change_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eNext)
 {
     if (m_eDeformCar_State == eNext)
@@ -250,8 +256,6 @@ void CKirby_Deform_Car::Update_DeformCarState(CKirby* pKirby, _float fTimeDelta)
             _vector vLook = pKirby->Get_Transform()->Get_State(STATE::LOOK);
             vLook = XMVector3Normalize(XMVectorSetY(vLook, 0.f));
 
-            const _float3 vCurVelocity = pMovement->Get_Velocity();
-
             _vector vBoostAcceleration = vLook * s_fBoostAcceleration;
             pMovement->Add_Acceleration(vBoostAcceleration);
 
@@ -302,6 +306,8 @@ void CKirby_Deform_Car::Exit_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eSt
             Effect_Stop(m_pBoostGas1);
             Effect_Stop(m_pBoostGas2);
             Effect_Stop(m_pBoostWind);
+
+            pModel->Stop_SoundHandle();
 
             break;
         case DEFORM_CAR_STATE::BOOST_END:

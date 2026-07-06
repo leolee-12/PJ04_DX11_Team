@@ -40,7 +40,7 @@ void CKirby_Attack::Update(CKirby* pKirby, const _float fTimeDelta)
     CKirby_AttackMode* pAttackMode = pKirby->Get_ActiveAttackMode();
     pAttackMode->Update_AttackState(pKirby, fTimeDelta);
 
-    if (pAttackMode->ReqEndAttackState() == true)
+    if (pAttackMode->Get_ReqEndAttackState() == true)
     {
         CMovement_Child* pMovement = pKirby->Get_Movement();
         

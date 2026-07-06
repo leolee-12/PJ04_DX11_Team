@@ -23,6 +23,8 @@ public:
     void Enable_AllHitBoxes(_bool b);
     _int Get_HitBoxCount() const { return (_int)m_HitBoxes.size(); }
 
+    void Set_HitBox_OnEnter(_int iIndex, std::function<void(CCollider*)> fn);
+
 protected:
     HRESULT Add_HitBox(_int iIndex, const _char* szBone, COLLIDER eShape,
         _float fRadius, _float fHeight,

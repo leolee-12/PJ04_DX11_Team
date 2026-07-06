@@ -36,7 +36,7 @@ HRESULT CAnimator::Initialize(void* pArg)
 }
 
 // ── 재생 제어 ──
-void CAnimator::Play(const string& strAnimName, _bool bLoop, _bool bRestart, _float fBlend, _float fSpeed, _bool bClearMask)
+void CAnimator::Play(const string& strAnimName, _bool bLoop, _bool bRestart, _float fBlend, _float fSpeed)
 {
     if (nullptr == m_pModel)
         return;
@@ -53,7 +53,7 @@ void CAnimator::Play(const string& strAnimName, _bool bLoop, _bool bRestart, _fl
     m_bFinished = false;
 
     m_PlayQueue.clear();
-    Start_Clip({ strAnimName, bLoop, bRestart, fBlend, fSpeed, bClearMask });
+    Start_Clip({ strAnimName, bLoop, bRestart, fBlend, fSpeed });
 }
 
 void CAnimator::Play(const ANI_PLAY_INFO* tAniInfo)
@@ -130,28 +130,38 @@ void CAnimator::TiltByProgress(const _char* szBone, _float fPeakDeg, _fvector vA
     SetBoneRotation(szBone, fAngle, vAxis);
 }
 
-void CAnimator::Set_Mask(const _char* szClip, const _char* szRootBone, _bool bLoop, _float fMaskTarget, _float fMaskBlendTime)
+void CAnimator::Set_Mask(const _char* szClip, const _char* szRootBone, _bool bLoop,
+    _float fTargetWeight, _float fWeightBlend, _float fClipBlend)
 {
     const _char* Roots[] = { szRootBone };
-    Set_Mask(szClip, Roots, 1, bLoop, fMaskTarget, fMaskBlendTime);
+    Set_Mask(szClip, Roots, 1, bLoop, fTargetWeight, fWeightBlend, fClipBlend);
 }
 
-void CAnimator::Set_Mask(const _char* szClip, const _char* const* pRoots, _uint iRootCount, _bool bLoop, _float fMaskTarget, _float fMaskBlendTime)
+void CAnimator::Set_Mask(const _char* szClip, const _char* const* pRoots, _uint iRootCount, _bool bLoop,
+    _float fTargetWeight, _float fWeightBlend, _float fClipBlend)
 {
-    // 임시 브릿지 역할
-    LAYER_PLAY_INFO tInfo;
+    LAYER_PLAY_INFO tInfo{};
+
     tInfo.iSlot = 1;
-    tInfo.tAnim.strAniName = (szClip != nullptr) ? szClip : "";
+
+    tInfo.tAnim.strAniName = szClip != nullptr ? szClip : "";
+
     tInfo.tAnim.bLoop = bLoop;
-    tInfo.fTargetWeight = fMaskTarget;
-    tInfo.fWeightBlend = fMaskBlendTime;
+    tInfo.tAnim.bRestart = false;
+    tInfo.tAnim.fBlend = fClipBlend;
+    tInfo.tAnim.fSpeed = 1.f;
+
+    tInfo.fTargetWeight = fTargetWeight;
+    tInfo.fWeightBlend = fWeightBlend;
 
     tInfo.Roots.reserve(iRootCount);
+
     for (_uint i = 0; i < iRootCount; ++i)
     {
-        const _char* sz = pRoots ? pRoots[i] : nullptr;
-        if (sz != nullptr)
-            tInfo.Roots.push_back(sz);
+        const _char* szRoot = pRoots != nullptr ? pRoots[i] : nullptr;
+
+        if (szRoot != nullptr)
+            tInfo.Roots.emplace_back(szRoot);
     }
 
     Apply_Overlay(tInfo);

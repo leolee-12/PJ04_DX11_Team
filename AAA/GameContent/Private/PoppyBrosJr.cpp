@@ -63,38 +63,6 @@ HRESULT CPoppyBrosJr::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CPoppyBrosJr::Priority_Update(_float fTimeDelta)
-{
-	if (!m_bActive)
-		return;
-
-	__super::Priority_Update(fTimeDelta);
-}
-
-void CPoppyBrosJr::Update(_float fTimeDelta)
-{
-	if (!m_bActive)
-		return;
-
-#ifdef _DEBUG
-	if (m_pGameInstance_Proxy->Is_EditMode())
-	{
-		if (m_pMovement) m_pMovement->Sync_To_Controller();
-		return;
-	}
-#endif
-
-	__super::Update(fTimeDelta);
-}
-
-void CPoppyBrosJr::Late_Update(_float fTimeDelta)
-{
-	if (!m_bActive)
-		return;
-
-	__super::Late_Update(fTimeDelta);
-}
-
 _bool CPoppyBrosJr::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
 {
 	Out.fRadius = { 0.5f };

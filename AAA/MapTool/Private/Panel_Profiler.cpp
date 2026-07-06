@@ -94,25 +94,26 @@ void CPanel_Profiler::Render()
 			Counter(Engine::EPROFILE_COUNTER::ENV_INSTANCE_FALLBACK));
 
 		const _uint iTextureRequests = Counter(Engine::EPROFILE_COUNTER::TEXTUREHUB_REQUEST);
-		const _uint iTextureReuse = Counter(Engine::EPROFILE_COUNTER::TEXTUREHUB_REUSE);
+		const _uint iTextureDeduped = Counter(Engine::EPROFILE_COUNTER::TEXTUREHUB_DEDUPED);
+		const _uint iTextureFirstLoad = Counter(Engine::EPROFILE_COUNTER::TEXTUREHUB_FIRST_LOAD_REQUEST);
 
 		ImGui::Separator();
-		ImGui::Text("Engine TextureHub (Frame):");
+		ImGui::Text("Engine TextureHub LoadOrGet (Frame):");
 		ImGui::Text("  cached SRV %u", Snapshot.iTextureHubCached);
-		ImGui::Text("  requests %u / reused %u / miss %u / failed %u",
+		ImGui::Text("  requests %u / deduped %u / first-load %u / failed %u",
 			iTextureRequests,
-			iTextureReuse,
-			Counter(Engine::EPROFILE_COUNTER::TEXTUREHUB_MISS),
+			iTextureDeduped,
+			iTextureFirstLoad,
 			Counter(Engine::EPROFILE_COUNTER::TEXTUREHUB_FAILED));
 
 		if (0 == iTextureRequests)
 		{
-			ImGui::Text("  reuse rate N/A");
+			ImGui::Text("  dedup rate N/A");
 		}
 		else
 		{
-			const _float fReuseRate = static_cast<_float>(iTextureReuse) / static_cast<_float>(iTextureRequests) * 100.f;
-			ImGui::Text("  reuse rate %.1f%%", fReuseRate);
+			const _float fDedupRate = static_cast<_float>(iTextureDeduped) / static_cast<_float>(iTextureRequests) * 100.f;
+			ImGui::Text("  dedup rate %.1f%%", fDedupRate);
 		}
 	}
 

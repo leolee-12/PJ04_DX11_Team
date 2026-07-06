@@ -75,12 +75,31 @@ void CMonster::Priority_Update(_float fTimeDelta)
 {
 	if (!m_bActive) return;
 	__super::Priority_Update(fTimeDelta);
+
+	if (m_fBodyCheckOffTime > 0.f)
+	{
+		m_fBodyCheckOffTime -= fTimeDelta;
+		if (m_fBodyCheckOffTime <= 0.f)
+		{
+			m_fBodyCheckOffTime = 0.f;
+			if (m_bHadBodyCheckTrait)
+				m_TraitFlags |= MT_BODYCHECK_DAMAGE;
+		}
+	}
 }
 
 void CMonster::Update(_float fTimeDelta)
 {
 	if (!m_bActive) return;
+
+	fTimeDelta = Filter_TimeDelta(fTimeDelta);
 #ifdef _DEBUG
+	if (m_pGameInstance_Proxy->Is_EditMode())
+	{
+		if (m_pMovement) m_pMovement->Sync_To_Controller();
+		return;
+	}
+
 	if (m_pGameInstance_Proxy->Key_Down(DIK_P) && m_pMovement && m_pMovement->Is_Grounded())
 		Change_State(MONSTER_STATE_TYPE::FLATTEN);
 #endif
@@ -280,6 +299,7 @@ void CMonster::SetUp_Collider_CallBack()
 				ATTACK_INFO atk{};
 				atk.fDamage = 10.f;
 				atk.fKnockback = 8.f;
+				atk.eHitType = HIT_TYPE::BODY_CONTACT;
 				XMStoreFloat3(&atk.vAttackerPos, vAtkPos);
 				atk.pAttacker = pOther->Get_Owner();
 				Damaged(atk);
@@ -412,6 +432,9 @@ HRESULT CMonster::Ready_State()
 
 void CMonster::On_Damaged(const ATTACK_INFO& tInfo)
 {
+	if (tInfo.eHitType != HIT_TYPE::BODY_CONTACT)
+		Open_BodyCheckBlock();
+
 	m_LastHit = { tInfo.vAttackerPos, tInfo.fKnockback, tInfo.fDamage };
 
 	//Play_OneShotSFX(L"CharaBasic_DamageReact_Normal.wav", 0.8f);
@@ -434,6 +457,9 @@ void CMonster::On_Damaged(const ATTACK_INFO& tInfo)
 
 void CMonster::On_Death(const ATTACK_INFO& tInfo)
 {
+	if (tInfo.eHitType != HIT_TYPE::BODY_CONTACT)
+		Open_BodyCheckBlock();
+
 	//  Movement 상태 안으로 이전
 	m_LastHit = { tInfo.vAttackerPos, tInfo.fKnockback, tInfo.fDamage };
 
@@ -577,6 +603,15 @@ void CMonster::Compute_SpatPivot()
 		(vMin.x + vMax.x) * 0.5f,
 		(vMin.y + vMax.y) * 0.5f,
 		(vMin.z + vMax.z) * 0.5f);
+}
+
+void CMonster::Open_BodyCheckBlock()
+{
+	if (m_fBodyCheckOffTime <= 0.f)
+		m_bHadBodyCheckTrait = Has_Trait(MT_BODYCHECK_DAMAGE);
+
+	m_TraitFlags &= ~MT_BODYCHECK_DAMAGE;
+	m_fBodyCheckOffTime = s_fBodyCheckOffDuration;
 }
 
 void CMonster::Update_SpatPivot_FromBone()

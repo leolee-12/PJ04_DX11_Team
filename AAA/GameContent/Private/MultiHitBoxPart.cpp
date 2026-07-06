@@ -28,7 +28,7 @@ void CMultiHitBoxPart::SetUp_HitBox_Callback(_int iIndex)
             ATTACK_INFO atk{};
             atk.fDamage = hb.fDamage;
             atk.fKnockback = hb.fKnockback;
-            XMStoreFloat3(&atk.vAttackerPos, m_pTransformCom->Get_State(STATE::POSITION));
+            atk.vAttackerPos = _float3(m_CombinedWorldMatrix._41, m_CombinedWorldMatrix._42, m_CombinedWorldMatrix._43);
             atk.pAttacker = this;
             pVictim->Damaged(atk);
         });
@@ -65,6 +65,12 @@ void CMultiHitBoxPart::Enable_AllHitBoxes(_bool b)
 {
     for (_int i = 0; i < (_int)m_HitBoxes.size(); ++i)
         Enable_HitBox(i, b);
+}
+
+void CMultiHitBoxPart::Set_HitBox_OnEnter(_int iIndex, std::function<void(CCollider*)> fn)
+{
+    if (iIndex < 0 || iIndex >= (_int)m_HitBoxes.size()) return;
+    m_HitBoxes[iIndex].pCollider->Set_OnEnter(std::move(fn));
 }
 
 HRESULT CMultiHitBoxPart::Add_HitBox(_int iIndex, const _char* szBone, COLLIDER eShape, _float fRadius, _float fHeight, _float fDamage, _float fKnockback, const _float3& vCenter, const _float3& vRadians)

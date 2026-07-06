@@ -1,11 +1,14 @@
 #include "Kirby_State.h"
 
 #include "GameInstance.h"
-#include "Movement_Child.h"
 
 #include "Kirby.h"
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
+
+#include "Movement_Child.h"
+
+#include "LevelDesign_Ladder.h"
 
 CKirby_State::CKirby_State()
 {
@@ -13,6 +16,9 @@ CKirby_State::CKirby_State()
 
 HRESULT CKirby_State::Initialize()
 {
+    m_pGameInstance_Proxy = CGameInstance::GetProxy();
+    if (m_pGameInstance_Proxy == nullptr)
+        return E_FAIL;
 
     return S_OK;
 }
@@ -37,6 +43,8 @@ void CKirby_State::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInf
 
     pKirby->Add_HP(-tInfo.fDamage);
     pKirby->Start_DamageInvincibility();
+
+    m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_DamageNormal.wav", 0.5f);
 
     pKirby->Change_State(KIRBY_STATE_TYPE::DAMAGED);
 }
@@ -93,6 +101,42 @@ _bool CKirby_State::Transition_Fall_OR_Wait_OR_Run(CKirby* pKirby)
     return Transition_Wait_OR_Run(pKirby);
 }
 
+_bool CKirby_State::Try_Transition_Ladder_CommandUp(CKirby* pKirby)
+{
+    // 있으면 충돌
+    CLevelDesign_Ladder* pLadder = pKirby->Get_Ladder();
+    if (pLadder == nullptr)
+        return false;
+
+    CTransform* pTransform = pKirby->Get_Transform();
+    _vector vPos = pTransform->Get_State(STATE::POSITION);
+
+    _int iCellIndex = pLadder->Get_NearestCellIndex(vPos);
+    if (pLadder->Is_TopCell(iCellIndex))
+        return false;
+
+    pKirby->Change_State(KIRBY_STATE_TYPE::LADDER);
+    return true;
+}
+
+_bool CKirby_State::Try_Transition_Ladder_CommandDown(CKirby* pKirby)
+{
+    // 있으면 충돌
+    CLevelDesign_Ladder* pLadder = pKirby->Get_Ladder();
+    if (pLadder == nullptr)
+        return false;
+
+    CTransform* pTransform = pKirby->Get_Transform();
+    _vector vPos = pTransform->Get_State(STATE::POSITION);
+
+    _int iCellIndex = pLadder->Get_NearestCellIndex(vPos);
+    if (pLadder->Is_BottomCell(iCellIndex))
+        return false;
+
+    pKirby->Change_State(KIRBY_STATE_TYPE::LADDER);
+    return true;
+}
+
 _bool CKirby_State::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
     // 전역 처리
@@ -100,28 +144,35 @@ _bool CKirby_State::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
     return false;
 }
 
-void CKirby_State::Request_GrabState(CKirby* pKirby, GRAB_TYPE eType)
+void CKirby_State::Request_GrabState(CKirby* pKirby, CUTSCENE_KIRBY_TYPE eType)
 {
     switch (eType)
     {
-        case GRAB_TYPE::GORILLA_SCENE:
+        case CUTSCENE_KIRBY_TYPE::GORILLA_SCENE:
         {
             pKirby->Change_State(KIRBY_STATE_TYPE::CUTSCENE_GRABBED);
             break;
         }
-        case GRAB_TYPE::GORILLA_COMBAT:
+        case CUTSCENE_KIRBY_TYPE::GORILLA_COMBAT:
         {
             pKirby->Change_State(KIRBY_STATE_TYPE::QTE_GRABBED);
+            break;
+        }
+        case CUTSCENE_KIRBY_TYPE::DEFORM_CAR_GET_FIRST:
+        {
+            pKirby->Change_State(KIRBY_STATE_TYPE::CAR_FIRST_BREAK_WALL);
             break;
         }
     }
 }
 
-void CKirby_State::Request_ReleaseGrabState(CKirby* pKirby, GRAB_TYPE eType)
+void CKirby_State::Request_ReleaseGrabState(CKirby* pKirby, CUTSCENE_KIRBY_TYPE eType)
 {
 }
 
 void CKirby_State::Free()
 {
+    Safe_Release(m_pGameInstance_Proxy);
+
     __super::Free();
 }

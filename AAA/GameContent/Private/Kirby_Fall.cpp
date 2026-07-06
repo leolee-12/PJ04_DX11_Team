@@ -1,13 +1,14 @@
 #include "Kirby_Fall.h"
 
 #include "GameInstance.h"
-#include "Movement_Child.h"
 
 #include "Kirby.h"
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
 
 #include "Kirby_Deform.h"
+
+#include "Movement_Child.h"
 
 CKirby_Fall::CKirby_Fall()
 {
@@ -67,7 +68,27 @@ _bool CKirby_Fall::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
     {
         // Move Press
         case KIRBY_COMMAND_TYPE::MOVE_TOP:
+        {
+            if (!pCommand->IsPress())
+                return false;
+
+            if (Try_Transition_Ladder_CommandUp(pKirby))
+                return true;
+
+            Handle_MoveCommand(pKirby, pCommand);
+            return true;
+        }
         case KIRBY_COMMAND_TYPE::MOVE_DOWN:
+        {
+            if (!pCommand->IsPress())
+                return false;
+
+            if (Try_Transition_Ladder_CommandDown(pKirby))
+                return true;
+
+            Handle_MoveCommand(pKirby, pCommand);
+            return true;
+        }
         case KIRBY_COMMAND_TYPE::MOVE_LEFT:
         case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
         {

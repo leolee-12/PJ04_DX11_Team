@@ -1,18 +1,16 @@
 #pragma once
 #include "GameContent_Defines.h"
-#include "Camera.h"
+#include "Camera_Shakeable.h"
 #include "Camera_AreaData.h"
 NS_BEGIN(Client)
 
-class CLIENT_DLL CCamera_AreaCam final : public CCamera
+class CLIENT_DLL CCamera_AreaCam final : public CCamera_Shakeable
 {
     GENERATED_BODY(CCamera_AreaCam)
 public:
     static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_CameraAreaCam";
     static constexpr const _float4  s_vSpotlightDarken = { 0.8f, 0.f, 0.f, 0.f };
     typedef struct tagAreaCamDesc final : public CCamera::CAMERA_DESC {
-        wstring strTargetLayer = L"Layer_Player";
-        wstring strTargetObj = L"Kirby";
         wstring strDataPath = L"../../Resources/YSH/CameraData/Level0_Stage1_Step01_cam.json";
     } AREACAM_DESC;
 private:
@@ -29,6 +27,18 @@ public:
     void    Begin_TransformZoom() { m_bTransZoom = true; }
     void    End_TransformZoom() { m_bTransZoom = false; }
     _bool   Is_TransformZoom() const { return m_bTransZoom; }
+    void Begin_Handoff(_fvector vEye, _fvector vAt, _float fFovyRad = -1.f)
+    {
+        XMStoreFloat3(&m_eyeCur, vEye);
+        XMStoreFloat3(&m_atCur, vAt);
+        m_eyeVel = {};
+        m_atVel = {};
+        m_bInit = true;
+        m_blendTimer = m_blendDur;            
+
+        if (fFovyRad > 0.f)
+            m_fFovCurDeg = XMConvertToDegrees(fFovyRad);  
+    }
 
 private:
     virtual HRESULT Ready_Events() override;
@@ -36,8 +46,9 @@ private:
 private:
     CAreaCameraSolver m_solver;
     CGameObject* m_pTarget = nullptr;
-    wstring           m_strTargetLayer, m_strTargetObj, m_strDataPath;
+    wstring      m_strDataPath;
     _float3 m_eyeCur = {}, m_atCur = {}, m_eyeVel = {}, m_atVel = {};
+    _float m_fFovCurDeg = { -1.f };
 
     //_float  m_smoothTime = 0.35f;
     _float m_smoothBase = { 0.35f };

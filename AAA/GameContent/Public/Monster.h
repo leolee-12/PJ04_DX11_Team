@@ -104,7 +104,7 @@ public:
 
 	virtual CAnimator*			Get_BodyAnimator() const { return nullptr; }
 
-	virtual _bool				Is_Touch_Harmful() const { return true; }
+	virtual _bool               Is_Touch_Harmful() const { return m_fBodyCheckOffTime <= 0.f; }
 
 	// 윤석현 추가
 	void						Enable_Controller(_bool bEnable);
@@ -147,6 +147,10 @@ protected:
 	_bool						m_bSFX2D = { false };
 
 	_float3						m_vSpatPivot = { 0.f, 0.f, 0.f };
+	_float                      m_fBodyCheckOffTime = { 0.f };
+	_bool                       m_bHadBodyCheckTrait = { false };
+
+	static constexpr _float     s_fBodyCheckOffDuration = 0.2f;         // 피격 후 몸박 차단 시간
 
 protected:
 	// 부모가 관리할 공통 파이프라인
@@ -177,6 +181,7 @@ protected:
 	_bool						Handle_SharedAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
 	void						Play_DeathFX();
 	void						Compute_SpatPivot();
+	void                        Open_BodyCheckBlock();
 	void						Update_SpatPivot_FromBone();
 
 protected:
@@ -190,7 +195,10 @@ protected:
 		Desc.pHitFlashColor = Get_HitFlashColorPtr();
 
 		if (FAILED(Add_PartObject(m_iPrototypeLevel, szProtoTag, szPartTag, &Desc)))
+		{
+			MSG_BOX("MonsterPart Add Failed");
 			return nullptr;
+		}
 
 		return dynamic_cast<TPart*>(m_PartObjects[szPartTag]);
 	}

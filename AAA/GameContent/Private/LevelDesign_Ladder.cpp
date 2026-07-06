@@ -178,12 +178,60 @@ CGameObject* CLevelDesign_Ladder::Create_Prototype(ID3D11Device* pDevice, ID3D11
 	return CLevelDesign_Ladder::Create(pDevice, pContext);
 }
 
+_int CLevelDesign_Ladder::Get_NearestCellIndex(_fvector vWorldPosition) const
+{
+	if (m_iTopCellIndex < m_iBottomCellIndex)
+		return -1;
+
+	// Convert the player's world position to ladder-local space.
+	const _matrix matWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+	const _matrix matInverse = XMMatrixInverse(nullptr, matWorld);
+	const _vector vLocalPosition = XMVector3TransformCoord(vWorldPosition, matInverse);
+
+	// Find the nearest cell index relative to the first cell.
+	const _float fLocalY = XMVectorGetY(vLocalPosition);
+	_int iCellIndex = static_cast<_int>(roundf((fLocalY - m_fBottomCellLocalY) / m_fCellSpacing));
+	Helper::IntClamp(iCellIndex, m_iBottomCellIndex, m_iTopCellIndex);
+
+	return iCellIndex;
+}
+
+_bool CLevelDesign_Ladder::Try_GetCellWorld(_int iCellIndex, _vector& vOutWorldPosition) const
+{
+	if (iCellIndex < m_iBottomCellIndex || iCellIndex > m_iTopCellIndex)
+		return false;
+
+	// Convert the cell index to a ladder-local position.
+	const _float fCellLocalY = m_fBottomCellLocalY + static_cast<_float>(iCellIndex) * m_fCellSpacing;
+	const _vector vLocalCellPosition = XMVectorSet(0.f, fCellLocalY, m_fClimbOffsetZ, 1.f);
+
+	// Transform the local cell position by the ladder world matrix.
+	const _matrix matWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+	vOutWorldPosition = XMVector3TransformCoord(vLocalCellPosition, matWorld);
+
+	return true;
+}
+
+_bool CLevelDesign_Ladder::Is_TopCell(_int iCellIndex) const
+{
+	return m_iTopCellIndex >= m_iBottomCellIndex && iCellIndex == m_iTopCellIndex;
+}
+
+_bool CLevelDesign_Ladder::Is_BottomCell(_int iCellIndex) const
+{
+	return m_iTopCellIndex >= m_iBottomCellIndex && iCellIndex == m_iBottomCellIndex;
+}
+
 HRESULT CLevelDesign_Ladder::Ready_Components()
 {
 	if (FAILED(Ready_RenderComponents()))
 		return E_FAIL;
 
 	if (FAILED(Resolve_SegmentStepY()))
+		return E_FAIL;
+
+	// Kirby 상호작용
+	if (FAILED(Calculate_TopBottomCellIndices()))
 		return E_FAIL;
 
 	if (FAILED(Ready_LadderCollider()))
@@ -311,6 +359,20 @@ HRESULT CLevelDesign_Ladder::Render_Model(CModel* pModel)
 		if (FAILED(pModel->Render(i)))
 			return E_FAIL;
 	}
+
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Ladder::Calculate_TopBottomCellIndices()
+{
+	if (m_tLadderDesc.iLength == 0 || m_fSegmentStepY <= 0.f)
+		return E_FAIL;
+
+	// 모델 세그먼트 하나를 이동 셀 한 칸으로 사용한다.
+	m_fCellSpacing = m_fSegmentStepY;
+
+	m_iBottomCellIndex = 0;
+	m_iTopCellIndex = static_cast<_int>(m_tLadderDesc.iLength) - 1;
 
 	return S_OK;
 }

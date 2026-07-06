@@ -76,6 +76,8 @@ HRESULT CKirby::Initialize(void* pArg)
     if (FAILED(Ready_AnimEvents()))
         return E_FAIL;  
 
+    m_fInvincibleDuration = 2.f;
+
     return S_OK;
 }
 
@@ -92,9 +94,15 @@ void CKirby::Update(_float fTimeDelta)
     if (m_pKirby_StateMachine->Ignore_TimeScale_StateMachine())
         fTimeDelta = m_pGameInstance_Proxy->Get_RawTimeDelta(L"Timer_60");
 
-    XMStoreFloat3(&m_vWishDir, XMVectorZero());
+    if (m_pGameInstance_Proxy->Key_Down(DIK_F3))
+    {
+        CUTSCENE_GRAB_DESC desc{};
+        desc.eType = CUTSCENE_KIRBY_TYPE::DEFORM_CAR_GET_FIRST;
 
-    Update_Timer(fTimeDelta);
+        m_pGameInstance_Proxy->Publish(EventTag::Cutscene_KirbyStart, &desc);
+    }
+
+    XMStoreFloat3(&m_vWishDir, XMVectorZero());
 
     m_pKirby_InputManager->Update_KirbyInput(fTimeDelta);
     m_pKirby_Controller->Update_KirbyController(fTimeDelta);
@@ -140,7 +148,7 @@ void CKirby::Late_Update(_float fTimeDelta)
 #endif
     }
 
-    Update_BlobShadow();
+    //Update_BlobShadow();
 }
 
 HRESULT CKirby::Render()
@@ -273,6 +281,14 @@ CKirby_AttackMode* CKirby::Get_ActiveAttackMode()
         return m_pKirby_Deform;
     else
         return m_pKirby_Ability;
+}
+
+CKirby_Deform_Model* CKirby::Get_CurrentDeformModel()
+{
+    if (Has_Deform())
+        return Get_DeformPart_Model(m_pKirby_Deform->Get_DeformType());
+    else
+        return m_pBody;
 }
 
 CKirby_Ability* CKirby::Get_KirbyAbility()
@@ -469,20 +485,29 @@ void CKirby::SetUp_Collider_Callback()
                     OutputDebugStringA(szBuf);
 #endif
                 }
-
-                else if (iGroup == ETOUI(COLLISION_LAYER::ENV_LADDER))
-                {
-                    CLevelDesign_Ladder* pLadder = dynamic_cast<CLevelDesign_Ladder*>(pOther->Get_Owner());
-                    if (pLadder == nullptr)
-                        return;
-
-                    Set_Ladder(pLadder);
-                }
             }
         );
     }
 
-    m_KirbyColliders[HURT_BOX]->Set_OnExit(
+    m_KirbyColliders[HURT_BOX]->Set_OnStay
+    (
+        [this](CCollider* pOther)
+        {
+            const _uint iGroup = pOther->Get_RegisteredGroup();
+
+            if (iGroup == ETOUI(COLLISION_LAYER::ENV_LADDER))
+            {
+                CLevelDesign_Ladder* pLadder = dynamic_cast<CLevelDesign_Ladder*>(pOther->Get_Owner());
+                if (pLadder == nullptr)
+                    return;
+
+                Set_Ladder(pLadder);
+            }
+        }
+    );
+
+    m_KirbyColliders[HURT_BOX]->Set_OnExit
+    (
         [this](CCollider* pOther)
         {
             const _uint iGroup = pOther->Get_RegisteredGroup();
@@ -492,7 +517,8 @@ void CKirby::SetUp_Collider_Callback()
                 Clear_Ladder();
                 return;
             }
-        });
+        }
+    );
 }
 
 HRESULT CKirby::Ready_PartObjects()
@@ -622,7 +648,7 @@ HRESULT CKirby::Ready_Events()
         }
     );
 
-    Subscribe_Event(EventTag::Cutscene_GrabKirby,
+    Subscribe_Event(EventTag::Cutscene_KirbyStart,
         [this](void* pData)
         {
             CUTSCENE_GRAB_DESC* pDesc = static_cast<CUTSCENE_GRAB_DESC*>(pData);
@@ -638,7 +664,7 @@ HRESULT CKirby::Ready_Events()
         });
 
     Subscribe_Event(EventTag::Cutscene_ReleaseKirby,
-        [this](void*)
+        [this](void* pData)
         {
             Clear_CutsceneGrabTarget();
             m_pKirby_StateMachine->Request_ReleaseGrabState_StateMachine();
@@ -663,7 +689,7 @@ HRESULT CKirby::Ready_AnimEvents()
 
 _bool CKirby::Block_Hit(const ATTACK_INFO& tInfo) 
 { 
-    return m_fInvincibleTime > 0.f; 
+    return Is_Invincible();
 }
 
 void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
@@ -671,21 +697,27 @@ void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
     m_pKirby_StateMachine->On_Damaged_KirbyStateMachine(tInfo);
 }
 
-void CKirby::Update_Timer(_float fTimeDelta)
-{
-    if (m_fInvincibleTime > 0.f)
-        m_fInvincibleTime -= fTimeDelta;
-}
-
 void CKirby::Set_CutsceneGrabTarget(CUTSCENE_GRAB_DESC* pGrabDesc)
 {
+    //if (pGrabDesc->eType == CUTSCENE_KIRBY_TYPE::DEFORM_CAR_GET_FIRST)
+    //{
+    //    CUTSCENE_CAMERA_DESC cam{};
+    //    cam.eCam = ECutsceneCam::Cutscene;
+    //    cam.szTrack = L"DeformCarGetFirst_camera1";
+    //    cam.pProgress = Get_DeformPart_Model(DEFORM_TYPE::CAR)->Get_Animator();
+    //    cam.pAnchorWorld = m_pTransformCom->Get_WorldMatrixPtr();
+    //    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+    //}
+    m_vBaseScale = Get_Transform()->Get_Scaled();
     m_pGrabBone = pGrabDesc->pBoneMatrix;
     m_pGrabOwnerWorld = pGrabDesc->pSourceWorld;
 }
 
 void CKirby::Clear_CutsceneGrabTarget()
 {
-    m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.f);
+    m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(m_vBaseScale.x, 0.f, 0.f, 0.f));
+    m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, m_vBaseScale.y, 0.f, 0.f));
+    m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, m_vBaseScale.z, 0.f));
 
     m_pGrabBone = nullptr;
     m_pGrabOwnerWorld = nullptr;
@@ -722,7 +754,7 @@ void CKirby::Update_InvincibilityHitFlash()
         return;
     }
 
-    const _float fInvincibilityElapsedTime = s_fInvincibleDuration - m_fInvincibleTime;
+    const _float fInvincibilityElapsedTime = m_fInvincibleDuration - m_fInvincibleTime;
 
     constexpr _float fInitialFlashDuration = 0.12f;
     if (fInvincibilityElapsedTime < fInitialFlashDuration)
@@ -779,7 +811,8 @@ void CKirby::Update_CutsceneGrabTransform()
     if (m_pGrabBone == nullptr || m_pGrabOwnerWorld == nullptr)
         return;
 
-    _matrix matGrabTargetWorld = XMMatrixRotationY(XMConvertToRadians(-180.f)) * XMLoadFloat4x4(m_pGrabBone) * XMLoadFloat4x4(m_pGrabOwnerWorld);
+    _matrix matGrabTargetWorld = XMMatrixRotationY(XMConvertToRadians(-180.f))
+        * XMLoadFloat4x4(m_pGrabBone) * XMLoadFloat4x4(m_pGrabOwnerWorld);
     Get_Transform()->Set_WorldMatrix(matGrabTargetWorld);
 
     m_pMovement->Sync_To_Controller();
@@ -791,7 +824,10 @@ void CKirby::Damaged(const ATTACK_INFO& tInfo)
         return;
 
     if (Block_Hit(tInfo))
+    {
+        m_pGameInstance_Proxy->Play_SFX(L"CharaBasic_DamageReact_Normal.wav", 0.5f);
         return;
+    }
 
     On_Damaged(tInfo);
 

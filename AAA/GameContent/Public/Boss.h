@@ -36,8 +36,6 @@ protected:
     virtual void  On_Enter_Corpse() override;     // ∫∏Ω∫ ªÁ∏¡(»Ì¿‘»≠ X) + Boss_Died
     void          Publish_Boss_Died();
 
-   
-
 private:
     void Check_PhaseTransition();
 

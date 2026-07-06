@@ -1,11 +1,12 @@
 #include "Kirby_ControllableState.h"
 
 #include "GameInstance.h"
-#include "Movement_Child.h"
 
 #include "Kirby.h"
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
+
+#include "Movement_Child.h"
 
 CKirby_ControllableState::CKirby_ControllableState()
 {

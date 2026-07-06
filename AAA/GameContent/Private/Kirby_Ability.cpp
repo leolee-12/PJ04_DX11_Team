@@ -14,7 +14,10 @@ CKirby_Ability::CKirby_Ability()
 
 HRESULT CKirby_Ability::Initialize()
 {
-    m_tAniInfos.resize(ETOUI(ABILITY_ANI::END));
+    if (FAILED(__super::Initialize()))
+        return E_FAIL;
+
+    m_AniInfos.resize(ETOUI(ABILITY_ANI::END));
 
     Set_FullBodyAni(ABILITY_ANI::WAIT, "Wait", true, false, 0.1f, 1.8f);
     Set_FullBodyAni(ABILITY_ANI::RUN, "Run", true, false, 0.1f, 3.5f);
@@ -47,7 +50,7 @@ HRESULT CKirby_Ability::Initialize()
 
 const CAnimator::ANI_PLAY_INFO* CKirby_Ability::Get_AniInfo(ABILITY_ANI eAbilityAni)
 {
-    return &m_tAniInfos[ETOUI(eAbilityAni)].tBaseAniInfo;
+    return &m_AniInfos[ETOUI(eAbilityAni)].tBaseAniInfo;
 }
 
 void CKirby_Ability::Play_AbilityAni(CKirby* pKirby, ABILITY_ANI eAbilityAni)
@@ -55,32 +58,18 @@ void CKirby_Ability::Play_AbilityAni(CKirby* pKirby, ABILITY_ANI eAbilityAni)
     CKirby_Body* pBody = pKirby->Get_Body();
     CAnimator* pAnimator = pBody->Get_Animator();
 
-    const ABILITY_ANI_DESC& tDesc = m_tAniInfos[ETOUI(eAbilityAni)];
+    const KIRBY_TYPE_ANI_DESC& tDesc = m_AniInfos[ETOUI(eAbilityAni)];
 
     pAnimator->Play(&tDesc.tBaseAniInfo);
 
-    if (tDesc.ePlayType == ABILITY_ANI_PLAY_TYPE::OVERLAY)
-    {
-        pAnimator->Set_Mask(
-            tDesc.tOverlayAniInfo.strAniName.c_str(),
-            tDesc.strOverlayRootBone.c_str(),
-            tDesc.tOverlayAniInfo.bLoop,
-            tDesc.fOverlayWeight,
-            tDesc.fOverlayBlend
-        );
-    }
-}
-
-void CKirby_Ability::Clear_Overlay(CKirby* pKirby, _uint iSlot, _float fOverlayBlendTime)
-{
-    pKirby->Get_Body()->Get_Animator()->Clear_Overlay(iSlot, fOverlayBlendTime);
+    if (tDesc.ePlayType == ANI_PLAY_TYPE::OVERLAY)
+        pAnimator->Apply_Overlay(tDesc.tLayerAniInfo);
 }
 
 void CKirby_Ability::Set_FullBodyAni(ABILITY_ANI eAni, const _string& strAniName, _bool bLoop, _bool bRestart, _float fBlend, _float fSpeed)
 {
-    ABILITY_ANI_DESC& desc = m_tAniInfos[ETOUI(eAni)];
-
-    desc.ePlayType = ABILITY_ANI_PLAY_TYPE::FULL_BODY;
+    KIRBY_TYPE_ANI_DESC& desc = m_AniInfos[ETOUI(eAni)];
+    desc.ePlayType = ANI_PLAY_TYPE::FULL_BODY;
 
     desc.tBaseAniInfo.strAniName = strAniName;
     desc.tBaseAniInfo.bLoop = bLoop;
@@ -90,30 +79,32 @@ void CKirby_Ability::Set_FullBodyAni(ABILITY_ANI eAni, const _string& strAniName
 }
 
 void CKirby_Ability::Set_OverlayAni(ABILITY_ANI eAni, const _string& strBaseAniName, const _string& strOverlayAniName, const _string& strRootBone,
-    _bool bBaseLoop, _bool bBaseRestart, _float fBaseSpeed, _float fBaseBlend, _bool bBaseClearMask,
-    _bool bOverlayLoop, _bool bOverlayRestart, _float fOverlaySpeed, _float fOverlaysBlend)
+    _bool bBaseLoop, _bool bBaseRestart, _float fBaseSpeed, _float fBaseBlend,
+    _bool bOverlayLoop, _bool bOverlayRestart, _float fOverlaySpeed, _float fTargetWeight, _float fWeightBlendTime,
+    _float fOverlayClipBlend)
 {
-    ABILITY_ANI_DESC& desc = m_tAniInfos[ETOUI(eAni)];
+    KIRBY_TYPE_ANI_DESC& desc = m_AniInfos[ETOUI(eAni)];
 
-    desc.ePlayType = ABILITY_ANI_PLAY_TYPE::OVERLAY;
+    desc.ePlayType = ANI_PLAY_TYPE::OVERLAY;
 
     desc.tBaseAniInfo.strAniName = strBaseAniName;
     desc.tBaseAniInfo.bLoop = bBaseLoop;
     desc.tBaseAniInfo.bRestart = bBaseRestart;
     desc.tBaseAniInfo.fBlend = fBaseBlend;
     desc.tBaseAniInfo.fSpeed = fBaseSpeed;
-    desc.tBaseAniInfo.bClearMask = bBaseClearMask;
 
-    desc.tOverlayAniInfo.strAniName = strOverlayAniName;
-    desc.tOverlayAniInfo.bLoop = bOverlayLoop;
-    desc.tOverlayAniInfo.bRestart = bOverlayRestart;
-    desc.tOverlayAniInfo.fBlend = fOverlaysBlend;
-    desc.tOverlayAniInfo.fSpeed = fOverlaySpeed;
-    desc.tOverlayAniInfo.bClearMask = bBaseClearMask;
+    CAnimator::LAYER_PLAY_INFO& tLayer = desc.tLayerAniInfo;
 
-    desc.strOverlayRootBone = strRootBone;
-    desc.fOverlayWeight = 1.f;
-    desc.fOverlayBlend = fOverlaysBlend;
+    tLayer.iSlot = 1;
+    tLayer.tAnim.strAniName = strOverlayAniName;
+    tLayer.tAnim.bLoop = bOverlayLoop;
+    tLayer.tAnim.bRestart = bOverlayRestart;
+    tLayer.tAnim.fBlend = fOverlayClipBlend;
+    tLayer.tAnim.fSpeed = fOverlaySpeed;
+
+    tLayer.Roots = { strRootBone };
+    tLayer.fTargetWeight = fTargetWeight;
+    tLayer.fWeightBlend = fWeightBlendTime;
 }
 
 void CKirby_Ability::Free()

@@ -21,6 +21,7 @@ private:
 public:
     virtual HRESULT Initialize(const CBounding::BOUNDING_DESC* pBoundingDesc) override;
     virtual void    Update(_fmatrix TransformMatrix) override;
+    virtual void    Reset_Desc(const CBounding::BOUNDING_DESC* pDesc) override;
     virtual _bool   Intersect(COLLIDER eTargetType, CBounding* pBounding) override;
 
     // 다른 bounding의 switch가 호출하는 진입점(캡슐 수학을 여기 한 곳에)
