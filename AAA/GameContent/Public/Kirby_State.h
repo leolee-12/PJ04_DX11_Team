@@ -2,11 +2,12 @@
 
 #include "Base.h"
 
-#include "GameContent_Defines.h"
+#include "GameContent_const.h"
 
 #include "Kirby_Command.h"
 
 NS_BEGIN(Engine)
+class CGameInstance_Proxy;
 NS_END
 
 NS_BEGIN(Client)
@@ -24,8 +25,8 @@ enum class KIRBY_STATE_TYPE
 	DAMAGED,
 	GUARD,
 	LADDER,
-	CUTSCENE_GRABBED, QTE_GRABBED,
 	GET_DEFORM,
+	CUTSCENE_GRABBED, QTE_GRABBED, CAR_FIRST_BREAK_WALL
 };
 
 class CLIENT_DLL CKirby_State abstract : public CBase
@@ -56,12 +57,15 @@ protected:
 	_bool Transition_Wait_OR_Run(CKirby* pKirby);
 	_bool Transition_Fall_OR_Wait_OR_Run(CKirby* pKirby);
 
+protected:
+	CGameInstance_Proxy* m_pGameInstance_Proxy{};
+
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand);
 
 public:
-	virtual void Request_GrabState(CKirby* pKirby, GRAB_TYPE eType);
-	virtual void Request_ReleaseGrabState(CKirby* pKirby, GRAB_TYPE eType);
+	virtual void Request_GrabState(CKirby* pKirby, CUTSCENE_KIRBY_TYPE eType);
+	virtual void Request_ReleaseGrabState(CKirby* pKirby, CUTSCENE_KIRBY_TYPE eType);
 
 	virtual _bool Ignore_TimeScale() { return false; }
 

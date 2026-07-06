@@ -184,14 +184,14 @@ using LD_OBJECT_ENTRY = variant<LD_PARSED_OBJECT, LD_BREAKABLE_DESC, LD_LADDER_D
 
 inline const LD_OBJECT_DESC& Get_LDObjectDesc(const LD_OBJECT_ENTRY& Entry)
 {
-	const auto ToBaseDesc = [](const auto& Desc) -> const LD_OBJECT_DESC& { return static_cast<const LD_OBJECT_DESC&>(Desc);; };
+	const auto ToBaseDesc = [](const auto& Desc) -> const LD_OBJECT_DESC& { return static_cast<const LD_OBJECT_DESC&>(Desc); };
 
 	return std::visit(ToBaseDesc, Entry);
 }
 
 inline LD_OBJECT_DESC& Get_LDObjectDesc(LD_OBJECT_ENTRY& Entry)
 {
-	const auto ToBaseDesc = [](auto& Desc) -> LD_OBJECT_DESC& { return static_cast<LD_OBJECT_DESC&>(Desc);; };
+	const auto ToBaseDesc = [](auto& Desc) -> LD_OBJECT_DESC& { return static_cast<LD_OBJECT_DESC&>(Desc); };
 
 	return std::visit(ToBaseDesc, Entry);
 }

@@ -17,10 +17,6 @@ HRESULT CKirby_Guard::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
-    m_pGameInstance_Proxy = CGameInstance::GetProxy();
-    if (m_pGameInstance_Proxy == nullptr)
-        return E_FAIL;
-
     return S_OK;
 }
 
@@ -120,7 +116,5 @@ CKirby_Guard* CKirby_Guard::Create()
 
 void CKirby_Guard::Free()
 {
-    Safe_Release(m_pGameInstance_Proxy);
-
     __super::Free();
 }

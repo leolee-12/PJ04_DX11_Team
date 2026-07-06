@@ -1,8 +1,8 @@
 #include "Culling_Manager.h"
-#include "Culling_Util.h"
+#include "Geometry_Utils.h"
+#include "Math_Utils.h"
 #include "Profiler_Manager.h"
 #include "GameInstance.h"
-#include <cmath>
 
 NS_BEGIN(Engine)
 
@@ -11,27 +11,6 @@ namespace
 	inline _bool Is_ValidViewIndex(CULLING_VIEW eView)
 	{
 		return ETOUI(eView) < ETOUI(CULLING_VIEW::END);
-	}
-
-	inline _bool Is_FiniteFloat(_float fValue)
-	{
-		return std::isfinite(fValue);
-	}
-
-	inline _bool Is_ValidFloat3(const _float3& vValue)
-	{
-		return Is_FiniteFloat(vValue.x)
-			&& Is_FiniteFloat(vValue.y)
-			&& Is_FiniteFloat(vValue.z);
-	}
-
-	inline _bool Is_ValidBoundingBox(const BoundingBox& Bounds)
-	{
-		return Is_ValidFloat3(Bounds.Center)
-			&& Is_ValidFloat3(Bounds.Extents)
-			&& Bounds.Extents.x >= 0.f
-			&& Bounds.Extents.y >= 0.f
-			&& Bounds.Extents.z >= 0.f;
 	}
 
 	inline void Reset_ViewState(CCulling_Manager::FRUSTUM_VIEW_STATE* pState)
@@ -118,7 +97,7 @@ _bool CCulling_Manager::Update_View(CULLING_VIEW eView, const CULLING_VIEW_DESC&
 
 	State.bValid = true;
 
-	if (Is_FiniteFloat(Desc.fCullMargin) && Desc.fCullMargin > 0.f)
+	if (MathUtils::Is_FiniteFloat(Desc.fCullMargin) && Desc.fCullMargin > 0.f)
 		State.fCullMargin = Desc.fCullMargin;
 
 	return true;
@@ -158,10 +137,10 @@ _bool XM_CALLCONV CCulling_Manager::IsIn_WorldSpace(CULLING_VIEW eView, _fvector
 	_float3 vCenter{};
 	XMStoreFloat3(&vCenter, vWorldPos);
 
-	if (!Is_ValidFloat3(vCenter))
+	if (!MathUtils::Is_ValidFloat3(vCenter))
 		return true;
 
-	if (!Is_FiniteFloat(fRange))
+	if (!MathUtils::Is_FiniteFloat(fRange))
 		return true;
 
 	BoundingSphere WorldSphere{};
@@ -190,7 +169,7 @@ _bool CCulling_Manager::IsIn_WorldSpace_AABB(CULLING_VIEW eView, const BoundingB
 		return true;
 	}
 
-	if (!Is_ValidBoundingBox(WorldBounds))
+	if (!GeometryUtils::Is_ValidAABB(WorldBounds))
 	{
 #ifdef _DEBUG
 		++Stats.iInvalidBoundsFailOpen;
@@ -204,7 +183,7 @@ _bool CCulling_Manager::IsIn_WorldSpace_AABB(CULLING_VIEW eView, const BoundingB
 
 	BoundingBox ExpandedBounds = WorldBounds;
 	if (State.fCullMargin > 0.f)
-		CCulling_Util::Expand_AABB(&ExpandedBounds, State.fCullMargin);
+		GeometryUtils::Expand_AABB(&ExpandedBounds, State.fCullMargin);
 
 	const _bool bVisible = State.WorldFrustum.Intersects(ExpandedBounds);
 
@@ -245,7 +224,7 @@ _bool CCulling_Manager::Should_CullAABB(CULLING_VIEW eView, const BoundingBox& W
 		return false;
 	}
 
-	if (!Is_ValidBoundingBox(WorldBounds))
+	if (!GeometryUtils::Is_ValidAABB(WorldBounds))
 	{
 		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_FAIL_OPEN_INVALID_BOUNDS, 1);
 
@@ -282,21 +261,21 @@ _bool CCulling_Manager::Should_CullByDistance(const BoundingBox& WorldBounds, _f
 
 	const _float4* pCamPos = m_pProxy->Get_CamPosition();
 	if (nullptr == pCamPos
-		|| !Is_FiniteFloat(pCamPos->x)
-		|| !Is_FiniteFloat(pCamPos->y)
-		|| !Is_FiniteFloat(pCamPos->z))
+		|| !MathUtils::Is_FiniteFloat(pCamPos->x)
+		|| !MathUtils::Is_FiniteFloat(pCamPos->y)
+		|| !MathUtils::Is_FiniteFloat(pCamPos->z))
 	{
 		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_FAIL_OPEN_INVALID_CAMERA, 1);
 		return false;
 	}
 
-	if (!Is_FiniteFloat(fCullDistance) || fCullDistance < 0.f)
+	if (!MathUtils::Is_FiniteFloat(fCullDistance) || fCullDistance < 0.f)
 	{
 		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_FAIL_OPEN_INVALID_DISTANCE, 1);
 		return false;
 	}
 
-	if (!Is_ValidFloat3(WorldBounds.Center) || !Is_ValidFloat3(WorldBounds.Extents))
+	if (!MathUtils::Is_ValidFloat3(WorldBounds.Center) || !MathUtils::Is_ValidFloat3(WorldBounds.Extents))
 	{
 		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_FAIL_OPEN_INVALID_BOUNDS, 1);
 		return false;
@@ -304,7 +283,14 @@ _bool CCulling_Manager::Should_CullByDistance(const BoundingBox& WorldBounds, _f
 
 	PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_TESTED, 1);
 
-	const _bool bCull = CCulling_Util::Check_CullByDistance(WorldBounds, *pCamPos, fCullDistance);
+	const _vector vCam = XMLoadFloat4(pCamPos);
+	const _vector vCenter = XMLoadFloat3(&WorldBounds.Center);
+	const _vector vExtents = XMLoadFloat3(&WorldBounds.Extents);
+
+	const _float fCenterDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vCenter, vCam)));
+	const _float fBoundsRadius = XMVectorGetX(XMVector3Length(vExtents));
+	const _float fSurfaceDistance = (fCenterDistance > fBoundsRadius) ? (fCenterDistance - fBoundsRadius) : 0.f;
+	const _bool bCull = fSurfaceDistance >= fCullDistance;
 
 	PROFILE_COUNTER_ADD(
 		bCull ? EPROFILE_COUNTER::DISTANCE_CULLED : EPROFILE_COUNTER::DISTANCE_VISIBLE,

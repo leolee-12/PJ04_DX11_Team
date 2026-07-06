@@ -112,7 +112,8 @@ HRESULT CBoss_Stage1::Ready_Events()
 
     });
 
-    Subscribe_Event(EventTag::Cutscene_ReleaseKirby, [this](void* p) {
+
+    Subscribe_Event(EventTag::Cutscene_KirbyStart, [this](void* p) {
         m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_Boss1.marker.wav", 3.f, 0.5f);
         });
 

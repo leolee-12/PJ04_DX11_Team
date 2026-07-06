@@ -17,10 +17,6 @@ HRESULT CKirby_GetAbility::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
-    m_pGameInstance_Proxy = CGameInstance::GetProxy();
-    if (m_pGameInstance_Proxy == nullptr)
-        return E_FAIL;
-
     return S_OK;
 }
 
@@ -89,10 +85,6 @@ void CKirby_GetAbility::Exit(CKirby* pKirby)
     m_pGameInstance_Proxy->Set_TimeScale(1.f);
 }
 
-void CKirby_GetAbility::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
-{
-}
-
 _bool CKirby_GetAbility::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
     if (__super::Handle_Command(pKirby, pCommand))
@@ -107,6 +99,10 @@ _bool CKirby_GetAbility::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand
     //}
 
     return false;
+}
+
+void CKirby_GetAbility::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
 }
 
 void CKirby_GetAbility::Parts_On(CKirby* pKirby, _float fRatio)
@@ -160,7 +156,5 @@ CKirby_GetAbility* CKirby_GetAbility::Create()
 
 void CKirby_GetAbility::Free()
 {
-    Safe_Release(m_pGameInstance_Proxy);
-
     __super::Free();
 }

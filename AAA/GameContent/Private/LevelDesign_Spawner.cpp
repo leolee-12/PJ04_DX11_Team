@@ -104,6 +104,9 @@ HRESULT CLevelDesign_Spawner::Spawn_One(const LD_OBJECT_ENTRY& Desc, const LD_SP
 		return E_FAIL;
 	}
 
+	if (Resolved.bFallback && nullptr != pInOutReport)
+		++pInOutReport->iFallbackSpecCount;
+
 	const LD_SPAWN_SPEC& Spec = Resolved.Spec;
 	Apply_ModelProtoLevel(&Resolved.ObjectDesc, Request.Levels.iModelPrototypeLevel);
 	const LD_OBJECT_DESC& SpawnDesc = Get_LDObjectDesc(Resolved.ObjectDesc);

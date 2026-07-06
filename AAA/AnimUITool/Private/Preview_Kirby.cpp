@@ -40,7 +40,7 @@ HRESULT CPreview_Kirby::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	m_pAnimatorCom->Play("Wait", true, true, 0.2f, 1.0f, false);
+	m_pAnimatorCom->Play("Wait", true, true, 0.2f, 1.0f);
 	
 	return S_OK;
 }

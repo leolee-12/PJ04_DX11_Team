@@ -12,6 +12,7 @@
 #include "LD_Stage1BossDemo.h"
 #include "LD_SlopeBoardA.h"
 #include "LD_SlopeBoardC.h"
+#include "LD_DeformCarBreakWall.h"
 #include "LevelDesign_MonsterCatalog.h"
 
 #include <cwctype>
@@ -254,6 +255,7 @@ void CLevelDesign_Registry::Register_EnemiesAndGimmicks()
 	CLD_Stage1BossDemo::Register_LevelDesignSpecs();
 	CLD_SlopeBoardA::Register_LevelDesignSpecs();
 	CLD_SlopeBoardC::Register_LevelDesignSpecs();
+	CLD_DeformCarBreakWall::Register_LevelDesignSpecs();
 	Register_Unsupported(L"ArrowBoard", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
 }
 

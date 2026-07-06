@@ -29,13 +29,18 @@ void CKirby_QTE_Grabbed::Enter(CKirby* pKirby)
 {
     __super::Enter(pKirby);
 
+    m_fQTE_TimeLimit = s_fQTE_GorillaLimit;
+    m_iQTE_InputCount = 0;
+    m_iQTE_RequiredCount = 20;
+    m_bPublishedEvent = false;
+
     // Ani
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
     pAbility->Clear_Overlay(pKirby, 1, 0.1f);
 
     CKirby_Body* pBody = pKirby->Get_Body();
     CAnimator* pAnimator = pBody->Get_Animator();
-    pAnimator->Play("Damage", true, false, 0.1f, 2.f, true);
+    pAnimator->Play("Damage", true, false, 0.1f, 2.f);
 
     pBody->Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);
 
@@ -51,7 +56,9 @@ void CKirby_QTE_Grabbed::Enter(CKirby* pKirby)
 void CKirby_QTE_Grabbed::Update(CKirby* pKirby, const _float fTimeDelta)
 {
     __super::Update(pKirby, fTimeDelta);
+
     Update_QTEGrabbedState(pKirby, fTimeDelta);
+
     pKirby->Update_CutsceneGrabTransform();
 }
 
@@ -69,16 +76,27 @@ _bool CKirby_QTE_Grabbed::Handle_Command(CKirby* pKirby, CKirby_Command* pComman
 
     KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
 
-    //switch (eCommandType)
-    //{
-    //    default:
-    //        break;
-    //}
+    switch (eCommandType)
+    {
+        // Move Press
+        case KIRBY_COMMAND_TYPE::MOVE_TOP:
+        case KIRBY_COMMAND_TYPE::MOVE_DOWN:
+        case KIRBY_COMMAND_TYPE::MOVE_LEFT:
+        case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
+        {
+            if (!pCommand->IsDown())
+                return false;
+
+            ++m_iQTE_InputCount;
+
+            return true;
+        }
+    }
 
     return false;
 }
 
-void CKirby_QTE_Grabbed::Request_ReleaseGrabState(CKirby* pKirby, GRAB_TYPE eType)
+void CKirby_QTE_Grabbed::Request_ReleaseGrabState(CKirby* pKirby, CUTSCENE_KIRBY_TYPE eType)
 {
     Change_QTEGrabbedState(pKirby, QTE_GRABBED_STATE::ESCAPE);
 }
@@ -97,7 +115,7 @@ void CKirby_QTE_Grabbed::Change_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STAT
 
 void CKirby_QTE_Grabbed::Enter_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE eState)
 {
-    switch (m_eQTEGrabbedState)
+    switch (eState)
     {
         case QTE_GRABBED_STATE::START:
         {
@@ -118,7 +136,7 @@ void CKirby_QTE_Grabbed::Enter_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE
             pMovement->Set_VelocityY(22.f);
 
             pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), true, true);
-            pKirby->Get_Body()->Get_Animator()->Play("Damage", true, true, 0.1f, 0.8f, true);
+            pKirby->Get_Body()->Get_Animator()->Play("Damage", true, true, 0.1f, 0.8f);
             break;
         }
         case QTE_GRABBED_STATE::GRABBED_STATE_END:
@@ -138,6 +156,15 @@ void CKirby_QTE_Grabbed::Update_QTEGrabbedState(CKirby* pKirby, _float fTimeDelt
     {
         case QTE_GRABBED_STATE::START:
         {
+            m_fQTE_TimeLimit -= fTimeDelta;
+
+            if (m_bPublishedEvent == false && m_fQTE_TimeLimit > 0.f &&
+                m_iQTE_InputCount >= m_iQTE_RequiredCount)
+            {
+                m_bPublishedEvent = true;
+                m_pGameInstance_Proxy->Publish(EventTag::QTE_Success, nullptr);
+            }
+
             break;
         }
         case QTE_GRABBED_STATE::ESCAPE:
@@ -168,7 +195,7 @@ void CKirby_QTE_Grabbed::Update_QTEGrabbedState(CKirby* pKirby, _float fTimeDelt
 
 void CKirby_QTE_Grabbed::Exit_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE eState)
 {
-    switch (m_eQTEGrabbedState)
+    switch (eState)
     {
         case QTE_GRABBED_STATE::START:
         {

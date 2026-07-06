@@ -24,10 +24,6 @@ HRESULT CKirby_Ability_Normal::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
-    m_pGameInstance_Proxy = CGameInstance::GetProxy();
-    if (m_pGameInstance_Proxy == nullptr)
-        return E_FAIL;
-
     m_fMaxSuperInhaleTime = 1.f;
 
     m_vInhaleEffectStartPos = { 0.f, 0.63f, 0.6f };
@@ -111,13 +107,6 @@ void CKirby_Ability_Normal::Exit_AttackState(CKirby* pKirby)
     }
 }
 
-void CKirby_Ability_Normal::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
-{
-    End_InhaleCollider(pKirby);
-    Off_InhaleEffect();
-    __super::On_Damaged_KirbyState(pKirby, tInfo);
-}
-
 _bool CKirby_Ability_Normal::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
     KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
@@ -183,6 +172,13 @@ _bool CKirby_Ability_Normal::Enter_Attack_KeyUp(CKirby* pKirby)
     return true;
 }
 
+void CKirby_Ability_Normal::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+    End_InhaleCollider(pKirby);
+    Off_InhaleEffect();
+    __super::On_Damaged_KirbyState(pKirby, tInfo);
+}
+
 void CKirby_Ability_Normal::Change_InhaleState(CKirby* pKirby, INHALE_STATE eNext)
 {
     if (m_eInhaleState == eNext)
@@ -244,7 +240,7 @@ void CKirby_Ability_Normal::Enter_InhaleState(CKirby* pKirby, INHALE_STATE eStat
         case INHALE_STATE::STUFFED_START:
         {
             //pBody->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
-            pAnimator->Play("Stuffed", false, false, 0.1f, 1.5f, true);
+            pAnimator->Play("Stuffed", false, false, 0.1f, 1.5f);
             //pBody->Set_KirbyBody(KIRBY_BODY_STATE::STUFFED);
             break;
         }
@@ -252,7 +248,7 @@ void CKirby_Ability_Normal::Enter_InhaleState(CKirby* pKirby, INHALE_STATE eStat
 
         case INHALE_STATE::STUFFED_SPIT:
         {
-            pAnimator->Play("Spit", false, false, 0.1f, 2.f, true);
+            pAnimator->Play("Spit", false, false, 0.1f, 2.f);
             break;
         }
 
@@ -775,8 +771,6 @@ CKirby_Ability_Normal* CKirby_Ability_Normal::Create()
 void CKirby_Ability_Normal::Free()
 {
     Unsubscribe_InhaleCapturedEvent();
-
-    Safe_Release(m_pGameInstance_Proxy);
 
     __super::Free();
 }

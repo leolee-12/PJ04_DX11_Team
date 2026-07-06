@@ -2,8 +2,6 @@
 
 #include "Kirby_ControllableState.h"
 
-#include "GameContent_Defines.h"
-
 NS_BEGIN(Engine)
 NS_END
 
@@ -13,6 +11,9 @@ class CKirby;
 
 class CLIENT_DLL CKirby_Ladder final : public CKirby_ControllableState
 {
+private:
+	enum LADDER_STATE { WAIT, MOVE };
+
 private:
 	CKirby_Ladder();
 	virtual ~CKirby_Ladder() = default;
@@ -30,6 +31,17 @@ public:
 
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
+
+private:
+	LADDER_STATE m_eLadderState{};
+
+	_float m_fClimbUpDown{};
+
+private:
+	void Change_LadderState(CKirby* pKirby, LADDER_STATE eNext);
+	void Enter_LadderState(CKirby* pKirby, LADDER_STATE eState);
+	void Update_LadderState(CKirby* pKirby, _float fTimeDelta);
+	void Exit_LadderState(CKirby* pKirby, LADDER_STATE eState);
 
 public:
 	static CKirby_Ladder* Create();

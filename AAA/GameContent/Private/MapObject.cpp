@@ -62,31 +62,7 @@ HRESULT CMapObject::Render()
 		if (!Should_RenderMesh(i))
 			continue;
 
-		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
-
-		MESH_LAYER_BIND_CONTEXT Ctx{};
-		Ctx.pShader = m_pShaderCom;
-		Ctx.pModel = m_pModelCom;
-		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
-		Ctx.iMesh = i;
-		Ctx.pLayer = &Layer;
-		Ctx.eProfile = MESH_LAYER_PROFILE::MAP;
-		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
-		Ctx.iFallbackPass = ETOI(MAP_DEFAULT_PASS);
-		Ctx.bUseLayerEx = true;
-
-		MESH_LAYER_BIND_RESULT Result{};
-		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
-			return E_FAIL;
-
-		if (Result.bSkipMesh)
-			continue;
-
-		Bind_MeshLayers(i);
-
-		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Render(i)))
+		if (FAILED(Render_MapMesh(i)))
 			return E_FAIL;
 	}
 
@@ -120,6 +96,44 @@ HRESULT CMapObject::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMapObject::Render_MapMesh(_uint iMesh, const _float4x4* pWorldOverride)
+{
+	if (nullptr != pWorldOverride)
+	{
+		if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", pWorldOverride)))
+			return E_FAIL;
+	}
+
+	const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(iMesh);
+
+	MESH_LAYER_BIND_CONTEXT Ctx{};
+	Ctx.pShader = m_pShaderCom;
+	Ctx.pModel = m_pModelCom;
+	Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+	Ctx.iMesh = iMesh;
+	Ctx.pLayer = &Layer;
+	Ctx.eProfile = MESH_LAYER_PROFILE::MAP;
+	Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
+	Ctx.iFallbackPass = ETOI(MAP_DEFAULT_PASS);
+	Ctx.bUseLayerEx = true;
+
+	MESH_LAYER_BIND_RESULT Result{};
+	if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
+		return E_FAIL;
+
+	if (Result.bSkipMesh)
+		return S_OK;
+
+	Bind_MeshLayers(iMesh);
+
+	if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+		return E_FAIL;
+	if (FAILED(m_pModelCom->Render(iMesh)))
 		return E_FAIL;
 
 	return S_OK;
