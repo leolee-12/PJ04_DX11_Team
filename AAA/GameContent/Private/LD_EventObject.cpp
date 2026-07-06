@@ -114,6 +114,9 @@ void CLD_EventObject::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
+	if (!m_bActive || Is_Dead())
+		return;
+
 	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 

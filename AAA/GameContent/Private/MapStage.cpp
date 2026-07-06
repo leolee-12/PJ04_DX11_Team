@@ -2,20 +2,15 @@
 #include "MapEvent_BreakWall.h"
 
 #include "GameInstance_Proxy.h"
+#include "Math_Utils.h"
 
 #include <chrono>
-#include <cstring>
 
 NS_BEGIN(Client)
 
 namespace
 {
 	constexpr const _tchar* STAGE12_BREAK_WALL_BASE_SECTION_NAME = L"GsDefault_2";
-
-	_bool Is_SameMatrix(const _float4x4& lhs, const _float4x4& rhs)
-	{
-		return 0 == memcmp(&lhs, &rhs, sizeof(_float4x4));
-	}
 }
 
 CMapStage::CMapStage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -201,7 +196,7 @@ HRESULT CMapStage::Ready_Events()
 {
 	if (CMapEvent_BreakWall::STAGE12_STAGE_NAME == m_strStageName)
 	{
-		Subscribe_Event(EventTag::Stage12_CarBreakWall,
+		Subscribe_Event(EventTag::Stage1_Step2_CarBreakMap,
 			[this](void* pData)
 			{
 				UNREFERENCED_PARAMETER(pData);
@@ -244,7 +239,7 @@ void CMapStage::Refresh_SectionTransforms()
 {
 	const _float4x4* pCurrentWorld = m_pTransformCom->Get_WorldMatrixPtr();
 
-	if (m_bSnapshotValid && Is_SameMatrix(m_LastWorldMatrix, *pCurrentWorld))
+	if (m_bSnapshotValid && Is_NearlyEqualFloat4x4(m_LastWorldMatrix, *pCurrentWorld))
 		return;
 
 	for (CMapSection* pSection : m_Sections)
@@ -311,8 +306,9 @@ void CMapStage::Submit_VisibleSections()
 #endif
 		}
 
-		// Map sections always submit their complete depth to LightDepth RT.
-		// Main-camera culling intentionally affects only the main pass.
+		// ESM policy:
+		// Map sections must always submit their complete depth to the shadow pass.
+		// Main-camera culling must not remove shadow casters, because off-camera sections can still affect visible shadow results.
 		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pSection);
 
 #ifdef _DEBUG

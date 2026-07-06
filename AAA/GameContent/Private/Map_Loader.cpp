@@ -332,7 +332,7 @@ HRESULT CMap_Loader::Preload_LevelDesignEntries(const MAP_PACKAGE& Package, cons
 	return S_OK;
 }
 
-HRESULT CMap_Loader::Load_LevelDesignEntries(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST& Request, MAP_LOAD_RESULT* pOutReport)
+HRESULT CMap_Loader::Load_LevelDesignEntries(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST& Request, MAP_LOAD_RESULT* pOutReport, const MAP_EDIT_CHANGE* pOverrideDesc)
 {
 	if (Package.LevelDesignJsonPaths.empty())
 		return S_OK;
@@ -360,7 +360,7 @@ HRESULT CMap_Loader::Load_LevelDesignEntries(const MAP_PACKAGE& Package, const M
 		Context.pCallbackContext = Request.pCallbackContext;
 
 		LD_LOAD_RESULT LDReport{};
-		const HRESULT hrLoad = CLevelDesign_Loader::Load_LevelDesign_Runtime(Context, strJsonPath, &LDReport);
+		const HRESULT hrLoad = CLevelDesign_Loader::Load_LevelDesign_Runtime(Context, strJsonPath, &LDReport, pOverrideDesc);
 		if (FAILED(hrLoad))
 			return hrLoad;
 		if (S_FALSE == hrLoad)
@@ -544,7 +544,8 @@ HRESULT CMap_Loader::Spawn_Map(
 	_uint iRuntimeLevel,
 	MAP_LOAD_RESULT* pOutReport,
 	CMapStage** ppOutStage,
-	const MAP_LOAD_OPTIONS& Options)
+	const MAP_LOAD_OPTIONS& Options,
+	const MAP_EDIT_CHANGE* pLevelDesignOverrideDesc)
 {
 	if (nullptr == pDevice || nullptr == pContext || strManifestPath.empty())
 		return E_FAIL;
@@ -584,7 +585,7 @@ HRESULT CMap_Loader::Spawn_Map(
 		hr = pMapLoader->Spawn(Package, Request, pOutReport);
 
 	if (SUCCEEDED(hr) && Options.bLoadLevelDesign)
-		hr = pMapLoader->Load_LevelDesignEntries(Package, Request, pOutReport);
+		hr = pMapLoader->Load_LevelDesignEntries(Package, Request, pOutReport, pLevelDesignOverrideDesc);
 
 	Safe_Release(pMapLoader);
 	return hr;
@@ -619,6 +620,8 @@ HRESULT CMap_Loader::Spawn_Map(
 		return E_FAIL;
 	}
 
+	const MAP_EDIT_CHANGE* pLevelDesignOverrideDesc = MapContentDesc.bHasMapContent ? &MapContentDesc.OverrideDesc : nullptr;
+
 	CMapStage* pLocalStage = nullptr;
 	CMapStage** ppStageForSpawn = ppOutStage;
 
@@ -636,7 +639,8 @@ HRESULT CMap_Loader::Spawn_Map(
 		iRuntimeLevel,
 		pOutReport,
 		ppStageForSpawn,
-		Options);
+		Options,
+		pLevelDesignOverrideDesc);
 
 	if (FAILED(hrSpawn))
 		return hrSpawn;
@@ -875,10 +879,7 @@ HRESULT CMap_Loader::Load_Env_Runtime(
 	return hr;
 }
 
-HRESULT CMap_Loader::Load_LevelDesign_Runtime(
-	const MAP_RUNTIME_LOAD_CONTEXT& Context,
-	const _wstring& strMapManifestPath,
-	MAP_LOAD_RESULT* pOutReport)
+HRESULT CMap_Loader::Load_LevelDesign_Runtime(const MAP_RUNTIME_LOAD_CONTEXT& Context, const _wstring& strMapManifestPath, MAP_LOAD_RESULT* pOutReport, const MAP_EDIT_CHANGE* pOverrideDesc)
 {
 	if (nullptr != pOutReport)
 		*pOutReport = {};
@@ -889,8 +890,20 @@ HRESULT CMap_Loader::Load_LevelDesign_Runtime(
 		return E_FAIL;
 	}
 
-	CMap_Loader* pMapLoader =
-		Create(Context.pDevice, Context.pContext);
+	MAP_EDIT_DATA LoadedMapContentDesc{};
+	const MAP_EDIT_CHANGE* pResolvedOverrideDesc = pOverrideDesc;
+
+	if (nullptr == pResolvedOverrideDesc)
+	{
+		const HRESULT hrAsset = CMap_EditFile::Load_EditFile(strMapManifestPath, &LoadedMapContentDesc);
+		if (FAILED(hrAsset) && S_FALSE != hrAsset)
+			return hrAsset;
+
+		if (LoadedMapContentDesc.bHasMapContent)
+			pResolvedOverrideDesc = &LoadedMapContentDesc.OverrideDesc;
+	}
+
+	CMap_Loader* pMapLoader = Create(Context.pDevice, Context.pContext);
 
 	if (nullptr == pMapLoader)
 		return E_FAIL;
@@ -914,7 +927,7 @@ HRESULT CMap_Loader::Load_LevelDesign_Runtime(
 		Request.pCreatedCallback = Context.pCreatedCallback;
 		Request.pCallbackContext = Context.pCallbackContext;
 
-		hr = pMapLoader->Load_LevelDesignEntries(Package, Request, pOutReport);
+		hr = pMapLoader->Load_LevelDesignEntries(Package, Request, pOutReport, pResolvedOverrideDesc);
 	}
 
 	Safe_Release(pMapLoader);

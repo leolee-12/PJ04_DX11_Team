@@ -710,6 +710,10 @@ HRESULT CGameInstance::Refresh_StaticBoxPose(physx::PxRigidStatic* pActor, const
 {
     return m_pPhysX_Manager->Refresh_StaticBoxPose(pActor, vLocalCenter, WorldMatrix);
 }
+HRESULT CGameInstance::Refresh_StaticActorPose(physx::PxRigidStatic* pActor, _fmatrix WorldMatrix)
+{
+    return m_pPhysX_Manager->Refresh_StaticActorPose(pActor, WorldMatrix);
+}
 PxRigidStatic* CGameInstance::Create_StaticBox(const _float3& vLocalCenter, const _float3& vLocalHalfExtents, _fmatrix WorldMatrix)
 {
     return m_pPhysX_Manager->Create_StaticBox(vLocalCenter, vLocalHalfExtents, WorldMatrix);

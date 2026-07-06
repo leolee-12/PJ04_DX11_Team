@@ -97,7 +97,8 @@ private:
 	virtual _uint			Get_ModelProtoLevel() const override;
 	virtual HRESULT			Bind_WorldMatrix() override;
 	void					Update_LocalBounds();
-	void					Refresh_ColliderActor();
+	void					Refresh_ColliderPose();
+	void					Rebuild_ColliderActor();
 
 public:
 	static CMapSection* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

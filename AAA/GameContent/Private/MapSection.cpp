@@ -73,7 +73,7 @@ HRESULT CMapSection::Initialize(void* pArg)
 	m_CombinedWorldMatrix = *m_pTransformCom->Get_WorldMatrixPtr();
 	Update_LocalBounds();
 	Refresh_WorldBounds();
-	Refresh_ColliderActor();
+	Rebuild_ColliderActor();
 
 	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
@@ -156,7 +156,7 @@ void CMapSection::Refresh_CombinedWorldMatrix()
 
 	XMStoreFloat4x4(&m_CombinedWorldMatrix, CombinedWorld);
 	Refresh_WorldBounds();
-	Refresh_ColliderActor();
+	Refresh_ColliderPose();
 }
 
 void CMapSection::Notify_EditTransformChanged()
@@ -235,7 +235,7 @@ void CMapSection::Set_CollisionActorEnabled(_bool bEnable)
 		return;
 
 	m_bCreateCollisionActor = bEnable;
-	Refresh_ColliderActor();
+	Rebuild_ColliderActor();
 }
 
 const _tchar* CMapSection::Get_ModelProtoTag() const
@@ -267,7 +267,15 @@ void CMapSection::Update_LocalBounds()
 	m_LocalBounds = Make_AABB_FromMinMax(vMin, vMax);
 }
 
-void CMapSection::Refresh_ColliderActor()
+void CMapSection::Refresh_ColliderPose()
+{
+	if (nullptr == m_pColliderActor)
+		return;
+
+	m_pGameInstance_Proxy->Refresh_StaticActorPose(m_pColliderActor, XMLoadFloat4x4(&m_CombinedWorldMatrix));
+}
+
+void CMapSection::Rebuild_ColliderActor()
 {
 	if (nullptr != m_pColliderActor)
 	{
