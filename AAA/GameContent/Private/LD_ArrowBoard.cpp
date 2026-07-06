@@ -10,12 +10,13 @@ namespace
 	inline constexpr const _char* ARROWBOARD_MODEL_PATH = "../../Resources/Map/Gimmick/Anim/ArrowBoard/ArrowBoard.ysh";
 	inline constexpr const _char* ARROWBOARD_ANIM_ATTACKED = "Attacked";
 	inline constexpr const _char* ARROWBOARD_ANIM_WAIT = "Wait";
-	inline constexpr _float ARROWBOARD_ANIM_SPEED = 1.5f;
 	inline constexpr const _char* ARROWBOARD_DEG_PATH = "Gimmick.ArrowBoard.MainComponent.Deg";
-	inline constexpr _float ARROWBOARD_MIN_HURT_RADIUS = 0.1f;
-	inline constexpr _uint ARROWBOARD_MATERIAL_TEST_PASS = 8u;
-
 	inline constexpr const _char* ARROWBOARD_ARROW_BONE_NAME = "ArrowDirL";
+	inline constexpr _float ARROWBOARD_ANIM_SPEED = 1.5f;
+	inline constexpr _float ARROWBOARD_MIN_HURT_RADIUS = 0.1f;
+	inline constexpr _float ARROWBOARD_GLOW_PERIOD = 0.3333f;
+	inline constexpr _float ARROWBOARD_GLOW_MAX_INTENSITY = 2.f;
+	inline constexpr _uint ARROWBOARD_MATERIAL_TEST_PASS = 8u;
 }
 
 NS_BEGIN(Client)
@@ -45,6 +46,7 @@ HRESULT CLD_ArrowBoard::Initialize(void* pArg)
 	m_tArrowBoardDesc = *static_cast<const LD_EVENTOBJECT_DESC*>(pArg);
 	m_bHurtBoxRegistered = false;
 	m_fArrowDeg = 0.f;
+	m_fGlowTime = 0.f;
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -92,10 +94,14 @@ void CLD_ArrowBoard::Update(_float fTimeDelta)
 	if (!m_bActive || Is_Dead())
 		return;
 
-	m_pAnimatorCom->SetBoneRotation(
-		ARROWBOARD_ARROW_BONE_NAME,
-		-m_fArrowDeg,
-		XMVectorSet(0.f, 0.f, 1.f, 0.f));
+	m_fGlowTime += fTimeDelta;
+	if (ARROWBOARD_GLOW_PERIOD <= m_fGlowTime)
+	{
+		m_bGlow = !m_bGlow;
+		m_fGlowTime -= ARROWBOARD_GLOW_PERIOD;
+	}
+
+	m_pAnimatorCom->SetBoneRotation(ARROWBOARD_ARROW_BONE_NAME, -m_fArrowDeg, XMVectorSet(0.f, 0.f, 1.f, 0.f));
 
 	m_pAnimatorCom->Update(fTimeDelta);
 
@@ -268,9 +274,11 @@ HRESULT CLD_ArrowBoard::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
 		return E_FAIL;
 
-	return m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint));
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
+		return E_FAIL;
 
-	const _float4 vEmissiveColor = { 0.f, 0.f, 0.f, 0.f };
+	const _float fGlowIntensity = m_bGlow ? ARROWBOARD_GLOW_MAX_INTENSITY : 0.f;
+	const _float4 vEmissiveColor = { fGlowIntensity, fGlowIntensity * 0.8f, fGlowIntensity * 0.05f, 0.f };
 	return m_pShaderCom->Bind_RawValue("g_vEmissiveColor", &vEmissiveColor, sizeof(_float4));
 }
 

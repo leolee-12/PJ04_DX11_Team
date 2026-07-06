@@ -43,7 +43,6 @@ private:
 
 	CCollider* m_pTriggerCollider = { nullptr };
 
-	_float4x4 m_TriggerLocalMatrix = {};
 	_bool m_bInside = { false };
 	_bool m_bAmbientStopping = { false };
 

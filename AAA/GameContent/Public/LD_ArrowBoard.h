@@ -54,6 +54,8 @@ private:
 
 	_bool m_bHurtBoxRegistered = { false };
 	_float m_fArrowDeg = { 0.f };
+	_float m_fGlowTime = { 0.f };
+	_bool m_bGlow = { false };
 
 private:
 	HRESULT Ready_RenderComponents();

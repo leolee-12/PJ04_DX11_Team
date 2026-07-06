@@ -400,6 +400,7 @@ PS_OUT PS_ARROWBOARD_OPAQUE(PS_IN In)
     float2 uv = In.vTexcoord;
     float4 diffuse = g_DiffuseTexture.Sample(LinearSampler, uv);
     float3 mra = g_MRATexture.Sample(LinearSampler, uv).rgb;
+    float fArrowMask = step(0.1f, diffuse.a);
 
     float3 N = normalize(In.vNormal);
     float3 T = normalize(In.vTangent.xyz);
@@ -414,7 +415,7 @@ PS_OUT PS_ARROWBOARD_OPAQUE(PS_IN In)
     Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(mra, 1.f);
-    Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * fArrowMask, 1.f);
     Out.vGeoNormal = float4(N * 0.5f + 0.5f, 0.f);
     Out.vMaterialID = g_iMaterialID;
 

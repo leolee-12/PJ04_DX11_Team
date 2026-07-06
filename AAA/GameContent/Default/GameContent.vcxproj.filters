@@ -1773,15 +1773,6 @@
     <ClInclude Include="..\Public\Kirby_CarFirstBreakWall.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\LD_Stage1BossDemo.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\LD_SlopeBoardA.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\LD_SlopeBoardC.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\RailTrack.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClInclude>
@@ -1817,6 +1808,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\LD_ArrowBoard.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\04. ArrowBoard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_Stage1BossDemo.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForBossMap1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_SlopeBoardC.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_SlopeBoardA.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2606,15 +2606,6 @@
     <ClCompile Include="..\Private\Kirby_CarFirstBreakWall.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\LD_SlopeBoardA.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\LD_SlopeBoardC.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\RailTrack.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClCompile>
@@ -2650,6 +2641,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\LD_ArrowBoard.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\04. ArrowBoard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForBossMap1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_SlopeBoardA.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_SlopeBoardC.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

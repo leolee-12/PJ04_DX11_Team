@@ -67,6 +67,39 @@ namespace
 	{
 		return static_cast<_float>(iFrame) * kAudioFrameToSecond;
 	}
+
+	void Build_DefaultAudioAreaDesc(LD_PARSED_OBJECT* pOutDesc)
+	{
+		if (nullptr == pOutDesc)
+			return;
+
+		*pOutDesc = {};
+
+		pOutDesc->wstrSourcePath = L"Palette";
+		pOutDesc->strSourceFile = L"AudioArea";
+		pOutDesc->strSection = L"Palette";
+		pOutDesc->strEntryKey = L"AudioArea_Default";
+		pOutDesc->strObjectName = L"AreaBgmRequestor";
+		pOutDesc->strKind = L"Palette";
+
+		pOutDesc->eCategory = LD_CATEGORY::AUDIO_AREA;
+
+		pOutDesc->fScale = 1.f;
+		pOutDesc->vRight = { 1.f, 0.f, 0.f, 0.f };
+		pOutDesc->vUp = { 0.f, 1.f, 0.f, 0.f };
+		pOutDesc->vLook = { 0.f, 0.f, 1.f, 0.f };
+		pOutDesc->vPosition = { 0.f, 0.f, 0.f, 1.f };
+
+		pOutDesc->vParsedPosition = { 0.f, 0.f, 0.f };
+		pOutDesc->qParsedRotation = { 0.f, 0.f, 0.f, 1.f };
+		pOutDesc->vParsedScale = { 1.f, 1.f, 1.f };
+
+		pOutDesc->AudioArea.iSoundId = 1u;
+		pOutDesc->AudioArea.strShapeType = L"Rectangular";
+		pOutDesc->AudioArea.vAreaSize = { 1.f, 1.f, 1.f };
+		pOutDesc->AudioArea.iFadeInFrame = 60u;
+		pOutDesc->AudioArea.iInactivateFrame = 60u;
+	}
 }
 
 NS_BEGIN(Client)
@@ -90,8 +123,12 @@ HRESULT CLD_AudioArea::Initialize_Prototype()
 
 HRESULT CLD_AudioArea::Initialize(void* pArg)
 {
+	LD_PARSED_OBJECT DefaultDesc{};
 	if (nullptr == pArg)
-		return E_FAIL;
+	{
+		Build_DefaultAudioAreaDesc(&DefaultDesc);
+		pArg = &DefaultDesc;
+	}
 
 	const LD_PARSED_OBJECT* pParsedDesc = static_cast<const LD_PARSED_OBJECT*>(pArg);
 
@@ -194,17 +231,9 @@ void CLD_AudioArea::Update_TriggerCollider()
 	if (!bValidArea)
 		return;
 
-	_matrix TriggerMatrix =
-		XMMatrixScaling(vAreaSize.x, vAreaSize.y, vAreaSize.z) *
-		XMMatrixTranslation(
-			m_tAudioAreaDesc.vAreaCenter.x,
-			m_tAudioAreaDesc.vAreaCenter.y,
-			m_tAudioAreaDesc.vAreaCenter.z);
+	const _matrix TriggerWorldMatrix = XMMatrixScaling(vAreaSize.x, vAreaSize.y, vAreaSize.z) * XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
 
-	if (m_tAudioAreaDesc.eCenterSpace == LD_AUDIO_AREA_CENTER_SPACE::LOCAL)
-		TriggerMatrix = TriggerMatrix * XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
-
-	m_pTriggerCollider->Update(TriggerMatrix);
+	m_pTriggerCollider->Update(TriggerWorldMatrix);
 
 #ifdef _DEBUG
 	m_pGameInstance_Proxy->Add_DebugComponent(m_pTriggerCollider);
