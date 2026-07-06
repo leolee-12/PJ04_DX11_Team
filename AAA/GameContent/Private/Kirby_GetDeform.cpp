@@ -30,9 +30,9 @@ KIRBY_STATE_TYPE CKirby_GetDeform::Get_StateType()
     return KIRBY_STATE_TYPE::GET_DEFORM;
 }
 
-void CKirby_GetDeform::Enter(CKirby* pKirby)
+void CKirby_GetDeform::Enter(CKirby* pKirby, _int iFlag)
 {
-    __super::Enter(pKirby);
+    __super::Enter(pKirby, iFlag);
 
     // 받아와서
     m_eDeformType = DEFORM_TYPE::CAR;

@@ -22,7 +22,7 @@ public:
 	virtual KIRBY_STATE_TYPE Get_StateType() = 0;
 
 public:
-	virtual void Enter(CKirby* pKirby);
+	virtual void Enter(CKirby* pKirby, _int iFlag);
 	virtual void Update(CKirby* pKirby, const _float fTimeDelta);
 	virtual void Exit(CKirby* pKirby);
 

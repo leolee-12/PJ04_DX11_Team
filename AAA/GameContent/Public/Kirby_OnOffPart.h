@@ -12,6 +12,8 @@ NS_END
 
 NS_BEGIN(Client)
 
+class CKirby;
+
 class CKirby_OnOffPart abstract : public CPartObject
 {
 	GENERATED_BODY_ABSTRACT(CKirby_OnOffPart)
@@ -44,6 +46,8 @@ public:
 	void Set_SocketBoneMatrix(const _float4x4* pSocketBoneMatrix) { m_pSocketBoneMatrix = pSocketBoneMatrix; }
 
 	void PartOnOff(_bool bOn) { m_bOn = bOn; }
+
+	virtual void Set_LadderState(CKirby* pKirby, _bool bOn);
 
 protected:
 	struct KIRBY_PART_COMPONENT_DESC°¡

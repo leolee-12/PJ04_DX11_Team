@@ -25,9 +25,9 @@ KIRBY_STATE_TYPE CKirby_QTE_Grabbed::Get_StateType()
     return KIRBY_STATE_TYPE::QTE_GRABBED;
 }
 
-void CKirby_QTE_Grabbed::Enter(CKirby* pKirby)
+void CKirby_QTE_Grabbed::Enter(CKirby* pKirby, _int iFlag)
 {
-    __super::Enter(pKirby);
+    __super::Enter(pKirby, iFlag);
 
     m_fQTE_TimeLimit = s_fQTE_GorillaLimit;
     m_iQTE_InputCount = 0;

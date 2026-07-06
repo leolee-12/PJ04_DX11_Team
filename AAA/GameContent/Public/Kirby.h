@@ -99,6 +99,8 @@ public:
 	CKirby_OnOffPart* Find_WeaponPart(COPY_ABILITY_TYPE eType);
 	CKirby_OnOffPart* Find_HatPart(COPY_ABILITY_TYPE eType);
 
+	void Set_WeaponLadderState(_bool bOn);
+
 	CKirby_Body* Get_Body() { return m_pBody; }
 	CKirby_Deform_Model* Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType = KIRBY_DEFORM_MODEL_TYPE::MAIN);
 
@@ -111,7 +113,7 @@ public:
 
 	//System
 	void Excute_Command(CKirby_Command* pCommand);
-	void Change_State(KIRBY_STATE_TYPE eNewState);
+	void Change_State(KIRBY_STATE_TYPE eNewState, _int iFlag = -1);
 
 	// Attack Mode
 	CKirby_AttackMode* Get_ActiveAttackMode();

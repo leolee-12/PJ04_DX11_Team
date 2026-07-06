@@ -56,7 +56,7 @@ void CKirby_Deform_Car::Exit_Deform(CKirby* pKirby)
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
 }
 
-void CKirby_Deform_Car::Enter_AttackState(CKirby* pKirby)
+void CKirby_Deform_Car::Enter_AttackState(CKirby* pKirby, _int iFlag)
 {
     m_fAccBoostTime = m_fMaxBoostTime;
     m_bReqEndAttackState = false;

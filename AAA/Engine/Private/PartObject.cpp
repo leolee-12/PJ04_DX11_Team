@@ -54,6 +54,4 @@ void CPartObject::Compute_CombinedWorldMatrix(_fmatrix ChildMatrix)
 void CPartObject::Free()
 {
 	__super::Free();
-
-
 }
