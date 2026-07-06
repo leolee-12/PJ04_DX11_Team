@@ -116,6 +116,9 @@ public:
 	// Attack Mode
 	CKirby_AttackMode* Get_ActiveAttackMode();
 
+	// Model
+	CKirby_Deform_Model* Get_CurrentDeformModel();
+
 	// Ability
 	CKirby_Ability* Get_KirbyAbility();
 	void Request_ChangeKirbyAbility(COPY_ABILITY_TYPE eAbilityState);

@@ -43,9 +43,11 @@ public:
 	static CGameObject* Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
 public:
-	_vector Get_NearestRungWorld(_fvector vWorldPosition) const;
-	_vector Get_TopClimbWorld() const;
-	_vector Get_BottomClimbWorld() const;
+	// Kirby 상호작용
+	_int Get_NearestCellIndex(_fvector vWorldPosition) const;
+	_bool Try_GetCellWorld(_int iCellIndex, _vector& vOutWorldPosition) const;
+	_bool Is_TopCell(_int iCellIndex) const;
+	_bool Is_BottomCell(_int iCellIndex) const;
 
 private:
 	CShader* m_pShaderCom = nullptr;
@@ -55,10 +57,12 @@ private:
 	LD_LADDER_DESC m_tLadderDesc = {};
 	_float m_fSegmentStepY = { 1.f };
 
-private:
-	_float m_fClimbOffsetZ = -1.f;
-	_float m_fRungSpacing = 0.5f;
-	_float m_fBottomLocalY = 0.f;
+	// Kirby 상호작용
+	_float m_fClimbOffsetZ = { -1.f };
+	_float m_fCellSpacing = { 0.5f };
+	_float m_fBottomCellLocalY = { 0.f };
+	_int m_iBottomCellIndex = { 0 };
+	_int m_iTopCellIndex = { -1 };
 
 private:
 	HRESULT	Ready_Components();
@@ -67,6 +71,8 @@ private:
 	HRESULT	Resolve_SegmentStepY();
 	HRESULT	Bind_ShaderResources(const _float4x4& WorldMatrix);
 	HRESULT	Render_Model(CModel* pModel);
+	// Kirby 상호작용
+	HRESULT	Calculate_TopBottomCellIndices();
 
 public:
 	static CLevelDesign_Ladder* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

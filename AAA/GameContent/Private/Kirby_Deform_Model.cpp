@@ -107,10 +107,49 @@ _bool CKirby_Deform_Model::Handle_AnimEventSound(const ANIM_EVENT& e, ANIM_EVENT
     if (e.strParam.empty())
         return true;
 
-    const _wstring strSoundKey = StrToWstr(e.strParam);
-    m_pGameInstance_Proxy->Play_SFX(strSoundKey.c_str(), e.vOffset.x);
+    enum KIRBY_SOUND_TYPEP { DEFAULT, SECTION_LOOP, SECTION_LOOP_STOP };
+
+    const _wstring wstrSoundKey = StrToWstr(e.strParam);
+
+    switch(e.iIntParam)
+    {
+        case KIRBY_SOUND_TYPEP::DEFAULT:
+        {
+            m_pGameInstance_Proxy->Play_SFX(wstrSoundKey.c_str(), e.vOffset.x);
+            break;
+        }
+        case KIRBY_SOUND_TYPEP::SECTION_LOOP:
+        {
+            auto iter = m_SoundHandles.find(wstrSoundKey);
+
+            if (iter == m_SoundHandles.end())
+            {
+                CSound_Handle pHandle = m_pGameInstance_Proxy->Play_SFX_Section_Loop(wstrSoundKey.c_str(), e.vOffset.y, e.vOffset.z, e.vOffset.x);
+                m_SoundHandles.emplace(wstrSoundKey, pHandle);
+            }
+            break;
+        }
+        case KIRBY_SOUND_TYPEP::SECTION_LOOP_STOP:
+        {
+            auto iter = m_SoundHandles.find(wstrSoundKey);
+
+            if (iter != m_SoundHandles.end())
+            {
+                iter->second.Stop();
+                m_SoundHandles.erase(iter);
+            }
+            break;
+        }
+    }
 
     return true;
+}
+
+void CKirby_Deform_Model::Stop_SoundHandle()
+{
+    for (auto pair : m_SoundHandles)
+        pair.second.Stop();
+    m_SoundHandles.clear();
 }
 
 HRESULT CKirby_Deform_Model::Bind_CommonShaderResources(CShader* pShader)
@@ -144,5 +183,7 @@ HRESULT CKirby_Deform_Model::Bind_CommonShaderResources(CShader* pShader)
 
 void CKirby_Deform_Model::Free()
 {
+    Stop_SoundHandle();
+
     __super::Free();
 }

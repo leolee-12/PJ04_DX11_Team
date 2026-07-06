@@ -9,6 +9,8 @@ class CShader;
 class CModel;
 class CAnimator;
 class CTexture;
+
+class CSound_Handle;
 NS_END
 
 NS_BEGIN(Client)
@@ -51,6 +53,7 @@ public:
 
 public:
 	void Set_KirbyEye(KIRBY_EYE_STATE eState) { m_eEye = eState; }
+	void Stop_SoundHandle();
 
 protected:
 	_bool Handle_AnimEventEye(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
@@ -72,6 +75,9 @@ protected:
 
 	const _float* m_pHitFlashIntensity{};
 	const _float3* m_pHitFlashColor{};
+
+	// Sound
+	unordered_map<_wstring, CSound_Handle> m_SoundHandles;
 
 protected:
 	static constexpr _float4 s_vBodyColor{ 1.f, 0.1882353f, 0.3764706f, 1.f };
