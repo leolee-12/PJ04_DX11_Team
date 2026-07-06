@@ -11,6 +11,8 @@
 #include "Movement_Child.h"
 #include "LevelDesign_Ladder.h"
 
+#include "Kirby_OnOffPart.h"
+
 CKirby_Ladder::CKirby_Ladder()
 {
 }
@@ -32,7 +34,10 @@ void CKirby_Ladder::Enter(CKirby* pKirby)
 {
     __super::Enter(pKirby);
     
-    pKirby->Get_KirbyAbility()->Clear_Overlay(pKirby);
+    CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+    pAbility->Clear_Overlay(pKirby);
+
+    Set_WeaponLadderState(pKirby, true);
 
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Stop();
@@ -97,6 +102,8 @@ void CKirby_Ladder::Exit(CKirby* pKirby)
     pMovement->Stop();
     pMovement->Set_UseGravity(true);
     pMovement->Set_LinearDrag(CKirby::s_fLinearDrag);
+
+    Set_WeaponLadderState(pKirby, false);
 }
 
 _bool CKirby_Ladder::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -170,6 +177,8 @@ void CKirby_Ladder::Enter_LadderState(CKirby* pKirby, LADDER_STATE eState)
         }
         case LADDER_STATE::LADDER_TOP_JUMP:
         {
+            Set_WeaponLadderState(pKirby, false);
+
             pKirby->Get_KirbyAbility()->Play_AbilityAni(pKirby, ABILITY_ANI::JUMP_END_L);
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Set_LinearDrag(CKirby::s_fLinearDrag);
@@ -317,6 +326,18 @@ _bool CKirby_Ladder::Handle_LadderTopBottom(CKirby* pKirby, CLevelDesign_Ladder*
     }
 
     return false;
+}
+
+void CKirby_Ladder::Set_WeaponLadderState(CKirby* pKirby, _bool bON)
+{
+    CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+    COPY_ABILITY_TYPE eAbilityType = pAbility->Get_AbilityType();
+
+    CKirby_OnOffPart* pWeapon = pKirby->Find_WeaponPart(eAbilityType);
+    if (pWeapon == nullptr)
+        return;
+    
+    pWeapon->Set_LadderState(pKirby, bON);
 }
 
 CKirby_Ladder* CKirby_Ladder::Create()

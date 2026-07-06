@@ -53,6 +53,8 @@ private:
 	void Set_NextCell();
 	_bool Handle_LadderTopBottom(CKirby* pKirby, CLevelDesign_Ladder* pLadder);
 
+	void Set_WeaponLadderState(CKirby* pKirby, _bool bON);
+
 public:
 	static CKirby_Ladder* Create();
 private:

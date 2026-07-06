@@ -2,6 +2,8 @@
 
 #include "GameInstance.h"
 
+#include "Kirby.h"
+
 CKirby_OnOffPart::CKirby_OnOffPart(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPartObject(pDevice, pContext)
 {
@@ -96,6 +98,10 @@ HRESULT CKirby_OnOffPart::Render_Shadow()
     }
 
     return S_OK;
+}
+
+void CKirby_OnOffPart::Set_LadderState(CKirby* pKirby, _bool bOn)
+{
 }
 
 HRESULT CKirby_OnOffPart::Ready_PartComponents(const KIRBY_PART_COMPONENT_DESC°¡& tDesc)
