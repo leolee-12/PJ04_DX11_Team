@@ -876,12 +876,24 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall">
       <UniqueIdentifier>{3538ca96-894c-436a-9f2f-5c4bf121451d}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="01. Projectile\01. Kirby_Spit">
+    </Filter>
+    <Filter Include="01. Projectile\01. Kirby_Spit">
       <UniqueIdentifier>{13343d6f-6325-403c-a289-3544da5b6a8f}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Spat">
       <UniqueIdentifier>{dcb1512b-4270-4d45-88e6-fa87ac86dc6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\Inhalable\00. CopyBubble">
+      <UniqueIdentifier>{deec2911-da93-47a7-9cc7-c861c4ab2bb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\03. EventObject\ForStage1-2">
+      <UniqueIdentifier>{1accfe0f-f5c1-4443-96d0-fc2ebc97200d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\03. EventObject\ForBossMap1">
+      <UniqueIdentifier>{a1998211-a419-40ce-9907-dcb0b25d085a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\03. EventObject\DeformObject">
+      <UniqueIdentifier>{db4dd2aa-6b1a-46ff-9ea0-6febeafe9851}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1745,15 +1757,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_CarFirstBreakWall.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\LD_Stage1BossDemo.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\LD_SlopeBoardA.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\LD_SlopeBoardC.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\RailTrack.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
@@ -1764,8 +1767,23 @@
     <ClInclude Include="..\Public\Monster_State_Spat.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LD_DeformObject.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\DeformObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_CopyBubble.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable\00. CopyBubble</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\LD_DeformCarBreakWall.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\ForStage1-2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_SlopeBoardC.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\ForStage1-2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_SlopeBoardA.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\ForStage1-2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_Stage1BossDemo.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\ForBossMap1</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2554,15 +2572,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_CarFirstBreakWall.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\LD_Stage1BossDemo.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\LD_SlopeBoardA.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\LD_SlopeBoardC.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\RailTrack.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
@@ -2573,8 +2582,23 @@
     <ClCompile Include="..\Private\Monster_State_Spat.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\LD_DeformObject.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\DeformObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_CopyBubble.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable\00. CopyBubble</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\LD_DeformCarBreakWall.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\ForStage1-2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_SlopeBoardA.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\ForStage1-2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_SlopeBoardC.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\ForStage1-2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\ForBossMap1</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
