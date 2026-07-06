@@ -21,6 +21,7 @@
 #include "Monster_State_KnockOut.h"
 #include "Monster_State_Spat.h"
 #include "Monster_State_Retreat.h"
+#include "Monster_State_Flatten.h"
 
 // 전용 상태
 #include "BladeKnight_State_Attack.h"
@@ -111,9 +112,10 @@ HRESULT CBladeKnight::Ready_State()
 {
     if (m_pStateMachine == nullptr)
         return E_FAIL;
-    
-    // 공통 상태에는 사용할 AnimInfo를 넣어줘야 함
 
+    if (FAILED(__super::Ready_State()))
+        return E_FAIL;
+    
     ANI_PLAY_INFO Info{};
 
     // State Idle

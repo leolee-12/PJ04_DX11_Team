@@ -15,6 +15,7 @@
 #include "Monster_State_KnockBack.h"
 #include "Monster_State_KnockBackDeath.h"
 #include "Monster_State_KnockOut.h"
+#include "Cappy_State_Detect.h"
 
 CCappy::CCappy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -100,6 +101,9 @@ HRESULT CCappy::Ready_State()
 	if (nullptr == m_pStateMachine)
 		return E_FAIL;
 
+	if (FAILED(__super::Ready_State()))
+		return E_FAIL;
+
 	ANI_PLAY_INFO Info{};
 	
 	// 임시 작성 
@@ -108,6 +112,10 @@ HRESULT CCappy::Ready_State()
 	Info.bLoop = true;
 	Info.fSpeed = 1.5f;
 	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::IDLE, CMonster_State_Idle::Create(Info))))
+		return E_FAIL;
+
+	// DETECT
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::DETECT, CCappy_State_Detect::Create(Info))))
 		return E_FAIL;
 
 	// FALL

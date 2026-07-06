@@ -53,6 +53,9 @@
     <ClInclude Include="..\Public\Cappy_Body.h" />
     <ClInclude Include="..\Public\Cappy_Brain.h" />
     <ClInclude Include="..\Public\Cappy_Hat.h" />
+    <ClInclude Include="..\Public\Cappy_State_Detect.h" />
+    <ClInclude Include="..\Public\Cappy_State_Idle.h" />
+    <ClInclude Include="..\Public\Cappy_State_KasaUp.h" />
     <ClInclude Include="..\Public\CarMilkyWay.h" />
     <ClInclude Include="..\Public\Car_00_MilkyWay.h" />
     <ClInclude Include="..\Public\Character.h" />
@@ -66,6 +69,7 @@
     <ClInclude Include="..\Public\LD_SlopeBoardA.h" />
     <ClInclude Include="..\Public\LD_SlopeBoardC.h" />
     <ClInclude Include="..\Public\LD_Stage1BossDemo.h" />
+    <ClInclude Include="..\Public\Monster_State_Flatten.h" />
     <ClInclude Include="..\Public\Monster_State_Spat.h" />
     <ClInclude Include="..\Public\Sparkle.h" />
     <ClInclude Include="..\Public\SphereMesh.h" />
@@ -352,6 +356,9 @@
     <ClCompile Include="..\Private\Cappy_Body.cpp" />
     <ClCompile Include="..\Private\Cappy_Brain.cpp" />
     <ClCompile Include="..\Private\Cappy_Hat.cpp" />
+    <ClCompile Include="..\Private\Cappy_State_Detect.cpp" />
+    <ClCompile Include="..\Private\Cappy_State_Idle.cpp" />
+    <ClCompile Include="..\Private\Cappy_State_KasaUp.cpp" />
     <ClCompile Include="..\Private\CarMilkyWay.cpp" />
     <ClCompile Include="..\Private\Car_00_MilkyWay.cpp" />
     <ClCompile Include="..\Private\CommonHit.cpp" />
@@ -366,6 +373,7 @@
     <ClCompile Include="..\Private\LD_SlopeBoardA.cpp" />
     <ClCompile Include="..\Private\LD_SlopeBoardC.cpp" />
     <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp" />
+    <ClCompile Include="..\Private\Monster_State_Flatten.cpp" />
     <ClCompile Include="..\Private\Monster_State_Spat.cpp" />
     <ClCompile Include="..\Private\Sparkle.cpp" />
     <ClCompile Include="..\Private\SphereMesh.cpp" />

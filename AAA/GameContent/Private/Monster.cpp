@@ -11,6 +11,8 @@
 #include "GameContent_const.h"
 #include "Effect_Loader.h"
 
+#include "Monster_State_Flatten.h"
+
 //#pragma warning(push, 0)
 //#ifdef new
 //#undef new
@@ -78,6 +80,11 @@ void CMonster::Priority_Update(_float fTimeDelta)
 void CMonster::Update(_float fTimeDelta)
 {
 	if (!m_bActive) return;
+#ifdef _DEBUG
+	if (m_pGameInstance_Proxy->Key_Down(DIK_P) && m_pMovement && m_pMovement->Is_Grounded())
+		Change_State(MONSTER_STATE_TYPE::FLATTEN);
+#endif
+
 	Update_AI(fTimeDelta);
 	__super::Update(fTimeDelta);
 }
@@ -356,7 +363,7 @@ void CMonster::Check_AirborneReflex(_float fTimeDelta)
 	const MONSTER_STATE_TYPE eState = Get_StateType();
 	if (eState == MONSTER_STATE_TYPE::FALL || eState == MONSTER_STATE_TYPE::LANDING ||
 		eState == MONSTER_STATE_TYPE::CAPTURED || eState == MONSTER_STATE_TYPE::KNOCK_OUT ||
-		eState == MONSTER_STATE_TYPE::KNOCK_BACK_DEATH)
+		eState == MONSTER_STATE_TYPE::KNOCK_BACK_DEATH || eState == MONSTER_STATE_TYPE::FLATTEN)
 	{
 		m_fAirborneTimer = 0.f;
 		return;
@@ -396,6 +403,10 @@ HRESULT CMonster::Create_Movement()
 
 HRESULT CMonster::Ready_State()
 {
+	// 공통 FLATTEN 상태
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::FLATTEN, CMonster_State_Flatten::Create())))
+		return E_FAIL;
+
 	return S_OK;
 }
 

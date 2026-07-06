@@ -132,6 +132,9 @@ HRESULT CKabu::Ready_State()
     if (m_pStateMachine == nullptr)
         return E_FAIL;
 
+    if (FAILED(__super::Ready_State()))
+        return E_FAIL;
+
     ANI_PLAY_INFO Info{};
 
     // IDLE - 이후 CKabu_State_Idle 로 교체
@@ -206,11 +209,11 @@ HRESULT CKabu::Ready_AnimEvents()
             if (Handle_SharedAnimEvent(e, ePhase))
                 return;
 
-            switch (static_cast<EANIM_EVENT>(e.iEventType))
-            {
-            default:
-                break;
-            }
+            //switch (static_cast<EANIM_EVENT>(e.iEventType))
+            //{
+            //default:
+            //    break;
+            //}
         });
 
     return S_OK;

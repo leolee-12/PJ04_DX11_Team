@@ -1,11 +1,21 @@
 #include "Cappy_Brain.h"
 
+void CCappy_Brain::Decide(const MONSTER_BLACKBOARD&, _float)
+{
+
+}
+
 HRESULT CCappy_Brain::Initialize(CMonster* pOwner)
 {
 	if (FAILED(__super::Initialize(pOwner)))
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CCappy_Brain::Decide_Internal(const MONSTER_BLACKBOARD&, _float)
+{
+
 }
 
 CCappy_Brain* CCappy_Brain::Create(CMonster* pOwner)

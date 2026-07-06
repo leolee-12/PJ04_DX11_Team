@@ -691,9 +691,6 @@
     <Filter Include="00. GameObject\06. Monster\04. Cappy\Parts\Hat">
       <UniqueIdentifier>{14d7107e-0156-4acf-97b5-c3456b029634}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\06. Monster\04. Cappy\State\Hide">
-      <UniqueIdentifier>{df128945-7f07-4cd3-b637-325bb681a823}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\06. Monster\06. PoppyBrosJr\State\WindUp">
       <UniqueIdentifier>{c1e07d83-aa5d-4967-ba16-a10e1f3306e1}</UniqueIdentifier>
     </Filter>
@@ -879,6 +876,18 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\Sparkle">
       <UniqueIdentifier>{99c5e77a-1ebf-4337-9cd1-835047d27aaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\04. Cappy\State\Detect">
+      <UniqueIdentifier>{7bf8069e-5df9-4f1e-b7cc-1ec0c588312f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Flatten">
+      <UniqueIdentifier>{8e646b35-3b8a-4919-868e-451db4457e22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\04. Cappy\State\Idle">
+      <UniqueIdentifier>{4b434a78-748d-432b-9622-b3996aa9f6ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\04. Cappy\State\KasaUp">
+      <UniqueIdentifier>{0e21ff0e-4b02-48ee-b141-033f22cc997b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1767,6 +1776,18 @@
     <ClInclude Include="..\Public\Sparkle.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\Sparkle</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Cappy_State_Detect.h">
+      <Filter>00. GameObject\06. Monster\04. Cappy\State\Detect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_State_Flatten.h">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Flatten</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Cappy_State_Idle.h">
+      <Filter>00. GameObject\06. Monster\04. Cappy\State\Idle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Cappy_State_KasaUp.h">
+      <Filter>00. GameObject\06. Monster\04. Cappy\State\KasaUp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2575,6 +2596,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\Sparkle.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\Sparkle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Cappy_State_Detect.cpp">
+      <Filter>00. GameObject\06. Monster\04. Cappy\State\Detect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_State_Flatten.cpp">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Flatten</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Cappy_State_Idle.cpp">
+      <Filter>00. GameObject\06. Monster\04. Cappy\State\Idle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Cappy_State_KasaUp.cpp">
+      <Filter>00. GameObject\06. Monster\04. Cappy\State\KasaUp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

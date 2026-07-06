@@ -10,9 +10,12 @@ protected:
 	CCappy_Brain() = default;
 	virtual ~CCappy_Brain() = default;
 
+public:
+	virtual void			Decide(const MONSTER_BLACKBOARD&, _float) override;
+
 protected:
 	virtual HRESULT			Initialize(CMonster* pOwner) override;
-
+	virtual void			Decide_Internal(const MONSTER_BLACKBOARD&, _float) override;
 public:
 	static CCappy_Brain*	Create(CMonster* pOwner);
 

@@ -113,6 +113,9 @@ HRESULT CNormalEnemy::Ready_State()
 	if (m_pStateMachine == nullptr)
 		return E_FAIL;
 
+	if (FAILED(__super::Ready_State()))
+		return E_FAIL;
+
 	// State Idle
 	ANI_PLAY_INFO Info{};
 
