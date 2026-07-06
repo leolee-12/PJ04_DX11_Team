@@ -20,9 +20,9 @@ HRESULT CKirby_ControllableState::Initialize()
     return S_OK;
 }
 
-void CKirby_ControllableState::Enter(CKirby* pKirby)
+void CKirby_ControllableState::Enter(CKirby* pKirby, _int iFlag)
 {
-    __super::Enter(pKirby);
+    __super::Enter(pKirby, iFlag);
 }
 
 void CKirby_ControllableState::Update(CKirby* pKirby, const _float fTimeDelta)

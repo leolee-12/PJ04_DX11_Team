@@ -25,9 +25,9 @@ KIRBY_STATE_TYPE CKirby_GetAbility::Get_StateType()
     return KIRBY_STATE_TYPE::GET_ABILITY;
 }
 
-void CKirby_GetAbility::Enter(CKirby* pKirby)
+void CKirby_GetAbility::Enter(CKirby* pKirby, _int iFlag)
 {
-    __super::Enter(pKirby);
+    __super::Enter(pKirby, iFlag);
 
     // Ani
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();

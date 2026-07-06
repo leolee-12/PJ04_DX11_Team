@@ -40,7 +40,7 @@ protected:
 	HRESULT Initialize();
 
 public:
-	virtual void Enter_AttackState(CKirby* pKirby) = 0;
+	virtual void Enter_AttackState(CKirby* pKirby, _int iFlag) = 0;
 	virtual void Update_AttackState(CKirby* pKirby, _float fTimeDelta) = 0;
 	virtual void Exit_AttackState(CKirby* pKirby) = 0;
 

@@ -113,7 +113,7 @@ public:
 
 	//System
 	void Excute_Command(CKirby_Command* pCommand);
-	void Change_State(KIRBY_STATE_TYPE eNewState);
+	void Change_State(KIRBY_STATE_TYPE eNewState, _int iFlag = -1);
 
 	// Attack Mode
 	CKirby_AttackMode* Get_ActiveAttackMode();

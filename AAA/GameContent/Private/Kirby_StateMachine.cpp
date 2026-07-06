@@ -45,7 +45,7 @@ KIRBY_STATE_TYPE CKirby_StateMachine::Get_StateType()
     return m_pCurState->Get_StateType();
 }
 
-void CKirby_StateMachine::Change_State(KIRBY_STATE_TYPE eNewstate)
+void CKirby_StateMachine::Change_State(KIRBY_STATE_TYPE eNewstate, _int iFlag)
 {
     if (m_pCurState && m_pCurState->Get_StateType() == eNewstate)
         return;
@@ -60,7 +60,7 @@ void CKirby_StateMachine::Change_State(KIRBY_STATE_TYPE eNewstate)
     if (m_pCurState == nullptr)
         return;
 
-    m_pCurState->Enter(m_pKirby);
+    m_pCurState->Enter(m_pKirby, iFlag);
 }
 
 void CKirby_StateMachine::Update_StateMachine(const _float fTimeDelta)

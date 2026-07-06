@@ -25,9 +25,9 @@ KIRBY_STATE_TYPE CKirby_Run::Get_StateType()
     return KIRBY_STATE_TYPE::RUN;
 }
 
-void CKirby_Run::Enter(CKirby* pKirby)
+void CKirby_Run::Enter(CKirby* pKirby, _int iFlag)
 {
-    __super::Enter(pKirby);
+    __super::Enter(pKirby, iFlag);
 
     if (pKirby->Has_Deform())
         pKirby->Get_KirbyDeform()->Play_DeformAni(pKirby, DEFORM_ANI::RUN);

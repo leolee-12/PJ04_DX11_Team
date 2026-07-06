@@ -31,7 +31,7 @@ public:
 	KIRBY_STATE_TYPE Get_StateType();
 
 public:
-	void Change_State(KIRBY_STATE_TYPE eNewstate);
+	void Change_State(KIRBY_STATE_TYPE eNewstate, _int iFlag = -1);
 	void Update_StateMachine(const _float fTimeDelta);
 	void Handle_Command(CKirby_Command* pCommand);
 

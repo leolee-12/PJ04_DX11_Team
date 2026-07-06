@@ -281,9 +281,9 @@ void CKirby::Excute_Command(CKirby_Command* pCommand)
     m_pKirby_StateMachine->Handle_Command(pCommand);
 }
 
-void CKirby::Change_State(KIRBY_STATE_TYPE eNewState)
+void CKirby::Change_State(KIRBY_STATE_TYPE eNewState, _int iFlag)
 {
-    m_pKirby_StateMachine->Change_State(eNewState);
+    m_pKirby_StateMachine->Change_State(eNewState, iFlag);
 }
 
 CKirby_AttackMode* CKirby::Get_ActiveAttackMode()

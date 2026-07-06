@@ -80,7 +80,7 @@ COPY_ABILITY_TYPE CKirby_Ability_Sword::Get_AbilityType()
     return COPY_ABILITY_TYPE::SWORD;
 }
 
-void CKirby_Ability_Sword::Enter_AttackState(CKirby* pKirby)
+void CKirby_Ability_Sword::Enter_AttackState(CKirby* pKirby, _int iFlag)
 {
     SWORD_STATE eStartState = m_eSwordState;
 
