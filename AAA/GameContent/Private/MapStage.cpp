@@ -239,7 +239,7 @@ void CMapStage::Refresh_SectionTransforms()
 {
 	const _float4x4* pCurrentWorld = m_pTransformCom->Get_WorldMatrixPtr();
 
-	if (m_bSnapshotValid && Is_NearlyEqualFloat4x4(m_LastWorldMatrix, *pCurrentWorld))
+	if (m_bSnapshotValid && MathUtils::Is_NearlyEqualFloat4x4(m_LastWorldMatrix, *pCurrentWorld))
 		return;
 
 	for (CMapSection* pSection : m_Sections)

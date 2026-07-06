@@ -178,6 +178,93 @@ CGameObject* CLevelDesign_Ladder::Create_Prototype(ID3D11Device* pDevice, ID3D11
 	return CLevelDesign_Ladder::Create(pDevice, pContext);
 }
 
+_vector CLevelDesign_Ladder::Get_NearestRungWorld(_fvector vWorldPosition) const
+{
+	// 사다리의 로컬 좌표를 월드 좌표로 변환하는 행렬이다.
+	const _matrix matWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+	// 발판 간격이 0이면 발판 번호를 계산할 수 없으므로 하단 위치를 반환한다.
+	if (m_fRungSpacing <= 0.f || m_tLadderDesc.iLength == 0)
+		return Get_BottomClimbWorld();
+
+	// 커비의 월드 위치를 사다리 로컬 위치로 변환하기 위한 역행렬이다.
+	const _matrix matInverse = XMMatrixInverse(nullptr, matWorld);
+
+	// 커비의 월드 위치를 사다리 기준 로컬 위치로 변환한다.
+	const _vector vLocalPosition = XMVector3TransformCoord(vWorldPosition, matInverse);
+
+	// 사다리 기준으로 커비가 현재 위치한 높이다.
+	const _float fCurrentLocalY = XMVectorGetY(vLocalPosition);
+
+	// 마지막 TOP 모델이 배치된 로컬 Y를 계산한다.
+	// 사다리 렌더링 인덱스가 0부터 iLength - 1까지이므로 -1을 사용한다.
+	const _float fTopLimitLocalY = m_fBottomLocalY + m_fSegmentStepY * static_cast<_float>(m_tLadderDesc.iLength - 1);
+
+	// 상단 범위 안에 들어가는 최대 발판 번호를 계산한다.
+	_int iMaxRungIndex = static_cast<_int>(floorf((fTopLimitLocalY - m_fBottomLocalY) / m_fRungSpacing));
+
+	// 잘못된 설정으로 음수가 나오는 것을 방지한다.
+	if (iMaxRungIndex < 0)
+		iMaxRungIndex = 0;
+
+	// 현재 커비 위치에서 가장 가까운 발판 번호를 계산한다.
+	// roundf를 사용하므로 위와 아래 중 더 가까운 발판이 선택된다.
+	_int iRungIndex = static_cast<_int>(roundf((fCurrentLocalY - m_fBottomLocalY) / m_fRungSpacing));
+
+	// 발판 번호가 사다리 범위를 벗어나지 않도록 제한한다.
+	Helper::IntClamp(iRungIndex, 0, iMaxRungIndex);
+
+	// 선택된 발판 번호를 실제 로컬 Y 위치로 변환한다.
+	const _float fSnappedLocalY = m_fBottomLocalY + static_cast<_float>(iRungIndex) * m_fRungSpacing;
+
+	// 커비가 붙을 최종 사다리 로컬 위치다.
+	// X는 사다리 좌우 중앙, Y는 선택된 발판, Z는 사다리 앞쪽 위치다.
+	const _vector vLocalRung = XMVectorSet(0.f, fSnappedLocalY, m_fClimbOffsetZ, 1.f);
+
+	// 계산된 로컬 발판 위치를 월드 위치로 변환해서 반환한다.
+	return XMVector3TransformCoord(vLocalRung, matWorld);
+}
+
+_vector CLevelDesign_Ladder::Get_TopClimbWorld() const
+{
+	// 사다리의 로컬 좌표를 월드 좌표로 변환하는 행렬이다.
+	const _matrix matWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+	// 사다리 길이나 발판 간격이 유효하지 않으면 하단 위치를 반환한다.
+	if (m_fRungSpacing <= 0.f || m_tLadderDesc.iLength == 0)
+		return Get_BottomClimbWorld();
+
+	// 마지막 TOP 모델이 배치된 로컬 Y를 계산한다.
+	const _float fTopLimitLocalY = m_fBottomLocalY + m_fSegmentStepY * static_cast<_float>(m_tLadderDesc.iLength - 1);
+
+	// 상단 제한 범위 안에 들어가는 최대 발판 번호를 계산한다.
+	_int iMaxRungIndex = static_cast<_int>(floorf((fTopLimitLocalY - m_fBottomLocalY) / m_fRungSpacing));
+
+	if (iMaxRungIndex < 0)
+		iMaxRungIndex = 0;
+
+	// 실제로 스냅 가능한 가장 높은 발판의 로컬 Y를 계산한다.
+	const _float fTopRungLocalY = m_fBottomLocalY + static_cast<_float>(iMaxRungIndex) * m_fRungSpacing;
+
+	// 가장 높은 발판의 사다리 로컬 위치를 만든다.
+	const _vector vLocalTop = XMVectorSet(0.f, fTopRungLocalY, m_fClimbOffsetZ, 1.f);
+
+	// 로컬 위치를 월드 위치로 변환해서 반환한다.
+	return XMVector3TransformCoord(vLocalTop, matWorld);
+}
+
+_vector CLevelDesign_Ladder::Get_BottomClimbWorld() const
+{
+	// 사다리의 로컬 좌표를 월드 좌표로 변환하는 행렬이다.
+	const _matrix matWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+	// 가장 아래 발판의 사다리 로컬 위치를 만든다.
+	const _vector vLocalBottom = XMVectorSet(0.f, m_fBottomLocalY, m_fClimbOffsetZ, 1.f);
+
+	// 로컬 위치를 월드 위치로 변환해서 반환한다.
+	return XMVector3TransformCoord(vLocalBottom, matWorld);
+}
+
 HRESULT CLevelDesign_Ladder::Ready_Components()
 {
 	if (FAILED(Ready_RenderComponents()))

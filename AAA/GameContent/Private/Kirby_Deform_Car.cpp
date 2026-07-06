@@ -28,7 +28,7 @@ HRESULT CKirby_Deform_Car::Initialize()
     Set_FullBodyAni(DEFORM_ANI::JUMP_START, "JumpStart", false, false, 0.1f, 1.5f);
     Set_FullBodyAni(DEFORM_ANI::JUMP, "Jump", false, false, 0.1f, 1.5f);
 
-    Set_FullBodyAni(DEFORM_ANI::DAMAGE, "Damage", false, false, 0.1f, 1.5f);
+    Set_FullBodyAni(DEFORM_ANI::DAMAGED, "Damage", false, false, 0.1f, 1.5f);
 
     m_fMaxBoostTime = 0.5f;
 
@@ -80,11 +80,10 @@ void CKirby_Deform_Car::Exit_AttackState(CKirby* pKirby)
 {
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pKirby->Get_Movement()->Set_MaxHorizontalSpeed(s_fCarSpeed);
-}
 
-void CKirby_Deform_Car::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
-{
-    // 崔副 锭 面倒贸府
+    Effect_Stop(m_pBoostGas1);
+    Effect_Stop(m_pBoostGas2);
+    Effect_Stop(m_pBoostWind);
 }
 
 _bool CKirby_Deform_Car::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -182,6 +181,11 @@ _bool CKirby_Deform_Car::Enter_Attack_KeyUp(CKirby* pKirby)
     return true;
 }
 
+void CKirby_Deform_Car::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+    // 崔副 锭 面倒贸府
+}
+
 void CKirby_Deform_Car::Change_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eNext)
 {
     if (m_eDeformCar_State == eNext)
@@ -249,8 +253,6 @@ void CKirby_Deform_Car::Update_DeformCarState(CKirby* pKirby, _float fTimeDelta)
             // 捞悼
             _vector vLook = pKirby->Get_Transform()->Get_State(STATE::LOOK);
             vLook = XMVector3Normalize(XMVectorSetY(vLook, 0.f));
-
-            const _float3 vCurVelocity = pMovement->Get_Velocity();
 
             _vector vBoostAcceleration = vLook * s_fBoostAcceleration;
             pMovement->Add_Acceleration(vBoostAcceleration);

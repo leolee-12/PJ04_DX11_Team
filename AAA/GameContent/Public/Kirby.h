@@ -146,6 +146,7 @@ public:
 	void Start_DamageInvincibility() { m_fInvincibleTime = s_fInvincibleDuration; }
 
 	// Ladder
+	CLevelDesign_Ladder* Get_Ladder() { return m_pLadder; }
 	void Set_Ladder(CLevelDesign_Ladder* pLadder) { m_pLadder = pLadder; }
 	void Clear_Ladder() { m_pLadder = nullptr; };
 	_bool IsLadder() { return m_pLadder ? true : false; }

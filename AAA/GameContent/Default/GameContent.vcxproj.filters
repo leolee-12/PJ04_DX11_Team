@@ -469,17 +469,11 @@
     <Filter Include="00. GameObject\08. CutsceneActor\Gorilla">
       <UniqueIdentifier>{ef97af82-579e-4774-9fb4-27668458611d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutSceneGrab">
-      <UniqueIdentifier>{46d69dab-00a6-49b7-ba75-db2ddb5232e3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Guard">
       <UniqueIdentifier>{79d635b3-fdb4-4144-aeaa-4d2690b735c9}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\97. UI\UIContainer\Sequence\Flash">
       <UniqueIdentifier>{64c10457-ee8a-4e26-bb8c-7e851d26d956}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\QTE_Grabbed">
-      <UniqueIdentifier>{b3d902fb-45c2-4c61-b777-dd904840d9a8}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\10. Common_SpinSlash">
       <UniqueIdentifier>{5ab4f5f3-211a-454f-82c1-c91e908decbf}</UniqueIdentifier>
@@ -868,7 +862,22 @@
     <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\00. Deform_Car">
       <UniqueIdentifier>{b600ded8-bf65-4554-b846-776c35549114}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Projectile\01. Kirby_Spit">
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene">
+      <UniqueIdentifier>{a68d0ce8-8ccf-41f9-955f-022b1bc87f23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla">
+      <UniqueIdentifier>{41e2d8cd-3ff4-4eb3-97e2-9f7d6d96c2c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\CutSceneGrab">
+      <UniqueIdentifier>{46d69dab-00a6-49b7-ba75-db2ddb5232e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\QTE_Grabbed">
+      <UniqueIdentifier>{b3d902fb-45c2-4c61-b777-dd904840d9a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall">
+      <UniqueIdentifier>{3538ca96-894c-436a-9f2f-5c4bf121451d}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="01. Projectile\01. Kirby_Spit">
       <UniqueIdentifier>{13343d6f-6325-403c-a289-3544da5b6a8f}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Spat">
@@ -1405,7 +1414,7 @@
       <Filter>00. GameObject\00. Camera\BossCam</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_CutSceneGrabbed.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutSceneGrab</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\CutSceneGrab</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Starblock.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable\01. Starblock</Filter>
@@ -1420,7 +1429,7 @@
       <Filter>00. GameObject\97. UI\UIContainer\Sequence\Flash</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\QTE_Grabbed</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\QTE_Grabbed</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Common_SpinSlash.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\10. Common_SpinSlash</Filter>
@@ -1734,7 +1743,10 @@
     <ClInclude Include="..\Public\Kirby_AttackMode.h">
       <Filter>00. GameObject\05. Kirby\02. AttackMode</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\LD_Stage1BossDemo.h">
+    <ClInclude Include="..\Public\Kirby_CarFirstBreakWall.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall</Filter>
+	</ClInclude>
+	<ClInclude Include="..\Public\LD_Stage1BossDemo.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_SlopeBoardA.h">
@@ -2214,7 +2226,7 @@
       <Filter>00. GameObject\00. Camera\BossCam</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_CutSceneGrabbed.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutSceneGrab</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\CutSceneGrab</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Starblock.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable\01. Starblock</Filter>
@@ -2229,7 +2241,7 @@
       <Filter>00. GameObject\97. UI\UIContainer\Sequence\Flash</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\QTE_Grabbed</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\QTE_Grabbed</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Common_SpinSlash.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\10. Common_SpinSlash</Filter>
@@ -2540,7 +2552,10 @@
     <ClCompile Include="..\Private\Kirby_AttackMode.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp">
+    <ClCompile Include="..\Private\Kirby_CarFirstBreakWall.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\LD_Stage1BossDemo.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_SlopeBoardA.cpp">

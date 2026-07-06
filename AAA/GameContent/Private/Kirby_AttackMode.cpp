@@ -12,6 +12,27 @@ CKirby_AttackMode::CKirby_AttackMode()
 {
 }
 
+HRESULT CKirby_AttackMode::Initialize()
+{
+    m_pGameInstance_Proxy = CGameInstance::GetProxy();
+    if (m_pGameInstance_Proxy == nullptr)
+        return E_FAIL;
+
+    return S_OK;
+}
+
+_bool CKirby_AttackMode::Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation)
+{
+    switch (eAttackLocation)
+    {
+    case KIRBY_ATTACK_LOCATION::GROUND:
+    case KIRBY_ATTACK_LOCATION::AIR:
+        return true;
+    }
+
+    return false;
+}
+
 void CKirby_AttackMode::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
 {
     CMovement_Child* pMovement = pKirby->Get_Movement();
@@ -23,16 +44,9 @@ void CKirby_AttackMode::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO&
     pKirby->Change_State(KIRBY_STATE_TYPE::DAMAGED);
 }
 
-_bool CKirby_AttackMode::Can_Attack(KIRBY_ATTACK_LOCATION eAttackLocation)
+void CKirby_AttackMode::Clear_Overlay(CKirby* pKirby, _uint iSlot, _float fOverlayBlendTime)
 {
-    switch (eAttackLocation)
-    {
-        case KIRBY_ATTACK_LOCATION::GROUND:
-        case KIRBY_ATTACK_LOCATION::AIR:
-        return true;
-    }
-
-    return false;
+    pKirby->Get_Body()->Get_Animator()->Clear_Overlay(iSlot, fOverlayBlendTime);
 }
 
 void CKirby_AttackMode::Effect_Stop(CEffect_Container*& pContainer)
@@ -46,5 +60,7 @@ void CKirby_AttackMode::Effect_Stop(CEffect_Container*& pContainer)
 
 void CKirby_AttackMode::Free()
 {
+    Safe_Release(m_pGameInstance_Proxy);
+
     __super::Free();
 }

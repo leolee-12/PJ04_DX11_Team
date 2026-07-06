@@ -2,8 +2,6 @@
 
 #include "Kirby_State.h"
 
-#include "GameContent_Defines.h"
-
 NS_BEGIN(Engine)
 class CAnimator;
 NS_END
@@ -36,7 +34,7 @@ public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
 public:
-	virtual void Request_ReleaseGrabState(CKirby* pKirby, GRAB_TYPE eType) override;
+	virtual void Request_ReleaseGrabState(CKirby* pKirby, CUTSCENE_KIRBY_TYPE eType) override;
 
 private:
 	void Change_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE eNext);
@@ -46,6 +44,11 @@ private:
 
 private:
 	QTE_GRABBED_STATE m_eQTEGrabbedState{ QTE_GRABBED_STATE:: GRABBED_STATE_END };
+
+	_bool m_bPublishedEvent{};
+	_float m_fQTE_TimeLimit{};
+	_uint m_iQTE_InputCount{};
+	_uint m_iQTE_RequiredCount{};
 
 public:
 	static CKirby_QTE_Grabbed* Create();

@@ -168,6 +168,14 @@ _bool CKirby_Jump::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
         // Move Press
         case KIRBY_COMMAND_TYPE::MOVE_TOP:
         case KIRBY_COMMAND_TYPE::MOVE_DOWN:
+        {
+            if (pKirby->IsLadder() && pCommand->IsPress())
+            {
+                pKirby->Change_State(KIRBY_STATE_TYPE::LADDER);
+                return true;
+            }
+        }
+
         case KIRBY_COMMAND_TYPE::MOVE_LEFT:
         case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
         {

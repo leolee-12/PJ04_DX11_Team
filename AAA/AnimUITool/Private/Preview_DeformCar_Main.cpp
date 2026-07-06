@@ -33,7 +33,7 @@ HRESULT CPreview_DeformCar_Main::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	m_pAnimatorCom->Play("Boost", true, true, 0.2f, 1.f, false);
+	m_pAnimatorCom->Play("Boost", true, true, 0.2f, 1.f);
 
 	return S_OK;
 }

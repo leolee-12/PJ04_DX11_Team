@@ -58,19 +58,16 @@ public:
 	virtual void Update_AttackState(CKirby* pKirby, _float fTimeDelta) override;
 	virtual void Exit_AttackState(CKirby* pKirby) override;
 
-public:
-	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
-
-public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
 	virtual _bool Enter_Attack_KeyDown(CKirby* pKirby) override;
 	virtual _bool Enter_Attack_KeyPress(CKirby* pKirby) override;
 	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) override;
 
-private:
-	CGameInstance_Proxy* m_pGameInstance_Proxy{};
+public:
+	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
 
+private:
 	// State
 	MOUTH_STATE m_eMouthState{};
 
