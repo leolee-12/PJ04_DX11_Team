@@ -217,6 +217,17 @@ CKirby_OnOffPart* CKirby::Find_HatPart(COPY_ABILITY_TYPE eType)
     return nullptr;
 }
 
+void CKirby::Set_WeaponLadderState(_bool bOn)
+{
+    COPY_ABILITY_TYPE eAbilityType = m_pKirby_Ability->Get_AbilityType();
+    CKirby_OnOffPart* pWeapon = Find_WeaponPart(eAbilityType);
+
+    if (pWeapon == nullptr)
+        return;
+
+    pWeapon->Set_LadderState(this, bOn);
+}
+
 CKirby_Deform_Model* CKirby::Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType)
 {
     switch (eDeformType)
