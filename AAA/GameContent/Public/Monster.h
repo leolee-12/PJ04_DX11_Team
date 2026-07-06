@@ -194,7 +194,10 @@ protected:
 		Desc.pHitFlashColor = Get_HitFlashColorPtr();
 
 		if (FAILED(Add_PartObject(m_iPrototypeLevel, szProtoTag, szPartTag, &Desc)))
+		{
+			MSG_BOX("MonsterPart Add Failed");
 			return nullptr;
+		}
 
 		return dynamic_cast<TPart*>(m_PartObjects[szPartTag]);
 	}

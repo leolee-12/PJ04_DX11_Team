@@ -62,12 +62,16 @@ public:
 
 	void Effect_Stop(CEffect_Container*& pContainer1);
 
+	const _wstring& Get_AttackModeName() { return m_wstrAttackModeName; }
+
 protected:
 	CGameInstance_Proxy* m_pGameInstance_Proxy{};
 
 	_bool m_bReqEndAttackState{ true };
 
 	vector<KIRBY_TYPE_ANI_DESC> m_AniInfos;
+
+	_wstring m_wstrAttackModeName = L"NULL";
 
 protected:
 	virtual void Free() override;

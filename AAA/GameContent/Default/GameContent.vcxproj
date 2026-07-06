@@ -32,6 +32,8 @@
     <ClInclude Include="..\public\BossBase.h" />
     <ClInclude Include="..\public\BossNamePlate.h" />
     <ClInclude Include="..\public\Boss_Brain.h" />
+    <ClInclude Include="..\public\Boss_Cage.h" />
+    <ClInclude Include="..\public\Boss_Cage_Body.h" />
     <ClInclude Include="..\public\Boss_Gorilla.h" />
     <ClInclude Include="..\public\Boss_Gorilla_Body.h" />
     <ClInclude Include="..\public\Boss_Gorilla_Brain.h" />
@@ -331,6 +333,8 @@
     <ClCompile Include="..\private\BossBase.cpp" />
     <ClCompile Include="..\private\BossNamePlate.cpp" />
     <ClCompile Include="..\private\Boss_Brain.cpp" />
+    <ClCompile Include="..\private\Boss_Cage.cpp" />
+    <ClCompile Include="..\private\Boss_Cage_Body.cpp" />
     <ClCompile Include="..\private\Boss_Gorilla.cpp" />
     <ClCompile Include="..\private\Boss_Gorilla_Body.cpp" />
     <ClCompile Include="..\private\Boss_Gorilla_Brain.cpp" />

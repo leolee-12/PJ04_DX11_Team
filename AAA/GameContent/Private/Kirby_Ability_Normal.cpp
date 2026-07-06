@@ -24,6 +24,8 @@ HRESULT CKirby_Ability_Normal::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
+    m_wstrAttackModeName = L"Ä¿ºñ";
+
     m_fMaxSuperInhaleTime = 1.f;
 
     m_vInhaleEffectStartPos = { 0.f, 0.63f, 0.6f };

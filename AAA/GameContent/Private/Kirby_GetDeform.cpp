@@ -136,6 +136,10 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
             pKirby->Change_HatSocketMatrix(pKirby->Get_KirbyAbility()->Get_AbilityType(),
                 pDeformModel_Demo->Get_HatBoneMatirx());
 
+            KIRBY_NAME_UPDATED tNameDesc{};
+            tNameDesc.strAtkModeName = pKirby->Get_ActiveAttackMode()->Get_AttackModeName();
+            m_pGameInstance_Proxy->Publish(EventTag::Kirby_Name_Updated, &tNameDesc);
+
             break;
         }
         case DEFORM_STATE::DEFORM_END:
