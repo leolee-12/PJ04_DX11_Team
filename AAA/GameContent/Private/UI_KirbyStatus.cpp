@@ -2,6 +2,7 @@
 #include "UI_GaugeFill.h"
 #include "UI_Image.h"
 #include "UI_GaugeBarCom.h"
+#include "UI_Text.h"
 #include "GameInstance.h"
 
 namespace
@@ -9,6 +10,7 @@ namespace
     constexpr const _tchar* COM_GAUGEBAR = TEXT("Com_GaugeBar");
 
     constexpr const _tchar* PART_HP_FILL_CENTER = TEXT("Guage");
+    constexpr const _tchar* PART_TEXT = TEXT("Text_Name");
 }
 
 CUI_KirbyStatus::CUI_KirbyStatus(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -87,6 +89,17 @@ HRESULT CUI_KirbyStatus::Ready_Events()
                 _float fDeltaHp = pDesc->fCurrHp - m_fDefaultCurrHP;
                 m_pGaugeBar->Add_Value(fDeltaHp);
                 m_fDefaultCurrHP = pDesc->fCurrHp;
+            }
+        });
+    Subscribe_Event(EventTag::Kirby_Name_Updated, [this](void* pData)
+        {
+            if (auto pDesc = static_cast<KIRBY_NAME_UPDATED*>(pData))
+            {
+                auto iter = m_UIPartObjects.find(PART_TEXT);
+                if (iter != m_UIPartObjects.end())
+                {
+                    static_cast<CUI_Text*>(iter->second)->Set_Text(pDesc->strAtkModeName);
+                }
             }
         });
 

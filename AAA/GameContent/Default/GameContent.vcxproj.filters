@@ -892,6 +892,15 @@
     <Filter Include="00. GameObject\00. Camera\Shakeable\Cutscene">
       <UniqueIdentifier>{44ee9036-9fb5-42d3-a001-52dd473415a5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\BossCage">
+      <UniqueIdentifier>{e77c861a-2b81-4e49-a7e4-26ef8eb371d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\BossCage\Part">
+      <UniqueIdentifier>{a522a8ef-6e97-4c78-b7ef-172342932d2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\BossCage\Part\Body">
+      <UniqueIdentifier>{f2c53996-0fa0-4e8f-b0d8-0a2c2597db35}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1779,6 +1788,12 @@
     <ClInclude Include="..\public\Camera_Shakeable.h">
       <Filter>00. GameObject\00. Camera\Shakeable</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Boss_Cage_Body.h">
+      <Filter>00. GameObject\07. Boss\BossCage\Part\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Cage.h">
+      <Filter>00. GameObject\07. Boss\BossCage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2590,6 +2605,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Camera_Shakeable.cpp">
       <Filter>00. GameObject\00. Camera\Shakeable</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Cage_Body.cpp">
+      <Filter>00. GameObject\07. Boss\BossCage\Part\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Cage.cpp">
+      <Filter>00. GameObject\07. Boss\BossCage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -34,6 +34,10 @@ void CKirby_AbilityDump::Enter(CKirby* pKirby)
 
     m_bPartsOff = false;
     m_bCloseEye = false;
+
+    KIRBY_NAME_UPDATED tNameDesc{};
+    tNameDesc.strAtkModeName = L"Ä¿ºñ";
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_Name_Updated, &tNameDesc);
 }
 
 void CKirby_AbilityDump::Update(CKirby* pKirby, const _float fTimeDelta)
