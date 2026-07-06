@@ -34,6 +34,14 @@ void CCharacter::Priority_Update(_float fTimeDelta)
     if (m_fHitStopTime > 0.f)
         m_fHitStopTime = max(0.f, m_fHitStopTime - fTimeDelta);
 
+    if (m_fHitFlashTime > 0.f)
+    {
+        m_fHitFlashTime = max(0.f, m_fHitFlashTime - fTimeDelta);
+        m_fHitFlashCur = m_fHitFlashTime / m_fHitFlashDuration; // 1 -> 0
+    }
+    else
+        m_fHitFlashCur = 0.f;
+
     if (m_fShakeTime > 0.f)
     {
         m_fShakeTime = max(0.f, m_fShakeTime - fTimeDelta);
@@ -54,15 +62,6 @@ void CCharacter::Priority_Update(_float fTimeDelta)
 void CCharacter::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
-
-    // 기본(몬스터) = 원샷 1회 페이드. 커비는 이 값을 자기 Update에서 덮어씀.
-    if (m_fHitFlashTime > 0.f)
-    {
-        m_fHitFlashTime = max(0.f, m_fHitFlashTime - fTimeDelta);
-        m_fHitFlashCur = m_fHitFlashTime / m_fHitFlashDuration; // 1 -> 0
-    }
-    else
-        m_fHitFlashCur = 0.f;
 }
 
 void CCharacter::Late_Update(_float fTimeDelta)

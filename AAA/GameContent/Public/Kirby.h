@@ -168,7 +168,7 @@ private:
 	virtual void  On_Damaged(const ATTACK_INFO& tInfo) override;
 	
 	// Timer
-	void Update_Timer(_float fTimeDelta);
+	//void Update_Timer(_float fTimeDelta);
 
 	// CutScene Grab
 	void Set_CutsceneGrabTarget(CUTSCENE_GRAB_DESC* pGrabDesc);

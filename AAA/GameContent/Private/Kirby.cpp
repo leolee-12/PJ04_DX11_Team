@@ -96,8 +96,6 @@ void CKirby::Update(_float fTimeDelta)
 
     XMStoreFloat3(&m_vWishDir, XMVectorZero());
 
-    Update_Timer(fTimeDelta);
-
     m_pKirby_InputManager->Update_KirbyInput(fTimeDelta);
     m_pKirby_Controller->Update_KirbyController(fTimeDelta);
     m_pKirby_StateMachine->Update_StateMachine(fTimeDelta);
@@ -671,12 +669,6 @@ _bool CKirby::Block_Hit(const ATTACK_INFO& tInfo)
 void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
 {
     m_pKirby_StateMachine->On_Damaged_KirbyStateMachine(tInfo);
-}
-
-void CKirby::Update_Timer(_float fTimeDelta)
-{
-    if (m_fInvincibleTime > 0.f)
-        m_fInvincibleTime -= fTimeDelta;
 }
 
 void CKirby::Set_CutsceneGrabTarget(CUTSCENE_GRAB_DESC* pGrabDesc)
