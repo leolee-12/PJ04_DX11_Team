@@ -63,12 +63,14 @@ void CKirby_CarFirstBreakWall::Update(CKirby* pKirby, const _float fTimeDelta)
     //    pMovement->Rotate_To_Direction(XMLoadFloat3(&m_vLeftDir), fTimeDelta);
     //}
 
-    if(fRatio <= 0.75f)
+    /*if(fRatio <= 0.75f)
     {
         _vector vLook = pTransform->Get_State(STATE::LOOK);
         vLook = XMVector3Normalize(XMVectorSetY(vLook, 0.f));
         pMovement->Add_Acceleration(vLook * 70.f);
-    }
+    }*/
+
+    pKirby->Update_CutsceneGrabTransform();
 
     if(pAnimator->Is_Finished())
         Transition_Fall_OR_Wait_OR_Run(pKirby);

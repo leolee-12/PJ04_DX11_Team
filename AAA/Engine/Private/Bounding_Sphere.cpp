@@ -25,6 +25,15 @@ void CBounding_Sphere::Update(_fmatrix TransformMatrix)
     m_pOriginalDesc->Transform(*m_pDesc, TransformMatrix);
 }
 
+void CBounding_Sphere::Reset_Desc(const CBounding::BOUNDING_DESC* pDesc)
+{
+    auto pSphereDesc = static_cast<const BOUNDING_SPHERE_DESC*>(pDesc);
+
+    m_pOriginalDesc->Center = pSphereDesc->vCenter;
+    m_pOriginalDesc->Radius = pSphereDesc->fRadius;
+    *m_pDesc = *m_pOriginalDesc;
+}
+
 _bool CBounding_Sphere::Intersect(COLLIDER eTargetType, CBounding* pBounding)
 {
     m_isColl = false;

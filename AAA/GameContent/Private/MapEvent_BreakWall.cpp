@@ -403,8 +403,12 @@ void CMapEvent_BreakWall::Start_Break()
 
 	m_pGameInstance_Proxy->Publish(EventTag::Stage1_Step2_CarBreakMap, nullptr);
 
-	CAMERA_SHAKE_DESC ShakeDesc{ 0.6f, 0.4f };
+	CAMERA_SHAKE_DESC ShakeDesc{};
+	ShakeDesc.fTrauma = 1.f;
 	m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &ShakeDesc);
+
+	//m_pGameInstance_Proxy->Pulse_TimeScale(0.f, 0.2f);
+	m_pGameInstance_Proxy->Lerp_TimeScale(0.f, 1.f, 0.2f);
 
 	for (_uint i = 0; i < static_cast<_uint>(m_Fragments.size()); ++i)
 	{

@@ -1,8 +1,10 @@
 #pragma once
 #include "GameContent_Defines.h"
-#include "Camera.h"
+#include "Camera_Shakeable.h"
 
-NS_BEGIN(Engine) class CAnimator; NS_END
+NS_BEGIN(Engine) 
+class CAnimator;
+NS_END
 
 NS_BEGIN(Client)
 
@@ -14,12 +16,13 @@ struct CAM_TRACK
     _bool   aim = true;
     vector<_float3> eye;
     vector<_float3> at;
+    vector<_float>  fov;
 
     HRESULT Load(const wstring& path);
-    void    Sample(_float progress, _float3& outEye, _float3& outAt) const;
+    void    Sample(_float progress, _float3& outEye, _float3& outAt, _float& outFov) const;
 };
 
-class CLIENT_DLL CCamera_Cutscene final : public CCamera
+class CLIENT_DLL CCamera_Cutscene final : public CCamera_Shakeable
 {
     GENERATED_BODY(CCamera_Cutscene)
 public:
@@ -39,13 +42,6 @@ public:
 
     // 트랙 인계 (Cutscene_CameraChange 핸들러가 호출)
     _bool Play_Track(const _tchar* szTrack, CAnimator* pProgress, const _float4x4* pAnchorWorld);
-    void Add_Shake(_float fTrauma, _float fDuration = 0.f)
-    {
-        m_fTrauma = min(1.f, m_fTrauma + fTrauma);
-        m_fTraumaDecay = (fDuration > 0.f) ? (m_fTrauma / fDuration) : DEFAULT_TRAUMA_DECAY;
-    }
-    void Set_Rumble(_float fLevel) { m_fRumble = max(0.f, min(1.f, fLevel)); }
-    void Stop_Rumble() { Add_Shake(m_fRumble); m_fRumble = 0.f; }
 
 private:
     unordered_map<wstring, CAM_TRACK> m_Tracks;     // 이름 -> 트랙 캐시
@@ -54,20 +50,8 @@ private:
     const _float4x4* m_pAnchor = { nullptr };
     wstring          m_strDir = L"../../Resources/YSH/CameraData/CamAnim/";
 
-    _float m_fTrauma = { 0.f }, m_fShakeTime = { 0.f }, m_fRumble = { 0.f };
-    // 튜닝
-    _float m_fTraumaDecay = { 1.6f };                       // 초당 감쇠
-    _float m_fShakeFreq = { 22.f };
-    _float m_fShakeYaw = { XMConvertToRadians(2.2f) };
-    _float m_fShakePitch = { XMConvertToRadians(1.8f) };
-    _float m_fShakeRoll = { XMConvertToRadians(1.2f) };
-    _float m_fShakePos = { 0.12f };
-
-    static constexpr _float DEFAULT_TRAUMA_DECAY = 1.6f;
-
 private:
     virtual HRESULT Ready_Events() override;   
-    void Apply_Shake(_matrix& CamWorld);
     void Apply_Pose();
 
 public:

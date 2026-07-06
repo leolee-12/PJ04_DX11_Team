@@ -48,18 +48,26 @@ namespace Client
     inline constexpr const _tchar* EVT_QUERY_PLAYER = L"Query_Player";
     inline constexpr const _tchar* EVT_QUERY_BOSS = L"Query_Boss";
 
+    enum class ECutsceneCam { Cutscene, Boss, Area };
+    enum class CUTSCENE_KIRBY_TYPE : _uint{ GORILLA_SCENE, GORILLA_COMBAT, DEFORM_CAR_GET_FIRST, _COUNT };
+
+    enum class GRAB_RELEASE_TYPE : _uint { GORILLA_ESCAPE, GORILLA_THROWN, DEFAULT_RELEASE };
+
     struct KIRBY_ABILITY_CHANGED
     {
         _bool bBegin = { true }; // true=변신 시작(줌인), false=변신 끝(복귀)
     };
 
-    enum class ECutsceneCam { Cutscene, Boss };
-    enum class CUTSCENE_KIRBY_TYPE : _uint{ GORILLA_SCENE, GORILLA_COMBAT, DEFORM_CAR_GET_FIRST, _COUNT };
-
     struct CAMERA_SHAKE_DESC
     {
         _float fTrauma = { 0.5f };      
         _float fDuration = { 0.f };     
+        _bool  bIgnoreTimeScale = { false };
+    };
+
+    struct CUTSCENE_RELEASE_DESC
+    {
+        GRAB_RELEASE_TYPE eType = { GRAB_RELEASE_TYPE::DEFAULT_RELEASE };
     };
 
     struct CUTSCENE_CAMERA_DESC

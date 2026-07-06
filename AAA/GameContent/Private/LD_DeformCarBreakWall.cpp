@@ -95,6 +95,9 @@ void CLD_DeformCarBreakWall::Update(_float fTimeDelta)
 		&& !m_bAnimationActive
 		&& STATE::BREAKING == m_eState)
 	{
+		CUTSCENE_CAMERA_DESC cam{};
+		cam.eCam = ECutsceneCam::Area;
+		m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
 		m_eState = STATE::BROKEN;
 	}
 }
@@ -284,6 +287,26 @@ void CLD_DeformCarBreakWall::On_Event()
 		Set_MeshVisible(iMeshIndex, true);
 
 	m_eState = STATE::BREAKING;
+
+	CUTSCENE_GRAB_DESC Desc{};
+	Desc.eType = CUTSCENE_KIRBY_TYPE::DEFORM_CAR_GET_FIRST;
+	Desc.pBoneMatrix = m_pModelCom->Get_BoneMatrixPtr("CarConstL");
+	Desc.pSourceWorld = m_pTransformCom->Get_WorldMatrixPtr();
+	m_pGameInstance_Proxy->Publish(EventTag::Cutscene_KirbyStart, &Desc);
+
+	CUTSCENE_CAMERA_DESC cam{};
+	cam.eCam = ECutsceneCam::Cutscene;
+	cam.szTrack = L"DeformCarGetFirst_camera1";
+	cam.pProgress = m_pAnimatorCom;
+	cam.pAnchorWorld = m_pTransformCom->Get_WorldMatrixPtr();
+	m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+
+	CAMERA_SHAKE_DESC Shake{};
+	Shake.fTrauma = 1.f;
+	Shake.bIgnoreTimeScale = true;
+	m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &Shake);
+
+	m_pGameInstance_Proxy->Lerp_TimeScale(0.1f, 1.f, 3.f);
 
 	Release_RigidStatic();
 	Unregister_BoostTrigger(false);

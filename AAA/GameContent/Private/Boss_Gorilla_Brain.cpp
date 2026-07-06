@@ -5,17 +5,18 @@
 #include "Monster_Movement.h"
 #include "MultiHitBoxPart.h"
 #include "Boss_Gorilla_Body.h"
+#include "Boss_Gorilla.h"
+#include "GameInstance.h"
 
 CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
 {
     const _float fCloseRange = 6.f;  
-    const _float fSwingRange = 20.f;
-    const _float fThrowRange = 40.f;
+    const _float fSwingRange = 25.f;
     const _float fFacingDot = 0.86f;
     const _float fTurnSpeedDeg = 90.f;
-    const _float fChargeTime = 0.5f;
+    const _float fChargeTime = 0.2f;
     const _float fSpd = 1.5f;
-    const _float fAtkInterval = 2.5f;   
+    const _float fAtkInterval = 2.f;   
     const _float fStopRange = 5.f;
 
 
@@ -78,7 +79,7 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
         };
 
     auto MakeArmSpin = [&]() -> CBTNode* {
-        const _float fSpinDuration = 5.f;     // 스핀 지속 시간
+        const _float fSpinDuration = 10.f;     // 스핀 지속 시간
         const _float fSpinTurnDeg = 120.f;   // 스핀 중 타겟 추적 회전 속도(deg/s)
         auto fSpinT = make_shared<_float>(0.f);
         auto bSpin = make_shared<bool>(false);
@@ -168,13 +169,99 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
         };
 
     auto MakeCatch = [&]() -> CBTNode* {
-        return CBTSequence::Create({   // TODO: CatchAttack 적중 분기
-            OneShot("CatchReadyStart"),
-            OneShot("CatchReady"),
-            OneShot("CatchAttack"),
-            OneShot("CatchThrow"),
+        // CatchAttack: 시작 시 캐치 콜라이더 on, 잡히면 즉시 종료, 끝까지 안 잡히면 통과
+        auto bAtkOn = make_shared<bool>(false);
+        auto* pCatchAttack = CBTAction::Create(
+            [this, bAtkOn, fSpd](CBlackboard*, _float) -> BT_STATUS {
+                CAnimator* pAnim = m_pOwner->Get_BodyAnimator();
+                auto* pGorilla = static_cast<CBoss_Gorilla*>(m_pOwner);
+                if (!*bAtkOn) {
+                    *bAtkOn = true;
+                    pGorilla->Reset_CatchHit();                    // m_bCatchHit = false
+                    pAnim->Play("CatchAttack", false, true, 0.1f, fSpd);
+                    pGorilla->Get_HitBoxPart()->Enable_HitBox(CBoss_Gorilla_Body::GHB_CATCH, true);
+                }
+                // 잡힘: 콜백이 이미 콜라이더 off + Fire_Grab + Begin_QTE 처리함
+                if (pGorilla->Is_CatchHit()) { *bAtkOn = false; return BT_STATUS::SUCCESS; }
+
+                if (pAnim->Is_Finished()) {
+                    pGorilla->Get_HitBoxPart()->Enable_HitBox(CBoss_Gorilla_Body::GHB_CATCH, false);
+                    *bAtkOn = false;
+                    return BT_STATUS::SUCCESS;                     // 헛손질도 SUCCESS로 통과, 아래서 분기
+                }
+
+                if (!pGorilla->Is_CatchHit())
+                {
+                    CTransform* pTf = m_pOwner->Get_Transform();
+                    _float3 vFwd{};
+                    XMStoreFloat3(&vFwd, XMVector3Normalize(XMVectorSetY(pTf->Get_State(STATE::LOOK), 0.f)));
+                    m_pOwner->Add_MoveDir(vFwd);
+                }
+
+                return BT_STATUS::RUNNING;
+            },
+            [this, bAtkOn]() {
+                *bAtkOn = false;
+                static_cast<CBoss_Gorilla*>(m_pOwner)->Get_HitBoxPart()
+                    ->Enable_HitBox(CBoss_Gorilla_Body::GHB_CATCH, false);
             });
-        };
+
+    auto bWaitOn = make_shared<bool>(false);
+    auto* pQTEWait = CBTAction::Create(
+        [this, bWaitOn](CBlackboard*, _float fDt) -> BT_STATUS {
+            auto* pGorilla = static_cast<CBoss_Gorilla*>(m_pOwner);
+            if (!*bWaitOn) {
+                *bWaitOn = true;
+                m_pOwner->Get_BodyAnimator()->Play("CatchSuccessWait", true, true, 0.1f, 1.f);
+            }
+            if (pGorilla->Is_QTEEscaped()) { *bWaitOn = false; return BT_STATUS::SUCCESS; }
+            if (pGorilla->Tick_QTETimer(fDt)) { *bWaitOn = false; return BT_STATUS::FAILURE; }
+            return BT_STATUS::RUNNING;
+        },
+        [bWaitOn]() { *bWaitOn = false; });
+
+    auto* pReleaseEscape = CBTAction::Create([this](CBlackboard*, _float) {
+        static_cast<CBoss_Gorilla*>(m_pOwner)->Fire_Release(GRAB_RELEASE_TYPE::GORILLA_ESCAPE);
+        return BT_STATUS::SUCCESS; });
+
+    auto bThrowOn = make_shared<bool>(false);
+    auto* pThrow = CBTAction::Create(
+        [this, bThrowOn, fSpd](CBlackboard*, _float) -> BT_STATUS {
+            CAnimator* pAnim = m_pOwner->Get_BodyAnimator();
+            if (!*bThrowOn) {
+                *bThrowOn = true;
+                pAnim->Play("CatchThrow", false, true, 0.1f, fSpd);
+            }
+            if (pAnim->Is_Finished()) {
+                *bThrowOn = false;
+                static_cast<CBoss_Gorilla*>(m_pOwner)->Fire_Release(GRAB_RELEASE_TYPE::GORILLA_THROWN);
+                return BT_STATUS::SUCCESS;
+            }
+            return BT_STATUS::RUNNING;
+        },
+        [bThrowOn]() { *bThrowOn = false; });
+
+	return CBTSequence::Create({
+		    OneShot("CatchReadyStart"),
+		    OneShot("CatchReady"),
+		    pCatchAttack,
+		    CBTSelector::Create({
+		        CBTSequence::Create({
+		    	    CBTCondition::Create([this](CBlackboard*) {
+		    		    return static_cast<CBoss_Gorilla*>(m_pOwner)->Is_CatchHit(); }),
+		    	    OneShot("CatchSuccessB"),
+		    	    CBTSelector::Create({
+		    		    // QTE 성공: 놓치기
+		    		    CBTSequence::Create({ pQTEWait, pReleaseEscape, OneShot("CatchRelease") }),
+		    		    // pQTEWait가 FAILURE(시간초과)면 여기로: 내다 던지기
+		    		    pThrow,
+		    	    }),
+		        }),
+		    OneShot("CatchFailure"),
+		    }),
+	    });
+    };
+
 
     auto MakeJumpToTarget = [&]() -> CBTNode* {
         auto bAir = make_shared<bool>(false);
@@ -229,41 +316,43 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
 
     // ---- 공격 결정: 거리 사다리 ----
     CBTNode* pAttackDecision = CBTSelector::Create({
-        // 1) 매 3공격: 점프(P0)/스핀(P1) -> 카운터 리셋
+        // 1) 매 3연속: 점프(P0)/스핀(P1) -> 카운터 리셋 (기존 그대로)
         CBTSequence::Create({
             CBTCondition::Create([this](CBlackboard*) { return m_iMeleeSinceThrow >= 3; }),
             (iPhase == 0 ? MakeJumpToTarget() : MakeArmSpin()),
             CBTAction::Create([this](CBlackboard*, _float) {
                 m_iMeleeSinceThrow = 0; return BT_STATUS::SUCCESS; }),
         }),
-            // 2) 근접 (<= fCloseRange): 20% 잡기 / 80% 찍기패턴
-        CBTSequence::Create({
-            CBTCondition::Create([this, fCloseRange](CBlackboard* pBB) {
-                return pBB->Get<_float>("DistToTarget", FLT_MAX) <= fCloseRange; }),
-            CBTSelector::Create({
-                CBTSequence::Create({
-                    CBTCondition::Create([](CBlackboard*) { return (rand() % 100) < 20; }),
-                    MakeCatch(),
-                }),
-                MakeStampPattern(),
-            }),
-            MeleeCount(),
-        }),
-        // 3) 중거리 (<= fSwingRange): 휘두르기 L/R
+        // 2) 스윙레인지 내라면 어디서든: 확률 잡기
         CBTSequence::Create({
             CBTCondition::Create([this, fSwingRange](CBlackboard* pBB) {
-                return pBB->Get<_float>("DistToTarget", FLT_MAX) <= fSwingRange; }),
-            Rand2(MakeArmSwing(false), MakeArmSwing(true)),
+                return pBB->Get<_float>("DistToTarget", FLT_MAX) <= fSwingRange
+                    && (rand() % 100) < 20; }),
+            MakeCatch(),
             MeleeCount(),
         }),
-            // 4) (P0 한정) 그 외 먼 거리: 돌던지기
-        CBTSequence::Create({
-            CBTCondition::Create([iPhase, fThrowRange](CBlackboard* pBB) {
-                  return iPhase == 0 && pBB->Get<_float>("DistToTarget", FLT_MAX) >= fThrowRange; }),
-            MakeThrowRock(),
-            MeleeCount(),
-        }),
-    });
+            // 3) 근접 (<= fCloseRange): 내려찍기만
+            CBTSequence::Create({
+                CBTCondition::Create([this, fCloseRange](CBlackboard* pBB) {
+                    return pBB->Get<_float>("DistToTarget", FLT_MAX) <= fCloseRange; }),
+                MakeStampPattern(),
+                MeleeCount(),
+            }),
+            // 4) 중거리 (<= fSwingRange): 휘두르기 L/R (기존 그대로)
+            CBTSequence::Create({
+                CBTCondition::Create([this, fSwingRange](CBlackboard* pBB) {
+                    return pBB->Get<_float>("DistToTarget", FLT_MAX) <= fSwingRange; }),
+                Rand2(MakeArmSwing(false), MakeArmSwing(true)),
+                MeleeCount(),
+            }),
+            // 5) (P0) 그 밖 원거리: 돌던지기 (기존 그대로)
+            CBTSequence::Create({
+                CBTCondition::Create([iPhase, fSwingRange](CBlackboard* pBB) {
+                      return iPhase == 0 && pBB->Get<_float>("DistToTarget", FLT_MAX) > fSwingRange; }),
+                MakeThrowRock(),
+                MeleeCount(),
+            }),
+        });
 
     // ---- 스캐폴딩 ----
     auto bMove = make_shared<bool>(false);
@@ -335,19 +424,6 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
         },
         [bTurn]() { *bTurn = false; });
 
-    const _float fRecoverTime = 0.8f;
-    auto fRecoverT = make_shared<_float>(0.f);
-    auto* pPostAttackRecover = CBTAction::Create(
-        [this, fRecoverT, fRecoverTime](CBlackboard*, _float dt) -> BT_STATUS {
-            if (*fRecoverT == 0.f)
-                m_pOwner->Get_BodyAnimator()->Play("Wait", true, true);   // 회전 없이 정지
-            *fRecoverT += dt;
-            if (*fRecoverT >= fRecoverTime) { *fRecoverT = 0.f; return BT_STATUS::SUCCESS; }
-            return BT_STATUS::RUNNING;
-        },
-        [fRecoverT]() { *fRecoverT = 0.f; });
-
-
     // 공격 쿨다운: 매 프레임 dt 누적, 차면 SUCCESS / 아니면 FAILURE
     auto* pCooldownGate = CBTAction::Create([this, fAtkInterval](CBlackboard*, _float dt) -> BT_STATUS {
         m_fAtkTimer += dt;
@@ -356,13 +432,12 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
     auto* pResetTimer = CBTAction::Create([this](CBlackboard*, _float) {
         m_fAtkTimer = 0.f; return BT_STATUS::SUCCESS;
         });
-    // 현재 거리에 맞는 공격이 있나? 없으면(애매한 거리) -> 공격 분기 실패 -> 추적
-    auto* pAttackable = CBTCondition::Create([this, fSwingRange, fThrowRange, iPhase](CBlackboard* pBB) {
-        if (m_iMeleeSinceThrow >= 3) return true;                  // 점프/스핀: 거리 무관
+    auto* pAttackable = CBTCondition::Create([this, fSwingRange, iPhase](CBlackboard* pBB) {
+        if (m_iMeleeSinceThrow >= 3) return true;
         _float d = pBB->Get<_float>("DistToTarget", FLT_MAX);
-        if (d <= fSwingRange) return true;                         // 근접/휘두르기
-        if (iPhase == 0 && d >= fThrowRange) return true;          // 던지기(P0)
-        return false;                                              // 14~40 애매 -> 추적
+        if (d <= fSwingRange) return true;                 // 근접/휘두르기
+        if (iPhase == 0 && d > fSwingRange) return true;   // 던지기(P0): 근접 밖 전부
+        return false;
         });
 
     auto bHeld = make_shared<bool>(false);   // 현재 정지 상태 유지 중인가

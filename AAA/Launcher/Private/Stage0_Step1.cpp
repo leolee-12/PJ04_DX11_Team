@@ -146,11 +146,11 @@ HRESULT CStage0_Step1::Ready_Camera()
     CamDesc.vEye = _float3(-1.f, 1.f, -10.f);
     CamDesc.vAt = _float3(0.f, 0.f, 0.f);
     CamDesc.fFovy = XMConvertToRadians(50.f); CamDesc.fNear = 0.1f; CamDesc.fFar = 1000.f;
-    CamDesc.strTargetLayer = TEXT("Layer_LiveObject");
-    CamDesc.strTargetObj = TEXT("Proto_Kirby_0");
     m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::STAGE0_STEP1),
         TEXT("Prototype_GameObject_Camera_Follow"),
         ETOUI(LEVEL::STAGE0_STEP1), TEXT("Layer_Camera"), TEXT("CameraFollow"), &CamDesc);
+
+
 
     return S_OK;
 }

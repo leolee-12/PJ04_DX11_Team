@@ -33,6 +33,7 @@ public:
 
 public:
 	void Update(_fmatrix TransformMatrix);
+	void Reset_Bounding(const COLLIDER_DESC& Desc);
 
 public:
 	_bool Intersect(CCollider* pTarget);
