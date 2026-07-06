@@ -35,19 +35,25 @@ protected:
 	virtual void			On_Explode() {}
 	virtual void			On_Impact() override;
 
+	virtual HRESULT			Ready_AnimEvents() { return S_OK; }
+
 private:
 	HRESULT					Bind_ShaderResources();
 	void					Roll_ByMovement(_float fTimeDelta);
 
 protected:
-	CShader* m_pShaderCom = { nullptr };
-	CModel* m_pModelCom = { nullptr };
-	CAnimator* m_pAnimatorCom = { nullptr };
+	CShader*				m_pShaderCom = { nullptr };
+	CModel*					m_pModelCom = { nullptr };
+	CAnimator*				m_pAnimatorCom = { nullptr };
 
 protected:
 	_float					m_fRollAngle = { 0.f };
 	_float3					m_vRollAxis = { 1.f, 0.f, 0.f };
 	static constexpr _float ROLL_DEG_PER_SPEED = { 45.f };
+
+	_float					m_fBurnRatio = { 0.f };
+
+	_float3					m_vGlow = { 0.f, 0.f, 0.f };
 
 protected:
 	virtual void			Free() override;

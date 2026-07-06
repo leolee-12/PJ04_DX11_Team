@@ -2,6 +2,11 @@
 #include "Projectile_Bomb.h"
 #include "Inhalable.h"
 
+NS_BEGIN(Engine)
+class CEffect_Container;
+NS_END
+
+
 NS_BEGIN(Client)
 
 class CEnemyBomb final : public CProjectile_Bomb, public IInhalable
@@ -49,11 +54,17 @@ protected:
 
 	virtual void				On_Explode() override;
 
+	virtual HRESULT				Ready_AnimEvents() override;
+
 private:
 	void						Update_Captured(_float fTimeDelta);	
+	void						Update_FuseSocket();
 
 private:
 	CGameObject*				m_pCaptor = { nullptr };
+	CEffect_Container*			m_pFuseFx = { nullptr };
+	_float4x4					m_matFuseWorld{};
+	const _float4x4*			m_pFuseBone = { nullptr };
 
 	_bool						m_bCaptured = { false };
 	_float						m_fPullSpeed = { 0.f };

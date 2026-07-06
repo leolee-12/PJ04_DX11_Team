@@ -47,6 +47,15 @@ void CEnemyBomb::On_Swallowed()
 
 	SWALLOW_EVENT payload{ this };          
 	m_pGameInstance_Proxy->Publish(EVT_SWALLOWED, &payload);
+
+	if (m_pFuseFx)
+	{
+		m_pFuseFx->EffectContainer_StopAfterEmission();
+		//m_pFuseFx->EffectContainer_Stop();
+		//m_pFuseFx->Start_FadeOut(0.3f);
+		m_pFuseFx = nullptr;
+	}
+
 	m_pCaptor = nullptr;
 	Despawn();
 }
@@ -56,10 +65,12 @@ void CEnemyBomb::Update(_float fTimeDelta)
 	if (m_bAlive && m_bCaptured)		// 흡입 중 : 물리/폭발/피격 off
 	{
 		Update_Captured(fTimeDelta);	// 흡입 로직만
+		Update_FuseSocket();
 		return;
 	}
 
 	__super::Update(fTimeDelta);
+	Update_FuseSocket();
 }
 
 HRESULT CEnemyBomb::Ready_Visual()
@@ -74,7 +85,7 @@ HRESULT CEnemyBomb::Ready_Visual()
 
 	CAnimator::ANIMATOR_DESC ad{};
 	ad.pModel = m_pModelCom;
-	ad.strDataFile = TEXT("");
+	ad.strDataFile = TEXT("../../Resources/CHJ/Monster/PoppyBrosJr/EnemyBomb/EnemyBomb_AnimEvents.json");
 	m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
 	if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&ad)))
 		return E_FAIL;
@@ -89,6 +100,7 @@ void CEnemyBomb::On_Activated()
 
 	m_bCaptured = false;
 	m_fRollAngle = 0.f;
+	m_vGlow = { 0.f, 0.f, 0.f };
 	m_pAnimatorCom->Clear_Overlay(1);
 
 	m_pAnimatorCom->Play("FuseBurning", false, true);		// 크래쉬 안나게 설정
@@ -99,17 +111,30 @@ void CEnemyBomb::On_Activated()
 	LayerInfo.tAnim.strAniName = "FuseBurning";
 	LayerInfo.tAnim.bLoop = false;		// 해당 애니메이션 끝나면 수명 끝이므로 false
 	LayerInfo.tAnim.bRestart = true;
-	LayerInfo.tAnim.fSpeed = 1.25f;
+	LayerInfo.tAnim.fSpeed = 1.f;
 	LayerInfo.Roots = { "EffectL" };
 
 	m_pAnimatorCom->Apply_Overlay(LayerInfo);
 
 	if (m_bCarried)
 	{
-		// 점화 이펙트 여기에서 부착
-
 		m_pAnimatorCom->Pause_Mask(1);
 		Update_Socket();
+	}
+
+	if (nullptr == m_pFuseBone)
+		m_pFuseBone = m_pModelCom->Get_BoneMatrixPtr("EffectL");
+
+	Update_FuseSocket();
+
+	if (nullptr == m_pFuseFx)
+	{
+		CEffect_Loader::GetInstance()->Spawn(
+			L"BombFuseEffect", Get_LevelIndex(),
+			_float3(0.f, 0.f, 0.f),
+			_float3(0.f, 0.f, 0.f),
+			_float3(0.f, 0.f, 0.f),
+			&m_matFuseWorld, &m_pFuseFx);
 	}
 }
 
@@ -142,7 +167,41 @@ void CEnemyBomb::On_Explode()
 		vPos, _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
 		nullptr);
 
+	if (m_pFuseFx)
+	{
+		m_pFuseFx->EffectContainer_StopAfterEmission();
+		//m_pFuseFx->EffectContainer_Stop();
+
+		m_pFuseFx = nullptr;
+	}
+
 	Despawn();
+}
+
+HRESULT CEnemyBomb::Ready_AnimEvents()
+{
+	if (nullptr == m_pAnimatorCom)
+		return E_FAIL;
+
+	m_pAnimatorCom->Set_EventCallback(
+		[this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase)
+		{
+
+			switch (static_cast<EANIM_EVENT>(e.iEventType))
+			{
+			case EANIM_EVENT::SetBody:
+			{
+				if (phase == ANIM_EVENT_PHASE::POINT)
+				{
+					m_vGlow = _float3(e.vOffset.x, e.vOffset.y, e.vOffset.z);
+				}
+				break;
+			}
+			default:
+				break;
+			}
+		});
+	return S_OK;
 }
 
 void CEnemyBomb::Update_Captured(_float fTimeDelta)
@@ -181,6 +240,19 @@ void CEnemyBomb::Update_Captured(_float fTimeDelta)
 		m_pAnimatorCom->SetBoneRotation("RotL", m_fRollAngle, XMLoadFloat3(&m_vRollAxis));		// 회전 유지
 		m_pAnimatorCom->Update(fTimeDelta);
 	}
+}
+
+void CEnemyBomb::Update_FuseSocket()
+{
+	if (!m_pFuseBone)	return;
+	_matrix matBoneWorld =
+		XMLoadFloat4x4(m_pFuseBone) *
+		XMLoadFloat4x4(Get_Transform()->Get_WorldMatrixPtr());
+
+	_matrix matSocket = XMMatrixIdentity();   // 회전=월드 정렬
+	matSocket.r[3] = matBoneWorld.r[3];
+
+	XMStoreFloat4x4(&m_matFuseWorld, matSocket);
 }
 
 CEnemyBomb* CEnemyBomb::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

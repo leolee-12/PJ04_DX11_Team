@@ -19,6 +19,9 @@ HRESULT CProjectile_Bomb::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
+    if (FAILED(Ready_AnimEvents()))
+        return E_FAIL;
+
     if (m_pMovement)
         m_pMovement->Set_Physics(-45.f, 0.3f, 0.45f);
 
@@ -72,6 +75,7 @@ HRESULT CProjectile_Bomb::Render()
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
 
+
     const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
@@ -85,7 +89,10 @@ HRESULT CProjectile_Bomb::Render()
                 return E_FAIL;
             if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
                 return E_FAIL;
-
+            if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_FuseMaskTexture", i, MTEX_TYPE::UNKNOWN, 0)))
+                return E_FAIL;
+            if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_FuseBurntTexture", i, MTEX_TYPE::UNKNOWN, 1)))
+                return E_FAIL;
             iPass = 1;
         }
         else
@@ -171,10 +178,17 @@ void CProjectile_Bomb::Tick_Visual(_float fTimeDelta)
     Roll_ByMovement(fTimeDelta);
 
     if (m_pAnimatorCom)
+    {
         m_pAnimatorCom->Update(fTimeDelta);
+        m_fBurnRatio =
+            m_pAnimatorCom->Get_LayerProgress(1);
 
-    if (m_pAnimatorCom && m_pAnimatorCom->Is_Overlay_Finished(1))        // FuseBurning 애니메이션을 Base에 깔기
-        Bomb_Explode();
+        _vector vCur = XMLoadFloat3(&m_vGlow);
+        XMStoreFloat3(&m_vGlow, vCur);
+
+        if (m_fBurnRatio >= 1.f)
+            Bomb_Explode();
+    }
 }
 
 void CProjectile_Bomb::On_Impact()
@@ -216,6 +230,10 @@ HRESULT	CProjectile_Bomb::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fBurnRatio", &m_fBurnRatio, sizeof(_float))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vGlow", &m_vGlow, sizeof(_float3))))
         return E_FAIL;
 
     return S_OK;

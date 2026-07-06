@@ -177,6 +177,7 @@ protected:
 	_bool						Handle_SharedAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
 	void						Play_DeathFX();
 	void						Compute_SpatPivot();
+	void						Update_SpatPivot_FromBone();
 
 protected:
 	template<class TPart>

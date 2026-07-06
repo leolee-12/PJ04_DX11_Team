@@ -874,6 +874,12 @@
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Spat">
       <UniqueIdentifier>{dcb1512b-4270-4d45-88e6-fa87ac86dc6e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\12. BombFuseEffect">
+      <UniqueIdentifier>{a77db0a5-c085-47bb-ae9c-91fba3cf6b27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\Sparkle">
+      <UniqueIdentifier>{99c5e77a-1ebf-4337-9cd1-835047d27aaf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1755,6 +1761,12 @@
     <ClInclude Include="..\Public\Monster_State_Spat.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BombFuseEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\12. BombFuseEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Sparkle.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\Sparkle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2557,6 +2569,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Monster_State_Spat.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BombFuseEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\12. BombFuseEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Sparkle.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\Sparkle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

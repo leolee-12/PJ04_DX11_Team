@@ -568,6 +568,27 @@ void CMonster::Compute_SpatPivot()
 		(vMin.z + vMax.z) * 0.5f);
 }
 
+void CMonster::Update_SpatPivot_FromBone()
+{
+	auto it = m_PartObjects.find(L"Body");
+	if (it == m_PartObjects.end())
+		return;
+
+	CMonsterPart* pBody =
+		dynamic_cast<CMonsterPart*>(it->second);
+	if (nullptr == pBody)
+		return;
+
+	const _float4x4* pBone =
+		pBody->Get_BoneMatrixPtr("CenterL");
+	if (nullptr == pBone)
+		pBone = pBody->Get_BoneMatrixPtr("RotL");
+
+	if (pBone)
+		m_vSpatPivot = _float3(
+			pBone->_41, pBone->_42, pBone->_43);
+}
+
 void CMonster::Play_ActionLoopSFX(const _tchar* pKey)
 {
 	m_ActionLoopSnd.Stop();
@@ -615,6 +636,9 @@ void CMonster::On_SpatBegin()
 	
 	Enable_Controller(false);
 	Enable_Colliders(false);
+
+	Update_SpatPivot_FromBone();
+
 	Change_State(MONSTER_STATE_TYPE::SPAT);
 }
 

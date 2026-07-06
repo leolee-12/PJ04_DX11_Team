@@ -72,7 +72,7 @@
 #include "CarMilkyWay.h"
 #include "CommonHit.h"
 #include "SpitObject.h"
-
+#include "BombFuseEffect.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -104,6 +104,7 @@
 #include "HitMark.h"
 #include "Bubble.h"
 #include "StarEmitter.h"
+#include "Sparkle.h"
 
 //sky
 #include "SkySphere.h"
@@ -949,6 +950,23 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StarSmooth"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Star/Common_00_Common_StarSmooth.ysh"));
 
+
+        ));
+
+    // 6 
+    Register(CBombFuseEffect::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CBombFuseEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSparkle::PROTOTYPE_TAG, CSparkle::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, Texture_CommonSparkle02.iLevelID, Texture_CommonSparkle02.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_CommonSparkle02.szFileTag,
+                    Texture_CommonSparkle02.iNumTex));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeEmitter::PROTOTYPE_TAG, CSmokeEmitter::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
 
         ));
 

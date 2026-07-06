@@ -42,7 +42,7 @@ float g_fUVCutLeft = { 0.f };
 float g_fUVCutTop = { 0.f };
 float g_fUVCutBottom = { 0.f };
 
-
+float g_fRoll = { 0.f };
 
 struct VS_IN
 {
@@ -69,9 +69,15 @@ VS_OUT VS_MAIN(VS_IN In)
         vScale.y = length(mul(float4(0.f, 1.f, 0.f, 0.f), g_WorldMatrix).xyz);
         vScale.z = length(mul(float4(0.f, 0.f, 1.f, 0.f), g_WorldMatrix).xyz);
 
+        float2 vLocal = In.vPosition.xy * vScale.xy; // 스케일 적용
+        float s = sin(g_fRoll);
+        float c = cos(g_fRoll);
+        float2 vRolled = float2(vLocal.x * c - vLocal.y * s,
+                                  vLocal.x * s + vLocal.y * c); // 화면 롤
+
         vPosition = mul(float4(0.f, 0.f, 0.f, 1.f), g_WorldMatrix);
         vPosition = mul(vPosition, g_ViewMatrix);
-        vPosition.xyz += In.vPosition * vScale;
+        vPosition.xyz += float3(vRolled, In.vPosition.z * vScale.z);
         vPosition = mul(vPosition, g_ProjMatrix);
     }
     else
