@@ -89,6 +89,20 @@ _bool CKirby_Hovering::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
     {
         // Move Press
         case KIRBY_COMMAND_TYPE::MOVE_TOP:
+        {
+            if (!pCommand->IsPress())
+                return false;
+
+            if (Try_Transition_Ladder_CommandUp(pKirby))
+                return true;
+
+            if (m_bMoveLock)
+                return true;
+
+            Handle_MoveCommand(pKirby, pCommand);
+            return true;
+        }
+
         case KIRBY_COMMAND_TYPE::MOVE_DOWN:
         case KIRBY_COMMAND_TYPE::MOVE_LEFT:
         case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
@@ -96,7 +110,7 @@ _bool CKirby_Hovering::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             if (!pCommand->IsPress())
                 return false;
 
-            if (m_bMoveLock == true)
+            if (m_bMoveLock)
                 return true;
 
             Handle_MoveCommand(pKirby, pCommand);

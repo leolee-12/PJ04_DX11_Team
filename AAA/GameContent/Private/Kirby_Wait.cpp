@@ -47,6 +47,8 @@ void CKirby_Wait::Update(CKirby* pKirby, const _float fTimeDelta)
 void CKirby_Wait::Exit(CKirby* pKirby)
 {
     __super::Exit(pKirby);
+
+    pKirby->Get_CurrentDeformModel()->Stop_SoundHandle();
 }
 
 _bool CKirby_Wait::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -60,7 +62,29 @@ _bool CKirby_Wait::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
     {
         // Move Press
         case KIRBY_COMMAND_TYPE::MOVE_TOP:
+        {
+            if (!pCommand->IsPress())
+                return false;
+
+            if (Try_Transition_Ladder_CommandUp(pKirby))
+                return true;
+
+            Handle_MoveCommand(pKirby, pCommand);
+            pKirby->Change_State(KIRBY_STATE_TYPE::RUN);
+            return true;
+        }
         case KIRBY_COMMAND_TYPE::MOVE_DOWN:
+        {
+            if (!pCommand->IsPress())
+                return false;
+
+            if (Try_Transition_Ladder_CommandDown(pKirby))
+                return true;
+
+            Handle_MoveCommand(pKirby, pCommand);
+            pKirby->Change_State(KIRBY_STATE_TYPE::RUN);
+            return true;
+        }
         case KIRBY_COMMAND_TYPE::MOVE_LEFT:
         case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
         {

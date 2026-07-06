@@ -229,6 +229,7 @@ void CKirby_GetDeform::Exit_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
                 m_pInhaleEffect->EffectContainer_Stop();
                 m_pInhaleEffect = nullptr;
             }
+            pKirby->Get_Body()->Stop_SoundHandle();
             break;
         }
         case DEFORM_STATE::DEFORM:
