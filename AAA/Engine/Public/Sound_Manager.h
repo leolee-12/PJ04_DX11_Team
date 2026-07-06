@@ -30,6 +30,7 @@ public:
     // Loop SFX : 상태 코드에서 재생 필요할 때 사용
     CSound_Handle PlaySFXLoop(const TCHAR* pSoundKey, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
     CSound_Handle PlaySFX3DLoop(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
+    CSound_Handle PlaySFXSectionLoop(const TCHAR* pSoundKey, float _fLoopStart, float fLoopEnd, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
 
     // BGM: 소유 핸들로 교체(기존 정지 후 재생)
     void PlayBGM(const TCHAR* pSoundKey, float fVolume = 1.f, bool bLoop = true);
@@ -37,6 +38,8 @@ public:
 
     // 구간 반복 BGM: 0부터 재생, 이후 fStart01~fEnd01(0~1) 구간 반복
     void PlayBGM_Section(const TCHAR* pSoundKey, float fStart01, float fEnd01, float fVolume = 1.f);
+    void Fade_BGM_Out(_float fSec);
+    void Play_BGM_Fade(const TCHAR* pSoundKey, float fSec, float fVolume = 1.f);
 
     // 버스(카테고리) 단위 제어
     void SetBusVolume(ESoundBus eBus, float fVolume);
@@ -65,6 +68,8 @@ private:
     HRESULT Ready_Buses();
     HRESULT LoadSoundFile();
     HRESULT LoadSoundFileRecursive(const char* pPath);
+
+    static void Fade_BGM_Channel(FMOD::Channel* pCh, float fFrom, float fTo, float fSeconds, bool bStopAtEnd);
 
 public:
     static CSound_Manager* Create();

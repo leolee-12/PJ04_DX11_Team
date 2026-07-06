@@ -48,22 +48,40 @@ HRESULT CLevelDesign_Ladder::Initialize(void* pArg)
 	if (nullptr == pArg)
 		return E_FAIL;
 
-	if (FAILED(__super::Initialize(pArg)))
-		return E_FAIL;
-
 	m_tLadderDesc = *static_cast<const LD_LADDER_DESC*>(pArg);
 
-	if (FAILED(Validate_Desc()))
+	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	if (FAILED(Resolve_SegmentStepY()))
+	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
 
-	if (FAILED(Ready_LadderCollider()))
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Ladder::Validate_Initialized()
+{
+	if (FAILED(__super::Validate_Initialized()))
 		return E_FAIL;
+
+	if (m_tLadderDesc.eCategory != LD_CATEGORY::GIMMICK)
+		return E_FAIL;
+	if (0u == m_tLadderDesc.iLength)
+		return E_FAIL;
+	if (m_fSegmentStepY <= 0.f)
+		return E_FAIL;
+
+	if (nullptr == m_pShaderCom || nullptr == m_pCollider)
+		return E_FAIL;
+
+	for (_uint i = 0; i < SEGMENT::_COUNT; ++i)
+	{
+		if (nullptr == m_ModelComs[i])
+			return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -72,7 +90,7 @@ void CLevelDesign_Ladder::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
-	if (m_pCollider && m_pCollider->Is_Enabled())
+	if (m_pCollider->Is_Enabled())
 	{
 		m_pCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 #ifdef _DEBUG
@@ -86,9 +104,6 @@ void CLevelDesign_Ladder::Late_Update(_float fTimeDelta)
 
 HRESULT CLevelDesign_Ladder::Render()
 {
-	if (nullptr == m_pShaderCom)
-		return S_OK;
-
 	const _matrix matBaseWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
 	const _uint iLength = m_tLadderDesc.iLength;
 
@@ -251,14 +266,22 @@ _vector CLevelDesign_Ladder::Get_BottomClimbWorld() const
 }
 
 HRESULT CLevelDesign_Ladder::Validate_Desc()
+
+HRESULT CLevelDesign_Ladder::Ready_Components()
 {
-	if (0u == m_tLadderDesc.iLength)
+	if (FAILED(Ready_RenderComponents()))
+		return E_FAIL;
+
+	if (FAILED(Resolve_SegmentStepY()))
+		return E_FAIL;
+
+	if (FAILED(Ready_LadderCollider()))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CLevelDesign_Ladder::Ready_Components()
+HRESULT CLevelDesign_Ladder::Ready_RenderComponents()
 {
 	m_pShaderCom = Add_Component<CShader>(Shader_NonAnimMesh_PBR.iLevelID, Shader_NonAnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
 	if (nullptr == m_pShaderCom)

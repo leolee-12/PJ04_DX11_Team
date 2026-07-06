@@ -29,9 +29,11 @@ private:
 	CLevelDesign_Ladder(const CLevelDesign_Ladder& Prototype);
 	virtual ~CLevelDesign_Ladder() = default;
 
-public:
 	virtual HRESULT	Initialize_Prototype() override;
 	virtual HRESULT	Initialize(void* pArg) override;
+	virtual HRESULT	Validate_Initialized() override;
+
+public:
 	virtual void	Late_Update(_float fTimeDelta) override;
 	virtual HRESULT	Render() override;
 	virtual void	Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
@@ -62,8 +64,9 @@ private:
 	virtual HRESULT	Validate_Desc() override;
 
 	HRESULT	Ready_Components();
-	HRESULT Ready_LadderCollider();
-	HRESULT Resolve_SegmentStepY();
+	HRESULT	Ready_RenderComponents();
+	HRESULT	Ready_LadderCollider();
+	HRESULT	Resolve_SegmentStepY();
 	HRESULT	Bind_ShaderResources(const _float4x4& WorldMatrix);
 	HRESULT	Render_Model(CModel* pModel);
 

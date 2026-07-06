@@ -1,10 +1,6 @@
 #pragma once
 #include "Monster_State.h"
 
-NS_BEGIN(Engine)
-class CEffect_Container;
-NS_END
-
 NS_BEGIN(Client)
 class CMonster;
 
@@ -22,19 +18,6 @@ public:
     virtual void                Enter(MONSTER_STATE_TYPE ePrevState = MONSTER_STATE_TYPE::IDLE) override;
     virtual void                Update(_float fTimeDelta) override;
     virtual void                Exit(MONSTER_STATE_TYPE eNextState) override;
-
-private:
-    _float                      m_fSpinAngle = { 0.f };
-    _float                      m_fLifeTime = { 0.f };
-    static constexpr _float     s_fMaxLifeTime = 2.5f;
-    static constexpr _float     s_fSpinSpeedDeg = 360.f;
-
-    const _float4x4*            m_pBoneMat = { nullptr };  
-    _float4x4                   m_SocketWorld = {};
-
-    _bool                       m_bSpinBone = { false };
-
-    //CEffect_Container*          m_pSpitFx = { nullptr };
 
 public:
     static CMonster_State_Spat* Create(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f);

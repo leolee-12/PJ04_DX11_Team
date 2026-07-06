@@ -6,7 +6,6 @@
 #include "GameInstance.h"
 #include "GameObject.h"
 #include "MapSection.h"
-#include "Transform.h"
 #include "GameContrnt_Events.h"     // UI_RBTN_PROBE / WORLD_RBTN_DOWN
 
 #include "imgui.h"
@@ -25,7 +24,7 @@ namespace
     }
 
     _bool Compute_ViewportPickingRay(
-        Engine::CGameInstance_Proxy* pProxy,
+        CGameInstance_Proxy* pProxy,
         _float fNdcX,
         _float fNdcY,
         _vector* pOutOrigin,

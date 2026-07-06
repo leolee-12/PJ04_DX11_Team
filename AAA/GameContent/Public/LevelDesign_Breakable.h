@@ -24,23 +24,21 @@ class CLevelDesign_Breakable final
 
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_LevelDesign_Breakable";
-	static constexpr const _tchar* STARBLOCK_H1W1_MODEL_PROTO_TAG = L"Prototype_Component_Model_Star_H1W1";
-	static constexpr const _tchar* STARBLOCK_H2W2_MODEL_PROTO_TAG = L"Prototype_Component_Model_Star_H2W2";
-	static constexpr const _tchar* STARBLOCK_H3W3_MODEL_PROTO_TAG = L"Prototype_Component_Model_Star_H3W3";
 	static constexpr const _tchar* WOODBOX_MODEL_PROTO_TAG = L"Prototype_Component_Model_BoxWood";
 	static constexpr const _tchar* PLASTICBOX_MODEL_PROTO_TAG = L"Prototype_Component_Model_BoxPlastic";
 	static constexpr const _tchar* BREAKABLE_ROCK_S_MODEL_PROTO_TAG = L"Prototype_Component_Model_BreakableRock_S";
 	static constexpr const _tchar* BREAKABLE_ROCK_M_MODEL_PROTO_TAG = L"Prototype_Component_Model_BreakableRock_M";
-	static constexpr const _tchar* STARBLOCK_MODEL_PROTO_TAG = STARBLOCK_H1W1_MODEL_PROTO_TAG;
 
 private:
 	CLevelDesign_Breakable(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CLevelDesign_Breakable(const CLevelDesign_Breakable& Prototype);
 	virtual ~CLevelDesign_Breakable() = default;
 
-public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
+	virtual	HRESULT	Validate_Initialized() override;
+
+public:
 	virtual void    Update(_float fTimeDelta) override;
 	virtual void    Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
@@ -71,11 +69,9 @@ private:
 	BREAKABLE_STATE m_eState = { BREAKABLE_STATE::INTACT };
 
 private:
-	virtual	HRESULT	Validate_Desc() override;
-
 	HRESULT			Ready_Components();
 	HRESULT			Ready_HurtBox();
-	HRESULT			Ready_PhysicsActor_Box();
+	HRESULT			Ready_PhysicsActor();
 	void			Release_PhysicsActor();
 
 	HRESULT			Bind_ShaderResources();

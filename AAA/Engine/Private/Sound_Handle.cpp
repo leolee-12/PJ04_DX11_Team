@@ -18,6 +18,20 @@ void CSound_Handle::Stop()
     m_pChannel = nullptr;
 }
 
+void CSound_Handle::Release_Loop()
+{
+    if (!m_pChannel)
+        return;
+
+    FMOD_MODE mode = 0;
+    if (m_pChannel->getMode(&mode) != FMOD_OK)
+        return;
+
+    mode &= ~(FMOD_LOOP_NORMAL | FMOD_LOOP_BIDI);
+    mode |= FMOD_LOOP_OFF;
+    m_pChannel->setMode(mode);
+}
+
 void CSound_Handle::Set_Paused(_bool bPause)
 {
     if (!m_pChannel)

@@ -1,6 +1,6 @@
 #include "Map_Spawner.h"
 #include "MapStage.h"
-#include "MapBreakSection.h"
+#include "MapEvent_BreakWall.h"
 #include "EnvObject_Static.h"
 #include "EnvObject_Interact.h"
 #include "EnvTrigger_Generic.h"
@@ -131,35 +131,33 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 			Targets.pStageObjectTag
 			});
 
-		if (StageDesc.strStageName == CMapBreakSection::STAGE12_STAGE_NAME)
+		if (StageDesc.strStageName == CMapEvent_BreakWall::STAGE12_STAGE_NAME)
 		{
-			CMapBreakSection::MAP_BREAK_SECTION_DESC Desc{};
-			Desc.strSectionName = CMapBreakSection::STAGE12_SECTION_NAME;
-			Desc.wstrModelProtoTag = CMapBreakSection::STAGE12_MODEL_PROTO_TAG;
+			CMapEvent_BreakWall::MAP_EVENT_BREAK_WALL_DESC Desc{};
 			Desc.iModelProtoLevel = Levels.iStageModelLevel;
 			Desc.bRenderable = false;
 
-			CGameObject* pBreakObject = nullptr;
+			CGameObject* pBreakWall = nullptr;
 			if (FAILED(m_pProxy->Add_GameObject_Return(
-				&pBreakObject,
+				&pBreakWall,
 				Levels.iObjectLevel,
-				CMapBreakSection::PROTOTYPE_TAG,
+				CMapEvent_BreakWall::PROTOTYPE_TAG,
 				Targets.Stage.iPlaceLevel,
-				CMapBreakSection::LAYER_TAG,
-				CMapBreakSection::STAGE12_OBJECT_TAG,
+				CMapEvent_BreakWall::LAYER_TAG,
+				CMapEvent_BreakWall::STAGE12_OBJECT_TAG,
 				&Desc)))
 			{
 				Rollback(CreatedObjects);
 				return E_FAIL;
 			}
 
-			CreatedObjects.push_back(pBreakObject);
+			CreatedObjects.push_back(pBreakWall);
 			PendingCallbacks.push_back({
-					pBreakObject,
-					CMapBreakSection::PROTOTYPE_TAG,
-					CMapBreakSection::LAYER_TAG,
-					CMapBreakSection::STAGE12_OBJECT_TAG
-				});
+				pBreakWall,
+				CMapEvent_BreakWall::PROTOTYPE_TAG,
+				CMapEvent_BreakWall::LAYER_TAG,
+				CMapEvent_BreakWall::STAGE12_OBJECT_TAG
+			});
 		}
 	}
 

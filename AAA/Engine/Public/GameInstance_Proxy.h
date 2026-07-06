@@ -184,9 +184,12 @@ public: // Picking
 
     CSound_Handle Play_SFX_Loop(const TCHAR* pSoundKey, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
     CSound_Handle Play_SFX3D_Loop(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
+    CSound_Handle Play_SFX_Section_Loop(const TCHAR* pSoundKey, float fLoopStart, float fLoopEnd, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
 
     void Play_BGM(const TCHAR* pSoundKey, float fVolume = 1.f, bool bLoop = true);
     void Play_BGM_Section(const TCHAR* pSoundKey, float fStart01, float fEnd01, float fVolume = 1.f);
+    void Fade_BGM_Out(float fSeconds);
+    void Play_BGM_Fade(const TCHAR* pSoundKey, float fSeconds, float fVolume = 1.f);
     void Stop_BGM();
     void Set_BusVolume(ESoundBus eBus, float fVolume);
     void Stop_Bus(ESoundBus eBus);
@@ -254,6 +257,7 @@ public:
 #pragma region PHYSIX_MANAGER
       physx::PxTriangleMesh* Cook_TriangleMesh(const _float3* pPositions, _uint iNumVertices, const _uint* pIndices, _uint iNumIndices, _bool bFlipWinding = true);
       physx::PxRigidStatic*  Create_StaticActor(physx::PxTriangleMesh* pMesh, _fmatrix WorldMatrix);
+      HRESULT				 Refresh_StaticBoxPose(physx::PxRigidStatic* pActor, const _float3& vLocalCenter, _fmatrix WorldMatrix);
       physx::PxRigidStatic*  Create_StaticBox(const _float3& vLocalCenter, const _float3& vLocalHalfExtents, _fmatrix WorldMatrix);
       void                   Remove_StaticActor(physx::PxRigidStatic* pActor);
 

@@ -41,6 +41,7 @@ public:
 
 protected:
     // non-loop 파트 전부 종료 시 1회 호출. 기본 no-op. 페이드인/아웃이 신호 발행 override.
+    virtual void    On_SequenceStart() {}
     virtual void    On_SequenceDone() {}
     void            Refresh_Subscription();
 
