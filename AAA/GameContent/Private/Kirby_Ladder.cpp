@@ -58,6 +58,13 @@ void CKirby_Ladder::Enter(CKirby* pKirby)
     {
         MSG_BOX("Enter Bug: CKirby_Ladder");
     }
+
+    // 변수 초기화
+    m_iCurMoveDir = 0;
+    m_iPreMoveDir = 0;
+
+    m_eLadderState = LADDER_STATE::LADDER_END;
+    Change_LadderState(pKirby, LADDER_STATE::WAIT);
 }
 
 void CKirby_Ladder::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -99,14 +106,7 @@ _bool CKirby_Ladder::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             if (!pCommand->IsPress())
                 return false;
 
-            CLevelDesign_Ladder* pLadder = pKirby->Get_Ladder();
-            if (pLadder->Is_TopCell(m_iCurLadderIndex))
-            {
-                Transition_Fall_OR_Wait_OR_Run(pKirby);
-                return true;
-            }
-
-            m_iNextLadderIndex = m_iCurLadderIndex + 1;
+            m_iCurMoveDir = 1;
 
             return true;
         }
@@ -116,14 +116,7 @@ _bool CKirby_Ladder::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             if (!pCommand->IsPress())
                 return false;
 
-            CLevelDesign_Ladder* pLadder = pKirby->Get_Ladder();
-            if (pLadder->Is_BottomCell(m_iCurLadderIndex))
-            {
-                Transition_Fall_OR_Wait_OR_Run(pKirby);
-                return true;
-            }
-
-            m_iNextLadderIndex = m_iCurLadderIndex - 1;
+            m_iCurMoveDir = -1;
 
             return true;
         }
@@ -158,7 +151,10 @@ void CKirby_Ladder::Enter_LadderState(CKirby* pKirby, LADDER_STATE eState)
     switch (m_eLadderState)
     {
         case LADDER_STATE::WAIT:
+        {
+
             break;
+        }
         case LADDER_STATE::MOVE:
             break;
     }
@@ -169,9 +165,28 @@ void CKirby_Ladder::Update_LadderState(CKirby* pKirby, _float fTimeDelta)
     switch (m_eLadderState)
     {
         case LADDER_STATE::WAIT:
+        {
+            CLevelDesign_Ladder* pLadder = pKirby->Get_Ladder();
+            if(Handle_LadderTopBottom(pKirby, pLadder))
+                return;
+
+            if (m_iCurMoveDir != 0)
+            {
+                Set_NextCell();
+                Change_LadderState(pKirby, LADDER_STATE::MOVE);
+            }
+
             break;
+        }
         case LADDER_STATE::MOVE:
         {
+            if (m_iCurMoveDir != 0 && m_iPreMoveDir != m_iCurMoveDir)
+            {
+                std::swap(m_iCurLadderIndex, m_iNextLadderIndex);
+                m_iPreMoveDir = m_iCurMoveDir;
+                m_iCurMoveDir = 0;
+            }
+
             CLevelDesign_Ladder* pLadder = pKirby->Get_Ladder();
             if (m_iCurLadderIndex != m_iNextLadderIndex)
             {
@@ -204,6 +219,19 @@ void CKirby_Ladder::Update_LadderState(CKirby* pKirby, _float fTimeDelta)
                     pMovement->Sync_To_Controller();
 
                     m_iCurLadderIndex = m_iNextLadderIndex;
+
+                    if (Handle_LadderTopBottom(pKirby, pLadder))
+                        return;
+
+                    if(m_iCurMoveDir == 0)
+                    {
+                        m_iPreMoveDir = 0;
+                        Change_LadderState(pKirby, LADDER_STATE::WAIT);
+                    }
+                    else
+                    {
+                        Set_NextCell();
+                    }
                     return;
                 }
 
@@ -227,6 +255,34 @@ void CKirby_Ladder::Exit_LadderState(CKirby* pKirby, LADDER_STATE eState)
         case LADDER_STATE::MOVE:
             break;
     }
+}
+
+void CKirby_Ladder::Set_NextCell()
+{
+    m_iNextLadderIndex = m_iCurLadderIndex + m_iCurMoveDir;
+    m_iPreMoveDir = m_iCurMoveDir;
+    m_iCurMoveDir = 0;
+}
+
+_bool CKirby_Ladder::Handle_LadderTopBottom(CKirby* pKirby, CLevelDesign_Ladder* pLadder)
+{
+    if (m_iCurMoveDir == 1 && pLadder->Is_TopCell(m_iCurLadderIndex))
+    {
+        m_iCurMoveDir = 0;
+        m_iPreMoveDir = 0;
+        Transition_Fall_OR_Wait_OR_Run(pKirby);
+        return true;
+    }
+    
+    if (m_iCurMoveDir == -1 && pLadder->Is_BottomCell(m_iCurLadderIndex))
+    {
+        m_iCurMoveDir = 0;
+        m_iPreMoveDir = 0;
+        Transition_Fall_OR_Wait_OR_Run(pKirby);
+        return true;
+    }
+
+    return false;
 }
 
 CKirby_Ladder* CKirby_Ladder::Create()

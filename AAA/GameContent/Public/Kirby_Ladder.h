@@ -8,13 +8,14 @@ NS_END
 NS_BEGIN(Client)
 
 class CKirby;
+class CLevelDesign_Ladder;
 
 class CLIENT_DLL CKirby_Ladder final : public CKirby_ControllableState
 {
 private:
 	static constexpr _float s_fLadderSpeed = 8.f;
 
-	enum LADDER_STATE { WAIT, MOVE };
+	enum LADDER_STATE { WAIT, MOVE, LADDER_END };
 
 private:
 	CKirby_Ladder();
@@ -40,11 +41,17 @@ private:
 	_int m_iCurLadderIndex{};
 	_int m_iNextLadderIndex{};
 
+	_int m_iCurMoveDir{};
+	_int m_iPreMoveDir{};
+
 private:
 	void Change_LadderState(CKirby* pKirby, LADDER_STATE eNext);
 	void Enter_LadderState(CKirby* pKirby, LADDER_STATE eState);
 	void Update_LadderState(CKirby* pKirby, _float fTimeDelta);
 	void Exit_LadderState(CKirby* pKirby, LADDER_STATE eState);
+
+	void Set_NextCell();
+	_bool Handle_LadderTopBottom(CKirby* pKirby, CLevelDesign_Ladder* pLadder);
 
 public:
 	static CKirby_Ladder* Create();
