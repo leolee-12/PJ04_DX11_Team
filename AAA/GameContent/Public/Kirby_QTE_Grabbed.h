@@ -45,6 +45,11 @@ private:
 private:
 	QTE_GRABBED_STATE m_eQTEGrabbedState{ QTE_GRABBED_STATE:: GRABBED_STATE_END };
 
+	_bool m_bPublishedEvent{};
+	_float m_fQTE_TimeLimit{};
+	_uint m_iQTE_InputCount{};
+	_uint m_iQTE_RequiredCount{};
+
 public:
 	static CKirby_QTE_Grabbed* Create();
 private:

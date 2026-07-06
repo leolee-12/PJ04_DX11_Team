@@ -868,16 +868,19 @@
     <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\00. Deform_Car">
       <UniqueIdentifier>{b600ded8-bf65-4554-b846-776c35549114}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Gorilla">
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene">
+      <UniqueIdentifier>{a68d0ce8-8ccf-41f9-955f-022b1bc87f23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla">
       <UniqueIdentifier>{41e2d8cd-3ff4-4eb3-97e2-9f7d6d96c2c1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Gorilla\CutSceneGrab">
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\CutSceneGrab">
       <UniqueIdentifier>{46d69dab-00a6-49b7-ba75-db2ddb5232e3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Gorilla\QTE_Grabbed">
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\QTE_Grabbed">
       <UniqueIdentifier>{b3d902fb-45c2-4c61-b777-dd904840d9a8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CarFirstBreakWall">
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall">
       <UniqueIdentifier>{3538ca96-894c-436a-9f2f-5c4bf121451d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -1417,7 +1420,7 @@
       <Filter>00. GameObject\00. Camera\BossCam</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_CutSceneGrabbed.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Gorilla\CutSceneGrab</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\CutSceneGrab</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Starblock.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable\01. Starblock</Filter>
@@ -1432,7 +1435,7 @@
       <Filter>00. GameObject\97. UI\UIContainer\Sequence\Flash</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_QTE_Grabbed.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Gorilla\QTE_Grabbed</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\QTE_Grabbed</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Common_SpinSlash.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\10. Common_SpinSlash</Filter>
@@ -1750,7 +1753,7 @@
       <Filter>00. GameObject\05. Kirby\02. AttackMode</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_CarFirstBreakWall.h">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CarFirstBreakWall</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2214,7 +2217,7 @@
       <Filter>00. GameObject\00. Camera\BossCam</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_CutSceneGrabbed.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Gorilla\CutSceneGrab</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\CutSceneGrab</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Starblock.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable\01. Starblock</Filter>
@@ -2229,7 +2232,7 @@
       <Filter>00. GameObject\97. UI\UIContainer\Sequence\Flash</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_QTE_Grabbed.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Gorilla\QTE_Grabbed</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\QTE_Grabbed</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Common_SpinSlash.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\10. Common_SpinSlash</Filter>
@@ -2544,7 +2547,7 @@
       <Filter>00. GameObject\05. Kirby\02. AttackMode</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_CarFirstBreakWall.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CarFirstBreakWall</Filter>
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

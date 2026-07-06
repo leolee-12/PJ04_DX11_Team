@@ -80,6 +80,10 @@ void CKirby_Deform_Car::Exit_AttackState(CKirby* pKirby)
 {
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pKirby->Get_Movement()->Set_MaxHorizontalSpeed(s_fCarSpeed);
+
+    Effect_Stop(m_pBoostGas1);
+    Effect_Stop(m_pBoostGas2);
+    Effect_Stop(m_pBoostWind);
 }
 
 _bool CKirby_Deform_Car::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -249,8 +253,6 @@ void CKirby_Deform_Car::Update_DeformCarState(CKirby* pKirby, _float fTimeDelta)
             // ÀÌµ¿
             _vector vLook = pKirby->Get_Transform()->Get_State(STATE::LOOK);
             vLook = XMVector3Normalize(XMVectorSetY(vLook, 0.f));
-
-            const _float3 vCurVelocity = pMovement->Get_Velocity();
 
             _vector vBoostAcceleration = vLook * s_fBoostAcceleration;
             pMovement->Add_Acceleration(vBoostAcceleration);

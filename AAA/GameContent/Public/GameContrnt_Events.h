@@ -25,10 +25,13 @@ namespace Client
         inline constexpr const _tchar* Cutscene_ReleaseKirby = L"Cutscene.ReleaseKirby";     
         inline constexpr const _tchar* Cutscene_CameraChange = L"Cutscene.CameraChange";
 
-        //
         inline constexpr const _tchar* Cutscene_KirbyStart =    L"Cutscene.KirbyStart";           // 커비 컷씬위치로
+        // 두 개 통합ㄱㄱ
         inline constexpr const _tchar* Cutscene_GorillaHandoff = L"Cutscene.GorillaHandoff";
         inline constexpr const _tchar* Cutscene_GorillaBreak = L"Cutscene.GorillaBreak";  // 고릴라 환경 부수기 이벤트
+
+        // QTE
+        inline constexpr const _tchar* QTE_Success = L"QTE.Success";
 
         inline constexpr const _tchar* Camera_Shake = L"Camera.Shake";
         inline constexpr const _tchar* Camera_Rumble = L"Camera.Rumble";

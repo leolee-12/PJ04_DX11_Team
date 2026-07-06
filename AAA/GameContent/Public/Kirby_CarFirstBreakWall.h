@@ -28,11 +28,17 @@ public:
 	virtual void Update(CKirby* pKirby, const _float fTimeDelta) override;
 	virtual void Exit(CKirby* pKirby) override;
 
-public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
 public:
+	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
+
+public:
 	virtual void Request_ReleaseGrabState(CKirby* pKirby, CUTSCENE_KIRBY_TYPE eType) override;
+
+private:
+	_bool m_bTurnStarted{};
+	_float3 m_vLeftDir{};
 
 public:
 	static CKirby_CarFirstBreakWall* Create();
