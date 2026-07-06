@@ -278,14 +278,6 @@ void CPanel_Viewport::Draw_Gizmo(CGameObject* pSelected, const ImVec2& vImagePos
         if (CMapSection* pSection = dynamic_cast<CMapSection*>(pSelected))
             pSection->Notify_EditTransformChanged();
     }
-
-    if (m_bWasGizmoUsing && !bUsing)
-    {
-        if (CLevel_Edit* pLevel = CEditInstance::GetInstance()->Get_Level())
-            pLevel->Commit_MapEditObjectFromCurrentState(pSelected);
-    }
-
-    m_bWasGizmoUsing = bUsing;
 }
 
 CPanel_Viewport* CPanel_Viewport::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

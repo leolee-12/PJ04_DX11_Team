@@ -558,9 +558,6 @@
     <ClInclude Include="..\public\ComputeShader.h">
       <Filter>19. ComputeShader</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Culling_Util.h">
-      <Filter>20. Culling</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Culling_Manager.h">
       <Filter>20. Culling</Filter>
     </ClInclude>
@@ -644,6 +641,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\Sound_Handle.h">
       <Filter>13. Sound\Handler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Geometry_Utils.h">
+      <Filter>96. Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Math_Utils.h">
+      <Filter>96. Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Parsing_Utils.h">
+      <Filter>96. Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -862,9 +868,6 @@
     </ClCompile>
     <ClCompile Include="..\private\ComputeShader.cpp">
       <Filter>19. ComputeShader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Culling_Util.cpp">
-      <Filter>20. Culling</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Culling_Manager.cpp">
       <Filter>20. Culling</Filter>

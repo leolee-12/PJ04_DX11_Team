@@ -35,17 +35,16 @@ public:
         _bool bFlipWinding = true);
 
     physx::PxRigidStatic* Create_StaticActor(physx::PxTriangleMesh* pMesh, _fmatrix WorldMatrix);
+    physx::PxRigidStatic* Create_StaticBox(const _float3& vLocalCenter, const _float3& vLocalHalfExtents, _fmatrix WorldMatrix);
+    physx::PxRigidStatic* Cook_StaticMesh(const _float3* pVertices, _uint iNumVertices, const _uint* pIndices, _uint iNumIndices, _fmatrix WorldMatrix);
     void                  Remove_StaticActor(physx::PxRigidStatic* pActor);
+    HRESULT               Refresh_StaticActorPose(physx::PxRigidStatic* pActor, _fmatrix WorldMatrix);
+    HRESULT               Refresh_StaticBoxPose(physx::PxRigidStatic* pActor, const _float3& vLocalCenter, _fmatrix WorldMatrix);
 
     physx::PxController* Create_CapsuleController(const _float3& vPos, _float fRadius, _float fHeight);
     void                 Release_Controller(physx::PxController* pCtrl);
 
-    physx::PxRigidStatic* Create_StaticBox(const _float3& vLocalCenter, const _float3& vLocalHalfExtents, _fmatrix WorldMatrix);
-    HRESULT Refresh_StaticBoxPose(physx::PxRigidStatic* pActor, const _float3& vLocalCenter, _fmatrix WorldMatrix);
-    physx::PxRigidStatic* Cook_StaticMesh(
-        const _float3* pVertices, _uint iNumVertices,
-        const _uint* pIndices, _uint iNumIndices,
-        _fmatrix WorldMatrix);
+
 
     physx::PxPhysics* Get_Physics() const { return m_pPhysics; }
     physx::PxScene* Get_Scene()   const { return m_pScene; }

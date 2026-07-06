@@ -70,12 +70,21 @@ struct MAP_ENV_EDITED_DESC
 	_bool bUseNearDistAlpha = { false };
 };
 
+struct MAP_LD_EDITED_DESC
+{
+	_wstring strStableKey;
+
+	_bool bHasWorldMatrix = { false };
+	_float4x4 matWorld = {};
+};
+
 struct MAP_EDIT_CHANGE
 {
-	_uint Version = { 4 };
+	_uint Version = { 5 };
 	unordered_set<_wstring> DeletedEnvObjectKeys;
 	unordered_map<_wstring, MAP_ENV_EDITED_DESC> EditedEnvObjects;
 	unordered_map<_wstring, MAP_ENV_EDITED_DESC> EditedMapSections;
+	unordered_map<_wstring, MAP_LD_EDITED_DESC> EditedLevelDesignObjects;
 	vector<MAP_ADD_OBJECT> AddedMapObjects;
 };
 
@@ -187,6 +196,11 @@ inline _bool Has_AnyMapEnvEdit(const MAP_ENV_EDITED_DESC& Edit)
 		|| Edit.bHasWorldMatrix
 		|| Edit.bHasNearDistAlpha
 		|| Edit.bHasCollMesh;
+}
+
+inline _bool Has_AnyMapLDEdit(const MAP_LD_EDITED_DESC& Edit)
+{
+	return Edit.bHasWorldMatrix;
 }
 
 NS_END

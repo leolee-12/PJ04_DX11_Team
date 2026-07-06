@@ -11,6 +11,7 @@
 #include "Map_Loader.h"
 #include "MapStage.h"
 #include "MapSection.h"
+#include "LevelDesignObject.h"
 #include "EnvObject_Static.h"
 #include "EnvTrigger_RenderGlobals.h"
 #include "Env_InstanceController.h"
@@ -130,7 +131,51 @@ namespace
 		return XMLoadFloat4x4(&Mat);
 	}
 
+	_matrix Build_LevelDesignBaseWorldMatrix(const LD_OBJECT_DESC& Desc)
+	{
+		const CGameObject::GAMEOBJECT_DESC& BaseDesc = static_cast<const CGameObject::GAMEOBJECT_DESC&>(Desc);
+
+		_float4x4 Mat{};
+		Mat.m[0][0] = BaseDesc.vRight.x;
+		Mat.m[0][1] = BaseDesc.vRight.y;
+		Mat.m[0][2] = BaseDesc.vRight.z;
+		Mat.m[0][3] = BaseDesc.vRight.w;
+		Mat.m[1][0] = BaseDesc.vUp.x;
+		Mat.m[1][1] = BaseDesc.vUp.y;
+		Mat.m[1][2] = BaseDesc.vUp.z;
+		Mat.m[1][3] = BaseDesc.vUp.w;
+		Mat.m[2][0] = BaseDesc.vLook.x;
+		Mat.m[2][1] = BaseDesc.vLook.y;
+		Mat.m[2][2] = BaseDesc.vLook.z;
+		Mat.m[2][3] = BaseDesc.vLook.w;
+		Mat.m[3][0] = BaseDesc.vPosition.x;
+		Mat.m[3][1] = BaseDesc.vPosition.y;
+		Mat.m[3][2] = BaseDesc.vPosition.z;
+		Mat.m[3][3] = BaseDesc.vPosition.w;
+		return XMLoadFloat4x4(&Mat);
+	}
+
 	void Update_WorldMatrixEdit(const _float4x4& CurrentWorld, _matrix BaseWorldMatrix, MAP_ENV_EDITED_DESC* pInOutEdit)
+	{
+		if (nullptr == pInOutEdit)
+			return;
+
+		_float4x4 BaseWorld{};
+		XMStoreFloat4x4(&BaseWorld, BaseWorldMatrix);
+
+		if (pInOutEdit->bHasWorldMatrix || !IsNearlyEqualFloat4x4(CurrentWorld, BaseWorld))
+		{
+			pInOutEdit->bHasWorldMatrix = true;
+			pInOutEdit->matWorld = CurrentWorld;
+		}
+		else
+		{
+			pInOutEdit->bHasWorldMatrix = false;
+			pInOutEdit->matWorld = {};
+		}
+	}
+	
+	void Update_WorldMatrixEdit(const _float4x4& CurrentWorld, _matrix BaseWorldMatrix, MAP_LD_EDITED_DESC* pInOutEdit)
 	{
 		if (nullptr == pInOutEdit)
 			return;
@@ -548,6 +593,30 @@ _bool CLevel_Edit::Try_GetMapPreviewSectionEdit(const _wstring& strSectionKey, M
 	return m_pMapPreviewSession->Try_GetEditedMapSection(strSectionKey, pOutEdit);
 }
 
+_bool CLevel_Edit::Track_EditedMapPreviewLevelDesignObject(CGameObject* pObject, const MAP_LD_EDITED_DESC& Edit)
+{
+	if (nullptr == m_pMapPreviewSession)
+		return false;
+
+	return m_pMapPreviewSession->Track_EditedLevelDesignObject(pObject, Edit);
+}
+
+_bool CLevel_Edit::Clear_EditedMapPreviewLevelDesignObject(CGameObject* pObject)
+{
+	if (nullptr == m_pMapPreviewSession)
+		return false;
+
+	return m_pMapPreviewSession->Clear_EditedLevelDesignObject(pObject);
+}
+
+_bool CLevel_Edit::Try_GetMapPreviewLevelDesignEdit(CGameObject* pObject, MAP_LD_EDITED_DESC* pOutEdit) const
+{
+	if (nullptr == m_pMapPreviewSession || nullptr == pObject || nullptr == pOutEdit)
+		return false;
+
+	return m_pMapPreviewSession->Try_GetEditedLevelDesignObject(pObject, pOutEdit);
+}
+
 _bool CLevel_Edit::Commit_MapEditObjectFromCurrentState(CGameObject* pObject)
 {
 	if (nullptr == pObject || nullptr == m_pMapPreviewSession)
@@ -582,6 +651,16 @@ _bool CLevel_Edit::Commit_MapEditObjectFromCurrentState(CGameObject* pObject)
 		const _float4x4& CurrentWorld = *pSection->Get_Transform()->Get_WorldMatrixPtr();
 		Update_WorldMatrixEdit(CurrentWorld, Build_SectionBaseWorldMatrix(pSection->Get_Desc()), &Edit);
 		return Track_EditedMapPreviewSection(strSectionKey, Edit);
+	}
+
+	if (CLevelDesignObject* pLDObject = dynamic_cast<CLevelDesignObject*>(pObject))
+	{
+		MAP_LD_EDITED_DESC Edit{};
+		Try_GetMapPreviewLevelDesignEdit(pObject, &Edit);
+
+		const _float4x4& CurrentWorld = *pLDObject->Get_Transform()->Get_WorldMatrixPtr();
+		Update_WorldMatrixEdit(CurrentWorld, Build_LevelDesignBaseWorldMatrix(pLDObject->Get_LevelDesignDesc()), &Edit);
+		return Track_EditedMapPreviewLevelDesignObject(pObject, Edit);
 	}
 
 	return false;
@@ -624,7 +703,23 @@ HRESULT CLevel_Edit::Save_MapOverride()
 	if (nullptr == m_pMapPreviewSession)
 		return E_FAIL;
 
-	Commit_MapEditObjectFromCurrentState(m_pSelected);
+	for (CGameObject* pObject : m_MapPreviewObjects)
+	{
+		if (nullptr == dynamic_cast<CEnvObject*>(pObject)
+			&& nullptr == dynamic_cast<CLevelDesignObject*>(pObject))
+		{
+			continue;
+		}
+
+		if (!Commit_MapEditObjectFromCurrentState(pObject))
+			return E_FAIL;
+	}
+
+	if (nullptr != dynamic_cast<CMapSection*>(m_pSelected)
+		&& !Commit_MapEditObjectFromCurrentState(m_pSelected))
+	{
+		return E_FAIL;
+	}
 
 	const MAP_EDIT_DATA MapContentDesc = m_pMapPreviewSession->Build_EditDataSnapShot();
 
@@ -879,6 +974,8 @@ HRESULT CLevel_Edit::Load_LDPreview(_uint iPresetIndex)
 
 	Clear_LDPreview();
 
+	MAP_EDIT_DATA MapContentDesc = Build_MapPreviewContentDescSnapshot();
+
 	MAP_RUNTIME_LOAD_CONTEXT Context{};
 	Context.pDevice = m_pDevice;
 	Context.pContext = m_pContext;
@@ -892,7 +989,8 @@ HRESULT CLevel_Edit::Load_LDPreview(_uint iPresetIndex)
 	if (FAILED(CMap_Loader::Load_LevelDesign_Runtime(
 		Context,
 		strManifestPath,
-		&Report)))
+		&Report,
+		&MapContentDesc.OverrideDesc)))
 	{
 		Set_MapPreviewStatus(
 			L"LevelDesign preview load failed.");
@@ -1096,6 +1194,9 @@ void CLevel_Edit::Clear_MapPreviewLayer(const wstring& strLayerTag)
 
 		if (pObject == m_pMapStage)
 			m_pMapStage = nullptr;
+
+		if (nullptr != m_pMapPreviewSession)
+			m_pMapPreviewSession->Unregister_PreviewObject(pObject);
 
 		m_MapPreviewObjects.erase(pObject);
 		m_pGameInstance_Proxy->Destroy_GameObject(pObject);
@@ -1804,11 +1905,8 @@ _bool CLevel_Edit::Try_RegisterAddedMapOverridePlacement(CGameObject* pObject, c
 	return true;
 }
 
-void CLevel_Edit::Try_RegisterLoadedAddedMapObject(
-	CGameObject* pObject,
-	const _wstring& strPrototypeTag,
-	const _wstring& strLayerTag,
-	const _wstring& strObjectTag)
+void CLevel_Edit::Try_RegisterLoadedAddedMapObject(CGameObject* pObject, const _wstring& strPrototypeTag,
+	const _wstring& strLayerTag, const _wstring& strObjectTag)
 {
 	if (nullptr == pObject || nullptr == m_pMapPreviewSession)
 		return;
