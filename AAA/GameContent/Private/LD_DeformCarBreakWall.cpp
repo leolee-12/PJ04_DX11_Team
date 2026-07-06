@@ -3,6 +3,8 @@
 #include "Parsing_Utils.h"
 #include "GameContent_const.h"
 
+#include "Geometry_Utils.h"
+
 #include "GameInstance.h"
 
 namespace
@@ -15,7 +17,6 @@ namespace
 	inline constexpr const _uint DISABLE_MESH_INDEX[] = { 1 };
 	inline constexpr const _uint ON_TO_OFF_MESH_INDEX[] = { 0,2,9,10 };
 	inline constexpr const _uint OFF_TO_ON_MESH_INDEX[] = { 3,4,5,6,7,8,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30 };
-	//inline constexpr const _uint STAY_MESH_INDEX[] = { 9,10 };
 }
 
 NS_BEGIN(Client)
@@ -115,8 +116,7 @@ void CLD_DeformCarBreakWall::Register_LevelDesignSpecs()
 	CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
 }
 
-_bool CLD_DeformCarBreakWall::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec,
-	LD_OBJECT_ENTRY* pOutEntry)
+_bool CLD_DeformCarBreakWall::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
 {
 	UNREFERENCED_PARAMETER(jEntry);
 
@@ -160,10 +160,20 @@ HRESULT CLD_DeformCarBreakWall::Ready_Components()
 	if (FAILED(Ready_DeformCarBreakWall()))
 		return E_FAIL;
 
-	if (FAILED(Ready_WallRigidStatic()))
+	_float3 vMin{}, vMax{};
+	m_pModelCom->Get_MeshAABB(DEFORM_CAR_BREAK_WALL_COLLIMESH_INDEX, &vMin, &vMax);
+
+	if (!GeometryUtils::Is_ValidAABB(vMin, vMax))
 		return E_FAIL;
 
-	if (FAILED(Ready_BoostTrigger()))
+	const BoundingBox LocalBounds = GeometryUtils::Make_AABB_FromMinMax(vMin, vMax);
+	if (LocalBounds.Extents.x <= 0.f || LocalBounds.Extents.y <= 0.f || LocalBounds.Extents.z <= 0.f)
+		return E_FAIL;
+
+	if (FAILED(Ready_WallRigidStatic(LocalBounds)))
+		return E_FAIL;
+
+	if (FAILED(Ready_BoostTrigger(LocalBounds)))
 		return E_FAIL;
 
 	return S_OK;
@@ -192,35 +202,45 @@ HRESULT CLD_DeformCarBreakWall::Ready_DeformCarBreakWall()
 	for (_uint iMeshIndex : OFF_TO_ON_MESH_INDEX)
 		Set_MeshVisible(iMeshIndex, false);
 
-	//for (_uint iMeshIndex : STAY_MESH_INDEX)
-	//	Set_MeshVisible(iMeshIndex, true);
-
 	return S_OK;
 }
 
-HRESULT CLD_DeformCarBreakWall::Ready_WallRigidStatic()
+HRESULT CLD_DeformCarBreakWall::Ready_WallRigidStatic(const BoundingBox& LocalBounds)
 {
-	_float3 vMin{}, vMax{};
-	m_pModelCom->Get_MeshAABB(DEFORM_CAR_BREAK_WALL_COLLIMESH_INDEX, &vMin, &vMax);
-
-	const _float3 vLocalCenter = {
-			(vMin.x + vMax.x) * 0.5f,
-			(vMin.y + vMax.y) * 0.5f,
-			(vMin.z + vMax.z) * 0.5f
-	};
-	const _float3 vLocalHalfExtents = {
-			(vMax.x - vMin.x) * 0.5f,
-			(vMax.y - vMin.y) * 0.5f,
-			(vMax.z - vMin.z) * 0.5f
-	};
-
-	if (vLocalHalfExtents.x <= 0.f || vLocalHalfExtents.y <= 0.f || vLocalHalfExtents.z <= 0.f)
-		return E_FAIL;
-
 	m_pRigidStatic = m_pGameInstance_Proxy->Create_StaticBox(
-		vLocalCenter, vLocalHalfExtents, XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+		LocalBounds.Center, LocalBounds.Extents, XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
 	return nullptr != m_pRigidStatic ? S_OK : E_FAIL;
+}
+
+HRESULT CLD_DeformCarBreakWall::Ready_BoostTrigger(const BoundingBox& LocalBounds)
+{
+	BoundingBox TriggerBounds = LocalBounds;
+
+	constexpr _float fPadding = 2.f;
+	if (!GeometryUtils::Expand_AABB(&TriggerBounds, fPadding))
+		return E_FAIL;
+
+	CCollider::COLLIDER_DESC ColliderDesc{};
+	ColliderDesc.pOwner = this;
+	ColliderDesc.vCenter = TriggerBounds.Center;
+	ColliderDesc.vSize = { TriggerBounds.Extents.x * 2.f, TriggerBounds.Extents.y * 2.f, TriggerBounds.Extents.z * 2.f };
+
+	if (ColliderDesc.vSize.x <= 0.f || ColliderDesc.vSize.y <= 0.f || ColliderDesc.vSize.z <= 0.f)
+		return E_FAIL;
+
+	m_pBoostTrigger = Add_Component<CCollider>(Collider_OBB.iLevelID, Collider_OBB.szProtoTag, TEXT("Com_BoostTrigger"),
+		&ColliderDesc);
+
+	if (nullptr == m_pBoostTrigger)
+		return E_FAIL;
+
+	SetUp_BoostTriggerCallback();
+
+	m_pGameInstance_Proxy->Register_Collider(m_pBoostTrigger, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+	m_bBoostTriggerRegistered = true;
+
+	return S_OK;
 }
 
 void CLD_DeformCarBreakWall::On_Event()
@@ -241,38 +261,6 @@ void CLD_DeformCarBreakWall::On_Event()
 
 	Release_RigidStatic();
 	Unregister_BoostTrigger(false);
-}
-
-HRESULT CLD_DeformCarBreakWall::Ready_BoostTrigger()
-{
-	_float3 vMin{}, vMax{};
-	m_pModelCom->Get_MeshAABB(DEFORM_CAR_BREAK_WALL_COLLIMESH_INDEX, &vMin, &vMax);
-
-	if (vMin.x > vMax.x || vMin.y > vMax.y || vMin.z > vMax.z)
-		return E_FAIL;
-
-	constexpr _float fPadding = 2.f;
-
-	CCollider::COLLIDER_DESC ColliderDesc{};
-	ColliderDesc.pOwner = this;
-	ColliderDesc.vCenter = { (vMin.x + vMax.x) * 0.5f, (vMin.y + vMax.y) * 0.5f, (vMin.z + vMax.z) * 0.5f };
-	ColliderDesc.vSize = { (vMax.x - vMin.x) + fPadding * 2.f, (vMax.y - vMin.y) + fPadding * 2.f, (vMax.z - vMin.z) + fPadding * 2.f };
-
-	if (ColliderDesc.vSize.x <= 0.f || ColliderDesc.vSize.y <= 0.f || ColliderDesc.vSize.z <= 0.f)
-		return E_FAIL;
-
-	m_pBoostTrigger = Add_Component<CCollider>(Collider_OBB.iLevelID, Collider_OBB.szProtoTag, TEXT("Com_BoostTrigger"),
-		&ColliderDesc);
-
-	if (nullptr == m_pBoostTrigger)
-		return E_FAIL;
-
-	SetUp_BoostTriggerCallback();
-
-	m_pGameInstance_Proxy->Register_Collider(m_pBoostTrigger, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
-	m_bBoostTriggerRegistered = true;
-
-	return S_OK;
 }
 
 void CLD_DeformCarBreakWall::SetUp_BoostTriggerCallback()

@@ -874,9 +874,6 @@
     <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Spat">
       <UniqueIdentifier>{dcb1512b-4270-4d45-88e6-fa87ac86dc6e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="99. Defines\Leo\Utils">
-      <UniqueIdentifier>{6cf11970-9a27-43c8-9ee8-94532478608e}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1754,15 +1751,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Monster_State_Spat.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Parsing_Utils.h">
-      <Filter>99. Defines\Leo\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Math_Utils.h">
-      <Filter>99. Defines\Leo\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Geometry_Utils.h">
-      <Filter>99. Defines\Leo\Utils</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_DeformCarBreakWall.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>

@@ -199,7 +199,6 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClInclude Include="..\public\ComputeShader.h" />
     <ClInclude Include="..\Public\ContainerObject.h" />
     <ClInclude Include="..\public\Controller.h" />
-    <ClInclude Include="..\Public\Culling_Util.h" />
     <ClInclude Include="..\Public\CustomFont.h" />
     <ClInclude Include="..\Public\DataExporter.h" />
     <ClInclude Include="..\Public\DataLoader.h" />
@@ -232,6 +231,7 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClInclude Include="..\public\GameInstance.h" />
     <ClInclude Include="..\public\GameInstance_Proxy.h" />
     <ClInclude Include="..\public\GameObject.h" />
+    <ClInclude Include="..\Public\Geometry_Utils.h" />
     <ClInclude Include="..\Public\Graphic_Device.h" />
     <ClInclude Include="..\Public\Input_Device.h" />
     <ClInclude Include="..\public\Layer.h" />
@@ -241,12 +241,14 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClInclude Include="..\Public\Light_Manager.h" />
     <ClInclude Include="..\Public\Material.h" />
     <ClInclude Include="..\Public\MaterialEx.h" />
+    <ClInclude Include="..\Public\Math_Utils.h" />
     <ClInclude Include="..\Public\Mesh.h" />
     <ClInclude Include="..\Public\MeshLayer_Utils.h" />
     <ClInclude Include="..\Public\Model.h" />
     <ClInclude Include="..\public\Movement.h" />
     <ClInclude Include="..\Public\Navigation.h" />
     <ClInclude Include="..\public\Object_Manager.h" />
+    <ClInclude Include="..\Public\Parsing_Utils.h" />
     <ClInclude Include="..\Public\PartObject.h" />
     <ClInclude Include="..\public\PhysX_Manager.h" />
     <ClInclude Include="..\public\Picking_Utils.h" />
@@ -310,7 +312,6 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClCompile Include="..\private\ComputeShader.cpp" />
     <ClCompile Include="..\Private\ContainerObject.cpp" />
     <ClCompile Include="..\private\Controller.cpp" />
-    <ClCompile Include="..\Private\Culling_Util.cpp" />
     <ClCompile Include="..\Private\CustomFont.cpp" />
     <ClCompile Include="..\Private\DataExporter.cpp" />
     <ClCompile Include="..\Private\DataLoader.cpp" />

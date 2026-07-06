@@ -61,13 +61,11 @@
     <ClInclude Include="..\Public\Common_Curve03.h" />
     <ClInclude Include="..\Public\Common_JumpSlash.h" />
     <ClInclude Include="..\Public\Common_Ring03.h" />
-    <ClInclude Include="..\Public\Geometry_Utils.h" />
     <ClInclude Include="..\Public\Kirby_AttackMode.h" />
     <ClInclude Include="..\Public\LD_DeformCarBreakWall.h" />
     <ClInclude Include="..\Public\LD_SlopeBoardA.h" />
     <ClInclude Include="..\Public\LD_SlopeBoardC.h" />
     <ClInclude Include="..\Public\LD_Stage1BossDemo.h" />
-    <ClInclude Include="..\Public\Math_Utils.h" />
     <ClInclude Include="..\Public\Monster_State_Spat.h" />
     <ClInclude Include="..\Public\SphereMesh.h" />
     <ClInclude Include="..\Public\SphereParticle.h" />
@@ -191,7 +189,6 @@
     <ClInclude Include="..\Public\NormalEnemy_Body.h" />
     <ClInclude Include="..\Public\NormalEnemy_Brain.h" />
     <ClInclude Include="..\Public\NormalEnemy_State_Brake.h" />
-    <ClInclude Include="..\Public\Parsing_Utils.h" />
     <ClInclude Include="..\Public\PoppyBrosJr.h" />
     <ClInclude Include="..\Public\RailRideable.h" />
     <ClInclude Include="..\Public\Shader_PassMeta.h" />

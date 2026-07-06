@@ -2,8 +2,6 @@
 #include "DataLoader.h"
 #include "Parsing_Utils.h"
 #include "LevelDesign_Registry.h"
-#include "LevelDesign_Food.h"
-#include "LevelDesign_Point.h"
 
 #include <exception>
 #include <filesystem>
@@ -163,8 +161,7 @@ void CLevelDesign_Parser::Parse_ObjectSection(
 			wstrSourcePath,
 			strSourceFile,
 			strSection,
-			StrToWstr(Iter.key()),
-			Iter.value());
+			StrToWstr(Iter.key()));
 
 		Fill_Common(Iter.value(), &CommonDesc);
 
@@ -214,11 +211,8 @@ LD_OBJECT_DESC CLevelDesign_Parser::Make_BaseDesc(
 	const _wstring& wstrSourcePath,
 	const _wstring& strSourceFile,
 	const _wstring& strSection,
-	const _wstring& strEntryKey,
-	const json& jEntry)
+	const _wstring& strEntryKey)
 {
-	UNREFERENCED_PARAMETER(jEntry);
-
 	LD_OBJECT_DESC Desc{};
 	Desc.wstrSourcePath = wstrSourcePath;
 	Desc.strSourceFile = strSourceFile;

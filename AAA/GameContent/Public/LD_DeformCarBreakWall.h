@@ -47,8 +47,8 @@ private:
 	virtual HRESULT Ready_Components() override;
 
 	HRESULT	Ready_DeformCarBreakWall();
-	HRESULT	Ready_WallRigidStatic();
-	HRESULT	Ready_BoostTrigger();
+	HRESULT	Ready_WallRigidStatic(const BoundingBox& LocalBounds);
+	HRESULT	Ready_BoostTrigger(const BoundingBox& LocalBounds);
 
 	void	SetUp_BoostTriggerCallback();
 	void	Handle_BoostTrigger(CCollider* pOther);
