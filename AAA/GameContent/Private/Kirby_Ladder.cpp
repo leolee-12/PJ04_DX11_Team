@@ -72,48 +72,7 @@ void CKirby_Ladder::Update(CKirby* pKirby, const _float fTimeDelta)
         return;
     }
 
-    if (m_iCurLadderIndex != m_iNextLadderIndex)
-    {
-        constexpr _float fLadderSpeed = 8.f;
-
-        // 현재 위치
-        CTransform* pTransform = pKirby->Get_Transform();
-        _vector vCurPos = pTransform->Get_State(STATE::POSITION);
-
-        // 목표 위치
-        _vector vLadderNextCellPos{};
-        if (!pLadder->Try_GetCellWorld(m_iNextLadderIndex, vLadderNextCellPos))
-        {
-            MSG_BOX("Update Bug Point 2: CKirby_Ladder");
-            Transition_Fall_OR_Wait_OR_Run(pKirby);
-            return;
-        }
-
-        const _float fCurrentY = XMVectorGetY(vCurPos);
-        const _float fTargetY = XMVectorGetY(vLadderNextCellPos);
-
-        const _float fRemainDistY = fabsf(fTargetY - fCurrentY);
-        const _float fPredictDistY = fLadderSpeed * fTimeDelta;
-
-        _bool bWillArrive = fPredictDistY >= fRemainDistY;
-
-        CMovement_Child* pMovement = pKirby->Get_Movement();
-
-        if (bWillArrive)
-        {
-            pTransform->Set_State(STATE::POSITION, vLadderNextCellPos);
-            pMovement->Sync_To_Controller();
-
-            m_iCurLadderIndex = m_iNextLadderIndex;
-            return;
-        }
-
-        _bool bMoveUp = m_iCurLadderIndex < m_iNextLadderIndex;
-        if (bMoveUp)
-            pMovement->Set_VelocityY(fLadderSpeed);
-        else
-            pMovement->Set_VelocityY(-fLadderSpeed);
-    }
+    Update_LadderState(pKirby, fTimeDelta);
 }
 
 void CKirby_Ladder::Exit(CKirby* pKirby)
@@ -212,7 +171,50 @@ void CKirby_Ladder::Update_LadderState(CKirby* pKirby, _float fTimeDelta)
         case LADDER_STATE::WAIT:
             break;
         case LADDER_STATE::MOVE:
+        {
+            CLevelDesign_Ladder* pLadder = pKirby->Get_Ladder();
+            if (m_iCurLadderIndex != m_iNextLadderIndex)
+            {
+                // 현재 위치
+                CTransform* pTransform = pKirby->Get_Transform();
+                _vector vCurPos = pTransform->Get_State(STATE::POSITION);
+
+                // 목표 위치
+                _vector vLadderNextCellPos{};
+                if (!pLadder->Try_GetCellWorld(m_iNextLadderIndex, vLadderNextCellPos))
+                {
+                    MSG_BOX("Update Bug Point 2: CKirby_Ladder");
+                    Transition_Fall_OR_Wait_OR_Run(pKirby);
+                    return;
+                }
+
+                const _float fCurrentY = XMVectorGetY(vCurPos);
+                const _float fTargetY = XMVectorGetY(vLadderNextCellPos);
+
+                const _float fRemainDistY = fabsf(fTargetY - fCurrentY);
+                const _float fPredictDistY = s_fLadderSpeed * fTimeDelta;
+
+                _bool bWillArrive = fPredictDistY >= fRemainDistY;
+
+                CMovement_Child* pMovement = pKirby->Get_Movement();
+
+                if (bWillArrive)
+                {
+                    pTransform->Set_State(STATE::POSITION, vLadderNextCellPos);
+                    pMovement->Sync_To_Controller();
+
+                    m_iCurLadderIndex = m_iNextLadderIndex;
+                    return;
+                }
+
+                _bool bMoveUp = m_iCurLadderIndex < m_iNextLadderIndex;
+                if (bMoveUp)
+                    pMovement->Set_VelocityY(s_fLadderSpeed);
+                else
+                    pMovement->Set_VelocityY(-s_fLadderSpeed);
+            }
             break;
+        }
     }
 }
 

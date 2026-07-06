@@ -104,20 +104,6 @@ _bool CKirby_Hovering::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
         }
 
         case KIRBY_COMMAND_TYPE::MOVE_DOWN:
-        {
-            if (!pCommand->IsPress())
-                return false;
-
-            if (Try_Transition_Ladder_CommandDown(pKirby))
-                return true;
-
-            if (m_bMoveLock)
-                return true;
-
-            Handle_MoveCommand(pKirby, pCommand);
-            return true;
-        }
-
         case KIRBY_COMMAND_TYPE::MOVE_LEFT:
         case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
         {

@@ -12,6 +12,8 @@ class CKirby;
 class CLIENT_DLL CKirby_Ladder final : public CKirby_ControllableState
 {
 private:
+	static constexpr _float s_fLadderSpeed = 8.f;
+
 	enum LADDER_STATE { WAIT, MOVE };
 
 private:
