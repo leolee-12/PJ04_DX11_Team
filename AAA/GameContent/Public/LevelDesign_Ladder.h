@@ -61,8 +61,6 @@ private:
 	_float m_fBottomLocalY = 0.f;
 
 private:
-	virtual HRESULT	Validate_Desc() override;
-
 	HRESULT	Ready_Components();
 	HRESULT	Ready_RenderComponents();
 	HRESULT	Ready_LadderCollider();

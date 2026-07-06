@@ -265,8 +265,6 @@ _vector CLevelDesign_Ladder::Get_BottomClimbWorld() const
 	return XMVector3TransformCoord(vLocalBottom, matWorld);
 }
 
-HRESULT CLevelDesign_Ladder::Validate_Desc()
-
 HRESULT CLevelDesign_Ladder::Ready_Components()
 {
 	if (FAILED(Ready_RenderComponents()))
