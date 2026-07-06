@@ -283,6 +283,14 @@ CKirby_AttackMode* CKirby::Get_ActiveAttackMode()
         return m_pKirby_Ability;
 }
 
+CKirby_Deform_Model* CKirby::Get_CurrentDeformModel()
+{
+    if (Has_Deform())
+        return Get_DeformPart_Model(m_pKirby_Deform->Get_DeformType());
+    else
+        return m_pBody;
+}
+
 CKirby_Ability* CKirby::Get_KirbyAbility()
 {
     return m_pKirby_Ability;
@@ -809,7 +817,10 @@ void CKirby::Damaged(const ATTACK_INFO& tInfo)
         return;
 
     if (Block_Hit(tInfo))
+    {
+        m_pGameInstance_Proxy->Play_SFX(L"CharaBasic_DamageReact_Normal.wav", 0.5f);
         return;
+    }
 
     On_Damaged(tInfo);
 

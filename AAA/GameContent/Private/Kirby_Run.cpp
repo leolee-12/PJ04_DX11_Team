@@ -51,6 +51,8 @@ void CKirby_Run::Update(CKirby* pKirby, const _float fTimeDelta)
 void CKirby_Run::Exit(CKirby* pKirby)
 {
     __super::Exit(pKirby);
+
+    pKirby->Get_CurrentDeformModel()->Stop_SoundHandle();
 }
 
 _bool CKirby_Run::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)

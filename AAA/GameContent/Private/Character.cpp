@@ -65,7 +65,7 @@ void CCharacter::Damaged(const ATTACK_INFO& tInfo)
         return;
 
     m_pGameInstance_Proxy->Play_SFX(
-        TEXT("CharaBasic_DamageReact_Normal.wav"));
+        TEXT("CharaBasic_DamageReact_Normal.wav"), 0.5f);
 
     m_fHitFlashTime = m_fHitFlashDuration;
 

@@ -42,6 +42,8 @@ void CKirby_State::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInf
     pKirby->Add_HP(-tInfo.fDamage);
     pKirby->Start_DamageInvincibility();
 
+    m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_DamageNormal.wav", 0.5f);
+
     pKirby->Change_State(KIRBY_STATE_TYPE::DAMAGED);
 }
 
