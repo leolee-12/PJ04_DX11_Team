@@ -307,6 +307,8 @@ void CKirby_Deform_Car::Exit_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eSt
             Effect_Stop(m_pBoostGas2);
             Effect_Stop(m_pBoostWind);
 
+            pModel->Stop_SoundHandle();
+
             break;
         case DEFORM_CAR_STATE::BOOST_END:
             pMovement->Set_MaxHorizontalSpeed(s_fCarSpeed);

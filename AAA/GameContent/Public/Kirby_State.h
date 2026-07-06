@@ -56,6 +56,8 @@ protected:
 	_bool Try_Transition_Fall(CKirby* pKirby);
 	_bool Transition_Wait_OR_Run(CKirby* pKirby);
 	_bool Transition_Fall_OR_Wait_OR_Run(CKirby* pKirby);
+	_bool Try_Transition_Ladder_CommandUp(CKirby* pKirby);
+	_bool Try_Transition_Ladder_CommandDown(CKirby* pKirby);
 
 protected:
 	CGameInstance_Proxy* m_pGameInstance_Proxy{};

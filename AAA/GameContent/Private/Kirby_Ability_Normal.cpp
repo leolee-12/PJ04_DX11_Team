@@ -99,7 +99,8 @@ void CKirby_Ability_Normal::Exit_AttackState(CKirby* pKirby)
         {
             End_InhaleCollider(pKirby);
             Unsubscribe_InhaleCapturedEvent();
-
+            Off_InhaleEffect();
+            pKirby->Get_Body()->Stop_SoundHandle();
             Restore_KirbyAfterInhale(pKirby);
             break;
         }
@@ -174,13 +175,6 @@ _bool CKirby_Ability_Normal::Enter_Attack_KeyUp(CKirby* pKirby)
     return true;
 }
 
-void CKirby_Ability_Normal::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
-{
-    End_InhaleCollider(pKirby);
-    Off_InhaleEffect();
-    __super::On_Damaged_KirbyState(pKirby, tInfo);
-}
-
 void CKirby_Ability_Normal::Change_InhaleState(CKirby* pKirby, INHALE_STATE eNext)
 {
     if (m_eInhaleState == eNext)
@@ -234,6 +228,8 @@ void CKirby_Ability_Normal::Enter_InhaleState(CKirby* pKirby, INHALE_STATE eStat
             End_InhaleCollider(pKirby);
             Off_InhaleEffect();
             Clear_Captured();
+
+            pBody->Stop_SoundHandle();
 
             pAnimator->Play("InhaleEnd", false, false, 0.1f, 1.5f);
             break;
