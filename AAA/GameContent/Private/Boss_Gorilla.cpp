@@ -46,6 +46,22 @@ HRESULT CBoss_Gorilla::Initialize(void* pArg)
         m_pMovement->Set_RotSpeed(90.f);
     }
 
+    m_pBody->Set_HitBox_OnEnter(CBoss_Gorilla_Body::GHB_CATCH,
+        [this](CCollider* pOther)
+        {
+            if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
+                return;
+            if (m_bCatchHit)
+                return;
+
+            m_bCatchHit = true;
+            m_pBody->Enable_HitBox(CBoss_Gorilla_Body::GHB_CATCH, false);
+            Fire_Grab();       
+            Begin_QTE(s_fQTE_GorillaLimit);
+        });
+
+    Subscribe_Event(EventTag::QTE_Success, [this](void*) { m_bQTEEscaped = true; });
+
     return S_OK;
 }
 
@@ -87,7 +103,7 @@ void CBoss_Gorilla::Play_Intro()
     if (CAnimator* pAnim = Get_BodyAnimator())
         pAnim->Play(s_Intro[0], false, true, 0.2f, 1.5f);
 
-    Fire_Grab();
+    //Fire_Grab();
 }
 
 _bool CBoss_Gorilla::Is_Intro_Finished() const
@@ -189,8 +205,6 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
             {
                 if (e.strParam.empty())
                 {
-                    if (m_eLife != EBOSS_LIFE::INTRO)
-                        break;
                     CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
                     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
                 }
@@ -385,6 +399,12 @@ void CBoss_Gorilla::Fire_Grab()
     grab.pSourceWorld = m_pTransformCom->Get_WorldMatrixPtr();         
     grab.eType = CUTSCENE_KIRBY_TYPE::GORILLA_COMBAT;
     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_KirbyStart, &grab);
+}
+
+void CBoss_Gorilla::Fire_Release(GRAB_RELEASE_TYPE eType)
+{
+    CUTSCENE_RELEASE_DESC desc{ eType };
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_ReleaseKirby, &desc);
 }
 
 void CBoss_Gorilla::Tick_DeathSequence(_float fTimeDelta)

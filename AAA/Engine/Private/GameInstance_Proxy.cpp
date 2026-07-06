@@ -165,6 +165,20 @@ _float CGameInstance_Proxy::Get_TimeScale() const
 
 	return m_pOwner->m_pTimer_Manager->Get_TimeScale();
 }
+void CGameInstance_Proxy::Lerp_TimeScale(_float fFrom, _float fTo, _float fDuration)
+{
+	if (m_pOwner == nullptr)
+		return;
+
+	m_pOwner->m_pTimer_Manager->Lerp_TimeScale(fFrom, fTo, fDuration);
+}
+void CGameInstance_Proxy::Pulse_TimeScale(_float fScale, _float fHold, _float fBlendIn, _float fBlendOut)
+{
+	if (m_pOwner == nullptr)
+		return;
+
+	m_pOwner->m_pTimer_Manager->Pulse_TimeScale(fScale, fHold, fBlendIn, fBlendOut);
+}
 #pragma endregion
 
 #pragma region LEVELMANAGER

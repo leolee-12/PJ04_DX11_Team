@@ -12,18 +12,16 @@ static _vector SmoothDampV(_fvector cur, _fvector target, _vector& vel, _float s
     return XMVectorAdd(target, XMVectorScale(XMVectorAdd(change, temp), e));
 }
 
-CCamera_AreaCam::CCamera_AreaCam(ID3D11Device* pDevice, ID3D11DeviceContext* pContext) : CCamera{ pDevice, pContext }
+CCamera_AreaCam::CCamera_AreaCam(ID3D11Device* pDevice, ID3D11DeviceContext* pContext) : CCamera_Shakeable(pDevice, pContext)
 {
 }
-CCamera_AreaCam::CCamera_AreaCam(const CCamera_AreaCam& Prototype) : CCamera(Prototype) {}
+CCamera_AreaCam::CCamera_AreaCam(const CCamera_AreaCam& Prototype) : CCamera_Shakeable(Prototype) {}
 
 HRESULT CCamera_AreaCam::Initialize_Prototype() { return S_OK; }
 
 HRESULT CCamera_AreaCam::Initialize(void* pArg)
 {
     if (auto pDesc = static_cast<AREACAM_DESC*>(pArg)) {
-        m_strTargetLayer = pDesc->strTargetLayer;
-        m_strTargetObj = pDesc->strTargetObj;
         m_strDataPath = pDesc->strDataPath;
     }
     if (FAILED(__super::Initialize(pArg))) return E_FAIL;
@@ -43,17 +41,20 @@ void CCamera_AreaCam::Priority_Update(_float fTimeDelta)
 {
     fTimeDelta = Resolve_TimeDelta(fTimeDelta);
     if (!m_bActive) { __super::Priority_Update(fTimeDelta); return; }
+    Tick_Shake(fTimeDelta);
     if (!m_pTarget)
-        m_pTarget = m_pGameInstance_Proxy->Find_GameObject(Get_LevelIndex(), m_strTargetLayer, m_strTargetObj);
+    {
+        PLAYER_QUERY p;
+        m_pGameInstance_Proxy->Publish(EVT_QUERY_PLAYER, &p);
+        m_pTarget = p.pPlayer;
+    }
+
     _vector vKirby = m_pTarget ? m_pTarget->Get_Transform()->Get_State(STATE::POSITION) : XMVectorSet(0.f, 0.f, 0.f,
         1.f);
 
     if (m_solver.Cur_GazeMode() == 2) {
         string tag = m_solver.Cur_GazeTag();
-        // TODO: 프로젝트의 보스/타깃 찾기 방식에 맞춰 위치 획득.
-        //   예) wstring wtag(tag.begin(), tag.end());
-        //       CGameObject* p = m_pGameInstance_Proxy->Find_GameObject(Get_LevelIndex(), L"Layer_Boss", wtag);
-        CGameObject* pTarget = nullptr;   // <- 위 Find_GameObject로 교체
+        CGameObject* pTarget = nullptr;
         if (pTarget) m_solver.Set_GazeOverride(pTarget->Get_Transform()->Get_State(STATE::POSITION), true);
         else         m_solver.Set_GazeOverride(XMVectorZero(), false);
     }
@@ -117,7 +118,10 @@ void CCamera_AreaCam::Priority_Update(_float fTimeDelta)
     XMStoreFloat3(&m_atCur, SmoothDampV(XMLoadFloat3(&m_atCur), vAt, aVel, smoothT, fTimeDelta));
     XMStoreFloat3(&m_eyeVel, eVel); XMStoreFloat3(&m_atVel, aVel);
 
-    m_fFovy = XMConvertToRadians(fFovDeg);
+    if (m_fFovCurDeg < 0.f)
+        m_fFovCurDeg = fFovDeg;
+    m_fFovCurDeg += (fFovDeg - m_fFovCurDeg) * min(1.f, fTimeDelta * 5.f);
+    m_fFovy = XMConvertToRadians(m_fFovCurDeg);
     Recalculate_ProjMatrix();
 
     _vector vE = XMLoadFloat3(&m_eyeCur);
@@ -132,10 +136,17 @@ void CCamera_AreaCam::Priority_Update(_float fTimeDelta)
     vRight = XMVector3Normalize(vRight);
     _vector vUp = XMVector3Normalize(XMVector3Cross(vLook, vRight));
 
-    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(vE, 1.f));
-    m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSetW(vRight, 0.f));
-    m_pTransformCom->Set_State(STATE::UP, XMVectorSetW(vUp, 0.f));
-    m_pTransformCom->Set_State(STATE::LOOK, XMVectorSetW(vLook, 0.f));
+    _matrix CamWorld;
+    CamWorld.r[0] = XMVectorSetW(vRight, 0.f);
+    CamWorld.r[1] = XMVectorSetW(vUp, 0.f);
+    CamWorld.r[2] = XMVectorSetW(vLook, 0.f);
+    CamWorld.r[3] = XMVectorSetW(vE, 1.f);
+    Apply_Shake(CamWorld);
+
+    m_pTransformCom->Set_State(STATE::RIGHT, CamWorld.r[0]);
+    m_pTransformCom->Set_State(STATE::UP, CamWorld.r[1]);
+    m_pTransformCom->Set_State(STATE::LOOK, CamWorld.r[2]);
+    m_pTransformCom->Set_State(STATE::POSITION, CamWorld.r[3]);
 
     __super::Priority_Update(fTimeDelta);
 }
@@ -152,7 +163,8 @@ HRESULT CCamera_AreaCam::Ready_Events()
             else
                 m_pGameInstance_Proxy->Tween_ShaderGlobal("g_fSpotlightDarken", _float4(0.f, 0.f, 0.f, 0.f), 0.5f);
         });
-    return S_OK;
+
+    return Ready_ShakeEvents();
 }
 
 _float CCamera_AreaCam::Resolve_TimeDelta(_float fTimeDelta)

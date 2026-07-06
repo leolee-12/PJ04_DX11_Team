@@ -34,42 +34,18 @@ void CEditCamera::Priority_Update(_float fTimeDelta)
     if (m_bActive)
     {
         ImGuiIO& io = ImGui::GetIO();
-
-        // 우클릭 드래그 → 회전
         if (io.MouseDown[1])
         {
-            // io.MouseDelta.x, io.MouseDelta.y 로 Yaw/Pitch
-            if (io.MouseDelta.x)
-            {
-                m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), io.MouseDelta.x * m_fMouseSensor * fTimeDelta);
-            }
-            if (io.MouseDelta.y)
-            {
-                m_pTransformCom->Turn(m_pTransformCom->Get_State(STATE::RIGHT), io.MouseDelta.y * m_fMouseSensor * fTimeDelta);
-            }
-        }
-
-        // 휠 → 줌
-        if (io.MouseWheel != 0.f)
-        {
-            m_pTransformCom->Go_Straight(fTimeDelta * io.MouseWheel);
-        }
-
-        // WASD (우클릭 중일 때만)
-        if (io.MouseDown[1])
-        {
-            if (ImGui::IsKeyDown(ImGuiKey_W)) {
-                m_pTransformCom->Go_Straight(fTimeDelta);
-            }
-            if (ImGui::IsKeyDown(ImGuiKey_S)) {
-                m_pTransformCom->Go_Backward(fTimeDelta);
-            }
-            if (ImGui::IsKeyDown(ImGuiKey_A)) {
-                m_pTransformCom->Go_Left(fTimeDelta);
-            }
-            if (ImGui::IsKeyDown(ImGuiKey_D)) {
-                m_pTransformCom->Go_Right(fTimeDelta);
-            }
+            _float fSpeed = 1.f;
+            if (ImGui::IsKeyDown(ImGuiKey_LeftShift)) fSpeed = 10.f;
+            if (io.MouseDelta.x != 0.f) m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), io.MouseDelta.x *
+                m_fMouseSensor * fTimeDelta);
+            if (io.MouseDelta.y != 0.f) m_pTransformCom->Turn(m_pTransformCom->Get_State(STATE::RIGHT),
+                io.MouseDelta.y * m_fMouseSensor * fTimeDelta);
+            if (ImGui::IsKeyDown(ImGuiKey_W)) m_pTransformCom->Go_Straight(fTimeDelta * fSpeed);
+            if (ImGui::IsKeyDown(ImGuiKey_S)) m_pTransformCom->Go_Backward(fTimeDelta * fSpeed);
+            if (ImGui::IsKeyDown(ImGuiKey_A)) m_pTransformCom->Go_Left(fTimeDelta * fSpeed);
+            if (ImGui::IsKeyDown(ImGuiKey_D)) m_pTransformCom->Go_Right(fTimeDelta * fSpeed);
         }
     }
 	__super::Priority_Update(fTimeDelta);

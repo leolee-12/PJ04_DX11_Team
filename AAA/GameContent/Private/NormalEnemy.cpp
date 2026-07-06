@@ -59,38 +59,6 @@ HRESULT CNormalEnemy::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CNormalEnemy::Priority_Update(_float fTimeDelta)
-{
-	if (!m_bActive)
-		return;
-
-	__super::Priority_Update(fTimeDelta);
-}
-
-void CNormalEnemy::Update(_float fTimeDelta)
-{
-	if (!m_bActive)
-		return;
-
-#ifdef _DEBUG
-	if (m_pGameInstance_Proxy->Is_EditMode())
-	{
-		if (m_pMovement) m_pMovement->Sync_To_Controller();
-		return;
-	}
-#endif
-
-	__super::Update(fTimeDelta);
-}
-
-void CNormalEnemy::Late_Update(_float fTimeDelta)
-{
-	if (!m_bActive)
-		return;
-
-	__super::Late_Update(fTimeDelta);
-}
-
 _bool CNormalEnemy::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
 {
 	Out.fRadius = { 0.6f };

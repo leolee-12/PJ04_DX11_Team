@@ -1,10 +1,10 @@
 #pragma once
 #include "GameContent_Defines.h"
-#include "Camera.h"
+#include "Camera_Shakeable.h"
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL CCamera_Boss final : public CCamera
+class CLIENT_DLL CCamera_Boss final : public CCamera_Shakeable
 {
     GENERATED_BODY(CCamera_Boss)
 public:
@@ -26,17 +26,8 @@ public:
 
     void Snap() { m_bInit = false; m_eyeVel = {}; m_atVel = {}; }   // 활성 시 하드컷
 
-    void Add_Shake(_float fTrauma, _float fDuration = 0.f)
-    {
-        m_fTrauma = min(1.f, m_fTrauma + fTrauma);
-        m_fTraumaDecay = (fDuration > 0.f) ? (m_fTrauma / fDuration) : DEFAULT_TRAUMA_DECAY;
-    }
-    void Set_Rumble(_float fLevel) { m_fRumble = max(0.f, min(1.f, fLevel)); }
-    void Stop_Rumble() { Add_Shake(m_fRumble); m_fRumble = 0.f; }
-
 private:
     virtual HRESULT Ready_Events() override;
-    void            Apply_Shake(_matrix& CamWorld);
 
     CGameObject* m_pPlayer = { nullptr };
     CGameObject* m_pBoss = { nullptr };
@@ -52,16 +43,6 @@ private:
 
     _float3 m_eyeCur = {}, m_atCur = {}, m_eyeVel = {}, m_atVel = {};
     _bool   m_bInit = { false };
-
-    _float m_fTrauma = { 0.f }, m_fShakeTime = { 0.f }, m_fRumble = { 0.f };
-    _float m_fTraumaDecay = { 1.6f };
-    _float m_fShakeFreq = { 22.f };
-    _float m_fShakeYaw = { XMConvertToRadians(2.2f) };
-    _float m_fShakePitch = { XMConvertToRadians(1.8f) };
-    _float m_fShakeRoll = { XMConvertToRadians(1.2f) };
-    _float m_fShakePos = { 0.12f };
-
-    static constexpr _float DEFAULT_TRAUMA_DECAY = 1.6f;
 
 public:
     static CCamera_Boss* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

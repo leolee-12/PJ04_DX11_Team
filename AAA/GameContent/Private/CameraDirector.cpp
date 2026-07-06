@@ -3,6 +3,7 @@
 #include "GameContrnt_Events.h"
 #include "Camera_Cutscene.h"
 #include "Camera_Boss.h"
+#include "Camera_AreaCam.h"
 
 CCameraDirector::CCameraDirector(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject(pDevice, pContext) {
@@ -38,6 +39,7 @@ void CCameraDirector::On_CameraChange(void* p)
 
     const _bool bCut = (d->eCam == ECutsceneCam::Cutscene);
     const _bool bBoss = (d->eCam == ECutsceneCam::Boss);
+    const _bool bArea = (d->eCam == ECutsceneCam::Area);
 
     _bool bReady = false;
     if (bCut && pCut)
@@ -50,8 +52,32 @@ void CCameraDirector::On_CameraChange(void* p)
         + L" pCut=" + std::wstring(pCut ? L"O" : L"X")
         + L" bReady=" + std::wstring(bReady ? L"O" : L"X") + L"\n").c_str());
 
-    if (pArea) pArea->Set_Active(!(bCut && bReady) && !bBoss);
+    if (bArea)
+    {
+        CCamera* pFromCam = nullptr;
+        if (pCut && pCut->Is_Active())       pFromCam = pCut;
+        else if (pBoss && pBoss->Is_Active()) pFromCam = pBoss;
+
+        auto pAreaCam = m_pGameInstance_Proxy->Find_GameObject<CCamera_AreaCam>(
+            lvl, TEXT("Layer_Camera"), TEXT("CameraFollow"));
+
+        if (pAreaCam)
+        {
+            if (pFromCam)
+            {
+                CTransform* pTf = pFromCam->Get_Transform();
+                _vector vEye = pTf->Get_State(STATE::POSITION);
+                _vector vAt = vEye + pTf->Get_State(STATE::LOOK);
+                pAreaCam->Begin_Handoff(vEye, vAt, pFromCam->Get_Fovy());
+            }
+            pAreaCam->Set_Active(true);
+        }
+        if (pCut)  pCut->Set_Active(false);
+        if (pBoss) pBoss->Set_Active(false);
+        return;
+    }
     if (pCut)  pCut->Set_Active(bCut && bReady);
+    if (pBoss && bCut && bReady) pBoss->Set_Active(false);
     if (bBoss)
     {
         if (pCut)  pCut->Set_Active(false);
