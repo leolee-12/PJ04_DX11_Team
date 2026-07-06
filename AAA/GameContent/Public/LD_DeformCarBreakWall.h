@@ -42,6 +42,7 @@ private:
 	CCollider*	m_pBoostTrigger = { nullptr };
 	_bool		m_bBoostTriggerRegistered = { false };
 	STATE		m_eState = { STATE::IDLE };
+	_bool		m_bMeshHiddenAtFrame = { false };
 
 private:
 	virtual HRESULT Ready_Components() override;
