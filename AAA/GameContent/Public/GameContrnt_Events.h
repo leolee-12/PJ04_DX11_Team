@@ -34,6 +34,7 @@ namespace Client
         inline constexpr const _tchar* Cutscene_GorillaAppear = L"Cutscene.GorillaAppear";   // 트리거 발동
         inline constexpr const _tchar* Cutscene_GorillaBreak = L"Cutscene.GorillaBreak";  // 고릴라 환경 부수기 이벤트
         inline constexpr const _tchar* Cutscene_CameraChange = L"Cutscene.CameraChange";
+        inline constexpr const _tchar* Cutscene_StageClear = L"Cutscene.StageClear";
 
 
         // QTE
@@ -165,4 +166,17 @@ namespace Client
         _wstring strPayload;
     };
 #pragma endregion
+
+#pragma region 컷씬
+    enum class STAGECLEAR_ANIM { CUT1, DANCE, _COUNT };
+
+    struct CUTSCENE_STAGECLEAR
+    {
+        _float3 vPos = { 0.f, 0.f, 0.f };
+        STAGECLEAR_ANIM eAnim{ STAGECLEAR_ANIM::_COUNT };
+        _float fAnimSpeed { 1.f };
+        _float fBlendDuration = { 0.f };
+    };
+#pragma endregion
+
 }
