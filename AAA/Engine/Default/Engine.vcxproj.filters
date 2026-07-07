@@ -319,6 +319,12 @@
     <Filter Include="13. Sound\Handler">
       <UniqueIdentifier>{071d0a53-c568-4414-b241-79a02c5230e2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="99. Defines\pch">
+      <UniqueIdentifier>{2a09911f-6d40-4db8-baf2-7aa0d3c77798}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="96. Utils\ShaderCache">
+      <UniqueIdentifier>{422f767a-a6c8-4821-b35f-2c2461d643b3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h">
@@ -651,6 +657,12 @@
     <ClInclude Include="..\Public\Parsing_Utils.h">
       <Filter>96. Utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Engine_pch.h">
+      <Filter>99. Defines\pch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ShaderCache_Utils.h">
+      <Filter>96. Utils\ShaderCache</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -935,30 +947,31 @@
     <ClCompile Include="..\Private\Sound_Handle.cpp">
       <Filter>13. Sound\Handler</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Engine_pch.cpp">
+      <Filter>99. Defines\pch</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Engine_Shader_Defines.hlsli">
       <Filter>95. ShaderFiles</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\ShaderFiles\Shader_Cell.hlsl">
+    <None Include="..\ShaderFiles\Shader_PostProsess.hlsl">
       <Filter>95. ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_Deferred.hlsl">
+    </None>
+    <None Include="..\ShaderFiles\Shader_Cell.hlsl">
       <Filter>95. ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_Effect_VtxTex.hlsl">
+    </None>
+    <None Include="..\ShaderFiles\Shader_Deferred.hlsl">
       <Filter>95. ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_Effect_Mesh.hlsl">
+    </None>
+    <None Include="..\ShaderFiles\Shader_Effect_Mesh.hlsl">
       <Filter>95. ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_PostProsess.hlsl">
+    </None>
+    <None Include="..\ShaderFiles\Shader_Effect_VtxTex.hlsl">
       <Filter>95. ShaderFiles</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_VolumetricFog.hlsl">
+    </None>
+    <None Include="..\ShaderFiles\Shader_VolumetricFog.hlsl">
       <Filter>95. ShaderFiles\raw Shader</Filter>
-    </FxCompile>
+    </None>
   </ItemGroup>
 </Project>
