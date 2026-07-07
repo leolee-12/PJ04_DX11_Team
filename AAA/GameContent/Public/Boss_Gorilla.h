@@ -50,7 +50,7 @@ public:
     void                   Begin_QTE(_float fSeconds) { m_bQTEEscaped = false; m_fQTETimer = fSeconds; }
     _bool                  Is_QTEEscaped() const { return m_bQTEEscaped; }
     _bool                  Tick_QTETimer(_float fDt) { m_fQTETimer -= fDt; return m_fQTETimer <= 0.f; }
-    void                   Fire_Release(GRAB_RELEASE_TYPE eType);
+    void                   Fire_Release(KIRBY_ATTACHMENT_END_REASON eType);
 
 protected:
     virtual CMonsterBrain* Create_Brain() override;
@@ -72,7 +72,9 @@ protected:
     virtual _bool  Get_HurtBoxDesc(CAPSULE_DESC& Out) const override;
     virtual _bool  Is_Touch_Harmful() const override { return false; }
 
-    virtual const _tchar*  Get_AppearEventTag() const override { return EventTag::Cutscene_GorillaHandoff; }
+    virtual const _tchar*  Get_AppearEventTag() const override { return EventTag::Kirby_AttachmentEnd; }
+    // yse Ãß°¡
+    virtual _bool Should_AppearFromEvent(void* pData) const override;
     virtual HRESULT        Ready_AnimEvents() override;                       
 
     virtual HRESULT Ready_PartObjects() override;
