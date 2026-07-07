@@ -147,7 +147,7 @@ public:
 	// Damage
 	virtual void Damaged(const ATTACK_INFO& tInfo) override;
 	void Add_HP(_float fHP);
-	void Start_DamageInvincibility() { Start_Invincibility(); }
+	void Start_DamageInvincibility();
 
 	// Ladder
 	CLevelDesign_Ladder* Get_Ladder() { return m_pLadder; }
@@ -172,12 +172,9 @@ private:
 	// Damage
 	virtual _bool Block_Hit(const ATTACK_INFO& tInfo) override;
 	virtual void  On_Damaged(const ATTACK_INFO& tInfo) override;
-	
-	// Timer
-	//void Update_Timer(_float fTimeDelta);
 
 	// CutScene Grab
-	void Set_CutsceneGrabTarget(CUTSCENE_GRAB_DESC* pGrabDesc);
+	void Set_CutsceneGrabTarget(KIRBY_ATTACHMENT_BEGIN_DESC* pGrabDesc);
 	void Clear_CutsceneGrabTarget();
 
 private:

@@ -93,7 +93,7 @@ void CKirby_CarFirstBreakWall::On_Damaged_KirbyState(CKirby* pKirby, const ATTAC
 {
 }
 
-void CKirby_CarFirstBreakWall::Request_ReleaseGrabState(CKirby* pKirby, CUTSCENE_KIRBY_TYPE eType)
+void CKirby_CarFirstBreakWall::Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType)
 {
     Transition_Fall_OR_Wait_OR_Run(pKirby);
 }

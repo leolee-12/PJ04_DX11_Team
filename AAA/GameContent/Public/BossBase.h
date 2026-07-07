@@ -32,6 +32,7 @@ protected:
     virtual CMonsterBrain* Create_Brain() override = 0;
     virtual _bool          Use_StateMachine() const override { return false; }
     virtual const _tchar* Get_AppearEventTag() const { return nullptr; }
+    virtual _bool Should_AppearFromEvent(void*) const { return true; }
 
     // ø¨√‚ »≈
     virtual void   Play_Intro() = 0;

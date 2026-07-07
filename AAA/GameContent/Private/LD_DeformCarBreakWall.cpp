@@ -298,11 +298,11 @@ void CLD_DeformCarBreakWall::On_Event()
 
 	m_eState = STATE::BREAKING;
 
-	CUTSCENE_GRAB_DESC Desc{};
-	Desc.eType = CUTSCENE_KIRBY_TYPE::DEFORM_CAR_GET_FIRST;
+	KIRBY_ATTACHMENT_BEGIN_DESC Desc{};
+	Desc.eType = KIRBY_ATTACHMENT_CONTEXT::DEFORM_CAR_GET_FIRST;
 	Desc.pBoneMatrix = m_pModelCom->Get_BoneMatrixPtr("CarConstL");
 	Desc.pSourceWorld = m_pTransformCom->Get_WorldMatrixPtr();
-	m_pGameInstance_Proxy->Publish(EventTag::Cutscene_KirbyStart, &Desc);
+	m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentBegin, &Desc);
 
 	CUTSCENE_CAMERA_DESC cam{};
 	cam.eCam = ECutsceneCam::Cutscene;

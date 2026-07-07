@@ -96,7 +96,7 @@ _bool CKirby_QTE_Grabbed::Handle_Command(CKirby* pKirby, CKirby_Command* pComman
     return false;
 }
 
-void CKirby_QTE_Grabbed::Request_ReleaseGrabState(CKirby* pKirby, CUTSCENE_KIRBY_TYPE eType)
+void CKirby_QTE_Grabbed::Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType)
 {
     Change_QTEGrabbedState(pKirby, QTE_GRABBED_STATE::ESCAPE);
 }

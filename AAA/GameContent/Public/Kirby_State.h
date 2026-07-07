@@ -66,8 +66,8 @@ public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand);
 
 public:
-	virtual void Request_GrabState(CKirby* pKirby, CUTSCENE_KIRBY_TYPE eType);
-	virtual void Request_ReleaseGrabState(CKirby* pKirby, CUTSCENE_KIRBY_TYPE eType);
+	virtual void Request_GrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType);
+	virtual void Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType);
 
 	virtual _bool Ignore_TimeScale() { return false; }
 
