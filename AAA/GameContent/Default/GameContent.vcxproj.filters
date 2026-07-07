@@ -1800,15 +1800,6 @@
     <ClInclude Include="..\Public\LD_DeformCarBreakWall.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\LD_SlopeBoardC.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\ForStage1-2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\LD_SlopeBoardA.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\ForStage1-2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\LD_Stage1BossDemo.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\ForBossMap1</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\LD_PopFlower.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\01. PopFlower</Filter>
     </ClInclude>
@@ -1837,6 +1828,12 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_SlopeBoardA.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_SlopeBoardA.h" />
+    <ClInclude Include="..\Public\LD_SlopeBoardC.h" />
+    <ClInclude Include="..\Public\LD_Stage1BossDemo.h" />
+    <ClInclude Include="..\Public\LD_GarageRadio.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
     </ClInclude>
   </ItemGroup>
@@ -2642,15 +2639,6 @@
     <ClCompile Include="..\Private\LD_DeformCarBreakWall.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\LD_SlopeBoardA.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\ForStage1-2</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\LD_SlopeBoardC.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\ForStage1-2</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject\ForBossMap1</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\LD_PopFlower.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\01. PopFlower</Filter>
     </ClCompile>
@@ -2679,6 +2667,12 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_SlopeBoardC.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_SlopeBoardA.cpp" />
+    <ClCompile Include="..\Private\LD_SlopeBoardC.cpp" />
+    <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp" />
+    <ClCompile Include="..\Private\LD_GarageRadio.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
     </ClCompile>
   </ItemGroup>

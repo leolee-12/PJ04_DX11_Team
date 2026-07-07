@@ -5,6 +5,10 @@ NS_BEGIN(Engine)
 class CCollider;
 NS_END
 
+NS_BEGIN(physx)
+class PxRigidStatic;
+NS_END
+
 NS_BEGIN(Client)
 
 struct LD_SPAWN_SPEC;
@@ -26,7 +30,7 @@ private:
 	CLD_SlopeBoardC(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CLD_SlopeBoardC(const CLD_SlopeBoardC& Prototype);
 	virtual ~CLD_SlopeBoardC() = default;
-
+	
 	virtual HRESULT Validate_Initialized() override;
 
 public:
@@ -36,24 +40,36 @@ public:
 
 	static void Register_LevelDesignSpecs();
 	static _bool Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
-	static CGameObject* Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
 private:
 	CCollider* m_pInteractionCollider = { nullptr };
+	physx::PxRigidStatic* m_pHorizontalPhysicsActor = { nullptr };
+	physx::PxRigidStatic* m_pVerticalPhysicsActor = { nullptr };
 
 	STATE m_eState = { STATE::IDLE };
-	_float m_fEventAnimSpeed = { 1.5f };
+	_float m_fEventStopProgress = { 1.f };
 
 private:
+	virtual HRESULT Ready_Events() override;
 	virtual HRESULT Ready_Components() override;
 	HRESULT Ready_RenderComponents();
+	HRESULT Ready_PhysicsBoxes();
+	HRESULT Ready_PhysicsBox(const _float3& vWorldCenter, const _float3& vWorldHalfExtents, physx::PxRigidStatic** ppOutActor);
 	HRESULT Ready_InteractionCollider();
 
+	void Release_PhysicsBox(physx::PxRigidStatic** ppActor);
+	void Release_PhysicsBoxes();
+
 	void Handle_Interaction(CCollider* pOther);
+	void On_Event();
 
 public:
+	static CGameObject* Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	static CLD_SlopeBoardC* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
+
+protected:
+	virtual void Free() override;
 };
 
 NS_END
