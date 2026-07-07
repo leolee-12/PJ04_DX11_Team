@@ -12,9 +12,9 @@ namespace
 
     constexpr const _char* s_RescuedClips[ETOUI(CCage_WaddleDee::DEE_POS::END)] =
     {
-        "DeeFront_Dance",
-        "DeeLeft_Dance",
-        "DeeRight_Dance",
+        "DeeFront_Cut1",
+        "DeeLeft_Cut1",
+        "DeeRight_Cut1",
     };
 
     constexpr _float g_fDanceDuration = { 4.f };
@@ -70,19 +70,15 @@ void CCage_WaddleDee::Update(_float fTimeDelta)
     if (!m_bActive)
         return;
 
-    __super::Update(fTimeDelta);   // 애니메이터 갱신
+    __super::Update(fTimeDelta);
 
     if (STATE::CAGED == m_eState && m_pAnimatorCom->Is_Finished())
         Play_RandomCageWait();
 
-    if (STATE::RESCUED == m_eState)
+    if (STATE::RESCUED == m_eState && m_pAnimatorCom->Is_Finished())
     {
-        m_fDanceTimer += fTimeDelta;
-        if (m_fDanceTimer > g_fDanceDuration)
-        {
-            m_eState = STATE::DONE;
-            Set_Active(false);     // 파츠만 끈다. 케이지 정리는 컨테이너가 결정
-        }
+        m_eState = STATE::DONE;
+        Set_Active(false);
     }
 }
 
@@ -150,9 +146,11 @@ void CCage_WaddleDee::Rescue()
         m_pSocketBoneMatrix = nullptr;
     }
 
+    m_pSocketBoneMatrix = nullptr;
+    m_pTransformCom->Set_WorldMatrix(XMMatrixIdentity());
+
     m_eState = STATE::RESCUED;
-    m_fDanceTimer = 0.f;
-    m_pAnimatorCom->Play(s_RescuedClips[ETOUI(m_ePos)], true, true);
+    m_pAnimatorCom->Play(s_RescuedClips[ETOUI(m_ePos)], false, true);
 }
 
 HRESULT CCage_WaddleDee::Ready_Components()

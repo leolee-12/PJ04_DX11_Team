@@ -2,6 +2,10 @@
 #include "GameContent_Defines.h"
 #include "ContainerObject.h"
 
+NS_BEGIN(Engine)
+class CCollider;
+NS_END
+
 NS_BEGIN(Client)
 
 class CBoss_Cage_Body;
@@ -56,6 +60,7 @@ public:
 
 private:
     HRESULT Ready_PartObjects();
+    HRESULT Ready_BreakTrigger();
 
 private:
     const _float4x4* m_pAttachBone = { nullptr };
@@ -63,12 +68,14 @@ private:
     _float4x4        m_AttachOffset = {};
 
     CCage_WaddleDee* m_WaddleDees[3] = {};
-
     CBoss_Cage_Body* m_pBody = { nullptr };
+    CCollider* m_pBreakTrigger = { nullptr };
+
     CAGE_STATE m_eState = { CAGE_STATE::HANGING };
     _bool      m_bAnimPrimed = { false };           // 본 1프레임 갱신 후 Pause 완료 여부
     _float     m_fFloatHeight = { 0.f };
     _float     m_fDescendSpeed = { 3.f };
+
 
 public:
     static CBoss_Cage* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

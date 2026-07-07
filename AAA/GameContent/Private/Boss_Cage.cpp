@@ -29,6 +29,9 @@ HRESULT CBoss_Cage::Initialize(void* pArg)
     if (FAILED(Ready_PartObjects()))
         return E_FAIL;
 
+    if (FAILED(Ready_BreakTrigger()))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -100,7 +103,15 @@ void CBoss_Cage::Late_Update(_float fTimeDelta)
         m_pTransformCom->Set_WorldMatrix(World);
     }
 
-    __super::Late_Update(fTimeDelta);   // 파츠들이 이 안에서 케이지 월드까지 합성 + 렌더그룹 등록
+    __super::Late_Update(fTimeDelta);
+
+    if (CAGE_STATE::FLOAT_IDLE == m_eState && m_pBreakTrigger && m_pBreakTrigger->Is_Enabled())
+    {
+        m_pBreakTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+#ifdef _DEBUG
+        m_pGameInstance_Proxy->Add_DebugComponent(m_pBreakTrigger);
+#endif
+    }
 }
 
 HRESULT CBoss_Cage::Ready_PartObjects()
@@ -138,6 +149,33 @@ HRESULT CBoss_Cage::Ready_PartObjects()
 
         m_WaddleDees[i] = static_cast<CCage_WaddleDee*>(m_PartObjects.find(szPartTags[i])->second);
     }
+
+    return S_OK;
+}
+
+HRESULT CBoss_Cage::Ready_BreakTrigger()
+{
+    CCollider::COLLIDER_DESC Desc{};
+    Desc.pOwner = this;
+    Desc.fRadius = 1.5f;                      
+    Desc.vCenter = _float3(0.f, 1.5f, 0.f);    
+
+    m_pBreakTrigger = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
+        TEXT("Com_BreakTrigger"), &Desc);
+    if (nullptr == m_pBreakTrigger)
+        return E_FAIL;
+
+    m_pGameInstance_Proxy->Register_Collider(m_pBreakTrigger, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+
+    m_pBreakTrigger->Set_OnEnter([this](CCollider* pOther)
+        {
+            if (nullptr == pOther)
+                return;
+            if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
+                return;
+
+            Break();
+        });
 
     return S_OK;
 }
@@ -185,6 +223,14 @@ void CBoss_Cage::Start_Descend(_fvector vLookTarget, _float fSpawnHeightOffset)
 
 void CBoss_Cage::Break()
 {
+    if (CAGE_STATE::FLOAT_IDLE != m_eState)
+        return;
+
+    m_pBreakTrigger->Set_Enabled(false);                    
+
+    m_pBody->Get_Animator()->Play("Cut1", false, true);     
+    Rescue_WaddleDees();                                    
+    m_eState = CAGE_STATE::BREAKING;
 }
 
 void CBoss_Cage::Attach_To_Bone(const _float4x4* pBoneMatrix, const _float4x4* pOwnerWorld, _fmatrix OffsetMatrix)
