@@ -67,6 +67,7 @@
     <ClInclude Include="..\public\GameContent_pch.h" />
     <ClInclude Include="..\Public\Kirby_AttackMode.h" />
     <ClInclude Include="..\Public\Kirby_CarFirstBreakWall.h" />
+    <ClInclude Include="..\Public\Kirby_Dodge.h" />
     <ClInclude Include="..\Public\LD_DeformCarBreakWall.h" />
     <ClInclude Include="..\Public\LD_SlopeBoardA.h" />
     <ClInclude Include="..\Public\LD_SlopeBoardC.h" />
@@ -373,6 +374,7 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_AttackMode.cpp" />
     <ClCompile Include="..\Private\Kirby_CarFirstBreakWall.cpp" />
+    <ClCompile Include="..\Private\Kirby_Dodge.cpp" />
     <ClCompile Include="..\Private\LD_DeformCarBreakWall.cpp" />
     <ClCompile Include="..\Private\LD_SlopeBoardA.cpp" />
     <ClCompile Include="..\Private\LD_SlopeBoardC.cpp" />

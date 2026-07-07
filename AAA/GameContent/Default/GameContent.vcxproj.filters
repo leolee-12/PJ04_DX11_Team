@@ -1803,6 +1803,9 @@
     <ClInclude Include="..\public\GameContent_pch.h">
       <Filter>99. Defines\pch</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Dodge.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Dodge</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2623,6 +2626,9 @@
     </ClCompile>
     <ClCompile Include="..\private\GameContent_pch.cpp">
       <Filter>99. Defines\pch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Dodge.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Dodge</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
