@@ -27,7 +27,7 @@ enum class KIRBY_STATE_TYPE
 	DODGE,
 	LADDER,
 	GET_DEFORM,
-	CUTSCENE_GRABBED, QTE_GRABBED, CAR_FIRST_BREAK_WALL
+	CUTSCENE_GRABBED, QTE_GRABBED, CAR_FIRST_BREAK_WALL, STAGE_CLEAR
 };
 
 class CLIENT_DLL CKirby_State abstract : public CBase
@@ -69,6 +69,8 @@ public:
 public:
 	virtual void Request_GrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType);
 	virtual void Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType);
+
+	virtual void Request_StageClear(CKirby* pKirby, const CUTSCENE_STAGECLEAR* pDesc);
 
 	virtual _bool Ignore_TimeScale() { return false; }
 

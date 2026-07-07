@@ -34,6 +34,9 @@ public:
 public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
+public:
+	virtual void Request_StageClear(CKirby* pKirby, const CUTSCENE_STAGECLEAR* pDesc) override;
+
 private:
 	void Change_ClearState(CKirby* pKirby, CLEAR_STATE eNext);
 	void Enter_ClearState(CKirby* pKirby, CLEAR_STATE eState);

@@ -22,7 +22,7 @@ HRESULT CKirby_Clear::Initialize()
 
 KIRBY_STATE_TYPE CKirby_Clear::Get_StateType()
 {
-    return KIRBY_STATE_TYPE::CUTSCENE_GRABBED;
+    return KIRBY_STATE_TYPE::STAGE_CLEAR;
 }
 
 void CKirby_Clear::Enter(CKirby* pKirby, _int iFlag)
@@ -33,12 +33,7 @@ void CKirby_Clear::Enter(CKirby* pKirby, _int iFlag)
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
     pAbility->Clear_Overlay(pKirby, 1, 0.1f);
 
-    CKirby_Body* pBody = pKirby->Get_Body();
-    CAnimator* pAnimator = pBody->Get_Animator();
-    pAnimator->Play("Cut1", false, false, 0.1f, 1.5f);
-
     m_eClearState = CLEAR_STATE::CLEAR_END;
-    Change_ClearState(pKirby, CLEAR_STATE::CUT1);
 }
 
 void CKirby_Clear::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -61,6 +56,31 @@ _bool CKirby_Clear::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
     return false;
 }
 
+void CKirby_Clear::Request_StageClear(CKirby* pKirby, const CUTSCENE_STAGECLEAR* pDesc)
+{
+    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+
+    switch (pDesc->eAnim)
+    {
+        case STAGECLEAR_ANIM::CUT1:
+        {
+            pKirby->Get_Transform()->Set_State(STATE::POSITION,
+                XMVectorSetW(XMLoadFloat3(&pDesc->vPos), 1.f));
+
+            pAnimator->Play("Cut1", false, false, pDesc->fBlendDuration, pDesc->fAnimSpeed);
+
+            Change_ClearState(pKirby, CLEAR_STATE::CUT1);
+            break;
+        }
+        case STAGECLEAR_ANIM::DANCE:
+        {
+            pAnimator->Play("ClearDanceLong", false, false, pDesc->fBlendDuration, pDesc->fAnimSpeed);
+            Change_ClearState(pKirby, CLEAR_STATE::DANCE);
+            break;
+        }
+    }
+}
+
 void CKirby_Clear::Change_ClearState(CKirby* pKirby, CLEAR_STATE eNext)
 {
     if (m_eClearState == eNext)
@@ -75,15 +95,11 @@ void CKirby_Clear::Change_ClearState(CKirby* pKirby, CLEAR_STATE eNext)
 
 void CKirby_Clear::Enter_ClearState(CKirby* pKirby, CLEAR_STATE eState)
 {
-    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
-
     switch (eState)
     {
         case CLEAR_STATE::CUT1:
-            pAnimator->Play("Cut1", false, false, 0.1f, 1.f);
             break;
         case CLEAR_STATE::DANCE:
-            pAnimator->Play("ClearDanceLong", false, false, 0.1f, 1.f);
             break;
         case CLEAR_STATE::CLEAR_END:
             break;
@@ -92,18 +108,19 @@ void CKirby_Clear::Enter_ClearState(CKirby* pKirby, CLEAR_STATE eState)
 
 void CKirby_Clear::Update_ClearState(CKirby* pKirby, _float fTimeDelta)
 {
-    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
-
     switch (m_eClearState)
     {
         case CLEAR_STATE::CUT1:
         {
-            if (pAnimator->Is_Finished())
-                Change_ClearState(pKirby, CLEAR_STATE::DANCE);
             break;
         }
         case CLEAR_STATE::DANCE:
+        {
+            CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+            if (pAnimator->Is_Finished())
+                Transition_Fall_OR_Wait_OR_Run(pKirby);
             break;
+        }
         case CLEAR_STATE::CLEAR_END:
             break;
     }
