@@ -64,8 +64,10 @@ void CKirby_Clear::Request_StageClear(CKirby* pKirby, const CUTSCENE_STAGECLEAR*
     {
         case STAGECLEAR_ANIM::CUT1:
         {
-            pKirby->Get_Transform()->Set_State(STATE::POSITION,
-                XMVectorSetW(XMLoadFloat3(&pDesc->vPos), 1.f));
+            //CTransform* pTransform = pKirby->Get_Transform();
+
+            pKirby->Get_Transform()->Set_WorldMatrix(pDesc->AnchorWorld);
+            pKirby->Get_Movement()->Sync_To_Controller();
 
             pAnimator->Play("Cut1", false, false, pDesc->fBlendDuration, pDesc->fAnimSpeed);
 
@@ -116,9 +118,9 @@ void CKirby_Clear::Update_ClearState(CKirby* pKirby, _float fTimeDelta)
         }
         case CLEAR_STATE::DANCE:
         {
-            CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+  /*          CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
             if (pAnimator->Is_Finished())
-                Transition_Fall_OR_Wait_OR_Run(pKirby);
+                Transition_Fall_OR_Wait_OR_Run(pKirby);*/
             break;
         }
         case CLEAR_STATE::CLEAR_END:
