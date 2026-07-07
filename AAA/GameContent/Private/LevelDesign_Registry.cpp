@@ -21,6 +21,7 @@
 #include "LD_SlopeBoardA.h"
 #include "LD_SlopeBoardC.h"
 #include "LD_DeformCarBreakWall.h"
+#include "LD_GarageRadio.h"
 
 #include <mutex>
 
@@ -260,6 +261,7 @@ void CLevelDesign_Registry::Register_EnemiesAndGimmicks()
 	CLD_SlopeBoardA::Register_LevelDesignSpecs();
 	CLD_SlopeBoardC::Register_LevelDesignSpecs();
 	CLD_DeformCarBreakWall::Register_LevelDesignSpecs();
+	CLD_GarageRadio::Register_LevelDesignSpecs();
 	CLD_ArrowBoard::Register_LevelDesignSpecs();
 }
 

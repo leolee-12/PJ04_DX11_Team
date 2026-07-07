@@ -85,7 +85,7 @@ HRESULT CLD_DeformObject::Validate_Initialized()
 	if (m_tDeformObjectDesc.fInteractionRadius < 0.f)
 		return E_FAIL;
 
-	if (nullptr == m_pInteractionCollider || !m_bInteractionColliderRegistered)
+	if (nullptr == m_pInteractionCollider)
 		return E_FAIL;
 
 	if (!m_tDeformObjectDesc.bUseCollMesh || nullptr == m_pRigidStatic)
@@ -253,7 +253,6 @@ HRESULT CLD_DeformObject::Ready_InteractionCollider()
 		return E_FAIL;
 
 	m_pGameInstance_Proxy->Register_Collider(m_pInteractionCollider, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
-	m_bInteractionColliderRegistered = true;
 
 	return S_OK;
 }
@@ -264,22 +263,6 @@ void CLD_DeformObject::Set_InteractionEnabled(_bool bEnabled)
 		return;
 
 	m_pInteractionCollider->Set_Enabled(bEnabled);
-}
-
-void CLD_DeformObject::Unregister_InteractionCollider(_bool bImmediate)
-{
-	if (nullptr == m_pInteractionCollider || !m_bInteractionColliderRegistered)
-		return;
-
-	m_pInteractionCollider->Set_Enabled(false);
-
-	const _uint iGroup = ETOUI(COLLISION_LAYER::ENV_TRIGGER);
-	if (bImmediate)
-		m_pGameInstance_Proxy->Immediate_Unregister(m_pInteractionCollider, iGroup);
-	else
-		m_pGameInstance_Proxy->Request_Unregister(m_pInteractionCollider, iGroup);
-
-	m_bInteractionColliderRegistered = false;
 }
 
 CLD_DeformObject* CLD_DeformObject::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -310,8 +293,6 @@ CGameObject* CLD_DeformObject::Clone(void* pArg)
 
 void CLD_DeformObject::Free()
 {
-	Unregister_InteractionCollider(true);
-
 	__super::Free();
 }
 

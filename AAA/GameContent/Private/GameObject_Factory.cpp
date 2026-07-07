@@ -178,13 +178,14 @@ IMPLEMENT_SINGLETON(CGameObject_Factory)
 
 namespace
 {
-    CModel* Create_TextureHubModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath, _bool bCookCollisionMesh)
+    CModel* Create_TextureHubModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath,
+        _bool bCookCollisionMesh, _fmatrix PreTransformMatrix = XMMatrixIdentity())
     {
         CModel::MODEL_LOAD_DESC Desc{};
         Desc.eType = eType;
         Desc.pModelFilePath = pModelFilePath;
         Desc.bCookCollisionMesh = bCookCollisionMesh;
-        XMStoreFloat4x4(&Desc.PreTransformMatrix, XMMatrixIdentity());
+        XMStoreFloat4x4(&Desc.PreTransformMatrix, PreTransformMatrix);
 
         return CModel::Create_WithTextureHub(pDevice, pContext, Desc);
     }

@@ -10,7 +10,10 @@
 namespace
 {
 	inline constexpr const _char* DEFORM_CAR_BREAK_WALL_MODEL_PATH = "../../Resources/Map/Gimmick/Anim/DeformCarBreakWall/DeformCarBreakWall.ysh";
-	inline constexpr const _char* DEFORM_CAR_BREAK_WALL_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { "DeformCarGetFirst", "DeformCarGetEnd", "", "" };
+	inline constexpr const _char* ANIM_FIRST = "DeformCarGetFirst";
+	inline constexpr const _char* ANIM_END = "DeformCarGetEnd";
+	inline constexpr const _char* DEFORM_CAR_BREAK_WALL_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_FIRST, ANIM_END, "", "" };
+	inline constexpr _float DEFORM_CAR_BREAK_WALL_ANIM_SPEED = 1.5f;
 	inline constexpr const _uint DEFORM_CAR_BREAK_WALL_MESH_COUNT = 31u;
 	inline constexpr const _uint DEFORM_CAR_BREAK_WALL_COLLIMESH_INDEX = 10u;
 
@@ -33,6 +36,22 @@ CLD_DeformCarBreakWall::CLD_DeformCarBreakWall(const CLD_DeformCarBreakWall& Pro
 	: CLD_EventObject(Prototype)
 	, m_eState(Prototype.m_eState)
 {
+}
+
+HRESULT CLD_DeformCarBreakWall::Initialize(void* pArg)
+{
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
+
+	const LD_ANIM_PLAY_DESC AnimDescs[] =
+	{
+		{ ANIM_FIRST, false, DEFORM_CAR_BREAK_WALL_ANIM_SPEED },
+	};
+
+	if (FAILED(Ready_AnimPlayDescs(AnimDescs, static_cast<_uint>(_countof(AnimDescs)))))
+		return E_FAIL;
+
+	return Set_AnimPose(ANIM_FIRST, 0.f);
 }
 
 HRESULT CLD_DeformCarBreakWall::Validate_Initialized()
@@ -75,7 +94,7 @@ void CLD_DeformCarBreakWall::Update(_float fTimeDelta)
 
 	if (STATE::BREAKING == m_eState && !m_bMeshHiddenAtFrame)
 	{
-		const _int iAnimationIndex = m_pModelCom->Get_AnimationIndex(DEFORM_CAR_BREAK_WALL_ANIM_NAMES[0]);
+		const _int iAnimationIndex = m_pModelCom->Get_AnimationIndex(ANIM_FIRST);
 		if (0 <= iAnimationIndex)
 		{
 			const _float fDuration = m_pModelCom->Get_AnimationDuration(static_cast<_uint>(iAnimationIndex));
@@ -181,7 +200,7 @@ HRESULT CLD_DeformCarBreakWall::Ready_Components()
 	if (FAILED(__super::Ready_Components()))
 		return E_FAIL;
 
-	if (FAILED(Ready_DeformCarBreakWall()))
+	if (FAILED(Ready_RenderComponent()))
 		return E_FAIL;
 
 	_float3 vMin{}, vMax{};
@@ -203,16 +222,9 @@ HRESULT CLD_DeformCarBreakWall::Ready_Components()
 	return S_OK;
 }
 
-HRESULT CLD_DeformCarBreakWall::Ready_DeformCarBreakWall()
+HRESULT CLD_DeformCarBreakWall::Ready_RenderComponent()
 {
 	m_eState = STATE::IDLE;
-
-	const _int iAnimationIndex = m_pModelCom->Get_AnimationIndex(DEFORM_CAR_BREAK_WALL_ANIM_NAMES[0]);
-	if (iAnimationIndex < 0)
-		return E_FAIL;
-
-	m_pModelCom->Set_AnimationIndex(static_cast<_uint>(iAnimationIndex), false, true, 0.f);
-	m_pModelCom->Seek_Animation(0.f);
 
 	if (DEFORM_CAR_BREAK_WALL_MESH_COUNT != static_cast<_uint>(m_pModelCom->Get_NumMeshes()))
 		return E_FAIL;
@@ -276,8 +288,7 @@ void CLD_DeformCarBreakWall::On_Event()
 	if (STATE::IDLE != m_eState)
 		return;
 
-	if (!Play_EventAnimation(0u, false))
-		return;
+	Play_Anim(ANIM_FIRST);
 
 	for (_uint iMeshIndex : ON_TO_OFF_MESH_INDICES)
 		Set_MeshVisible(iMeshIndex, false);

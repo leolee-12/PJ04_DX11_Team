@@ -44,7 +44,6 @@ private:
 	LD_DEFORMOBJECT_DESC m_tDeformObjectDesc = {};
 
 	CCollider* m_pInteractionCollider = { nullptr };
-	_bool m_bInteractionColliderRegistered = { false };
 	_bool m_bAvailable = { true };
 
 private:
@@ -52,7 +51,6 @@ private:
 	HRESULT Ready_InteractionCollider();
 
 	void Set_InteractionEnabled(_bool bEnabled);
-	void Unregister_InteractionCollider(_bool bImmediate);
 
 public:
 	static CLD_DeformObject* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -27,6 +27,7 @@ private:
 	CLD_DeformCarBreakWall(const CLD_DeformCarBreakWall& Prototype);
 	virtual ~CLD_DeformCarBreakWall() = default;
 
+	virtual HRESULT Initialize(void* pArg) override;
 	virtual HRESULT Validate_Initialized() override;
 
 public:
@@ -46,7 +47,7 @@ private:
 private:
 	virtual HRESULT Ready_Components() override;
 
-	HRESULT Ready_DeformCarBreakWall();
+	HRESULT Ready_RenderComponent();
 	HRESULT Ready_WallRigidStatic(const BoundingBox& LocalBounds);
 	HRESULT Ready_BoostTrigger(const BoundingBox& LocalBounds);
 
