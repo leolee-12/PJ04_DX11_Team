@@ -115,6 +115,9 @@
       <AdditionalIncludeDirectories>../Public/;../Public/PhysX/</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Engine_pch.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>Engine_pch.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -146,6 +149,9 @@ call "UpdateLib.bat" $(Configuration)</Command>
       <AdditionalIncludeDirectories>../Public/;../Public/PhysX/</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Engine_pch.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>Engine_pch.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -222,6 +228,7 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClInclude Include="..\Public\Engine_Function.h" />
     <ClInclude Include="..\Public\Engine_Macro.h" />
     <ClInclude Include="..\Public\Engine_Model_Data.h" />
+    <ClInclude Include="..\public\Engine_pch.h" />
     <ClInclude Include="..\Public\Engine_Struct.h" />
     <ClInclude Include="..\Public\Engine_Typedef.h" />
     <ClInclude Include="..\public\Environment_Manager.h" />
@@ -260,6 +267,7 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClInclude Include="..\Public\RenderTarget.h" />
     <ClInclude Include="..\Public\RigIdBody.h" />
     <ClInclude Include="..\Public\Shader.h" />
+    <ClInclude Include="..\Public\ShaderCache_Utils.h" />
     <ClInclude Include="..\public\ShaderGlobal_Manager.h" />
     <ClInclude Include="..\public\Shadow_Dir.h" />
     <ClInclude Include="..\Public\Sound_Manager.h" />
@@ -329,6 +337,10 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClCompile Include="..\Private\Effect_Part.cpp" />
     <ClCompile Include="..\private\Effect_Manager.cpp" />
     <ClCompile Include="..\Private\Effect_Quad.cpp" />
+    <ClCompile Include="..\private\Engine_pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\private\Environment_Manager.cpp" />
     <ClCompile Include="..\private\EventBus.cpp" />
     <ClCompile Include="..\Private\Font_Manager.cpp" />
@@ -387,12 +399,24 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <None Include="..\ShaderFiles\Engine_Shader_Defines.hlsli" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\ShaderFiles\Shader_Cell.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_Deferred.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_Effect_Mesh.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_Effect_VtxTex.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_PostProsess.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_VolumetricFog.hlsl" />
+    <None Include="..\ShaderFiles\Shader_Cell.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Deferred.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Effect_Mesh.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Effect_VtxTex.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_PostProsess.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_VolumetricFog.hlsl">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

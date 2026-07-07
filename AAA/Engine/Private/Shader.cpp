@@ -1,4 +1,6 @@
 #include "Shader.h"
+#include "ShaderCache_Utils.h"
+#pragma comment(lib, "d3dcompiler.lib")
 
 CShader::CShader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CComponent { pDevice, pContext }
@@ -22,14 +24,54 @@ HRESULT CShader::Initialize_Prototype(const _tchar* pShaderFilePath, const D3D11
 
 #ifdef _DEBUG
     iHLSLFlag |= D3DCOMPILE_DEBUG;
-	iHLSLFlag |= D3DCOMPILE_SKIP_OPTIMIZATION;
+    iHLSLFlag |= D3DCOMPILE_SKIP_OPTIMIZATION;
+    const _tchar* szCacheExt = TEXT(".fxbin_d");    // 컴파일 플래그가 달라서 Debug/Release 캐시 분리
 #else
-	iHLSLFlag |= D3DCOMPILE_OPTIMIZATION_LEVEL1;
+    iHLSLFlag |= D3DCOMPILE_OPTIMIZATION_LEVEL1;
+    const _tchar* szCacheExt = TEXT(".fxbin");
 #endif
 
-    // ID3DBlob = 임의의 메모리공간을 나타내는 인터페이스
-    if (FAILED(D3DX11CompileEffectFromFile(pShaderFilePath, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE, iHLSLFlag, 0, m_pDevice, &m_pEffect, nullptr)))
-        return E_FAIL;
+    namespace fs = std::filesystem;
+    fs::path srcPath = pShaderFilePath;
+    fs::path cachePath = srcPath;
+    cachePath += szCacheExt;
+
+    // 1. 캐시가 신선하면 컴파일 없이 블롭에서 바로 이펙트 생성
+    if (ShaderCache::Is_Fresh(srcPath, cachePath))
+    {
+        vector<char> Blob = ShaderCache::Read_Blob(cachePath);
+        if (!Blob.empty())
+            D3DX11CreateEffectFromMemory(Blob.data(), Blob.size(), 0, m_pDevice, &m_pEffect);
+        // 실패하면 m_pEffect가 nullptr로 남아 아래에서 재컴파일한다
+    }
+
+    // 2. 캐시 미스 또는 캐시 손상 -> 컴파일 후 캐시 갱신
+    if (nullptr == m_pEffect)
+    {
+        ID3DBlob* pCode = { nullptr };
+        ID3DBlob* pError = { nullptr };
+
+        // fx_5_0 프로파일은 엔트리포인트를 nullptr로 넘겨야 한다
+        HRESULT hr = D3DCompileFromFile(pShaderFilePath, nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
+            nullptr, "fx_5_0", iHLSLFlag, 0, &pCode, &pError);
+
+        if (FAILED(hr))
+        {
+            ShaderCache::Report_Error(pError, "Shader Compile Error");
+            Safe_Release(pError);
+            return E_FAIL;
+        }
+        Safe_Release(pError);   // 성공 시엔 경고만 들어있을 수 있다
+
+        hr = D3DX11CreateEffectFromMemory(pCode->GetBufferPointer(), pCode->GetBufferSize(), 0, m_pDevice, &m_pEffect);
+        if (SUCCEEDED(hr))
+            ShaderCache::Write_Blob(cachePath, pCode->GetBufferPointer(), pCode->GetBufferSize());
+
+        Safe_Release(pCode);
+
+        if (FAILED(hr))
+            return E_FAIL;
+    }
     
 	ID3DX11EffectTechnique*     pTechnique = m_pEffect->GetTechniqueByIndex(0);
     if (!pTechnique->IsValid())
