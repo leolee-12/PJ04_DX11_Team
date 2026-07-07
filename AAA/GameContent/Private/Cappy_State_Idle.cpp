@@ -27,8 +27,17 @@ void CCappy_State_Idle::Enter(MONSTER_STATE_TYPE ePrevState)
 
 void CCappy_State_Idle::Update(_float fTimeDelta)
 {
-	if (m_pOwner == nullptr)
+	if (m_pOwner == nullptr || m_pAnimator == nullptr)
 		return;
+
+	_int iType = m_pOwner->Get_AIType();
+
+	if (iType == 1)
+	{
+		if (m_pAnimator->Get_CurrentAnimName() == "HidingJumpB" && m_pAnimator->Is_Finished())
+			Play_IdleAnimation();
+	}
+
 }
 
 void CCappy_State_Idle::Exit(MONSTER_STATE_TYPE eNextState)
@@ -64,25 +73,25 @@ void CCappy_State_Idle::Play_IdleAnimation()
 	{
 		Info.strAniName = "HidingWaitA";
 		Info.bLoop = false;
-		Info.fSpeed = 1.f;
+		Info.fSpeed = 1.25f;
 
 		m_pAnimator->Play(&Info);
 
 		Info.strAniName = "HidingJumpA";
 		Info.bLoop = false;
-		Info.fSpeed = 1.f;
+		Info.fSpeed = 1.25f;
 
 		m_pAnimator->Enqueue(Info);
 
 		Info.strAniName = "HidingWaitB";
 		Info.bLoop = false;
-		Info.fSpeed = 1.f;
+		Info.fSpeed = 1.25f;
 
 		m_pAnimator->Enqueue(Info);
 
 		Info.strAniName = "HidingJumpB";
 		Info.bLoop = false;
-		Info.fSpeed = 1.f;
+		Info.fSpeed = 1.25f;
 
 		m_pAnimator->Enqueue(Info);
 

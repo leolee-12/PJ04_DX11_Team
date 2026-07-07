@@ -56,9 +56,10 @@
     <ClInclude Include="..\Public\Cappy_Body.h" />
     <ClInclude Include="..\Public\Cappy_Brain.h" />
     <ClInclude Include="..\Public\Cappy_Hat.h" />
+    <ClInclude Include="..\Public\Cappy_State_Chase.h" />
     <ClInclude Include="..\Public\Cappy_State_Detect.h" />
+    <ClInclude Include="..\Public\Cappy_State_HatLose.h" />
     <ClInclude Include="..\Public\Cappy_State_Idle.h" />
-    <ClInclude Include="..\Public\Cappy_State_KasaUp.h" />
     <ClInclude Include="..\Public\CarMilkyWay.h" />
     <ClInclude Include="..\Public\Car_00_MilkyWay.h" />
     <ClInclude Include="..\Public\Character.h" />
@@ -363,9 +364,10 @@
     <ClCompile Include="..\Private\Cappy_Body.cpp" />
     <ClCompile Include="..\Private\Cappy_Brain.cpp" />
     <ClCompile Include="..\Private\Cappy_Hat.cpp" />
+    <ClCompile Include="..\Private\Cappy_State_Chase.cpp" />
     <ClCompile Include="..\Private\Cappy_State_Detect.cpp" />
+    <ClCompile Include="..\Private\Cappy_State_HatLose.cpp" />
     <ClCompile Include="..\Private\Cappy_State_Idle.cpp" />
-    <ClCompile Include="..\Private\Cappy_State_KasaUp.cpp" />
     <ClCompile Include="..\Private\CarMilkyWay.cpp" />
     <ClCompile Include="..\Private\Car_00_MilkyWay.cpp" />
     <ClCompile Include="..\Private\CommonHit.cpp" />

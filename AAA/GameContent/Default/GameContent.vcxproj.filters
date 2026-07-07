@@ -913,8 +913,11 @@
     <Filter Include="00. GameObject\06. Monster\04. Cappy\State\Idle">
       <UniqueIdentifier>{4b434a78-748d-432b-9622-b3996aa9f6ed}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\06. Monster\04. Cappy\State\KasaUp">
-      <UniqueIdentifier>{0e21ff0e-4b02-48ee-b141-033f22cc997b}</UniqueIdentifier>
+    <Filter Include="00. GameObject\06. Monster\04. Cappy\State\Chase">
+      <UniqueIdentifier>{3959e8af-cec6-4fe0-ab24-c741894ca7bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\04. Cappy\State\HatLose">
+      <UniqueIdentifier>{0ff73919-563b-4a8b-9974-8f92e30f12fa}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1824,8 +1827,11 @@
     <ClInclude Include="..\Public\Cappy_State_Idle.h">
       <Filter>00. GameObject\06. Monster\04. Cappy\State\Idle</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Cappy_State_KasaUp.h">
-      <Filter>00. GameObject\06. Monster\04. Cappy\State\KasaUp</Filter>
+    <ClInclude Include="..\Public\Cappy_State_Chase.h">
+      <Filter>00. GameObject\06. Monster\04. Cappy\State\Chase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Cappy_State_HatLose.h">
+      <Filter>00. GameObject\06. Monster\04. Cappy\State\HatLose</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2660,8 +2666,11 @@
     <ClCompile Include="..\Private\Cappy_State_Idle.cpp">
       <Filter>00. GameObject\06. Monster\04. Cappy\State\Idle</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Cappy_State_KasaUp.cpp">
-      <Filter>00. GameObject\06. Monster\04. Cappy\State\KasaUp</Filter>
+    <ClCompile Include="..\Private\Cappy_State_Chase.cpp">
+      <Filter>00. GameObject\06. Monster\04. Cappy\State\Chase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Cappy_State_HatLose.cpp">
+      <Filter>00. GameObject\06. Monster\04. Cappy\State\HatLose</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

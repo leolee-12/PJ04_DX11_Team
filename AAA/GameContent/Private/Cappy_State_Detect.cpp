@@ -1,5 +1,6 @@
 #include "Cappy_State_Detect.h"
 #include "GameInstance.h"
+#include "Monster.h"
 
 HRESULT CCappy_State_Detect::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpeed)
 {
@@ -21,27 +22,12 @@ void CCappy_State_Detect::Enter(MONSTER_STATE_TYPE ePrevState)
     if (m_pOwner == nullptr || m_pAnimator == nullptr)
         return;
 
-    ANI_PLAY_INFO Info{};
-
-    Info.strAniName = "KasaUp3";
-    Info.bLoop = false;
-    Info.fSpeed = 1.25f;
-    
-    m_pAnimator->Play(&Info);
-
-    LAYER_PLAY_INFO LayerInfo{};
-    LayerInfo.iSlot = 1;
-    LayerInfo.tAnim.strAniName = "KasaUp1";
-    LayerInfo.tAnim.bLoop = false;
-    LayerInfo.tAnim.fSpeed = 1.25f;
-    LayerInfo.Roots = { "CappyHatL" };
-
-    m_pAnimator->Apply_Overlay(LayerInfo);
+    Play_DetectAnimation();
 }
 
 void CCappy_State_Detect::Update(_float fTimeDelta)
 {
-    if (m_pOwner == nullptr)
+    if (m_pOwner == nullptr || m_pAnimator == nullptr)
         return;
 
     __super::Update(fTimeDelta);
@@ -49,14 +35,41 @@ void CCappy_State_Detect::Update(_float fTimeDelta)
 
 void CCappy_State_Detect::Exit(MONSTER_STATE_TYPE eNextState)
 {
-    if (m_pOwner == nullptr || m_pAnimator == nullptr)
+    if (m_pOwner == nullptr)
+        return;
+}
+
+void CCappy_State_Detect::Play_DetectAnimation()
+{
+    if (nullptr == m_pOwner || m_pAnimator == nullptr)
         return;
 
-    if (m_pAnimator)
-    {
-        m_pAnimator->Clear_Overlay(1);
-    }
+    _int iRand = rand() % 2;
 
+    ANI_PLAY_INFO		Info{};
+    LAYER_PLAY_INFO		LayerInfo{};
+
+    switch (iRand)
+    {
+    case 0:
+    {
+        Info.strAniName = "KasaUp1";
+        Info.bLoop = false;
+        Info.fSpeed = 1.f;
+
+        m_pAnimator->Play(&Info);
+        break;
+    }
+    case 1:
+    {
+        Info.strAniName = "KasaUp2";
+        Info.bLoop = false;
+        Info.fSpeed = 1.f;
+
+        m_pAnimator->Play(&Info);
+        break;
+    }
+    }
 }
 
 CCappy_State_Detect* CCappy_State_Detect::Create(const ANI_PLAY_INFO& tInfo, _float fSpeed)

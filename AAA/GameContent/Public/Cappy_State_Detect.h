@@ -18,6 +18,9 @@ public:
 	virtual void					Update(_float fTimeDelta) override;
 	virtual void					Exit(MONSTER_STATE_TYPE eNextState) override;
 
+private:
+	void							Play_DetectAnimation();
+
 public:
 	static CCappy_State_Detect*		Create(const ANI_PLAY_INFO& tInfo = {}, _float fSpeed = 0.f);
 
