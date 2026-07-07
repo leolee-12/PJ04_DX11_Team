@@ -160,8 +160,7 @@ HRESULT CLD_EventObject::Ready_RenderComponents()
 	if (m_tEventObjectDesc.wstrModelProtoTag.empty())
 		return E_FAIL;
 
-	const auto& ShaderDesc = MODEL::ANIM == m_tEventObjectDesc.eModelType ? Shader_AnimMesh_PBR :
-		Shader_NonAnimMesh_PBR;
+	const auto& ShaderDesc = MODEL::ANIM == m_tEventObjectDesc.eModelType ? Shader_AnimMesh_PBR : Shader_NonAnimMesh_PBR;
 
 	m_pShaderCom = Add_Component<CShader>(ShaderDesc.iLevelID, ShaderDesc.szProtoTag,
 		TEXT("Com_Shader"));

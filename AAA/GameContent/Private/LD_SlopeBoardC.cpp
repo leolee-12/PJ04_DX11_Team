@@ -1,11 +1,14 @@
 #include "LD_SlopeBoardC.h"
 #include "LevelDesign_Registry.h"
 #include "Parsing_Utils.h"
+#include "GameContent_const.h"
+
+#include "GameInstance.h"
 
 namespace
 {
 	inline constexpr const _char* SLOPEBOARD_C_MODEL_PATH = "../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardC.ysh";
-	inline constexpr const _char * SLOPEBOARD_C_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { "FallenWait", "Wait", "", "" };
+	inline constexpr const _char * SLOPEBOARD_C_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { "FallenWait", "Wait", "Cut1", "" };
 }
 
 NS_BEGIN(Client)
@@ -17,6 +20,8 @@ CLD_SlopeBoardC::CLD_SlopeBoardC(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 CLD_SlopeBoardC::CLD_SlopeBoardC(const CLD_SlopeBoardC& Prototype)
 	: CLD_EventObject(Prototype)
+	, m_eState(Prototype.m_eState)
+	, m_fEventAnimSpeed(Prototype.m_fEventAnimSpeed)
 {
 }
 
@@ -42,6 +47,30 @@ HRESULT CLD_SlopeBoardC::Validate_Initialized()
 	}
 
 	return S_OK;
+}
+
+void CLD_SlopeBoardC::Update(_float fTimeDelta)
+{
+	const _bool bAnimationWasActive = m_bAnimationActive;
+
+	__super::Update(fTimeDelta);
+
+	if (bAnimationWasActive && !m_bAnimationActive && STATE::PLAYING == m_eState)
+		m_eState = STATE::PLAYED;
+}
+
+void CLD_SlopeBoardC::Late_Update(_float fTimeDelta)
+{
+	if (nullptr != m_pInteractionCollider && m_pInteractionCollider->Is_Enabled())
+	{
+		m_pInteractionCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+
+#ifdef _DEBUG
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pInteractionCollider);
+#endif
+	}
+
+	__super::Late_Update(fTimeDelta);
 }
 
 void CLD_SlopeBoardC::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
@@ -99,6 +128,91 @@ _bool CLD_SlopeBoardC::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& 
 
 	*pOutEntry = Desc;
 	return true;
+}
+
+HRESULT CLD_SlopeBoardC::Ready_Components()
+{
+	if (FAILED(Ready_RenderComponents()))
+		return E_FAIL;
+
+	if (FAILED(Ready_AnimEvents()))
+		return E_FAIL;
+
+	m_MeshVisible.assign(static_cast<size_t>(m_pModelCom->Get_NumMeshes()), true);
+
+	if (FAILED(Ready_RigidStatic()))
+		return E_FAIL;
+
+	if (FAILED(Ready_InteractionCollider()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLD_SlopeBoardC::Ready_RenderComponents()
+{
+	if (FAILED(__super::Ready_RenderComponents()))
+		return E_FAIL;
+
+	m_eState = STATE::IDLE;
+
+	const _int iAnimationIndex = m_pModelCom->Get_AnimationIndex(SLOPEBOARD_C_ANIM_NAMES[2u]);
+	if (iAnimationIndex < 0)
+		return E_FAIL;
+
+	m_pModelCom->Set_AnimationIndex(static_cast<_uint>(iAnimationIndex), false, true, 0.f);
+	m_pModelCom->Seek_Animation(0.f);
+	m_bAnimationActive = false;
+
+	return S_OK;
+}
+
+HRESULT CLD_SlopeBoardC::Ready_InteractionCollider()
+{
+	_float3 vMin{}, vMax{};
+	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
+
+	if (vMin.x > vMax.x || vMin.y > vMax.y || vMin.z > vMax.z)
+		return E_FAIL;
+
+	const _float3 vCenter = { (vMin.x + vMax.x) * 0.5f, (vMin.y + vMax.y) * 0.5f, (vMin.z + vMax.z) * 0.5f };
+	const _float3 vSize = { vMax.x - vMin.x, vMax.y - vMin.y, vMax.z - vMin.z };
+
+	if (vSize.x <= 0.f || vSize.y <= 0.f || vSize.z <= 0.f)
+		return E_FAIL;
+
+	CCollider::COLLIDER_DESC ColliderDesc{};
+	ColliderDesc.pOwner = this;
+	ColliderDesc.vCenter = vCenter;
+	ColliderDesc.vSize = vSize;
+
+	m_pInteractionCollider = Add_Component<CCollider>(Collider_OBB.iLevelID, Collider_OBB.szProtoTag, TEXT("Com_InteractionCollider"),
+		&ColliderDesc);
+	if (nullptr == m_pInteractionCollider)
+		return E_FAIL;
+
+	m_pInteractionCollider->Set_OnEnter([this](CCollider* pOther) { Handle_Interaction(pOther); });
+	m_pGameInstance_Proxy->Register_Collider(m_pInteractionCollider, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+
+	return S_OK;
+}
+
+void CLD_SlopeBoardC::Handle_Interaction(CCollider* pOther)
+{
+	if (nullptr == pOther)
+		return;
+
+	if (ETOUI(COLLISION_LAYER::CAR_BOOST) != pOther->Get_RegisteredGroup())
+		return;
+
+	if (STATE::IDLE != m_eState)
+		return;
+
+	m_pAnimatorCom->Play(m_tEventObjectDesc.strAnimNames[2], false, true, 0.f, m_fEventAnimSpeed);
+	m_bAnimationActive = true;
+	m_eState = STATE::PLAYING;
+
+	m_pInteractionCollider->Set_Enabled(false);
 }
 
 CGameObject* CLD_SlopeBoardC::Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
