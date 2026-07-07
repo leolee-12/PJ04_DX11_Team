@@ -18,6 +18,8 @@ HRESULT CKirby_Dodge::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
+    m_fSlowMaxTime = 0.6f;
+
     return S_OK;
 }
 
@@ -66,6 +68,8 @@ void CKirby_Dodge::Enter(CKirby* pKirby, _int iFlag)
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_MaxHorizontalSpeed(s_fDodgeMaxHorizontalSpeed);
 
+    m_iEvasionCount = 1;
+
     Change_DodgeState(pKirby, Dodge_State::DODGE_START);
 }
 
@@ -73,6 +77,7 @@ void CKirby_Dodge::Update(CKirby* pKirby, const _float fTimeDelta)
 {
     __super::Update(pKirby, fTimeDelta);
 
+    Update_SlowTimer(fTimeDelta);
     Update_DodgeState(pKirby, fTimeDelta);
 }
 
@@ -101,6 +106,16 @@ _bool CKirby_Dodge::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
     //}
 
     return false;
+}
+
+void CKirby_Dodge::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+    if(m_iEvasionCount > 0)
+    {
+        --m_iEvasionCount;
+        m_fSlowAccTime = m_fSlowMaxTime;
+        m_pGameInstance_Proxy->Lerp_TimeScale(0.5f, 1.f, 2.f);
+    }
 }
 
 void CKirby_Dodge::Change_DodgeState(CKirby* pKirby, Dodge_State eNext)
@@ -181,7 +196,7 @@ void CKirby_Dodge::Update_DodgeState(CKirby* pKirby, _float fTimeDelta)
 
         case Dodge_State::DODGE1:
         {
-            Moove(pKirby);
+            DodgeMove(pKirby);
 
             CMovement_Child* pMovement = pKirby->Get_Movement();
             _bool bIsGound = pMovement->Is_Grounded();
@@ -198,7 +213,7 @@ void CKirby_Dodge::Update_DodgeState(CKirby* pKirby, _float fTimeDelta)
         {
             _float fRatio = pAnimator->Get_Progress();
             if (fRatio <= 0.85f)
-                Moove(pKirby);
+                DodgeMove(pKirby);
             else
                 pKirby->Get_Movement()->Stop_Horizontal();
 
@@ -252,13 +267,26 @@ void CKirby_Dodge::Set_DodgeAniDir(CKirby* pKirby)
     }
 }
 
-void CKirby_Dodge::Moove(CKirby* pKirby)
+void CKirby_Dodge::DodgeMove(CKirby* pKirby)
 {
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Add_Acceleration(XMVectorSet(0.f, -120.f, 0.f, 0.f));
     constexpr _float fSpeed = 15.f;
     pMovement->Set_VelocityX(m_vDodgeDir.x * fSpeed);
     pMovement->Set_VelocityZ(m_vDodgeDir.z * fSpeed);
+}
+
+void CKirby_Dodge::Update_SlowTimer(_float fTimeDelta)
+{
+    if (m_fSlowAccTime > 0) {
+        m_fSlowAccTime -= fTimeDelta;
+
+        if (m_fSlowAccTime <= 0.f)
+        {
+            m_fSlowAccTime = 0.f;
+            m_pGameInstance_Proxy->Set_TimeScale(1.f);
+        }
+    }
 }
 
 CKirby_Dodge* CKirby_Dodge::Create()

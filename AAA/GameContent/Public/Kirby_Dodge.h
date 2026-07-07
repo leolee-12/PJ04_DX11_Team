@@ -39,6 +39,9 @@ public:
 
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
+public:
+	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
+
 private:
 	void Change_DodgeState(CKirby* pKirby, Dodge_State eNext);
 	void Enter_DodgeState(CKirby* pKirby, Dodge_State eState);
@@ -48,6 +51,8 @@ private:
 	void Set_DodgeAniDir(CKirby* pKirby);
 	void DodgeMove(CKirby* pKirby);
 
+	void Update_SlowTimer(_float fTimeDelta);
+
 private:
 	Dodge_State m_eDodgeState{ DODGE_END };
 	DODGE_STATE_FLAG m_eDodgeFlag{};
@@ -55,6 +60,10 @@ private:
 	DODGE_ANI_DIR m_eDodgeAniDir{};
 
 	_float3 m_vDodgeDir{};
+
+	_int m_iEvasionCount{};
+	_float m_fSlowMaxTime{};
+	_float m_fSlowAccTime{};
 
 public:
 	static CKirby_Dodge* Create();
