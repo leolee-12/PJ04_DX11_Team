@@ -13,43 +13,48 @@ namespace Client
 
     namespace EventTag
     {
+        // 커비 부착
+        inline constexpr const _tchar* Kirby_AttachmentBegin = L"Kirby.Attachment.Begin";
+        inline constexpr const _tchar* Kirby_AttachmentEnd = L"Kirby.Attachment.End";
+
+        // 커비 어빌리티 / UI
         inline constexpr const _tchar* Kirby_PointStarGained = L"Kirby.PointStarGained";
         inline constexpr const _tchar* Kirby_HP_Updated = L"Kirby.HPUpdated";
         inline constexpr const _tchar* Kirby_Name_Updated = L"Kirby.NameUpdated";
         inline constexpr const _tchar* Kirby_Ability_Changed = L"Kirby.AbilityChanged";
+        inline constexpr const _tchar* Swallowed = L"OnSwallowed";
 
+        // 보스
         inline constexpr const _tchar* Boss_HP_Appeared = L"Boss.HPAppeared";
         inline constexpr const _tchar* Boss_HP_Updated = L"Boss.HPUpdated";
         inline constexpr const _tchar* Boss_Died = L"Boss.Died";
+        inline constexpr const _tchar* NamePlate_Appeared = L"Boss.NamePlateOn";
 
-        inline constexpr const _tchar* Cutscene_DeformCarBreakWall = L"Cutscene.DeformCarBreakWall";
-
+        // 컷씬
         inline constexpr const _tchar* Cutscene_GorillaAppear = L"Cutscene.GorillaAppear";   // 트리거 발동
+        inline constexpr const _tchar* Cutscene_GorillaBreak = L"Cutscene.GorillaBreak";  // 고릴라 환경 부수기 이벤트
         inline constexpr const _tchar* Cutscene_CameraChange = L"Cutscene.CameraChange";
 
-        // ----------Kirby 부착----------
-        inline constexpr const _tchar* Kirby_AttachmentBegin = L"Kirby.Attachment.Begin";
-        inline constexpr const _tchar* Kirby_AttachmentEnd = L"Kirby.Attachment.End";  
-
-        inline constexpr const _tchar* Cutscene_GorillaBreak = L"Cutscene.GorillaBreak";  // 고릴라 환경 부수기 이벤트
 
         // QTE
         inline constexpr const _tchar* QTE_Success = L"QTE.Success";
 
+        // 카메라
         inline constexpr const _tchar* Camera_Shake = L"Camera.Shake";
         inline constexpr const _tchar* Camera_Rumble = L"Camera.Rumble";
+        inline constexpr const _tchar* BossCam_Focus = L"BossCam_Focus";
 
-        inline constexpr const _tchar* NamePlate_Appeared = L"Boss.NamePlateOn";
+        // Fx
         inline constexpr const _tchar* FullScreen_Flash = L"Fx.FullScreenFlashOn";
-
+        
+        // 맵 
         inline constexpr const _tchar* Stage1_Step2_CarBreakMap = L"Stage1-2.CarBreakMap";
+
+        // 포인터 질의
+        inline constexpr const _tchar* Query_Player = L"Query_Player";
+        inline constexpr const _tchar* Query_Boss = L"Query_Boss";
     }
 
-    inline constexpr const _tchar* EVT_SWALLOWED = L"OnSwallowed";
-    inline constexpr const _tchar* EVT_QUERY_PLAYER = L"Query_Player";
-    inline constexpr const _tchar* EVT_QUERY_BOSS = L"Query_Boss";
-
-    enum class ECutsceneCam { Cutscene, Boss, Area };
 
 #pragma region Kirby 부착
     enum class KIRBY_ATTACHMENT_CONTEXT : _uint
@@ -78,15 +83,18 @@ namespace Client
     };
 #pragma endregion
 
-    struct KIRBY_ABILITY_CHANGED
-    {
-        _bool bBegin = { true }; // true=변신 시작(줌인), false=변신 끝(복귀)
-    };
+#pragma region 포인터 질의
+    struct PLAYER_QUERY { CGameObject* pPlayer = { nullptr }; };
+    struct BOSS_QUERY { CGameObject* pBoss = { nullptr }; };
+#pragma endregion
+
+#pragma region 카메라관련 
+    enum class ECutsceneCam { Cutscene, Boss, Area };
 
     struct CAMERA_SHAKE_DESC
     {
-        _float fTrauma = { 0.5f };      
-        _float fDuration = { 0.f };     
+        _float fTrauma = { 0.5f };
+        _float fDuration = { 0.f };
         _bool  bIgnoreTimeScale = { false };
     };
 
@@ -98,31 +106,43 @@ namespace Client
         const _float4x4* pAnchorWorld = nullptr;        // 로컬->월드 앵커(고릴라 월드행렬)
     };
 
-    struct PLAYER_QUERY { CGameObject* pPlayer = { nullptr }; };
-    struct BOSS_QUERY { CGameObject* pBoss = { nullptr }; };
+    struct BOSSCAM_FOCUS_DESC
+    {
+        CGameObject* pTarget = { nullptr };
+        _float       fAimHeight = { 2.f };   // 타겟별 시선 높이
+    };
+#pragma endregion
 
-    struct SWALLOW_EVENT 
-    { 
-        IInhalable* pInhalable; 
+#pragma region 커비 어빌리티 / ui
+    struct KIRBY_ABILITY_CHANGED
+    {
+        _bool bBegin = { true }; // true=변신 시작(줌인), false=변신 끝(복귀)
     };
 
-    typedef struct tagKirbyPointStarGained
+    struct SWALLOW_EVENT
     {
-        _uint iAmount = 1;
-    }KIRBY_POINTSTAR_GAINED_DESC;
-
-    typedef struct tagKirbyHPUpdated
-    {
-        _float fMaxHP = { 100.f };
-        _float fCurrHp = { 100.f };
-    }KIRBY_HP_UPDATED;
+        IInhalable* pInhalable;
+    };
 
     struct KIRBY_NAME_UPDATED
     {
         _wstring strAtkModeName = { L"커비" };
     };
 
-    typedef struct tagBossHPUpdated 
+    struct KIRBY_POINTSTAR_GAINED_DESC
+    {
+        _uint iAmount = 1;
+    };
+
+    struct KIRBY_HP_UPDATED
+    {
+        _float fMaxHP = { 100.f };
+        _float fCurrHp = { 100.f };
+    };
+#pragma endregion
+
+#pragma region 보스
+    typedef struct tagBossHPUpdated
     {
         _float fMaxHP = { 100.f };
         _float fCurrHp = { 100.f };
@@ -134,9 +154,9 @@ namespace Client
         _float fMaxHP = { 100.f };
         _float fCurrHp = { 100.f };
     }BOSS_HP_APPEARED;
+#pragma endregion
 
-
-    /* ----------------------- Leo ---------------------- */
+#pragma region 환경 트리거
     struct TRIGGER_EVENT_PAYLOAD
     {
         CGameObject* pTriggerObject = { nullptr };
@@ -144,5 +164,5 @@ namespace Client
         _wstring strEventTag;
         _wstring strPayload;
     };
-    /* -------------------------------------------------- */
+#pragma endregion
 }

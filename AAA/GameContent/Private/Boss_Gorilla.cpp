@@ -171,6 +171,11 @@ void CBoss_Gorilla::On_Enter_Corpse()
         _vector vKirby = XMLoadFloat3(&Get_BlackBoard().vTargetPos);
         m_pCage->Start_Descend(vKirby);
 
+        BOSSCAM_FOCUS_DESC FocusDesc{};
+        FocusDesc.pTarget = m_pCage;
+        FocusDesc.fAimHeight = 2.f;
+        m_pGameInstance_Proxy->Publish(EventTag::BossCam_Focus, &FocusDesc);
+
         m_pGameInstance_Proxy->Add_GameObject_Instance(m_pCage, m_iLevelIndex, m_strLayerTag, L"Boss_Cage");
         m_pCage = nullptr;
     }
