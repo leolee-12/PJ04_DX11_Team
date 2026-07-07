@@ -88,7 +88,7 @@ HRESULT CBoss_Cage_Body::Render()
             if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
                 return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Begin(8)))
+        if (FAILED(m_pShaderCom->Begin(9)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render(i)))
