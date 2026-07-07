@@ -14,12 +14,14 @@
 #include "Kirby_AbilityDump.h"
 #include "Kirby_Damaged.h"
 #include "Kirby_Guard.h"
+#include "Kirby_Dodge.h"
 #include "Kirby_Ladder.h"
 #include "Kirby_GetDeform.h"
 
 #include "Kirby_CutSceneGrabbed.h"
 #include "Kirby_QTE_Grabbed.h"
 #include "Kirby_CarFirstBreakWall.h"
+#include "Kirby_Clear.h"
 
 CKirby_StateMachine::CKirby_StateMachine()
 {
@@ -91,6 +93,14 @@ void CKirby_StateMachine::Request_ReleaseGrabState_StateMachine(KIRBY_ATTACHMENT
     m_pCurState->Request_ReleaseGrabState(m_pKirby, eType);
 }
 
+void CKirby_StateMachine::Request_ClearStage_StateMachine(const CUTSCENE_STAGECLEAR* pDesc)
+{
+    if (m_pCurState->Get_StateType() != KIRBY_STATE_TYPE::STAGE_CLEAR)
+        Change_State(KIRBY_STATE_TYPE::STAGE_CLEAR);
+
+    m_pCurState->Request_StageClear(m_pKirby, pDesc);
+}
+
 _bool CKirby_StateMachine::Ignore_TimeScale_StateMachine()
 {
     return m_pCurState->Ignore_TimeScale();
@@ -118,11 +128,15 @@ HRESULT CKirby_StateMachine::Init_State()
     if (FAILED(Register_State(KIRBY_STATE_TYPE::ABILITY_DUMP, CKirby_AbilityDump::Create())))               return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::DAMAGED, CKirby_Damaged::Create())))                        return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::GUARD, CKirby_Guard::Create())))                            return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::DODGE, CKirby_Dodge::Create())))                            return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::LADDER, CKirby_Ladder::Create())))                          return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::GET_DEFORM, CKirby_GetDeform::Create())))                   return E_FAIL;
+
+
     if (FAILED(Register_State(KIRBY_STATE_TYPE::CUTSCENE_GRABBED, CKirby_CutSceneGrabbed::Create())))       return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::QTE_GRABBED, CKirby_QTE_Grabbed::Create())))                return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::GET_DEFORM, CKirby_GetDeform::Create())))                   return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::CAR_FIRST_BREAK_WALL, CKirby_CarFirstBreakWall::Create()))) return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::STAGE_CLEAR, CKirby_Clear::Create())))                      return E_FAIL;
 
     return S_OK;
 }

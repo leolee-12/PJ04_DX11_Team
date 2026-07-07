@@ -8,6 +8,8 @@
 
 #include "Movement_Child.h"
 
+#include "Kirby_Dodge.h"
+
 CKirby_Guard::CKirby_Guard()
 {
 }
@@ -65,6 +67,20 @@ _bool CKirby_Guard::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 
     switch (eCommandType)
     {
+        // Move Press
+        case KIRBY_COMMAND_TYPE::MOVE_TOP:
+            pKirby->Change_State(KIRBY_STATE_TYPE::DODGE, DODGE_STATE_FLAG::DODGE_FRONT);
+            break;
+        case KIRBY_COMMAND_TYPE::MOVE_DOWN:
+            pKirby->Change_State(KIRBY_STATE_TYPE::DODGE, DODGE_STATE_FLAG::DODGE_BACK);
+            break;
+        case KIRBY_COMMAND_TYPE::MOVE_LEFT:
+            pKirby->Change_State(KIRBY_STATE_TYPE::DODGE, DODGE_STATE_FLAG::DODGE_LEFT);
+            break;
+        case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
+            pKirby->Change_State(KIRBY_STATE_TYPE::DODGE, DODGE_STATE_FLAG::DODGE_RIGHT);
+            break;
+
         // Attack
         case KIRBY_COMMAND_TYPE::ATTACK:
         {

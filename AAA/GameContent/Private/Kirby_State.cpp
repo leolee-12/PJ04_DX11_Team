@@ -170,6 +170,10 @@ void CKirby_State::Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CON
 {
 }
 
+void CKirby_State::Request_StageClear(CKirby* pKirby, const CUTSCENE_STAGECLEAR* pDesc)
+{
+}
+
 void CKirby_State::Free()
 {
     Safe_Release(m_pGameInstance_Proxy);
