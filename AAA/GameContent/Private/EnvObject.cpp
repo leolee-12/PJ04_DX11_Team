@@ -314,6 +314,97 @@ HRESULT CEnvObject::Refresh()
 	return S_OK;
 }
 
+#pragma region Editable
+_bool CEnvObject::Get_EditDesc(EDITABLE_DESC* pOutDesc) const
+{
+	if (nullptr == pOutDesc)
+		return false;
+
+	pOutDesc->eKind = EDITABLE_OBJECT_KIND::ENV_OBJECT;
+	pOutDesc->strStableKey = m_tDesc.wstrSourceFile + L"|" + m_tDesc.wstrSection + L"|" + m_tDesc.wstrEntryKey + L"|" + to_wstring(m_tDesc.iUid);
+	pOutDesc->iCapabilities = EDIT_CAP_RENDERABLE | EDIT_CAP_CULL_DISTANCE | EDIT_CAP_CULL_FRUSTUM;
+
+	if (m_tDesc.tRender.bHasShadow)			pOutDesc->iCapabilities |= EDIT_CAP_SHADOW;
+	if (m_tDesc.tCollision.bHasCollMesh)	pOutDesc->iCapabilities |= EDIT_CAP_COLLISION_MESH;
+	if (m_bIsDecal)							pOutDesc->iCapabilities |= EDIT_CAP_DECAL;
+	if (nullptr != m_pModelCom)				pOutDesc->iCapabilities |= EDIT_CAP_MESH_LAYER;
+
+	pOutDesc->Policy.bRenderable = m_bRenderable;
+	pOutDesc->Policy.bUseCullDistance = m_bUseCullDistance;
+	pOutDesc->Policy.bUseCullFrustum = m_bUseCullFrustum;
+	pOutDesc->Policy.bUseCollMesh = m_tDesc.tCollision.bHasCollMesh && m_tDesc.tCollision.bUseCollMesh;
+	pOutDesc->Policy.bUseShadow = m_tDesc.tRender.bHasShadow && m_tDesc.tRender.bUseShadow;
+	pOutDesc->ModelSlots.clear();
+
+	if (nullptr != m_pModelCom)
+	{
+		EDITABLE_MODEL_SLOT Slot{};
+		Slot.strLabel = L"Model";
+		Slot.eKind = EDITABLE_MODEL_KIND::NONANIM;
+		Slot.pModel = m_pModelCom;
+		Slot.iMeshCount = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+		pOutDesc->ModelSlots.push_back(Slot);
+	}
+
+	return true;
+}
+
+HRESULT CEnvObject::Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy)
+{
+	m_bRenderable = Policy.bRenderable;
+	m_bUseCullDistance = Policy.bUseCullDistance;
+	m_bUseCullFrustum = Policy.bUseCullFrustum;
+
+	m_tDesc.tRender.bUseCullDistance = Policy.bUseCullDistance;
+	m_tDesc.tRender.bUseCullFrustum = Policy.bUseCullFrustum;
+
+	if (m_tDesc.tRender.bHasShadow)
+	{
+		m_tDesc.tRender.bUseShadow = Policy.bUseShadow;
+		m_tDesc.tRender.bShadowMappingCaster = m_tDesc.tRender.bUseShadow;
+		m_bCastShadow = m_tDesc.tRender.bUseShadow;
+	}
+	else
+	{
+		m_tDesc.tRender.bUseShadow = false;
+		m_tDesc.tRender.bShadowMappingCaster = false;
+		m_bCastShadow = false;
+	}
+
+	if (m_tDesc.tCollision.bHasCollMesh && m_tDesc.tCollision.bUseCollMesh != Policy.bUseCollMesh)
+	{
+		m_tDesc.tCollision.bUseCollMesh = Policy.bUseCollMesh;
+		if (FAILED(Ready_PhysicsActor()))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+const MESH_LAYER_IDX* CEnvObject::Get_EditMeshLayer(_uint iModelSlot, _uint iMesh) const
+{
+	if (0u != iModelSlot)
+		return nullptr;
+
+	if (nullptr == m_pModelCom || iMesh >= m_pModelCom->Get_NumMeshes())
+		return nullptr;
+
+	return &m_pModelCom->Get_MeshLayer(iMesh);
+}
+
+HRESULT CEnvObject::Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX& Layer)
+{
+	if (0u != iModelSlot)
+		return E_FAIL;
+
+	if (nullptr == m_pModelCom || iMesh >= m_pModelCom->Get_NumMeshes())
+		return E_FAIL;
+
+	m_pModelCom->Set_MeshLayer(iMesh, Layer);
+	return S_OK;
+}
+#pragma endregion
+
 HRESULT CEnvObject::Ready_RenderComponents(_uint iModelProtoLevel, const wstring& wstrModelProtoTag)
 {
 	if (wstrModelProtoTag.empty())

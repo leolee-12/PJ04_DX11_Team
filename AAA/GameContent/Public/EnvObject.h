@@ -1,6 +1,6 @@
 #pragma once
-
 #include "EnvObject_Defines.h"
+#include "Editable.h"
 
 NS_BEGIN(Engine)
 class CShader;
@@ -13,7 +13,7 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL CEnvObject abstract : public CGameObject
+class CLIENT_DLL CEnvObject abstract : public CGameObject, public IEditable
 {
 	GENERATED_BODY_ABSTRACT(CEnvObject)
 
@@ -56,6 +56,13 @@ public:
 
 	_bool Pick_Marb1e(_fvector vRayOrigin, _fvector vRayDir, _float3* pOutHit, _float* fOutDistance);
 	HRESULT Refresh();
+
+#pragma region Editable
+	virtual _bool Get_EditDesc(EDITABLE_DESC* pOutDesc) const override;
+	virtual HRESULT Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy) override;
+	virtual const MESH_LAYER_IDX* Get_EditMeshLayer(_uint iModelSlot, _uint iMesh) const override;
+	virtual HRESULT Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX& Layer) override;
+#pragma endregion
 
 protected:
 	HRESULT Ready_RenderComponents(_uint iModelProtoLevel, const wstring& wstrModelProtoTag);

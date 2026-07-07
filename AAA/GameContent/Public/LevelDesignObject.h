@@ -1,9 +1,10 @@
 #pragma once
 #include "LevelDesign_LoadTypes.h"
+#include "Editable.h"
 
 NS_BEGIN(Client)
 
-class CLevelDesignObject abstract : public CGameObject
+class CLevelDesignObject abstract : public CGameObject, public IEditable
 {
 	GENERATED_BODY_ABSTRACT(CLevelDesignObject)
 
@@ -19,6 +20,13 @@ protected:
 
 public:
 	const LD_OBJECT_DESC& Get_LevelDesignDesc() const { return m_tLevelDesignDesc; }
+
+#pragma region Editable
+	virtual _bool Get_EditDesc(EDITABLE_DESC* pOutDesc) const override;
+	virtual HRESULT Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy) override;
+	virtual const MESH_LAYER_IDX* Get_EditMeshLayer(_uint iModelSlot, _uint iMesh) const override;
+	virtual HRESULT Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX& Layer) override;
+#pragma endregion
 
 protected:
 	LD_OBJECT_DESC	m_tLevelDesignDesc = {};

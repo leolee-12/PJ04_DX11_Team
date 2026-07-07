@@ -1,5 +1,6 @@
 #pragma once
 #include "MapObject.h"
+#include "Editable.h"
 #include "Map_Defines.h"
 
 NS_BEGIN(physx)
@@ -8,7 +9,7 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL CMapSection final : public CMapObject
+class CLIENT_DLL CMapSection final : public CMapObject, public IEditable
 {
 	GENERATED_BODY(CMapSection)
 
@@ -59,6 +60,13 @@ public:
 	_bool					Is_Culling() const { return m_bEnableCulling; }
 	_bool					Is_Renderable() const { return m_bRenderable; }
 	const _wstring&			Get_SectionName() const { return m_strSectionName; }
+
+#pragma region Editable
+	virtual _bool Get_EditDesc(EDITABLE_DESC* pOutDesc) const override;
+	virtual HRESULT Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy) override;
+	virtual const MESH_LAYER_IDX* Get_EditMeshLayer(_uint iModelSlot, _uint iMesh) const override;
+	virtual HRESULT Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX& Layer) override;
+#pragma endregion
 
 #ifdef _DEBUG
 	const MAP_SECTION_PROFILE& Get_Profile() const { return m_Profile; }

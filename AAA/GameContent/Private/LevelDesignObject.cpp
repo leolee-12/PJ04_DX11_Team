@@ -60,6 +60,44 @@ _wstring CLevelDesignObject::Make_LevelDesignObjectKey() const
 		+ m_tLevelDesignDesc.strObjectName;
 }
 
+#pragma region Editable
+_bool CLevelDesignObject::Get_EditDesc(EDITABLE_DESC* pOutDesc) const
+{
+	if (nullptr == pOutDesc)
+		return false;
+
+	pOutDesc->eKind = EDITABLE_OBJECT_KIND::LEVEL_DESIGN_OBJECT;
+	pOutDesc->strStableKey = m_tLevelDesignDesc.strSourceFile + L"|" + m_tLevelDesignDesc.strSection +
+		L"|" + m_tLevelDesignDesc.strEntryKey + L"|" + to_wstring(m_tLevelDesignDesc.iUid);
+	pOutDesc->iCapabilities = 0u;
+	pOutDesc->Policy = {};
+	pOutDesc->ModelSlots.clear();
+	return true;
+}
+
+HRESULT CLevelDesignObject::Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy)
+{
+	UNREFERENCED_PARAMETER(Policy);
+	return S_OK;
+}
+
+const MESH_LAYER_IDX* CLevelDesignObject::Get_EditMeshLayer(_uint iModelSlot, _uint iMesh) const
+{
+	UNREFERENCED_PARAMETER(iModelSlot);
+	UNREFERENCED_PARAMETER(iMesh);
+	return nullptr;
+}
+
+HRESULT CLevelDesignObject::Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX&
+	Layer)
+{
+	UNREFERENCED_PARAMETER(iModelSlot);
+	UNREFERENCED_PARAMETER(iMesh);
+	UNREFERENCED_PARAMETER(Layer);
+	return E_FAIL;
+}
+#pragma endregion
+
 void CLevelDesignObject::Free()
 {
 	__super::Free();
