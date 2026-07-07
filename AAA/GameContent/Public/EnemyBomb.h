@@ -33,7 +33,6 @@ public:
 	virtual void				On_SpatBegin() override {}
 	virtual void				On_SpatEnd()   override {}
 
-
 	virtual COPY_ABILITY_TYPE	Get_CopyAbility() const override
 	{
 		return COPY_ABILITY_TYPE::NONE;		// TODO : BOMB 능력 구현 시 변경
@@ -43,6 +42,7 @@ public:
 
 	void						On_Swallowed();
 
+	virtual void				Despawn() override;
 
 protected:
 	virtual void				Update(_float fTimeDelta) override;

@@ -51,13 +51,24 @@ void CEnemyBomb::On_Swallowed()
 	if (m_pFuseFx)
 	{
 		m_pFuseFx->EffectContainer_StopAfterEmission();
-		//m_pFuseFx->EffectContainer_Stop();
-		//m_pFuseFx->Start_FadeOut(0.3f);
+
 		m_pFuseFx = nullptr;
 	}
 
 	m_pCaptor = nullptr;
 	Despawn();
+}
+
+void CEnemyBomb::Despawn()
+{
+	if (m_pFuseFx)
+	{
+		m_pFuseFx->EffectContainer_StopAfterEmission();
+
+		m_pFuseFx = nullptr;
+	}
+
+	__super::Despawn();
 }
 
 void CEnemyBomb::Update(_float fTimeDelta)

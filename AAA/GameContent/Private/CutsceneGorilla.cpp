@@ -46,7 +46,8 @@ void CCutsceneGorilla::Update(_float fTimeDelta)
             {
                 if (!m_bGrabFired) Fire_Grab();
                 Play(CLIP_APPEAR2, false, 0.2f, 1.5f);
-                Fire_CutsceneCamera();       
+                Fire_CutsceneCamera();
+                m_pGameInstance_Proxy->Publish(EventTag::BGMChange, nullptr);
                 m_ePhase = EPhase::Appearing2;
             }
             break;

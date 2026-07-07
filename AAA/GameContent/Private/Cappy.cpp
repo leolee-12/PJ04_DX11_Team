@@ -94,7 +94,7 @@ _bool CCappy::Can_BeInhaled(const INHALE_QUERY& q) const
 void CCappy::On_Swallowed()
 {
 	SWALLOW_EVENT payload{ this };
-	m_pGameInstance_Proxy->Publish(EVT_SWALLOWED, &payload);
+	m_pGameInstance_Proxy->Publish(EventTag::Swallowed, &payload);
 	m_pCaptor = nullptr;
 
 	if (Hat_Out())

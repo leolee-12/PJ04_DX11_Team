@@ -172,7 +172,7 @@ void CCappy_Hat::Update_CapturePull(_float fTimeDelta)
 	if (fDist <= 0.5f)
 	{
 		SWALLOW_EVENT payload{ this };   
-		m_pGameInstance_Proxy->Publish(EVT_SWALLOWED, &payload);
+		m_pGameInstance_Proxy->Publish(EventTag::Swallowed, &payload);
 		m_bCaptured = false;
 		Set_Active(false);               
 		return;

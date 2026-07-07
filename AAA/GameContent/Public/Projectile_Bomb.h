@@ -25,7 +25,7 @@ public:
 	virtual HRESULT			Render() override;
 	virtual HRESULT			Render_Shadow() override;
 
-	void					Despawn();
+	virtual void			Despawn();
 	void					Bomb_Explode();
 
 protected:

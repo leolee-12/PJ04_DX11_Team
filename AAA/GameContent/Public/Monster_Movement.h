@@ -29,6 +29,8 @@ public:
 	void						Launch(_fvector vHorizDir, _float fHorizSpeed, _float fUpSpeed);
 	_bool						Is_Launched() const { return m_bLaunched; }
 	_bool						Update_Launched(_float fTimeDelta);
+	void						Cancle_Launch();
+
 	// À±¼®Çö Ãß°¡
 	void						Knockback(_fvector vAttackerPos, _float fStrength);
 	void						KO(_fvector vAttackerPos, _float fStrength);
