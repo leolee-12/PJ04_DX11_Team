@@ -25,12 +25,12 @@ namespace Client
         inline constexpr const _tchar* Cutscene_DeformCarBreakWall = L"Cutscene.DeformCarBreakWall";
 
         inline constexpr const _tchar* Cutscene_GorillaAppear = L"Cutscene.GorillaAppear";   // 트리거 발동
-        inline constexpr const _tchar* Cutscene_ReleaseKirby = L"Cutscene.ReleaseKirby";     
         inline constexpr const _tchar* Cutscene_CameraChange = L"Cutscene.CameraChange";
 
-        inline constexpr const _tchar* Cutscene_KirbyStart =    L"Cutscene.KirbyStart";           // 커비 컷씬위치로
-        // 두 개 통합ㄱㄱ
-        inline constexpr const _tchar* Cutscene_GorillaHandoff = L"Cutscene.GorillaHandoff";
+        // ----------Kirby 부착----------
+        inline constexpr const _tchar* Kirby_AttachmentBegin = L"Kirby.Attachment.Begin";
+        inline constexpr const _tchar* Kirby_AttachmentEnd = L"Kirby.Attachment.End";  
+
         inline constexpr const _tchar* Cutscene_GorillaBreak = L"Cutscene.GorillaBreak";  // 고릴라 환경 부수기 이벤트
 
         // QTE
@@ -50,9 +50,33 @@ namespace Client
     inline constexpr const _tchar* EVT_QUERY_BOSS = L"Query_Boss";
 
     enum class ECutsceneCam { Cutscene, Boss, Area };
-    enum class CUTSCENE_KIRBY_TYPE : _uint{ GORILLA_SCENE, GORILLA_COMBAT, DEFORM_CAR_GET_FIRST, _COUNT };
 
-    enum class GRAB_RELEASE_TYPE : _uint { GORILLA_ESCAPE, GORILLA_THROWN, DEFAULT_RELEASE };
+#pragma region Kirby 부착
+    enum class KIRBY_ATTACHMENT_CONTEXT : _uint
+    { 
+        GORILLA_SCENE,
+        GORILLA_COMBAT,
+        DEFORM_CAR_GET_FIRST,
+        _COUNT 
+    };
+    struct KIRBY_ATTACHMENT_BEGIN_DESC
+    {
+        KIRBY_ATTACHMENT_CONTEXT eType = { KIRBY_ATTACHMENT_CONTEXT::_COUNT };
+        const _float4x4* pBoneMatrix = { nullptr };
+        const _float4x4* pSourceWorld = { nullptr };
+    };
+
+    enum class KIRBY_ATTACHMENT_END_REASON : _uint
+    {
+        GORILLA_SCENE_HANDOFF,
+        GORILLA_COMBAT_ESCAPE, GORILLA_COMBAT_THROWN,
+        DEFAULT_RELEASE
+    };
+    struct KIRBY_ATTACHMENT_END_DESC
+    {
+        KIRBY_ATTACHMENT_END_REASON eType = { KIRBY_ATTACHMENT_END_REASON::DEFAULT_RELEASE };
+    };
+#pragma endregion
 
     struct KIRBY_ABILITY_CHANGED
     {
@@ -66,26 +90,12 @@ namespace Client
         _bool  bIgnoreTimeScale = { false };
     };
 
-    struct CUTSCENE_RELEASE_DESC
-    {
-        GRAB_RELEASE_TYPE eType = { GRAB_RELEASE_TYPE::DEFAULT_RELEASE };
-    };
-
     struct CUTSCENE_CAMERA_DESC
     {
         ECutsceneCam       eCam = ECutsceneCam::Cutscene;
         const _tchar* szTrack = nullptr;                // 컷씬캠일 때 재생 트랙 (예: L"DemoAppear2_camera1")
         CAnimator* pProgress = nullptr;                 // progress 소스(고릴라 애니메이터)
         const _float4x4* pAnchorWorld = nullptr;        // 로컬->월드 앵커(고릴라 월드행렬)
-    };
-
-    struct CUTSCENE_HANDOFF_DESC { const _float4x4* pFinalWorld = nullptr; };
-
-    struct CUTSCENE_GRAB_DESC
-    {
-        const _float4x4* pBoneMatrix = { nullptr }; 
-        const _float4x4* pSourceWorld = { nullptr };
-        CUTSCENE_KIRBY_TYPE  eType = { CUTSCENE_KIRBY_TYPE::_COUNT };
     };
 
     struct PLAYER_QUERY { CGameObject* pPlayer = { nullptr }; };

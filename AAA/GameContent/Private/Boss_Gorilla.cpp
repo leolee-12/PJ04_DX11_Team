@@ -176,6 +176,17 @@ void CBoss_Gorilla::On_Enter_Corpse()
     }
 }
 
+// yse Ãß°¡
+_bool CBoss_Gorilla::Should_AppearFromEvent(void* pData) const
+{
+    if (pData == nullptr)
+        return false;
+
+    const auto* pDesc = static_cast<KIRBY_ATTACHMENT_END_DESC*>(pData);
+
+    return pDesc->eType == KIRBY_ATTACHMENT_END_REASON::GORILLA_SCENE_HANDOFF;
+}
+
 HRESULT CBoss_Gorilla::Ready_AnimEvents()
 {
     CAnimator* pAnim = Get_BodyAnimator();
@@ -432,17 +443,17 @@ void CBoss_Gorilla::Fire_Grab()
     if (nullptr == m_pBody)
         return;
 
-    CUTSCENE_GRAB_DESC grab{};
+    KIRBY_ATTACHMENT_BEGIN_DESC grab{};
     grab.pBoneMatrix = m_pBody->Get_BoneMatrixPtr(GRAB_BONE);          
     grab.pSourceWorld = m_pTransformCom->Get_WorldMatrixPtr();         
-    grab.eType = CUTSCENE_KIRBY_TYPE::GORILLA_COMBAT;
-    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_KirbyStart, &grab);
+    grab.eType = KIRBY_ATTACHMENT_CONTEXT::GORILLA_COMBAT;
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentBegin, &grab);
 }
 
-void CBoss_Gorilla::Fire_Release(GRAB_RELEASE_TYPE eType)
+void CBoss_Gorilla::Fire_Release(KIRBY_ATTACHMENT_END_REASON eType)
 {
-    CUTSCENE_RELEASE_DESC desc{ eType };
-    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_ReleaseKirby, &desc);
+    KIRBY_ATTACHMENT_END_DESC desc{ eType };
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentEnd, &desc);
 }
 
 void CBoss_Gorilla::Tick_DeathSequence(_float fTimeDelta)

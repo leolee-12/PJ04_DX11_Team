@@ -124,11 +124,11 @@ void CCutsceneGorilla::On_AnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE p)
         default: break;
     }
 
-    //Subscribe_Event(EventTag::Cutscene_KirbyStart, [this](void* pData) {
-    //    auto pDesc = static_cast<CUTSCENE_GRAB_DESC*>(pData);
+    //Subscribe_Event(EventTag::Kirby_AttachmentBegin, [this](void* pData) {
+    //    auto pDesc = static_cast<KIRBY_ATTACHMENT_BEGIN_DESC*>(pData);
     //    Begin_CutsceneCapture(pDesc->pBoneMatrix, pDesc->pSourceWorld);
     //    });
-    //Subscribe_Event(EventTag::Cutscene_ReleaseKirby, [this](void*) {
+    //Subscribe_Event(EventTag::Kirby_AttachmentEnd, [this](void*) {
     //    End_CutsceneCapture(/* 내려놓을 좌표 */);
     //    });
 }
@@ -145,11 +145,11 @@ void CCutsceneGorilla::Fire_Grab()
 {
     if (m_bGrabFired) return;
     m_bGrabFired = true;
-    CUTSCENE_GRAB_DESC grab{};
+    KIRBY_ATTACHMENT_BEGIN_DESC grab{};
     grab.pBoneMatrix = Get_BoneMatrixPtr(GRAB_BONE);
     grab.pSourceWorld = Get_Transform()->Get_WorldMatrixPtr();
-    grab.eType = CUTSCENE_KIRBY_TYPE::GORILLA_SCENE;
-    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_KirbyStart, &grab);
+    grab.eType = KIRBY_ATTACHMENT_CONTEXT::GORILLA_SCENE;
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentBegin, &grab);
 }
 
 void CCutsceneGorilla::Fire_CutsceneCamera()
@@ -168,9 +168,9 @@ void CCutsceneGorilla::Do_Handoff()
         return;
     m_ePhase = EPhase::Done;
 
-    CUTSCENE_HANDOFF_DESC ho{};
-    ho.pFinalWorld = Get_Transform()->Get_WorldMatrixPtr();
-    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GorillaHandoff, &ho);
+    KIRBY_ATTACHMENT_END_DESC Desc{};
+    Desc.eType = KIRBY_ATTACHMENT_END_REASON::GORILLA_SCENE_HANDOFF;
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentEnd, &Desc);
 
     UnSubscribe_Event(EventTag::Cutscene_GorillaAppear);
     Set_Active(false);

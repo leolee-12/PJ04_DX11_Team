@@ -51,7 +51,12 @@ void CLevel_Edit::Update(_float fTimeDelta)
         m_pGameInstance_Proxy->Toggle_DebugRender();
 
     if (m_pGameInstance_Proxy->Key_Down(DIK_F7))
-        m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GorillaHandoff, nullptr);
+    {
+        KIRBY_ATTACHMENT_END_DESC Desc{};
+        Desc.eType =KIRBY_ATTACHMENT_END_REASON::GORILLA_SCENE_HANDOFF;
+
+        m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentEnd, &Desc);
+    }
 #endif
 }
 
