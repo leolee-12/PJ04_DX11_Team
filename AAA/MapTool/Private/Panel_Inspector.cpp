@@ -883,8 +883,8 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 		pbRenderable = FindBoolProperty(pBreakWall, L"Renderable", L"MapEvent_BreakWall");
 
 	_bool* pbEnableCulling = nullptr;
-	_bool* pbCreateCollisionActor = nullptr;
-	_bool bSourceCanCreateCollisionActor = false;
+	_bool* pbUseCollMesh = nullptr;
+	_bool bHasCollMesh = false;
 
 	_wstring strStageName;
 	_wstring strSectionName;
@@ -892,8 +892,8 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 	if (nullptr != pMapSection)
 	{
 		pbEnableCulling = FindBoolProperty(pMapSection, L"Enable Culling", L"MapSection");
-		pbCreateCollisionActor = Resolve_MapCollMeshEditState(pLevel, pMapStage, pMapSection);
-		bSourceCanCreateCollisionActor = pMapSection->Get_Desc().bSourceCreateCollisionActor;
+		pbUseCollMesh = Resolve_MapCollMeshEditState(pLevel, pMapStage, pMapSection);
+		bHasCollMesh = pMapSection->Has_CollMesh();
 		strStageName = pMapStage->Get_StageName();
 		strSectionName = pMapSection->Get_SectionName();
 	}
@@ -932,16 +932,16 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 			ImGui::BeginGroup();
 			if (pbEnableCulling)
 				ImGui::Checkbox("Enable Culling##SectionEdit", (bool*)pbEnableCulling);
-			if (pbCreateCollisionActor)
+			if (pbUseCollMesh)
 			{
-				ImGui::BeginDisabled(!bSourceCanCreateCollisionActor);
-				ImGui::Checkbox("Create Collision Actor##SectionEdit", (bool*)pbCreateCollisionActor);
+				ImGui::BeginDisabled(!bHasCollMesh);
+				ImGui::Checkbox("Use Collision Mesh On Reload##SectionEdit", (bool*)pbUseCollMesh);
 				ImGui::EndDisabled();
 			}
 			ImGui::EndGroup();
 
-			if (!bSourceCanCreateCollisionActor)
-				ImGui::TextDisabled("Coll actor unavailable.");
+			if (!bHasCollMesh)
+				ImGui::TextDisabled("Collision mesh unavailable.");
 
 			ImGui::TextDisabled("Shadow depth is always submitted.");
 			ImGui::TextDisabled("Apply on reload.");
@@ -974,24 +974,23 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 			}
 		}
 
-		const _bool bCreateCollisionActorValue =
-			(nullptr != pbCreateCollisionActor)
-			? *pbCreateCollisionActor
-			: bSourceCanCreateCollisionActor;
+		const _bool bUseCollMeshValue =
+			(nullptr != pbUseCollMesh)
+			? *pbUseCollMesh
+			: bHasCollMesh;
 
-		const _bool bBaseUseCollMesh = bSourceCanCreateCollisionActor;
+		const _bool bBaseUseCollMesh = bHasCollMesh;
 
 		Edit.bHasCollMesh = false;
 		Edit.bUseCollMesh = bBaseUseCollMesh;
 
-		if (bSourceCanCreateCollisionActor && bCreateCollisionActorValue != bBaseUseCollMesh)
+		if (bHasCollMesh && bUseCollMeshValue != bBaseUseCollMesh)
 		{
 			Edit.bHasCollMesh = true;
-			Edit.bUseCollMesh = bCreateCollisionActorValue;
+			Edit.bUseCollMesh = bUseCollMeshValue;
 		}
 
-		pMapSection->Set_CollisionActorEnabled(
-			bSourceCanCreateCollisionActor ? bCreateCollisionActorValue : false);
+		pMapSection->Set_UseCollMesh(bHasCollMesh ? bUseCollMeshValue : false);
 
 		if (Has_AnyMapEnvEdit(Edit))
 		{
@@ -1956,23 +1955,19 @@ void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
 #endif
 			}
 
-			const _bool bRenderable =
-				ReadBoolProperty(pSection, L"Renderable", L"MapSection", pSection->Get_Desc().bRenderable);
-			const _bool bEnableCulling =
-				ReadBoolProperty(pSection, L"Enable Culling", L"MapSection", pSection->Get_Desc().bEnableCulling);
-			_bool* pbCreateCollisionActor =
-				Resolve_MapCollMeshEditState(pLevel, pMapStage, pSection);
+			const _bool bRenderable = ReadBoolProperty(pSection, L"Renderable", L"MapSection", pSection->Get_Desc().bRenderable);
+			const _bool bEnableCulling = ReadBoolProperty(pSection, L"Enable Culling", L"MapSection", pSection->Get_Desc().bEnableCulling);
+			_bool* pbUseCollMesh = Resolve_MapCollMeshEditState(pLevel, pMapStage, pSection);
 
-			const _bool bCreateCollision =
-				(nullptr != pbCreateCollisionActor)
-				? *pbCreateCollisionActor
-				: pSection->Get_Desc().bSourceCreateCollisionActor;
+			const _bool bUseCollMesh = (nullptr != pbUseCollMesh)
+				? *pbUseCollMesh
+				: pSection->Has_CollMesh();
 
 			ImGui::TextDisabled("R:%s  C:%s",
 				bRenderable ? "On" : "Off",
 				bEnableCulling ? "On" : "Off");
-			ImGui::TextDisabled("Shadow: Forced  Coll:%s",
-				bCreateCollision ? "On" : "Off");
+			ImGui::TextDisabled("Shadow: Forced  CollMesh:%s",
+				bUseCollMesh ? "On" : "Off");
 
 			ImGui::Separator();
 			ImGui::PopID();
@@ -2122,8 +2117,7 @@ _bool* CPanel_Inspector::Resolve_EnvCollMeshEditState(CLevel_Edit* pLevel, Clien
 	return &Iter->second;
 }
 
-_bool* CPanel_Inspector::Resolve_MapCollMeshEditState(CLevel_Edit* pLevel, CMapStage* pMapStage,
-	CMapSection* pSection)
+_bool* CPanel_Inspector::Resolve_MapCollMeshEditState(CLevel_Edit* pLevel, CMapStage* pMapStage, CMapSection* pSection)
 {
 	if (nullptr == pLevel || nullptr == pMapStage || nullptr == pSection)
 		return nullptr;
@@ -2136,23 +2130,18 @@ _bool* CPanel_Inspector::Resolve_MapCollMeshEditState(CLevel_Edit* pLevel, CMapS
 			pSection->Get_SectionName());
 
 		MAP_ENV_EDITED_DESC SavedEdit{};
-		const _bool bSourceCanCreateCollisionActor =
-			pSection->Get_Desc().bSourceCreateCollisionActor;
+		const _bool bHasCollMesh = pSection->Has_CollMesh();
 
-		_bool bCreateCollisionActor = bSourceCanCreateCollisionActor;
-		if (pLevel->Try_GetMapPreviewSectionEdit(strSectionKey, &SavedEdit)
-			&& SavedEdit.bHasCollMesh)
+		_bool bUseCollMesh = bHasCollMesh;
+		if (pLevel->Try_GetMapPreviewSectionEdit(strSectionKey, &SavedEdit) && SavedEdit.bHasCollMesh)
 		{
-			bCreateCollisionActor =
-				bSourceCanCreateCollisionActor && SavedEdit.bUseCollMesh;
+			bUseCollMesh = bHasCollMesh && SavedEdit.bUseCollMesh;
 		}
 
-		if (!bSourceCanCreateCollisionActor)
-			bCreateCollisionActor = false;
+		if (!bHasCollMesh)
+			bUseCollMesh = false;
 
-		Iter = m_MapCollMeshEditStates.emplace(
-			pSection,
-			bCreateCollisionActor).first;
+		Iter = m_MapCollMeshEditStates.emplace(pSection, bUseCollMesh).first;
 	}
 
 	return &Iter->second;

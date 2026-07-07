@@ -21,6 +21,10 @@ namespace
 		{ "Stage1-1", L"Stage1-1", },
 		{ "Stage1-2", L"Stage1-2", },
 
+		{ "Stage3-1", L"Stage3-1", },
+		{ "Stage3-2", L"Stage3-2", },
+		{ "Stage3-3", L"Stage3-3", },
+
 		{ "BossMap1", L"BossMap1", },
 
 		{ "Town", L"Town", },

@@ -42,15 +42,27 @@ protected:
 	vector<_bool> m_MeshVisible;
 	_bool m_bAnimationActive = { false };
 
+	struct LD_ANIM_PLAY_DESC
+	{
+		_string strAnimName;
+		_bool bLoop = { false };
+		_float fSpeed = { 1.f };
+	};
+
+	vector<LD_ANIM_PLAY_DESC> m_AnimPlayDescs;
+
 protected:
 	virtual HRESULT Ready_Components();
 	HRESULT Ready_RenderComponents();
+
+	HRESULT Ready_AnimPlayDescs(const LD_ANIM_PLAY_DESC* pAnimDescs, _uint iCount);
+	const LD_ANIM_PLAY_DESC* Find_AnimPlayDesc(const _string& strAnimName) const;
+	HRESULT Set_AnimPose(const _string& strAnimName, _float fProgress);
+	void Play_Anim(const _string& strAnimName);
+
 	HRESULT Ready_AnimEvents();
 	HRESULT Ready_RigidStatic();
 	void    Release_RigidStatic();
-
-	_bool Play_EventAnimation(_uint iAnimSlot, _bool bLoop);
-	_bool Play_EventAnimation(const _string& strAnimName, _bool bLoop);
 
 	_int Find_MeshIndex_ByName(const _string& strMeshName) const;
 

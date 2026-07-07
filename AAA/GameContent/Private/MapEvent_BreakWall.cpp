@@ -382,9 +382,6 @@ HRESULT CMapEvent_BreakWall::Ready_BoostTrigger()
 
 void CMapEvent_BreakWall::On_BoostTriggerEnter(CCollider* pOther)
 {
-	if (nullptr == pOther)
-		return;
-
 	if (ETOUI(COLLISION_LAYER::CAR_BOOST) != pOther->Get_RegisteredGroup())
 		return;
 

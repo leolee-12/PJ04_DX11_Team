@@ -67,9 +67,14 @@
     <ClInclude Include="..\public\GameContent_pch.h" />
     <ClInclude Include="..\Public\Kirby_AttackMode.h" />
     <ClInclude Include="..\Public\Kirby_CarFirstBreakWall.h" />
+    <ClInclude Include="..\Public\LD_ArrowBoard.h" />
     <ClInclude Include="..\Public\LD_DeformCarBreakWall.h" />
+    <ClInclude Include="..\Public\LD_DeformObject.h" />
+    <ClInclude Include="..\Public\LD_GarageRadio.h" />
+    <ClInclude Include="..\Public\LD_PopFlower.h" />
     <ClInclude Include="..\Public\LD_SlopeBoardA.h" />
     <ClInclude Include="..\Public\LD_SlopeBoardC.h" />
+    <ClInclude Include="..\Public\LD_AudioArea.h" />
     <ClInclude Include="..\Public\LD_Stage1BossDemo.h" />
     <ClInclude Include="..\Public\Monster_State_Spat.h" />
     <ClInclude Include="..\Public\SphereMesh.h" />
@@ -373,9 +378,14 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_AttackMode.cpp" />
     <ClCompile Include="..\Private\Kirby_CarFirstBreakWall.cpp" />
+    <ClCompile Include="..\Private\LD_ArrowBoard.cpp" />
     <ClCompile Include="..\Private\LD_DeformCarBreakWall.cpp" />
+    <ClCompile Include="..\Private\LD_DeformObject.cpp" />
+    <ClCompile Include="..\Private\LD_GarageRadio.cpp" />
+    <ClCompile Include="..\Private\LD_PopFlower.cpp" />
     <ClCompile Include="..\Private\LD_SlopeBoardA.cpp" />
     <ClCompile Include="..\Private\LD_SlopeBoardC.cpp" />
+    <ClCompile Include="..\Private\LD_AudioArea.cpp" />
     <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp" />
     <ClCompile Include="..\Private\Monster_State_Spat.cpp" />
     <ClCompile Include="..\Private\SphereMesh.cpp" />

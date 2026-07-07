@@ -23,6 +23,25 @@ namespace GeometryUtils
             && Bounds.Extents.z >= 0.f;
     }
 
+    inline _bool Has_UsableSize(const _float3& vSize, _float fMinAxis = 0.001f)
+    {
+        const _float3 vAbsSize = MathUtils::Abs_Float3(vSize);
+        return vAbsSize.x > fMinAxis
+            && vAbsSize.y > fMinAxis
+            && vAbsSize.z > fMinAxis;
+    }
+
+    inline _float3 Make_AbsSize(const _float3& vSize)
+    {
+        return MathUtils::Abs_Float3(vSize);
+    }
+
+    inline _float3 Make_HalfExtentsFromSize(const _float3& vSize)
+    {
+        const _float3 vAbsSize = MathUtils::Abs_Float3(vSize);
+        return { vAbsSize.x * 0.5f, vAbsSize.y * 0.5f, vAbsSize.z * 0.5f };
+    }
+
     inline BoundingBox Make_AABB_FromMinMax(const _float3& vMin, const _float3& vMax)
     {
         BoundingBox Bounds{};

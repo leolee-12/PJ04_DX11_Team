@@ -47,9 +47,10 @@ public:
 	void	Deserialize_SectionState(const json& j);
 	void	Set_RenderID(RENDERID eRenderID);
 	void	Set_Culling(_bool bEnableCulling) { m_bEnableCulling = bEnableCulling; }
-	void	Set_CollisionActorEnabled(_bool bEnable);
+	void	Set_UseCollMesh(_bool bUseCollMesh);
 	void	Set_Renderable(_bool bRenderable) { m_bRenderable = bRenderable; }
-	_bool	Is_CollisionActorEnabled() const { return m_bCreateCollisionActor; }
+	_bool	Has_CollMesh() const { return m_bHasCollMesh; }
+	_bool	Is_UseCollMesh() const { return m_bUseCollMesh; }
 
 	const MAP_SECTION_DESC&	Get_Desc() const { return m_tDesc; }
 	const BoundingBox&		Get_WorldBounds() const { return m_WorldBounds; }
@@ -79,7 +80,8 @@ private:
 	const _float4x4*	m_pParentMatrix = {};
 	_float4x4			m_CombinedWorldMatrix = {};
 	MAP_SECTION_DESC	m_tDesc = {};
-	_bool				m_bCreateCollisionActor = { true };
+	_bool				m_bHasCollMesh = { false };
+	_bool				m_bUseCollMesh = { true };
 
 	physx::PxRigidStatic* m_pColliderActor = { nullptr };
 

@@ -97,6 +97,14 @@ struct LD_EVENTOBJECT_DESC : public LD_OBJECT_DESC
 };
 #pragma endregion
 
+#pragma region DeformObject
+struct LD_DEFORMOBJECT_DESC : public LD_EVENTOBJECT_DESC
+{
+	DEFORM_TYPE eDeformType = { DEFORM_TYPE::NONE };
+	_float fInteractionRadius = { 0.f };
+};
+#pragma endregion
+
 #pragma region Portal
 #pragma endregion
 
@@ -130,6 +138,18 @@ struct LD_BUSH_DESC : public LD_OBJECT_DESC
 };
 #pragma endregion
 
+#pragma region AudioArea
+struct LD_AUDIO_AREA_DESC
+{
+	_uint iSoundId = 0;
+	_wstring strVariationType;
+	_wstring strShapeType;
+	_float3 vAreaSize = {};
+	_uint iFadeInFrame = 0;
+	_uint iInactivateFrame = 0;
+};
+#pragma endregion
+
 struct LD_VOLUME_DESC
 {
 	_float3 vAreaCenter = {};
@@ -151,18 +171,6 @@ struct LD_GUIDE_AREA_DESC
 	_uint iRelationActorUid = 0;
 };
 
-struct LD_AUDIO_AREA_DESC
-{
-	_uint iSoundId = 0;
-	_wstring strVariationType;
-	_wstring strShapeType;
-	_float3 vAreaCenter = {};
-	_float4 qAreaRot = { 0.f, 0.f, 0.f, 1.f };
-	_float3 vAreaSize = {};
-	_uint iFadeInFrame = 0;
-	_uint iInactivateFrame = 0;
-};
-
 struct LD_STEP_LINK_INFO
 {
 	_bool bIgnoreWarningAtOneWay = false;
@@ -180,7 +188,7 @@ struct LD_PARSED_OBJECT : public LD_OBJECT_DESC
 	LD_AUDIO_AREA_DESC AudioArea;
 };
 
-using LD_OBJECT_ENTRY = variant<LD_PARSED_OBJECT, LD_BREAKABLE_DESC, LD_LADDER_DESC, LD_EVENTOBJECT_DESC, LD_FOOD_DESC, LD_POINT_DESC, LD_BUSH_DESC>;
+using LD_OBJECT_ENTRY = variant<LD_PARSED_OBJECT, LD_BREAKABLE_DESC, LD_LADDER_DESC, LD_EVENTOBJECT_DESC, LD_FOOD_DESC, LD_POINT_DESC, LD_BUSH_DESC, LD_DEFORMOBJECT_DESC>;
 
 inline const LD_OBJECT_DESC& Get_LDObjectDesc(const LD_OBJECT_ENTRY& Entry)
 {

@@ -655,6 +655,9 @@ _bool CLevel_Edit::Commit_MapEditObjectFromCurrentState(CGameObject* pObject)
 
 	if (CLevelDesignObject* pLDObject = dynamic_cast<CLevelDesignObject*>(pObject))
 	{
+		if (m_pMapPreviewSession->Is_AddedObject(pObject))
+			return true;
+
 		MAP_LD_EDITED_DESC Edit{};
 		Try_GetMapPreviewLevelDesignEdit(pObject, &Edit);
 
@@ -766,6 +769,14 @@ HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
 		return E_FAIL;
 	}
 
+	if (FAILED(Load_LDPreview(iPresetIndex)))
+	{
+		Set_MapPreviewStatus(
+			L"Map preset LevelDesign load failed.");
+		Sync_MapPreviewRuntimeStateToSession();
+		return E_FAIL;
+	}
+
 	if (FAILED(Ready_EnvObjects(&DeletedEnvDescs, &EnvReport)))
 	{
 		const wstring strStageName = Get_MapPreviewLoadedStageNameRef().empty()
@@ -775,14 +786,6 @@ HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
 		Set_MapPreviewStatus(
 			L"Environment preview load failed: stage=" + strStageName
 			+ L" / " + Build_EnvPreviewCountText(EnvReport, true));
-		Sync_MapPreviewRuntimeStateToSession();
-		return E_FAIL;
-	}
-
-	if (FAILED(Load_LDPreview(iPresetIndex)))
-	{
-		Set_MapPreviewStatus(
-			L"Map preset LevelDesign load failed.");
 		Sync_MapPreviewRuntimeStateToSession();
 		return E_FAIL;
 	}
@@ -1881,7 +1884,8 @@ _bool CLevel_Edit::Try_RegisterAddedMapOverridePlacement(CGameObject* pObject, c
 	if (!m_pMapPreviewSession->Get_EditData().bHasMapContent)
 		return false;
 
-	if (!CMap_Loader::Is_MapLayer(m_strPendingLayer))
+	if (!CMap_Loader::Is_MapLayer(m_strPendingLayer)
+		&& !CLevelDesign_Registry::Is_LevelDesignLayer(m_strPendingLayer))
 		return false;
 
 	MAP_ADD_OBJECT AddedDesc{};
