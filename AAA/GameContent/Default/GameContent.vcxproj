@@ -44,6 +44,7 @@
     <ClInclude Include="..\Public\BrontoBurt_State_Idle.h" />
     <ClInclude Include="..\Public\BrontoBurt_State_Return.h" />
     <ClInclude Include="..\Public\Bubble.h" />
+    <ClInclude Include="..\public\Cage_WaddleDee.h" />
     <ClInclude Include="..\public\CameraDirector.h" />
     <ClInclude Include="..\Public\Camera_AreaData.h" />
     <ClInclude Include="..\public\Camera_AreaCam.h" />
@@ -351,6 +352,7 @@
     <ClCompile Include="..\Private\BrontoBurt_State_Idle.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_State_Return.cpp" />
     <ClCompile Include="..\Private\Bubble.cpp" />
+    <ClCompile Include="..\private\Cage_WaddleDee.cpp" />
     <ClCompile Include="..\private\CameraDirector.cpp" />
     <ClCompile Include="..\Private\Camera_AreaSolver.cpp" />
     <ClCompile Include="..\private\Camera_AreaCam.cpp" />
@@ -656,6 +658,11 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Effect</ShaderType>
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ShaderFiles\Shader_WaddleDee.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
