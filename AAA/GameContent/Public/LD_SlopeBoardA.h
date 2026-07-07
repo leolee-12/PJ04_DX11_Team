@@ -27,6 +27,7 @@ private:
 	CLD_SlopeBoardA(const CLD_SlopeBoardA& Prototype);
 	virtual ~CLD_SlopeBoardA() = default;
 
+	virtual HRESULT Initialize(void* pArg) override;
 	virtual HRESULT Validate_Initialized() override;
 
 public:
@@ -50,15 +51,14 @@ private:
 	virtual HRESULT Ready_Components() override;
 	virtual _bool Should_RenderMesh(_uint iMeshIndex) const override;
 	virtual HRESULT Bind_BoneMatrices(_uint iMeshIndex) override;
+	
+	HRESULT Ready_RenderComponent();
+	HRESULT Ready_PhysicsComponent();
+	HRESULT Update_ToFallenPose();
+	HRESULT Ready_CollisionComponent();
 
-	HRESULT Ready_SlopeBoard();
-	HRESULT Ready_RigidStatic_FromMeshAABB();
-	HRESULT Update_RigidStatic_ToFallenPose();
-	HRESULT Ready_InteractionTrigger();
-
-	void SetUp_InteractionTriggerCallback();
-	void Handle_InteractionTrigger(CCollider* pOther);
-	void Unregister_InteractionTrigger(_bool bImmediate);
+	void SetUp_CollisionCallback();
+	void Handle_CollisionEnter(CCollider* pOther);
 	void On_Event();
 
 public:

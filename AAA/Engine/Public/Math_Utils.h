@@ -19,6 +19,20 @@ namespace MathUtils
             && Is_FiniteFloat(vValue.z);
     }
 
+
+
+    inline _float Abs_Float(_float fValue)
+    {
+        return fValue < 0.f ? -fValue : fValue;
+    }
+
+    inline _float3 Abs_Float3(const _float3& vValue)
+    {
+        return { Abs_Float(vValue.x), Abs_Float(vValue.y), Abs_Float(vValue.z) };
+    }
+
+
+
     inline _bool Is_NearlyEqualFloat4x4(const _float4x4& A, const _float4x4& B, _float fEpsilon = Helper::fEpsilon)
     {
         for (_uint iRow = 0; iRow < 4; ++iRow)

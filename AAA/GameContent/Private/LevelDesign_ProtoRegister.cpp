@@ -80,8 +80,8 @@ HRESULT CLevelDesign_ProtoRegister::Ensure_Resources(const LD_RUNTIME_LEVELS& Le
 		CModel::MODEL_LOAD_DESC ModelDesc{};
 		ModelDesc.eType = Requirement.eModelType;
 		ModelDesc.pModelFilePath = Requirement.strFilePath.c_str();
-		XMStoreFloat4x4(&ModelDesc.PreTransformMatrix, XMMatrixIdentity());
 		ModelDesc.bCookCollisionMesh = Requirement.bCookCollisionMesh;
+		ModelDesc.PreTransformMatrix = Requirement.PreTransformMatrix;
 
 		CBase* pModel = CModel::Create_WithTextureHub(m_pDevice, m_pContext, ModelDesc);
 		if (nullptr == pModel)

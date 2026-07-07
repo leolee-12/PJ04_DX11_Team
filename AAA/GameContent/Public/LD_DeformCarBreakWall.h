@@ -27,6 +27,7 @@ private:
 	CLD_DeformCarBreakWall(const CLD_DeformCarBreakWall& Prototype);
 	virtual ~CLD_DeformCarBreakWall() = default;
 
+	virtual HRESULT Initialize(void* pArg) override;
 	virtual HRESULT Validate_Initialized() override;
 
 public:
@@ -40,19 +41,18 @@ public:
 
 private:
 	CCollider*	m_pBoostTrigger = { nullptr };
-	_bool		m_bBoostTriggerRegistered = { false };
 	STATE		m_eState = { STATE::IDLE };
+	_bool		m_bMeshHiddenAtFrame = { false };
 
 private:
 	virtual HRESULT Ready_Components() override;
 
-	HRESULT	Ready_DeformCarBreakWall();
-	HRESULT	Ready_WallRigidStatic(const BoundingBox& LocalBounds);
-	HRESULT	Ready_BoostTrigger(const BoundingBox& LocalBounds);
+	HRESULT Ready_RenderComponent();
+	HRESULT Ready_WallRigidStatic(const BoundingBox& LocalBounds);
+	HRESULT Ready_BoostTrigger(const BoundingBox& LocalBounds);
 
 	void	SetUp_BoostTriggerCallback();
 	void	Handle_BoostTrigger(CCollider* pOther);
-	void	Unregister_BoostTrigger(_bool bImmediate);
 	void	On_Event();
 
 public:

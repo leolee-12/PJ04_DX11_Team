@@ -2,9 +2,6 @@
 #include "GameContent_const.h"
 #include "Shader_PassMeta.h"
 
-#include "Animator.h"
-#include "Model.h"
-#include "Shader.h"
 #include "GameInstance.h"
 
 namespace
@@ -31,6 +28,7 @@ CLD_EventObject::CLD_EventObject(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 CLD_EventObject::CLD_EventObject(const CLD_EventObject& Prototype)
 	: CLevelDesignObject(Prototype)
 	, m_tEventObjectDesc(Prototype.m_tEventObjectDesc)
+	, m_AnimPlayDescs(Prototype.m_AnimPlayDescs)
 {
 }
 
@@ -80,12 +78,12 @@ HRESULT CLD_EventObject::Validate_Initialized()
 		if (nullptr == m_pAnimatorCom)
 			return E_FAIL;
 
-		for (_uint i = 0; i < LD_ANIM_SLOT_COUNT; ++i)
+		for (const auto& AnimDesc : m_AnimPlayDescs)
 		{
-			if (m_tEventObjectDesc.strAnimNames[i].empty())
-				continue;
+			if (AnimDesc.strAnimName.empty())
+				return E_FAIL;
 
-			if (m_pModelCom->Get_AnimationIndex(m_tEventObjectDesc.strAnimNames[i]) < 0)
+			if (m_pModelCom->Get_AnimationIndex(AnimDesc.strAnimName) < 0)
 				return E_FAIL;
 		}
 	}
@@ -160,8 +158,7 @@ HRESULT CLD_EventObject::Ready_RenderComponents()
 	if (m_tEventObjectDesc.wstrModelProtoTag.empty())
 		return E_FAIL;
 
-	const auto& ShaderDesc = MODEL::ANIM == m_tEventObjectDesc.eModelType ? Shader_AnimMesh_PBR :
-		Shader_NonAnimMesh_PBR;
+	const auto& ShaderDesc = MODEL::ANIM == m_tEventObjectDesc.eModelType ? Shader_AnimMesh_PBR : Shader_NonAnimMesh_PBR;
 
 	m_pShaderCom = Add_Component<CShader>(ShaderDesc.iLevelID, ShaderDesc.szProtoTag,
 		TEXT("Com_Shader"));
@@ -191,6 +188,64 @@ HRESULT CLD_EventObject::Ready_RenderComponents()
 	}
 
 	return S_OK;
+}
+
+HRESULT CLD_EventObject::Ready_AnimPlayDescs(const LD_ANIM_PLAY_DESC* pAnimDescs, _uint iCount)
+{
+	m_AnimPlayDescs.clear();
+
+	if (0u < iCount && nullptr == pAnimDescs)
+		return E_FAIL;
+
+	for (_uint i = 0; i < iCount; ++i)
+	{
+		const LD_ANIM_PLAY_DESC& AnimDesc = pAnimDescs[i];
+
+		if (AnimDesc.strAnimName.empty())
+			return E_FAIL;
+
+		if (m_pModelCom->Get_AnimationIndex(AnimDesc.strAnimName) < 0)
+			return E_FAIL;
+
+		m_AnimPlayDescs.push_back(AnimDesc);
+	}
+
+	return S_OK;
+}
+
+const CLD_EventObject::LD_ANIM_PLAY_DESC* CLD_EventObject::Find_AnimPlayDesc(const _string& strAnimName) const
+{
+	for (const auto& AnimDesc : m_AnimPlayDescs)
+	{
+		if (AnimDesc.strAnimName == strAnimName)
+			return &AnimDesc;
+	}
+
+	return nullptr;
+}
+
+HRESULT CLD_EventObject::Set_AnimPose(const _string& strAnimName, _float fProgress)
+{
+	const LD_ANIM_PLAY_DESC* pAnimDesc = Find_AnimPlayDesc(strAnimName);
+	if (nullptr == pAnimDesc)
+		return E_FAIL;
+
+	m_pAnimatorCom->Play(pAnimDesc->strAnimName, pAnimDesc->bLoop, true, 0.f, pAnimDesc->fSpeed);
+	m_pAnimatorCom->Seek(fProgress);
+	m_bAnimationActive = false;
+
+	return S_OK;
+}
+
+void CLD_EventObject::Play_Anim(const _string& strAnimName)
+{
+	const LD_ANIM_PLAY_DESC* pAnimDesc = Find_AnimPlayDesc(strAnimName);
+	if (nullptr == pAnimDesc)
+		return;
+
+	m_pAnimatorCom->Resume();
+	m_pAnimatorCom->Play(pAnimDesc->strAnimName, pAnimDesc->bLoop, true, 0.f, pAnimDesc->fSpeed);
+	m_bAnimationActive = true;
 }
 
 HRESULT CLD_EventObject::Ready_AnimEvents()
@@ -249,29 +304,6 @@ void CLD_EventObject::Release_RigidStatic()
 		m_pGameInstance_Proxy->Remove_StaticActor(m_pRigidStatic);
 
 	m_pRigidStatic = nullptr;
-}
-
-_bool CLD_EventObject::Play_EventAnimation(_uint iAnimSlot, _bool bLoop)
-{
-	if (LD_ANIM_SLOT_COUNT <= iAnimSlot)
-		return false;
-
-	return Play_EventAnimation(m_tEventObjectDesc.strAnimNames[iAnimSlot], bLoop);
-}
-
-_bool CLD_EventObject::Play_EventAnimation(const _string& strAnimName, _bool bLoop)
-{
-	if (nullptr == m_pAnimatorCom || nullptr == m_pModelCom || strAnimName.empty())
-		return false;
-
-	if (m_pModelCom->Get_AnimationIndex(strAnimName) < 0)
-		return false;
-
-	m_pAnimatorCom->Resume();
-	m_pAnimatorCom->Play(strAnimName, bLoop, true, 0.f, 1.5f);
-	m_bAnimationActive = true;
-
-	return true;
 }
 
 _int CLD_EventObject::Find_MeshIndex_ByName(const _string& strMeshName) const

@@ -17,7 +17,6 @@ enum class ENV_OBJECT_KIND
 enum class ENV_SOURCE_TYPE
 {
 	DECOR_DECOR,
-	TOY_DECOR,
 	TOY_OBJ,
 	DECOR_OBJ,
 	UNKNOWN,
@@ -55,20 +54,9 @@ enum class ENV_INTERACT_TYPE
 enum class ENV_COLLIDER_KIND
 {
 	NONE,
-	SIMPLE_SHAPE,
 	MODEL_MESH,
 	TRIGGER_ONLY,
 	UNKNOWN,
-	END
-};
-
-enum class ENV_SIMPLE_SHAPE
-{
-	NONE,
-	BOX,
-	SPHERE,
-	CYLINDER,
-	SLOPE,
 	END
 };
 
@@ -99,7 +87,6 @@ struct ENV_COLLISION_DESC
 	_float3 vSize = {};
 
 	ENV_COLLIDER_KIND eColliderKind = { ENV_COLLIDER_KIND::NONE };
-	ENV_SIMPLE_SHAPE  eSimpleShape = { ENV_SIMPLE_SHAPE::NONE };
 
 	_bool   bHasCollMesh = { false };
 	_bool   bCookCollMesh = { false };
@@ -196,18 +183,9 @@ struct ENV_OBJECT_DESC : public CGameObject::GAMEOBJECT_DESC
 	json jRawProperties;
 };
 
-inline _bool EnvObject_IsSimpleShapeOnly(const ENV_OBJECT_DESC& Desc)
-{
-	return Desc.eSourceType == ENV_SOURCE_TYPE::TOY_DECOR
-		&& Desc.tCollision.eColliderKind == ENV_COLLIDER_KIND::SIMPLE_SHAPE;
-}
-
 inline _bool EnvObject_NeedsModel(const ENV_OBJECT_DESC& Desc)
 {
 	if (Desc.eKind == ENV_OBJECT_KIND::EFFECT)
-		return false;
-
-	if (EnvObject_IsSimpleShapeOnly(Desc))
 		return false;
 
 	return Desc.eKind == ENV_OBJECT_KIND::STATIC

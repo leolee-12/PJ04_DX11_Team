@@ -8,12 +8,18 @@
 namespace
 {
 	inline constexpr const _char* SLOPEBOARD_A_MODEL_PATH = "../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardA.ysh";
-	inline constexpr const _char * SLOPEBOARD_A_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { "LandBack", "LandFront", "LandStartFront", "" };
+	inline constexpr const _char* ANIM_LANDBACK = "LandBack";
+	inline constexpr const _char* ANIM_LANDFRONT = "LandFront";
+	inline constexpr const _char* ANIM_LANDSTARTFRONT = "LandStartFront";
+	inline constexpr const _char* SLOPEBOARD_A_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_LANDBACK, ANIM_LANDFRONT, ANIM_LANDSTARTFRONT, "" };
+
 	inline constexpr const _char* SLOPEBOARD_A_PLATFORM_MESH_NAME = "PlateM__BoardC";
 	inline constexpr const _char* SLOPEBOARD_A_PLATFORM_BONE_NAME = "FrontAnimL";
+
 	inline constexpr _float SLOPEBOARD_A_MIN_HALF_EXTENT = 0.01f;
 	inline constexpr _float SLOPEBOARD_A_FALLEN_ANGLE_RAD = XM_PI / 3.f + 0.05f;
 	inline constexpr _float SLOPEBOARD_A_FALL_VISUAL_DURATION = 1.f;
+	inline constexpr _float SLOPEBOARD_A_ANIM_SPEED = 1.5f;
 
 	void Log_SlopeBoardPhysicsWarning(const _string& strMessage)
 	{
@@ -71,6 +77,21 @@ CLD_SlopeBoardA::CLD_SlopeBoardA(const CLD_SlopeBoardA& Prototype)
 {
 }
 
+HRESULT CLD_SlopeBoardA::Initialize(void* pArg)
+{
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
+
+	const LD_ANIM_PLAY_DESC AnimDescs[] =
+	{
+			{ ANIM_LANDBACK, false, SLOPEBOARD_A_ANIM_SPEED },
+			{ ANIM_LANDFRONT, false, SLOPEBOARD_A_ANIM_SPEED },
+			{ ANIM_LANDSTARTFRONT, false, SLOPEBOARD_A_ANIM_SPEED },
+	};
+
+	return Ready_AnimPlayDescs(AnimDescs, static_cast<_uint>(_countof(AnimDescs)));
+}
+
 HRESULT CLD_SlopeBoardA::Validate_Initialized()
 {
 	if (FAILED(__super::Validate_Initialized()))
@@ -121,11 +142,10 @@ void CLD_SlopeBoardA::Update(_float fTimeDelta)
 		{
 			m_bEndAnimationPlayed = true;
 
-			if (FAILED(Update_RigidStatic_ToFallenPose()))
+			if (FAILED(Update_ToFallenPose()))
 				Log_SlopeBoardPhysicsWarning("[LDSlopeBoardA] fallen platform rigid static pose update failed.");
 
-			if (!Play_EventAnimation(0u, false))
-				m_eState = STATE::BROKEN;
+			Play_Anim(ANIM_LANDBACK);
 		}
 	}
 
@@ -228,13 +248,19 @@ HRESULT CLD_SlopeBoardA::Ready_Components()
 	if (FAILED(__super::Ready_Components()))
 		return E_FAIL;
 
-	if (FAILED(Ready_SlopeBoard()))
+	if (FAILED(Ready_RenderComponent()))
+		return E_FAIL;
+
+	if (FAILED(Ready_PhysicsComponent()))
+		return E_FAIL;
+
+	if (FAILED(Ready_CollisionComponent()))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CLD_SlopeBoardA::Ready_SlopeBoard()
+HRESULT CLD_SlopeBoardA::Ready_RenderComponent()
 {
 	m_eState = STATE::IDLE;
 	m_fElapsed = 0.f;
@@ -250,16 +276,10 @@ HRESULT CLD_SlopeBoardA::Ready_SlopeBoard()
 	Set_AllMeshesVisible(false);
 	Set_MeshVisible(static_cast<_uint>(iPlatformMeshIndex), true);
 
-	if (FAILED(Ready_RigidStatic_FromMeshAABB()))
-		return E_FAIL;
-
-	if (FAILED(Ready_InteractionTrigger()))
-		return E_FAIL;
-
 	return S_OK;
 }
 
-HRESULT CLD_SlopeBoardA::Ready_RigidStatic_FromMeshAABB()
+HRESULT CLD_SlopeBoardA::Ready_PhysicsComponent()
 {
 	const _int iMeshIndex = Find_MeshIndex_ByName(SLOPEBOARD_A_PLATFORM_MESH_NAME);
 	if (iMeshIndex < 0)
@@ -305,7 +325,7 @@ HRESULT CLD_SlopeBoardA::Ready_RigidStatic_FromMeshAABB()
 	return S_OK;
 }
 
-HRESULT CLD_SlopeBoardA::Update_RigidStatic_ToFallenPose()
+HRESULT CLD_SlopeBoardA::Update_ToFallenPose()
 {
 	const _int iMeshIndex = Find_MeshIndex_ByName(SLOPEBOARD_A_PLATFORM_MESH_NAME);
 	if (iMeshIndex < 0)
@@ -331,7 +351,7 @@ HRESULT CLD_SlopeBoardA::Update_RigidStatic_ToFallenPose()
 	return m_pGameInstance_Proxy->Refresh_StaticBoxPose(m_pRigidStatic, vLocalCenter, MeshWorld);
 }
 
-HRESULT CLD_SlopeBoardA::Ready_InteractionTrigger()
+HRESULT CLD_SlopeBoardA::Ready_CollisionComponent()
 {
 	const _int iMeshIndex = Find_MeshIndex_ByName(SLOPEBOARD_A_PLATFORM_MESH_NAME);
 	if (iMeshIndex < 0)
@@ -374,7 +394,7 @@ HRESULT CLD_SlopeBoardA::Ready_InteractionTrigger()
 	if (nullptr == m_pInteractionTrigger)
 		return E_FAIL;
 
-	SetUp_InteractionTriggerCallback();
+	SetUp_CollisionCallback();
 
 	m_pGameInstance_Proxy->Register_Collider(
 		m_pInteractionTrigger,
@@ -384,7 +404,7 @@ HRESULT CLD_SlopeBoardA::Ready_InteractionTrigger()
 	return S_OK;
 }
 
-void CLD_SlopeBoardA::SetUp_InteractionTriggerCallback()
+void CLD_SlopeBoardA::SetUp_CollisionCallback()
 {
 	if (nullptr == m_pInteractionTrigger)
 		return;
@@ -392,11 +412,11 @@ void CLD_SlopeBoardA::SetUp_InteractionTriggerCallback()
 	m_pInteractionTrigger->Set_OnEnter(
 		[this](CCollider* pOther)
 		{
-			Handle_InteractionTrigger(pOther);
+			Handle_CollisionEnter(pOther);
 		});
 }
 
-void CLD_SlopeBoardA::Handle_InteractionTrigger(CCollider* pOther)
+void CLD_SlopeBoardA::Handle_CollisionEnter(CCollider* pOther)
 {
 	if (nullptr == pOther)
 		return;
@@ -407,39 +427,18 @@ void CLD_SlopeBoardA::Handle_InteractionTrigger(CCollider* pOther)
 	On_Event();
 }
 
-void CLD_SlopeBoardA::Unregister_InteractionTrigger(_bool bImmediate)
-{
-	if (nullptr == m_pInteractionTrigger)
-		return;
-
-	m_pInteractionTrigger->Set_Enabled(false);
-
-	if (!m_bInteractionTriggerRegistered)
-		return;
-
-	const _uint iGroup = ETOUI(COLLISION_LAYER::ENV_TRIGGER);
-
-	if (bImmediate)
-		m_pGameInstance_Proxy->Immediate_Unregister(m_pInteractionTrigger, iGroup);
-	else
-		m_pGameInstance_Proxy->Request_Unregister(m_pInteractionTrigger, iGroup);
-
-	m_bInteractionTriggerRegistered = false;
-}
-
 void CLD_SlopeBoardA::On_Event()
 {
 	if (STATE::IDLE != m_eState)
 		return;
 
-	if (!Play_EventAnimation(1u, false))
-		return;
+	Play_Anim(ANIM_LANDFRONT);
 
 	m_eState = STATE::PLAYING;
 	m_fElapsed = 0.f;
 	m_bEndAnimationPlayed = false;
 
-	Unregister_InteractionTrigger(false);
+	m_pInteractionTrigger->Set_Enabled(false);
 }
 
 _bool CLD_SlopeBoardA::Should_RenderMesh(_uint iMeshIndex) const
@@ -506,8 +505,6 @@ CGameObject* CLD_SlopeBoardA::Clone(void* pArg)
 
 void CLD_SlopeBoardA::Free()
 {
-	Unregister_InteractionTrigger(true);
-
 	__super::Free();
 }
 

@@ -426,6 +426,35 @@ PS_OUT PS_CAGE(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_ARROWBOARD_OPAQUE(PS_IN In)
+{
+    PS_OUT Out;
+
+    float2 uv = In.vTexcoord;
+    float4 diffuse = g_DiffuseTexture.Sample(LinearSampler, uv);
+    float3 mra = g_MRATexture.Sample(LinearSampler, uv).rgb;
+    float fArrowMask = step(0.1f, diffuse.a);
+
+    float3 N = normalize(In.vNormal);
+    float3 T = normalize(In.vTangent.xyz);
+    float3 B = normalize(In.vBinormal.xyz);
+    float3x3 TBN = float3x3(T, B, N);
+
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, uv).rg;
+    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+    float3 Nw = mul(nTS, TBN);
+
+    Out.vDiffuse = float4(diffuse.rgb, 1.f);
+    Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
+    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(mra, 1.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * fArrowMask, 1.f);
+    Out.vGeoNormal = float4(N * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
+
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass DefaultPass // 0
@@ -510,7 +539,17 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_SHADOW();
     }
-    pass CagePass // 8
+    pass ArrowBoardOpaquePass // 8
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_ARROWBOARD_OPAQUE();
+    }
+    pass CagePass // 9
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);

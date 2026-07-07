@@ -45,21 +45,9 @@ namespace
 		return 0 == _wcsicmp(A.c_str(), B);
 	}
 
-	ENV_SIMPLE_SHAPE Resolve_SimpleShapeFromObjectName(const wstring& wstrObjectName)
+	_bool Is_SkippedEnvSourceFile(const wstring& wstrSourceFile)
 	{
-		if (Is_SameText(wstrObjectName, L"Cube"))
-			return ENV_SIMPLE_SHAPE::BOX;
-
-		if (Is_SameText(wstrObjectName, L"Sphere"))
-			return ENV_SIMPLE_SHAPE::SPHERE;
-
-		if (Is_SameText(wstrObjectName, L"Cylinder"))
-			return ENV_SIMPLE_SHAPE::CYLINDER;
-
-		if (Is_SameText(wstrObjectName, L"Slope"))
-			return ENV_SIMPLE_SHAPE::SLOPE;
-
-		return ENV_SIMPLE_SHAPE::NONE;
+		return Is_SameText(wstrSourceFile, L"Toy_Decor.bin");
 	}
 
 	void Resolve_EnvColliderKind(ENV_OBJECT_DESC* pDesc)
@@ -70,7 +58,6 @@ namespace
 		ENV_COLLISION_DESC& Collision = pDesc->tCollision;
 
 		Collision.eColliderKind = ENV_COLLIDER_KIND::NONE;
-		Collision.eSimpleShape = ENV_SIMPLE_SHAPE::NONE;
 
 		Collision.bHasCollMesh = false;
 		Collision.bCookCollMesh = false;
@@ -84,28 +71,9 @@ namespace
 		if (pDesc->eKind == ENV_OBJECT_KIND::EFFECT)
 			return;
 
-		// Toy_Decor의 Cube/Sphere/Cylinder/Slope는 apxbin 카탈로그가 아니라
-		// 원본 배치 데이터 기반 단순 충돌체이므로 기존 처리를 유지한다.
-		if (pDesc->eSourceType == ENV_SOURCE_TYPE::TOY_DECOR)
-		{
-			const ENV_SIMPLE_SHAPE eShape =
-				Resolve_SimpleShapeFromObjectName(pDesc->wstrObjectName);
-
-			if (eShape != ENV_SIMPLE_SHAPE::NONE)
-			{
-				if (!Collision.bInvalidCollision)
-				{
-					Collision.eColliderKind = ENV_COLLIDER_KIND::SIMPLE_SHAPE;
-					Collision.eSimpleShape = eShape;
-				}
-				return;
-			}
-		}
-
 		// Decor 계열 모델 메쉬 충돌은 원본 IsInvalidCollision 플래그 대신
 		// DecorCollisionCatalog의 objectName 존재 여부로 판단한다.
-		if (pDesc->eSourceType == ENV_SOURCE_TYPE::DECOR_DECOR
-			|| pDesc->eSourceType == ENV_SOURCE_TYPE::TOY_DECOR)
+		if (pDesc->eSourceType == ENV_SOURCE_TYPE::DECOR_DECOR)
 		{
 			Collision.bCatalogCollisionChecked = true;
 
@@ -504,6 +472,9 @@ HRESULT CMap_Parser::Parse_EnvRoot(const json& jRoot, vector<ENV_OBJECT_DESC>* p
 	wstring wstrSourceFile;
 	Try_ReadString(jRoot, "source_file", &wstrSourceFile);
 
+	if (Is_SkippedEnvSourceFile(wstrSourceFile))
+		return S_OK;
+
 	const json* pData = Find_JsonValue(jRoot, "data");
 	if (nullptr == pData || !pData->is_object())
 		return E_FAIL;
@@ -541,7 +512,6 @@ void CMap_Parser::Parse_SectionObject(
 		switch (eSourceType)
 		{
 		case ENV_SOURCE_TYPE::DECOR_DECOR:
-		case ENV_SOURCE_TYPE::TOY_DECOR:
 			Parse_DecorEntry(
 				wstrSourceFile,
 				wstrSection,
@@ -751,8 +721,6 @@ ENV_SOURCE_TYPE CMap_Parser::Classify_SourceType(const wstring& wstrSourceFile)
 {
 	if (0 == _wcsicmp(wstrSourceFile.c_str(), L"Decor_Decor.bin"))
 		return ENV_SOURCE_TYPE::DECOR_DECOR;
-	if (0 == _wcsicmp(wstrSourceFile.c_str(), L"Toy_Decor.bin"))
-		return ENV_SOURCE_TYPE::TOY_DECOR;
 	if (0 == _wcsicmp(wstrSourceFile.c_str(), L"Toy_Obj.bin"))
 		return ENV_SOURCE_TYPE::TOY_OBJ;
 	if (0 == _wcsicmp(wstrSourceFile.c_str(), L"Decor_Obj.bin"))
