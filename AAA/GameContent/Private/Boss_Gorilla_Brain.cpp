@@ -221,7 +221,7 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
         [bWaitOn]() { *bWaitOn = false; });
 
     auto* pReleaseEscape = CBTAction::Create([this](CBlackboard*, _float) {
-        static_cast<CBoss_Gorilla*>(m_pOwner)->Fire_Release(GRAB_RELEASE_TYPE::GORILLA_ESCAPE);
+        static_cast<CBoss_Gorilla*>(m_pOwner)->Fire_Release(KIRBY_ATTACHMENT_END_REASON::GORILLA_COMBAT_ESCAPE);
         return BT_STATUS::SUCCESS; });
 
     auto bThrowOn = make_shared<bool>(false);
@@ -234,7 +234,7 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
             }
             if (pAnim->Is_Finished()) {
                 *bThrowOn = false;
-                static_cast<CBoss_Gorilla*>(m_pOwner)->Fire_Release(GRAB_RELEASE_TYPE::GORILLA_THROWN);
+                static_cast<CBoss_Gorilla*>(m_pOwner)->Fire_Release(KIRBY_ATTACHMENT_END_REASON::GORILLA_COMBAT_THROWN);
                 return BT_STATUS::SUCCESS;
             }
             return BT_STATUS::RUNNING;

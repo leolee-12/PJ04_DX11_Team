@@ -81,12 +81,12 @@ void CKirby_StateMachine::On_Damaged_KirbyStateMachine(const ATTACK_INFO& tInfo)
     m_pCurState->On_Damaged_KirbyState(m_pKirby, tInfo);
 }
 
-void CKirby_StateMachine::Request_GrabState_StateMachine(CUTSCENE_KIRBY_TYPE eType)
+void CKirby_StateMachine::Request_GrabState_StateMachine(KIRBY_ATTACHMENT_CONTEXT eType)
 {
     m_pCurState->Request_GrabState(m_pKirby, eType);
 }
 
-void CKirby_StateMachine::Request_ReleaseGrabState_StateMachine(CUTSCENE_KIRBY_TYPE eType)
+void CKirby_StateMachine::Request_ReleaseGrabState_StateMachine(KIRBY_ATTACHMENT_CONTEXT eType)
 {
     m_pCurState->Request_ReleaseGrabState(m_pKirby, eType);
 }
