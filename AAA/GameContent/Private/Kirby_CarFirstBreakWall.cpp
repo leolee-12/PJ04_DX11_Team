@@ -50,26 +50,6 @@ void CKirby_CarFirstBreakWall::Update(CKirby* pKirby, const _float fTimeDelta)
 
     CTransform* pTransform = pKirby->Get_Transform();
 
-    //// È¸Àü
-    //if (fRatio >= 0.25f && m_bTurnStarted == false)
-    //{
-    //    m_bTurnStarted = true;
-    //    _vector vLeft = -pTransform->Get_State(STATE::RIGHT);
-
-    //    XMStoreFloat3(&m_vLeftDir, XMVector3Normalize(XMVectorSetY(vLeft, 0.f)));
-    //}
-    //if (m_bTurnStarted && fRatio <= 0.75f)
-    //{
-    //    pMovement->Rotate_To_Direction(XMLoadFloat3(&m_vLeftDir), fTimeDelta);
-    //}
-
-    /*if(fRatio <= 0.75f)
-    {
-        _vector vLook = pTransform->Get_State(STATE::LOOK);
-        vLook = XMVector3Normalize(XMVectorSetY(vLook, 0.f));
-        pMovement->Add_Acceleration(vLook * 70.f);
-    }*/
-
     pKirby->Update_CutsceneGrabTransform();
 
     if(pAnimator->Is_Finished())

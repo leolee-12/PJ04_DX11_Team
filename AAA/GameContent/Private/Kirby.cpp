@@ -94,14 +94,6 @@ void CKirby::Update(_float fTimeDelta)
     if (m_pKirby_StateMachine->Ignore_TimeScale_StateMachine())
         fTimeDelta = m_pGameInstance_Proxy->Get_RawTimeDelta(L"Timer_60");
 
-    if (m_pGameInstance_Proxy->Key_Down(DIK_F3))
-    {
-        KIRBY_ATTACHMENT_BEGIN_DESC desc{};
-        desc.eType = KIRBY_ATTACHMENT_CONTEXT::DEFORM_CAR_GET_FIRST;
-
-        m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentBegin, &desc);
-    }
-
     XMStoreFloat3(&m_vWishDir, XMVectorZero());
 
     m_pKirby_InputManager->Update_KirbyInput(fTimeDelta);
@@ -674,6 +666,14 @@ HRESULT CKirby::Ready_Events()
             const auto* pDesc = static_cast<KIRBY_ATTACHMENT_END_DESC*>(pData);
             Clear_CutsceneGrabTarget();
             m_pKirby_StateMachine->Request_ReleaseGrabState_StateMachine();
+        }
+    );
+
+    Subscribe_Event(EventTag::Cutscene_StageClear,
+        [this](void* pData)
+        {
+            const auto* pDesc = static_cast<CUTSCENE_STAGECLEAR*>(pData);
+            m_pKirby_StateMachine->Request_ClearStage_StateMachine(pDesc);
         }
     );
 
