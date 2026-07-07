@@ -904,6 +904,9 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\BossCage\Part\WaddleDee">
+      <UniqueIdentifier>{ac205231-35bf-4ba3-89a7-12ee79038e55}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1800,6 +1803,9 @@
     <ClInclude Include="..\public\GameContent_pch.h">
       <Filter>99. Defines\pch</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Cage_WaddleDee.h">
+      <Filter>00. GameObject\07. Boss\BossCage\Part\WaddleDee</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2621,6 +2627,9 @@
     <ClCompile Include="..\private\GameContent_pch.cpp">
       <Filter>99. Defines\pch</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Cage_WaddleDee.cpp">
+      <Filter>00. GameObject\07. Boss\BossCage\Part\WaddleDee</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Shader_Ring.hlsl">
@@ -2661,6 +2670,9 @@
     </None>
     <None Include="..\ShaderFiles\Shader_UI.hlsl">
       <Filter>98. ShaderFiles\Hojun</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_WaddleDee.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
   </ItemGroup>
 </Project>

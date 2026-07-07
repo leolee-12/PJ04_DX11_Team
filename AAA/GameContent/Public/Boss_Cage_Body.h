@@ -22,7 +22,7 @@ private:
     CBoss_Cage_Body(const CBoss_Cage_Body& Prototype);
     virtual ~CBoss_Cage_Body() = default;
 
-private:
+public:
     virtual HRESULT             Initialize_Prototype() override;
     virtual HRESULT             Initialize(void* pArg) override;
     virtual HRESULT             Render() override;
@@ -32,6 +32,12 @@ public:
     {
         pOutData->strPrototypeTag = PROTOTYPE_TAG;
     }
+
+public:
+    void    Set_RenderBird(_bool b) { m_bRenderBird = b; }
+
+private:
+    _bool m_bRenderBird = { false };
 
 private:
     virtual HRESULT             Ready_Components() override;

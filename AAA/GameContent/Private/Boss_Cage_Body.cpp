@@ -27,7 +27,7 @@ HRESULT CBoss_Cage_Body::Initialize(void* pArg)
         return E_FAIL;
 
     m_pAnimatorCom->Play("Wait", true, true);
-    m_pAnimatorCom->Pause();
+    //m_pAnimatorCom->Pause();
 
     return S_OK;
 }
@@ -55,7 +55,7 @@ HRESULT CBoss_Cage_Body::Render()
 
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
-        if (i == 0)
+        if (i == 0 && !m_bRenderBird)
             continue;
 
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
@@ -71,7 +71,7 @@ HRESULT CBoss_Cage_Body::Render()
             if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
                 return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Begin(0)))
+        if (FAILED(m_pShaderCom->Begin(8)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render(i)))

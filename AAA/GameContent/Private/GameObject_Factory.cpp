@@ -138,6 +138,7 @@
 #include "Boss_Gorilla_RockHole.h"
 #include "Boss_Cage.h"
 #include "Boss_Cage_Body.h"
+#include "Cage_WaddleDee.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
@@ -477,6 +478,22 @@ void CGameObject_Factory::Register_Test()
     Register(CTestTriggerBox::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
         CREATOR(CTestTriggerBox),
         LOADER()
+    );
+
+    Register(CBoss_Cage::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
+        CREATOR(CBoss_Cage),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/WaddleDee/Body/Model_Anim.ysh"
+                    , XMMatrixRotationY(XMConvertToRadians(180.f))
+                ));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::PROTOTYPE_TAG, CCage_WaddleDee::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Cage_Body::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Gimmick/CaptiveCage/CageL/CageL_Anim_TopL.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Cage_Body::PROTOTYPE_TAG, CBoss_Cage_Body::Create(pDevice, pContext));
+        )
     );
 }
 
@@ -1010,6 +1027,11 @@ void CGameObject_Factory::Register_MainBoss()
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Gorilla_RockHole::PROTOTYPE_TAG,
                 CBoss_Gorilla_RockHole::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/WaddleDee/Body/Model_Anim.ysh"
+                    , XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::PROTOTYPE_TAG, CCage_WaddleDee::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Cage_Body::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Gimmick/CaptiveCage/CageL/CageL_Anim_TopL.ysh",

@@ -92,13 +92,16 @@ void CBoss_Gorilla::Update(_float fTimeDelta)
     __super::Update(fTimeDelta);
     Tick_DeathSequence(fTimeDelta);
 
-    m_pCage->Update(fTimeDelta);
+    if(m_pCage)
+        m_pCage->Update(fTimeDelta);
 }
 
 void CBoss_Gorilla::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
-    m_pCage->Late_Update(fTimeDelta);
+
+    if (m_pCage)
+        m_pCage->Late_Update(fTimeDelta);
 }
 
 CMonsterBrain* CBoss_Gorilla::Create_Brain()
@@ -162,6 +165,15 @@ void CBoss_Gorilla::On_Enter_Corpse()
     _float3 vPos{};
     XMStoreFloat3(&vPos, vPosV);
     CEffect_Loader::GetInstance()->Spawn(L"DeathSmoke", m_iPrototypeLevel, vPos);
+
+    if (m_pCage)
+    {
+        _vector vKirby = XMLoadFloat3(&Get_BlackBoard().vTargetPos);
+        m_pCage->Start_Descend(vKirby);
+
+        m_pGameInstance_Proxy->Add_GameObject_Instance(m_pCage, m_iLevelIndex, m_strLayerTag, L"Boss_Cage");
+        m_pCage = nullptr;
+    }
 }
 
 HRESULT CBoss_Gorilla::Ready_AnimEvents()
@@ -377,7 +389,9 @@ HRESULT CBoss_Gorilla::Ready_PartObjects()
     if (nullptr == m_pCage)
         return E_FAIL;
         
-    m_pCage->Attach_To_Bone(m_pBody->Get_BoneMatrixPtr("C_Anchor2J"), m_pTransformCom->Get_WorldMatrixPtr());
+    m_pCage->Attach_To_Bone(m_pBody->Get_BoneMatrixPtr("CageL"),
+        m_pTransformCom->Get_WorldMatrixPtr(), 
+        XMMatrixRotationY(XMConvertToRadians(180)) * XMMatrixTranslation(0.f, -3.5f, 0.f));
 
     return S_OK;
 }
