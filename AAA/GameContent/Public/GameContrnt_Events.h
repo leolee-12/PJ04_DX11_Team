@@ -172,7 +172,7 @@ namespace Client
 
     struct CUTSCENE_STAGECLEAR
     {
-        _float3 vPos = { 0.f, 0.f, 0.f };
+        _float4x4 AnchorWorld {};
         STAGECLEAR_ANIM eAnim{ STAGECLEAR_ANIM::_COUNT };
         _float fAnimSpeed { 1.f };
         _float fBlendDuration = { 0.f };

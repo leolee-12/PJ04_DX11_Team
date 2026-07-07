@@ -106,11 +106,6 @@ void CCutsceneGorilla::On_AnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE p)
         case EANIM_EVENT::Sound:    /* m_pGameInstance_Proxy->Play_Sound(e.strParam.c_str()); */ break;
         case EANIM_EVENT::Fx:       /* 이펙트 풀 스폰 */ break;
 
-        case EANIM_EVENT::LockMove:                // DemoAppear1 트랙의 strParam 으로 컷씬 신호
-            if (e.strParam == "GrabKirby")
-                Fire_Grab();
-            break;
-
         case EANIM_EVENT::PubEvent:
         {
             if (p == ANIM_EVENT_PHASE::POINT && !e.strParam.empty())
@@ -123,14 +118,6 @@ void CCutsceneGorilla::On_AnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE p)
 
         default: break;
     }
-
-    //Subscribe_Event(EventTag::Kirby_AttachmentBegin, [this](void* pData) {
-    //    auto pDesc = static_cast<KIRBY_ATTACHMENT_BEGIN_DESC*>(pData);
-    //    Begin_CutsceneCapture(pDesc->pBoneMatrix, pDesc->pSourceWorld);
-    //    });
-    //Subscribe_Event(EventTag::Kirby_AttachmentEnd, [this](void*) {
-    //    End_CutsceneCapture(/* 내려놓을 좌표 */);
-    //    });
 }
 
 void CCutsceneGorilla::Begin_Appear()
