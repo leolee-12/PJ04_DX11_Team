@@ -1211,8 +1211,10 @@ void CLevel_Tool::Update(_float fTimeDelta)
     {
         //m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GorillaAppear, nullptr);
 
-        CUTSCENE_HANDOFF_DESC ho{};
-        m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GorillaHandoff, &ho);
+        KIRBY_ATTACHMENT_END_DESC Desc{};
+        Desc.eType = KIRBY_ATTACHMENT_END_REASON::GORILLA_SCENE_HANDOFF;
+
+        m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentEnd, &Desc);
 
         Log_Info("Publish: Cutscene_GorillaAppear");
     }
