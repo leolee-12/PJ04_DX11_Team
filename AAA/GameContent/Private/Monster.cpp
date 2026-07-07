@@ -11,6 +11,8 @@
 #include "GameContent_const.h"
 #include "Effect_Loader.h"
 
+#include "Monster_State_Flatten.h"
+
 //#pragma warning(push, 0)
 //#ifdef new
 //#undef new
@@ -97,7 +99,11 @@ void CMonster::Update(_float fTimeDelta)
 		if (m_pMovement) m_pMovement->Sync_To_Controller();
 		return;
 	}
+
+	if (m_pGameInstance_Proxy->Key_Down(DIK_P) && m_pMovement && m_pMovement->Is_Grounded())
+		Change_State(MONSTER_STATE_TYPE::FLATTEN);
 #endif
+
 	Update_AI(fTimeDelta);
 	__super::Update(fTimeDelta);
 }
@@ -377,7 +383,7 @@ void CMonster::Check_AirborneReflex(_float fTimeDelta)
 	const MONSTER_STATE_TYPE eState = Get_StateType();
 	if (eState == MONSTER_STATE_TYPE::FALL || eState == MONSTER_STATE_TYPE::LANDING ||
 		eState == MONSTER_STATE_TYPE::CAPTURED || eState == MONSTER_STATE_TYPE::KNOCK_OUT ||
-		eState == MONSTER_STATE_TYPE::KNOCK_BACK_DEATH)
+		eState == MONSTER_STATE_TYPE::KNOCK_BACK_DEATH || eState == MONSTER_STATE_TYPE::FLATTEN)
 	{
 		m_fAirborneTimer = 0.f;
 		return;
@@ -417,6 +423,10 @@ HRESULT CMonster::Create_Movement()
 
 HRESULT CMonster::Ready_State()
 {
+	// 공통 FLATTEN 상태
+	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::FLATTEN, CMonster_State_Flatten::Create())))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -604,6 +614,27 @@ void CMonster::Open_BodyCheckBlock()
 	m_fBodyCheckOffTime = s_fBodyCheckOffDuration;
 }
 
+void CMonster::Update_SpatPivot_FromBone()
+{
+	auto it = m_PartObjects.find(L"Body");
+	if (it == m_PartObjects.end())
+		return;
+
+	CMonsterPart* pBody =
+		dynamic_cast<CMonsterPart*>(it->second);
+	if (nullptr == pBody)
+		return;
+
+	const _float4x4* pBone =
+		pBody->Get_BoneMatrixPtr("CenterL");
+	if (nullptr == pBone)
+		pBone = pBody->Get_BoneMatrixPtr("RotL");
+
+	if (pBone)
+		m_vSpatPivot = _float3(
+			pBone->_41, pBone->_42, pBone->_43);
+}
+
 void CMonster::Play_ActionLoopSFX(const _tchar* pKey)
 {
 	m_ActionLoopSnd.Stop();
@@ -651,6 +682,9 @@ void CMonster::On_SpatBegin()
 	
 	Enable_Controller(false);
 	Enable_Colliders(false);
+
+	Update_SpatPivot_FromBone();
+
 	Change_State(MONSTER_STATE_TYPE::SPAT);
 }
 

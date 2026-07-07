@@ -31,6 +31,7 @@ private:
 protected:
 	virtual HRESULT				Initialize_Prototype() override;
 	virtual HRESULT				Initialize(void* pArg) override;
+	virtual void				Update(_float fTimeDelta) override;
 
 public:
 	virtual void				Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override
@@ -44,6 +45,10 @@ public:
 	virtual _bool				Get_HurtBoxDesc(CAPSULE_DESC& Out) const override;
 
 	virtual CAnimator*			Get_BodyAnimator() const override;
+	virtual _bool				Can_BeInhaled(const INHALE_QUERY& q) const override;
+	virtual void				On_Swallowed() override;
+	virtual void				On_SpatBegin() override;
+	virtual void				On_SpatEnd() override;
 
 public:
 	CCappy_Body*				Get_Body() { return m_pBody; }
@@ -60,12 +65,16 @@ private:
 	virtual HRESULT				Ready_PartObjects() override;
 
 	virtual void				On_Deserialized() override;
+	void						Sync_PartFlags();
 
-	virtual void				On_Swallowed() override;
+	_bool						Hat_Out() const;
+	void						Check_HatlessReflex();
 
 private:
 	CCappy_Body*				m_pBody = { nullptr };
 	CCappy_Hat*					m_pHat = { nullptr };
+
+	_bool						m_bDeferFinal = { false };
 
 public:
 	static CCappy*				Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

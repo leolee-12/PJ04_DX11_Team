@@ -7,6 +7,10 @@ Texture2D g_DiffuseTexture;
 Texture2D g_NormalTexture;
 Texture2D g_UnknownTexture;
 Texture2D g_BodyMaskTexture;
+Texture2D g_FuseMaskTexture;
+Texture2D g_FuseBurntTexture;
+float   g_fBurnRatio;
+float3   g_vGlow;
 
 Texture2D g_MRATexture;
 
@@ -163,7 +167,7 @@ PS_OUT PS_BODY(PS_IN In)
     Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(vMRA, g_iMaterialID / 255.f);
-    Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb + g_vGlow, 1.f);
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
 
     return Out;
@@ -173,7 +177,15 @@ PS_OUT PS_FUSE(PS_IN In)
 {
     PS_OUT Out;
 
+    //float fBurn = 1.f - g_FuseBurntTexture.Sample(ClampSampler, In.vTexcoord).r;
+    float fBurn = In.vTexcoord.y;
+    
+    clip(fBurn - g_fBurnRatio); // Åº ºÎºÐ Á¦°Å
+    
     float3 vAlbedo = g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord).rgb;
+    
+    float fChar = smoothstep(g_fBurnRatio, g_fBurnRatio + 0.15f, fBurn);
+    vAlbedo *= lerp(0.2f, 1.f, fChar);
     
     float3 vMRA = g_MRATexture.Sample(ClampSampler, In.vTexcoord).rgb;
     
@@ -188,11 +200,16 @@ PS_OUT PS_FUSE(PS_IN In)
     
     float3 Nw = mul(nTS, TBN);
    
+    float fEmber = 1.f - smoothstep(g_fBurnRatio, g_fBurnRatio + 0.05f, fBurn);
+    
     Out.vDiffuse = float4(vAlbedo, 1.f);
     Out.vNormal = float4(Nw * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(0.f, 1.f, 1.f, g_iMaterialID / 255.f);
-    Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
+    
+    Out.vEmissive = float4(g_vEmissiveColor.rgb + float3(1.f, 0.35f, 0.05f) * fEmber, 1.f);
+    //Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
+    
     Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
 
     return Out;

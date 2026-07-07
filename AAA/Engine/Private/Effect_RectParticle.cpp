@@ -135,6 +135,10 @@ HRESULT CEffect_RectParticle::Bind_ShaderValue()
 	if (FAILED(__super::Bind_ShaderValue()))
 		return E_FAIL;
 
+	_float fRoll = 0.f;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fRoll", &fRoll, sizeof(fRoll))))
+		return E_FAIL;
+
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_bBillboard", &m_bBillboard, sizeof(m_bBillboard))))
 		return E_FAIL;
 

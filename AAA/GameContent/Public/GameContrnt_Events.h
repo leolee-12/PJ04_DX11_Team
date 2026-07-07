@@ -36,7 +36,6 @@ namespace Client
         inline constexpr const _tchar* Cutscene_CameraChange = L"Cutscene.CameraChange";
         inline constexpr const _tchar* Cutscene_StageClear = L"Cutscene.StageClear";
 
-
         // QTE
         inline constexpr const _tchar* QTE_Success = L"QTE.Success";
 
@@ -54,6 +53,9 @@ namespace Client
         // 포인터 질의
         inline constexpr const _tchar* Query_Player = L"Query_Player";
         inline constexpr const _tchar* Query_Boss = L"Query_Boss";
+
+        // 사운드 
+        inline constexpr const _tchar* BGMChange = L"ChangeBGM";
     }
 
 

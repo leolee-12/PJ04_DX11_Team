@@ -302,6 +302,7 @@ void CEffect_NonParticle::Update_Rot(const _float fTimeDelta, const _float fRati
     else
         vAxis = XMVector3Normalize(vAxis);
 
+    m_fRoll = XMConvertToRadians(m_vBaseRotationDegree.z + fAnimDegree);
     _float3 vScale = m_pTransformCom->Get_Scaled();
 
     _matrix matBaseRot = XMMatrixRotationRollPitchYaw(

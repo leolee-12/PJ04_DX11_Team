@@ -182,6 +182,7 @@ protected:
 	void						Play_DeathFX();
 	void						Compute_SpatPivot();
 	void                        Open_BodyCheckBlock();
+	void						Update_SpatPivot_FromBone();
 
 protected:
 	template<class TPart>

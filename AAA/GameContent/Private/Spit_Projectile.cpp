@@ -2,6 +2,7 @@
 #include "GameInstance.h"
 #include "Inhalable.h"
 #include "GameContent_const.h"
+#include "Effect_Loader.h" 
 
 CSpit_Projectile::CSpit_Projectile(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CProjectile(pDevice, pContext)
@@ -16,7 +17,7 @@ CSpit_Projectile::CSpit_Projectile(const CSpit_Projectile& Prototype)
 HRESULT CSpit_Projectile::Initialize(void* pArg)
 {
 	m_fHitRadius = 1.25f;
-
+	m_fLifeTime = 2.0f;
 	return __super::Initialize(pArg);
 }
 
@@ -50,6 +51,26 @@ void CSpit_Projectile::Fire(IInhalable* const* ppPayloads, _uint iCount, const _
 	m_fSpinDeg = 0.f;
 
 	Launch(vPos, vDir);
+
+	if (m_pSpitFx)   
+	{
+		m_pSpitFx->EffectContainer_Stop();
+		m_pSpitFx = nullptr;
+	}
+
+	const _float4* pCamLook =
+		m_pGameInstance_Proxy->Get_CamLook();
+	_float3 vFaceCam{};
+	XMStoreFloat3(&vFaceCam,
+		XMVectorNegate(XMLoadFloat4(pCamLook)));
+
+	CEffect_Loader::GetInstance()->Spawn(
+		L"SpitObject", Get_LevelIndex(),
+		_float3(0.f, 0.f, 0.f),
+		vFaceCam,
+		_float3(0.f, 0.f, 0.f),
+		m_pTransformCom->Get_WorldMatrixPtr(),
+		&m_pSpitFx);
 }
 
 void CSpit_Projectile::Update(_float fTimeDelta)
@@ -115,6 +136,13 @@ void CSpit_Projectile::Kill()
 {
 	if (!m_bAlive)
 		return;
+
+	if (m_pSpitFx)
+	{
+		m_pSpitFx->EffectContainer_StopAfterEmission();
+		m_pSpitFx = nullptr;
+	}
+
 	for (_uint i = 0; i < m_iPayloadCount; ++i)
 	{
 		if (m_Payloads[i].pInhalable)
