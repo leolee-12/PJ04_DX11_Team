@@ -64,6 +64,7 @@
     <ClInclude Include="..\Public\Common_Curve03.h" />
     <ClInclude Include="..\Public\Common_JumpSlash.h" />
     <ClInclude Include="..\Public\Common_Ring03.h" />
+    <ClInclude Include="..\public\GameContent_pch.h" />
     <ClInclude Include="..\Public\Kirby_AttackMode.h" />
     <ClInclude Include="..\Public\Kirby_CarFirstBreakWall.h" />
     <ClInclude Include="..\Public\LD_DeformCarBreakWall.h" />
@@ -366,6 +367,10 @@
     <ClCompile Include="..\Private\Common_Curve03.cpp" />
     <ClCompile Include="..\Private\Common_JumpSlash.cpp" />
     <ClCompile Include="..\Private\Common_Ring03.cpp" />
+    <ClCompile Include="..\private\GameContent_pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\Private\Kirby_AttackMode.cpp" />
     <ClCompile Include="..\Private\Kirby_CarFirstBreakWall.cpp" />
     <ClCompile Include="..\Private\LD_DeformCarBreakWall.cpp" />
@@ -715,6 +720,9 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>../Public/;../../EngineSDK/Inc/;../../EngineSDK/Inc/PhysX</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>GameContent_pch.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>GameContent_pch.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -746,6 +754,9 @@ call "UpdateLib.bat" $(Configuration)</Command>
       <AdditionalIncludeDirectories>../Public/;../../EngineSDK/Inc/;../../EngineSDK/Inc/PhysX</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>GameContent_pch.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>GameContent_pch.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
