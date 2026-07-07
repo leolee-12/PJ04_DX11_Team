@@ -100,7 +100,7 @@ HRESULT CKirby_OnOffPart::Render_Shadow()
     return S_OK;
 }
 
-void CKirby_OnOffPart::Set_LadderState(CKirby* pKirby, _bool bOn)
+void CKirby_OnOffPart::Put_OnBack(CKirby* pKirby, _bool bOn)
 {
 }
 

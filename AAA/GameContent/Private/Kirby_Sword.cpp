@@ -112,17 +112,17 @@ HRESULT CKirby_Sword::Render()
     return S_OK;
 }
 
-void CKirby_Sword::Set_LadderState(CKirby* pKirby, _bool bOn)
+void CKirby_Sword::Put_OnBack(CKirby* pKirby, _bool bOn)
 {
     if (bOn)
     {
         Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("FloaterL"));
-        m_pAnimatorCom->Play("Carry", true, true);
+        m_pAnimatorCom->Play("Carry", true, true, 0.f);
     }
     else
     {
         Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("RHaveL"));
-        m_pAnimatorCom->Play("Reset", true, true);
+        m_pAnimatorCom->Play("Reset", true, true, 0.f);
     }
 }
 

@@ -209,7 +209,7 @@ CKirby_OnOffPart* CKirby::Find_HatPart(COPY_ABILITY_TYPE eType)
     return nullptr;
 }
 
-void CKirby::Set_WeaponLadderState(_bool bOn)
+void CKirby::Put_WeaponOnBack(_bool bOn)
 {
     COPY_ABILITY_TYPE eAbilityType = m_pKirby_Ability->Get_AbilityType();
     CKirby_OnOffPart* pWeapon = Find_WeaponPart(eAbilityType);
@@ -217,7 +217,7 @@ void CKirby::Set_WeaponLadderState(_bool bOn)
     if (pWeapon == nullptr)
         return;
 
-    pWeapon->Set_LadderState(this, bOn);
+    pWeapon->Put_OnBack(this, bOn);
 }
 
 CKirby_Deform_Model* CKirby::Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType)
@@ -665,7 +665,7 @@ HRESULT CKirby::Ready_Events()
         {
             const auto* pDesc = static_cast<KIRBY_ATTACHMENT_END_DESC*>(pData);
             Clear_CutsceneGrabTarget();
-            m_pKirby_StateMachine->Request_ReleaseGrabState_StateMachine();
+            m_pKirby_StateMachine->Request_ReleaseGrabState_StateMachine(pDesc->eType);
         }
     );
 

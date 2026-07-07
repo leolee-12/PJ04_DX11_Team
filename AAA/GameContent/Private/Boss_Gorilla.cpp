@@ -288,8 +288,17 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
                     break;
                 if (phase == ANIM_EVENT_PHASE::POINT && !e.strParam.empty())
                 {
-                    wstring tag(e.strParam.begin(), e.strParam.end());
-                    m_pGameInstance_Proxy->Publish(tag, nullptr);
+                    if (StrToWstr(e.strParam) == EventTag::Kirby_AttachmentEnd)
+                    {
+                        KIRBY_ATTACHMENT_END_DESC Desc{};
+                        Desc.eType = KIRBY_ATTACHMENT_END_REASON::GORILLA_COMBAT_ESCAPE;
+                        m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentEnd, &Desc);
+                    }
+                    else
+                    {
+                        wstring tag(e.strParam.begin(), e.strParam.end());
+                        m_pGameInstance_Proxy->Publish(tag, nullptr);
+                    }
                 }
                 break;
             }

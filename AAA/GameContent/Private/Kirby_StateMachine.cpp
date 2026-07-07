@@ -88,7 +88,7 @@ void CKirby_StateMachine::Request_GrabState_StateMachine(KIRBY_ATTACHMENT_CONTEX
     m_pCurState->Request_GrabState(m_pKirby, eType);
 }
 
-void CKirby_StateMachine::Request_ReleaseGrabState_StateMachine(KIRBY_ATTACHMENT_CONTEXT eType)
+void CKirby_StateMachine::Request_ReleaseGrabState_StateMachine(KIRBY_ATTACHMENT_END_REASON eType)
 {
     m_pCurState->Request_ReleaseGrabState(m_pKirby, eType);
 }
