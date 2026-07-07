@@ -907,6 +907,9 @@
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Dodge">
       <UniqueIdentifier>{9bc4a490-a77a-4aaa-acdc-9e35f3ab0be9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Clear">
+      <UniqueIdentifier>{1bbc49fa-6136-4673-a659-2bc54e9438ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1806,6 +1809,9 @@
     <ClInclude Include="..\Public\Kirby_Dodge.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Dodge</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Clear.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Clear</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2629,6 +2635,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Dodge.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Dodge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Clear.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Clear</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
