@@ -267,6 +267,7 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClInclude Include="..\Public\RenderTarget.h" />
     <ClInclude Include="..\Public\RigIdBody.h" />
     <ClInclude Include="..\Public\Shader.h" />
+    <ClInclude Include="..\Public\ShaderCache_Utils.h" />
     <ClInclude Include="..\public\ShaderGlobal_Manager.h" />
     <ClInclude Include="..\public\Shadow_Dir.h" />
     <ClInclude Include="..\Public\Sound_Manager.h" />
@@ -398,12 +399,24 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <None Include="..\ShaderFiles\Engine_Shader_Defines.hlsli" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\ShaderFiles\Shader_Cell.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_Deferred.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_Effect_Mesh.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_Effect_VtxTex.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_PostProsess.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_VolumetricFog.hlsl" />
+    <None Include="..\ShaderFiles\Shader_Cell.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Deferred.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Effect_Mesh.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Effect_VtxTex.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_PostProsess.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_VolumetricFog.hlsl">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

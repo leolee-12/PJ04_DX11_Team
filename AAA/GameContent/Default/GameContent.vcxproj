@@ -603,27 +603,51 @@
     <ClCompile Include="..\Private\WalkSmoke.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_Bomb.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_EffectRock.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_EnvInstance.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_Gorilla.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_Kirby.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_MapEx.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_MaterialTest.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_Monster.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_Ring.hlsl">
+    <None Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Bomb.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_EffectRock.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_EnvInstance.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Gorilla.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Kirby.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_MapEx.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_MaterialTest.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Monster.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Ring.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_SkySphere.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_UI.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_SkySphere.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_UI.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Effect</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Effect</ShaderType>
-    </FxCompile>
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

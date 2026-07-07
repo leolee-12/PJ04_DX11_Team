@@ -2623,44 +2623,44 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_UI.hlsl">
-      <Filter>98. ShaderFiles\Hojun</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_MaterialTest.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_Kirby.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_SkySphere.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_EnvInstance.hlsl">
-      <Filter>98. ShaderFiles\Leo</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_MapEx.hlsl">
-      <Filter>98. ShaderFiles\Leo</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_Gorilla.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_Bomb.hlsl">
-      <Filter>98. ShaderFiles\Hojun</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_EffectRock.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_Ring.hlsl">
+    <None Include="..\ShaderFiles\Shader_Ring.hlsl">
       <Filter>98. ShaderFiles\Ring</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_Monster.hlsl">
+    </None>
+    <None Include="..\ShaderFiles\Shader_SkySphere.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
-    </FxCompile>
+    </None>
+    <None Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Monster.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_MaterialTest.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Kirby.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Gorilla.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_EffectRock.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_MapEx.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_EnvInstance.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Bomb.hlsl">
+      <Filter>98. ShaderFiles\Hojun</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_UI.hlsl">
+      <Filter>98. ShaderFiles\Hojun</Filter>
+    </None>
   </ItemGroup>
 </Project>
