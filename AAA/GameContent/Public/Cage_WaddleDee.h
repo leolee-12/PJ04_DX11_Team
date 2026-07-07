@@ -14,7 +14,7 @@ public:
     static constexpr const _tchar* MODEL_PROTO_TAG = L"Prototype_Component_Model_WaddleDee"; // 실제 모델 태그로
 
     enum class DEE_POS : _uint { FRONT, LEFT, RIGHT, END };
-    enum class STATE { CAGED, RESCUED, DONE };
+    enum class STATE { CAGED, RESCUED, DANCE, DONE };
 
     struct WADDLEDEE_DESC : public CMonsterPart::MONSTERPART_DESC
     {

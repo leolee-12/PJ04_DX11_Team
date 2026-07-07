@@ -6,15 +6,15 @@ namespace
 {
     struct DEE_CLIPS
     {
-        const _char* szCaged;     // 갇혀 있는 동안 루프
-        const _char* szRescued;   // 구출 후 춤
+        const _char* szRescueCut;   
+        const _char* szClearDance;  
     };
 
-    constexpr const _char* s_RescuedClips[ETOUI(CCage_WaddleDee::DEE_POS::END)] =
+    constexpr DEE_CLIPS s_DeeClips[ETOUI(CCage_WaddleDee::DEE_POS::END)] =
     {
-        "DeeFront_Cut1",
-        "DeeLeft_Cut1",
-        "DeeRight_Cut1",
+        { "DeeFront_Cut1", "DeeFront_ClearDanceLong" },
+        { "DeeLeft_Cut1",  "DeeLeft_ClearDanceLong"  },
+        { "DeeRight_Cut1", "DeeRight_ClearDanceLong" },
     };
 
     constexpr _float g_fDanceDuration = { 4.f };
@@ -77,8 +77,13 @@ void CCage_WaddleDee::Update(_float fTimeDelta)
 
     if (STATE::RESCUED == m_eState && m_pAnimatorCom->Is_Finished())
     {
+        m_eState = STATE::DANCE;
+        m_pAnimatorCom->Play(s_DeeClips[ETOUI(m_ePos)].szClearDance, false, true, 0.f, 1.5f);
+    }
+
+    if (STATE::DANCE == m_eState && m_pAnimatorCom->Is_Finished())
+    {
         m_eState = STATE::DONE;
-        Set_Active(false);
     }
 }
 
@@ -150,7 +155,7 @@ void CCage_WaddleDee::Rescue()
     m_pTransformCom->Set_WorldMatrix(XMMatrixIdentity());
 
     m_eState = STATE::RESCUED;
-    m_pAnimatorCom->Play(s_RescuedClips[ETOUI(m_ePos)], false, true);
+    m_pAnimatorCom->Play(s_DeeClips[ETOUI(m_ePos)].szRescueCut, false, true, 0.f, 1.5f);
 }
 
 HRESULT CCage_WaddleDee::Ready_Components()

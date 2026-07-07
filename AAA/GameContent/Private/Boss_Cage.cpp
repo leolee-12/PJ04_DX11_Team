@@ -79,12 +79,24 @@ void CBoss_Cage::Update(_float fTimeDelta)
 
         case CAGE_STATE::BREAKING:
             if (m_pBody->Get_Animator()->Is_Finished())
+            {
+                m_pBody->Set_Active(false);
+                Fire_CutsceneCamera(L"ClearDanceLong_Camera", Get_DeeAnimator());
                 m_eState = CAGE_STATE::BROKEN;
+            }
             break;
 
         case CAGE_STATE::BROKEN:
-            if (Is_RescueDone())
-                Set_Active(false);
+            // 임시로 박음 나중에 ClearUI로 옮기삼
+            if (!m_bHeadTurnFired)
+            {
+                CAnimator* pDeeAnim = Get_DeeAnimator();
+                if (pDeeAnim && pDeeAnim->Is_Finished())
+                {
+                    m_bHeadTurnFired = true;
+                    Fire_CutsceneCamera(L"Cut4_Camera", nullptr);
+                }
+            }
             break;
     }
 }
@@ -180,6 +192,26 @@ HRESULT CBoss_Cage::Ready_BreakTrigger()
     return S_OK;
 }
 
+void CBoss_Cage::Fire_CutsceneCamera(const _tchar* szTrack, CAnimator* pProgress)
+{
+    CUTSCENE_CAMERA_DESC cam{};
+    cam.eCam = ECutsceneCam::Cutscene;
+    cam.szTrack = szTrack;
+    cam.pProgress = pProgress;                                  
+    cam.pAnchorWorld = m_pTransformCom->Get_WorldMatrixPtr();   
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+}
+
+CAnimator* CBoss_Cage::Get_DeeAnimator() const
+{
+    for (auto pDee : m_WaddleDees)
+    {
+        if (pDee)
+            return pDee->Get_Animator();
+    }
+    return nullptr;
+}
+
 void CBoss_Cage::Rescue_WaddleDees()
 {
     for (auto pDee : m_WaddleDees)
@@ -228,9 +260,10 @@ void CBoss_Cage::Break()
 
     m_pBreakTrigger->Set_Enabled(false);                    
 
-    m_pBody->Get_Animator()->Play("Cut1", false, true);     
+    m_pBody->Get_Animator()->Play("Cut1", false, true, 0.f, 1.5f);     
     Rescue_WaddleDees();                                    
     m_eState = CAGE_STATE::BREAKING;
+    Fire_CutsceneCamera(L"Cut1Rescue_Camera", m_pBody->Get_Animator());
 }
 
 void CBoss_Cage::Attach_To_Bone(const _float4x4* pBoneMatrix, const _float4x4* pOwnerWorld, _fmatrix OffsetMatrix)

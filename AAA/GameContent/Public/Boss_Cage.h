@@ -61,6 +61,8 @@ public:
 private:
     HRESULT Ready_PartObjects();
     HRESULT Ready_BreakTrigger();
+    void Fire_CutsceneCamera(const _tchar* szTrack, CAnimator* pProgress);
+    CAnimator* Get_DeeAnimator() const;
 
 private:
     const _float4x4* m_pAttachBone = { nullptr };
@@ -75,6 +77,8 @@ private:
     _bool      m_bAnimPrimed = { false };           // 본 1프레임 갱신 후 Pause 완료 여부
     _float     m_fFloatHeight = { 0.f };
     _float     m_fDescendSpeed = { 3.f };
+
+    _bool      m_bHeadTurnFired = { false };
 
 
 public:

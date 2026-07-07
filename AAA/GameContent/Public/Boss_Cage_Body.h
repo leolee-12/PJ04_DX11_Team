@@ -38,10 +38,12 @@ public:
 
 private:
     _bool m_bRenderBird = { false };
+    _bool m_bRender = { true };
 
 private:
     virtual HRESULT             Ready_Components() override;
     virtual HRESULT             Bind_ShaderResources() override;
+    void                        Ready_AnimEvent();
 
 public:
     static CBoss_Cage_Body* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

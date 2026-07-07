@@ -74,6 +74,7 @@ _bool CCamera_Cutscene::Play_Track(const _tchar* szTrack, CAnimator* pProgress, 
         it = m_Tracks.emplace(name, move(t)).first;
     }
     m_pCur = &it->second; m_pProgress = pProgress; m_pAnchor = pAnchorWorld;
+    m_fLocalTime = 0.f;
     m_fTrauma = 0.f; 
     m_fRumble = 0.f;
     Apply_Pose(); 
@@ -85,6 +86,10 @@ void CCamera_Cutscene::Priority_Update(_float fTimeDelta)
 {
     if (!m_bActive) return;
     Tick_Shake(fTimeDelta);
+
+    if (m_pCur && nullptr == m_pProgress)
+        m_fLocalTime += fTimeDelta;
+
     Apply_Pose();
     __super::Priority_Update(fTimeDelta);
 }
@@ -96,10 +101,18 @@ HRESULT CCamera_Cutscene::Ready_Events()
 
 void CCamera_Cutscene::Apply_Pose()
 {
-    if (!m_pCur || !m_pProgress || !m_pAnchor)
+    if (!m_pCur || !m_pAnchor)
         return;
 
-    _float prog = m_pProgress->Get_Progress();
+    _float prog;
+    if (m_pProgress)
+        prog = m_pProgress->Get_Progress();
+    else
+    {
+        const _float fDuration = m_pCur->frameCount / 60.f;
+        prog = (fDuration > 0.f) ? min(1.f, m_fLocalTime / fDuration) : 1.f;
+    }
+
     _float3 eyeL, atL;
     _float fovL = m_pCur->fovY;
     m_pCur->Sample(prog, eyeL, atL, fovL);
