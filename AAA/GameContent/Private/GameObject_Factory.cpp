@@ -136,6 +136,8 @@
 #include "CutsceneGorilla.h"
 #include "GorillaNamePlate.h"
 #include "Boss_Gorilla_RockHole.h"
+#include "Boss_Cage.h"
+#include "Boss_Cage_Body.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
@@ -1010,6 +1012,12 @@ void CGameObject_Factory::Register_MainBoss()
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Gorilla_RockHole::PROTOTYPE_TAG,
                 CBoss_Gorilla_RockHole::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Cage_Body::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Gimmick/CaptiveCage/CageL/CageL_Anim_TopL.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Cage_Body::PROTOTYPE_TAG, CBoss_Cage_Body::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Cage::PROTOTYPE_TAG, CBoss_Cage::Create(pDevice, pContext));
         )
     );
 

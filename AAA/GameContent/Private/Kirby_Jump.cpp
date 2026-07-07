@@ -28,13 +28,16 @@ KIRBY_STATE_TYPE CKirby_Jump::Get_StateType()
     return KIRBY_STATE_TYPE::JUMP;
 }
 
-void CKirby_Jump::Enter(CKirby* pKirby)
+void CKirby_Jump::Enter(CKirby* pKirby, _int iFlag)
 {
-    __super::Enter(pKirby);
+    __super::Enter(pKirby, iFlag);
 
     // Movement Jump
     CMovement_Child* pMovementCom = pKirby->Get_Movement();
-    pMovementCom->Try_Jump();
+    if (iFlag == JUMP_STATE_FLAG::FORCE_JUMP)
+        pMovementCom->Force_Jump();
+    else
+        pMovementCom->Try_Jump();
 
      // Ani
     if (pKirby->Has_Deform())
@@ -171,23 +174,14 @@ _bool CKirby_Jump::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             if (!pCommand->IsPress())
                 return false;
 
-            if (Try_Transition_Ladder_CommandUp(pKirby))
+            if (pKirby->Get_Movement()->Get_VerticalVelocity() <= 0.f &&
+                Try_Transition_Ladder_CommandUp(pKirby))
                 return true;
 
             Handle_MoveCommand(pKirby, pCommand);
             return true;
         }
         case KIRBY_COMMAND_TYPE::MOVE_DOWN:
-        {
-            if (!pCommand->IsPress())
-                return false;
-
-            if (Try_Transition_Ladder_CommandDown(pKirby))
-                return true;
-
-            Handle_MoveCommand(pKirby, pCommand);
-            return true;
-        }
         case KIRBY_COMMAND_TYPE::MOVE_LEFT:
         case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
         {

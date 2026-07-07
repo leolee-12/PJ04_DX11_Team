@@ -25,9 +25,9 @@ KIRBY_STATE_TYPE CKirby_Guard::Get_StateType()
     return KIRBY_STATE_TYPE::GUARD;
 }
 
-void CKirby_Guard::Enter(CKirby* pKirby)
+void CKirby_Guard::Enter(CKirby* pKirby, _int iFlag)
 {
-    __super::Enter(pKirby);
+    __super::Enter(pKirby, iFlag);
 
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
     pAbility->Clear_Overlay(pKirby, 1, 0.1f);

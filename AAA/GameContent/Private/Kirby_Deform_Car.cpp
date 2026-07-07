@@ -19,6 +19,8 @@ HRESULT CKirby_Deform_Car::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
+    m_wstrAttackModeName = L"자동차 머금기";
+
     Set_FullBodyAni(DEFORM_ANI::WAIT, "Idling", true, false, 0.1f, 1.5f);
     Set_FullBodyAni(DEFORM_ANI::RUN, "Moving", true, false, 0.1f, 1.5f);
 
@@ -54,7 +56,7 @@ void CKirby_Deform_Car::Exit_Deform(CKirby* pKirby)
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
 }
 
-void CKirby_Deform_Car::Enter_AttackState(CKirby* pKirby)
+void CKirby_Deform_Car::Enter_AttackState(CKirby* pKirby, _int iFlag)
 {
     m_fAccBoostTime = m_fMaxBoostTime;
     m_bReqEndAttackState = false;

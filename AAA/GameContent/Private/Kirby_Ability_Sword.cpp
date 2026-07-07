@@ -20,6 +20,8 @@ HRESULT CKirby_Ability_Sword::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
+    m_wstrAttackModeName = L"½º¿öµå";
+
     Set_OverlayAni(ABILITY_ANI::WAIT, "Wait", "Sword_HaveSwordWait", "R_ShoulderJ",
         true, false, 1.8f, 0.1f,
         true, false, 1.8f, 1.f, 0.1f, 0.1f);
@@ -80,7 +82,7 @@ COPY_ABILITY_TYPE CKirby_Ability_Sword::Get_AbilityType()
     return COPY_ABILITY_TYPE::SWORD;
 }
 
-void CKirby_Ability_Sword::Enter_AttackState(CKirby* pKirby)
+void CKirby_Ability_Sword::Enter_AttackState(CKirby* pKirby, _int iFlag)
 {
     SWORD_STATE eStartState = m_eSwordState;
 

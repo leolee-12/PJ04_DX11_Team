@@ -23,9 +23,9 @@ KIRBY_STATE_TYPE CKirby_AbilityDump::Get_StateType()
     return KIRBY_STATE_TYPE::ABILITY_DUMP;
 }
 
-void CKirby_AbilityDump::Enter(CKirby* pKirby)
+void CKirby_AbilityDump::Enter(CKirby* pKirby, _int iFlag)
 {
-    __super::Enter(pKirby);
+    __super::Enter(pKirby, iFlag);
 
     // Ani
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
@@ -34,6 +34,10 @@ void CKirby_AbilityDump::Enter(CKirby* pKirby)
 
     m_bPartsOff = false;
     m_bCloseEye = false;
+
+    KIRBY_NAME_UPDATED tNameDesc{};
+    tNameDesc.strAtkModeName = L"Ä¿ºñ";
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_Name_Updated, &tNameDesc);
 }
 
 void CKirby_AbilityDump::Update(CKirby* pKirby, const _float fTimeDelta)

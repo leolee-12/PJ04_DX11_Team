@@ -4,6 +4,9 @@
 
 #include "Damageable.h"
 
+#include "Kirby.h"
+#include "Kirby_Body.h"
+
 CKirby_Sword::CKirby_Sword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CKirby_OnOffPart(pDevice, pContext)
 {
@@ -107,6 +110,20 @@ HRESULT CKirby_Sword::Render()
     }
 
     return S_OK;
+}
+
+void CKirby_Sword::Set_LadderState(CKirby* pKirby, _bool bOn)
+{
+    if (bOn)
+    {
+        Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("FloaterL"));
+        m_pAnimatorCom->Play("Carry", true, true);
+    }
+    else
+    {
+        Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("RHaveL"));
+        m_pAnimatorCom->Play("Reset", true, true);
+    }
 }
 
 void CKirby_Sword::Set_HitBox(_bool bOn)

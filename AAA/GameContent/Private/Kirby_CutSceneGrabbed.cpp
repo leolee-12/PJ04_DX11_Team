@@ -25,9 +25,9 @@ KIRBY_STATE_TYPE CKirby_CutSceneGrabbed::Get_StateType()
     return KIRBY_STATE_TYPE::CUTSCENE_GRABBED;
 }
 
-void CKirby_CutSceneGrabbed::Enter(CKirby* pKirby)
+void CKirby_CutSceneGrabbed::Enter(CKirby* pKirby, _int iFlag)
 {
-    __super::Enter(pKirby);
+    __super::Enter(pKirby, iFlag);
 
     // Ani
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();

@@ -24,6 +24,8 @@ HRESULT CKirby_Ability_Normal::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
+    m_wstrAttackModeName = L"Ä¿ºñ";
+
     m_fMaxSuperInhaleTime = 1.f;
 
     m_vInhaleEffectStartPos = { 0.f, 0.63f, 0.6f };
@@ -37,7 +39,7 @@ COPY_ABILITY_TYPE CKirby_Ability_Normal::Get_AbilityType()
     return COPY_ABILITY_TYPE::NORMAL;
 }
 
-void CKirby_Ability_Normal::Enter_AttackState(CKirby* pKirby)
+void CKirby_Ability_Normal::Enter_AttackState(CKirby* pKirby, _int iFlag)
 {
     m_eInhaleState = INHALE_STATE::NORMAL_EXIT;
 

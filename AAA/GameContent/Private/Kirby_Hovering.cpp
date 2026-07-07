@@ -25,9 +25,9 @@ KIRBY_STATE_TYPE CKirby_Hovering::Get_StateType()
     return KIRBY_STATE_TYPE::HOVERING;
 }
 
-void CKirby_Hovering::Enter(CKirby* pKirby)
+void CKirby_Hovering::Enter(CKirby* pKirby, _int iFlag)
 {
-    __super::Enter(pKirby);
+    __super::Enter(pKirby, iFlag);
 
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
     pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::FLIGHT_START);

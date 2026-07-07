@@ -30,9 +30,9 @@ KIRBY_STATE_TYPE CKirby_GetDeform::Get_StateType()
     return KIRBY_STATE_TYPE::GET_DEFORM;
 }
 
-void CKirby_GetDeform::Enter(CKirby* pKirby)
+void CKirby_GetDeform::Enter(CKirby* pKirby, _int iFlag)
 {
-    __super::Enter(pKirby);
+    __super::Enter(pKirby, iFlag);
 
     // 받아와서
     m_eDeformType = DEFORM_TYPE::CAR;
@@ -135,6 +135,10 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
 
             pKirby->Change_HatSocketMatrix(pKirby->Get_KirbyAbility()->Get_AbilityType(),
                 pDeformModel_Demo->Get_HatBoneMatirx());
+
+            KIRBY_NAME_UPDATED tNameDesc{};
+            tNameDesc.strAtkModeName = pKirby->Get_ActiveAttackMode()->Get_AttackModeName();
+            m_pGameInstance_Proxy->Publish(EventTag::Kirby_Name_Updated, &tNameDesc);
 
             break;
         }

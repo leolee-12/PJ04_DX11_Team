@@ -40,7 +40,7 @@ protected:
 	HRESULT Initialize();
 
 public:
-	virtual void Enter_AttackState(CKirby* pKirby) = 0;
+	virtual void Enter_AttackState(CKirby* pKirby, _int iFlag) = 0;
 	virtual void Update_AttackState(CKirby* pKirby, _float fTimeDelta) = 0;
 	virtual void Exit_AttackState(CKirby* pKirby) = 0;
 
@@ -62,12 +62,16 @@ public:
 
 	void Effect_Stop(CEffect_Container*& pContainer1);
 
+	const _wstring& Get_AttackModeName() { return m_wstrAttackModeName; }
+
 protected:
 	CGameInstance_Proxy* m_pGameInstance_Proxy{};
 
 	_bool m_bReqEndAttackState{ true };
 
 	vector<KIRBY_TYPE_ANI_DESC> m_AniInfos;
+
+	_wstring m_wstrAttackModeName = L"NULL";
 
 protected:
 	virtual void Free() override;

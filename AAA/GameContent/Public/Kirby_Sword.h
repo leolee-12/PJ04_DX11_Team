@@ -8,6 +8,8 @@ NS_END
 
 NS_BEGIN(Client)
 
+class CKirby;
+
 class CKirby_Sword final : public CKirby_OnOffPart
 {
 	GENERATED_BODY(CKirby_Sword)
@@ -33,6 +35,9 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
+
+public:
+	virtual void Set_LadderState(CKirby* pKirby, _bool bOn) override;
 
 public:
 	//À±¼®Çö Ãß°¡

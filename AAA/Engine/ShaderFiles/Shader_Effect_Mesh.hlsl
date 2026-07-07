@@ -6,6 +6,9 @@
 
 float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
+float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
+uint g_iMaterialID = 0;
+
 Texture2D g_DiffuseTexture;
 bool g_bUseDiffuseTexture = { false };
 float2 g_vDiffuseTiling = { 1.f, 1.f };
@@ -140,6 +143,9 @@ struct PS_GBUFFER_OUT
     float4 vNormal : SV_TARGET1;
     float4 vDepth : SV_TARGET2;
     float4 vMRA : SV_TARGET3;
+    float4 vEmissive : SV_TARGET4;
+    float4 vGeoNormal : SV_TARGET5;
+    uint   vMaterialID : SV_TARGET6;
 };
 
 void Apply_CircleUVAnim(float2 vTexcoord, bool bUse, float fRatio, float fStartDegree, bool bClockwise)
@@ -335,6 +341,9 @@ PS_GBUFFER_OUT PS_GBUFFER(PS_IN In)
     Out.vNormal = float4(vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(g_vEffectMRA, 1.f);
+    Out.vMaterialID = g_iMaterialID;
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vColor.a, 1.f);
+    Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
 
     return Out;
 }

@@ -25,9 +25,9 @@ KIRBY_STATE_TYPE CKirby_GetAbility::Get_StateType()
     return KIRBY_STATE_TYPE::GET_ABILITY;
 }
 
-void CKirby_GetAbility::Enter(CKirby* pKirby)
+void CKirby_GetAbility::Enter(CKirby* pKirby, _int iFlag)
 {
-    __super::Enter(pKirby);
+    __super::Enter(pKirby, iFlag);
 
     // Ani
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
@@ -42,6 +42,10 @@ void CKirby_GetAbility::Enter(CKirby* pKirby)
     tDesc.bBegin = true;
     m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &tDesc);
     m_pGameInstance_Proxy->Set_TimeScale(0.f);
+
+    KIRBY_NAME_UPDATED tNameDesc{};
+    tNameDesc.strAtkModeName = pKirby->Get_ActiveAttackMode()->Get_AttackModeName();
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_Name_Updated, &tNameDesc);
 }
 
 void CKirby_GetAbility::Update(CKirby* pKirby, const _float fTimeDelta)

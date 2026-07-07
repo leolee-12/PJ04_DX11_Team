@@ -23,7 +23,7 @@ HRESULT CKirby_State::Initialize()
     return S_OK;
 }
 
-void CKirby_State::Enter(CKirby* pKirby)
+void CKirby_State::Enter(CKirby* pKirby, _int iFlag)
 {
 }
 

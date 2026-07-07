@@ -25,7 +25,7 @@ public:
 	virtual KIRBY_STATE_TYPE Get_StateType() override;
 
 public:
-	virtual void Enter(CKirby* pKirby) override;
+	virtual void Enter(CKirby* pKirby, _int iFlag) override;
 	virtual void Update(CKirby* pKirby, const _float fTimeDelta) override;
 	virtual void Exit(CKirby* pKirby) override;
 

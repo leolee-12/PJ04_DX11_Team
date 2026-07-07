@@ -70,7 +70,7 @@ public:
 		return dynamic_cast<T*>(iter->second);
 	}
 
-	void Set_Active(_bool bActive) { m_bActive = bActive; }
+	virtual void Set_Active(_bool bActive) { m_bActive = bActive; }
 	_bool Is_Active() const { return m_bActive; }
 
 public:
