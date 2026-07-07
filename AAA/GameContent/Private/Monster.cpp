@@ -670,7 +670,7 @@ void CMonster::Enable_Colliders(_bool bEnable)
 void CMonster::On_Swallowed()
 {
 	SWALLOW_EVENT payload{ this };
-	m_pGameInstance_Proxy->Publish(EVT_SWALLOWED, &payload);
+	m_pGameInstance_Proxy->Publish(EventTag::Swallowed, &payload);
 	m_pCaptor = nullptr;
 	Set_Active(false);
 }

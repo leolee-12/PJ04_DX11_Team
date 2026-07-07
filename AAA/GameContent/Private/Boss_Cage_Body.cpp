@@ -26,8 +26,10 @@ HRESULT CBoss_Cage_Body::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
+    Ready_AnimEvent();
+
     m_pAnimatorCom->Play("Wait", true, true);
-    m_pAnimatorCom->Pause();
+    //m_pAnimatorCom->Pause();
 
     return S_OK;
 }
@@ -45,8 +47,23 @@ HRESULT CBoss_Cage_Body::Bind_ShaderResources()
     return S_OK;
 }
 
+void CBoss_Cage_Body::Ready_AnimEvent()
+{
+    m_pAnimatorCom->Set_EventCallback([this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase)
+        {
+            if (e.iEventType == ETOI(EANIM_EVENT::OnOffMesh))
+            {
+                m_bRender = false;
+            }
+        }
+    );
+}
+
 HRESULT CBoss_Cage_Body::Render()
 {
+    if (!m_bRender)
+        return S_OK;
+
     if (FAILED(Bind_ShaderResources()))
         return E_FAIL;
 
@@ -55,7 +72,7 @@ HRESULT CBoss_Cage_Body::Render()
 
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
-        if (i == 0)
+        if (i == 0 && !m_bRenderBird)
             continue;
 
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
@@ -71,7 +88,7 @@ HRESULT CBoss_Cage_Body::Render()
             if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
                 return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Begin(0)))
+        if (FAILED(m_pShaderCom->Begin(9)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Render(i)))
@@ -87,6 +104,7 @@ HRESULT CBoss_Cage_Body::Ready_Components()
     t.tShader = Shader_AnimMesh_PBR;
     t.szModelProtoTag = MODEL_PROTO_TAG;
     t.bAnimated = true;
+    t.szAnimEventFile = L"../../Resources/YSH/Gimmick/CaptiveCage/CageL/CageL_Anim_TopL_AnimEvents.json";
 
     if (FAILED(Ready_MeshPart(t)))
         return E_FAIL;

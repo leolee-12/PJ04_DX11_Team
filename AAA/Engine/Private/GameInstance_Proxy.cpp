@@ -12,6 +12,7 @@
 #include "Camera_Manager.h"
 #include "PhysX_Manager.h"
 #include "Font_Manager.h"
+#include "Object_Manager.h"
 
 using namespace physx;
 
@@ -232,6 +233,14 @@ HRESULT CGameInstance_Proxy::Add_GameObject_Return(CGameObject** ppOut, _uint iP
 		return E_FAIL;
 
 	return m_pOwner->Add_GameObject_Return(ppOut, iPrototypeLevelIndex, strPrototypeTag, iLayerLevelIndex, strLayerTag, strObjectTag, pArg);
+}
+
+HRESULT CGameInstance_Proxy::Add_GameObject_Instance(CGameObject* pGameObject, _uint iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strObjectTag)
+{
+	if (!IsConnected())
+		return E_FAIL;
+
+	return m_pOwner->m_pObject_Manager->Add_GameObject_Instance(pGameObject, iLayerLevelIndex, strLayerTag, strObjectTag);
 }
 
 void CGameInstance_Proxy::Clear_Objects(_int iLevelIndex)

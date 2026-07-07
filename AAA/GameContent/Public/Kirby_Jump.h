@@ -11,6 +11,8 @@ NS_BEGIN(Client)
 
 class CKirby;
 
+enum JUMP_STATE_FLAG { NONE, FORCE_JUMP };
+
 class CLIENT_DLL CKirby_Jump final : public CKirby_ControllableState
 {
 private:
@@ -26,7 +28,7 @@ public:
 	virtual KIRBY_STATE_TYPE Get_StateType() override;
 
 public:
-	virtual void Enter(CKirby* pKirby) override;
+	virtual void Enter(CKirby* pKirby, _int iFlag) override;
 	virtual void Update(CKirby* pKirby, const _float fTimeDelta) override;
 	virtual void Exit(CKirby* pKirby) override;
 

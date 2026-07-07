@@ -325,7 +325,7 @@ void CMapStage::On_Stage12CarBreakWall()
 			continue;
 
 		pSection->Set_Renderable(false);
-		pSection->Set_CollisionActorEnabled(false);
+		pSection->Set_UseCollMesh(false);
 		return;
 	}
 }

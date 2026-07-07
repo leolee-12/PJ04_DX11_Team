@@ -6,10 +6,10 @@
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
 
-#include "Kirby_Deform.h"
-
 #include "Movement_Child.h"
 #include "LevelDesign_Ladder.h"
+
+#include "Kirby_Jump.h"
 
 CKirby_Ladder::CKirby_Ladder()
 {
@@ -20,6 +20,8 @@ HRESULT CKirby_Ladder::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
+    m_iMaxDownAniCells = 2;
+
     return S_OK;
 }
 
@@ -28,12 +30,14 @@ KIRBY_STATE_TYPE CKirby_Ladder::Get_StateType()
     return KIRBY_STATE_TYPE::LADDER;
 }
 
-void CKirby_Ladder::Enter(CKirby* pKirby)
+void CKirby_Ladder::Enter(CKirby* pKirby, _int iFlag)
 {
-    __super::Enter(pKirby);
+    __super::Enter(pKirby, iFlag);
     
-    //pKirby->Get_KirbyAbility()->Clear_Overlay(pKirby);
-    //pKirby->Get_Body()->Get_Animator()->Play("LadderWait", true, false, 0.1f, 1.5f);
+    CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+    pAbility->Clear_Overlay(pKirby);
+
+    pKirby->Set_WeaponLadderState(true);
 
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Stop();
@@ -52,6 +56,11 @@ void CKirby_Ladder::Enter(CKirby* pKirby)
     if (pLadder->Try_GetCellWorld(m_iCurLadderIndex, vLadderCellPos))
     {
         pTransform->Set_State(STATE::POSITION, vLadderCellPos);
+
+        _vector vLadderPos = pLadder->Get_Transform()->Get_State(STATE::POSITION);
+        vLadderPos = XMVectorSetY(vLadderPos, XMVectorGetY(vLadderCellPos));
+        pTransform->LookAt(vLadderPos);
+
         pMovement->Sync_To_Controller();
     }
     else
@@ -62,6 +71,7 @@ void CKirby_Ladder::Enter(CKirby* pKirby)
     // 변수 초기화
     m_iCurMoveDir = 0;
     m_iPreMoveDir = 0;
+    m_iRemainDownAniCells = m_iMaxDownAniCells;
 
     m_eLadderState = LADDER_STATE::LADDER_END;
     Change_LadderState(pKirby, LADDER_STATE::WAIT);
@@ -72,7 +82,7 @@ void CKirby_Ladder::Update(CKirby* pKirby, const _float fTimeDelta)
     __super::Update(pKirby, fTimeDelta);
 
     CLevelDesign_Ladder* pLadder = pKirby->Get_Ladder();
-    if (pLadder == nullptr)
+    if (pLadder == nullptr && m_eLadderState != LADDER_TOP_JUMP)
     {
         MSG_BOX("Update Bug Point 1: CKirby_Ladder");
         Transition_Fall_OR_Wait_OR_Run(pKirby);
@@ -80,6 +90,9 @@ void CKirby_Ladder::Update(CKirby* pKirby, const _float fTimeDelta)
     }
 
     Update_LadderState(pKirby, fTimeDelta);
+
+    // 예약 x 조작감 별로
+    m_iCurMoveDir = 0;
 }
 
 void CKirby_Ladder::Exit(CKirby* pKirby)
@@ -90,6 +103,8 @@ void CKirby_Ladder::Exit(CKirby* pKirby)
     pMovement->Stop();
     pMovement->Set_UseGravity(true);
     pMovement->Set_LinearDrag(CKirby::s_fLinearDrag);
+
+    pKirby->Set_WeaponLadderState(false);
 }
 
 _bool CKirby_Ladder::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -105,8 +120,8 @@ _bool CKirby_Ladder::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
         {
             if (!pCommand->IsPress())
                 return false;
-
-            m_iCurMoveDir = 1;
+            if(m_eLadderState != LADDER_STATE::LADDER_TOP_JUMP)
+                m_iCurMoveDir = 1;
 
             return true;
         }
@@ -116,7 +131,8 @@ _bool CKirby_Ladder::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             if (!pCommand->IsPress())
                 return false;
 
-            m_iCurMoveDir = -1;
+            if (m_eLadderState != LADDER_STATE::LADDER_TOP_JUMP)
+                m_iCurMoveDir = -1;
 
             return true;
         }
@@ -126,7 +142,7 @@ _bool CKirby_Ladder::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
             if (!pCommand->IsDown())
                 return false;
 
-            pKirby->Change_State(KIRBY_STATE_TYPE::JUMP);
+            pKirby->Change_State(KIRBY_STATE_TYPE::JUMP, JUMP_STATE_FLAG::FORCE_JUMP);
             return true;
         }
     }
@@ -148,15 +164,30 @@ void CKirby_Ladder::Change_LadderState(CKirby* pKirby, LADDER_STATE eNext)
 
 void CKirby_Ladder::Enter_LadderState(CKirby* pKirby, LADDER_STATE eState)
 {
-    switch (m_eLadderState)
+    switch (eState)
     {
         case LADDER_STATE::WAIT:
         {
-
+            pKirby->Get_Body()->Get_Animator()->Play("LadderWait", true, false, 0.1f, 1.5f);
+            m_iRemainDownAniCells = m_iMaxDownAniCells;
             break;
         }
         case LADDER_STATE::MOVE:
+        {
+            Apply_LadderUp(pKirby);
             break;
+        }
+        case LADDER_STATE::LADDER_TOP_JUMP:
+        {
+            pKirby->Set_WeaponLadderState(false);
+
+            pKirby->Get_KirbyAbility()->Play_AbilityAni(pKirby, ABILITY_ANI::JUMP_END_L);
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Set_LinearDrag(CKirby::s_fLinearDrag);
+            pMovement->Force_Jump(2.5f);
+
+            break;
+        }
     }
 }
 
@@ -187,6 +218,12 @@ void CKirby_Ladder::Update_LadderState(CKirby* pKirby, _float fTimeDelta)
                 m_iCurMoveDir = 0;
             }
 
+            _bool bMoveDown = m_iNextLadderIndex < m_iCurLadderIndex;
+            if(m_bPlayAniLadderUp && bMoveDown && m_iRemainDownAniCells <= 0)
+                Apply_LadderDown(pKirby);
+            else if(!m_bPlayAniLadderUp && !bMoveDown)
+                Apply_LadderUp(pKirby);
+
             CLevelDesign_Ladder* pLadder = pKirby->Get_Ladder();
             if (m_iCurLadderIndex != m_iNextLadderIndex)
             {
@@ -207,7 +244,7 @@ void CKirby_Ladder::Update_LadderState(CKirby* pKirby, _float fTimeDelta)
                 const _float fTargetY = XMVectorGetY(vLadderNextCellPos);
 
                 const _float fRemainDistY = fabsf(fTargetY - fCurrentY);
-                const _float fPredictDistY = s_fLadderSpeed * fTimeDelta;
+                const _float fPredictDistY = m_fLadderSpeed * fTimeDelta;
 
                 _bool bWillArrive = fPredictDistY >= fRemainDistY;
 
@@ -217,6 +254,11 @@ void CKirby_Ladder::Update_LadderState(CKirby* pKirby, _float fTimeDelta)
                 {
                     pTransform->Set_State(STATE::POSITION, vLadderNextCellPos);
                     pMovement->Sync_To_Controller();
+
+                    if (bMoveDown)
+                        --m_iRemainDownAniCells;
+                    else
+                        m_iRemainDownAniCells = m_iMaxDownAniCells;
 
                     m_iCurLadderIndex = m_iNextLadderIndex;
 
@@ -237,18 +279,32 @@ void CKirby_Ladder::Update_LadderState(CKirby* pKirby, _float fTimeDelta)
 
                 _bool bMoveUp = m_iCurLadderIndex < m_iNextLadderIndex;
                 if (bMoveUp)
-                    pMovement->Set_VelocityY(s_fLadderSpeed);
+                    pMovement->Set_VelocityY(m_fLadderSpeed);
                 else
-                    pMovement->Set_VelocityY(-s_fLadderSpeed);
+                    pMovement->Set_VelocityY(-m_fLadderSpeed);
             }
             break;
+        }
+        case LADDER_STATE::LADDER_TOP_JUMP:
+        {
+            _vector vLook = pKirby->Get_Transform()->Get_State(STATE::LOOK);
+            vLook = XMVector3Normalize(XMVectorSetY(vLook, 0.f));
+
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+
+            constexpr _float fSpeed = 5.f;
+            pMovement->Set_VelocityX(XMVectorGetX(vLook) * fSpeed);
+            pMovement->Set_VelocityZ(XMVectorGetZ(vLook) * fSpeed);
+
+            if (pKirby->Get_Body()->Get_Animator()->Is_Finished())
+                Transition_Wait_OR_Run(pKirby);
         }
     }
 }
 
 void CKirby_Ladder::Exit_LadderState(CKirby* pKirby, LADDER_STATE eState)
 {
-    switch (m_eLadderState)
+    switch (eState)
     {
         case LADDER_STATE::WAIT:
             break;
@@ -270,7 +326,7 @@ _bool CKirby_Ladder::Handle_LadderTopBottom(CKirby* pKirby, CLevelDesign_Ladder*
     {
         m_iCurMoveDir = 0;
         m_iPreMoveDir = 0;
-        Transition_Fall_OR_Wait_OR_Run(pKirby);
+        Change_LadderState(pKirby, LADDER_STATE::LADDER_TOP_JUMP);
         return true;
     }
     
@@ -283,6 +339,22 @@ _bool CKirby_Ladder::Handle_LadderTopBottom(CKirby* pKirby, CLevelDesign_Ladder*
     }
 
     return false;
+}
+
+void CKirby_Ladder::Apply_LadderUp(CKirby* pKirby)
+{
+    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+    pAnimator->Play("LadderUp", true, false, 0.1f, 1.5f);
+    m_bPlayAniLadderUp = true;
+    m_fLadderSpeed = 6.f;
+}
+
+void CKirby_Ladder::Apply_LadderDown(CKirby* pKirby)
+{
+    CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+    pAnimator->Play("LadderDown", true, false, 0.1f, 1.5f);
+    m_bPlayAniLadderUp = false;
+    m_fLadderSpeed = 12.f;
 }
 
 CKirby_Ladder* CKirby_Ladder::Create()

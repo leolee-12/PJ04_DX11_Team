@@ -24,7 +24,7 @@ public:
 	virtual KIRBY_STATE_TYPE Get_StateType() override;
 
 public:
-	virtual void Enter(CKirby* pKirby) override;
+	virtual void Enter(CKirby* pKirby, _int iFlag) override;
 	virtual void Update(CKirby* pKirby, const _float fTimeDelta) override;
 	virtual void Exit(CKirby* pKirby) override;
 
@@ -34,7 +34,7 @@ public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
 
 public:
-	virtual void Request_ReleaseGrabState(CKirby* pKirby, CUTSCENE_KIRBY_TYPE eType) override;
+	virtual void Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType) override;
 
 private:
 	_bool m_bTurnStarted{};

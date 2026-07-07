@@ -266,7 +266,7 @@ HRESULT CLevelDesign_Ladder::Ready_LadderCollider()
 	CCollider::COLLIDER_DESC Desc{};
 	Desc.pOwner = this;
 	Desc.fHeight = (_float)m_tLadderDesc.iLength * m_fSegmentStepY;
-	Desc.fRadius = 0.75f;
+	Desc.fRadius = 0.5f;
 	Desc.vCenter = _float3(0.f, -0.75f, -1.f);
 
 	m_pCollider = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag, TEXT("Com_Collider"), &Desc);

@@ -205,21 +205,6 @@
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Hovering">
       <UniqueIdentifier>{7ab702f2-1ea4-4b6f-abc2-0a8e23722ed6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else">
-      <UniqueIdentifier>{81932a37-a633-4e20-b93d-c5e42826e4f4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Attack">
-      <UniqueIdentifier>{1a16a95c-467c-4517-b7e1-f705d612b308}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\AbilityDump">
-      <UniqueIdentifier>{26490427-a373-403b-bd61-8303f0dffa59}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\GetAbility">
-      <UniqueIdentifier>{ef199045-e026-474a-9ec3-100f82b3ae9a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Damaged">
-      <UniqueIdentifier>{f4dff91e-89fb-4ec2-a836-1510c556d9ab}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\06. Monster">
       <UniqueIdentifier>{c69f6e1f-9250-40fa-90bd-8d408e832ff0}</UniqueIdentifier>
     </Filter>
@@ -384,9 +369,6 @@
     </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\Visible\06. Bush">
       <UniqueIdentifier>{963a97ff-c356-4ff8-9881-d0062ea29e71}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Visible\03. EventObject">
-      <UniqueIdentifier>{cad72eff-ed18-4366-b3fe-facecee465d1}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\Invisible">
       <UniqueIdentifier>{e71e062d-1cfa-4165-bd2e-41ca3c096f4a}</UniqueIdentifier>
@@ -646,9 +628,6 @@
     <Filter Include="02. Component\01. Monster_Movement\00. Rail">
       <UniqueIdentifier>{bc260f59-12f2-4b10-855a-455fabc6411e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\GetDeform">
-      <UniqueIdentifier>{a75ad0b3-6c7f-486d-9311-5d2ca1cda8e5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01. Projectile\00. PhysicsProjectile\01. Bomb">
       <UniqueIdentifier>{a7cbb794-7713-433a-905e-5aad935b8cd9}</UniqueIdentifier>
     </Filter>
@@ -850,21 +829,6 @@
     <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\00. Deform_Car">
       <UniqueIdentifier>{b600ded8-bf65-4554-b846-776c35549114}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene">
-      <UniqueIdentifier>{a68d0ce8-8ccf-41f9-955f-022b1bc87f23}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla">
-      <UniqueIdentifier>{41e2d8cd-3ff4-4eb3-97e2-9f7d6d96c2c1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\CutSceneGrab">
-      <UniqueIdentifier>{46d69dab-00a6-49b7-ba75-db2ddb5232e3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\QTE_Grabbed">
-      <UniqueIdentifier>{b3d902fb-45c2-4c61-b777-dd904840d9a8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall">
-      <UniqueIdentifier>{3538ca96-894c-436a-9f2f-5c4bf121451d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01. Projectile\01. Kirby_Spit">
       <UniqueIdentifier>{13343d6f-6325-403c-a289-3544da5b6a8f}</UniqueIdentifier>
     </Filter>
@@ -889,6 +853,39 @@
     <Filter Include="00. GameObject\00. Camera\Shakeable\Cutscene">
       <UniqueIdentifier>{44ee9036-9fb5-42d3-a001-52dd473415a5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else">
+      <UniqueIdentifier>{81932a37-a633-4e20-b93d-c5e42826e4f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Attack">
+      <UniqueIdentifier>{1a16a95c-467c-4517-b7e1-f705d612b308}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\AbilityDump">
+      <UniqueIdentifier>{26490427-a373-403b-bd61-8303f0dffa59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\GetAbility">
+      <UniqueIdentifier>{ef199045-e026-474a-9ec3-100f82b3ae9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Damaged">
+      <UniqueIdentifier>{f4dff91e-89fb-4ec2-a836-1510c556d9ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\GetDeform">
+      <UniqueIdentifier>{a75ad0b3-6c7f-486d-9311-5d2ca1cda8e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene">
+      <UniqueIdentifier>{a68d0ce8-8ccf-41f9-955f-022b1bc87f23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla">
+      <UniqueIdentifier>{41e2d8cd-3ff4-4eb3-97e2-9f7d6d96c2c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\CutSceneGrab">
+      <UniqueIdentifier>{46d69dab-00a6-49b7-ba75-db2ddb5232e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\QTE_Grabbed">
+      <UniqueIdentifier>{b3d902fb-45c2-4c61-b777-dd904840d9a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall">
+      <UniqueIdentifier>{3538ca96-894c-436a-9f2f-5c4bf121451d}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\07. Boss\BossCage">
       <UniqueIdentifier>{e77c861a-2b81-4e49-a7e4-26ef8eb371d1}</UniqueIdentifier>
     </Filter>
@@ -897,6 +894,36 @@
     </Filter>
     <Filter Include="00. GameObject\07. Boss\BossCage\Part\Body">
       <UniqueIdentifier>{f2c53996-0fa0-4e8f-b0d8-0a2c2597db35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99. Defines\pch">
+      <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Dodge">
+      <UniqueIdentifier>{9bc4a490-a77a-4aaa-acdc-9e35f3ab0be9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\01. PopFlower">
+      <UniqueIdentifier>{8c057022-a123-4cb3-b8da-192c9d35aeda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Invisible\04. SoundArea">
+      <UniqueIdentifier>{c42bd8d2-711b-42b4-b333-090254cdb85b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\04. ArrowBoard">
+      <UniqueIdentifier>{5f8d9b4f-ea69-40d6-a6bd-0ded9461d520}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\99. EventObject">
+      <UniqueIdentifier>{cad72eff-ed18-4366-b3fe-facecee465d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2">
+      <UniqueIdentifier>{1accfe0f-f5c1-4443-96d0-fc2ebc97200d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\99. EventObject\ForBossMap1">
+      <UniqueIdentifier>{a1998211-a419-40ce-9907-dcb0b25d085a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\99. EventObject\DeformObject">
+      <UniqueIdentifier>{db4dd2aa-6b1a-46ff-9ea0-6febeafe9851}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\BossCage\Part\WaddleDee">
+      <UniqueIdentifier>{ac205231-35bf-4ba3-89a7-12ee79038e55}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\12. BombFuseEffect">
       <UniqueIdentifier>{a77db0a5-c085-47bb-ae9c-91fba3cf6b27}</UniqueIdentifier>
@@ -1263,12 +1290,6 @@
     <ClInclude Include="..\Public\Monster.h">
       <Filter>00. GameObject\06. Monster</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\LevelDesignObject.h">
-      <Filter>00. GameObject\96. LevelDesign</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\LevelDesign_Defines.h">
-      <Filter>00. GameObject\96. LevelDesign</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Breakable.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\00. Breakable</Filter>
     </ClInclude>
@@ -1474,7 +1495,7 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_EventObject.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_FallBorder.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\02. FallBorder</Filter>
@@ -1782,15 +1803,6 @@
     <ClInclude Include="..\Public\Kirby_CarFirstBreakWall.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\LD_Stage1BossDemo.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\LD_SlopeBoardA.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\LD_SlopeBoardC.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\RailTrack.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClInclude>
@@ -1800,8 +1812,14 @@
     <ClInclude Include="..\Public\Monster_State_Spat.h">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LD_DeformObject.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\DeformObject</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\LD_DeformCarBreakWall.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_PopFlower.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\01. PopFlower</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Camera_Shakeable.h">
       <Filter>00. GameObject\00. Camera\Shakeable</Filter>
@@ -1811,6 +1829,39 @@
     </ClInclude>
     <ClInclude Include="..\public\Boss_Cage.h">
       <Filter>00. GameObject\07. Boss\BossCage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GameContent_pch.h">
+      <Filter>99. Defines\pch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_AudioArea.h">
+      <Filter>00. GameObject\96. LevelDesign\Invisible\04. SoundArea</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_ArrowBoard.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\04. ArrowBoard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_SlopeBoardA.h" />
+    <ClInclude Include="..\Public\LD_SlopeBoardC.h" />
+    <ClInclude Include="..\Public\LD_Stage1BossDemo.h" />
+    <ClInclude Include="..\Public\LD_GarageRadio.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesignObject.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_SlopeBoardA.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_SlopeBoardC.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesign_Defines.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_Stage1BossDemo.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForBossMap1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Cage_WaddleDee.h">
+      <Filter>00. GameObject\07. Boss\BossCage\Part\WaddleDee</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BombFuseEffect.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\12. BombFuseEffect</Filter>
@@ -2117,9 +2168,6 @@
     <ClCompile Include="..\Private\Monster.cpp">
       <Filter>00. GameObject\06. Monster</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\LevelDesignObject.cpp">
-      <Filter>00. GameObject\96. LevelDesign</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Breakable.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\00. Breakable</Filter>
     </ClCompile>
@@ -2316,7 +2364,7 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_EventObject.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_FallBorder.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\02. FallBorder</Filter>
@@ -2621,15 +2669,6 @@
     <ClCompile Include="..\Private\Kirby_CarFirstBreakWall.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\LD_SlopeBoardA.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\LD_SlopeBoardC.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\RailTrack.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClCompile>
@@ -2639,8 +2678,14 @@
     <ClCompile Include="..\Private\Monster_State_Spat.cpp">
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\Spat</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\LD_DeformObject.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\DeformObject</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\LD_DeformCarBreakWall.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\03. EventObject</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_PopFlower.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\01. PopFlower</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Camera_Shakeable.cpp">
       <Filter>00. GameObject\00. Camera\Shakeable</Filter>
@@ -2650,6 +2695,36 @@
     </ClCompile>
     <ClCompile Include="..\private\Boss_Cage.cpp">
       <Filter>00. GameObject\07. Boss\BossCage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GameContent_pch.cpp">
+      <Filter>99. Defines\pch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_AudioArea.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Invisible\04. SoundArea</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_ArrowBoard.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\04. ArrowBoard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_SlopeBoardA.cpp" />
+    <ClCompile Include="..\Private\LD_SlopeBoardC.cpp" />
+    <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp" />
+    <ClCompile Include="..\Private\LD_GarageRadio.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_SlopeBoardC.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelDesignObject.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_SlopeBoardA.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForBossMap1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Cage_WaddleDee.cpp">
+      <Filter>00. GameObject\07. Boss\BossCage\Part\WaddleDee</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BombFuseEffect.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\12. BombFuseEffect</Filter>
@@ -2674,44 +2749,47 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_UI.hlsl">
-      <Filter>98. ShaderFiles\Hojun</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_MaterialTest.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_Kirby.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_SkySphere.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_EnvInstance.hlsl">
-      <Filter>98. ShaderFiles\Leo</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_MapEx.hlsl">
-      <Filter>98. ShaderFiles\Leo</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_Gorilla.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_Bomb.hlsl">
-      <Filter>98. ShaderFiles\Hojun</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_EffectRock.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_Ring.hlsl">
+    <None Include="..\ShaderFiles\Shader_Ring.hlsl">
       <Filter>98. ShaderFiles\Ring</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_Monster.hlsl">
+    </None>
+    <None Include="..\ShaderFiles\Shader_SkySphere.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
-    </FxCompile>
+    </None>
+    <None Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Monster.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_MaterialTest.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Kirby.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Gorilla.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_EffectRock.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_MapEx.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_EnvInstance.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Bomb.hlsl">
+      <Filter>98. ShaderFiles\Hojun</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_UI.hlsl">
+      <Filter>98. ShaderFiles\Hojun</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_WaddleDee.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
   </ItemGroup>
 </Project>

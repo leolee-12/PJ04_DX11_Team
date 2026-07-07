@@ -25,9 +25,9 @@ KIRBY_STATE_TYPE CKirby_CutSceneGrabbed::Get_StateType()
     return KIRBY_STATE_TYPE::CUTSCENE_GRABBED;
 }
 
-void CKirby_CutSceneGrabbed::Enter(CKirby* pKirby)
+void CKirby_CutSceneGrabbed::Enter(CKirby* pKirby, _int iFlag)
 {
-    __super::Enter(pKirby);
+    __super::Enter(pKirby, iFlag);
 
     // Ani
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
@@ -80,7 +80,7 @@ _bool CKirby_CutSceneGrabbed::Handle_Command(CKirby* pKirby, CKirby_Command* pCo
     return false;
 }
 
-void CKirby_CutSceneGrabbed::Request_ReleaseGrabState(CKirby* pKirby, CUTSCENE_KIRBY_TYPE eType)
+void CKirby_CutSceneGrabbed::Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType)
 {
     pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), true, true);
     Transition_Fall_OR_Wait_OR_Run(pKirby);

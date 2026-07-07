@@ -31,7 +31,7 @@ public:
 	KIRBY_STATE_TYPE Get_StateType();
 
 public:
-	void Change_State(KIRBY_STATE_TYPE eNewstate);
+	void Change_State(KIRBY_STATE_TYPE eNewstate, _int iFlag = -1);
 	void Update_StateMachine(const _float fTimeDelta);
 	void Handle_Command(CKirby_Command* pCommand);
 
@@ -39,8 +39,8 @@ public:
 	void  On_Damaged_KirbyStateMachine(const ATTACK_INFO& tInfo);
 
 public:
-	void Request_GrabState_StateMachine(CUTSCENE_KIRBY_TYPE eType);
-	void Request_ReleaseGrabState_StateMachine(CUTSCENE_KIRBY_TYPE eType = CUTSCENE_KIRBY_TYPE::_COUNT);
+	void Request_GrabState_StateMachine(KIRBY_ATTACHMENT_CONTEXT eType);
+	void Request_ReleaseGrabState_StateMachine(KIRBY_ATTACHMENT_CONTEXT eType = KIRBY_ATTACHMENT_CONTEXT::_COUNT);
 
 	_bool Ignore_TimeScale_StateMachine();
 

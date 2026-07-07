@@ -4,6 +4,9 @@
 
 #include "Damageable.h"
 
+#include "Kirby.h"
+#include "Kirby_Body.h"
+
 CKirby_Sword::CKirby_Sword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CKirby_OnOffPart(pDevice, pContext)
 {
@@ -109,6 +112,20 @@ HRESULT CKirby_Sword::Render()
     return S_OK;
 }
 
+void CKirby_Sword::Set_LadderState(CKirby* pKirby, _bool bOn)
+{
+    if (bOn)
+    {
+        Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("FloaterL"));
+        m_pAnimatorCom->Play("Carry", true, true);
+    }
+    else
+    {
+        Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("RHaveL"));
+        m_pAnimatorCom->Play("Reset", true, true);
+    }
+}
+
 void CKirby_Sword::Set_HitBox(_bool bOn)
 {
     if (m_pHitBox)
@@ -160,7 +177,7 @@ void CKirby_Sword::SetUp_HitBox_Callback()
             if (nullptr == pVictim) return;
 
             ATTACK_INFO atk{};
-            atk.fDamage = 50.f;
+            atk.fDamage = 500.f;
             atk.fKnockback = 4.f;
             atk.vAttackerPos = _float3(m_pParentMatrix->_41, m_pParentMatrix->_42, m_pParentMatrix->_43);
             atk.pAttacker = this;

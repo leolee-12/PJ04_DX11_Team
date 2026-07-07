@@ -25,9 +25,9 @@ KIRBY_STATE_TYPE CKirby_CarFirstBreakWall::Get_StateType()
     return KIRBY_STATE_TYPE::CAR_FIRST_BREAK_WALL;
 }
 
-void CKirby_CarFirstBreakWall::Enter(CKirby* pKirby)
+void CKirby_CarFirstBreakWall::Enter(CKirby* pKirby, _int iFlag)
 {
-    __super::Enter(pKirby);
+    __super::Enter(pKirby, iFlag);
 
     m_bTurnStarted = false;
 
@@ -93,7 +93,7 @@ void CKirby_CarFirstBreakWall::On_Damaged_KirbyState(CKirby* pKirby, const ATTAC
 {
 }
 
-void CKirby_CarFirstBreakWall::Request_ReleaseGrabState(CKirby* pKirby, CUTSCENE_KIRBY_TYPE eType)
+void CKirby_CarFirstBreakWall::Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType)
 {
     Transition_Fall_OR_Wait_OR_Run(pKirby);
 }

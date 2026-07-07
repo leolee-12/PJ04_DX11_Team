@@ -160,10 +160,7 @@ namespace
 		}
 
 		if (Edit.bHasCollMesh)
-		{
-			pOutDesc->bCreateCollisionActor =
-				pOutDesc->bSourceCreateCollisionActor && Edit.bUseCollMesh;
-		}
+			pOutDesc->bUseCollMesh = Edit.bUseCollMesh;
 	}
 
 	json Save_EditedDesc(const MAP_ENV_EDITED_DESC& Edit, _bool bEnvObjectEdit)

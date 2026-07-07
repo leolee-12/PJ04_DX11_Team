@@ -70,6 +70,26 @@ struct MAP_ENV_EDITED_DESC
 	_bool bUseNearDistAlpha = { false };
 };
 
+struct MAP_SECTION_EDITED_DESC
+{
+	_wstring strStableKey;
+
+	_bool bHasRenderable = { false };
+	_bool bRenderable = { true };
+
+	_bool bHasEnableCulling = { false };
+	_bool bEnableCulling = { true };
+
+	_bool bHasWorldMatrix = { false };
+	_float4x4 matWorld = {};
+
+	_bool bHasUseCollMesh = { false };
+	_bool bUseCollMesh = { false };
+
+	_bool bHasRenderID = { false };
+	RENDERID eRenderID = { RENDERID::NONBLEND };
+};
+
 struct MAP_LD_EDITED_DESC
 {
 	_wstring strStableKey;
@@ -196,6 +216,15 @@ inline _bool Has_AnyMapEnvEdit(const MAP_ENV_EDITED_DESC& Edit)
 		|| Edit.bHasWorldMatrix
 		|| Edit.bHasNearDistAlpha
 		|| Edit.bHasCollMesh;
+}
+
+inline _bool Has_AnyMapSectionEdit(const MAP_SECTION_EDITED_DESC& Edit)
+{
+	return Edit.bHasRenderable
+		|| Edit.bHasEnableCulling
+		|| Edit.bHasWorldMatrix
+		|| Edit.bHasUseCollMesh
+		|| Edit.bHasRenderID;
 }
 
 inline _bool Has_AnyMapLDEdit(const MAP_LD_EDITED_DESC& Edit)

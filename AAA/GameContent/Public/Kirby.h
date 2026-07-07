@@ -99,6 +99,8 @@ public:
 	CKirby_OnOffPart* Find_WeaponPart(COPY_ABILITY_TYPE eType);
 	CKirby_OnOffPart* Find_HatPart(COPY_ABILITY_TYPE eType);
 
+	void Set_WeaponLadderState(_bool bOn);
+
 	CKirby_Body* Get_Body() { return m_pBody; }
 	CKirby_Deform_Model* Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType = KIRBY_DEFORM_MODEL_TYPE::MAIN);
 
@@ -111,7 +113,7 @@ public:
 
 	//System
 	void Excute_Command(CKirby_Command* pCommand);
-	void Change_State(KIRBY_STATE_TYPE eNewState);
+	void Change_State(KIRBY_STATE_TYPE eNewState, _int iFlag = -1);
 
 	// Attack Mode
 	CKirby_AttackMode* Get_ActiveAttackMode();
@@ -145,7 +147,7 @@ public:
 	// Damage
 	virtual void Damaged(const ATTACK_INFO& tInfo) override;
 	void Add_HP(_float fHP);
-	void Start_DamageInvincibility() { Start_Invincibility(); }
+	void Start_DamageInvincibility();
 
 	// Ladder
 	CLevelDesign_Ladder* Get_Ladder() { return m_pLadder; }
@@ -170,12 +172,9 @@ private:
 	// Damage
 	virtual _bool Block_Hit(const ATTACK_INFO& tInfo) override;
 	virtual void  On_Damaged(const ATTACK_INFO& tInfo) override;
-	
-	// Timer
-	//void Update_Timer(_float fTimeDelta);
 
 	// CutScene Grab
-	void Set_CutsceneGrabTarget(CUTSCENE_GRAB_DESC* pGrabDesc);
+	void Set_CutsceneGrabTarget(KIRBY_ATTACHMENT_BEGIN_DESC* pGrabDesc);
 	void Clear_CutsceneGrabTarget();
 
 private:

@@ -3,6 +3,7 @@
 
 #include "GameInstance.h"
 #include "Profiler_Manager.h"
+#include "Geometry_Utils.h"
 
 NS_BEGIN(Client)
 
@@ -11,8 +12,6 @@ namespace
 	constexpr _bool		ENABLE_ENV_OBJECT_SHADOW = true;
 	constexpr _float	ENV_DISTANCE_CULL_START = 175.f;
 	constexpr _float	ENV_SHADOW_DISTANCE_CULL_START = 175.f;
-	constexpr _float	ENV_PICK_AABB_PADDING = 0.05f;
-	constexpr _float	ENV_PICK_THIN_EXTENT = 0.06f;
 
 	void Log_EnvPhysicsWarning(const string& strMessage)
 	{
@@ -35,68 +34,6 @@ namespace
 		return XMMatrixScalingFromVector(vScale)
 			* XMMatrixRotationQuaternion(vRotation)
 			* XMMatrixTranslationFromVector(vPosition);
-	}
-
-	BoundingBox Make_DefaultAABB()
-	{
-		BoundingBox Bounds{};
-		Bounds.Center = _float3(0.f, 0.f, 0.f);
-		Bounds.Extents = _float3(0.5f, 0.5f, 0.5f);
-		return Bounds;
-	}
-
-	_bool Is_FiniteFloat(_float fValue)
-	{
-		return std::isfinite(fValue);
-	}
-
-	_bool Is_ValidAABB(const _float3& vMin, const _float3& vMax)
-	{
-		return Is_FiniteFloat(vMin.x) && Is_FiniteFloat(vMin.y) && Is_FiniteFloat(vMin.z)
-			&& Is_FiniteFloat(vMax.x) && Is_FiniteFloat(vMax.y) && Is_FiniteFloat(vMax.z)
-			&& vMax.x >= vMin.x && vMax.y >= vMin.y && vMax.z >= vMin.z;
-	}
-
-	BoundingBox Make_AABB_FromMinMax(const _float3& vMin, const _float3& vMax)
-	{
-		BoundingBox Bounds{};
-		Bounds.Center = _float3(
-			(vMin.x + vMax.x) * 0.5f,
-			(vMin.y + vMax.y) * 0.5f,
-			(vMin.z + vMax.z) * 0.5f);
-		Bounds.Extents = _float3(
-			(vMax.x - vMin.x) * 0.5f,
-			(vMax.y - vMin.y) * 0.5f,
-			(vMax.z - vMin.z) * 0.5f);
-		return Bounds;
-	}
-
-	_bool Is_ThinBounds(const BoundingBox& Bounds)
-	{
-		return Bounds.Extents.x <= ENV_PICK_THIN_EXTENT
-			|| Bounds.Extents.y <= ENV_PICK_THIN_EXTENT
-			|| Bounds.Extents.z <= ENV_PICK_THIN_EXTENT;
-	}
-
-	_bool Is_ThinObjectBounds(const BoundingBox& LocalBounds, const _float3& vObjectScale)
-	{
-		BoundingBox ScaledBounds = LocalBounds;
-		ScaledBounds.Extents.x *= vObjectScale.x;
-		ScaledBounds.Extents.y *= vObjectScale.y;
-		ScaledBounds.Extents.z *= vObjectScale.z;
-
-		return Is_ThinBounds(ScaledBounds);
-	}
-
-	_float3 RayPoint(_fvector vOrigin, _fvector vDir, _float fDist)
-	{
-		_float3 vPoint = {};
-
-		const _vector vWorldPoint =
-			XMVectorAdd(vOrigin, XMVectorScale(XMVector3Normalize(vDir), fDist));
-
-		XMStoreFloat3(&vPoint, vWorldPoint);
-		return vPoint;
 	}
 }
 
@@ -169,6 +106,9 @@ HRESULT CEnvObject::Render()
 	if (!m_bRenderable)
 		return S_OK;
 
+	if (m_bUseCameraDither && m_fDissolve >= 0.999f)
+		return S_OK;
+
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -176,9 +116,6 @@ HRESULT CEnvObject::Render()
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		if (m_bUseCameraDither && m_fDissolve >= 0.999f)
-			continue;
-
 		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
 
 		MESH_LAYER_BIND_CONTEXT Ctx{};
@@ -426,10 +363,6 @@ HRESULT CEnvObject::Ready_PhysicsActor()
 	case ENV_COLLIDER_KIND::MODEL_MESH:
 		return Ready_PhysicsActor_ModelMesh();
 
-	case ENV_COLLIDER_KIND::SIMPLE_SHAPE:
-		// 다음 단계에서 Cube / Sphere / Cylinder / Slope 처리 예정.
-		return S_OK;
-
 	case ENV_COLLIDER_KIND::NONE:
 	case ENV_COLLIDER_KIND::TRIGGER_ONLY:
 	case ENV_COLLIDER_KIND::UNKNOWN:
@@ -540,9 +473,8 @@ _bool CEnvObject::Should_CreatePhysicsActor() const
 		return Collision.bHasCollMesh
 			&& !Collision.bInvalidCollision;
 
-	case ENV_COLLIDER_KIND::SIMPLE_SHAPE:
 	case ENV_COLLIDER_KIND::TRIGGER_ONLY:
-		// 단순 충돌/트리거는 기존 원본 invalid 플래그를 존중한다.
+		// 단순 충돌/트리거는 모델 메시 invalid 플래그만 확인한다.
 		return !Collision.bInvalidCollision;
 
 	case ENV_COLLIDER_KIND::NONE:
@@ -577,20 +509,20 @@ void CEnvObject::Update_LocalBounds()
 {
 	if (nullptr == m_pModelCom)
 	{
-		m_LocalBounds = Make_DefaultAABB();
+		m_LocalBounds = GeometryUtils::Make_DefaultAABB(0.5f);
 		return;
 	}
 
 	_float3 vMin{}, vMax{};
 	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
 
-	if (!Is_ValidAABB(vMin, vMax))
+	if (!GeometryUtils::Is_ValidAABB(vMin, vMax))
 	{
-		m_LocalBounds = Make_DefaultAABB();
+		m_LocalBounds = GeometryUtils::Make_DefaultAABB(0.5f);
 		return;
 	}
 
-	m_LocalBounds = Make_AABB_FromMinMax(vMin, vMax);
+	m_LocalBounds = GeometryUtils::Make_AABB_FromMinMax(vMin, vMax);
 }
 
 void CEnvObject::Refresh_WorldBounds()

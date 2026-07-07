@@ -566,6 +566,10 @@ void CMovement_Child::Move_Controller(_fvector vVelocity, _float fTimeDelta, _ve
 
     m_bGrounded = bControllerGrounded || bPermitGrounded;
 
+    // 접지일때 Y 속도 초기화
+    if (m_bGrounded && XMVectorGetY(vOutVelocity) < 0.f)
+        vOutVelocity = XMVectorSetY(vOutVelocity, 0.f);
+
     //// 천장에 머리 박았을 때 수직 속도 제거
     //if (flags.isSet(physx::PxControllerCollisionFlag::eCOLLISION_UP) && XMVectorGetY(vOutVelocity) > 0.f)
     //    vOutVelocity = XMVectorSetY(vOutVelocity, 0.f);

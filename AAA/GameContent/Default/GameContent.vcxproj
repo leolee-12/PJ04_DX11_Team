@@ -45,6 +45,7 @@
     <ClInclude Include="..\Public\BrontoBurt_State_Idle.h" />
     <ClInclude Include="..\Public\BrontoBurt_State_Return.h" />
     <ClInclude Include="..\Public\Bubble.h" />
+    <ClInclude Include="..\public\Cage_WaddleDee.h" />
     <ClInclude Include="..\public\CameraDirector.h" />
     <ClInclude Include="..\Public\Camera_AreaData.h" />
     <ClInclude Include="..\public\Camera_AreaCam.h" />
@@ -69,11 +70,17 @@
     <ClInclude Include="..\Public\Common_Curve03.h" />
     <ClInclude Include="..\Public\Common_JumpSlash.h" />
     <ClInclude Include="..\Public\Common_Ring03.h" />
+    <ClInclude Include="..\public\GameContent_pch.h" />
     <ClInclude Include="..\Public\Kirby_AttackMode.h" />
     <ClInclude Include="..\Public\Kirby_CarFirstBreakWall.h" />
+    <ClInclude Include="..\Public\LD_ArrowBoard.h" />
     <ClInclude Include="..\Public\LD_DeformCarBreakWall.h" />
+    <ClInclude Include="..\Public\LD_DeformObject.h" />
+    <ClInclude Include="..\Public\LD_GarageRadio.h" />
+    <ClInclude Include="..\Public\LD_PopFlower.h" />
     <ClInclude Include="..\Public\LD_SlopeBoardA.h" />
     <ClInclude Include="..\Public\LD_SlopeBoardC.h" />
+    <ClInclude Include="..\Public\LD_AudioArea.h" />
     <ClInclude Include="..\Public\LD_Stage1BossDemo.h" />
     <ClInclude Include="..\Public\Monster_State_Flatten.h" />
     <ClInclude Include="..\Public\Monster_State_Spat.h" />
@@ -353,6 +360,7 @@
     <ClCompile Include="..\Private\BrontoBurt_State_Idle.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_State_Return.cpp" />
     <ClCompile Include="..\Private\Bubble.cpp" />
+    <ClCompile Include="..\private\Cage_WaddleDee.cpp" />
     <ClCompile Include="..\private\CameraDirector.cpp" />
     <ClCompile Include="..\Private\Camera_AreaSolver.cpp" />
     <ClCompile Include="..\private\Camera_AreaCam.cpp" />
@@ -378,11 +386,20 @@
     <ClCompile Include="..\Private\Common_Curve03.cpp" />
     <ClCompile Include="..\Private\Common_JumpSlash.cpp" />
     <ClCompile Include="..\Private\Common_Ring03.cpp" />
+    <ClCompile Include="..\private\GameContent_pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\Private\Kirby_AttackMode.cpp" />
     <ClCompile Include="..\Private\Kirby_CarFirstBreakWall.cpp" />
+    <ClCompile Include="..\Private\LD_ArrowBoard.cpp" />
     <ClCompile Include="..\Private\LD_DeformCarBreakWall.cpp" />
+    <ClCompile Include="..\Private\LD_DeformObject.cpp" />
+    <ClCompile Include="..\Private\LD_GarageRadio.cpp" />
+    <ClCompile Include="..\Private\LD_PopFlower.cpp" />
     <ClCompile Include="..\Private\LD_SlopeBoardA.cpp" />
     <ClCompile Include="..\Private\LD_SlopeBoardC.cpp" />
+    <ClCompile Include="..\Private\LD_AudioArea.cpp" />
     <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp" />
     <ClCompile Include="..\Private\Monster_State_Flatten.cpp" />
     <ClCompile Include="..\Private\Monster_State_Spat.cpp" />
@@ -612,27 +629,56 @@
     <ClCompile Include="..\Private\WalkSmoke.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_Bomb.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_EffectRock.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_EnvInstance.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_Gorilla.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_Kirby.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_MapEx.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_MaterialTest.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_Monster.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_Ring.hlsl">
+    <None Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Bomb.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_EffectRock.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_EnvInstance.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Gorilla.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Kirby.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_MapEx.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_MaterialTest.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Monster.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_NonAnim_PBR.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Ring.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_SkySphere.hlsl" />
-    <FxCompile Include="..\ShaderFiles\Shader_UI.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_SkySphere.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_UI.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Effect</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Effect</ShaderType>
-    </FxCompile>
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ShaderFiles\Shader_WaddleDee.hlsl">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -729,6 +775,9 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>../Public/;../../EngineSDK/Inc/;../../EngineSDK/Inc/PhysX</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>GameContent_pch.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>GameContent_pch.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -760,6 +809,9 @@ call "UpdateLib.bat" $(Configuration)</Command>
       <AdditionalIncludeDirectories>../Public/;../../EngineSDK/Inc/;../../EngineSDK/Inc/PhysX</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>GameContent_pch.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>GameContent_pch.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

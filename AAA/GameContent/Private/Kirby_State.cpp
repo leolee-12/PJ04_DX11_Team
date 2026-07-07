@@ -23,7 +23,7 @@ HRESULT CKirby_State::Initialize()
     return S_OK;
 }
 
-void CKirby_State::Enter(CKirby* pKirby)
+void CKirby_State::Enter(CKirby* pKirby, _int iFlag)
 {
 }
 
@@ -144,21 +144,21 @@ _bool CKirby_State::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
     return false;
 }
 
-void CKirby_State::Request_GrabState(CKirby* pKirby, CUTSCENE_KIRBY_TYPE eType)
+void CKirby_State::Request_GrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType)
 {
     switch (eType)
     {
-        case CUTSCENE_KIRBY_TYPE::GORILLA_SCENE:
+        case KIRBY_ATTACHMENT_CONTEXT::GORILLA_SCENE:
         {
             pKirby->Change_State(KIRBY_STATE_TYPE::CUTSCENE_GRABBED);
             break;
         }
-        case CUTSCENE_KIRBY_TYPE::GORILLA_COMBAT:
+        case KIRBY_ATTACHMENT_CONTEXT::GORILLA_COMBAT:
         {
             pKirby->Change_State(KIRBY_STATE_TYPE::QTE_GRABBED);
             break;
         }
-        case CUTSCENE_KIRBY_TYPE::DEFORM_CAR_GET_FIRST:
+        case KIRBY_ATTACHMENT_CONTEXT::DEFORM_CAR_GET_FIRST:
         {
             pKirby->Change_State(KIRBY_STATE_TYPE::CAR_FIRST_BREAK_WALL);
             break;
@@ -166,7 +166,7 @@ void CKirby_State::Request_GrabState(CKirby* pKirby, CUTSCENE_KIRBY_TYPE eType)
     }
 }
 
-void CKirby_State::Request_ReleaseGrabState(CKirby* pKirby, CUTSCENE_KIRBY_TYPE eType)
+void CKirby_State::Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType)
 {
 }
 

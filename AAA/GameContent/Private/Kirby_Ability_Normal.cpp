@@ -39,7 +39,7 @@ COPY_ABILITY_TYPE CKirby_Ability_Normal::Get_AbilityType()
     return COPY_ABILITY_TYPE::NORMAL;
 }
 
-void CKirby_Ability_Normal::Enter_AttackState(CKirby* pKirby)
+void CKirby_Ability_Normal::Enter_AttackState(CKirby* pKirby, _int iFlag)
 {
     m_eInhaleState = INHALE_STATE::NORMAL_EXIT;
 
@@ -570,7 +570,7 @@ void CKirby_Ability_Normal::Subscribe_InhaleCapturedEvent(CKirby* pKirby)
         return;
 
     m_hInhaleCapturedEvent = m_pGameInstance_Proxy->Subscribe(
-        EVT_SWALLOWED,
+        EventTag::Swallowed,
         [this, pKirby](void* pData)
         {
             SWALLOW_EVENT* pEvent = static_cast<SWALLOW_EVENT*>(pData);

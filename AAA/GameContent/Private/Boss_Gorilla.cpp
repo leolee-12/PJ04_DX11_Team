@@ -92,13 +92,16 @@ void CBoss_Gorilla::Update(_float fTimeDelta)
     __super::Update(fTimeDelta);
     Tick_DeathSequence(fTimeDelta);
 
-    m_pCage->Update(fTimeDelta);
+    if(m_pCage)
+        m_pCage->Update(fTimeDelta);
 }
 
 void CBoss_Gorilla::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
-    m_pCage->Late_Update(fTimeDelta);
+
+    if (m_pCage)
+        m_pCage->Late_Update(fTimeDelta);
 }
 
 CMonsterBrain* CBoss_Gorilla::Create_Brain()
@@ -162,6 +165,31 @@ void CBoss_Gorilla::On_Enter_Corpse()
     _float3 vPos{};
     XMStoreFloat3(&vPos, vPosV);
     CEffect_Loader::GetInstance()->Spawn(L"DeathSmoke", m_iPrototypeLevel, vPos);
+
+    if (m_pCage)
+    {
+        _vector vKirby = XMLoadFloat3(&Get_BlackBoard().vTargetPos);
+        m_pCage->Start_Descend(vKirby);
+
+        BOSSCAM_FOCUS_DESC FocusDesc{};
+        FocusDesc.pTarget = m_pCage;
+        FocusDesc.fAimHeight = 2.f;
+        m_pGameInstance_Proxy->Publish(EventTag::BossCam_Focus, &FocusDesc);
+
+        m_pGameInstance_Proxy->Add_GameObject_Instance(m_pCage, m_iLevelIndex, m_strLayerTag, L"Boss_Cage");
+        m_pCage = nullptr;
+    }
+}
+
+// yse Ãß°¡
+_bool CBoss_Gorilla::Should_AppearFromEvent(void* pData) const
+{
+    if (pData == nullptr)
+        return false;
+
+    const auto* pDesc = static_cast<KIRBY_ATTACHMENT_END_DESC*>(pData);
+
+    return pDesc->eType == KIRBY_ATTACHMENT_END_REASON::GORILLA_SCENE_HANDOFF;
 }
 
 HRESULT CBoss_Gorilla::Ready_AnimEvents()
@@ -377,7 +405,9 @@ HRESULT CBoss_Gorilla::Ready_PartObjects()
     if (nullptr == m_pCage)
         return E_FAIL;
         
-    m_pCage->Attach_To_Bone(m_pBody->Get_BoneMatrixPtr("C_Anchor2J"), m_pTransformCom->Get_WorldMatrixPtr());
+    m_pCage->Attach_To_Bone(m_pBody->Get_BoneMatrixPtr("CageL"),
+        m_pTransformCom->Get_WorldMatrixPtr(), 
+        XMMatrixRotationY(XMConvertToRadians(180)) * XMMatrixTranslation(0.f, -3.5f, 0.f));
 
     return S_OK;
 }
@@ -418,17 +448,17 @@ void CBoss_Gorilla::Fire_Grab()
     if (nullptr == m_pBody)
         return;
 
-    CUTSCENE_GRAB_DESC grab{};
+    KIRBY_ATTACHMENT_BEGIN_DESC grab{};
     grab.pBoneMatrix = m_pBody->Get_BoneMatrixPtr(GRAB_BONE);          
     grab.pSourceWorld = m_pTransformCom->Get_WorldMatrixPtr();         
-    grab.eType = CUTSCENE_KIRBY_TYPE::GORILLA_COMBAT;
-    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_KirbyStart, &grab);
+    grab.eType = KIRBY_ATTACHMENT_CONTEXT::GORILLA_COMBAT;
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentBegin, &grab);
 }
 
-void CBoss_Gorilla::Fire_Release(GRAB_RELEASE_TYPE eType)
+void CBoss_Gorilla::Fire_Release(KIRBY_ATTACHMENT_END_REASON eType)
 {
-    CUTSCENE_RELEASE_DESC desc{ eType };
-    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_ReleaseKirby, &desc);
+    KIRBY_ATTACHMENT_END_DESC desc{ eType };
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentEnd, &desc);
 }
 
 void CBoss_Gorilla::Tick_DeathSequence(_float fTimeDelta)

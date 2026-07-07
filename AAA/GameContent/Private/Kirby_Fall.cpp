@@ -27,9 +27,9 @@ KIRBY_STATE_TYPE CKirby_Fall::Get_StateType()
     return KIRBY_STATE_TYPE::FALL;
 }
 
-void CKirby_Fall::Enter(CKirby* pKirby)
+void CKirby_Fall::Enter(CKirby* pKirby, _int iFlag)
 {
-    __super::Enter(pKirby);
+    __super::Enter(pKirby, iFlag);
 
     Change_FallState(FALL_STATE::FALLING);
 

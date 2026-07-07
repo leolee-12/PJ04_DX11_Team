@@ -96,10 +96,10 @@ void CKirby::Update(_float fTimeDelta)
 
     if (m_pGameInstance_Proxy->Key_Down(DIK_F3))
     {
-        CUTSCENE_GRAB_DESC desc{};
-        desc.eType = CUTSCENE_KIRBY_TYPE::DEFORM_CAR_GET_FIRST;
+        KIRBY_ATTACHMENT_BEGIN_DESC desc{};
+        desc.eType = KIRBY_ATTACHMENT_CONTEXT::DEFORM_CAR_GET_FIRST;
 
-        m_pGameInstance_Proxy->Publish(EventTag::Cutscene_KirbyStart, &desc);
+        m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentBegin, &desc);
     }
 
     XMStoreFloat3(&m_vWishDir, XMVectorZero());
@@ -217,6 +217,17 @@ CKirby_OnOffPart* CKirby::Find_HatPart(COPY_ABILITY_TYPE eType)
     return nullptr;
 }
 
+void CKirby::Set_WeaponLadderState(_bool bOn)
+{
+    COPY_ABILITY_TYPE eAbilityType = m_pKirby_Ability->Get_AbilityType();
+    CKirby_OnOffPart* pWeapon = Find_WeaponPart(eAbilityType);
+
+    if (pWeapon == nullptr)
+        return;
+
+    pWeapon->Set_LadderState(this, bOn);
+}
+
 CKirby_Deform_Model* CKirby::Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType)
 {
     switch (eDeformType)
@@ -270,9 +281,9 @@ void CKirby::Excute_Command(CKirby_Command* pCommand)
     m_pKirby_StateMachine->Handle_Command(pCommand);
 }
 
-void CKirby::Change_State(KIRBY_STATE_TYPE eNewState)
+void CKirby::Change_State(KIRBY_STATE_TYPE eNewState, _int iFlag)
 {
-    m_pKirby_StateMachine->Change_State(eNewState);
+    m_pKirby_StateMachine->Change_State(eNewState, iFlag);
 }
 
 CKirby_AttackMode* CKirby::Get_ActiveAttackMode()
@@ -641,34 +652,30 @@ HRESULT CKirby::Bind_ShaderResources()
 
 HRESULT CKirby::Ready_Events()
 {
-    Subscribe_Event(EVT_QUERY_PLAYER,
+    Subscribe_Event(EventTag::Query_Player,
         [this](void* pData)
         {
             static_cast<PLAYER_QUERY*>(pData)->pPlayer = this;
         }
     );
 
-    Subscribe_Event(EventTag::Cutscene_KirbyStart,
+    Subscribe_Event(EventTag::Kirby_AttachmentBegin,
         [this](void* pData)
         {
-            CUTSCENE_GRAB_DESC* pDesc = static_cast<CUTSCENE_GRAB_DESC*>(pData);
+            KIRBY_ATTACHMENT_BEGIN_DESC* pDesc = static_cast<KIRBY_ATTACHMENT_BEGIN_DESC*>(pData);
             Set_CutsceneGrabTarget(pDesc);
             m_pKirby_StateMachine->Request_GrabState_StateMachine(pDesc->eType);
-        });
+        }
+    );
 
-    Subscribe_Event(EventTag::Cutscene_GorillaHandoff,
-        [this](void*)
-        {
-            Clear_CutsceneGrabTarget();
-            m_pKirby_StateMachine->Request_ReleaseGrabState_StateMachine();
-        });
-
-    Subscribe_Event(EventTag::Cutscene_ReleaseKirby,
+    Subscribe_Event(EventTag::Kirby_AttachmentEnd,
         [this](void* pData)
         {
+            const auto* pDesc = static_cast<KIRBY_ATTACHMENT_END_DESC*>(pData);
             Clear_CutsceneGrabTarget();
             m_pKirby_StateMachine->Request_ReleaseGrabState_StateMachine();
-        });
+        }
+    );
 
     return S_OK;
 }
@@ -697,9 +704,9 @@ void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
     m_pKirby_StateMachine->On_Damaged_KirbyStateMachine(tInfo);
 }
 
-void CKirby::Set_CutsceneGrabTarget(CUTSCENE_GRAB_DESC* pGrabDesc)
+void CKirby::Set_CutsceneGrabTarget(KIRBY_ATTACHMENT_BEGIN_DESC* pGrabDesc)
 {
-    //if (pGrabDesc->eType == CUTSCENE_KIRBY_TYPE::DEFORM_CAR_GET_FIRST)
+    //if (pGrabDesc->eType == KIRBY_ATTACHMENT_CONTEXT::DEFORM_CAR_GET_FIRST)
     //{
     //    CUTSCENE_CAMERA_DESC cam{};
     //    cam.eCam = ECutsceneCam::Cutscene;
@@ -848,6 +855,11 @@ void CKirby::Add_HP(_float fHP)
     tDesc.fCurrHp = m_fCurHP;
     tDesc.fMaxHP = m_fMaxHP;
     m_pGameInstance_Proxy->Publish(EventTag::Kirby_HP_Updated, &tDesc);
+}
+
+void CKirby::Start_DamageInvincibility()
+{
+    Start_Invincibility(m_fInvincibleDuration);
 }
 
 CKirby* CKirby::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

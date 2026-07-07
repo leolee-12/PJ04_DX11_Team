@@ -20,10 +20,18 @@ HRESULT CBossBase::Initialize(void* pArg)
     Enable_Colliders(false);
     Enable_Controller(false);
 
+    // yse Ãß°¡
     if (const _tchar* pTag = Get_AppearEventTag())
-        Subscribe_Event(pTag, [this](void*) { Appear(); });
+    {
+        Subscribe_Event(pTag,
+            [this](void* pData)
+            {
+                if (Should_AppearFromEvent(pData))
+                    Appear();
+            });
+    }
 
-    Subscribe_Event(EVT_QUERY_BOSS, [this](void* p) {
+    Subscribe_Event(EventTag::Query_Boss, [this](void* p) {
         if (auto q = static_cast<BOSS_QUERY*>(p)) q->pBoss = this;
         });
 
@@ -135,7 +143,7 @@ void CBossBase::On_Death(const ATTACK_INFO& tInfo)
 CGameObject* CBossBase::Find_Player() const
 {
     PLAYER_QUERY q;
-    m_pGameInstance_Proxy->Publish(EVT_QUERY_PLAYER, &q);
+    m_pGameInstance_Proxy->Publish(EventTag::Query_Player, &q);
     return q.pPlayer;
 }
 

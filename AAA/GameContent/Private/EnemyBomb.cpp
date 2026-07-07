@@ -46,7 +46,7 @@ void CEnemyBomb::On_Swallowed()
 	m_pTransformCom->Set_Scale(m_vBaseScale.x, m_vBaseScale.y, m_vBaseScale.z);
 
 	SWALLOW_EVENT payload{ this };          
-	m_pGameInstance_Proxy->Publish(EVT_SWALLOWED, &payload);
+	m_pGameInstance_Proxy->Publish(EventTag::Swallowed, &payload);
 
 	if (m_pFuseFx)
 	{

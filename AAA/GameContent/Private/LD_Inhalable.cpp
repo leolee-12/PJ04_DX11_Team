@@ -99,7 +99,7 @@ void CLD_Inhalable::SetUp_Collider_CallBack()
 void CLD_Inhalable::On_Swallowed()
 {
 	SWALLOW_EVENT payload{ this };
-	m_pGameInstance_Proxy->Publish(EVT_SWALLOWED, &payload);
+	m_pGameInstance_Proxy->Publish(EventTag::Swallowed, &payload);
 	m_pCaptor = nullptr;
 	Enable_Colliders(false);
 	Set_Active(false);

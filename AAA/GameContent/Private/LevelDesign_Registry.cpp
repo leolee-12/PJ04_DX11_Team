@@ -1,21 +1,28 @@
 #include "LevelDesign_Registry.h"
+#include "LevelDesign_MonsterCatalog.h"
+
 #include "LevelDesign_Unsupported.h"
-#include "LevelDesign_Breakable.h"
-#include "LevelDesign_Starblock.h"
+#include "LevelDesign_Boundary.h"
 #include "LevelDesign_Rail.h"
+#include "LevelDesign_FallBorder.h"
+#include "LD_AudioArea.h"
+
+#include "LevelDesign_Breakable.h"
+#include "LD_PopFlower.h"
 #include "LevelDesign_Ladder.h"
-#include "LevelDesign_Food.h"
+#include "LD_ArrowBoard.h"
 #include "LevelDesign_Point.h"
 #include "LevelDesign_Bush.h"
-#include "LevelDesign_Boundary.h"
-#include "LevelDesign_FallBorder.h"
+#include "LevelDesign_Starblock.h"
+#include "LevelDesign_Food.h"
+
+#include "LD_DeformObject.h"
 #include "LD_Stage1BossDemo.h"
 #include "LD_SlopeBoardA.h"
 #include "LD_SlopeBoardC.h"
 #include "LD_DeformCarBreakWall.h"
-#include "LevelDesign_MonsterCatalog.h"
+#include "LD_GarageRadio.h"
 
-#include <cwctype>
 #include <mutex>
 
 NS_BEGIN(Client)
@@ -227,9 +234,7 @@ void CLevelDesign_Registry::Register_GuideAudio()
 	Register_Unsupported(L"LensFlare", LD_CATEGORY::GUIDE_AREA, L"Layer_LevelDesign_Guide");
 	Register_Unsupported(L"IntroductionDemo", LD_CATEGORY::GUIDE_AREA, L"Layer_LevelDesign_Guide");
 
-	Register_Unsupported(L"AreaBgmRequestor", LD_CATEGORY::AUDIO_AREA, L"Layer_LevelDesign_Audio");
-	Register_Unsupported(L"AreaSeJungle", LD_CATEGORY::AUDIO_AREA, L"Layer_LevelDesign_Audio");
-	Register_Unsupported(L"AreaSeSeaWave", LD_CATEGORY::AUDIO_AREA, L"Layer_LevelDesign_Audio");
+	CLD_AudioArea::Register_LevelDesignSpecs();
 }
 
 void CLevelDesign_Registry::Register_ItemsAndBreakables()
@@ -239,8 +244,7 @@ void CLevelDesign_Registry::Register_ItemsAndBreakables()
 	CLevelDesign_Food::Register_LevelDesignSpecs();
 	CLevelDesign_Point::Register_LevelDesignSpecs();
 	CLevelDesign_Bush::Register_LevelDesignSpecs();
-
-	Register_Unsupported(L"PopFlower", LD_CATEGORY::FOLIAGE, L"Layer_LevelDesign_Gimmick");
+	CLD_PopFlower::Register_LevelDesignSpecs();
 }
 
 void CLevelDesign_Registry::Register_EnemiesAndGimmicks()
@@ -252,11 +256,13 @@ void CLevelDesign_Registry::Register_EnemiesAndGimmicks()
 	Register_Unsupported(L"TwinkleSwitch", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
 
 	CLevelDesign_Ladder::Register_LevelDesignSpecs();
+	CLD_DeformObject::Register_LevelDesignSpecs();
 	CLD_Stage1BossDemo::Register_LevelDesignSpecs();
 	CLD_SlopeBoardA::Register_LevelDesignSpecs();
 	CLD_SlopeBoardC::Register_LevelDesignSpecs();
 	CLD_DeformCarBreakWall::Register_LevelDesignSpecs();
-	Register_Unsupported(L"ArrowBoard", LD_CATEGORY::GIMMICK, L"Layer_LevelDesign_Gimmick");
+	CLD_GarageRadio::Register_LevelDesignSpecs();
+	CLD_ArrowBoard::Register_LevelDesignSpecs();
 }
 
 NS_END
