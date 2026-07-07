@@ -10,13 +10,19 @@
 namespace
 {
 	inline constexpr const _char* DEFORM_CAR_BREAK_WALL_MODEL_PATH = "../../Resources/Map/Gimmick/Anim/DeformCarBreakWall/DeformCarBreakWall.ysh";
-	inline constexpr const _char* DEFORM_CAR_BREAK_WALL_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { "DeformCarGetFirst", "DeformCarGetEnd", "", "" };
+	inline constexpr const _char* ANIM_FIRST = "DeformCarGetFirst";
+	inline constexpr const _char* ANIM_END = "DeformCarGetEnd";
+	inline constexpr const _char* DEFORM_CAR_BREAK_WALL_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_FIRST, ANIM_END, "", "" };
+	inline constexpr _float DEFORM_CAR_BREAK_WALL_ANIM_SPEED = 1.5f;
 	inline constexpr const _uint DEFORM_CAR_BREAK_WALL_MESH_COUNT = 31u;
 	inline constexpr const _uint DEFORM_CAR_BREAK_WALL_COLLIMESH_INDEX = 10u;
 
-	inline constexpr const _uint DISABLE_MESH_INDEX[] = { 1 };
-	inline constexpr const _uint ON_TO_OFF_MESH_INDEX[] = { 0,2,9,10 };
-	inline constexpr const _uint OFF_TO_ON_MESH_INDEX[] = { 3,4,5,6,7,8,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30 };
+	inline constexpr const _uint DISABLE_MESH_INDICES[] = { 1 };
+	inline constexpr const _uint ON_TO_OFF_MESH_INDICES[] = { 0,2 };
+	inline constexpr const _uint OFF_TO_ON_MESH_INDICES[] = { 3,4,5,6,7,8,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30 };
+	
+	inline constexpr const _uint ON_TO_OFF_AT_FRAME_MESH_INDICES[] = { 9,10 };
+	inline constexpr const _float MESH_HIDE_TRACK_FRAME = 1.f;
 }
 
 NS_BEGIN(Client)
@@ -30,6 +36,22 @@ CLD_DeformCarBreakWall::CLD_DeformCarBreakWall(const CLD_DeformCarBreakWall& Pro
 	: CLD_EventObject(Prototype)
 	, m_eState(Prototype.m_eState)
 {
+}
+
+HRESULT CLD_DeformCarBreakWall::Initialize(void* pArg)
+{
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
+
+	const LD_ANIM_PLAY_DESC AnimDescs[] =
+	{
+		{ ANIM_FIRST, false, DEFORM_CAR_BREAK_WALL_ANIM_SPEED },
+	};
+
+	if (FAILED(Ready_AnimPlayDescs(AnimDescs, static_cast<_uint>(_countof(AnimDescs)))))
+		return E_FAIL;
+
+	return Set_AnimPose(ANIM_FIRST, 0.f);
 }
 
 HRESULT CLD_DeformCarBreakWall::Validate_Initialized()
@@ -58,7 +80,7 @@ HRESULT CLD_DeformCarBreakWall::Validate_Initialized()
 	if (STATE::IDLE != m_eState)
 		return E_FAIL;
 
-	if (nullptr == m_pBoostTrigger || !m_bBoostTriggerRegistered)
+	if (nullptr == m_pBoostTrigger)
 		return E_FAIL;
 
 	return S_OK;
@@ -69,6 +91,24 @@ void CLD_DeformCarBreakWall::Update(_float fTimeDelta)
 	const _bool bAnimationWasActive = m_bAnimationActive;
 
 	__super::Update(fTimeDelta);
+
+	if (STATE::BREAKING == m_eState && !m_bMeshHiddenAtFrame)
+	{
+		const _int iAnimationIndex = m_pModelCom->Get_AnimationIndex(ANIM_FIRST);
+		if (0 <= iAnimationIndex)
+		{
+			const _float fDuration = m_pModelCom->Get_AnimationDuration(static_cast<_uint>(iAnimationIndex));
+			const _float fFrameOneProgress = 0.f < fDuration ? MESH_HIDE_TRACK_FRAME / fDuration : 1.f;
+
+			if (m_pModelCom->Get_CurrentAnimProgress() >= fFrameOneProgress)
+			{
+				for (_uint iMeshIndex : ON_TO_OFF_AT_FRAME_MESH_INDICES)
+					Set_MeshVisible(iMeshIndex, false);
+
+				m_bMeshHiddenAtFrame = true;
+			}
+		}
+	}
 
 	if (bAnimationWasActive
 		&& !m_bAnimationActive
@@ -83,7 +123,7 @@ void CLD_DeformCarBreakWall::Update(_float fTimeDelta)
 
 void CLD_DeformCarBreakWall::Late_Update(_float fTimeDelta)
 {
-	if (STATE::IDLE == m_eState && nullptr != m_pBoostTrigger && m_pBoostTrigger->Is_Enabled())
+	if (STATE::IDLE == m_eState && m_pBoostTrigger->Is_Enabled())
 	{
 		m_pBoostTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
@@ -160,7 +200,7 @@ HRESULT CLD_DeformCarBreakWall::Ready_Components()
 	if (FAILED(__super::Ready_Components()))
 		return E_FAIL;
 
-	if (FAILED(Ready_DeformCarBreakWall()))
+	if (FAILED(Ready_RenderComponent()))
 		return E_FAIL;
 
 	_float3 vMin{}, vMax{};
@@ -182,28 +222,26 @@ HRESULT CLD_DeformCarBreakWall::Ready_Components()
 	return S_OK;
 }
 
-HRESULT CLD_DeformCarBreakWall::Ready_DeformCarBreakWall()
+HRESULT CLD_DeformCarBreakWall::Ready_RenderComponent()
 {
 	m_eState = STATE::IDLE;
-
-	const _int iAnimationIndex = m_pModelCom->Get_AnimationIndex(DEFORM_CAR_BREAK_WALL_ANIM_NAMES[0]);
-	if (iAnimationIndex < 0)
-		return E_FAIL;
-
-	m_pModelCom->Set_AnimationIndex(static_cast<_uint>(iAnimationIndex), false, true, 0.f);
-	m_pModelCom->Seek_Animation(0.f);
 
 	if (DEFORM_CAR_BREAK_WALL_MESH_COUNT != static_cast<_uint>(m_pModelCom->Get_NumMeshes()))
 		return E_FAIL;
 
-	for (_uint iMeshIndex : DISABLE_MESH_INDEX)
+	for (_uint iMeshIndex : DISABLE_MESH_INDICES)
 		Set_MeshVisible(iMeshIndex, false);
 
-	for (_uint iMeshIndex : ON_TO_OFF_MESH_INDEX)
+	for (_uint iMeshIndex : ON_TO_OFF_MESH_INDICES)
 		Set_MeshVisible(iMeshIndex, true);
 
-	for (_uint iMeshIndex : OFF_TO_ON_MESH_INDEX)
+	for (_uint iMeshIndex : OFF_TO_ON_MESH_INDICES)
 		Set_MeshVisible(iMeshIndex, false);
+
+	for (_uint iMeshIndex : ON_TO_OFF_AT_FRAME_MESH_INDICES)
+		Set_MeshVisible(iMeshIndex, true);
+
+	m_bMeshHiddenAtFrame = false;
 
 	return S_OK;
 }
@@ -241,7 +279,6 @@ HRESULT CLD_DeformCarBreakWall::Ready_BoostTrigger(const BoundingBox& LocalBound
 	SetUp_BoostTriggerCallback();
 
 	m_pGameInstance_Proxy->Register_Collider(m_pBoostTrigger, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
-	m_bBoostTriggerRegistered = true;
 
 	return S_OK;
 }
@@ -251,13 +288,12 @@ void CLD_DeformCarBreakWall::On_Event()
 	if (STATE::IDLE != m_eState)
 		return;
 
-	if (!Play_EventAnimation(0u, false))
-		return;
+	Play_Anim(ANIM_FIRST);
 
-	for (_uint iMeshIndex : ON_TO_OFF_MESH_INDEX)
+	for (_uint iMeshIndex : ON_TO_OFF_MESH_INDICES)
 		Set_MeshVisible(iMeshIndex, false);
 
-	for (_uint iMeshIndex : OFF_TO_ON_MESH_INDEX)
+	for (_uint iMeshIndex : OFF_TO_ON_MESH_INDICES)
 		Set_MeshVisible(iMeshIndex, true);
 
 	m_eState = STATE::BREAKING;
@@ -283,46 +319,21 @@ void CLD_DeformCarBreakWall::On_Event()
 	m_pGameInstance_Proxy->Lerp_TimeScale(0.1f, 1.f, 3.f);
 
 	Release_RigidStatic();
-	Unregister_BoostTrigger(false);
+
+	m_pBoostTrigger->Set_Enabled(false);
 }
 
 void CLD_DeformCarBreakWall::SetUp_BoostTriggerCallback()
 {
-	if (nullptr == m_pBoostTrigger)
-		return;
-
 	m_pBoostTrigger->Set_OnEnter([this](CCollider* pOther) { Handle_BoostTrigger(pOther); });
 }
 
 void CLD_DeformCarBreakWall::Handle_BoostTrigger(CCollider* pOther)
 {
-	if (nullptr == pOther)
-		return;
-
 	if (ETOUI(COLLISION_LAYER::CAR_BOOST) != pOther->Get_RegisteredGroup())
 		return;
 
 	On_Event();
-}
-
-void CLD_DeformCarBreakWall::Unregister_BoostTrigger(_bool bImmediate)
-{
-	if (nullptr == m_pBoostTrigger)
-		return;
-
-	m_pBoostTrigger->Set_Enabled(false);
-
-	if (!m_bBoostTriggerRegistered)
-		return;
-
-	const _uint iGroup = ETOUI(COLLISION_LAYER::ENV_TRIGGER);
-
-	if (bImmediate)
-		m_pGameInstance_Proxy->Immediate_Unregister(m_pBoostTrigger, iGroup);
-	else
-		m_pGameInstance_Proxy->Request_Unregister(m_pBoostTrigger, iGroup);
-
-	m_bBoostTriggerRegistered = false;
 }
 
 CLD_DeformCarBreakWall* CLD_DeformCarBreakWall::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -342,6 +353,24 @@ CGameObject* CLD_DeformCarBreakWall::Clone(void* pArg)
 {
 	CLD_DeformCarBreakWall* pInstance = new CLD_DeformCarBreakWall(*this);
 
+	LD_EVENTOBJECT_DESC TempDesc{};
+	if (nullptr == pArg)
+	{
+		TempDesc.strObjectName = OBJECT_NAME;
+		TempDesc.strKind = OBJECT_NAME;
+		TempDesc.eCategory = LD_CATEGORY::GIMMICK;
+		TempDesc.iModelProtoLevel = m_iPrototypeLevel;
+		TempDesc.eModelType = MODEL::ANIM;
+		TempDesc.wstrModelProtoTag = MODEL_PROTO_TAG;
+		TempDesc.bUseCollMesh = false;
+		TempDesc.strAnimEventFile.clear();
+
+		for (_uint i = 0; i < LD_ANIM_SLOT_COUNT; ++i)
+			TempDesc.strAnimNames[i] = DEFORM_CAR_BREAK_WALL_ANIM_NAMES[i];
+
+		pArg = &TempDesc;
+	}
+
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Cloned : CLD_DeformCarBreakWall");
@@ -353,8 +382,6 @@ CGameObject* CLD_DeformCarBreakWall::Clone(void* pArg)
 
 void CLD_DeformCarBreakWall::Free()
 {
-	Unregister_BoostTrigger(true);
-
 	__super::Free();
 }
 

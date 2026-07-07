@@ -31,11 +31,12 @@ void CCamera_Boss::Priority_Update(_float fTimeDelta)
     Tick_Shake(fTimeDelta);
 
     // 이벤트 쿼리로 타깃 확보(없을 때만)
-    if (!m_pPlayer) { PLAYER_QUERY q{}; m_pGameInstance_Proxy->Publish(EVT_QUERY_PLAYER, &q); m_pPlayer = q.pPlayer; }
-    if (!m_pBoss) { BOSS_QUERY   q{}; m_pGameInstance_Proxy->Publish(EVT_QUERY_BOSS, &q); m_pBoss = q.pBoss; }
+    if (!m_pPlayer) { PLAYER_QUERY q{}; m_pGameInstance_Proxy->Publish(EventTag::Query_Player, &q); m_pPlayer = q.pPlayer; }
+    if (!m_pBoss) { BOSS_QUERY   q{}; m_pGameInstance_Proxy->Publish(EventTag::Query_Boss, &q); m_pBoss = q.pBoss; }
 
     _vector P = m_pPlayer ? m_pPlayer->Get_Transform()->Get_State(STATE::POSITION) : XMVectorSet(0, 0, 0, 1);
-    _vector B = m_pBoss ? m_pBoss->Get_Transform()->Get_State(STATE::POSITION) : XMVectorAdd(P,
+    CGameObject* pFocus = m_pFocusOverride ? m_pFocusOverride : m_pBoss;
+    _vector B = pFocus ? pFocus->Get_Transform()->Get_State(STATE::POSITION) : XMVectorAdd(P,
         XMVectorSet(0, 0, 5, 0));
 
     _vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
@@ -52,8 +53,9 @@ void CCamera_Boss::Priority_Update(_float fTimeDelta)
     vEye = XMVectorAdd(vEye, XMVectorScale(vRight, m_fShoulderOffset));
 
     // at: 보스 쪽으로 프레이밍(어깨 너머 보스)
+    _float fAimH = m_pFocusOverride ? m_fFocusAimHeight : m_fAimHeight;
     _vector vAt = XMVectorLerp(P, B, m_fAimBias);
-    vAt = XMVectorAdd(vAt, XMVectorScale(vUp, m_fAimHeight));
+    vAt = XMVectorAdd(vAt, XMVectorScale(vUp, fAimH));
 
     if (!m_bInit) { XMStoreFloat3(&m_eyeCur, vEye); XMStoreFloat3(&m_atCur, vAt); m_bInit = true; }
 
@@ -92,6 +94,16 @@ void CCamera_Boss::Priority_Update(_float fTimeDelta)
 
 HRESULT CCamera_Boss::Ready_Events()
 {
+    Subscribe_Event(EventTag::BossCam_Focus, [this](void* p) {
+        if (auto* d = static_cast<BOSSCAM_FOCUS_DESC*>(p))
+        {
+            m_pFocusOverride = d->pTarget;
+            m_fFocusAimHeight = d->fAimHeight;
+        }
+        else
+            m_pFocusOverride = nullptr;
+        });
+
     return Ready_ShakeEvents();
 }
 

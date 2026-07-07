@@ -38,9 +38,10 @@ HRESULT CEnvObject_Static::Initialize(void* pArg)
 
 void CEnvObject_Static::Late_Update(_float fTimeDelta)
 {
-	__super::Late_Update(fTimeDelta);
-
 	Refresh_WorldBounds();
+
+	__super::Late_Update(fTimeDelta);
+	
 	Check_Visible();
 	Submit_RenderGroups();
 }

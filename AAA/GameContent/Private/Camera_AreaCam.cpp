@@ -45,7 +45,7 @@ void CCamera_AreaCam::Priority_Update(_float fTimeDelta)
     if (!m_pTarget)
     {
         PLAYER_QUERY p;
-        m_pGameInstance_Proxy->Publish(EVT_QUERY_PLAYER, &p);
+        m_pGameInstance_Proxy->Publish(EventTag::Query_Player, &p);
         m_pTarget = p.pPlayer;
     }
 

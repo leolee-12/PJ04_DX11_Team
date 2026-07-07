@@ -652,7 +652,7 @@ HRESULT CKirby::Bind_ShaderResources()
 
 HRESULT CKirby::Ready_Events()
 {
-    Subscribe_Event(EVT_QUERY_PLAYER,
+    Subscribe_Event(EventTag::Query_Player,
         [this](void* pData)
         {
             static_cast<PLAYER_QUERY*>(pData)->pPlayer = this;

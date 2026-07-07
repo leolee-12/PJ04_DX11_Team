@@ -19,7 +19,6 @@ namespace
 		switch (eSourceType)
 		{
 		case ENV_SOURCE_TYPE::DECOR_DECOR: return "DECOR_DECOR";
-		case ENV_SOURCE_TYPE::TOY_DECOR: return "TOY_DECOR";
 		case ENV_SOURCE_TYPE::TOY_OBJ: return "TOY_OBJ";
 		case ENV_SOURCE_TYPE::DECOR_OBJ: return "DECOR_OBJ";
 		case ENV_SOURCE_TYPE::UNKNOWN: return "UNKNOWN";
@@ -182,7 +181,7 @@ HRESULT CMap_Builder::Build_StageDesc(const MAP_MANIFEST_DESC& Manifest, MAP_STA
 		Desc.eRenderID = Manifest.SectionRenderIDs[i];
 		Desc.bRenderable = true;
 		Desc.bEnableCulling = true;
-		Desc.bSourceCreateCollisionActor = Desc.bCreateCollisionActor;
+		Desc.bUseCollMesh = true;
 
 		pOutStageDesc->SectionDescs.push_back(Desc);
 	}
@@ -232,7 +231,6 @@ HRESULT CMap_Builder::Build_EnvDescs(const MAP_MANIFEST_DESC& Manifest, vector<E
 				Desc.tRender.bShadowMappingCaster = false;
 
 				Desc.tCollision.eColliderKind = ENV_COLLIDER_KIND::NONE;
-				Desc.tCollision.eSimpleShape = ENV_SIMPLE_SHAPE::NONE;
 				Desc.tCollision.bHasCollMesh = false;
 				Desc.tCollision.bCookCollMesh = false;
 				Desc.tCollision.bUseCollMesh = false;
@@ -263,7 +261,7 @@ HRESULT CMap_Builder::Validate_And_Filter(MAP_PACKAGE* pPackage)
 
 	for (const ENV_OBJECT_DESC& Desc : pPackage->EnvObjectDescs)
 	{
-		if ((EnvObject_NeedsModel(Desc) || EnvObject_IsSimpleShapeOnly(Desc))
+		if (EnvObject_NeedsModel(Desc)
 			&& (Desc.wstrModelPath.empty() || Desc.wstrModelProtoTag.empty()))
 		{
 			++iSkippedMissingModel;

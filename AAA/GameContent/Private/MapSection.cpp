@@ -1,39 +1,10 @@
 #include "MapSection.h"
 #include "Shader_PassMeta.h"
+#include "Geometry_Utils.h"
 
 #include "GameInstance.h"
 
 NS_BEGIN(Client)
-
-namespace
-{
-	BoundingBox Make_DefaultAABB()
-	{
-		return BoundingBox(_float3(0.f, 0.f, 0.f), _float3(1.f, 1.f, 1.f));
-	}
-
-	_bool Is_ValidAABB(const _float3& vMin, const _float3& vMax)
-	{
-		return vMin.x <= vMax.x
-			&& vMin.y <= vMax.y
-			&& vMin.z <= vMax.z;
-	}
-
-	BoundingBox Make_AABB_FromMinMax(const _float3& vMin, const _float3& vMax)
-	{
-		const _float3 vCenter(
-			(vMin.x + vMax.x) * 0.5f,
-			(vMin.y + vMax.y) * 0.5f,
-			(vMin.z + vMax.z) * 0.5f);
-
-		const _float3 vExtents(
-			(vMax.x - vMin.x) * 0.5f,
-			(vMax.y - vMin.y) * 0.5f,
-			(vMax.z - vMin.z) * 0.5f);
-
-		return BoundingBox(vCenter, vExtents);
-	}
-}
 
 CMapSection::CMapSection(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMapObject { pDevice, pContext }
@@ -65,10 +36,12 @@ HRESULT CMapSection::Initialize(void* pArg)
 	m_eRenderID = pDesc->eRenderID;
 	m_bEnableCulling = pDesc->bEnableCulling;
 	m_bRenderable = pDesc->bRenderable;
-	m_bCreateCollisionActor = pDesc->bCreateCollisionActor;
+	m_bUseCollMesh = pDesc->bUseCollMesh;
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
+
+	m_bHasCollMesh = nullptr != m_pModelCom->Get_CollisionMesh();
 
 	m_CombinedWorldMatrix = *m_pTransformCom->Get_WorldMatrixPtr();
 	Update_LocalBounds();
@@ -85,14 +58,14 @@ HRESULT CMapSection::Validate_Initialized()
 {
 	if (FAILED(__super::Validate_Initialized()))
 		return E_FAIL;
-
 	if (m_strSectionName.empty() || m_strModelProtoTag.empty())
 		return E_FAIL;
 	if (ETOUI(m_eSectionType) >= MAP_SECTION_TYPE_COUNT)
 		return E_FAIL;
 	if (ETOUI(m_eRenderID) >= ETOUI(RENDERID::END))
 		return E_FAIL;
-
+	if (m_bUseCollMesh && (!m_bHasCollMesh || nullptr == m_pColliderActor))
+		return E_FAIL;
 	return S_OK;
 }
 
@@ -229,12 +202,12 @@ void CMapSection::Set_RenderID(RENDERID eRenderID)
 	m_eRenderID = eRenderID;
 }
 
-void CMapSection::Set_CollisionActorEnabled(_bool bEnable)
+void CMapSection::Set_UseCollMesh(_bool bUseCollMesh)
 {
-	if (m_bCreateCollisionActor == bEnable)
+	if (m_bUseCollMesh == bUseCollMesh)
 		return;
 
-	m_bCreateCollisionActor = bEnable;
+	m_bUseCollMesh = bUseCollMesh;
 	Rebuild_ColliderActor();
 }
 
@@ -258,13 +231,13 @@ void CMapSection::Update_LocalBounds()
 	_float3 vMin{}, vMax{};
 	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
 
-	if (!Is_ValidAABB(vMin, vMax))
+	if (!GeometryUtils::Is_ValidAABB(vMin, vMax))
 	{
-		m_LocalBounds = Make_DefaultAABB();
+		m_LocalBounds = GeometryUtils::Make_DefaultAABB();
 		return;
 	}
 
-	m_LocalBounds = Make_AABB_FromMinMax(vMin, vMax);
+	m_LocalBounds = GeometryUtils::Make_AABB_FromMinMax(vMin, vMax);
 }
 
 void CMapSection::Refresh_ColliderPose()
@@ -283,10 +256,7 @@ void CMapSection::Rebuild_ColliderActor()
 		m_pColliderActor = nullptr;
 	}
 
-	if (!m_bCreateCollisionActor)
-		return;
-
-	if (nullptr == m_pModelCom->Get_CollisionMesh())
+	if (!m_bUseCollMesh)
 		return;
 
 	m_pColliderActor = m_pGameInstance_Proxy->Create_StaticActor(

@@ -50,6 +50,8 @@ private:
     const _float4x4* m_pAnchor = { nullptr };
     wstring          m_strDir = L"../../Resources/YSH/CameraData/CamAnim/";
 
+    _float m_fLocalTime = { 0.f };
+
 private:
     virtual HRESULT Ready_Events() override;   
     void Apply_Pose();

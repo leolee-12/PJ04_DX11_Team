@@ -11,7 +11,12 @@ namespace
 {
 	inline constexpr const _char* STAGE1_BOSS_DEMO_MODEL_PATH = "../../Resources/Map/Gimmick/Anim/Level1BossDemoBg/Level1BossDemoBg.ysh";
 	inline constexpr const _tchar* STAGE1_BOSS_DEMO_ANIM_EVENT_FILE = L"../../Resources/Map/Gimmick/Anim/Level1BossDemoBg/Level1BossDemoBg_AnimEvents.json";
-	inline constexpr const _char* STAGE1_BOSS_DEMO_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { "DemoAppear2", "DemoAppear2AfterWait", "DemoAppear2BeforWait", "" };
+	
+	inline constexpr const _char* ANIM_APPEAR = "DemoAppear2";
+	inline constexpr const _char* ANIM_AFTERWAIT = "DemoAppear2AfterWait";
+	inline constexpr const _char* ANIM_BEFOREWAIT = "DemoAppear2BeforWait";
+	
+	inline constexpr const _char* STAGE1_BOSS_DEMO_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_APPEAR, ANIM_AFTERWAIT, ANIM_BEFOREWAIT, "" };
 
 	inline constexpr _uint EVENTOBJECT_ANIM_DEFAULT_PASS = 1u;
 	inline constexpr _uint STAGE1_BOSS_DEMO_GLASS_PASS = 0u;
@@ -154,6 +159,16 @@ HRESULT CLD_Stage1BossDemo::Ready_Stage1BossDemo()
 {
 	m_eDemoState = DEMO_STATE::IDLE;
 
+	const LD_ANIM_PLAY_DESC AnimDescs[] =
+	{
+			{ ANIM_APPEAR, false, 1.5f },
+			{ ANIM_AFTERWAIT, false, 1.5f },
+			{ ANIM_BEFOREWAIT, false, 1.5f },
+	};
+
+	if (FAILED(Ready_AnimPlayDescs(AnimDescs, static_cast<_uint>(_countof(AnimDescs)))))
+		return E_FAIL;
+
 	static constexpr _uint PieceIndices[] =
 	{
 			28u, 29u, 30u, 31u, 32u, 33u, 34u, 35u, 36u,
@@ -163,8 +178,7 @@ HRESULT CLD_Stage1BossDemo::Ready_Stage1BossDemo()
 	for (_uint iMeshIndex : PieceIndices)
 		Set_MeshVisible(iMeshIndex, false);
 
-	if (!Play_EventAnimation(2u, false))
-		return E_FAIL;
+	Play_Anim(ANIM_BEFOREWAIT);
 
 	return S_OK;
 }
@@ -174,7 +188,7 @@ void CLD_Stage1BossDemo::On_Event(const _wstring& strEventTag)
 	UNREFERENCED_PARAMETER(strEventTag);
 
 	m_eDemoState = DEMO_STATE::PLAYING;
-	Play_EventAnimation(0u, false);
+	Play_Anim(ANIM_APPEAR);
 }
 
 void CLD_Stage1BossDemo::On_AnimEvent(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase)

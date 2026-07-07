@@ -44,6 +44,9 @@ private:
     _float3 m_eyeCur = {}, m_atCur = {}, m_eyeVel = {}, m_atVel = {};
     _bool   m_bInit = { false };
 
+    CGameObject* m_pFocusOverride = { nullptr };
+    _float       m_fFocusAimHeight = { 2.f };
+
 public:
     static CCamera_Boss* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual CGameObject* Clone(void* pArg) override;

@@ -138,11 +138,13 @@
 #include "Boss_Gorilla_RockHole.h"
 #include "Boss_Cage.h"
 #include "Boss_Cage_Body.h"
+#include "Cage_WaddleDee.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
 #include "LevelDesign_Starblock.h"
 #include "LevelDesign_Rail.h"
+#include "LD_AudioArea.h"
 #include "LD_Stage1BossDemo.h"
 #include "LD_SlopeBoardA.h"
 #include "LD_SlopeBoardC.h"
@@ -177,13 +179,14 @@ IMPLEMENT_SINGLETON(CGameObject_Factory)
 
 namespace
 {
-    CModel* Create_TextureHubModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath, _bool bCookCollisionMesh)
+    CModel* Create_TextureHubModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODEL eType, const _char* pModelFilePath,
+        _bool bCookCollisionMesh, _fmatrix PreTransformMatrix = XMMatrixIdentity())
     {
         CModel::MODEL_LOAD_DESC Desc{};
         Desc.eType = eType;
         Desc.pModelFilePath = pModelFilePath;
         Desc.bCookCollisionMesh = bCookCollisionMesh;
-        XMStoreFloat4x4(&Desc.PreTransformMatrix, XMMatrixIdentity());
+        XMStoreFloat4x4(&Desc.PreTransformMatrix, PreTransformMatrix);
 
         return CModel::Create_WithTextureHub(pDevice, pContext, Desc);
     }
@@ -478,6 +481,22 @@ void CGameObject_Factory::Register_Test()
         CREATOR(CTestTriggerBox),
         LOADER()
     );
+
+    Register(CBoss_Cage::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
+        CREATOR(CBoss_Cage),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/WaddleDee/Body/Model_Anim.ysh"
+                    , XMMatrixRotationY(XMConvertToRadians(180.f))
+                ));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::PROTOTYPE_TAG, CCage_WaddleDee::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Cage_Body::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Gimmick/CaptiveCage/CageL/CageL_Anim_TopL.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Cage_Body::PROTOTYPE_TAG, CBoss_Cage_Body::Create(pDevice, pContext));
+        )
+    );
 }
 
 void CGameObject_Factory::Register_Container()
@@ -722,6 +741,7 @@ void CGameObject_Factory::Register_NonAnimObject()
 
     Register(CLevelDesign_Unsupported::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Unsupported), LOADER());
     Register(CLevelDesign_Rail::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Rail), LOADER());
+    Register(CLD_AudioArea::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_AudioArea), LOADER());
     Register(CLevelDesign_Starblock::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Starblock),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLevelDesign_Starblock::STARBLOCK_MODEL_PROTO_TAG,
             CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh"));));
@@ -1010,6 +1030,11 @@ void CGameObject_Factory::Register_MainBoss()
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Gorilla_RockHole::PROTOTYPE_TAG,
                 CBoss_Gorilla_RockHole::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/WaddleDee/Body/Model_Anim.ysh"
+                    , XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::PROTOTYPE_TAG, CCage_WaddleDee::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Cage_Body::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Gimmick/CaptiveCage/CageL/CageL_Anim_TopL.ysh",

@@ -82,6 +82,7 @@ public: //ObjectManager
         _uint iLayerLevel, const _wstring& strLayerTag, const _wstring& strObjectTag, void* pArg = nullptr);
     HRESULT Add_GameObject_Return(CGameObject** ppOut, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, 
         _uint iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strObjectTag, void* pArg = nullptr);
+    HRESULT Add_GameObject_Instance(CGameObject* pGameObject, _uint iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strObjectTag);
     void	Clear_Objects(_int iLevelIndex);
     void    Destroy_GameObject(CGameObject* pGameObject);
     CGameObject* Find_GameObject(_uint iLevelIndex, const _wstring& strLayerTag, const _wstring& strObjectTag);
