@@ -42,8 +42,6 @@ void CKirby_GetAbility::Enter(CKirby* pKirby, _int iFlag)
     m_bCloseEye = false;
     m_bOpenMouse = false;
 
-
-
     KIRBY_ABILITY_CHANGED tDesc{};
     tDesc.bBegin = true;
     m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &tDesc);
