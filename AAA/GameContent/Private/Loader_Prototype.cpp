@@ -477,27 +477,8 @@ static HRESULT Spawn_UIContainers_FromBundle(CGameInstance_Proxy* pProxy, ID3D11
         if (jUI.contains("Container"))
         {
             json jContainer = jUI["Container"];
-            
-            if (jContainer.contains("UIPartObjects") && jContainer["UIPartObjects"].is_object())
-            {
-                for (auto& [strPartTag, jPart] : jContainer["UIPartObjects"].items())
-                {
-                    // Part prototype은 항상 STATIC에 있음
-                    jPart["ProtoLevel"] = ETOUI(LEVEL::STATIC);
-
-                    // TextureProtoTag가 있는 Part만 현재 Texture prototype을 사용 ( Game Level과 AnimUITool의 LEVEL 인덱스가 다른 부분 보정 )
-                    if (jPart.contains("TextureProtoTag") && !jPart["TextureProtoTag"].get<string>().empty())
-                    {
-                        jPart["TextureLevel"] = iLevelIndex;
-                    }
-
-                    if (jPart.contains("MaskTextureProtoTag") && !jPart["MaskTextureProtoTag"].get<string>().empty())
-                    {
-                        jPart["MaskTextureLevel"] = iLevelIndex;
-                    }
-                }
-            }
-
+            Prepare_UIContainerJson(pProxy, pDevice, pContext, jContainer,
+                iContProtoLevel, ETOUI(LEVEL::STATIC), iLevelIndex);
             pObj->Deserialize(jContainer);
         }
 
@@ -565,6 +546,44 @@ HRESULT CLIENT_DLL Load_Level_UI(CGameInstance_Proxy* pProxy, ID3D11Device* pDev
         return Spawn_UIContainers_FromBundle(pProxy, pDevice, pContext, strFilePath, iLevelIndex);
 
     return E_FAIL;
+}
+
+void Prepare_UIContainerJson(
+    CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
+    json& jContainer, _uint iContainerProtoLevel, _uint iPartProtoLevel, _uint iTextureLevel)
+{
+    if (jContainer.contains("UIPartObjects") && jContainer["UIPartObjects"].is_object())
+    {
+        for (auto& [strPartTag, jPart] : jContainer["UIPartObjects"].items())
+        {
+            jPart["ProtoLevel"] = iPartProtoLevel;
+            if (jPart.contains("TextureProtoTag") && !jPart.value("TextureProtoTag", string()).empty())
+                jPart["TextureLevel"] = iTextureLevel;
+            if (jPart.contains("MaskTextureProtoTag") && !jPart.value("MaskTextureProtoTag", string()).empty())
+                jPart["MaskTextureLevel"] = iTextureLevel;
+        }
+    }
+
+    if (jContainer.contains("Children") && jContainer["Children"].is_object())
+    {
+        for (auto& [strChildTag, jChild] : jContainer["Children"].items())
+        {
+            jChild["ProtoLevel"] = iContainerProtoLevel;
+            if (jChild.contains("ProtoTag"))
+            {
+                _wstring strChildProto = StrToWstr(jChild["ProtoTag"].get<string>());
+                auto* pChildReg = CGameObject_Factory::GetInstance()->Get_Registration(strChildProto);
+                if (pChildReg && !pProxy->Has_Prototype(iContainerProtoLevel, strChildProto))
+                {
+                    pChildReg->ResourceLoader(pProxy, pDevice, pContext, iContainerProtoLevel);
+                    pProxy->Add_Prototype(iContainerProtoLevel, strChildProto,
+                        pChildReg->CreatorFunc(pDevice, pContext));
+                }
+            }
+            Client::Prepare_UIContainerJson(pProxy, pDevice, pContext, jChild,
+                iContainerProtoLevel, iPartProtoLevel, iTextureLevel);
+        }
+    }
 }
 
 NS_END

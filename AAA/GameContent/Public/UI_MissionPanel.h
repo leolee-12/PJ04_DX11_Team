@@ -37,7 +37,7 @@ private:
     enum class ESUCCESS { NONE, SHAKING, REVEALED };
     ESUCCESS m_eSuccess = { ESUCCESS::NONE };
     _float   m_fSuccessTimer = { 0.f };
-    _float   m_fShakeDur = { 0.5f };
+    _float   m_fShakeDur = { 1.f };
 
     _bool m_bSucceeded = { false };
 

@@ -463,55 +463,8 @@ CGameObject* CLevel_Tool::Load_UIContainerByPath(const _wstring& strFullPath, _f
         if (j.contains("Container"))
         {
             json jContainer = j["Container"];
-
-            std::function<void(json&)> PatchContainer = [&](json& jCont)
-                {
-                    if (jCont.contains("UIPartObjects") && jCont["UIPartObjects"].is_object())
-                    {
-                        for (auto& [strPartTag, jPart] : jCont["UIPartObjects"].items())
-                        {
-                            jPart["ProtoLevel"] = iPartProtoLevel;
-                            if (jPart.contains("TextureProtoTag") &&
-                                !jPart.value("TextureProtoTag", std::string()).empty())
-                                jPart["TextureLevel"] = iObjectLevel;
-                            if (jPart.contains("MaskTextureProtoTag") &&
-                                !jPart.value("MaskTextureProtoTag", std::string()).empty())
-                                jPart["MaskTextureLevel"] = iObjectLevel;
-                        }
-                    }
-                    if (jCont.contains("Children") && jCont["Children"].is_object())
-                        for (auto& [strChildTag, jChild] : jCont["Children"].items())
-                            PatchContainer(jChild);
-                };
-            PatchContainer(jContainer);
-
-            std::function<void(const json&)> EnsureChildProtos = [&](const json& jCont)
-                {
-                    if (!jCont.contains("Children") || !jCont["Children"].is_object())
-                        return;
-
-                    for (auto& [strChildTag, jChild] : jCont["Children"].items())
-                    {
-                        if (jChild.contains("ProtoTag") && jChild.contains("ProtoLevel"))
-                        {
-                            _wstring strChildProto = StrToWstr(jChild["ProtoTag"].get<std::string>());
-                            _uint    iChildLevel = jChild["ProtoLevel"].get<_uint>();
-
-                            auto* pChildReg = Client::CGameObject_Factory::GetInstance()
-                                ->Get_Registration(strChildProto);
-
-                            if (pChildReg &&
-                                !m_pGameInstance_Proxy->Has_Prototype(iChildLevel, strChildProto))
-                            {
-                                pChildReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, iChildLevel);
-                                m_pGameInstance_Proxy->Add_Prototype(iChildLevel, strChildProto,
-                                    pChildReg->CreatorFunc(m_pDevice, m_pContext));
-                            }
-                        }
-                        EnsureChildProtos(jChild);   // 중첩 코디네이터까지 재귀
-                    }
-                };
-            EnsureChildProtos(jContainer);
+            Client::Prepare_UIContainerJson(m_pGameInstance_Proxy, m_pDevice, m_pContext, jContainer,
+                iContainerProtoLevel, iPartProtoLevel, iObjectLevel);
             pObj->Deserialize(jContainer);
         }
 
@@ -1137,29 +1090,8 @@ HRESULT CLevel_Tool::Load_UIManifest(const _wstring& strManifestPath)
         if (jUI.contains("Container"))
         {
             json jContainer = jUI["Container"];
-
-            if (jContainer.contains("UIPartObjects") &&
-                jContainer["UIPartObjects"].is_object())
-            {
-                for (auto& [strPartTag, jPart] :
-                    jContainer["UIPartObjects"].items())
-                {
-                    jPart["ProtoLevel"] = iPartProtoLevel;
-
-                    if (jPart.contains("TextureProtoTag") &&
-                        !jPart.value("TextureProtoTag", std::string()).empty())
-                    {
-                        jPart["TextureLevel"] = iObjectLevel;
-                    }
-
-                    if (jPart.contains("MaskTextureProtoTag") &&
-                        !jPart.value("MaskTextureProtoTag", std::string()).empty())
-                    {
-                        jPart["MaskTextureLevel"] = iObjectLevel;
-                    }
-                }
-            }
-
+            Client::Prepare_UIContainerJson(m_pGameInstance_Proxy, m_pDevice, m_pContext, jContainer,
+                iContainerProtoLevel, iPartProtoLevel, iObjectLevel);
             pObj->Deserialize(jContainer);
         }
 

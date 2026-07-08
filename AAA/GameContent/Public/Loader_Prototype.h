@@ -51,4 +51,8 @@ HRESULT CLIENT_DLL Ready_Level_UIResources(CGameInstance_Proxy* pProxy, ID3D11De
 // (LEVEL_NAME)_ui.json : manifest 파일을 읽고 해당하는 레벨의 Object Table에 배치한다(ContainerObject만 - PartObject들은 Prototype 찾아서 Container가 갖고 있음)
 HRESULT CLIENT_DLL Load_Level_UI(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* strFilePath, _uint iLevelIndex);
 
+void CLIENT_DLL Prepare_UIContainerJson(
+    CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
+    Engine::json& jContainer, _uint iContainerProtoLevel, _uint iPartProtoLevel, _uint iTextureLevel);
+
 NS_END

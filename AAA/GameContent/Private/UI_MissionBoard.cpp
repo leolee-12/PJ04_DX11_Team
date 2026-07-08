@@ -10,13 +10,14 @@ CUI_MissionBoard::CUI_MissionBoard(ID3D11Device* d, ID3D11DeviceContext* c)
     m_fIntroSlideOffX = 900.f;   
     m_fIntroSlideDur = 0.30f;    
     m_fIntroStagger = 0.12f;     
-    m_fSuccessGap = 0.35f;
+    m_fSuccessGap = 1.5f;
 }
 CUI_MissionBoard::CUI_MissionBoard(const CUI_MissionBoard& p)
     : CUICoordinatorContainer(p)
     , m_fIntroSlideOffX(p.m_fIntroSlideOffX)
     , m_fIntroSlideDur(p.m_fIntroSlideDur)
     , m_fIntroStagger(p.m_fIntroStagger)
+    , m_fSuccessGap(p.m_fSuccessGap)
 {
 }
 

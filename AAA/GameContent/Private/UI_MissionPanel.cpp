@@ -65,7 +65,7 @@ void CUI_MissionPanel::Play_Success()
         shake.vDirection = { 1.f, 0.f };   // ÁÂ¿ì·Î
         shake.fDistance = 6.f;            // ÀÛ°Ô
         shake.fDuration = m_fShakeDur;
-        shake.fWaveCount = 12.f;           // ºÎµéºÎµé(¶³¸² È½¼ö)
+        shake.fWaveCount = 24.f;           // ºÎµéºÎµé(¶³¸² È½¼ö)
         shake.fDamping = 1.f;            // Á¡Á¡ Àæ¾Æµê
         shake.bRestoreOnFinish = true;
         pAnim->Play_Bounce(PART_CAGE, shake);
