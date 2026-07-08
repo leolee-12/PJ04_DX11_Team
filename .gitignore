@@ -467,6 +467,7 @@ AAA/*.zip
 # Personal workspace files (local only, do not track)
 /명세서/
 /AGENTS.md
+/CLAUDE.md
 /Temp/
 /[Dd]ocs/
 AAA/AnimUITool/Default/AnimUITool_imgui.ini

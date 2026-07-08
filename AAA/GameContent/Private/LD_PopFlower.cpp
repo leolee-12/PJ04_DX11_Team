@@ -53,7 +53,6 @@ HRESULT CLD_PopFlower::Initialize(void* pArg)
 
 	m_tPopFlowerDesc = *static_cast<const LD_EVENTOBJECT_DESC*>(pArg);
 	m_eState = STATE::IDLE;
-	m_bInteractionTriggerRegistered = false;
 	m_bPlayerOverlapping = false;
 	m_iBudMeshIndex = -1;
 	m_iBloomMeshIndex = -1;
@@ -87,10 +86,7 @@ HRESULT CLD_PopFlower::Validate_Initialized()
 	if (m_tPopFlowerDesc.bUseCollMesh || !m_tPopFlowerDesc.strAnimEventFile.empty())
 		return E_FAIL;
 
-	if (nullptr == m_pShaderCom || nullptr == m_pModelCom || nullptr == m_pAnimatorCom || nullptr == m_pInteractionTrigger)
-		return E_FAIL;
-
-	if (!m_bInteractionTriggerRegistered)
+	if (nullptr == m_pShaderCom || nullptr == m_pModelCom || nullptr == m_pAnimatorCom || nullptr == m_pTrigger)
 		return E_FAIL;
 
 	if (m_pModelCom->Get_AnimationIndex(POPFLOWER_ANIM_WAIT) < 0)
@@ -133,12 +129,12 @@ void CLD_PopFlower::Late_Update(_float fTimeDelta)
 	if (!m_bActive || Is_Dead())
 		return;
 
-	if (m_pInteractionTrigger->Is_Enabled())
+	if (m_pTrigger->Is_Enabled())
 	{
-		m_pInteractionTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+		m_pTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
 #ifdef _DEBUG
-		m_pGameInstance_Proxy->Add_DebugComponent(m_pInteractionTrigger);
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pTrigger);
 #endif
 	}
 
@@ -222,7 +218,7 @@ HRESULT CLD_PopFlower::Ready_Components()
 	if (FAILED(Ready_InitialState()))
 		return E_FAIL;
 
-	if (FAILED(Ready_InteractionTrigger()))
+	if (FAILED(Ready_Trigger()))
 		return E_FAIL;
 
 	return S_OK;
@@ -268,7 +264,7 @@ HRESULT CLD_PopFlower::Ready_InitialState()
 	return S_OK;
 }
 
-HRESULT CLD_PopFlower::Ready_InteractionTrigger()
+HRESULT CLD_PopFlower::Ready_Trigger()
 {
 	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pModelCom)
 		return E_FAIL;
@@ -303,15 +299,14 @@ HRESULT CLD_PopFlower::Ready_InteractionTrigger()
 	ColliderDesc.vCenter = vCenter;
 	ColliderDesc.fRadius = fRadius;
 
-	m_pInteractionTrigger = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
-		TEXT("Com_InteractionTrigger"), &ColliderDesc);
-	if (nullptr == m_pInteractionTrigger)
+	m_pTrigger = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
+		TEXT("Com_Trigger"), &ColliderDesc);
+	if (nullptr == m_pTrigger)
 		return E_FAIL;
 
-	SetUp_InteractionTriggerCallback();
+	SetUp_Collider_Callback();
 
-	m_pGameInstance_Proxy->Register_Collider(m_pInteractionTrigger, ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
-	m_bInteractionTriggerRegistered = true;
+	m_pGameInstance_Proxy->Register_Collider(m_pTrigger, ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
 
 	return S_OK;
 }
@@ -389,17 +384,17 @@ HRESULT CLD_PopFlower::Render_Model()
 	return S_OK;
 }
 
-void CLD_PopFlower::SetUp_InteractionTriggerCallback()
+void CLD_PopFlower::SetUp_Collider_Callback()
 {
-	if (nullptr == m_pInteractionTrigger)
+	if (nullptr == m_pTrigger)
 		return;
 
-	m_pInteractionTrigger->Set_OnEnter([this](CCollider* pOther) { Handle_InteractionTrigger(pOther); });
-	m_pInteractionTrigger->Set_OnStay([this](CCollider* pOther) { Handle_InteractionTriggerStay(pOther); });
-	m_pInteractionTrigger->Set_OnExit([this](CCollider* pOther) { Handle_InteractionTriggerExit(pOther); });
+	m_pTrigger->Set_OnEnter([this](CCollider* pOther) { Handle_TriggerEnter(pOther); });
+	m_pTrigger->Set_OnStay([this](CCollider* pOther) { Handle_TriggerStay(pOther); });
+	m_pTrigger->Set_OnExit([this](CCollider* pOther) { Handle_TriggerExit(pOther); });
 }
 
-void CLD_PopFlower::Handle_InteractionTrigger(CCollider* pOther)
+void CLD_PopFlower::Handle_TriggerEnter(CCollider* pOther)
 {
 	if (!Is_PlayerCollider(pOther))
 		return;
@@ -416,7 +411,7 @@ void CLD_PopFlower::Handle_InteractionTrigger(CCollider* pOther)
 	Grant_Reward(pOther);
 }
 
-void CLD_PopFlower::Handle_InteractionTriggerStay(CCollider* pOther)
+void CLD_PopFlower::Handle_TriggerStay(CCollider* pOther)
 {
 	if (!Is_PlayerCollider(pOther))
 		return;
@@ -424,7 +419,7 @@ void CLD_PopFlower::Handle_InteractionTriggerStay(CCollider* pOther)
 	m_bPlayerOverlapping = true;
 }
 
-void CLD_PopFlower::Handle_InteractionTriggerExit(CCollider* pOther)
+void CLD_PopFlower::Handle_TriggerExit(CCollider* pOther)
 {
 	if (!Is_PlayerCollider(pOther))
 		return;
@@ -451,26 +446,6 @@ void CLD_PopFlower::Grant_Reward(CCollider* pOther)
 	KIRBY_POINTSTAR_GAINED_DESC Desc{};
 	Desc.iAmount = POPFLOWER_POINT_AMOUNT;
 	m_pGameInstance_Proxy->Publish(EventTag::Kirby_PointStarGained, &Desc);
-}
-
-void CLD_PopFlower::Unregister_InteractionTrigger(_bool bImmediate)
-{
-	if (nullptr == m_pInteractionTrigger)
-		return;
-
-	m_pInteractionTrigger->Set_Enabled(false);
-
-	if (!m_bInteractionTriggerRegistered)
-		return;
-
-	const _uint iGroup = ETOUI(COLLISION_LAYER::ENV_TRIGGER);
-
-	if (bImmediate)
-		m_pGameInstance_Proxy->Immediate_Unregister(m_pInteractionTrigger, iGroup);
-	else
-		m_pGameInstance_Proxy->Request_Unregister(m_pInteractionTrigger, iGroup);
-
-	m_bInteractionTriggerRegistered = false;
 }
 
 _bool CLD_PopFlower::Play_Animation(const _char* pAnimName, _bool bLoop)
@@ -559,8 +534,6 @@ CGameObject* CLD_PopFlower::Clone(void* pArg)
 
 void CLD_PopFlower::Free()
 {
-	Unregister_InteractionTrigger(true);
-
 	__super::Free();
 }
 

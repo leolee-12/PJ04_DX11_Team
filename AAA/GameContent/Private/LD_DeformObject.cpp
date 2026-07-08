@@ -85,7 +85,7 @@ HRESULT CLD_DeformObject::Validate_Initialized()
 	if (m_tDeformObjectDesc.fInteractionRadius < 0.f)
 		return E_FAIL;
 
-	if (nullptr == m_pInteractionCollider)
+	if (nullptr == m_pTrigger)
 		return E_FAIL;
 
 	if (!m_tDeformObjectDesc.bUseCollMesh || nullptr == m_pRigidStatic)
@@ -104,12 +104,12 @@ void CLD_DeformObject::Update(_float fTimeDelta)
 
 void CLD_DeformObject::Late_Update(_float fTimeDelta)
 {
-	if (m_bAvailable && m_pInteractionCollider->Is_Enabled())
+	if (m_bAvailable && m_pTrigger->Is_Enabled())
 	{
-		m_pInteractionCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+		m_pTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
 #ifdef _DEBUG
-		m_pGameInstance_Proxy->Add_DebugComponent(m_pInteractionCollider);
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pTrigger);
 #endif
 	}
 
@@ -190,7 +190,7 @@ HRESULT CLD_DeformObject::On_DeformAcquired()
 		return S_FALSE;
 
 	m_bAvailable = false;
-	Set_InteractionEnabled(false);
+	Set_TriggerEnabled(false);
 	Release_RigidStatic();
 	Set_Active(false);
 
@@ -211,8 +211,8 @@ HRESULT CLD_DeformObject::On_DeformReleased(const _float3& vWorldPosition)
 
 	m_bAvailable = true;
 	Set_Active(true);
-	Set_InteractionEnabled(true);
-	m_pInteractionCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+	Set_TriggerEnabled(true);
+	m_pTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
 	return S_OK;
 }
@@ -222,10 +222,10 @@ HRESULT CLD_DeformObject::Ready_Components()
 	if (FAILED(__super::Ready_Components()))
 		return E_FAIL;
 
-	return Ready_InteractionCollider();
+	return Ready_Trigger();
 }
 
-HRESULT CLD_DeformObject::Ready_InteractionCollider()
+HRESULT CLD_DeformObject::Ready_Trigger()
 {
 	_float3 vMin = {};
 	_float3 vMax = {};
@@ -247,22 +247,22 @@ HRESULT CLD_DeformObject::Ready_InteractionCollider()
 	ColliderDesc.vCenter = vCenter;
 	ColliderDesc.fRadius = fInteractionRadius;
 
-	m_pInteractionCollider = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
-		TEXT("Com_InteractionCollider"), &ColliderDesc);
-	if (nullptr == m_pInteractionCollider)
+	m_pTrigger = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
+		TEXT("Com_Trigger"), &ColliderDesc);
+	if (nullptr == m_pTrigger)
 		return E_FAIL;
 
-	m_pGameInstance_Proxy->Register_Collider(m_pInteractionCollider, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+	m_pGameInstance_Proxy->Register_Collider(m_pTrigger, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
 
 	return S_OK;
 }
 
-void CLD_DeformObject::Set_InteractionEnabled(_bool bEnabled)
+void CLD_DeformObject::Set_TriggerEnabled(_bool bEnabled)
 {
-	if (nullptr == m_pInteractionCollider)
+	if (nullptr == m_pTrigger)
 		return;
 
-	m_pInteractionCollider->Set_Enabled(bEnabled);
+	m_pTrigger->Set_Enabled(bEnabled);
 }
 
 CLD_DeformObject* CLD_DeformObject::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

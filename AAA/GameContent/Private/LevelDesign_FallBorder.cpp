@@ -74,7 +74,7 @@ HRESULT CLevelDesign_FallBorder::Validate_Initialized()
 	if (strObjectName != L"FallBorder")
 		return E_FAIL;
 
-	if (nullptr == m_pColliderCom)
+	if (nullptr == m_pTrigger)
 		return E_FAIL;
 
 	return S_OK;
@@ -84,10 +84,10 @@ void CLevelDesign_FallBorder::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
-	m_pColliderCom->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+	m_pTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
 #ifdef _DEBUG
-	m_pGameInstance_Proxy->Add_DebugComponent(m_pColliderCom);
+	m_pGameInstance_Proxy->Add_DebugComponent(m_pTrigger);
 #endif
 }
 
@@ -104,9 +104,9 @@ HRESULT CLevelDesign_FallBorder::Ready_Components(const LD_PARSED_OBJECT& Desc)
 	if (!Has_UsableBoxSize(Desc.Volume.vAreaSize))
 		return E_FAIL;
 
-	m_pColliderCom = Add_Component<CCollider>(L"Com_Collider", CCollider::Create(m_pDevice, m_pContext, COLLIDER::OBB));
+	m_pTrigger = Add_Component<CCollider>(L"Com_Trigger", CCollider::Create(m_pDevice, m_pContext, COLLIDER::OBB));
 
-	if (nullptr == m_pColliderCom)
+	if (nullptr == m_pTrigger)
 		return E_FAIL;
 
 	CCollider::COLLIDER_DESC ColliderDesc{};
@@ -114,10 +114,10 @@ HRESULT CLevelDesign_FallBorder::Ready_Components(const LD_PARSED_OBJECT& Desc)
 	ColliderDesc.vCenter = { 0.f, 0.f, 0.f };
 	ColliderDesc.vSize = Make_ColliderSize(Desc.Volume.vAreaSize);
 
-	if (FAILED(m_pColliderCom->Initialize(&ColliderDesc)))
+	if (FAILED(m_pTrigger->Initialize(&ColliderDesc)))
 		return E_FAIL;
 
-	m_pGameInstance_Proxy->Register_Collider(m_pColliderCom, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+	m_pGameInstance_Proxy->Register_Collider(m_pTrigger, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
 
 	SetUp_Collider_Callback();
 
@@ -126,23 +126,21 @@ HRESULT CLevelDesign_FallBorder::Ready_Components(const LD_PARSED_OBJECT& Desc)
 
 void CLevelDesign_FallBorder::SetUp_Collider_Callback()
 {
-	if (nullptr == m_pColliderCom)
+	if (nullptr == m_pTrigger)
 		return;
 
-	m_pColliderCom->Set_OnEnter([this](CCollider* pOther)
-		{
-			if (nullptr == pOther)
-				return;
-
-			if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
-				return;
-
-			Handle_Fall(pOther->Get_Owner());
-		});
+	m_pTrigger->Set_OnEnter([this](CCollider* pOther) { Handle_TriggerEnter(pOther); });
 }
 
-void CLevelDesign_FallBorder::Handle_Fall(CGameObject* pPlayer)
+void CLevelDesign_FallBorder::Handle_TriggerEnter(CCollider* pOther)
 {
+	if (nullptr == pOther)
+		return;
+
+	if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
+		return;
+
+	CGameObject* pPlayer = pOther->Get_Owner();
 	if (nullptr == pPlayer)
 		return;
 

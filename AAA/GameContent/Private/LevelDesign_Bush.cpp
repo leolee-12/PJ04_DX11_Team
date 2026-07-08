@@ -118,7 +118,7 @@ HRESULT CLevelDesign_Bush::Validate_Initialized()
 			return E_FAIL;
 	}
 
-	if (nullptr == m_pAnimatorCom || nullptr == m_pHurtBoxCom)
+	if (nullptr == m_pAnimatorCom || nullptr == m_pHurtBox)
 		return E_FAIL;
 
 	_bool bHasWaitAnim = false;
@@ -150,11 +150,11 @@ void CLevelDesign_Bush::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
-	if (BUSH_STATE::BASIC == m_eState && m_pHurtBoxCom->Is_Enabled())
+	if (BUSH_STATE::BASIC == m_eState && m_pHurtBox->Is_Enabled())
 	{
-		m_pHurtBoxCom->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+		m_pHurtBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 #ifdef _DEBUG
-		m_pGameInstance_Proxy->Add_DebugComponent(m_pHurtBoxCom);
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pHurtBox);
 #endif
 	}
 
@@ -185,7 +185,7 @@ void CLevelDesign_Bush::Damaged(const ATTACK_INFO& tInfo)
 		return;
 
 	m_eState = BUSH_STATE::CUT;
-	m_pHurtBoxCom->Set_Enabled(false);
+	m_pHurtBox->Set_Enabled(false);
 }
 
 void CLevelDesign_Bush::Register_LevelDesignSpecs()
@@ -331,12 +331,12 @@ HRESULT CLevelDesign_Bush::Ready_HurtBox()
 	ColliderDesc.vCenter = { (vMin.x + vMax.x) * 0.5f, (vMin.y + vMax.y) * 0.5f, (vMin.z + vMax.z) * 0.5f };
 	ColliderDesc.fRadius = max(max(vSize.x, vSize.y), vSize.z) * 0.5f;
 
-	m_pHurtBoxCom = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, TEXT("Com_HurtBox"),
+	m_pHurtBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, TEXT("Com_HurtBox"),
 		&ColliderDesc);
-	if (nullptr == m_pHurtBoxCom)
+	if (nullptr == m_pHurtBox)
 		return E_FAIL;
 
-	m_pGameInstance_Proxy->Register_Collider(m_pHurtBoxCom, ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
+	m_pGameInstance_Proxy->Register_Collider(m_pHurtBox, ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
 
 	return S_OK;
 }

@@ -4,13 +4,23 @@
 
 #include "GameInstance.h"
 
+NS_BEGIN(Client)
+
 CLD_Inhalable::CLD_Inhalable(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevelDesignObject(pDevice, pContext)
 {
 }
 
-CLD_Inhalable::CLD_Inhalable(const CLevelDesignObject& Prototype)
+CLD_Inhalable::CLD_Inhalable(const CLD_Inhalable& Prototype)
 	: CLevelDesignObject(Prototype)
+	, m_eState(Prototype.m_eState)
+	, m_fColliderRadius(Prototype.m_fColliderRadius)
+	, m_fPullSpeed(Prototype.m_fPullSpeed)
+	, m_vBaseScale(Prototype.m_vBaseScale)
+	, m_fScaleRatio(Prototype.m_fScaleRatio)
+	, m_fLifeTime(Prototype.m_fLifeTime)
+	, s_fSpatDamage(Prototype.s_fSpatDamage)
+	, s_fSpatKnockback(Prototype.s_fSpatKnockback)
 {
 }
 
@@ -19,7 +29,7 @@ HRESULT CLD_Inhalable::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Ready_Collider()))
+	if (FAILED(Ready_HurtBox()))
 		return E_FAIL;
 
 	return S_OK;
@@ -69,7 +79,7 @@ void CLD_Inhalable::Late_Update(_float fTimeDelta)
 	}
 }
 
-HRESULT CLD_Inhalable::Ready_Collider()
+HRESULT CLD_Inhalable::Ready_HurtBox()
 {
 	if (m_fColliderRadius <= 0.f)
 		return E_FAIL;
@@ -87,12 +97,12 @@ HRESULT CLD_Inhalable::Ready_Collider()
 
 	m_pGameInstance_Proxy->Register_Collider(m_pHurtBox, ETOUI(COLLISION_LAYER::ENV_HURT));
 
-	SetUp_Collider_CallBack();
+	SetUp_Collider_Callback();
 
 	return S_OK;
 }
 
-void CLD_Inhalable::SetUp_Collider_CallBack()
+void CLD_Inhalable::SetUp_Collider_Callback()
 {
 }
 
@@ -176,4 +186,5 @@ void CLD_Inhalable::On_SpatEnd()
 	Set_Active(false);
 }
 
+NS_END
 

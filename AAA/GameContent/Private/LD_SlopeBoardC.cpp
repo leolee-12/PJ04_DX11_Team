@@ -68,6 +68,9 @@ HRESULT CLD_SlopeBoardC::Validate_Initialized()
 	if (nullptr == m_pHorizontalPhysicsActor || nullptr == m_pVerticalPhysicsActor)
 		return E_FAIL;
 
+	if (nullptr == m_pTrigger)
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -84,12 +87,12 @@ void CLD_SlopeBoardC::Update(_float fTimeDelta)
 
 void CLD_SlopeBoardC::Late_Update(_float fTimeDelta)
 {
-	if (m_pInteractionCollider->Is_Enabled())
+	if (m_pTrigger->Is_Enabled())
 	{
-		m_pInteractionCollider->Update(XMMatrixIdentity());
+		m_pTrigger->Update(XMMatrixIdentity());
 
 #ifdef _DEBUG
-		m_pGameInstance_Proxy->Add_DebugComponent(m_pInteractionCollider);
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pTrigger);
 #endif
 	}
 
@@ -175,7 +178,7 @@ HRESULT CLD_SlopeBoardC::Ready_Components()
 	if (FAILED(Ready_PhysicsBoxes()))
 		return E_FAIL;
 
-	if (FAILED(Ready_InteractionCollider()))
+	if (FAILED(Ready_Trigger()))
 		return E_FAIL;
 
 	return S_OK;
@@ -257,7 +260,7 @@ void CLD_SlopeBoardC::Release_PhysicsBoxes()
 	Release_PhysicsBox(&m_pVerticalPhysicsActor);
 }
 
-HRESULT CLD_SlopeBoardC::Ready_InteractionCollider()
+HRESULT CLD_SlopeBoardC::Ready_Trigger()
 {
 	CCollider::COLLIDER_DESC ColliderDesc{};
 	ColliderDesc.pOwner = this;
@@ -267,17 +270,25 @@ HRESULT CLD_SlopeBoardC::Ready_InteractionCollider()
 		SLOPEBOARD_C_VERTICAL_BOX_HALF_EXTENTS.y * 2.f,
 		SLOPEBOARD_C_VERTICAL_BOX_HALF_EXTENTS.z * 2.f };
 
-	m_pInteractionCollider = Add_Component<CCollider>(Collider_AABB.iLevelID, Collider_AABB.szProtoTag, TEXT("Com_InteractionCollider"), &ColliderDesc);
-	if (nullptr == m_pInteractionCollider)
+	m_pTrigger = Add_Component<CCollider>(Collider_AABB.iLevelID, Collider_AABB.szProtoTag, TEXT("Com_Trigger"), &ColliderDesc);
+	if (nullptr == m_pTrigger)
 		return E_FAIL;
 
-	m_pInteractionCollider->Set_OnEnter([this](CCollider* pOther) { Handle_Interaction(pOther); });
-	m_pGameInstance_Proxy->Register_Collider(m_pInteractionCollider, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+	SetUp_Collider_Callback();
+	m_pGameInstance_Proxy->Register_Collider(m_pTrigger, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
 
 	return S_OK;
 }
 
-void CLD_SlopeBoardC::Handle_Interaction(CCollider* pOther)
+void CLD_SlopeBoardC::SetUp_Collider_Callback()
+{
+	if (nullptr == m_pTrigger)
+		return;
+
+	m_pTrigger->Set_OnEnter([this](CCollider* pOther) { Handle_TriggerEnter(pOther); });
+}
+
+void CLD_SlopeBoardC::Handle_TriggerEnter(CCollider* pOther)
 {
 	if (nullptr == pOther)
 		return;
@@ -301,7 +312,7 @@ void CLD_SlopeBoardC::On_Event()
 	Play_Anim(ANIM_CUT1);
 	m_eState = STATE::PLAYING;
 
-	m_pInteractionCollider->Set_Enabled(false);
+	m_pTrigger->Set_Enabled(false);
 }
 
 CGameObject* CLD_SlopeBoardC::Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

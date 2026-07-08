@@ -42,7 +42,7 @@ public:
 	static _bool Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
 
 private:
-	CCollider* m_pInteractionCollider = { nullptr };
+	CCollider* m_pTrigger = { nullptr };
 	physx::PxRigidStatic* m_pHorizontalPhysicsActor = { nullptr };
 	physx::PxRigidStatic* m_pVerticalPhysicsActor = { nullptr };
 
@@ -55,12 +55,13 @@ private:
 	HRESULT Ready_RenderComponents();
 	HRESULT Ready_PhysicsBoxes();
 	HRESULT Ready_PhysicsBox(const _float3& vWorldCenter, const _float3& vWorldHalfExtents, physx::PxRigidStatic** ppOutActor);
-	HRESULT Ready_InteractionCollider();
+	HRESULT Ready_Trigger();
 
 	void Release_PhysicsBox(physx::PxRigidStatic** ppActor);
 	void Release_PhysicsBoxes();
 
-	void Handle_Interaction(CCollider* pOther);
+	void SetUp_Collider_Callback();
+	void Handle_TriggerEnter(CCollider* pOther);
 	void On_Event();
 
 public:

@@ -122,7 +122,7 @@ HRESULT CLD_SlopeBoardA::Validate_Initialized()
 	if (nullptr == m_pRigidStatic)
 		return E_FAIL;
 
-	if (nullptr == m_pInteractionTrigger || !m_bInteractionTriggerRegistered)
+	if (nullptr == m_pTrigger)
 		return E_FAIL;
 
 	return S_OK;
@@ -161,17 +161,17 @@ void CLD_SlopeBoardA::Update(_float fTimeDelta)
 
 void CLD_SlopeBoardA::Late_Update(_float fTimeDelta)
 {
-	if (m_pInteractionTrigger->Is_Enabled())
+	if (m_pTrigger->Is_Enabled())
 	{
 		const _float4x4* pBoneMatrix = m_pModelCom->Get_BoneMatrixPtr(SLOPEBOARD_A_PLATFORM_BONE_NAME);
 		const _matrix TriggerWorld = RemoveScale_FromWorldMatrix(
 			XMLoadFloat4x4(pBoneMatrix)
 			* XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
-		m_pInteractionTrigger->Update(TriggerWorld);
+		m_pTrigger->Update(TriggerWorld);
 
 #ifdef _DEBUG
-		m_pGameInstance_Proxy->Add_DebugComponent(m_pInteractionTrigger);
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pTrigger);
 #endif
 	}
 
@@ -254,7 +254,7 @@ HRESULT CLD_SlopeBoardA::Ready_Components()
 	if (FAILED(Ready_PhysicsComponent()))
 		return E_FAIL;
 
-	if (FAILED(Ready_CollisionComponent()))
+	if (FAILED(Ready_Trigger()))
 		return E_FAIL;
 
 	return S_OK;
@@ -351,7 +351,7 @@ HRESULT CLD_SlopeBoardA::Update_ToFallenPose()
 	return m_pGameInstance_Proxy->Refresh_StaticBoxPose(m_pRigidStatic, vLocalCenter, MeshWorld);
 }
 
-HRESULT CLD_SlopeBoardA::Ready_CollisionComponent()
+HRESULT CLD_SlopeBoardA::Ready_Trigger()
 {
 	const _int iMeshIndex = Find_MeshIndex_ByName(SLOPEBOARD_A_PLATFORM_MESH_NAME);
 	if (iMeshIndex < 0)
@@ -385,38 +385,37 @@ HRESULT CLD_SlopeBoardA::Ready_CollisionComponent()
 	ColliderDesc.vCenter = vCenter;
 	ColliderDesc.vSize = vSize;
 
-	m_pInteractionTrigger = Add_Component<CCollider>(
+	m_pTrigger = Add_Component<CCollider>(
 		Collider_OBB.iLevelID,
 		Collider_OBB.szProtoTag,
-		TEXT("Com_SlopeBoardTrigger"),
+		TEXT("Com_Trigger"),
 		&ColliderDesc);
 
-	if (nullptr == m_pInteractionTrigger)
+	if (nullptr == m_pTrigger)
 		return E_FAIL;
 
-	SetUp_CollisionCallback();
+	SetUp_Collider_Callback();
 
 	m_pGameInstance_Proxy->Register_Collider(
-		m_pInteractionTrigger,
+		m_pTrigger,
 		ETOUI(COLLISION_LAYER::ENV_TRIGGER));
 
-	m_bInteractionTriggerRegistered = true;
 	return S_OK;
 }
 
-void CLD_SlopeBoardA::SetUp_CollisionCallback()
+void CLD_SlopeBoardA::SetUp_Collider_Callback()
 {
-	if (nullptr == m_pInteractionTrigger)
+	if (nullptr == m_pTrigger)
 		return;
 
-	m_pInteractionTrigger->Set_OnEnter(
+	m_pTrigger->Set_OnEnter(
 		[this](CCollider* pOther)
 		{
-			Handle_CollisionEnter(pOther);
+			Handle_TriggerEnter(pOther);
 		});
 }
 
-void CLD_SlopeBoardA::Handle_CollisionEnter(CCollider* pOther)
+void CLD_SlopeBoardA::Handle_TriggerEnter(CCollider* pOther)
 {
 	if (nullptr == pOther)
 		return;
@@ -438,7 +437,7 @@ void CLD_SlopeBoardA::On_Event()
 	m_fElapsed = 0.f;
 	m_bEndAnimationPlayed = false;
 
-	m_pInteractionTrigger->Set_Enabled(false);
+	m_pTrigger->Set_Enabled(false);
 }
 
 _bool CLD_SlopeBoardA::Should_RenderMesh(_uint iMeshIndex) const

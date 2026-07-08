@@ -55,7 +55,7 @@ private:
     CShader* m_pShaderComs[BUSH_STATE::_COUNT] = { nullptr };
     CModel* m_pModelComs[BUSH_STATE::_COUNT] = { nullptr };
     CAnimator* m_pAnimatorCom = { nullptr };
-    CCollider* m_pHurtBoxCom = { nullptr };
+    CCollider* m_pHurtBox = { nullptr };
 
     LD_BUSH_DESC m_tBushDesc = {};
     BUSH_STATE m_eState = { BUSH_STATE::BASIC };
