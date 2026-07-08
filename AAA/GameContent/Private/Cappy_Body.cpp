@@ -33,9 +33,39 @@ HRESULT CCappy_Body::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CCappy_Body::Update(_float fTimeDelta)
+HRESULT CCappy_Body::Render()
 {
-	__super::Update(fTimeDelta);
+	if (FAILED(Bind_ShaderResources()))
+		return E_FAIL;
+
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", i, MTEX_TYPE::NORMALS, 0)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
+			return E_FAIL;
+
+		if (m_pAnimatorCom)                            
+		{
+			if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+				return E_FAIL;
+		}
+
+		if (FAILED(m_pShaderCom->Begin(1)))
+			return E_FAIL;
+
+		// 숨어 있는 상태 + 모자 쓰고 있을 때 팔을 렌더 하지 않음
+		if (m_bIsHidden && m_bHatAttached && i == 1)
+			continue;
+
+		if (FAILED(m_pModelCom->Render(i)))
+			return E_FAIL;
+	}
+
+	return S_OK;
 }
 
 HRESULT CCappy_Body::Ready_Components()
@@ -43,7 +73,7 @@ HRESULT CCappy_Body::Ready_Components()
 	PART_SETUP t{};
 	t.tShader = Shader_Monster;
 	t.szModelProtoTag = TEXT("Prototype_Component_Model_Cappy_Body");
-
+	t.szAnimEventFile = TEXT("../../Resources/CHJ/Monster/Cappy/Body/Cappy_Body_AnimEvents.json");
 	if (FAILED(Ready_MeshPart(t)))
 		return E_FAIL;
 

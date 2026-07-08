@@ -95,6 +95,9 @@ HRESULT CPoppyBrosJr::Ready_State()
 	if (m_pStateMachine == nullptr)
 		return E_FAIL;
 
+	if (FAILED(__super::Ready_State()))
+		return E_FAIL;
+
 	ANI_PLAY_INFO Info{};
 
 	// IDLE

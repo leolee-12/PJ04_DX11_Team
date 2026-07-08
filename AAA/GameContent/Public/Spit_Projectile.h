@@ -1,6 +1,10 @@
 #pragma once
 #include "Projectile.h"
 
+NS_BEGIN(Engine)
+class CEffect_Container;
+NS_END
+
 NS_BEGIN(Client)
 class IInhalable;
 
@@ -49,6 +53,8 @@ private:
     float   m_fSpinDeg = { 0.f };
     _float3  m_vSpinAxis = { 0.f, 0.f, 1.f };
     static constexpr _float SPIN_SPEED_DEG = 720.f;
+
+    CEffect_Container*          m_pSpitFx = { nullptr };
 
 public:
     static CSpit_Projectile* Create(ID3D11Device*, ID3D11DeviceContext*);

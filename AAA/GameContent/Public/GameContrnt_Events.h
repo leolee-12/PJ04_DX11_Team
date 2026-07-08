@@ -36,7 +36,6 @@ namespace Client
         inline constexpr const _tchar* Cutscene_CameraChange = L"Cutscene.CameraChange";
         inline constexpr const _tchar* Cutscene_StageClear = L"Cutscene.StageClear";
 
-
         // QTE
         inline constexpr const _tchar* QTE_Success = L"QTE.Success";
 
@@ -54,6 +53,9 @@ namespace Client
         // 포인터 질의
         inline constexpr const _tchar* Query_Player = L"Query_Player";
         inline constexpr const _tchar* Query_Boss = L"Query_Boss";
+
+        // 사운드 
+        inline constexpr const _tchar* BGMChange = L"ChangeBGM";
     }
 
 
@@ -173,7 +175,7 @@ namespace Client
 
     struct CUTSCENE_STAGECLEAR
     {
-        _float3 vPos = { 0.f, 0.f, 0.f };
+        _float4x4 AnchorWorld {};
         STAGECLEAR_ANIM eAnim{ STAGECLEAR_ANIM::_COUNT };
         _float fAnimSpeed { 1.f };
         _float fBlendDuration = { 0.f };

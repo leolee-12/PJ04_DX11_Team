@@ -92,6 +92,10 @@ HRESULT CEffect_RectEmitter::Render()
         if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &Particle.vColor, sizeof(Particle.vColor))))
             return E_FAIL;
 
+        _float fRoll = XMConvertToRadians(Particle.vRotation.z);
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_fRoll", &fRoll, sizeof(fRoll))))
+            return E_FAIL;
+
         if (FAILED(Bind_ShaderValue(fLocalRatio)))
             return E_FAIL;
 

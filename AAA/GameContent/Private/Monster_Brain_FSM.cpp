@@ -24,7 +24,7 @@ _bool CMonster_Brain_FSM::Can_Decide(const MONSTER_BLACKBOARD& BlackBoard) const
 
     if (eCurState == MONSTER_STATE_TYPE::CAPTURED || eCurState == MONSTER_STATE_TYPE::DEATH ||
         eCurState == MONSTER_STATE_TYPE::KNOCK_OUT || eCurState == MONSTER_STATE_TYPE::KNOCK_BACK_DEATH ||
-        eCurState == MONSTER_STATE_TYPE::FALL ||  eCurState == MONSTER_STATE_TYPE::LANDING )
+        eCurState == MONSTER_STATE_TYPE::FALL ||  eCurState == MONSTER_STATE_TYPE::LANDING  || eCurState == MONSTER_STATE_TYPE::FLATTEN)
         return false;
 
     if (!BlackBoard.bCanTransition)
