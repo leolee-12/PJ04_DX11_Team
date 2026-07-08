@@ -39,7 +39,7 @@ class CKirby final : public CCharacter
 	GENERATED_BODY(CKirby)
 
 public:
-	enum KIRBY_COLLIDER { HURT_BOX, INHALE_BOX, CAR_BOOST_COLLIDER ,COLLIDER_END };
+	enum KIRBY_COLLIDER { HURT_BOX, INHALE_BOX ,COLLIDER_END };
 
 	struct KIRBY_BODY_DESC : public CContainerObject::COTAINEROBJECT_DESC
 	{
@@ -52,7 +52,7 @@ public:
 	static constexpr _float s_fCCT_Height = 0.1f;
 	
 	static constexpr _float s_fGroundFriction = 40.f;
-	static constexpr _float s_fMaxHorizontalSpeed = 8.f;
+	static constexpr _float s_fMaxHorizontalSpeed = 9.f;
 
 	static constexpr _float s_fLinearDrag = 0.9f;
 	static constexpr _float s_fFallVelocityY = -7.f;
@@ -99,7 +99,7 @@ public:
 	CKirby_OnOffPart* Find_WeaponPart(COPY_ABILITY_TYPE eType);
 	CKirby_OnOffPart* Find_HatPart(COPY_ABILITY_TYPE eType);
 
-	void Set_WeaponLadderState(_bool bOn);
+	void Put_WeaponOnBack(_bool bOn);
 
 	CKirby_Body* Get_Body() { return m_pBody; }
 	CKirby_Deform_Model* Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType = KIRBY_DEFORM_MODEL_TYPE::MAIN);
@@ -157,7 +157,7 @@ public:
 
 private:
 	HRESULT Ready_Components();
-	void	SetUp_Collider_Callback();
+	HRESULT	SetUp_Collider_Callback();
 	HRESULT Ready_PartObjects();
 	HRESULT Ready_System();
 	HRESULT Ready_Ability();
@@ -218,14 +218,12 @@ private:
 	unordered_map<DEFORM_TYPE, CKirby_Deform*> m_Deformations;
 
 	// CutScene Grab
-	const _float4x4* m_pGrabBone = nullptr;
-	const _float4x4* m_pGrabOwnerWorld = nullptr;
+	_float3 m_vPreAttachScale{};
+	const _float4x4* m_pGrabBone{};
+	const _float4x4* m_pGrabOwnerWorld{};
 
 	// Ladder
 	CLevelDesign_Ladder* m_pLadder{};
-
-	// À±¼®Çö Ãß°¡
-	_float3 m_vBaseScale = { 1.f, 1.f, 1.f };
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

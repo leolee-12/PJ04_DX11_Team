@@ -47,7 +47,7 @@ public:
 
 	void PartOnOff(_bool bOn) { m_bOn = bOn; }
 
-	virtual void Set_LadderState(CKirby* pKirby, _bool bOn);
+	virtual void Put_OnBack(CKirby* pKirby, _bool bOn);
 
 protected:
 	struct KIRBY_PART_COMPONENT_DESC°¡

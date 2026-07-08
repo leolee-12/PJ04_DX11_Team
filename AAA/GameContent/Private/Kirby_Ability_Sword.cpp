@@ -72,6 +72,10 @@ HRESULT CKirby_Ability_Sword::Initialize()
 
     Set_FullBodyAni(ABILITY_ANI::GUARD, "Sword_Guard", true, true, 0.1f, 1.8f);
 
+    Set_FullBodyAni(ABILITY_ANI::SLIDE_START, "SwordSlideStart", false, false, 0.1f, 1.5f);
+    Set_FullBodyAni(ABILITY_ANI::SLIDE, "SwordSlide", true, false, 0.1f, 1.5f);
+    Set_FullBodyAni(ABILITY_ANI::SLIDE_END, "SwordSlideEnd", false, false, 0.1f, 1.5f);
+
     m_fSuperSpinSlashChargeTime = 0.8f;
 
     return S_OK;

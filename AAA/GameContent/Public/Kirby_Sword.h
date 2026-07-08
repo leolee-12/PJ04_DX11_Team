@@ -37,7 +37,7 @@ public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
 public:
-	virtual void Set_LadderState(CKirby* pKirby, _bool bOn) override;
+	virtual void Put_OnBack(CKirby* pKirby, _bool bOn) override;
 
 public:
 	//À±¼®Çö Ãß°¡

@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 
 #include "Kirby.h"
+#include "Kirby_Ability.h"
 
 #include "Kirby_Wait.h"
 #include "Kirby_Run.h"
@@ -14,6 +15,7 @@
 #include "Kirby_AbilityDump.h"
 #include "Kirby_Damaged.h"
 #include "Kirby_Guard.h"
+#include "Kirby_Slide.h"
 #include "Kirby_Dodge.h"
 #include "Kirby_Ladder.h"
 #include "Kirby_GetDeform.h"
@@ -55,8 +57,6 @@ void CKirby_StateMachine::Change_State(KIRBY_STATE_TYPE eNewstate, _int iFlag)
     if(m_pCurState != nullptr)
         m_pCurState->Exit(m_pKirby);
 
-    m_pKirby->Apply_ChangeKirbyAbility();
-
     m_pCurState = Find_State(eNewstate);
 
     if (m_pCurState == nullptr)
@@ -88,7 +88,7 @@ void CKirby_StateMachine::Request_GrabState_StateMachine(KIRBY_ATTACHMENT_CONTEX
     m_pCurState->Request_GrabState(m_pKirby, eType);
 }
 
-void CKirby_StateMachine::Request_ReleaseGrabState_StateMachine(KIRBY_ATTACHMENT_CONTEXT eType)
+void CKirby_StateMachine::Request_ReleaseGrabState_StateMachine(KIRBY_ATTACHMENT_END_REASON eType)
 {
     m_pCurState->Request_ReleaseGrabState(m_pKirby, eType);
 }
@@ -99,6 +99,25 @@ void CKirby_StateMachine::Request_ClearStage_StateMachine(const CUTSCENE_STAGECL
         Change_State(KIRBY_STATE_TYPE::STAGE_CLEAR);
 
     m_pCurState->Request_StageClear(m_pKirby, pDesc);
+}
+
+void CKirby_StateMachine::Get_EssenceBubble(COPY_ABILITY_TYPE eNewAbility)
+{
+    if (m_pKirby->Has_Deform())
+        return;
+
+    KIRBY_STATE_TYPE eCurState = Get_StateType();
+    if (eCurState == KIRBY_STATE_TYPE::GET_ABILITY || eCurState == KIRBY_STATE_TYPE::GET_DEFORM ||
+        eCurState == KIRBY_STATE_TYPE::ABILITY_DUMP)
+        return;
+
+    CKirby_Ability* pAbility = m_pKirby->Get_KirbyAbility();
+    COPY_ABILITY_TYPE eCurAbilityType = pAbility->Get_AbilityType();
+    if (eCurAbilityType == eNewAbility)
+        return;
+
+    m_pKirby->Request_ChangeKirbyAbility(eNewAbility);
+    m_pKirby->Change_State(KIRBY_STATE_TYPE::GET_ABILITY, GETABILITY_STATE_FLAG::ESSENCE);
 }
 
 _bool CKirby_StateMachine::Ignore_TimeScale_StateMachine()
@@ -128,6 +147,7 @@ HRESULT CKirby_StateMachine::Init_State()
     if (FAILED(Register_State(KIRBY_STATE_TYPE::ABILITY_DUMP, CKirby_AbilityDump::Create())))               return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::DAMAGED, CKirby_Damaged::Create())))                        return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::GUARD, CKirby_Guard::Create())))                            return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::SLIDE, CKirby_Slide::Create())))                            return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::DODGE, CKirby_Dodge::Create())))                            return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::LADDER, CKirby_Ladder::Create())))                          return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::GET_DEFORM, CKirby_GetDeform::Create())))                   return E_FAIL;

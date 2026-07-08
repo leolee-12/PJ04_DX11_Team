@@ -40,8 +40,10 @@ public:
 
 public:
 	void Request_GrabState_StateMachine(KIRBY_ATTACHMENT_CONTEXT eType);
-	void Request_ReleaseGrabState_StateMachine(KIRBY_ATTACHMENT_CONTEXT eType = KIRBY_ATTACHMENT_CONTEXT::_COUNT);
+	void Request_ReleaseGrabState_StateMachine(KIRBY_ATTACHMENT_END_REASON eType = KIRBY_ATTACHMENT_END_REASON::DEFAULT_RELEASE);
 	void Request_ClearStage_StateMachine(const CUTSCENE_STAGECLEAR* pDesc);
+
+	void Get_EssenceBubble(COPY_ABILITY_TYPE eNewAbility);
 
 	_bool Ignore_TimeScale_StateMachine();
 

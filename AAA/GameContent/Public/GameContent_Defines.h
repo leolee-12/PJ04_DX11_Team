@@ -16,7 +16,7 @@ namespace Client
 	enum class VTXTEX_SHADER { DEFAULT, ALPHABLEND };
 
 	enum class KIRBY_SHADER_PASS { KIRBY, ANIM_TEXTURED_PBR, ANIM_CONSTANT_PBR, ANIM_SHADOW };
-	enum class COPY_ABILITY_TYPE { NONE, NORMAL, SWORD, BOMB };
+	enum class COPY_ABILITY_TYPE { NONE, NORMAL, SWORD, BOMB, ICE };
 	enum class DEFORM_TYPE { NONE, CAR, CYLINDER, COASTER };
 	
 	static constexpr _float s_fQTE_GorillaLimit = { 5.f };
@@ -34,6 +34,7 @@ namespace Client
 		CAR_BOOST,
 		ENV_HURT,
 		ENV_LADDER,
+		ESSENCE_BUBBLE,
 		ENV_TRIGGER = 100
 	};
 

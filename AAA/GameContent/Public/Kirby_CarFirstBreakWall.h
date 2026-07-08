@@ -34,11 +34,7 @@ public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
 
 public:
-	virtual void Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType) override;
-
-private:
-	_bool m_bTurnStarted{};
-	_float3 m_vLeftDir{};
+	virtual void Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType) override;
 
 public:
 	static CKirby_CarFirstBreakWall* Create();

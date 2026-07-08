@@ -46,6 +46,9 @@ void CKirby_Guard::Enter(CKirby* pKirby, _int iFlag)
 void CKirby_Guard::Update(CKirby* pKirby, const _float fTimeDelta)
 {
     __super::Update(pKirby, fTimeDelta);
+
+    if (!pKirby->Get_Movement()->Is_Grounded())
+        Transition_Fall_OR_Wait_OR_Run(pKirby);
 }
 
 void CKirby_Guard::Exit(CKirby* pKirby)
@@ -69,17 +72,46 @@ _bool CKirby_Guard::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
     {
         // Move Press
         case KIRBY_COMMAND_TYPE::MOVE_TOP:
+        {
+            if (!pCommand->IsDown())
+                return false;
+
             pKirby->Change_State(KIRBY_STATE_TYPE::DODGE, DODGE_STATE_FLAG::DODGE_FRONT);
             break;
+        }
         case KIRBY_COMMAND_TYPE::MOVE_DOWN:
+        {
+            if (!pCommand->IsDown())
+                return false;
+
             pKirby->Change_State(KIRBY_STATE_TYPE::DODGE, DODGE_STATE_FLAG::DODGE_BACK);
             break;
+        }
         case KIRBY_COMMAND_TYPE::MOVE_LEFT:
+        {
+            if (!pCommand->IsDown())
+                return false;
+
             pKirby->Change_State(KIRBY_STATE_TYPE::DODGE, DODGE_STATE_FLAG::DODGE_LEFT);
             break;
+        }
         case KIRBY_COMMAND_TYPE::MOVE_RIGHT:
+        {
+            if (!pCommand->IsDown())
+                return false;
+
             pKirby->Change_State(KIRBY_STATE_TYPE::DODGE, DODGE_STATE_FLAG::DODGE_RIGHT);
             break;
+        }
+
+        case KIRBY_COMMAND_TYPE::JUMP:
+        {
+            if (!pCommand->IsDown())
+                return false;
+
+            pKirby->Change_State(KIRBY_STATE_TYPE::SLIDE);
+            return true;
+        }
 
         // Attack
         case KIRBY_COMMAND_TYPE::ATTACK:
