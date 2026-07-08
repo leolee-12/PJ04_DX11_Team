@@ -74,6 +74,17 @@ const _float4x4* CKirby_Deform_Model::Get_HatBoneMatirx()
     return Get_BoneMatrixPtr("HatL");;
 }
 
+_bool CKirby_Deform_Model::Handle_AnimEventParent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+{
+    if (Handle_AnimEventEye(e, ePhase) == true)
+        return true;
+
+    if (Handle_AnimEventSound(e, ePhase) == true)
+        return true;
+
+    return false;
+}
+
 _bool CKirby_Deform_Model::Handle_AnimEventEye(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 {
     if (static_cast<EANIM_EVENT>(e.iEventType) != EANIM_EVENT::SetEye)
