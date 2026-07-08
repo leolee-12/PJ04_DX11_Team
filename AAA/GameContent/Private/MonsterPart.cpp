@@ -1,6 +1,7 @@
 #include "MonsterPart.h"
 #include "GameInstance.h"
 #include "Animator.h"
+#include "Ability_Model.h"
 
 CMonsterPart::CMonsterPart(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPartObject{ pDevice, pContext } {
