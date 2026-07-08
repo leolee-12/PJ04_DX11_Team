@@ -2048,9 +2048,6 @@
     <ClCompile Include="..\Private\Kirby_Controller.cpp">
       <Filter>00. GameObject\05. Kirby\00. System\02. Kirby_Controller</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Kirby_StateMachine.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Kirby_Wait.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait</Filter>
     </ClCompile>
@@ -2779,6 +2776,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_HitBox_Model.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_StateMachine.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

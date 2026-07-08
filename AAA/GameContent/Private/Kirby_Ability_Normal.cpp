@@ -197,9 +197,6 @@ void CKirby_Ability_Normal::Enter_InhaleState(CKirby* pKirby, INHALE_STATE eStat
     {
         case INHALE_STATE::INHALE_LOOP:
         {
-            //pBody->Set_KirbyBody(KIRBY_BODY_STATE::INHALE);
-            //pBody->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
-
             pMovement->Set_MaxHorizontalSpeed(2.f);
 
             Start_InhaleCollider(pKirby);
@@ -209,7 +206,6 @@ void CKirby_Ability_Normal::Enter_InhaleState(CKirby* pKirby, INHALE_STATE eStat
 
         case INHALE_STATE::SUPER_INHALE_START:
         {
-            //pBody->Set_KirbyEye(KIRBY_EYE_STATE::ANGRY);
             pAnimator->Play("SuperInhaleStart", false, false, 0.1f, 2.5f);
 
             static_cast<CInhaleContainer*>(m_pInhaleEffect)->On_SuperInhale();
@@ -218,7 +214,6 @@ void CKirby_Ability_Normal::Enter_InhaleState(CKirby* pKirby, INHALE_STATE eStat
 
         case INHALE_STATE::SUPER_INHALE_LOOP:
         {
-            //pBody->Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);
             Play_InhaleLoopAnimation(pKirby);
             break;
         }
@@ -234,26 +229,17 @@ void CKirby_Ability_Normal::Enter_InhaleState(CKirby* pKirby, INHALE_STATE eStat
             pAnimator->Play("InhaleEnd", false, false, 0.1f, 1.5f);
             break;
         }
-
         case INHALE_STATE::STUFFED_START:
         {
-            //pBody->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
-            //pBody->Set_KirbyBody(KIRBY_BODY_STATE::STUFFED);
             pAnimator->Play("Stuffed", false, false, 0.1f, 1.5f);
-
             pBody->Stop_SoundHandle();
-
             break;
         }
-
-
         case INHALE_STATE::STUFFED_SPIT:
         {
             pAnimator->Play("Spit", false, false, 0.1f, 2.f);
             break;
         }
-
-
         case INHALE_STATE::NORMAL_EXIT:
         {
             m_bReqEndAttackState = true;
@@ -290,7 +276,6 @@ void CKirby_Ability_Normal::Update_InhaleState(CKirby* pKirby, _float fTimeDelta
                 Change_InhaleState(pKirby, INHALE_STATE::SUPER_INHALE_START);
             break;
         }
-
         case INHALE_STATE::SUPER_INHALE_START:
         {
             _float fRatio = pAnimator->Get_Progress();
@@ -300,58 +285,36 @@ void CKirby_Ability_Normal::Update_InhaleState(CKirby* pKirby, _float fTimeDelta
                 Change_InhaleState(pKirby, INHALE_STATE::SUPER_INHALE_LOOP);
             break;
         }
-
         case INHALE_STATE::SUPER_INHALE_LOOP:
         {
             break;
         }
-
         case INHALE_STATE::INHALE_END:
         {
-            if (pAnimator->Get_Progress() >= 0.5f)
-                //pBody->Set_KirbyBody(KIRBY_BODY_STATE::NORMAL);
-
             if (pAnimator->Is_Finished())
                 Change_InhaleState(pKirby, INHALE_STATE::NORMAL_EXIT);
-
             break;
         }
-
         case INHALE_STATE::STUFFED_START:
         {
             if (pAnimator->Is_Finished())
                 Change_InhaleState(pKirby, INHALE_STATE::NORMAL_EXIT);
-
             break;
         }
-
-
         case INHALE_STATE::STUFFED_SPIT:
         {
             _float fRatio = pAnimator->Get_Progress();
 
-            if (fRatio >= 0.4f)
-            {
-                //pKirby->Get_Body()->Set_KirbyBody(KIRBY_BODY_STATE::NORMAL);
+            if (fRatio >= 0.4f)          
                 Change_MouthState(MOUTH_STATE::DEFAULT);
-            }
             else if (fRatio >= 0.1f)
-            {
-                //pKirby->Get_Body()->Set_KirbyBody(KIRBY_BODY_STATE::INHALE);
                 Spit_Inhalable(pKirby);
-            }
-            else
-            {
-                //pKirby->Get_Body()->Set_KirbyBody(KIRBY_BODY_STATE::STUFFED);
-            }
 
             if (pAnimator->Is_Finished())
                 Change_InhaleState(pKirby, INHALE_STATE::NORMAL_EXIT);
 
             break;
         }
-
-
         case INHALE_STATE::NORMAL_EXIT:
         {
             m_bReqEndAttackState = true;
@@ -373,9 +336,6 @@ void CKirby_Ability_Normal::Exit_InhaleState(CKirby* pKirby, INHALE_STATE eState
             break;
 
         case INHALE_STATE::INHALE_END:
-            //pBody->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
-            //pBody->Set_KirbyBody(KIRBY_BODY_STATE::NORMAL);
-
             pKirby->Get_Movement()->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
             break;
 
@@ -383,10 +343,8 @@ void CKirby_Ability_Normal::Exit_InhaleState(CKirby* pKirby, INHALE_STATE eState
             pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
             break;
 
-
         case INHALE_STATE::STUFFED_SPIT:
             break;
-
 
         case INHALE_STATE::NORMAL_EXIT:
             break;

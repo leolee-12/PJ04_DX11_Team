@@ -12,6 +12,8 @@ NS_BEGIN(Client)
 class CKirby;
 class CKirby_Body;
 
+enum GETABILITY_STATE_FLAG { GETABILITY_DEFAULT, ESSENCE };
+
 class CLIENT_DLL CKirby_GetAbility final : public CKirby_State
 {
 private:

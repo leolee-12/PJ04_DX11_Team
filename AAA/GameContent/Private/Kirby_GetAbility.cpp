@@ -30,13 +30,19 @@ void CKirby_GetAbility::Enter(CKirby* pKirby, _int iFlag)
     __super::Enter(pKirby, iFlag);
 
     // Ani
-    CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
-    pAbility->Clear_Overlay(pKirby, 1, 0.1f);
-    pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::GET_ABILITY);
+    CKirby_Ability* pPreAbility = pKirby->Get_KirbyAbility();
+    pKirby->Set_AbilityPartsActive(pPreAbility->Get_AbilityType(), false);
+    pKirby->Apply_ChangeKirbyAbility();
+
+    CKirby_Ability* pNewAbility = pKirby->Get_KirbyAbility();
+    pNewAbility->Clear_Overlay(pKirby, 1, 0.1f);
+    pNewAbility->Play_AbilityAni(pKirby, ABILITY_ANI::GET_ABILITY);
 
     m_bPartsOn = false;
     m_bCloseEye = false;
     m_bOpenMouse = false;
+
+
 
     KIRBY_ABILITY_CHANGED tDesc{};
     tDesc.bBegin = true;
@@ -93,14 +99,6 @@ _bool CKirby_GetAbility::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand
 {
     if (__super::Handle_Command(pKirby, pCommand))
         return true;
-
-    KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
-
-    //switch (eCommandType)
-    //{
-    //    default:        
-    //        break;
-    //}
 
     return false;
 }
