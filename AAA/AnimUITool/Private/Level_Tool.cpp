@@ -1200,12 +1200,9 @@ void CLevel_Tool::Update(_float fTimeDelta)
 
     if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F8, false))
     {
-        KIRBY_POINTSTAR_GAINED_DESC Desc{};
-        Desc.iAmount = 1;
+        m_pGameInstance_Proxy->Publish(EventTag::StageClear_UIStarted, nullptr);
 
-        m_pGameInstance_Proxy->Publish(EventTag::Kirby_PointStarGained, &Desc);
-
-        Log_Info("Publish: Kirby.PointStarGained");
+        Log_Info("Publish: StageClear_UIStarted");
     }
     if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F7, false))
     {

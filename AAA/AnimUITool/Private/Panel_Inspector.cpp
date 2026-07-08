@@ -12,6 +12,7 @@
 #include "Kirby_States.h"
 #include "UIPartObject.h"
 #include "UIContainerObject.h"
+#include "UI_MovableContainer.h"
 #include "Level_Tool.h"
 #include "UI_SpriteAnim.h"
 #include "UI_Fonts.h"
@@ -791,6 +792,40 @@ void CPanel_Inspector::Render_UIInspector()
         sel.pContainer->Set_Tilt(fTiltX, fTiltY);
         sel.pContainer->Set_PerspDistance(fDist);
         uictx.bDirty = true;
+    }
+    if (auto pMovable = dynamic_cast<Client::CUIMovableContainer*>(sel.pContainer))
+    {
+        ImGui::Separator();
+        ImGui::TextUnformatted("Move Animation");
+
+        _float3 vTarget = pMovable->Get_MoveTargetPos();
+        _float  fTgtTiltX = pMovable->Get_MoveTargetTiltX();
+        _float  fTgtTiltY = pMovable->Get_MoveTargetTiltY();
+        _float  fDur = pMovable->Get_MoveDuration();
+
+        bool bMoveDirty = false;
+        bMoveDirty |= ImGui::DragFloat3("Target Pos", &vTarget.x, 1.f, -2000.f, 2000.f, "%.1f");
+        bMoveDirty |= ImGui::DragFloat("Target Tilt X", &fTgtTiltX, 0.5f, -60.f, 60.f, "%.1f deg");
+        bMoveDirty |= ImGui::DragFloat("Target Tilt Y", &fTgtTiltY, 0.5f, -60.f, 60.f, "%.1f deg");
+        bMoveDirty |= ImGui::DragFloat("Duration", &fDur, 0.05f, 0.f, 10.f, "%.2f s");
+        if (bMoveDirty)
+        {
+            pMovable->Set_MoveTarget(vTarget, fTgtTiltX, fTgtTiltY);
+            pMovable->Set_MoveDuration(fDur);
+            uictx.bDirty = true;
+        }
+
+        if (ImGui::Button("Capture Current -> Target"))
+        {
+            _vector vPos = pMovable->Get_Transform()->Get_State(STATE::POSITION);
+            _float3 vNow; XMStoreFloat3(&vNow, vPos);
+            pMovable->Set_MoveTarget(vNow, pMovable->Get_TiltX(), pMovable->Get_TiltY());
+            uictx.bDirty = true;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Preview Move")) pMovable->Start_Move(false);
+        ImGui::SameLine();
+        if (ImGui::Button("Preview Back")) pMovable->Start_Move(true);
     }
 
     if (nullptr == sel.pPart)

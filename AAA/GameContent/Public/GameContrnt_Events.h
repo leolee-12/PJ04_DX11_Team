@@ -56,6 +56,9 @@ namespace Client
 
         // 사운드 
         inline constexpr const _tchar* BGMChange = L"ChangeBGM";
+
+        // 전역 UI
+        inline constexpr const _tchar* StageClear_UIStarted = L"StageClear.UIStarted";
     }
 
 
@@ -104,9 +107,9 @@ namespace Client
     struct CUTSCENE_CAMERA_DESC
     {
         ECutsceneCam       eCam = ECutsceneCam::Cutscene;
-        const _tchar* szTrack = nullptr;                // 컷씬캠일 때 재생 트랙 (예: L"DemoAppear2_camera1")
-        CAnimator* pProgress = nullptr;                 // progress 소스(고릴라 애니메이터)
-        const _float4x4* pAnchorWorld = nullptr;        // 로컬->월드 앵커(고릴라 월드행렬)
+        const _tchar*      szTrack = nullptr;                // 컷씬캠일 때 재생 트랙 (예: L"DemoAppear2_camera1")
+        CAnimator*         pProgress = nullptr;                 // progress 소스(고릴라 애니메이터)
+        const _float4x4*   pAnchorWorld = nullptr;        // 로컬->월드 앵커(고릴라 월드행렬)
     };
 
     struct BOSSCAM_FOCUS_DESC

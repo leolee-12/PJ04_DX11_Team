@@ -325,9 +325,11 @@
     <ClInclude Include="..\Public\UI_Image.h" />
     <ClInclude Include="..\Public\UI_KirbyStatus.h" />
     <ClInclude Include="..\public\UI_LoadingCurtain.h" />
+    <ClInclude Include="..\public\UI_MovableContainer.h" />
     <ClInclude Include="..\Public\UI_PointStar.h" />
     <ClInclude Include="..\Public\UI_SpriteAnim.h" />
     <ClInclude Include="..\public\UI_SpriteAnimCurtain.h" />
+    <ClInclude Include="..\public\UI_StageClear.h" />
     <ClInclude Include="..\Public\UI_Structs.h" />
     <ClInclude Include="..\Public\UI_TestImageContainer.h" />
     <ClInclude Include="..\Public\UI_Text.h" />
@@ -622,9 +624,11 @@
     <ClCompile Include="..\Private\UI_Image.cpp" />
     <ClCompile Include="..\Private\UI_KirbyStatus.cpp" />
     <ClCompile Include="..\private\UI_LoadingCurtain.cpp" />
+    <ClCompile Include="..\private\UI_MovableContainer.cpp" />
     <ClCompile Include="..\Private\UI_PointStar.cpp" />
     <ClCompile Include="..\Private\UI_SpriteAnim.cpp" />
     <ClCompile Include="..\private\UI_SpriteAnimCurtain.cpp" />
+    <ClCompile Include="..\private\UI_StageClear.cpp" />
     <ClCompile Include="..\Private\UI_TestImageContainer.cpp" />
     <ClCompile Include="..\Private\UI_Text.cpp" />
     <ClCompile Include="..\Private\UI_Title.cpp" />

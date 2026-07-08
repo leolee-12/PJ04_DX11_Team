@@ -102,7 +102,7 @@ void CBoss_Cage::Update(_float fTimeDelta)
                 if (pDeeAnim && pDeeAnim->Is_Finished())
                 {
                     m_bHeadTurnFired = true;
-                    Fire_CutsceneCamera(L"Cut4_Camera", nullptr);
+                    m_pGameInstance_Proxy->Publish(EventTag::StageClear_UIStarted, nullptr);
                 }
             }
             break;
@@ -205,8 +205,8 @@ void CBoss_Cage::Fire_CutsceneCamera(const _tchar* szTrack, CAnimator* pProgress
     CUTSCENE_CAMERA_DESC cam{};
     cam.eCam = ECutsceneCam::Cutscene;
     cam.szTrack = szTrack;
-    cam.pProgress = pProgress;                                  
-    cam.pAnchorWorld = m_pTransformCom->Get_WorldMatrixPtr();   
+    cam.pProgress = pProgress;                               
+    cam.pAnchorWorld = m_pTransformCom->Get_WorldMatrixPtr();
     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
 }
 

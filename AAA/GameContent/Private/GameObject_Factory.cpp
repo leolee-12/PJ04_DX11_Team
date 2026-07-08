@@ -28,6 +28,8 @@
 #include "UI_FadeIn.h"
 #include "UI_BossStatus.h"
 #include "UI_FlashCurtain.h"
+#include "UI_MovableContainer.h"
+#include "UI_StageClear.h"
 
 // UI Parts
 #include "UI_Image.h"
@@ -215,12 +217,12 @@ void CGameObject_Factory::Copy_TagsByCategory(map<wstring, vector<wstring>>* pOu
 void CGameObject_Factory::RegisterAll()
 {
     Register_UI();
+    Register_UIContainer();
     Register_Camera();
     Register_Test();
     Register_MiniBoss();
     Register_MainBoss();
     Register_Container();
-    Register_UIContainer();
     Register_NonAnimObject();
     Register_AnimObject();
     Register_Effect();
@@ -732,6 +734,18 @@ void CGameObject_Factory::Register_UIContainer()
         TEXT("UI_CONTAINER"),
         CREATOR(CUI_FlashCurtain),
         LOADER());
+
+    Register(CUIMovableContainer::PROTOTYPE_TAG,
+        TEXT("UI_CONTAINER"),         
+        CREATOR(CUIMovableContainer),
+        LOADER()
+    );
+
+    Register(CUI_StageClear::PROTOTYPE_TAG,
+        TEXT("UI_CONTAINER"),
+        CREATOR(CUI_StageClear),
+        LOADER()
+    );
 }
 
 void CGameObject_Factory::Register_NonAnimObject()
