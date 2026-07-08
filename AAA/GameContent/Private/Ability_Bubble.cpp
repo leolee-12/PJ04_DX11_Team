@@ -37,9 +37,6 @@ HRESULT CAbility_Bubble::Initialize(void* pArg)
 	if (FAILED(Ready_PartObjects()))
 		return E_FAIL;
 
-	if (FAILED(Ready_Collider()))
-		return E_FAIL;
-
 	return S_OK;
 }
 
@@ -56,6 +53,14 @@ void CAbility_Bubble::Late_Update(_float fTimeDelta)
 	}
 }
 
+void CAbility_Bubble::Set_RenderActive(_bool bActive)
+{
+	if (m_pModelPart)
+		m_pModelPart->Set_ModelRenderActive(bActive);
+
+	// TODO :  이펙트도 여기서 토글
+}
+
 HRESULT CAbility_Bubble::Ready_PartObjects()
 {
 	CAbility_Model::ABILITY_MODEL_DESC desc{};
@@ -65,6 +70,12 @@ HRESULT CAbility_Bubble::Ready_PartObjects()
 
 	if (FAILED(Add_PartObject(m_iPrototypeLevel, CAbility_Model::PROTOTYPE_TAG, PART_MODEL_TAG, &desc)))
 		return E_FAIL;
+
+	CAbility_Model* pInstance = dynamic_cast<CAbility_Model*>(m_PartObjects[PART_MODEL_TAG]);
+	if (pInstance == nullptr)
+		return E_FAIL;
+
+	m_pModelPart = pInstance;
 
 	return S_OK;
 }
@@ -80,7 +91,7 @@ HRESULT CAbility_Bubble::Ready_Collider()
 	if (nullptr == m_pCollider)
 		return E_FAIL;
 
-	m_pGameInstance_Proxy->Register_Collider(m_pCollider, ETOUI(COLLISION_LAYER::ESSENCE_BUBBLE));
+	m_pGameInstance_Proxy->Register_Collider(m_pCollider, ETOUI(m_eCollLayer));
 
 	return S_OK;
 }

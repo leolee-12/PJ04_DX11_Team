@@ -54,6 +54,8 @@ void CAbility_Model::Late_Update(_float fTimeDelta)
 		matWorld = matWorld * XMLoadFloat4x4(m_pSocketBoneMatrix);
 
 	Compute_CombinedWorldMatrix(matWorld);
+
+	if (!m_bRenderActive) return;
 	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }

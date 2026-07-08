@@ -35,6 +35,7 @@ namespace Client
 		ENV_HURT,
 		ENV_LADDER,
 		ESSENCE_BUBBLE,
+		DROPPED_BUBBLE,
 		ENV_TRIGGER = 100
 	};
 

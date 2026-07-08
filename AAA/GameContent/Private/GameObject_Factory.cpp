@@ -686,11 +686,30 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CAbility_Model::PROTOTYPE_TAG,
                 CAbility_Model::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Sword"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Sword/Sword.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Sword/Sword.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            // TODO : 다른 능력 모델 등록
 
         )
-
     );
+
+    // Ability Bubble - DroppedBubble
+    //Register
+    //(
+    //    CDroppedBubble::PROTOTYPE_TAG, TEXT("Bubble"),
+    //    CREATOR(CDroppedBubble),
+    //    LOADER
+    //    (
+    //        TRY_ADD_PROTO(pProxy, iLevelIndex, CAbility_Model::PROTOTYPE_TAG,
+    //            CAbility_Model::Create(pDevice, pContext));
+    //        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Sword"),
+    //            CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Sword/Sword.ysh",
+    //                XMMatrixRotationY(XMConvertToRadians(180.f))));
+    //        // TODO : 다른 능력 모델 등록
+
+    //    )
+    //);
+
 
 }
 
