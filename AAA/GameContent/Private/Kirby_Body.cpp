@@ -91,10 +91,7 @@ HRESULT CKirby_Body::Ready_AnimEvents(CKirby* pKirby)
     m_pAnimatorCom->Set_EventCallback(
         [this, pKirby](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
         {
-            if (Handle_AnimEventEye(e, ePhase) == true)
-                return;
-
-            if (Handle_AnimEventSound(e, ePhase) == true)
+            if (Handle_AnimEventParent(e, ePhase) == true)
                 return;
 
             switch (static_cast<EANIM_EVENT>(e.iEventType))
@@ -143,6 +140,22 @@ HRESULT CKirby_Body::Ready_AnimEvents(CKirby* pKirby)
                         case KIRBY_BODY_STATE::NORMAL:  Set_KirbyBody(KIRBY_BODY_STATE::NORMAL);  break;
                         case KIRBY_BODY_STATE::STUFFED: Set_KirbyBody(KIRBY_BODY_STATE::STUFFED); break;
                         case KIRBY_BODY_STATE::INHALE:  Set_KirbyBody(KIRBY_BODY_STATE::INHALE);  break;
+                    }
+                    break;
+                }
+
+                case EANIM_EVENT::SetMouth:
+                {
+                    if (ePhase != ANIM_EVENT_PHASE::POINT)
+                        break;
+
+                    switch (static_cast<KIRBY_MOUTH_STATE>(e.iIntParam))
+                    {
+                    case KIRBY_MOUTH_STATE::IDLE:        Set_KirbyMouth(KIRBY_MOUTH_STATE::IDLE);        break;
+                    case KIRBY_MOUTH_STATE::OPEN:        Set_KirbyMouth(KIRBY_MOUTH_STATE::OPEN);        break;
+                    case KIRBY_MOUTH_STATE::ANGRY:       Set_KirbyMouth(KIRBY_MOUTH_STATE::ANGRY);       break;
+                    case KIRBY_MOUTH_STATE::SMILE_OPEN:  Set_KirbyMouth(KIRBY_MOUTH_STATE::SMILE_OPEN);  break;
+                    case KIRBY_MOUTH_STATE::SMILE_CLOSE: Set_KirbyMouth(KIRBY_MOUTH_STATE::SMILE_CLOSE); break;
                     }
                     break;
                 }

@@ -33,6 +33,8 @@ void CKirby_Clear::Enter(CKirby* pKirby, _int iFlag)
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
     pAbility->Clear_Overlay(pKirby, 1, 0.1f);
 
+    pKirby->Set_AbilityPartsActive(pAbility->Get_AbilityType(), false, true);
+
     m_eClearState = CLEAR_STATE::CLEAR_END;
 }
 
@@ -46,6 +48,12 @@ void CKirby_Clear::Update(CKirby* pKirby, const _float fTimeDelta)
 void CKirby_Clear::Exit(CKirby* pKirby)
 {
     __super::Exit(pKirby);
+
+    // Ani
+    CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+    pKirby->Set_AbilityPartsActive(pAbility->Get_AbilityType(), true, true);
+
+    pKirby->Get_Body()->Set_KirbyMouth(KIRBY_MOUTH_STATE::IDLE);
 }
 
 _bool CKirby_Clear::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)

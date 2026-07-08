@@ -116,7 +116,7 @@ void CKirby_Sword::Put_OnBack(CKirby* pKirby, _bool bOn)
 {
     if (bOn)
     {
-        Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("FloaterL"));
+        Set_SocketBoneMatrix(pKirby->Get_Body()->Get_BoneMatrixPtr("CenterL"));
         m_pAnimatorCom->Play("Carry", true, true, 0.f);
     }
     else
