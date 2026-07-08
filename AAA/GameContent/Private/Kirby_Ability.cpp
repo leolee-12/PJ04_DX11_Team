@@ -45,7 +45,11 @@ HRESULT CKirby_Ability::Initialize()
 
     Set_FullBodyAni(ABILITY_ANI::GUARD, "Guard", true, true, 0.1f, 1.8f);
 
-    Set_FullBodyAni(ABILITY_ANI::DODGE_START, "DodgeStart", false, false, 0.1f, 1.5f);
+    Set_FullBodyAni(ABILITY_ANI::DODGE_START, "DodgeStart", false, false, 0.1f, 2.f);
+
+    Set_FullBodyAni(ABILITY_ANI::SLIDE_START, "SlideStart", false, false, 0.1f, 1.5f);
+    Set_FullBodyAni(ABILITY_ANI::SLIDE, "Slide", true, false, 0.1f, 1.5f);
+    Set_FullBodyAni(ABILITY_ANI::SLIDE_END, "SlideEnd", false, false, 0.1f, 1.5f);
 
     return S_OK;
 }

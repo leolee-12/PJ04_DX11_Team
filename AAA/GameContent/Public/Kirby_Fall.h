@@ -39,6 +39,8 @@ private:
 private:
 	FALL_STATE m_eFallState{};
 
+	_bool m_bGuardReserved{};
+
 public:
 	static CKirby_Fall* Create();
 private:

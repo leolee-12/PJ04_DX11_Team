@@ -71,8 +71,6 @@ void CKirby_Dodge::Enter(CKirby* pKirby, _int iFlag)
     m_iEvasionCount = 1;
 
     Change_DodgeState(pKirby, Dodge_State::DODGE_START);
-
-    pKirby->Put_WeaponOnBack(true);
 }
 
 void CKirby_Dodge::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -140,6 +138,8 @@ void CKirby_Dodge::Enter_DodgeState(CKirby* pKirby, Dodge_State eState)
         }
         case Dodge_State::DODGE1:
         {
+            pKirby->Put_WeaponOnBack(true);
+
             switch (m_eDodgeAniDir)
             {
                 case DODGE_ANI_DIR::ANI_LEFT:   strAnimationName = "DodgeLeft1"; break;

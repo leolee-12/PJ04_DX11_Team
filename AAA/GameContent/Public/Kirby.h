@@ -52,7 +52,7 @@ public:
 	static constexpr _float s_fCCT_Height = 0.1f;
 	
 	static constexpr _float s_fGroundFriction = 40.f;
-	static constexpr _float s_fMaxHorizontalSpeed = 8.f;
+	static constexpr _float s_fMaxHorizontalSpeed = 9.f;
 
 	static constexpr _float s_fLinearDrag = 0.9f;
 	static constexpr _float s_fFallVelocityY = -7.f;
