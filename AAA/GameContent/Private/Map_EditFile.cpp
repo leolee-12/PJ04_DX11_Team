@@ -163,6 +163,105 @@ namespace
 			pOutDesc->bUseCollMesh = Edit.bUseCollMesh;
 	}
 
+	void Set_CommonPolicyOverride(EDIT_OBJECT_COMMON_OVERRIDE* pCommon, _uint iCapability, _bool bValue)
+	{
+		if (nullptr == pCommon)
+			return;
+
+		pCommon->iPolicyMask |= iCapability;
+
+		switch (iCapability)
+		{
+		case EDIT_CAP_RENDERABLE:
+			pCommon->Policy.bRenderable = bValue;
+			break;
+		case EDIT_CAP_CULL_DISTANCE:
+			pCommon->Policy.bUseCullDistance = bValue;
+			break;
+		case EDIT_CAP_CULL_FRUSTUM:
+			pCommon->Policy.bUseCullFrustum = bValue;
+			break;
+		case EDIT_CAP_COLLISION_MESH:
+			pCommon->Policy.bUseCollMesh = bValue;
+			break;
+		case EDIT_CAP_SHADOW:
+			pCommon->Policy.bUseShadow = bValue;
+			break;
+		default:
+			break;
+		}
+	}
+
+	EDIT_OBJECT_OVERRIDE_DESC Convert_LegacyEnvEditToOverride(const MAP_ENV_EDITED_DESC& Edit)
+	{
+		EDIT_OBJECT_OVERRIDE_DESC Desc{};
+		Desc.eKind = EDITABLE_OBJECT_KIND::ENV_OBJECT;
+		Desc.strStableKey = Edit.strStableKey;
+
+		if (Edit.bHasRenderable)                Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_RENDERABLE,
+			Edit.bRenderable);
+		if (Edit.bHasUseCullDistance)   Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_CULL_DISTANCE,
+			Edit.bUseCullDistance);
+		if (Edit.bHasUseCullFrustum)    Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_CULL_FRUSTUM,
+			Edit.bUseCullFrustum);
+		if (Edit.bHasCollMesh)          Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_COLLISION_MESH,
+			Edit.bUseCollMesh);
+		if (Edit.bHasShadow)            Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_SHADOW, Edit.bUseShadow);
+
+		if (Edit.bHasWorldMatrix)
+		{
+			Desc.Common.bHasWorldMatrix = true;
+			Desc.Common.matWorld = Edit.matWorld;
+		}
+
+		if (Edit.bHasNearDistAlpha)
+		{
+			EDIT_ENVOBJECT_OVERRIDE EnvOverride{};
+			EnvOverride.bHasNearDistAlpha = true;
+			EnvOverride.bUseNearDistAlpha = Edit.bUseNearDistAlpha;
+			Desc.ClassOverride = EnvOverride;
+		}
+
+		return Desc;
+	}
+
+	EDIT_OBJECT_OVERRIDE_DESC Convert_LegacyMapSectionEditToOverride(const MAP_ENV_EDITED_DESC& Edit)
+	{
+		EDIT_OBJECT_OVERRIDE_DESC Desc{};
+		Desc.eKind = EDITABLE_OBJECT_KIND::MAP_SECTION;
+		Desc.strStableKey = Edit.strStableKey;
+
+		if (Edit.bHasRenderable)                Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_RENDERABLE,
+			Edit.bRenderable);
+		if (Edit.bHasEnableCulling)     Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_CULL_FRUSTUM,
+			Edit.bEnableCulling);
+		if (Edit.bHasCollMesh)          Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_COLLISION_MESH,
+			Edit.bUseCollMesh);
+
+		if (Edit.bHasWorldMatrix)
+		{
+			Desc.Common.bHasWorldMatrix = true;
+			Desc.Common.matWorld = Edit.matWorld;
+		}
+
+		return Desc;
+	}
+
+	EDIT_OBJECT_OVERRIDE_DESC Convert_LegacyLDEditToOverride(const MAP_LD_EDITED_DESC& Edit)
+	{
+		EDIT_OBJECT_OVERRIDE_DESC Desc{};
+		Desc.eKind = EDITABLE_OBJECT_KIND::LEVEL_DESIGN_OBJECT;
+		Desc.strStableKey = Edit.strStableKey;
+
+		if (Edit.bHasWorldMatrix)
+		{
+			Desc.Common.bHasWorldMatrix = true;
+			Desc.Common.matWorld = Edit.matWorld;
+		}
+
+		return Desc;
+	}
+
 	json Save_EditedDesc(const MAP_ENV_EDITED_DESC& Edit, _bool bEnvObjectEdit)
 	{
 		json j = json::object();

@@ -1,6 +1,8 @@
 #pragma once
 #include "GameContent_Defines.h"
 
+#include <variant>
+
 NS_BEGIN(Engine)
 class CModel;
 struct MESH_LAYER_IDX;
@@ -49,6 +51,54 @@ struct EDIT_OBJECT_POLICY
 	_bool bUseCullFrustum = { false };
 	_bool bUseCollMesh = { false };
 	_bool bUseShadow = { false };
+};
+
+struct EDIT_OBJECT_COMMON_OVERRIDE
+{
+	_uint iPolicyMask = { 0u };
+	EDIT_OBJECT_POLICY Policy = {};
+
+	_bool bHasWorldMatrix = { false };
+	_float4x4 matWorld = {};
+};
+
+struct EDIT_MAPSECTION_OVERRIDE
+{
+};
+
+struct EDIT_ENVOBJECT_OVERRIDE
+{
+	_bool bHasNearDistAlpha = { false };
+	_bool bUseNearDistAlpha = { false };
+
+	_bool bHasDecalAlpha = { false };
+	_float fDecalAlpha = { 1.f };
+};
+
+struct EDIT_LEVELDESIGN_OVERRIDE
+{
+};
+
+struct EDIT_LD_BUSH_OVERRIDE
+{
+	_bool bHasGenerateItem = { false };
+	_bool bGenerateItem = { false };
+};
+
+using EDIT_CLASS_OVERRIDE = variant<
+	monostate,
+	EDIT_MAPSECTION_OVERRIDE,
+	EDIT_ENVOBJECT_OVERRIDE,
+	EDIT_LEVELDESIGN_OVERRIDE,
+	EDIT_LD_BUSH_OVERRIDE>;
+
+struct EDIT_OBJECT_OVERRIDE_DESC
+{
+	EDITABLE_OBJECT_KIND eKind = { EDITABLE_OBJECT_KIND::MAP_SECTION };
+	_wstring strStableKey;
+
+	EDIT_OBJECT_COMMON_OVERRIDE Common = {};
+	EDIT_CLASS_OVERRIDE ClassOverride = monostate{};
 };
 
 struct EDITABLE_DESC
