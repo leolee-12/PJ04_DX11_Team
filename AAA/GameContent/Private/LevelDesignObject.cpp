@@ -90,8 +90,6 @@ void CLevelDesignObject::Collect_EditModelSlots(vector<EDITABLE_MODEL_SLOT>* pOu
 	if (nullptr == pOutSlots)
 		return;
 
-	pOutSlots->clear();
-
 	const auto& Components = Get_Components();
 	const auto Iter = Components.find(TEXT("Com_Model"));
 	if (Iter == Components.end())

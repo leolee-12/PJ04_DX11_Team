@@ -332,8 +332,8 @@ _bool CEnvObject::Get_EditDesc(EDITABLE_DESC* pOutDesc) const
 	pOutDesc->Policy.bRenderable = m_bRenderable;
 	pOutDesc->Policy.bUseCullDistance = m_bUseCullDistance;
 	pOutDesc->Policy.bUseCullFrustum = m_bUseCullFrustum;
-	pOutDesc->Policy.bUseCollMesh = m_tDesc.tCollision.bHasCollMesh && m_tDesc.tCollision.bUseCollMesh;
-	pOutDesc->Policy.bUseShadow = m_tDesc.tRender.bHasShadow && m_tDesc.tRender.bUseShadow;
+	pOutDesc->Policy.bUseCollMesh = m_tDesc.tCollision.bHasCollMesh && m_bUseCollMesh;
+	pOutDesc->Policy.bUseShadow = m_tDesc.tRender.bHasShadow && m_bCastShadow;
 	pOutDesc->ModelSlots.clear();
 
 	if (nullptr != m_pModelCom)
@@ -351,32 +351,16 @@ _bool CEnvObject::Get_EditDesc(EDITABLE_DESC* pOutDesc) const
 
 HRESULT CEnvObject::Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy)
 {
+	const _bool bPrevUseCollMesh = m_bUseCollMesh;
+
 	m_bRenderable = Policy.bRenderable;
 	m_bUseCullDistance = Policy.bUseCullDistance;
 	m_bUseCullFrustum = Policy.bUseCullFrustum;
+	m_bCastShadow = m_tDesc.tRender.bHasShadow && Policy.bUseShadow;
+	m_bUseCollMesh = m_tDesc.tCollision.bHasCollMesh && Policy.bUseCollMesh;
 
-	m_tDesc.tRender.bUseCullDistance = Policy.bUseCullDistance;
-	m_tDesc.tRender.bUseCullFrustum = Policy.bUseCullFrustum;
-
-	if (m_tDesc.tRender.bHasShadow)
-	{
-		m_tDesc.tRender.bUseShadow = Policy.bUseShadow;
-		m_tDesc.tRender.bShadowMappingCaster = m_tDesc.tRender.bUseShadow;
-		m_bCastShadow = m_tDesc.tRender.bUseShadow;
-	}
-	else
-	{
-		m_tDesc.tRender.bUseShadow = false;
-		m_tDesc.tRender.bShadowMappingCaster = false;
-		m_bCastShadow = false;
-	}
-
-	if (m_tDesc.tCollision.bHasCollMesh && m_tDesc.tCollision.bUseCollMesh != Policy.bUseCollMesh)
-	{
-		m_tDesc.tCollision.bUseCollMesh = Policy.bUseCollMesh;
-		if (FAILED(Ready_PhysicsActor()))
-			return E_FAIL;
-	}
+	if (bPrevUseCollMesh != m_bUseCollMesh && FAILED(Ready_PhysicsActor()))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -556,8 +540,7 @@ _bool CEnvObject::Should_CreatePhysicsActor() const
 	case ENV_COLLIDER_KIND::MODEL_MESH:
 		if (m_tDesc.eKind == ENV_OBJECT_KIND::STATIC)
 		{
-			return Collision.bHasCollMesh
-				&& Collision.bUseCollMesh;
+			return Collision.bHasCollMesh && m_bUseCollMesh;
 		}
 
 		// Interact 등은 이번 단위에서 기존 정책 유지.
@@ -693,6 +676,7 @@ void CEnvObject::Apply_DescDefaults()
 	m_bUseCullDistance = m_tDesc.tRender.bUseCullDistance;
 	m_bUseCullFrustum = m_tDesc.tRender.bUseCullFrustum;
 	m_bCastShadow = m_tDesc.tRender.bHasShadow && m_tDesc.tRender.bUseShadow;
+	m_bUseCollMesh = m_tDesc.tCollision.bHasCollMesh && m_tDesc.tCollision.bUseCollMesh;
 	m_bVisible = true;
 }
 

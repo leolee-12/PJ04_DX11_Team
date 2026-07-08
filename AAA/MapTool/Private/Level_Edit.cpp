@@ -155,6 +155,57 @@ namespace
 		return XMLoadFloat4x4(&Mat);
 	}
 
+	void Update_EnvPolicyEditFromCurrent(CEnvObject* pEnvObject, MAP_ENV_EDITED_DESC* pInOutEdit)
+	{
+		if (nullptr == pEnvObject || nullptr == pInOutEdit)
+			return;
+
+		EDITABLE_DESC EditDesc{};
+		if (!pEnvObject->Get_EditDesc(&EditDesc))
+			return;
+
+		const ENV_OBJECT_DESC& Desc = pEnvObject->Get_Desc();
+		const EDIT_OBJECT_POLICY& Policy = EditDesc.Policy;
+
+		const _bool bBaseRenderable = !Desc.tCollision.bInvisibleCollision;
+		pInOutEdit->bHasRenderable = Policy.bRenderable != bBaseRenderable;
+		pInOutEdit->bRenderable = Policy.bRenderable;
+
+		pInOutEdit->bHasUseCullDistance = Policy.bUseCullDistance != Desc.tRender.bUseCullDistance;
+		pInOutEdit->bUseCullDistance = Policy.bUseCullDistance;
+
+		pInOutEdit->bHasUseCullFrustum = Policy.bUseCullFrustum != Desc.tRender.bUseCullFrustum;
+		pInOutEdit->bUseCullFrustum = Policy.bUseCullFrustum;
+
+		pInOutEdit->bHasShadow = Desc.tRender.bHasShadow && Policy.bUseShadow != Desc.tRender.bUseShadow;
+		pInOutEdit->bUseShadow = Policy.bUseShadow;
+
+		pInOutEdit->bHasCollMesh = Desc.tCollision.bHasCollMesh && Policy.bUseCollMesh != Desc.tCollision.bUseCollMesh;
+		pInOutEdit->bUseCollMesh = Policy.bUseCollMesh;
+	}
+
+	void Update_SectionPolicyEditFromCurrent(CMapSection* pSection, MAP_ENV_EDITED_DESC* pInOutEdit)
+	{
+		if (nullptr == pSection || nullptr == pInOutEdit)
+			return;
+
+		EDITABLE_DESC EditDesc{};
+		if (!pSection->Get_EditDesc(&EditDesc))
+			return;
+
+		const MAP_SECTION_DESC& Desc = pSection->Get_Desc();
+		const EDIT_OBJECT_POLICY& Policy = EditDesc.Policy;
+
+		pInOutEdit->bHasRenderable = Policy.bRenderable != Desc.bRenderable;
+		pInOutEdit->bRenderable = Policy.bRenderable;
+
+		pInOutEdit->bHasEnableCulling = Policy.bUseCullFrustum != Desc.bEnableCulling;
+		pInOutEdit->bEnableCulling = Policy.bUseCullFrustum;
+
+		pInOutEdit->bHasCollMesh = pSection->Has_CollMesh() && Policy.bUseCollMesh != Desc.bUseCollMesh;
+		pInOutEdit->bUseCollMesh = Policy.bUseCollMesh;
+	}
+
 	void Update_WorldMatrixEdit(const _float4x4& CurrentWorld, _matrix BaseWorldMatrix, MAP_ENV_EDITED_DESC* pInOutEdit)
 	{
 		if (nullptr == pInOutEdit)
@@ -633,6 +684,7 @@ _bool CLevel_Edit::Commit_MapEditObjectFromCurrentState(CGameObject* pObject)
 
 		MAP_ENV_EDITED_DESC Edit{};
 		Try_GetMapPreviewEnvEdit(pObject, &Edit);
+		Update_EnvPolicyEditFromCurrent(pEnvObject, &Edit);
 
 		const _float4x4& CurrentWorld = *pEnvObject->Get_Transform()->Get_WorldMatrixPtr();
 		Update_WorldMatrixEdit(CurrentWorld, Build_EnvBaseWorldMatrix(pEnvObject->Get_Desc()), &Edit);
@@ -647,6 +699,7 @@ _bool CLevel_Edit::Commit_MapEditObjectFromCurrentState(CGameObject* pObject)
 
 		MAP_ENV_EDITED_DESC Edit{};
 		Try_GetMapPreviewSectionEdit(strSectionKey, &Edit);
+		Update_SectionPolicyEditFromCurrent(pSection, &Edit);
 
 		const _float4x4& CurrentWorld = *pSection->Get_Transform()->Get_WorldMatrixPtr();
 		Update_WorldMatrixEdit(CurrentWorld, Build_SectionBaseWorldMatrix(pSection->Get_Desc()), &Edit);

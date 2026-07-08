@@ -1,7 +1,6 @@
 ﻿#include "Panel_Inspector.h"
 #include "EditInstance.h"
 #include "Level_Edit.h"
-
 #include "Shader_PassMeta.h"
 #include "MapStage.h"
 #include "MapSection.h"
@@ -13,6 +12,7 @@
 #include "LevelDesign_Starblock.h"
 #include "LevelDesign_Breakable.h"
 #include "LevelDesign_Bush.h"
+#include "Editable.h"
 
 #include "GameInstance.h"
 #include "GameObject.h"
@@ -108,163 +108,6 @@ namespace
 		return bDefault;
 	}
 
-	void Fill_EditWorldMatrix(CGameObject* pObject, MAP_ENV_EDITED_DESC* pOutEdit)
-	{
-		if (nullptr == pObject || nullptr == pOutEdit)
-			return;
-
-		pOutEdit->bHasWorldMatrix = true;
-		pOutEdit->matWorld = *pObject->Get_Transform()->Get_WorldMatrixPtr();
-	}
-
-	_matrix Build_EnvBaseWorldMatrix(const ENV_OBJECT_DESC& Desc)
-	{
-		if (Desc.bHasWorldMatrix)
-			return XMLoadFloat4x4(&Desc.matWorld);
-
-		const _vector vScale = XMLoadFloat3(&Desc.vScale);
-		const _vector vRotation = XMLoadFloat4(&Desc.vRotation);
-		const _vector vPosition = XMVectorSet(
-			Desc.vPosition.x,
-			Desc.vPosition.y,
-			Desc.vPosition.z,
-			1.f);
-
-		return XMMatrixScalingFromVector(vScale)
-			* XMMatrixRotationQuaternion(vRotation)
-			* XMMatrixTranslationFromVector(vPosition);
-	}
-
-	_bool IsNearlyEqualFloat4x4(const _float4x4& A, const _float4x4& B, _float fEpsilon = 0.0001f)
-	{
-		for (_uint iRow = 0; iRow < 4; ++iRow)
-		{
-			for (_uint iCol = 0; iCol < 4; ++iCol)
-			{
-				if (fabsf(A.m[iRow][iCol] - B.m[iRow][iCol]) > fEpsilon)
-					return false;
-			}
-		}
-
-		return true;
-	}
-
-	MAP_ENV_EDITED_DESC Build_EnvEditFromCurrentObject(CEnvObject* pEnvObject, _bool bUseNearDistAlpha)
-	{
-		MAP_ENV_EDITED_DESC Edit{};
-		if (nullptr == pEnvObject)
-			return Edit;
-
-		const ENV_OBJECT_DESC& Desc = pEnvObject->Get_Desc();
-
-		const _bool bRenderable =
-			ReadBoolProperty(pEnvObject, L"Renderable", L"EnvObject", true);
-		const _bool bBaseRenderable = !Desc.tCollision.bInvisibleCollision;
-		if (bRenderable != bBaseRenderable)
-		{
-			Edit.bHasRenderable = true;
-			Edit.bRenderable = bRenderable;
-		}
-
-		const _bool bUseCullDistance = ReadBoolProperty(pEnvObject, L"Use Distance Culling", L"EnvObject", Desc.tRender.bUseCullDistance);
-		if (bUseCullDistance != Desc.tRender.bUseCullDistance)
-		{
-			Edit.bHasUseCullDistance = true;
-			Edit.bUseCullDistance = bUseCullDistance;
-		}
-
-		const _bool bUseCullFrustum = ReadBoolProperty(pEnvObject, L"Use Frustum Culling", L"EnvObject", Desc.tRender.bUseCullFrustum);
-		if (bUseCullFrustum != Desc.tRender.bUseCullFrustum)
-		{
-			Edit.bHasUseCullFrustum = true;
-			Edit.bUseCullFrustum = bUseCullFrustum;
-		}
-
-		_float4x4 BaseWorld = {};
-		XMStoreFloat4x4(&BaseWorld, Build_EnvBaseWorldMatrix(Desc));
-
-		const _float4x4& CurrentWorld =
-			*pEnvObject->Get_Transform()->Get_WorldMatrixPtr();
-
-		if (!IsNearlyEqualFloat4x4(CurrentWorld, BaseWorld))
-		{
-			Edit.bHasWorldMatrix = true;
-			Edit.matWorld = CurrentWorld;
-		}
-
-		const _bool bBaseUseNearDistAlpha = Desc.tRender.bUseNearDistAlpha;
-		if (bUseNearDistAlpha != bBaseUseNearDistAlpha)
-		{
-			Edit.bHasNearDistAlpha = true;
-			Edit.bUseNearDistAlpha = bUseNearDistAlpha;
-		}
-
-		return Edit;
-	}
-
-	_matrix Build_SectionBaseWorldMatrix(const MAP_SECTION_DESC& Desc)
-	{
-		_float4x4 Mat{};
-
-		Mat.m[0][0] = Desc.vRight.x;
-		Mat.m[0][1] = Desc.vRight.y;
-		Mat.m[0][2] = Desc.vRight.z;
-		Mat.m[0][3] = Desc.vRight.w;
-
-		Mat.m[1][0] = Desc.vUp.x;
-		Mat.m[1][1] = Desc.vUp.y;
-		Mat.m[1][2] = Desc.vUp.z;
-		Mat.m[1][3] = Desc.vUp.w;
-
-		Mat.m[2][0] = Desc.vLook.x;
-		Mat.m[2][1] = Desc.vLook.y;
-		Mat.m[2][2] = Desc.vLook.z;
-		Mat.m[2][3] = Desc.vLook.w;
-
-		Mat.m[3][0] = Desc.vPosition.x;
-		Mat.m[3][1] = Desc.vPosition.y;
-		Mat.m[3][2] = Desc.vPosition.z;
-		Mat.m[3][3] = Desc.vPosition.w;
-
-		return XMLoadFloat4x4(&Mat);
-	}
-
-	MAP_ENV_EDITED_DESC Build_SectionEditFromCurrentSection(Client::CMapSection* pSection)
-	{
-		MAP_ENV_EDITED_DESC Edit{};
-		if (nullptr == pSection)
-			return Edit;
-
-		const MAP_SECTION_DESC& Desc = pSection->Get_Desc();
-
-		const _bool bRenderable =
-			ReadBoolProperty(pSection, L"Renderable", L"MapSection", Desc.bRenderable);
-		if (bRenderable != Desc.bRenderable)
-		{
-			Edit.bHasRenderable = true;
-			Edit.bRenderable = bRenderable;
-		}
-
-		const _bool bEnableCulling =
-			ReadBoolProperty(pSection, L"Enable Culling", L"MapSection", Desc.bEnableCulling);
-		if (bEnableCulling != Desc.bEnableCulling)
-		{
-			Edit.bHasEnableCulling = true;
-			Edit.bEnableCulling = bEnableCulling;
-		}
-
-		_float4x4 BaseWorld = {};
-		XMStoreFloat4x4(&BaseWorld, Build_SectionBaseWorldMatrix(Desc));
-
-		const _float4x4& CurrentWorld =
-			*pSection->Get_Transform()->Get_WorldMatrixPtr();
-
-		if (!IsNearlyEqualFloat4x4(CurrentWorld, BaseWorld))
-			Fill_EditWorldMatrix(pSection, &Edit);
-
-		return Edit;
-	}
-
 	const _char* GetEnvShaderPassComboItem(void*, _int idx)
 	{
 		if (idx < 0 || idx >= static_cast<int>(_countof(g_EnvShaderPassMetas)))
@@ -284,18 +127,55 @@ namespace
 		_bool bBushMeshUi = { false };
 		_bool bBushBasicMeshUi = { false };
 		_bool bBushCutMeshUi = { false };
+
+		IEditable* pEditable = { nullptr };
+		EDITABLE_DESC EditDesc = {};
+		_uint iModelSlot = { 0u };
 	};
 
-	MESH_LAYER_UI_CONTEXT Resolve_MeshLayerUIContext(CGameObject* pObject, int iBushMeshSlot)
+	MESH_LAYER_UI_CONTEXT Resolve_MeshLayerUIContext(CGameObject* pObject, int iModelSlot)
 	{
 		MESH_LAYER_UI_CONTEXT Ctx{};
 
 		if (nullptr == pObject)
 			return Ctx;
 
+		Ctx.pEditable = dynamic_cast<IEditable*>(pObject);
+		if (nullptr != Ctx.pEditable)
+		{
+			if (!Ctx.pEditable->Get_EditDesc(&Ctx.EditDesc))
+				return Ctx;
+
+			if (0u == (Ctx.EditDesc.iCapabilities & EDIT_CAP_MESH_LAYER))
+				return Ctx;
+
+			if (Ctx.EditDesc.ModelSlots.empty())
+				return Ctx;
+
+			if (iModelSlot < 0 || static_cast<size_t>(iModelSlot) >= Ctx.EditDesc.ModelSlots.size())
+				iModelSlot = 0;
+
+			Ctx.iModelSlot = static_cast<_uint>(iModelSlot);
+			const EDITABLE_MODEL_SLOT& Slot = Ctx.EditDesc.ModelSlots[Ctx.iModelSlot];
+
+			Ctx.pModel = Slot.pModel;
+			Ctx.bBushMeshUi = nullptr != dynamic_cast<CLevelDesign_Bush*>(pObject);
+			Ctx.bBushBasicMeshUi = Ctx.bBushMeshUi && Slot.strLabel == L"Basic";
+			Ctx.bBushCutMeshUi = Ctx.bBushMeshUi && Slot.strLabel == L"Cut";
+			Ctx.bEnvObjectMeshUi = nullptr != dynamic_cast<CEnvObject*>(pObject);
+			Ctx.bMapObjectMeshUi = nullptr != dynamic_cast<Client::CMapObject*>(pObject);
+
+			const _bool bStarblockMeshUi = nullptr != dynamic_cast<CLevelDesign_Starblock*>(pObject);
+			const CLevelDesign_Breakable* pBreakable = dynamic_cast<CLevelDesign_Breakable*>(pObject);
+			const _bool bBreakableNonAnimMeshUi = nullptr != pBreakable && MODEL::NONANIM == pBreakable->Get_BreakableDesc().eModelType;
+
+			Ctx.bEnvPassMeshUi = Ctx.bEnvObjectMeshUi || bStarblockMeshUi || bBreakableNonAnimMeshUi || Ctx.bBushCutMeshUi;
+			return Ctx;
+		}
+
 		Ctx.bBushMeshUi = nullptr != dynamic_cast<CLevelDesign_Bush*>(pObject);
-		Ctx.bBushBasicMeshUi = Ctx.bBushMeshUi && 0 == iBushMeshSlot;
-		Ctx.bBushCutMeshUi = Ctx.bBushMeshUi && 1 == iBushMeshSlot;
+		Ctx.bBushBasicMeshUi = Ctx.bBushMeshUi && 0 == iModelSlot;
+		Ctx.bBushCutMeshUi = Ctx.bBushMeshUi && 1 == iModelSlot;
 
 		Ctx.pModelComponentTag = Ctx.bBushMeshUi
 			? (Ctx.bBushBasicMeshUi ? L"Com_Model_Basic" : L"Com_Model_Cut")
@@ -473,6 +353,9 @@ void CPanel_Inspector::Render()
 	_bool bRenderGlobalsDirty = false;
 
 	Draw_Transform(pSelected);
+
+	ImGui::Separator();
+	Draw_EditableObjectPolicyPanel(pSelected);
 
 	if (dynamic_cast<CEnvObject*>(pSelected))
 	{
@@ -744,115 +627,152 @@ _bool CPanel_Inspector::Draw_Transform(CGameObject* pObject, const string& strSu
 	return bChanged;
 }
 
+void CPanel_Inspector::Draw_EditableObjectPolicyPanel(CGameObject* pObject)
+{
+	IEditable* pEditable = dynamic_cast<IEditable*>(pObject);
+	if (nullptr == pEditable)
+		return;
+
+	EDITABLE_DESC EditDesc{};
+	if (!pEditable->Get_EditDesc(&EditDesc))
+		return;
+
+	const _uint iPolicyCaps =
+		EDIT_CAP_RENDERABLE
+		| EDIT_CAP_CULL_DISTANCE
+		| EDIT_CAP_CULL_FRUSTUM
+		| EDIT_CAP_COLLISION_MESH
+		| EDIT_CAP_SHADOW;
+
+	if (0u == (EditDesc.iCapabilities & iPolicyCaps))
+		return;
+
+	if (!ImGui::CollapsingHeader("Object Policy##Editable", ImGuiTreeNodeFlags_DefaultOpen))
+		return;
+
+	const _wstring strStateKey = EditDesc.strStableKey.empty()
+		? L"ptr|" + to_wstring(reinterpret_cast<size_t>(pObject))
+		: EditDesc.strStableKey;
+
+	auto IterPolicy = m_EditablePolicyDrafts.find(strStateKey);
+	if (IterPolicy == m_EditablePolicyDrafts.end())
+		IterPolicy = m_EditablePolicyDrafts.emplace(strStateKey, EditDesc.Policy).first;
+
+	EDIT_OBJECT_POLICY& NewPolicy = IterPolicy->second;
+
+	if (EditDesc.iCapabilities & EDIT_CAP_RENDERABLE)
+		ImGui::Checkbox("Renderable##EditablePolicy", (bool*)&NewPolicy.bRenderable);
+
+	if (EditDesc.iCapabilities & EDIT_CAP_CULL_DISTANCE)
+		ImGui::Checkbox("Use Distance Culling##EditablePolicy", (bool*)&NewPolicy.bUseCullDistance);
+
+	if (EditDesc.iCapabilities & EDIT_CAP_CULL_FRUSTUM)
+		ImGui::Checkbox("Use Frustum Culling##EditablePolicy", (bool*)&NewPolicy.bUseCullFrustum);
+
+	if (EditDesc.iCapabilities & EDIT_CAP_COLLISION_MESH)
+		ImGui::Checkbox("Use Collision Mesh##EditablePolicy", (bool*)&NewPolicy.bUseCollMesh);
+
+	if (EditDesc.iCapabilities & EDIT_CAP_SHADOW)
+		ImGui::Checkbox("Use Shadow##EditablePolicy", (bool*)&NewPolicy.bUseShadow);
+
+	if (ImGui::Button("Apply Object Policy##EditablePolicy"))
+	{
+		if (FAILED(pEditable->Apply_EditPolicy(NewPolicy)))
+		{
+			MSG_BOX("OBJECT POLICY APPLY FAILED");
+		}
+		else
+		{
+			EDITABLE_DESC AppliedDesc{};
+			if (pEditable->Get_EditDesc(&AppliedDesc))
+				NewPolicy = AppliedDesc.Policy;
+		}
+	}
+
+	ImGui::SameLine();
+	if (ImGui::Button("Reset##EditablePolicy"))
+		NewPolicy = EditDesc.Policy;
+}
+
 void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject* pObject)
 {
 	Client::CEnvObject* pEnvObject = dynamic_cast<CEnvObject*>(pObject);
 	if (nullptr == pLevel || nullptr == pEnvObject)
 		return;
 
-	_bool* pbRenderable = FindBoolProperty(pEnvObject, L"Renderable", L"EnvObject");
-	_bool* pbUseCullDistance = FindBoolProperty(pEnvObject, L"Use Distance Culling", L"EnvObject");
-	_bool* pbUseCullFrustum = FindBoolProperty(pEnvObject, L"Use Frustum Culling", L"EnvObject");
-	_bool* pbUseShadow = Resolve_EnvShadowEditState(pLevel, pEnvObject);
-	_bool* pbUseCollMesh = Resolve_EnvCollMeshEditState(pLevel, pEnvObject);
 	_bool* pbUseNearDistAlpha = Resolve_EnvNearAlphaEditState(pLevel, pEnvObject);
 
 	const ENV_OBJECT_DESC& Desc = pEnvObject->Get_Desc();
-	const auto& Collision = Desc.tCollision;
-	const auto& Render = Desc.tRender;
 
-	const _bool bHasShadow = Render.bHasShadow;
-	const _bool bHasCollMesh = Collision.bHasCollMesh;
-
-	ImGui::TextUnformatted("EnvObject Edit");
-
-	if (pbRenderable)
-		ImGui::Checkbox("Renderable##EnvEdit", (bool*)pbRenderable);
-	if (pbUseCullDistance)
-		ImGui::Checkbox("Distance Culling##EnvEdit", (bool*)pbUseCullDistance);
-	if (pbUseCullFrustum)
-		ImGui::Checkbox("Frustum Culling##EnvEdit", (bool*)pbUseCullFrustum);
-
-	if (pbUseShadow)
-	{
-		ImGui::BeginDisabled(!bHasShadow);
-		ImGui::Checkbox("Cast Shadow##EnvEdit", (bool*)pbUseShadow);
-		ImGui::EndDisabled();
-	}
-
-	if (pbUseCollMesh)
-	{
-		ImGui::BeginDisabled(!bHasCollMesh);
-		ImGui::Checkbox("Use Collision Mesh On Reload##EnvEdit", (bool*)pbUseCollMesh);
-		ImGui::EndDisabled();
-	}
-
-	if (!bHasShadow)
-		ImGui::TextDisabled("Source data does not provide shadow capability for this object.");
-
-	if (!bHasCollMesh)
-		ImGui::TextDisabled("Source data does not provide collision mesh capability for this object.");
+	ImGui::TextUnformatted("EnvObject Override");
 
 	if (pbUseNearDistAlpha)
 		ImGui::Checkbox("Use Near Dist Alpha##EnvEdit", (bool*)pbUseNearDistAlpha);
 
-	ImGui::TextDisabled("Applied on next env reload.");
-	ImGui::TextDisabled("Restart persistence requires Save Override Now or toolbar Map Edit Save.");
+	ImGui::TextDisabled("Object Policy is handled by the common panel.");
+	ImGui::TextDisabled("Apply Override stores these values in the edit session.");
+	ImGui::TextDisabled("Save Override Now or toolbar Map Edit Save persists applied overrides.");
 
-	if (ImGui::Button("Apply Current##EnvEdit"))
-	{
-		MAP_ENV_EDITED_DESC Edit = Build_EnvEditFromCurrentObject(
-			pEnvObject,
-			(nullptr != pbUseNearDistAlpha)
-			? *pbUseNearDistAlpha
-			: Desc.tRender.bUseNearDistAlpha);
+	auto CommitCurrentEnvEdit = [&]() -> _bool
+		{
+			if (!pLevel->Commit_MapEditObjectFromCurrentState(pObject))
+				return false;
 
-		const _bool bBaseUseShadow = bHasShadow;
-		if (bHasShadow && nullptr != pbUseShadow && *pbUseShadow != bBaseUseShadow)
-		{
-			Edit.bHasShadow = true;
-			Edit.bUseShadow = *pbUseShadow;
-		}
+			const _bool bUseNearDistAlpha = (nullptr != pbUseNearDistAlpha)
+				? *pbUseNearDistAlpha
+				: Desc.tRender.bUseNearDistAlpha;
 
-		const _bool bBaseUseCollMesh = false;
-		if (bHasCollMesh && nullptr != pbUseCollMesh && *pbUseCollMesh != bBaseUseCollMesh)
-		{
-			Edit.bHasCollMesh = true;
-			Edit.bUseCollMesh = *pbUseCollMesh;
-		}
+			MAP_ENV_EDITED_DESC Edit{};
+			pLevel->Try_GetMapPreviewEnvEdit(pObject, &Edit);
 
-		if (Has_AnyMapEnvEdit(Edit))
-		{
-			pLevel->Track_EditedMapPreviewEnvObject(pObject, Edit);
-		}
-		else
-		{
+			if (bUseNearDistAlpha != Desc.tRender.bUseNearDistAlpha)
+			{
+				Edit.bHasNearDistAlpha = true;
+				Edit.bUseNearDistAlpha = bUseNearDistAlpha;
+			}
+			else
+			{
+				Edit.bHasNearDistAlpha = false;
+				Edit.bUseNearDistAlpha = false;
+			}
+
+			if (Has_AnyMapEnvEdit(Edit))
+				return pLevel->Track_EditedMapPreviewEnvObject(pObject, Edit);
+
 			pLevel->Clear_EditedMapPreviewEnvObject(pObject);
-			Clear_EnvShadowEditState(pObject);
-			Clear_EnvCollMeshEditState(pObject);
 			Clear_EnvNearAlphaEditState(pObject);
-		}
+			return true;
+		};
+
+	if (ImGui::Button("Apply Override##EnvEdit"))
+	{
+		if (!CommitCurrentEnvEdit())
+			MSG_BOX("MAP EDIT APPLY FAILED");
 	}
 
 	ImGui::SameLine();
 
 	if (ImGui::Button("Save Override Now##EnvEdit"))
 	{
-		if (FAILED(pLevel->Save_MapOverride()))
+		if (!CommitCurrentEnvEdit())
+		{
+			MSG_BOX("MAP EDIT APPLY FAILED");
+		}
+		else if (FAILED(pLevel->Save_MapOverride()))
+		{
 			MSG_BOX("MAP EDIT SAVE FAILED");
+		}
 	}
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("Clear Saved Edit##EnvEdit"))
+	if (ImGui::Button("Clear Override##EnvEdit"))
 	{
 		const CMap_EditSession* pSession = pLevel->Get_MapPreviewSession();
 		const _int iPresetIndex =
 			(nullptr != pSession) ? pSession->Get_EditData().iPresetIndex : -1;
 
 		pLevel->Clear_EditedMapPreviewEnvObject(pObject);
-		m_EnvShadowEditStates.clear();
-		m_EnvCollMeshEditStates.clear();
 		m_EnvNearAlphaEditStates.clear();
 
 		if (0 <= iPresetIndex)
@@ -877,23 +797,14 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 		return;
 
 	_bool* pbRenderable = nullptr;
-	if (nullptr != pMapSection)
-		pbRenderable = FindBoolProperty(pMapSection, L"Renderable", L"MapSection");
-	else
+	if (nullptr != pBreakWall)
 		pbRenderable = FindBoolProperty(pBreakWall, L"Renderable", L"MapEvent_BreakWall");
-
-	_bool* pbEnableCulling = nullptr;
-	_bool* pbUseCollMesh = nullptr;
-	_bool bHasCollMesh = false;
 
 	_wstring strStageName;
 	_wstring strSectionName;
 
 	if (nullptr != pMapSection)
 	{
-		pbEnableCulling = FindBoolProperty(pMapSection, L"Enable Culling", L"MapSection");
-		pbUseCollMesh = Resolve_MapCollMeshEditState(pLevel, pMapStage, pMapSection);
-		bHasCollMesh = pMapSection->Has_CollMesh();
 		strStageName = pMapStage->Get_StageName();
 		strSectionName = pMapSection->Get_SectionName();
 	}
@@ -920,35 +831,21 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 
 	if (ImGui::CollapsingHeader(pFlagsHeader, ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		ImGui::BeginGroup();
-		if (pbRenderable)
-			ImGui::Checkbox(pRenderableLabel, (bool*)pbRenderable);
-		ImGui::EndGroup();
-
 		if (nullptr != pMapSection)
 		{
-			ImGui::SameLine(0.f, 20.f);
-
-			ImGui::BeginGroup();
-			if (pbEnableCulling)
-				ImGui::Checkbox("Enable Culling##SectionEdit", (bool*)pbEnableCulling);
-			if (pbUseCollMesh)
-			{
-				ImGui::BeginDisabled(!bHasCollMesh);
-				ImGui::Checkbox("Use Collision Mesh On Reload##SectionEdit", (bool*)pbUseCollMesh);
-				ImGui::EndDisabled();
-			}
-			ImGui::EndGroup();
-
-			if (!bHasCollMesh)
+			if (!pMapSection->Has_CollMesh())
 				ImGui::TextDisabled("Collision mesh unavailable.");
 
+			ImGui::TextDisabled("Renderable, culling, and collision mesh are handled by Object Policy.");
 			ImGui::TextDisabled("Shadow depth is always submitted.");
 			ImGui::TextDisabled("Apply on reload.");
 			ImGui::TextDisabled("Save to persist.");
 		}
 		else
 		{
+			if (pbRenderable)
+				ImGui::Checkbox(pRenderableLabel, (bool*)pbRenderable);
+
 			ImGui::TextDisabled("Transform and Renderable affect the current preview.");
 			ImGui::TextDisabled("Culling, shadow, and section collision actor are not used by MapEvent_BreakWall.");
 		}
@@ -961,46 +858,8 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 
 	if (ImGui::Button("Apply##SectionEdit"))
 	{
-		MAP_ENV_EDITED_DESC Edit = Build_SectionEditFromCurrentSection(pMapSection);
-
-		if (!Edit.bHasWorldMatrix)
-		{
-			MAP_ENV_EDITED_DESC SavedEdit{};
-			if (pLevel->Try_GetMapPreviewSectionEdit(strSectionKey, &SavedEdit)
-				&& SavedEdit.bHasWorldMatrix)
-			{
-				Edit.bHasWorldMatrix = true;
-				Edit.matWorld = SavedEdit.matWorld;
-			}
-		}
-
-		const _bool bUseCollMeshValue =
-			(nullptr != pbUseCollMesh)
-			? *pbUseCollMesh
-			: bHasCollMesh;
-
-		const _bool bBaseUseCollMesh = bHasCollMesh;
-
-		Edit.bHasCollMesh = false;
-		Edit.bUseCollMesh = bBaseUseCollMesh;
-
-		if (bHasCollMesh && bUseCollMeshValue != bBaseUseCollMesh)
-		{
-			Edit.bHasCollMesh = true;
-			Edit.bUseCollMesh = bUseCollMeshValue;
-		}
-
-		pMapSection->Set_UseCollMesh(bHasCollMesh ? bUseCollMeshValue : false);
-
-		if (Has_AnyMapEnvEdit(Edit))
-		{
-			pLevel->Track_EditedMapPreviewSection(strSectionKey, Edit);
-		}
-		else
-		{
-			pLevel->Clear_EditedMapPreviewSection(strSectionKey);
-			Clear_MapCollMeshEditState(pMapSection);
-		}
+		if (!pLevel->Commit_MapEditObjectFromCurrentState(pMapSection))
+			MSG_BOX("MAP EDIT APPLY FAILED");
 	}
 
 	ImGui::SameLine();
@@ -1022,7 +881,6 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 			(nullptr != pSession) ? pSession->Get_EditData().iPresetIndex : -1;
 
 		pLevel->Clear_EditedMapPreviewSection(strSectionKey);
-		m_MapCollMeshEditStates.clear();
 
 		if (0 <= iPresetIndex)
 		{
@@ -1037,20 +895,32 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 	if (nullptr == pObject)
 		return;
 
-	static CGameObject* s_pBushMeshOwner = nullptr;
-	static int s_iBushMeshSlot = 1;
+	IEditable* pEditable = dynamic_cast<IEditable*>(pObject);
+	EDITABLE_DESC EditDesc{};
+	const _bool bEditable = nullptr != pEditable && pEditable->Get_EditDesc(&EditDesc);
 
-	const _bool bBushMeshUi = nullptr != dynamic_cast<CLevelDesign_Bush*>(pObject);
+	if (bEditable && 0u == (EditDesc.iCapabilities & EDIT_CAP_MESH_LAYER))
+		return;
 
-	if (bBushMeshUi && s_pBushMeshOwner != pObject)
+	auto MakeStateKey = [&](const EDITABLE_DESC& Desc) -> _wstring
+		{
+			return Desc.strStableKey.empty() ? L"ptr|" + to_wstring(reinterpret_cast<size_t>(pObject)) : Desc.strStableKey;
+		};
+
+	_uint iSelectedModelSlot = 0u;
+	if (bEditable && !EditDesc.ModelSlots.empty())
 	{
-		s_pBushMeshOwner = pObject;
-		s_iBushMeshSlot = 1;
+		_uint& iStoredSlot = m_SelectedModelSlotByEditableKey[MakeStateKey(EditDesc)];
+		if (iStoredSlot >= EditDesc.ModelSlots.size())
+			iStoredSlot = 0u;
+		iSelectedModelSlot = iStoredSlot;
 	}
 
-	MESH_LAYER_UI_CONTEXT Ui = Resolve_MeshLayerUIContext(pObject, s_iBushMeshSlot);
+	MESH_LAYER_UI_CONTEXT Ui = Resolve_MeshLayerUIContext(pObject, static_cast<int>(iSelectedModelSlot));
 	CModel* pModel = Ui.pModel;
-	if (nullptr == pModel)
+	const _bool bHasEditableModelSlots = nullptr != Ui.pEditable && !Ui.EditDesc.ModelSlots.empty();
+
+	if (nullptr == pModel && !bHasEditableModelSlots)
 		return;
 
 	if (!ImGui::CollapsingHeader("Mesh Render Settings (per Model)"))
@@ -1059,82 +929,116 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 	ImGui::TextDisabled("Mesh Render Settings are saved per model sidecar.");
 	ImGui::TextDisabled("All objects/sections using this model will be affected.");
 
-	_bool bBushSlotChanged = false;
-
-	if (bBushMeshUi)
+	_bool bModelSlotChanged = false;
+	if (Ui.pEditable && !Ui.EditDesc.ModelSlots.empty())
 	{
-		int iBushSlot = s_iBushMeshSlot;
-
-		ImGui::SetNextItemWidth(160.f);
-		if (ImGui::Combo("Bush Model", &iBushSlot, "Basic\0Cut\0\0"))
+		string strItems;
+		for (const EDITABLE_MODEL_SLOT& Slot : Ui.EditDesc.ModelSlots)
 		{
-			s_iBushMeshSlot = (iBushSlot <= 0) ? 0 : 1;
-			bBushSlotChanged = true;
+			strItems += WstrToStr(Slot.strLabel);
+			strItems += EDITABLE_MODEL_KIND::ANIM == Slot.eKind ? " (Anim)" : " (NonAnim)";
+			strItems.push_back('\0');
+		}
+		strItems.push_back('\0');
 
-			Ui = Resolve_MeshLayerUIContext(pObject, s_iBushMeshSlot);
+		int iSlot = static_cast<int>(Ui.iModelSlot);
+		ImGui::SetNextItemWidth(220.f);
+		if (ImGui::Combo("Model Slot##EditableMeshLayer", &iSlot, strItems.c_str()))
+		{
+			_uint& iStoredSlot = m_SelectedModelSlotByEditableKey[MakeStateKey(Ui.EditDesc)];
+			iStoredSlot = static_cast<_uint>(iSlot);
+			bModelSlotChanged = true;
+
+			Ui = Resolve_MeshLayerUIContext(pObject, iSlot);
 			pModel = Ui.pModel;
 			if (nullptr == pModel)
-			{
-				ImGui::TextDisabled("Selected Bush model slot is unavailable.");
 				return;
+		}
+	}
+
+	auto GetSelectedSlotLabel = [&]() -> string
+		{
+			if (nullptr == Ui.pEditable || Ui.iModelSlot >= Ui.EditDesc.ModelSlots.size())
+				return {};
+
+			const EDITABLE_MODEL_SLOT& Slot = Ui.EditDesc.ModelSlots[Ui.iModelSlot];
+			return WstrToStr(Slot.strLabel) + (EDITABLE_MODEL_KIND::ANIM == Slot.eKind ? " (Anim)" : " (NonAnim)");
+		};
+
+	auto DrawSaveMeshLayerButton = [&]()
+		{
+			if (ImGui::Button("Save MeshLayer##EditableModelSlot"))
+			{
+				if (nullptr == pModel || FAILED(pModel->Save_MeshLayers()))
+					MSG_BOX("MESH LAYER SAVE FAILED");
 			}
+
+			const string strSlotLabel = GetSelectedSlotLabel();
+			if (!strSlotLabel.empty())
+			{
+				ImGui::SameLine();
+				ImGui::TextDisabled("Slot: %s", strSlotLabel.c_str());
+			}
+		};
+
+	auto MakeMeshFocusKey = [&]() -> _wstring
+		{
+			if (nullptr != Ui.pEditable)
+				return MakeStateKey(Ui.EditDesc) + L"|slot|" + to_wstring(Ui.iModelSlot);
+
+			return L"ptr|" + to_wstring(reinterpret_cast<size_t>(pObject)) + L"|slot|" + to_wstring(Ui.iModelSlot);
+		};
+
+	if (bHasEditableModelSlots)
+	{
+		const EDITABLE_MODEL_SLOT& Slot = Ui.EditDesc.ModelSlots[Ui.iModelSlot];
+		if (nullptr == Slot.pModel)
+		{
+			ImGui::TextDisabled("Selected ModelSlot has no model.");
+			return;
 		}
 
-		ImGui::TextDisabled((0 == s_iBushMeshSlot) ? "Basic uses fixed anim pass and Bush texture defaults." : "Cut uses ENV_PASS domain and Bush texture defaults.");
+		if (0u == Slot.iMeshCount)
+		{
+			ImGui::TextDisabled("Selected ModelSlot has no mesh.");
+			DrawSaveMeshLayerButton();
+			return;
+		}
 	}
 
 	static const char* UvItems[] = { "TEXCOORD0", "TEXCOORD1", "TEXCOORD2", "TEXCOORD3" };
 
 	const size_t iNumMeshes = pModel->Get_NumMeshes();
 
-	static CGameObject* s_pFocusedMeshOwner = nullptr;
-	static _int s_iFocusedMeshIndex = -1;
+	const _wstring strMeshFocusKey = MakeMeshFocusKey();
+	_int& iFocusedMeshIndex = m_SelectedMeshByEditableSlotKey[strMeshFocusKey];
 
-	_bool bFocusedMeshChanged = (s_pFocusedMeshOwner != pObject) || bBushSlotChanged;
-
-	if (bFocusedMeshChanged)
-	{
-		s_pFocusedMeshOwner = pObject;
-		s_iFocusedMeshIndex = (iNumMeshes > 0) ? 0 : -1;
-
-#ifdef _DEBUG
-		if (auto* pSection = dynamic_cast<Client::CMapSection*>(pObject))
-		{
-			if (m_bEditorSoloMesh)
-				pSection->Set_EditorSoloMeshIndex(s_iFocusedMeshIndex);
-			else
-				pSection->Clear_EditorSoloMesh();
-		}
-#endif
-	}
+	_bool bFocusedMeshChanged = bModelSlotChanged;
 
 	if (0 == iNumMeshes)
+		iFocusedMeshIndex = -1;
+	else if (iFocusedMeshIndex < 0 || iFocusedMeshIndex >= static_cast<_int>(iNumMeshes))
 	{
-		ImGui::TextDisabled("No mesh available.");
-
-		if (ImGui::Button("Bake (Save sidecar)"))
-		{
-			if (FAILED(pModel->Save_MeshLayers()))
-				MSG_BOX("MESH LAYER SAVE FAILED");
-		}
-		return;
-	}
-
-	if (s_iFocusedMeshIndex < 0 || s_iFocusedMeshIndex >= static_cast<_int>(iNumMeshes))
-	{
-		s_iFocusedMeshIndex = 0;
+		iFocusedMeshIndex = 0;
 		bFocusedMeshChanged = true;
 	}
 
 #ifdef _DEBUG
-	if (auto* pSection = dynamic_cast<Client::CMapSection*>(pObject))
+	if (auto* pSection = dynamic_cast<CMapSection*>(pObject))
 	{
 		if (m_bEditorSoloMesh)
-			pSection->Set_EditorSoloMeshIndex(s_iFocusedMeshIndex);
+			pSection->Set_EditorSoloMeshIndex(iFocusedMeshIndex);
 		else
 			pSection->Clear_EditorSoloMesh();
 	}
 #endif
+
+	if (0 == iNumMeshes)
+	{
+		ImGui::TextDisabled("No mesh available.");
+		DrawSaveMeshLayerButton();
+		return;
+	}
 
 	ImGui::BeginChild("MeshList", ImVec2(0.f, 140.f), true);
 	for (size_t i = 0; i < iNumMeshes; ++i)
@@ -1143,20 +1047,20 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 		const MESH_LAYER_IDX SummaryLayer = pModel->Get_MeshLayer(iMesh);
 		const string strMeshName = pModel->Get_MeshName(iMesh);
 		const string strLabel = to_string(i) + ": " + strMeshName;
-		const _bool bSelected = (s_iFocusedMeshIndex == static_cast<_int>(i));
+		const _bool bSelected = (iFocusedMeshIndex == static_cast<_int>(i));
 
 		ImGui::PushID(static_cast<int>(i));
 
 		if (ImGui::Selectable(strLabel.c_str(), bSelected, ImGuiSelectableFlags_SpanAllColumns))
 		{
-			s_iFocusedMeshIndex = static_cast<_int>(i);
+			iFocusedMeshIndex = static_cast<_int>(i);
 			bFocusedMeshChanged = true;
 
 #ifdef _DEBUG
 			if (auto* pSection = dynamic_cast<Client::CMapSection*>(pObject))
 			{
 				if (m_bEditorSoloMesh)
-					pSection->Set_EditorSoloMeshIndex(s_iFocusedMeshIndex);
+					pSection->Set_EditorSoloMeshIndex(iFocusedMeshIndex);
 			}
 #endif
 		}
@@ -1174,7 +1078,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 
 	ImGui::Separator();
 
-	const _uint iMesh = static_cast<_uint>(s_iFocusedMeshIndex);
+	const _uint iMesh = static_cast<_uint>(iFocusedMeshIndex);
 	MESH_LAYER_IDX Layer = pModel->Get_MeshLayer(iMesh);
 
 	_bool bChanged = false;
@@ -1192,13 +1096,13 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 		}
 	}
 
-	ImGui::PushID(s_iFocusedMeshIndex);
+	ImGui::PushID(iFocusedMeshIndex);
 	ImGui::Text("Editing Mesh: %d: %s",
-		s_iFocusedMeshIndex,
+		iFocusedMeshIndex,
 		pModel->Get_MeshName(iMesh).c_str());
 
 #ifdef _DEBUG
-	if (auto* pSection = dynamic_cast<Client::CMapSection*>(pObject))
+	if (auto* pSection = dynamic_cast<CMapSection*>(pObject))
 	{
 		if (m_bEditorSoloMesh)
 		{
@@ -1862,16 +1766,22 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 		ImGui::TextDisabled("  (no texture slot override)");
 
 	if (bChanged)
-		pModel->Set_MeshLayer(iMesh, Layer);
+	{
+		if (nullptr != Ui.pEditable)
+		{
+			if (FAILED(Ui.pEditable->Apply_EditMeshLayer(Ui.iModelSlot, iMesh, Layer)))
+				MSG_BOX("MESH LAYER APPLY FAILED");
+		}
+		else
+		{
+			pModel->Set_MeshLayer(iMesh, Layer);
+		}
+	}
 
 	ImGui::Separator();
 	ImGui::PopID();
 
-	if (ImGui::Button("Bake (Save sidecar)"))
-	{
-		if (FAILED(pModel->Save_MeshLayers()))
-			MSG_BOX("MESH LAYER SAVE FAILED");
-	}
+	DrawSaveMeshLayerButton();
 }
 
 void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
@@ -1957,11 +1867,7 @@ void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
 
 			const _bool bRenderable = ReadBoolProperty(pSection, L"Renderable", L"MapSection", pSection->Get_Desc().bRenderable);
 			const _bool bEnableCulling = ReadBoolProperty(pSection, L"Enable Culling", L"MapSection", pSection->Get_Desc().bEnableCulling);
-			_bool* pbUseCollMesh = Resolve_MapCollMeshEditState(pLevel, pMapStage, pSection);
-
-			const _bool bUseCollMesh = (nullptr != pbUseCollMesh)
-				? *pbUseCollMesh
-				: pSection->Has_CollMesh();
+			const _bool bUseCollMesh = pSection->Has_CollMesh() && pSection->Is_UseCollMesh();
 
 			ImGui::TextDisabled("R:%s  C:%s",
 				bRenderable ? "On" : "Off",
@@ -1997,6 +1903,12 @@ void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
 				m_pFocusedMapSection->Notify_EditTransformChanged();
 
 			ImGui::Separator();
+			Draw_EditableObjectPolicyPanel(m_pFocusedMapSection);
+
+			ImGui::Separator();
+			Draw_MeshLayerPanel(m_pFocusedMapSection);
+
+			ImGui::Separator();
 			Draw_MapSectionEditPanel(pLevel, pMapStage, m_pFocusedMapSection);
 			ImGui::Separator();
 #ifdef _DEBUG
@@ -2004,8 +1916,6 @@ void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
 			ImGui::Separator();
 #endif
 			Draw_Properties(m_pFocusedMapSection);
-			ImGui::Separator();
-			Draw_MeshLayerPanel(m_pFocusedMapSection);
 			ImGui::Separator();
 			Draw_MapSectionRenderOptions(m_pFocusedMapSection);
 
@@ -2058,95 +1968,6 @@ void CPanel_Inspector::Draw_MapSectionViewFilter(CMapStage* pMapStage, CMapSecti
 }
 #endif
 
-_bool* CPanel_Inspector::Resolve_EnvShadowEditState(CLevel_Edit* pLevel, Client::CEnvObject* pEnvObject)
-{
-	if (nullptr == pLevel || nullptr == pEnvObject)
-		return nullptr;
-
-	auto Iter = m_EnvShadowEditStates.find(pEnvObject);
-	if (Iter == m_EnvShadowEditStates.end())
-	{
-		MAP_ENV_EDITED_DESC SavedEdit{};
-		const _bool bHasShadow = pEnvObject->Get_Desc().tRender.bHasShadow;
-
-		_bool bUseShadow = bHasShadow;
-		if (pLevel->Try_GetMapPreviewEnvEdit(pEnvObject, &SavedEdit))
-		{
-			if (SavedEdit.bHasShadow)
-				bUseShadow = bHasShadow && SavedEdit.bUseShadow;
-		}
-
-		if (!bHasShadow)
-			bUseShadow = false;
-
-		Iter = m_EnvShadowEditStates.emplace(
-			static_cast<CGameObject*>(pEnvObject),
-			bUseShadow).first;
-	}
-
-	return &Iter->second;
-}
-
-_bool* CPanel_Inspector::Resolve_EnvCollMeshEditState(CLevel_Edit* pLevel, Client::CEnvObject* pEnvObject)
-{
-	if (nullptr == pLevel || nullptr == pEnvObject)
-		return nullptr;
-
-	auto Iter = m_EnvCollMeshEditStates.find(pEnvObject);
-	if (Iter == m_EnvCollMeshEditStates.end())
-	{
-		MAP_ENV_EDITED_DESC SavedEdit{};
-		const auto& Collision = pEnvObject->Get_Desc().tCollision;
-		const _bool bHasCollMesh = Collision.bHasCollMesh;
-
-		_bool bUseCollMesh = false;
-		if (pLevel->Try_GetMapPreviewEnvEdit(pEnvObject, &SavedEdit))
-		{
-			if (SavedEdit.bHasCollMesh)
-				bUseCollMesh = bHasCollMesh && SavedEdit.bUseCollMesh;
-		}
-
-		if (!bHasCollMesh)
-			bUseCollMesh = false;
-
-		Iter = m_EnvCollMeshEditStates.emplace(
-			static_cast<CGameObject*>(pEnvObject),
-			bUseCollMesh).first;
-	}
-
-	return &Iter->second;
-}
-
-_bool* CPanel_Inspector::Resolve_MapCollMeshEditState(CLevel_Edit* pLevel, CMapStage* pMapStage, CMapSection* pSection)
-{
-	if (nullptr == pLevel || nullptr == pMapStage || nullptr == pSection)
-		return nullptr;
-
-	auto Iter = m_MapCollMeshEditStates.find(pSection);
-	if (Iter == m_MapCollMeshEditStates.end())
-	{
-		const _wstring strSectionKey = CMap_EditFile::Make_SectionKey(
-			pMapStage->Get_StageName(),
-			pSection->Get_SectionName());
-
-		MAP_ENV_EDITED_DESC SavedEdit{};
-		const _bool bHasCollMesh = pSection->Has_CollMesh();
-
-		_bool bUseCollMesh = bHasCollMesh;
-		if (pLevel->Try_GetMapPreviewSectionEdit(strSectionKey, &SavedEdit) && SavedEdit.bHasCollMesh)
-		{
-			bUseCollMesh = bHasCollMesh && SavedEdit.bUseCollMesh;
-		}
-
-		if (!bHasCollMesh)
-			bUseCollMesh = false;
-
-		Iter = m_MapCollMeshEditStates.emplace(pSection, bUseCollMesh).first;
-	}
-
-	return &Iter->second;
-}
-
 _bool* CPanel_Inspector::Resolve_EnvNearAlphaEditState(CLevel_Edit* pLevel, CEnvObject* pEnvObject)
 {
 	if (nullptr == pLevel || nullptr == pEnvObject)
@@ -2167,24 +1988,6 @@ _bool* CPanel_Inspector::Resolve_EnvNearAlphaEditState(CLevel_Edit* pLevel, CEnv
 	}
 
 	return &Iter->second;
-}
-
-void CPanel_Inspector::Clear_EnvShadowEditState(CGameObject* pObject)
-{
-	if (nullptr != pObject)
-		m_EnvShadowEditStates.erase(pObject);
-}
-
-void CPanel_Inspector::Clear_EnvCollMeshEditState(CGameObject* pObject)
-{
-	if (nullptr != pObject)
-		m_EnvCollMeshEditStates.erase(pObject);
-}
-
-void CPanel_Inspector::Clear_MapCollMeshEditState(CMapSection* pSection)
-{
-	if (nullptr != pSection)
-		m_MapCollMeshEditStates.erase(pSection);
 }
 
 void CPanel_Inspector::Clear_EnvNearAlphaEditState(CGameObject* pObject)

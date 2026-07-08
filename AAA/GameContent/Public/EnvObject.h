@@ -47,6 +47,7 @@ public:
 	_bool   Is_Visible_Main() const { return m_bVisible; }
 	_bool   Is_Visible_Shadow() const { return m_bVisibleShadow; }
 	_bool   Is_Decal() const { return m_bIsDecal; }
+	_bool   Is_UseCollMesh() const { return m_bUseCollMesh; }
 
 	const ENV_OBJECT_DESC& Get_Desc() const { return m_tDesc; }
 	const BoundingBox& Get_WorldBounds() const { return m_WorldBounds; }
@@ -91,6 +92,7 @@ protected:
 	_bool			m_bVisible = { false };
 	_bool			m_bVisibleShadow = { false };
 	_bool			m_bDebugDraw = { false };
+	_bool			m_bUseCollMesh = { false };
 
 	// 디더링관련
 	_bool m_bUseCameraDither = { false }; // 객체 디더 사용 여부

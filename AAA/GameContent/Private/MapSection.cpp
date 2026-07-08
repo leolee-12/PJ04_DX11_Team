@@ -1,8 +1,9 @@
 #include "MapSection.h"
 #include "Shader_PassMeta.h"
-#include "Geometry_Utils.h"
+#include "Map_EditFile.h"
 
 #include "GameInstance.h"
+#include "Geometry_Utils.h"
 
 NS_BEGIN(Client)
 
@@ -144,7 +145,7 @@ _bool CMapSection::Get_EditDesc(EDITABLE_DESC* pOutDesc) const
 		return false;
 
 	pOutDesc->eKind = EDITABLE_OBJECT_KIND::MAP_SECTION;
-	pOutDesc->strStableKey = m_strSectionName;
+	pOutDesc->strStableKey = CMap_EditFile::Make_SectionKey(m_strStageName, m_strSectionName);
 	pOutDesc->iCapabilities = EDIT_CAP_RENDERABLE | EDIT_CAP_CULL_FRUSTUM | EDIT_CAP_MESH_LAYER;
 
 	if (m_bHasCollMesh)	pOutDesc->iCapabilities |= EDIT_CAP_COLLISION_MESH;

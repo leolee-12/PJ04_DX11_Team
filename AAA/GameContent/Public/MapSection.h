@@ -60,6 +60,8 @@ public:
 	_bool					Is_Culling() const { return m_bEnableCulling; }
 	_bool					Is_Renderable() const { return m_bRenderable; }
 	const _wstring&			Get_SectionName() const { return m_strSectionName; }
+	const _wstring&			Get_StageName() const { return m_strStageName; }
+	void					Set_StageName(const _wstring& strStageName) { m_strStageName = strStageName; }
 
 #pragma region Editable
 	virtual _bool Get_EditDesc(EDITABLE_DESC* pOutDesc) const override;
@@ -79,6 +81,7 @@ public:
 
 private:
 	_wstring			m_strSectionName;
+	_wstring			m_strStageName;
 	_wstring			m_strModelProtoTag;
 	_uint				m_iModelProtoLevel = {};
 	MAP_SECTION_TYPE	m_eSectionType = { MAP_SECTION_TYPE::UNKNOWN };
