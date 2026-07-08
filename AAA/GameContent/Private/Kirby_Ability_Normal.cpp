@@ -238,8 +238,11 @@ void CKirby_Ability_Normal::Enter_InhaleState(CKirby* pKirby, INHALE_STATE eStat
         case INHALE_STATE::STUFFED_START:
         {
             //pBody->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
-            pAnimator->Play("Stuffed", false, false, 0.1f, 1.5f);
             //pBody->Set_KirbyBody(KIRBY_BODY_STATE::STUFFED);
+            pAnimator->Play("Stuffed", false, false, 0.1f, 1.5f);
+
+            pBody->Stop_SoundHandle();
+
             break;
         }
 

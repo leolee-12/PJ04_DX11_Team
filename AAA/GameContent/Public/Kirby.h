@@ -157,7 +157,7 @@ public:
 
 private:
 	HRESULT Ready_Components();
-	void	SetUp_Collider_Callback();
+	HRESULT	SetUp_Collider_Callback();
 	HRESULT Ready_PartObjects();
 	HRESULT Ready_System();
 	HRESULT Ready_Ability();

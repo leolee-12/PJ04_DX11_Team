@@ -70,7 +70,8 @@ HRESULT CKirby::Initialize(void* pArg)
     if (FAILED(Ready_System()))
         return E_FAIL;
 
-    SetUp_Collider_Callback();
+    if (FAILED(SetUp_Collider_Callback()))
+        return E_FAIL;
 
     // Part 생성된 후
     if (FAILED(Ready_AnimEvents()))
@@ -447,42 +448,42 @@ HRESULT CKirby::Ready_Components()
     return S_OK;
 }
 
-void CKirby::SetUp_Collider_Callback()
+HRESULT CKirby::SetUp_Collider_Callback()
 {
-    if (m_KirbyColliders[HURT_BOX])
-    {
-        m_KirbyColliders[HURT_BOX]->Set_OnEnter(
-            [this](CCollider* pOther)
+    if (m_KirbyColliders[HURT_BOX] == nullptr)
+        return E_FAIL;
+
+    m_KirbyColliders[HURT_BOX]->Set_OnEnter(
+        [this](CCollider* pOther)
+        {
+            const _uint iGroup = pOther->Get_RegisteredGroup();
+            CGameObject* pGameObject = pOther->Get_Owner();
+
+            if (iGroup == ETOUI(COLLISION_LAYER::MONSTER_HURT))
             {
-                const _uint iGroup = pOther->Get_RegisteredGroup();
-                CGameObject* pGameObject = pOther->Get_Owner();
+                CMonster* pMonster = dynamic_cast<CMonster*>(pGameObject);
+                if (pMonster == nullptr)
+                    return;
 
-                if (iGroup == ETOUI(COLLISION_LAYER::MONSTER_HURT))
-                {
-                    CMonster* pMonster = dynamic_cast<CMonster*>(pGameObject);
-                    if (pMonster == nullptr)
-                        return;
+                if (!pMonster->Is_Touch_Harmful())
+                    return;
 
-                    if (!pMonster->Is_Touch_Harmful())
-                        return;
-
-                    ATTACK_INFO tAttackDesc{};
-                    tAttackDesc.eHitType = HIT_TYPE::BODY_CONTACT;
-                    tAttackDesc.pAttacker = pMonster;
-                    XMStoreFloat3(&tAttackDesc.vAttackerPos,
-                        pMonster->Get_Transform()->Get_State(STATE::POSITION));
-                    tAttackDesc.fDamage = 10.f;
-                    tAttackDesc.fKnockback = 2.f;       
-                    Damaged(tAttackDesc);
+                ATTACK_INFO tAttackDesc{};
+                tAttackDesc.eHitType = HIT_TYPE::BODY_CONTACT;
+                tAttackDesc.pAttacker = pMonster;
+                XMStoreFloat3(&tAttackDesc.vAttackerPos,
+                    pMonster->Get_Transform()->Get_State(STATE::POSITION));
+                tAttackDesc.fDamage = 10.f;
+                tAttackDesc.fKnockback = 2.f;
+                Damaged(tAttackDesc);
 #ifdef _DEBUG
-                    char szBuf[128];
-                    sprintf_s(szBuf, "[Kirby] Hurt! HP %.0f/%.0f\n", m_fCurHP, m_fMaxHP);
-                    OutputDebugStringA(szBuf);
+                char szBuf[128];
+                sprintf_s(szBuf, "[Kirby] Hurt! HP %.0f/%.0f\n", m_fCurHP, m_fMaxHP);
+                OutputDebugStringA(szBuf);
 #endif
-                }
             }
-        );
-    }
+        }
+    );
 
     m_KirbyColliders[HURT_BOX]->Set_OnStay
     (
@@ -514,6 +515,8 @@ void CKirby::SetUp_Collider_Callback()
             }
         }
     );
+
+    return S_OK;
 }
 
 HRESULT CKirby::Ready_PartObjects()
