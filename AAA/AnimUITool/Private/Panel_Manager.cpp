@@ -21,6 +21,8 @@
 
 #include "Level_Tool.h"
 
+#include "UI_CoordinatorContainer.h"
+
 
 CPanel_Manager::CPanel_Manager(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice(pDevice), m_pContext(pContext)
@@ -247,14 +249,33 @@ _bool CPanel_Manager::Validate_UISelection()
     // 컨테이너가 추적 목록에 없으면(삭제됨) 선택 해제
     if (m_pLevel)
     {
-        const auto& Entries = m_pLevel->Get_UIContainerEntries();        
-        auto it = std::find_if(Entries.begin(), Entries.end(),
-            [&Selection](const UI_CONTAINER_ENTRY& Entry)
-            {
-                return Entry.pContainer == Selection.pContainer;
-            });
+        const auto& Entries = m_pLevel->Get_UIContainerEntries();
 
-        if (it == Entries.end())
+        _bool bFound = false;
+        for (const UI_CONTAINER_ENTRY& Entry : Entries)
+        {
+            if (Entry.pContainer == Selection.pContainer)
+            {
+                bFound = true;
+                break;
+            }
+
+            // 코디네이터의 자식 컨테이너면 유효
+            if (auto* pCoord = dynamic_cast<Client::CUICoordinatorContainer*>(Entry.pContainer))
+            {
+                for (const _wstring& childTag : pCoord->Get_ChildOrder())
+                {
+                    if (pCoord->Find_Child(childTag) == Selection.pContainer)
+                    {
+                        bFound = true;
+                        break;
+                    }
+                }
+                if (bFound) break;
+            }
+        }
+
+        if (!bFound)
         {
             Clear_UISelected();
             return false;

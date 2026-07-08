@@ -30,6 +30,9 @@
 #include "UI_FlashCurtain.h"
 #include "UI_MovableContainer.h"
 #include "UI_StageClear.h"
+#include "UI_CoordinatorContainer.h"
+#include "UI_MissionBoard.h"
+#include "UI_MissionPanel.h"
 
 // UI Parts
 #include "UI_Image.h"
@@ -232,48 +235,21 @@ void CGameObject_Factory::RegisterAll()
 
 void CGameObject_Factory::Register_UI()
 {
-    Register(CUI_Image::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
-        CREATOR(CUI_Image),
-        LOADER());
-
-    Register(CUI_SpriteAnim::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
-        CREATOR(CUI_SpriteAnim),
-        LOADER());
-
-    Register(CUI_Text::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
-        CREATOR(CUI_Text),
-        LOADER());
-
-    Register(CUI_Effect::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
-        CREATOR(CUI_Effect),
-        LOADER());
-
-    Register(CUI_GaugeFill::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
-        CREATOR(CUI_GaugeFill),
-        LOADER());
-
-    Register(CUI_Curtain::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
-        CREATOR(CUI_Curtain),
-        LOADER());
-
-    Register(CUI_Eraser::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
-        CREATOR(CUI_Eraser),
-        LOADER());
-
-    Register(CUI_SpriteAnimCurtain::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
-        CREATOR(CUI_SpriteAnimCurtain),
-        LOADER());
-
-    Register(CUI_CurtainTexture::PROTOTYPE_TAG, TEXT("UI_OBJECT"),
-        CREATOR(CUI_CurtainTexture),
-        LOADER());
+    Register(CUI_Image::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_Image), LOADER());
+    Register(CUI_SpriteAnim::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_SpriteAnim), LOADER());
+    Register(CUI_Text::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_Text), LOADER());
+    Register(CUI_Effect::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_Effect), LOADER());
+    Register(CUI_GaugeFill::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_GaugeFill), LOADER());
+    Register(CUI_Curtain::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_Curtain), LOADER());
+    Register(CUI_Eraser::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_Eraser), LOADER());
+    Register(CUI_SpriteAnimCurtain::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_SpriteAnimCurtain), LOADER());
+    Register(CUI_CurtainTexture::PROTOTYPE_TAG, TEXT("UI_OBJECT"), CREATOR(CUI_CurtainTexture), LOADER());
 }
 
 void CGameObject_Factory::Register_Camera()
 {
     Register(TEXT("Proto_CameraFree"), TEXT("CAMERA_OBJECT"),
-        CREATOR(CCamera_Free), LOADER()
-    );
+        CREATOR(CCamera_Free), LOADER());
 }
 
 void CGameObject_Factory::Register_Test()
@@ -676,76 +652,21 @@ void CGameObject_Factory::Register_Container()
 
 void CGameObject_Factory::Register_UIContainer()
 {
-    Register(CUI_TestImageContainer::PROTOTYPE_TAG,
-        TEXT("UI_CONTAINER_TEST"),
-        CREATOR(CUI_TestImageContainer),
-        LOADER()
-    );
-
-    Register(CUI_Title::PROTOTYPE_TAG,
-        TEXT("UI_CONTAINER"),
-        CREATOR(CUI_Title),
-        LOADER()
-    );
-
-    Register(CUI_GenericContainer::PROTOTYPE_TAG,
-        TEXT("UI_CONTAINER"),
-        CREATOR(CUI_GenericContainer),
-        LOADER()
-    );
-    
-    Register(CUI_PointStar::PROTOTYPE_TAG,
-        TEXT("UI_CONTAINER"),
-        CREATOR(CUI_PointStar),
-        LOADER()
-    );
-
-    Register(CUI_KirbyStatus::PROTOTYPE_TAG,
-        TEXT("UI_CONTAINER"),
-        CREATOR(CUI_KirbyStatus),
-        LOADER()
-    );
-    
-    Register(CUI_FadeOut::PROTOTYPE_TAG,
-        TEXT("UI_CONTAINER"),
-        CREATOR(CUI_FadeOut),
-        LOADER()
-    );
-
-    Register(CUI_LoadingCurtain::PROTOTYPE_TAG,
-        TEXT("UI_CONTAINER"),
-        CREATOR(CUI_LoadingCurtain),
-        LOADER()
-    );
-
-    Register(CUI_FadeIn::PROTOTYPE_TAG,
-        TEXT("UI_CONTAINER"),
-        CREATOR(CUI_FadeIn),
-        LOADER()
-    );
-
-    Register(CUI_BossStatus::PROTOTYPE_TAG,
-        TEXT("UI_CONTAINER"),
-        CREATOR(CUI_BossStatus),
-        LOADER()
-    );
-
-    Register(CUI_FlashCurtain::PROTOTYPE_TAG,
-        TEXT("UI_CONTAINER"),
-        CREATOR(CUI_FlashCurtain),
-        LOADER());
-
-    Register(CUIMovableContainer::PROTOTYPE_TAG,
-        TEXT("UI_CONTAINER"),         
-        CREATOR(CUIMovableContainer),
-        LOADER()
-    );
-
-    Register(CUI_StageClear::PROTOTYPE_TAG,
-        TEXT("UI_CONTAINER"),
-        CREATOR(CUI_StageClear),
-        LOADER()
-    );
+    Register(CUI_TestImageContainer::PROTOTYPE_TAG, TEXT("UI_CONTAINER_TEST"), CREATOR(CUI_TestImageContainer), LOADER());
+    Register(CUI_Title::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_Title), LOADER());
+    Register(CUI_GenericContainer::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_GenericContainer), LOADER());
+    Register(CUI_PointStar::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_PointStar), LOADER());
+    Register(CUI_KirbyStatus::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_KirbyStatus), LOADER());
+    Register(CUI_FadeOut::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_FadeOut), LOADER());
+    Register(CUI_LoadingCurtain::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_LoadingCurtain), LOADER());
+    Register(CUI_FadeIn::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_FadeIn), LOADER());
+    Register(CUI_BossStatus::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_BossStatus), LOADER());
+    Register(CUI_FlashCurtain::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_FlashCurtain), LOADER());
+    Register(CUIMovableContainer::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUIMovableContainer), LOADER());
+    Register(CUI_StageClear::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_StageClear), LOADER());
+    Register(CUICoordinatorContainer::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUICoordinatorContainer), LOADER());
+    Register(CUI_MissionBoard::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_MissionBoard), LOADER());
+    Register(CUI_MissionPanel::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_MissionPanel), LOADER());
 }
 
 void CGameObject_Factory::Register_NonAnimObject()

@@ -279,6 +279,9 @@ void CBoss_Cage::Break()
     Desc.fBlendDuration = 0.f;
     Desc.eAnim = STAGECLEAR_ANIM::CUT1;
     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_StageClear, &Desc);
+
+    _bool bShow = false;
+    m_pGameInstance_Proxy->Publish(EventTag::HUD_SetVisible, &bShow);
 }
 
 void CBoss_Cage::Attach_To_Bone(const _float4x4* pBoneMatrix, const _float4x4* pOwnerWorld, _fmatrix OffsetMatrix)

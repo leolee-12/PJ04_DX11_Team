@@ -59,6 +59,8 @@ namespace Client
 
         // Àü¿ª UI
         inline constexpr const _tchar* StageClear_UIStarted = L"StageClear.UIStarted";
+        inline constexpr const _tchar* StageClear_SequenceFinished = L"StageClear.Finished";
+        inline constexpr const _tchar* HUD_SetVisible = L"HUD.SetVisible";
     }
 
 

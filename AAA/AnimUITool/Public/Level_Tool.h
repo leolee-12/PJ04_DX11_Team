@@ -13,6 +13,10 @@ class PxTriangleMesh;
 class PxRigidStatic;
 NS_END
 
+NS_BEGIN(Client)
+class CUICoordinatorContainer;
+NS_END
+
 NS_BEGIN(AnimUITool)
 
 class CEditCamera;
@@ -50,6 +54,9 @@ public:
 
     void                        Delete_UIContainer(CUIContainerObject* pContainer);
     CGameObject*                Add_UIContainer();
+    CGameObject*                Add_UICoordinator();
+    CGameObject*                Add_ChildToCoordinator(Client::CUICoordinatorContainer* pCoord, const _wstring& strChildProtoTag, _wstring* pOutChildTag = nullptr);
+    CUICoordinatorContainer*    Find_ParentCoordinator(CUIContainerObject* pChild, _wstring* pOutTag = nullptr);
     CUIPartObject*              Add_UIPart(CGameObject* pContainer,UI_PART_TYPE eType = UI_PART_TYPE::IMAGE, _wstring* pOutPartTag = nullptr);
     HRESULT                     Remove_UIPart(CGameObject* pContainer, const _wstring& strPartTag);
     HRESULT                     Rename_UIPart(CGameObject* pContainer, const _wstring& strOldTag, const _wstring& strNewTag);

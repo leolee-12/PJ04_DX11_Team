@@ -24,6 +24,8 @@
 #include "UI_Curtain.h"
 #include "UI_CurtainAnimBase.h"
 
+#include "UI_CoordinatorContainer.h"
+
 namespace
 {
     template<typename TPair, size_t N>
@@ -856,6 +858,41 @@ void CPanel_Inspector::Render_UIInspector()
             }
             ImGui::TextDisabled(
                 "RunTime Spawn Class Tag : Save -> json in in !!");
+
+            _wstring strChildTag;
+            auto* pParentCoord = pLevel->Find_ParentCoordinator(sel.pContainer, &strChildTag);
+            if (pParentCoord)
+            {
+                ImGui::Separator();
+
+                static _wstring s_EditChildSrc;
+                static char     s_szChildName[128] = {};
+                if (s_EditChildSrc != strChildTag)
+                {
+                    s_EditChildSrc = strChildTag;
+                    strncpy_s(s_szChildName, ToUtf8(strChildTag).c_str(), sizeof(s_szChildName) - 1);
+                }
+
+                ImGui::SetNextItemWidth(-1.f);
+                const bool bEnter = ImGui::InputText("Child Name", s_szChildName, sizeof(s_szChildName),
+                    ImGuiInputTextFlags_EnterReturnsTrue);
+
+                if (bEnter || ImGui::IsItemDeactivatedAfterEdit())
+                {
+                    std::string strNew = s_szChildName;
+                    if (!strNew.empty())
+                    {
+                        _wstring strNewTag = StrToWstr(strNew);
+                        if (SUCCEEDED(pParentCoord->Rename_Child(strChildTag, strNewTag)))
+                        {
+                            s_EditChildSrc = strNewTag;
+                            uictx.bDirty = true;
+                        }
+                        else
+                            strncpy_s(s_szChildName, ToUtf8(strChildTag).c_str(), sizeof(s_szChildName) - 1);
+                    }
+                }
+            }
         }
 
         ImGui::Separator();

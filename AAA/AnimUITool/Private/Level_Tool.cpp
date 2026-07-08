@@ -33,6 +33,8 @@
 #include "UI_CurtainTexture.h"
 #include "PhysX_Manager.h"
 
+#include "UI_CoordinatorContainer.h"
+
 namespace
 {
     constexpr const _char* PREVIEW_MODEL_PATH =
@@ -300,17 +302,23 @@ HRESULT  CLevel_Tool::Save_UIContainer(CGameObject* pContainer, const _float2& v
                 return S_OK;
             };
 
-        if (j["Container"].contains("UIPartObjects"))
-        {
-            for (auto& [strPartTag, jPart] : j["Container"]["UIPartObjects"].items())
+        bool bTexOk = true;
+        std::function<void(const json&)> CollectFromContainer = [&](const json& jCont)
             {
-                if (FAILED(CollectTexturePath(jPart, "TextureProtoTag")))
-                    return E_FAIL;
-
-                if (FAILED(CollectTexturePath(jPart, "MaskTextureProtoTag")))
-                    return E_FAIL;
-            }
-        }
+                if (jCont.contains("UIPartObjects"))
+                {
+                    for (auto& [strPartTag, jPart] : jCont["UIPartObjects"].items())
+                    {
+                        if (FAILED(CollectTexturePath(jPart, "TextureProtoTag")))     bTexOk = false;
+                        if (FAILED(CollectTexturePath(jPart, "MaskTextureProtoTag"))) bTexOk = false;
+                    }
+                }
+                if (jCont.contains("Children"))
+                    for (auto& [strChildTag, jChild] : jCont["Children"].items())
+                        CollectFromContainer(jChild);   // 자식(그리고 중첩 코디네이터)까지
+            };
+        CollectFromContainer(j["Container"]);
+        if (!bTexOk) return E_FAIL;
 
         j["Textures"] = jTextures;
 
@@ -455,28 +463,54 @@ CGameObject* CLevel_Tool::Load_UIContainerByPath(const _wstring& strFullPath, _f
         {
             json jContainer = j["Container"];
 
-            if (jContainer.contains("UIPartObjects") &&
-                jContainer["UIPartObjects"].is_object())
-            {
-                for (auto& [strPartTag, jPart] :
-                    jContainer["UIPartObjects"].items())
+            std::function<void(json&)> PatchContainer = [&](json& jCont)
                 {
-                    jPart["ProtoLevel"] = iPartProtoLevel;
-
-                    if (jPart.contains("TextureProtoTag") &&
-                        !jPart.value("TextureProtoTag", std::string()).empty())
+                    if (jCont.contains("UIPartObjects") && jCont["UIPartObjects"].is_object())
                     {
-                        jPart["TextureLevel"] = iObjectLevel;
+                        for (auto& [strPartTag, jPart] : jCont["UIPartObjects"].items())
+                        {
+                            jPart["ProtoLevel"] = iPartProtoLevel;
+                            if (jPart.contains("TextureProtoTag") &&
+                                !jPart.value("TextureProtoTag", std::string()).empty())
+                                jPart["TextureLevel"] = iObjectLevel;
+                            if (jPart.contains("MaskTextureProtoTag") &&
+                                !jPart.value("MaskTextureProtoTag", std::string()).empty())
+                                jPart["MaskTextureLevel"] = iObjectLevel;
+                        }
                     }
+                    if (jCont.contains("Children") && jCont["Children"].is_object())
+                        for (auto& [strChildTag, jChild] : jCont["Children"].items())
+                            PatchContainer(jChild);
+                };
+            PatchContainer(jContainer);
 
-                    if (jPart.contains("MaskTextureProtoTag") &&
-                        !jPart.value("MaskTextureProtoTag", std::string()).empty())
+            std::function<void(const json&)> EnsureChildProtos = [&](const json& jCont)
+                {
+                    if (!jCont.contains("Children") || !jCont["Children"].is_object())
+                        return;
+
+                    for (auto& [strChildTag, jChild] : jCont["Children"].items())
                     {
-                        jPart["MaskTextureLevel"] = iObjectLevel;
-                    }
-                }
-            }
+                        if (jChild.contains("ProtoTag") && jChild.contains("ProtoLevel"))
+                        {
+                            _wstring strChildProto = StrToWstr(jChild["ProtoTag"].get<std::string>());
+                            _uint    iChildLevel = jChild["ProtoLevel"].get<_uint>();
 
+                            auto* pChildReg = Client::CGameObject_Factory::GetInstance()
+                                ->Get_Registration(strChildProto);
+
+                            if (pChildReg &&
+                                !m_pGameInstance_Proxy->Has_Prototype(iChildLevel, strChildProto))
+                            {
+                                pChildReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, iChildLevel);
+                                m_pGameInstance_Proxy->Add_Prototype(iChildLevel, strChildProto,
+                                    pChildReg->CreatorFunc(m_pDevice, m_pContext));
+                            }
+                        }
+                        EnsureChildProtos(jChild);   // 중첩 코디네이터까지 재귀
+                    }
+                };
+            EnsureChildProtos(jContainer);
             pObj->Deserialize(jContainer);
         }
 
@@ -546,6 +580,82 @@ CGameObject* CLevel_Tool::Add_UIContainer()
     Set_AuthoredProtoTag(pObj, strTag);   // 기본 ProtoTag = 자기(self-host)
     Log_Info("Added UI container: " + WstrToStr(strName));
     return pObj;
+}
+
+CGameObject* CLevel_Tool::Add_UICoordinator()
+{
+    const _uint iContainerProtoLevel = ETOUI(TOOL_LEVEL::EDIT);
+    const _uint iObjectLevel = ETOUI(TOOL_LEVEL::EDIT);
+    const _wstring strTag = Client::CUICoordinatorContainer::PROTOTYPE_TAG;
+
+    auto* pReg = Client::CGameObject_Factory::GetInstance()->Get_Registration(strTag);
+    if (!pReg) { Log_Error("Add_UICoordinator: Coordinator not registered"); return nullptr; }
+
+    if (!m_pGameInstance_Proxy->Has_Prototype(iContainerProtoLevel, strTag))
+    {
+        pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, iContainerProtoLevel);
+        if (FAILED(m_pGameInstance_Proxy->Add_Prototype(iContainerProtoLevel, strTag,
+            pReg->CreatorFunc(m_pDevice, m_pContext))))
+            return nullptr;
+    }
+
+    CGameObject::GAMEOBJECT_DESC desc{};
+    desc.vPosition = { 0.f, 0.f, 0.f, 1.f };
+
+    _wstring strName = L"Coordinator_" + std::to_wstring(m_iUIContainerCounter++);
+
+    CGameObject* pObj = nullptr;
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pObj, iContainerProtoLevel, strTag,
+        iObjectLevel, L"Layer_UI", strName, &desc)))
+        return nullptr;
+
+    Track_UIContainer(pObj, L"", _float2{ 1600.f, 900.f });   // 트래킹 -> 구동/렌더/저장
+    Set_AuthoredProtoTag(pObj, strTag);
+    Log_Info("Added UI coordinator: " + WstrToStr(strName));
+    return pObj;
+}
+
+CGameObject* CLevel_Tool::Add_ChildToCoordinator(Client::CUICoordinatorContainer* pCoord, const _wstring& strChildProtoTag, _wstring* pOutChildTag)
+{
+    if (!pCoord) return nullptr;
+    const _uint iProtoLevel = ETOUI(TOOL_LEVEL::EDIT);
+
+    // 자식 프로토 보장(미등록이면 로드+추가)
+    auto* pReg = Client::CGameObject_Factory::GetInstance()->Get_Registration(strChildProtoTag);
+    if (!pReg) { Log_Error("Add_ChildToCoordinator: child proto not registered"); return nullptr; }
+    if (!m_pGameInstance_Proxy->Has_Prototype(iProtoLevel, strChildProtoTag))
+    {
+        pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, iProtoLevel);
+        m_pGameInstance_Proxy->Add_Prototype(iProtoLevel, strChildProtoTag,
+            pReg->CreatorFunc(m_pDevice, m_pContext));
+    }
+
+    _wstring strChildTag = L"Child_" + std::to_wstring(m_iUIContainerCounter++);
+    if (FAILED(pCoord->Add_Child(iProtoLevel, strChildProtoTag, strChildTag)))
+        return nullptr;
+
+    if (pOutChildTag) *pOutChildTag = strChildTag;
+    Log_Info("Added child to coordinator: " + WstrToStr(strChildTag));
+    return pCoord->Find_Child(strChildTag);
+}
+
+CUICoordinatorContainer* CLevel_Tool::Find_ParentCoordinator(CUIContainerObject* pChild, _wstring* pOutTag)
+{
+    for (auto& Entry : m_UIContainers)
+    {
+        auto* pCoord = dynamic_cast<Client::CUICoordinatorContainer*>(Entry.pContainer);
+        if (!pCoord) continue;
+
+        for (const _wstring& tag : pCoord->Get_ChildOrder())
+        {
+            if (pCoord->Find_Child(tag) == pChild)
+            {
+                if (pOutTag) *pOutTag = tag;
+                return pCoord;
+            }
+        }
+    }
+    return nullptr;
 }
 
 CUIPartObject* CLevel_Tool::Add_UIPart(CGameObject* pContainer, UI_PART_TYPE eType, _wstring* pOutPartTag)

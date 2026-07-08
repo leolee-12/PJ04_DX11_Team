@@ -1,4 +1,5 @@
 #include "UI_MovableContainer.h"
+#include "UIPartObject.h"
 
 CUIMovableContainer::CUIMovableContainer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIContainerObject{ pDevice, pContext }
@@ -39,6 +40,28 @@ void CUIMovableContainer::Update(_float fTimeDelta)
     Update_MoveAnim(fTimeDelta);   // 위치/틸트 이동 진행 후 엔진 파트 갱신으로
 
     __super::Update(fTimeDelta);
+}
+
+void CUIMovableContainer::Late_Update(_float fTimeDelta)
+{
+    if (!m_bActive)
+        return;
+
+    Update_TiltedWorldMatrix();   
+
+    if (m_pGroupParentMatrix)
+    {
+        _matrix m = XMLoadFloat4x4(&m_TiltedWorldMatrix) * XMLoadFloat4x4(m_pGroupParentMatrix);
+        XMStoreFloat4x4(&m_TiltedWorldMatrix, m);
+    }
+
+    for (const auto& tag : m_UIPartOrder)
+    {
+        auto it = m_UIPartObjects.find(tag);
+        if (it == m_UIPartObjects.end()) continue;
+        if (it->second && it->second->Is_Active())
+            it->second->Late_Update(fTimeDelta);
+    }
 }
 
 void CUIMovableContainer::Start_Move(_bool bReverse)
@@ -89,6 +112,19 @@ void CUIMovableContainer::Play_Intro(_float fStartScaleMul, _float fAppearDurati
         vScale.y * m_fIntroStartScaleMul,
         vScale.z);
     Play_IntroFade(m_fIntroAppearDur);
+}
+
+void CUIMovableContainer::Play_SlideIn(const _float3& vFromOffset, _float fDuration)
+{
+    _vector vHomePos = m_pTransformCom->Get_State(STATE::POSITION);
+    _float3 vHome; XMStoreFloat3(&vHome, vHomePos);     // 저작(최종) 위치 = 도착점
+
+    _vector vStart = XMVectorSet(vHome.x + vFromOffset.x,
+        vHome.y + vFromOffset.y,
+        vHome.z + vFromOffset.z, 1.f);
+    m_pTransformCom->Set_State(STATE::POSITION, vStart);
+
+    Move_To(vHome, m_fTiltXDeg, m_fTiltYDeg, fDuration);
 }
 
 void CUIMovableContainer::Update_MoveAnim(_float fTimeDelta)

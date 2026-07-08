@@ -24,6 +24,7 @@ public:
     virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void* pArg) override;
     virtual void    Update(_float fTimeDelta) override;
+    virtual void    Late_Update(_float fTimeDelta) override;
 
     virtual json Serialize() const override;
     virtual void Deserialize_Internal(const json& j) override;
@@ -34,7 +35,7 @@ public:
     }
 
 public:
-    // 에디터에서 도착 지점(위치/틸트)과 소요시간 설정
+    void Set_GroupParentMatrix(const _float4x4* p) { m_pGroupParentMatrix = p; }
     void Set_MoveTarget(const _float3& vPos, _float fTiltXDeg, _float fTiltYDeg)
     {
         m_vMoveTargetPos = vPos;
@@ -59,6 +60,7 @@ public:
     void  Stop_Move() { m_bMoving = false; }
 
     void  Play_Intro(_float fStartScaleMul, _float fAppearDuration, _float fWaitDuration);
+    void Play_SlideIn(const _float3& vFromOffset, _float fDuration);
     void  Set_OnIntroFinished(function<void()> cb) { m_OnIntroFinished = cb; }
     _bool Is_IntroPlaying() const { return m_eIntro == EINTRO::APPEAR || m_eIntro == EINTRO::WAIT; }
 
@@ -69,6 +71,8 @@ protected:
     virtual void On_IntroFinished() { if (m_OnIntroFinished) m_OnIntroFinished(); }
 
 protected:
+    const _float4x4* m_pGroupParentMatrix = { nullptr };
+
     // 에디터가 저장하는 도착 지점(앵커)
     _float3 m_vMoveTargetPos = { 0.f, 0.f, 0.f };
     _float  m_fMoveTargetTiltX = { 0.f };
