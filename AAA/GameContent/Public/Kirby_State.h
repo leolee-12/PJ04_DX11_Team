@@ -68,7 +68,7 @@ public:
 
 public:
 	virtual void Request_GrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType);
-	virtual void Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType);
+	virtual void Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType);
 
 	virtual void Request_StageClear(CKirby* pKirby, const CUTSCENE_STAGECLEAR* pDesc);
 

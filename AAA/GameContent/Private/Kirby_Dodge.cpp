@@ -71,6 +71,8 @@ void CKirby_Dodge::Enter(CKirby* pKirby, _int iFlag)
     m_iEvasionCount = 1;
 
     Change_DodgeState(pKirby, Dodge_State::DODGE_START);
+
+    pKirby->Put_WeaponOnBack(true);
 }
 
 void CKirby_Dodge::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -88,7 +90,8 @@ void CKirby_Dodge::Exit(CKirby* pKirby)
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
 
-    Change_DodgeState(pKirby, Dodge_State::DODGE_END);
+    pKirby->Put_WeaponOnBack(false);
+
     m_eDodgeFlag = DODGE_STATE_FLAG::DODGE_NONE;
 }
 
@@ -96,14 +99,6 @@ _bool CKirby_Dodge::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
     if (__super::Handle_Command(pKirby, pCommand))
         return true;
-
-    KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
-
-    //switch (eCommandType)
-    //{
-    //    default:
-    //        break;
-    //}
 
     return false;
 }
@@ -171,6 +166,7 @@ void CKirby_Dodge::Enter_DodgeState(CKirby* pKirby, Dodge_State eState)
         }
         case Dodge_State::DODGE_END:
         {
+            Transition_Fall_OR_Wait_OR_Run(pKirby);
             break;
         }
     }
@@ -218,7 +214,7 @@ void CKirby_Dodge::Update_DodgeState(CKirby* pKirby, _float fTimeDelta)
                 pKirby->Get_Movement()->Stop_Horizontal();
 
             if (pAnimator->Is_Finished())
-                Transition_Fall_OR_Wait_OR_Run(pKirby);
+                Change_DodgeState(pKirby, Dodge_State::DODGE_END);
             break;
         }
     }

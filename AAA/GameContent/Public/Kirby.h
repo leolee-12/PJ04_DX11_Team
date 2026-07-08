@@ -99,7 +99,7 @@ public:
 	CKirby_OnOffPart* Find_WeaponPart(COPY_ABILITY_TYPE eType);
 	CKirby_OnOffPart* Find_HatPart(COPY_ABILITY_TYPE eType);
 
-	void Set_WeaponLadderState(_bool bOn);
+	void Put_WeaponOnBack(_bool bOn);
 
 	CKirby_Body* Get_Body() { return m_pBody; }
 	CKirby_Deform_Model* Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType = KIRBY_DEFORM_MODEL_TYPE::MAIN);
@@ -218,14 +218,12 @@ private:
 	unordered_map<DEFORM_TYPE, CKirby_Deform*> m_Deformations;
 
 	// CutScene Grab
-	const _float4x4* m_pGrabBone = nullptr;
-	const _float4x4* m_pGrabOwnerWorld = nullptr;
+	_float3 m_vPreAttachScale{};
+	const _float4x4* m_pGrabBone{};
+	const _float4x4* m_pGrabOwnerWorld{};
 
 	// Ladder
 	CLevelDesign_Ladder* m_pLadder{};
-
-	// À±¼®Çö Ãß°¡
-	_float3 m_vBaseScale = { 1.f, 1.f, 1.f };
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

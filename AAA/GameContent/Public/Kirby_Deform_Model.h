@@ -56,8 +56,7 @@ public:
 	void Stop_SoundHandle();
 
 protected:
-	_bool Handle_AnimEventEye(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
-	_bool Handle_AnimEventSound(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
+	_bool Handle_AnimEventParent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
 
 	HRESULT Bind_CommonShaderResources(CShader* pShader);
 
@@ -83,6 +82,10 @@ protected:
 	static constexpr _float4 s_vBodyColor{ 1.f, 0.1882353f, 0.3764706f, 1.f };
 	static constexpr _float4 s_vFootColor{ 0.67f, 0.f, 0.f, 1.f };
 	static constexpr _float4 s_vBlushColor{ 1.f, 0.05f, 0.12f, 1.f };
+
+private:
+	_bool Handle_AnimEventEye(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
+	_bool Handle_AnimEventSound(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
 
 protected:
 	virtual void Free();

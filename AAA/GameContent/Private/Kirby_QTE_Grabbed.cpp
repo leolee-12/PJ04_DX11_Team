@@ -17,6 +17,8 @@ HRESULT CKirby_QTE_Grabbed::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
+    m_iQTE_RequiredCount = 20;
+
     return S_OK;
 }
 
@@ -29,26 +31,20 @@ void CKirby_QTE_Grabbed::Enter(CKirby* pKirby, _int iFlag)
 {
     __super::Enter(pKirby, iFlag);
 
-    m_fQTE_TimeLimit = s_fQTE_GorillaLimit;
     m_iQTE_InputCount = 0;
-    m_iQTE_RequiredCount = 20;
     m_bPublishedEvent = false;
 
     // Ani
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
     pAbility->Clear_Overlay(pKirby, 1, 0.1f);
 
-    CKirby_Body* pBody = pKirby->Get_Body();
-    CAnimator* pAnimator = pBody->Get_Animator();
-    pAnimator->Play("Damage", true, false, 0.1f, 2.f);
-
-    pBody->Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);
-
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Stop();
     pMovement->Set_UseGravity(false);
 
     pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), false, true);
+
+    m_bDidSmallJump = false;
 
     Change_QTEGrabbedState(pKirby, QTE_GRABBED_STATE::START);
 }
@@ -96,9 +92,12 @@ _bool CKirby_QTE_Grabbed::Handle_Command(CKirby* pKirby, CKirby_Command* pComman
     return false;
 }
 
-void CKirby_QTE_Grabbed::Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType)
+void CKirby_QTE_Grabbed::Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType)
 {
-    Change_QTEGrabbedState(pKirby, QTE_GRABBED_STATE::ESCAPE);
+    if(eType == KIRBY_ATTACHMENT_END_REASON::GORILLA_COMBAT_ESCAPE)
+        Change_QTEGrabbedState(pKirby, QTE_GRABBED_STATE::ESCAPE);
+    else if (eType == KIRBY_ATTACHMENT_END_REASON::GORILLA_COMBAT_THROWN)
+        Change_QTEGrabbedState(pKirby, QTE_GRABBED_STATE::SLAM_SPIN);
 }
 
 void CKirby_QTE_Grabbed::Change_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE eNext)
@@ -119,28 +118,48 @@ void CKirby_QTE_Grabbed::Enter_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE
     {
         case QTE_GRABBED_STATE::START:
         {
+            CKirby_Body* pBody = pKirby->Get_Body();
+            pBody->Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);
+
+            CAnimator* pAnimator = pBody->Get_Animator();
+            pAnimator->Play("Damage", true, false, 0.1f, 2.f);
 
             break;
         }
         case QTE_GRABBED_STATE::ESCAPE:
         {      
-            CMovement_Child* pMovement = pKirby->Get_Movement();
-            pMovement->Set_UseGravity(true);
-            pMovement->Sync_To_Controller();
-
             _vector vBackDir = -pKirby->Get_Transform()->Get_State(STATE::LOOK);
             vBackDir = XMVectorSetY(vBackDir, 0.f);
             vBackDir = XMVector3Normalize(vBackDir);
-            pKirby->Get_Movement()->Set_Velocity(vBackDir * 15.f);
+
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Set_Velocity(vBackDir * 15.f);
 
             pMovement->Set_VelocityY(22.f);
 
-            pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), true, true);
             pKirby->Get_Body()->Get_Animator()->Play("Damage", true, true, 0.1f, 0.8f);
             break;
         }
-        case QTE_GRABBED_STATE::GRABBED_STATE_END:
+        case QTE_GRABBED_STATE::SLAM_SPIN:
         {      
+            m_fSpinAccTime = 0.f;
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Force_Jump();
+            //pKirby->Get_Body()->Get_Animator()->Play("Damage", true, true, 0.1f, 0.8f);
+            break;
+        }
+        case QTE_GRABBED_STATE::FAINT:
+        {      
+            pKirby->Get_Body()->Get_Animator()->Play("Faint", false, false, 0.1f, 1.5f);
+            break;
+        }
+        case QTE_GRABBED_STATE::WAKEUP:
+        {      
+            pKirby->Get_Body()->Get_Animator()->Play("WakeUp", false, false, 0.1f, 1.5f);
+            break;
+        }
+        case QTE_GRABBED_STATE::GRABBED_STATE_END:
+        {
             Transition_Fall_OR_Wait_OR_Run(pKirby);
             break;
         }
@@ -156,10 +175,7 @@ void CKirby_QTE_Grabbed::Update_QTEGrabbedState(CKirby* pKirby, _float fTimeDelt
     {
         case QTE_GRABBED_STATE::START:
         {
-            m_fQTE_TimeLimit -= fTimeDelta;
-
-            if (m_bPublishedEvent == false && m_fQTE_TimeLimit > 0.f &&
-                m_iQTE_InputCount >= m_iQTE_RequiredCount)
+            if (m_bPublishedEvent == false && m_iQTE_InputCount >= m_iQTE_RequiredCount)
             {
                 m_bPublishedEvent = true;
                 m_pGameInstance_Proxy->Publish(EventTag::QTE_Success, nullptr);
@@ -190,6 +206,46 @@ void CKirby_QTE_Grabbed::Update_QTEGrabbedState(CKirby* pKirby, _float fTimeDelt
 
             break;
         }
+        case QTE_GRABBED_STATE::SLAM_SPIN:
+        {
+            constexpr _float fSpinMaxTime = 1.2f;
+
+            _float fRotRatio = m_fSpinAccTime / fSpinMaxTime;
+            Helper::FloatClamp(fRotRatio, 0.f, 1.f);
+
+            _vector vAxis = XMVectorSet(1.f, 0.f, 0.f, 0.f);
+            pAnimator->SetBoneRotation("RotL", fRotRatio * -1440.f, vAxis);
+
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            if (pMovement->Is_Grounded() && m_bDidSmallJump == false)
+            {
+                constexpr _float fSmallJumpSpeed = 7.5f;
+                pMovement->Try_Jump(fSmallJumpSpeed);
+                m_bDidSmallJump = true;
+            }
+
+            m_fSpinAccTime += fTimeDelta;
+
+            if(m_fSpinAccTime >= fSpinMaxTime)
+            {
+                Change_QTEGrabbedState(pKirby, QTE_GRABBED_STATE::FAINT);
+                return;
+            }
+
+            break;
+        }
+        case QTE_GRABBED_STATE::FAINT:
+        {
+            if (pKirby->Get_Body()->Get_Animator()->Is_Finished())
+                Change_QTEGrabbedState(pKirby, QTE_GRABBED_STATE::WAKEUP);
+            break;
+        }
+        case QTE_GRABBED_STATE::WAKEUP:
+        {
+            if (pKirby->Get_Body()->Get_Animator()->Is_Finished())
+                Change_QTEGrabbedState(pKirby, QTE_GRABBED_STATE::GRABBED_STATE_END);
+            break;
+        }
     }
 }
 
@@ -199,6 +255,11 @@ void CKirby_QTE_Grabbed::Exit_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE 
     {
         case QTE_GRABBED_STATE::START:
         {
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Set_UseGravity(true);
+            pMovement->Sync_To_Controller();
+
+            pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), true, true);
             break;
         }
         case QTE_GRABBED_STATE::ESCAPE:
@@ -207,6 +268,19 @@ void CKirby_QTE_Grabbed::Exit_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE 
             break;
         }
         case QTE_GRABBED_STATE::GRABBED_STATE_END:
+        {
+            break;
+        }
+        case QTE_GRABBED_STATE::SLAM_SPIN:
+        {
+            pKirby->Get_Body()->Get_Animator()->SetBoneRotation("RotL", 0.f, XMVectorSet(1.f, 0.f, 0.f, 0.f));
+            break;
+        }
+        case QTE_GRABBED_STATE::FAINT:
+        {
+            break;
+        }
+        case QTE_GRABBED_STATE::WAKEUP:
         {
             break;
         }
