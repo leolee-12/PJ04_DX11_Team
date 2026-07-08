@@ -5,8 +5,7 @@
 #include "GameObject_Factory.h"
 #include "Loader_Prototype.h"
 #include "Level_FirstLoading.h"
-#include "Effect_Loader.h"
-#include "Projectile_Manager.h"
+#include "Singleton_Destroyer.h"
 
 CMainApp::CMainApp()
 {
@@ -114,14 +113,11 @@ void CMainApp::Free()
 {
 	__super::Free();
 
-	CEffect_Loader::DestroyInstance();
-	CProjectile_Manager::DestroyInstance();
+	CSingleton_Destroyer::Destroy_GameContent_Singletons();
 
 	Safe_Release(m_pGameInstance_Proxy);
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);
 
 	CGameInstance::DestroyInstance();
-
-	CGameObject_Factory::DestroyInstance();
 }

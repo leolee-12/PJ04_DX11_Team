@@ -110,6 +110,12 @@ void CLD_DeformCarBreakWall::Update(_float fTimeDelta)
 		}
 	}
 
+	if (STATE::BREAKING == m_eState && m_pAnimatorCom->Is_Finished())
+	{
+		_bool bShow = true;
+		m_pGameInstance_Proxy->Publish(EventTag::HUD_SetVisible, &bShow);
+	}
+
 	if (bAnimationWasActive
 		&& !m_bAnimationActive
 		&& STATE::BREAKING == m_eState)
@@ -319,6 +325,9 @@ void CLD_DeformCarBreakWall::On_Event()
 	Shake.fTrauma = 1.f;
 	Shake.bIgnoreTimeScale = true;
 	m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &Shake);
+
+	_bool bShow = false;
+	m_pGameInstance_Proxy->Publish(EventTag::HUD_SetVisible, &bShow);
 
 	m_pGameInstance_Proxy->Lerp_TimeScale(0.1f, 1.f, 3.f);
 

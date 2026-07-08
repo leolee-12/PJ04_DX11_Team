@@ -243,8 +243,16 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
             {
                 if (e.strParam.empty())
                 {
-                    CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
-                    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+                    if (m_eLife == EBOSS_LIFE::INTRO && e.iIntParam == 0)
+                    {
+                        CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
+                        m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+                    }
+                    if (m_eLife == EBOSS_LIFE::ACTIVE && e.iIntParam == 1)
+                    {
+                        CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
+                        m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+                    }
                 }
                 else                      
                 {

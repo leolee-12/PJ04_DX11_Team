@@ -2,12 +2,12 @@
 #include "UIPartObject.h"
 
 CUI_GenericContainer::CUI_GenericContainer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CUIContainerObject{ pDevice, pContext }
+    : CUIMovableContainer{ pDevice, pContext }
 {
 }
 
 CUI_GenericContainer::CUI_GenericContainer(const CUI_GenericContainer& Prototype)
-    : CUIContainerObject( Prototype )
+    : CUIMovableContainer( Prototype )
 {
 }
 
@@ -66,6 +66,19 @@ void CUI_GenericContainer::On_Deserialized()
 void CUI_GenericContainer::On_UIPartsChanged()
 {
     Bind_UIAnimator();
+}
+
+void CUI_GenericContainer::Play_IntroFade(_float fDuration)
+{
+    if (!m_pUIAnimatorCom)
+        return;
+
+    UI_FADE_DESC d{};
+    d.fFromAlpha = 0.f;    
+    d.fToAlpha = -1.f;     
+    d.fDuration = fDuration;
+    d.bRestoreOnFinish = false;
+    m_pUIAnimatorCom->Play_FadeAll(d);
 }
 
 void CUI_GenericContainer::Bind_UIAnimator()

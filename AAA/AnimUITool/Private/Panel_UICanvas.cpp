@@ -11,6 +11,9 @@
 #include "UI_SpriteAnim.h"
 #include "UI_GaugeFill.h"
 
+#include "UI_CoordinatorContainer.h"
+#include "UI_MissionPanel.h"
+
 using namespace AnimUITool;
 
 CPanel_UICanvas::CPanel_UICanvas(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -86,6 +89,53 @@ void CPanel_UICanvas::Render()
     UI_SELECTION& sel = m_pPanel_Manager->Get_UIContext().Selection;
     const _bool bHasContainer = (sel.pContainer != nullptr);
 
+    ImGui::SameLine();
+    if (ImGui::Button("Add Coordinator"))
+    {
+        if (CLevel_Tool* pLevel = m_pPanel_Manager->Get_Level())
+        {
+            CGameObject* pNew = pLevel->Add_UICoordinator();
+            if (pNew)
+            {
+                m_pPanel_Manager->Set_UISelected(dynamic_cast<CUIContainerObject*>(pNew), nullptr, L"");
+                m_pPanel_Manager->Get_UIContext().bDirty = true;
+            }
+        }
+    }
+
+    // 선택된 컨테이너가 코디네이터면 자식 붙이기 (파트 버튼과 동일 패턴)
+    ImGui::SameLine();
+    auto* pCoordSel = dynamic_cast<Client::CUICoordinatorContainer*>(sel.pContainer);
+    if (!pCoordSel) ImGui::BeginDisabled();
+    if (ImGui::Button("Child"))
+        ImGui::OpenPopup("AddChildPopup");
+    if (!pCoordSel) ImGui::EndDisabled();
+
+    if (ImGui::BeginPopup("AddChildPopup"))
+    {
+        auto AddChild = [&](const _wstring& strProto)
+            {
+                if (CLevel_Tool* pLevel = m_pPanel_Manager->Get_Level())
+                {
+                    _wstring strChildTag;
+                    CGameObject* pChild = pLevel->Add_ChildToCoordinator(pCoordSel, strProto, &strChildTag);
+                    if (pChild)
+                    {
+                        m_pPanel_Manager->Set_UISelected(dynamic_cast<CUIContainerObject*>(pChild), nullptr, L"");
+                        m_pPanel_Manager->Get_UIContext().bDirty = true;
+                    }
+                }
+            };
+
+        if (pCoordSel && ImGui::MenuItem("Generic Container"))
+            AddChild(Client::CUI_GenericContainer::PROTOTYPE_TAG);
+        if (pCoordSel && ImGui::MenuItem("Mission Panel"))
+            AddChild(Client::CUI_MissionPanel::PROTOTYPE_TAG);
+
+        ImGui::EndPopup();
+    }
+
+    ImGui::SameLine();
     if (!bHasContainer) ImGui::BeginDisabled();
     if (ImGui::Button("Part"))
         ImGui::OpenPopup("AddPartPopup");
@@ -282,16 +332,21 @@ void CPanel_UICanvas::Render()
 
             if (ImGui::Button("OK"))
             {
-                if (sel.pContainer && m_pPanel_Manager->Get_Level() && m_szSaveName[0])
+                CLevel_Tool* pLevel = m_pPanel_Manager->Get_Level();
+                if (sel.pContainer && pLevel && m_szSaveName[0])
                 {
-                    std::string s(m_szSaveName);
+                    // 자식이 선택돼 있으면 루트 코디네이터를 저장 대상으로
+                    CUIContainerObject* pSaveTarget = sel.pContainer;
+                    if (auto* pCoord = pLevel->Find_ParentCoordinator(sel.pContainer))
+                        pSaveTarget = pCoord;
 
-                    if (SUCCEEDED(m_pPanel_Manager->Get_Level()->Save_UIContainer(
-                        sel.pContainer,
+                    std::string s(m_szSaveName);
+                    if (SUCCEEDED(pLevel->Save_UIContainer(
+                        pSaveTarget,
                         m_pPanel_Manager->Get_UIContext().vDesignSize,
                         StrToWstr(s))))
                     {
-                        m_pPanel_Manager->Get_UIContext().bDirty = false;           // 저장 성공했을 때만 변경
+                        m_pPanel_Manager->Get_UIContext().bDirty = false;
                         ImGui::CloseCurrentPopup();
                     }
                 }
@@ -666,105 +721,75 @@ _bool CPanel_UICanvas::Build_PartBounds(CUIContainerObject* pContainer, CUIPartO
 
 _bool CPanel_UICanvas::Pick_TopmostPart(const _float2& vMouseUI, UI_PICK_CANDIDATE* pOutCandidate) const
 {
-    if (!pOutCandidate)
-        return false;
-
+    if (!pOutCandidate) return false;
     CLevel_Tool* pLevel = m_pPanel_Manager->Get_Level();
-    if (!pLevel)
-        return false;
+    if (!pLevel) return false;
 
     _bool bFound = false;
     UI_PICK_CANDIDATE Best{};
 
+    auto TryContainer = [&](CUIContainerObject* pContainer)
+        {
+            if (!pContainer || !pContainer->Is_Active()) return;
+
+            vector<pair<_wstring, CUIPartObject*>> OrderedParts;
+            pContainer->Get_UIPartObjectsInOrder(&OrderedParts);
+            for (const auto& Pair : OrderedParts)
+            {
+                CUIPartObject* pPart = Pair.second;
+                if (!pPart) continue;
+
+                UI_PART_BOUNDS Bounds{};
+                if (!Build_PartBounds(pContainer, pPart, &Bounds)) continue;
+
+                _matrix matInv = XMMatrixInverse(nullptr, XMLoadFloat4x4(&Bounds.WorldMatrix));
+                _vector vLocal = XMVector3TransformCoord(XMVectorSet(vMouseUI.x, vMouseUI.y, 0.f, 1.f), matInv);
+                const _float lx = XMVectorGetX(vLocal), ly = XMVectorGetY(vLocal);
+                if (fabsf(lx) > 0.5f || fabsf(ly) > 0.5f) continue;
+
+                const _int iNewLayer = static_cast<_int>(Bounds.eRenderLayer);
+                const _int iBestLayer = static_cast<_int>(Best.Bounds.eRenderLayer);
+                constexpr _float fZEqualEpsilon = 0.0001f;
+
+                _bool bTake = false;
+                if (!bFound) bTake = true;
+                else if (iNewLayer > iBestLayer) bTake = true;
+                else if (iNewLayer == iBestLayer)
+                {
+                    if (Bounds.fZ < Best.Bounds.fZ - fZEqualEpsilon) bTake = true;
+                    else if (Bounds.fZ >= Best.Bounds.fZ - fZEqualEpsilon &&
+                        Bounds.fZ <= Best.Bounds.fZ + fZEqualEpsilon)
+                    {
+                        const _int iNewOrder = pContainer->Get_UIPartOrderIndex(Pair.first);
+                        _int iBestOrder = Best.pContainer ? Best.pContainer->Get_UIPartOrderIndex(Best.strPartTag) : -1;
+                        if (pContainer != Best.pContainer) bTake = true;
+                        else if (iNewOrder > iBestOrder) bTake = true;
+                    }
+                }
+
+                if (bTake)
+                {
+                    bFound = true;
+                    Best.pContainer = pContainer;
+                    Best.pPart = pPart;
+                    Best.strPartTag = Pair.first;
+                    Best.Bounds = Bounds;
+                }
+            }
+        };
+
     for (const UI_CONTAINER_ENTRY& Entry : pLevel->Get_UIContainerEntries())
     {
         CUIContainerObject* pContainer = Entry.pContainer;
+        TryContainer(pContainer);
 
-        if (!pContainer)
-            continue;
-
-        if (!pContainer->Is_Active())
-            continue;
-
-        vector<pair<_wstring, CUIPartObject*>> OrderedParts;
-        pContainer->Get_UIPartObjectsInOrder(&OrderedParts);
-        for (const auto& Pair : OrderedParts)
-        {
-            CUIPartObject* pPart = Pair.second;
-            if (!pPart)
-                continue;
-
-            UI_PART_BOUNDS Bounds{};
-            if (!Build_PartBounds(pContainer, pPart, &Bounds))
-                continue;
-
-            _matrix matWorld = XMLoadFloat4x4(&Bounds.WorldMatrix);
-            _matrix matInv = XMMatrixInverse(nullptr, matWorld);
-
-            _vector vLocal = XMVector3TransformCoord(
-                XMVectorSet(vMouseUI.x, vMouseUI.y, 0.f, 1.f),
-                matInv);
-
-            const _float lx = XMVectorGetX(vLocal);
-            const _float ly = XMVectorGetY(vLocal);
-
-            if (fabsf(lx) > 0.5f || fabsf(ly) > 0.5f)
-                continue;
-
-            const _int iNewLayer = static_cast<_int>(Bounds.eRenderLayer);
-            const _int iBestLayer = static_cast<_int>(Best.Bounds.eRenderLayer);
-
-            constexpr _float fZEqualEpsilon = 0.0001f;
-
-            _bool bTake = false;
-            if (!bFound)
-            {
-                bTake = true;
-            }
-            else if (iNewLayer > iBestLayer)
-            {
-                bTake = true;
-            }
-            else if (iNewLayer == iBestLayer)
-            {
-                if (Bounds.fZ < Best.Bounds.fZ - fZEqualEpsilon)
-                {
-                    bTake = true;
-                }
-                else if (Bounds.fZ >= Best.Bounds.fZ - fZEqualEpsilon &&
-                    Bounds.fZ <= Best.Bounds.fZ + fZEqualEpsilon)
-                {
-                    const _int iNewOrder = pContainer->Get_UIPartOrderIndex(Pair.first);
-
-                    _int iBestOrder = -1;
-                    if (Best.pContainer)
-                        iBestOrder = Best.pContainer->Get_UIPartOrderIndex(Best.strPartTag);
-
-                    if (pContainer != Best.pContainer)
-                    {
-                        bTake = true;
-                    }
-                    else if (iNewOrder > iBestOrder)
-                    {
-                        bTake = true;
-                    }
-                }
-            }
-
-            if (bTake)
-            {
-                bFound = true;
-                Best.pContainer = pContainer;
-                Best.pPart = pPart;
-                Best.strPartTag = Pair.first;
-                Best.Bounds = Bounds;
-            }
-        }
+        // 코디네이터면 자식 컨테이너 파트도 피킹 대상
+        if (auto* pCoord = dynamic_cast<Client::CUICoordinatorContainer*>(pContainer))
+            for (const _wstring& childTag : pCoord->Get_ChildOrder())
+                TryContainer(pCoord->Find_Child(childTag));
     }
 
-    if (!bFound)
-        return false;
-
+    if (!bFound) return false;
     *pOutCandidate = Best;
     return true;
 }

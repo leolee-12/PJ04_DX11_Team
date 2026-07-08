@@ -8,21 +8,25 @@
 CUI_Image::CUI_Image(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CUIPartObject{ pDevice, pContext }
 	, m_vColor{ 1.f, 1.f, 1.f, 1.f }
+	, m_vColor2{ 1.f,1.f,1.f,1.f }
 	, m_fAlpha{ 1.f }
 	, m_bFlipX{ false }
 	, m_bFlipY{ false }
 	, m_iTextureLevel {ETOUI(LEVEL::STATIC)}
+	, m_iPassIdx{0}
 {
 }
 
 CUI_Image::CUI_Image(const CUI_Image& Prototype)
 	: CUIPartObject(Prototype)
 	, m_vColor{ Prototype.m_vColor }
+	, m_vColor2{ Prototype.m_vColor2 }
 	, m_fAlpha{ Prototype.m_fAlpha }
 	, m_bFlipX{ Prototype.m_bFlipX }
 	, m_bFlipY{ Prototype.m_bFlipY }
 	, m_iTextureLevel{ Prototype.m_iTextureLevel }
 	, m_strTextureProtoTag { Prototype.m_strTextureProtoTag }
+	, m_iPassIdx{ Prototype.m_iPassIdx }
 {
 }
 
@@ -78,7 +82,7 @@ HRESULT CUI_Image::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Begin(0)))
+	if (FAILED(m_pShaderCom->Begin(m_iPassIdx)))
 		return E_FAIL;
 	if (FAILED(m_pVIBufferCom->Bind_Resources()))
 		return E_FAIL;
@@ -205,6 +209,9 @@ HRESULT	CUI_Image::Bind_ShaderResources()
 			return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &m_vColor, sizeof(m_vColor))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor2", &m_vColor2, sizeof(m_vColor2))))
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &m_fAlpha, sizeof(m_fAlpha))))

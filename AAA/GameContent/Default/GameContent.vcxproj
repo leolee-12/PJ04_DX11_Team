@@ -92,8 +92,10 @@
     <ClInclude Include="..\Public\LD_AudioArea.h" />
     <ClInclude Include="..\Public\LD_Stage1BossDemo.h" />
     <ClInclude Include="..\Public\LD_CopyEssence.h" />
+    <ClInclude Include="..\public\Mission_Manager.h" />
     <ClInclude Include="..\Public\Monster_State_Flatten.h" />
     <ClInclude Include="..\Public\Monster_State_Spat.h" />
+    <ClInclude Include="..\public\Singleton_Destroyer.h" />
     <ClInclude Include="..\Public\Sparkle.h" />
     <ClInclude Include="..\Public\SphereMesh.h" />
     <ClInclude Include="..\Public\SphereParticle.h" />
@@ -152,6 +154,7 @@
     <ClInclude Include="..\public\Projectile_Boulder.h" />
     <ClInclude Include="..\public\Projectile_Manager.h" />
     <ClInclude Include="..\public\Projectile_Movement.h" />
+    <ClInclude Include="..\public\UI_CoordinatorContainer.h" />
     <ClInclude Include="..\Public\UI_FlashCurtain.h" />
     <ClInclude Include="..\public\CutsceneActor.h" />
     <ClInclude Include="..\public\CutsceneGorilla.h" />
@@ -333,9 +336,13 @@
     <ClInclude Include="..\Public\UI_Image.h" />
     <ClInclude Include="..\Public\UI_KirbyStatus.h" />
     <ClInclude Include="..\public\UI_LoadingCurtain.h" />
+    <ClInclude Include="..\public\UI_MissionBoard.h" />
+    <ClInclude Include="..\public\UI_MissionPanel.h" />
+    <ClInclude Include="..\public\UI_MovableContainer.h" />
     <ClInclude Include="..\Public\UI_PointStar.h" />
     <ClInclude Include="..\Public\UI_SpriteAnim.h" />
     <ClInclude Include="..\public\UI_SpriteAnimCurtain.h" />
+    <ClInclude Include="..\public\UI_StageClear.h" />
     <ClInclude Include="..\Public\UI_Structs.h" />
     <ClInclude Include="..\Public\UI_TestImageContainer.h" />
     <ClInclude Include="..\Public\UI_Text.h" />
@@ -420,8 +427,10 @@
     <ClCompile Include="..\Private\LD_AudioArea.cpp" />
     <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp" />
     <ClCompile Include="..\Private\LD_CopyEssence.cpp" />
+    <ClCompile Include="..\private\Mission_Manager.cpp" />
     <ClCompile Include="..\Private\Monster_State_Flatten.cpp" />
     <ClCompile Include="..\Private\Monster_State_Spat.cpp" />
+    <ClCompile Include="..\private\Singleton_Destroyer.cpp" />
     <ClCompile Include="..\Private\Sparkle.cpp" />
     <ClCompile Include="..\Private\SphereMesh.cpp" />
     <ClCompile Include="..\Private\SphereParticle.cpp" />
@@ -478,6 +487,7 @@
     <ClCompile Include="..\private\Projectile_Boulder.cpp" />
     <ClCompile Include="..\private\Projectile_Manager.cpp" />
     <ClCompile Include="..\private\Projectile_Movement.cpp" />
+    <ClCompile Include="..\private\UI_CoordinatorContainer.cpp" />
     <ClCompile Include="..\Private\UI_FlashCurtain.cpp" />
     <ClCompile Include="..\private\CutsceneActor.cpp" />
     <ClCompile Include="..\private\CutsceneGorilla.cpp" />
@@ -637,9 +647,13 @@
     <ClCompile Include="..\Private\UI_Image.cpp" />
     <ClCompile Include="..\Private\UI_KirbyStatus.cpp" />
     <ClCompile Include="..\private\UI_LoadingCurtain.cpp" />
+    <ClCompile Include="..\private\UI_MissionBoard.cpp" />
+    <ClCompile Include="..\private\UI_MissionPanel.cpp" />
+    <ClCompile Include="..\private\UI_MovableContainer.cpp" />
     <ClCompile Include="..\Private\UI_PointStar.cpp" />
     <ClCompile Include="..\Private\UI_SpriteAnim.cpp" />
     <ClCompile Include="..\private\UI_SpriteAnimCurtain.cpp" />
+    <ClCompile Include="..\private\UI_StageClear.cpp" />
     <ClCompile Include="..\Private\UI_TestImageContainer.cpp" />
     <ClCompile Include="..\Private\UI_Text.cpp" />
     <ClCompile Include="..\Private\UI_Title.cpp" />
