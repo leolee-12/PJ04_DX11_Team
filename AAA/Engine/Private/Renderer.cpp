@@ -315,6 +315,14 @@ void CRenderer::Add_DebugComponent(CComponent* pComponent)
     m_DebugComponents.push_back(pComponent);
     Safe_AddRef(pComponent);
 }
+
+void CRenderer::Add_DebugTextComponent(CComponent* pComponent)
+{
+    if (!m_bDebugRender) return;
+
+    m_DebugTextComponents.push_back(pComponent);
+    Safe_AddRef(pComponent);
+}
 #endif
 
 void CRenderer::Bind_RenderTarget(ID3D11RenderTargetView* pRTV, ID3D11DepthStencilView* pDSV, _uint iWidth, _uint iHeight)
@@ -1338,6 +1346,9 @@ HRESULT CRenderer::Render_Debug()
 
     m_DebugComponents.clear();
 
+    if (FAILED(Render_DebugText()))
+        return E_FAIL;
+
     if (FAILED(m_pShaderDeferred->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::ORTHO))))
         return E_FAIL;
     if (FAILED(m_pShaderDeferred->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::ORTHO))))
@@ -1358,6 +1369,27 @@ HRESULT CRenderer::Render_Debug()
     m_pGameInstance_Proxy->Render_RT_Debug(TEXT("MRT_SSAO_Blur"), m_pShaderDeferred, m_pVIBuffer);
 
     return S_OK;
+}
+
+HRESULT CRenderer::Render_DebugText()
+{
+    Reset_RS();
+
+    HRESULT hr = S_OK;
+
+    for (auto& pDebugCom : m_DebugTextComponents)
+    {
+        if (nullptr != pDebugCom && FAILED(pDebugCom->Render_DebugText()))
+            hr = E_FAIL;
+
+        Safe_Release(pDebugCom);
+    }
+
+    m_DebugTextComponents.clear();
+
+    Reset_RS();
+
+    return hr;
 }
 #endif
 
@@ -1390,6 +1422,12 @@ void CRenderer::Free()
         Safe_Release(pDebugCom);
     }
     m_DebugComponents.clear();
+
+    for (auto& pDebugCom : m_DebugTextComponents)
+    {
+        Safe_Release(pDebugCom);
+    }
+    m_DebugTextComponents.clear();
 #endif // _DEBUG
 
     __super::Free();

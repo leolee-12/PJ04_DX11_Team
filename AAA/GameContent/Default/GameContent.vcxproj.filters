@@ -58,9 +58,6 @@
     <Filter Include="99. Defines\Hojun\UI">
       <UniqueIdentifier>{cd0a7659-a8f0-4741-aa44-321f59e15d07}</UniqueIdentifier>
     </Filter>
-    <Filter Include="98. ShaderFiles\Leo">
-      <UniqueIdentifier>{a3345da1-0cb7-4733-ac92-e971f6f0980d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="99. Defines\Leo">
       <UniqueIdentifier>{ca69a650-f542-4ef4-9ce8-1c68bc5ca0a6}</UniqueIdentifier>
     </Filter>
@@ -948,6 +945,9 @@
     </Filter>
     <Filter Include="00. GameObject\06. Monster\04. Cappy\State\HatLose">
       <UniqueIdentifier>{0ff73919-563b-4a8b-9974-8f92e30f12fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98. ShaderFiles\Leo">
+      <UniqueIdentifier>{a3345da1-0cb7-4733-ac92-e971f6f0980d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -2809,5 +2809,16 @@
     <None Include="..\ShaderFiles\Shader_WaddleDee.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_World_NonAnim.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_World_Anim.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_World_Instance.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

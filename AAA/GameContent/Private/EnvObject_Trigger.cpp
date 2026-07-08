@@ -10,6 +10,10 @@ CEnvObject_Trigger::CEnvObject_Trigger(ID3D11Device* pDevice, ID3D11DeviceContex
 	, m_vAreaSize{ 1.f, 1.f, 1.f }
 	, m_vAreaRot{ 0.f, 0.f, 0.f, 1.f }
 	, m_bDebugDrawTrigger{ true }
+	, m_strDebugTextFontTag{ L"KOR-FOT-ComicReggaeStd-B" }
+	, m_vDebugTextColor{ 1.f, 1.f, 0.2f, 1.f }
+	, m_fDebugTextScale{ 0.7f }
+	, m_vDebugBoxColor{ 0.2f, 0.2f, 0.4f, 1.f }
 {
 	m_strProtoTag = PROTOTYPE_TAG;
 }
@@ -21,6 +25,10 @@ CEnvObject_Trigger::CEnvObject_Trigger(const CEnvObject_Trigger& Prototype)
 	, m_vAreaSize{ Prototype.m_vAreaSize }
 	, m_vAreaRot{ Prototype.m_vAreaRot }
 	, m_bDebugDrawTrigger{ Prototype.m_bDebugDrawTrigger }
+	, m_strDebugTextFontTag{ Prototype.m_strDebugTextFontTag }
+	, m_vDebugTextColor{ Prototype.m_vDebugTextColor }
+	, m_fDebugTextScale{ Prototype.m_fDebugTextScale }
+	, m_vDebugBoxColor{ Prototype.m_vDebugBoxColor }
 {
 	m_strProtoTag = PROTOTYPE_TAG;
 }
@@ -94,7 +102,13 @@ void CEnvObject_Trigger::Late_Update(_float fTimeDelta)
 
 #ifdef _DEBUG
 		if (m_bDebugDrawTrigger)
+		{
+			const _float fDebugTextScale = max(0.1f, m_fDebugTextScale);
+			m_pCollider->Set_DebugText(m_strDebugTextFontTag, Get_DebugLabel(), m_vDebugTextColor, _float2(fDebugTextScale, fDebugTextScale));
+			m_pCollider->Set_DebugRenderColor(m_vDebugBoxColor);
 			m_pGameInstance_Proxy->Add_DebugComponent(m_pCollider);
+			m_pGameInstance_Proxy->Add_DebugTextComponent(m_pCollider);
+		}
 #endif
 	}
 }
@@ -150,6 +164,16 @@ void CEnvObject_Trigger::SetUp_Collider_Callback()
 
 	m_pCollider->Set_OnExit([this](CCollider* pOther) { OnTriggerExit(pOther); });
 }
+
+#ifdef _DEBUG
+_wstring CEnvObject_Trigger::Get_DebugLabel() const
+{
+	if (m_strTriggerId.empty())
+		return L"NULL";
+
+	return m_strTriggerId;
+}
+#endif
 
 void CEnvObject_Trigger::Free()
 {

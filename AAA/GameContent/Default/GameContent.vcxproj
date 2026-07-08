@@ -685,6 +685,11 @@
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_World_Anim.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_World_Instance.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_World_NonAnim.hlsl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

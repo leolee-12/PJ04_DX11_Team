@@ -100,6 +100,7 @@ public: //Renderer
     void    Add_RenderGroup_UI(RENDERUIID eGroupID, CUIObject* pUIObject);
 #ifdef _DEBUG
     void    Add_DebugComponent(class CComponent* pComponent);
+    void    Add_DebugTextComponent(class CComponent* pComponent);
     void    Toggle_DebugRender();
     _bool   IsOn_DebugRender();
 #endif
