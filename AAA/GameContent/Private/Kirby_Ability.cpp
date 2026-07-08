@@ -33,6 +33,7 @@ HRESULT CKirby_Ability::Initialize()
     Set_FullBodyAni(ABILITY_ANI::LANDING, "Landing", false, false, 0.05f, 1.f);
 
     Set_FullBodyAni(ABILITY_ANI::GET_ABILITY, "GetAbilityFirst", false, false, 0.1f, 2.5f);
+    Set_FullBodyAni(ABILITY_ANI::COPY, "Copy", false, false, 0.1f, 2.5f);
     Set_FullBodyAni(ABILITY_ANI::ABILITY_DUMP, "AbilityDump", false, false, 0.1f, 2.5f);
 
     Set_FullBodyAni(ABILITY_ANI::FLIGHT_START, "FlightStart", false, false, 0.1f, 2.25f);
