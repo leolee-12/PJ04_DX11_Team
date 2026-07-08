@@ -1,5 +1,7 @@
 #include "LevelDesignObject.h"
 
+#include "Model.h"
+
 NS_BEGIN(Client)
 
 CLevelDesignObject::CLevelDesignObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -61,40 +63,121 @@ _wstring CLevelDesignObject::Make_LevelDesignObjectKey() const
 }
 
 #pragma region Editable
-_bool CLevelDesignObject::Get_EditDesc(EDITABLE_DESC* pOutDesc) const
+void CLevelDesignObject::Add_EditModelSlot(vector<EDITABLE_MODEL_SLOT>* pOutSlots, const _tchar* pLabel, EDITABLE_MODEL_KIND eKind, CModel* pModel) const
 {
-	if (nullptr == pOutDesc)
-		return false;
+	if (nullptr == pOutSlots || nullptr == pModel)
+		return;
 
-	pOutDesc->eKind = EDITABLE_OBJECT_KIND::LEVEL_DESIGN_OBJECT;
-	pOutDesc->strStableKey = m_tLevelDesignDesc.strSourceFile + L"|" + m_tLevelDesignDesc.strSection +
-		L"|" + m_tLevelDesignDesc.strEntryKey + L"|" + to_wstring(m_tLevelDesignDesc.iUid);
-	pOutDesc->iCapabilities = 0u;
-	pOutDesc->Policy = {};
-	pOutDesc->ModelSlots.clear();
-	return true;
+	EDITABLE_MODEL_SLOT Slot{};
+	Slot.strLabel = nullptr != pLabel ? pLabel : L"Model";
+	Slot.eKind = eKind;
+	Slot.pModel = pModel;
+	Slot.iMeshCount = static_cast<_uint>(pModel->Get_NumMeshes());
+
+	pOutSlots->push_back(Slot);
+}
+void CLevelDesignObject::Build_EditCapabilities(_uint* pOutCaps, EDIT_OBJECT_POLICY* pOutPolicy) const
+{
+	if (nullptr != pOutCaps)
+		*pOutCaps = 0u;
+
+	if (nullptr != pOutPolicy)
+		*pOutPolicy = {};
 }
 
-HRESULT CLevelDesignObject::Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy)
+void CLevelDesignObject::Collect_EditModelSlots(vector<EDITABLE_MODEL_SLOT>* pOutSlots) const
+{
+	if (nullptr == pOutSlots)
+		return;
+
+	pOutSlots->clear();
+
+	const auto& Components = Get_Components();
+	const auto Iter = Components.find(TEXT("Com_Model"));
+	if (Iter == Components.end())
+		return;
+
+	CModel* pModel = dynamic_cast<CModel*>(Iter->second);
+	if (nullptr == pModel)
+		return;
+
+	const EDITABLE_MODEL_KIND eKind = 0u < pModel->Get_NumAnimations()
+		? EDITABLE_MODEL_KIND::ANIM
+		: EDITABLE_MODEL_KIND::NONANIM;
+
+	Add_EditModelSlot(pOutSlots, TEXT("Model"), eKind, pModel);
+}
+
+HRESULT CLevelDesignObject::On_ApplyEditPolicy(const EDIT_OBJECT_POLICY& Policy)
 {
 	UNREFERENCED_PARAMETER(Policy);
 	return S_OK;
 }
 
-const MESH_LAYER_IDX* CLevelDesignObject::Get_EditMeshLayer(_uint iModelSlot, _uint iMesh) const
+_bool CLevelDesignObject::Get_EditDesc(EDITABLE_DESC* pOutDesc) const
 {
-	UNREFERENCED_PARAMETER(iModelSlot);
-	UNREFERENCED_PARAMETER(iMesh);
-	return nullptr;
+	if (nullptr == pOutDesc)
+		return false;
+
+	*pOutDesc = {};
+	pOutDesc->eKind = EDITABLE_OBJECT_KIND::LEVEL_DESIGN_OBJECT;
+	pOutDesc->strStableKey = m_tLevelDesignDesc.strSourceFile + L"|" + m_tLevelDesignDesc.strSection + L"|" + m_tLevelDesignDesc.strEntryKey + L"|"
+		+ to_wstring(m_tLevelDesignDesc.iUid);
+
+	Build_EditCapabilities(&pOutDesc->iCapabilities, &pOutDesc->Policy);
+	Collect_EditModelSlots(&pOutDesc->ModelSlots);
+
+	if (!pOutDesc->ModelSlots.empty())
+	{
+		pOutDesc->iCapabilities |= EDIT_CAP_MESH_LAYER;
+
+		for (const EDITABLE_MODEL_SLOT& Slot : pOutDesc->ModelSlots)
+		{
+			if (EDITABLE_MODEL_KIND::ANIM == Slot.eKind)
+			{
+				pOutDesc->iCapabilities |= EDIT_CAP_ANIMATION;
+				break;
+			}
+		}
+	}
+
+	return true;
 }
 
-HRESULT CLevelDesignObject::Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX&
-	Layer)
+HRESULT CLevelDesignObject::Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy)
 {
-	UNREFERENCED_PARAMETER(iModelSlot);
-	UNREFERENCED_PARAMETER(iMesh);
-	UNREFERENCED_PARAMETER(Layer);
-	return E_FAIL;
+	return On_ApplyEditPolicy(Policy);
+}
+
+const MESH_LAYER_IDX* CLevelDesignObject::Get_EditMeshLayer(_uint iModelSlot, _uint iMesh) const
+{
+	vector<EDITABLE_MODEL_SLOT> Slots;
+	Collect_EditModelSlots(&Slots);
+
+	if (iModelSlot >= Slots.size())
+		return nullptr;
+
+	CModel* pModel = Slots[iModelSlot].pModel;
+	if (nullptr == pModel || iMesh >= pModel->Get_NumMeshes())
+		return nullptr;
+
+	return &pModel->Get_MeshLayer(iMesh);
+}
+
+HRESULT CLevelDesignObject::Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX& Layer)
+{
+	vector<EDITABLE_MODEL_SLOT> Slots;
+	Collect_EditModelSlots(&Slots);
+
+	if (iModelSlot >= Slots.size())
+		return E_FAIL;
+
+	CModel* pModel = Slots[iModelSlot].pModel;
+	if (nullptr == pModel || iMesh >= pModel->Get_NumMeshes())
+		return E_FAIL;
+
+	pModel->Set_MeshLayer(iMesh, Layer);
+	return S_OK;
 }
 #pragma endregion
 

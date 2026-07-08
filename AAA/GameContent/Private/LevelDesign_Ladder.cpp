@@ -222,6 +222,13 @@ _bool CLevelDesign_Ladder::Is_BottomCell(_int iCellIndex) const
 	return m_iTopCellIndex >= m_iBottomCellIndex && iCellIndex == m_iBottomCellIndex;
 }
 
+void CLevelDesign_Ladder::Collect_EditModelSlots(vector<EDITABLE_MODEL_SLOT>* pOutSlots) const
+{
+	Add_EditModelSlot(pOutSlots, TEXT("Top"), EDITABLE_MODEL_KIND::NONANIM, m_ModelComs[SEGMENT::TOP]);
+	Add_EditModelSlot(pOutSlots, TEXT("Mid"), EDITABLE_MODEL_KIND::NONANIM, m_ModelComs[SEGMENT::MID]);
+	Add_EditModelSlot(pOutSlots, TEXT("Bot"), EDITABLE_MODEL_KIND::NONANIM, m_ModelComs[SEGMENT::BOT]);
+}
+
 HRESULT CLevelDesign_Ladder::Ready_Components()
 {
 	if (FAILED(Ready_RenderComponents()))

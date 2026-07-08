@@ -65,6 +65,8 @@ private:
 	_int m_iTopCellIndex = { -1 };
 
 private:
+	virtual void Collect_EditModelSlots(vector<EDITABLE_MODEL_SLOT>* pOutSlots) const override;
+
 	HRESULT	Ready_Components();
 	HRESULT	Ready_RenderComponents();
 	HRESULT	Ready_LadderCollider();

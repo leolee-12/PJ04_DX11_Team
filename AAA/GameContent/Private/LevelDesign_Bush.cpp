@@ -236,6 +236,21 @@ CGameObject* CLevelDesign_Bush::Create_Prototype(ID3D11Device* pDevice, ID3D11De
 	return CLevelDesign_Bush::Create(pDevice, pContext);
 }
 
+void CLevelDesign_Bush::Collect_EditModelSlots(vector<EDITABLE_MODEL_SLOT>* pOutSlots) const
+{
+	auto AddSlot = [&](BUSH_STATE eSlot, const _tchar* pLabel)
+		{
+			const MODEL eModelType = Resolve_ModelType(eSlot);
+			const EDITABLE_MODEL_KIND eKind = MODEL::ANIM == eModelType
+				? EDITABLE_MODEL_KIND::ANIM
+				: EDITABLE_MODEL_KIND::NONANIM;
+			Add_EditModelSlot(pOutSlots, pLabel, eKind, m_pModelComs[eSlot]);
+		};
+
+	AddSlot(BUSH_STATE::BASIC, TEXT("Basic"));
+	AddSlot(BUSH_STATE::CUT, TEXT("Cut"));
+}
+
 HRESULT CLevelDesign_Bush::Ready_Components()
 {
 	if (FAILED(Ready_RenderComponents()))

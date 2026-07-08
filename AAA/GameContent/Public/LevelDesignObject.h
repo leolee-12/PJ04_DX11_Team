@@ -32,6 +32,12 @@ protected:
 	LD_OBJECT_DESC	m_tLevelDesignDesc = {};
 
 protected:
+	void Add_EditModelSlot(vector<EDITABLE_MODEL_SLOT>* pOutSlots, const _tchar* pLabel, EDITABLE_MODEL_KIND eKind, CModel* pModel) const;
+	virtual void Build_EditCapabilities(_uint* pOutCaps, EDIT_OBJECT_POLICY* pOutPolicy) const;
+	virtual void Collect_EditModelSlots(vector<EDITABLE_MODEL_SLOT>* pOutSlots) const;
+	virtual HRESULT On_ApplyEditPolicy(const EDIT_OBJECT_POLICY& Policy);
+
+protected:
 	virtual void Free() override;
 };
 

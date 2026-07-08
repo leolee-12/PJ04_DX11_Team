@@ -61,6 +61,8 @@ private:
     BUSH_STATE m_eState = { BUSH_STATE::BASIC };
 
 private:
+    virtual void Collect_EditModelSlots(vector<EDITABLE_MODEL_SLOT>* pOutSlots) const override;
+
     HRESULT Ready_Components();
     HRESULT Ready_RenderComponents();
     HRESULT Ready_HurtBox();
