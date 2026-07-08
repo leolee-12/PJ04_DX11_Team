@@ -34,6 +34,7 @@
 #include "PhysX_Manager.h"
 
 #include "UI_CoordinatorContainer.h"
+#include "Mission_Manager.h"
 
 namespace
 {
@@ -1329,13 +1330,16 @@ void CLevel_Tool::Update(_float fTimeDelta)
 
     if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F6, false))
     {
+        //BOSS_HP_APPEARED Desc{};
+        //Desc.strBossName = L"테스트 고르르뭄바";
+        //Desc.fMaxHP = 100.f;
+        //Desc.fCurrHp = 100.f;
+        auto* pM = CMissionManager::GetInstance();
+        pM->Set_Succeeded(0, true);   // Main
+        pM->Set_Succeeded(1, true);   // Sub1
+        pM->Set_Succeeded(3, true);
 
-        BOSS_HP_APPEARED Desc{};
-        Desc.strBossName = L"테스트 고르르뭄바";
-        Desc.fMaxHP = 100.f;
-        Desc.fCurrHp = 100.f;
-
-        m_pGameInstance_Proxy->Publish(EventTag::Boss_HP_Appeared, &Desc);
+        m_pGameInstance_Proxy->Publish(EventTag::StageClear_SequenceFinished, nullptr);
 
         Log_Info("Publish: Boss_HP_Appeared");
     }

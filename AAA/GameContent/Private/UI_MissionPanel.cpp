@@ -8,6 +8,42 @@ CUI_MissionPanel::CUI_MissionPanel(const CUI_MissionPanel& p) : CUI_GenericConta
 HRESULT CUI_MissionPanel::Initialize_Prototype() { return __super::Initialize_Prototype(); }
 HRESULT CUI_MissionPanel::Initialize(void* pArg) { return __super::Initialize(pArg); }
 
+void CUI_MissionPanel::Update(_float fTimeDelta)
+{
+    __super::Update(fTimeDelta);   // 애니메이터(바운스/페이드) 진행
+
+    if (m_eSuccess == ESUCCESS::SHAKING)
+    {
+        m_fSuccessTimer += fTimeDelta;
+        if (m_fSuccessTimer >= m_fShakeDur)
+        {
+            if (auto it = m_UIPartObjects.find(PART_CAGE); it != m_UIPartObjects.end())
+                it->second->Set_Active(false);
+
+            if (auto it = m_UIPartObjects.find(PART_WADDLE); it != m_UIPartObjects.end())
+            {
+                it->second->Set_Active(true);
+                if (auto* pAnim = Get_UIAnimatorCom())
+                {
+                    UI_BOUNCE_DESC pop{};
+                    pop.vDirection = { 0.f, 1.f };
+                    pop.fDistance = 14.f;
+                    pop.fDuration = 0.25f;
+                    pop.fWaveCount = 1.f;
+                    pop.fDamping = 1.f;
+                    pop.bRestoreOnFinish = true;
+                    pAnim->Play_Bounce(PART_WADDLE, pop);
+
+                    UI_FADE_DESC fd{};
+                    fd.fFromAlpha = 0.f; fd.fToAlpha = -1.f; fd.fDuration = 0.15f;
+                    pAnim->Play_Fade(PART_WADDLE, fd);
+                }
+            }
+            m_eSuccess = ESUCCESS::REVEALED;
+        }
+    }
+}
+
 void CUI_MissionPanel::Set_Mission(_bool /*bIsMain*/, _bool bSucceeded, const _wstring& strName)
 {
     m_bSucceeded = bSucceeded;
@@ -21,18 +57,31 @@ void CUI_MissionPanel::Set_Mission(_bool /*bIsMain*/, _bool bSucceeded, const _w
 
 void CUI_MissionPanel::Play_Success()
 {
-    if (!m_bSucceeded) return;
-    auto* pAnim = Get_UIAnimatorCom();
-    auto it = m_UIPartObjects.find(PART_STAMP);
-    if (!pAnim || it == m_UIPartObjects.end()) return;
+    if (m_eSuccess != ESUCCESS::NONE) return;
 
-    it->second->Set_Active(true);
+    if (auto* pAnim = Get_UIAnimatorCom())
+    {
+        UI_BOUNCE_DESC shake{};
+        shake.vDirection = { 1.f, 0.f };   // 좌우로
+        shake.fDistance = 6.f;            // 작게
+        shake.fDuration = m_fShakeDur;
+        shake.fWaveCount = 12.f;           // 부들부들(떨림 횟수)
+        shake.fDamping = 1.f;            // 점점 잦아듦
+        shake.bRestoreOnFinish = true;
+        pAnim->Play_Bounce(PART_CAGE, shake);
+    }
 
-    UI_FADE_DESC fd{}; fd.fFromAlpha = 0.f; fd.fToAlpha = -1.f; fd.fDuration = 0.15f;
-    pAnim->Play_Fade(PART_STAMP, fd);
+    m_fSuccessTimer = 0.f;
+    m_eSuccess = ESUCCESS::SHAKING;
+}
 
-    UI_BOUNCE_DESC bd{};                 // 스탬프 팝 (필드는 프로젝트 UI_BOUNCE_DESC에 맞게)
-    pAnim->Play_Bounce(PART_STAMP, bd);
+void CUI_MissionPanel::On_Deserialized()
+{
+    __super::On_Deserialized();
+
+    if (!m_pGameInstance_Proxy->Is_EditMode())
+        if (auto it = m_UIPartObjects.find(PART_WADDLE); it != m_UIPartObjects.end())
+            it->second->Set_Active(false);
 }
 
 CUI_MissionPanel* CUI_MissionPanel::Create(ID3D11Device* d, ID3D11DeviceContext* c)

@@ -967,6 +967,9 @@
     <Filter Include="00. GameObject\97. UI\UIContainer\GenericContainer\MissionPanel">
       <UniqueIdentifier>{eb9f33bf-b388-4c06-9368-d9d2c2c18037}</UniqueIdentifier>
     </Filter>
+    <Filter Include="97. DataSystem\Singleton Destroyer">
+      <UniqueIdentifier>{42251981-a8bb-404e-be2b-ab0584156f19}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1929,6 +1932,9 @@
     <ClInclude Include="..\public\UI_MissionPanel.h">
       <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\MissionPanel</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Singleton_Destroyer.h">
+      <Filter>97. DataSystem\Singleton Destroyer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2815,6 +2821,9 @@
     </ClCompile>
     <ClCompile Include="..\private\UI_MissionPanel.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\MissionPanel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Singleton_Destroyer.cpp">
+      <Filter>97. DataSystem\Singleton Destroyer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
