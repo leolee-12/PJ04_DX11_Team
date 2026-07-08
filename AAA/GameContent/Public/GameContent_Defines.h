@@ -34,7 +34,7 @@ namespace Client
 		CAR_BOOST,
 		ENV_HURT,
 		ENV_LADDER,
-		ABILITY_BUBBLE,
+		ESSENCE_BUBBLE,
 		ENV_TRIGGER = 100
 	};
 

@@ -80,7 +80,7 @@ HRESULT CAbility_Bubble::Ready_Collider()
 	if (nullptr == m_pCollider)
 		return E_FAIL;
 
-	m_pGameInstance_Proxy->Register_Collider(m_pCollider, ETOUI(COLLISION_LAYER::ABILITY_BUBBLE));
+	m_pGameInstance_Proxy->Register_Collider(m_pCollider, ETOUI(COLLISION_LAYER::ESSENCE_BUBBLE));
 
 	return S_OK;
 }

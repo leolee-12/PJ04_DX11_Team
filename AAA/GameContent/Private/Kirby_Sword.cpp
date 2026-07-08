@@ -153,14 +153,16 @@ HRESULT CKirby_Sword::Ready_HitBox()
     desc.fRadius = {0.25f};
     desc.fHeight = {0.8f};
     desc.vRadians = { XMConvertToRadians(-90.f), 0.f, 0.f};
-    m_pHitBox = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag,
-        TEXT("HitBox_Com"), &desc);
-    if (nullptr == m_pHitBox) return E_FAIL;
+    m_pHitBox = Add_Component<CCollider>(
+        Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag,TEXT("HitBox_Com"), &desc);
+
+    if (m_pHitBox == nullptr)
+        return E_FAIL;
 
     SetUp_HitBox_Callback();
     m_pHitBox->Set_Enabled(false);
-    m_pGameInstance_Proxy->Register_Collider(m_pHitBox,
-        ETOUI(COLLISION_LAYER::PLAYER_HIT));
+
+    m_pGameInstance_Proxy->Register_Collider(m_pHitBox, ETOUI(COLLISION_LAYER::PLAYER_HIT));
 
     return S_OK;
 }
@@ -174,14 +176,20 @@ void CKirby_Sword::SetUp_HitBox_Callback()
                 return;
 
             IDamageable* pVictim = dynamic_cast<IDamageable*>(pTarget);
-            if (nullptr == pVictim) return;
+            if (pVictim == nullptr)
+                return;
 
-            ATTACK_INFO atk{};
-            atk.fDamage = 500.f;
-            atk.fKnockback = 6.f;
-            atk.vAttackerPos = _float3(m_pParentMatrix->_41, m_pParentMatrix->_42, m_pParentMatrix->_43);
-            atk.pAttacker = this;
-            pVictim->Damaged(atk);
+            ATTACK_INFO tDesc{};
+            tDesc.eHitType = HIT_TYPE::SWORD_DEFAULT;
+            tDesc.pAttacker = this;
+            tDesc.vAttackerPos =  {
+                m_pParentMatrix->_41,
+                m_pParentMatrix->_42,
+                m_pParentMatrix->_43
+            };
+            tDesc.fDamage = 500.f;
+            tDesc.fKnockback = 6.f;
+            pVictim->Damaged(tDesc);
 
             m_HitTargets.insert(pTarget);   
 #ifdef _DEBUG

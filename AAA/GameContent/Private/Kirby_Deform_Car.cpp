@@ -10,6 +10,8 @@
 
 #include "Movement_Child.h"
 
+#include "Kirby_DeformCar_Main.h"
+
 CKirby_Deform_Car::CKirby_Deform_Car()
 {
 }
@@ -217,7 +219,9 @@ void CKirby_Deform_Car::Enter_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eS
 
             BoostEffectStart(pKirby, m_pBoostGas1, m_pBoostGas2, L"BoostGas");
 
-            pKirby->Get_Collider(CKirby::KIRBY_COLLIDER::CAR_BOOST_COLLIDER)->Set_Enabled(true);
+            CKirby_HitBox_Model* pCarMainModel =
+                static_cast<CKirby_HitBox_Model*>(pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR));
+            pCarMainModel->Set_HitBoxEnabled(true);
 
             CEffect_Loader::GetInstance()->Spawn(L"CarMilkyWay", pKirby->Get_LevelIndex(),
                 _float3(0.f, 1.3f, 2.4f), _float3(0.f, 0.f, 0.f), _float3(0.f, 180.f, 0.f),
@@ -299,9 +303,12 @@ void CKirby_Deform_Car::Exit_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eSt
     switch (m_eDeformCar_State)
     {
         case DEFORM_CAR_STATE::BOOST:
+        {
             pModel->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
 
-            pKirby->Get_Collider(CKirby::KIRBY_COLLIDER::CAR_BOOST_COLLIDER)->Set_Enabled(false);
+            CKirby_HitBox_Model* pCarMainModel =
+                static_cast<CKirby_HitBox_Model*>(pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR));
+            pCarMainModel->Set_HitBoxEnabled(false);
 
             Effect_Stop(m_pBoostGas1);
             Effect_Stop(m_pBoostGas2);
@@ -310,6 +317,7 @@ void CKirby_Deform_Car::Exit_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eSt
             pModel->Stop_SoundHandle();
 
             break;
+        }
         case DEFORM_CAR_STATE::BOOST_END:
             pMovement->Set_MaxHorizontalSpeed(s_fCarSpeed);
             break;

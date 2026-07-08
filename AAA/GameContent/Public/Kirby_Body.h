@@ -21,7 +21,7 @@ class CKirby_Body final : public CKirby_Deform_Model
 	GENERATED_BODY(CKirby_Body)
 
 public:
-	struct KIRBY_BODY_DESC : public CKirby_Deform_Model::KIRBY_FORM_DESC
+	struct KIRBY_BODY_DESC : public CKirby_Deform_Model::KIRBY_DEFORM_MODEL_DESC
 	{
 	};
 

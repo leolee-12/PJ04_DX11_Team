@@ -10,7 +10,9 @@ NS_BEGIN(Client)
 enum class HIT_TYPE : _uint
 {
     NORMAL = 0,             
-    BODY_CONTACT,           
+    BODY_CONTACT,
+    SWORD_DEFAULT, SWORD_SPIN,
+    CAR_BOOSTER_HIT,
 };
 
 struct ATTACK_INFO

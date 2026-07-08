@@ -44,6 +44,8 @@ void CKirby_Fall::Update(CKirby* pKirby, const _float fTimeDelta)
     __super::Update(pKirby, fTimeDelta);
 
     Update_FallState(pKirby);
+
+    m_bGuardReserved = false;
 }
 
 void CKirby_Fall::Exit(CKirby* pKirby)
@@ -128,6 +130,18 @@ _bool CKirby_Fall::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 
             return true;
         }
+        // Guard
+        case KIRBY_COMMAND_TYPE::GUARD:
+        {
+            if (!pCommand->IsPress())
+                return false;
+
+            if (pKirby->Has_Deform())
+                return true;
+
+            m_bGuardReserved = true;
+            return true;
+        }
     }
 
     return false;
@@ -153,8 +167,17 @@ void CKirby_Fall::Update_FallState(CKirby* pKirby)
                 pAnimator = pKirby_Body->Get_Animator();
             }
 
+            if (m_bGuardReserved)
+            {
+                pKirby->Change_State(KIRBY_STATE_TYPE::GUARD);
+                return;
+            }
+
             if (pAnimator->Is_Finished())
+            {
                 Transition_Wait_OR_Run(pKirby);
+                return;
+            }
 
             break;
         }

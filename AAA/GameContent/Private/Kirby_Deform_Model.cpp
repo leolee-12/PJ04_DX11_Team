@@ -26,7 +26,7 @@ HRESULT CKirby_Deform_Model::Initialize(void* pArg)
         return E_FAIL;
     }
 
-    KIRBY_FORM_DESC* pDesc = static_cast<KIRBY_FORM_DESC*>(pArg);
+    KIRBY_DEFORM_MODEL_DESC* pDesc = static_cast<KIRBY_DEFORM_MODEL_DESC*>(pArg);
 
     m_pHitFlashIntensity = pDesc->pHitFlashIntensity;
     m_pHitFlashColor = pDesc->pHitFlashColor;

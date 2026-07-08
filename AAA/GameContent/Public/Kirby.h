@@ -39,7 +39,7 @@ class CKirby final : public CCharacter
 	GENERATED_BODY(CKirby)
 
 public:
-	enum KIRBY_COLLIDER { HURT_BOX, INHALE_BOX, CAR_BOOST_COLLIDER ,COLLIDER_END };
+	enum KIRBY_COLLIDER { HURT_BOX, INHALE_BOX ,COLLIDER_END };
 
 	struct KIRBY_BODY_DESC : public CContainerObject::COTAINEROBJECT_DESC
 	{
@@ -52,7 +52,7 @@ public:
 	static constexpr _float s_fCCT_Height = 0.1f;
 	
 	static constexpr _float s_fGroundFriction = 40.f;
-	static constexpr _float s_fMaxHorizontalSpeed = 8.f;
+	static constexpr _float s_fMaxHorizontalSpeed = 9.f;
 
 	static constexpr _float s_fLinearDrag = 0.9f;
 	static constexpr _float s_fFallVelocityY = -7.f;
@@ -157,7 +157,7 @@ public:
 
 private:
 	HRESULT Ready_Components();
-	void	SetUp_Collider_Callback();
+	HRESULT	SetUp_Collider_Callback();
 	HRESULT Ready_PartObjects();
 	HRESULT Ready_System();
 	HRESULT Ready_Ability();

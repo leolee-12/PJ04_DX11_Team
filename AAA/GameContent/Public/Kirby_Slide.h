@@ -12,13 +12,18 @@ NS_BEGIN(Client)
 class CKirby;
 class CKirby_Body;
 
-enum GETABILITY_STATE_FLAG { GETABILITY_DEFAULT, ESSENCE };
-
-class CLIENT_DLL CKirby_GetAbility final : public CKirby_State
+class CLIENT_DLL CKirby_Slide final : public CKirby_State
 {
 private:
-	CKirby_GetAbility();
-	virtual ~CKirby_GetAbility() = default;
+	enum SLIDE_STATE { SLIDE_START, SLIDE, SLIDE_END, STATE_END };
+
+private:
+	static constexpr _float s_fSlideGroundFriction = 30.f;
+	static constexpr _float s_fMaxSlideHorizontalSpeed = 27.f;
+
+private:
+	CKirby_Slide();
+	virtual ~CKirby_Slide() = default;
 
 private:
 	HRESULT Initialize();
@@ -36,21 +41,20 @@ public:
 public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
 
-public:
-	virtual _bool Ignore_TimeScale() { return true; }
+private:
+	void Change_SlideState(CKirby* pKirby, SLIDE_STATE eNextState);
+	void Enter_SlideState(CKirby* pKirby, SLIDE_STATE eState);
+	void Update_SlideState(CKirby* pKirby, const _float fTimeDelta);
+	void Exit_SlideState(CKirby* pKirby, SLIDE_STATE eState);
 
 private:
-	_bool m_bPartsOn{};
-	_bool m_bCloseEye{};
-	_bool m_bOpenMouse{};
+	SLIDE_STATE m_eSlideState{ STATE_END };
 
-private:
-	void Parts_On(CKirby* pKirby, _float fRatio);
-	void Close_Eye(CKirby_Body* pBody, _float fRatio);
-	void Open_Mouse(CKirby_Body* pBody, _float fRatio);
+	_float3 m_vSlideDir{};
+	_float m_fSlideTime{};
 
 public:
-	static CKirby_GetAbility* Create();
+	static CKirby_Slide* Create();
 private:
 	virtual void Free() override;
 };
