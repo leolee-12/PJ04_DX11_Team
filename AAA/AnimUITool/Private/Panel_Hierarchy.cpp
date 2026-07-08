@@ -13,6 +13,7 @@
 #include "PartObject.h"
 #include "Model.h"
 #include "Animator.h"
+#include "UI_CoordinatorContainer.h"
 
 CPanel_Hierarchy::CPanel_Hierarchy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPanel(pDevice, pContext)
@@ -232,6 +233,8 @@ void CPanel_Hierarchy::Render_UIHierarchy()
 
     CUIContainerObject* pPendingDeleteContainer = nullptr;
     CUIContainerObject* pPartDeleteOwner = nullptr;
+    CUICoordinatorContainer* pChildDeleteCoord = nullptr;
+    _wstring strChildDeleteTag;
     _wstring strPartDeleteTag;
 
     for (auto& Entry : UIContainers)
@@ -447,31 +450,117 @@ void CPanel_Hierarchy::Render_UIHierarchy()
                 }
             }
 
+            if (auto* pCoord = dynamic_cast<Client::CUICoordinatorContainer*>(pContainer))
+            {
+                for (const _wstring& childTag : pCoord->Get_ChildOrder())
+                {
+                    CUIContainerObject* pChild = pCoord->Find_Child(childTag);
+                    if (!pChild)
+                        continue;
+
+                    ImGui::PushID(pChild);
+
+                    if (ImGui::SmallButton("X"))
+                    {
+                        pChildDeleteCoord = pCoord;
+                        strChildDeleteTag = childTag;
+                    }
+                    ImGui::SameLine();
+
+                    const _bool bChildSelected =
+                        UIContext.Selection.pContainer == pChild &&
+                        UIContext.Selection.pPart == nullptr;
+
+                    ImGuiTreeNodeFlags eChildFlags =
+                        ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+                    if (bChildSelected)
+                        eChildFlags |= ImGuiTreeNodeFlags_Selected;
+
+                    std::string strChildName = "[child] " + ToUtf8(childTag);
+                    const _bool bChildOpen = ImGui::TreeNodeEx(strChildName.c_str(), eChildFlags);
+
+                    if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+                        m_pPanel_Manager->Set_UISelected(pChild, nullptr, L"");
+
+                    if (bChildOpen)
+                    {
+                        const auto& ChildParts = pChild->Get_UIPartObjects();
+                        if (ChildParts.empty())
+                        {
+                            ImGui::TextDisabled("(no parts)");
+                        }
+                        else
+                        {
+                            for (const auto& Pair : ChildParts)
+                            {
+                                CUIPartObject* pPart = Pair.second;
+                                if (!pPart)
+                                    continue;
+
+                                const _bool bPartSel =
+                                    UIContext.Selection.pContainer == pChild &&
+                                    UIContext.Selection.pPart == pPart &&
+                                    UIContext.Selection.strPartTag == Pair.first;
+
+                                ImGui::PushID(pPart);
+
+                                if (ImGui::SmallButton("X"))
+                                {
+                                    pPartDeleteOwner = pChild;
+                                    strPartDeleteTag = Pair.first;
+                                }
+                                ImGui::SameLine();
+
+                                if (ImGui::Selectable(ToUtf8(Pair.first).c_str(), bPartSel,
+                                    ImGuiSelectableFlags_SpanAvailWidth))
+                                    m_pPanel_Manager->Set_UISelected(pChild, pPart, Pair.first);
+
+                                ImGui::PopID();
+                            }
+                        }
+                        ImGui::TreePop();
+                    }
+
+                    ImGui::PopID();
+                }
+            }
+
             ImGui::TreePop();
         }
 
         ImGui::PopID();
-      }
+    }
 
-      if (pPartDeleteOwner)
-      {
-          if (UIContext.Selection.pContainer == pPartDeleteOwner &&
-              UIContext.Selection.strPartTag == strPartDeleteTag)
-              m_pPanel_Manager->Set_UISelected(pPartDeleteOwner, nullptr, L"");
+    if (pPartDeleteOwner)
+    {
+        if (UIContext.Selection.pContainer == pPartDeleteOwner &&
+            UIContext.Selection.strPartTag == strPartDeleteTag)
+            m_pPanel_Manager->Set_UISelected(pPartDeleteOwner, nullptr, L"");
+    
+        pLevel->Remove_UIPart(pPartDeleteOwner, strPartDeleteTag);
+        UIContext.bDirty = true;
+    }
+    
+    if (pPendingDeleteContainer)
+    {
+        if (UIContext.Selection.pContainer == pPendingDeleteContainer)
+            m_pPanel_Manager->Clear_UISelected();
+    
+        pLevel->Delete_UIContainer(pPendingDeleteContainer);
+        UIContext.bDirty = true;
+    }
 
-          pLevel->Remove_UIPart(pPartDeleteOwner, strPartDeleteTag);
-          UIContext.bDirty = true;
-      }
+    if (pChildDeleteCoord)
+    {
+        // 선택이 지워질 자식이면 코디네이터로 선택 이동
+        if (auto* pDelChild = pChildDeleteCoord->Find_Child(strChildDeleteTag))
+            if (UIContext.Selection.pContainer == pDelChild)
+                m_pPanel_Manager->Set_UISelected(pChildDeleteCoord, nullptr, L"");
 
-      if (pPendingDeleteContainer)
-      {
-          if (UIContext.Selection.pContainer == pPendingDeleteContainer)
-              m_pPanel_Manager->Clear_UISelected();
-
-          pLevel->Delete_UIContainer(pPendingDeleteContainer);
-          UIContext.bDirty = true;
-      }
- }
+        pChildDeleteCoord->Remove_Child(strChildDeleteTag);
+        UIContext.bDirty = true;
+    }
+}
 
 const _char* CPanel_Hierarchy::Get_RenderLayerName(RENDERUIID eRenderLayer)
 {

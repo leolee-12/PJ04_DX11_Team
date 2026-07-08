@@ -33,6 +33,7 @@ float2 g_vEffectTiling = float2(1.f, 1.f);
 float2 g_vEffectOffset = float2(0.f, 0.f);
 
 float4 g_vColor = { 1.f, 1.f, 1.f, 1.f };
+float4 g_vColor2 = { 1.f, 1.f, 1.f, 1.f };
 float4 g_vUVTransform = { 1.f, 1.f, 0.f, 0.f };
 
 Texture2D g_Texture;
@@ -328,6 +329,23 @@ PS_OUT PS_CURTAINFILL(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_TWOCOLOR(PS_IN In)
+{
+    PS_OUT Out;
+    float2 uv = ApplyUVTransform(In.vTexcoord);
+    Out.vColor = g_Texture.Sample(UISampler, uv).rgba;
+    Out.vColor.rgb = lerp(g_vColor.rgb, g_vColor2.rgb, Out.vColor.rgb);
+    Out.vColor.a *= g_fAlpha;
+
+    if (Out.vColor.a <= 0.f)
+        discard;
+
+    if (g_bAlphaTest && Out.vColor.a <= g_fTestAlpha)
+        discard;
+
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass UI // pass 0
@@ -448,5 +466,15 @@ technique11 DefaultTechnique
         SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
         SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0, PS_CURTAINFILL())); // PS 그대로 재사용
+    }
+
+    pass TwoColorPass // pass 12
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Z_Disable, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
+        SetGeometryShader(NULL);
+        SetPixelShader(CompileShader(ps_5_0, PS_TWOCOLOR()));
     }
 }

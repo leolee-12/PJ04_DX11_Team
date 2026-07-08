@@ -154,6 +154,9 @@ void CBossBase::Publish_Boss_Appeared()
     desc.fMaxHP = m_fMaxHP;
     desc.fCurrHp = m_fCurHP;
     m_pGameInstance_Proxy->Publish(EventTag::Boss_HP_Appeared, &desc);
+
+    _bool bShow = true;
+    m_pGameInstance_Proxy->Publish(EventTag::HUD_SetVisible, &bShow);
 }
 
 void CBossBase::Publish_HP()

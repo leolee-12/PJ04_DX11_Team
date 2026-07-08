@@ -6,8 +6,7 @@
 
 #include "Loader_Prototype.h"
 #include "GameObject_Factory.h"
-#include "Effect_Loader.h"
-#include "Projectile_Manager.h"
+#include "Singleton_Destroyer.h"
 
 CEditorApp::CEditorApp()
 {
@@ -189,8 +188,8 @@ void CEditorApp::Free()
 {
     __super::Free();
 
-    CEffect_Loader::DestroyInstance();
-    CProjectile_Manager::DestroyInstance();
+    CSingleton_Destroyer::Destroy_GameContent_Singletons();
+
     Safe_Release(m_pRTV);
     Safe_Release(m_pSRV);
     Safe_Release(m_pDSV);
@@ -203,6 +202,4 @@ void CEditorApp::Free()
     Safe_Release(m_pContext);
 
     CGameInstance::DestroyInstance();
-
-    CGameObject_Factory::DestroyInstance();
 }
