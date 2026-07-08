@@ -67,21 +67,12 @@ void CKirby_AbilityDump::Exit(CKirby* pKirby)
 
 void CKirby_AbilityDump::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
 {
-
 }
 
 _bool CKirby_AbilityDump::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
     if (__super::Handle_Command(pKirby, pCommand))
         return true;
-
-    KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
-
-    //switch (eCommandType)
-    //{
-    //    default:
-    //        break;
-    //}
 
     return false;
 }
@@ -92,6 +83,7 @@ void CKirby_AbilityDump::Parts_Off(CKirby* pKirby, _float fRatio)
     {
         pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), false);
         pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::NORMAL);
+        pKirby->Apply_ChangeKirbyAbility();
         m_bPartsOff = true;
     }
 }

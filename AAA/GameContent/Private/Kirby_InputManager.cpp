@@ -149,15 +149,17 @@ void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
         ProcessCommand(pCommand);
     }
 
-    // Q, E
+    // L, R
     if (m_pGameInstance_Proxy->Key_Pressing(DIK_Q) ||
-        m_pGameInstance_Proxy->Key_Pressing(DIK_E))
+        m_pGameInstance_Proxy->Key_Pressing(DIK_E) ||
+        m_pGameInstance_Proxy->Key_Pressing(DIK_LCONTROL))
     {
         pCommand = new Guard_Command(KEY_STATE_TYPE::PRESS);
         ProcessCommand(pCommand);
     }
     if (m_pGameInstance_Proxy->Key_Up(DIK_Q) ||
-        m_pGameInstance_Proxy->Key_Up(DIK_E))
+        m_pGameInstance_Proxy->Key_Up(DIK_E) ||
+        m_pGameInstance_Proxy->Key_Up(DIK_LCONTROL))
     {
         pCommand = new Guard_Command(KEY_STATE_TYPE::UP);
         ProcessCommand(pCommand);

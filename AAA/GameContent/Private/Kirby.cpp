@@ -7,6 +7,8 @@
 #include "Controller.h"
 
 #include "GameContent_const.h"
+#include "Effect_Loader.h"
+
 #include "Movement_Child.h"
 
 // Parts
@@ -32,7 +34,7 @@
 // Ladder
 #include "LevelDesign_Ladder.h"
 
-#include "Effect_Loader.h"
+#include "EssenceBubble.h"
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCharacter{ pDevice, pContext }
@@ -70,7 +72,8 @@ HRESULT CKirby::Initialize(void* pArg)
     if (FAILED(Ready_System()))
         return E_FAIL;
 
-    SetUp_Collider_Callback();
+    if (FAILED(SetUp_Collider_Callback()))
+        return E_FAIL;
 
     // Part 생성된 후
     if (FAILED(Ready_AnimEvents()))
@@ -421,24 +424,11 @@ HRESULT CKirby::Ready_Components()
     m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX]->Set_Enabled(false);
     m_pGameInstance_Proxy->Register_Collider(m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX], ETOUI(COLLISION_LAYER::PLAYER_INHALE));
 
-    // Wall Breaker Collider
-    CCollider::COLLIDER_DESC WallBreakerDesc{};
-    WallBreakerDesc.pOwner = this;
-    WallBreakerDesc.vCenter = _float3(0.f, 1.5f, 1.3f);
-    WallBreakerDesc.fRadius = 2.f;
-
-    m_KirbyColliders[KIRBY_COLLIDER::CAR_BOOST_COLLIDER] = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
-        TEXT("WallBreakerCollider_Com"), &WallBreakerDesc);
-    if (m_KirbyColliders[KIRBY_COLLIDER::CAR_BOOST_COLLIDER] == nullptr)
-        return E_FAIL;
-
-    m_KirbyColliders[KIRBY_COLLIDER::CAR_BOOST_COLLIDER]->Set_Enabled(false);
-     m_pGameInstance_Proxy->Register_Collider(m_KirbyColliders[KIRBY_COLLIDER::CAR_BOOST_COLLIDER], ETOUI(COLLISION_LAYER::CAR_BOOST));
-
     //임시
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::MONSTER_PROJECTILE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::ENV_HURT));
+    //m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::ESSENCE_BUBBLE));      // Dropped Bubble 구현시 등록
 
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HIT));
@@ -446,6 +436,7 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_D_RANGE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_TRIGGER));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_LADDER));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ESSENCE_BUBBLE));
 
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT),        ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT),        ETOUI(COLLISION_LAYER::ENV_HURT));
@@ -453,6 +444,7 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE), ETOUI(COLLISION_LAYER::ENV_HURT));
 
+    // Kirby_DeformCar_Main
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::CAR_BOOST), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::CAR_BOOST), ETOUI(COLLISION_LAYER::ENV_TRIGGER));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::CAR_BOOST), ETOUI(COLLISION_LAYER::ENV_HURT));
@@ -460,37 +452,50 @@ HRESULT CKirby::Ready_Components()
     return S_OK;
 }
 
-void CKirby::SetUp_Collider_Callback()
+HRESULT CKirby::SetUp_Collider_Callback()
 {
-    if (m_KirbyColliders[HURT_BOX])
-    {
-        m_KirbyColliders[HURT_BOX]->Set_OnEnter(
-            [this](CCollider* pOther)
+    if (m_KirbyColliders[HURT_BOX] == nullptr)
+        return E_FAIL;
+
+    m_KirbyColliders[HURT_BOX]->Set_OnEnter(
+        [this](CCollider* pOther)
+        {
+            const _uint iGroup = pOther->Get_RegisteredGroup();
+            CGameObject* pGameObject = pOther->Get_Owner();
+
+            if (iGroup == ETOUI(COLLISION_LAYER::MONSTER_HURT))
             {
-                const _uint iGroup = pOther->Get_RegisteredGroup();
+                CMonster* pMonster = dynamic_cast<CMonster*>(pGameObject);
+                if (pMonster == nullptr)
+                    return;
 
-                if (iGroup == ETOUI(COLLISION_LAYER::MONSTER_HURT))
-                {
-                    CMonster* pMon = dynamic_cast<CMonster*>(pOther->Get_Owner());
-                    if (pMon && !pMon->Is_Touch_Harmful())
-                        return;
+                if (!pMonster->Is_Touch_Harmful())
+                    return;
 
-                    _vector vAtkPos = pOther->Get_Owner()->Get_Transform()->Get_State(STATE::POSITION);
-                    ATTACK_INFO atk{};
-                    atk.fDamage = 10.f;
-                    atk.fKnockback = 2.f;                     
-                    XMStoreFloat3(&atk.vAttackerPos, vAtkPos);
-                    atk.pAttacker = pOther->Get_Owner();
-                    Damaged(atk);
+                ATTACK_INFO tAttackDesc{};
+                tAttackDesc.eHitType = HIT_TYPE::BODY_CONTACT;
+                tAttackDesc.pAttacker = pMonster;
+                XMStoreFloat3(&tAttackDesc.vAttackerPos,
+                    pMonster->Get_Transform()->Get_State(STATE::POSITION));
+                tAttackDesc.fDamage = 10.f;
+                tAttackDesc.fKnockback = 2.f;
+                Damaged(tAttackDesc);
 #ifdef _DEBUG
-                    char szBuf[128];
-                    sprintf_s(szBuf, "[Kirby] Hurt! HP %.0f/%.0f\n", m_fCurHP, m_fMaxHP);
-                    OutputDebugStringA(szBuf);
+                char szBuf[128];
+                sprintf_s(szBuf, "[Kirby] Hurt! HP %.0f/%.0f\n", m_fCurHP, m_fMaxHP);
+                OutputDebugStringA(szBuf);
 #endif
-                }
             }
-        );
-    }
+            else if (iGroup == ETOUI(COLLISION_LAYER::ESSENCE_BUBBLE))
+            {
+                CEssenceBubble *pEssenceBubble = dynamic_cast<CEssenceBubble*>(pGameObject);
+                if (pEssenceBubble == nullptr)
+                    return;
+
+                m_pKirby_StateMachine->Get_EssenceBubble(pEssenceBubble->Get_Ability());
+            }
+        }
+    );
 
     m_KirbyColliders[HURT_BOX]->Set_OnStay
     (
@@ -522,6 +527,8 @@ void CKirby::SetUp_Collider_Callback()
             }
         }
     );
+
+    return S_OK;
 }
 
 HRESULT CKirby::Ready_PartObjects()

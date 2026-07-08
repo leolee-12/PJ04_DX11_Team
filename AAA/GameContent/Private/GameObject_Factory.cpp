@@ -166,6 +166,12 @@
 #include "EnemyBomb.h"
 #include "Spit_Projectile.h"
 
+// Ability Bubble
+#include "EssenceBubble.h"
+#include "DroppedBubble.h"
+
+#include "Ability_Model.h"
+
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
 #define CREATOR(CLASS) \
@@ -647,6 +653,22 @@ void CGameObject_Factory::Register_Container()
         )
     );
 
+
+    // Ability Bubble - EssenceBubble
+    Register
+    (
+        CEssenceBubble::PROTOTYPE_TAG, TEXT("Bubble"),
+        CREATOR(CEssenceBubble),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CAbility_Model::PROTOTYPE_TAG,
+                CAbility_Model::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Sword"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Sword/Sword.ysh"));
+
+        )
+
+    );
 
 }
 

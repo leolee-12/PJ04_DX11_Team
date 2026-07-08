@@ -2,13 +2,15 @@
 
 #include "GameInstance.h"
 
+#include "Monster.h"
+
 CKirby_DeformCar_Main::CKirby_DeformCar_Main(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CKirby_Deform_Model(pDevice, pContext)
+    : CKirby_HitBox_Model(pDevice, pContext)
 {
 }
 
 CKirby_DeformCar_Main::CKirby_DeformCar_Main(const CKirby_DeformCar_Main& Prototype)
-    : CKirby_Deform_Model(Prototype)
+    : CKirby_HitBox_Model(Prototype)
 {
 }
 
@@ -26,6 +28,9 @@ HRESULT CKirby_DeformCar_Main::Initialize(void* pArg)
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
+        return E_FAIL;
+
+    if (FAILED(SetUp_Collider_Callback()))
         return E_FAIL;
 
     m_bActive = false;
@@ -142,6 +147,56 @@ HRESULT CKirby_DeformCar_Main::Ready_Components()
     if (m_pAnimatorCom == nullptr || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
         return E_FAIL;
 
+    // Wall Breaker Collider
+    CCollider::COLLIDER_DESC WallBreakerDesc{};
+    WallBreakerDesc.pOwner = this;
+    WallBreakerDesc.vCenter = _float3(0.f, 1.5f, 1.5f);
+    WallBreakerDesc.fRadius = 2.f;
+
+    m_pHitBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
+        TEXT("WallBreakerCollider_Com"), &WallBreakerDesc);
+    if (m_pHitBox == nullptr)
+        return E_FAIL;
+
+    m_pHitBox->Set_Enabled(false);
+    m_pGameInstance_Proxy->Register_Collider(m_pHitBox, ETOUI(COLLISION_LAYER::CAR_BOOST));
+
+    return S_OK;
+}
+
+HRESULT CKirby_DeformCar_Main::SetUp_Collider_Callback()
+{
+    if (m_pHitBox == nullptr)
+        return E_FAIL;
+
+    m_pHitBox->Set_OnEnter
+    (
+        [this](CCollider* pOther)
+        {
+            const _uint iGroup = pOther->Get_RegisteredGroup();
+            CGameObject* pGameObject = pOther->Get_Owner();
+
+            if (iGroup == ETOUI(COLLISION_LAYER::MONSTER_HURT))
+            {
+                CMonster* pMonster = dynamic_cast<CMonster*>(pGameObject);
+                if (pMonster == nullptr)
+                    return;
+
+                ATTACK_INFO tDesc{};
+                tDesc.eHitType = HIT_TYPE::CAR_BOOSTER_HIT;
+                tDesc.pAttacker = this;
+                tDesc.vAttackerPos = {
+                    m_CombinedWorldMatrix._41,
+                    m_CombinedWorldMatrix._42,
+                    m_CombinedWorldMatrix._43
+                };
+                tDesc.fDamage = 0.f;
+                tDesc.fKnockback = 0.f;
+                pMonster->Damaged(tDesc);
+            }
+        }
+    );
+
     return S_OK;
 }
 
@@ -173,5 +228,7 @@ CGameObject* CKirby_DeformCar_Main::Clone(void* pArg)
 
 void CKirby_DeformCar_Main::Free()
 {
+    m_pHitBox = nullptr;
+
     __super::Free();
 }

@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Public\Ability_Bubble.h" />
+    <ClInclude Include="..\Public\Ability_Model.h" />
     <ClInclude Include="..\Public\Ancor_WorkingDirectory.h" />
     <ClInclude Include="..\Public\BladeKnight_Body.h" />
     <ClInclude Include="..\Public\BladeKnight_Brain.h" />
@@ -70,11 +72,15 @@
     <ClInclude Include="..\Public\Common_Curve03.h" />
     <ClInclude Include="..\Public\Common_JumpSlash.h" />
     <ClInclude Include="..\Public\Common_Ring03.h" />
+    <ClInclude Include="..\Public\DroppedBubble.h" />
+    <ClInclude Include="..\Public\EssenceBubble.h" />
     <ClInclude Include="..\public\GameContent_pch.h" />
     <ClInclude Include="..\Public\Kirby_AttackMode.h" />
     <ClInclude Include="..\Public\Kirby_CarFirstBreakWall.h" />
     <ClInclude Include="..\Public\Kirby_Clear.h" />
     <ClInclude Include="..\Public\Kirby_Dodge.h" />
+    <ClInclude Include="..\Public\Kirby_HitBox_Model.h" />
+    <ClInclude Include="..\Public\Kirby_Slide.h" />
     <ClInclude Include="..\Public\LD_ArrowBoard.h" />
     <ClInclude Include="..\Public\LD_DeformCarBreakWall.h" />
     <ClInclude Include="..\Public\LD_DeformObject.h" />
@@ -84,6 +90,7 @@
     <ClInclude Include="..\Public\LD_SlopeBoardC.h" />
     <ClInclude Include="..\Public\LD_AudioArea.h" />
     <ClInclude Include="..\Public\LD_Stage1BossDemo.h" />
+    <ClInclude Include="..\Public\LD_CopyEssence.h" />
     <ClInclude Include="..\public\Mission_Manager.h" />
     <ClInclude Include="..\Public\Monster_State_Flatten.h" />
     <ClInclude Include="..\Public\Monster_State_Spat.h" />
@@ -344,6 +351,8 @@
     <ClInclude Include="..\Public\WalkSmoke.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Private\Ability_Bubble.cpp" />
+    <ClCompile Include="..\Private\Ability_Model.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Body.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Brain.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State_Attack.cpp" />
@@ -388,6 +397,7 @@
     <ClCompile Include="..\Private\CarMilkyWay.cpp" />
     <ClCompile Include="..\Private\Car_00_MilkyWay.cpp" />
     <ClCompile Include="..\Private\CommonHit.cpp" />
+    <ClCompile Include="..\Private\DroppedBubble.cpp" />
     <ClCompile Include="..\Private\EnvTrigger_EventPublisher.cpp" />
     <ClCompile Include="..\Private\EnvTrigger_RenderGlobals.cpp" />
     <ClCompile Include="..\Private\Character.cpp" />
@@ -395,6 +405,7 @@
     <ClCompile Include="..\Private\Common_Curve03.cpp" />
     <ClCompile Include="..\Private\Common_JumpSlash.cpp" />
     <ClCompile Include="..\Private\Common_Ring03.cpp" />
+    <ClCompile Include="..\Private\EssenceBubble.cpp" />
     <ClCompile Include="..\private\GameContent_pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -403,6 +414,8 @@
     <ClCompile Include="..\Private\Kirby_CarFirstBreakWall.cpp" />
     <ClCompile Include="..\Private\Kirby_Clear.cpp" />
     <ClCompile Include="..\Private\Kirby_Dodge.cpp" />
+    <ClCompile Include="..\Private\Kirby_HitBox_Model.cpp" />
+    <ClCompile Include="..\Private\Kirby_Slide.cpp" />
     <ClCompile Include="..\Private\LD_ArrowBoard.cpp" />
     <ClCompile Include="..\Private\LD_DeformCarBreakWall.cpp" />
     <ClCompile Include="..\Private\LD_DeformObject.cpp" />
@@ -412,6 +425,7 @@
     <ClCompile Include="..\Private\LD_SlopeBoardC.cpp" />
     <ClCompile Include="..\Private\LD_AudioArea.cpp" />
     <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp" />
+    <ClCompile Include="..\Private\LD_CopyEssence.cpp" />
     <ClCompile Include="..\private\Mission_Manager.cpp" />
     <ClCompile Include="..\Private\Monster_State_Flatten.cpp" />
     <ClCompile Include="..\Private\Monster_State_Spat.cpp" />
