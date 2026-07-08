@@ -17,7 +17,12 @@ private:
 	CKirby_QTE_Grabbed();
 	virtual ~CKirby_QTE_Grabbed() = default;
 
-	enum QTE_GRABBED_STATE { START, ESCAPE, GRABBED_STATE_END };
+	enum QTE_GRABBED_STATE
+	{
+		START, ESCAPE,
+		SLAM_SPIN, FAINT, WAKEUP,
+		GRABBED_STATE_END
+	};
 
 private:
 	HRESULT Initialize();
@@ -34,7 +39,7 @@ public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
 public:
-	virtual void Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType) override;
+	virtual void Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType) override;
 
 private:
 	void Change_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE eNext);
@@ -46,9 +51,12 @@ private:
 	QTE_GRABBED_STATE m_eQTEGrabbedState{ QTE_GRABBED_STATE:: GRABBED_STATE_END };
 
 	_bool m_bPublishedEvent{};
-	_float m_fQTE_TimeLimit{};
 	_uint m_iQTE_InputCount{};
 	_uint m_iQTE_RequiredCount{};
+
+	_float m_fSpinAccTime{};
+
+	_bool m_bDidSmallJump{};
 
 public:
 	static CKirby_QTE_Grabbed* Create();

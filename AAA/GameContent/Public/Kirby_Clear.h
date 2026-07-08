@@ -11,11 +11,14 @@ NS_BEGIN(Client)
 class CKirby;
 class CKirby_Body;
 
-class CLIENT_DLL CKirby_CutSceneGrabbed final : public CKirby_State
+class CLIENT_DLL CKirby_Clear final : public CKirby_State
 {
 private:
-	CKirby_CutSceneGrabbed();
-	virtual ~CKirby_CutSceneGrabbed() = default;
+	enum CLEAR_STATE { CUT1, DANCE, CLEAR_END };
+
+private:
+	CKirby_Clear();
+	virtual ~CKirby_Clear() = default;
 
 private:
 	HRESULT Initialize();
@@ -32,10 +35,19 @@ public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
 public:
-	virtual void Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType) override;
+	virtual void Request_StageClear(CKirby* pKirby, const CUTSCENE_STAGECLEAR* pDesc) override;
+
+private:
+	void Change_ClearState(CKirby* pKirby, CLEAR_STATE eNext);
+	void Enter_ClearState(CKirby* pKirby, CLEAR_STATE eState);
+	void Update_ClearState(CKirby* pKirby, _float fTimeDelta);
+	void Exit_ClearState(CKirby* pKirby, CLEAR_STATE eState);
+	
+private:
+	CLEAR_STATE m_eClearState{};
 
 public:
-	static CKirby_CutSceneGrabbed* Create();
+	static CKirby_Clear* Create();
 private:
 	virtual void Free() override;
 };

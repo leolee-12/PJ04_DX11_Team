@@ -166,7 +166,11 @@ void CKirby_State::Request_GrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eT
     }
 }
 
-void CKirby_State::Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType)
+void CKirby_State::Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType)
+{
+}
+
+void CKirby_State::Request_StageClear(CKirby* pKirby, const CUTSCENE_STAGECLEAR* pDesc)
 {
 }
 

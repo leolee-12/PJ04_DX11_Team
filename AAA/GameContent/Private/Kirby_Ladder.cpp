@@ -37,7 +37,7 @@ void CKirby_Ladder::Enter(CKirby* pKirby, _int iFlag)
     CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
     pAbility->Clear_Overlay(pKirby);
 
-    pKirby->Set_WeaponLadderState(true);
+    pKirby->Put_WeaponOnBack(true);
 
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Stop();
@@ -104,7 +104,7 @@ void CKirby_Ladder::Exit(CKirby* pKirby)
     pMovement->Set_UseGravity(true);
     pMovement->Set_LinearDrag(CKirby::s_fLinearDrag);
 
-    pKirby->Set_WeaponLadderState(false);
+    pKirby->Put_WeaponOnBack(false);
 }
 
 _bool CKirby_Ladder::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -179,7 +179,7 @@ void CKirby_Ladder::Enter_LadderState(CKirby* pKirby, LADDER_STATE eState)
         }
         case LADDER_STATE::LADDER_TOP_JUMP:
         {
-            pKirby->Set_WeaponLadderState(false);
+            pKirby->Put_WeaponOnBack(false);
 
             pKirby->Get_KirbyAbility()->Play_AbilityAni(pKirby, ABILITY_ANI::JUMP_END_L);
             CMovement_Child* pMovement = pKirby->Get_Movement();

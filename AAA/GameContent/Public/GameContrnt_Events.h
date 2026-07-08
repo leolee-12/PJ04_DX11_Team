@@ -78,6 +78,7 @@ namespace Client
     {
         GORILLA_SCENE_HANDOFF,
         GORILLA_COMBAT_ESCAPE, GORILLA_COMBAT_THROWN,
+        DEFORM_CAR_GET_FIRST_RELEASE,
         DEFAULT_RELEASE
     };
     struct KIRBY_ATTACHMENT_END_DESC
@@ -174,7 +175,7 @@ namespace Client
 
     struct CUTSCENE_STAGECLEAR
     {
-        _float3 vPos = { 0.f, 0.f, 0.f };
+        _float4x4 AnchorWorld {};
         STAGECLEAR_ANIM eAnim{ STAGECLEAR_ANIM::_COUNT };
         _float fAnimSpeed { 1.f };
         _float fBlendDuration = { 0.f };

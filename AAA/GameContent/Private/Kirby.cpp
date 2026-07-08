@@ -94,14 +94,6 @@ void CKirby::Update(_float fTimeDelta)
     if (m_pKirby_StateMachine->Ignore_TimeScale_StateMachine())
         fTimeDelta = m_pGameInstance_Proxy->Get_RawTimeDelta(L"Timer_60");
 
-    if (m_pGameInstance_Proxy->Key_Down(DIK_F3))
-    {
-        KIRBY_ATTACHMENT_BEGIN_DESC desc{};
-        desc.eType = KIRBY_ATTACHMENT_CONTEXT::DEFORM_CAR_GET_FIRST;
-
-        m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentBegin, &desc);
-    }
-
     XMStoreFloat3(&m_vWishDir, XMVectorZero());
 
     m_pKirby_InputManager->Update_KirbyInput(fTimeDelta);
@@ -217,7 +209,7 @@ CKirby_OnOffPart* CKirby::Find_HatPart(COPY_ABILITY_TYPE eType)
     return nullptr;
 }
 
-void CKirby::Set_WeaponLadderState(_bool bOn)
+void CKirby::Put_WeaponOnBack(_bool bOn)
 {
     COPY_ABILITY_TYPE eAbilityType = m_pKirby_Ability->Get_AbilityType();
     CKirby_OnOffPart* pWeapon = Find_WeaponPart(eAbilityType);
@@ -225,7 +217,7 @@ void CKirby::Set_WeaponLadderState(_bool bOn)
     if (pWeapon == nullptr)
         return;
 
-    pWeapon->Set_LadderState(this, bOn);
+    pWeapon->Put_OnBack(this, bOn);
 }
 
 CKirby_Deform_Model* CKirby::Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY_DEFORM_MODEL_TYPE eDeformModelType)
@@ -675,7 +667,15 @@ HRESULT CKirby::Ready_Events()
         {
             const auto* pDesc = static_cast<KIRBY_ATTACHMENT_END_DESC*>(pData);
             Clear_CutsceneGrabTarget();
-            m_pKirby_StateMachine->Request_ReleaseGrabState_StateMachine();
+            m_pKirby_StateMachine->Request_ReleaseGrabState_StateMachine(pDesc->eType);
+        }
+    );
+
+    Subscribe_Event(EventTag::Cutscene_StageClear,
+        [this](void* pData)
+        {
+            const auto* pDesc = static_cast<CUTSCENE_STAGECLEAR*>(pData);
+            m_pKirby_StateMachine->Request_ClearStage_StateMachine(pDesc);
         }
     );
 
@@ -708,25 +708,16 @@ void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
 
 void CKirby::Set_CutsceneGrabTarget(KIRBY_ATTACHMENT_BEGIN_DESC* pGrabDesc)
 {
-    //if (pGrabDesc->eType == KIRBY_ATTACHMENT_CONTEXT::DEFORM_CAR_GET_FIRST)
-    //{
-    //    CUTSCENE_CAMERA_DESC cam{};
-    //    cam.eCam = ECutsceneCam::Cutscene;
-    //    cam.szTrack = L"DeformCarGetFirst_camera1";
-    //    cam.pProgress = Get_DeformPart_Model(DEFORM_TYPE::CAR)->Get_Animator();
-    //    cam.pAnchorWorld = m_pTransformCom->Get_WorldMatrixPtr();
-    //    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
-    //}
-    m_vBaseScale = Get_Transform()->Get_Scaled();
+    m_vPreAttachScale = Get_Transform()->Get_Scaled();
     m_pGrabBone = pGrabDesc->pBoneMatrix;
     m_pGrabOwnerWorld = pGrabDesc->pSourceWorld;
 }
 
 void CKirby::Clear_CutsceneGrabTarget()
 {
-    m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(m_vBaseScale.x, 0.f, 0.f, 0.f));
-    m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, m_vBaseScale.y, 0.f, 0.f));
-    m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, m_vBaseScale.z, 0.f));
+    m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(m_vPreAttachScale.x, 0.f, 0.f, 0.f));
+    m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, m_vPreAttachScale.y, 0.f, 0.f));
+    m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, m_vPreAttachScale.z, 0.f));
 
     m_pGrabBone = nullptr;
     m_pGrabOwnerWorld = nullptr;

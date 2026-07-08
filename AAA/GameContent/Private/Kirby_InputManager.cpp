@@ -42,6 +42,15 @@ void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
             ProcessCommand(pCommand);
         }
     }
+    if (m_pGameInstance_Proxy->Key_Down(DIK_W))
+    {
+        _float3 vDir{};
+        if (Cal_MoveDir(MOVE_DIR::TOP, vDir) == true)
+        {
+            pCommand = new MoveTop_Command(KEY_STATE_TYPE::DOWN, vDir);
+            ProcessCommand(pCommand);
+        }
+    }
 
     // DOWN
     if (m_pGameInstance_Proxy->Key_Pressing(DIK_S))
@@ -50,6 +59,15 @@ void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
         if (Cal_MoveDir(MOVE_DIR::DOWN, vDir))
         {
             pCommand = new MoveBottom_Command(KEY_STATE_TYPE::PRESS, vDir);
+            ProcessCommand(pCommand);
+        }
+    }
+    if (m_pGameInstance_Proxy->Key_Down(DIK_S))
+    {
+        _float3 vDir{};
+        if (Cal_MoveDir(MOVE_DIR::DOWN, vDir))
+        {
+            pCommand = new MoveBottom_Command(KEY_STATE_TYPE::DOWN, vDir);
             ProcessCommand(pCommand);
         }
     }
@@ -64,6 +82,15 @@ void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
             ProcessCommand(pCommand);
         }
     }
+    if (m_pGameInstance_Proxy->Key_Down(DIK_A))
+    {
+        _float3 vDir{};
+        if (Cal_MoveDir(MOVE_DIR::LEFT, vDir))
+        {
+            pCommand = new MoveLeft_Command(KEY_STATE_TYPE::DOWN, vDir);
+            ProcessCommand(pCommand);
+        }
+    }
 
     // RIGHT
     if (m_pGameInstance_Proxy->Key_Pressing(DIK_D))
@@ -72,6 +99,15 @@ void CKirby_InputManager::Update_KirbyInput(_float fTimeDelta)
         if (Cal_MoveDir(MOVE_DIR::RIGHT, vDir))
         {
             pCommand = new MoveRight_Command(KEY_STATE_TYPE::PRESS, vDir);
+            ProcessCommand(pCommand);
+        }
+    }
+    if (m_pGameInstance_Proxy->Key_Down(DIK_D))
+    {
+        _float3 vDir{};
+        if (Cal_MoveDir(MOVE_DIR::RIGHT, vDir))
+        {
+            pCommand = new MoveRight_Command(KEY_STATE_TYPE::DOWN, vDir);
             ProcessCommand(pCommand);
         }
     }
