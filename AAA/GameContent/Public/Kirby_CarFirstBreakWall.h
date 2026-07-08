@@ -36,10 +36,6 @@ public:
 public:
 	virtual void Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType) override;
 
-private:
-	_bool m_bTurnStarted{};
-	_float3 m_vLeftDir{};
-
 public:
 	static CKirby_CarFirstBreakWall* Create();
 private:

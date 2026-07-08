@@ -218,14 +218,12 @@ private:
 	unordered_map<DEFORM_TYPE, CKirby_Deform*> m_Deformations;
 
 	// CutScene Grab
-	const _float4x4* m_pGrabBone = nullptr;
-	const _float4x4* m_pGrabOwnerWorld = nullptr;
+	_float3 m_vPreAttachScale{};
+	const _float4x4* m_pGrabBone{};
+	const _float4x4* m_pGrabOwnerWorld{};
 
 	// Ladder
 	CLevelDesign_Ladder* m_pLadder{};
-
-	// À±¼®Çö Ãß°¡
-	_float3 m_vBaseScale = { 1.f, 1.f, 1.f };
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

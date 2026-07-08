@@ -29,8 +29,6 @@ void CKirby_CarFirstBreakWall::Enter(CKirby* pKirby, _int iFlag)
 {
     __super::Enter(pKirby, iFlag);
 
-    m_bTurnStarted = false;
-
     // Ani
     CKirby_Deform_Model* pModel = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR, KIRBY_DEFORM_MODEL_TYPE::MAIN);
     CAnimator* pAnimator = pModel->Get_Animator();
@@ -44,16 +42,7 @@ void CKirby_CarFirstBreakWall::Update(CKirby* pKirby, const _float fTimeDelta)
     CKirby_Deform_Model* pModel = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR, KIRBY_DEFORM_MODEL_TYPE::MAIN);
     CAnimator* pAnimator = pModel->Get_Animator();
     
-    CMovement_Child* pMovement = pKirby->Get_Movement();
-
-    _float fRatio = pAnimator->Get_Progress();
-
-    CTransform* pTransform = pKirby->Get_Transform();
-
     pKirby->Update_CutsceneGrabTransform();
-
-    if(pAnimator->Is_Finished())
-        Transition_Fall_OR_Wait_OR_Run(pKirby);
 }
 
 void CKirby_CarFirstBreakWall::Exit(CKirby* pKirby)
