@@ -24,7 +24,7 @@ class CKirby_Deform_Model abstract : public CPartObject
 	GENERATED_BODY_ABSTRACT(CKirby_Deform_Model)
 
 public:
-	struct KIRBY_FORM_DESC : public CPartObject::PARTOBJECT_DESC
+	struct KIRBY_DEFORM_MODEL_DESC : public CPartObject::PARTOBJECT_DESC
 	{
 		const _float* pHitFlashIntensity{};
 		const _float3* pHitFlashColor{};

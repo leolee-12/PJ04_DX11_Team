@@ -12,7 +12,7 @@ class CKirby_DeformCar_Demo final : public CKirby_Deform_Model
 	GENERATED_BODY(CKirby_DeformCar_Demo)
 
 public:
-	struct KIRBY_DEFORMCAR_DEMO_DESC : public CKirby_Deform_Model::KIRBY_FORM_DESC
+	struct KIRBY_DEFORMCAR_DEMO_DESC : public CKirby_Deform_Model::KIRBY_DEFORM_MODEL_DESC
 	{
 	};
 

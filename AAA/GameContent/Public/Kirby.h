@@ -39,7 +39,7 @@ class CKirby final : public CCharacter
 	GENERATED_BODY(CKirby)
 
 public:
-	enum KIRBY_COLLIDER { HURT_BOX, INHALE_BOX, CAR_BOOST_COLLIDER ,COLLIDER_END };
+	enum KIRBY_COLLIDER { HURT_BOX, INHALE_BOX ,COLLIDER_END };
 
 	struct KIRBY_BODY_DESC : public CContainerObject::COTAINEROBJECT_DESC
 	{

@@ -421,20 +421,6 @@ HRESULT CKirby::Ready_Components()
     m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX]->Set_Enabled(false);
     m_pGameInstance_Proxy->Register_Collider(m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX], ETOUI(COLLISION_LAYER::PLAYER_INHALE));
 
-    // Wall Breaker Collider
-    CCollider::COLLIDER_DESC WallBreakerDesc{};
-    WallBreakerDesc.pOwner = this;
-    WallBreakerDesc.vCenter = _float3(0.f, 1.5f, 1.3f);
-    WallBreakerDesc.fRadius = 2.f;
-
-    m_KirbyColliders[KIRBY_COLLIDER::CAR_BOOST_COLLIDER] = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
-        TEXT("WallBreakerCollider_Com"), &WallBreakerDesc);
-    if (m_KirbyColliders[KIRBY_COLLIDER::CAR_BOOST_COLLIDER] == nullptr)
-        return E_FAIL;
-
-    m_KirbyColliders[KIRBY_COLLIDER::CAR_BOOST_COLLIDER]->Set_Enabled(false);
-     m_pGameInstance_Proxy->Register_Collider(m_KirbyColliders[KIRBY_COLLIDER::CAR_BOOST_COLLIDER], ETOUI(COLLISION_LAYER::CAR_BOOST));
-
     //юс╫ц
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::MONSTER_PROJECTILE));
@@ -453,6 +439,7 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE), ETOUI(COLLISION_LAYER::ENV_HURT));
 
+    // Kirby_DeformCar_Main
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::CAR_BOOST), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::CAR_BOOST), ETOUI(COLLISION_LAYER::ENV_TRIGGER));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::CAR_BOOST), ETOUI(COLLISION_LAYER::ENV_HURT));
@@ -468,20 +455,25 @@ void CKirby::SetUp_Collider_Callback()
             [this](CCollider* pOther)
             {
                 const _uint iGroup = pOther->Get_RegisteredGroup();
+                CGameObject* pGameObject = pOther->Get_Owner();
 
                 if (iGroup == ETOUI(COLLISION_LAYER::MONSTER_HURT))
                 {
-                    CMonster* pMon = dynamic_cast<CMonster*>(pOther->Get_Owner());
-                    if (pMon && !pMon->Is_Touch_Harmful())
+                    CMonster* pMonster = dynamic_cast<CMonster*>(pGameObject);
+                    if (pMonster == nullptr)
                         return;
 
-                    _vector vAtkPos = pOther->Get_Owner()->Get_Transform()->Get_State(STATE::POSITION);
-                    ATTACK_INFO atk{};
-                    atk.fDamage = 10.f;
-                    atk.fKnockback = 2.f;                     
-                    XMStoreFloat3(&atk.vAttackerPos, vAtkPos);
-                    atk.pAttacker = pOther->Get_Owner();
-                    Damaged(atk);
+                    if (!pMonster->Is_Touch_Harmful())
+                        return;
+
+                    ATTACK_INFO tAttackDesc{};
+                    tAttackDesc.eHitType = HIT_TYPE::BODY_CONTACT;
+                    tAttackDesc.pAttacker = pMonster;
+                    XMStoreFloat3(&tAttackDesc.vAttackerPos,
+                        pMonster->Get_Transform()->Get_State(STATE::POSITION));
+                    tAttackDesc.fDamage = 10.f;
+                    tAttackDesc.fKnockback = 2.f;       
+                    Damaged(tAttackDesc);
 #ifdef _DEBUG
                     char szBuf[128];
                     sprintf_s(szBuf, "[Kirby] Hurt! HP %.0f/%.0f\n", m_fCurHP, m_fMaxHP);

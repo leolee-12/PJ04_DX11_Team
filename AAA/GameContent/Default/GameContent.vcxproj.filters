@@ -808,9 +808,6 @@
     <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\00. Body">
       <UniqueIdentifier>{81d949c1-1101-4e64-aa3f-d769238287d9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\02. DeformCar_Main">
-      <UniqueIdentifier>{30e6faec-8ca3-4f51-a179-3a72f1929f83}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\01. DeformCar_Demo">
       <UniqueIdentifier>{bf99796d-3273-432e-a337-ddc43bb3ee3e}</UniqueIdentifier>
     </Filter>
@@ -951,6 +948,12 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\Slide">
       <UniqueIdentifier>{d47f8cec-43d6-45be-8a92-21521f57752f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model">
+      <UniqueIdentifier>{722bacb3-e3c5-48a6-b789-5ccdbd86c13f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model\02. DeformCar_Main">
+      <UniqueIdentifier>{30e6faec-8ca3-4f51-a179-3a72f1929f83}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1648,7 +1651,7 @@
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\01. DeformCar_Demo</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_DeformCar_Main.h">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\02. DeformCar_Main</Filter>
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model\02. DeformCar_Main</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_GetDeform.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\GetDeform</Filter>
@@ -1898,6 +1901,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Slide.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Slide</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_HitBox_Model.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2520,7 +2526,7 @@
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\01. DeformCar_Demo</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_DeformCar_Main.cpp">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\02. DeformCar_Main</Filter>
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model\02. DeformCar_Main</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Deform_Model.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform</Filter>
@@ -2770,6 +2776,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Slide.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Slide</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_HitBox_Model.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
