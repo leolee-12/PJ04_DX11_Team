@@ -336,7 +336,7 @@ HRESULT CLevelDesign_Bush::Ready_HurtBox()
 	if (nullptr == m_pHurtBoxCom)
 		return E_FAIL;
 
-	m_pGameInstance_Proxy->Register_Collider(m_pHurtBoxCom, ETOUI(COLLISION_LAYER::ENV_HURT));
+	m_pGameInstance_Proxy->Register_Collider(m_pHurtBoxCom, ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
 
 	return S_OK;
 }

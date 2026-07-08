@@ -310,7 +310,7 @@ HRESULT CLD_PopFlower::Ready_InteractionTrigger()
 
 	SetUp_InteractionTriggerCallback();
 
-	m_pGameInstance_Proxy->Register_Collider(m_pInteractionTrigger, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+	m_pGameInstance_Proxy->Register_Collider(m_pInteractionTrigger, ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
 	m_bInteractionTriggerRegistered = true;
 
 	return S_OK;
