@@ -130,6 +130,9 @@ protected:
     void Update_Move(const _float fTimeDelta, const _float fRatio);
     void Update_MoveSin(const _float fTimeDelta, const _float fRatio);
 
+protected:
+    _float              m_fRoll{};
+
 private:
     vector<RATIO_VALUE> m_AlphaRatioValue;
     vector<RATIO_VALUE> m_SizeRatioValue;

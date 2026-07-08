@@ -7,6 +7,7 @@
 
 NS_BEGIN(Client)
 using ANI_PLAY_INFO = CAnimator::ANI_PLAY_INFO;
+using LAYER_PLAY_INFO = CAnimator::LAYER_PLAY_INFO;
 
 class CMonster;
 class CMonster_Movement;

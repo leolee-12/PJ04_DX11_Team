@@ -82,6 +82,14 @@ void CBoss_Cage::Update(_float fTimeDelta)
             {
                 m_pBody->Set_Active(false);
                 Fire_CutsceneCamera(L"ClearDanceLong_Camera", Get_DeeAnimator());
+
+                CUTSCENE_STAGECLEAR Desc{};
+                Desc.AnchorWorld = *(m_pTransformCom->Get_WorldMatrixPtr());
+                Desc.fAnimSpeed = 1.5f;
+                Desc.fBlendDuration = 0.f;
+                Desc.eAnim = STAGECLEAR_ANIM::DANCE;
+                m_pGameInstance_Proxy->Publish(EventTag::Cutscene_StageClear, &Desc);
+
                 m_eState = CAGE_STATE::BROKEN;
             }
             break;
@@ -264,6 +272,13 @@ void CBoss_Cage::Break()
     Rescue_WaddleDees();                                    
     m_eState = CAGE_STATE::BREAKING;
     Fire_CutsceneCamera(L"Cut1Rescue_Camera", m_pBody->Get_Animator());
+
+    CUTSCENE_STAGECLEAR Desc{};
+    Desc.AnchorWorld = *(m_pTransformCom->Get_WorldMatrixPtr());
+    Desc.fAnimSpeed = 1.5f;
+    Desc.fBlendDuration = 0.f;
+    Desc.eAnim = STAGECLEAR_ANIM::CUT1;
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_StageClear, &Desc);
 }
 
 void CBoss_Cage::Attach_To_Bone(const _float4x4* pBoneMatrix, const _float4x4* pOwnerWorld, _fmatrix OffsetMatrix)

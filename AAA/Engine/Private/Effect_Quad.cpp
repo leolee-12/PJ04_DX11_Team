@@ -116,6 +116,8 @@ HRESULT CEffect_Quad::Bind_ShaderValue()
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_bBillboard", &m_bBillboard, sizeof(m_bBillboard))))
         return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fRoll", &m_fRoll, sizeof(m_fRoll))))
+        return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_bSpriteAniTexture", &m_bSpriteAniTexture, sizeof(m_bSpriteAniTexture))))
         return E_FAIL;

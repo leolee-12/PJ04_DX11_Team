@@ -1,5 +1,6 @@
 #include "Monster_State_Captured.h"
 #include "Monster.h"
+#include "Monster_Movement.h"
 
 HRESULT CMonster_State_Captured::Initialize(const ANI_PLAY_INFO& tInfo, _float fSpeed)
 {
@@ -21,6 +22,9 @@ void CMonster_State_Captured::Enter(MONSTER_STATE_TYPE ePrevState)
 
 	m_pOwner->Enable_Controller(false);
 	m_pOwner->Enable_Colliders(false);
+
+	if (m_pMovement)
+		m_pMovement->Cancle_Launch();		// 기존 넉백/이동량 제거
 
 	if (m_pAnimator && !m_PlayInfo.strAniName.empty())
 		m_pAnimator->Play(&m_PlayInfo);

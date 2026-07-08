@@ -26,6 +26,9 @@ void CMonster_State_Death::Enter(MONSTER_STATE_TYPE ePrevState)
 		const CMonster::HIT_REACTION& tHit = m_pOwner->Get_LastHit();
 		Apply_DeathLaunch(XMLoadFloat3(&tHit.vAttackerPos), tHit.fKnockBack);
 	}
+
+	// 죽음 진입 -> 히트박스/컨트롤러 off
+	m_pOwner->Enable_Colliders(false);
 }
 
 void CMonster_State_Death::Update(_float fTimeDelta)

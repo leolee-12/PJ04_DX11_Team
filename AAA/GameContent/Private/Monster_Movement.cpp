@@ -199,6 +199,19 @@ _bool CMonster_Movement::Update_Launched(_float fTimeDelta)
 	return m_bGrounded;
 }
 
+void CMonster_Movement::Cancle_Launch()
+{
+	m_vHorizVel = {};
+	m_fVerticalVelocity = 0.f;
+
+	m_bLaunched = false;
+	m_bKO = false;
+	m_bBouncing = false;
+	m_iBounceCount = 0;
+
+	m_bJumpArc = false;
+}
+
 CMonster_Movement* CMonster_Movement::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CMonster_Movement* pInstance = new CMonster_Movement(pDevice, pContext);

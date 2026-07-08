@@ -655,9 +655,6 @@
     <Filter Include="00. GameObject\06. Monster\04. Cappy\Parts\Hat">
       <UniqueIdentifier>{14d7107e-0156-4acf-97b5-c3456b029634}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\06. Monster\04. Cappy\State\Hide">
-      <UniqueIdentifier>{df128945-7f07-4cd3-b637-325bb681a823}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\06. Monster\06. PoppyBrosJr\State\WindUp">
       <UniqueIdentifier>{c1e07d83-aa5d-4967-ba16-a10e1f3306e1}</UniqueIdentifier>
     </Filter>
@@ -930,6 +927,27 @@
     </Filter>
     <Filter Include="00. GameObject\07. Boss\BossCage\Part\WaddleDee">
       <UniqueIdentifier>{ac205231-35bf-4ba3-89a7-12ee79038e55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\12. BombFuseEffect">
+      <UniqueIdentifier>{a77db0a5-c085-47bb-ae9c-91fba3cf6b27}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\Sparkle">
+      <UniqueIdentifier>{99c5e77a-1ebf-4337-9cd1-835047d27aaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\04. Cappy\State\Detect">
+      <UniqueIdentifier>{7bf8069e-5df9-4f1e-b7cc-1ec0c588312f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\01. StateMachine\State\Flatten">
+      <UniqueIdentifier>{8e646b35-3b8a-4919-868e-451db4457e22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\04. Cappy\State\Idle">
+      <UniqueIdentifier>{4b434a78-748d-432b-9622-b3996aa9f6ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\04. Cappy\State\Chase">
+      <UniqueIdentifier>{3959e8af-cec6-4fe0-ab24-c741894ca7bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\04. Cappy\State\HatLose">
+      <UniqueIdentifier>{0ff73919-563b-4a8b-9974-8f92e30f12fa}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1851,6 +1869,27 @@
     <ClInclude Include="..\public\Cage_WaddleDee.h">
       <Filter>00. GameObject\07. Boss\BossCage\Part\WaddleDee</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BombFuseEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\12. BombFuseEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Sparkle.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\Sparkle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Cappy_State_Detect.h">
+      <Filter>00. GameObject\06. Monster\04. Cappy\State\Detect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster_State_Flatten.h">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Flatten</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Cappy_State_Idle.h">
+      <Filter>00. GameObject\06. Monster\04. Cappy\State\Idle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Cappy_State_Chase.h">
+      <Filter>00. GameObject\06. Monster\04. Cappy\State\Chase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Cappy_State_HatLose.h">
+      <Filter>00. GameObject\06. Monster\04. Cappy\State\HatLose</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Editable.h">
       <Filter>00. GameObject\95. Interface</Filter>
     </ClInclude>
@@ -2701,6 +2740,27 @@
     </ClCompile>
     <ClCompile Include="..\private\Cage_WaddleDee.cpp">
       <Filter>00. GameObject\07. Boss\BossCage\Part\WaddleDee</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BombFuseEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\12. BombFuseEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Sparkle.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\Sparkle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Cappy_State_Detect.cpp">
+      <Filter>00. GameObject\06. Monster\04. Cappy\State\Detect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster_State_Flatten.cpp">
+      <Filter>00. GameObject\06. Monster\01. StateMachine\State\Flatten</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Cappy_State_Idle.cpp">
+      <Filter>00. GameObject\06. Monster\04. Cappy\State\Idle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Cappy_State_Chase.cpp">
+      <Filter>00. GameObject\06. Monster\04. Cappy\State\Chase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Cappy_State_HatLose.cpp">
+      <Filter>00. GameObject\06. Monster\04. Cappy\State\HatLose</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesignObject.cpp">
       <Filter>00. GameObject\96. LevelDesign</Filter>

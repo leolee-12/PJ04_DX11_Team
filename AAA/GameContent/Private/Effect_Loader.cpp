@@ -54,7 +54,9 @@ namespace
         { TEXT("BombExplosion"),          TEXT("../../Resources/YSH/Effects/BombExplosion.JSON") },
         { TEXT("CommonHit"),              TEXT("../../Resources/CHJ/Effect/CommonHit.JSON") },
         { TEXT("SpitObject"),             TEXT("../../Resources/CHJ/Effect/SpitObject.JSON") },
-        { TEXT("SpitAir"),                TEXT("../../Resources/YSH/Effects/Spit_Air.JSON") }
+        { TEXT("SpitAir"),                TEXT("../../Resources/YSH/Effects/Spit_Air.JSON") },
+
+        { TEXT("BombFuseEffect"),         TEXT("../../Resources/CHJ/Effect/BombFuseEffect.JSON") },
     };
 }
 
