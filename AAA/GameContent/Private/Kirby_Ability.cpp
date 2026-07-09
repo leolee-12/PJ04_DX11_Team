@@ -55,6 +55,11 @@ HRESULT CKirby_Ability::Initialize()
     return S_OK;
 }
 
+_bool CKirby_Ability::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+{
+    return false;
+}
+
 const CAnimator::ANI_PLAY_INFO* CKirby_Ability::Get_AniInfo(ABILITY_ANI eAbilityAni)
 {
     return &m_AniInfos[ETOUI(eAbilityAni)].tBaseAniInfo;
