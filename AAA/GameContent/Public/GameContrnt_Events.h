@@ -44,8 +44,10 @@ namespace Client
         inline constexpr const _tchar* Camera_Rumble = L"Camera.Rumble";
         inline constexpr const _tchar* BossCam_Focus = L"BossCam_Focus";
 
-        // Fx
+        // Screen Fx
         inline constexpr const _tchar* FullScreen_Flash = L"Fx.FullScreenFlashOn";
+        inline constexpr const _tchar* Letterbox_Begin = L"Letterbox.Begin";
+        inline constexpr const _tchar* Letterbox_End = L"Letterbox.End";
         
         // ¸Ê 
         inline constexpr const _tchar* Stage1_Step2_CarBreakMap = L"Stage1-2.CarBreakMap";

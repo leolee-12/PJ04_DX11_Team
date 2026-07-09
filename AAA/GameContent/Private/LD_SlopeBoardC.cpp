@@ -305,6 +305,13 @@ void CLD_SlopeBoardC::On_Event()
 	Play_Anim(ANIM_CUT1);
 	m_eState = STATE::PLAYING;
 
+	CUTSCENE_CAMERA_DESC cam{};
+	cam.eCam = ECutsceneCam::Cutscene;
+	cam.szTrack = L"Bridge_Cut2_camera1";
+	cam.pProgress = m_pAnimatorCom;
+	cam.pAnchorWorld = m_pTransformCom->Get_WorldMatrixPtr();
+	m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+
 	m_pInteractionCollider->Set_Enabled(false);
 }
 

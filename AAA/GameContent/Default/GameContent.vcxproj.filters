@@ -954,8 +954,8 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model\02. DeformCar_Main">
       <UniqueIdentifier>{30e6faec-8ca3-4f51-a179-3a72f1929f83}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="00. GameObject\09. AbilityBubble">
+    </Filter>
+    <Filter Include="00. GameObject\09. AbilityBubble">
       <UniqueIdentifier>{7307adf4-ee69-421c-96b8-f1311031fa77}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\Visible\07. CopyEssence">
@@ -996,6 +996,9 @@
     </Filter>
     <Filter Include="97. DataSystem\Singleton Destroyer">
       <UniqueIdentifier>{42251981-a8bb-404e-be2b-ab0584156f19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\GenericContainer\LetterBox">
+      <UniqueIdentifier>{aa6b189d-1a9c-4975-b704-36f879881c75}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1946,8 +1949,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_HitBox_Model.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\LD_CopyEssence.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_CopyEssence.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\07. CopyEssence</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -1982,6 +1985,9 @@
     </ClInclude>
     <ClInclude Include="..\public\Singleton_Destroyer.h">
       <Filter>97. DataSystem\Singleton Destroyer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_LetterBox.h">
+      <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\LetterBox</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2857,8 +2863,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_StateMachine.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\LD_CopyEssence.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_CopyEssence.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\07. CopyEssence</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -2893,6 +2899,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Singleton_Destroyer.cpp">
       <Filter>97. DataSystem\Singleton Destroyer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_LetterBox.cpp">
+      <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\LetterBox</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

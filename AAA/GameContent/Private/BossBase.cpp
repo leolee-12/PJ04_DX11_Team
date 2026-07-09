@@ -157,6 +157,7 @@ void CBossBase::Publish_Boss_Appeared()
 
     _bool bShow = true;
     m_pGameInstance_Proxy->Publish(EventTag::HUD_SetVisible, &bShow);
+    m_pGameInstance_Proxy->Publish(EventTag::Letterbox_End, nullptr);
 }
 
 void CBossBase::Publish_HP()

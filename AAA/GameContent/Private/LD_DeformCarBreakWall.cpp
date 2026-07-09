@@ -127,6 +127,7 @@ void CLD_DeformCarBreakWall::Update(_float fTimeDelta)
 		CUTSCENE_CAMERA_DESC cam{};
 		cam.eCam = ECutsceneCam::Area;
 		m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+		m_pGameInstance_Proxy->Publish(EventTag::Letterbox_End, nullptr);
 		m_eState = STATE::BROKEN;
 	}
 }
@@ -328,6 +329,7 @@ void CLD_DeformCarBreakWall::On_Event()
 
 	_bool bShow = false;
 	m_pGameInstance_Proxy->Publish(EventTag::HUD_SetVisible, &bShow);
+	m_pGameInstance_Proxy->Publish(EventTag::Letterbox_Begin, nullptr);
 
 	m_pGameInstance_Proxy->Lerp_TimeScale(0.1f, 1.f, 3.f);
 

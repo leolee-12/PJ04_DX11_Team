@@ -334,6 +334,7 @@
     <ClInclude Include="..\Public\TestTriggerBox.h" />
     <ClInclude Include="..\Public\UI_Image.h" />
     <ClInclude Include="..\Public\UI_KirbyStatus.h" />
+    <ClInclude Include="..\public\UI_LetterBox.h" />
     <ClInclude Include="..\public\UI_LoadingCurtain.h" />
     <ClInclude Include="..\public\UI_MissionBoard.h" />
     <ClInclude Include="..\public\UI_MissionPanel.h" />
@@ -645,6 +646,7 @@
     <ClCompile Include="..\Private\TestTriggerBox.cpp" />
     <ClCompile Include="..\Private\UI_Image.cpp" />
     <ClCompile Include="..\Private\UI_KirbyStatus.cpp" />
+    <ClCompile Include="..\private\UI_LetterBox.cpp" />
     <ClCompile Include="..\private\UI_LoadingCurtain.cpp" />
     <ClCompile Include="..\private\UI_MissionBoard.cpp" />
     <ClCompile Include="..\private\UI_MissionPanel.cpp" />
