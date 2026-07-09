@@ -361,7 +361,7 @@ _bool CKirby_Ability_Sword::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVEN
             case SWORD_HIT_PARAM::SUPER_SPIN_SLASH:
             {
                 tAttackInfo.fDamage = 10.f;
-                tAttackInfo.fKnockback = 20.f;
+                tAttackInfo.fKnockback = 30.f;
                 tAttackInfo.eHitType = HIT_TYPE::SWORD_SPIN;
                 pSword->Begin_Hit(tAttackInfo);
                 break;

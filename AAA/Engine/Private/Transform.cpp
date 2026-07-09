@@ -316,6 +316,34 @@ _bool CTransform::LookAt_Smooth(_fvector vAt, _float fTimeDelta)
     return fabsf(fYaw) <= fMaxStep;
 }
 
+void CTransform::LookTo(_fvector vLookDir, _fvector vUpDir)
+{
+    _float3 vScaled = Get_Scaled();
+
+    _vector vLook = XMVector3Normalize(vLookDir);
+    _vector vUp = XMVector3Normalize(vUpDir);
+
+    // look을 up 평면에 맞게 보정
+    vLook = vLook - vUp * XMVector3Dot(vLook, vUp);
+
+    if (XMVectorGetX(XMVector3LengthSq(vLook)) <= 0.0001f)
+        return;
+
+    vLook = XMVector3Normalize(vLook);
+
+    _vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vLook));
+    vUp = XMVector3Normalize(XMVector3Cross(vLook, vRight));
+
+    Set_State(STATE::RIGHT, vRight * vScaled.x);
+    Set_State(STATE::UP, vUp * vScaled.y);
+    Set_State(STATE::LOOK, vLook * vScaled.z);
+}
+
+void CTransform::LookTo(_fvector vLookDir)
+{
+    LookTo(vLookDir, XMVectorSet(0.f, 1.f, 0.f, 0.f));
+}
+
 CTransform* CTransform::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     CTransform* pInstance = new CTransform(pDevice, pContext);

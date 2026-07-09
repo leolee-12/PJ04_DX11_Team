@@ -122,6 +122,8 @@ void CKirby::Update(_float fTimeDelta)
     __super::Update(fTimeDelta);
 
     Update_InvincibilityHitFlash();
+
+    Get_CurrentDeformModel()->Set_GoundNormal(m_pMovement->Get_GroundNormal());
 }
 
 void CKirby::Late_Update(_float fTimeDelta)
@@ -157,7 +159,7 @@ void CKirby::On_Deserialized()
         m_pMovement->Sync_To_Controller();
 }
 
-_bool CKirby::Dispatch_BodyAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+_bool CKirby::Dispatch_BodyAnimEventToAbility(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 {
     return m_pKirby_Ability->Handle_BodyAnimEvent(this, e, ePhase);
 }
@@ -518,6 +520,13 @@ HRESULT CKirby::SetUp_Collider_Callback()
 
                 m_pKirby_StateMachine->Get_EssenceBubble(pEssenceBubble->Get_Ability());
             }
+            /*          
+            else if (iGroup == ETOUI(COLLISION_LAYER::))
+            {
+     
+            }
+            */
+
         }
     );
 

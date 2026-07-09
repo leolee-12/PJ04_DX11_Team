@@ -103,6 +103,9 @@ public:
 	void LookAt(_fvector vAt);
 	_bool LookAt_Smooth(_fvector vAt, _float fTimeDelta);
 
+	void LookTo(_fvector vLookDir, _fvector vUpDir);
+	void LookTo(_fvector vLookDir);
+
 private:
 	union {
 		_float4x4				m_WorldMatrix = {};

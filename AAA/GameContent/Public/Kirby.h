@@ -32,6 +32,8 @@ class CKirby_Deform_Model;
 
 class CLevelDesign_Ladder;
 
+class CLD_DeformObject;
+
 enum class KIRBY_DEFORM_MODEL_TYPE { DEMO, MAIN };
 
 class CKirby final : public CCharacter
@@ -88,7 +90,7 @@ public:
 
 public:
 	// Ability AnimEvent
-	_bool Dispatch_BodyAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
+	_bool Dispatch_BodyAnimEventToAbility(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
 
 	// Com
 	CMovement_Child* Get_Movement() { return m_pMovement; }
@@ -160,6 +162,13 @@ public:
 	void Clear_Ladder() { m_pLadder = nullptr; };
 	_bool IsLadder() { return m_pLadder ? true : false; }
 
+	//Deform Object
+	CLD_DeformObject* Get_TriggerDeformObj() { return m_pTriggerDeformObj; }
+	void Set_TriggerDeformObj(CLD_DeformObject* pTriggerDeformObj) { m_pTriggerDeformObj = pTriggerDeformObj; }
+
+	CLD_DeformObject* Get_HeldDeformObj() { return m_pHeldDeformObj; }
+	void Set_HeldDeformObj(CLD_DeformObject* pHeldDeformObj) { m_pHeldDeformObj = pHeldDeformObj; }
+
 private:
 	HRESULT Ready_Components();
 	HRESULT	SetUp_Collider_Callback();
@@ -229,6 +238,10 @@ private:
 
 	// Ladder
 	CLevelDesign_Ladder* m_pLadder{};
+
+	//Deform Object
+	CLD_DeformObject* m_pTriggerDeformObj{};
+	CLD_DeformObject* m_pHeldDeformObj{};
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
