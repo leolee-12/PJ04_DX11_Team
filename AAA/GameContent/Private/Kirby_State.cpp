@@ -103,6 +103,9 @@ _bool CKirby_State::Transition_Fall_OR_Wait_OR_Run(CKirby* pKirby)
 
 _bool CKirby_State::Try_Transition_Ladder_CommandUp(CKirby* pKirby)
 {
+    if (pKirby->Has_Deform())
+        return false;
+
     // 있으면 충돌
     CLevelDesign_Ladder* pLadder = pKirby->Get_Ladder();
     if (pLadder == nullptr)

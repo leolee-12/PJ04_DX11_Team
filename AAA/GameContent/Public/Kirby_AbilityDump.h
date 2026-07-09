@@ -36,11 +36,9 @@ public:
 
 private:
 	_bool m_bPartsOff{};
-	_bool m_bCloseEye{};
 
 private:
-	void Parts_Off(CKirby* pKirby, _float fRatio);
-	void Close_Eye(CKirby_Body* pBody, _float fRatio);
+	void Update_AbilityDump(CKirby* pKirby, _float fRatio);
 
 public:
 	static CKirby_AbilityDump* Create();

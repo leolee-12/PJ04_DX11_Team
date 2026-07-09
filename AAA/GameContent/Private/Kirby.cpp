@@ -35,6 +35,7 @@
 #include "LevelDesign_Ladder.h"
 
 #include "EssenceBubble.h"
+#include "LD_DeformObject.h"
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCharacter{ pDevice, pContext }
@@ -459,6 +460,7 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_LADDER));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ESSENCE_BUBBLE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::DEFORM_OBJECT));
 
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT), ETOUI(COLLISION_LAYER::ENV_HURT));
@@ -519,14 +521,11 @@ HRESULT CKirby::SetUp_Collider_Callback()
                     return;
 
                 m_pKirby_StateMachine->Get_EssenceBubble(pEssenceBubble->Get_Ability());
-            }
-            /*          
-            else if (iGroup == ETOUI(COLLISION_LAYER::))
+            }                      
+            else if (iGroup == ETOUI(COLLISION_LAYER::DEFORM_OBJECT))
             {
-     
-            }
-            */
-
+                Set_TriggerDeformObj(static_cast<CLD_DeformObject*>(pGameObject));
+            }           
         }
     );
 
@@ -557,6 +556,10 @@ HRESULT CKirby::SetUp_Collider_Callback()
             {
                 Clear_Ladder();
                 return;
+            }
+            else if (iGroup == ETOUI(COLLISION_LAYER::DEFORM_OBJECT))
+            {
+                Set_TriggerDeformObj(nullptr);
             }
         }
     );
@@ -772,9 +775,9 @@ void CKirby::Set_CutsceneGrabTarget(KIRBY_ATTACHMENT_BEGIN_DESC* pGrabDesc)
 
 void CKirby::Clear_CutsceneGrabTarget()
 {
-    m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(m_vPreAttachScale.x, 0.f, 0.f, 0.f));
-    m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, m_vPreAttachScale.y, 0.f, 0.f));
-    m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, m_vPreAttachScale.z, 0.f));
+    m_pTransformCom->Remove_YRotation();
+    m_pTransformCom->Set_Scale(m_vPreAttachScale.x, m_vPreAttachScale.y, m_vPreAttachScale.z);
+    m_pMovement->Sync_To_Controller();
 
     m_pGrabBone = nullptr;
     m_pGrabOwnerWorld = nullptr;

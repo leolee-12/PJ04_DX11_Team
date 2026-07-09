@@ -67,7 +67,7 @@ _bool CKirby_ControllableState::Handle_Command(CKirby* pKirby, CKirby_Command* p
         }
         case KIRBY_COMMAND_TYPE::ATTACK:
         {
-            if (GetAsyncKeyState('F') & 0x8000)
+            if (pKirby->IsTriggerDeformObj())
             {
                 if (!pCommand->IsDown())
                     return false;

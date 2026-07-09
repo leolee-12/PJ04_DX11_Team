@@ -165,6 +165,7 @@ public:
 	//Deform Object
 	CLD_DeformObject* Get_TriggerDeformObj() { return m_pTriggerDeformObj; }
 	void Set_TriggerDeformObj(CLD_DeformObject* pTriggerDeformObj) { m_pTriggerDeformObj = pTriggerDeformObj; }
+	_bool IsTriggerDeformObj() { return m_pTriggerDeformObj != nullptr; }
 
 	CLD_DeformObject* Get_HeldDeformObj() { return m_pHeldDeformObj; }
 	void Set_HeldDeformObj(CLD_DeformObject* pHeldDeformObj) { m_pHeldDeformObj = pHeldDeformObj; }
