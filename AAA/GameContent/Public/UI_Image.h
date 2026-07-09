@@ -15,6 +15,8 @@ class CLIENT_DLL CUI_Image final : public CUIPartObject
 	GENERATED_BODY(CUI_Image)
 
 	PROPERTY(_float4, m_vColor, L"Color", L"UI");
+	PROPERTY(_float4, m_vColor2, L"Color2", L"UI");
+	
 	PROPERTY(_float, m_fAlpha, L"Alpha", L"UI");
 
 	PROPERTY(_bool, m_bFlipX, L"FlipX", L"UV");
@@ -22,6 +24,8 @@ class CLIENT_DLL CUI_Image final : public CUIPartObject
 
 	PROPERTY(_int, m_iTextureLevel, L"TextureLevel", L"Texture");
 	PROPERTY(_wstring, m_strTextureProtoTag, L"TextureProtoTag", L"Texture");
+
+	PROPERTY(_uint, m_iPassIdx, L"ShaderPass", L"Shader");
 
 public:
 	typedef struct tagUIImageDesc : public CUIPartObject::UI_PARTOBJECT_DESC

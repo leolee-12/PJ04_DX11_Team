@@ -1,12 +1,12 @@
 #pragma once
 
 #include "GameContent_Defines.h"
-#include "UIContainerObject.h"
+#include "UI_MovableContainer.h"
 #include "UIAnimatorCom.h"
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL CUI_GenericContainer final : public CUIContainerObject, public IUIAnimatorOwner
+class CLIENT_DLL CUI_GenericContainer : public CUIMovableContainer, public IUIAnimatorOwner
 {
 	GENERATED_BODY(CUI_GenericContainer)
 
@@ -19,7 +19,7 @@ public:
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_UI_GenericContainer";
 
-private:
+protected:
 	CUI_GenericContainer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CUI_GenericContainer(const CUI_GenericContainer& Prototype);
 	virtual ~CUI_GenericContainer() = default;
@@ -42,6 +42,7 @@ public:
 protected:
 	virtual void On_Deserialized() override;
 	virtual void On_UIPartsChanged() override;
+	virtual void Play_IntroFade(_float fDuration) override;
 
 private:
 	void Bind_UIAnimator();

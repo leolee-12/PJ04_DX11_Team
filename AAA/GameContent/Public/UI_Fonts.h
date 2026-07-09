@@ -22,5 +22,7 @@ namespace Client
         { L"KOR-VDL-LogoGBlack-Black",      L"../../Resources/Fonts/KOR-VDL-LogoGBlack-Black.spritefont" },
         { L"KOR-VDL-LogoJrBlack-Black",     L"../../Resources/Fonts/KOR-VDL-LogoJrBlack-Black.spritefont" },
         { L"KOR-VDL-LogoMaru-Ultra",        L"../../Resources/Fonts/KOR-VDL-LogoMaru-Ultra.spritefont" },
+        { L"KOR-VDL-LogoGBlack-Black_Big",  L"../../Resources/YSH/Font/KOR-VDL-LogoGBlack-Black.spritefont" },
+        
     };
 }

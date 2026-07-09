@@ -73,7 +73,12 @@ _bool CCamera_Cutscene::Play_Track(const _tchar* szTrack, CAnimator* pProgress, 
         }
         it = m_Tracks.emplace(name, move(t)).first;
     }
-    m_pCur = &it->second; m_pProgress = pProgress; m_pAnchor = pAnchorWorld;
+    m_pCur = &it->second; 
+    m_pProgress = pProgress; 
+
+    if(pAnchorWorld)
+        m_pAnchor = pAnchorWorld;
+
     m_fLocalTime = 0.f;
     m_fTrauma = 0.f; 
     m_fRumble = 0.f;

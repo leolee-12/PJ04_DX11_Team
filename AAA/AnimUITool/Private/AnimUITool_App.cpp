@@ -4,15 +4,15 @@
 #include "Panel_Viewport.h"
 #include "Panel_UICanvas.h"
 #include "Preview_Actor.h"
-#include "GameObject_Factory.h"
+
 
 #include "AnimUITool_Defines.h"
 
 #include "Level_Tool.h"
 #include "Loader_Prototype.h"
 
-#include "Effect_Loader.h"
-#include "Projectile_Manager.h"
+#include "GameObject_Factory.h"
+#include "Singleton_Destroyer.h"
 
 
 CAnimUITool_App::CAnimUITool_App()
@@ -365,8 +365,8 @@ void CAnimUITool_App::Free()
 
 	Safe_Release(m_pPanel_Manager);
 
-	CEffect_Loader::DestroyInstance();
-	CProjectile_Manager::DestroyInstance();
+	CSingleton_Destroyer::Destroy_GameContent_Singletons();
+
 	Safe_Release(m_pRTV);
 	Safe_Release(m_pSRV);
 	Safe_Release(m_pDSV);
@@ -378,8 +378,6 @@ void CAnimUITool_App::Free()
 	Safe_Release(m_pGameInstance_Proxy);
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);
-
-	Client::CGameObject_Factory::DestroyInstance();
 
 	CGameInstance::DestroyInstance();
 }
