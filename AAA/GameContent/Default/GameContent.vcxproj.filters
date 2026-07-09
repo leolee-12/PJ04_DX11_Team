@@ -954,8 +954,8 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model\02. DeformCar_Main">
       <UniqueIdentifier>{30e6faec-8ca3-4f51-a179-3a72f1929f83}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="00. GameObject\09. AbilityBubble">
+    </Filter>
+    <Filter Include="00. GameObject\09. AbilityBubble">
       <UniqueIdentifier>{7307adf4-ee69-421c-96b8-f1311031fa77}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\Visible\07. CopyEssence">
@@ -976,7 +976,10 @@
     <Filter Include="00. GameObject\09. AbilityBubble\Parts\Ability_Model">
       <UniqueIdentifier>{bf263cb2-3a5a-4cae-a1c3-3f631a883bff}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\97. UI\UIContainer\MovableContainer">
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\DeformCarBridge">
+      <UniqueIdentifier>{859ac8de-dcc8-4015-a7ef-68eee0e3db5f}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="00. GameObject\97. UI\UIContainer\MovableContainer">
       <UniqueIdentifier>{d9e2f7a8-fd90-4353-8eef-082b1015eb32}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\97. UI\UIContainer\GenericContainer\StageClear">
@@ -996,6 +999,7 @@
     </Filter>
     <Filter Include="97. DataSystem\Singleton Destroyer">
       <UniqueIdentifier>{42251981-a8bb-404e-be2b-ab0584156f19}</UniqueIdentifier>
+>>>>>>> main
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1946,8 +1950,8 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_HitBox_Model.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\LD_CopyEssence.h">
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_CopyEssence.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\07. CopyEssence</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -1962,7 +1966,10 @@
     <ClInclude Include="..\Public\DroppedBubble.h">
       <Filter>00. GameObject\09. AbilityBubble\Containers\Dropped</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\UI_MovableContainer.h">
+    <ClInclude Include="..\Public\Kirby_DeformCarBridge.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\DeformCarBridge</Filter>
+	</ClInclude>
+	<ClInclude Include="..\public\UI_MovableContainer.h">
       <Filter>00. GameObject\97. UI\UIContainer\MovableContainer</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UI_StageClear.h">
@@ -2857,8 +2864,8 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_StateMachine.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\LD_CopyEssence.cpp">
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_CopyEssence.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\07. CopyEssence</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -2873,7 +2880,10 @@
     <ClCompile Include="..\Private\DroppedBubble.cpp">
       <Filter>00. GameObject\09. AbilityBubble\Containers\Dropped</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\UI_MovableContainer.cpp">
+    <ClCompile Include="..\Private\Kirby_DeformCarBridge.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\DeformCarBridge</Filter>
+	</ClCompile>
+	<ClCompile Include="..\private\UI_MovableContainer.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\MovableContainer</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI_StageClear.cpp">
