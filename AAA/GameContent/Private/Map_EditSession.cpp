@@ -16,6 +16,8 @@ void CMap_EditSession::Reset()
 	m_MapPreviewLDItems.clear();
 	m_DeletedMapPreviewEnvItems.clear();
 	m_DeletedMapPreviewEnvOrder.clear();
+	m_DeletedMapPreviewLDItems.clear();
+	m_DeletedMapPreviewLDOrder.clear();
 	m_AddedObjectsByRuntime.clear();
 	m_AddedObjectUiItems.clear();
 	m_AddedObjectOrder.clear();
@@ -37,6 +39,7 @@ void CMap_EditSession::Set_EditData(const MAP_EDIT_DATA& Desc)
 	m_AddedObjectOrder.clear();
 
 	Rebuild_DeletedEnvItemsFromWorkingDelta();
+	Rebuild_DeletedLevelDesignItemsFromWorkingDelta();
 }
 
 void CMap_EditSession::Set_EditMeta(const MAP_EDIT_DATA& Desc)
@@ -195,33 +198,66 @@ _bool CMap_EditSession::Can_DeleteAsEnvOverride(CGameObject* pObject) const
 	return m_MapPreviewEnvItems.find(pObject) != m_MapPreviewEnvItems.end();
 }
 
+_bool CMap_EditSession::Can_DeleteAsLevelDesignOverride(CGameObject* pObject) const
+{
+	if (nullptr == pObject)
+		return false;
+
+	return m_MapPreviewLDItems.find(pObject) != m_MapPreviewLDItems.end();
+}
+
 _bool CMap_EditSession::Track_DeletedPreviewObject(CGameObject* pObject)
 {
 	if (nullptr == pObject)
 		return false;
 
-	auto Iter = m_MapPreviewEnvItems.find(pObject);
-	if (Iter == m_MapPreviewEnvItems.end())
-		return false;
+	auto EnvIter = m_MapPreviewEnvItems.find(pObject);
+	if (EnvIter != m_MapPreviewEnvItems.end())
+	{
+		const MAP_EDIT_ENV_ITEM Item = EnvIter->second;
+		m_MapPreviewEnvItems.erase(EnvIter);
 
-	const MAP_EDIT_ENV_ITEM Item = Iter->second;
-	m_MapPreviewEnvItems.erase(Iter);
+		if (Item.strStableKey.empty())
+			return false;
 
-	if (Item.strStableKey.empty())
-		return false;
+		m_tEditData.OverrideDesc.DeletedEnvObjectKeys.insert(Item.strStableKey);
+		m_DeletedMapPreviewEnvItems[Item.strStableKey] = Item;
 
-	m_tEditData.OverrideDesc.DeletedEnvObjectKeys.insert(Item.strStableKey);
-	m_DeletedMapPreviewEnvItems[Item.strStableKey] = Item;
+		const auto OrderIter = find(
+			m_DeletedMapPreviewEnvOrder.begin(),
+			m_DeletedMapPreviewEnvOrder.end(),
+			Item.strStableKey);
 
-	const auto OrderIter = find(
-		m_DeletedMapPreviewEnvOrder.begin(),
-		m_DeletedMapPreviewEnvOrder.end(),
-		Item.strStableKey);
+		if (OrderIter == m_DeletedMapPreviewEnvOrder.end())
+			m_DeletedMapPreviewEnvOrder.push_back(Item.strStableKey);
 
-	if (OrderIter == m_DeletedMapPreviewEnvOrder.end())
-		m_DeletedMapPreviewEnvOrder.push_back(Item.strStableKey);
+		return true;
+	}
 
-	return true;
+	auto LDIter = m_MapPreviewLDItems.find(pObject);
+	if (LDIter != m_MapPreviewLDItems.end())
+	{
+		const MAP_EDIT_LD_ITEM Item = LDIter->second;
+		m_MapPreviewLDItems.erase(LDIter);
+
+		if (Item.strStableKey.empty())
+			return false;
+
+		m_tEditData.OverrideDesc.DeletedLevelDesignObjectKeys.insert(Item.strStableKey);
+		m_DeletedMapPreviewLDItems[Item.strStableKey] = Item;
+
+		const auto OrderIter = find(
+			m_DeletedMapPreviewLDOrder.begin(),
+			m_DeletedMapPreviewLDOrder.end(),
+			Item.strStableKey);
+
+		if (OrderIter == m_DeletedMapPreviewLDOrder.end())
+			m_DeletedMapPreviewLDOrder.push_back(Item.strStableKey);
+
+		return true;
+	}
+
+	return false;
 }
 
 _bool CMap_EditSession::Track_EditedPreviewObject(
@@ -443,6 +479,62 @@ void CMap_EditSession::Restore_AllDeletedEnvItems()
 	m_DeletedMapPreviewEnvOrder.clear();
 }
 
+_bool CMap_EditSession::Try_GetDeletedLevelDesignItem(const _wstring& strStableKey, MAP_EDIT_LD_ITEM* pOutItem) const
+{
+	if (nullptr == pOutItem)
+		return false;
+
+	const auto Iter = m_DeletedMapPreviewLDItems.find(strStableKey);
+	if (Iter == m_DeletedMapPreviewLDItems.end())
+		return false;
+
+	*pOutItem = Iter->second;
+	return true;
+}
+
+_bool CMap_EditSession::Restore_DeletedLevelDesignItem(const _wstring& strStableKey)
+{
+	if (strStableKey.empty())
+		return false;
+
+	const size_t iErased = m_tEditData.OverrideDesc.DeletedLevelDesignObjectKeys.erase(strStableKey);
+	m_DeletedMapPreviewLDItems.erase(strStableKey);
+	m_DeletedMapPreviewLDOrder.erase(
+		remove(m_DeletedMapPreviewLDOrder.begin(), m_DeletedMapPreviewLDOrder.end(), strStableKey),
+		m_DeletedMapPreviewLDOrder.end());
+
+	return 0 < iErased;
+}
+
+void CMap_EditSession::Restore_AllDeletedLevelDesignItems()
+{
+	m_tEditData.OverrideDesc.DeletedLevelDesignObjectKeys.clear();
+	m_DeletedMapPreviewLDItems.clear();
+	m_DeletedMapPreviewLDOrder.clear();
+}
+
+void CMap_EditSession::Rebuild_DeletedLevelDesignItemsFromWorkingDelta()
+{
+	m_DeletedMapPreviewLDItems.clear();
+	m_DeletedMapPreviewLDOrder.clear();
+
+	vector<_wstring> SortedKeys(
+		m_tEditData.OverrideDesc.DeletedLevelDesignObjectKeys.begin(),
+		m_tEditData.OverrideDesc.DeletedLevelDesignObjectKeys.end());
+
+	sort(SortedKeys.begin(), SortedKeys.end());
+
+	for (const auto& strKey : SortedKeys)
+	{
+		MAP_EDIT_LD_ITEM Item{};
+		Item.strStableKey = strKey;
+		Item.strDisplayName = L"(Unresolved Override)";
+
+		m_DeletedMapPreviewLDItems[strKey] = Item;
+		m_DeletedMapPreviewLDOrder.push_back(strKey);
+	}
+}
+
 void CMap_EditSession::Rebuild_DeletedEnvItems(const vector<ENV_OBJECT_DESC>& DeletedDescs)
 {
 	m_DeletedMapPreviewEnvItems.clear();
@@ -540,6 +632,7 @@ void CMap_EditSession::Set_Change(const MAP_EDIT_CHANGE& Desc)
 {
 	m_tEditData.OverrideDesc = Desc;
 	Rebuild_DeletedEnvItemsFromWorkingDelta();
+	Rebuild_DeletedLevelDesignItemsFromWorkingDelta();
 
 	m_AddedObjectsByRuntime.clear();
 	m_AddedObjectUiItems.clear();

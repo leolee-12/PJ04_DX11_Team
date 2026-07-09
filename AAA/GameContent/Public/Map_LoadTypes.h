@@ -103,6 +103,7 @@ struct MAP_EDIT_CHANGE
 {
 	_uint Version = { 6 };
 	unordered_set<_wstring> DeletedEnvObjectKeys;
+	unordered_set<_wstring> DeletedLevelDesignObjectKeys;
 	unordered_map<_wstring, EDIT_OBJECT_OVERRIDE_DESC> EditedEnvObjects;
 	unordered_map<_wstring, EDIT_OBJECT_OVERRIDE_DESC> EditedMapSections;
 	unordered_map<_wstring, EDIT_OBJECT_OVERRIDE_DESC> EditedLevelDesignObjects;

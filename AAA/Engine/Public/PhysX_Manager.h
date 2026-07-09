@@ -44,10 +44,32 @@ public:
     physx::PxController* Create_CapsuleController(const _float3& vPos, _float fRadius, _float fHeight);
     void                 Release_Controller(physx::PxController* pCtrl);
 
-
-
     physx::PxPhysics* Get_Physics() const { return m_pPhysics; }
     physx::PxScene* Get_Scene()   const { return m_pScene; }
+
+public:
+    // ¾À ¿À¹ö·¦ Äõ¸®. °ãÄ£ ¾×ÅÍ°¡ ÇÏ³ª¶óµµ ÀÖÀ¸¸é true
+    _bool Overlap_Box(const _float3& vCenter, const _float3& vHalfExtents, const _float4& qRot,
+        vector<physx::PxActor*>* pOutActors = nullptr, _bool bStatic = true, _bool bDynamic = true);
+    _bool Overlap_Sphere(const _float3& vCenter, _float fRadius,
+        vector<physx::PxActor*>* pOutActors = nullptr, _bool bStatic = true, _bool bDynamic = true);
+    _bool Overlap_Capsule(const _float3& vCenter, _float fRadius, _float fHalfHeight,
+        vector<physx::PxActor*>* pOutActors = nullptr, _bool bStatic = true, _bool bDynamic = true);
+
+    _bool Sweep_Box(const _float3& vCenter, const _float3& vHalfExtents, const _float4& qRot,
+        const _float3& vDir, _float fMaxDist,
+        _float3* pOutNormal = nullptr, _float* pOutDist = nullptr,
+        _bool bStatic = true, _bool bDynamic = false);
+
+    _bool Sweep_Sphere(const _float3& vCenter, _float fRadius,
+        const _float3& vDir, _float fMaxDist,
+        _float3* pOutNormal = nullptr, _float* pOutDist = nullptr,
+        _bool bStatic = true, _bool bDynamic = false);
+
+    _bool Sweep_Capsule(const _float3& vCenter, _float fRadius, _float fHalfHeight,
+        const _float3& vDir, _float fMaxDist,
+        _float3* pOutNormal = nullptr, _float* pOutDist = nullptr,
+        _bool bStatic = true, _bool bDynamic = false);
 
 public:
     physx::PxRigidDynamic* Create_DynamicBox(const _float3& vPos, const _float4& qRot, const _float3& vHalfExtents, _float fDensity = 10.f);
@@ -92,6 +114,14 @@ private:
         const physx::PxGeometry& geom, _float fDensity,
         const physx::PxTransform& localPose =
         physx::PxTransform(physx::PxIdentity));
+
+    _bool Overlap_Internal(const physx::PxGeometry& Geom, const physx::PxTransform& Pose,
+        vector<physx::PxActor*>* pOutActors, _bool bStatic, _bool bDynamic);
+
+    _bool Sweep_Internal(const physx::PxGeometry& Geom, const physx::PxTransform& Pose,
+        const _float3& vDir, _float fMaxDist,
+        _float3* pOutNormal, _float* pOutDist, _bool bStatic, _bool bDynamic);
+
 
 public:
     static CPhysX_Manager* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

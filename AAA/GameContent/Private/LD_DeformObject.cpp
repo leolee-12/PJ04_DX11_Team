@@ -19,7 +19,7 @@ namespace
 
 	static const LD_DEFORMOBJECT_CATALOG g_DeformObjectCatalog[] =
 	{
-		{ L"DeformCar", L"Proto_Component_Model_DeformCar", "../../Resources/Map/Gimmick/Anim/DeformCar/DeformCar.ysh", MODEL::ANIM, DEFORM_TYPE::CAR, 0.f },
+		{ L"DeformCar", L"Proto_Component_Model_DeformCar", "../../Resources/Map/Gimmick/Anim/DeformCar/DeformCar.ysh", MODEL::ANIM, DEFORM_TYPE::CAR, 6.5f },
 		//{ L"DeformCylinder", L"Proto_Component_Model_DeformCylinder", "../../Resources/Map/Gimmick/Anim/DeformCylinder/DeformCylinder.ysh", MODEL::ANIM, DEFORM_TYPE::CYLINDER, 0.f},
 		//{ L"DeformCoaster", L"Proto_Component_Model_DeformCoaster", "../../Resources/Map/Gimmick/Anim/DeformCoaster/DeformCoaster.ysh", MODEL::ANIM, DEFORM_TYPE::COASTER, 0.f },
 	};
@@ -225,6 +225,19 @@ HRESULT CLD_DeformObject::Ready_Components()
 	return Ready_Trigger();
 }
 
+void CLD_DeformObject::On_Deserialized()
+{
+	__super::On_Deserialized();
+
+	if (!m_bAvailable)
+		return;
+
+	if (FAILED(Ready_RigidStatic()))
+		return;
+
+	m_pTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+}
+
 HRESULT CLD_DeformObject::Ready_Trigger()
 {
 	_float3 vMin = {};
@@ -252,7 +265,7 @@ HRESULT CLD_DeformObject::Ready_Trigger()
 	if (nullptr == m_pTrigger)
 		return E_FAIL;
 
-	m_pGameInstance_Proxy->Register_Collider(m_pTrigger, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+	m_pGameInstance_Proxy->Register_Collider(m_pTrigger, ETOUI(COLLISION_LAYER::DEFORM_OBJECT));
 
 	return S_OK;
 }
@@ -281,6 +294,40 @@ CLD_DeformObject* CLD_DeformObject::Create(ID3D11Device* pDevice, ID3D11DeviceCo
 CGameObject* CLD_DeformObject::Clone(void* pArg)
 {
 	CLD_DeformObject* pInstance = new CLD_DeformObject(*this);
+
+	LD_DEFORMOBJECT_DESC TempDesc{};
+	if (nullptr == pArg)
+	{
+		const LD_DEFORMOBJECT_CATALOG* pCatalog = nullptr;
+		for (const LD_DEFORMOBJECT_CATALOG& Entry : g_DeformObjectCatalog)
+		{
+			if (Is_SupportedCatalog(Entry))
+			{
+				pCatalog = &Entry;
+				break;
+			}
+		}
+
+		if (nullptr == pCatalog)
+		{
+			MSG_BOX("Failed to Cloned : CLD_DeformObject");
+			Safe_Release(pInstance);
+			return nullptr;
+		}
+
+		TempDesc.strObjectName = pCatalog->pObjectName;
+		TempDesc.strKind = pCatalog->pObjectName;
+		TempDesc.eCategory = LD_CATEGORY::GIMMICK;
+		TempDesc.iModelProtoLevel = m_iPrototypeLevel;
+		TempDesc.eModelType = pCatalog->eModelType;
+		TempDesc.wstrModelProtoTag = pCatalog->pModelProtoTag;
+		TempDesc.bUseCollMesh = true;
+		TempDesc.strAnimEventFile.clear();
+		TempDesc.eDeformType = pCatalog->eDeformType;
+		TempDesc.fInteractionRadius = pCatalog->fInteractionRadius;
+
+		pArg = &TempDesc;
+	}
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{

@@ -15,7 +15,7 @@ struct LD_SPAWN_SPEC;
 
 class CLD_SlopeBoardC final : public CLD_EventObject
 {
-	GENERATED_BODY(CLD_SlopeBoardC);
+	GENERATED_BODY(CLD_SlopeBoardC)
 
 public:
 	static constexpr const _tchar* OBJECT_NAME = L"SlopeBoardC";
@@ -24,7 +24,7 @@ public:
 	static constexpr const _tchar* LAYER_TAG = L"Layer_LevelDesign_Gimmick";
 
 private:
-	enum class STATE { IDLE, PLAYING, PLAYED };
+	enum class STATE { IDLE, PLAYING, PLAYED, DONE };
 
 private:
 	CLD_SlopeBoardC(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -63,6 +63,8 @@ private:
 	void SetUp_Collider_Callback();
 	void Handle_TriggerEnter(CCollider* pOther);
 	void On_Event();
+
+	virtual void On_AnimEvent(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase) override;
 
 public:
 	static CGameObject* Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
