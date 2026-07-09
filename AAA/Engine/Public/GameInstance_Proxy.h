@@ -8,6 +8,7 @@ class PxRigidStatic;
 class PxController;
 class PxRigidDynamic;
 class PxConvexMesh;
+class PxActor;
 NS_END
 
 NS_BEGIN(Engine)
@@ -279,6 +280,20 @@ public:
       physx::PxConvexMesh*   Cook_ConvexMesh(const _float3* pPositions, _uint iNumVertices);
       physx::PxRigidDynamic* Create_DynamicConvex(physx::PxConvexMesh* pMesh, _fmatrix WorldMatrix, _float fDensity = 10.f);
       void                   Remove_DynamicActor(physx::PxRigidDynamic* pActor);
+
+      _bool Overlap_Box(const _float3& vCenter, const _float3& vHalfExtents, const _float4& qRot,
+          vector<physx::PxActor*>* pOutActors = nullptr, _bool bStatic = true, _bool bDynamic = true);
+      _bool Overlap_Sphere(const _float3& vCenter, _float fRadius,
+          vector<physx::PxActor*>* pOutActors = nullptr, _bool bStatic = true, _bool bDynamic = true);
+      _bool Overlap_Capsule(const _float3& vCenter, _float fRadius, _float fHalfHeight,
+          vector<physx::PxActor*>* pOutActors = nullptr, _bool bStatic = true, _bool bDynamic = true);
+
+      _bool Sweep_Box(const _float3& vCenter, const _float3& vHalfExtents, const _float4& qRot, const _float3& vDir, _float fMaxDist, 
+          _float3* pOutNormal = nullptr, _float* pOutDist = nullptr, _bool bStatic = true, _bool bDynamic = false);
+      _bool Sweep_Sphere(const _float3& vCenter, _float fRadius, const _float3& vDir, _float fMaxDist,
+          _float3* pOutNormal = nullptr, _float* pOutDist = nullptr, _bool bStatic = true, _bool bDynamic = false);
+      _bool Sweep_Capsule(const _float3& vCenter, _float fRadius, _float fHalfHeight, const _float3& vDir, _float fMaxDist,
+          _float3* pOutNormal = nullptr, _float* pOutDist = nullptr, _bool bStatic = true, _bool bDynamic = false);
 #pragma endregion
 
 #pragma region TEXTURE_HUB

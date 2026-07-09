@@ -386,6 +386,52 @@ void CPhysX_Manager::Release_Controller(physx::PxController* pCtrl)
     pCtrl->release();
 }
 
+_bool CPhysX_Manager::Overlap_Box(const _float3& vCenter, const _float3& vHalfExtents, const _float4& qRot, vector<physx::PxActor*>* pOutActors, _bool bStatic, _bool bDynamic)
+{
+    PxBoxGeometry Geom(vHalfExtents.x, vHalfExtents.y, vHalfExtents.z);
+    PxTransform   Pose(PxVec3(vCenter.x, vCenter.y, vCenter.z),
+        PxQuat(qRot.x, qRot.y, qRot.z, qRot.w));
+    return Overlap_Internal(Geom, Pose, pOutActors, bStatic, bDynamic);
+}
+
+_bool CPhysX_Manager::Overlap_Sphere(const _float3& vCenter, _float fRadius, vector<physx::PxActor*>* pOutActors, _bool bStatic, _bool bDynamic)
+{
+    PxSphereGeometry Geom(fRadius);
+    PxTransform      Pose(PxVec3(vCenter.x, vCenter.y, vCenter.z));
+    return Overlap_Internal(Geom, Pose, pOutActors, bStatic, bDynamic);
+}
+
+_bool CPhysX_Manager::Overlap_Capsule(const _float3& vCenter, _float fRadius, _float fHalfHeight, vector<physx::PxActor*>* pOutActors, _bool bStatic, _bool bDynamic)
+{
+    PxCapsuleGeometry Geom(fRadius, fHalfHeight);
+    PxTransform       Pose(PxVec3(vCenter.x, vCenter.y, vCenter.z),
+        PxQuat(PxHalfPi, PxVec3(0.f, 0.f, 1.f)));
+    return Overlap_Internal(Geom, Pose, pOutActors, bStatic, bDynamic);
+}
+
+_bool CPhysX_Manager::Sweep_Box(const _float3& vCenter, const _float3& vHalfExtents, const _float4& qRot, const _float3& vDir, _float fMaxDist, _float3* pOutNormal, _float* pOutDist, _bool bStatic, _bool bDynamic)
+{
+    PxBoxGeometry Geom(vHalfExtents.x, vHalfExtents.y, vHalfExtents.z);
+    PxTransform   Pose(PxVec3(vCenter.x, vCenter.y, vCenter.z),
+        PxQuat(qRot.x, qRot.y, qRot.z, qRot.w));
+    return Sweep_Internal(Geom, Pose, vDir, fMaxDist, pOutNormal, pOutDist, bStatic, bDynamic);
+}
+
+_bool CPhysX_Manager::Sweep_Sphere(const _float3& vCenter, _float fRadius, const _float3& vDir, _float fMaxDist, _float3* pOutNormal, _float* pOutDist, _bool bStatic, _bool bDynamic)
+{
+    PxSphereGeometry Geom(fRadius);
+    PxTransform      Pose(PxVec3(vCenter.x, vCenter.y, vCenter.z));
+    return Sweep_Internal(Geom, Pose, vDir, fMaxDist, pOutNormal, pOutDist, bStatic, bDynamic);
+}
+
+_bool CPhysX_Manager::Sweep_Capsule(const _float3& vCenter, _float fRadius, _float fHalfHeight, const _float3& vDir, _float fMaxDist, _float3* pOutNormal, _float* pOutDist, _bool bStatic, _bool bDynamic)
+{
+    PxCapsuleGeometry Geom(fRadius, fHalfHeight);
+    PxTransform       Pose(PxVec3(vCenter.x, vCenter.y, vCenter.z),
+        PxQuat(PxHalfPi, PxVec3(0.f, 0.f, 1.f)));
+    return Sweep_Internal(Geom, Pose, vDir, fMaxDist, pOutNormal, pOutDist, bStatic, bDynamic);
+}
+
 void CPhysX_Manager::Render_Debug(_fmatrix ViewMatrix, _fmatrix ProjMatrix)
 {
     if (!m_bDebugDraw || nullptr == m_pScene || nullptr == m_pBatch)
@@ -465,6 +511,74 @@ physx::PxRigidDynamic* CPhysX_Manager::Finalize_Dynamic(const physx::PxTransform
     m_pScene->addActor(*pActor);
     m_Dynamics.push_back(pActor);
     return pActor;
+}
+
+_bool CPhysX_Manager::Overlap_Internal(const physx::PxGeometry& Geom, const physx::PxTransform& Pose, vector<physx::PxActor*>* pOutActors, _bool bStatic, _bool bDynamic)
+{
+    if (nullptr == m_pScene)
+        return false;
+
+    PxQueryFilterData Filter{};
+    Filter.flags = PxQueryFlags(0);
+    if (bStatic)
+        Filter.flags |= PxQueryFlag::eSTATIC;
+    if (bDynamic)
+        Filter.flags |= PxQueryFlag::eDYNAMIC;
+
+    if (nullptr == pOutActors)
+        Filter.flags |= PxQueryFlag::eANY_HIT;
+
+    constexpr PxU32 MAX_TOUCH = 32;
+    PxOverlapHit    Touches[MAX_TOUCH];
+    PxOverlapBuffer Buf(Touches, MAX_TOUCH);
+
+    if (!m_pScene->overlap(Geom, Pose, Buf, Filter))
+        return false;
+
+    if (pOutActors)
+    {
+        pOutActors->clear();
+        for (PxU32 i = 0; i < Buf.getNbTouches(); ++i)
+        {
+            PxActor* pActor = Buf.getTouch(i).actor;
+            if (pActor && find(pOutActors->begin(), pOutActors->end(), pActor) == pOutActors->end())
+                pOutActors->push_back(pActor);
+        }
+        return !pOutActors->empty();
+    }
+    return true;
+}
+
+_bool CPhysX_Manager::Sweep_Internal(const physx::PxGeometry& Geom, const physx::PxTransform& Pose, const _float3& vDir, _float fMaxDist, _float3* pOutNormal, _float* pOutDist, _bool bStatic, _bool bDynamic)
+{
+    if (nullptr == m_pScene)
+        return false;
+
+    PxVec3 Dir(vDir.x, vDir.y, vDir.z);
+    if (Dir.normalize() < 1e-6f)
+        return false;
+
+    PxQueryFilterData Filter{};
+    Filter.flags = PxQueryFlags(0);
+    if (bStatic)
+        Filter.flags |= PxQueryFlag::eSTATIC;
+    if (bDynamic)
+        Filter.flags |= PxQueryFlag::eDYNAMIC;
+
+    // eMTD: 시작부터 겹쳐있는 경우에도 밀어낼 방향 노멀을 계산해줌
+    PxSweepBuffer Hit;
+    if (!m_pScene->sweep(Geom, Pose, Dir, fMaxDist, Hit,
+        PxHitFlag::eDEFAULT | PxHitFlag::eMTD, Filter))
+        return false;
+
+    if (!Hit.hasBlock)
+        return false;
+
+    if (pOutNormal)
+        *pOutNormal = _float3{ Hit.block.normal.x, Hit.block.normal.y, Hit.block.normal.z };
+    if (pOutDist)
+        *pOutDist = Hit.block.distance;
+    return true;
 }
 
 CPhysX_Manager* CPhysX_Manager::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

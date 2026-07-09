@@ -11,7 +11,7 @@ struct LD_SPAWN_SPEC;
 
 class CLD_DeformCarBreakWall final : public CLD_EventObject
 {
-	GENERATED_BODY(CLD_DeformCarBreakWall);
+	GENERATED_BODY(CLD_DeformCarBreakWall)
 
 public:
 	static constexpr const _tchar* OBJECT_NAME = L"DemoDeformCarFirst";

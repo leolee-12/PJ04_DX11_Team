@@ -7,14 +7,15 @@
 
 namespace
 {
-	inline constexpr const _tchar* TEMP_EVENT_TAG = L"Temp";
+	inline constexpr const _tchar* TEMP_EVENT_TAG = L"Bridge.CutSceneStart";
 
 	inline constexpr const _char* SLOPEBOARD_C_MODEL_PATH = "../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardC.ysh";
+	inline constexpr const _tchar* SLOPEBOARD_C_ANIM_EVENT_FILE = L"../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardC_AnimEvents.json";
 
 	inline constexpr const _char* ANIM_CUT1 = "Cut1";
 	inline constexpr const _char* SLOPEBOARD_C_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_CUT1 };
 
-	inline constexpr _float SLOPEBOARD_C_ANIM_SPEED = 1.f;
+	inline constexpr _float SLOPEBOARD_C_ANIM_SPEED = 1.5f;
 	inline constexpr _float SLOPEBOARD_C_BOX_THICKNESS = 4.f;
 	inline constexpr _float SLOPEBOARD_C_STOP_TRACK_FRAME = 450.f;
 
@@ -56,7 +57,7 @@ HRESULT CLD_SlopeBoardC::Validate_Initialized()
 	if (m_tEventObjectDesc.eModelType != MODEL::ANIM || m_tEventObjectDesc.wstrModelProtoTag != MODEL_PROTO_TAG)
 		return E_FAIL;
 
-	if (m_tEventObjectDesc.bUseCollMesh || !m_tEventObjectDesc.strAnimEventFile.empty())
+	if (m_tEventObjectDesc.bUseCollMesh || m_tEventObjectDesc.strAnimEventFile.empty())
 		return E_FAIL;
 
 	if (m_tEventObjectDesc.strAnimNames[0] != SLOPEBOARD_C_ANIM_NAMES[0])
@@ -82,6 +83,16 @@ void CLD_SlopeBoardC::Update(_float fTimeDelta)
 	{
 		Release_PhysicsBox(&m_pVerticalPhysicsActor);
 		m_eState = STATE::PLAYED;
+	}
+
+	if (STATE::PLAYED == m_eState && m_pAnimatorCom->Is_Finished())
+	{
+		KIRBY_POSITION_SYNC_END_DESC desc{};
+		desc.eType = KIRBY_POSITION_SYNC_END_REASON::CAR_BRIDGE_END;
+		m_pGameInstance_Proxy->Publish(EventTag::Kirby_PositionSyncEnd, &desc);
+		m_pGameInstance_Proxy->Publish(EventTag::Letterbox_End, nullptr);
+		m_pGameInstance_Proxy->Publish(EventTag::FadeOut_Start, nullptr);
+		m_eState = STATE::DONE;
 	}
 }
 
@@ -150,7 +161,7 @@ _bool CLD_SlopeBoardC::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& 
 	Desc.eModelType = Spec.eModelType;
 	Desc.wstrModelProtoTag = Spec.wstrModelProtoTag;
 	Desc.bUseCollMesh = false;
-	Desc.strAnimEventFile.clear();
+	Desc.strAnimEventFile = SLOPEBOARD_C_ANIM_EVENT_FILE;
 
 	Desc.strAnimNames[0] = SLOPEBOARD_C_ANIM_NAMES[0];
 
@@ -312,7 +323,34 @@ void CLD_SlopeBoardC::On_Event()
 	Play_Anim(ANIM_CUT1);
 	m_eState = STATE::PLAYING;
 
+	CUTSCENE_CAMERA_DESC cam{};
+	cam.eCam = ECutsceneCam::Cutscene;
+	cam.szTrack = L"Bridge_Cut1_camera1";
+	cam.pProgress = m_pAnimatorCom;
+	cam.pAnchorWorld = m_pTransformCom->Get_WorldMatrixPtr();
+	m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+
+	KIRBY_POSITION_SYNC_BEGIN_DESC Pos{};
+	Pos.fAnimSpeed = SLOPEBOARD_C_ANIM_SPEED;
+	Pos.fBlendDuration = 0.f;
+	Pos.AnchorWorld = *m_pTransformCom->Get_WorldMatrixPtr();
+	Pos.eType = KIRBY_POSITION_SYNC_CONTEXT::CAR_BRIDGE;
+	m_pGameInstance_Proxy->Publish(EventTag::Kirby_PositionSyncBegin, &Pos);
+
+	_bool b = { false };
+	m_pGameInstance_Proxy->Publish(EventTag::HUD_SetVisible, &b);
+	m_pGameInstance_Proxy->Publish(EventTag::Letterbox_Begin, nullptr);
+
 	m_pTrigger->Set_Enabled(false);
+}
+
+void CLD_SlopeBoardC::On_AnimEvent(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase)
+{
+	if (ANIM_EVENT_PHASE::POINT != ePhase)
+		return;
+
+	if (EANIM_EVENT::UI == static_cast<EANIM_EVENT>(AnimEvent.iEventType))
+		m_pGameInstance_Proxy->Publish(EventTag::TitleLogo_Show, nullptr);
 }
 
 CGameObject* CLD_SlopeBoardC::Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -347,7 +385,7 @@ CGameObject* CLD_SlopeBoardC::Clone(void* pArg)
 		TempDesc.eModelType = MODEL::ANIM;
 		TempDesc.wstrModelProtoTag = MODEL_PROTO_TAG;
 		TempDesc.bUseCollMesh = false;
-		TempDesc.strAnimEventFile.clear();
+		TempDesc.strAnimEventFile= SLOPEBOARD_C_ANIM_EVENT_FILE;
 
 		TempDesc.strAnimNames[0] = SLOPEBOARD_C_ANIM_NAMES[0];
 

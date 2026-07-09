@@ -336,6 +336,7 @@
     <ClInclude Include="..\Public\TestTriggerBox.h" />
     <ClInclude Include="..\Public\UI_Image.h" />
     <ClInclude Include="..\Public\UI_KirbyStatus.h" />
+    <ClInclude Include="..\public\UI_LetterBox.h" />
     <ClInclude Include="..\public\UI_LoadingCurtain.h" />
     <ClInclude Include="..\public\UI_MissionBoard.h" />
     <ClInclude Include="..\public\UI_MissionPanel.h" />
@@ -348,6 +349,7 @@
     <ClInclude Include="..\Public\UI_TestImageContainer.h" />
     <ClInclude Include="..\Public\UI_Text.h" />
     <ClInclude Include="..\Public\UI_Title.h" />
+    <ClInclude Include="..\public\UI_TitleLogo.h" />
     <ClInclude Include="..\Public\Vacuum.h" />
     <ClInclude Include="..\Public\InhaleContainer.h" />
     <ClInclude Include="..\Public\WalkSmoke.h" />
@@ -648,6 +650,7 @@
     <ClCompile Include="..\Private\TestTriggerBox.cpp" />
     <ClCompile Include="..\Private\UI_Image.cpp" />
     <ClCompile Include="..\Private\UI_KirbyStatus.cpp" />
+    <ClCompile Include="..\private\UI_LetterBox.cpp" />
     <ClCompile Include="..\private\UI_LoadingCurtain.cpp" />
     <ClCompile Include="..\private\UI_MissionBoard.cpp" />
     <ClCompile Include="..\private\UI_MissionPanel.cpp" />
@@ -659,6 +662,7 @@
     <ClCompile Include="..\Private\UI_TestImageContainer.cpp" />
     <ClCompile Include="..\Private\UI_Text.cpp" />
     <ClCompile Include="..\Private\UI_Title.cpp" />
+    <ClCompile Include="..\private\UI_TitleLogo.cpp" />
     <ClCompile Include="..\Private\Vacuum.cpp" />
     <ClCompile Include="..\Private\InhaleContainer.cpp" />
     <ClCompile Include="..\Private\WalkSmoke.cpp" />

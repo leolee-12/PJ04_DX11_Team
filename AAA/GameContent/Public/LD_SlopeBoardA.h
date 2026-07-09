@@ -11,7 +11,7 @@ struct LD_SPAWN_SPEC;
 
 class CLD_SlopeBoardA final : public CLD_EventObject
 {
-	GENERATED_BODY(CLD_SlopeBoardA);
+	GENERATED_BODY(CLD_SlopeBoardA)
 
 public:
 	static constexpr const _tchar* OBJECT_NAME = L"SlopeBoardA";

@@ -87,6 +87,9 @@ public:
 	virtual void On_Deserialized() override;
 
 public:
+	// Ability AnimEvent
+	_bool Handel_BodyAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
+
 	// Com
 	CMovement_Child* Get_Movement() { return m_pMovement; }
 
