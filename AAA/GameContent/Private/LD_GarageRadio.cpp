@@ -6,13 +6,13 @@
 
 namespace
 {
-	inline constexpr const _tchar* TEMP_EVENT_TAG = L"Temp"; // TODO: 컷신 트리거 이벤트 태그 확정 후 정리
+	inline constexpr const _tchar* TEMP_EVENT_TAG = L"Bridge.CutSceneStart";
 
 	inline constexpr const _char* GARAGE_RADIO_MODEL_PATH = "../../Resources/Map/Gimmick/Anim/GarageRadio/GarageRadio.ysh";
 	inline constexpr const _char* ANIM_CUT1 = "Cut1";
 	inline constexpr const _char* ANIM_WAIT = "Wait";
 	inline constexpr const _char* GARAGE_RADIO_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_CUT1, ANIM_WAIT };
-	inline constexpr _float GARAGE_RADIO_ANIM_SPEED = 1.f;
+	inline constexpr _float GARAGE_RADIO_ANIM_SPEED = 1.5f;
 }
 
 NS_BEGIN(Client)

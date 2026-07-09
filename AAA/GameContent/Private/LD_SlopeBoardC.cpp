@@ -7,7 +7,7 @@
 
 namespace
 {
-	inline constexpr const _tchar* TEMP_EVENT_TAG = L"Temp";
+	inline constexpr const _tchar* TEMP_EVENT_TAG = L"Bridge.CutSceneStart";
 
 	inline constexpr const _char* SLOPEBOARD_C_MODEL_PATH = "../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardC.ysh";
 	inline constexpr const _tchar* SLOPEBOARD_C_ANIM_EVENT_FILE = L"../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardC_AnimEvents.json";
