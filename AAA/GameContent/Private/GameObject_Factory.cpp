@@ -155,6 +155,7 @@
 #include "LD_SlopeBoardA.h"
 #include "LD_SlopeBoardC.h"
 #include "LD_DeformCarBreakWall.h"
+#include "LD_DeformObject.h"
 
 // EnvObject
 #include "EnvTrigger_Generic.h"
@@ -722,6 +723,10 @@ void CGameObject_Factory::Register_AnimObject()
     Register(CLD_DeformCarBreakWall::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_DeformCarBreakWall),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_DeformCarBreakWall::MODEL_PROTO_TAG,
             Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/DeformCarBreakWall/DeformCarBreakWall.ysh", false));));
+
+    Register(CLD_DeformObject::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_DeformObject),
+        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Proto_Component_Model_DeformCar"),
+            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/DeformCar/DeformCar.ysh", true));));
 }
 
 void CGameObject_Factory::Register_Effect()

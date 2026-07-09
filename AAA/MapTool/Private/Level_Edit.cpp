@@ -1834,18 +1834,20 @@ _bool CLevel_Edit::Handle_MapSpecificDeletion(CGameObject* pObject)
 
 	if (!bWasMapPreviewObject)
 		return false;
-	if (nullptr == m_pMapPreviewSession
-		|| !m_pMapPreviewSession->Can_DeleteAsEnvOverride(pObject))
-	{
+	if (nullptr == m_pMapPreviewSession)
 		return false;
-	}
 
-	_bool bTrackedDeletedEnv = false;
-	if (nullptr != m_pMapPreviewSession)
-	{
-		bTrackedDeletedEnv = m_pMapPreviewSession->Track_DeletedPreviewObject(pObject);
-		m_pMapPreviewSession->Unregister_AddedObject(pObject);
-	}
+	const _bool bCanDeleteEnvOverride =
+		m_pMapPreviewSession->Can_DeleteAsEnvOverride(pObject);
+	const _bool bCanDeleteLevelDesignOverride =
+		m_pMapPreviewSession->Can_DeleteAsLevelDesignOverride(pObject);
+
+	if (!bCanDeleteEnvOverride && !bCanDeleteLevelDesignOverride)
+		return false;
+
+	const _bool bTrackedDeletedPreview =
+		m_pMapPreviewSession->Track_DeletedPreviewObject(pObject);
+	m_pMapPreviewSession->Unregister_AddedObject(pObject);
 
 	m_MapPreviewObjects.erase(pObject);
 
@@ -1854,18 +1856,18 @@ _bool CLevel_Edit::Handle_MapSpecificDeletion(CGameObject* pObject)
 		m_pMapStage = nullptr;
 		Set_MapPreviewStageRuntime(false, L"");
 	}
-	else if (0 < Get_MapPreviewEnvCreatedCountInternal())
+	else if (bCanDeleteEnvOverride && 0 < Get_MapPreviewEnvCreatedCountInternal())
 	{
 		const _uint iNextEnvCount = Get_MapPreviewEnvCreatedCountInternal() - 1;
 		Set_MapPreviewEnvRuntime(0 < iNextEnvCount, iNextEnvCount);
 	}
-	else
+	else if (bCanDeleteEnvOverride)
 	{
 		Set_MapPreviewEnvRuntime(false, 0);
 	}
 
 #ifdef _DEBUG
-	if (bTrackedDeletedEnv)
+	if (bCanDeleteEnvOverride && bTrackedDeletedPreview)
 	{
 		for (const auto& [strCurrentLayer, CurrentObjects] : m_Layers)
 		{
@@ -1887,11 +1889,17 @@ _bool CLevel_Edit::Handle_MapSpecificDeletion(CGameObject* pObject)
 	}
 #endif
 
-	if (bTrackedDeletedEnv)
+	if (bTrackedDeletedPreview && bCanDeleteEnvOverride)
 	{
 		Set_MapPreviewStatus(
 			L"Map preview env override deleted. / deleted="
 			+ to_wstring(m_pMapPreviewSession->Get_DeletedEnvCount()));
+	}
+	else if (bTrackedDeletedPreview && bCanDeleteLevelDesignOverride)
+	{
+		Set_MapPreviewStatus(
+			L"Map preview LevelDesign override deleted. / deleted="
+			+ to_wstring(m_pMapPreviewSession->Get_DeletedLevelDesignCount()));
 	}
 	else if (!Is_MapStageLoaded() && !Is_MapEnvLoaded())
 	{
