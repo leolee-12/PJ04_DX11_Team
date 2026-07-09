@@ -30,8 +30,7 @@ public:
     virtual DEFORM_TYPE         Get_DeformType() const = 0;
     virtual DEFORM_OBJECT_KIND  Get_DeformKind() const = 0;
 
-    virtual _bool   Request_Deform() const = 0;
-    virtual HRESULT Begin_Deform(const _float4x4& AnchorWorld) = 0;
+    virtual _bool   Request_Deform(const _float4x4& AnchorWorld) = 0;
     virtual void    End_Deform(const _float4x4& AnchorWorld) = 0;
 };
 
