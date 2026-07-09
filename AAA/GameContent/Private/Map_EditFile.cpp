@@ -961,6 +961,23 @@ HRESULT CMap_EditFile::Apply_LevelDesignChange(LD_PACKAGE* pInOutPackage, const 
 	if (nullptr == pInOutPackage)
 		return E_FAIL;
 
+	if (!OverrideDesc.DeletedLevelDesignObjectKeys.empty())
+	{
+		auto& ObjectDescs = pInOutPackage->ObjectDescs;
+		ObjectDescs.erase(
+			remove_if(
+				ObjectDescs.begin(),
+				ObjectDescs.end(),
+				[&](const LD_OBJECT_ENTRY& Entry)
+				{
+					const LD_OBJECT_DESC& Desc = Get_LDObjectDesc(Entry);
+					const _wstring strKey = Make_LevelDesignKey(Desc);
+					return OverrideDesc.DeletedLevelDesignObjectKeys.find(strKey)
+						!= OverrideDesc.DeletedLevelDesignObjectKeys.end();
+				}),
+			ObjectDescs.end());
+	}
+
 	if (OverrideDesc.EditedLevelDesignObjects.empty())
 		return S_OK;
 
@@ -1231,7 +1248,18 @@ json CMap_EditFile::Save_Change(const MAP_EDIT_CHANGE& Desc)
 	for (const auto& strKey : DeletedKeys)
 		jDeletedEnvObjects.push_back(WstrToStr(strKey));
 
+	vector<_wstring> DeletedLevelDesignKeys(
+		Desc.DeletedLevelDesignObjectKeys.begin(),
+		Desc.DeletedLevelDesignObjectKeys.end());
+
+	sort(DeletedLevelDesignKeys.begin(), DeletedLevelDesignKeys.end());
+
+	json jDeletedLevelDesignObjects = json::array();
+	for (const auto& strKey : DeletedLevelDesignKeys)
+		jDeletedLevelDesignObjects.push_back(WstrToStr(strKey));
+
 	jOverride["DeletedEnvObjects"] = jDeletedEnvObjects;
+	jOverride["DeletedLevelDesignObjects"] = jDeletedLevelDesignObjects;
 	jOverride["EditedEnvObjects"] = Save_EditObjectOverrideMap(Desc.EditedEnvObjects);
 	jOverride["EditedMapSections"] = Save_EditObjectOverrideMap(Desc.EditedMapSections);
 	jOverride["EditedLevelDesignObjects"] = Save_EditObjectOverrideMap(Desc.EditedLevelDesignObjects);
@@ -1282,6 +1310,23 @@ HRESULT CMap_EditFile::Load_Change(const json& jOverride, MAP_EDIT_CHANGE* pOutD
 			const _wstring strKey = StrToWstr(jKey.get<string>());
 			if (!strKey.empty())
 				pOutDesc->DeletedEnvObjectKeys.insert(strKey);
+		}
+	}
+
+	const auto IterDeletedLevelDesign = jOverride.find("DeletedLevelDesignObjects");
+	if (IterDeletedLevelDesign != jOverride.end())
+	{
+		if (!IterDeletedLevelDesign->is_array())
+			return E_FAIL;
+
+		for (const auto& jKey : *IterDeletedLevelDesign)
+		{
+			if (!jKey.is_string())
+				continue;
+
+			const _wstring strKey = StrToWstr(jKey.get<string>());
+			if (!strKey.empty())
+				pOutDesc->DeletedLevelDesignObjectKeys.insert(strKey);
 		}
 	}
 

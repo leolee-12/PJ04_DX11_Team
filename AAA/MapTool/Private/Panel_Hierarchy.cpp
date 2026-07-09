@@ -368,16 +368,17 @@ void CPanel_Hierarchy::Render()
                             (nullptr != pSession) && pSession->Is_AddedObject(pObject);
                         const _bool bCanDeleteNormal = !bIsMapPreviewObject;
                         const _bool bCanRemoveAdded = bIsAddedMapOverride;
-                        const _bool bCanDeleteEnvOverride =
+                        const _bool bCanDeletePreviewOverride =
                             bIsMapPreviewObject
                             && !bIsAddedMapOverride
                             && nullptr != pSession
-                            && pSession->Can_DeleteAsEnvOverride(pObject);
+                            && (pSession->Can_DeleteAsEnvOverride(pObject)
+                                || pSession->Can_DeleteAsLevelDesignOverride(pObject));
 
                         const char* pDeleteButtonLabel = nullptr;
                         if (bCanRemoveAdded)
                             pDeleteButtonLabel = "Remove";
-                        else if (bCanDeleteEnvOverride)
+                        else if (bCanDeletePreviewOverride)
                             pDeleteButtonLabel = "X";
                         else if (bCanDeleteNormal)
                             pDeleteButtonLabel = "X";
