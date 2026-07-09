@@ -48,6 +48,7 @@ private:
 
 private:
 	virtual HRESULT Ready_Components() override;
+	virtual void On_Deserialized() override;
 	HRESULT Ready_Trigger();
 
 	void Set_TriggerEnabled(_bool bEnabled);

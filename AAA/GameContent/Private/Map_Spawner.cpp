@@ -182,7 +182,7 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 				&pControllerObject,
 				ETOUI(LEVEL::STATIC),
 				CEnv_InstanceController::PROTOTYPE_TAG,
-				Levels.iObjectLevel,
+				Targets.EnvStatic.iPlaceLevel,
 				ENV_INSTANCE_LAYER_TAG,
 				ENV_INSTANCE_OBJECT_TAG,
 				nullptr)))
@@ -296,7 +296,7 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 				&pCreatedObject,
 				Levels.iObjectLevel,
 				Added.strPrototypeTag.c_str(),
-				Levels.iObjectLevel,
+				Targets.EnvEffect.iPlaceLevel,
 				Added.strLayerTag.c_str(),
 				Added.strObjectTag,
 				pArg)))

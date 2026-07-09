@@ -36,6 +36,7 @@ namespace Client
 		ENV_FOLIAGE,
 		ENV_LADDER,
 		ESSENCE_BUBBLE,
+		DEFORM_OBJECT,
 		ENV_TRIGGER = 100
 	};
 
