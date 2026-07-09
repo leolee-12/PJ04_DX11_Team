@@ -127,6 +127,8 @@ void CCutsceneGorilla::Begin_Appear()
         return;
     Play(CLIP_APPEAR1, false, 0.2f, 1.5f);
     m_ePhase = EPhase::Appearing1;
+    _bool bShow = false;
+    m_pGameInstance_Proxy->Publish(EventTag::HUD_SetVisible, &bShow);
 }
 
 void CCutsceneGorilla::Fire_Grab()
