@@ -92,7 +92,7 @@ _bool CKirby_QTE_Grabbed::Handle_Command(CKirby* pKirby, CKirby_Command* pComman
     return false;
 }
 
-void CKirby_QTE_Grabbed::Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType)
+void CKirby_QTE_Grabbed::Request_Attach_End(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType)
 {
     if(eType == KIRBY_ATTACHMENT_END_REASON::GORILLA_COMBAT_ESCAPE)
         Change_QTEGrabbedState(pKirby, QTE_GRABBED_STATE::ESCAPE);

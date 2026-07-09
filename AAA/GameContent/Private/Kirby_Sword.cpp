@@ -2,8 +2,6 @@
 
 #include "GameInstance.h"
 
-#include "Damageable.h"
-
 #include "Kirby.h"
 #include "Kirby_Body.h"
 
@@ -13,7 +11,8 @@ CKirby_Sword::CKirby_Sword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 }
 
 CKirby_Sword::CKirby_Sword(const CKirby_Sword& Prototype)
-    : CKirby_OnOffPart(Prototype) {
+    : CKirby_OnOffPart(Prototype)
+{
 }
 
 HRESULT CKirby_Sword::Initialize_Prototype()
@@ -172,30 +171,32 @@ void CKirby_Sword::SetUp_HitBox_Callback()
     m_pHitBox->Set_OnEnter([this](CCollider* pOther)
         {
             CGameObject* pTarget = pOther->Get_Owner();
-            if (m_HitTargets.count(pTarget))   
+            if (pTarget == nullptr)
                 return;
 
-            IDamageable* pVictim = dynamic_cast<IDamageable*>(pTarget);
-            if (pVictim == nullptr)
+            if (m_DamagedTargets.count(pTarget) > 0)   
+                return;
+
+            IDamageable* pDamageable = dynamic_cast<IDamageable*>(pTarget);
+            if (pDamageable == nullptr)
                 return;
 
             ATTACK_INFO tDesc{};
-            tDesc.eHitType = HIT_TYPE::SWORD_DEFAULT;
-            tDesc.pAttacker = this;
+
             tDesc.vAttackerPos =  {
                 m_pParentMatrix->_41,
                 m_pParentMatrix->_42,
                 m_pParentMatrix->_43
             };
-            tDesc.fDamage = 500.f;
-            tDesc.fKnockback = 6.f;
-            pVictim->Damaged(tDesc);
 
-            m_HitTargets.insert(pTarget);   
+            pDamageable->Damaged(tDesc);
+
+            m_DamagedTargets.insert(pTarget);   
 #ifdef _DEBUG
             OutputDebugStringA("[Kirby_Sword] HIT Somthing!\n");
 #endif
-        });
+        }
+    );
 }
 
 CKirby_Sword* CKirby_Sword::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
