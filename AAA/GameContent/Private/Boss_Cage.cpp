@@ -85,7 +85,7 @@ void CBoss_Cage::Update(_float fTimeDelta)
 
                 CUTSCENE_STAGECLEAR Desc{};
                 Desc.AnchorWorld = *(m_pTransformCom->Get_WorldMatrixPtr());
-                Desc.fAnimSpeed = 1.5f;
+                Desc.fAnimSpeed = CLEAR_ANIM_SPEED;
                 Desc.fBlendDuration = 0.f;
                 Desc.eAnim = STAGECLEAR_ANIM::DANCE;
                 m_pGameInstance_Proxy->Publish(EventTag::Cutscene_StageClear, &Desc);

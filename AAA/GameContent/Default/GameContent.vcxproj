@@ -156,6 +156,7 @@
     <ClInclude Include="..\public\Projectile_Manager.h" />
     <ClInclude Include="..\public\Projectile_Movement.h" />
     <ClInclude Include="..\public\UI_CoordinatorContainer.h" />
+    <ClInclude Include="..\public\UI_CutFade.h" />
     <ClInclude Include="..\Public\UI_FlashCurtain.h" />
     <ClInclude Include="..\public\CutsceneActor.h" />
     <ClInclude Include="..\public\CutsceneGorilla.h" />
@@ -492,6 +493,7 @@
     <ClCompile Include="..\private\Projectile_Manager.cpp" />
     <ClCompile Include="..\private\Projectile_Movement.cpp" />
     <ClCompile Include="..\private\UI_CoordinatorContainer.cpp" />
+    <ClCompile Include="..\private\UI_CutFade.cpp" />
     <ClCompile Include="..\Private\UI_FlashCurtain.cpp" />
     <ClCompile Include="..\private\CutsceneActor.cpp" />
     <ClCompile Include="..\private\CutsceneGorilla.cpp" />

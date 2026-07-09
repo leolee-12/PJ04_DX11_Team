@@ -316,7 +316,8 @@ _bool CKirby_Ability_Sword::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVEN
         {
             case SWORD_HIT_PARAM::SLASH1_H:
             {
-                tAttackInfo.fDamage = 10.f;
+                //tAttackInfo.fDamage = 10.f; ¿øº»
+                tAttackInfo.fDamage = 500.f;
                 tAttackInfo.fKnockback = 4.5f;
                 tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
                 pSword->Begin_Hit(tAttackInfo);

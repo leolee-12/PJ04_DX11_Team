@@ -18,6 +18,7 @@ class CBoss_Cage final : public CContainerObject
 
 public:
     static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_Boss_Cage";
+    static constexpr const _float  CLEAR_ANIM_SPEED = 2.f;
 
     enum class CAGE_STATE
     {

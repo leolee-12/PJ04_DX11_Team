@@ -53,6 +53,10 @@ namespace Client
         inline constexpr const _tchar* Letterbox_Begin = L"Letterbox.Begin";
         inline constexpr const _tchar* Letterbox_End = L"Letterbox.End";
         inline constexpr const _tchar* FadeOut_Start = L"FadeOut_Start";
+        inline constexpr const _tchar* CutFade_Out = L"CutFade.Out";
+        inline constexpr const _tchar* CutFade_OutDone = L"CutFade.OutDone";
+        inline constexpr const _tchar* CutFade_In = L"CutFade.In";
+        inline constexpr const _tchar* CutFade_InDone = L"CutFade.InDone";
         
         // ¸Ê 
         inline constexpr const _tchar* Stage1_Step2_CarBreakMap = L"Stage1-2.CarBreakMap";
