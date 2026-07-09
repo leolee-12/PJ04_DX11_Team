@@ -138,7 +138,7 @@ HRESULT CLD_AudioArea::Initialize(void* pArg)
 	m_tAudioAreaDesc = pParsedDesc->AudioArea;
 	m_eMode = Resolve_Mode();
 
-	if (FAILED(Ready_TriggerCollider()))
+	if (FAILED(Ready_Trigger()))
 		return E_FAIL;
 
 	SetUp_Collider_Callback();
@@ -168,7 +168,7 @@ HRESULT CLD_AudioArea::Validate_Initialized()
 	if (m_eMode == MODE::UNKNOWN)
 		return E_FAIL;
 
-	if (nullptr == m_pTriggerCollider)
+	if (nullptr == m_pTrigger)
 		return E_FAIL;
 
 	return S_OK;
@@ -176,7 +176,7 @@ HRESULT CLD_AudioArea::Validate_Initialized()
 
 void CLD_AudioArea::Late_Update(_float fTimeDelta)
 {
-	Update_TriggerCollider();
+	Update_Trigger();
 
 	if (m_eMode != MODE::AMBIENT_LOOP)
 		return;
@@ -199,13 +199,13 @@ void CLD_AudioArea::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
 }
 
-HRESULT CLD_AudioArea::Ready_TriggerCollider()
+HRESULT CLD_AudioArea::Ready_Trigger()
 {
-	m_pTriggerCollider = Add_Component<CCollider>(
-		L"Com_AudioAreaTrigger",
+	m_pTrigger = Add_Component<CCollider>(
+		L"Com_Trigger",
 		CCollider::Create(m_pDevice, m_pContext, COLLIDER::AABB));
 
-	if (nullptr == m_pTriggerCollider)
+	if (nullptr == m_pTrigger)
 		return E_FAIL;
 
 	CCollider::COLLIDER_DESC ColliderDesc{};
@@ -213,44 +213,44 @@ HRESULT CLD_AudioArea::Ready_TriggerCollider()
 	ColliderDesc.vCenter = { 0.f, 0.f, 0.f };
 	ColliderDesc.vSize = { 1.f, 1.f, 1.f };
 
-	if (FAILED(m_pTriggerCollider->Initialize(&ColliderDesc)))
+	if (FAILED(m_pTrigger->Initialize(&ColliderDesc)))
 		return E_FAIL;
 
-	m_pGameInstance_Proxy->Register_Collider(m_pTriggerCollider, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+	m_pGameInstance_Proxy->Register_Collider(m_pTrigger, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
 
 	return S_OK;
 }
 
-void CLD_AudioArea::Update_TriggerCollider()
+void CLD_AudioArea::Update_Trigger()
 {
 	const _float3 vAreaSize = GeometryUtils::Make_AbsSize(m_tAudioAreaDesc.vAreaSize);
 	const _bool bValidArea = GeometryUtils::Has_UsableSize(vAreaSize);
 
-	m_pTriggerCollider->Set_Enabled(bValidArea);
+	m_pTrigger->Set_Enabled(bValidArea);
 
 	if (!bValidArea)
 		return;
 
 	const _matrix TriggerWorldMatrix = XMMatrixScaling(vAreaSize.x, vAreaSize.y, vAreaSize.z) * XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
 
-	m_pTriggerCollider->Update(TriggerWorldMatrix);
+	m_pTrigger->Update(TriggerWorldMatrix);
 
 #ifdef _DEBUG
-	m_pGameInstance_Proxy->Add_DebugComponent(m_pTriggerCollider);
+	m_pGameInstance_Proxy->Add_DebugComponent(m_pTrigger);
 #endif
 }
 
 void CLD_AudioArea::SetUp_Collider_Callback()
 {
-	if (nullptr == m_pTriggerCollider)
+	if (nullptr == m_pTrigger)
 		return;
 
-	m_pTriggerCollider->Set_OnEnter([this](CCollider* pOther) { OnTriggerEnter(pOther); });
-	m_pTriggerCollider->Set_OnStay([this](CCollider* pOther) { OnTriggerStay(pOther); });
-	m_pTriggerCollider->Set_OnExit([this](CCollider* pOther) { OnTriggerExit(pOther); });
+	m_pTrigger->Set_OnEnter([this](CCollider* pOther) { Handle_TriggerEnter(pOther); });
+	m_pTrigger->Set_OnStay([this](CCollider* pOther) { Handle_TriggerStay(pOther); });
+	m_pTrigger->Set_OnExit([this](CCollider* pOther) { Handle_TriggerExit(pOther); });
 }
 
-void CLD_AudioArea::OnTriggerEnter(CCollider* pOther)
+void CLD_AudioArea::Handle_TriggerEnter(CCollider* pOther)
 {
 	if (!Is_TriggerActivator(pOther))
 		return;
@@ -278,13 +278,13 @@ void CLD_AudioArea::OnTriggerEnter(CCollider* pOther)
 #endif
 }
 
-void CLD_AudioArea::OnTriggerStay(CCollider* pOther)
+void CLD_AudioArea::Handle_TriggerStay(CCollider* pOther)
 {
 	if (!Is_TriggerActivator(pOther))
 		return;
 }
 
-void CLD_AudioArea::OnTriggerExit(CCollider* pOther)
+void CLD_AudioArea::Handle_TriggerExit(CCollider* pOther)
 {
 	if (!Is_TriggerActivator(pOther))
 		return;

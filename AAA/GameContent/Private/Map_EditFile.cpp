@@ -103,97 +103,176 @@ namespace
 		pOutDesc->vPosition	= _float4(Mat.m[3][0], Mat.m[3][1], Mat.m[3][2], Mat.m[3][3]);
 	}
 
-	void Apply_EnvEditToDesc(ENV_OBJECT_DESC* pOutDesc, const MAP_ENV_EDITED_DESC& Edit)
+	void Apply_CommonOverrideToEnvDesc(ENV_OBJECT_DESC* pOutDesc, const EDIT_OBJECT_COMMON_OVERRIDE& Common)
 	{
 		if (nullptr == pOutDesc)
 			return;
 
-		if (Edit.bHasRenderable)
-			pOutDesc->tCollision.bInvisibleCollision = !Edit.bRenderable;
+		const EDIT_OBJECT_POLICY& Policy = Common.Policy;
 
-		if (Edit.bHasUseCullDistance)
-			pOutDesc->tRender.bUseCullDistance = Edit.bUseCullDistance;
+		if (Common.iPolicyMask & EDIT_CAP_RENDERABLE)
+			pOutDesc->tCollision.bInvisibleCollision = !Policy.bRenderable;
 
-		if (Edit.bHasUseCullFrustum)
-			pOutDesc->tRender.bUseCullFrustum = Edit.bUseCullFrustum;
+		if (Common.iPolicyMask & EDIT_CAP_CULL_DISTANCE)
+			pOutDesc->tRender.bUseCullDistance = Policy.bUseCullDistance;
 
-		if (Edit.bHasShadow)
+		if (Common.iPolicyMask & EDIT_CAP_CULL_FRUSTUM)
+			pOutDesc->tRender.bUseCullFrustum = Policy.bUseCullFrustum;
+
+		if (Common.iPolicyMask & EDIT_CAP_SHADOW)
 		{
-			pOutDesc->tRender.bUseShadow = pOutDesc->tRender.bHasShadow && Edit.bUseShadow;
-			pOutDesc->tRender.bShadowMappingCaster = pOutDesc->tRender.bUseShadow; // Transitional mirror only.
+			pOutDesc->tRender.bUseShadow = pOutDesc->tRender.bHasShadow && Policy.bUseShadow;
+			pOutDesc->tRender.bShadowMappingCaster = pOutDesc->tRender.bUseShadow;
 		}
 
-		if (Edit.bHasWorldMatrix)
+		if (Common.bHasWorldMatrix)
 		{
 			pOutDesc->bHasWorldMatrix = true;
-			pOutDesc->matWorld = Edit.matWorld;
+			pOutDesc->matWorld = Common.matWorld;
 
 			CGameObject::GAMEOBJECT_DESC& BaseDesc = static_cast<CGameObject::GAMEOBJECT_DESC&>(*pOutDesc);
-			Apply_WorldMatrixToGameObjectDesc(&BaseDesc, Edit.matWorld);
+			Apply_WorldMatrixToGameObjectDesc(&BaseDesc, Common.matWorld);
 		}
 
-		if (Edit.bHasCollMesh)
-		{
-			pOutDesc->tCollision.bUseCollMesh = pOutDesc->tCollision.bHasCollMesh && Edit.bUseCollMesh;
-		}
-
-		if (Edit.bHasNearDistAlpha)
-			pOutDesc->tRender.bUseNearDistAlpha = Edit.bUseNearDistAlpha;
+		if (Common.iPolicyMask & EDIT_CAP_COLLISION_MESH)
+			pOutDesc->tCollision.bUseCollMesh = pOutDesc->tCollision.bHasCollMesh && Policy.bUseCollMesh;
 	}
 
-	void Apply_SectionEditToDesc(MAP_SECTION_DESC* pOutDesc, const MAP_ENV_EDITED_DESC& Edit)
+	void Apply_CommonOverrideToMapSectionDesc(MAP_SECTION_DESC* pOutDesc, const EDIT_OBJECT_COMMON_OVERRIDE& Common)
 	{
 		if (nullptr == pOutDesc)
 			return;
 
-		if (Edit.bHasRenderable)
-			pOutDesc->bRenderable = Edit.bRenderable;
+		const EDIT_OBJECT_POLICY& Policy = Common.Policy;
 
-		if (Edit.bHasEnableCulling)
-			pOutDesc->bEnableCulling = Edit.bEnableCulling;
+		if (Common.iPolicyMask & EDIT_CAP_RENDERABLE)
+			pOutDesc->bRenderable = Policy.bRenderable;
 
-		if (Edit.bHasWorldMatrix)
+		if (Common.iPolicyMask & EDIT_CAP_CULL_FRUSTUM)
+			pOutDesc->bEnableCulling = Policy.bUseCullFrustum;
+
+		if (Common.bHasWorldMatrix)
 		{
-			CGameObject::GAMEOBJECT_DESC& BaseDesc =
-				static_cast<CGameObject::GAMEOBJECT_DESC&>(*pOutDesc);
-			Apply_WorldMatrixToGameObjectDesc(&BaseDesc, Edit.matWorld);
+			CGameObject::GAMEOBJECT_DESC& BaseDesc = static_cast<CGameObject::GAMEOBJECT_DESC&>(*pOutDesc);
+			Apply_WorldMatrixToGameObjectDesc(&BaseDesc, Common.matWorld);
 		}
 
-		if (Edit.bHasCollMesh)
-			pOutDesc->bUseCollMesh = Edit.bUseCollMesh;
+		if (Common.iPolicyMask & EDIT_CAP_COLLISION_MESH)
+			pOutDesc->bUseCollMesh = Policy.bUseCollMesh;
 	}
 
-	json Save_EditedDesc(const MAP_ENV_EDITED_DESC& Edit, _bool bEnvObjectEdit)
+	void Apply_CommonOverrideToLDDesc(LD_OBJECT_DESC* pOutDesc, const EDIT_OBJECT_COMMON_OVERRIDE& Common)
 	{
-		json j = json::object();
+		if (nullptr == pOutDesc)
+			return;
 
-		if (Edit.bHasRenderable)
-			j["Renderable"] = static_cast<bool>(Edit.bRenderable);
-
-		if (bEnvObjectEdit)
+		if (Common.bHasWorldMatrix)
 		{
-			if (Edit.bHasUseCullDistance)
-				j["UseCullDistance"] = static_cast<bool>(Edit.bUseCullDistance);
-
-			if (Edit.bHasUseCullFrustum)
-				j["UseCullFrustum"] = static_cast<bool>(Edit.bUseCullFrustum);
+			CGameObject::GAMEOBJECT_DESC& BaseDesc = static_cast<CGameObject::GAMEOBJECT_DESC&>(*pOutDesc);
+			Apply_WorldMatrixToGameObjectDesc(&BaseDesc, Common.matWorld);
 		}
-		else
+	}
+
+	void Apply_ClassOverrideToEnvDesc(ENV_OBJECT_DESC* pOutDesc, const EDIT_CLASS_OVERRIDE& ClassOverride)
+	{
+		if (nullptr == pOutDesc)
+			return;
+
+		const EDIT_ENVOBJECT_OVERRIDE* pEnvOverride = get_if<EDIT_ENVOBJECT_OVERRIDE>(&ClassOverride);
+		if (nullptr == pEnvOverride)
+			return;
+
+		if (pEnvOverride->bHasNearDistAlpha)
+			pOutDesc->tRender.bUseNearDistAlpha = pEnvOverride->bUseNearDistAlpha;
+	}
+
+	void Apply_ClassOverrideToMapSectionDesc(MAP_SECTION_DESC* pOutDesc, const EDIT_CLASS_OVERRIDE& ClassOverride)
+	{
+		UNREFERENCED_PARAMETER(pOutDesc);
+		UNREFERENCED_PARAMETER(ClassOverride);
+	}
+
+	void Apply_ClassOverrideToLDEntry(LD_OBJECT_ENTRY* pOutEntry, const EDIT_CLASS_OVERRIDE& ClassOverride)
+	{
+		if (nullptr == pOutEntry)
+			return;
+
+		const EDIT_LD_BUSH_OVERRIDE* pBushOverride = get_if<EDIT_LD_BUSH_OVERRIDE>(&ClassOverride);
+		if (nullptr == pBushOverride)
+			return;
+
+		LD_BUSH_DESC* pBushDesc = get_if<LD_BUSH_DESC>(pOutEntry);
+		if (nullptr == pBushDesc)
+			return;
+
+		if (pBushOverride->bHasGenerateItem)
+			pBushDesc->bGenerateItem = pBushOverride->bGenerateItem;
+	}
+
+	void Apply_EditObjectOverrideToEnvDesc(ENV_OBJECT_DESC* pOutDesc, const EDIT_OBJECT_OVERRIDE_DESC& Edit)
+	{
+		if (nullptr == pOutDesc)
+			return;
+
+		if (EDITABLE_OBJECT_KIND::ENV_OBJECT != Edit.eKind)
+			return;
+
+		Apply_CommonOverrideToEnvDesc(pOutDesc, Edit.Common);
+		Apply_ClassOverrideToEnvDesc(pOutDesc, Edit.ClassOverride);
+	}
+
+	void Apply_EditObjectOverrideToMapSectionDesc(MAP_SECTION_DESC* pOutDesc, const EDIT_OBJECT_OVERRIDE_DESC& Edit)
+	{
+		if (nullptr == pOutDesc)
+			return;
+
+		if (EDITABLE_OBJECT_KIND::MAP_SECTION != Edit.eKind)
+			return;
+
+		Apply_CommonOverrideToMapSectionDesc(pOutDesc, Edit.Common);
+		Apply_ClassOverrideToMapSectionDesc(pOutDesc, Edit.ClassOverride);
+	}
+
+	void Apply_EditObjectOverrideToLDEntry(LD_OBJECT_ENTRY* pOutEntry, const EDIT_OBJECT_OVERRIDE_DESC& Edit)
+	{
+		if (nullptr == pOutEntry)
+			return;
+
+		if (EDITABLE_OBJECT_KIND::LEVEL_DESIGN_OBJECT != Edit.eKind)
+			return;
+
+		LD_OBJECT_DESC& Desc = Get_LDObjectDesc(*pOutEntry);
+		Apply_CommonOverrideToLDDesc(&Desc, Edit.Common);
+		Apply_ClassOverrideToLDEntry(pOutEntry, Edit.ClassOverride);
+	}
+
+	void Set_CommonPolicyOverride(EDIT_OBJECT_COMMON_OVERRIDE* pCommon, _uint iCapability, _bool bValue)
+	{
+		if (nullptr == pCommon)
+			return;
+
+		pCommon->iPolicyMask |= iCapability;
+
+		switch (iCapability)
 		{
-			if (Edit.bHasEnableCulling)
-				j["EnableCulling"] = static_cast<bool>(Edit.bEnableCulling);
+		case EDIT_CAP_RENDERABLE:
+			pCommon->Policy.bRenderable = bValue;
+			break;
+		case EDIT_CAP_CULL_DISTANCE:
+			pCommon->Policy.bUseCullDistance = bValue;
+			break;
+		case EDIT_CAP_CULL_FRUSTUM:
+			pCommon->Policy.bUseCullFrustum = bValue;
+			break;
+		case EDIT_CAP_COLLISION_MESH:
+			pCommon->Policy.bUseCollMesh = bValue;
+			break;
+		case EDIT_CAP_SHADOW:
+			pCommon->Policy.bUseShadow = bValue;
+			break;
+		default:
+			break;
 		}
-
-		if (Edit.bHasWorldMatrix)
-			j["WorldMatrix"] = Save_Float4x4(Edit.matWorld);
-
-		if (Edit.bHasCollMesh)
-			j["UseCollMesh"] = static_cast<bool>(Edit.bUseCollMesh);
-
-		if (Edit.bHasNearDistAlpha)
-			j["UseNearDistAlpha"] = static_cast<bool>(Edit.bUseNearDistAlpha);
-
-		return j;
 	}
 
 	HRESULT Load_EditedDesc(const json& jValue, MAP_ENV_EDITED_DESC* pOutDesc, _bool bEnvObjectEdit)
@@ -201,7 +280,7 @@ namespace
 		if (nullptr == pOutDesc)
 			return E_FAIL;
 
-		*pOutDesc = {}; 
+		*pOutDesc = {};
 
 		if (!jValue.is_object())
 			return E_FAIL;
@@ -296,12 +375,432 @@ namespace
 		return S_OK;
 	}
 
-	json Save_EditedMap(const unordered_map<_wstring, MAP_ENV_EDITED_DESC>& EditedMap, _bool bEnvObjectEdit)
+	EDIT_OBJECT_OVERRIDE_DESC Convert_LegacyEnvEditToOverride(const MAP_ENV_EDITED_DESC& Edit)
+	{
+		EDIT_OBJECT_OVERRIDE_DESC Desc{};
+		Desc.eKind = EDITABLE_OBJECT_KIND::ENV_OBJECT;
+		Desc.strStableKey = Edit.strStableKey;
+
+		if (Edit.bHasRenderable)		Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_RENDERABLE, Edit.bRenderable);
+		if (Edit.bHasUseCullDistance)	Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_CULL_DISTANCE, Edit.bUseCullDistance);
+		if (Edit.bHasUseCullFrustum)	Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_CULL_FRUSTUM, Edit.bUseCullFrustum);
+		if (Edit.bHasCollMesh)			Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_COLLISION_MESH, Edit.bUseCollMesh);
+		if (Edit.bHasShadow)			Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_SHADOW, Edit.bUseShadow);
+
+		if (Edit.bHasWorldMatrix)
+		{
+			Desc.Common.bHasWorldMatrix = true;
+			Desc.Common.matWorld = Edit.matWorld;
+		}
+
+		if (Edit.bHasNearDistAlpha)
+		{
+			EDIT_ENVOBJECT_OVERRIDE EnvOverride{};
+			EnvOverride.bHasNearDistAlpha = true;
+			EnvOverride.bUseNearDistAlpha = Edit.bUseNearDistAlpha;
+			Desc.ClassOverride = EnvOverride;
+		}
+
+		return Desc;
+	}
+
+	EDIT_OBJECT_OVERRIDE_DESC Convert_LegacyMapSectionEditToOverride(const MAP_ENV_EDITED_DESC& Edit)
+	{
+		EDIT_OBJECT_OVERRIDE_DESC Desc{};
+		Desc.eKind = EDITABLE_OBJECT_KIND::MAP_SECTION;
+		Desc.strStableKey = Edit.strStableKey;
+
+		if (Edit.bHasRenderable)	Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_RENDERABLE, Edit.bRenderable);
+		if (Edit.bHasEnableCulling)	Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_CULL_FRUSTUM, Edit.bEnableCulling);
+		if (Edit.bHasCollMesh)		Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_COLLISION_MESH, Edit.bUseCollMesh);
+
+		if (Edit.bHasWorldMatrix)
+		{
+			Desc.Common.bHasWorldMatrix = true;
+			Desc.Common.matWorld = Edit.matWorld;
+		}
+
+		return Desc;
+	}
+
+	EDIT_OBJECT_OVERRIDE_DESC Convert_LegacyLDEditToOverride(const MAP_LD_EDITED_DESC& Edit)
+	{
+		EDIT_OBJECT_OVERRIDE_DESC Desc{};
+		Desc.eKind = EDITABLE_OBJECT_KIND::LEVEL_DESIGN_OBJECT;
+		Desc.strStableKey = Edit.strStableKey;
+
+		if (Edit.bHasWorldMatrix)
+		{
+			Desc.Common.bHasWorldMatrix = true;
+			Desc.Common.matWorld = Edit.matWorld;
+		}
+
+		return Desc;
+	}
+
+	json Save_CommonOverride(const EDIT_OBJECT_COMMON_OVERRIDE& Common)
+	{
+		json jCommon = json::object();
+
+		if (0u != Common.iPolicyMask)
+		{
+			json jPolicy = json::object();
+
+			if (Common.iPolicyMask & EDIT_CAP_RENDERABLE)		jPolicy["Renderable"] = static_cast<bool>(Common.Policy.bRenderable);
+			if (Common.iPolicyMask & EDIT_CAP_CULL_DISTANCE)	jPolicy["UseCullDistance"] = static_cast<bool>(Common.Policy.bUseCullDistance);
+			if (Common.iPolicyMask & EDIT_CAP_CULL_FRUSTUM)		jPolicy["UseCullFrustum"] = static_cast<bool>(Common.Policy.bUseCullFrustum);
+			if (Common.iPolicyMask & EDIT_CAP_COLLISION_MESH)	jPolicy["UseCollMesh"] = static_cast<bool>(Common.Policy.bUseCollMesh);
+			if (Common.iPolicyMask & EDIT_CAP_SHADOW)			jPolicy["UseShadow"] = static_cast<bool>(Common.Policy.bUseShadow);
+
+			if (!jPolicy.empty())	jCommon["Policy"] = jPolicy;
+		}
+
+		if (Common.bHasWorldMatrix)	jCommon["WorldMatrix"] = Save_Float4x4(Common.matWorld);
+
+		return jCommon;
+	}
+
+	HRESULT Load_CommonPolicyField(const json& jPolicy, const char* pFieldName, EDIT_OBJECT_COMMON_OVERRIDE* pOutCommon, _uint iCapability)
+	{
+		const auto Iter = jPolicy.find(pFieldName);
+		if (Iter == jPolicy.end())
+			return S_OK;
+
+		if (!Iter->is_boolean())
+			return E_FAIL;
+
+		Set_CommonPolicyOverride(pOutCommon, iCapability, Iter->get<bool>());
+		return S_OK;
+	}
+
+	HRESULT Load_CommonOverride(const json& jCommon, EDIT_OBJECT_COMMON_OVERRIDE* pOutCommon)
+	{
+		if (nullptr == pOutCommon)
+			return E_FAIL;
+
+		*pOutCommon = {};
+
+		if (!jCommon.is_object())
+			return E_FAIL;
+
+		const auto IterPolicy = jCommon.find("Policy");
+		if (IterPolicy != jCommon.end())
+		{
+			if (!IterPolicy->is_object())
+				return E_FAIL;
+
+			if (FAILED(Load_CommonPolicyField(*IterPolicy, "Renderable", pOutCommon, EDIT_CAP_RENDERABLE)))			return E_FAIL;
+			if (FAILED(Load_CommonPolicyField(*IterPolicy, "UseCullDistance", pOutCommon, EDIT_CAP_CULL_DISTANCE)))	return E_FAIL;
+			if (FAILED(Load_CommonPolicyField(*IterPolicy, "UseCullFrustum", pOutCommon, EDIT_CAP_CULL_FRUSTUM)))	return E_FAIL;
+			if (FAILED(Load_CommonPolicyField(*IterPolicy, "UseCollMesh", pOutCommon, EDIT_CAP_COLLISION_MESH)))	return E_FAIL;
+			if (FAILED(Load_CommonPolicyField(*IterPolicy, "UseShadow", pOutCommon, EDIT_CAP_SHADOW)))				return E_FAIL;
+		}
+
+		const auto IterWorldMatrix = jCommon.find("WorldMatrix");
+		if (IterWorldMatrix != jCommon.end())
+		{
+			if (FAILED(Load_Float4x4(*IterWorldMatrix, &pOutCommon->matWorld)))
+				return E_FAIL;
+
+			pOutCommon->bHasWorldMatrix = true;
+		}
+
+		return S_OK;
+	}
+
+	const char* Get_ClassOverrideName(const EDIT_CLASS_OVERRIDE& ClassOverride)
+	{
+		if (holds_alternative<EDIT_ENVOBJECT_OVERRIDE>(ClassOverride))		return "EnvObject";
+		if (holds_alternative<EDIT_LD_BUSH_OVERRIDE>(ClassOverride))		return "Bush";
+		if (holds_alternative<EDIT_MAPSECTION_OVERRIDE>(ClassOverride))		return "MapSection";
+		if (holds_alternative<EDIT_LEVELDESIGN_OVERRIDE>(ClassOverride))	return "LevelDesignObject";
+
+		return "";
+	}
+
+	json Save_ClassOverride(const EDIT_CLASS_OVERRIDE& ClassOverride)
+	{
+		json jClassOverride = json::object();
+
+		if (const EDIT_ENVOBJECT_OVERRIDE* pEnvOverride = get_if<EDIT_ENVOBJECT_OVERRIDE>(&ClassOverride))
+		{
+			if (pEnvOverride->bHasNearDistAlpha)	jClassOverride["UseNearDistAlpha"] = static_cast<bool>(pEnvOverride->bUseNearDistAlpha);
+			if (pEnvOverride->bHasDecalAlpha)		jClassOverride["DecalAlpha"] = pEnvOverride->fDecalAlpha;
+		}
+		else if (const EDIT_LD_BUSH_OVERRIDE* pBushOverride = get_if<EDIT_LD_BUSH_OVERRIDE>(&ClassOverride))
+		{
+			if (pBushOverride->bHasGenerateItem)	jClassOverride["GenerateItem"] = static_cast<bool>(pBushOverride->bGenerateItem);
+		}
+
+		return jClassOverride;
+	}
+
+	HRESULT Load_ClassOverride(const string& strClassName, const json& jClassOverride, EDIT_CLASS_OVERRIDE* pOutClassOverride)
+	{
+		if (nullptr == pOutClassOverride)
+			return E_FAIL;
+
+		*pOutClassOverride = monostate{};
+
+		if (!jClassOverride.is_object())
+			return E_FAIL;
+
+		if ("EnvObject" == strClassName)
+		{
+			EDIT_ENVOBJECT_OVERRIDE EnvOverride{};
+
+			const auto IterNearDistAlpha = jClassOverride.find("UseNearDistAlpha");
+			if (IterNearDistAlpha != jClassOverride.end())
+			{
+				if (!IterNearDistAlpha->is_boolean())
+					return E_FAIL;
+
+				EnvOverride.bHasNearDistAlpha = true;
+				EnvOverride.bUseNearDistAlpha = IterNearDistAlpha->get<bool>();
+			}
+
+			const auto IterDecalAlpha = jClassOverride.find("DecalAlpha");
+			if (IterDecalAlpha != jClassOverride.end())
+			{
+				if (!IterDecalAlpha->is_number())
+					return E_FAIL;
+
+				EnvOverride.bHasDecalAlpha = true;
+				EnvOverride.fDecalAlpha = IterDecalAlpha->get<_float>();
+			}
+
+			*pOutClassOverride = EnvOverride;
+			return S_OK;
+		}
+
+		if ("Bush" == strClassName)
+		{
+			EDIT_LD_BUSH_OVERRIDE BushOverride{};
+
+			const auto IterGenerateItem = jClassOverride.find("GenerateItem");
+			if (IterGenerateItem != jClassOverride.end())
+			{
+				if (!IterGenerateItem->is_boolean())
+					return E_FAIL;
+
+				BushOverride.bHasGenerateItem = true;
+				BushOverride.bGenerateItem = IterGenerateItem->get<bool>();
+			}
+
+			*pOutClassOverride = BushOverride;
+			return S_OK;
+		}
+
+		if ("MapSection" == strClassName)
+		{
+			*pOutClassOverride = EDIT_MAPSECTION_OVERRIDE{};
+			return S_OK;
+		}
+
+		if ("LevelDesignObject" == strClassName)
+		{
+			*pOutClassOverride = EDIT_LEVELDESIGN_OVERRIDE{};
+			return S_OK;
+		}
+
+		return E_FAIL;
+	}
+
+	const char* Get_ObjectKindName(EDITABLE_OBJECT_KIND eKind)
+	{
+		switch (eKind)
+		{
+		case EDITABLE_OBJECT_KIND::MAP_SECTION:
+			return "MapSection";
+		case EDITABLE_OBJECT_KIND::ENV_OBJECT:
+			return "EnvObject";
+		case EDITABLE_OBJECT_KIND::LEVEL_DESIGN_OBJECT:
+			return "LevelDesignObject";
+		default:
+			return "MapSection";
+		}
+	}
+
+	HRESULT Load_ObjectKindName(const string& strKind, EDITABLE_OBJECT_KIND* pOutKind)
+	{
+		if (nullptr == pOutKind)
+			return E_FAIL;
+
+		if ("MapSection" == strKind)
+		{
+			*pOutKind = EDITABLE_OBJECT_KIND::MAP_SECTION;
+			return S_OK;
+		}
+
+		if ("EnvObject" == strKind)
+		{
+			*pOutKind = EDITABLE_OBJECT_KIND::ENV_OBJECT;
+			return S_OK;
+		}
+
+		if ("LevelDesignObject" == strKind)
+		{
+			*pOutKind = EDITABLE_OBJECT_KIND::LEVEL_DESIGN_OBJECT;
+			return S_OK;
+		}
+
+		return E_FAIL;
+	}
+
+	json Save_NewEditObjectOverride(const EDIT_OBJECT_OVERRIDE_DESC& Edit)
+	{
+		json jEdit = json::object();
+		jEdit["Kind"] = Get_ObjectKindName(Edit.eKind);
+
+		if (0u != Edit.Common.iPolicyMask || Edit.Common.bHasWorldMatrix)
+		{
+			const json jCommon = Save_CommonOverride(Edit.Common);
+			if (!jCommon.empty())
+				jEdit["Common"] = jCommon;
+		}
+
+		if (Has_AnyClassOverride(Edit.ClassOverride))
+		{
+			const char* pClassName = Get_ClassOverrideName(Edit.ClassOverride);
+			const json jClassOverride = Save_ClassOverride(Edit.ClassOverride);
+
+			if (nullptr != pClassName && '\0' != pClassName[0] && !jClassOverride.empty())
+			{
+				jEdit["Class"] = pClassName;
+				jEdit["ClassOverride"] = jClassOverride;
+			}
+		}
+
+		return jEdit;
+	}
+
+	HRESULT Load_NewEditObjectOverride(const json& jValue, EDITABLE_OBJECT_KIND eFallbackKind, EDIT_OBJECT_OVERRIDE_DESC* pOutDesc)
+	{
+		if (nullptr == pOutDesc)
+			return E_FAIL;
+
+		*pOutDesc = {};
+
+		if (!jValue.is_object())
+			return E_FAIL;
+
+		EDIT_OBJECT_OVERRIDE_DESC Desc{};
+		Desc.eKind = eFallbackKind;
+
+		const auto IterKind = jValue.find("Kind");
+		if (IterKind != jValue.end())
+		{
+			if (!IterKind->is_string())
+				return E_FAIL;
+
+			if (FAILED(Load_ObjectKindName(IterKind->get<string>(), &Desc.eKind)))
+				return E_FAIL;
+		}
+
+		const auto IterCommon = jValue.find("Common");
+		if (IterCommon != jValue.end())
+		{
+			if (FAILED(Load_CommonOverride(*IterCommon, &Desc.Common)))
+				return E_FAIL;
+		}
+
+		const auto IterClass = jValue.find("Class");
+		const auto IterClassOverride = jValue.find("ClassOverride");
+
+		if (IterClassOverride != jValue.end())
+		{
+			if (IterClass == jValue.end() || !IterClass->is_string())
+				return E_FAIL;
+
+			if (FAILED(Load_ClassOverride(IterClass->get<string>(), *IterClassOverride, &Desc.ClassOverride)))
+				return E_FAIL;
+		}
+		else if (IterClass != jValue.end() && !IterClass->is_string())
+		{
+			return E_FAIL;
+		}
+
+		*pOutDesc = Desc;
+		return S_OK;
+	}
+
+	HRESULT Load_LegacyEditObjectOverride(const json& jValue, EDITABLE_OBJECT_KIND eFallbackKind, EDIT_OBJECT_OVERRIDE_DESC* pOutDesc)
+	{
+		if (nullptr == pOutDesc)
+			return E_FAIL;
+
+		*pOutDesc = {};
+
+		if (!jValue.is_object())
+			return E_FAIL;
+
+		switch (eFallbackKind)
+		{
+		case EDITABLE_OBJECT_KIND::ENV_OBJECT:
+		{
+			MAP_ENV_EDITED_DESC LegacyEdit{};
+			if (FAILED(Load_EditedDesc(jValue, &LegacyEdit, true)))
+				return E_FAIL;
+
+			*pOutDesc = Convert_LegacyEnvEditToOverride(LegacyEdit);
+			return S_OK;
+		}
+		case EDITABLE_OBJECT_KIND::MAP_SECTION:
+		{
+			MAP_ENV_EDITED_DESC LegacyEdit{};
+			if (FAILED(Load_EditedDesc(jValue, &LegacyEdit, false)))
+				return E_FAIL;
+
+			*pOutDesc = Convert_LegacyMapSectionEditToOverride(LegacyEdit);
+			return S_OK;
+		}
+		case EDITABLE_OBJECT_KIND::LEVEL_DESIGN_OBJECT:
+		{
+			MAP_LD_EDITED_DESC LegacyEdit{};
+
+			const auto IterWorldMatrix = jValue.find("WorldMatrix");
+			if (IterWorldMatrix != jValue.end())
+			{
+				if (FAILED(Load_Float4x4(*IterWorldMatrix, &LegacyEdit.matWorld)))
+					return E_FAIL;
+
+				LegacyEdit.bHasWorldMatrix = true;
+			}
+
+			*pOutDesc = Convert_LegacyLDEditToOverride(LegacyEdit);
+			return S_OK;
+		}
+		default:
+			return E_FAIL;
+		}
+	}
+
+	HRESULT Load_EditObjectOverride(const json& jValue, EDITABLE_OBJECT_KIND eFallbackKind, EDIT_OBJECT_OVERRIDE_DESC* pOutDesc)
+	{
+		if (nullptr == pOutDesc)
+			return E_FAIL;
+
+		if (!jValue.is_object())
+			return E_FAIL;
+
+		const bool bNewFormat =
+			jValue.contains("Common")
+			|| jValue.contains("Class")
+			|| jValue.contains("ClassOverride")
+			|| jValue.contains("Kind");
+
+		if (bNewFormat)
+			return Load_NewEditObjectOverride(jValue, eFallbackKind, pOutDesc);
+
+		return Load_LegacyEditObjectOverride(jValue, eFallbackKind, pOutDesc);
+	}
+
+	json Save_EditObjectOverrideMap(const unordered_map<_wstring, EDIT_OBJECT_OVERRIDE_DESC>& EditedMap)
 	{
 		vector<_wstring> Keys;
 		for (const auto& Pair : EditedMap)
 		{
-			if (!Pair.first.empty() && Has_AnyMapEnvEdit(Pair.second))
+			if (!Pair.first.empty() && Has_AnyEdit(Pair.second))
 				Keys.push_back(Pair.first);
 		}
 
@@ -314,13 +813,13 @@ namespace
 			if (Iter == EditedMap.end())
 				continue;
 
-			jResult[WstrToStr(strKey)] = Save_EditedDesc(Iter->second, bEnvObjectEdit);
+			jResult[WstrToStr(strKey)] = Save_NewEditObjectOverride(Iter->second);
 		}
 
 		return jResult;
 	}
 
-	HRESULT Load_EditedMap(const json& jRoot, const char* pFieldName, unordered_map<_wstring, MAP_ENV_EDITED_DESC>* pOutMap, _bool bEnvObjectEdit)
+	HRESULT Load_EditObjectOverrideMap(const json& jRoot, const char* pFieldName, unordered_map<_wstring, EDIT_OBJECT_OVERRIDE_DESC>* pOutMap, EDITABLE_OBJECT_KIND eFallbackKind)
 	{
 		if (nullptr == pFieldName || nullptr == pOutMap)
 			return E_FAIL;
@@ -340,79 +839,17 @@ namespace
 			if (strKey.empty())
 				continue;
 
-			MAP_ENV_EDITED_DESC Edit{};
-			if (FAILED(Load_EditedDesc(Iter.value(), &Edit, bEnvObjectEdit)))
+			if (!Iter.value().is_object())
 				return E_FAIL;
 
-			if (!Has_AnyMapEnvEdit(Edit))
-				continue;
+			EDIT_OBJECT_OVERRIDE_DESC Edit{};
+			if (FAILED(Load_EditObjectOverride(Iter.value(), eFallbackKind, &Edit)))
+				return E_FAIL;
 
-			Edit.strStableKey = strKey;
-			(*pOutMap)[strKey] = Edit;
-		}
+			if (Edit.eKind != eFallbackKind)
+				return E_FAIL;
 
-		return S_OK;
-	}
-
-	json Save_LDEditedMap(const unordered_map<_wstring, MAP_LD_EDITED_DESC>& EditedMap)
-	{
-		vector<_wstring> Keys;
-		for (const auto& Pair : EditedMap)
-		{
-			if (!Pair.first.empty() && Has_AnyMapLDEdit(Pair.second))
-				Keys.push_back(Pair.first);
-		}
-
-		sort(Keys.begin(), Keys.end());
-
-		json jResult = json::object();
-		for (const auto& strKey : Keys)
-		{
-			const auto Iter = EditedMap.find(strKey);
-			if (Iter == EditedMap.end())
-				continue;
-
-			json jEdit = json::object();
-			if (Iter->second.bHasWorldMatrix)
-				jEdit["WorldMatrix"] = Save_Float4x4(Iter->second.matWorld);
-
-			jResult[WstrToStr(strKey)] = jEdit;
-		}
-
-		return jResult;
-	}
-
-	HRESULT Load_LDEditedMap(const json& jRoot, const char* pFieldName, unordered_map<_wstring, MAP_LD_EDITED_DESC>* pOutMap)
-	{
-		if (nullptr == pFieldName || nullptr == pOutMap)
-			return E_FAIL;
-
-		pOutMap->clear();
-
-		const auto IterField = jRoot.find(pFieldName);
-		if (IterField == jRoot.end())
-			return S_OK;
-
-		if (!IterField->is_object())
-			return E_FAIL;
-
-		for (auto Iter = IterField->begin(); Iter != IterField->end(); ++Iter)
-		{
-			const _wstring strKey = StrToWstr(Iter.key());
-			if (strKey.empty() || !Iter.value().is_object())
-				continue;
-
-			MAP_LD_EDITED_DESC Edit{};
-			const auto IterWorldMatrix = Iter.value().find("WorldMatrix");
-			if (IterWorldMatrix != Iter.value().end())
-			{
-				if (FAILED(Load_Float4x4(*IterWorldMatrix, &Edit.matWorld)))
-					return E_FAIL;
-
-				Edit.bHasWorldMatrix = true;
-			}
-
-			if (!Has_AnyMapLDEdit(Edit))
+			if (!Has_AnyEdit(Edit))
 				continue;
 
 			Edit.strStableKey = strKey;
@@ -475,7 +912,7 @@ HRESULT CMap_EditFile::Apply_Change(MAP_PACKAGE* pInOutPackage, const MAP_EDIT_C
 			if (Iter == OverrideDesc.EditedMapSections.end())
 				continue;
 
-			Apply_SectionEditToDesc(&SectionDesc, Iter->second);
+			Apply_EditObjectOverrideToMapSectionDesc(&SectionDesc, Iter->second);
 		}
 	}
 
@@ -488,7 +925,7 @@ HRESULT CMap_EditFile::Apply_Change(MAP_PACKAGE* pInOutPackage, const MAP_EDIT_C
 			if (Iter == OverrideDesc.EditedEnvObjects.end())
 				continue;
 
-			Apply_EnvEditToDesc(&Desc, Iter->second);
+			Apply_EditObjectOverrideToEnvDesc(&Desc, Iter->second);
 		}
 	}
 
@@ -535,11 +972,7 @@ HRESULT CMap_EditFile::Apply_LevelDesignChange(LD_PACKAGE* pInOutPackage, const 
 		if (Iter == OverrideDesc.EditedLevelDesignObjects.end())
 			continue;
 
-		if (Iter->second.bHasWorldMatrix)
-		{
-			CGameObject::GAMEOBJECT_DESC& BaseDesc = static_cast<CGameObject::GAMEOBJECT_DESC&>(Desc);
-			Apply_WorldMatrixToGameObjectDesc(&BaseDesc, Iter->second.matWorld);
-		}
+		Apply_EditObjectOverrideToLDEntry(&Entry, Iter->second);
 	}
 
 	return S_OK;
@@ -786,7 +1219,7 @@ HRESULT CMap_EditFile::Load_Data(const json& jLevelRoot, MAP_EDIT_DATA* pOutDesc
 json CMap_EditFile::Save_Change(const MAP_EDIT_CHANGE& Desc)
 {
 	json jOverride = json::object();
-	jOverride["Version"] = Desc.Version;
+	jOverride["Version"] = Desc.Version < 6u ? 6u : Desc.Version;
 
 	vector<_wstring> DeletedKeys(
 		Desc.DeletedEnvObjectKeys.begin(),
@@ -799,9 +1232,9 @@ json CMap_EditFile::Save_Change(const MAP_EDIT_CHANGE& Desc)
 		jDeletedEnvObjects.push_back(WstrToStr(strKey));
 
 	jOverride["DeletedEnvObjects"] = jDeletedEnvObjects;
-	jOverride["EditedEnvObjects"] = Save_EditedMap(Desc.EditedEnvObjects, true);
-	jOverride["EditedMapSections"] = Save_EditedMap(Desc.EditedMapSections, false);
-	jOverride["EditedLevelDesignObjects"] = Save_LDEditedMap(Desc.EditedLevelDesignObjects);
+	jOverride["EditedEnvObjects"] = Save_EditObjectOverrideMap(Desc.EditedEnvObjects);
+	jOverride["EditedMapSections"] = Save_EditObjectOverrideMap(Desc.EditedMapSections);
+	jOverride["EditedLevelDesignObjects"] = Save_EditObjectOverrideMap(Desc.EditedLevelDesignObjects);
 
 	jOverride["AddedMapObjects"] = json::array();
 	for (const auto& Added : Desc.AddedMapObjects)
@@ -852,13 +1285,13 @@ HRESULT CMap_EditFile::Load_Change(const json& jOverride, MAP_EDIT_CHANGE* pOutD
 		}
 	}
 
-	if (FAILED(Load_EditedMap(jOverride, "EditedEnvObjects", &pOutDesc->EditedEnvObjects, true)))
+	if (FAILED(Load_EditObjectOverrideMap(jOverride, "EditedEnvObjects", &pOutDesc->EditedEnvObjects, EDITABLE_OBJECT_KIND::ENV_OBJECT)))
 		return E_FAIL;
 
-	if (FAILED(Load_EditedMap(jOverride, "EditedMapSections", &pOutDesc->EditedMapSections, false)))
+	if (FAILED(Load_EditObjectOverrideMap(jOverride, "EditedMapSections", &pOutDesc->EditedMapSections, EDITABLE_OBJECT_KIND::MAP_SECTION)))
 		return E_FAIL;
 
-	if (FAILED(Load_LDEditedMap(jOverride, "EditedLevelDesignObjects", &pOutDesc->EditedLevelDesignObjects)))
+	if (FAILED(Load_EditObjectOverrideMap(jOverride, "EditedLevelDesignObjects", &pOutDesc->EditedLevelDesignObjects, EDITABLE_OBJECT_KIND::LEVEL_DESIGN_OBJECT)))
 		return E_FAIL;
 
 	const auto IterAdded = jOverride.find("AddedMapObjects");

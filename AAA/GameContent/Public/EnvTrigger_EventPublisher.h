@@ -3,7 +3,7 @@
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL CEnvTrigger_EventPublisher final : public CEnvObject_Trigger
+class CEnvTrigger_EventPublisher final : public CEnvObject_Trigger
 {
 	GENERATED_BODY(CEnvTrigger_EventPublisher)
 

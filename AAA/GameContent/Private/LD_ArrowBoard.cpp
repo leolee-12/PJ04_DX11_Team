@@ -44,7 +44,6 @@ HRESULT CLD_ArrowBoard::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_tArrowBoardDesc = *static_cast<const LD_EVENTOBJECT_DESC*>(pArg);
-	m_bHurtBoxRegistered = false;
 	m_fArrowDeg = 0.f;
 	m_fGlowTime = 0.f;
 
@@ -54,13 +53,16 @@ HRESULT CLD_ArrowBoard::Initialize(void* pArg)
 	if (FAILED(Ready_RenderComponents()))
 		return E_FAIL;
 
+	if (FAILED(Ready_HurtBox()))
+		return E_FAIL;
+
 	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
 
 	JsonUtils::Try_ReadFloat(m_tArrowBoardDesc.jRaw, ARROWBOARD_DEG_PATH, &m_fArrowDeg);
 	m_pAnimatorCom->Play(ARROWBOARD_ANIM_WAIT, true, true, 0.f, ARROWBOARD_ANIM_SPEED);
 
-	return Ready_HurtBox();
+	return S_OK;
 }
 
 HRESULT CLD_ArrowBoard::Validate_Initialized()
@@ -81,6 +83,9 @@ HRESULT CLD_ArrowBoard::Validate_Initialized()
 		return E_FAIL;
 
 	if (m_pModelCom->Get_AnimationIndex(ARROWBOARD_ANIM_ATTACKED) < 0)
+		return E_FAIL;
+
+	if (nullptr == m_pHurtBox)
 		return E_FAIL;
 
 	if (!m_pAnimatorCom->Has_Bone(ARROWBOARD_ARROW_BONE_NAME))
@@ -251,14 +256,13 @@ HRESULT CLD_ArrowBoard::Ready_HurtBox()
 	ColliderDesc.vCenter = { (vMin.x + vMax.x) * 0.5f, (vMin.y + vMax.y) * 0.5f, (vMin.z + vMax.z) * 0.5f };
 	ColliderDesc.fRadius = fRadius;
 
-	m_pHurtBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, TEXT("Com_ArrowBoardHurtBox"), &ColliderDesc);
+	m_pHurtBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, TEXT("Com_HurtBox"), &ColliderDesc);
 	if (nullptr == m_pHurtBox)
 		return E_FAIL;
 
-	SetUp_HurtBoxCallback();
+	SetUp_Collider_Callback();
 
 	m_pGameInstance_Proxy->Register_Collider(m_pHurtBox, ETOUI(COLLISION_LAYER::ENV_HURT));
-	m_bHurtBoxRegistered = true;
 
 	return S_OK;
 }
@@ -302,7 +306,7 @@ HRESULT CLD_ArrowBoard::Render_Model()
 	return m_pModelCom->Render(0u);
 }
 
-void CLD_ArrowBoard::SetUp_HurtBoxCallback()
+void CLD_ArrowBoard::SetUp_Collider_Callback()
 {
 	if (nullptr == m_pHurtBox)
 		return;
@@ -325,26 +329,6 @@ void CLD_ArrowBoard::Handle_HurtBox(CCollider* pOther)
 	ATTACK_INFO AttackInfo{};
 	AttackInfo.pAttacker = pOther->Get_Owner();
 	Damaged(AttackInfo);
-}
-
-void CLD_ArrowBoard::Unregister_HurtBox(_bool bImmediate)
-{
-	if (nullptr == m_pHurtBox)
-		return;
-
-	m_pHurtBox->Set_Enabled(false);
-
-	if (!m_bHurtBoxRegistered || nullptr == m_pGameInstance_Proxy)
-		return;
-
-	const _uint iGroup = ETOUI(COLLISION_LAYER::ENV_HURT);
-
-	if (bImmediate)
-		m_pGameInstance_Proxy->Immediate_Unregister(m_pHurtBox, iGroup);
-	else
-		m_pGameInstance_Proxy->Request_Unregister(m_pHurtBox, iGroup);
-
-	m_bHurtBoxRegistered = false;
 }
 
 CLD_ArrowBoard* CLD_ArrowBoard::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -375,8 +359,6 @@ CGameObject* CLD_ArrowBoard::Clone(void* pArg)
 
 void CLD_ArrowBoard::Free()
 {
-	Unregister_HurtBox(true);
-
 	__super::Free();
 }
 

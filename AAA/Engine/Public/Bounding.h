@@ -28,7 +28,13 @@ public:
 
 #ifdef _DEBUG
 public:
+	void Set_DebugColor(const _float4& vColor) { m_vDebugColor = vColor; }
+	const _float4& Get_DebugRenderColor() const { return true == m_isColl ? m_vDebugCollidingColor : m_vDebugColor; }
 	virtual HRESULT Render(PrimitiveBatch<VertexPositionColor>* pBatch) = 0;
+
+protected:
+	_float4 m_vDebugColor = { 0.f, 1.f, 1.f, 1.f };
+	_float4 m_vDebugCollidingColor = { 1.f, 0.f, 0.f, 1.f };
 #endif
 
 protected:

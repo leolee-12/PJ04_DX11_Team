@@ -52,7 +52,6 @@ private:
 
 	LD_EVENTOBJECT_DESC m_tArrowBoardDesc = {};
 
-	_bool m_bHurtBoxRegistered = { false };
 	_float m_fArrowDeg = { 0.f };
 	_float m_fGlowTime = { 0.f };
 	_bool m_bGlow = { false };
@@ -64,9 +63,8 @@ private:
 	HRESULT Bind_ShaderResources();
 	HRESULT Render_Model();
 
-	void SetUp_HurtBoxCallback();
+	void SetUp_Collider_Callback();
 	void Handle_HurtBox(CCollider* pOther);
-	void Unregister_HurtBox(_bool bImmediate);
 
 public:
 	static CLD_ArrowBoard* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

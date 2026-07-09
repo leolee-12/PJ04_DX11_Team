@@ -30,15 +30,15 @@ public:
 	virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
 private:
-	physx::PxRigidStatic* m_pPhysicsActor = { nullptr };
+	physx::PxRigidStatic* m_pRigidStatic = { nullptr };
 	physx::PxTriangleMesh* m_pCollisionMesh = { nullptr };
 
 private:
 	HRESULT Ready_Components(const LD_PARSED_OBJECT& Desc);
-	HRESULT Ready_PhysicsActor(const LD_PARSED_OBJECT& Desc);
-	HRESULT Ready_PhysicsActor_FromPoints(const LD_PARSED_OBJECT& Desc);
-	HRESULT Ready_PhysicsActor_FromBox(const LD_PARSED_OBJECT& Desc);
-	void    Release_PhysicsResources();
+	HRESULT Ready_RigidStatic(const LD_PARSED_OBJECT& Desc);
+	HRESULT Ready_RigidStatic_FromPoints(const LD_PARSED_OBJECT& Desc);
+	HRESULT Ready_RigidStatic_FromBox(const LD_PARSED_OBJECT& Desc);
+	void    Release_RigidStatic();
 
 public:
 	static void Register_LevelDesignSpecs();

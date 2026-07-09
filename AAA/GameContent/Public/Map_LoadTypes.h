@@ -2,6 +2,7 @@
 #include "Map_Defines.h"
 #include "EnvObject_Defines.h"
 #include "LevelDesign_LoadTypes.h"
+#include "Editable.h"
 
 NS_BEGIN(Engine)
 class CGameObject;
@@ -100,11 +101,11 @@ struct MAP_LD_EDITED_DESC
 
 struct MAP_EDIT_CHANGE
 {
-	_uint Version = { 5 };
+	_uint Version = { 6 };
 	unordered_set<_wstring> DeletedEnvObjectKeys;
-	unordered_map<_wstring, MAP_ENV_EDITED_DESC> EditedEnvObjects;
-	unordered_map<_wstring, MAP_ENV_EDITED_DESC> EditedMapSections;
-	unordered_map<_wstring, MAP_LD_EDITED_DESC> EditedLevelDesignObjects;
+	unordered_map<_wstring, EDIT_OBJECT_OVERRIDE_DESC> EditedEnvObjects;
+	unordered_map<_wstring, EDIT_OBJECT_OVERRIDE_DESC> EditedMapSections;
+	unordered_map<_wstring, EDIT_OBJECT_OVERRIDE_DESC> EditedLevelDesignObjects;
 	vector<MAP_ADD_OBJECT> AddedMapObjects;
 };
 
@@ -205,6 +206,24 @@ struct MAP_LOAD_RESULT
 	_uint iLevelDesignFallbackSpecCount = {};
 	_uint iLevelDesignSkippedCreateFailedCount = {};
 };
+
+inline _bool Has_AnyClassOverride(const EDIT_CLASS_OVERRIDE& ClassOverride)
+{
+	if (const EDIT_ENVOBJECT_OVERRIDE* pEnvOverride = get_if<EDIT_ENVOBJECT_OVERRIDE>(&ClassOverride))
+		return pEnvOverride->bHasNearDistAlpha || pEnvOverride->bHasDecalAlpha;
+
+	if (const EDIT_LD_BUSH_OVERRIDE* pBushOverride = get_if<EDIT_LD_BUSH_OVERRIDE>(&ClassOverride))
+		return pBushOverride->bHasGenerateItem;
+
+	return false;
+}
+
+inline _bool Has_AnyEdit(const EDIT_OBJECT_OVERRIDE_DESC& Edit)
+{
+	return 0u != Edit.Common.iPolicyMask
+		|| Edit.Common.bHasWorldMatrix
+		|| Has_AnyClassOverride(Edit.ClassOverride);
+}
 
 inline _bool Has_AnyMapEnvEdit(const MAP_ENV_EDITED_DESC& Edit)
 {

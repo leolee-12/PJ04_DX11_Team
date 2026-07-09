@@ -41,7 +41,7 @@ private:
 	LD_AUDIO_AREA_DESC m_tAudioAreaDesc = {};
 	MODE m_eMode = { MODE::UNKNOWN };
 
-	CCollider* m_pTriggerCollider = { nullptr };
+	CCollider* m_pTrigger = { nullptr };
 
 	_bool m_bInside = { false };
 	_bool m_bAmbientStopping = { false };
@@ -50,13 +50,13 @@ private:
 	_float m_fCurrentVolume = { 0.f };
 
 private:
-	HRESULT Ready_TriggerCollider();
-	void Update_TriggerCollider();
+	HRESULT Ready_Trigger();
+	void Update_Trigger();
 	void SetUp_Collider_Callback();
 
-	void OnTriggerEnter(CCollider* pOther);
-	void OnTriggerStay(CCollider* pOther);
-	void OnTriggerExit(CCollider* pOther);
+	void Handle_TriggerEnter(CCollider* pOther);
+	void Handle_TriggerStay(CCollider* pOther);
+	void Handle_TriggerExit(CCollider* pOther);
 
 	_bool Is_TriggerActivator(CCollider* pOther) const;
 	MODE Resolve_Mode() const;

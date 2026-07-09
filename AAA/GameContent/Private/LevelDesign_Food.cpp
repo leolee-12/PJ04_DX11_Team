@@ -100,9 +100,7 @@ HRESULT CLevelDesign_Food::Validate_Initialized()
 	if (nullptr == pCatalog->pModelProtoTag || m_tFoodDesc.wstrModelProtoTag != pCatalog->pModelProtoTag)
 		return E_FAIL;
 
-	if (nullptr == m_pShaderCom || nullptr == m_pModelCom || nullptr == m_pPickupCollider)
-		return E_FAIL;
-	if (!m_bPickupColliderRegistered)
+	if (nullptr == m_pShaderCom || nullptr == m_pModelCom || nullptr == m_pHurtBox)
 		return E_FAIL;
 
 	return S_OK;
@@ -115,11 +113,11 @@ void CLevelDesign_Food::Late_Update(_float fTimeDelta)
 
 	m_pTransformCom->Turn(XMVector3Normalize(XMVectorSet(0.f, 1.f, 0.f, 0.f)), fTimeDelta);
 
-	if (m_pPickupCollider->Is_Enabled())
+	if (m_pHurtBox->Is_Enabled())
 	{
-		m_pPickupCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+		m_pHurtBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 #ifdef _DEBUG
-		m_pGameInstance_Proxy->Add_DebugComponent(m_pPickupCollider);
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pHurtBox);
 #endif
 	}
 
@@ -196,7 +194,7 @@ HRESULT CLevelDesign_Food::Ready_Components()
 	if (FAILED(Ready_RenderComponents()))
 		return E_FAIL;
 
-	if (FAILED(Ready_PickupCollider()))
+	if (FAILED(Ready_HurtBox()))
 		return E_FAIL;
 
 	SetUp_Collider_Callback();
@@ -293,7 +291,7 @@ const _tchar* CLevelDesign_Food::Resolve_ModelProtoTag() const
 	return m_tFoodDesc.wstrModelProtoTag.c_str();
 }
 
-HRESULT CLevelDesign_Food::Ready_PickupCollider()
+HRESULT CLevelDesign_Food::Ready_HurtBox()
 {
 	_float3 vMin = {};
 	_float3 vMax = {};
@@ -311,23 +309,22 @@ HRESULT CLevelDesign_Food::Ready_PickupCollider()
 	ColliderDesc.vCenter = vCenter;
 	ColliderDesc.fRadius = fBoundsRadius;
 
-	m_pPickupCollider = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, TEXT("Com_PickupCollider"),
+	m_pHurtBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, TEXT("Com_HurtBox"),
 		&ColliderDesc);
-	if (nullptr == m_pPickupCollider)
+	if (nullptr == m_pHurtBox)
 		return E_FAIL;
 
-	m_pGameInstance_Proxy->Register_Collider(m_pPickupCollider, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
-	m_bPickupColliderRegistered = true;
+	m_pGameInstance_Proxy->Register_Collider(m_pHurtBox, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
 
 	return S_OK;
 }
 
 void CLevelDesign_Food::SetUp_Collider_Callback()
 {
-	if (nullptr == m_pPickupCollider)
+	if (nullptr == m_pHurtBox)
 		return;
 
-	m_pPickupCollider->Set_OnEnter([this](CCollider* pOther) { Handle_Pickup(pOther); });
+	m_pHurtBox->Set_OnEnter([this](CCollider* pOther) { Handle_Pickup(pOther); });
 }
 
 void CLevelDesign_Food::Handle_Pickup(CCollider* pOther)
@@ -345,26 +342,11 @@ void CLevelDesign_Food::Handle_Pickup(CCollider* pOther)
 
 	pKirby->Add_HP(m_tFoodDesc.fHealAmount);
 
-	if (m_pPickupCollider)
-		m_pPickupCollider->Set_Enabled(false);
+	if (m_pHurtBox)
+		m_pHurtBox->Set_Enabled(false);
 
-	Unregister_PickupCollider(false);
 	Set_Active(false);
 	m_pGameInstance_Proxy->Destroy_GameObject(this);
-}
-
-void CLevelDesign_Food::Unregister_PickupCollider(_bool bImmediate)
-{
-	if (nullptr == m_pPickupCollider || !m_bPickupColliderRegistered)
-		return;
-
-	const _uint iGroup = ETOUI(COLLISION_LAYER::ENV_TRIGGER);
-	if (bImmediate)
-		m_pGameInstance_Proxy->Immediate_Unregister(m_pPickupCollider, iGroup);
-	else
-		m_pGameInstance_Proxy->Request_Unregister(m_pPickupCollider, iGroup);
-
-	m_bPickupColliderRegistered = false;
 }
 
 CLevelDesign_Food* CLevelDesign_Food::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -395,8 +377,6 @@ CGameObject* CLevelDesign_Food::Clone(void* pArg)
 
 void CLevelDesign_Food::Free()
 {
-	Unregister_PickupCollider(true);
-
 	__super::Free();
 }
 
