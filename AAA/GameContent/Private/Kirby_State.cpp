@@ -144,7 +144,7 @@ _bool CKirby_State::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
     return false;
 }
 
-void CKirby_State::Request_GrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType)
+void CKirby_State::Request_Attach(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType)
 {
     switch (eType)
     {
@@ -166,12 +166,22 @@ void CKirby_State::Request_GrabState(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eT
     }
 }
 
-void CKirby_State::Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType)
+void CKirby_State::Request_Attach_End(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType)
+{
+
+}
+
+void CKirby_State::Request_PositionSync(CKirby* pKirby, const KIRBY_POSITION_SYNC_BEGIN_DESC* pDesc)
+{
+}
+
+void CKirby_State::Request_PositionEndSync(CKirby* pKirby, const KIRBY_POSITION_SYNC_END_DESC* pDesc)
 {
 }
 
 void CKirby_State::Request_StageClear(CKirby* pKirby, const CUTSCENE_STAGECLEAR* pDesc)
 {
+
 }
 
 void CKirby_State::Free()

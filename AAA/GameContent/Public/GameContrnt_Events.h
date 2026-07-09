@@ -17,6 +17,10 @@ namespace Client
         inline constexpr const _tchar* Kirby_AttachmentBegin = L"Kirby.Attachment.Begin";
         inline constexpr const _tchar* Kirby_AttachmentEnd = L"Kirby.Attachment.End";
 
+        // Kirby 이동
+        inline constexpr const _tchar* Kirby_PositionSyncBegin = L"Kirby.Position.Sync.Begin";
+        inline constexpr const _tchar* Kirby_PositionSyncEnd = L"Kirby.Position.Sync.End";
+
         // 커비 어빌리티 / UI
         inline constexpr const _tchar* Kirby_PointStarGained = L"Kirby.PointStarGained";
         inline constexpr const _tchar* Kirby_HP_Updated = L"Kirby.HPUpdated";
@@ -84,6 +88,32 @@ namespace Client
     struct KIRBY_ATTACHMENT_END_DESC
     {
         KIRBY_ATTACHMENT_END_REASON eType = { KIRBY_ATTACHMENT_END_REASON::DEFAULT_RELEASE };
+    };
+
+    // Kirby 이동
+    enum class KIRBY_POSITION_SYNC_CONTEXT : _uint
+    {
+        CAR_BRIDGE,
+        DEFAULT_SYNC
+    };
+
+    struct KIRBY_POSITION_SYNC_BEGIN_DESC
+    {
+        KIRBY_POSITION_SYNC_CONTEXT eType = { KIRBY_POSITION_SYNC_CONTEXT::DEFAULT_SYNC };
+        _float4x4 AnchorWorld{};
+        _float fAnimSpeed{ 1.f };
+        _float fBlendDuration = { 0.f };
+    };
+
+    enum class KIRBY_POSITION_SYNC_END_REASON : _uint
+    {
+        CAR_BRIDGE_END,
+        DEFAULT_SYNC_END
+    };
+
+    struct KIRBY_POSITION_SYNC_END_DESC
+    {
+        KIRBY_POSITION_SYNC_END_REASON eType = { KIRBY_POSITION_SYNC_END_REASON::DEFAULT_SYNC_END };
     };
 #pragma endregion
 

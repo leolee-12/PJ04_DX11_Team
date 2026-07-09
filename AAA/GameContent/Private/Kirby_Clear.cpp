@@ -72,9 +72,9 @@ void CKirby_Clear::Request_StageClear(CKirby* pKirby, const CUTSCENE_STAGECLEAR*
     {
         case STAGECLEAR_ANIM::CUT1:
         {
-            //CTransform* pTransform = pKirby->Get_Transform();
+            CTransform* pTransform = pKirby->Get_Transform();
+            pTransform->Set_WorldMatrix(pDesc->AnchorWorld);
 
-            pKirby->Get_Transform()->Set_WorldMatrix(pDesc->AnchorWorld);
             pKirby->Get_Movement()->Sync_To_Controller();
 
             pAnimator->Play("Cut1", false, false, pDesc->fBlendDuration, pDesc->fAnimSpeed);
