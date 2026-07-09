@@ -64,9 +64,6 @@
     <Filter Include="97. DataSystem\LevelDesignLoader">
       <UniqueIdentifier>{ac90f625-f08a-4a8a-89fd-03d9fa0dc850}</UniqueIdentifier>
     </Filter>
-    <Filter Include="96. CameraDirector">
-      <UniqueIdentifier>{ac2123fc-d03d-4f44-a7a4-a4fc408e20d9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject">
       <UniqueIdentifier>{998c82c0-2ef5-457f-bbe6-45b63b21e082}</UniqueIdentifier>
     </Filter>
@@ -1009,6 +1006,18 @@
     <Filter Include="00. GameObject\97. UI\UIContainer\GenericContainer\CutFade">
       <UniqueIdentifier>{42685eeb-8084-4009-84ba-36bd8947bef0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="96. Director">
+      <UniqueIdentifier>{db6f6142-987e-43c2-8b82-522718e5adac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="96. Director\CameraDirector">
+      <UniqueIdentifier>{ac2123fc-d03d-4f44-a7a4-a4fc408e20d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="96. Director\Dialogue Director">
+      <UniqueIdentifier>{1e583989-ba7c-4868-82e4-0facfa9e4aeb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="96. Director\Dialogue Arranger">
+      <UniqueIdentifier>{847f5679-2d3f-4d9a-955e-be1815af2b8d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1522,7 +1531,7 @@
       <Filter>00. GameObject\00. Camera\Shakeable\Cutscene</Filter>
     </ClInclude>
     <ClInclude Include="..\public\CameraDirector.h">
-      <Filter>96. CameraDirector</Filter>
+      <Filter>96. Director\CameraDirector</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BossNamePlate.h">
       <Filter>00. GameObject\07. Boss\BossNamePlate</Filter>
@@ -2007,6 +2016,12 @@
     <ClInclude Include="..\public\UI_CutFade.h">
       <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\CutFade</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Dialogue_Director.h">
+      <Filter>96. Director\Dialogue Director</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Dialogue_Arranger.h">
+      <Filter>96. Director\Dialogue Arranger</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2448,7 +2463,7 @@
       <Filter>00. GameObject\00. Camera\Shakeable\Cutscene</Filter>
     </ClCompile>
     <ClCompile Include="..\private\CameraDirector.cpp">
-      <Filter>96. CameraDirector</Filter>
+      <Filter>96. Director\CameraDirector</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BossNamePlate.cpp">
       <Filter>00. GameObject\07. Boss\BossNamePlate</Filter>
@@ -2926,6 +2941,12 @@
     </ClCompile>
     <ClCompile Include="..\private\UI_CutFade.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\CutFade</Filter>
+    </ClCompile>
+    <ClCompile Include="..\public\Dialogue_Director.cpp">
+      <Filter>96. Director\Dialogue Director</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Dialogue_Arranger.cpp">
+      <Filter>96. Director\Dialogue Arranger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

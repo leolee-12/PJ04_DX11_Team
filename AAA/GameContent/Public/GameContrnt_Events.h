@@ -73,6 +73,14 @@ namespace Client
         inline constexpr const _tchar* StageClear_SequenceFinished = L"StageClear.Finished";
         inline constexpr const _tchar* HUD_SetVisible = L"HUD.SetVisible";
         inline constexpr const _tchar* TitleLogo_Show = L"TitleLogo.Show";
+
+        // 대화 이벤트
+        inline constexpr const _tchar* Dialogue_Setup = L"Dialogue.Setup";
+        inline constexpr const _tchar* Dialogue_Start = L"Dialogue.Start";
+        inline constexpr const _tchar* Dialogue_Finished = L"Dialogue.Finished";
+
+        // 케이지
+        inline constexpr const _tchar* Cage_Descend = L"Cage.Descend";
     }
 
 
@@ -225,6 +233,14 @@ namespace Client
     struct KIRBY_POSITION_SYNC_END_DESC
     {
         KIRBY_POSITION_SYNC_END_REASON eType = { KIRBY_POSITION_SYNC_END_REASON::DEFAULT_SYNC_END };
+    };
+#pragma endregion
+
+#pragma region Object 재배치
+    struct DIALOGUE_SETUP_DESC
+    {
+        _float4x4 KirbyWorld{};
+        _float4x4 DeeWorld{};
     };
 #pragma endregion
 

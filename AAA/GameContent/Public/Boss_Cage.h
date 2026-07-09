@@ -56,10 +56,14 @@ public:
 
 public:
     void       Start_Descend(_fvector vLookTarget, _float fSpawnHeightOffset = 10.f);
+    void       Start_Descend_InPlace(_float fSpawnHeightOffset = 10.f);
     void       Break();
     CAGE_STATE Get_CageState() const { return m_eState; }
 
+    virtual void On_Deserialized() override;
+
 private:
+    virtual HRESULT Ready_Events() override;
     HRESULT Ready_PartObjects();
     HRESULT Ready_BreakTrigger();
     void Fire_CutsceneCamera(const _tchar* szTrack, CAnimator* pProgress);
