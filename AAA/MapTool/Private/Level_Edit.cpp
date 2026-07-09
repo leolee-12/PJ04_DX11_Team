@@ -170,31 +170,31 @@ namespace
 		pInOutEdit->eKind = EDITABLE_OBJECT_KIND::ENV_OBJECT;
 
 		const _bool bBaseRenderable = !Desc.tCollision.bInvisibleCollision;
-		if (Policy.bRenderable != bBaseRenderable)
+		if ((Common.iPolicyMask & EDIT_CAP_RENDERABLE) || Policy.bRenderable != bBaseRenderable)
 			Common.iPolicyMask |= EDIT_CAP_RENDERABLE;
 		else
 			Common.iPolicyMask &= ~EDIT_CAP_RENDERABLE;
 		Common.Policy.bRenderable = Policy.bRenderable;
 
-		if (Policy.bUseCullDistance != Desc.tRender.bUseCullDistance)
+		if ((Common.iPolicyMask & EDIT_CAP_CULL_DISTANCE) || Policy.bUseCullDistance != Desc.tRender.bUseCullDistance)
 			Common.iPolicyMask |= EDIT_CAP_CULL_DISTANCE;
 		else
 			Common.iPolicyMask &= ~EDIT_CAP_CULL_DISTANCE;
 		Common.Policy.bUseCullDistance = Policy.bUseCullDistance;
 
-		if (Policy.bUseCullFrustum != Desc.tRender.bUseCullFrustum)
+		if ((Common.iPolicyMask & EDIT_CAP_CULL_FRUSTUM) || Policy.bUseCullFrustum != Desc.tRender.bUseCullFrustum)
 			Common.iPolicyMask |= EDIT_CAP_CULL_FRUSTUM;
 		else
 			Common.iPolicyMask &= ~EDIT_CAP_CULL_FRUSTUM;
 		Common.Policy.bUseCullFrustum = Policy.bUseCullFrustum;
 
-		if (Desc.tRender.bHasShadow && Policy.bUseShadow != Desc.tRender.bUseShadow)
+		if (Desc.tRender.bHasShadow && ((Common.iPolicyMask & EDIT_CAP_SHADOW) || Policy.bUseShadow != Desc.tRender.bUseShadow))
 			Common.iPolicyMask |= EDIT_CAP_SHADOW;
 		else
 			Common.iPolicyMask &= ~EDIT_CAP_SHADOW;
 		Common.Policy.bUseShadow = Policy.bUseShadow;
 
-		if (Desc.tCollision.bHasCollMesh && Policy.bUseCollMesh != Desc.tCollision.bUseCollMesh)
+		if (Desc.tCollision.bHasCollMesh && ((Common.iPolicyMask & EDIT_CAP_COLLISION_MESH) || Policy.bUseCollMesh != Desc.tCollision.bUseCollMesh))
 			Common.iPolicyMask |= EDIT_CAP_COLLISION_MESH;
 		else
 			Common.iPolicyMask &= ~EDIT_CAP_COLLISION_MESH;
@@ -215,19 +215,19 @@ namespace
 		EDIT_OBJECT_COMMON_OVERRIDE& Common = pInOutEdit->Common;
 		pInOutEdit->eKind = EDITABLE_OBJECT_KIND::MAP_SECTION;
 
-		if (Policy.bRenderable != Desc.bRenderable)
+		if ((Common.iPolicyMask & EDIT_CAP_RENDERABLE) || Policy.bRenderable != Desc.bRenderable)
 			Common.iPolicyMask |= EDIT_CAP_RENDERABLE;
 		else
 			Common.iPolicyMask &= ~EDIT_CAP_RENDERABLE;
 		Common.Policy.bRenderable = Policy.bRenderable;
 
-		if (Policy.bUseCullFrustum != Desc.bEnableCulling)
+		if ((Common.iPolicyMask & EDIT_CAP_CULL_FRUSTUM) || Policy.bUseCullFrustum != Desc.bEnableCulling)
 			Common.iPolicyMask |= EDIT_CAP_CULL_FRUSTUM;
 		else
 			Common.iPolicyMask &= ~EDIT_CAP_CULL_FRUSTUM;
 		Common.Policy.bUseCullFrustum = Policy.bUseCullFrustum;
 
-		if (pSection->Has_CollMesh() && Policy.bUseCollMesh != Desc.bUseCollMesh)
+		if (pSection->Has_CollMesh() && ((Common.iPolicyMask & EDIT_CAP_COLLISION_MESH) || Policy.bUseCollMesh != Desc.bUseCollMesh))
 			Common.iPolicyMask |= EDIT_CAP_COLLISION_MESH;
 		else
 			Common.iPolicyMask &= ~EDIT_CAP_COLLISION_MESH;
