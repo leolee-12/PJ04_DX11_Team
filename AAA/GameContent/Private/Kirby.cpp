@@ -36,6 +36,9 @@
 
 #include "EssenceBubble.h"
 
+// 임시
+#include "Bubble_Manager.h"
+
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCharacter{ pDevice, pContext }
 {
@@ -122,6 +125,33 @@ void CKirby::Update(_float fTimeDelta)
     __super::Update(fTimeDelta);
 
     Update_InvincibilityHitFlash();
+
+    if (m_pGameInstance_Proxy->Key_Down(DIK_B))
+    {
+        CTransform* pT = Get_Transform();
+        _vector vP =
+            pT->Get_State(STATE::POSITION);
+        _vector vL =
+            pT->Get_State(STATE::LOOK);
+
+        // 커비 뒤 2.5m, 살짝 위
+        _vector vSpawnV = vP
+            - vL * 2.5f
+            + XMVectorSet(0.f, 0.6f, 0.f, 0.f);
+
+        _float3 vSpawn{};
+        XMStoreFloat3(&vSpawn, vSpawnV);
+
+        auto* pMgr =
+            CBubble_Manager::GetInstance();
+        auto eKind =
+            CBubble_Manager::BUBBLE_KIND::DROPPED;
+
+        pMgr->Spawn(
+            Get_LevelIndex(), eKind,
+            COPY_ABILITY_TYPE::SWORD,
+            vSpawn, nullptr);
+    }
 }
 
 void CKirby::Late_Update(_float fTimeDelta)

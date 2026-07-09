@@ -29,6 +29,9 @@ HRESULT CEssenceBubble::Initialize(void* pArg)
 
 void CEssenceBubble::Update(_float fTimeDelta)
 {
+	if (!m_bActive)
+		return;
+
 	__super::Update(fTimeDelta);
 
 	if (m_fTimer > 0.f)
@@ -49,6 +52,12 @@ void CEssenceBubble::Update(_float fTimeDelta)
 	}
 }
 
+void CEssenceBubble::Activate(const _float3& vPos)
+{
+	__super::Activate(vPos);
+	m_bIsKirbyEnter = false;
+}
+
 void CEssenceBubble::SetUp_Collider_CallBack()
 {
 	if (m_pCollider == nullptr)
@@ -67,7 +76,6 @@ void CEssenceBubble::SetUp_Collider_CallBack()
 			return;
 		m_fTimer = s_fReSpawnTime;
 		});
-
 }
 
 CEssenceBubble* CEssenceBubble::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -87,17 +95,7 @@ CGameObject* CEssenceBubble::Clone(void* pArg)
 {
 	CEssenceBubble* pInstance = new CEssenceBubble(*this);
 
-	//if (FAILED(pInstance->Initialize(pArg)))
-	//{
-	//	MSG_BOX("Failed to Cloned : CEssenceBubble");
-	//	Safe_Release(pInstance);
-	//}
-
-	ABILITY_BUBBLE_DESC desc{};
-	desc.eAbility = COPY_ABILITY_TYPE::SWORD;
-	desc.szModelProtoTag = L"Prototype_Component_Model_Sword";
-
-	if (FAILED(pInstance->Initialize(&desc)))
+	if (FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Cloned : CEssenceBubble");
 		Safe_Release(pInstance);

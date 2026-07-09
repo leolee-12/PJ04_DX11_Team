@@ -18,6 +18,7 @@ private:
 public:
 	virtual HRESULT				Initialize(void* pArg) override;
 	virtual void				Update(_float fTimeDelta) override;
+	virtual void				Activate(const _float3& vPos) override;
 	virtual void				Copy_PrototypeName(ENGINE_OBJECT_DATA* pOut) override
 	{
 		pOut->strPrototypeTag = PROTOTYPE_TAG;

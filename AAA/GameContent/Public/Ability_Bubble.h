@@ -8,6 +8,7 @@ NS_END
 
 NS_BEGIN(Client)
 class CAbility_Model;
+class CBubble_Manager;
 
 class CAbility_Bubble abstract : public CContainerObject
 {
@@ -42,6 +43,9 @@ public:
     _bool               Is_Available() const { return m_bAvailable; }
     void                Set_RenderActive(_bool bActive);
 
+    void                Set_Pool(CBubble_Manager* pPool, _uint iLevel, const _wstring& strKey);
+    virtual void        Activate(const _float3& vPos);
+
 protected:
     CAbility_Model*     m_pModelPart = { nullptr };
     CCollider*          m_pCollider = { nullptr };
@@ -50,12 +54,18 @@ protected:
 
     COLLISION_LAYER     m_eCollLayer = { COLLISION_LAYER::ESSENCE_BUBBLE };
 
+    CBubble_Manager*    m_pPool = { nullptr };
+    _uint               m_iPoolLevel = {};
+    _wstring            m_strPoolKey;
+    _float3             m_vBaseScale = {};
+
     _bool               m_bAvailable = { true };
     _float              m_fTimer = { 0.f };
 
 protected:
     HRESULT             Ready_PartObjects();
     HRESULT				Ready_Collider();
+    void                Return_ToPool();
     virtual void        SetUp_Collider_CallBack() = 0;
 
     virtual void        Free() override;

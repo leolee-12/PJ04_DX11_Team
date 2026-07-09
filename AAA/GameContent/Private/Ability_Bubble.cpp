@@ -1,6 +1,7 @@
 #include "Ability_Bubble.h"
 #include "GameInstance.h"
 #include "GameContent_const.h"
+#include "Bubble_Manager.h"
 
 #include "Ability_Model.h"
 
@@ -37,11 +38,16 @@ HRESULT CAbility_Bubble::Initialize(void* pArg)
 	if (FAILED(Ready_PartObjects()))
 		return E_FAIL;
 
+	m_vBaseScale = m_pTransformCom->Get_Scaled();
+
 	return S_OK;
 }
 
 void CAbility_Bubble::Late_Update(_float fTimeDelta)
 {
+	if (!m_bActive)
+		return;
+
 	__super::Late_Update(fTimeDelta);
 
 	if (m_pCollider && m_pCollider->Is_Enabled())
@@ -59,6 +65,28 @@ void CAbility_Bubble::Set_RenderActive(_bool bActive)
 		m_pModelPart->Set_ModelRenderActive(bActive);
 
 	// TODO :  이펙트도 여기서 토글
+}
+
+void CAbility_Bubble::Set_Pool(CBubble_Manager* pPool, _uint iLevel, const _wstring& strKey)
+{
+	m_pPool = pPool;
+	m_iPoolLevel = iLevel;
+	m_strPoolKey = strKey;
+}
+
+void CAbility_Bubble::Activate(const _float3& vPos)
+{
+	m_bActive = true;
+	m_bAvailable = true;
+	m_fTimer = 0.f;
+
+	m_pTransformCom->Set_State(STATE::POSITION,	XMVectorSetW(XMLoadFloat3(&vPos), 1.f));
+	m_pTransformCom->Set_Scale(m_vBaseScale.x, m_vBaseScale.y, m_vBaseScale.z);
+
+	Set_RenderActive(true);
+
+	if (m_pCollider)
+		m_pCollider->Set_Enabled(true);
 }
 
 HRESULT CAbility_Bubble::Ready_PartObjects()
@@ -84,8 +112,10 @@ HRESULT CAbility_Bubble::Ready_Collider()
 {
 	CCollider::COLLIDER_DESC ColliderDesc{};
 	ColliderDesc.pOwner = this;
+/*	ColliderDesc.vCenter = { 0.f, 0.85f, 0.f };
+	ColliderDesc.fRadius = 0.85f;*/		// 이펙트 사이즈는 이거로 진행 ( 배치 위치랑 크기 감 잡기 용도로 남겨둠
 	ColliderDesc.vCenter = { 0.f, 0.85f, 0.f };
-	ColliderDesc.fRadius = 0.85f;   // 튜닝값
+	ColliderDesc.fRadius = 1.25f;		// 충돌체 사이즈는 이거로 고정
 
 	m_pCollider = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, TEXT("Com_BubbleCollider"), &ColliderDesc);
 	if (nullptr == m_pCollider)
@@ -94,6 +124,12 @@ HRESULT CAbility_Bubble::Ready_Collider()
 	m_pGameInstance_Proxy->Register_Collider(m_pCollider, ETOUI(m_eCollLayer));
 
 	return S_OK;
+}
+
+void CAbility_Bubble::Return_ToPool()
+{
+	if (m_pPool)
+		m_pPool->Return(m_iPoolLevel, m_strPoolKey, this);
 }
 
 void CAbility_Bubble::Free()

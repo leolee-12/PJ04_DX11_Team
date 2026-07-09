@@ -75,6 +75,12 @@ protected:
     
     _bool                   m_bRenderActive = { true };
     _int                    m_iShadowPassIdx = { 7 };
+    _float                  m_fSpinAngle = { 0.f };
+
+private:
+    HRESULT                 Render_Sword();
+    HRESULT                 Render_Bomb();
+    HRESULT                 Render_Ice();       // юс╫ц
 
 public:
     static CAbility_Model*  Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
