@@ -47,8 +47,8 @@ public:
 	virtual DEFORM_TYPE			Get_DeformType() const override { return m_tDeformObjectDesc.eDeformType; }
 	virtual DEFORM_OBJECT_KIND	Get_DeformKind() const override { return m_eKind; }
 	virtual _bool			Request_Deform() const override;
-	virtual HRESULT			Begin_Deform(const _float4x4& AnchorWorld) override;
-	virtual void			End_Deform(const _float4x4& AnchorWorld) override;
+	virtual HRESULT			Begin_Deform(const _float4x4* AnchorWorld) override;
+	virtual void			End_Deform(const _float4x4* AnchorWorld) override;
 #pragma endregion
 
 private:

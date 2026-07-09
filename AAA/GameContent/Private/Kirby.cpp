@@ -775,9 +775,9 @@ void CKirby::Set_CutsceneGrabTarget(KIRBY_ATTACHMENT_BEGIN_DESC* pGrabDesc)
 
 void CKirby::Clear_CutsceneGrabTarget()
 {
-    m_pTransformCom->Remove_YRotation();
-    m_pTransformCom->Set_Scale(m_vPreAttachScale.x, m_vPreAttachScale.y, m_vPreAttachScale.z);
-    m_pMovement->Sync_To_Controller();
+    m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(m_vPreAttachScale.x, 0.f, 0.f, 0.f));
+    m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, m_vPreAttachScale.y, 0.f, 0.f));
+    m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, m_vPreAttachScale.z, 0.f));
 
     m_pGrabBone = nullptr;
     m_pGrabOwnerWorld = nullptr;
