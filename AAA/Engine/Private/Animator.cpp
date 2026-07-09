@@ -443,11 +443,16 @@ void CAnimator::Process_Range(ANIM_EVENT_TRACK& track, _float fCur)
 
 void CAnimator::Reset_RuntimeState(ANIM_EVENT_TRACK* pTrack)
 {
-    if (!pTrack) return;
-    for (auto& e : pTrack->Events) 
-    { 
+    if (!pTrack)
+        return;
+
+    for (auto& e : pTrack->Events)
+    {
+        if (e.bIsRange && e.bActive && m_Callback)
+            m_Callback(e, ANIM_EVENT_PHASE::END);
+
         e.bActive = false;
-        e.bFired = false; 
+        e.bFired = false;
     }
 }
 

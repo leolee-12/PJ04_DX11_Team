@@ -80,6 +80,8 @@ public:
     _float  Get_Speed() const;
     _float  Get_HorizontalSpeed() const;
 
+    const _float3& Get_GroundNormal() { return m_vGroundNormal; }
+
     // ¼³Á¤.
     void Set_Mass(_float fMass);
     void Set_Gravity(_float fGravity);
@@ -128,6 +130,10 @@ private:
 
 private:
     _float m_fAccCoyoteTime{};
+
+private:
+    _bool m_bHasGroundNormal{};
+    _float3 m_vGroundNormal = { 0.f, 1.f, 0.f };
 
 public:
     static CMovement_Child* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

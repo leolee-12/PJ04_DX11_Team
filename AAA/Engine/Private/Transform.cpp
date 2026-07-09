@@ -245,6 +245,21 @@ void CTransform::Turn(_fvector vAxis, _float fTimeDelta)
     Rotate(XMQuaternionRotationAxis(vAxis, XMConvertToRadians(m_fRotationPerSec) * fTimeDelta));
 }
 
+_matrix CTransform::Get_RotationMatrix()
+{
+    _vector vRight = XMVector3Normalize(Get_State(STATE::RIGHT));
+    _vector vUp = XMVector3Normalize(Get_State(STATE::UP));
+    _vector vLook = XMVector3Normalize(Get_State(STATE::LOOK));
+
+    _matrix matRot = XMMatrixIdentity();
+    matRot.r[0] = XMVectorSetW(vRight, 0.f);
+    matRot.r[1] = XMVectorSetW(vUp, 0.f);
+    matRot.r[2] = XMVectorSetW(vLook, 0.f);
+    matRot.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+
+    return matRot;
+}
+
 void CTransform::Chase(_fvector vGoal, _float fTimeDelta, _float fLimit, CNavigation* pNavigation)
 {
     _vector     vPosition = Get_State(STATE::POSITION);
@@ -314,6 +329,58 @@ _bool CTransform::LookAt_Smooth(_fvector vAt, _float fTimeDelta)
     Rotate(XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fApplied));
 
     return fabsf(fYaw) <= fMaxStep;
+}
+
+void CTransform::Remove_YRotation()
+{
+    constexpr _float EPSILON = 0.000001f;
+
+    const _float3 vScale = Get_Scaled();
+    const _vector vPosition = Get_State(STATE::POSITION);
+
+    _matrix matRot = Get_RotationMatrix();
+
+    _vector vLook = XMVectorSetY(matRot.r[2], 0.f);
+    if (XMVectorGetX(XMVector3LengthSq(vLook)) <= EPSILON)
+        return;
+
+    vLook = XMVector3Normalize(vLook);
+
+    _float fYaw = atan2f(XMVectorGetX(vLook), XMVectorGetZ(vLook));
+    _matrix matNoY = matRot * XMMatrixRotationY(-fYaw);
+
+    Set_State(STATE::RIGHT, XMVector3Normalize(matNoY.r[0]) * vScale.x);
+    Set_State(STATE::UP, XMVector3Normalize(matNoY.r[1]) * vScale.y);
+    Set_State(STATE::LOOK, XMVector3Normalize(matNoY.r[2]) * vScale.z);
+    Set_State(STATE::POSITION, vPosition);
+}
+
+void CTransform::LookTo(_fvector vLookDir, _fvector vUpDir)
+{
+    _float3 vScaled = Get_Scaled();
+
+    _vector vLook = XMVector3Normalize(vLookDir);
+    _vector vUp = XMVector3Normalize(vUpDir);
+
+    // look을 up 평면에 맞게 보정
+    vLook = vLook - vUp * XMVector3Dot(vLook, vUp);
+
+    if (XMVectorGetX(XMVector3LengthSq(vLook)) <= 0.0001f)
+        return;
+
+    vLook = XMVector3Normalize(vLook);
+
+    _vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vLook));
+    vUp = XMVector3Normalize(XMVector3Cross(vLook, vRight));
+
+    Set_State(STATE::RIGHT, vRight * vScaled.x);
+    Set_State(STATE::UP, vUp * vScaled.y);
+    Set_State(STATE::LOOK, vLook * vScaled.z);
+}
+
+void CTransform::LookTo(_fvector vLookDir)
+{
+    LookTo(vLookDir, XMVectorSet(0.f, 1.f, 0.f, 0.f));
 }
 
 CTransform* CTransform::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

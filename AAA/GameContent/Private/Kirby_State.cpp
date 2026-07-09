@@ -103,6 +103,9 @@ _bool CKirby_State::Transition_Fall_OR_Wait_OR_Run(CKirby* pKirby)
 
 _bool CKirby_State::Try_Transition_Ladder_CommandUp(CKirby* pKirby)
 {
+    if (pKirby->Has_Deform())
+        return false;
+
     // 있으면 충돌
     CLevelDesign_Ladder* pLadder = pKirby->Get_Ladder();
     if (pLadder == nullptr)
@@ -168,7 +171,6 @@ void CKirby_State::Request_Attach(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType
 
 void CKirby_State::Request_Attach_End(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType)
 {
-
 }
 
 void CKirby_State::Request_PositionSync(CKirby* pKirby, const KIRBY_POSITION_SYNC_BEGIN_DESC* pDesc)
@@ -181,7 +183,6 @@ void CKirby_State::Request_PositionEndSync(CKirby* pKirby, const KIRBY_POSITION_
 
 void CKirby_State::Request_StageClear(CKirby* pKirby, const CUTSCENE_STAGECLEAR* pDesc)
 {
-
 }
 
 void CKirby_State::Free()

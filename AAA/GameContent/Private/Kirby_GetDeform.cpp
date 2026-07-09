@@ -13,6 +13,8 @@
 
 #include "Movement_Child.h"
 
+#include "Deformable.h"
+
 CKirby_GetDeform::CKirby_GetDeform()
 {
 }
@@ -34,18 +36,19 @@ void CKirby_GetDeform::Enter(CKirby* pKirby, _int iFlag)
 {
     __super::Enter(pKirby, iFlag);
 
-    // 받아와서
-    m_eDeformType = DEFORM_TYPE::CAR;
+    Subscribe_DeformEvent(pKirby);
+    
+    pKirby->Set_HeldDeformObj(pKirby->Get_TriggerDeformObj());    
+    IDeformable* pDeformable = pKirby->Get_HeldDeformObj();
+    m_eDeformType = pDeformable->Get_DeformType();
+
+    // 
+    pDeformable->Request_Deform(pKirby->Get_Transform()->Get_WorldMatrixPtr());
 
     m_eDeformState = DEFORM_STATE::DEFORM_STATE_END;
     Change_GetDeformState(pKirby, DEFORM_STATE::SUPER_INHALE_START);
 
     pKirby->Get_KirbyAbility()->Clear_Overlay(pKirby);
-
-    //KIRBY_ABILITY_CHANGED tDesc{};
-    //tDesc.bBegin = true;
-    //m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &tDesc);
-    //m_pGameInstance_Proxy->Set_TimeScale(0.f);
 }
 
 void CKirby_GetDeform::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -59,24 +62,13 @@ void CKirby_GetDeform::Exit(CKirby* pKirby)
 {
     __super::Exit(pKirby);
 
-    //KIRBY_ABILITY_CHANGED Desc{};
-    //Desc.bBegin = false;
-    //m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &Desc);
-    //m_pGameInstance_Proxy->Set_TimeScale(1.f);
+    Unsubscribe_DeformEvent();
 }
 
 _bool CKirby_GetDeform::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
 {
     if (__super::Handle_Command(pKirby, pCommand))
         return true;
-
-    KIRBY_COMMAND_TYPE eCommandType = pCommand->GetCommandType();
-
-    //switch (eCommandType)
-    //{
-    //    default:        
-    //        break;
-    //}
 
     return false;
 }
@@ -125,20 +117,26 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
         }
         case DEFORM_STATE::DEFORM:
         {
+            if (m_pInhaleEffect)
+            {
+                m_pInhaleEffect->EffectContainer_Stop();
+                m_pInhaleEffect = nullptr;
+            }
+            pKirby->Get_Body()->Stop_SoundHandle();
+
+            KIRBY_ABILITY_CHANGED tDesc{};
+            tDesc.bBegin = true;
+            m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &tDesc);
+            m_pGameInstance_Proxy->Set_TimeScale(0.f);
+
             pKirby->Get_Body()->Set_Active(false);
 
             CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR, KIRBY_DEFORM_MODEL_TYPE::DEMO);
             pDeformModel_Demo->Set_Active(true);
-            pDeformModel_Demo->Get_Animator()->Play("Deform", false, false, 0.1f, 1.5f);
-
-            pKirby->Get_KirbyAbility()->Get_AbilityType();
+            pDeformModel_Demo->Get_Animator()->Play("Deform", false, false, 0.1f, 1.8f);
 
             pKirby->Change_HatSocketMatrix(pKirby->Get_KirbyAbility()->Get_AbilityType(),
                 pDeformModel_Demo->Get_HatBoneMatirx());
-
-            KIRBY_NAME_UPDATED tNameDesc{};
-            tNameDesc.strAtkModeName = pKirby->Get_ActiveAttackMode()->Get_AttackModeName();
-            m_pGameInstance_Proxy->Publish(EventTag::Kirby_Name_Updated, &tNameDesc);
 
             break;
         }
@@ -147,7 +145,7 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
             CKirby_Deform_Model* pDeformModel_Main = pKirby->Get_DeformPart_Model(m_eDeformType, KIRBY_DEFORM_MODEL_TYPE::MAIN);
             pDeformModel_Main->Set_Active(true);
 
-            pDeformModel_Main->Get_Animator()->Play("DemoEndFirst", false, false, 0.f, 2.f);
+            pDeformModel_Main->Get_Animator()->Play("DemoEndFirst", false, false, 0.f, 3.5f);
 
             pKirby->Change_HatSocketMatrix(pKirby->Get_KirbyAbility()->Get_AbilityType(),
                 pDeformModel_Main->Get_HatBoneMatirx());
@@ -155,6 +153,14 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Set_RotationSpeed(s_fDeform_End_Rot_Speed_Degree);
             Set_RotationDir(pKirby);
+            
+            pKirby->Change_KirbyDeform(m_eDeformType);
+
+            // 이름 바꾸기
+            KIRBY_NAME_UPDATED tNameDesc{};
+            tNameDesc.strAtkModeName = pKirby->Get_ActiveAttackMode()->Get_AttackModeName();
+            m_pGameInstance_Proxy->Publish(EventTag::Kirby_Name_Updated, &tNameDesc);
+
             break;
         }
         case DEFORM_STATE::DEFORM_STATE_END:
@@ -228,12 +234,6 @@ void CKirby_GetDeform::Exit_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
         }
         case DEFORM_STATE::SUPER_INHALE_LOOP:
         {
-            if (m_pInhaleEffect)
-            {
-                m_pInhaleEffect->EffectContainer_Stop();
-                m_pInhaleEffect = nullptr;
-            }
-            pKirby->Get_Body()->Stop_SoundHandle();
             break;
         }
         case DEFORM_STATE::DEFORM:
@@ -244,10 +244,13 @@ void CKirby_GetDeform::Exit_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
         }
         case DEFORM_STATE::DEFORM_END:
         {
+            KIRBY_ABILITY_CHANGED Desc{};
+            Desc.bBegin = false;
+            m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &Desc);
+            m_pGameInstance_Proxy->Set_TimeScale(1.f);
+
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
-
-            pKirby->Change_KirbyDeform(m_eDeformType);
 
             break;
         }
@@ -284,6 +287,37 @@ void CKirby_GetDeform::Set_RotationDir(CKirby* pKirby)
         XMStoreFloat3(&m_vRotationDir, vRightDir);
 }
 
+void CKirby_GetDeform::Subscribe_DeformEvent(CKirby* pKirby)
+{
+    if (m_bSubscribedDeformEvent == true)
+        return;
+
+    m_DeformEvent = m_pGameInstance_Proxy->Subscribe(
+        EventTag::Deform_Acquired,
+        [this, pKirby](void* pData)
+        {
+            Handle_DeformEvent(pKirby);
+        }
+    );
+
+    m_bSubscribedDeformEvent = true;
+}
+
+void CKirby_GetDeform::Unsubscribe_DeformEvent()
+{
+    if (m_bSubscribedDeformEvent == false)
+        return;
+
+    m_pGameInstance_Proxy->UnSubscribe(m_DeformEvent);
+
+    m_bSubscribedDeformEvent = false;
+}
+
+void CKirby_GetDeform::Handle_DeformEvent(CKirby* pKirby)
+{
+    Change_GetDeformState(pKirby, DEFORM_STATE::DEFORM);
+}
+
 CKirby_GetDeform* CKirby_GetDeform::Create()
 {
     CKirby_GetDeform* pInstance = new CKirby_GetDeform();
@@ -299,5 +333,7 @@ CKirby_GetDeform* CKirby_GetDeform::Create()
 
 void CKirby_GetDeform::Free()
 {
+    Unsubscribe_DeformEvent();
+
     __super::Free();
 }

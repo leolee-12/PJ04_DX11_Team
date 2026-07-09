@@ -252,7 +252,7 @@ HRESULT CLD_DeformObject::On_DeformReleased(const _float3& vWorldPosition)
 }
 
 #pragma region Deformable
-_bool CLD_DeformObject::Request_Deform(const _float4x4& AnchorWorld)
+_bool CLD_DeformObject::Request_Deform(const _float4x4* AnchorWorld)
 {
 	if (!m_bAvailable || DEFORM_OBJECT_STATE::IDLE != m_eState)
 		return false;
@@ -261,7 +261,7 @@ _bool CLD_DeformObject::Request_Deform(const _float4x4& AnchorWorld)
 		return false;
 
 	m_eState = DEFORM_OBJECT_STATE::CAPTURED;
-	m_AnchorWorld = AnchorWorld;
+	m_AnchorWorld = *AnchorWorld;
 	m_bAlignDone = false;
 
 	Set_TriggerEnabled(false);
@@ -273,12 +273,12 @@ _bool CLD_DeformObject::Request_Deform(const _float4x4& AnchorWorld)
 	return true;
 }
 
-void CLD_DeformObject::End_Deform(const _float4x4& AnchorWorld)
+void CLD_DeformObject::End_Deform(const _float4x4* AnchorWorld)
 {
 	if (DEFORM_OBJECT_STATE::ACQUIRED != m_eState)
 		return;
 
-	_matrix Anchor = XMLoadFloat4x4(&AnchorWorld);
+	_matrix Anchor = XMLoadFloat4x4(AnchorWorld);
 
 	_vector vLook = XMVectorSetY(Anchor.r[2], 0.f);
 	if (XMVectorGetX(XMVector3LengthSq(vLook)) <= FLT_EPSILON)
