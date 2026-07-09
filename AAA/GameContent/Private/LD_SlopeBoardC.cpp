@@ -16,7 +16,7 @@ namespace
 	constexpr const _char* ANIM_CUT1 = "Cut1";
 	constexpr const _char* SLOPEBOARD_C_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_FALLENWAIT, ANIM_WAIT, ANIM_CUT1, "" };
 
-	inline constexpr _float SLOPEBOARD_C_ANIM_SPEED = 1.f;
+	inline constexpr _float SLOPEBOARD_C_ANIM_SPEED = 1.5f;
 	constexpr _float SLOPEBOARD_C_BOX_THICKNESS = 4.f;
 	constexpr _float SLOPEBOARD_C_STOP_TRACK_FRAME = 450.f;
 
@@ -84,6 +84,15 @@ void CLD_SlopeBoardC::Update(_float fTimeDelta)
 	{
 		Release_PhysicsBox(&m_pVerticalPhysicsActor);
 		m_eState = STATE::PLAYED;
+	}
+
+	if (STATE::PLAYED == m_eState && m_pAnimatorCom->Is_Finished())
+	{
+		KIRBY_POSITION_SYNC_END_DESC desc{};
+		desc.eType = KIRBY_POSITION_SYNC_END_REASON::CAR_BRIDGE_END;
+		m_pGameInstance_Proxy->Publish(EventTag::Kirby_PositionSyncEnd, &desc);
+		m_pGameInstance_Proxy->Publish(EventTag::Letterbox_End, nullptr);
+		m_pGameInstance_Proxy->Publish(EventTag::FadeOut_Start, nullptr);
 	}
 }
 
@@ -307,10 +316,21 @@ void CLD_SlopeBoardC::On_Event()
 
 	CUTSCENE_CAMERA_DESC cam{};
 	cam.eCam = ECutsceneCam::Cutscene;
-	cam.szTrack = L"Bridge_Cut2_camera1";
+	cam.szTrack = L"Bridge_Cut1_camera1";
 	cam.pProgress = m_pAnimatorCom;
 	cam.pAnchorWorld = m_pTransformCom->Get_WorldMatrixPtr();
 	m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+
+	KIRBY_POSITION_SYNC_BEGIN_DESC Pos{};
+	Pos.fAnimSpeed = SLOPEBOARD_C_ANIM_SPEED;
+	Pos.fBlendDuration = 0.f;
+	Pos.AnchorWorld = *m_pTransformCom->Get_WorldMatrixPtr();
+	Pos.eType = KIRBY_POSITION_SYNC_CONTEXT::CAR_BRIDGE;
+	m_pGameInstance_Proxy->Publish(EventTag::Kirby_PositionSyncBegin, &Pos);
+
+	_bool b = { false };
+	m_pGameInstance_Proxy->Publish(EventTag::HUD_SetVisible, &b);
+	m_pGameInstance_Proxy->Publish(EventTag::Letterbox_Begin, nullptr);
 
 	m_pInteractionCollider->Set_Enabled(false);
 }

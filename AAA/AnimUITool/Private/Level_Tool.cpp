@@ -1243,21 +1243,21 @@ void CLevel_Tool::Update(_float fTimeDelta)
 
     if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F8, false))
     {
-        m_pGameInstance_Proxy->Publish(EventTag::Letterbox_Begin, nullptr);
+        m_pGameInstance_Proxy->Publish(EventTag::TitleLogo_Show, nullptr);
         // m_pGameInstance_Proxy->Publish(EventTag::StageClear_UIStarted, nullptr);
     }
-    if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F7, false))
-    {
-        m_pGameInstance_Proxy->Publish(EventTag::Letterbox_End, nullptr);
-        //m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GorillaAppear, nullptr);
-
-        //KIRBY_ATTACHMENT_END_DESC Desc{};
-        //Desc.eType = KIRBY_ATTACHMENT_END_REASON::GORILLA_SCENE_HANDOFF;
-        //
-        //m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentEnd, &Desc);
-
-        Log_Info("Publish: Cutscene_GorillaAppear");
-    }
+    //if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F7, false))
+    //{
+    //    m_pGameInstance_Proxy->Publish(EventTag::Letterbox_End, nullptr);
+    //    //m_pGameInstance_Proxy->Publish(EventTag::Cutscene_GorillaAppear, nullptr);
+    //
+    //    //KIRBY_ATTACHMENT_END_DESC Desc{};
+    //    //Desc.eType = KIRBY_ATTACHMENT_END_REASON::GORILLA_SCENE_HANDOFF;
+    //    //
+    //    //m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentEnd, &Desc);
+    //
+    //    Log_Info("Publish: Cutscene_GorillaAppear");
+    //}
 
 
     if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F6, false))

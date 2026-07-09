@@ -348,6 +348,7 @@
     <ClInclude Include="..\Public\UI_TestImageContainer.h" />
     <ClInclude Include="..\Public\UI_Text.h" />
     <ClInclude Include="..\Public\UI_Title.h" />
+    <ClInclude Include="..\public\UI_TitleLogo.h" />
     <ClInclude Include="..\Public\Vacuum.h" />
     <ClInclude Include="..\Public\InhaleContainer.h" />
     <ClInclude Include="..\Public\WalkSmoke.h" />
@@ -660,6 +661,7 @@
     <ClCompile Include="..\Private\UI_TestImageContainer.cpp" />
     <ClCompile Include="..\Private\UI_Text.cpp" />
     <ClCompile Include="..\Private\UI_Title.cpp" />
+    <ClCompile Include="..\private\UI_TitleLogo.cpp" />
     <ClCompile Include="..\Private\Vacuum.cpp" />
     <ClCompile Include="..\Private\InhaleContainer.cpp" />
     <ClCompile Include="..\Private\WalkSmoke.cpp" />
