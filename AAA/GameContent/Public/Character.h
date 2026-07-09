@@ -50,7 +50,7 @@ protected:
 	_float  m_fHitFlashCur = { 0.f };          // 현재 강도 0..1
 	_float  m_fHitFlashTime = { 0.f };          // 원샷 잔여시간(몬스터)
 	_float  m_fHitFlashDuration = { 0.12f };        // 원샷 1회 길이
-	_float3 m_vHitFlashColor = { 1.f, 1.f, 1.f };// 흰색
+	_float3 m_vHitFlashColor = { 1.f, 1.f, 1.f };  // 흰색
 
 	// 히트 리액션 (스톱 + 렌더 셰이크)
 	_float  m_fHitStopTime = { 0.f };                       // 남은 정지 시간

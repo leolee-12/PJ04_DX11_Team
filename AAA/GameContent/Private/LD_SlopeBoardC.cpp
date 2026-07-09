@@ -10,6 +10,7 @@ namespace
 	inline constexpr const _tchar* TEMP_EVENT_TAG = L"Temp";
 
 	inline constexpr const _char* SLOPEBOARD_C_MODEL_PATH = "../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardC.ysh";
+	inline constexpr const _tchar* SLOPEBOARD_C_ANIM_EVENT_FILE = L"../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardC_AnimEvents.json";
 
 	inline constexpr const _char* ANIM_CUT1 = "Cut1";
 	inline constexpr const _char* SLOPEBOARD_C_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_CUT1 };
@@ -56,7 +57,7 @@ HRESULT CLD_SlopeBoardC::Validate_Initialized()
 	if (m_tEventObjectDesc.eModelType != MODEL::ANIM || m_tEventObjectDesc.wstrModelProtoTag != MODEL_PROTO_TAG)
 		return E_FAIL;
 
-	if (m_tEventObjectDesc.bUseCollMesh || !m_tEventObjectDesc.strAnimEventFile.empty())
+	if (m_tEventObjectDesc.bUseCollMesh || m_tEventObjectDesc.strAnimEventFile.empty())
 		return E_FAIL;
 
 	if (m_tEventObjectDesc.strAnimNames[0] != SLOPEBOARD_C_ANIM_NAMES[0])
@@ -91,6 +92,7 @@ void CLD_SlopeBoardC::Update(_float fTimeDelta)
 		m_pGameInstance_Proxy->Publish(EventTag::Kirby_PositionSyncEnd, &desc);
 		m_pGameInstance_Proxy->Publish(EventTag::Letterbox_End, nullptr);
 		m_pGameInstance_Proxy->Publish(EventTag::FadeOut_Start, nullptr);
+		m_eState = STATE::DONE;
 	}
 }
 
@@ -159,7 +161,7 @@ _bool CLD_SlopeBoardC::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& 
 	Desc.eModelType = Spec.eModelType;
 	Desc.wstrModelProtoTag = Spec.wstrModelProtoTag;
 	Desc.bUseCollMesh = false;
-	Desc.strAnimEventFile.clear();
+	Desc.strAnimEventFile = SLOPEBOARD_C_ANIM_EVENT_FILE;
 
 	Desc.strAnimNames[0] = SLOPEBOARD_C_ANIM_NAMES[0];
 
@@ -342,6 +344,15 @@ void CLD_SlopeBoardC::On_Event()
 	m_pTrigger->Set_Enabled(false);
 }
 
+void CLD_SlopeBoardC::On_AnimEvent(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase)
+{
+	if (ANIM_EVENT_PHASE::POINT != ePhase)
+		return;
+
+	if (EANIM_EVENT::UI == static_cast<EANIM_EVENT>(AnimEvent.iEventType))
+		m_pGameInstance_Proxy->Publish(EventTag::TitleLogo_Show, nullptr);
+}
+
 CGameObject* CLD_SlopeBoardC::Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	return CLD_SlopeBoardC::Create(pDevice, pContext);
@@ -374,7 +385,7 @@ CGameObject* CLD_SlopeBoardC::Clone(void* pArg)
 		TempDesc.eModelType = MODEL::ANIM;
 		TempDesc.wstrModelProtoTag = MODEL_PROTO_TAG;
 		TempDesc.bUseCollMesh = false;
-		TempDesc.strAnimEventFile.clear();
+		TempDesc.strAnimEventFile= SLOPEBOARD_C_ANIM_EVENT_FILE;
 
 		TempDesc.strAnimNames[0] = SLOPEBOARD_C_ANIM_NAMES[0];
 
