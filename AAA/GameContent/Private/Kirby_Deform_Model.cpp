@@ -54,6 +54,28 @@ void CKirby_Deform_Model::Late_Update(_float fTimeDelta)
 
     CPartObject::Compute_CombinedWorldMatrix(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
+    //_matrix matWorld = XMLoadFloat4x4(&m_CombinedWorldMatrix);
+
+    //_vector vUp = XMVector3Normalize(XMLoadFloat3(&m_vGroundNoraml));
+    //_vector vLook = XMVectorSetW(matWorld.r[2], 0.f);
+
+    //vLook = vLook - vUp * XMVector3Dot(vLook, vUp);
+
+    //_float sx = XMVectorGetX(XMVector3Length(matWorld.r[0]));
+    //_float sy = XMVectorGetX(XMVector3Length(matWorld.r[1]));
+    //_float sz = XMVectorGetX(XMVector3Length(matWorld.r[2]));
+
+    //vLook = XMVector3Normalize(vLook);
+
+    //_vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vLook));
+    //vLook = XMVector3Normalize(XMVector3Cross(vRight, vUp));
+
+    //matWorld.r[0] = XMVectorSetW(vRight * sx, 0.f);
+    //matWorld.r[1] = XMVectorSetW(vUp * sy, 0.f);
+    //matWorld.r[2] = XMVectorSetW(vLook * sz, 0.f);
+
+    //XMStoreFloat4x4(&m_CombinedWorldMatrix, matWorld);
+
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }

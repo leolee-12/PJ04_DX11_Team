@@ -33,11 +33,6 @@ void CKirby_AbilityDump::Enter(CKirby* pKirby, _int iFlag)
     pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::ABILITY_DUMP);
 
     m_bPartsOff = false;
-    m_bCloseEye = false;
-
-    KIRBY_NAME_UPDATED tNameDesc{};
-    tNameDesc.strAtkModeName = L"Ä¿ºñ";
-    m_pGameInstance_Proxy->Publish(EventTag::Kirby_Name_Updated, &tNameDesc);
 }
 
 void CKirby_AbilityDump::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -49,9 +44,7 @@ void CKirby_AbilityDump::Update(CKirby* pKirby, const _float fTimeDelta)
 
     const _float fRatio = pAnimator->Get_Progress();
 
-
-    Parts_Off(pKirby, fRatio);
-    Close_Eye(pBody, fRatio);
+    Update_AbilityDump(pKirby, fRatio);
 
     if(pAnimator->Is_Finished())
     {
@@ -77,30 +70,19 @@ _bool CKirby_AbilityDump::Handle_Command(CKirby* pKirby, CKirby_Command* pComman
     return false;
 }
 
-void CKirby_AbilityDump::Parts_Off(CKirby* pKirby, _float fRatio)
+void CKirby_AbilityDump::Update_AbilityDump(CKirby* pKirby, _float fRatio)
 {
     if (m_bPartsOff == false && fRatio >= 0.45f)
     {
         pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), false);
         pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::NORMAL);
         pKirby->Apply_ChangeKirbyAbility();
+
+        KIRBY_NAME_UPDATED tNameDesc{};
+        tNameDesc.strAtkModeName = pKirby->Get_KirbyAbility()->Get_AttackModeName();
+        m_pGameInstance_Proxy->Publish(EventTag::Kirby_Name_Updated, &tNameDesc);
+
         m_bPartsOff = true;
-    }
-}
-
-void CKirby_AbilityDump::Close_Eye(CKirby_Body* pBody, _float fRatio)
-{
-    if (m_bCloseEye == false && fRatio >= 0.55f && fRatio < 0.9f)
-    {
-        pBody->Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);
-
-        m_bCloseEye = true;
-    }
-    else if (m_bCloseEye == true && fRatio >= 0.9f)
-    {
-        pBody->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
-
-        m_bCloseEye = false;
     }
 }
 

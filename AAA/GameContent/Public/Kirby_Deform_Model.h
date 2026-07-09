@@ -55,6 +55,8 @@ public:
 	void Set_KirbyEye(KIRBY_EYE_STATE eState) { m_eEye = eState; }
 	void Stop_SoundHandle();
 
+	void Set_GoundNormal(const _float3 vGoundNoraml) { m_vGroundNoraml = vGoundNoraml; }
+
 protected:
 	_bool Handle_AnimEventParent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
 
@@ -77,6 +79,8 @@ protected:
 
 	// Sound
 	unordered_map<_wstring, CSound_Handle> m_SoundHandles;
+
+	_float3 m_vGroundNoraml{ 0.f, 1.f, 0.f };
 
 protected:
 	static constexpr _float4 s_vBodyColor{ 1.f, 0.1882353f, 0.3764706f, 1.f };

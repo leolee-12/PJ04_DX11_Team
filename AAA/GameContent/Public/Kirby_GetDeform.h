@@ -52,6 +52,11 @@ private:
 
 	void Set_RotationDir(CKirby* pKirby);
 
+	// Event
+	void Subscribe_DeformEvent(CKirby* pKirby);
+	void Unsubscribe_DeformEvent();
+	void Handle_DeformEvent(CKirby* pKirby);
+
 private:
 	DEFORM_STATE m_eDeformState{};
 
@@ -62,6 +67,10 @@ private:
 	CEffect_Container* m_pInhaleEffect{};
 
 	_float3 m_vRotationDir{};
+
+	// Event
+	SUBHANDLE m_DeformEvent{};
+	_bool m_bSubscribedDeformEvent{};
 
 public:
 	static CKirby_GetDeform* Create();
