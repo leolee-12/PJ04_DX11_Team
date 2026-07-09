@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Kirby_OnOffPart.h"
+
 #include "Damageable.h"
 
 NS_BEGIN(Engine)
@@ -41,8 +42,11 @@ public:
 	virtual void Put_OnBack(CKirby* pKirby, _bool bOn) override;
 
 public:
-	//À±¼®Çö Ãß°¡
-	void Reset_HitList() { m_DamagedTargets.clear(); }
+	void Begin_Hit(const ATTACK_INFO& tInfo, _bool bResetHitList = true);
+	void End_Hit(_bool bResetHitList = true);
+
+	void Reset_DamagedList() { m_DamagedTargets.clear(); }
+
 	void Set_HitBox(_bool bOn);
 
 private:

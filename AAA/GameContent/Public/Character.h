@@ -61,7 +61,7 @@ protected:
 	_float  m_fShakeElapsed = { 0.f };                      // 셰이크 경과(사인 위상용)
 
 	_float  m_fInvincibleTime = { 0.f };
-	_float  m_fInvincibleDuration = { 0.2f };
+	_float  m_fInvincibleDuration = { 0.0f };
 
 protected:
 	virtual _bool Block_Hit(const ATTACK_INFO& tInfo) { return false; }

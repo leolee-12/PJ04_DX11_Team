@@ -157,6 +157,11 @@ void CKirby::On_Deserialized()
         m_pMovement->Sync_To_Controller();
 }
 
+_bool CKirby::Handel_BodyAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+{
+    return m_pKirby_Ability->Handle_BodyAnimEvent(this, e, ePhase);
+}
+
 void CKirby::Set_AbilityPartsActive(COPY_ABILITY_TYPE eAbilityType, _bool bOn, _bool bOnlyWeapon)
 {
     CKirby_OnOffPart* pWeapon = Find_WeaponPart(eAbilityType);
