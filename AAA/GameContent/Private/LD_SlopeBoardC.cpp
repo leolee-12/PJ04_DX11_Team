@@ -339,7 +339,6 @@ void CLD_SlopeBoardC::On_Event()
 	m_pGameInstance_Proxy->Publish(EventTag::HUD_SetVisible, &b);
 	m_pGameInstance_Proxy->Publish(EventTag::Letterbox_Begin, nullptr);
 
-	m_pInteractionCollider->Set_Enabled(false);
 	m_pTrigger->Set_Enabled(false);
 }
 
