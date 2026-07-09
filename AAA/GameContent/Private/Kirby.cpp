@@ -157,7 +157,7 @@ void CKirby::On_Deserialized()
         m_pMovement->Sync_To_Controller();
 }
 
-_bool CKirby::Handel_BodyAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+_bool CKirby::Dispatch_BodyAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 {
     return m_pKirby_Ability->Handle_BodyAnimEvent(this, e, ePhase);
 }

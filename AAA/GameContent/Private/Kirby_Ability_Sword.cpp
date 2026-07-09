@@ -290,6 +290,9 @@ void CKirby_Ability_Sword::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_IN
     Effect_Stop(m_pSwordChargeEffect);
     Effect_Stop(m_pSwordSuperChargeEffect);
 
+    CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::SWORD));
+    pSword->End_Hit();
+
     __super::On_Damaged_KirbyState(pKirby, tInfo);
 }
 
