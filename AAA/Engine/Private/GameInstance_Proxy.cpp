@@ -292,6 +292,13 @@ void CGameInstance_Proxy::Add_DebugComponent(CComponent* pComponent)
 
 	m_pOwner->m_pRenderer->Add_DebugComponent(pComponent);
 }
+void CGameInstance_Proxy::Add_DebugTextComponent(CComponent* pComponent)
+{
+	if (!IsConnected())
+		return;
+
+	m_pOwner->m_pRenderer->Add_DebugTextComponent(pComponent);
+}
 void CGameInstance_Proxy::Toggle_DebugRender()
 {
 	if (!IsConnected())

@@ -78,19 +78,20 @@ public:
 
 	const CMap_EditSession* Get_MapPreviewSession() const { return m_pMapPreviewSession; }
 
-	_bool Track_EditedMapPreviewEnvObject(CGameObject* pObject, const MAP_ENV_EDITED_DESC& Edit);
+	_bool Track_EditedMapPreviewEnvObject(CGameObject* pObject, const EDIT_OBJECT_OVERRIDE_DESC& Edit);
 	_bool Clear_EditedMapPreviewEnvObject(CGameObject* pObject);
-	_bool Try_GetMapPreviewEnvEdit(CGameObject* pObject, MAP_ENV_EDITED_DESC* pOutEdit) const;
-	_bool Track_EditedMapPreviewSection(const _wstring& strSectionKey, const MAP_ENV_EDITED_DESC& Edit);
+	_bool Try_GetMapPreviewEnvEdit(CGameObject* pObject, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const;
+	_bool Track_EditedMapPreviewSection(const _wstring& strSectionKey, const EDIT_OBJECT_OVERRIDE_DESC& Edit);
 	_bool Clear_EditedMapPreviewSection(const _wstring& strSectionKey);
-	_bool Try_GetMapPreviewSectionEdit(const _wstring& strSectionKey, MAP_ENV_EDITED_DESC* pOutEdit) const;
-	_bool Track_EditedMapPreviewLevelDesignObject(CGameObject* pObject, const MAP_LD_EDITED_DESC& Edit);
+	_bool Try_GetMapPreviewSectionEdit(const _wstring& strSectionKey, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const;
+	_bool Track_EditedMapPreviewLevelDesignObject(CGameObject* pObject, const EDIT_OBJECT_OVERRIDE_DESC& Edit);
 	_bool Clear_EditedMapPreviewLevelDesignObject(CGameObject* pObject);
-	_bool Try_GetMapPreviewLevelDesignEdit(CGameObject* pObject, MAP_LD_EDITED_DESC* pOutEdit) const;
+	_bool Try_GetMapPreviewLevelDesignEdit(CGameObject* pObject, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const;
 	_bool Commit_MapEditObjectFromCurrentState(CGameObject* pObject);
 
 	HRESULT Restore_DeletedMapPreviewEnv(const _wstring& strStableKey);
 	HRESULT Restore_AllDeletedMapPreviewEnv();
+	HRESULT Save_PlaceEdit();
 	HRESULT Save_MapOverride();
 
 	// Getter & Setter

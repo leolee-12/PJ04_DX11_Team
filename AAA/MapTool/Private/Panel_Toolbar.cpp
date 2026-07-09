@@ -75,10 +75,10 @@ namespace
 			pLevel->Clear_LDPreview();
 
 		ImGui::SameLine();
-		if (ImGui::Button("Map Edit Save"))
+		if (ImGui::Button("Place Edit Save"))
 		{
-			if (FAILED(pLevel->Save_MapOverride()))
-				MSG_BOX("MAP EDIT SAVE FAILED");
+			if (FAILED(pLevel->Save_PlaceEdit()))
+				MSG_BOX("PLACE EDIT SAVE FAILED");
 		}
 
 		if (ImGui::IsItemHovered())

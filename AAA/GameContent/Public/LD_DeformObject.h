@@ -43,14 +43,14 @@ public:
 private:
 	LD_DEFORMOBJECT_DESC m_tDeformObjectDesc = {};
 
-	CCollider* m_pInteractionCollider = { nullptr };
+	CCollider* m_pTrigger = { nullptr };
 	_bool m_bAvailable = { true };
 
 private:
 	virtual HRESULT Ready_Components() override;
-	HRESULT Ready_InteractionCollider();
+	HRESULT Ready_Trigger();
 
-	void Set_InteractionEnabled(_bool bEnabled);
+	void Set_TriggerEnabled(_bool bEnabled);
 
 public:
 	static CLD_DeformObject* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

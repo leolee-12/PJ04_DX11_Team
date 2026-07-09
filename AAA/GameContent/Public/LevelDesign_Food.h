@@ -44,8 +44,7 @@ public:
 private:
 	CShader*		m_pShaderCom = { nullptr };
 	CModel*			m_pModelCom = { nullptr };
-	CCollider*		m_pPickupCollider = { nullptr };
-	_bool			m_bPickupColliderRegistered = { false };
+	CCollider*		m_pHurtBox = { nullptr };
 
 	LD_FOOD_DESC	m_tFoodDesc = {};
 
@@ -56,10 +55,9 @@ private:
 	HRESULT			Render_Model();
 	const _tchar*	Resolve_ModelProtoTag() const;
 
-	HRESULT			Ready_PickupCollider();
+	HRESULT			Ready_HurtBox();
 	void			SetUp_Collider_Callback();
 	void			Handle_Pickup(CCollider* pOther);
-	void			Unregister_PickupCollider(_bool bImmediate);
 
 public:
 	static CLevelDesign_Food* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

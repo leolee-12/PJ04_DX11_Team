@@ -53,11 +53,10 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
 	CAnimator* m_pAnimatorCom = { nullptr };
-	CCollider* m_pInteractionTrigger = { nullptr };
+	CCollider* m_pTrigger = { nullptr };
 
 	LD_EVENTOBJECT_DESC m_tPopFlowerDesc = {};
 	STATE m_eState = { STATE::IDLE };
-	_bool m_bInteractionTriggerRegistered = { false };
 
 	_int m_iBudMeshIndex = { -1 };
 	_int m_iBloomMeshIndex = { -1 };
@@ -66,18 +65,17 @@ private:
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_RenderComponents();
-	HRESULT Ready_InteractionTrigger();
+	HRESULT Ready_Trigger();
 	HRESULT Ready_InitialState();
 
 	HRESULT Bind_ShaderResources();
 	HRESULT Render_Model();
 
-	void SetUp_InteractionTriggerCallback();
-	void Handle_InteractionTrigger(CCollider* pOther);
-	void Handle_InteractionTriggerStay(CCollider* pOther);
-	void Handle_InteractionTriggerExit(CCollider* pOther);
+	void SetUp_Collider_Callback();
+	void Handle_TriggerEnter(CCollider* pOther);
+	void Handle_TriggerStay(CCollider* pOther);
+	void Handle_TriggerExit(CCollider* pOther);
 	void Grant_Reward(CCollider* pOther);
-	void Unregister_InteractionTrigger(_bool bImmediate);
 	_bool Play_Animation(const _char* pAnimName, _bool bLoop);
 	_bool Is_PlayerCollider(CCollider* pOther) const;
 	void Update_AnimationSpeed();

@@ -1,6 +1,6 @@
 #pragma once
-
 #include "EnvObject_Defines.h"
+#include "Editable.h"
 
 NS_BEGIN(Engine)
 class CShader;
@@ -13,7 +13,7 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL CEnvObject abstract : public CGameObject
+class CLIENT_DLL CEnvObject abstract : public CGameObject, public IEditable
 {
 	GENERATED_BODY_ABSTRACT(CEnvObject)
 
@@ -47,6 +47,7 @@ public:
 	_bool   Is_Visible_Main() const { return m_bVisible; }
 	_bool   Is_Visible_Shadow() const { return m_bVisibleShadow; }
 	_bool   Is_Decal() const { return m_bIsDecal; }
+	_bool   Is_UseCollMesh() const { return m_bUseCollMesh; }
 
 	const ENV_OBJECT_DESC& Get_Desc() const { return m_tDesc; }
 	const BoundingBox& Get_WorldBounds() const { return m_WorldBounds; }
@@ -56,6 +57,13 @@ public:
 
 	_bool Pick_Marb1e(_fvector vRayOrigin, _fvector vRayDir, _float3* pOutHit, _float* fOutDistance);
 	HRESULT Refresh();
+
+#pragma region Editable
+	virtual _bool Get_EditDesc(EDITABLE_DESC* pOutDesc) const override;
+	virtual HRESULT Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy) override;
+	virtual const MESH_LAYER_IDX* Get_EditMeshLayer(_uint iModelSlot, _uint iMesh) const override;
+	virtual HRESULT Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX& Layer) override;
+#pragma endregion
 
 protected:
 	HRESULT Ready_RenderComponents(_uint iModelProtoLevel, const wstring& wstrModelProtoTag);
@@ -84,6 +92,7 @@ protected:
 	_bool			m_bVisible = { false };
 	_bool			m_bVisibleShadow = { false };
 	_bool			m_bDebugDraw = { false };
+	_bool			m_bUseCollMesh = { false };
 
 	// 디더링관련
 	_bool m_bUseCameraDither = { false }; // 객체 디더 사용 여부

@@ -8,6 +8,21 @@
 #include "Camera_AreaCam.h"
 #include "Level_Loading.h"
 
+#ifdef _DEBUG
+namespace
+{
+    LEVEL Resolve_DebugLevel(const _wstring& strLevelTag)
+    {
+        if (strLevelTag == L"STAGE0_STEP1" || strLevelTag == L"Stage0_Step1" || strLevelTag == L"Stage1-1") return LEVEL::STAGE0_STEP1;
+        if (strLevelTag == L"STAGE0_STEP2" || strLevelTag == L"Stage0_Step2" || strLevelTag == L"Stage1-2") return LEVEL::STAGE0_STEP2;
+        if (strLevelTag == L"TOWN_STEP1" || strLevelTag == L"Town_Step1") return LEVEL::TOWN_STEP1;
+        if (strLevelTag == L"BOSS_STAGE1" || strLevelTag == L"Boss_Stage1" || strLevelTag == L"BossMap1") return LEVEL::BOSS_STAGE1;
+        if (strLevelTag == L"TEST" || strLevelTag == L"Test") return LEVEL::TEST;
+        return LEVEL::END;
+    }
+}
+#endif
+
 CStage0_Step1::CStage0_Step1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel { pDevice, pContext }
 {
@@ -105,16 +120,31 @@ HRESULT CStage0_Step1::Ready_Events()
         //}
         });
 
-    //Subscribe_Event(TEXT("Debug Level Change"), [this](void* p) {
-    //     Ä³½ºÆÃ
-    //    
-    //    CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::eLevel);
-    //    if (pLoadingLevel)
-    //    {
-    //        m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
-    //        return;
-    //    }
-    //    });
+#ifdef _DEBUG
+    Subscribe_Event(TEXT("Debug Level Change"), [this](void* p){
+        const TRIGGER_EVENT_PAYLOAD* pPayload = static_cast<const TRIGGER_EVENT_PAYLOAD*>(p);
+        if (nullptr == pPayload)
+        {
+            OutputDebugStringW(L"[Stage0_Step1] Debug Level Change payload is null.\n");
+            return;
+        }
+
+        const LEVEL eNextLevel = Resolve_DebugLevel(pPayload->strPayload);
+        if (LEVEL::END == eNextLevel)
+        {
+            const _wstring strLog = L"[Stage0_Step1] Unknown debug level payload: " + pPayload->strPayload + L"\n";
+            OutputDebugStringW(strLog.c_str());
+            return;
+        }
+
+        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, eNextLevel);
+        if (pLoadingLevel)
+        {
+            m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
+            return;
+        }
+        });
+#endif
 
     return S_OK;
 }

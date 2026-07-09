@@ -9,11 +9,9 @@ namespace
 	inline constexpr const _tchar* TEMP_EVENT_TAG = L"Temp"; // TODO: 컷신 트리거 이벤트 태그 확정 후 정리
 
 	inline constexpr const _char* GARAGE_RADIO_MODEL_PATH = "../../Resources/Map/Gimmick/Anim/GarageRadio/GarageRadio.ysh";
-	inline constexpr const _char* ANIM_PERFORMANCE = "PerformanceAnim";
-	inline constexpr const _char* ANIM_SPEAKERBIG = "SpeakerBig";
-	inline constexpr const _char* ANIM_WAIT = "Wait";
 	inline constexpr const _char* ANIM_CUT1 = "Cut1";
-	inline constexpr const _char* GARAGE_RADIO_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_PERFORMANCE, ANIM_SPEAKERBIG, ANIM_WAIT, ANIM_CUT1 };
+	inline constexpr const _char* ANIM_WAIT = "Wait";
+	inline constexpr const _char* GARAGE_RADIO_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_CUT1, ANIM_WAIT };
 	inline constexpr _float GARAGE_RADIO_ANIM_SPEED = 1.f;
 }
 
@@ -37,16 +35,16 @@ HRESULT CLD_GarageRadio::Initialize(void* pArg)
 
 	const LD_ANIM_PLAY_DESC AnimDescs[] =
 	{
-		{ ANIM_PERFORMANCE, false, GARAGE_RADIO_ANIM_SPEED },
-		{ ANIM_SPEAKERBIG, false, GARAGE_RADIO_ANIM_SPEED },
-		{ ANIM_WAIT, true, GARAGE_RADIO_ANIM_SPEED },
 		{ ANIM_CUT1, false, GARAGE_RADIO_ANIM_SPEED },
+		{ ANIM_WAIT, false, GARAGE_RADIO_ANIM_SPEED },
 	};
 
 	if (FAILED(Ready_AnimPlayDescs(AnimDescs, static_cast<_uint>(_countof(AnimDescs)))))
 		return E_FAIL;
 
-	return Set_AnimPose(ANIM_WAIT, 0.f);
+	Set_AnimPose(ANIM_WAIT, 0.f);
+
+	return S_OK;
 }
 
 HRESULT CLD_GarageRadio::Validate_Initialized()
@@ -66,11 +64,11 @@ HRESULT CLD_GarageRadio::Validate_Initialized()
 	if (!m_tEventObjectDesc.strAnimEventFile.empty())
 		return E_FAIL;
 
-	for (_uint i = 0; i < LD_ANIM_SLOT_COUNT; ++i)
-	{
-		if (m_tEventObjectDesc.strAnimNames[i] != GARAGE_RADIO_ANIM_NAMES[i])
-			return E_FAIL;
-	}
+	if (m_tEventObjectDesc.strAnimNames[0] != GARAGE_RADIO_ANIM_NAMES[0])
+		return E_FAIL;
+
+	if (m_tEventObjectDesc.strAnimNames[1] != GARAGE_RADIO_ANIM_NAMES[1])
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -137,8 +135,8 @@ _bool CLD_GarageRadio::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& 
 	Desc.bUseCollMesh = false;
 	Desc.strAnimEventFile.clear();
 
-	for (_uint i = 0; i < LD_ANIM_SLOT_COUNT; ++i)
-		Desc.strAnimNames[i] = GARAGE_RADIO_ANIM_NAMES[i];
+	Desc.strAnimNames[0] = GARAGE_RADIO_ANIM_NAMES[0];
+	Desc.strAnimNames[1] = GARAGE_RADIO_ANIM_NAMES[1];
 
 	*pOutEntry = Desc;
 	return true;
@@ -151,7 +149,16 @@ CGameObject* CLD_GarageRadio::Create_Prototype(ID3D11Device* pDevice, ID3D11Devi
 
 HRESULT CLD_GarageRadio::Ready_Events()
 {
-	Subscribe_Event(TEMP_EVENT_TAG, [this](void*) { On_Event(); });
+	Subscribe_Event(TEMP_EVENT_TAG, [this](void* pData)
+		{
+			_float4x4* pMat = { nullptr };
+			if (pMat = static_cast<_float4x4*>(pData))
+			{
+				_matrix fixMat = XMMatrixRotationY(XMConvertToRadians(180)) * XMLoadFloat4x4(pMat);
+				m_pTransformCom->Set_WorldMatrix(fixMat);
+				On_Event();
+			}
+		});
 
 	return S_OK;
 }

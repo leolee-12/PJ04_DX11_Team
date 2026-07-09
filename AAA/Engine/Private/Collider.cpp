@@ -218,6 +218,31 @@ void CCollider::Remove_FromContacts(CCollider* pOther)
 }
 
 #ifdef _DEBUG
+void CCollider::Set_DebugText(const _wstring& strFontTag, const _wstring& strText, const _float4& vColor, const _float2&
+    vScale, TEXT_ALIGN eAlign)
+{
+    m_bUseDebugText = true;
+    m_strDebugFontTag = strFontTag;
+    m_strDebugText = strText;
+    m_vDebugTextColor = vColor;
+    m_vDebugTextScale = vScale;
+    m_eDebugTextAlign = eAlign;
+}
+
+void CCollider::Set_DebugRenderColor(const _float4& vColor)
+{
+    if (nullptr == m_pBounding)
+        return;
+
+    m_pBounding->Set_DebugColor(vColor);
+}
+
+void CCollider::Clear_DebugText()
+{
+    m_bUseDebugText = false;
+    m_strDebugFontTag.clear();
+    m_strDebugText.clear();
+}
 
 HRESULT CCollider::Render()
 {
@@ -238,6 +263,93 @@ HRESULT CCollider::Render()
     m_pBatch->End();
 
     return S_OK;
+}
+
+HRESULT CCollider::Render_DebugText()
+{
+    if (!m_bUseDebugText || m_strDebugFontTag.empty() || m_strDebugText.empty())
+        return S_OK;
+
+    _float3 vWorldPos{};
+    if (false == Try_GetDebugTextWorldPos(&vWorldPos))
+        return S_OK;
+
+    const _float4x4* pView = m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, PROJ_TYPE::PERSPEC);
+    const _float4x4* pProj = m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, PROJ_TYPE::PERSPEC);
+    if (nullptr == pView || nullptr == pProj)
+        return S_OK;
+
+    const _vector vClipPos = XMVector4Transform(XMVector4Transform(XMVectorSet(vWorldPos.x, vWorldPos.y, vWorldPos.z, 1.f),
+        XMLoadFloat4x4(pView)), XMLoadFloat4x4(pProj));
+    const _float fW = XMVectorGetW(vClipPos);
+    if (fW <= 0.001f)
+        return S_OK;
+
+    const _float fNdcX = XMVectorGetX(vClipPos) / fW;
+    const _float fNdcY = XMVectorGetY(vClipPos) / fW;
+    const _float fNdcZ = XMVectorGetZ(vClipPos) / fW;
+    if (fNdcX < -1.f || fNdcX > 1.f || fNdcY < -1.f || fNdcY > 1.f || fNdcZ < 0.f || fNdcZ > 1.f)
+        return S_OK;
+
+    D3D11_VIEWPORT Viewport{};
+    UINT iNumViewports = 1;
+    m_pContext->RSGetViewports(&iNumViewports, &Viewport);
+    if (0 == iNumViewports || Viewport.Width <= 0.f || Viewport.Height <= 0.f)
+        return S_OK;
+
+    _float2 vPixelPos{};
+    vPixelPos.x = Viewport.TopLeftX + (fNdcX * 0.5f + 0.5f) * Viewport.Width;
+    vPixelPos.y = Viewport.TopLeftY + (-fNdcY * 0.5f + 0.5f) * Viewport.Height;
+
+    _float4 vColor = !m_CurrContacts.empty() ? _float4(1.f, 0.f, 0.f, 1.f) : m_vDebugTextColor;
+    m_pGameInstance_Proxy->Draw_Text_Raw(m_strDebugFontTag, m_strDebugText.c_str(), vPixelPos, XMLoadFloat4(&vColor), m_vDebugTextScale, m_eDebugTextAlign);
+
+    return S_OK;
+}
+
+_bool CCollider::Try_GetDebugTextWorldPos(_float3* pOut) const
+{
+    if (nullptr == pOut || nullptr == m_pBounding)
+        return false;
+
+    switch (m_eType)
+    {
+    case COLLIDER::AABB:
+    {
+        const BoundingBox* pDesc = static_cast<CBounding_AABB*>(m_pBounding)->Get_Desc();
+        *pOut = pDesc->Center;
+        pOut->y += pDesc->Extents.y + 0.35f;
+        return true;
+    }
+    case COLLIDER::OBB:
+    {
+        const BoundingOrientedBox* pDesc = static_cast<CBounding_OBB*>(m_pBounding)->Get_Desc();
+        const _float fExtent = max(pDesc->Extents.x, max(pDesc->Extents.y, pDesc->Extents.z));
+        *pOut = pDesc->Center;
+        pOut->y += fExtent + 0.35f;
+        return true;
+    }
+    case COLLIDER::SPHERE:
+    {
+        const BoundingSphere* pDesc = static_cast<CBounding_Sphere*>(m_pBounding)->Get_Desc();
+        *pOut = pDesc->Center;
+        pOut->y += pDesc->Radius + 0.35f;
+        return true;
+    }
+    case COLLIDER::CAPSULE:
+    {
+        _float3 vP0{}, vP1{};
+        CBounding_Capsule* pCapsule = static_cast<CBounding_Capsule*>(m_pBounding);
+        pCapsule->Get_Segment(vP0, vP1);
+
+        pOut->x = (vP0.x + vP1.x) * 0.5f;
+        pOut->y = max(vP0.y, vP1.y) + pCapsule->Get_Radius() + 0.35f;
+        pOut->z = (vP0.z + vP1.z) * 0.5f;
+        return true;
+    }
+    }
+
+    return false;
 }
 #endif
 

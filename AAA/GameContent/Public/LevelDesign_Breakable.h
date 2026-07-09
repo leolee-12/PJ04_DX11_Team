@@ -60,8 +60,8 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CModel* m_pModelCom = { nullptr };
 	CAnimator* m_pAnimatorCom = { nullptr };
-	CCollider* m_pHurtBoxCom = { nullptr };
-	physx::PxRigidStatic* m_pPhysicsActor = { nullptr };
+	CCollider* m_pHurtBox = { nullptr };
+	physx::PxRigidStatic* m_pRigidStatic = { nullptr };
 
 	LD_BREAKABLE_DESC m_tBreakableDesc = {};
 	_uint m_iBreakAnimIndex = { LD_INVALID_ID };
@@ -71,8 +71,8 @@ private:
 private:
 	HRESULT			Ready_Components();
 	HRESULT			Ready_HurtBox();
-	HRESULT			Ready_PhysicsActor();
-	void			Release_PhysicsActor();
+	HRESULT			Ready_RigidStatic();
+	void			Release_RigidStatic();
 
 	HRESULT			Bind_ShaderResources();
 	const _tchar*	Resolve_ModelProtoTag() const;

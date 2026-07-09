@@ -117,7 +117,7 @@ HRESULT CLevelDesign_Starblock::Validate_Initialized()
 	if (FAILED(__super::Validate_Initialized()))
 		return E_FAIL;
 
-	if (nullptr == m_pShaderCom || nullptr == m_pModelCom || nullptr == m_pPhysicsActor)
+	if (nullptr == m_pShaderCom || nullptr == m_pModelCom || nullptr == m_pRigidStatic)
 		return E_FAIL;
 
 	if (m_tBreakableDesc.eCategory != LD_CATEGORY::BREAKABLE)
@@ -216,7 +216,7 @@ void CLevelDesign_Starblock::Damaged(const ATTACK_INFO& tInfo)
 	CEffect_Loader::GetInstance()->Spawn(L"CommonHit", Get_LevelIndex(), vPos, vFaceCam, _float3(0.f, 0.f, 0.f), nullptr);
 
 	Enable_Colliders(false);
-	Release_PhysicsActor();
+	Release_RigidStatic();
 	Set_Active(false);
 }
 #pragma endregion
@@ -224,7 +224,7 @@ void CLevelDesign_Starblock::Damaged(const ATTACK_INFO& tInfo)
 #pragma region Inhalable
 void CLevelDesign_Starblock::Be_Captured(CGameObject* pInhaler)
 {
-	Release_PhysicsActor();
+	Release_RigidStatic();
 
 	__super::Be_Captured(pInhaler);
 }
@@ -258,15 +258,15 @@ HRESULT CLevelDesign_Starblock::Ready_Components()
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
 		return E_FAIL;
 
-	if (FAILED(Ready_PhysicsActor()))
+	if (FAILED(Ready_RigidStatic()))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CLevelDesign_Starblock::Ready_PhysicsActor()
+HRESULT CLevelDesign_Starblock::Ready_RigidStatic()
 {
-	Release_PhysicsActor();
+	Release_RigidStatic();
 
 	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom || nullptr == m_pModelCom)
 		return E_FAIL;
@@ -290,26 +290,26 @@ HRESULT CLevelDesign_Starblock::Ready_PhysicsActor()
 			(vMax.z - vMin.z) * 0.5f
 	};
 
-	m_pPhysicsActor = m_pGameInstance_Proxy->Create_StaticBox(
+	m_pRigidStatic = m_pGameInstance_Proxy->Create_StaticBox(
 		vLocalCenter,
 		vLocalHalfExtents,
 		XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
-	if (nullptr == m_pPhysicsActor)
+	if (nullptr == m_pRigidStatic)
 		return E_FAIL;
 
 	return S_OK;
 }
 
-void CLevelDesign_Starblock::Release_PhysicsActor()
+void CLevelDesign_Starblock::Release_RigidStatic()
 {
-	if (nullptr == m_pPhysicsActor)
+	if (nullptr == m_pRigidStatic)
 		return;
 
 	if (nullptr != m_pGameInstance_Proxy)
-		m_pGameInstance_Proxy->Remove_StaticActor(m_pPhysicsActor);
+		m_pGameInstance_Proxy->Remove_StaticActor(m_pRigidStatic);
 
-	m_pPhysicsActor = nullptr;
+	m_pRigidStatic = nullptr;
 }
 
 HRESULT CLevelDesign_Starblock::Bind_ShaderResources()
@@ -349,9 +349,9 @@ void CLevelDesign_Starblock::Compute_SpatPivot()
 		(vMin.z + vMax.z) * 0.5f);
 }
 
-void CLevelDesign_Starblock::SetUp_Collider_CallBack()
+void CLevelDesign_Starblock::SetUp_Collider_Callback()
 {
-	__super::SetUp_Collider_CallBack();
+	__super::SetUp_Collider_Callback();
 
 	if (m_pHurtBox)
 	{
@@ -444,7 +444,7 @@ CGameObject* CLevelDesign_Starblock::Clone(void* pArg)
 
 void CLevelDesign_Starblock::Free()
 {
-	Release_PhysicsActor();
+	Release_RigidStatic();
 
 	__super::Free();
 }

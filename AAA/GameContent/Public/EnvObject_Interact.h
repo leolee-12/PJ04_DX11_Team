@@ -4,7 +4,7 @@
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL CEnvObject_Interact final : public CEnvObject
+class CEnvObject_Interact final : public CEnvObject
 {
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_EnvObject_Interact";
