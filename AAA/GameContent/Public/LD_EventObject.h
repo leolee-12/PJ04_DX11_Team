@@ -15,7 +15,7 @@ NS_BEGIN(Client)
 
 class CLD_EventObject abstract : public CLevelDesignObject
 {
-	GENERATED_BODY_ABSTRACT(CLD_EventObject);
+	GENERATED_BODY_ABSTRACT(CLD_EventObject)
 
 protected:
 	CLD_EventObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

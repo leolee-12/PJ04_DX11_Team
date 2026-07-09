@@ -33,6 +33,8 @@
 #include "UI_CoordinatorContainer.h"
 #include "UI_MissionBoard.h"
 #include "UI_MissionPanel.h"
+#include "UI_LetterBox.h"
+#include "UI_TitleLogo.h"
 
 // UI Parts
 #include "UI_Image.h"
@@ -689,6 +691,8 @@ void CGameObject_Factory::Register_UIContainer()
     Register(CUICoordinatorContainer::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUICoordinatorContainer), LOADER());
     Register(CUI_MissionBoard::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_MissionBoard), LOADER());
     Register(CUI_MissionPanel::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_MissionPanel), LOADER());
+    Register(CUI_LetterBox::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_LetterBox), LOADER());
+    Register(CUI_TitleLogo::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_TitleLogo), LOADER());
 }
 
 void CGameObject_Factory::Register_NonAnimObject()

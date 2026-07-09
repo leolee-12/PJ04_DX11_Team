@@ -11,7 +11,7 @@ struct LD_SPAWN_SPEC;
 
 class CLD_DeformObject final : public CLD_EventObject
 {
-	GENERATED_BODY(CLD_DeformObject);
+	GENERATED_BODY(CLD_DeformObject)
 
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_LevelDesign_DeformObject";

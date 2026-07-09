@@ -7,7 +7,7 @@ struct LD_SPAWN_SPEC;
 
 class CLD_GarageRadio final : public CLD_EventObject
 {
-	GENERATED_BODY(CLD_GarageRadio);
+	GENERATED_BODY(CLD_GarageRadio)
 
 public:
 	static constexpr const _tchar* OBJECT_NAME = L"GarageRadio";
