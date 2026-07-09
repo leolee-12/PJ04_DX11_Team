@@ -31,6 +31,9 @@ public:
     _uint   Move(_fvector vDisp, _float fMinDist, _float fTimeDelta);
     _bool   Is_Grounded() const { return m_bGrounded; }
 
+    // 리사이즈
+    _bool Set_CapsuleSize(_float fRadius, _float fHeight);
+
     // 위치
     void    Set_FootPosition(_fvector vPos);
     _vector Get_FootPosition() const;

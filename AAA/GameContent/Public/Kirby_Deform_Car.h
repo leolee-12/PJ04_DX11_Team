@@ -19,6 +19,10 @@ private:
 	static constexpr _float s_fMaxBoostSpeed = 20.f;
 	static constexpr _float s_fBoostAcceleration = 180.f;
 
+	// Controller
+	static constexpr _float s_fCar_CCT_Radius = 1.8f;
+	static constexpr _float s_fCar_CCT_Height = 0.05f;
+
 	enum DEFORM_CAR_STATE { BOOST, BOOST_END, CRUSH, DEFORM_CAR_END };
 	enum BOOST_JUMP_STATE { GROUND, JUMP_START, JUMP, FALL, LANDING };
 

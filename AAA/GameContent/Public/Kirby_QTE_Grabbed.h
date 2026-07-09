@@ -39,7 +39,7 @@ public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
 public:
-	virtual void Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType) override;
+	virtual void Request_Attach_End(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType) override;
 
 private:
 	void Change_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE eNext);

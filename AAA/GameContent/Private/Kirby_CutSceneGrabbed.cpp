@@ -72,7 +72,7 @@ _bool CKirby_CutSceneGrabbed::Handle_Command(CKirby* pKirby, CKirby_Command* pCo
     return false;
 }
 
-void CKirby_CutSceneGrabbed::Request_ReleaseGrabState(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType)
+void CKirby_CutSceneGrabbed::Request_Attach_End(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType)
 {
     pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), true, true);
     Transition_Fall_OR_Wait_OR_Run(pKirby);

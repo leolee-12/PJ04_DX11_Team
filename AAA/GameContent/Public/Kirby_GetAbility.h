@@ -41,13 +41,9 @@ public:
 
 private:
 	_bool m_bPartsOn{};
-	_bool m_bCloseEye{};
-	_bool m_bOpenMouse{};
-
+	_int m_iGetAbilityStateFlag{};
 private:
 	void Parts_On(CKirby* pKirby, _float fRatio);
-	void Close_Eye(CKirby_Body* pBody, _float fRatio);
-	void Open_Mouse(CKirby_Body* pBody, _float fRatio);
 
 public:
 	static CKirby_GetAbility* Create();
