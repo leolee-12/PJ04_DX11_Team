@@ -74,8 +74,13 @@ HRESULT CBubble_Manager::Register_At_Static(const _tchar* szProtoTag, ID3D11Devi
 
 HRESULT CBubble_Manager::Spawn(_uint iTargetLevel, BUBBLE_KIND eKind,  COPY_ABILITY_TYPE eAbility, const _float3& vPos, CAbility_Bubble** ppOut)
 {
-    if (nullptr == Model_Of(eAbility))     // NONE/미지원 능력 방어
-    {   
+    return Spawn(iTargetLevel, eKind, eAbility, vPos, _float3(0.f, 0.f, 0.f), ppOut);
+}
+
+HRESULT CBubble_Manager::Spawn(_uint iTargetLevel, BUBBLE_KIND eKind, COPY_ABILITY_TYPE eAbility, const _float3& vPos, const _float3& vDir, CAbility_Bubble** ppOut)
+{
+    if (nullptr == Model_Of(eAbility))
+    {
 #ifdef _DEBUG
         MSG_BOX("Bubble Spawn Failed : UnSupported Ability");
 #endif
@@ -84,18 +89,17 @@ HRESULT CBubble_Manager::Spawn(_uint iTargetLevel, BUBBLE_KIND eKind,  COPY_ABIL
 
     const _wstring strKey = Make_Key(eKind, eAbility);
 
-    // 1) 휴면 재사용
     auto it = m_Dormant.find(POOL_KEY{ iTargetLevel, strKey });
     if (it != m_Dormant.end() && !it->second.empty())
     {
         CAbility_Bubble* p = it->second.back();
         it->second.pop_back();
         p->Activate(vPos);
+        p->Launch(vDir);
         if (ppOut) *ppOut = p;
         return S_OK;
     }
 
-    // 2) STATIC 원본 → 타겟 레벨 clone
     CAbility_Bubble::ABILITY_BUBBLE_DESC desc{};
     desc.eAbility = eAbility;
     desc.szModelProtoTag = Model_Of(eAbility);
@@ -104,9 +108,7 @@ HRESULT CBubble_Manager::Spawn(_uint iTargetLevel, BUBBLE_KIND eKind,  COPY_ABIL
     const _wstring strTag = strKey + L"#" + std::to_wstring(m_iSpawnCounter++);
 
     CGameObject* pObj = nullptr;
-    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(
-        &pObj, ETOUI(LEVEL::STATIC), Proto_Of(eKind),
-        iTargetLevel, BUBBLE_LAYER_TAG, strTag, &desc)))
+    if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(&pObj, ETOUI(LEVEL::STATIC), Proto_Of(eKind), iTargetLevel, BUBBLE_LAYER_TAG, strTag, &desc)))
         return E_FAIL;
 
     CAbility_Bubble* pBubble = dynamic_cast<CAbility_Bubble*>(pObj);
@@ -118,6 +120,7 @@ HRESULT CBubble_Manager::Spawn(_uint iTargetLevel, BUBBLE_KIND eKind,  COPY_ABIL
 
     pBubble->Set_Pool(this, iTargetLevel, strKey);
     pBubble->Activate(vPos);
+    pBubble->Launch(vDir);
     if (ppOut) *ppOut = pBubble;
     return S_OK;
 }

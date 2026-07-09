@@ -46,6 +46,8 @@ public:
     void                Set_Pool(CBubble_Manager* pPool, _uint iLevel, const _wstring& strKey);
     virtual void        Activate(const _float3& vPos);
 
+    virtual void        Launch(const _float3& vDir) {}
+
 protected:
     CAbility_Model*     m_pModelPart = { nullptr };
     CCollider*          m_pCollider = { nullptr };

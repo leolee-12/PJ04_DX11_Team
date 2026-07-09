@@ -44,7 +44,12 @@ public:
     // 생성 후 1회: 버블 proto STATIC 등록
     HRESULT                 Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     HRESULT                 Register_At_Static(const _tchar* szProtoTag, ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+
+    // 기본 Spawn - Launch 안할 때 사용
     HRESULT                 Spawn(_uint iTargetLevel, BUBBLE_KIND eKind, COPY_ABILITY_TYPE eAbility, const _float3& vPos, CAbility_Bubble** ppOut);
+
+    // Dropped Bubble 발사할 때 방향 전달
+    HRESULT                 Spawn(_uint iTargetLevel, BUBBLE_KIND eKind, COPY_ABILITY_TYPE eAbility, const _float3& vPos, const _float3& vDir, CAbility_Bubble** ppOut);
 
     void                    Return(_uint iLevel, const _wstring& strKey, CAbility_Bubble* pBubble);
     void                    Clear_Level(_uint iLevel);

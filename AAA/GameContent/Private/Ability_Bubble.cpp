@@ -114,6 +114,7 @@ HRESULT CAbility_Bubble::Ready_Collider()
 	ColliderDesc.pOwner = this;
 /*	ColliderDesc.vCenter = { 0.f, 0.85f, 0.f };
 	ColliderDesc.fRadius = 0.85f;*/		// 이펙트 사이즈는 이거로 진행 ( 배치 위치랑 크기 감 잡기 용도로 남겨둠
+
 	ColliderDesc.vCenter = { 0.f, 0.85f, 0.f };
 	ColliderDesc.fRadius = 1.25f;		// 충돌체 사이즈는 이거로 고정
 

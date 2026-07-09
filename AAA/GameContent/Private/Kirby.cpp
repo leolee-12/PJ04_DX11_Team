@@ -136,11 +136,13 @@ void CKirby::Update(_float fTimeDelta)
 
         // 커비 뒤 2.5m, 살짝 위
         _vector vSpawnV = vP
-            - vL * 2.5f
-            + XMVectorSet(0.f, 0.6f, 0.f, 0.f);
+            + XMVectorSet(0.f, 1.f, 0.f, 0.f);
 
         _float3 vSpawn{};
         XMStoreFloat3(&vSpawn, vSpawnV);
+
+        _float3 vDir{};
+        XMStoreFloat3(&vDir, -vL);
 
         auto* pMgr =
             CBubble_Manager::GetInstance();
@@ -150,7 +152,7 @@ void CKirby::Update(_float fTimeDelta)
         pMgr->Spawn(
             Get_LevelIndex(), eKind,
             COPY_ABILITY_TYPE::SWORD,
-            vSpawn, nullptr);
+            vSpawn, vDir, nullptr);
     }
 }
 
