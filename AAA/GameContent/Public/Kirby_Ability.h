@@ -38,6 +38,8 @@ public:
 	virtual COPY_ABILITY_TYPE Get_AbilityType() = 0;
 
 public:
+	virtual _bool Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
+
 	const CAnimator::ANI_PLAY_INFO* Get_AniInfo(ABILITY_ANI eAbilityAni);
 
 	void Play_AbilityAni(CKirby* pKirby, ABILITY_ANI eAbilityAni);
