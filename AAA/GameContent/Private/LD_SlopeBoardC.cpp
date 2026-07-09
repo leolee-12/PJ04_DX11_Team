@@ -337,6 +337,23 @@ CGameObject* CLD_SlopeBoardC::Clone(void* pArg)
 {
 	CLD_SlopeBoardC* pInstance = new CLD_SlopeBoardC(*this);
 
+	LD_EVENTOBJECT_DESC TempDesc{};
+	if (nullptr == pArg)
+	{
+		TempDesc.strObjectName = OBJECT_NAME;
+		TempDesc.strKind = OBJECT_NAME;
+		TempDesc.eCategory = LD_CATEGORY::GIMMICK;
+		TempDesc.iModelProtoLevel = m_iPrototypeLevel;
+		TempDesc.eModelType = MODEL::ANIM;
+		TempDesc.wstrModelProtoTag = MODEL_PROTO_TAG;
+		TempDesc.bUseCollMesh = false;
+		TempDesc.strAnimEventFile.clear();
+
+		TempDesc.strAnimNames[0] = SLOPEBOARD_C_ANIM_NAMES[0];
+
+		pArg = &TempDesc;
+	}
+
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Cloned : CLD_SlopeBoardC");

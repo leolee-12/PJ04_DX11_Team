@@ -101,11 +101,11 @@ struct MAP_LD_EDITED_DESC
 
 struct MAP_EDIT_CHANGE
 {
-	_uint Version = { 5 };
+	_uint Version = { 6 };
 	unordered_set<_wstring> DeletedEnvObjectKeys;
-	unordered_map<_wstring, MAP_ENV_EDITED_DESC> EditedEnvObjects;
-	unordered_map<_wstring, MAP_ENV_EDITED_DESC> EditedMapSections;
-	unordered_map<_wstring, MAP_LD_EDITED_DESC> EditedLevelDesignObjects;
+	unordered_map<_wstring, EDIT_OBJECT_OVERRIDE_DESC> EditedEnvObjects;
+	unordered_map<_wstring, EDIT_OBJECT_OVERRIDE_DESC> EditedMapSections;
+	unordered_map<_wstring, EDIT_OBJECT_OVERRIDE_DESC> EditedLevelDesignObjects;
 	vector<MAP_ADD_OBJECT> AddedMapObjects;
 };
 

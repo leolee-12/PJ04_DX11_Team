@@ -659,39 +659,48 @@ void CPanel_Inspector::Draw_EditableObjectPolicyPanel(CGameObject* pObject)
 		IterPolicy = m_EditablePolicyDrafts.emplace(strStateKey, EditDesc.Policy).first;
 
 	EDIT_OBJECT_POLICY& NewPolicy = IterPolicy->second;
+	_bool bPolicyChanged = false;
 
 	if (EditDesc.iCapabilities & EDIT_CAP_RENDERABLE)
-		ImGui::Checkbox("Renderable##EditablePolicy", (bool*)&NewPolicy.bRenderable);
+		bPolicyChanged |= ImGui::Checkbox("Renderable##EditablePolicy", (bool*)&NewPolicy.bRenderable);
 
 	if (EditDesc.iCapabilities & EDIT_CAP_CULL_DISTANCE)
-		ImGui::Checkbox("Use Distance Culling##EditablePolicy", (bool*)&NewPolicy.bUseCullDistance);
+		bPolicyChanged |= ImGui::Checkbox("Use Distance Culling##EditablePolicy", (bool*)&NewPolicy.bUseCullDistance);
 
 	if (EditDesc.iCapabilities & EDIT_CAP_CULL_FRUSTUM)
-		ImGui::Checkbox("Use Frustum Culling##EditablePolicy", (bool*)&NewPolicy.bUseCullFrustum);
+		bPolicyChanged |= ImGui::Checkbox("Use Frustum Culling##EditablePolicy", (bool*)&NewPolicy.bUseCullFrustum);
 
 	if (EditDesc.iCapabilities & EDIT_CAP_COLLISION_MESH)
-		ImGui::Checkbox("Use Collision Mesh##EditablePolicy", (bool*)&NewPolicy.bUseCollMesh);
+		bPolicyChanged |= ImGui::Checkbox("Use Collision Mesh##EditablePolicy", (bool*)&NewPolicy.bUseCollMesh);
 
 	if (EditDesc.iCapabilities & EDIT_CAP_SHADOW)
-		ImGui::Checkbox("Use Shadow##EditablePolicy", (bool*)&NewPolicy.bUseShadow);
+		bPolicyChanged |= ImGui::Checkbox("Use Shadow##EditablePolicy", (bool*)&NewPolicy.bUseShadow);
 
-	if (ImGui::Button("Apply Object Policy##EditablePolicy"))
+	auto ApplyPolicyDraft = [&]() -> _bool
 	{
 		if (FAILED(pEditable->Apply_EditPolicy(NewPolicy)))
-		{
-			MSG_BOX("OBJECT POLICY APPLY FAILED");
-		}
-		else
-		{
-			EDITABLE_DESC AppliedDesc{};
-			if (pEditable->Get_EditDesc(&AppliedDesc))
-				NewPolicy = AppliedDesc.Policy;
-		}
-	}
+			return false;
+
+		EDITABLE_DESC AppliedDesc{};
+		if (pEditable->Get_EditDesc(&AppliedDesc))
+			NewPolicy = AppliedDesc.Policy;
+
+		return true;
+	};
+
+	if (bPolicyChanged && !ApplyPolicyDraft())
+		MSG_BOX("OBJECT POLICY APPLY FAILED");
+
+	if (ImGui::Button("Apply Object Policy##EditablePolicy") && !ApplyPolicyDraft())
+		MSG_BOX("OBJECT POLICY APPLY FAILED");
 
 	ImGui::SameLine();
 	if (ImGui::Button("Reset##EditablePolicy"))
+	{
 		NewPolicy = EditDesc.Policy;
+		if (!ApplyPolicyDraft())
+			MSG_BOX("OBJECT POLICY APPLY FAILED");
+	}
 }
 
 void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject* pObject)
@@ -711,7 +720,7 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 
 	ImGui::TextDisabled("Object Policy is handled by the common panel.");
 	ImGui::TextDisabled("Apply Override stores these values in the edit session.");
-	ImGui::TextDisabled("Save Override Now or toolbar Map Edit Save persists applied overrides.");
+	ImGui::TextDisabled("Save Override Now persists applied overrides.");
 
 	auto CommitCurrentEnvEdit = [&]() -> _bool
 		{
@@ -722,21 +731,30 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 				? *pbUseNearDistAlpha
 				: Desc.tRender.bUseNearDistAlpha;
 
-			MAP_ENV_EDITED_DESC Edit{};
+			EDIT_OBJECT_OVERRIDE_DESC Edit{};
+			Edit.eKind = EDITABLE_OBJECT_KIND::ENV_OBJECT;
 			pLevel->Try_GetMapPreviewEnvEdit(pObject, &Edit);
+
+			EDIT_ENVOBJECT_OVERRIDE EnvOverride{};
+			if (const EDIT_ENVOBJECT_OVERRIDE* pSavedEnvOverride = get_if<EDIT_ENVOBJECT_OVERRIDE>(&Edit.ClassOverride))
+				EnvOverride = *pSavedEnvOverride;
 
 			if (bUseNearDistAlpha != Desc.tRender.bUseNearDistAlpha)
 			{
-				Edit.bHasNearDistAlpha = true;
-				Edit.bUseNearDistAlpha = bUseNearDistAlpha;
+				EnvOverride.bHasNearDistAlpha = true;
+				EnvOverride.bUseNearDistAlpha = bUseNearDistAlpha;
+				Edit.ClassOverride = EnvOverride;
 			}
 			else
 			{
-				Edit.bHasNearDistAlpha = false;
-				Edit.bUseNearDistAlpha = false;
+				EnvOverride.bHasNearDistAlpha = false;
+				EnvOverride.bUseNearDistAlpha = false;
+				Edit.ClassOverride = (EnvOverride.bHasNearDistAlpha || EnvOverride.bHasDecalAlpha)
+					? EDIT_CLASS_OVERRIDE{ EnvOverride }
+					: EDIT_CLASS_OVERRIDE{ monostate{} };
 			}
 
-			if (Has_AnyMapEnvEdit(Edit))
+			if (Has_AnyEdit(Edit))
 				return pLevel->Track_EditedMapPreviewEnvObject(pObject, Edit);
 
 			pLevel->Clear_EditedMapPreviewEnvObject(pObject);
@@ -760,7 +778,7 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 		}
 		else if (FAILED(pLevel->Save_MapOverride()))
 		{
-			MSG_BOX("MAP EDIT SAVE FAILED");
+			MSG_BOX("OBJECT OVERRIDE SAVE FAILED");
 		}
 	}
 
@@ -869,7 +887,7 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 		pLevel->Commit_MapEditObjectFromCurrentState(pMapSection);
 
 		if (FAILED(pLevel->Save_MapOverride()))
-			MSG_BOX("MAP EDIT SAVE FAILED");
+			MSG_BOX("OBJECT OVERRIDE SAVE FAILED");
 	}
 
 	ImGui::SameLine();
@@ -1976,10 +1994,13 @@ _bool* CPanel_Inspector::Resolve_EnvNearAlphaEditState(CLevel_Edit* pLevel, CEnv
 	auto Iter = m_EnvNearAlphaEditStates.find(pEnvObject);
 	if (Iter == m_EnvNearAlphaEditStates.end())
 	{
-		MAP_ENV_EDITED_DESC SavedEdit{};
+		EDIT_OBJECT_OVERRIDE_DESC SavedEdit{};
+		EDIT_ENVOBJECT_OVERRIDE* pSavedEnvOverride = nullptr;
 		const _bool bUseNearDistAlpha =
-			pLevel->Try_GetMapPreviewEnvEdit(pEnvObject, &SavedEdit) && SavedEdit.bHasNearDistAlpha
-			? SavedEdit.bUseNearDistAlpha
+			pLevel->Try_GetMapPreviewEnvEdit(pEnvObject, &SavedEdit)
+			&& nullptr != (pSavedEnvOverride = get_if<EDIT_ENVOBJECT_OVERRIDE>(&SavedEdit.ClassOverride))
+			&& pSavedEnvOverride->bHasNearDistAlpha
+			? pSavedEnvOverride->bUseNearDistAlpha
 			: pEnvObject->Get_Desc().tRender.bUseNearDistAlpha;
 
 		Iter = m_EnvNearAlphaEditStates.emplace(

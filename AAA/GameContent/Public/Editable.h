@@ -110,7 +110,7 @@ struct EDITABLE_DESC
 	vector<EDITABLE_MODEL_SLOT> ModelSlots;
 };
 
-class IEditable
+class CLIENT_DLL IEditable
 {
 public:
     virtual ~IEditable() = default;

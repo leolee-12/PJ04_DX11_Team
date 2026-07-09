@@ -5,7 +5,7 @@
 NS_BEGIN(Client)
 class CEnv_InstanceController;
 
-class CLIENT_DLL CEnvObject_Static final : public CEnvObject
+class CEnvObject_Static final : public CEnvObject
 {
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_EnvObject_Static";
