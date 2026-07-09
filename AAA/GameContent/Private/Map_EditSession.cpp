@@ -3,8 +3,6 @@
 #include "EnvObject.h"
 #include "LevelDesignObject.h"
 
-#include <algorithm>
-
 NS_BEGIN(Client)
 
 CMap_EditSession::CMap_EditSession()
@@ -228,7 +226,7 @@ _bool CMap_EditSession::Track_DeletedPreviewObject(CGameObject* pObject)
 
 _bool CMap_EditSession::Track_EditedPreviewObject(
 	CGameObject* pObject,
-	const MAP_ENV_EDITED_DESC& Edit)
+	const EDIT_OBJECT_OVERRIDE_DESC& Edit)
 {
 	if (nullptr == pObject)
 		return false;
@@ -241,13 +239,14 @@ _bool CMap_EditSession::Track_EditedPreviewObject(
 	if (strStableKey.empty())
 		return false;
 
-	if (!Has_AnyMapEnvEdit(Edit))
+	if (!Has_AnyEdit(Edit))
 	{
 		m_tEditData.OverrideDesc.EditedEnvObjects.erase(strStableKey);
 	}
 	else
 	{
-		MAP_ENV_EDITED_DESC StoredEdit = Edit;
+		EDIT_OBJECT_OVERRIDE_DESC StoredEdit = Edit;
+		StoredEdit.eKind = EDITABLE_OBJECT_KIND::ENV_OBJECT;
 		StoredEdit.strStableKey = strStableKey;
 		m_tEditData.OverrideDesc.EditedEnvObjects[strStableKey] = StoredEdit;
 	}
@@ -279,7 +278,7 @@ _bool CMap_EditSession::Clear_EditedPreviewObject(CGameObject* pObject)
 
 _bool CMap_EditSession::Try_GetEditedEnvObject(
 	const _wstring& strStableKey,
-	MAP_ENV_EDITED_DESC* pOutEdit) const
+	EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const
 {
 	if (nullptr == pOutEdit || strStableKey.empty())
 		return false;
@@ -294,18 +293,19 @@ _bool CMap_EditSession::Try_GetEditedEnvObject(
 
 _bool CMap_EditSession::Track_EditedMapSection(
 	const _wstring& strSectionKey,
-	const MAP_ENV_EDITED_DESC& Edit)
+	const EDIT_OBJECT_OVERRIDE_DESC& Edit)
 {
 	if (strSectionKey.empty())
 		return false;
 
-	if (!Has_AnyMapEnvEdit(Edit))
+	if (!Has_AnyEdit(Edit))
 	{
 		m_tEditData.OverrideDesc.EditedMapSections.erase(strSectionKey);
 	}
 	else
 	{
-		MAP_ENV_EDITED_DESC StoredEdit = Edit;
+		EDIT_OBJECT_OVERRIDE_DESC StoredEdit = Edit;
+		StoredEdit.eKind = EDITABLE_OBJECT_KIND::MAP_SECTION;
 		StoredEdit.strStableKey = strSectionKey;
 		m_tEditData.OverrideDesc.EditedMapSections[strSectionKey] = StoredEdit;
 	}
@@ -327,7 +327,7 @@ _bool CMap_EditSession::Clear_EditedMapSection(const _wstring& strSectionKey)
 	return 0 < iErased;
 }
 
-_bool CMap_EditSession::Try_GetEditedMapSection(const _wstring& strSectionKey, MAP_ENV_EDITED_DESC* pOutEdit) const
+_bool CMap_EditSession::Try_GetEditedMapSection(const _wstring& strSectionKey, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const
 {
 	if (nullptr == pOutEdit || strSectionKey.empty())
 		return false;
@@ -340,7 +340,7 @@ _bool CMap_EditSession::Try_GetEditedMapSection(const _wstring& strSectionKey, M
 	return true;
 }
 
-_bool CMap_EditSession::Track_EditedLevelDesignObject(CGameObject* pObject, const MAP_LD_EDITED_DESC& Edit)
+_bool CMap_EditSession::Track_EditedLevelDesignObject(CGameObject* pObject, const EDIT_OBJECT_OVERRIDE_DESC& Edit)
 {
 	if (nullptr == pObject)
 		return false;
@@ -353,13 +353,14 @@ _bool CMap_EditSession::Track_EditedLevelDesignObject(CGameObject* pObject, cons
 	if (strStableKey.empty())
 		return false;
 
-	if (!Has_AnyMapLDEdit(Edit))
+	if (!Has_AnyEdit(Edit))
 	{
 		m_tEditData.OverrideDesc.EditedLevelDesignObjects.erase(strStableKey);
 	}
 	else
 	{
-		MAP_LD_EDITED_DESC StoredEdit = Edit;
+		EDIT_OBJECT_OVERRIDE_DESC StoredEdit = Edit;
+		StoredEdit.eKind = EDITABLE_OBJECT_KIND::LEVEL_DESIGN_OBJECT;
 		StoredEdit.strStableKey = strStableKey;
 		m_tEditData.OverrideDesc.EditedLevelDesignObjects[strStableKey] = StoredEdit;
 	}
@@ -387,7 +388,7 @@ _bool CMap_EditSession::Clear_EditedLevelDesignObject(CGameObject* pObject)
 	return 0 < iErased;
 }
 
-_bool CMap_EditSession::Try_GetEditedLevelDesignObject(CGameObject* pObject, MAP_LD_EDITED_DESC* pOutEdit) const
+_bool CMap_EditSession::Try_GetEditedLevelDesignObject(CGameObject* pObject, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const
 {
 	if (nullptr == pObject || nullptr == pOutEdit)
 		return false;

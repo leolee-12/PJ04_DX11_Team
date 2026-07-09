@@ -10,9 +10,11 @@ NS_BEGIN(Client)
 
 class CLD_Inhalable abstract : public CLevelDesignObject, public IInhalable
 {
+	GENERATED_BODY_ABSTRACT(CLD_Inhalable);
+
 protected:
 	CLD_Inhalable(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CLD_Inhalable(const CLevelDesignObject& Prototype);
+	CLD_Inhalable(const CLD_Inhalable& Prototype);
 	virtual ~CLD_Inhalable() = default;
 
 	virtual HRESULT Initialize(void* pArg) override;
@@ -59,8 +61,8 @@ protected:
 	static constexpr _float     s_fSpinSpeedDeg = 360.f;
 
 protected:
-	HRESULT			Ready_Collider();
-	virtual void	SetUp_Collider_CallBack();
+	HRESULT			Ready_HurtBox();
+	virtual void	SetUp_Collider_Callback();
 
 	virtual void	On_Swallowed();
 	virtual void	Enable_Colliders(_bool b);

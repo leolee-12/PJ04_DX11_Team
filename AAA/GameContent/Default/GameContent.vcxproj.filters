@@ -58,9 +58,6 @@
     <Filter Include="99. Defines\Hojun\UI">
       <UniqueIdentifier>{cd0a7659-a8f0-4741-aa44-321f59e15d07}</UniqueIdentifier>
     </Filter>
-    <Filter Include="98. ShaderFiles\Leo">
-      <UniqueIdentifier>{a3345da1-0cb7-4733-ac92-e971f6f0980d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="99. Defines\Leo">
       <UniqueIdentifier>{ca69a650-f542-4ef4-9ce8-1c68bc5ca0a6}</UniqueIdentifier>
     </Filter>
@@ -1000,6 +997,9 @@
     <Filter Include="97. DataSystem\Singleton Destroyer">
       <UniqueIdentifier>{42251981-a8bb-404e-be2b-ab0584156f19}</UniqueIdentifier>
     </Filter>
+    <Filter Include="98. ShaderFiles\Leo">
+      <UniqueIdentifier>{a3345da1-0cb7-4733-ac92-e971f6f0980d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -1902,9 +1902,6 @@
     <ClInclude Include="..\Public\LD_GarageRadio.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\LevelDesignObject.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\LD_SlopeBoardA.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
     </ClInclude>
@@ -1985,6 +1982,12 @@
     </ClInclude>
     <ClInclude Include="..\public\Singleton_Destroyer.h">
       <Filter>97. DataSystem\Singleton Destroyer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Editable.h">
+      <Filter>00. GameObject\95. Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesignObject.h">
+      <Filter>00. GameObject\96. LevelDesign</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2816,9 +2819,6 @@
     <ClCompile Include="..\Private\LD_SlopeBoardC.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\LevelDesignObject.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\LD_SlopeBoardA.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
     </ClCompile>
@@ -2897,6 +2897,9 @@
     <ClCompile Include="..\private\Singleton_Destroyer.cpp">
       <Filter>97. DataSystem\Singleton Destroyer</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\LevelDesignObject.cpp">
+      <Filter>00. GameObject\96. LevelDesign</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Shader_Ring.hlsl">
@@ -2941,5 +2944,16 @@
     <None Include="..\ShaderFiles\Shader_WaddleDee.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_World_NonAnim.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_World_Anim.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_World_Instance.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

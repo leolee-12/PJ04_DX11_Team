@@ -52,7 +52,7 @@ public:
 private:
 	CShader* m_pShaderCom = nullptr;
 	CModel* m_ModelComs[SEGMENT::_COUNT] = { nullptr };
-	CCollider* m_pCollider = { nullptr };
+	CCollider* m_pTrigger = { nullptr };
 
 	LD_LADDER_DESC m_tLadderDesc = {};
 	_float m_fSegmentStepY = { 1.f };
@@ -65,9 +65,11 @@ private:
 	_int m_iTopCellIndex = { -1 };
 
 private:
+	virtual void Collect_EditModelSlots(vector<EDITABLE_MODEL_SLOT>* pOutSlots) const override;
+
 	HRESULT	Ready_Components();
 	HRESULT	Ready_RenderComponents();
-	HRESULT	Ready_LadderCollider();
+	HRESULT	Ready_Trigger();
 	HRESULT	Resolve_SegmentStepY();
 	HRESULT	Bind_ShaderResources(const _float4x4& WorldMatrix);
 	HRESULT	Render_Model(CModel* pModel);

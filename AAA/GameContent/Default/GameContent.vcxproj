@@ -75,6 +75,7 @@
     <ClInclude Include="..\Public\DroppedBubble.h" />
     <ClInclude Include="..\Public\EssenceBubble.h" />
     <ClInclude Include="..\public\GameContent_pch.h" />
+    <ClInclude Include="..\Public\Editable.h" />
     <ClInclude Include="..\Public\Kirby_AttackMode.h" />
     <ClInclude Include="..\Public\Kirby_CarFirstBreakWall.h" />
     <ClInclude Include="..\Public\Kirby_Clear.h" />
@@ -713,6 +714,11 @@
     <None Include="..\ShaderFiles\Shader_WaddleDee.hlsl">
       <FileType>Document</FileType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_World_Anim.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_World_Instance.hlsl" />
+    <FxCompile Include="..\ShaderFiles\Shader_World_NonAnim.hlsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

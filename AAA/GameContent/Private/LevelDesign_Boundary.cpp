@@ -87,7 +87,7 @@ HRESULT CLevelDesign_Boundary::Validate_Initialized()
 		return E_FAIL;
 	}
 
-	if (nullptr == m_pPhysicsActor)
+	if (nullptr == m_pRigidStatic)
 		return E_FAIL;
 
 	return S_OK;
@@ -103,26 +103,26 @@ void CLevelDesign_Boundary::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 
 HRESULT CLevelDesign_Boundary::Ready_Components(const LD_PARSED_OBJECT& Desc)
 {
-	if (FAILED(Ready_PhysicsActor(Desc)))
+	if (FAILED(Ready_RigidStatic(Desc)))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CLevelDesign_Boundary::Ready_PhysicsActor(const LD_PARSED_OBJECT& Desc)
+HRESULT CLevelDesign_Boundary::Ready_RigidStatic(const LD_PARSED_OBJECT& Desc)
 {
-	Release_PhysicsResources();
+	Release_RigidStatic();
 
 	if (Has_UsableTrianglePoints(Desc))
-		return Ready_PhysicsActor_FromPoints(Desc);
+		return Ready_RigidStatic_FromPoints(Desc);
 
 	if (Has_UsableBoxSize(Desc.Volume.vAreaSize))
-		return Ready_PhysicsActor_FromBox(Desc);
+		return Ready_RigidStatic_FromBox(Desc);
 
 	return E_FAIL;
 }
 
-HRESULT CLevelDesign_Boundary::Ready_PhysicsActor_FromPoints(const LD_PARSED_OBJECT& Desc)
+HRESULT CLevelDesign_Boundary::Ready_RigidStatic_FromPoints(const LD_PARSED_OBJECT& Desc)
 {
 	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom)
 		return E_FAIL;
@@ -158,8 +158,8 @@ HRESULT CLevelDesign_Boundary::Ready_PhysicsActor_FromPoints(const LD_PARSED_OBJ
 	if (nullptr == m_pCollisionMesh)
 		return E_FAIL;
 
-	m_pPhysicsActor = m_pGameInstance_Proxy->Create_StaticActor(m_pCollisionMesh, WorldMatrix);
-	if (nullptr == m_pPhysicsActor)
+	m_pRigidStatic = m_pGameInstance_Proxy->Create_StaticActor(m_pCollisionMesh, WorldMatrix);
+	if (nullptr == m_pRigidStatic)
 	{
 		m_pCollisionMesh->release();
 		m_pCollisionMesh = nullptr;
@@ -169,7 +169,7 @@ HRESULT CLevelDesign_Boundary::Ready_PhysicsActor_FromPoints(const LD_PARSED_OBJ
 	return S_OK;
 }
 
-HRESULT CLevelDesign_Boundary::Ready_PhysicsActor_FromBox(const LD_PARSED_OBJECT& Desc)
+HRESULT CLevelDesign_Boundary::Ready_RigidStatic_FromBox(const LD_PARSED_OBJECT& Desc)
 {
 	if (nullptr == m_pGameInstance_Proxy)
 		return E_FAIL;
@@ -184,20 +184,20 @@ HRESULT CLevelDesign_Boundary::Ready_PhysicsActor_FromBox(const LD_PARSED_OBJECT
 		XMMatrixRotationQuaternion(XMLoadFloat4(&qAreaRot))
 		* XMMatrixTranslation(vAreaCenter.x, vAreaCenter.y, vAreaCenter.z);
 
-	m_pPhysicsActor = m_pGameInstance_Proxy->Create_StaticBox(
+	m_pRigidStatic = m_pGameInstance_Proxy->Create_StaticBox(
 		vLocalCenter,
 		vHalfExtents,
 		WorldMatrix);
 
-	return (nullptr != m_pPhysicsActor) ? S_OK : E_FAIL;
+	return (nullptr != m_pRigidStatic) ? S_OK : E_FAIL;
 }
 
-void CLevelDesign_Boundary::Release_PhysicsResources()
+void CLevelDesign_Boundary::Release_RigidStatic()
 {
-	if (nullptr != m_pPhysicsActor && nullptr != m_pGameInstance_Proxy)
-		m_pGameInstance_Proxy->Remove_StaticActor(m_pPhysicsActor);
+	if (nullptr != m_pRigidStatic && nullptr != m_pGameInstance_Proxy)
+		m_pGameInstance_Proxy->Remove_StaticActor(m_pRigidStatic);
 
-	m_pPhysicsActor = nullptr;
+	m_pRigidStatic = nullptr;
 
 	if (nullptr != m_pCollisionMesh)
 	{
@@ -261,7 +261,7 @@ CGameObject* CLevelDesign_Boundary::Clone(void* pArg)
 
 void CLevelDesign_Boundary::Free()
 {
-	Release_PhysicsResources();
+	Release_RigidStatic();
 
 	__super::Free();
 }

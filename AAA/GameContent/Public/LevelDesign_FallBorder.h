@@ -30,12 +30,12 @@ public:
 	virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
 private:
-	CCollider* m_pColliderCom = { nullptr };
+	CCollider* m_pTrigger = { nullptr };
 
 private:
 	HRESULT Ready_Components(const LD_PARSED_OBJECT& Desc);
 	void    SetUp_Collider_Callback();
-	void    Handle_Fall(CGameObject* pPlayer);
+	void    Handle_TriggerEnter(CCollider* pOther);
 
 public:
 	static void Register_LevelDesignSpecs();

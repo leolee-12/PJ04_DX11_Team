@@ -80,7 +80,7 @@ HRESULT CLD_DeformCarBreakWall::Validate_Initialized()
 	if (STATE::IDLE != m_eState)
 		return E_FAIL;
 
-	if (nullptr == m_pBoostTrigger)
+	if (nullptr == m_pTrigger)
 		return E_FAIL;
 
 	return S_OK;
@@ -133,12 +133,12 @@ void CLD_DeformCarBreakWall::Update(_float fTimeDelta)
 
 void CLD_DeformCarBreakWall::Late_Update(_float fTimeDelta)
 {
-	if (STATE::IDLE == m_eState && m_pBoostTrigger->Is_Enabled())
+	if (STATE::IDLE == m_eState && m_pTrigger->Is_Enabled())
 	{
-		m_pBoostTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+		m_pTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
 #ifdef _DEBUG
-		m_pGameInstance_Proxy->Add_DebugComponent(m_pBoostTrigger);
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pTrigger);
 #endif
 	}
 
@@ -226,7 +226,7 @@ HRESULT CLD_DeformCarBreakWall::Ready_Components()
 	if (FAILED(Ready_WallRigidStatic(LocalBounds)))
 		return E_FAIL;
 
-	if (FAILED(Ready_BoostTrigger(LocalBounds)))
+	if (FAILED(Ready_Trigger(LocalBounds)))
 		return E_FAIL;
 
 	return S_OK;
@@ -264,7 +264,7 @@ HRESULT CLD_DeformCarBreakWall::Ready_WallRigidStatic(const BoundingBox& LocalBo
 	return nullptr != m_pRigidStatic ? S_OK : E_FAIL;
 }
 
-HRESULT CLD_DeformCarBreakWall::Ready_BoostTrigger(const BoundingBox& LocalBounds)
+HRESULT CLD_DeformCarBreakWall::Ready_Trigger(const BoundingBox& LocalBounds)
 {
 	BoundingBox TriggerBounds = LocalBounds;
 
@@ -280,15 +280,15 @@ HRESULT CLD_DeformCarBreakWall::Ready_BoostTrigger(const BoundingBox& LocalBound
 	if (ColliderDesc.vSize.x <= 0.f || ColliderDesc.vSize.y <= 0.f || ColliderDesc.vSize.z <= 0.f)
 		return E_FAIL;
 
-	m_pBoostTrigger = Add_Component<CCollider>(Collider_OBB.iLevelID, Collider_OBB.szProtoTag, TEXT("Com_BoostTrigger"),
+	m_pTrigger = Add_Component<CCollider>(Collider_OBB.iLevelID, Collider_OBB.szProtoTag, TEXT("Com_Trigger"),
 		&ColliderDesc);
 
-	if (nullptr == m_pBoostTrigger)
+	if (nullptr == m_pTrigger)
 		return E_FAIL;
 
-	SetUp_BoostTriggerCallback();
+	SetUp_Collider_Callback();
 
-	m_pGameInstance_Proxy->Register_Collider(m_pBoostTrigger, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+	m_pGameInstance_Proxy->Register_Collider(m_pTrigger, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
 
 	return S_OK;
 }
@@ -333,16 +333,22 @@ void CLD_DeformCarBreakWall::On_Event()
 
 	Release_RigidStatic();
 
-	m_pBoostTrigger->Set_Enabled(false);
+	m_pTrigger->Set_Enabled(false);
 }
 
-void CLD_DeformCarBreakWall::SetUp_BoostTriggerCallback()
+void CLD_DeformCarBreakWall::SetUp_Collider_Callback()
 {
-	m_pBoostTrigger->Set_OnEnter([this](CCollider* pOther) { Handle_BoostTrigger(pOther); });
+	if (nullptr == m_pTrigger)
+		return;
+
+	m_pTrigger->Set_OnEnter([this](CCollider* pOther) { Handle_TriggerEnter(pOther); });
 }
 
-void CLD_DeformCarBreakWall::Handle_BoostTrigger(CCollider* pOther)
+void CLD_DeformCarBreakWall::Handle_TriggerEnter(CCollider* pOther)
 {
+	if (nullptr == pOther)
+		return;
+
 	if (ETOUI(COLLISION_LAYER::CAR_BOOST) != pOther->Get_RegisteredGroup())
 		return;
 

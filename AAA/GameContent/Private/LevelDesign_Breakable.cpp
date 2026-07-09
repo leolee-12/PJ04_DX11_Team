@@ -107,8 +107,6 @@ HRESULT CLevelDesign_Breakable::Initialize(void* pArg)
 	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
 
-	m_pGameInstance_Proxy->Register_Collider(m_pHurtBoxCom, ETOUI(COLLISION_LAYER::ENV_HURT));
-
 	return S_OK;
 }
 
@@ -117,7 +115,7 @@ HRESULT CLevelDesign_Breakable::Validate_Initialized()
 	if (FAILED(__super::Validate_Initialized()))
 		return E_FAIL;
 
-	if (nullptr == m_pShaderCom || nullptr == m_pModelCom || nullptr == m_pHurtBoxCom || nullptr == m_pPhysicsActor)
+	if (nullptr == m_pShaderCom || nullptr == m_pModelCom || nullptr == m_pHurtBox || nullptr == m_pRigidStatic)
 		return E_FAIL;
 
 	if (m_tBreakableDesc.eCategory != LD_CATEGORY::BREAKABLE)
@@ -174,9 +172,9 @@ void CLevelDesign_Breakable::Late_Update(_float fTimeDelta)
 
 	if (BREAKABLE_STATE::INTACT == m_eState)
 	{
-		m_pHurtBoxCom->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+		m_pHurtBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 #ifdef _DEBUG
-		m_pGameInstance_Proxy->Add_DebugComponent(m_pHurtBoxCom);
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pHurtBox);
 #endif
 	}
 
@@ -293,8 +291,8 @@ void CLevelDesign_Breakable::Damaged(const ATTACK_INFO& tInfo)
 
 	CEffect_Loader::GetInstance()->Spawn(L"CommonHit", Get_LevelIndex(), vPos, vFaceCam, _float3(0.f, 0.f, 0.f), nullptr);
 
-	Release_PhysicsActor();
-	m_pHurtBoxCom->Set_Enabled(false);
+	Release_RigidStatic();
+	m_pHurtBox->Set_Enabled(false);
 
 	if (MODEL::ANIM == m_tBreakableDesc.eModelType)
 	{
@@ -418,7 +416,7 @@ HRESULT CLevelDesign_Breakable::Ready_Components()
 	if (FAILED(Ready_HurtBox()))
 		return E_FAIL;
 
-	if (FAILED(Ready_PhysicsActor()))
+	if (FAILED(Ready_RigidStatic()))
 		return E_FAIL;
 
 	return S_OK;
@@ -449,12 +447,12 @@ HRESULT CLevelDesign_Breakable::Ready_HurtBox()
 	ColliderDesc.vCenter = { (vMin.x + vMax.x) * 0.5f, (vMin.y + vMax.y) * 0.5f, (vMin.z + vMax.z) * 0.5f };
 	ColliderDesc.fRadius = fRadius * 0.5f;
 
-	m_pHurtBoxCom = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, TEXT("Com_HurtBox"),
+	m_pHurtBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, TEXT("Com_HurtBox"),
 		&ColliderDesc);
-	if (nullptr == m_pHurtBoxCom)
+	if (nullptr == m_pHurtBox)
 		return E_FAIL;
 
-	m_pHurtBoxCom->Set_OnEnter([this](CCollider* pOther)
+	m_pHurtBox->Set_OnEnter([this](CCollider* pOther)
 		{
 			if (nullptr == pOther)
 				return;
@@ -466,12 +464,14 @@ HRESULT CLevelDesign_Breakable::Ready_HurtBox()
 			Damaged(AttackInfo);
 		});
 
+	m_pGameInstance_Proxy->Register_Collider(m_pHurtBox, ETOUI(COLLISION_LAYER::ENV_HURT));
+
 	return S_OK;
 }
 
-HRESULT CLevelDesign_Breakable::Ready_PhysicsActor()
+HRESULT CLevelDesign_Breakable::Ready_RigidStatic()
 {
-	Release_PhysicsActor();
+	Release_RigidStatic();
 
 	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom || nullptr == m_pModelCom)
 		return E_FAIL;
@@ -495,26 +495,26 @@ HRESULT CLevelDesign_Breakable::Ready_PhysicsActor()
 			(vMax.z - vMin.z) * 0.5f
 	};
 
-	m_pPhysicsActor = m_pGameInstance_Proxy->Create_StaticBox(
+	m_pRigidStatic = m_pGameInstance_Proxy->Create_StaticBox(
 		vLocalCenter,
 		vLocalHalfExtents,
 		XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
-	if (nullptr == m_pPhysicsActor)
+	if (nullptr == m_pRigidStatic)
 		return E_FAIL;
 
 	return S_OK;
 }
 
-void CLevelDesign_Breakable::Release_PhysicsActor()
+void CLevelDesign_Breakable::Release_RigidStatic()
 {
-	if (nullptr == m_pPhysicsActor)
+	if (nullptr == m_pRigidStatic)
 		return;
 
 	if (nullptr != m_pGameInstance_Proxy)
-		m_pGameInstance_Proxy->Remove_StaticActor(m_pPhysicsActor);
+		m_pGameInstance_Proxy->Remove_StaticActor(m_pRigidStatic);
 
-	m_pPhysicsActor = nullptr;
+	m_pRigidStatic = nullptr;
 }
 
 HRESULT CLevelDesign_Breakable::Bind_ShaderResources()
@@ -574,7 +574,7 @@ CGameObject* CLevelDesign_Breakable::Clone(void* pArg)
 
 void CLevelDesign_Breakable::Free()
 {
-	Release_PhysicsActor();
+	Release_RigidStatic();
 
 	__super::Free();
 }

@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Panel.h"
+#include "Editable.h"
 
 NS_BEGIN(Engine)
 class CGameObject;
@@ -27,6 +28,7 @@ public:
 private:
 	_bool   Draw_Properties(IReflectable* pHolder);
 	_bool   Draw_Transform(CGameObject* pObject, const string & strSuffix = "");
+	void    Draw_EditableObjectPolicyPanel(CGameObject* pObject);
 	void    Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject* pObject);
 	void    Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* pMapStage, CGameObject* pObject);
 	void    Draw_MeshLayerPanel(CGameObject* pObject);
@@ -39,10 +41,10 @@ private:
 
 private:
 	unordered_map<CGameObject*, _float3>	m_RotEditEuler;
-	unordered_map<CGameObject*, _bool>		m_EnvShadowEditStates;
-	unordered_map<CGameObject*, _bool>		m_EnvCollMeshEditStates;
-	unordered_map<CMapSection*, _bool>		m_MapCollMeshEditStates;
 	unordered_map<CGameObject*, _bool>		m_EnvNearAlphaEditStates;
+	unordered_map<_wstring, _uint> m_SelectedModelSlotByEditableKey;
+	unordered_map<_wstring, _int> m_SelectedMeshByEditableSlotKey;
+	unordered_map<_wstring, EDIT_OBJECT_POLICY> m_EditablePolicyDrafts;
 
 	CMapSection* m_pFocusedMapSection = { nullptr };
 
@@ -53,13 +55,7 @@ private:
 #endif
 
 private:
-	_bool*	Resolve_EnvShadowEditState(CLevel_Edit* pLevel, CEnvObject* pEnvObject);
-	_bool*	Resolve_EnvCollMeshEditState(CLevel_Edit* pLevel, CEnvObject* pEnvObject);
-	_bool*	Resolve_MapCollMeshEditState(CLevel_Edit* pLevel, CMapStage* pMapStage, CMapSection* pSection);
 	_bool*	Resolve_EnvNearAlphaEditState(CLevel_Edit* pLevel, CEnvObject* pEnvObject);
-	void    Clear_EnvShadowEditState(CGameObject* pObject);
-	void    Clear_EnvCollMeshEditState(CGameObject* pObject);
-	void    Clear_MapCollMeshEditState(CMapSection* pSection);
 	void    Clear_EnvNearAlphaEditState(CGameObject* pObject);
 
 public:

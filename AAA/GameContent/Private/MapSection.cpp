@@ -1,8 +1,9 @@
 #include "MapSection.h"
 #include "Shader_PassMeta.h"
-#include "Geometry_Utils.h"
+#include "Map_EditFile.h"
 
 #include "GameInstance.h"
+#include "Geometry_Utils.h"
 
 NS_BEGIN(Client)
 
@@ -136,6 +137,70 @@ void CMapSection::Notify_EditTransformChanged()
 {
 	Refresh_CombinedWorldMatrix();
 }
+
+#pragma region Editable
+_bool CMapSection::Get_EditDesc(EDITABLE_DESC* pOutDesc) const
+{
+	if (nullptr == pOutDesc)
+		return false;
+
+	pOutDesc->eKind = EDITABLE_OBJECT_KIND::MAP_SECTION;
+	pOutDesc->strStableKey = CMap_EditFile::Make_SectionKey(m_strStageName, m_strSectionName);
+	pOutDesc->iCapabilities = EDIT_CAP_RENDERABLE | EDIT_CAP_CULL_FRUSTUM | EDIT_CAP_MESH_LAYER;
+
+	if (m_bHasCollMesh)	pOutDesc->iCapabilities |= EDIT_CAP_COLLISION_MESH;
+
+	pOutDesc->Policy.bRenderable = m_bRenderable;
+	pOutDesc->Policy.bUseCullDistance = false;
+	pOutDesc->Policy.bUseCullFrustum = m_bEnableCulling;
+	pOutDesc->Policy.bUseCollMesh = m_bHasCollMesh && m_bUseCollMesh;
+	pOutDesc->Policy.bUseShadow = false;
+
+	pOutDesc->ModelSlots.clear();
+	if (nullptr != m_pModelCom)
+	{
+		EDITABLE_MODEL_SLOT Slot{};
+		Slot.strLabel = L"Model";
+		Slot.eKind = EDITABLE_MODEL_KIND::NONANIM;
+		Slot.pModel = m_pModelCom;
+		Slot.iMeshCount = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+		pOutDesc->ModelSlots.push_back(Slot);
+	}
+
+	return true;
+}
+
+HRESULT CMapSection::Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy)
+{
+	m_bRenderable = Policy.bRenderable;
+	m_bEnableCulling = Policy.bUseCullFrustum;
+	Set_UseCollMesh(m_bHasCollMesh ? Policy.bUseCollMesh : false);
+	return S_OK;
+}
+
+const MESH_LAYER_IDX* CMapSection::Get_EditMeshLayer(_uint iModelSlot, _uint iMesh) const
+{
+	if (0u != iModelSlot)
+		return nullptr;
+
+	if (nullptr == m_pModelCom || iMesh >= m_pModelCom->Get_NumMeshes())
+		return nullptr;
+
+	return &m_pModelCom->Get_MeshLayer(iMesh);
+}
+
+HRESULT CMapSection::Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX& Layer)
+{
+	if (0u != iModelSlot)
+		return E_FAIL;
+
+	if (nullptr == m_pModelCom || iMesh >= m_pModelCom->Get_NumMeshes())
+		return E_FAIL;
+
+	m_pModelCom->Set_MeshLayer(iMesh, Layer);
+	return S_OK;
+}
+#pragma endregion
 
 #ifdef _DEBUG
 void CMapSection::Reset_FrameProfile()

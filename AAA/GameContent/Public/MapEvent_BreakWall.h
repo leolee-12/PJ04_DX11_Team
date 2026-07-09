@@ -7,7 +7,7 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CLIENT_DLL CMapEvent_BreakWall final : public CMapObject
+class CMapEvent_BreakWall final : public CMapObject
 {
 	GENERATED_BODY(CMapEvent_BreakWall)
 

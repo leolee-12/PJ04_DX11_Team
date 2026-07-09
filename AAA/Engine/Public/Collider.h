@@ -72,7 +72,12 @@ public:
 
 #ifdef _DEBUG
 public:
+	void Set_DebugText(const _wstring& strFontTag, const _wstring& strText, const _float4& vColor,
+		const _float2& vScale = _float2(0.55f, 0.55f), TEXT_ALIGN eAlign = TEXT_ALIGN::CENTER);
+	void Set_DebugRenderColor(const _float4& vColor);
+	void Clear_DebugText();
 	virtual HRESULT Render() override;
+	virtual HRESULT Render_DebugText() override;
 #endif
 
 private:
@@ -97,10 +102,19 @@ private:
 
 #ifdef _DEBUG
 private:
-	PrimitiveBatch<VertexPositionColor>* m_pBatch = { nullptr };
-	BasicEffect*						m_pEffect = { nullptr };
-	ID3D11InputLayout*					m_pInputLayout = { nullptr };
+	PrimitiveBatch<VertexPositionColor>*	m_pBatch = { nullptr };
+	BasicEffect*							m_pEffect = { nullptr };
+	ID3D11InputLayout*						m_pInputLayout = { nullptr };
 
+	_bool		m_bUseDebugText = { false };
+	_wstring	m_strDebugFontTag;
+	_wstring	m_strDebugText;
+	_float4		m_vDebugTextColor = { 1.f, 1.f, 1.f, 1.f };
+	_float2		m_vDebugTextScale = { 0.55f, 0.55f };
+	TEXT_ALIGN	m_eDebugTextAlign = { TEXT_ALIGN::CENTER };
+
+private:
+	_bool Try_GetDebugTextWorldPos(_float3* pOut) const;
 #endif
 
 public:

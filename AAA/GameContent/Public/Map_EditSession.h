@@ -68,15 +68,15 @@ public:
 	void Unregister_PreviewObject(CGameObject* pObject);
 	_bool Can_DeleteAsEnvOverride(CGameObject* pObject) const;
 	_bool Track_DeletedPreviewObject(CGameObject* pObject);
-	_bool Track_EditedPreviewObject(CGameObject* pObject, const MAP_ENV_EDITED_DESC& Edit);
+	_bool Track_EditedPreviewObject(CGameObject* pObject, const EDIT_OBJECT_OVERRIDE_DESC& Edit);
 	_bool Clear_EditedPreviewObject(CGameObject* pObject);
-	_bool Try_GetEditedEnvObject(const _wstring& strStableKey, MAP_ENV_EDITED_DESC* pOutEdit) const;
-	_bool Track_EditedMapSection(const _wstring& strSectionKey, const MAP_ENV_EDITED_DESC& Edit);
+	_bool Try_GetEditedEnvObject(const _wstring& strStableKey, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const;
+	_bool Track_EditedMapSection(const _wstring& strSectionKey, const EDIT_OBJECT_OVERRIDE_DESC& Edit);
 	_bool Clear_EditedMapSection(const _wstring& strSectionKey);
-	_bool Try_GetEditedMapSection(const _wstring& strSectionKey, MAP_ENV_EDITED_DESC* pOutEdit) const;
-	_bool Track_EditedLevelDesignObject(CGameObject* pObject, const MAP_LD_EDITED_DESC& Edit);
+	_bool Try_GetEditedMapSection(const _wstring& strSectionKey, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const;
+	_bool Track_EditedLevelDesignObject(CGameObject* pObject, const EDIT_OBJECT_OVERRIDE_DESC& Edit);
 	_bool Clear_EditedLevelDesignObject(CGameObject* pObject);
-	_bool Try_GetEditedLevelDesignObject(CGameObject* pObject, MAP_LD_EDITED_DESC* pOutEdit) const;
+	_bool Try_GetEditedLevelDesignObject(CGameObject* pObject, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const;
 
 	_uint Get_EditedMapSectionCount() const { return static_cast<_uint>(m_tEditData.OverrideDesc.EditedMapSections.size()); }
 

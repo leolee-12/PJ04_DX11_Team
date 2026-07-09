@@ -7,24 +7,22 @@
 
 namespace
 {
-	constexpr const _tchar* TEMP_EVENT_TAG = L"Temp";
+	inline constexpr const _tchar* TEMP_EVENT_TAG = L"Temp";
 
-	constexpr const _char* SLOPEBOARD_C_MODEL_PATH = "../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardC.ysh";
+	inline constexpr const _char* SLOPEBOARD_C_MODEL_PATH = "../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardC.ysh";
 
-	constexpr const _char* ANIM_WAIT = "Wait";
-	constexpr const _char* ANIM_FALLENWAIT = "FallenWait";
-	constexpr const _char* ANIM_CUT1 = "Cut1";
-	constexpr const _char* SLOPEBOARD_C_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_FALLENWAIT, ANIM_WAIT, ANIM_CUT1, "" };
+	inline constexpr const _char* ANIM_CUT1 = "Cut1";
+	inline constexpr const _char* SLOPEBOARD_C_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_CUT1 };
 
 	inline constexpr _float SLOPEBOARD_C_ANIM_SPEED = 1.f;
-	constexpr _float SLOPEBOARD_C_BOX_THICKNESS = 4.f;
-	constexpr _float SLOPEBOARD_C_STOP_TRACK_FRAME = 450.f;
+	inline constexpr _float SLOPEBOARD_C_BOX_THICKNESS = 4.f;
+	inline constexpr _float SLOPEBOARD_C_STOP_TRACK_FRAME = 450.f;
 
-	const _float3 SLOPEBOARD_C_HORIZONTAL_BOX_CENTER = { 258.f, 23.f - SLOPEBOARD_C_BOX_THICKNESS * 0.5f, -1062.5f };
-	const _float3 SLOPEBOARD_C_HORIZONTAL_BOX_HALF_EXTENTS = { 12.f, SLOPEBOARD_C_BOX_THICKNESS * 0.5f, 53.5f };
+	inline constexpr _float3 SLOPEBOARD_C_HORIZONTAL_BOX_CENTER = { 258.f, 23.f - SLOPEBOARD_C_BOX_THICKNESS * 0.5f, -1062.5f };
+	inline constexpr _float3 SLOPEBOARD_C_HORIZONTAL_BOX_HALF_EXTENTS = { 12.f, SLOPEBOARD_C_BOX_THICKNESS * 0.5f, 53.5f };
 
-	const _float3 SLOPEBOARD_C_VERTICAL_BOX_CENTER = { 258.f, 48.5f, -1116.f + SLOPEBOARD_C_BOX_THICKNESS * 0.5f };
-	const _float3 SLOPEBOARD_C_VERTICAL_BOX_HALF_EXTENTS = { 12.f, 25.5f, SLOPEBOARD_C_BOX_THICKNESS * 0.5f };
+	inline constexpr _float3 SLOPEBOARD_C_VERTICAL_BOX_CENTER = { 258.f, 48.5f, -1116.f + SLOPEBOARD_C_BOX_THICKNESS * 0.5f };
+	inline constexpr _float3 SLOPEBOARD_C_VERTICAL_BOX_HALF_EXTENTS = { 12.f, 25.5f, SLOPEBOARD_C_BOX_THICKNESS * 0.5f };
 
 
 	_matrix Make_ModelPreTransformMatrix()
@@ -61,16 +59,16 @@ HRESULT CLD_SlopeBoardC::Validate_Initialized()
 	if (m_tEventObjectDesc.bUseCollMesh || !m_tEventObjectDesc.strAnimEventFile.empty())
 		return E_FAIL;
 
-	for (_uint i = 0; i < LD_ANIM_SLOT_COUNT; ++i)
-	{
-		if (m_tEventObjectDesc.strAnimNames[i] != SLOPEBOARD_C_ANIM_NAMES[i])
-			return E_FAIL;
-	}
+	if (m_tEventObjectDesc.strAnimNames[0] != SLOPEBOARD_C_ANIM_NAMES[0])
+		return E_FAIL;
 
 	if (nullptr == Find_AnimPlayDesc(ANIM_CUT1))
 		return E_FAIL;
 
 	if (nullptr == m_pHorizontalPhysicsActor || nullptr == m_pVerticalPhysicsActor)
+		return E_FAIL;
+
+	if (nullptr == m_pTrigger)
 		return E_FAIL;
 
 	return S_OK;
@@ -89,12 +87,12 @@ void CLD_SlopeBoardC::Update(_float fTimeDelta)
 
 void CLD_SlopeBoardC::Late_Update(_float fTimeDelta)
 {
-	if (m_pInteractionCollider->Is_Enabled())
+	if (m_pTrigger->Is_Enabled())
 	{
-		m_pInteractionCollider->Update(XMMatrixIdentity());
+		m_pTrigger->Update(XMMatrixIdentity());
 
 #ifdef _DEBUG
-		m_pGameInstance_Proxy->Add_DebugComponent(m_pInteractionCollider);
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pTrigger);
 #endif
 	}
 
@@ -154,8 +152,7 @@ _bool CLD_SlopeBoardC::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& 
 	Desc.bUseCollMesh = false;
 	Desc.strAnimEventFile.clear();
 
-	for (_uint i = 0; i < LD_ANIM_SLOT_COUNT; ++i)
-		Desc.strAnimNames[i] = SLOPEBOARD_C_ANIM_NAMES[i];
+	Desc.strAnimNames[0] = SLOPEBOARD_C_ANIM_NAMES[0];
 
 	*pOutEntry = Desc;
 	return true;
@@ -181,7 +178,7 @@ HRESULT CLD_SlopeBoardC::Ready_Components()
 	if (FAILED(Ready_PhysicsBoxes()))
 		return E_FAIL;
 
-	if (FAILED(Ready_InteractionCollider()))
+	if (FAILED(Ready_Trigger()))
 		return E_FAIL;
 
 	return S_OK;
@@ -263,7 +260,7 @@ void CLD_SlopeBoardC::Release_PhysicsBoxes()
 	Release_PhysicsBox(&m_pVerticalPhysicsActor);
 }
 
-HRESULT CLD_SlopeBoardC::Ready_InteractionCollider()
+HRESULT CLD_SlopeBoardC::Ready_Trigger()
 {
 	CCollider::COLLIDER_DESC ColliderDesc{};
 	ColliderDesc.pOwner = this;
@@ -273,17 +270,25 @@ HRESULT CLD_SlopeBoardC::Ready_InteractionCollider()
 		SLOPEBOARD_C_VERTICAL_BOX_HALF_EXTENTS.y * 2.f,
 		SLOPEBOARD_C_VERTICAL_BOX_HALF_EXTENTS.z * 2.f };
 
-	m_pInteractionCollider = Add_Component<CCollider>(Collider_AABB.iLevelID, Collider_AABB.szProtoTag, TEXT("Com_InteractionCollider"), &ColliderDesc);
-	if (nullptr == m_pInteractionCollider)
+	m_pTrigger = Add_Component<CCollider>(Collider_AABB.iLevelID, Collider_AABB.szProtoTag, TEXT("Com_Trigger"), &ColliderDesc);
+	if (nullptr == m_pTrigger)
 		return E_FAIL;
 
-	m_pInteractionCollider->Set_OnEnter([this](CCollider* pOther) { Handle_Interaction(pOther); });
-	m_pGameInstance_Proxy->Register_Collider(m_pInteractionCollider, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+	SetUp_Collider_Callback();
+	m_pGameInstance_Proxy->Register_Collider(m_pTrigger, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
 
 	return S_OK;
 }
 
-void CLD_SlopeBoardC::Handle_Interaction(CCollider* pOther)
+void CLD_SlopeBoardC::SetUp_Collider_Callback()
+{
+	if (nullptr == m_pTrigger)
+		return;
+
+	m_pTrigger->Set_OnEnter([this](CCollider* pOther) { Handle_TriggerEnter(pOther); });
+}
+
+void CLD_SlopeBoardC::Handle_TriggerEnter(CCollider* pOther)
 {
 	if (nullptr == pOther)
 		return;
@@ -294,7 +299,9 @@ void CLD_SlopeBoardC::Handle_Interaction(CCollider* pOther)
 	if (STATE::IDLE != m_eState)
 		return;
 
-	m_pGameInstance_Proxy->Publish(TEMP_EVENT_TAG, nullptr);
+	_float4x4 vAncorWorld{};
+	vAncorWorld = *(m_pTransformCom->Get_WorldMatrixPtr());
+	m_pGameInstance_Proxy->Publish(TEMP_EVENT_TAG, &vAncorWorld);
 }
 
 void CLD_SlopeBoardC::On_Event()
@@ -305,7 +312,7 @@ void CLD_SlopeBoardC::On_Event()
 	Play_Anim(ANIM_CUT1);
 	m_eState = STATE::PLAYING;
 
-	m_pInteractionCollider->Set_Enabled(false);
+	m_pTrigger->Set_Enabled(false);
 }
 
 CGameObject* CLD_SlopeBoardC::Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -329,6 +336,23 @@ CLD_SlopeBoardC* CLD_SlopeBoardC::Create(ID3D11Device* pDevice, ID3D11DeviceCont
 CGameObject* CLD_SlopeBoardC::Clone(void* pArg)
 {
 	CLD_SlopeBoardC* pInstance = new CLD_SlopeBoardC(*this);
+
+	LD_EVENTOBJECT_DESC TempDesc{};
+	if (nullptr == pArg)
+	{
+		TempDesc.strObjectName = OBJECT_NAME;
+		TempDesc.strKind = OBJECT_NAME;
+		TempDesc.eCategory = LD_CATEGORY::GIMMICK;
+		TempDesc.iModelProtoLevel = m_iPrototypeLevel;
+		TempDesc.eModelType = MODEL::ANIM;
+		TempDesc.wstrModelProtoTag = MODEL_PROTO_TAG;
+		TempDesc.bUseCollMesh = false;
+		TempDesc.strAnimEventFile.clear();
+
+		TempDesc.strAnimNames[0] = SLOPEBOARD_C_ANIM_NAMES[0];
+
+		pArg = &TempDesc;
+	}
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{

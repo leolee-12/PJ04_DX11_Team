@@ -29,6 +29,7 @@ public:
 
 #ifdef _DEBUG
 	void Add_DebugComponent(class CComponent* pComponent);
+	void Add_DebugTextComponent(class CComponent* pComponent);
 	void Toggle_DebugRender() { m_bDebugRender = !m_bDebugRender; }
 	_bool IsOn_DebugRender() { return m_bDebugRender; }
 #endif
@@ -54,6 +55,7 @@ private:
 
 #ifdef _DEBUG
 	list<CComponent*>		m_DebugComponents;
+	list<CComponent*>       m_DebugTextComponents;
 	_bool					m_bDebugRender = { false };
 #endif
 
@@ -124,6 +126,7 @@ private:
 #ifdef _DEBUG
 private:
 	HRESULT Render_Debug();
+	HRESULT Render_DebugText();
 #endif
 
 	void	Reset_RS();

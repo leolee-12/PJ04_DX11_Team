@@ -50,11 +50,16 @@ static _float Sq_Dist_Segment_Segment(XMVECTOR P1, XMVECTOR Q1, XMVECTOR P2, XMV
 
 // ---- 본체 ----
 CBounding_Capsule::CBounding_Capsule(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CBounding{ pDevice, pContext } {
+    : CBounding{ pDevice, pContext }
+{
 }
 
 HRESULT CBounding_Capsule::Initialize(const CBounding::BOUNDING_DESC* pBoundingDesc)
 {
+#ifdef _DEBUG
+    m_vDebugColor = { 0.f, 0.f, 1.f, 1.f };
+#endif
+
     auto pDesc = static_cast<const BOUNDING_CAPSULE_DESC*>(pBoundingDesc);
     m_fRadius = pDesc->fRadius;
     _float fCyl = pDesc->fHeight;                 // 원기둥 길이(반구중심 간)
@@ -170,10 +175,8 @@ _bool CBounding_Capsule::Intersect(COLLIDER eTargetType, CBounding* pBounding)
 #ifdef _DEBUG
 HRESULT CBounding_Capsule::Render(PrimitiveBatch<VertexPositionColor>* pBatch)
 {
-    XMVECTOR color = m_isColl ? XMVectorSet(1.f, 0.f, 0.f, 1.f)   // 충돌 중 = 빨강
-        : XMVectorSet(0.f, 0.f, 1.f, 1.f);  // 평소 = 파랑
-
-    Debug_DrawCapsule(pBatch, XMLoadFloat3(&m_vP0), XMLoadFloat3(&m_vP1), m_fWorldRadius, color);
+    const _float4& vColor = Get_DebugRenderColor();
+    Debug_DrawCapsule(pBatch, XMLoadFloat3(&m_vP0), XMLoadFloat3(&m_vP1), m_fWorldRadius, XMLoadFloat4(&vColor));
     return S_OK;
 }
 #endif
