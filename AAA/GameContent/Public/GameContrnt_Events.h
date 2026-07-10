@@ -105,11 +105,11 @@ namespace Client
         GORILLA_SCENE_HANDOFF,
         GORILLA_COMBAT_ESCAPE, GORILLA_COMBAT_THROWN,
         DEFORM_CAR_GET_FIRST_RELEASE,
-        DEFAULT_RELEASE
+        _COUNT
     };
     struct KIRBY_ATTACHMENT_END_DESC
     {
-        KIRBY_ATTACHMENT_END_REASON eType = { KIRBY_ATTACHMENT_END_REASON::DEFAULT_RELEASE };
+        KIRBY_ATTACHMENT_END_REASON eType = { KIRBY_ATTACHMENT_END_REASON::_COUNT };
     };
 
     
@@ -214,12 +214,12 @@ namespace Client
     enum class KIRBY_POSITION_SYNC_CONTEXT : _uint
     {
         CAR_BRIDGE,
-        DEFAULT_SYNC
+        _COUNT
     };
 
     struct KIRBY_POSITION_SYNC_BEGIN_DESC
     {
-        KIRBY_POSITION_SYNC_CONTEXT eType = { KIRBY_POSITION_SYNC_CONTEXT::DEFAULT_SYNC };
+        KIRBY_POSITION_SYNC_CONTEXT eType = { KIRBY_POSITION_SYNC_CONTEXT::_COUNT };
         _float4x4 AnchorWorld{};
         _float fAnimSpeed{ 1.f };
         _float fBlendDuration = { 0.f };
@@ -228,12 +228,12 @@ namespace Client
     enum class KIRBY_POSITION_SYNC_END_REASON : _uint
     {
         CAR_BRIDGE_END,
-        DEFAULT_SYNC_END
+        _COUNT
     };
 
     struct KIRBY_POSITION_SYNC_END_DESC
     {
-        KIRBY_POSITION_SYNC_END_REASON eType = { KIRBY_POSITION_SYNC_END_REASON::DEFAULT_SYNC_END };
+        KIRBY_POSITION_SYNC_END_REASON eType = { KIRBY_POSITION_SYNC_END_REASON::_COUNT };
     };
 #pragma endregion
 
