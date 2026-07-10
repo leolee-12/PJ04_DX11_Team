@@ -128,35 +128,6 @@ void CKirby::Update(_float fTimeDelta)
     Update_InvincibilityHitFlash();
 
     Get_CurrentDeformModel()->Set_GoundNormal(m_pMovement->Get_GroundNormal());
-
-    if (m_pGameInstance_Proxy->Key_Down(DIK_B))
-    {
-        CTransform* pT = Get_Transform();
-        _vector vP =
-            pT->Get_State(STATE::POSITION);
-        _vector vL =
-            pT->Get_State(STATE::LOOK);
-
-        // 커비 뒤 2.5m, 살짝 위
-        _vector vSpawnV = vP
-            + XMVectorSet(0.f, 1.f, 0.f, 0.f);
-
-        _float3 vSpawn{};
-        XMStoreFloat3(&vSpawn, vSpawnV);
-
-        _float3 vDir{};
-        XMStoreFloat3(&vDir, -vL);
-
-        auto* pMgr =
-            CBubble_Manager::GetInstance();
-        auto eKind =
-            CBubble_Manager::BUBBLE_KIND::DROPPED;
-
-        pMgr->Spawn(
-            Get_LevelIndex(), eKind,
-            COPY_ABILITY_TYPE::SWORD,
-            vSpawn, vDir, nullptr);
-    }
 }
 
 void CKirby::Late_Update(_float fTimeDelta)
