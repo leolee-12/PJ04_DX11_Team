@@ -11,6 +11,7 @@ NS_BEGIN(Engine)
 // in destructor by design.
 class ENGINE_DLL CSound_Handle final
 {
+    friend class CSound_Manager;
 public:
     CSound_Handle() = default;
     explicit CSound_Handle(FMOD::Channel* pChannel);

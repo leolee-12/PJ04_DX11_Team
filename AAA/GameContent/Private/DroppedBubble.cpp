@@ -121,6 +121,8 @@ void CDroppedBubble::Be_Captured(CGameObject* pInhaler)
 
 	if (m_pCollider)
 		m_pCollider->Set_Enabled(false);
+	if (m_pController)
+		m_pController->Set_Enabled(false);
 
 	m_fPullSpeed = 0.f;
 	m_fScaleRatio = 1.f;
@@ -173,13 +175,18 @@ void CDroppedBubble::Despawn()
 	if (!m_bActive)
 		return;
 
+	m_bAvailable = false;
+
 	Set_Active(false);
 	Set_RenderActive(false);
 
 	m_vVelocity = { 0.f, 0.f, 0.f };
+
 	if (m_pController)
 		m_pController->Set_Enabled(false);
 
+	if (m_pCollider)
+		m_pCollider->Set_Enabled(false);
 
 
 	Return_ToPool();

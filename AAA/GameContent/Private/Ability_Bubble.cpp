@@ -4,6 +4,9 @@
 #include "Bubble_Manager.h"
 
 #include "Ability_Model.h"
+#include "Effect_Loader.h"
+#include "Effect_Container.h";
+
 
 CAbility_Bubble::CAbility_Bubble(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CContainerObject{ pDevice, pContext }
@@ -64,7 +67,11 @@ void CAbility_Bubble::Set_RenderActive(_bool bActive)
 	if (m_pModelPart)
 		m_pModelPart->Set_ModelRenderActive(bActive);
 
-	// TODO :  이펙트도 여기서 토글
+	if (bActive)
+		Start_Aura();
+	else 
+		Stop_Aura();
+
 }
 
 void CAbility_Bubble::Set_Pool(CBubble_Manager* pPool, _uint iLevel, const _wstring& strKey)
@@ -87,6 +94,28 @@ void CAbility_Bubble::Activate(const _float3& vPos)
 
 	if (m_pCollider)
 		m_pCollider->Set_Enabled(true);
+}
+
+void CAbility_Bubble::Start_Aura()
+{
+	if (m_pAura)
+		return;
+
+	CEffect_Loader::GetInstance()->Spawn(AURA_EFFECT_ID, Get_LevelIndex(),
+											_float3(0.f, -0.45f, 0.f),
+											_float3(0.f, 0.f, 0.f),
+											_float3(0.f, 0.f, 0.f),
+											m_pTransformCom->Get_WorldMatrixPtr(),
+											&m_pAura);
+}
+
+void CAbility_Bubble::Stop_Aura()
+{
+	if (nullptr == m_pAura)
+		return;
+
+	m_pAura->EffectContainer_StopAfterEmission();
+	m_pAura = nullptr;
 }
 
 HRESULT CAbility_Bubble::Ready_PartObjects()
@@ -129,11 +158,15 @@ HRESULT CAbility_Bubble::Ready_Collider()
 
 void CAbility_Bubble::Return_ToPool()
 {
+	Stop_Aura();
+
 	if (m_pPool)
 		m_pPool->Return(m_iPoolLevel, m_strPoolKey, this);
 }
 
 void CAbility_Bubble::Free()
 {
+	//Stop_Aura();
+
 	__super::Free();
 }

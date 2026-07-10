@@ -80,6 +80,7 @@
 #include "CommonHit.h"
 #include "SpitObject.h"
 #include "BombFuseEffect.h"
+#include "BubbleAura.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -112,6 +113,7 @@
 #include "Bubble.h"
 #include "StarEmitter.h"
 #include "Sparkle.h"
+#include "StarMesh.h"
 
 //sky
 #include "SkySphere.h"
@@ -977,6 +979,24 @@ void CGameObject_Factory::Register_Effect()
 
         ));
 
+    // 7 Bubble Aura (EssenceBubble / DorppedBubble °ø¿ë)
+    Register(CBubbleAura::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CBubbleAura),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBubble::PROTOTYPE_TAG, CBubble::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, Texture_CommonRing01.iLevelID, Texture_CommonRing01.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_CommonRing01.szFileTag, Texture_CommonRing01.iNumTex));
+
+            //TRY_ADD_PROTO(pProxy, iLevelIndex, CStarMesh::PROTOTYPE_TAG, CStarMesh::Create(pDevice, pContext));
+
+            //TRY_ADD_PROTO(pProxy, iLevelIndex, CStarEmitter::PROTOTYPE_TAG, CStarEmitter::Create(pDevice, pContext));
+
+            //TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StarSmooth"),
+            //    CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Star/Common_00_Common_StarSmooth.ysh"));
+        ));
+        
 }
 
 void CGameObject_Factory::Register_Bubble()

@@ -29,9 +29,10 @@ namespace
 
 	_bool Is_AudioAreaObject(const _wstring& strObjectName)
 	{
-		return JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaBgmRequestor")
-			|| JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaSeJungle")
-			|| JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaSeSeaWave");
+		if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaBgmRequestor"))
+			return true;
+
+		return 0 == _wcsnicmp(strObjectName.c_str(), L"AreaSe", 6);
 	}
 
 	_bool Try_ReadRailNodes(const json& jEntry, _float fDefaultControlLength, vector<LD_RAIL_NODE_DESC>* pOutNodes)
@@ -79,8 +80,7 @@ namespace
 
 	_string Resolve_AudioAreaMainPath(const _wstring& strObjectName)
 	{
-		if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaSeJungle")
-			|| JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaSeSeaWave"))
+		if (0 == _wcsnicmp(strObjectName.c_str(), L"AreaSe", 6))
 			return "Gimmick.AreaSe.MainComponent";
 
 		return {};
@@ -428,28 +428,42 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 	{
 		pDesc->eCategory = LD_CATEGORY::AUDIO_AREA;
 
-		const _string strMainPath = Resolve_AudioAreaMainPath(strObjectName);
+		const _string strMainPath =	Resolve_AudioAreaMainPath(strObjectName);
 
-		JsonUtils::Try_ReadUInt(jEntry, "SoundId", &pDesc->AudioArea.iSoundId);
+		JsonUtils::Try_ReadUInt(jEntry, "SoundId",	&pDesc->AudioArea.iSoundId);
 
-		if (!JsonUtils::Try_ReadString(jEntry, "VariationType", &pDesc->AudioArea.strVariationType) && !strMainPath.empty())
-			JsonUtils::Try_ReadString(jEntry, strMainPath + ".VariationType",
-				&pDesc->AudioArea.strVariationType);
-
-		if (!JsonUtils::Try_ReadString(jEntry, "ShapeType", &pDesc->AudioArea.strShapeType) && !strMainPath.empty())
-			JsonUtils::Try_ReadString(jEntry, strMainPath + ".ShapeType", &pDesc->AudioArea.strShapeType);
-
-		const _string strShapePrefix = Resolve_AudioAreaShapePrefix(pDesc->AudioArea.strShapeType);
-		if (!JsonUtils::Try_ReadFloat3Array(jEntry, "AreaSize", &pDesc->AudioArea.vAreaSize)
-			&& !strMainPath.empty()
-			&& !strShapePrefix.empty())
+		if (!JsonUtils::Try_ReadString(jEntry, "VariationType",	&pDesc->AudioArea.strVariationType)
+			&& !strMainPath.empty())
 		{
-			const _string strAreaSizePath = strMainPath + "." + strShapePrefix + "Size";
-			JsonUtils::Try_ReadFloat3Array(jEntry, strAreaSizePath, &pDesc->AudioArea.vAreaSize);
+			JsonUtils::Try_ReadString(jEntry, strMainPath + ".VariationType", &pDesc->AudioArea.strVariationType);
 		}
 
-		JsonUtils::Try_ReadUInt(jEntry, "FadeInFrame", &pDesc->AudioArea.iFadeInFrame);
-		JsonUtils::Try_ReadUInt(jEntry, "InactivateFrame", &pDesc->AudioArea.iInactivateFrame);
+		if (!JsonUtils::Try_ReadString(jEntry, "ShapeType",	&pDesc->AudioArea.strShapeType)	&& !strMainPath.empty())
+		{
+			JsonUtils::Try_ReadString(jEntry, strMainPath + ".ShapeType", &pDesc->AudioArea.strShapeType);
+		}
+
+		const _string strShapePrefix =	Resolve_AudioAreaShapePrefix(pDesc->AudioArea.strShapeType);
+
+		if (!JsonUtils::Try_ReadFloat3Array(jEntry, "AreaSize",	&pDesc->AudioArea.vAreaSize) && !strMainPath.empty() && !strShapePrefix.empty())
+		{
+			const _string strAreaSizePath =	strMainPath + "." + strShapePrefix + "Size";
+			JsonUtils::Try_ReadFloat3Array(jEntry, strAreaSizePath,	&pDesc->AudioArea.vAreaSize);
+		}
+
+		if (JsonUtils::Equals_NoCase(pDesc->AudioArea.strShapeType.c_str(),	L"Cylinder")
+										&& !strMainPath.empty()
+										&& !strShapePrefix.empty())
+		{
+			const _string strAreaCenterPath = strMainPath + "." + strShapePrefix + "Center";
+			if (JsonUtils::Try_ReadFloat3Array(jEntry, strAreaCenterPath, &pDesc->AudioArea.vAreaCenter))
+				pDesc->AudioArea.bHasAreaCenter = true;
+		}
+
+		JsonUtils::Try_ReadUInt(jEntry, "FadeInFrame",
+			&pDesc->AudioArea.iFadeInFrame);
+		JsonUtils::Try_ReadUInt(jEntry, "InactivateFrame",
+			&pDesc->AudioArea.iInactivateFrame);
 		return;
 	}
 

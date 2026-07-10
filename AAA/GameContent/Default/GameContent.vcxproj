@@ -144,6 +144,7 @@
     <ClInclude Include="..\Public\Star2DParticle.h" />
     <ClInclude Include="..\Public\SpitObject.h" />
     <ClInclude Include="..\Public\StarEmitter.h" />
+    <ClInclude Include="..\Public\StarMesh.h" />
     <ClInclude Include="..\Public\StarParticle.h" />
     <ClInclude Include="..\public\SpinWind.h" />
     <ClInclude Include="..\Public\SwordCharge.h" />
@@ -484,6 +485,7 @@
     <ClCompile Include="..\Private\Star2DParticle.cpp" />
     <ClCompile Include="..\Private\SpitObject.cpp" />
     <ClCompile Include="..\Private\StarEmitter.cpp" />
+    <ClCompile Include="..\Private\StarMesh.cpp" />
     <ClCompile Include="..\Private\StarParticle.cpp" />
     <ClCompile Include="..\private\SpinWind.cpp" />
     <ClCompile Include="..\Private\SwordCharge.cpp" />

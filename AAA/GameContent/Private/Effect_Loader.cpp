@@ -57,6 +57,7 @@ namespace
         { TEXT("SpitAir"),                TEXT("../../Resources/YSH/Effects/Spit_Air.JSON") },
 
         { TEXT("BombFuseEffect"),         TEXT("../../Resources/CHJ/Effect/BombFuseEffect.JSON") },
+        { TEXT("BubbleAura"),             TEXT("../../Resources/CHJ/Effect/BubbleAura.JSON") },
     };
 }
 
