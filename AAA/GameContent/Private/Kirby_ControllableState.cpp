@@ -50,17 +50,29 @@ _bool CKirby_ControllableState::Handle_Command(CKirby* pKirby, CKirby_Command* p
             if (!pCommand->IsPress())
                 return false;
 
-            COPY_ABILITY_TYPE eAbilityType = pKirby->Get_KirbyAbility()->Get_AbilityType();
-            if (eAbilityType == COPY_ABILITY_TYPE::NORMAL)
-                return true;
-
-            if (pKirby->Can_AbilityDump() == true)
+            if (pKirby->Has_Deform())
             {
-                pKirby->Change_State(KIRBY_STATE_TYPE::ABILITY_DUMP);
-                pKirby->Reset_AbilityDumpCool();
-                return true;
+                if (pKirby->Can_Dump() == true)
+                {
+                    pKirby->Change_State(KIRBY_STATE_TYPE::DEFORM_DUMP);
+                    pKirby->Reset_DumpCool();
+                    return true;
+                }
             }
+            else
+            {
+                COPY_ABILITY_TYPE eAbilityType = pKirby->Get_KirbyAbility()->Get_AbilityType();
+                if (eAbilityType == COPY_ABILITY_TYPE::NORMAL)
+                    return true;
 
+                if (pKirby->Can_Dump() == true)
+                {
+                    pKirby->Change_State(KIRBY_STATE_TYPE::ABILITY_DUMP);
+                    pKirby->Reset_DumpCool();
+                    return true;
+                }
+            }
+    
             pKirby->Req_AbilityDumpCoolDecrease();
 
             return true;

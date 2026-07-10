@@ -1003,7 +1003,12 @@
     <Filter Include="00. GameObject\97. UI\UIContainer\GenericContainer\TitleLogo">
       <UniqueIdentifier>{bbb4987a-476e-4041-a47f-d7275e792b36}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\97. UI\UIContainer\GenericContainer\CutFade">
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\DeformDump">
+      <UniqueIdentifier>{c901a202-1d74-4832-b027-3901c993d27a}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect">
+	</Filter>
+	<Filter Include="00. GameObject\97. UI\UIContainer\GenericContainer\CutFade">
       <UniqueIdentifier>{42685eeb-8084-4009-84ba-36bd8947bef0}</UniqueIdentifier>
     </Filter>
     <Filter Include="96. Director">
@@ -2022,7 +2027,12 @@
     <ClInclude Include="..\Public\Deformable.h">
       <Filter>00. GameObject\95. Interface</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\UI_CutFade.h">
+    <ClInclude Include="..\Public\Kirby_DeformDump.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\DeformDump</Filter>
+	</ClInclude>
+	<ClInclude Include="..\Public\AbilityBubbleEffect.h">
+	</ClInclude>
+	<ClInclude Include="..\public\UI_CutFade.h">
       <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\CutFade</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Dialogue_Director.h">
@@ -2954,7 +2964,12 @@
     <ClCompile Include="..\private\UI_TitleLogo.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\TitleLogo</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\UI_CutFade.cpp">
+    <ClCompile Include="..\Private\Kirby_DeformDump.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\DeformDump</Filter>
+	</ClCompile>
+	<ClCompile Include="..\Private\AbilityBubbleEffect.cpp">
+	</ClCompile>
+	<ClCompile Include="..\private\UI_CutFade.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\CutFade</Filter>
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
@@ -2964,7 +2979,7 @@
       <Filter>96. Director\Dialogue Arranger</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\AbilityBubbleEffect.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect</Filter>
+	<Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Bubble_Manager.cpp">
       <Filter>00. GameObject\09. AbilityBubble\Manager</Filter>

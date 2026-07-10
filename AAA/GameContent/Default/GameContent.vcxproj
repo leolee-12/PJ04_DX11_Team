@@ -75,6 +75,7 @@
     <ClInclude Include="..\Public\Common_JumpSlash.h" />
     <ClInclude Include="..\Public\Common_Ring03.h" />
     <ClInclude Include="..\Public\Deformable.h" />
+    <ClInclude Include="..\Public\Kirby_DeformDump.h" />
     <ClInclude Include="..\public\Dialogue_Arranger.h" />
     <ClInclude Include="..\public\Dialogue_Director.h" />
     <ClInclude Include="..\Public\DroppedBubble.h" />
@@ -409,6 +410,7 @@
     <ClCompile Include="..\Private\CarMilkyWay.cpp" />
     <ClCompile Include="..\Private\Car_00_MilkyWay.cpp" />
     <ClCompile Include="..\Private\CommonHit.cpp" />
+    <ClCompile Include="..\Private\Kirby_DeformDump.cpp" />
     <ClCompile Include="..\private\Dialogue_Arranger.cpp" />
     <ClCompile Include="..\Private\DroppedBubble.cpp" />
     <ClCompile Include="..\Private\EnvTrigger_EventPublisher.cpp" />

@@ -34,6 +34,8 @@ HRESULT CKirby_Deform_Car::Initialize()
 
     Set_FullBodyAni(DEFORM_ANI::DAMAGED, "Damage", false, false, 0.1f, 1.5f);
 
+    Set_FullBodyAni(DEFORM_ANI::SPIT_START, "SpitStart", false, false, 0.1f, 1.5f);
+
     m_fMaxBoostTime = 0.5f;
 
     return S_OK;
