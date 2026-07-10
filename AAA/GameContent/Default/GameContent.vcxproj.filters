@@ -2031,12 +2031,10 @@
     <ClInclude Include="..\public\Dialogue_Arranger.h">
       <Filter>96. Director\Dialogue Arranger</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\AbilityBubbleEffect.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Bubble_Manager.h">
       <Filter>00. GameObject\09. AbilityBubble\Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BubbleAura.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2963,12 +2961,10 @@
     <ClCompile Include="..\private\Dialogue_Arranger.cpp">
       <Filter>96. Director\Dialogue Arranger</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\AbilityBubbleEffect.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Bubble_Manager.cpp">
       <Filter>00. GameObject\09. AbilityBubble\Manager</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\BubbleAura.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Shader_Ring.hlsl">
@@ -2999,9 +2995,6 @@
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
     <None Include="..\ShaderFiles\Shader_MapEx.hlsl">
-      <Filter>98. ShaderFiles\Leo</Filter>
-    </None>
-    <None Include="..\ShaderFiles\Shader_EnvInstance.hlsl">
       <Filter>98. ShaderFiles\Leo</Filter>
     </None>
     <None Include="..\ShaderFiles\Shader_Bomb.hlsl">

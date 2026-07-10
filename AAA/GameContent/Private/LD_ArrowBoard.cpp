@@ -1,5 +1,6 @@
 #include "LD_ArrowBoard.h"
 #include "LevelDesign_Registry.h"
+#include "MeshLayer_Binder.h"
 #include "Parsing_Utils.h"
 #include "GameContent_const.h"
 
@@ -16,7 +17,6 @@ namespace
 	inline constexpr _float ARROWBOARD_MIN_HURT_RADIUS = 0.1f;
 	inline constexpr _float ARROWBOARD_GLOW_PERIOD = 0.3333f;
 	inline constexpr _float ARROWBOARD_GLOW_MAX_INTENSITY = 2.f;
-	inline constexpr _uint ARROWBOARD_MATERIAL_TEST_PASS = 8u;
 }
 
 NS_BEGIN(Client)
@@ -209,7 +209,7 @@ CGameObject* CLD_ArrowBoard::Create_Prototype(ID3D11Device* pDevice, ID3D11Devic
 
 HRESULT CLD_ArrowBoard::Ready_RenderComponents()
 {
-	m_pShaderCom = Add_Component<CShader>(Shader_AnimMesh_PBR.iLevelID, Shader_AnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
+	m_pShaderCom = Add_Component<CShader>(Shader_World_Anim.iLevelID, Shader_World_Anim.szProtoTag, TEXT("Com_Shader"));
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
@@ -288,19 +288,31 @@ HRESULT CLD_ArrowBoard::Bind_ShaderResources()
 
 HRESULT CLD_ArrowBoard::Render_Model()
 {
-	if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", 0u, MTEX_TYPE::DIFFUSE, 0u)))
+	MESH_LAYER_IDX Layer = m_pModelCom->Get_MeshLayer(0u);
+	Layer.iPass = ETOI(WORLD_PASS::DEFAULT);
+
+	MESH_LAYER_BIND_CONTEXT Ctx{};
+	Ctx.pShader = m_pShaderCom;
+	Ctx.pModel = m_pModelCom;
+	Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+	Ctx.iMesh = 0u;
+	Ctx.pLayer = &Layer;
+	Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_ANIM;
+	Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
+	Ctx.iFallbackPass = ETOUI(WORLD_PASS::ARROWBOARD_OPAQUE);
+	Ctx.fDissolve = 0.f;
+
+	MESH_LAYER_BIND_RESULT Result{};
+	if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
 		return E_FAIL;
 
-	if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", 0u, MTEX_TYPE::NORMALS, 0u)))
-		return E_FAIL;
-
-	if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", 0u, MTEX_TYPE::METALNESS, 0u)))
-		return E_FAIL;
+	if (Result.bSkipMesh)
+		return S_OK;
 
 	if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", 0u)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Begin(ARROWBOARD_MATERIAL_TEST_PASS)))
+	if (FAILED(m_pShaderCom->Begin(Result.iPass)))
 		return E_FAIL;
 
 	return m_pModelCom->Render(0u);

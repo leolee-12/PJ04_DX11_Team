@@ -130,7 +130,7 @@ HRESULT CEnvObject::Render()
 		Ctx.fDissolve = m_fDissolve;
 
 		if (m_bUseCameraDither)
-			Ctx.iExtraFlags |= ShaderPass::EnvInstFlags::Dither;
+			Ctx.iExtraFlags |= WorldShaderFlags::Dither;
 
 		MESH_LAYER_BIND_RESULT Result{};
 		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))

@@ -119,17 +119,7 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DISCARD();
     }
-    pass ColorMRADitherPass // 11
-    {
-        SetRasterizerState(RS_Cull_None);
-        SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_COLOR_MRA_DITHER();
-    }
-    pass Decal_Pass // 12
+    pass Decal_Pass // 11
     {
         SetRasterizerState(WORLD_DECAL_RS);
         SetDepthStencilState(WORLD_DECAL_DSS, 0);
@@ -139,7 +129,7 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DECAL();
     }
-    pass COLOR_CONST_MRA_Pass // 13
+    pass COLOR_CONST_MRA_Pass // 12
     {
         SetRasterizerState(RS_Cull_None);
         SetDepthStencilState(DSS_Default, 0);
@@ -148,5 +138,15 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_COLOR_CONST_MRA();
+    }
+    pass ARROWBOARD_OPAQUE_Pass // 13
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_ARROWBOARD_OPAQUE();
     }
 }

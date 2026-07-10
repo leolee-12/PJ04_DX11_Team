@@ -108,12 +108,12 @@ namespace
 		return bDefault;
 	}
 
-	const _char* GetEnvShaderPassComboItem(void*, _int idx)
+	const _char* GetWorldShaderPassComboItem(void*, _int idx)
 	{
-		if (idx < 0 || idx >= static_cast<int>(_countof(g_EnvShaderPassMetas)))
+		if (idx < 0 || idx >= static_cast<int>(_countof(g_WorldShaderPassMetas)))
 			return nullptr;
 
-		return g_EnvShaderPassMetas[idx].szName;
+		return g_WorldShaderPassMetas[idx].szName;
 	}
 
 	struct MESH_LAYER_UI_CONTEXT
@@ -1554,20 +1554,19 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 
 	if (Ui.bEnvPassMeshUi)
 	{
-		int iPassCombo = Get_EnvShaderPassComboIndex(Layer.iPass);
+		int iPassCombo = Get_WorldShaderPassComboIndex(Layer.iPass);
 
-		ImGui::SetNextItemWidth(160.f);
 		if (ImGui::Combo("Pass",
 			&iPassCombo,
-			GetEnvShaderPassComboItem,
+			GetWorldShaderPassComboItem,
 			nullptr,
-			static_cast<int>(_countof(g_EnvShaderPassMetas))))
+			static_cast<int>(_countof(g_WorldShaderPassMetas))))
 		{
-			Layer.iPass = Get_EnvShaderPassFromComboIndex(iPassCombo);
+			Layer.iPass = Get_WorldShaderPassFromComboIndex(iPassCombo);
 			bChanged = true;
 		}
 
-		if (Layer.iPass == ETOI(ENV_PASS::COLOR))
+		if (Layer.iPass == ETOI(WORLD_PASS::COLOR))
 		{
 			ImGui::SetNextItemWidth(180.f);
 			if (ImGui::ColorEdit4("Render Color##MeshLayer", (float*)&Layer.vRenderColor))
@@ -1577,7 +1576,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 		if (Ui.bEnvObjectMeshUi)
 			ImGui::TextDisabled("Dither is controlled per object in EnvObject Edit.");
 		else
-			ImGui::TextDisabled("NonAnim LevelDesign uses ENV_PASS domain.");
+			ImGui::TextDisabled("NonAnim LevelDesign uses WORLD_PASS domain.");
 	}
 	else if (Ui.bBushBasicMeshUi)
 	{

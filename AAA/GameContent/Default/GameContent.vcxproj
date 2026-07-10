@@ -688,9 +688,6 @@
     <None Include="..\ShaderFiles\Shader_EffectRock.hlsl">
       <FileType>Document</FileType>
     </None>
-    <None Include="..\ShaderFiles\Shader_EnvInstance.hlsl">
-      <FileType>Document</FileType>
-    </None>
     <None Include="..\ShaderFiles\Shader_Gorilla.hlsl">
       <FileType>Document</FileType>
     </None>
