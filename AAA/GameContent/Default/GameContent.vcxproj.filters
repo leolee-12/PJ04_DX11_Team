@@ -1006,6 +1006,9 @@
     <Filter Include="00. GameObject\97. UI\UIContainer\GenericContainer\TitleLogo">
       <UniqueIdentifier>{bbb4987a-476e-4041-a47f-d7275e792b36}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\DeformDump">
+      <UniqueIdentifier>{c901a202-1d74-4832-b027-3901c993d27a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -2004,6 +2007,9 @@
     <ClInclude Include="..\Public\Deformable.h">
       <Filter>00. GameObject\95. Interface</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_DeformDump.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\DeformDump</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2920,6 +2926,9 @@
     </ClCompile>
     <ClCompile Include="..\private\UI_TitleLogo.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\TitleLogo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_DeformDump.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\DeformDump</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
