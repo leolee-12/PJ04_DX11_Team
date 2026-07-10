@@ -278,4 +278,87 @@ inline _int Get_EnvShaderPassFromComboIndex(_int iIndex)
 }
 #pragma endregion
 
+
+#pragma region World Pass
+enum class WORLD_PASS : _int
+{
+	DEFAULT = -1,
+
+	SHADOW = 0,
+	WHITE,
+	DIFF,
+	DMN,
+	UKWN,
+	UMN,
+
+	DMNU,
+	TREESHADOW,
+	GRASS_FUR,
+	COLOR,
+	DISCARD,
+	COLOR_MRA_DITHER,
+	DECAL,
+	COLOR_CONST_MRA,
+
+	COUNT
+};
+
+static_assert(ETOI(ENV_PASS::SHADOW) == ETOI(WORLD_PASS::SHADOW));
+static_assert(ETOI(ENV_PASS::WHITE) == ETOI(WORLD_PASS::WHITE));
+static_assert(ETOI(ENV_PASS::DIFF) == ETOI(WORLD_PASS::DIFF));
+static_assert(ETOI(ENV_PASS::DMN) == ETOI(WORLD_PASS::DMN));
+static_assert(ETOI(ENV_PASS::UKWN) == ETOI(WORLD_PASS::UKWN));
+static_assert(ETOI(ENV_PASS::UMN) == ETOI(WORLD_PASS::UMN));
+static_assert(ETOI(ENV_PASS::DMNU) == ETOI(WORLD_PASS::DMNU));
+static_assert(ETOI(ENV_PASS::TREESHADOW) == ETOI(WORLD_PASS::TREESHADOW));
+static_assert(ETOI(ENV_PASS::GRASS_FUR) == ETOI(WORLD_PASS::GRASS_FUR));
+static_assert(ETOI(ENV_PASS::COLOR) == ETOI(WORLD_PASS::COLOR));
+static_assert(ETOI(ENV_PASS::DISCARD) == ETOI(WORLD_PASS::DISCARD));
+static_assert(ETOI(ENV_PASS::COLORMRADITHER) == ETOI(WORLD_PASS::COLOR_MRA_DITHER));
+static_assert(ETOI(ENV_PASS::DECAL) == ETOI(WORLD_PASS::DECAL));
+
+struct WORLD_SHADER_PASS_META
+{
+	WORLD_PASS      ePass;
+	const _char* szName;
+	_uint           iRequiredTextureMask;
+};
+
+inline constexpr WORLD_SHADER_PASS_META g_WorldShaderPassMetas[] =
+{
+	{ WORLD_PASS::DEFAULT,          "Default",          DIFF | MRA | NORM },
+	{ WORLD_PASS::SHADOW,           "SHADOW",           0 },
+	{ WORLD_PASS::WHITE,            "WHITE",            0 },
+	{ WORLD_PASS::DIFF,             "DIFF",             DIFF },
+	{ WORLD_PASS::DMN,              "DMN",              DIFF | MRA | NORM },
+	{ WORLD_PASS::UKWN,             "UKWN",             UKWN },
+	{ WORLD_PASS::UMN,              "UMN",              UKWN | MRA | NORM },
+
+	{ WORLD_PASS::DMNU,             "DMNU",             DIFF | MRA | NORM | UKWN },
+	{ WORLD_PASS::TREESHADOW,       "TREESHADOW",       UKWN },
+	{ WORLD_PASS::GRASS_FUR,        "GRASS_FUR",        UKWN | MRA | NORM },
+	{ WORLD_PASS::COLOR,            "COLOR",            MRA | NORM },
+	{ WORLD_PASS::DISCARD,          "DISCARD",          0 },
+	{ WORLD_PASS::COLOR_MRA_DITHER, "COLOR_MRA_DITHER", 0 },
+	{ WORLD_PASS::DECAL,            "DECAL",            0 },
+	{ WORLD_PASS::COLOR_CONST_MRA,  "COLOR_CONST_MRA",  NORM },
+};
+
+inline _bool Is_ValidWorldPassValue(_int iPass)
+{
+	return 0 <= iPass && iPass < ETOI(WORLD_PASS::COUNT);
+}
+
+inline const WORLD_SHADER_PASS_META* Find_WorldShaderPassMeta(_int iPass)
+{
+	for (const auto& Meta : g_WorldShaderPassMetas)
+	{
+		if (ETOI(Meta.ePass) == iPass)
+			return &Meta;
+	}
+
+	return &g_WorldShaderPassMetas[0];
+}
+#pragma endregion
+
 NS_END

@@ -13,6 +13,12 @@ namespace
 	HRESULT Bind_EnvInstance(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult);
 	HRESULT Bind_AnimPBRLimited(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult);
 
+	HRESULT Bind_World(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult);
+	HRESULT Bind_WorldMainTextures(const MESH_LAYER_BIND_CONTEXT& Ctx);
+	HRESULT Bind_WorldCommonParams(const MESH_LAYER_BIND_CONTEXT& Ctx);
+	HRESULT Bind_WorldShadow(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult);
+	HRESULT Bind_WorldDecal(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult);
+
 	HRESULT Bind_LegacyMainTextures(const MESH_LAYER_BIND_CONTEXT& Ctx);
 	HRESULT Bind_LegacyCommonParams(const MESH_LAYER_BIND_CONTEXT& Ctx, _bool bBindEnvFlags);
 
@@ -40,6 +46,11 @@ HRESULT MeshLayerBinder::Bind(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIN
 	{
 	case MESH_LAYER_PROFILE::MAP:
 		return Bind_Map(Ctx, pOutResult);
+
+	case MESH_LAYER_PROFILE::WORLD_NONANIM:
+	case MESH_LAYER_PROFILE::WORLD_ANIM:
+	case MESH_LAYER_PROFILE::WORLD_INSTANCE:
+		return Bind_World(Ctx, pOutResult);
 
 	case MESH_LAYER_PROFILE::NONANIM_PBR:
 		return Bind_NonAnimPBR(Ctx, pOutResult);
@@ -84,6 +95,11 @@ _uint MeshLayerBinder::Resolve_Pass(MESH_LAYER_PROFILE eProfile, MESH_LAYER_REND
 	{
 	case MESH_LAYER_PROFILE::MAP:
 		return MeshLayerProfile::Resolve_MapPass(Layer, iFallbackPass);
+
+	case MESH_LAYER_PROFILE::WORLD_NONANIM:
+	case MESH_LAYER_PROFILE::WORLD_ANIM:
+	case MESH_LAYER_PROFILE::WORLD_INSTANCE:
+		return MeshLayerProfile::Resolve_WorldPass(Layer, iFallbackPass);
 
 	case MESH_LAYER_PROFILE::NONANIM_PBR:
 		return MeshLayerProfile::Resolve_NonAnimPBRPass(Layer, iFallbackPass);
@@ -260,6 +276,139 @@ namespace
 			return E_FAIL;
 
 		pOutResult->iPass = Ctx.iFallbackPass;
+		return S_OK;
+	}
+
+	HRESULT Bind_World(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult)
+	{
+		const MESH_LAYER_IDX& Layer = *Ctx.pLayer;
+
+		switch (Ctx.eKind)
+		{
+		case MESH_LAYER_RENDER_KIND::MAIN:
+		{
+			if (FAILED(Bind_WorldMainTextures(Ctx)))
+				return E_FAIL;
+			if (FAILED(Bind_WorldCommonParams(Ctx)))
+				return E_FAIL;
+
+			const _uint iFallbackPass = (0u != Ctx.iFallbackPass) ? Ctx.iFallbackPass : ETOUI(WORLD_PASS::DMN);
+			pOutResult->iPass = MeshLayerBinder::Resolve_Pass(Ctx.eProfile, Ctx.eKind, Layer, iFallbackPass);
+			return S_OK;
+		}
+
+		case MESH_LAYER_RENDER_KIND::SHADOW:
+			return Bind_WorldShadow(Ctx, pOutResult);
+
+		case MESH_LAYER_RENDER_KIND::DECAL:
+			return Bind_WorldDecal(Ctx, pOutResult);
+
+		default:
+			return E_FAIL;
+		}
+	}
+
+	HRESULT Bind_WorldMainTextures(const MESH_LAYER_BIND_CONTEXT& Ctx)
+	{
+		const MESH_LAYER_IDX& Layer = *Ctx.pLayer;
+
+		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_DiffuseTexture", MTEX_TYPE::DIFFUSE,
+			Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)], DEFAULT_TEXTURE::MAGENTA)))
+			return E_FAIL;
+		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_NormalTexture", MTEX_TYPE::NORMALS,
+			Layer.idx[ETOUI(MTEX_TYPE::NORMALS)], DEFAULT_TEXTURE::FLAT_NORMAL)))
+			return E_FAIL;
+		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_MRATexture", MTEX_TYPE::METALNESS,
+			Layer.idx[ETOUI(MTEX_TYPE::METALNESS)], DEFAULT_TEXTURE::MRA)))
+			return E_FAIL;
+		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_UnknownTexture", MTEX_TYPE::UNKNOWN,
+			Layer.idx[ETOUI(MTEX_TYPE::UNKNOWN)], DEFAULT_TEXTURE::BLACK)))
+			return E_FAIL;
+
+		return S_OK;
+	}
+
+	HRESULT Bind_WorldCommonParams(const MESH_LAYER_BIND_CONTEXT& Ctx)
+	{
+		const MESH_LAYER_IDX& Layer = *Ctx.pLayer;
+
+		const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
+		const _uint iUnknownUVIndex = (Layer.iUnknownUVIndex <= 3u) ? Layer.iUnknownUVIndex : 0u;
+		const _float4 vUVTransform = Layer.bUseUVTransform
+			? _float4{ Layer.vUVScale.x, Layer.vUVScale.y, Layer.vUVOffset.x, Layer.vUVOffset.y }
+			: _float4{ 1.f, 1.f, 0.f, 0.f };
+		const _float4 vUVTransformNormal = Layer.bUseUVTransform
+			? _float4{ Layer.vUVScaleNormal.x, Layer.vUVScaleNormal.y, Layer.vUVOffset.x, Layer.vUVOffset.y }
+			: _float4{ 1.f, 1.f, 0.f, 0.f };
+		const _float4 vUVTransformMaterial = Layer.bUseUVTransform
+			? _float4{ Layer.vUVScaleMaterial.x, Layer.vUVScaleMaterial.y, Layer.vUVOffset.x, Layer.vUVOffset.y }
+			: _float4{ 1.f, 1.f, 0.f, 0.f };
+		const _float4 vUVTransformUnknown = vUVTransform;
+		const _float fUVRotate = Layer.bUseUVTransform ? Layer.fUVRotate : 0.f;
+		const _float fNormalStrength = Layer.fNormalStrength;
+		const _float fMaskStrength = Layer.fMaskStrength;
+		const _uint iWorldFlags = Layer.iFlags | Ctx.iExtraFlags;
+
+		if (FAILED(Ctx.pShader->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint)))) return E_FAIL;
+		if (FAILED(Ctx.pShader->Bind_RawValue("g_iUnknownUVIndex", &iUnknownUVIndex, sizeof(_uint)))) return E_FAIL;
+		if (FAILED(Ctx.pShader->Bind_RawValue("g_vUVTransform", &vUVTransform, sizeof(_float4)))) return E_FAIL;
+		if (FAILED(Ctx.pShader->Bind_RawValue("g_vUVTransformNormal", &vUVTransformNormal, sizeof(_float4)))) return E_FAIL;
+		if (FAILED(Ctx.pShader->Bind_RawValue("g_vUVTransformMaterial", &vUVTransformMaterial, sizeof(_float4)))) return E_FAIL;
+		if (FAILED(Ctx.pShader->Bind_RawValue("g_vUVTransformUnknown", &vUVTransformUnknown, sizeof(_float4)))) return E_FAIL;
+		if (FAILED(Ctx.pShader->Bind_RawValue("g_fUVRotate", &fUVRotate, sizeof(_float)))) return E_FAIL;
+		if (FAILED(Ctx.pShader->Bind_RawValue("g_NormalStrength", &fNormalStrength, sizeof(_float)))) return E_FAIL;
+		if (FAILED(Ctx.pShader->Bind_RawValue("g_MaskStrength", &fMaskStrength, sizeof(_float)))) return E_FAIL;
+		if (FAILED(Ctx.pShader->Bind_RawValue("g_vColor", &Layer.vRenderColor, sizeof(_float4)))) return E_FAIL;
+		if (FAILED(Ctx.pShader->Bind_RawValue("g_iWorldFlags", &iWorldFlags, sizeof(_uint)))) return E_FAIL;
+		if (FAILED(Ctx.pShader->Bind_RawValue("g_fDissolve", &Ctx.fDissolve, sizeof(_float)))) return E_FAIL;
+
+		return S_OK;
+	}
+
+	HRESULT Bind_WorldShadow(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult)
+	{
+		const MESH_LAYER_IDX& Layer = *Ctx.pLayer;
+
+		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_DiffuseTexture", MTEX_TYPE::DIFFUSE,
+			Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)], DEFAULT_TEXTURE::MAGENTA)))
+			return E_FAIL;
+		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_UnknownTexture", MTEX_TYPE::UNKNOWN,
+			Layer.idx[ETOUI(MTEX_TYPE::UNKNOWN)], DEFAULT_TEXTURE::BLACK)))
+			return E_FAIL;
+		if (FAILED(Bind_WorldCommonParams(Ctx)))
+			return E_FAIL;
+
+		const _uint iShadowAlphaSource = static_cast<_uint>(MeshLayerProfile::Resolve_EnvShadowAlphaSourceFromLayer(Layer));
+		if (FAILED(Ctx.pShader->Bind_RawValue("g_iShadowAlphaSource", &iShadowAlphaSource, sizeof(_uint))))
+			return E_FAIL;
+
+		pOutResult->iPass = (0u != Ctx.iFallbackPass) ? Ctx.iFallbackPass : ETOUI(WORLD_PASS::SHADOW);
+		return S_OK;
+	}
+
+	HRESULT Bind_WorldDecal(const MESH_LAYER_BIND_CONTEXT& Ctx, MESH_LAYER_BIND_RESULT* pOutResult)
+	{
+		const MESH_LAYER_IDX& Layer = *Ctx.pLayer;
+
+		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_DiffuseTexture", MTEX_TYPE::DIFFUSE,
+			Layer.idx[ETOUI(MTEX_TYPE::DIFFUSE)], DEFAULT_TEXTURE::MAGENTA)))
+			return E_FAIL;
+		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_NormalTexture", MTEX_TYPE::NORMALS,
+			Layer.idx[ETOUI(MTEX_TYPE::NORMALS)], DEFAULT_TEXTURE::FLAT_NORMAL)))
+			return E_FAIL;
+		if (FAILED(MeshLayerBinder::Bind_TextureSafe(Ctx.pShader, Ctx.pModel, Ctx.pGI_Proxy, Ctx.iMesh, "g_MRATexture", MTEX_TYPE::METALNESS,
+			Layer.idx[ETOUI(MTEX_TYPE::METALNESS)], DEFAULT_TEXTURE::MRA)))
+			return E_FAIL;
+		if (FAILED(Bind_WorldCommonParams(Ctx)))
+			return E_FAIL;
+
+		const _float fHasNormal = (Ctx.pModel->Get_MeshTextureCount(Ctx.iMesh, MTEX_TYPE::NORMALS) > 0u) ? 1.f : 0.f;
+		const _float fHasMRA = (Ctx.pModel->Get_MeshTextureCount(Ctx.iMesh, MTEX_TYPE::METALNESS) > 0u) ? 1.f : 0.f;
+
+		if (FAILED(Ctx.pShader->Bind_RawValue("g_fDecalHasNormal", &fHasNormal, sizeof(_float)))) return E_FAIL;
+		if (FAILED(Ctx.pShader->Bind_RawValue("g_fDecalHasMRA", &fHasMRA, sizeof(_float)))) return E_FAIL;
+
+		pOutResult->iPass = (0u != Ctx.iFallbackPass) ? Ctx.iFallbackPass : ETOUI(WORLD_PASS::DECAL);
 		return S_OK;
 	}
 
