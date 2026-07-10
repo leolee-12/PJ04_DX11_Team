@@ -76,6 +76,8 @@
     <ClInclude Include="..\Public\Common_Ring03.h" />
     <ClInclude Include="..\Public\Deformable.h" />
     <ClInclude Include="..\Public\Kirby_DeformDump.h" />
+    <ClInclude Include="..\public\Dialogue_Arranger.h" />
+    <ClInclude Include="..\public\Dialogue_Director.h" />
     <ClInclude Include="..\Public\DroppedBubble.h" />
     <ClInclude Include="..\Public\EssenceBubble.h" />
     <ClInclude Include="..\public\GameContent_pch.h" />
@@ -120,7 +122,6 @@
     <ClInclude Include="..\Public\Kirby_Deform.h" />
     <ClInclude Include="..\Public\Kirby_Deform_Model.h" />
     <ClInclude Include="..\Public\Kirby_DeformCarBridge.h" />
-    <ClInclude Include="..\Public\Deformable.h" />
     <ClInclude Include="..\Public\Editable.h" />
     <ClInclude Include="..\Public\Kirby_GetDeform.h" />
     <ClInclude Include="..\Public\EnemyBomb.h" />
@@ -161,6 +162,7 @@
     <ClInclude Include="..\public\Projectile_Manager.h" />
     <ClInclude Include="..\public\Projectile_Movement.h" />
     <ClInclude Include="..\public\UI_CoordinatorContainer.h" />
+    <ClInclude Include="..\public\UI_CutFade.h" />
     <ClInclude Include="..\Public\UI_FlashCurtain.h" />
     <ClInclude Include="..\public\CutsceneActor.h" />
     <ClInclude Include="..\public\CutsceneGorilla.h" />
@@ -409,6 +411,7 @@
     <ClCompile Include="..\Private\Car_00_MilkyWay.cpp" />
     <ClCompile Include="..\Private\CommonHit.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformDump.cpp" />
+    <ClCompile Include="..\private\Dialogue_Arranger.cpp" />
     <ClCompile Include="..\Private\DroppedBubble.cpp" />
     <ClCompile Include="..\Private\EnvTrigger_EventPublisher.cpp" />
     <ClCompile Include="..\Private\EnvTrigger_RenderGlobals.cpp" />
@@ -500,6 +503,7 @@
     <ClCompile Include="..\private\Projectile_Manager.cpp" />
     <ClCompile Include="..\private\Projectile_Movement.cpp" />
     <ClCompile Include="..\private\UI_CoordinatorContainer.cpp" />
+    <ClCompile Include="..\private\UI_CutFade.cpp" />
     <ClCompile Include="..\Private\UI_FlashCurtain.cpp" />
     <ClCompile Include="..\private\CutsceneActor.cpp" />
     <ClCompile Include="..\private\CutsceneGorilla.cpp" />
@@ -674,6 +678,7 @@
     <ClCompile Include="..\Private\Vacuum.cpp" />
     <ClCompile Include="..\Private\InhaleContainer.cpp" />
     <ClCompile Include="..\Private\WalkSmoke.cpp" />
+    <ClCompile Include="..\public\Dialogue_Director.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl">
