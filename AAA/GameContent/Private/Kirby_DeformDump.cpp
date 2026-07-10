@@ -101,7 +101,6 @@ void CKirby_DeformDump::Enter_DeformDumpState(CKirby* pKirby, DEFORM_DUMP_STATE 
             // Parts
             COPY_ABILITY_TYPE m_eAbilityType = pKirby->Get_KirbyAbility()->Get_AbilityType();
             pKirby->Change_HatSocketMatrix(m_eAbilityType, pBody->Get_HatBoneMatirx());
-            pKirby->Set_AbilityPartsActive(m_eAbilityType, true);
 
             // ptr
             pKirby->Get_HeldDeformObj()->End_Deform(pKirby->Get_Transform()->Get_WorldMatrixPtr());
@@ -161,8 +160,12 @@ void CKirby_DeformDump::Exit_DeformDumpState(CKirby* pKirby, DEFORM_DUMP_STATE e
 
             break;
         case DEFORM_DUMP_STATE::SPIT_DEFORM:
-
+        {
+            // Weapon
+            COPY_ABILITY_TYPE m_eAbilityType = pKirby->Get_KirbyAbility()->Get_AbilityType();
+            pKirby->Set_AbilityPartsActive(m_eAbilityType, true);
             break;
+        }
     }
 }
 
