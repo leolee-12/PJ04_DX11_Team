@@ -2,6 +2,8 @@
 
 #include "Kirby_OnOffPart.h"
 
+#include "Damageable.h"
+
 NS_BEGIN(Engine)
 class CCollider;
 NS_END
@@ -40,8 +42,11 @@ public:
 	virtual void Put_OnBack(CKirby* pKirby, _bool bOn) override;
 
 public:
-	//À±¼®Çö Ãß°¡
-	void Reset_HitList() { m_HitTargets.clear(); }
+	void Begin_Hit(const ATTACK_INFO& tInfo, _bool bResetHitList = true);
+	void End_Hit(_bool bResetHitList = true);
+
+	void Reset_DamagedList() { m_DamagedTargets.clear(); }
+
 	void Set_HitBox(_bool bOn);
 
 private:
@@ -51,8 +56,9 @@ private:
 
 private:
 	CCollider* m_pHitBox{};
+	ATTACK_INFO m_tAttackInfo{};
 
-	unordered_set<CGameObject*> m_HitTargets;
+	unordered_set<CGameObject*> m_DamagedTargets;
 
 public:
 	static CKirby_Sword* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

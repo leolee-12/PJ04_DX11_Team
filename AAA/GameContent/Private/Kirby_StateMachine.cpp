@@ -23,6 +23,7 @@
 #include "Kirby_CutSceneGrabbed.h"
 #include "Kirby_QTE_Grabbed.h"
 #include "Kirby_CarFirstBreakWall.h"
+#include "Kirby_DeformCarBridge.h"
 #include "Kirby_Clear.h"
 
 CKirby_StateMachine::CKirby_StateMachine()
@@ -83,14 +84,37 @@ void CKirby_StateMachine::On_Damaged_KirbyStateMachine(const ATTACK_INFO& tInfo)
     m_pCurState->On_Damaged_KirbyState(m_pKirby, tInfo);
 }
 
-void CKirby_StateMachine::Request_GrabState_StateMachine(KIRBY_ATTACHMENT_CONTEXT eType)
+void CKirby_StateMachine::Request_Attachment_StateMachine(KIRBY_ATTACHMENT_CONTEXT eType)
 {
-    m_pCurState->Request_GrabState(m_pKirby, eType);
+    m_pCurState->Request_Attach(m_pKirby, eType);
 }
 
-void CKirby_StateMachine::Request_ReleaseGrabState_StateMachine(KIRBY_ATTACHMENT_END_REASON eType)
+void CKirby_StateMachine::Request_Attachment_End_StateMachine(KIRBY_ATTACHMENT_END_REASON eType)
 {
-    m_pCurState->Request_ReleaseGrabState(m_pKirby, eType);
+    m_pCurState->Request_Attach_End(m_pKirby, eType);
+}
+
+void CKirby_StateMachine::Request_PositionSync_StateMachine(const KIRBY_POSITION_SYNC_BEGIN_DESC* pDesc)
+{
+    switch (pDesc->eType)
+    {
+        case KIRBY_POSITION_SYNC_CONTEXT::CAR_BRIDGE:
+        {
+            Change_State(KIRBY_STATE_TYPE::DEFORM_CAR_BRIDGE);
+            break;
+        }
+        case KIRBY_POSITION_SYNC_CONTEXT::DEFAULT_SYNC:
+        {
+            break;
+        }
+    }
+
+    m_pCurState->Request_PositionSync(m_pKirby, pDesc);
+}
+
+void CKirby_StateMachine::Request_PositionSync_End_StateMachine(const KIRBY_POSITION_SYNC_END_DESC* pDesc)
+{
+    m_pCurState->Request_PositionEndSync(m_pKirby, pDesc);
 }
 
 void CKirby_StateMachine::Request_ClearStage_StateMachine(const CUTSCENE_STAGECLEAR* pDesc)
@@ -156,6 +180,7 @@ HRESULT CKirby_StateMachine::Init_State()
     if (FAILED(Register_State(KIRBY_STATE_TYPE::CUTSCENE_GRABBED, CKirby_CutSceneGrabbed::Create())))       return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::QTE_GRABBED, CKirby_QTE_Grabbed::Create())))                return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::CAR_FIRST_BREAK_WALL, CKirby_CarFirstBreakWall::Create()))) return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::DEFORM_CAR_BRIDGE, CKirby_DeformCarBridge::Create())))      return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::STAGE_CLEAR, CKirby_Clear::Create())))                      return E_FAIL;
 
     return S_OK;

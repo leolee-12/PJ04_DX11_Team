@@ -33,6 +33,8 @@
 #include "UI_CoordinatorContainer.h"
 #include "UI_MissionBoard.h"
 #include "UI_MissionPanel.h"
+#include "UI_LetterBox.h"
+#include "UI_TitleLogo.h"
 
 // UI Parts
 #include "UI_Image.h"
@@ -155,6 +157,7 @@
 #include "LD_SlopeBoardA.h"
 #include "LD_SlopeBoardC.h"
 #include "LD_DeformCarBreakWall.h"
+#include "LD_DeformObject.h"
 #include "LD_CopyEssence.h"
 
 // EnvObject
@@ -699,6 +702,8 @@ void CGameObject_Factory::Register_UIContainer()
     Register(CUICoordinatorContainer::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUICoordinatorContainer), LOADER());
     Register(CUI_MissionBoard::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_MissionBoard), LOADER());
     Register(CUI_MissionPanel::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_MissionPanel), LOADER());
+    Register(CUI_LetterBox::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_LetterBox), LOADER());
+    Register(CUI_TitleLogo::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_TitleLogo), LOADER());
 }
 
 void CGameObject_Factory::Register_NonAnimObject()
@@ -732,6 +737,10 @@ void CGameObject_Factory::Register_AnimObject()
     Register(CLD_DeformCarBreakWall::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_DeformCarBreakWall),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_DeformCarBreakWall::MODEL_PROTO_TAG,
             Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/DeformCarBreakWall/DeformCarBreakWall.ysh", false));));
+
+    Register(CLD_DeformObject::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_DeformObject),
+        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Proto_Component_Model_DeformCar"),
+            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/DeformCar/DeformCar.ysh", true));));
 
     Register(CLD_CopyEssence::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_CopyEssence),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_CopyEssence::MODEL_PROTO_TAG,

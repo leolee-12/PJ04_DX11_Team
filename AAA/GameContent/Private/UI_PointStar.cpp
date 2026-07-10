@@ -95,6 +95,11 @@ HRESULT CUI_PointStar::Ready_Events()
 			On_PointStarGained(pDesc);
 		});
 
+	Subscribe_Event(EventTag::HUD_SetVisible, [this](void* pData)
+		{
+			if (pData) Set_Active(*static_cast<_bool*>(pData));
+		});
+
 	return S_OK;
 }
 

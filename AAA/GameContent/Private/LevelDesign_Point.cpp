@@ -109,9 +109,7 @@ HRESULT CLevelDesign_Point::Validate_Initialized()
 	if (nullptr == pCatalog->pModelProtoTag || m_tPointDesc.wstrModelProtoTag != pCatalog->pModelProtoTag)
 		return E_FAIL;
 
-	if (nullptr == m_pShaderCom || nullptr == m_pModelCom || nullptr == m_pPickupCollider)
-		return E_FAIL;
-	if (!m_bPickupColliderRegistered)
+	if (nullptr == m_pShaderCom || nullptr == m_pModelCom || nullptr == m_pHurtBox)
 		return E_FAIL;
 
 	return S_OK;
@@ -125,11 +123,11 @@ void CLevelDesign_Point::Late_Update(_float fTimeDelta)
 	if (m_bRotate)
 		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
 
-	if (m_pPickupCollider->Is_Enabled())
+	if (m_pHurtBox->Is_Enabled())
 	{
-		m_pPickupCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+		m_pHurtBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 #ifdef _DEBUG
-		m_pGameInstance_Proxy->Add_DebugComponent(m_pPickupCollider);
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pHurtBox);
 #endif
 	}
 
@@ -206,7 +204,7 @@ HRESULT CLevelDesign_Point::Ready_Components()
 	if (FAILED(Ready_RenderComponents()))
 		return E_FAIL;
 
-	if (FAILED(Ready_PickupCollider()))
+	if (FAILED(Ready_HurtBox()))
 		return E_FAIL;
 
 	SetUp_Collider_Callback();
@@ -315,7 +313,7 @@ const _tchar* CLevelDesign_Point::Resolve_ModelProtoTag() const
 	return m_tPointDesc.wstrModelProtoTag.c_str();
 }
 
-HRESULT CLevelDesign_Point::Ready_PickupCollider()
+HRESULT CLevelDesign_Point::Ready_HurtBox()
 {
 	_float3 vMin = {};
 	_float3 vMax = {};
@@ -332,23 +330,22 @@ HRESULT CLevelDesign_Point::Ready_PickupCollider()
 	ColliderDesc.pOwner = this;
 	ColliderDesc.vCenter = vCenter;
 	ColliderDesc.fRadius = fBoundsRadius;
-	m_pPickupCollider = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, TEXT("Com_PickupCollider"),
+	m_pHurtBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, TEXT("Com_HurtBox"),
 		&ColliderDesc);
-	if (nullptr == m_pPickupCollider)
+	if (nullptr == m_pHurtBox)
 		return E_FAIL;
 
-	m_pGameInstance_Proxy->Register_Collider(m_pPickupCollider, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
-	m_bPickupColliderRegistered = true;
+	m_pGameInstance_Proxy->Register_Collider(m_pHurtBox, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
 
 	return S_OK;
 }
 
 void CLevelDesign_Point::SetUp_Collider_Callback()
 {
-	if (nullptr == m_pPickupCollider)
+	if (nullptr == m_pHurtBox)
 		return;
 
-	m_pPickupCollider->Set_OnEnter([this](CCollider* pOther) { Handle_Pickup(pOther); });
+	m_pHurtBox->Set_OnEnter([this](CCollider* pOther) { Handle_Pickup(pOther); });
 }
 
 void CLevelDesign_Point::Handle_Pickup(CCollider* pOther)
@@ -364,26 +361,11 @@ void CLevelDesign_Point::Handle_Pickup(CCollider* pOther)
 	Desc.iAmount = static_cast<_uint>(m_tPointDesc.iValue);
 	m_pGameInstance_Proxy->Publish(EventTag::Kirby_PointStarGained, &Desc);
 
-	if (m_pPickupCollider)
-		m_pPickupCollider->Set_Enabled(false);
+	if (m_pHurtBox)
+		m_pHurtBox->Set_Enabled(false);
 
-	Unregister_PickupCollider(false);
 	Set_Active(false);
 	m_pGameInstance_Proxy->Destroy_GameObject(this);
-}
-
-void CLevelDesign_Point::Unregister_PickupCollider(_bool bImmediate)
-{
-	if (nullptr == m_pPickupCollider || !m_bPickupColliderRegistered)
-		return;
-
-	const _uint iGroup = ETOUI(COLLISION_LAYER::ENV_TRIGGER);
-	if (bImmediate)
-		m_pGameInstance_Proxy->Immediate_Unregister(m_pPickupCollider, iGroup);
-	else
-		m_pGameInstance_Proxy->Request_Unregister(m_pPickupCollider, iGroup);
-
-	m_bPickupColliderRegistered = false;
 }
 
 CLevelDesign_Point* CLevelDesign_Point::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -414,8 +396,6 @@ CGameObject* CLevelDesign_Point::Clone(void* pArg)
 
 void CLevelDesign_Point::Free()
 {
-	Unregister_PickupCollider(true);
-
 	__super::Free();
 }
 

@@ -11,7 +11,7 @@ struct LD_SPAWN_SPEC;
 
 class CLD_SlopeBoardA final : public CLD_EventObject
 {
-	GENERATED_BODY(CLD_SlopeBoardA);
+	GENERATED_BODY(CLD_SlopeBoardA)
 
 public:
 	static constexpr const _tchar* OBJECT_NAME = L"SlopeBoardA";
@@ -40,8 +40,7 @@ public:
 	static CGameObject* Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
 private:
-	CCollider* m_pInteractionTrigger = { nullptr };
-	_bool m_bInteractionTriggerRegistered = { false };
+	CCollider* m_pTrigger = { nullptr };
 
 	STATE m_eState = { STATE::IDLE };
 	_float m_fElapsed = { 0.f };
@@ -55,10 +54,10 @@ private:
 	HRESULT Ready_RenderComponent();
 	HRESULT Ready_PhysicsComponent();
 	HRESULT Update_ToFallenPose();
-	HRESULT Ready_CollisionComponent();
+	HRESULT Ready_Trigger();
 
-	void SetUp_CollisionCallback();
-	void Handle_CollisionEnter(CCollider* pOther);
+	void SetUp_Collider_Callback();
+	void Handle_TriggerEnter(CCollider* pOther);
 	void On_Event();
 
 public:

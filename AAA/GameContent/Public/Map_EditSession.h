@@ -62,21 +62,24 @@ public:
 	void Set_ManifestPath(const _wstring& strManifestPath);
 
 	_uint Get_DeletedEnvCount() const { return static_cast<_uint>(m_DeletedMapPreviewEnvOrder.size()); }
+	_uint Get_DeletedLevelDesignCount() const { return static_cast<_uint>(m_DeletedMapPreviewLDOrder.size()); }
 
 	void Register_PreviewObject(const _wstring& strLayerTag, const _wstring& strObjectTag, CGameObject* pObject);
 
 	void Unregister_PreviewObject(CGameObject* pObject);
 	_bool Can_DeleteAsEnvOverride(CGameObject* pObject) const;
+	_bool Can_DeleteAsLevelDesignOverride(CGameObject* pObject) const;
+
 	_bool Track_DeletedPreviewObject(CGameObject* pObject);
-	_bool Track_EditedPreviewObject(CGameObject* pObject, const MAP_ENV_EDITED_DESC& Edit);
+	_bool Track_EditedPreviewObject(CGameObject* pObject, const EDIT_OBJECT_OVERRIDE_DESC& Edit);
 	_bool Clear_EditedPreviewObject(CGameObject* pObject);
-	_bool Try_GetEditedEnvObject(const _wstring& strStableKey, MAP_ENV_EDITED_DESC* pOutEdit) const;
-	_bool Track_EditedMapSection(const _wstring& strSectionKey, const MAP_ENV_EDITED_DESC& Edit);
+	_bool Try_GetEditedEnvObject(const _wstring& strStableKey, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const;
+	_bool Track_EditedMapSection(const _wstring& strSectionKey, const EDIT_OBJECT_OVERRIDE_DESC& Edit);
 	_bool Clear_EditedMapSection(const _wstring& strSectionKey);
-	_bool Try_GetEditedMapSection(const _wstring& strSectionKey, MAP_ENV_EDITED_DESC* pOutEdit) const;
-	_bool Track_EditedLevelDesignObject(CGameObject* pObject, const MAP_LD_EDITED_DESC& Edit);
+	_bool Try_GetEditedMapSection(const _wstring& strSectionKey, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const;
+	_bool Track_EditedLevelDesignObject(CGameObject* pObject, const EDIT_OBJECT_OVERRIDE_DESC& Edit);
 	_bool Clear_EditedLevelDesignObject(CGameObject* pObject);
-	_bool Try_GetEditedLevelDesignObject(CGameObject* pObject, MAP_LD_EDITED_DESC* pOutEdit) const;
+	_bool Try_GetEditedLevelDesignObject(CGameObject* pObject, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const;
 
 	_uint Get_EditedMapSectionCount() const { return static_cast<_uint>(m_tEditData.OverrideDesc.EditedMapSections.size()); }
 
@@ -90,6 +93,11 @@ public:
 	_bool Restore_DeletedEnvItem(const _wstring& strStableKey);
 	void Restore_AllDeletedEnvItems();
 	void Rebuild_DeletedEnvItems(const vector<ENV_OBJECT_DESC>& DeletedDescs);
+
+	const vector<_wstring>& Get_DeletedLevelDesignOrder() const { return m_DeletedMapPreviewLDOrder; }
+	_bool Try_GetDeletedLevelDesignItem(const _wstring& strStableKey, MAP_EDIT_LD_ITEM* pOutItem) const;
+	_bool Restore_DeletedLevelDesignItem(const _wstring& strStableKey);
+	void Restore_AllDeletedLevelDesignItems();
 
 	void Clear_RuntimeState();
 
@@ -126,11 +134,14 @@ private:
 	unordered_map<_wstring, MAP_EDIT_ENV_ITEM> m_DeletedMapPreviewEnvItems;
 	vector<_wstring> m_DeletedMapPreviewEnvOrder;
 
+	unordered_map<CGameObject*, MAP_EDIT_LD_ITEM> m_MapPreviewLDItems;
+	unordered_map<_wstring, MAP_EDIT_LD_ITEM> m_DeletedMapPreviewLDItems;
+	vector<_wstring> m_DeletedMapPreviewLDOrder;
+
 	unordered_map<CGameObject*, Client::MAP_ADD_OBJECT> m_AddedObjectsByRuntime;
 	unordered_map<CGameObject*, MAP_EDIT_ADDED_ITEM> m_AddedObjectUiItems;
 	vector<CGameObject*> m_AddedObjectOrder;
 
-	unordered_map<CGameObject*, MAP_EDIT_LD_ITEM> m_MapPreviewLDItems;
 
 	_bool m_bStageLoaded = { false };
 	_bool m_bEnvLoaded = { false };
@@ -144,6 +155,7 @@ private:
 	static _wstring Build_LevelDesignDisplayName(const LD_OBJECT_DESC& Desc);
 
 	void Rebuild_DeletedEnvItemsFromWorkingDelta();
+	void Rebuild_DeletedLevelDesignItemsFromWorkingDelta();
 	_bool Remove_AddedObjectDescByKey(const _wstring& strLayerTag, const _wstring& strObjectTag);
 
 public:

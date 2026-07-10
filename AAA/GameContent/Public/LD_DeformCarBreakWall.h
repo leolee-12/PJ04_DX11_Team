@@ -11,7 +11,7 @@ struct LD_SPAWN_SPEC;
 
 class CLD_DeformCarBreakWall final : public CLD_EventObject
 {
-	GENERATED_BODY(CLD_DeformCarBreakWall);
+	GENERATED_BODY(CLD_DeformCarBreakWall)
 
 public:
 	static constexpr const _tchar* OBJECT_NAME = L"DemoDeformCarFirst";
@@ -40,7 +40,7 @@ public:
 	static CGameObject*	Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
 private:
-	CCollider*	m_pBoostTrigger = { nullptr };
+	CCollider*	m_pTrigger = { nullptr };
 	STATE		m_eState = { STATE::IDLE };
 	_bool		m_bMeshHiddenAtFrame = { false };
 
@@ -49,10 +49,10 @@ private:
 
 	HRESULT Ready_RenderComponent();
 	HRESULT Ready_WallRigidStatic(const BoundingBox& LocalBounds);
-	HRESULT Ready_BoostTrigger(const BoundingBox& LocalBounds);
+	HRESULT Ready_Trigger(const BoundingBox& LocalBounds);
 
-	void	SetUp_BoostTriggerCallback();
-	void	Handle_BoostTrigger(CCollider* pOther);
+	void	SetUp_Collider_Callback();
+	void	Handle_TriggerEnter(CCollider* pOther);
 	void	On_Event();
 
 public:

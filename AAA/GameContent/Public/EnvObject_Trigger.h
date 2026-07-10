@@ -15,7 +15,12 @@ class CLIENT_DLL CEnvObject_Trigger abstract : public CEnvObject
 	PROPERTY(_float3, m_vAreaCenter, L"Area Center", L"Trigger")
 	PROPERTY(_float3, m_vAreaSize, L"Area Size", L"Trigger")
 	PROPERTY(_float4, m_vAreaRot, L"Area Rotation", L"Trigger")
+
 	PROPERTY(_bool, m_bDebugDrawTrigger, L"Debug Draw", L"Trigger")
+	PROPERTY(_wstring, m_strDebugTextFontTag, L"Debug Text Font", L"Trigger")
+	PROPERTY(_float, m_fDebugTextScale, L"Debug Text Scale", L"Trigger")
+	PROPERTY(_float4, m_vDebugTextColor, L"Debug Text Color", L"Trigger")
+	PROPERTY(_float4, m_vDebugBoxColor, L"Debug Box Color", L"Trigger")
 
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_EnvObject_Trigger";
@@ -33,16 +38,20 @@ public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
 protected:
+	CCollider* m_pCollider = { nullptr };
+
+protected:
 	virtual void OnTriggerEnter(CCollider* pOther);
 	virtual void OnTriggerStay(CCollider* pOther);
 	virtual void OnTriggerExit(CCollider* pOther);
 
-protected:
-	CCollider* m_pCollider = { nullptr };
-
-protected:
 	HRESULT Ready_TriggerCollider();
 	void	SetUp_Collider_Callback();
+
+#ifdef _DEBUG
+protected:
+	virtual _wstring Get_DebugLabel() const;
+#endif
 
 protected:
 	virtual void Free() override;

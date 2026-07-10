@@ -7,7 +7,7 @@ struct LD_SPAWN_SPEC;
 
 class CLD_Stage1BossDemo final : public CLD_EventObject
 {
-	GENERATED_BODY(CLD_Stage1BossDemo);
+	GENERATED_BODY(CLD_Stage1BossDemo)
 
 public:
 	static constexpr const _tchar* OBJECT_NAME = L"Level1BossDemoBg";

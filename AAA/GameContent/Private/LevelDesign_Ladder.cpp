@@ -74,7 +74,7 @@ HRESULT CLevelDesign_Ladder::Validate_Initialized()
 	if (m_fSegmentStepY <= 0.f)
 		return E_FAIL;
 
-	if (nullptr == m_pShaderCom || nullptr == m_pCollider)
+	if (nullptr == m_pShaderCom || nullptr == m_pTrigger)
 		return E_FAIL;
 
 	for (_uint i = 0; i < SEGMENT::_COUNT; ++i)
@@ -90,11 +90,11 @@ void CLevelDesign_Ladder::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
-	if (m_pCollider->Is_Enabled())
+	if (m_pTrigger->Is_Enabled())
 	{
-		m_pCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+		m_pTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 #ifdef _DEBUG
-		m_pGameInstance_Proxy->Add_DebugComponent(m_pCollider);
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pTrigger);
 #endif // _DEBUG
 
 	}
@@ -222,6 +222,13 @@ _bool CLevelDesign_Ladder::Is_BottomCell(_int iCellIndex) const
 	return m_iTopCellIndex >= m_iBottomCellIndex && iCellIndex == m_iBottomCellIndex;
 }
 
+void CLevelDesign_Ladder::Collect_EditModelSlots(vector<EDITABLE_MODEL_SLOT>* pOutSlots) const
+{
+	Add_EditModelSlot(pOutSlots, TEXT("Top"), EDITABLE_MODEL_KIND::NONANIM, m_ModelComs[SEGMENT::TOP]);
+	Add_EditModelSlot(pOutSlots, TEXT("Mid"), EDITABLE_MODEL_KIND::NONANIM, m_ModelComs[SEGMENT::MID]);
+	Add_EditModelSlot(pOutSlots, TEXT("Bot"), EDITABLE_MODEL_KIND::NONANIM, m_ModelComs[SEGMENT::BOT]);
+}
+
 HRESULT CLevelDesign_Ladder::Ready_Components()
 {
 	if (FAILED(Ready_RenderComponents()))
@@ -234,7 +241,7 @@ HRESULT CLevelDesign_Ladder::Ready_Components()
 	if (FAILED(Calculate_TopBottomCellIndices()))
 		return E_FAIL;
 
-	if (FAILED(Ready_LadderCollider()))
+	if (FAILED(Ready_Trigger()))
 		return E_FAIL;
 
 	return S_OK;
@@ -261,7 +268,7 @@ HRESULT CLevelDesign_Ladder::Ready_RenderComponents()
 	return S_OK;
 }
 
-HRESULT CLevelDesign_Ladder::Ready_LadderCollider()
+HRESULT CLevelDesign_Ladder::Ready_Trigger()
 {
 	CCollider::COLLIDER_DESC Desc{};
 	Desc.pOwner = this;
@@ -269,11 +276,11 @@ HRESULT CLevelDesign_Ladder::Ready_LadderCollider()
 	Desc.fRadius = 0.5f;
 	Desc.vCenter = _float3(0.f, -0.75f, -1.f);
 
-	m_pCollider = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag, TEXT("Com_Collider"), &Desc);
-	if (nullptr == m_pCollider)
+	m_pTrigger = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag, TEXT("Com_Trigger"), &Desc);
+	if (nullptr == m_pTrigger)
 		return E_FAIL;
 
-	m_pGameInstance_Proxy->Register_Collider(m_pCollider, ETOUI(COLLISION_LAYER::ENV_LADDER));
+	m_pGameInstance_Proxy->Register_Collider(m_pTrigger, ETOUI(COLLISION_LAYER::ENV_LADDER));
 
 	return S_OK;
 }

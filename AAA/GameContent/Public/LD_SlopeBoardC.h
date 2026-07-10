@@ -15,7 +15,7 @@ struct LD_SPAWN_SPEC;
 
 class CLD_SlopeBoardC final : public CLD_EventObject
 {
-	GENERATED_BODY(CLD_SlopeBoardC);
+	GENERATED_BODY(CLD_SlopeBoardC)
 
 public:
 	static constexpr const _tchar* OBJECT_NAME = L"SlopeBoardC";
@@ -24,7 +24,7 @@ public:
 	static constexpr const _tchar* LAYER_TAG = L"Layer_LevelDesign_Gimmick";
 
 private:
-	enum class STATE { IDLE, PLAYING, PLAYED };
+	enum class STATE { IDLE, PLAYING, PLAYED, DONE };
 
 private:
 	CLD_SlopeBoardC(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -42,7 +42,7 @@ public:
 	static _bool Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
 
 private:
-	CCollider* m_pInteractionCollider = { nullptr };
+	CCollider* m_pTrigger = { nullptr };
 	physx::PxRigidStatic* m_pHorizontalPhysicsActor = { nullptr };
 	physx::PxRigidStatic* m_pVerticalPhysicsActor = { nullptr };
 
@@ -55,13 +55,16 @@ private:
 	HRESULT Ready_RenderComponents();
 	HRESULT Ready_PhysicsBoxes();
 	HRESULT Ready_PhysicsBox(const _float3& vWorldCenter, const _float3& vWorldHalfExtents, physx::PxRigidStatic** ppOutActor);
-	HRESULT Ready_InteractionCollider();
+	HRESULT Ready_Trigger();
 
 	void Release_PhysicsBox(physx::PxRigidStatic** ppActor);
 	void Release_PhysicsBoxes();
 
-	void Handle_Interaction(CCollider* pOther);
+	void SetUp_Collider_Callback();
+	void Handle_TriggerEnter(CCollider* pOther);
 	void On_Event();
+
+	virtual void On_AnimEvent(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase) override;
 
 public:
 	static CGameObject* Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

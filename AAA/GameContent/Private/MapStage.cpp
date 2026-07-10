@@ -228,6 +228,7 @@ HRESULT CMapStage::Ready_Sections(const MAP_STAGE_DESC* pDesc)
 			return E_FAIL;
 		}
 
+		pSection->Set_StageName(m_strStageName);
 		pSection->Set_ParentMatrix(m_pTransformCom->Get_WorldMatrixPtr());
 		m_Sections.push_back(pSection);
 	}

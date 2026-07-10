@@ -35,6 +35,7 @@
 #include "LevelDesign_Ladder.h"
 
 #include "EssenceBubble.h"
+#include "LD_DeformObject.h"
 
 // 임시
 #include "Bubble_Manager.h"
@@ -126,6 +127,8 @@ void CKirby::Update(_float fTimeDelta)
 
     Update_InvincibilityHitFlash();
 
+    Get_CurrentDeformModel()->Set_GoundNormal(m_pMovement->Get_GroundNormal());
+
     if (m_pGameInstance_Proxy->Key_Down(DIK_B))
     {
         CTransform* pT = Get_Transform();
@@ -187,6 +190,11 @@ void CKirby::On_Deserialized()
 {
     if (m_pMovement)
         m_pMovement->Sync_To_Controller();
+}
+
+_bool CKirby::Dispatch_BodyAnimEventToAbility(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+{
+    return m_pKirby_Ability->Handle_BodyAnimEvent(this, e, ePhase);
 }
 
 void CKirby::Set_AbilityPartsActive(COPY_ABILITY_TYPE eAbilityType, _bool bOn, _bool bOnlyWeapon)
@@ -285,6 +293,21 @@ CKirby_Deform_Model* CKirby::Find_DeformModel(const wchar_t* pPartTag)
         return nullptr;
 
     return dynamic_cast<CKirby_Deform_Model*>(iter->second);
+}
+
+void CKirby::Set_CollisionSize(_float fCCTRadius, _float fCCTHeight)
+{
+    m_pController->Set_CapsuleSize(fCCTRadius, fCCTHeight);
+
+    CCollider::COLLIDER_DESC HurtDesc{};
+    HurtDesc.pOwner = this;
+    HurtDesc.vCenter = _float3(0.f, 0.f, 0.f);
+    HurtDesc.fRadius = fCCTRadius + s_fHurtBoxRadiusPadding;
+    HurtDesc.fHeight = fCCTHeight;
+
+    m_KirbyColliders[HURT_BOX]->Reset_Bounding(HurtDesc);
+
+    m_KirbyColliders[HURT_BOX]->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 }
 
 void CKirby::Add_MoveDir(const _float3& vWishDir)
@@ -400,39 +423,37 @@ _bool CKirby::Can_AbilityDump()
 HRESULT CKirby::Ready_Components()
 {
     // Controller
-    _float3 vFootPos;
-    XMStoreFloat3(&vFootPos, m_pTransformCom->Get_State(STATE::POSITION));
-
     m_pController = Add_Component<CController>(TEXT("Com_Controller"),
         CController::Create(m_pDevice, m_pContext));
     if (m_pController == nullptr)
         return E_FAIL;
 
     CController::CONTROLLER_DESC ctrlDesc{};
-    ctrlDesc.vFootPos = vFootPos;
+    ctrlDesc.vFootPos = { 0.f ,0.f, 0.f };
     ctrlDesc.fRadius = s_fCCT_Radius;
     ctrlDesc.fHeight = s_fCCT_Height;
     ctrlDesc.pOwner = this;
     if (FAILED(m_pController->Initialize(&ctrlDesc)))
         return E_FAIL;
 
-
     // Movement
     m_pMovement = Add_Component<CMovement_Child>(TEXT("Com_Movement"), CMovement_Child::Create(m_pDevice, m_pContext));
-    if (m_pMovement == nullptr) return E_FAIL;
+    if (m_pMovement == nullptr)
+        return E_FAIL;
 
     m_pMovement->Set_Refs(m_pTransformCom, m_pController->Get_Raw());
 
-    // Cllider
+    // Collider
     m_KirbyColliders.resize(COLLIDER_END);
 
     // Collider HurtBox
     CCollider::COLLIDER_DESC ColliderDesc{};
     ColliderDesc.pOwner = this;
-    ColliderDesc.vCenter = _float3(vFootPos.x, vFootPos.y + (s_fCCT_Radius + 0.1f), vFootPos.z);
-    ColliderDesc.fRadius = s_fCCT_Radius + 0.1f;
+    ColliderDesc.vCenter = _float3(0.f, 0.f, 0.f); // 발 위치임
+    ColliderDesc.fRadius = s_fCCT_Radius + s_fHurtBoxRadiusPadding;
+    ColliderDesc.fHeight = s_fCCT_Height;
 
-    m_KirbyColliders[KIRBY_COLLIDER::HURT_BOX] = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
+    m_KirbyColliders[KIRBY_COLLIDER::HURT_BOX] = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag,
         TEXT("HurtBox_Com"), &ColliderDesc);
     if (m_KirbyColliders[KIRBY_COLLIDER::HURT_BOX] == nullptr)
         return E_FAIL;
@@ -460,6 +481,7 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::MONSTER_PROJECTILE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::ENV_HURT));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::DROPPED_BUBBLE));
 
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HURT));
@@ -469,17 +491,23 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_TRIGGER));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_LADDER));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ESSENCE_BUBBLE));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::DEFORM_OBJECT));
 
-    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT),        ETOUI(COLLISION_LAYER::MONSTER_HURT));
-    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT),        ETOUI(COLLISION_LAYER::ENV_HURT));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT), ETOUI(COLLISION_LAYER::MONSTER_HURT));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT), ETOUI(COLLISION_LAYER::ENV_HURT));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HIT), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
+
 
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE), ETOUI(COLLISION_LAYER::ENV_HURT));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
 
     // Kirby_DeformCar_Main
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::CAR_BOOST), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::CAR_BOOST), ETOUI(COLLISION_LAYER::ENV_TRIGGER));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::CAR_BOOST), ETOUI(COLLISION_LAYER::ENV_HURT));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::CAR_BOOST), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
 
     return S_OK;
 }
@@ -524,9 +552,13 @@ HRESULT CKirby::SetUp_Collider_Callback()
                 if (pEssenceBubble == nullptr)
                     return;
 
-                if(pEssenceBubble->Is_Available())
+                if (pEssenceBubble->Is_Available())
                     m_pKirby_StateMachine->Get_EssenceBubble(pEssenceBubble->Get_Ability());
             }
+            else if (iGroup == ETOUI(COLLISION_LAYER::DEFORM_OBJECT))
+            {
+                Set_TriggerDeformObj(static_cast<CLD_DeformObject*>(pGameObject));
+            }           
         }
     );
 
@@ -557,6 +589,10 @@ HRESULT CKirby::SetUp_Collider_Callback()
             {
                 Clear_Ladder();
                 return;
+            }
+            else if (iGroup == ETOUI(COLLISION_LAYER::DEFORM_OBJECT))
+            {
+                Set_TriggerDeformObj(nullptr);
             }
         }
     );
@@ -691,12 +727,13 @@ HRESULT CKirby::Ready_Events()
         }
     );
 
+    // Attach
     Subscribe_Event(EventTag::Kirby_AttachmentBegin,
         [this](void* pData)
         {
             KIRBY_ATTACHMENT_BEGIN_DESC* pDesc = static_cast<KIRBY_ATTACHMENT_BEGIN_DESC*>(pData);
             Set_CutsceneGrabTarget(pDesc);
-            m_pKirby_StateMachine->Request_GrabState_StateMachine(pDesc->eType);
+            m_pKirby_StateMachine->Request_Attachment_StateMachine(pDesc->eType);
         }
     );
 
@@ -705,10 +742,28 @@ HRESULT CKirby::Ready_Events()
         {
             const auto* pDesc = static_cast<KIRBY_ATTACHMENT_END_DESC*>(pData);
             Clear_CutsceneGrabTarget();
-            m_pKirby_StateMachine->Request_ReleaseGrabState_StateMachine(pDesc->eType);
+            m_pKirby_StateMachine->Request_Attachment_End_StateMachine(pDesc->eType);
         }
     );
 
+    // Pos
+    Subscribe_Event(EventTag::Kirby_PositionSyncBegin,
+        [this](void* pData)
+        {
+            const auto* pDesc = static_cast<KIRBY_POSITION_SYNC_BEGIN_DESC*>(pData);
+            m_pKirby_StateMachine->Request_PositionSync_StateMachine(pDesc);
+        }
+    );
+
+    Subscribe_Event(EventTag::Kirby_PositionSyncEnd,
+        [this](void* pData)
+        {
+            const auto* pDesc = static_cast<KIRBY_POSITION_SYNC_END_DESC*>(pData);
+            m_pKirby_StateMachine->Request_PositionSync_End_StateMachine(pDesc);
+        }
+    );
+
+    // Clear
     Subscribe_Event(EventTag::Cutscene_StageClear,
         [this](void* pData)
         {

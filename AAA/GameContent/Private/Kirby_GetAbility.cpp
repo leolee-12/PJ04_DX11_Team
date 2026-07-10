@@ -34,13 +34,16 @@ void CKirby_GetAbility::Enter(CKirby* pKirby, _int iFlag)
     pKirby->Set_AbilityPartsActive(pPreAbility->Get_AbilityType(), false);
     pKirby->Apply_ChangeKirbyAbility();
 
+
     CKirby_Ability* pNewAbility = pKirby->Get_KirbyAbility();
     pNewAbility->Clear_Overlay(pKirby, 1, 0.1f);
-    pNewAbility->Play_AbilityAni(pKirby, ABILITY_ANI::GET_ABILITY);
+    if (iFlag == GETABILITY_STATE_FLAG::ESSENCE)
+        pNewAbility->Play_AbilityAni(pKirby, ABILITY_ANI::COPY);
+    else
+        pNewAbility->Play_AbilityAni(pKirby, ABILITY_ANI::GET_ABILITY);
 
+    m_iGetAbilityStateFlag = iFlag;
     m_bPartsOn = false;
-    m_bCloseEye = false;
-    m_bOpenMouse = false;
 
     KIRBY_ABILITY_CHANGED tDesc{};
     tDesc.bBegin = true;
@@ -76,8 +79,6 @@ void CKirby_GetAbility::Update(CKirby* pKirby, const _float fTimeDelta)
     }
 
     Parts_On(pKirby, fRatio);
-    Close_Eye(pBody, fRatio);
-    Open_Mouse(pBody, fRatio);
 }
 
 void CKirby_GetAbility::Exit(CKirby* pKirby)
@@ -107,38 +108,25 @@ void CKirby_GetAbility::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO&
 
 void CKirby_GetAbility::Parts_On(CKirby* pKirby, _float fRatio)
 {
-    if (m_bPartsOn == false && fRatio >= 0.3f)
+    if (m_iGetAbilityStateFlag == GETABILITY_STATE_FLAG::ESSENCE)
     {
-        pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), true);
+        if (m_bPartsOn == false && fRatio >= 0.0f)
+        {
+            pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), true);
 
-        m_bPartsOn = true;
+            m_bPartsOn = true;
+        }
     }
-}
-
-void CKirby_GetAbility::Close_Eye(CKirby_Body* pBody, _float fRatio)
-{
-    if (m_bCloseEye == false && fRatio >= 0.3f && fRatio < 0.55f)
+    else
     {
-        pBody->Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);
+        if (m_bPartsOn == false && fRatio >= 0.3f)
+        {
+            pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), true);
 
-        m_bCloseEye = true;
+            m_bPartsOn = true;
+        }
     }
-    else if (m_bCloseEye == true && fRatio >= 0.55f)
-    {
-        pBody->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
 
-        m_bCloseEye = false;
-    }
-}
-
-void CKirby_GetAbility::Open_Mouse(CKirby_Body* pBody, _float fRatio)
-{
-    if (m_bOpenMouse == false && fRatio >= 0.55f)
-    {
-        pBody->Set_KirbyMouth(KIRBY_MOUTH_STATE::SMILE_OPEN);
-
-        m_bOpenMouse = true;
-    }
 }
 
 CKirby_GetAbility* CKirby_GetAbility::Create()

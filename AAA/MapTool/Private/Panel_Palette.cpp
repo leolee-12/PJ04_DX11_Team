@@ -4,6 +4,7 @@
 #include "Level_Edit.h"
 #include "GameObject_Factory.h"
 #include "LD_AudioArea.h"
+#include "LD_DeformObject.h"
 
 #include "GameInstance.h"
 
@@ -57,10 +58,15 @@ void CPanel_Palette::Render()
 					{
 						pLevel->Begin_PlaceMode(strTag, CLD_AudioArea::LAYER_TAG);
 					}
-					else
+					else if (category == L"LEVELDESIGN_OBJECT" && strTag == CLD_AudioArea::PROTOTYPE_TAG)
 					{
-						pLevel->Begin_PlaceMode(strTag, L"Default_Layer");
+						pLevel->Begin_PlaceMode(strTag, CLD_AudioArea::LAYER_TAG);
 					}
+					else if (category == L"LEVELDESIGN_OBJECT" && strTag == CLD_DeformObject::PROTOTYPE_TAG)
+					{
+							pLevel->Begin_PlaceMode(strTag, CLD_DeformObject::LAYER_TAG);
+					}
+
 				}
 			}
 			ImGui::TreePop();

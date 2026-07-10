@@ -32,8 +32,9 @@ HRESULT CKirby_Ability::Initialize()
 
     Set_FullBodyAni(ABILITY_ANI::LANDING, "Landing", false, false, 0.05f, 1.f);
 
-    Set_FullBodyAni(ABILITY_ANI::GET_ABILITY, "GetAbilityFirst", false, false, 0.1f, 2.5f);
-    Set_FullBodyAni(ABILITY_ANI::ABILITY_DUMP, "AbilityDump", false, false, 0.1f, 2.5f);
+    Set_FullBodyAni(ABILITY_ANI::GET_ABILITY,   "GetAbilityFirst", false, false, 0.1f, 2.5f);
+    Set_FullBodyAni(ABILITY_ANI::COPY,          "Copy", false, false, 0.1f, 2.5f);
+    Set_FullBodyAni(ABILITY_ANI::ABILITY_DUMP,  "AbilityDump", false, false, 0.1f, 2.5f);
 
     Set_FullBodyAni(ABILITY_ANI::FLIGHT_START, "FlightStart", false, false, 0.1f, 2.25f);
     Set_FullBodyAni(ABILITY_ANI::FLIGHT, "Flight", false, true, 0.1f, 2.f);
@@ -52,6 +53,11 @@ HRESULT CKirby_Ability::Initialize()
     Set_FullBodyAni(ABILITY_ANI::SLIDE_END, "SlideEnd", false, false, 0.1f, 1.5f);
 
     return S_OK;
+}
+
+_bool CKirby_Ability::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+{
+    return false;
 }
 
 const CAnimator::ANI_PLAY_INFO* CKirby_Ability::Get_AniInfo(ABILITY_ANI eAbilityAni)

@@ -10,12 +10,17 @@ namespace Client
 {
     class CMonster;
     class IInhalable;
+    class IDeformable;
 
     namespace EventTag
     {
         // 커비 부착
         inline constexpr const _tchar* Kirby_AttachmentBegin = L"Kirby.Attachment.Begin";
         inline constexpr const _tchar* Kirby_AttachmentEnd = L"Kirby.Attachment.End";
+
+        // Kirby 이동
+        inline constexpr const _tchar* Kirby_PositionSyncBegin = L"Kirby.Position.Sync.Begin";
+        inline constexpr const _tchar* Kirby_PositionSyncEnd = L"Kirby.Position.Sync.End";
 
         // 커비 어빌리티 / UI
         inline constexpr const _tchar* Kirby_PointStarGained = L"Kirby.PointStarGained";
@@ -44,8 +49,11 @@ namespace Client
         inline constexpr const _tchar* Camera_Rumble = L"Camera.Rumble";
         inline constexpr const _tchar* BossCam_Focus = L"BossCam_Focus";
 
-        // Fx
+        // Screen Fx
         inline constexpr const _tchar* FullScreen_Flash = L"Fx.FullScreenFlashOn";
+        inline constexpr const _tchar* Letterbox_Begin = L"Letterbox.Begin";
+        inline constexpr const _tchar* Letterbox_End = L"Letterbox.End";
+        inline constexpr const _tchar* FadeOut_Start = L"FadeOut_Start";
         
         // 맵 
         inline constexpr const _tchar* Stage1_Step2_CarBreakMap = L"Stage1-2.CarBreakMap";
@@ -61,6 +69,7 @@ namespace Client
         inline constexpr const _tchar* StageClear_UIStarted = L"StageClear.UIStarted";
         inline constexpr const _tchar* StageClear_SequenceFinished = L"StageClear.Finished";
         inline constexpr const _tchar* HUD_SetVisible = L"HUD.SetVisible";
+        inline constexpr const _tchar* TitleLogo_Show = L"TitleLogo.Show";
     }
 
 
@@ -90,6 +99,9 @@ namespace Client
     {
         KIRBY_ATTACHMENT_END_REASON eType = { KIRBY_ATTACHMENT_END_REASON::DEFAULT_RELEASE };
     };
+
+    
+
 #pragma endregion
 
 #pragma region 포인터 질의
@@ -184,6 +196,32 @@ namespace Client
         STAGECLEAR_ANIM eAnim{ STAGECLEAR_ANIM::_COUNT };
         _float fAnimSpeed { 1.f };
         _float fBlendDuration = { 0.f };
+    };
+
+    // Kirby 이동
+    enum class KIRBY_POSITION_SYNC_CONTEXT : _uint
+    {
+        CAR_BRIDGE,
+        DEFAULT_SYNC
+    };
+
+    struct KIRBY_POSITION_SYNC_BEGIN_DESC
+    {
+        KIRBY_POSITION_SYNC_CONTEXT eType = { KIRBY_POSITION_SYNC_CONTEXT::DEFAULT_SYNC };
+        _float4x4 AnchorWorld{};
+        _float fAnimSpeed{ 1.f };
+        _float fBlendDuration = { 0.f };
+    };
+
+    enum class KIRBY_POSITION_SYNC_END_REASON : _uint
+    {
+        CAR_BRIDGE_END,
+        DEFAULT_SYNC_END
+    };
+
+    struct KIRBY_POSITION_SYNC_END_DESC
+    {
+        KIRBY_POSITION_SYNC_END_REASON eType = { KIRBY_POSITION_SYNC_END_REASON::DEFAULT_SYNC_END };
     };
 #pragma endregion
 

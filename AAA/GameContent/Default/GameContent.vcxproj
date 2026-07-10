@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Public\AbilityBubbleEffect.h" />
     <ClInclude Include="..\Public\Ability_Bubble.h" />
     <ClInclude Include="..\Public\Ability_Model.h" />
     <ClInclude Include="..\Public\Ancor_WorkingDirectory.h" />
@@ -48,6 +47,7 @@
     <ClInclude Include="..\Public\BrontoBurt_State_Idle.h" />
     <ClInclude Include="..\Public\BrontoBurt_State_Return.h" />
     <ClInclude Include="..\Public\Bubble.h" />
+    <ClInclude Include="..\Public\BubbleAura.h" />
     <ClInclude Include="..\Public\Bubble_Manager.h" />
     <ClInclude Include="..\public\Cage_WaddleDee.h" />
     <ClInclude Include="..\public\CameraDirector.h" />
@@ -353,7 +353,6 @@
     <ClInclude Include="..\Public\WalkSmoke.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Private\AbilityBubbleEffect.cpp" />
     <ClCompile Include="..\Private\Ability_Bubble.cpp" />
     <ClCompile Include="..\Private\Ability_Model.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Body.cpp" />
@@ -381,6 +380,7 @@
     <ClCompile Include="..\Private\BrontoBurt_State_Idle.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_State_Return.cpp" />
     <ClCompile Include="..\Private\Bubble.cpp" />
+    <ClCompile Include="..\Private\BubbleAura.cpp" />
     <ClCompile Include="..\Private\Bubble_Manager.cpp" />
     <ClCompile Include="..\private\Cage_WaddleDee.cpp" />
     <ClCompile Include="..\private\CameraDirector.cpp" />

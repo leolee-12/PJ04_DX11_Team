@@ -58,9 +58,6 @@
     <Filter Include="99. Defines\Hojun\UI">
       <UniqueIdentifier>{cd0a7659-a8f0-4741-aa44-321f59e15d07}</UniqueIdentifier>
     </Filter>
-    <Filter Include="98. ShaderFiles\Leo">
-      <UniqueIdentifier>{a3345da1-0cb7-4733-ac92-e971f6f0980d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="99. Defines\Leo">
       <UniqueIdentifier>{ca69a650-f542-4ef4-9ce8-1c68bc5ca0a6}</UniqueIdentifier>
     </Filter>
@@ -976,6 +973,9 @@
     <Filter Include="00. GameObject\09. AbilityBubble\Parts\Ability_Model">
       <UniqueIdentifier>{bf263cb2-3a5a-4cae-a1c3-3f631a883bff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\DeformCarBridge">
+      <UniqueIdentifier>{859ac8de-dcc8-4015-a7ef-68eee0e3db5f}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\97. UI\UIContainer\MovableContainer">
       <UniqueIdentifier>{d9e2f7a8-fd90-4353-8eef-082b1015eb32}</UniqueIdentifier>
     </Filter>
@@ -996,6 +996,15 @@
     </Filter>
     <Filter Include="97. DataSystem\Singleton Destroyer">
       <UniqueIdentifier>{42251981-a8bb-404e-be2b-ab0584156f19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98. ShaderFiles\Leo">
+      <UniqueIdentifier>{a3345da1-0cb7-4733-ac92-e971f6f0980d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\GenericContainer\LetterBox">
+      <UniqueIdentifier>{aa6b189d-1a9c-4975-b704-36f879881c75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\GenericContainer\TitleLogo">
+      <UniqueIdentifier>{bbb4987a-476e-4041-a47f-d7275e792b36}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect">
       <UniqueIdentifier>{9a60cf97-d070-41ab-b46a-36ea78ff4834}</UniqueIdentifier>
@@ -1902,13 +1911,7 @@
     <ClInclude Include="..\Public\LD_ArrowBoard.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\04. ArrowBoard</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\LD_SlopeBoardA.h" />
-    <ClInclude Include="..\Public\LD_SlopeBoardC.h" />
-    <ClInclude Include="..\Public\LD_Stage1BossDemo.h" />
     <ClInclude Include="..\Public\LD_GarageRadio.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\LevelDesignObject.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_SlopeBoardA.h">
@@ -1968,6 +1971,9 @@
     <ClInclude Include="..\Public\DroppedBubble.h">
       <Filter>00. GameObject\09. AbilityBubble\Containers\Dropped</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_DeformCarBridge.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\DeformCarBridge</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\UI_MovableContainer.h">
       <Filter>00. GameObject\97. UI\UIContainer\MovableContainer</Filter>
     </ClInclude>
@@ -1988,6 +1994,21 @@
     </ClInclude>
     <ClInclude Include="..\public\Singleton_Destroyer.h">
       <Filter>97. DataSystem\Singleton Destroyer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Editable.h">
+      <Filter>00. GameObject\95. Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LevelDesignObject.h">
+      <Filter>00. GameObject\96. LevelDesign</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_LetterBox.h">
+      <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\LetterBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_TitleLogo.h">
+      <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\TitleLogo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Deformable.h">
+      <Filter>00. GameObject\95. Interface</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\AbilityBubbleEffect.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect</Filter>
@@ -2819,16 +2840,10 @@
     <ClCompile Include="..\Private\LD_ArrowBoard.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\04. ArrowBoard</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\LD_SlopeBoardA.cpp" />
-    <ClCompile Include="..\Private\LD_SlopeBoardC.cpp" />
-    <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp" />
     <ClCompile Include="..\Private\LD_GarageRadio.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_SlopeBoardC.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\LevelDesignObject.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_SlopeBoardA.cpp">
@@ -2885,6 +2900,9 @@
     <ClCompile Include="..\Private\DroppedBubble.cpp">
       <Filter>00. GameObject\09. AbilityBubble\Containers\Dropped</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kirby_DeformCarBridge.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\DeformCarBridge</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\UI_MovableContainer.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\MovableContainer</Filter>
     </ClCompile>
@@ -2905,6 +2923,15 @@
     </ClCompile>
     <ClCompile Include="..\private\Singleton_Destroyer.cpp">
       <Filter>97. DataSystem\Singleton Destroyer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LevelDesignObject.cpp">
+      <Filter>00. GameObject\96. LevelDesign</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_LetterBox.cpp">
+      <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\LetterBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_TitleLogo.cpp">
+      <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\TitleLogo</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\AbilityBubbleEffect.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect</Filter>
@@ -2956,5 +2983,19 @@
     <None Include="..\ShaderFiles\Shader_WaddleDee.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
+    <None Include="..\ShaderFiles\Shader_World_Common.hlsli">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_World_NonAnim.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_World_Anim.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </FxCompile>
+    <FxCompile Include="..\ShaderFiles\Shader_World_Instance.hlsl">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

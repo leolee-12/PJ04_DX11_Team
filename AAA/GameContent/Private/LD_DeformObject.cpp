@@ -7,6 +7,17 @@
 
 namespace
 {
+	// 회전 & 빨려들어가는 물리 관련
+	static constexpr _float s_fPullInitSpeed = { 4.f };
+	static constexpr _float s_fPullAccel = { 18.f };
+	static constexpr _float s_fAcquireDistance = { 1.2f };
+	static constexpr _float s_fShrinkLerp = { 2.5f };
+	static constexpr _float s_fMinScaleRatio = { 0.15f };
+	static constexpr _float s_fAlignRotSpeedDegree = { 540.f };
+	static constexpr _float s_fPullTargetFwd = { 1.8f };
+	static constexpr _float s_fPullTargetUp = { 0.5f };
+	static constexpr _float s_fReleaseFwd = { 3.f };
+
 	struct LD_DEFORMOBJECT_CATALOG
 	{
 		const _tchar* pObjectName;
@@ -14,14 +25,15 @@ namespace
 		const _char* pModelPath;
 		MODEL eModelType;
 		DEFORM_TYPE eDeformType;
+		DEFORM_OBJECT_KIND eKind;
 		_float fInteractionRadius;
 	};
 
 	static const LD_DEFORMOBJECT_CATALOG g_DeformObjectCatalog[] =
 	{
-		{ L"DeformCar", L"Proto_Component_Model_DeformCar", "../../Resources/Map/Gimmick/Anim/DeformCar/DeformCar.ysh", MODEL::ANIM, DEFORM_TYPE::CAR, 0.f },
-		//{ L"DeformCylinder", L"Proto_Component_Model_DeformCylinder", "../../Resources/Map/Gimmick/Anim/DeformCylinder/DeformCylinder.ysh", MODEL::ANIM, DEFORM_TYPE::CYLINDER, 0.f},
-		//{ L"DeformCoaster", L"Proto_Component_Model_DeformCoaster", "../../Resources/Map/Gimmick/Anim/DeformCoaster/DeformCoaster.ysh", MODEL::ANIM, DEFORM_TYPE::COASTER, 0.f },
+		{ L"DeformCar", L"Proto_Component_Model_DeformCar", "../../Resources/Map/Gimmick/Anim/DeformCar/DeformCar.ysh", MODEL::ANIM, DEFORM_TYPE::CAR, DEFORM_OBJECT_KIND::MOBILE, 6.5f },
+		//{ L"DeformCylinder", L"Proto_Component_Model_DeformCylinder", "../../Resources/Map/Gimmick/Anim/DeformCylinder/DeformCylinder.ysh", MODEL::ANIM, DEFORM_TYPE::CYLINDER, DEFORM_OBJECT_KIND::MOBILE, 0.f},
+		//{ L"DeformCoaster", L"Proto_Component_Model_DeformCoaster", "../../Resources/Map/Gimmick/Anim/DeformCoaster/DeformCoaster.ysh", MODEL::ANIM, DEFORM_TYPE::COASTER, DEFORM_OBJECT_KIND::FIXED, 0.f },
 	};
 
 	const LD_DEFORMOBJECT_CATALOG* Find_DeformObjectCatalog(const _wstring& strObjectName)
@@ -55,6 +67,8 @@ CLD_DeformObject::CLD_DeformObject(const CLD_DeformObject& Prototype)
 	: CLD_EventObject(Prototype)
 	, m_tDeformObjectDesc(Prototype.m_tDeformObjectDesc)
 	, m_bAvailable(Prototype.m_bAvailable)
+	, m_eState(Prototype.m_eState)
+	, m_eKind(Prototype.m_eKind)
 {
 }
 
@@ -64,6 +78,12 @@ HRESULT CLD_DeformObject::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_tDeformObjectDesc = *static_cast<const LD_DEFORMOBJECT_DESC*>(pArg);
+
+	const LD_DEFORMOBJECT_CATALOG* pCatalog = Find_DeformObjectCatalog(m_tDeformObjectDesc.strObjectName);
+	if (nullptr == pCatalog)
+		return E_FAIL;
+
+	m_eKind = pCatalog->eKind;
 
 	return __super::Initialize(pArg);
 }
@@ -85,7 +105,7 @@ HRESULT CLD_DeformObject::Validate_Initialized()
 	if (m_tDeformObjectDesc.fInteractionRadius < 0.f)
 		return E_FAIL;
 
-	if (nullptr == m_pInteractionCollider)
+	if (nullptr == m_pTrigger)
 		return E_FAIL;
 
 	if (!m_tDeformObjectDesc.bUseCollMesh || nullptr == m_pRigidStatic)
@@ -96,20 +116,38 @@ HRESULT CLD_DeformObject::Validate_Initialized()
 
 void CLD_DeformObject::Update(_float fTimeDelta)
 {
-	if (!m_bAvailable)
-		return;
+	switch (m_eState)
+	{
+	case DEFORM_OBJECT_STATE::IDLE:
+	{
+		if (!m_bAvailable)
+			return;
 
-	__super::Update(fTimeDelta);
+		__super::Update(fTimeDelta);
+		break;
+	}
+	case DEFORM_OBJECT_STATE::CAPTURED:
+	{
+		Update_Captured(fTimeDelta);
+
+		if (DEFORM_OBJECT_STATE::CAPTURED == m_eState)
+			__super::Update(fTimeDelta);
+
+		break;
+	}
+	case DEFORM_OBJECT_STATE::ACQUIRED:
+		break;
+	}
 }
 
 void CLD_DeformObject::Late_Update(_float fTimeDelta)
 {
-	if (m_bAvailable && m_pInteractionCollider->Is_Enabled())
+	if (m_bAvailable && m_pTrigger->Is_Enabled())
 	{
-		m_pInteractionCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+		m_pTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
 #ifdef _DEBUG
-		m_pGameInstance_Proxy->Add_DebugComponent(m_pInteractionCollider);
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pTrigger);
 #endif
 	}
 
@@ -190,7 +228,7 @@ HRESULT CLD_DeformObject::On_DeformAcquired()
 		return S_FALSE;
 
 	m_bAvailable = false;
-	Set_InteractionEnabled(false);
+	Set_TriggerEnabled(false);
 	Release_RigidStatic();
 	Set_Active(false);
 
@@ -202,8 +240,7 @@ HRESULT CLD_DeformObject::On_DeformReleased(const _float3& vWorldPosition)
 	if (m_bAvailable)
 		return S_FALSE;
 
-	m_pTransformCom->Set_State(
-		STATE::POSITION,
+	m_pTransformCom->Set_State(STATE::POSITION,
 		XMVectorSetW(XMLoadFloat3(&vWorldPosition), 1.f));
 
 	if (FAILED(Ready_RigidStatic()))
@@ -211,10 +248,101 @@ HRESULT CLD_DeformObject::On_DeformReleased(const _float3& vWorldPosition)
 
 	m_bAvailable = true;
 	Set_Active(true);
-	Set_InteractionEnabled(true);
-	m_pInteractionCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+	Set_TriggerEnabled(true);
+	m_pTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
 	return S_OK;
+}
+
+#pragma region Deformable
+_bool CLD_DeformObject::Request_Deform() const
+{
+	return m_bAvailable && DEFORM_OBJECT_STATE::IDLE == m_eState;
+}
+
+HRESULT CLD_DeformObject::Begin_Deform(const _float4x4* AnchorWorld)
+{
+	if (!Request_Deform())
+		return E_FAIL;
+
+	if (DEFORM_OBJECT_KIND::MOBILE != m_eKind)
+		return E_FAIL;
+
+	m_eState = DEFORM_OBJECT_STATE::CAPTURED;
+	m_AnchorWorld = *AnchorWorld;
+
+	Set_TriggerEnabled(false);
+	Release_RigidStatic();
+
+	m_fPullSpeed = s_fPullInitSpeed;
+	m_vBaseScale = m_pTransformCom->Get_Scaled();
+	m_fScaleRatio = 1.f;
+	m_pTransformCom->Set_RotationPerSec(s_fAlignRotSpeedDegree);
+
+	return S_OK;
+}
+
+void CLD_DeformObject::End_Deform(const _float4x4* AnchorWorld)
+{
+	if (DEFORM_OBJECT_STATE::ACQUIRED != m_eState)
+		return;
+
+	_matrix Anchor = XMLoadFloat4x4(AnchorWorld);
+
+	_vector vLook = XMVectorSetY(Anchor.r[2], 0.f);
+	if (XMVectorGetX(XMVector3LengthSq(vLook)) <= FLT_EPSILON)
+		vLook = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+	vLook = XMVector3Normalize(vLook);
+
+	const _vector vReleasePos = XMVectorSetW(Anchor.r[3] + vLook * s_fReleaseFwd, 1.f);
+
+	m_pTransformCom->Set_Scale(m_vBaseScale.x, m_vBaseScale.y, m_vBaseScale.z);
+	m_pTransformCom->Set_State(STATE::POSITION, vReleasePos);
+	m_pTransformCom->LookAt(vReleasePos + vLook);
+
+	m_eState = DEFORM_OBJECT_STATE::IDLE;
+
+	_float3 vPosition{};
+	XMStoreFloat3(&vPosition, vReleasePos);
+	On_DeformReleased(vPosition);
+}
+#pragma endregion
+
+void CLD_DeformObject::Update_Captured(_float fTimeDelta)
+{
+	_matrix AnchorWorld = XMLoadFloat4x4(&m_AnchorWorld);
+	_vector vAnchorPos = AnchorWorld.r[3];
+	_vector vTarget = vAnchorPos
+		+ XMVector3Normalize(AnchorWorld.r[2]) * s_fPullTargetFwd
+		+ XMVector3Normalize(AnchorWorld.r[1]) * s_fPullTargetUp;
+
+	_vector vSelf = m_pTransformCom->Get_State(STATE::POSITION);
+	_vector vDir = vTarget - vSelf;
+	_float fDist = XMVectorGetX(XMVector3Length(vDir));
+
+	if (fDist <= s_fAcquireDistance)
+	{
+		m_eState = DEFORM_OBJECT_STATE::ACQUIRED;
+		On_DeformAcquired();
+
+		DEFORM_ACQUIRED_EVENT Payload{};
+		Payload.eType = Get_DeformType();
+		Payload.pSource = this;
+		m_pGameInstance_Proxy->Publish(EventTag::Deform_Acquired, &Payload);
+
+		return;
+	}
+
+	m_pTransformCom->LookAt_Smooth(vAnchorPos, fTimeDelta);
+
+	m_fPullSpeed += s_fPullAccel * fTimeDelta;
+	_float fMove = min(m_fPullSpeed * fTimeDelta, fDist);
+	m_pTransformCom->Set_State(STATE::POSITION, vSelf + XMVector3Normalize(vDir) * fMove);
+
+	m_fScaleRatio += (s_fMinScaleRatio - m_fScaleRatio) * min(s_fShrinkLerp * fTimeDelta, 1.f);
+	m_pTransformCom->Set_Scale(m_vBaseScale.x * m_fScaleRatio,
+		m_vBaseScale.y * m_fScaleRatio,
+		m_vBaseScale.z * m_fScaleRatio);
 }
 
 HRESULT CLD_DeformObject::Ready_Components()
@@ -222,10 +350,23 @@ HRESULT CLD_DeformObject::Ready_Components()
 	if (FAILED(__super::Ready_Components()))
 		return E_FAIL;
 
-	return Ready_InteractionCollider();
+	return Ready_Trigger();
 }
 
-HRESULT CLD_DeformObject::Ready_InteractionCollider()
+void CLD_DeformObject::On_Deserialized()
+{
+	__super::On_Deserialized();
+
+	if (!m_bAvailable)
+		return;
+
+	if (FAILED(Ready_RigidStatic()))
+		return;
+
+	m_pTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+}
+
+HRESULT CLD_DeformObject::Ready_Trigger()
 {
 	_float3 vMin = {};
 	_float3 vMax = {};
@@ -247,22 +388,22 @@ HRESULT CLD_DeformObject::Ready_InteractionCollider()
 	ColliderDesc.vCenter = vCenter;
 	ColliderDesc.fRadius = fInteractionRadius;
 
-	m_pInteractionCollider = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
-		TEXT("Com_InteractionCollider"), &ColliderDesc);
-	if (nullptr == m_pInteractionCollider)
+	m_pTrigger = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
+		TEXT("Com_Trigger"), &ColliderDesc);
+	if (nullptr == m_pTrigger)
 		return E_FAIL;
 
-	m_pGameInstance_Proxy->Register_Collider(m_pInteractionCollider, ETOUI(COLLISION_LAYER::ENV_TRIGGER));
+	m_pGameInstance_Proxy->Register_Collider(m_pTrigger, ETOUI(COLLISION_LAYER::DEFORM_OBJECT));
 
 	return S_OK;
 }
 
-void CLD_DeformObject::Set_InteractionEnabled(_bool bEnabled)
+void CLD_DeformObject::Set_TriggerEnabled(_bool bEnabled)
 {
-	if (nullptr == m_pInteractionCollider)
+	if (nullptr == m_pTrigger)
 		return;
 
-	m_pInteractionCollider->Set_Enabled(bEnabled);
+	m_pTrigger->Set_Enabled(bEnabled);
 }
 
 CLD_DeformObject* CLD_DeformObject::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -281,6 +422,40 @@ CLD_DeformObject* CLD_DeformObject::Create(ID3D11Device* pDevice, ID3D11DeviceCo
 CGameObject* CLD_DeformObject::Clone(void* pArg)
 {
 	CLD_DeformObject* pInstance = new CLD_DeformObject(*this);
+
+	LD_DEFORMOBJECT_DESC TempDesc{};
+	if (nullptr == pArg)
+	{
+		const LD_DEFORMOBJECT_CATALOG* pCatalog = nullptr;
+		for (const LD_DEFORMOBJECT_CATALOG& Entry : g_DeformObjectCatalog)
+		{
+			if (Is_SupportedCatalog(Entry))
+			{
+				pCatalog = &Entry;
+				break;
+			}
+		}
+
+		if (nullptr == pCatalog)
+		{
+			MSG_BOX("Failed to Cloned : CLD_DeformObject");
+			Safe_Release(pInstance);
+			return nullptr;
+		}
+
+		TempDesc.strObjectName = pCatalog->pObjectName;
+		TempDesc.strKind = pCatalog->pObjectName;
+		TempDesc.eCategory = LD_CATEGORY::GIMMICK;
+		TempDesc.iModelProtoLevel = m_iPrototypeLevel;
+		TempDesc.eModelType = pCatalog->eModelType;
+		TempDesc.wstrModelProtoTag = pCatalog->pModelProtoTag;
+		TempDesc.bUseCollMesh = true;
+		TempDesc.strAnimEventFile.clear();
+		TempDesc.eDeformType = pCatalog->eDeformType;
+		TempDesc.fInteractionRadius = pCatalog->fInteractionRadius;
+
+		pArg = &TempDesc;
+	}
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{

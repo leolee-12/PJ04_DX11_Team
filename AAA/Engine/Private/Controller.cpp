@@ -77,6 +77,27 @@ _uint CController::Move(_fvector vDisp, _float fMinDist, _float fTimeDelta)
     return (_uint)(physx::PxU32)flags;
 }
 
+_bool CController::Set_CapsuleSize(_float fRadius, _float fHeight)
+{
+    if (m_pController ==  nullptr)
+        return false;
+
+    auto* pCapsule = static_cast<physx::PxCapsuleController*>(m_pController);
+
+    // 크기 변경 전 발 위치 보존
+    const physx::PxExtendedVec3 vFootPos = pCapsule->getFootPosition();
+
+    if (!pCapsule->setRadius(fRadius))
+        return false;
+
+    if (!pCapsule->setHeight(fHeight))
+        return false;
+
+    pCapsule->setFootPosition(vFootPos);
+
+    return true;
+}
+
 void CController::Set_FootPosition(_fvector vPos)
 {
     if (nullptr == m_pController) return;

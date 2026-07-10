@@ -64,11 +64,9 @@ _bool CBounding_Sphere::Intersect(COLLIDER eTargetType, CBounding* pBounding)
 
 HRESULT CBounding_Sphere::Render(PrimitiveBatch<VertexPositionColor>* pBatch)
 {
-    
-    XMVECTOR color = m_isColl ? XMVectorSet(1.f, 0.f, 0.f, 1.f)   // 충돌=빨강
-        : XMVectorSet(0.f, 1.f, 1.f, 1.f);  // 평소=시안
+    const _float4& vColor = Get_DebugRenderColor();
+    Debug_DrawSphere(pBatch, XMLoadFloat3(&m_pDesc->Center), m_pDesc->Radius, XMLoadFloat4(&vColor));
 
-    Debug_DrawSphere(pBatch, XMLoadFloat3(&m_pDesc->Center), m_pDesc->Radius, color);
     return S_OK;
 }
 

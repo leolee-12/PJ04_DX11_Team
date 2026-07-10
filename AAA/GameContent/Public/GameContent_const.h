@@ -51,6 +51,9 @@ namespace ProtoDesc
 	inline constexpr SHADER_DESC Shader_Map = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Map"), TEXT("../Bin/ShaderFiles/Shader_Map.hlsl") };
 	inline constexpr SHADER_DESC Shader_MapEx = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_MapEx"), TEXT("../Bin/ShaderFiles/Shader_MapEx.hlsl") };
 	inline constexpr SHADER_DESC Shader_EnvInstance = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_EnvInstance"), TEXT("../Bin/ShaderFiles/Shader_EnvInstance.hlsl") };
+	inline constexpr SHADER_DESC Shader_World_NonAnim = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_World_NonAnim"), TEXT("../Bin/ShaderFiles/Shader_World_NonAnim.hlsl") };
+	inline constexpr SHADER_DESC Shader_World_Anim = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_World_Anim"), TEXT("../Bin/ShaderFiles/Shader_World_Anim.hlsl") };
+	inline constexpr SHADER_DESC Shader_World_Instance = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_World_Instance"), TEXT("../Bin/ShaderFiles/Shader_World_Instance.hlsl") };
 	inline constexpr SHADER_DESC Shader_SkySphere = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_SkySphere"), TEXT("../Bin/ShaderFiles/Shader_SkySphere.hlsl") };
 
 	inline constexpr SHADER_DESC Shader_UI = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_UI"), TEXT("../Bin/ShaderFiles/Shader_UI.hlsl") };

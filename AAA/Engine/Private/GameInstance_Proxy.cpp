@@ -292,6 +292,13 @@ void CGameInstance_Proxy::Add_DebugComponent(CComponent* pComponent)
 
 	m_pOwner->m_pRenderer->Add_DebugComponent(pComponent);
 }
+void CGameInstance_Proxy::Add_DebugTextComponent(CComponent* pComponent)
+{
+	if (!IsConnected())
+		return;
+
+	m_pOwner->m_pRenderer->Add_DebugTextComponent(pComponent);
+}
 void CGameInstance_Proxy::Toggle_DebugRender()
 {
 	if (!IsConnected())
@@ -1126,6 +1133,51 @@ void                   CGameInstance_Proxy::Remove_DynamicActor(physx::PxRigidDy
 {
 	if (!IsConnected()) return;
 	m_pOwner->m_pPhysX_Manager->Remove_DynamicActor(pActor);
+}
+
+_bool CGameInstance_Proxy::Overlap_Box(const _float3& vCenter, const _float3& vHalfExtents, const _float4& qRot, vector<physx::PxActor*>* pOutActors, _bool bStatic, _bool bDynamic)
+{
+	if (!IsConnected()) return false;
+	return m_pOwner->m_pPhysX_Manager->Overlap_Box(vCenter, vHalfExtents, qRot, pOutActors, bStatic, bDynamic);
+}
+_bool CGameInstance_Proxy::Overlap_Sphere(const _float3& vCenter, _float fRadius, vector<physx::PxActor*>* pOutActors, _bool bStatic, _bool bDynamic)
+{
+	if (!IsConnected()) return false;
+	return m_pOwner->m_pPhysX_Manager->Overlap_Sphere(vCenter, fRadius, pOutActors, bStatic, bDynamic);
+}
+_bool CGameInstance_Proxy::Overlap_Capsule(const _float3& vCenter, _float fRadius, _float fHalfHeight, vector<physx::PxActor*>* pOutActors, _bool bStatic, _bool bDynamic)
+{
+	if (!IsConnected()) return false;
+	return m_pOwner->m_pPhysX_Manager->Overlap_Capsule(vCenter, fRadius, fHalfHeight, pOutActors, bStatic, bDynamic);
+}
+_bool CGameInstance_Proxy::Sweep_Box(const _float3& vCenter, const _float3& vHalfExtents, const _float4& qRot,
+	const _float3& vDir, _float fMaxDist, _float3* pOutNormal, _float* pOutDist, _bool bStatic, _bool bDynamic)
+{
+	if (!IsConnected()) return false;
+	return m_pOwner->m_pPhysX_Manager->Sweep_Box(vCenter, vHalfExtents, qRot, vDir, fMaxDist, pOutNormal, pOutDist, bStatic, bDynamic);
+
+	/* 예시 사용 코드
+	_float3 vNormal{};
+	_float  fDist = 0.f;
+	if (m_pGameInstance_Proxy->Sweep_Box(vBodyCenter, vHalf, qRot,
+	        vLookDir, fProbeLen, &vNormal, &fDist, true, false))
+	{
+	    const _float fWallCos = cosf(XMConvertToRadians(50.f));   // 50도 초과 = 벽으로 판정
+	    if (vNormal.y < fWallCos)
+	        On_BoosterCrash(vNormal);
+	}*/
+}
+_bool CGameInstance_Proxy::Sweep_Sphere(const _float3& vCenter, _float fRadius,
+	const _float3& vDir, _float fMaxDist, _float3* pOutNormal, _float* pOutDist, _bool bStatic, _bool bDynamic)
+{
+	if (!IsConnected()) return false;
+	return m_pOwner->m_pPhysX_Manager->Sweep_Sphere(vCenter, fRadius, vDir, fMaxDist, pOutNormal, pOutDist, bStatic, bDynamic);
+}
+_bool CGameInstance_Proxy::Sweep_Capsule(const _float3& vCenter, _float fRadius, _float fHalfHeight,
+	const _float3& vDir, _float fMaxDist, _float3* pOutNormal, _float* pOutDist, _bool bStatic, _bool bDynamic)
+{
+	if (!IsConnected()) return false;
+	return m_pOwner->m_pPhysX_Manager->Sweep_Capsule(vCenter, fRadius, fHalfHeight, vDir, fMaxDist, pOutNormal, pOutDist, bStatic, bDynamic);
 }
 #pragma endregion
 

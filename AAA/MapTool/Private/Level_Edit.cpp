@@ -155,27 +155,86 @@ namespace
 		return XMLoadFloat4x4(&Mat);
 	}
 
-	void Update_WorldMatrixEdit(const _float4x4& CurrentWorld, _matrix BaseWorldMatrix, MAP_ENV_EDITED_DESC* pInOutEdit)
+	void Update_EnvPolicyEditFromCurrent(CEnvObject* pEnvObject, EDIT_OBJECT_OVERRIDE_DESC* pInOutEdit)
 	{
-		if (nullptr == pInOutEdit)
+		if (nullptr == pEnvObject || nullptr == pInOutEdit)
 			return;
 
-		_float4x4 BaseWorld{};
-		XMStoreFloat4x4(&BaseWorld, BaseWorldMatrix);
+		EDITABLE_DESC EditDesc{};
+		if (!pEnvObject->Get_EditDesc(&EditDesc))
+			return;
 
-		if (pInOutEdit->bHasWorldMatrix || !IsNearlyEqualFloat4x4(CurrentWorld, BaseWorld))
-		{
-			pInOutEdit->bHasWorldMatrix = true;
-			pInOutEdit->matWorld = CurrentWorld;
-		}
+		const ENV_OBJECT_DESC& Desc = pEnvObject->Get_Desc();
+		const EDIT_OBJECT_POLICY& Policy = EditDesc.Policy;
+		EDIT_OBJECT_COMMON_OVERRIDE& Common = pInOutEdit->Common;
+		pInOutEdit->eKind = EDITABLE_OBJECT_KIND::ENV_OBJECT;
+
+		const _bool bBaseRenderable = !Desc.tCollision.bInvisibleCollision;
+		if ((Common.iPolicyMask & EDIT_CAP_RENDERABLE) || Policy.bRenderable != bBaseRenderable)
+			Common.iPolicyMask |= EDIT_CAP_RENDERABLE;
 		else
-		{
-			pInOutEdit->bHasWorldMatrix = false;
-			pInOutEdit->matWorld = {};
-		}
+			Common.iPolicyMask &= ~EDIT_CAP_RENDERABLE;
+		Common.Policy.bRenderable = Policy.bRenderable;
+
+		if ((Common.iPolicyMask & EDIT_CAP_CULL_DISTANCE) || Policy.bUseCullDistance != Desc.tRender.bUseCullDistance)
+			Common.iPolicyMask |= EDIT_CAP_CULL_DISTANCE;
+		else
+			Common.iPolicyMask &= ~EDIT_CAP_CULL_DISTANCE;
+		Common.Policy.bUseCullDistance = Policy.bUseCullDistance;
+
+		if ((Common.iPolicyMask & EDIT_CAP_CULL_FRUSTUM) || Policy.bUseCullFrustum != Desc.tRender.bUseCullFrustum)
+			Common.iPolicyMask |= EDIT_CAP_CULL_FRUSTUM;
+		else
+			Common.iPolicyMask &= ~EDIT_CAP_CULL_FRUSTUM;
+		Common.Policy.bUseCullFrustum = Policy.bUseCullFrustum;
+
+		if (Desc.tRender.bHasShadow && ((Common.iPolicyMask & EDIT_CAP_SHADOW) || Policy.bUseShadow != Desc.tRender.bUseShadow))
+			Common.iPolicyMask |= EDIT_CAP_SHADOW;
+		else
+			Common.iPolicyMask &= ~EDIT_CAP_SHADOW;
+		Common.Policy.bUseShadow = Policy.bUseShadow;
+
+		if (Desc.tCollision.bHasCollMesh && ((Common.iPolicyMask & EDIT_CAP_COLLISION_MESH) || Policy.bUseCollMesh != Desc.tCollision.bUseCollMesh))
+			Common.iPolicyMask |= EDIT_CAP_COLLISION_MESH;
+		else
+			Common.iPolicyMask &= ~EDIT_CAP_COLLISION_MESH;
+		Common.Policy.bUseCollMesh = Policy.bUseCollMesh;
 	}
-	
-	void Update_WorldMatrixEdit(const _float4x4& CurrentWorld, _matrix BaseWorldMatrix, MAP_LD_EDITED_DESC* pInOutEdit)
+
+	void Update_SectionPolicyEditFromCurrent(CMapSection* pSection, EDIT_OBJECT_OVERRIDE_DESC* pInOutEdit)
+	{
+		if (nullptr == pSection || nullptr == pInOutEdit)
+			return;
+
+		EDITABLE_DESC EditDesc{};
+		if (!pSection->Get_EditDesc(&EditDesc))
+			return;
+
+		const MAP_SECTION_DESC& Desc = pSection->Get_Desc();
+		const EDIT_OBJECT_POLICY& Policy = EditDesc.Policy;
+		EDIT_OBJECT_COMMON_OVERRIDE& Common = pInOutEdit->Common;
+		pInOutEdit->eKind = EDITABLE_OBJECT_KIND::MAP_SECTION;
+
+		if ((Common.iPolicyMask & EDIT_CAP_RENDERABLE) || Policy.bRenderable != Desc.bRenderable)
+			Common.iPolicyMask |= EDIT_CAP_RENDERABLE;
+		else
+			Common.iPolicyMask &= ~EDIT_CAP_RENDERABLE;
+		Common.Policy.bRenderable = Policy.bRenderable;
+
+		if ((Common.iPolicyMask & EDIT_CAP_CULL_FRUSTUM) || Policy.bUseCullFrustum != Desc.bEnableCulling)
+			Common.iPolicyMask |= EDIT_CAP_CULL_FRUSTUM;
+		else
+			Common.iPolicyMask &= ~EDIT_CAP_CULL_FRUSTUM;
+		Common.Policy.bUseCullFrustum = Policy.bUseCullFrustum;
+
+		if (pSection->Has_CollMesh() && ((Common.iPolicyMask & EDIT_CAP_COLLISION_MESH) || Policy.bUseCollMesh != Desc.bUseCollMesh))
+			Common.iPolicyMask |= EDIT_CAP_COLLISION_MESH;
+		else
+			Common.iPolicyMask &= ~EDIT_CAP_COLLISION_MESH;
+		Common.Policy.bUseCollMesh = Policy.bUseCollMesh;
+	}
+
+	void Update_WorldMatrixEdit(const _float4x4& CurrentWorld, _matrix BaseWorldMatrix, EDIT_OBJECT_OVERRIDE_DESC* pInOutEdit)
 	{
 		if (nullptr == pInOutEdit)
 			return;
@@ -183,15 +242,15 @@ namespace
 		_float4x4 BaseWorld{};
 		XMStoreFloat4x4(&BaseWorld, BaseWorldMatrix);
 
-		if (pInOutEdit->bHasWorldMatrix || !IsNearlyEqualFloat4x4(CurrentWorld, BaseWorld))
+		if (pInOutEdit->Common.bHasWorldMatrix || !IsNearlyEqualFloat4x4(CurrentWorld, BaseWorld))
 		{
-			pInOutEdit->bHasWorldMatrix = true;
-			pInOutEdit->matWorld = CurrentWorld;
+			pInOutEdit->Common.bHasWorldMatrix = true;
+			pInOutEdit->Common.matWorld = CurrentWorld;
 		}
 		else
 		{
-			pInOutEdit->bHasWorldMatrix = false;
-			pInOutEdit->matWorld = {};
+			pInOutEdit->Common.bHasWorldMatrix = false;
+			pInOutEdit->Common.matWorld = {};
 		}
 	}
 
@@ -538,7 +597,7 @@ void CLevel_Edit::End_PlaceMode()
 
 _bool CLevel_Edit::Track_EditedMapPreviewEnvObject(
 	CGameObject* pObject,
-	const MAP_ENV_EDITED_DESC& Edit)
+	const EDIT_OBJECT_OVERRIDE_DESC& Edit)
 {
 	if (nullptr == m_pMapPreviewSession)
 		return false;
@@ -554,7 +613,7 @@ _bool CLevel_Edit::Clear_EditedMapPreviewEnvObject(CGameObject* pObject)
 	return m_pMapPreviewSession->Clear_EditedPreviewObject(pObject);
 }
 
-_bool CLevel_Edit::Try_GetMapPreviewEnvEdit(CGameObject* pObject, MAP_ENV_EDITED_DESC* pOutEdit) const
+_bool CLevel_Edit::Try_GetMapPreviewEnvEdit(CGameObject* pObject, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const
 {
 	if (nullptr == m_pMapPreviewSession || nullptr == pObject || nullptr == pOutEdit)
 		return false;
@@ -569,7 +628,7 @@ _bool CLevel_Edit::Try_GetMapPreviewEnvEdit(CGameObject* pObject, MAP_ENV_EDITED
 	return m_pMapPreviewSession->Try_GetEditedEnvObject(strStableKey, pOutEdit);
 }
 
-_bool CLevel_Edit::Track_EditedMapPreviewSection(const _wstring& strSectionKey, const MAP_ENV_EDITED_DESC& Edit)
+_bool CLevel_Edit::Track_EditedMapPreviewSection(const _wstring& strSectionKey, const EDIT_OBJECT_OVERRIDE_DESC& Edit)
 {
 	if (nullptr == m_pMapPreviewSession)
 		return false;
@@ -585,7 +644,7 @@ _bool CLevel_Edit::Clear_EditedMapPreviewSection(const _wstring& strSectionKey)
 	return m_pMapPreviewSession->Clear_EditedMapSection(strSectionKey);
 }
 
-_bool CLevel_Edit::Try_GetMapPreviewSectionEdit(const _wstring& strSectionKey, MAP_ENV_EDITED_DESC* pOutEdit) const
+_bool CLevel_Edit::Try_GetMapPreviewSectionEdit(const _wstring& strSectionKey, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const
 {
 	if (nullptr == m_pMapPreviewSession)
 		return false;
@@ -593,7 +652,7 @@ _bool CLevel_Edit::Try_GetMapPreviewSectionEdit(const _wstring& strSectionKey, M
 	return m_pMapPreviewSession->Try_GetEditedMapSection(strSectionKey, pOutEdit);
 }
 
-_bool CLevel_Edit::Track_EditedMapPreviewLevelDesignObject(CGameObject* pObject, const MAP_LD_EDITED_DESC& Edit)
+_bool CLevel_Edit::Track_EditedMapPreviewLevelDesignObject(CGameObject* pObject, const EDIT_OBJECT_OVERRIDE_DESC& Edit)
 {
 	if (nullptr == m_pMapPreviewSession)
 		return false;
@@ -609,7 +668,7 @@ _bool CLevel_Edit::Clear_EditedMapPreviewLevelDesignObject(CGameObject* pObject)
 	return m_pMapPreviewSession->Clear_EditedLevelDesignObject(pObject);
 }
 
-_bool CLevel_Edit::Try_GetMapPreviewLevelDesignEdit(CGameObject* pObject, MAP_LD_EDITED_DESC* pOutEdit) const
+_bool CLevel_Edit::Try_GetMapPreviewLevelDesignEdit(CGameObject* pObject, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const
 {
 	if (nullptr == m_pMapPreviewSession || nullptr == pObject || nullptr == pOutEdit)
 		return false;
@@ -631,8 +690,10 @@ _bool CLevel_Edit::Commit_MapEditObjectFromCurrentState(CGameObject* pObject)
 		if (!m_pMapPreviewSession->Can_DeleteAsEnvOverride(pObject))
 			return false;
 
-		MAP_ENV_EDITED_DESC Edit{};
+		EDIT_OBJECT_OVERRIDE_DESC Edit{};
+		Edit.eKind = EDITABLE_OBJECT_KIND::ENV_OBJECT;
 		Try_GetMapPreviewEnvEdit(pObject, &Edit);
+		Update_EnvPolicyEditFromCurrent(pEnvObject, &Edit);
 
 		const _float4x4& CurrentWorld = *pEnvObject->Get_Transform()->Get_WorldMatrixPtr();
 		Update_WorldMatrixEdit(CurrentWorld, Build_EnvBaseWorldMatrix(pEnvObject->Get_Desc()), &Edit);
@@ -645,8 +706,10 @@ _bool CLevel_Edit::Commit_MapEditObjectFromCurrentState(CGameObject* pObject)
 		if (strSectionKey.empty())
 			return false;
 
-		MAP_ENV_EDITED_DESC Edit{};
+		EDIT_OBJECT_OVERRIDE_DESC Edit{};
+		Edit.eKind = EDITABLE_OBJECT_KIND::MAP_SECTION;
 		Try_GetMapPreviewSectionEdit(strSectionKey, &Edit);
+		Update_SectionPolicyEditFromCurrent(pSection, &Edit);
 
 		const _float4x4& CurrentWorld = *pSection->Get_Transform()->Get_WorldMatrixPtr();
 		Update_WorldMatrixEdit(CurrentWorld, Build_SectionBaseWorldMatrix(pSection->Get_Desc()), &Edit);
@@ -658,7 +721,8 @@ _bool CLevel_Edit::Commit_MapEditObjectFromCurrentState(CGameObject* pObject)
 		if (m_pMapPreviewSession->Is_AddedObject(pObject))
 			return true;
 
-		MAP_LD_EDITED_DESC Edit{};
+		EDIT_OBJECT_OVERRIDE_DESC Edit{};
+		Edit.eKind = EDITABLE_OBJECT_KIND::LEVEL_DESIGN_OBJECT;
 		Try_GetMapPreviewLevelDesignEdit(pObject, &Edit);
 
 		const _float4x4& CurrentWorld = *pLDObject->Get_Transform()->Get_WorldMatrixPtr();
@@ -701,28 +765,10 @@ HRESULT CLevel_Edit::Restore_AllDeletedMapPreviewEnv()
 	return Load_MapPreviewEnv(static_cast<_uint>(MapContentDesc.iPresetIndex));
 }
 
-HRESULT CLevel_Edit::Save_MapOverride()
+HRESULT CLevel_Edit::Save_PlaceEdit()
 {
 	if (nullptr == m_pMapPreviewSession)
 		return E_FAIL;
-
-	for (CGameObject* pObject : m_MapPreviewObjects)
-	{
-		if (nullptr == dynamic_cast<CEnvObject*>(pObject)
-			&& nullptr == dynamic_cast<CLevelDesignObject*>(pObject))
-		{
-			continue;
-		}
-
-		if (!Commit_MapEditObjectFromCurrentState(pObject))
-			return E_FAIL;
-	}
-
-	if (nullptr != dynamic_cast<CMapSection*>(m_pSelected)
-		&& !Commit_MapEditObjectFromCurrentState(m_pSelected))
-	{
-		return E_FAIL;
-	}
 
 	const MAP_EDIT_DATA MapContentDesc = m_pMapPreviewSession->Build_EditDataSnapShot();
 
@@ -733,6 +779,11 @@ HRESULT CLevel_Edit::Save_MapOverride()
 		static_cast<_uint>(MapContentDesc.iPresetIndex),
 		MapContentDesc,
 		m_pMapStage);
+}
+
+HRESULT CLevel_Edit::Save_MapOverride()
+{
+	return Save_PlaceEdit();
 }
 
 HRESULT CLevel_Edit::Load_MapPreview(_uint iPresetIndex)
@@ -1783,18 +1834,20 @@ _bool CLevel_Edit::Handle_MapSpecificDeletion(CGameObject* pObject)
 
 	if (!bWasMapPreviewObject)
 		return false;
-	if (nullptr == m_pMapPreviewSession
-		|| !m_pMapPreviewSession->Can_DeleteAsEnvOverride(pObject))
-	{
+	if (nullptr == m_pMapPreviewSession)
 		return false;
-	}
 
-	_bool bTrackedDeletedEnv = false;
-	if (nullptr != m_pMapPreviewSession)
-	{
-		bTrackedDeletedEnv = m_pMapPreviewSession->Track_DeletedPreviewObject(pObject);
-		m_pMapPreviewSession->Unregister_AddedObject(pObject);
-	}
+	const _bool bCanDeleteEnvOverride =
+		m_pMapPreviewSession->Can_DeleteAsEnvOverride(pObject);
+	const _bool bCanDeleteLevelDesignOverride =
+		m_pMapPreviewSession->Can_DeleteAsLevelDesignOverride(pObject);
+
+	if (!bCanDeleteEnvOverride && !bCanDeleteLevelDesignOverride)
+		return false;
+
+	const _bool bTrackedDeletedPreview =
+		m_pMapPreviewSession->Track_DeletedPreviewObject(pObject);
+	m_pMapPreviewSession->Unregister_AddedObject(pObject);
 
 	m_MapPreviewObjects.erase(pObject);
 
@@ -1803,18 +1856,18 @@ _bool CLevel_Edit::Handle_MapSpecificDeletion(CGameObject* pObject)
 		m_pMapStage = nullptr;
 		Set_MapPreviewStageRuntime(false, L"");
 	}
-	else if (0 < Get_MapPreviewEnvCreatedCountInternal())
+	else if (bCanDeleteEnvOverride && 0 < Get_MapPreviewEnvCreatedCountInternal())
 	{
 		const _uint iNextEnvCount = Get_MapPreviewEnvCreatedCountInternal() - 1;
 		Set_MapPreviewEnvRuntime(0 < iNextEnvCount, iNextEnvCount);
 	}
-	else
+	else if (bCanDeleteEnvOverride)
 	{
 		Set_MapPreviewEnvRuntime(false, 0);
 	}
 
 #ifdef _DEBUG
-	if (bTrackedDeletedEnv)
+	if (bCanDeleteEnvOverride && bTrackedDeletedPreview)
 	{
 		for (const auto& [strCurrentLayer, CurrentObjects] : m_Layers)
 		{
@@ -1836,11 +1889,17 @@ _bool CLevel_Edit::Handle_MapSpecificDeletion(CGameObject* pObject)
 	}
 #endif
 
-	if (bTrackedDeletedEnv)
+	if (bTrackedDeletedPreview && bCanDeleteEnvOverride)
 	{
 		Set_MapPreviewStatus(
 			L"Map preview env override deleted. / deleted="
 			+ to_wstring(m_pMapPreviewSession->Get_DeletedEnvCount()));
+	}
+	else if (bTrackedDeletedPreview && bCanDeleteLevelDesignOverride)
+	{
+		Set_MapPreviewStatus(
+			L"Map preview LevelDesign override deleted. / deleted="
+			+ to_wstring(m_pMapPreviewSession->Get_DeletedLevelDesignCount()));
 	}
 	else if (!Is_MapStageLoaded() && !Is_MapEnvLoaded())
 	{

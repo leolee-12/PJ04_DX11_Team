@@ -7,6 +7,10 @@
 
 namespace
 {
+	static constexpr const _char* ANIM_WAIT = "Wait";
+	static constexpr const _char* ANIM_SHAKE_ONCE = "ShakeOnce";
+	static constexpr const _char* ANIM_SHAKE_LOOP = "ShakeLoop";
+
 	struct LD_BUSH_CATALOG
 	{
 		const _tchar* pObjectName;
@@ -118,21 +122,28 @@ HRESULT CLevelDesign_Bush::Validate_Initialized()
 			return E_FAIL;
 	}
 
-	if (nullptr == m_pAnimatorCom || nullptr == m_pHurtBoxCom)
+	if (nullptr == m_pAnimatorCom || nullptr == m_pHurtBox)
 		return E_FAIL;
 
 	_bool bHasWaitAnim = false;
+	_bool bHasShakeOnceAnim = false;
+	_bool bHasShakeLoopAnim = false;
 	const _uint iNumAnimations = m_pModelComs[BUSH_STATE::BASIC]->Get_NumAnimations();
 	for (_uint i = 0; i < iNumAnimations; ++i)
 	{
-		if (m_pModelComs[BUSH_STATE::BASIC]->Get_AnimationName(i) == "Wait")
-		{
+		const _string& strAnimName = m_pModelComs[BUSH_STATE::BASIC]->Get_AnimationName(i);
+		if (strAnimName == ANIM_WAIT)
 			bHasWaitAnim = true;
+		else if (strAnimName == ANIM_SHAKE_ONCE)
+			bHasShakeOnceAnim = true;
+		else if (strAnimName == ANIM_SHAKE_LOOP)
+			bHasShakeLoopAnim = true;
+
+		if (bHasWaitAnim && bHasShakeOnceAnim && bHasShakeLoopAnim)
 			break;
-		}
 	}
 
-	if (!bHasWaitAnim)
+	if (!bHasWaitAnim || !bHasShakeOnceAnim || !bHasShakeLoopAnim)
 		return E_FAIL;
 
 	return S_OK;
@@ -140,9 +151,34 @@ HRESULT CLevelDesign_Bush::Validate_Initialized()
 
 void CLevelDesign_Bush::Update(_float fTimeDelta)
 {
-	if (BUSH_STATE::BASIC == m_eState)
+	if (BUSH_STATE::BASIC != m_eState)
+		return;
+
+	m_pAnimatorCom->Update(fTimeDelta);
+
+	const _string& strCurrentAnimName = m_pAnimatorCom->Get_CurrentAnimName();
+	if (strCurrentAnimName == ANIM_SHAKE_ONCE)
 	{
-		m_pAnimatorCom->Update(fTimeDelta);
+		if (!m_pAnimatorCom->Is_Finished())
+			return;
+
+		if (m_bInhaleOverlapping)
+			m_pAnimatorCom->Play(ANIM_SHAKE_LOOP, false, true);
+		else
+			m_pAnimatorCom->Play(ANIM_WAIT, true, true);
+
+		return;
+	}
+
+	if (strCurrentAnimName == ANIM_SHAKE_LOOP)
+	{
+		if (!m_pAnimatorCom->Is_Finished())
+			return;
+
+		if (m_bInhaleOverlapping)
+			m_pAnimatorCom->Play(ANIM_SHAKE_LOOP, false, true);
+		else
+			m_pAnimatorCom->Play(ANIM_WAIT, true, true);
 	}
 }
 
@@ -150,11 +186,11 @@ void CLevelDesign_Bush::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
-	if (BUSH_STATE::BASIC == m_eState && m_pHurtBoxCom->Is_Enabled())
+	if (BUSH_STATE::BASIC == m_eState && m_pHurtBox->Is_Enabled())
 	{
-		m_pHurtBoxCom->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+		m_pHurtBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 #ifdef _DEBUG
-		m_pGameInstance_Proxy->Add_DebugComponent(m_pHurtBoxCom);
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pHurtBox);
 #endif
 	}
 
@@ -179,13 +215,14 @@ void CLevelDesign_Bush::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 
 void CLevelDesign_Bush::Damaged(const ATTACK_INFO& tInfo)
 {
-	UNREFERENCED_PARAMETER(tInfo);
-
 	if (BUSH_STATE::CUT == m_eState)
 		return;
 
+	if (HIT_TYPE::SWORD_DEFAULT != tInfo.eHitType && HIT_TYPE::SWORD_SPIN != tInfo.eHitType)
+		return;
+
 	m_eState = BUSH_STATE::CUT;
-	m_pHurtBoxCom->Set_Enabled(false);
+	m_pHurtBox->Set_Enabled(false);
 }
 
 void CLevelDesign_Bush::Register_LevelDesignSpecs()
@@ -234,6 +271,21 @@ _bool CLevelDesign_Bush::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json
 CGameObject* CLevelDesign_Bush::Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	return CLevelDesign_Bush::Create(pDevice, pContext);
+}
+
+void CLevelDesign_Bush::Collect_EditModelSlots(vector<EDITABLE_MODEL_SLOT>* pOutSlots) const
+{
+	auto AddSlot = [&](BUSH_STATE eSlot, const _tchar* pLabel)
+		{
+			const MODEL eModelType = Resolve_ModelType(eSlot);
+			const EDITABLE_MODEL_KIND eKind = MODEL::ANIM == eModelType
+				? EDITABLE_MODEL_KIND::ANIM
+				: EDITABLE_MODEL_KIND::NONANIM;
+			Add_EditModelSlot(pOutSlots, pLabel, eKind, m_pModelComs[eSlot]);
+		};
+
+	AddSlot(BUSH_STATE::BASIC, TEXT("Basic"));
+	AddSlot(BUSH_STATE::CUT, TEXT("Cut"));
 }
 
 HRESULT CLevelDesign_Bush::Ready_Components()
@@ -292,7 +344,7 @@ HRESULT CLevelDesign_Bush::Ready_RenderComponents()
 	if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
 		return E_FAIL;
 
-	m_pAnimatorCom->Play("Wait", true, true);
+	m_pAnimatorCom->Play(ANIM_WAIT, true, true);
 
 	return S_OK;
 }
@@ -316,14 +368,61 @@ HRESULT CLevelDesign_Bush::Ready_HurtBox()
 	ColliderDesc.vCenter = { (vMin.x + vMax.x) * 0.5f, (vMin.y + vMax.y) * 0.5f, (vMin.z + vMax.z) * 0.5f };
 	ColliderDesc.fRadius = max(max(vSize.x, vSize.y), vSize.z) * 0.5f;
 
-	m_pHurtBoxCom = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, TEXT("Com_HurtBox"),
+	m_pHurtBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, TEXT("Com_HurtBox"),
 		&ColliderDesc);
-	if (nullptr == m_pHurtBoxCom)
+	if (nullptr == m_pHurtBox)
 		return E_FAIL;
 
-	m_pGameInstance_Proxy->Register_Collider(m_pHurtBoxCom, ETOUI(COLLISION_LAYER::ENV_HURT));
+	SetUp_Collider_Callback();
+
+	m_pGameInstance_Proxy->Register_Collider(m_pHurtBox, ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
 
 	return S_OK;
+}
+
+void CLevelDesign_Bush::SetUp_Collider_Callback()
+{
+	if (nullptr == m_pHurtBox)
+		return;
+
+	m_pHurtBox->Set_OnEnter([this](CCollider* pOther) { Handle_HurtBoxEnter(pOther); });
+	m_pHurtBox->Set_OnExit([this](CCollider* pOther) { Handle_HurtBoxExit(pOther); });
+}
+
+void CLevelDesign_Bush::Handle_HurtBoxEnter(CCollider* pOther)
+{
+	if (BUSH_STATE::BASIC != m_eState || nullptr == pOther)
+		return;
+
+	const _uint iGroup = pOther->Get_RegisteredGroup();
+	if (ETOUI(COLLISION_LAYER::PLAYER_INHALE) == iGroup)
+	{
+		m_bInhaleOverlapping = true;
+		if (m_pAnimatorCom->Get_CurrentAnimName() != ANIM_SHAKE_LOOP || m_pAnimatorCom->Is_Finished())
+			m_pAnimatorCom->Play(ANIM_SHAKE_LOOP, false, true);
+		return;
+	}
+
+	if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != iGroup && ETOUI(COLLISION_LAYER::PLAYER_PROJECTILE) != iGroup)
+		return;
+
+	if (m_pAnimatorCom->Get_CurrentAnimName() == ANIM_SHAKE_LOOP)
+		return;
+	if (m_pAnimatorCom->Get_CurrentAnimName() == ANIM_SHAKE_ONCE && !m_pAnimatorCom->Is_Finished())
+		return;
+
+	m_pAnimatorCom->Play(ANIM_SHAKE_ONCE, false, true);
+}
+
+void CLevelDesign_Bush::Handle_HurtBoxExit(CCollider* pOther)
+{
+	if (BUSH_STATE::BASIC != m_eState || nullptr == pOther)
+		return;
+
+	if (ETOUI(COLLISION_LAYER::PLAYER_INHALE) != pOther->Get_RegisteredGroup())
+		return;
+
+	m_bInhaleOverlapping = false;
 }
 
 HRESULT CLevelDesign_Bush::Bind_ShaderResources(BUSH_STATE eSlot)
