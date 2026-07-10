@@ -10,6 +10,7 @@ namespace Client
 {
     class CMonster;
     class IInhalable;
+    class IDeformable;
 
     namespace EventTag
     {

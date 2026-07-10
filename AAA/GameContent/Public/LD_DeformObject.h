@@ -1,5 +1,6 @@
 #pragma once
 #include "LD_EventObject.h"
+#include "Deformable.h"
 
 NS_BEGIN(Engine)
 class CCollider;
@@ -9,13 +10,16 @@ NS_BEGIN(Client)
 
 struct LD_SPAWN_SPEC;
 
-class CLD_DeformObject final : public CLD_EventObject
+class CLD_DeformObject final
+	: public CLD_EventObject
+	, public IDeformable
 {
 	GENERATED_BODY(CLD_DeformObject)
 
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_LevelDesign_DeformObject";
 	static constexpr const _tchar* LAYER_TAG = L"Layer_LevelDesign_Gimmick";
+
 
 private:
 	CLD_DeformObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -35,16 +39,33 @@ public:
 	static CGameObject* Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
 public:
-	DEFORM_TYPE	Get_DeformType() const { return m_tDeformObjectDesc.eDeformType; }	// 머금기 타입 확인
-	_bool		Is_Available() const { return m_bAvailable; }						// 흡입 가능한 상태인지?
-	HRESULT		On_DeformAcquired();												// 먹힐 때 발동 (객체 비활성)
-	HRESULT		On_DeformReleased(const _float3& vWorldPosition);					// 뱉을 때 발동 (객체 활성)
+	_bool		Is_Available() const { return m_bAvailable; }
+	HRESULT		On_DeformAcquired();
+	HRESULT		On_DeformReleased(const _float3& vWorldPosition);
+
+#pragma region Deformable
+	virtual DEFORM_TYPE			Get_DeformType() const override { return m_tDeformObjectDesc.eDeformType; }
+	virtual DEFORM_OBJECT_KIND	Get_DeformKind() const override { return m_eKind; }
+	virtual _bool			Request_Deform() const override;
+	virtual HRESULT			Begin_Deform(const _float4x4* AnchorWorld) override;
+	virtual void			End_Deform(const _float4x4* AnchorWorld) override;
+#pragma endregion
 
 private:
+	enum class DEFORM_OBJECT_STATE { IDLE, CAPTURED, ACQUIRED };
+
 	LD_DEFORMOBJECT_DESC m_tDeformObjectDesc = {};
 
 	CCollider* m_pTrigger = { nullptr };
 	_bool m_bAvailable = { true };
+
+	DEFORM_OBJECT_STATE m_eState = { DEFORM_OBJECT_STATE::IDLE };
+	DEFORM_OBJECT_KIND m_eKind = { DEFORM_OBJECT_KIND::MOBILE };
+	_float4x4 m_AnchorWorld = {};
+	_float m_fPullSpeed = { 0.f };
+	_float3 m_vBaseScale = { 1.f, 1.f, 1.f };
+	_float m_fScaleRatio = { 1.f };
+
 
 private:
 	virtual HRESULT Ready_Components() override;
@@ -52,6 +73,7 @@ private:
 	HRESULT Ready_Trigger();
 
 	void Set_TriggerEnabled(_bool bEnabled);
+	void Update_Captured(_float fTimeDelta);
 
 public:
 	static CLD_DeformObject* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

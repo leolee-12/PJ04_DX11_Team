@@ -2013,6 +2013,9 @@
     <ClInclude Include="..\public\UI_TitleLogo.h">
       <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\TitleLogo</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Deformable.h">
+      <Filter>00. GameObject\95. Interface</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\UI_CutFade.h">
       <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\CutFade</Filter>
     </ClInclude>
@@ -2991,6 +2994,9 @@
     </None>
     <None Include="..\ShaderFiles\Shader_WaddleDee.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_World_Common.hlsli">
+      <Filter>98. ShaderFiles\Leo</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

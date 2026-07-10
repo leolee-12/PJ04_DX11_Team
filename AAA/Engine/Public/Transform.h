@@ -96,12 +96,20 @@ public:
 	void Rotation(_fvector vQuatanion);
 	void Rotate(_fvector vQuatanion);
 	void Turn(_fvector vAxis, _float fTimeDelta);
+	_matrix Get_RotationMatrix();
 
 	void Chase(_fvector vGoal, _float fTimeDelta, _float fLimit = 0.1f, class CNavigation* pNavigation = nullptr);
 	void Chase_XZ(_fvector vGoal, _float fTimeDelta, _float fLimit = 0.1f, class CNavigation* pNavigation = nullptr);
 
 	void LookAt(_fvector vAt);
 	_bool LookAt_Smooth(_fvector vAt, _float fTimeDelta);
+
+	void Remove_YRotation();
+
+	void LookTo(_fvector vLookDir, _fvector vUpDir);
+	void LookTo(_fvector vLookDir);
+
+
 
 private:
 	union {

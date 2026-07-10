@@ -195,7 +195,11 @@ _bool CMovement_Child::Check_GroundBelow()
     );
 
     if (bHit == false || HitBuffer.hasBlock == false)
+    {
+        m_bHasGroundNormal = false;
+        m_vGroundNormal = { 0.f, 1.f, 0.f };
         return false;
+    }
 
     // 가장 가까운 충돌 결과를 꺼냄
     const physx::PxRaycastHit& Hit = HitBuffer.block;
@@ -204,7 +208,15 @@ _bool CMovement_Child::Check_GroundBelow()
     const _float fMinGroundNormalY = cosf(physx::PxPi / 4.f);
 
     if (Hit.normal.y < fMinGroundNormalY)
+    {
+        // 땅 노말 저장
+        m_bHasGroundNormal = false;
+        m_vGroundNormal = { 0.f, 1.f, 0.f };
         return false;
+    }
+
+    m_bHasGroundNormal = true;
+    m_vGroundNormal = { Hit.normal.x, Hit.normal.y, Hit.normal.z };
 
     return true;
 }

@@ -159,13 +159,6 @@ void CKirby_Ability_Sword::Exit_AttackState(CKirby* pKirby)
 
     CKirby_Body* pBody = pKirby->Get_Body();
     pBody->Set_KirbyEye(KIRBY_EYE_STATE::IDLE);
-
-    CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::SWORD));
-    if (pSword)
-    {
-        //pSword->Set_HitBox(false);
-        pSword->Reset_DamagedList();
-    }
 }
 
 _bool CKirby_Ability_Sword::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -297,6 +290,9 @@ void CKirby_Ability_Sword::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_IN
     Effect_Stop(m_pSwordChargeEffect);
     Effect_Stop(m_pSwordSuperChargeEffect);
 
+    CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::SWORD));
+    pSword->End_Hit();
+
     __super::On_Damaged_KirbyState(pKirby, tInfo);
 }
 
@@ -305,7 +301,12 @@ _bool CKirby_Ability_Sword::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVEN
     if (static_cast<EANIM_EVENT>(e.iEventType) != EANIM_EVENT::Hitbox)
         return false;
 
-    enum SWORD_HIT_PARAM { SLASH1_H, SLASH_2_1_H, SLASH_2_2_H, SLASH_2_3_H, SLASH_2_4_H, SLASH_3_H};
+    enum SWORD_HIT_PARAM
+    {
+        SLASH1_H, SLASH_2_1_H, SLASH_2_2_H, SLASH_2_3_H, SLASH_2_4_H, SLASH_3_H,
+        JUMP_SLASH_H,
+        SPIN_SLASH, SUPER_SPIN_SLASH
+    };
 
     if (ePhase == ANIM_EVENT_PHASE::BEGIN)
     {
@@ -323,22 +324,9 @@ _bool CKirby_Ability_Sword::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVEN
                 pSword->Begin_Hit(tAttackInfo);
                 break;
             }
-            case SWORD_HIT_PARAM::SLASH_2_1_H:
-            {
-                tAttackInfo.fDamage = 10.f;
-                tAttackInfo.fKnockback = 4.5f;
-                tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
-                pSword->Begin_Hit(tAttackInfo);
-                break;
-            }
+            case SWORD_HIT_PARAM::SLASH_2_1_H: 
             case SWORD_HIT_PARAM::SLASH_2_2_H:
-            {
-                tAttackInfo.fDamage = 10.f;
-                tAttackInfo.fKnockback = 4.5f;
-                tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
-                pSword->Begin_Hit(tAttackInfo);
-                break;
-            }
+            case SWORD_HIT_PARAM::SLASH_2_3_H:
             case SWORD_HIT_PARAM::SLASH_2_4_H:
             {
                 tAttackInfo.fDamage = 10.f;
@@ -352,6 +340,30 @@ _bool CKirby_Ability_Sword::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVEN
                 tAttackInfo.fDamage = 200.f;
                 tAttackInfo.fKnockback = 10.f;
                 tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
+                pSword->Begin_Hit(tAttackInfo);
+                break;
+            }
+            case SWORD_HIT_PARAM::JUMP_SLASH_H:
+            {
+                tAttackInfo.fDamage = 10.f;
+                tAttackInfo.fKnockback = 4.5f;
+                tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
+                pSword->Begin_Hit(tAttackInfo);
+                break;
+            }
+            case SWORD_HIT_PARAM::SPIN_SLASH:
+            {
+                tAttackInfo.fDamage = 10.f;
+                tAttackInfo.fKnockback = 4.5f;
+                tAttackInfo.eHitType = HIT_TYPE::SWORD_SPIN;
+                pSword->Begin_Hit(tAttackInfo);
+                break;
+            }
+            case SWORD_HIT_PARAM::SUPER_SPIN_SLASH:
+            {
+                tAttackInfo.fDamage = 10.f;
+                tAttackInfo.fKnockback = 30.f;
+                tAttackInfo.eHitType = HIT_TYPE::SWORD_SPIN;
                 pSword->Begin_Hit(tAttackInfo);
                 break;
             }
@@ -370,12 +382,14 @@ _bool CKirby_Ability_Sword::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVEN
             case SWORD_HIT_PARAM::SLASH_2_3_H:
             case SWORD_HIT_PARAM::SLASH_2_4_H:
             case SWORD_HIT_PARAM::SLASH_3_H:
+            case SWORD_HIT_PARAM::JUMP_SLASH_H:
+            case SWORD_HIT_PARAM::SPIN_SLASH:
+            case SWORD_HIT_PARAM::SUPER_SPIN_SLASH:
                 CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::SWORD));
                 pSword->End_Hit();
                 break;
         }
  
-
         return true;
     }
     

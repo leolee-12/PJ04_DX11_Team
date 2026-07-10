@@ -72,6 +72,7 @@
     <ClInclude Include="..\Public\Common_Curve03.h" />
     <ClInclude Include="..\Public\Common_JumpSlash.h" />
     <ClInclude Include="..\Public\Common_Ring03.h" />
+    <ClInclude Include="..\Public\Deformable.h" />
     <ClInclude Include="..\public\Dialogue_Arranger.h" />
     <ClInclude Include="..\public\Dialogue_Director.h" />
     <ClInclude Include="..\Public\DroppedBubble.h" />
@@ -719,6 +720,7 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Effect</ShaderType>
       <FileType>Document</FileType>
     </None>
+    <None Include="..\ShaderFiles\Shader_World_Common.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Shader_WaddleDee.hlsl">
