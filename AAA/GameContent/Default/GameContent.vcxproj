@@ -117,6 +117,9 @@
     <ClInclude Include="..\Public\Kirby_Deform_Car.h" />
     <ClInclude Include="..\Public\Kirby_Deform.h" />
     <ClInclude Include="..\Public\Kirby_Deform_Model.h" />
+    <ClInclude Include="..\Public\Kirby_DeformCarBridge.h" />
+    <ClInclude Include="..\Public\Deformable.h" />
+    <ClInclude Include="..\Public\Editable.h" />
     <ClInclude Include="..\Public\Kirby_GetDeform.h" />
     <ClInclude Include="..\Public\EnemyBomb.h" />
     <ClInclude Include="..\Public\KirbyBomb.h" />
@@ -348,6 +351,8 @@
     <ClInclude Include="..\Public\UI_TestImageContainer.h" />
     <ClInclude Include="..\Public\UI_Text.h" />
     <ClInclude Include="..\Public\UI_Title.h" />
+    <ClInclude Include="..\public\UI_LetterBox.h" />
+    <ClInclude Include="..\public\UI_TitleLogo.h" />
     <ClInclude Include="..\Public\Vacuum.h" />
     <ClInclude Include="..\Public\InhaleContainer.h" />
     <ClInclude Include="..\Public\WalkSmoke.h" />
@@ -452,6 +457,7 @@
     <ClCompile Include="..\Private\Kirby_Deform_Car.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform_Model.cpp" />
+    <ClCompile Include="..\Private\Kirby_DeformCarBridge.cpp" />
     <ClCompile Include="..\Private\Kirby_GetDeform.cpp" />
     <ClCompile Include="..\Private\EnemyBomb.cpp" />
     <ClCompile Include="..\Private\KirbyBomb.cpp" />
@@ -660,6 +666,8 @@
     <ClCompile Include="..\Private\UI_TestImageContainer.cpp" />
     <ClCompile Include="..\Private\UI_Text.cpp" />
     <ClCompile Include="..\Private\UI_Title.cpp" />
+    <ClCompile Include="..\Private\UI_LetterBox.cpp" />
+    <ClCompile Include="..\Private\UI_TitleLogo.cpp" />
     <ClCompile Include="..\Private\Vacuum.cpp" />
     <ClCompile Include="..\Private\InhaleContainer.cpp" />
     <ClCompile Include="..\Private\WalkSmoke.cpp" />
