@@ -310,8 +310,8 @@ HRESULT CLevelDesign_Bush::Ready_RenderComponents()
 
 		const MODEL eModelType = Resolve_ModelType(eSlot);
 		const auto& ShaderDesc = MODEL::ANIM == eModelType
-			? Shader_AnimMesh_PBR
-			: Shader_NonAnimMesh_PBR;
+			? Shader_World_Anim
+			: Shader_World_NonAnim;
 
 		_tchar szShaderTag[32] = {};
 		_tchar szModelTag[32] = {};
@@ -462,31 +462,28 @@ HRESULT CLevelDesign_Bush::Render_Model(BUSH_STATE eSlot)
 
 		if (MODEL::ANIM == eModelType)
 		{
-			auto BindMaterial = [&](const _char* pConstantName, MTEX_TYPE eType, DEFAULT_TEXTURE eDefaultKind) -> HRESULT
-				{
-					const _uint iLayerIndex = Layer.idx[ETOUI(eType)];
-					const _uint iTextureCount = pModel->Get_MeshTextureCount(i, eType);
+			MESH_LAYER_BIND_CONTEXT Ctx{};
+			Ctx.pShader = pShader;
+			Ctx.pModel = pModel;
+			Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+			Ctx.iMesh = i;
+			Ctx.pLayer = &Layer;
+			Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_ANIM;
+			Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
+			Ctx.iFallbackPass = ETOUI(WORLD_PASS::UMN);
+			Ctx.fDissolve = 0.f;
 
-					if (0u < iTextureCount)
-					{
-						const _uint iSafeIndex = (iLayerIndex < iTextureCount) ? iLayerIndex : (iTextureCount - 1u);
+			MESH_LAYER_BIND_RESULT Result{};
+			if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
+				return E_FAIL;
 
-						if (SUCCEEDED(pModel->Bind_Material(pShader, pConstantName, i, eType, iSafeIndex)))
-							return S_OK;
-					}
+			if (Result.bSkipMesh)
+				continue;
 
-					return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(pShader, pConstantName, eDefaultKind);
-				};
+			if (FAILED(pModel->Bind_BoneMatrices(pShader, "g_BoneMatrices", i)))
+				return E_FAIL;
 
-			if (FAILED(BindMaterial("g_NormalTexture", MTEX_TYPE::NORMALS, DEFAULT_TEXTURE::FLAT_NORMAL)))	return E_FAIL;
-			if (FAILED(BindMaterial("g_UnknownTexture", MTEX_TYPE::UNKNOWN, DEFAULT_TEXTURE::BLACK)))		return E_FAIL;
-
-				if (FAILED(pModel->Bind_BoneMatrices(pShader, "g_BoneMatrices", i)))
-					return E_FAIL;
-
-			const _uint iBushPass = 4u;
-
-			if (FAILED(pShader->Begin(iBushPass)))
+			if (FAILED(pShader->Begin(Result.iPass)))
 				return E_FAIL;
 		}
 		else
@@ -497,9 +494,9 @@ HRESULT CLevelDesign_Bush::Render_Model(BUSH_STATE eSlot)
 			Ctx.pGI_Proxy = m_pGameInstance_Proxy;
 			Ctx.iMesh = i;
 			Ctx.pLayer = &Layer;
-			Ctx.eProfile = MESH_LAYER_PROFILE::NONANIM_PBR;
+			Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
 			Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
-			Ctx.iFallbackPass = ShaderPass::NonAnimPBR::UMN;
+			Ctx.iFallbackPass = ETOUI(WORLD_PASS::UMN);
 			Ctx.fDissolve = 0.f;
 
 			MESH_LAYER_BIND_RESULT Result{};

@@ -7,6 +7,11 @@ NS_BEGIN(Client)
 enum class MESH_LAYER_PROFILE : _uint
 {
 	MAP,
+
+	WORLD_NONANIM,
+	WORLD_ANIM,
+	WORLD_INSTANCE,
+
 	NONANIM_PBR,
 	ENV_INSTANCE,
 	ANIM_PBR_LIMITIED
@@ -24,6 +29,7 @@ namespace MeshLayerProfile
 	_uint Resolve_MapPass(const MESH_LAYER_IDX& Layer, _uint iFallbackPass);
 	_uint Resolve_NonAnimPBRPass(const MESH_LAYER_IDX& Layer, _uint iFallbackPass);
 	_uint Resolve_EnvInstancePass(const MESH_LAYER_IDX& Layer, _uint iFallbackPass);
+	_uint Resolve_WorldPass(const MESH_LAYER_IDX& Layer, _uint iFallbackPass);
 
 	ENV_SHADOW_ALPHA_SOURCE Resolve_EnvShadowAlphaSourceFromLayer(const MESH_LAYER_IDX& Layer);
 }

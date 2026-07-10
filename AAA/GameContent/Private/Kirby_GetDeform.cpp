@@ -43,8 +43,7 @@ void CKirby_GetDeform::Enter(CKirby* pKirby, _int iFlag)
     m_eDeformType = pDeformable->Get_DeformType();
 
     // 
-    pDeformable->Request_Deform();
-    pDeformable->Begin_Deform(pKirby->Get_Transform()->Get_WorldMatrixPtr());
+    pDeformable->Request_Deform(pKirby->Get_Transform()->Get_WorldMatrixPtr());
 
     m_eDeformState = DEFORM_STATE::DEFORM_STATE_END;
     Change_GetDeformState(pKirby, DEFORM_STATE::SUPER_INHALE_START);

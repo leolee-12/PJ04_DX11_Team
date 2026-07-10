@@ -724,9 +724,22 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Effect</ShaderType>
       <FileType>Document</FileType>
     </None>
+    <None Include="..\ShaderFiles\Shader_World_Common.hlsli" />
+    <None Include="..\ShaderFiles\Shader_World_Technique.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Shader_WaddleDee.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ShaderFiles\Shader_World_Anim.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_World_Instance.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_World_NonAnim.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

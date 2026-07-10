@@ -11,11 +11,8 @@ namespace
 	static constexpr _float s_fPullInitSpeed = { 4.f };
 	static constexpr _float s_fPullAccel = { 18.f };
 	static constexpr _float s_fAcquireDistance = { 1.2f };
-	static constexpr _float s_fShrinkLerp = { 2.5f };
-	static constexpr _float s_fMinScaleRatio = { 0.15f };
-	static constexpr _float s_fAlignRotSpeedDegree = { 540.f };
+	static constexpr _float s_fAlignRotSpeedDegree = { 72.f };
 	static constexpr _float s_fPullTargetFwd = { 1.8f };
-	static constexpr _float s_fPullTargetUp = { 0.5f };
 	static constexpr _float s_fReleaseFwd = { 3.f };
 
 	struct LD_DEFORMOBJECT_CATALOG
@@ -255,31 +252,25 @@ HRESULT CLD_DeformObject::On_DeformReleased(const _float3& vWorldPosition)
 }
 
 #pragma region Deformable
-_bool CLD_DeformObject::Request_Deform() const
+_bool CLD_DeformObject::Request_Deform(const _float4x4* AnchorWorld)
 {
-	return m_bAvailable && DEFORM_OBJECT_STATE::IDLE == m_eState;
-}
-
-HRESULT CLD_DeformObject::Begin_Deform(const _float4x4* AnchorWorld)
-{
-	if (!Request_Deform())
-		return E_FAIL;
+	if (!m_bAvailable || DEFORM_OBJECT_STATE::IDLE != m_eState)
+		return false;
 
 	if (DEFORM_OBJECT_KIND::MOBILE != m_eKind)
-		return E_FAIL;
+		return false;
 
 	m_eState = DEFORM_OBJECT_STATE::CAPTURED;
 	m_AnchorWorld = *AnchorWorld;
+	m_bAlignDone = false;
 
 	Set_TriggerEnabled(false);
 	Release_RigidStatic();
 
 	m_fPullSpeed = s_fPullInitSpeed;
-	m_vBaseScale = m_pTransformCom->Get_Scaled();
-	m_fScaleRatio = 1.f;
 	m_pTransformCom->Set_RotationPerSec(s_fAlignRotSpeedDegree);
 
-	return S_OK;
+	return true;
 }
 
 void CLD_DeformObject::End_Deform(const _float4x4* AnchorWorld)
@@ -296,7 +287,6 @@ void CLD_DeformObject::End_Deform(const _float4x4* AnchorWorld)
 
 	const _vector vReleasePos = XMVectorSetW(Anchor.r[3] + vLook * s_fReleaseFwd, 1.f);
 
-	m_pTransformCom->Set_Scale(m_vBaseScale.x, m_vBaseScale.y, m_vBaseScale.z);
 	m_pTransformCom->Set_State(STATE::POSITION, vReleasePos);
 	m_pTransformCom->LookAt(vReleasePos + vLook);
 
@@ -312,11 +302,24 @@ void CLD_DeformObject::Update_Captured(_float fTimeDelta)
 {
 	_matrix AnchorWorld = XMLoadFloat4x4(&m_AnchorWorld);
 	_vector vAnchorPos = AnchorWorld.r[3];
-	_vector vTarget = vAnchorPos
-		+ XMVector3Normalize(AnchorWorld.r[2]) * s_fPullTargetFwd
-		+ XMVector3Normalize(AnchorWorld.r[1]) * s_fPullTargetUp;
+
+	if (!m_bAlignDone)
+	{
+		m_bAlignDone = m_pTransformCom->LookAt_Smooth(vAnchorPos, fTimeDelta);
+		return;
+	}
+
+	_vector vLook = XMVectorSetY(AnchorWorld.r[2], 0.f);
+	if (XMVectorGetX(XMVector3LengthSq(vLook)) <= FLT_EPSILON)
+		vLook = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+	vLook = XMVector3Normalize(vLook);
 
 	_vector vSelf = m_pTransformCom->Get_State(STATE::POSITION);
+
+	_vector vTarget = vAnchorPos + vLook * s_fPullTargetFwd;
+	vTarget = XMVectorSetY(vTarget, XMVectorGetY(vSelf));
+	vTarget = XMVectorSetW(vTarget, 1.f);
+
 	_vector vDir = vTarget - vSelf;
 	_float fDist = XMVectorGetX(XMVector3Length(vDir));
 
@@ -333,16 +336,9 @@ void CLD_DeformObject::Update_Captured(_float fTimeDelta)
 		return;
 	}
 
-	m_pTransformCom->LookAt_Smooth(vAnchorPos, fTimeDelta);
-
 	m_fPullSpeed += s_fPullAccel * fTimeDelta;
 	_float fMove = min(m_fPullSpeed * fTimeDelta, fDist);
 	m_pTransformCom->Set_State(STATE::POSITION, vSelf + XMVector3Normalize(vDir) * fMove);
-
-	m_fScaleRatio += (s_fMinScaleRatio - m_fScaleRatio) * min(s_fShrinkLerp * fTimeDelta, 1.f);
-	m_pTransformCom->Set_Scale(m_vBaseScale.x * m_fScaleRatio,
-		m_vBaseScale.y * m_fScaleRatio,
-		m_vBaseScale.z * m_fScaleRatio);
 }
 
 HRESULT CLD_DeformObject::Ready_Components()

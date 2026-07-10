@@ -3,6 +3,7 @@
 #include "Parsing_Utils.h"
 #include "GameContent_const.h"
 #include "GameContrnt_Events.h"
+#include "MeshLayer_Binder.h"
 #include "Kirby.h"
 
 #include "GameInstance.h"
@@ -13,7 +14,6 @@ namespace
 	inline constexpr const _char* POPFLOWER_ANIM_WAIT = "Wait";
 	inline constexpr const _char* POPFLOWER_ANIM_OPEN = "Open";
 	inline constexpr const _char* POPFLOWER_ANIM_OPEN_WAIT = "OpenWait";
-	inline constexpr _uint POPFLOWER_ANIM_PASS = 1u;
 	inline constexpr _float POPFLOWER_DEFAULT_ANIM_SPEED = 1.f;
 	inline constexpr _float POPFLOWER_COLLISION_ANIM_SPEED = 7.f;
 
@@ -226,7 +226,7 @@ HRESULT CLD_PopFlower::Ready_Components()
 
 HRESULT CLD_PopFlower::Ready_RenderComponents()
 {
-	m_pShaderCom = Add_Component<CShader>(Shader_AnimMesh_PBR.iLevelID, Shader_AnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
+	m_pShaderCom = Add_Component<CShader>(Shader_World_Anim.iLevelID, Shader_World_Anim.szProtoTag, TEXT("Com_Shader"));
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
@@ -343,38 +343,28 @@ HRESULT CLD_PopFlower::Render_Model()
 
 		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
 
-		auto BindMaterial = [&](const _char* pConstantName, MTEX_TYPE eType, DEFAULT_TEXTURE eDefaultKind) -> HRESULT
-			{
-				const _uint iLayerIndex = MTEX_TYPE::UNKNOWN == eType ? 3u : Layer.idx[ETOUI(eType)];
-				const _uint iTextureCount = m_pModelCom->Get_MeshTextureCount(i, eType);
+		MESH_LAYER_BIND_CONTEXT Ctx{};
+		Ctx.pShader = m_pShaderCom;
+		Ctx.pModel = m_pModelCom;
+		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+		Ctx.iMesh = i;
+		Ctx.pLayer = &Layer;
+		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_ANIM;
+		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
+		Ctx.iFallbackPass = ETOUI(WORLD_PASS::DMN);
+		Ctx.fDissolve = 0.f;
 
-				if (0u < iTextureCount)
-				{
-					const _uint iSafeIndex = iLayerIndex < iTextureCount ? iLayerIndex : iTextureCount - 1u;
-
-					if (SUCCEEDED(m_pModelCom->Bind_Material(m_pShaderCom, pConstantName, i, eType, iSafeIndex)))
-						return S_OK;
-				}
-
-				return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(m_pShaderCom, pConstantName, eDefaultKind);
-			};
-
-		if (FAILED(BindMaterial("g_DiffuseTexture", MTEX_TYPE::DIFFUSE, DEFAULT_TEXTURE::MAGENTA)))
+		MESH_LAYER_BIND_RESULT Result{};
+		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
 			return E_FAIL;
 
-		if (FAILED(BindMaterial("g_NormalTexture", MTEX_TYPE::NORMALS, DEFAULT_TEXTURE::FLAT_NORMAL)))
-			return E_FAIL;
-
-		if (FAILED(BindMaterial("g_MRATexture", MTEX_TYPE::METALNESS, DEFAULT_TEXTURE::MRA)))
-			return E_FAIL;
-
-		if (FAILED(BindMaterial("g_UnknownTexture", MTEX_TYPE::UNKNOWN, DEFAULT_TEXTURE::BLACK)))
-			return E_FAIL;
+		if (Result.bSkipMesh)
+			continue;
 
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Begin(POPFLOWER_ANIM_PASS)))
+		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
 			return E_FAIL;
 
 		if (FAILED(m_pModelCom->Render(i)))
