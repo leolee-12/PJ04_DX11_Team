@@ -233,6 +233,7 @@ void CKirby_Deform_Car::Enter_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eS
                 _float3(0.f, 1.3f, 2.4f), _float3(0.f, 0.f, 0.f), _float3(0.f, 180.f, 0.f),
                 pKirby->Get_Transform()->Get_WorldMatrixPtr(), &m_pBoostWind);
 
+            m_fMinimumBoostTime = 0.2f;
             break;
         }
         case DEFORM_CAR_STATE::BOOST_END:
@@ -287,8 +288,13 @@ void CKirby_Deform_Car::Update_DeformCarState(CKirby* pKirby, _float fTimeDelta)
             _vector vBoostAcceleration = vLook * s_fBoostAcceleration;
             pMovement->Add_Acceleration(vBoostAcceleration);
 
-            if (Check_FrontCollision(pKirby))
+            // 살짝 Boost 진행된 후 충돌
+
+            if (Check_FrontCollision(pKirby) == true && m_fMinimumBoostTime <= 0.f)
                 Change_DeformCarState(pKirby, DEFORM_CAR_STATE::CRASH);
+
+            if (m_fMinimumBoostTime > 0.f)
+                m_fMinimumBoostTime -= fTimeDelta;
 
             m_fAccBoostTime -= fTimeDelta;
 

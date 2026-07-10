@@ -56,6 +56,8 @@ private:
 	_float m_fMaxBoostTime{};
 	_float m_fAccBoostTime{};
 
+	_float m_fMinimumBoostTime{};
+
 	DEFORM_CAR_STATE m_eDeformCar_State{};
 	BOOST_JUMP_STATE m_eBoostJumpState{};
 
