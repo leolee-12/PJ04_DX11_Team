@@ -44,11 +44,10 @@ public:
 	HRESULT		On_DeformReleased(const _float3& vWorldPosition);
 
 #pragma region Deformable
-	virtual DEFORM_TYPE			Get_DeformType() const override { return m_tDeformObjectDesc.eDeformType; }
-	virtual DEFORM_OBJECT_KIND	Get_DeformKind() const override { return m_eKind; }
-	virtual _bool			Request_Deform() const override;
-	virtual HRESULT			Begin_Deform(const _float4x4* AnchorWorld) override;
-	virtual void			End_Deform(const _float4x4* AnchorWorld) override;
+	virtual DEFORM_TYPE				Get_DeformType() const override { return m_tDeformObjectDesc.eDeformType; }
+	virtual DEFORM_OBJECT_KIND		Get_DeformKind() const override { return m_eKind; }
+	virtual _bool					Request_Deform(const _float4x4* AnchorWorld) override;
+	virtual void					End_Deform(const _float4x4* AnchorWorld) override;
 #pragma endregion
 
 private:
@@ -62,9 +61,8 @@ private:
 	DEFORM_OBJECT_STATE m_eState = { DEFORM_OBJECT_STATE::IDLE };
 	DEFORM_OBJECT_KIND m_eKind = { DEFORM_OBJECT_KIND::MOBILE };
 	_float4x4 m_AnchorWorld = {};
+	_bool m_bAlignDone = { false };
 	_float m_fPullSpeed = { 0.f };
-	_float3 m_vBaseScale = { 1.f, 1.f, 1.f };
-	_float m_fScaleRatio = { 1.f };
 
 
 private:

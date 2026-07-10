@@ -36,6 +36,19 @@ _uint MeshLayerProfile::Resolve_EnvInstancePass(const MESH_LAYER_IDX& Layer, _ui
     return static_cast<_uint>(pMeta->ePass);
 }
 
+_uint MeshLayerProfile::Resolve_WorldPass(const MESH_LAYER_IDX& Layer, _uint iFallbackPass)
+{
+    const auto ePass = static_cast<WORLD_PASS>(Layer.iPass);
+
+    if (WORLD_PASS::DEFAULT == ePass)
+        return iFallbackPass;
+
+    if (!Is_ValidWorldPassValue(Layer.iPass))
+        return iFallbackPass;
+
+    return static_cast<_uint>(ePass);
+}
+
 ENV_SHADOW_ALPHA_SOURCE MeshLayerProfile::Resolve_EnvShadowAlphaSourceFromLayer(const MESH_LAYER_IDX& Layer)
 {
     const ENV_SHADER_PASS_META* pMeta = Find_EnvShaderPassMeta(Layer.iPass);

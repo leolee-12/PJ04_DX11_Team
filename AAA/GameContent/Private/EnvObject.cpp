@@ -124,9 +124,9 @@ HRESULT CEnvObject::Render()
 		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
 		Ctx.iMesh = i;
 		Ctx.pLayer = &Layer;
-		Ctx.eProfile = MESH_LAYER_PROFILE::NONANIM_PBR;
+		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
 		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
-		Ctx.iFallbackPass = ShaderPass::NonAnimPBR::DMN;
+		Ctx.iFallbackPass = ETOUI(WORLD_PASS::DMN);
 		Ctx.fDissolve = m_fDissolve;
 
 		if (m_bUseCameraDither)
@@ -169,9 +169,9 @@ HRESULT CEnvObject::Render_Shadow()
 		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
 		Ctx.iMesh = i;
 		Ctx.pLayer = &Layer;
-		Ctx.eProfile = MESH_LAYER_PROFILE::NONANIM_PBR;
+		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
 		Ctx.eKind = MESH_LAYER_RENDER_KIND::SHADOW;
-		Ctx.iFallbackPass = ShaderPass::NonAnimPBR::Shadow;
+		Ctx.iFallbackPass = ETOUI(WORLD_PASS::SHADOW);
 
 		MESH_LAYER_BIND_RESULT Result{};
 		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
@@ -239,9 +239,9 @@ HRESULT CEnvObject::Render_Decal()
 		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
 		Ctx.iMesh = i;
 		Ctx.pLayer = &Layer;
-		Ctx.eProfile = MESH_LAYER_PROFILE::NONANIM_PBR;
+		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
 		Ctx.eKind = MESH_LAYER_RENDER_KIND::DECAL;
-		Ctx.iFallbackPass = ShaderPass::NonAnimPBR::DECAL;
+		Ctx.iFallbackPass = ETOUI(WORLD_PASS::DECAL);
 
 		MESH_LAYER_BIND_RESULT Result{};
 		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
@@ -399,7 +399,7 @@ HRESULT CEnvObject::Ready_RenderComponents(_uint iModelProtoLevel, const wstring
 		return E_FAIL;	// 렌더할 객체가 모델이 없으면 초기화 실패
 	}
 
-	m_pShaderCom = Add_Component<CShader>(Shader_NonAnimMesh_PBR.iLevelID, Shader_NonAnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
+	m_pShaderCom = Add_Component<CShader>(Shader_World_NonAnim.iLevelID, Shader_World_NonAnim.szProtoTag, TEXT("Com_Shader"));
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 

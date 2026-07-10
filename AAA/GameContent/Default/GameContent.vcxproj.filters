@@ -3031,16 +3031,17 @@
     <None Include="..\ShaderFiles\Shader_World_Common.hlsli">
       <Filter>98. ShaderFiles\Leo</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\ShaderFiles\Shader_World_NonAnim.hlsl">
+    <None Include="..\ShaderFiles\Shader_World_NonAnim.hlsl">
       <Filter>98. ShaderFiles\Leo</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_World_Anim.hlsl">
+    </None>
+    <None Include="..\ShaderFiles\Shader_World_Instance.hlsl">
       <Filter>98. ShaderFiles\Leo</Filter>
-    </FxCompile>
-    <FxCompile Include="..\ShaderFiles\Shader_World_Instance.hlsl">
+    </None>
+    <None Include="..\ShaderFiles\Shader_World_Anim.hlsl">
       <Filter>98. ShaderFiles\Leo</Filter>
-    </FxCompile>
+    </None>
+    <None Include="..\ShaderFiles\Shader_World_Technique.hlsli">
+      <Filter>98. ShaderFiles\Leo</Filter>
+    </None>
   </ItemGroup>
 </Project>
