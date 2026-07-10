@@ -69,11 +69,11 @@ public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand);
 
 public:
-	virtual void Request_Attach(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType);
-	virtual void Request_Attach_End(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType);
+	virtual void Request_Attachment(CKirby* pKirby, const KIRBY_ATTACHMENT_BEGIN_DESC* pDesc);
+	virtual void Request_Attachment_End(CKirby* pKirby, const KIRBY_ATTACHMENT_END_DESC* pDesc);
 
 	virtual void Request_PositionSync(CKirby* pKirby, const KIRBY_POSITION_SYNC_BEGIN_DESC* pDesc);
-	virtual void Request_PositionEndSync(CKirby* pKirby, const KIRBY_POSITION_SYNC_END_DESC* pDesc);
+	virtual void Request_PositionSync_End(CKirby* pKirby, const KIRBY_POSITION_SYNC_END_DESC* pDesc);
 
 	virtual void Request_StageClear(CKirby* pKirby, const CUTSCENE_STAGECLEAR* pDesc);
 

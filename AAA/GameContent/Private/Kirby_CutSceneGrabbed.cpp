@@ -50,7 +50,7 @@ void CKirby_CutSceneGrabbed::Update(CKirby* pKirby, const _float fTimeDelta)
 {
     __super::Update(pKirby, fTimeDelta);
 
-    pKirby->Update_CutsceneGrabTransform();
+    pKirby->Update_CutsceneAttachTransform();
 }
 
 void CKirby_CutSceneGrabbed::Exit(CKirby* pKirby)
@@ -72,10 +72,25 @@ _bool CKirby_CutSceneGrabbed::Handle_Command(CKirby* pKirby, CKirby_Command* pCo
     return false;
 }
 
-void CKirby_CutSceneGrabbed::Request_Attach_End(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType)
+void CKirby_CutSceneGrabbed::Request_Attachment_End(CKirby* pKirby, const KIRBY_ATTACHMENT_END_DESC* pDesc)
 {
-    pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), true, true);
-    Transition_Fall_OR_Wait_OR_Run(pKirby);
+    switch(pDesc->eType)
+    {
+        case KIRBY_ATTACHMENT_END_REASON::GORILLA_SCENE_HANDOFF:
+        {
+            pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), true, true);
+            Transition_Fall_OR_Wait_OR_Run(pKirby);
+            break;
+        }
+        default:
+        {
+            MSG_BOX("Event Error: CKirby_CutSceneGrabbed");
+            break;
+        }
+    }
+
+
+
 }
 
 CKirby_CutSceneGrabbed* CKirby_CutSceneGrabbed::Create()
