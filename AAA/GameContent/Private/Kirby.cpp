@@ -391,30 +391,30 @@ void CKirby::Apply_ChangeKirbyAbility()
     Set_KirbyAbility(m_eNextAbilityType);
 }
 
-void CKirby::Update_AbilityDumpCool(_float fTimeDelta)
+void CKirby::Update_DumpCool(_float fTimeDelta)
 {
-    if (m_bDecreaseAbilityDumpCool == true)
+    if (m_bDecreaseDumpCool == true)
     {
-        m_fAccAbilityDumpCoolTime -= fTimeDelta;
+        m_fAccDumpCoolTime -= fTimeDelta;
 
-        m_bDecreaseAbilityDumpCool = false;
+        m_bDecreaseDumpCool = false;
     }
     else
     {
-        m_fAccAbilityDumpCoolTime += fTimeDelta;
+        m_fAccDumpCoolTime += fTimeDelta;
     }
 
-    Helper::FloatClamp(m_fAccAbilityDumpCoolTime, 0.f, m_fMaxAbilityDumpCoolTime);
+    Helper::FloatClamp(m_fAccDumpCoolTime, 0.f, m_fMaxDumpCoolTime);
 }
 
-void CKirby::Reset_AbilityDumpCool()
+void CKirby::Reset_DumpCool()
 {
-    m_fAccAbilityDumpCoolTime = m_fMaxAbilityDumpCoolTime;
+    m_fAccDumpCoolTime = m_fMaxDumpCoolTime;
 }
 
-_bool CKirby::Can_AbilityDump()
+_bool CKirby::Can_Dump()
 {
-    if (m_fAccAbilityDumpCoolTime <= 0.f)
+    if (m_fAccDumpCoolTime <= 0.f)
         return true;
 
     return false;

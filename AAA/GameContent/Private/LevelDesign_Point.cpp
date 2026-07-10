@@ -1,8 +1,7 @@
 #include "LevelDesign_Point.h"
 #include "LevelDesign_Registry.h"
-#include "Shader_PassMeta.h"
 #include "Parsing_Utils.h"
-
+#include "MeshLayer_Binder.h"
 #include "GameInstance.h"
 
 namespace
@@ -218,7 +217,7 @@ HRESULT CLevelDesign_Point::Ready_RenderComponents()
 	if (nullptr == pModelProtoTag)
 		return E_FAIL;
 
-	m_pShaderCom = Add_Component<CShader>(Shader_NonAnimMesh_PBR.iLevelID, Shader_NonAnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
+	m_pShaderCom = Add_Component<CShader>(Shader_World_NonAnim.iLevelID, Shader_World_NonAnim.szProtoTag, TEXT("Com_Shader"));
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
@@ -243,6 +242,10 @@ HRESULT CLevelDesign_Point::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
 		return E_FAIL;
 
+	const _float4 vEmissiveColor = { 0.f, 0.f, 0.f, 0.f };
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vEmissiveColor", &vEmissiveColor, sizeof(_float4))))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -252,51 +255,36 @@ HRESULT CLevelDesign_Point::Render_Model()
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
-
-		auto BindMaterial = [&](const _char* pConstantName, MTEX_TYPE eType, DEFAULT_TEXTURE eDefaultKind) -> HRESULT
-			{
-				const _uint iLayerIndex = Layer.idx[ETOUI(eType)];
-				const _uint iTextureCount = m_pModelCom->Get_MeshTextureCount(i, eType);
-
-				if (0u < iTextureCount)
-				{
-					const _uint iSafeIndex = (iLayerIndex < iTextureCount) ? iLayerIndex : (iTextureCount - 1u);
-
-					if (SUCCEEDED(m_pModelCom->Bind_Material(m_pShaderCom, pConstantName, i, eType, iSafeIndex)))
-						return S_OK;
-				}
-
-				return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(m_pShaderCom, pConstantName, eDefaultKind);
-			};
+		MESH_LAYER_IDX Layer = m_pModelCom->Get_MeshLayer(i);
+		Layer.iPass = ETOI(WORLD_PASS::DEFAULT);
 
 		const _bool bUseColorPass = (0u == m_pModelCom->Get_MeshTextureCount(i, MTEX_TYPE::DIFFUSE));
+		if (bUseColorPass)
+			Layer.vRenderColor = m_vRenderColor;
 
-		if (!bUseColorPass)
-			if (FAILED(BindMaterial("g_DiffuseTexture", MTEX_TYPE::DIFFUSE, DEFAULT_TEXTURE::MAGENTA))) return E_FAIL;
-		if (FAILED(BindMaterial("g_NormalTexture", MTEX_TYPE::NORMALS, DEFAULT_TEXTURE::FLAT_NORMAL))) return E_FAIL;
-		if (FAILED(BindMaterial("g_MRATexture", MTEX_TYPE::METALNESS, DEFAULT_TEXTURE::MRA))) return E_FAIL;
+		MESH_LAYER_BIND_CONTEXT Ctx{};
+		Ctx.pShader = m_pShaderCom;
+		Ctx.pModel = m_pModelCom;
+		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+		Ctx.iMesh = i;
+		Ctx.pLayer = &Layer;
+		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
+		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
+		Ctx.iFallbackPass = bUseColorPass ? ETOUI(WORLD_PASS::COLOR_CONST_MRA) : ETOUI(WORLD_PASS::DMN);
 
-		const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
-		_uint iFlags = Layer.iFlags;
-		_float fDissolve = 0.f;
+		MESH_LAYER_BIND_RESULT Result{};
+		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
+			return E_FAIL;
 
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint)))) return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_iEnvInstanceFlags", &iFlags, sizeof(_uint)))) return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve", &fDissolve, sizeof(_float)))) return E_FAIL;
-
-		_uint iPass = ShaderPass::NonAnimPBR::DMN;
 		if (bUseColorPass)
 		{
 			const _float3 vMRA = { 0.65f, 0.3f, 1.0f };
 			const _float4 vEmissiveColor = { 0.30f, 0.14f, 0.02f, 1.0f };
-			if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &m_vRenderColor, sizeof(_float4)))) return E_FAIL;
 			if (FAILED(m_pShaderCom->Bind_RawValue("g_vMRA", &vMRA, sizeof(_float3)))) return E_FAIL;
 			if (FAILED(m_pShaderCom->Bind_RawValue("g_vEmissiveColor", &vEmissiveColor, sizeof(_float4)))) return E_FAIL;
-			iPass = ShaderPass::NonAnimPBR::COLOR2;
 		}
 
-		if (FAILED(m_pShaderCom->Begin(iPass)))
+		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;
@@ -365,7 +353,6 @@ void CLevelDesign_Point::Handle_Pickup(CCollider* pOther)
 		m_pHurtBox->Set_Enabled(false);
 
 	Set_Active(false);
-	m_pGameInstance_Proxy->Destroy_GameObject(this);
 }
 
 CLevelDesign_Point* CLevelDesign_Point::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

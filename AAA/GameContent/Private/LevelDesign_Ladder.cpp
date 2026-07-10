@@ -1,6 +1,6 @@
 #include "LevelDesign_Ladder.h"
 #include "LevelDesign_Registry.h"
-#include "Shader_PassMeta.h"
+#include "MeshLayer_Binder.h"
 #include "Parsing_Utils.h"
 
 #include "GameInstance.h"
@@ -249,7 +249,7 @@ HRESULT CLevelDesign_Ladder::Ready_Components()
 
 HRESULT CLevelDesign_Ladder::Ready_RenderComponents()
 {
-	m_pShaderCom = Add_Component<CShader>(Shader_NonAnimMesh_PBR.iLevelID, Shader_NonAnimMesh_PBR.szProtoTag, TEXT("Com_Shader"));
+	m_pShaderCom = Add_Component<CShader>(Shader_World_NonAnim.iLevelID, Shader_World_NonAnim.szProtoTag, TEXT("Com_Shader"));
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
@@ -332,36 +332,24 @@ HRESULT CLevelDesign_Ladder::Render_Model(CModel* pModel)
 	{
 		const MESH_LAYER_IDX& Layer = pModel->Get_MeshLayer(i);
 
-		auto BindMaterial = [&](const _char* pConstantName, MTEX_TYPE eType, DEFAULT_TEXTURE eDefaultKind) -> HRESULT
-			{
-				const _uint iLayerIndex = Layer.idx[ETOUI(eType)];
-				const _uint iTextureCount = pModel->Get_MeshTextureCount(i, eType);
+		MESH_LAYER_BIND_CONTEXT Ctx{};
+		Ctx.pShader = m_pShaderCom;
+		Ctx.pModel = pModel;
+		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+		Ctx.iMesh = i;
+		Ctx.pLayer = &Layer;
+		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
+		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
+		Ctx.iFallbackPass = ETOUI(WORLD_PASS::DMN);
 
-				if (0u < iTextureCount)
-				{
-					const _uint iSafeIndex = (iLayerIndex < iTextureCount) ? iLayerIndex : (iTextureCount - 1u);
+		MESH_LAYER_BIND_RESULT Result{};
+		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
+			return E_FAIL;
 
-					if (SUCCEEDED(pModel->Bind_Material(m_pShaderCom, pConstantName, i, eType, iSafeIndex)))
-						return S_OK;
-				}
+		if (Result.bSkipMesh)
+			continue;
 
-				return m_pGameInstance_Proxy->Bind_DefaultTextureFromHub(m_pShaderCom, pConstantName, eDefaultKind);
-			};
-
-		if (FAILED(BindMaterial("g_DiffuseTexture", MTEX_TYPE::DIFFUSE, DEFAULT_TEXTURE::MAGENTA)))             return E_FAIL;
-		if (FAILED(BindMaterial("g_NormalTexture", MTEX_TYPE::NORMALS, DEFAULT_TEXTURE::FLAT_NORMAL)))			return E_FAIL;
-		if (FAILED(BindMaterial("g_MRATexture", MTEX_TYPE::METALNESS, DEFAULT_TEXTURE::MRA)))                   return E_FAIL;
-		if (FAILED(BindMaterial("g_UnknownTexture", MTEX_TYPE::UNKNOWN, DEFAULT_TEXTURE::BLACK)))               return E_FAIL;
-
-		const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
-		_uint iFlags = Layer.iFlags;
-		_float fDissolve = 0.f;
-
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint))))                        return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_iEnvInstanceFlags", &iFlags, sizeof(_uint))))					return E_FAIL;
-		if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolve", &fDissolve, sizeof(_float))))                     return E_FAIL;
-
-		if (FAILED(m_pShaderCom->Begin(ShaderPass::NonAnimPBR::DMN)))
+		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
 			return E_FAIL;
 		if (FAILED(pModel->Render(i)))
 			return E_FAIL;

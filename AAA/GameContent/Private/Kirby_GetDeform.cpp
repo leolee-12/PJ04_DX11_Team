@@ -43,8 +43,7 @@ void CKirby_GetDeform::Enter(CKirby* pKirby, _int iFlag)
     m_eDeformType = pDeformable->Get_DeformType();
 
     // 
-    pDeformable->Request_Deform();
-    pDeformable->Begin_Deform(pKirby->Get_Transform()->Get_WorldMatrixPtr());
+    pDeformable->Request_Deform(pKirby->Get_Transform()->Get_WorldMatrixPtr());
 
     m_eDeformState = DEFORM_STATE::DEFORM_STATE_END;
     Change_GetDeformState(pKirby, DEFORM_STATE::SUPER_INHALE_START);
@@ -132,7 +131,7 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
 
             pKirby->Get_Body()->Set_Active(false);
 
-            CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR, KIRBY_DEFORM_MODEL_TYPE::DEMO);
+            CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(m_eDeformType, KIRBY_DEFORM_MODEL_TYPE::DEMO);
             pDeformModel_Demo->Set_Active(true);
             pDeformModel_Demo->Get_Animator()->Play("Deform", false, false, 0.1f, 1.8f);
 
@@ -148,8 +147,8 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
 
             pDeformModel_Main->Get_Animator()->Play("DemoEndFirst", false, false, 0.f, 3.5f);
 
-            pKirby->Change_HatSocketMatrix(pKirby->Get_KirbyAbility()->Get_AbilityType(),
-                pDeformModel_Main->Get_HatBoneMatirx());
+            COPY_ABILITY_TYPE m_eAbilityType = pKirby->Get_KirbyAbility()->Get_AbilityType();
+            pKirby->Change_HatSocketMatrix(m_eAbilityType, pDeformModel_Main->Get_HatBoneMatirx());
 
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Set_RotationSpeed(s_fDeform_End_Rot_Speed_Degree);
