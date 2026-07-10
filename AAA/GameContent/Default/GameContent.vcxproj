@@ -79,6 +79,7 @@
     <ClInclude Include="..\public\Dialogue_Director.h" />
     <ClInclude Include="..\Public\DroppedBubble.h" />
     <ClInclude Include="..\Public\EssenceBubble.h" />
+    <ClInclude Include="..\Public\FlowerPetals.h" />
     <ClInclude Include="..\public\GameContent_pch.h" />
     <ClInclude Include="..\Public\Kirby_AttackMode.h" />
     <ClInclude Include="..\Public\Kirby_CarFirstBreakWall.h" />
@@ -96,6 +97,7 @@
     <ClInclude Include="..\Public\LD_AudioArea.h" />
     <ClInclude Include="..\Public\LD_Stage1BossDemo.h" />
     <ClInclude Include="..\Public\LD_CopyEssence.h" />
+    <ClInclude Include="..\Public\MeshEmitterCommon.h" />
     <ClInclude Include="..\public\Mission_Manager.h" />
     <ClInclude Include="..\Public\Monster_State_Flatten.h" />
     <ClInclude Include="..\Public\Monster_State_Spat.h" />
@@ -419,6 +421,7 @@
     <ClCompile Include="..\Private\Common_JumpSlash.cpp" />
     <ClCompile Include="..\Private\Common_Ring03.cpp" />
     <ClCompile Include="..\Private\EssenceBubble.cpp" />
+    <ClCompile Include="..\Private\FlowerPetals.cpp" />
     <ClCompile Include="..\private\GameContent_pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -439,6 +442,7 @@
     <ClCompile Include="..\Private\LD_AudioArea.cpp" />
     <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp" />
     <ClCompile Include="..\Private\LD_CopyEssence.cpp" />
+    <ClCompile Include="..\Private\MeshEmitterCommon.cpp" />
     <ClCompile Include="..\private\Mission_Manager.cpp" />
     <ClCompile Include="..\Private\Monster_State_Flatten.cpp" />
     <ClCompile Include="..\Private\Monster_State_Spat.cpp" />

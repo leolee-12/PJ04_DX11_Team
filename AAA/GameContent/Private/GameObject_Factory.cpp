@@ -80,6 +80,7 @@
 #include "CommonHit.h"
 #include "SpitObject.h"
 #include "BombFuseEffect.h"
+#include "FlowerPetals.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -112,6 +113,7 @@
 #include "Bubble.h"
 #include "StarEmitter.h"
 #include "Sparkle.h"
+#include "MeshEmitterCommon.h"
 
 //sky
 #include "SkySphere.h"
@@ -976,6 +978,16 @@ void CGameObject_Factory::Register_Effect()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
 
         ));
+
+    // 7
+    Register(CFlowerPetals::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CFlowerPetals),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_Flower"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Flower/Flower_00_TopL.ysh"));
+        )
+    );
 
 }
 

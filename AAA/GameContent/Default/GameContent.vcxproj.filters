@@ -1024,6 +1024,12 @@
     <Filter Include="00. GameObject\09. AbilityBubble\Manager">
       <UniqueIdentifier>{3d8af718-58a0-42f1-a08e-373667aa0ea9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\18. MeshEmitterCommon">
+      <UniqueIdentifier>{931f0406-5701-4929-b20c-638a4c7b719e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\14. FlowerPetals">
+      <UniqueIdentifier>{226d0445-b5ec-4f92-ade0-210ed72ccd46}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -2035,6 +2041,12 @@
       <Filter>00. GameObject\09. AbilityBubble\Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BubbleAura.h" />
+    <ClInclude Include="..\Public\MeshEmitterCommon.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\18. MeshEmitterCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\FlowerPetals.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. FlowerPetals</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2965,6 +2977,12 @@
       <Filter>00. GameObject\09. AbilityBubble\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BubbleAura.cpp" />
+    <ClCompile Include="..\Private\MeshEmitterCommon.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\18. MeshEmitterCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\FlowerPetals.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. FlowerPetals</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Shader_Ring.hlsl">
