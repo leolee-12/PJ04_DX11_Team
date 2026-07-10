@@ -18,6 +18,7 @@ class CBoss_Cage final : public CContainerObject
 
 public:
     static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_Boss_Cage";
+    static constexpr const _float  CLEAR_ANIM_SPEED = 2.f;
 
     enum class CAGE_STATE
     {
@@ -55,10 +56,14 @@ public:
 
 public:
     void       Start_Descend(_fvector vLookTarget, _float fSpawnHeightOffset = 10.f);
+    void       Start_Descend_InPlace(_float fSpawnHeightOffset = 10.f);
     void       Break();
     CAGE_STATE Get_CageState() const { return m_eState; }
 
+    virtual void On_Deserialized() override;
+
 private:
+    virtual HRESULT Ready_Events() override;
     HRESULT Ready_PartObjects();
     HRESULT Ready_BreakTrigger();
     void Fire_CutsceneCamera(const _tchar* szTrack, CAnimator* pProgress);
