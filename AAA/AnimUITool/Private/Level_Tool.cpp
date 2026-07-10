@@ -1243,7 +1243,8 @@ void CLevel_Tool::Update(_float fTimeDelta)
 
     if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F8, false))
     {
-        m_pGameInstance_Proxy->Publish(EventTag::TitleLogo_Show, nullptr);
+        m_pGameInstance_Proxy->Publish(EventTag::CutFade_Out, nullptr);
+        //m_pGameInstance_Proxy->Publish(EventTag::TitleLogo_Show, nullptr);
         // m_pGameInstance_Proxy->Publish(EventTag::StageClear_UIStarted, nullptr);
     }
     //if (!io.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F7, false))

@@ -7,6 +7,7 @@
 #include "GigantEdge_Brain.h"
 #include "Animator.h"
 #include "Monster_Movement.h"
+#include "GameContrnt_Events.h"
 
 CGigantEdge::CGigantEdge(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMiniBoss(pDevice, pContext) {
@@ -99,6 +100,12 @@ _bool CGigantEdge::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
     return true;
 }
 
+void CGigantEdge::On_Corpse_End()
+{
+    __super::On_Corpse_End();
+    m_pGameInstance_Proxy->Publish(EventTag::Cage_Descend, nullptr);
+}
+
 _bool CGigantEdge::Block_Hit(const ATTACK_INFO& tInfo)
 {
     if (!m_bGuarding) return false;
@@ -162,6 +169,12 @@ CGigantEdge* CGigantEdge::Clone(void* pArg)
 void CGigantEdge::Free()
 {
     __super::Free();
+}
+
+void CGigantEdge::On_Swallowed()
+{
+    __super::On_Swallowed();
+    m_pGameInstance_Proxy->Publish(EventTag::Cage_Descend, nullptr);
 }
 
 HRESULT CGigantEdge::Ready_PartObjects()

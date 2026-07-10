@@ -35,6 +35,7 @@
 #include "UI_MissionPanel.h"
 #include "UI_LetterBox.h"
 #include "UI_TitleLogo.h"
+#include "UI_CutFade.h"
 
 // UI Parts
 #include "UI_Image.h"
@@ -704,6 +705,7 @@ void CGameObject_Factory::Register_UIContainer()
     Register(CUI_MissionPanel::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_MissionPanel), LOADER());
     Register(CUI_LetterBox::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_LetterBox), LOADER());
     Register(CUI_TitleLogo::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_TitleLogo), LOADER());
+    Register(CUI_CutFade::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_CutFade), LOADER());
 }
 
 void CGameObject_Factory::Register_NonAnimObject()
@@ -1074,6 +1076,22 @@ void CGameObject_Factory::Register_MainBoss()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_GorillaNamePlate"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM,
                     "../../Resources/YSH/Boss/Gorilla/NamePlate/Model_KR.ysh"));
+        )
+    );
+
+    Register(CBoss_Cage::PROTOTYPE_TAG, TEXT("MainBoss"),
+        CREATOR(CBoss_Cage),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/WaddleDee/Body/Model_Anim.ysh"
+                    , XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::PROTOTYPE_TAG, CCage_WaddleDee::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Cage_Body::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Gimmick/CaptiveCage/CageL/CageL_Anim_TopL.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Cage_Body::PROTOTYPE_TAG, CBoss_Cage_Body::Create(pDevice, pContext));
         )
     );
 }

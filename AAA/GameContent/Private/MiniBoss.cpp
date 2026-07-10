@@ -2,6 +2,7 @@
 #include "GameInstance.h"
 #include "Monster_State.h"
 #include "Monster_State_Captured.h"
+#include "GameContrnt_Events.h"
 
 CMiniBoss::CMiniBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CBossBase(pDevice, pContext) {
@@ -41,9 +42,16 @@ void CMiniBoss::Be_Captured(CGameObject* pInhaler)
     m_bEaten = true;
 }
 
+void CMiniBoss::On_Swallowed()
+{
+    m_pGameInstance_Proxy->Publish(EventTag::Boss_Died, nullptr);
+	__super::On_Swallowed();
+}
+
 void CMiniBoss::On_Enter_Corpse()
 {
     m_TraitFlags = MT_INHALABLE | MT_STRONG_INHALE_ONLY;  
+    m_pGameInstance_Proxy->Publish(EventTag::Boss_Died, nullptr);
 }
 
 void CMiniBoss::Free()
