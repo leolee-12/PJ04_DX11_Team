@@ -346,7 +346,6 @@ void CLevelDesign_Food::Handle_Pickup(CCollider* pOther)
 		m_pHurtBox->Set_Enabled(false);
 
 	Set_Active(false);
-	m_pGameInstance_Proxy->Destroy_GameObject(this);
 }
 
 CLevelDesign_Food* CLevelDesign_Food::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

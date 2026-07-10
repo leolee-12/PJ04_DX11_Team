@@ -11,7 +11,7 @@ namespace
 	static constexpr _float s_fPullInitSpeed = { 4.f };
 	static constexpr _float s_fPullAccel = { 18.f };
 	static constexpr _float s_fAcquireDistance = { 1.2f };
-	static constexpr _float s_fAlignRotSpeedDegree = { 540.f };
+	static constexpr _float s_fAlignRotSpeedDegree = { 72.f };
 	static constexpr _float s_fPullTargetFwd = { 1.8f };
 	static constexpr _float s_fReleaseFwd = { 3.f };
 
