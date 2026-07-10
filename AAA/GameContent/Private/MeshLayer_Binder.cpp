@@ -123,6 +123,11 @@ namespace
 			if (FAILED(Bind_WorldCommonParams(Ctx)))
 				return E_FAIL;
 
+			if (FAILED(Ctx.pShader->Bind_RawValue("g_vEmissiveColor", &Layer.vEmissiveColor, sizeof(_float4))))
+				return E_FAIL;
+			if (FAILED(Ctx.pShader->Bind_RawValue("g_vMRA", &Layer.vMRA, sizeof(_float3))))
+				return E_FAIL;
+
 			const _uint iFallbackPass = (0u != Ctx.iFallbackPass) ? Ctx.iFallbackPass : ETOUI(WORLD_PASS::DMN);
 			pOutResult->iPass = MeshLayerBinder::Resolve_Pass(Ctx.eProfile, Ctx.eKind, Layer, iFallbackPass);
 			return S_OK;

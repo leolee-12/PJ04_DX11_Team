@@ -191,6 +191,12 @@ inline json Save_MeshLayer(const MESH_LAYER_IDX& Layer)
 	if (Layer.vRenderColor.x != 1.f || Layer.vRenderColor.y != 1.f || Layer.vRenderColor.z != 1.f || Layer.vRenderColor.w != 1.f)
 		jMesh["RenderColor"] = { Layer.vRenderColor.x, Layer.vRenderColor.y, Layer.vRenderColor.z, Layer.vRenderColor.w };
 
+	if (Layer.vEmissiveColor.x != 0.f || Layer.vEmissiveColor.y != 0.f || Layer.vEmissiveColor.z != 0.f || Layer.vEmissiveColor.w != 0.f)
+		jMesh["EmissiveColor"] = { Layer.vEmissiveColor.x, Layer.vEmissiveColor.y, Layer.vEmissiveColor.z, Layer.vEmissiveColor.w };
+
+	if (Layer.vMRA.x != 0.f || Layer.vMRA.y != 1.f || Layer.vMRA.z != 1.f)
+		jMesh["MRAValue"] = { Layer.vMRA.x, Layer.vMRA.y, Layer.vMRA.z };
+
 	const unsigned int iUnknown = static_cast<unsigned int>(MTEX_TYPE::UNKNOWN);
 	if (Layer.iExtraTexType[0] != iUnknown || Layer.iExtraTexType[1] != iUnknown || Layer.iExtraTexType[2] != iUnknown || Layer.iExtraTexType[3] != iUnknown)
 		jMesh["ExtraTexType"] = { Layer.iExtraTexType[0], Layer.iExtraTexType[1], Layer.iExtraTexType[2], Layer.iExtraTexType[3] };
@@ -263,6 +269,28 @@ inline HRESULT Load_MeshLayer(const json& jMesh, MESH_LAYER_IDX* pOutLayer)
 			Layer.vRenderColor.y = jMesh["RenderColor"][1].get<_float>();
 			Layer.vRenderColor.z = jMesh["RenderColor"][2].get<_float>();
 			Layer.vRenderColor.w = jMesh["RenderColor"][3].get<_float>();
+		}
+	}
+
+	if (jMesh.contains("EmissiveColor") && jMesh["EmissiveColor"].is_array() && jMesh["EmissiveColor"].size() == 4)
+	{
+		if (jMesh["EmissiveColor"][0].is_number() && jMesh["EmissiveColor"][1].is_number() && jMesh["EmissiveColor"][2].is_number() &&
+			jMesh["EmissiveColor"][3].is_number())
+		{
+			Layer.vEmissiveColor.x = jMesh["EmissiveColor"][0].get<_float>();
+			Layer.vEmissiveColor.y = jMesh["EmissiveColor"][1].get<_float>();
+			Layer.vEmissiveColor.z = jMesh["EmissiveColor"][2].get<_float>();
+			Layer.vEmissiveColor.w = jMesh["EmissiveColor"][3].get<_float>();
+		}
+	}
+
+	if (jMesh.contains("MRAValue") && jMesh["MRAValue"].is_array() && jMesh["MRAValue"].size() == 3)
+	{
+		if (jMesh["MRAValue"][0].is_number() && jMesh["MRAValue"][1].is_number() && jMesh["MRAValue"][2].is_number())
+		{
+			Layer.vMRA.x = jMesh["MRAValue"][0].get<_float>();
+			Layer.vMRA.y = jMesh["MRAValue"][1].get<_float>();
+			Layer.vMRA.z = jMesh["MRAValue"][2].get<_float>();
 		}
 	}
 

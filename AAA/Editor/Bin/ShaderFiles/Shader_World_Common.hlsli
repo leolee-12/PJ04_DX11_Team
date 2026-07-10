@@ -340,7 +340,22 @@ PS_OUT PS_TREESHADOW(PS_IN In)
 
 PS_OUT PS_GRASS_FUR(PS_IN In)
 {
-    return PS_DIFF_SAMPLE(In, Get_BaseUV(In));
+    Apply_DitherIfNeeded(In.vPosition);
+
+    float4 vMask = g_DiffuseTexture.Sample(LinearSampler, Get_BaseUV(In));
+    if (vMask.a < 0.1f)
+        discard;
+
+    float3 vMRA = g_MRATexture.Sample(LinearSampler, Get_MaterialUV(In)).rgb;
+    float3 vNormal = Reconstruct_Normal(In, Get_NormalUV(In));
+    float4 vGrassColor = float4(g_vColor.rgb, vMask.a);
+
+    return Make_GBufferOutput(
+                In,
+                vGrassColor,
+                vNormal,
+                float4(vMRA, 1.f),
+                float4(g_vEmissiveColor.rgb * vMask.a, 1.f));
 }
 
 PS_OUT PS_COLOR(PS_IN In)
@@ -392,6 +407,22 @@ PS_OUT PS_COLOR_CONST_MRA(PS_IN In)
                   float4(vMRA, 1.f),
                   float4(g_vEmissiveColor.rgb * fArrowMask, 1.f));
   }
+
+PS_OUT PS_DMN_OPAQUE(PS_IN In)
+{
+    Apply_DitherIfNeeded(In.vPosition);
+
+    float3 vDiffuse = g_DiffuseTexture.Sample(LinearSampler, Get_BaseUV(In)).rgb;
+    float3 vMRA = g_MRATexture.Sample(LinearSampler, Get_MaterialUV(In)).rgb;
+    float3 vNormal = Reconstruct_Normal(In, Get_NormalUV(In));
+
+    return Make_GBufferOutput(
+                    In,
+                    float4(vDiffuse, 1.f),
+                    vNormal,
+                    float4(vMRA, 1.f),
+                    float4(g_vEmissiveColor.rgb, 1.f));
+}
 
 
 

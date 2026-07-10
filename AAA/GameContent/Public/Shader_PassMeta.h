@@ -164,6 +164,7 @@ enum class WORLD_PASS : _int
 	DECAL,
 	COLOR_CONST_MRA,
 	ARROWBOARD_OPAQUE,
+	DMN_OPAQUE,
 
 	COUNT
 };
@@ -177,20 +178,21 @@ struct WORLD_SHADER_PASS_META
 
 inline constexpr WORLD_SHADER_PASS_META g_WorldShaderPassMetas[] =
 {
-	{ WORLD_PASS::DEFAULT,          "Default",          DIFF | MRA | NORM },
-	{ WORLD_PASS::WHITE,            "WHITE",            0 },
-	{ WORLD_PASS::DIFF,             "DIFF",             DIFF },
-	{ WORLD_PASS::DMN,              "DMN",              DIFF | MRA | NORM },
-	{ WORLD_PASS::UKWN,             "UKWN",             UKWN },
-	{ WORLD_PASS::UMN,              "UMN",              UKWN | MRA | NORM },
+	{ WORLD_PASS::DEFAULT,				"Default",				DIFF | MRA | NORM },
+	{ WORLD_PASS::WHITE,				"WHITE",				0 },
+	{ WORLD_PASS::DIFF,					"DIFF",					DIFF },
+	{ WORLD_PASS::DMN,					"DMN",					DIFF | MRA | NORM },
+	{ WORLD_PASS::UKWN,					"UKWN",					UKWN },
+	{ WORLD_PASS::UMN,					"UMN",					UKWN | MRA | NORM },
 
-	{ WORLD_PASS::DMNU,             "DMNU",             DIFF | MRA | NORM | UKWN },
-	{ WORLD_PASS::TREESHADOW,       "TREESHADOW",       UKWN },
-	{ WORLD_PASS::GRASS_FUR,        "GRASS_FUR",        UKWN | MRA | NORM },
-	{ WORLD_PASS::COLOR,            "COLOR",            MRA | NORM },
-	{ WORLD_PASS::DISCARD,          "DISCARD",          0 },
-	{ WORLD_PASS::COLOR_CONST_MRA,  "COLOR_CONST_MRA",  NORM },
-	{ WORLD_PASS::ARROWBOARD_OPAQUE, "ARROWBOARD_OPAQUE", DIFF | MRA | NORM },
+	{ WORLD_PASS::DMNU,					"DMNU",					DIFF | MRA | NORM | UKWN },
+	{ WORLD_PASS::TREESHADOW,			"TREESHADOW",			UKWN },
+	{ WORLD_PASS::GRASS_FUR,			"GRASS_FUR",			DIFF | MRA | NORM },
+	{ WORLD_PASS::COLOR,				"COLOR",				MRA | NORM },
+	{ WORLD_PASS::DISCARD,				"DISCARD",				0 },
+	{ WORLD_PASS::COLOR_CONST_MRA,		"COLOR_CONST_MRA",		NORM },
+	{ WORLD_PASS::ARROWBOARD_OPAQUE,	"ARROWBOARD_OPAQUE",	DIFF | MRA | NORM },
+	{ WORLD_PASS::DMN_OPAQUE,			"DMN_OPAQUE",			DIFF | MRA | NORM },
 };
 
 inline _bool Is_ValidWorldPassValue(_int iPass)
@@ -228,6 +230,9 @@ inline SHADOW_ALPHA_SOURCE Resolve_WorldShadowAlphaSource(WORLD_PASS ePass)
 
 	case WORLD_PASS::TREESHADOW:
 		return SHADOW_ALPHA_SOURCE::DIFFUSE_R;
+
+	case WORLD_PASS::DMN_OPAQUE:
+		return SHADOW_ALPHA_SOURCE::NONE;
 
 	case WORLD_PASS::DISCARD:
 		return SHADOW_ALPHA_SOURCE::DISCARD_ALL;

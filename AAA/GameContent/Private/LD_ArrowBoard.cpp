@@ -16,7 +16,6 @@ namespace
 	inline constexpr _float ARROWBOARD_ANIM_SPEED = 1.5f;
 	inline constexpr _float ARROWBOARD_MIN_HURT_RADIUS = 0.1f;
 	inline constexpr _float ARROWBOARD_GLOW_PERIOD = 0.3333f;
-	inline constexpr _float ARROWBOARD_GLOW_MAX_INTENSITY = 2.f;
 }
 
 NS_BEGIN(Client)
@@ -281,15 +280,16 @@ HRESULT CLD_ArrowBoard::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
 		return E_FAIL;
 
-	const _float fGlowIntensity = m_bGlow ? ARROWBOARD_GLOW_MAX_INTENSITY : 0.f;
-	const _float4 vEmissiveColor = { fGlowIntensity, fGlowIntensity * 0.8f, fGlowIntensity * 0.05f, 0.f };
-	return m_pShaderCom->Bind_RawValue("g_vEmissiveColor", &vEmissiveColor, sizeof(_float4));
+	return S_OK;
 }
 
 HRESULT CLD_ArrowBoard::Render_Model()
 {
 	MESH_LAYER_IDX Layer = m_pModelCom->Get_MeshLayer(0u);
 	Layer.iPass = ETOI(WORLD_PASS::DEFAULT);
+
+	if (!m_bGlow)
+		Layer.vEmissiveColor = { 0.f, 0.f, 0.f, 0.f };
 
 	MESH_LAYER_BIND_CONTEXT Ctx{};
 	Ctx.pShader = m_pShaderCom;

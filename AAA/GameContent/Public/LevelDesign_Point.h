@@ -48,7 +48,6 @@ private:
 	CCollider*	m_pHurtBox = nullptr;
 
 	LD_POINT_DESC	m_tPointDesc = {};
-	_float4			m_vRenderColor = { 1.f, 1.f, 1.f, 1.f };
 	_bool			m_bRotate = { false };
 
 private:
