@@ -342,7 +342,20 @@ void CPanel_Inspector::Render()
 
 	_bool bRenderGlobalsDirty = false;
 
-	Draw_Transform(pSelected);
+	const _bool bTransformChanged = Draw_Transform(pSelected);
+	if (bTransformChanged)
+	{
+		if (IEditable* pEditable = dynamic_cast<IEditable*>(pSelected))
+		{
+			const HRESULT hr = pEditable->On_EditTransformChanged();
+#ifdef _DEBUG
+			if (FAILED(hr))
+				OutputDebugStringA("[MapTool] IEditable::On_EditTransformChanged failed in Inspector.\n");
+#else
+			UNREFERENCED_PARAMETER(hr);
+#endif
+		}
+	}
 
 	ImGui::Separator();
 	Draw_EditableObjectPolicyPanel(pSelected);
@@ -1900,7 +1913,7 @@ void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
 
 			const _bool bTransformChanged = Draw_Transform(m_pFocusedMapSection, strName);
 			if (bTransformChanged)
-				m_pFocusedMapSection->Notify_EditTransformChanged();
+				m_pFocusedMapSection->On_EditTransformChanged();
 
 			ImGui::Separator();
 			Draw_EditableObjectPolicyPanel(m_pFocusedMapSection);

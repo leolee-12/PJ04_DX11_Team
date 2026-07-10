@@ -305,8 +305,8 @@ _bool CEnvObject::Pick_Marb1e(_fvector vRayOrigin, _fvector vRayDir, _float3* pO
 
 HRESULT CEnvObject::Refresh()
 {
-	m_bTransformDirty = true;
-	Refresh_WorldBounds();
+	if (FAILED(On_EditTransformChanged()))
+		return E_FAIL;
 
 	if (FAILED(Ready_PhysicsActor()))
 		return E_FAIL;
@@ -362,6 +362,13 @@ HRESULT CEnvObject::Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy)
 	if (bPrevUseCollMesh != m_bUseCollMesh && FAILED(Ready_PhysicsActor()))
 		return E_FAIL;
 
+	return S_OK;
+}
+
+HRESULT CEnvObject::On_EditTransformChanged()
+{
+	m_bTransformDirty = true;
+	Refresh_WorldBounds();
 	return S_OK;
 }
 
