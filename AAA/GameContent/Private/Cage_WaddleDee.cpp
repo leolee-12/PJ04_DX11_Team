@@ -60,7 +60,7 @@ HRESULT CCage_WaddleDee::Initialize(void* pArg)
         return E_FAIL;
 
     m_iCagedClipIdx = static_cast<_uint>(m_pGameInstance_Proxy->RandomInt(0, g_iNumCagedWaits - 1));
-    m_pAnimatorCom->Play(s_CagedWaits[m_iCagedClipIdx], false, false);
+    m_pAnimatorCom->Play(s_CagedWaits[m_iCagedClipIdx], false, false, 0.f, 1.5f);
 
     return S_OK;
 }
@@ -78,7 +78,7 @@ void CCage_WaddleDee::Update(_float fTimeDelta)
     if (STATE::RESCUED == m_eState && m_pAnimatorCom->Is_Finished())
     {
         m_eState = STATE::DANCE;
-        m_pAnimatorCom->Play(s_DeeClips[ETOUI(m_ePos)].szClearDance, false, true, 0.f, 1.5f);
+        m_pAnimatorCom->Play(s_DeeClips[ETOUI(m_ePos)].szClearDance, false, true, 0.f, 2.f);
     }
 
     if (STATE::DANCE == m_eState && m_pAnimatorCom->Is_Finished())
@@ -175,7 +175,7 @@ void CCage_WaddleDee::Play_RandomCageWait()
         ++iNext;
 
     m_iCagedClipIdx = iNext;
-    m_pAnimatorCom->Play(s_CagedWaits[iNext], false, false);
+    m_pAnimatorCom->Play(s_CagedWaits[iNext], false, false, 0.2f, 1.5f);
 }
 
 CCage_WaddleDee* CCage_WaddleDee::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

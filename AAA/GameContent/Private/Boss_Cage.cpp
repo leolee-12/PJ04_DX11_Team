@@ -85,7 +85,7 @@ void CBoss_Cage::Update(_float fTimeDelta)
 
                 CUTSCENE_STAGECLEAR Desc{};
                 Desc.AnchorWorld = *(m_pTransformCom->Get_WorldMatrixPtr());
-                Desc.fAnimSpeed = 1.5f;
+                Desc.fAnimSpeed = CLEAR_ANIM_SPEED;
                 Desc.fBlendDuration = 0.f;
                 Desc.eAnim = STAGECLEAR_ANIM::DANCE;
                 m_pGameInstance_Proxy->Publish(EventTag::Cutscene_StageClear, &Desc);
@@ -103,6 +103,7 @@ void CBoss_Cage::Update(_float fTimeDelta)
                 {
                     m_bHeadTurnFired = true;
                     m_pGameInstance_Proxy->Publish(EventTag::StageClear_UIStarted, nullptr);
+                    m_pGameInstance_Proxy->Publish(EventTag::CutFade_Out, nullptr);
                 }
             }
             break;
@@ -134,6 +135,19 @@ void CBoss_Cage::Late_Update(_float fTimeDelta)
     }
 }
 
+HRESULT CBoss_Cage::Ready_Events()
+{
+    Subscribe_Event(EventTag::Cage_Descend, [this](void*)
+        {
+            if (CAGE_STATE::HANGING != m_eState || Is_Attached())
+                return;
+
+            Start_Descend_InPlace();
+        });
+
+    return S_OK;
+}
+
 HRESULT CBoss_Cage::Ready_PartObjects()
 {
     CMonsterPart::MONSTERPART_DESC Desc{};
@@ -149,7 +163,6 @@ HRESULT CBoss_Cage::Ready_PartObjects()
 
     const _char* szSocketBones[3] = { "DeeFrontL", "DeeLeftL", "DeeRightL" };
     const _tchar* szPartTags[3] = { L"Part_DeeFront", L"Part_DeeLeft", L"Part_DeeRight" };
-    const _float3 vOffsets[3] = { { 0.f, 0.f, 0.5f }, { -0.5f, 0.f, -0.3f }, { 0.5f, 0.f, -0.3f } };
 
     for (_uint i = 0; i < 3; ++i)
     {
@@ -241,6 +254,8 @@ _bool CBoss_Cage::Is_RescueDone() const
 
 void CBoss_Cage::Start_Descend(_fvector vLookTarget, _float fSpawnHeightOffset)
 {
+    Set_Active(true);
+
     if (m_pAttachOwnerWorld)
         m_fFloatHeight = m_pAttachOwnerWorld->m[3][1];
     else
@@ -255,6 +270,20 @@ void CBoss_Cage::Start_Descend(_fvector vLookTarget, _float fSpawnHeightOffset)
     _vector vFlatTarget = XMVectorSetY(vLookTarget, XMVectorGetY(vPos));
     vFlatTarget = XMVectorSetW(vFlatTarget, 1.f);
     m_pTransformCom->LookAt(vFlatTarget);
+
+    m_pBody->Set_RenderBird(true);
+    m_pBody->Get_Animator()->Resume();
+    m_eState = CAGE_STATE::DESCEND;
+}
+
+void CBoss_Cage::Start_Descend_InPlace(_float fSpawnHeightOffset)
+{
+    Set_Active(true);   
+
+    _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+    m_fFloatHeight = XMVectorGetY(vPos);
+    m_pTransformCom->Set_State(STATE::POSITION,
+        XMVectorSetY(vPos, m_fFloatHeight + fSpawnHeightOffset));
 
     m_pBody->Set_RenderBird(true);
     m_pBody->Get_Animator()->Resume();
@@ -284,8 +313,17 @@ void CBoss_Cage::Break()
     m_pGameInstance_Proxy->Publish(EventTag::HUD_SetVisible, &bShow);
 }
 
+void CBoss_Cage::On_Deserialized()
+{
+    __super::On_Deserialized();
+
+    if (m_pGameInstance_Proxy && !m_pGameInstance_Proxy->Is_EditMode())
+        Set_Active(false);
+}
+
 void CBoss_Cage::Attach_To_Bone(const _float4x4* pBoneMatrix, const _float4x4* pOwnerWorld, _fmatrix OffsetMatrix)
 {
+    Set_Active(true);
     m_pAttachBone = pBoneMatrix;
     m_pAttachOwnerWorld = pOwnerWorld;
     XMStoreFloat4x4(&m_AttachOffset, OffsetMatrix);

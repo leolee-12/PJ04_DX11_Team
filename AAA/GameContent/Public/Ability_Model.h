@@ -52,6 +52,8 @@ public:
         pOut->strPrototypeTag = PROTOTYPE_TAG;
     }
 
+    void                    Set_ModelRenderActive(_bool bActive) { m_bRenderActive = bActive; }
+
 public:
     CAnimator*              Get_Animator() const { return m_pAnimatorCom; }
     CModel*                 Get_Model()    const { return m_pModelCom; }
@@ -70,8 +72,15 @@ protected:
 
     COPY_ABILITY_TYPE       m_eAbility = { COPY_ABILITY_TYPE::NONE };
     const _tchar*           m_szModelProtoTag = { nullptr };
-
+    
+    _bool                   m_bRenderActive = { true };
     _int                    m_iShadowPassIdx = { 7 };
+    _float                  m_fSpinAngle = { 0.f };
+
+private:
+    HRESULT                 Render_Sword();
+    HRESULT                 Render_Bomb();
+    HRESULT                 Render_Ice();       // юс╫ц
 
 public:
     static CAbility_Model*  Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

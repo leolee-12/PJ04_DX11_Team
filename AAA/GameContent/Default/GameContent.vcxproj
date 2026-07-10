@@ -47,6 +47,8 @@
     <ClInclude Include="..\Public\BrontoBurt_State_Idle.h" />
     <ClInclude Include="..\Public\BrontoBurt_State_Return.h" />
     <ClInclude Include="..\Public\Bubble.h" />
+    <ClInclude Include="..\Public\BubbleAura.h" />
+    <ClInclude Include="..\Public\Bubble_Manager.h" />
     <ClInclude Include="..\public\Cage_WaddleDee.h" />
     <ClInclude Include="..\public\CameraDirector.h" />
     <ClInclude Include="..\Public\Camera_AreaData.h" />
@@ -73,14 +75,14 @@
     <ClInclude Include="..\Public\Common_JumpSlash.h" />
     <ClInclude Include="..\Public\Common_Ring03.h" />
     <ClInclude Include="..\Public\Deformable.h" />
+    <ClInclude Include="..\public\Dialogue_Arranger.h" />
+    <ClInclude Include="..\public\Dialogue_Director.h" />
     <ClInclude Include="..\Public\DroppedBubble.h" />
     <ClInclude Include="..\Public\EssenceBubble.h" />
     <ClInclude Include="..\public\GameContent_pch.h" />
-    <ClInclude Include="..\Public\Editable.h" />
     <ClInclude Include="..\Public\Kirby_AttackMode.h" />
     <ClInclude Include="..\Public\Kirby_CarFirstBreakWall.h" />
     <ClInclude Include="..\Public\Kirby_Clear.h" />
-    <ClInclude Include="..\Public\Kirby_DeformCarBridge.h" />
     <ClInclude Include="..\Public\Kirby_Dodge.h" />
     <ClInclude Include="..\Public\Kirby_HitBox_Model.h" />
     <ClInclude Include="..\Public\Kirby_Slide.h" />
@@ -118,6 +120,8 @@
     <ClInclude Include="..\Public\Kirby_Deform_Car.h" />
     <ClInclude Include="..\Public\Kirby_Deform.h" />
     <ClInclude Include="..\Public\Kirby_Deform_Model.h" />
+    <ClInclude Include="..\Public\Kirby_DeformCarBridge.h" />
+    <ClInclude Include="..\Public\Editable.h" />
     <ClInclude Include="..\Public\Kirby_GetDeform.h" />
     <ClInclude Include="..\Public\EnemyBomb.h" />
     <ClInclude Include="..\Public\KirbyBomb.h" />
@@ -157,6 +161,7 @@
     <ClInclude Include="..\public\Projectile_Manager.h" />
     <ClInclude Include="..\public\Projectile_Movement.h" />
     <ClInclude Include="..\public\UI_CoordinatorContainer.h" />
+    <ClInclude Include="..\public\UI_CutFade.h" />
     <ClInclude Include="..\Public\UI_FlashCurtain.h" />
     <ClInclude Include="..\public\CutsceneActor.h" />
     <ClInclude Include="..\public\CutsceneGorilla.h" />
@@ -337,7 +342,6 @@
     <ClInclude Include="..\Public\TestTriggerBox.h" />
     <ClInclude Include="..\Public\UI_Image.h" />
     <ClInclude Include="..\Public\UI_KirbyStatus.h" />
-    <ClInclude Include="..\public\UI_LetterBox.h" />
     <ClInclude Include="..\public\UI_LoadingCurtain.h" />
     <ClInclude Include="..\public\UI_MissionBoard.h" />
     <ClInclude Include="..\public\UI_MissionPanel.h" />
@@ -350,6 +354,7 @@
     <ClInclude Include="..\Public\UI_TestImageContainer.h" />
     <ClInclude Include="..\Public\UI_Text.h" />
     <ClInclude Include="..\Public\UI_Title.h" />
+    <ClInclude Include="..\public\UI_LetterBox.h" />
     <ClInclude Include="..\public\UI_TitleLogo.h" />
     <ClInclude Include="..\Public\Vacuum.h" />
     <ClInclude Include="..\Public\InhaleContainer.h" />
@@ -383,6 +388,8 @@
     <ClCompile Include="..\Private\BrontoBurt_State_Idle.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_State_Return.cpp" />
     <ClCompile Include="..\Private\Bubble.cpp" />
+    <ClCompile Include="..\Private\BubbleAura.cpp" />
+    <ClCompile Include="..\Private\Bubble_Manager.cpp" />
     <ClCompile Include="..\private\Cage_WaddleDee.cpp" />
     <ClCompile Include="..\private\CameraDirector.cpp" />
     <ClCompile Include="..\Private\Camera_AreaSolver.cpp" />
@@ -402,6 +409,7 @@
     <ClCompile Include="..\Private\CarMilkyWay.cpp" />
     <ClCompile Include="..\Private\Car_00_MilkyWay.cpp" />
     <ClCompile Include="..\Private\CommonHit.cpp" />
+    <ClCompile Include="..\private\Dialogue_Arranger.cpp" />
     <ClCompile Include="..\Private\DroppedBubble.cpp" />
     <ClCompile Include="..\Private\EnvTrigger_EventPublisher.cpp" />
     <ClCompile Include="..\Private\EnvTrigger_RenderGlobals.cpp" />
@@ -418,7 +426,6 @@
     <ClCompile Include="..\Private\Kirby_AttackMode.cpp" />
     <ClCompile Include="..\Private\Kirby_CarFirstBreakWall.cpp" />
     <ClCompile Include="..\Private\Kirby_Clear.cpp" />
-    <ClCompile Include="..\Private\Kirby_DeformCarBridge.cpp" />
     <ClCompile Include="..\Private\Kirby_Dodge.cpp" />
     <ClCompile Include="..\Private\Kirby_HitBox_Model.cpp" />
     <ClCompile Include="..\Private\Kirby_Slide.cpp" />
@@ -454,6 +461,7 @@
     <ClCompile Include="..\Private\Kirby_Deform_Car.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform_Model.cpp" />
+    <ClCompile Include="..\Private\Kirby_DeformCarBridge.cpp" />
     <ClCompile Include="..\Private\Kirby_GetDeform.cpp" />
     <ClCompile Include="..\Private\EnemyBomb.cpp" />
     <ClCompile Include="..\Private\KirbyBomb.cpp" />
@@ -493,6 +501,7 @@
     <ClCompile Include="..\private\Projectile_Manager.cpp" />
     <ClCompile Include="..\private\Projectile_Movement.cpp" />
     <ClCompile Include="..\private\UI_CoordinatorContainer.cpp" />
+    <ClCompile Include="..\private\UI_CutFade.cpp" />
     <ClCompile Include="..\Private\UI_FlashCurtain.cpp" />
     <ClCompile Include="..\private\CutsceneActor.cpp" />
     <ClCompile Include="..\private\CutsceneGorilla.cpp" />
@@ -651,7 +660,6 @@
     <ClCompile Include="..\Private\TestTriggerBox.cpp" />
     <ClCompile Include="..\Private\UI_Image.cpp" />
     <ClCompile Include="..\Private\UI_KirbyStatus.cpp" />
-    <ClCompile Include="..\private\UI_LetterBox.cpp" />
     <ClCompile Include="..\private\UI_LoadingCurtain.cpp" />
     <ClCompile Include="..\private\UI_MissionBoard.cpp" />
     <ClCompile Include="..\private\UI_MissionPanel.cpp" />
@@ -663,10 +671,12 @@
     <ClCompile Include="..\Private\UI_TestImageContainer.cpp" />
     <ClCompile Include="..\Private\UI_Text.cpp" />
     <ClCompile Include="..\Private\UI_Title.cpp" />
-    <ClCompile Include="..\private\UI_TitleLogo.cpp" />
+    <ClCompile Include="..\Private\UI_LetterBox.cpp" />
+    <ClCompile Include="..\Private\UI_TitleLogo.cpp" />
     <ClCompile Include="..\Private\Vacuum.cpp" />
     <ClCompile Include="..\Private\InhaleContainer.cpp" />
     <ClCompile Include="..\Private\WalkSmoke.cpp" />
+    <ClCompile Include="..\public\Dialogue_Director.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl">
