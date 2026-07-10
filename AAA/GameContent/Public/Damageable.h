@@ -11,6 +11,7 @@ enum class HIT_TYPE : _uint
 {
     NORMAL = 0,             
     BODY_CONTACT,
+    SLIDE,
     SWORD_DEFAULT, SWORD_SPIN,
     CAR_BOOSTER_HIT,
 };

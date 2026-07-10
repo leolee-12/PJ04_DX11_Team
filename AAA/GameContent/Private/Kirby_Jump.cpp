@@ -61,8 +61,6 @@ void CKirby_Jump::Enter(CKirby* pKirby, _int iFlag)
 
     // Ground Ignore
     m_fAccGroundIgnoreTime = m_fMaxGroundIgnoreTime;
-
-
 }
 
 void CKirby_Jump::Update(CKirby* pKirby, const _float fTimeDelta)

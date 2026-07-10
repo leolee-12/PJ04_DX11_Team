@@ -49,14 +49,40 @@ HRESULT CKirby_Ability::Initialize()
     Set_FullBodyAni(ABILITY_ANI::DODGE_START, "DodgeStart", false, false, 0.1f, 2.f);
 
     Set_FullBodyAni(ABILITY_ANI::SLIDE_START, "SlideStart", false, false, 0.1f, 1.5f);
-    Set_FullBodyAni(ABILITY_ANI::SLIDE, "Slide", true, false, 0.1f, 1.5f);
-    Set_FullBodyAni(ABILITY_ANI::SLIDE_END, "SlideEnd", false, false, 0.1f, 1.5f);
+    Set_FullBodyAni(ABILITY_ANI::SLIDE, "Slide", false, false, 0.1f, 1.5f);
 
     return S_OK;
 }
 
 _bool CKirby_Ability::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 {
+    if (static_cast<EANIM_EVENT>(e.iEventType) != EANIM_EVENT::Hitbox)
+        return false;
+
+    if (ePhase == ANIM_EVENT_PHASE::BEGIN)
+    {
+        switch (static_cast<COMMON_HIT_PARAM>(e.iIntParam))
+        {
+            case COMMON_HIT_PARAM::SLIDE_H:
+            {
+                pKirby->Get_Collider(CKirby::KIRBY_COLLIDER::SLIDE_COLLIDER)->Set_Enabled(true);
+                return true;
+            }
+        }
+    }
+
+    if (ePhase == ANIM_EVENT_PHASE::END)
+    {
+        switch (static_cast<COMMON_HIT_PARAM>(e.iIntParam))
+        {
+            case COMMON_HIT_PARAM::SLIDE_H:
+            {
+                pKirby->Get_Collider(CKirby::KIRBY_COLLIDER::SLIDE_COLLIDER)->Set_Enabled(false);
+                return true;
+            }
+        }
+    }
+
     return false;
 }
 

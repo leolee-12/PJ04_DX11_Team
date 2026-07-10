@@ -36,6 +36,11 @@ public:
 	void Handle_Command(CKirby_Command* pCommand);
 
 public:
+	void On_KirbyCollisionEnter_StateMachine(_uint iColliderType, CCollider* pOther);
+	void On_KirbyCollisionStay_StateMachine(_uint iColliderType, CCollider* pOther);
+	void On_KirbyCollisionExit_StateMachine(_uint iColliderType, CCollider* pOther);
+
+public:
 	void  On_Damaged_KirbyStateMachine(const ATTACK_INFO& tInfo);
 
 public:
