@@ -101,7 +101,7 @@ void CKirby_Slide::On_KirbyCollisionEnter(CKirby* pKirby, _uint iColliderType, C
                 _vector vKirbyPos = pKirby->Get_Transform()->Get_State(STATE::POSITION);
                 XMStoreFloat3(&tAttackDesc.vAttackerPos, vKirbyPos);
                 tAttackDesc.fDamage = 10.f;
-                tAttackDesc.fKnockback = 2.f;
+                tAttackDesc.fKnockback = 3.f;
                 pMonster->Damaged(tAttackDesc);
 
                 Change_SlideState(pKirby, SLIDE_STATE::BACK_JUMP);

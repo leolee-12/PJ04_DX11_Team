@@ -236,10 +236,28 @@ void CKirby_Deform_Car::Enter_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eS
             break;
         }
         case DEFORM_CAR_STATE::BOOST_END:
+        {
             pModel->Get_Animator()->Play("BoostEnd", false, false, 0.1f, 1.5f);
             break;
-        case DEFORM_CAR_STATE::CRUSH:
+        }
+        case DEFORM_CAR_STATE::CRASH:
+        {
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+
+            _vector vBackDir = -pKirby->Get_Transform()->Get_State(STATE::LOOK);
+            vBackDir = XMVector3Normalize(XMVectorSetY(vBackDir, 0.f));
+            pMovement->Set_Velocity(vBackDir * 17.f);
+
+            _float fJumpVelocity{};
+            if (pMovement->Is_Grounded())
+                fJumpVelocity = 20.f;
+            else
+                fJumpVelocity = 10.f;
+            pMovement->Add_Velocity(XMVectorSet(0.f, fJumpVelocity, 0.f, 0.f));
+
+            pModel->Get_Animator()->Play("Crash", false, false, 0.1f, 2.f);
             break;
+        }
         case DEFORM_CAR_STATE::DEFORM_CAR_END:
             m_bReqEndAttackState = true;
             break;
@@ -269,6 +287,9 @@ void CKirby_Deform_Car::Update_DeformCarState(CKirby* pKirby, _float fTimeDelta)
             _vector vBoostAcceleration = vLook * s_fBoostAcceleration;
             pMovement->Add_Acceleration(vBoostAcceleration);
 
+            if (Check_FrontCollision(pKirby))
+                Change_DeformCarState(pKirby, DEFORM_CAR_STATE::CRASH);
+
             m_fAccBoostTime -= fTimeDelta;
 
             if (m_eBoostJumpState != BOOST_JUMP_STATE::GROUND)
@@ -292,10 +313,12 @@ void CKirby_Deform_Car::Update_DeformCarState(CKirby* pKirby, _float fTimeDelta)
                 Change_DeformCarState(pKirby, DEFORM_CAR_STATE::DEFORM_CAR_END);
             break;
         }
-        case DEFORM_CAR_STATE::CRUSH:
+        case DEFORM_CAR_STATE::CRASH:
+        {
+            if (pModel->Get_Animator()->Is_Finished())
+                Change_DeformCarState(pKirby, DEFORM_CAR_STATE::DEFORM_CAR_END);
             break;
-        case DEFORM_CAR_STATE::DEFORM_CAR_END:
-            break;
+        }
     }
 
     m_vRotDir = {};
@@ -327,9 +350,7 @@ void CKirby_Deform_Car::Exit_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eSt
         case DEFORM_CAR_STATE::BOOST_END:
             pMovement->Set_MaxHorizontalSpeed(s_fCarSpeed);
             break;
-        case DEFORM_CAR_STATE::CRUSH:
-            break;
-        case DEFORM_CAR_STATE::DEFORM_CAR_END:
+        case DEFORM_CAR_STATE::CRASH:
             break;
     }
 }
@@ -442,6 +463,26 @@ void CKirby_Deform_Car::BoostEffectStart(CKirby* pKirby, CEffect_Container*& pCo
     CEffect_Loader::GetInstance()->Spawn(EffectTag, pKirby->Get_LevelIndex(),
         _float3(-1.f, 0.5f, -2.8f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
         pKirby->Get_Transform()->Get_WorldMatrixPtr(), &pContainer2);
+}
+
+_bool CKirby_Deform_Car::Check_FrontCollision(CKirby* pKirby)
+{
+    CTransform* pTransform = pKirby->Get_Transform();
+
+    _float3 vCenter{};
+    XMStoreFloat3(&vCenter, pTransform->Get_State(STATE::POSITION));
+    vCenter.y += 2.f;
+
+    _float3 vDir{};
+    XMStoreFloat3(&vDir, XMVector3Normalize(pTransform->Get_State(STATE::LOOK)));
+
+    _float fRadius = 0.1f;
+    _float3 vDumpNormal{};
+    _float  fDumpDistance{};
+    return m_pGameInstance_Proxy->Sweep_Sphere(
+        vCenter, fRadius, vDir,
+        3.f,
+        &vDumpNormal, &fDumpDistance, true, false);
 }
 
 CKirby_Deform_Car* CKirby_Deform_Car::Create()

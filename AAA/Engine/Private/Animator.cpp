@@ -386,6 +386,8 @@ void CAnimator::Update(_float fTimeDelta)
         //    Fire_Point(track.Events, m_fPrevProgress, fCur);
 
         //Process_Range(track, fCur);
+
+        // Loop일 때 Begin이 안 불리는 문제 
         if (fCur < m_fPrevProgress)
         {
             Fire_Point(track.Events, m_fPrevProgress, 1.0f);
