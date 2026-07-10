@@ -1,6 +1,11 @@
 #include "Ability_Model.h"
 #include "GameInstance.h"
 
+namespace
+{
+	inline constexpr _float ABILITY_SPIN_SPEED = 240.f;
+}
+
 CAbility_Model::CAbility_Model(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPartObject{ pDevice, pContext }
 {
@@ -43,8 +48,16 @@ void CAbility_Model::Update(_float fTimeDelta)
 {
 	if (m_pGameInstance_Proxy->Is_EditMode())
 		return;
-	if (m_pAnimatorCom)
+
+	if (m_pAnimatorCom )
+	{
+		m_fSpinAngle = fmodf(m_fSpinAngle + ABILITY_SPIN_SPEED * fTimeDelta, 360.f);
+		m_pAnimatorCom->SetBoneRotation("TopL", m_fSpinAngle, XMVectorSet(0.f, 1.f, 0.f, 0.f));
+
 		m_pAnimatorCom->Update(fTimeDelta);
+	}
+
+
 }
 
 void CAbility_Model::Late_Update(_float fTimeDelta)
@@ -54,6 +67,8 @@ void CAbility_Model::Late_Update(_float fTimeDelta)
 		matWorld = matWorld * XMLoadFloat4x4(m_pSocketBoneMatrix);
 
 	Compute_CombinedWorldMatrix(matWorld);
+
+	if (!m_bRenderActive) return;
 	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
@@ -63,34 +78,17 @@ HRESULT CAbility_Model::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	// TODO : 능력 별로 모델, Shader  다르게 설정 & Render에서도 분기하기. 지금은 AnimMesh PBR 공통으로 처리
-
-	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
-	for (_uint i = 0; i < iNumMeshes; ++i)
+	switch (m_eAbility)
 	{
-		if (m_pAnimatorCom)
-			m_pModelCom->Bind_BoneMatrices(
-				m_pShaderCom, "g_BoneMatrices", i);
-
-		// diffuse 없으면 무텍스처 -> 상수색 패스(3)
-		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom,
-			"g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
-		{
-			if (FAILED(m_pShaderCom->Begin(3)))
-				return E_FAIL;
-			if (FAILED(m_pModelCom->Render(i)))
-				return E_FAIL;
-			continue;
-		}
-
-		m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", i, MTEX_TYPE::NORMALS, 0);
-		m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0);
-
-		if (FAILED(m_pShaderCom->Begin(1)))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Render(i)))
-			return E_FAIL;
+	case COPY_ABILITY_TYPE::SWORD:
+		return Render_Sword();
+	case COPY_ABILITY_TYPE::BOMB:
+		return Render_Bomb();
+	case COPY_ABILITY_TYPE::ICE:
+		return Render_Ice();
 	}
+
+
 	return S_OK;
 }
 
@@ -153,8 +151,21 @@ HRESULT CAbility_Model::Ready_MeshPart(const PART_SETUP& tSetup)
 HRESULT CAbility_Model::Ready_Components()
 {
 	PART_SETUP t{};
-	// TODO : 능력별 모델 전용 SHADER 세팅 ( 지금은 PBR 공통 )
-	t.tShader = Shader_AnimMesh_PBR;
+	
+	switch (m_eAbility)
+	{
+	case COPY_ABILITY_TYPE::BOMB:
+	{
+		t.tShader = Shader_Bomb;
+		m_iShadowPassIdx = 2;
+		break;
+	}
+	default:
+	{
+		t.tShader = Shader_AnimMesh_PBR;		// Sword
+		break;
+	}
+	}
 	t.szModelProtoTag = m_szModelProtoTag;
 	t.bAnimated = true;
 	t.szAnimEventFile = nullptr;
@@ -173,6 +184,192 @@ HRESULT CAbility_Model::Bind_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CAbility_Model::Render_Sword()
+{
+	static constexpr _uint   iJewelMesh = 1u;
+	static constexpr _float4 vJewelDiffuse = { 1.f, 0.72f, 0.08f, 1.f };
+	static constexpr _float3 vJewelMRA = { 0.25f, 0.18f, 1.f };
+	static constexpr _float4 vJewelEmissive = { 0.05f, 0.025f, 0.f, 1.f };
+
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		_uint iPass = 1u;
+
+		if (iJewelMesh != i)
+		{
+			if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom,	"g_NormalTexture", i, MTEX_TYPE::NORMALS, 0)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom,	"g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
+				return E_FAIL;
+		}
+		else
+		{
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantDiffuse", &vJewelDiffuse, sizeof(_float4))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantMRA", &vJewelMRA, sizeof(_float3))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantEmissive", &vJewelEmissive, sizeof(_float4))))
+				return E_FAIL;
+
+			iPass = 3u;
+		}
+
+		if (m_pAnimatorCom)
+		{
+			if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+				return E_FAIL;
+		}
+
+		if (FAILED(m_pShaderCom->Begin(iPass)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Render(i)))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+HRESULT CAbility_Model::Render_Bomb()
+{
+	static constexpr _float  fBurnRatio = 0.f;
+	static constexpr _float3 vGlow = { 0.f, 0.f, 0.f };
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fBurnRatio", &fBurnRatio, sizeof(_float))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vGlow", &vGlow, sizeof(_float3))))
+		return E_FAIL;
+
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		_uint iPass = 0u;
+
+		if (1u == i)   // FuseM__FuseC (심지)
+		{
+			if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom,	"g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom,	"g_NormalTexture", i, MTEX_TYPE::NORMALS, 0)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom,	"g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom,	"g_FuseMaskTexture", i, MTEX_TYPE::UNKNOWN, 0)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom,	"g_FuseBurntTexture", i, MTEX_TYPE::UNKNOWN, 1)))
+				return E_FAIL;
+			iPass = 1u;
+		}
+		else   // BombM / MetalM (몸통)
+		{
+			if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom,	"g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 1)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom,	"g_NormalTexture", i, MTEX_TYPE::NORMALS, 0)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom,	"g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
+				return E_FAIL;
+
+			iPass = 0u;
+		}
+
+		if (m_pAnimatorCom)
+		{
+			if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+				return E_FAIL;
+		}
+
+		if (FAILED(m_pShaderCom->Begin(iPass)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Render(i)))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+HRESULT CAbility_Model::Render_Ice()
+{
+	static constexpr _float4 vIceDiffuse =	{ 0.70f, 0.84f, 0.95f, 1.f };
+	static constexpr _float3 vIceMRA =	{ 0.f, 0.15f, 1.f };
+	static constexpr _float4 vIceEmissive =	{ 0.f, 0.f, 0.f, 1.f };
+
+	static constexpr _float4 vJuelDiffuse =	{ 0.45f, 0.78f, 0.95f, 1.f };
+	static constexpr _float3 vJuelMRA =	{ 0.10f, 0.10f, 1.f };
+	static constexpr _float4 vJuelEmissive = { 0.03f, 0.06f, 0.09f, 1.f };
+
+	const _uint iNumMeshes =
+		static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		_uint iPass = 1u;
+
+		if (0u == i)   
+		{
+			if (FAILED(m_pModelCom->Bind_Material(
+				m_pShaderCom, "g_DiffuseTexture",
+				i, MTEX_TYPE::DIFFUSE, 1)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_Material(
+				m_pShaderCom, "g_UnknownTexture",
+				i, MTEX_TYPE::DIFFUSE, 0)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_Material(
+				m_pShaderCom, "g_NormalTexture",
+				i, MTEX_TYPE::NORMALS, 0)))
+				return E_FAIL;
+			if (FAILED(m_pModelCom->Bind_Material(
+				m_pShaderCom, "g_MRATexture",
+				i, MTEX_TYPE::METALNESS, 0)))
+				return E_FAIL;
+			iPass = 0u;
+		}
+		else   // Ice(1,2) / Juel(3) = 상수 Pass3
+		{
+			const _bool bJuel = (3u == i);
+
+			const _float4* pDiff =
+				bJuel ? &vJuelDiffuse : &vIceDiffuse;
+			const _float3* pMRA =
+				bJuel ? &vJuelMRA : &vIceMRA;
+			const _float4* pEmi =
+				bJuel ? &vJuelEmissive : &vIceEmissive;
+
+			if (FAILED(m_pShaderCom->Bind_RawValue(
+				"g_vConstantDiffuse",
+				pDiff, sizeof(_float4))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue(
+				"g_vConstantMRA",
+				pMRA, sizeof(_float3))))
+				return E_FAIL;
+			if (FAILED(m_pShaderCom->Bind_RawValue(
+				"g_vConstantEmissive",
+				pEmi, sizeof(_float4))))
+				return E_FAIL;
+
+			iPass = 3u;
+		}
+
+		if (m_pAnimatorCom)
+		{
+			if (FAILED(m_pModelCom->Bind_BoneMatrices(
+				m_pShaderCom, "g_BoneMatrices", i)))
+				return E_FAIL;
+		}
+
+		if (FAILED(m_pShaderCom->Begin(iPass)))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Render(i)))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }

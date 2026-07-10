@@ -158,6 +158,7 @@
 #include "LD_SlopeBoardC.h"
 #include "LD_DeformCarBreakWall.h"
 #include "LD_DeformObject.h"
+#include "LD_CopyEssence.h"
 
 // EnvObject
 #include "EnvTrigger_Generic.h"
@@ -205,6 +206,28 @@ namespace
 
         return CModel::Create_WithTextureHub(pDevice, pContext, Desc);
     }
+
+    void Register_BubbleShared(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _uint iLevelIndex)
+    {
+        TRY_ADD_PROTO(pProxy, iLevelIndex, CAbility_Model::PROTOTYPE_TAG, CAbility_Model::Create(pDevice, pContext));
+        
+        // 능력 추가될 때마다 아래에 추가
+        
+        // Sword
+        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Sword"),
+            CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Sword/Sword.ysh",
+                XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+        // Bomb
+        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_KirbyBomb"),
+            CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Gimmick/CopyEssence/Bomb/KirbyBomb.ysh",
+                XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+        // Ice
+        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_IceHat"),
+            CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Gimmick/CopyEssence/IceHat/Ice_Hat.ysh",
+                XMMatrixRotationY(XMConvertToRadians(180.f))));
+    }
 }
 
 void CGameObject_Factory::Copy_RegisteredTags(vector<wstring>* pOutTags)
@@ -238,6 +261,8 @@ void CGameObject_Factory::RegisterAll()
     Register_NonAnimObject();
     Register_AnimObject();
     Register_Effect();
+    Register_Bubble();
+
 
     Register_Cutscene();
 }
@@ -537,6 +562,9 @@ void CGameObject_Factory::Register_Container()
             //Kirby_Projectile
             TRY_ADD_PROTO(pProxy, iLevelIndex, CSpit_Projectile::PROTOTYPE_TAG,
                 CSpit_Projectile::Create(pDevice, pContext));
+
+
+
         )
     ); 
 
@@ -655,24 +683,6 @@ void CGameObject_Factory::Register_Container()
                         XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
-
-
-    // Ability Bubble - EssenceBubble
-    Register
-    (
-        CEssenceBubble::PROTOTYPE_TAG, TEXT("Bubble"),
-        CREATOR(CEssenceBubble),
-        LOADER
-        (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CAbility_Model::PROTOTYPE_TAG,
-                CAbility_Model::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Sword"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Sword/Sword.ysh"));
-
-        )
-
-    );
-
 }
 
 void CGameObject_Factory::Register_UIContainer()
@@ -731,6 +741,10 @@ void CGameObject_Factory::Register_AnimObject()
     Register(CLD_DeformObject::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_DeformObject),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Proto_Component_Model_DeformCar"),
             Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/DeformCar/DeformCar.ysh", true));));
+
+    Register(CLD_CopyEssence::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_CopyEssence),
+        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_CopyEssence::MODEL_PROTO_TAG,
+            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/DeformCarBreakWall/DeformCarBreakWall.ysh", true));));
 }
 
 void CGameObject_Factory::Register_Effect()
@@ -963,6 +977,31 @@ void CGameObject_Factory::Register_Effect()
 
         ));
 
+}
+
+void CGameObject_Factory::Register_Bubble()
+{
+    //Ability Bubble - DroppedBubble
+    Register
+    (
+        CDroppedBubble::PROTOTYPE_TAG, TEXT("Bubble"),
+        CREATOR(CDroppedBubble),
+        LOADER
+        (
+            Register_BubbleShared(pProxy, pDevice, pContext, iLevelIndex);
+        )
+    );
+
+    //Ability Bubble - EssenceBubble
+    Register
+    (
+        CEssenceBubble::PROTOTYPE_TAG, TEXT("Bubble"),
+        CREATOR(CEssenceBubble),
+        LOADER
+        (
+            Register_BubbleShared(pProxy, pDevice, pContext, iLevelIndex);
+        )
+    );
 }
 
 void CGameObject_Factory::Register_MiniBoss()

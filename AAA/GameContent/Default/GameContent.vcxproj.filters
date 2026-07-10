@@ -1018,6 +1018,12 @@
     <Filter Include="96. Director\Dialogue Arranger">
       <UniqueIdentifier>{847f5679-2d3f-4d9a-955e-be1815af2b8d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect">
+      <UniqueIdentifier>{9a60cf97-d070-41ab-b46a-36ea78ff4834}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\09. AbilityBubble\Manager">
+      <UniqueIdentifier>{3d8af718-58a0-42f1-a08e-373667aa0ea9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -2025,6 +2031,12 @@
     <ClInclude Include="..\public\Dialogue_Arranger.h">
       <Filter>96. Director\Dialogue Arranger</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\AbilityBubbleEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Bubble_Manager.h">
+      <Filter>00. GameObject\09. AbilityBubble\Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -2950,6 +2962,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Dialogue_Arranger.cpp">
       <Filter>96. Director\Dialogue Arranger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\AbilityBubbleEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bubble_Manager.cpp">
+      <Filter>00. GameObject\09. AbilityBubble\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
