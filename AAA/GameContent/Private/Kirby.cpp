@@ -37,6 +37,9 @@
 #include "EssenceBubble.h"
 #include "LD_DeformObject.h"
 
+// 임시
+#include "Bubble_Manager.h"
+
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCharacter{ pDevice, pContext }
 {
@@ -125,6 +128,35 @@ void CKirby::Update(_float fTimeDelta)
     Update_InvincibilityHitFlash();
 
     Get_CurrentDeformModel()->Set_GoundNormal(m_pMovement->Get_GroundNormal());
+
+    if (m_pGameInstance_Proxy->Key_Down(DIK_B))
+    {
+        CTransform* pT = Get_Transform();
+        _vector vP =
+            pT->Get_State(STATE::POSITION);
+        _vector vL =
+            pT->Get_State(STATE::LOOK);
+
+        // 커비 뒤 2.5m, 살짝 위
+        _vector vSpawnV = vP
+            + XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+        _float3 vSpawn{};
+        XMStoreFloat3(&vSpawn, vSpawnV);
+
+        _float3 vDir{};
+        XMStoreFloat3(&vDir, -vL);
+
+        auto* pMgr =
+            CBubble_Manager::GetInstance();
+        auto eKind =
+            CBubble_Manager::BUBBLE_KIND::DROPPED;
+
+        pMgr->Spawn(
+            Get_LevelIndex(), eKind,
+            COPY_ABILITY_TYPE::SWORD,
+            vSpawn, vDir, nullptr);
+    }
 }
 
 void CKirby::Late_Update(_float fTimeDelta)
@@ -449,8 +481,8 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::MONSTER_PROJECTILE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::ENV_HURT));
-    //m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::ESSENCE_BUBBLE));      // Dropped Bubble 구현시 등록
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::DROPPED_BUBBLE));
 
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HIT));
@@ -520,8 +552,9 @@ HRESULT CKirby::SetUp_Collider_Callback()
                 if (pEssenceBubble == nullptr)
                     return;
 
-                m_pKirby_StateMachine->Get_EssenceBubble(pEssenceBubble->Get_Ability());
-            }                      
+                if (pEssenceBubble->Is_Available())
+                    m_pKirby_StateMachine->Get_EssenceBubble(pEssenceBubble->Get_Ability());
+            }
             else if (iGroup == ETOUI(COLLISION_LAYER::DEFORM_OBJECT))
             {
                 Set_TriggerDeformObj(static_cast<CLD_DeformObject*>(pGameObject));

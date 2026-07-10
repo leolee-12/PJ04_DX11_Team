@@ -3,6 +3,7 @@
 #include "Effect_Loader.h"
 #include "Projectile_Manager.h"
 #include "Mission_Manager.h"
+#include "Bubble_Manager.h"
 
 
 void CSingleton_Destroyer::Destroy_GameContent_Singletons()
@@ -11,4 +12,5 @@ void CSingleton_Destroyer::Destroy_GameContent_Singletons()
 	CEffect_Loader::DestroyInstance();
 	CProjectile_Manager::DestroyInstance();
 	CMissionManager::DestroyInstance();
+	CBubble_Manager::DestroyInstance();
 }
