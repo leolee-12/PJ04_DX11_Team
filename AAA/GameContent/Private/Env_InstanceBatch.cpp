@@ -185,7 +185,7 @@ HRESULT CEnv_InstanceBatch::Initialize(void* pArg)
 
 HRESULT CEnv_InstanceBatch::Ready_Component()
 {
-	m_pShaderCom = Add_Component<CShader>(Shader_EnvInstance.iLevelID, Shader_EnvInstance.szProtoTag, TEXT("Com_Shader"));
+	m_pShaderCom = Add_Component<CShader>(Shader_World_Instance.iLevelID, Shader_World_Instance.szProtoTag, TEXT("Com_Shader"));
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
@@ -288,9 +288,9 @@ HRESULT CEnv_InstanceBatch::Render_Instanced()
 		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
 		Ctx.iMesh = i;
 		Ctx.pLayer = &Layer;
-		Ctx.eProfile = MESH_LAYER_PROFILE::ENV_INSTANCE;
+		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_INSTANCE;
 		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
-		Ctx.iFallbackPass = ETOUI(ENV_PASS::DMN);
+		Ctx.iFallbackPass = ETOUI(WORLD_PASS::DMN);
 
 		MESH_LAYER_BIND_RESULT Result{};
 		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
@@ -382,9 +382,9 @@ HRESULT CEnv_InstanceBatch::Render_Decal_Instanced()
 		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
 		Ctx.iMesh = i;
 		Ctx.pLayer = &Layer;
-		Ctx.eProfile = MESH_LAYER_PROFILE::ENV_INSTANCE;
+		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_INSTANCE;
 		Ctx.eKind = MESH_LAYER_RENDER_KIND::DECAL;
-		Ctx.iFallbackPass = ETOUI(ENV_PASS::DECAL);
+		Ctx.iFallbackPass = ETOUI(WORLD_PASS::DECAL);
 
 		MESH_LAYER_BIND_RESULT Result{};
 		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
@@ -439,9 +439,9 @@ HRESULT CEnv_InstanceBatch::Render_Shadow_Instanced()
 		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
 		Ctx.iMesh = i;
 		Ctx.pLayer = &Layer;
-		Ctx.eProfile = MESH_LAYER_PROFILE::ENV_INSTANCE;
+		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_INSTANCE;
 		Ctx.eKind = MESH_LAYER_RENDER_KIND::SHADOW;
-		Ctx.iFallbackPass = ETOUI(ENV_PASS::SHADOW);
+		Ctx.iFallbackPass = ETOUI(WORLD_PASS::SHADOW);
 
 		MESH_LAYER_BIND_RESULT Result{};
 		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))

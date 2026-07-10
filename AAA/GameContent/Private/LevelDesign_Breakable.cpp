@@ -243,9 +243,9 @@ HRESULT CLevelDesign_Breakable::Render()
 			Ctx.pGI_Proxy = m_pGameInstance_Proxy;
 			Ctx.iMesh = i;
 			Ctx.pLayer = &Layer;
-			Ctx.eProfile = MESH_LAYER_PROFILE::NONANIM_PBR;
+			Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
 			Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
-			Ctx.iFallbackPass = ShaderPass::NonAnimPBR::DMN;
+			Ctx.iFallbackPass = ETOUI(WORLD_PASS::DMN);
 			Ctx.fDissolve = 0.f;
 
 			MESH_LAYER_BIND_RESULT Result{};
@@ -365,7 +365,7 @@ HRESULT CLevelDesign_Breakable::Ready_Components()
 
 	const auto& ShaderDesc = MODEL::ANIM == m_tBreakableDesc.eModelType
 		? Shader_AnimMesh_PBR
-		: Shader_NonAnimMesh_PBR;
+		: Shader_World_NonAnim;
 
 	m_pShaderCom = Add_Component<CShader>(ShaderDesc.iLevelID, ShaderDesc.szProtoTag,
 		TEXT("Com_Shader"));
