@@ -16,10 +16,20 @@ private:
 	virtual ~CEssenceBubble() = default;
 
 public:
+	virtual HRESULT				Initialize(void* pArg) override;
+	virtual void				Update(_float fTimeDelta) override;
+	virtual void				Activate(const _float3& vPos) override;
 	virtual void				Copy_PrototypeName(ENGINE_OBJECT_DATA* pOut) override
 	{
 		pOut->strPrototypeTag = PROTOTYPE_TAG;
 	}
+
+protected:
+	virtual void				SetUp_Collider_CallBack() override;
+
+private:
+	static constexpr _float		s_fReSpawnTime = { 2.f };
+	_bool						m_bIsKirbyEnter = { false };
 
 public:
 	static CEssenceBubble*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

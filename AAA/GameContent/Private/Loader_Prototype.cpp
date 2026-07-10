@@ -20,6 +20,7 @@
 #include "UI_CurtainTexture.h"
 #include "Env_InstanceController.h"
 #include "Collider.h"
+#include "Bubble_Manager.h"
 
 
 NS_BEGIN(Client)
@@ -31,6 +32,9 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
 
     // 셰어드 리소스 준비 직후 1회
     if (FAILED(CEffect_Loader::GetInstance()->Ready(pProxy, pDevice, pContext)))
+        return E_FAIL;
+
+    if (FAILED(CBubble_Manager::GetInstance()->Initialize(pDevice, pContext)))
         return E_FAIL;
 
     // 게임플레이에서 호출 커비 등이 자기 레벨로 스폰
