@@ -34,7 +34,7 @@ public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
 
 public:
-	virtual void Request_Attach_End(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType) override;
+	virtual void Request_Attachment_End(CKirby* pKirby, const KIRBY_ATTACHMENT_END_DESC* pDesc) override;
 
 public:
 	static CKirby_CarFirstBreakWall* Create();

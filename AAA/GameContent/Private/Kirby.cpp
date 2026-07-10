@@ -731,9 +731,9 @@ HRESULT CKirby::Ready_Events()
     Subscribe_Event(EventTag::Kirby_AttachmentBegin,
         [this](void* pData)
         {
-            KIRBY_ATTACHMENT_BEGIN_DESC* pDesc = static_cast<KIRBY_ATTACHMENT_BEGIN_DESC*>(pData);
-            Set_CutsceneGrabTarget(pDesc);
-            m_pKirby_StateMachine->Request_Attachment_StateMachine(pDesc->eType);
+            const auto* pDesc = static_cast<KIRBY_ATTACHMENT_BEGIN_DESC*>(pData);
+            Set_CutsceneAttachTarget(pDesc);
+            m_pKirby_StateMachine->Request_Attachment_StateMachine(pDesc);
         }
     );
 
@@ -741,8 +741,8 @@ HRESULT CKirby::Ready_Events()
         [this](void* pData)
         {
             const auto* pDesc = static_cast<KIRBY_ATTACHMENT_END_DESC*>(pData);
-            Clear_CutsceneGrabTarget();
-            m_pKirby_StateMachine->Request_Attachment_End_StateMachine(pDesc->eType);
+            Clear_CutsceneAttachTarget();
+            m_pKirby_StateMachine->Request_Attachment_End_StateMachine(pDesc);
         }
     );
 
@@ -799,21 +799,21 @@ void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
     m_pKirby_StateMachine->On_Damaged_KirbyStateMachine(tInfo);
 }
 
-void CKirby::Set_CutsceneGrabTarget(KIRBY_ATTACHMENT_BEGIN_DESC* pGrabDesc)
+void CKirby::Set_CutsceneAttachTarget(const KIRBY_ATTACHMENT_BEGIN_DESC* pAttachDesc)
 {
     m_vPreAttachScale = Get_Transform()->Get_Scaled();
-    m_pGrabBone = pGrabDesc->pBoneMatrix;
-    m_pGrabOwnerWorld = pGrabDesc->pSourceWorld;
+    m_pAttachBone = pAttachDesc->pBoneMatrix;
+    m_pAttachOwnerWorld = pAttachDesc->pSourceWorld;
 }
 
-void CKirby::Clear_CutsceneGrabTarget()
+void CKirby::Clear_CutsceneAttachTarget()
 {
     m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(m_vPreAttachScale.x, 0.f, 0.f, 0.f));
     m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, m_vPreAttachScale.y, 0.f, 0.f));
     m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, m_vPreAttachScale.z, 0.f));
 
-    m_pGrabBone = nullptr;
-    m_pGrabOwnerWorld = nullptr;
+    m_pAttachBone = nullptr;
+    m_pAttachOwnerWorld = nullptr;
 }
 
 void CKirby::Update_BlobShadow()
@@ -899,13 +899,13 @@ CCollider* CKirby::Get_Collider(KIRBY_COLLIDER eKirbyCollider)
     return m_KirbyColliders[eKirbyCollider];
 }
 
-void CKirby::Update_CutsceneGrabTransform()
+void CKirby::Update_CutsceneAttachTransform()
 {
-    if (m_pGrabBone == nullptr || m_pGrabOwnerWorld == nullptr)
+    if (m_pAttachBone == nullptr || m_pAttachOwnerWorld == nullptr)
         return;
 
     _matrix matGrabTargetWorld = XMMatrixRotationY(XMConvertToRadians(-180.f))
-        * XMLoadFloat4x4(m_pGrabBone) * XMLoadFloat4x4(m_pGrabOwnerWorld);
+        * XMLoadFloat4x4(m_pAttachBone) * XMLoadFloat4x4(m_pAttachOwnerWorld);
     Get_Transform()->Set_WorldMatrix(matGrabTargetWorld);
 
     m_pMovement->Sync_To_Controller();

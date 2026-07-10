@@ -86,14 +86,38 @@ void CKirby_StateMachine::On_Damaged_KirbyStateMachine(const ATTACK_INFO& tInfo)
     m_pCurState->On_Damaged_KirbyState(m_pKirby, tInfo);
 }
 
-void CKirby_StateMachine::Request_Attachment_StateMachine(KIRBY_ATTACHMENT_CONTEXT eType)
+void CKirby_StateMachine::Request_Attachment_StateMachine(const KIRBY_ATTACHMENT_BEGIN_DESC* pDesc)
 {
-    m_pCurState->Request_Attach(m_pKirby, eType);
+    switch (pDesc->eType)
+    {
+        case KIRBY_ATTACHMENT_CONTEXT::GORILLA_SCENE:
+        {
+            Change_State(KIRBY_STATE_TYPE::CUTSCENE_GRABBED);
+            break;
+        }
+        case KIRBY_ATTACHMENT_CONTEXT::GORILLA_COMBAT:
+        {
+            Change_State(KIRBY_STATE_TYPE::QTE_GRABBED);
+            break;
+        }
+        case KIRBY_ATTACHMENT_CONTEXT::DEFORM_CAR_GET_FIRST:
+        {
+            Change_State(KIRBY_STATE_TYPE::CAR_FIRST_BREAK_WALL);
+            break;
+        }
+        default:
+        {
+            MSG_BOX("Event Miss: CKirby_StateMachine");
+            return;
+        }
+    }
+
+    m_pCurState->Request_Attachment(m_pKirby, pDesc);
 }
 
-void CKirby_StateMachine::Request_Attachment_End_StateMachine(KIRBY_ATTACHMENT_END_REASON eType)
+void CKirby_StateMachine::Request_Attachment_End_StateMachine(const KIRBY_ATTACHMENT_END_DESC* pDesc)
 {
-    m_pCurState->Request_Attach_End(m_pKirby, eType);
+    m_pCurState->Request_Attachment_End(m_pKirby, pDesc);
 }
 
 void CKirby_StateMachine::Request_PositionSync_StateMachine(const KIRBY_POSITION_SYNC_BEGIN_DESC* pDesc)
@@ -105,7 +129,7 @@ void CKirby_StateMachine::Request_PositionSync_StateMachine(const KIRBY_POSITION
             Change_State(KIRBY_STATE_TYPE::DEFORM_CAR_BRIDGE);
             break;
         }
-        case KIRBY_POSITION_SYNC_CONTEXT::DEFAULT_SYNC:
+        case KIRBY_POSITION_SYNC_CONTEXT::_COUNT:
         {
             break;
         }
@@ -116,7 +140,7 @@ void CKirby_StateMachine::Request_PositionSync_StateMachine(const KIRBY_POSITION
 
 void CKirby_StateMachine::Request_PositionSync_End_StateMachine(const KIRBY_POSITION_SYNC_END_DESC* pDesc)
 {
-    m_pCurState->Request_PositionEndSync(m_pKirby, pDesc);
+    m_pCurState->Request_PositionSync_End(m_pKirby, pDesc);
 }
 
 void CKirby_StateMachine::Request_ClearStage_StateMachine(const CUTSCENE_STAGECLEAR* pDesc)

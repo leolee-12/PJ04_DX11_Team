@@ -34,7 +34,7 @@ public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
 	virtual void Request_PositionSync(CKirby* pKirby, const KIRBY_POSITION_SYNC_BEGIN_DESC* pDesc) override;
-	virtual void Request_PositionEndSync(CKirby* pKirby, const KIRBY_POSITION_SYNC_END_DESC* pDesc) override;
+	virtual void Request_PositionSync_End(CKirby* pKirby, const KIRBY_POSITION_SYNC_END_DESC* pDesc) override;
 
 private:
 	void Change_BridgeState(CKirby* pKirby, DEFORM_CAR_BRIDGE_STATE eNext);
