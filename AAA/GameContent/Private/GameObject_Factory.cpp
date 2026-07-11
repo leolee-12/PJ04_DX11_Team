@@ -35,6 +35,7 @@
 #include "UI_MissionPanel.h"
 #include "UI_LetterBox.h"
 #include "UI_TitleLogo.h"
+#include "UI_CutFade.h"
 
 // UI Parts
 #include "UI_Image.h"
@@ -47,7 +48,6 @@
 #include "UI_Eraser.h"
 #include "UI_SpriteAnimCurtain.h"
 #include "UI_CurtainTexture.h"
-
 
 // Kirby
 #include "Kirby.h"
@@ -186,6 +186,15 @@
 
 #include "Ability_Model.h"
 
+//System Object
+#include "KirbySpawnPoint.h"
+#include "CameraDirector.h"
+#include "Dialogue_Director.h"
+#include "Dialogue_Arranger.h"
+
+// CutSceneActor
+#include "DialogueDee.h"
+
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
 #define CREATOR(CLASS) \
@@ -275,6 +284,7 @@ void CGameObject_Factory::RegisterAll()
 
 
     Register_Cutscene();
+    Register_SystemObject();
 }
 
 void CGameObject_Factory::Register_UI()
@@ -714,6 +724,7 @@ void CGameObject_Factory::Register_UIContainer()
     Register(CUI_MissionPanel::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_MissionPanel), LOADER());
     Register(CUI_LetterBox::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_LetterBox), LOADER());
     Register(CUI_TitleLogo::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_TitleLogo), LOADER());
+    Register(CUI_CutFade::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_CutFade), LOADER());
 }
 
 void CGameObject_Factory::Register_NonAnimObject()
@@ -1119,6 +1130,22 @@ void CGameObject_Factory::Register_MainBoss()
                     "../../Resources/YSH/Boss/Gorilla/NamePlate/Model_KR.ysh"));
         )
     );
+
+    Register(CBoss_Cage::PROTOTYPE_TAG, TEXT("MainBoss"),
+        CREATOR(CBoss_Cage),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/WaddleDee/Body/Model_Anim.ysh"
+                    , XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::PROTOTYPE_TAG, CCage_WaddleDee::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Cage_Body::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Gimmick/CaptiveCage/CageL/CageL_Anim_TopL.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Cage_Body::PROTOTYPE_TAG, CBoss_Cage_Body::Create(pDevice, pContext));
+        )
+    );
 }
 
 void CGameObject_Factory::Register_Cutscene()
@@ -1132,6 +1159,23 @@ void CGameObject_Factory::Register_Cutscene()
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
+
+    Register(CDialogueDee::PROTOTYPE_TAG, TEXT("Dialogue"),
+        CREATOR(CDialogueDee),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM,
+                    "../../Resources/YSH/WaddleDee/Body/Model_Anim.ysh"
+                    , XMMatrixRotationY(XMConvertToRadians(180.f))));
+        ));
+}
+
+void CGameObject_Factory::Register_SystemObject()
+{
+    Register(CKirbySpawnPoint::PROTOTYPE_TAG, TEXT("System_Object"), CREATOR(CKirbySpawnPoint), LOADER());
+    Register(CCameraDirector::PROTOTYPE_TAG, TEXT("System_Object"), CREATOR(CCameraDirector), LOADER());
+    Register(CDialogue_Director::PROTOTYPE_TAG, TEXT("System_Object"), CREATOR(CDialogue_Director), LOADER());
+    Register(CDialogue_Arranger::PROTOTYPE_TAG, TEXT("System_Object"), CREATOR(CDialogue_Arranger), LOADER());
 }
 
 void CGameObject_Factory::Free()

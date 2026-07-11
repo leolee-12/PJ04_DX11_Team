@@ -119,6 +119,7 @@ void CBossBase::Update_AI(_float fTimeDelta)
                     Enable_Controller(false);
                     Enable_Colliders(false);
                     Set_Active(false);
+					On_Corpse_End();
                 }
             }
             if (m_pMovement && !m_pGameInstance_Proxy->Is_EditMode())

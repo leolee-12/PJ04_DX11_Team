@@ -234,8 +234,7 @@ void CPoppyBrosJr::Attach_Bomb()
 		return;
 
 	CProjectile* pBomb = nullptr;
-	CProjectile_Manager::GetInstance()->Spawn(
-		Get_LevelIndex(), L"Bomb", CEnemyBomb::PROTOTYPE_TAG, &pBomb);
+	CProjectile_Manager::GetInstance()->Spawn(Get_PrototypeLevelIndex(), Get_LevelIndex(), L"Bomb", CEnemyBomb::PROTOTYPE_TAG, &pBomb);
 	if (nullptr == pBomb)
 		return;
 

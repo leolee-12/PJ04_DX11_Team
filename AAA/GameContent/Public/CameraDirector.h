@@ -4,6 +4,10 @@
 
 NS_BEGIN(Client)
 
+class CCamera_AreaCam;
+class CCamera_Cutscene;
+class CCamera_Boss;
+
 class CLIENT_DLL CCameraDirector final : public CGameObject
 {
     GENERATED_BODY(CCameraDirector)
@@ -21,9 +25,23 @@ public:
 
 protected:
     virtual HRESULT Ready_Events() override;
+    virtual void On_Deserialized() override;
 
 private:
     void On_CameraChange(void* p);
+
+    HRESULT Ensure_Cameras();    
+    void    Arrange();           
+    void    Sleep_Cameras();     
+
+private:
+    _bool m_bClone = { false };
+
+    CCamera_AreaCam* m_pAreaCam = { nullptr };
+    CCamera_Cutscene* m_pCutCam = { nullptr };
+    CCamera_Boss* m_pBossCam = { nullptr };
+
+    static CCameraDirector* s_pActiveDirector;
 
 public:
     static CCameraDirector* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
