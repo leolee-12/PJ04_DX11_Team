@@ -40,6 +40,8 @@ public:
     void PlayBGM_Section(const TCHAR* pSoundKey, float fStart01, float fEnd01, float fVolume = 1.f);
     void Fade_BGM_Out(_float fSec);
     void Play_BGM_Fade(const TCHAR* pSoundKey, float fSec, float fVolume = 1.f);
+    void Play_BGM_Fade(const TCHAR* pSoundKey, float fInSec, float fOutSec, float fVolume, CSound_Handle* pOut);
+    void Resume_BGM_Fade(CSound_Handle& hBgm, float fInSec);
 
     // 버스(카테고리) 단위 제어
     void SetBusVolume(ESoundBus eBus, float fVolume);
@@ -69,7 +71,7 @@ private:
     HRESULT LoadSoundFile();
     HRESULT LoadSoundFileRecursive(const char* pPath);
 
-    static void Fade_BGM_Channel(FMOD::Channel* pCh, float fFrom, float fTo, float fSeconds, bool bStopAtEnd);
+    static void Fade_BGM_Channel(FMOD::Channel* pChannel, float fFrom, float fTo, float fSeconds, bool bStopAtEnd);
 
 public:
     static CSound_Manager* Create();

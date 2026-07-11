@@ -23,7 +23,7 @@ HRESULT CSound_Manager::Initialize()
 
 HRESULT CSound_Manager::Ready_Buses()
 {
-	static const char* s_szBusName[] = { "BGM", "SFX", "UI", "VOICE" };
+	static const char* s_szBusName[] = { "BGM", "SFX", "UI", "VOICE", "Ambient" };
 
 	FMOD::ChannelGroup* pMaster = nullptr;
 	m_pSystem->getMasterChannelGroup(&pMaster);
@@ -204,6 +204,42 @@ void CSound_Manager::Play_BGM_Fade(const TCHAR* pSoundKey, float fSec, float fVo
 	Fade_BGM_Channel(m_pBGMChannel, 0.f, 1.f, fSec, false);
 }
 
+void CSound_Manager::Play_BGM_Fade(const TCHAR* pSoundKey, float fInSec, float fOutSec, float fVolume, CSound_Handle* pOut)
+{
+	Fade_BGM_Out(fOutSec);
+
+	m_pBGMChannel = PlayInternal(pSoundKey, fVolume, ESoundBus::BGM, true);
+
+	if (pOut)
+		*pOut = CSound_Handle(m_pBGMChannel);
+
+	if (!m_pBGMChannel)
+		return;
+
+	Fade_BGM_Channel(m_pBGMChannel, 0.f, 1.f, fInSec, false);
+}
+
+void CSound_Manager::Resume_BGM_Fade(CSound_Handle& hBgm, float fInSec)
+{
+	FMOD::Channel* pChannel = hBgm.m_pChannel;
+	if (!pChannel)
+		return;
+
+	bool bPlaying = false;
+	if (pChannel->isPlaying(&bPlaying) != FMOD_OK || !bPlaying)
+	{
+		hBgm = CSound_Handle();
+		return;
+	}
+
+	if (m_pBGMChannel && m_pBGMChannel != pChannel)
+		Fade_BGM_Out(fInSec);
+
+	m_pBGMChannel = pChannel;
+	pChannel->setPaused(false);
+	Fade_BGM_Channel(pChannel, 0.f, 1.f, fInSec, false);
+}
+
 void CSound_Manager::SetBusVolume(ESoundBus eBus, float fVolume)
 {
 	if (m_pBuses[ETOUI(eBus)])
@@ -307,34 +343,34 @@ HRESULT CSound_Manager::LoadSoundFileRecursive(const char* pPath)
 	return S_OK;
 }
 
-void CSound_Manager::Fade_BGM_Channel(FMOD::Channel* pCh, float fFrom, float fTo, float fSeconds, bool bStopAtEnd)
+void CSound_Manager::Fade_BGM_Channel(FMOD::Channel* pChannel, float fFrom, float fTo, float fSeconds, bool bStopAtEnd)
 {
-	if (!pCh)
+	if (!pChannel)
 		return;
 
-	FMOD::System* pSys = nullptr;
-	if (pCh->getSystemObject(&pSys) != FMOD_OK || !pSys)
+	FMOD::System* pSystem = nullptr;
+	if (pChannel->getSystemObject(&pSystem) != FMOD_OK || !pSystem)
 		return;
 
-	int iRate = 48000;
-	if (pSys->getSoftwareFormat(
-		&iRate, nullptr, nullptr) != FMOD_OK)
+	int iSampleRate = 48000;
+	if (pSystem->getSoftwareFormat(
+		&iSampleRate, nullptr, nullptr) != FMOD_OK)
 		return;
 
-	unsigned long long clk = 0;
-	if (pCh->getDSPClock(nullptr, &clk) != FMOD_OK)
+	unsigned long long iDspClock = 0;
+	if (pChannel->getDSPClock(nullptr, &iDspClock) != FMOD_OK)
 		return;
 
 	if (fSeconds < 0.f)
 		fSeconds = 0.f;
-	unsigned long long fade =
-		(unsigned long long)((double)iRate * fSeconds);
+	unsigned long long iFadeSamples =
+		(unsigned long long)((double)iSampleRate * fSeconds);
 
-	pCh->removeFadePoints(0, ~0ull);
-	pCh->addFadePoint(clk, fFrom);
-	pCh->addFadePoint(clk + fade, fTo);
+	pChannel->removeFadePoints(0, ~0ull);
+	pChannel->addFadePoint(iDspClock, fFrom);
+	pChannel->addFadePoint(iDspClock + iFadeSamples, fTo);
 	if (bStopAtEnd)
-		pCh->setDelay(0, clk + fade, true);
+		pChannel->setDelay(0, iDspClock + iFadeSamples, true);
 }
 
 CSound_Manager* CSound_Manager::Create()

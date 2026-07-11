@@ -50,6 +50,9 @@ public:
 	virtual void				On_SpatBegin() override;
 	virtual void				On_SpatEnd() override;
 
+	virtual void				Enable_Colliders(_bool bEnable) override;
+
+
 public:
 	CCappy_Body*				Get_Body() { return m_pBody; }
 	CCappy_Hat*					Get_Hat() { return m_pHat; }

@@ -205,6 +205,8 @@ private:
 	void Play_BGM_Section(const TCHAR* pSoundKey, float fStart01, float fEnd01, float fVolume = 1.f);
 	void Fade_BGM_Out(float fSeconds);
 	void Play_BGM_Fade(const TCHAR* pSoundKey, float fSeconds, float fVolume = 1.f);
+	void Play_BGM_Fade(const TCHAR* pSoundKey, float fInSec, float fOutSec,	float fVolume, CSound_Handle* pOut);
+	void Resume_BGM_Fade(CSound_Handle& hBgm, float fInSec);
 	void Stop_BGM();
 	void Set_BusVolume(ESoundBus eBus, float fVolume);
 	void Stop_Bus(ESoundBus eBus);
