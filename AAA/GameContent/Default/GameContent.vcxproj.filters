@@ -1068,6 +1068,15 @@
     <Filter Include="00. GameObject\08. CutsceneActor\WaddleDee">
       <UniqueIdentifier>{6700c8e4-b099-469b-ad89-420d86594b71}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\Dialogue">
+      <UniqueIdentifier>{90e690e2-d3c3-47c6-b828-2881240d9b80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\HelpUI">
+      <UniqueIdentifier>{3129b019-37b4-434d-a7f9-b49f78201594}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\HelpUI\QTE">
+      <UniqueIdentifier>{1caed732-02f9-405a-8cf4-37f1442462c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -2121,6 +2130,12 @@
     <ClInclude Include="..\Public\StarMesh.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\Mesh</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\UI_Dialogue.h">
+      <Filter>00. GameObject\97. UI\UIContainer\Dialogue</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_QTE.h">
+      <Filter>00. GameObject\97. UI\UIContainer\HelpUI\QTE</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -3092,6 +3107,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\StarMesh.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_Dialogue.cpp">
+      <Filter>00. GameObject\97. UI\UIContainer\Dialogue</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_QTE.cpp">
+      <Filter>00. GameObject\97. UI\UIContainer\HelpUI\QTE</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

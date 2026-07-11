@@ -36,6 +36,8 @@
 #include "UI_LetterBox.h"
 #include "UI_TitleLogo.h"
 #include "UI_CutFade.h"
+#include "UI_Dialogue.h"
+#include "UI_QTE.h"
 
 // UI Parts
 #include "UI_Image.h"
@@ -725,6 +727,8 @@ void CGameObject_Factory::Register_UIContainer()
     Register(CUI_LetterBox::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_LetterBox), LOADER());
     Register(CUI_TitleLogo::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_TitleLogo), LOADER());
     Register(CUI_CutFade::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_CutFade), LOADER());
+    Register(CUI_Dialogue::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_Dialogue), LOADER());
+    Register(CUI_QTE::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_QTE), LOADER());
 }
 
 void CGameObject_Factory::Register_NonAnimObject()

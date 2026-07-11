@@ -49,6 +49,8 @@ namespace Client
 
         // QTE
         inline constexpr const _tchar* QTE_Success = L"QTE.Success";
+        inline constexpr const _tchar* QTE_Show = L"QTE.Show";
+        inline constexpr const _tchar* QTE_Hide = L"QTE.Hide";
 
         // 카메라
         inline constexpr const _tchar* Camera_Shake = L"Camera.Shake";
@@ -88,6 +90,8 @@ namespace Client
         inline constexpr const _tchar* Dialogue_Arrange = L"Dialogue.Arrange";
         inline constexpr const _tchar* Sequence_KirbyAnim = L"Sequence.KirbyAnim";
         inline constexpr const _tchar* Sequence_KirbyWarp = L"Sequence.KirbyWarp";
+        inline constexpr const _tchar* Dialogue_Say = L"Dialogue.Say";
+        inline constexpr const _tchar* Dialogue_SayDone = L"Dialogue.SayDone";
 
         // 케이지
         inline constexpr const _tchar* Cage_Descend = L"Cage.Descend";
@@ -280,6 +284,11 @@ namespace Client
         _bool  bLoop = { false };
         _float fSpeed = { 1.f };
         _float fBlendDuration = { 0.2f };
+    };
+    struct DIALOGUE_SAY_DESC
+    {
+        _wstring strSpeaker{};
+        _wstring strLines[3]{};    // Top / Middle / Bottom
     };
 #pragma endregion
 
