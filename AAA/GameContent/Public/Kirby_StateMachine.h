@@ -52,6 +52,14 @@ public:
 
 	void Request_ClearStage_StateMachine(const CUTSCENE_STAGECLEAR* pDesc);
 
+	// Dialogue
+	void Request_Dialogue_StateMachine(const SEQUENCE_KIRBY_WARP_DESC* pDesc);
+	void Request_DialogueAnim_StateMachine(const SEQUENCE_KIRBY_ANIM_DESC* pDesc);
+
+	// SequenceLock
+	void Request_SequenceLock_StateMachine(const KIRBY_LEVEL_SPAWN_DESC* pDesc);
+	void Request_SequenceLock_End_StateMachine(const KIRBY_LEVEL_SLEEP_DESC* pDesc);
+
 public:
 	void Get_EssenceBubble(COPY_ABILITY_TYPE eNewAbility);
 

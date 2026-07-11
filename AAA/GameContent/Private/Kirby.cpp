@@ -690,7 +690,7 @@ HRESULT CKirby::Ready_Events()
         }
     );
 
-    //넴주
+    // SequenceLock
     Subscribe_Event(EventTag::Kirby_LevelSpawn,
         [this](void* pData)
         {
@@ -698,9 +698,10 @@ HRESULT CKirby::Ready_Events()
             m_pLastSpawner = pDesc->pSpawner;
 
             Set_OwnerLevelLayer(pDesc->iLevelIndex, m_strLayerTag);
-
-            Warp_To(pDesc->vPosition, pDesc->vLook);
-        });
+            m_pKirby_StateMachine->Request_SequenceLock_StateMachine(pDesc);
+            Set_Active(true);
+        }
+    );
 
     Subscribe_Event(EventTag::Kirby_LevelSleep,
         [this](void* pData)
@@ -710,16 +711,50 @@ HRESULT CKirby::Ready_Events()
             if (pDesc->pSpawner != m_pLastSpawner)
                 return;
 
+            m_pKirby_StateMachine->Request_SequenceLock_End_StateMachine(pDesc);
+            Set_Active(false);
+
+            // 나중에 수정 차 회전이랑 한번에
             Clear_CutsceneAttachTarget();
             Clear_Ladder();
             Set_TriggerDeformObj(nullptr);
             Set_HeldDeformObj(nullptr);
-
-            Set_Active(false);
-        });
+        }
+    );
 
     Subscribe_Event(EventTag::Kirby_HUD_Refresh,
-        [this](void*) { Republish_HUDState(); });
+        [this](void*)
+        {
+            Republish_HUDState();
+        }
+    );
+
+    // Dialogue
+#pragma region Dialogue
+    // 위치 이동
+    Subscribe_Event(EventTag::Sequence_KirbyWarp,
+        [this](void* pData)
+        {
+            const auto* pDesc = static_cast<SEQUENCE_KIRBY_WARP_DESC*>(pData);
+            if (pDesc == nullptr)
+                return;
+
+            m_pKirby_StateMachine->Request_Dialogue_StateMachine(pDesc);
+        }
+    );
+
+    // 대화 애니메이션 시작
+    Subscribe_Event(EventTag::Sequence_KirbyAnim,
+        [this](void* pData)
+        {
+            const auto* pDesc = static_cast<SEQUENCE_KIRBY_ANIM_DESC*>(pData);
+            if (pDesc == nullptr)
+                return;
+
+            m_pKirby_StateMachine->Request_DialogueAnim_StateMachine(pDesc);
+        }
+    );
+#pragma endregion
 
     return S_OK;
 }
@@ -936,24 +971,6 @@ void CKirby::Update_GroundNormal(_float3& vGroundNormal)
     vGroundNormal = vHitNormal;
 }
 
-void CKirby::Warp_To(const _float3& vPosition, const _float3& vLook)
-{
-    m_pTransformCom->Set_State(STATE::POSITION,
-        XMVectorSetW(XMLoadFloat3(&vPosition), 1.f));
-
-    _vector vFlatLook = XMVectorSetY(XMVectorSetW(XMLoadFloat3(&vLook), 0.f), 0.f);
-    if (XMVectorGetX(XMVector3LengthSq(vFlatLook)) > FLT_EPSILON)
-        m_pTransformCom->LookAt(m_pTransformCom->Get_State(STATE::POSITION) + vFlatLook);
-
-    if (m_pMovement)
-        m_pMovement->Sync_To_Controller();
-
-    // 이거 일단 임시로 박음
-    Change_State(KIRBY_STATE_TYPE::WAIT);
-
-    Set_Active(true);
-}
-
 void CKirby::Republish_HUDState()
 {
     KIRBY_HP_UPDATED tHP{};
@@ -963,8 +980,7 @@ void CKirby::Republish_HUDState()
     m_pGameInstance_Proxy->Publish(EventTag::Kirby_HP_Updated, &tHP);
 
     KIRBY_NAME_UPDATED tName{};
-    if (CKirby_AttackMode* pMode = Get_ActiveAttackMode())
-        tName.strAtkModeName = pMode->Get_AttackModeName();
+    tName.strAtkModeName = Get_ActiveAttackMode()->Get_AttackModeName();
     m_pGameInstance_Proxy->Publish(EventTag::Kirby_Name_Updated, &tName);
 }
 
