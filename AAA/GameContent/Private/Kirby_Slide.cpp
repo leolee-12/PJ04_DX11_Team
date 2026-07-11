@@ -5,6 +5,7 @@
 #include "Kirby.h"
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
+#include "Kirby_Jump.h"
 
 #include "Movement_Child.h"
 
@@ -70,7 +71,7 @@ _bool CKirby_Slide::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
                 (m_fSlideTime / 2.f) > 0.3f)
                 return true;
 
-            pKirby->Change_State(KIRBY_STATE_TYPE::JUMP);
+            pKirby->Change_State(KIRBY_STATE_TYPE::JUMP, JUMP_STATE_FLAG::JUMP_FROM_SLIDE);
             return true;
         }
     }
