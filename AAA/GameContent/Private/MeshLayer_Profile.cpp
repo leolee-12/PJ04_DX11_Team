@@ -12,30 +12,6 @@ _uint MeshLayerProfile::Resolve_MapPass(const MESH_LAYER_IDX& Layer, _uint iFall
     return static_cast<_uint>(iPass);
 }
 
-_uint MeshLayerProfile::Resolve_NonAnimPBRPass(const MESH_LAYER_IDX& Layer, _uint iFallbackPass)
-{
-    const ENV_SHADER_PASS_META* pMeta = Find_EnvShaderPassMeta(Layer.iPass);
-    if (nullptr == pMeta)
-        return iFallbackPass;
-
-    if (ENV_PASS::DEFAULT == pMeta->ePass)
-        return iFallbackPass;
-
-    return pMeta->iNonAnimPass;
-}
-
-_uint MeshLayerProfile::Resolve_EnvInstancePass(const MESH_LAYER_IDX& Layer, _uint iFallbackPass)
-{
-    const ENV_SHADER_PASS_META* pMeta = Find_EnvShaderPassMeta(Layer.iPass);
-    if (nullptr == pMeta)
-        return iFallbackPass;
-
-    if (ENV_PASS::DEFAULT == pMeta->ePass)
-        return iFallbackPass;
-
-    return static_cast<_uint>(pMeta->ePass);
-}
-
 _uint MeshLayerProfile::Resolve_WorldPass(const MESH_LAYER_IDX& Layer, _uint iFallbackPass)
 {
     const auto ePass = static_cast<WORLD_PASS>(Layer.iPass);
@@ -49,13 +25,9 @@ _uint MeshLayerProfile::Resolve_WorldPass(const MESH_LAYER_IDX& Layer, _uint iFa
     return static_cast<_uint>(ePass);
 }
 
-ENV_SHADOW_ALPHA_SOURCE MeshLayerProfile::Resolve_EnvShadowAlphaSourceFromLayer(const MESH_LAYER_IDX& Layer)
+SHADOW_ALPHA_SOURCE MeshLayerProfile::Resolve_WorldShadowAlphaSourceFromLayer(const MESH_LAYER_IDX& Layer)
 {
-    const ENV_SHADER_PASS_META* pMeta = Find_EnvShaderPassMeta(Layer.iPass);
-    if (nullptr == pMeta)
-        return ENV_SHADOW_ALPHA_SOURCE::NONE;
-
-    return Resolve_EnvShadowAlphaSource(pMeta->ePass);
+    return Resolve_WorldShadowAlphaSource(static_cast<WORLD_PASS>(Layer.iPass));
 }
 
 NS_END

@@ -14,19 +14,18 @@ namespace
 		const _tchar* pModelProtoTag;
 		const _char* pModelPath;
 		_int iValue;
-		_float4 vRenderColor;
 		_bool bRotate;
 	};
 
 	static const LD_POINT_CATALOG g_PointCatalog[] =
 	{
-		{ L"PointStarYellow", CLevelDesign_Point::YELLOW_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopYellowL.ysh", 1, { 1.f, 0.68f, 0.05f, 1.f }, true },
-		{ L"PointStarGreen", CLevelDesign_Point::GREEN_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopGreenL.ysh", 5, { 0.2f, 0.85f, 0.25f, 1.f }, true },
-		{ L"PointStarRed", CLevelDesign_Point::RED_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopRedL.ysh", 10, { 1.f, 0.2f, 0.18f, 1.f }, true },
-		{ L"PointStarBlue", CLevelDesign_Point::BLUE_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopBlueL.ysh", 30, { 0.2f, 0.42f, 1.f, 1.f }, true },
-		{ L"CoinClusterS", CLevelDesign_Point::COIN_CLUSTER_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterSL.ysh", 100, { 1.f, 0.68f, 0.05f, 1.f }, false },
-		{ L"CoinClusterM", CLevelDesign_Point::COIN_CLUSTER_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterML.ysh", 250, { 1.f, 0.68f, 0.05f, 1.f }, false },
-		{ L"CoinClusterL", CLevelDesign_Point::COIN_CLUSTER_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterLL.ysh", 500, { 1.f, 0.68f, 0.05f, 1.f }, false }
+		{ L"PointStarYellow", CLevelDesign_Point::YELLOW_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopYellowL.ysh", 1, true },
+		{ L"PointStarGreen", CLevelDesign_Point::GREEN_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopGreenL.ysh", 5, true },
+		{ L"PointStarRed", CLevelDesign_Point::RED_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopRedL.ysh", 10, true },
+		{ L"PointStarBlue", CLevelDesign_Point::BLUE_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopBlueL.ysh", 30, true },
+		{ L"CoinClusterS", CLevelDesign_Point::COIN_CLUSTER_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterSL.ysh", 100, false },
+		{ L"CoinClusterM", CLevelDesign_Point::COIN_CLUSTER_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterML.ysh", 250, false },
+		{ L"CoinClusterL", CLevelDesign_Point::COIN_CLUSTER_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Point/TopCoinClusterLL.ysh", 500, false }
 	};
 
 	static const LD_POINT_CATALOG* Find_PointCatalog(const _wstring& wstrObjName)
@@ -51,7 +50,6 @@ CLevelDesign_Point::CLevelDesign_Point(ID3D11Device* pDevice, ID3D11DeviceContex
 CLevelDesign_Point::CLevelDesign_Point(const CLevelDesign_Point& Prototype)
 	: CLevelDesignObject(Prototype)
 	, m_tPointDesc(Prototype.m_tPointDesc)
-	, m_vRenderColor(Prototype.m_vRenderColor)
 	, m_bRotate(Prototype.m_bRotate)
 {
 }
@@ -72,7 +70,6 @@ HRESULT CLevelDesign_Point::Initialize(void* pArg)
 	if (nullptr == pCatalog)
 		return E_FAIL;
 
-	m_vRenderColor = pCatalog->vRenderColor;
 	m_bRotate = pCatalog->bRotate;
 
 	if (FAILED(__super::Initialize(pArg)))
@@ -242,10 +239,6 @@ HRESULT CLevelDesign_Point::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
 		return E_FAIL;
 
-	const _float4 vEmissiveColor = { 0.f, 0.f, 0.f, 0.f };
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vEmissiveColor", &vEmissiveColor, sizeof(_float4))))
-		return E_FAIL;
-
 	return S_OK;
 }
 
@@ -255,12 +248,8 @@ HRESULT CLevelDesign_Point::Render_Model()
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		MESH_LAYER_IDX Layer = m_pModelCom->Get_MeshLayer(i);
-		Layer.iPass = ETOI(WORLD_PASS::DEFAULT);
-
+		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
 		const _bool bUseColorPass = (0u == m_pModelCom->Get_MeshTextureCount(i, MTEX_TYPE::DIFFUSE));
-		if (bUseColorPass)
-			Layer.vRenderColor = m_vRenderColor;
 
 		MESH_LAYER_BIND_CONTEXT Ctx{};
 		Ctx.pShader = m_pShaderCom;
@@ -275,15 +264,6 @@ HRESULT CLevelDesign_Point::Render_Model()
 		MESH_LAYER_BIND_RESULT Result{};
 		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
 			return E_FAIL;
-
-		if (bUseColorPass)
-		{
-			const _float3 vMRA = { 0.65f, 0.3f, 1.0f };
-			const _float4 vEmissiveColor = { 0.30f, 0.14f, 0.02f, 1.0f };
-			if (FAILED(m_pShaderCom->Bind_RawValue("g_vMRA", &vMRA, sizeof(_float3)))) return E_FAIL;
-			if (FAILED(m_pShaderCom->Bind_RawValue("g_vEmissiveColor", &vEmissiveColor, sizeof(_float4)))) return E_FAIL;
-		}
-
 		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
 			return E_FAIL;
 		if (FAILED(m_pModelCom->Render(i)))

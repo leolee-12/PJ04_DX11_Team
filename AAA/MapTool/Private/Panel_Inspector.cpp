@@ -9,8 +9,7 @@
 #include "Map_EditSession.h"
 #include "EnvObject.h"
 #include "EnvTrigger_RenderGlobals.h"
-#include "LevelDesign_Starblock.h"
-#include "LevelDesign_Breakable.h"
+#include "LevelDesignObject.h"
 #include "LevelDesign_Bush.h"
 #include "Editable.h"
 
@@ -108,12 +107,12 @@ namespace
 		return bDefault;
 	}
 
-	const _char* GetEnvShaderPassComboItem(void*, _int idx)
+	const _char* GetWorldShaderPassComboItem(void*, _int idx)
 	{
-		if (idx < 0 || idx >= static_cast<int>(_countof(g_EnvShaderPassMetas)))
+		if (idx < 0 || idx >= static_cast<int>(_countof(g_WorldShaderPassMetas)))
 			return nullptr;
 
-		return g_EnvShaderPassMetas[idx].szName;
+		return g_WorldShaderPassMetas[idx].szName;
 	}
 
 	struct MESH_LAYER_UI_CONTEXT
@@ -123,10 +122,9 @@ namespace
 
 		_bool bEnvObjectMeshUi = { false };
 		_bool bMapObjectMeshUi = { false };
-		_bool bEnvPassMeshUi = { false };
+		_bool bWorldPassMeshUi = { false };
 		_bool bBushMeshUi = { false };
 		_bool bBushBasicMeshUi = { false };
-		_bool bBushCutMeshUi = { false };
 
 		IEditable* pEditable = { nullptr };
 		EDITABLE_DESC EditDesc = {};
@@ -161,21 +159,17 @@ namespace
 			Ctx.pModel = Slot.pModel;
 			Ctx.bBushMeshUi = nullptr != dynamic_cast<CLevelDesign_Bush*>(pObject);
 			Ctx.bBushBasicMeshUi = Ctx.bBushMeshUi && Slot.strLabel == L"Basic";
-			Ctx.bBushCutMeshUi = Ctx.bBushMeshUi && Slot.strLabel == L"Cut";
-			Ctx.bEnvObjectMeshUi = nullptr != dynamic_cast<CEnvObject*>(pObject);
+			Ctx.bEnvObjectMeshUi = EDITABLE_OBJECT_KIND::ENV_OBJECT == Ctx.EditDesc.eKind;
 			Ctx.bMapObjectMeshUi = nullptr != dynamic_cast<Client::CMapObject*>(pObject);
+			Ctx.bWorldPassMeshUi =
+				EDITABLE_OBJECT_KIND::ENV_OBJECT == Ctx.EditDesc.eKind ||
+				EDITABLE_OBJECT_KIND::LEVEL_DESIGN_OBJECT == Ctx.EditDesc.eKind;
 
-			const _bool bStarblockMeshUi = nullptr != dynamic_cast<CLevelDesign_Starblock*>(pObject);
-			const CLevelDesign_Breakable* pBreakable = dynamic_cast<CLevelDesign_Breakable*>(pObject);
-			const _bool bBreakableNonAnimMeshUi = nullptr != pBreakable && MODEL::NONANIM == pBreakable->Get_BreakableDesc().eModelType;
-
-			Ctx.bEnvPassMeshUi = Ctx.bEnvObjectMeshUi || bStarblockMeshUi || bBreakableNonAnimMeshUi || Ctx.bBushCutMeshUi;
 			return Ctx;
 		}
 
 		Ctx.bBushMeshUi = nullptr != dynamic_cast<CLevelDesign_Bush*>(pObject);
 		Ctx.bBushBasicMeshUi = Ctx.bBushMeshUi && 0 == iModelSlot;
-		Ctx.bBushCutMeshUi = Ctx.bBushMeshUi && 1 == iModelSlot;
 
 		Ctx.pModelComponentTag = Ctx.bBushMeshUi
 			? (Ctx.bBushBasicMeshUi ? L"Com_Model_Basic" : L"Com_Model_Cut")
@@ -184,14 +178,10 @@ namespace
 		Ctx.pModel = pObject->Get_Component<CModel>(Ctx.pModelComponentTag);
 
 		Ctx.bEnvObjectMeshUi = nullptr != dynamic_cast<CEnvObject*>(pObject);
-		Ctx.bMapObjectMeshUi = nullptr != dynamic_cast<Client::CMapObject*>(pObject);
-
-		const _bool bStarblockMeshUi = nullptr != dynamic_cast<CLevelDesign_Starblock*>(pObject);
-
-		const CLevelDesign_Breakable* pBreakable = dynamic_cast<CLevelDesign_Breakable*>(pObject);
-		const _bool bBreakableNonAnimMeshUi = nullptr != pBreakable && MODEL::NONANIM == pBreakable->Get_BreakableDesc().eModelType;
-
-		Ctx.bEnvPassMeshUi = Ctx.bEnvObjectMeshUi || bStarblockMeshUi || bBreakableNonAnimMeshUi || Ctx.bBushCutMeshUi;
+		Ctx.bMapObjectMeshUi = nullptr != dynamic_cast<CMapObject*>(pObject);
+		Ctx.bWorldPassMeshUi =
+			Ctx.bEnvObjectMeshUi ||
+			nullptr != dynamic_cast<CLevelDesignObject*>(pObject);
 
 		return Ctx;
 	}
@@ -352,7 +342,20 @@ void CPanel_Inspector::Render()
 
 	_bool bRenderGlobalsDirty = false;
 
-	Draw_Transform(pSelected);
+	const _bool bTransformChanged = Draw_Transform(pSelected);
+	if (bTransformChanged)
+	{
+		if (IEditable* pEditable = dynamic_cast<IEditable*>(pSelected))
+		{
+			const HRESULT hr = pEditable->On_EditTransformChanged();
+#ifdef _DEBUG
+			if (FAILED(hr))
+				OutputDebugStringA("[MapTool] IEditable::On_EditTransformChanged failed in Inspector.\n");
+#else
+			UNREFERENCED_PARAMETER(hr);
+#endif
+		}
+	}
 
 	ImGui::Separator();
 	Draw_EditableObjectPolicyPanel(pSelected);
@@ -1552,36 +1555,46 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 			ImGui::EndTable();
 		};
 
-	if (Ui.bEnvPassMeshUi)
+	if (Ui.bWorldPassMeshUi)
 	{
-		int iPassCombo = Get_EnvShaderPassComboIndex(Layer.iPass);
+		int iPassCombo = Get_WorldShaderPassComboIndex(Layer.iPass);
 
-		ImGui::SetNextItemWidth(160.f);
 		if (ImGui::Combo("Pass",
 			&iPassCombo,
-			GetEnvShaderPassComboItem,
+			GetWorldShaderPassComboItem,
 			nullptr,
-			static_cast<int>(_countof(g_EnvShaderPassMetas))))
+			static_cast<int>(_countof(g_WorldShaderPassMetas))))
 		{
-			Layer.iPass = Get_EnvShaderPassFromComboIndex(iPassCombo);
+			Layer.iPass = Get_WorldShaderPassFromComboIndex(iPassCombo);
 			bChanged = true;
 		}
 
-		if (Layer.iPass == ETOI(ENV_PASS::COLOR))
+		ImGui::SeparatorText("Constant Material");
+
+		const ImGuiColorEditFlags iColorEditFlags = ImGuiColorEditFlags_Float | ImGuiColorEditFlags_HDR;
+
+		ImGui::SetNextItemWidth(240.f);
+		if (ImGui::ColorEdit4("Render Color##MeshLayer", (float*)&Layer.vRenderColor, iColorEditFlags))
 		{
-			ImGui::SetNextItemWidth(180.f);
-			if (ImGui::ColorEdit4("Render Color##MeshLayer", (float*)&Layer.vRenderColor))
-				bChanged = true;
+			bChanged = true;
+		}
+
+		ImGui::SetNextItemWidth(240.f);
+		if (ImGui::ColorEdit3("Emissive Color##MeshLayer", (float*)&Layer.vEmissiveColor, iColorEditFlags))
+		{
+			bChanged = true;
+		}
+
+		ImGui::SetNextItemWidth(240.f);
+		if (ImGui::ColorEdit3("MRA (M/R/A)##MeshLayer", (float*)&Layer.vMRA, iColorEditFlags))
+		{
+			bChanged = true;
 		}
 
 		if (Ui.bEnvObjectMeshUi)
 			ImGui::TextDisabled("Dither is controlled per object in EnvObject Edit.");
 		else
-			ImGui::TextDisabled("NonAnim LevelDesign uses ENV_PASS domain.");
-	}
-	else if (Ui.bBushBasicMeshUi)
-	{
-		ImGui::TextDisabled("Pass is fixed by Bush Basic anim render path.");
+			ImGui::TextDisabled("LevelDesign uses WORLD_PASS domain.");
 	}
 	else if (Ui.bMapObjectMeshUi)
 	{
@@ -1694,7 +1707,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 
 		DrawUVCombo("Base UV", Layer.iUVIndex);
 
-		if (Ui.bEnvPassMeshUi)
+		if (Ui.bWorldPassMeshUi)
 			DrawUVCombo("Unknown UV", Layer.iUnknownUVIndex);
 
 		if (ImGui::Checkbox("Use UV Transform", (bool*)&Layer.bUseUVTransform))
@@ -1706,7 +1719,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 		if (ImGui::DragFloat2("UV Scale", (float*)&Layer.vUVScale, 0.01f))
 			bChanged = true;
 
-		if (Ui.bEnvPassMeshUi)
+		if (Ui.bWorldPassMeshUi)
 		{
 			ImGui::SetNextItemWidth(160.f);
 			if (ImGui::DragFloat2("UV ScaleNormal", (float*)&Layer.vUVScaleNormal, 0.01f))
@@ -1727,7 +1740,7 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 
 		ImGui::EndDisabled();
 
-		if (Ui.bEnvPassMeshUi)
+		if (Ui.bWorldPassMeshUi)
 		{
 			ImGui::SeparatorText("Strength");
 
@@ -1742,41 +1755,23 @@ void CPanel_Inspector::Draw_MeshLayerPanel(CGameObject* pObject)
 
 		ImGui::SeparatorText("Texture Slots");
 
-		if (Ui.bBushBasicMeshUi)
+		if (ImGui::BeginTable("WorldMeshTexGrid", 4, ImGuiTableFlags_SizingStretchSame))
 		{
-			if (ImGui::BeginTable("BushBasicTexGrid", 2, ImGuiTableFlags_SizingStretchSame))
-			{
-				ImGui::TableNextRow();
+			ImGui::TableNextRow();
 
-				ImGui::TableNextColumn();
-				DrawCompactLayerSlotCell("Nrm", "##BushBasicTexNormal", MTEX_TYPE::NORMALS);
+			ImGui::TableNextColumn();
+			DrawCompactLayerSlotCell("Dif", "##WorldTexDiffuse", MTEX_TYPE::DIFFUSE);
 
-				ImGui::TableNextColumn();
-				DrawCompactLayerSlotCell("Unk", "##BushBasicTexUnknown", MTEX_TYPE::UNKNOWN);
+			ImGui::TableNextColumn();
+			DrawCompactLayerSlotCell("Nrm", "##WorldTexNormal", MTEX_TYPE::NORMALS);
 
-				ImGui::EndTable();
-			}
-		}
-		else
-		{
-			if (ImGui::BeginTable("EnvMeshTexGrid", 4, ImGuiTableFlags_SizingStretchSame))
-			{
-				ImGui::TableNextRow();
+			ImGui::TableNextColumn();
+			DrawCompactLayerSlotCell("MRA", "##WorldTexMRA", MTEX_TYPE::METALNESS);
 
-				ImGui::TableNextColumn();
-				DrawCompactLayerSlotCell("Dif", "##EnvTexDiffuse", MTEX_TYPE::DIFFUSE);
+			ImGui::TableNextColumn();
+			DrawCompactLayerSlotCell("Unk", "##WorldTexUnknown", MTEX_TYPE::UNKNOWN);
 
-				ImGui::TableNextColumn();
-				DrawCompactLayerSlotCell("Nrm", "##EnvTexNormal", MTEX_TYPE::NORMALS);
-
-				ImGui::TableNextColumn();
-				DrawCompactLayerSlotCell("MRA", "##EnvTexMRA", MTEX_TYPE::METALNESS);
-
-				ImGui::TableNextColumn();
-				DrawCompactLayerSlotCell("Unk", "##EnvTexUnknown", MTEX_TYPE::UNKNOWN);
-
-				ImGui::EndTable();
-			}
+			ImGui::EndTable();
 		}
 	}
 
@@ -1918,7 +1913,7 @@ void CPanel_Inspector::Draw_MapStageSections(Client::CMapStage* pMapStage)
 
 			const _bool bTransformChanged = Draw_Transform(m_pFocusedMapSection, strName);
 			if (bTransformChanged)
-				m_pFocusedMapSection->Notify_EditTransformChanged();
+				m_pFocusedMapSection->On_EditTransformChanged();
 
 			ImGui::Separator();
 			Draw_EditableObjectPolicyPanel(m_pFocusedMapSection);

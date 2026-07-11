@@ -147,6 +147,11 @@ HRESULT CLevelDesignObject::Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy)
 	return On_ApplyEditPolicy(Policy);
 }
 
+HRESULT CLevelDesignObject::On_EditTransformChanged()
+{
+	return S_OK;
+}
+
 const MESH_LAYER_IDX* CLevelDesignObject::Get_EditMeshLayer(_uint iModelSlot, _uint iMesh) const
 {
 	vector<EDITABLE_MODEL_SLOT> Slots;

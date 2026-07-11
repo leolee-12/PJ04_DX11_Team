@@ -37,7 +37,6 @@ public:
 	void	Refresh_WorldBounds();
 	void	Set_ParentMatrix(const _float4x4* pParentMatrix);
 	void	Refresh_CombinedWorldMatrix();
-	void	Notify_EditTransformChanged();
 
 #ifdef _DEBUG
 	void	Reset_FrameProfile();
@@ -66,6 +65,7 @@ public:
 #pragma region Editable
 	virtual _bool Get_EditDesc(EDITABLE_DESC* pOutDesc) const override;
 	virtual HRESULT Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy) override;
+	virtual HRESULT On_EditTransformChanged() override;
 	virtual const MESH_LAYER_IDX* Get_EditMeshLayer(_uint iModelSlot, _uint iMesh) const override;
 	virtual HRESULT Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX& Layer) override;
 #pragma endregion
