@@ -75,6 +75,8 @@
     <ClInclude Include="..\Public\Common_JumpSlash.h" />
     <ClInclude Include="..\Public\Common_Ring03.h" />
     <ClInclude Include="..\Public\Deformable.h" />
+    <ClInclude Include="..\public\DialogueDee.h" />
+    <ClInclude Include="..\public\KirbySpawnPoint.h" />
     <ClInclude Include="..\Public\Kirby_DeformDump.h" />
     <ClInclude Include="..\public\Dialogue_Arranger.h" />
     <ClInclude Include="..\public\Dialogue_Director.h" />
@@ -107,6 +109,7 @@
     <ClInclude Include="..\public\Mission_Manager.h" />
     <ClInclude Include="..\Public\Monster_State_Flatten.h" />
     <ClInclude Include="..\Public\Monster_State_Spat.h" />
+    <ClInclude Include="..\public\SequencePlayer.h" />
     <ClInclude Include="..\public\Singleton_Destroyer.h" />
     <ClInclude Include="..\Public\Sparkle.h" />
     <ClInclude Include="..\Public\SphereMesh.h" />
@@ -418,6 +421,8 @@
     <ClCompile Include="..\Private\CarMilkyWay.cpp" />
     <ClCompile Include="..\Private\Car_00_MilkyWay.cpp" />
     <ClCompile Include="..\Private\CommonHit.cpp" />
+    <ClCompile Include="..\private\DialogueDee.cpp" />
+    <ClCompile Include="..\private\KirbySpawnPoint.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformDump.cpp" />
     <ClCompile Include="..\private\Dialogue_Arranger.cpp" />
     <ClCompile Include="..\Private\DroppedBubble.cpp" />
@@ -459,6 +464,7 @@
     <ClCompile Include="..\private\Mission_Manager.cpp" />
     <ClCompile Include="..\Private\Monster_State_Flatten.cpp" />
     <ClCompile Include="..\Private\Monster_State_Spat.cpp" />
+    <ClCompile Include="..\private\SequencePlayer.cpp" />
     <ClCompile Include="..\private\Singleton_Destroyer.cpp" />
     <ClCompile Include="..\Private\Sparkle.cpp" />
     <ClCompile Include="..\Private\SphereMesh.cpp" />

@@ -197,6 +197,10 @@ private:
 	void Cal_RenderWorldMatrix();
 	void Update_GroundNormal(_float3& vGroundNormal);
 
+	// Level SPawn
+	void Warp_To(const _float3& vPosition, const _float3& vLook);
+	void Republish_HUDState();
+
 private:
 	// Parts
 	CKirby_Body* m_pBody{};
@@ -250,6 +254,9 @@ private:
 	IDeformable* m_pHeldDeformObj{};
 
 	_float4x4 m_RenderWorldMatrix{};
+
+	// Level Spawn
+	const void* m_pLastSpawner = { nullptr };
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -1,11 +1,9 @@
 #include "Stage0_Step1.h"
 
 #include "GameInstance.h"
-#include "Camera_Free.h"
 #include "Loader_Prototype.h"
 #include "Map_Loader.h"
 #include "Launcher_LevelProfiles.h"
-#include "Camera_AreaCam.h"
 #include "Level_Loading.h"
 
 #ifdef _DEBUG
@@ -76,9 +74,6 @@ HRESULT CStage0_Step1::Initialize()
             return E_FAIL;
     }
 
-    if (FAILED(Ready_Camera()))
-        return E_FAIL;
-
     if (FAILED(Ready_Lights()))
         return E_FAIL;
 
@@ -106,18 +101,18 @@ HRESULT CStage0_Step1::Render()
 HRESULT CStage0_Step1::Ready_Events()
 {
     Subscribe_Event(TEXT("FadeOut_Done"), [this](void* p) {
-        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::STAGE0_STEP2);
-        if (pLoadingLevel)
-        {
-            m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
-            return;
-        }
-        //CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::TOWN_STEP1);
+        //CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::STAGE0_STEP2);
         //if (pLoadingLevel)
         //{
         //    m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
         //    return;
         //}
+        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::TOWN_STEP1);
+        if (pLoadingLevel)
+        {
+            m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
+            return;
+        }
         });
 
 #ifdef _DEBUG
@@ -162,25 +157,6 @@ HRESULT CStage0_Step1::Ready_Lights()
 
     if (FAILED(m_pGameInstance_Proxy->Add_Light(LightDesc)))
         return E_FAIL;
-
-    return S_OK;
-}
-
-HRESULT CStage0_Step1::Ready_Camera()
-{
-    m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::STAGE0_STEP1),
-        TEXT("Prototype_GameObject_Camera_Follow"),
-        CCamera_AreaCam::Create(m_pDevice, m_pContext));
-
-    CCamera_AreaCam::AREACAM_DESC CamDesc{};
-    CamDesc.vEye = _float3(-1.f, 1.f, -10.f);
-    CamDesc.vAt = _float3(0.f, 0.f, 0.f);
-    CamDesc.fFovy = XMConvertToRadians(50.f); CamDesc.fNear = 0.1f; CamDesc.fFar = 1000.f;
-    m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::STAGE0_STEP1),
-        TEXT("Prototype_GameObject_Camera_Follow"),
-        ETOUI(LEVEL::STAGE0_STEP1), TEXT("Layer_Camera"), TEXT("CameraFollow"), &CamDesc);
-
-
 
     return S_OK;
 }

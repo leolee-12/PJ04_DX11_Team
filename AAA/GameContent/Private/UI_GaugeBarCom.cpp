@@ -33,6 +33,14 @@ void CUI_GaugeBarCom::Reset_Empty()
         m_pGauge->Reset_Empty(); 
 }
 
+void CUI_GaugeBarCom::Snap_Value(_float fCurrent, _float fMax)
+{
+    m_fMax = max(1.f, fMax);
+    m_fCur = clamp(fCurrent, 0.f, m_fMax);
+    if (m_pGauge)
+        m_pGauge->Snap(m_fCur / m_fMax);
+}
+
 void CUI_GaugeBarCom::Push()
 {
     if (m_pGauge)

@@ -86,6 +86,13 @@ HRESULT CUI_KirbyStatus::Ready_Events()
         {
             if (auto pDesc = static_cast<KIRBY_HP_UPDATED*>(pData))
             {
+                if (pDesc->bSnap)
+                {
+                    m_pGaugeBar->Snap_Value(pDesc->fCurrHp, pDesc->fMaxHP);
+                    m_fDefaultCurrHP = pDesc->fCurrHp;
+                    return;
+                }
+
                 _float fDeltaHp = pDesc->fCurrHp - m_fDefaultCurrHP;
                 m_pGaugeBar->Add_Value(fDeltaHp);
                 m_fDefaultCurrHP = pDesc->fCurrHp;
