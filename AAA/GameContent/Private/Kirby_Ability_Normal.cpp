@@ -638,7 +638,7 @@ void CKirby_Ability_Normal::Spit_Inhalable(CKirby* pKirby)
     XMStoreFloat3(&vD, vDir);
 
     CProjectile* pProj = nullptr;
-    CProjectile_Manager::GetInstance()->Spawn(
+    CProjectile_Manager::GetInstance()->Spawn(pKirby->Get_PrototypeLevelIndex(),
         pKirby->Get_LevelIndex(), L"Spit", CSpit_Projectile::PROTOTYPE_TAG, &pProj);
 
     if (auto* pSpit = static_cast<CSpit_Projectile*>(pProj))
