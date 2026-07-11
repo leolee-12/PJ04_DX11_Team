@@ -9,12 +9,11 @@ CProjectile_Manager::CProjectile_Manager()
 {
 }
 
-HRESULT CProjectile_Manager::Spawn(_uint iLevel, const _wstring& strKey,
-    const _wstring& strProtoTag, CProjectile** ppOut)
+HRESULT CProjectile_Manager::Spawn(_uint iProtoLevel, _uint iLayerLevel, const _wstring& strKey, const _wstring& strProtoTag, CProjectile** ppOut)
 {
-    POOL_KEY key{ iLevel, strKey };
+    POOL_KEY key{ iLayerLevel, strKey };
 
-    auto it = m_Dormant.find(key);                        // 1) 재사용
+    auto it = m_Dormant.find(key);
     if (it != m_Dormant.end() && !it->second.empty())
     {
         CProjectile* p = it->second.back(); it->second.pop_back();
@@ -23,16 +22,16 @@ HRESULT CProjectile_Manager::Spawn(_uint iLevel, const _wstring& strKey,
     }
 
     _wstring strObjTag = strKey + L"#" + std::to_wstring(m_iSpawnCounter++);
-    CGameObject* pObj = nullptr;                          // 2) STATIC 프로토에서 Clone
+    CGameObject* pObj = nullptr;
     if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(
-        &pObj, iLevel, strProtoTag,
-        iLevel, PROJECTILE_LAYER_TAG, strObjTag, nullptr)))
+        &pObj, iProtoLevel, strProtoTag,
+        iLayerLevel, PROJECTILE_LAYER_TAG, strObjTag, nullptr)))
         return E_FAIL;
 
     CProjectile* pProj = dynamic_cast<CProjectile*>(pObj);
     if (!pProj) { m_pGameInstance_Proxy->Destroy_GameObject(pObj); return E_FAIL; }
 
-    pProj->Set_Pool(this, iLevel, strKey);
+    pProj->Set_Pool(this, iLayerLevel, strKey);
     if (ppOut) *ppOut = pProj;
     return S_OK;
 }

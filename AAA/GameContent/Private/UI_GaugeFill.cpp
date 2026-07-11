@@ -418,6 +418,15 @@ void CUI_GaugeFill::Reset_Empty()
     m_bGaugeInit = true;
 }
 
+void CUI_GaugeFill::Snap(_float fRatio)
+{
+    m_bAppearSweep = false;
+    m_eGhostMode = GHOST_MODE::NONE;
+    m_fGhostHoldAcc = 0.f;
+    m_fFillRatio = m_fGhostRatio = m_fTargetRatio = clamp(fRatio, 0.f, 1.f);
+    m_bGaugeInit = true;
+}
+
 CUI_GaugeFill* CUI_GaugeFill::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     CUI_GaugeFill* pInstance = new CUI_GaugeFill(pDevice, pContext);

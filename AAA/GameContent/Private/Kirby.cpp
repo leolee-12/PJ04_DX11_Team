@@ -87,6 +87,9 @@ HRESULT CKirby::Initialize(void* pArg)
 
 void CKirby::Priority_Update(_float fTimeDelta)
 {
+    if (!m_bActive)
+        return;
+
     if (m_pKirby_StateMachine->Ignore_TimeScale_StateMachine())
         fTimeDelta = m_pGameInstance_Proxy->Get_RawTimeDelta(L"Timer_60");
 
@@ -95,6 +98,9 @@ void CKirby::Priority_Update(_float fTimeDelta)
 
 void CKirby::Update(_float fTimeDelta)
 {
+    if (!m_bActive)
+        return;
+
     if (m_pKirby_StateMachine->Ignore_TimeScale_StateMachine())
         fTimeDelta = m_pGameInstance_Proxy->Get_RawTimeDelta(L"Timer_60");
 
@@ -125,10 +131,23 @@ void CKirby::Update(_float fTimeDelta)
     Update_InvincibilityHitFlash();
 
     Get_CurrentDeformModel()->Set_GoundNormal(m_pMovement->Get_GroundNormal());
+
+#ifdef _DEBUG
+    if (m_pGameInstance_Proxy->Key_Down(DIK_TAB))
+    {
+        wchar_t szBuf[128] = {};
+        swprintf_s(szBuf, L"[Kirby] LevelIndex=%u, Layer=%s, Active=%d\n",
+            Get_LevelIndex(), m_strLayerTag.c_str(), Is_Active() ? 1 : 0);
+        OutputDebugStringW(szBuf);
+    }
+#endif
 }
 
 void CKirby::Late_Update(_float fTimeDelta)
 {
+    if (!m_bActive)
+        return;
+
     if (m_pKirby_StateMachine->Ignore_TimeScale_StateMachine())
         fTimeDelta = m_pGameInstance_Proxy->Get_RawTimeDelta(L"Timer_60");
 
@@ -668,6 +687,37 @@ HRESULT CKirby::Ready_Events()
         }
     );
 
+    //넴주
+    Subscribe_Event(EventTag::Kirby_LevelSpawn,
+        [this](void* pData)
+        {
+            const auto* pDesc = static_cast<KIRBY_LEVEL_SPAWN_DESC*>(pData);
+            m_pLastSpawner = pDesc->pSpawner;
+
+            Set_OwnerLevelLayer(pDesc->iLevelIndex, m_strLayerTag);
+
+            Warp_To(pDesc->vPosition, pDesc->vLook);
+        });
+
+    Subscribe_Event(EventTag::Kirby_LevelSleep,
+        [this](void* pData)
+        {
+            const auto* pDesc = static_cast<KIRBY_LEVEL_SLEEP_DESC*>(pData);
+
+            if (pDesc->pSpawner != m_pLastSpawner)
+                return;
+
+            Clear_CutsceneAttachTarget();
+            Clear_Ladder();
+            Set_TriggerDeformObj(nullptr);
+            Set_HeldDeformObj(nullptr);
+
+            Set_Active(false);
+        });
+
+    Subscribe_Event(EventTag::Kirby_HUD_Refresh,
+        [this](void*) { Republish_HUDState(); });
+
     return S_OK;
 }
 
@@ -817,12 +867,47 @@ void CKirby::Set_CutsceneAttachTarget(const KIRBY_ATTACHMENT_BEGIN_DESC* pAttach
 
 void CKirby::Clear_CutsceneAttachTarget()
 {
+    if (nullptr == m_pAttachBone && nullptr == m_pAttachOwnerWorld)
+        return;
+
     m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(m_vPreAttachScale.x, 0.f, 0.f, 0.f));
     m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, m_vPreAttachScale.y, 0.f, 0.f));
     m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, m_vPreAttachScale.z, 0.f));
 
     m_pAttachBone = nullptr;
     m_pAttachOwnerWorld = nullptr;
+}
+
+void CKirby::Warp_To(const _float3& vPosition, const _float3& vLook)
+{
+    m_pTransformCom->Set_State(STATE::POSITION,
+        XMVectorSetW(XMLoadFloat3(&vPosition), 1.f));
+
+    _vector vFlatLook = XMVectorSetY(XMVectorSetW(XMLoadFloat3(&vLook), 0.f), 0.f);
+    if (XMVectorGetX(XMVector3LengthSq(vFlatLook)) > FLT_EPSILON)
+        m_pTransformCom->LookAt(m_pTransformCom->Get_State(STATE::POSITION) + vFlatLook);
+
+    if (m_pMovement)
+        m_pMovement->Sync_To_Controller();
+
+    // 이거 일단 임시로 박음
+    Change_State(KIRBY_STATE_TYPE::WAIT);
+
+    Set_Active(true);
+}
+
+void CKirby::Republish_HUDState()
+{
+    KIRBY_HP_UPDATED tHP{};
+    tHP.fCurrHp = m_fCurHP;
+    tHP.fMaxHP = m_fMaxHP;
+    tHP.bSnap = true;
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_HP_Updated, &tHP);
+
+    KIRBY_NAME_UPDATED tName{};
+    if (CKirby_AttackMode* pMode = Get_ActiveAttackMode())
+        tName.strAtkModeName = pMode->Get_AttackModeName();
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_Name_Updated, &tName);
 }
 
 void CKirby::Update_BlobShadow()

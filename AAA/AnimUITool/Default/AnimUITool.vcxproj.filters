@@ -58,9 +58,6 @@
     <Filter Include="03. Panels\Browser">
       <UniqueIdentifier>{735ee1b2-fa09-4f5e-9098-f857f3c6b25b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="96. ShaderFiles\Defines">
-      <UniqueIdentifier>{faad848a-186b-4861-910b-572f60a2a359}</UniqueIdentifier>
-    </Filter>
     <Filter Include="03. Panels\UICanvas">
       <UniqueIdentifier>{82aac75a-ceed-489b-a9ca-2b0eaf934ea4}</UniqueIdentifier>
     </Filter>
@@ -261,5 +258,10 @@
     <ResourceCompile Include="AnimUITool.rc">
       <Filter>98. Default</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Bin\ShaderFiles\Shader_Grid.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </None>
   </ItemGroup>
 </Project>

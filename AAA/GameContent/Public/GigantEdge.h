@@ -43,6 +43,8 @@ public:
     _bool Is_GroggyRequested() const { return m_bGroggyRequested; }
     void  Clear_Groggy() { m_bGroggyRequested = false; }
 
+    virtual void On_Swallowed() override;
+
 protected:
     virtual HRESULT        Ready_PartObjects() override;
     virtual HRESULT        Ready_AnimEvents() override;
@@ -59,6 +61,8 @@ protected:
     virtual _float         Get_CapsuleHeight() const override { return s_fCCT_Height; }
     virtual _float		   Get_InteractRadius() const override { return 0.f; }
     virtual _bool		   Get_HurtBoxDesc(CAPSULE_DESC& Out) const override;
+
+    virtual void           On_Corpse_End() override;
 
 private:
     CGigantEdge_Body*   m_pBody   = { nullptr };

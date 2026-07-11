@@ -17,8 +17,7 @@ public:
     static constexpr const _tchar* PROJECTILE_LAYER_TAG = L"Layer_Projectile";
 
     // 휴면 있으면 pop, 없으면 STATIC 프로토에서 Clone. 발사는 호출측이 Launch().
-    HRESULT  Spawn(_uint iLevel, const _wstring& strKey, const _wstring& strProtoTag,
-        CProjectile** ppOut);
+    HRESULT  Spawn(_uint iProtoLevel, _uint iLayerLevel, const _wstring& strKey, const _wstring& strProtoTag, CProjectile** ppOut);
     void     Return(_uint iLevel, const _wstring& strKey, CProjectile* pProj);
     void     Clear_Level(_uint iLevel);      // 레벨 언로드 시 호출 필수
 

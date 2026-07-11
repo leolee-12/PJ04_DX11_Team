@@ -20,6 +20,7 @@ public:
 
 public:
     virtual void Be_Captured(CGameObject* pInhaler) override;
+    virtual void On_Swallowed() override;
 
 protected:
     virtual void Update_AI(_float fTimeDelta) override;
