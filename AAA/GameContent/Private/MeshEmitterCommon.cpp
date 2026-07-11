@@ -5,17 +5,20 @@
 
 CMeshEmitterCommon::CMeshEmitterCommon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CEffect_MeshEmitter{ pDevice, pContext }
+	, m_iRenderGroup{ static_cast<_int>(RENDERID::NONBLEND) }
 {
 }
 
 CMeshEmitterCommon::CMeshEmitterCommon(const CMeshEmitterCommon& Prototype)
 	: CEffect_MeshEmitter(Prototype)
+	, m_iRenderGroup{ Prototype.m_iRenderGroup }
 {
 }
 
 HRESULT CMeshEmitterCommon::Initialize_Prototype()
 {
 	m_eProjType = PROJ_TYPE::PERSPEC;
+	m_iRenderGroup = static_cast<_int>(RENDERID::NONBLEND);
 	return S_OK;
 }
 
@@ -49,7 +52,8 @@ void CMeshEmitterCommon::Late_Update(_float fTimeDelta)
 	if (m_bActive == false)
 		return;
 
-	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+	Helper::IntClamp(m_iRenderGroup, static_cast<_int>(RENDERID::PRIORITY), static_cast<_int>(RENDERID::END) - 1);
+	m_pGameInstance_Proxy->Add_RenderGroup(static_cast<RENDERID>(m_iRenderGroup), this);
 }
 
 HRESULT CMeshEmitterCommon::Render()

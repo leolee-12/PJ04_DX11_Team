@@ -114,6 +114,11 @@
 #include "StarEmitter.h"
 #include "Sparkle.h"
 #include "MeshEmitterCommon.h"
+#include "QuadCommon.h"
+#include "MeshCommon.h"
+#include "RectParticleCommon.h"
+#include "MeshParticleCommon.h"
+#include "RectEmitterCommon.h"
 
 //sky
 #include "SkySphere.h"
