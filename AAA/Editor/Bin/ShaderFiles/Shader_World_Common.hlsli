@@ -183,7 +183,7 @@ void Apply_ShadowAlphaCut(float2 vUV, float2 vUnknownUV)
     else if (SHADOW_ALPHA_DIFFUSE_R == g_iShadowAlphaSource)    fAlpha = g_DiffuseTexture.Sample(LinearSampler, vUV).r;
     else if (SHADOW_ALPHA_UNKNOWN_R == g_iShadowAlphaSource)    fAlpha = g_UnknownTexture.Sample(LinearSampler, vUnknownUV).r;
 
-    if (fAlpha < 0.5f)
+    if (fAlpha < 0.1f)
         discard;
 }
 
