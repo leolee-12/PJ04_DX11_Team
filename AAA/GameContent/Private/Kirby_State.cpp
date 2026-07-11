@@ -96,15 +96,15 @@ void CKirby_State::Request_DialogueAnim(CKirby* pKirby, const SEQUENCE_KIRBY_ANI
 {
 }
 
-void CKirby_State::Request_SequenceLock(CKirby* pKirby, const KIRBY_LEVEL_SPAWN_DESC* pDesc)
+void CKirby_State::Request_SequenceLock(CKirby* pKirby, const KIRBY_LEVEL_SLEEP_DESC* pDesc)
 {
 }
 
-void CKirby_State::Request_SequenceLock_End(CKirby* pKirby, const KIRBY_LEVEL_SLEEP_DESC* pDesc)
+void CKirby_State::Request_SequenceLock_End(CKirby* pKirby, const KIRBY_LEVEL_SPAWN_DESC* pDesc)
 {
 }
 
-void CKirby_State::Cleanup_ForLevelTransition(CKirby* pKirby, const KIRBY_LEVEL_SPAWN_DESC* pDesc)
+void CKirby_State::Cleanup_ForLevelTransition(CKirby* pKirby, const KIRBY_LEVEL_SLEEP_DESC* pDesc)
 {
 }
 

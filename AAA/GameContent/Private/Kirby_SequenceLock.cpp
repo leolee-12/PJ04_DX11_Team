@@ -52,7 +52,12 @@ void CKirby_SequenceLock::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INF
 {
 }
 
-void CKirby_SequenceLock::Request_SequenceLock(CKirby* pKirby, const KIRBY_LEVEL_SPAWN_DESC* pDesc)
+void CKirby_SequenceLock::Request_SequenceLock(CKirby* pKirby, const KIRBY_LEVEL_SLEEP_DESC* pDesc)
+{
+
+}
+
+void CKirby_SequenceLock::Request_SequenceLock_End(CKirby* pKirby, const KIRBY_LEVEL_SPAWN_DESC* pDesc)
 {
     CTransform* pTransform = pKirby->Get_Transform();
 
@@ -64,10 +69,7 @@ void CKirby_SequenceLock::Request_SequenceLock(CKirby* pKirby, const KIRBY_LEVEL
         pTransform->LookTo(XMVector3Normalize(vLook));
 
     pKirby->Get_Movement()->Sync_To_Controller();
-}
 
-void CKirby_SequenceLock::Request_SequenceLock_End(CKirby* pKirby, const KIRBY_LEVEL_SLEEP_DESC* pDesc)
-{
     pKirby->Change_State(KIRBY_STATE_TYPE::WAIT);
 }
 

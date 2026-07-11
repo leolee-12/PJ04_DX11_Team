@@ -57,8 +57,8 @@ public:
 	void Request_DialogueAnim_StateMachine(const SEQUENCE_KIRBY_ANIM_DESC* pDesc);
 
 	// SequenceLock
-	void Request_SequenceLock_StateMachine(const KIRBY_LEVEL_SPAWN_DESC* pDesc);
-	void Request_SequenceLock_End_StateMachine(const KIRBY_LEVEL_SLEEP_DESC* pDesc);
+	void Request_SequenceLock_StateMachine(const KIRBY_LEVEL_SLEEP_DESC* pDesc);
+	void Request_SequenceLock_End_StateMachine(const KIRBY_LEVEL_SPAWN_DESC* pDesc);
 
 public:
 	void Get_EssenceBubble(COPY_ABILITY_TYPE eNewAbility);
