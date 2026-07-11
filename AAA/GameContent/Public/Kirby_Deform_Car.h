@@ -23,7 +23,7 @@ private:
 	static constexpr _float s_fCar_CCT_Radius = 1.8f;
 	static constexpr _float s_fCar_CCT_Height = 0.05f;
 
-	enum DEFORM_CAR_STATE { BOOST, BOOST_END, CRUSH, DEFORM_CAR_END };
+	enum DEFORM_CAR_STATE { BOOST, BOOST_END, CRASH, DEFORM_CAR_END };
 	enum BOOST_JUMP_STATE { GROUND, JUMP_START, JUMP, FALL, LANDING };
 
 private:
@@ -56,6 +56,8 @@ private:
 	_float m_fMaxBoostTime{};
 	_float m_fAccBoostTime{};
 
+	_float m_fMinimumBoostTime{};
+
 	DEFORM_CAR_STATE m_eDeformCar_State{};
 	BOOST_JUMP_STATE m_eBoostJumpState{};
 
@@ -77,6 +79,8 @@ private:
 	void Exit_BoostJumpState(CKirby* pKirby, BOOST_JUMP_STATE eStaten);
 
 	void BoostEffectStart(CKirby* pKirby, CEffect_Container*& pContainer1, CEffect_Container*& pContainer2, const _tchar* EffectTag);
+
+	_bool Check_FrontCollision(CKirby* pKirby);
 
 public:
 	static CKirby_Deform_Car* Create();

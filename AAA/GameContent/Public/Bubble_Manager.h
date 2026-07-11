@@ -47,9 +47,11 @@ public:
 
     // 기본 Spawn - Launch 안할 때 사용
     HRESULT                 Spawn(_uint iTargetLevel, BUBBLE_KIND eKind, COPY_ABILITY_TYPE eAbility, const _float3& vPos, CAbility_Bubble** ppOut);
+    HRESULT                 Spawn(_uint iTargetLevel, BUBBLE_KIND eKind, COPY_ABILITY_TYPE eAbility, _fvector vPos, CAbility_Bubble** ppOut);
 
     // Dropped Bubble 발사할 때 방향 전달
     HRESULT                 Spawn(_uint iTargetLevel, BUBBLE_KIND eKind, COPY_ABILITY_TYPE eAbility, const _float3& vPos, const _float3& vDir, CAbility_Bubble** ppOut);
+    HRESULT                 Spawn(_uint iTargetLevel, BUBBLE_KIND eKind, COPY_ABILITY_TYPE eAbility, _fvector vPos, _fvector vDir, CAbility_Bubble** ppOut);
 
     void                    Return(_uint iLevel, const _wstring& strKey, CAbility_Bubble* pBubble);
     void                    Clear_Level(_uint iLevel);

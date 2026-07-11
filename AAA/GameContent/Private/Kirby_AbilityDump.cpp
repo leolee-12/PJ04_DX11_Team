@@ -6,6 +6,8 @@
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
 
+#include "Bubble_Manager.h"
+
 CKirby_AbilityDump::CKirby_AbilityDump()
 {
 }
@@ -14,6 +16,8 @@ HRESULT CKirby_AbilityDump::Initialize()
 {
     if (FAILED(__super::Initialize()))
         return E_FAIL;
+
+    m_pBubbleManager = CBubble_Manager::GetInstance();
 
     return S_OK;
 }
@@ -74,6 +78,8 @@ void CKirby_AbilityDump::Update_AbilityDump(CKirby* pKirby, _float fRatio)
 {
     if (m_bPartsOff == false && fRatio >= 0.45f)
     {
+        Spawn_DroppedBubble(pKirby);
+
         pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), false);
         pKirby->Request_ChangeKirbyAbility(COPY_ABILITY_TYPE::NORMAL);
         pKirby->Apply_ChangeKirbyAbility();
@@ -84,6 +90,17 @@ void CKirby_AbilityDump::Update_AbilityDump(CKirby* pKirby, _float fRatio)
 
         m_bPartsOff = true;
     }
+}
+
+void CKirby_AbilityDump::Spawn_DroppedBubble(CKirby* pKirby)
+{
+    CTransform* pTransform = pKirby->Get_Transform();
+    _vector vSpawnPos = pTransform->Get_State(STATE::POSITION) + XMVectorSet(0.f, 1.f, 0.f, 0.f);
+    _vector vDir = -pTransform->Get_State(STATE::LOOK);
+
+    m_pBubbleManager->Spawn(pKirby->Get_LevelIndex(), CBubble_Manager::BUBBLE_KIND::DROPPED,
+        pKirby->Get_KirbyAbility()->Get_AbilityType(),
+        vSpawnPos, vDir, nullptr);
 }
 
 CKirby_AbilityDump* CKirby_AbilityDump::Create()

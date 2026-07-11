@@ -11,6 +11,8 @@ NS_BEGIN(Client)
 class CKirby;
 class CKirby_Body;
 
+class CBubble_Manager;
+
 class CLIENT_DLL CKirby_AbilityDump final : public CKirby_State
 {
 private:
@@ -37,8 +39,12 @@ public:
 private:
 	_bool m_bPartsOff{};
 
+	CBubble_Manager* m_pBubbleManager{};
+
 private:
 	void Update_AbilityDump(CKirby* pKirby, _float fRatio);
+
+	void Spawn_DroppedBubble(CKirby* pKirby);
 
 public:
 	static CKirby_AbilityDump* Create();

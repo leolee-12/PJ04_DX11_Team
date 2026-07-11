@@ -73,8 +73,10 @@ HRESULT CKirby_Ability_Sword::Initialize()
     Set_FullBodyAni(ABILITY_ANI::GUARD, "Sword_Guard", true, true, 0.1f, 1.8f);
 
     Set_FullBodyAni(ABILITY_ANI::SLIDE_START, "SwordSlideStart", false, false, 0.1f, 1.5f);
-    Set_FullBodyAni(ABILITY_ANI::SLIDE, "SwordSlide", true, false, 0.1f, 1.5f);
-    Set_FullBodyAni(ABILITY_ANI::SLIDE_END, "SwordSlideEnd", false, false, 0.1f, 1.5f);
+    Set_FullBodyAni(ABILITY_ANI::SLIDE, "SwordSlide", false, false, 0.1f, 1.5f);
+
+    Set_FullBodyAni(ABILITY_ANI::SLIDE_JUMP_L, "UpwardSlash", false, false, 0.1f, 1.5f);
+    Set_FullBodyAni(ABILITY_ANI::SLIDE_JUMP_R, "UpwardSlash", false, false, 0.1f, 1.5f);
 
     m_fSuperSpinSlashChargeTime = 0.8f;
 
@@ -305,24 +307,34 @@ _bool CKirby_Ability_Sword::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVEN
     {
         SLASH1_H, SLASH_2_1_H, SLASH_2_2_H, SLASH_2_3_H, SLASH_2_4_H, SLASH_3_H,
         JUMP_SLASH_H,
-        SPIN_SLASH, SUPER_SPIN_SLASH
+        SPIN_SLASH, SUPER_SPIN_SLASH,
+        UPWARDSLASH
     };
+
+    CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::SWORD));
 
     if (ePhase == ANIM_EVENT_PHASE::BEGIN)
     {
         ATTACK_INFO tAttackInfo{};
-        CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::SWORD));
 
-        switch (static_cast<SWORD_HIT_PARAM>(e.iIntParam))
+        switch (e.iIntParam)
         {
+            case COMMON_HIT_PARAM::SLIDE_H:
+            {
+                tAttackInfo.fDamage = 10.f;
+                tAttackInfo.fKnockback = 9.5f;
+                tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
+                pSword->Begin_Hit(tAttackInfo);
+                return true;
+            }
             case SWORD_HIT_PARAM::SLASH1_H:
             {
-                //tAttackInfo.fDamage = 10.f; ¿øº»
-                tAttackInfo.fDamage = 500.f;
+                tAttackInfo.fDamage = 10.f;
+                //tAttackInfo.fDamage = 500.f;
                 tAttackInfo.fKnockback = 4.5f;
                 tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
                 pSword->Begin_Hit(tAttackInfo);
-                break;
+                return true;
             }
             case SWORD_HIT_PARAM::SLASH_2_1_H: 
             case SWORD_HIT_PARAM::SLASH_2_2_H:
@@ -333,7 +345,7 @@ _bool CKirby_Ability_Sword::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVEN
                 tAttackInfo.fKnockback = 4.5f;
                 tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
                 pSword->Begin_Hit(tAttackInfo);
-                break;
+                return true;
             }
             case SWORD_HIT_PARAM::SLASH_3_H:
             {
@@ -341,7 +353,7 @@ _bool CKirby_Ability_Sword::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVEN
                 tAttackInfo.fKnockback = 10.f;
                 tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
                 pSword->Begin_Hit(tAttackInfo);
-                break;
+                return true;
             }
             case SWORD_HIT_PARAM::JUMP_SLASH_H:
             {
@@ -349,7 +361,7 @@ _bool CKirby_Ability_Sword::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVEN
                 tAttackInfo.fKnockback = 4.5f;
                 tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
                 pSword->Begin_Hit(tAttackInfo);
-                break;
+                return true;
             }
             case SWORD_HIT_PARAM::SPIN_SLASH:
             {
@@ -357,7 +369,7 @@ _bool CKirby_Ability_Sword::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVEN
                 tAttackInfo.fKnockback = 4.5f;
                 tAttackInfo.eHitType = HIT_TYPE::SWORD_SPIN;
                 pSword->Begin_Hit(tAttackInfo);
-                break;
+                return true;
             }
             case SWORD_HIT_PARAM::SUPER_SPIN_SLASH:
             {
@@ -365,17 +377,25 @@ _bool CKirby_Ability_Sword::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVEN
                 tAttackInfo.fKnockback = 30.f;
                 tAttackInfo.eHitType = HIT_TYPE::SWORD_SPIN;
                 pSword->Begin_Hit(tAttackInfo);
-                break;
+                return true;
+            }
+            case SWORD_HIT_PARAM::UPWARDSLASH:
+            {
+                tAttackInfo.fDamage = 10.f;
+                tAttackInfo.fKnockback = 4.5f;
+                tAttackInfo.eHitType = HIT_TYPE::UPWARD_SLASH;
+                pSword->Begin_Hit(tAttackInfo);
+                return true;
             }
         }
-
-        return true;
     }
     
     if (ePhase == ANIM_EVENT_PHASE::END)
     {
         switch (static_cast<SWORD_HIT_PARAM>(e.iIntParam))
         {
+            case COMMON_HIT_PARAM::SLIDE_H:
+
             case SWORD_HIT_PARAM::SLASH1_H:
             case SWORD_HIT_PARAM::SLASH_2_1_H:
             case SWORD_HIT_PARAM::SLASH_2_2_H:
@@ -385,13 +405,11 @@ _bool CKirby_Ability_Sword::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVEN
             case SWORD_HIT_PARAM::JUMP_SLASH_H:
             case SWORD_HIT_PARAM::SPIN_SLASH:
             case SWORD_HIT_PARAM::SUPER_SPIN_SLASH:
-                CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::SWORD));
+            case SWORD_HIT_PARAM::UPWARDSLASH:
                 pSword->End_Hit();
-                break;
+                return true;
         }
- 
-        return true;
-    }
+     }
     
     return false;
 }

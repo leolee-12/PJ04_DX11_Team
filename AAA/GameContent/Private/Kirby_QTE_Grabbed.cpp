@@ -143,8 +143,7 @@ void CKirby_QTE_Grabbed::Enter_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE
         case QTE_GRABBED_STATE::ESCAPE:
         {      
             _vector vBackDir = -pKirby->Get_Transform()->Get_State(STATE::LOOK);
-            vBackDir = XMVectorSetY(vBackDir, 0.f);
-            vBackDir = XMVector3Normalize(vBackDir);
+            vBackDir = XMVector3Normalize(XMVectorSetY(vBackDir, 0.f));
 
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Set_Velocity(vBackDir * 15.f);

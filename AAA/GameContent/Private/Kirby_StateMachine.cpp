@@ -81,6 +81,21 @@ void CKirby_StateMachine::Handle_Command(CKirby_Command* pCommand)
     m_pCurState->Handle_Command(m_pKirby, pCommand);
 }
 
+void CKirby_StateMachine::On_KirbyCollisionEnter_StateMachine(_uint iColliderType, CCollider* pOther)
+{
+    m_pCurState->On_KirbyCollisionEnter(m_pKirby, iColliderType, pOther);
+}
+
+void CKirby_StateMachine::On_KirbyCollisionStay_StateMachine(_uint iColliderType, CCollider* pOther)
+{
+    m_pCurState->On_KirbyCollisionStay(m_pKirby, iColliderType, pOther);
+}
+
+void CKirby_StateMachine::On_KirbyCollisionExit_StateMachine(_uint iColliderType, CCollider* pOther)
+{
+    m_pCurState->On_KirbyCollisionExit(m_pKirby, iColliderType, pOther);
+}
+
 void CKirby_StateMachine::On_Damaged_KirbyStateMachine(const ATTACK_INFO& tInfo)
 {
     m_pCurState->On_Damaged_KirbyState(m_pKirby, tInfo);
