@@ -71,7 +71,7 @@ HRESULT CBoss_Stage1::Initialize()
     if (FAILED(Ready_Lights()))
         return E_FAIL;
 
-    m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_PreBoss.marker.wav", 3.f, 0.5f);     // 1ÃÊ Fade IN µé¾îº¸¸ç Æ©´×
+    m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_PreBoss.marker.wav", 3.f, 0.4f);     // 1ÃÊ Fade IN µé¾îº¸¸ç Æ©´×
 
     m_pGameInstance_Proxy->Set_ShaderGlobal("g_fFogEnable", _float4(0.f, 0.f, 0.f, 0.f));
 
@@ -110,10 +110,14 @@ HRESULT CBoss_Stage1::Ready_Events()
 
     });
 
-
     Subscribe_Event(EventTag::BGMChange, [this](void* p) {
         m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_Boss1.marker.wav", 3.f, 0.5f);
         });
+
+    Subscribe_Event(EventTag::Cutscene_KirbyDancing, [this](void* p) {
+        m_pGameInstance_Proxy->Play_SFX(L"K15_KirbyDanceLong.marker.dspadpcm.wav", 0.45f, ESoundBus::SFX);
+        });
+    
 
     return S_OK;
 

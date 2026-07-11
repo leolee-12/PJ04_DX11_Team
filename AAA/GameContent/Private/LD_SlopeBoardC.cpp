@@ -320,6 +320,8 @@ void CLD_SlopeBoardC::On_Event()
 	if (STATE::IDLE != m_eState)
 		return;
 
+	m_pGameInstance_Proxy->Fade_BGM_Out(1.5f);
+
 	Play_Anim(ANIM_CUT1);
 	m_eState = STATE::PLAYING;
 
@@ -349,8 +351,33 @@ void CLD_SlopeBoardC::On_AnimEvent(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE
 	if (ANIM_EVENT_PHASE::POINT != ePhase)
 		return;
 
-	if (EANIM_EVENT::UI == static_cast<EANIM_EVENT>(AnimEvent.iEventType))
-		m_pGameInstance_Proxy->Publish(EventTag::TitleLogo_Show, nullptr);
+	switch (static_cast<EANIM_EVENT>(AnimEvent.iEventType))
+	{
+	case EANIM_EVENT::UI:
+	{
+		if (ePhase == ANIM_EVENT_PHASE::POINT)
+			m_pGameInstance_Proxy->Publish(EventTag::TitleLogo_Show, nullptr);
+		break;
+	}
+	case EANIM_EVENT::Sound:
+	{
+		if (AnimEvent.strParam.empty())
+		{
+#ifdef _DEBUG
+			MSG_BOX("Sound StrParam is Empty");
+#endif
+			return;
+		}
+
+		if (ePhase == ANIM_EVENT_PHASE::POINT)
+			m_pGameInstance_Proxy->Play_SFX(StrToWstr(AnimEvent.strParam).c_str(), AnimEvent.vOffset.x);
+
+		break;
+	}
+	default:
+		break;
+
+	}
 }
 
 CGameObject* CLD_SlopeBoardC::Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

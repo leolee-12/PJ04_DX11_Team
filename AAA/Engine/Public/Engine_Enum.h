@@ -56,6 +56,6 @@ namespace Engine
 
 	enum class DEFAULT_TEXTURE { WHITE, BLACK, MAGENTA, FLAT_NORMAL, MRA, END };
 
-	enum class ESoundBus { BGM, SFX, UI, VOICE, END };
+	enum class ESoundBus { BGM, SFX, UI, VOICE, AMBIENT, END };
 }
 #endif // Engine_Enum_h__
