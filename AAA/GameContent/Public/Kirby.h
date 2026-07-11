@@ -201,7 +201,7 @@ private:
 	void Cal_RenderWorldMatrix();
 	void Update_GroundNormal(_float3& vGroundNormal);
 
-	// Level SPawn
+	// Level Spawn
 	void Republish_HUDState();
 
 private:
