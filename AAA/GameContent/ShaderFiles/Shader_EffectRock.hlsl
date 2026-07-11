@@ -2,6 +2,8 @@
 
 float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
+float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
+
 Texture2D g_DiffuseTexture;
 bool g_bUseDiffuseTexture = { false };
 float2 g_vDiffuseTiling = { 1.f, 1.f };
@@ -143,6 +145,7 @@ struct PS_GBUFFER_OUT
     float4 vNormal : SV_TARGET1;
     float4 vDepth : SV_TARGET2;
     float4 vMRA : SV_TARGET3;
+    float4 vEmissive : SV_TARGET4;
 };
 
 void Apply_CircleUVAnim(float2 vTexcoord, bool bUse, float fRatio, float fStartDegree, bool bClockwise)
@@ -310,6 +313,7 @@ PS_GBUFFER_OUT PS_GBUFFER(PS_IN In)
     Out.vNormal = float4(vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
     Out.vMRA = float4(vMRA, 1.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb * vColor.a, 1.f);
 
     return Out;
 }
@@ -318,6 +322,7 @@ PS_COLOR_OUT PS_MAIN(PS_IN In)
 {
     PS_COLOR_OUT Out;
     Out.vColor = ComposeEffectColor_Linear(In.vTexcoord);
+    Out.vColor.rgb += g_vEmissiveColor.rgb * Out.vColor.a;
     return Out;
 }
 
@@ -325,6 +330,7 @@ PS_COLOR_OUT PS_MAIN_MIRROR(PS_IN In)
 {
     PS_COLOR_OUT Out;
     Out.vColor = ComposeEffectColor_Mirror(In.vTexcoord);
+    Out.vColor.rgb += g_vEmissiveColor.rgb * Out.vColor.a;
     return Out;
 }
 

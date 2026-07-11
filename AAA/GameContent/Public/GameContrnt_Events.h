@@ -84,7 +84,6 @@ namespace Client
         inline constexpr const _tchar* TitleLogo_Show = L"TitleLogo.Show";
 
         // 대화 이벤트
-        inline constexpr const _tchar* Dialogue_Setup = L"Dialogue.Setup";
         inline constexpr const _tchar* Dialogue_Start = L"Dialogue.Start";
         inline constexpr const _tchar* Dialogue_Finished = L"Dialogue.Finished";
         inline constexpr const _tchar* Dialogue_Arrange = L"Dialogue.Arrange";
@@ -260,14 +259,6 @@ namespace Client
     struct KIRBY_POSITION_SYNC_END_DESC
     {
         KIRBY_POSITION_SYNC_END_REASON eType = { KIRBY_POSITION_SYNC_END_REASON::_COUNT };
-    };
-#pragma endregion
-
-#pragma region Object 재배치
-    struct DIALOGUE_SETUP_DESC
-    {
-        _float4x4 KirbyWorld{};
-        _float4x4 DeeWorld{};
     };
 #pragma endregion
 

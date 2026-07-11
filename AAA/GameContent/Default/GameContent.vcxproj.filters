@@ -1068,6 +1068,12 @@
     <Filter Include="00. GameObject\08. CutsceneActor\WaddleDee">
       <UniqueIdentifier>{6700c8e4-b099-469b-ad89-420d86594b71}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Dialogue">
+      <UniqueIdentifier>{2c2d36e9-7ad0-4552-90ae-4bf34ee1586c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\SequenceLock">
+      <UniqueIdentifier>{177175b4-2098-427f-ad7d-a019dd2a0446}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\97. UI\UIContainer\Dialogue">
       <UniqueIdentifier>{90e690e2-d3c3-47c6-b828-2881240d9b80}</UniqueIdentifier>
     </Filter>
@@ -2124,6 +2130,13 @@
     <ClInclude Include="..\public\Dialogue_Arranger.h">
       <Filter>03. SystemObject\Dialogue Arranger</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\StarMesh.h" />
+    <ClInclude Include="..\Public\Kirby_Dialogue.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Dialogue</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_SequenceLock.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\SequenceLock</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\BubbleAura.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\BubbleAura</Filter>
     </ClInclude>
@@ -3101,6 +3114,13 @@
     </ClCompile>
     <ClCompile Include="..\private\Dialogue_Arranger.cpp">
       <Filter>03. SystemObject\Dialogue Arranger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\StarMesh.cpp" />
+    <ClCompile Include="..\Private\Kirby_Dialogue.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Dialogue</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_SequenceLock.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\SequenceLock</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BubbleAura.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\BubbleAura</Filter>
