@@ -45,10 +45,11 @@ namespace Client
         inline constexpr const _tchar* Cutscene_GorillaBreak = L"Cutscene.GorillaBreak";  // 고릴라 환경 부수기 이벤트
         inline constexpr const _tchar* Cutscene_CameraChange = L"Cutscene.CameraChange";
         inline constexpr const _tchar* Cutscene_StageClear = L"Cutscene.StageClear";
-        inline constexpr const _tchar* Cutscene_KirbyDancing = L"Cutscene.KirbyDancing";
 
         // QTE
         inline constexpr const _tchar* QTE_Success = L"QTE.Success";
+        inline constexpr const _tchar* QTE_Show = L"QTE.Show";
+        inline constexpr const _tchar* QTE_Hide = L"QTE.Hide";
 
         // 카메라
         inline constexpr const _tchar* Camera_Shake = L"Camera.Shake";
@@ -82,12 +83,13 @@ namespace Client
         inline constexpr const _tchar* TitleLogo_Show = L"TitleLogo.Show";
 
         // 대화 이벤트
-        inline constexpr const _tchar* Dialogue_Setup = L"Dialogue.Setup";
         inline constexpr const _tchar* Dialogue_Start = L"Dialogue.Start";
         inline constexpr const _tchar* Dialogue_Finished = L"Dialogue.Finished";
         inline constexpr const _tchar* Dialogue_Arrange = L"Dialogue.Arrange";
         inline constexpr const _tchar* Sequence_KirbyAnim = L"Sequence.KirbyAnim";
         inline constexpr const _tchar* Sequence_KirbyWarp = L"Sequence.KirbyWarp";
+        inline constexpr const _tchar* Dialogue_Say = L"Dialogue.Say";
+        inline constexpr const _tchar* Dialogue_SayDone = L"Dialogue.SayDone";
 
         // 케이지
         inline constexpr const _tchar* Cage_Descend = L"Cage.Descend";
@@ -259,14 +261,6 @@ namespace Client
     };
 #pragma endregion
 
-#pragma region Object 재배치
-    struct DIALOGUE_SETUP_DESC
-    {
-        _float4x4 KirbyWorld{};
-        _float4x4 DeeWorld{};
-    };
-#pragma endregion
-
 #pragma region 대화 이벤트
     struct SEQUENCE_KIRBY_WARP_DESC
     {
@@ -280,6 +274,11 @@ namespace Client
         _bool  bLoop = { false };
         _float fSpeed = { 1.f };
         _float fBlendDuration = { 0.2f };
+    };
+    struct DIALOGUE_SAY_DESC
+    {
+        _wstring strSpeaker{};
+        _wstring strLines[3]{};    // Top / Middle / Bottom
     };
 #pragma endregion
 

@@ -87,8 +87,10 @@
     <ClInclude Include="..\Public\Kirby_AttackMode.h" />
     <ClInclude Include="..\Public\Kirby_CarFirstBreakWall.h" />
     <ClInclude Include="..\Public\Kirby_Clear.h" />
+    <ClInclude Include="..\Public\Kirby_Dialogue.h" />
     <ClInclude Include="..\Public\Kirby_Dodge.h" />
     <ClInclude Include="..\Public\Kirby_HitBox_Model.h" />
+    <ClInclude Include="..\Public\Kirby_SequenceLock.h" />
     <ClInclude Include="..\Public\Kirby_Slide.h" />
     <ClInclude Include="..\Public\LD_ArrowBoard.h" />
     <ClInclude Include="..\Public\LD_DeformCarBreakWall.h" />
@@ -174,6 +176,7 @@
     <ClInclude Include="..\public\Projectile_Movement.h" />
     <ClInclude Include="..\public\UI_CoordinatorContainer.h" />
     <ClInclude Include="..\public\UI_CutFade.h" />
+    <ClInclude Include="..\public\UI_Dialogue.h" />
     <ClInclude Include="..\Public\UI_FlashCurtain.h" />
     <ClInclude Include="..\public\CutsceneActor.h" />
     <ClInclude Include="..\public\CutsceneGorilla.h" />
@@ -359,6 +362,7 @@
     <ClInclude Include="..\public\UI_MissionPanel.h" />
     <ClInclude Include="..\public\UI_MovableContainer.h" />
     <ClInclude Include="..\Public\UI_PointStar.h" />
+    <ClInclude Include="..\public\UI_QTE.h" />
     <ClInclude Include="..\Public\UI_SpriteAnim.h" />
     <ClInclude Include="..\public\UI_SpriteAnimCurtain.h" />
     <ClInclude Include="..\public\UI_StageClear.h" />
@@ -442,8 +446,10 @@
     <ClCompile Include="..\Private\Kirby_AttackMode.cpp" />
     <ClCompile Include="..\Private\Kirby_CarFirstBreakWall.cpp" />
     <ClCompile Include="..\Private\Kirby_Clear.cpp" />
+    <ClCompile Include="..\Private\Kirby_Dialogue.cpp" />
     <ClCompile Include="..\Private\Kirby_Dodge.cpp" />
     <ClCompile Include="..\Private\Kirby_HitBox_Model.cpp" />
+    <ClCompile Include="..\Private\Kirby_SequenceLock.cpp" />
     <ClCompile Include="..\Private\Kirby_Slide.cpp" />
     <ClCompile Include="..\Private\LD_ArrowBoard.cpp" />
     <ClCompile Include="..\Private\LD_DeformCarBreakWall.cpp" />
@@ -526,6 +532,7 @@
     <ClCompile Include="..\private\Projectile_Movement.cpp" />
     <ClCompile Include="..\private\UI_CoordinatorContainer.cpp" />
     <ClCompile Include="..\private\UI_CutFade.cpp" />
+    <ClCompile Include="..\private\UI_Dialogue.cpp" />
     <ClCompile Include="..\Private\UI_FlashCurtain.cpp" />
     <ClCompile Include="..\private\CutsceneActor.cpp" />
     <ClCompile Include="..\private\CutsceneGorilla.cpp" />
@@ -689,6 +696,7 @@
     <ClCompile Include="..\private\UI_MissionPanel.cpp" />
     <ClCompile Include="..\private\UI_MovableContainer.cpp" />
     <ClCompile Include="..\Private\UI_PointStar.cpp" />
+    <ClCompile Include="..\private\UI_QTE.cpp" />
     <ClCompile Include="..\Private\UI_SpriteAnim.cpp" />
     <ClCompile Include="..\private\UI_SpriteAnimCurtain.cpp" />
     <ClCompile Include="..\private\UI_StageClear.cpp" />

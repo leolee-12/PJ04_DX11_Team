@@ -99,6 +99,12 @@ HRESULT CDialogue_Arranger::Ready_Events()
             m_pPlayer->Play();
         });
 
+    Subscribe_Event(EventTag::Dialogue_SayDone, [this](void*)
+        {
+            if (m_pPlayer)
+                m_pPlayer->Notify_SayDone();
+        });
+
     return S_OK;
 }
 
