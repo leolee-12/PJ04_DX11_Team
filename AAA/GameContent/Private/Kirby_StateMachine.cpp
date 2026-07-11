@@ -44,7 +44,7 @@ HRESULT CKirby_StateMachine::Initialize(CKirby* pKirby)
     if (FAILED(Init_State()))
         return E_FAIL;
 
-    Change_State(KIRBY_STATE_TYPE::WAIT);
+    Change_State(KIRBY_STATE_TYPE::SEQUENCE_LOCK);
 
     return S_OK;
 }
