@@ -51,7 +51,12 @@ void CKirby_Jump::Enter(CKirby* pKirby, _int iFlag)
     else
     {
         CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
-        ABILITY_ANI eJumpAni = m_bLeft ? ABILITY_ANI::JUMP_L : ABILITY_ANI::JUMP_R;
+        ABILITY_ANI eJumpAni{};
+        if (iFlag == JUMP_STATE_FLAG::JUMP_FROM_SLIDE)
+            eJumpAni = m_bLeft ? ABILITY_ANI::SLIDE_JUMP_L : ABILITY_ANI::SLIDE_JUMP_R;
+        else
+            eJumpAni = m_bLeft ? ABILITY_ANI::JUMP_L : ABILITY_ANI::JUMP_R;
+
         pAbility->Play_AbilityAni(pKirby, eJumpAni);
 
         m_eJumpType = JUMP_STATE::JUMP;
@@ -125,7 +130,10 @@ void CKirby_Jump::Update(CKirby* pKirby, const _float fTimeDelta)
                 _bool bCanPlayJumpEnd = pKribyBody->Get_KirbyBody() != KIRBY_BODY_STATE::STUFFED;
                 _bool bPlayJumpEnd = bCanPlayJumpEnd && (rand() % 2 == 0);
 
-                if (bPlayJumpEnd)
+                CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+                _bool bCanPlayJumpEndFromSlide = pAbility->Can_PlayJumpEndFromSlide();
+
+                if (bPlayJumpEnd && bCanPlayJumpEndFromSlide)
                 {
                     if(m_bLeft)
                         pKirby->Change_State(KIRBY_STATE_TYPE::FALL, FALL_STATE_FLAG::PLAY_JUMP_END_L);

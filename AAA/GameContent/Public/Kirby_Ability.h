@@ -50,6 +50,8 @@ public:
 
 	void Play_AbilityAni(CKirby* pKirby, ABILITY_ANI eAbilityAni);
 
+	virtual _bool Can_PlayJumpEndFromSlide() { return true; };
+
 protected:
 	void Set_FullBodyAni(ABILITY_ANI eAni, const _string& strAniName, _bool bLoop = true, _bool bRestart = false, _float fBlend = 0.1f, _float fSpeed = 1.f);
 
