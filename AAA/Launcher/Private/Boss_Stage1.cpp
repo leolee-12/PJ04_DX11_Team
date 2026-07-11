@@ -106,9 +106,9 @@ HRESULT CBoss_Stage1::Ready_Events()
         m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_Boss1.marker.wav", 3.f, 0.5f);
         });
 
-    Subscribe_Event(EventTag::Cutscene_KirbyDancing, [this](void* p) {
+    /*Subscribe_Event(EventTag::Cutscene_StageClear, [this](void* p) {
         m_pGameInstance_Proxy->Play_SFX(L"K15_KirbyDanceLong.marker.dspadpcm.wav", 0.45f, ESoundBus::SFX);
-        });
+        });*/
     
 
     return S_OK;
