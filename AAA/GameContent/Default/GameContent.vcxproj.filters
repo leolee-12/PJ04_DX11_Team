@@ -2054,11 +2054,6 @@
     <ClInclude Include="..\public\Dialogue_Director.h">
       <Filter>03. SystemObject\Dialogue Director</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Dialogue_Arranger.h">
-      <Filter>96. Director\Dialogue Arranger</Filter>
-    </ClInclude>
-      <Filter>03. SystemObject\Dialogue Arranger</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Bubble_Manager.h">
       <Filter>00. GameObject\09. AbilityBubble\Manager</Filter>
     </ClInclude>
@@ -2087,6 +2082,9 @@
     </ClInclude>
     <ClInclude Include="..\public\DialogueDee.h">
       <Filter>00. GameObject\08. CutsceneActor\WaddleDee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Dialogue_Arranger.h">
+      <Filter>03. SystemObject\Dialogue Arranger</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -3014,11 +3012,6 @@
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Dialogue_Arranger.cpp">
-      <Filter>96. Director\Dialogue Arranger</Filter>
-    </ClCompile>
-      <Filter>03. SystemObject\Dialogue Arranger</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Bubble_Manager.cpp">
       <Filter>00. GameObject\09. AbilityBubble\Manager</Filter>
     </ClCompile>
@@ -3044,6 +3037,9 @@
     </ClCompile>
     <ClCompile Include="..\private\DialogueDee.cpp">
       <Filter>00. GameObject\08. CutsceneActor\WaddleDee</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Dialogue_Arranger.cpp">
+      <Filter>03. SystemObject\Dialogue Arranger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
