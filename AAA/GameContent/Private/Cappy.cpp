@@ -262,6 +262,17 @@ void CCappy::Apply_AIVariation(const _wstring& strVariation)
 
 }
 
+void CCappy::On_Damaged(const ATTACK_INFO& tInfo)
+{
+	//if (tInfo.eHitType == HIT_TYPE::CAR_BOOSTER_HIT)
+	//{
+
+	//	return;
+	//}
+
+	__super::On_Damaged(tInfo);
+}
+
 HRESULT CCappy::Ready_PartObjects()
 {
 	m_pBody = Add_MonsterPart<CCappy_Body>(CCappy_Body::PROTOTYPE_TAG, TEXT("Body"));

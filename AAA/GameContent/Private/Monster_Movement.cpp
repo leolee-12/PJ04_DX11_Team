@@ -84,12 +84,16 @@ void CMonster_Movement::Launch(_fvector vHorizDir, _float fHorizSpeed, _float fU
 
 void CMonster_Movement::Knockback(_fvector vAttackerPos, _float fStrength)
 {
+	fStrength = min(fStrength, s_fKB_MaxStrength);
+
 	m_bKO = false;
 	Start_Launch(vAttackerPos, fStrength, 1.2f);
 }
 
 void CMonster_Movement::KO(_fvector vAttackerPos, _float fStrength)
 {
+	fStrength = max(fStrength, s_fKO_MinStrength);
+
 	m_bKO = true;
 	Start_Launch(vAttackerPos, fStrength, 1.4f);
 }

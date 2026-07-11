@@ -56,6 +56,9 @@ protected:
     virtual HRESULT         Ready_State() override;
     virtual HRESULT         Ready_AnimEvents() override;
 
+    virtual void			On_Damaged(const ATTACK_INFO& tInfo) override;
+
+
 private:
     HRESULT                 Ready_PartObjects();
     virtual void            On_Deserialized() override;

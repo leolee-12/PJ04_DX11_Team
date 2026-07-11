@@ -99,9 +99,6 @@ void CMonster::Update(_float fTimeDelta)
 		if (m_pMovement) m_pMovement->Sync_To_Controller();
 		return;
 	}
-
-	if (m_pGameInstance_Proxy->Key_Down(DIK_P) && m_pMovement && m_pMovement->Is_Grounded())
-		Change_State(MONSTER_STATE_TYPE::FLATTEN);
 #endif
 
 	Update_AI(fTimeDelta);
@@ -432,12 +429,20 @@ HRESULT CMonster::Ready_State()
 
 void CMonster::On_Damaged(const ATTACK_INFO& tInfo)
 {
+	if (tInfo.eHitType == HIT_TYPE::CAR_BOOSTER_HIT)
+	{
+		if (m_pMovement->Is_Grounded())
+			Change_State(MONSTER_STATE_TYPE::FLATTEN);
+		else
+			Despawn();
+
+		return;
+	}
+
 	if (tInfo.eHitType != HIT_TYPE::BODY_CONTACT)
 		Open_BodyCheckBlock();
 
 	m_LastHit = { tInfo.vAttackerPos, tInfo.fKnockback, tInfo.fDamage };
-
-	//Play_OneShotSFX(L"CharaBasic_DamageReact_Normal.wav", 0.8f);
 
 	// 몬스터 피격 이펙트
 	const _float4* pCamLook = m_pGameInstance_Proxy->Get_CamLook();
