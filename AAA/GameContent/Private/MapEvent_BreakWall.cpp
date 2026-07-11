@@ -2,9 +2,13 @@
 #include "GameContrnt_Events.h"
 
 #include "GameInstance.h"
+#include "Geometry_Utils.h"
 
 namespace
 {
+	constexpr _float BREAK_FRAGMENT_GRAVITY = -15.f;
+	constexpr _float BREAK_FRAGMENT_DESPAWN_FALL_DISTANCE = 30.f;
+
 	struct BREAK_FRAGMENT_BIND
 	{
 		const _char* pFragmentName = nullptr;
@@ -55,11 +59,6 @@ CMapEvent_BreakWall::CMapEvent_BreakWall(ID3D11Device* pDevice, ID3D11DeviceCont
 CMapEvent_BreakWall::CMapEvent_BreakWall(const CMapEvent_BreakWall& Prototype)
 	: CMapObject(Prototype)
 {
-}
-
-HRESULT CMapEvent_BreakWall::Initialize_Prototype()
-{
-	return __super::Initialize_Prototype();
 }
 
 HRESULT CMapEvent_BreakWall::Initialize(void* pArg)
@@ -122,79 +121,27 @@ HRESULT CMapEvent_BreakWall::Validate_Initialized()
 	return S_OK;
 }
 
+void CMapEvent_BreakWall::Update(_float fTimeDelta)
+{
+	if (BREAK_STATE::BREAKING == m_eBreakState)
+		Update_Fragments(fTimeDelta);
+}
+
 void CMapEvent_BreakWall::Late_Update(_float fTimeDelta)
 {
-	if (BREAK_STATE::INTACT == m_eBreakState)
-	{
-		m_pBoostTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+	UNREFERENCED_PARAMETER(fTimeDelta);
 
-#ifdef _DEBUG
-		m_pGameInstance_Proxy->Add_DebugComponent(m_pBoostTrigger);
-#endif
-	}
+	if (BREAK_STATE::INTACT == m_eBreakState)
+		Update_BoostTrigger();
 
 	if (!m_bRenderable)
 		return;
 
-	if (BREAK_STATE::INTACT == m_eBreakState)
+	if (BREAK_STATE::INTACT == m_eBreakState
+		|| BREAK_STATE::BREAKING == m_eBreakState)
 	{
 		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
-		return;
 	}
-
-	if (BREAK_STATE::BREAKING != m_eBreakState)
-		return;
-
-	constexpr _float fGravity = -15.f;
-	_bool bAnyActive = false;
-
-	for (BREAK_FRAGMENT& Fragment : m_Fragments)
-	{
-		if (!Fragment.bActive)
-			continue;
-
-		Fragment.vVelocity.y += fGravity * fTimeDelta;
-		Fragment.vOffset.x += Fragment.vVelocity.x * fTimeDelta;
-		Fragment.vOffset.y += Fragment.vVelocity.y * fTimeDelta;
-		Fragment.vOffset.z += Fragment.vVelocity.z * fTimeDelta;
-
-		_vector vAngularVelocity = XMLoadFloat3(&Fragment.vAngularVelocity);
-		const _float fAngularSpeed = XMVectorGetX(XMVector3Length(vAngularVelocity));
-
-		if (fAngularSpeed > 0.f)
-		{
-			_vector vAxis = XMVector3Normalize(vAngularVelocity);
-			_vector vDeltaRotation = XMQuaternionRotationAxis(vAxis, fAngularSpeed * fTimeDelta);
-			_vector vRotation = XMQuaternionNormalize(XMQuaternionMultiply(XMLoadFloat4(&Fragment.vRotation), vDeltaRotation));
-			XMStoreFloat4(&Fragment.vRotation, vRotation);
-		}
-
-		const _float3 vEnginePivot = { Fragment.vPivot.x, Fragment.vPivot.y, -Fragment.vPivot.z };
-		const _vector vWorldPosition = XMVector3TransformCoord(
-			XMVectorSet(
-				vEnginePivot.x + Fragment.vOffset.x,
-				vEnginePivot.y + Fragment.vOffset.y,
-				vEnginePivot.z + Fragment.vOffset.z,
-				1.f),
-			XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
-
-		const _float fWorldY = XMVectorGetY(vWorldPosition);
-		if (fWorldY < 15.f)
-		{
-			Fragment.bActive = false;
-			continue;
-		}
-
-		bAnyActive = true;
-	}
-
-	if (!bAnyActive)
-	{
-		m_eBreakState = BREAK_STATE::BROKEN;
-		return;
-	}
-
-	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 
 HRESULT CMapEvent_BreakWall::Render()
@@ -350,19 +297,19 @@ HRESULT CMapEvent_BreakWall::Ready_BoostTrigger()
 		vMax.z = max(vMax.z, vPivot.z);
 	}
 
-	constexpr _float fPadding = 2.f;
+	BoundingBox TriggerBounds = GeometryUtils::Make_AABB_FromMinMax(vMin, vMax);
+
+	constexpr _float fPadding = 0.5f;
+	if (!GeometryUtils::Expand_AABB(&TriggerBounds, fPadding))
+		return E_FAIL;
 
 	CCollider::COLLIDER_DESC ColliderDesc{};
 	ColliderDesc.pOwner = this;
-	ColliderDesc.vCenter = {
-			(vMin.x + vMax.x) * 0.5f,
-			(vMin.y + vMax.y) * 0.5f,
-			(vMin.z + vMax.z) * 0.5f
-	};
+	ColliderDesc.vCenter = TriggerBounds.Center;
 	ColliderDesc.vSize = {
-			(vMax.x - vMin.x) + fPadding * 2.f,
-			(vMax.y - vMin.y) + fPadding * 2.f,
-			(vMax.z - vMin.z) + fPadding * 2.f
+					TriggerBounds.Extents.x * 2.f,
+					TriggerBounds.Extents.y * 2.f,
+					TriggerBounds.Extents.z * 2.f
 	};
 
 	m_pBoostTrigger = Add_Component<CCollider>(L"Com_BoostTrigger", CCollider::Create(m_pDevice, m_pContext, COLLIDER::AABB));
@@ -388,6 +335,53 @@ void CMapEvent_BreakWall::On_BoostTriggerEnter(CCollider* pOther)
 	Start_Break();
 }
 
+void CMapEvent_BreakWall::Update_BoostTrigger()
+{
+	m_pBoostTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+
+#ifdef _DEBUG
+	m_pGameInstance_Proxy->Add_DebugComponent(m_pBoostTrigger);
+#endif
+}
+
+void CMapEvent_BreakWall::Update_Fragments(_float fTimeDelta)
+{
+	_bool bAnyActive = false;
+
+	for (BREAK_FRAGMENT& Fragment : m_Fragments)
+	{
+		if (!Fragment.bActive)
+			continue;
+
+		Fragment.vVelocity.y += BREAK_FRAGMENT_GRAVITY * fTimeDelta;
+		Fragment.vOffset.x += Fragment.vVelocity.x * fTimeDelta;
+		Fragment.vOffset.y += Fragment.vVelocity.y * fTimeDelta;
+		Fragment.vOffset.z += Fragment.vVelocity.z * fTimeDelta;
+
+		_vector vAngularVelocity = XMLoadFloat3(&Fragment.vAngularVelocity);
+		const _float fAngularSpeed = XMVectorGetX(XMVector3Length(vAngularVelocity));
+
+		if (fAngularSpeed > 0.f)
+		{
+			_vector vAxis = XMVector3Normalize(vAngularVelocity);
+			_vector vDeltaRotation = XMQuaternionRotationAxis(vAxis, fAngularSpeed * fTimeDelta);
+			_vector vRotation = XMQuaternionNormalize(XMQuaternionMultiply(XMLoadFloat4(&Fragment.vRotation), vDeltaRotation));
+			XMStoreFloat4(&Fragment.vRotation, vRotation);
+		}
+
+		if (Fragment.vOffset.y <= -BREAK_FRAGMENT_DESPAWN_FALL_DISTANCE)
+		{
+			Fragment.bActive = false;
+			continue;
+		}
+
+		bAnyActive = true;
+	}
+
+	if (!bAnyActive)
+		m_eBreakState = BREAK_STATE::BROKEN;
+}
+
 void CMapEvent_BreakWall::Start_Break()
 {
 	if (BREAK_STATE::INTACT != m_eBreakState)
@@ -403,8 +397,6 @@ void CMapEvent_BreakWall::Start_Break()
 	CAMERA_SHAKE_DESC ShakeDesc{};
 	ShakeDesc.fTrauma = 1.f;
 	m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &ShakeDesc);
-
-	//m_pGameInstance_Proxy->Pulse_TimeScale(0.f, 0.2f);
 	m_pGameInstance_Proxy->Lerp_TimeScale(0.f, 1.f, 0.2f);
 
 	for (_uint i = 0; i < static_cast<_uint>(m_Fragments.size()); ++i)
@@ -423,11 +415,6 @@ void CMapEvent_BreakWall::Start_Break()
 			1.60f + static_cast<_float>(i % 5) * 0.5f,
 			1.45f + static_cast<_float>(i % 4) * 0.5f };
 	}
-
-
-#ifdef _DEBUG
-	OutputDebugStringA("[MapEvent_BreakWall] Break started.\n");
-#endif
 }
 
 CMapEvent_BreakWall* CMapEvent_BreakWall::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

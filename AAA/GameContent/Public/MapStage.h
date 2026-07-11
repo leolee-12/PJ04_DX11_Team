@@ -13,7 +13,6 @@ private:
 	CMapStage(const CMapStage& Prototype);
 	virtual ~CMapStage() = default;
 
-	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	HRESULT			Validate_Initialized();
 
@@ -26,8 +25,6 @@ public:
 	const _wstring&					Get_StageName() const { return m_strStageName; }
 
 #ifdef _DEBUG
-	const MAP_STAGE_PROFILE& Get_Profile() const { return m_Profile; }
-
 	void Set_EditorSoloSection(CMapSection* pSection);
 	void Clear_EditorSoloSection();
 	CMapSection* Get_EditorSoloSection() const { return m_pEditorSoloSection; }
@@ -47,7 +44,6 @@ private:
 	_bool					m_bSnapshotValid = { false };
 
 #ifdef _DEBUG
-	MAP_STAGE_PROFILE		m_Profile = {};
 	CMapSection* m_pEditorSoloSection = nullptr;
 #endif
 
@@ -58,11 +54,6 @@ private:
 	void			Submit_VisibleSections();
 
 	void			On_Stage12CarBreakWall();
-
-#ifdef _DEBUG
-	void    Reset_ProfileFrame();
-	void    Count_MainSubmitted(RENDERID eRenderID);
-#endif
 
 public:
 	static CMapStage*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

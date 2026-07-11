@@ -57,11 +57,11 @@ private:
 	CMapEvent_BreakWall(const CMapEvent_BreakWall& Prototype);
 	virtual ~CMapEvent_BreakWall() = default;
 
-	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual HRESULT Validate_Initialized() override;
 
 public:
+	virtual void    Update(_float fTimeDelta) override;
 	virtual void	Late_Update(_float fTimeDelta) override;
 	virtual HRESULT	Render() override;
 	virtual void	Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
@@ -87,8 +87,11 @@ private:
 private:
 	HRESULT	Ready_BoostTrigger();
 	void	On_BoostTriggerEnter(CCollider* pOther);
-	void	Start_Break();
 	HRESULT	Ready_Fragments();
+	
+	void    Update_BoostTrigger();
+	void    Update_Fragments(_float fTimeDelta);
+	void	Start_Break();
 	const BREAK_FRAGMENT* Find_Fragment(_uint iMesh) const;
 
 public:
