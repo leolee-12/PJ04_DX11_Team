@@ -7,6 +7,7 @@ import shutil
 import stat
 import tempfile
 import xml.etree.ElementTree as ET
+from collections import defaultdict
 from io import BytesIO
 from pathlib import Path
 from typing import Iterable
@@ -23,6 +24,25 @@ DEFAULT_EXCLUDED_DIRS = {
     "out",
     "build",
 }
+
+FILTERABLE_ITEM_TYPES = {
+    "ClCompile",
+    "ClInclude",
+    "FxCompile",
+    "Image",
+    "None",
+    "ResourceCompile",
+}
+
+ALLOWED_FILTER_ITEM_TYPES = FILTERABLE_ITEM_TYPES | {"Filter"}
+
+
+class FilterValidationError(ValueError):
+    """필터 구조 또는 프로젝트 대조 오류를 모아서 전달합니다."""
+
+    def __init__(self, messages: list[str]) -> None:
+        super().__init__("filter validation failed")
+        self.messages = messages
 
 
 def local_name(tag: object) -> str:
@@ -202,6 +222,258 @@ def parse_xml(raw: bytes) -> ET.Element:
     return ET.fromstring(raw, parser=parser)
 
 
+def direct_item_group_children(
+    root: ET.Element,
+) -> Iterable[ET.Element]:
+    """모든 ItemGroup의 직접 자식 요소를 순서대로 반환합니다."""
+
+    for element in root.iter():
+        if local_name(element.tag) != "ItemGroup":
+            continue
+
+        yield from element
+
+
+def collect_file_items(
+    root: ET.Element,
+) -> dict[tuple[str, str], list[ET.Element]]:
+    """필터에 배치할 수 있는 파일 항목을 타입과 경로로 묶습니다."""
+
+    items: dict[
+        tuple[str, str],
+        list[ET.Element],
+    ] = defaultdict(list)
+
+    for element in direct_item_group_children(root):
+        item_type = local_name(element.tag)
+
+        if item_type not in FILTERABLE_ITEM_TYPES:
+            continue
+
+        include = (element.get("Include") or "").strip()
+
+        if not include:
+            continue
+
+        key = (
+            item_type.casefold(),
+            normalize_path(include),
+        )
+        items[key].append(element)
+
+    return items
+
+
+def validate_filter_tree(root: ET.Element) -> list[str]:
+    """필터 XML 내부의 구조, 중복, 참조 오류를 검사합니다."""
+
+    errors: list[str] = []
+    filter_definitions: dict[
+        str,
+        list[ET.Element],
+    ] = defaultdict(list)
+    guid_definitions: dict[
+        str,
+        list[tuple[str, str]],
+    ] = defaultdict(list)
+
+    for element in direct_item_group_children(root):
+        item_type = local_name(element.tag)
+
+        if not item_type:
+            continue
+
+        if item_type not in ALLOWED_FILTER_ITEM_TYPES:
+            include = (element.get("Include") or "").strip()
+            errors.append(
+                "[UNEXPECTED_ITEM] "
+                f"Type={item_type} "
+                f"Include={include or '<none>'}"
+            )
+            continue
+
+        include = (element.get("Include") or "").strip()
+
+        if not include:
+            if item_type == "Filter":
+                value = (element.text or "").strip()
+                errors.append(
+                    "[ORPHAN_FILTER] "
+                    f"Filter={value or '<empty>'}"
+                )
+            else:
+                errors.append(
+                    "[MISSING_INCLUDE] "
+                    f"Type={item_type}"
+                )
+
+            continue
+
+        if item_type != "Filter":
+            continue
+
+        filter_definitions[
+            normalize_path(include)
+        ].append(element)
+
+        guid = child_text(element, "UniqueIdentifier")
+
+        if guid:
+            guid_definitions[
+                guid.casefold()
+            ].append((guid, include))
+
+    for definitions in filter_definitions.values():
+        if len(definitions) <= 1:
+            continue
+
+        include = (
+            definitions[0].get("Include")
+            or "<empty>"
+        )
+        errors.append(
+            "[DUPLICATE_FILTER] "
+            f"Filter={include} "
+            f"Count={len(definitions)}"
+        )
+
+    for definitions in guid_definitions.values():
+        if len(definitions) <= 1:
+            continue
+
+        guid = definitions[0][0]
+        filters = ", ".join(
+            include
+            for _, include in definitions
+        )
+        errors.append(
+            "[DUPLICATE_GUID] "
+            f"GUID={guid} "
+            f"Filters={filters}"
+        )
+
+    file_items = collect_file_items(root)
+
+    for elements in file_items.values():
+        if len(elements) <= 1:
+            continue
+
+        item_type = local_name(elements[0].tag)
+        include = (
+            elements[0].get("Include")
+            or "<empty>"
+        )
+        filters = ", ".join(
+            child_text(element, "Filter")
+            or "<none>"
+            for element in elements
+        )
+        errors.append(
+            "[DUPLICATE_ITEM] "
+            f"Type={item_type} "
+            f"Include={include} "
+            f"Count={len(elements)} "
+            f"Filters={filters}"
+        )
+
+    known_filters = set(filter_definitions)
+
+    for elements in file_items.values():
+        for element in elements:
+            filter_name = child_text(
+                element,
+                "Filter",
+            )
+
+            if not filter_name:
+                continue
+
+            if normalize_path(filter_name) in known_filters:
+                continue
+
+            item_type = local_name(element.tag)
+            include = (
+                element.get("Include")
+                or "<empty>"
+            )
+            errors.append(
+                "[UNDECLARED_FILTER] "
+                f"Type={item_type} "
+                f"Include={include} "
+                f"Filter={filter_name}"
+            )
+
+    return errors
+
+
+def compare_with_project(
+    filter_path: Path,
+    filter_root: ET.Element,
+) -> list[str]:
+    """동일 이름의 vcxproj와 filters 파일 항목을 양방향 대조합니다."""
+
+    errors: list[str] = []
+    project_path = filter_path.with_suffix("")
+
+    if not project_path.is_file():
+        return [
+            "[MISSING_PROJECT] "
+            f"File={project_path}"
+        ]
+
+    try:
+        project_root = parse_xml(
+            project_path.read_bytes()
+        )
+    except ET.ParseError as error:
+        return [
+            "[INVALID_PROJECT_XML] "
+            f"File={project_path} "
+            f"Reason={error}"
+        ]
+    except OSError as error:
+        return [
+            "[PROJECT_READ_ERROR] "
+            f"File={project_path} "
+            f"Reason={error}"
+        ]
+
+    if local_name(project_root.tag) != "Project":
+        return [
+            "[INVALID_PROJECT_ROOT] "
+            f"File={project_path}"
+        ]
+
+    project_items = collect_file_items(project_root)
+    filter_items = collect_file_items(filter_root)
+
+    for key in sorted(
+        project_items.keys() - filter_items.keys(),
+    ):
+        element = project_items[key][0]
+        item_type = local_name(element.tag)
+        include = element.get("Include") or "<empty>"
+        errors.append(
+            "[PROJECT_ONLY] "
+            f"Type={item_type} "
+            f"Include={include}"
+        )
+
+    for key in sorted(
+        filter_items.keys() - project_items.keys(),
+    ):
+        element = filter_items[key][0]
+        item_type = local_name(element.tag)
+        include = element.get("Include") or "<empty>"
+        errors.append(
+            "[FILTERS_ONLY] "
+            f"Type={item_type} "
+            f"Include={include}"
+        )
+
+    return errors
+
+
 def serialize_xml(
     root: ET.Element,
     newline: str,
@@ -242,7 +514,7 @@ def serialize_xml(
 
 def normalize_file(path: Path) -> tuple[bool, bytes]:
     """
-    파일 하나를 읽어 정렬한 결과를 반환합니다.
+    파일 하나를 검증하고 정렬한 결과를 반환합니다.
 
     반환값:
         (변경 필요 여부, 정렬된 데이터)
@@ -257,6 +529,16 @@ def normalize_file(path: Path) -> tuple[bool, bytes]:
     if local_name(root.tag) != "Project":
         raise ValueError("root element is not <Project>")
 
+    validation_errors = validate_filter_tree(root)
+    validation_errors.extend(
+        compare_with_project(path, root)
+    )
+
+    if validation_errors:
+        raise FilterValidationError(
+            validation_errors
+        )
+
     for element in root.iter():
         if local_name(element.tag) == "ItemGroup":
             sort_item_group(element)
@@ -266,6 +548,16 @@ def normalize_file(path: Path) -> tuple[bool, bytes]:
         newline,
         has_bom,
     )
+
+    normalized_root = parse_xml(normalized)
+    post_validation_errors = validate_filter_tree(
+        normalized_root
+    )
+
+    if post_validation_errors:
+        raise FilterValidationError(
+            post_validation_errors
+        )
 
     return normalized != raw, normalized
 
@@ -363,8 +655,8 @@ def discover_files(
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Deterministically sort Visual Studio "
-            ".vcxproj.filters XML files."
+            "Validate and deterministically sort "
+            "Visual Studio .vcxproj.filters XML files."
         )
     )
 
@@ -382,8 +674,8 @@ def parse_args() -> argparse.Namespace:
         "--check",
         action="store_true",
         help=(
-            "Do not modify files; exit 1 if normalization "
-            "is needed."
+            "Validate without modifying files; exit 1 "
+            "if normalization is needed."
         ),
     )
 
@@ -443,11 +735,18 @@ def main() -> int:
                 )
                 print(f"[SORTED] {path}")
 
-        except (
-            ET.ParseError,
-            OSError,
-            ValueError,
-        ) as error:
+        except FilterValidationError as error:
+            error_count += 1
+            print(f"[INVALID] {path}")
+
+            for message in error.messages:
+                print(f"  {message}")
+
+        except ET.ParseError as error:
+            error_count += 1
+            print(f"[INVALID_XML] {path}: {error}")
+
+        except (OSError, ValueError) as error:
             error_count += 1
             print(f"[ERROR] {path}: {error}")
 

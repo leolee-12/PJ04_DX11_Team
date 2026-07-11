@@ -107,12 +107,7 @@
       <UniqueIdentifier>{a77db0a5-c085-47bb-ae9c-91fba3cf6b27}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect">
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect">
       <UniqueIdentifier>{9a60cf97-d070-41ab-b46a-36ea78ff4834}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\BubbleAura">
-      <UniqueIdentifier>{34e8c8a7-dd40-4972-a48a-81234410bfab}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\BubbleAura">
       <UniqueIdentifier>{34e8c8a7-dd40-4972-a48a-81234410bfab}</UniqueIdentifier>
@@ -149,9 +144,6 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\04. RectEmitterCommon">
       <UniqueIdentifier>{a7f6f60d-9a51-4ddb-a762-19f74dde4a04}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\05. MeshEmitterCommon">
-      <UniqueIdentifier>{931f0406-5701-4929-b20c-638a4c7b719e}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\05. MeshEmitterCommon">
       <UniqueIdentifier>{931f0406-5701-4929-b20c-638a4c7b719e}</UniqueIdentifier>
@@ -1496,6 +1488,9 @@
     <ClInclude Include="..\Public\Kirby_DeformDump.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\DeformDump</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Dialogue.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Dialogue</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Kirby_Dodge.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Dodge</Filter>
     </ClInclude>
@@ -1534,6 +1529,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Run.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Run</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_SequenceLock.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\SequenceLock</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Slide.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Slide</Filter>
@@ -2051,6 +2049,9 @@
     <ClInclude Include="..\public\UI_CutFade.h">
       <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\CutFade</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\UI_Dialogue.h">
+      <Filter>00. GameObject\97. UI\UIContainer\Dialogue</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\UI_Effect.h">
       <Filter>00. GameObject\97. UI\UIPart\Effect</Filter>
     </ClInclude>
@@ -2105,6 +2106,9 @@
     <ClInclude Include="..\Public\UI_PointStar.h">
       <Filter>00. GameObject\97. UI\UIContainer\UI_PointStar</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\UI_QTE.h">
+      <Filter>00. GameObject\97. UI\UIContainer\HelpUI\QTE</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\UI_SpriteAnim.h">
       <Filter>00. GameObject\97. UI\UIPart\SpriteAnim</Filter>
     </ClInclude>
@@ -2129,7 +2133,6 @@
     <ClInclude Include="..\public\UI_TitleLogo.h">
       <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\TitleLogo</Filter>
     </ClInclude>
-    <Filter>00. GameObject\03. Effect\01. Effect_Part\05. MeshEmitterCommon</Filter>
     <ClInclude Include="..\Public\UIAnimatorCom.h">
       <Filter>00. GameObject\97. UI\Component\Animator</Filter>
     </ClInclude>
@@ -2227,8 +2230,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Bubble_Manager.cpp">
       <Filter>00. GameObject\09. AbilityBubble\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\BubbleAura.cpp">
     </ClCompile>
     <ClCompile Include="..\Private\BubbleAura.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\BubbleAura</Filter>
@@ -2503,6 +2504,9 @@
     <ClCompile Include="..\Private\Kirby_DeformDump.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\DeformDump</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Dialogue.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Dialogue</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Kirby_Dodge.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Dodge</Filter>
     </ClCompile>
@@ -2541,6 +2545,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Run.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Run</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_SequenceLock.cpp">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\SequenceLock</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Slide.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\Slide</Filter>
@@ -3028,6 +3035,9 @@
     <ClCompile Include="..\private\UI_CutFade.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\CutFade</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\UI_Dialogue.cpp">
+      <Filter>00. GameObject\97. UI\UIContainer\Dialogue</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\UI_Effect.cpp">
       <Filter>00. GameObject\97. UI\UIPart\Effect</Filter>
     </ClCompile>
@@ -3076,6 +3086,9 @@
     <ClCompile Include="..\Private\UI_PointStar.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\UI_PointStar</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\UI_QTE.cpp">
+      <Filter>00. GameObject\97. UI\UIContainer\HelpUI\QTE</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\UI_SpriteAnim.cpp">
       <Filter>00. GameObject\97. UI\UIPart\SpriteAnim</Filter>
     </ClCompile>
@@ -3093,25 +3106,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\UI_Title.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\Title</Filter>
-    </ClCompile>
-    <Filter>03. SystemObject\Kirby SpawnPoint</Filter>
-    <ClCompile Include="..\Private\BubbleAura.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\BubbleAura</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Kirby_Dialogue.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Dialogue</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Kirby_SequenceLock.cpp">
-      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\SequenceLock</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\StarMesh.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\UI_Dialogue.cpp">
-      <Filter>00. GameObject\97. UI\UIContainer\Dialogue</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\UI_QTE.cpp">
-      <Filter>00. GameObject\97. UI\UIContainer\HelpUI\QTE</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI_TitleLogo.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\TitleLogo</Filter>
