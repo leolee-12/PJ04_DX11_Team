@@ -2053,7 +2053,6 @@
     <ClInclude Include="..\Public\Bubble_Manager.h">
       <Filter>00. GameObject\09. AbilityBubble\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BubbleAura.h" />
     <ClInclude Include="..\Public\MeshEmitterCommon.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\18. MeshEmitterCommon</Filter>
     </ClInclude>
@@ -3003,7 +3002,6 @@
     <ClCompile Include="..\Private\Bubble_Manager.cpp">
       <Filter>00. GameObject\09. AbilityBubble\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\BubbleAura.cpp" />
     <ClCompile Include="..\Private\MeshEmitterCommon.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\18. MeshEmitterCommon</Filter>
     </ClCompile>
