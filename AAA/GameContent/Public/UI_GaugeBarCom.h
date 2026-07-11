@@ -38,6 +38,7 @@ public:
 
     void Appear(_float fCurrent, _float fMax);
     void Reset_Empty();
+    void Snap_Value(_float fCurrent, _float fMax);
 
 private:
     void   Push();

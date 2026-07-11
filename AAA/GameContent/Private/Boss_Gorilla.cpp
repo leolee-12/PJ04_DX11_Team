@@ -320,7 +320,7 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
                     CProjectile* p = nullptr;
                     const _wstring strKey = e.strParam.empty()
                         ? L"Boulder" : _wstring(e.strParam.begin(), e.strParam.end());
-                    CProjectile_Manager::GetInstance()->Spawn(Get_LevelIndex(), strKey,
+                    CProjectile_Manager::GetInstance()->Spawn(Get_PrototypeLevelIndex() , Get_LevelIndex(), strKey,
                         CProjectile_Boulder::PROTOTYPE_TAG, &p);
 
                     if (p)

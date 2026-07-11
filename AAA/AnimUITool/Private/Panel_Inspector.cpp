@@ -6,6 +6,7 @@
 #include "Panel_Manager.h"
 #include "Transform.h"
 #include "Property.h"
+#include "EffectPart_Enum.h"
 #include "Preview_Kirby.h"
 #include "Preview_DeformCar_Main.h"
 #include "Preview_DeformCar_Demo.h"
@@ -262,11 +263,36 @@ void CPanel_Inspector::Render_Properties(IReflectable* pHolder)
 
         void* pData = pHolder->Get_PropertyPtr(prop.uOffset);
         if (!pData) continue;
-        std::string name(prop.strName.begin(), prop.strName.end());
+        std::string name = ToUtf8(prop.strName);
 
         switch (prop.eType)
         {
-        case PROP_TYPE::INT:    ImGui::InputInt(name.c_str(), (int*)pData); break;
+        case PROP_TYPE::INT:
+        {
+            int* pValue = (int*)pData;
+            if (const Engine::EFFECTPART_ENUM_ITEMS* pEnumItems = Engine::Find_EffectPartPropertyEnum(prop))
+            {
+                const wstring* pEnumName = Engine::Find_EffectPartEnumName(*pEnumItems, *pValue);
+                string strPreview = pEnumName ? ToUtf8(*pEnumName) : to_string(*pValue);
+
+                if (ImGui::BeginCombo(name.c_str(), strPreview.c_str()))
+                {
+                    for (const auto& Item : *pEnumItems)
+                    {
+                        const bool bSelected = Item.first == *pValue;
+                        string strItemLabel = ToUtf8(Item.second) + "##" + to_string(Item.first);
+                        if (ImGui::Selectable(strItemLabel.c_str(), bSelected))
+                            *pValue = Item.first;
+                        if (bSelected)
+                            ImGui::SetItemDefaultFocus();
+                    }
+                    ImGui::EndCombo();
+                }
+            }
+            else
+                ImGui::InputInt(name.c_str(), pValue);
+            break;
+        }
         case PROP_TYPE::UINT: { int v = (int)*(_uint*)pData; if (ImGui::InputInt(name.c_str(), &v)) *(_uint*)pData = (_uint)(v < 0 ? 0 : v); } break;
         case PROP_TYPE::FLOAT:  ImGui::DragFloat(name.c_str(), (float*)pData, 0.1f); break;
         case PROP_TYPE::BOOL:   ImGui::Checkbox(name.c_str(), (bool*)pData); break;

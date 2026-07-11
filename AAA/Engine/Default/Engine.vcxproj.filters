@@ -414,6 +414,9 @@
     <ClInclude Include="..\Public\Property.h">
       <Filter>05. GameObject\01. Property</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\EffectPart_Enum.h">
+      <Filter>05. GameObject\01. Property</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Input_Device.h">
       <Filter>01. Device\Input</Filter>
     </ClInclude>

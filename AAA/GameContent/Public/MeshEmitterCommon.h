@@ -8,6 +8,8 @@ class CMeshEmitterCommon final : public CEffect_MeshEmitter
 {
 	GENERATED_BODY(CMeshEmitterCommon)
 
+	PROPERTY(_int, m_iRenderGroup, L"Render Group", L"Rendering");
+
 public:
 	struct MESH_EMITTER_COMMON_DESC : public CEffect_MeshEmitter::EFFECT_MESHEMITTER_DESC
 	{

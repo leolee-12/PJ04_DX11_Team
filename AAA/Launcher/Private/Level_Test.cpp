@@ -1,11 +1,9 @@
 #include "Level_Test.h"
 
 #include "GameInstance.h"
-#include "Camera_Free.h"
 #include "Loader_Prototype.h"
 #include "Map_Loader.h"
 #include "Launcher_LevelProfiles.h"
-#include "Camera_AreaCam.h"
 #include "Level_Loading.h"
 
 CLevel_Test::CLevel_Test(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -49,9 +47,6 @@ HRESULT CLevel_Test::Initialize()
             Manifest.strUIFile.c_str(), iLevel)))
             return E_FAIL;
     }
-
-    if (FAILED(Ready_Camera()))
-        return E_FAIL;
 
     if (FAILED(Ready_Lights()))
         return E_FAIL;
@@ -102,23 +97,6 @@ HRESULT CLevel_Test::Ready_Lights()
 
     if (FAILED(m_pGameInstance_Proxy->Add_Light(LightDesc)))
         return E_FAIL;
-
-    return S_OK;
-}
-
-HRESULT CLevel_Test::Ready_Camera()
-{
-    m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::TEST),
-        TEXT("Prototype_GameObject_Camera_Follow"),
-        CCamera_AreaCam::Create(m_pDevice, m_pContext));
-
-    CCamera_AreaCam::AREACAM_DESC CamDesc{};
-    CamDesc.vEye = _float3(-1.f, 1.f, -10.f);
-    CamDesc.vAt = _float3(0.f, 0.f, 0.f);
-    CamDesc.fFovy = XMConvertToRadians(50.f); CamDesc.fNear = 0.1f; CamDesc.fFar = 1000.f;
-    m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::TEST),
-        TEXT("Prototype_GameObject_Camera_Follow"),
-        ETOUI(LEVEL::TEST), TEXT("Layer_Camera"), TEXT("CameraFollow"), &CamDesc);
 
     return S_OK;
 }

@@ -44,6 +44,7 @@ protected:
 
     // ★ 분기 훅: 시체 진입 시 (미니보스=흡입화 / 보스=폭발 등)
     virtual void   On_Enter_Corpse() {}
+    virtual void   On_Corpse_End() {}
 
 
     // 피격/사망 (기존 CMiniBoss:: 구현을 그대로 이식)

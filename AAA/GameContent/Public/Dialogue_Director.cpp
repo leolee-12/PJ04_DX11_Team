@@ -38,8 +38,7 @@ HRESULT CDialogue_Director::Ready_Events()
             if (ESEQ::FADEOUT != m_eSeq)
                 return;
 
-            m_pGameInstance_Proxy->Publish(EventTag::Dialogue_Setup, nullptr);
-            m_pGameInstance_Proxy->Publish(EventTag::CutFade_In, nullptr);
+            m_pGameInstance_Proxy->Publish(EventTag::Dialogue_Arrange, nullptr);
             m_eSeq = ESEQ::FADEIN;
         });
 

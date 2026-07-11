@@ -5,6 +5,31 @@
 #include "Camera_Boss.h"
 #include "Camera_AreaCam.h"
 
+CCameraDirector* CCameraDirector::s_pActiveDirector = nullptr;
+
+namespace
+{
+    constexpr const _tchar* LAYER_CAMERA = TEXT("Layer_Camera");
+    constexpr const _tchar* TAG_AREA = TEXT("CameraFollow");
+    constexpr const _tchar* TAG_CUT = TEXT("CameraCutscene");
+    constexpr const _tchar* TAG_BOSS = TEXT("CameraBoss");
+
+    const _tchar* Resolve_AreaCamDataPath(LEVEL eLevel)
+    {
+        switch (eLevel)
+        {
+            case LEVEL::STAGE0_STEP1: return L"../../Resources/YSH/CameraData/Level0_Stage1_Step01_cam.json";
+            case LEVEL::STAGE0_STEP2: return L"../../Resources/YSH/CameraData/Level0_Stage1_Step02_cam.json";
+            case LEVEL::TOWN_STEP1:   return L"../../Resources/YSH/CameraData/Town_Step1_cam.json";
+            case LEVEL::BOSS_STAGE1:  return L"../../Resources/YSH/CameraData/Level1_Stage5_Step01_cam.json";
+            case LEVEL::TEST:         return L"../../Resources/YSH/CameraData/Level0_Stage1_Step01_cam.json";
+            default:
+                OutputDebugStringW(L"[CameraDirector] AreaCam 데이터 경로 테이블에 이 레벨이 없음\n");
+                return L"../../Resources/YSH/CameraData/Level0_Stage1_Step01_cam.json";
+        }
+    }
+}
+
 CCameraDirector::CCameraDirector(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject(pDevice, pContext) {
 }
@@ -14,7 +39,11 @@ CCameraDirector::CCameraDirector(const CCameraDirector& Prototype)
 
 HRESULT CCameraDirector::Initialize(void* pArg)
 {
-    return __super::Initialize(pArg);   // 내부에서 Ready_Events 호출
+    if (FAILED(__super::Initialize(pArg)))   
+        return E_FAIL;
+
+    m_bClone = true;    
+    return S_OK;
 }
 
 HRESULT CCameraDirector::Ready_Events()
@@ -23,72 +52,147 @@ HRESULT CCameraDirector::Ready_Events()
     return S_OK;
 }
 
+void CCameraDirector::On_Deserialized()
+{
+    if (m_pGameInstance_Proxy->Is_EditMode())
+        return;
+
+    if (FAILED(Ensure_Cameras()))
+    {
+        UnSubscribe_Event(EventTag::Cutscene_CameraChange);
+        return;
+    }
+
+    Arrange();
+}
+
 void CCameraDirector::On_CameraChange(void* p)
 {
     auto d = static_cast<CUTSCENE_CAMERA_DESC*>(p);
-
-    OutputDebugStringW((L"[CamDir] recv eCam=" + std::to_wstring((int)d->eCam)
-        + L" track=" + (d->szTrack ? d->szTrack : L"(null)")
-        + L" prog=" + (d->pProgress ? L"O" : L"X")
-        + L" anchor=" + (d->pAnchorWorld ? L"O" : L"X") + L"\n").c_str());
-
-    const _uint lvl = Get_LevelIndex();
-    CGameObject* pArea = m_pGameInstance_Proxy->Find_GameObject(lvl, TEXT("Layer_Camera"), TEXT("CameraFollow"));
-    auto         pCut = m_pGameInstance_Proxy->Find_GameObject<CCamera_Cutscene>(lvl, TEXT("Layer_Camera"),TEXT("CameraCutscene"));
-    auto         pBoss = m_pGameInstance_Proxy->Find_GameObject<CCamera_Boss>(lvl, TEXT("Layer_Camera"), TEXT("CameraBoss"));
 
     const _bool bCut = (d->eCam == ECutsceneCam::Cutscene);
     const _bool bBoss = (d->eCam == ECutsceneCam::Boss);
     const _bool bArea = (d->eCam == ECutsceneCam::Area);
 
     _bool bReady = false;
-    if (bCut && pCut)
-        bReady = pCut->Play_Track(d->szTrack, d->pProgress, d->pAnchorWorld);
-
-    OutputDebugStringW((L"[CamDir] pCut=" + std::wstring(pCut ? L"O" : L"X")
-        + L" bReady=" + std::wstring(bReady ? L"O" : L"X") + L"\n").c_str());
-
-    OutputDebugStringW((L"[CamDir] pArea=" + std::wstring(pArea ? L"O" : L"X")
-        + L" pCut=" + std::wstring(pCut ? L"O" : L"X")
-        + L" bReady=" + std::wstring(bReady ? L"O" : L"X") + L"\n").c_str());
+    if (bCut)
+        bReady = m_pCutCam->Play_Track(d->szTrack, d->pProgress, d->pAnchorWorld);
 
     if (bArea)
     {
         CCamera* pFromCam = nullptr;
-        if (pCut && pCut->Is_Active())       pFromCam = pCut;
-        else if (pBoss && pBoss->Is_Active()) pFromCam = pBoss;
+        if (m_pCutCam->Is_Active())       pFromCam = m_pCutCam;
+        else if (m_pBossCam->Is_Active()) pFromCam = m_pBossCam;
 
-        auto pAreaCam = m_pGameInstance_Proxy->Find_GameObject<CCamera_AreaCam>(
-            lvl, TEXT("Layer_Camera"), TEXT("CameraFollow"));
-
-        if (pAreaCam)
+        if (pFromCam)
         {
-            if (pFromCam)
-            {
-                CTransform* pTf = pFromCam->Get_Transform();
-                _vector vEye = pTf->Get_State(STATE::POSITION);
-                _vector vAt = vEye + pTf->Get_State(STATE::LOOK);
-                pAreaCam->Begin_Handoff(vEye, vAt, pFromCam->Get_Fovy());
-            }
-            pAreaCam->Set_Active(true);
+            CTransform* pTf = pFromCam->Get_Transform();
+            _vector vEye = pTf->Get_State(STATE::POSITION);
+            _vector vAt = vEye + pTf->Get_State(STATE::LOOK);
+            m_pAreaCam->Begin_Handoff(vEye, vAt, pFromCam->Get_Fovy());
         }
-        if (pCut)  pCut->Set_Active(false);
-        if (pBoss) pBoss->Set_Active(false);
+        m_pAreaCam->Set_Active(true);
+        m_pCutCam->Set_Active(false);
+        m_pBossCam->Set_Active(false);
         return;
     }
-    if (pCut)  pCut->Set_Active(bCut && bReady);
-    if (pBoss && bCut && bReady) pBoss->Set_Active(false);
+
+    m_pCutCam->Set_Active(bCut && bReady);
+    if (bCut && bReady)
+        m_pBossCam->Set_Active(false);
+
     if (bBoss)
     {
-        if (pCut)  pCut->Set_Active(false);
-        if (pArea) pArea->Set_Active(false);
-        if (pBoss) { pBoss->Snap(); pBoss->Set_Active(true); } 
+        m_pCutCam->Set_Active(false);
+        m_pAreaCam->Set_Active(false);
+        m_pBossCam->Snap();
+        m_pBossCam->Set_Active(true);
         return;
     }
+}
 
-    OutputDebugStringW((L"[CamDir] AFTER area=" + std::to_wstring(pArea ? (int)pArea->Is_Active() : -1)
-        + L" cut=" + std::to_wstring(pCut ? (int)pCut->Is_Active() : -1)
-        + L" boss=" + std::to_wstring(pBoss ? (int)pBoss->Is_Active() : -1) + L"\n").c_str());
+HRESULT CCameraDirector::Ensure_Cameras()
+{
+    const _uint iStatic = ETOUI(LEVEL::STATIC);
+
+    // AreaCam
+    if (!m_pGameInstance_Proxy->Has_Prototype(iStatic, CCamera_AreaCam::PROTOTYPE_TAG))
+    {
+        m_pGameInstance_Proxy->Add_Prototype(iStatic, CCamera_AreaCam::PROTOTYPE_TAG,
+            CCamera_AreaCam::Create(m_pDevice, m_pContext));
+
+        CCamera_AreaCam::AREACAM_DESC CamDesc{};
+        CamDesc.vEye = _float3(-1.f, 1.f, -10.f);
+        CamDesc.vAt = _float3(0.f, 0.f, 0.f);
+        CamDesc.fFovy = XMConvertToRadians(50.f); CamDesc.fNear = 0.1f; CamDesc.fFar = 1000.f;
+        CamDesc.strDataPath = Resolve_AreaCamDataPath(static_cast<LEVEL>(Get_LevelIndex()));
+        if (FAILED(m_pGameInstance_Proxy->Add_GameObject(iStatic, CCamera_AreaCam::PROTOTYPE_TAG,
+            iStatic, LAYER_CAMERA, TAG_AREA, &CamDesc)))
+            return E_FAIL;
+    }
+
+    // Cutscene
+    if (!m_pGameInstance_Proxy->Has_Prototype(iStatic, CCamera_Cutscene::PROTOTYPE_TAG))
+    {
+        m_pGameInstance_Proxy->Add_Prototype(iStatic, CCamera_Cutscene::PROTOTYPE_TAG,
+            CCamera_Cutscene::Create(m_pDevice, m_pContext));
+
+        CCamera_Cutscene::CUTSCENECAM_DESC CutDesc{};
+        CutDesc.fFovy = XMConvertToRadians(50.f); CutDesc.fNear = 0.1f; CutDesc.fFar = 1000.f;
+        if (FAILED(m_pGameInstance_Proxy->Add_GameObject(iStatic, CCamera_Cutscene::PROTOTYPE_TAG,
+            iStatic, LAYER_CAMERA, TAG_CUT, &CutDesc)))
+            return E_FAIL;
+    }
+
+    // Boss
+    if (!m_pGameInstance_Proxy->Has_Prototype(iStatic, CCamera_Boss::PROTOTYPE_TAG))
+    {
+        m_pGameInstance_Proxy->Add_Prototype(iStatic, CCamera_Boss::PROTOTYPE_TAG,
+            CCamera_Boss::Create(m_pDevice, m_pContext));
+
+        CCamera_Boss::BOSSCAM_DESC BossDesc{};
+        BossDesc.fFovy = XMConvertToRadians(50.f); BossDesc.fNear = 0.1f; BossDesc.fFar = 1000.f;
+        if (FAILED(m_pGameInstance_Proxy->Add_GameObject(iStatic, CCamera_Boss::PROTOTYPE_TAG,
+            iStatic, LAYER_CAMERA, TAG_BOSS, &BossDesc)))
+            return E_FAIL;
+    }
+
+    m_pAreaCam = m_pGameInstance_Proxy->Find_GameObject<CCamera_AreaCam>(iStatic, LAYER_CAMERA, TAG_AREA);
+    m_pCutCam = m_pGameInstance_Proxy->Find_GameObject<CCamera_Cutscene>(iStatic, LAYER_CAMERA, TAG_CUT);
+    m_pBossCam = m_pGameInstance_Proxy->Find_GameObject<CCamera_Boss>(iStatic, LAYER_CAMERA, TAG_BOSS);
+
+    if (nullptr == m_pAreaCam || nullptr == m_pCutCam || nullptr == m_pBossCam)
+    {
+        MSG_BOX("CameraDirector: STATIC camera cache failed - creation path broken");
+        return E_FAIL;
+    }
+
+    Safe_AddRef(m_pAreaCam);
+    Safe_AddRef(m_pCutCam);
+    Safe_AddRef(m_pBossCam);
+
+    return S_OK;
+}
+
+void CCameraDirector::Arrange()
+{
+    m_pAreaCam->Rearrange(Resolve_AreaCamDataPath(static_cast<LEVEL>(Get_LevelIndex())));
+    m_pAreaCam->Set_Active(true);
+
+    m_pCutCam->Set_Active(false);
+
+    m_pBossCam->Clear_LevelRefs();
+    m_pBossCam->Set_Active(false);
+
+    s_pActiveDirector = this;
+}
+
+void CCameraDirector::Sleep_Cameras()
+{
+    m_pAreaCam->Set_Active(false);
+    m_pCutCam->Set_Active(false);
+    m_pBossCam->Clear_LevelRefs();
+    m_pBossCam->Set_Active(false);
 }
 
 CCameraDirector* CCameraDirector::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -103,4 +207,20 @@ CGameObject* CCameraDirector::Clone(void* pArg)
     if (FAILED(p->Initialize(pArg))) { MSG_BOX("Failed to Cloned : CCameraDirector"); Safe_Release(p); }
     return p;
 }
-void CCameraDirector::Free() { __super::Free(); }
+void CCameraDirector::Free() 
+{ 
+    if (m_bClone)
+    {
+        if (s_pActiveDirector == this)
+        {
+            Sleep_Cameras();
+            s_pActiveDirector = nullptr;
+        }
+
+        Safe_Release(m_pAreaCam);
+        Safe_Release(m_pCutCam);
+        Safe_Release(m_pBossCam);
+    }
+
+    __super::Free();
+}
