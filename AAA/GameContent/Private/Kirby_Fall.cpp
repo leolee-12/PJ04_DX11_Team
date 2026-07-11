@@ -33,9 +33,10 @@ void CKirby_Fall::Enter(CKirby* pKirby, _int iFlag)
 
     m_eFallState = FALL_STATE::FALL_STATE_END;
 
-    switch (static_cast<FALL_STATE_FLAG>(iFlag))
+    switch (iFlag)
     {
         case FALL_STATE_FLAG::FALL_DIRECT:
+        default:
         {
             Change_FallState(pKirby, FALL_STATE::FALLING);
             break;

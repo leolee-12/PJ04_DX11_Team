@@ -214,7 +214,7 @@ _bool CKirby_Hovering::Update_HoveringStateMachine(CKirby* pKirby, _float fTimeD
             {
                 _bool bIsGround = pMovement->Is_Grounded();
                 if (bIsGround == false)
-                    pKirby->Change_State(KIRBY_STATE_TYPE::FALL, FALL_STATE_FLAG::FALL_DIRECT);
+                    pKirby->Change_State(KIRBY_STATE_TYPE::FALL);
                 else
                     Transition_Wait_OR_Run(pKirby);
                 
