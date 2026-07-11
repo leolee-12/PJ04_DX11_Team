@@ -1,6 +1,7 @@
 #include "EnvObject_Trigger.h"
 
 #include "GameInstance.h"
+#include "Geometry_Utils.h"
 
 NS_BEGIN(Client)
 
@@ -48,6 +49,11 @@ HRESULT CEnvObject_Trigger::Initialize(void* pArg)
 	m_vAreaSize = m_tDesc.tEffect.vAreaSize;
 	m_vAreaRot = m_tDesc.tEffect.vAreaRot;
 
+	m_bTriggerShapeDirty = true;
+	m_bTriggerTransformDirty = true;
+	m_bTriggerDebugStyleDirty = true;
+	m_bTriggerAreaValid = false;
+
 	m_bRenderable = false;
 	m_bCastShadow = false;
 	m_bUseCullDistance = false;
@@ -71,52 +77,38 @@ void CEnvObject_Trigger::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
-	const auto AbsAxis = [](_float fValue) -> _float
-		{
-			return fValue < 0.f ? -fValue : fValue;
-		};
-
-	const _float3 vAreaSize =
-	{
-			AbsAxis(m_vAreaSize.x),
-			AbsAxis(m_vAreaSize.y),
-			AbsAxis(m_vAreaSize.z)
-	};
-
-	constexpr _float kMinTriggerAxis = 0.001f;
-	const _bool bValidArea =
-		vAreaSize.x > kMinTriggerAxis &&
-		vAreaSize.y > kMinTriggerAxis &&
-		vAreaSize.z > kMinTriggerAxis;
-
-	m_pCollider->Set_Enabled(bValidArea);
-
-	if (bValidArea)
-	{
-		// 트리거는 현재 AABB만 지원 : AreaRot 무시(추후 OBB 지원할 때 받기)
-		const _matrix TriggerLocalMatrix =
-			XMMatrixScaling(vAreaSize.x, vAreaSize.y, vAreaSize.z) *
-			XMMatrixTranslation(m_vAreaCenter.x, m_vAreaCenter.y, m_vAreaCenter.z);
-
-		m_pCollider->Update(TriggerLocalMatrix * XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+	if (m_bTriggerShapeDirty || m_bTriggerTransformDirty)
+		Refresh_TriggerCollider();
 
 #ifdef _DEBUG
-		if (m_bDebugDrawTrigger)
-		{
-			const _float fDebugTextScale = max(0.1f, m_fDebugTextScale);
-			m_pCollider->Set_DebugText(m_strDebugTextFontTag, Get_DebugLabel(), m_vDebugTextColor, _float2(fDebugTextScale, fDebugTextScale));
-			m_pCollider->Set_DebugRenderColor(m_vDebugBoxColor);
-			m_pGameInstance_Proxy->Add_DebugComponent(m_pCollider);
-			m_pGameInstance_Proxy->Add_DebugTextComponent(m_pCollider);
-		}
-#endif
-	}
-}
+	if (m_bTriggerAreaValid && m_bDebugDrawTrigger)
+	{
+		if (m_bTriggerDebugStyleDirty)
+			Refresh_TriggerDebugStyle();
 
+		m_pGameInstance_Proxy->Add_DebugComponent(m_pCollider);
+		m_pGameInstance_Proxy->Add_DebugTextComponent(m_pCollider);
+	}
+#endif
+}
 
 void CEnvObject_Trigger::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 {
 	__super::Copy_PrototypeName(pOutData);
+}
+
+#pragma region Editable
+HRESULT CEnvObject_Trigger::On_EditTransformChanged()
+{
+	m_bTriggerTransformDirty = true;
+	return __super::On_EditTransformChanged();
+}
+#pragma endregion
+
+void CEnvObject_Trigger::Mark_TriggerDirty()
+{
+	m_bTriggerShapeDirty = true;
+	m_bTriggerDebugStyleDirty = true;
 }
 
 void CEnvObject_Trigger::OnTriggerEnter(CCollider* pOther)
@@ -165,7 +157,35 @@ void CEnvObject_Trigger::SetUp_Collider_Callback()
 	m_pCollider->Set_OnExit([this](CCollider* pOther) { OnTriggerExit(pOther); });
 }
 
+void CEnvObject_Trigger::Refresh_TriggerCollider()
+{
+	m_bTriggerAreaValid = GeometryUtils::Has_UsableSize(m_vAreaSize);
+	m_pCollider->Set_Enabled(m_bTriggerAreaValid);
+
+	if (m_bTriggerAreaValid)
+	{
+		const _float3 vAreaSize = GeometryUtils::Make_AbsSize(m_vAreaSize);
+		const _matrix TriggerLocalMatrix =
+			XMMatrixScaling(vAreaSize.x, vAreaSize.y, vAreaSize.z) *
+			XMMatrixTranslation(m_vAreaCenter.x, m_vAreaCenter.y, m_vAreaCenter.z);
+
+		m_pCollider->Update(TriggerLocalMatrix * XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+	}
+
+	m_bTriggerShapeDirty = false;
+	m_bTriggerTransformDirty = false;
+}
+
 #ifdef _DEBUG
+void CEnvObject_Trigger::Refresh_TriggerDebugStyle()
+{
+	const _float fDebugTextScale = max(0.1f, m_fDebugTextScale);
+	m_pCollider->Set_DebugText(m_strDebugTextFontTag, Get_DebugLabel(), m_vDebugTextColor, _float2(fDebugTextScale,
+		fDebugTextScale));
+	m_pCollider->Set_DebugRenderColor(m_vDebugBoxColor);
+	m_bTriggerDebugStyleDirty = false;
+}
+
 _wstring CEnvObject_Trigger::Get_DebugLabel() const
 {
 	if (m_strTriggerId.empty())

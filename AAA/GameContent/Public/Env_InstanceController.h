@@ -20,16 +20,22 @@ private:
 public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 	ENV_INSTANCE_BATCH_HANDLE Register_BatchesForDesc(const ENV_OBJECT_DESC& tDesc);
+	_uint Register_ShadowBatch(const ENV_OBJECT_DESC& tDesc);
 	_bool Submit_Main(_uint iBatchIndex, CEnvObject_Static* pObj);
 	_bool Submit_Shadow(_uint iBatchIndex, CEnvObject_Static* pObj);
 	_bool Submit_Decal(_uint iBatchIndex, CEnvObject_Static* pObj);
+	HRESULT Apply_ModelMeshLayer(_uint iModelProtoLevel, const _wstring& wstrModelProtoTag, _uint iMesh, const MESH_LAYER_IDX& Layer);
 
 private:
 	vector<CEnv_InstanceBatch*> m_Batches;
 	unordered_map<ENV_INSTANCE_KEY, _uint, ENV_INSTANCE_KEY_HASH> m_BatchIndexByKey;
+	unordered_map<ENV_INSTANCE_KEY, unordered_map<_uint, MESH_LAYER_IDX>, ENV_INSTANCE_KEY_HASH> m_MeshLayerOverridesByModel;
 
 private:
+	CEnv_InstanceBatch* Find_Batch(const ENV_INSTANCE_KEY& tKey);
 	_uint FindOrCreate_BatchIndex(const ENV_INSTANCE_KEY& tKey);
+	HRESULT Apply_CachedMeshLayers(const ENV_INSTANCE_KEY& tBatchKey, CEnv_InstanceBatch* pBatch);
+	static ENV_INSTANCE_KEY Make_ModelMeshLayerKey(_uint iModelProtoLevel, const _wstring& wstrModelProtoTag);
 
 public:
 	static CEnv_InstanceController* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

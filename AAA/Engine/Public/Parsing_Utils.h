@@ -1,31 +1,43 @@
 #pragma once
 #include "Engine_Defines.h"
 
-#include <functional>
+#include <string_view>
 
 NS_BEGIN(Engine)
 
 namespace JsonUtils
 {
-	inline vector<_string> Split_DottedPath(const _string& strPath)
+	inline const json* Find_JsonValueByPath(const json& jSource, std::string_view strPath)
 	{
-		vector<_string> Parts;
+		if (strPath.empty())
+			return &jSource;
 
-		size_t iStart = 0;
-		while (iStart < strPath.size())
+		if (!jSource.is_object())
+			return nullptr;
+
+		for (size_t iKeyLength = strPath.size(); ; )
 		{
-			const size_t iDot = strPath.find('.', iStart);
-			if (_string::npos == iDot)
+			auto Iter = jSource.find(strPath.substr(0, iKeyLength));
+			if (Iter != jSource.end())
 			{
-				Parts.push_back(strPath.substr(iStart));
-				break;
+				if (iKeyLength == strPath.size())
+					return &(*Iter);
+
+				if (const json* pFound = Find_JsonValueByPath(*Iter, strPath.substr(iKeyLength + 1)))
+					return pFound;
 			}
 
-			Parts.push_back(strPath.substr(iStart, iDot - iStart));
-			iStart = iDot + 1;
+			if (0 == iKeyLength)
+				break;
+
+			const size_t iDot = strPath.rfind('.', iKeyLength - 1);
+			if (std::string_view::npos == iDot)
+				break;
+
+			iKeyLength = iDot;
 		}
 
-		return Parts;
+		return nullptr;
 	}
 
 	inline const json* Find_JsonValue(const json& jSource, const _string& strPath)
@@ -34,41 +46,21 @@ namespace JsonUtils
 		if (ExactIter != jSource.end())
 			return &(*ExactIter);
 
-		const vector<_string> Parts = Split_DottedPath(strPath);
+		return Find_JsonValueByPath(jSource, std::string_view(strPath));
+	}
 
-		function<const json* (const json&, size_t)> FindRecursive;
-		FindRecursive = [&](const json& Current, size_t iStart) -> const json*
-			{
-				if (iStart >= Parts.size())
-					return &Current;
+	inline _bool Has_NumberArrayElements(const json& jValue, size_t iRequiredCount)
+	{
+		if (!jValue.is_array() || jValue.size() < iRequiredCount)
+			return false;
 
-				if (!Current.is_object())
-					return nullptr;
+		for (size_t i = 0; i < iRequiredCount; ++i)
+		{
+			if (!jValue[i].is_number())
+				return false;
+		}
 
-				for (size_t iEnd = Parts.size(); iEnd > iStart; --iEnd)
-				{
-					_string strKey;
-
-					for (size_t i = iStart; i < iEnd; ++i)
-					{
-						if (i > iStart)
-							strKey += ".";
-
-						strKey += Parts[i];
-					}
-
-					auto Iter = Current.find(strKey);
-					if (Iter == Current.end())
-						continue;
-
-					if (const json* pFound = FindRecursive(*Iter, iEnd))
-						return pFound;
-				}
-
-				return nullptr;
-			};
-
-		return FindRecursive(jSource, 0);
+		return true;
 	}
 
 	inline _bool Try_ReadString(const json& jSource, const _string& strPath, _wstring* pOut)
@@ -174,7 +166,7 @@ namespace JsonUtils
 			return false;
 
 		const json* pValue = Find_JsonValue(jSource, strPath);
-		if (nullptr == pValue || !pValue->is_array() || pValue->size() < 3)
+		if (nullptr == pValue || !Has_NumberArrayElements(*pValue, 3))
 			return false;
 
 		pOut->x = (*pValue)[0].get<_float>();
@@ -189,7 +181,7 @@ namespace JsonUtils
 			return false;
 
 		const json* pValue = Find_JsonValue(jSource, strPath);
-		if (nullptr == pValue || !pValue->is_array() || pValue->size() < 4)
+		if (nullptr == pValue || !Has_NumberArrayElements(*pValue, 4))
 			return false;
 
 		pOut->x = (*pValue)[0].get<_float>();

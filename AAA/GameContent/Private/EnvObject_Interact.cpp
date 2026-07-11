@@ -29,7 +29,7 @@ HRESULT CEnvObject_Interact::Initialize(void* pArg)
 	if (FAILED(Ready_RenderComponents(m_tDesc.iModelProtoLevel, m_tDesc.wstrModelProtoTag)))
 		return E_FAIL;
 
-	if (FAILED(Ready_PhysicsActor()))
+	if (FAILED(Rebuild_PhysicsActor()))
 		return E_FAIL;
 
 	return S_OK;

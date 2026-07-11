@@ -116,7 +116,9 @@ void CEnvTrigger_RenderGlobals::OnTriggerEnter(CCollider* pOther)
 
 	Apply_RenderGlobals();
 
+#ifdef _DEBUG
 	OutputDebugStringA("[EnvTrigger_RenderGlobals] Apply RenderGlobals\n");
+#endif
 }
 
 void CEnvTrigger_RenderGlobals::OnTriggerStay(CCollider* pOther)

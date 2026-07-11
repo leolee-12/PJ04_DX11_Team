@@ -36,9 +36,20 @@ public:
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
+	
+#pragma region Editable
+	virtual HRESULT On_EditTransformChanged() override;
+#pragma endregion
+
+	void Mark_TriggerDirty();
 
 protected:
 	CCollider* m_pCollider = { nullptr };
+
+	_bool m_bTriggerShapeDirty = { true };
+	_bool m_bTriggerTransformDirty = { true };
+	_bool m_bTriggerDebugStyleDirty = { true };
+	_bool m_bTriggerAreaValid = { false };
 
 protected:
 	virtual void OnTriggerEnter(CCollider* pOther);
@@ -47,10 +58,12 @@ protected:
 
 	HRESULT Ready_TriggerCollider();
 	void	SetUp_Collider_Callback();
+	void    Refresh_TriggerCollider();
 
 #ifdef _DEBUG
 protected:
-	virtual _wstring Get_DebugLabel() const;
+	void	Refresh_TriggerDebugStyle();
+	virtual _wstring	Get_DebugLabel() const;
 #endif
 
 protected:
