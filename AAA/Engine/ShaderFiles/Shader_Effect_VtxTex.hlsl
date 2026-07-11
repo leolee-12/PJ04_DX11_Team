@@ -194,6 +194,7 @@ PS_OUT PS_MAIN(PS_IN In)
     
     Out.vColor.xyz *= g_vColor * g_fEffectIntensity;
     Out.vColor.a *= g_fAlpha;
+    Out.vColor.rgb += g_vEmissiveColor.rgb * Out.vColor.a;
     
     if (g_bAlphaTest == true && Out.vColor.a <= g_fTestAlpha)
         discard;
@@ -258,6 +259,7 @@ PS_OUT PS_MAIN_MIRROR(PS_IN In)
     
     Out.vColor.xyz *= g_vColor * g_fEffectIntensity;
     Out.vColor.a *= g_fAlpha;
+    Out.vColor.rgb += g_vEmissiveColor.rgb * Out.vColor.a;
     
     if (g_bAlphaTest == true && Out.vColor.a <= g_fTestAlpha)
         discard;
