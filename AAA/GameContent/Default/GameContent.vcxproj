@@ -101,6 +101,11 @@
     <ClInclude Include="..\Public\LD_Stage1BossDemo.h" />
     <ClInclude Include="..\Public\LD_CopyEssence.h" />
     <ClInclude Include="..\Public\MeshEmitterCommon.h" />
+    <ClInclude Include="..\Public\QuadCommon.h" />
+    <ClInclude Include="..\Public\MeshCommon.h" />
+    <ClInclude Include="..\Public\RectParticleCommon.h" />
+    <ClInclude Include="..\Public\MeshParticleCommon.h" />
+    <ClInclude Include="..\Public\RectEmitterCommon.h" />
     <ClInclude Include="..\public\Mission_Manager.h" />
     <ClInclude Include="..\Public\Monster_State_Flatten.h" />
     <ClInclude Include="..\Public\Monster_State_Spat.h" />
@@ -451,6 +456,11 @@
     <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp" />
     <ClCompile Include="..\Private\LD_CopyEssence.cpp" />
     <ClCompile Include="..\Private\MeshEmitterCommon.cpp" />
+    <ClCompile Include="..\Private\QuadCommon.cpp" />
+    <ClCompile Include="..\Private\MeshCommon.cpp" />
+    <ClCompile Include="..\Private\RectParticleCommon.cpp" />
+    <ClCompile Include="..\Private\MeshParticleCommon.cpp" />
+    <ClCompile Include="..\Private\RectEmitterCommon.cpp" />
     <ClCompile Include="..\private\Mission_Manager.cpp" />
     <ClCompile Include="..\Private\Monster_State_Flatten.cpp" />
     <ClCompile Include="..\Private\Monster_State_Spat.cpp" />

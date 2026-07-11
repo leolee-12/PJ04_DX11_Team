@@ -12,6 +12,7 @@
 #include "LevelDesignObject.h"
 #include "LevelDesign_Bush.h"
 #include "Editable.h"
+#include "EffectPart_Enum.h"
 
 #include "GameInstance.h"
 #include "GameObject.h"
@@ -480,10 +481,36 @@ _bool CPanel_Inspector::Draw_Properties(IReflectable* pHolder)
 		switch (prop.eType)
 		{
 		case PROP_TYPE::INT:
+		{
 			ImGui::Text(strPropName.c_str());
-			if (ImGui::InputInt(("##" + strPropName).c_str(), (int*)pData))
+			int* pValue = (int*)pData;
+			const string strID = "##" + strPropName;
+			if (const Engine::EFFECTPART_ENUM_ITEMS* pEnumItems = Engine::Find_EffectPartPropertyEnum(prop))
+			{
+				const wstring* pEnumName = Engine::Find_EffectPartEnumName(*pEnumItems, *pValue);
+				string strPreview = pEnumName ? WstrToStr(*pEnumName) : to_string(*pValue);
+
+				if (ImGui::BeginCombo(strID.c_str(), strPreview.c_str()))
+				{
+					for (const auto& Item : *pEnumItems)
+					{
+						const bool bSelected = Item.first == *pValue;
+						string strItemLabel = WstrToStr(Item.second) + "##" + to_string(Item.first);
+						if (ImGui::Selectable(strItemLabel.c_str(), bSelected))
+						{
+							*pValue = Item.first;
+							bChanged = true;
+						}
+						if (bSelected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndCombo();
+				}
+			}
+			else if (ImGui::InputInt(strID.c_str(), pValue))
 				bChanged = true;
 			break;
+		}
 		case PROP_TYPE::FLOAT:
 			ImGui::Text(strPropName.c_str());
 			if (ImGui::DragFloat(("##" + strPropName).c_str(), (float*)pData, 0.1f))

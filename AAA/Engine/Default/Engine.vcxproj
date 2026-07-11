@@ -211,6 +211,7 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClInclude Include="..\Public\DebugCapsule.h" />
     <ClInclude Include="..\Public\DebugDraw.h" />
     <ClInclude Include="..\public\Effect_Allocator.h" />
+    <ClInclude Include="..\Public\EffectPart_Enum.h" />
     <ClInclude Include="..\public\Effect_Container.h" />
     <ClInclude Include="..\Public\Effect_Emitter.h" />
     <ClInclude Include="..\Public\Effect_Mesh.h" />
