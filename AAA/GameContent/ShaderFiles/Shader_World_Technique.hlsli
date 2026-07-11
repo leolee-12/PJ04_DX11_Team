@@ -159,4 +159,14 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DMN_OPAQUE();
     }
+    pass UKWN_BLACK_OVERLAY_Pass // 15
+    {
+        SetRasterizerState(RS_Cull_None);
+        SetDepthStencilState(DSS_NoWrite, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_UKWN_BLACK_OVERLAY();
+    }
 }

@@ -424,6 +424,17 @@ PS_OUT PS_DMN_OPAQUE(PS_IN In)
                     float4(g_vEmissiveColor.rgb, 1.f));
 }
 
+float4 PS_UKWN_BLACK_OVERLAY(PS_IN In) : SV_TARGET0
+{
+    Apply_DitherIfNeeded(In.vPosition);
+
+    float3 vUnknown = g_UnknownTexture.Sample(LinearSampler, Get_UnknownUV(In)).rgb;
+    float fBrightness = saturate(max(vUnknown.r, max(vUnknown.g, vUnknown.b)));
+    float fShadeAlpha = saturate((1.f - fBrightness) * max(g_MaskStrength, 0.f));
+
+    return float4(0.f, 0.f, 0.f, fShadeAlpha);
+}
+
 
 
 struct PS_DECAL_OUT
