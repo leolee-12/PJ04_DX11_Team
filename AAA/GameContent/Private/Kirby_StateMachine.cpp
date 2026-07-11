@@ -187,7 +187,7 @@ void CKirby_StateMachine::Request_DialogueAnim_StateMachine(const SEQUENCE_KIRBY
     m_pCurState->Request_DialogueAnim(m_pKirby, pDesc);
 }
 
-void CKirby_StateMachine::Request_SequenceLock_StateMachine(const KIRBY_LEVEL_SPAWN_DESC* pDesc)
+void CKirby_StateMachine::Request_SequenceLock_StateMachine(const KIRBY_LEVEL_SLEEP_DESC* pDesc)
 {
     m_pCurState->Cleanup_ForLevelTransition(m_pKirby, pDesc);
 
@@ -197,7 +197,7 @@ void CKirby_StateMachine::Request_SequenceLock_StateMachine(const KIRBY_LEVEL_SP
     m_pCurState->Request_SequenceLock(m_pKirby, pDesc);
 }
 
-void CKirby_StateMachine::Request_SequenceLock_End_StateMachine(const KIRBY_LEVEL_SLEEP_DESC* pDesc)
+void CKirby_StateMachine::Request_SequenceLock_End_StateMachine(const KIRBY_LEVEL_SPAWN_DESC* pDesc)
 {
     m_pCurState->Request_SequenceLock_End(m_pKirby, pDesc);
 }

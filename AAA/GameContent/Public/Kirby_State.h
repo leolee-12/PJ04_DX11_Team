@@ -79,10 +79,10 @@ public:
 	virtual void Request_DialogueAnim(CKirby* pKirby, const SEQUENCE_KIRBY_ANIM_DESC* pDesc);
 
 	// SequenceLock
-	virtual void Request_SequenceLock(CKirby* pKirby, const KIRBY_LEVEL_SPAWN_DESC* pDesc);
-	virtual void Request_SequenceLock_End(CKirby* pKirby, const KIRBY_LEVEL_SLEEP_DESC* pDesc);
+	virtual void Request_SequenceLock(CKirby* pKirby, const KIRBY_LEVEL_SLEEP_DESC* pDesc);
+	virtual void Request_SequenceLock_End(CKirby* pKirby, const KIRBY_LEVEL_SPAWN_DESC* pDesc);
 
-	virtual void Cleanup_ForLevelTransition(CKirby* pKirby, const KIRBY_LEVEL_SPAWN_DESC* pDesc);
+	virtual void Cleanup_ForLevelTransition(CKirby* pKirby, const KIRBY_LEVEL_SLEEP_DESC* pDesc);
 
 protected:
 	_bool Handle_MoveCommand(CKirby* pKirby, CKirby_Command* pCommand);

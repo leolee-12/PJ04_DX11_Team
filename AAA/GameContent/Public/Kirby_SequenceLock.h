@@ -34,8 +34,8 @@ public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
 
 public:
-	virtual void Request_SequenceLock(CKirby* pKirby, const KIRBY_LEVEL_SPAWN_DESC* pDesc) override;
-	virtual void Request_SequenceLock_End(CKirby* pKirby, const KIRBY_LEVEL_SLEEP_DESC* pDesc) override;
+	virtual void Request_SequenceLock(CKirby* pKirby, const KIRBY_LEVEL_SLEEP_DESC* pDesc) override;
+	virtual void Request_SequenceLock_End(CKirby* pKirby, const KIRBY_LEVEL_SPAWN_DESC* pDesc) override;
 
 public:
 	static CKirby_SequenceLock* Create();

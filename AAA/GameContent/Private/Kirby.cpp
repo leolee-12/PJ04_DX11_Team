@@ -698,7 +698,7 @@ HRESULT CKirby::Ready_Events()
             m_pLastSpawner = pDesc->pSpawner;
 
             Set_OwnerLevelLayer(pDesc->iLevelIndex, m_strLayerTag);
-            m_pKirby_StateMachine->Request_SequenceLock_StateMachine(pDesc);
+            m_pKirby_StateMachine->Request_SequenceLock_End_StateMachine(pDesc);
             Set_Active(true);
         }
     );
@@ -711,7 +711,7 @@ HRESULT CKirby::Ready_Events()
             if (pDesc->pSpawner != m_pLastSpawner)
                 return;
 
-            m_pKirby_StateMachine->Request_SequenceLock_End_StateMachine(pDesc);
+            m_pKirby_StateMachine->Request_SequenceLock_StateMachine(pDesc);
             Set_Active(false);
 
             // 나중에 수정 차 회전이랑 한번에
@@ -918,22 +918,22 @@ void CKirby::Clear_CutsceneAttachTarget()
 
 void CKirby::Cal_RenderWorldMatrix()
 {
-   // _float3 vGroundNormal{ 0.f, 1.f, 0.f };
-   // Update_GroundNormal(vGroundNormal);
+ /*   _float3 vGroundNormal{ 0.f, 1.f, 0.f };
+    Update_GroundNormal(vGroundNormal);
 
-   // _vector vUp = XMVector3Normalize(XMLoadFloat3(&vGroundNormal));
+    _vector vUp = XMVector3Normalize(XMLoadFloat3(&vGroundNormal));
 
-   // _vector vLook = XMVector3Normalize(
-   //     XMVectorSetW(m_pTransformCom->Get_State(STATE::LOOK), 0.f));
+    _vector vLook = XMVector3Normalize(
+        XMVectorSetW(m_pTransformCom->Get_State(STATE::LOOK), 0.f));
 
-   //vLook = vLook - vUp * XMVector3Dot(vLook, vUp);
+   vLook = vLook - vUp * XMVector3Dot(vLook, vUp);
 
-   //_float3 vScale = m_pTransformCom->Get_Scaled();
+   _float3 vScale = m_pTransformCom->Get_Scaled();
 
-   //vLook = XMVector3Normalize(vLook);
+   vLook = XMVector3Normalize(vLook);
 
-   //_vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vLook));
-   //vLook = XMVector3Normalize(XMVector3Cross(vRight, vUp));
+   _vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vLook));
+   vLook = XMVector3Normalize(XMVector3Cross(vRight, vUp));*/
 
    _matrix WorldMatrix = XMMatrixIdentity();
    WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
