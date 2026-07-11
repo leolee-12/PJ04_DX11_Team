@@ -192,6 +192,10 @@ private:
 	void Set_CutsceneAttachTarget(const KIRBY_ATTACHMENT_BEGIN_DESC* pAttachDesc);
 	void Clear_CutsceneAttachTarget();
 
+	// Level SPawn
+	void Warp_To(const _float3& vPosition, const _float3& vLook);
+	void Republish_HUDState();
+
 private:
 	// Parts
 	CKirby_Body* m_pBody{};
@@ -243,6 +247,9 @@ private:
 	//Deform Object
 	IDeformable* m_pTriggerDeformObj{};
 	IDeformable* m_pHeldDeformObj{};
+
+	// Level Spawn
+	const void* m_pLastSpawner = { nullptr };
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

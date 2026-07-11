@@ -51,7 +51,6 @@ public:
 	void		 Set_Enabled(_bool b)
 	{
 		m_bEnabled = b;
-		if (!b) { m_PrevContacts.clear(); m_CurrContacts.clear(); }
 	}
 
 public:

@@ -25,6 +25,7 @@ public:
     virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* p) override { p->strPrototypeTag = PROTOTYPE_TAG; }
 
     void Snap() { m_bInit = false; m_eyeVel = {}; m_atVel = {}; }   // 활성 시 하드컷
+    void Clear_LevelRefs() { m_pBoss = nullptr; m_pFocusOverride = nullptr; }
 
 private:
     virtual HRESULT Ready_Events() override;

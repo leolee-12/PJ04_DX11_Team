@@ -79,6 +79,7 @@ private:
     void Register_MiniBoss();
     void Register_MainBoss();
     void Register_Cutscene();
+    void Register_SystemObject();
 
 public:
     virtual void Free() override;
