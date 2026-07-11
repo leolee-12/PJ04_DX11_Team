@@ -33,8 +33,8 @@ namespace
 	const AUDIO_AREA_SOUND_BINDING g_AudioAreaSoundBindings[] =
 	{
 		{ L"AreaBgmRequestor",		nullptr,				1u,					L"K15_Grassland1.marker.wav",			AUDIO_AREA_PLAY_TYPE::BGM_FADE,		0.5f, 0.f },
-		{ L"AreaSeJungle",			L"Jungle",				kAnySoundId,		L"EnvJungle_Jungle1.wav",				AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.30f, 70.f },
-		{ L"AreaSeSeaWave",			L"SeaWave",				kAnySoundId,		L"EnvWaterWave_SeaWave1.wav",			AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.35f, 50.f },
+		{ L"AreaSeJungle",			L"Jungle",				kAnySoundId,		L"EnvJungle_Jungle1.wav",				AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.12f, 66.f },
+		{ L"AreaSeSeaWave",			L"SeaWave",				kAnySoundId,		L"EnvWaterWave_SeaWave1.wav",			AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.18f, 50.f },
 		{ L"AreaSeWaterPipe",		L"WaterPipe",			kAnySoundId,		L"GimmickWaterPipe_FallingWater.wav",	AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.35f, 8.f },
 		{ L"AreaSeLavaWaterFall",	L"LavaWaterFall",		kAnySoundId,		L"EnvLavaWaterFall_Lava1.wav",			AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.35f, 20.f },
 		{ L"AreaSeSandWaterFall",	L"SandWaterFall",		kAnySoundId,		L"EnvSandWaterFall_SandFall1.wav",		AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.35f, 10.f },
@@ -413,9 +413,12 @@ void CLD_AudioArea::Update_BgmFadeOut(_float fTimeDelta)
 		return;
 	}
 
+	const AUDIO_AREA_SOUND_BINDING* pBinding =	Find_AudioAreaSoundBinding(m_tLevelDesignDesc.strObjectName, m_tAudioAreaDesc);
+	const _float fStartVolume =	nullptr != pBinding ? pBinding->fVolume : 1.f;
+
 	const _float fFadeSec =	max(Get_InactivateSeconds(), 0.001f);
 
-	m_fCurrentVolume -= fTimeDelta / fFadeSec;
+	m_fCurrentVolume -=	fStartVolume * fTimeDelta / fFadeSec;
 	if (m_fCurrentVolume > 0.f)
 	{
 		m_BgmHandle.Set_Volume(m_fCurrentVolume);

@@ -331,6 +331,8 @@ void CLD_DeformCarBreakWall::On_Event()
 	m_pGameInstance_Proxy->Publish(EventTag::HUD_SetVisible, &bShow);
 	m_pGameInstance_Proxy->Publish(EventTag::Letterbox_Begin, nullptr);
 
+	m_pGameInstance_Proxy->Play_SFX(L"DemoDeformCarGetFirst_BreakGroundWall.wav", 1.f, ESoundBus::SFX);
+
 	m_pGameInstance_Proxy->Lerp_TimeScale(0.1f, 1.f, 3.f);
 
 	Release_RigidStatic();

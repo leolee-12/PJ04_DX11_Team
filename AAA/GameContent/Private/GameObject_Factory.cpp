@@ -216,17 +216,17 @@ namespace
         // 능력 추가될 때마다 아래에 추가
         
         // Sword
-        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Sword"),
+        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Ability_Model_Sword"),
             CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Sword/Sword.ysh",
                 XMMatrixRotationY(XMConvertToRadians(180.f))));
 
         // Bomb
-        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_KirbyBomb"),
+        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Ability_Model_Bomb"),
             CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Gimmick/CopyEssence/Bomb/KirbyBomb.ysh",
                 XMMatrixRotationY(XMConvertToRadians(180.f))));
 
         // Ice
-        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_IceHat"),
+        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Ability_Model_Ice"),
             CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Gimmick/CopyEssence/IceHat/Ice_Hat.ysh",
                 XMMatrixRotationY(XMConvertToRadians(180.f))));
     }

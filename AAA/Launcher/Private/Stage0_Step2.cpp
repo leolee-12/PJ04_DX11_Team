@@ -72,7 +72,7 @@ HRESULT CStage0_Step2::Initialize()
     // 나중에 트리거박스로 이관
     //m_pGameInstance_Proxy->Play_BGM(L"K15_Grassland1.marker.wav", 0.5f);
 
-    m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_Grassland1.marker.wav", 3.f, 0.5f);
+    m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_Grassland1.marker.wav", 5.f, 0.35f);
 
     return S_OK;
 }

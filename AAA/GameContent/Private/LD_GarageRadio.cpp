@@ -163,6 +163,38 @@ HRESULT CLD_GarageRadio::Ready_Events()
 	return S_OK;
 }
 
+void CLD_GarageRadio::On_AnimEvent(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase)
+{
+	if (ANIM_EVENT_PHASE::POINT != ePhase)
+		return;
+
+	switch (static_cast<EANIM_EVENT>(AnimEvent.iEventType))
+	{
+	case EANIM_EVENT::Sound:
+	{
+		if (AnimEvent.strParam.empty())
+		{
+#ifdef _DEBUG
+			MSG_BOX("Sound StrParam is Empty");
+#endif
+			return;
+		}
+
+		if (ePhase == ANIM_EVENT_PHASE::POINT)
+		{
+			if (AnimEvent.iIntParam == 1)
+				m_pGameInstance_Proxy->Play_BGM_Fade(StrToWstr(AnimEvent.strParam).c_str(), AnimEvent.vOffset.x);
+			else 
+				m_pGameInstance_Proxy->Play_SFX(StrToWstr(AnimEvent.strParam).c_str(), AnimEvent.vOffset.x);
+		}
+		break;
+	}
+	default:
+		break;
+
+	}
+}
+
 void CLD_GarageRadio::On_Event()
 {
 	if (STATE::PLAYING == m_eState)
