@@ -340,7 +340,22 @@ PS_OUT PS_TREESHADOW(PS_IN In)
 
 PS_OUT PS_GRASS_FUR(PS_IN In)
 {
-    return PS_DIFF_SAMPLE(In, Get_BaseUV(In));
+    Apply_DitherIfNeeded(In.vPosition);
+
+    float4 vMask = g_DiffuseTexture.Sample(LinearSampler, Get_BaseUV(In));
+    if (vMask.a < 0.1f)
+        discard;
+
+    float3 vMRA = g_MRATexture.Sample(LinearSampler, Get_MaterialUV(In)).rgb;
+    float3 vNormal = Reconstruct_Normal(In, Get_NormalUV(In));
+    float4 vGrassColor = float4(g_vColor.rgb, vMask.a);
+
+    return Make_GBufferOutput(
+                In,
+                vGrassColor,
+                vNormal,
+                float4(vMRA, 1.f),
+                float4(g_vEmissiveColor.rgb * vMask.a, 1.f));
 }
 
 PS_OUT PS_COLOR(PS_IN In)
@@ -364,18 +379,6 @@ PS_OUT PS_DISCARD(PS_IN In)
     return (PS_OUT) 0;
 }
 
-PS_OUT PS_COLOR_MRA_DITHER(PS_IN In)
-{
-    Apply_Dissolve(In.vPosition);
-
-    return Make_GBufferOutput(
-                In,
-                g_vColor,
-                In.vNormal.xyz,
-                float4(g_vMRA, 1.f),
-                float4(g_vEmissiveColor.rgb, 1.f));
-}
-
 PS_OUT PS_COLOR_CONST_MRA(PS_IN In)
 {
     Apply_DitherIfNeeded(In.vPosition);
@@ -388,6 +391,48 @@ PS_OUT PS_COLOR_CONST_MRA(PS_IN In)
                 vNormal,
                 float4(g_vMRA, 1.f),
                 float4(g_vEmissiveColor.rgb * g_vColor.a, 1.f));
+}
+
+  PS_OUT PS_ARROWBOARD_OPAQUE(PS_IN In)
+  {
+      float4 vDiffuse = g_DiffuseTexture.Sample(LinearSampler, Get_BaseUV(In));
+      float3 vMRA = g_MRATexture.Sample(LinearSampler, Get_MaterialUV(In)).rgb;
+      float3 vNormal = Reconstruct_Normal(In, Get_NormalUV(In));
+      float fArrowMask = step(0.1f, vDiffuse.a);
+
+      return Make_GBufferOutput(
+                  In,
+                  float4(vDiffuse.rgb, 1.f),
+                  vNormal,
+                  float4(vMRA, 1.f),
+                  float4(g_vEmissiveColor.rgb * fArrowMask, 1.f));
+  }
+
+PS_OUT PS_DMN_OPAQUE(PS_IN In)
+{
+    Apply_DitherIfNeeded(In.vPosition);
+
+    float3 vDiffuse = g_DiffuseTexture.Sample(LinearSampler, Get_BaseUV(In)).rgb;
+    float3 vMRA = g_MRATexture.Sample(LinearSampler, Get_MaterialUV(In)).rgb;
+    float3 vNormal = Reconstruct_Normal(In, Get_NormalUV(In));
+
+    return Make_GBufferOutput(
+                    In,
+                    float4(vDiffuse, 1.f),
+                    vNormal,
+                    float4(vMRA, 1.f),
+                    float4(g_vEmissiveColor.rgb, 1.f));
+}
+
+float4 PS_UKWN_BLACK_OVERLAY(PS_IN In) : SV_TARGET0
+{
+    Apply_DitherIfNeeded(In.vPosition);
+
+    float3 vUnknown = g_UnknownTexture.Sample(LinearSampler, Get_UnknownUV(In)).rgb;
+    float fBrightness = saturate(max(vUnknown.r, max(vUnknown.g, vUnknown.b)));
+    float fShadeAlpha = saturate((1.f - fBrightness) * max(g_MaskStrength, 0.f));
+
+    return float4(0.f, 0.f, 0.f, fShadeAlpha);
 }
 
 

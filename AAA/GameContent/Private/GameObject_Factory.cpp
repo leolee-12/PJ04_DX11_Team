@@ -80,6 +80,7 @@
 #include "CommonHit.h"
 #include "SpitObject.h"
 #include "BombFuseEffect.h"
+#include "FlowerPetals.h"
 #include "BubbleAura.h"
 
 // Effect_Part
@@ -113,6 +114,7 @@
 #include "Bubble.h"
 #include "StarEmitter.h"
 #include "Sparkle.h"
+#include "MeshEmitterCommon.h"
 #include "StarMesh.h"
 
 //sky
@@ -159,6 +161,7 @@
 #include "LD_SlopeBoardA.h"
 #include "LD_SlopeBoardC.h"
 #include "LD_DeformCarBreakWall.h"
+#include "LD_GarageRadio.h"
 #include "LD_DeformObject.h"
 #include "LD_CopyEssence.h"
 
@@ -740,6 +743,10 @@ void CGameObject_Factory::Register_AnimObject()
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_DeformCarBreakWall::MODEL_PROTO_TAG,
             Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/DeformCarBreakWall/DeformCarBreakWall.ysh", false));));
 
+    Register(CLD_GarageRadio::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_GarageRadio),
+        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_GarageRadio::MODEL_PROTO_TAG,
+            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/GarageRadio/GarageRadio.ysh", false));));
+
     Register(CLD_DeformObject::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_DeformObject),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Proto_Component_Model_DeformCar"),
             Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/DeformCar/DeformCar.ysh", true));));
@@ -996,6 +1003,17 @@ void CGameObject_Factory::Register_Effect()
             //TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StarSmooth"),
             //    CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Star/Common_00_Common_StarSmooth.ysh"));
         ));
+
+    // 7
+    Register(CFlowerPetals::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CFlowerPetals),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_Flower"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Flower/Flower_00_TopL.ysh"));
+        )
+    );
+
         
 }
 

@@ -31,19 +31,36 @@ void CKirby_Fall::Enter(CKirby* pKirby, _int iFlag)
 {
     __super::Enter(pKirby, iFlag);
 
-    Change_FallState(FALL_STATE::FALLING);
+    m_eFallState = FALL_STATE::FALL_STATE_END;
 
-    if(pKirby->Has_Deform())
-        pKirby->Get_KirbyDeform()->Play_DeformAni(pKirby, DEFORM_ANI::FALL);
-    else
-        pKirby->Get_KirbyAbility()->Play_AbilityAni(pKirby, ABILITY_ANI::FALL);
+    switch (iFlag)
+    {
+        case FALL_STATE_FLAG::FALL_DIRECT:
+        default:
+        {
+            Change_FallState(pKirby, FALL_STATE::FALLING);
+            break;
+        }
+        case FALL_STATE_FLAG::PLAY_JUMP_END_L:
+        {
+            m_bLeft = true;
+            Change_FallState(pKirby, FALL_STATE::JUMP_END);
+            break;
+        }
+        case FALL_STATE_FLAG::PLAY_JUMP_END_R:
+        {
+            m_bLeft = false;
+            Change_FallState(pKirby, FALL_STATE::JUMP_END);
+            break;
+        }
+    }
 }
 
 void CKirby_Fall::Update(CKirby* pKirby, const _float fTimeDelta)
 {
     __super::Update(pKirby, fTimeDelta);
 
-    Update_FallState(pKirby);
+    Update_FallState(pKirby, fTimeDelta);
 
     m_bGuardReserved = false;
 }
@@ -147,48 +164,46 @@ _bool CKirby_Fall::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
     return false;
 }
 
-void CKirby_Fall::Update_FallState(CKirby* pKirby)
+void CKirby_Fall::Change_FallState(CKirby* pKirby, FALL_STATE eNewState)
 {
-    switch (m_eFallState)
-    {
-        case FALL_STATE::LAND_START:
-        {
-            CAnimator* pAnimator{};
+    if (m_eFallState == eNewState)
+        return;
 
+    Exit_FallState(pKirby, m_eFallState);
+
+    m_eFallState = eNewState;
+
+    Enter_FallState(pKirby, m_eFallState);
+}
+
+void CKirby_Fall::Enter_FallState(CKirby* pKirby, FALL_STATE eState)
+{
+    switch (eState)
+    {
+        case FALL_STATE::JUMP_END:
+        {
             if (pKirby->Has_Deform())
             {
-                CKirby_Deform* pKirbyDeform = pKirby->Get_KirbyDeform();
-                CKirby_Deform_Model* pDeformModel = pKirby->Get_DeformPart_Model(pKirbyDeform->Get_DeformType());
-                pAnimator = pDeformModel->Get_Animator();
+                MSG_BOX("Bug 1: CKirby_Fall");
             }
             else
             {
-                CKirby_Body* pKirby_Body = pKirby->Get_Body();
-                pAnimator = pKirby_Body->Get_Animator();
+                CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+                ABILITY_ANI eJumpEndAni = m_bLeft ? ABILITY_ANI::JUMP_END_L : ABILITY_ANI::JUMP_END_R;
+                pAbility->Play_AbilityAni(pKirby, eJumpEndAni);
             }
-
-            if (m_bGuardReserved)
-            {
-                pKirby->Change_State(KIRBY_STATE_TYPE::GUARD);
-                return;
-            }
-
-            if (pAnimator->Is_Finished())
-            {
-                Transition_Wait_OR_Run(pKirby);
-                return;
-            }
-
             break;
         }
-
         case FALL_STATE::FALLING:
         {
-            CMovement_Child* pMovement = pKirby->Get_Movement();
-
-            if (pMovement->Is_Grounded() == false)
-                break;
-
+            if (pKirby->Has_Deform())
+                pKirby->Get_KirbyDeform()->Play_DeformAni(pKirby, DEFORM_ANI::FALL);
+            else
+                pKirby->Get_KirbyAbility()->Play_AbilityAni(pKirby, ABILITY_ANI::FALL);
+            break;
+        }
+        case FALL_STATE::LAND_START:
+        {
             if (pKirby->Has_Deform())
             {
                 pKirby->Get_KirbyDeform()->Play_DeformAni(pKirby, DEFORM_ANI::LANDING);
@@ -198,23 +213,101 @@ void CKirby_Fall::Update_FallState(CKirby* pKirby)
                 pKirby->Get_KirbyAbility()->Play_AbilityAni(pKirby, ABILITY_ANI::LANDING);
 
                 CKirby_Body* pKirby_Body = pKirby->Get_Body();
-                if (pKirby->Get_Body()->Get_KirbyBody() != KIRBY_BODY_STATE::STUFFED)
+                if (pKirby_Body->Get_KirbyBody() != KIRBY_BODY_STATE::STUFFED)
                     pKirby_Body->Set_KirbyEye(KIRBY_EYE_STATE::CLOSE);
             }
-
-            Change_FallState(FALL_STATE::LAND_START);
-            
             break;
         }
+        case FALL_STATE::FALL_STATE_END:
+            break;
     }
 }
 
-void CKirby_Fall::Change_FallState(FALL_STATE eNewState)
+void CKirby_Fall::Update_FallState(CKirby* pKirby, _float fTimeDelta)
 {
-    if (m_eFallState == eNewState)
-        return;
+    switch (m_eFallState)
+    {
+        case FALL_STATE::JUMP_END:
+        {
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            if (pMovement->Is_Grounded())
+            {
+                Change_FallState(pKirby, FALL_STATE::LAND_START);
+                return;
+            }
 
-    m_eFallState = eNewState;
+            if (pKirby->Has_Deform())
+            {
+                MSG_BOX("Bug 2: CKirby_Fall");
+            }
+            else
+            {
+                CKirby_Body* pKirby_Body = pKirby->Get_Body();
+                CAnimator* pAnimator = pKirby_Body->Get_Animator();
+                if (pAnimator->Is_Finished())
+                    Change_FallState(pKirby, FALL_STATE::FALLING);
+            }
+      
+            break;
+        }
+        case FALL_STATE::FALLING:
+        {
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+
+            if (pMovement->Is_Grounded() == false)
+                return;
+
+            Change_FallState(pKirby, FALL_STATE::LAND_START);
+            break;
+        }
+        case FALL_STATE::LAND_START:
+        {
+            if (m_bGuardReserved)
+            {
+                pKirby->Change_State(KIRBY_STATE_TYPE::GUARD);
+                return;
+            }
+
+            CAnimator* pAnimator{};
+
+            if (pKirby->Has_Deform())
+            {
+                CKirby_Deform* pKirbyDeform = pKirby->Get_KirbyDeform();
+                DEFORM_TYPE eDeformType = pKirbyDeform->Get_DeformType();
+                CKirby_Deform_Model* pDeformModel = pKirby->Get_DeformPart_Model(eDeformType);
+                pAnimator = pDeformModel->Get_Animator();
+            }
+            else
+            {
+                CKirby_Body* pKirby_Body = pKirby->Get_Body();
+                pAnimator = pKirby_Body->Get_Animator();
+            }
+
+            if (pAnimator->Is_Finished())
+            {
+                Transition_Wait_OR_Run(pKirby);
+                return;
+            }
+            break;
+        }
+        case FALL_STATE::FALL_STATE_END:
+            break;
+    }
+}
+
+void CKirby_Fall::Exit_FallState(CKirby* pKirby, FALL_STATE eState)
+{
+    switch (eState)
+    {
+        case FALL_STATE::JUMP_END:
+            break;
+        case FALL_STATE::FALLING:
+            break;
+        case FALL_STATE::LAND_START:
+            break;
+        case FALL_STATE::FALL_STATE_END:
+            break;
+    }
 }
 
 CKirby_Fall* CKirby_Fall::Create()

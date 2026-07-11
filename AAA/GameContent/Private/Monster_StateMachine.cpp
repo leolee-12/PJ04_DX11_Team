@@ -24,13 +24,13 @@ MONSTER_STATE_TYPE		CMonster_StateMachine::Get_StateType()
     return m_pCurState->Get_StateType();
 }
 
-_bool CMonster_StateMachine::Change_State(MONSTER_STATE_TYPE eNewState)
+_bool CMonster_StateMachine::Change_State(MONSTER_STATE_TYPE eNewState, _bool bStateReenter)
 {
     CMonster_State* pNextState = Find_State(eNewState);
     if (nullptr == pNextState)
         return false;
 
-    if (m_pCurState == pNextState)
+    if (m_pCurState == pNextState && !bStateReenter)
         return true;
 
     if (nullptr != m_pCurState)

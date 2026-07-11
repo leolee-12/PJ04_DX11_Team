@@ -198,12 +198,12 @@ void CMonster::Clear_MoveDir()
 	XMStoreFloat3(&m_vWishDir, XMVectorZero());
 }
 
-_bool CMonster::Change_State(MONSTER_STATE_TYPE eNewState)
+_bool CMonster::Change_State(MONSTER_STATE_TYPE eNewState, _bool bStateReenter)
 {
 	if (nullptr == m_pStateMachine)
 		return false;
 
-	return m_pStateMachine->Change_State(eNewState);
+	return m_pStateMachine->Change_State(eNewState, bStateReenter);
 }
 
 _bool	CMonster::Has_State(MONSTER_STATE_TYPE eState) const
@@ -452,7 +452,7 @@ void CMonster::On_Damaged(const ATTACK_INFO& tInfo)
 		vPos, vFaceCam, _float3(0.f, 0.f, 0.f),
 		nullptr);
 
-	Change_State(MONSTER_STATE_TYPE::KNOCK_BACK);
+	Change_State(MONSTER_STATE_TYPE::KNOCK_BACK, true);
 }
 
 void CMonster::On_Death(const ATTACK_INFO& tInfo)

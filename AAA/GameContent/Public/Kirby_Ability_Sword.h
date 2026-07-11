@@ -60,6 +60,9 @@ public:
 
 	virtual _bool Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase) override;
 
+public:
+	virtual _bool Can_PlayJumpEndFromSlide() { return false; };
+
 private:
 	SWORD_STATE m_eSwordState{};
 

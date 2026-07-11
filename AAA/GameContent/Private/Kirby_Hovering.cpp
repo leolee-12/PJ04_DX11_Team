@@ -8,6 +8,8 @@
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
 
+#include "Kirby_Fall.h"
+
 CKirby_Hovering::CKirby_Hovering()
 {
 }
@@ -212,15 +214,9 @@ _bool CKirby_Hovering::Update_HoveringStateMachine(CKirby* pKirby, _float fTimeD
             {
                 _bool bIsGround = pMovement->Is_Grounded();
                 if (bIsGround == false)
-                {
                     pKirby->Change_State(KIRBY_STATE_TYPE::FALL);
-                    CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
-                    pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::FALL);
-                }
                 else
-                {
                     Transition_Wait_OR_Run(pKirby);
-                }
                 
                 pBody->Set_KirbyBody(KIRBY_BODY_STATE::NORMAL);
 

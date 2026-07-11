@@ -11,7 +11,7 @@ NS_BEGIN(Client)
 
 class CKirby;
 
-enum JUMP_STATE_FLAG { JUMP_NONE, FORCE_JUMP };
+enum JUMP_STATE_FLAG { JUMP_NONE, FORCE_JUMP, JUMP_FROM_SLIDE };
 
 class CLIENT_DLL CKirby_Jump final : public CKirby_ControllableState
 {
@@ -19,7 +19,7 @@ private:
 	CKirby_Jump();
 	virtual ~CKirby_Jump() = default;
 
-	enum class JUMP_STATE { JUMP_START, JUMP, JUMP_END };
+	enum class JUMP_STATE { JUMP_START, JUMP };
 
 private:
 	HRESULT Initialize();

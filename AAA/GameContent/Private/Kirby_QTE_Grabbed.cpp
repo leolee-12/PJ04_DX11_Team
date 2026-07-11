@@ -55,7 +55,7 @@ void CKirby_QTE_Grabbed::Update(CKirby* pKirby, const _float fTimeDelta)
 
     Update_QTEGrabbedState(pKirby, fTimeDelta);
 
-    pKirby->Update_CutsceneGrabTransform();
+    pKirby->Update_CutsceneAttachTransform();
 }
 
 void CKirby_QTE_Grabbed::Exit(CKirby* pKirby)
@@ -92,12 +92,26 @@ _bool CKirby_QTE_Grabbed::Handle_Command(CKirby* pKirby, CKirby_Command* pComman
     return false;
 }
 
-void CKirby_QTE_Grabbed::Request_Attach_End(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType)
+void CKirby_QTE_Grabbed::Request_Attachment_End(CKirby* pKirby, const KIRBY_ATTACHMENT_END_DESC* pDesc)
 {
-    if(eType == KIRBY_ATTACHMENT_END_REASON::GORILLA_COMBAT_ESCAPE)
-        Change_QTEGrabbedState(pKirby, QTE_GRABBED_STATE::ESCAPE);
-    else if (eType == KIRBY_ATTACHMENT_END_REASON::GORILLA_COMBAT_THROWN)
-        Change_QTEGrabbedState(pKirby, QTE_GRABBED_STATE::SLAM_SPIN);
+    switch (pDesc->eType)
+    {
+        case KIRBY_ATTACHMENT_END_REASON::GORILLA_COMBAT_ESCAPE:
+        {
+            Change_QTEGrabbedState(pKirby, QTE_GRABBED_STATE::ESCAPE);
+            break;
+        }
+        case KIRBY_ATTACHMENT_END_REASON::GORILLA_COMBAT_THROWN:
+        {
+            Change_QTEGrabbedState(pKirby, QTE_GRABBED_STATE::SLAM_SPIN);
+            break;
+        }
+        default:
+        {
+            MSG_BOX("Event Error: CKirby_QTE_Grabbed");
+            break;
+        }
+    }
 }
 
 void CKirby_QTE_Grabbed::Change_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE eNext)
@@ -129,8 +143,7 @@ void CKirby_QTE_Grabbed::Enter_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE
         case QTE_GRABBED_STATE::ESCAPE:
         {      
             _vector vBackDir = -pKirby->Get_Transform()->Get_State(STATE::LOOK);
-            vBackDir = XMVectorSetY(vBackDir, 0.f);
-            vBackDir = XMVector3Normalize(vBackDir);
+            vBackDir = XMVector3Normalize(XMVectorSetY(vBackDir, 0.f));
 
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Set_Velocity(vBackDir * 15.f);

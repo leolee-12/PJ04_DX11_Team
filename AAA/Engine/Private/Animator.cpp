@@ -375,15 +375,45 @@ void CAnimator::Update(_float fTimeDelta)
     if (it != m_Tracks.end())
     {
         auto& track = it->second;
-        if (fCur < m_fPrevProgress)                 
+        //if (fCur < m_fPrevProgress)                 
+        //{
+        //    Fire_Point(track.Events, m_fPrevProgress, 1.0f);
+        //    if (m_bCurLoop)                      
+        //        for (auto& e : track.Events) e.bFired = false;
+        //    Fire_Point(track.Events, -0.0001f, fCur);
+        //}
+        //else
+        //    Fire_Point(track.Events, m_fPrevProgress, fCur);
+
+        //Process_Range(track, fCur);
+
+        // Loop일 때 Begin이 안 불리는 문제 
+        if (fCur < m_fPrevProgress)
         {
             Fire_Point(track.Events, m_fPrevProgress, 1.0f);
-            if (m_bCurLoop)                      
-                for (auto& e : track.Events) e.bFired = false;
+
+            if (m_bCurLoop)
+            {
+                for (auto& e : track.Events)
+                {
+                    e.bFired = false;
+
+                    if (e.bIsRange && e.bActive)
+                    {
+                        if (m_Callback)
+                            m_Callback(e, ANIM_EVENT_PHASE::END);
+
+                        e.bActive = false;
+                    }
+                }
+            }
+
             Fire_Point(track.Events, -0.0001f, fCur);
         }
         else
+        {
             Fire_Point(track.Events, m_fPrevProgress, fCur);
+        }
 
         Process_Range(track, fCur);
     }

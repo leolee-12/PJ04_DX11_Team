@@ -11,14 +11,16 @@
 #include "Kirby_Fall.h"
 #include "Kirby_Attack.h"
 #include "Kirby_Hovering.h"
-#include "Kirby_GetAbility.h"
-#include "Kirby_AbilityDump.h"
 #include "Kirby_Damaged.h"
 #include "Kirby_Guard.h"
 #include "Kirby_Slide.h"
 #include "Kirby_Dodge.h"
 #include "Kirby_Ladder.h"
+
+#include "Kirby_GetAbility.h"
+#include "Kirby_AbilityDump.h"
 #include "Kirby_GetDeform.h"
+#include "Kirby_DeformDump.h"
 
 #include "Kirby_CutSceneGrabbed.h"
 #include "Kirby_QTE_Grabbed.h"
@@ -79,19 +81,58 @@ void CKirby_StateMachine::Handle_Command(CKirby_Command* pCommand)
     m_pCurState->Handle_Command(m_pKirby, pCommand);
 }
 
+void CKirby_StateMachine::On_KirbyCollisionEnter_StateMachine(_uint iColliderType, CCollider* pOther)
+{
+    m_pCurState->On_KirbyCollisionEnter(m_pKirby, iColliderType, pOther);
+}
+
+void CKirby_StateMachine::On_KirbyCollisionStay_StateMachine(_uint iColliderType, CCollider* pOther)
+{
+    m_pCurState->On_KirbyCollisionStay(m_pKirby, iColliderType, pOther);
+}
+
+void CKirby_StateMachine::On_KirbyCollisionExit_StateMachine(_uint iColliderType, CCollider* pOther)
+{
+    m_pCurState->On_KirbyCollisionExit(m_pKirby, iColliderType, pOther);
+}
+
 void CKirby_StateMachine::On_Damaged_KirbyStateMachine(const ATTACK_INFO& tInfo)
 {
     m_pCurState->On_Damaged_KirbyState(m_pKirby, tInfo);
 }
 
-void CKirby_StateMachine::Request_Attachment_StateMachine(KIRBY_ATTACHMENT_CONTEXT eType)
+void CKirby_StateMachine::Request_Attachment_StateMachine(const KIRBY_ATTACHMENT_BEGIN_DESC* pDesc)
 {
-    m_pCurState->Request_Attach(m_pKirby, eType);
+    switch (pDesc->eType)
+    {
+        case KIRBY_ATTACHMENT_CONTEXT::GORILLA_SCENE:
+        {
+            Change_State(KIRBY_STATE_TYPE::CUTSCENE_GRABBED);
+            break;
+        }
+        case KIRBY_ATTACHMENT_CONTEXT::GORILLA_COMBAT:
+        {
+            Change_State(KIRBY_STATE_TYPE::QTE_GRABBED);
+            break;
+        }
+        case KIRBY_ATTACHMENT_CONTEXT::DEFORM_CAR_GET_FIRST:
+        {
+            Change_State(KIRBY_STATE_TYPE::CAR_FIRST_BREAK_WALL);
+            break;
+        }
+        default:
+        {
+            MSG_BOX("Event Miss: CKirby_StateMachine");
+            return;
+        }
+    }
+
+    m_pCurState->Request_Attachment(m_pKirby, pDesc);
 }
 
-void CKirby_StateMachine::Request_Attachment_End_StateMachine(KIRBY_ATTACHMENT_END_REASON eType)
+void CKirby_StateMachine::Request_Attachment_End_StateMachine(const KIRBY_ATTACHMENT_END_DESC* pDesc)
 {
-    m_pCurState->Request_Attach_End(m_pKirby, eType);
+    m_pCurState->Request_Attachment_End(m_pKirby, pDesc);
 }
 
 void CKirby_StateMachine::Request_PositionSync_StateMachine(const KIRBY_POSITION_SYNC_BEGIN_DESC* pDesc)
@@ -103,7 +144,7 @@ void CKirby_StateMachine::Request_PositionSync_StateMachine(const KIRBY_POSITION
             Change_State(KIRBY_STATE_TYPE::DEFORM_CAR_BRIDGE);
             break;
         }
-        case KIRBY_POSITION_SYNC_CONTEXT::DEFAULT_SYNC:
+        case KIRBY_POSITION_SYNC_CONTEXT::_COUNT:
         {
             break;
         }
@@ -114,7 +155,7 @@ void CKirby_StateMachine::Request_PositionSync_StateMachine(const KIRBY_POSITION
 
 void CKirby_StateMachine::Request_PositionSync_End_StateMachine(const KIRBY_POSITION_SYNC_END_DESC* pDesc)
 {
-    m_pCurState->Request_PositionEndSync(m_pKirby, pDesc);
+    m_pCurState->Request_PositionSync_End(m_pKirby, pDesc);
 }
 
 void CKirby_StateMachine::Request_ClearStage_StateMachine(const CUTSCENE_STAGECLEAR* pDesc)
@@ -167,14 +208,17 @@ HRESULT CKirby_StateMachine::Init_State()
     if (FAILED(Register_State(KIRBY_STATE_TYPE::FALL, CKirby_Fall::Create())))                              return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::ATTACK, CKirby_Attack::Create())))                          return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::HOVERING, CKirby_Hovering::Create())))                      return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::GET_ABILITY, CKirby_GetAbility::Create())))                 return E_FAIL;
-    if (FAILED(Register_State(KIRBY_STATE_TYPE::ABILITY_DUMP, CKirby_AbilityDump::Create())))               return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::DAMAGED, CKirby_Damaged::Create())))                        return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::GUARD, CKirby_Guard::Create())))                            return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::SLIDE, CKirby_Slide::Create())))                            return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::DODGE, CKirby_Dodge::Create())))                            return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::LADDER, CKirby_Ladder::Create())))                          return E_FAIL;
+
+
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::GET_ABILITY, CKirby_GetAbility::Create())))                 return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::ABILITY_DUMP, CKirby_AbilityDump::Create())))               return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::GET_DEFORM, CKirby_GetDeform::Create())))                   return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::DEFORM_DUMP, CKirby_DeformDump::Create())))                 return E_FAIL;
 
 
     if (FAILED(Register_State(KIRBY_STATE_TYPE::CUTSCENE_GRABBED, CKirby_CutSceneGrabbed::Create())))       return E_FAIL;

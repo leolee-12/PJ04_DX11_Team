@@ -15,11 +15,12 @@ class CKirby_Body;
 class CLIENT_DLL CKirby_Slide final : public CKirby_State
 {
 private:
-	enum SLIDE_STATE { SLIDE_START, SLIDE, SLIDE_END, STATE_END };
+	enum SLIDE_STATE { SLIDE_START, SLIDE, BACK_JUMP, STATE_END };
 
 private:
 	static constexpr _float s_fSlideGroundFriction = 30.f;
 	static constexpr _float s_fMaxSlideHorizontalSpeed = 27.f;
+	static constexpr _float s_fMaxSlideTime = 0.6f;
 
 private:
 	CKirby_Slide();
@@ -37,6 +38,9 @@ public:
 	virtual void Exit(CKirby* pKirby) override;
 
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
+
+public:
+	virtual void On_KirbyCollisionEnter(CKirby* pKirby, _uint iColliderType, CCollider* pOther) override;
 
 public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;

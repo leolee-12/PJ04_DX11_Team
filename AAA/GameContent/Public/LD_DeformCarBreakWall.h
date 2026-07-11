@@ -33,6 +33,7 @@ private:
 public:
 	virtual void    Update(_float fTimeDelta) override;
 	virtual void    Late_Update(_float fTimeDelta) override;
+	virtual HRESULT Render() override;
 	virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
 	static void		Register_LevelDesignSpecs();

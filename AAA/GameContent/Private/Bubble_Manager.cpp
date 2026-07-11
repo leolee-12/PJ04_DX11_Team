@@ -77,6 +77,14 @@ HRESULT CBubble_Manager::Spawn(_uint iTargetLevel, BUBBLE_KIND eKind,  COPY_ABIL
     return Spawn(iTargetLevel, eKind, eAbility, vPos, _float3(0.f, 0.f, 0.f), ppOut);
 }
 
+HRESULT CBubble_Manager::Spawn(_uint iTargetLevel, BUBBLE_KIND eKind, COPY_ABILITY_TYPE eAbility, _fvector vPos, CAbility_Bubble** ppOut)
+{
+    _float3 vPosition{};
+    XMStoreFloat3(&vPosition, vPos);
+
+    return Spawn(iTargetLevel, eKind, eAbility, vPosition, ppOut);
+}
+
 HRESULT CBubble_Manager::Spawn(_uint iTargetLevel, BUBBLE_KIND eKind, COPY_ABILITY_TYPE eAbility, const _float3& vPos, const _float3& vDir, CAbility_Bubble** ppOut)
 {
     if (nullptr == Model_Of(eAbility))
@@ -123,6 +131,16 @@ HRESULT CBubble_Manager::Spawn(_uint iTargetLevel, BUBBLE_KIND eKind, COPY_ABILI
     pBubble->Launch(vDir);
     if (ppOut) *ppOut = pBubble;
     return S_OK;
+}
+
+HRESULT CBubble_Manager::Spawn(_uint iTargetLevel, BUBBLE_KIND eKind, COPY_ABILITY_TYPE eAbility, _fvector vPos, _fvector vDir, CAbility_Bubble** ppOut)
+{
+    _float3 vPosition{};
+    _float3 vDirection{};
+    XMStoreFloat3(&vPosition, vPos);
+    XMStoreFloat3(&vDirection, vDir);
+
+    return Spawn(iTargetLevel, eKind, eAbility, vPosition, vDirection, ppOut);
 }
 
 void CBubble_Manager::Return(_uint iLevel, const _wstring& strKey, CAbility_Bubble* p)

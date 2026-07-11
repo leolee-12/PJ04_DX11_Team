@@ -24,7 +24,7 @@ public:
 public:
 	void							Update_StateMachine(_float fTimeDelta);
 
-	_bool							Change_State(MONSTER_STATE_TYPE eNewState);
+	_bool							Change_State(MONSTER_STATE_TYPE eNewState, _bool bStateReenter = false);
 	HRESULT							Register_State(MONSTER_STATE_TYPE eType, CMonster_State* pState);
 	_bool							Has_State(MONSTER_STATE_TYPE eType) const;
 

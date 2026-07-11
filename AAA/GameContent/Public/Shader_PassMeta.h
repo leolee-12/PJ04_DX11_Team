@@ -128,85 +128,14 @@ static DEFAULT_TEXTURE GetLayerExDefaultTexture(_uint iEntry)
 
 
 
-#pragma region Env Pass
-enum class ENV_PASS : _int
+#pragma region World Pass
+// Shader_World_Common.hlsli의 g_iFlags 비트(FLAG_DITHER)와 1:1 대응
+namespace WorldShaderFlags
 {
-	DEFAULT = -1,
-	SHADOW,
-	WHITE,
-	DIFF,
-	DMN,
-	UKWN,
-	UMN,
-
-	DMNU,
-	TREESHADOW,
-	GRASS_FUR,
-	COLOR,
-	DISCARD,
-	COLORMRADITHER,
-	DECAL,
-
-	_COUNT
-};
-
-namespace ShaderPass
-{
-	namespace NonAnimPBR
-	{
-		inline constexpr _uint Default = 0;
-		inline constexpr _uint Diffuse = 1;
-		inline constexpr _uint Shadow = 2;
-		inline constexpr _uint White = 3;
-		inline constexpr _uint Dither = 4;
-		inline constexpr _uint DIFF = 5;
-		inline constexpr _uint DMN = 6;
-		inline constexpr _uint UKWN = 7;
-		inline constexpr _uint UMN = 8;
-
-		inline constexpr _uint DMNU = 9;
-		inline constexpr _uint TREESHADOW = 10;
-		inline constexpr _uint GRASS_FUR = 11;
-		inline constexpr _uint COLOR = 12;
-		inline constexpr _uint DISCARD = 13;
-		inline constexpr _uint COLORMRADITHER = 14;
-		inline constexpr _uint DECAL = 15;
-		inline constexpr _uint COLOR2 = 16;
-	}
-
-	namespace EnvInstFlags
-	{
-		inline constexpr _uint Dither = 1u << 0;
-	}
+	inline constexpr _uint Dither = 1u << 0;
 }
 
-struct ENV_SHADER_PASS_META
-{
-	ENV_PASS		ePass;
-	_uint			iNonAnimPass;
-	const _char*	szName;
-	_uint			iRequiredTextureMask;
-};
-
-inline constexpr ENV_SHADER_PASS_META g_EnvShaderPassMetas[] =
-{
-	{ ENV_PASS::DEFAULT,		ShaderPass::NonAnimPBR::DMN,			"Default",			DIFF | MRA | NORM },
-	{ ENV_PASS::WHITE,			ShaderPass::NonAnimPBR::White,			"WHITE",			0 },
-	{ ENV_PASS::DIFF,			ShaderPass::NonAnimPBR::DIFF,			"DIFF",				DIFF },
-	{ ENV_PASS::DMN,			ShaderPass::NonAnimPBR::DMN,			"DMN",				DIFF | MRA | NORM },
-	{ ENV_PASS::UKWN,			ShaderPass::NonAnimPBR::UKWN,			"UKWN",				UKWN },
-	{ ENV_PASS::UMN,			ShaderPass::NonAnimPBR::UMN,			"UMN",				UKWN | MRA | NORM },
-
-	{ ENV_PASS::DMNU,			ShaderPass::NonAnimPBR::DMNU,			"DMNU",				DIFF | MRA | NORM | UKWN },
-	{ ENV_PASS::TREESHADOW,		ShaderPass::NonAnimPBR::TREESHADOW,		"TREESHADOW",		UKWN },
-	{ ENV_PASS::GRASS_FUR,		ShaderPass::NonAnimPBR::GRASS_FUR,		"GRASS_FUR",		UKWN | MRA | NORM },
-	{ ENV_PASS::COLOR,			ShaderPass::NonAnimPBR::COLOR,			"COLOR",			MRA | NORM },
-	{ ENV_PASS::DISCARD,		ShaderPass::NonAnimPBR::DISCARD,		"DISCARD",			0 },
-	{ ENV_PASS::COLORMRADITHER,	ShaderPass::NonAnimPBR::COLORMRADITHER,	"COLORMRADITHER",	0 },
-	{ ENV_PASS::DECAL,			ShaderPass::NonAnimPBR::DECAL,			"DECAL",			0 },
-};
-
-enum class ENV_SHADOW_ALPHA_SOURCE : _uint
+enum class SHADOW_ALPHA_SOURCE : _uint
 {
 	NONE = 0u,
 	DIFFUSE = 1u,
@@ -216,70 +145,6 @@ enum class ENV_SHADOW_ALPHA_SOURCE : _uint
 	UNKNOWN_R = 5u,
 };
 
-inline ENV_SHADOW_ALPHA_SOURCE Resolve_EnvShadowAlphaSource(ENV_PASS ePass)
-{
-	switch (ePass)
-	{
-	case ENV_PASS::DEFAULT:
-	case ENV_PASS::DIFF:
-	case ENV_PASS::DMN:
-	case ENV_PASS::GRASS_FUR:
-		return ENV_SHADOW_ALPHA_SOURCE::DIFFUSE;
-
-	case ENV_PASS::DMNU:
-		return ENV_SHADOW_ALPHA_SOURCE::UNKNOWN_R;
-
-	case ENV_PASS::UKWN:
-	case ENV_PASS::UMN:
-		return ENV_SHADOW_ALPHA_SOURCE::UNKNOWN;
-
-	case ENV_PASS::TREESHADOW:
-		return ENV_SHADOW_ALPHA_SOURCE::DIFFUSE_R;
-
-	case ENV_PASS::DISCARD:
-		return ENV_SHADOW_ALPHA_SOURCE::DISCARD_ALL;
-
-	case ENV_PASS::WHITE:
-	case ENV_PASS::COLOR:
-	case ENV_PASS::SHADOW:
-	default:
-		return ENV_SHADOW_ALPHA_SOURCE::NONE;
-	}
-}
-
-inline const ENV_SHADER_PASS_META* Find_EnvShaderPassMeta(_int iPass)
-{
-	for (const auto& Meta : g_EnvShaderPassMetas)
-	{
-		if (ETOI(Meta.ePass) == iPass)
-			return &Meta;
-	}
-
-	return &g_EnvShaderPassMetas[0];
-}
-
-inline _int Get_EnvShaderPassComboIndex(_int iPass)
-{
-	for (_uint i = 0; i < _countof(g_EnvShaderPassMetas); ++i)
-	{
-		if (ETOI(g_EnvShaderPassMetas[i].ePass) == iPass)
-			return static_cast<_int>(i);
-	}
-
-	return 0;
-}
-
-inline _int Get_EnvShaderPassFromComboIndex(_int iIndex)
-{
-	if (iIndex < 0 || iIndex >= static_cast<_int>(_countof(g_EnvShaderPassMetas)))
-		return ETOI(ENV_PASS::DEFAULT);
-
-	return ETOI(g_EnvShaderPassMetas[iIndex].ePass);
-}
-#pragma endregion
-
-
-#pragma region World Pass
 enum class WORLD_PASS : _int
 {
 	DEFAULT = -1,
@@ -296,52 +161,40 @@ enum class WORLD_PASS : _int
 	GRASS_FUR,
 	COLOR,
 	DISCARD,
-	COLOR_MRA_DITHER,
 	DECAL,
 	COLOR_CONST_MRA,
+	ARROWBOARD_OPAQUE,
+	DMN_OPAQUE,
+	UKWN_BLACK_OVERLAY,
 
 	COUNT
 };
 
-static_assert(ETOI(ENV_PASS::SHADOW) == ETOI(WORLD_PASS::SHADOW));
-static_assert(ETOI(ENV_PASS::WHITE) == ETOI(WORLD_PASS::WHITE));
-static_assert(ETOI(ENV_PASS::DIFF) == ETOI(WORLD_PASS::DIFF));
-static_assert(ETOI(ENV_PASS::DMN) == ETOI(WORLD_PASS::DMN));
-static_assert(ETOI(ENV_PASS::UKWN) == ETOI(WORLD_PASS::UKWN));
-static_assert(ETOI(ENV_PASS::UMN) == ETOI(WORLD_PASS::UMN));
-static_assert(ETOI(ENV_PASS::DMNU) == ETOI(WORLD_PASS::DMNU));
-static_assert(ETOI(ENV_PASS::TREESHADOW) == ETOI(WORLD_PASS::TREESHADOW));
-static_assert(ETOI(ENV_PASS::GRASS_FUR) == ETOI(WORLD_PASS::GRASS_FUR));
-static_assert(ETOI(ENV_PASS::COLOR) == ETOI(WORLD_PASS::COLOR));
-static_assert(ETOI(ENV_PASS::DISCARD) == ETOI(WORLD_PASS::DISCARD));
-static_assert(ETOI(ENV_PASS::COLORMRADITHER) == ETOI(WORLD_PASS::COLOR_MRA_DITHER));
-static_assert(ETOI(ENV_PASS::DECAL) == ETOI(WORLD_PASS::DECAL));
-
 struct WORLD_SHADER_PASS_META
 {
-	WORLD_PASS      ePass;
-	const _char* szName;
-	_uint           iRequiredTextureMask;
+	WORLD_PASS		ePass;
+	const _char*	szName;
+	_uint			iRequiredTextureMask;
 };
 
 inline constexpr WORLD_SHADER_PASS_META g_WorldShaderPassMetas[] =
 {
-	{ WORLD_PASS::DEFAULT,          "Default",          DIFF | MRA | NORM },
-	{ WORLD_PASS::SHADOW,           "SHADOW",           0 },
-	{ WORLD_PASS::WHITE,            "WHITE",            0 },
-	{ WORLD_PASS::DIFF,             "DIFF",             DIFF },
-	{ WORLD_PASS::DMN,              "DMN",              DIFF | MRA | NORM },
-	{ WORLD_PASS::UKWN,             "UKWN",             UKWN },
-	{ WORLD_PASS::UMN,              "UMN",              UKWN | MRA | NORM },
+	{ WORLD_PASS::DEFAULT,				"Default",				DIFF | MRA | NORM },
+	{ WORLD_PASS::WHITE,				"WHITE",				0 },
+	{ WORLD_PASS::DIFF,					"DIFF",					DIFF },
+	{ WORLD_PASS::DMN,					"DMN",					DIFF | MRA | NORM },
+	{ WORLD_PASS::UKWN,					"UKWN",					UKWN },
+	{ WORLD_PASS::UMN,					"UMN",					UKWN | MRA | NORM },
 
-	{ WORLD_PASS::DMNU,             "DMNU",             DIFF | MRA | NORM | UKWN },
-	{ WORLD_PASS::TREESHADOW,       "TREESHADOW",       UKWN },
-	{ WORLD_PASS::GRASS_FUR,        "GRASS_FUR",        UKWN | MRA | NORM },
-	{ WORLD_PASS::COLOR,            "COLOR",            MRA | NORM },
-	{ WORLD_PASS::DISCARD,          "DISCARD",          0 },
-	{ WORLD_PASS::COLOR_MRA_DITHER, "COLOR_MRA_DITHER", 0 },
-	{ WORLD_PASS::DECAL,            "DECAL",            0 },
-	{ WORLD_PASS::COLOR_CONST_MRA,  "COLOR_CONST_MRA",  NORM },
+	{ WORLD_PASS::DMNU,					"DMNU",					DIFF | MRA | NORM | UKWN },
+	{ WORLD_PASS::TREESHADOW,			"TREESHADOW",			UKWN },
+	{ WORLD_PASS::GRASS_FUR,			"GRASS_FUR",			DIFF | MRA | NORM },
+	{ WORLD_PASS::COLOR,				"COLOR",				MRA | NORM },
+	{ WORLD_PASS::DISCARD,				"DISCARD",				0 },
+	{ WORLD_PASS::COLOR_CONST_MRA,		"COLOR_CONST_MRA",		NORM },
+	{ WORLD_PASS::ARROWBOARD_OPAQUE,	"ARROWBOARD_OPAQUE",	DIFF | MRA | NORM },
+	{ WORLD_PASS::DMN_OPAQUE,			"DMN_OPAQUE",			DIFF | MRA | NORM },
+	{ WORLD_PASS::UKWN_BLACK_OVERLAY,	"UKWN_BLACK_OVERLAY",	UKWN },
 };
 
 inline _bool Is_ValidWorldPassValue(_int iPass)
@@ -359,6 +212,76 @@ inline const WORLD_SHADER_PASS_META* Find_WorldShaderPassMeta(_int iPass)
 
 	return &g_WorldShaderPassMetas[0];
 }
+
+inline SHADOW_ALPHA_SOURCE Resolve_WorldShadowAlphaSource(WORLD_PASS ePass)
+{
+	switch (ePass)
+	{
+	case WORLD_PASS::DEFAULT:
+	case WORLD_PASS::DIFF:
+	case WORLD_PASS::DMN:
+	case WORLD_PASS::GRASS_FUR:
+		return SHADOW_ALPHA_SOURCE::DIFFUSE;
+
+	case WORLD_PASS::DMNU:
+	case WORLD_PASS::UKWN_BLACK_OVERLAY:
+		return SHADOW_ALPHA_SOURCE::UNKNOWN_R;
+
+	case WORLD_PASS::UKWN:
+	case WORLD_PASS::UMN:
+		return SHADOW_ALPHA_SOURCE::UNKNOWN;
+
+	case WORLD_PASS::TREESHADOW:
+		return SHADOW_ALPHA_SOURCE::DIFFUSE_R;
+
+	case WORLD_PASS::DMN_OPAQUE:
+		return SHADOW_ALPHA_SOURCE::NONE;
+
+	case WORLD_PASS::DISCARD:
+		return SHADOW_ALPHA_SOURCE::DISCARD_ALL;
+
+	default:
+		return SHADOW_ALPHA_SOURCE::NONE;
+	}
+}
+
+inline _int Get_WorldShaderPassComboIndex(_int iPass)
+{
+	for (_uint i = 0; i < _countof(g_WorldShaderPassMetas); ++i)
+	{
+		if (ETOI(g_WorldShaderPassMetas[i].ePass) == iPass)
+			return static_cast<_int>(i);
+	}
+
+	return 0;
+}
+
+inline _int Get_WorldShaderPassFromComboIndex(_int iIndex)
+{
+	if (iIndex < 0 || iIndex >= static_cast<_int>(_countof(g_WorldShaderPassMetas)))
+		return ETOI(WORLD_PASS::DEFAULT);
+
+	return ETOI(g_WorldShaderPassMetas[iIndex].ePass);
+}
 #pragma endregion
 
+
+
+#pragma region Anim Mesh Pass
+enum class ANIM_MESH_PASS : _uint
+{
+	DEFAULT = 0,
+	NON_EYE,
+	TEST,
+	CONSTANT_MATERIAL,
+	RESERVED_BUSH,
+	RESERVED_BOX,
+	EYE_WITHOUT_NORMAL,
+	SHADOW,
+	RESERVED_ARROWBOARD_OPAQUE,
+	CAGE,
+
+	COUNT
+};
+#pragma endregion
 NS_END

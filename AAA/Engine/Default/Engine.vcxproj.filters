@@ -636,9 +636,6 @@
     <ClInclude Include="..\Public\Anim_Layer.h">
       <Filter>99. Defines\Hojun</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\MeshLayer_Utils.h">
-      <Filter>07. Component\Model\MaterialEx</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Profiler_Manager.h">
       <Filter>94. Profiler</Filter>
     </ClInclude>
@@ -662,6 +659,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\ShaderCache_Utils.h">
       <Filter>96. Utils\ShaderCache</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MeshLayer_Utils.h">
+      <Filter>96. Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

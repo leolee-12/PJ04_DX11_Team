@@ -11,10 +11,6 @@ enum class MESH_LAYER_PROFILE : _uint
 	WORLD_NONANIM,
 	WORLD_ANIM,
 	WORLD_INSTANCE,
-
-	NONANIM_PBR,
-	ENV_INSTANCE,
-	ANIM_PBR_LIMITIED
 };
 
 enum class MESH_LAYER_RENDER_KIND : _uint
@@ -27,11 +23,9 @@ enum class MESH_LAYER_RENDER_KIND : _uint
 namespace MeshLayerProfile
 {
 	_uint Resolve_MapPass(const MESH_LAYER_IDX& Layer, _uint iFallbackPass);
-	_uint Resolve_NonAnimPBRPass(const MESH_LAYER_IDX& Layer, _uint iFallbackPass);
-	_uint Resolve_EnvInstancePass(const MESH_LAYER_IDX& Layer, _uint iFallbackPass);
 	_uint Resolve_WorldPass(const MESH_LAYER_IDX& Layer, _uint iFallbackPass);
 
-	ENV_SHADOW_ALPHA_SOURCE Resolve_EnvShadowAlphaSourceFromLayer(const MESH_LAYER_IDX& Layer);
+	SHADOW_ALPHA_SOURCE Resolve_WorldShadowAlphaSourceFromLayer(const MESH_LAYER_IDX& Layer);
 }
 
 NS_END

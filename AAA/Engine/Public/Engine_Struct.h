@@ -120,6 +120,8 @@ namespace Engine
 		float			fMaskStrength = 1.f;
 
 		XMFLOAT4		vRenderColor = { 1.f, 1.f, 1.f, 1.f };
+		XMFLOAT4		vEmissiveColor = { 0.f, 0.f, 0.f, 0.f };
+		XMFLOAT3		vMRA = { 0.f, 1.f, 1.f };
 
 		int				iExtraBind[4] = { -1, -1, -1, -1 };
 		unsigned int    iExtraTexType[4] = {

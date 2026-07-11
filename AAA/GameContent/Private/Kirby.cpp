@@ -359,30 +359,30 @@ void CKirby::Apply_ChangeKirbyAbility()
     Set_KirbyAbility(m_eNextAbilityType);
 }
 
-void CKirby::Update_AbilityDumpCool(_float fTimeDelta)
+void CKirby::Update_DumpCool(_float fTimeDelta)
 {
-    if (m_bDecreaseAbilityDumpCool == true)
+    if (m_bDecreaseDumpCool == true)
     {
-        m_fAccAbilityDumpCoolTime -= fTimeDelta;
+        m_fAccDumpCoolTime -= fTimeDelta;
 
-        m_bDecreaseAbilityDumpCool = false;
+        m_bDecreaseDumpCool = false;
     }
     else
     {
-        m_fAccAbilityDumpCoolTime += fTimeDelta;
+        m_fAccDumpCoolTime += fTimeDelta;
     }
 
-    Helper::FloatClamp(m_fAccAbilityDumpCoolTime, 0.f, m_fMaxAbilityDumpCoolTime);
+    Helper::FloatClamp(m_fAccDumpCoolTime, 0.f, m_fMaxDumpCoolTime);
 }
 
-void CKirby::Reset_AbilityDumpCool()
+void CKirby::Reset_DumpCool()
 {
-    m_fAccAbilityDumpCoolTime = m_fMaxAbilityDumpCoolTime;
+    m_fAccDumpCoolTime = m_fMaxDumpCoolTime;
 }
 
-_bool CKirby::Can_AbilityDump()
+_bool CKirby::Can_Dump()
 {
-    if (m_fAccAbilityDumpCoolTime <= 0.f)
+    if (m_fAccDumpCoolTime <= 0.f)
         return true;
 
     return false;
@@ -445,6 +445,22 @@ HRESULT CKirby::Ready_Components()
     m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX]->Set_Enabled(false);
     m_pGameInstance_Proxy->Register_Collider(m_KirbyColliders[KIRBY_COLLIDER::INHALE_BOX], ETOUI(COLLISION_LAYER::PLAYER_INHALE));
 
+
+    // Collider Slide
+    CCollider::COLLIDER_DESC SlideDesc{};
+    SlideDesc.pOwner = this;
+    SlideDesc.vCenter = _float3(0.f, 0.f, 0.8f);
+    SlideDesc.fRadius = 1.f;
+
+    m_KirbyColliders[KIRBY_COLLIDER::SLIDE_COLLIDER] = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
+        TEXT("SlideCollider_Com"), &SlideDesc);
+    if (m_KirbyColliders[KIRBY_COLLIDER::SLIDE_COLLIDER] == nullptr)
+        return E_FAIL;
+
+    m_KirbyColliders[KIRBY_COLLIDER::SLIDE_COLLIDER]->Set_Enabled(false);
+    m_pGameInstance_Proxy->Register_Collider(m_KirbyColliders[KIRBY_COLLIDER::SLIDE_COLLIDER], ETOUI(COLLISION_LAYER::PLAYER_HIT));
+
+
     //юс╫ц
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::MONSTER_PROJECTILE));
@@ -476,94 +492,6 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::CAR_BOOST), ETOUI(COLLISION_LAYER::ENV_TRIGGER));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::CAR_BOOST), ETOUI(COLLISION_LAYER::ENV_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::CAR_BOOST), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
-
-    return S_OK;
-}
-
-HRESULT CKirby::SetUp_Collider_Callback()
-{
-    if (m_KirbyColliders[HURT_BOX] == nullptr)
-        return E_FAIL;
-
-    m_KirbyColliders[HURT_BOX]->Set_OnEnter(
-        [this](CCollider* pOther)
-        {
-            const _uint iGroup = pOther->Get_RegisteredGroup();
-            CGameObject* pGameObject = pOther->Get_Owner();
-
-            if (iGroup == ETOUI(COLLISION_LAYER::MONSTER_HURT))
-            {
-                CMonster* pMonster = dynamic_cast<CMonster*>(pGameObject);
-                if (pMonster == nullptr)
-                    return;
-
-                if (!pMonster->Is_Touch_Harmful())
-                    return;
-
-                ATTACK_INFO tAttackDesc{};
-                tAttackDesc.eHitType = HIT_TYPE::BODY_CONTACT;
-                tAttackDesc.pAttacker = pMonster;
-                XMStoreFloat3(&tAttackDesc.vAttackerPos,
-                    pMonster->Get_Transform()->Get_State(STATE::POSITION));
-                tAttackDesc.fDamage = 10.f;
-                tAttackDesc.fKnockback = 2.f;
-                Damaged(tAttackDesc);
-#ifdef _DEBUG
-                char szBuf[128];
-                sprintf_s(szBuf, "[Kirby] Hurt! HP %.0f/%.0f\n", m_fCurHP, m_fMaxHP);
-                OutputDebugStringA(szBuf);
-#endif
-            }
-            else if (iGroup == ETOUI(COLLISION_LAYER::ESSENCE_BUBBLE))
-            {
-                CEssenceBubble *pEssenceBubble = dynamic_cast<CEssenceBubble*>(pGameObject);
-                if (pEssenceBubble == nullptr)
-                    return;
-
-                if (pEssenceBubble->Is_Available())
-                    m_pKirby_StateMachine->Get_EssenceBubble(pEssenceBubble->Get_Ability());
-            }
-            else if (iGroup == ETOUI(COLLISION_LAYER::DEFORM_OBJECT))
-            {
-                Set_TriggerDeformObj(static_cast<CLD_DeformObject*>(pGameObject));
-            }           
-        }
-    );
-
-    m_KirbyColliders[HURT_BOX]->Set_OnStay
-    (
-        [this](CCollider* pOther)
-        {
-            const _uint iGroup = pOther->Get_RegisteredGroup();
-
-            if (iGroup == ETOUI(COLLISION_LAYER::ENV_LADDER))
-            {
-                CLevelDesign_Ladder* pLadder = dynamic_cast<CLevelDesign_Ladder*>(pOther->Get_Owner());
-                if (pLadder == nullptr)
-                    return;
-
-                Set_Ladder(pLadder);
-            }
-        }
-    );
-
-    m_KirbyColliders[HURT_BOX]->Set_OnExit
-    (
-        [this](CCollider* pOther)
-        {
-            const _uint iGroup = pOther->Get_RegisteredGroup();
-
-            if (iGroup == ETOUI(COLLISION_LAYER::ENV_LADDER))
-            {
-                Clear_Ladder();
-                return;
-            }
-            else if (iGroup == ETOUI(COLLISION_LAYER::DEFORM_OBJECT))
-            {
-                Set_TriggerDeformObj(nullptr);
-            }
-        }
-    );
 
     return S_OK;
 }
@@ -699,9 +627,9 @@ HRESULT CKirby::Ready_Events()
     Subscribe_Event(EventTag::Kirby_AttachmentBegin,
         [this](void* pData)
         {
-            KIRBY_ATTACHMENT_BEGIN_DESC* pDesc = static_cast<KIRBY_ATTACHMENT_BEGIN_DESC*>(pData);
-            Set_CutsceneGrabTarget(pDesc);
-            m_pKirby_StateMachine->Request_Attachment_StateMachine(pDesc->eType);
+            const auto* pDesc = static_cast<KIRBY_ATTACHMENT_BEGIN_DESC*>(pData);
+            Set_CutsceneAttachTarget(pDesc);
+            m_pKirby_StateMachine->Request_Attachment_StateMachine(pDesc);
         }
     );
 
@@ -709,8 +637,8 @@ HRESULT CKirby::Ready_Events()
         [this](void* pData)
         {
             const auto* pDesc = static_cast<KIRBY_ATTACHMENT_END_DESC*>(pData);
-            Clear_CutsceneGrabTarget();
-            m_pKirby_StateMachine->Request_Attachment_End_StateMachine(pDesc->eType);
+            Clear_CutsceneAttachTarget();
+            m_pKirby_StateMachine->Request_Attachment_End_StateMachine(pDesc);
         }
     );
 
@@ -757,6 +685,119 @@ HRESULT CKirby::Ready_AnimEvents()
     return S_OK;
 }
 
+HRESULT CKirby::SetUp_Collider_Callback()
+{
+    m_KirbyColliders[HURT_BOX]->Set_OnEnter(
+        [this](CCollider* pOther)
+        {
+            const _uint iGroup = pOther->Get_RegisteredGroup();
+            CGameObject* pGameObject = pOther->Get_Owner();
+
+            if (iGroup == ETOUI(COLLISION_LAYER::MONSTER_HURT))
+            {
+                CMonster* pMonster = dynamic_cast<CMonster*>(pGameObject);
+                if (pMonster == nullptr)
+                    return;
+
+                if (!pMonster->Is_Touch_Harmful())
+                    return;
+
+                ATTACK_INFO tAttackDesc{};
+                tAttackDesc.eHitType = HIT_TYPE::BODY_CONTACT;
+                tAttackDesc.pAttacker = pMonster;
+                XMStoreFloat3(&tAttackDesc.vAttackerPos,
+                    pMonster->Get_Transform()->Get_State(STATE::POSITION));
+                tAttackDesc.fDamage = 10.f;
+                tAttackDesc.fKnockback = 2.f;
+                Damaged(tAttackDesc);
+#ifdef _DEBUG
+                char szBuf[128];
+                sprintf_s(szBuf, "[Kirby] Hurt! HP %.0f/%.0f\n", m_fCurHP, m_fMaxHP);
+                OutputDebugStringA(szBuf);
+#endif
+            }
+            else if (iGroup == ETOUI(COLLISION_LAYER::ESSENCE_BUBBLE))
+            {
+                CEssenceBubble* pEssenceBubble = dynamic_cast<CEssenceBubble*>(pGameObject);
+                if (pEssenceBubble == nullptr)
+                    return;
+
+                if (pEssenceBubble->Is_Available())
+                    m_pKirby_StateMachine->Get_EssenceBubble(pEssenceBubble->Get_Ability());
+            }
+            else if (iGroup == ETOUI(COLLISION_LAYER::DEFORM_OBJECT))
+            {
+                Set_TriggerDeformObj(static_cast<CLD_DeformObject*>(pGameObject));
+            }
+        }
+    );
+
+    m_KirbyColliders[HURT_BOX]->Set_OnStay
+    (
+        [this](CCollider* pOther)
+        {
+            const _uint iGroup = pOther->Get_RegisteredGroup();
+
+            if (iGroup == ETOUI(COLLISION_LAYER::ENV_LADDER))
+            {
+                CLevelDesign_Ladder* pLadder = dynamic_cast<CLevelDesign_Ladder*>(pOther->Get_Owner());
+                if (pLadder == nullptr)
+                    return;
+
+                Set_Ladder(pLadder);
+            }
+        }
+    );
+
+    m_KirbyColliders[HURT_BOX]->Set_OnExit
+    (
+        [this](CCollider* pOther)
+        {
+            const _uint iGroup = pOther->Get_RegisteredGroup();
+
+            if (iGroup == ETOUI(COLLISION_LAYER::ENV_LADDER))
+            {
+                Clear_Ladder();
+                return;
+            }
+            else if (iGroup == ETOUI(COLLISION_LAYER::DEFORM_OBJECT))
+            {
+                Set_TriggerDeformObj(nullptr);
+            }
+        }
+    );
+
+    Route_CollisionToState(KIRBY_COLLIDER::SLIDE_COLLIDER);
+
+    return S_OK;
+}
+
+void CKirby::Route_CollisionToState(KIRBY_COLLIDER eCollider)
+{
+    CCollider* pCollider = m_KirbyColliders[eCollider];
+
+    pCollider->Set_OnEnter(
+        [this, eCollider](CCollider* pOther)
+        {
+            m_pKirby_StateMachine->On_KirbyCollisionEnter_StateMachine(ETOUI(eCollider), pOther);
+        }
+    );
+
+    pCollider->Set_OnStay(
+        [this, eCollider](CCollider* pOther)
+        {
+            m_pKirby_StateMachine->On_KirbyCollisionStay_StateMachine(ETOUI(eCollider), pOther);
+        }
+    );
+
+    pCollider->Set_OnExit(
+        [this, eCollider](CCollider* pOther)
+        {
+            m_pKirby_StateMachine->On_KirbyCollisionExit_StateMachine(ETOUI(eCollider), pOther);
+        }
+    );
+}
+
 _bool CKirby::Block_Hit(const ATTACK_INFO& tInfo) 
 { 
     return Is_Invincible();
@@ -767,21 +808,21 @@ void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
     m_pKirby_StateMachine->On_Damaged_KirbyStateMachine(tInfo);
 }
 
-void CKirby::Set_CutsceneGrabTarget(KIRBY_ATTACHMENT_BEGIN_DESC* pGrabDesc)
+void CKirby::Set_CutsceneAttachTarget(const KIRBY_ATTACHMENT_BEGIN_DESC* pAttachDesc)
 {
     m_vPreAttachScale = Get_Transform()->Get_Scaled();
-    m_pGrabBone = pGrabDesc->pBoneMatrix;
-    m_pGrabOwnerWorld = pGrabDesc->pSourceWorld;
+    m_pAttachBone = pAttachDesc->pBoneMatrix;
+    m_pAttachOwnerWorld = pAttachDesc->pSourceWorld;
 }
 
-void CKirby::Clear_CutsceneGrabTarget()
+void CKirby::Clear_CutsceneAttachTarget()
 {
     m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(m_vPreAttachScale.x, 0.f, 0.f, 0.f));
     m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, m_vPreAttachScale.y, 0.f, 0.f));
     m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, m_vPreAttachScale.z, 0.f));
 
-    m_pGrabBone = nullptr;
-    m_pGrabOwnerWorld = nullptr;
+    m_pAttachBone = nullptr;
+    m_pAttachOwnerWorld = nullptr;
 }
 
 void CKirby::Update_BlobShadow()
@@ -867,13 +908,13 @@ CCollider* CKirby::Get_Collider(KIRBY_COLLIDER eKirbyCollider)
     return m_KirbyColliders[eKirbyCollider];
 }
 
-void CKirby::Update_CutsceneGrabTransform()
+void CKirby::Update_CutsceneAttachTransform()
 {
-    if (m_pGrabBone == nullptr || m_pGrabOwnerWorld == nullptr)
+    if (m_pAttachBone == nullptr || m_pAttachOwnerWorld == nullptr)
         return;
 
     _matrix matGrabTargetWorld = XMMatrixRotationY(XMConvertToRadians(-180.f))
-        * XMLoadFloat4x4(m_pGrabBone) * XMLoadFloat4x4(m_pGrabOwnerWorld);
+        * XMLoadFloat4x4(m_pAttachBone) * XMLoadFloat4x4(m_pAttachOwnerWorld);
     Get_Transform()->Set_WorldMatrix(matGrabTargetWorld);
 
     m_pMovement->Sync_To_Controller();

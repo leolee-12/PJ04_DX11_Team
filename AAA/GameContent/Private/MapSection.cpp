@@ -133,11 +133,6 @@ void CMapSection::Refresh_CombinedWorldMatrix()
 	Refresh_ColliderPose();
 }
 
-void CMapSection::Notify_EditTransformChanged()
-{
-	Refresh_CombinedWorldMatrix();
-}
-
 #pragma region Editable
 _bool CMapSection::Get_EditDesc(EDITABLE_DESC* pOutDesc) const
 {
@@ -175,6 +170,12 @@ HRESULT CMapSection::Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy)
 	m_bRenderable = Policy.bRenderable;
 	m_bEnableCulling = Policy.bUseCullFrustum;
 	Set_UseCollMesh(m_bHasCollMesh ? Policy.bUseCollMesh : false);
+	return S_OK;
+}
+
+HRESULT CMapSection::On_EditTransformChanged()
+{
+	Refresh_CombinedWorldMatrix();
 	return S_OK;
 }
 

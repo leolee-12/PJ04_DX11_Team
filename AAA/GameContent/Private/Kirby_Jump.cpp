@@ -9,6 +9,8 @@
 
 #include "Kirby_Deform.h"
 
+#include "Kirby_Fall.h"
+
 CKirby_Jump::CKirby_Jump()
 {
 }
@@ -44,25 +46,24 @@ void CKirby_Jump::Enter(CKirby* pKirby, _int iFlag)
     {
         pKirby->Get_KirbyDeform()->Play_DeformAni(pKirby, DEFORM_ANI::JUMP_START);
 
-        //Jump State
         m_eJumpType = JUMP_STATE::JUMP_START;
     }
     else
     {
         CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
-        if (m_bLeft == true)
-            pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::JUMP_L);
+        ABILITY_ANI eJumpAni{};
+        if (iFlag == JUMP_STATE_FLAG::JUMP_FROM_SLIDE)
+            eJumpAni = m_bLeft ? ABILITY_ANI::SLIDE_JUMP_L : ABILITY_ANI::SLIDE_JUMP_R;
         else
-            pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::JUMP_R);
+            eJumpAni = m_bLeft ? ABILITY_ANI::JUMP_L : ABILITY_ANI::JUMP_R;
 
-        //Jump State
+        pAbility->Play_AbilityAni(pKirby, eJumpAni);
+
         m_eJumpType = JUMP_STATE::JUMP;
     }
 
     // Ground Ignore
     m_fAccGroundIgnoreTime = m_fMaxGroundIgnoreTime;
-
-
 }
 
 void CKirby_Jump::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -81,22 +82,25 @@ void CKirby_Jump::Update(CKirby* pKirby, const _float fTimeDelta)
 
     if (m_fAccGroundIgnoreTime <= 0.f && bIsGround == true)
     {
-        pKirby->Change_State(KIRBY_STATE_TYPE::FALL);
+        //pKirby->Change_State(KIRBY_STATE_TYPE::FALL, FALL_STATE_FLAG::FALL_DIRECT);
+        Transition_Wait_OR_Run(pKirby);
         return;
     }
 
     if (bIsGround == true)
     {
-        pKirby->Change_State(KIRBY_STATE_TYPE::FALL);
+        //pKirby->Change_State(KIRBY_STATE_TYPE::FALL, FALL_STATE_FLAG::FALL_DIRECT);
+        Transition_Wait_OR_Run(pKirby);
         return;
     }
    
     switch (m_eJumpType)
     {
         case JUMP_STATE::JUMP_START:
+        {
             // Ani
             if (pKirby->Has_Deform())
-            {                
+            {
                 CKirby_Deform* pKirbyDeform = pKirby->Get_KirbyDeform();
                 CKirby_Deform_Model* pDeformModel = pKirby->Get_DeformPart_Model(pKirbyDeform->Get_DeformType());
                 if (pDeformModel->Get_Animator()->Is_Finished())
@@ -107,10 +111,10 @@ void CKirby_Jump::Update(CKirby* pKirby, const _float fTimeDelta)
             }
             else
             {
-                // 아직 없음
+                MSG_BOX("Bug 1: CKirby_Jump");
             }
             break;
-
+        }
         case JUMP_STATE::JUMP:
         {
             if (pMovement->Get_VerticalVelocity() > 0.f)
@@ -118,34 +122,30 @@ void CKirby_Jump::Update(CKirby* pKirby, const _float fTimeDelta)
 
             if (pKirby->Has_Deform())
             {
-                pKirby->Change_State(KIRBY_STATE_TYPE::FALL);
+                pKirby->Change_State(KIRBY_STATE_TYPE::FALL, FALL_STATE_FLAG::FALL_DIRECT);
             }
-            else {
-                _bool bCanPlayJumpEnd = pKirby->Get_Body()->Get_KirbyBody() != KIRBY_BODY_STATE::STUFFED;
+            else
+            {
+                CKirby_Body* pKribyBody = pKirby->Get_Body();
+                _bool bCanPlayJumpEnd = pKribyBody->Get_KirbyBody() != KIRBY_BODY_STATE::STUFFED;
                 _bool bPlayJumpEnd = bCanPlayJumpEnd && (rand() % 2 == 0);
 
-                if (bPlayJumpEnd == false)
+                CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
+                _bool bCanPlayJumpEndFromSlide = pAbility->Can_PlayJumpEndFromSlide();
+
+                if (bPlayJumpEnd && bCanPlayJumpEndFromSlide)
                 {
-                    pKirby->Change_State(KIRBY_STATE_TYPE::FALL);
+                    if(m_bLeft)
+                        pKirby->Change_State(KIRBY_STATE_TYPE::FALL, FALL_STATE_FLAG::PLAY_JUMP_END_L);
+                    else
+                        pKirby->Change_State(KIRBY_STATE_TYPE::FALL, FALL_STATE_FLAG::PLAY_JUMP_END_R);
+                }
+                else
+                {
+                    pKirby->Change_State(KIRBY_STATE_TYPE::FALL, FALL_STATE_FLAG::FALL_DIRECT);
                     return;
                 }
-
-                CKirby_Ability* pAbility = pKirby->Get_KirbyAbility();
-                if (m_bLeft)
-                    pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::JUMP_END_L);
-                else
-                    pAbility->Play_AbilityAni(pKirby, ABILITY_ANI::JUMP_END_R);
-
-                m_eJumpType = JUMP_STATE::JUMP_END;
             }
-            break;
-        }
-        case JUMP_STATE::JUMP_END:
-        {
-            CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
-
-            if (pAnimator->Is_Finished())
-                pKirby->Change_State(KIRBY_STATE_TYPE::FALL);
             break;
         }
     }
