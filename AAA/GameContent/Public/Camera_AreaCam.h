@@ -40,6 +40,8 @@ public:
             m_fFovCurDeg = XMConvertToDegrees(fFovyRad);  
     }
 
+    void Rearrange(const wstring& strDataPath);
+
 private:
     virtual HRESULT Ready_Events() override;
     _float Resolve_TimeDelta(_float fTimeDelta);

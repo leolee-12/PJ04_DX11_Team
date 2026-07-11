@@ -17,6 +17,7 @@
 #include "GameContent_AnimEvents.h"
 #include "Effect_Container.h"
 #include "Effect_Part.h"
+#include "EffectPart_Enum.h"
 #include "Map_Loader.h"
 #include "MapStage.h"
 #include "MapObject.h"
@@ -909,8 +910,31 @@ void CImGui_Manager::Draw_Property(IReflectable* pHolder, const FPROPERTY& prop)
     switch (prop.eType)
     {
         case PROP_TYPE::INT:
-            ImGui::InputInt(strLabel.c_str(), (int*)pData);
+        {
+            int* pValue = (int*)pData;
+            if (const Engine::EFFECTPART_ENUM_ITEMS* pEnumItems = Engine::Find_EffectPartPropertyEnum(prop))
+            {
+                const wstring* pEnumName = Engine::Find_EffectPartEnumName(*pEnumItems, *pValue);
+                string strPreview = pEnumName ? WstrToStr(*pEnumName) : to_string(*pValue);
+
+                if (ImGui::BeginCombo(strLabel.c_str(), strPreview.c_str()))
+                {
+                    for (const auto& Item : *pEnumItems)
+                    {
+                        const bool bSelected = Item.first == *pValue;
+                        string strItemLabel = WstrToStr(Item.second) + "##" + to_string(Item.first);
+                        if (ImGui::Selectable(strItemLabel.c_str(), bSelected))
+                            *pValue = Item.first;
+                        if (bSelected)
+                            ImGui::SetItemDefaultFocus();
+                    }
+                    ImGui::EndCombo();
+                }
+            }
+            else
+                ImGui::InputInt(strLabel.c_str(), pValue);
             break;
+        }
         case PROP_TYPE::UINT:
         {
             int v = (int)(*(_uint*)pData);

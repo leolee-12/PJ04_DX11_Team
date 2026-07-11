@@ -4,6 +4,7 @@
 
 NS_BEGIN(Engine)
 class CCollider;
+class CEffect_Container;
 NS_END
 
 NS_BEGIN(Client)
@@ -16,6 +17,7 @@ class CAbility_Bubble abstract : public CContainerObject
 
 public:
     static constexpr const _tchar* PART_MODEL_TAG = L"Part_AbilityModel";
+    static constexpr const _tchar* AURA_EFFECT_ID = L"BubbleAura";
 
 public:
     struct ABILITY_BUBBLE_DESC : public CContainerObject::COTAINEROBJECT_DESC
@@ -56,6 +58,7 @@ protected:
 
     COLLISION_LAYER     m_eCollLayer = { COLLISION_LAYER::ESSENCE_BUBBLE };
 
+    CEffect_Container*  m_pAura = { nullptr };
     CBubble_Manager*    m_pPool = { nullptr };
     _uint               m_iPoolLevel = {};
     _wstring            m_strPoolKey;
@@ -65,10 +68,13 @@ protected:
     _float              m_fTimer = { 0.f };
 
 protected:
+    void                Start_Aura();
+    void                Stop_Aura();
     HRESULT             Ready_PartObjects();
     HRESULT				Ready_Collider();
     void                Return_ToPool();
     virtual void        SetUp_Collider_CallBack() = 0;
+
 
     virtual void        Free() override;
 

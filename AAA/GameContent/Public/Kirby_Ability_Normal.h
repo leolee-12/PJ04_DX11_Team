@@ -136,7 +136,7 @@ private:
 	void  Clear_Captured();
 	void  Clear_Candidates();
 
-	void Off_InhaleEffect();
+	void  Off_InhaleEffect();
 
 public:
 	static CKirby_Ability_Normal* Create();

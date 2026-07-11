@@ -41,13 +41,13 @@ private:
 	LD_AUDIO_AREA_DESC m_tAudioAreaDesc = {};
 	MODE m_eMode = { MODE::UNKNOWN };
 
-	CCollider* m_pTrigger = { nullptr };
-
-	_bool m_bInside = { false };
-	_bool m_bAmbientStopping = { false };
-
-	CSound_Handle m_AmbientHandle = {};
-	_float m_fCurrentVolume = { 0.f };
+	CCollider*		m_pTrigger = { nullptr };
+	CGameObject*	m_pPlayer = { nullptr };
+	CSound_Handle	m_AmbientHandle = {};
+	CSound_Handle	m_BgmHandle = {};
+	_bool			m_bBgmStopping = { false };
+	_bool			m_bBgmPaused = { false };
+	_float			m_fCurrentVolume = { 0.f };
 
 private:
 	HRESULT Ready_Trigger();
@@ -64,10 +64,8 @@ private:
 	void Request_BGM();
 	void Release_BGM();
 
-	void Start_Ambient();
-	void Update_Ambient(_float fTimeDelta);
-	void Stop_Ambient();
-	void Update_AmbientFadeOut(_float fTimeDelta);
+	void Update_Proximity();
+	void Update_BgmFadeOut(_float fTimeDelta);
 
 	_wstring Resolve_SoundKey() const;
 	_float Get_FadeInSeconds() const;

@@ -177,6 +177,7 @@ HRESULT CMapStage::Ready_Events()
 			[this](void* pData)
 			{
 				UNREFERENCED_PARAMETER(pData);
+				m_pGameInstance_Proxy->Play_SFX(L"GimmickWallStake_Strike.wav", 1.0f, ESoundBus::SFX);
 				On_Stage12CarBreakWall();
 			});
 	}

@@ -15,6 +15,7 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
     PROPERTY(_int, m_iMirror,           L"Mirror",      L"Effect");
     PROPERTY(_int, m_iDepthIgnore,      L"Depth Ignore", L"Effect");
     PROPERTY(_float, m_fEffectIntensity, L"Effect Intensity_E", L"Effect");
+    PROPERTY(_float4, m_vEmissiveColor, L"Emissive Color", L"Effect");
 
     PROPERTY(_float3, m_vLocalPos,      L"Local Pos",   L"Effect");
 

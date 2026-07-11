@@ -1,15 +1,10 @@
 #include "Boss_Stage1.h"
 
 #include "GameInstance.h"
-#include "Camera_Free.h"
 #include "Loader_Prototype.h"
 #include "Map_Loader.h"
 #include "Launcher_LevelProfiles.h"
-#include "Camera_AreaCam.h"
 #include "Level_Loading.h"
-#include "CameraDirector.h"
-#include "Camera_Cutscene.h"
-#include "Camera_Boss.h"
 #include "GameContrnt_Events.h"
 
 CBoss_Stage1::CBoss_Stage1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -65,13 +60,10 @@ HRESULT CBoss_Stage1::Initialize()
             return E_FAIL;
     }
 
-    if (FAILED(Ready_Camera()))
-        return E_FAIL;
-
     if (FAILED(Ready_Lights()))
         return E_FAIL;
 
-    m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_PreBoss.marker.wav", 3.f, 0.5f);     // 1ÃÊ Fade IN µé¾îº¸¸ç Æ©´×
+    m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_PreBoss.marker.wav", 3.f, 0.4f);     // 1ÃÊ Fade IN µé¾îº¸¸ç Æ©´×
 
     m_pGameInstance_Proxy->Set_ShaderGlobal("g_fFogEnable", _float4(0.f, 0.f, 0.f, 0.f));
 
@@ -110,10 +102,14 @@ HRESULT CBoss_Stage1::Ready_Events()
 
     });
 
-
     Subscribe_Event(EventTag::BGMChange, [this](void* p) {
         m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_Boss1.marker.wav", 3.f, 0.5f);
         });
+
+    Subscribe_Event(EventTag::Cutscene_KirbyDancing, [this](void* p) {
+        m_pGameInstance_Proxy->Play_SFX(L"K15_KirbyDanceLong.marker.dspadpcm.wav", 0.45f, ESoundBus::SFX);
+        });
+    
 
     return S_OK;
 
@@ -132,50 +128,6 @@ HRESULT CBoss_Stage1::Ready_Lights()
     LightDesc.vDirection = _float4(0.557f, -0.766f, 0.321f, 0.f);
 
     if (FAILED(m_pGameInstance_Proxy->Add_Light(LightDesc)))
-        return E_FAIL;
-
-    return S_OK;
-}
-
-HRESULT CBoss_Stage1::Ready_Camera()
-{
-    m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::BOSS_STAGE1),
-        TEXT("Prototype_GameObject_Camera_Follow"),
-        CCamera_AreaCam::Create(m_pDevice, m_pContext));
-
-    CCamera_AreaCam::AREACAM_DESC CamDesc{};
-    CamDesc.vEye = _float3(-1.f, 1.f, -10.f);
-    CamDesc.vAt = _float3(0.f, 0.f, 0.f);
-    CamDesc.fFovy = XMConvertToRadians(50.f); CamDesc.fNear = 0.1f; CamDesc.fFar = 1000.f;
-    CamDesc.strDataPath = TEXT("../../Resources/YSH/CameraData/Level1_Stage5_Step01_cam.json");
-    if (FAILED(m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::BOSS_STAGE1),
-        TEXT("Prototype_GameObject_Camera_Follow"),
-        ETOUI(LEVEL::BOSS_STAGE1), TEXT("Layer_Camera"), TEXT("CameraFollow"), &CamDesc)))
-        return E_FAIL;
-
-    m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::BOSS_STAGE1),
-        CCamera_Cutscene::PROTOTYPE_TAG, CCamera_Cutscene::Create(m_pDevice, m_pContext));
-    CCamera_Cutscene::CUTSCENECAM_DESC CutDesc{};
-    CutDesc.fFovy = XMConvertToRadians(50.f); CutDesc.fNear = 0.1f; CutDesc.fFar = 1000.f;
-    if (FAILED(m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::BOSS_STAGE1),
-        CCamera_Cutscene::PROTOTYPE_TAG,
-        ETOUI(LEVEL::BOSS_STAGE1), TEXT("Layer_Camera"), TEXT("CameraCutscene"), &CutDesc)))
-        return E_FAIL;
-
-    m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::BOSS_STAGE1),
-        CCamera_Boss::PROTOTYPE_TAG, CCamera_Boss::Create(m_pDevice, m_pContext));
-    CCamera_Boss::BOSSCAM_DESC BossDesc{};
-    BossDesc.fFovy = XMConvertToRadians(50.f); BossDesc.fNear = 0.1f; BossDesc.fFar = 1000.f;
-    if (FAILED(m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::BOSS_STAGE1),
-        CCamera_Boss::PROTOTYPE_TAG, ETOUI(LEVEL::BOSS_STAGE1),
-        TEXT("Layer_Camera"), TEXT("CameraBoss"), &BossDesc)))
-        return E_FAIL;
-
-    m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::BOSS_STAGE1),
-        CCameraDirector::PROTOTYPE_TAG, CCameraDirector::Create(m_pDevice, m_pContext));
-    if (FAILED(m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::BOSS_STAGE1),
-        CCameraDirector::PROTOTYPE_TAG,
-        ETOUI(LEVEL::BOSS_STAGE1), TEXT("Layer_Camera"), TEXT("CameraDirector"))))
         return E_FAIL;
 
     return S_OK;

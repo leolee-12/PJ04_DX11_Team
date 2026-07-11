@@ -58,6 +58,7 @@ public:
 	CTransform* Get_Transform() { return m_pTransformCom; }
 	PROJ_TYPE Get_ProjType() const { return m_eProjType; }
 	_uint Get_LevelIndex() const { return m_iLevelIndex; }
+	_uint Get_PrototypeLevelIndex() const { return m_iPrototypeLevel; }
 	const wstring& Get_LayerTag() { return m_strLayerTag; }
 	const wstring& Get_ObjectTag() { return m_strObjectTag; }
 

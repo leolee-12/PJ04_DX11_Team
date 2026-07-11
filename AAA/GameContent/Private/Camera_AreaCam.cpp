@@ -151,6 +151,20 @@ void CCamera_AreaCam::Priority_Update(_float fTimeDelta)
     __super::Priority_Update(fTimeDelta);
 }
 
+void CCamera_AreaCam::Rearrange(const wstring& strDataPath)
+{
+    m_strDataPath = strDataPath;
+    m_solver.Load(m_strDataPath);
+
+    m_bInit = false;
+    m_lastArea = -1;
+    m_blendTimer = 0.f;
+    m_eyeVel = {}; m_atVel = {};
+    m_bTransZoom = false;
+    m_transWeight = 0.f;
+    m_fFovCurDeg = -1.f;
+}
+
 HRESULT CCamera_AreaCam::Ready_Events()
 {
     Subscribe_Event(EventTag::Kirby_Ability_Changed, [this](void* pData)

@@ -144,6 +144,8 @@ struct LD_AUDIO_AREA_DESC
 	_uint iSoundId = 0;
 	_wstring strVariationType;
 	_wstring strShapeType;
+	_float3 vAreaCenter = {};
+	_bool bHasAreaCenter = false;
 	_float3 vAreaSize = {};
 	_uint iFadeInFrame = 0;
 	_uint iInactivateFrame = 0;

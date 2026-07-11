@@ -42,7 +42,8 @@ public:
 	static _bool Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
 
 private:
-	CCollider* m_pTrigger = { nullptr };
+	CCollider*				m_pTrigger = { nullptr };
+
 	physx::PxRigidStatic* m_pHorizontalPhysicsActor = { nullptr };
 	physx::PxRigidStatic* m_pVerticalPhysicsActor = { nullptr };
 

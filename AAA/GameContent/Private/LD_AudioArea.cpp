@@ -1,5 +1,6 @@
 #include "LD_AudioArea.h"
 #include "LevelDesign_Registry.h"
+#include "GameContrnt_Events.h"
 
 #include "GameInstance.h"
 #include "Parsing_Utils.h"
@@ -11,6 +12,7 @@ namespace
 	{
 		BGM_FADE,
 		SFX_LOOP,
+		AMBIENT,
 		NONE
 	};
 
@@ -22,6 +24,7 @@ namespace
 		const _tchar* pSoundKey = L"";
 		AUDIO_AREA_PLAY_TYPE ePlayType = AUDIO_AREA_PLAY_TYPE::NONE;
 		_float fVolume = 1.f;
+		_float fFalloffRange = 10.f;
 	};
 
 	constexpr _float kAudioFrameToSecond = 1.f / 60.f;
@@ -29,9 +32,13 @@ namespace
 
 	const AUDIO_AREA_SOUND_BINDING g_AudioAreaSoundBindings[] =
 	{
-		{ L"AreaBgmRequestor", nullptr, 1u, L"", AUDIO_AREA_PLAY_TYPE::BGM_FADE, 1.f },
-		{ L"AreaSeJungle", L"Jungle", kAnySoundId, L"", AUDIO_AREA_PLAY_TYPE::SFX_LOOP, 1.f },
-		{ L"AreaSeSeaWave", L"SeaWave", kAnySoundId, L"", AUDIO_AREA_PLAY_TYPE::SFX_LOOP, 1.f },
+		{ L"AreaBgmRequestor",		nullptr,				1u,					L"K15_Grassland1.marker.wav",			AUDIO_AREA_PLAY_TYPE::BGM_FADE,		0.5f, 0.f },
+		{ L"AreaSeJungle",			L"Jungle",				kAnySoundId,		L"EnvJungle_Jungle1.wav",				AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.12f, 66.f },
+		{ L"AreaSeSeaWave",			L"SeaWave",				kAnySoundId,		L"EnvWaterWave_SeaWave1.wav",			AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.18f, 50.f },
+		{ L"AreaSeWaterPipe",		L"WaterPipe",			kAnySoundId,		L"GimmickWaterPipe_FallingWater.wav",	AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.35f, 8.f },
+		{ L"AreaSeLavaWaterFall",	L"LavaWaterFall",		kAnySoundId,		L"EnvLavaWaterFall_Lava1.wav",			AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.35f, 20.f },
+		{ L"AreaSeSandWaterFall",	L"SandWaterFall",		kAnySoundId,		L"EnvSandWaterFall_SandFall1.wav",		AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.35f, 10.f },
+		{ L"AreaSeWorldMap",		L"WorldMap",			kAnySoundId,		L"EnvWorldMap_World1Wind.wav",			AUDIO_AREA_PLAY_TYPE::AMBIENT,		0.35f, 10.f },
 	};
 
 	_bool Matches_OptionalText(const _wstring& strValue, const _tchar* pExpected)
@@ -157,18 +164,12 @@ HRESULT CLD_AudioArea::Validate_Initialized()
 	if (m_tLevelDesignDesc.eCategory != LD_CATEGORY::AUDIO_AREA)
 		return E_FAIL;
 
-	const _wstring& strObjectName = m_tLevelDesignDesc.strObjectName;
-	if (!JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaBgmRequestor")
-		&& !JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaSeJungle")
-		&& !JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaSeSeaWave"))
-	{
-		return E_FAIL;
-	}
+	const _wstring& strObjectName =	m_tLevelDesignDesc.strObjectName;
 
-	if (m_eMode == MODE::UNKNOWN)
-		return E_FAIL;
+	const _bool bAudioAreaName = JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaBgmRequestor")
+															|| 0 == _wcsnicmp(strObjectName.c_str(), L"AreaSe", 6);
 
-	if (nullptr == m_pTrigger)
+	if (!bAudioAreaName)
 		return E_FAIL;
 
 	return S_OK;
@@ -178,17 +179,17 @@ void CLD_AudioArea::Late_Update(_float fTimeDelta)
 {
 	Update_Trigger();
 
-	if (m_eMode != MODE::AMBIENT_LOOP)
-		return;
-
-	if (m_bAmbientStopping)
+	if (m_eMode == MODE::BGM_REQUEST)
 	{
-		Update_AmbientFadeOut(fTimeDelta);
+		if (m_bBgmStopping)
+			Update_BgmFadeOut(fTimeDelta);
 		return;
 	}
 
-	if (m_bInside)
-		Update_Ambient(fTimeDelta);
+	if (m_eMode != MODE::AMBIENT_LOOP)
+		return;
+
+	Update_Proximity();
 }
 
 void CLD_AudioArea::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
@@ -231,7 +232,18 @@ void CLD_AudioArea::Update_Trigger()
 	if (!bValidArea)
 		return;
 
-	const _matrix TriggerWorldMatrix = XMMatrixScaling(vAreaSize.x, vAreaSize.y, vAreaSize.z) * XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+	const _matrix ScaleMatrix =	XMMatrixScaling(vAreaSize.x, vAreaSize.y, vAreaSize.z);
+
+	_matrix TriggerWorldMatrix;
+	if (m_tAudioAreaDesc.bHasAreaCenter)
+	{
+		const _float3& vCenter = m_tAudioAreaDesc.vAreaCenter;
+		TriggerWorldMatrix = ScaleMatrix * XMMatrixTranslation(vCenter.x, vCenter.y, vCenter.z);
+	}
+	else
+	{
+		TriggerWorldMatrix = ScaleMatrix * XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+	}
 
 	m_pTrigger->Update(TriggerWorldMatrix);
 
@@ -255,25 +267,11 @@ void CLD_AudioArea::Handle_TriggerEnter(CCollider* pOther)
 	if (!Is_TriggerActivator(pOther))
 		return;
 
-	m_bInside = true;
-	m_bAmbientStopping = false;
-
-	switch (m_eMode)
-	{
-	case MODE::BGM_REQUEST:
+	if (m_eMode == MODE::BGM_REQUEST)
 		Request_BGM();
-		break;
-
-	case MODE::AMBIENT_LOOP:
-		Start_Ambient();
-		break;
-
-	default:
-		break;
-	}
 
 #ifdef _DEBUG
-	const _wstring strMessage = L"[CLD_AudioArea] Enter: " + Make_LevelDesignObjectKey() + L"\n";
+	const _wstring strMessage =	L"[CLD_AudioArea] Enter: " + Make_LevelDesignObjectKey() + L"\n";
 	OutputDebugStringW(strMessage.c_str());
 #endif
 }
@@ -289,24 +287,11 @@ void CLD_AudioArea::Handle_TriggerExit(CCollider* pOther)
 	if (!Is_TriggerActivator(pOther))
 		return;
 
-	m_bInside = false;
-
-	switch (m_eMode)
-	{
-	case MODE::BGM_REQUEST:
+	if (m_eMode == MODE::BGM_REQUEST)
 		Release_BGM();
-		break;
-
-	case MODE::AMBIENT_LOOP:
-		Stop_Ambient();
-		break;
-
-	default:
-		break;
-	}
 
 #ifdef _DEBUG
-	const _wstring strMessage = L"[CLD_AudioArea] Exit: " + Make_LevelDesignObjectKey() + L"\n";
+	const _wstring strMessage =	L"[CLD_AudioArea] Exit: " + Make_LevelDesignObjectKey() + L"\n";
 	OutputDebugStringW(strMessage.c_str());
 #endif
 }
@@ -319,85 +304,132 @@ _bool CLD_AudioArea::Is_TriggerActivator(CCollider* pOther) const
 
 void CLD_AudioArea::Request_BGM()
 {
-	const AUDIO_AREA_SOUND_BINDING* pBinding = Find_AudioAreaSoundBinding(m_tLevelDesignDesc.strObjectName, m_tAudioAreaDesc);
-	if (nullptr == pBinding || pBinding->ePlayType != AUDIO_AREA_PLAY_TYPE::BGM_FADE)
+	const AUDIO_AREA_SOUND_BINDING* pBinding =	Find_AudioAreaSoundBinding(
+			m_tLevelDesignDesc.strObjectName, m_tAudioAreaDesc);
+	if (nullptr == pBinding	|| pBinding->ePlayType != AUDIO_AREA_PLAY_TYPE::BGM_FADE)
 		return;
+
+	m_bBgmStopping = false;
+
+	if (m_BgmHandle.Is_Valid())
+	{
+		m_pGameInstance_Proxy->Resume_BGM_Fade(m_BgmHandle, Get_FadeInSeconds());
+
+		if (m_BgmHandle.Is_Valid())
+		{
+			m_BgmHandle.Set_Volume(pBinding->fVolume);
+			m_bBgmPaused = false;
+			return;
+		}
+	}
 
 	const _wstring strSoundKey = Resolve_SoundKey();
 	if (strSoundKey.empty())
 		return;
 
-	m_pGameInstance_Proxy->Play_BGM_Fade(strSoundKey.c_str(), Get_FadeInSeconds(), pBinding->fVolume);
+	m_pGameInstance_Proxy->Play_BGM_Fade(strSoundKey.c_str(), Get_FadeInSeconds(), Get_FadeInSeconds(), pBinding->fVolume, &m_BgmHandle);
+	m_bBgmPaused = false;
 }
 
 void CLD_AudioArea::Release_BGM()
 {
-	// 현재 SoundManager에는 BGM request stack/restore가 없으므로 Exit에서는 끊지 않는다.
+	if (!m_BgmHandle.Is_Valid())
+		return;
+
+	const AUDIO_AREA_SOUND_BINDING* pBinding =	Find_AudioAreaSoundBinding(m_tLevelDesignDesc.strObjectName, m_tAudioAreaDesc);
+
+	m_fCurrentVolume =
+		nullptr != pBinding ? pBinding->fVolume : 1.f;
+	m_bBgmStopping = true;
 }
 
-void CLD_AudioArea::Start_Ambient()
+void CLD_AudioArea::Update_Proximity()
 {
-	if (m_AmbientHandle.Is_Valid())
+	const AUDIO_AREA_SOUND_BINDING* pBinding =
+		Find_AudioAreaSoundBinding(
+			m_tLevelDesignDesc.strObjectName, m_tAudioAreaDesc);
+	if (nullptr == pBinding
+		|| pBinding->ePlayType != AUDIO_AREA_PLAY_TYPE::AMBIENT)
 		return;
 
-	const AUDIO_AREA_SOUND_BINDING* pBinding = Find_AudioAreaSoundBinding(m_tLevelDesignDesc.strObjectName, m_tAudioAreaDesc);
-	if (nullptr == pBinding || pBinding->ePlayType != AUDIO_AREA_PLAY_TYPE::SFX_LOOP)
-		return;
-
-	const _wstring strSoundKey = Resolve_SoundKey();
-	if (strSoundKey.empty())
-		return;
-
-	m_AmbientHandle = m_pGameInstance_Proxy->Play_SFX_Loop(strSoundKey.c_str(), 0.f, ESoundBus::SFX);
-	m_fCurrentVolume = 0.f;
-	m_bAmbientStopping = false;
-}
-
-void CLD_AudioArea::Update_Ambient(_float fTimeDelta)
-{
-	if (!m_AmbientHandle.Is_Valid())
-		return;
-
-	const AUDIO_AREA_SOUND_BINDING* pBinding = Find_AudioAreaSoundBinding(m_tLevelDesignDesc.strObjectName, m_tAudioAreaDesc);
-	const _float fTargetVolume = nullptr != pBinding ? pBinding->fVolume : 1.f;
-	const _float fFadeSec = max(Get_FadeInSeconds(), 0.001f);
-
-	m_fCurrentVolume += fTimeDelta / fFadeSec * fTargetVolume;
-	if (m_fCurrentVolume > fTargetVolume)
-		m_fCurrentVolume = fTargetVolume;
-
-	m_AmbientHandle.Set_Volume(m_fCurrentVolume);
-}
-
-void CLD_AudioArea::Stop_Ambient()
-{
-	if (!m_AmbientHandle.Is_Valid())
-		return;
-
-	m_bAmbientStopping = true;
-}
-
-void CLD_AudioArea::Update_AmbientFadeOut(_float fTimeDelta)
-{
 	if (!m_AmbientHandle.Is_Valid())
 	{
-		m_bAmbientStopping = false;
+		const _wstring strSoundKey = Resolve_SoundKey();
+		if (strSoundKey.empty())
+			return;
+
+		m_AmbientHandle = m_pGameInstance_Proxy->Play_SFX_Loop(
+			strSoundKey.c_str(), 0.f, ESoundBus::AMBIENT);
+		if (!m_AmbientHandle.Is_Valid())
+			return;
+	}
+
+	if (nullptr == m_pPlayer)
+	{
+		PLAYER_QUERY PlayerQuery{};
+		m_pGameInstance_Proxy->Publish(EventTag::Query_Player, &PlayerQuery);
+		m_pPlayer = PlayerQuery.pPlayer;
+		if (nullptr == m_pPlayer)
+			return;
+	}
+
+	_float4 vPlayerPos{};
+	XMStoreFloat4(&vPlayerPos, m_pPlayer->Get_Transform()->Get_State(STATE::POSITION));
+
+	_float3 vAreaCenter{};
+	if (m_tAudioAreaDesc.bHasAreaCenter)
+		vAreaCenter = m_tAudioAreaDesc.vAreaCenter;
+	else
+	{
+		_float4 vAnchorPos{};
+		XMStoreFloat4(&vAnchorPos, m_pTransformCom->Get_State(STATE::POSITION));
+		vAreaCenter = { vAnchorPos.x, vAnchorPos.y, vAnchorPos.z };
+	}
+
+	const _float3 vAreaSize = GeometryUtils::Make_AbsSize(m_tAudioAreaDesc.vAreaSize);
+	const _float3 vHalfSize = {vAreaSize.x * 0.5f, vAreaSize.y * 0.5f, vAreaSize.z * 0.5f };
+
+	// per-axis distance from player to box surface (inside = 0)
+	_float3 vSurfaceDist{};
+	vSurfaceDist.x = max(fabsf(vPlayerPos.x - vAreaCenter.x) - vHalfSize.x, 0.f);
+	vSurfaceDist.y = max(fabsf(vPlayerPos.y - vAreaCenter.y) - vHalfSize.y, 0.f);
+	vSurfaceDist.z = max(fabsf(vPlayerPos.z - vAreaCenter.z) - vHalfSize.z, 0.f);
+
+	const _float fDistToArea = sqrtf(vSurfaceDist.x * vSurfaceDist.x
+									+ vSurfaceDist.y * vSurfaceDist.y
+									+ vSurfaceDist.z * vSurfaceDist.z);
+
+	const _float fFalloffRange = max(pBinding->fFalloffRange, 0.001f);
+	const _float fAttenRatio = max(0.f, 1.f - fDistToArea / fFalloffRange);
+
+	m_AmbientHandle.Set_Volume(pBinding->fVolume * fAttenRatio);
+}
+
+void CLD_AudioArea::Update_BgmFadeOut(_float fTimeDelta)
+{
+	if (!m_BgmHandle.Is_Valid())
+	{
+		m_bBgmStopping = false;
 		return;
 	}
 
-	const _float fFadeSec = max(Get_InactivateSeconds(), 0.001f);
+	const AUDIO_AREA_SOUND_BINDING* pBinding =	Find_AudioAreaSoundBinding(m_tLevelDesignDesc.strObjectName, m_tAudioAreaDesc);
+	const _float fStartVolume =	nullptr != pBinding ? pBinding->fVolume : 1.f;
 
-	m_fCurrentVolume -= fTimeDelta / fFadeSec;
+	const _float fFadeSec =	max(Get_InactivateSeconds(), 0.001f);
+
+	m_fCurrentVolume -=	fStartVolume * fTimeDelta / fFadeSec;
 	if (m_fCurrentVolume > 0.f)
 	{
-		m_AmbientHandle.Set_Volume(m_fCurrentVolume);
+		m_BgmHandle.Set_Volume(m_fCurrentVolume);
 		return;
 	}
 
 	m_fCurrentVolume = 0.f;
-	m_AmbientHandle.Stop();
-	m_AmbientHandle = {};
-	m_bAmbientStopping = false;
+	m_BgmHandle.Set_Volume(0.f);
+	m_BgmHandle.Set_Paused(true);
+	m_bBgmPaused = true;
+	m_bBgmStopping = false;
 }
 
 _wstring CLD_AudioArea::Resolve_SoundKey() const
@@ -427,16 +459,28 @@ _float CLD_AudioArea::Get_InactivateSeconds() const
 
 CLD_AudioArea::MODE CLD_AudioArea::Resolve_Mode() const
 {
-	const _wstring& strObjectName = m_tLevelDesignDesc.strObjectName;
+	const AUDIO_AREA_SOUND_BINDING* pBinding =	Find_AudioAreaSoundBinding(m_tLevelDesignDesc.strObjectName, m_tAudioAreaDesc);
 
-	if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaBgmRequestor"))
+	if (nullptr != pBinding)
+	{
+		switch (pBinding->ePlayType)
+		{
+		case AUDIO_AREA_PLAY_TYPE::BGM_FADE:
+			return MODE::BGM_REQUEST;
+		case AUDIO_AREA_PLAY_TYPE::SFX_LOOP:
+			return MODE::AMBIENT_LOOP;
+		default:
+			break;
+		}
+	}
+
+	const _wstring& strObjectName =	m_tLevelDesignDesc.strObjectName;
+
+	if (JsonUtils::Equals_NoCase(strObjectName.c_str(),	L"AreaBgmRequestor"))
 		return MODE::BGM_REQUEST;
 
-	if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaSeJungle")
-		|| JsonUtils::Equals_NoCase(strObjectName.c_str(), L"AreaSeSeaWave"))
-	{
+	if (0 == _wcsnicmp(strObjectName.c_str(), L"AreaSe", 6))
 		return MODE::AMBIENT_LOOP;
-	}
 
 	return MODE::UNKNOWN;
 }
@@ -445,9 +489,13 @@ void CLD_AudioArea::Register_LevelDesignSpecs()
 {
 	const _wstring ObjectNames[] =
 	{
-			L"AreaBgmRequestor",
-			L"AreaSeJungle",
-			L"AreaSeSeaWave",
+		L"AreaBgmRequestor",
+		L"AreaSeJungle",
+		L"AreaSeSeaWave",
+		L"AreaSeWaterPipe",
+		L"AreaSeLavaWaterFall",
+		L"AreaSeSandWaterFall",
+		L"AreaSeWorldMap",
 	};
 
 	for (const _wstring& strObjectName : ObjectNames)
@@ -499,6 +547,9 @@ void CLD_AudioArea::Free()
 {
 	if (m_AmbientHandle.Is_Valid())
 		m_AmbientHandle.Stop();
+
+	if (m_bBgmPaused && m_BgmHandle.Is_Valid())
+		m_BgmHandle.Stop();
 
 	__super::Free();
 }

@@ -22,6 +22,11 @@ namespace Client
         inline constexpr const _tchar* Kirby_PositionSyncBegin = L"Kirby.Position.Sync.Begin";
         inline constexpr const _tchar* Kirby_PositionSyncEnd = L"Kirby.Position.Sync.End";
 
+        //  Kirby Spawn
+        inline constexpr const _tchar* Kirby_LevelSpawn = L"Kirby.Level.Spawn";
+        inline constexpr const _tchar* Kirby_LevelSleep = L"Kirby.Level.Sleep";
+        inline constexpr const _tchar* Kirby_HUD_Refresh = L"Kirby.HUD.Refresh";
+
         // 커비 어빌리티 / UI
         inline constexpr const _tchar* Kirby_PointStarGained = L"Kirby.PointStarGained";
         inline constexpr const _tchar* Kirby_HP_Updated = L"Kirby.HPUpdated";
@@ -40,6 +45,7 @@ namespace Client
         inline constexpr const _tchar* Cutscene_GorillaBreak = L"Cutscene.GorillaBreak";  // 고릴라 환경 부수기 이벤트
         inline constexpr const _tchar* Cutscene_CameraChange = L"Cutscene.CameraChange";
         inline constexpr const _tchar* Cutscene_StageClear = L"Cutscene.StageClear";
+        inline constexpr const _tchar* Cutscene_KirbyDancing = L"Cutscene.KirbyDancing";
 
         // QTE
         inline constexpr const _tchar* QTE_Success = L"QTE.Success";
@@ -79,6 +85,9 @@ namespace Client
         inline constexpr const _tchar* Dialogue_Setup = L"Dialogue.Setup";
         inline constexpr const _tchar* Dialogue_Start = L"Dialogue.Start";
         inline constexpr const _tchar* Dialogue_Finished = L"Dialogue.Finished";
+        inline constexpr const _tchar* Dialogue_Arrange = L"Dialogue.Arrange";
+        inline constexpr const _tchar* Sequence_KirbyAnim = L"Sequence.KirbyAnim";
+        inline constexpr const _tchar* Sequence_KirbyWarp = L"Sequence.KirbyWarp";
 
         // 케이지
         inline constexpr const _tchar* Cage_Descend = L"Cage.Descend";
@@ -111,9 +120,21 @@ namespace Client
     {
         KIRBY_ATTACHMENT_END_REASON eType = { KIRBY_ATTACHMENT_END_REASON::_COUNT };
     };
+#pragma endregion
 
-    
+#pragma region Kirby Spawn
+    struct KIRBY_LEVEL_SPAWN_DESC
+    {
+        _float3 vPosition{};
+        _float3 vLook = { 0.f, 0.f, 1.f };   // 스폰 방향 (yaw만 사용)
+        _uint   iLevelIndex = {};
+        const void* pSpawner = { nullptr };
+    };
 
+    struct KIRBY_LEVEL_SLEEP_DESC
+    {
+        const void* pSpawner = { nullptr };
+    };
 #pragma endregion
 
 #pragma region 포인터 질의
@@ -171,6 +192,7 @@ namespace Client
     {
         _float fMaxHP = { 100.f };
         _float fCurrHp = { 100.f };
+        _bool  bSnap = { false };
     };
 #pragma endregion
 
@@ -242,6 +264,22 @@ namespace Client
     {
         _float4x4 KirbyWorld{};
         _float4x4 DeeWorld{};
+    };
+#pragma endregion
+
+#pragma region 대화 이벤트
+    struct SEQUENCE_KIRBY_WARP_DESC
+    {
+        _float3 vPosition{};
+        _float3 vLook = { 0.f, 0.f, 1.f };
+    };
+
+    struct SEQUENCE_KIRBY_ANIM_DESC
+    {
+        string strClip{};
+        _bool  bLoop = { false };
+        _float fSpeed = { 1.f };
+        _float fBlendDuration = { 0.2f };
     };
 #pragma endregion
 

@@ -1,6 +1,7 @@
 #include "Dialogue_Arranger.h"
 #include "GameInstance.h"
 #include "GameContrnt_Events.h"
+#include "SequencePlayer.h"
 
 // 위치 vPos에서 vDir 방향을 바라보는 액터 월드 행렬 (스케일 1, 수평 시선)
 static _float4x4 Make_ActorWorld(_fvector vPos, _fvector vDir)
@@ -39,28 +40,63 @@ HRESULT CDialogue_Arranger::Initialize(void* pArg)
     return S_OK;
 }
 
+void CDialogue_Arranger::Update(_float fTimeDelta)
+{
+    __super::Update(fTimeDelta);
+
+    if (nullptr == m_pPlayer)
+        return;
+
+    m_pPlayer->Update(fTimeDelta);
+
+    if (m_pPlayer->Is_Finished() && !m_bFinishNotified)
+    {
+        m_bFinishNotified = true;
+        m_pGameInstance_Proxy->Publish(EventTag::Dialogue_Finished, nullptr);
+    }
+}
+
 HRESULT CDialogue_Arranger::Ready_Events()
 {
-    Subscribe_Event(EventTag::CutFade_OutDone, [this](void*)
+    Subscribe_Event(EventTag::Dialogue_Arrange, [this](void*)
         {
             if (m_bArranged)
                 return;
             m_bArranged = true;
 
-            // 배치된 자리(자기 트랜스폼)가 대화 씬 앵커.
-            // 커비는 룩 반대편에서 웨이들디를, 웨이들디는 룩 방향에서 커비를 바라봄
+            m_pPlayer = CSequencePlayer::Create(m_pGameInstance_Proxy);
+
+            const _wstring strPath =
+                L"../../Resources/YSH/SequenceData/" + m_strDialogueId + L".json";
+            if (FAILED(m_pPlayer->Load(strPath)))
+            {
+                MSG_BOX("Dialogue_Arranger: sequence load failed");
+                return;
+            }
+
+            // 앵커: 자기 트랜스폼 기준. A = look 반대편(커비 자리), B = 맞은편(NPC 자리)
             _vector vAnchor = m_pTransformCom->Get_State(STATE::POSITION);
             _vector vLook = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f));
             _float  fHalf = m_fActorGap * 0.5f;
 
-            DIALOGUE_SETUP_DESC Desc{};
-            Desc.KirbyWorld = Make_ActorWorld(vAnchor - vLook * fHalf, vLook);
-            Desc.DeeWorld = Make_ActorWorld(vAnchor + vLook * fHalf, XMVectorNegate(vLook));
+            _float4x4 AnchorA = Make_ActorWorld(vAnchor - vLook * fHalf, vLook);
+            _float4x4 AnchorB = Make_ActorWorld(vAnchor + vLook * fHalf, XMVectorNegate(vLook));
+            _float4x4 AnchorC = Make_ActorWorld(vAnchor, vLook);
 
-            m_pGameInstance_Proxy->Publish(EventTag::Dialogue_Setup, &Desc);
+            m_pPlayer->Bind_Anchor(L"A", XMLoadFloat4x4(&AnchorA));
+            m_pPlayer->Bind_Anchor(L"B", XMLoadFloat4x4(&AnchorB));
+            m_pPlayer->Bind_Anchor(L"Center", XMLoadFloat4x4(&AnchorC));
 
-            // 동기 실행: 위 발행이 리턴했으면 재배치 완료. 바로 걷어냄
-            m_pGameInstance_Proxy->Publish(EventTag::CutFade_In, nullptr);
+            PLAYER_QUERY q{};
+            m_pGameInstance_Proxy->Publish(EventTag::Query_Player, &q);
+            m_pPlayer->Bind_Actor(L"Kirby", q.pPlayer);
+
+            CGameObject* pDee = m_pGameInstance_Proxy->Find_GameObject(Get_LevelIndex(), TEXT("Layer_LiveObject"), TEXT("DialogueDee"));
+            if (pDee)
+                pDee->Set_Active(true);
+            m_pPlayer->Bind_Actor(L"Dee", pDee);
+
+            m_pPlayer->Play();
         });
 
     return S_OK;
@@ -90,5 +126,6 @@ CGameObject* CDialogue_Arranger::Clone(void* pArg)
 
 void CDialogue_Arranger::Free()
 {
+    Safe_Release(m_pPlayer);
     __super::Free();
 }

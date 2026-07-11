@@ -27,6 +27,8 @@ HRESULT CEffect_MeshEmitter::Initialize(void* pArg)
     m_wstrModelTag = pDesc->wstrModelTag;
     m_bUseDiffuseTexture = pDesc->bUseDiffuseTexture;
     m_bUseUnknownTexture = pDesc->bUseUnKnownTexture;
+    m_bUseNormalTexture = pDesc->bUseNormalTexture;
+    m_bUseMRATexture = pDesc->bUseMRATexture;
 
     m_bCustomShader = pDesc->bCustomShader;
     m_iShaderLevel = pDesc->iShaderLevel;
@@ -87,6 +89,18 @@ HRESULT CEffect_MeshEmitter::Render()
             if (m_bUseDiffuseTexture == true)
             {
                 if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
+                    return E_FAIL;
+            }
+
+            if (m_bUseNormalTexture == true)
+            {
+                if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", i, MTEX_TYPE::NORMALS, 0)))
+                    return E_FAIL;
+            }
+
+            if (m_bUseMRATexture == true)
+            {
+                if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
                     return E_FAIL;
             }
 
@@ -164,6 +178,14 @@ HRESULT CEffect_MeshEmitter::Bind_ShaderValue()
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vDiffuseOffset", &m_vCurDiffuseUVOffset,
         sizeof(m_vCurDiffuseUVOffset))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseNormalTexture", &m_bUseNormalTexture,
+        sizeof(m_bUseNormalTexture))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseMRATexture", &m_bUseMRATexture,
+        sizeof(m_bUseMRATexture))))
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_bUseUnknownTexture", &m_bUseUnknownTexture,
@@ -291,6 +313,10 @@ void CEffect_MeshEmitter::Init_PropertyValue()
 
     m_vDiffuseUVScroll = false;
     m_vDiffuseUVScrollCount = { 0.f, 0.f };
+
+    m_bUseNormalTexture = false;
+
+    m_bUseMRATexture = false;
 
     m_bUseUnknownTexture = false;
     m_vUnknownTiling = { 1.f, 1.f };

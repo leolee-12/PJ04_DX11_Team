@@ -1,13 +1,9 @@
 #include "Stage0_Step2.h"
 
 #include "GameInstance.h"
-#include "Camera_Free.h"
 #include "Loader_Prototype.h"
 #include "Map_Loader.h"
 #include "Launcher_LevelProfiles.h"
-#include "Camera_AreaCam.h"
-#include "Camera_Cutscene.h"
-#include "CameraDirector.h"
 #include "Level_Loading.h"
 
 CStage0_Step2::CStage0_Step2(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -63,16 +59,13 @@ HRESULT CStage0_Step2::Initialize()
             return E_FAIL;
     }
 
-    if (FAILED(Ready_Camera()))
-        return E_FAIL;
-
     if (FAILED(Ready_Lights()))
         return E_FAIL;
 
     // 나중에 트리거박스로 이관
     //m_pGameInstance_Proxy->Play_BGM(L"K15_Grassland1.marker.wav", 0.5f);
 
-    m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_Grassland1.marker.wav", 3.f, 0.5f);
+    m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_Grassland1.marker.wav", 5.f, 0.35f);
 
     return S_OK;
 }
@@ -125,40 +118,6 @@ HRESULT CStage0_Step2::Ready_Lights()
     LightDesc.vDirection = _float4(0.557f, -0.766f, 0.321f, 0.f);
 
     if (FAILED(m_pGameInstance_Proxy->Add_Light(LightDesc)))
-        return E_FAIL;
-
-    return S_OK;
-}
-
-HRESULT CStage0_Step2::Ready_Camera()
-{
-    m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::STAGE0_STEP2),
-        TEXT("Prototype_GameObject_Camera_Follow"),
-        CCamera_AreaCam::Create(m_pDevice, m_pContext));
-
-    CCamera_AreaCam::AREACAM_DESC CamDesc{};
-    CamDesc.vEye = _float3(-1.f, 1.f, -10.f);
-    CamDesc.vAt = _float3(0.f, 0.f, 0.f);
-    CamDesc.fFovy = XMConvertToRadians(50.f); CamDesc.fNear = 0.1f; CamDesc.fFar = 1000.f;
-    CamDesc.strDataPath = TEXT("../../Resources/YSH/CameraData/Level0_Stage1_Step02_cam.json");
-    m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::STAGE0_STEP2),
-        TEXT("Prototype_GameObject_Camera_Follow"),
-        ETOUI(LEVEL::STAGE0_STEP2), TEXT("Layer_Camera"), TEXT("CameraFollow"), &CamDesc);
-
-    m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::STAGE0_STEP2),
-        CCamera_Cutscene::PROTOTYPE_TAG, CCamera_Cutscene::Create(m_pDevice, m_pContext));
-    CCamera_Cutscene::CUTSCENECAM_DESC CutDesc{};
-    CutDesc.fFovy = XMConvertToRadians(50.f); CutDesc.fNear = 0.1f; CutDesc.fFar = 1000.f;
-    if (FAILED(m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::STAGE0_STEP2),
-        CCamera_Cutscene::PROTOTYPE_TAG,
-        ETOUI(LEVEL::STAGE0_STEP2), TEXT("Layer_Camera"), TEXT("CameraCutscene"), &CutDesc)))
-        return E_FAIL;
-
-    m_pGameInstance_Proxy->Add_Prototype(ETOUI(LEVEL::STAGE0_STEP2),
-        CCameraDirector::PROTOTYPE_TAG, CCameraDirector::Create(m_pDevice, m_pContext));
-    if (FAILED(m_pGameInstance_Proxy->Add_GameObject(ETOUI(LEVEL::STAGE0_STEP2),
-        CCameraDirector::PROTOTYPE_TAG,
-        ETOUI(LEVEL::STAGE0_STEP2), TEXT("Layer_Camera"), TEXT("CameraDirector"))))
         return E_FAIL;
 
     return S_OK;

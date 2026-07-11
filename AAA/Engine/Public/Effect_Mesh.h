@@ -18,6 +18,12 @@ class ENGINE_DLL CEffect_Mesh abstract : public CEffect_NonParticle
     PROPERTY(_bool, m_vDiffuseUVScroll,             L"UV Scroll     _D",         L"Diffuse");
     PROPERTY(_float2, m_vDiffuseUVScrollCount,      L"UV Scroll Count_D",         L"Diffuse");
 
+    // Normal
+    PROPERTY(_bool, m_bUseNormalTexture,            L"Use Normal Textrue_N",      L"Normal");
+
+    // MRA
+    PROPERTY(_bool, m_bUseMRATexture,               L"Use Material Textrue_M",    L"Material");
+
     // Unknown
     PROPERTY(_bool, m_bUseUnknownTexture,           L"Use Unknown Textrue_U",     L"Unknown");
     PROPERTY(_float2, m_vUnknownTiling,             L"Tiling_U",                  L"Unknown");
@@ -90,6 +96,8 @@ public:
         _wstring wstrModelTag;
         _bool bUseDiffuseTexture{};
         _bool bUseUnKnownTexture{};
+        _bool bUseNormalTexture{};
+        _bool bUseMRATexture{};
 
         // Shader
         _uint iShaderLevel{};

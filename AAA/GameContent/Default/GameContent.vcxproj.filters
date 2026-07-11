@@ -34,13 +34,16 @@
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part">
       <UniqueIdentifier>{40aab48f-b6b1-4fe9-80fa-b4ca0ea5dad0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\00. SmokeSphereOriginal">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre">
+      <UniqueIdentifier>{cd09fc73-01b5-4909-8163-909af424a333}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\00. SmokeSphereOriginal">
       <UniqueIdentifier>{362df019-e5fa-4be5-9f18-eea43e8e277e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\01. SmokeLowPoly">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\01. SmokeLowPoly">
       <UniqueIdentifier>{ff5efbd2-0596-453b-abf9-11fce4e0e720}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\02. SmokeTail">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\02. SmokeTail">
       <UniqueIdentifier>{d13a01c7-b84d-40fa-a0a4-51a1b67b7315}</UniqueIdentifier>
     </Filter>
     <Filter Include="97. DataSystem\Header">
@@ -142,25 +145,25 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash">
       <UniqueIdentifier>{61c41364-99b2-4864-a87d-85109fe32b06}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\04. Common_Circle01">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\04. Common_Circle01">
       <UniqueIdentifier>{29830c83-0212-4f5e-ad0d-0455cb58e043}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\05. Common_Curve03">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\05. Common_Curve03">
       <UniqueIdentifier>{377b3a79-9ef3-4d43-a5a4-dd199fcf4342}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\03. Vacuum">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\03. Vacuum">
       <UniqueIdentifier>{7f2948ff-51eb-4306-96e2-4d6fd2e69ead}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\06. InhaleEffect">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\06. InhaleEffect">
       <UniqueIdentifier>{eac9b9b7-bf0c-4d4c-bde8-6fc2eb74c3ed}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\07. TornadoSpinReverse">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\07. TornadoSpinReverse">
       <UniqueIdentifier>{787e47ba-9f50-4b14-8202-9fedb31d5864}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\08. Common_Ring03">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\08. Common_Ring03">
       <UniqueIdentifier>{ea802e0e-a008-40c2-8690-c4635c1185e3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\09. Common_JumpSlash">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\09. Common_JumpSlash">
       <UniqueIdentifier>{a7a58fec-6650-4f57-9df6-0b8c82791b61}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\05. Kirby">
@@ -442,7 +445,7 @@
     <Filter Include="00. GameObject\97. UI\UIContainer\Sequence\Flash">
       <UniqueIdentifier>{64c10457-ee8a-4e26-bb8c-7e851d26d956}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\10. Common_SpinSlash">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\10. Common_SpinSlash">
       <UniqueIdentifier>{5ab4f5f3-211a-454f-82c1-c91e908decbf}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash">
@@ -571,7 +574,7 @@
     <Filter Include="01. Projectile\00. PhysicsProjectile\00. Boulder">
       <UniqueIdentifier>{f745a7d5-14c1-44e7-9706-d907f8396f4d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\11. Common_SpinSlashTrail">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\11. Common_SpinSlashTrail">
       <UniqueIdentifier>{7d7b3904-b384-435a-9f16-5d9eaf0cb573}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\05. SpinSlashTrail">
@@ -655,16 +658,16 @@
     <Filter Include="00. GameObject\07. Boss\Boss\Gorilla\Part\RockHole">
       <UniqueIdentifier>{aa2f0431-38a5-4836-b306-ff8619edda25}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect">
       <UniqueIdentifier>{dd57bfb0-711b-4c59-a37c-801cd5dcb276}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\RockEffect">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect\RockEffect">
       <UniqueIdentifier>{c54f78de-34eb-4aef-8a0a-b4535d96b23c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\RockFloorEffect">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect\RockFloorEffect">
       <UniqueIdentifier>{b5b527aa-e1f8-44e7-92a9-c2a17868f3c1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SpinWind">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect\SpinWind">
       <UniqueIdentifier>{62409eab-c56c-4d68-a4a5-734967b6cc72}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer">
@@ -679,16 +682,16 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\07. DespawnEffect">
       <UniqueIdentifier>{e4898539-8c43-4e25-9225-88d7fe38505a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\13. SmokeParticle">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\13. SmokeParticle">
       <UniqueIdentifier>{edf7a60d-c353-4b44-83af-c72b7da910cd}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\08. BoostGas">
       <UniqueIdentifier>{f3d3b293-2e65-42ed-b5f1-fd201a943c21}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\99. SmokeEmitter">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\99. SmokeEmitter">
       <UniqueIdentifier>{ceb4bc6d-b69e-4301-84d7-c4155c360871}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\98. Car_00_MilkyWay">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\98. Car_00_MilkyWay">
       <UniqueIdentifier>{08a76153-b365-47dc-92b7-2b62dfcb08d5}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\99. CarMilkyWay">
@@ -712,10 +715,10 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\98. GetAbilityEffect">
       <UniqueIdentifier>{94eefdbc-2090-4d48-a274-d094d76d72a3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\97. Star2DParticle">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\97. Star2DParticle">
       <UniqueIdentifier>{45484847-3690-4ecf-b25d-b0b39459f33e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\96. SwordCharge">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\96. SwordCharge">
       <UniqueIdentifier>{13c32bd0-2712-4d73-afc0-b1876d478039}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\97. SwordChargeEffect">
@@ -727,13 +730,13 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\05. Gorilla_Swing">
       <UniqueIdentifier>{56174e45-60e7-49aa-8781-81edf97becf5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SwingEffect">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect\SwingEffect">
       <UniqueIdentifier>{29efe63d-79c4-449b-a474-052109dc93dd}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\06. Gorilla_Ring">
       <UniqueIdentifier>{c9f6dfc2-48b9-4927-8563-c108eb1ab4de}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\Shockwave">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect\Shockwave">
       <UniqueIdentifier>{8b96a12e-2bca-49bc-8a21-8793a67b9ee5}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Ladder">
@@ -742,7 +745,7 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion">
       <UniqueIdentifier>{485a73df-26e0-4a27-a49d-295d417d941b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\16. Common_SphereNoise">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\16. Common_SphereNoise">
       <UniqueIdentifier>{669cbc33-14dd-4636-ae1e-9df27f94568e}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\10. CommonHit">
@@ -751,34 +754,34 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\11. SpitObject">
       <UniqueIdentifier>{67c8b5ca-3d52-4622-a89d-948c3a95df05}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\15. Sphere">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\15. Sphere">
       <UniqueIdentifier>{a8895ff1-a371-4585-ac71-38ee6197d341}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\15. Sphere\MeshParticle">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\15. Sphere\MeshParticle">
       <UniqueIdentifier>{b1a2f5cc-ae00-41cb-b647-f98698bbbf86}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\15. Sphere\Mesh">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\15. Sphere\Mesh">
       <UniqueIdentifier>{771af8b6-b922-49ce-b2cf-fc329fe45188}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\14. Star">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star">
       <UniqueIdentifier>{792d854b-212f-4720-bb96-6f9577206865}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\14. Star\MeshParticle">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\MeshParticle">
       <UniqueIdentifier>{35016b5e-260b-4a74-a291-ba9775ec2d10}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\14. Star\Mesh">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\Mesh">
       <UniqueIdentifier>{4967c70d-f3e5-4aee-a299-904aa520e889}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\17. QuadEffect">
       <UniqueIdentifier>{74bc5f52-4870-4683-9341-fc939a30c8ff}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\HitMark">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\17. QuadEffect\HitMark">
       <UniqueIdentifier>{77605aed-77ee-41ea-9d31-348d80a1bdf8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\Bubble">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\17. QuadEffect\Bubble">
       <UniqueIdentifier>{09e21467-1e49-47a3-9e68-417e07b45c06}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\14. Star\Emitter">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\Emitter">
       <UniqueIdentifier>{2a99a782-1b06-4ca2-bcec-3900ae1eb0e7}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\02. AttackMode">
@@ -922,7 +925,7 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\12. BombFuseEffect">
       <UniqueIdentifier>{a77db0a5-c085-47bb-ae9c-91fba3cf6b27}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\Sparkle">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\17. QuadEffect\Sparkle">
       <UniqueIdentifier>{99c5e77a-1ebf-4337-9cd1-835047d27aaf}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\04. Cappy\State\Detect">
@@ -1005,23 +1008,11 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\01. StateMachine\State\Else\DeformDump">
       <UniqueIdentifier>{c901a202-1d74-4832-b027-3901c993d27a}</UniqueIdentifier>
-	</Filter>
-	<Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect">
-	</Filter>
-	<Filter Include="00. GameObject\97. UI\UIContainer\GenericContainer\CutFade">
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect">
+    </Filter>
+    <Filter Include="00. GameObject\97. UI\UIContainer\GenericContainer\CutFade">
       <UniqueIdentifier>{42685eeb-8084-4009-84ba-36bd8947bef0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="96. Director">
-      <UniqueIdentifier>{db6f6142-987e-43c2-8b82-522718e5adac}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="96. Director\CameraDirector">
-      <UniqueIdentifier>{ac2123fc-d03d-4f44-a7a4-a4fc408e20d9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="96. Director\Dialogue Director">
-      <UniqueIdentifier>{1e583989-ba7c-4868-82e4-0facfa9e4aeb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="96. Director\Dialogue Arranger">
-      <UniqueIdentifier>{847f5679-2d3f-4d9a-955e-be1815af2b8d}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect">
       <UniqueIdentifier>{9a60cf97-d070-41ab-b46a-36ea78ff4834}</UniqueIdentifier>
@@ -1029,11 +1020,53 @@
     <Filter Include="00. GameObject\09. AbilityBubble\Manager">
       <UniqueIdentifier>{3d8af718-58a0-42f1-a08e-373667aa0ea9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\18. MeshEmitterCommon">
-      <UniqueIdentifier>{931f0406-5701-4929-b20c-638a4c7b719e}</UniqueIdentifier>
+    <Filter Include="03. SystemObject">
+      <UniqueIdentifier>{3db9cd73-2e4f-465d-b038-4ca8426ce6f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. SystemObject\Dialogue Director">
+      <UniqueIdentifier>{1e583989-ba7c-4868-82e4-0facfa9e4aeb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. SystemObject\Dialogue Arranger">
+      <UniqueIdentifier>{847f5679-2d3f-4d9a-955e-be1815af2b8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. SystemObject\CameraDirector">
+      <UniqueIdentifier>{ac2123fc-d03d-4f44-a7a4-a4fc408e20d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. SystemObject\Kirby SpawnPoint">
+      <UniqueIdentifier>{7d4ea5e9-6555-47f7-ae04-007b1bcfcab8}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\14. FlowerPetals">
       <UniqueIdentifier>{226d0445-b5ec-4f92-ade0-210ed72ccd46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\00. QuadCommon">
+      <UniqueIdentifier>{05c95001-67ec-4480-9c3e-2def286ecfd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\01. MeshCommon">
+      <UniqueIdentifier>{4e1a2524-bbfd-483d-bc98-1ec9a92b1555}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\02. RectParticleCommon">
+      <UniqueIdentifier>{25518dd5-1f3f-4d06-856c-b976fbb92664}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\03. MeshParticleCommon">
+      <UniqueIdentifier>{26a1af3a-fd1f-42a1-85fd-2acf2a84d379}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\04. RectEmitterCommon">
+      <UniqueIdentifier>{a7f6f60d-9a51-4ddb-a762-19f74dde4a04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\05. MeshEmitterCommon">
+      <UniqueIdentifier>{931f0406-5701-4929-b20c-638a4c7b719e}</UniqueIdentifier>
+	</Filter>
+	<Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\BubbleAura">
+      <UniqueIdentifier>{34e8c8a7-dd40-4972-a48a-81234410bfab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\CopyEssence">
+      <UniqueIdentifier>{97a43dad-cc91-46a7-82f3-88e81c2782ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. SystemObject\SequencePlayer">
+      <UniqueIdentifier>{3ba1b310-8431-447a-884a-81d9b62168a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\08. CutsceneActor\WaddleDee">
+      <UniqueIdentifier>{6700c8e4-b099-469b-ad89-420d86594b71}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1110,7 +1143,7 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SmokeSphereOriginal.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\00. SmokeSphereOriginal</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\00. SmokeSphereOriginal</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EnvObject.h">
       <Filter>00. GameObject\02. EnvObject</Filter>
@@ -1125,10 +1158,10 @@
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SmokeLowPoly.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\01. SmokeLowPoly</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\01. SmokeLowPoly</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SmokeTail.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\02. SmokeTail</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\02. SmokeTail</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Material_Object.h">
       <Filter>00. GameObject\Test\Shader_Material</Filter>
@@ -1152,13 +1185,13 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Common_Curve03.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\05. Common_Curve03</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\05. Common_Curve03</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Common_Circle01.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\04. Common_Circle01</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\04. Common_Circle01</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Vacuum.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\03. Vacuum</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\03. Vacuum</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\InhaleContainer.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\01. InhaleContainer</Filter>
@@ -1203,10 +1236,10 @@
       <Filter>00. GameObject\97. UI\Component\Animator</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\InhaleEffect.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\06. InhaleEffect</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\06. InhaleEffect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TornadoSpinReverse.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\07. TornadoSpinReverse</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\07. TornadoSpinReverse</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_InputManager.h">
       <Filter>00. GameObject\05. Kirby\00. System\01. Kirby_InputManager</Filter>
@@ -1261,9 +1294,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\LevelData.h">
       <Filter>97. DataSystem\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Effect_Loader.h">
-      <Filter>97. DataSystem\EffectLoader</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TestTriggerBox.h">
       <Filter>00. GameObject\Test\TestRect</Filter>
@@ -1530,10 +1560,10 @@
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\KnockBack\KnockBackDeath</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Common_Ring03.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\08. Common_Ring03</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\08. Common_Ring03</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Common_JumpSlash.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\09. Common_JumpSlash</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\09. Common_JumpSlash</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Sword_JumpSlash.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash</Filter>
@@ -1548,7 +1578,7 @@
       <Filter>00. GameObject\00. Camera\Shakeable\Cutscene</Filter>
     </ClInclude>
     <ClInclude Include="..\public\CameraDirector.h">
-      <Filter>96. Director\CameraDirector</Filter>
+      <Filter>03. SystemObject\CameraDirector</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BossNamePlate.h">
       <Filter>00. GameObject\07. Boss\BossNamePlate</Filter>
@@ -1578,7 +1608,7 @@
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\QTE_Grabbed</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Common_SpinSlash.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\10. Common_SpinSlash</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\10. Common_SpinSlash</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Sword_SpinSlash.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
@@ -1608,7 +1638,7 @@
       <Filter>01. Projectile\00. PhysicsProjectile</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Common_SpinSlashTrail.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\11. Common_SpinSlashTrail</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\11. Common_SpinSlashTrail</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Sword_SpinSlashTrail.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\05. SpinSlashTrail</Filter>
@@ -1770,16 +1800,16 @@
       <Filter>00. GameObject\07. Boss\Boss\Gorilla\Part\RockHole</Filter>
     </ClInclude>
     <ClInclude Include="..\public\RockEffect.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\RockEffect</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect\RockEffect</Filter>
     </ClInclude>
     <ClInclude Include="..\public\RockFloorEffect.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\RockFloorEffect</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect\RockFloorEffect</Filter>
     </ClInclude>
     <ClInclude Include="..\public\RockBurst.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\00. Gorilla_Spin</Filter>
     </ClInclude>
     <ClInclude Include="..\public\SpinWind.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SpinWind</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect\SpinWind</Filter>
     </ClInclude>
     <ClInclude Include="..\public\DeathSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\01. Gorilla_DeathSmoke</Filter>
@@ -1791,10 +1821,10 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. BoostGas</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SmokeEmitter.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\99. SmokeEmitter</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\99. SmokeEmitter</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Car_00_MilkyWay.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\98. Car_00_MilkyWay</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\98. Car_00_MilkyWay</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\CarMilkyWay.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\99. CarMilkyWay</Filter>
@@ -1827,13 +1857,13 @@
       <Filter>00. GameObject\01. Map\Section</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Star2DParticle.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\97. Star2DParticle</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\97. Star2DParticle</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\GetAbilityEffect.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\98. GetAbilityEffect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SwordCharge.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\96. SwordCharge</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\96. SwordCharge</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SwordChargeEffect.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\97. SwordChargeEffect</Filter>
@@ -1842,10 +1872,10 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\05. Gorilla_Swing</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Swing_Smoke.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SwingEffect</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect\SwingEffect</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Shockwave.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\Shockwave</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect\Shockwave</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Gorilla_Ring.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\06. Gorilla_Ring</Filter>
@@ -1857,7 +1887,7 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Common_SphereNoise.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\16. Common_SphereNoise</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\16. Common_SphereNoise</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\CommonHit.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\10. CommonHit</Filter>
@@ -1866,25 +1896,25 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\11. SpitObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SphereParticle.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\15. Sphere\MeshParticle</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\15. Sphere\MeshParticle</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SmokeParticle.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\13. SmokeParticle</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\13. SmokeParticle</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SphereMesh.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\15. Sphere\Mesh</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\15. Sphere\Mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\StarParticle.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. Star\MeshParticle</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\MeshParticle</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\HitMark.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\HitMark</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\17. QuadEffect\HitMark</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Bubble.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\Bubble</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\17. QuadEffect\Bubble</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\StarEmitter.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. Star\Emitter</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\Emitter</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_AttackMode.h">
       <Filter>00. GameObject\05. Kirby\02. AttackMode</Filter>
@@ -1956,7 +1986,7 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\12. BombFuseEffect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Sparkle.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\Sparkle</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\17. QuadEffect\Sparkle</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Cappy_State_Detect.h">
       <Filter>00. GameObject\06. Monster\04. Cappy\State\Detect</Filter>
@@ -2035,27 +2065,59 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_DeformDump.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\DeformDump</Filter>
-	</ClInclude>
-	<ClInclude Include="..\Public\AbilityBubbleEffect.h">
-	</ClInclude>
-	<ClInclude Include="..\public\UI_CutFade.h">
+    </ClInclude>
+    <ClInclude Include="..\public\UI_CutFade.h">
       <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\CutFade</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Dialogue_Director.h">
-      <Filter>96. Director\Dialogue Director</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Dialogue_Arranger.h">
-      <Filter>96. Director\Dialogue Arranger</Filter>
+      <Filter>03. SystemObject\Dialogue Director</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Bubble_Manager.h">
       <Filter>00. GameObject\09. AbilityBubble\Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BubbleAura.h" />
     <ClInclude Include="..\Public\MeshEmitterCommon.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\18. MeshEmitterCommon</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\05. MeshEmitterCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\QuadCommon.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\00. QuadCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MeshCommon.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\01. MeshCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RectParticleCommon.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\02. RectParticleCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MeshParticleCommon.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\03. MeshParticleCommon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RectEmitterCommon.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\04. RectEmitterCommon</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\FlowerPetals.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\14. FlowerPetals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BubbleAura.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\BubbleAura</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\StarMesh.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. Star\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Effect_Loader.h">
+      <Filter>97. DataSystem\EffectLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BubbleAura.h" />
+    <ClInclude Include="..\public\KirbySpawnPoint.h">
+      <Filter>03. SystemObject\Kirby SpawnPoint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\SequencePlayer.h">
+      <Filter>03. SystemObject\SequencePlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\DialogueDee.h">
+      <Filter>00. GameObject\08. CutsceneActor\WaddleDee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Dialogue_Arranger.h">
+      <Filter>03. SystemObject\Dialogue Arranger</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2111,7 +2173,7 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SmokeSphereOriginal.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\00. SmokeSphereOriginal</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\00. SmokeSphereOriginal</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TestMap.cpp">
       <Filter>00. GameObject\Test\TestMap</Filter>
@@ -2126,10 +2188,10 @@
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SmokeLowPoly.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\01. SmokeLowPoly</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\01. SmokeLowPoly</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SmokeTail.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\02. SmokeTail</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\02. SmokeTail</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Material_Object.cpp">
       <Filter>00. GameObject\Test\Shader_Material</Filter>
@@ -2144,13 +2206,13 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Common_Curve03.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\05. Common_Curve03</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\05. Common_Curve03</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Common_Circle01.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\04. Common_Circle01</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\04. Common_Circle01</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Vacuum.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\03. Vacuum</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\03. Vacuum</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\InhaleContainer.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\01. InhaleContainer</Filter>
@@ -2189,10 +2251,10 @@
       <Filter>00. GameObject\97. UI\Component\Animator</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\InhaleEffect.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\06. InhaleEffect</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\06. InhaleEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TornadoSpinReverse.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\07. TornadoSpinReverse</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\07. TornadoSpinReverse</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_InputManager.cpp">
       <Filter>00. GameObject\05. Kirby\00. System\01. Kirby_InputManager</Filter>
@@ -2480,10 +2542,10 @@
       <Filter>00. GameObject\06. Monster\01. StateMachine\State\KnockBack\KnockBackDeath</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Common_Ring03.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\08. Common_Ring03</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\08. Common_Ring03</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Common_JumpSlash.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\09. Common_JumpSlash</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\09. Common_JumpSlash</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Sword_JumpSlash.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\03. JumpSlash</Filter>
@@ -2498,7 +2560,7 @@
       <Filter>00. GameObject\00. Camera\Shakeable\Cutscene</Filter>
     </ClCompile>
     <ClCompile Include="..\private\CameraDirector.cpp">
-      <Filter>96. Director\CameraDirector</Filter>
+      <Filter>03. SystemObject\CameraDirector</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BossNamePlate.cpp">
       <Filter>00. GameObject\07. Boss\BossNamePlate</Filter>
@@ -2528,7 +2590,7 @@
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\Gorilla\QTE_Grabbed</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Common_SpinSlash.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\10. Common_SpinSlash</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\10. Common_SpinSlash</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Sword_SpinSlash.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\04. SpinSlash</Filter>
@@ -2558,7 +2620,7 @@
       <Filter>01. Projectile\00. PhysicsProjectile</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Common_SpinSlashTrail.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\11. Common_SpinSlashTrail</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\11. Common_SpinSlashTrail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Sword_SpinSlashTrail.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\05. SpinSlashTrail</Filter>
@@ -2717,16 +2779,16 @@
       <Filter>00. GameObject\07. Boss\Boss\Gorilla\Part\RockHole</Filter>
     </ClCompile>
     <ClCompile Include="..\private\RockEffect.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\RockEffect</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect\RockEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\private\RockFloorEffect.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\RockFloorEffect</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect\RockFloorEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\private\RockBurst.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\00. Gorilla_Spin</Filter>
     </ClCompile>
     <ClCompile Include="..\private\SpinWind.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SpinWind</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect\SpinWind</Filter>
     </ClCompile>
     <ClCompile Include="..\private\DeathSmoke.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\01. Gorilla_DeathSmoke</Filter>
@@ -2738,10 +2800,10 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. BoostGas</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SmokeEmitter.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\99. SmokeEmitter</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\99. SmokeEmitter</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Car_00_MilkyWay.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\98. Car_00_MilkyWay</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\98. Car_00_MilkyWay</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CarMilkyWay.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\99. CarMilkyWay</Filter>
@@ -2774,13 +2836,13 @@
       <Filter>00. GameObject\01. Map\Section</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Star2DParticle.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\97. Star2DParticle</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\97. Star2DParticle</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\GetAbilityEffect.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\98. GetAbilityEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SwordCharge.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\96. SwordCharge</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\96. SwordCharge</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SwordChargeEffect.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\97. SwordChargeEffect</Filter>
@@ -2789,10 +2851,10 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\05. Gorilla_Swing</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Swing_Smoke.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\SwingEffect</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect\SwingEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Shockwave.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\12. Gorilla_Effect\Shockwave</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\12. Gorilla_Effect\Shockwave</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Gorilla_Ring.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\06. Gorilla_Ring</Filter>
@@ -2804,7 +2866,7 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Common_SphereNoise.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\16. Common_SphereNoise</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\16. Common_SphereNoise</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CommonHit.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\10. CommonHit</Filter>
@@ -2813,25 +2875,25 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\11. SpitObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SphereParticle.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\15. Sphere\MeshParticle</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\15. Sphere\MeshParticle</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SmokeParticle.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\13. SmokeParticle</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\13. SmokeParticle</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SphereMesh.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\15. Sphere\Mesh</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\15. Sphere\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\StarParticle.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. Star\MeshParticle</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\MeshParticle</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HitMark.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\HitMark</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\17. QuadEffect\HitMark</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Bubble.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\Bubble</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\17. QuadEffect\Bubble</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\StarEmitter.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. Star\Emitter</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\Emitter</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_AttackMode.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode</Filter>
@@ -2900,7 +2962,7 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\12. BombFuseEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Sparkle.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\17. QuadEffect\Sparkle</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\17. QuadEffect\Sparkle</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Cappy_State_Detect.cpp">
       <Filter>00. GameObject\06. Monster\04. Cappy\State\Detect</Filter>
@@ -2976,27 +3038,56 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_DeformDump.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\DeformDump</Filter>
-	</ClCompile>
-	<ClCompile Include="..\Private\AbilityBubbleEffect.cpp">
-	</ClCompile>
-	<ClCompile Include="..\private\UI_CutFade.cpp">
+    </ClCompile>
+    <ClCompile Include="..\private\UI_CutFade.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\CutFade</Filter>
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
-      <Filter>96. Director\Dialogue Director</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Dialogue_Arranger.cpp">
-      <Filter>96. Director\Dialogue Arranger</Filter>
+      <Filter>03. SystemObject\Dialogue Director</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Bubble_Manager.cpp">
       <Filter>00. GameObject\09. AbilityBubble\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BubbleAura.cpp" />
     <ClCompile Include="..\Private\MeshEmitterCommon.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\18. MeshEmitterCommon</Filter>
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\05. MeshEmitterCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\QuadCommon.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\00. QuadCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MeshCommon.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\01. MeshCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RectParticleCommon.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\02. RectParticleCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MeshParticleCommon.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\03. MeshParticleCommon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RectEmitterCommon.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\04. RectEmitterCommon</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\FlowerPetals.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\14. FlowerPetals</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BubbleAura.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\BubbleAura</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\StarMesh.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\14. Star\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BubbleAura.cpp" />
+    <ClCompile Include="..\private\KirbySpawnPoint.cpp">
+      <Filter>03. SystemObject\Kirby SpawnPoint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\SequencePlayer.cpp">
+      <Filter>03. SystemObject\SequencePlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\DialogueDee.cpp">
+      <Filter>00. GameObject\08. CutsceneActor\WaddleDee</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Dialogue_Arranger.cpp">
+      <Filter>03. SystemObject\Dialogue Arranger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

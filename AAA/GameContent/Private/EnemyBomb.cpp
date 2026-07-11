@@ -33,6 +33,8 @@ void CEnemyBomb::Be_Captured(CGameObject* pInhaler)
 
 	if (m_pHitBox)
 		m_pHitBox->Set_Enabled(false);     // 피격 off
+	if (m_pController)
+		m_pController->Set_Enabled(false);
 	if (m_pAnimatorCom)
 		m_pAnimatorCom->Pause_Mask(1);		// 도화선 애니메이션 멈추기
 
