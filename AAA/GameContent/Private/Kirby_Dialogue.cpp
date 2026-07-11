@@ -56,12 +56,12 @@ void CKirby_Dialogue::Request_Dialogue(CKirby* pKirby, const SEQUENCE_KIRBY_WARP
 {
     CTransform* pTransform = pKirby->Get_Transform();
 
-    _vector vPos = XMLoadFloat3(&pDesc->vPosition);
+    _vector vPos = XMVectorSetW(XMLoadFloat3(&pDesc->vPosition), 1.f);
     pTransform->Set_State(STATE::POSITION, vPos);
 
     _vector vLook = XMLoadFloat3(&pDesc->vLook);
-    vLook = XMVector3Normalize(vLook);
-    pTransform->LookTo(vLook);
+    if (XMVectorGetX(XMVector3LengthSq(vLook)) > Helper::fEpsilon)
+        pTransform->LookTo(XMVector3Normalize(vLook));
 
     pKirby->Get_Movement()->Sync_To_Controller();
 }
