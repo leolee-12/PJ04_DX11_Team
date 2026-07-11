@@ -11,11 +11,14 @@ NS_BEGIN(Client)
 class CKirby;
 class CKirby_Body;
 
-class CLIENT_DLL CKirby_CarFirstBreakWall final : public CKirby_State
+class CLIENT_DLL CKirby_DeformDump final : public CKirby_State
 {
 private:
-	CKirby_CarFirstBreakWall();
-	virtual ~CKirby_CarFirstBreakWall() = default;
+	enum DEFORM_DUMP_STATE { SPIT_START, SPIT_DEFORM, DEFORM_DUMP_STATE_END };
+
+private:
+	CKirby_DeformDump();
+	virtual ~CKirby_DeformDump() = default;
 
 private:
 	HRESULT Initialize();
@@ -29,15 +32,21 @@ public:
 	virtual void Exit(CKirby* pKirby) override;
 
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
-
+	
 public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
 
-public:
-	virtual void Request_Attachment_End(CKirby* pKirby, const KIRBY_ATTACHMENT_END_DESC* pDesc) override;
+private:
+	void Change_DeformDumpState(CKirby* pKirby, DEFORM_DUMP_STATE eNext);
+	void Enter_DeformDumpState(CKirby* pKirby, DEFORM_DUMP_STATE eState);
+	void Update_DeformDumpState(CKirby* pKirby, _float fTimeDelta);
+	void Exit_DeformDumpState(CKirby* pKirby, DEFORM_DUMP_STATE eState);
+
+private:
+	DEFORM_DUMP_STATE m_eDeformDumpState{};
 
 public:
-	static CKirby_CarFirstBreakWall* Create();
+	static CKirby_DeformDump* Create();
 private:
 	virtual void Free() override;
 };

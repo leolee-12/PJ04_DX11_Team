@@ -54,17 +54,41 @@ _bool CKirby_DeformCarBridge::Handle_Command(CKirby* pKirby, CKirby_Command* pCo
 
 void CKirby_DeformCarBridge::Request_PositionSync(CKirby* pKirby, const KIRBY_POSITION_SYNC_BEGIN_DESC* pDesc)
 {
-    CTransform* pTransform = pKirby->Get_Transform();
-    pTransform->Set_WorldMatrix(pDesc->AnchorWorld);
+    switch (pDesc->eType)
+    {
+        case KIRBY_POSITION_SYNC_CONTEXT::CAR_BRIDGE:
+        {
+            CTransform* pTransform = pKirby->Get_Transform();
+            pTransform->Set_WorldMatrix(pDesc->AnchorWorld);
 
-    CAnimator* pAnimator = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR)->Get_Animator();
-    pAnimator->Play("Cut1", false, false, pDesc->fBlendDuration, pDesc->fAnimSpeed);
+            CAnimator* pAnimator = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR)->Get_Animator();
+            pAnimator->Play("Cut1", false, false, pDesc->fBlendDuration, pDesc->fAnimSpeed);
 
-    Change_BridgeState(pKirby, DEFORM_CAR_BRIDGE_STATE::START);
+            Change_BridgeState(pKirby, DEFORM_CAR_BRIDGE_STATE::START);
+            break;
+        }
+        default:
+        {
+            MSG_BOX("Event Error 1: CKirby_DeformCarBridge");
+            break;
+        }
+    }
 }
 
-void CKirby_DeformCarBridge::Request_PositionEndSync(CKirby* pKirby, const KIRBY_POSITION_SYNC_END_DESC* pDesc)
+void CKirby_DeformCarBridge::Request_PositionSync_End(CKirby* pKirby, const KIRBY_POSITION_SYNC_END_DESC* pDesc)
 {
+    switch (pDesc->eType)
+    {
+        case KIRBY_POSITION_SYNC_END_REASON::CAR_BRIDGE_END:
+        {
+            break;
+        }
+        default:
+        {
+            MSG_BOX("Event Error 2: CKirby_DeformCarBridge");
+            break;
+        }
+    }
 }
 
 void CKirby_DeformCarBridge::Change_BridgeState(CKirby* pKirby, DEFORM_CAR_BRIDGE_STATE eNext)

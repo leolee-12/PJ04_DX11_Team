@@ -134,10 +134,10 @@ public:
 	void Apply_ChangeKirbyAbility();
 
 	// Ability Dump
-	void Update_AbilityDumpCool(_float fTimeDelta);
-	void Reset_AbilityDumpCool();
-	_bool Can_AbilityDump();
-	void Req_AbilityDumpCoolDecrease() { m_bDecreaseAbilityDumpCool = true; }
+	void Update_DumpCool(_float fTimeDelta);
+	void Reset_DumpCool();
+	_bool Can_Dump();
+	void Req_AbilityDumpCoolDecrease() { m_bDecreaseDumpCool = true; }
 
 	// Deform
 	_bool Has_Deform() { return m_pKirby_Deform ? true : false; }
@@ -148,8 +148,8 @@ public:
 	// Collider
 	CCollider* Get_Collider(KIRBY_COLLIDER eKirbyCollider);
 
-	// CutScene Grab
-	void Update_CutsceneGrabTransform();
+	// CutScene Attach
+	void Update_CutsceneAttachTransform();
 
 	// Damage
 	virtual void Damaged(const ATTACK_INFO& tInfo) override;
@@ -188,9 +188,9 @@ private:
 	virtual _bool Block_Hit(const ATTACK_INFO& tInfo) override;
 	virtual void  On_Damaged(const ATTACK_INFO& tInfo) override;
 
-	// CutScene Grab
-	void Set_CutsceneGrabTarget(KIRBY_ATTACHMENT_BEGIN_DESC* pGrabDesc);
-	void Clear_CutsceneGrabTarget();
+	// CutScene Attach
+	void Set_CutsceneAttachTarget(const KIRBY_ATTACHMENT_BEGIN_DESC* pAttachDesc);
+	void Clear_CutsceneAttachTarget();
 
 private:
 	// Parts
@@ -224,18 +224,18 @@ private:
 	COPY_ABILITY_TYPE m_eNextAbilityType{};
 
 	// Ability Dump
-	_float m_fAccAbilityDumpCoolTime{};
-	_float m_fMaxAbilityDumpCoolTime{ 0.5f };
-	_bool m_bDecreaseAbilityDumpCool{};
+	_float m_fAccDumpCoolTime{};
+	_float m_fMaxDumpCoolTime{ 0.5f };
+	_bool m_bDecreaseDumpCool{};
 
 	// Deform
 	CKirby_Deform* m_pKirby_Deform{};
 	unordered_map<DEFORM_TYPE, CKirby_Deform*> m_Deformations;
 
-	// CutScene Grab
+	// CutScene Attach
 	_float3 m_vPreAttachScale{};
-	const _float4x4* m_pGrabBone{};
-	const _float4x4* m_pGrabOwnerWorld{};
+	const _float4x4* m_pAttachBone{};
+	const _float4x4* m_pAttachOwnerWorld{};
 
 	// Ladder
 	CLevelDesign_Ladder* m_pLadder{};

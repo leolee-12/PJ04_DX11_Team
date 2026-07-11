@@ -29,7 +29,7 @@ void CKirby_State::Enter(CKirby* pKirby, _int iFlag)
 
 void CKirby_State::Update(CKirby* pKirby, const _float fTimeDelta)
 {
-    pKirby->Update_AbilityDumpCool(fTimeDelta);
+    pKirby->Update_DumpCool(fTimeDelta);
 }
 
 void CKirby_State::Exit(CKirby* pKirby)
@@ -147,29 +147,11 @@ _bool CKirby_State::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
     return false;
 }
 
-void CKirby_State::Request_Attach(CKirby* pKirby, KIRBY_ATTACHMENT_CONTEXT eType)
+void CKirby_State::Request_Attachment(CKirby* pKirby, const KIRBY_ATTACHMENT_BEGIN_DESC* pDesc)
 {
-    switch (eType)
-    {
-        case KIRBY_ATTACHMENT_CONTEXT::GORILLA_SCENE:
-        {
-            pKirby->Change_State(KIRBY_STATE_TYPE::CUTSCENE_GRABBED);
-            break;
-        }
-        case KIRBY_ATTACHMENT_CONTEXT::GORILLA_COMBAT:
-        {
-            pKirby->Change_State(KIRBY_STATE_TYPE::QTE_GRABBED);
-            break;
-        }
-        case KIRBY_ATTACHMENT_CONTEXT::DEFORM_CAR_GET_FIRST:
-        {
-            pKirby->Change_State(KIRBY_STATE_TYPE::CAR_FIRST_BREAK_WALL);
-            break;
-        }
-    }
 }
 
-void CKirby_State::Request_Attach_End(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType)
+void CKirby_State::Request_Attachment_End(CKirby* pKirby, const KIRBY_ATTACHMENT_END_DESC* pDesc)
 {
 }
 
@@ -177,7 +159,7 @@ void CKirby_State::Request_PositionSync(CKirby* pKirby, const KIRBY_POSITION_SYN
 {
 }
 
-void CKirby_State::Request_PositionEndSync(CKirby* pKirby, const KIRBY_POSITION_SYNC_END_DESC* pDesc)
+void CKirby_State::Request_PositionSync_End(CKirby* pKirby, const KIRBY_POSITION_SYNC_END_DESC* pDesc)
 {
 }
 

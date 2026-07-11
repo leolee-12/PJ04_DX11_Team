@@ -39,14 +39,15 @@ public:
 	void  On_Damaged_KirbyStateMachine(const ATTACK_INFO& tInfo);
 
 public:
-	void Request_Attachment_StateMachine(KIRBY_ATTACHMENT_CONTEXT eType);
-	void Request_Attachment_End_StateMachine(KIRBY_ATTACHMENT_END_REASON eType = KIRBY_ATTACHMENT_END_REASON::DEFAULT_RELEASE);
+	void Request_Attachment_StateMachine(const KIRBY_ATTACHMENT_BEGIN_DESC* pDesc);
+	void Request_Attachment_End_StateMachine(const KIRBY_ATTACHMENT_END_DESC* pDesc);
 
 	void Request_PositionSync_StateMachine(const KIRBY_POSITION_SYNC_BEGIN_DESC* pDesc);
 	void Request_PositionSync_End_StateMachine(const KIRBY_POSITION_SYNC_END_DESC* pDesc);
 
 	void Request_ClearStage_StateMachine(const CUTSCENE_STAGECLEAR* pDesc);
 
+public:
 	void Get_EssenceBubble(COPY_ABILITY_TYPE eNewAbility);
 
 	_bool Ignore_TimeScale_StateMachine();

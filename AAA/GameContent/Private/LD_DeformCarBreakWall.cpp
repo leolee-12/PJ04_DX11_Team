@@ -122,7 +122,7 @@ void CLD_DeformCarBreakWall::Update(_float fTimeDelta)
 		&& STATE::BREAKING == m_eState)
 	{
 		KIRBY_ATTACHMENT_END_DESC tDesc{};
-		tDesc.eType = KIRBY_ATTACHMENT_END_REASON::DEFAULT_RELEASE;
+		tDesc.eType = KIRBY_ATTACHMENT_END_REASON::DEFORM_CAR_GET_FIRST_RELEASE;
 		m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentEnd, &tDesc);
 
 		CUTSCENE_CAMERA_DESC cam{};

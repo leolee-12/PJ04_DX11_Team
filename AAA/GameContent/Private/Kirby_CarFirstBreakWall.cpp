@@ -42,7 +42,7 @@ void CKirby_CarFirstBreakWall::Update(CKirby* pKirby, const _float fTimeDelta)
     CKirby_Deform_Model* pModel = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR, KIRBY_DEFORM_MODEL_TYPE::MAIN);
     CAnimator* pAnimator = pModel->Get_Animator();
     
-    pKirby->Update_CutsceneGrabTransform();
+    pKirby->Update_CutsceneAttachTransform();
 }
 
 void CKirby_CarFirstBreakWall::Exit(CKirby* pKirby)
@@ -62,9 +62,21 @@ void CKirby_CarFirstBreakWall::On_Damaged_KirbyState(CKirby* pKirby, const ATTAC
 {
 }
 
-void CKirby_CarFirstBreakWall::Request_Attach_End(CKirby* pKirby, KIRBY_ATTACHMENT_END_REASON eType)
+void CKirby_CarFirstBreakWall::Request_Attachment_End(CKirby* pKirby, const KIRBY_ATTACHMENT_END_DESC* pDesc)
 {
-    Transition_Fall_OR_Wait_OR_Run(pKirby);
+    switch (pDesc->eType)
+    {
+        case KIRBY_ATTACHMENT_END_REASON::DEFORM_CAR_GET_FIRST_RELEASE:
+        {
+            Transition_Fall_OR_Wait_OR_Run(pKirby);
+            break;
+        }
+        default:
+        {
+            MSG_BOX("Event Error: CKirby_CarFirstBreakWall");
+            break;
+        }
+    }
 }
 
 CKirby_CarFirstBreakWall* CKirby_CarFirstBreakWall::Create()
