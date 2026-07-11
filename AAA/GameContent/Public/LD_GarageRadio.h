@@ -38,7 +38,7 @@ private:
 
 private:
 	virtual HRESULT Ready_Events() override;
-
+	virtual void	On_AnimEvent(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase) override;
 	void On_Event();
 
 public:

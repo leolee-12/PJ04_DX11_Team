@@ -124,6 +124,14 @@ void CCappy::On_SpatEnd()
 	__super::On_SpatEnd();
 }
 
+void CCappy::Enable_Colliders(_bool bEnable)
+{
+	__super::Enable_Colliders(bEnable);
+
+	if (m_pHat)
+		m_pHat->Enable_HurtBox(bEnable && !m_pHat->Is_Detached());
+}
+
 CMonsterBrain* CCappy::Create_Brain()
 {
 	return CCappy_Brain::Create(this);

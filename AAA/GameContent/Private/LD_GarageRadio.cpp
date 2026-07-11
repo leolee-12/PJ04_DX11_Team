@@ -1,14 +1,20 @@
 #include "LD_GarageRadio.h"
 #include "LevelDesign_Registry.h"
-#include "GameContrnt_Events.h"
+#include "GameContent_const.h"
 
 #include "Parsing_Utils.h"
 
 namespace
 {
+	// AnimEvent 추가 후
+	// 1. Validated_Initailzed에서 방어 코드 제거
+	// 2. Clone에서 AnimEvent json 경로 추가
+
 	inline constexpr const _tchar* TEMP_EVENT_TAG = L"Bridge.CutSceneStart";
 
 	inline constexpr const _char* GARAGE_RADIO_MODEL_PATH = "../../Resources/Map/Gimmick/Anim/GarageRadio/GarageRadio.ysh";
+	inline constexpr const _tchar* GARAGE_RADIO_ANIM_EVENT_FILE = L"../../Resources/Map/Gimmick/Anim/GarageRadio/GarageRadio_Animevents.json";
+
 	inline constexpr const _char* ANIM_CUT1 = "Cut1";
 	inline constexpr const _char* ANIM_WAIT = "Wait";
 	inline constexpr const _char* GARAGE_RADIO_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_CUT1, ANIM_WAIT };
@@ -61,7 +67,7 @@ HRESULT CLD_GarageRadio::Validate_Initialized()
 	if (m_tEventObjectDesc.bUseCollMesh || nullptr != m_pRigidStatic)
 		return E_FAIL;
 
-	if (!m_tEventObjectDesc.strAnimEventFile.empty())
+	if (m_tEventObjectDesc.strAnimEventFile.empty())
 		return E_FAIL;
 
 	if (m_tEventObjectDesc.strAnimNames[0] != GARAGE_RADIO_ANIM_NAMES[0])
@@ -133,7 +139,7 @@ _bool CLD_GarageRadio::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& 
 	Desc.eModelType = Spec.eModelType;
 	Desc.wstrModelProtoTag = Spec.wstrModelProtoTag;
 	Desc.bUseCollMesh = false;
-	Desc.strAnimEventFile.clear();
+	Desc.strAnimEventFile = GARAGE_RADIO_ANIM_EVENT_FILE;
 
 	Desc.strAnimNames[0] = GARAGE_RADIO_ANIM_NAMES[0];
 	Desc.strAnimNames[1] = GARAGE_RADIO_ANIM_NAMES[1];
@@ -163,6 +169,38 @@ HRESULT CLD_GarageRadio::Ready_Events()
 	return S_OK;
 }
 
+void CLD_GarageRadio::On_AnimEvent(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE ePhase)
+{
+	if (ANIM_EVENT_PHASE::POINT != ePhase)
+		return;
+
+	switch (static_cast<EANIM_EVENT>(AnimEvent.iEventType))
+	{
+	case EANIM_EVENT::Sound:
+	{
+		if (AnimEvent.strParam.empty())
+		{
+#ifdef _DEBUG
+			MSG_BOX("Sound StrParam is Empty");
+#endif
+			return;
+		}
+
+		if (ePhase == ANIM_EVENT_PHASE::POINT)
+		{
+			if (AnimEvent.iIntParam == 1)
+				m_pGameInstance_Proxy->Play_BGM_Fade(StrToWstr(AnimEvent.strParam).c_str(), AnimEvent.vOffset.x);
+			else 
+				m_pGameInstance_Proxy->Play_SFX(StrToWstr(AnimEvent.strParam).c_str(), AnimEvent.vOffset.x);
+		}
+		break;
+	}
+	default:
+		break;
+
+	}
+}
+
 void CLD_GarageRadio::On_Event()
 {
 	if (STATE::PLAYING == m_eState)
@@ -188,6 +226,24 @@ CLD_GarageRadio* CLD_GarageRadio::Create(ID3D11Device* pDevice, ID3D11DeviceCont
 CGameObject* CLD_GarageRadio::Clone(void* pArg)
 {
 	CLD_GarageRadio* pInstance = new CLD_GarageRadio(*this);
+	
+	LD_EVENTOBJECT_DESC TempDesc{};
+	if (nullptr == pArg)
+	{
+		TempDesc.strObjectName = OBJECT_NAME;
+		TempDesc.strKind = OBJECT_NAME;
+		TempDesc.eCategory = LD_CATEGORY::GIMMICK;
+		TempDesc.iModelProtoLevel = m_iPrototypeLevel;
+		TempDesc.eModelType = MODEL::ANIM;
+		TempDesc.wstrModelProtoTag = MODEL_PROTO_TAG;
+		TempDesc.bUseCollMesh = false;
+		TempDesc.strAnimEventFile.clear();
+
+		TempDesc.strAnimNames[0] = GARAGE_RADIO_ANIM_NAMES[0];
+		TempDesc.strAnimNames[1] = GARAGE_RADIO_ANIM_NAMES[1];
+
+		pArg = &TempDesc;
+	}
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{

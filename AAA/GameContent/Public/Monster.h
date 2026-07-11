@@ -89,7 +89,7 @@ public:
 	void						Clear_MoveDir();
 
 	// Brain이 실행 FSM에 상태 전환을 요청
-	_bool						Change_State(MONSTER_STATE_TYPE eNewState);
+	_bool						Change_State(MONSTER_STATE_TYPE eNewState, _bool bStateReenter = false);
 	_bool						Has_State(MONSTER_STATE_TYPE eState) const;
 	MONSTER_STATE_TYPE			Get_StateType() const;
 
@@ -108,7 +108,7 @@ public:
 
 	// 윤석현 추가
 	void						Enable_Controller(_bool bEnable);
-	void						Enable_Colliders(_bool bEnable);
+	virtual void				Enable_Colliders(_bool bEnable);
 
 	void						Play_ActionLoopSFX(const _tchar* pKey);
 	void						Stop_ActionLoopSFX();

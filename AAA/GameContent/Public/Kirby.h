@@ -41,7 +41,7 @@ class CKirby final : public CCharacter
 	GENERATED_BODY(CKirby)
 
 public:
-	enum KIRBY_COLLIDER { HURT_BOX, INHALE_BOX ,COLLIDER_END };
+	enum KIRBY_COLLIDER { HURT_BOX, INHALE_BOX, SLIDE_COLLIDER, COLLIDER_END };
 
 	struct KIRBY_BODY_DESC : public CContainerObject::COTAINEROBJECT_DESC
 	{
@@ -172,7 +172,6 @@ public:
 
 private:
 	HRESULT Ready_Components();
-	HRESULT	SetUp_Collider_Callback();
 	HRESULT Ready_PartObjects();
 	HRESULT Ready_System();
 	HRESULT Ready_Ability();
@@ -180,6 +179,9 @@ private:
 	HRESULT Bind_ShaderResources();
 	virtual HRESULT Ready_Events() override;
 	HRESULT Ready_AnimEvents();
+
+	HRESULT	SetUp_Collider_Callback();
+	void Route_CollisionToState(KIRBY_COLLIDER eCollider);
 
 	// Ability
 	void Set_KirbyAbility(COPY_ABILITY_TYPE eAbilityState);

@@ -16,6 +16,7 @@ namespace
 	inline constexpr _float DEFORM_CAR_BREAK_WALL_ANIM_SPEED = 1.5f;
 	inline constexpr const _uint DEFORM_CAR_BREAK_WALL_MESH_COUNT = 31u;
 	inline constexpr const _uint DEFORM_CAR_BREAK_WALL_COLLIMESH_INDEX = 10u;
+	inline constexpr const _uint DEFORM_CAR_BREAK_WALL_CRUCK_SHADE_MESH_INDEX = 2u;
 
 	inline constexpr const _uint DISABLE_MESH_INDICES[] = { 1 };
 	inline constexpr const _uint ON_TO_OFF_MESH_INDICES[] = { 0,2 };
@@ -144,6 +145,32 @@ void CLD_DeformCarBreakWall::Late_Update(_float fTimeDelta)
 	}
 
 	__super::Late_Update(fTimeDelta);
+}
+
+HRESULT CLD_DeformCarBreakWall::Render()
+{
+	if (FAILED(Bind_ShaderResources()))
+		return E_FAIL;
+
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		if (DEFORM_CAR_BREAK_WALL_CRUCK_SHADE_MESH_INDEX == i || !Should_RenderMesh(i))
+			continue;
+
+		if (FAILED(Render_Mesh(i, Resolve_RenderPass(i))))
+			return E_FAIL;
+	}
+
+	if (Should_RenderMesh(DEFORM_CAR_BREAK_WALL_CRUCK_SHADE_MESH_INDEX))
+	{
+		const _uint iPass = Resolve_RenderPass(DEFORM_CAR_BREAK_WALL_CRUCK_SHADE_MESH_INDEX);
+		if (FAILED(Render_Mesh(DEFORM_CAR_BREAK_WALL_CRUCK_SHADE_MESH_INDEX, iPass)))
+			return E_FAIL;
+	}
+
+	return S_OK;
 }
 
 void CLD_DeformCarBreakWall::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
@@ -330,6 +357,8 @@ void CLD_DeformCarBreakWall::On_Event()
 	_bool bShow = false;
 	m_pGameInstance_Proxy->Publish(EventTag::HUD_SetVisible, &bShow);
 	m_pGameInstance_Proxy->Publish(EventTag::Letterbox_Begin, nullptr);
+
+	m_pGameInstance_Proxy->Play_SFX(L"DemoDeformCarGetFirst_BreakGroundWall.wav", 1.f, ESoundBus::SFX);
 
 	m_pGameInstance_Proxy->Lerp_TimeScale(0.1f, 1.f, 3.f);
 

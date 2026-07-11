@@ -45,6 +45,7 @@ namespace Client
         inline constexpr const _tchar* Cutscene_GorillaBreak = L"Cutscene.GorillaBreak";  // 고릴라 환경 부수기 이벤트
         inline constexpr const _tchar* Cutscene_CameraChange = L"Cutscene.CameraChange";
         inline constexpr const _tchar* Cutscene_StageClear = L"Cutscene.StageClear";
+        inline constexpr const _tchar* Cutscene_KirbyDancing = L"Cutscene.KirbyDancing";
 
         // QTE
         inline constexpr const _tchar* QTE_Success = L"QTE.Success";

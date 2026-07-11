@@ -80,6 +80,8 @@
 #include "CommonHit.h"
 #include "SpitObject.h"
 #include "BombFuseEffect.h"
+#include "FlowerPetals.h"
+#include "BubbleAura.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -112,6 +114,8 @@
 #include "Bubble.h"
 #include "StarEmitter.h"
 #include "Sparkle.h"
+#include "MeshEmitterCommon.h"
+#include "StarMesh.h"
 
 //sky
 #include "SkySphere.h"
@@ -157,6 +161,7 @@
 #include "LD_SlopeBoardA.h"
 #include "LD_SlopeBoardC.h"
 #include "LD_DeformCarBreakWall.h"
+#include "LD_GarageRadio.h"
 #include "LD_DeformObject.h"
 #include "LD_CopyEssence.h"
 
@@ -223,17 +228,17 @@ namespace
         // 능력 추가될 때마다 아래에 추가
         
         // Sword
-        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Sword"),
+        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Ability_Model_Sword"),
             CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Sword/Sword.ysh",
                 XMMatrixRotationY(XMConvertToRadians(180.f))));
 
         // Bomb
-        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_KirbyBomb"),
+        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Ability_Model_Bomb"),
             CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Gimmick/CopyEssence/Bomb/KirbyBomb.ysh",
                 XMMatrixRotationY(XMConvertToRadians(180.f))));
 
         // Ice
-        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_IceHat"),
+        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Ability_Model_Ice"),
             CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Gimmick/CopyEssence/IceHat/Ice_Hat.ysh",
                 XMMatrixRotationY(XMConvertToRadians(180.f))));
     }
@@ -749,6 +754,10 @@ void CGameObject_Factory::Register_AnimObject()
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_DeformCarBreakWall::MODEL_PROTO_TAG,
             Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/DeformCarBreakWall/DeformCarBreakWall.ysh", false));));
 
+    Register(CLD_GarageRadio::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_GarageRadio),
+        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_GarageRadio::MODEL_PROTO_TAG,
+            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/GarageRadio/GarageRadio.ysh", false));));
+
     Register(CLD_DeformObject::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_DeformObject),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Proto_Component_Model_DeformCar"),
             Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/DeformCar/DeformCar.ysh", true));));
@@ -988,6 +997,35 @@ void CGameObject_Factory::Register_Effect()
 
         ));
 
+    // 7 Bubble Aura (EssenceBubble / DorppedBubble 공용)
+    Register(CBubbleAura::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CBubbleAura),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBubble::PROTOTYPE_TAG, CBubble::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, Texture_CommonRing01.iLevelID, Texture_CommonRing01.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_CommonRing01.szFileTag, Texture_CommonRing01.iNumTex));
+
+            //TRY_ADD_PROTO(pProxy, iLevelIndex, CStarMesh::PROTOTYPE_TAG, CStarMesh::Create(pDevice, pContext));
+
+            //TRY_ADD_PROTO(pProxy, iLevelIndex, CStarEmitter::PROTOTYPE_TAG, CStarEmitter::Create(pDevice, pContext));
+
+            //TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StarSmooth"),
+            //    CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Star/Common_00_Common_StarSmooth.ysh"));
+        ));
+
+    // 7
+    Register(CFlowerPetals::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CFlowerPetals),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_Flower"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Flower/Flower_00_TopL.ysh"));
+        )
+    );
+
+        
 }
 
 void CGameObject_Factory::Register_Bubble()

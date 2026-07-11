@@ -19,7 +19,7 @@ struct MESH_LAYER_BIND_CONTEXT
 	_uint iMesh = { 0 };
 	const MESH_LAYER_IDX* pLayer = { nullptr };
 
-	MESH_LAYER_PROFILE eProfile = { MESH_LAYER_PROFILE::NONANIM_PBR };
+	MESH_LAYER_PROFILE eProfile = { MESH_LAYER_PROFILE::WORLD_NONANIM };
 	MESH_LAYER_RENDER_KIND eKind = { MESH_LAYER_RENDER_KIND::MAIN };
 
 	_uint iFallbackPass = { 0u };

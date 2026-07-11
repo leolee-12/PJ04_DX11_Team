@@ -9,13 +9,15 @@ NS_BEGIN(Client)
 
 class CKirby;
 
+enum FALL_STATE_FLAG { FALL_DIRECT, PLAY_JUMP_END_L, PLAY_JUMP_END_R};
+
 class CLIENT_DLL CKirby_Fall final : public CKirby_ControllableState
 {
 private:
 	CKirby_Fall();
 	virtual ~CKirby_Fall() = default;
 
-	enum class FALL_STATE { FALLING, LAND_START };
+	enum class FALL_STATE { JUMP_END, FALLING, LAND_START, FALL_STATE_END };
 
 private:
 	HRESULT Initialize();
@@ -32,14 +34,17 @@ public:
 	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand) override;
 
 private:
-	void Update_FallState(CKirby* pKirby);
-
-	void Change_FallState(FALL_STATE eNewState);
+	void Change_FallState(CKirby* pKirby, FALL_STATE eNext);
+	void Enter_FallState(CKirby* pKirby, FALL_STATE eState);
+	void Update_FallState(CKirby* pKirby, _float fTimeDelta);
+	void Exit_FallState(CKirby* pKirby, FALL_STATE eState);
 
 private:
 	FALL_STATE m_eFallState{};
 
 	_bool m_bGuardReserved{};
+
+	_bool m_bLeft{};
 
 public:
 	static CKirby_Fall* Create();

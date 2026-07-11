@@ -29,9 +29,9 @@ const _tchar* CBubble_Manager::Model_Of(COPY_ABILITY_TYPE eAbility) const
 {
     switch (eAbility)
     {
-    case COPY_ABILITY_TYPE::SWORD: return L"Prototype_Component_Model_Sword";
-    case COPY_ABILITY_TYPE::BOMB:  return L"Prototype_Component_Model_KirbyBomb";
-    case COPY_ABILITY_TYPE::ICE:   return L"Prototype_Component_Model_IceHat";
+    case COPY_ABILITY_TYPE::SWORD: return L"Prototype_Component_Ability_Model_Sword";
+    case COPY_ABILITY_TYPE::BOMB:  return L"Prototype_Component_Ability_Model_Bomb";
+    case COPY_ABILITY_TYPE::ICE:   return L"Prototype_Component_Ability_Model_Ice";
     }
     return nullptr;
 }
@@ -75,6 +75,14 @@ HRESULT CBubble_Manager::Register_At_Static(const _tchar* szProtoTag, ID3D11Devi
 HRESULT CBubble_Manager::Spawn(_uint iTargetLevel, BUBBLE_KIND eKind,  COPY_ABILITY_TYPE eAbility, const _float3& vPos, CAbility_Bubble** ppOut)
 {
     return Spawn(iTargetLevel, eKind, eAbility, vPos, _float3(0.f, 0.f, 0.f), ppOut);
+}
+
+HRESULT CBubble_Manager::Spawn(_uint iTargetLevel, BUBBLE_KIND eKind, COPY_ABILITY_TYPE eAbility, _fvector vPos, CAbility_Bubble** ppOut)
+{
+    _float3 vPosition{};
+    XMStoreFloat3(&vPosition, vPos);
+
+    return Spawn(iTargetLevel, eKind, eAbility, vPosition, ppOut);
 }
 
 HRESULT CBubble_Manager::Spawn(_uint iTargetLevel, BUBBLE_KIND eKind, COPY_ABILITY_TYPE eAbility, const _float3& vPos, const _float3& vDir, CAbility_Bubble** ppOut)
@@ -123,6 +131,16 @@ HRESULT CBubble_Manager::Spawn(_uint iTargetLevel, BUBBLE_KIND eKind, COPY_ABILI
     pBubble->Launch(vDir);
     if (ppOut) *ppOut = pBubble;
     return S_OK;
+}
+
+HRESULT CBubble_Manager::Spawn(_uint iTargetLevel, BUBBLE_KIND eKind, COPY_ABILITY_TYPE eAbility, _fvector vPos, _fvector vDir, CAbility_Bubble** ppOut)
+{
+    _float3 vPosition{};
+    _float3 vDirection{};
+    XMStoreFloat3(&vPosition, vPos);
+    XMStoreFloat3(&vDirection, vDir);
+
+    return Spawn(iTargetLevel, eKind, eAbility, vPosition, vDirection, ppOut);
 }
 
 void CBubble_Manager::Return(_uint iLevel, const _wstring& strKey, CAbility_Bubble* p)

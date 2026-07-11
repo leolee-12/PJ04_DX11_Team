@@ -20,9 +20,15 @@ enum class ABILITY_ANI
 	STUFFED_START, STUFFED_WAIT, STUFFED_RUN, STUFFED_JUMP, STUFFED_FALL, STUFFED_LANDING, STUFFED_SPIT,
 	DAMAGED,
 	GUARD,
-	SLIDE_START, SLIDE, SLIDE_END,
+	SLIDE_START, SLIDE,
 	DODGE_START,
+	SLIDE_JUMP_L, SLIDE_JUMP_R,
 	END
+};
+
+enum COMMON_HIT_PARAM
+{
+	SLIDE_H = 100000
 };
 
 class CLIENT_DLL CKirby_Ability abstract : public CKirby_AttackMode
@@ -43,6 +49,8 @@ public:
 	const CAnimator::ANI_PLAY_INFO* Get_AniInfo(ABILITY_ANI eAbilityAni);
 
 	void Play_AbilityAni(CKirby* pKirby, ABILITY_ANI eAbilityAni);
+
+	virtual _bool Can_PlayJumpEndFromSlide() { return true; };
 
 protected:
 	void Set_FullBodyAni(ABILITY_ANI eAni, const _string& strAniName, _bool bLoop = true, _bool bRestart = false, _float fBlend = 0.1f, _float fSpeed = 1.f);

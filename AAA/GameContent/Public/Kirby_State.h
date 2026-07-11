@@ -49,8 +49,26 @@ public:
 	virtual void Update(CKirby* pKirby, const _float fTimeDelta);
 	virtual void Exit(CKirby* pKirby);
 
+	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand);
+
+public:
+	virtual void On_KirbyCollisionEnter(CKirby* pKirby, _uint iColliderType, CCollider* pOther);
+	virtual void On_KirbyCollisionStay(CKirby* pKirby, _uint iColliderType, CCollider* pOther);
+	virtual void On_KirbyCollisionExit(CKirby* pKirby, _uint iColliderType, CCollider* pOther);
+
 public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo);
+
+public:
+	virtual void Request_Attachment(CKirby* pKirby, const KIRBY_ATTACHMENT_BEGIN_DESC* pDesc);
+	virtual void Request_Attachment_End(CKirby* pKirby, const KIRBY_ATTACHMENT_END_DESC* pDesc);
+
+	virtual void Request_PositionSync(CKirby* pKirby, const KIRBY_POSITION_SYNC_BEGIN_DESC* pDesc);
+	virtual void Request_PositionSync_End(CKirby* pKirby, const KIRBY_POSITION_SYNC_END_DESC* pDesc);
+
+	virtual void Request_StageClear(CKirby* pKirby, const CUTSCENE_STAGECLEAR* pDesc);
+
+	virtual _bool Ignore_TimeScale() { return false; }
 
 protected:
 	_bool Handle_MoveCommand(CKirby* pKirby, CKirby_Command* pCommand);
@@ -64,20 +82,6 @@ protected:
 
 protected:
 	CGameInstance_Proxy* m_pGameInstance_Proxy{};
-
-public:
-	virtual _bool Handle_Command(CKirby* pKirby, CKirby_Command* pCommand);
-
-public:
-	virtual void Request_Attachment(CKirby* pKirby, const KIRBY_ATTACHMENT_BEGIN_DESC* pDesc);
-	virtual void Request_Attachment_End(CKirby* pKirby, const KIRBY_ATTACHMENT_END_DESC* pDesc);
-
-	virtual void Request_PositionSync(CKirby* pKirby, const KIRBY_POSITION_SYNC_BEGIN_DESC* pDesc);
-	virtual void Request_PositionSync_End(CKirby* pKirby, const KIRBY_POSITION_SYNC_END_DESC* pDesc);
-
-	virtual void Request_StageClear(CKirby* pKirby, const CUTSCENE_STAGECLEAR* pDesc);
-
-	virtual _bool Ignore_TimeScale() { return false; }
 
 protected:
 	virtual void Free() override;
