@@ -194,6 +194,9 @@ private:
 	void Set_CutsceneAttachTarget(const KIRBY_ATTACHMENT_BEGIN_DESC* pAttachDesc);
 	void Clear_CutsceneAttachTarget();
 
+	void Cal_RenderWorldMatrix();
+	void Update_GroundNormal(_float3& vGroundNormal);
+
 private:
 	// Parts
 	CKirby_Body* m_pBody{};
@@ -245,6 +248,8 @@ private:
 	//Deform Object
 	IDeformable* m_pTriggerDeformObj{};
 	IDeformable* m_pHeldDeformObj{};
+
+	_float4x4 m_RenderWorldMatrix{};
 
 public:
 	static CKirby* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

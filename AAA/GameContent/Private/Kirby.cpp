@@ -58,6 +58,8 @@ HRESULT CKirby::Initialize_Prototype()
 
 HRESULT CKirby::Initialize(void* pArg)
 {
+    XMStoreFloat4x4(&m_RenderWorldMatrix, XMMatrixIdentity());
+
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
@@ -82,7 +84,7 @@ HRESULT CKirby::Initialize(void* pArg)
     // Part 생성된 후
     if (FAILED(Ready_AnimEvents()))
         return E_FAIL;  
-
+  
     m_fInvincibleDuration = 2.f;
 
     return S_OK;
@@ -127,7 +129,7 @@ void CKirby::Update(_float fTimeDelta)
 
     Update_InvincibilityHitFlash();
 
-    Get_CurrentDeformModel()->Set_GoundNormal(m_pMovement->Get_GroundNormal());
+    Cal_RenderWorldMatrix();
 }
 
 void CKirby::Late_Update(_float fTimeDelta)
@@ -503,7 +505,7 @@ HRESULT CKirby::Ready_PartObjects()
 {
     // Body
     CKirby_Body::KIRBY_BODY_DESC BodyDesc{};
-    BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    BodyDesc.pParentMatrix = &m_RenderWorldMatrix;
     BodyDesc.pHitFlashIntensity = Get_HitFlashPtr();       
     BodyDesc.pHitFlashColor = Get_HitFlashColorPtr();
 
@@ -514,7 +516,7 @@ HRESULT CKirby::Ready_PartObjects()
 
     // DeformCar_Demo
     CKirby_DeformCar_Demo::KIRBY_DEFORMCAR_DEMO_DESC DeformCar_Demo_Desc{};
-    DeformCar_Demo_Desc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    DeformCar_Demo_Desc.pParentMatrix = &m_RenderWorldMatrix;
     DeformCar_Demo_Desc.pHitFlashIntensity = Get_HitFlashPtr();
     DeformCar_Demo_Desc.pHitFlashColor = Get_HitFlashColorPtr();
 
@@ -523,7 +525,7 @@ HRESULT CKirby::Ready_PartObjects()
 
     // DeformCar_Main
     CKirby_DeformCar_Main::KIRBY_DEFORMCAR_MAIN_DESC DeformCar_Main_Desc{};
-    DeformCar_Main_Desc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    DeformCar_Main_Desc.pParentMatrix = &m_RenderWorldMatrix;
     DeformCar_Main_Desc.pHitFlashIntensity = Get_HitFlashPtr();
     DeformCar_Main_Desc.pHitFlashColor = Get_HitFlashColorPtr();
 
@@ -533,7 +535,7 @@ HRESULT CKirby::Ready_PartObjects()
 
     // Sword
     CKirby_Sword::KIRBY_SWORD_DESC SwordDesc{};
-    SwordDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    SwordDesc.pParentMatrix = &m_RenderWorldMatrix;
     SwordDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("RHaveL");
     SwordDesc.pHitFlashIntensity = Get_HitFlashPtr();
     SwordDesc.pHitFlashColor = Get_HitFlashColorPtr();
@@ -543,7 +545,7 @@ HRESULT CKirby::Ready_PartObjects()
 
     // SwordHat
     CKirby_SwordHat::KIRBY_SWORDHAT_DESC SwordHatDesc{};
-    SwordHatDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    SwordHatDesc.pParentMatrix = &m_RenderWorldMatrix;
     SwordHatDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("HatL");
     SwordHatDesc.pHitFlashIntensity = Get_HitFlashPtr();
     SwordHatDesc.pHitFlashColor = Get_HitFlashColorPtr();
@@ -826,6 +828,61 @@ void CKirby::Clear_CutsceneAttachTarget()
 
     m_pAttachBone = nullptr;
     m_pAttachOwnerWorld = nullptr;
+}
+
+void CKirby::Cal_RenderWorldMatrix()
+{
+    _float3 vGroundNormal{ 0.f, 1.f, 0.f };
+    Update_GroundNormal(vGroundNormal);
+
+    _vector vUp = XMVector3Normalize(XMLoadFloat3(&vGroundNormal));
+
+    _vector vLook = XMVector3Normalize(
+        XMVectorSetW(m_pTransformCom->Get_State(STATE::LOOK), 0.f));
+
+   vLook = vLook - vUp * XMVector3Dot(vLook, vUp);
+
+   _float3 vScale =m_pTransformCom->Get_Scaled();
+
+   vLook = XMVector3Normalize(vLook);
+
+   _vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vLook));
+   vLook = XMVector3Normalize(XMVector3Cross(vRight, vUp));
+
+   _matrix WorldMatrix = XMMatrixIdentity();
+   WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+   WorldMatrix.r[0] = XMVectorSetW(vRight * vScale.x, 0.f);
+   WorldMatrix.r[1] = XMVectorSetW(vUp * vScale.y, 0.f);
+   WorldMatrix.r[2] = XMVectorSetW(vLook * vScale.z, 0.f);
+
+   XMStoreFloat4x4(&m_RenderWorldMatrix, WorldMatrix);
+}
+
+void CKirby::Update_GroundNormal(_float3& vGroundNormal)
+{
+    _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+
+    _float3 vCenter{};
+    XMStoreFloat3(&vCenter, vPos + XMVectorSet(0.f, 0.35f, 0.f, 0.f));
+
+    const _float3 vHalfExtents = { 0.2f, 0.15f, 0.2f };
+    const _float4 vRot = { 0.f, 0.f, 0.f, 1.f };
+    const _float3 vDir = { 0.f, -1.f, 0.f };
+    const _float fMaxDist = 1.2f;
+
+    _float fHitDist = 0.f;
+    _float3 vHitNormal{ 0.f, 1.f, 0.f };
+
+    if (!m_pGameInstance_Proxy->Sweep_Box(vCenter, vHalfExtents,
+        vRot, vDir, fMaxDist, &vHitNormal, &fHitDist,
+        true, false))
+    {
+        vGroundNormal = { 0.f, 1.f, 0.f };
+        return;
+    }
+
+    vGroundNormal = vHitNormal;
 }
 
 void CKirby::Update_BlobShadow()
