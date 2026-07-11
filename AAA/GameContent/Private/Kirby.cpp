@@ -55,6 +55,8 @@ HRESULT CKirby::Initialize_Prototype()
 
 HRESULT CKirby::Initialize(void* pArg)
 {
+    XMStoreFloat4x4(&m_RenderWorldMatrix, XMMatrixIdentity());
+
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
@@ -79,7 +81,7 @@ HRESULT CKirby::Initialize(void* pArg)
     // Part 생성된 후
     if (FAILED(Ready_AnimEvents()))
         return E_FAIL;  
-
+  
     m_fInvincibleDuration = 2.f;
 
     return S_OK;
@@ -130,6 +132,7 @@ void CKirby::Update(_float fTimeDelta)
 
     Update_InvincibilityHitFlash();
 
+    Cal_RenderWorldMatrix();
     Get_CurrentDeformModel()->Set_GoundNormal(m_pMovement->Get_GroundNormal());
 
 #ifdef _DEBUG
@@ -519,7 +522,7 @@ HRESULT CKirby::Ready_PartObjects()
 {
     // Body
     CKirby_Body::KIRBY_BODY_DESC BodyDesc{};
-    BodyDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    BodyDesc.pParentMatrix = &m_RenderWorldMatrix;
     BodyDesc.pHitFlashIntensity = Get_HitFlashPtr();       
     BodyDesc.pHitFlashColor = Get_HitFlashColorPtr();
 
@@ -530,7 +533,7 @@ HRESULT CKirby::Ready_PartObjects()
 
     // DeformCar_Demo
     CKirby_DeformCar_Demo::KIRBY_DEFORMCAR_DEMO_DESC DeformCar_Demo_Desc{};
-    DeformCar_Demo_Desc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    DeformCar_Demo_Desc.pParentMatrix = &m_RenderWorldMatrix;
     DeformCar_Demo_Desc.pHitFlashIntensity = Get_HitFlashPtr();
     DeformCar_Demo_Desc.pHitFlashColor = Get_HitFlashColorPtr();
 
@@ -539,7 +542,7 @@ HRESULT CKirby::Ready_PartObjects()
 
     // DeformCar_Main
     CKirby_DeformCar_Main::KIRBY_DEFORMCAR_MAIN_DESC DeformCar_Main_Desc{};
-    DeformCar_Main_Desc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    DeformCar_Main_Desc.pParentMatrix = &m_RenderWorldMatrix;
     DeformCar_Main_Desc.pHitFlashIntensity = Get_HitFlashPtr();
     DeformCar_Main_Desc.pHitFlashColor = Get_HitFlashColorPtr();
 
@@ -549,7 +552,7 @@ HRESULT CKirby::Ready_PartObjects()
 
     // Sword
     CKirby_Sword::KIRBY_SWORD_DESC SwordDesc{};
-    SwordDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    SwordDesc.pParentMatrix = &m_RenderWorldMatrix;
     SwordDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("RHaveL");
     SwordDesc.pHitFlashIntensity = Get_HitFlashPtr();
     SwordDesc.pHitFlashColor = Get_HitFlashColorPtr();
@@ -559,7 +562,7 @@ HRESULT CKirby::Ready_PartObjects()
 
     // SwordHat
     CKirby_SwordHat::KIRBY_SWORDHAT_DESC SwordHatDesc{};
-    SwordHatDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    SwordHatDesc.pParentMatrix = &m_RenderWorldMatrix;
     SwordHatDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("HatL");
     SwordHatDesc.pHitFlashIntensity = Get_HitFlashPtr();
     SwordHatDesc.pHitFlashColor = Get_HitFlashColorPtr();
@@ -687,7 +690,7 @@ HRESULT CKirby::Ready_Events()
         }
     );
 
-    //넴주
+    // SequenceLock
     Subscribe_Event(EventTag::Kirby_LevelSpawn,
         [this](void* pData)
         {
@@ -695,9 +698,10 @@ HRESULT CKirby::Ready_Events()
             m_pLastSpawner = pDesc->pSpawner;
 
             Set_OwnerLevelLayer(pDesc->iLevelIndex, m_strLayerTag);
-
-            Warp_To(pDesc->vPosition, pDesc->vLook);
-        });
+            m_pKirby_StateMachine->Request_SequenceLock_StateMachine(pDesc);
+            Set_Active(true);
+        }
+    );
 
     Subscribe_Event(EventTag::Kirby_LevelSleep,
         [this](void* pData)
@@ -707,16 +711,50 @@ HRESULT CKirby::Ready_Events()
             if (pDesc->pSpawner != m_pLastSpawner)
                 return;
 
+            m_pKirby_StateMachine->Request_SequenceLock_End_StateMachine(pDesc);
+            Set_Active(false);
+
+            // 나중에 수정 차 회전이랑 한번에
             Clear_CutsceneAttachTarget();
             Clear_Ladder();
             Set_TriggerDeformObj(nullptr);
             Set_HeldDeformObj(nullptr);
-
-            Set_Active(false);
-        });
+        }
+    );
 
     Subscribe_Event(EventTag::Kirby_HUD_Refresh,
-        [this](void*) { Republish_HUDState(); });
+        [this](void*)
+        {
+            Republish_HUDState();
+        }
+    );
+
+    // Dialogue
+#pragma region Dialogue
+    // 위치 이동
+    Subscribe_Event(EventTag::Sequence_KirbyWarp,
+        [this](void* pData)
+        {
+            const auto* pDesc = static_cast<SEQUENCE_KIRBY_WARP_DESC*>(pData);
+            if (pDesc == nullptr)
+                return;
+
+            m_pKirby_StateMachine->Request_Dialogue_StateMachine(pDesc);
+        }
+    );
+
+    // 대화 애니메이션 시작
+    Subscribe_Event(EventTag::Sequence_KirbyAnim,
+        [this](void* pData)
+        {
+            const auto* pDesc = static_cast<SEQUENCE_KIRBY_ANIM_DESC*>(pData);
+            if (pDesc == nullptr)
+                return;
+
+            m_pKirby_StateMachine->Request_DialogueAnim_StateMachine(pDesc);
+        }
+    );
+#pragma endregion
 
     return S_OK;
 }
@@ -878,22 +916,59 @@ void CKirby::Clear_CutsceneAttachTarget()
     m_pAttachOwnerWorld = nullptr;
 }
 
-void CKirby::Warp_To(const _float3& vPosition, const _float3& vLook)
+void CKirby::Cal_RenderWorldMatrix()
 {
-    m_pTransformCom->Set_State(STATE::POSITION,
-        XMVectorSetW(XMLoadFloat3(&vPosition), 1.f));
+    _float3 vGroundNormal{ 0.f, 1.f, 0.f };
+    Update_GroundNormal(vGroundNormal);
 
-    _vector vFlatLook = XMVectorSetY(XMVectorSetW(XMLoadFloat3(&vLook), 0.f), 0.f);
-    if (XMVectorGetX(XMVector3LengthSq(vFlatLook)) > FLT_EPSILON)
-        m_pTransformCom->LookAt(m_pTransformCom->Get_State(STATE::POSITION) + vFlatLook);
+    _vector vUp = XMVector3Normalize(XMLoadFloat3(&vGroundNormal));
 
-    if (m_pMovement)
-        m_pMovement->Sync_To_Controller();
+    _vector vLook = XMVector3Normalize(
+        XMVectorSetW(m_pTransformCom->Get_State(STATE::LOOK), 0.f));
 
-    // 이거 일단 임시로 박음
-    Change_State(KIRBY_STATE_TYPE::WAIT);
+   vLook = vLook - vUp * XMVector3Dot(vLook, vUp);
 
-    Set_Active(true);
+   _float3 vScale =m_pTransformCom->Get_Scaled();
+
+   vLook = XMVector3Normalize(vLook);
+
+   _vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vLook));
+   vLook = XMVector3Normalize(XMVector3Cross(vRight, vUp));
+
+   _matrix WorldMatrix = XMMatrixIdentity();
+   WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+   WorldMatrix.r[0] = XMVectorSetW(vRight * vScale.x, 0.f);
+   WorldMatrix.r[1] = XMVectorSetW(vUp * vScale.y, 0.f);
+   WorldMatrix.r[2] = XMVectorSetW(vLook * vScale.z, 0.f);
+
+   XMStoreFloat4x4(&m_RenderWorldMatrix, WorldMatrix);
+}
+
+void CKirby::Update_GroundNormal(_float3& vGroundNormal)
+{
+    _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+
+    _float3 vCenter{};
+    XMStoreFloat3(&vCenter, vPos + XMVectorSet(0.f, 0.35f, 0.f, 0.f));
+
+    const _float3 vHalfExtents = { 0.2f, 0.15f, 0.2f };
+    const _float4 vRot = { 0.f, 0.f, 0.f, 1.f };
+    const _float3 vDir = { 0.f, -1.f, 0.f };
+    const _float fMaxDist = 1.2f;
+
+    _float fHitDist = 0.f;
+    _float3 vHitNormal{ 0.f, 1.f, 0.f };
+
+    if (!m_pGameInstance_Proxy->Sweep_Box(vCenter, vHalfExtents,
+        vRot, vDir, fMaxDist, &vHitNormal, &fHitDist,
+        true, false))
+    {
+        vGroundNormal = { 0.f, 1.f, 0.f };
+        return;
+    }
+
+    vGroundNormal = vHitNormal;
 }
 
 void CKirby::Republish_HUDState()
@@ -905,8 +980,7 @@ void CKirby::Republish_HUDState()
     m_pGameInstance_Proxy->Publish(EventTag::Kirby_HP_Updated, &tHP);
 
     KIRBY_NAME_UPDATED tName{};
-    if (CKirby_AttackMode* pMode = Get_ActiveAttackMode())
-        tName.strAtkModeName = pMode->Get_AttackModeName();
+    tName.strAtkModeName = Get_ActiveAttackMode()->Get_AttackModeName();
     m_pGameInstance_Proxy->Publish(EventTag::Kirby_Name_Updated, &tName);
 }
 

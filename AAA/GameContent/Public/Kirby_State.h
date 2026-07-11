@@ -28,8 +28,12 @@ enum class KIRBY_STATE_TYPE
 	DODGE,
 	LADDER,
 	GET_DEFORM, DEFORM_DUMP,
+
+
 	CUTSCENE_GRABBED, QTE_GRABBED, CAR_FIRST_BREAK_WALL, DEFORM_CAR_BRIDGE,
-	STAGE_CLEAR
+	STAGE_CLEAR,
+	SEQUENCE_LOCK,
+	DIALOGUE
 };
 
 class CLIENT_DLL CKirby_State abstract : public CBase
@@ -60,6 +64,8 @@ public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo);
 
 public:
+	virtual _bool Ignore_TimeScale() { return false; }
+
 	virtual void Request_Attachment(CKirby* pKirby, const KIRBY_ATTACHMENT_BEGIN_DESC* pDesc);
 	virtual void Request_Attachment_End(CKirby* pKirby, const KIRBY_ATTACHMENT_END_DESC* pDesc);
 
@@ -68,7 +74,15 @@ public:
 
 	virtual void Request_StageClear(CKirby* pKirby, const CUTSCENE_STAGECLEAR* pDesc);
 
-	virtual _bool Ignore_TimeScale() { return false; }
+	// Dialogue
+	virtual void Request_Dialogue(CKirby* pKirby, const SEQUENCE_KIRBY_WARP_DESC* pDesc);
+	virtual void Request_DialogueAnim(CKirby* pKirby, const SEQUENCE_KIRBY_ANIM_DESC* pDesc);
+
+	// SequenceLock
+	virtual void Request_SequenceLock(CKirby* pKirby, const KIRBY_LEVEL_SPAWN_DESC* pDesc);
+	virtual void Request_SequenceLock_End(CKirby* pKirby, const KIRBY_LEVEL_SLEEP_DESC* pDesc);
+
+	virtual void Cleanup_ForLevelTransition(CKirby* pKirby, const KIRBY_LEVEL_SPAWN_DESC* pDesc);
 
 protected:
 	_bool Handle_MoveCommand(CKirby* pKirby, CKirby_Command* pCommand);

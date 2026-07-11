@@ -27,6 +27,8 @@
 #include "Kirby_CarFirstBreakWall.h"
 #include "Kirby_DeformCarBridge.h"
 #include "Kirby_Clear.h"
+#include "Kirby_Dialogue.h"
+#include "Kirby_SequenceLock.h"
 
 CKirby_StateMachine::CKirby_StateMachine()
 {
@@ -166,6 +168,40 @@ void CKirby_StateMachine::Request_ClearStage_StateMachine(const CUTSCENE_STAGECL
     m_pCurState->Request_StageClear(m_pKirby, pDesc);
 }
 
+void CKirby_StateMachine::Request_Dialogue_StateMachine(const SEQUENCE_KIRBY_WARP_DESC* pDesc)
+{
+    if (m_pCurState->Get_StateType() != KIRBY_STATE_TYPE::DIALOGUE)
+        Change_State(KIRBY_STATE_TYPE::DIALOGUE);
+
+    m_pCurState->Request_Dialogue(m_pKirby, pDesc);
+}
+
+void CKirby_StateMachine::Request_DialogueAnim_StateMachine(const SEQUENCE_KIRBY_ANIM_DESC* pDesc)
+{
+    if (m_pCurState->Get_StateType() != KIRBY_STATE_TYPE::DIALOGUE)
+    {
+        MSG_BOX("Is Not Dialogue State : CKirby_StateMachine");
+        return;
+    }
+
+    m_pCurState->Request_DialogueAnim(m_pKirby, pDesc);
+}
+
+void CKirby_StateMachine::Request_SequenceLock_StateMachine(const KIRBY_LEVEL_SPAWN_DESC* pDesc)
+{
+    m_pCurState->Cleanup_ForLevelTransition(m_pKirby, pDesc);
+
+    if (m_pCurState->Get_StateType() != KIRBY_STATE_TYPE::SEQUENCE_LOCK)
+        Change_State(KIRBY_STATE_TYPE::SEQUENCE_LOCK);
+
+    m_pCurState->Request_SequenceLock(m_pKirby, pDesc);
+}
+
+void CKirby_StateMachine::Request_SequenceLock_End_StateMachine(const KIRBY_LEVEL_SLEEP_DESC* pDesc)
+{
+    m_pCurState->Request_SequenceLock_End(m_pKirby, pDesc);
+}
+
 void CKirby_StateMachine::Get_EssenceBubble(COPY_ABILITY_TYPE eNewAbility)
 {
     if (m_pKirby->Has_Deform())
@@ -226,6 +262,8 @@ HRESULT CKirby_StateMachine::Init_State()
     if (FAILED(Register_State(KIRBY_STATE_TYPE::CAR_FIRST_BREAK_WALL, CKirby_CarFirstBreakWall::Create()))) return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::DEFORM_CAR_BRIDGE, CKirby_DeformCarBridge::Create())))      return E_FAIL;
     if (FAILED(Register_State(KIRBY_STATE_TYPE::STAGE_CLEAR, CKirby_Clear::Create())))                      return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::DIALOGUE, CKirby_Dialogue::Create())))                      return E_FAIL;
+    if (FAILED(Register_State(KIRBY_STATE_TYPE::SEQUENCE_LOCK, CKirby_SequenceLock::Create())))             return E_FAIL;
 
     return S_OK;
 }

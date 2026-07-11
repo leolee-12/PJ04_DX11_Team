@@ -194,8 +194,14 @@ private:
 	void Set_CutsceneAttachTarget(const KIRBY_ATTACHMENT_BEGIN_DESC* pAttachDesc);
 	void Clear_CutsceneAttachTarget();
 
+	void Update_BlobShadow();
+	void Update_InvincibilityHitFlash();
+
+	// Modle Rot
+	void Cal_RenderWorldMatrix();
+	void Update_GroundNormal(_float3& vGroundNormal);
+
 	// Level SPawn
-	void Warp_To(const _float3& vPosition, const _float3& vLook);
 	void Republish_HUDState();
 
 private:
@@ -212,9 +218,6 @@ private:
 
 	// Collider
 	vector<CCollider*> m_KirbyColliders;
-
-	void Update_BlobShadow();
-	void Update_InvincibilityHitFlash();
 
 private:
 	// System
@@ -250,7 +253,9 @@ private:
 	IDeformable* m_pTriggerDeformObj{};
 	IDeformable* m_pHeldDeformObj{};
 
-	// Level Spawn
+	_float4x4 m_RenderWorldMatrix{};
+
+	// Level Spawner
 	const void* m_pLastSpawner = { nullptr };
 
 public:
