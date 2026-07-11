@@ -352,6 +352,7 @@ PS_COLOR_OUT PS_MAIN(PS_IN In)
 {
     PS_COLOR_OUT Out;
     Out.vColor = ComposeEffectColor_Linear(In.vTexcoord);
+    Out.vColor.rgb += g_vEmissiveColor.rgb * Out.vColor.a;
     return Out;
 }
 
@@ -359,6 +360,7 @@ PS_COLOR_OUT PS_MAIN_MIRROR(PS_IN In)
 {
     PS_COLOR_OUT Out;
     Out.vColor = ComposeEffectColor_Mirror(In.vTexcoord);
+    Out.vColor.rgb += g_vEmissiveColor.rgb * Out.vColor.a;
     return Out;
 }
 

@@ -142,6 +142,9 @@ void CEffect_Part::MoveUVScroll(const _float fRatio, const _bool bUpdate, const 
 
 HRESULT CEffect_Part::Bind_ShaderValue()
 {
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vEmissiveColor", &m_vEmissiveColor, sizeof(m_vEmissiveColor))))
+        return E_FAIL;
+
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fEffectIntensity", &m_fEffectIntensity, sizeof(m_fEffectIntensity))))
         return E_FAIL;
 
@@ -228,6 +231,7 @@ void CEffect_Part::Init_PropertyValue()
     m_iMirror = Sampler::DEFAULT;
     m_iDepthIgnore = DepthMode::DEPTH_DEFAULT;
     m_fEffectIntensity = 1.f;
+    m_vEmissiveColor = { 0.f, 0.f, 0.f, 0.f };
 
     m_vLocalPos = { 0.f, 0.f, 0.f };
 
