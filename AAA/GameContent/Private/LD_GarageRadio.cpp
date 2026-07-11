@@ -1,11 +1,14 @@
 #include "LD_GarageRadio.h"
 #include "LevelDesign_Registry.h"
-#include "GameContrnt_Events.h"
 
 #include "Parsing_Utils.h"
 
 namespace
 {
+	// AnimEvent 추가 후
+	// 1. Validated_Initailzed에서 방어 코드 제거
+	// 2. Clone에서 AnimEvent json 경로 추가
+
 	inline constexpr const _tchar* TEMP_EVENT_TAG = L"Bridge.CutSceneStart";
 
 	inline constexpr const _char* GARAGE_RADIO_MODEL_PATH = "../../Resources/Map/Gimmick/Anim/GarageRadio/GarageRadio.ysh";
@@ -188,6 +191,24 @@ CLD_GarageRadio* CLD_GarageRadio::Create(ID3D11Device* pDevice, ID3D11DeviceCont
 CGameObject* CLD_GarageRadio::Clone(void* pArg)
 {
 	CLD_GarageRadio* pInstance = new CLD_GarageRadio(*this);
+	
+	LD_EVENTOBJECT_DESC TempDesc{};
+	if (nullptr == pArg)
+	{
+		TempDesc.strObjectName = OBJECT_NAME;
+		TempDesc.strKind = OBJECT_NAME;
+		TempDesc.eCategory = LD_CATEGORY::GIMMICK;
+		TempDesc.iModelProtoLevel = m_iPrototypeLevel;
+		TempDesc.eModelType = MODEL::ANIM;
+		TempDesc.wstrModelProtoTag = MODEL_PROTO_TAG;
+		TempDesc.bUseCollMesh = false;
+		TempDesc.strAnimEventFile.clear();
+
+		TempDesc.strAnimNames[0] = GARAGE_RADIO_ANIM_NAMES[0];
+		TempDesc.strAnimNames[1] = GARAGE_RADIO_ANIM_NAMES[1];
+
+		pArg = &TempDesc;
+	}
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
