@@ -37,9 +37,6 @@
 #include "EssenceBubble.h"
 #include "LD_DeformObject.h"
 
-// юс╫ц
-#include "Bubble_Manager.h"
-
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCharacter{ pDevice, pContext }
 {

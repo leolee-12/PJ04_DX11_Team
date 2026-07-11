@@ -126,6 +126,12 @@ void CCappy_Hat::On_SpatEnd()
 	Set_Active(false);
 }
 
+void CCappy_Hat::Enable_HurtBox(_bool b)
+{
+	if (m_pHurtBox)
+		m_pHurtBox->Set_Enabled(b);
+}
+
 HRESULT CCappy_Hat::Ready_Components()
 {
 	PART_SETUP t{};

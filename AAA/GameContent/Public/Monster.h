@@ -108,7 +108,7 @@ public:
 
 	// À±¼®Çö Ãß°¡
 	void						Enable_Controller(_bool bEnable);
-	void						Enable_Colliders(_bool bEnable);
+	virtual void				Enable_Colliders(_bool bEnable);
 
 	void						Play_ActionLoopSFX(const _tchar* pKey);
 	void						Stop_ActionLoopSFX();

@@ -44,6 +44,8 @@ public:
     virtual void                On_SpatBegin() override; // AI/컨트롤러/자체콜라이더 끄고 애님 전환
     virtual void                On_SpatEnd() override; // 풀 반환(Set_Active false) 또는 사망FX
 
+    void                        Enable_HurtBox(_bool b);
+
     _bool                       Is_Capturing() const { return m_bCaptured; }
     _bool                       Is_Detached() const { return m_bDetached; }
     _bool                       Is_Gone() const { return m_bGone; }

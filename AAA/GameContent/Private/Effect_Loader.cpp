@@ -59,6 +59,7 @@ namespace
         { TEXT("BombFuseEffect"),         TEXT("../../Resources/CHJ/Effect/BombFuseEffect.JSON") },
 
         { TEXT("FlowerPetals"),           TEXT("../../Resources/Map/Effect/Proto_FlowerPetals_0.JSON") },
+        { TEXT("BubbleAura"),             TEXT("../../Resources/CHJ/Effect/BubbleAura.JSON") },
     };
 }
 
