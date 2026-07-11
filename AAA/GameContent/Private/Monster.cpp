@@ -540,23 +540,18 @@ _bool CMonster::Handle_SharedAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePh
 	{
 		if (ePhase != ANIM_EVENT_PHASE::POINT)
 			return true;
+
 		if (e.strParam.empty())
 			return true;
 
-		string strKey = e.strParam;
-		const size_t iLen = strKey.size();
-		if (iLen < 4 ||	
-			strKey.compare(iLen - 4, 4, ".wav") != 0)
-			strKey += ".wav";
-
 		if (m_bSFX2D)
 		{
-			m_pGameInstance_Proxy->Play_SFX(StrToWstr(strKey).c_str(), e.vOffset.x);
+			m_pGameInstance_Proxy->Play_SFX(StrToWstr(e.strParam).c_str(), e.vOffset.x);
 		}
 		else
 		{
 			_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
-			m_pGameInstance_Proxy->Play_SFX3D(StrToWstr(strKey).c_str(), vPos, e.vOffset.x);
+			m_pGameInstance_Proxy->Play_SFX3D(StrToWstr(e.strParam).c_str(), vPos, e.vOffset.x);
 		}
 		return true;
 	}
