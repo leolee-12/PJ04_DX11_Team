@@ -273,7 +273,7 @@ HRESULT CLevelDesign_Ladder::Ready_Trigger()
 	CCollider::COLLIDER_DESC Desc{};
 	Desc.pOwner = this;
 	Desc.fHeight = (_float)m_tLadderDesc.iLength * m_fSegmentStepY;
-	Desc.fRadius = 0.5f;
+	Desc.fRadius = 0.3f;
 	Desc.vCenter = _float3(0.f, -0.75f, -1.f);
 
 	m_pTrigger = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag, TEXT("Com_Trigger"), &Desc);

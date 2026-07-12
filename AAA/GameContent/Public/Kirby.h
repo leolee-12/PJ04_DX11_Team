@@ -56,7 +56,7 @@ public:
 
 	// Movement_Child
 	static constexpr _float s_fGroundFriction = 40.f;
-	static constexpr _float s_fMaxHorizontalSpeed = 9.f;
+	static constexpr _float s_fMaxHorizontalSpeed = 8.5f;
 
 	static constexpr _float s_fLinearDrag = 0.9f;
 	static constexpr _float s_fFallVelocityY = -7.f;
@@ -242,9 +242,10 @@ private:
 	unordered_map<DEFORM_TYPE, CKirby_Deform*> m_Deformations;
 
 	// CutScene Attach
-	_float3 m_vPreAttachScale{};
+	_bool m_bIsAttach{};
 	const _float4x4* m_pAttachBone{};
 	const _float4x4* m_pAttachOwnerWorld{};
+	_float3 m_vPreAttachScale{ 1.f, 1.f, 1.f };
 
 	// Ladder
 	CLevelDesign_Ladder* m_pLadder{};
@@ -254,7 +255,7 @@ private:
 	IDeformable* m_pHeldDeformObj{};
 
 	_float4x4 m_RenderWorldMatrix{};
-	_float3 m_vRenderGroundNormal{};
+	_float3 m_vRenderGroundNormal{ 0.f, 1.f, 0.f };
 
 	// Level Spawner
 	const void* m_pLastSpawner = { nullptr };
