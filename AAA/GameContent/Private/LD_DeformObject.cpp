@@ -82,7 +82,12 @@ HRESULT CLD_DeformObject::Initialize(void* pArg)
 
 	m_eKind = pCatalog->eKind;
 
-	return __super::Initialize(pArg);
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
+
+	m_bUseShadow = true;
+
+	return S_OK;
 }
 
 HRESULT CLD_DeformObject::Validate_Initialized()

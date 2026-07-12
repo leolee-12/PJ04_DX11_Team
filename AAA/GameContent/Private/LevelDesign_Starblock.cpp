@@ -109,6 +109,11 @@ HRESULT CLevelDesign_Starblock::Initialize(void* pArg)
 
 	Compute_SpatPivot();
 
+	if (FAILED(Ready_CullBounds(m_pModelCom)))
+		return E_FAIL;
+
+	m_bUseShadow = true;
+
 	return S_OK;
 }
 
@@ -143,8 +148,12 @@ void CLevelDesign_Starblock::Late_Update(_float fTimeDelta)
 		return;
 
 	__super::Late_Update(fTimeDelta);
-	
-	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+
+	if (m_bCullTransformDynamic)
+		Refresh_WorldBounds();
+
+	Check_Visible();
+	Submit_RenderGroups();
 }
 
 HRESULT CLevelDesign_Starblock::Render()
@@ -189,6 +198,14 @@ HRESULT CLevelDesign_Starblock::Render()
 	return S_OK;
 }
 
+HRESULT CLevelDesign_Starblock::Render_Shadow()
+{
+	if (!m_bActive)
+		return S_OK;
+
+	return Render_ShadowModel(m_pShaderCom, m_pModelCom, MESH_LAYER_PROFILE::WORLD_NONANIM);
+}
+
 void CLevelDesign_Starblock::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 {
 	if (nullptr == pOutData)
@@ -227,6 +244,14 @@ void CLevelDesign_Starblock::Be_Captured(CGameObject* pInhaler)
 	Release_RigidStatic();
 
 	__super::Be_Captured(pInhaler);
+
+	m_bCullTransformDynamic = true;
+}
+
+void CLevelDesign_Starblock::On_SpatEnd()
+{
+	__super::On_SpatEnd();
+	m_bCullTransformDynamic = false;
 }
 #pragma endregion
 

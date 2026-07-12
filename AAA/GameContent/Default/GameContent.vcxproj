@@ -208,7 +208,6 @@
     <ClInclude Include="..\Public\LevelDesign_Food.h" />
     <ClInclude Include="..\Public\LevelDesign_Ladder.h" />
     <ClInclude Include="..\Public\LevelDesign_Point.h" />
-    <ClInclude Include="..\Public\LevelDesign_Portal.h" />
     <ClInclude Include="..\public\GigantEdge_Brain.h" />
     <ClInclude Include="..\Public\Kirby_Damaged.h" />
     <ClInclude Include="..\Public\LevelDesign_Starblock.h" />
@@ -591,7 +590,6 @@
     <ClCompile Include="..\Private\LevelDesign_Loader.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Parser.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Point.cpp" />
-    <ClCompile Include="..\Private\LevelDesign_Portal.cpp" />
     <ClCompile Include="..\Private\LevelDesign_ProtoRegister.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Rail.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Registry.cpp" />

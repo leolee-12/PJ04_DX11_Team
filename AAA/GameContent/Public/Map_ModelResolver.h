@@ -2,7 +2,10 @@
 #include "Base.h"
 #include "Map_LoadTypes.h"
 
+#include <memory>
+
 NS_BEGIN(Client)
+struct MAP_ENV_MODEL_INDEX;
 
 class CMap_ModelResolver final : public CBase
 {
@@ -16,6 +19,8 @@ public:
 	_bool Resolve_EnvObject(ENV_OBJECT_DESC* pDesc);
 	void Clear_EnvModelCache();
 
+	static void Invalidate_EnvModelCache(const _wstring& strMapRoot = L"../../Resources/Map");
+
 private:
 	void Build_MapSectionCandidates(const _wstring& strSectionName, vector<_wstring>* pOutCandidates) const;
 	_wstring Make_MapSectionProtoTag(const _wstring& strStageFolderName, const _wstring& strSectionName) const;
@@ -23,16 +28,8 @@ private:
 	_bool Resolve_EnvByKey(const _wstring& strKey, ENV_OBJECT_DESC* pDesc) const;
 
 private:
-	struct ENV_MODEL_ENTRY
-	{
-		_wstring wstrModelPath;
-		_wstring wstrModelProtoTag;
-	};
-
-private:
 	_wstring m_strMapRoot;
-	filesystem::path m_EnvCacheRoot;
-	unordered_map<_wstring, ENV_MODEL_ENTRY> m_EnvModelCache;
+	shared_ptr<const MAP_ENV_MODEL_INDEX> m_pEnvModelIndex;
 
 public:
 	static CMap_ModelResolver* Create(const _wstring& strMapRoot = L"../../Resources/Map");

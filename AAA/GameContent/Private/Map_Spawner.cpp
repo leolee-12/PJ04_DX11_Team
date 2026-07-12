@@ -86,14 +86,18 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 	if (nullptr != ppOutEnvInstanceController)
 		*ppOutEnvInstanceController = nullptr;
 
-	MAP_STAGE_DESC StageDesc = Package.StageDesc;
-	StageDesc.iSectionProtoLevel = Levels.iObjectLevel;
-
-	for (MAP_SECTION_DESC& SectionDesc : StageDesc.SectionDescs)
-		SectionDesc.iModelProtoLevel = Levels.iStageModelLevel;
-
 	vector<CGameObject*> CreatedObjects;
 	vector<PENDING_CREATED_CALLBACK_INFO> PendingCallbacks;
+
+	const size_t iExpectedObjectCount =
+		(Options.bSpawnStage ? 2u : 0u)
+		+ (Options.bSpawnEnv
+			? Package.EnvObjectDescs.size() + Package.AddedObjectDescs.size() + 1u
+			: 0u);
+
+	CreatedObjects.reserve(iExpectedObjectCount);
+	PendingCallbacks.reserve(iExpectedObjectCount);
+
 	CMapStage* pStage = nullptr;
 	CEnv_InstanceController* pEnvInstanceController = nullptr;
 
@@ -101,6 +105,12 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 	{
 		if (nullptr == Targets.Stage.pLayerTag || nullptr == Targets.pStageObjectTag)
 			return E_FAIL;
+
+		MAP_STAGE_DESC StageDesc = Package.StageDesc;
+		StageDesc.iSectionProtoLevel = Levels.iObjectLevel;
+
+		for (MAP_SECTION_DESC& SectionDesc : StageDesc.SectionDescs)
+			SectionDesc.iModelProtoLevel = Levels.iStageModelLevel;
 
 		CGameObject* pStageObject = nullptr;
 		if (FAILED(m_pProxy->Add_GameObject_Return(
@@ -325,7 +335,7 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 		if (Options.bSpawnStage)
 		{
 			pOutReport->bStageLoaded = true;
-			pOutReport->strStageName = StageDesc.strStageName;
+			pOutReport->strStageName = Package.StageDesc.strStageName;
 		}
 
 		if (Options.bSpawnEnv)

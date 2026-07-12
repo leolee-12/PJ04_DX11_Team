@@ -56,7 +56,6 @@ public:
 	_float Get_Dissolve() const { return m_fDissolve; }
 
 	_bool Pick_Marb1e(_fvector vRayOrigin, _fvector vRayDir, _float3* pOutHit, _float* fOutDistance);
-	HRESULT Refresh();
 
 #pragma region Editable
 	virtual _bool Get_EditDesc(EDITABLE_DESC* pOutDesc) const override;
@@ -68,8 +67,9 @@ public:
 
 protected:
 	HRESULT Ready_RenderComponents(_uint iModelProtoLevel, const wstring& wstrModelProtoTag);
-	HRESULT Ready_PhysicsActor();
+	HRESULT Rebuild_PhysicsActor();
 	HRESULT Ready_PhysicsActor_ModelMesh();
+	HRESULT Sync_PhysicsActorPose();
 	void	Release_PhysicsActor();
 
 	_bool	Should_CreatePhysicsActor() const;
@@ -86,6 +86,7 @@ protected:
 	CShader*		m_pShaderCom = { nullptr };
 	CModel*			m_pModelCom = { nullptr };
 	physx::PxRigidStatic* m_pPhysicsActor = { nullptr };
+	_float3         m_vPhysicsActorScale = { 1.f, 1.f, 1.f };
 
 	BoundingBox		m_LocalBounds = {};
 	BoundingBox		m_WorldBounds = {};

@@ -63,30 +63,4 @@ struct MAP_PRESET
 	_uint iEnvJsonPathCount;
 };
 
-#ifdef _DEBUG
-struct MAP_SECTION_PROFILE
-{
-	double	dRenderCpuMs = {};
-	_uint	iEstimatedDrawCalls = {};
-};
-
-struct MAP_STAGE_PROFILE
-{
-	_uint   iFrameIndex = {};
-	_uint   iTotalSections = {};
-
-	_uint   iMainCandidateSections = {};
-	_uint   iMainVisibleSections = {};
-	_uint   iMainCulledSections = {};
-	_uint   iMainSubmittedSections = {};
-	_uint   iMainSubmittedNonBlend = {};
-	_uint   iMainSubmittedBlend = {};
-
-	_uint   iShadowCandidateSections = {};
-	_uint   iShadowSubmittedSections = {};
-
-	double  dCullingCpuMs = {};
-};
-#endif
-
 NS_END
