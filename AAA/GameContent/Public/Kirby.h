@@ -198,8 +198,8 @@ private:
 	void Update_InvincibilityHitFlash();
 
 	// Modle Rot
-	void Cal_RenderWorldMatrix();
-	void Update_GroundNormal(_float3& vGroundNormal);
+	void Update_RenderWorldMatrix(_float fTimeDelta);
+	_bool Cal_GroundNormal(_float3& vGroundNormal);
 
 	// Level Spawn
 	void Republish_HUDState();
@@ -254,6 +254,7 @@ private:
 	IDeformable* m_pHeldDeformObj{};
 
 	_float4x4 m_RenderWorldMatrix{};
+	_float3 m_vRenderGroundNormal{};
 
 	// Level Spawner
 	const void* m_pLastSpawner = { nullptr };
