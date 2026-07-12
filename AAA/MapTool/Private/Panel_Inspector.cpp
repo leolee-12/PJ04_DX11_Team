@@ -900,7 +900,8 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 				ImGui::Checkbox(pRenderableLabel, (bool*)pbRenderable);
 
 			ImGui::TextDisabled("Transform and Renderable affect the current preview.");
-			ImGui::TextDisabled("Culling, shadow, and section collision actor are not used by MapEvent_BreakWall.");
+			ImGui::TextDisabled("Culling and section collision actor are not used by MapEvent_BreakWall.");
+			ImGui::TextDisabled("Shadow follows Renderable and break state.");
 		}
 	}
 

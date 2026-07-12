@@ -197,6 +197,13 @@ _wstring CEnvObject_Trigger::Get_DebugLabel() const
 
 void CEnvObject_Trigger::Free()
 {
+	if (nullptr != m_pCollider)
+	{
+		m_pCollider->Set_OnEnter(nullptr);
+		m_pCollider->Set_OnStay(nullptr);
+		m_pCollider->Set_OnExit(nullptr);
+	}
+
 	__super::Free();
 }
 

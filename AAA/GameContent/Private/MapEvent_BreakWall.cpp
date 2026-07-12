@@ -1,5 +1,6 @@
 #include "MapEvent_BreakWall.h"
 #include "GameContrnt_Events.h"
+#include "Shader_PassMeta.h"
 
 #include "GameInstance.h"
 #include "Geometry_Utils.h"
@@ -141,6 +142,7 @@ void CMapEvent_BreakWall::Late_Update(_float fTimeDelta)
 		|| BREAK_STATE::BREAKING == m_eBreakState)
 	{
 		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 	}
 }
 
@@ -170,18 +172,49 @@ HRESULT CMapEvent_BreakWall::Render()
 		if (BREAK_STATE::BREAKING == m_eBreakState && !pFragment->bActive)
 			continue;
 
-		const _float3 vEnginePivot = { pFragment->vPivot.x, pFragment->vPivot.y, -pFragment->vPivot.z };
-
-		_matrix Rotation = XMMatrixRotationQuaternion(XMLoadFloat4(&pFragment->vRotation));
-		_matrix Translation = XMMatrixTranslation(
-			vEnginePivot.x + pFragment->vOffset.x,
-			vEnginePivot.y + pFragment->vOffset.y,
-			vEnginePivot.z + pFragment->vOffset.z);
-
-		_float4x4 WorldMatrix{};
-		XMStoreFloat4x4(&WorldMatrix, Rotation * Translation * BreakWallWorld);
+		const _float4x4 WorldMatrix = Build_FragmentWorldMatrix(*pFragment, BreakWallWorld);
 
 		if (FAILED(Render_MapMesh(i, &WorldMatrix)))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+HRESULT CMapEvent_BreakWall::Render_Shadow()
+{
+	if (!m_bRenderable)
+		return S_OK;
+
+	if (BREAK_STATE::INTACT != m_eBreakState
+		&& BREAK_STATE::BREAKING != m_eBreakState)
+	{
+		return S_OK;
+	}
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
+		return E_FAIL;
+
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+	const _matrix BreakWallWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		const BREAK_FRAGMENT* pFragment = Find_Fragment(i);
+		if (nullptr == pFragment)
+			continue;
+		if (BREAK_STATE::BREAKING == m_eBreakState && !pFragment->bActive)
+			continue;
+
+		const _float4x4 WorldMatrix = Build_FragmentWorldMatrix(*pFragment, BreakWallWorld);
+
+		if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &WorldMatrix)))
+			return E_FAIL;
+		if (FAILED(m_pShaderCom->Begin(ETOI(MAP_PASS::SHADOW))))
+			return E_FAIL;
+		if (FAILED(m_pModelCom->Render(i)))
 			return E_FAIL;
 	}
 
@@ -415,6 +448,21 @@ void CMapEvent_BreakWall::Start_Break()
 			1.60f + static_cast<_float>(i % 5) * 0.5f,
 			1.45f + static_cast<_float>(i % 4) * 0.5f };
 	}
+}
+
+_float4x4 CMapEvent_BreakWall::Build_FragmentWorldMatrix(const BREAK_FRAGMENT& Fragment, _fmatrix BreakWallWorld) const
+{
+	const _float3 vEnginePivot = { Fragment.vPivot.x, Fragment.vPivot.y, -Fragment.vPivot.z };
+
+	const _matrix Rotation = XMMatrixRotationQuaternion(XMLoadFloat4(&Fragment.vRotation));
+	const _matrix Translation = XMMatrixTranslation(
+		vEnginePivot.x + Fragment.vOffset.x,
+		vEnginePivot.y + Fragment.vOffset.y,
+		vEnginePivot.z + Fragment.vOffset.z);
+
+	_float4x4 WorldMatrix{};
+	XMStoreFloat4x4(&WorldMatrix, Rotation * Translation * BreakWallWorld);
+	return WorldMatrix;
 }
 
 CMapEvent_BreakWall* CMapEvent_BreakWall::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
