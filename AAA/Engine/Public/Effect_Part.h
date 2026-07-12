@@ -17,6 +17,18 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
     PROPERTY(_float, m_fEffectIntensity, L"Effect Intensity_E", L"Effect");
     PROPERTY(_float4, m_vEmissiveColor, L"Emissive Color", L"Effect");
 
+    PROPERTY(_bool, m_bEmissiveChange, L"Emissive Change_EM", L"Emissive");
+    PROPERTY(_float4, m_vEmissiveStartValue, L"Start_EM", L"Emissive");
+    PROPERTY(_float4, m_vEmissiveEndValue, L"End_EM", L"Emissive");
+
+    PROPERTY(_bool, m_bActive_Emissive_Ratio_1, L"Active Ratio 1_EM", L"Emissive");
+    PROPERTY(_float, m_fEmissive_Ratio_1, L"Ratio 1_EM", L"Emissive");
+    PROPERTY(_float4, m_vEmissive_Value_1, L"Value 1_EM", L"Emissive");
+
+    PROPERTY(_bool, m_bActive_Emissive_Ratio_2, L"Active Ratio 2_EM", L"Emissive");
+    PROPERTY(_float, m_fEmissive_Ratio_2, L"Ratio 2_EM", L"Emissive");
+    PROPERTY(_float4, m_vEmissive_Value_2, L"Value 2_EM", L"Emissive");
+
     PROPERTY(_float3, m_vLocalPos,      L"Local Pos",   L"Effect");
 
     // Orbit
@@ -88,6 +100,12 @@ protected:
     {
         _float fRatio{};
         _float3 vValue{};
+    };
+
+    struct RATIO_VALUE_FLOAT4
+    {
+        _float fRatio{};
+        _float4 vValue{};
     };
 
 #pragma region NEW
@@ -196,6 +214,13 @@ protected:
         const _float3& vStartValue, const _float3& vEndValue,
         _bool bActiveRatio0, _float fRatio0, const _float3& vValue0,
         _bool bActiveRatio1, _float fRatio1, const _float3& vValue1,
+        _bool bNormalizePoints);
+
+    static _float4 Evaluate_Float4Curve(
+        _float fRatio, const _float4& vFixedValue, _bool bChange,
+        const _float4& vStartValue, const _float4& vEndValue,
+        _bool bActiveRatio0, _float fRatio0, const _float4& vValue0,
+        _bool bActiveRatio1, _float fRatio1, const _float4& vValue1,
         _bool bNormalizePoints);
 
     _float Get_FadeOutAlpha() const { return m_fFadeOutAlpha; }

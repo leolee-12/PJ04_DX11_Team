@@ -310,6 +310,65 @@ _float3 CEffect_Part::Evaluate_Float3Curve(
     return bNormalizePoints == true ? Points[iCount - 1].vValue : vFixedValue;
 }
 
+_float4 CEffect_Part::Evaluate_Float4Curve(
+    _float fRatio, const _float4& vFixedValue, _bool bChange,
+    const _float4& vStartValue, const _float4& vEndValue,
+    _bool bActiveRatio0, _float fRatio0, const _float4& vValue0,
+    _bool bActiveRatio1, _float fRatio1, const _float4& vValue1,
+    _bool bNormalizePoints)
+{
+    if (bChange == false)
+        return vFixedValue;
+
+    RATIO_VALUE_FLOAT4 Points[4]{};
+    _uint iCount = 0;
+    Points[iCount++] = { 0.f, vStartValue };
+    if (bActiveRatio0 == true)
+        Points[iCount++] = { fRatio0, vValue0 };
+    if (bActiveRatio1 == true)
+        Points[iCount++] = { fRatio1, vValue1 };
+    Points[iCount++] = { 1.f, vEndValue };
+
+    if (bNormalizePoints == true)
+    {
+        for (_uint i = 0; i < iCount; ++i)
+            Helper::FloatClamp(Points[i].fRatio, 0.f, 1.f);
+
+        for (_uint i = 0; i < iCount; ++i)
+        {
+            for (_uint j = i + 1; j < iCount; ++j)
+            {
+                if (Points[j].fRatio < Points[i].fRatio)
+                    std::swap(Points[i], Points[j]);
+            }
+        }
+
+        Helper::FloatClamp(fRatio, 0.f, 1.f);
+    }
+
+    for (_uint i = 0; i + 1 < iCount; ++i)
+    {
+        if (fRatio <= Points[i + 1].fRatio)
+        {
+            const _float fRange = Points[i + 1].fRatio - Points[i].fRatio;
+            if (bNormalizePoints == true && fRange <= Helper::fEpsilon)
+                return Points[i + 1].vValue;
+
+            const _float fStep = Helper::FloatSmoothStep(
+                Points[i].fRatio, Points[i + 1].fRatio, fRatio);
+
+            _float4 vResult{};
+            vResult.x = Points[i].vValue.x + (Points[i + 1].vValue.x - Points[i].vValue.x) * fStep;
+            vResult.y = Points[i].vValue.y + (Points[i + 1].vValue.y - Points[i].vValue.y) * fStep;
+            vResult.z = Points[i].vValue.z + (Points[i + 1].vValue.z - Points[i].vValue.z) * fStep;
+            vResult.w = Points[i].vValue.w + (Points[i + 1].vValue.w - Points[i].vValue.w) * fStep;
+            return vResult;
+        }
+    }
+
+    return bNormalizePoints == true ? Points[iCount - 1].vValue : vFixedValue;
+}
+
 void CEffect_Part::Update_UVScroll(const _float fTimeDelta, const _float fRatio)
 {
     MoveUVScroll(fRatio, m_bTextureUVScroll, m_vTextureUVScrollCount, m_vTextureOffset, m_vCurTextureUVOffset);
@@ -423,6 +482,15 @@ void CEffect_Part::Init_PropertyValue()
     m_iDepthIgnore = DepthMode::DEPTH_DEFAULT;
     m_fEffectIntensity = 1.f;
     m_vEmissiveColor = { 0.f, 0.f, 0.f, 0.f };
+    m_bEmissiveChange = false;
+    m_vEmissiveStartValue = { 0.f, 0.f, 0.f, 0.f };
+    m_vEmissiveEndValue = { 0.f, 0.f, 0.f, 0.f };
+    m_bActive_Emissive_Ratio_1 = false;
+    m_fEmissive_Ratio_1 = 0.5f;
+    m_vEmissive_Value_1 = { 0.f, 0.f, 0.f, 0.f };
+    m_bActive_Emissive_Ratio_2 = false;
+    m_fEmissive_Ratio_2 = 0.75f;
+    m_vEmissive_Value_2 = { 0.f, 0.f, 0.f, 0.f };
 
     m_vLocalPos = { 0.f, 0.f, 0.f };
 
@@ -538,6 +606,16 @@ void CEffect_Part::Update_Value(const _float fTimeDelta)
 
 void CEffect_Part::Update_Core(const _float fTimeDelta, const _float fRatio)
 {
+    if (m_bEmissiveChange == true)
+    {
+        m_vEmissiveColor = Evaluate_Float4Curve(
+            fRatio, m_vEmissiveColor, true,
+            m_vEmissiveStartValue, m_vEmissiveEndValue,
+            m_bActive_Emissive_Ratio_1, m_fEmissive_Ratio_1, m_vEmissive_Value_1,
+            m_bActive_Emissive_Ratio_2, m_fEmissive_Ratio_2, m_vEmissive_Value_2,
+            false);
+    }
+
     Update_UVScroll(fTimeDelta, fRatio);
 }
 

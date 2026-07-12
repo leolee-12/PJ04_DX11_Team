@@ -5,6 +5,7 @@
 NS_BEGIN(Engine)
 
 class CModel;
+namespace EffectMesh { struct VALUES; }
 
 class ENGINE_DLL CEffect_Mesh abstract : public CEffect_NonParticle
 {
@@ -149,6 +150,7 @@ private:
     _wstring m_wstrShaderTag;
 
 private:
+    EffectMesh::VALUES Make_MeshValues();
     void Init_PropertyValue();
 };
 
