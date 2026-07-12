@@ -11,37 +11,14 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
 {
     GENERATED_BODY_ABSTRACT(CEffect_Part)
 
+    // Effect
     PROPERTY(_int, m_iShaderPass,       L"Shader Pass", L"Effect");
     PROPERTY(_int, m_iMirror,           L"Mirror",      L"Effect");
     PROPERTY(_int, m_iDepthIgnore,      L"Depth Ignore", L"Effect");
     PROPERTY(_float, m_fEffectIntensity, L"Effect Intensity_E", L"Effect");
-    PROPERTY(_float4, m_vEmissiveColor, L"Emissive Color", L"Effect");
-
-    PROPERTY(_bool, m_bEmissiveChange, L"Emissive Change_EM", L"Emissive");
-    PROPERTY(_float4, m_vEmissiveStartValue, L"Start_EM", L"Emissive");
-    PROPERTY(_float4, m_vEmissiveEndValue, L"End_EM", L"Emissive");
-
-    PROPERTY(_bool, m_bActive_Emissive_Ratio_1, L"Active Ratio 1_EM", L"Emissive");
-    PROPERTY(_float, m_fEmissive_Ratio_1, L"Ratio 1_EM", L"Emissive");
-    PROPERTY(_float4, m_vEmissive_Value_1, L"Value 1_EM", L"Emissive");
-
-    PROPERTY(_bool, m_bActive_Emissive_Ratio_2, L"Active Ratio 2_EM", L"Emissive");
-    PROPERTY(_float, m_fEmissive_Ratio_2, L"Ratio 2_EM", L"Emissive");
-    PROPERTY(_float4, m_vEmissive_Value_2, L"Value 2_EM", L"Emissive");
-
     PROPERTY(_float3, m_vLocalPos,      L"Local Pos",   L"Effect");
-
-    // Orbit
-    PROPERTY(_bool,   m_bOrbitChange,       L"Orbit Change_O", L"Orbit");
-    PROPERTY(_float3, m_vOrbitPivot,        L"Pivot_O",        L"Orbit");
-    PROPERTY(_float3, m_vOrbitAxis,         L"Axis_O",         L"Orbit");
-    PROPERTY(_float,  m_fOrbitDegree,       L"Degree_O",       L"Orbit");
-    PROPERTY(_float,  m_fOrbit_Start_Ratio, L"Start_O",        L"Orbit");
-    PROPERTY(_float,  m_fOrbit_End_Ratio,   L"End_O",          L"Orbit");
-
     PROPERTY(_float, m_fStartRatio,     L"Start Ratio",  L"Effect");
     PROPERTY(_float, m_fEndRatio,       L"End Ratio",    L"Effect");
-
 
     // Texture
     PROPERTY(_bool, m_bUseTextureCom,           L"Use TextureCom_T",          L"Texture Com");
@@ -65,6 +42,28 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
     PROPERTY(_float, m_fMaskStrength,              L"Strength_M",                   L"Mask Com");
     PROPERTY(_bool, m_bUseMaskUVDistortion,        L"Use UV Distortion_M",          L"Mask Com");
     PROPERTY(_float2, m_vMaskUVDistortionStrength, L"UV Distortion Strength_M",     L"Mask Com");
+
+    // Emissive
+    PROPERTY(_float4, m_vEmissiveColor, L"Emissive Color", L"Emissive");
+    PROPERTY(_bool, m_bEmissiveChange, L"Emissive Change_EM", L"Emissive");
+    PROPERTY(_float4, m_vEmissiveStartValue, L"Start_EM", L"Emissive");
+    PROPERTY(_float4, m_vEmissiveEndValue, L"End_EM", L"Emissive");
+
+    PROPERTY(_bool, m_bActive_Emissive_Ratio_1, L"Active Ratio 1_EM", L"Emissive");
+    PROPERTY(_float, m_fEmissive_Ratio_1, L"Ratio 1_EM", L"Emissive");
+    PROPERTY(_float4, m_vEmissive_Value_1, L"Value 1_EM", L"Emissive");
+
+    PROPERTY(_bool, m_bActive_Emissive_Ratio_2, L"Active Ratio 2_EM", L"Emissive");
+    PROPERTY(_float, m_fEmissive_Ratio_2, L"Ratio 2_EM", L"Emissive");
+    PROPERTY(_float4, m_vEmissive_Value_2, L"Value 2_EM", L"Emissive");
+
+    // Orbit
+    PROPERTY(_bool,   m_bOrbitChange,       L"Orbit Change_O", L"Orbit");
+    PROPERTY(_float3, m_vOrbitPivot,        L"Pivot_O",        L"Orbit");
+    PROPERTY(_float3, m_vOrbitAxis,         L"Axis_O",         L"Orbit");
+    PROPERTY(_float,  m_fOrbitDegree,       L"Degree_O",       L"Orbit");
+    PROPERTY(_float,  m_fOrbit_Start_Ratio, L"Start_O",        L"Orbit");
+    PROPERTY(_float,  m_fOrbit_End_Ratio,   L"End_O",          L"Orbit");
 
 public:
     struct EFFECT_PART_DESC : public CGameObject::GAMEOBJECT_DESC

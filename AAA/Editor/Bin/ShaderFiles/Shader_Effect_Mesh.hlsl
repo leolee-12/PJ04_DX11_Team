@@ -105,6 +105,8 @@ struct VS_OUT
     float2 vTexcoord : TEXCOORD0;
     float4 vNormal : NORMAL;
     float4 vProjPos : TEXCOORD1;
+    float3 vTangent : TANGENT;
+    float3 vBinormal : BINORMAL;
 };
 
 VS_OUT VS_MAIN(VS_IN In)
@@ -120,6 +122,8 @@ VS_OUT VS_MAIN(VS_IN In)
     Out.vTexcoord = In.vTexcoord;
     Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix));
     Out.vProjPos = vProj;
+    Out.vTangent = normalize(mul(float4(In.vTangent, 0.f), g_WorldMatrix).xyz);
+    Out.vBinormal = normalize(mul(float4(In.vBinormal, 0.f), g_WorldMatrix).xyz);
 
     return Out;
 }
@@ -130,6 +134,8 @@ struct PS_IN
     float2 vTexcoord : TEXCOORD0;
     float4 vNormal : NORMAL;
     float4 vProjPos : TEXCOORD1;
+    float3 vTangent : TANGENT;
+    float3 vBinormal : BINORMAL;
 };
 
 struct PS_COLOR_OUT
@@ -291,15 +297,32 @@ PS_GBUFFER_OUT PS_GBUFFER(PS_IN In)
     if (vColor.a <= g_fAlphaClip)
         discard;
 
-    float3 vNormal = normalize(In.vNormal.xyz);
+    float3 vGeometryNormal = normalize(In.vNormal.xyz);
+    float3 vNormal = vGeometryNormal;
+
+    if (g_bUseNormalTexture == true)
+    {
+        float3 vTangent = normalize(In.vTangent);
+        float3 vBinormal = normalize(In.vBinormal);
+        float3x3 TBN = float3x3(vTangent, vBinormal, vGeometryNormal);
+
+        float2 vNormalRG = g_NormalTexture.Sample(LinearSampler, In.vTexcoord).rg;
+        float3 vTangentNormal = float3(
+            vNormalRG, sqrt(saturate(1.f - dot(vNormalRG, vNormalRG))));
+        vNormal = normalize(mul(vTangentNormal, TBN));
+    }
+
+    float3 vMRA = g_vEffectMRA;
+    if (g_bUseMRATexture == true)
+        vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
 
     Out.vDiffuse = float4(vColor.rgb, 1.f);
     Out.vNormal = float4(vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(g_vEffectMRA, 1.f);
+    Out.vMRA = float4(vMRA, 1.f);
     Out.vMaterialID = g_iMaterialID;
     Out.vEmissive = float4(g_vEmissiveColor.rgb * vColor.a, 1.f);
-    Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vGeoNormal = float4(vGeometryNormal * 0.5f + 0.5f, 0.f);
 
     return Out;
 }
