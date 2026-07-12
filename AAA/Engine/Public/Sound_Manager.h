@@ -39,8 +39,7 @@ public:
     // 구간 반복 BGM: 0부터 재생, 이후 fStart01~fEnd01(0~1) 구간 반복
     void PlayBGM_Section(const TCHAR* pSoundKey, float fStart01, float fEnd01, float fVolume = 1.f);
     void Fade_BGM_Out(_float fSec);
-    void Play_BGM_Fade(const TCHAR* pSoundKey, float fSec, float fVolume = 1.f);
-    void Play_BGM_Fade(const TCHAR* pSoundKey, float fInSec, float fOutSec, float fVolume, CSound_Handle* pOut);
+    void Play_BGM_Fade(const TCHAR* pSoundKey, float fSec, float fVolume = 1.f, CSound_Handle* pOut = nullptr);
     void Resume_BGM_Fade(CSound_Handle& hBgm, float fInSec);
 
     // 버스(카테고리) 단위 제어

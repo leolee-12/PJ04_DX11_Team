@@ -31,6 +31,8 @@ HRESULT CCappy_Hat::Initialize(void* pArg)
 	if (FAILED(Ready_HurtBox()))
 		return E_FAIL;
 
+	SetUp_Collider_CallBack();
+
 	XMStoreFloat4x4(&m_matDetachParent, XMMatrixIdentity());
 
 	m_pAnimatorCom->Play("Wait", true, true);
@@ -106,9 +108,27 @@ void CCappy_Hat::On_SpatBegin()
 
 void CCappy_Hat::On_SpatEnd()
 {
-	m_bGone = true;
+	Despawn();
+}
 
-	_vector vPosV = m_pTransformCom->Get_State(STATE::POSITION);
+void CCappy_Hat::Enable_HurtBox(_bool b)
+{
+	if (m_pHurtBox)
+		m_pHurtBox->Set_Enabled(b);
+}
+
+void CCappy_Hat::Despawn()
+{
+	if (m_bGone)
+		return;
+
+	m_bGone = true;
+	m_bDetached = true;
+
+	if (m_pHurtBox)
+		m_pHurtBox->Set_Enabled(false);
+
+	_vector vPosV = XMLoadFloat4x4(&m_CombinedWorldMatrix).r[3];
 	_float3 vPos{};
 	XMStoreFloat3(&vPos, vPosV);
 
@@ -119,17 +139,9 @@ void CCappy_Hat::On_SpatEnd()
 
 	m_pGameInstance_Proxy->Play_SFX3D(L"CharaBasic_Dead.wav", vPosV, 0.3f);
 
-	CEffect_Loader::GetInstance()->Spawn(
-		L"DespawnEffect", Get_LevelIndex(),
-		vPos, vFaceCam, _float3(0.f, 0.f, 0.f), nullptr);
+	CEffect_Loader::GetInstance()->Spawn(L"DespawnEffect", Get_LevelIndex(), vPos, vFaceCam, _float3(0.f, 0.f, 0.f), nullptr);
 
 	Set_Active(false);
-}
-
-void CCappy_Hat::Enable_HurtBox(_bool b)
-{
-	if (m_pHurtBox)
-		m_pHurtBox->Set_Enabled(b);
 }
 
 HRESULT CCappy_Hat::Ready_Components()
@@ -159,6 +171,17 @@ HRESULT CCappy_Hat::Ready_HurtBox()
 	m_pGameInstance_Proxy->Register_Collider(m_pHurtBox, ETOUI(COLLISION_LAYER::MONSTER_HURT));
 	m_pHurtBox->Set_Enabled(true);
 	return S_OK;
+}
+
+void CCappy_Hat::SetUp_Collider_CallBack()
+{
+	if (m_pHurtBox)
+	{
+		m_pHurtBox->Set_OnEnter([this](CCollider* pOther) {
+			if (ETOUI(COLLISION_LAYER::CAR_BOOST) == pOther->Get_RegisteredGroup() && m_bThrown)
+				Despawn();
+		});
+	}
 }
 
 void CCappy_Hat::Update_CapturePull(_float fTimeDelta)

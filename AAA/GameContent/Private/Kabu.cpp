@@ -187,6 +187,21 @@ HRESULT CKabu::Ready_AnimEvents()
     return S_OK;
 }
 
+void CKabu::On_Damaged(const ATTACK_INFO& tInfo)
+{
+    if (tInfo.eHitType == HIT_TYPE::CAR_BOOSTER_HIT)
+    {
+        if (!(static_cast<CMonster_RailMovement*>(m_pMovement)->Is_OffPath()))
+            Change_State(MONSTER_STATE_TYPE::FLATTEN);
+        else
+            Despawn();
+
+        return;
+    }
+
+    __super::On_Damaged(tInfo);
+}
+
 HRESULT  CKabu::Ready_PartObjects()
 {
     m_pBody = Add_MonsterPart<CKabu_Body>(

@@ -327,7 +327,7 @@ void CLD_AudioArea::Request_BGM()
 	if (strSoundKey.empty())
 		return;
 
-	m_pGameInstance_Proxy->Play_BGM_Fade(strSoundKey.c_str(), Get_FadeInSeconds(), Get_FadeInSeconds(), pBinding->fVolume, &m_BgmHandle);
+	m_pGameInstance_Proxy->Play_BGM_Fade(strSoundKey.c_str(), Get_FadeInSeconds(), pBinding->fVolume, &m_BgmHandle);
 	m_bBgmPaused = false;
 }
 

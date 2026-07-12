@@ -284,4 +284,22 @@ enum class ANIM_MESH_PASS : _uint
 	COUNT
 };
 #pragma endregion
+
+#pragma region NonAnim Mesh Pass
+//enum class NONANIM_MESH_PASS : _uint
+//{
+//	DEFAULT = 0,
+//	NON_EYE,
+//	TEST,
+//	CONSTANT_MATERIAL,
+//	RESERVED_BUSH,
+//	RESERVED_BOX,
+//	EYE_WITHOUT_NORMAL,
+//	SHADOW,
+//	RESERVED_ARROWBOARD_OPAQUE,
+//	CAGE,
+//
+//	COUNT
+//};
+#pragma endregion
 NS_END

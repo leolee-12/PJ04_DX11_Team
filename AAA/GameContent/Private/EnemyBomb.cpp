@@ -161,7 +161,7 @@ void CEnemyBomb::On_Bounce(_int iCount)
 	CAnimator::ANI_PLAY_INFO AniInfo{};
 	AniInfo.strAniName = "DangerGlow";
 	AniInfo.bLoop = true;
-	AniInfo.fSpeed = 1.25f;
+	AniInfo.fSpeed = 2.0f;
 
 	m_pAnimatorCom->Play(&AniInfo);			// Base 애니메이션 설정
 	m_pAnimatorCom->Resume_Mask(1);
