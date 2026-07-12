@@ -104,22 +104,15 @@ public:
         _wstring wstrShaderTag;
     };
 
-private:
-    enum ShaderPass { Default, AlphaBlend, Additive, ShaderPass_End };
-
 protected:
     CEffect_Mesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     CEffect_Mesh(const CEffect_Mesh& Prototype);
     virtual ~CEffect_Mesh() = default;
 
 protected:
-    virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void* pArg) override;
 
 public:
-    virtual void    Priority_Update(_float fTimeDelta) override;
-    virtual void    Update(_float fTimeDelta) override;
-    virtual void    Late_Update(_float fTimeDelta) override;
     virtual HRESULT Render() override;
 
 protected:
@@ -157,9 +150,6 @@ private:
 
 private:
     void Init_PropertyValue();
-
-protected:
-    virtual void Free() override;
 };
 
 NS_END

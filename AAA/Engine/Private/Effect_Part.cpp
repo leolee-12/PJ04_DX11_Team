@@ -153,6 +153,163 @@ void CEffect_Part::Update_Orbit(const _float fRatio)
     m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(vOrbitPos, 1.f));
 }
 
+_int CEffect_Part::Resolve_ShaderPass()
+{
+    Helper::IntClamp(m_iShaderPass, ShaderPass::Default, ShaderPass::ShaderPass_End - 1);
+    Helper::IntClamp(m_iMirror, Sampler::DEFAULT, Sampler::SAMPLER_END - 1);
+    Helper::IntClamp(m_iDepthIgnore, DepthMode::DEPTH_DEFAULT, DepthMode::DEPTH_MODE_END - 1);
+
+    return m_iShaderPass +
+        (m_iMirror == Sampler::MIRROR ? ShaderPass::ShaderPass_End : 0) +
+        (m_iDepthIgnore == DepthMode::DEPTH_IGNORE ? ShaderPass::ShaderPass_End * Sampler::SAMPLER_END : 0);
+}
+
+HRESULT CEffect_Part::Bind_ViewProjectionMatrices()
+{
+    if (FAILED(m_pShaderCom->Bind_Matrix(
+        "g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix(
+        "g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+void CEffect_Part::Evaluate_SpriteFrame(
+    _int iFrameX, _int iFrameY, _float fRatio,
+    _float2& vOutUV, _float2& vOutSize)
+{
+    if (iFrameX < 1)
+        iFrameX = 1;
+    if (iFrameY < 1)
+        iFrameY = 1;
+
+    Helper::FloatClamp(fRatio, 0.f, 1.f);
+
+    const _int iTotalCount = iFrameX * iFrameY;
+    _int iFrameIndex = static_cast<_int>(static_cast<_float>(iTotalCount) * fRatio);
+    if (iFrameIndex >= iTotalCount)
+        iFrameIndex = iTotalCount - 1;
+
+    vOutSize.x = 1.f / static_cast<_float>(iFrameX);
+    vOutSize.y = 1.f / static_cast<_float>(iFrameY);
+    vOutUV.x = vOutSize.x * static_cast<_float>(iFrameIndex % iFrameX);
+    vOutUV.y = vOutSize.y * static_cast<_float>(iFrameIndex / iFrameX);
+}
+
+_float CEffect_Part::Evaluate_FloatCurve(
+    _float fRatio, _float fFixedValue, _bool bChange,
+    _float fStartValue, _float fEndValue,
+    _bool bActiveRatio0, _float fRatio0, _float fValue0,
+    _bool bActiveRatio1, _float fRatio1, _float fValue1,
+    _bool bNormalizePoints)
+{
+    if (bChange == false)
+        return fFixedValue;
+
+    RATIO_VALUE Points[4]{};
+    _uint iCount = 0;
+    Points[iCount++] = { 0.f, fStartValue };
+    if (bActiveRatio0 == true)
+        Points[iCount++] = { fRatio0, fValue0 };
+    if (bActiveRatio1 == true)
+        Points[iCount++] = { fRatio1, fValue1 };
+    Points[iCount++] = { 1.f, fEndValue };
+
+    if (bNormalizePoints == true)
+    {
+        for (_uint i = 0; i < iCount; ++i)
+            Helper::FloatClamp(Points[i].fRatio, 0.f, 1.f);
+
+        for (_uint i = 0; i < iCount; ++i)
+        {
+            for (_uint j = i + 1; j < iCount; ++j)
+            {
+                if (Points[j].fRatio < Points[i].fRatio)
+                    std::swap(Points[i], Points[j]);
+            }
+        }
+
+        Helper::FloatClamp(fRatio, 0.f, 1.f);
+    }
+
+    for (_uint i = 0; i + 1 < iCount; ++i)
+    {
+        if (fRatio <= Points[i + 1].fRatio)
+        {
+            const _float fRange = Points[i + 1].fRatio - Points[i].fRatio;
+            if (bNormalizePoints == true && fRange <= Helper::fEpsilon)
+                return Points[i + 1].fValue;
+
+            const _float fStep = Helper::FloatSmoothStep(
+                Points[i].fRatio, Points[i + 1].fRatio, fRatio);
+            return Points[i].fValue + (Points[i + 1].fValue - Points[i].fValue) * fStep;
+        }
+    }
+
+    return bNormalizePoints == true ? Points[iCount - 1].fValue : fFixedValue;
+}
+
+_float3 CEffect_Part::Evaluate_Float3Curve(
+    _float fRatio, const _float3& vFixedValue, _bool bChange,
+    const _float3& vStartValue, const _float3& vEndValue,
+    _bool bActiveRatio0, _float fRatio0, const _float3& vValue0,
+    _bool bActiveRatio1, _float fRatio1, const _float3& vValue1,
+    _bool bNormalizePoints)
+{
+    if (bChange == false)
+        return vFixedValue;
+
+    RATIO_VALUE_FLOAT3 Points[4]{};
+    _uint iCount = 0;
+    Points[iCount++] = { 0.f, vStartValue };
+    if (bActiveRatio0 == true)
+        Points[iCount++] = { fRatio0, vValue0 };
+    if (bActiveRatio1 == true)
+        Points[iCount++] = { fRatio1, vValue1 };
+    Points[iCount++] = { 1.f, vEndValue };
+
+    if (bNormalizePoints == true)
+    {
+        for (_uint i = 0; i < iCount; ++i)
+            Helper::FloatClamp(Points[i].fRatio, 0.f, 1.f);
+
+        for (_uint i = 0; i < iCount; ++i)
+        {
+            for (_uint j = i + 1; j < iCount; ++j)
+            {
+                if (Points[j].fRatio < Points[i].fRatio)
+                    std::swap(Points[i], Points[j]);
+            }
+        }
+
+        Helper::FloatClamp(fRatio, 0.f, 1.f);
+    }
+
+    for (_uint i = 0; i + 1 < iCount; ++i)
+    {
+        if (fRatio <= Points[i + 1].fRatio)
+        {
+            const _float fRange = Points[i + 1].fRatio - Points[i].fRatio;
+            if (bNormalizePoints == true && fRange <= Helper::fEpsilon)
+                return Points[i + 1].vValue;
+
+            const _float fStep = Helper::FloatSmoothStep(
+                Points[i].fRatio, Points[i + 1].fRatio, fRatio);
+
+            _float3 vResult{};
+            vResult.x = Points[i].vValue.x + (Points[i + 1].vValue.x - Points[i].vValue.x) * fStep;
+            vResult.y = Points[i].vValue.y + (Points[i + 1].vValue.y - Points[i].vValue.y) * fStep;
+            vResult.z = Points[i].vValue.z + (Points[i + 1].vValue.z - Points[i].vValue.z) * fStep;
+            return vResult;
+        }
+    }
+
+    return bNormalizePoints == true ? Points[iCount - 1].vValue : vFixedValue;
+}
+
 void CEffect_Part::Update_UVScroll(const _float fTimeDelta, const _float fRatio)
 {
     MoveUVScroll(fRatio, m_bTextureUVScroll, m_vTextureUVScrollCount, m_vTextureOffset, m_vCurTextureUVOffset);
@@ -382,13 +539,6 @@ void CEffect_Part::Update_Value(const _float fTimeDelta)
 void CEffect_Part::Update_Core(const _float fTimeDelta, const _float fRatio)
 {
     Update_UVScroll(fTimeDelta, fRatio);
-
-    Update_EffectPart(fTimeDelta, fRatio);
-}
-
-void CEffect_Part::Update_EffectPart(const _float fTimeDelta, const _float fRatio)
-{
-
 }
 
 _float CEffect_Part::Get_PartDuration() const

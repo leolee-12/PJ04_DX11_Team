@@ -14,11 +14,6 @@ CEffect_MeshEmitter::CEffect_MeshEmitter(const CEffect_MeshEmitter& Prototype)
     Init_PropertyValue();
 }
 
-HRESULT CEffect_MeshEmitter::Initialize_Prototype()
-{
-    return S_OK;
-}
-
 HRESULT CEffect_MeshEmitter::Initialize(void* pArg)
 {
     EFFECT_MESHEMITTER_DESC* pDesc = static_cast<EFFECT_MESHEMITTER_DESC*>(pArg);
@@ -43,21 +38,6 @@ HRESULT CEffect_MeshEmitter::Initialize(void* pArg)
     return S_OK;
 }
 
-void CEffect_MeshEmitter::Priority_Update(_float fTimeDelta)
-{
-    __super::Priority_Update(fTimeDelta);
-}
-
-void CEffect_MeshEmitter::Update(_float fTimeDelta)
-{
-    __super::Update(fTimeDelta);
-}
-
-void CEffect_MeshEmitter::Late_Update(_float fTimeDelta)
-{
-    __super::Late_Update(fTimeDelta);
-}
-
 HRESULT CEffect_MeshEmitter::Render()
 {
     if (FAILED(Bind_ShaderResources()))
@@ -67,6 +47,7 @@ HRESULT CEffect_MeshEmitter::Render()
         return E_FAIL;
 
     size_t iNumMeshes = m_pModelCom->Get_NumMeshes();
+    const _int iPass = Resolve_ShaderPass();
 
     for (const EMITTER_PARTICLE& Particle : m_EmitterParticles)
     {
@@ -110,14 +91,6 @@ HRESULT CEffect_MeshEmitter::Render()
                     return E_FAIL;
             }
 
-            Helper::IntClamp(m_iShaderPass, ShaderPass::Default, ShaderPass::ShaderPass_End - 1);
-            Helper::IntClamp(m_iMirror, Sampler::DEFAULT, Sampler::SAMPLER_END - 1);
-            Helper::IntClamp(m_iDepthIgnore, DepthMode::DEPTH_DEFAULT, DepthMode::DEPTH_MODE_END - 1);
-
-            _int iPass = m_iShaderPass +
-                (m_iMirror == Sampler::MIRROR ? ShaderPass::ShaderPass_End : 0) +
-                (m_iDepthIgnore == DepthMode::DEPTH_IGNORE ? ShaderPass::ShaderPass_End * Sampler::SAMPLER_END : 0);
-
             if (FAILED(m_pShaderCom->Begin(iPass)))
                 return E_FAIL;
 
@@ -127,11 +100,6 @@ HRESULT CEffect_MeshEmitter::Render()
     }
 
     return S_OK;
-}
-
-void CEffect_MeshEmitter::Effect_Start()
-{
-    __super::Effect_Start();
 }
 
 HRESULT CEffect_MeshEmitter::Ready_Components()
@@ -153,12 +121,7 @@ HRESULT CEffect_MeshEmitter::Ready_Components()
 
 HRESULT CEffect_MeshEmitter::Bind_ShaderResources()
 {
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW,
-        m_eProjType))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ,
-        m_eProjType))))
+    if (FAILED(Bind_ViewProjectionMatrices()))
         return E_FAIL;
 
     return S_OK;
@@ -382,9 +345,4 @@ void CEffect_MeshEmitter::Init_PropertyValue()
     m_fMaskLinearUVRatio = 0.f;
     m_fDiffuseLinearUVRatio = 0.f;
     m_fUnknownLinearUVRatio = 0.f;
-}
-
-void CEffect_MeshEmitter::Free()
-{
-    __super::Free();
 }

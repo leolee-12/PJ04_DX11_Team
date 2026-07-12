@@ -14,11 +14,6 @@ CEffect_Mesh::CEffect_Mesh(const CEffect_Mesh& Prototype)
     Init_PropertyValue();
 }
 
-HRESULT CEffect_Mesh::Initialize_Prototype()
-{
-    return S_OK;
-}
-
 HRESULT CEffect_Mesh::Initialize(void* pArg)
 {
     EFFECT_MESH_DESC* pDesc = static_cast<EFFECT_MESH_DESC*>(pArg);
@@ -46,21 +41,6 @@ HRESULT CEffect_Mesh::Initialize(void* pArg)
     return S_OK;
 }
 
-void CEffect_Mesh::Priority_Update(_float fTimeDelta)
-{
-    __super::Priority_Update(fTimeDelta);
-}
-
-void CEffect_Mesh::Update(_float fTimeDelta)
-{
-    __super::Update(fTimeDelta);
-}
-
-void CEffect_Mesh::Late_Update(_float fTimeDelta)
-{
-    __super::Late_Update(fTimeDelta);
-}
-
 HRESULT CEffect_Mesh::Render()
 {
     if (FAILED(Bind_ShaderResources()))
@@ -70,6 +50,7 @@ HRESULT CEffect_Mesh::Render()
         return E_FAIL;
 
     size_t iNumMeshes = m_pModelCom->Get_NumMeshes();
+    const _int iPass = Resolve_ShaderPass();
 
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
@@ -96,14 +77,6 @@ HRESULT CEffect_Mesh::Render()
             if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_UnknownTexture", i, MTEX_TYPE::UNKNOWN, 0)))
                 return E_FAIL;
         }
-
-        Helper::IntClamp(m_iShaderPass, ShaderPass::Default, ShaderPass::ShaderPass_End - 1);
-        Helper::IntClamp(m_iMirror, Sampler::DEFAULT, Sampler::SAMPLER_END - 1);
-        Helper::IntClamp(m_iDepthIgnore, DepthMode::DEPTH_DEFAULT, DepthMode::DEPTH_MODE_END - 1);
-
-        _int iPass = m_iShaderPass +
-            (m_iMirror == Sampler::MIRROR ? ShaderPass::ShaderPass_End : 0) +
-            (m_iDepthIgnore == DepthMode::DEPTH_IGNORE ? ShaderPass::ShaderPass_End * Sampler::SAMPLER_END : 0);
 
         if (FAILED(m_pShaderCom->Begin(iPass)))
             return E_FAIL;
@@ -137,9 +110,7 @@ HRESULT CEffect_Mesh::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
+    if (FAILED(Bind_ViewProjectionMatrices()))
         return E_FAIL;
 
     return S_OK;
@@ -355,9 +326,4 @@ void CEffect_Mesh::Init_PropertyValue()
     m_fMaskLinearUVRatio = 0.f;
     m_fDiffuseLinearUVRatio = 0.f;
     m_fUnknownLinearUVRatio = 0.f;
-}
-
-void CEffect_Mesh::Free()
-{
-    __super::Free();
 }

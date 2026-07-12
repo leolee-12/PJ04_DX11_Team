@@ -110,16 +110,10 @@ protected:
     virtual ~CEffect_MeshEmitter() = default;
 
 protected:
-    virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void* pArg) override;
 
 public:
-    virtual void    Priority_Update(_float fTimeDelta) override;
-    virtual void    Update(_float fTimeDelta) override;
-    virtual void    Late_Update(_float fTimeDelta) override;
     virtual HRESULT Render() override;
-
-    virtual void    Effect_Start() override;
 
 protected:
     _float2 m_vCurDiffuseUVOffset{};
@@ -154,9 +148,6 @@ private:
 
 private:
     void Init_PropertyValue();
-
-protected:
-    virtual void Free() override;
 };
 
 NS_END
