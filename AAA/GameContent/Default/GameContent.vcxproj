@@ -34,6 +34,9 @@
     <ClInclude Include="..\public\Boss.h" />
     <ClInclude Include="..\public\BossBase.h" />
     <ClInclude Include="..\public\BossNamePlate.h" />
+    <ClInclude Include="..\public\Boss_Armadillo.h" />
+    <ClInclude Include="..\public\Boss_Armadillo_Body.h" />
+    <ClInclude Include="..\public\Boss_Armadillo_Brain.h" />
     <ClInclude Include="..\public\Boss_Brain.h" />
     <ClInclude Include="..\public\Boss_Cage.h" />
     <ClInclude Include="..\public\Boss_Cage_Body.h" />
@@ -391,6 +394,9 @@
     <ClCompile Include="..\private\Boss.cpp" />
     <ClCompile Include="..\private\BossBase.cpp" />
     <ClCompile Include="..\private\BossNamePlate.cpp" />
+    <ClCompile Include="..\private\Boss_Armadillo.cpp" />
+    <ClCompile Include="..\private\Boss_Armadillo_Body.cpp" />
+    <ClCompile Include="..\private\Boss_Armadillo_Brain.cpp" />
     <ClCompile Include="..\private\Boss_Brain.cpp" />
     <ClCompile Include="..\private\Boss_Cage.cpp" />
     <ClCompile Include="..\private\Boss_Cage_Body.cpp" />
@@ -769,6 +775,11 @@
       <FileType>Document</FileType>
     </None>
     <None Include="..\ShaderFiles\Shader_World_NonAnim.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ShaderFiles\Shader_Armadillo.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
