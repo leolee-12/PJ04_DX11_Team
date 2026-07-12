@@ -33,22 +33,29 @@ void CEnvTrigger_Generic::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 
 void CEnvTrigger_Generic::OnTriggerEnter(CCollider* pOther)
 {
+#ifdef _DEBUG
 	char szBuf[128];
 	sprintf_s(szBuf, "[EnvTrigger_Generic] Enter <- group %u\n", pOther->Get_RegisteredGroup());
 	OutputDebugStringA(szBuf);
+#else
+	UNREFERENCED_PARAMETER(pOther);
+#endif
 }
 
 void CEnvTrigger_Generic::OnTriggerStay(CCollider* pOther)
 {
 	UNREFERENCED_PARAMETER(pOther);
-	OutputDebugStringA("[EnvTrigger_Generic] Stay\n");
 }
 
 void CEnvTrigger_Generic::OnTriggerExit(CCollider* pOther)
 {
+#ifdef _DEBUG
 	char szBuf[128];
-	sprintf_s(szBuf, "[EnvTrigger_Generic] Exit  <- group %u\n", pOther->Get_RegisteredGroup());
+	sprintf_s(szBuf, "[EnvTrigger_Generic] Exit <- group %u\n", pOther->Get_RegisteredGroup());
 	OutputDebugStringA(szBuf);
+#else
+	UNREFERENCED_PARAMETER(pOther);
+#endif
 }
 
 CEnvTrigger_Generic* CEnvTrigger_Generic::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

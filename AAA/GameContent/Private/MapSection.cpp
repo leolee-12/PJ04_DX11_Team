@@ -17,11 +17,6 @@ CMapSection::CMapSection(const CMapSection& Prototype)
 {
 }
 
-HRESULT CMapSection::Initialize_Prototype()
-{
-	return __super::Initialize_Prototype();
-}
-
 HRESULT CMapSection::Initialize(void* pArg)
 {
 	if (nullptr == pArg)
@@ -204,12 +199,6 @@ HRESULT CMapSection::Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const ME
 #pragma endregion
 
 #ifdef _DEBUG
-void CMapSection::Reset_FrameProfile()
-{
-	// Profiling is temporarily disabled during the GameContent migration.
-	m_Profile = {};
-}
-
 void CMapSection::Set_EditorSoloMeshIndex(_int iMeshIndex)
 {
 	const _int iNumMeshes = static_cast<_int>(m_pModelCom->Get_NumMeshes());

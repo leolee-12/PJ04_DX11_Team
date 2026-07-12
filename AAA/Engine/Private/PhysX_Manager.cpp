@@ -80,26 +80,51 @@ PxTriangleMesh* CPhysX_Manager::Cook_TriangleMesh(const _float3* pPositions, _ui
 
     const _uint iNumTris = iNumIndices / 3;
 
-    // DX(좌수) 데이터 → PhysX 와인딩 정합: 삼각형 1·2 인덱스 스왑
-    vector<PxU32> Indices(iNumIndices);
-    if (bFlipWinding)
-        for (_uint i = 0; i < iNumTris; ++i) {
-            Indices[i * 3 + 0] = pIndices[i * 3 + 0];
-            Indices[i * 3 + 1] = pIndices[i * 3 + 2];
-            Indices[i * 3 + 2] = pIndices[i * 3 + 1];
-        }
-    else
-        memcpy(Indices.data(), pIndices, sizeof(PxU32) * iNumIndices);
+    // DX(좌수) 기준을 PhysX 와인딩에 맞춤 + 퇴화 삼각형 제거
+    // 넓이가 0에 가까운 삼각형은 법선 정규화가 불가능해서
+    // 캡슐 스윕 시 triNormal.isNormalized() 어설트를 유발함
+    vector<PxU32> Indices;
+    Indices.reserve(iNumIndices);
+
+    const _float fAreaEps = 1e-6f;
+    const _float fAreaEpsSq = fAreaEps * fAreaEps;
+
+    for (_uint i = 0; i < iNumTris; ++i)
+    {
+        const PxU32 i0 = pIndices[i * 3 + 0];
+        const PxU32 i1 = bFlipWinding ? pIndices[i * 3 + 2] : pIndices[i * 3 + 1];
+        const PxU32 i2 = bFlipWinding ? pIndices[i * 3 + 1] : pIndices[i * 3 + 2];
+
+        const PxVec3 p0(pPositions[i0].x, pPositions[i0].y, pPositions[i0].z);
+        const PxVec3 p1(pPositions[i1].x, pPositions[i1].y, pPositions[i1].z);
+        const PxVec3 p2(pPositions[i2].x, pPositions[i2].y, pPositions[i2].z);
+
+        // 외적 크기 = 삼각형 넓이 x2. 임계값 미만이면 슬리버라서 스킵
+        if ((p1 - p0).cross(p2 - p0).magnitudeSquared() < fAreaEpsSq)
+            continue;
+
+        Indices.push_back(i0);
+        Indices.push_back(i1);
+        Indices.push_back(i2);
+    }
+
+    // 전부 퇴화 삼각형이면 쿠킹 불가
+    if (Indices.empty())
+        return nullptr;
 
     PxTriangleMeshDesc desc;
     desc.points.count = iNumVertices;
     desc.points.stride = sizeof(_float3);
     desc.points.data = pPositions;
-    desc.triangles.count = iNumTris;
+    desc.triangles.count = static_cast<_uint>(Indices.size()) / 3;
     desc.triangles.stride = 3 * sizeof(PxU32);
     desc.triangles.data = Indices.data();
 
     PxCookingParams params(m_pPhysics->getTolerancesScale());
+    // 1mm 이내로 붙은 정점은 용접해서 슬리버 삼각형을 추가로 제거
+    params.meshWeldTolerance = 1e-3f;
+    params.meshPreprocessParams |= PxMeshPreprocessingFlag::eWELD_VERTICES;
+
     return PxCreateTriangleMesh(params, desc, m_pPhysics->getPhysicsInsertionCallback());
 }
 
@@ -114,6 +139,13 @@ PxRigidStatic* CPhysX_Manager::Create_StaticActor(PxTriangleMesh* pMesh, _fmatri
         return nullptr;
 
     _float3 vS; XMStoreFloat3(&vS, vScale);
+#ifdef _DEBUG
+    if (fabsf(vS.x) < 1e-4f || fabsf(vS.y) < 1e-4f || fabsf(vS.z) < 1e-4f)
+        __debugbreak();
+#endif
+    if (fabsf(vS.x) < 1e-4f || fabsf(vS.y) < 1e-4f || fabsf(vS.z) < 1e-4f)
+        return nullptr;
+
     _float4 qR; XMStoreFloat4(&qR, vQuat);
     _float3 vT; XMStoreFloat3(&vT, vTrans);
 

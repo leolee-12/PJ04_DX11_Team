@@ -724,17 +724,13 @@ void CGameInstance_Proxy::Fade_BGM_Out(float fSeconds)
 	if (!IsConnected()) return;
 	m_pOwner->Fade_BGM_Out(fSeconds);
 }
-void CGameInstance_Proxy::Play_BGM_Fade(const TCHAR* pSoundKey, float fSeconds, float fVolume)
+void CGameInstance_Proxy::Play_BGM_Fade(const TCHAR* pSoundKey, float fSeconds, float fVolume, CSound_Handle* pOut)
 {
-	if (!IsConnected()) return;
-	m_pOwner->Play_BGM_Fade(
-		pSoundKey, fSeconds, fVolume);
+	if (!IsConnected()) 
+		return;
+	m_pOwner->Play_BGM_Fade(pSoundKey, fSeconds, fVolume, pOut);
 }
-void CGameInstance_Proxy::Play_BGM_Fade(const TCHAR* pSoundKey, float fInSec, float fOutSec, float fVolume, CSound_Handle* pOut)
-{
-	if (!IsConnected()) return;
-	m_pOwner->Play_BGM_Fade(pSoundKey, fInSec, fOutSec, fVolume, pOut);
-}
+
 void CGameInstance_Proxy::Resume_BGM_Fade(CSound_Handle& hBgm, float fInSec)
 {
 	if (!IsConnected()) return;

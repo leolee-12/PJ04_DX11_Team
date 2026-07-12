@@ -30,7 +30,7 @@ HRESULT CEnvObject_Static::Initialize(void* pArg)
 	if (FAILED(Ready_RenderComponents(m_tDesc.iModelProtoLevel, m_tDesc.wstrModelProtoTag)))
 		return E_FAIL;
 
-	if (FAILED(Ready_PhysicsActor()))
+	if (FAILED(Rebuild_PhysicsActor()))
 		return E_FAIL;
 
 	return S_OK;
@@ -50,6 +50,19 @@ void CEnvObject_Static::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 {
 	__super::Copy_PrototypeName(pOutData);
 }
+
+#pragma region Editable
+HRESULT CEnvObject_Static::Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX& Layer)
+{
+	if (FAILED(__super::Apply_EditMeshLayer(iModelSlot, iMesh, Layer)))
+		return E_FAIL;
+
+	if (nullptr == m_pInstanceController)
+		return S_OK;
+
+	return m_pInstanceController->Apply_ModelMeshLayer(m_tDesc.iModelProtoLevel, m_tDesc.wstrModelProtoTag, iMesh, Layer);
+}
+#pragma endregion
 
 void CEnvObject_Static::Set_InstanceController(CEnv_InstanceController* pCtrl)
 {
@@ -114,9 +127,12 @@ void CEnvObject_Static::Submit_RenderGroups()
 
 		if (Can_RenderInstance() && nullptr != m_pInstanceController)
 		{
-			bSubmittedShadow = m_pInstanceController->Submit_Shadow(
-				m_InstanceBatchHandle.iShadowBatchIndex,
-				this);
+			if (INVALID_INDEX == m_InstanceBatchHandle.iShadowBatchIndex)
+			{
+				m_InstanceBatchHandle.iShadowBatchIndex = m_pInstanceController->Register_ShadowBatch(m_tDesc);
+			}
+
+			bSubmittedShadow = m_pInstanceController->Submit_Shadow(m_InstanceBatchHandle.iShadowBatchIndex, this);
 		}
 
 		if (!bSubmittedShadow)

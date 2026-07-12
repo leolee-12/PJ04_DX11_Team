@@ -683,7 +683,7 @@ _bool CLevel_Edit::Commit_MapEditObjectFromCurrentState(CGameObject* pObject)
 
 	if (CEnvObject* pEnvObject = dynamic_cast<CEnvObject*>(pObject))
 	{
-		if (FAILED(pEnvObject->Refresh()))
+		if (FAILED(pEnvObject->On_EditTransformChanged()))
 			return false;
 		if (m_pMapPreviewSession->Is_AddedObject(pObject))
 			return true;

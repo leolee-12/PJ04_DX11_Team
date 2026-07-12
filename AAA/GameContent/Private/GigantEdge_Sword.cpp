@@ -1,6 +1,7 @@
 #include "GigantEdge_Sword.h"
 #include "GameInstance.h"
 #include "Damageable.h"
+#include "Shader_PassMeta.h"
 
 CGigantEdge_Sword::CGigantEdge_Sword(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonsterHitPart(pDevice, pContext) {
@@ -21,8 +22,40 @@ HRESULT CGigantEdge_Sword::Initialize(void* pArg)
     if (FAILED(Ready_HitBox(CapsuleDesc)))
         return E_FAIL;
 
+    m_iShadowPassIdx = 2;
+
     Set_Drawn(false);                               
     return S_OK;
+}
+
+HRESULT CGigantEdge_Sword::Render()
+{
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW,
+        m_eProjType))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ,
+        m_eProjType))))
+        return E_FAIL;
+
+    const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+    for (_uint i = 0; i < iNumMeshes; ++i)
+    {
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
+            return E_FAIL;
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", i, MTEX_TYPE::NORMALS, 0)))
+            return E_FAIL;
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))
+            return E_FAIL;
+
+        if (FAILED(m_pShaderCom->Begin(0)))
+            return E_FAIL;
+        if (FAILED(m_pModelCom->Render(i)))
+            return E_FAIL;
+    }
+
+    return E_NOTIMPL;
 }
 
 HRESULT CGigantEdge_Sword::Ready_Components()

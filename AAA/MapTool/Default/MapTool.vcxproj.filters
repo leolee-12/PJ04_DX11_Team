@@ -1,23 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <ItemGroup>
     <Filter Include="00. App">
       <UniqueIdentifier>{2a7264af-40a2-4757-9482-96f5e7fdd4be}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="99. Defines">
-      <UniqueIdentifier>{25564f6b-a75a-4ddb-9b02-bf655d66c754}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="97. ImGui">
-      <UniqueIdentifier>{03994ea0-6dbd-4ef4-bd88-a5f053b9788a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="98. Default">
-      <UniqueIdentifier>{af80204d-74ad-49b5-9062-98caf5bf0c62}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="96. ShaderFiles">
-      <UniqueIdentifier>{b0e00da9-d2b7-4846-a001-5be1ecd5c365}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="97. ImGui\Manager">
-      <UniqueIdentifier>{145d22c2-9d22-43df-a2db-0327d67036de}</UniqueIdentifier>
     </Filter>
     <Filter Include="01. API">
       <UniqueIdentifier>{04303959-6606-45ed-9feb-21e3c219aad7}</UniqueIdentifier>
@@ -28,35 +13,35 @@
     <Filter Include="02. Levels">
       <UniqueIdentifier>{35e7a30f-47e6-4264-9b5d-7769a6aa3c11}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. Levels\Tool">
-      <UniqueIdentifier>{d92d8af8-9554-448d-8062-490c19fd90ec}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. Levels\Edit">
       <UniqueIdentifier>{16801054-3ab6-4dc2-bd99-c5287519aa18}</UniqueIdentifier>
     </Filter>
     <Filter Include="02. Levels\Loader">
       <UniqueIdentifier>{4e6c892c-a544-457e-b413-00e04340cddb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. Levels\Tool">
+      <UniqueIdentifier>{d92d8af8-9554-448d-8062-490c19fd90ec}</UniqueIdentifier>
+    </Filter>
     <Filter Include="03. Objects">
       <UniqueIdentifier>{b3b7bac2-c0b8-4b78-a5f9-a6d46c8529fe}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03. Objects\Grid">
-      <UniqueIdentifier>{f6fb9d53-a35e-4815-8785-8997190a42b7}</UniqueIdentifier>
     </Filter>
     <Filter Include="03. Objects\Camera">
       <UniqueIdentifier>{b12c09d0-c36b-47d6-a528-13cafe5057d1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03. Objects\Grid">
+      <UniqueIdentifier>{f6fb9d53-a35e-4815-8785-8997190a42b7}</UniqueIdentifier>
+    </Filter>
     <Filter Include="04. Panels">
       <UniqueIdentifier>{8cd65a44-7542-4a0f-be36-60fc2d99138f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Panels\Hierarchy">
-      <UniqueIdentifier>{9df3c044-1638-4c5e-b8cd-0125b13d0e80}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="04. Panels\Viewport">
-      <UniqueIdentifier>{3191eb09-8dd4-463d-8887-fbf63628cedc}</UniqueIdentifier>
+    <Filter Include="04. Panels\00. Manager">
+      <UniqueIdentifier>{59c1a732-144c-4530-9d03-93792c200f41}</UniqueIdentifier>
     </Filter>
     <Filter Include="04. Panels\Console">
       <UniqueIdentifier>{71b4d72a-263e-4e36-b69c-704742851dc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04. Panels\Hierarchy">
+      <UniqueIdentifier>{9df3c044-1638-4c5e-b8cd-0125b13d0e80}</UniqueIdentifier>
     </Filter>
     <Filter Include="04. Panels\Inspector">
       <UniqueIdentifier>{caa2072f-f9e7-4250-b819-538fc49fc9c4}</UniqueIdentifier>
@@ -64,67 +49,34 @@
     <Filter Include="04. Panels\Profiler">
       <UniqueIdentifier>{1cfcb692-1664-4e2a-9477-1731a2118f9c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="04. Panels\00. Manager">
-      <UniqueIdentifier>{59c1a732-144c-4530-9d03-93792c200f41}</UniqueIdentifier>
+    <Filter Include="04. Panels\Viewport">
+      <UniqueIdentifier>{3191eb09-8dd4-463d-8887-fbf63628cedc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="96. ShaderFiles">
+      <UniqueIdentifier>{b0e00da9-d2b7-4846-a001-5be1ecd5c365}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97. ImGui">
+      <UniqueIdentifier>{03994ea0-6dbd-4ef4-bd88-a5f053b9788a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97. ImGui\Manager">
+      <UniqueIdentifier>{145d22c2-9d22-43df-a2db-0327d67036de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98. Default">
+      <UniqueIdentifier>{af80204d-74ad-49b5-9062-98caf5bf0c62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99. Defines">
+      <UniqueIdentifier>{25564f6b-a75a-4ddb-9b02-bf655d66c754}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Public\Panel.h">
-      <Filter>04. Panels</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Panel_Manager.h">
-      <Filter>04. Panels\00. Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Panel_Inspector.h">
-      <Filter>04. Panels\Inspector</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Panel_Viewport.h">
-      <Filter>04. Panels\Viewport</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Panel_Hierarchy.h">
-      <Filter>04. Panels\Hierarchy</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Panel_Console.h">
-      <Filter>04. Panels\Console</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\MapTool_Struct.h">
-      <Filter>99. Defines</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\MapTool_Func.h">
-      <Filter>99. Defines</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\MapTool_Enum.h">
-      <Filter>99. Defines</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\MapTool_Defines.h">
-      <Filter>99. Defines</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\ToolApp.h">
-      <Filter>00. App</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Panel_Toolbar.h">
-      <Filter>04. Panels</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Panel_Palette.h">
-      <Filter>04. Panels</Filter>
+    <ClInclude Include="..\Public\Edit_Grid.h">
+      <Filter>03. Objects\Grid</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EditCamera.h">
       <Filter>03. Objects\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Edit_Grid.h">
-      <Filter>03. Objects\Grid</Filter>
-    </ClInclude>
-    <ClInclude Include="MapTool.h">
-      <Filter>98. Default</Filter>
-    </ClInclude>
-    <ClInclude Include="framework.h">
-      <Filter>98. Default</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>98. Default</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>98. Default</Filter>
+    <ClInclude Include="..\Public\EditInstance.h">
+      <Filter>01. API\00. EditInstance</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ImGui_Manager.h">
       <Filter>97. ImGui\Manager</Filter>
@@ -138,16 +90,112 @@
     <ClInclude Include="..\Public\Loader.h">
       <Filter>02. Levels\Loader</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MapTool_Defines.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapTool_Enum.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapTool_Func.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapTool_Struct.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel.h">
+      <Filter>04. Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_Console.h">
+      <Filter>04. Panels\Console</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_Hierarchy.h">
+      <Filter>04. Panels\Hierarchy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_Inspector.h">
+      <Filter>04. Panels\Inspector</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_Manager.h">
+      <Filter>04. Panels\00. Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_Palette.h">
+      <Filter>04. Panels</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Panel_Profiler.h">
       <Filter>04. Panels\Profiler</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\EditInstance.h">
-      <Filter>01. API\00. EditInstance</Filter>
+    <ClInclude Include="..\Public\Panel_Toolbar.h">
+      <Filter>04. Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_Viewport.h">
+      <Filter>04. Panels\Viewport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ToolApp.h">
+      <Filter>00. App</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>98. Default</Filter>
+    </ClInclude>
+    <ClInclude Include="MapTool.h">
+      <Filter>98. Default</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>98. Default</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>98. Default</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\ThirdParty\ImGui\Src\ImGuizmo.cpp">
-      <Filter>97. ImGui</Filter>
+    <ClCompile Include="..\Private\Edit_Grid.cpp">
+      <Filter>03. Objects\Grid</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EditCamera.cpp">
+      <Filter>03. Objects\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EditInstance.cpp">
+      <Filter>01. API\00. EditInstance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ImGui_Manager.cpp">
+      <Filter>97. ImGui\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Edit.cpp">
+      <Filter>02. Levels\Edit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Loading.cpp">
+      <Filter>02. Levels\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loader.cpp">
+      <Filter>02. Levels\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel.cpp">
+      <Filter>04. Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Console.cpp">
+      <Filter>04. Panels\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Hierarchy.cpp">
+      <Filter>04. Panels\Hierarchy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Inspector.cpp">
+      <Filter>04. Panels\Inspector</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Manager.cpp">
+      <Filter>04. Panels\00. Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Palette.cpp">
+      <Filter>04. Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Profiler.cpp">
+      <Filter>04. Panels\Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Toolbar.cpp">
+      <Filter>04. Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Viewport.cpp">
+      <Filter>04. Panels\Viewport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ToolApp.cpp">
+      <Filter>00. App</Filter>
     </ClCompile>
     <ClCompile Include="..\ThirdParty\ImGui\Src\imgui.cpp">
       <Filter>97. ImGui</Filter>
@@ -170,66 +218,18 @@
     <ClCompile Include="..\ThirdParty\ImGui\Src\imgui_widgets.cpp">
       <Filter>97. ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Panel.cpp">
-      <Filter>04. Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Panel_Manager.cpp">
-      <Filter>04. Panels\00. Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Panel_Inspector.cpp">
-      <Filter>04. Panels\Inspector</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Panel_Viewport.cpp">
-      <Filter>04. Panels\Viewport</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Panel_Hierarchy.cpp">
-      <Filter>04. Panels\Hierarchy</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Panel_Console.cpp">
-      <Filter>04. Panels\Console</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\ToolApp.cpp">
-      <Filter>00. App</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Panel_Toolbar.cpp">
-      <Filter>04. Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Panel_Palette.cpp">
-      <Filter>04. Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\EditCamera.cpp">
-      <Filter>03. Objects\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Edit_Grid.cpp">
-      <Filter>03. Objects\Grid</Filter>
+    <ClCompile Include="..\ThirdParty\ImGui\Src\ImGuizmo.cpp">
+      <Filter>97. ImGui</Filter>
     </ClCompile>
     <ClCompile Include="MapTool.cpp">
       <Filter>98. Default</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\ImGui_Manager.cpp">
-      <Filter>97. ImGui\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Level_Edit.cpp">
-      <Filter>02. Levels\Edit</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Level_Loading.cpp">
-      <Filter>02. Levels\Loader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Loader.cpp">
-      <Filter>02. Levels\Loader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Panel_Profiler.cpp">
-      <Filter>04. Panels\Profiler</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\EditInstance.cpp">
-      <Filter>01. API\00. EditInstance</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="small.ico">
+    <Image Include="MapTool.ico">
       <Filter>98. Default</Filter>
     </Image>
-    <Image Include="MapTool.ico">
+    <Image Include="small.ico">
       <Filter>98. Default</Filter>
     </Image>
   </ItemGroup>

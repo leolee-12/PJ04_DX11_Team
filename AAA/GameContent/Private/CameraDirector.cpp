@@ -4,6 +4,7 @@
 #include "Camera_Cutscene.h"
 #include "Camera_Boss.h"
 #include "Camera_AreaCam.h"
+#include "Camera_Dialogue.h"
 
 CCameraDirector* CCameraDirector::s_pActiveDirector = nullptr;
 
@@ -13,6 +14,7 @@ namespace
     constexpr const _tchar* TAG_AREA = TEXT("CameraFollow");
     constexpr const _tchar* TAG_CUT = TEXT("CameraCutscene");
     constexpr const _tchar* TAG_BOSS = TEXT("CameraBoss");
+    constexpr const _tchar* TAG_DIALOG = TEXT("CameraDialogue");
 
     const _tchar* Resolve_AreaCamDataPath(LEVEL eLevel)
     {
@@ -49,6 +51,7 @@ HRESULT CCameraDirector::Initialize(void* pArg)
 HRESULT CCameraDirector::Ready_Events()
 {
     Subscribe_Event(EventTag::Cutscene_CameraChange, [this](void* p) { On_CameraChange(p); });
+    Subscribe_Event(EventTag::Dialogue_CamBegin, [this](void* p) { On_DialogueCamBegin(p); });
     return S_OK;
 }
 
@@ -83,6 +86,7 @@ void CCameraDirector::On_CameraChange(void* p)
         CCamera* pFromCam = nullptr;
         if (m_pCutCam->Is_Active())       pFromCam = m_pCutCam;
         else if (m_pBossCam->Is_Active()) pFromCam = m_pBossCam;
+        else if (m_pDlgCam->Is_Active())  pFromCam = m_pDlgCam;
 
         if (pFromCam)
         {
@@ -94,6 +98,7 @@ void CCameraDirector::On_CameraChange(void* p)
         m_pAreaCam->Set_Active(true);
         m_pCutCam->Set_Active(false);
         m_pBossCam->Set_Active(false);
+        m_pDlgCam->Set_Active(false);
         return;
     }
 
@@ -105,10 +110,24 @@ void CCameraDirector::On_CameraChange(void* p)
     {
         m_pCutCam->Set_Active(false);
         m_pAreaCam->Set_Active(false);
+        m_pDlgCam->Set_Active(false);
         m_pBossCam->Snap();
         m_pBossCam->Set_Active(true);
         return;
     }
+}
+
+void CCameraDirector::On_DialogueCamBegin(void* p)
+{
+    auto d = static_cast<DIALOGUE_CAMERA_DESC*>(p);
+    if (nullptr == d || nullptr == d->pAnchorWorld)
+        return;
+
+    m_pDlgCam->Begin(*d->pAnchorWorld, XMLoadFloat3(&d->vPosA), XMLoadFloat3(&d->vPosB));
+    m_pDlgCam->Set_Active(true);
+    m_pAreaCam->Set_Active(false);
+    m_pCutCam->Set_Active(false);
+    m_pBossCam->Set_Active(false);
 }
 
 HRESULT CCameraDirector::Ensure_Cameras()
@@ -157,11 +176,25 @@ HRESULT CCameraDirector::Ensure_Cameras()
             return E_FAIL;
     }
 
+    // Dialogue
+    if (!m_pGameInstance_Proxy->Has_Prototype(iStatic, CCamera_Dialogue::PROTOTYPE_TAG))
+    {
+        m_pGameInstance_Proxy->Add_Prototype(iStatic, CCamera_Dialogue::PROTOTYPE_TAG,
+            CCamera_Dialogue::Create(m_pDevice, m_pContext));
+
+        CCamera_Dialogue::DIALOGUECAM_DESC DialogDesc{};
+        DialogDesc.fFovy = XMConvertToRadians(50.f); DialogDesc.fNear = 0.1f; DialogDesc.fFar = 1000.f;
+        if (FAILED(m_pGameInstance_Proxy->Add_GameObject(iStatic, CCamera_Dialogue::PROTOTYPE_TAG,
+            iStatic, LAYER_CAMERA, TAG_DIALOG, &DialogDesc)))
+            return E_FAIL;
+    }
+
     m_pAreaCam = m_pGameInstance_Proxy->Find_GameObject<CCamera_AreaCam>(iStatic, LAYER_CAMERA, TAG_AREA);
     m_pCutCam = m_pGameInstance_Proxy->Find_GameObject<CCamera_Cutscene>(iStatic, LAYER_CAMERA, TAG_CUT);
     m_pBossCam = m_pGameInstance_Proxy->Find_GameObject<CCamera_Boss>(iStatic, LAYER_CAMERA, TAG_BOSS);
+    m_pDlgCam = m_pGameInstance_Proxy->Find_GameObject<CCamera_Dialogue>(iStatic, LAYER_CAMERA, TAG_DIALOG);
 
-    if (nullptr == m_pAreaCam || nullptr == m_pCutCam || nullptr == m_pBossCam)
+    if (nullptr == m_pAreaCam || nullptr == m_pCutCam || nullptr == m_pBossCam || nullptr == m_pDlgCam)
     {
         MSG_BOX("CameraDirector: STATIC camera cache failed - creation path broken");
         return E_FAIL;
@@ -170,6 +203,7 @@ HRESULT CCameraDirector::Ensure_Cameras()
     Safe_AddRef(m_pAreaCam);
     Safe_AddRef(m_pCutCam);
     Safe_AddRef(m_pBossCam);
+    Safe_AddRef(m_pDlgCam);
 
     return S_OK;
 }
@@ -184,6 +218,8 @@ void CCameraDirector::Arrange()
     m_pBossCam->Clear_LevelRefs();
     m_pBossCam->Set_Active(false);
 
+    m_pDlgCam->Set_Active(false);
+
     s_pActiveDirector = this;
 }
 
@@ -193,6 +229,7 @@ void CCameraDirector::Sleep_Cameras()
     m_pCutCam->Set_Active(false);
     m_pBossCam->Clear_LevelRefs();
     m_pBossCam->Set_Active(false);
+    m_pDlgCam->Set_Active(false);
 }
 
 CCameraDirector* CCameraDirector::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -220,6 +257,7 @@ void CCameraDirector::Free()
         Safe_Release(m_pAreaCam);
         Safe_Release(m_pCutCam);
         Safe_Release(m_pBossCam);
+        Safe_Release(m_pDlgCam);
     }
 
     __super::Free();

@@ -356,6 +356,13 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
                 }
                 break;
             }
+            case EANIM_EVENT::UI:
+            {
+                if (phase != ANIM_EVENT_PHASE::POINT) break;
+                if (e.strParam.empty()) break;
+
+                m_pGameInstance_Proxy->Publish(StrToWstr(e.strParam), nullptr);
+            }
             default: 
                 break;
         }

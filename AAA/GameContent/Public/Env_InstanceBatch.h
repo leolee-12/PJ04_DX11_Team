@@ -44,6 +44,8 @@ public:
 	_bool	Is_RegisteredThisFrame() { return m_bRegisteredThisFrame; }
 	void	Set_RegisteredThisFrame(_bool b) { m_bRegisteredThisFrame = b; }
 
+	HRESULT Apply_MeshLayer(_uint iMesh, const MESH_LAYER_IDX& Layer);
+
 private:
 	ENV_INSTANCE_KEY m_tKey = {};
 

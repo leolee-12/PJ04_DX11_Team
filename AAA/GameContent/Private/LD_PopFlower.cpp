@@ -16,6 +16,7 @@ namespace
 	inline constexpr const _char* POPFLOWER_ANIM_OPEN_WAIT = "OpenWait";
 	inline constexpr _float POPFLOWER_DEFAULT_ANIM_SPEED = 1.f;
 	inline constexpr _float POPFLOWER_COLLISION_ANIM_SPEED = 7.f;
+	inline constexpr _float POPFLOWER_CULL_MARGIN = 0.5f;
 
 	inline constexpr const _char* POPFLOWER_BLOOM_MESH_NAME = "Flower__PopFlowerC";
 	inline constexpr const _char* POPFLOWER_BUD_MESH_NAME = "Tsubomi__PopFlowerC";
@@ -62,6 +63,11 @@ HRESULT CLD_PopFlower::Initialize(void* pArg)
 
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
+
+	if (FAILED(Ready_CullBounds(m_pModelCom, POPFLOWER_CULL_MARGIN)))
+		return E_FAIL;
+
+	m_bUseShadow = true;
 
 	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
@@ -138,7 +144,8 @@ void CLD_PopFlower::Late_Update(_float fTimeDelta)
 #endif
 	}
 
-	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+	Check_Visible();
+	Submit_RenderGroups();
 }
 
 HRESULT CLD_PopFlower::Render()
@@ -147,6 +154,30 @@ HRESULT CLD_PopFlower::Render()
 		return E_FAIL;
 
 	return Render_Model();
+}
+
+HRESULT CLD_PopFlower::Render_Shadow()
+{
+	if (!m_bActive || Is_Dead())
+		return S_OK;
+
+	if (FAILED(Bind_ShadowTransforms(m_pShaderCom)))
+		return E_FAIL;
+
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		if (!Should_RenderMesh(i))
+			continue;
+
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+			return E_FAIL;
+
+		if (FAILED(Render_ShadowMesh(m_pShaderCom, m_pModelCom, i, MESH_LAYER_PROFILE::WORLD_ANIM)))
+			return E_FAIL;
+	}
+
+	return S_OK;
 }
 
 void CLD_PopFlower::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)

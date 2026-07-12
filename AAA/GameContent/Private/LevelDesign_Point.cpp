@@ -81,6 +81,11 @@ HRESULT CLevelDesign_Point::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
+	if (FAILED(Ready_CullBounds_RotationInvariant(m_pModelCom)))
+		return E_FAIL;
+
+	m_bUseShadow = true;
+
 	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
 
@@ -127,7 +132,8 @@ void CLevelDesign_Point::Late_Update(_float fTimeDelta)
 #endif
 	}
 
-	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+	Check_Visible();
+	Submit_RenderGroups();
 }
 
 HRESULT CLevelDesign_Point::Render()
@@ -136,6 +142,11 @@ HRESULT CLevelDesign_Point::Render()
 		return E_FAIL;
 
 	return Render_Model();
+}
+
+HRESULT CLevelDesign_Point::Render_Shadow()
+{
+	return Render_ShadowModel(m_pShaderCom, m_pModelCom, MESH_LAYER_PROFILE::WORLD_NONANIM);
 }
 
 void CLevelDesign_Point::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)

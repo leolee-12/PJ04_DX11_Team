@@ -742,7 +742,8 @@ HRESULT CRenderer::Render_DoF()
         };
 
     m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderPost,
-        { "g_fDoFEnable", "g_fFocusDist", "g_fAperture", "g_fDoFMaxCoC", "g_fDoFAutoFocus" });
+        { "g_fDoFEnable", "g_fDoFNear", "g_fDoFFar", "g_fDoFFarFalloff",
+          "g_fDoFCamNear", "g_fAperture", "g_fDoFMaxCoC" });
 
     if (bOn)
     {

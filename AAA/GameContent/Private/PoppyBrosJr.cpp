@@ -10,7 +10,6 @@
 
 #include "Monster_StateMachine.h"
 #include "Monster_State_Idle.h"
-#include "Monster_State_Detect.h"
 #include "Monster_State_Chase.h"
 #include "Monster_State_Patrol.h"
 #include "Monster_State_Fall.h"
@@ -108,11 +107,11 @@ HRESULT CPoppyBrosJr::Ready_State()
 		return E_FAIL;
 
 	// DETECT
-	Info.strAniName = "Find";
-	Info.bLoop = false;
-	Info.fSpeed = 1.25f;
-	if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::DETECT, CMonster_State_Detect::Create(Info))))
-		return E_FAIL;
+	//Info.strAniName = "Find";
+	//Info.bLoop = false;
+	//Info.fSpeed = 1.25f;
+	//if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::DETECT, CMonster_State_Detect::Create(Info))))
+	//	return E_FAIL;
 
 	//CHASE
 	Info.strAniName = "Walk";

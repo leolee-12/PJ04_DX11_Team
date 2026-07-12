@@ -63,6 +63,7 @@ protected:
 	virtual HRESULT				Ready_AnimEvents() override;
 
 	virtual void				Apply_AIVariation(const _wstring& strVariation) override;
+	virtual void				On_Damaged(const ATTACK_INFO& tInfo) override;
 
 private:
 	virtual HRESULT				Ready_PartObjects() override;

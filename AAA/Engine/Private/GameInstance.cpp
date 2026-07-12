@@ -562,14 +562,11 @@ void CGameInstance::Fade_BGM_Out(float fSeconds)
 {
     m_pSound_Manager->Fade_BGM_Out(fSeconds);
 }
-void CGameInstance::Play_BGM_Fade(const TCHAR* pSoundKey, float fSeconds, float fVolume)
+void CGameInstance::Play_BGM_Fade(const TCHAR* pSoundKey, float fSeconds, float fVolume, CSound_Handle* pOut)
 {
-    m_pSound_Manager->Play_BGM_Fade(pSoundKey, fSeconds, fVolume);
+    m_pSound_Manager->Play_BGM_Fade(pSoundKey, fSeconds, fVolume, pOut);
 }
-void CGameInstance::Play_BGM_Fade(const TCHAR* pSoundKey,  float fInSec, float fOutSec,  float fVolume, CSound_Handle* pOut)
-{
-    m_pSound_Manager->Play_BGM_Fade(pSoundKey, fInSec, fOutSec, fVolume, pOut);
-}
+
 void CGameInstance::Resume_BGM_Fade(CSound_Handle& hBgm, float fInSec)
 {
     m_pSound_Manager->Resume_BGM_Fade(hBgm, fInSec);
