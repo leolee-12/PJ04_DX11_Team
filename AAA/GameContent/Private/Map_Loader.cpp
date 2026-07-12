@@ -12,6 +12,7 @@
 #include "GameInstance.h"
 #include "DataLoader.h"
 #include "Texture_Hub.h"
+#include "GameObject_Factory.h"
 
 #include <mutex>
 #include <filesystem>
@@ -1044,6 +1045,109 @@ HRESULT CMap_Loader::Load_LevelDesign_Runtime(const MAP_RUNTIME_LOAD_CONTEXT& Co
 	return hr;
 }
 
+HRESULT CMap_Loader::Collect_PreloadJobs(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _wstring& strFallbackManifestPath,
+	const _wstring& strLevelObjectsPath, _uint iRuntimeLevel, vector<function<HRESULT()>>* pOutJobs)
+{
+	if (nullptr == pDevice || nullptr == pContext || nullptr == pOutJobs)
+		return E_FAIL;
+
+	_wstring strResolvedManifestPath;
+	MAP_EDIT_DATA MapContentDesc{};
+	if (FAILED(Resolve_LevelMapRequest(strFallbackManifestPath, strLevelObjectsPath,
+		&strResolvedManifestPath, &MapContentDesc)))
+		return E_FAIL;
+
+	CMap_Loader* pMapLoader = Create(pDevice, pContext);
+	if (nullptr == pMapLoader)
+		return E_FAIL;
+
+	MAP_PACKAGE Package{};
+	HRESULT hr = pMapLoader->Build_Package(strResolvedManifestPath, &Package);
+	Safe_Release(pMapLoader);
+
+	MAP_PACKAGE PreloadPackage{};
+	if (SUCCEEDED(hr))
+	{
+		PreloadPackage = Package;
+		if (MapContentDesc.bHasMapContent)
+			hr = CMap_EditFile::Apply_Change(&PreloadPackage, MapContentDesc.OverrideDesc);
+	}
+
+	if (FAILED(hr))
+		return hr;
+
+	MAP_RUNTIME_LEVELS Levels{};
+	Build_DefaultRuntimeLevels(iRuntimeLevel, &Levels);
+
+	{
+		vector<MAP_ADD_OBJECT> Added = PreloadPackage.AddedObjectDescs;
+		pOutJobs->push_back([pDevice, pContext, Added, Levels]() -> HRESULT
+			{ return Preload_SharedObjects(pDevice, pContext, Added, Levels); });
+	}
+
+	vector<MAP_SECTION_DESC> SectionDescs = PreloadPackage.StageDesc.SectionDescs;
+	if (PreloadPackage.StageDesc.strStageName == CMapEvent_BreakWall::STAGE12_STAGE_NAME)
+	{
+		MAP_SECTION_DESC Desc{};
+		Desc.strSectionName = CMapEvent_BreakWall::STAGE12_SECTION_NAME;
+		Desc.wstrModelProtoTag = CMapEvent_BreakWall::STAGE12_MODEL_PROTO_TAG;
+		Desc.wstrModelPath = CMapEvent_BreakWall::STAGE12_MODEL_PATH;
+		Desc.iModelProtoLevel = Levels.iStageModelLevel;
+		SectionDescs.push_back(Desc);
+	}
+	for (const MAP_SECTION_DESC& Desc : SectionDescs)
+		pOutJobs->push_back([pDevice, pContext, Desc, Levels]() -> HRESULT
+			{ return Preload_One_SectionModel(pDevice, pContext, Desc, Levels); });
+
+	unordered_map<_wstring, pair<ENV_OBJECT_DESC, _bool>> EnvModelJobs;
+	for (const ENV_OBJECT_DESC& Desc : PreloadPackage.EnvObjectDescs)
+	{
+		if (Desc.wstrModelProtoTag.empty())
+			continue;
+
+		const _bool bCook = Desc.tCollision.eColliderKind == ENV_COLLIDER_KIND::MODEL_MESH
+			&& Desc.tCollision.bCookCollMesh;
+
+		auto iter = EnvModelJobs.find(Desc.wstrModelProtoTag);
+		if (iter == EnvModelJobs.end())
+			EnvModelJobs.emplace(Desc.wstrModelProtoTag, make_pair(Desc, bCook));
+		else
+			iter->second.second = iter->second.second || bCook;
+	}
+	for (const auto& Pair : EnvModelJobs)
+	{
+		const ENV_OBJECT_DESC Desc = Pair.second.first;
+		const _bool bCook = Pair.second.second;
+		pOutJobs->push_back([pDevice, pContext, Desc, bCook, Levels]() -> HRESULT
+			{ return Preload_One_EnvModel(pDevice, pContext, Desc, bCook, Levels); });
+	}
+
+	for (const _wstring& strJsonPath : PreloadPackage.LevelDesignJsonPaths)
+	{
+		if (strJsonPath.empty())
+			continue;
+
+		pOutJobs->push_back([pDevice, pContext, strJsonPath, Levels]() -> HRESULT
+			{
+				CGameInstance_Proxy* pProxy = CGameInstance::GetProxy();
+				const HRESULT hrHub = Ready_TexHub(pProxy);
+				Safe_Release(pProxy);
+				if (FAILED(hrHub))
+					return E_FAIL;
+
+				LD_RUNTIME_LEVELS LDLevels{};
+				LDLevels.iObjectLevel = Levels.iLevelDesignObjectLevel;
+				LDLevels.iPrototypeLevel = Levels.iLevelDesignPrototypeLevel;
+				LDLevels.iModelPrototypeLevel = Levels.iLevelDesignModelPrototypeLevel;
+				return CLevelDesign_Loader::Preload_LevelDesign(pDevice, pContext, strJsonPath, LDLevels);
+			});
+	}
+
+	Store_MapPackage(strResolvedManifestPath, iRuntimeLevel, MAP_PACKAGE_BUILD_OPTIONS{}, move(Package));
+
+	return S_OK;
+}
+
 _uint CMap_Loader::Get_MapCount()
 {
 	return CMap_PresetCatalog::Get_Count();
@@ -1252,6 +1356,81 @@ void CMap_Loader::Build_DefaultRuntimeTargets(_uint iRuntimeLevel, MAP_SPAWN_TAR
 	pOutTargets->EnvEffect.pLayerTag = kLayerEnvEffect;
 
 	pOutTargets->pStageObjectTag = L"MapStage";
+}
+
+HRESULT CMap_Loader::Preload_SharedObjects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const vector<MAP_ADD_OBJECT>& AddedDescs, const MAP_RUNTIME_LEVELS& Levels)
+{
+	CMap_ProtoRegister* pRegister = CMap_ProtoRegister::Create(pDevice, pContext);
+	if (nullptr == pRegister)
+		return E_FAIL;
+
+	HRESULT hr = pRegister->Ready_ObjectPrototypes(Levels.iObjectLevel);
+
+	CGameInstance_Proxy* pProxy = CGameInstance::GetProxy();
+	if (SUCCEEDED(hr))
+	{
+		for (const MAP_ADD_OBJECT& Added : AddedDescs)
+		{
+			if (pProxy->Has_Prototype(Levels.iObjectLevel, Added.strPrototypeTag))
+				continue;
+
+			auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(Added.strPrototypeTag);
+			if (nullptr == pReg) { hr = E_FAIL; break; }
+
+			pReg->ResourceLoader(pProxy, pDevice, pContext, Levels.iObjectLevel);
+			if (FAILED(pProxy->Add_Prototype(Levels.iObjectLevel, Added.strPrototypeTag.c_str(),
+				static_cast<CGameObject*>(pReg->CreatorFunc(pDevice, pContext)))))
+			{
+				hr = E_FAIL;
+				break;
+			}
+		}
+	}
+
+	Safe_Release(pRegister);
+	Safe_Release(pProxy);
+	return hr;
+}
+
+HRESULT CMap_Loader::Preload_One_SectionModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const MAP_SECTION_DESC& Desc, const MAP_RUNTIME_LEVELS& Levels)
+{
+	CGameInstance_Proxy* pProxy = CGameInstance::GetProxy();
+	const HRESULT hrHub = Ready_TexHub(pProxy);
+	Safe_Release(pProxy);
+	if (FAILED(hrHub))
+		return E_FAIL;
+
+	CMap_ProtoRegister* pRegister = CMap_ProtoRegister::Create(pDevice, pContext);
+	if (nullptr == pRegister)
+		return E_FAIL;
+
+	const HRESULT hr = pRegister->Ready_MapSectionModel(Levels.iStageModelLevel, Desc);
+	Safe_Release(pRegister);
+	return hr;
+}
+
+HRESULT CMap_Loader::Preload_One_EnvModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const ENV_OBJECT_DESC& Desc, _bool bCookCollisionMesh, const MAP_RUNTIME_LEVELS& Levels)
+{
+	CGameInstance_Proxy* pProxy = CGameInstance::GetProxy();
+	const HRESULT hrHub = Ready_TexHub(pProxy);
+	Safe_Release(pProxy);
+	if (FAILED(hrHub))
+		return E_FAIL;
+
+	CMap_ProtoRegister* pRegister = CMap_ProtoRegister::Create(pDevice, pContext);
+	if (nullptr == pRegister)
+		return E_FAIL;
+
+	const HRESULT hr = pRegister->Ready_EnvModel(
+		Levels.iEnvModelLevel, Desc, bCookCollisionMesh, Levels.bEnableEnvObjectPicking);
+	Safe_Release(pRegister);
+
+	if (FAILED(hr))
+	{
+		Log_GameContentWarning("EnvObject model skipped: object="
+			+ WstrToStr(Desc.wstrObjectName) + " path=" + WstrToStr(Desc.wstrModelPath));
+	}
+	return S_OK;
 }
 
 CMap_Loader* CMap_Loader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
