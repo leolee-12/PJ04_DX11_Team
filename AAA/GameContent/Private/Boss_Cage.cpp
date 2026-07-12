@@ -312,6 +312,8 @@ void CBoss_Cage::Break()
 
     _bool bShow = false;
     m_pGameInstance_Proxy->Publish(EventTag::HUD_SetVisible, &bShow);
+
+    m_pGameInstance_Proxy->Play_SFX(L"DemoStageClear_CatchedCageL.wav", 0.5f);
 }
 
 void CBoss_Cage::On_Deserialized()

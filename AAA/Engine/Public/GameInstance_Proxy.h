@@ -194,8 +194,7 @@ public: // Picking
     void Play_BGM(const TCHAR* pSoundKey, float fVolume = 1.f, bool bLoop = true);
     void Play_BGM_Section(const TCHAR* pSoundKey, float fStart01, float fEnd01, float fVolume = 1.f);
     void Fade_BGM_Out(float fSeconds);
-    void Play_BGM_Fade(const TCHAR* pSoundKey, float fSeconds, float fVolume = 1.f);
-    void Play_BGM_Fade(const TCHAR* pSoundKey, float fInSec, float fOutSec, float fVolume, CSound_Handle* pOut);
+    void Play_BGM_Fade(const TCHAR* pSoundKey, float fSeconds, float fVolume = 1.f, CSound_Handle* pOut = nullptr);
     void Resume_BGM_Fade(CSound_Handle& hBgm, float fInSec);
     void Stop_BGM();
     void Set_BusVolume(ESoundBus eBus, float fVolume);
