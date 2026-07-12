@@ -1,0 +1,267 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="00. App">
+      <UniqueIdentifier>{2a7264af-40a2-4757-9482-96f5e7fdd4be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels">
+      <UniqueIdentifier>{35e7a30f-47e6-4264-9b5d-7769a6aa3c11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. Objects">
+      <UniqueIdentifier>{b3b7bac2-c0b8-4b78-a5f9-a6d46c8529fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Panels">
+      <UniqueIdentifier>{8cd65a44-7542-4a0f-be36-60fc2d99138f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99. Defines">
+      <UniqueIdentifier>{25564f6b-a75a-4ddb-9b02-bf655d66c754}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97. ImGui">
+      <UniqueIdentifier>{03994ea0-6dbd-4ef4-bd88-a5f053b9788a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Panels\Manager">
+      <UniqueIdentifier>{59c1a732-144c-4530-9d03-93792c200f41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Panels\Hierarchy">
+      <UniqueIdentifier>{9df3c044-1638-4c5e-b8cd-0125b13d0e80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Panels\Viewport">
+      <UniqueIdentifier>{3191eb09-8dd4-463d-8887-fbf63628cedc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Panels\Console">
+      <UniqueIdentifier>{71b4d72a-263e-4e36-b69c-704742851dc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Panels\Inspector">
+      <UniqueIdentifier>{caa2072f-f9e7-4250-b819-538fc49fc9c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. Objects\Grid">
+      <UniqueIdentifier>{f6fb9d53-a35e-4815-8785-8997190a42b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. Objects\Camera">
+      <UniqueIdentifier>{b12c09d0-c36b-47d6-a528-13cafe5057d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\Tool">
+      <UniqueIdentifier>{d92d8af8-9554-448d-8062-490c19fd90ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98. Default">
+      <UniqueIdentifier>{af80204d-74ad-49b5-9062-98caf5bf0c62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="96. ShaderFiles">
+      <UniqueIdentifier>{b0e00da9-d2b7-4846-a001-5be1ecd5c365}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. Objects\Preview_Actor">
+      <UniqueIdentifier>{fe46b911-fdf0-4e5e-8db9-2dd3c9ff0956}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Panels\Animation">
+      <UniqueIdentifier>{496127c3-2f2f-4aa4-a1ca-0cb42ff0b1d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Panels\Browser">
+      <UniqueIdentifier>{735ee1b2-fa09-4f5e-9098-f857f3c6b25b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Panels\UICanvas">
+      <UniqueIdentifier>{82aac75a-ceed-489b-a9ca-2b0eaf934ea4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. Objects\Preview_Kirby">
+      <UniqueIdentifier>{e1d3aae1-6727-4935-acac-12d6279558fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Panels\Preview">
+      <UniqueIdentifier>{2abfc9cb-9484-4d82-99e3-991eb6fa9327}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Panels\Palette">
+      <UniqueIdentifier>{0ca1783a-af7b-4828-ab67-acf5518b4760}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. Objects\PreviewDeformCar">
+      <UniqueIdentifier>{e25fb557-88d9-49e2-ab97-98a81dee4b2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. Objects\Preview_DeformCar_Demo">
+      <UniqueIdentifier>{d4db8ab4-b15b-4088-9d4b-48d09b299337}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Public\Panel.h">
+      <Filter>03. Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_Manager.h">
+      <Filter>03. Panels\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_Inspector.h">
+      <Filter>03. Panels\Inspector</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_Viewport.h">
+      <Filter>03. Panels\Viewport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_Hierarchy.h">
+      <Filter>03. Panels\Hierarchy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_Console.h">
+      <Filter>03. Panels\Console</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\AnimUITool_Struct.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\AnimUITool_Func.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\AnimUITool_Enum.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\AnimUITool_Defines.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\AnimUITool_App.h">
+      <Filter>00. App</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EditCamera.h">
+      <Filter>02. Objects\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Edit_Grid.h">
+      <Filter>02. Objects\Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimUITool.h">
+      <Filter>98. Default</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>98. Default</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>98. Default</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>98. Default</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Preview_Actor.h">
+      <Filter>02. Objects\Preview_Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_Animation.h">
+      <Filter>03. Panels\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_Browser.h">
+      <Filter>03. Panels\Browser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_UICanvas.h">
+      <Filter>03. Panels\UICanvas</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Preview_Kirby.h">
+      <Filter>02. Objects\Preview_Kirby</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_Preview.h">
+      <Filter>03. Panels\Preview</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Panel_Palette.h">
+      <Filter>03. Panels\Palette</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Tool.h">
+      <Filter>01. Levels\Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Preview_DeformCar_Main.h">
+      <Filter>02. Objects\PreviewDeformCar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Preview_DeformCar_Demo.h">
+      <Filter>02. Objects\Preview_DeformCar_Demo</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\ThirdParty\ImGui\Src\ImGuizmo.cpp">
+      <Filter>97. ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGui\Src\imgui.cpp">
+      <Filter>97. ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGui\Src\imgui_demo.cpp">
+      <Filter>97. ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGui\Src\imgui_draw.cpp">
+      <Filter>97. ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGui\Src\imgui_impl_dx11.cpp">
+      <Filter>97. ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGui\Src\imgui_impl_win32.cpp">
+      <Filter>97. ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGui\Src\imgui_tables.cpp">
+      <Filter>97. ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ThirdParty\ImGui\Src\imgui_widgets.cpp">
+      <Filter>97. ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel.cpp">
+      <Filter>03. Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Manager.cpp">
+      <Filter>03. Panels\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Inspector.cpp">
+      <Filter>03. Panels\Inspector</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Viewport.cpp">
+      <Filter>03. Panels\Viewport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Hierarchy.cpp">
+      <Filter>03. Panels\Hierarchy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Console.cpp">
+      <Filter>03. Panels\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\AnimUITool_App.cpp">
+      <Filter>00. App</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Tool.cpp">
+      <Filter>01. Levels\Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EditCamera.cpp">
+      <Filter>02. Objects\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Edit_Grid.cpp">
+      <Filter>02. Objects\Grid</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimUITool.cpp">
+      <Filter>98. Default</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Preview_Actor.cpp">
+      <Filter>02. Objects\Preview_Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Animation.cpp">
+      <Filter>03. Panels\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Browser.cpp">
+      <Filter>03. Panels\Browser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_UICanvas.cpp">
+      <Filter>03. Panels\UICanvas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Preview_Kirby.cpp">
+      <Filter>02. Objects\Preview_Kirby</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Preview.cpp">
+      <Filter>03. Panels\Preview</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Panel_Palette.cpp">
+      <Filter>03. Panels\Palette</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Preview_DeformCar_Main.cpp">
+      <Filter>02. Objects\PreviewDeformCar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Preview_DeformCar_Demo.cpp">
+      <Filter>02. Objects\Preview_DeformCar_Demo</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="AnimUITool.ico">
+      <Filter>98. Default</Filter>
+    </Image>
+    <Image Include="small.ico">
+      <Filter>98. Default</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="AnimUITool.rc">
+      <Filter>98. Default</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Bin\ShaderFiles\Shader_Grid.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </None>
+  </ItemGroup>
+</Project>

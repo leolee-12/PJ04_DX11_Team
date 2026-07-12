@@ -1,35 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="00. Editor">
-      <UniqueIdentifier>{8f4d59d9-6120-4315-8f8e-76c894b39d6d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01. Levels">
-      <UniqueIdentifier>{77a5aa69-63e5-42dc-9eae-722a6b78947b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01. Levels\Edit">
-      <UniqueIdentifier>{15ad9438-7a9c-4ca3-8468-9a09a3af5749}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01. Levels\Loading">
-      <UniqueIdentifier>{49fa660c-c1ef-45c4-8ac1-84d1ce66d21b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01. Levels\Loading\Loader">
-      <UniqueIdentifier>{3900752a-0e6e-4575-b37d-4b1738738e6c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. Objects">
-      <UniqueIdentifier>{885ebc7b-9404-4c39-986f-8bb8eb52ebe6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. Objects\01. NavMash">
-      <UniqueIdentifier>{fa7ca004-f5fe-48f0-97fd-9003e627f107}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. Objects\02. Camera">
-      <UniqueIdentifier>{48993c1d-5317-4746-b38f-e999b8a918fd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. Objects\03. Grid">
-      <UniqueIdentifier>{db04b3d2-42e5-4ba2-92bb-84bba2fd381b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="96. ShaderFiles">
-      <UniqueIdentifier>{3125b36f-811e-4f59-bc97-1e7df29dd8f4}</UniqueIdentifier>
+    <Filter Include="98. Default">
+      <UniqueIdentifier>{9eeda0df-4bb2-468a-ad88-7ead74c58c3d}</UniqueIdentifier>
     </Filter>
     <Filter Include="97. ThirdParty">
       <UniqueIdentifier>{13bb2792-078d-4277-9a2e-d9997f41b639}</UniqueIdentifier>
@@ -37,49 +10,64 @@
     <Filter Include="97. ThirdParty\ImGui">
       <UniqueIdentifier>{8d7f67f5-5068-47c7-a39d-ad3f75ee9211}</UniqueIdentifier>
     </Filter>
-    <Filter Include="97. ThirdParty\ImGui\Manager">
-      <UniqueIdentifier>{15041f7f-ef50-4922-8da3-8fc04b4d3378}</UniqueIdentifier>
-    </Filter>
     <Filter Include="97. ThirdParty\ImGui\Private">
       <UniqueIdentifier>{6e65f23c-fb80-48d2-966b-2ec70f13a6ce}</UniqueIdentifier>
     </Filter>
     <Filter Include="97. ThirdParty\ImGui\Public">
       <UniqueIdentifier>{1d7b82c1-139f-4dc6-a684-c70beca5c2b6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="98. Default">
-      <UniqueIdentifier>{9eeda0df-4bb2-468a-ad88-7ead74c58c3d}</UniqueIdentifier>
+    <Filter Include="97. ThirdParty\ImGui\Manager">
+      <UniqueIdentifier>{15041f7f-ef50-4922-8da3-8fc04b4d3378}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. Editor">
+      <UniqueIdentifier>{8f4d59d9-6120-4315-8f8e-76c894b39d6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels">
+      <UniqueIdentifier>{77a5aa69-63e5-42dc-9eae-722a6b78947b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\Loading">
+      <UniqueIdentifier>{49fa660c-c1ef-45c4-8ac1-84d1ce66d21b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\Loading\Loader">
+      <UniqueIdentifier>{3900752a-0e6e-4575-b37d-4b1738738e6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\Edit">
+      <UniqueIdentifier>{15ad9438-7a9c-4ca3-8468-9a09a3af5749}</UniqueIdentifier>
     </Filter>
     <Filter Include="99. Defines">
       <UniqueIdentifier>{0ea7ba26-41e8-4685-88ac-ac57b4dc87bd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="96. ShaderFiles">
+      <UniqueIdentifier>{3125b36f-811e-4f59-bc97-1e7df29dd8f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. Objects">
+      <UniqueIdentifier>{885ebc7b-9404-4c39-986f-8bb8eb52ebe6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. Objects\02. Camera">
+      <UniqueIdentifier>{48993c1d-5317-4746-b38f-e999b8a918fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. Objects\03. Grid">
+      <UniqueIdentifier>{db04b3d2-42e5-4ba2-92bb-84bba2fd381b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. Objects\01. NavMash">
+      <UniqueIdentifier>{fa7ca004-f5fe-48f0-97fd-9003e627f107}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\public\Edit_Grid.h">
-      <Filter>02. Objects\03. Grid</Filter>
+    <ClInclude Include="Editor.h">
+      <Filter>98. Default</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\EditCamera.h">
-      <Filter>02. Objects\02. Camera</Filter>
+    <ClInclude Include="framework.h">
+      <Filter>98. Default</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>98. Default</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>98. Default</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Editor_Defines.h">
       <Filter>99. Defines</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\EditorApp.h">
-      <Filter>00. Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\ImGui_Manager.h">
-      <Filter>97. ThirdParty\ImGui\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Level_Edit.h">
-      <Filter>01. Levels\Edit</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Level_Loading.h">
-      <Filter>01. Levels\Loading</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Loader.h">
-      <Filter>01. Levels\Loading\Loader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\NavMesh_Editor.h">
-      <Filter>02. Objects\01. NavMash</Filter>
     </ClInclude>
     <ClInclude Include="..\ThirdParty\ImGui\Inc\imconfig.h">
       <Filter>97. ThirdParty\ImGui\Private</Filter>
@@ -108,17 +96,29 @@
     <ClInclude Include="..\ThirdParty\ImGui\Inc\imstb_truetype.h">
       <Filter>97. ThirdParty\ImGui\Private</Filter>
     </ClInclude>
-    <ClInclude Include="Editor.h">
-      <Filter>98. Default</Filter>
+    <ClInclude Include="..\Public\ImGui_Manager.h">
+      <Filter>97. ThirdParty\ImGui\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="framework.h">
-      <Filter>98. Default</Filter>
+    <ClInclude Include="..\public\EditorApp.h">
+      <Filter>00. Editor</Filter>
     </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>98. Default</Filter>
+    <ClInclude Include="..\public\Level_Loading.h">
+      <Filter>01. Levels\Loading</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>98. Default</Filter>
+    <ClInclude Include="..\Public\Loader.h">
+      <Filter>01. Levels\Loading\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Level_Edit.h">
+      <Filter>01. Levels\Edit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\EditCamera.h">
+      <Filter>02. Objects\02. Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Edit_Grid.h">
+      <Filter>02. Objects\03. Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\NavMesh_Editor.h">
+      <Filter>02. Objects\01. NavMash</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -135,29 +135,8 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\private\Edit_Grid.cpp">
-      <Filter>02. Objects\03. Grid</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\EditCamera.cpp">
-      <Filter>02. Objects\02. Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\EditorApp.cpp">
-      <Filter>00. Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\ImGui_Manager.cpp">
-      <Filter>97. ThirdParty\ImGui\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Level_Edit.cpp">
-      <Filter>01. Levels\Edit</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Level_Loading.cpp">
-      <Filter>01. Levels\Loading</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Loader.cpp">
-      <Filter>01. Levels\Loading\Loader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\NavMesh_Editor.cpp">
-      <Filter>02. Objects\01. NavMash</Filter>
+    <ClCompile Include="Editor.cpp">
+      <Filter>98. Default</Filter>
     </ClCompile>
     <ClCompile Include="..\ThirdParty\ImGui\Src\imgui.cpp">
       <Filter>97. ThirdParty\ImGui\Public</Filter>
@@ -183,8 +162,29 @@
     <ClCompile Include="..\ThirdParty\ImGui\Src\ImGuizmo.cpp">
       <Filter>97. ThirdParty\ImGui\Public</Filter>
     </ClCompile>
-    <ClCompile Include="Editor.cpp">
-      <Filter>98. Default</Filter>
+    <ClCompile Include="..\Private\ImGui_Manager.cpp">
+      <Filter>97. ThirdParty\ImGui\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EditorApp.cpp">
+      <Filter>00. Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_Loading.cpp">
+      <Filter>01. Levels\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loader.cpp">
+      <Filter>01. Levels\Loading\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_Edit.cpp">
+      <Filter>01. Levels\Edit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EditCamera.cpp">
+      <Filter>02. Objects\02. Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Edit_Grid.cpp">
+      <Filter>02. Objects\03. Grid</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\NavMesh_Editor.cpp">
+      <Filter>02. Objects\01. NavMash</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -90,6 +90,8 @@ namespace Client
         inline constexpr const _tchar* Sequence_KirbyWarp = L"Sequence.KirbyWarp";
         inline constexpr const _tchar* Dialogue_Say = L"Dialogue.Say";
         inline constexpr const _tchar* Dialogue_SayDone = L"Dialogue.SayDone";
+        inline constexpr const _tchar* Dialogue_CamBegin = L"Dialogue.CamBegin";
+        inline constexpr const _tchar* Dialogue_CamShot = L"Dialogue.CamShot";
 
         // ƒ…¿Ã¡ˆ
         inline constexpr const _tchar* Cage_Descend = L"Cage.Descend";
@@ -275,10 +277,23 @@ namespace Client
         _float fSpeed = { 1.f };
         _float fBlendDuration = { 0.2f };
     };
+    struct DIALOGUE_CAMERA_DESC
+    {
+        const _float4x4* pAnchorWorld = nullptr;  
+        _float3 vPosA{};                          
+        _float3 vPosB{};                          
+    };
+
     struct DIALOGUE_SAY_DESC
     {
         _wstring strSpeaker{};
-        _wstring strLines[3]{};    // Top / Middle / Bottom
+        _wstring strLines[3]{};
+    };
+
+    struct DIALOGUE_CAMSHOT_DESC
+    {
+        _wstring strShot{};
+        _float   fBlendDur = { -1.f };
     };
 #pragma endregion
 
