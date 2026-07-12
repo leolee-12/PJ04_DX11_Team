@@ -33,6 +33,8 @@ void CKirby_CarFirstBreakWall::Enter(CKirby* pKirby, _int iFlag)
     CKirby_Deform_Model* pModel = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR, KIRBY_DEFORM_MODEL_TYPE::MAIN);
     CAnimator* pAnimator = pModel->Get_Animator();
     pAnimator->Play("DeformCarGetFirst", false, false, 0.1f, 1.5f);
+
+    pModel->Stop_SoundHandle();
 }
 
 void CKirby_CarFirstBreakWall::Update(CKirby* pKirby, const _float fTimeDelta)

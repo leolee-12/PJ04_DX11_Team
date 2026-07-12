@@ -117,6 +117,8 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
         }
         case DEFORM_STATE::DEFORM:
         {
+            m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_DeformingSwallow1.wav", 0.2f);
+
             if (m_pInhaleEffect)
             {
                 m_pInhaleEffect->EffectContainer_Stop();
@@ -127,6 +129,12 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
             KIRBY_ABILITY_CHANGED tDesc{};
             tDesc.bBegin = true;
             m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &tDesc);
+
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Set_GravityScale(0.f);
+            pMovement->Set_Velocity(XMVectorSet(0.f, 0.f, 0.f, 0.f));
+            pMovement->Clear_Forces();
+
             m_pGameInstance_Proxy->Set_TimeScale(0.f);
 
             pKirby->Get_Body()->Set_Active(false);
@@ -165,7 +173,7 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
         }
         case DEFORM_STATE::DEFORM_STATE_END:
         {
-            pKirby->Change_State(KIRBY_STATE_TYPE::WAIT);
+            Transition_Fall_OR_Wait_OR_Run_Immediate(pKirby);
             break;
         }
     }
@@ -247,9 +255,11 @@ void CKirby_GetDeform::Exit_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
             KIRBY_ABILITY_CHANGED Desc{};
             Desc.bBegin = false;
             m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &Desc);
-            m_pGameInstance_Proxy->Set_TimeScale(1.f);
 
             CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Set_GravityScale(1.f);
+            m_pGameInstance_Proxy->Set_TimeScale(1.f);
+
             pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
 
             break;

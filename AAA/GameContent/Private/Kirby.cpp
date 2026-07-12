@@ -128,11 +128,11 @@ void CKirby::Update(_float fTimeDelta)
 
     m_pMovement->Update_RigidBody(fTimeDelta);
 
+    Update_RenderWorldMatrix(fTimeDelta);
+
     __super::Update(fTimeDelta);
 
     Update_InvincibilityHitFlash();
-
-    Update_RenderWorldMatrix(fTimeDelta);
 
 #ifdef _DEBUG
     if (m_pGameInstance_Proxy->Key_Down(DIK_TAB))
