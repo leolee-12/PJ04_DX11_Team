@@ -45,15 +45,20 @@ public:
     virtual void                On_SpatEnd() override; // 풀 반환(Set_Active false) 또는 사망FX
 
     void                        Enable_HurtBox(_bool b);
+    void                        Despawn();
+
+    void                        Set_Thrown(_bool bThrown) { m_bThrown = bThrown; }
 
     _bool                       Is_Capturing() const { return m_bCaptured; }
     _bool                       Is_Detached() const { return m_bDetached; }
+    _bool                       Is_Thrown() const { return m_bThrown; }
     _bool                       Is_Gone() const { return m_bGone; }
     _bool                       Needs_Container() const { return m_bDetached && m_bActive && !m_bGone; }
 
 private:
     virtual HRESULT             Ready_Components() override;
     HRESULT                     Ready_HurtBox();
+    void                        SetUp_Collider_CallBack();
     void                        Update_CapturePull(_float fTimeDelta);
 
     void                        Detach();
@@ -67,6 +72,7 @@ private:
     _bool                       m_bDetached = { false };
     _bool                       m_bCaptured = { false };
     _bool                       m_bGone = { false };
+    _bool						m_bThrown = { false };
 
     _float                      m_fPullSpeed = { 0.f };
     static constexpr _float     s_fPullAccel = { 40.f };

@@ -111,6 +111,7 @@ void CCappy::On_SpatBegin()
 	__super::On_SpatBegin();                   // Set_Active(true)+ÄÝoff+SPAT
 	if (m_pBody) m_pBody->Set_Active(true);    // ¸öÅë ´Ù½Ã ·»´õ(º° »çÃâ)
 	m_bDeferFinal = false;
+	if (m_pHat) m_pHat->Set_Thrown(false);
 }
 
 void CCappy::On_SpatEnd()
@@ -216,7 +217,7 @@ HRESULT CCappy::Ready_State()
 
 HRESULT CCappy::Ready_AnimEvents()
 {
-	if (nullptr == m_pBody)
+	if (nullptr == m_pBody || m_pHat == nullptr)
 		return E_FAIL;
 
 	CAnimator* pAnimator = m_pBody->Get_Animator();
@@ -244,6 +245,14 @@ HRESULT CCappy::Ready_AnimEvents()
 					BB.bCanMove = false;
 				break;
 			}
+			case EANIM_EVENT::OnOffPart:
+			{
+				if (ePhase == ANIM_EVENT_PHASE::BEGIN)
+					m_pHat->Set_Thrown(true);
+				else if (ePhase == ANIM_EVENT_PHASE::END)
+					m_pHat->Set_Thrown(false);
+				break;
+			}
 			default: 
 				break;
 			}
@@ -264,11 +273,20 @@ void CCappy::Apply_AIVariation(const _wstring& strVariation)
 
 void CCappy::On_Damaged(const ATTACK_INFO& tInfo)
 {
-	//if (tInfo.eHitType == HIT_TYPE::CAR_BOOSTER_HIT)
-	//{
+	if (tInfo.eHitType == HIT_TYPE::CAR_BOOSTER_HIT)
+	{
+		if (m_pHat && (m_pHat->Is_Detached() || m_pHat->Is_Thrown()))
+			m_pHat->Despawn();
 
-	//	return;
-	//}
+		if (m_pMovement && m_pMovement->Is_Grounded())
+		{
+			Change_State(MONSTER_STATE_TYPE::FLATTEN);
+		}
+		else
+			Despawn();
+
+		return;
+	}
 
 	__super::On_Damaged(tInfo);
 }
