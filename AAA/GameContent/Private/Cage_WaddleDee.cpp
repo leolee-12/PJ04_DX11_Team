@@ -158,6 +158,16 @@ void CCage_WaddleDee::Rescue()
     m_pAnimatorCom->Play(s_DeeClips[ETOUI(m_ePos)].szRescueCut, false, true, 0.f, 1.5f);
 }
 
+HRESULT CCage_WaddleDee::Ready_Events()
+{
+    Subscribe_Event(EventTag::CutFade_OutDone, [this](void* /*pData*/)
+        {
+            Set_Active(false);
+        });
+
+    return S_OK;
+}
+
 HRESULT CCage_WaddleDee::Ready_Components()
 {
     PART_SETUP t{};
