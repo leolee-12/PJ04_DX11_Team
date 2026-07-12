@@ -13,7 +13,19 @@ namespace
 	static constexpr _float s_fAcquireDistance = { 1.2f };
 	static constexpr _float s_fAlignRotSpeedDegree = { 72.f };
 	static constexpr _float s_fPullTargetFwd = { 1.8f };
-	static constexpr _float s_fReleaseFwd = { 3.f };
+	static constexpr _float s_fReleaseFwd = { 5.f };
+
+	static constexpr _float s_fGravity = { -45.f };
+	static constexpr _float s_fMaxFallSpeed = { -15.f };
+	static constexpr _float s_fGroundProbeDistance = { 0.02f };
+	static constexpr _float s_fMinSweepHalfExtent = { 0.05f };
+
+	static constexpr const _char* ANIM_WAIT = { "Wait" };
+	static constexpr const _char* ANIM_SHAKE = { "Shake" };
+	static constexpr const _char* ANIM_FALL = { "Fall" };
+	static constexpr const _char* ANIM_LANDING = { "Landing" };
+
+	static constexpr _float s_fAnimSpeed = { 1.f };
 
 	struct LD_DEFORMOBJECT_CATALOG
 	{
@@ -85,6 +97,19 @@ HRESULT CLD_DeformObject::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+	const LD_ANIM_PLAY_DESC AnimDescs[] =
+	{
+			{ ANIM_WAIT, true, s_fAnimSpeed },
+			{ ANIM_SHAKE, true, s_fAnimSpeed },
+			{ ANIM_FALL, true, s_fAnimSpeed },
+			{ ANIM_LANDING, false, s_fAnimSpeed },
+	};
+
+	if (FAILED(Ready_AnimPlayDescs(AnimDescs, static_cast<_uint>(_countof(AnimDescs)))))
+		return E_FAIL;
+
+	Play_Anim(ANIM_WAIT);
+
 	m_bUseShadow = true;
 
 	return S_OK;
@@ -139,6 +164,29 @@ void CLD_DeformObject::Update(_float fTimeDelta)
 	}
 	case DEFORM_OBJECT_STATE::ACQUIRED:
 		break;
+
+	case DEFORM_OBJECT_STATE::FALLING:
+	{
+		Update_Falling(fTimeDelta);
+
+		if (DEFORM_OBJECT_STATE::FALLING == m_eState)
+			__super::Update(fTimeDelta);
+
+		break;
+	}
+	case DEFORM_OBJECT_STATE::LANDING:
+	{
+		__super::Update(fTimeDelta);
+
+		if (m_bAnimationActive)
+			break;
+
+		m_bAvailable = true;
+		Set_TriggerEnabled(true);
+		m_pTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+		Change_State(DEFORM_OBJECT_STATE::IDLE);
+		break;
+	}
 	}
 }
 
@@ -180,7 +228,11 @@ void CLD_DeformObject::Register_LevelDesignSpecs()
 		Spec.eModelType = Entry.eModelType;
 		Spec.pPrototypeFactory = &Create_Prototype;
 		Spec.pBuildDesc = &Build_Desc;
-		Spec.ModelRequirements = { { Entry.pModelProtoTag, Entry.pModelPath, Entry.eModelType, true }, };
+
+		_float4x4 PreTransformMatrix{};
+		XMStoreFloat4x4(&PreTransformMatrix, XMMatrixRotationY(XMConvertToRadians(180.f)));
+
+		Spec.ModelRequirements = { { Entry.pModelProtoTag, Entry.pModelPath, Entry.eModelType, true, PreTransformMatrix }, };
 
 		CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
 	}
@@ -242,16 +294,13 @@ HRESULT CLD_DeformObject::On_DeformReleased(const _float3& vWorldPosition)
 	if (m_bAvailable)
 		return S_FALSE;
 
-	m_pTransformCom->Set_State(STATE::POSITION,
-		XMVectorSetW(XMLoadFloat3(&vWorldPosition), 1.f));
+	m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&vWorldPosition), 1.f));
 
-	if (FAILED(Ready_RigidStatic()))
-		return E_FAIL;
+	m_fVerticalVelocity = 0.f;
 
-	m_bAvailable = true;
 	Set_Active(true);
-	Set_TriggerEnabled(true);
-	m_pTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+	Set_TriggerEnabled(false);
+	Change_State(DEFORM_OBJECT_STATE::FALLING);
 
 	return S_OK;
 }
@@ -265,7 +314,7 @@ _bool CLD_DeformObject::Request_Deform(const _float4x4* AnchorWorld)
 	if (DEFORM_OBJECT_KIND::MOBILE != m_eKind)
 		return false;
 
-	m_eState = DEFORM_OBJECT_STATE::CAPTURED;
+	Change_State(DEFORM_OBJECT_STATE::CAPTURED);
 	m_AnchorWorld = *AnchorWorld;
 	m_bAlignDone = false;
 
@@ -295,8 +344,6 @@ void CLD_DeformObject::End_Deform(const _float4x4* AnchorWorld)
 	m_pTransformCom->Set_State(STATE::POSITION, vReleasePos);
 	m_pTransformCom->LookAt(vReleasePos + vLook);
 
-	m_eState = DEFORM_OBJECT_STATE::IDLE;
-
 	_float3 vPosition{};
 	XMStoreFloat3(&vPosition, vReleasePos);
 	On_DeformReleased(vPosition);
@@ -307,10 +354,12 @@ void CLD_DeformObject::Update_Captured(_float fTimeDelta)
 {
 	_matrix AnchorWorld = XMLoadFloat4x4(&m_AnchorWorld);
 	_vector vAnchorPos = AnchorWorld.r[3];
+	_vector vSelf = m_pTransformCom->Get_State(STATE::POSITION);
 
 	if (!m_bAlignDone)
 	{
-		m_bAlignDone = m_pTransformCom->LookAt_Smooth(vAnchorPos, fTimeDelta);
+		const _vector vAlignTarget = vSelf - (vAnchorPos - vSelf);
+		m_bAlignDone = m_pTransformCom->LookAt_Smooth(vAlignTarget, fTimeDelta);
 		return;
 	}
 
@@ -318,8 +367,6 @@ void CLD_DeformObject::Update_Captured(_float fTimeDelta)
 	if (XMVectorGetX(XMVector3LengthSq(vLook)) <= FLT_EPSILON)
 		vLook = XMVectorSet(0.f, 0.f, 1.f, 0.f);
 	vLook = XMVector3Normalize(vLook);
-
-	_vector vSelf = m_pTransformCom->Get_State(STATE::POSITION);
 
 	_vector vTarget = vAnchorPos + vLook * s_fPullTargetFwd;
 	vTarget = XMVectorSetY(vTarget, XMVectorGetY(vSelf));
@@ -330,7 +377,7 @@ void CLD_DeformObject::Update_Captured(_float fTimeDelta)
 
 	if (fDist <= s_fAcquireDistance)
 	{
-		m_eState = DEFORM_OBJECT_STATE::ACQUIRED;
+		Change_State(DEFORM_OBJECT_STATE::ACQUIRED);
 		On_DeformAcquired();
 
 		DEFORM_ACQUIRED_EVENT Payload{};
@@ -344,6 +391,73 @@ void CLD_DeformObject::Update_Captured(_float fTimeDelta)
 	m_fPullSpeed += s_fPullAccel * fTimeDelta;
 	_float fMove = min(m_fPullSpeed * fTimeDelta, fDist);
 	m_pTransformCom->Set_State(STATE::POSITION, vSelf + XMVector3Normalize(vDir) * fMove);
+}
+
+void CLD_DeformObject::Update_Falling(_float fTimeDelta)
+{
+	m_fVerticalVelocity = max(m_fVerticalVelocity + s_fGravity * fTimeDelta, s_fMaxFallSpeed);
+
+	const _float fFallDistance = -m_fVerticalVelocity * fTimeDelta;
+	if (fFallDistance <= 0.f)
+		return;
+
+	_float3 vMin{};
+	_float3 vMax{};
+	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
+
+	const _float3 vLocalCenter =
+	{
+			(vMin.x + vMax.x) * 0.5f,
+			(vMin.y + vMax.y) * 0.5f,
+			(vMin.z + vMax.z) * 0.5f
+	};
+
+	const _float3 vScale = m_pTransformCom->Get_Scaled();
+	const _float3 vHalfExtents =
+	{
+			max((vMax.x - vMin.x) * 0.5f * vScale.x, s_fMinSweepHalfExtent),
+			max((vMax.y - vMin.y) * 0.5f * vScale.y, s_fMinSweepHalfExtent),
+			max((vMax.z - vMin.z) * 0.5f * vScale.z, s_fMinSweepHalfExtent)
+	};
+
+	const _matrix WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+	_float3 vWorldCenter{};
+	XMStoreFloat3(&vWorldCenter, XMVector3TransformCoord(XMLoadFloat3(&vLocalCenter), WorldMatrix));
+
+	_float4 vRotation{};
+	XMStoreFloat4(&vRotation, XMQuaternionRotationMatrix(m_pTransformCom->Get_RotationMatrix()));
+
+	const _float3 vDown = { 0.f, -1.f, 0.f };
+	_float fHitDistance = 0.f;
+
+	const _bool bHit = m_pGameInstance_Proxy->Sweep_Box(
+		vWorldCenter,
+		vHalfExtents,
+		vRotation,
+		vDown,
+		fFallDistance + s_fGroundProbeDistance,
+		nullptr,
+		&fHitDistance,
+		true,
+		false);
+
+	_float fMoveDistance = fFallDistance;
+	if (bHit)
+		fMoveDistance = max(0.f, fHitDistance);
+
+	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
+	vPosition = XMVectorSetY(vPosition, XMVectorGetY(vPosition) - fMoveDistance);
+	m_pTransformCom->Set_State(STATE::POSITION, vPosition);
+
+	if (!bHit)
+		return;
+
+	if (FAILED(Ready_RigidStatic()))
+		return;
+
+	m_fVerticalVelocity = 0.f;
+	Change_State(DEFORM_OBJECT_STATE::LANDING);
 }
 
 HRESULT CLD_DeformObject::Ready_Components()
@@ -405,6 +519,37 @@ void CLD_DeformObject::Set_TriggerEnabled(_bool bEnabled)
 		return;
 
 	m_pTrigger->Set_Enabled(bEnabled);
+}
+
+void CLD_DeformObject::Change_State(DEFORM_OBJECT_STATE eState)
+{
+	if (m_eState == eState)
+		return;
+
+	m_eState = eState;
+
+	switch (m_eState)
+	{
+	case DEFORM_OBJECT_STATE::IDLE:
+		Play_Anim(ANIM_WAIT);
+		break;
+
+	case DEFORM_OBJECT_STATE::CAPTURED:
+		Play_Anim(ANIM_SHAKE);
+		break;
+
+	case DEFORM_OBJECT_STATE::ACQUIRED:
+		m_bAnimationActive = false;
+		break;
+
+	case DEFORM_OBJECT_STATE::FALLING:
+		Play_Anim(ANIM_FALL);
+		break;
+
+	case DEFORM_OBJECT_STATE::LANDING:
+		Play_Anim(ANIM_LANDING);
+		break;
+	}
 }
 
 CLD_DeformObject* CLD_DeformObject::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

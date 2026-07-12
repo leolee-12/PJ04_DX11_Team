@@ -51,7 +51,7 @@ public:
 #pragma endregion
 
 private:
-	enum class DEFORM_OBJECT_STATE { IDLE, CAPTURED, ACQUIRED };
+	enum class DEFORM_OBJECT_STATE { IDLE, CAPTURED, ACQUIRED, FALLING, LANDING };
 
 	LD_DEFORMOBJECT_DESC m_tDeformObjectDesc = {};
 
@@ -63,7 +63,7 @@ private:
 	_float4x4 m_AnchorWorld = {};
 	_bool m_bAlignDone = { false };
 	_float m_fPullSpeed = { 0.f };
-
+	_float m_fVerticalVelocity = { 0.f };
 
 private:
 	virtual HRESULT Ready_Components() override;
@@ -71,7 +71,9 @@ private:
 	HRESULT Ready_Trigger();
 
 	void Set_TriggerEnabled(_bool bEnabled);
+	void Change_State(DEFORM_OBJECT_STATE eState);
 	void Update_Captured(_float fTimeDelta);
+	void Update_Falling(_float fTimeDelta);
 
 public:
 	static CLD_DeformObject* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
