@@ -40,7 +40,7 @@ void CKirby_Guard::Enter(CKirby* pKirby, _int iFlag)
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_GroundFriction(s_fGuardGroundFriction);
 
-    m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_Guard.wav", 0.5f);
+    m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_Guard.wav", 0.1f);
 }
 
 void CKirby_Guard::Update(CKirby* pKirby, const _float fTimeDelta)

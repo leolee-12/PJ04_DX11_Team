@@ -117,6 +117,8 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
         }
         case DEFORM_STATE::DEFORM:
         {
+            m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_DeformingSwallow1.wav", 0.2f);
+
             if (m_pInhaleEffect)
             {
                 m_pInhaleEffect->EffectContainer_Stop();
