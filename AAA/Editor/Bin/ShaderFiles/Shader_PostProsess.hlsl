@@ -39,10 +39,12 @@ static const int SSR_STEPS = 128;
 
 //DoF
 float g_fDoFEnable = 0.f;
-float g_fFocusDist = 12.f; // AutoFocus=0일 때 수동 초점거리(view 단위)
-float g_fAperture = 1.5f; // 조리개: 클수록 얕은 심도(블러↑, near 더 빨리)
-float g_fDoFMaxCoC = 12.f; // 최대 blur 반경(half-res 픽셀)
-float g_fDoFAutoFocus = 1.f; // 1=화면 중앙 깊이로 자동 초점
+float g_fDoFNear = 6.f; // 이 범위 안은 완전 선명 (view Z)
+float g_fDoFFar = 18.f;
+float g_fDoFFarFalloff = 12.f; // Far 밖으로 이 거리만큼 가면 최대 흐림
+float g_fDoFCamNear = 0.1f; // near 램프 시작점(카메라 near). 여기서 최대 흐림
+float g_fAperture = 1.f; // 의미 변경: CoC 강도 배율 (0~1)
+float g_fDoFMaxCoC = 12.f;
 
 /* SSR 폴백용 IBL */
 TextureCube g_PrefilteredCube; // 디퍼드와 동일 큐브
@@ -51,7 +53,7 @@ float g_fIBLIntensity = 0.f;
 float4x4 g_CamViewMatrixInverse;
 
 //ToneMapping
-
+// 이거 이제 안씀
 float g_fExposure = 1.0f; // 커비 ToneMapping 노출 스칼라
 float g_fToneMapMode = 1.0f; // 0=Reinhard(기존) / 1=ACES / 2=노출만(커비 literal)
 
@@ -122,17 +124,20 @@ float3 Hash3(float2 uv, float i)
 //DoF 헬퍼
 float DoF_ViewZ(float2 uv)
 {
-    float ndcZ = g_DepthTexture.SampleLevel(LinearSampler, uv, 0).x; // z/w
+    float ndcZ = g_DepthTexture.SampleLevel(ClampSampler, uv, 0).x; // z/w
     return ViewPosFromUV(uv, ndcZ).z;
 }
-float DoF_Focus()
-{
-    return (g_fDoFAutoFocus > 0.5f) ? DoF_ViewZ(float2(0.5f, 0.5f)) : g_fFocusDist;
-}
-float DoF_CoC(float2 uv, float focus) // 음수=near, 양수=far, [-1,1]
+float DoF_CoC(float2 uv) // 음수=near blur, 양수=far blur, [-1,1]
 {
     float vz = max(DoF_ViewZ(uv), 1e-3f);
-    return clamp((1.f - focus / vz) * g_fAperture, -1.f, 1.f);
+
+    // DoFNear 안쪽: 카메라 near로 갈수록 1 (dof near <-> cam near 램프)
+    float nearB = 1.f - smoothstep(g_fDoFCamNear, g_fDoFNear, vz);
+    // DoFFar 바깥: Falloff 거리에 걸쳐 점점 1
+    float farB = smoothstep(g_fDoFFar, g_fDoFFar + g_fDoFFarFalloff, vz);
+
+    // [DoFNear, DoFFar] 구간은 둘 다 0이라 CoC 0 = 무조건 선명
+    return clamp((farB - nearB) * g_fAperture, -1.f, 1.f);
 }
 
 // Tone 매핑
@@ -150,7 +155,7 @@ float3 ApplySaturation(float3 c, float s)
   //============================ Bloom Bright (pass 0) ============================
 float4 PS_BLOOMBRIGHT(PS_IN In) : SV_TARGET0
 {
-    float3 c = g_SceneTexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    float3 c = g_SceneTexture.Sample(ClampSampler, In.vTexcoord).rgb;
     float luma = dot(c, float3(0.2126f, 0.7152f, 0.0722f));
     float k = max(luma - g_fThreshold, 0.f) / max(luma, 1e-4f); // soft knee
     return float4(c * k, 1.f);
@@ -160,14 +165,14 @@ float4 PS_BLOOMBRIGHT(PS_IN In) : SV_TARGET0
 float4 PS_BLUR(PS_IN In) : SV_TARGET0
 {
     const float w[5] = { 0.227027f, 0.194594f, 0.121622f, 0.054054f, 0.016216f };
-    float3 result = g_BloomTexture.Sample(LinearSampler, In.vTexcoord).rgb * w[0];
+    float3 result = g_BloomTexture.Sample(ClampSampler, In.vTexcoord).rgb * w[0];
     
     [unroll]
     for (int i = 1; i < 5; ++i)
     {
         float2 off = g_vBlurDir * g_vTexelSize * i;
-        result += g_BloomTexture.Sample(LinearSampler, In.vTexcoord + off).rgb * w[i];
-        result += g_BloomTexture.Sample(LinearSampler, In.vTexcoord - off).rgb * w[i];
+        result += g_BloomTexture.Sample(ClampSampler, In.vTexcoord + off).rgb * w[i];
+        result += g_BloomTexture.Sample(ClampSampler, In.vTexcoord - off).rgb * w[i];
     }
     return float4(result, 1.f);
 }
@@ -175,10 +180,10 @@ float4 PS_BLUR(PS_IN In) : SV_TARGET0
   //============================ Composite (pass 2) ============================
 float4 PS_COMPOSITE(PS_IN In) : SV_TARGET0
 {
-    float4 scene = g_SceneTexture.Sample(LinearSampler, In.vTexcoord);
+    float4 scene = g_SceneTexture.Sample(ClampSampler, In.vTexcoord);
     if (0.f == scene.a)
         discard;
-    float3 bloom = g_BloomTexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    float3 bloom = g_BloomTexture.Sample(ClampSampler, In.vTexcoord).rgb;
 
     float3 color = scene.rgb + bloom * g_fBloomIntensity;
     color *= g_fExposure;
@@ -257,14 +262,14 @@ float4 PS_SSAO_BLUR(PS_IN In) : SV_TARGET0
     for (int x = -2; x <= 2; ++x)
       [unroll]
         for (int y = -2; y <= 2; ++y)
-            result += g_SSAOTexture.Sample(PointSampler, In.vTexcoord + float2(x, y) * g_vTexelSize).r;
+            result += g_SSAOTexture.Sample(ClampSampler, In.vTexcoord + float2(x, y) * g_vTexelSize).r;
     return (result / 25.f).xxxx; // 5x5 박스 블러로 해시 노이즈 제거
 }
 
    //============================ SSR (pass 5) ============================
 float4 PS_SSR(PS_IN In) : SV_TARGET0
 {
-    float4 scene = g_SceneTexture.Sample(LinearSampler, In.vTexcoord);
+    float4 scene = g_SceneTexture.Sample(ClampSampler, In.vTexcoord);
 
     float ndcZ = g_DepthTexture.Sample(PointSampler, In.vTexcoord).x;
     if (ndcZ == 0.f)
@@ -289,7 +294,7 @@ float4 PS_SSR(PS_IN In) : SV_TARGET0
       /* --- IBL 스펙큘러 (폴백 + 거친 표면 기본 반사) --- */
     float3 R_view = reflect(viewDir, viewN);
     float3 R_world = normalize(mul(float4(R_view, 0.f), g_CamViewMatrixInverse).xyz);
-    float3 prefiltered = g_PrefilteredCube.SampleLevel(LinearSampler, R_world, roughness * (g_iSpecularMip - 1)).rgb;
+    float3 prefiltered = g_PrefilteredCube.SampleLevel(ClampSampler, R_world, roughness * (g_iSpecularMip - 1)).rgb;
     float2 envBRDF = EnvBRDFApprox(roughness, NdotV);
     float ssao = g_SSAOTexture.Sample(PointSampler, In.vTexcoord).r;
     float3 iblSpec = prefiltered * (F0 * envBRDF.x + envBRDF.y) * ao * ssao * g_fIBLIntensity;
@@ -364,7 +369,7 @@ float4 PS_SSR(PS_IN In) : SV_TARGET0
         if (hit > 0.5f)
         {
             float3 F = F0 + (max((1.f - roughness).xxx, F0) - F0) * pow(1.f - NdotV, 5.f);
-            float3 hitColor = g_SceneTexture.Sample(LinearSampler, hitUV).rgb;
+            float3 hitColor = g_SceneTexture.Sample(ClampSampler, hitUV).rgb;
             ssrColor = hitColor * F;
 
             float roughFade = saturate(1.f - roughness / 0.8f);
@@ -383,8 +388,8 @@ float4 PS_SSR(PS_IN In) : SV_TARGET0
 // Downsample + CoC → half. rgb=color, a=coc*0.5+0.5 (6)
 float4 PS_DOF_DOWN(PS_IN In) : SV_TARGET0
 {
-    float coc = DoF_CoC(In.vTexcoord, DoF_Focus());
-    float3 col = g_SceneTexture.SampleLevel(LinearSampler, In.vTexcoord, 0).rgb;
+    float coc = DoF_CoC(In.vTexcoord);
+    float3 col = g_SceneTexture.SampleLevel(ClampSampler, In.vTexcoord, 0).rgb;
     return float4(col, coc * 0.5f + 0.5f);
 }
 
@@ -392,7 +397,7 @@ float4 PS_DOF_DOWN(PS_IN In) : SV_TARGET0
 static const int DOF_TAPS = 16;
 float4 PS_DOF_BLUR(PS_IN In) : SV_TARGET0
 {
-    float4 c0 = g_BloomTexture.SampleLevel(LinearSampler, In.vTexcoord, 0);
+    float4 c0 = g_BloomTexture.SampleLevel(ClampSampler, In.vTexcoord, 0);
     float3 sum = 0.f;
     float wsum = 0.f;
     float cocSum = 0.f;
@@ -403,7 +408,7 @@ float4 PS_DOF_BLUR(PS_IN In) : SV_TARGET0
         float ang = t * 6.2831853f * 4.0f; // 나선
         float rad = sqrt(t); // 디스크 균등 분포
         float2 off = float2(cos(ang), sin(ang)) * rad * g_fDoFMaxCoC * g_vTexelSize;
-        float4 s = g_BloomTexture.SampleLevel(LinearSampler, In.vTexcoord + off, 0);
+        float4 s = g_BloomTexture.SampleLevel(ClampSampler, In.vTexcoord + off, 0);
         float scoc = s.a * 2.f - 1.f;
           // '샘플'의 blur 반경이 중심까지 닿으면 기여 → near/far 모두 번짐
         float w = saturate(abs(scoc) * g_fDoFMaxCoC - rad * g_fDoFMaxCoC + 1.f);
@@ -419,12 +424,12 @@ float4 PS_DOF_BLUR(PS_IN In) : SV_TARGET0
   // Composite → full. g_SceneTexture=sharp(SSR), g_BloomTexture=blurred(half) (8)
 float4 PS_DOF_COMPOSITE(PS_IN In) : SV_TARGET0
 {
-    float4 sharp = g_SceneTexture.SampleLevel(LinearSampler, In.vTexcoord, 0);
+    float4 sharp = g_SceneTexture.SampleLevel(ClampSampler, In.vTexcoord, 0);
     if (g_fDoFEnable < 0.5f)
         return sharp;
 
-    float4 b = g_BloomTexture.SampleLevel(LinearSampler, In.vTexcoord, 0); // 업샘플
-    float coc = abs(DoF_CoC(In.vTexcoord, DoF_Focus())); // 이 픽셀 흐림량
+    float4 b = g_BloomTexture.SampleLevel(ClampSampler, In.vTexcoord, 0); // 업샘플
+    float coc = abs(DoF_CoC(In.vTexcoord));
     float bled = b.a * 2.f - 1.f; // 번져 들어온 CoC
     float nearBleed = saturate(-bled); // 앞 물체가 위로 번짐
     float tt = max(smoothstep(0.05f, 0.5f, coc), nearBleed);
@@ -433,7 +438,7 @@ float4 PS_DOF_COMPOSITE(PS_IN In) : SV_TARGET0
 
 float4 PS_CURTAIN_COMPOSITE(PS_IN In) : SV_TARGET0
 {
-    return g_CurtainTexture.Sample(LinearSampler, In.vTexcoord);
+    return g_CurtainTexture.Sample(ClampSampler, In.vTexcoord);
 }
 
 float4 PS_OCCLUSION_SILHOUETTE(PS_IN In) : SV_TARGET0
@@ -453,7 +458,7 @@ float4 PS_SPOTLIGHT_DARKEN(PS_IN In) : SV_TARGET0
 
 float4 PS_ESM_RESOLVE(PS_IN In) : SV_TARGET0
 {
-    float d = g_LightDepthTexture.Sample(LinearSampler, In.vTexcoord).r;
+    float d = g_LightDepthTexture.Sample(ClampSampler, In.vTexcoord).r;
     return float4(exp(g_fESMConst * d), 0.f, 0.f, 1.f);
 }
 

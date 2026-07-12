@@ -18,6 +18,7 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
     const _float fSpd = 1.5f;
     const _float fAtkInterval = 2.f;   
     const _float fStopRange = 5.f;
+    const _uint  iCatchPersent = 20;
 
 
     // ---- °øÀ¯ ÇïÆÛ ----
@@ -327,7 +328,7 @@ CBTNode* CBoss_Gorilla_Brain::Build_PhaseTree(_int iPhase)
         CBTSequence::Create({
             CBTCondition::Create([this, fSwingRange](CBlackboard* pBB) {
                 return pBB->Get<_float>("DistToTarget", FLT_MAX) <= fSwingRange
-                    && (rand() % 100) < 20; }),
+                    && (rand() % 100) < iCatchPersent; }),
             MakeCatch(),
             MeleeCount(),
         }),
