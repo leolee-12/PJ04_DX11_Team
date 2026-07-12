@@ -1083,6 +1083,9 @@
     <Filter Include="00. GameObject\97. UI\UIContainer\HelpUI\QTE">
       <UniqueIdentifier>{1caed732-02f9-405a-8cf4-37f1442462c3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\00. Camera\Shakeable\DialogueCam">
+      <UniqueIdentifier>{2f597cdb-e009-4e5b-a1e1-21acfc86145c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\GameContent_Defines.h">
@@ -2149,6 +2152,9 @@
     <ClInclude Include="..\public\UI_QTE.h">
       <Filter>00. GameObject\97. UI\UIContainer\HelpUI\QTE</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Camera_Dialogue.h">
+      <Filter>00. GameObject\00. Camera\Shakeable\DialogueCam</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\GameObject_Factory.cpp">
@@ -3133,6 +3139,9 @@
     </ClCompile>
     <ClCompile Include="..\private\UI_QTE.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\HelpUI\QTE</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Camera_Dialogue.cpp">
+      <Filter>00. GameObject\00. Camera\Shakeable\DialogueCam</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -23,9 +23,13 @@ public:
         _wstring strTag;                 // event: 발행할 이벤트 태그
         _wstring strActor;               // warp / anim
         _wstring strAnchor;              // warp
-        _wstring strClip;                // anim (3단계에서 구현)
+        _wstring strClip;                
         _wstring strSpeaker;             // say: 화자 이름
         _wstring strLines[3];
+        _wstring strCamShot;
+        _float   fCamBlend;
+        _float   fAnimSpeed = { 1.f };
+        _float   fAnimBlend = { 0.2f };
         _bool    bLoop = { false };
     };
 

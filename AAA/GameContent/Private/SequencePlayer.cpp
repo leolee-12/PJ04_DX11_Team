@@ -64,6 +64,10 @@ HRESULT CSequencePlayer::Load(const _wstring& strFilePath)
                 tStep.strLines[0] = StrToWstr(jText.get<string>());
         }
         tStep.bLoop = jStep.value("loop", false);
+        tStep.strCamShot = StrToWstr(jStep.value("cam", ""));
+        tStep.fCamBlend = jStep.value("camblend", -1.f);
+        tStep.fAnimSpeed = jStep.value("speed", 1.f);
+        tStep.fAnimBlend = jStep.value("blend", 0.2f);
 
         m_Steps.push_back(tStep);
     }
@@ -108,6 +112,14 @@ void CSequencePlayer::Update(_float fTimeDelta)
 
 void CSequencePlayer::Enter_Step(const SEQUENCE_STEP& tStep)
 {
+    if (!tStep.strCamShot.empty())
+    {
+        DIALOGUE_CAMSHOT_DESC Desc{};
+        Desc.strShot = tStep.strCamShot;
+        Desc.fBlendDur = tStep.fCamBlend;
+        m_pGameInstance_Proxy->Publish(EventTag::Dialogue_CamShot, &Desc);
+    }
+
     switch (tStep.eType)
     {
         case ESTEP::EVENT:
@@ -191,20 +203,20 @@ void CSequencePlayer::Execute_Anim(const SEQUENCE_STEP& tStep)
         return;
     }
 
-    // 커비: 이벤트 계약으로 위임. 상태 처리 방식은 커비 측 자유
     if (dynamic_cast<CKirby*>(it->second))
     {
         SEQUENCE_KIRBY_ANIM_DESC Desc{};
         Desc.strClip = WstrToStr(tStep.strClip);
         Desc.bLoop = tStep.bLoop;
+        Desc.fSpeed = tStep.fAnimSpeed;
+        Desc.fBlendDuration = tStep.fAnimBlend;
         m_pGameInstance_Proxy->Publish(EventTag::Sequence_KirbyAnim, &Desc);
         return;
     }
 
-    // NPC: CutsceneActor 직접 재생
     if (auto pActor = dynamic_cast<CCutsceneActor*>(it->second))
     {
-        pActor->Play(WstrToStr(tStep.strClip).c_str(), tStep.bLoop);
+        pActor->Play(WstrToStr(tStep.strClip).c_str(), tStep.bLoop, tStep.fAnimBlend, tStep.fAnimSpeed);
         return;
     }
 
