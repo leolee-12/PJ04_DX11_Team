@@ -19,11 +19,15 @@ CDialogue_Arranger::CDialogue_Arranger(ID3D11Device* pDevice, ID3D11DeviceContex
     : CGameObject{ pDevice, pContext }
 {
     m_fActorGap = { 3.f };
+    m_fActorBackset = { 0.6f };
+    m_fFocusPull = { 0.3f };
 }
 
 CDialogue_Arranger::CDialogue_Arranger(const CDialogue_Arranger& Prototype)
     : CGameObject(Prototype)
     , m_fActorGap(Prototype.m_fActorGap)
+    , m_fActorBackset(Prototype.m_fActorBackset)
+    , m_fFocusPull(Prototype.m_fFocusPull)
 {
 }
 
@@ -74,13 +78,18 @@ HRESULT CDialogue_Arranger::Ready_Events()
                 return;
             }
 
-            // 앵커: 자기 트랜스폼 기준. A = look 반대편(커비 자리), B = 맞은편(NPC 자리)
             _vector vAnchor = m_pTransformCom->Get_State(STATE::POSITION);
             _vector vLook = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f));
+            _vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+            _vector vSide = XMVector3Normalize(XMVector3Cross(vUp, vLook));   // + 방향 = 카메라 자리
             _float  fHalf = m_fActorGap * 0.5f;
 
-            _float4x4 AnchorA = Make_ActorWorld(vAnchor - vLook * fHalf, vLook);
-            _float4x4 AnchorB = Make_ActorWorld(vAnchor + vLook * fHalf, XMVectorNegate(vLook));
+            _vector vPosA = vAnchor - vLook * fHalf - vSide * m_fActorBackset;   // 커비: 뒤로 살짝
+            _vector vPosB = vAnchor + vLook * fHalf - vSide * m_fActorBackset;   // 상대: 뒤로 살짝
+            _vector vFocus = vAnchor + vSide * m_fFocusPull;
+
+            _float4x4 AnchorA = Make_ActorWorld(vPosA, vFocus - vPosA);
+            _float4x4 AnchorB = Make_ActorWorld(vPosB, vFocus - vPosB);
             _float4x4 AnchorC = Make_ActorWorld(vAnchor, vLook);
 
             m_pPlayer->Bind_Anchor(L"A", XMLoadFloat4x4(&AnchorA));
@@ -95,6 +104,12 @@ HRESULT CDialogue_Arranger::Ready_Events()
             if (pDee)
                 pDee->Set_Active(true);
             m_pPlayer->Bind_Actor(L"Dee", pDee);
+
+            DIALOGUE_CAMERA_DESC CamDesc{};
+            CamDesc.pAnchorWorld = &AnchorC;
+            XMStoreFloat3(&CamDesc.vPosA, XMLoadFloat4x4(&AnchorA).r[3]);
+            XMStoreFloat3(&CamDesc.vPosB, XMLoadFloat4x4(&AnchorB).r[3]);
+            m_pGameInstance_Proxy->Publish(EventTag::Dialogue_CamBegin, &CamDesc);
 
             m_pPlayer->Play();
         });

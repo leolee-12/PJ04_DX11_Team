@@ -22,6 +22,9 @@
     <Filter Include="00. GameObject\00. Camera\Shakeable\Cutscene">
       <UniqueIdentifier>{44ee9036-9fb5-42d3-a001-52dd473415a5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\00. Camera\Shakeable\DialogueCam">
+      <UniqueIdentifier>{2f597cdb-e009-4e5b-a1e1-21acfc86145c}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\01. Map">
       <UniqueIdentifier>{52aa1b5e-9f41-4300-b321-d94a31de3ab2}</UniqueIdentifier>
     </Filter>
@@ -1191,6 +1194,9 @@
     <ClInclude Include="..\public\Camera_Cutscene.h">
       <Filter>00. GameObject\00. Camera\Shakeable\Cutscene</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Camera_Dialogue.h">
+      <Filter>00. GameObject\00. Camera\Shakeable\DialogueCam</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Camera_Free.h">
       <Filter>00. GameObject\00. Camera\Free</Filter>
     </ClInclude>
@@ -2248,6 +2254,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Camera_Cutscene.cpp">
       <Filter>00. GameObject\00. Camera\Shakeable\Cutscene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Camera_Dialogue.cpp">
+      <Filter>00. GameObject\00. Camera\Shakeable\DialogueCam</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Camera_Free.cpp">
       <Filter>00. GameObject\00. Camera\Free</Filter>
