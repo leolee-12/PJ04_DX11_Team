@@ -19,6 +19,7 @@ public:
 
 public:
     virtual HRESULT Initialize(void* pArg) override;
+    virtual HRESULT Render() override;
     virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* p) override { p->strPrototypeTag = PROTOTYPE_TAG; }
 
 private:
