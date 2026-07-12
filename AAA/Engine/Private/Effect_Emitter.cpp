@@ -236,6 +236,10 @@ void CEffect_Emitter::Update_Core(const _float fTimeDelta, const _float fRatio)
 
     __super::Update_Core(fTimeDelta, fRatio);
 
+    if (m_bOrbitChange == true)
+        Set_LocalPositionFromProperty();
+    Update_Orbit(fRatio);
+
     if (Can_Emit() == true)
         Emit_ByRate(fTimeDelta);
 

@@ -19,6 +19,14 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
 
     PROPERTY(_float3, m_vLocalPos,      L"Local Pos",   L"Effect");
 
+    // Orbit
+    PROPERTY(_bool,   m_bOrbitChange,       L"Orbit Change_O", L"Orbit");
+    PROPERTY(_float3, m_vOrbitPivot,        L"Pivot_O",        L"Orbit");
+    PROPERTY(_float3, m_vOrbitAxis,         L"Axis_O",         L"Orbit");
+    PROPERTY(_float,  m_fOrbitDegree,       L"Degree_O",       L"Orbit");
+    PROPERTY(_float,  m_fOrbit_Start_Ratio, L"Start_O",        L"Orbit");
+    PROPERTY(_float,  m_fOrbit_End_Ratio,   L"End_O",          L"Orbit");
+
     PROPERTY(_float, m_fStartRatio,     L"Start Ratio",  L"Effect");
     PROPERTY(_float, m_fEndRatio,       L"End Ratio",    L"Effect");
 
@@ -165,6 +173,8 @@ protected:
 
 protected:
     void Compute_CombinedWorldMatrix();
+    void Set_LocalPositionFromProperty();
+    void Update_Orbit(const _float fRatio);
 
     _float Get_FadeOutAlpha() const { return m_fFadeOutAlpha; }
 
