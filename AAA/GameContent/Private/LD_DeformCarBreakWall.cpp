@@ -52,7 +52,10 @@ HRESULT CLD_DeformCarBreakWall::Initialize(void* pArg)
 	if (FAILED(Ready_AnimPlayDescs(AnimDescs, static_cast<_uint>(_countof(AnimDescs)))))
 		return E_FAIL;
 
-	return Set_AnimPose(ANIM_FIRST, 0.f);
+	if (FAILED(Set_AnimPose(ANIM_FIRST, 0.f)))
+		return E_FAIL;
+
+	return S_OK;
 }
 
 HRESULT CLD_DeformCarBreakWall::Validate_Initialized()

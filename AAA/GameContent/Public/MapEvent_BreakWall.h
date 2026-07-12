@@ -57,13 +57,14 @@ private:
 	CMapEvent_BreakWall(const CMapEvent_BreakWall& Prototype);
 	virtual ~CMapEvent_BreakWall() = default;
 
-	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual HRESULT Validate_Initialized() override;
 
 public:
+	virtual void    Update(_float fTimeDelta) override;
 	virtual void	Late_Update(_float fTimeDelta) override;
 	virtual HRESULT	Render() override;
+	virtual HRESULT	Render_Shadow() override;
 	virtual void	Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
 	const _tchar*	Get_SectionName() const { return STAGE12_SECTION_NAME; }
@@ -87,9 +88,13 @@ private:
 private:
 	HRESULT	Ready_BoostTrigger();
 	void	On_BoostTriggerEnter(CCollider* pOther);
-	void	Start_Break();
 	HRESULT	Ready_Fragments();
+	
+	void    Update_BoostTrigger();
+	void    Update_Fragments(_float fTimeDelta);
+	void	Start_Break();
 	const BREAK_FRAGMENT* Find_Fragment(_uint iMesh) const;
+	_float4x4 Build_FragmentWorldMatrix(const BREAK_FRAGMENT& Fragment, _fmatrix BreakWallWorld) const;
 
 public:
 	static CMapEvent_BreakWall* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "EnvObject.h"
 
 NS_BEGIN(Client)
@@ -20,6 +19,10 @@ public:
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
+
+#pragma region Editable
+	virtual HRESULT Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, const MESH_LAYER_IDX& Layer) override;
+#pragma endregion
 
 public: // Editor preview
 	void    Set_EditorForceMainPassNonInstanced(_bool bEnable) { m_bEditorForceMainPassNonInstanced = bEnable; }

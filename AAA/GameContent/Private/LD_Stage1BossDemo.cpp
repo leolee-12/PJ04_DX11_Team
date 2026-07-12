@@ -152,6 +152,8 @@ HRESULT CLD_Stage1BossDemo::Ready_Components()
 	if (FAILED(Ready_Stage1BossDemo()))
 		return E_FAIL;
 
+	m_bUseShadow = true;
+
 	return S_OK;
 }
 

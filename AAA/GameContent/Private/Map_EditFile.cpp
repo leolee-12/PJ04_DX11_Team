@@ -15,6 +15,63 @@ namespace
 {
 	using namespace std::filesystem;
 
+	struct MAP_ENV_EDITED_DESC
+	{
+		_wstring strStableKey;
+
+		_bool bHasRenderable = { false };
+		_bool bRenderable = { true };
+
+		_bool bHasEnableCulling = { false };
+		_bool bEnableCulling = { true };
+
+		_bool bHasUseCullDistance = { false };
+		_bool bUseCullDistance = { true };
+
+		_bool bHasUseCullFrustum = { false };
+		_bool bUseCullFrustum = { true };
+
+		_bool bHasShadow = { false }; // Edit JSON contains UseShadow.
+		_bool bUseShadow = { false };
+
+		_bool bHasWorldMatrix = { false };
+		_float4x4 matWorld = {};
+
+		_bool bHasCollMesh = { false }; // Edit JSON contains UseCollMesh.
+		_bool bUseCollMesh = { false };
+
+		_bool bHasNearDistAlpha = { false };
+		_bool bUseNearDistAlpha = { false };
+	};
+
+	struct MAP_SECTION_EDITED_DESC
+	{
+		_wstring strStableKey;
+
+		_bool bHasRenderable = { false };
+		_bool bRenderable = { true };
+
+		_bool bHasEnableCulling = { false };
+		_bool bEnableCulling = { true };
+
+		_bool bHasWorldMatrix = { false };
+		_float4x4 matWorld = {};
+
+		_bool bHasUseCollMesh = { false };
+		_bool bUseCollMesh = { false };
+
+		_bool bHasRenderID = { false };
+		RENDERID eRenderID = { RENDERID::NONBLEND };
+	};
+
+	struct MAP_LD_EDITED_DESC
+	{
+		_wstring strStableKey;
+
+		_bool bHasWorldMatrix = { false };
+		_float4x4 matWorld = {};
+	};
+
 	HRESULT Resolve_EditFilePathFromManifest_Impl(const _wstring& strManifestPath, _wstring* pOutEditFilePath)
 	{
 		if (nullptr == pOutEditFilePath || strManifestPath.empty())
@@ -275,7 +332,7 @@ namespace
 		}
 	}
 
-	HRESULT Load_EditedDesc(const json& jValue, MAP_ENV_EDITED_DESC* pOutDesc, _bool bEnvObjectEdit)
+	HRESULT Load_LegacyEnvEditedDesc(const json& jValue, MAP_ENV_EDITED_DESC* pOutDesc)
 	{
 		if (nullptr == pOutDesc)
 			return E_FAIL;
@@ -295,52 +352,34 @@ namespace
 			pOutDesc->bRenderable = IterRenderable->get<bool>();
 		}
 
-		if (bEnvObjectEdit)
+		const auto IterUseCullDistance = jValue.find("UseCullDistance");
+		if (IterUseCullDistance != jValue.end())
 		{
-			const auto IterUseCullDistance = jValue.find("UseCullDistance");
-			if (IterUseCullDistance != jValue.end())
-			{
-				if (!IterUseCullDistance->is_boolean())
-					return E_FAIL;
+			if (!IterUseCullDistance->is_boolean())
+				return E_FAIL;
 
-				pOutDesc->bHasUseCullDistance = true;
-				pOutDesc->bUseCullDistance = IterUseCullDistance->get<bool>();
-			}
-
-			const auto IterUseCullFrustum = jValue.find("UseCullFrustum");
-			if (IterUseCullFrustum != jValue.end())
-			{
-				if (!IterUseCullFrustum->is_boolean())
-					return E_FAIL;
-
-				pOutDesc->bHasUseCullFrustum = true;
-				pOutDesc->bUseCullFrustum = IterUseCullFrustum->get<bool>();
-			}
-		}
-		else
-		{
-			const auto IterEnableCulling = jValue.find("EnableCulling");
-			if (IterEnableCulling != jValue.end())
-			{
-				if (!IterEnableCulling->is_boolean())
-					return E_FAIL;
-
-				pOutDesc->bHasEnableCulling = true;
-				pOutDesc->bEnableCulling = IterEnableCulling->get<bool>();
-			}
+			pOutDesc->bHasUseCullDistance = true;
+			pOutDesc->bUseCullDistance = IterUseCullDistance->get<bool>();
 		}
 
-		if (bEnvObjectEdit)
+		const auto IterUseCullFrustum = jValue.find("UseCullFrustum");
+		if (IterUseCullFrustum != jValue.end())
 		{
-			const auto IterUseShadow = jValue.find("UseShadow");
-			if (IterUseShadow != jValue.end())
-			{
-				if (!IterUseShadow->is_boolean())
-					return E_FAIL;
+			if (!IterUseCullFrustum->is_boolean())
+				return E_FAIL;
 
-				pOutDesc->bHasShadow = true;
-				pOutDesc->bUseShadow = IterUseShadow->get<bool>();
-			}
+			pOutDesc->bHasUseCullFrustum = true;
+			pOutDesc->bUseCullFrustum = IterUseCullFrustum->get<bool>();
+		}
+
+		const auto IterUseShadow = jValue.find("UseShadow");
+		if (IterUseShadow != jValue.end())
+		{
+			if (!IterUseShadow->is_boolean())
+				return E_FAIL;
+
+			pOutDesc->bHasShadow = true;
+			pOutDesc->bUseShadow = IterUseShadow->get<bool>();
 		}
 
 		const auto IterWorldMatrix = jValue.find("WorldMatrix");
@@ -375,6 +414,58 @@ namespace
 		return S_OK;
 	}
 
+	HRESULT Load_LegacyMapSectionEditedDesc(const json& jValue, MAP_SECTION_EDITED_DESC* pOutDesc)
+	{
+		if (nullptr == pOutDesc)
+			return E_FAIL;
+
+		*pOutDesc = {};
+
+		if (!jValue.is_object())
+			return E_FAIL;
+
+		const auto IterRenderable = jValue.find("Renderable");
+		if (IterRenderable != jValue.end())
+		{
+			if (!IterRenderable->is_boolean())
+				return E_FAIL;
+
+			pOutDesc->bHasRenderable = true;
+			pOutDesc->bRenderable = IterRenderable->get<bool>();
+		}
+
+		const auto IterEnableCulling = jValue.find("EnableCulling");
+		if (IterEnableCulling != jValue.end())
+		{
+			if (!IterEnableCulling->is_boolean())
+				return E_FAIL;
+
+			pOutDesc->bHasEnableCulling = true;
+			pOutDesc->bEnableCulling = IterEnableCulling->get<bool>();
+		}
+
+		const auto IterWorldMatrix = jValue.find("WorldMatrix");
+		if (IterWorldMatrix != jValue.end())
+		{
+			if (FAILED(Load_Float4x4(*IterWorldMatrix, &pOutDesc->matWorld)))
+				return E_FAIL;
+
+			pOutDesc->bHasWorldMatrix = true;
+		}
+
+		const auto IterUseCollMesh = jValue.find("UseCollMesh");
+		if (IterUseCollMesh != jValue.end())
+		{
+			if (!IterUseCollMesh->is_boolean())
+				return E_FAIL;
+
+			pOutDesc->bHasUseCollMesh = true;
+			pOutDesc->bUseCollMesh = IterUseCollMesh->get<bool>();
+		}
+
+		return S_OK;
+	}
+
 	EDIT_OBJECT_OVERRIDE_DESC Convert_LegacyEnvEditToOverride(const MAP_ENV_EDITED_DESC& Edit)
 	{
 		EDIT_OBJECT_OVERRIDE_DESC Desc{};
@@ -404,7 +495,7 @@ namespace
 		return Desc;
 	}
 
-	EDIT_OBJECT_OVERRIDE_DESC Convert_LegacyMapSectionEditToOverride(const MAP_ENV_EDITED_DESC& Edit)
+	EDIT_OBJECT_OVERRIDE_DESC Convert_LegacyMapSectionEditToOverride(const MAP_SECTION_EDITED_DESC& Edit)
 	{
 		EDIT_OBJECT_OVERRIDE_DESC Desc{};
 		Desc.eKind = EDITABLE_OBJECT_KIND::MAP_SECTION;
@@ -412,7 +503,7 @@ namespace
 
 		if (Edit.bHasRenderable)	Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_RENDERABLE, Edit.bRenderable);
 		if (Edit.bHasEnableCulling)	Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_CULL_FRUSTUM, Edit.bEnableCulling);
-		if (Edit.bHasCollMesh)		Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_COLLISION_MESH, Edit.bUseCollMesh);
+		if (Edit.bHasUseCollMesh)	Set_CommonPolicyOverride(&Desc.Common, EDIT_CAP_COLLISION_MESH, Edit.bUseCollMesh);
 
 		if (Edit.bHasWorldMatrix)
 		{
@@ -739,16 +830,17 @@ namespace
 		case EDITABLE_OBJECT_KIND::ENV_OBJECT:
 		{
 			MAP_ENV_EDITED_DESC LegacyEdit{};
-			if (FAILED(Load_EditedDesc(jValue, &LegacyEdit, true)))
+			if (FAILED(Load_LegacyEnvEditedDesc(jValue, &LegacyEdit)))
 				return E_FAIL;
 
 			*pOutDesc = Convert_LegacyEnvEditToOverride(LegacyEdit);
 			return S_OK;
 		}
+
 		case EDITABLE_OBJECT_KIND::MAP_SECTION:
 		{
-			MAP_ENV_EDITED_DESC LegacyEdit{};
-			if (FAILED(Load_EditedDesc(jValue, &LegacyEdit, false)))
+			MAP_SECTION_EDITED_DESC LegacyEdit{};
+			if (FAILED(Load_LegacyMapSectionEditedDesc(jValue, &LegacyEdit)))
 				return E_FAIL;
 
 			*pOutDesc = Convert_LegacyMapSectionEditToOverride(LegacyEdit);

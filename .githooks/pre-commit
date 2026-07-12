@@ -1,0 +1,45 @@
+#!/bin/sh
+# Pre-commit check: block the commit when staged .vcxproj.filters files
+# are not sorted (see AAA/Tools/sort_vcxproj_filters.py).
+#
+# One-time setup per clone (terminal, SourceTree Terminal, or
+# GitHub Desktop "Open in Command Prompt"):
+#     git config core.hooksPath .githooks
+
+ROOT="$(git rev-parse --show-toplevel)"
+
+# Only staged filter files (Added/Copied/Modified/Renamed) are checked,
+# so commits that do not touch filter files are never blocked.
+FILES="$(git diff --cached --name-only --diff-filter=ACMR -- '*.vcxproj.filters')"
+
+[ -z "$FILES" ] && exit 0
+
+# Prefer the Windows py launcher (always on PATH for GUI clients),
+# then python3 / python.
+if command -v py >/dev/null 2>&1; then
+    PY="py -3"
+elif command -v python3 >/dev/null 2>&1; then
+    PY="python3"
+elif command -v python >/dev/null 2>&1; then
+    PY="python"
+else
+    echo "[pre-commit] Python not found; skipping .vcxproj.filters sort check." >&2
+    exit 0
+fi
+
+# $FILES is newline-separated repo-relative paths; hooks run from the
+# repository root, so the paths resolve as-is.
+$PY "$ROOT/AAA/Tools/sort_vcxproj_filters.py" $FILES --check --quiet
+STATUS=$?
+
+if [ "$STATUS" -ne 0 ]; then
+    echo ""
+    echo "Visual Studio filter files are not sorted (or failed to parse)."
+    echo "Fix it from the repository root:"
+    echo "    .\AAA\SortFilters.bat"
+    echo "then review 'git diff', re-stage the files and commit again."
+    echo "(exit code $STATUS: 1 = needs sorting, 2 = parse/IO error, e.g. conflict markers)"
+    echo ""
+fi
+
+exit "$STATUS"

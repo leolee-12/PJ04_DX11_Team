@@ -4,11 +4,23 @@
 #include "YshModelValidator.h"
 
 #include <cwctype>
+#include <mutex>
 
 NS_BEGIN(Client)
 
-namespace
+struct MAP_ENV_MODEL_INDEX
 {
+	struct ENTRY
+	{
+		_wstring wstrModelPath;
+		_wstring wstrModelProtoTag;
+	};
+
+	unordered_map<_wstring, ENTRY> Entries;
+};
+
+namespace
+{	
 	using namespace std::filesystem;
 
 	constexpr _bool kEnableYshPrevalidation = false;
@@ -67,6 +79,23 @@ namespace
 			ch = static_cast<wchar_t>(towlower(ch));
 
 		return strValue;
+	}
+
+	_wstring Make_EnvModelIndexKey(const filesystem::path& Root)
+	{
+		return To_LowerCopy(Root.lexically_normal().wstring());
+	}
+
+	unordered_map<_wstring, shared_ptr<const MAP_ENV_MODEL_INDEX>>& Get_EnvModelIndexCache()
+	{
+		static unordered_map<_wstring, shared_ptr<const MAP_ENV_MODEL_INDEX>> Cache;
+		return Cache;
+	}
+
+	mutex& Get_EnvModelIndexMutex()
+	{
+		static mutex Mutex;
+		return Mutex;
 	}
 
 	_bool IsValidEnvModelFile(const path& FilePath)
@@ -138,47 +167,60 @@ HRESULT CMap_ModelResolver::Resolve_MapSection(
 HRESULT CMap_ModelResolver::Build_EnvModelCache()
 {
 	const path Root = path(m_strMapRoot) / L"Env";
-	if (m_EnvCacheRoot == Root)
-		return S_OK;
+	const _wstring strCacheKey = Make_EnvModelIndexKey(Root);
 
-	Clear_EnvModelCache();
-	m_EnvCacheRoot = Root;
+	lock_guard<mutex> Lock(Get_EnvModelIndexMutex());
+
+	auto& Cache = Get_EnvModelIndexCache();
+	const auto Iter = Cache.find(strCacheKey);
+	if (Iter != Cache.end())
+	{
+		m_pEnvModelIndex = Iter->second;
+		return S_OK;
+	}
+
+	auto pMutableIndex = make_shared<MAP_ENV_MODEL_INDEX>();
 
 	error_code ErrorCode;
 	if (!exists(Root, ErrorCode) || ErrorCode)
 	{
 		Log_GameContentWarning("EnvObject model root missing: " + WstrToStr(Root.wstring()));
-		return S_OK;
 	}
-
-	for (recursive_directory_iterator Iter(Root, directory_options::skip_permission_denied, ErrorCode),
-		End;
-		Iter != End;
-		Iter.increment(ErrorCode))
+	else
 	{
-		if (ErrorCode)
-			break;
+		for (recursive_directory_iterator Iter(Root, directory_options::skip_permission_denied, ErrorCode),
+			End;
+			Iter != End;
+			Iter.increment(ErrorCode))
+		{
+			if (ErrorCode)
+				break;
 
-		if (!Iter->is_regular_file())
-			continue;
+			if (!Iter->is_regular_file())
+				continue;
 
-		const path FilePath = Iter->path();
-		if (0 != _wcsicmp(FilePath.extension().c_str(), L".ysh"))
-			continue;
+			const path FilePath = Iter->path();
+			if (0 != _wcsicmp(FilePath.extension().c_str(), L".ysh"))
+				continue;
 
-		if (!IsValidEnvModelFile(FilePath))
-			continue;
+			if (!IsValidEnvModelFile(FilePath))
+				continue;
 
-		const _wstring strStem = To_LowerCopy(FilePath.stem().wstring());
-		if (m_EnvModelCache.find(strStem) != m_EnvModelCache.end())
-			continue;
+			const _wstring strStem = To_LowerCopy(FilePath.stem().wstring());
+			if (pMutableIndex->Entries.find(strStem) != pMutableIndex->Entries.end())
+				continue;
 
-		ENV_MODEL_ENTRY Entry{};
-		Entry.wstrModelPath = FilePath.wstring();
-		Entry.wstrModelProtoTag = Make_EnvModelProtoTag(Root, FilePath);
+			MAP_ENV_MODEL_INDEX::ENTRY Entry{};
+			Entry.wstrModelPath = FilePath.wstring();
+			Entry.wstrModelProtoTag = Make_EnvModelProtoTag(Root, FilePath);
 
-		m_EnvModelCache.emplace(strStem, move(Entry));
+			pMutableIndex->Entries.emplace(strStem, move(Entry));
+		}
 	}
+
+	shared_ptr<const MAP_ENV_MODEL_INDEX> pIndex = pMutableIndex;
+	Cache.emplace(strCacheKey, pIndex);
+	m_pEnvModelIndex = pIndex;
 
 	return S_OK;
 }
@@ -221,8 +263,17 @@ _bool CMap_ModelResolver::Resolve_EnvObject(ENV_OBJECT_DESC* pDesc)
 
 void CMap_ModelResolver::Clear_EnvModelCache()
 {
-	m_EnvCacheRoot.clear();
-	m_EnvModelCache.clear();
+	m_pEnvModelIndex.reset();
+	Invalidate_EnvModelCache(m_strMapRoot);
+}
+
+void CMap_ModelResolver::Invalidate_EnvModelCache(const _wstring& strMapRoot)
+{
+	const path Root = path(strMapRoot) / L"Env";
+	const _wstring strCacheKey = Make_EnvModelIndexKey(Root);
+
+	lock_guard<mutex> Lock(Get_EnvModelIndexMutex());
+	Get_EnvModelIndexCache().erase(strCacheKey);
 	Get_RejectedModelLogSet().clear();
 	Get_TrimmedResolveLogSet().clear();
 }
@@ -270,8 +321,12 @@ _bool CMap_ModelResolver::Resolve_EnvByKey(const _wstring& strKey, ENV_OBJECT_DE
 	if (nullptr == pDesc || strKey.empty())
 		return false;
 
-	const auto Iter = m_EnvModelCache.find(To_LowerCopy(strKey));
-	if (Iter == m_EnvModelCache.end())
+	const shared_ptr<const MAP_ENV_MODEL_INDEX> pIndex = m_pEnvModelIndex;
+	if (nullptr == pIndex)
+		return false;
+
+	const auto Iter = pIndex->Entries.find(To_LowerCopy(strKey));
+	if (Iter == pIndex->Entries.end())
 		return false;
 
 	pDesc->wstrModelPath = Iter->second.wstrModelPath;

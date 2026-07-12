@@ -192,6 +192,8 @@ HRESULT CLD_SlopeBoardC::Ready_Components()
 	if (FAILED(Ready_Trigger()))
 		return E_FAIL;
 
+	m_bUseShadow = true;
+
 	return S_OK;
 }
 

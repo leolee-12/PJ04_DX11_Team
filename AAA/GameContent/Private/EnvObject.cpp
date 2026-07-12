@@ -303,17 +303,6 @@ _bool CEnvObject::Pick_Marb1e(_fvector vRayOrigin, _fvector vRayDir, _float3* pO
 	return bHit;
 }
 
-HRESULT CEnvObject::Refresh()
-{
-	if (FAILED(On_EditTransformChanged()))
-		return E_FAIL;
-
-	if (FAILED(Ready_PhysicsActor()))
-		return E_FAIL;
-
-	return S_OK;
-}
-
 #pragma region Editable
 _bool CEnvObject::Get_EditDesc(EDITABLE_DESC* pOutDesc) const
 {
@@ -359,7 +348,7 @@ HRESULT CEnvObject::Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy)
 	m_bCastShadow = m_tDesc.tRender.bHasShadow && Policy.bUseShadow;
 	m_bUseCollMesh = m_tDesc.tCollision.bHasCollMesh && Policy.bUseCollMesh;
 
-	if (bPrevUseCollMesh != m_bUseCollMesh && FAILED(Ready_PhysicsActor()))
+	if (bPrevUseCollMesh != m_bUseCollMesh && FAILED(Rebuild_PhysicsActor()))
 		return E_FAIL;
 
 	return S_OK;
@@ -369,7 +358,18 @@ HRESULT CEnvObject::On_EditTransformChanged()
 {
 	m_bTransformDirty = true;
 	Refresh_WorldBounds();
-	return S_OK;
+
+	if (nullptr != m_pPhysicsActor)
+	{
+		constexpr _float SCALE_EPSILON = 0.0001f;
+		const _float3 vCurrentScale = m_pTransformCom->Get_Scaled();
+		const _vector vScaleEpsilon = XMVectorReplicate(SCALE_EPSILON);
+
+		if (!XMVector3NearEqual(XMLoadFloat3(&m_vPhysicsActorScale), XMLoadFloat3(&vCurrentScale), vScaleEpsilon))
+			return Rebuild_PhysicsActor();
+	}
+
+	return Sync_PhysicsActorPose();
 }
 
 const MESH_LAYER_IDX* CEnvObject::Get_EditMeshLayer(_uint iModelSlot, _uint iMesh) const
@@ -419,26 +419,12 @@ HRESULT CEnvObject::Ready_RenderComponents(_uint iModelProtoLevel, const wstring
 	return S_OK;
 }
 
-HRESULT CEnvObject::Ready_PhysicsActor()
+HRESULT CEnvObject::Rebuild_PhysicsActor()
 {
 	Release_PhysicsActor();
 
 	if (!Should_CreatePhysicsActor())
-	{
-//#ifdef _DEBUG
-//		if (m_tDesc.tCollision.bInvalidCollision)
-//		{
-//			Log_EnvPhysicsInfo(
-//				"[EnvPhysics] Skip actor: invalid collision. object="
-//				+ WstrToStr(m_tDesc.wstrObjectName)
-//				+ " uid="
-//				+ to_string(m_tDesc.iUid)
-//				+ " modelTag="
-//				+ WstrToStr(m_tDesc.wstrModelProtoTag));
-//		}
-//#endif
 		return S_OK;
-	}
 
 	switch (m_tDesc.tCollision.eColliderKind)
 	{
@@ -456,18 +442,7 @@ HRESULT CEnvObject::Ready_PhysicsActor()
 HRESULT CEnvObject::Ready_PhysicsActor_ModelMesh()
 {
 	if (!m_tDesc.tCollision.bHasCollMesh)
-	{
-#ifdef _DEBUG
-		Log_EnvPhysicsInfo(
-			"[EnvPhysics] MODEL_MESH actor skipped : no collision mesh capability.object = "
-			+ WstrToStr(m_tDesc.wstrObjectName)
-			+ " uid="
-			+ to_string(m_tDesc.iUid)
-			+ " modelTag="
-			+ WstrToStr(m_tDesc.wstrModelProtoTag));
-#endif
 		return S_OK;
-	}
 
 	if (nullptr == m_pGameInstance_Proxy)
 		return E_FAIL;
@@ -476,55 +451,33 @@ HRESULT CEnvObject::Ready_PhysicsActor_ModelMesh()
 		return E_FAIL;
 
 	if (nullptr == m_pModelCom)
-	{
-#ifdef _DEBUG
-		Log_EnvPhysicsWarning(
-			"EnvObject MODEL_MESH collision skipped: model component is null.");
-#endif
 		return S_OK;
-	}
 
 	physx::PxTriangleMesh* pCollisionMesh = m_pModelCom->Get_CollisionMesh();
 	if (nullptr == pCollisionMesh)
-	{
-#ifdef _DEBUG
-		Log_EnvPhysicsWarning(
-			"EnvObject MODEL_MESH collision skipped: cooked collision mesh is null.");
-#endif
 		return S_OK;
-	}
 
-	m_pPhysicsActor = m_pGameInstance_Proxy->Create_StaticActor(
-		pCollisionMesh,
-		XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+	m_pPhysicsActor = m_pGameInstance_Proxy->Create_StaticActor(pCollisionMesh, XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
 	if (nullptr == m_pPhysicsActor)
-	{
-#ifdef _DEBUG
-		Log_EnvPhysicsWarning(
-			"[EnvPhysics] MODEL_MESH actor failed: Create_StaticActor returned null. object="
-			+ WstrToStr(m_tDesc.wstrObjectName)
-			+ " uid="
-			+ to_string(m_tDesc.iUid)
-			+ " modelTag="
-			+ WstrToStr(m_tDesc.wstrModelProtoTag));
-#endif
 		return E_FAIL;
-	}
 
-//#ifdef _DEBUG
-//	Log_EnvPhysicsInfo(
-//		"[EnvPhysics] MODEL_MESH actor created. object="
-//		+ WstrToStr(m_tDesc.wstrObjectName)
-//		+ " uid="
-//		+ to_string(m_tDesc.iUid)
-//		+ " apxbin="
-//		+ WstrToStr(m_tDesc.tCollision.strDecorCollisionApxbinName)
-//		+ " modelTag="
-//		+ WstrToStr(m_tDesc.wstrModelProtoTag));
-//#endif
+	m_vPhysicsActorScale = m_pTransformCom->Get_Scaled();
 
 	return S_OK;
+}
+
+HRESULT CEnvObject::Sync_PhysicsActorPose()
+{
+	if (nullptr == m_pPhysicsActor)
+		return S_OK;
+
+	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom)
+		return E_FAIL;
+
+	return m_pGameInstance_Proxy->Refresh_StaticActorPose(
+		m_pPhysicsActor,
+		XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 }
 
 void CEnvObject::Release_PhysicsActor()
