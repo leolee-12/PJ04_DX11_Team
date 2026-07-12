@@ -18,8 +18,6 @@ HRESULT CKirby_Dodge::Initialize()
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
-    m_fSlowMaxTime = 0.6f;
-
     return S_OK;
 }
 
@@ -70,6 +68,7 @@ void CKirby_Dodge::Enter(CKirby* pKirby, _int iFlag)
 
     m_iEvasionCount = 1;
 
+    m_eDodgeState = Dodge_State::DODGE_END;
     Change_DodgeState(pKirby, Dodge_State::DODGE_START);
 }
 
@@ -90,6 +89,7 @@ void CKirby_Dodge::Exit(CKirby* pKirby)
 
     pKirby->Put_WeaponOnBack(false);
 
+    m_eDodgeState = Dodge_State::DODGE_END;
     m_eDodgeFlag = DODGE_STATE_FLAG::DODGE_NONE;
 }
 
@@ -106,8 +106,7 @@ void CKirby_Dodge::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInf
     if(m_iEvasionCount > 0)
     {
         --m_iEvasionCount;
-        m_fSlowAccTime = m_fSlowMaxTime;
-        m_pGameInstance_Proxy->Lerp_TimeScale(0.5f, 1.f, 2.f);
+        m_pGameInstance_Proxy->Lerp_TimeScale(0.2f, 1.f, 1.5f);
     }
 }
 
@@ -195,9 +194,8 @@ void CKirby_Dodge::Update_DodgeState(CKirby* pKirby, _float fTimeDelta)
             DodgeMove(pKirby);
 
             CMovement_Child* pMovement = pKirby->Get_Movement();
-            _bool bIsGound = pMovement->Is_Grounded();
 
-            if (bIsGound)
+            if (pMovement->Get_VerticalVelocity() <= 0.f && pMovement->Is_Grounded())
                 Change_DodgeState(pKirby, Dodge_State::DODGE2);
             else if (pAnimator->Is_Finished())
                 Transition_Fall_OR_Wait_OR_Run(pKirby);
@@ -274,15 +272,6 @@ void CKirby_Dodge::DodgeMove(CKirby* pKirby)
 
 void CKirby_Dodge::Update_SlowTimer(_float fTimeDelta)
 {
-    if (m_fSlowAccTime > 0) {
-        m_fSlowAccTime -= fTimeDelta;
-
-        if (m_fSlowAccTime <= 0.f)
-        {
-            m_fSlowAccTime = 0.f;
-            m_pGameInstance_Proxy->Set_TimeScale(1.f);
-        }
-    }
 }
 
 CKirby_Dodge* CKirby_Dodge::Create()
