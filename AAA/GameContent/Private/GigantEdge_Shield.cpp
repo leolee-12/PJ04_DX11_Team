@@ -1,5 +1,6 @@
 #include "GigantEdge_Shield.h"
 #include "Animator.h"
+#include "Shader_PassMeta.h"
 
 CGigantEdge_Shield::CGigantEdge_Shield(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonsterHitPart(pDevice, pContext) {
@@ -21,6 +22,8 @@ HRESULT CGigantEdge_Shield::Initialize(void* pArg)
     CapsuleDesc.fRadius = 0.25f;
     if (FAILED(Ready_HitBox(CapsuleDesc)))
         return E_FAIL;
+
+    m_iShadowPassIdx = ETOI(ANIM_MESH_PASS::SHADOW);
 
     m_pAnimatorCom->Play("Reset");
     Set_Drawn(false);                     
