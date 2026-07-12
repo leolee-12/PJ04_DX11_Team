@@ -155,6 +155,7 @@
     <ClInclude Include="..\public\Shockwave.h" />
     <ClInclude Include="..\Public\SmokeParticle.h" />
     <ClInclude Include="..\public\Spit_Projectile.h" />
+    <ClInclude Include="..\Public\Split_Starblock.h" />
     <ClInclude Include="..\Public\Star2DParticle.h" />
     <ClInclude Include="..\Public\SpitObject.h" />
     <ClInclude Include="..\Public\StarEmitter.h" />
@@ -511,6 +512,7 @@
     <ClCompile Include="..\private\Shockwave.cpp" />
     <ClCompile Include="..\Private\SmokeParticle.cpp" />
     <ClCompile Include="..\private\Spit_Projectile.cpp" />
+    <ClCompile Include="..\Private\Split_Starblock.cpp" />
     <ClCompile Include="..\Private\Star2DParticle.cpp" />
     <ClCompile Include="..\Private\SpitObject.cpp" />
     <ClCompile Include="..\Private\StarEmitter.cpp" />

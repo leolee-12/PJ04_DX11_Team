@@ -121,6 +121,9 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\14. FlowerPetals">
       <UniqueIdentifier>{226d0445-b5ec-4f92-ade0-210ed72ccd46}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\15. Split">
+      <UniqueIdentifier>{6fc60edd-b034-4d2e-b974-b555d698dd72}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\97. SwordChargeEffect">
       <UniqueIdentifier>{337bfefa-886b-4153-b3e4-87d81d98e19b}</UniqueIdentifier>
     </Filter>
@@ -1959,6 +1962,9 @@
     <ClInclude Include="..\Public\SpitObject.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\11. SpitObject</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Split_Starblock.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Star2DParticle.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\97. Star2DParticle</Filter>
     </ClInclude>
@@ -2944,6 +2950,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\SpitObject.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\11. SpitObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Split_Starblock.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Star2DParticle.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\97. Star2DParticle</Filter>

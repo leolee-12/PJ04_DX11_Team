@@ -83,6 +83,7 @@
 #include "SpitObject.h"
 #include "BombFuseEffect.h"
 #include "FlowerPetals.h"
+#include "Split_Starblock.h"
 #include "BubbleAura.h"
 
 // Effect_Part
@@ -1024,13 +1025,25 @@ void CGameObject_Factory::Register_Effect()
             //    CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Star/Common_00_Common_StarSmooth.ysh"));
         ));
 
-    // 7
+    // 8
     Register(CFlowerPetals::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CFlowerPetals),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_Flower"),
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Flower"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Flower/Flower_00_TopL.ysh"));
+        )
+    );
+
+    // 9
+    Register(CSplit_Starblock::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSplit_Starblock),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Starblock_Piece1"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Starblock/BlockBombH2W2Piece.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Starblock_Piece2"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Starblock/BlockChainH2W2Piece.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Starblock_Piece3"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Starblock/BlockStarH2W2Piece.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
         )
     );
 
