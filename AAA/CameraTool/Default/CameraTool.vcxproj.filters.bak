@@ -1,8 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="99. Defines">
+      <UniqueIdentifier>{e9ccda80-10bb-40bb-ad62-da1c24cf620e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98. Default">
+      <UniqueIdentifier>{6aa986e3-2759-4b3a-ab80-0905a4aeea07}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. Editor">
       <UniqueIdentifier>{6bbc3eaf-cecb-44b7-aff4-a64a09f48370}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97. ThirdParty">
+      <UniqueIdentifier>{0f477d75-af86-4ae1-bc97-d9686997906e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97. ThirdParty\Manager">
+      <UniqueIdentifier>{f0b07325-ffd3-4504-9d1a-946a45e68436}</UniqueIdentifier>
     </Filter>
     <Filter Include="01. Levels">
       <UniqueIdentifier>{47d46c05-e580-4f23-86aa-da690f541c2c}</UniqueIdentifier>
@@ -13,31 +25,25 @@
     <Filter Include="02. Object\Camera">
       <UniqueIdentifier>{24405f3f-60a2-41ca-b4c2-ac2b3ceff5a7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="97. ThirdParty">
-      <UniqueIdentifier>{0f477d75-af86-4ae1-bc97-d9686997906e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="97. ThirdParty\Manager">
-      <UniqueIdentifier>{f0b07325-ffd3-4504-9d1a-946a45e68436}</UniqueIdentifier>
+    <Filter Include="97. ThirdParty\Public">
+      <UniqueIdentifier>{c831bc67-642c-43f6-b1bb-62589757890f}</UniqueIdentifier>
     </Filter>
     <Filter Include="97. ThirdParty\Private">
       <UniqueIdentifier>{243a2321-92a2-4293-a8de-62307fb1e5b3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="97. ThirdParty\Public">
-      <UniqueIdentifier>{c831bc67-642c-43f6-b1bb-62589757890f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="98. Default">
-      <UniqueIdentifier>{6aa986e3-2759-4b3a-ab80-0905a4aeea07}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="99. Defines">
-      <UniqueIdentifier>{e9ccda80-10bb-40bb-ad62-da1c24cf620e}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Public\EditCamera.h">
-      <Filter>02. Object\Camera</Filter>
+    <ClInclude Include="targetver.h">
+      <Filter>98. Default</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Editor_Defines.h">
-      <Filter>99. Defines</Filter>
+    <ClInclude Include="CameraTool.h">
+      <Filter>98. Default</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>98. Default</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>98. Default</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EditorApp.h">
       <Filter>00. Editor</Filter>
@@ -45,8 +51,14 @@
     <ClInclude Include="..\Public\ImGui_Manager.h">
       <Filter>97. ThirdParty\Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\EditCamera.h">
+      <Filter>02. Object\Camera</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Level_Edit.h">
       <Filter>01. Levels</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Editor_Defines.h">
+      <Filter>99. Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\ThirdParty\ImGui\Inc\imconfig.h">
       <Filter>97. ThirdParty\Public</Filter>
@@ -75,36 +87,27 @@
     <ClInclude Include="..\ThirdParty\ImGui\Inc\imstb_truetype.h">
       <Filter>97. ThirdParty\Public</Filter>
     </ClInclude>
-    <ClInclude Include="CameraTool.h">
-      <Filter>98. Default</Filter>
-    </ClInclude>
-    <ClInclude Include="framework.h">
-      <Filter>98. Default</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>98. Default</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>98. Default</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="CameraTool.ico">
-      <Filter>98. Default</Filter>
-    </Image>
     <Image Include="small.ico">
       <Filter>98. Default</Filter>
     </Image>
+    <Image Include="CameraTool.ico">
+      <Filter>98. Default</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Private\EditCamera.cpp">
-      <Filter>02. Object\Camera</Filter>
+    <ClCompile Include="CameraTool.cpp">
+      <Filter>98. Default</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EditorApp.cpp">
       <Filter>00. Editor</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\ImGui_Manager.cpp">
       <Filter>97. ThirdParty\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EditCamera.cpp">
+      <Filter>02. Object\Camera</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Edit.cpp">
       <Filter>01. Levels</Filter>
@@ -132,9 +135,6 @@
     </ClCompile>
     <ClCompile Include="..\ThirdParty\ImGui\Src\ImGuizmo.cpp">
       <Filter>97. ThirdParty\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="CameraTool.cpp">
-      <Filter>98. Default</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
