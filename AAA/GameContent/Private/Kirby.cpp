@@ -977,7 +977,7 @@ void CKirby::Update_RenderWorldMatrix(_float fTimeDelta)
    // 같은 방향이거나 반대 방향이면
    if (XMVectorGetX(XMVector3LengthSq(vLook)) < Helper::fEpsilon)
    {
-       // 그냥 원래 방향으로 세팅
+       // 그냥 원래 방향으로 세팅./
        XMStoreFloat4x4(&m_RenderWorldMatrix, matBaseWorld);
        XMStoreFloat3(&m_vRenderGroundNormal, vBaseUp);
        return;
@@ -1020,9 +1020,14 @@ _bool CKirby::Cal_GroundNormal(_float3& vGroundNormal)
         return false;
     }
 
+    if (vHitNormal.y < 0.5f)
+    {
+        vGroundNormal = { 0.f, 1.f, 0.f };
+        return false;
+    }
+
     vGroundNormal = vHitNormal;
     return true;
-
 }
 
 void CKirby::Republish_HUDState()
