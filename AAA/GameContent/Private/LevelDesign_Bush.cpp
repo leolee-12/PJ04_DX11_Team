@@ -82,6 +82,8 @@ HRESULT CLevelDesign_Bush::Initialize(void* pArg)
 	if (FAILED(Ready_BushCullBounds()))
 		return E_FAIL;
 
+	m_bUseShadow = true;
+
 	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
 

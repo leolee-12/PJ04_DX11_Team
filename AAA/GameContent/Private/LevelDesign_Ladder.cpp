@@ -60,6 +60,8 @@ HRESULT CLevelDesign_Ladder::Initialize(void* pArg)
 	if (FAILED(Ready_LadderCullBounds()))
 		return E_FAIL;
 
+	m_bUseShadow = true;
+
 	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
 
