@@ -133,9 +133,6 @@
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part">
       <UniqueIdentifier>{40aab48f-b6b1-4fe9-80fa-b4ca0ea5dad0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\00. QuadCommon">
-      <UniqueIdentifier>{05c95001-67ec-4480-9c3e-2def286ecfd7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\01. MeshCommon">
       <UniqueIdentifier>{4e1a2524-bbfd-483d-bc98-1ec9a92b1555}</UniqueIdentifier>
     </Filter>
@@ -216,9 +213,6 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\Emitter">
       <UniqueIdentifier>{2a99a782-1b06-4ca2-bcec-3900ae1eb0e7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\Mesh">
-      <UniqueIdentifier>{4967c70d-f3e5-4aee-a299-904aa520e889}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\MeshParticle">
       <UniqueIdentifier>{35016b5e-260b-4a74-a291-ba9775ec2d10}</UniqueIdentifier>
@@ -1084,6 +1078,9 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\00. RectCommon">
+      <UniqueIdentifier>{05c95001-67ec-4480-9c3e-2def286ecfd7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -1875,8 +1872,8 @@
     <ClInclude Include="..\public\Projectile_Movement.h">
       <Filter>01. Projectile\Movement</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\QuadCommon.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\00. QuadCommon</Filter>
+    <ClInclude Include="..\Public\RectCommon.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\00. RectCommon</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\RailRideable.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
@@ -1964,9 +1961,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\StarEmitter.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\Emitter</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\StarMesh.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\Mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\StarParticle.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\MeshParticle</Filter>
@@ -2867,8 +2861,8 @@
     <ClCompile Include="..\private\Projectile_Movement.cpp">
       <Filter>01. Projectile\Movement</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\QuadCommon.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\00. QuadCommon</Filter>
+    <ClCompile Include="..\Private\RectCommon.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\00. RectCommon</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\RailRideable.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
@@ -2950,9 +2944,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\StarEmitter.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\Emitter</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\StarMesh.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\StarParticle.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\MeshParticle</Filter>
