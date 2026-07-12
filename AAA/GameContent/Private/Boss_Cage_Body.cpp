@@ -54,6 +54,7 @@ void CBoss_Cage_Body::Ready_AnimEvent()
             if (e.iEventType == ETOI(EANIM_EVENT::OnOffMesh))
             {
                 m_bRender = false;
+                m_pGameInstance_Proxy->Play_SFX(L"DemoStageClear_CageBreak.wav", 0.45f);
             }
         }
     );
