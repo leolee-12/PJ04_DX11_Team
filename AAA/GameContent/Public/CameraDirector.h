@@ -7,6 +7,7 @@ NS_BEGIN(Client)
 class CCamera_AreaCam;
 class CCamera_Cutscene;
 class CCamera_Boss;
+class CCamera_Dialogue;
 
 class CLIENT_DLL CCameraDirector final : public CGameObject
 {
@@ -29,6 +30,7 @@ protected:
 
 private:
     void On_CameraChange(void* p);
+    void On_DialogueCamBegin(void* p);
 
     HRESULT Ensure_Cameras();    
     void    Arrange();           
@@ -40,6 +42,7 @@ private:
     CCamera_AreaCam* m_pAreaCam = { nullptr };
     CCamera_Cutscene* m_pCutCam = { nullptr };
     CCamera_Boss* m_pBossCam = { nullptr };
+    CCamera_Dialogue* m_pDlgCam = { nullptr };
 
     static CCameraDirector* s_pActiveDirector;
 

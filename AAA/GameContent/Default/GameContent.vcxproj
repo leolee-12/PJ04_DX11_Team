@@ -55,6 +55,7 @@
     <ClInclude Include="..\public\Camera_AreaCam.h" />
     <ClInclude Include="..\public\Camera_Boss.h" />
     <ClInclude Include="..\public\Camera_Cutscene.h" />
+    <ClInclude Include="..\public\Camera_Dialogue.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\public\Camera_Shakeable.h" />
     <ClInclude Include="..\Public\Cappy.h" />
@@ -411,6 +412,7 @@
     <ClCompile Include="..\private\Camera_AreaCam.cpp" />
     <ClCompile Include="..\private\Camera_Boss.cpp" />
     <ClCompile Include="..\private\Camera_Cutscene.cpp" />
+    <ClCompile Include="..\private\Camera_Dialogue.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Camera_Shakeable.cpp" />
     <ClCompile Include="..\Private\Cappy.cpp" />

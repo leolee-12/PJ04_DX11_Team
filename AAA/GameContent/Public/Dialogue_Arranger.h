@@ -14,6 +14,8 @@ class CDialogue_Arranger final : public CGameObject
 
     PROPERTY(_float, m_fActorGap, L"Actor Gap", L"Dialogue")   // 커비-웨이들디 간격
     PROPERTY(_wstring, m_strDialogueId, L"Dialogue Id", L"Dialogue")
+    PROPERTY(_float, m_fActorBackset, L"Actor Backset", L"Dialogue")  
+    PROPERTY(_float, m_fFocusPull, L"Focus Pull", L"Dialogue")
 
 public:
     static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_Dialogue_Arranger";
