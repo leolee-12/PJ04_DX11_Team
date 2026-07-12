@@ -14,11 +14,6 @@ CEffect_Particle::CEffect_Particle(const CEffect_Particle& Prototype)
     Init_PropertyValue();
 }
 
-HRESULT CEffect_Particle::Initialize_Prototype()
-{
-    return S_OK;
-}
-
 HRESULT CEffect_Particle::Initialize(void* pArg)
 {
     EFFECT_PARTICLE_DESC* pDesc = static_cast<EFFECT_PARTICLE_DESC*>(pArg);
@@ -26,22 +21,9 @@ HRESULT CEffect_Particle::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
-    if (FAILED(Ready_Components()))
-        return E_FAIL;
-
     Reset_Particles();
 
     return S_OK;
-}
-
-void CEffect_Particle::Priority_Update(_float fTimeDelta)
-{
-    __super::Priority_Update(fTimeDelta);
-}
-
-void CEffect_Particle::Update(_float fTimeDelta)
-{
-    __super::Update(fTimeDelta);
 }
 
 void CEffect_Particle::Late_Update(_float fTimeDelta)
@@ -50,11 +32,6 @@ void CEffect_Particle::Late_Update(_float fTimeDelta)
 
     Compute_CombinedWorldMatrix();
     Update_ParticleParentMatrices();
-}
-
-HRESULT CEffect_Particle::Render()
-{
-    return S_OK;
 }
 
 void CEffect_Particle::Effect_Start()
@@ -68,19 +45,6 @@ void CEffect_Particle::On_Deserialized()
 {
     __super::On_Deserialized();
     Reset_Particles();
-}
-
-HRESULT CEffect_Particle::Bind_ShaderValue()
-{
-    if (FAILED(__super::Bind_ShaderValue()))
-        return E_FAIL;
-
-    return S_OK;
-}
-
-HRESULT CEffect_Particle::Ready_Components()
-{
-    return S_OK;
 }
 
 void CEffect_Particle::Init_PropertyValue()
@@ -640,11 +604,12 @@ void CEffect_Particle::Update_ParticleMove(PARTICLE& Particle, _float fRatio, _f
 
 void CEffect_Particle::Update_ParticleAlpha(PARTICLE& Particle, _float fLocalRatio)
 {
-    _float fAlpha = Evaluate_ParticleFloatCurve(
+    _float fAlpha = Evaluate_FloatCurve(
         fLocalRatio, m_fParticleAlpha, m_bParticleAlphaChange,
         m_fParticleAlphaStartValue, m_fParticleAlphaEndValue,
         m_bActive_ParticleAlpha_Ratio_0, m_fParticleAlpha_Ratio_0, m_fParticleAlpha_Value_0,
-        m_bActive_ParticleAlpha_Ratio_1, m_fParticleAlpha_Ratio_1, m_fParticleAlpha_Value_1);
+        m_bActive_ParticleAlpha_Ratio_1, m_fParticleAlpha_Ratio_1, m_fParticleAlpha_Value_1,
+        true);
 
     fAlpha *= Get_FadeOutAlpha();
     Helper::FloatClamp(fAlpha, 0.f, 1.f);
@@ -654,11 +619,12 @@ void CEffect_Particle::Update_ParticleAlpha(PARTICLE& Particle, _float fLocalRat
 
 void CEffect_Particle::Update_ParticleSize(PARTICLE& Particle, _float fLocalRatio)
 {
-    _float fSizeRatio = Evaluate_ParticleFloatCurve(
+    _float fSizeRatio = Evaluate_FloatCurve(
         fLocalRatio, 1.f, m_bParticleSizeChange,
         m_fParticleSizeStartValue, m_fParticleSizeEndValue,
         m_bActive_ParticleSize_Ratio_0, m_fParticleSize_Ratio_0, m_fParticleSize_Value_0,
-        m_bActive_ParticleSize_Ratio_1, m_fParticleSize_Ratio_1, m_fParticleSize_Value_1);
+        m_bActive_ParticleSize_Ratio_1, m_fParticleSize_Ratio_1, m_fParticleSize_Value_1,
+        true);
 
     _float fSize = Particle.fBaseSize * fSizeRatio;
 
@@ -676,11 +642,12 @@ void CEffect_Particle::Update_ParticleColor(PARTICLE& Particle, _float fLocalRat
         return;
     }
 
-    _float3 vColor = Evaluate_ParticleFloat3Curve(
+    _float3 vColor = Evaluate_Float3Curve(
         fLocalRatio, m_vParticleColor, m_bParticleColorChange,
         m_vParticleColorStartValue, m_vParticleColorEndValue,
         m_bActive_ParticleColor_Ratio_0, m_fParticleColor_Ratio_0, m_vParticleColor_Value_0,
-        m_bActive_ParticleColor_Ratio_1, m_fParticleColor_Ratio_1, m_vParticleColor_Value_1);
+        m_bActive_ParticleColor_Ratio_1, m_fParticleColor_Ratio_1, m_vParticleColor_Value_1,
+        true);
 
     if (m_bParticleRandomColor == true)
     {
@@ -690,121 +657,6 @@ void CEffect_Particle::Update_ParticleColor(PARTICLE& Particle, _float fLocalRat
     }
 
     Particle.vColor = vColor;
-}
-
-_float CEffect_Particle::Evaluate_ParticleFloatCurve(_float fLocalRatio, _float fFixedValue, _bool bChange, _float
-    fStartValue, _float fEndValue, _bool bActiveRatio0, _float fRatio0, _float fValue0, _bool bActiveRatio1, _float
-    fRatio1, _float fValue1) const
-{
-    if (bChange == false)
-        return fFixedValue;
-
-    RATIO_VALUE Points[4]{};
-    _uint iCount = 0;
-
-    Points[iCount++] = { 0.f, fStartValue };
-
-    if (bActiveRatio0 == true)
-        Points[iCount++] = { fRatio0, fValue0 };
-
-    if (bActiveRatio1 == true)
-        Points[iCount++] = { fRatio1, fValue1 };
-
-    Points[iCount++] = { 1.f, fEndValue };
-
-    for (_uint i = 0; i < iCount; ++i)
-        Helper::FloatClamp(Points[i].fRatio, 0.f, 1.f);
-
-    for (_uint i = 0; i < iCount; ++i)
-    {
-        for (_uint j = i + 1; j < iCount; ++j)
-        {
-            if (Points[j].fRatio < Points[i].fRatio)
-                std::swap(Points[i], Points[j]);
-        }
-    }
-
-    Helper::FloatClamp(fLocalRatio, 0.f, 1.f);
-
-    for (_uint i = 0; i + 1 < iCount; ++i)
-    {
-        if (fLocalRatio <= Points[i + 1].fRatio)
-        {
-            const _float fRange = Points[i + 1].fRatio - Points[i].fRatio;
-
-            if (fRange <= Helper::fEpsilon)
-                return Points[i + 1].fValue;
-
-            const _float fStep = Helper::FloatSmoothStep(
-                Points[i].fRatio,
-                Points[i + 1].fRatio,
-                fLocalRatio);
-
-            return Points[i].fValue + (Points[i + 1].fValue - Points[i].fValue) * fStep;
-        }
-    }
-
-    return Points[iCount - 1].fValue;
-}
-
-_float3 CEffect_Particle::Evaluate_ParticleFloat3Curve(_float fLocalRatio, const _float3& vFixedValue, _bool bChange,
-    const _float3& vStartValue, const _float3& vEndValue, _bool bActiveRatio0, _float fRatio0, const _float3& vValue0,
-    _bool bActiveRatio1, _float fRatio1, const _float3& vValue1) const
-{
-    if (bChange == false)
-        return vFixedValue;
-
-    RATIO_VALUE_FLOAT3 Points[4]{};
-    _uint iCount = 0;
-
-    Points[iCount++] = { 0.f, vStartValue };
-
-    if (bActiveRatio0 == true)
-        Points[iCount++] = { fRatio0, vValue0 };
-
-    if (bActiveRatio1 == true)
-        Points[iCount++] = { fRatio1, vValue1 };
-
-    Points[iCount++] = { 1.f, vEndValue };
-
-    for (_uint i = 0; i < iCount; ++i)
-        Helper::FloatClamp(Points[i].fRatio, 0.f, 1.f);
-
-    for (_uint i = 0; i < iCount; ++i)
-    {
-        for (_uint j = i + 1; j < iCount; ++j)
-        {
-            if (Points[j].fRatio < Points[i].fRatio)
-                std::swap(Points[i], Points[j]);
-        }
-    }
-
-    Helper::FloatClamp(fLocalRatio, 0.f, 1.f);
-
-    for (_uint i = 0; i + 1 < iCount; ++i)
-    {
-        if (fLocalRatio <= Points[i + 1].fRatio)
-        {
-            const _float fRange = Points[i + 1].fRatio - Points[i].fRatio;
-
-            if (fRange <= Helper::fEpsilon)
-                return Points[i + 1].vValue;
-
-            const _float fStep = Helper::FloatSmoothStep(
-                Points[i].fRatio,
-                Points[i + 1].fRatio,
-                fLocalRatio);
-
-            _float3 vResult{};
-            vResult.x = Points[i].vValue.x + (Points[i + 1].vValue.x - Points[i].vValue.x) * fStep;
-            vResult.y = Points[i].vValue.y + (Points[i + 1].vValue.y - Points[i].vValue.y) * fStep;
-            vResult.z = Points[i].vValue.z + (Points[i + 1].vValue.z - Points[i].vValue.z) * fStep;
-
-            return vResult;
-        }
-    }
-
-    return Points[iCount - 1].vValue;
 }
 
 _float4x4 CEffect_Particle::Make_ParticleWorldMatrix(const PARTICLE& Particle) const
@@ -839,9 +691,4 @@ _float4x4 CEffect_Particle::Make_ParticleWorldMatrix(const PARTICLE& Particle) c
     XMStoreFloat4x4(&ParticleWorld, matWorld);
 
     return ParticleWorld;
-}
-
-void CEffect_Particle::Free()
-{
-    __super::Free();
 }
