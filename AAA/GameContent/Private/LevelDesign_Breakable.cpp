@@ -8,6 +8,8 @@
 
 namespace
 {
+	static constexpr _float BREAKABLE_CULL_MARGIN = 1.f;
+
 	struct LD_BREAKABLE_CATALOG
 	{
 		const _tchar* pObjectName;
@@ -104,6 +106,11 @@ HRESULT CLevelDesign_Breakable::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
+	if (FAILED(Ready_CullBounds(m_pModelCom, BREAKABLE_CULL_MARGIN)))
+		return E_FAIL;
+
+	m_bUseShadow = true;
+
 	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
 
@@ -178,7 +185,8 @@ void CLevelDesign_Breakable::Late_Update(_float fTimeDelta)
 #endif
 	}
 
-	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+	Check_Visible();
+	Submit_RenderGroups();
 }
 
 HRESULT CLevelDesign_Breakable::Render()
@@ -193,14 +201,8 @@ HRESULT CLevelDesign_Breakable::Render()
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		if (MODEL::ANIM == m_tBreakableDesc.eModelType)
-		{
-			if (BREAKABLE_STATE::INTACT == m_eState && i != m_iBaseMeshIndex)
-				continue;
-
-			if (BREAKABLE_STATE::BREAKING == m_eState && i == m_iBaseMeshIndex)
-				continue;
-		}
+		if (!Should_RenderMesh(i))
+			continue;
 
 		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
 
@@ -255,6 +257,36 @@ HRESULT CLevelDesign_Breakable::Render()
 		}
 
 		if (FAILED(m_pModelCom->Render(i)))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Breakable::Render_Shadow()
+{
+	if (BREAKABLE_STATE::DESTROYED == m_eState)
+		return S_OK;
+
+	if (MODEL::NONANIM == m_tBreakableDesc.eModelType)
+		return Render_ShadowModel(m_pShaderCom, m_pModelCom, MESH_LAYER_PROFILE::WORLD_NONANIM);
+
+	if (MODEL::ANIM != m_tBreakableDesc.eModelType)
+		return E_FAIL;
+
+	if (FAILED(Bind_ShadowTransforms(m_pShaderCom)))
+		return E_FAIL;
+
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		if (!Should_RenderMesh(i))
+			continue;
+
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+			return E_FAIL;
+
+		if (FAILED(Render_ShadowMesh(m_pShaderCom, m_pModelCom, i, MESH_LAYER_PROFILE::WORLD_ANIM)))
 			return E_FAIL;
 	}
 
@@ -531,6 +563,23 @@ HRESULT CLevelDesign_Breakable::Bind_ShaderResources()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+_bool CLevelDesign_Breakable::Should_RenderMesh(_uint iMeshIndex) const
+{
+	if (BREAKABLE_STATE::DESTROYED == m_eState)
+		return false;
+
+	if (MODEL::ANIM != m_tBreakableDesc.eModelType)
+		return true;
+
+	if (BREAKABLE_STATE::INTACT == m_eState)
+		return iMeshIndex == m_iBaseMeshIndex;
+
+	if (BREAKABLE_STATE::BREAKING == m_eState)
+		return iMeshIndex != m_iBaseMeshIndex;
+
+	return false;
 }
 
 const _tchar* CLevelDesign_Breakable::Resolve_ModelProtoTag() const

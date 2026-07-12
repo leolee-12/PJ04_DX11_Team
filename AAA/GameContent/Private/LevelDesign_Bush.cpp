@@ -4,12 +4,14 @@
 #include "Parsing_Utils.h"
 
 #include "GameInstance.h"
+#include "Geometry_Utils.h"
 
 namespace
 {
 	static constexpr const _char* ANIM_WAIT = "Wait";
 	static constexpr const _char* ANIM_SHAKE_ONCE = "ShakeOnce";
 	static constexpr const _char* ANIM_SHAKE_LOOP = "ShakeLoop";
+	static constexpr _float BUSH_CULL_MARGIN = 0.5f;
 
 	struct LD_BUSH_CATALOG
 	{
@@ -76,6 +78,11 @@ HRESULT CLevelDesign_Bush::Initialize(void* pArg)
 
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
+
+	if (FAILED(Ready_BushCullBounds()))
+		return E_FAIL;
+
+	m_bUseShadow = true;
 
 	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
@@ -194,7 +201,8 @@ void CLevelDesign_Bush::Late_Update(_float fTimeDelta)
 #endif
 	}
 
-	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+	Check_Visible();
+	Submit_RenderGroups();
 }
 
 HRESULT CLevelDesign_Bush::Render()
@@ -203,6 +211,35 @@ HRESULT CLevelDesign_Bush::Render()
 		return E_FAIL;
 
 	return Render_Model(m_eState);
+}
+
+HRESULT CLevelDesign_Bush::Render_Shadow()
+{
+	const BUSH_STATE eSlot = m_eState;
+	CShader* pShader = m_pShaderComs[eSlot];
+	CModel* pModel = m_pModelComs[eSlot];
+	const MODEL eModelType = Resolve_ModelType(eSlot);
+
+	if (MODEL::NONANIM == eModelType)
+		return Render_ShadowModel(pShader, pModel, MESH_LAYER_PROFILE::WORLD_NONANIM);
+
+	if (MODEL::ANIM != eModelType)
+		return E_FAIL;
+
+	if (FAILED(Bind_ShadowTransforms(pShader)))
+		return E_FAIL;
+
+	const _uint iNumMeshes = static_cast<_uint>(pModel->Get_NumMeshes());
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		if (FAILED(pModel->Bind_BoneMatrices(pShader, "g_BoneMatrices", i)))
+			return E_FAIL;
+
+		if (FAILED(Render_ShadowMesh(pShader, pModel, i, MESH_LAYER_PROFILE::WORLD_ANIM)))
+			return E_FAIL;
+	}
+
+	return S_OK;
 }
 
 void CLevelDesign_Bush::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
@@ -379,6 +416,34 @@ HRESULT CLevelDesign_Bush::Ready_HurtBox()
 
 	return S_OK;
 }
+
+HRESULT CLevelDesign_Bush::Ready_BushCullBounds()
+{
+	BoundingBox CullBounds{};
+	_bool bHasBounds = false;
+
+	for (_uint i = 0; i < BUSH_STATE::_COUNT; ++i)
+	{
+		_float3 vMin{}, vMax{};
+		m_pModelComs[i]->Get_ModelAABB(&vMin, &vMax);
+
+		const BoundingBox ModelBounds = GeometryUtils::Is_ValidAABB(vMin, vMax)
+			? GeometryUtils::Make_AABB_FromMinMax(vMin, vMax)
+			: GeometryUtils::Make_DefaultAABB(0.5f);
+
+		CullBounds = bHasBounds
+			? GeometryUtils::Merge_AABB(CullBounds, ModelBounds)
+			: ModelBounds;
+		bHasBounds = true;
+	}
+
+	if (!bHasBounds || !GeometryUtils::Expand_AABB(&CullBounds, BUSH_CULL_MARGIN))
+		return E_FAIL;
+
+	Set_CullLocalBounds(CullBounds);
+	return S_OK;
+}
+
 
 void CLevelDesign_Bush::SetUp_Collider_Callback()
 {

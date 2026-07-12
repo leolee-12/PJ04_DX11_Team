@@ -115,7 +115,8 @@ void CLD_EventObject::Late_Update(_float fTimeDelta)
 	if (!m_bActive || Is_Dead())
 		return;
 
-	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+	Check_Visible();
+	Submit_RenderGroups();
 }
 
 HRESULT CLD_EventObject::Render()
@@ -131,6 +132,38 @@ HRESULT CLD_EventObject::Render()
 			continue;
 
 		if (FAILED(Render_Mesh(i, Resolve_RenderPass(i))))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+HRESULT CLD_EventObject::Render_Shadow()
+{
+	if (!m_bActive || Is_Dead())
+		return S_OK;
+
+	const MODEL eModelType = m_tEventObjectDesc.eModelType;
+	if (MODEL::ANIM != eModelType && MODEL::NONANIM != eModelType)
+		return E_FAIL;
+
+	if (FAILED(Bind_ShadowTransforms(m_pShaderCom)))
+		return E_FAIL;
+
+	const MESH_LAYER_PROFILE eProfile = MODEL::ANIM == eModelType
+		? MESH_LAYER_PROFILE::WORLD_ANIM
+		: MESH_LAYER_PROFILE::WORLD_NONANIM;
+
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		if (!Should_RenderMesh(i))
+			continue;
+
+		if (MODEL::ANIM == eModelType && FAILED(Bind_BoneMatrices(i)))
+			return E_FAIL;
+
+		if (FAILED(Render_ShadowMesh(m_pShaderCom, m_pModelCom, i, eProfile)))
 			return E_FAIL;
 	}
 

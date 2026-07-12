@@ -52,7 +52,8 @@ public:
 		MAP_LOAD_RESULT* pOutReport = nullptr,
 		CMapStage** ppOutStage = nullptr,
 		const MAP_LOAD_OPTIONS& Options = MAP_LOAD_OPTIONS{},
-		const MAP_EDIT_CHANGE* pLevelDesignOverrideDesc = nullptr);
+		const MAP_EDIT_CHANGE* pLevelDesignOverrideDesc = nullptr,
+		const MAP_EDIT_CHANGE* pMapOverrideDesc = nullptr);
 
 	static HRESULT Spawn_Map(
 		ID3D11Device* pDevice,

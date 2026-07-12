@@ -1641,9 +1641,6 @@
     <ClInclude Include="..\Public\LevelDesign_Point.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\05. Point</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\LevelDesign_Portal.h">
-      <Filter>00. GameObject\96. LevelDesign\Invisible\03. Portal</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_ProtoRegister.h">
       <Filter>97. DataSystem\LevelDesignLoader</Filter>
     </ClInclude>
@@ -2647,9 +2644,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Point.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\05. Point</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\LevelDesign_Portal.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Invisible\03. Portal</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_ProtoRegister.cpp">
       <Filter>97. DataSystem\LevelDesignLoader</Filter>

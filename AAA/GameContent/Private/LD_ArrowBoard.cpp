@@ -55,6 +55,11 @@ HRESULT CLD_ArrowBoard::Initialize(void* pArg)
 	if (FAILED(Ready_HurtBox()))
 		return E_FAIL;
 
+	if (FAILED(Ready_CullBounds(m_pModelCom)))
+		return E_FAIL;
+
+	m_bUseShadow = true;
+
 	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
 
@@ -129,7 +134,8 @@ void CLD_ArrowBoard::Late_Update(_float fTimeDelta)
 #endif
 	}
 
-	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+	Check_Visible();
+	Submit_RenderGroups();
 }
 
 HRESULT CLD_ArrowBoard::Render()
@@ -138,6 +144,20 @@ HRESULT CLD_ArrowBoard::Render()
 		return E_FAIL;
 
 	return Render_Model();
+}
+
+HRESULT CLD_ArrowBoard::Render_Shadow()
+{
+	if (!m_bActive || Is_Dead())
+		return S_OK;
+
+	if (FAILED(Bind_ShadowTransforms(m_pShaderCom)))
+		return E_FAIL;
+
+	if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", 0u)))
+		return E_FAIL;
+
+	return Render_ShadowMesh(m_pShaderCom, m_pModelCom, 0u, MESH_LAYER_PROFILE::WORLD_ANIM);
 }
 
 void CLD_ArrowBoard::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)

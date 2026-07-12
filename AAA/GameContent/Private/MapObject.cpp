@@ -14,7 +14,6 @@ CMapObject::CMapObject(const CMapObject& Prototype)
 
 HRESULT CMapObject::Initialize_Prototype()
 {
-	m_eProjType = PROJ_TYPE::PERSPEC;
 	m_iMaterialID = WORLD_STATIC_ID;
 	return S_OK;
 }
@@ -40,9 +39,6 @@ HRESULT CMapObject::Validate_Initialized()
 
 	return S_OK;
 }
-
-void CMapObject::Priority_Update(_float fTimeDelta) {}
-void CMapObject::Update(_float fTimeDelta) {}
 
 void CMapObject::Late_Update(_float fTimeDelta)
 {
@@ -128,8 +124,6 @@ HRESULT CMapObject::Render_MapMesh(_uint iMesh, const _float4x4* pWorldOverride)
 
 	if (Result.bSkipMesh)
 		return S_OK;
-
-	Bind_MeshLayers(iMesh);
 
 	if (FAILED(m_pShaderCom->Begin(Result.iPass)))
 		return E_FAIL;

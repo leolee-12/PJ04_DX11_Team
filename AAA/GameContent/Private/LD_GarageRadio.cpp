@@ -50,6 +50,8 @@ HRESULT CLD_GarageRadio::Initialize(void* pArg)
 
 	Set_AnimPose(ANIM_WAIT, 0.f);
 
+	m_bUseShadow = true;
+
 	return S_OK;
 }
 

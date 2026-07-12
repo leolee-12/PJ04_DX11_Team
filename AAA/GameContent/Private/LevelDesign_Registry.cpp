@@ -209,7 +209,7 @@ _bool CLevelDesign_Registry::Is_LevelDesignLayer(const _wstring& strLayerTag)
 
 void CLevelDesign_Registry::Register_Core()
 {
-	Register_Unsupported(L"StartPortal", LD_CATEGORY::PORTAL, L"Layer_LevelDesign_Portal");
+	Register_Unsupported(L"StartPortal", LD_CATEGORY::UNSUPPORTED, L"Layer_LevelDesign_Unsupported");
 	Register_Unsupported(L"DoorZone", LD_CATEGORY::DOOR, L"Layer_LevelDesign_Gimmick");
 
 	LD_SPAWN_SPEC RailSpec{};
