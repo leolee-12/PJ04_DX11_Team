@@ -27,7 +27,7 @@ HRESULT CRockEffect::Initialize(void* pArg)
 
     // 돌 모델: 디퓨즈 + 노멀 + MRA
     tDesc.bUseDiffuseTexture = true;
-    tDesc.bUseUnKnownTexture = false;
+    tDesc.bUseUnknownTexture = false;
     tDesc.bUseNormalTexture = true;   // 1단계(b)에서 추가한 필드
     tDesc.bUseMRATexture = true;
 

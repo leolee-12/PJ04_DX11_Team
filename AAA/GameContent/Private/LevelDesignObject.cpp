@@ -390,6 +390,31 @@ HRESULT CLevelDesignObject::Render_ShadowModel(CShader* pShader, CModel* pModel,
 	return S_OK;
 }
 
+_bool CLevelDesignObject::Compute_EffectSpawnPosition(CModel* pModel, _float fHeightRatio, _float3* pOutPosition) const
+{
+	if (nullptr == pModel || nullptr == m_pTransformCom || nullptr == pOutPosition)
+		return false;
+
+	_float3 vMin{}, vMax{};
+	pModel->Get_ModelAABB(&vMin, &vMax);
+
+	if (!GeometryUtils::Is_ValidAABB(vMin, vMax))
+		return false;
+
+	const _float fClampedHeightRatio = max(0.f, min(1.f, fHeightRatio));
+	const _float3 vLocalPosition = {
+			(vMin.x + vMax.x) * 0.5f,
+			vMin.y + (vMax.y - vMin.y) * fClampedHeightRatio,
+			(vMin.z + vMax.z) * 0.5f
+	};
+
+	XMStoreFloat3(pOutPosition, XMVector3TransformCoord(
+		XMLoadFloat3(&vLocalPosition),
+		XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr())));
+
+	return true;
+}
+
 void CLevelDesignObject::Free()
 {
 	__super::Free();

@@ -26,7 +26,7 @@ HRESULT CEffect_MeshEmitter::Initialize(void* pArg)
     m_iModelLevel = pDesc->iModelLevel;
     m_wstrModelTag = pDesc->wstrModelTag;
     m_bUseDiffuseTexture = pDesc->bUseDiffuseTexture;
-    m_bUseUnknownTexture = pDesc->bUseUnKnownTexture;
+    m_bUseUnknownTexture = pDesc->bUseUnknownTexture;
     m_bUseNormalTexture = pDesc->bUseNormalTexture;
     m_bUseMRATexture = pDesc->bUseMRATexture;
 

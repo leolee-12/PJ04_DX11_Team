@@ -1962,7 +1962,13 @@
     <ClInclude Include="..\Public\SpitObject.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\11. SpitObject</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Split_Bush.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Split_Starblock.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Split_Stone.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Star2DParticle.h">
@@ -2951,7 +2957,13 @@
     <ClCompile Include="..\Private\SpitObject.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\11. SpitObject</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Split_Bush.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Split_Starblock.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Split_Stone.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Star2DParticle.cpp">

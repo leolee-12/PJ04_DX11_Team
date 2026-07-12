@@ -84,6 +84,8 @@
 #include "BombFuseEffect.h"
 #include "FlowerPetals.h"
 #include "Split_Starblock.h"
+#include "Split_Stone.h"
+#include "Split_Bush.h"
 #include "BubbleAura.h"
 
 // Effect_Part
@@ -770,7 +772,7 @@ void CGameObject_Factory::Register_AnimObject()
 
     Register(CLD_DeformObject::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_DeformObject),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Proto_Component_Model_DeformCar"),
-            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/DeformCar/DeformCar.ysh", true));));
+            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/DeformCar/DeformCar.ysh", true, XMMatrixRotationY(XMConvertToRadians(180.f))));));
 
     Register(CLD_CopyEssence::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_CopyEssence),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_CopyEssence::MODEL_PROTO_TAG,
@@ -1040,14 +1042,39 @@ void CGameObject_Factory::Register_Effect()
         LOADER
         (
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Starblock_Piece1"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Starblock/BlockBombH2W2Piece.ysh"));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Starblock_Piece2"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Starblock/BlockChainH2W2Piece.ysh"));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Starblock_Piece3"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Starblock/BlockStarH2W2Piece.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Starblock_Piece01"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Starblock/BlockBombH2W2Piece.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Starblock_Piece02"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Starblock/BlockStarH2W2Piece.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Stone"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/Stone.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StoneDust"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/StoneDust.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
         )
     );
 
-        
+    // 10
+    Register(CSplit_Stone::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSplit_Stone),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Nature_Piece01"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/LandBreak/Nature_Piece01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Nature_Piece02"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/LandBreak/Nature_Piece02.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Stone"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/Stone.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StoneDust"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/StoneDust.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StoneHiMesh"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/StoneHiMesh.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    // 11
+    Register(CSplit_Bush::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSplit_Bush),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BushLeafL"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Bush/BasicL.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BushLeafM"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Bush/BasicM.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BushLeafS"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Bush/BasicS.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Bush_00"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Bush/Bush_00.ysh"));
+        )
+    );
 }
 
 void CGameObject_Factory::Register_Bubble()

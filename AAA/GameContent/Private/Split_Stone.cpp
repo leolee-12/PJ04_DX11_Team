@@ -1,23 +1,23 @@
-#include "Split_Starblock.h"
+#include "Split_Stone.h"
 #include "GameContent_const.h"
 #include "MeshEmitterCommon.h"
 
-CSplit_Starblock::CSplit_Starblock(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSplit_Stone::CSplit_Stone(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CEffect_Container(pDevice, pContext)
 {
 }
 
-CSplit_Starblock::CSplit_Starblock(const CSplit_Starblock& Prototype)
+CSplit_Stone::CSplit_Stone(const CSplit_Stone& Prototype)
 	: CEffect_Container(Prototype)
 {
 }
 
-HRESULT CSplit_Starblock::Initialize_Prototype()
+HRESULT CSplit_Stone::Initialize_Prototype()
 {
 	return S_OK;
 }
 
-HRESULT CSplit_Starblock::Initialize(void* pArg)
+HRESULT CSplit_Stone::Initialize(void* pArg)
 {
 	EFFECT_CONTAINER_DESC* pDesc = static_cast<EFFECT_CONTAINER_DESC*>(pArg);
 
@@ -30,38 +30,38 @@ HRESULT CSplit_Starblock::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CSplit_Starblock::Priority_Update(_float fTimeDelta)
+void CSplit_Stone::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
 }
 
-void CSplit_Starblock::Update(_float fTimeDelta)
+void CSplit_Stone::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
 }
 
-void CSplit_Starblock::Late_Update(_float fTimeDelta)
+void CSplit_Stone::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
 }
 
-HRESULT CSplit_Starblock::Render()
+HRESULT CSplit_Stone::Render()
 {
 	__super::Render();
 
 	return S_OK;
 }
 
-HRESULT CSplit_Starblock::Ready_EffectPartObjects()
+HRESULT CSplit_Stone::Ready_EffectPartObjects()
 {
 	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tDesc{};
 	tDesc.iModelLevel = m_iPrototypeLevel;
 
-	tDesc.wstrModelTag = L"Prototype_Component_Model_Starblock_Piece01";
+	tDesc.wstrModelTag = L"Prototype_Component_Model_Nature_Piece01";
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, TEXT("Piece_1"), &tDesc)))
 		return E_FAIL;
 
-	tDesc.wstrModelTag = L"Prototype_Component_Model_Starblock_Piece02";
+	tDesc.wstrModelTag = L"Prototype_Component_Model_Nature_Piece02";
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, TEXT("Piece_2"), &tDesc)))
 		return E_FAIL;
 
@@ -73,6 +73,10 @@ HRESULT CSplit_Starblock::Ready_EffectPartObjects()
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, TEXT("StoneDust"), &tDesc)))
 		return E_FAIL;
 
+	tDesc.wstrModelTag = L"Prototype_Component_Model_StoneHiMesh";
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, TEXT("StoneHiMesh"), &tDesc)))
+		return E_FAIL;
+
 	tDesc.wstrModelTag = L"Prototype_Component_Model_SmokeSphereOriginal";
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, TEXT("Smoke"), &tDesc)))
 		return E_FAIL;
@@ -80,33 +84,33 @@ HRESULT CSplit_Starblock::Ready_EffectPartObjects()
 	return S_OK;
 }
 
-CSplit_Starblock* CSplit_Starblock::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSplit_Stone* CSplit_Stone::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CSplit_Starblock* pInstance = new CSplit_Starblock(pDevice, pContext);
+	CSplit_Stone* pInstance = new CSplit_Stone(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created: CSplit_Starblock");
+		MSG_BOX("Failed to Created: CSplit_Stone");
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject* CSplit_Starblock::Clone(void* pArg)
+CGameObject* CSplit_Stone::Clone(void* pArg)
 {
-	CSplit_Starblock* pInstance = new CSplit_Starblock(*this);
+	CSplit_Stone* pInstance = new CSplit_Stone(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX("Failed to Cloned: CSplit_Starblock");
+		MSG_BOX("Failed to Cloned: CSplit_Stone");
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CSplit_Starblock::Free()
+void CSplit_Stone::Free()
 {
 	__super::Free();
 }

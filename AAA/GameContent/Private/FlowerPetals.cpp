@@ -62,7 +62,7 @@ HRESULT CFlowerPetals::Ready_EffectPartObjects()
 	tDesc.iModelLevel = m_iPrototypeLevel;
 	tDesc.wstrModelTag = L"Prototype_Component_Model_Flower";
 	tDesc.bUseDiffuseTexture = false;
-	tDesc.bUseUnKnownTexture = true;
+	tDesc.bUseUnknownTexture = true;
 
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, TEXT("Flower_0"), &tDesc)))
 		return E_FAIL;

@@ -9,6 +9,7 @@
 namespace
 {
 	static constexpr _float BREAKABLE_CULL_MARGIN = 1.f;
+	static constexpr _float DESTROY_EFFECT_HEIGHT_RATIO = 0.55f;
 
 	struct LD_BREAKABLE_CATALOG
 	{
@@ -19,15 +20,16 @@ namespace
 		_uint iBreakAnimIndex;
 		const _char* pBaseMeshName;
 		_bool bCookCollisionMesh;
+		const _tchar* pDestroyEffectId;
 	};
 
 	static const LD_BREAKABLE_CATALOG g_BreakableCatalog[] =
 	{
-		{ L"WoodBox", CLevelDesign_Breakable::WOODBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxWood/BoxWood.ysh", MODEL::ANIM, 2u, "WoodBoxM__BoxWoodC", false},
-		{ L"BoxPlastic", CLevelDesign_Breakable::PLASTICBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxPlastic/BoxPlastic.ysh", MODEL::ANIM, 0u, "BoxPlasticM__BoxPlasticC", false},
-		{ L"BreakableRockS", CLevelDesign_Breakable::BREAKABLE_ROCK_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_S.ysh", MODEL::NONANIM, LD_INVALID_ID, nullptr, true },
-		{ L"BreakableRockM", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh", MODEL::NONANIM, LD_INVALID_ID, nullptr, true },
-		{ L"BreakableRockMForBridge", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh", MODEL::NONANIM, LD_INVALID_ID, nullptr, true }
+		{ L"WoodBox", CLevelDesign_Breakable::WOODBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxWood/BoxWood.ysh", MODEL::ANIM, 2u, "WoodBoxM__BoxWoodC", false, L"CommonHit" },
+		{ L"BoxPlastic", CLevelDesign_Breakable::PLASTICBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxPlastic/BoxPlastic.ysh", MODEL::ANIM, 0u, "BoxPlasticM__BoxPlasticC", false, L"CommonHit" },
+		{ L"BreakableRockS", CLevelDesign_Breakable::BREAKABLE_ROCK_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_S.ysh", MODEL::NONANIM, LD_INVALID_ID, nullptr, true, L"Split_Stone" },
+		{ L"BreakableRockM", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh", MODEL::NONANIM, LD_INVALID_ID, nullptr, true, L"Split_Stone_Big"  },
+		{ L"BreakableRockMForBridge", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh", MODEL::NONANIM, LD_INVALID_ID, nullptr, true, L"Split_Stone_Big"  }
 	};
 
 	static const LD_BREAKABLE_CATALOG* Find_BreakableCatalog(const _wstring& wstrObjName)
@@ -314,9 +316,17 @@ void CLevelDesign_Breakable::Damaged(const ATTACK_INFO& tInfo)
 	XMStoreFloat3(&vFaceCam, XMVectorNegate(XMLoadFloat4(pCamLook)));
 
 	_float3 vPos{};
-	XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+	if (!Compute_EffectSpawnPosition(m_pModelCom, DESTROY_EFFECT_HEIGHT_RATIO, &vPos))
+		XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
 
-	CEffect_Loader::GetInstance()->Spawn(L"CommonHit", Get_LevelIndex(), vPos, vFaceCam, _float3(0.f, 0.f, 0.f), nullptr);
+	const LD_BREAKABLE_CATALOG* pCatalog = Find_BreakableCatalog(m_tBreakableDesc.strObjectName);
+	if (nullptr != pCatalog && nullptr != pCatalog->pDestroyEffectId)
+	{
+		if (MODEL::ANIM == pCatalog->eModelType)
+			CEffect_Loader::GetInstance()->Spawn(pCatalog->pDestroyEffectId, Get_LevelIndex(), vPos, vFaceCam, _float3(0.f, 0.f, 0.f), nullptr);
+		else
+			CEffect_Loader::GetInstance()->Spawn(pCatalog->pDestroyEffectId, Get_LevelIndex(), vPos);
+	}
 
 	Release_RigidStatic();
 	m_pHurtBox->Set_Enabled(false);

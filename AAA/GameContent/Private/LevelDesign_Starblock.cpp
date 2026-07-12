@@ -8,18 +8,21 @@
 
 namespace
 {
+	static constexpr _float DESTROY_EFFECT_HEIGHT_RATIO = 0.5f;
+
 	struct LD_STARBLOCK_CATALOG
 	{
 		const _tchar* pObjectName;
 		const _tchar* pModelProtoTag;
 		const _char* pModelPath;
 		const _float fRadius;
+		const _tchar* pDestroyEffectId;
 	};
 
 	static const LD_STARBLOCK_CATALOG g_StarblockCatalog[] =
 	{
-		{ L"StarBlock", CLevelDesign_Starblock::STARBLOCK_H1W1_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh", 0.5f },
-		{ L"StarBlockBig", CLevelDesign_Starblock::STARBLOCK_H3W3_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H3W3.ysh" , 1.5f },
+		{ L"StarBlock", CLevelDesign_Starblock::STARBLOCK_H1W1_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H1W1.ysh", 0.5f, L"Split_Starblock" },
+		{ L"StarBlockBig", CLevelDesign_Starblock::STARBLOCK_H3W3_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/Star/H3W3.ysh" , 1.5f, L"Split_Starblock_Big" },
 	};
 
 	static const LD_STARBLOCK_CATALOG* Find_StarblockCatalog(const _wstring& wstrObjName)
@@ -228,9 +231,15 @@ void CLevelDesign_Starblock::Damaged(const ATTACK_INFO& tInfo)
 	XMStoreFloat3(&vFaceCam, XMVectorNegate(XMLoadFloat4(pCamLook)));
 
 	_float3 vPos{};
-	XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+	if (!Compute_EffectSpawnPosition(m_pModelCom, DESTROY_EFFECT_HEIGHT_RATIO, &vPos))
+		XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+	const LD_STARBLOCK_CATALOG* pCatalog = Find_StarblockCatalog(m_tBreakableDesc.strObjectName);
 
 	CEffect_Loader::GetInstance()->Spawn(L"CommonHit", Get_LevelIndex(), vPos, vFaceCam, _float3(0.f, 0.f, 0.f), nullptr);
+
+	if (nullptr != pCatalog && nullptr != pCatalog->pDestroyEffectId)
+		CEffect_Loader::GetInstance()->Spawn(pCatalog->pDestroyEffectId, Get_LevelIndex(), vPos);
 
 	Enable_Colliders(false);
 	Release_RigidStatic();

@@ -66,6 +66,8 @@ protected:
 	HRESULT Render_ShadowMesh(CShader* pShader, CModel* pModel, _uint iMeshIndex, MESH_LAYER_PROFILE eProfile) const;	// Anim 개별 구현용
 	HRESULT Render_ShadowModel(CShader* pShader, CModel* pModel, MESH_LAYER_PROFILE eProfile, const _float4x4* pWorldOverride = nullptr) const;	// NonAnim 공통
 
+	_bool Compute_EffectSpawnPosition(CModel* pModel, _float fHeightRatio, _float3* pOutPosition) const;
+
 protected:
 	virtual void Free() override;
 };
