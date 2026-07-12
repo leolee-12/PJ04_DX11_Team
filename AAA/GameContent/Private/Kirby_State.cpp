@@ -142,6 +142,21 @@ _bool CKirby_State::Try_Transition_Fall(CKirby* pKirby)
     return false;
 }
 
+_bool CKirby_State::Try_Transition_Fall_Immediate(CKirby* pKirby)
+{
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    _float fYVelocity = pMovement->Get_VerticalVelocity();
+
+    _bool bIsGround = pMovement->Is_Grounded();
+    if (bIsGround == false)
+    {
+        pKirby->Change_State(KIRBY_STATE_TYPE::FALL);
+        return true;
+    }
+
+    return false;
+}
+
 _bool CKirby_State::Transition_Wait_OR_Run(CKirby* pKirby)
 {
     if (pKirby->Has_MoveDir() == true)
@@ -155,6 +170,14 @@ _bool CKirby_State::Transition_Wait_OR_Run(CKirby* pKirby)
 _bool CKirby_State::Transition_Fall_OR_Wait_OR_Run(CKirby* pKirby)
 {
     if (Try_Transition_Fall(pKirby))
+        return true;
+
+    return Transition_Wait_OR_Run(pKirby);
+}
+
+_bool CKirby_State::Transition_Fall_OR_Wait_OR_Run_Immediate(CKirby* pKirby)
+{
+    if (Try_Transition_Fall_Immediate(pKirby))
         return true;
 
     return Transition_Wait_OR_Run(pKirby);
