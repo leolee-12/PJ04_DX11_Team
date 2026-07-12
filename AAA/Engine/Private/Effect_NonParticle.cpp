@@ -170,6 +170,7 @@ void CEffect_NonParticle::Update_Core(const _float fTimeDelta, const _float fRat
 
     Update_Move(fTimeDelta, fRatio);       // Move관련 가장 먼저
     Update_MoveSin(fTimeDelta, fRatio);
+    Update_Orbit(fRatio);
 }
 
 void CEffect_NonParticle::Update_Alpha(const _float fTimeDelta, const _float fRatio)

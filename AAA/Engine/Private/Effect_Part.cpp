@@ -119,6 +119,40 @@ void CEffect_Part::Compute_CombinedWorldMatrix()
     }
 }
 
+void CEffect_Part::Set_LocalPositionFromProperty()
+{
+    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&m_vLocalPos), 1.f));
+}
+
+void CEffect_Part::Update_Orbit(const _float fRatio)
+{
+    if (m_bOrbitChange == false)
+        return;
+
+    const _float fOrbitRange = m_fOrbit_End_Ratio - m_fOrbit_Start_Ratio;
+    _float fSubRatio = 0.f;
+
+    if (fabsf(fOrbitRange) > Helper::fEpsilon)
+        fSubRatio = (fRatio - m_fOrbit_Start_Ratio) / fOrbitRange;
+    else if (fRatio >= m_fOrbit_Start_Ratio)
+        fSubRatio = 1.f;
+
+    Helper::FloatClamp(fSubRatio, 0.f, 1.f);
+
+    _vector vAxis = XMLoadFloat3(&m_vOrbitAxis);
+    if (XMVectorGetX(XMVector3LengthSq(vAxis)) <= Helper::fEpsilon)
+        vAxis = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+    else
+        vAxis = XMVector3Normalize(vAxis);
+
+    const _float fRadian = XMConvertToRadians(m_fOrbitDegree * fSubRatio);
+    _vector vPivot = XMLoadFloat3(&m_vOrbitPivot);
+    _vector vBasePos = XMVectorSetW(m_pTransformCom->Get_State(STATE::POSITION), 0.f);
+    _vector vOrbitPos = vPivot + XMVector3Rotate(vBasePos - vPivot, XMQuaternionRotationAxis(vAxis, fRadian));
+
+    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(vOrbitPos, 1.f));
+}
+
 void CEffect_Part::Update_UVScroll(const _float fTimeDelta, const _float fRatio)
 {
     MoveUVScroll(fRatio, m_bTextureUVScroll, m_vTextureUVScrollCount, m_vTextureOffset, m_vCurTextureUVOffset);
@@ -234,6 +268,13 @@ void CEffect_Part::Init_PropertyValue()
     m_vEmissiveColor = { 0.f, 0.f, 0.f, 0.f };
 
     m_vLocalPos = { 0.f, 0.f, 0.f };
+
+    m_bOrbitChange = false;
+    m_vOrbitPivot = { 0.f, 0.f, 0.f };
+    m_vOrbitAxis = { 0.f, 1.f, 0.f };
+    m_fOrbitDegree = 360.f;
+    m_fOrbit_Start_Ratio = 0.f;
+    m_fOrbit_End_Ratio = 1.f;
 
     m_bIsPlay = { true };
 
