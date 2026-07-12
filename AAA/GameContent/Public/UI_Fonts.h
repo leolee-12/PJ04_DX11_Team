@@ -25,6 +25,6 @@ namespace Client
         { L"KOR-VDL-LogoGBlack-Black_Big",  L"../../Resources/YSH/Font/KOR-VDL-LogoGBlack-Black.spritefont" },
         { L"DialogName",                    L"../../Resources/YSH/Font/DialogName.spritefont" },
         { L"DialogText",                    L"../../Resources/YSH/Font/DialogText.spritefont" },
-        
+        { L"NameTag",                       L"../../Resources/YSH/Font/NameTag.spritefont" },
     };
 }

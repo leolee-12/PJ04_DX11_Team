@@ -6,6 +6,7 @@
 #include "Map_Loader.h"
 #include "Loader_Prototype.h"
 #include "Launcher_LevelProfiles.h"
+#include "Map_Loader.h"
 #include <set>
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -25,7 +26,16 @@ unsigned int APIENTRY ThreadMain(void* pArg)
         return -1;
 
     return 0;
+}
 
+unsigned int APIENTRY CollectorMain(void* pArg)
+{
+    CLoader* pLoader = static_cast<CLoader*>(pArg);
+    if (FAILED(CoInitializeEx(nullptr, 0)))
+        return -1;
+    const HRESULT hr = pLoader->Collect_And_StartWorkers();
+    CoUninitialize();
+    return FAILED(hr) ? -1 : 0;
 }
 
 
@@ -33,26 +43,13 @@ unsigned int APIENTRY ThreadMain(void* pArg)
 HRESULT CLoader::Initialize(LEVEL eNextLevelID, _bool Initialized)
 {
     m_eNextLevelID = eNextLevelID;
+    m_bNeedStatic = !Initialized;
 
-    Ready_WorkQueue();
+    m_hCollector = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, CollectorMain, this, 0, nullptr));
+    if (0 == m_hCollector)
+        return E_FAIL;
 
-    if (!Initialized)
-        Ready_StaticResources();
-
-    /* eNextLevelID에 필요한 자원을 로딩하는 작업을 수행한다. 누가? 스레드가 */
-    //m_hThread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, ThreadMain, this, 0, nullptr));
-    //if (0 == m_hThread)
-    //    return E_FAIL;
-    for (_uint i = 0; i < WORKER_COUNT; ++i)
-    {
-        m_hThreads[i] = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, ThreadMain, this, 0, nullptr));
-        if (0 == m_hThreads)
-        {
-            MSG_BOX("Create Failed : Loading Thread");
-            return E_FAIL;
-        }
-    }
-
+    SetThreadPriority(m_hCollector, THREAD_PRIORITY_BELOW_NORMAL);
     return S_OK;
 }
 
@@ -102,15 +99,21 @@ HRESULT CLoader::Read_Manifest(const _tchar* path, const LEVEL eLevel)
     if (FAILED(Load_LevelManifest(path, &Manifest)))
         return E_FAIL;
 
-    Add_Work([this, Manifest, eLevel]() -> HRESULT
-        {
-            return CMap_Loader::Preload_Map(
-                m_pDevice,
-                m_pContext,
-                Manifest.strMapManifest,
-                Manifest.strObjectsFile,
-                ETOUI(eLevel));
-        });
+    vector<function<HRESULT()>> MapJobs;
+    if (SUCCEEDED(CMap_Loader::Collect_PreloadJobs(m_pDevice, m_pContext,
+        Manifest.strMapManifest, Manifest.strObjectsFile, ETOUI(eLevel), &MapJobs)))
+    {
+        for (auto& Job : MapJobs)
+            Add_Work(move(Job));
+    }
+    else
+    {
+        Add_Work([this, Manifest, eLevel]() -> HRESULT
+            {
+                return CMap_Loader::Preload_Map(m_pDevice, m_pContext,
+                    Manifest.strMapManifest, Manifest.strObjectsFile, ETOUI(eLevel));
+            });
+    }
 
     string strContent;
     CDataLoader::Read_Json(Manifest.strObjectsFile.c_str(), &strContent);
@@ -150,6 +153,29 @@ HRESULT CLoader::Read_Manifest(const _tchar* path, const LEVEL eLevel)
             });
     }
 
+    return S_OK;
+}
+
+HRESULT CLoader::Collect_And_StartWorkers()
+{
+    if (m_bNeedStatic)
+        Ready_StaticResources();
+
+    if (FAILED(Ready_WorkQueue()))
+        return E_FAIL;
+
+    const _uint iHW = thread::hardware_concurrency();
+    m_iWorkerCount = std::clamp(iHW > 2 ? iHW - 2 : 1u, 1u, MAX_WORKER_COUNT);
+
+    for (_uint i = 0; i < m_iWorkerCount; ++i)
+    {
+        m_hThreads[i] = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, ThreadMain, this, 0, nullptr));
+        if (0 == m_hThreads[i])
+            return E_FAIL;
+        SetThreadPriority(m_hThreads[i], THREAD_PRIORITY_BELOW_NORMAL);
+    }
+
+    m_bJobsReady = true;
     return S_OK;
 }
 
@@ -206,134 +232,6 @@ HRESULT CLoader::Ready_WorkQueue()
     return S_OK;
 }
 
-HRESULT CLoader::Ready_Resources_For_GamePlay()
-{
-    return S_OK;
-}
-
-HRESULT CLoader::Ready_Resources_For_Test()
-{
-    LEVEL_MANIFEST Manifest{};
-    if (FAILED(Load_LevelManifest(LAUNCHER_LEVEL_PROFILES::LEVEL_TEST, &Manifest)))
-        return E_FAIL;
-
-    LEVEL eLevel = LEVEL::TEST;
-
-    Add_Work([this, Manifest, eLevel]() -> HRESULT
-        {
-            return CMap_Loader::Preload_Map(
-                m_pDevice,
-                m_pContext,
-                Manifest.strMapManifest,
-                Manifest.strObjectsFile,
-                ETOUI(eLevel));
-        });
-
-    string strContent;
-    CDataLoader::Read_Json(Manifest.strObjectsFile.c_str(), &strContent);
-    json jLevel = json::parse(strContent);
-
-    set<wstring> visited;
-    for (auto& jObj : jLevel["Objects"])
-    {
-        wstring wProto = StrToWstr(jObj["Prototype_Tag"].get<string>());
-        if (!visited.insert(wProto).second) continue;
-
-        if (m_pGameInstance_Proxy->Has_Prototype(ETOUI(eLevel), wProto)) continue;
-
-        Add_Work([this, wProto, eLevel]() -> HRESULT
-            {
-                auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(wProto);
-                if (!pReg) return E_FAIL;
-
-                pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, ETOUI(eLevel));
-                m_pGameInstance_Proxy->Add_Prototype(ETOUI(eLevel), wProto.c_str(),
-                    pReg->CreatorFunc(m_pDevice, m_pContext));
-                return S_OK;
-            });
-    }
-
-    if (!Manifest.strUIFile.empty())
-    {
-        wstring strUIFile = Manifest.strUIFile;
-        Add_Work([this, strUIFile, eLevel]() -> HRESULT
-            {
-                return Ready_Level_UIResources(
-                    m_pGameInstance_Proxy,
-                    m_pDevice,
-                    m_pContext,
-                    strUIFile.c_str(),
-                    ETOUI(eLevel));
-            });
-    }
-
-    return S_OK;
-}
-
-HRESULT CLoader::Ready_Resources_For_TownStep1()
-{
-    LEVEL_MANIFEST Manifest{};
-    if (FAILED(Load_LevelManifest(LAUNCHER_LEVEL_PROFILES::LEVEL_TOWN_STEP1, &Manifest)))
-        return E_FAIL;
-
-    LEVEL eLevel = LEVEL::TOWN_STEP1;
-
-    Add_Work([this, Manifest, eLevel]() -> HRESULT
-        {
-            return CMap_Loader::Preload_Map(
-                m_pDevice,
-                m_pContext,
-                Manifest.strMapManifest,
-                Manifest.strObjectsFile,
-                ETOUI(eLevel));
-        });
-
-    string strContent;
-    CDataLoader::Read_Json(Manifest.strObjectsFile.c_str(), &strContent);
-    json jLevel = json::parse(strContent);
-
-    set<wstring> visited;
-    for (auto& jObj : jLevel["Objects"])
-    {
-        wstring wProto = StrToWstr(jObj["Prototype_Tag"].get<string>());
-        if (!visited.insert(wProto).second) continue;
-
-        if (m_pGameInstance_Proxy->Has_Prototype(ETOUI(eLevel), wProto)) continue;
-
-        Add_Work([this, wProto, eLevel]() -> HRESULT
-            {
-                auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(wProto);
-                if (!pReg) return E_FAIL;
-
-                pReg->ResourceLoader(m_pGameInstance_Proxy, m_pDevice, m_pContext, ETOUI(eLevel));
-                m_pGameInstance_Proxy->Add_Prototype(ETOUI(eLevel), wProto.c_str(),
-                    pReg->CreatorFunc(m_pDevice, m_pContext));
-                return S_OK;
-            });
-    }
-
-    if (!Manifest.strUIFile.empty())
-    {
-        wstring strUIFile = Manifest.strUIFile;
-        Add_Work([this, strUIFile, eLevel]() -> HRESULT
-            {
-                return Ready_Level_UIResources(
-                    m_pGameInstance_Proxy,
-                    m_pDevice,
-                    m_pContext,
-                    strUIFile.c_str(),
-                    ETOUI(eLevel));
-            });
-    }
-
-    return S_OK;
-}
-
-HRESULT CLoader::Ready_Resources_For_BossStage1()
-{
-    return E_NOTIMPL;
-}
-
 CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID, _bool Initialized)
 {
     CLoader* pInstance = new CLoader(pDevice, pContext);
@@ -351,10 +249,14 @@ void CLoader::Free()
 {
     __super::Free();
 
-    WaitForMultipleObjects(WORKER_COUNT, m_hThreads, true, INFINITE);
-    for (_uint i = 0; i < WORKER_COUNT; ++i)
+    WaitForSingleObject(m_hCollector, INFINITE);
+    CloseHandle(m_hCollector);
+
+    if (m_iWorkerCount > 0)
     {
-        CloseHandle(m_hThreads[i]);
+        WaitForMultipleObjects(m_iWorkerCount, m_hThreads, true, INFINITE);
+        for (_uint i = 0; i < m_iWorkerCount; ++i)
+            CloseHandle(m_hThreads[i]);
     }
     
     Safe_Release(m_pGameInstance_Proxy);

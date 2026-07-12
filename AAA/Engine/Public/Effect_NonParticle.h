@@ -100,18 +100,6 @@ protected:
     CEffect_NonParticle(const CEffect_NonParticle& Prototype);
     virtual ~CEffect_NonParticle() = default;
 
-protected:
-    virtual HRESULT Initialize_Prototype() override;
-    virtual HRESULT Initialize(void* pArg) override;
-
-public:
-    virtual void    Priority_Update(_float fTimeDelta) override;
-    virtual void    Update(_float fTimeDelta) override;
-    virtual void    Late_Update(_float fTimeDelta) override;
-    virtual HRESULT Render() override;
-
-    virtual void    Effect_Start() override;
-
 public:
     // Color
     void Set_Color(const _float3& vColor) { m_vColor = vColor; }
@@ -134,16 +122,7 @@ protected:
     _float              m_fRoll{};
 
 private:
-    vector<RATIO_VALUE> m_AlphaRatioValue;
-    vector<RATIO_VALUE> m_SizeRatioValue;
-    vector<RATIO_VALUE_FLOAT3> m_ColorRatioValue;
-
-private:
-    HRESULT Ready_Components();
     void Init_PropertyValue();
-
-protected:
-    virtual void Free() override;
 };
 
 NS_END
