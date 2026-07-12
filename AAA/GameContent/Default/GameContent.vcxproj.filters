@@ -133,6 +133,9 @@
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part">
       <UniqueIdentifier>{40aab48f-b6b1-4fe9-80fa-b4ca0ea5dad0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\00. RectCommon">
+      <UniqueIdentifier>{05c95001-67ec-4480-9c3e-2def286ecfd7}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\01. MeshCommon">
       <UniqueIdentifier>{4e1a2524-bbfd-483d-bc98-1ec9a92b1555}</UniqueIdentifier>
     </Filter>
@@ -1078,9 +1081,6 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\00. RectCommon">
-      <UniqueIdentifier>{05c95001-67ec-4480-9c3e-2def286ecfd7}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -1872,14 +1872,14 @@
     <ClInclude Include="..\public\Projectile_Movement.h">
       <Filter>01. Projectile\Movement</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\RectCommon.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\00. RectCommon</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\RailRideable.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\RailTrack.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RectCommon.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\00. RectCommon</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\RectEmitterCommon.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\04. RectEmitterCommon</Filter>
@@ -2861,14 +2861,14 @@
     <ClCompile Include="..\private\Projectile_Movement.cpp">
       <Filter>01. Projectile\Movement</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\RectCommon.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\00. RectCommon</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\RailRideable.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\RailTrack.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RectCommon.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\00. RectCommon</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\RectEmitterCommon.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\04. RectEmitterCommon</Filter>
