@@ -13,21 +13,6 @@ class CMeshEmitterCommon final : public CEffect_MeshEmitter
 public:
 	struct MESH_EMITTER_COMMON_DESC : public CEffect_MeshEmitter::EFFECT_MESHEMITTER_DESC
 	{
-		_bool bUseDiffuseTexture = false;
-		_bool bUseUnKnownTexture = true;
-
-		_bool bUseTextureCom = false;
-		_uint iTextureLevel = 0;
-		_wstring wstrTextureTag = L"";
-
-		_bool bUseMaskCom = false;
-		_uint iMaskLevel = 0;
-		_wstring wstrMaskTag = L"";
-
-		_bool bCustomShader = false;
-		_uint iCustomShaderLevel = 0;
-		_wstring wstrCustomShaderTag = L"";
-
 	};
 
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_MeshEmitterCommon";

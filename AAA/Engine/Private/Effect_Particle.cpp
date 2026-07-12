@@ -196,6 +196,10 @@ void CEffect_Particle::Update_Core(const _float fTimeDelta, const _float fRatio)
 {
     __super::Update_Core(fTimeDelta, fRatio);
 
+    if (m_bOrbitChange == true)
+        Set_LocalPositionFromProperty();
+    Update_Orbit(fRatio);
+
     Update_Particles_ByContainerTime(fRatio);
 }
 
