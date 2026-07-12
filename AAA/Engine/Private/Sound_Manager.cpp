@@ -192,21 +192,9 @@ void CSound_Manager::Fade_BGM_Out(_float fSec)
 	m_pBGMChannel = nullptr; 
 }
 
-void CSound_Manager::Play_BGM_Fade(const TCHAR* pSoundKey, float fSec, float fVolume)
+void CSound_Manager::Play_BGM_Fade(const TCHAR* pSoundKey, float fSec, float fVolume, CSound_Handle* pOut)
 {
 	Fade_BGM_Out(fSec);
-
-	m_pBGMChannel = PlayInternal(pSoundKey, fVolume, ESoundBus::BGM, true);
-
-	if (!m_pBGMChannel)
-		return;
-
-	Fade_BGM_Channel(m_pBGMChannel, 0.f, 1.f, fSec, false);
-}
-
-void CSound_Manager::Play_BGM_Fade(const TCHAR* pSoundKey, float fInSec, float fOutSec, float fVolume, CSound_Handle* pOut)
-{
-	Fade_BGM_Out(fOutSec);
 
 	m_pBGMChannel = PlayInternal(pSoundKey, fVolume, ESoundBus::BGM, true);
 
@@ -216,7 +204,7 @@ void CSound_Manager::Play_BGM_Fade(const TCHAR* pSoundKey, float fInSec, float f
 	if (!m_pBGMChannel)
 		return;
 
-	Fade_BGM_Channel(m_pBGMChannel, 0.f, 1.f, fInSec, false);
+	Fade_BGM_Channel(m_pBGMChannel, 0.f, 1.f, fSec, false);
 }
 
 void CSound_Manager::Resume_BGM_Fade(CSound_Handle& hBgm, float fInSec)

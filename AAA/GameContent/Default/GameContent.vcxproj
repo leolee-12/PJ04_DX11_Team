@@ -55,6 +55,7 @@
     <ClInclude Include="..\public\Camera_AreaCam.h" />
     <ClInclude Include="..\public\Camera_Boss.h" />
     <ClInclude Include="..\public\Camera_Cutscene.h" />
+    <ClInclude Include="..\public\Camera_Dialogue.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\public\Camera_Shakeable.h" />
     <ClInclude Include="..\Public\Cappy.h" />
@@ -176,6 +177,7 @@
     <ClInclude Include="..\public\Projectile_Movement.h" />
     <ClInclude Include="..\public\UI_CoordinatorContainer.h" />
     <ClInclude Include="..\public\UI_CutFade.h" />
+    <ClInclude Include="..\public\UI_Dialogue.h" />
     <ClInclude Include="..\Public\UI_FlashCurtain.h" />
     <ClInclude Include="..\public\CutsceneActor.h" />
     <ClInclude Include="..\public\CutsceneGorilla.h" />
@@ -206,7 +208,6 @@
     <ClInclude Include="..\Public\LevelDesign_Food.h" />
     <ClInclude Include="..\Public\LevelDesign_Ladder.h" />
     <ClInclude Include="..\Public\LevelDesign_Point.h" />
-    <ClInclude Include="..\Public\LevelDesign_Portal.h" />
     <ClInclude Include="..\public\GigantEdge_Brain.h" />
     <ClInclude Include="..\Public\Kirby_Damaged.h" />
     <ClInclude Include="..\Public\LevelDesign_Starblock.h" />
@@ -361,6 +362,7 @@
     <ClInclude Include="..\public\UI_MissionPanel.h" />
     <ClInclude Include="..\public\UI_MovableContainer.h" />
     <ClInclude Include="..\Public\UI_PointStar.h" />
+    <ClInclude Include="..\public\UI_QTE.h" />
     <ClInclude Include="..\Public\UI_SpriteAnim.h" />
     <ClInclude Include="..\public\UI_SpriteAnimCurtain.h" />
     <ClInclude Include="..\public\UI_StageClear.h" />
@@ -410,6 +412,7 @@
     <ClCompile Include="..\private\Camera_AreaCam.cpp" />
     <ClCompile Include="..\private\Camera_Boss.cpp" />
     <ClCompile Include="..\private\Camera_Cutscene.cpp" />
+    <ClCompile Include="..\private\Camera_Dialogue.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Camera_Shakeable.cpp" />
     <ClCompile Include="..\Private\Cappy.cpp" />
@@ -530,6 +533,7 @@
     <ClCompile Include="..\private\Projectile_Movement.cpp" />
     <ClCompile Include="..\private\UI_CoordinatorContainer.cpp" />
     <ClCompile Include="..\private\UI_CutFade.cpp" />
+    <ClCompile Include="..\private\UI_Dialogue.cpp" />
     <ClCompile Include="..\Private\UI_FlashCurtain.cpp" />
     <ClCompile Include="..\private\CutsceneActor.cpp" />
     <ClCompile Include="..\private\CutsceneGorilla.cpp" />
@@ -586,7 +590,6 @@
     <ClCompile Include="..\Private\LevelDesign_Loader.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Parser.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Point.cpp" />
-    <ClCompile Include="..\Private\LevelDesign_Portal.cpp" />
     <ClCompile Include="..\Private\LevelDesign_ProtoRegister.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Rail.cpp" />
     <ClCompile Include="..\Private\LevelDesign_Registry.cpp" />
@@ -693,6 +696,7 @@
     <ClCompile Include="..\private\UI_MissionPanel.cpp" />
     <ClCompile Include="..\private\UI_MovableContainer.cpp" />
     <ClCompile Include="..\Private\UI_PointStar.cpp" />
+    <ClCompile Include="..\private\UI_QTE.cpp" />
     <ClCompile Include="..\Private\UI_SpriteAnim.cpp" />
     <ClCompile Include="..\private\UI_SpriteAnimCurtain.cpp" />
     <ClCompile Include="..\private\UI_StageClear.cpp" />

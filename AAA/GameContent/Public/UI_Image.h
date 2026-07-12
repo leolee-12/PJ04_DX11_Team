@@ -58,6 +58,12 @@ public:
 		pOut->strPrototypeTag = PROTOTYPE_TAG;
 	}
 
+	void Set_Alpha(_float fAlpha) { m_fAlpha = fAlpha; }
+	void Set_Color(const _float4& vColor) { m_vColor = vColor; }
+
+	const _float4& Get_Color2() const { return m_vColor2; }
+	void Set_Color2(const _float4& vColor) { m_vColor2 = vColor; }
+
 	//  Editor에서 텍스처 바로 바꾸기 위한 용도
 	HRESULT					Set_Texture(_int iLevel, const _wstring& strProtoTag);
 

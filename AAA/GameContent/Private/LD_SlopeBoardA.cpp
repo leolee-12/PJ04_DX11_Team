@@ -89,7 +89,12 @@ HRESULT CLD_SlopeBoardA::Initialize(void* pArg)
 			{ ANIM_LANDSTARTFRONT, false, SLOPEBOARD_A_ANIM_SPEED },
 	};
 
-	return Ready_AnimPlayDescs(AnimDescs, static_cast<_uint>(_countof(AnimDescs)));
+	if (FAILED(Ready_AnimPlayDescs(AnimDescs, static_cast<_uint>(_countof(AnimDescs)))))
+		return E_FAIL;
+
+	m_bUseShadow = true;
+
+	return S_OK;
 }
 
 HRESULT CLD_SlopeBoardA::Validate_Initialized()

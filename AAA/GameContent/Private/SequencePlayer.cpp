@@ -41,9 +41,33 @@ HRESULT CSequencePlayer::Load(const _wstring& strFilePath)
         tStep.strTag = StrToWstr(jStep.value("tag", ""));
         tStep.strActor = StrToWstr(jStep.value("actor", ""));
         tStep.strAnchor = StrToWstr(jStep.value("anchor", ""));
+        if (jStep.contains("wait") && jStep["wait"].is_number())
+            tStep.fDuration = jStep["wait"].get<_float>();
+        else
+            tStep.fDuration = jStep.value("duration", 0.f);
+
+        tStep.strTag = StrToWstr(jStep.value("tag", ""));
+        tStep.strActor = StrToWstr(jStep.value("actor", ""));
+        tStep.strAnchor = StrToWstr(jStep.value("anchor", ""));
         tStep.strClip = StrToWstr(jStep.value("clip", ""));
-        tStep.strTextId = StrToWstr(jStep.value("text_id", ""));
-        tStep.bWait = jStep.value("wait", true);
+        tStep.strSpeaker = StrToWstr(jStep.value("name", ""));
+        if (jStep.contains("text"))
+        {
+            auto& jText = jStep["text"];
+            if (jText.is_array())
+            {
+                const size_t iCount = min<size_t>(jText.size(), 3);
+                for (size_t k = 0; k < iCount; ++k)
+                    tStep.strLines[k] = StrToWstr(jText[k].get<string>());
+            }
+            else
+                tStep.strLines[0] = StrToWstr(jText.get<string>());
+        }
+        tStep.bLoop = jStep.value("loop", false);
+        tStep.strCamShot = StrToWstr(jStep.value("cam", ""));
+        tStep.fCamBlend = jStep.value("camblend", -1.f);
+        tStep.fAnimSpeed = jStep.value("speed", 1.f);
+        tStep.fAnimBlend = jStep.value("blend", 0.2f);
 
         m_Steps.push_back(tStep);
     }
@@ -88,6 +112,14 @@ void CSequencePlayer::Update(_float fTimeDelta)
 
 void CSequencePlayer::Enter_Step(const SEQUENCE_STEP& tStep)
 {
+    if (!tStep.strCamShot.empty())
+    {
+        DIALOGUE_CAMSHOT_DESC Desc{};
+        Desc.strShot = tStep.strCamShot;
+        Desc.fBlendDur = tStep.fCamBlend;
+        m_pGameInstance_Proxy->Publish(EventTag::Dialogue_CamShot, &Desc);
+    }
+
     switch (tStep.eType)
     {
         case ESTEP::EVENT:
@@ -96,11 +128,11 @@ void CSequencePlayer::Enter_Step(const SEQUENCE_STEP& tStep)
         case ESTEP::WARP:
             Execute_Warp(tStep);
             break;
-        case ESTEP::ANIM:   // 3단계에서 구현
-            OutputDebugStringW(L"[SequencePlayer] anim step (stub)\n");
+        case ESTEP::ANIM:
+            Execute_Anim(tStep);
             break;
-        case ESTEP::SAY:    // 4단계에서 구현
-            OutputDebugStringW(L"[SequencePlayer] say step (stub)\n");
+        case ESTEP::SAY:
+            Execute_Say(tStep);
             break;
         default:
             break;
@@ -111,10 +143,11 @@ _bool CSequencePlayer::Is_StepDone(const SEQUENCE_STEP& tStep)
 {
     switch (tStep.eType)
     {
-        case ESTEP::WAIT:
-            return m_fStepTime >= tStep.fDuration;
+        case ESTEP::SAY:
+            return m_bSayDone;    // UI 좌클릭이 Dialogue_SayDone -> 어레인저 중계로 세워줌
+
         default:
-            return true;    // event/warp는 즉발, anim/say는 스텁이라 즉시 통과
+            return m_fStepTime >= tStep.fDuration;
     }
 }
 
@@ -170,24 +203,36 @@ void CSequencePlayer::Execute_Anim(const SEQUENCE_STEP& tStep)
         return;
     }
 
-    // 커비: 이벤트 계약으로 위임. 상태 처리 방식은 커비 측 자유
     if (dynamic_cast<CKirby*>(it->second))
     {
         SEQUENCE_KIRBY_ANIM_DESC Desc{};
         Desc.strClip = WstrToStr(tStep.strClip);
         Desc.bLoop = tStep.bLoop;
+        Desc.fSpeed = tStep.fAnimSpeed;
+        Desc.fBlendDuration = tStep.fAnimBlend;
         m_pGameInstance_Proxy->Publish(EventTag::Sequence_KirbyAnim, &Desc);
         return;
     }
 
-    // NPC: CutsceneActor 직접 재생
     if (auto pActor = dynamic_cast<CCutsceneActor*>(it->second))
     {
-        pActor->Play(WstrToStr(tStep.strClip).c_str(), tStep.bLoop);
+        pActor->Play(WstrToStr(tStep.strClip).c_str(), tStep.bLoop, tStep.fAnimBlend, tStep.fAnimSpeed);
         return;
     }
 
     OutputDebugStringW(L"[SequencePlayer] anim: actor type not supported\n");
+}
+
+void CSequencePlayer::Execute_Say(const SEQUENCE_STEP& tStep)
+{
+    m_bSayDone = false;
+
+    DIALOGUE_SAY_DESC Desc{};
+    Desc.strSpeaker = tStep.strSpeaker;
+    for (_uint i = 0; i < 3; ++i)
+        Desc.strLines[i] = tStep.strLines[i];
+
+    m_pGameInstance_Proxy->Publish(EventTag::Dialogue_Say, &Desc);
 }
 
 CSequencePlayer* CSequencePlayer::Create(CGameInstance_Proxy* pProxy)

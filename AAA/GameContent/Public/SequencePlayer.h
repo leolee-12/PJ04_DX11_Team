@@ -23,9 +23,13 @@ public:
         _wstring strTag;                 // event: 발행할 이벤트 태그
         _wstring strActor;               // warp / anim
         _wstring strAnchor;              // warp
-        _wstring strClip;                // anim (3단계에서 구현)
-        _wstring strTextId;              // say (4단계에서 구현)
-        _bool    bWait = { true };        // anim/say: 완료까지 대기 여부
+        _wstring strClip;                
+        _wstring strSpeaker;             // say: 화자 이름
+        _wstring strLines[3];
+        _wstring strCamShot;
+        _float   fCamBlend;
+        _float   fAnimSpeed = { 1.f };
+        _float   fAnimBlend = { 0.2f };
         _bool    bLoop = { false };
     };
 
@@ -44,6 +48,7 @@ public:
 
     _bool Is_Playing() const { return m_bPlaying; }
     _bool Is_Finished() const { return m_bFinished; }
+    void  Notify_SayDone() { m_bSayDone = true; }
 
 private:
     void Enter_Step(const SEQUENCE_STEP& tStep);     // 스텝 진입 시 1회 실행
@@ -52,6 +57,7 @@ private:
 
     void Execute_Warp(const SEQUENCE_STEP& tStep);
     void Execute_Anim(const SEQUENCE_STEP& tStep);
+    void Execute_Say(const SEQUENCE_STEP& tStep);
 
 private:
     CGameInstance_Proxy* m_pGameInstance_Proxy = { nullptr };   // 소유자보다 오래 살지 않으므로 참조만
@@ -64,6 +70,7 @@ private:
     _float m_fStepTime = { 0.f };
     _bool  m_bPlaying = { false };
     _bool  m_bFinished = { false };
+    _bool  m_bSayDone = { false };
 
 public:
     static CSequencePlayer* Create(CGameInstance_Proxy* pProxy);

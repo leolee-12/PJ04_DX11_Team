@@ -69,6 +69,9 @@ private:
 	_float						m_fJumpHeight = { 0.f };
 	_float						m_fJumpT = { 0.f };
 
+	static constexpr _float		s_fKB_MaxStrength = { 16.f };
+	static constexpr _float		s_fKO_MinStrength = { 12.f };
+
 private:
 	void						Start_Launch(_fvector vAttackerPos, _float fStrength, _float fUpRatio);
 

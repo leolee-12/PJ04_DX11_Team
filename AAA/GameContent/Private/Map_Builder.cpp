@@ -139,21 +139,16 @@ HRESULT CMap_Builder::Build_StageDesc(const MAP_MANIFEST_DESC& Manifest, MAP_STA
 	if (nullptr == pOutStageDesc || nullptr == m_pResolver)
 		return E_FAIL;
 
-	const size_t iSectionCount = Manifest.SectionNames.size();
-	if (Manifest.SectionTypes.size() != iSectionCount
-		|| Manifest.SectionRenderIDs.size() != iSectionCount)
-	{
-		return E_FAIL;
-	}
+	const size_t iSectionCount = Manifest.Sections.size();
 
 	pOutStageDesc->strStageName = Manifest.strStageName;
 	pOutStageDesc->iSectionProtoLevel = 0;
 	pOutStageDesc->SectionDescs.clear();
 	pOutStageDesc->SectionDescs.reserve(iSectionCount);
 
-	for (size_t i = 0; i < iSectionCount; ++i)
+	for (const MAP_MANIFEST_SECTION& Section : Manifest.Sections)
 	{
-		const _wstring& strSectionName = Manifest.SectionNames[i];
+		const _wstring& strSectionName = Section.strName;
 
 		_wstring wstrModelPath;
 		_wstring wstrModelProtoTag;
@@ -177,8 +172,8 @@ HRESULT CMap_Builder::Build_StageDesc(const MAP_MANIFEST_DESC& Manifest, MAP_STA
 		Desc.wstrModelPath = wstrModelPath;
 		Desc.wstrModelProtoTag = wstrModelProtoTag;
 		Desc.iModelProtoLevel = 0;
-		Desc.eSectionType = Manifest.SectionTypes[i];
-		Desc.eRenderID = Manifest.SectionRenderIDs[i];
+		Desc.eSectionType = Section.eType;
+		Desc.eRenderID = Section.eRenderID;
 		Desc.bRenderable = true;
 		Desc.bEnableCulling = true;
 		Desc.bUseCollMesh = true;
@@ -237,7 +232,7 @@ HRESULT CMap_Builder::Build_EnvDescs(const MAP_MANIFEST_DESC& Manifest, vector<E
 				Desc.tCollision.bHasDecorCollisionApxbin = false;
 			}
 
-			pOutEnvDescs->push_back(Desc);
+			pOutEnvDescs->push_back(std::move(Desc));
 		}
 
 		pOutJsonPaths->push_back(strJsonPath);
@@ -259,7 +254,7 @@ HRESULT CMap_Builder::Validate_And_Filter(MAP_PACKAGE* pPackage)
 	_uint iLoggedMissingModel = 0;
 #endif
 
-	for (const ENV_OBJECT_DESC& Desc : pPackage->EnvObjectDescs)
+	for (ENV_OBJECT_DESC& Desc : pPackage->EnvObjectDescs)
 	{
 		if (EnvObject_NeedsModel(Desc)
 			&& (Desc.wstrModelPath.empty() || Desc.wstrModelProtoTag.empty()))
@@ -275,7 +270,7 @@ HRESULT CMap_Builder::Validate_And_Filter(MAP_PACKAGE* pPackage)
 			continue;
 		}
 
-		Filtered.push_back(Desc);
+		Filtered.push_back(std::move(Desc));
 	}
 
 	pPackage->EnvObjectDescs.swap(Filtered);

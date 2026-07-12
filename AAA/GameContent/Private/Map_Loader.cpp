@@ -15,6 +15,7 @@
 
 #include <mutex>
 #include <filesystem>
+#include <memory>
 
 namespace
 {
@@ -28,8 +29,17 @@ namespace
 	constexpr _tchar kMapTexPoolRoot[] = L"../../Resources/Map/TexPool";
 	_bool g_bMapTexHubReady = false;
 	mutex g_MapTexHubMutex;
+
+	using MAP_PACKAGE_HANDLE = shared_ptr<const MAP_PACKAGE>;
+
+	struct MAP_PACKAGE_CACHE_ENTRY
+	{
+		MAP_PACKAGE_HANDLE pPackage;
+		MAP_PACKAGE_BUILD_OPTIONS BuildOptions;
+	};
+
 	mutex g_MapPackageCacheMutex;
-	unordered_map<_wstring, MAP_PACKAGE> g_MapPackageCache;
+	unordered_map<_wstring, MAP_PACKAGE_CACHE_ENTRY> g_MapPackageCache;
 
 	_bool Is_EnvPickingModelProtoTag(const _wstring& strModelProtoTag)
 	{
@@ -98,26 +108,68 @@ namespace
 		return to_wstring(iRuntimeLevel) + L"|" + strManifestPath;
 	}
 
-	void Store_MapPackage(const _wstring& strManifestPath, _uint iRuntimeLevel, const MAP_PACKAGE& Package)
+	MAP_PACKAGE_BUILD_OPTIONS Make_PackageBuildOptions(const MAP_LOAD_OPTIONS& Options)
 	{
-		lock_guard<mutex> lock(g_MapPackageCacheMutex);
-		g_MapPackageCache[Make_MapCacheKey(strManifestPath, iRuntimeLevel)] = Package;
+		MAP_PACKAGE_BUILD_OPTIONS BuildOptions{};
+		BuildOptions.bBuildStage = Options.bLoadStage;
+		BuildOptions.bBuildEnv = Options.bLoadEnv;
+		BuildOptions.bBuildLevelDesignPaths = Options.bLoadLevelDesign;
+		BuildOptions.bApplyDelta = true;
+		return BuildOptions;
 	}
 
-	bool Try_GetMapPackage(const _wstring& strManifestPath,
+	MAP_EDIT_APPLY_OPTIONS Make_PackageApplyOptions(const MAP_LOAD_OPTIONS& Options)
+	{
+		MAP_EDIT_APPLY_OPTIONS ApplyOptions{};
+		ApplyOptions.bApplyStage = Options.bLoadStage;
+		ApplyOptions.bApplyEnv = Options.bLoadEnv;
+		ApplyOptions.bApplyAddedObjects = Options.bLoadEnv;
+		return ApplyOptions;
+	}
+
+	_bool Has_PackageBuildScope(
+		const MAP_PACKAGE_BUILD_OPTIONS& Cached,
+		const MAP_PACKAGE_BUILD_OPTIONS& Required)
+	{
+		return (!Required.bBuildStage || Cached.bBuildStage)
+			&& (!Required.bBuildEnv || Cached.bBuildEnv)
+			&& (!Required.bBuildLevelDesignPaths || Cached.bBuildLevelDesignPaths);
+	}
+
+	void Store_MapPackage(
+		const _wstring& strManifestPath,
 		_uint iRuntimeLevel,
-		MAP_PACKAGE* pOutPackage)
+		const MAP_PACKAGE_BUILD_OPTIONS& BuildOptions,
+		MAP_PACKAGE&& Package)
+	{
+		MAP_PACKAGE_HANDLE pPackage = make_shared<MAP_PACKAGE>(move(Package));
+
+		lock_guard<mutex> Lock(g_MapPackageCacheMutex);
+		g_MapPackageCache[Make_MapCacheKey(strManifestPath, iRuntimeLevel)] = {
+				pPackage,
+				BuildOptions
+		};
+	}
+
+	_bool Try_GetMapPackage(
+		const _wstring& strManifestPath,
+		_uint iRuntimeLevel,
+		const MAP_PACKAGE_BUILD_OPTIONS& RequiredBuildOptions,
+		MAP_PACKAGE_HANDLE* pOutPackage)
 	{
 		if (nullptr == pOutPackage)
 			return false;
 
-		lock_guard<mutex> lock(g_MapPackageCacheMutex);
+		lock_guard<mutex> Lock(g_MapPackageCacheMutex);
 
-		const auto iter = g_MapPackageCache.find(Make_MapCacheKey(strManifestPath, iRuntimeLevel));
-		if (iter == g_MapPackageCache.end())
+		const auto Iter = g_MapPackageCache.find(Make_MapCacheKey(strManifestPath, iRuntimeLevel));
+		if (Iter == g_MapPackageCache.end())
 			return false;
 
-		*pOutPackage = iter->second;
+		if (!Has_PackageBuildScope(Iter->second.BuildOptions, RequiredBuildOptions))
+			return false;
+
+		*pOutPackage = Iter->second.pPackage;
 		return true;
 	}
 
@@ -274,9 +326,11 @@ HRESULT CMap_Loader::Load_FromManifest(
 		return E_FAIL;
 	}
 
+	const MAP_PACKAGE_BUILD_OPTIONS BuildOptions = Make_PackageBuildOptions(Options);
+
 	MAP_PACKAGE Package{};
 
-	HRESULT hr = Build_Package(strManifestPath, &Package);
+	HRESULT hr = Build_Package(strManifestPath, BuildOptions, &Package);
 	if (FAILED(hr))
 		return hr;
 
@@ -455,8 +509,10 @@ HRESULT CMap_Loader::Preload_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 	if (nullptr == pMapLoader)
 		return E_FAIL;
 
+	const MAP_PACKAGE_BUILD_OPTIONS BuildOptions = Make_PackageBuildOptions(Options);
+
 	MAP_PACKAGE Package{};
-	HRESULT hr = pMapLoader->Build_Package(strManifestPath, &Package);
+	HRESULT hr = pMapLoader->Build_Package(strManifestPath, BuildOptions, &Package);
 
 	if (SUCCEEDED(hr))
 	{
@@ -478,7 +534,7 @@ HRESULT CMap_Loader::Preload_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 	}
 
 	if (SUCCEEDED(hr))
-		Store_MapPackage(strManifestPath, iRuntimeLevel, Package);
+		Store_MapPackage(strManifestPath, iRuntimeLevel, BuildOptions, move(Package));
 
 	Safe_Release(pMapLoader);
 	return hr;
@@ -506,11 +562,21 @@ HRESULT CMap_Loader::Preload_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 	if (nullptr == pMapLoader)
 		return E_FAIL;
 
-	MAP_PACKAGE Package{};
-	HRESULT hr = pMapLoader->Build_Package(strResolvedManifestPath, &Package);
+	const MAP_PACKAGE_BUILD_OPTIONS BuildOptions = Make_PackageBuildOptions(Options);
 
-	if (SUCCEEDED(hr) && MapContentDesc.bHasMapContent)
-		hr = CMap_EditFile::Apply_Change(&Package, MapContentDesc.OverrideDesc);
+	MAP_PACKAGE Package{};
+	HRESULT hr = pMapLoader->Build_Package(strResolvedManifestPath, BuildOptions, &Package);
+
+	MAP_PACKAGE PreloadPackage{};
+	if (SUCCEEDED(hr))
+	{
+		PreloadPackage = Package;
+
+		if (MapContentDesc.bHasMapContent)
+		{
+			hr = CMap_EditFile::Apply_Change(&PreloadPackage, MapContentDesc.OverrideDesc, Make_PackageApplyOptions(Options));
+		}
+	}
 
 	if (SUCCEEDED(hr))
 	{
@@ -521,17 +587,17 @@ HRESULT CMap_Loader::Preload_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 		if (Options.bLoadStage || Options.bLoadEnv)
 		{
-			hr = pMapLoader->Ready_Prototypes(Levels, Package);
+			hr = pMapLoader->Ready_Prototypes(Levels, PreloadPackage);
 		}
 
 		if (SUCCEEDED(hr) && Options.bLoadLevelDesign)
 		{
-			hr = pMapLoader->Preload_LevelDesignEntries(Package, Levels);
+			hr = pMapLoader->Preload_LevelDesignEntries(PreloadPackage, Levels);
 		}
 	}
 
 	if (SUCCEEDED(hr))
-		Store_MapPackage(strResolvedManifestPath, iRuntimeLevel, Package);
+		Store_MapPackage(strResolvedManifestPath, iRuntimeLevel, BuildOptions, move(Package));
 
 	Safe_Release(pMapLoader);
 	return hr;
@@ -545,7 +611,8 @@ HRESULT CMap_Loader::Spawn_Map(
 	MAP_LOAD_RESULT* pOutReport,
 	CMapStage** ppOutStage,
 	const MAP_LOAD_OPTIONS& Options,
-	const MAP_EDIT_CHANGE* pLevelDesignOverrideDesc)
+	const MAP_EDIT_CHANGE* pLevelDesignOverrideDesc,
+	const MAP_EDIT_CHANGE* pMapOverrideDesc)
 {
 	if (nullptr == pDevice || nullptr == pContext || strManifestPath.empty())
 		return E_FAIL;
@@ -557,9 +624,35 @@ HRESULT CMap_Loader::Spawn_Map(
 		return E_FAIL;
 	}
 
-	MAP_PACKAGE Package{};
-	if (!Try_GetMapPackage(strManifestPath, iRuntimeLevel, &Package))
+	const MAP_PACKAGE_BUILD_OPTIONS RequiredBuildOptions = Make_PackageBuildOptions(Options);
+
+	MAP_PACKAGE_HANDLE pCachedPackage;
+	if (!Try_GetMapPackage(
+		strManifestPath,
+		iRuntimeLevel,
+		RequiredBuildOptions,
+		&pCachedPackage))
+	{
 		return E_FAIL;
+	}
+
+	MAP_PACKAGE OverridePackage{};
+	const MAP_PACKAGE* pSpawnPackage = pCachedPackage.get();
+
+	if (nullptr != pMapOverrideDesc)
+	{
+		OverridePackage = *pCachedPackage;
+
+		if (FAILED(CMap_EditFile::Apply_Change(
+			&OverridePackage,
+			*pMapOverrideDesc,
+			Make_PackageApplyOptions(Options))))
+		{
+			return E_FAIL;
+		}
+
+		pSpawnPackage = &OverridePackage;
+	}
 
 	CMap_Loader* pMapLoader = Create(pDevice, pContext);
 	if (nullptr == pMapLoader)
@@ -581,11 +674,27 @@ HRESULT CMap_Loader::Spawn_Map(
 
 	HRESULT hr = S_OK;
 
+	if (nullptr != pMapOverrideDesc && (Options.bLoadStage || Options.bLoadEnv))
+	{
+		hr = pMapLoader->Ready_Prototypes(Levels, *pSpawnPackage);
+		if (FAILED(hr))
+		{
+			Safe_Release(pMapLoader);
+			return hr;
+		}
+	}
+
 	if (Options.bLoadStage || Options.bLoadEnv)
-		hr = pMapLoader->Spawn(Package, Request, pOutReport);
+		hr = pMapLoader->Spawn(*pSpawnPackage, Request, pOutReport);
 
 	if (SUCCEEDED(hr) && Options.bLoadLevelDesign)
-		hr = pMapLoader->Load_LevelDesignEntries(Package, Request, pOutReport, pLevelDesignOverrideDesc);
+	{
+		hr = pMapLoader->Load_LevelDesignEntries(
+			*pSpawnPackage,
+			Request,
+			pOutReport,
+			pLevelDesignOverrideDesc);
+	}
 
 	Safe_Release(pMapLoader);
 	return hr;
@@ -640,6 +749,7 @@ HRESULT CMap_Loader::Spawn_Map(
 		pOutReport,
 		ppStageForSpawn,
 		Options,
+		pLevelDesignOverrideDesc,
 		pLevelDesignOverrideDesc);
 
 	if (FAILED(hrSpawn))

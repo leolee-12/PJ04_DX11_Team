@@ -24,7 +24,6 @@ private:
 	CMapSection(const CMapSection& Prototype);
 	virtual ~CMapSection() = default;
 
-	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual HRESULT Validate_Initialized() override;
 
@@ -37,10 +36,6 @@ public:
 	void	Refresh_WorldBounds();
 	void	Set_ParentMatrix(const _float4x4* pParentMatrix);
 	void	Refresh_CombinedWorldMatrix();
-
-#ifdef _DEBUG
-	void	Reset_FrameProfile();
-#endif
 
 public:
 	json	Serialize_SectionState() const;
@@ -71,8 +66,6 @@ public:
 #pragma endregion
 
 #ifdef _DEBUG
-	const MAP_SECTION_PROFILE& Get_Profile() const { return m_Profile; }
-
 	void	Set_EditorSoloMeshIndex(_int iMeshIndex);
 	void	Clear_EditorSoloMesh();
 	_int	Get_EditorSoloMeshIndex() const { return m_iEditorSoloMeshIndex; }
@@ -97,8 +90,6 @@ private:
 	physx::PxRigidStatic* m_pColliderActor = { nullptr };
 
 #ifdef _DEBUG
-	MAP_SECTION_PROFILE	m_Profile = {};
-
 	_int m_iEditorSoloMeshIndex = -1;
 	
 private:

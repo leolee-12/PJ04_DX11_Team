@@ -110,7 +110,6 @@ void CKirby_Clear::Enter_ClearState(CKirby* pKirby, CLEAR_STATE eState)
         case CLEAR_STATE::CUT1:
             break;
         case CLEAR_STATE::DANCE:
-            m_pGameInstance_Proxy->Publish(EventTag::Cutscene_KirbyDancing, nullptr);       
             break;
         case CLEAR_STATE::CLEAR_END:
             break;

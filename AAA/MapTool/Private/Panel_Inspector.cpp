@@ -1,21 +1,19 @@
 ﻿#include "Panel_Inspector.h"
 #include "EditInstance.h"
 #include "Level_Edit.h"
+
 #include "Shader_PassMeta.h"
 #include "MapStage.h"
 #include "MapSection.h"
 #include "MapEvent_BreakWall.h"
 #include "Map_EditFile.h"
 #include "Map_EditSession.h"
-#include "EnvObject.h"
 #include "EnvTrigger_RenderGlobals.h"
-#include "LevelDesignObject.h"
 #include "LevelDesign_Bush.h"
 #include "Editable.h"
 #include "EffectPart_Enum.h"
 
 #include "GameInstance.h"
-#include "GameObject.h"
 #include "ContainerObject.h"
 #include "PartObject.h"
 #include "UIContainerObject.h"
@@ -377,10 +375,12 @@ void CPanel_Inspector::Render()
 	Draw_MeshLayerPanel(pSelected);
 
 	ImGui::Separator();
-	bRenderGlobalsDirty |= Draw_Properties(pSelected);
-
-	if (bRenderGlobalsDirty)
+	const _bool bPropertiesChanged = Draw_Properties(pSelected);
+	if (bPropertiesChanged)
 	{
+		if (auto* pTrigger = dynamic_cast<Client::CEnvObject_Trigger*>(pSelected))
+			pTrigger->Mark_TriggerDirty();
+
 		if (auto* pRenderGlobals = dynamic_cast<Client::CEnvTrigger_RenderGlobals*>(pSelected))
 			pRenderGlobals->Apply_RenderGlobals();
 	}
@@ -457,6 +457,8 @@ _bool CPanel_Inspector::Draw_Properties(IReflectable* pHolder)
 	const _bool bSkipMapSectionCategory =
 		nullptr != dynamic_cast<CMapSection*>(pHolder)
 		|| nullptr != dynamic_cast<CMapEvent_BreakWall*>(pHolder);
+	const _bool bSkipTriggerAreaRotation =
+		nullptr != dynamic_cast<CEnvObject_Trigger*>(pHolder);
 
 	for (auto& prop : pHolder->Get_Properties())
 	{
@@ -464,6 +466,9 @@ _bool CPanel_Inspector::Draw_Properties(IReflectable* pHolder)
 			continue;
 
 		if (bSkipMapSectionCategory && prop.strCategory == L"MapSection")
+			continue;
+
+		if (bSkipTriggerAreaRotation && prop.strCategory == L"Trigger" && prop.strName == L"Area Rotation")
 			continue;
 
 		const string strPropCategory = WstrToStr(prop.strCategory);
@@ -895,7 +900,8 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 				ImGui::Checkbox(pRenderableLabel, (bool*)pbRenderable);
 
 			ImGui::TextDisabled("Transform and Renderable affect the current preview.");
-			ImGui::TextDisabled("Culling, shadow, and section collision actor are not used by MapEvent_BreakWall.");
+			ImGui::TextDisabled("Culling and section collision actor are not used by MapEvent_BreakWall.");
+			ImGui::TextDisabled("Shadow follows Renderable and break state.");
 		}
 	}
 

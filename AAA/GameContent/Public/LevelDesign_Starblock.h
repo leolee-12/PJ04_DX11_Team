@@ -41,6 +41,7 @@ private:
 public:
 	virtual void    Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+	virtual HRESULT Render_Shadow() override;
 	virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
 	// Damageable
@@ -48,6 +49,7 @@ public:
 
 	// Inhalable
 	virtual void Be_Captured(CGameObject* pInhaler) override;
+	virtual void On_SpatEnd() override;
 	virtual _float3 Get_SpatPivotOffset() const override { return m_vSpatPivot; }
 
 public:
@@ -61,6 +63,7 @@ private:
 	LD_BREAKABLE_DESC m_tBreakableDesc = {};
 
 	_float3 m_vSpatPivot{};
+	_bool m_bCullTransformDynamic = { false };
 
 private:
 	HRESULT			Ready_Components();

@@ -76,6 +76,11 @@ HRESULT CLevelDesign_Food::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
+	if (FAILED(Ready_CullBounds_RotationInvariant(m_pModelCom)))
+		return E_FAIL;
+
+	m_bUseShadow = true;
+
 	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
 
@@ -121,7 +126,8 @@ void CLevelDesign_Food::Late_Update(_float fTimeDelta)
 #endif
 	}
 
-	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+	Check_Visible();
+	Submit_RenderGroups();
 }
 
 HRESULT CLevelDesign_Food::Render()
@@ -130,6 +136,11 @@ HRESULT CLevelDesign_Food::Render()
 		return E_FAIL;
 
 	return Render_Model();
+}
+
+HRESULT CLevelDesign_Food::Render_Shadow()
+{
+	return Render_ShadowModel(m_pShaderCom, m_pModelCom, MESH_LAYER_PROFILE::WORLD_NONANIM);
 }
 
 void CLevelDesign_Food::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)

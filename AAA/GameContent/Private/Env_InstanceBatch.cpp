@@ -166,6 +166,15 @@ HRESULT CEnv_InstanceBatch::Render_Decal()
 	return hr;
 }
 
+HRESULT CEnv_InstanceBatch::Apply_MeshLayer(_uint iMesh, const MESH_LAYER_IDX& Layer)
+{
+	if (nullptr == m_pModelCom || iMesh >= m_pModelCom->Get_NumMeshes())
+		return E_FAIL;
+
+	m_pModelCom->Set_MeshLayer(iMesh, Layer);
+	return S_OK;
+}
+
 HRESULT CEnv_InstanceBatch::Initialize(void* pArg)
 {
 	if (nullptr == pArg)

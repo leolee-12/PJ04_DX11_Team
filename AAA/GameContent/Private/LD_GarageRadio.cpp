@@ -50,6 +50,8 @@ HRESULT CLD_GarageRadio::Initialize(void* pArg)
 
 	Set_AnimPose(ANIM_WAIT, 0.f);
 
+	m_bUseShadow = true;
+
 	return S_OK;
 }
 
@@ -189,7 +191,7 @@ void CLD_GarageRadio::On_AnimEvent(const ANIM_EVENT& AnimEvent, ANIM_EVENT_PHASE
 		if (ePhase == ANIM_EVENT_PHASE::POINT)
 		{
 			if (AnimEvent.iIntParam == 1)
-				m_pGameInstance_Proxy->Play_BGM_Fade(StrToWstr(AnimEvent.strParam).c_str(), AnimEvent.vOffset.x);
+				m_pGameInstance_Proxy->Play_BGM_Fade(StrToWstr(AnimEvent.strParam).c_str(), 2.f, AnimEvent.vOffset.x);
 			else 
 				m_pGameInstance_Proxy->Play_SFX(StrToWstr(AnimEvent.strParam).c_str(), AnimEvent.vOffset.x);
 		}
@@ -227,24 +229,6 @@ CGameObject* CLD_GarageRadio::Clone(void* pArg)
 {
 	CLD_GarageRadio* pInstance = new CLD_GarageRadio(*this);
 	
-	LD_EVENTOBJECT_DESC TempDesc{};
-	if (nullptr == pArg)
-	{
-		TempDesc.strObjectName = OBJECT_NAME;
-		TempDesc.strKind = OBJECT_NAME;
-		TempDesc.eCategory = LD_CATEGORY::GIMMICK;
-		TempDesc.iModelProtoLevel = m_iPrototypeLevel;
-		TempDesc.eModelType = MODEL::ANIM;
-		TempDesc.wstrModelProtoTag = MODEL_PROTO_TAG;
-		TempDesc.bUseCollMesh = false;
-		TempDesc.strAnimEventFile.clear();
-
-		TempDesc.strAnimNames[0] = GARAGE_RADIO_ANIM_NAMES[0];
-		TempDesc.strAnimNames[1] = GARAGE_RADIO_ANIM_NAMES[1];
-
-		pArg = &TempDesc;
-	}
-
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
 		MSG_BOX("Failed to Cloned : CLD_GarageRadio");

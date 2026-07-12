@@ -182,19 +182,14 @@ HRESULT CMap_ProtoRegister::Ready_Prototypes(const MAP_RUNTIME_LEVELS& Levels, c
 
 HRESULT CMap_ProtoRegister::Ready_ObjectPrototypes(_uint iObjectLevel)
 {
-	if (nullptr == m_pProxy)
-		return E_FAIL;
-
-	auto EnsurePrototype = [&](const wchar_t* pPrototypeTag, CGameObject* pPrototype) -> HRESULT
+	auto EnsurePrototype = [&](const wchar_t* pPrototypeTag, auto&& Factory) -> HRESULT
 		{
+			if (m_pProxy->Has_Prototype(iObjectLevel, pPrototypeTag))
+				return S_OK;
+
+			CGameObject* pPrototype = Factory();
 			if (nullptr == pPrototype)
 				return E_FAIL;
-
-			if (m_pProxy->Has_Prototype(iObjectLevel, pPrototypeTag))
-			{
-				Safe_Release(pPrototype);
-				return S_OK;
-			}
 
 			if (FAILED(m_pProxy->Add_Prototype(iObjectLevel, pPrototypeTag, pPrototype)))
 			{
@@ -205,39 +200,59 @@ HRESULT CMap_ProtoRegister::Ready_ObjectPrototypes(_uint iObjectLevel)
 			return S_OK;
 		};
 
-	if (FAILED(EnsurePrototype(CMapSection::PROTOTYPE_TAG, CMapSection::Create(m_pDevice,
-		m_pContext))))
+	if (FAILED(EnsurePrototype(CMapSection::PROTOTYPE_TAG,
+		[&]() -> CGameObject* { return CMapSection::Create(m_pDevice, m_pContext); })))
+	{
 		return E_FAIL;
+	}
 
-	if (FAILED(EnsurePrototype(CMapEvent_BreakWall::PROTOTYPE_TAG, CMapEvent_BreakWall::Create(m_pDevice, m_pContext))))
+	if (FAILED(EnsurePrototype(CMapEvent_BreakWall::PROTOTYPE_TAG,
+		[&]() -> CGameObject* { return CMapEvent_BreakWall::Create(m_pDevice, m_pContext); })))
+	{
 		return E_FAIL;
+	}
 
-	if (FAILED(EnsurePrototype(CMapStage::PROTOTYPE_TAG, CMapStage::Create(m_pDevice, m_pContext))))
+	if (FAILED(EnsurePrototype(CMapStage::PROTOTYPE_TAG,
+		[&]() -> CGameObject* { return CMapStage::Create(m_pDevice, m_pContext); })))
+	{
 		return E_FAIL;
+	}
 
 	if (FAILED(EnsurePrototype(CEnvObject_Static::PROTOTYPE_TAG,
-		CEnvObject_Static::Create(m_pDevice, m_pContext))))
+		[&]() -> CGameObject* { return CEnvObject_Static::Create(m_pDevice, m_pContext); })))
+	{
 		return E_FAIL;
+	}
 
 	if (FAILED(EnsurePrototype(CEnvObject_Interact::PROTOTYPE_TAG,
-		CEnvObject_Interact::Create(m_pDevice, m_pContext))))
+		[&]() -> CGameObject* { return CEnvObject_Interact::Create(m_pDevice, m_pContext); })))
+	{
 		return E_FAIL;
+	}
 
 	if (FAILED(EnsurePrototype(CEnvTrigger_Generic::LEGACY_PROTOTYPE_TAG,
-		CEnvTrigger_Generic::Create(m_pDevice, m_pContext))))
+		[&]() -> CGameObject* { return CEnvTrigger_Generic::Create(m_pDevice, m_pContext); })))
+	{
 		return E_FAIL;
+	}
 
 	if (FAILED(EnsurePrototype(CEnvTrigger_Generic::PROTOTYPE_TAG,
-		CEnvTrigger_Generic::Create(m_pDevice, m_pContext))))
+		[&]() -> CGameObject* { return CEnvTrigger_Generic::Create(m_pDevice, m_pContext); })))
+	{
 		return E_FAIL;
+	}
 
 	if (FAILED(EnsurePrototype(CEnvTrigger_RenderGlobals::PROTOTYPE_TAG,
-		CEnvTrigger_RenderGlobals::Create(m_pDevice, m_pContext))))
+		[&]() -> CGameObject* { return CEnvTrigger_RenderGlobals::Create(m_pDevice, m_pContext); })))
+	{
 		return E_FAIL;
+	}
 
 	if (FAILED(EnsurePrototype(CEnvTrigger_EventPublisher::PROTOTYPE_TAG,
-		CEnvTrigger_EventPublisher::Create(m_pDevice, m_pContext))))
+		[&]() -> CGameObject* { return CEnvTrigger_EventPublisher::Create(m_pDevice, m_pContext); })))
+	{
 		return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -298,21 +313,6 @@ HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_D
 	if (m_pProxy->Has_Prototype(iModelLevel, Desc.wstrModelProtoTag))
 		return S_OK;
 
-//#ifdef _DEBUG
-//	if (bCookCollisionMesh)
-//	{
-//		Log_GameContentInfo(
-//			"[EnvCook] begin object="
-//			+ WstrToStr(Desc.wstrObjectName)
-//			+ " protoTag="
-//			+ WstrToStr(Desc.wstrModelProtoTag)
-//			+ " path="
-//			+ WstrToStr(Desc.wstrModelPath)
-//			+ " apxbin="
-//			+ WstrToStr(Desc.tCollision.strDecorCollisionApxbinName));
-//	}
-//#endif
-
 	const string wstrModelPath = WstrToStr(Desc.wstrModelPath);
 	CModel* pModelPrototype = nullptr;
 
@@ -345,17 +345,6 @@ HRESULT CMap_ProtoRegister::Ready_EnvModel(_uint iModelLevel, const ENV_OBJECT_D
 			+ e.what());
 		return E_FAIL;
 	}
-
-//#ifdef _DEBUG
-//	if (bCookCollisionMesh)
-//	{
-//		Log_GameContentInfo(
-//			"[EnvCook] end object="
-//			+ WstrToStr(Desc.wstrObjectName)
-//			+ " protoTag="
-//			+ WstrToStr(Desc.wstrModelProtoTag));
-//	}
-//#endif
 
 	if (nullptr == pModelPrototype)
 		return E_FAIL;

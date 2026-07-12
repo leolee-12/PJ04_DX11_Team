@@ -12,14 +12,19 @@ NS_BEGIN(Client)
 class CMapStage;
 class CEnv_InstanceController;
 
+struct MAP_MANIFEST_SECTION
+{
+	_wstring strName;
+	MAP_SECTION_TYPE eType = { MAP_SECTION_TYPE::UNKNOWN };
+	RENDERID eRenderID = { RENDERID::NONBLEND };
+};
+
 struct MAP_MANIFEST_DESC
 {
 	_wstring strLevelName;
 	_wstring strStageName;
 	_wstring strStageFolderName;
-	vector<_wstring> SectionNames;
-	vector<MAP_SECTION_TYPE> SectionTypes;
-	vector<RENDERID> SectionRenderIDs;
+	vector<MAP_MANIFEST_SECTION> Sections;
 	vector<_wstring> EnvJsonPaths;
 	vector<_wstring> LevelDesignJsonPaths;
 	_wstring strDeltaPath;
@@ -40,63 +45,6 @@ struct MAP_ADD_OBJECT
 	_wstring strLayerTag;
 	_wstring strObjectTag;
 	json jObject;
-};
-
-struct MAP_ENV_EDITED_DESC
-{
-	_wstring strStableKey;
-
-	_bool bHasRenderable = { false };
-	_bool bRenderable = { true };
-
-	_bool bHasEnableCulling = { false };
-	_bool bEnableCulling = { true };
-
-	_bool bHasUseCullDistance = { false };
-	_bool bUseCullDistance = { true };
-
-	_bool bHasUseCullFrustum = { false };
-	_bool bUseCullFrustum = { true };
-
-	_bool bHasShadow = { false }; // Edit JSON contains UseShadow.
-	_bool bUseShadow = { false };
-
-	_bool bHasWorldMatrix = { false };
-	_float4x4 matWorld = {};
-
-	_bool bHasCollMesh = { false }; // Edit JSON contains UseCollMesh.
-	_bool bUseCollMesh = { false };
-
-	_bool bHasNearDistAlpha = { false };
-	_bool bUseNearDistAlpha = { false };
-};
-
-struct MAP_SECTION_EDITED_DESC
-{
-	_wstring strStableKey;
-
-	_bool bHasRenderable = { false };
-	_bool bRenderable = { true };
-
-	_bool bHasEnableCulling = { false };
-	_bool bEnableCulling = { true };
-
-	_bool bHasWorldMatrix = { false };
-	_float4x4 matWorld = {};
-
-	_bool bHasUseCollMesh = { false };
-	_bool bUseCollMesh = { false };
-
-	_bool bHasRenderID = { false };
-	RENDERID eRenderID = { RENDERID::NONBLEND };
-};
-
-struct MAP_LD_EDITED_DESC
-{
-	_wstring strStableKey;
-
-	_bool bHasWorldMatrix = { false };
-	_float4x4 matWorld = {};
 };
 
 struct MAP_EDIT_CHANGE
@@ -224,32 +172,6 @@ inline _bool Has_AnyEdit(const EDIT_OBJECT_OVERRIDE_DESC& Edit)
 	return 0u != Edit.Common.iPolicyMask
 		|| Edit.Common.bHasWorldMatrix
 		|| Has_AnyClassOverride(Edit.ClassOverride);
-}
-
-inline _bool Has_AnyMapEnvEdit(const MAP_ENV_EDITED_DESC& Edit)
-{
-	return Edit.bHasRenderable
-		|| Edit.bHasEnableCulling
-		|| Edit.bHasUseCullDistance
-		|| Edit.bHasUseCullFrustum
-		|| Edit.bHasShadow
-		|| Edit.bHasWorldMatrix
-		|| Edit.bHasNearDistAlpha
-		|| Edit.bHasCollMesh;
-}
-
-inline _bool Has_AnyMapSectionEdit(const MAP_SECTION_EDITED_DESC& Edit)
-{
-	return Edit.bHasRenderable
-		|| Edit.bHasEnableCulling
-		|| Edit.bHasWorldMatrix
-		|| Edit.bHasUseCollMesh
-		|| Edit.bHasRenderID;
-}
-
-inline _bool Has_AnyMapLDEdit(const MAP_LD_EDITED_DESC& Edit)
-{
-	return Edit.bHasWorldMatrix;
 }
 
 NS_END

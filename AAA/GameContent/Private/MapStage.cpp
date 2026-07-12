@@ -4,8 +4,6 @@
 #include "GameInstance_Proxy.h"
 #include "Math_Utils.h"
 
-#include <chrono>
-
 NS_BEGIN(Client)
 
 namespace
@@ -21,12 +19,6 @@ CMapStage::CMapStage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 CMapStage::CMapStage(const CMapStage& Prototype)
 	: CGameObject(Prototype)
 {
-}
-
-HRESULT CMapStage::Initialize_Prototype()
-{
-	m_eProjType = PROJ_TYPE::PERSPEC;
-	return S_OK;
 }
 
 HRESULT CMapStage::Initialize(void* pArg)
@@ -82,23 +74,8 @@ void CMapStage::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
-#ifdef _DEBUG
-	Reset_ProfileFrame();
-#endif
-
 	Refresh_SectionTransforms();
-
-#ifdef _DEBUG
-	const auto CullingBegin = std::chrono::steady_clock::now();
-#endif
-
 	Submit_VisibleSections();
-
-#ifdef _DEBUG
-	const auto CullingEnd = std::chrono::steady_clock::now();
-	m_Profile.dCullingCpuMs =
-		std::chrono::duration<double, std::milli>(CullingEnd - CullingBegin).count();
-#endif
 }
 
 void CMapStage::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
@@ -200,7 +177,7 @@ HRESULT CMapStage::Ready_Events()
 			[this](void* pData)
 			{
 				UNREFERENCED_PARAMETER(pData);
-				m_pGameInstance_Proxy->Play_SFX(L"GimmickWallStake_Strike.wav", 1.0f, ESoundBus::SFX);
+				m_pGameInstance_Proxy->Play_SFX(L"GimmickWallStake_Strike.wav", 0.6f, ESoundBus::SFX);
 				On_Stage12CarBreakWall();
 			});
 	}
@@ -251,27 +228,6 @@ void CMapStage::Refresh_SectionTransforms()
 	m_bSnapshotValid = true;
 }
 
-#ifdef _DEBUG
-void CMapStage::Reset_ProfileFrame()
-{
-	const _uint iNextFrame = m_Profile.iFrameIndex + 1;
-	m_Profile = {};
-	m_Profile.iFrameIndex = iNextFrame;
-	m_Profile.iTotalSections = static_cast<_uint>(m_Sections.size());
-
-	for (CMapSection* pSection : m_Sections)
-	{
-		if (!pSection->Is_Renderable())
-			continue;
-
-		++m_Profile.iMainCandidateSections;
-		++m_Profile.iShadowCandidateSections;
-
-		pSection->Reset_FrameProfile();
-	}
-}
-#endif
-
 void CMapStage::Submit_VisibleSections()
 {
 	for (CMapSection* pSection : m_Sections)
@@ -294,28 +250,12 @@ void CMapStage::Submit_VisibleSections()
 		{
 			const RENDERID eRenderID = pSection->Get_RenderID();
 			m_pGameInstance_Proxy->Add_RenderGroup(eRenderID, pSection);
-
-#ifdef _DEBUG
-			++m_Profile.iMainVisibleSections;
-			++m_Profile.iMainSubmittedSections;
-			Count_MainSubmitted(eRenderID);
-#endif
-		}
-		else
-		{
-#ifdef _DEBUG
-			++m_Profile.iMainCulledSections;
-#endif
 		}
 
 		// ESM policy:
 		// Map sections must always submit their complete depth to the shadow pass.
 		// Main-camera culling must not remove shadow casters, because off-camera sections can still affect visible shadow results.
 		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pSection);
-
-#ifdef _DEBUG
-		++m_Profile.iShadowSubmittedSections;
-#endif
 	}
 }
 
@@ -331,25 +271,6 @@ void CMapStage::On_Stage12CarBreakWall()
 		return;
 	}
 }
-
-#ifdef _DEBUG
-void CMapStage::Count_MainSubmitted(RENDERID eRenderID)
-{
-	switch (eRenderID)
-	{
-	case RENDERID::NONBLEND:
-		++m_Profile.iMainSubmittedNonBlend;
-		break;
-
-	case RENDERID::BLEND:
-		++m_Profile.iMainSubmittedBlend;
-		break;
-
-	default:
-		break;
-	}
-}
-#endif
 
 CMapStage* CMapStage::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

@@ -285,7 +285,7 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 
 	if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"StartPortal"))
 	{
-		pDesc->eCategory = LD_CATEGORY::PORTAL;
+		pDesc->eCategory = LD_CATEGORY::UNSUPPORTED;
 		JsonUtils::Try_ReadInt(jEntry, "PortalNo", &pDesc->Portal.iPortalNo);
 		JsonUtils::Try_ReadBoolFromNumeric(jEntry, "UseRestartCheck", &pDesc->Portal.bUseRestartCheck);
 		JsonUtils::Try_ReadFloat3Array(jEntry, "RestartAreaOffs", &pDesc->Portal.vRestartAreaOffs);

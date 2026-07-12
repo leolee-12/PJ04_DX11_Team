@@ -34,11 +34,13 @@ HRESULT CShaderGlobal_Manager::Initialize()
 
     Register({ "g_fFogEnable",          "Fog Enable",        GVAL::BOOL,   { 1.f, 0.f, 0.f, 0.f }, { 0.f, 1.f } });
 
-    Register({ "g_fDoFEnable",    "DoF Enable",     GVAL::BOOL,  { 1.f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
-    Register({ "g_fFocusDist",    "DoF FocusDist",  GVAL::FLOAT, { 14.f, 0.f, 0.f, 0.f }, { 0.5f, 100.f } });
-    Register({ "g_fAperture",     "DoF Aperture",   GVAL::FLOAT, { 0.1f, 0.f, 0.f, 0.f }, { 0.1f, 8.f } });
-    Register({ "g_fDoFMaxCoC",    "DoF MaxBlur",    GVAL::FLOAT, { 1.f, 0.f, 0.f, 0.f }, { 1.f, 40.f } });
-    Register({ "g_fDoFAutoFocus", "DoF AutoFocus",  GVAL::BOOL,  { 0.f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
+    Register({ "g_fDoFEnable",     "DoF Enable",       GVAL::BOOL,  { 1.f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
+    Register({ "g_fDoFNear",       "DoF Near",         GVAL::FLOAT, { 6.f,  0.f, 0.f, 0.f }, { 0.1f, 100.f } });
+    Register({ "g_fDoFFar",        "DoF Far",          GVAL::FLOAT, { 100.f, 0.f, 0.f, 0.f }, { 0.5f, 200.f } });
+    Register({ "g_fDoFFarFalloff", "DoF Far Falloff",  GVAL::FLOAT, { 100.f, 0.f, 0.f, 0.f }, { 0.5f, 100.f } });
+    Register({ "g_fDoFCamNear",    "DoF NearRampFrom", GVAL::FLOAT, { 0.1f, 0.f, 0.f, 0.f }, { 0.01f, 10.f } });
+    Register({ "g_fAperture",      "DoF Strength",     GVAL::FLOAT, { 0.5f,  0.f, 0.f, 0.f }, { 0.f, 1.f } });
+    Register({ "g_fDoFMaxCoC",     "DoF MaxBlur",      GVAL::FLOAT, { 1.f, 0.f, 0.f, 0.f }, { 1.f, 40.f } });
 
     Register({ "g_fExposure",    "Exposure",          GVAL::FLOAT, { 1.f, 0.f, 0.f, 0.f }, { 0.f, 4.f } });
     Register({ "g_fToneMapMode", "ToneMap 0R/1A/2E",  GVAL::FLOAT, { 0.0f, 0.f, 0.f, 0.f }, { 0.f, 2.f } });

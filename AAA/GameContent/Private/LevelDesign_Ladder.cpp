@@ -1,9 +1,10 @@
 #include "LevelDesign_Ladder.h"
 #include "LevelDesign_Registry.h"
 #include "MeshLayer_Binder.h"
-#include "Parsing_Utils.h"
 
 #include "GameInstance.h"
+#include "Parsing_Utils.h"
+#include "Geometry_Utils.h"
 
 namespace
 {
@@ -56,6 +57,11 @@ HRESULT CLevelDesign_Ladder::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
+	if (FAILED(Ready_LadderCullBounds()))
+		return E_FAIL;
+
+	m_bUseShadow = true;
+
 	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
 
@@ -99,7 +105,8 @@ void CLevelDesign_Ladder::Late_Update(_float fTimeDelta)
 
 	}
 
-	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
+	Check_Visible();
+	Submit_RenderGroups();
 }
 
 HRESULT CLevelDesign_Ladder::Render()
@@ -123,6 +130,28 @@ HRESULT CLevelDesign_Ladder::Render()
 			return E_FAIL;
 
 		if (FAILED(Render_Model(pModel)))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Ladder::Render_Shadow()
+{
+	const _matrix matBaseWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+	const _uint iLength = m_tLadderDesc.iLength;
+
+	for (_uint i = 0; i < iLength; ++i)
+	{
+		SEGMENT eSegment = SEGMENT::MID;
+
+		if (0 == i) eSegment = SEGMENT::BOT;
+		else if (iLength - 1 == i) eSegment = SEGMENT::TOP;
+
+		_float4x4 WorldMatrix{};
+		XMStoreFloat4x4(&WorldMatrix, XMMatrixTranslation(0.f, m_fSegmentStepY * static_cast<_float>(i), 0.f) * matBaseWorld);
+
+		if (FAILED(Render_ShadowModel(m_pShaderCom, m_ModelComs[eSegment], MESH_LAYER_PROFILE::WORLD_NONANIM, &WorldMatrix)))
 			return E_FAIL;
 	}
 
@@ -321,6 +350,40 @@ HRESULT CLevelDesign_Ladder::Bind_ShaderResources(const _float4x4& WorldMatrix)
 		return E_FAIL;
 
 
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Ladder::Ready_LadderCullBounds()
+{
+	BoundingBox LadderBounds{};
+	_bool bHasBounds = false;
+
+	for (_uint i = 0; i < m_tLadderDesc.iLength; ++i)
+	{
+		SEGMENT eSegment = SEGMENT::MID;
+
+		if (0 == i) eSegment = SEGMENT::BOT;
+		else if (m_tLadderDesc.iLength - 1 == i) eSegment = SEGMENT::TOP;
+
+		_float3 vMin{}, vMax{};
+		m_ModelComs[eSegment]->Get_ModelAABB(&vMin, &vMax);
+
+		BoundingBox SegmentBounds = GeometryUtils::Is_ValidAABB(vMin, vMax)
+			? GeometryUtils::Make_AABB_FromMinMax(vMin, vMax)
+			: GeometryUtils::Make_DefaultAABB(0.5f);
+
+		SegmentBounds.Center.y += m_fSegmentStepY * static_cast<_float>(i);
+
+		LadderBounds = bHasBounds
+			? GeometryUtils::Merge_AABB(LadderBounds, SegmentBounds)
+			: SegmentBounds;
+		bHasBounds = true;
+	}
+
+	if (!bHasBounds)
+		return E_FAIL;
+
+	Set_CullLocalBounds(LadderBounds);
 	return S_OK;
 }
 
