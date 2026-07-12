@@ -17,6 +17,18 @@ class ENGINE_DLL CEffect_Part abstract : public CGameObject
     PROPERTY(_float, m_fEffectIntensity, L"Effect Intensity_E", L"Effect");
     PROPERTY(_float4, m_vEmissiveColor, L"Emissive Color", L"Effect");
 
+    PROPERTY(_bool, m_bEmissiveChange, L"Emissive Change_EM", L"Emissive");
+    PROPERTY(_float4, m_vEmissiveStartValue, L"Start_EM", L"Emissive");
+    PROPERTY(_float4, m_vEmissiveEndValue, L"End_EM", L"Emissive");
+
+    PROPERTY(_bool, m_bActive_Emissive_Ratio_1, L"Active Ratio 1_EM", L"Emissive");
+    PROPERTY(_float, m_fEmissive_Ratio_1, L"Ratio 1_EM", L"Emissive");
+    PROPERTY(_float4, m_vEmissive_Value_1, L"Value 1_EM", L"Emissive");
+
+    PROPERTY(_bool, m_bActive_Emissive_Ratio_2, L"Active Ratio 2_EM", L"Emissive");
+    PROPERTY(_float, m_fEmissive_Ratio_2, L"Ratio 2_EM", L"Emissive");
+    PROPERTY(_float4, m_vEmissive_Value_2, L"Value 2_EM", L"Emissive");
+
     PROPERTY(_float3, m_vLocalPos,      L"Local Pos",   L"Effect");
 
     // Orbit
@@ -71,6 +83,7 @@ public:
     };
 
 protected:
+    enum ShaderPass { Default, AlphaBlend, Additive, ShaderPass_End };
     enum Sampler { DEFAULT, MIRROR, SAMPLER_END };
     enum DepthMode { DEPTH_DEFAULT, DEPTH_IGNORE, DEPTH_MODE_END };
     enum MaskBlendMode { MASK_MULTIPLY, MASK_ADD, MASK_SUBTRACT, MASK_REPLACE, MASK_BLEND_END };
@@ -87,6 +100,12 @@ protected:
     {
         _float fRatio{};
         _float3 vValue{};
+    };
+
+    struct RATIO_VALUE_FLOAT4
+    {
+        _float fRatio{};
+        _float4 vValue{};
     };
 
 #pragma region NEW
@@ -176,6 +195,34 @@ protected:
     void Set_LocalPositionFromProperty();
     void Update_Orbit(const _float fRatio);
 
+    _int Resolve_ShaderPass();
+    HRESULT Bind_ViewProjectionMatrices();
+
+    static void Evaluate_SpriteFrame(
+        _int iFrameX, _int iFrameY, _float fRatio,
+        _float2& vOutUV, _float2& vOutSize);
+
+    static _float Evaluate_FloatCurve(
+        _float fRatio, _float fFixedValue, _bool bChange,
+        _float fStartValue, _float fEndValue,
+        _bool bActiveRatio0, _float fRatio0, _float fValue0,
+        _bool bActiveRatio1, _float fRatio1, _float fValue1,
+        _bool bNormalizePoints);
+
+    static _float3 Evaluate_Float3Curve(
+        _float fRatio, const _float3& vFixedValue, _bool bChange,
+        const _float3& vStartValue, const _float3& vEndValue,
+        _bool bActiveRatio0, _float fRatio0, const _float3& vValue0,
+        _bool bActiveRatio1, _float fRatio1, const _float3& vValue1,
+        _bool bNormalizePoints);
+
+    static _float4 Evaluate_Float4Curve(
+        _float fRatio, const _float4& vFixedValue, _bool bChange,
+        const _float4& vStartValue, const _float4& vEndValue,
+        _bool bActiveRatio0, _float fRatio0, const _float4& vValue0,
+        _bool bActiveRatio1, _float fRatio1, const _float4& vValue1,
+        _bool bNormalizePoints);
+
     _float Get_FadeOutAlpha() const { return m_fFadeOutAlpha; }
 
     virtual void Update_UVScroll(const _float fTimeDelta, const _float fRatio);
@@ -188,7 +235,6 @@ protected:
     void Update_Value(const _float fTimeDelta);
     
     virtual void Update_Core(const _float fTimeDelta, const _float fRatio);
-    virtual void Update_EffectPart(const _float fTimeDelta, const _float fRatio);
 
     _float Get_PartDuration() const;
 

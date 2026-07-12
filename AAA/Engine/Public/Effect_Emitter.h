@@ -154,8 +154,6 @@ protected:
     };
 
 protected:
-    enum ShaderPass { Default, AlphaBlend, Additive, ShaderPass_End };
-
     enum EmitterShapeType
     {
         EMITTER_SHAPE_POINT,
@@ -186,22 +184,16 @@ protected:
     virtual ~CEffect_Emitter() = default;
 
 protected:
-    virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void* pArg) override;
 
 public:
-    virtual void    Priority_Update(_float fTimeDelta) override;
     virtual void    Update(_float fTimeDelta) override;
     virtual void    Late_Update(_float fTimeDelta) override;
-    virtual HRESULT Render() override;
 
     virtual void    Effect_Start() override;
 
     void Stop_Emission();
     _bool Is_EmissionFinished() const;
-
-protected:
-    HRESULT Bind_ShaderValue();
 
 protected:
     virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;
@@ -231,18 +223,6 @@ protected:
     _bool Can_Emit() const;
     _bool Has_AliveParticle() const;
 
-    _float Evaluate_EmitterFloatCurve(
-        _float fLocalRatio, _float fFixedValue, _bool bChange,
-        _float fStartValue, _float fEndValue,
-        _bool bActiveRatio0, _float fRatio0, _float fValue0,
-        _bool bActiveRatio1, _float fRatio1, _float fValue1) const;
-
-    _float3 Evaluate_EmitterFloat3Curve(
-        _float fLocalRatio, const _float3& vFixedValue, _bool bChange,
-        const _float3& vStartValue, const _float3& vEndValue,
-        _bool bActiveRatio0, _float fRatio0, const _float3& vValue0,
-        _bool bActiveRatio1, _float fRatio1, const _float3& vValue1) const;
-
     _float4x4 Make_EmitterParticleWorldMatrix(const EMITTER_PARTICLE& Particle) const;
 
 protected:
@@ -258,11 +238,7 @@ protected:
     _float3 m_fPivot{};
 
 private:
-    HRESULT Ready_Components();
     void Init_PropertyValue();
-
-protected:
-    virtual void Free() override;
 };
 
 NS_END

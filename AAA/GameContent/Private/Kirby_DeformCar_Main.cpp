@@ -151,7 +151,7 @@ HRESULT CKirby_DeformCar_Main::Ready_Components()
     CCollider::COLLIDER_DESC WallBreakerDesc{};
     WallBreakerDesc.pOwner = this;
     WallBreakerDesc.vCenter = _float3(0.f, 1.5f, 1.5f);
-    WallBreakerDesc.fRadius = 2.f;
+    WallBreakerDesc.fRadius = 2.3f;
 
     m_pHitBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
         TEXT("WallBreakerCollider_Com"), &WallBreakerDesc);

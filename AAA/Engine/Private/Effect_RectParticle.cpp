@@ -14,11 +14,6 @@ CEffect_RectParticle::CEffect_RectParticle(const CEffect_RectParticle& Prototype
 	Init_PropertyValue();
 }
 
-HRESULT CEffect_RectParticle::Initialize_Prototype()
-{
-	return S_OK;
-}
-
 HRESULT CEffect_RectParticle::Initialize(void* pArg)
 {
 	EFFECT_RECTPARTICLE_DESC* pDesc = static_cast<EFFECT_RECTPARTICLE_DESC*>(pArg);
@@ -39,21 +34,6 @@ HRESULT CEffect_RectParticle::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CEffect_RectParticle::Priority_Update(_float fTimeDelta)
-{
-	__super::Priority_Update(fTimeDelta);
-}
-
-void CEffect_RectParticle::Update(_float fTimeDelta)
-{
-	__super::Update(fTimeDelta);
-}
-
-void CEffect_RectParticle::Late_Update(_float fTimeDelta)
-{
-	__super::Late_Update(fTimeDelta);
-}
-
 HRESULT CEffect_RectParticle::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
@@ -64,6 +44,8 @@ HRESULT CEffect_RectParticle::Render()
 
 	if (FAILED(m_pVIBuffer->Bind_Resources()))
 		return E_FAIL;
+
+	const _int iPass = Resolve_ShaderPass();
 
 	for (const PARTICLE& Particle : m_Particles)
 	{
@@ -81,14 +63,6 @@ HRESULT CEffect_RectParticle::Render()
 		if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &Particle.vColor, sizeof(Particle.vColor))))
 			return E_FAIL;
 
-		Helper::IntClamp(m_iShaderPass, ShaderPass::Default, ShaderPass::ShaderPass_End - 1);
-		Helper::IntClamp(m_iMirror, Sampler::DEFAULT, Sampler::SAMPLER_END - 1);
-		Helper::IntClamp(m_iDepthIgnore, DepthMode::DEPTH_DEFAULT, DepthMode::DEPTH_MODE_END - 1);
-
-		_int iPass = m_iShaderPass +
-			(m_iMirror == Sampler::MIRROR ? ShaderPass::ShaderPass_End : 0) +
-			(m_iDepthIgnore == DepthMode::DEPTH_IGNORE ? ShaderPass::ShaderPass_End * Sampler::SAMPLER_END : 0);
-
 		if (FAILED(m_pShaderCom->Begin(iPass)))
 			return E_FAIL;
 
@@ -97,11 +71,6 @@ HRESULT CEffect_RectParticle::Render()
 	}
 
 	return S_OK;
-}
-
-void CEffect_RectParticle::Effect_Start()
-{
-	__super::Effect_Start();
 }
 
 HRESULT CEffect_RectParticle::Ready_Components()
@@ -122,9 +91,7 @@ HRESULT CEffect_RectParticle::Ready_Components()
 
 HRESULT CEffect_RectParticle::Bind_ShaderResources()
 {
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
+	if (FAILED(Bind_ViewProjectionMatrices()))
 		return E_FAIL;
 
 	return S_OK;
@@ -164,50 +131,11 @@ void CEffect_RectParticle::Update_Core(const _float fTimeDelta, const _float fRa
 {
 	__super::Update_Core(fTimeDelta, fRatio);
 
-	Update_TexSpriteAnimation(fTimeDelta, fRatio);
-	Update_MaskSpriteAnimation(fTimeDelta, fRatio);
-}
-
-void CEffect_RectParticle::Update_TexSpriteAnimation(const _float fTimeDelta, const _float fRatio)
-{
 	if (m_bSpriteAniTexture == true)
-	{
-		_int iTotalCount = m_iTexFrameX * m_iTexFrameY;
-		_int iCurTexFrameIndex = static_cast<_int>(static_cast<_float>(iTotalCount) * fRatio);
+        Evaluate_SpriteFrame(m_iTexFrameX, m_iTexFrameY, fRatio, m_fCurTexAniUV, m_fCurTexAniSize);
 
-		if (iCurTexFrameIndex >= iTotalCount)
-			iCurTexFrameIndex -= 1;
-
-		_float fCurTexFrameX = static_cast<_float>(iCurTexFrameIndex % m_iTexFrameX);
-		_float fCurTexFrameY = static_cast<_float>(iCurTexFrameIndex / m_iTexFrameX);
-
-		m_fCurTexAniSize.x = 1.f / static_cast<_float>(m_iTexFrameX);
-		m_fCurTexAniSize.y = 1.f / static_cast<_float>(m_iTexFrameY);
-
-		m_fCurTexAniUV.x = m_fCurTexAniSize.x * fCurTexFrameX;
-		m_fCurTexAniUV.y = m_fCurTexAniSize.y * fCurTexFrameY;
-	}
-}
-
-void CEffect_RectParticle::Update_MaskSpriteAnimation(const _float fTimeDelta, const _float fRatio)
-{
 	if (m_bSpriteAniMask == true)
-	{
-		_int iTotalCount = m_iMaskFrameX * m_iMaskFrameY;
-		_int iCurMaskFrameIndex = static_cast<_int>(static_cast<_float>(iTotalCount) * fRatio);
-
-		if (iCurMaskFrameIndex >= iTotalCount)
-			iCurMaskFrameIndex -= 1;
-
-		_float fCurMaskFrameX = static_cast<_float>(iCurMaskFrameIndex % m_iMaskFrameX);
-		_float fCurMaskFrameY = static_cast<_float>(iCurMaskFrameIndex / m_iMaskFrameX);
-
-		m_fCurMaskAniSize.x = 1.f / static_cast<_float>(m_iMaskFrameX);
-		m_fCurMaskAniSize.y = 1.f / static_cast<_float>(m_iMaskFrameY);
-
-		m_fCurMaskAniUV.x = m_fCurMaskAniSize.x * fCurMaskFrameX;
-		m_fCurMaskAniUV.y = m_fCurMaskAniSize.y * fCurMaskFrameY;
-	}
+        Evaluate_SpriteFrame(m_iMaskFrameX, m_iMaskFrameY, fRatio, m_fCurMaskAniUV, m_fCurMaskAniSize);
 }
 
 void CEffect_RectParticle::Init_PropertyValue()
@@ -221,9 +149,4 @@ void CEffect_RectParticle::Init_PropertyValue()
 	m_bSpriteAniMask = false;
 	m_iMaskFrameX = 1;
 	m_iMaskFrameY = 1;
-}
-
-void CEffect_RectParticle::Free()
-{
-	__super::Free();
 }

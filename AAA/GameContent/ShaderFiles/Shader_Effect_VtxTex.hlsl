@@ -141,7 +141,7 @@ float4 ApplyMaskBlend(float4 vColor, float4 vMaskValue)
     return vColor * lerp(float4(1.f, 1.f, 1.f, 1.f), vMaskValue, saturate(fStrength));
 }
 
-PS_OUT PS_MAIN(PS_IN In)
+PS_OUT ComposeEffectColor(PS_IN In, SamplerState EffectSampler)
 {
     PS_OUT Out;
        
@@ -171,7 +171,7 @@ PS_OUT PS_MAIN(PS_IN In)
         else
             vUV = g_vMaskOffset + In.vTexcoord * g_vMaskTiling;
 
-        vMaskValue = ResolveMaskValue(g_Mask.Sample(LinearSampler, vUV));
+        vMaskValue = ResolveMaskValue(g_Mask.Sample(EffectSampler, vUV));
 
         if (g_bUseMaskUVDistortion == true)
             vUVDistortion = (vMaskValue.rr * 2.f - 1.f) * g_vMaskUVDistortionStrength;
@@ -186,7 +186,7 @@ PS_OUT PS_MAIN(PS_IN In)
         else
             vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling + vUVDistortion;
         
-        Out.vColor *= g_Texture.Sample(LinearSampler, vUV);
+        Out.vColor *= g_Texture.Sample(EffectSampler, vUV);
     }
     
     if (g_bUseMask == true)
@@ -206,65 +206,14 @@ PS_OUT PS_MAIN(PS_IN In)
 
 
 
+PS_OUT PS_MAIN(PS_IN In)
+{
+    return ComposeEffectColor(In, LinearSampler);
+}
+
 PS_OUT PS_MAIN_MIRROR(PS_IN In)
 {
-    PS_OUT Out;
-       
-    if (In.vTexcoord.x > (1.f - g_fUVCutRight) || In.vTexcoord.x < g_fUVCutLeft)
-        discard;
-    
-    if (In.vTexcoord.y > (1.f - g_fUVCutBottom) || In.vTexcoord.y < g_fUVCutTop)
-        discard;
-    
-    if (g_bFlipX == 1)
-        In.vTexcoord.x = -In.vTexcoord.x + 1.f;
-    
-    if (g_bFlipY == 1)
-        In.vTexcoord.y = -In.vTexcoord.y + 1.f;
-    
-    Out.vColor = float4(1.f, 1.f, 1.f, 1.f);
-
-    float4 vMaskValue = float4(1.f, 1.f, 1.f, 1.f);
-    float2 vUVDistortion = float2(0.f, 0.f);
-
-    if (g_bUseMask == true)
-    {
-        float2 vUV = float2(0.f, 0.f);
-
-        if (g_bSpriteAniMask == true)
-            vUV = In.vTexcoord * g_vSpriteAniMaskSize + g_vSpriteAniMaskUV;
-        else
-            vUV = g_vMaskOffset + In.vTexcoord * g_vMaskTiling;
-
-        vMaskValue = ResolveMaskValue(g_Mask.Sample(MirrorSampler, vUV));
-
-        if (g_bUseMaskUVDistortion == true)
-            vUVDistortion = (vMaskValue.rr * 2.f - 1.f) * g_vMaskUVDistortionStrength;
-    }
-    
-    if (g_bUseTexture == true)
-    {
-        float2 vUV = float2(0.f, 0.f);
-        
-        if (g_bSpriteAniTexture == true)
-            vUV = In.vTexcoord * g_vSpriteAniTexSize + g_vSpriteAniTexUV + vUVDistortion;
-        else
-            vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling + vUVDistortion;
-        
-        Out.vColor *= g_Texture.Sample(MirrorSampler, vUV);
-    }
-    
-    if (g_bUseMask == true)
-        Out.vColor = ApplyMaskBlend(Out.vColor, vMaskValue);
-    
-    Out.vColor.xyz *= g_vColor * g_fEffectIntensity;
-    Out.vColor.a *= g_fAlpha;
-    Out.vColor.rgb += g_vEmissiveColor.rgb * Out.vColor.a;
-    
-    if (g_bAlphaTest == true && Out.vColor.a <= g_fTestAlpha)
-        discard;
-    
-    return Out;
+    return ComposeEffectColor(In, MirrorSampler);
 }
 
 

@@ -95,6 +95,13 @@ public:
 		MAP_LOAD_RESULT* pOutReport = nullptr,
 		const MAP_EDIT_CHANGE* pOverrideDesc = nullptr);
 
+	static HRESULT Collect_PreloadJobs(
+		ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
+		const _wstring& strFallbackManifestPath,
+		const _wstring& strLevelObjectsPath,
+		_uint iRuntimeLevel,
+		vector<function<HRESULT()>>* pOutJobs);
+
 	static _uint			Get_MapCount();
 	static const _char*		Get_MapName(_uint iMapIndex);
 	static HRESULT			Get_MapManifestPath(_uint iMapIndex, _wstring* pOutManifestPath);
@@ -144,6 +151,13 @@ private:
 
 	static void Build_DefaultRuntimeLevels(_uint iRuntimeLevel, MAP_RUNTIME_LEVELS* pOutLevels);
 	static void Build_DefaultRuntimeTargets(_uint iRuntimeLevel, MAP_SPAWN_TARGETS* pOutTargets);
+
+	static HRESULT Preload_SharedObjects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
+		const vector<MAP_ADD_OBJECT>& AddedDescs, const MAP_RUNTIME_LEVELS& Levels);
+	static HRESULT Preload_One_SectionModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
+		const MAP_SECTION_DESC& Desc, const MAP_RUNTIME_LEVELS& Levels);
+	static HRESULT Preload_One_EnvModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
+		const ENV_OBJECT_DESC& Desc, _bool bCookCollisionMesh, const MAP_RUNTIME_LEVELS& Levels);
 
 public:
 	static CMap_Loader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

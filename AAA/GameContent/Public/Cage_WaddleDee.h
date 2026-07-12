@@ -42,6 +42,7 @@ public:
     DEE_POS Get_Pos() const { return m_ePos; }
 
 private:
+    virtual HRESULT Ready_Events() override;
     virtual HRESULT Ready_Components() override;
     void            Play_RandomCageWait();
 

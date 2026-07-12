@@ -5,6 +5,7 @@
 NS_BEGIN(Engine)
 
 class CModel;
+namespace EffectMesh { struct VALUES; }
 
 class ENGINE_DLL CEffect_MeshParticle abstract : public CEffect_Particle
 {
@@ -110,19 +111,12 @@ protected:
     virtual ~CEffect_MeshParticle() = default;
 
 protected:
-    virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void* pArg) override;
 
 public:
-    virtual void    Priority_Update(_float fTimeDelta) override;
-    virtual void    Update(_float fTimeDelta) override;
-    virtual void    Late_Update(_float fTimeDelta) override;
     virtual HRESULT Render() override;
 
-    virtual void    Effect_Start() override;
-
 protected:
-    virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;
     virtual void Update_UVScroll(const _float fTimeDelta, const _float fRatio) override;
 
 protected:
@@ -154,10 +148,8 @@ private:
     _wstring m_wstrShaderTag;
 
 private:
+    EffectMesh::VALUES Make_MeshValues();
     void Init_PropertyValue();
-
-protected:
-    virtual void Free() override;
 };
 
 NS_END

@@ -142,10 +142,17 @@ void CKirby_QTE_Grabbed::Enter_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE
         }
         case QTE_GRABBED_STATE::ESCAPE:
         {      
-            _vector vBackDir = -pKirby->Get_Transform()->Get_State(STATE::LOOK);
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            _float fEscapeHorizontalSpeed = 18.f;
+            pMovement->Set_MaxHorizontalSpeed(fEscapeHorizontalSpeed);
+
+            CTransform* pTransform = pKirby->Get_Transform();
+            _vector vLook = XMVector3Normalize(pTransform->Get_State(STATE::LOOK));
+            pTransform->LookTo(-vLook);
+            
+            _vector vBackDir = -pTransform->Get_State(STATE::LOOK);
             vBackDir = XMVector3Normalize(XMVectorSetY(vBackDir, 0.f));
 
-            CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Set_Velocity(vBackDir * 15.f);
 
             pMovement->Set_VelocityY(22.f);
@@ -277,7 +284,11 @@ void CKirby_QTE_Grabbed::Exit_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE 
         }
         case QTE_GRABBED_STATE::ESCAPE:
         {
-            pKirby->Get_Body()->Get_Animator()->SetBoneRotation("RotL", 0.f, XMVectorSet(1.f, 0.f, 0.f, 0.f));
+            CAnimator* pAnimator = pKirby->Get_Body()->Get_Animator();
+            pAnimator->SetBoneRotation("RotL", 0.f, XMVectorSet(1.f, 0.f, 0.f, 0.f));
+
+            CMovement_Child* pMovement = pKirby->Get_Movement();
+            pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
             break;
         }
         case QTE_GRABBED_STATE::GRABBED_STATE_END:
