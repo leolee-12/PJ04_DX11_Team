@@ -69,8 +69,6 @@ private:
 	virtual void OnTriggerStay(CCollider* pOther) override;
 	virtual void OnTriggerExit(CCollider* pOther) override;
 
-	_bool Is_TriggerActivator(CCollider* pOther) const;
-
 public:
 	static CEnvTrigger_RenderGlobals* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;

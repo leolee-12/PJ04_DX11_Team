@@ -56,6 +56,9 @@ HRESULT CSplit_Starblock::Ready_EffectPartObjects()
 {
 	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tDesc{};
 	tDesc.iModelLevel = m_iPrototypeLevel;
+	tDesc.bCustomShader = true;
+	tDesc.iShaderLevel = Shader_EffectRock.iLevelID;
+	tDesc.wstrShaderTag = Shader_EffectRock.szProtoTag;
 
 	tDesc.wstrModelTag = L"Prototype_Component_Model_Starblock_Piece01";
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, TEXT("Piece_1"), &tDesc)))

@@ -77,6 +77,10 @@
     <ClInclude Include="..\Public\Common_Ring03.h" />
     <ClInclude Include="..\Public\Deformable.h" />
     <ClInclude Include="..\public\DialogueDee.h" />
+    <ClInclude Include="..\Public\Env_SpotLight.h" />
+    <ClInclude Include="..\Public\EnvVolume_Culling.h" />
+    <ClInclude Include="..\Public\EnvVolume_Effect.h" />
+    <ClInclude Include="..\Public\EnvVolume_Light.h" />
     <ClInclude Include="..\public\KirbySpawnPoint.h" />
     <ClInclude Include="..\Public\Kirby_DeformDump.h" />
     <ClInclude Include="..\public\Dialogue_Arranger.h" />
@@ -430,6 +434,10 @@
     <ClCompile Include="..\Private\Car_00_MilkyWay.cpp" />
     <ClCompile Include="..\Private\CommonHit.cpp" />
     <ClCompile Include="..\private\DialogueDee.cpp" />
+    <ClCompile Include="..\Private\Env_SpotLight.cpp" />
+    <ClCompile Include="..\Private\EnvVolume_Culling.cpp" />
+    <ClCompile Include="..\Private\EnvVolume_Effect.cpp" />
+    <ClCompile Include="..\Private\EnvVolume_Light.cpp" />
     <ClCompile Include="..\private\KirbySpawnPoint.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformDump.cpp" />
     <ClCompile Include="..\private\Dialogue_Arranger.cpp" />

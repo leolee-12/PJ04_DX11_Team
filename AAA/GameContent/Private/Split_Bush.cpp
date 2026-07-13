@@ -56,6 +56,9 @@ HRESULT CSplit_Bush::Ready_EffectPartObjects()
 {
 	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tDesc{};
 	tDesc.iModelLevel = m_iPrototypeLevel;
+	tDesc.bCustomShader = true;
+	tDesc.iShaderLevel = Shader_EffectRock.iLevelID;
+	tDesc.wstrShaderTag = Shader_EffectRock.szProtoTag;
 
 	tDesc.wstrModelTag = L"Prototype_Component_Model_BushLeafL";
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, TEXT("LeafL"), &tDesc)))
@@ -67,10 +70,6 @@ HRESULT CSplit_Bush::Ready_EffectPartObjects()
 
 	tDesc.wstrModelTag = L"Prototype_Component_Model_BushLeafS";
 	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, TEXT("LeafS"), &tDesc)))
-		return E_FAIL;
-
-	tDesc.wstrModelTag = L"Prototype_Component_Model_Bush_00";
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, TEXT("Bush_00"), &tDesc)))
 		return E_FAIL;
 
 	return S_OK;

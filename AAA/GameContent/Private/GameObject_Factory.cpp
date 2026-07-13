@@ -179,6 +179,10 @@
 #include "EnvTrigger_Generic.h"
 #include "EnvTrigger_RenderGlobals.h"
 #include "EnvTrigger_EventPublisher.h"
+#include "EnvVolume_Effect.h"
+#include "EnvVolume_Culling.h"
+#include "EnvVolume_Light.h"
+#include "Env_SpotLight.h"
 
 // Projectile
 #include "Projectile_Boulder.h"
@@ -739,6 +743,10 @@ void CGameObject_Factory::Register_NonAnimObject()
     Register(CEnvTrigger_Generic::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvTrigger_Generic), LOADER());
     Register(CEnvTrigger_RenderGlobals::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvTrigger_RenderGlobals), LOADER());
     Register(CEnvTrigger_EventPublisher::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvTrigger_EventPublisher), LOADER());
+    Register(CEnvVolume_Effect::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvVolume_Effect), LOADER());
+    Register(CEnvVolume_Culling::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvVolume_Culling), LOADER());
+    Register(CEnvVolume_Light::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvVolume_Light), LOADER());
+    Register(CEnv_SpotLight::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnv_SpotLight), LOADER());
 
     Register(CLevelDesign_Unsupported::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Unsupported), LOADER());
     Register(CLevelDesign_Rail::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Rail), LOADER());
@@ -1072,7 +1080,6 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BushLeafL"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Bush/BasicL.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BushLeafM"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Bush/BasicM.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BushLeafS"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Bush/BasicS.ysh"));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Bush_00"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Bush/Bush_00.ysh"));
         )
     );
 }

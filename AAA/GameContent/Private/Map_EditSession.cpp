@@ -672,12 +672,14 @@ _bool CMap_EditSession::Unregister_AddedObject(CGameObject* pObject)
 	_bool bRemoved = false;
 	_wstring strLayerTag;
 	_wstring strObjectTag;
+	_wstring strReplacedEnvKey;
 
 	const auto AddedIter = m_AddedObjectsByRuntime.find(pObject);
 	if (AddedIter != m_AddedObjectsByRuntime.end())
 	{
 		strLayerTag = AddedIter->second.strLayerTag;
 		strObjectTag = AddedIter->second.strObjectTag;
+		strReplacedEnvKey = AddedIter->second.strReplacedEnvKey;
 	}
 	else
 	{
@@ -690,6 +692,9 @@ _bool CMap_EditSession::Unregister_AddedObject(CGameObject* pObject)
 	}
 
 	if (Remove_AddedObjectDescByKey(strLayerTag, strObjectTag))
+		bRemoved = true;
+
+	if (!strReplacedEnvKey.empty() && Restore_DeletedEnvItem(strReplacedEnvKey))
 		bRemoved = true;
 
 	if (0 < m_AddedObjectsByRuntime.erase(pObject))

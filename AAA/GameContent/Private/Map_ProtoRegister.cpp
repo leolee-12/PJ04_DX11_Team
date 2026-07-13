@@ -5,6 +5,10 @@
 #include "EnvTrigger_Generic.h"
 #include "EnvTrigger_RenderGlobals.h"
 #include "EnvTrigger_EventPublisher.h"
+#include "EnvVolume_Effect.h"
+#include "EnvVolume_Culling.h"
+#include "EnvVolume_Light.h"
+#include "Env_SpotLight.h"
 #include "MapSection.h"
 #include "MapEvent_BreakWall.h"
 #include "MapStage.h"
@@ -253,6 +257,31 @@ HRESULT CMap_ProtoRegister::Ready_ObjectPrototypes(_uint iObjectLevel)
 	{
 		return E_FAIL;
 	}
+
+	if (FAILED(EnsurePrototype(CEnvVolume_Effect::PROTOTYPE_TAG,
+		[&]() -> CGameObject* { return CEnvVolume_Effect::Create(m_pDevice, m_pContext); })))
+	{
+		return E_FAIL;
+	}
+
+	if (FAILED(EnsurePrototype(CEnvVolume_Culling::PROTOTYPE_TAG,
+		[&]() -> CGameObject* { return CEnvVolume_Culling::Create(m_pDevice, m_pContext); })))
+	{
+		return E_FAIL;
+	}
+
+	if (FAILED(EnsurePrototype(CEnvVolume_Light::PROTOTYPE_TAG,
+		[&]() -> CGameObject* { return CEnvVolume_Light::Create(m_pDevice, m_pContext); })))
+	{
+		return E_FAIL;
+	}
+
+	if (FAILED(EnsurePrototype(CEnv_SpotLight::PROTOTYPE_TAG,
+		[&]() -> CGameObject* { return CEnv_SpotLight::Create(m_pDevice, m_pContext); })))
+	{
+		return E_FAIL;
+	}
+
 
 	return S_OK;
 }
