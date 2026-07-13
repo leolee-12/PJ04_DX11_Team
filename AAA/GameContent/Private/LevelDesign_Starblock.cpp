@@ -232,6 +232,10 @@ void CLevelDesign_Starblock::Damaged(const ATTACK_INFO& tInfo)
 
 	CEffect_Loader::GetInstance()->Spawn(L"CommonHit", Get_LevelIndex(), vPos, vFaceCam, _float3(0.f, 0.f, 0.f), nullptr);
 
+	// (임시 연결)
+	// TODO : 어택 타입에 따른 사운드 분기
+	m_pGameInstance_Proxy->Play_SFX(L"GimmickBasic_BlockCrash.wav", 0.3f);
+
 	Enable_Colliders(false);
 	Release_RigidStatic();
 	Set_Active(false);

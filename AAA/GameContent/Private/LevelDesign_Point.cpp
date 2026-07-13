@@ -6,6 +6,7 @@
 
 namespace
 {
+	constexpr const _tchar* POINTSTAR_PICKUP_SOUND = L"ItemPointStar_YellowCatched.wav";
 	constexpr _float s_fPointRotationPerSec = 360.f;
 
 	struct LD_POINT_CATALOG
@@ -339,6 +340,9 @@ void CLevelDesign_Point::Handle_Pickup(CCollider* pOther)
 	KIRBY_POINTSTAR_GAINED_DESC Desc{};
 	Desc.iAmount = static_cast<_uint>(m_tPointDesc.iValue);
 	m_pGameInstance_Proxy->Publish(EventTag::Kirby_PointStarGained, &Desc);
+
+	_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+	m_pGameInstance_Proxy->Play_SFX3D(POINTSTAR_PICKUP_SOUND, vPos, 0.5f);
 
 	if (m_pHurtBox)
 		m_pHurtBox->Set_Enabled(false);
