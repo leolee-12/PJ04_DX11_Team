@@ -89,6 +89,7 @@
 #include "Split_Stone.h"
 #include "Split_Bush.h"
 #include "BubbleAura.h"
+#include "TrailContainer.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -127,6 +128,7 @@
 #include "RectParticleCommon.h"
 #include "MeshParticleCommon.h"
 #include "RectEmitterCommon.h"
+#include "TrailCommon.h"
 
 //sky
 #include "SkySphere.h"
@@ -1051,6 +1053,15 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, Texture_CommonSparkle01.iLevelID, Texture_CommonSparkle01.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_CommonSparkle01.szFileTag, Texture_CommonSparkle01.iNumTex));
 
+        ));
+
+    // Generic Trail Container
+    Register(CTrailContainer::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CTrailContainer),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CTrailCommon::PROTOTYPE_TAG,
+                CTrailCommon::Create(pDevice, pContext));
         ));
 
     // 8
