@@ -14,6 +14,10 @@
 #include "LevelDesignObject.h"
 #include "EnvObject_Static.h"
 #include "EnvTrigger_RenderGlobals.h"
+#include "EnvVolume_Effect.h"
+#include "EnvVolume_Culling.h"
+#include "EnvVolume_Light.h"
+#include "Env_SpotLight.h"
 #include "Env_InstanceController.h"
 #include "LevelDesign_Registry.h"
 
@@ -48,7 +52,7 @@ namespace
 
 	constexpr _tchar kMapModelRoot[] = L"../../Resources/Map";
 
-	ENV_OBJECT_DESC Make_DefaultEnvTriggerDesc(const wstring& strObjectName, const _float3& vPosition)
+	ENV_OBJECT_DESC Make_DefaultEnvRuntimeDesc(const wstring& strPrototypeTag, const wstring& strObjectName, const _float3& vPosition)
 	{
 		ENV_OBJECT_DESC Desc{};
 		Engine::CGameObject::GAMEOBJECT_DESC& BaseDesc =
@@ -72,6 +76,17 @@ namespace
 		Desc.tEffect.vAreaCenter = { 0.f, 0.f, 0.f };
 		Desc.tEffect.vAreaSize = { 1.f, 1.f, 1.f };
 		Desc.tEffect.vAreaRot = { 0.f, 0.f, 0.f, 1.f };
+
+		if (strPrototypeTag == CEnvTrigger_RenderGlobals::PROTOTYPE_TAG)
+			Desc.tEffect.eEffectType = ENV_EFFECT_TYPE::TONE_MAPPING_AREA;
+		else if (strPrototypeTag == CEnvVolume_Effect::PROTOTYPE_TAG)
+			Desc.tEffect.eEffectType = ENV_EFFECT_TYPE::FIELD_EFFECT;
+		else if (strPrototypeTag == CEnvVolume_Culling::PROTOTYPE_TAG)
+			Desc.tEffect.eEffectType = ENV_EFFECT_TYPE::DECOR_PARTS_CULLING_AREA;
+		else if (strPrototypeTag == CEnvVolume_Light::PROTOTYPE_TAG)
+			Desc.tEffect.eEffectType = ENV_EFFECT_TYPE::LOCAL_AREA_LIGHT;
+		else if (strPrototypeTag == CEnv_SpotLight::PROTOTYPE_TAG)
+			Desc.tEffect.eEffectType = ENV_EFFECT_TYPE::SPOT_LIGHT;
 
 		return Desc;
 	}
@@ -555,14 +570,14 @@ void CLevel_Edit::Place_Object_At(const _float3& vPos)
 {
 	wstring strName = m_strPendingProto + L"_" + to_wstring(m_iPlaceCount++);
 
-	ENV_OBJECT_DESC EnvTriggerDesc{};
+	ENV_OBJECT_DESC EnvRuntimeDesc{};
 	void* pArg = nullptr;
 
 	auto* pRegistration = CGameObject_Factory::GetInstance()->Get_Registration(m_strPendingProto);
 	if (nullptr != pRegistration && pRegistration->strCategory == L"ENV_TRIGGER")
 	{
-		EnvTriggerDesc = Make_DefaultEnvTriggerDesc(strName, vPos);
-		pArg = &EnvTriggerDesc;
+		EnvRuntimeDesc = Make_DefaultEnvRuntimeDesc(m_strPendingProto, strName, vPos);
+		pArg = &EnvRuntimeDesc;
 	}
 
 	CGameObject* pObj = Spawn_Object(m_strPendingProto, m_strPendingLayer, strName, pArg);
@@ -595,9 +610,7 @@ void CLevel_Edit::End_PlaceMode()
 	m_strPendingProto = {};
 }
 
-_bool CLevel_Edit::Track_EditedMapPreviewEnvObject(
-	CGameObject* pObject,
-	const EDIT_OBJECT_OVERRIDE_DESC& Edit)
+_bool CLevel_Edit::Track_EditedMapPreviewEnvObject(CGameObject* pObject, const EDIT_OBJECT_OVERRIDE_DESC& Edit)
 {
 	if (nullptr == m_pMapPreviewSession)
 		return false;
@@ -676,6 +689,23 @@ _bool CLevel_Edit::Try_GetMapPreviewLevelDesignEdit(CGameObject* pObject, EDIT_O
 	return m_pMapPreviewSession->Try_GetEditedLevelDesignObject(pObject, pOutEdit);
 }
 
+HRESULT CLevel_Edit::Clear_MapPreviewEnvObjectOverride(CGameObject* pObject)
+{
+	if (nullptr == pObject || nullptr == m_pMapPreviewSession)
+		return E_FAIL;
+
+	const _int iPresetIndex = m_pMapPreviewSession->Get_EditData().iPresetIndex;
+	if (0 > iPresetIndex)
+		return E_FAIL;
+
+	if (m_pMapPreviewSession->Is_AddedObject(pObject))
+		Delete_Object(pObject);
+	else
+		m_pMapPreviewSession->Clear_EditedPreviewObject(pObject);
+
+	return Load_MapPreviewEnv(static_cast<_uint>(iPresetIndex));
+}
+
 _bool CLevel_Edit::Commit_MapEditObjectFromCurrentState(CGameObject* pObject)
 {
 	if (nullptr == pObject || nullptr == m_pMapPreviewSession)
@@ -689,6 +719,8 @@ _bool CLevel_Edit::Commit_MapEditObjectFromCurrentState(CGameObject* pObject)
 			return true;
 		if (!m_pMapPreviewSession->Can_DeleteAsEnvOverride(pObject))
 			return false;
+		if (ENV_OBJECT_KIND::EFFECT == pEnvObject->Get_Desc().eKind)
+			return Promote_MapPreviewEnvObjectToAdded(pObject);
 
 		EDIT_OBJECT_OVERRIDE_DESC Edit{};
 		Edit.eKind = EDITABLE_OBJECT_KIND::ENV_OBJECT;
@@ -1932,6 +1964,67 @@ _bool CLevel_Edit::Handle_MapSpecificDeletion(CGameObject* pObject)
 	}
 
 	Sync_MapPreviewRuntimeStateToSession();
+	return true;
+}
+
+_bool CLevel_Edit::Promote_MapPreviewEnvObjectToAdded(CGameObject* pObject)
+{
+	if (nullptr == pObject || nullptr == m_pMapPreviewSession)
+		return false;
+
+	CEnvObject* pEnvObject = dynamic_cast<CEnvObject*>(pObject);
+	if (nullptr == pEnvObject || ENV_OBJECT_KIND::EFFECT != pEnvObject->Get_Desc().eKind)
+		return false;
+
+	if (m_pMapPreviewSession->Is_AddedObject(pObject))
+		return true;
+
+	if (!m_pMapPreviewSession->Can_DeleteAsEnvOverride(pObject))
+		return false;
+
+	_wstring strPrototypeTag;
+	_wstring strLayerTag;
+	_wstring strObjectTag;
+
+	for (const auto& [strCurrentLayer, Objects] : m_Layers)
+	{
+		const auto Iter = find_if(
+			Objects.begin(),
+			Objects.end(),
+			[pObject](const EDITOR_OBJECT_HANDLE& Handle)
+			{
+				return Handle.pObject == pObject;
+			});
+
+		if (Iter == Objects.end())
+			continue;
+
+		strPrototypeTag = Iter->strPrototypeTag;
+		strLayerTag = strCurrentLayer;
+		strObjectTag = Iter->strName;
+		break;
+	}
+
+	if (strPrototypeTag.empty() || strLayerTag.empty() || strObjectTag.empty())
+		return false;
+
+	const _wstring strStableKey = CMap_EditFile::Make_EnvKey(pEnvObject->Get_Desc());
+	if (strStableKey.empty())
+		return false;
+
+	MAP_ADD_OBJECT AddedDesc{};
+	AddedDesc.strPrototypeTag = strPrototypeTag;
+	AddedDesc.strLayerTag = strLayerTag;
+	AddedDesc.strObjectTag = strObjectTag;
+	AddedDesc.strReplacedEnvKey = strStableKey;
+	AddedDesc.jObject = pObject->Serialize();
+
+	m_pMapPreviewSession->Clear_EditedPreviewObject(pObject);
+
+	if (!m_pMapPreviewSession->Track_DeletedPreviewObject(pObject))
+		return false;
+
+	m_pMapPreviewSession->Register_AddedObject(pObject, AddedDesc, strObjectTag);
 	return true;
 }
 

@@ -96,7 +96,7 @@ public:
         _uint iModelLevel{};
         _wstring wstrModelTag;
         _bool bUseDiffuseTexture{};
-        _bool bUseUnKnownTexture{};
+        _bool bUseUnknownTexture{};
         _bool bUseNormalTexture{};
         _bool bUseMRATexture{};
 

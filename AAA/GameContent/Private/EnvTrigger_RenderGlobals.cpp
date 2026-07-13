@@ -111,7 +111,7 @@ void CEnvTrigger_RenderGlobals::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 
 void CEnvTrigger_RenderGlobals::OnTriggerEnter(CCollider* pOther)
 {
-	if (false == Is_TriggerActivator(pOther))
+	if (false == Is_PlayerActivator(pOther))
 		return;
 
 	Apply_RenderGlobals();
@@ -186,11 +186,6 @@ void CEnvTrigger_RenderGlobals::Apply_RenderGlobals()
 	SetFloat("g_fAtmosStart", m_fAtmosStart);
 	SetFloat("g_fAtmosEnd", m_fAtmosEnd);
 	SetFloat("g_fAtmosStrength", m_fAtmosStrength);
-}
-
-_bool CEnvTrigger_RenderGlobals::Is_TriggerActivator(CCollider* pOther) const
-{
-	return nullptr != pOther && ETOUI(COLLISION_LAYER::PLAYER_HURT) == pOther->Get_RegisteredGroup();
 }
 
 CEnvTrigger_RenderGlobals* CEnvTrigger_RenderGlobals::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

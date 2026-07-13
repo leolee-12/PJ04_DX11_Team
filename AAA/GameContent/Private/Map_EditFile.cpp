@@ -1363,6 +1363,10 @@ json CMap_EditFile::Save_Change(const MAP_EDIT_CHANGE& Desc)
 		jAdded["Prototype_Tag"] = WstrToStr(Added.strPrototypeTag);
 		jAdded["Layer_Tag"] = WstrToStr(Added.strLayerTag);
 		jAdded["Object_Tag"] = WstrToStr(Added.strObjectTag);
+
+		if (!Added.strReplacedEnvKey.empty())
+			jAdded["Replaced_Env_Key"] = WstrToStr(Added.strReplacedEnvKey);
+
 		jAdded["Object"] = Added.jObject;
 		jOverride["AddedMapObjects"].push_back(jAdded);
 	}
@@ -1456,6 +1460,10 @@ HRESULT CMap_EditFile::Load_Change(const json& jOverride, MAP_EDIT_CHANGE* pOutD
 			const auto IterObjectTag = jAdded.find("Object_Tag");
 			if (IterObjectTag != jAdded.end() && IterObjectTag->is_string())
 				AddedDesc.strObjectTag = StrToWstr(IterObjectTag->get<string>());
+
+			const auto IterReplacedEnvKey = jAdded.find("Replaced_Env_Key");
+			if (IterReplacedEnvKey != jAdded.end() && IterReplacedEnvKey->is_string())
+				AddedDesc.strReplacedEnvKey = StrToWstr(IterReplacedEnvKey->get<string>());
 
 			const auto IterObject = jAdded.find("Object");
 			if (IterObject != jAdded.end())

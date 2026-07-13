@@ -9,6 +9,8 @@ class CEnvTrigger_EventPublisher final : public CEnvObject_Trigger
 
 	PROPERTY(_wstring, m_strEventTag, L"Event Tag", L"Event Publisher")
 	PROPERTY(_wstring, m_strPayload, L"Payload", L"Event Publisher")
+	PROPERTY(_wstring, m_strExitEventTag, L"Exit Event Tag", L"Event Publisher")
+	PROPERTY(_wstring, m_strExitPayload, L"Exit Payload", L"Event Publisher")
 	PROPERTY(_bool, m_bPublishOnce, L"Publish Once", L"Event Publisher")
 
 public:
@@ -26,13 +28,14 @@ public:
 
 private:
 	_bool m_bPublished = { false };
+	_bool m_bExitPublished = { false };
 
 private:
+	void Publish_Event(const _wstring& strEventTag, const _wstring& strPayload, _bool& bPublished);
+
 	virtual void OnTriggerEnter(CCollider* pOther) override;
 	virtual void OnTriggerStay(CCollider* pOther) override;
 	virtual void OnTriggerExit(CCollider* pOther) override;
-
-	_bool Is_TriggerActivator(CCollider* pOther) const;
 
 public:
 	static CEnvTrigger_EventPublisher* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

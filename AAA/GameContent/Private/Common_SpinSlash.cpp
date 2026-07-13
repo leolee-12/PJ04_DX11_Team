@@ -28,7 +28,7 @@ HRESULT CCommon_SpinSlash::Initialize(void* pArg)
     tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Common_SpinSlash");
 
     tDesc.bUseDiffuseTexture = false;
-    tDesc.bUseUnKnownTexture = true;
+    tDesc.bUseUnknownTexture = true;
 
     tDesc.bUseTextureCom = true;
     tDesc.iTextureLevel = Texture_Common_SpinSlash_2.iLevelID;

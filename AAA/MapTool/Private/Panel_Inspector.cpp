@@ -566,16 +566,18 @@ _bool CPanel_Inspector::Draw_Properties(IReflectable* pHolder)
 		}
 		case PROP_TYPE::WSTRING:
 		{
-			wstring* pWstr = (wstring*)pData;
-			string str = WstrToStr(*pWstr);
-			char buf[256] = {};
-			strcpy_s(buf, str.c_str());
-			if (ImGui::InputText(("##" + strPropName).c_str(), buf, sizeof(buf)))
-			{
-				*pWstr = StrToWstr(buf);
-				bChanged = true;
-			}
-			break;
+        ImGui::Text(strPropName.c_str());
+
+        wstring* pWstr = (wstring*)pData;
+        string str = WstrToStr(*pWstr);
+        char buf[256] = {};
+        strcpy_s(buf, str.c_str());
+        if (ImGui::InputText(("##" + strPropName).c_str(), buf, sizeof(buf)))
+        {
+                *pWstr = StrToWstr(buf);
+                bChanged = true;
+        }
+        break;
 		}
 		}
 	}
@@ -762,6 +764,10 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 			if (!pLevel->Commit_MapEditObjectFromCurrentState(pObject))
 				return false;
 
+			const CMap_EditSession* pSession = pLevel->Get_MapPreviewSession();
+			if (nullptr != pSession && pSession->Is_AddedObject(pObject))
+				return true;
+
 			const _bool bUseNearDistAlpha = (nullptr != pbUseNearDistAlpha)
 				? *pbUseNearDistAlpha
 				: Desc.tRender.bUseNearDistAlpha;
@@ -819,20 +825,15 @@ void CPanel_Inspector::Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject*
 
 	ImGui::SameLine();
 
+
 	if (ImGui::Button("Clear Override##EnvEdit"))
 	{
-		const CMap_EditSession* pSession = pLevel->Get_MapPreviewSession();
-		const _int iPresetIndex =
-			(nullptr != pSession) ? pSession->Get_EditData().iPresetIndex : -1;
-
-		pLevel->Clear_EditedMapPreviewEnvObject(pObject);
 		m_EnvNearAlphaEditStates.clear();
 
-		if (0 <= iPresetIndex)
-		{
-			pLevel->Load_MapPreviewEnv(static_cast<_uint>(iPresetIndex));
-			return;
-		}
+		if (FAILED(pLevel->Clear_MapPreviewEnvObjectOverride(pObject)))
+			MSG_BOX("OBJECT OVERRIDE CLEAR FAILED");
+
+		return;
 	}
 }
 

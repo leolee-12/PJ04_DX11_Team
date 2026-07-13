@@ -28,7 +28,7 @@ HRESULT CShockwave::Initialize(void* pArg)
     tDesc.wstrModelTag = MODEL_PROTO_TAG;
 
     tDesc.bUseDiffuseTexture = false;
-    tDesc.bUseUnKnownTexture = true;
+    tDesc.bUseUnknownTexture = true;
 
     tDesc.bUseTextureCom = false;
     tDesc.iTextureLevel = 0;

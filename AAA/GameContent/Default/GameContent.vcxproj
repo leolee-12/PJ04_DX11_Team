@@ -80,6 +80,10 @@
     <ClInclude Include="..\Public\Common_Ring03.h" />
     <ClInclude Include="..\Public\Deformable.h" />
     <ClInclude Include="..\public\DialogueDee.h" />
+    <ClInclude Include="..\Public\Env_SpotLight.h" />
+    <ClInclude Include="..\Public\EnvVolume_Culling.h" />
+    <ClInclude Include="..\Public\EnvVolume_Effect.h" />
+    <ClInclude Include="..\Public\EnvVolume_Light.h" />
     <ClInclude Include="..\public\KirbySpawnPoint.h" />
     <ClInclude Include="..\Public\Kirby_DeformDump.h" />
     <ClInclude Include="..\public\Dialogue_Arranger.h" />
@@ -159,6 +163,9 @@
     <ClInclude Include="..\public\Shockwave.h" />
     <ClInclude Include="..\Public\SmokeParticle.h" />
     <ClInclude Include="..\public\Spit_Projectile.h" />
+    <ClInclude Include="..\Public\Split_Bush.h" />
+    <ClInclude Include="..\Public\Split_Starblock.h" />
+    <ClInclude Include="..\Public\Split_Stone.h" />
     <ClInclude Include="..\Public\Star2DParticle.h" />
     <ClInclude Include="..\Public\SpitObject.h" />
     <ClInclude Include="..\Public\StarEmitter.h" />
@@ -438,6 +445,10 @@
     <ClCompile Include="..\Private\Car_00_MilkyWay.cpp" />
     <ClCompile Include="..\Private\CommonHit.cpp" />
     <ClCompile Include="..\private\DialogueDee.cpp" />
+    <ClCompile Include="..\Private\Env_SpotLight.cpp" />
+    <ClCompile Include="..\Private\EnvVolume_Culling.cpp" />
+    <ClCompile Include="..\Private\EnvVolume_Effect.cpp" />
+    <ClCompile Include="..\Private\EnvVolume_Light.cpp" />
     <ClCompile Include="..\private\KirbySpawnPoint.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformDump.cpp" />
     <ClCompile Include="..\private\Dialogue_Arranger.cpp" />
@@ -523,6 +534,9 @@
     <ClCompile Include="..\private\Shockwave.cpp" />
     <ClCompile Include="..\Private\SmokeParticle.cpp" />
     <ClCompile Include="..\private\Spit_Projectile.cpp" />
+    <ClCompile Include="..\Private\Split_Bush.cpp" />
+    <ClCompile Include="..\Private\Split_Starblock.cpp" />
+    <ClCompile Include="..\Private\Split_Stone.cpp" />
     <ClCompile Include="..\Private\Star2DParticle.cpp" />
     <ClCompile Include="..\Private\SpitObject.cpp" />
     <ClCompile Include="..\Private\StarEmitter.cpp" />

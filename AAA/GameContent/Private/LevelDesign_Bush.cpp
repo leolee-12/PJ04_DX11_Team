@@ -2,6 +2,7 @@
 #include "LevelDesign_Registry.h"
 #include "MeshLayer_Binder.h"
 #include "Parsing_Utils.h"
+#include "Effect_Loader.h"
 
 #include "GameInstance.h"
 #include "Geometry_Utils.h"
@@ -12,6 +13,7 @@ namespace
 	static constexpr const _char* ANIM_SHAKE_ONCE = "ShakeOnce";
 	static constexpr const _char* ANIM_SHAKE_LOOP = "ShakeLoop";
 	static constexpr _float BUSH_CULL_MARGIN = 0.5f;
+	static constexpr _float DESTROY_EFFECT_HEIGHT_RATIO = 0.55f;
 
 	struct LD_BUSH_CATALOG
 	{
@@ -257,6 +259,12 @@ void CLevelDesign_Bush::Damaged(const ATTACK_INFO& tInfo)
 
 	if (HIT_TYPE::SWORD_DEFAULT != tInfo.eHitType && HIT_TYPE::SWORD_SPIN != tInfo.eHitType)
 		return;
+
+	_float3 vPos{};
+	if (!Compute_EffectSpawnPosition(m_pModelComs[BUSH_STATE::BASIC], DESTROY_EFFECT_HEIGHT_RATIO, &vPos))
+		XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+	CEffect_Loader::GetInstance()->Spawn(L"Split_Bush", Get_LevelIndex(), vPos);
 
 	m_eState = BUSH_STATE::CUT;
 	m_pHurtBox->Set_Enabled(false);
