@@ -89,6 +89,10 @@ HRESULT CEffect_RectParticle::Bind_ShaderValue()
 	if (FAILED(__super::Bind_ShaderValue()))
 		return E_FAIL;
 
+	if (m_bCustomShader == false &&
+		FAILED(EffectRect::Bind_GBufferOutput(m_pShaderCom, Get_UseGBufferOutput())))
+		return E_FAIL;
+
 	auto Values = Make_RectValues();
 	if (FAILED(EffectRect::Bind_StaticShaderValues(m_pShaderCom, Values)) ||
 		FAILED(EffectRect::Bind_SpriteShaderValues(m_pShaderCom, Values)) ||

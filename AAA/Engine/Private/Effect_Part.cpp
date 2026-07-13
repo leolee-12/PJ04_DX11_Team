@@ -478,6 +478,7 @@ void CEffect_Part::Init_PropertyValue()
     m_iShaderPass = { 0 };
     m_iMirror = Sampler::DEFAULT;
     m_iDepthIgnore = DepthMode::DEPTH_DEFAULT;
+    m_bUseGBufferOutput = false;
     m_fEffectIntensity = 1.f;
     m_vEmissiveColor = { 0.f, 0.f, 0.f, 0.f };
     m_bEmissiveChange = false;

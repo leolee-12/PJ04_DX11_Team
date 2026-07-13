@@ -59,6 +59,7 @@ void CQuadCommon::Late_Update(_float fTimeDelta)
 
 HRESULT CQuadCommon::Render()
 {
+	Set_UseGBufferOutput(static_cast<RENDERID>(m_iRenderGroup) == RENDERID::NONBLEND);
 	return __super::Render();
 }
 

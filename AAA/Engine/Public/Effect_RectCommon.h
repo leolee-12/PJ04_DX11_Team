@@ -34,6 +34,8 @@ namespace EffectRect
 
     ENGINE_DLL HRESULT Bind_Roll(CShader* pShader, _float fRoll);
 
+    ENGINE_DLL HRESULT Bind_GBufferOutput(CShader* pShader, _bool bUseGBufferOutput);
+
     ENGINE_DLL HRESULT Bind_ParticleDrawValues(CShader* pShader, const _float4x4& WorldMatrix, _float fAlpha, const _float3& vColor);
 
     ENGINE_DLL HRESULT Begin_AndRender(CShader* pShader, CVIBuffer_Rect* pBuffer, _int iPass);

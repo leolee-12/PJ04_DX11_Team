@@ -62,6 +62,11 @@ HRESULT Engine::EffectRect::Bind_Roll(CShader* pShader, _float fRoll)
     return pShader->Bind_RawValue("g_fRoll", &fRoll, sizeof(_float));
 }
 
+HRESULT Engine::EffectRect::Bind_GBufferOutput(CShader* pShader, _bool bUseGBufferOutput)
+{
+    return pShader->Bind_RawValue("g_bWriteEmissiveGBuffer", &bUseGBufferOutput, sizeof(_bool));
+}
+
 HRESULT Engine::EffectRect::Bind_ParticleDrawValues(CShader* pShader, const _float4x4& WorldMatrix, _float fAlpha, const _float3& vColor)
 {
     if (FAILED(pShader->Bind_Matrix("g_WorldMatrix", &WorldMatrix)) ||

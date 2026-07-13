@@ -58,6 +58,7 @@ void CRectParticleCommon::Late_Update(_float fTimeDelta)
 
 HRESULT CRectParticleCommon::Render()
 {
+	Set_UseGBufferOutput(static_cast<RENDERID>(m_iRenderGroup) == RENDERID::NONBLEND);
 	return __super::Render();
 }
 

@@ -166,6 +166,7 @@ public:
 
 protected:
     _bool m_bCustomShader{};
+    _bool m_bUseGBufferOutput{};
     CShader* m_pShaderCom{};
     CTexture* m_pTextureCom{};
     CTexture* m_pMaskCom{};
@@ -196,6 +197,8 @@ protected:
     void Compute_CombinedWorldMatrix();
     void Set_LocalPositionFromProperty();
     void Update_Orbit(const _float fRatio);
+    void Set_UseGBufferOutput(_bool bUseGBufferOutput) { m_bUseGBufferOutput = bUseGBufferOutput; }
+    _bool Get_UseGBufferOutput() const { return m_bUseGBufferOutput; }
 
     _int Resolve_ShaderPass();
     HRESULT Bind_ViewProjectionMatrices();

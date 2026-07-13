@@ -90,6 +90,10 @@ HRESULT CEffect_RectEmitter::Bind_ShaderValue()
     if (FAILED(__super::Bind_ShaderValue()))
         return E_FAIL;
 
+    if (m_bCustomShader == false &&
+        FAILED(EffectRect::Bind_GBufferOutput(m_pShaderCom, Get_UseGBufferOutput())))
+        return E_FAIL;
+
     auto Values = Make_RectValues();
     EffectRect::Update_SpriteAnimations(Values, 0.f, true);
 
