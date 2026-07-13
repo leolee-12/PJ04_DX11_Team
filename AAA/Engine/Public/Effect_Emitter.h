@@ -192,8 +192,8 @@ public:
 
     virtual void    Effect_Start() override;
 
-    void Stop_Emission();
-    _bool Is_EmissionFinished() const;
+    virtual _bool Stop_Emission() override;
+    virtual _bool Is_EmissionFinished() const override;
 
 protected:
     virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;

@@ -62,10 +62,12 @@ void CEffect_Emitter::Effect_Start()
     m_bEmitterParticlesUpdatedThisFrame = false;
 }
 
-void CEffect_Emitter::Stop_Emission()
+_bool CEffect_Emitter::Stop_Emission()
 {
     m_bEmissionEnabled = false;
     m_fEmitterSpawnAccumulator = 0.f;
+
+    return true;
 }
 
 _bool CEffect_Emitter::Is_EmissionFinished() const

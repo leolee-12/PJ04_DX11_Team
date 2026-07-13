@@ -112,6 +112,14 @@ HRESULT CVIBuffer_Trail::Configure(const TRAIL_DESC& TrailDesc)
     const _uint iRequiredVertices = iMaxRenderSamples * 2 + ValidatedDesc.iMaxSamples;
     const _bool bRecreateBuffer = m_pVB == nullptr || m_iNumVertices != iRequiredVertices;
 
+    // 새 버퍼 생성에 실패하면 기존 버퍼와 설정을 그대로 유지한다.
+    if (bRecreateBuffer == true)
+    {
+        const HRESULT hr = Create_DynamicVB(iRequiredVertices);
+        if (FAILED(hr))
+            return hr;
+    }
+
     m_Desc = ValidatedDesc;
     m_iNumVertices = iRequiredVertices;
     m_RenderSamples.clear();
@@ -120,24 +128,29 @@ HRESULT CVIBuffer_Trail::Configure(const TRAIL_DESC& TrailDesc)
     m_RenderVertices.resize(iRequiredVertices);
     Clear();
 
-    // 동적 버퍼 생성
-    if (bRecreateBuffer == true)
-        return Create_DynamicVB();
-
     return S_OK;
 }
 
-HRESULT CVIBuffer_Trail::Create_DynamicVB()
+HRESULT CVIBuffer_Trail::Create_DynamicVB(_uint iNumVertices)
 {
-    Safe_Release(m_pVB);
-
     D3D11_BUFFER_DESC BufferDesc{};
-    BufferDesc.ByteWidth = m_iVertexStride * m_iNumVertices;
+    BufferDesc.ByteWidth = m_iVertexStride * iNumVertices;
     BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
     BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-    return m_pDevice->CreateBuffer(&BufferDesc, nullptr, &m_pVB);
+    ID3D11Buffer* pNewVertexBuffer = nullptr;
+    const HRESULT hr = m_pDevice->CreateBuffer(&BufferDesc, nullptr, &pNewVertexBuffer);
+    if (FAILED(hr))
+    {
+        Safe_Release(pNewVertexBuffer);
+        return hr;
+    }
+
+    Safe_Release(m_pVB);
+    m_pVB = pNewVertexBuffer;
+
+    return S_OK;
 }
 
 void CVIBuffer_Trail::Push_Sample(const _float3& vBase, const _float3& vTip, _float fInitialAge)
@@ -308,6 +321,9 @@ _bool CVIBuffer_Trail::Is_Renderable() const
 
 HRESULT CVIBuffer_Trail::Upload_Vertices()
 {
+    if (m_pVB == nullptr)
+        return E_FAIL;
+
     // 최종 정점을 Dynamic Vertex Buffer에 복사
     Build_RenderVertices();
     if (m_iNumActiveVertices < 4)

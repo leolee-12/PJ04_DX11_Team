@@ -48,6 +48,7 @@ public:
 
     _bool Is_Empty() const { return m_Samples.empty(); }
     _bool Is_Renderable() const;
+    _bool Has_VertexBuffer() const { return m_pVB != nullptr; }
     _uint Get_NumSamples() const { return static_cast<_uint>(m_Samples.size()); }
     _float Get_LifeTime() const { return m_Desc.fSampleLifeTime; }
     const TRAIL_DESC& Get_Description() const { return m_Desc; }
@@ -63,7 +64,7 @@ private:
     _bool m_bBreakBeforeNextSample{ true };
 
 private:
-    HRESULT Create_DynamicVB();
+    HRESULT Create_DynamicVB(_uint iNumVertices);
     HRESULT Upload_Vertices();
     void Build_RenderVertices();
 

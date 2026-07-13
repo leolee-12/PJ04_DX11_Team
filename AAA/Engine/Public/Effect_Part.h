@@ -148,6 +148,9 @@ public:
     virtual HRESULT Render() override;
 
     virtual void    Effect_Start();
+    virtual void    On_EffectLoop() {} // 컨테이너가 한 바퀴 루프했다는 사실을 각 Part에 알려주는 공통 가상 함수
+    virtual _bool   Stop_Emission() { return false; }
+    virtual _bool   Is_EmissionFinished() const { return true; }
     void Start_FadeOut(_float fFadeOutDuration = 0.3f);
     _bool Is_FadingOut() const { return m_bFadeOutActive; }
     _bool Is_FadeOutFinished() const { return m_bFadeOutFinished; }
@@ -158,7 +161,7 @@ public:
 
     void Set_ParentMatrix(const _float4x4* pParentMatrix);
 
-    void Set_IsPlay(_bool bPlay) { m_bIsPlay = bPlay; }
+    virtual void Set_IsPlay(_bool bPlay) { m_bIsPlay = bPlay; }
     _bool Get_IsPlay() { return m_bIsPlay; }
 
 protected:

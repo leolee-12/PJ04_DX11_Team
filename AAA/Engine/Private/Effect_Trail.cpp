@@ -57,7 +57,10 @@ void CEffect_Trail::Update(_float fTimeDelta)
 
     if (m_pVIBuffer != nullptr)
     {
-        Configure_Buffer();
+        const HRESULT hr = Configure_Buffer();
+        if (FAILED(hr) && m_pVIBuffer->Has_VertexBuffer() == false)
+            return;
+
         m_pVIBuffer->Update(fTimeDelta);
     }
 }
@@ -102,16 +105,36 @@ void CEffect_Trail::Effect_Start()
     Start_Emission();
 }
 
+void CEffect_Trail::On_EffectLoop()
+{
+    Begin_NewSegment();
+}
+
+void CEffect_Trail::Set_IsPlay(_bool bPlay)
+{
+    if (m_bIsPlay != bPlay)
+    {
+        if (bPlay == true)
+            Begin_NewSegment();
+        else
+            Clear_Trail();
+    }
+
+    __super::Set_IsPlay(bPlay);
+}
+
 void CEffect_Trail::Start_Emission()
 {
     m_bEmitting = true;
     Begin_NewSegment();
 }
 
-void CEffect_Trail::Stop_Emission()
+_bool CEffect_Trail::Stop_Emission()
 {
     m_bEmitting = false;
     Begin_NewSegment();
+
+    return true;
 }
 
 void CEffect_Trail::Clear_Trail()
@@ -153,7 +176,7 @@ _bool CEffect_Trail::Is_TrailRenderable() const
     return m_pVIBuffer != nullptr && m_pVIBuffer->Is_Renderable();
 }
 
-_bool CEffect_Trail::Is_TrailFinished() const
+_bool CEffect_Trail::Is_EmissionFinished() const
 {
     return m_bEmitting == false && (m_pVIBuffer == nullptr || m_pVIBuffer->Is_Empty());
 }
@@ -210,7 +233,8 @@ HRESULT CEffect_Trail::Configure_Buffer()
     const CVIBuffer_Trail::TRAIL_DESC& CurrentDesc = m_pVIBuffer->Get_Description();
     _float fExpectedSmoothness = TrailDesc.fSplineSmoothness;
     Helper::FloatClamp(fExpectedSmoothness, 0.f, 1.f);
-    if (CurrentDesc.iMaxSamples == (std::max)(static_cast<_uint>(2), (std::min)(TrailDesc.iMaxSamples, 512u)) &&
+    if (m_pVIBuffer->Has_VertexBuffer() == true &&
+        CurrentDesc.iMaxSamples == (std::max)(static_cast<_uint>(2), (std::min)(TrailDesc.iMaxSamples, 512u)) &&
         CurrentDesc.iSmoothSegments == (std::max)(static_cast<_uint>(1), (std::min)(TrailDesc.iSmoothSegments, 16u)) &&
         fabsf(CurrentDesc.fSampleLifeTime - (std::max)(TrailDesc.fSampleLifeTime, Helper::fEpsilon)) <= Helper::fEpsilon &&
         fabsf(CurrentDesc.fSplineSmoothness - fExpectedSmoothness) <= Helper::fEpsilon &&

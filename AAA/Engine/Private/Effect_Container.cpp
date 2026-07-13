@@ -3,8 +3,6 @@
 #include "GameInstance.h"
 
 #include "Effect_Part.h"
-#include "Effect_Emitter.h"
-#include "Effect_Trail.h"
 
 #include "Effect_Manager.h"
 
@@ -65,6 +63,9 @@ void CEffect_Container::Update(_float fTimeDelta)
         if (m_bLoop == true)
         {
             m_fAccTime = 0.f;
+
+            for (auto& [strPartTag, pPart] : m_EffestParts)
+                pPart->On_EffectLoop();
         }
         else
         {
@@ -174,20 +175,9 @@ void CEffect_Container::EffectContainer_StopAfterEmission()
 
     for (auto& [tag, pPart] : m_EffestParts)
     {
-        CEffect_Emitter* pEmitter = dynamic_cast<CEffect_Emitter*>(pPart);
-        if (pEmitter != nullptr)
+        if (pPart->Stop_Emission() == true)
         {
-            pEmitter->Stop_Emission();
-            pEmitter->Update_PlayValue(true, true, m_fDuration, m_fAccTime);
-            bHasEmissionPart = true;
-            continue;
-        }
-
-        CEffect_Trail* pTrail = dynamic_cast<CEffect_Trail*>(pPart);
-        if (pTrail != nullptr)
-        {
-            pTrail->Stop_Emission();
-            pTrail->Update_PlayValue(true, true, m_fDuration, m_fAccTime);
+            pPart->Update_PlayValue(true, true, m_fDuration, m_fAccTime);
             bHasEmissionPart = true;
             continue;
         }
@@ -234,19 +224,6 @@ _bool CEffect_Container::Set_EffectPartPlay(const _wstring& strPartTag, _bool bP
     auto iter = m_EffestParts.find(strPartTag);
     if (iter == m_EffestParts.end())
         return false;
-
-    // 에디터나 코드에서 Trail Part 하나만 끄고 다시 켤 때 이전 위치와 새 위치가 잘못 연결되지 않도록 
-    if (iter->second->Get_IsPlay() != bPlay)
-    {
-        CEffect_Trail* pTrail = dynamic_cast<CEffect_Trail*>(iter->second);
-        if (pTrail != nullptr)
-        {
-            if (bPlay == true)
-                pTrail->Begin_NewSegment();
-            else
-                pTrail->Clear_Trail();
-        }
-    }
 
     iter->second->Set_IsPlay(bPlay);
     return true;
@@ -324,12 +301,7 @@ void CEffect_Container::Update_WaitForEmitters()
 
     for (auto& [tag, pPart] : m_EffestParts)
     {
-        CEffect_Emitter* pEmitter = dynamic_cast<CEffect_Emitter*>(pPart);
-        if (pEmitter != nullptr && pEmitter->Is_EmissionFinished() == false)
-            return;
-
-        CEffect_Trail* pTrail = dynamic_cast<CEffect_Trail*>(pPart);
-        if (pTrail != nullptr && pTrail->Is_TrailFinished() == false)
+        if (pPart->Is_EmissionFinished() == false)
             return;
     }
 

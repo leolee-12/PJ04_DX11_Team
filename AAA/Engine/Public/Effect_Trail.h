@@ -52,10 +52,12 @@ public:
     virtual void Late_Update(_float fTimeDelta) override;
     virtual HRESULT Render() override;
     virtual void Effect_Start() override;
+    virtual void On_EffectLoop() override;
+    virtual void Set_IsPlay(_bool bPlay) override;
 
 public:
     void Start_Emission();
-    void Stop_Emission();
+    virtual _bool Stop_Emission() override;
     void Clear_Trail();
     void Begin_NewSegment();
 
@@ -64,7 +66,8 @@ public:
 
     _bool Is_Emitting() const { return m_bEmitting; }
     _bool Is_TrailRenderable() const;
-    _bool Is_TrailFinished() const;
+    virtual _bool Is_EmissionFinished() const override;
+    _bool Is_TrailFinished() const { return Is_EmissionFinished(); }
 
 protected:
     virtual void On_Deserialized() override;
