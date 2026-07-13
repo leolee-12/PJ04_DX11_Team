@@ -4,6 +4,7 @@
 
 #include "Effect_Part.h"
 #include "Effect_Emitter.h"
+#include "Effect_Trail.h"
 
 #include "Effect_Manager.h"
 
@@ -169,7 +170,7 @@ void CEffect_Container::EffectContainer_StopAfterEmission()
 
     m_bFadeOutRequested = false;
 
-    _bool bHasEmitter = false;
+    _bool bHasEmissionPart = false;
 
     for (auto& [tag, pPart] : m_EffestParts)
     {
@@ -178,14 +179,23 @@ void CEffect_Container::EffectContainer_StopAfterEmission()
         {
             pEmitter->Stop_Emission();
             pEmitter->Update_PlayValue(true, true, m_fDuration, m_fAccTime);
-            bHasEmitter = true;
+            bHasEmissionPart = true;
+            continue;
+        }
+
+        CEffect_Trail* pTrail = dynamic_cast<CEffect_Trail*>(pPart);
+        if (pTrail != nullptr)
+        {
+            pTrail->Stop_Emission();
+            pTrail->Update_PlayValue(true, true, m_fDuration, m_fAccTime);
+            bHasEmissionPart = true;
             continue;
         }
 
         pPart->Update_PlayValue(false, m_bLoop, m_fDuration, m_fAccTime);
     }
 
-    if (bHasEmitter == false)
+    if (bHasEmissionPart == false)
     {
         EffectContainer_Stop();
         return;
@@ -224,6 +234,19 @@ _bool CEffect_Container::Set_EffectPartPlay(const _wstring& strPartTag, _bool bP
     auto iter = m_EffestParts.find(strPartTag);
     if (iter == m_EffestParts.end())
         return false;
+
+    // 에디터나 코드에서 Trail Part 하나만 끄고 다시 켤 때 이전 위치와 새 위치가 잘못 연결되지 않도록 
+    if (iter->second->Get_IsPlay() != bPlay)
+    {
+        CEffect_Trail* pTrail = dynamic_cast<CEffect_Trail*>(iter->second);
+        if (pTrail != nullptr)
+        {
+            if (bPlay == true)
+                pTrail->Begin_NewSegment();
+            else
+                pTrail->Clear_Trail();
+        }
+    }
 
     iter->second->Set_IsPlay(bPlay);
     return true;
@@ -303,6 +326,10 @@ void CEffect_Container::Update_WaitForEmitters()
     {
         CEffect_Emitter* pEmitter = dynamic_cast<CEffect_Emitter*>(pPart);
         if (pEmitter != nullptr && pEmitter->Is_EmissionFinished() == false)
+            return;
+
+        CEffect_Trail* pTrail = dynamic_cast<CEffect_Trail*>(pPart);
+        if (pTrail != nullptr && pTrail->Is_TrailFinished() == false)
             return;
     }
 

@@ -26,9 +26,6 @@ PROPERTY(_bool, m_bSpriteAniMask, L"Sprite Animation Mask", L"Sprite Animation")
 PROPERTY(_int, m_iMaskFrameX, L"Frame X_M", L"Sprite Animation");
 PROPERTY(_int, m_iMaskFrameY, L"Frame Y_M", L"Sprite Animation");
 
-// 0: Effect Part ratio (legacy), 1: each particle lifetime ratio
-PROPERTY(_int, m_iSpriteTimeMode, L"Sprite Time Mode", L"Sprite Animation");
-
 public:
     struct EFFECT_RECTPARTICLE_DESC : public CEffect_Particle::EFFECT_PARTICLE_DESC
     {

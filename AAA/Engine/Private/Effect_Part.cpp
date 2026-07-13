@@ -177,9 +177,7 @@ HRESULT CEffect_Part::Bind_ViewProjectionMatrices()
     return S_OK;
 }
 
-void CEffect_Part::Evaluate_SpriteFrame(
-    _int iFrameX, _int iFrameY, _float fRatio,
-    _float2& vOutUV, _float2& vOutSize)
+void CEffect_Part::Evaluate_SpriteFrame(_int iFrameX, _int iFrameY, _float fRatio, _float2& vOutUV, _float2& vOutSize)
 {
     if (iFrameX < 1)
         iFrameX = 1;

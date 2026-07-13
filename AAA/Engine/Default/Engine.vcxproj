@@ -217,6 +217,7 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClInclude Include="..\Public\Effect_Mesh.h" />
     <ClInclude Include="..\Public\Effect_MeshCommon.h" />
     <ClInclude Include="..\Public\Effect_RectCommon.h" />
+    <ClInclude Include="..\Public\Effect_Trail.h" />
     <ClInclude Include="..\Public\Effect_MeshEmitter.h" />
     <ClInclude Include="..\Public\Effect_MeshParticle.h" />
     <ClInclude Include="..\Public\Effect_NonParticle.h" />
@@ -333,6 +334,7 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClCompile Include="..\Private\Effect_Mesh.cpp" />
     <ClCompile Include="..\Private\Effect_MeshCommon.cpp" />
     <ClCompile Include="..\Private\Effect_RectCommon.cpp" />
+    <ClCompile Include="..\Private\Effect_Trail.cpp" />
     <ClCompile Include="..\Private\Effect_MeshEmitter.cpp" />
     <ClCompile Include="..\Private\Effect_MeshParticle.cpp" />
     <ClCompile Include="..\Private\Effect_NonParticle.cpp" />
@@ -414,6 +416,9 @@ call "UpdateLib.bat" $(Configuration)</Command>
       <FileType>Document</FileType>
     </None>
     <None Include="..\ShaderFiles\Shader_Effect_VtxTex.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Effect_Trail.hlsl">
       <FileType>Document</FileType>
     </None>
     <None Include="..\ShaderFiles\Shader_PostProsess.hlsl">

@@ -100,20 +100,6 @@ HRESULT CEffect_RectParticle::Bind_ShaderValue()
 
 HRESULT CEffect_RectParticle::Bind_ParticleRectValue(const PARTICLE& Particle)
 {
-	auto Values = Make_RectValues();
-	const _int iSpriteTimeMode = EffectRect::Normalize_SpriteTimeMode(m_iSpriteTimeMode);
-
-	if (iSpriteTimeMode == EffectRect::SPRITE_TIME_PARTICLE &&
-		(m_bSpriteAniTexture == true || m_bSpriteAniMask == true))
-	{
-		_float fParticleRatio = Particle.fPreviousLocalRatio;
-		Helper::FloatClamp(fParticleRatio, 0.f, 1.f);
-		EffectRect::Update_SpriteAnimations(Values, fParticleRatio);
-
-		if (FAILED(EffectRect::Bind_SpriteShaderValues(m_pShaderCom, Values)))
-			return E_FAIL;
-	}
-
 	if (m_bUseParticleRoll == true)
 	{
 		const _float fRoll = XMConvertToRadians(Particle.vRotation.z);
@@ -128,11 +114,8 @@ void CEffect_RectParticle::Update_Core(const _float fTimeDelta, const _float fRa
 {
 	__super::Update_Core(fTimeDelta, fRatio);
 
-	if (EffectRect::Normalize_SpriteTimeMode(m_iSpriteTimeMode) == EffectRect::SPRITE_TIME_EFFECT)
-	{
-		auto Values = Make_RectValues();
-		EffectRect::Update_SpriteAnimations(Values, fRatio);
-	}
+	auto Values = Make_RectValues();
+	EffectRect::Update_SpriteAnimations(Values, fRatio);
 }
 
 void CEffect_RectParticle::Init_PropertyValue()
@@ -140,7 +123,6 @@ void CEffect_RectParticle::Init_PropertyValue()
 	auto Values = Make_RectValues();
 	EffectRect::Initialize_DefaultValues(Values);
 	m_bUseParticleRoll = false;
-	m_iSpriteTimeMode = EffectRect::SPRITE_TIME_EFFECT;
 }
 
 EffectRect::VALUES CEffect_RectParticle::Make_RectValues()

@@ -26,9 +26,6 @@ PROPERTY(_bool, m_bSpriteAniMask, L"Sprite Animation Mask", L"Sprite Animation")
 PROPERTY(_int, m_iMaskFrameX, L"Frame X_M", L"Sprite Animation");
 PROPERTY(_int, m_iMaskFrameY, L"Frame Y_M", L"Sprite Animation");
 
-// 0: Effect Part ratio, 1: each particle lifetime ratio (legacy)
-PROPERTY(_int, m_iSpriteTimeMode, L"Sprite Time Mode", L"Sprite Animation");
-
 public:
     struct EFFECT_RECTEMITTER_DESC : public CEffect_Emitter::EFFECT_EMITTER_DESC
     {
@@ -52,9 +49,6 @@ protected:
 public:
     virtual HRESULT Render() override;
 
-protected:
-    virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;
-
 private:
     HRESULT Ready_Components();
     HRESULT Bind_ShaderValue();
@@ -75,8 +69,6 @@ private:
 
     _float2 m_fCurMaskAniUV{};
     _float2 m_fCurMaskAniSize{};
-
-    _float m_fCurrentEffectRatio{};
 
 private:
     EffectRect::VALUES Make_RectValues();

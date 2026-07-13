@@ -197,9 +197,7 @@ protected:
     _int Resolve_ShaderPass();
     HRESULT Bind_ViewProjectionMatrices();
 
-    static void Evaluate_SpriteFrame(
-        _int iFrameX, _int iFrameY, _float fRatio,
-        _float2& vOutUV, _float2& vOutSize);
+    static void Evaluate_SpriteFrame(_int iFrameX, _int iFrameY, _float fRatio, _float2& vOutUV, _float2& vOutSize);
 
     static _float Evaluate_FloatCurve(
         _float fRatio, _float fFixedValue, _bool bChange,

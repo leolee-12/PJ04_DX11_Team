@@ -91,12 +91,7 @@ HRESULT CEffect_RectEmitter::Bind_ShaderValue()
         return E_FAIL;
 
     auto Values = Make_RectValues();
-    const _int iSpriteTimeMode = EffectRect::Normalize_SpriteTimeMode(m_iSpriteTimeMode);
-    const _float fRatio = iSpriteTimeMode == EffectRect::SPRITE_TIME_EFFECT
-        ? m_fCurrentEffectRatio
-        : 0.f;
-
-    EffectRect::Update_SpriteAnimations(Values, fRatio, true);
+    EffectRect::Update_SpriteAnimations(Values, 0.f, true);
 
     if (FAILED(EffectRect::Bind_StaticShaderValues(m_pShaderCom, Values)) ||
         FAILED(EffectRect::Bind_SpriteShaderValues(m_pShaderCom, Values)) ||
@@ -109,10 +104,8 @@ HRESULT CEffect_RectEmitter::Bind_ShaderValue()
 HRESULT CEffect_RectEmitter::Bind_EmitterRectValue(const EMITTER_PARTICLE& Particle)
 {
     auto Values = Make_RectValues();
-    const _int iSpriteTimeMode = EffectRect::Normalize_SpriteTimeMode(m_iSpriteTimeMode);
 
-    if (iSpriteTimeMode == EffectRect::SPRITE_TIME_PARTICLE &&
-        (m_bSpriteAniTexture == true || m_bSpriteAniMask == true))
+    if (m_bSpriteAniTexture == true || m_bSpriteAniMask == true)
     {
         _float fParticleRatio = 1.f;
         if (Particle.fLifeTime > Helper::fEpsilon)
@@ -134,19 +127,11 @@ HRESULT CEffect_RectEmitter::Bind_EmitterRectValue(const EMITTER_PARTICLE& Parti
     return S_OK;
 }
 
-void CEffect_RectEmitter::Update_Core(const _float fTimeDelta, const _float fRatio)
-{
-    __super::Update_Core(fTimeDelta, fRatio);
-    m_fCurrentEffectRatio = fRatio;
-}
-
 void CEffect_RectEmitter::Init_PropertyValue()
 {
     auto Values = Make_RectValues();
     EffectRect::Initialize_DefaultValues(Values);
     m_bUseParticleRoll = true;
-    m_iSpriteTimeMode = EffectRect::SPRITE_TIME_PARTICLE;
-    m_fCurrentEffectRatio = 0.f;
 }
 
 EffectRect::VALUES CEffect_RectEmitter::Make_RectValues()

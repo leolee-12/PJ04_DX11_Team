@@ -48,6 +48,7 @@ public:
 
     CShader* Get_2DShader() { return m_p2DShader; }
     CShader* Get_MeshShader() { return m_pMeshShader; }
+    CShader* Get_TrailShader() { return m_pTrailShader; }
 
 private:
     ID3D11Device* m_pDevice = { nullptr };
@@ -56,6 +57,7 @@ private:
 
     CShader* m_p2DShader = { nullptr };
     CShader* m_pMeshShader = { nullptr };
+    CShader* m_pTrailShader = { nullptr };
 
     _uint m_iSpawnCounter = { 0 };
 

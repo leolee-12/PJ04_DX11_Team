@@ -5,15 +5,7 @@
 
 namespace
 {
-    template<typename T>
-    HRESULT BindValue(Engine::CShader* pShader, const _char* pName, const T& Value)
-    {
-        return pShader->Bind_RawValue(pName, &Value, sizeof(T));
-    }
-
-    void EvaluateSpriteFrame(
-        _int iFrameX, _int iFrameY, _float fRatio,
-        _float2& vOutUV, _float2& vOutSize)
+    void EvaluateSpriteFrame(_int iFrameX, _int iFrameY, _float fRatio, _float2& vOutUV, _float2& vOutSize)
     {
         if (iFrameX < 1)
             iFrameX = 1;
@@ -34,8 +26,7 @@ namespace
     }
 }
 
-HRESULT Engine::EffectRect::Bind_ShaderValues(
-    CShader* pShader, const VALUES& Values, _float fRoll)
+HRESULT Engine::EffectRect::Bind_ShaderValues(CShader* pShader, const VALUES& Values, _float fRoll)
 {
     if (FAILED(Bind_StaticShaderValues(pShader, Values)) ||
         FAILED(Bind_SpriteShaderValues(pShader, Values)) ||
@@ -45,24 +36,22 @@ HRESULT Engine::EffectRect::Bind_ShaderValues(
     return S_OK;
 }
 
-HRESULT Engine::EffectRect::Bind_StaticShaderValues(
-    CShader* pShader, const VALUES& Values)
+HRESULT Engine::EffectRect::Bind_StaticShaderValues(CShader* pShader, const VALUES& Values)
 {
-    if (FAILED(BindValue(pShader, "g_bBillboard", Values.bBillboard)) ||
-        FAILED(BindValue(pShader, "g_bSpriteAniTexture", Values.bSpriteAniTexture)) ||
-        FAILED(BindValue(pShader, "g_bSpriteAniMask", Values.bSpriteAniMask)))
+    if (FAILED(pShader->Bind_RawValue("g_bBillboard", &Values.bBillboard, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_bSpriteAniTexture", &Values.bSpriteAniTexture, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_bSpriteAniMask", &Values.bSpriteAniMask, sizeof(_bool))))
         return E_FAIL;
 
     return S_OK;
 }
 
-HRESULT Engine::EffectRect::Bind_SpriteShaderValues(
-    CShader* pShader, const VALUES& Values)
+HRESULT Engine::EffectRect::Bind_SpriteShaderValues(CShader* pShader, const VALUES& Values)
 {
-    if (FAILED(BindValue(pShader, "g_vSpriteAniTexUV", Values.vCurrentTexUV)) ||
-        FAILED(BindValue(pShader, "g_vSpriteAniTexSize", Values.vCurrentTexSize)) ||
-        FAILED(BindValue(pShader, "g_vSpriteAniMaskUV", Values.vCurrentMaskUV)) ||
-        FAILED(BindValue(pShader, "g_vSpriteAniMaskSize", Values.vCurrentMaskSize)))
+    if (FAILED(pShader->Bind_RawValue("g_vSpriteAniTexUV", &Values.vCurrentTexUV, sizeof(_float2))) ||
+        FAILED(pShader->Bind_RawValue("g_vSpriteAniTexSize", &Values.vCurrentTexSize, sizeof(_float2))) ||
+        FAILED(pShader->Bind_RawValue("g_vSpriteAniMaskUV", &Values.vCurrentMaskUV, sizeof(_float2))) ||
+        FAILED(pShader->Bind_RawValue("g_vSpriteAniMaskSize", &Values.vCurrentMaskSize, sizeof(_float2))))
         return E_FAIL;
 
     return S_OK;
@@ -70,48 +59,47 @@ HRESULT Engine::EffectRect::Bind_SpriteShaderValues(
 
 HRESULT Engine::EffectRect::Bind_Roll(CShader* pShader, _float fRoll)
 {
-    return BindValue(pShader, "g_fRoll", fRoll);
+    return pShader->Bind_RawValue("g_fRoll", &fRoll, sizeof(_float));
 }
 
-HRESULT Engine::EffectRect::Bind_ParticleDrawValues(
-    CShader* pShader, const _float4x4& WorldMatrix,
-    _float fAlpha, const _float3& vColor)
+HRESULT Engine::EffectRect::Bind_ParticleDrawValues(CShader* pShader, const _float4x4& WorldMatrix, _float fAlpha, const _float3& vColor)
 {
     if (FAILED(pShader->Bind_Matrix("g_WorldMatrix", &WorldMatrix)) ||
-        FAILED(BindValue(pShader, "g_fAlpha", fAlpha)) ||
-        FAILED(BindValue(pShader, "g_vColor", vColor)))
+        FAILED(pShader->Bind_RawValue("g_fAlpha", &fAlpha, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_vColor", &vColor, sizeof(_float3))))
         return E_FAIL;
 
     return S_OK;
 }
 
-HRESULT Engine::EffectRect::Begin_AndRender(
-    CShader* pShader, CVIBuffer_Rect* pBuffer, _int iPass)
+HRESULT Engine::EffectRect::Begin_AndRender(CShader* pShader, CVIBuffer_Rect* pBuffer, _int iPass)
 {
-    if (FAILED(pShader->Begin(iPass)) ||
-        FAILED(pBuffer->Render()))
+    if (FAILED(pShader->Begin(iPass)) || FAILED(pBuffer->Render()))
         return E_FAIL;
 
     return S_OK;
 }
 
-void Engine::EffectRect::Update_SpriteAnimations(
-    VALUES& Values, _float fRatio, _bool bEvaluateDisabled)
+void Engine::EffectRect::Update_SpriteAnimations(VALUES& Values, _float fRatio, _bool bEvaluateDisabled)
 {
     if (Values.bSpriteAniTexture == true || bEvaluateDisabled == true)
     {
-        EvaluateSpriteFrame(
+        EvaluateSpriteFrame
+        (
             Values.iTexFrameX, Values.iTexFrameY,
             Values.bSpriteAniTexture == true ? fRatio : 0.f,
-            Values.vCurrentTexUV, Values.vCurrentTexSize);
+            Values.vCurrentTexUV, Values.vCurrentTexSize
+        );
     }
 
     if (Values.bSpriteAniMask == true || bEvaluateDisabled == true)
     {
-        EvaluateSpriteFrame(
+        EvaluateSpriteFrame
+        (
             Values.iMaskFrameX, Values.iMaskFrameY,
             Values.bSpriteAniMask == true ? fRatio : 0.f,
-            Values.vCurrentMaskUV, Values.vCurrentMaskSize);
+            Values.vCurrentMaskUV, Values.vCurrentMaskSize
+        );
     }
 }
 
@@ -126,10 +114,4 @@ void Engine::EffectRect::Initialize_DefaultValues(VALUES& Values)
     Values.bSpriteAniMask = false;
     Values.iMaskFrameX = 1;
     Values.iMaskFrameY = 1;
-}
-
-_int Engine::EffectRect::Normalize_SpriteTimeMode(_int iMode)
-{
-    Helper::IntClamp(iMode, SPRITE_TIME_EFFECT, SPRITE_TIME_END - 1);
-    return iMode;
 }
