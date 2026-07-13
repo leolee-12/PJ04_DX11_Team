@@ -10,7 +10,7 @@ class ENGINE_DLL CEffect_Quad abstract : public CEffect_NonParticle
 {
     GENERATED_BODY_ABSTRACT(CEffect_Quad)
 
-    PROPERTY(_bool, m_bBillboard, L"Billboard", L"Rendering");
+    PROPERTY(_bool, m_bBillboard, L"Billboard", L"Effect");
 
     // Sprite Animation Texture
     PROPERTY(_bool, m_bSpriteAniTexture, L"Sprite Animation Texture", L"Sprite Animation");
