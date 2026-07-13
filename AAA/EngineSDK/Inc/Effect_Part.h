@@ -148,6 +148,9 @@ public:
     virtual HRESULT Render() override;
 
     virtual void    Effect_Start();
+    virtual void    On_EffectLoop() {} // 컨테이너가 한 바퀴 루프했다는 사실을 각 Part에 알려주는 공통 가상 함수
+    virtual _bool   Stop_Emission() { return false; }
+    virtual _bool   Is_EmissionFinished() const { return true; }
     void Start_FadeOut(_float fFadeOutDuration = 0.3f);
     _bool Is_FadingOut() const { return m_bFadeOutActive; }
     _bool Is_FadeOutFinished() const { return m_bFadeOutFinished; }
@@ -158,11 +161,12 @@ public:
 
     void Set_ParentMatrix(const _float4x4* pParentMatrix);
 
-    void Set_IsPlay(_bool bPlay) { m_bIsPlay = bPlay; }
+    virtual void Set_IsPlay(_bool bPlay) { m_bIsPlay = bPlay; }
     _bool Get_IsPlay() { return m_bIsPlay; }
 
 protected:
     _bool m_bCustomShader{};
+    _bool m_bUseGBufferOutput{};
     CShader* m_pShaderCom{};
     CTexture* m_pTextureCom{};
     CTexture* m_pMaskCom{};
@@ -193,13 +197,13 @@ protected:
     void Compute_CombinedWorldMatrix();
     void Set_LocalPositionFromProperty();
     void Update_Orbit(const _float fRatio);
+    void Set_UseGBufferOutput(_bool bUseGBufferOutput) { m_bUseGBufferOutput = bUseGBufferOutput; }
+    _bool Get_UseGBufferOutput() const { return m_bUseGBufferOutput; }
 
     _int Resolve_ShaderPass();
     HRESULT Bind_ViewProjectionMatrices();
 
-    static void Evaluate_SpriteFrame(
-        _int iFrameX, _int iFrameY, _float fRatio,
-        _float2& vOutUV, _float2& vOutSize);
+    static void Evaluate_SpriteFrame(_int iFrameX, _int iFrameY, _float fRatio, _float2& vOutUV, _float2& vOutSize);
 
     static _float Evaluate_FloatCurve(
         _float fRatio, _float fFixedValue, _bool bChange,

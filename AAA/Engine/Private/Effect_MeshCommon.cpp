@@ -5,37 +5,27 @@
 
 namespace
 {
-    template<typename T>
-    HRESULT BindValue(Engine::CShader* pShader, const _char* pName, const T& Value)
+    HRESULT BindDiffuseValues(Engine::CShader* pShader, const Engine::EffectMesh::VALUES& Values)
     {
-        return pShader->Bind_RawValue(pName, &Value, sizeof(T));
-    }
-
-    HRESULT BindDiffuseValues(
-        Engine::CShader* pShader, const Engine::EffectMesh::VALUES& Values)
-    {
-        if (FAILED(BindValue(pShader, "g_bUseDiffuseTexture", Values.Diffuse.bUse)) ||
-            FAILED(BindValue(pShader, "g_vDiffuseTiling", Values.Diffuse.vTiling)) ||
-            FAILED(BindValue(pShader, "g_vDiffuseOffset", Values.Diffuse.vCurrentOffset)))
+        if (FAILED(pShader->Bind_RawValue("g_bUseDiffuseTexture", &Values.Diffuse.bUse, sizeof(_bool))) ||
+            FAILED(pShader->Bind_RawValue("g_vDiffuseTiling", &Values.Diffuse.vTiling, sizeof(_float2))) ||
+            FAILED(pShader->Bind_RawValue("g_vDiffuseOffset", &Values.Diffuse.vCurrentOffset, sizeof(_float2))))
             return E_FAIL;
 
         return S_OK;
     }
 
-    HRESULT BindUnknownValues(
-        Engine::CShader* pShader, const Engine::EffectMesh::VALUES& Values)
+    HRESULT BindUnknownValues(Engine::CShader* pShader, const Engine::EffectMesh::VALUES& Values)
     {
-        if (FAILED(BindValue(pShader, "g_bUseUnknownTexture", Values.Unknown.bUse)) ||
-            FAILED(BindValue(pShader, "g_vUnknownTiling", Values.Unknown.vTiling)) ||
-            FAILED(BindValue(pShader, "g_vUnknownOffset", Values.Unknown.vCurrentOffset)))
+        if (FAILED(pShader->Bind_RawValue("g_bUseUnknownTexture", &Values.Unknown.bUse, sizeof(_bool))) ||
+            FAILED(pShader->Bind_RawValue("g_vUnknownTiling", &Values.Unknown.vTiling, sizeof(_float2))) ||
+            FAILED(pShader->Bind_RawValue("g_vUnknownOffset", &Values.Unknown.vCurrentOffset, sizeof(_float2))))
             return E_FAIL;
 
         return S_OK;
     }
 
-    void MoveUVScroll(
-        const _float fRatio,
-        const Engine::EffectMesh::TEXTURE_VALUES& Values)
+    void MoveUVScroll(const _float fRatio, const Engine::EffectMesh::TEXTURE_VALUES& Values)
     {
         if (Values.bUVScroll == false)
         {
@@ -49,8 +39,7 @@ namespace
         Values.vCurrentOffset.y = fmodf(Values.vCurrentOffset.y, 1.f);
     }
 
-    _float ComputeAnimationRatio(
-        const _float fRatio, const _float fStartRatio, const _float fEndRatio)
+    _float ComputeAnimationRatio(const _float fRatio, const _float fStartRatio, const _float fEndRatio)
     {
         const _float fRange = fEndRatio - fStartRatio;
         if (fabsf(fRange) <= Helper::fEpsilon)
@@ -61,14 +50,12 @@ namespace
         return fResult;
     }
 
-    void UpdateCircleRatio(
-        Engine::EffectMesh::CIRCLE_UV_VALUES& Values, const _float fRatio)
+    void UpdateCircleRatio(Engine::EffectMesh::CIRCLE_UV_VALUES& Values, const _float fRatio)
     {
         Values.fRatio = ComputeAnimationRatio(fRatio, Values.fStartRatio, Values.fEndRatio);
     }
 
-    void UpdateLinearRatio(
-        Engine::EffectMesh::LINEAR_UV_VALUES& Values, const _float fRatio)
+    void UpdateLinearRatio(Engine::EffectMesh::LINEAR_UV_VALUES& Values, const _float fRatio)
     {
         Values.fRatio = ComputeAnimationRatio(fRatio, Values.fStartRatio, Values.fEndRatio);
     }
@@ -103,8 +90,7 @@ namespace
     }
 }
 
-HRESULT Engine::EffectMesh::Bind_ShaderValues(
-    CShader* pShader, const VALUES& Values, _bool bBindUnknownBeforePBR)
+HRESULT Engine::EffectMesh::Bind_ShaderValues(CShader* pShader, const VALUES& Values, _bool bBindUnknownBeforePBR)
 {
     if (FAILED(BindDiffuseValues(pShader, Values)))
         return E_FAIL;
@@ -112,54 +98,53 @@ HRESULT Engine::EffectMesh::Bind_ShaderValues(
     if (bBindUnknownBeforePBR == true && FAILED(BindUnknownValues(pShader, Values)))
         return E_FAIL;
 
-    if (FAILED(BindValue(pShader, "g_bUseNormalTexture", Values.bUseNormalTexture)) ||
-        FAILED(BindValue(pShader, "g_bUseMRATexture", Values.bUseMRATexture)))
+    if (FAILED(pShader->Bind_RawValue("g_bUseNormalTexture", &Values.bUseNormalTexture, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_bUseMRATexture", &Values.bUseMRATexture, sizeof(_bool))))
         return E_FAIL;
 
     if (bBindUnknownBeforePBR == false && FAILED(BindUnknownValues(pShader, Values)))
         return E_FAIL;
 
-    if (FAILED(BindValue(pShader, "g_bUseCircleUVAnim_T", Values.TextureCircle.bUse)) ||
-        FAILED(BindValue(pShader, "g_fCircleUVRatio_T", Values.TextureCircle.fRatio)) ||
-        FAILED(BindValue(pShader, "g_fCircleUVStartDegree_T", Values.TextureCircle.fStartDegree)) ||
-        FAILED(BindValue(pShader, "g_bCircleUVClockwise_T", Values.TextureCircle.bClockwise)) ||
-        FAILED(BindValue(pShader, "g_bUseCircleUVAnim_M", Values.MaskCircle.bUse)) ||
-        FAILED(BindValue(pShader, "g_fCircleUVRatio_M", Values.MaskCircle.fRatio)) ||
-        FAILED(BindValue(pShader, "g_fCircleUVStartDegree_M", Values.MaskCircle.fStartDegree)) ||
-        FAILED(BindValue(pShader, "g_bCircleUVClockwise_M", Values.MaskCircle.bClockwise)) ||
-        FAILED(BindValue(pShader, "g_bUseCircleUVAnim_D", Values.DiffuseCircle.bUse)) ||
-        FAILED(BindValue(pShader, "g_fCircleUVRatio_D", Values.DiffuseCircle.fRatio)) ||
-        FAILED(BindValue(pShader, "g_fCircleUVStartDegree_D", Values.DiffuseCircle.fStartDegree)) ||
-        FAILED(BindValue(pShader, "g_bCircleUVClockwise_D", Values.DiffuseCircle.bClockwise)) ||
-        FAILED(BindValue(pShader, "g_bUseCircleUVAnim_U", Values.UnknownCircle.bUse)) ||
-        FAILED(BindValue(pShader, "g_fCircleUVRatio_U", Values.UnknownCircle.fRatio)) ||
-        FAILED(BindValue(pShader, "g_fCircleUVStartDegree_U", Values.UnknownCircle.fStartDegree)) ||
-        FAILED(BindValue(pShader, "g_bCircleUVClockwise_U", Values.UnknownCircle.bClockwise)))
+    if (FAILED(pShader->Bind_RawValue("g_bUseCircleUVAnim_T", &Values.TextureCircle.bUse, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_fCircleUVRatio_T", &Values.TextureCircle.fRatio, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_fCircleUVStartDegree_T", &Values.TextureCircle.fStartDegree, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_bCircleUVClockwise_T", &Values.TextureCircle.bClockwise, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_bUseCircleUVAnim_M", &Values.MaskCircle.bUse, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_fCircleUVRatio_M", &Values.MaskCircle.fRatio, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_fCircleUVStartDegree_M", &Values.MaskCircle.fStartDegree, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_bCircleUVClockwise_M", &Values.MaskCircle.bClockwise, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_bUseCircleUVAnim_D", &Values.DiffuseCircle.bUse, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_fCircleUVRatio_D", &Values.DiffuseCircle.fRatio, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_fCircleUVStartDegree_D", &Values.DiffuseCircle.fStartDegree, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_bCircleUVClockwise_D", &Values.DiffuseCircle.bClockwise, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_bUseCircleUVAnim_U", &Values.UnknownCircle.bUse, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_fCircleUVRatio_U", &Values.UnknownCircle.fRatio, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_fCircleUVStartDegree_U", &Values.UnknownCircle.fStartDegree, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_bCircleUVClockwise_U", &Values.UnknownCircle.bClockwise, sizeof(_bool))))
         return E_FAIL;
 
-    if (FAILED(BindValue(pShader, "g_bUseLinearUVAnim_T", Values.TextureLinear.bUse)) ||
-        FAILED(BindValue(pShader, "g_fLinearUVRatio_T", Values.TextureLinear.fRatio)) ||
-        FAILED(BindValue(pShader, "g_iLinearUVAxis_T", Values.TextureLinear.iAxis)) ||
-        FAILED(BindValue(pShader, "g_bLinearUVReverse_T", Values.TextureLinear.bReverse)) ||
-        FAILED(BindValue(pShader, "g_bUseLinearUVAnim_M", Values.MaskLinear.bUse)) ||
-        FAILED(BindValue(pShader, "g_fLinearUVRatio_M", Values.MaskLinear.fRatio)) ||
-        FAILED(BindValue(pShader, "g_iLinearUVAxis_M", Values.MaskLinear.iAxis)) ||
-        FAILED(BindValue(pShader, "g_bLinearUVReverse_M", Values.MaskLinear.bReverse)) ||
-        FAILED(BindValue(pShader, "g_bUseLinearUVAnim_D", Values.DiffuseLinear.bUse)) ||
-        FAILED(BindValue(pShader, "g_fLinearUVRatio_D", Values.DiffuseLinear.fRatio)) ||
-        FAILED(BindValue(pShader, "g_iLinearUVAxis_D", Values.DiffuseLinear.iAxis)) ||
-        FAILED(BindValue(pShader, "g_bLinearUVReverse_D", Values.DiffuseLinear.bReverse)) ||
-        FAILED(BindValue(pShader, "g_bUseLinearUVAnim_U", Values.UnknownLinear.bUse)) ||
-        FAILED(BindValue(pShader, "g_fLinearUVRatio_U", Values.UnknownLinear.fRatio)) ||
-        FAILED(BindValue(pShader, "g_iLinearUVAxis_U", Values.UnknownLinear.iAxis)) ||
-        FAILED(BindValue(pShader, "g_bLinearUVReverse_U", Values.UnknownLinear.bReverse)))
+    if (FAILED(pShader->Bind_RawValue("g_bUseLinearUVAnim_T", &Values.TextureLinear.bUse, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_fLinearUVRatio_T", &Values.TextureLinear.fRatio, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_iLinearUVAxis_T", &Values.TextureLinear.iAxis, sizeof(_int))) ||
+        FAILED(pShader->Bind_RawValue("g_bLinearUVReverse_T", &Values.TextureLinear.bReverse, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_bUseLinearUVAnim_M", &Values.MaskLinear.bUse, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_fLinearUVRatio_M", &Values.MaskLinear.fRatio, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_iLinearUVAxis_M", &Values.MaskLinear.iAxis, sizeof(_int))) ||
+        FAILED(pShader->Bind_RawValue("g_bLinearUVReverse_M", &Values.MaskLinear.bReverse, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_bUseLinearUVAnim_D", &Values.DiffuseLinear.bUse, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_fLinearUVRatio_D", &Values.DiffuseLinear.fRatio, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_iLinearUVAxis_D", &Values.DiffuseLinear.iAxis, sizeof(_int))) ||
+        FAILED(pShader->Bind_RawValue("g_bLinearUVReverse_D", &Values.DiffuseLinear.bReverse, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_bUseLinearUVAnim_U", &Values.UnknownLinear.bUse, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_fLinearUVRatio_U", &Values.UnknownLinear.fRatio, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_iLinearUVAxis_U", &Values.UnknownLinear.iAxis, sizeof(_int))) ||
+        FAILED(pShader->Bind_RawValue("g_bLinearUVReverse_U", &Values.UnknownLinear.bReverse, sizeof(_bool))))
         return E_FAIL;
 
     return S_OK;
 }
 
-HRESULT Engine::EffectMesh::Bind_Materials(
-    CModel* pModel, CShader* pShader, _uint iMeshIndex, const VALUES& Values)
+HRESULT Engine::EffectMesh::Bind_Materials(CModel* pModel, CShader* pShader, _uint iMeshIndex, const VALUES& Values)
 {
     if (Values.Diffuse.bUse == true &&
         FAILED(pModel->Bind_Material(pShader, "g_DiffuseTexture", iMeshIndex, MTEX_TYPE::DIFFUSE, 0)))
