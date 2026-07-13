@@ -373,6 +373,12 @@
     <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword">
       <UniqueIdentifier>{fcd6a4fd-d852-4910-bb95-c63423f00f06}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\02. Kirby_Ability_Bomb">
+      <UniqueIdentifier>{af50f9c4-0c3a-46ad-a885-d9a43a09bdb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\03. Kirby_Ability_Ice">
+      <UniqueIdentifier>{91d84220-16da-4a06-882e-ad195ee2cc42}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform">
       <UniqueIdentifier>{f560c2aa-8eeb-4595-83ed-635fdbd73ecd}</UniqueIdentifier>
     </Filter>
@@ -405,6 +411,12 @@
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat">
       <UniqueIdentifier>{d12eb026-e157-4495-859c-6ae236366e96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\02. BombHat">
+      <UniqueIdentifier>{6b28ef8a-5281-4514-a75a-ddd94164a18b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\03. IceHat">
+      <UniqueIdentifier>{109bd620-9956-4e72-8af9-dfbd48ee4c64}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster">
       <UniqueIdentifier>{c69f6e1f-9250-40fa-90bd-8d408e832ff0}</UniqueIdentifier>
@@ -1440,6 +1452,12 @@
     <ClInclude Include="..\Public\Kirby_Ability_Sword.h">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Ability_Bomb.h">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\02. Kirby_Ability_Bomb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Ability_Ice.h">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\03. Kirby_Ability_Ice</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Kirby_AbilityDump.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\AbilityDump</Filter>
     </ClInclude>
@@ -1556,6 +1574,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_SwordHat.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_BombHat.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\02. BombHat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_IceHat.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\03. IceHat</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Wait.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait</Filter>
@@ -2459,6 +2483,12 @@
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Ability_Bomb.cpp">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\02. Kirby_Ability_Bomb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Ability_Ice.cpp">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\03. Kirby_Ability_Ice</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\AbilityDump</Filter>
     </ClCompile>
@@ -2569,6 +2599,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_SwordHat.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_BombHat.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\02. BombHat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_IceHat.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\03. IceHat</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Wait.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait</Filter>
