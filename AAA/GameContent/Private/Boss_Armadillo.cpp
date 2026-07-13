@@ -50,8 +50,11 @@ void CBoss_Armadillo::Update(_float fTimeDelta)
     }
     if (m_pGameInstance_Proxy->Key_Down(DIK_0))
         Appear();
+    if (m_pGameInstance_Proxy->Key_Down(DIK_9))
+        m_bDebugWallHit = true;
 #endif
     __super::Update(fTimeDelta);
+    Update_BodyOffset(fTimeDelta);
 }
 
 void CBoss_Armadillo::Late_Update(_float fTimeDelta)
@@ -113,6 +116,20 @@ CMultiHitBoxPart* CBoss_Armadillo::Get_HitBoxPart() const
 
 _bool CBoss_Armadillo::Sweep_Wall(const _float3& vDir, _float fDist, _float3* pOutNormal) const
 {
+#ifdef _DEBUG
+    if (m_bDebugWallHit)
+    {
+        m_bDebugWallHit = false;  
+        if (pOutNormal)
+        {
+            _vector d = XMVector3Normalize(XMVectorSetY(XMLoadFloat3(&vDir), 0.f));
+            _float fJitter = XMConvertToRadians(((rand() % 81) - 40) * 1.f);
+            XMStoreFloat3(pOutNormal, XMVector3Transform(-d, XMMatrixRotationY(fJitter)));
+        }
+        return true;
+    }
+#endif
+
     _float3 vPos;
     XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
     vPos.y += s_fCCT_Height * 0.5f;   // ¸öÅë Áß½É ³ôÀÌ¿¡¼­ ½ô
@@ -128,6 +145,23 @@ _bool CBoss_Armadillo::Sweep_Wall(const _float3& vDir, _float fDist, _float3* pO
     return true;
 }
 
+void CBoss_Armadillo::Set_TwinDanceOffset(_bool bOn)
+{
+    if (!m_pBody) return;
+
+    if (bOn)
+    {
+        const _float4x4* pBone = m_pBody->Get_BoneMatrixPtr("Partner1L");
+        if (!pBone) return;
+        m_vBodyOffsetTarget = _float3(-pBone->_41 * 0.5f, 0.f, -pBone->_43 * 0.5f);
+    }
+    else
+        m_vBodyOffsetTarget = _float3(0.f, 0.f, 0.f);
+
+    XMStoreFloat3(&m_vBodyOffsetStart, m_pBody->Get_Transform()->Get_State(STATE::POSITION));
+    m_fBodyOffsetT = 0.f;
+}
+
 void CBoss_Armadillo::Summon_Partner()
 {
     if (m_pPartner) return;
@@ -138,7 +172,7 @@ void CBoss_Armadillo::Summon_Partner()
     if (!p) return;
 
     p->Attach_To_Socket(m_pBody->Get_BoneMatrixPtr("Partner1L"),
-        m_pTransformCom->Get_WorldMatrixPtr(), XMMatrixIdentity());
+        m_pBody->Get_CombinedWorldMatrixPtr(), XMMatrixIdentity());
     m_pPartner = static_cast<CProjectile_Partner*>(p);
 }
 
@@ -211,6 +245,20 @@ HRESULT CBoss_Armadillo::Ready_PartObjects()
         [this](CCollider*) { m_bCatchHit = true; });
 
     return S_OK;
+}
+
+void CBoss_Armadillo::Update_BodyOffset(_float fTimeDelta)
+{
+    if (!m_pBody || m_fBodyOffsetT >= 1.f)
+        return;
+
+    m_fBodyOffsetT = min(m_fBodyOffsetT + fTimeDelta / s_fBodyOffsetBlendTime, 1.f);
+
+    _float t = m_fBodyOffsetT * m_fBodyOffsetT * (3.f - 2.f * m_fBodyOffsetT);
+
+    _vector vPos = XMVectorLerp(XMLoadFloat3(&m_vBodyOffsetStart),
+        XMLoadFloat3(&m_vBodyOffsetTarget), t);
+    m_pBody->Get_Transform()->Set_State(STATE::POSITION, XMVectorSetW(vPos, 1.f));
 }
 
 CBoss_Armadillo* CBoss_Armadillo::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -37,11 +37,14 @@ public:
     _bool Is_CatchHit() const { return m_bCatchHit; }
 
     _bool Sweep_Wall(const _float3& vDir, _float fDist, _float3* pOutNormal) const;
+    void  Set_TwinDanceOffset(_bool bOn);
 
     void Summon_Partner();
     void Fire_PartnerThrow();
     void Enable_PartnerSpinHit(_bool b);
     void Play_PartnerAnim(const _char* szClip, _bool bLoop);
+
+    _bool Has_Partner() const { return m_pPartner != nullptr; }
 
 protected:
     virtual CMonsterBrain* Create_Brain() override;
@@ -68,6 +71,18 @@ private:
 
     _bool m_bCatchHit = { false };
     CProjectile_Partner* m_pPartner = { nullptr };
+
+    _float3 m_vBodyOffsetStart = { 0.f, 0.f, 0.f };
+    _float3 m_vBodyOffsetTarget = { 0.f, 0.f, 0.f };
+    _float  m_fBodyOffsetT = { 1.f };
+    static constexpr _float s_fBodyOffsetBlendTime = 0.25f;
+
+#ifdef _DEBUG
+    mutable _bool m_bDebugWallHit = { false };
+#endif
+
+private:
+    void Update_BodyOffset(_float fTimeDelta);
 
 public:
     static CBoss_Armadillo* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
