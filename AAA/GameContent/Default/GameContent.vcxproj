@@ -118,6 +118,7 @@
     <ClInclude Include="..\Public\MeshParticleCommon.h" />
     <ClInclude Include="..\Public\RectEmitterCommon.h" />
     <ClInclude Include="..\Public\TrailCommon.h" />
+    <ClInclude Include="..\Public\TrailContainer.h" />
     <ClInclude Include="..\public\Mission_Manager.h" />
     <ClInclude Include="..\Public\Monster_State_Flatten.h" />
     <ClInclude Include="..\Public\Monster_State_Spat.h" />
@@ -492,6 +493,7 @@
     <ClCompile Include="..\Private\MeshParticleCommon.cpp" />
     <ClCompile Include="..\Private\RectEmitterCommon.cpp" />
     <ClCompile Include="..\Private\TrailCommon.cpp" />
+    <ClCompile Include="..\Private\TrailContainer.cpp" />
     <ClCompile Include="..\private\Mission_Manager.cpp" />
     <ClCompile Include="..\Private\Monster_State_Flatten.cpp" />
     <ClCompile Include="..\Private\Monster_State_Spat.cpp" />
