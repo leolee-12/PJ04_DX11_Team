@@ -146,6 +146,32 @@ void CModel::Get_ModelAABB(_float3* pOutMin, _float3* pOutMax) const
 	*pOutMax = mx;
 }
 
+_bool CModel::Get_CollisionAABB(_float3* pOutMin, _float3* pOutMax) const
+{
+	if (nullptr == pOutMin || nullptr == pOutMax || nullptr == m_pCollisionMesh)
+		return false;
+
+	const physx::PxBounds3 Bounds = m_pCollisionMesh->getLocalBounds();
+	if (!Bounds.isValid() || Bounds.isEmpty())
+		return false;
+
+	*pOutMin =
+	{
+			Bounds.minimum.x,
+			Bounds.minimum.y,
+			Bounds.minimum.z
+	};
+
+	*pOutMax =
+	{
+			Bounds.maximum.x,
+			Bounds.maximum.y,
+			Bounds.maximum.z
+	};
+
+	return true;
+}
+
 _float CModel::Get_CurrentAnimProgress() const
 {
 	_uint idx = m_isBlending ? m_iBlendTargetAnimIndex : m_iCurrentAnimationIndex;

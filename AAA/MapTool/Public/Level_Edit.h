@@ -87,6 +87,7 @@ public:
 	_bool Track_EditedMapPreviewLevelDesignObject(CGameObject* pObject, const EDIT_OBJECT_OVERRIDE_DESC& Edit);
 	_bool Clear_EditedMapPreviewLevelDesignObject(CGameObject* pObject);
 	_bool Try_GetMapPreviewLevelDesignEdit(CGameObject* pObject, EDIT_OBJECT_OVERRIDE_DESC* pOutEdit) const;
+	HRESULT Clear_MapPreviewEnvObjectOverride(CGameObject* pObject);
 	_bool Commit_MapEditObjectFromCurrentState(CGameObject* pObject);
 
 	HRESULT Restore_DeletedMapPreviewEnv(const _wstring& strStableKey);
@@ -163,6 +164,7 @@ private:
 	void    Set_MapPreviewStatus(const wstring& strStatus);
 	void    Sync_MapPreviewRuntimeStateToSession();
 	_bool   Handle_MapSpecificDeletion(CGameObject* pObject);
+	_bool	Promote_MapPreviewEnvObjectToAdded(CGameObject* pObject);
 	_bool   Try_RegisterAddedMapOverridePlacement(CGameObject* pObject, const _wstring& strObjectTag);
 	void    Try_RegisterLoadedAddedMapObject(
 		CGameObject* pObject,

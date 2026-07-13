@@ -44,6 +44,7 @@ struct MAP_ADD_OBJECT
 	_wstring strPrototypeTag;
 	_wstring strLayerTag;
 	_wstring strObjectTag;
+	_wstring strReplacedEnvKey;
 	json jObject;
 };
 

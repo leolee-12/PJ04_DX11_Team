@@ -37,11 +37,20 @@
     <Filter Include="00. GameObject\02. EnvObject">
       <UniqueIdentifier>{ce9ba11f-9390-48f8-9a7f-e24b38b55608}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\02. EnvObject\EnvTrigger">
+      <UniqueIdentifier>{f61d97f4-06b5-4b44-8a89-c4328f90ddfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\02. EnvObject\EnvTrigger\Trigger">
+      <UniqueIdentifier>{84257336-de92-4c0b-834e-ecde29e11e01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\02. EnvObject\EnvTrigger\Volume">
+      <UniqueIdentifier>{c487a407-1c31-42f3-afaa-a5b383647e55}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\02. EnvObject\Instance">
       <UniqueIdentifier>{9df9d2af-5f82-4056-9d63-b9f7cc4c1544}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\02. EnvObject\Trigger">
-      <UniqueIdentifier>{f61d97f4-06b5-4b44-8a89-c4328f90ddfb}</UniqueIdentifier>
+    <Filter Include="00. GameObject\02. EnvObject\SpotLight">
+      <UniqueIdentifier>{e2a9ab56-0259-439a-9340-671198eb11ea}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect">
       <UniqueIdentifier>{289ff231-82b4-41ae-806c-a6d26b461dfa}</UniqueIdentifier>
@@ -121,6 +130,9 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\14. FlowerPetals">
       <UniqueIdentifier>{226d0445-b5ec-4f92-ade0-210ed72ccd46}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\15. Split">
+      <UniqueIdentifier>{6fc60edd-b034-4d2e-b974-b555d698dd72}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\97. SwordChargeEffect">
       <UniqueIdentifier>{337bfefa-886b-4153-b3e4-87d81d98e19b}</UniqueIdentifier>
     </Filter>
@@ -133,7 +145,7 @@
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part">
       <UniqueIdentifier>{40aab48f-b6b1-4fe9-80fa-b4ca0ea5dad0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\00. QuadCommon">
+    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\00. RectCommon">
       <UniqueIdentifier>{05c95001-67ec-4480-9c3e-2def286ecfd7}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\01. MeshCommon">
@@ -216,9 +228,6 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\Emitter">
       <UniqueIdentifier>{2a99a782-1b06-4ca2-bcec-3900ae1eb0e7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\Mesh">
-      <UniqueIdentifier>{4967c70d-f3e5-4aee-a299-904aa520e889}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\MeshParticle">
       <UniqueIdentifier>{35016b5e-260b-4a74-a291-ba9775ec2d10}</UniqueIdentifier>
@@ -1347,6 +1356,9 @@
     <ClInclude Include="..\Public\Env_InstanceController.h">
       <Filter>00. GameObject\02. EnvObject\Instance</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Env_SpotLight.h">
+      <Filter>00. GameObject\02. EnvObject\SpotLight</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\EnvObject.h">
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClInclude>
@@ -1360,16 +1372,25 @@
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EnvObject_Trigger.h">
-      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EnvTrigger_EventPublisher.h">
-      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Trigger</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EnvTrigger_Generic.h">
-      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Trigger</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EnvTrigger_RenderGlobals.h">
-      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Trigger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvVolume_Culling.h">
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Volume</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvVolume_Effect.h">
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Volume</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnvVolume_Light.h">
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Volume</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EssenceBubble.h">
       <Filter>00. GameObject\09. AbilityBubble\Containers\Essence</Filter>
@@ -1923,14 +1944,14 @@
     <ClInclude Include="..\public\Projectile_Partner.h">
       <Filter>00. GameObject\07. Boss\Boss\Armadillo\Projectile</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\QuadCommon.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\00. QuadCommon</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\RailRideable.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\RailTrack.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RectCommon.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\00. RectCommon</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\RectEmitterCommon.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\04. RectEmitterCommon</Filter>
@@ -2007,14 +2028,20 @@
     <ClInclude Include="..\Public\SpitObject.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\11. SpitObject</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Split_Bush.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Split_Starblock.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Split_Stone.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Star2DParticle.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\97. Star2DParticle</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\StarEmitter.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\Emitter</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\StarMesh.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\Mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\StarParticle.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\MeshParticle</Filter>
@@ -2414,6 +2441,9 @@
     <ClCompile Include="..\Private\Env_InstanceController.cpp">
       <Filter>00. GameObject\02. EnvObject\Instance</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Env_SpotLight.cpp">
+      <Filter>00. GameObject\02. EnvObject\SpotLight</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\EnvObject.cpp">
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClCompile>
@@ -2424,16 +2454,25 @@
       <Filter>00. GameObject\02. EnvObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnvObject_Trigger.cpp">
-      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnvTrigger_EventPublisher.cpp">
-      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Trigger</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnvTrigger_Generic.cpp">
-      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Trigger</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnvTrigger_RenderGlobals.cpp">
-      <Filter>00. GameObject\02. EnvObject\Trigger</Filter>
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvVolume_Culling.cpp">
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Volume</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvVolume_Effect.cpp">
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Volume</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnvVolume_Light.cpp">
+      <Filter>00. GameObject\02. EnvObject\EnvTrigger\Volume</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EssenceBubble.cpp">
       <Filter>00. GameObject\09. AbilityBubble\Containers\Essence</Filter>
@@ -2939,14 +2978,14 @@
     <ClCompile Include="..\private\Projectile_Partner.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Armadillo\Projectile</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\QuadCommon.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\00. QuadCommon</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\RailRideable.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\RailTrack.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RectCommon.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\00. RectCommon</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\RectEmitterCommon.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\04. RectEmitterCommon</Filter>
@@ -3017,14 +3056,20 @@
     <ClCompile Include="..\Private\SpitObject.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\11. SpitObject</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Split_Bush.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Split_Starblock.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Split_Stone.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Star2DParticle.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\97. Star2DParticle</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\StarEmitter.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\Emitter</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\StarMesh.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\StarParticle.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\14. Star\MeshParticle</Filter>
@@ -3199,6 +3244,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\ShaderFiles\Shader_AbillityModel.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
     <None Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
@@ -3255,9 +3303,6 @@
     </None>
     <None Include="..\ShaderFiles\Shader_World_Technique.hlsli">
       <Filter>98. ShaderFiles\Leo</Filter>
-    </None>
-    <None Include="..\ShaderFiles\Shader_AbillityModel.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
   </ItemGroup>
 </Project>

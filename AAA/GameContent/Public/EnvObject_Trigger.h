@@ -56,6 +56,8 @@ protected:
 	virtual void OnTriggerStay(CCollider* pOther);
 	virtual void OnTriggerExit(CCollider* pOther);
 
+	_bool Is_PlayerActivator(const CCollider* pOther) const;
+
 	HRESULT Ready_TriggerCollider();
 	void	SetUp_Collider_Callback();
 	void    Refresh_TriggerCollider();

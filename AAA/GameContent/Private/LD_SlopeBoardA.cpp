@@ -21,6 +21,9 @@ namespace
 	inline constexpr _float SLOPEBOARD_A_FALL_VISUAL_DURATION = 1.f;
 	inline constexpr _float SLOPEBOARD_A_ANIM_SPEED = 1.5f;
 
+	inline constexpr const _tchar* SLOPEBOARD_FALL_START	= L"GimmickSlopeBoard_SlopeBoardABFallStart.wav";
+	inline constexpr const _tchar* SLOPEBOARD_FALL_END		= L"GimmickSlopeBoard_SlopeBoardABFallEnd.wav";
+
 	void Log_SlopeBoardPhysicsWarning(const _string& strMessage)
 	{
 #ifdef _DEBUG
@@ -150,6 +153,7 @@ void CLD_SlopeBoardA::Update(_float fTimeDelta)
 			if (FAILED(Update_ToFallenPose()))
 				Log_SlopeBoardPhysicsWarning("[LDSlopeBoardA] fallen platform rigid static pose update failed.");
 
+			m_pGameInstance_Proxy->Play_SFX(SLOPEBOARD_FALL_END, 0.45f);
 			Play_Anim(ANIM_LANDBACK);
 		}
 	}
@@ -436,12 +440,13 @@ void CLD_SlopeBoardA::On_Event()
 	if (STATE::IDLE != m_eState)
 		return;
 
+	m_pGameInstance_Proxy->Play_SFX(SLOPEBOARD_FALL_START, 0.45f);
+
 	Play_Anim(ANIM_LANDFRONT);
 
 	m_eState = STATE::PLAYING;
 	m_fElapsed = 0.f;
 	m_bEndAnimationPlayed = false;
-
 	m_pTrigger->Set_Enabled(false);
 }
 

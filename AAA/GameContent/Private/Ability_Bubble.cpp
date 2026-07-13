@@ -102,7 +102,7 @@ void CAbility_Bubble::Start_Aura()
 		return;
 
 	CEffect_Loader::GetInstance()->Spawn(AURA_EFFECT_ID, Get_LevelIndex(),
-											_float3(0.f, -0.45f, 0.f),
+											_float3(0.f, 0.85f, 0.f),
 											_float3(0.f, 0.f, 0.f),
 											_float3(0.f, 0.f, 0.f),
 											m_pTransformCom->Get_WorldMatrixPtr(),
@@ -141,8 +141,6 @@ HRESULT CAbility_Bubble::Ready_Collider()
 {
 	CCollider::COLLIDER_DESC ColliderDesc{};
 	ColliderDesc.pOwner = this;
-/*	ColliderDesc.vCenter = { 0.f, 0.85f, 0.f };
-	ColliderDesc.fRadius = 0.85f;*/		// 이펙트 사이즈는 이거로 진행 ( 배치 위치랑 크기 감 잡기 용도로 남겨둠
 
 	ColliderDesc.vCenter = { 0.f, 0.85f, 0.f };
 	ColliderDesc.fRadius = 1.25f;		// 충돌체 사이즈는 이거로 고정
