@@ -1,33 +1,33 @@
-#include "QuadCommon.h"
+#include "RectCommon.h"
 #include "GameContent_const.h"
 
 #include "GameInstance.h"
 
-CQuadCommon::CQuadCommon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CRectCommon::CRectCommon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CEffect_Quad{ pDevice, pContext }
 	, m_iRenderGroup{ static_cast<_int>(RENDERID::BLEND) }
 {
 }
 
-CQuadCommon::CQuadCommon(const CQuadCommon& Prototype)
+CRectCommon::CRectCommon(const CRectCommon& Prototype)
 	: CEffect_Quad(Prototype)
 	, m_iRenderGroup{ Prototype.m_iRenderGroup }
 {
 }
 
-HRESULT CQuadCommon::Initialize_Prototype()
+HRESULT CRectCommon::Initialize_Prototype()
 {
 	m_eProjType = PROJ_TYPE::PERSPEC;
 	m_iRenderGroup = static_cast<_int>(RENDERID::BLEND);
 	return S_OK;
 }
 
-HRESULT CQuadCommon::Initialize(void* pArg)
+HRESULT CRectCommon::Initialize(void* pArg)
 {
 	if (nullptr == pArg)
 		return E_FAIL;
 
-	QUAD_COMMON_DESC tDesc = *static_cast<QUAD_COMMON_DESC*>(pArg);
+	RECT_COMMON_DESC tDesc = *static_cast<RECT_COMMON_DESC*>(pArg);
 
 	if (FAILED(__super::Initialize(&tDesc)))
 		return E_FAIL;
@@ -35,17 +35,17 @@ HRESULT CQuadCommon::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CQuadCommon::Priority_Update(_float fTimeDelta)
+void CRectCommon::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
 }
 
-void CQuadCommon::Update(_float fTimeDelta)
+void CRectCommon::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
 }
 
-void CQuadCommon::Late_Update(_float fTimeDelta)
+void CRectCommon::Late_Update(_float fTimeDelta)
 {
 	__super::Late_Update(fTimeDelta);
 
@@ -57,39 +57,39 @@ void CQuadCommon::Late_Update(_float fTimeDelta)
 	m_pGameInstance_Proxy->Add_RenderGroup(static_cast<RENDERID>(m_iRenderGroup), this);
 }
 
-HRESULT CQuadCommon::Render()
+HRESULT CRectCommon::Render()
 {
 	Set_UseGBufferOutput(static_cast<RENDERID>(m_iRenderGroup) == RENDERID::NONBLEND);
 	return __super::Render();
 }
 
-CQuadCommon* CQuadCommon::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CRectCommon* CRectCommon::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CQuadCommon* pInstance = new CQuadCommon(pDevice, pContext);
+	CRectCommon* pInstance = new CRectCommon(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created: CQuadCommon");
+		MSG_BOX("Failed to Created: CRectCommon");
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject* CQuadCommon::Clone(void* pArg)
+CGameObject* CRectCommon::Clone(void* pArg)
 {
-	CQuadCommon* pInstance = new CQuadCommon(*this);
+	CRectCommon* pInstance = new CRectCommon(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX("Failed to Cloned: CQuadCommon");
+		MSG_BOX("Failed to Cloned: CRectCommon");
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CQuadCommon::Free()
+void CRectCommon::Free()
 {
 	__super::Free();
 }

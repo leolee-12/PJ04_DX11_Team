@@ -39,11 +39,13 @@ namespace ProtoDesc
 	inline constexpr SHADER_DESC Shader_VtxNorTex = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxNorTex"), TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl") };
 	inline constexpr SHADER_DESC Shader_Kirby = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Kirby"), TEXT("../Bin/ShaderFiles/Shader_Kirby.hlsl") };
 	inline constexpr SHADER_DESC Shader_Gorilla = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Gorilla"), TEXT("../Bin/ShaderFiles/Shader_Gorilla.hlsl") };
+	inline constexpr SHADER_DESC Shader_Armadillo = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Armadillo"), TEXT("../Bin/ShaderFiles/Shader_Armadillo.hlsl") };
 	inline constexpr SHADER_DESC Shader_Monster = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Monster"), TEXT("../Bin/ShaderFiles/Shader_Monster.hlsl") };
 	inline constexpr SHADER_DESC Shader_WaddleDee = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_WaddleDee"), TEXT("../Bin/ShaderFiles/Shader_WaddleDee.hlsl") };
 	inline constexpr SHADER_DESC Shader_Bomb = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Bomb"), TEXT("../Bin/ShaderFiles/Shader_Bomb.hlsl") };
 	inline constexpr SHADER_DESC Shader_EffectRock = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_EffectRock"), TEXT("../Bin/ShaderFiles/Shader_EffectRock.hlsl") };
 	inline constexpr SHADER_DESC Shader_Ring = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Ring"), TEXT("../Bin/ShaderFiles/Shader_Ring.hlsl") };
+	inline constexpr SHADER_DESC Shader_AbillityModel = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_AbillityModel"), TEXT("../Bin/ShaderFiles/Shader_AbillityModel.hlsl") };
 
 
 	inline constexpr SHADER_DESC Shader_AnimMesh_PBR = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_AnimMesh_PBR"), TEXT("../Bin/ShaderFiles/Shader_AnimMesh_PBR.hlsl") };
@@ -97,7 +99,8 @@ namespace ProtoDesc
 	inline constexpr TEXTURE_DESC Texture_CommonRing01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonRing01"), TEXT("../../Resources/CHJ/Effect/Common/common_ring01.dds"), 1 };
 	
 	// Sparkle
-	inline constexpr TEXTURE_DESC Texture_CommonSparkle02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonSparkle02"), TEXT("../../Resources/CHJ/Effect/Bomb/common_sparkle02.png"), 1 };
+	inline constexpr TEXTURE_DESC Texture_CommonSparkle01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonSparkle01"), TEXT("../../Resources/CHJ/Effect/Textures/common_sparkle01.dds"), 1 };
+	inline constexpr TEXTURE_DESC Texture_CommonSparkle02 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonSparkle02"), TEXT("../../Resources/CHJ/Effect/Textures/common_sparkle02.dds"), 1 };
 
 	//sky
 	inline constexpr COMPONENT_DESC Model_SkyTest = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_SkyTest") };

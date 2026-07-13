@@ -28,7 +28,7 @@ HRESULT CCar_00_MilkyWay::Initialize(void* pArg)
     tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Car_00_MilkyWay");
 
     tDesc.bUseDiffuseTexture = true;
-    tDesc.bUseUnKnownTexture = false;
+    tDesc.bUseUnknownTexture = false;
 
     tDesc.bUseTextureCom = true;
     tDesc.iTextureLevel = Texture_Gradiant.iLevelID;

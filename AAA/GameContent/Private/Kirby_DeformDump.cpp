@@ -85,6 +85,8 @@ void CKirby_DeformDump::Enter_DeformDumpState(CKirby* pKirby, DEFORM_DUMP_STATE 
         }
         case DEFORM_DUMP_STATE::SPIT_DEFORM:
         {
+            m_pGameInstance_Proxy->Play_SFX(L"HeroBasic_SpitStart.wav", 0.2f);
+
             // Deform Model
             CKirby_Deform* pKirbyDeform = pKirby->Get_KirbyDeform();
             DEFORM_TYPE m_eDeformType = pKirbyDeform->Get_DeformType();

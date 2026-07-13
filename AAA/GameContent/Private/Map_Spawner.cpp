@@ -6,6 +6,10 @@
 #include "EnvTrigger_Generic.h"
 #include "EnvTrigger_RenderGlobals.h"
 #include "EnvTrigger_EventPublisher.h"
+#include "EnvVolume_Effect.h"
+#include "EnvVolume_Culling.h"
+#include "EnvVolume_Light.h"
+#include "Env_SpotLight.h"
 #include "Env_InstanceController.h"
 #include "GameContent_Log.h"
 #include "Parsing_Utils.h"
@@ -25,15 +29,19 @@ namespace
 		_wstring		strObjectTag;
 	};
 
-	_bool Is_AddedEnvTriggerPrototype(const _wstring& strPrototypeTag)
+	_bool Is_AddedEnvRuntimePrototype(const _wstring& strPrototypeTag)
 	{
 		return strPrototypeTag == CEnvTrigger_Generic::PROTOTYPE_TAG
 			|| strPrototypeTag == CEnvTrigger_Generic::LEGACY_PROTOTYPE_TAG
 			|| strPrototypeTag == CEnvTrigger_RenderGlobals::PROTOTYPE_TAG
-			|| strPrototypeTag == CEnvTrigger_EventPublisher::PROTOTYPE_TAG;
+			|| strPrototypeTag == CEnvTrigger_EventPublisher::PROTOTYPE_TAG
+			|| strPrototypeTag == CEnvVolume_Effect::PROTOTYPE_TAG
+			|| strPrototypeTag == CEnvVolume_Culling::PROTOTYPE_TAG
+			|| strPrototypeTag == CEnvVolume_Light::PROTOTYPE_TAG
+			|| strPrototypeTag == CEnv_SpotLight::PROTOTYPE_TAG;
 	}
 
-	ENV_OBJECT_DESC Make_AddedEnvTriggerDesc(const MAP_ADD_OBJECT& Added)
+	ENV_OBJECT_DESC Make_AddedEnvRuntimeDesc(const MAP_ADD_OBJECT& Added)
 	{
 		ENV_OBJECT_DESC Desc{};
 		Desc.eKind = ENV_OBJECT_KIND::EFFECT;
@@ -45,6 +53,17 @@ namespace
 		Desc.tRender.bUseCullDistance = false;
 		Desc.tRender.bUseCullFrustum = false;
 		Desc.tRender.bHasShadow = false;
+
+		if (Added.strPrototypeTag == CEnvTrigger_RenderGlobals::PROTOTYPE_TAG)
+			Desc.tEffect.eEffectType = ENV_EFFECT_TYPE::TONE_MAPPING_AREA;
+		else if (Added.strPrototypeTag == CEnvVolume_Effect::PROTOTYPE_TAG)
+			Desc.tEffect.eEffectType = ENV_EFFECT_TYPE::FIELD_EFFECT;
+		else if (Added.strPrototypeTag == CEnvVolume_Culling::PROTOTYPE_TAG)
+			Desc.tEffect.eEffectType = ENV_EFFECT_TYPE::DECOR_PARTS_CULLING_AREA;
+		else if (Added.strPrototypeTag == CEnvVolume_Light::PROTOTYPE_TAG)
+			Desc.tEffect.eEffectType = ENV_EFFECT_TYPE::LOCAL_AREA_LIGHT;
+		else if (Added.strPrototypeTag == CEnv_SpotLight::PROTOTYPE_TAG)
+			Desc.tEffect.eEffectType = ENV_EFFECT_TYPE::SPOT_LIGHT;
 
 		JsonUtils::Try_ReadFloat3Array(Added.jObject, "Area Center", &Desc.tEffect.vAreaCenter);
 		if (false == JsonUtils::Try_ReadFloat3Array(Added.jObject, "Area Size", &Desc.tEffect.vAreaSize))
@@ -293,13 +312,13 @@ HRESULT CMap_Spawner::Spawn(const MAP_PACKAGE& Package, const MAP_SPAWN_REQUEST&
 		{
 			CGameObject* pCreatedObject = nullptr;
 
-			ENV_OBJECT_DESC AddedEnvTriggerDesc{};
+			ENV_OBJECT_DESC AddedEnvRuntimeDesc{};
 			void* pArg = nullptr;
 
-			if (Is_AddedEnvTriggerPrototype(Added.strPrototypeTag))
+			if (Is_AddedEnvRuntimePrototype(Added.strPrototypeTag))
 			{
-				AddedEnvTriggerDesc = Make_AddedEnvTriggerDesc(Added);
-				pArg = &AddedEnvTriggerDesc;
+				AddedEnvRuntimeDesc = Make_AddedEnvRuntimeDesc(Added);
+				pArg = &AddedEnvRuntimeDesc;
 			}
 
 			if (FAILED(m_pProxy->Add_GameObject_Return(
@@ -390,6 +409,22 @@ const _tchar* CMap_Spawner::Get_EnvObjectProtoTag(const ENV_OBJECT_DESC& Desc) c
 	{
 	case ENV_EFFECT_TYPE::TONE_MAPPING_AREA:
 		return CEnvTrigger_RenderGlobals::PROTOTYPE_TAG;
+
+	case ENV_EFFECT_TYPE::FIELD_EFFECT:
+	case ENV_EFFECT_TYPE::FLOWER_WING:
+		return CEnvVolume_Effect::PROTOTYPE_TAG;
+
+	case ENV_EFFECT_TYPE::DECOR_PARTS_CULLING_AREA:
+		return CEnvVolume_Culling::PROTOTYPE_TAG;
+
+	case ENV_EFFECT_TYPE::GRASS_WIND:
+		return CEnvTrigger_EventPublisher::PROTOTYPE_TAG;
+
+	case ENV_EFFECT_TYPE::LOCAL_AREA_LIGHT:
+		return CEnvVolume_Light::PROTOTYPE_TAG;
+
+	case ENV_EFFECT_TYPE::SPOT_LIGHT:
+		return CEnv_SpotLight::PROTOTYPE_TAG;
 
 	default:
 		return CEnvTrigger_Generic::PROTOTYPE_TAG;

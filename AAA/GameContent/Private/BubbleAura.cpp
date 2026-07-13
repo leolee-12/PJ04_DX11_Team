@@ -2,9 +2,28 @@
 #include "GameInstance.h"
 #include "GameContent_const.h"
 
-#include "Bubble.h"
-#include "StarEmitter.h"
-#include "StarMesh.h"
+#include "RectCommon.h"
+#include "RectEmitterCommon.h"
+#include "RectParticleCommon.h"
+
+namespace
+{
+	CRectCommon::RECT_COMMON_DESC Make_RectDesc(const TEXTURE_DESC& tex)
+	{
+		CRectCommon::RECT_COMMON_DESC tRect{};
+		tRect.iVIBufferLevel = VI_Rect.iLevelID;
+		tRect.wstrVIBufferTag = VI_Rect.szProtoTag;
+		
+		tRect.bUseTextureCom = true;
+		tRect.iTextureLevel = tex.iLevelID;
+		tRect.wstrTextureTag = tex.szProtoTag;
+		
+		tRect.bUseMaskCom = false;
+		tRect.bCustomShader = false;
+
+		return tRect;
+	}
+}
 
 CBubbleAura::CBubbleAura(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CEffect_Container{ pDevice, pContext }
@@ -57,23 +76,45 @@ HRESULT CBubbleAura::Render()
 
 HRESULT CBubbleAura::Ready_EffectPartObjects()
 {
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CBubble::PROTOTYPE_TAG, L"RingHalo")))
+	CRectCommon::RECT_COMMON_DESC tRing = Make_RectDesc(Texture_CommonRing01);
+
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectCommon::PROTOTYPE_TAG, L"RingHalo", &tRing)))
 		return E_FAIL;
 
-	//if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CStarMesh::PROTOTYPE_TAG, L"OrbitStar00")))
-	//	return E_FAIL;
+	CRectCommon::RECT_COMMON_DESC tStar = Make_RectDesc(Texture_Star2D);
 
-	//if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CStarMesh::PROTOTYPE_TAG, L"OrbitStar01")))
-	//	return E_FAIL;
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectCommon::PROTOTYPE_TAG, L"OribitStar00", &tStar)))
+		return E_FAIL;
 
-	//if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CStarEmitter::PROTOTYPE_TAG, L"StarEmitter00")))
-	//	return E_FAIL;	
-	//
-	//if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CStarEmitter::PROTOTYPE_TAG, L"StarEmitter01")))
-	//	return E_FAIL;
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectCommon::PROTOTYPE_TAG, L"OribitStar01", &tStar)))
+		return E_FAIL;
 
+	CRectEmitterCommon::RECT_EMITTER_COMMON_DESC tStarEmit{};
+	tStarEmit.iVIBufferLevel = VI_Rect.iLevelID;
+	tStarEmit.wstrVIBufferTag = VI_Rect.szProtoTag;
+	tStarEmit.bUseTextureCom = true;
+	tStarEmit.iTextureLevel = Texture_Star2D.iLevelID;
+	tStarEmit.wstrTextureTag = Texture_Star2D.szProtoTag;
+	tStarEmit.bUseMaskCom = false;
+	tStarEmit.bCustomShader = false;
 
-	// TODO : 주위 Sparkle 추가
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectEmitterCommon::PROTOTYPE_TAG, L"StarMilkyWay00", &tStarEmit)))
+		return E_FAIL;
+
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectEmitterCommon::PROTOTYPE_TAG, L"StarMilkyWay01", &tStarEmit)))
+		return E_FAIL;
+
+	CRectParticleCommon::RECT_PARTICLE_COMMON_DESC tSparkle{};
+	tSparkle.iVIBufferLevel = VI_Rect.iLevelID;
+	tSparkle.wstrVIBufferTag = VI_Rect.szProtoTag;
+	tSparkle.bUseTextureCom = true;
+	tSparkle.iTextureLevel = Texture_CommonSparkle01.iLevelID;
+	tSparkle.wstrTextureTag = Texture_CommonSparkle01.szProtoTag;
+	tSparkle.bUseMaskCom = false;
+	tSparkle.bCustomShader = false;
+
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectParticleCommon::PROTOTYPE_TAG, L"Sparkle", &tSparkle)))
+		return E_FAIL;
 
 	return S_OK;
 }

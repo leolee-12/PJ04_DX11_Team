@@ -36,7 +36,7 @@ HRESULT CSwing_Smoke::Initialize(void* pArg)
     tDesc.wstrModelTag = MODEL_PROTO_TAG;
 
     tDesc.bUseDiffuseTexture = false;
-    tDesc.bUseUnKnownTexture = false;
+    tDesc.bUseUnknownTexture = false;
     tDesc.bUseNormalTexture = false;
     tDesc.bUseMRATexture = false;
 

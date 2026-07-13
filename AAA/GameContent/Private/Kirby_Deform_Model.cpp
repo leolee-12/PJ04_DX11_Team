@@ -107,50 +107,67 @@ _bool CKirby_Deform_Model::Handle_AnimEventEye(const ANIM_EVENT& e, ANIM_EVENT_P
     return true;
 }
 
-_bool CKirby_Deform_Model::Handle_AnimEventSound(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+_bool CKirby_Deform_Model::Handle_AnimEventSound(const ANIM_EVENT& tEvent, ANIM_EVENT_PHASE ePhase)
 {
-    if (static_cast<EANIM_EVENT>(e.iEventType) != EANIM_EVENT::Sound)
+    if (static_cast<EANIM_EVENT>(tEvent.iEventType) != EANIM_EVENT::Sound)
         return false;
 
-    if (ePhase != ANIM_EVENT_PHASE::POINT)
+    if (tEvent.strParam.empty())
         return true;
 
-    if (e.strParam.empty())
-        return true;
+    const _wstring wstrSoundKey = StrToWstr(tEvent.strParam);
 
-    enum KIRBY_SOUND_TYPEP { DEFAULT, SECTION_LOOP, SECTION_LOOP_STOP };
-
-    const _wstring wstrSoundKey = StrToWstr(e.strParam);
-
-    switch(e.iIntParam)
+    enum KIRBY_SOUND_TYPEP
     {
-        case KIRBY_SOUND_TYPEP::DEFAULT:
+        ONCE, SECTION_LOOP,
+    };
+
+    switch (tEvent.iIntParam)
+    {
+        case KIRBY_SOUND_TYPEP::ONCE:
         {
-            m_pGameInstance_Proxy->Play_SFX(wstrSoundKey.c_str(), e.vOffset.x);
+            if (ePhase == ANIM_EVENT_PHASE::POINT)
+            {
+                m_pGameInstance_Proxy->Play_SFX(wstrSoundKey.c_str(), tEvent.vOffset.x);
+            }
+            else if (ePhase == ANIM_EVENT_PHASE::BEGIN)
+            {
+                auto iter = m_SoundHandles.find(wstrSoundKey);
+
+                if (iter == m_SoundHandles.end())
+                {
+                    CSound_Handle pHandle = m_pGameInstance_Proxy->Play_SFX(wstrSoundKey.c_str(), tEvent.vOffset.x);
+                    m_SoundHandles.emplace(wstrSoundKey, pHandle);
+                }
+            }
+            else if (ePhase == ANIM_EVENT_PHASE::END)
+            { 
+                auto iter = m_SoundHandles.find(wstrSoundKey);
+
+                if (iter != m_SoundHandles.end())
+                {
+                    iter->second.Stop();                    
+                    m_SoundHandles.erase(iter);
+                }
+            }
+
             break;
         }
         case KIRBY_SOUND_TYPEP::SECTION_LOOP:
         {
-            auto iter = m_SoundHandles.find(wstrSoundKey);
-
-            if (iter == m_SoundHandles.end())
+            if (ePhase == ANIM_EVENT_PHASE::POINT)
             {
-                CSound_Handle pHandle = m_pGameInstance_Proxy->Play_SFX_Section_Loop(wstrSoundKey.c_str(), e.vOffset.y, e.vOffset.z, e.vOffset.x);
-                m_SoundHandles.emplace(wstrSoundKey, pHandle);
+                auto iter = m_SoundHandles.find(wstrSoundKey);
+
+                if (iter == m_SoundHandles.end())
+                {
+                    CSound_Handle pHandle = m_pGameInstance_Proxy->Play_SFX_Section_Loop(wstrSoundKey.c_str(), tEvent.vOffset.y, tEvent.vOffset.z, tEvent.vOffset.x);
+                    m_SoundHandles.emplace(wstrSoundKey, pHandle);
+                }
             }
             break;
         }
-        case KIRBY_SOUND_TYPEP::SECTION_LOOP_STOP:
-        {
-            auto iter = m_SoundHandles.find(wstrSoundKey);
-
-            if (iter != m_SoundHandles.end())
-            {
-                iter->second.Stop();
-                m_SoundHandles.erase(iter);
-            }
-            break;
-        }
+        return true;
     }
 
     return true;

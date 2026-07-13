@@ -56,6 +56,8 @@
 #include "Kirby_Body.h"
 #include "Kirby_DeformCar_Demo.h"
 #include "Kirby_DeformCar_Main.h"
+#include "Kirby_BombHat.h"
+#include "Kirby_IceHat.h"
 #include "Kirby_Sword.h"
 #include "Kirby_SwordHat.h"
 
@@ -83,6 +85,9 @@
 #include "SpitObject.h"
 #include "BombFuseEffect.h"
 #include "FlowerPetals.h"
+#include "Split_Starblock.h"
+#include "Split_Stone.h"
+#include "Split_Bush.h"
 #include "BubbleAura.h"
 
 // Effect_Part
@@ -117,12 +122,11 @@
 #include "StarEmitter.h"
 #include "Sparkle.h"
 #include "MeshEmitterCommon.h"
-#include "QuadCommon.h"
+#include "RectCommon.h"
 #include "MeshCommon.h"
 #include "RectParticleCommon.h"
 #include "MeshParticleCommon.h"
 #include "RectEmitterCommon.h"
-#include "StarMesh.h"
 
 //sky
 #include "SkySphere.h"
@@ -159,6 +163,10 @@
 #include "Boss_Cage_Body.h"
 #include "Cage_WaddleDee.h"
 
+#include "Boss_Armadillo.h"
+#include "Boss_Armadillo_Body.h"
+#include "Projectile_Partner.h"
+
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
 #include "LevelDesign_Starblock.h"
@@ -176,6 +184,10 @@
 #include "EnvTrigger_Generic.h"
 #include "EnvTrigger_RenderGlobals.h"
 #include "EnvTrigger_EventPublisher.h"
+#include "EnvVolume_Effect.h"
+#include "EnvVolume_Culling.h"
+#include "EnvVolume_Light.h"
+#include "Env_SpotLight.h"
 
 // Projectile
 #include "Projectile_Boulder.h"
@@ -543,6 +555,7 @@ void CGameObject_Factory::Register_Container()
         CREATOR(CKirby),
         LOADER
         (
+            // Model
             // Kirby_Body
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_Body::PROTOTYPE_TAG,
                 CKirby_Body::Create(pDevice, pContext));
@@ -567,8 +580,7 @@ void CGameObject_Factory::Register_Container()
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/DeformCar/Main.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
 
-
-
+            // Ability
             // Sword
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_Sword::PROTOTYPE_TAG,
                 CKirby_Sword::Create(pDevice, pContext));
@@ -581,12 +593,21 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SwordHat"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Hat/SwordHat.ysh"));
 
+            // Bomb Hat
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_BombHat::PROTOTYPE_TAG,
+                CKirby_BombHat::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BombHat"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Bomb/Hat/BombHat.ysh"));
+
+            // Ice Hat
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_IceHat::PROTOTYPE_TAG,
+                CKirby_IceHat::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_IceHat"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Gimmick/CopyEssence/IceHat/Ice_Hat.ysh"));
+
             //Kirby_Projectile
             TRY_ADD_PROTO(pProxy, iLevelIndex, CSpit_Projectile::PROTOTYPE_TAG,
                 CSpit_Projectile::Create(pDevice, pContext));
-
-
-
         )
     ); 
 
@@ -736,6 +757,10 @@ void CGameObject_Factory::Register_NonAnimObject()
     Register(CEnvTrigger_Generic::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvTrigger_Generic), LOADER());
     Register(CEnvTrigger_RenderGlobals::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvTrigger_RenderGlobals), LOADER());
     Register(CEnvTrigger_EventPublisher::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvTrigger_EventPublisher), LOADER());
+    Register(CEnvVolume_Effect::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvVolume_Effect), LOADER());
+    Register(CEnvVolume_Culling::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvVolume_Culling), LOADER());
+    Register(CEnvVolume_Light::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnvVolume_Light), LOADER());
+    Register(CEnv_SpotLight::PROTOTYPE_TAG, TEXT("ENV_TRIGGER"), CREATOR(CEnv_SpotLight), LOADER());
 
     Register(CLevelDesign_Unsupported::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Unsupported), LOADER());
     Register(CLevelDesign_Rail::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLevelDesign_Rail), LOADER());
@@ -769,7 +794,7 @@ void CGameObject_Factory::Register_AnimObject()
 
     Register(CLD_DeformObject::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_DeformObject),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Proto_Component_Model_DeformCar"),
-            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/DeformCar/DeformCar.ysh", true));));
+            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/DeformCar/DeformCar.ysh", true, XMMatrixRotationY(XMConvertToRadians(180.f))));));
 
     Register(CLD_CopyEssence::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_CopyEssence),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_CopyEssence::MODEL_PROTO_TAG,
@@ -1011,30 +1036,70 @@ void CGameObject_Factory::Register_Effect()
         CREATOR(CBubbleAura),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CBubble::PROTOTYPE_TAG, CBubble::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG, CRectCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectEmitterCommon::PROTOTYPE_TAG, CRectEmitterCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectParticleCommon::PROTOTYPE_TAG, CRectParticleCommon::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, Texture_CommonRing01.iLevelID, Texture_CommonRing01.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_CommonRing01.szFileTag, Texture_CommonRing01.iNumTex));
+            
+            TRY_ADD_PROTO(pProxy, Texture_Star2D.iLevelID, Texture_Star2D.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Star2D.szFileTag, Texture_Star2D.iNumTex));
 
-            //TRY_ADD_PROTO(pProxy, iLevelIndex, CStarMesh::PROTOTYPE_TAG, CStarMesh::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_CommonSparkle01.iLevelID, Texture_CommonSparkle01.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_CommonSparkle01.szFileTag, Texture_CommonSparkle01.iNumTex));
 
-            //TRY_ADD_PROTO(pProxy, iLevelIndex, CStarEmitter::PROTOTYPE_TAG, CStarEmitter::Create(pDevice, pContext));
-
-            //TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StarSmooth"),
-            //    CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Star/Common_00_Common_StarSmooth.ysh"));
         ));
 
-    // 7
+    // 8
     Register(CFlowerPetals::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CFlowerPetals),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_Flower"),
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Flower"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Flower/Flower_00_TopL.ysh"));
         )
     );
 
-        
+    // 9
+    Register(CSplit_Starblock::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSplit_Starblock),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Starblock_Piece01"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Starblock/BlockBombH2W2Piece.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Starblock_Piece02"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Starblock/BlockStarH2W2Piece.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Stone"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/Stone.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StoneDust"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/StoneDust.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    // 10
+    Register(CSplit_Stone::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSplit_Stone),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Nature_Piece01"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/LandBreak/Nature_Piece01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Nature_Piece02"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/LandBreak/Nature_Piece02.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Stone"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/Stone.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StoneDust"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/StoneDust.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StoneHiMesh"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/StoneHiMesh.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    // 11
+    Register(CSplit_Bush::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSplit_Bush),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BushLeafL"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Bush/BasicL.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BushLeafM"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Bush/BasicM.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BushLeafS"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Bush/BasicS.ysh"));
+        )
+    );
 }
 
 void CGameObject_Factory::Register_Bubble()
@@ -1148,6 +1213,22 @@ void CGameObject_Factory::Register_MainBoss()
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Gimmick/CaptiveCage/CageL/CageL_Anim_TopL.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Cage_Body::PROTOTYPE_TAG, CBoss_Cage_Body::Create(pDevice, pContext));
+        )
+    );
+
+    Register(CBoss_Armadillo::PROTOTYPE_TAG, TEXT("MainBoss"),
+        CREATOR(CBoss_Armadillo),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Armadillo_Body::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Armadillo/body/Body.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Armadillo_Body::PROTOTYPE_TAG, CBoss_Armadillo_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Partner::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Armadillo/Partner/PartnerModel_Anim.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Partner::PROTOTYPE_TAG,
+                CProjectile_Partner::Create(pDevice, pContext));
         )
     );
 }

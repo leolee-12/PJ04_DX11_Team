@@ -15,6 +15,8 @@ CEnvTrigger_EventPublisher::CEnvTrigger_EventPublisher(const CEnvTrigger_EventPu
 	: CEnvObject_Trigger(Prototype)
 	, m_strEventTag{ Prototype.m_strEventTag }
 	, m_strPayload{ Prototype.m_strPayload }
+	, m_strExitEventTag{ Prototype.m_strExitEventTag }
+	, m_strExitPayload{ Prototype.m_strExitPayload }
 	, m_bPublishOnce{ Prototype.m_bPublishOnce }
 {
 	m_strProtoTag = PROTOTYPE_TAG;
@@ -35,9 +37,29 @@ void CEnvTrigger_EventPublisher::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData
 	__super::Copy_PrototypeName(pOutData);
 }
 
+void CEnvTrigger_EventPublisher::Publish_Event(const _wstring& strEventTag, const _wstring& strPayload, _bool& bPublished)
+{
+	if (true == m_bPublishOnce && true == bPublished)
+		return;
+
+	TRIGGER_EVENT_PAYLOAD Payload{};
+	Payload.pTriggerObject = this;
+	Payload.strTriggerId = m_strTriggerId;
+	Payload.strEventTag = strEventTag;
+	Payload.strPayload = strPayload;
+
+	bPublished = true;
+	m_pGameInstance_Proxy->Publish(strEventTag, &Payload);
+
+#ifdef _DEBUG
+	const wstring strLog = L"[EnvTrigger_EventPublisher] Publish " + strEventTag + L"\n";
+	OutputDebugStringW(strLog.c_str());
+#endif
+}
+
 void CEnvTrigger_EventPublisher::OnTriggerEnter(CCollider* pOther)
 {
-	if (false == Is_TriggerActivator(pOther))
+	if (false == Is_PlayerActivator(pOther))
 		return;
 
 	if (true == m_strEventTag.empty())
@@ -48,22 +70,7 @@ void CEnvTrigger_EventPublisher::OnTriggerEnter(CCollider* pOther)
 		return;
 	}
 
-	if (true == m_bPublishOnce && true == m_bPublished)
-		return;
-
-	TRIGGER_EVENT_PAYLOAD Payload{};
-	Payload.pTriggerObject = this;
-	Payload.strTriggerId = m_strTriggerId;
-	Payload.strEventTag = m_strEventTag;
-	Payload.strPayload = m_strPayload;
-
-	m_bPublished = true;
-	m_pGameInstance_Proxy->Publish(m_strEventTag, &Payload);
-
-#ifdef _DEBUG
-	const wstring strLog = L"[EnvTrigger_EventPublisher] Publish " + m_strEventTag + L"\n";
-	OutputDebugStringW(strLog.c_str());
-#endif
+	Publish_Event(m_strEventTag, m_strPayload, m_bPublished);
 }
 
 void CEnvTrigger_EventPublisher::OnTriggerStay(CCollider* pOther)
@@ -73,12 +80,13 @@ void CEnvTrigger_EventPublisher::OnTriggerStay(CCollider* pOther)
 
 void CEnvTrigger_EventPublisher::OnTriggerExit(CCollider* pOther)
 {
-	UNREFERENCED_PARAMETER(pOther);
-}
+	if (false == Is_PlayerActivator(pOther))
+		return;
 
-_bool CEnvTrigger_EventPublisher::Is_TriggerActivator(CCollider* pOther) const
-{
-	return nullptr != pOther && ETOUI(COLLISION_LAYER::PLAYER_HURT) == pOther->Get_RegisteredGroup();
+	if (true == m_strExitEventTag.empty())
+		return;
+
+	Publish_Event(m_strExitEventTag, m_strExitPayload, m_bExitPublished);
 }
 
 CEnvTrigger_EventPublisher* CEnvTrigger_EventPublisher::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
