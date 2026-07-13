@@ -151,6 +151,13 @@ namespace Engine
 		float				fCullMargin = { 0.f };
 	};
 
+	struct CULLING_FADE_RESULT
+	{
+		bool   bCulled = { false };
+		float  fDissolve = { 0.f };
+		float  fBoundaryDistance = { FLT_MAX };
+	};
+
 #ifdef _DEBUG
 	struct FRUSTUM_CULLING_STATS
 	{

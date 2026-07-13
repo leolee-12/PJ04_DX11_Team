@@ -32,6 +32,10 @@ public:
 	_bool	IsIn_WorldSpace_AABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const;
 	_bool	Should_CullAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const;
 	_bool   Should_CullByDistance(const BoundingBox& WorldBounds, _float fCullDistance) const;
+	_float	Compute_SurfaceDistance(const BoundingSphere& WorldBounds) const;
+
+	CULLING_FADE_RESULT Evaluate_DistanceFade(const BoundingSphere& WorldBounds, _float fCullDistance, _float fFadeWidth) const;
+	CULLING_FADE_RESULT Evaluate_DistanceFade(_float fSurfaceDistance, _float fCullDistance, _float fFadeWidth) const;
 
 #ifdef _DEBUG
 	void	Reset_Stats();

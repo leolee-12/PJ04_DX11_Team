@@ -411,6 +411,9 @@
     <ClInclude Include="..\Public\Culling_Manager.h">
       <Filter>20. Culling</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\CullingState.h">
+      <Filter>20. Culling</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\CustomFont.h">
       <Filter>10. Fonts</Filter>
     </ClInclude>
@@ -744,6 +747,9 @@
       <Filter>07. Component\Controller</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Culling_Manager.cpp">
+      <Filter>20. Culling</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CullingState.cpp">
       <Filter>20. Culling</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CustomFont.cpp">

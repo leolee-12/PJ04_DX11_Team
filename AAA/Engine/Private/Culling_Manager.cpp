@@ -8,6 +8,8 @@ NS_BEGIN(Engine)
 
 namespace
 {
+	constexpr _float INVALID_SURFACE_DISTANCE = -1.f;
+
 	inline _bool Is_ValidViewIndex(CULLING_VIEW eView)
 	{
 		return ETOUI(eView) < ETOUI(CULLING_VIEW::END);
@@ -253,10 +255,24 @@ _bool CCulling_Manager::Should_CullAABB(CULLING_VIEW eView, const BoundingBox& W
 
 _bool CCulling_Manager::Should_CullByDistance(const BoundingBox& WorldBounds, _float fCullDistance) const
 {
+	if (!GeometryUtils::Is_ValidAABB(WorldBounds))
+	{
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_FAIL_OPEN_INVALID_BOUNDS, 1);
+		return false;
+	}
+
+	const _float fRadius = XMVectorGetX(XMVector3Length(XMLoadFloat3(&WorldBounds.Extents)));
+	const BoundingSphere WorldSphere(WorldBounds.Center, fRadius);
+
+	return Evaluate_DistanceFade(WorldSphere, fCullDistance, 0.f).bCulled;
+}
+
+_float CCulling_Manager::Compute_SurfaceDistance(const BoundingSphere& WorldBounds) const
+{
 	if (nullptr == m_pProxy)
 	{
 		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_FAIL_OPEN_INVALID_CAMERA, 1);
-		return false;
+		return INVALID_SURFACE_DISTANCE;
 	}
 
 	const _float4* pCamPos = m_pProxy->Get_CamPosition();
@@ -266,37 +282,98 @@ _bool CCulling_Manager::Should_CullByDistance(const BoundingBox& WorldBounds, _f
 		|| !MathUtils::Is_FiniteFloat(pCamPos->z))
 	{
 		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_FAIL_OPEN_INVALID_CAMERA, 1);
-		return false;
+		return INVALID_SURFACE_DISTANCE;
 	}
 
-	if (!MathUtils::Is_FiniteFloat(fCullDistance) || fCullDistance < 0.f)
-	{
-		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_FAIL_OPEN_INVALID_DISTANCE, 1);
-		return false;
-	}
-
-	if (!MathUtils::Is_ValidFloat3(WorldBounds.Center) || !MathUtils::Is_ValidFloat3(WorldBounds.Extents))
+	if (!MathUtils::Is_ValidFloat3(WorldBounds.Center)
+		|| !MathUtils::Is_FiniteFloat(WorldBounds.Radius)
+		|| WorldBounds.Radius < 0.f)
 	{
 		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_FAIL_OPEN_INVALID_BOUNDS, 1);
-		return false;
+		return INVALID_SURFACE_DISTANCE;
+	}
+
+	const _vector vCam = XMLoadFloat4(pCamPos);
+	const _vector vCenter = XMLoadFloat3(&WorldBounds.Center);
+	const _float fCenterDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vCenter, vCam)));
+
+	if (!MathUtils::Is_FiniteFloat(fCenterDistance))
+	{
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_FAIL_OPEN_INVALID_BOUNDS, 1);
+		return INVALID_SURFACE_DISTANCE;
+	}
+
+	return (fCenterDistance > WorldBounds.Radius)
+		? (fCenterDistance - WorldBounds.Radius)
+		: 0.f;
+}
+
+CULLING_FADE_RESULT CCulling_Manager::Evaluate_DistanceFade(
+	const BoundingSphere& WorldBounds,
+	_float fCullDistance,
+	_float fFadeWidth) const
+{
+	const _float fSurfaceDistance = Compute_SurfaceDistance(WorldBounds);
+
+	if (!MathUtils::Is_FiniteFloat(fSurfaceDistance) || fSurfaceDistance < 0.f)
+		return {};
+
+	return Evaluate_DistanceFade(fSurfaceDistance, fCullDistance, fFadeWidth);
+}
+
+CULLING_FADE_RESULT CCulling_Manager::Evaluate_DistanceFade(
+	_float fSurfaceDistance,
+	_float fCullDistance,
+	_float fFadeWidth) const
+{
+	CULLING_FADE_RESULT Result{};
+
+	if (!MathUtils::Is_FiniteFloat(fSurfaceDistance) || fSurfaceDistance < 0.f)
+	{
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_FAIL_OPEN_INVALID_BOUNDS, 1);
+		return Result;
+	}
+
+	if (!MathUtils::Is_FiniteFloat(fCullDistance) || fCullDistance < 0.f
+		|| !MathUtils::Is_FiniteFloat(fFadeWidth))
+	{
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_FAIL_OPEN_INVALID_DISTANCE, 1);
+		return Result;
 	}
 
 	PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_TESTED, 1);
 
-	const _vector vCam = XMLoadFloat4(pCamPos);
-	const _vector vCenter = XMLoadFloat3(&WorldBounds.Center);
-	const _vector vExtents = XMLoadFloat3(&WorldBounds.Extents);
+	Result.fBoundaryDistance = fSurfaceDistance;
 
-	const _float fCenterDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vCenter, vCam)));
-	const _float fBoundsRadius = XMVectorGetX(XMVector3Length(vExtents));
-	const _float fSurfaceDistance = (fCenterDistance > fBoundsRadius) ? (fCenterDistance - fBoundsRadius) : 0.f;
-	const _bool bCull = fSurfaceDistance >= fCullDistance;
+	if (fSurfaceDistance >= fCullDistance)
+	{
+		Result.bCulled = true;
+		Result.fDissolve = 1.f;
 
-	PROFILE_COUNTER_ADD(
-		bCull ? EPROFILE_COUNTER::DISTANCE_CULLED : EPROFILE_COUNTER::DISTANCE_VISIBLE,
-		1);
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_CULLED, 1);
+		return Result;
+	}
 
-	return bCull;
+	if (fFadeWidth <= Helper::fEpsilon)
+	{
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_VISIBLE, 1);
+		return Result;
+	}
+
+	const _float fFadeStart = max(fCullDistance - fFadeWidth, 0.f);
+	if (fSurfaceDistance <= fFadeStart)
+	{
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_VISIBLE, 1);
+		return Result;
+	}
+
+	_float fLinear = (fSurfaceDistance - fFadeStart) / fFadeWidth;
+	fLinear = max(0.f, min(fLinear, 1.f));
+
+	Result.fDissolve = fLinear * fLinear * (3.f - 2.f * fLinear);
+
+	PROFILE_COUNTER_ADD(EPROFILE_COUNTER::DISTANCE_VISIBLE, 1);
+	return Result;
 }
 
 #ifdef _DEBUG

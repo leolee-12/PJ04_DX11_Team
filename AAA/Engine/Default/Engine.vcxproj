@@ -205,6 +205,7 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClInclude Include="..\public\ComputeShader.h" />
     <ClInclude Include="..\Public\ContainerObject.h" />
     <ClInclude Include="..\public\Controller.h" />
+    <ClInclude Include="..\Public\CullingState.h" />
     <ClInclude Include="..\Public\CustomFont.h" />
     <ClInclude Include="..\Public\DataExporter.h" />
     <ClInclude Include="..\Public\DataLoader.h" />
@@ -322,6 +323,7 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClCompile Include="..\private\ComputeShader.cpp" />
     <ClCompile Include="..\Private\ContainerObject.cpp" />
     <ClCompile Include="..\private\Controller.cpp" />
+    <ClCompile Include="..\Private\CullingState.cpp" />
     <ClCompile Include="..\Private\CustomFont.cpp" />
     <ClCompile Include="..\Private\DataExporter.cpp" />
     <ClCompile Include="..\Private\DataLoader.cpp" />
