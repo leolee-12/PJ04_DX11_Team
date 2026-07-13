@@ -3,7 +3,7 @@
 #include "Parsing_Utils.h"
 #include "GameContent_const.h"
 
-#include "GameInstance.h"
+#include "Geometry_Utils.h"
 
 namespace
 {
@@ -13,7 +13,8 @@ namespace
 	static constexpr _float s_fAcquireDistance = { 1.2f };
 	static constexpr _float s_fAlignRotSpeedDegree = { 72.f };
 	static constexpr _float s_fPullTargetFwd = { 1.8f };
-	static constexpr _float s_fReleaseFwd = { 5.f };
+	static constexpr _float s_fReleaseSpeed = { 20.f };
+	static constexpr _float s_fReleaseFwd = { -5.f };
 
 	static constexpr _float s_fGravity = { -45.f };
 	static constexpr _float s_fMaxFallSpeed = { -15.f };
@@ -289,13 +290,13 @@ HRESULT CLD_DeformObject::On_DeformAcquired()
 	return S_OK;
 }
 
-HRESULT CLD_DeformObject::On_DeformReleased(const _float3& vWorldPosition)
+HRESULT CLD_DeformObject::On_DeformReleased(const _float3& vWorldPosition, const _float3& vTargetPosition)
 {
 	if (m_bAvailable)
 		return S_FALSE;
 
 	m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&vWorldPosition), 1.f));
-
+	m_vReleaseTargetPosition = vTargetPosition;
 	m_fVerticalVelocity = 0.f;
 
 	Set_Active(true);
@@ -339,14 +340,18 @@ void CLD_DeformObject::End_Deform(const _float4x4* AnchorWorld)
 		vLook = XMVectorSet(0.f, 0.f, 1.f, 0.f);
 	vLook = XMVector3Normalize(vLook);
 
-	const _vector vReleasePos = XMVectorSetW(Anchor.r[3] + vLook * s_fReleaseFwd, 1.f);
+	const _vector vReleaseStartPosition = XMVectorSetW(Anchor.r[3], 1.f);
+	const _vector vReleaseTargetPosition = XMVectorSetW(vReleaseStartPosition + vLook * s_fReleaseFwd, 1.f);
 
-	m_pTransformCom->Set_State(STATE::POSITION, vReleasePos);
-	m_pTransformCom->LookAt(vReleasePos + vLook);
+	_float3 vStartPosition{};
+	_float3 vTargetPosition{};
+	XMStoreFloat3(&vStartPosition, vReleaseStartPosition);
+	XMStoreFloat3(&vTargetPosition, vReleaseTargetPosition);
 
-	_float3 vPosition{};
-	XMStoreFloat3(&vPosition, vReleasePos);
-	On_DeformReleased(vPosition);
+	if (S_OK != On_DeformReleased(vStartPosition, vTargetPosition))
+		return;
+
+	m_pTransformCom->LookAt(vReleaseStartPosition + vLook);
 }
 #pragma endregion
 
@@ -401,34 +406,38 @@ void CLD_DeformObject::Update_Falling(_float fTimeDelta)
 	if (fFallDistance <= 0.f)
 		return;
 
-	_float3 vMin{};
-	_float3 vMax{};
-	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
+	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
+	_vector vHorizontalTarget = XMLoadFloat3(&m_vReleaseTargetPosition);
+	vHorizontalTarget = XMVectorSetY(vHorizontalTarget, XMVectorGetY(vPosition));
+	vHorizontalTarget = XMVectorSetW(vHorizontalTarget, 1.f);
 
-	const _float3 vLocalCenter =
+	const _vector vHorizontalDirection = vHorizontalTarget - vPosition;
+	const _float fHorizontalDistance = XMVectorGetX(XMVector3Length(vHorizontalDirection));
+
+	if (fHorizontalDistance > FLT_EPSILON)
 	{
-			(vMin.x + vMax.x) * 0.5f,
-			(vMin.y + vMax.y) * 0.5f,
-			(vMin.z + vMax.z) * 0.5f
-	};
+		const _float fHorizontalMoveDistance = min(s_fReleaseSpeed * fTimeDelta, fHorizontalDistance);
+		vPosition += XMVector3Normalize(vHorizontalDirection) * fHorizontalMoveDistance;
+		m_pTransformCom->Set_State(STATE::POSITION, vPosition);
+	}
 
 	const _float3 vScale = m_pTransformCom->Get_Scaled();
 	const _float3 vHalfExtents =
 	{
-			max((vMax.x - vMin.x) * 0.5f * vScale.x, s_fMinSweepHalfExtent),
-			max((vMax.y - vMin.y) * 0.5f * vScale.y, s_fMinSweepHalfExtent),
-			max((vMax.z - vMin.z) * 0.5f * vScale.z, s_fMinSweepHalfExtent)
+			max(m_LocalCollisionBounds.Extents.x * vScale.x, s_fMinSweepHalfExtent),
+			max(m_LocalCollisionBounds.Extents.y * vScale.y, s_fMinSweepHalfExtent),
+			max(m_LocalCollisionBounds.Extents.z * vScale.z, s_fMinSweepHalfExtent)
 	};
 
 	const _matrix WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
 
 	_float3 vWorldCenter{};
-	XMStoreFloat3(&vWorldCenter, XMVector3TransformCoord(XMLoadFloat3(&vLocalCenter), WorldMatrix));
+	XMStoreFloat3(&vWorldCenter, XMVector3TransformCoord(XMLoadFloat3(&m_LocalCollisionBounds.Center), WorldMatrix));
 
 	_float4 vRotation{};
 	XMStoreFloat4(&vRotation, XMQuaternionRotationMatrix(m_pTransformCom->Get_RotationMatrix()));
-
 	const _float3 vDown = { 0.f, -1.f, 0.f };
+
 	_float fHitDistance = 0.f;
 
 	const _bool bHit = m_pGameInstance_Proxy->Sweep_Box(
@@ -446,7 +455,6 @@ void CLD_DeformObject::Update_Falling(_float fTimeDelta)
 	if (bHit)
 		fMoveDistance = max(0.f, fHitDistance);
 
-	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
 	vPosition = XMVectorSetY(vPosition, XMVectorGetY(vPosition) - fMoveDistance);
 	m_pTransformCom->Set_State(STATE::POSITION, vPosition);
 
@@ -483,16 +491,17 @@ void CLD_DeformObject::On_Deserialized()
 
 HRESULT CLD_DeformObject::Ready_Trigger()
 {
-	_float3 vMin = {};
-	_float3 vMax = {};
-	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
-
-	if (vMin.x > vMax.x || vMin.y > vMax.y || vMin.z > vMax.z)
+	_float3 vMin{};
+	_float3 vMax{};
+	if (!m_pModelCom->Get_CollisionAABB(&vMin, &vMax))
 		return E_FAIL;
 
-	const _float3 vCenter = { (vMin.x + vMax.x) * 0.5f, (vMin.y + vMax.y) * 0.5f, (vMin.z + vMax.z) * 0.5f };
-	const _float3 vHalfExtents = { (vMax.x - vMin.x) * 0.5f, (vMax.y - vMin.y) * 0.5f, (vMax.z - vMin.z) * 0.5f };
-	const _float fBoundsRadius = XMVectorGetX(XMVector3Length(XMVectorSet(vHalfExtents.x, vHalfExtents.y, vHalfExtents.z, 0.f)));
+	if (!GeometryUtils::Is_ValidAABB(vMin, vMax))
+		return E_FAIL;
+
+	m_LocalCollisionBounds = GeometryUtils::Make_AABB_FromMinMax(vMin, vMax);
+
+	const _float fBoundsRadius = XMVectorGetX(XMVector3Length(XMLoadFloat3(&m_LocalCollisionBounds.Extents)));
 	const _float fInteractionRadius = 0.f < m_tDeformObjectDesc.fInteractionRadius ? m_tDeformObjectDesc.fInteractionRadius : fBoundsRadius;
 
 	if (fInteractionRadius <= 0.f)
@@ -500,13 +509,27 @@ HRESULT CLD_DeformObject::Ready_Trigger()
 
 	CCollider::COLLIDER_DESC ColliderDesc{};
 	ColliderDesc.pOwner = this;
-	ColliderDesc.vCenter = vCenter;
+	ColliderDesc.vCenter = m_LocalCollisionBounds.Center;
 	ColliderDesc.fRadius = fInteractionRadius;
 
 	m_pTrigger = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
 		TEXT("Com_Trigger"), &ColliderDesc);
 	if (nullptr == m_pTrigger)
 		return E_FAIL;
+
+	m_pTrigger->Set_OnEnter(
+		[this](CCollider* pOther)
+		{
+			if (pOther->Get_RegisteredGroup() == ETOUI(COLLISION_LAYER::PLAYER_HURT))
+				m_bKirbyInTrigger = true;
+		});
+
+	m_pTrigger->Set_OnExit(
+		[this](CCollider* pOther)
+		{
+			if (pOther->Get_RegisteredGroup() == ETOUI(COLLISION_LAYER::PLAYER_HURT))
+				m_bKirbyInTrigger = false;
+		});
 
 	m_pGameInstance_Proxy->Register_Collider(m_pTrigger, ETOUI(COLLISION_LAYER::DEFORM_OBJECT));
 
@@ -515,6 +538,9 @@ HRESULT CLD_DeformObject::Ready_Trigger()
 
 void CLD_DeformObject::Set_TriggerEnabled(_bool bEnabled)
 {
+	if (!bEnabled)
+		m_bKirbyInTrigger = false;
+
 	if (nullptr == m_pTrigger)
 		return;
 

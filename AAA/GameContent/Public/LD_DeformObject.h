@@ -41,7 +41,7 @@ public:
 public:
 	_bool		Is_Available() const { return m_bAvailable; }
 	HRESULT		On_DeformAcquired();
-	HRESULT		On_DeformReleased(const _float3& vWorldPosition);
+	HRESULT		On_DeformReleased(const _float3& vWorldPosition, const _float3& vTargetPosition);
 
 #pragma region Deformable
 	virtual DEFORM_TYPE				Get_DeformType() const override { return m_tDeformObjectDesc.eDeformType; }
@@ -57,6 +57,7 @@ private:
 
 	CCollider* m_pTrigger = { nullptr };
 	_bool m_bAvailable = { true };
+	_bool m_bKirbyInTrigger = { false };
 
 	DEFORM_OBJECT_STATE m_eState = { DEFORM_OBJECT_STATE::IDLE };
 	DEFORM_OBJECT_KIND m_eKind = { DEFORM_OBJECT_KIND::MOBILE };
@@ -64,6 +65,8 @@ private:
 	_bool m_bAlignDone = { false };
 	_float m_fPullSpeed = { 0.f };
 	_float m_fVerticalVelocity = { 0.f };
+	_float3 m_vReleaseTargetPosition = {};
+	BoundingBox m_LocalCollisionBounds = {};
 
 private:
 	virtual HRESULT Ready_Components() override;
