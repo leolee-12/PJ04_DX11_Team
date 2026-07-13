@@ -14,6 +14,7 @@
 // Parts
 #include "Kirby_Body.h"
 #include "Kirby_BombHat.h"
+#include "Kirby_IceHat.h"
 #include "Kirby_Sword.h"
 #include "Kirby_SwordHat.h"
 
@@ -29,6 +30,7 @@
 #include "Kirby_Ability_Normal.h"
 #include "Kirby_Ability_Sword.h"
 #include "Kirby_Ability_Bomb.h"
+#include "Kirby_Ability_Ice.h"
 
 // Deform
 #include "Kirby_Deform_Car.h"
@@ -238,6 +240,8 @@ CKirby_OnOffPart* CKirby::Find_HatPart(COPY_ABILITY_TYPE eType)
     {
         case COPY_ABILITY_TYPE::BOMB:
             return Find_OnOffPart(CKirby_BombHat::Kirby_PartTag);
+        case COPY_ABILITY_TYPE::ICE:
+            return Find_OnOffPart(CKirby_IceHat::Kirby_PartTag);
         case COPY_ABILITY_TYPE::SWORD:
             return Find_OnOffPart(CKirby_SwordHat::Kirby_PartTag);
     }
@@ -584,6 +588,16 @@ HRESULT CKirby::Ready_PartObjects()
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_BombHat::PROTOTYPE_TAG, CKirby_BombHat::Kirby_PartTag, &BombHatDesc)))
         return E_FAIL;
 
+    // IceHat
+    CKirby_IceHat::KIRBY_ICE_HAT_DESC IceHatDesc{};
+    IceHatDesc.pParentMatrix = &m_RenderWorldMatrix;
+    IceHatDesc.pSocketBoneMatrix = m_pBody->Get_BoneMatrixPtr("HatL");
+    IceHatDesc.pHitFlashIntensity = Get_HitFlashPtr();
+    IceHatDesc.pHitFlashColor = Get_HitFlashColorPtr();
+
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_IceHat::PROTOTYPE_TAG, CKirby_IceHat::Kirby_PartTag, &IceHatDesc)))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -619,6 +633,7 @@ HRESULT CKirby::Ready_Ability()
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::NORMAL, CKirby_Ability_Normal::Create()))) return E_FAIL;
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::SWORD, CKirby_Ability_Sword::Create())))   return E_FAIL;
     if (FAILED(Register_Ability(COPY_ABILITY_TYPE::BOMB, CKirby_Ability_Bomb::Create())))     return E_FAIL;
+    if (FAILED(Register_Ability(COPY_ABILITY_TYPE::ICE, CKirby_Ability_Ice::Create())))       return E_FAIL;
 
     auto iter = m_Abilities.find(COPY_ABILITY_TYPE::NORMAL);
     if (iter == m_Abilities.end())

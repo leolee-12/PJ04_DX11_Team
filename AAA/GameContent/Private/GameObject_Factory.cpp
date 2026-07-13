@@ -57,6 +57,7 @@
 #include "Kirby_DeformCar_Demo.h"
 #include "Kirby_DeformCar_Main.h"
 #include "Kirby_BombHat.h"
+#include "Kirby_IceHat.h"
 #include "Kirby_Sword.h"
 #include "Kirby_SwordHat.h"
 
@@ -589,10 +590,10 @@ void CGameObject_Factory::Register_Container()
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Bomb/Hat/BombHat.ysh"));
 
             // Ice Hat
-            //TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_BombHat::PROTOTYPE_TAG,
-            //    CKirby_BombHat::Create(pDevice, pContext));
-            //TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_IceHat"),
-            //    CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Gimmick/CopyEssence/IceHat/Ice_Hat.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_IceHat::PROTOTYPE_TAG,
+                CKirby_IceHat::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_IceHat"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Gimmick/CopyEssence/IceHat/Ice_Hat.ysh"));
 
             //Kirby_Projectile
             TRY_ADD_PROTO(pProxy, iLevelIndex, CSpit_Projectile::PROTOTYPE_TAG,

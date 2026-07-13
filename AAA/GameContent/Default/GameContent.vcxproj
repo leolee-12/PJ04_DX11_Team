@@ -263,6 +263,7 @@
     <ClInclude Include="..\public\GigantEdge_Sword.h" />
     <ClInclude Include="..\Public\Kirby_AbilityDump.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Bomb.h" />
+    <ClInclude Include="..\Public\Kirby_Ability_Ice.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Sword.h" />
     <ClInclude Include="..\Public\Kirby_ControllableState.h" />
     <ClInclude Include="..\Public\Kirby_GetAbility.h" />
@@ -303,6 +304,7 @@
     <ClInclude Include="..\Public\Kirby_Sword.h" />
     <ClInclude Include="..\Public\Kirby_SwordHat.h" />
     <ClInclude Include="..\Public\Kirby_BombHat.h" />
+    <ClInclude Include="..\Public\Kirby_IceHat.h" />
     <ClInclude Include="..\public\UI_Eraser.h" />
     <ClInclude Include="..\public\UI_FadeIn.h" />
     <ClInclude Include="..\public\UI_FadeOut.h" />
@@ -573,6 +575,7 @@
     <ClCompile Include="..\private\GorillaNamePlate.cpp" />
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Bomb.cpp" />
+    <ClCompile Include="..\Private\Kirby_Ability_Ice.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
     <ClCompile Include="..\Private\Kirby_Damaged.cpp" />
@@ -653,6 +656,7 @@
     <ClCompile Include="..\Private\Kirby_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_SwordHat.cpp" />
     <ClCompile Include="..\Private\Kirby_BombHat.cpp" />
+    <ClCompile Include="..\Private\Kirby_IceHat.cpp" />
     <ClCompile Include="..\Private\UI_GenericContainer.cpp" />
     <ClCompile Include="..\Private\InhaleEffect.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp" />
