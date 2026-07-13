@@ -501,3 +501,5 @@ AAA/Editor/Bin/ShaderFiles/Shader_World_Anim.hlsl.fxbin_d
 
 # Backups made by AAA/SortFilters.bat (sort_vcxproj_filters.py --backup)
 *.vcxproj.filters.bak
+AAA/Editor/Bin/ShaderFiles/Shader_Armadillo.hlsl.fxbin_d
+AAA/Editor/Bin/ShaderFiles/Shader_AbillityModel.hlsl.fxbin_d

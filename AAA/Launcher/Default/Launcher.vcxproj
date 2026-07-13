@@ -149,6 +149,9 @@
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\public\Stage0_Step2.h" />
+    <ClInclude Include="..\public\Stage1_Step1.h" />
+    <ClInclude Include="..\public\Stage1_Step2.h" />
+    <ClInclude Include="..\public\Stage1_Step3.h" />
     <ClInclude Include="..\public\Town_Step1.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Launcher.h" />
@@ -164,6 +167,9 @@
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\private\Stage0_Step2.cpp" />
+    <ClCompile Include="..\private\Stage1_Step1.cpp" />
+    <ClCompile Include="..\private\Stage1_Step2.cpp" />
+    <ClCompile Include="..\private\Stage1_Step3.cpp" />
     <ClCompile Include="..\private\Town_Step1.cpp" />
     <ClCompile Include="Launcher.cpp" />
   </ItemGroup>
