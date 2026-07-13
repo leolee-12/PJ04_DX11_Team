@@ -1,5 +1,6 @@
 #include "Effect_Quad.h"
 
+#include "Effect_RectCommon.h"
 #include "GameInstance.h"
 
 CEffect_Quad::CEffect_Quad(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -87,49 +88,29 @@ HRESULT CEffect_Quad::Bind_ShaderValue()
     if (FAILED(__super::Bind_ShaderValue()))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_bBillboard", &m_bBillboard, sizeof(m_bBillboard))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fRoll", &m_fRoll, sizeof(m_fRoll))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_bSpriteAniTexture", &m_bSpriteAniTexture, sizeof(m_bSpriteAniTexture))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vSpriteAniTexUV", &m_fCurTexAniUV, sizeof(m_fCurTexAniUV))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vSpriteAniTexSize", &m_fCurTexAniSize, sizeof(m_fCurTexAniSize))))
-        return E_FAIL;
-
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_bSpriteAniMask", &m_bSpriteAniMask, sizeof(m_bSpriteAniMask))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vSpriteAniMaskUV", &m_fCurMaskAniUV, sizeof(m_fCurMaskAniUV))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vSpriteAniMaskSize", &m_fCurMaskAniSize, sizeof(m_fCurMaskAniSize))))
-        return E_FAIL;
-
-    return S_OK;
+    auto Values = Make_RectValues();
+    return EffectRect::Bind_ShaderValues(m_pShaderCom, Values, m_fRoll);
 }
 
 void CEffect_Quad::Update_Core(const _float fTimeDelta, const _float fRatio)
 {
     __super::Update_Core(fTimeDelta, fRatio);
 
-    if (m_bSpriteAniTexture == true)
-        Evaluate_SpriteFrame(m_iTexFrameX, m_iTexFrameY, fRatio, m_fCurTexAniUV, m_fCurTexAniSize);
-
-    if (m_bSpriteAniMask == true)
-        Evaluate_SpriteFrame(m_iMaskFrameX, m_iMaskFrameY, fRatio, m_fCurMaskAniUV, m_fCurMaskAniSize);
+    auto Values = Make_RectValues();
+    EffectRect::Update_SpriteAnimations(Values, fRatio);
 }
 
 void CEffect_Quad::Init_PropertyValue()
 {
-    m_bBillboard = false;
+    auto Values = Make_RectValues();
+    EffectRect::Initialize_DefaultValues(Values);
+}
 
-    m_bSpriteAniTexture = false;
-    m_iTexFrameX = 1;
-    m_iTexFrameY = 1;
-
-    m_bSpriteAniMask = false;
-    m_iMaskFrameX = 1;
-    m_iMaskFrameY = 1;
+EffectRect::VALUES CEffect_Quad::Make_RectValues()
+{
+    return {
+        m_bBillboard,
+        m_bSpriteAniTexture, m_iTexFrameX, m_iTexFrameY, m_fCurTexAniUV, m_fCurTexAniSize,
+        m_bSpriteAniMask, m_iMaskFrameX, m_iMaskFrameY, m_fCurMaskAniUV, m_fCurMaskAniSize
+    };
 }

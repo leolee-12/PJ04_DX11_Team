@@ -444,6 +444,9 @@
     <ClInclude Include="..\Public\Effect_MeshCommon.h">
       <Filter>05. GameObject\Effect\EffectPart</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Effect_RectCommon.h">
+      <Filter>05. GameObject\Effect\EffectPart</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Effect_MeshEmitter.h">
       <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_MeshEmitter</Filter>
     </ClInclude>
@@ -774,6 +777,9 @@
       <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Mesh</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_MeshCommon.cpp">
+      <Filter>05. GameObject\Effect\EffectPart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_RectCommon.cpp">
       <Filter>05. GameObject\Effect\EffectPart</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_MeshEmitter.cpp">

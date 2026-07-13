@@ -216,6 +216,7 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClInclude Include="..\Public\Effect_Emitter.h" />
     <ClInclude Include="..\Public\Effect_Mesh.h" />
     <ClInclude Include="..\Public\Effect_MeshCommon.h" />
+    <ClInclude Include="..\Public\Effect_RectCommon.h" />
     <ClInclude Include="..\Public\Effect_MeshEmitter.h" />
     <ClInclude Include="..\Public\Effect_MeshParticle.h" />
     <ClInclude Include="..\Public\Effect_NonParticle.h" />
@@ -331,6 +332,7 @@ call "UpdateLib.bat" $(Configuration)</Command>
     <ClCompile Include="..\Private\Effect_Emitter.cpp" />
     <ClCompile Include="..\Private\Effect_Mesh.cpp" />
     <ClCompile Include="..\Private\Effect_MeshCommon.cpp" />
+    <ClCompile Include="..\Private\Effect_RectCommon.cpp" />
     <ClCompile Include="..\Private\Effect_MeshEmitter.cpp" />
     <ClCompile Include="..\Private\Effect_MeshParticle.cpp" />
     <ClCompile Include="..\Private\Effect_NonParticle.cpp" />

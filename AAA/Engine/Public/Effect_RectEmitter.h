@@ -5,12 +5,14 @@
 NS_BEGIN(Engine)
 
 class CVIBuffer_Rect;
+namespace EffectRect { struct VALUES; }
 
 class ENGINE_DLL CEffect_RectEmitter abstract : public CEffect_Emitter
 {
     GENERATED_BODY_ABSTRACT(CEffect_RectEmitter)
 
 PROPERTY(_bool, m_bBillboard, L"Billboard", L"Effect");
+PROPERTY(_bool, m_bUseParticleRoll, L"Use Particle Roll", L"Rect Animation");
 
 // Sprite Animation Texture
 PROPERTY(_bool, m_bSpriteAniTexture, L"Sprite Animation Texture", L"Sprite Animation");
@@ -23,6 +25,9 @@ PROPERTY(_bool, m_bSpriteAniMask, L"Sprite Animation Mask", L"Sprite Animation")
 
 PROPERTY(_int, m_iMaskFrameX, L"Frame X_M", L"Sprite Animation");
 PROPERTY(_int, m_iMaskFrameY, L"Frame Y_M", L"Sprite Animation");
+
+// 0: Effect Part ratio, 1: each particle lifetime ratio (legacy)
+PROPERTY(_int, m_iSpriteTimeMode, L"Sprite Time Mode", L"Sprite Animation");
 
 public:
     struct EFFECT_RECTEMITTER_DESC : public CEffect_Emitter::EFFECT_EMITTER_DESC
@@ -47,10 +52,13 @@ protected:
 public:
     virtual HRESULT Render() override;
 
+protected:
+    virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;
+
 private:
     HRESULT Ready_Components();
-    HRESULT Bind_ShaderResources();
-    HRESULT Bind_ShaderValue(_float fLocalRatio);
+    HRESULT Bind_ShaderValue();
+    HRESULT Bind_EmitterRectValue(const EMITTER_PARTICLE& Particle);
 
 private:
     CVIBuffer_Rect* m_pVIBuffer{};
@@ -68,7 +76,10 @@ private:
     _float2 m_fCurMaskAniUV{};
     _float2 m_fCurMaskAniSize{};
 
+    _float m_fCurrentEffectRatio{};
+
 private:
+    EffectRect::VALUES Make_RectValues();
     void Init_PropertyValue();
 };
 

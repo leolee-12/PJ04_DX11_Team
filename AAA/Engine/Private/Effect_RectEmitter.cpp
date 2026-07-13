@@ -1,5 +1,6 @@
 #include "Effect_RectEmitter.h"
 
+#include "Effect_RectCommon.h"
 #include "GameInstance.h"
 
 CEffect_RectEmitter::CEffect_RectEmitter(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -36,7 +37,10 @@ HRESULT CEffect_RectEmitter::Initialize(void* pArg)
 
 HRESULT CEffect_RectEmitter::Render()
 {
-    if (FAILED(Bind_ShaderResources()))
+    if (FAILED(Bind_ViewProjectionMatrices()))
+        return E_FAIL;
+
+    if (FAILED(Bind_ShaderValue()))
         return E_FAIL;
 
     if (FAILED(m_pVIBuffer->Bind_Resources()))
@@ -49,34 +53,15 @@ HRESULT CEffect_RectEmitter::Render()
         if (Particle.bAlive == false)
             continue;
 
-        _float fLocalRatio = 1.f;
-        if (Particle.fLifeTime > Helper::fEpsilon)
-            fLocalRatio = Particle.fAge / Particle.fLifeTime;
-
-        Helper::FloatClamp(fLocalRatio, 0.f, 1.f);
-
-        _float4x4 ParticleWorld = Make_EmitterParticleWorldMatrix(Particle);
-
-        if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &ParticleWorld)))
+        const _float4x4 ParticleWorld = Make_EmitterParticleWorldMatrix(Particle);
+        if (FAILED(EffectRect::Bind_ParticleDrawValues(
+            m_pShaderCom, ParticleWorld, Particle.fAlpha, Particle.vColor)))
             return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", &Particle.fAlpha, sizeof(Particle.fAlpha))))
+        if (FAILED(Bind_EmitterRectValue(Particle)))
             return E_FAIL;
 
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor", &Particle.vColor, sizeof(Particle.vColor))))
-            return E_FAIL;
-
-        _float fRoll = XMConvertToRadians(Particle.vRotation.z);
-        if (FAILED(m_pShaderCom->Bind_RawValue("g_fRoll", &fRoll, sizeof(fRoll))))
-            return E_FAIL;
-
-        if (FAILED(Bind_ShaderValue(fLocalRatio)))
-            return E_FAIL;
-
-        if (FAILED(m_pShaderCom->Begin(iPass)))
-            return E_FAIL;
-
-        if (FAILED(m_pVIBuffer->Render()))
+        if (FAILED(EffectRect::Begin_AndRender(m_pShaderCom, m_pVIBuffer, iPass)))
             return E_FAIL;
     }
 
@@ -100,61 +85,75 @@ HRESULT CEffect_RectEmitter::Ready_Components()
     return S_OK;
 }
 
-HRESULT CEffect_RectEmitter::Bind_ShaderResources()
-{
-    if (FAILED(Bind_ViewProjectionMatrices()))
-        return E_FAIL;
-
-    return S_OK;
-}
-
-HRESULT CEffect_RectEmitter::Bind_ShaderValue(_float fLocalRatio)
+HRESULT CEffect_RectEmitter::Bind_ShaderValue()
 {
     if (FAILED(__super::Bind_ShaderValue()))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_bBillboard", &m_bBillboard, sizeof(m_bBillboard))))
-        return E_FAIL;
+    auto Values = Make_RectValues();
+    const _int iSpriteTimeMode = EffectRect::Normalize_SpriteTimeMode(m_iSpriteTimeMode);
+    const _float fRatio = iSpriteTimeMode == EffectRect::SPRITE_TIME_EFFECT
+        ? m_fCurrentEffectRatio
+        : 0.f;
 
-    Evaluate_SpriteFrame(
-        m_iTexFrameX, m_iTexFrameY,
-        m_bSpriteAniTexture == true ? fLocalRatio : 0.f,
-        m_fCurTexAniUV, m_fCurTexAniSize);
-    Evaluate_SpriteFrame(
-        m_iMaskFrameX, m_iMaskFrameY,
-        m_bSpriteAniMask == true ? fLocalRatio : 0.f,
-        m_fCurMaskAniUV, m_fCurMaskAniSize);
+    EffectRect::Update_SpriteAnimations(Values, fRatio, true);
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_bSpriteAniTexture", &m_bSpriteAniTexture, sizeof(m_bSpriteAniTexture))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vSpriteAniTexUV", &m_fCurTexAniUV, sizeof(m_fCurTexAniUV))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vSpriteAniTexSize", &m_fCurTexAniSize, sizeof(m_fCurTexAniSize))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_bSpriteAniMask", &m_bSpriteAniMask, sizeof(m_bSpriteAniMask))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vSpriteAniMaskUV", &m_fCurMaskAniUV, sizeof(m_fCurMaskAniUV))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vSpriteAniMaskSize", &m_fCurMaskAniSize, sizeof(m_fCurMaskAniSize))))
+    if (FAILED(EffectRect::Bind_StaticShaderValues(m_pShaderCom, Values)) ||
+        FAILED(EffectRect::Bind_SpriteShaderValues(m_pShaderCom, Values)) ||
+        FAILED(EffectRect::Bind_Roll(m_pShaderCom, 0.f)))
         return E_FAIL;
 
     return S_OK;
 }
 
+HRESULT CEffect_RectEmitter::Bind_EmitterRectValue(const EMITTER_PARTICLE& Particle)
+{
+    auto Values = Make_RectValues();
+    const _int iSpriteTimeMode = EffectRect::Normalize_SpriteTimeMode(m_iSpriteTimeMode);
+
+    if (iSpriteTimeMode == EffectRect::SPRITE_TIME_PARTICLE &&
+        (m_bSpriteAniTexture == true || m_bSpriteAniMask == true))
+    {
+        _float fParticleRatio = 1.f;
+        if (Particle.fLifeTime > Helper::fEpsilon)
+            fParticleRatio = Particle.fAge / Particle.fLifeTime;
+        Helper::FloatClamp(fParticleRatio, 0.f, 1.f);
+
+        EffectRect::Update_SpriteAnimations(Values, fParticleRatio);
+        if (FAILED(EffectRect::Bind_SpriteShaderValues(m_pShaderCom, Values)))
+            return E_FAIL;
+    }
+
+    if (m_bUseParticleRoll == true)
+    {
+        const _float fRoll = XMConvertToRadians(Particle.vRotation.z);
+        if (FAILED(EffectRect::Bind_Roll(m_pShaderCom, fRoll)))
+            return E_FAIL;
+    }
+
+    return S_OK;
+}
+
+void CEffect_RectEmitter::Update_Core(const _float fTimeDelta, const _float fRatio)
+{
+    __super::Update_Core(fTimeDelta, fRatio);
+    m_fCurrentEffectRatio = fRatio;
+}
+
 void CEffect_RectEmitter::Init_PropertyValue()
 {
-    m_bBillboard = false;
+    auto Values = Make_RectValues();
+    EffectRect::Initialize_DefaultValues(Values);
+    m_bUseParticleRoll = true;
+    m_iSpriteTimeMode = EffectRect::SPRITE_TIME_PARTICLE;
+    m_fCurrentEffectRatio = 0.f;
+}
 
-    m_bSpriteAniTexture = false;
-    m_iTexFrameX = 1;
-    m_iTexFrameY = 1;
-
-    m_bSpriteAniMask = false;
-    m_iMaskFrameX = 1;
-    m_iMaskFrameY = 1;
+EffectRect::VALUES CEffect_RectEmitter::Make_RectValues()
+{
+    return {
+        m_bBillboard,
+        m_bSpriteAniTexture, m_iTexFrameX, m_iTexFrameY, m_fCurTexAniUV, m_fCurTexAniSize,
+        m_bSpriteAniMask, m_iMaskFrameX, m_iMaskFrameY, m_fCurMaskAniUV, m_fCurMaskAniSize
+    };
 }
