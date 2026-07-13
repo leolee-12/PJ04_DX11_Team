@@ -16,6 +16,7 @@ namespace
 	inline constexpr _float ARROWBOARD_ANIM_SPEED = 1.5f;
 	inline constexpr _float ARROWBOARD_MIN_HURT_RADIUS = 0.1f;
 	inline constexpr _float ARROWBOARD_GLOW_PERIOD = 0.3333f;
+	constexpr const _tchar* ARROWBOARD_HIT_SOUNDKEY = L"GimmickArrowBoard_Road.wav";
 }
 
 NS_BEGIN(Client)
@@ -175,6 +176,7 @@ void CLD_ArrowBoard::Damaged(const ATTACK_INFO& tInfo)
 	if (!m_bActive || Is_Dead())
 		return;
 
+	m_pGameInstance_Proxy->Play_SFX(ARROWBOARD_HIT_SOUNDKEY, 0.25f);
 	m_pAnimatorCom->Play(ARROWBOARD_ANIM_ATTACKED, false, true, 0.f, ARROWBOARD_ANIM_SPEED);
 }
 

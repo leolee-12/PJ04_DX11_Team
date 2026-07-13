@@ -122,12 +122,11 @@
 #include "StarEmitter.h"
 #include "Sparkle.h"
 #include "MeshEmitterCommon.h"
-#include "QuadCommon.h"
+#include "RectCommon.h"
 #include "MeshCommon.h"
 #include "RectParticleCommon.h"
 #include "MeshParticleCommon.h"
 #include "RectEmitterCommon.h"
-#include "StarMesh.h"
 
 //sky
 #include "SkySphere.h"
@@ -1037,17 +1036,21 @@ void CGameObject_Factory::Register_Effect()
         CREATOR(CBubbleAura),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CBubble::PROTOTYPE_TAG, CBubble::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG, CRectCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectEmitterCommon::PROTOTYPE_TAG, CRectEmitterCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectParticleCommon::PROTOTYPE_TAG, CRectParticleCommon::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, Texture_CommonRing01.iLevelID, Texture_CommonRing01.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_CommonRing01.szFileTag, Texture_CommonRing01.iNumTex));
+            
+            TRY_ADD_PROTO(pProxy, Texture_Star2D.iLevelID, Texture_Star2D.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Star2D.szFileTag, Texture_Star2D.iNumTex));
 
-            //TRY_ADD_PROTO(pProxy, iLevelIndex, CStarMesh::PROTOTYPE_TAG, CStarMesh::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_CommonSparkle01.iLevelID, Texture_CommonSparkle01.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_CommonSparkle01.szFileTag, Texture_CommonSparkle01.iNumTex));
 
-            //TRY_ADD_PROTO(pProxy, iLevelIndex, CStarEmitter::PROTOTYPE_TAG, CStarEmitter::Create(pDevice, pContext));
-
-            //TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StarSmooth"),
-            //    CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/CHJ/Effect/Star/Common_00_Common_StarSmooth.ysh"));
         ));
 
     // 8

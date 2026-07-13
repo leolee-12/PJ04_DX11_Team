@@ -112,7 +112,7 @@
     <ClInclude Include="..\Public\LD_CopyEssence.h" />
     <ClInclude Include="..\Public\MeshEmitterCommon.h" />
     <ClInclude Include="..\public\Projectile_Partner.h" />
-    <ClInclude Include="..\Public\QuadCommon.h" />
+    <ClInclude Include="..\Public\RectCommon.h" />
     <ClInclude Include="..\Public\MeshCommon.h" />
     <ClInclude Include="..\Public\RectParticleCommon.h" />
     <ClInclude Include="..\Public\MeshParticleCommon.h" />
@@ -169,7 +169,6 @@
     <ClInclude Include="..\Public\Star2DParticle.h" />
     <ClInclude Include="..\Public\SpitObject.h" />
     <ClInclude Include="..\Public\StarEmitter.h" />
-    <ClInclude Include="..\Public\StarMesh.h" />
     <ClInclude Include="..\Public\StarParticle.h" />
     <ClInclude Include="..\public\SpinWind.h" />
     <ClInclude Include="..\Public\SwordCharge.h" />
@@ -486,7 +485,7 @@
     <ClCompile Include="..\Private\LD_CopyEssence.cpp" />
     <ClCompile Include="..\Private\MeshEmitterCommon.cpp" />
     <ClCompile Include="..\private\Projectile_Partner.cpp" />
-    <ClCompile Include="..\Private\QuadCommon.cpp" />
+    <ClCompile Include="..\Private\RectCommon.cpp" />
     <ClCompile Include="..\Private\MeshCommon.cpp" />
     <ClCompile Include="..\Private\RectParticleCommon.cpp" />
     <ClCompile Include="..\Private\MeshParticleCommon.cpp" />
@@ -540,7 +539,6 @@
     <ClCompile Include="..\Private\Star2DParticle.cpp" />
     <ClCompile Include="..\Private\SpitObject.cpp" />
     <ClCompile Include="..\Private\StarEmitter.cpp" />
-    <ClCompile Include="..\Private\StarMesh.cpp" />
     <ClCompile Include="..\Private\StarParticle.cpp" />
     <ClCompile Include="..\private\SpinWind.cpp" />
     <ClCompile Include="..\Private\SwordCharge.cpp" />

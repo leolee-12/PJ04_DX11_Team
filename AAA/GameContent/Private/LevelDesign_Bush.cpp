@@ -17,25 +17,24 @@ namespace
 
 	struct LD_BUSH_CATALOG
 	{
-		const _tchar* pObjectName;
+		const _tchar*	pObjectName;
 
-		const _tchar* pBasicModelProtoTag;
-		const _char* pBasicModelPath;
-		MODEL eBasicModelType;
+		const _tchar*	pBasicModelProtoTag;
+		const _char*	pBasicModelPath;
+		MODEL			eBasicModelType;
 
-		const _tchar* pCutModelProtoTag;
-		const _char* pCutModelPath;
-		MODEL eCutModelType;
+		const _tchar*	pCutModelProtoTag;
+		const _char*	pCutModelPath;
+		MODEL			eCutModelType;
 	};
 
 	static const LD_BUSH_CATALOG g_EventObjectCatalog[] =
 	{
-		{ L"Bush2BasicS", CLevelDesign_Bush::BUSH_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/BushS.ysh", MODEL::ANIM,
-		CLevelDesign_Bush::CUT_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/CutS.ysh", MODEL::NONANIM },
-		{ L"Bush2BasicM", CLevelDesign_Bush::BUSH_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/BushM.ysh", MODEL::ANIM,
-		CLevelDesign_Bush::CUT_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/CutM.ysh", MODEL::NONANIM },
-		{ L"Bush2BasicL", CLevelDesign_Bush::BUSH_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/BushL.ysh", MODEL::ANIM,
-		CLevelDesign_Bush::CUT_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/CutL.ysh", MODEL::NONANIM }
+		{ L"Bush2BasicS", CLevelDesign_Bush::BUSH_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/BushS.ysh", MODEL::ANIM,	CLevelDesign_Bush::CUT_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/CutS.ysh", MODEL::NONANIM },
+
+		{ L"Bush2BasicM", CLevelDesign_Bush::BUSH_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/BushM.ysh", MODEL::ANIM,	CLevelDesign_Bush::CUT_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/CutM.ysh", MODEL::NONANIM },
+
+		{ L"Bush2BasicL", CLevelDesign_Bush::BUSH_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/BushL.ysh", MODEL::ANIM,	CLevelDesign_Bush::CUT_L_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/Bush/CutL.ysh", MODEL::NONANIM }
 	};
 
 	static const LD_BUSH_CATALOG* Find_BushCatalog(const _wstring& wstrObjName)
@@ -265,6 +264,14 @@ void CLevelDesign_Bush::Damaged(const ATTACK_INFO& tInfo)
 		XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
 
 	CEffect_Loader::GetInstance()->Spawn(L"Split_Bush", Get_LevelIndex(), vPos);
+
+	_int			iIdx = m_pGameInstance_Proxy->RandomInt(1, 4);
+	_tchar			szSoundKey[MAX_PATH] = {};
+
+	// RandomInt 0 Clamp
+	iIdx =	min(iIdx, 1);
+	swprintf_s(szSoundKey, L"GimmickBush_Cut%d.wav", iIdx);
+	m_pGameInstance_Proxy->Play_SFX(szSoundKey, 0.3f);
 
 	m_eState = BUSH_STATE::CUT;
 	m_pHurtBox->Set_Enabled(false);

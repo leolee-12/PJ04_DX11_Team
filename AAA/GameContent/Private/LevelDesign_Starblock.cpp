@@ -241,6 +241,10 @@ void CLevelDesign_Starblock::Damaged(const ATTACK_INFO& tInfo)
 	if (nullptr != pCatalog && nullptr != pCatalog->pDestroyEffectId)
 		CEffect_Loader::GetInstance()->Spawn(pCatalog->pDestroyEffectId, Get_LevelIndex(), vPos);
 
+	// (임시 연결)
+	// TODO : 어택 타입에 따른 사운드 분기
+	m_pGameInstance_Proxy->Play_SFX(L"GimmickBasic_BlockCrash.wav", 0.3f);
+
 	Enable_Colliders(false);
 	Release_RigidStatic();
 	Set_Active(false);

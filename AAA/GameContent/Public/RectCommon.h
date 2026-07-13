@@ -1,27 +1,26 @@
 #pragma once
-
 #include "GameContent_Defines.h"
-
-#include "Effect_Mesh.h"
+#include "Effect_Quad.h"
 
 NS_BEGIN(Client)
 
-class CStarMesh final : public CEffect_Mesh
+class CRectCommon final : public CEffect_Quad
 {
-	GENERATED_BODY(CStarMesh)
+	GENERATED_BODY(CRectCommon)
+
+	PROPERTY(_int, m_iRenderGroup, L"Render Group", L"Rendering");
 
 public:
-	struct STAR_MESH_DESC : public CEffect_Mesh::EFFECT_MESH_DESC
+	struct RECT_COMMON_DESC : public CEffect_Quad::EFFECT_QUAD_DESC
 	{
-
 	};
 
-	static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_StarMesh";
+	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_RectCommon";
 
 private:
-	CStarMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CStarMesh(const CStarMesh& Prototype);
-	virtual ~CStarMesh() = default;
+	CRectCommon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CRectCommon(const CRectCommon& Prototype);
+	virtual ~CRectCommon() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -35,10 +34,11 @@ public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
 public:
-	static CStarMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CRectCommon* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
+
 private:
-	virtual void Free();
+	virtual void Free() override;
 };
 
 NS_END
