@@ -10,7 +10,7 @@ class ENGINE_DLL CEffect_RectEmitter abstract : public CEffect_Emitter
 {
     GENERATED_BODY_ABSTRACT(CEffect_RectEmitter)
 
-PROPERTY(_bool, m_bBillboard, L"Billboard", L"Rendering");
+PROPERTY(_bool, m_bBillboard, L"Billboard", L"Effect");
 
 // Sprite Animation Texture
 PROPERTY(_bool, m_bSpriteAniTexture, L"Sprite Animation Texture", L"Sprite Animation");
@@ -42,28 +42,15 @@ protected:
     virtual ~CEffect_RectEmitter() = default;
 
 protected:
-    virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void* pArg) override;
 
 public:
-    virtual void    Priority_Update(_float fTimeDelta) override;
-    virtual void    Update(_float fTimeDelta) override;
-    virtual void    Late_Update(_float fTimeDelta) override;
     virtual HRESULT Render() override;
-
-    virtual void    Effect_Start() override;
-
-protected:
-    virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;
 
 private:
     HRESULT Ready_Components();
     HRESULT Bind_ShaderResources();
     HRESULT Bind_ShaderValue(_float fLocalRatio);
-
-private:
-    void Update_TexSpriteAnimation(_float fRatio);
-    void Update_MaskSpriteAnimation(_float fRatio);
 
 private:
     CVIBuffer_Rect* m_pVIBuffer{};
@@ -83,9 +70,6 @@ private:
 
 private:
     void Init_PropertyValue();
-
-protected:
-    virtual void Free() override;
 };
 
 NS_END

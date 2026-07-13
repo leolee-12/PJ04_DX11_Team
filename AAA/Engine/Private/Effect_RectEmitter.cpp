@@ -14,11 +14,6 @@ CEffect_RectEmitter::CEffect_RectEmitter(const CEffect_RectEmitter& Prototype)
     Init_PropertyValue();
 }
 
-HRESULT CEffect_RectEmitter::Initialize_Prototype()
-{
-    return S_OK;
-}
-
 HRESULT CEffect_RectEmitter::Initialize(void* pArg)
 {
     EFFECT_RECTEMITTER_DESC* pDesc = static_cast<EFFECT_RECTEMITTER_DESC*>(pArg);
@@ -39,21 +34,6 @@ HRESULT CEffect_RectEmitter::Initialize(void* pArg)
     return S_OK;
 }
 
-void CEffect_RectEmitter::Priority_Update(_float fTimeDelta)
-{
-    __super::Priority_Update(fTimeDelta);
-}
-
-void CEffect_RectEmitter::Update(_float fTimeDelta)
-{
-    __super::Update(fTimeDelta);
-}
-
-void CEffect_RectEmitter::Late_Update(_float fTimeDelta)
-{
-    __super::Late_Update(fTimeDelta);
-}
-
 HRESULT CEffect_RectEmitter::Render()
 {
     if (FAILED(Bind_ShaderResources()))
@@ -62,13 +42,7 @@ HRESULT CEffect_RectEmitter::Render()
     if (FAILED(m_pVIBuffer->Bind_Resources()))
         return E_FAIL;
 
-    Helper::IntClamp(m_iShaderPass, ShaderPass::Default, ShaderPass::ShaderPass_End - 1);
-    Helper::IntClamp(m_iMirror, Sampler::DEFAULT, Sampler::SAMPLER_END - 1);
-    Helper::IntClamp(m_iDepthIgnore, DepthMode::DEPTH_DEFAULT, DepthMode::DEPTH_MODE_END - 1);
-
-    _int iPass = m_iShaderPass +
-        (m_iMirror == Sampler::MIRROR ? ShaderPass::ShaderPass_End : 0) +
-        (m_iDepthIgnore == DepthMode::DEPTH_IGNORE ? ShaderPass::ShaderPass_End * Sampler::SAMPLER_END : 0);
+    const _int iPass = Resolve_ShaderPass();
 
     for (const EMITTER_PARTICLE& Particle : m_EmitterParticles)
     {
@@ -109,11 +83,6 @@ HRESULT CEffect_RectEmitter::Render()
     return S_OK;
 }
 
-void CEffect_RectEmitter::Effect_Start()
-{
-    __super::Effect_Start();
-}
-
 HRESULT CEffect_RectEmitter::Ready_Components()
 {
     if (m_bCustomShader == false)
@@ -133,10 +102,7 @@ HRESULT CEffect_RectEmitter::Ready_Components()
 
 HRESULT CEffect_RectEmitter::Bind_ShaderResources()
 {
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
+    if (FAILED(Bind_ViewProjectionMatrices()))
         return E_FAIL;
 
     return S_OK;
@@ -150,8 +116,14 @@ HRESULT CEffect_RectEmitter::Bind_ShaderValue(_float fLocalRatio)
     if (FAILED(m_pShaderCom->Bind_RawValue("g_bBillboard", &m_bBillboard, sizeof(m_bBillboard))))
         return E_FAIL;
 
-    Update_TexSpriteAnimation(fLocalRatio);
-    Update_MaskSpriteAnimation(fLocalRatio);
+    Evaluate_SpriteFrame(
+        m_iTexFrameX, m_iTexFrameY,
+        m_bSpriteAniTexture == true ? fLocalRatio : 0.f,
+        m_fCurTexAniUV, m_fCurTexAniSize);
+    Evaluate_SpriteFrame(
+        m_iMaskFrameX, m_iMaskFrameY,
+        m_bSpriteAniMask == true ? fLocalRatio : 0.f,
+        m_fCurMaskAniUV, m_fCurMaskAniSize);
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_bSpriteAniTexture", &m_bSpriteAniTexture, sizeof(m_bSpriteAniTexture))))
         return E_FAIL;
@@ -174,79 +146,6 @@ HRESULT CEffect_RectEmitter::Bind_ShaderValue(_float fLocalRatio)
     return S_OK;
 }
 
-void CEffect_RectEmitter::Update_Core(const _float fTimeDelta, const _float fRatio)
-{
-    __super::Update_Core(fTimeDelta, fRatio);
-}
-
-void CEffect_RectEmitter::Update_TexSpriteAnimation(_float fRatio)
-{
-    _int iFrameX = m_iTexFrameX;
-    _int iFrameY = m_iTexFrameY;
-
-    if (iFrameX < 1)
-        iFrameX = 1;
-
-    if (iFrameY < 1)
-        iFrameY = 1;
-
-    m_fCurTexAniSize.x = 1.f / static_cast<_float>(iFrameX);
-    m_fCurTexAniSize.y = 1.f / static_cast<_float>(iFrameY);
-
-    m_fCurTexAniUV = { 0.f, 0.f };
-
-    if (m_bSpriteAniTexture == false)
-        return;
-
-    Helper::FloatClamp(fRatio, 0.f, 1.f);
-
-    _int iTotalCount = iFrameX * iFrameY;
-    _int iCurTexFrameIndex = static_cast<_int>(static_cast<_float>(iTotalCount) * fRatio);
-
-    if (iCurTexFrameIndex >= iTotalCount)
-        iCurTexFrameIndex = iTotalCount - 1;
-
-    _float fCurTexFrameX = static_cast<_float>(iCurTexFrameIndex % iFrameX);
-    _float fCurTexFrameY = static_cast<_float>(iCurTexFrameIndex / iFrameX);
-
-    m_fCurTexAniUV.x = m_fCurTexAniSize.x * fCurTexFrameX;
-    m_fCurTexAniUV.y = m_fCurTexAniSize.y * fCurTexFrameY;
-}
-
-void CEffect_RectEmitter::Update_MaskSpriteAnimation(_float fRatio)
-{
-    _int iFrameX = m_iMaskFrameX;
-    _int iFrameY = m_iMaskFrameY;
-
-    if (iFrameX < 1)
-        iFrameX = 1;
-
-    if (iFrameY < 1)
-        iFrameY = 1;
-
-    m_fCurMaskAniSize.x = 1.f / static_cast<_float>(iFrameX);
-    m_fCurMaskAniSize.y = 1.f / static_cast<_float>(iFrameY);
-
-    m_fCurMaskAniUV = { 0.f, 0.f };
-
-    if (m_bSpriteAniMask == false)
-        return;
-
-    Helper::FloatClamp(fRatio, 0.f, 1.f);
-
-    _int iTotalCount = iFrameX * iFrameY;
-    _int iCurMaskFrameIndex = static_cast<_int>(static_cast<_float>(iTotalCount) * fRatio);
-
-    if (iCurMaskFrameIndex >= iTotalCount)
-        iCurMaskFrameIndex = iTotalCount - 1;
-
-    _float fCurMaskFrameX = static_cast<_float>(iCurMaskFrameIndex % iFrameX);
-    _float fCurMaskFrameY = static_cast<_float>(iCurMaskFrameIndex / iFrameX);
-
-    m_fCurMaskAniUV.x = m_fCurMaskAniSize.x * fCurMaskFrameX;
-    m_fCurMaskAniUV.y = m_fCurMaskAniSize.y * fCurMaskFrameY;
-}
-
 void CEffect_RectEmitter::Init_PropertyValue()
 {
     m_bBillboard = false;
@@ -258,9 +157,4 @@ void CEffect_RectEmitter::Init_PropertyValue()
     m_bSpriteAniMask = false;
     m_iMaskFrameX = 1;
     m_iMaskFrameY = 1;
-}
-
-void CEffect_RectEmitter::Free()
-{
-    __super::Free();
 }

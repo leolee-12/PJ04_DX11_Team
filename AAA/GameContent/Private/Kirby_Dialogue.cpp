@@ -28,6 +28,9 @@ KIRBY_STATE_TYPE CKirby_Dialogue::Get_StateType()
 void CKirby_Dialogue::Enter(CKirby* pKirby, _int iFlag)
 {
     __super::Enter(pKirby, iFlag);
+
+    COPY_ABILITY_TYPE eAbilityTepe = pKirby->Get_KirbyAbility()->Get_AbilityType();
+    pKirby->Set_AbilityPartsActive(eAbilityTepe, false, true);
 }
 
 void CKirby_Dialogue::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -38,6 +41,9 @@ void CKirby_Dialogue::Update(CKirby* pKirby, const _float fTimeDelta)
 void CKirby_Dialogue::Exit(CKirby* pKirby)
 {
     __super::Exit(pKirby);
+
+    COPY_ABILITY_TYPE eAbilityTepe = pKirby->Get_KirbyAbility()->Get_AbilityType();
+    pKirby->Set_AbilityPartsActive(eAbilityTepe, true, true);
 }
 
 _bool CKirby_Dialogue::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)

@@ -16,7 +16,6 @@ class CKirby_HitBox_Model abstract : public CKirby_Deform_Model
 public:
 	struct KIRBY_HITBOX_MODEL_DESC : public CKirby_Deform_Model::KIRBY_DEFORM_MODEL_DESC
 	{
-
 	};
 
 protected:

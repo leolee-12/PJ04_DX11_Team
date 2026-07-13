@@ -19,16 +19,17 @@ static void ReadVal(ifstream& f, T& v)
 
 HRESULT CDataLoader::Read_Json(const _tchar* strFilePath, string* pOutContnet)
 {
-	ifstream file(strFilePath);
-	if (!file.is_open())
-		return E_FAIL;
+    ifstream file(strFilePath, ios::binary);
+    if (!file.is_open())
+        return E_FAIL;
 
-	stringstream Buffer;
-	Buffer << file.rdbuf();
-	*pOutContnet = Buffer.str();
+    file.seekg(0, ios::end);
+    const streamsize iSize = file.tellg();
+    file.seekg(0, ios::beg);
 
-	file.close();
-	return S_OK;
+    pOutContnet->resize(static_cast<size_t>(iSize));
+    file.read(pOutContnet->data(), iSize);
+    return S_OK;
 }
 
 void CDataLoader::Parse_Float4(const json& jArray, _float4* pOutFloat4)

@@ -128,12 +128,11 @@ void CKirby::Update(_float fTimeDelta)
 
     m_pMovement->Update_RigidBody(fTimeDelta);
 
+    Update_RenderWorldMatrix(fTimeDelta);
+
     __super::Update(fTimeDelta);
 
     Update_InvincibilityHitFlash();
-
-    Cal_RenderWorldMatrix();
-    Get_CurrentDeformModel()->Set_GoundNormal(m_pMovement->Get_GroundNormal());
 
 #ifdef _DEBUG
     if (m_pGameInstance_Proxy->Key_Down(DIK_TAB))
@@ -523,6 +522,7 @@ HRESULT CKirby::Ready_PartObjects()
     // Body
     CKirby_Body::KIRBY_BODY_DESC BodyDesc{};
     BodyDesc.pParentMatrix = &m_RenderWorldMatrix;
+
     BodyDesc.pHitFlashIntensity = Get_HitFlashPtr();       
     BodyDesc.pHitFlashColor = Get_HitFlashColorPtr();
 
@@ -664,7 +664,8 @@ HRESULT CKirby::Ready_Events()
         }
     );
 
-    // Pos
+    // Position Sync
+#pragma region Position Sync
     Subscribe_Event(EventTag::Kirby_PositionSyncBegin,
         [this](void* pData)
         {
@@ -680,6 +681,8 @@ HRESULT CKirby::Ready_Events()
             m_pKirby_StateMachine->Request_PositionSync_End_StateMachine(pDesc);
         }
     );
+#pragma endregion
+
 
     // Clear
     Subscribe_Event(EventTag::Cutscene_StageClear,
@@ -714,8 +717,7 @@ HRESULT CKirby::Ready_Events()
             m_pKirby_StateMachine->Request_SequenceLock_StateMachine(pDesc);
             Set_Active(false);
 
-            // 나중에 수정 차 회전이랑 한번에
-            Clear_CutsceneAttachTarget();
+            //Clear_CutsceneAttachTarget();
             Clear_Ladder();
             Set_TriggerDeformObj(nullptr);
             Set_HeldDeformObj(nullptr);
@@ -898,54 +900,104 @@ void  CKirby::On_Damaged(const ATTACK_INFO& tInfo)
 
 void CKirby::Set_CutsceneAttachTarget(const KIRBY_ATTACHMENT_BEGIN_DESC* pAttachDesc)
 {
-    m_vPreAttachScale = Get_Transform()->Get_Scaled();
     m_pAttachBone = pAttachDesc->pBoneMatrix;
     m_pAttachOwnerWorld = pAttachDesc->pSourceWorld;
+    m_vPreAttachScale = Get_Transform()->Get_Scaled();
+
+    m_bIsAttach = true;
 }
 
 void CKirby::Clear_CutsceneAttachTarget()
 {
-    if (nullptr == m_pAttachBone && nullptr == m_pAttachOwnerWorld)
-        return;
-
-    m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(m_vPreAttachScale.x, 0.f, 0.f, 0.f));
-    m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, m_vPreAttachScale.y, 0.f, 0.f));
-    m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, m_vPreAttachScale.z, 0.f));
-
     m_pAttachBone = nullptr;
     m_pAttachOwnerWorld = nullptr;
+
+    _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+    _vector vLook = XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f);
+    if (XMVectorGetX(XMVector3LengthSq(vLook)) < Helper::fEpsilon)
+        vLook = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+
+    vLook = XMVector3Normalize(vLook);
+
+    _vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vLook));
+    vLook = XMVector3Normalize(XMVector3Cross(vRight, vUp));
+
+    _matrix matNewWorld = XMMatrixIdentity();
+    matNewWorld.r[0] = XMVectorSetW(vRight * m_vPreAttachScale.x, 0.f);
+    matNewWorld.r[1] = XMVectorSetW(vUp * m_vPreAttachScale.y, 0.f);
+    matNewWorld.r[2] = XMVectorSetW(vLook * m_vPreAttachScale.z, 0.f);
+    matNewWorld.r[3] = XMVectorSetW(vPos, 1.f);
+   
+    m_pTransformCom->Set_WorldMatrix(matNewWorld);
+    m_pMovement->Sync_To_Controller();
+
+    XMStoreFloat4x4(&m_RenderWorldMatrix, matNewWorld);
+    XMStoreFloat3(&m_vRenderGroundNormal, vUp);
+
+    m_vPreAttachScale = { 1.f,1.f,1.f };
+    m_bIsAttach = false;
 }
 
-void CKirby::Cal_RenderWorldMatrix()
+void CKirby::Update_RenderWorldMatrix(_float fTimeDelta)
 {
- /*   _float3 vGroundNormal{ 0.f, 1.f, 0.f };
-    Update_GroundNormal(vGroundNormal);
+    _matrix matBaseWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+    _vector vBaseUp = XMVector3Normalize(m_pTransformCom->Get_State(STATE::UP));
 
-    _vector vUp = XMVector3Normalize(XMLoadFloat3(&vGroundNormal));
+    // 누군가에게 부착되어 있을때 적용 x
+    if (m_bIsAttach)
+    {
+        XMStoreFloat4x4(&m_RenderWorldMatrix, matBaseWorld);
+        XMStoreFloat3(&m_vRenderGroundNormal, vBaseUp);
+        return;
+    }    
+
+    // Normal 못 구하면 적용 x
+    _float3 vTargetGroundNormal = { 0.f, 1.f, 0.f };
+    if (Cal_GroundNormal(vTargetGroundNormal) == false)
+    {
+        XMStoreFloat4x4(&m_RenderWorldMatrix, matBaseWorld);
+        XMStoreFloat3(&m_vRenderGroundNormal, vBaseUp);
+        return;
+    }
+
+    _vector vTargetNormal = XMVector3Normalize(XMLoadFloat3(&vTargetGroundNormal));
+
+    constexpr _float fSpeed = 12.f;
+    _float fRatio = 1.f - expf(-fSpeed * fTimeDelta);
+    _vector vCurNormal = XMVector3Normalize(XMLoadFloat3(&m_vRenderGroundNormal));
+    _vector vFinalUp = XMVector3Normalize(XMVectorLerp(vCurNormal, vTargetNormal, fRatio));
 
     _vector vLook = XMVector3Normalize(
         XMVectorSetW(m_pTransformCom->Get_State(STATE::LOOK), 0.f));
 
-   vLook = vLook - vUp * XMVector3Dot(vLook, vUp);
+   vLook = vLook - vFinalUp * XMVector3Dot(vLook, vFinalUp);
 
-   _float3 vScale = m_pTransformCom->Get_Scaled();
+   // 같은 방향이거나 반대 방향이면
+   if (XMVectorGetX(XMVector3LengthSq(vLook)) < Helper::fEpsilon)
+   {
+       // 그냥 원래 방향으로 세팅./
+       XMStoreFloat4x4(&m_RenderWorldMatrix, matBaseWorld);
+       XMStoreFloat3(&m_vRenderGroundNormal, vBaseUp);
+       return;
+   }
 
    vLook = XMVector3Normalize(vLook);
+   _vector vRight = XMVector3Normalize(XMVector3Cross(vFinalUp, vLook));
+   vLook = XMVector3Normalize(XMVector3Cross(vRight, vFinalUp));
 
-   _vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vLook));
-   vLook = XMVector3Normalize(XMVector3Cross(vRight, vUp));*/
+   _float3 vScale = m_pTransformCom->Get_Scaled();
+   matBaseWorld.r[0] = XMVectorSetW(vRight * vScale.x, 0.f);
+   matBaseWorld.r[1] = XMVectorSetW(vFinalUp * vScale.y, 0.f);
+   matBaseWorld.r[2] = XMVectorSetW(vLook * vScale.z, 0.f);
 
-   _matrix WorldMatrix = XMMatrixIdentity();
-   WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+   XMStoreFloat4x4(&m_RenderWorldMatrix, matBaseWorld);
 
-   //WorldMatrix.r[0] = XMVectorSetW(vRight * vScale.x, 0.f);
-   //WorldMatrix.r[1] = XMVectorSetW(vUp * vScale.y, 0.f);
-   //WorldMatrix.r[2] = XMVectorSetW(vLook * vScale.z, 0.f);
-
-   XMStoreFloat4x4(&m_RenderWorldMatrix, WorldMatrix);
+   XMStoreFloat3(&m_vRenderGroundNormal, vFinalUp);
 }
 
-void CKirby::Update_GroundNormal(_float3& vGroundNormal)
+_bool CKirby::Cal_GroundNormal(_float3& vGroundNormal)
 {
     _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
 
@@ -965,10 +1017,17 @@ void CKirby::Update_GroundNormal(_float3& vGroundNormal)
         true, false))
     {
         vGroundNormal = { 0.f, 1.f, 0.f };
-        return;
+        return false;
+    }
+
+    if (vHitNormal.y < 0.5f)
+    {
+        vGroundNormal = { 0.f, 1.f, 0.f };
+        return false;
     }
 
     vGroundNormal = vHitNormal;
+    return true;
 }
 
 void CKirby::Republish_HUDState()

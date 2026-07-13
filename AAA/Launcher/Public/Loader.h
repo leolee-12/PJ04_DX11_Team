@@ -22,18 +22,19 @@ private:
 	virtual ~CLoader() = default;
 
 public: 
-	static constexpr _uint	WORKER_COUNT = 4;
+	static constexpr _uint MAX_WORKER_COUNT = 4;
 
 public:
 	HRESULT Initialize(LEVEL eNextLevelID, _bool Initialzed);
+	HRESULT Collect_And_StartWorkers();
 	HRESULT Loading();
 	_bool isFinished()
 	{
-		return m_iFinishedWorkCount.load() == m_iTotalWorkCount;
+		return m_bJobsReady.load() && m_iFinishedWorkCount.load() == m_iTotalWorkCount;
 	}
 
 	_float Get_Progress() const {
-		if (m_iTotalWorkCount == 0) return 0.f;
+		if (!m_bJobsReady.load() || 0 == m_iTotalWorkCount) return 0.f;
 		return (_float)m_iFinishedWorkCount.load() / (_float)m_iTotalWorkCount;
 	}
 
@@ -48,7 +49,8 @@ private:
 	CGameInstance_Proxy*	m_pGameInstance_Proxy = { nullptr };
 	LEVEL					m_eNextLevelID = { LEVEL::END };
 
-	HANDLE					m_hThreads[WORKER_COUNT] = { };
+	HANDLE					m_hThreads[MAX_WORKER_COUNT] = {};
+	_uint					m_iWorkerCount = { 1 };
 
 	Concurrency::concurrent_queue<function<HRESULT()>> m_WorkQueue;
 
@@ -59,16 +61,16 @@ private:
 	_tchar					m_szLoadingText[MAX_PATH] = {};
 	_bool					m_isFinished = { };
 
+	HANDLE					m_hCollector = {};
+	_bool					m_bNeedStatic = { false };
+	atomic<_bool>			m_bJobsReady = { false };
+
 private:
 	void	Add_Work(function<HRESULT()>&& func);
 	HRESULT Read_Manifest(const _tchar* path, const LEVEL eLevel);
 
 	HRESULT Ready_StaticResources();
 	HRESULT Ready_WorkQueue();
-	HRESULT Ready_Resources_For_GamePlay();
-	HRESULT Ready_Resources_For_Test();
-	HRESULT Ready_Resources_For_TownStep1();
-	HRESULT Ready_Resources_For_BossStage1();
 
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID, _bool Initialized = true);

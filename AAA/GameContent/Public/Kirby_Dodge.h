@@ -62,8 +62,6 @@ private:
 	_float3 m_vDodgeDir{};
 
 	_int m_iEvasionCount{};
-	_float m_fSlowMaxTime{};
-	_float m_fSlowAccTime{};
 
 public:
 	static CKirby_Dodge* Create();

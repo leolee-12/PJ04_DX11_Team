@@ -28,6 +28,8 @@ KIRBY_STATE_TYPE CKirby_DeformCarBridge::Get_StateType()
 void CKirby_DeformCarBridge::Enter(CKirby* pKirby, _int iFlag)
 {
     __super::Enter(pKirby, iFlag);
+
+    pKirby->Get_CurrentDeformModel()->Stop_SoundHandle();
 }
 
 void CKirby_DeformCarBridge::Update(CKirby* pKirby, const _float fTimeDelta)
@@ -60,6 +62,8 @@ void CKirby_DeformCarBridge::Request_PositionSync(CKirby* pKirby, const KIRBY_PO
         {
             CTransform* pTransform = pKirby->Get_Transform();
             pTransform->Set_WorldMatrix(pDesc->AnchorWorld);
+
+            pKirby->Get_Movement()->Sync_To_Controller();
 
             CAnimator* pAnimator = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR)->Get_Animator();
             pAnimator->Play("Cut1", false, false, pDesc->fBlendDuration, pDesc->fAnimSpeed);

@@ -10,7 +10,7 @@ class ENGINE_DLL CEffect_Quad abstract : public CEffect_NonParticle
 {
     GENERATED_BODY_ABSTRACT(CEffect_Quad)
 
-    PROPERTY(_bool, m_bBillboard, L"Billboard", L"Rendering");
+    PROPERTY(_bool, m_bBillboard, L"Billboard", L"Effect");
 
     // Sprite Animation Texture
     PROPERTY(_bool, m_bSpriteAniTexture, L"Sprite Animation Texture", L"Sprite Animation");
@@ -36,31 +36,19 @@ public:
         _wstring wstrShaderTag;
     };
 
-private:
-    enum ShaderPass { Default, AlphaBlend, Additive, ShaderPass_End };
-
 protected:
     CEffect_Quad(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     CEffect_Quad(const CEffect_Quad& Prototype);
     virtual ~CEffect_Quad() = default;
 
 protected:
-    virtual HRESULT Initialize_Prototype() override;
     virtual HRESULT Initialize(void* pArg) override;
 
 public:
-    virtual void    Priority_Update(_float fTimeDelta) override;
-    virtual void    Update(_float fTimeDelta) override;
-    virtual void    Late_Update(_float fTimeDelta) override;
     virtual HRESULT Render() override;
 
 protected:
     virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;
-
-    virtual void Update_EffectPart(const _float fTimeDelta, const _float fRatio) override;
-
-    virtual void Update_TexSpriteAnimation(const _float fTimeDelta, const _float fRatio);
-    virtual void Update_MaskSpriteAnimation(const _float fTimeDelta, const _float fRatio);
 
 private:
     HRESULT Ready_Components();
@@ -85,9 +73,6 @@ private:
 
 private:
     void Init_PropertyValue();
-
-protected:
-    virtual void Free() override;
 };
 
 NS_END
