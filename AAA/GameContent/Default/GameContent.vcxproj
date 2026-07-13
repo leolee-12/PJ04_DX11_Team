@@ -34,6 +34,9 @@
     <ClInclude Include="..\public\Boss.h" />
     <ClInclude Include="..\public\BossBase.h" />
     <ClInclude Include="..\public\BossNamePlate.h" />
+    <ClInclude Include="..\public\Boss_Armadillo.h" />
+    <ClInclude Include="..\public\Boss_Armadillo_Body.h" />
+    <ClInclude Include="..\public\Boss_Armadillo_Brain.h" />
     <ClInclude Include="..\public\Boss_Brain.h" />
     <ClInclude Include="..\public\Boss_Cage.h" />
     <ClInclude Include="..\public\Boss_Cage_Body.h" />
@@ -108,6 +111,7 @@
     <ClInclude Include="..\Public\LD_Stage1BossDemo.h" />
     <ClInclude Include="..\Public\LD_CopyEssence.h" />
     <ClInclude Include="..\Public\MeshEmitterCommon.h" />
+    <ClInclude Include="..\public\Projectile_Partner.h" />
     <ClInclude Include="..\Public\QuadCommon.h" />
     <ClInclude Include="..\Public\MeshCommon.h" />
     <ClInclude Include="..\Public\RectParticleCommon.h" />
@@ -269,6 +273,8 @@
     <ClInclude Include="..\public\GigantEdge_Shield.h" />
     <ClInclude Include="..\public\GigantEdge_Sword.h" />
     <ClInclude Include="..\Public\Kirby_AbilityDump.h" />
+    <ClInclude Include="..\Public\Kirby_Ability_Bomb.h" />
+    <ClInclude Include="..\Public\Kirby_Ability_Ice.h" />
     <ClInclude Include="..\Public\Kirby_Ability_Sword.h" />
     <ClInclude Include="..\Public\Kirby_ControllableState.h" />
     <ClInclude Include="..\Public\Kirby_GetAbility.h" />
@@ -308,6 +314,8 @@
     <ClInclude Include="..\Public\UI_Enums.h" />
     <ClInclude Include="..\Public\Kirby_Sword.h" />
     <ClInclude Include="..\Public\Kirby_SwordHat.h" />
+    <ClInclude Include="..\Public\Kirby_BombHat.h" />
+    <ClInclude Include="..\Public\Kirby_IceHat.h" />
     <ClInclude Include="..\public\UI_Eraser.h" />
     <ClInclude Include="..\public\UI_FadeIn.h" />
     <ClInclude Include="..\public\UI_FadeOut.h" />
@@ -398,6 +406,9 @@
     <ClCompile Include="..\private\Boss.cpp" />
     <ClCompile Include="..\private\BossBase.cpp" />
     <ClCompile Include="..\private\BossNamePlate.cpp" />
+    <ClCompile Include="..\private\Boss_Armadillo.cpp" />
+    <ClCompile Include="..\private\Boss_Armadillo_Body.cpp" />
+    <ClCompile Include="..\private\Boss_Armadillo_Brain.cpp" />
     <ClCompile Include="..\private\Boss_Brain.cpp" />
     <ClCompile Include="..\private\Boss_Cage.cpp" />
     <ClCompile Include="..\private\Boss_Cage_Body.cpp" />
@@ -474,6 +485,7 @@
     <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp" />
     <ClCompile Include="..\Private\LD_CopyEssence.cpp" />
     <ClCompile Include="..\Private\MeshEmitterCommon.cpp" />
+    <ClCompile Include="..\private\Projectile_Partner.cpp" />
     <ClCompile Include="..\Private\QuadCommon.cpp" />
     <ClCompile Include="..\Private\MeshCommon.cpp" />
     <ClCompile Include="..\Private\RectParticleCommon.cpp" />
@@ -584,6 +596,8 @@
     <ClCompile Include="..\Private\Sword_JumpSlash.cpp" />
     <ClCompile Include="..\private\GorillaNamePlate.cpp" />
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp" />
+    <ClCompile Include="..\Private\Kirby_Ability_Bomb.cpp" />
+    <ClCompile Include="..\Private\Kirby_Ability_Ice.cpp" />
     <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_ControllableState.cpp" />
     <ClCompile Include="..\Private\Kirby_Damaged.cpp" />
@@ -663,6 +677,8 @@
     <ClCompile Include="..\Private\UI_GaugeFill.cpp" />
     <ClCompile Include="..\Private\Kirby_Sword.cpp" />
     <ClCompile Include="..\Private\Kirby_SwordHat.cpp" />
+    <ClCompile Include="..\Private\Kirby_BombHat.cpp" />
+    <ClCompile Include="..\Private\Kirby_IceHat.cpp" />
     <ClCompile Include="..\Private\UI_GenericContainer.cpp" />
     <ClCompile Include="..\Private\InhaleEffect.cpp" />
     <ClCompile Include="..\Private\Kirby.cpp" />
@@ -783,6 +799,16 @@
       <FileType>Document</FileType>
     </None>
     <None Include="..\ShaderFiles\Shader_World_NonAnim.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ShaderFiles\Shader_Armadillo.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\ShaderFiles\Shader_AbillityModel.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

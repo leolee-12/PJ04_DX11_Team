@@ -56,6 +56,8 @@
 #include "Kirby_Body.h"
 #include "Kirby_DeformCar_Demo.h"
 #include "Kirby_DeformCar_Main.h"
+#include "Kirby_BombHat.h"
+#include "Kirby_IceHat.h"
 #include "Kirby_Sword.h"
 #include "Kirby_SwordHat.h"
 
@@ -161,6 +163,10 @@
 #include "Boss_Cage.h"
 #include "Boss_Cage_Body.h"
 #include "Cage_WaddleDee.h"
+
+#include "Boss_Armadillo.h"
+#include "Boss_Armadillo_Body.h"
+#include "Projectile_Partner.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
@@ -550,6 +556,7 @@ void CGameObject_Factory::Register_Container()
         CREATOR(CKirby),
         LOADER
         (
+            // Model
             // Kirby_Body
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_Body::PROTOTYPE_TAG,
                 CKirby_Body::Create(pDevice, pContext));
@@ -574,8 +581,7 @@ void CGameObject_Factory::Register_Container()
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/DeformCar/Main.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
 
-
-
+            // Ability
             // Sword
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_Sword::PROTOTYPE_TAG,
                 CKirby_Sword::Create(pDevice, pContext));
@@ -588,12 +594,21 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SwordHat"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Hat/SwordHat.ysh"));
 
+            // Bomb Hat
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_BombHat::PROTOTYPE_TAG,
+                CKirby_BombHat::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BombHat"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Bomb/Hat/BombHat.ysh"));
+
+            // Ice Hat
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_IceHat::PROTOTYPE_TAG,
+                CKirby_IceHat::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_IceHat"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Gimmick/CopyEssence/IceHat/Ice_Hat.ysh"));
+
             //Kirby_Projectile
             TRY_ADD_PROTO(pProxy, iLevelIndex, CSpit_Projectile::PROTOTYPE_TAG,
                 CSpit_Projectile::Create(pDevice, pContext));
-
-
-
         )
     ); 
 
@@ -1195,6 +1210,22 @@ void CGameObject_Factory::Register_MainBoss()
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Gimmick/CaptiveCage/CageL/CageL_Anim_TopL.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Cage_Body::PROTOTYPE_TAG, CBoss_Cage_Body::Create(pDevice, pContext));
+        )
+    );
+
+    Register(CBoss_Armadillo::PROTOTYPE_TAG, TEXT("MainBoss"),
+        CREATOR(CBoss_Armadillo),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Armadillo_Body::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Armadillo/body/Body.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Armadillo_Body::PROTOTYPE_TAG, CBoss_Armadillo_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Partner::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Armadillo/Partner/PartnerModel_Anim.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Partner::PROTOTYPE_TAG,
+                CProjectile_Partner::Create(pDevice, pContext));
         )
     );
 }
