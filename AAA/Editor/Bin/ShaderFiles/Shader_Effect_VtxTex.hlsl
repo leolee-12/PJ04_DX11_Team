@@ -4,6 +4,7 @@ float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 bool g_bBillboard = { false };
 
 float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
+bool g_bWriteEmissiveGBuffer = { false };
 uint g_iMaterialID = 0;
 
 Texture2D g_Texture;
@@ -107,6 +108,12 @@ struct PS_OUT
     float4 vColor : SV_TARGET0;
 };
 
+struct PS_GBUFFER_OUT
+{
+    float4 vColor : SV_TARGET0;
+    float4 vEmissive : SV_TARGET4;
+};
+
 float4 ResolveMaskValue(float4 vMaskSample)
 {
     if (g_iMaskChannel == 1)
@@ -141,10 +148,8 @@ float4 ApplyMaskBlend(float4 vColor, float4 vMaskValue)
     return vColor * lerp(float4(1.f, 1.f, 1.f, 1.f), vMaskValue, saturate(fStrength));
 }
 
-PS_OUT ComposeEffectColor(PS_IN In, SamplerState EffectSampler)
+float4 ComposeEffectBaseColor(PS_IN In, SamplerState EffectSampler)
 {
-    PS_OUT Out;
-       
     if (In.vTexcoord.x > (1.f - g_fUVCutRight) || In.vTexcoord.x < g_fUVCutLeft)
         discard;
     
@@ -157,7 +162,7 @@ PS_OUT ComposeEffectColor(PS_IN In, SamplerState EffectSampler)
     if (g_bFlipY == 1)
         In.vTexcoord.y = -In.vTexcoord.y + 1.f;
     
-    Out.vColor = float4(1.f, 1.f, 1.f, 1.f);
+    float4 vColor = float4(1.f, 1.f, 1.f, 1.f);
 
     float4 vMaskValue = float4(1.f, 1.f, 1.f, 1.f);
     float2 vUVDistortion = float2(0.f, 0.f);
@@ -186,22 +191,47 @@ PS_OUT ComposeEffectColor(PS_IN In, SamplerState EffectSampler)
         else
             vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling + vUVDistortion;
         
-        Out.vColor *= g_Texture.Sample(EffectSampler, vUV);
+        vColor *= g_Texture.Sample(EffectSampler, vUV);
     }
     
     if (g_bUseMask == true)
-        Out.vColor = ApplyMaskBlend(Out.vColor, vMaskValue);
+        vColor = ApplyMaskBlend(vColor, vMaskValue);
     
-    Out.vColor.xyz *= g_vColor * g_fEffectIntensity;
-    Out.vColor.a *= g_fAlpha;
-    Out.vColor.rgb += g_vEmissiveColor.rgb * Out.vColor.a;
+    vColor.xyz *= g_vColor * g_fEffectIntensity;
+    vColor.a *= g_fAlpha;
     
-    if (g_bAlphaTest == true && Out.vColor.a <= g_fTestAlpha)
+    if (g_bAlphaTest == true && vColor.a <= g_fTestAlpha)
         discard;
     
+    return vColor;
+}
+
+PS_OUT ComposeEffectColor(PS_IN In, SamplerState EffectSampler)
+{
+    PS_OUT Out;
+    Out.vColor = ComposeEffectBaseColor(In, EffectSampler);
+    Out.vColor.rgb += g_vEmissiveColor.rgb * Out.vColor.a;
     return Out;
 }
 
+PS_GBUFFER_OUT ComposeDefaultEffectColor(PS_IN In, SamplerState EffectSampler)
+{
+    PS_GBUFFER_OUT Out;
+    Out.vColor = ComposeEffectBaseColor(In, EffectSampler);
+
+    const float3 vEmissive = g_vEmissiveColor.rgb * Out.vColor.a;
+    if (g_bWriteEmissiveGBuffer == true)
+    {
+        Out.vEmissive = float4(vEmissive, 1.f);
+    }
+    else
+    {
+        Out.vColor.rgb += vEmissive;
+        Out.vEmissive = float4(0.f, 0.f, 0.f, 0.f);
+    }
+
+    return Out;
+}
 
 
 
@@ -214,6 +244,16 @@ PS_OUT PS_MAIN(PS_IN In)
 PS_OUT PS_MAIN_MIRROR(PS_IN In)
 {
     return ComposeEffectColor(In, MirrorSampler);
+}
+
+PS_GBUFFER_OUT PS_DEFAULT(PS_IN In)
+{
+    return ComposeDefaultEffectColor(In, LinearSampler);
+}
+
+PS_GBUFFER_OUT PS_DEFAULT_MIRROR(PS_IN In)
+{
+    return ComposeDefaultEffectColor(In, MirrorSampler);
 }
 
 
@@ -230,7 +270,7 @@ technique11 DefaultTechnique
 
         SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
         SetGeometryShader(NULL);
-        SetPixelShader(CompileShader(ps_5_0, PS_MAIN()));
+        SetPixelShader(CompileShader(ps_5_0, PS_DEFAULT()));
     }
 
     pass AlphaBlend
@@ -263,7 +303,7 @@ technique11 DefaultTechnique
 
         SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
         SetGeometryShader(NULL);
-        SetPixelShader(CompileShader(ps_5_0, PS_MAIN_MIRROR()));
+        SetPixelShader(CompileShader(ps_5_0, PS_DEFAULT_MIRROR()));
     }
 
     pass AlphaBlend_Mirror
@@ -296,7 +336,7 @@ technique11 DefaultTechnique
 
         SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
         SetGeometryShader(NULL);
-        SetPixelShader(CompileShader(ps_5_0, PS_MAIN()));
+        SetPixelShader(CompileShader(ps_5_0, PS_DEFAULT()));
     }
 
     pass AlphaBlend_DepthIgnore
@@ -329,7 +369,7 @@ technique11 DefaultTechnique
 
         SetVertexShader(CompileShader(vs_5_0, VS_MAIN()));
         SetGeometryShader(NULL);
-        SetPixelShader(CompileShader(ps_5_0, PS_MAIN_MIRROR()));
+        SetPixelShader(CompileShader(ps_5_0, PS_DEFAULT_MIRROR()));
     }
 
     pass AlphaBlend_Mirror_DepthIgnore

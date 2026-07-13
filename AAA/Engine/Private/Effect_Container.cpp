@@ -3,7 +3,6 @@
 #include "GameInstance.h"
 
 #include "Effect_Part.h"
-#include "Effect_Emitter.h"
 
 #include "Effect_Manager.h"
 
@@ -64,6 +63,9 @@ void CEffect_Container::Update(_float fTimeDelta)
         if (m_bLoop == true)
         {
             m_fAccTime = 0.f;
+
+            for (auto& [strPartTag, pPart] : m_EffestParts)
+                pPart->On_EffectLoop();
         }
         else
         {
@@ -169,23 +171,21 @@ void CEffect_Container::EffectContainer_StopAfterEmission()
 
     m_bFadeOutRequested = false;
 
-    _bool bHasEmitter = false;
+    _bool bHasEmissionPart = false;
 
     for (auto& [tag, pPart] : m_EffestParts)
     {
-        CEffect_Emitter* pEmitter = dynamic_cast<CEffect_Emitter*>(pPart);
-        if (pEmitter != nullptr)
+        if (pPart->Stop_Emission() == true)
         {
-            pEmitter->Stop_Emission();
-            pEmitter->Update_PlayValue(true, true, m_fDuration, m_fAccTime);
-            bHasEmitter = true;
+            pPart->Update_PlayValue(true, true, m_fDuration, m_fAccTime);
+            bHasEmissionPart = true;
             continue;
         }
 
         pPart->Update_PlayValue(false, m_bLoop, m_fDuration, m_fAccTime);
     }
 
-    if (bHasEmitter == false)
+    if (bHasEmissionPart == false)
     {
         EffectContainer_Stop();
         return;
@@ -301,8 +301,7 @@ void CEffect_Container::Update_WaitForEmitters()
 
     for (auto& [tag, pPart] : m_EffestParts)
     {
-        CEffect_Emitter* pEmitter = dynamic_cast<CEffect_Emitter*>(pPart);
-        if (pEmitter != nullptr && pEmitter->Is_EmissionFinished() == false)
+        if (pPart->Is_EmissionFinished() == false)
             return;
     }
 

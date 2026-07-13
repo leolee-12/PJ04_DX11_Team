@@ -58,6 +58,7 @@ void CRectEmitterCommon::Late_Update(_float fTimeDelta)
 
 HRESULT CRectEmitterCommon::Render()
 {
+	Set_UseGBufferOutput(static_cast<RENDERID>(m_iRenderGroup) == RENDERID::NONBLEND);
 	return __super::Render();
 }
 
