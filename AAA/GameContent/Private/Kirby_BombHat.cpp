@@ -40,9 +40,11 @@ HRESULT CKirby_BombHat::Render()
 
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
-        _uint iPassIndex = ETOUI(KIRBY_SHADER_PASS::ANIM_TEXTURED_PBR);
+        _uint iPassIndex = ETOUI(KIRBY_SHADER_PASS::BOMBHAT);
 
-        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture1", i, MTEX_TYPE::DIFFUSE, 0)))
+            return E_FAIL;
+        if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 1)))
             return E_FAIL;
 
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", i, MTEX_TYPE::NORMALS, 0)))

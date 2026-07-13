@@ -161,6 +161,10 @@
 #include "Boss_Cage_Body.h"
 #include "Cage_WaddleDee.h"
 
+#include "Boss_Armadillo.h"
+#include "Boss_Armadillo_Body.h"
+#include "Projectile_Partner.h"
+
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
 #include "LevelDesign_Starblock.h"
@@ -1159,6 +1163,22 @@ void CGameObject_Factory::Register_MainBoss()
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Gimmick/CaptiveCage/CageL/CageL_Anim_TopL.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Cage_Body::PROTOTYPE_TAG, CBoss_Cage_Body::Create(pDevice, pContext));
+        )
+    );
+
+    Register(CBoss_Armadillo::PROTOTYPE_TAG, TEXT("MainBoss"),
+        CREATOR(CBoss_Armadillo),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Armadillo_Body::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Armadillo/body/Body.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Armadillo_Body::PROTOTYPE_TAG, CBoss_Armadillo_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Partner::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Armadillo/Partner/PartnerModel_Anim.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Partner::PROTOTYPE_TAG,
+                CProjectile_Partner::Create(pDevice, pContext));
         )
     );
 }
