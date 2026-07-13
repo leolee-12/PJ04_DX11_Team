@@ -28,6 +28,8 @@ KIRBY_STATE_TYPE CKirby_DeformCarBridge::Get_StateType()
 void CKirby_DeformCarBridge::Enter(CKirby* pKirby, _int iFlag)
 {
     __super::Enter(pKirby, iFlag);
+
+    pKirby->Get_CurrentDeformModel()->Stop_SoundHandle();
 }
 
 void CKirby_DeformCarBridge::Update(CKirby* pKirby, const _float fTimeDelta)

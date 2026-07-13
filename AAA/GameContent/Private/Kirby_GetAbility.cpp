@@ -48,6 +48,12 @@ void CKirby_GetAbility::Enter(CKirby* pKirby, _int iFlag)
     KIRBY_ABILITY_CHANGED tDesc{};
     tDesc.bBegin = true;
     m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &tDesc);
+
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Set_Velocity(XMVectorSet(0.f, 0.f, 0.f, 0.f));
+    pMovement->Clear_Forces();
+    pMovement->Set_GravityScale(0.f);
+
     m_pGameInstance_Proxy->Set_TimeScale(0.f);
 
     KIRBY_NAME_UPDATED tNameDesc{};
@@ -73,12 +79,10 @@ void CKirby_GetAbility::Update(CKirby* pKirby, const _float fTimeDelta)
 
     pMovement->Rotate_To_Direction(vDir, fTimeDelta);
 
-    if(pAnimator->Is_Finished() == true)
-    {
-        Transition_Fall_OR_Wait_OR_Run(pKirby);
-    }
-
     Parts_On(pKirby, fRatio);
+
+    if(pAnimator->Is_Finished() == true)
+        Transition_Fall_OR_Wait_OR_Run_Immediate(pKirby);
 }
 
 void CKirby_GetAbility::Exit(CKirby* pKirby)
@@ -91,6 +95,10 @@ void CKirby_GetAbility::Exit(CKirby* pKirby)
     KIRBY_ABILITY_CHANGED Desc{};
     Desc.bBegin = false;
     m_pGameInstance_Proxy->Publish(EventTag::Kirby_Ability_Changed, &Desc);
+    
+    CMovement_Child* pMovement = pKirby->Get_Movement();
+    pMovement->Set_GravityScale(1.f);
+
     m_pGameInstance_Proxy->Set_TimeScale(1.f);
 }
 

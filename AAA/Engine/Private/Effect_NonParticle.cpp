@@ -14,49 +14,6 @@ CEffect_NonParticle::CEffect_NonParticle(const CEffect_NonParticle& Prototype)
     Init_PropertyValue();
 }
 
-HRESULT CEffect_NonParticle::Initialize_Prototype()
-{
-    return S_OK;
-}
-
-HRESULT CEffect_NonParticle::Initialize(void* pArg)
-{
-    EFFECT_NONEPARTICLE_DESC* pDesc = static_cast<EFFECT_NONEPARTICLE_DESC*>(pArg);
-
-    if (FAILED(__super::Initialize(pArg)))
-        return E_FAIL;
-
-    if (FAILED(Ready_Components()))
-        return E_FAIL;
-
-    return S_OK;
-}
-
-void CEffect_NonParticle::Priority_Update(_float fTimeDelta)
-{
-    __super::Priority_Update(fTimeDelta);
-}
-
-void CEffect_NonParticle::Update(_float fTimeDelta)
-{
-    __super::Update(fTimeDelta);
-}
-
-void CEffect_NonParticle::Late_Update(_float fTimeDelta)
-{
-    __super::Late_Update(fTimeDelta);
-}
-
-HRESULT CEffect_NonParticle::Render()
-{
-    return S_OK;
-}
-
-void CEffect_NonParticle::Effect_Start()
-{
-    __super::Effect_Start();
-}
-
 HRESULT CEffect_NonParticle::Bind_ShaderValue()
 {
     if (FAILED(__super::Bind_ShaderValue()))
@@ -73,19 +30,12 @@ HRESULT CEffect_NonParticle::Bind_ShaderValue()
     return S_OK;
 }
 
-HRESULT CEffect_NonParticle::Ready_Components()
-{
-    return S_OK;
-}
-
 void CEffect_NonParticle::Init_PropertyValue()
 {
     // Alpha
     m_fAlpha = { 1.0f };
 
     m_bFadeInOut = { false };
-
-    m_AlphaRatioValue.reserve(4);
 
     m_bActive_Alpha_Ratio_0 = true;
     m_fAlpha_Ratio_0 = { 0.5f };
@@ -104,8 +54,6 @@ void CEffect_NonParticle::Init_PropertyValue()
 
     m_bSizeChange = { false };
 
-    m_SizeRatioValue.reserve(4);
-
     m_bActive_Size_Ratio_0 = false;
     m_fSize_Ratio_0 = { 0.5f };
 
@@ -121,8 +69,6 @@ void CEffect_NonParticle::Init_PropertyValue()
     m_vColor = { 1.f, 1.f, 1.f };
 
     m_bColorChange = { false };
-
-    m_ColorRatioValue.reserve(4);
 
     m_bActive_Color_Ratio_0 = false;
     m_fColor_Ratio_0 = { 0.5f };
@@ -176,67 +122,24 @@ void CEffect_NonParticle::Update_Core(const _float fTimeDelta, const _float fRat
 void CEffect_NonParticle::Update_Alpha(const _float fTimeDelta, const _float fRatio)
 {
     if (m_bFadeInOut == true)
-    {
-        const _float fStartRatio = 0.f;
-        const _float fEndRatio = 1.f;
-
-        m_AlphaRatioValue.push_back({ fStartRatio, m_fAlphaStartValue });
-
-        if (m_bActive_Alpha_Ratio_0 == true)
-            m_AlphaRatioValue.push_back({ m_fAlpha_Ratio_0, m_fAlpha_Value_0 });
-        if (m_bActive_Alpha_Ratio_1 == true)
-            m_AlphaRatioValue.push_back({ m_fAlpha_Ratio_1, m_fAlpha_Value_1 });
-
-        m_AlphaRatioValue.push_back({ fEndRatio, m_fAlphaEndValue });
-
-        for (_uint i = 0; i < m_AlphaRatioValue.size() - 1; ++i)
-        {
-            if (fRatio <= m_AlphaRatioValue[i + 1].fRatio)
-            {
-                _float fSmoothStep = Helper::FloatSmoothStep(m_AlphaRatioValue[i].fRatio, m_AlphaRatioValue[i + 1].fRatio, fRatio);
-                m_fAlpha = m_AlphaRatioValue[i].fValue + (m_AlphaRatioValue[i + 1].fValue - m_AlphaRatioValue[i].fValue) * fSmoothStep;
-
-                break;
-            }
-        }
-    }
-     /*
-    else
-    {
-        m_fAlpha = 1.f;
-    }
-    */
-
-    m_AlphaRatioValue.clear();
+        m_fAlpha = Evaluate_FloatCurve(
+            fRatio, m_fAlpha, true,
+            m_fAlphaStartValue, m_fAlphaEndValue,
+            m_bActive_Alpha_Ratio_0, m_fAlpha_Ratio_0, m_fAlpha_Value_0,
+            m_bActive_Alpha_Ratio_1, m_fAlpha_Ratio_1, m_fAlpha_Value_1,
+            false);
 }
 
 void CEffect_NonParticle::Update_Size(const _float fTimeDelta, const _float fRatio)
 {
     if (m_bSizeChange == true)
     {
-        const _float fStartRatio = 0.f;
-        const _float fEndRatio = 1.f;
-
-        m_SizeRatioValue.push_back({ fStartRatio, m_fSizeStartValue });
-
-        if (m_bActive_Size_Ratio_0 == true)
-            m_SizeRatioValue.push_back({ m_fSize_Ratio_0, m_fSize_Value_0 });
-        if (m_bActive_Size_Ratio_1 == true)
-            m_SizeRatioValue.push_back({ m_fSize_Ratio_1, m_fSize_Value_1 });
-
-        m_SizeRatioValue.push_back({ fEndRatio, m_fSizeEndValue });
-
-        _float fTargetRatio = (fRatio > 1.f) ? 1.f : fRatio;
-
-        for (_uint i = 0; i < m_SizeRatioValue.size() - 1; ++i)
-        {
-            if (fTargetRatio <= m_SizeRatioValue[i + 1].fRatio)
-            {
-                _float fSmoothStep = Helper::FloatSmoothStep(m_SizeRatioValue[i].fRatio, m_SizeRatioValue[i + 1].fRatio, fTargetRatio);
-                m_fSize = m_SizeRatioValue[i].fValue + (m_SizeRatioValue[i + 1].fValue - m_SizeRatioValue[i].fValue) * fSmoothStep;
-                break;
-            }
-        }
+        m_fSize = Evaluate_FloatCurve(
+            fRatio, m_fSize, true,
+            m_fSizeStartValue, m_fSizeEndValue,
+            m_bActive_Size_Ratio_0, m_fSize_Ratio_0, m_fSize_Value_0,
+            m_bActive_Size_Ratio_1, m_fSize_Ratio_1, m_fSize_Value_1,
+            false);
 
         if (m_fSize < Helper::fEpsilon)
             m_fSize = Helper::fEpsilon;
@@ -244,41 +147,17 @@ void CEffect_NonParticle::Update_Size(const _float fTimeDelta, const _float fRat
         m_pTransformCom->Set_Scale(m_fSize, m_fSize, m_fSize);
     }
 
-    m_SizeRatioValue.clear();
 }
 
 void CEffect_NonParticle::Update_Color(const _float fTimeDelta, const _float fRatio)
 {
     if (m_bColorChange == true)
-    {
-        const _float fStartRatio = 0.f;
-        const _float fEndRatio = 1.f;
-
-        m_ColorRatioValue.push_back({ fStartRatio, m_vColorStartValue });
-
-        if (m_bActive_Color_Ratio_0 == true)
-            m_ColorRatioValue.push_back({ m_fColor_Ratio_0, m_vColor_Value_0 });
-        if (m_bActive_Color_Ratio_1 == true)
-            m_ColorRatioValue.push_back({ m_fColor_Ratio_1, m_vColor_Value_1 });
-
-        m_ColorRatioValue.push_back({ fEndRatio, m_vColorEndValue });
-
-        for (_uint i = 0; i < m_ColorRatioValue.size() - 1; ++i)
-        {
-            if (fRatio <= m_ColorRatioValue[i + 1].fRatio)
-            {
-                _float fSmoothStep = Helper::FloatSmoothStep(m_ColorRatioValue[i].fRatio, m_ColorRatioValue[i + 1].fRatio, fRatio);
-
-                m_vColor.x = m_ColorRatioValue[i].vValue.x + (m_ColorRatioValue[i + 1].vValue.x - m_ColorRatioValue[i].vValue.x) * fSmoothStep;
-                m_vColor.y = m_ColorRatioValue[i].vValue.y + (m_ColorRatioValue[i + 1].vValue.y - m_ColorRatioValue[i].vValue.y) * fSmoothStep;
-                m_vColor.z = m_ColorRatioValue[i].vValue.z + (m_ColorRatioValue[i + 1].vValue.z - m_ColorRatioValue[i].vValue.z) * fSmoothStep;
-
-                break;
-            }
-        }
-    }
-
-    m_ColorRatioValue.clear();
+        m_vColor = Evaluate_Float3Curve(
+            fRatio, m_vColor, true,
+            m_vColorStartValue, m_vColorEndValue,
+            m_bActive_Color_Ratio_0, m_fColor_Ratio_0, m_vColor_Value_0,
+            m_bActive_Color_Ratio_1, m_fColor_Ratio_1, m_vColor_Value_1,
+            false);
 }
 
 void CEffect_NonParticle::Update_Rot(const _float fTimeDelta, const _float fRatio)
@@ -351,9 +230,4 @@ void CEffect_NonParticle::Update_MoveSin(const _float fTimeDelta, const _float f
     _vector vCurPos = m_pTransformCom->Get_State(STATE::POSITION);
 
     m_pTransformCom->Set_State(STATE::POSITION, vCurPos + XMVectorSet(0.f, fCurOffsetY, 0.f, 0.f));
-}
-
-void CEffect_NonParticle::Free()
-{
-    __super::Free();
 }

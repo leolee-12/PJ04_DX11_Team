@@ -216,7 +216,7 @@ void CKirby_Deform_Car::Enter_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eS
     {
         case DEFORM_CAR_STATE::BOOST:
         {
-            pModel->Get_Animator()->Play("Boost", true, false, 0.1f, 1.5f);
+            pModel->Get_Animator()->Play("Boost", true, false, 0.1f, 2.f);
 
             pModel->Set_KirbyEye(KIRBY_EYE_STATE::ANGRY);
 
@@ -238,7 +238,7 @@ void CKirby_Deform_Car::Enter_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eS
         }
         case DEFORM_CAR_STATE::BOOST_END:
         {
-            pModel->Get_Animator()->Play("BoostEnd", false, false, 0.1f, 1.5f);
+            pModel->Get_Animator()->Play("BoostEnd", false, false, 0.1f, 2.f);
             break;
         }
         case DEFORM_CAR_STATE::CRASH:
@@ -256,7 +256,7 @@ void CKirby_Deform_Car::Enter_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eS
                 fJumpVelocity = 10.f;
             pMovement->Add_Velocity(XMVectorSet(0.f, fJumpVelocity, 0.f, 0.f));
 
-            pModel->Get_Animator()->Play("Crash", false, false, 0.1f, 2.f);
+            pModel->Get_Animator()->Play("Crash", false, false, 0.1f, 1.5f);
             break;
         }
         case DEFORM_CAR_STATE::DEFORM_CAR_END:
@@ -380,7 +380,7 @@ void CKirby_Deform_Car::Enter_BoostJumpState(CKirby* pKirby, BOOST_JUMP_STATE eS
         case BOOST_JUMP_STATE::GROUND:
         {
             CKirby_Deform_Model* pModel = pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR);
-            pModel->Get_Animator()->Play("Boost", true, false, 0.1f, 1.5f);
+            pModel->Get_Animator()->Play("Boost", true, false, 0.1f, 2.f);
             pModel->Set_KirbyEye(KIRBY_EYE_STATE::ANGRY);
             break;
         }

@@ -105,6 +105,8 @@ struct VS_OUT
     float2 vTexcoord : TEXCOORD0;
     float4 vNormal : NORMAL;
     float4 vProjPos : TEXCOORD1;
+    float3 vTangent : TANGENT;
+    float3 vBinormal : BINORMAL;
 };
 
 VS_OUT VS_MAIN(VS_IN In)
@@ -120,6 +122,8 @@ VS_OUT VS_MAIN(VS_IN In)
     Out.vTexcoord = In.vTexcoord;
     Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix));
     Out.vProjPos = vProj;
+    Out.vTangent = normalize(mul(float4(In.vTangent, 0.f), g_WorldMatrix).xyz);
+    Out.vBinormal = normalize(mul(float4(In.vBinormal, 0.f), g_WorldMatrix).xyz);
 
     return Out;
 }
@@ -130,6 +134,8 @@ struct PS_IN
     float2 vTexcoord : TEXCOORD0;
     float4 vNormal : NORMAL;
     float4 vProjPos : TEXCOORD1;
+    float3 vTangent : TANGENT;
+    float3 vBinormal : BINORMAL;
 };
 
 struct PS_COLOR_OUT
@@ -218,7 +224,7 @@ float4 ApplyMaskBlend(float4 vColor, float4 vMaskValue)
     return vColor * lerp(float4(1.f, 1.f, 1.f, 1.f), vMaskValue, saturate(fStrength));
 }
 
-float4 ComposeEffectColor_Linear(float2 vTexcoord)
+float4 ComposeEffectColor(float2 vTexcoord, SamplerState EffectSampler)
 {
     float4 vColor = float4(1.f, 1.f, 1.f, 1.f);
     float4 vMaskValue = float4(1.f, 1.f, 1.f, 1.f);
@@ -230,7 +236,7 @@ float4 ComposeEffectColor_Linear(float2 vTexcoord)
         Apply_LinearUVAnim(vTexcoord, g_bUseLinearUVAnim_M, g_fLinearUVRatio_M, g_iLinearUVAxis_M, g_bLinearUVReverse_M);
 
         float2 vUV = g_vMaskOffset + vTexcoord * g_vMaskTiling;
-        vMaskValue = ResolveMaskValue(g_Mask.Sample(LinearSampler, vUV));
+        vMaskValue = ResolveMaskValue(g_Mask.Sample(EffectSampler, vUV));
 
         if (g_bUseMaskUVDistortion == true)
             vUVDistortion = (vMaskValue.rr * 2.f - 1.f) * g_vMaskUVDistortionStrength;
@@ -242,7 +248,7 @@ float4 ComposeEffectColor_Linear(float2 vTexcoord)
         Apply_LinearUVAnim(vTexcoord, g_bUseLinearUVAnim_T, g_fLinearUVRatio_T, g_iLinearUVAxis_T, g_bLinearUVReverse_T);
 
         float2 vUV = g_vTextureOffset + vTexcoord * g_vTextureTiling + vUVDistortion;
-        vColor *= g_Texture.Sample(LinearSampler, vUV);
+        vColor *= g_Texture.Sample(EffectSampler, vUV);
     }
 
     if (g_bUseDiffuseTexture == true)
@@ -251,7 +257,7 @@ float4 ComposeEffectColor_Linear(float2 vTexcoord)
         Apply_LinearUVAnim(vTexcoord, g_bUseLinearUVAnim_D, g_fLinearUVRatio_D, g_iLinearUVAxis_D, g_bLinearUVReverse_D);
         
         float2 vUV = g_vDiffuseOffset + vTexcoord * g_vDiffuseTiling + vUVDistortion;
-        vColor *= g_DiffuseTexture.Sample(LinearSampler, vUV);
+        vColor *= g_DiffuseTexture.Sample(EffectSampler, vUV);
     }
 
     if (g_bUseUnknownTexture == true)
@@ -260,7 +266,7 @@ float4 ComposeEffectColor_Linear(float2 vTexcoord)
         Apply_LinearUVAnim(vTexcoord, g_bUseLinearUVAnim_U, g_fLinearUVRatio_U, g_iLinearUVAxis_U, g_bLinearUVReverse_U);
 
         float2 vUV = g_vUnknownOffset + vTexcoord * g_vUnknownTiling + vUVDistortion;
-        vColor *= g_UnknownTexture.Sample(LinearSampler, vUV);
+        vColor *= g_UnknownTexture.Sample(EffectSampler, vUV);
     }
 
     if (g_bUseMask == true)
@@ -272,58 +278,14 @@ float4 ComposeEffectColor_Linear(float2 vTexcoord)
     return vColor;
 }
 
+float4 ComposeEffectColor_Linear(float2 vTexcoord)
+{
+    return ComposeEffectColor(vTexcoord, LinearSampler);
+}
+
 float4 ComposeEffectColor_Mirror(float2 vTexcoord)
 {
-    float4 vColor = float4(1.f, 1.f, 1.f, 1.f);
-    float4 vMaskValue = float4(1.f, 1.f, 1.f, 1.f);
-    float2 vUVDistortion = float2(0.f, 0.f);
-
-    if (g_bUseMask == true)
-    {
-        Apply_CircleUVAnim(vTexcoord, g_bUseCircleUVAnim_M, g_fCircleUVRatio_M, g_fCircleUVStartDegree_M, g_bCircleUVClockwise_M);
-        Apply_LinearUVAnim(vTexcoord, g_bUseLinearUVAnim_M, g_fLinearUVRatio_M, g_iLinearUVAxis_M, g_bLinearUVReverse_M);
-
-        float2 vUV = g_vMaskOffset + vTexcoord * g_vMaskTiling;
-        vMaskValue = ResolveMaskValue(g_Mask.Sample(MirrorSampler, vUV));
-
-        if (g_bUseMaskUVDistortion == true)
-            vUVDistortion = (vMaskValue.rr * 2.f - 1.f) * g_vMaskUVDistortionStrength;
-    }
-
-    if (g_bUseTexture == true)
-    {
-        Apply_CircleUVAnim(vTexcoord, g_bUseCircleUVAnim_T, g_fCircleUVRatio_T, g_fCircleUVStartDegree_T, g_bCircleUVClockwise_T);
-        Apply_LinearUVAnim(vTexcoord, g_bUseLinearUVAnim_T, g_fLinearUVRatio_T, g_iLinearUVAxis_T, g_bLinearUVReverse_T);
-
-        float2 vUV = g_vTextureOffset + vTexcoord * g_vTextureTiling + vUVDistortion;
-        vColor *= g_Texture.Sample(MirrorSampler, vUV);
-    }
-
-    if (g_bUseDiffuseTexture == true)
-    {
-        Apply_CircleUVAnim(vTexcoord, g_bUseCircleUVAnim_D, g_fCircleUVRatio_D, g_fCircleUVStartDegree_D, g_bCircleUVClockwise_D);
-        Apply_LinearUVAnim(vTexcoord, g_bUseLinearUVAnim_D, g_fLinearUVRatio_D, g_iLinearUVAxis_D, g_bLinearUVReverse_D);
-
-        float2 vUV = g_vDiffuseOffset + vTexcoord * g_vDiffuseTiling + vUVDistortion;
-        vColor *= g_DiffuseTexture.Sample(MirrorSampler, vUV);
-    }
-
-    if (g_bUseUnknownTexture == true)
-    {
-        Apply_CircleUVAnim(vTexcoord, g_bUseCircleUVAnim_U, g_fCircleUVRatio_U, g_fCircleUVStartDegree_U, g_bCircleUVClockwise_U);
-        Apply_LinearUVAnim(vTexcoord, g_bUseLinearUVAnim_U, g_fLinearUVRatio_U, g_iLinearUVAxis_U, g_bLinearUVReverse_U);
-
-        float2 vUV = g_vUnknownOffset + vTexcoord * g_vUnknownTiling + vUVDistortion;
-        vColor *= g_UnknownTexture.Sample(MirrorSampler, vUV);
-    }
-
-    if (g_bUseMask == true)
-        vColor = ApplyMaskBlend(vColor, vMaskValue);
-
-    vColor.rgb *= g_vColor * g_fEffectIntensity;
-    vColor.a *= g_fAlpha;
-
-    return vColor;
+    return ComposeEffectColor(vTexcoord, MirrorSampler);
 }
 
 PS_GBUFFER_OUT PS_GBUFFER(PS_IN In)
@@ -335,15 +297,32 @@ PS_GBUFFER_OUT PS_GBUFFER(PS_IN In)
     if (vColor.a <= g_fAlphaClip)
         discard;
 
-    float3 vNormal = normalize(In.vNormal.xyz);
+    float3 vGeometryNormal = normalize(In.vNormal.xyz);
+    float3 vNormal = vGeometryNormal;
+
+    if (g_bUseNormalTexture == true)
+    {
+        float3 vTangent = normalize(In.vTangent);
+        float3 vBinormal = normalize(In.vBinormal);
+        float3x3 TBN = float3x3(vTangent, vBinormal, vGeometryNormal);
+
+        float2 vNormalRG = g_NormalTexture.Sample(LinearSampler, In.vTexcoord).rg;
+        float3 vTangentNormal = float3(
+            vNormalRG, sqrt(saturate(1.f - dot(vNormalRG, vNormalRG))));
+        vNormal = normalize(mul(vTangentNormal, TBN));
+    }
+
+    float3 vMRA = g_vEffectMRA;
+    if (g_bUseMRATexture == true)
+        vMRA = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
 
     Out.vDiffuse = float4(vColor.rgb, 1.f);
     Out.vNormal = float4(vNormal * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
-    Out.vMRA = float4(g_vEffectMRA, 1.f);
+    Out.vMRA = float4(vMRA, 1.f);
     Out.vMaterialID = g_iMaterialID;
     Out.vEmissive = float4(g_vEmissiveColor.rgb * vColor.a, 1.f);
-    Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vGeoNormal = float4(vGeometryNormal * 0.5f + 0.5f, 0.f);
 
     return Out;
 }

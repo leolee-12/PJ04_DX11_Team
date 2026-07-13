@@ -14,27 +14,14 @@ CEffect_Emitter::CEffect_Emitter(const CEffect_Emitter& Prototype)
     Init_PropertyValue();
 }
 
-HRESULT CEffect_Emitter::Initialize_Prototype()
-{
-    return S_OK;
-}
-
 HRESULT CEffect_Emitter::Initialize(void* pArg)
 {
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
-    if (FAILED(Ready_Components()))
-        return E_FAIL;
-
     Reset_Emitter();
 
     return S_OK;
-}
-
-void CEffect_Emitter::Priority_Update(_float fTimeDelta)
-{
-    __super::Priority_Update(fTimeDelta);
 }
 
 void CEffect_Emitter::Update(_float fTimeDelta)
@@ -64,11 +51,6 @@ void CEffect_Emitter::Late_Update(_float fTimeDelta)
     Update_EmitterParticleParentMatrices();
 }
 
-HRESULT CEffect_Emitter::Render()
-{
-    return S_OK;
-}
-
 void CEffect_Emitter::Effect_Start()
 {
     __super::Effect_Start();
@@ -89,19 +71,6 @@ void CEffect_Emitter::Stop_Emission()
 _bool CEffect_Emitter::Is_EmissionFinished() const
 {
     return m_bEmissionEnabled == false && Has_AliveParticle() == false;
-}
-
-HRESULT CEffect_Emitter::Bind_ShaderValue()
-{
-    if (FAILED(__super::Bind_ShaderValue()))
-        return E_FAIL;
-
-    return S_OK;
-}
-
-HRESULT CEffect_Emitter::Ready_Components()
-{
-    return S_OK;
 }
 
 void CEffect_Emitter::Init_PropertyValue()
@@ -713,11 +682,12 @@ void CEffect_Emitter::Update_EmitterParticleMove(EMITTER_PARTICLE& Particle)
 
 void CEffect_Emitter::Update_EmitterParticleAlpha(EMITTER_PARTICLE& Particle, _float fLocalRatio)
 {
-    _float fAlpha = Evaluate_EmitterFloatCurve(
+    _float fAlpha = Evaluate_FloatCurve(
         fLocalRatio, m_fEmitterAlpha, m_bEmitterAlphaChange,
         m_fEmitterAlphaStartValue, m_fEmitterAlphaEndValue,
         m_bActive_EmitterAlpha_Ratio_0, m_fEmitterAlpha_Ratio_0, m_fEmitterAlpha_Value_0,
-        m_bActive_EmitterAlpha_Ratio_1, m_fEmitterAlpha_Ratio_1, m_fEmitterAlpha_Value_1);
+        m_bActive_EmitterAlpha_Ratio_1, m_fEmitterAlpha_Ratio_1, m_fEmitterAlpha_Value_1,
+        true);
 
     fAlpha *= Get_FadeOutAlpha();
     Helper::FloatClamp(fAlpha, 0.f, 1.f);
@@ -727,11 +697,12 @@ void CEffect_Emitter::Update_EmitterParticleAlpha(EMITTER_PARTICLE& Particle, _f
 
 void CEffect_Emitter::Update_EmitterParticleSize(EMITTER_PARTICLE& Particle, _float fLocalRatio)
 {
-    _float fSizeRatio = Evaluate_EmitterFloatCurve(
+    _float fSizeRatio = Evaluate_FloatCurve(
         fLocalRatio, 1.f, m_bEmitterSizeChange,
         m_fEmitterSizeStartValue, m_fEmitterSizeEndValue,
         m_bActive_EmitterSize_Ratio_0, m_fEmitterSize_Ratio_0, m_fEmitterSize_Value_0,
-        m_bActive_EmitterSize_Ratio_1, m_fEmitterSize_Ratio_1, m_fEmitterSize_Value_1);
+        m_bActive_EmitterSize_Ratio_1, m_fEmitterSize_Ratio_1, m_fEmitterSize_Value_1,
+        true);
 
     _float fSize = Particle.fBaseSize * fSizeRatio;
 
@@ -749,11 +720,12 @@ void CEffect_Emitter::Update_EmitterParticleColor(EMITTER_PARTICLE& Particle, _f
         return;
     }
 
-    _float3 vColor = Evaluate_EmitterFloat3Curve(
+    _float3 vColor = Evaluate_Float3Curve(
         fLocalRatio, m_vEmitterColor, m_bEmitterColorChange,
         m_vEmitterColorStartValue, m_vEmitterColorEndValue,
         m_bActive_EmitterColor_Ratio_0, m_fEmitterColor_Ratio_0, m_vEmitterColor_Value_0,
-        m_bActive_EmitterColor_Ratio_1, m_fEmitterColor_Ratio_1, m_vEmitterColor_Value_1);
+        m_bActive_EmitterColor_Ratio_1, m_fEmitterColor_Ratio_1, m_vEmitterColor_Value_1,
+        true);
 
     if (m_bEmitterRandomColor == true)
     {
@@ -786,121 +758,6 @@ _bool CEffect_Emitter::Has_AliveParticle() const
     }
 
     return false;
-}
-
-_float CEffect_Emitter::Evaluate_EmitterFloatCurve(_float fLocalRatio, _float fFixedValue, _bool bChange, _float
-    fStartValue, _float fEndValue, _bool bActiveRatio0, _float fRatio0, _float fValue0, _bool bActiveRatio1, _float
-    fRatio1, _float fValue1) const
-{
-    if (bChange == false)
-        return fFixedValue;
-
-    RATIO_VALUE Points[4]{};
-    _uint iCount = 0;
-
-    Points[iCount++] = { 0.f, fStartValue };
-
-    if (bActiveRatio0 == true)
-        Points[iCount++] = { fRatio0, fValue0 };
-
-    if (bActiveRatio1 == true)
-        Points[iCount++] = { fRatio1, fValue1 };
-
-    Points[iCount++] = { 1.f, fEndValue };
-
-    for (_uint i = 0; i < iCount; ++i)
-        Helper::FloatClamp(Points[i].fRatio, 0.f, 1.f);
-
-    for (_uint i = 0; i < iCount; ++i)
-    {
-        for (_uint j = i + 1; j < iCount; ++j)
-        {
-            if (Points[j].fRatio < Points[i].fRatio)
-                std::swap(Points[i], Points[j]);
-        }
-    }
-
-    Helper::FloatClamp(fLocalRatio, 0.f, 1.f);
-
-    for (_uint i = 0; i + 1 < iCount; ++i)
-    {
-        if (fLocalRatio <= Points[i + 1].fRatio)
-        {
-            const _float fRange = Points[i + 1].fRatio - Points[i].fRatio;
-
-            if (fRange <= Helper::fEpsilon)
-                return Points[i + 1].fValue;
-
-            const _float fStep = Helper::FloatSmoothStep(
-                Points[i].fRatio,
-                Points[i + 1].fRatio,
-                fLocalRatio);
-
-            return Points[i].fValue + (Points[i + 1].fValue - Points[i].fValue) * fStep;
-        }
-    }
-
-    return Points[iCount - 1].fValue;
-}
-
-_float3 CEffect_Emitter::Evaluate_EmitterFloat3Curve(_float fLocalRatio, const _float3& vFixedValue, _bool bChange,
-    const _float3& vStartValue, const _float3& vEndValue, _bool bActiveRatio0, _float fRatio0, const _float3& vValue0,
-    _bool bActiveRatio1, _float fRatio1, const _float3& vValue1) const
-{
-    if (bChange == false)
-        return vFixedValue;
-
-    RATIO_VALUE_FLOAT3 Points[4]{};
-    _uint iCount = 0;
-
-    Points[iCount++] = { 0.f, vStartValue };
-
-    if (bActiveRatio0 == true)
-        Points[iCount++] = { fRatio0, vValue0 };
-
-    if (bActiveRatio1 == true)
-        Points[iCount++] = { fRatio1, vValue1 };
-
-    Points[iCount++] = { 1.f, vEndValue };
-
-    for (_uint i = 0; i < iCount; ++i)
-        Helper::FloatClamp(Points[i].fRatio, 0.f, 1.f);
-
-    for (_uint i = 0; i < iCount; ++i)
-    {
-        for (_uint j = i + 1; j < iCount; ++j)
-        {
-            if (Points[j].fRatio < Points[i].fRatio)
-                std::swap(Points[i], Points[j]);
-        }
-    }
-
-    Helper::FloatClamp(fLocalRatio, 0.f, 1.f);
-
-    for (_uint i = 0; i + 1 < iCount; ++i)
-    {
-        if (fLocalRatio <= Points[i + 1].fRatio)
-        {
-            const _float fRange = Points[i + 1].fRatio - Points[i].fRatio;
-
-            if (fRange <= Helper::fEpsilon)
-                return Points[i + 1].vValue;
-
-            const _float fStep = Helper::FloatSmoothStep(
-                Points[i].fRatio,
-                Points[i + 1].fRatio,
-                fLocalRatio);
-
-            _float3 vResult{};
-            vResult.x = Points[i].vValue.x + (Points[i + 1].vValue.x - Points[i].vValue.x) * fStep;
-            vResult.y = Points[i].vValue.y + (Points[i + 1].vValue.y - Points[i].vValue.y) * fStep;
-            vResult.z = Points[i].vValue.z + (Points[i + 1].vValue.z - Points[i].vValue.z) * fStep;
-
-            return vResult;
-        }
-    }
-
-    return Points[iCount - 1].vValue;
 }
 
 _float4x4 CEffect_Emitter::Make_EmitterParticleWorldMatrix(const EMITTER_PARTICLE& Particle) const
@@ -936,9 +793,4 @@ _float4x4 CEffect_Emitter::Make_EmitterParticleWorldMatrix(const EMITTER_PARTICL
     XMStoreFloat4x4(&ParticleWorld, matWorld);
 
     return ParticleWorld;
-}
-
-void CEffect_Emitter::Free()
-{
-    __super::Free();
 }
