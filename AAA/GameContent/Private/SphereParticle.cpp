@@ -35,7 +35,7 @@ HRESULT CSphereParticle::Initialize(void* pArg)
     }
 
     tDesc.bUseDiffuseTexture = false;
-    tDesc.bUseUnKnownTexture = true;
+    tDesc.bUseUnknownTexture = true;
 
     tDesc.bUseTextureCom = false;
     tDesc.iTextureLevel = 0;

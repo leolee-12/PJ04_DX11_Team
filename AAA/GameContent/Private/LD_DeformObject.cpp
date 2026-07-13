@@ -3,7 +3,7 @@
 #include "Parsing_Utils.h"
 #include "GameContent_const.h"
 
-#include "GameInstance.h"
+#include "Geometry_Utils.h"
 
 namespace
 {
@@ -13,7 +13,20 @@ namespace
 	static constexpr _float s_fAcquireDistance = { 1.2f };
 	static constexpr _float s_fAlignRotSpeedDegree = { 72.f };
 	static constexpr _float s_fPullTargetFwd = { 1.8f };
-	static constexpr _float s_fReleaseFwd = { 3.f };
+	static constexpr _float s_fReleaseSpeed = { 20.f };
+	static constexpr _float s_fReleaseFwd = { -5.f };
+
+	static constexpr _float s_fGravity = { -45.f };
+	static constexpr _float s_fMaxFallSpeed = { -15.f };
+	static constexpr _float s_fGroundProbeDistance = { 0.02f };
+	static constexpr _float s_fMinSweepHalfExtent = { 0.05f };
+
+	static constexpr const _char* ANIM_WAIT = { "Wait" };
+	static constexpr const _char* ANIM_SHAKE = { "Shake" };
+	static constexpr const _char* ANIM_FALL = { "Fall" };
+	static constexpr const _char* ANIM_LANDING = { "Landing" };
+
+	static constexpr _float s_fAnimSpeed = { 1.f };
 
 	struct LD_DEFORMOBJECT_CATALOG
 	{
@@ -85,6 +98,19 @@ HRESULT CLD_DeformObject::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+	const LD_ANIM_PLAY_DESC AnimDescs[] =
+	{
+			{ ANIM_WAIT, true, s_fAnimSpeed },
+			{ ANIM_SHAKE, true, s_fAnimSpeed },
+			{ ANIM_FALL, true, s_fAnimSpeed },
+			{ ANIM_LANDING, false, s_fAnimSpeed },
+	};
+
+	if (FAILED(Ready_AnimPlayDescs(AnimDescs, static_cast<_uint>(_countof(AnimDescs)))))
+		return E_FAIL;
+
+	Play_Anim(ANIM_WAIT);
+
 	m_bUseShadow = true;
 
 	return S_OK;
@@ -139,6 +165,29 @@ void CLD_DeformObject::Update(_float fTimeDelta)
 	}
 	case DEFORM_OBJECT_STATE::ACQUIRED:
 		break;
+
+	case DEFORM_OBJECT_STATE::FALLING:
+	{
+		Update_Falling(fTimeDelta);
+
+		if (DEFORM_OBJECT_STATE::FALLING == m_eState)
+			__super::Update(fTimeDelta);
+
+		break;
+	}
+	case DEFORM_OBJECT_STATE::LANDING:
+	{
+		__super::Update(fTimeDelta);
+
+		if (m_bAnimationActive)
+			break;
+
+		m_bAvailable = true;
+		Set_TriggerEnabled(true);
+		m_pTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+		Change_State(DEFORM_OBJECT_STATE::IDLE);
+		break;
+	}
 	}
 }
 
@@ -180,7 +229,11 @@ void CLD_DeformObject::Register_LevelDesignSpecs()
 		Spec.eModelType = Entry.eModelType;
 		Spec.pPrototypeFactory = &Create_Prototype;
 		Spec.pBuildDesc = &Build_Desc;
-		Spec.ModelRequirements = { { Entry.pModelProtoTag, Entry.pModelPath, Entry.eModelType, true }, };
+
+		_float4x4 PreTransformMatrix{};
+		XMStoreFloat4x4(&PreTransformMatrix, XMMatrixRotationY(XMConvertToRadians(180.f)));
+
+		Spec.ModelRequirements = { { Entry.pModelProtoTag, Entry.pModelPath, Entry.eModelType, true, PreTransformMatrix }, };
 
 		CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
 	}
@@ -237,21 +290,18 @@ HRESULT CLD_DeformObject::On_DeformAcquired()
 	return S_OK;
 }
 
-HRESULT CLD_DeformObject::On_DeformReleased(const _float3& vWorldPosition)
+HRESULT CLD_DeformObject::On_DeformReleased(const _float3& vWorldPosition, const _float3& vTargetPosition)
 {
 	if (m_bAvailable)
 		return S_FALSE;
 
-	m_pTransformCom->Set_State(STATE::POSITION,
-		XMVectorSetW(XMLoadFloat3(&vWorldPosition), 1.f));
+	m_pTransformCom->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&vWorldPosition), 1.f));
+	m_vReleaseTargetPosition = vTargetPosition;
+	m_fVerticalVelocity = 0.f;
 
-	if (FAILED(Ready_RigidStatic()))
-		return E_FAIL;
-
-	m_bAvailable = true;
 	Set_Active(true);
-	Set_TriggerEnabled(true);
-	m_pTrigger->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+	Set_TriggerEnabled(false);
+	Change_State(DEFORM_OBJECT_STATE::FALLING);
 
 	return S_OK;
 }
@@ -265,7 +315,7 @@ _bool CLD_DeformObject::Request_Deform(const _float4x4* AnchorWorld)
 	if (DEFORM_OBJECT_KIND::MOBILE != m_eKind)
 		return false;
 
-	m_eState = DEFORM_OBJECT_STATE::CAPTURED;
+	Change_State(DEFORM_OBJECT_STATE::CAPTURED);
 	m_AnchorWorld = *AnchorWorld;
 	m_bAlignDone = false;
 
@@ -290,16 +340,18 @@ void CLD_DeformObject::End_Deform(const _float4x4* AnchorWorld)
 		vLook = XMVectorSet(0.f, 0.f, 1.f, 0.f);
 	vLook = XMVector3Normalize(vLook);
 
-	const _vector vReleasePos = XMVectorSetW(Anchor.r[3] + vLook * s_fReleaseFwd, 1.f);
+	const _vector vReleaseStartPosition = XMVectorSetW(Anchor.r[3], 1.f);
+	const _vector vReleaseTargetPosition = XMVectorSetW(vReleaseStartPosition + vLook * s_fReleaseFwd, 1.f);
 
-	m_pTransformCom->Set_State(STATE::POSITION, vReleasePos);
-	m_pTransformCom->LookAt(vReleasePos + vLook);
+	_float3 vStartPosition{};
+	_float3 vTargetPosition{};
+	XMStoreFloat3(&vStartPosition, vReleaseStartPosition);
+	XMStoreFloat3(&vTargetPosition, vReleaseTargetPosition);
 
-	m_eState = DEFORM_OBJECT_STATE::IDLE;
+	if (S_OK != On_DeformReleased(vStartPosition, vTargetPosition))
+		return;
 
-	_float3 vPosition{};
-	XMStoreFloat3(&vPosition, vReleasePos);
-	On_DeformReleased(vPosition);
+	m_pTransformCom->LookAt(vReleaseStartPosition + vLook);
 }
 #pragma endregion
 
@@ -307,10 +359,12 @@ void CLD_DeformObject::Update_Captured(_float fTimeDelta)
 {
 	_matrix AnchorWorld = XMLoadFloat4x4(&m_AnchorWorld);
 	_vector vAnchorPos = AnchorWorld.r[3];
+	_vector vSelf = m_pTransformCom->Get_State(STATE::POSITION);
 
 	if (!m_bAlignDone)
 	{
-		m_bAlignDone = m_pTransformCom->LookAt_Smooth(vAnchorPos, fTimeDelta);
+		const _vector vAlignTarget = vSelf - (vAnchorPos - vSelf);
+		m_bAlignDone = m_pTransformCom->LookAt_Smooth(vAlignTarget, fTimeDelta);
 		return;
 	}
 
@@ -318,8 +372,6 @@ void CLD_DeformObject::Update_Captured(_float fTimeDelta)
 	if (XMVectorGetX(XMVector3LengthSq(vLook)) <= FLT_EPSILON)
 		vLook = XMVectorSet(0.f, 0.f, 1.f, 0.f);
 	vLook = XMVector3Normalize(vLook);
-
-	_vector vSelf = m_pTransformCom->Get_State(STATE::POSITION);
 
 	_vector vTarget = vAnchorPos + vLook * s_fPullTargetFwd;
 	vTarget = XMVectorSetY(vTarget, XMVectorGetY(vSelf));
@@ -330,7 +382,7 @@ void CLD_DeformObject::Update_Captured(_float fTimeDelta)
 
 	if (fDist <= s_fAcquireDistance)
 	{
-		m_eState = DEFORM_OBJECT_STATE::ACQUIRED;
+		Change_State(DEFORM_OBJECT_STATE::ACQUIRED);
 		On_DeformAcquired();
 
 		DEFORM_ACQUIRED_EVENT Payload{};
@@ -344,6 +396,76 @@ void CLD_DeformObject::Update_Captured(_float fTimeDelta)
 	m_fPullSpeed += s_fPullAccel * fTimeDelta;
 	_float fMove = min(m_fPullSpeed * fTimeDelta, fDist);
 	m_pTransformCom->Set_State(STATE::POSITION, vSelf + XMVector3Normalize(vDir) * fMove);
+}
+
+void CLD_DeformObject::Update_Falling(_float fTimeDelta)
+{
+	m_fVerticalVelocity = max(m_fVerticalVelocity + s_fGravity * fTimeDelta, s_fMaxFallSpeed);
+
+	const _float fFallDistance = -m_fVerticalVelocity * fTimeDelta;
+	if (fFallDistance <= 0.f)
+		return;
+
+	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
+	_vector vHorizontalTarget = XMLoadFloat3(&m_vReleaseTargetPosition);
+	vHorizontalTarget = XMVectorSetY(vHorizontalTarget, XMVectorGetY(vPosition));
+	vHorizontalTarget = XMVectorSetW(vHorizontalTarget, 1.f);
+
+	const _vector vHorizontalDirection = vHorizontalTarget - vPosition;
+	const _float fHorizontalDistance = XMVectorGetX(XMVector3Length(vHorizontalDirection));
+
+	if (fHorizontalDistance > FLT_EPSILON)
+	{
+		const _float fHorizontalMoveDistance = min(s_fReleaseSpeed * fTimeDelta, fHorizontalDistance);
+		vPosition += XMVector3Normalize(vHorizontalDirection) * fHorizontalMoveDistance;
+		m_pTransformCom->Set_State(STATE::POSITION, vPosition);
+	}
+
+	const _float3 vScale = m_pTransformCom->Get_Scaled();
+	const _float3 vHalfExtents =
+	{
+			max(m_LocalCollisionBounds.Extents.x * vScale.x, s_fMinSweepHalfExtent),
+			max(m_LocalCollisionBounds.Extents.y * vScale.y, s_fMinSweepHalfExtent),
+			max(m_LocalCollisionBounds.Extents.z * vScale.z, s_fMinSweepHalfExtent)
+	};
+
+	const _matrix WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+	_float3 vWorldCenter{};
+	XMStoreFloat3(&vWorldCenter, XMVector3TransformCoord(XMLoadFloat3(&m_LocalCollisionBounds.Center), WorldMatrix));
+
+	_float4 vRotation{};
+	XMStoreFloat4(&vRotation, XMQuaternionRotationMatrix(m_pTransformCom->Get_RotationMatrix()));
+	const _float3 vDown = { 0.f, -1.f, 0.f };
+
+	_float fHitDistance = 0.f;
+
+	const _bool bHit = m_pGameInstance_Proxy->Sweep_Box(
+		vWorldCenter,
+		vHalfExtents,
+		vRotation,
+		vDown,
+		fFallDistance + s_fGroundProbeDistance,
+		nullptr,
+		&fHitDistance,
+		true,
+		false);
+
+	_float fMoveDistance = fFallDistance;
+	if (bHit)
+		fMoveDistance = max(0.f, fHitDistance);
+
+	vPosition = XMVectorSetY(vPosition, XMVectorGetY(vPosition) - fMoveDistance);
+	m_pTransformCom->Set_State(STATE::POSITION, vPosition);
+
+	if (!bHit)
+		return;
+
+	if (FAILED(Ready_RigidStatic()))
+		return;
+
+	m_fVerticalVelocity = 0.f;
+	Change_State(DEFORM_OBJECT_STATE::LANDING);
 }
 
 HRESULT CLD_DeformObject::Ready_Components()
@@ -369,16 +491,17 @@ void CLD_DeformObject::On_Deserialized()
 
 HRESULT CLD_DeformObject::Ready_Trigger()
 {
-	_float3 vMin = {};
-	_float3 vMax = {};
-	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
-
-	if (vMin.x > vMax.x || vMin.y > vMax.y || vMin.z > vMax.z)
+	_float3 vMin{};
+	_float3 vMax{};
+	if (!m_pModelCom->Get_CollisionAABB(&vMin, &vMax))
 		return E_FAIL;
 
-	const _float3 vCenter = { (vMin.x + vMax.x) * 0.5f, (vMin.y + vMax.y) * 0.5f, (vMin.z + vMax.z) * 0.5f };
-	const _float3 vHalfExtents = { (vMax.x - vMin.x) * 0.5f, (vMax.y - vMin.y) * 0.5f, (vMax.z - vMin.z) * 0.5f };
-	const _float fBoundsRadius = XMVectorGetX(XMVector3Length(XMVectorSet(vHalfExtents.x, vHalfExtents.y, vHalfExtents.z, 0.f)));
+	if (!GeometryUtils::Is_ValidAABB(vMin, vMax))
+		return E_FAIL;
+
+	m_LocalCollisionBounds = GeometryUtils::Make_AABB_FromMinMax(vMin, vMax);
+
+	const _float fBoundsRadius = XMVectorGetX(XMVector3Length(XMLoadFloat3(&m_LocalCollisionBounds.Extents)));
 	const _float fInteractionRadius = 0.f < m_tDeformObjectDesc.fInteractionRadius ? m_tDeformObjectDesc.fInteractionRadius : fBoundsRadius;
 
 	if (fInteractionRadius <= 0.f)
@@ -386,13 +509,27 @@ HRESULT CLD_DeformObject::Ready_Trigger()
 
 	CCollider::COLLIDER_DESC ColliderDesc{};
 	ColliderDesc.pOwner = this;
-	ColliderDesc.vCenter = vCenter;
+	ColliderDesc.vCenter = m_LocalCollisionBounds.Center;
 	ColliderDesc.fRadius = fInteractionRadius;
 
 	m_pTrigger = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
 		TEXT("Com_Trigger"), &ColliderDesc);
 	if (nullptr == m_pTrigger)
 		return E_FAIL;
+
+	m_pTrigger->Set_OnEnter(
+		[this](CCollider* pOther)
+		{
+			if (pOther->Get_RegisteredGroup() == ETOUI(COLLISION_LAYER::PLAYER_HURT))
+				m_bKirbyInTrigger = true;
+		});
+
+	m_pTrigger->Set_OnExit(
+		[this](CCollider* pOther)
+		{
+			if (pOther->Get_RegisteredGroup() == ETOUI(COLLISION_LAYER::PLAYER_HURT))
+				m_bKirbyInTrigger = false;
+		});
 
 	m_pGameInstance_Proxy->Register_Collider(m_pTrigger, ETOUI(COLLISION_LAYER::DEFORM_OBJECT));
 
@@ -401,10 +538,44 @@ HRESULT CLD_DeformObject::Ready_Trigger()
 
 void CLD_DeformObject::Set_TriggerEnabled(_bool bEnabled)
 {
+	if (!bEnabled)
+		m_bKirbyInTrigger = false;
+
 	if (nullptr == m_pTrigger)
 		return;
 
 	m_pTrigger->Set_Enabled(bEnabled);
+}
+
+void CLD_DeformObject::Change_State(DEFORM_OBJECT_STATE eState)
+{
+	if (m_eState == eState)
+		return;
+
+	m_eState = eState;
+
+	switch (m_eState)
+	{
+	case DEFORM_OBJECT_STATE::IDLE:
+		Play_Anim(ANIM_WAIT);
+		break;
+
+	case DEFORM_OBJECT_STATE::CAPTURED:
+		Play_Anim(ANIM_SHAKE);
+		break;
+
+	case DEFORM_OBJECT_STATE::ACQUIRED:
+		m_bAnimationActive = false;
+		break;
+
+	case DEFORM_OBJECT_STATE::FALLING:
+		Play_Anim(ANIM_FALL);
+		break;
+
+	case DEFORM_OBJECT_STATE::LANDING:
+		Play_Anim(ANIM_LANDING);
+		break;
+	}
 }
 
 CLD_DeformObject* CLD_DeformObject::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

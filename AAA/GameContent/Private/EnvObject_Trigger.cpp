@@ -126,6 +126,11 @@ void CEnvObject_Trigger::OnTriggerExit(CCollider* pOther)
 	UNREFERENCED_PARAMETER(pOther);
 }
 
+_bool CEnvObject_Trigger::Is_PlayerActivator(const CCollider* pOther) const
+{
+	return nullptr != pOther && ETOUI(COLLISION_LAYER::PLAYER_HURT) == pOther->Get_RegisteredGroup();
+}
+
 HRESULT CEnvObject_Trigger::Ready_TriggerCollider()
 {
 	m_pCollider = Add_Component<CCollider>(

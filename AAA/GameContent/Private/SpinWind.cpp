@@ -31,7 +31,7 @@ HRESULT CSpinWind::Initialize(void* pArg)
 
     // wind 메쉬(TornadoPieceMedium)는 UNKNOWN 슬롯 Smoke.png 1장뿐
     tDesc.bUseDiffuseTexture = false;
-    tDesc.bUseUnKnownTexture = true;    // Smoke 텍스처를 g_UnknownTexture로
+    tDesc.bUseUnknownTexture = true;    // Smoke 텍스처를 g_UnknownTexture로
     tDesc.bUseNormalTexture = false;
     tDesc.bUseMRATexture = false;
 

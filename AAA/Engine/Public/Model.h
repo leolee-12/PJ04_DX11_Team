@@ -63,6 +63,7 @@ public:
 
 	void Get_MeshAABB(_uint iIndex, _float3* pOutMin, _float3* pOutMax) const;
 	void Get_ModelAABB(_float3* pOutMin, _float3* pOutMax) const;
+	_bool Get_CollisionAABB(_float3* pOutMin, _float3* pOutMax) const;
 
 	_float Get_CurrentAnimProgress() const;
 

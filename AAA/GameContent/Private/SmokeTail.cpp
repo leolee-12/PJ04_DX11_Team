@@ -28,7 +28,7 @@ HRESULT CSmokeTail::Initialize(void* pArg)
     tDesc.wstrModelTag = TEXT("Prototype_Component_Model_SmokeTail");
 
     tDesc.bUseDiffuseTexture = false;
-    tDesc.bUseUnKnownTexture = true;
+    tDesc.bUseUnknownTexture = true;
 
     tDesc.bUseTextureCom = false;
     tDesc.iTextureLevel = 0;

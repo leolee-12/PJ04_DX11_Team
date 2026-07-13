@@ -28,7 +28,7 @@ HRESULT CInhaleEffect::Initialize(void* pArg)
     tDesc.wstrModelTag = TEXT("Prototype_Component_Model_InhaleEffect");
 
     tDesc.bUseDiffuseTexture = false;
-    tDesc.bUseUnKnownTexture = true;
+    tDesc.bUseUnknownTexture = true;
 
     tDesc.bUseTextureCom = true;
     tDesc.iTextureLevel = Texture_Wind01.iLevelID;

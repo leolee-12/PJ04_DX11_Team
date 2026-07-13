@@ -584,11 +584,21 @@ void CMap_Parser::Parse_EffectEntry(const _wstring& wstrSourceFile, const _wstri
 	JsonUtils::Try_ReadFloat4Array(jEntry, "Basic.BasicInfo.Rotation", &Desc.vRotation);
 	JsonUtils::Try_ReadFloat3Array(jEntry, "Basic.BasicInfo.SceneScale", &Desc.vScale);
 
-	BaseDesc.vPosition = _float4(Desc.vPosition.x, Desc.vPosition.y, Desc.vPosition.z, 1.f);
-
 	JsonUtils::Try_ReadFloat3Array(jEntry, "Position", &Desc.tEffect.vPosition);
 	JsonUtils::Try_ReadFloat3Array(jEntry, "Direction", &Desc.tEffect.vDirection);
-	JsonUtils::Try_ReadFloat4Array(jEntry, "Color", &Desc.tEffect.vColor);
+
+	if (false == JsonUtils::Try_ReadFloat4Array(jEntry, "Color", &Desc.tEffect.vColor))
+	{
+		const json* pColor = JsonUtils::Find_JsonValue(jEntry, "Color");
+		if (nullptr != pColor && pColor->is_object())
+		{
+			JsonUtils::Try_ReadFloat(*pColor, "R", &Desc.tEffect.vColor.x);
+			JsonUtils::Try_ReadFloat(*pColor, "G", &Desc.tEffect.vColor.y);
+			JsonUtils::Try_ReadFloat(*pColor, "B", &Desc.tEffect.vColor.z);
+			JsonUtils::Try_ReadFloat(*pColor, "A", &Desc.tEffect.vColor.w);
+		}
+	}
+
 	JsonUtils::Try_ReadFloat(jEntry, "Intensity", &Desc.tEffect.fIntensity);
 	JsonUtils::Try_ReadFloat(jEntry, "Range", &Desc.tEffect.fRange);
 	JsonUtils::Try_ReadFloat(jEntry, "Angle", &Desc.tEffect.fAngle);
@@ -631,6 +641,8 @@ void CMap_Parser::Parse_EffectEntry(const _wstring& wstrSourceFile, const _wstri
 		Desc.wstrComponentName = L"FieldEffect";
 	}
 
+	Desc.tEffect.eEffectType = Classify_EffectType(Desc.wstrObjectName, Desc.wstrComponentName);
+
 	if (nullptr != pMainComponent)
 	{
 		JsonUtils::Try_ReadFloat(*pMainComponent, "TransitionSec", &Desc.tEffect.fTransitionSec);
@@ -638,17 +650,85 @@ void CMap_Parser::Parse_EffectEntry(const _wstring& wstrSourceFile, const _wstri
 		JsonUtils::Try_ReadFloat(*pMainComponent, "OutTransitionSec", &Desc.tEffect.fOutTransitionSec);
 	}
 
-	if (Desc.wstrComponentName == L"ToneMappingArea")
+	switch (Desc.tEffect.eEffectType)
 	{
+	case ENV_EFFECT_TYPE::LOCAL_AREA_LIGHT:
+	case ENV_EFFECT_TYPE::DECOR_PARTS_CULLING_AREA:
+	{
+		if (nullptr == pMainComponent)
+			break;
+
+		_float3 vWorldAreaCenter = Desc.vPosition;
+		if (JsonUtils::Try_ReadFloat3Array(*pMainComponent, "AreaCenter", &vWorldAreaCenter))
+			Desc.vPosition = vWorldAreaCenter;
+
+		_float4 vWorldAreaRot = Desc.vRotation;
+		if (JsonUtils::Try_ReadFloat4Array(*pMainComponent, "AreaRot", &vWorldAreaRot))
+			Desc.vRotation = vWorldAreaRot;
+
+		JsonUtils::Try_ReadFloat3Array(*pMainComponent, "AreaSize", &Desc.tEffect.vAreaSize);
+
+		if (Desc.tEffect.eEffectType == ENV_EFFECT_TYPE::LOCAL_AREA_LIGHT)
+			JsonUtils::Try_ReadString(*pMainComponent, "AreaLightName", &Desc.tEffect.strAreaLightName);
+		else
+			JsonUtils::Try_ReadString(*pMainComponent, "HideKind", &Desc.tEffect.strHideKind);
+
+		Desc.tEffect.vAreaCenter = { 0.f, 0.f, 0.f };
+		Desc.tEffect.vAreaRot = Desc.vRotation;
+		Desc.vScale = { 1.f, 1.f, 1.f };
+		break;
+	}
+
+	case ENV_EFFECT_TYPE::TONE_MAPPING_AREA:
+	{
+		if (nullptr == pMainComponent)
+			break;
+
 		JsonUtils::Try_ReadFloat3Array(*pMainComponent, "Size", &Desc.tEffect.vAreaSize);
 		JsonUtils::Try_ReadFloat(*pMainComponent, "ExposureValue", &Desc.tEffect.fExposureValue);
 
 		Desc.tEffect.vAreaCenter = { 0.f, 0.f, 0.f };
 		Desc.tEffect.vAreaRot = Desc.vRotation;
 		Desc.vScale = { 1.f, 1.f, 1.f };
+		break;
 	}
 
-	Desc.tEffect.eEffectType = Classify_EffectType(Desc.wstrObjectName, Desc.wstrComponentName);
+	case ENV_EFFECT_TYPE::GRASS_WIND:
+	case ENV_EFFECT_TYPE::FIELD_EFFECT:
+	case ENV_EFFECT_TYPE::FLOWER_WING:
+	{
+		if (nullptr == pMainComponent)
+			break;
+
+		_float3 vWorldAreaCenter = Desc.vPosition;
+		if (JsonUtils::Try_ReadFloat3Array(*pMainComponent, "ActivationAreaCenter", &vWorldAreaCenter))
+			Desc.vPosition = vWorldAreaCenter;
+
+		_float4 vWorldAreaRot = Desc.vRotation;
+		if (JsonUtils::Try_ReadFloat4Array(*pMainComponent, "ActivationAreaRot", &vWorldAreaRot))
+			Desc.vRotation = vWorldAreaRot;
+
+		JsonUtils::Try_ReadFloat3Array(*pMainComponent, "ActivationAreaSize", &Desc.tEffect.vAreaSize);
+		JsonUtils::Try_ReadString(*pMainComponent, "ActivationCondition", &Desc.tEffect.strActivationCondition);
+
+		if (false == JsonUtils::Try_ReadFloat3Array(*pMainComponent, "EmitPos", &Desc.tEffect.vEmitPos))
+			Desc.tEffect.vEmitPos = Desc.vPosition;
+
+		Desc.tEffect.vAreaCenter = { 0.f, 0.f, 0.f };
+		Desc.tEffect.vAreaRot = Desc.vRotation;
+		Desc.vScale = { 1.f, 1.f, 1.f };
+		break;
+	}
+
+	case ENV_EFFECT_TYPE::SPOT_LIGHT:
+		Desc.vPosition = Desc.tEffect.vPosition;
+		break;
+
+	default:
+		break;
+	}
+
+	BaseDesc.vPosition = _float4(Desc.vPosition.x, Desc.vPosition.y, Desc.vPosition.z, 1.f);
 
 	Resolve_EnvColliderKind(&Desc);
 

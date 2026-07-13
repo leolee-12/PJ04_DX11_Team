@@ -13,6 +13,8 @@ namespace
 	constexpr const _tchar*		NORMAL_ROCK_BREAK_SOUNDKEY		= L"GimmickBreakable_NormalRockBreak.wav";
 	constexpr const _tchar*		LARGE_ROCK_BREAK_SOUNDKEY		= L"GimmickBreakable_LargeRockBreak.wav";
 
+	static constexpr _float		DESTROY_EFFECT_HEIGHT_RATIO = 0.55f;
+
 	static constexpr _float		BREAKABLE_CULL_MARGIN = 1.f;
 
 	struct LD_BREAKABLE_CATALOG
@@ -24,6 +26,7 @@ namespace
 		_uint iBreakAnimIndex;
 		const _char* pBaseMeshName;
 		_bool bCookCollisionMesh;
+		const _tchar* pDestroyEffectId;
 		
 		// 사운드 관련 정보
 		const _tchar*	pBreakSoundKey;
@@ -32,11 +35,11 @@ namespace
 
 	static const LD_BREAKABLE_CATALOG g_BreakableCatalog[] =
 	{
-		{ L"WoodBox", CLevelDesign_Breakable::WOODBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxWood/BoxWood.ysh", MODEL::ANIM, 2u, "WoodBoxM__BoxWoodC", false, WOOD_BOX_BREAK_SOUNDKEY, 0.25f},
-		{ L"BoxPlastic", CLevelDesign_Breakable::PLASTICBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxPlastic/BoxPlastic.ysh", MODEL::ANIM, 0u, "BoxPlasticM__BoxPlasticC", false, PLASTIC_BOX_BREAK_SOUNDKEY, 0.25f},
-		{ L"BreakableRockS", CLevelDesign_Breakable::BREAKABLE_ROCK_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_S.ysh", MODEL::NONANIM, LD_INVALID_ID, nullptr, true, NORMAL_ROCK_BREAK_SOUNDKEY, 0.45f},
-		{ L"BreakableRockM", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh", MODEL::NONANIM, LD_INVALID_ID, nullptr, true, NORMAL_ROCK_BREAK_SOUNDKEY, 0.45f},
-		{ L"BreakableRockMForBridge", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh", MODEL::NONANIM, LD_INVALID_ID, nullptr, true,  LARGE_ROCK_BREAK_SOUNDKEY, 0.15f}
+		{ L"WoodBox", CLevelDesign_Breakable::WOODBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxWood/BoxWood.ysh", MODEL::ANIM, 2u, "WoodBoxM__BoxWoodC", false, L"CommonHit", WOOD_BOX_BREAK_SOUNDKEY, 0.25f },
+		{ L"BoxPlastic", CLevelDesign_Breakable::PLASTICBOX_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/Anim/BoxPlastic/BoxPlastic.ysh", MODEL::ANIM, 0u, "BoxPlasticM__BoxPlasticC", false, L"CommonHit", PLASTIC_BOX_BREAK_SOUNDKEY, 0.25f },
+		{ L"BreakableRockS", CLevelDesign_Breakable::BREAKABLE_ROCK_S_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_S.ysh", MODEL::NONANIM, LD_INVALID_ID, nullptr, true, L"Split_Stone", NORMAL_ROCK_BREAK_SOUNDKEY, 0.45f },
+		{ L"BreakableRockM", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh", MODEL::NONANIM, LD_INVALID_ID, nullptr, true, L"Split_Stone_Big", NORMAL_ROCK_BREAK_SOUNDKEY, 0.45f  },
+		{ L"BreakableRockMForBridge", CLevelDesign_Breakable::BREAKABLE_ROCK_M_MODEL_PROTO_TAG, "../../Resources/Map/Gimmick/NonAnim/BreakableRock/BreakableRock_M.ysh", MODEL::NONANIM, LD_INVALID_ID, nullptr, true, L"Split_Stone_Big",  LARGE_ROCK_BREAK_SOUNDKEY, 0.15f  }
 	};
 
 	static const LD_BREAKABLE_CATALOG* Find_BreakableCatalog(const _wstring& wstrObjName)
@@ -323,12 +326,21 @@ void CLevelDesign_Breakable::Damaged(const ATTACK_INFO& tInfo)
 	XMStoreFloat3(&vFaceCam, XMVectorNegate(XMLoadFloat4(pCamLook)));
 
 	_float3 vPos{};
-	XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+	if (!Compute_EffectSpawnPosition(m_pModelCom, DESTROY_EFFECT_HEIGHT_RATIO, &vPos))
+		XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
 
 	const LD_BREAKABLE_CATALOG* pCatalog = Find_BreakableCatalog(m_tBreakableDesc.strObjectName);
 
 	if (nullptr != pCatalog && nullptr != pCatalog->pBreakSoundKey)
 		m_pGameInstance_Proxy->Play_SFX(pCatalog->pBreakSoundKey, pCatalog->fVolume);
+
+	if (nullptr != pCatalog && nullptr != pCatalog->pDestroyEffectId)
+	{
+		if (MODEL::ANIM == pCatalog->eModelType)
+			CEffect_Loader::GetInstance()->Spawn(pCatalog->pDestroyEffectId, Get_LevelIndex(), vPos, vFaceCam, _float3(0.f, 0.f, 0.f), nullptr);
+		else
+			CEffect_Loader::GetInstance()->Spawn(pCatalog->pDestroyEffectId, Get_LevelIndex(), vPos);
+	}
 
 	CEffect_Loader::GetInstance()->Spawn(L"CommonHit", Get_LevelIndex(), vPos, vFaceCam, _float3(0.f, 0.f, 0.f), nullptr);
 

@@ -28,7 +28,7 @@ HRESULT CCommon_Ring03::Initialize(void* pArg)
     tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Common_Ring03");
 
     tDesc.bUseDiffuseTexture = false;
-    tDesc.bUseUnKnownTexture = true;
+    tDesc.bUseUnknownTexture = true;
 
     tDesc.bUseTextureCom = true;
     tDesc.iTextureLevel = Texture_SwordSlash2.iLevelID;

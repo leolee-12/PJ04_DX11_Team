@@ -27,7 +27,7 @@ HRESULT CTestMeshParticle::Initialize(void* pArg)
     tDesc.wstrModelTag = TEXT("Prototype_Component_Model_SmokeSphereOriginal");
 
     tDesc.bUseDiffuseTexture = false;
-    tDesc.bUseUnKnownTexture = true;
+    tDesc.bUseUnknownTexture = true;
 
     tDesc.bUseTextureCom = false;
     tDesc.iTextureLevel = 0;

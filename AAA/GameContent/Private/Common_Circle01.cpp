@@ -28,7 +28,7 @@ HRESULT CCommon_Circle01::Initialize(void* pArg)
     tDesc.wstrModelTag = TEXT("Prototype_Component_Model_Common_Circle01");
 
     tDesc.bUseDiffuseTexture = false;
-    tDesc.bUseUnKnownTexture = true;
+    tDesc.bUseUnknownTexture = true;
 
     tDesc.bUseTextureCom = false;
     tDesc.iTextureLevel = 0;
