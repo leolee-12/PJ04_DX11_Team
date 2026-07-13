@@ -162,7 +162,8 @@ HRESULT CAbility_Model::Ready_Components()
 	}
 	default:
 	{
-		t.tShader = Shader_AnimMesh_PBR;		// Sword
+		t.tShader = Shader_AbillityModel;
+		m_iShadowPassIdx = 0;
 		break;
 	}
 	}
@@ -219,7 +220,7 @@ HRESULT CAbility_Model::Render_Sword()
 			if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantEmissive", &vJewelEmissive, sizeof(_float4))))
 				return E_FAIL;
 
-			iPass = 3u;
+			iPass = 2u;
 		}
 
 		if (m_pAnimatorCom)
@@ -313,49 +314,30 @@ HRESULT CAbility_Model::Render_Ice()
 
 		if (0u == i)   
 		{
-			if (FAILED(m_pModelCom->Bind_Material(
-				m_pShaderCom, "g_DiffuseTexture",
-				i, MTEX_TYPE::DIFFUSE, 1)))
+			if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture",	i, MTEX_TYPE::DIFFUSE, 1)))
 				return E_FAIL;
-			if (FAILED(m_pModelCom->Bind_Material(
-				m_pShaderCom, "g_UnknownTexture",
-				i, MTEX_TYPE::DIFFUSE, 0)))
+			if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture",	i, MTEX_TYPE::NORMALS, 0)))
 				return E_FAIL;
-			if (FAILED(m_pModelCom->Bind_Material(
-				m_pShaderCom, "g_NormalTexture",
-				i, MTEX_TYPE::NORMALS, 0)))
+			if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture",	i, MTEX_TYPE::METALNESS, 0)))
 				return E_FAIL;
-			if (FAILED(m_pModelCom->Bind_Material(
-				m_pShaderCom, "g_MRATexture",
-				i, MTEX_TYPE::METALNESS, 0)))
-				return E_FAIL;
-			iPass = 0u;
+			iPass = 1u;
 		}
 		else   // Ice(1,2) / Juel(3) = »ó¼ö Pass3
 		{
 			const _bool bJuel = (3u == i);
 
-			const _float4* pDiff =
-				bJuel ? &vJuelDiffuse : &vIceDiffuse;
-			const _float3* pMRA =
-				bJuel ? &vJuelMRA : &vIceMRA;
-			const _float4* pEmi =
-				bJuel ? &vJuelEmissive : &vIceEmissive;
+			const _float4* pDiff = bJuel ? &vJuelDiffuse : &vIceDiffuse;
+			const _float3* pMRA = bJuel ? &vJuelMRA : &vIceMRA;
+			const _float4* pEmi = bJuel ? &vJuelEmissive : &vIceEmissive;
 
-			if (FAILED(m_pShaderCom->Bind_RawValue(
-				"g_vConstantDiffuse",
-				pDiff, sizeof(_float4))))
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantDiffuse", pDiff, sizeof(_float4))))
 				return E_FAIL;
-			if (FAILED(m_pShaderCom->Bind_RawValue(
-				"g_vConstantMRA",
-				pMRA, sizeof(_float3))))
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantMRA", pMRA, sizeof(_float3))))
 				return E_FAIL;
-			if (FAILED(m_pShaderCom->Bind_RawValue(
-				"g_vConstantEmissive",
-				pEmi, sizeof(_float4))))
+			if (FAILED(m_pShaderCom->Bind_RawValue("g_vConstantEmissive", pEmi, sizeof(_float4))))
 				return E_FAIL;
 
-			iPass = 3u;
+			iPass = 2u;
 		}
 
 		if (m_pAnimatorCom)

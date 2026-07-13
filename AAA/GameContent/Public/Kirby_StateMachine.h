@@ -7,6 +7,7 @@
 #include "Kirby_Command.h"
 
 NS_BEGIN(Engine)
+class CGameInstance_Proxy;
 NS_END
 
 NS_BEGIN(Client)
@@ -71,6 +72,7 @@ private:
 
 	unordered_map<KIRBY_STATE_TYPE, CKirby_State*> m_States;
 
+	CGameInstance_Proxy* m_pGameInstance_Proxy{};
 private:
 	HRESULT Init_State();
 
