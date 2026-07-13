@@ -658,6 +658,18 @@
     <Filter Include="00. GameObject\07. Boss\Boss\Armadillo">
       <UniqueIdentifier>{028348be-a282-4c6e-b35f-c23a77b2027c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Brain">
+      <UniqueIdentifier>{2f3fa464-0dad-48e6-b461-172c792ca4de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Part">
+      <UniqueIdentifier>{e1ae568f-b8db-489a-9fb4-3919421203c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Part\Body">
+      <UniqueIdentifier>{f592afe4-7daf-4d78-b808-f02a5080bc6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Projectile">
+      <UniqueIdentifier>{92f525a8-d5f1-48fe-80ae-d34c47d8657c}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\07. Boss\Boss\Gorilla">
       <UniqueIdentifier>{39f4fe90-f4e4-435d-a96c-99eb6e330b2e}</UniqueIdentifier>
     </Filter>
@@ -1096,18 +1108,6 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Part">
-      <UniqueIdentifier>{e1ae568f-b8db-489a-9fb4-3919421203c5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Brain">
-      <UniqueIdentifier>{2f3fa464-0dad-48e6-b461-172c792ca4de}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Part\Body">
-      <UniqueIdentifier>{f592afe4-7daf-4d78-b808-f02a5080bc6f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Projectile">
-      <UniqueIdentifier>{92f525a8-d5f1-48fe-80ae-d34c47d8657c}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -1151,6 +1151,15 @@
     </ClInclude>
     <ClInclude Include="..\public\Boss.h">
       <Filter>00. GameObject\07. Boss\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Armadillo.h">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Armadillo_Body.h">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Part\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Armadillo_Brain.h">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Brain</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Boss_Brain.h">
       <Filter>00. GameObject\07. Boss\Boss</Filter>
@@ -1458,17 +1467,17 @@
     <ClInclude Include="..\Public\Kirby_Ability.h">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Kirby_Ability_Normal.h">
-      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\00. Kirby_Ability_Normal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Kirby_Ability_Sword.h">
-      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Kirby_Ability_Bomb.h">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\02. Kirby_Ability_Bomb</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Ability_Ice.h">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\03. Kirby_Ability_Ice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Ability_Normal.h">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\00. Kirby_Ability_Normal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Ability_Sword.h">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_AbilityDump.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\AbilityDump</Filter>
@@ -1481,6 +1490,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Body.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\00. Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_BombHat.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\02. BombHat</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_CarFirstBreakWall.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall</Filter>
@@ -1548,6 +1560,9 @@
     <ClInclude Include="..\Public\Kirby_Hovering.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Hovering</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_IceHat.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\03. IceHat</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Kirby_InputManager.h">
       <Filter>00. GameObject\05. Kirby\00. System\01. Kirby_InputManager</Filter>
     </ClInclude>
@@ -1586,12 +1601,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_SwordHat.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Kirby_BombHat.h">
-      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\02. BombHat</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Kirby_IceHat.h">
-      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\03. IceHat</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Wait.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait</Filter>
@@ -1911,6 +1920,9 @@
     <ClInclude Include="..\public\Projectile_Movement.h">
       <Filter>01. Projectile\Movement</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Projectile_Partner.h">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Projectile</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\QuadCommon.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\00. QuadCommon</Filter>
     </ClInclude>
@@ -2181,18 +2193,6 @@
     <ClInclude Include="..\Public\WalkSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Boss_Armadillo.h">
-      <Filter>00. GameObject\07. Boss\Boss\Armadillo</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Boss_Armadillo_Body.h">
-      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Part\Body</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Boss_Armadillo_Brain.h">
-      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Brain</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Projectile_Partner.h">
-      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Projectile</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -2233,6 +2233,15 @@
     </ClCompile>
     <ClCompile Include="..\private\Boss.cpp">
       <Filter>00. GameObject\07. Boss\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Armadillo.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Armadillo_Body.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Part\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Armadillo_Brain.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Brain</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Boss_Brain.cpp">
       <Filter>00. GameObject\07. Boss\Boss</Filter>
@@ -2501,17 +2510,17 @@
     <ClCompile Include="..\Private\Kirby_Ability.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Kirby_Ability_Normal.cpp">
-      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\00. Kirby_Ability_Normal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp">
-      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ability_Bomb.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\02. Kirby_Ability_Bomb</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Ability_Ice.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\03. Kirby_Ability_Ice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Ability_Normal.cpp">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\00. Kirby_Ability_Normal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Ability_Sword.cpp">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Ability\01. Kirby_Ability_Sword</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_AbilityDump.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\AbilityDump</Filter>
@@ -2524,6 +2533,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Body.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\00. Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_BombHat.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\02. BombHat</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_CarFirstBreakWall.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\CarFirstBreakWall</Filter>
@@ -2588,6 +2600,9 @@
     <ClCompile Include="..\Private\Kirby_Hovering.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Hovering</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kirby_IceHat.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\03. IceHat</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Kirby_InputManager.cpp">
       <Filter>00. GameObject\05. Kirby\00. System\01. Kirby_InputManager</Filter>
     </ClCompile>
@@ -2623,12 +2638,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_SwordHat.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Kirby_BombHat.cpp">
-      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\02. BombHat</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Kirby_IceHat.cpp">
-      <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\03. IceHat</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Wait.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait</Filter>
@@ -2927,6 +2936,9 @@
     <ClCompile Include="..\private\Projectile_Movement.cpp">
       <Filter>01. Projectile\Movement</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Projectile_Partner.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Projectile</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\QuadCommon.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\00. QuadCommon</Filter>
     </ClCompile>
@@ -3185,21 +3197,12 @@
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Boss_Armadillo.cpp">
-      <Filter>00. GameObject\07. Boss\Boss\Armadillo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Boss_Armadillo_Body.cpp">
-      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Part\Body</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Boss_Armadillo_Brain.cpp">
-      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Brain</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Projectile_Partner.cpp">
-      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Projectile</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl">
+      <Filter>98. ShaderFiles\Marb1e</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Armadillo.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
     <None Include="..\ShaderFiles\Shader_Bomb.hlsl">
@@ -3253,7 +3256,7 @@
     <None Include="..\ShaderFiles\Shader_World_Technique.hlsli">
       <Filter>98. ShaderFiles\Leo</Filter>
     </None>
-    <None Include="..\ShaderFiles\Shader_Armadillo.hlsl">
+    <None Include="..\ShaderFiles\Shader_AbillityModel.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
   </ItemGroup>

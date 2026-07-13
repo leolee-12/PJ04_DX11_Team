@@ -12,6 +12,7 @@ Texture2D g_WarpTexture; // _a5  Warp             (흡입 왜곡, 옵션/미사용)
 Texture2D g_NormalTexture; // _n0  KirbyEyeNormal.0X
 
 Texture2D g_DiffuseTexture;
+Texture2D g_DiffuseTexture1;
 Texture2D g_MRATexture;
 
 float4 g_vBodyColor = float4(1.f, 0.45f, 0.55f, 1.f); // 몸  = KirbySkin 검정 영역
@@ -251,6 +252,42 @@ PS_OUT PS_CONSTANT_MATERIAL(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_BOMBHAT(PS_IN In)
+{
+    PS_OUT Out;
+    
+    float3 vAlbedo;
+    
+    if (In.vTexcoord1.x <= 1.f && In.vTexcoord1.y <= 1.f)
+        vAlbedo = g_DiffuseTexture1.Sample(LinearSampler, In.vTexcoord1).rgb;
+    else
+        vAlbedo = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    
+    float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord).rgb;
+    
+    float3 N = normalize(In.vNormal);
+    float3 T = normalize(In.vTangent.xyz);
+    float3 B = normalize(In.vBinormal.xyz);
+  
+    float3x3 TBN = float3x3(T, B, N);
+
+    float2 nrg = g_NormalTexture.Sample(LinearSampler, In.vTexcoord).rg;
+    float3 nTS = float3(nrg, sqrt(saturate(1.f - dot(nrg, nrg))));
+    
+    float3 Nw = mul(nTS, TBN);
+
+    Out.vDiffuse = float4(vAlbedo, 1.f);
+    Out.vNormal = vector(Nw * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, 0.f, 0.f, 0.f);
+    Out.vMRA = float4(mra, 1.f);
+    Out.vEmissive = float4(g_vEmissiveColor.rgb, 1.f);
+    Out.vEmissive.rgb += g_vHitFlashColor * g_fHitFlash;
+    Out.vGeoNormal = float4(normalize(In.vNormal.xyz) * 0.5f + 0.5f, 0.f);
+    Out.vMaterialID = g_iMaterialID;
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass Body // 0
@@ -291,5 +328,15 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_SHADOW();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_SHADOW();
+    }
+    pass BombHatPass // 4
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_MarkOccluded, 1);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_BOMBHAT();
     }
 }
