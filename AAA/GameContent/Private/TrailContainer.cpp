@@ -8,7 +8,7 @@ CTrailContainer::CTrailContainer(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 }
 
 CTrailContainer::CTrailContainer(const CTrailContainer& Prototype)
-	: CEffect_Container{ Prototype }
+	: CEffect_Container ( Prototype )
 {
 }
 
@@ -51,18 +51,12 @@ HRESULT CTrailContainer::Render()
 HRESULT CTrailContainer::Ready_EffectPartObjects()
 {
 	CTrailCommon::TRAIL_COMMON_DESC tTrailDesc{};
-	tTrailDesc.bCustomShader = false;
-	tTrailDesc.bUseTextureCom = false;
-	tTrailDesc.bUseMaskCom = false;
+	tTrailDesc.bCustomShader	= false;
+	tTrailDesc.bUseTextureCom	= false;
+	tTrailDesc.bUseMaskCom		= false;
 
-	if (FAILED(Add_Effect_PartObject(
-		m_iPrototypeLevel,
-		CTrailCommon::PROTOTYPE_TAG,
-		L"Trail",
-		&tTrailDesc)))
-	{
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel,	CTrailCommon::PROTOTYPE_TAG, L"Trail", &tTrailDesc)))
 		return E_FAIL;
-	}
 
 	return S_OK;
 }

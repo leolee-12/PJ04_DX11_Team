@@ -65,6 +65,8 @@ namespace
         { TEXT("Split_Stone_Big"),        TEXT("../../Resources/Map/Effect/Proto_Split_Stone_Big.JSON") },
         { TEXT("Split_Bush"),             TEXT("../../Resources/Map/Effect/Proto_Split_Bush_0.JSON") },
         { TEXT("BubbleAura"),             TEXT("../../Resources/CHJ/Effect/BubbleAura.JSON") },
+
+        { TEXT("SwordTrail_BK"),      TEXT("../../Resources/CHJ/Effect/SwordTrail_BK.JSON") },
     };
 }
 

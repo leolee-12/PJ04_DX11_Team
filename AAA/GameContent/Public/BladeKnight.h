@@ -4,6 +4,7 @@
 
 NS_BEGIN(Engine)
 class CAnimator;
+class CEffect_Container;
 NS_END
 
 NS_BEGIN(Client)
@@ -65,6 +66,7 @@ private:
 private:
 	CBladeKnight_Body*			m_pBody = { nullptr };
 	CBladeKnight_Sword*			m_pSword = { nullptr };
+	CEffect_Container*			m_pSwordTrail = { nullptr };
 
 public:
 	static CBladeKnight*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext); 

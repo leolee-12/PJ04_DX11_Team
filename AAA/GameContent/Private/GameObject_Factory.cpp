@@ -90,6 +90,7 @@
 #include "Split_Bush.h"
 #include "BubbleAura.h"
 #include "TrailContainer.h"
+#include "SwordTrail_BK.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -1111,6 +1112,15 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BushLeafS"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Bush/BasicS.ysh"));
         )
     );
+
+    Register(CSwordTrail_BK::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CSwordTrail_BK),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CTrailCommon::PROTOTYPE_TAG, CTrailCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, Texture_BK_CommonSlash.iLevelID, Texture_BK_CommonSlash.szProtoTag,
+                            CTexture::Create(pDevice, pContext, Texture_BK_CommonSlash.szFileTag, Texture_BK_CommonSlash.iNumTex));
+        ));
 }
 
 void CGameObject_Factory::Register_Bubble()
