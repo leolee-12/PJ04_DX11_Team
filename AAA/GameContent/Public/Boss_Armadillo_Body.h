@@ -8,8 +8,7 @@ class CBoss_Armadillo_Body final : public CMultiHitBoxPart
     GENERATED_BODY(CBoss_Armadillo_Body)
 
 public:
-    // TODO: 패턴 확정되면 히트박스 슬롯 조정
-    enum ARMADILLO_HITBOX { AHB_RHAND, AHB_LHAND, AHB_ROLL, AHB_END };
+    enum ARMADILLO_HITBOX { AHB_ROLL, AHB_CATCH, AHB_THROW, AHB_END };
 
 private:
     CBoss_Armadillo_Body(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

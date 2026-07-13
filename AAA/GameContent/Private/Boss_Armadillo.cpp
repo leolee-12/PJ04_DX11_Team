@@ -4,8 +4,10 @@
 #include "Boss_Armadillo_Brain.h"
 #include "Boss_Armadillo_Body.h"
 #include "Animator.h"
+#include "Projectile_Partner.h"
+#include "Projectile_Manager.h"
 
-// 페이즈 임계값. 비어 있으면 1페이즈 (Brain의 Get_PhaseCount = size()+1 과 일치해야 함)
+// 보스러쉬용: 페이즈 구분 없음 (Brain의 Get_PhaseCount = 1과 일치)
 const vector<_float> CBoss_Armadillo::s_Thresholds = {};
 
 CBoss_Armadillo::CBoss_Armadillo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -25,8 +27,8 @@ HRESULT CBoss_Armadillo::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
-    m_strBossName = L"아르마딜로";      // TODO: 정식 이름
-    m_fMaxHP = 800.f;
+    m_strBossName = L"아르마파라파";
+    m_fMaxHP = 1000.f;
     m_fCurHP = m_fMaxHP;
 
     if (m_pMovement)
@@ -34,9 +36,6 @@ HRESULT CBoss_Armadillo::Initialize(void* pArg)
         m_pMovement->Set_MoveSpeed(4.f);
         m_pMovement->Set_RotSpeed(120.f);
     }
-
-    //임시
-    Set_Active(true);
 
     return S_OK;
 }
@@ -49,6 +48,8 @@ void CBoss_Armadillo::Update(_float fTimeDelta)
         if (m_pMovement) m_pMovement->Sync_To_Controller();
         return;
     }
+    if (m_pGameInstance_Proxy->Key_Down(DIK_0))
+        Appear();
 #endif
     __super::Update(fTimeDelta);
 }
@@ -65,9 +66,8 @@ CMonsterBrain* CBoss_Armadillo::Create_Brain()
 
 void CBoss_Armadillo::Play_Intro()
 {
-    // TODO: 인트로 연출 확정 시 교체 (지금은 클립 하나 재생하고 끝)
     if (CAnimator* pAnim = Get_BodyAnimator())
-        pAnim->Play("Wait", false, true, 0.2f, 1.f);
+        pAnim->Play("Angry", false, true, 0.f, 1.5f);
 }
 
 _bool CBoss_Armadillo::Is_Intro_Finished() const
@@ -78,12 +78,14 @@ _bool CBoss_Armadillo::Is_Intro_Finished() const
 
 void CBoss_Armadillo::Play_Death()
 {
-    Enable_Colliders(false);
+    Enable_Colliders(false);              // 메인보스: 즉시 콜라이더 off
     if (auto* p = Get_HitBoxPart())
         p->Enable_AllHitBoxes(false);
 
+    if (m_pPartner) { m_pPartner->Despawn(); m_pPartner = nullptr; }
+
     if (CAnimator* pAnim = Get_BodyAnimator())
-        pAnim->Play("DeathDown", false, true, 0.f, 1.f);   // TODO: 사망 클립명 확인
+        pAnim->Play("DeathDamage", false, true, 0.f, 1.f);   // DeathWait/Death 클립도 있음. 연출 늘릴 때 사용
 }
 
 _bool CBoss_Armadillo::Is_Death_Finished() const
@@ -109,6 +111,69 @@ CMultiHitBoxPart* CBoss_Armadillo::Get_HitBoxPart() const
     return m_pBody;
 }
 
+_bool CBoss_Armadillo::Sweep_Wall(const _float3& vDir, _float fDist, _float3* pOutNormal) const
+{
+    _float3 vPos;
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+    vPos.y += s_fCCT_Height * 0.5f;   // 몸통 중심 높이에서 쏨
+
+    _float3 vNormal{};
+    if (!m_pGameInstance_Proxy->Sweep_Sphere(vPos, 2.5f, vDir, fDist, &vNormal))
+        return false;
+
+    if (fabsf(vNormal.y) >= 0.5f)     // 바닥/경사는 벽으로 안 침
+        return false;
+
+    if (pOutNormal) *pOutNormal = vNormal;
+    return true;
+}
+
+void CBoss_Armadillo::Summon_Partner()
+{
+    if (m_pPartner) return;
+
+    CProjectile* p = nullptr;
+    CProjectile_Manager::GetInstance()->Spawn(Get_PrototypeLevelIndex(), Get_LevelIndex(),
+        CProjectile_Partner::POOL_KEY, CProjectile_Partner::PROTOTYPE_TAG, &p);
+    if (!p) return;
+
+    p->Attach_To_Socket(m_pBody->Get_BoneMatrixPtr("Partner1L"),
+        m_pTransformCom->Get_WorldMatrixPtr(), XMMatrixIdentity());
+    m_pPartner = static_cast<CProjectile_Partner*>(p);
+}
+
+void CBoss_Armadillo::Fire_PartnerThrow()
+{
+    if (!m_pPartner) return;
+
+    _vector vSelf = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vKirby = XMLoadFloat3(&Get_BlackBoard().vTargetPos);
+
+    _vector vDir = XMVectorSetY(vKirby - vSelf, 0.f);
+    if (XMVectorGetX(XMVector3LengthSq(vDir)) > 1e-6f)
+        vDir = XMVector3Normalize(vDir);
+    else
+        vDir = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f));
+
+    _vector vStart = vSelf + vDir * (s_fCCT_Radius + 1.5f);
+
+    _float3 vS, vD;
+    XMStoreFloat3(&vS, vStart);
+    XMStoreFloat3(&vD, vDir);
+    m_pPartner->Launch(vS, vD);
+    m_pPartner = nullptr;
+}
+
+void CBoss_Armadillo::Enable_PartnerSpinHit(_bool b)
+{
+    if (m_pPartner) m_pPartner->Enable_SpinHitBox(b);
+}
+
+void CBoss_Armadillo::Play_PartnerAnim(const _char* szClip, _bool bLoop)
+{
+    if (m_pPartner) m_pPartner->Play_Anim(szClip, bLoop);
+}
+
 HRESULT CBoss_Armadillo::Ready_AnimEvents()
 {
     CAnimator* pAnim = Get_BodyAnimator();
@@ -117,7 +182,20 @@ HRESULT CBoss_Armadillo::Ready_AnimEvents()
     pAnim->Set_EventCallback([this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase) {
         if (Handle_SharedAnimEvent(e, phase))
             return;
-        // TODO: 아르마딜로 전용 이벤트(Fx, CamShake, Projectile 등) 채우기
+
+        switch (static_cast<EANIM_EVENT>(e.iEventType))
+        {
+            case EANIM_EVENT::Projectile:
+            {
+                if (phase != ANIM_EVENT_PHASE::POINT) break;
+
+                if (e.iIntParam == 0) 
+                    Summon_Partner();
+                else                  
+                    Fire_PartnerThrow();
+                break;
+            }
+        }
         });
     return S_OK;
 }
@@ -127,6 +205,10 @@ HRESULT CBoss_Armadillo::Ready_PartObjects()
     m_pBody = Add_MonsterPart<CBoss_Armadillo_Body>(
         CBoss_Armadillo_Body::PROTOTYPE_TAG, CBoss_Armadillo_Body::PART_TAG);
     if (!m_pBody) return E_FAIL;
+
+    // 잡기 명중 판정
+    m_pBody->Set_HitBox_OnEnter(CBoss_Armadillo_Body::AHB_CATCH,
+        [this](CCollider*) { m_bCatchHit = true; });
 
     return S_OK;
 }

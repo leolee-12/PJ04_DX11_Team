@@ -10,9 +10,12 @@ private:
     virtual ~CBoss_Armadillo_Brain() = default;
 
 protected:
-    // s_Thresholds.size() + 1 과 일치해야 함 (현재 1페이즈)
+    // 보스러쉬용: 페이즈 구분 없음
     virtual _int     Get_PhaseCount() const override { return 1; }
     virtual CBTNode* Build_PhaseTree(_int iPhase) override;
+
+private:
+    _bool m_bOpeningDone = { false };   // 조우 직후 오프닝 시퀀스 1회 소진 여부
 
 public:
     static CBoss_Armadillo_Brain* Create(CMonster* pOwner);

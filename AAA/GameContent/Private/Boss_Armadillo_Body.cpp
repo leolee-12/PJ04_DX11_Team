@@ -15,10 +15,9 @@ HRESULT CBoss_Armadillo_Body::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg))) return E_FAIL;
     if (FAILED(Ready_Components()))        return E_FAIL;
 
-    //// TODO: 본 이름은 실제 아르마딜로 모델 스켈레톤 확정 후 교체 (지금은 고릴라식 임시값)
-    //Add_HitBox(AHB_RHAND, "RHaveL", COLLIDER::SPHERE, 2.5f, 0.f, 10.f, 8.f);
-    //Add_HitBox(AHB_LHAND, "LHaveL", COLLIDER::SPHERE, 2.5f, 0.f, 10.f, 8.f);
-    //Add_HitBox(AHB_ROLL, "RotL", COLLIDER::SPHERE, 5.f, 0.f, 15.f, 10.f);   // 구르기 전신 판정
+    Add_HitBox(AHB_ROLL, "Spine1J", COLLIDER::SPHERE, 4.5f, 0.f, 15.f, 12.f);  // 구르기 몸통
+    Add_HitBox(AHB_CATCH, "HeadJ", COLLIDER::SPHERE, 3.f, 0.f, 0.f, 0.f);      // 잡기 판정 (데미지 없음)
+    Add_HitBox(AHB_THROW, "Spine0J", COLLIDER::SPHERE, 4.f, 0.f, 20.f, 15.f);  // 잡기 성공 내던지기
 
     m_pAnimatorCom->Play("Wait", false);
 
@@ -62,7 +61,7 @@ HRESULT CBoss_Armadillo_Body::Ready_Components()
     PART_SETUP t{};
     t.tShader = Shader_Armadillo;
     t.szModelProtoTag = MODEL_PROTO_TAG;
-    t.szAnimEventFile = TEXT("../../Resources/YSH/Boss/Armadillo/Body/Armadillo_anim_events.json");  // 파일 없으면 무시됨
+    t.szAnimEventFile = TEXT("../../Resources/YSH/Boss/Armadillo/Body/Armadillo_anim_events.json");
     return Ready_MeshPart(t);
 }
 

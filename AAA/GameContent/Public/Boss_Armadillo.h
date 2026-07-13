@@ -4,6 +4,7 @@
 NS_BEGIN(Client)
 
 class CBoss_Armadillo_Body;
+class CProjectile_Partner;
 
 class CBoss_Armadillo final : public CBoss
 {
@@ -31,6 +32,17 @@ public:
     virtual CAnimator* Get_BodyAnimator() const override;
     virtual CMultiHitBoxPart* Get_HitBoxPart() const override;
 
+public:
+    void  Reset_CatchHit() { m_bCatchHit = false; }
+    _bool Is_CatchHit() const { return m_bCatchHit; }
+
+    _bool Sweep_Wall(const _float3& vDir, _float fDist, _float3* pOutNormal) const;
+
+    void Summon_Partner();
+    void Fire_PartnerThrow();
+    void Enable_PartnerSpinHit(_bool b);
+    void Play_PartnerAnim(const _char* szClip, _bool bLoop);
+
 protected:
     virtual CMonsterBrain* Create_Brain() override;
     virtual void           Play_Intro() override;
@@ -39,6 +51,7 @@ protected:
     virtual _bool          Is_Death_Finished() const override;
 
     virtual const vector<_float>& Get_PhaseThresholds() const override { return s_Thresholds; }
+    virtual const _tchar* Get_AppearEventTag() const override { return TEXT("Armadillo_Appear"); }
 
     virtual _float Get_CapsuleRadius() const override { return s_fCCT_Radius; }
     virtual _float Get_CapsuleHeight() const override { return s_fCCT_Height; }
@@ -52,6 +65,9 @@ protected:
 private:
     CBoss_Armadillo_Body* m_pBody = { nullptr };
     static const vector<_float> s_Thresholds;
+
+    _bool m_bCatchHit = { false };
+    CProjectile_Partner* m_pPartner = { nullptr };
 
 public:
     static CBoss_Armadillo* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

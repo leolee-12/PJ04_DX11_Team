@@ -107,6 +107,7 @@
     <ClInclude Include="..\Public\LD_Stage1BossDemo.h" />
     <ClInclude Include="..\Public\LD_CopyEssence.h" />
     <ClInclude Include="..\Public\MeshEmitterCommon.h" />
+    <ClInclude Include="..\public\Projectile_Partner.h" />
     <ClInclude Include="..\Public\QuadCommon.h" />
     <ClInclude Include="..\Public\MeshCommon.h" />
     <ClInclude Include="..\Public\RectParticleCommon.h" />
@@ -469,6 +470,7 @@
     <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp" />
     <ClCompile Include="..\Private\LD_CopyEssence.cpp" />
     <ClCompile Include="..\Private\MeshEmitterCommon.cpp" />
+    <ClCompile Include="..\private\Projectile_Partner.cpp" />
     <ClCompile Include="..\Private\QuadCommon.cpp" />
     <ClCompile Include="..\Private\MeshCommon.cpp" />
     <ClCompile Include="..\Private\RectParticleCommon.cpp" />
