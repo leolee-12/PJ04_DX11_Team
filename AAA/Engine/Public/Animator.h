@@ -97,6 +97,8 @@ public: // 재생 제어 (오브젝트/에디터는 오직 이것만 사용)
     void    SetBoneRotation(const _char* szBone, _float fAngleDeg, _fvector vAxis);
     _bool   Has_Bone(const _char* szBone) const;
 
+    _bool Is_Blending();
+
 public: // 에디터(데이터 편집)
     ANIM_EVENT_TRACK& Get_Track(const string& strAnimName);
     const unordered_map<string, ANIM_EVENT_TRACK>& Get_Tracks() const { return m_Tracks; }
