@@ -445,7 +445,12 @@ CULLING_FADE_RESULT CCulling_Manager::Evaluate_FrustumFadeAABB(CULLING_VIEW eVie
 		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_CULLED, 1);
 
 #ifdef _DEBUG
-		if (fNearestSupport < -Helper::fEpsilon)
+		// BoundingFrustum::Intersects(SAT)는 씬 좌표 크기에 비례한 부동소수 오차를 갖는다.
+		// 절대 epsilon(1e-5)은 원점에서 먼 오브젝트에서 너무 빡빡하므로 좌표 스케일에 비례한 여유를 둔다.
+		const _float fBoundsScale = max(1.f,
+			fabsf(WorldBounds.Center.x) + fabsf(WorldBounds.Center.y) + fabsf(WorldBounds.Center.z)
+			+ WorldBounds.Extents.x + WorldBounds.Extents.y + WorldBounds.Extents.z);
+		if (fNearestSupport < -(fBoundsScale * 1e-4f))
 			assert(!State.WorldFrustum.Intersects(WorldBounds));
 #endif
 
