@@ -89,7 +89,7 @@
 #include "Split_Stone.h"
 #include "Split_Bush.h"
 #include "BubbleAura.h"
-#include "TrailContainer.h"
+#include "Kirby_SwordTrail.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -1056,12 +1056,13 @@ void CGameObject_Factory::Register_Effect()
         ));
 
     // Generic Trail Container
-    Register(CTrailContainer::PROTOTYPE_TAG, TEXT("Effect_Container"),
-        CREATOR(CTrailContainer),
+    Register(CKirby_SwordTrail::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CKirby_SwordTrail),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CTrailCommon::PROTOTYPE_TAG,
-                CTrailCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CTrailCommon::PROTOTYPE_TAG, CTrailCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_SwordTrail.iLevelID, Texture_SwordTrail.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_SwordTrail.szFileTag, Texture_SwordTrail.iNumTex));
         ));
 
     // 8
