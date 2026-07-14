@@ -85,6 +85,7 @@
     <ClInclude Include="..\Public\EnvVolume_Culling.h" />
     <ClInclude Include="..\Public\EnvVolume_Effect.h" />
     <ClInclude Include="..\Public\EnvVolume_Light.h" />
+    <ClInclude Include="..\Public\ItemEffect.h" />
     <ClInclude Include="..\public\KirbySpawnPoint.h" />
     <ClInclude Include="..\Public\Kirby_DeformDump.h" />
     <ClInclude Include="..\public\Dialogue_Arranger.h" />
@@ -452,6 +453,7 @@
     <ClCompile Include="..\Private\EnvVolume_Culling.cpp" />
     <ClCompile Include="..\Private\EnvVolume_Effect.cpp" />
     <ClCompile Include="..\Private\EnvVolume_Light.cpp" />
+    <ClCompile Include="..\Private\ItemEffect.cpp" />
     <ClCompile Include="..\private\KirbySpawnPoint.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformDump.cpp" />
     <ClCompile Include="..\private\Dialogue_Arranger.cpp" />

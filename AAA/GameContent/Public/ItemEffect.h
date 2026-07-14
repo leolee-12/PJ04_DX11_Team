@@ -6,17 +6,17 @@ NS_BEGIN(Engine)
 
 class CEffect_Part;
 
-class CBreakWallEffect final : public CEffect_Container
+class CItemEffect final : public CEffect_Container
 {
-    GENERATED_BODY(CBreakWallEffect)
+    GENERATED_BODY(CItemEffect)
 
 public:
-    static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_BreakWallEffect";
+    static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_ItemEffect";
 
 private:
-    CBreakWallEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-    CBreakWallEffect(const CBreakWallEffect& Prototype);
-    virtual ~CBreakWallEffect() = default;
+    CItemEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    CItemEffect(const CItemEffect& Prototype);
+    virtual ~CItemEffect() = default;
 
 protected:
     virtual HRESULT Initialize_Prototype() override;
@@ -33,7 +33,7 @@ private:
     HRESULT Ready_EffectPartObjects();
 
 public:
-    static CBreakWallEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    static CItemEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual CGameObject* Clone(void* pArg) override;
 private:
     virtual void Free() override;

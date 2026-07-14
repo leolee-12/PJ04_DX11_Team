@@ -38,6 +38,8 @@ public:
 	virtual HRESULT	Render() override;
 	virtual HRESULT Render_Shadow() override;
 	virtual void	Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
+	
+	virtual _bool   Is_CullTransformDynamic() const override { return m_bPickingUp; }
 
 	static void Register_LevelDesignSpecs();
 	static _bool Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry);
@@ -50,6 +52,10 @@ private:
 
 	LD_POINT_DESC	m_tPointDesc = {};
 	_bool			m_bRotate = { false };
+	_bool			m_bPickingUp = { false };
+	_float			m_fPickupElapsed = {};
+	_float3			m_vPickupStartPos = {};
+	_float3			m_vPickupTargetPos = {};
 
 private:
 	HRESULT			Ready_Components();
@@ -61,6 +67,8 @@ private:
 	HRESULT			Ready_HurtBox();
 	void			SetUp_Collider_Callback();
 	void			Handle_Pickup(CCollider* pOther);
+	void			Begin_Pickup(const _float3& vStartPos);
+	void			Update_Pickup(_float fTimeDelta);
 
 public:
 	static CLevelDesign_Point* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
