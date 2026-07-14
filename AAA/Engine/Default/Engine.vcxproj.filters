@@ -64,33 +64,6 @@
     <Filter Include="05. GameObject\Effect\EffectPart">
       <UniqueIdentifier>{42b80ec2-d825-4521-b1ae-204abc8fe1cd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Emitter">
-      <UniqueIdentifier>{f6fe4cd6-259b-4194-b152-6063ffca5787}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_MeshEmitter">
-      <UniqueIdentifier>{572697e9-e334-4ef2-bbaa-686aba5ea8f2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_RectEmitter">
-      <UniqueIdentifier>{d49ef37d-8dbc-4fa5-bb4d-69cdb1c95e46}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="05. GameObject\Effect\EffectPart\Effect_NoneParticle">
-      <UniqueIdentifier>{3eda837d-3b83-49b9-ac0d-13e217cd8b2c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Mesh">
-      <UniqueIdentifier>{bf898bea-9c9c-46cf-a2d9-7b77aadbcb2f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Quad">
-      <UniqueIdentifier>{11914a26-172e-4caa-8ce4-2866473d5ef5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Paricle">
-      <UniqueIdentifier>{bba9c8c0-bbfb-47c4-b9c4-975253e549e9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_MeshParticle">
-      <UniqueIdentifier>{f3b89464-2504-4b1f-ac6d-3aaa815d6d01}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_RectParicle">
-      <UniqueIdentifier>{cac7e3a1-ecdd-4d62-8d22-bae46537c29b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="05. GameObject\Effect\Manager">
       <UniqueIdentifier>{e435d7f0-3a1d-4e62-950d-122e3a3dfb16}</UniqueIdentifier>
     </Filter>
@@ -325,6 +298,42 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{2a09911f-6d40-4db8-baf2-7aa0d3c77798}</UniqueIdentifier>
     </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\Helper">
+      <UniqueIdentifier>{47466b3f-ccc1-4efd-befc-77a930fb27ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\EffectChild">
+      <UniqueIdentifier>{eb540f21-f635-42b3-b91f-c216521b7586}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\EffectChild\00. Effect_NoneParticle">
+      <UniqueIdentifier>{3eda837d-3b83-49b9-ac0d-13e217cd8b2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\EffectChild\00. Effect_NoneParticle\Effect_Mesh">
+      <UniqueIdentifier>{bf898bea-9c9c-46cf-a2d9-7b77aadbcb2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\EffectChild\00. Effect_NoneParticle\Effect_Quad">
+      <UniqueIdentifier>{11914a26-172e-4caa-8ce4-2866473d5ef5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\EffectChild\00. Effect_NoneParticle\Effect_Trail">
+      <UniqueIdentifier>{ed6c19d4-a683-4f79-8050-df960275b928}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\EffectChild\01. Effect_Paricle">
+      <UniqueIdentifier>{bba9c8c0-bbfb-47c4-b9c4-975253e549e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\EffectChild\01. Effect_Paricle\Effect_MeshParticle">
+      <UniqueIdentifier>{f3b89464-2504-4b1f-ac6d-3aaa815d6d01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\EffectChild\01. Effect_Paricle\Effect_RectParicle">
+      <UniqueIdentifier>{cac7e3a1-ecdd-4d62-8d22-bae46537c29b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\EffectChild\02. Effect_Emitter">
+      <UniqueIdentifier>{f6fe4cd6-259b-4194-b152-6063ffca5787}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\EffectChild\02. Effect_Emitter\Effect_MeshEmitter">
+      <UniqueIdentifier>{572697e9-e334-4ef2-bbaa-686aba5ea8f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05. GameObject\Effect\EffectPart\EffectChild\02. Effect_Emitter\Effect_RectEmitter">
+      <UniqueIdentifier>{d49ef37d-8dbc-4fa5-bb4d-69cdb1c95e46}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Anim_Layer.h">
@@ -436,43 +445,34 @@
       <Filter>05. GameObject\Effect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_Emitter.h">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\02. Effect_Emitter</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Effect_Manager.h">
       <Filter>05. GameObject\Effect\Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_Mesh.h">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Effect_MeshCommon.h">
-      <Filter>05. GameObject\Effect\EffectPart</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\00. Effect_NoneParticle\Effect_Mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_MeshEmitter.h">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_MeshEmitter</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\02. Effect_Emitter\Effect_MeshEmitter</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_MeshParticle.h">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_MeshParticle</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\01. Effect_Paricle\Effect_MeshParticle</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_NonParticle.h">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Effect_Part.h">
-      <Filter>05. GameObject\Effect\EffectPart</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\00. Effect_NoneParticle</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_Particle.h">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\01. Effect_Paricle</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_Quad.h">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Quad</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\00. Effect_NoneParticle\Effect_Quad</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_RectEmitter.h">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_RectEmitter</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\02. Effect_Emitter\Effect_RectEmitter</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_RectParticle.h">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_RectParicle</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\EffectPart_Enum.h">
-      <Filter>05. GameObject\01. Property</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\01. Effect_Paricle\Effect_RectParicle</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Engine_Defines.h">
       <Filter>99. Defines</Filter>
@@ -672,6 +672,21 @@
     <ClInclude Include="..\public\VIBuffer_Trail.h">
       <Filter>07. Component\VIBuffer\Trail</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Effect_MeshCommon.h">
+      <Filter>05. GameObject\Effect\EffectPart\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_RectCommon.h">
+      <Filter>05. GameObject\Effect\EffectPart\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_Trail.h">
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\00. Effect_NoneParticle\Effect_Trail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_Part.h">
+      <Filter>05. GameObject\Effect\EffectPart</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EffectPart_Enum.h">
+      <Filter>05. GameObject\Effect\EffectPart\Helper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Animation.cpp">
@@ -771,40 +786,34 @@
       <Filter>05. GameObject\Effect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_Emitter.cpp">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\02. Effect_Emitter</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Effect_Manager.cpp">
       <Filter>05. GameObject\Effect\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_Mesh.cpp">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Effect_MeshCommon.cpp">
-      <Filter>05. GameObject\Effect\EffectPart</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\00. Effect_NoneParticle\Effect_Mesh</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_MeshEmitter.cpp">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_MeshEmitter</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\02. Effect_Emitter\Effect_MeshEmitter</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_MeshParticle.cpp">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_MeshParticle</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\01. Effect_Paricle\Effect_MeshParticle</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_NonParticle.cpp">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Effect_Part.cpp">
-      <Filter>05. GameObject\Effect\EffectPart</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\00. Effect_NoneParticle</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_Particle.cpp">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\01. Effect_Paricle</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_Quad.cpp">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_NoneParticle\Effect_Quad</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\00. Effect_NoneParticle\Effect_Quad</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_RectEmitter.cpp">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Emitter\Effect_RectEmitter</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\02. Effect_Emitter\Effect_RectEmitter</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_RectParticle.cpp">
-      <Filter>05. GameObject\Effect\EffectPart\Effect_Paricle\Effect_RectParicle</Filter>
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\01. Effect_Paricle\Effect_RectParicle</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Engine_pch.cpp">
       <Filter>99. Defines\pch</Filter>
@@ -965,6 +974,18 @@
     <ClCompile Include="..\private\VIBuffer_Trail.cpp">
       <Filter>07. Component\VIBuffer\Trail</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Effect_MeshCommon.cpp">
+      <Filter>05. GameObject\Effect\EffectPart\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_RectCommon.cpp">
+      <Filter>05. GameObject\Effect\EffectPart\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_Trail.cpp">
+      <Filter>05. GameObject\Effect\EffectPart\EffectChild\00. Effect_NoneParticle\Effect_Trail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_Part.cpp">
+      <Filter>05. GameObject\Effect\EffectPart</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ShaderFiles\Engine_Shader_Defines.hlsli">
@@ -980,6 +1001,9 @@
       <Filter>95. ShaderFiles</Filter>
     </None>
     <None Include="..\ShaderFiles\Shader_Effect_VtxTex.hlsl">
+      <Filter>95. ShaderFiles</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Effect_Trail.hlsl">
       <Filter>95. ShaderFiles</Filter>
     </None>
     <None Include="..\ShaderFiles\Shader_PostProsess.hlsl">

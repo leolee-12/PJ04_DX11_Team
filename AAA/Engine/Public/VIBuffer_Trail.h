@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "VIBuffer.h"
 
@@ -7,20 +7,25 @@ NS_BEGIN(Engine)
 class ENGINE_DLL CVIBuffer_Trail final : public CVIBuffer
 {
 public:
-    /* CPU Ãø Å¥ ¿ø¼Ò: º» 1½Ö + ÇöÀç ³ªÀÌ */
-    typedef struct tagTrailSample
+    struct TRAIL_SAMPLE
     {
-        _float3 vBase;
-        _float3 vTip;
-        _float  fAge;
-    } TRAIL_SAMPLE;
+        _float3 vBase{};
+        _float3 vTip{};
+        _float  fAge{};
+        _float  fDistance{};            // ëˆ„ì  ì´ë™ ê±°ë¦¬, U ì¢Œí‘œì— ì‚¬ìš© ê°€ëŠ¥
+        _bool   bStartsNewSegment{};    // ì´ì „ ìƒ˜í”Œê³¼ ì—°ê²°í• ì§€ ì—¬ë¶€
+    };
 
-    /* Initialize(pArg)·Î ³Ñ±â´Â µğ½ºÅ©¸³ÅÍ */
-    typedef struct tagTrailDesc
+    struct TRAIL_DESC
     {
-        _uint  iMaxSamples = 32;     /* Å¥ ÃÖ´ë »ùÇÃ ½Ö ¼ö */
-        _float fSampleLifeTime = 0.3f;   /* »ùÇÃÀÌ »ì¾ÆÀÖ´Â ½Ã°£(ÃÊ) */
-    } TRAIL_DESC;
+        _uint  iMaxSamples{ 64 };
+        _float fSampleLifeTime{ 0.3f };
+        _uint  iSmoothSegments{ 4 };
+        _float fSplineSmoothness{ 1.f };
+        _bool  bDistanceUV{ true };
+        _float fTailWidthScale{ 0.f };
+        _float fHeadWidthScale{ 1.f };
+    };
 
 private:
     CVIBuffer_Trail(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -29,27 +34,39 @@ private:
 
 public:
     virtual HRESULT Initialize_Prototype() override;
-    virtual HRESULT Initialize(void* pArg) override;            /* pArg = TRAIL_DESC* */
+    virtual HRESULT Initialize(void* pArg) override;
     virtual HRESULT Bind_Resources() override;
     virtual HRESULT Render() override;
 
 public:
-    /* ¸Å ÇÁ·¹ÀÓ Effect Ãø¿¡¼­ È£Ãâ */
-    void  Push_Sample(const _float3& vBase, const _float3& vTip);
-    void  Update(_float fTimeDelta);
-    void  Clear();
+    HRESULT Configure(const TRAIL_DESC& TrailDesc);
 
-    _bool Is_Empty() const { return m_Samples.size() < 2; }
-    _float Get_LifeTime() const { return m_fSampleLifeTime; }
+    void Push_Sample(const _float3& vBase, const _float3& vTip, _float fInitialAge = 0.f);
+    void Begin_NewSegment();
+    void Update(_float fTimeDelta);
+    void Clear();
+
+    _bool Is_Empty() const { return m_Samples.empty(); }
+    _bool Is_Renderable() const;
+    _bool Has_VertexBuffer() const { return m_pVB != nullptr; }
+    _uint Get_NumSamples() const { return static_cast<_uint>(m_Samples.size()); }
+    _float Get_LifeTime() const { return m_Desc.fSampleLifeTime; }
+    const TRAIL_DESC& Get_Description() const { return m_Desc; }
 
 private:
-    _uint   m_iMaxSamples = { 0 };
-    _float  m_fSampleLifeTime = { 0.3f };
+    TRAIL_DESC m_Desc{};
+    deque<TRAIL_SAMPLE> m_Samples;
+    // ë Œë”ìš© ë³´ê°„ ë Œë”ë§ìš© ìƒ˜í”Œ
+    vector<TRAIL_SAMPLE> m_RenderSamples;
+    // GPUì— ì˜¬ë¦´ ìµœì¢… ì •ì  ë°°ì—´
+    vector<VTXTRAIL> m_RenderVertices;
+    _uint m_iNumActiveVertices{};
+    _bool m_bBreakBeforeNextSample{ true };
 
-    deque<TRAIL_SAMPLE>  m_Samples;
-
-    HRESULT Create_DynamicVB();
-    void    Upload_Vertices();
+private:
+    HRESULT Create_DynamicVB(_uint iNumVertices);
+    HRESULT Upload_Vertices();
+    void Build_RenderVertices();
 
 public:
     static CVIBuffer_Trail* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

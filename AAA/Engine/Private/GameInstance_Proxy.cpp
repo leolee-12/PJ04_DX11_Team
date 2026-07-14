@@ -933,6 +933,14 @@ CShader* CGameInstance_Proxy::Get_MeshShader()
 
 	return m_pOwner->m_pEffect_Manager->Get_MeshShader();
 }
+
+CShader* CGameInstance_Proxy::Get_TrailShader()
+{
+	if (!IsConnected())
+		return nullptr;
+
+	return m_pOwner->m_pEffect_Manager->Get_TrailShader();
+}
 #pragma endregion
 
 #pragma region EDITMODE

@@ -92,6 +92,8 @@ private:
 	CEffect_Container* m_pSwordChargeEffect{};
 	CEffect_Container* m_pSwordSuperChargeEffect{};
 
+	CEffect_Container* m_pUpwardSlash{};
+
 private:
 	void Update_ChargeTime(_float fTimeDelta);
 	void MoveLock_Ratio(_float fRatio, _float fRatioStart, _float fRatioEnd);

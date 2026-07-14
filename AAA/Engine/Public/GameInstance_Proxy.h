@@ -237,6 +237,7 @@ public:
 
     CShader* Get_2DShader();
     CShader* Get_MeshShader();
+    CShader* Get_TrailShader();
 #pragma endregion
 
 #pragma region EDITMODE
