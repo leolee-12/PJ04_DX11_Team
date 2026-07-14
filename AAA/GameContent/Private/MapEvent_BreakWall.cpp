@@ -1,6 +1,7 @@
 #include "MapEvent_BreakWall.h"
 #include "GameContrnt_Events.h"
 #include "Shader_PassMeta.h"
+#include "Effect_Loader.h"
 
 #include "GameInstance.h"
 #include "Geometry_Utils.h"
@@ -9,6 +10,10 @@ namespace
 {
 	constexpr _float BREAK_FRAGMENT_GRAVITY = -15.f;
 	constexpr _float BREAK_FRAGMENT_DESPAWN_FALL_DISTANCE = 30.f;
+	constexpr const _tchar* BREAK_WALL_EFFECT_ID = L"Split_Stone_Ultra";
+	constexpr _float BREAK_WALL_EFFECT_HEIGHT_RATIO = 1.f;
+	constexpr _float BREAK_WALL_EFFECT_FRONT_RATIO = -0.5f;
+
 
 	struct BREAK_FRAGMENT_BIND
 	{
@@ -409,6 +414,36 @@ void CMapEvent_BreakWall::Start_Break()
 	m_bRenderable = true;
 
 	m_pBoostTrigger->Set_Enabled(false);
+
+	// 이펙트 위치는 파편/트리거와 동일하게 Flip_Axis(pivot) 기준으로 계산한다.
+	// (Get_ModelAABB는 메시 로컬이 원점이라 실제 벽 위치와 어긋나 이펙트가 빈 공간에서 재생됨)
+	if (!m_Fragments.empty())
+	{
+		const _float3 vFirstPivot = GeometryUtils::Flip_Axis(STATE::LOOK, m_Fragments.front().vPivot);
+		_float3 vMin = vFirstPivot;
+		_float3 vMax = vFirstPivot;
+
+		for (const BREAK_FRAGMENT& Fragment : m_Fragments)
+		{
+			const _float3 vPivot = GeometryUtils::Flip_Axis(STATE::LOOK, Fragment.vPivot);
+
+			vMin.x = min(vMin.x, vPivot.x); vMin.y = min(vMin.y, vPivot.y); vMin.z = min(vMin.z, vPivot.z);
+			vMax.x = max(vMax.x, vPivot.x); vMax.y = max(vMax.y, vPivot.y); vMax.z = max(vMax.z, vPivot.z);
+		}
+
+		const _float3 vLocalEffectPosition = {
+						(vMin.x + vMax.x) * 0.5f,
+						vMin.y + (vMax.y - vMin.y) * BREAK_WALL_EFFECT_HEIGHT_RATIO,
+						vMin.z + (vMax.z - vMin.z) * BREAK_WALL_EFFECT_FRONT_RATIO
+		};
+
+		_float3 vEffectPosition{};
+		XMStoreFloat3(&vEffectPosition, XMVector3TransformCoord(
+			XMLoadFloat3(&vLocalEffectPosition),
+			XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr())));
+
+		CEffect_Loader::GetInstance()->Spawn(BREAK_WALL_EFFECT_ID, Get_LevelIndex(), vEffectPosition);
+	}
 
 	m_pGameInstance_Proxy->Publish(EventTag::Stage1_Step2_CarBreakMap, nullptr);
 

@@ -2,6 +2,7 @@
 #include "LevelDesign_Registry.h"
 #include "Parsing_Utils.h"
 #include "GameContent_const.h"
+#include "GameObject_Factory.h"   // 추가
 
 #include "Geometry_Utils.h"
 
@@ -46,6 +47,14 @@ namespace
 		//{ L"DeformCoaster", L"Proto_Component_Model_DeformCoaster", "../../Resources/Map/Gimmick/Anim/DeformCoaster/DeformCoaster.ysh", MODEL::ANIM, DEFORM_TYPE::COASTER, DEFORM_OBJECT_KIND::FIXED, 0.f },
 	};
 
+	_bool Is_SupportedCatalog(const LD_DEFORMOBJECT_CATALOG& Entry)
+	{
+		return nullptr != Entry.pModelProtoTag
+			&& nullptr != Entry.pModelPath
+			&& MODEL::END != Entry.eModelType
+			&& DEFORM_TYPE::NONE != Entry.eDeformType;
+	}
+
 	const LD_DEFORMOBJECT_CATALOG* Find_DeformObjectCatalog(const _wstring& strObjectName)
 	{
 		for (const LD_DEFORMOBJECT_CATALOG& Entry : g_DeformObjectCatalog)
@@ -57,12 +66,14 @@ namespace
 		return nullptr;
 	}
 
-	_bool Is_SupportedCatalog(const LD_DEFORMOBJECT_CATALOG& Entry)
+	const LD_DEFORMOBJECT_CATALOG* Find_DeformObjectCatalog_ByType(DEFORM_TYPE eType)
 	{
-		return nullptr != Entry.pModelProtoTag
-			&& nullptr != Entry.pModelPath
-			&& MODEL::END != Entry.eModelType
-			&& DEFORM_TYPE::NONE != Entry.eDeformType;
+		for (const LD_DEFORMOBJECT_CATALOG& Entry : g_DeformObjectCatalog)
+		{
+			if (Entry.eDeformType == eType && Is_SupportedCatalog(Entry))
+				return &Entry;
+		}
+		return nullptr;
 	}
 }
 
@@ -306,6 +317,93 @@ HRESULT CLD_DeformObject::On_DeformReleased(const _float3& vWorldPosition, const
 	return S_OK;
 }
 
+void CLD_DeformObject::Begin_Released(const _float4x4* AnchorWorld)
+{
+	if (nullptr == AnchorWorld)
+		return;
+
+	m_bAvailable = false;      // On_DeformReleased 가드(!m_bAvailable) 통과
+	Set_TriggerEnabled(false);
+	Release_RigidStatic();     // Initialize에서 생성된 RigidStatic 제거(착지 시 재생성)
+
+	_matrix Anchor = XMLoadFloat4x4(AnchorWorld);
+
+	_vector vLook = XMVectorSetY(Anchor.r[2], 0.f);
+	if (XMVectorGetX(XMVector3LengthSq(vLook)) <= FLT_EPSILON)
+		vLook = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+	vLook = XMVector3Normalize(vLook);
+
+	const _vector vReleaseStartPosition = XMVectorSetW(Anchor.r[3], 1.f);
+	const _vector vReleaseTargetPosition = XMVectorSetW(vReleaseStartPosition + vLook *
+		s_fReleaseFwd, 1.f);
+
+	_float3 vStartPosition{};
+	_float3 vTargetPosition{};
+	XMStoreFloat3(&vStartPosition, vReleaseStartPosition);
+	XMStoreFloat3(&vTargetPosition, vReleaseTargetPosition);
+
+	if (S_OK != On_DeformReleased(vStartPosition, vTargetPosition))
+		return;
+
+	m_pTransformCom->LookAt(vReleaseStartPosition + vLook);
+}
+
+HRESULT CLD_DeformObject::Register_StaticPrototype(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+	if (nullptr == pProxy)
+		return E_FAIL;
+
+	const _uint iStatic = ETOUI(LEVEL::STATIC);
+	if (pProxy->Has_Prototype(iStatic, PROTOTYPE_TAG))
+		return S_OK;
+
+	auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(PROTOTYPE_TAG);
+	if (nullptr == pReg)
+		return E_FAIL;
+
+	// 팩토리 LOADER 재사용 → 모델(Proto_Component_Model_DeformCar)을 STATIC에 등록
+	CGameObject_Factory::GetInstance()->LoadResource(PROTOTYPE_TAG, pProxy, pDevice, pContext,
+		iStatic);
+
+	// 객체 프로토타입을 STATIC에 등록
+	return pProxy->Add_Prototype(iStatic, PROTOTYPE_TAG, pReg->CreatorFunc(pDevice, pContext));
+}
+
+HRESULT CLD_DeformObject::Spawn_Released(CGameInstance_Proxy* pProxy, DEFORM_TYPE eType, _uint
+	iTargetLevel, const _float4x4* AnchorWorld)
+{
+	if (nullptr == pProxy || nullptr == AnchorWorld)
+		return E_FAIL;
+
+	const LD_DEFORMOBJECT_CATALOG* pCatalog = Find_DeformObjectCatalog_ByType(eType);
+	if (nullptr == pCatalog)
+		return E_FAIL;
+
+	LD_DEFORMOBJECT_DESC Desc{};   // Clone(pArg==nullptr) 합성 경로와 동일
+	Desc.strObjectName = pCatalog->pObjectName;
+	Desc.strKind = pCatalog->pObjectName;
+	Desc.eCategory = LD_CATEGORY::GIMMICK;
+	Desc.iModelProtoLevel = ETOUI(LEVEL::STATIC);      // STATIC 모델 참조
+	Desc.eModelType = pCatalog->eModelType;
+	Desc.wstrModelProtoTag = pCatalog->pModelProtoTag;
+	Desc.bUseCollMesh = true;
+	Desc.strAnimEventFile.clear();
+	Desc.eDeformType = pCatalog->eDeformType;
+	Desc.fInteractionRadius = pCatalog->fInteractionRadius;
+
+	static _uint s_iSpawnCounter = 0;
+	const _wstring strObjectTag = _wstring(pCatalog->pObjectName) + L"_Spit_" +
+		std::to_wstring(s_iSpawnCounter++);
+
+	CGameObject* pObject = nullptr;
+	if (FAILED(pProxy->Add_GameObject_Return(&pObject, ETOUI(LEVEL::STATIC), PROTOTYPE_TAG,
+		iTargetLevel, LAYER_TAG, strObjectTag, &Desc)) || nullptr == pObject)
+		return E_FAIL;
+
+	static_cast<CLD_DeformObject*>(pObject)->Begin_Released(AnchorWorld);
+	return S_OK;
+}
+
 #pragma region Deformable
 _bool CLD_DeformObject::Request_Deform(const _float4x4* AnchorWorld)
 {
@@ -326,32 +424,6 @@ _bool CLD_DeformObject::Request_Deform(const _float4x4* AnchorWorld)
 	m_pTransformCom->Set_RotationPerSec(s_fAlignRotSpeedDegree);
 
 	return true;
-}
-
-void CLD_DeformObject::End_Deform(const _float4x4* AnchorWorld)
-{
-	if (DEFORM_OBJECT_STATE::ACQUIRED != m_eState)
-		return;
-
-	_matrix Anchor = XMLoadFloat4x4(AnchorWorld);
-
-	_vector vLook = XMVectorSetY(Anchor.r[2], 0.f);
-	if (XMVectorGetX(XMVector3LengthSq(vLook)) <= FLT_EPSILON)
-		vLook = XMVectorSet(0.f, 0.f, 1.f, 0.f);
-	vLook = XMVector3Normalize(vLook);
-
-	const _vector vReleaseStartPosition = XMVectorSetW(Anchor.r[3], 1.f);
-	const _vector vReleaseTargetPosition = XMVectorSetW(vReleaseStartPosition + vLook * s_fReleaseFwd, 1.f);
-
-	_float3 vStartPosition{};
-	_float3 vTargetPosition{};
-	XMStoreFloat3(&vStartPosition, vReleaseStartPosition);
-	XMStoreFloat3(&vTargetPosition, vReleaseTargetPosition);
-
-	if (S_OK != On_DeformReleased(vStartPosition, vTargetPosition))
-		return;
-
-	m_pTransformCom->LookAt(vReleaseStartPosition + vLook);
 }
 #pragma endregion
 
