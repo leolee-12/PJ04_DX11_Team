@@ -38,6 +38,7 @@ HRESULT CMapSection::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_bHasCollMesh = nullptr != m_pModelCom->Get_CollisionMesh();
+	m_bUseCollMesh = m_bUseCollMesh && m_bHasCollMesh;
 
 	m_CombinedWorldMatrix = *m_pTransformCom->Get_WorldMatrixPtr();
 	Update_LocalBounds();
@@ -77,9 +78,7 @@ HRESULT CMapSection::Render_Shadow()
 {
 	if (FAILED(Bind_WorldMatrix()))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
+	if (FAILED(Bind_ShadowTransforms()))
 		return E_FAIL;
 
 	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
@@ -88,9 +87,7 @@ HRESULT CMapSection::Render_Shadow()
 		if (!Should_RenderMesh(i))
 			continue;
 
-		if (FAILED(m_pShaderCom->Begin(ETOI(MAP_PASS::SHADOW))))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Render(i)))
+		if (FAILED(Render_ShadowMesh(i)))
 			return E_FAIL;
 	}
 

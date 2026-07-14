@@ -192,9 +192,7 @@ HRESULT CMapEvent_BreakWall::Render_Shadow()
 		return S_OK;
 	}
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
+	if (FAILED(Bind_ShadowTransforms()))
 		return E_FAIL;
 
 	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
@@ -210,11 +208,7 @@ HRESULT CMapEvent_BreakWall::Render_Shadow()
 
 		const _float4x4 WorldMatrix = Build_FragmentWorldMatrix(*pFragment, BreakWallWorld);
 
-		if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &WorldMatrix)))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom->Begin(ETOI(MAP_PASS::SHADOW))))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Render(i)))
+		if (FAILED(Render_ShadowMesh(i, &WorldMatrix)))
 			return E_FAIL;
 	}
 
@@ -304,22 +298,13 @@ HRESULT CMapEvent_BreakWall::Ready_BoostTrigger()
 	if (m_Fragments.empty())
 		return E_FAIL;
 
-	const _float3 vFirstPivot = {
-			m_Fragments.front().vPivot.x,
-			m_Fragments.front().vPivot.y,
-			-m_Fragments.front().vPivot.z
-	};
-
+	const _float3 vFirstPivot = GeometryUtils::Flip_Axis(STATE::LOOK, m_Fragments.front().vPivot);
 	_float3 vMin = vFirstPivot;
 	_float3 vMax = vFirstPivot;
 
 	for (const BREAK_FRAGMENT& Fragment : m_Fragments)
 	{
-		const _float3 vPivot = {
-				Fragment.vPivot.x,
-				Fragment.vPivot.y,
-				-Fragment.vPivot.z
-		};
+		const _float3 vPivot = GeometryUtils::Flip_Axis(STATE::LOOK, Fragment.vPivot);
 
 		vMin.x = min(vMin.x, vPivot.x);
 		vMin.y = min(vMin.y, vPivot.y);
@@ -452,7 +437,7 @@ void CMapEvent_BreakWall::Start_Break()
 
 _float4x4 CMapEvent_BreakWall::Build_FragmentWorldMatrix(const BREAK_FRAGMENT& Fragment, _fmatrix BreakWallWorld) const
 {
-	const _float3 vEnginePivot = { Fragment.vPivot.x, Fragment.vPivot.y, -Fragment.vPivot.z };
+	const _float3 vEnginePivot = GeometryUtils::Flip_Axis(STATE::LOOK, Fragment.vPivot);
 
 	const _matrix Rotation = XMMatrixRotationQuaternion(XMLoadFloat4(&Fragment.vRotation));
 	const _matrix Translation = XMMatrixTranslation(

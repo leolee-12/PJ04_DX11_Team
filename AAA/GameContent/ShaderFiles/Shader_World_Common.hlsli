@@ -1,4 +1,4 @@
-#include "Engine_Shader_Defines.hlsli"
+               #include "Engine_Shader_Defines.hlsli"
 
 float4x4 g_ViewMatrix, g_ProjMatrix;
 float4x4 g_ViewMatrixInverse, g_ProjMatrixInverse;
@@ -26,6 +26,7 @@ float g_fUVRotate = 0.f;
 #define FLAG_DITHER 0x01u
 
 uint g_iFlags = 0u;
+uint g_iUseInstanceDissolve = 0u;
 float g_fDissolve = 0.f;
 
 uint g_iMaterialID = 0u;
@@ -62,7 +63,8 @@ struct PS_IN
     float2 vTexcoord3 : TEXCOORD3;
 
     float4 vProjPos : TEXCOORD4;
-
+    nointerpolation float fDissolve : TEXCOORD5;
+    
     float4 vTangent : TANGENT;
     float4 vBinormal : BINORMAL;
 };
@@ -86,9 +88,13 @@ static const float Bayer4x4[16] =
     15.0 / 16.0, 7.0 / 16.0, 13.0 / 16.0, 5.0 / 16.0
 };
 
-void Apply_Dissolve(float4 vScreenPos)
+void Apply_Dither(float4 vScreenPos, float fDissolve)
 {
-    float fVisibility = 1.f - g_fDissolve;
+      [branch]
+    if (fDissolve <= 0.0001f)
+        return;
+
+    float fVisibility = 1.f - saturate(fDissolve);
     int2 px = int2(vScreenPos.xy) & 3;
     if (fVisibility <= Bayer4x4[px.y * 4 + px.x])
         discard;
@@ -96,9 +102,21 @@ void Apply_Dissolve(float4 vScreenPos)
 
 void Apply_DitherIfNeeded(float4 vScreenPos)
 {
-    [branch]
+      [branch]
     if (0u != (g_iFlags & FLAG_DITHER))
-        Apply_Dissolve(vScreenPos);
+        Apply_Dither(vScreenPos, g_fDissolve);
+}
+
+void Apply_DitherIfNeeded(PS_IN In)
+{
+      [branch]
+    if (0u != g_iUseInstanceDissolve)
+    {
+        Apply_Dither(In.vPosition, In.fDissolve);
+        return;
+    }
+
+    Apply_DitherIfNeeded(In.vPosition);
 }
 
 float2 Select_UV(float2 vTexcoord0, float2 vTexcoord1, float2 vTexcoord2, float2 vTexcoord3, uint iUVIndex)
@@ -222,6 +240,8 @@ PS_OUT Make_GBufferOutput(PS_IN In, float4 vDiffuse, float3 vNormal, float4 vMRA
 
 PS_OUT PS_WHITE(PS_IN In)
 {
+    Apply_DitherIfNeeded(In);
+    
     return Make_GBufferOutput(
           In,
           float4(1.f, 1.f, 1.f, 1.f),
@@ -232,7 +252,7 @@ PS_OUT PS_WHITE(PS_IN In)
 
 PS_OUT PS_DIFF_SAMPLE(PS_IN In, float2 vUV)
 {
-    Apply_DitherIfNeeded(In.vPosition);
+    Apply_DitherIfNeeded(In);
 
     float4 vDiffuse = g_DiffuseTexture.Sample(LinearSampler, vUV);
     if (vDiffuse.a < 0.1f)
@@ -248,7 +268,7 @@ PS_OUT PS_DIFF_SAMPLE(PS_IN In, float2 vUV)
 
 PS_OUT PS_DMN_SAMPLE(PS_IN In, float2 vBaseUV, float2 vNormalUV, float2 vMaterialUV)
 {
-    Apply_DitherIfNeeded(In.vPosition);
+    Apply_DitherIfNeeded(In);
 
     float4 vDiffuse = g_DiffuseTexture.Sample(LinearSampler, vBaseUV);
     if (vDiffuse.a < 0.1f)
@@ -267,7 +287,7 @@ PS_OUT PS_DMN_SAMPLE(PS_IN In, float2 vBaseUV, float2 vNormalUV, float2 vMateria
 
 PS_OUT PS_UKWN_SAMPLE(PS_IN In, float2 vUV)
 {
-    Apply_DitherIfNeeded(In.vPosition);
+    Apply_DitherIfNeeded(In);
 
     float4 vDiffuse = g_UnknownTexture.Sample(LinearSampler, vUV);
     if (vDiffuse.a < 0.1f)
@@ -283,7 +303,7 @@ PS_OUT PS_UKWN_SAMPLE(PS_IN In, float2 vUV)
 
 PS_OUT PS_UMN_SAMPLE(PS_IN In, float2 vUnknownUV, float2 vNormalUV, float2 vMaterialUV)
 {
-    Apply_DitherIfNeeded(In.vPosition);
+    Apply_DitherIfNeeded(In);
 
     float4 vDiffuse = g_UnknownTexture.Sample(LinearSampler, vUnknownUV);
     if (vDiffuse.a < 0.1f)
@@ -340,7 +360,7 @@ PS_OUT PS_TREESHADOW(PS_IN In)
 
 PS_OUT PS_GRASS_FUR(PS_IN In)
 {
-    Apply_DitherIfNeeded(In.vPosition);
+    Apply_DitherIfNeeded(In);
 
     float4 vMask = g_DiffuseTexture.Sample(LinearSampler, Get_BaseUV(In));
     if (vMask.a < 0.1f)
@@ -360,7 +380,7 @@ PS_OUT PS_GRASS_FUR(PS_IN In)
 
 PS_OUT PS_COLOR(PS_IN In)
 {
-    Apply_DitherIfNeeded(In.vPosition);
+    Apply_DitherIfNeeded(In);
 
     float3 vMRA = g_MRATexture.Sample(LinearSampler, Get_MaterialUV(In)).rgb;
     float3 vNormal = Reconstruct_Normal(In, Get_NormalUV(In));
@@ -381,7 +401,7 @@ PS_OUT PS_DISCARD(PS_IN In)
 
 PS_OUT PS_COLOR_CONST_MRA(PS_IN In)
 {
-    Apply_DitherIfNeeded(In.vPosition);
+    Apply_DitherIfNeeded(In);
 
     float3 vNormal = Reconstruct_Normal(In, Get_NormalUV(In));
 
@@ -393,24 +413,26 @@ PS_OUT PS_COLOR_CONST_MRA(PS_IN In)
                 float4(g_vEmissiveColor.rgb * g_vColor.a, 1.f));
 }
 
-  PS_OUT PS_ARROWBOARD_OPAQUE(PS_IN In)
-  {
-      float4 vDiffuse = g_DiffuseTexture.Sample(LinearSampler, Get_BaseUV(In));
-      float3 vMRA = g_MRATexture.Sample(LinearSampler, Get_MaterialUV(In)).rgb;
-      float3 vNormal = Reconstruct_Normal(In, Get_NormalUV(In));
-      float fArrowMask = step(0.1f, vDiffuse.a);
+PS_OUT PS_ARROWBOARD_OPAQUE(PS_IN In)
+{
+    Apply_DitherIfNeeded(In);
+  
+    float4 vDiffuse = g_DiffuseTexture.Sample(LinearSampler, Get_BaseUV(In));
+    float3 vMRA = g_MRATexture.Sample(LinearSampler, Get_MaterialUV(In)).rgb;
+    float3 vNormal = Reconstruct_Normal(In, Get_NormalUV(In));
+    float fArrowMask = step(0.1f, vDiffuse.a);
 
-      return Make_GBufferOutput(
-                  In,
-                  float4(vDiffuse.rgb, 1.f),
-                  vNormal,
-                  float4(vMRA, 1.f),
-                  float4(g_vEmissiveColor.rgb * fArrowMask, 1.f));
-  }
+    return Make_GBufferOutput(
+                In,
+                float4(vDiffuse.rgb, 1.f),
+                vNormal,
+                float4(vMRA, 1.f),
+                float4(g_vEmissiveColor.rgb * fArrowMask, 1.f));
+}
 
 PS_OUT PS_DMN_OPAQUE(PS_IN In)
 {
-    Apply_DitherIfNeeded(In.vPosition);
+    Apply_DitherIfNeeded(In);
 
     float3 vDiffuse = g_DiffuseTexture.Sample(LinearSampler, Get_BaseUV(In)).rgb;
     float3 vMRA = g_MRATexture.Sample(LinearSampler, Get_MaterialUV(In)).rgb;
@@ -426,7 +448,7 @@ PS_OUT PS_DMN_OPAQUE(PS_IN In)
 
 float4 PS_UKWN_BLACK_OVERLAY(PS_IN In) : SV_TARGET0
 {
-    Apply_DitherIfNeeded(In.vPosition);
+    Apply_DitherIfNeeded(In);
 
     float3 vUnknown = g_UnknownTexture.Sample(LinearSampler, Get_UnknownUV(In)).rgb;
     float fBrightness = saturate(max(vUnknown.r, max(vUnknown.g, vUnknown.b)));

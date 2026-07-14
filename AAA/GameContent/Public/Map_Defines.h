@@ -10,6 +10,8 @@
 
 NS_BEGIN(Client)
 
+// Serialized section classification reserved for future type-specific policies.
+// Current runtime render policy is selected by RENDERID.
 enum class MAP_SECTION_TYPE
 {
 	DEFAULT,

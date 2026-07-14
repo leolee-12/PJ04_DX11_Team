@@ -142,13 +142,7 @@ void CEnvObject_Static::Submit_RenderGroups()
 
 _bool CEnvObject_Static::Should_BypassMainInstance() const
 {
-	if (m_bEditorForceMainPassNonInstanced)
-		return true;
-
-	if (!m_bUseCameraDither)
-		return false;
-
-	return m_fDissolve > 0.0001f;
+	return m_bEditorForceMainPassNonInstanced;
 }
 
 CEnvObject_Static* CEnvObject_Static::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

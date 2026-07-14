@@ -135,7 +135,7 @@ HRESULT CTexture_Hub::LoadOrGet(const _tchar* pTexturePath, TEXTURE_HANDLE* pOut
 			++m_iFirstLoadRequestCount;
 	}
 
-	// 파일 로드/디코딩 -> 락 바깥에서 수행
+	// 파일 I/O는 락 바깥에서 수행
 	ID3D11ShaderResourceView* pSRV = nullptr;
 	const HRESULT hr = Create_TextureSRV(m_pDevice, pTexturePath, &pSRV);
 
@@ -186,8 +186,6 @@ HRESULT CTexture_Hub::Get(const _tchar* pTextureName, TEXTURE_HANDLE* pOut) cons
 	const _wstring strKey = To_NormalizedTextureName(pTextureName);
 	if (strKey.empty())
 		return E_FAIL;
-
-	using GetLock = std::conditional_t<0 != PROFILE_ENABLE, unique_lock<shared_mutex>, shared_lock<shared_mutex>>;
 
 	shared_lock<shared_mutex> Lock(m_Mutex);
 
@@ -291,14 +289,13 @@ ID3D11ShaderResourceView* CTexture_Hub::Get_SRV(TEXTURE_HANDLE Handle) const
 
 CTexture_Hub* CTexture_Hub::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CTexture_Hub* pInstance = new CTexture_Hub(pDevice, pContext);
-
-	if (nullptr == pInstance)
+	if (nullptr == pDevice || nullptr == pContext)
 	{
 		MSG_BOX("Failed to Created : CTexture_Hub");
+		return nullptr;
 	}
 
-	return pInstance;
+	return new CTexture_Hub(pDevice, pContext);
 }
 
 

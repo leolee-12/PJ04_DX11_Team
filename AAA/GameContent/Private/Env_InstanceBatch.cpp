@@ -33,6 +33,13 @@ void CEnv_InstanceBatch::Submit(CEnvObject_Static* pObj, _uint64 iCurrentFrame)
 	Safe_AddRef(pObj);
 
 	tData.InstanceData.matWorld = *pObj->Get_Transform()->Get_WorldMatrixPtr();
+	tData.InstanceData.vDissolveParams = {
+			pObj->Get_FinalMainDissolve(),
+			pObj->Get_FinalShadowDissolve(),
+			0.f,
+			0.f
+	};
+
 	m_Submitted.push_back(tData);
 }
 

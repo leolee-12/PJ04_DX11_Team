@@ -60,10 +60,12 @@ namespace
         { TEXT("BombFuseEffect"),         TEXT("../../Resources/CHJ/Effect/BombFuseEffect.JSON") },
 
         { TEXT("FlowerPetals"),           TEXT("../../Resources/Map/Effect/Proto_FlowerPetals_0.JSON") },
+        { TEXT("FlowerWing"),             TEXT("../../Resources/Map/Effect/Proto_FlowerWing.JSON") },
         { TEXT("Split_Starblock"),        TEXT("../../Resources/Map/Effect/Proto_Split_Starblock_0.JSON") },
         { TEXT("Split_Starblock_Big"),    TEXT("../../Resources/Map/Effect/Proto_Split_Starblock_Big.JSON") },
         { TEXT("Split_Stone"),            TEXT("../../Resources/Map/Effect/Proto_Split_Stone_0.JSON") },
         { TEXT("Split_Stone_Big"),        TEXT("../../Resources/Map/Effect/Proto_Split_Stone_Big.JSON") },
+        { TEXT("Split_Stone_Ultra"),        TEXT("../../Resources/Map/Effect/Proto_Split_Stone_Ultra.JSON") },
         { TEXT("Split_Bush"),             TEXT("../../Resources/Map/Effect/Proto_Split_Bush_0.JSON") },
         { TEXT("BubbleAura"),             TEXT("../../Resources/CHJ/Effect/BubbleAura.JSON") },
     };
