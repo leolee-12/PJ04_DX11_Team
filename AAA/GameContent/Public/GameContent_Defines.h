@@ -38,6 +38,7 @@ namespace Client
 		ESSENCE_BUBBLE,
 		DROPPED_BUBBLE,
 		DEFORM_OBJECT,
+		DROP_STAR,
 		ENV_TRIGGER = 100
 	};
 

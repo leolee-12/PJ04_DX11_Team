@@ -212,6 +212,9 @@
 // CutSceneActor
 #include "DialogueDee.h"
 
+#include "DropStar.h"
+#include "DropStar_Body.h"
+
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
 #define CREATOR(CLASS) \
@@ -729,6 +732,21 @@ void CGameObject_Factory::Register_Container()
                         XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
+
+    // Drop Star
+    Register
+    (
+        CDropStar::PROTOTYPE_TAG, TEXT("ETC"),
+        CREATOR(CDropStar),
+        LOADER
+        (
+                TRY_ADD_PROTO(pProxy, iLevelIndex, CDropStar_Body::PROTOTYPE_TAG, CDropStar_Body::Create(pDevice, pContext));
+   
+                TRY_ADD_PROTO(pProxy, iLevelIndex,  CDropStar_Body::MODEL_PROTO_TAG,
+                                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/DropStar/DropStar.ysh",
+                                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
 }
 
 void CGameObject_Factory::Register_UIContainer()
@@ -1128,7 +1146,7 @@ void CGameObject_Factory::Register_Bubble()
     //Ability Bubble - DroppedBubble
     Register
     (
-        CDroppedBubble::PROTOTYPE_TAG, TEXT("Bubble"),
+        CDroppedBubble::PROTOTYPE_TAG, TEXT("ETC"),
         CREATOR(CDroppedBubble),
         LOADER
         (
@@ -1139,7 +1157,7 @@ void CGameObject_Factory::Register_Bubble()
     //Ability Bubble - EssenceBubble
     Register
     (
-        CEssenceBubble::PROTOTYPE_TAG, TEXT("Bubble"),
+        CEssenceBubble::PROTOTYPE_TAG, TEXT("ETC"),
         CREATOR(CEssenceBubble),
         LOADER
         (

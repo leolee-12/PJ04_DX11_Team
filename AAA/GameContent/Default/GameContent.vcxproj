@@ -22,6 +22,9 @@
     <ClInclude Include="..\Public\Ability_Bubble.h" />
     <ClInclude Include="..\Public\Ability_Model.h" />
     <ClInclude Include="..\Public\Ancor_WorkingDirectory.h" />
+    <ClInclude Include="..\Public\DropStar.h" />
+    <ClInclude Include="..\Public\DropStar_Body.h" />
+    <ClInclude Include="..\Public\DropStar_Manager.h" />
     <ClInclude Include="..\Public\SwordTrail_BK.h" />
     <ClInclude Include="..\Public\BladeKnight_Body.h" />
     <ClInclude Include="..\Public\BladeKnight_Brain.h" />
@@ -397,6 +400,9 @@
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp" />
     <ClCompile Include="..\Private\Ability_Model.cpp" />
+    <ClCompile Include="..\Private\DropStar.cpp" />
+    <ClCompile Include="..\Private\DropStar_Body.cpp" />
+    <ClCompile Include="..\Private\DropStar_Manager.cpp" />
     <ClCompile Include="..\Private\SwordTrail_BK.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Body.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Brain.cpp" />
