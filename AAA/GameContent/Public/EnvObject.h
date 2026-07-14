@@ -5,6 +5,7 @@
 NS_BEGIN(Engine)
 class CShader;
 class CModel;
+class CCullingState;
 NS_END
 
 NS_BEGIN(physx)
@@ -42,6 +43,10 @@ public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
 public:
+	const BoundingBox& Get_WorldBounds() const;
+	const BoundingBox& Get_LocalBounds() const;
+	_bool Pick_Marb1e(_fvector vRayOrigin, _fvector vRayDir, _float3* pOutHit, _float* fOutDistance);
+
 	_bool   Is_ProfileRenderable() const { return m_bRenderable && Has_RenderModel(); }
 	_bool   Is_ShadowCaster() const { return m_bCastShadow; }
 	_bool   Is_Visible_Main() const { return m_bVisible; }
@@ -50,12 +55,10 @@ public:
 	_bool   Is_UseCollMesh() const { return m_bUseCollMesh; }
 
 	const ENV_OBJECT_DESC& Get_Desc() const { return m_tDesc; }
-	const BoundingBox& Get_WorldBounds() const { return m_WorldBounds; }
-	const BoundingBox& Get_LocalBounds() const { return m_LocalBounds; }
 	_float Get_DecalAlpha() const { return m_fDecalAlpha; }
 	_float Get_Dissolve() const { return m_fDissolve; }
-
-	_bool Pick_Marb1e(_fvector vRayOrigin, _fvector vRayDir, _float3* pOutHit, _float* fOutDistance);
+	_float Get_FinalMainDissolve() const;
+	_float Get_FinalShadowDissolve() const;
 
 #pragma region Editable
 	virtual _bool Get_EditDesc(EDITABLE_DESC* pOutDesc) const override;
@@ -75,9 +78,9 @@ protected:
 	_bool	Should_CreatePhysicsActor() const;
 
 	HRESULT Bind_ShaderResources();
-	void	Update_LocalBounds();
-	void	Refresh_WorldBounds();
-	void	Check_Visible();
+	HRESULT Ready_CullingState();
+	void    Refresh_WorldBounds();
+	void    Check_Visible();
 	_bool	Has_RenderModel() const { return nullptr != m_pModelCom; }
 
 protected:
@@ -85,12 +88,10 @@ protected:
 	wstring			m_strProtoTag = { PROTOTYPE_TAG };
 	CShader*		m_pShaderCom = { nullptr };
 	CModel*			m_pModelCom = { nullptr };
+	CCullingState*	m_pCullingState = { nullptr };
 	physx::PxRigidStatic* m_pPhysicsActor = { nullptr };
 	_float3         m_vPhysicsActorScale = { 1.f, 1.f, 1.f };
 
-	BoundingBox		m_LocalBounds = {};
-	BoundingBox		m_WorldBounds = {};
-	_bool			m_bTransformDirty = { true };
 	_bool			m_bVisible = { false };
 	_bool			m_bVisibleShadow = { false };
 	_bool			m_bDebugDraw = { false };

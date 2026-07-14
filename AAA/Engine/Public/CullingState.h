@@ -24,23 +24,23 @@ public:
 		_uint   iCauseFlags = { CAUSE_NONE };
 	};
 
-	struct CHANNEL_POLICY
+	struct CULLING_CHANNEL_QUERY
 	{
-		CULLING_VIEW	eView = { CULLING_VIEW::MAIN_CAMERA };
+		CULLING_VIEW    eView = { CULLING_VIEW::MAIN_CAMERA };
 
-		_bool	bUseDistance = { false };
-		_bool	bUseFrustum = { false };
-		_bool	bUseFrustumFade = { false };
+		_bool   bUseDistance = { true };
+		_bool   bUseFrustum = { true };
+		_bool   bUseFrustumFade = { true };
 
-		_float	fCullDistance = { 175.f };
-		_float	fDistanceFadeWidth = { 10.f };
-		_float	fFrustumFadeWidth = { 1.5f };
+		_float  fCullDistance = { 175.f };
+		_float  fDistanceFadeWidth = { 10.f };
+		_float  fFrustumFadeWidth = { 1.5f };
 	};
 
-	struct EVALUATE_DESC
+	struct CULLING_EVALUATION_INPUT
 	{
-		CHANNEL_POLICY  Main = {};
-		CHANNEL_POLICY  Shadow = { CULLING_VIEW::SHADOW_DIR };
+		CULLING_CHANNEL_QUERY	Main = {};
+		CULLING_CHANNEL_QUERY	Shadow = { CULLING_VIEW::SHADOW_DIR, true, true, false };
 
 		_bool   bEvaluateMain = { true };
 		_bool   bEvaluateShadow = { false };
@@ -63,7 +63,7 @@ public:
 	void Mark_TransformDirty();
 
 	void Refresh_WorldBounds(const _float4x4& WorldMatrix);
-	void Evaluate(const EVALUATE_DESC& Desc);
+	void Evaluate(const CULLING_EVALUATION_INPUT& Desc);
 
 	void Reset_Channel(CHANNEL eChannel);
 	void Reset_AllResults();
@@ -87,7 +87,7 @@ private:
 	CHANNEL_RESULT  m_Results[ETOUI(CHANNEL::COUNT)] = {};
 
 private:
-	void Evaluate_Channel(CHANNEL eChannel, const CHANNEL_POLICY& Policy, const CULLING_FADE_RESULT* pDistanceResult);
+	void Evaluate_Channel(CHANNEL eChannel, const CULLING_CHANNEL_QUERY& Query, const CULLING_FADE_RESULT* pDistanceResult);
 
 public:
 	static CCullingState* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

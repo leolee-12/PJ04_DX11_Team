@@ -35,10 +35,10 @@ HRESULT CCullingState::Initialize(void* pArg)
 
 HRESULT CCullingState::Set_LocalBounds(const BoundingBox& LocalBounds)
 {
-	m_LocalBounds = GeometryUtils::Is_ValidAABB(LocalBounds)
-		? LocalBounds
-		: GeometryUtils::Make_DefaultAABB(0.5f);
+	if (!GeometryUtils::Is_ValidAABB(LocalBounds))
+		return E_FAIL;
 
+	m_LocalBounds = LocalBounds;
 	m_bHasBounds = true;
 	m_bRotationInvariant = false;
 	Mark_TransformDirty();
@@ -46,7 +46,6 @@ HRESULT CCullingState::Set_LocalBounds(const BoundingBox& LocalBounds)
 
 	return S_OK;
 }
-
 
 HRESULT CCullingState::Set_LocalBoundsFromModel(CModel* pModel, _float fMargin)
 {
@@ -56,9 +55,10 @@ HRESULT CCullingState::Set_LocalBoundsFromModel(CModel* pModel, _float fMargin)
 	_float3 vMin{}, vMax{};
 	pModel->Get_ModelAABB(&vMin, &vMax);
 
-	BoundingBox LocalBounds = GeometryUtils::Is_ValidAABB(vMin, vMax)
-		? GeometryUtils::Make_AABB_FromMinMax(vMin, vMax)
-		: GeometryUtils::Make_DefaultAABB(0.5f);
+	if (!GeometryUtils::Is_ValidAABB(vMin, vMax))
+		return E_FAIL;
+
+	BoundingBox LocalBounds = GeometryUtils::Make_AABB_FromMinMax(vMin, vMax);
 
 	if (!GeometryUtils::Expand_AABB(&LocalBounds, fMargin))
 		return E_FAIL;
@@ -111,7 +111,7 @@ void CCullingState::Refresh_WorldBounds(const _float4x4& WorldMatrix)
 	m_bTransformDirty = false;
 }
 
-void CCullingState::Evaluate(const EVALUATE_DESC& Desc)
+void CCullingState::Evaluate(const CULLING_EVALUATION_INPUT& Desc)
 {
 	Reset_AllResults();
 
@@ -223,7 +223,7 @@ const BoundingBox& CCullingState::Get_WorldBounds() const
 	return m_WorldBounds;
 }
 
-void CCullingState::Evaluate_Channel(CHANNEL eChannel, const CHANNEL_POLICY& Policy, const CULLING_FADE_RESULT* pDistanceResult)
+void CCullingState::Evaluate_Channel(CHANNEL eChannel, const CULLING_CHANNEL_QUERY& Query, const CULLING_FADE_RESULT* pDistanceResult)
 {
 	CHANNEL_RESULT& Result = m_Results[ETOUI(eChannel)];
 
@@ -242,16 +242,16 @@ void CCullingState::Evaluate_Channel(CHANNEL eChannel, const CHANNEL_POLICY& Pol
 		}
 	}
 
-	if (!Policy.bUseFrustum)
+	if (!Query.bUseFrustum)
 		return;
 
-	if (Policy.bUseFrustumFade)
+	if (Query.bUseFrustumFade)
 	{
 		const CULLING_FADE_RESULT FrustumResult =
 			m_pGameInstance_Proxy->Evaluate_FrustumFadeAABB(
-				Policy.eView,
+				Query.eView,
 				m_WorldBounds,
-				Policy.fFrustumFadeWidth,
+				Query.fFrustumFadeWidth,
 				CCulling_Manager::CULLING_PLANE_MASK_MAIN_SIDE);
 
 		Result.fDissolve = max(Result.fDissolve, FrustumResult.fDissolve);
@@ -268,7 +268,7 @@ void CCullingState::Evaluate_Channel(CHANNEL eChannel, const CHANNEL_POLICY& Pol
 		return;
 	}
 
-	if (m_pGameInstance_Proxy->Should_CullAABB(Policy.eView, m_WorldBounds))
+	if (m_pGameInstance_Proxy->Should_CullAABB(Query.eView, m_WorldBounds))
 	{
 		Result.bCulled = true;
 		Result.fDissolve = 1.f;

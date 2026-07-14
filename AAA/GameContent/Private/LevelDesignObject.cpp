@@ -3,17 +3,13 @@
 
 #include "GameInstance.h"
 #include "Geometry_Utils.h"
+#include "CullingState.h"
 
 NS_BEGIN(Client)
 
 namespace
 {
 	constexpr _bool		ENABLE_LD_OBJECT_SHADOW = true;
-	constexpr _float	LD_DISTANCE_CULL_START = 175.f;
-	constexpr _float	LD_SHADOW_DISTANCE_CULL_START = 175.f;
-	constexpr _uint		LD_CULL_CHECK_INTERVAL = 2u;
-
-	static_assert(0u < LD_CULL_CHECK_INTERVAL);
 }
 
 CLevelDesignObject::CLevelDesignObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -25,8 +21,6 @@ CLevelDesignObject::CLevelDesignObject(const CLevelDesignObject& Prototype)
 	: CGameObject(Prototype)
 	, m_tLevelDesignDesc(Prototype.m_tLevelDesignDesc)
 	, m_bUseShadow(Prototype.m_bUseShadow)
-	, m_bUseCullDistance(Prototype.m_bUseCullDistance)
-	, m_bUseCullFrustum(Prototype.m_bUseCullFrustum)
 {
 }
 
@@ -48,6 +42,10 @@ HRESULT CLevelDesignObject::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+	m_pCullingState = Add_Component<CCullingState>(L"Com_CullingState", CCullingState::Create(m_pDevice, m_pContext));
+	if (nullptr == m_pCullingState)
+		return E_FAIL;
+
 	m_iMaterialID = 0;
 
 	return S_OK;
@@ -55,7 +53,7 @@ HRESULT CLevelDesignObject::Initialize(void* pArg)
 
 HRESULT CLevelDesignObject::Validate_Initialized()
 {
-	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom)
+	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom || nullptr == m_pCullingState)
 		return E_FAIL;
 	if (m_tLevelDesignDesc.strObjectName.empty())
 		return E_FAIL;
@@ -91,6 +89,7 @@ void CLevelDesignObject::Add_EditModelSlot(vector<EDITABLE_MODEL_SLOT>* pOutSlot
 
 	pOutSlots->push_back(Slot);
 }
+
 void CLevelDesignObject::Build_EditCapabilities(_uint* pOutCaps, EDIT_OBJECT_POLICY* pOutPolicy) const
 {
 	if (nullptr != pOutCaps)
@@ -164,11 +163,8 @@ HRESULT CLevelDesignObject::Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy)
 
 HRESULT CLevelDesignObject::On_EditTransformChanged()
 {
-	if (!m_bHasCullBounds)
-		return S_OK;
+	m_pCullingState->Mark_TransformDirty();
 
-	Refresh_WorldBounds();
-	m_iCullCheckCounter = 0u;
 	return S_OK;
 }
 
@@ -204,103 +200,55 @@ HRESULT CLevelDesignObject::Apply_EditMeshLayer(_uint iModelSlot, _uint iMesh, c
 }
 #pragma endregion
 
-HRESULT CLevelDesignObject::Ready_CullBounds(CModel* pModel, _float fBoundsMargin)
+HRESULT CLevelDesignObject::Ready_CullingState(CModel* pModel, _float fBoundsMargin, _bool bRotationInvariant)
 {
-	if (nullptr == pModel || nullptr == m_pTransformCom)
+	if (nullptr == pModel || nullptr == m_pTransformCom || nullptr == m_pCullingState)
 		return E_FAIL;
 
-	_float3 vMin{}, vMax{};
-	pModel->Get_ModelAABB(&vMin, &vMax);
-
-	BoundingBox LocalBounds = GeometryUtils::Is_ValidAABB(vMin, vMax)
-		? GeometryUtils::Make_AABB_FromMinMax(vMin, vMax)
-		: GeometryUtils::Make_DefaultAABB(0.5f);
-
-	if (!GeometryUtils::Expand_AABB(&LocalBounds, fBoundsMargin))
+	if (FAILED(m_pCullingState->Set_LocalBoundsFromModel(pModel, fBoundsMargin)))
 		return E_FAIL;
 
-	Set_CullLocalBounds(LocalBounds);
+	m_pCullingState->Set_RotationInvariant(bRotationInvariant);
+	m_pCullingState->Refresh_WorldBounds(*m_pTransformCom->Get_WorldMatrixPtr());
+
 	return S_OK;
 }
 
-HRESULT CLevelDesignObject::Ready_CullBounds_RotationInvariant(CModel* pModel, _float fBoundsMargin)
+HRESULT CLevelDesignObject::Ready_CullingState(const BoundingBox& LocalBounds, _bool bRotationInvariant)
 {
-	if (FAILED(Ready_CullBounds(pModel, fBoundsMargin)))
+	if (nullptr == m_pTransformCom || nullptr == m_pCullingState)
 		return E_FAIL;
 
-	m_bUseRotationInvariantCullBounds = true;
-	Refresh_WorldBounds();
+	if (FAILED(m_pCullingState->Set_LocalBounds(LocalBounds)))
+		return E_FAIL;
+
+	m_pCullingState->Set_RotationInvariant(bRotationInvariant);
+	m_pCullingState->Refresh_WorldBounds(*m_pTransformCom->Get_WorldMatrixPtr());
+
 	return S_OK;
-}
-
-void CLevelDesignObject::Set_CullLocalBounds(const BoundingBox& LocalBounds)
-{
-	m_LocalBounds = GeometryUtils::Is_ValidAABB(LocalBounds)
-		? LocalBounds
-		: GeometryUtils::Make_DefaultAABB(0.5f);
-
-	m_bHasCullBounds = true;
-	m_bUseRotationInvariantCullBounds = false;
-	m_iCullCheckCounter = m_tLevelDesignDesc.iUid % LD_CULL_CHECK_INTERVAL;
-
-	Refresh_WorldBounds();
-}
-
-void CLevelDesignObject::Refresh_WorldBounds()
-{
-	if (!m_bHasCullBounds || nullptr == m_pTransformCom)
-		return;
-
-	if (m_bUseRotationInvariantCullBounds)
-	{
-		const _float3 vScale = m_pTransformCom->Get_Scaled();
-		const _float fMaxScale = max(vScale.x, max(vScale.y, vScale.z));
-		const _float fRadius = (XMVectorGetX(XMVector3Length(XMLoadFloat3(&m_LocalBounds.Center)))
-			+ XMVectorGetX(XMVector3Length(XMLoadFloat3(&m_LocalBounds.Extents)))) * fMaxScale;
-
-		_float3 vPosition{};
-		XMStoreFloat3(&vPosition, m_pTransformCom->Get_State(STATE::POSITION));
-		m_WorldBounds = BoundingBox(vPosition, _float3(fRadius, fRadius, fRadius));
-		return;
-	}
-
-	GeometryUtils::Transform_AABB(m_LocalBounds, XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()), &m_WorldBounds);
 }
 
 void CLevelDesignObject::Check_Visible()
 {
+	const _bool bUseCulling = Is_CullingEnabled();
 	const _bool bShadowPolicy = ENABLE_LD_OBJECT_SHADOW && m_bUseShadow;
 
-	if (!m_bHasCullBounds)
+	CCullingState::CULLING_EVALUATION_INPUT Input{};
+	Input.bEvaluateMain = bUseCulling;
+	Input.bEvaluateShadow = bUseCulling && bShadowPolicy;
+
+	if (bUseCulling)
 	{
-		m_bVisible = true;
-		m_bVisibleShadow = bShadowPolicy;
-		return;
+		if (Is_CullTransformDynamic())
+			m_pCullingState->Mark_TransformDirty();
+
+		m_pCullingState->Refresh_WorldBounds(*m_pTransformCom->Get_WorldMatrixPtr());
 	}
 
-	if (0u < m_iCullCheckCounter)
-	{
-		--m_iCullCheckCounter;
-		m_bVisibleShadow = m_bVisibleShadow && bShadowPolicy;
-		return;
-	}
-	m_iCullCheckCounter = LD_CULL_CHECK_INTERVAL - 1u;
+	m_pCullingState->Evaluate(Input);
 
-	m_bVisible = true;
-	m_bVisibleShadow = bShadowPolicy;
-
-	if (m_bUseCullDistance && m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, LD_DISTANCE_CULL_START))
-		m_bVisible = false;
-	else if (m_bUseCullFrustum && m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, m_WorldBounds))
-		m_bVisible = false;
-
-	if (m_bVisibleShadow)
-	{
-		if (m_bUseCullDistance && m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, LD_SHADOW_DISTANCE_CULL_START))
-			m_bVisibleShadow = false;
-		else if (m_bUseCullFrustum && m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_WorldBounds))
-			m_bVisibleShadow = false;
-	}
+	m_bVisible = !m_pCullingState->Is_Culled(CCullingState::CHANNEL::MAIN);
+	m_bVisibleShadow = bShadowPolicy && !m_pCullingState->Is_Culled(CCullingState::CHANNEL::SHADOW);
 }
 
 void CLevelDesignObject::Submit_RenderGroups(RENDERID eMainID)
