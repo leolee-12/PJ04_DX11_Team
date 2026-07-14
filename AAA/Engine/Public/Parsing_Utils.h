@@ -49,6 +49,46 @@ namespace JsonUtils
 		return Find_JsonValueByPath(jSource, std::string_view(strPath));
 	}
 
+	inline _bool Find_NonFiniteNumberPath(const json& jValue, const _string& strPath, _string* pOutPath)
+	{
+		if (jValue.is_number_float())
+		{
+			if (std::isfinite(jValue.get<double>()))
+				return false;
+
+			if (nullptr != pOutPath)
+				*pOutPath = strPath;
+			return true;
+		}
+
+		if (jValue.is_array())
+		{
+			for (size_t i = 0; i < jValue.size(); ++i)
+			{
+				const _string strElementPath = strPath + "[" + to_string(i) + "]";
+				if (Find_NonFiniteNumberPath(jValue[i], strElementPath, pOutPath))
+					return true;
+			}
+
+			return false;
+		}
+
+		if (jValue.is_object())
+		{
+			for (auto Iter = jValue.begin(); Iter != jValue.end(); ++Iter)
+			{
+				const _string strMemberPath = strPath.empty()
+					? Iter.key()
+					: strPath + "." + Iter.key();
+
+				if (Find_NonFiniteNumberPath(*Iter, strMemberPath, pOutPath))
+					return true;
+			}
+		}
+
+		return false;
+	}
+
 	inline _bool Has_NumberArrayElements(const json& jValue, size_t iRequiredCount)
 	{
 		if (!jValue.is_array() || jValue.size() < iRequiredCount)
@@ -160,6 +200,20 @@ namespace JsonUtils
 		return false;
 	}
 
+	inline _bool Try_ReadFloat2Array(const json& jSource, const _string& strPath, _float2* pOut)
+	{
+		if (nullptr == pOut)
+			return false;
+
+		const json* pValue = Find_JsonValue(jSource, strPath);
+		if (nullptr == pValue || !Has_NumberArrayElements(*pValue, 2) || pValue->size() != 2)
+			return false;
+
+		pOut->x = (*pValue)[0].get<_float>();
+		pOut->y = (*pValue)[1].get<_float>();
+		return true;
+	}
+
 	inline _bool Try_ReadFloat3Array(const json& jSource, const _string& strPath, _float3* pOut)
 	{
 		if (nullptr == pOut)
@@ -205,29 +259,35 @@ namespace JsonUtils
 		if (pValue->empty())
 			return true;
 
+		vector<_float3> Values;
+
 		if ((*pValue)[0].is_array())
 		{
-			pOut->reserve(pValue->size());
+			Values.reserve(pValue->size());
 
 			for (const json& jItem : *pValue)
 			{
-				if (!jItem.is_array() || jItem.size() < 3)
+				if (!jItem.is_array() || jItem.size() < 3
+					|| !jItem[0].is_number() || !jItem[1].is_number() || !jItem[2].is_number())
+				{
 					return false;
+				}
 
 				_float3 Value{};
 				Value.x = jItem[0].get<_float>();
 				Value.y = jItem[1].get<_float>();
 				Value.z = jItem[2].get<_float>();
-				pOut->push_back(Value);
+				Values.push_back(Value);
 			}
 
+			pOut->swap(Values);
 			return true;
 		}
 
 		if (0 != (pValue->size() % 3u))
 			return false;
 
-		pOut->reserve(pValue->size() / 3u);
+		Values.reserve(pValue->size() / 3u);
 
 		for (size_t i = 0; i < pValue->size(); i += 3u)
 		{
@@ -242,9 +302,10 @@ namespace JsonUtils
 			Value.x = (*pValue)[i + 0].get<_float>();
 			Value.y = (*pValue)[i + 1].get<_float>();
 			Value.z = (*pValue)[i + 2].get<_float>();
-			pOut->push_back(Value);
+			Values.push_back(Value);
 		}
 
+		pOut->swap(Values);
 		return true;
 	}
 
@@ -271,9 +332,11 @@ namespace JsonUtils
 		return true;
 	}
 
-	inline _bool Equals_NoCase(const _tchar* strLeft, const _tchar* pRight)
+	inline _bool Equals_NoCase(const _tchar* pLeft, const _tchar* pRight)
 	{
-		return 0 == _wcsicmp(strLeft, pRight);
+		return nullptr != pLeft
+			&& nullptr != pRight
+			&& 0 == _wcsicmp(pLeft, pRight);
 	}
 }
 

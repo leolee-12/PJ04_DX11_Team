@@ -28,6 +28,7 @@ namespace
         { TEXT("SpinSlashTrail_Super"),   TEXT("../../Resources/YSE/EffectContainer/SpinSlashTrail_Super.json") },
         { TEXT("SwordChargeEffect"),      TEXT("../../Resources/YSE/EffectContainer/SwordChargeEffect.json") },
         { TEXT("SwordSuperChargeEffect"), TEXT("../../Resources/YSE/EffectContainer/SwordSuperChargeEffect.json") },
+        {TEXT("UpwardsSlash"),            TEXT("../../Resources/YSE/EffectContainer/UpwardsSlash.JSON")},
 
         { TEXT("RockFloor"),              TEXT("../../Resources/YSH/Effects/Proto_RockBurst_0.json") },
         { TEXT("BoostGas"),               TEXT("../../Resources/YSE/EffectContainer/BoostGas.json") },
@@ -59,10 +60,12 @@ namespace
         { TEXT("BombFuseEffect"),         TEXT("../../Resources/CHJ/Effect/BombFuseEffect.JSON") },
 
         { TEXT("FlowerPetals"),           TEXT("../../Resources/Map/Effect/Proto_FlowerPetals_0.JSON") },
+        { TEXT("FlowerWing"),             TEXT("../../Resources/Map/Effect/Proto_FlowerWing.JSON") },
         { TEXT("Split_Starblock"),        TEXT("../../Resources/Map/Effect/Proto_Split_Starblock_0.JSON") },
         { TEXT("Split_Starblock_Big"),    TEXT("../../Resources/Map/Effect/Proto_Split_Starblock_Big.JSON") },
         { TEXT("Split_Stone"),            TEXT("../../Resources/Map/Effect/Proto_Split_Stone_0.JSON") },
         { TEXT("Split_Stone_Big"),        TEXT("../../Resources/Map/Effect/Proto_Split_Stone_Big.JSON") },
+        { TEXT("Split_Stone_Ultra"),        TEXT("../../Resources/Map/Effect/Proto_Split_Stone_Ultra.JSON") },
         { TEXT("Split_Bush"),             TEXT("../../Resources/Map/Effect/Proto_Split_Bush_0.JSON") },
         { TEXT("BubbleAura"),             TEXT("../../Resources/CHJ/Effect/BubbleAura.JSON") },
 

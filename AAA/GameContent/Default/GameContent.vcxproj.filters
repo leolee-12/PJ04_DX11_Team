@@ -133,7 +133,7 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\15. Split">
       <UniqueIdentifier>{6fc60edd-b034-4d2e-b974-b555d698dd72}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\16. TrailContainer">
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\16. Kirby_SwordTrail">
       <UniqueIdentifier>{a31c6265-e519-49a8-9abc-68d8e557c0b2}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect">
@@ -1653,6 +1653,9 @@
     <ClInclude Include="..\Public\Kirby_SwordHat.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_SwordTrail.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\16. Kirby_SwordTrail</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Kirby_Wait.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait</Filter>
     </ClInclude>
@@ -2141,9 +2144,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\TrailCommon.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\06. TrailCommon</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\TrailContainer.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\16. TrailContainer</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UI_BossStatus.h">
       <Filter>00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus</Filter>
@@ -2729,6 +2729,9 @@
     <ClCompile Include="..\Private\Kirby_SwordHat.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kirby_SwordTrail.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\16. Kirby_SwordTrail</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Kirby_Wait.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait</Filter>
     </ClCompile>
@@ -3190,9 +3193,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\TrailCommon.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\06. TrailCommon</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\TrailContainer.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\16. TrailContainer</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI_BossStatus.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus</Filter>

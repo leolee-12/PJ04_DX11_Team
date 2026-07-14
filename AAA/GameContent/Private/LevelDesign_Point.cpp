@@ -82,7 +82,7 @@ HRESULT CLevelDesign_Point::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	if (FAILED(Ready_CullBounds_RotationInvariant(m_pModelCom)))
+	if (FAILED(Ready_CullingState(m_pModelCom, 0.f, true)))
 		return E_FAIL;
 
 	m_bUseShadow = true;
@@ -266,6 +266,7 @@ HRESULT CLevelDesign_Point::Render_Model()
 		MESH_LAYER_BIND_CONTEXT Ctx{};
 		Ctx.pShader = m_pShaderCom;
 		Ctx.pModel = m_pModelCom;
+		Ctx.pCullingState = m_pCullingState;
 		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
 		Ctx.iMesh = i;
 		Ctx.pLayer = &Layer;

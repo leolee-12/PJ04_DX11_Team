@@ -455,8 +455,7 @@ HRESULT CLevelDesign_Bush::Ready_BushCullBounds()
 	if (!bHasBounds || !GeometryUtils::Expand_AABB(&CullBounds, BUSH_CULL_MARGIN))
 		return E_FAIL;
 
-	Set_CullLocalBounds(CullBounds);
-	return S_OK;
+	return Ready_CullingState(CullBounds);
 }
 
 
@@ -545,13 +544,13 @@ HRESULT CLevelDesign_Bush::Render_Model(BUSH_STATE eSlot)
 			MESH_LAYER_BIND_CONTEXT Ctx{};
 			Ctx.pShader = pShader;
 			Ctx.pModel = pModel;
+			Ctx.pCullingState = m_pCullingState;
 			Ctx.pGI_Proxy = m_pGameInstance_Proxy;
 			Ctx.iMesh = i;
 			Ctx.pLayer = &Layer;
 			Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_ANIM;
 			Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
 			Ctx.iFallbackPass = ETOUI(WORLD_PASS::UMN);
-			Ctx.fDissolve = 0.f;
 
 			MESH_LAYER_BIND_RESULT Result{};
 			if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
@@ -571,13 +570,13 @@ HRESULT CLevelDesign_Bush::Render_Model(BUSH_STATE eSlot)
 			MESH_LAYER_BIND_CONTEXT Ctx{};
 			Ctx.pShader = pShader;
 			Ctx.pModel = pModel;
+			Ctx.pCullingState = m_pCullingState;
 			Ctx.pGI_Proxy = m_pGameInstance_Proxy;
 			Ctx.iMesh = i;
 			Ctx.pLayer = &Layer;
 			Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
 			Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
 			Ctx.iFallbackPass = ETOUI(WORLD_PASS::UMN);
-			Ctx.fDissolve = 0.f;
 
 			MESH_LAYER_BIND_RESULT Result{};
 			if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))

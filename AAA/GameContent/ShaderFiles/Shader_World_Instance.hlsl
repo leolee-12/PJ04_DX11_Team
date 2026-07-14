@@ -10,6 +10,7 @@ struct VS_IN
     float2 vTexcoord3 : TEXCOORD3;
     float4 vTangent : TANGENT;
     float4 vBinormal : BINORMAL;
+    float4 vDissolveParams : DISSOLVE;
 
     row_major float4x4 WorldMatrix : WORLD;
 };
@@ -26,6 +27,7 @@ PS_IN VS_MAIN(VS_IN In)
     Out.vTexcoord2 = In.vTexcoord2;
     Out.vTexcoord3 = In.vTexcoord3;
     Out.vProjPos = Out.vPosition;
+    Out.fDissolve = In.vDissolveParams.x;
     Out.vTangent = float4(normalize(mul(float4(In.vTangent.xyz, 0.f), In.WorldMatrix).xyz), In.vTangent.w);
     Out.vBinormal = float4(normalize(mul(float4(In.vBinormal.xyz, 0.f), In.WorldMatrix).xyz), In.vBinormal.w);
 
@@ -40,6 +42,7 @@ struct VS_SHADOW_OUT
     float4 vProjPos : TEXCOORD0;
     float2 vTexcoord : TEXCOORD1;
     float2 vUnknownTexcoord : TEXCOORD2;
+    nointerpolation float fDissolve : TEXCOORD3;
 };
 
 VS_SHADOW_OUT VS_SHADOW(VS_IN In)
@@ -49,6 +52,7 @@ VS_SHADOW_OUT VS_SHADOW(VS_IN In)
     float4 vWorldPosition = mul(float4(In.vPosition, 1.f), In.WorldMatrix);
     Out.vPosition = mul(mul(vWorldPosition, g_ViewMatrix), g_ProjMatrix);
     Out.vProjPos = Out.vPosition;
+    Out.fDissolve = In.vDissolveParams.y;
     Out.vTexcoord = Apply_UVTransform(Select_UV(In.vTexcoord0, In.vTexcoord1, In.vTexcoord2, In.vTexcoord3, g_iUVIndex), g_vUVTransform);
     Out.vUnknownTexcoord = Apply_UVTransform(Select_UV(In.vTexcoord0, In.vTexcoord1, In.vTexcoord2, In.vTexcoord3, g_iUnknownUVIndex),
       g_vUVTransformUnknown);
@@ -58,6 +62,7 @@ VS_SHADOW_OUT VS_SHADOW(VS_IN In)
 
 PS_SHADOW_OUT PS_SHADOW(VS_SHADOW_OUT In)
 {
+    Apply_Dither(In.vPosition, In.fDissolve);
     Apply_ShadowAlphaCut(In.vTexcoord, In.vUnknownTexcoord);
     return Make_ShadowOutput(In.vProjPos);
 }

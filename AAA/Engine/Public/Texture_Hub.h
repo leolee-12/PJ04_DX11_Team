@@ -27,6 +27,8 @@ public:
 private:
 	ID3D11Device* m_pDevice = { nullptr };
 	ID3D11DeviceContext* m_pContext = { nullptr };
+
+	// 캐시된 텍스처는 허브 수명 동안 유지(STATIC), 개별 삭제는 아직 미지원
 	vector<ID3D11ShaderResourceView*> m_SRVs;
 	unordered_map<_wstring, TEXTURE_HANDLE> m_HandleByNormalizedPath;
 	unordered_map<_wstring, TEXTURE_HANDLE> m_HandleByTextureName;
