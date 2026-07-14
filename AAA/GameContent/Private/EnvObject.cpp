@@ -4,14 +4,13 @@
 #include "GameInstance.h"
 #include "Profiler_Manager.h"
 #include "Geometry_Utils.h"
+#include "CullingState.h"
 
 NS_BEGIN(Client)
 
 namespace
 {
 	constexpr _bool		ENABLE_ENV_OBJECT_SHADOW = true;
-	constexpr _float	ENV_DISTANCE_CULL_START = 175.f;
-	constexpr _float	ENV_SHADOW_DISTANCE_CULL_START = 175.f;
 
 	void Log_EnvPhysicsWarning(const string& strMessage)
 	{
@@ -82,6 +81,9 @@ HRESULT CEnvObject::Initialize(void* pArg)
 	Apply_DescDefaults();
 	Apply_TransformFromDesc();
 
+	if (FAILED(Ready_CullingState()))
+		return E_FAIL;
+
 	m_bUseCameraDither = m_tDesc.tRender.bUseNearDistAlpha;
 	m_bIsDecal = m_tDesc.tRender.bIsDecal;
 
@@ -92,9 +94,10 @@ void CEnvObject::Late_Update(_float fTimeDelta)
 {
 	if (!m_bUseCameraDither) { m_fDissolve = 0.f; return; }
 
+	const BoundingBox& WorldBounds = m_pCullingState->Get_WorldBounds();
 	_vector C = XMLoadFloat4(m_pGameInstance_Proxy->Get_CamPosition());
-	_vector E = XMLoadFloat3(&m_WorldBounds.Center);   // 객체 위치
-	_float  d = XMVectorGetX(XMVector3Length(E - C));  // 객체-카메라 거리
+	_vector E = XMLoadFloat3(&WorldBounds.Center);		// 객체 위치
+	_float  d = XMVectorGetX(XMVector3Length(E - C));	// 객체-카메라 거리
 
 	// near → 1(사라짐),  far → 0(불투명)
 	_float t = (m_fDitherFar - d) / max(m_fDitherFar - m_fDitherNear, 1e-4f);
@@ -121,6 +124,7 @@ HRESULT CEnvObject::Render()
 		MESH_LAYER_BIND_CONTEXT Ctx{};
 		Ctx.pShader = m_pShaderCom;
 		Ctx.pModel = m_pModelCom;
+		Ctx.pCullingState = m_pCullingState;
 		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
 		Ctx.iMesh = i;
 		Ctx.pLayer = &Layer;
@@ -166,6 +170,7 @@ HRESULT CEnvObject::Render_Shadow()
 		MESH_LAYER_BIND_CONTEXT Ctx{};
 		Ctx.pShader = m_pShaderCom;
 		Ctx.pModel = m_pModelCom;
+		Ctx.pCullingState = m_pCullingState;
 		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
 		Ctx.iMesh = i;
 		Ctx.pLayer = &Layer;
@@ -208,8 +213,9 @@ HRESULT CEnvObject::Render_Decal()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrixInverse", m_pGameInstance_Proxy->Get_InverseMatrix_Prespec(D3DTS::PROJ))))
 		return E_FAIL;
 
-	const _float3 vDecalBoundsCenter = m_LocalBounds.Center;
-	const _float3 vDecalBoundsExtents = m_LocalBounds.Extents;
+	const BoundingBox& LocalBounds = m_pCullingState->Get_LocalBounds();
+	const _float3 vDecalBoundsCenter = LocalBounds.Center;
+	const _float3 vDecalBoundsExtents = LocalBounds.Extents;
 
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vDecalBoundsCenter", &vDecalBoundsCenter, sizeof(_float3))))
 		return E_FAIL;
@@ -266,6 +272,16 @@ void CEnvObject::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	pOutData->strPrototypeTag = m_strProtoTag;
 }
 
+const BoundingBox& CEnvObject::Get_WorldBounds() const
+{
+	return m_pCullingState->Get_WorldBounds();
+}
+
+const BoundingBox& CEnvObject::Get_LocalBounds() const
+{
+	return m_pCullingState->Get_LocalBounds();
+}
+
 _bool CEnvObject::Pick_Marb1e(_fvector vRayOrigin, _fvector vRayDir, _float3* pOutHit, _float* fOutDistance)
 {
 	if (!m_pModelCom)
@@ -301,6 +317,16 @@ _bool CEnvObject::Pick_Marb1e(_fvector vRayOrigin, _fvector vRayDir, _float3* pO
 		*fOutDistance = closestDist;
 
 	return bHit;
+}
+
+_float CEnvObject::Get_FinalMainDissolve() const
+{
+	return max(m_fDissolve, m_pCullingState->Get_Dissolve(CCullingState::CHANNEL::MAIN));
+}
+
+_float CEnvObject::Get_FinalShadowDissolve() const
+{
+	return m_pCullingState->Get_Dissolve(CCullingState::CHANNEL::SHADOW);
 }
 
 #pragma region Editable
@@ -356,7 +382,7 @@ HRESULT CEnvObject::Apply_EditPolicy(const EDIT_OBJECT_POLICY& Policy)
 
 HRESULT CEnvObject::On_EditTransformChanged()
 {
-	m_bTransformDirty = true;
+	m_pCullingState->Mark_TransformDirty();
 	Refresh_WorldBounds();
 
 	if (nullptr != m_pPhysicsActor)
@@ -414,7 +440,9 @@ HRESULT CEnvObject::Ready_RenderComponents(_uint iModelProtoLevel, const wstring
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
 
-	Update_LocalBounds();
+	if (FAILED(m_pCullingState->Set_LocalBoundsFromModel(m_pModelCom)))
+		return E_FAIL;
+
 	Refresh_WorldBounds();
 	return S_OK;
 }
@@ -539,68 +567,42 @@ HRESULT CEnvObject::Bind_ShaderResources()
 	return S_OK;
 }
 
-void CEnvObject::Update_LocalBounds()
+HRESULT CEnvObject::Ready_CullingState()
 {
-	if (nullptr == m_pModelCom)
-	{
-		m_LocalBounds = GeometryUtils::Make_DefaultAABB(0.5f);
-		return;
-	}
+	m_pCullingState = Add_Component<CCullingState>(
+		L"Com_CullingState",
+		CCullingState::Create(m_pDevice, m_pContext));
+	if (nullptr == m_pCullingState)
+		return E_FAIL;
 
-	_float3 vMin{}, vMax{};
-	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
+	if (FAILED(m_pCullingState->Set_LocalBounds(GeometryUtils::Make_DefaultAABB(0.5f))))
+		return E_FAIL;
 
-	if (!GeometryUtils::Is_ValidAABB(vMin, vMax))
-	{
-		m_LocalBounds = GeometryUtils::Make_DefaultAABB(0.5f);
-		return;
-	}
-
-	m_LocalBounds = GeometryUtils::Make_AABB_FromMinMax(vMin, vMax);
+	m_pCullingState->Refresh_WorldBounds(*m_pTransformCom->Get_WorldMatrixPtr());
+	return S_OK;
 }
 
 void CEnvObject::Refresh_WorldBounds()
 {
-	if (nullptr == m_pTransformCom || !m_bTransformDirty)
-		return;
-
-	m_LocalBounds.Transform(m_WorldBounds, XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
-	m_bTransformDirty = false;
+	m_pCullingState->Refresh_WorldBounds(*m_pTransformCom->Get_WorldMatrixPtr());
 }
 
 void CEnvObject::Check_Visible()
 {
 	const _bool bEnableShadow = ENABLE_ENV_OBJECT_SHADOW && m_bCastShadow;
 
-	m_bVisible = m_bRenderable;
-	m_bVisibleShadow = bEnableShadow;
+	CCullingState::CULLING_EVALUATION_INPUT Input{};
+	Input.Main.bUseDistance = m_bUseCullDistance;
+	Input.Main.bUseFrustum = m_bUseCullFrustum;
+	Input.Shadow.bUseDistance = m_bUseCullDistance;
+	Input.Shadow.bUseFrustum = m_bUseCullFrustum;
+	Input.bEvaluateMain = m_bRenderable;
+	Input.bEvaluateShadow = bEnableShadow;
 
-	// Distance -> Frustum
-	// 1. Main
-	if (m_bVisible)
-	{
-		if (m_bUseCullDistance && m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_DISTANCE_CULL_START))
-		{
-			m_bVisible = false;
-		}
-		else if (m_bUseCullFrustum && m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, m_WorldBounds))
-		{
-			m_bVisible = false;
-		}
-	}
+	m_pCullingState->Evaluate(Input);
 
-	// 2. Shadow
-	if (m_bVisibleShadow)
-	{
-		if (m_bUseCullDistance && m_pGameInstance_Proxy->Should_CullByDistance(m_WorldBounds, ENV_SHADOW_DISTANCE_CULL_START))
-		{
-			m_bVisibleShadow = false;
-		}
-		else if (m_bUseCullFrustum && m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, m_WorldBounds))
-		{
-			m_bVisibleShadow = false;
-		}
-	}
+	m_bVisible = m_bRenderable && !m_pCullingState->Is_Culled(CCullingState::CHANNEL::MAIN);
+	m_bVisibleShadow = bEnableShadow && !m_pCullingState->Is_Culled(CCullingState::CHANNEL::SHADOW);
 
 #pragma region Profiling
 	if (m_bVisible)
@@ -610,6 +612,7 @@ void CEnvObject::Check_Visible()
 		PROFILE_COUNTER_ADD(Engine::EPROFILE_COUNTER::ENV_VISIBLE_SHADOW, 1);
 #pragma endregion
 }
+
 
 void CEnvObject::Apply_TransformFromDesc()
 {
@@ -624,10 +627,6 @@ void CEnvObject::Apply_TransformFromDesc()
 	{
 		m_pTransformCom->Set_WorldMatrix(Build_WorldMatrix_FromTRS(m_tDesc));
 	}
-
-	m_bTransformDirty = true;
-
-	Refresh_WorldBounds();
 }
 
 void CEnvObject::Apply_DescDefaults()

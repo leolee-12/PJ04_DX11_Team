@@ -300,117 +300,154 @@ void CKirby_Ability_Sword::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_IN
 
 _bool CKirby_Ability_Sword::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 {
-    if (static_cast<EANIM_EVENT>(e.iEventType) != EANIM_EVENT::Hitbox)
-        return false;
-
-    enum SWORD_HIT_PARAM
-    {
-        SLASH1_H, SLASH_2_1_H, SLASH_2_2_H, SLASH_2_3_H, SLASH_2_4_H, SLASH_3_H,
-        JUMP_SLASH_H,
-        SPIN_SLASH, SUPER_SPIN_SLASH,
-        UPWARDSLASH
-    };
-
     CKirby_Sword* pSword = static_cast<CKirby_Sword*>(pKirby->Find_WeaponPart(COPY_ABILITY_TYPE::SWORD));
 
-    if (ePhase == ANIM_EVENT_PHASE::BEGIN)
+    if (static_cast<EANIM_EVENT>(e.iEventType) == EANIM_EVENT::Hitbox)
     {
-        ATTACK_INFO tAttackInfo{};
-
-        switch (e.iIntParam)
+        enum SWORD_HIT_PARAM
         {
-            case COMMON_HIT_PARAM::SLIDE_H:
+            SLASH1_H, SLASH_2_1_H, SLASH_2_2_H, SLASH_2_3_H, SLASH_2_4_H, SLASH_3_H,
+            JUMP_SLASH_H,
+            SPIN_SLASH, SUPER_SPIN_SLASH,
+            UPWARDSLASH
+        };
+
+
+        if (ePhase == ANIM_EVENT_PHASE::BEGIN)
+        {
+            ATTACK_INFO tAttackInfo{};
+
+            switch (e.iIntParam)
             {
-                tAttackInfo.fDamage = 10.f;
-                tAttackInfo.fKnockback = 9.5f;
-                tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
-                pSword->Begin_Hit(tAttackInfo);
-                return true;
+                case COMMON_HIT_PARAM::SLIDE_H:
+                {
+                    tAttackInfo.fDamage = 10.f;
+                    tAttackInfo.fKnockback = 9.5f;
+                    tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
+                    pSword->Begin_Hit(tAttackInfo);
+                    return true;
+                }
+                case SWORD_HIT_PARAM::SLASH1_H:
+                {
+                    tAttackInfo.fDamage = 10.f;
+                    //tAttackInfo.fDamage = 500.f;
+                    tAttackInfo.fKnockback = 4.5f;
+                    tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
+                    pSword->Begin_Hit(tAttackInfo);
+                    return true;
+                }
+                case SWORD_HIT_PARAM::SLASH_2_1_H: 
+                case SWORD_HIT_PARAM::SLASH_2_2_H:
+                case SWORD_HIT_PARAM::SLASH_2_3_H:
+                case SWORD_HIT_PARAM::SLASH_2_4_H:
+                {
+                    tAttackInfo.fDamage = 10.f;
+                    tAttackInfo.fKnockback = 4.5f;
+                    tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
+                    pSword->Begin_Hit(tAttackInfo);
+                    return true;
+                }
+                case SWORD_HIT_PARAM::SLASH_3_H:
+                {
+                    tAttackInfo.fDamage = 200.f;
+                    tAttackInfo.fKnockback = 10.f;
+                    tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
+                    pSword->Begin_Hit(tAttackInfo);
+                    return true;
+                }
+                case SWORD_HIT_PARAM::JUMP_SLASH_H:
+                {
+                    tAttackInfo.fDamage = 10.f;
+                    tAttackInfo.fKnockback = 4.5f;
+                    tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
+                    pSword->Begin_Hit(tAttackInfo);
+                    return true;
+                }
+                case SWORD_HIT_PARAM::SPIN_SLASH:
+                {
+                    tAttackInfo.fDamage = 10.f;
+                    tAttackInfo.fKnockback = 4.5f;
+                    tAttackInfo.eHitType = HIT_TYPE::SWORD_SPIN;
+                    pSword->Begin_Hit(tAttackInfo);
+                    return true;
+                }
+                case SWORD_HIT_PARAM::SUPER_SPIN_SLASH:
+                {
+                    tAttackInfo.fDamage = 10.f;
+                    tAttackInfo.fKnockback = 30.f;
+                    tAttackInfo.eHitType = HIT_TYPE::SWORD_SPIN;
+                    pSword->Begin_Hit(tAttackInfo);
+                    return true;
+                }
+                case SWORD_HIT_PARAM::UPWARDSLASH:
+                {
+                    tAttackInfo.fDamage = 10.f;
+                    tAttackInfo.fKnockback = 4.5f;
+                    tAttackInfo.eHitType = HIT_TYPE::UPWARD_SLASH;
+                    pSword->Begin_Hit(tAttackInfo);
+                    return true;
+                }
             }
-            case SWORD_HIT_PARAM::SLASH1_H:
+        }
+        
+        if (ePhase == ANIM_EVENT_PHASE::END)
+        {
+            switch (static_cast<SWORD_HIT_PARAM>(e.iIntParam))
             {
-                tAttackInfo.fDamage = 10.f;
-                //tAttackInfo.fDamage = 500.f;
-                tAttackInfo.fKnockback = 4.5f;
-                tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
-                pSword->Begin_Hit(tAttackInfo);
-                return true;
+                case COMMON_HIT_PARAM::SLIDE_H:
+
+                case SWORD_HIT_PARAM::SLASH1_H:
+                case SWORD_HIT_PARAM::SLASH_2_1_H:
+                case SWORD_HIT_PARAM::SLASH_2_2_H:
+                case SWORD_HIT_PARAM::SLASH_2_3_H:
+                case SWORD_HIT_PARAM::SLASH_2_4_H:
+                case SWORD_HIT_PARAM::SLASH_3_H:
+                case SWORD_HIT_PARAM::JUMP_SLASH_H:
+                case SWORD_HIT_PARAM::SPIN_SLASH:
+                case SWORD_HIT_PARAM::SUPER_SPIN_SLASH:
+                case SWORD_HIT_PARAM::UPWARDSLASH:
+                    pSword->End_Hit();
+                    return true;
             }
-            case SWORD_HIT_PARAM::SLASH_2_1_H: 
-            case SWORD_HIT_PARAM::SLASH_2_2_H:
-            case SWORD_HIT_PARAM::SLASH_2_3_H:
-            case SWORD_HIT_PARAM::SLASH_2_4_H:
+        }
+        
+            return false;
+    }
+
+    if (static_cast<EANIM_EVENT>(e.iEventType) == EANIM_EVENT::Fx)
+    {
+        if (ePhase == ANIM_EVENT_PHASE::BEGIN)
+        {
+            switch (e.iIntParam)
             {
-                tAttackInfo.fDamage = 10.f;
-                tAttackInfo.fKnockback = 4.5f;
-                tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
-                pSword->Begin_Hit(tAttackInfo);
-                return true;
+                case 0:
+                {
+                    if (m_pUpwardSlash != nullptr)
+                        return true;
+
+                    CEffect_Loader::GetInstance()->Spawn(L"UpwardsSlash", pKirby->Get_LevelIndex(),
+                        _float3{ 0.f, 0.f, 0.f }, _float3{ 0.f, 0.f, 0.f }, _float3{ 0.f, 0.f, 0.f },
+                        pSword->Get_CombinedWorldMatrixPtr(), &m_pUpwardSlash);
+                    return true;
+                }
             }
-            case SWORD_HIT_PARAM::SLASH_3_H:
+        }
+        else if (ePhase == ANIM_EVENT_PHASE::END)
+        {
+            switch (e.iIntParam)
             {
-                tAttackInfo.fDamage = 200.f;
-                tAttackInfo.fKnockback = 10.f;
-                tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
-                pSword->Begin_Hit(tAttackInfo);
-                return true;
-            }
-            case SWORD_HIT_PARAM::JUMP_SLASH_H:
-            {
-                tAttackInfo.fDamage = 10.f;
-                tAttackInfo.fKnockback = 4.5f;
-                tAttackInfo.eHitType = HIT_TYPE::SWORD_DEFAULT;
-                pSword->Begin_Hit(tAttackInfo);
-                return true;
-            }
-            case SWORD_HIT_PARAM::SPIN_SLASH:
-            {
-                tAttackInfo.fDamage = 10.f;
-                tAttackInfo.fKnockback = 4.5f;
-                tAttackInfo.eHitType = HIT_TYPE::SWORD_SPIN;
-                pSword->Begin_Hit(tAttackInfo);
-                return true;
-            }
-            case SWORD_HIT_PARAM::SUPER_SPIN_SLASH:
-            {
-                tAttackInfo.fDamage = 10.f;
-                tAttackInfo.fKnockback = 30.f;
-                tAttackInfo.eHitType = HIT_TYPE::SWORD_SPIN;
-                pSword->Begin_Hit(tAttackInfo);
-                return true;
-            }
-            case SWORD_HIT_PARAM::UPWARDSLASH:
-            {
-                tAttackInfo.fDamage = 10.f;
-                tAttackInfo.fKnockback = 4.5f;
-                tAttackInfo.eHitType = HIT_TYPE::UPWARD_SLASH;
-                pSword->Begin_Hit(tAttackInfo);
-                return true;
+                case 0:
+                {
+                    if (m_pUpwardSlash == nullptr)
+                        return true;
+
+                    m_pUpwardSlash->EffectContainer_StopAfterEmission();
+                    m_pUpwardSlash = nullptr;
+                }
             }
         }
     }
-    
-    if (ePhase == ANIM_EVENT_PHASE::END)
-    {
-        switch (static_cast<SWORD_HIT_PARAM>(e.iIntParam))
-        {
-            case COMMON_HIT_PARAM::SLIDE_H:
 
-            case SWORD_HIT_PARAM::SLASH1_H:
-            case SWORD_HIT_PARAM::SLASH_2_1_H:
-            case SWORD_HIT_PARAM::SLASH_2_2_H:
-            case SWORD_HIT_PARAM::SLASH_2_3_H:
-            case SWORD_HIT_PARAM::SLASH_2_4_H:
-            case SWORD_HIT_PARAM::SLASH_3_H:
-            case SWORD_HIT_PARAM::JUMP_SLASH_H:
-            case SWORD_HIT_PARAM::SPIN_SLASH:
-            case SWORD_HIT_PARAM::SUPER_SPIN_SLASH:
-            case SWORD_HIT_PARAM::UPWARDSLASH:
-                pSword->End_Hit();
-                return true;
-        }
-     }
-    
     return false;
 }
 

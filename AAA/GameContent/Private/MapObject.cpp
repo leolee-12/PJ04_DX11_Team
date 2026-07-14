@@ -97,6 +97,16 @@ HRESULT CMapObject::Bind_ShaderResources()
 	return S_OK;
 }
 
+HRESULT CMapObject::Bind_ShadowTransforms()
+{
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 HRESULT CMapObject::Render_MapMesh(_uint iMesh, const _float4x4* pWorldOverride)
 {
 	if (nullptr != pWorldOverride)
@@ -126,6 +136,22 @@ HRESULT CMapObject::Render_MapMesh(_uint iMesh, const _float4x4* pWorldOverride)
 		return S_OK;
 
 	if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+		return E_FAIL;
+	if (FAILED(m_pModelCom->Render(iMesh)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMapObject::Render_ShadowMesh(_uint iMesh, const _float4x4* pWorldOverride)
+{
+	if (nullptr != pWorldOverride)
+	{
+		if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", pWorldOverride)))
+			return E_FAIL;
+	}
+
+	if (FAILED(m_pShaderCom->Begin(ETOI(MAP_PASS::SHADOW))))
 		return E_FAIL;
 	if (FAILED(m_pModelCom->Render(iMesh)))
 		return E_FAIL;
