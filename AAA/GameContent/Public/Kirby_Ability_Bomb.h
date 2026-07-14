@@ -5,6 +5,7 @@
 NS_BEGIN(Client)
 
 class CKirby;
+class CKirbyBomb;
 
 class CLIENT_DLL CKirby_Ability_Bomb final : public CKirby_Ability
 {
@@ -45,12 +46,18 @@ private:
 
 	_bool Handle_ReserveAttack(CKirby* pKirby);
 
+	void Spawn_Bomb(CKirby* pKirby);
+	void Throw_Bomb(CKirby* pKirby);
+
 private:
 	BOMB_STATE m_eBombState{};
 
 	_bool m_bKeyUp{};
 
 	_bool m_bReserveAttack{};
+
+private:
+	CKirbyBomb* m_pBomb{};
 
 public:
 	static CKirby_Ability_Bomb* Create();

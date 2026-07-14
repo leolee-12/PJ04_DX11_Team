@@ -7,6 +7,9 @@
 #include "Kirby_Body.h"
 #include "Kirby_State.h"
 
+#include "Projectile_Manager.h"
+#include "KirbyBomb.h"
+
 CKirby_Ability_Bomb::CKirby_Ability_Bomb()
 {
 }
@@ -134,16 +137,15 @@ void CKirby_Ability_Bomb::Enter_BombState(CKirby* pKirby, BOMB_STATE eState)
     switch (eState)
     {
         case BOMB_STATE::BOMB_STATE_END:
-        {
             if (!Handle_ReserveAttack(pKirby))
                 m_bReqEndAttackState = true;
             break;
-        }
         case BOMB_STATE::MOVE_THROW:
             pAnimator->Play("BombShoot", false, true, 0.1f, 2.f);
             break;
         case BOMB_STATE::CHARGE_START:
             pAnimator->Play("BombThrowCharge", true, false, 0.1f, 1.5f);
+            Spawn_Bomb(pKirby);
             break;
         case BOMB_STATE::CHARGE:
             pAnimator->Play("BombThrowCharge", true, false, 0.1f, 1.5f);
@@ -158,6 +160,7 @@ void CKirby_Ability_Bomb::Enter_BombState(CKirby* pKirby, BOMB_STATE eState)
             break;
         case BOMB_STATE::THROW:
             pAnimator->Play("BombThrow", false, false, 0.1f, 2.5f);
+            Throw_Bomb(pKirby);
             break;
     }
 }
@@ -262,6 +265,40 @@ _bool CKirby_Ability_Bomb::Handle_ReserveAttack(CKirby* pKirby)
     m_bReserveAttack = false;
 
     return true;
+}
+
+void CKirby_Ability_Bomb::Spawn_Bomb(CKirby* pKirby)
+{
+    CProjectile* pProjectile{};
+
+    if (FAILED(CProjectile_Manager::GetInstance()->Spawn(pKirby->Get_PrototypeLevelIndex(), pKirby->Get_LevelIndex(),
+        CKirbyBomb::POOL_KEY, CKirbyBomb::PROTOTYPE_TAG, &pProjectile)))
+        return;
+
+    CKirbyBomb* pBomb = dynamic_cast<CKirbyBomb*>(pProjectile);
+
+    if (pBomb == nullptr)
+        return;
+
+    const _float4x4* pSocketBone = pKirby->Get_Body()->Get_BoneMatrixPtr("RHaveL");
+
+    pBomb->Attach_To_Socket(pSocketBone, pKirby->Get_Transform()->Get_WorldMatrixPtr(), XMMatrixIdentity());
+
+    m_pBomb = pBomb;
+}
+
+void CKirby_Ability_Bomb::Throw_Bomb(CKirby* pKirby)
+{
+    CTransform* pTransform = pKirby->Get_Transform();    
+    _vector vKirbyPos = pTransform->Get_State(STATE::POSITION);
+    _vector vKirbyLook = pTransform->Get_State(STATE::LOOK);
+
+    _float3 vPos{};
+    XMStoreFloat3(&vPos, vKirbyPos);
+    _float3 vLook{};
+    XMStoreFloat3(&vLook, vKirbyLook);
+
+    m_pBomb->Launch(vPos, vLook);
 }
 
 CKirby_Ability_Bomb* CKirby_Ability_Bomb::Create()
