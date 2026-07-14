@@ -1474,7 +1474,10 @@ void CImGui_Manager::Draw_MeshLayerPanel(CGameObject* pObj)
     }
 
     if (ImGui::Button("Bake (Save sidecar)"))
-        pModel->Save_MeshLayers();
+    {
+        if (FAILED(pModel->Save_MeshLayers()))
+            MSG_BOX("MESH LAYER SAVE FAILED");
+    }
 }
 
 void CImGui_Manager::Draw_MapSectionRenderOptions(CMapSection* pSection)

@@ -41,7 +41,9 @@ protected:
 	virtual _bool Should_RenderMesh(_uint iMesh) const { return true; }
 	HRESULT Ready_MapComponents();
 	HRESULT Bind_ShaderResources();
+	HRESULT Bind_ShadowTransforms();
 	HRESULT Render_MapMesh(_uint iMesh, const _float4x4* pWorldOverride = nullptr);
+	HRESULT Render_ShadowMesh(_uint iMesh, const _float4x4* pWorldOverride = nullptr);
 
 public:
 	virtual void Free() override;

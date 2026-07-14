@@ -3,6 +3,7 @@
 #include "GameInstance_Proxy.h"
 #include "Model.h"
 #include "Shader.h"
+#include "CullingState.h"
 
 NS_BEGIN(Client)
 
@@ -69,8 +70,7 @@ HRESULT MeshLayerBinder::Bind_TextureSafe(CShader* pShader, CModel* pModel, CGam
 	return pGI_Proxy->Bind_DefaultTextureFromHub(pShader, pConstantName, eDefaultKind);
 }
 
-_uint MeshLayerBinder::Resolve_Pass(MESH_LAYER_PROFILE eProfile, MESH_LAYER_RENDER_KIND eKind, const MESH_LAYER_IDX& Layer, _uint
-	iFallbackPass)
+_uint MeshLayerBinder::Resolve_Pass(MESH_LAYER_PROFILE eProfile, MESH_LAYER_RENDER_KIND eKind, const MESH_LAYER_IDX& Layer, _uint iFallbackPass)
 {
 	if (MESH_LAYER_RENDER_KIND::MAIN != eKind)
 		return iFallbackPass;
@@ -183,7 +183,25 @@ namespace
 		const _float fUVRotate = Layer.bUseUVTransform ? Layer.fUVRotate : 0.f;
 		const _float fNormalStrength = Layer.fNormalStrength;
 		const _float fMaskStrength = Layer.fMaskStrength;
-		const _uint iFlags = Layer.iFlags | Ctx.iExtraFlags;
+		const _uint iUseInstanceDissolve = (MESH_LAYER_PROFILE::WORLD_INSTANCE == Ctx.eProfile) ? 1u : 0u;
+		_uint iFlags = Layer.iFlags | Ctx.iExtraFlags;
+		_float fDissolve = Ctx.fDissolve;
+
+		if (nullptr != Ctx.pCullingState &&
+			(MESH_LAYER_RENDER_KIND::MAIN == Ctx.eKind || MESH_LAYER_RENDER_KIND::SHADOW == Ctx.eKind))
+		{
+			const CCullingState::CHANNEL eCullChannel =
+				(MESH_LAYER_RENDER_KIND::SHADOW == Ctx.eKind)
+				? CCullingState::CHANNEL::SHADOW
+				: CCullingState::CHANNEL::MAIN;
+
+			const _float fCullingDissolve = Ctx.pCullingState->Get_Dissolve(eCullChannel);
+			if (fCullingDissolve > 0.f)
+			{
+				iFlags |= WorldShaderFlags::Dither;
+				fDissolve = max(fDissolve, fCullingDissolve);
+			}
+		}
 
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iUVIndex", &iUVIndex, sizeof(_uint)))) return E_FAIL;
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iUnknownUVIndex", &iUnknownUVIndex, sizeof(_uint)))) return E_FAIL;
@@ -195,8 +213,9 @@ namespace
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_NormalStrength", &fNormalStrength, sizeof(_float)))) return E_FAIL;
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_MaskStrength", &fMaskStrength, sizeof(_float)))) return E_FAIL;
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_vColor", &Layer.vRenderColor, sizeof(_float4)))) return E_FAIL;
+		if (FAILED(Ctx.pShader->Bind_RawValue("g_iUseInstanceDissolve", &iUseInstanceDissolve, sizeof(_uint)))) return E_FAIL;
 		if (FAILED(Ctx.pShader->Bind_RawValue("g_iFlags", &iFlags, sizeof(_uint)))) return E_FAIL;
-		if (FAILED(Ctx.pShader->Bind_RawValue("g_fDissolve", &Ctx.fDissolve, sizeof(_float)))) return E_FAIL;
+		if (FAILED(Ctx.pShader->Bind_RawValue("g_fDissolve", &fDissolve, sizeof(_float)))) return E_FAIL;
 
 		return S_OK;
 	}

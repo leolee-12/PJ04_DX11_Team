@@ -47,7 +47,9 @@ public:
 	_bool	Has_CollMesh() const { return m_bHasCollMesh; }
 	_bool	Is_UseCollMesh() const { return m_bUseCollMesh; }
 
-	const MAP_SECTION_DESC&	Get_Desc() const { return m_tDesc; }
+	// Creation descriptor baseline for MapTool policy and transform overrides.
+	const MAP_SECTION_DESC& Get_Desc() const { return m_tDesc; }
+
 	const BoundingBox&		Get_WorldBounds() const { return m_WorldBounds; }
 	MAP_SECTION_TYPE		Get_SectionType() const { return m_eSectionType; }
 	RENDERID				Get_RenderID() const { return m_eRenderID; }

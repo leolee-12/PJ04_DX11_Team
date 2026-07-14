@@ -56,7 +56,7 @@ HRESULT CLD_ArrowBoard::Initialize(void* pArg)
 	if (FAILED(Ready_HurtBox()))
 		return E_FAIL;
 
-	if (FAILED(Ready_CullBounds(m_pModelCom)))
+	if (FAILED(Ready_CullingState(m_pModelCom)))
 		return E_FAIL;
 
 	m_bUseShadow = true;
@@ -316,13 +316,13 @@ HRESULT CLD_ArrowBoard::Render_Model()
 	MESH_LAYER_BIND_CONTEXT Ctx{};
 	Ctx.pShader = m_pShaderCom;
 	Ctx.pModel = m_pModelCom;
+	Ctx.pCullingState = m_pCullingState;
 	Ctx.pGI_Proxy = m_pGameInstance_Proxy;
 	Ctx.iMesh = 0u;
 	Ctx.pLayer = &Layer;
 	Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_ANIM;
 	Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
 	Ctx.iFallbackPass = ETOUI(WORLD_PASS::ARROWBOARD_OPAQUE);
-	Ctx.fDissolve = 0.f;
 
 	MESH_LAYER_BIND_RESULT Result{};
 	if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))

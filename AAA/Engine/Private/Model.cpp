@@ -676,6 +676,15 @@ HRESULT CModel::Save_MeshLayers() const
 			j[to_string(i)] = jMesh;
 	}
 
+	_string strInvalidPath;
+	if (JsonUtils::Find_NonFiniteNumberPath(j, {}, &strInvalidPath))
+	{
+		OutputDebugStringA("[MeshLayer] Save failed: non-finite value at ");
+		OutputDebugStringA(strInvalidPath.empty() ? "<root>" : strInvalidPath.c_str());
+		OutputDebugStringA("\n");
+		return E_FAIL;
+	}
+
 	ofstream fout(m_strMeshLayerPath);
 	if (!fout.is_open())
 		return E_FAIL;

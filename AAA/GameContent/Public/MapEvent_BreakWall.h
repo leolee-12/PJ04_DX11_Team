@@ -25,6 +25,7 @@ public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_MapEvent_BreakWall";
 	static constexpr const _tchar* LAYER_TAG = L"Layer_MapEvent_BreakWall";
 
+	// Stage1-2-specific event asset contract. Keep these tags and paths aligned when renaming map content.
 	static constexpr const _tchar* STAGE12_STAGE_NAME = L"Stage1-2_MapStage";
 	static constexpr const _tchar* STAGE12_SECTION_NAME = L"GsDefault_4";
 	static constexpr const _tchar* STAGE12_MODEL_PROTO_TAG = L"Prototype_Component_Model_MapEvent_BreakWall_Stage1-2_GsDefault_4";

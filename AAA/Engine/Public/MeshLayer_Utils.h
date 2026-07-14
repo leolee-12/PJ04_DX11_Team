@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine_Defines.h"
+#include "Parsing_Utils.h"
 
 NS_BEGIN(Engine)
 
@@ -107,23 +108,8 @@ inline void Load_MeshLayerBindEx(const json& j, MESH_LAYER_TEX_BIND_EX* pOut)
 			Bind.iUVIndex = static_cast<_uint>(iUVIndex);
 	}
 
-	if (j.contains("Scale") && j["Scale"].is_array() && j["Scale"].size() == 2)
-	{
-		if (j["Scale"][0].is_number() && j["Scale"][1].is_number())
-		{
-			Bind.vUVScale.x = j["Scale"][0].get<_float>();
-			Bind.vUVScale.y = j["Scale"][1].get<_float>();
-		}
-	}
-
-	if (j.contains("Offset") && j["Offset"].is_array() && j["Offset"].size() == 2)
-	{
-		if (j["Offset"][0].is_number() && j["Offset"][1].is_number())
-		{
-			Bind.vUVOffset.x = j["Offset"][0].get<_float>();
-			Bind.vUVOffset.y = j["Offset"][1].get<_float>();
-		}
-	}
+	JsonUtils::Try_ReadFloat2Array(j, "Scale", &Bind.vUVScale);
+	JsonUtils::Try_ReadFloat2Array(j, "Offset", &Bind.vUVOffset);
 
 	if (j.contains("Rotate") && j["Rotate"].is_number())
 		Bind.fUVRotate = j["Rotate"].get<_float>();
@@ -300,36 +286,14 @@ inline HRESULT Load_MeshLayer(const json& jMesh, MESH_LAYER_IDX* pOutLayer)
 
 		if (Layer.bUseUVTransform)
 		{
-			if (jMesh.contains("UVScale") && jMesh["UVScale"].is_array() && jMesh["UVScale"].size() == 2 && jMesh["UVScale"][0].is_number() &&
-				jMesh["UVScale"][1].is_number())
-			{
-				Layer.vUVScale.x = jMesh["UVScale"][0].get<_float>();
-				Layer.vUVScale.y = jMesh["UVScale"][1].get<_float>();
-			}
-
-			if (jMesh.contains("UVScaleNormal") && jMesh["UVScaleNormal"].is_array() && jMesh["UVScaleNormal"].size() == 2 && jMesh["UVScaleNormal"]
-				[0].is_number() && jMesh["UVScaleNormal"][1].is_number())
-			{
-				Layer.vUVScaleNormal.x = jMesh["UVScaleNormal"][0].get<_float>();
-				Layer.vUVScaleNormal.y = jMesh["UVScaleNormal"][1].get<_float>();
-			}
-
-			if (jMesh.contains("UVScaleMaterial") && jMesh["UVScaleMaterial"].is_array() && jMesh["UVScaleMaterial"].size() == 2 &&
-				jMesh["UVScaleMaterial"][0].is_number() && jMesh["UVScaleMaterial"][1].is_number())
-			{
-				Layer.vUVScaleMaterial.x = jMesh["UVScaleMaterial"][0].get<_float>();
-				Layer.vUVScaleMaterial.y = jMesh["UVScaleMaterial"][1].get<_float>();
-			}
+			JsonUtils::Try_ReadFloat2Array(jMesh, "UVScale", &Layer.vUVScale);
+			JsonUtils::Try_ReadFloat2Array(jMesh, "UVScaleNormal", &Layer.vUVScaleNormal);
+			JsonUtils::Try_ReadFloat2Array(jMesh, "UVScaleMaterial", &Layer.vUVScaleMaterial);
 
 			if (jMesh.contains("UVRotate") && jMesh["UVRotate"].is_number())
 				Layer.fUVRotate = jMesh["UVRotate"].get<_float>();
 
-			if (jMesh.contains("UVOffset") && jMesh["UVOffset"].is_array() && jMesh["UVOffset"].size() == 2 && jMesh["UVOffset"][0].is_number() &&
-				jMesh["UVOffset"][1].is_number())
-			{
-				Layer.vUVOffset.x = jMesh["UVOffset"][0].get<_float>();
-				Layer.vUVOffset.y = jMesh["UVOffset"][1].get<_float>();
-			}
+			JsonUtils::Try_ReadFloat2Array(jMesh, "UVOffset", &Layer.vUVOffset);
 		}
 	}
 

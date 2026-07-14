@@ -112,7 +112,7 @@ HRESULT CLevelDesign_Starblock::Initialize(void* pArg)
 
 	Compute_SpatPivot();
 
-	if (FAILED(Ready_CullBounds(m_pModelCom)))
+	if (FAILED(Ready_CullingState(m_pModelCom)))
 		return E_FAIL;
 
 	m_bUseShadow = true;
@@ -152,9 +152,6 @@ void CLevelDesign_Starblock::Late_Update(_float fTimeDelta)
 
 	__super::Late_Update(fTimeDelta);
 
-	if (m_bCullTransformDynamic)
-		Refresh_WorldBounds();
-
 	Check_Visible();
 	Submit_RenderGroups();
 }
@@ -176,13 +173,13 @@ HRESULT CLevelDesign_Starblock::Render()
 		MESH_LAYER_BIND_CONTEXT Ctx{};
 		Ctx.pShader = m_pShaderCom;
 		Ctx.pModel = m_pModelCom;
+		Ctx.pCullingState = m_pCullingState;
 		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
 		Ctx.iMesh = i;
 		Ctx.pLayer = &Layer;
 		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
 		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
 		Ctx.iFallbackPass = ETOUI(WORLD_PASS::DMN);
-		Ctx.fDissolve = 0.f;
 
 		MESH_LAYER_BIND_RESULT Result{};
 		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))

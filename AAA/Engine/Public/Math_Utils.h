@@ -23,7 +23,7 @@ namespace MathUtils
 
     inline _float Abs_Float(_float fValue)
     {
-        return fValue < 0.f ? -fValue : fValue;
+        return std::fabs(fValue);
     }
 
     inline _float3 Abs_Float3(const _float3& vValue)
@@ -39,7 +39,7 @@ namespace MathUtils
         {
             for (_uint iCol = 0; iCol < 4; ++iCol)
             {
-                if (fabsf(A.m[iRow][iCol] - B.m[iRow][iCol]) > fEpsilon)
+                if (std::fabs(A.m[iRow][iCol] - B.m[iRow][iCol]) > fEpsilon)
                     return false;
             }
         }
