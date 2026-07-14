@@ -781,6 +781,18 @@
     <Filter Include="00. GameObject\09. AbilityBubble\Parts\Ability_Model">
       <UniqueIdentifier>{bf263cb2-3a5a-4cae-a1c3-3f631a883bff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\10. DropStar">
+      <UniqueIdentifier>{a2ce7ff0-d14e-4cba-8c17-c4e9803da0ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\10. DropStar\Manager">
+      <UniqueIdentifier>{ddcdbe58-47b2-43b5-be2c-e7ddacc4272e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\10. DropStar\Parts">
+      <UniqueIdentifier>{1b0611e1-ea78-4e51-8d4b-905c94dccc2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\10. DropStar\Spawner">
+      <UniqueIdentifier>{f0da657c-89ee-4d75-ace3-e7ac58c9b39c}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\95. Interface">
       <UniqueIdentifier>{3f986a95-5219-485c-8719-2667dcade916}</UniqueIdentifier>
     </Filter>
@@ -1132,18 +1144,6 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\10. DropStar">
-      <UniqueIdentifier>{a2ce7ff0-d14e-4cba-8c17-c4e9803da0ce}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\10. DropStar\Manager">
-      <UniqueIdentifier>{ddcdbe58-47b2-43b5-be2c-e7ddacc4272e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\10. DropStar\Parts">
-      <UniqueIdentifier>{1b0611e1-ea78-4e51-8d4b-905c94dccc2b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\10. DropStar\Spawner">
-      <UniqueIdentifier>{f0da657c-89ee-4d75-ace3-e7ac58c9b39c}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -1364,6 +1364,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\DroppedBubble.h">
       <Filter>00. GameObject\09. AbilityBubble\Containers\Dropped</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DropStar.h">
+      <Filter>00. GameObject\10. DropStar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DropStar_Body.h">
+      <Filter>00. GameObject\10. DropStar\Parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DropStar_Manager.h">
+      <Filter>00. GameObject\10. DropStar\Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Editable.h">
       <Filter>00. GameObject\95. Interface</Filter>
@@ -2259,15 +2268,6 @@
     <ClInclude Include="..\Public\WalkSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\DropStar.h">
-      <Filter>00. GameObject\10. DropStar</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\DropStar_Manager.h">
-      <Filter>00. GameObject\10. DropStar\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\DropStar_Body.h">
-      <Filter>00. GameObject\10. DropStar\Parts</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -2473,6 +2473,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\DroppedBubble.cpp">
       <Filter>00. GameObject\09. AbilityBubble\Containers\Dropped</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DropStar.cpp">
+      <Filter>00. GameObject\10. DropStar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DropStar_Body.cpp">
+      <Filter>00. GameObject\10. DropStar\Parts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DropStar_Manager.cpp">
+      <Filter>00. GameObject\10. DropStar\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Effect_Loader.cpp">
       <Filter>97. DataSystem\EffectLoader</Filter>
@@ -3301,15 +3310,6 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\DropStar.cpp">
-      <Filter>00. GameObject\10. DropStar</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\DropStar_Manager.cpp">
-      <Filter>00. GameObject\10. DropStar\Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\DropStar_Body.cpp">
-      <Filter>00. GameObject\10. DropStar\Parts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
