@@ -86,6 +86,9 @@ private:
 
 	CHANNEL_RESULT  m_Results[ETOUI(CHANNEL::COUNT)] = {};
 
+private:
+	void Evaluate_Channel(CHANNEL eChannel, const CHANNEL_POLICY& Policy, const CULLING_FADE_RESULT* pDistanceResult);
+
 public:
 	static CCullingState* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CComponent* Clone(void* pArg) override;

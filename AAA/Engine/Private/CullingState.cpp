@@ -1,5 +1,8 @@
 #include "CullingState.h"
 
+#include "Culling_Manager.h"
+#include "GameInstance_Proxy.h"
+#include "Math_Utils.h"
 #include "Model.h"
 
 CCullingState::CCullingState(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -108,6 +111,73 @@ void CCullingState::Refresh_WorldBounds(const _float4x4& WorldMatrix)
 	m_bTransformDirty = false;
 }
 
+void CCullingState::Evaluate(const EVALUATE_DESC& Desc)
+{
+	Reset_AllResults();
+
+	const _bool bEvaluateMainDistance = Desc.bEvaluateMain && Desc.Main.bUseDistance;
+	const _bool bEvaluateShadowDistance = Desc.bEvaluateShadow && Desc.Shadow.bUseDistance;
+
+	CULLING_FADE_RESULT MainDistanceResult{};
+	CULLING_FADE_RESULT ShadowDistanceResult{};
+	_bool bHasMainDistanceResult = false;
+	_bool bHasShadowDistanceResult = false;
+
+	if (bEvaluateMainDistance || bEvaluateShadowDistance)
+	{
+		const _float fSurfaceDistance = m_pGameInstance_Proxy->Compute_SurfaceDistance(m_WorldSphere);
+		const _bool bHasSurfaceDistance = MathUtils::Is_FiniteFloat(fSurfaceDistance) && fSurfaceDistance >= 0.f;
+
+		if (bHasSurfaceDistance)
+		{
+			const _bool bShareDistanceResult =
+				bEvaluateMainDistance
+				&& bEvaluateShadowDistance
+				&& Desc.Main.fCullDistance == Desc.Shadow.fCullDistance
+				&& Desc.Main.fDistanceFadeWidth == Desc.Shadow.fDistanceFadeWidth;
+
+			if (bShareDistanceResult)
+			{
+				MainDistanceResult = m_pGameInstance_Proxy->Evaluate_DistanceFade(
+					fSurfaceDistance,
+					Desc.Main.fCullDistance,
+					Desc.Main.fDistanceFadeWidth);
+				ShadowDistanceResult = MainDistanceResult;
+				bHasMainDistanceResult = true;
+				bHasShadowDistanceResult = true;
+			}
+			else
+			{
+				if (bEvaluateMainDistance)
+				{
+					MainDistanceResult = m_pGameInstance_Proxy->Evaluate_DistanceFade(
+						fSurfaceDistance,
+						Desc.Main.fCullDistance,
+						Desc.Main.fDistanceFadeWidth);
+					bHasMainDistanceResult = true;
+				}
+
+				if (bEvaluateShadowDistance)
+				{
+					ShadowDistanceResult = m_pGameInstance_Proxy->Evaluate_DistanceFade(
+						fSurfaceDistance,
+						Desc.Shadow.fCullDistance,
+						Desc.Shadow.fDistanceFadeWidth);
+					bHasShadowDistanceResult = true;
+				}
+			}
+		}
+	}
+
+	if (Desc.bEvaluateMain)
+		Evaluate_Channel(CHANNEL::MAIN, Desc.Main, bHasMainDistanceResult ? &MainDistanceResult : nullptr);
+
+	if (Desc.bEvaluateShadow)
+		Evaluate_Channel(CHANNEL::SHADOW, Desc.Shadow, bHasShadowDistanceResult ? &ShadowDistanceResult :
+			nullptr);
+}
+
+
 void CCullingState::Reset_Channel(CHANNEL eChannel)
 {
 	if (ETOUI(eChannel) >= ETOUI(CHANNEL::COUNT))
@@ -151,6 +221,59 @@ const BoundingBox& CCullingState::Get_LocalBounds() const
 const BoundingBox& CCullingState::Get_WorldBounds() const
 {
 	return m_WorldBounds;
+}
+
+void CCullingState::Evaluate_Channel(CHANNEL eChannel, const CHANNEL_POLICY& Policy, const CULLING_FADE_RESULT* pDistanceResult)
+{
+	CHANNEL_RESULT& Result = m_Results[ETOUI(eChannel)];
+
+	if (nullptr != pDistanceResult)
+	{
+		Result.fDissolve = max(Result.fDissolve, pDistanceResult->fDissolve);
+
+		if (pDistanceResult->bCulled || pDistanceResult->fDissolve > 0.f)
+			Result.iCauseFlags |= CAUSE_DISTANCE;
+
+		if (pDistanceResult->bCulled)
+		{
+			Result.bCulled = true;
+			Result.fDissolve = 1.f;
+			return;
+		}
+	}
+
+	if (!Policy.bUseFrustum)
+		return;
+
+	if (Policy.bUseFrustumFade)
+	{
+		const CULLING_FADE_RESULT FrustumResult =
+			m_pGameInstance_Proxy->Evaluate_FrustumFadeAABB(
+				Policy.eView,
+				m_WorldBounds,
+				Policy.fFrustumFadeWidth,
+				CCulling_Manager::CULLING_PLANE_MASK_MAIN_SIDE);
+
+		Result.fDissolve = max(Result.fDissolve, FrustumResult.fDissolve);
+
+		if (FrustumResult.bCulled || FrustumResult.fDissolve > 0.f)
+			Result.iCauseFlags |= CAUSE_FRUSTUM;
+
+		if (FrustumResult.bCulled)
+		{
+			Result.bCulled = true;
+			Result.fDissolve = 1.f;
+		}
+
+		return;
+	}
+
+	if (m_pGameInstance_Proxy->Should_CullAABB(Policy.eView, m_WorldBounds))
+	{
+		Result.bCulled = true;
+		Result.fDissolve = 1.f;
+		Result.iCauseFlags |= CAUSE_FRUSTUM;
+	}
 }
 
 CCullingState* CCullingState::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

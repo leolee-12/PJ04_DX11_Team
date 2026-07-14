@@ -496,6 +496,14 @@ _float CGameInstance_Proxy::Compute_SurfaceDistance(const BoundingSphere& WorldB
 	return m_pOwner->Compute_SurfaceDistance(WorldBounds);
 }
 
+CULLING_FADE_RESULT CGameInstance_Proxy::Evaluate_FrustumFadeAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds, _float fFadeWidth, _uint iPlaneMask) const
+{
+	if (!IsConnected())
+		return {};
+
+	return m_pOwner->Evaluate_FrustumFadeAABB(eView, WorldBounds, fFadeWidth, iPlaneMask);
+}
+
 CULLING_FADE_RESULT CGameInstance_Proxy::Evaluate_DistanceFade(
 	const BoundingSphere& WorldBounds,
 	_float fCullDistance,

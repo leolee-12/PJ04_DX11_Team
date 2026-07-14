@@ -7,12 +7,21 @@ class CGameInstance_Proxy;
 class ENGINE_DLL CCulling_Manager final : public CBase
 {
 public:
+	enum class CULLING_PLANE : _uint { LEFT, RIGHT, TOP, BOTTOM, NEAR_PLANE, FAR_PLANE, COUNT };
+
 	struct FRUSTUM_VIEW_STATE
 	{
 		BoundingFrustum		WorldFrustum = {};
+		_float4				WorldPlanes[ETOUI(CULLING_PLANE::COUNT)] = {};
 		_bool				bValid = { false };
 		_float				fCullMargin = { 0.f };
 	};
+
+	static constexpr _uint CULLING_PLANE_MASK_LEFT = (1u << ETOUI(CULLING_PLANE::LEFT));
+	static constexpr _uint CULLING_PLANE_MASK_RIGHT = (1u << ETOUI(CULLING_PLANE::RIGHT));
+	static constexpr _uint CULLING_PLANE_MASK_TOP = (1u << ETOUI(CULLING_PLANE::TOP));
+	static constexpr _uint CULLING_PLANE_MASK_BOTTOM = (1u << ETOUI(CULLING_PLANE::BOTTOM));
+	static constexpr _uint CULLING_PLANE_MASK_MAIN_SIDE = CULLING_PLANE_MASK_LEFT | CULLING_PLANE_MASK_RIGHT | CULLING_PLANE_MASK_TOP | CULLING_PLANE_MASK_BOTTOM;
 
 private:
 	CCulling_Manager();
@@ -34,6 +43,8 @@ public:
 	_bool   Should_CullByDistance(const BoundingBox& WorldBounds, _float fCullDistance) const;
 	_float	Compute_SurfaceDistance(const BoundingSphere& WorldBounds) const;
 
+
+	CULLING_FADE_RESULT Evaluate_FrustumFadeAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds, _float fFadeWidth, _uint iPlaneMask) const;
 	CULLING_FADE_RESULT Evaluate_DistanceFade(const BoundingSphere& WorldBounds, _float fCullDistance, _float fFadeWidth) const;
 	CULLING_FADE_RESULT Evaluate_DistanceFade(_float fSurfaceDistance, _float fCullDistance, _float fFadeWidth) const;
 

@@ -15,17 +15,60 @@ namespace
 		return ETOUI(eView) < ETOUI(CULLING_VIEW::END);
 	}
 
+	inline void Store_InsidePlane(_float4* pOutPlane, _fvector vOutwardPlane)
+	{
+		if (nullptr == pOutPlane)
+			return;
+
+		XMStoreFloat4(pOutPlane, XMPlaneNormalize(XMVectorNegate(vOutwardPlane)));
+	}
+
 	inline void Reset_ViewState(CCulling_Manager::FRUSTUM_VIEW_STATE* pState)
 	{
 		if (nullptr == pState)
 			return;
 
 		pState->WorldFrustum = {};
+
+		for (_uint i = 0; i < ETOUI(CCulling_Manager::CULLING_PLANE::COUNT); ++i)
+			pState->WorldPlanes[i] = {};
+
 		pState->bValid = false;
 		pState->fCullMargin = 0.f;
 	}
 
 #ifdef _DEBUG
+	inline void Debug_ValidatePlaneCache(const CCulling_Manager::FRUSTUM_VIEW_STATE& State)
+	{
+		const _float fInsideDistance = (State.WorldFrustum.Near + State.WorldFrustum.Far) * 0.5f;
+		if (!MathUtils::Is_FiniteFloat(fInsideDistance) || fInsideDistance <= 0.f)
+			return;
+
+		const _vector vForward = XMVector3Rotate(
+			XMVectorSet(0.f, 0.f, 1.f, 0.f),
+			XMLoadFloat4(&State.WorldFrustum.Orientation));
+		const _vector vInsidePoint = XMVectorMultiplyAdd(
+			vForward,
+			XMVectorReplicate(fInsideDistance),
+			XMLoadFloat3(&State.WorldFrustum.Origin));
+
+		_bool bInsidePlanes = true;
+		for (_uint i = 0; i < ETOUI(CCulling_Manager::CULLING_PLANE::COUNT); ++i)
+		{
+			const _float fSignedDistance = XMVectorGetX(
+				XMPlaneDotCoord(XMLoadFloat4(&State.WorldPlanes[i]), vInsidePoint));
+			bInsidePlanes = bInsidePlanes && fSignedDistance >= -Helper::fEpsilon;
+		}
+
+		_float3 vInsidePointFloat{};
+		XMStoreFloat3(&vInsidePointFloat, vInsidePoint);
+
+		BoundingSphere InsideBounds{};
+		InsideBounds.Center = vInsidePointFloat;
+
+		assert(bInsidePlanes == State.WorldFrustum.Intersects(InsideBounds));
+	}
+
 	inline void Reset_StatsSlot(FRUSTUM_CULLING_STATS* pStats)
 	{
 		if (nullptr == pStats)
@@ -96,6 +139,25 @@ _bool CCulling_Manager::Update_View(CULLING_VIEW eView, const CULLING_VIEW_DESC&
 
 	XMStoreFloat4(&State.WorldFrustum.Orientation,
 		XMQuaternionNormalize(XMLoadFloat4(&State.WorldFrustum.Orientation)));
+
+	_vector vNearPlane = {};
+	_vector vFarPlane = {};
+	_vector vRightPlane = {};
+	_vector vLeftPlane = {};
+	_vector vTopPlane = {};
+	_vector vBottomPlane = {};
+	State.WorldFrustum.GetPlanes(&vNearPlane, &vFarPlane, &vRightPlane, &vLeftPlane, &vTopPlane, &vBottomPlane);
+
+	Store_InsidePlane(&State.WorldPlanes[ETOUI(CULLING_PLANE::LEFT)], vLeftPlane);
+	Store_InsidePlane(&State.WorldPlanes[ETOUI(CULLING_PLANE::RIGHT)], vRightPlane);
+	Store_InsidePlane(&State.WorldPlanes[ETOUI(CULLING_PLANE::TOP)], vTopPlane);
+	Store_InsidePlane(&State.WorldPlanes[ETOUI(CULLING_PLANE::BOTTOM)], vBottomPlane);
+	Store_InsidePlane(&State.WorldPlanes[ETOUI(CULLING_PLANE::NEAR_PLANE)], vNearPlane);
+	Store_InsidePlane(&State.WorldPlanes[ETOUI(CULLING_PLANE::FAR_PLANE)], vFarPlane);
+
+#ifdef _DEBUG
+	Debug_ValidatePlaneCache(State);
+#endif
 
 	State.bValid = true;
 
@@ -306,6 +368,107 @@ _float CCulling_Manager::Compute_SurfaceDistance(const BoundingSphere& WorldBoun
 	return (fCenterDistance > WorldBounds.Radius)
 		? (fCenterDistance - WorldBounds.Radius)
 		: 0.f;
+}
+
+CULLING_FADE_RESULT CCulling_Manager::Evaluate_FrustumFadeAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds, _float fFadeWidth, _uint iPlaneMask) const
+{
+	CULLING_FADE_RESULT Result{};
+
+	if (!m_bEnableFrustumCulling)
+	{
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_DISABLED_POLICY, 1);
+		return Result;
+	}
+
+	if (!Is_ValidViewIndex(eView))
+	{
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_FAIL_OPEN_INVALID_VIEW, 1);
+		return Result;
+	}
+
+	const FRUSTUM_VIEW_STATE& State = m_ViewStates[ETOUI(eView)];
+	if (!State.bValid)
+	{
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_FAIL_OPEN_INVALID_VIEW, 1);
+		return Result;
+	}
+
+	if (!GeometryUtils::Is_ValidAABB(WorldBounds))
+	{
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_FAIL_OPEN_INVALID_BOUNDS, 1);
+		return Result;
+	}
+
+	if (!MathUtils::Is_FiniteFloat(fFadeWidth))
+		return Result;
+
+	const _uint iValidPlaneMask = (1u << ETOUI(CULLING_PLANE::COUNT)) - 1u;
+	iPlaneMask &= iValidPlaneMask;
+
+	if (0u == iPlaneMask)
+		return Result;
+
+	PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_TESTED, 1);
+
+	_float fNearestSupport = FLT_MAX;
+
+	for (_uint i = 0; i < ETOUI(CULLING_PLANE::COUNT); ++i)
+	{
+		if (0u == (iPlaneMask & (1u << i)))
+			continue;
+
+		const _float4& Plane = State.WorldPlanes[i];
+		const _float fCenterDistance = XMVectorGetX(
+			XMPlaneDotCoord(XMLoadFloat4(&Plane), XMLoadFloat3(&WorldBounds.Center)));
+		const _float fProjectedRadius =
+			fabsf(Plane.x) * WorldBounds.Extents.x +
+			fabsf(Plane.y) * WorldBounds.Extents.y +
+			fabsf(Plane.z) * WorldBounds.Extents.z;
+		const _float fSupportDistance = fCenterDistance + fProjectedRadius;
+
+		if (!MathUtils::Is_FiniteFloat(fSupportDistance))
+		{
+			PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_FAIL_OPEN_INVALID_VIEW, 1);
+			return CULLING_FADE_RESULT{};
+		}
+
+		fNearestSupport = min(fNearestSupport, fSupportDistance);
+	}
+
+	Result.fBoundaryDistance = fNearestSupport;
+
+	if (fNearestSupport <= 0.f)
+	{
+		Result.bCulled = true;
+		Result.fDissolve = 1.f;
+
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_CULLED, 1);
+
+#ifdef _DEBUG
+		if (fNearestSupport < -Helper::fEpsilon)
+			assert(!State.WorldFrustum.Intersects(WorldBounds));
+#endif
+
+		return Result;
+	}
+
+	if (fFadeWidth <= Helper::fEpsilon)
+	{
+		PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_VISIBLE, 1);
+		return Result;
+	}
+
+	if (fNearestSupport < fFadeWidth)
+	{
+		_float fLinear = fNearestSupport / fFadeWidth;
+		fLinear = max(0.f, min(fLinear, 1.f));
+		const _float fSmooth = fLinear * fLinear * (3.f - 2.f * fLinear);
+
+		Result.fDissolve = 1.f - fSmooth;
+	}
+
+	PROFILE_COUNTER_ADD(EPROFILE_COUNTER::FRUSTUM_VISIBLE, 1);
+	return Result;
 }
 
 CULLING_FADE_RESULT CCulling_Manager::Evaluate_DistanceFade(
