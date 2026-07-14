@@ -90,7 +90,6 @@
 #include "Split_Bush.h"
 #include "BubbleAura.h"
 #include "Kirby_SwordTrail.h"
-#include "TrailContainer.h"
 #include "SwordTrail_BK.h"
 
 // Effect_Part
