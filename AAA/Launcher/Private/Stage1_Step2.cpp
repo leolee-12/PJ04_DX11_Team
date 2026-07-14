@@ -76,6 +76,8 @@ void CStage1_Step2::Update(_float fTimeDelta)
     {
         m_pGameInstance_Proxy->Toggle_DebugRender();
     }
+    if (m_pGameInstance_Proxy->Key_Down(DIK_0))
+        m_pGameInstance_Proxy->Publish(TEXT("Armadillo_Appear"), nullptr);
 #endif //  _DEBUG
 }
 

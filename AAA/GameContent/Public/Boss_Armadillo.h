@@ -5,6 +5,7 @@ NS_BEGIN(Client)
 
 class CBoss_Armadillo_Body;
 class CProjectile_Partner;
+class CBoss_Armadillo_Cage;
 
 class CBoss_Armadillo final : public CBoss
 {
@@ -15,6 +16,8 @@ public:
 
     static constexpr _float s_fCCT_Radius = 3.f;
     static constexpr _float s_fCCT_Height = 6.f;
+
+    static constexpr const _char* GRAB_BONE = "RHaveL";
 
 private:
     CBoss_Armadillo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -36,6 +39,15 @@ public:
     void  Reset_CatchHit() { m_bCatchHit = false; }
     _bool Is_CatchHit() const { return m_bCatchHit; }
 
+    //QTE
+    void  Begin_QTE(_float fSeconds);
+    void  End_QTE();
+    _bool Is_QTEEscaped() const { return m_bQTEEscaped; }
+    _bool Tick_QTETimer(_float fDt) { m_fQTETimer -= fDt; return m_fQTETimer <= 0.f; }
+
+    void  Fire_Grab();
+    void  Fire_Release(KIRBY_ATTACHMENT_END_REASON eType);
+
     _bool Sweep_Wall(const _float3& vDir, _float fDist, _float3* pOutNormal) const;
     void  Set_TwinDanceOffset(_bool bOn);
 
@@ -45,6 +57,9 @@ public:
     void Play_PartnerAnim(const _char* szClip, _bool bLoop);
 
     _bool Has_Partner() const { return m_pPartner != nullptr; }
+
+    void Show_Cage();
+    void Hide_Cage();
 
 protected:
     virtual CMonsterBrain* Create_Brain() override;
@@ -69,13 +84,17 @@ private:
     CBoss_Armadillo_Body* m_pBody = { nullptr };
     static const vector<_float> s_Thresholds;
 
-    _bool m_bCatchHit = { false };
     CProjectile_Partner* m_pPartner = { nullptr };
+    CBoss_Armadillo_Cage* m_pCage = { nullptr };
 
     _float3 m_vBodyOffsetStart = { 0.f, 0.f, 0.f };
     _float3 m_vBodyOffsetTarget = { 0.f, 0.f, 0.f };
     _float  m_fBodyOffsetT = { 1.f };
     static constexpr _float s_fBodyOffsetBlendTime = 0.25f;
+
+    _bool m_bCatchHit = { false };
+    _bool  m_bQTEEscaped = { false };
+    _float m_fQTETimer = { 0.f };
 
 #ifdef _DEBUG
     mutable _bool m_bDebugWallHit = { false };
@@ -83,6 +102,7 @@ private:
 
 private:
     void Update_BodyOffset(_float fTimeDelta);
+    void Fire_CatchCamera(const _tchar* szTrack);
 
 public:
     static CBoss_Armadillo* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

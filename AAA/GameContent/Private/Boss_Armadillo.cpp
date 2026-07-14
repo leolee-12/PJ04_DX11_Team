@@ -3,7 +3,8 @@
 #include "Monster_Movement.h"
 #include "Boss_Armadillo_Brain.h"
 #include "Boss_Armadillo_Body.h"
-#include "Animator.h"
+#include "Boss_Armadillo_Cage.h"
+
 #include "Projectile_Partner.h"
 #include "Projectile_Manager.h"
 
@@ -36,6 +37,8 @@ HRESULT CBoss_Armadillo::Initialize(void* pArg)
         m_pMovement->Set_MoveSpeed(4.f);
         m_pMovement->Set_RotSpeed(120.f);
     }
+
+    Subscribe_Event(EventTag::QTE_Success, [this](void*) { m_bQTEEscaped = true; });
 
     return S_OK;
 }
@@ -85,6 +88,8 @@ void CBoss_Armadillo::Play_Death()
     if (auto* p = Get_HitBoxPart())
         p->Enable_AllHitBoxes(false);
 
+    Hide_Cage();
+
     if (m_pPartner) { m_pPartner->Despawn(); m_pPartner = nullptr; }
 
     if (CAnimator* pAnim = Get_BodyAnimator())
@@ -112,6 +117,36 @@ CAnimator* CBoss_Armadillo::Get_BodyAnimator() const
 CMultiHitBoxPart* CBoss_Armadillo::Get_HitBoxPart() const
 {
     return m_pBody;
+}
+
+void CBoss_Armadillo::Begin_QTE(_float fSeconds)
+{
+    m_bQTEEscaped = false;
+    m_fQTETimer = fSeconds;
+    m_pGameInstance_Proxy->Publish(EventTag::QTE_Show, nullptr);
+}
+
+void CBoss_Armadillo::End_QTE()
+{
+    m_pGameInstance_Proxy->Publish(EventTag::QTE_Hide, nullptr);
+}
+
+void CBoss_Armadillo::Fire_Grab()
+{
+    if (nullptr == m_pBody)
+        return;
+
+    KIRBY_ATTACHMENT_BEGIN_DESC grab{};
+    grab.pBoneMatrix = m_pBody->Get_BoneMatrixPtr(GRAB_BONE);
+    grab.pSourceWorld = m_pTransformCom->Get_WorldMatrixPtr();
+    grab.eType = KIRBY_ATTACHMENT_CONTEXT::GORILLA_COMBAT;
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentBegin, &grab);
+}
+
+void CBoss_Armadillo::Fire_Release(KIRBY_ATTACHMENT_END_REASON eType)
+{
+    KIRBY_ATTACHMENT_END_DESC desc{ eType };
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentEnd, &desc);
 }
 
 _bool CBoss_Armadillo::Sweep_Wall(const _float3& vDir, _float fDist, _float3* pOutNormal) const
@@ -208,6 +243,18 @@ void CBoss_Armadillo::Play_PartnerAnim(const _char* szClip, _bool bLoop)
     if (m_pPartner) m_pPartner->Play_Anim(szClip, bLoop);
 }
 
+void CBoss_Armadillo::Show_Cage()
+{
+    if (m_pCage)
+        m_pCage->Set_Active(true);
+}
+
+void CBoss_Armadillo::Hide_Cage()
+{
+    if (m_pCage)
+        m_pCage->Set_Active(false);
+}
+
 HRESULT CBoss_Armadillo::Ready_AnimEvents()
 {
     CAnimator* pAnim = Get_BodyAnimator();
@@ -229,6 +276,32 @@ HRESULT CBoss_Armadillo::Ready_AnimEvents()
                     Fire_PartnerThrow();
                 break;
             }
+            case EANIM_EVENT::OnOffPart:
+            {
+                if (phase != ANIM_EVENT_PHASE::POINT) break;
+
+                if (e.iIntParam == 0)
+                    Hide_Cage();
+
+                break;
+            }
+            case EANIM_EVENT::CamTrack:
+            {
+                if (phase != ANIM_EVENT_PHASE::POINT) break;
+
+                if (!e.strParam.empty())
+                {
+                    wstring w = StrToWstr(e.strParam);
+                    Fire_CatchCamera(w.c_str());
+                }
+                else
+                {
+                    CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
+                    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+                }
+
+                break;
+            }
         }
         });
     return S_OK;
@@ -240,9 +313,23 @@ HRESULT CBoss_Armadillo::Ready_PartObjects()
         CBoss_Armadillo_Body::PROTOTYPE_TAG, CBoss_Armadillo_Body::PART_TAG);
     if (!m_pBody) return E_FAIL;
 
-    // 잡기 명중 판정
+    m_pCage = Add_MonsterPart<CBoss_Armadillo_Cage>(
+        CBoss_Armadillo_Cage::PROTOTYPE_TAG, CBoss_Armadillo_Cage::PART_TAG,
+        m_pBody->Get_BoneMatrixPtr("RHaveL"));
+    if (!m_pCage) return E_FAIL;
+
     m_pBody->Set_HitBox_OnEnter(CBoss_Armadillo_Body::AHB_CATCH,
-        [this](CCollider*) { m_bCatchHit = true; });
+        [this](CCollider* pOther)
+        {
+            if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
+                return;
+            if (m_bCatchHit)
+                return;
+
+            m_bCatchHit = true;
+            m_pBody->Enable_HitBox(CBoss_Armadillo_Body::AHB_CATCH, false);
+            Fire_Grab();
+        });
 
     return S_OK;
 }
@@ -259,6 +346,16 @@ void CBoss_Armadillo::Update_BodyOffset(_float fTimeDelta)
     _vector vPos = XMVectorLerp(XMLoadFloat3(&m_vBodyOffsetStart),
         XMLoadFloat3(&m_vBodyOffsetTarget), t);
     m_pBody->Get_Transform()->Set_State(STATE::POSITION, XMVectorSetW(vPos, 1.f));
+}
+
+void CBoss_Armadillo::Fire_CatchCamera(const _tchar* szTrack)
+{
+    CUTSCENE_CAMERA_DESC cam{};
+    cam.eCam = ECutsceneCam::Cutscene;
+    cam.szTrack = szTrack;
+    cam.pProgress = Get_BodyAnimator();                      
+    cam.pAnchorWorld = m_pTransformCom->Get_WorldMatrixPtr();
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
 }
 
 CBoss_Armadillo* CBoss_Armadillo::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

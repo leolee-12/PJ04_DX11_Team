@@ -11,8 +11,12 @@ CBTNode* CBoss_Armadillo_Brain::Build_PhaseTree(_int iPhase)
 {
     UNREFERENCED_PARAMETER(iPhase);
 
+#ifdef _DEBUG
+    m_bOpeningDone = true;
+#endif
+
     // ---- 튜닝 상수 ----
-    const _float fSpd = 1.f;
+    const _float fSpd = 1.5f;
     const _float fCatchRange = 8.f;      // 루프에서 잡기를 고르는 거리
     const _float fTurnSpeedDeg = 120.f;
     const _float fWalkSpeed = 4.f;      // 기본 이동 속도 (Initialize와 일치)
@@ -30,12 +34,12 @@ CBTNode* CBoss_Armadillo_Brain::Build_PhaseTree(_int iPhase)
         return CBTPlayClip::Create(Anim, { c, true, fHold, fSpd });
         };
     auto Rest = [&]() -> CBTNode* { return HoldLoop("Wait", fRestTime); };
-    auto PlayFacing = [&](const string& c, _float fTurnDeg = 120.f) -> CBTNode* {
+    auto PlayFacing = [&](const string& c, _float fTurnDeg = 120.f, _float fSpeedMul = 1.f) -> CBTNode* {
         auto bP = make_shared<bool>(false);
         return CBTAction::Create(
-            [this, bP, c, fSpd, fTurnDeg](CBlackboard* pBB, _float dt) -> BT_STATUS {
+            [this, bP, c, fSpd, fTurnDeg, fSpeedMul](CBlackboard* pBB, _float dt) -> BT_STATUS {
                 CAnimator* pAnim = m_pOwner->Get_BodyAnimator();
-                if (!*bP) { pAnim->Play(c, false, true, 0.1f, fSpd); *bP = true; }
+                if (!*bP) { pAnim->Play(c, false, true, 0.1f, fSpd * fSpeedMul); *bP = true; }
 
                 _float3 vDir = pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 0.f));
                 _vector vToTgt = XMLoadFloat3(&vDir);
@@ -155,10 +159,13 @@ CBTNode* CBoss_Armadillo_Brain::Build_PhaseTree(_int iPhase)
         const _float fSegTimeMax = 4.f;    // 한 돌진이 벽을 못 만나면 이 시간 후 안전 종료
         const _float fReAimTime = 0.5f;
         const _float fSnapTurnDeg = 720.f;
+        const _float fBounceBackSpeed = 8.f;
+        const _float fBounceUpSpeed = 10.f;
 
         auto* pRush = CBTAction::Create(
             [this, bOn, bGroggy, iState, iWallHits, fSegT, fAimT, vDir,
-            fSpd, fRollSpeed, fWalkSpeed, fWallProbe, iGroggyHits, fSegTimeMax, fReAimTime, fSnapTurnDeg](CBlackboard* pBB, _float dt) -> BT_STATUS {
+            fSpd, fRollSpeed, fWalkSpeed, fWallProbe, iGroggyHits, fSegTimeMax, fReAimTime, fSnapTurnDeg
+            , fBounceBackSpeed, fBounceUpSpeed](CBlackboard* pBB, _float dt) -> BT_STATUS {
                 auto* pArma = static_cast<CBoss_Armadillo*>(m_pOwner);
                 if (!*bOn) {
                     m_pOwner->Get_BodyAnimator()->Play("RollAttack", true, true, 0.1f, fSpd);
@@ -176,7 +183,10 @@ CBTNode* CBoss_Armadillo_Brain::Build_PhaseTree(_int iPhase)
                     if (pArma->Sweep_Wall(*vDir, fWallProbe, &vN))
                     {
                         ++(*iWallHits);
-                        if (*iWallHits >= iGroggyHits) {                 // 3번째 벽: 그로기
+                        if (*iWallHits >= iGroggyHits) {
+                            _vector vBounce = XMVector3Normalize(XMVectorSetY(XMLoadFloat3(&vN), 0.f));
+                            m_pOwner->Get_Movement()->Launch(vBounce, fBounceBackSpeed, fBounceUpSpeed);
+
                             m_pOwner->Get_Movement()->Set_MoveSpeed(fWalkSpeed);
                             *bGroggy = true; *bOn = false;
                             return BT_STATUS::SUCCESS;
@@ -228,8 +238,7 @@ CBTNode* CBoss_Armadillo_Brain::Build_PhaseTree(_int iPhase)
                     *fFallT = 0.f; *bFallOn = true;
                 }
                 *fFallT += dt;
-                // 한 프레임 만에 끝나지 않게 최소 재생 보장 후, 착지 판정으로 종료
-                if (*fFallT >= 0.1f && m_pOwner->Get_Movement()->Is_Grounded()) {
+                if (*fFallT >= 0.05f && !m_pOwner->Get_Movement()->Is_Launched()) {
                     *bFallOn = false;
                     return BT_STATUS::SUCCESS;
                 }
@@ -304,53 +313,177 @@ CBTNode* CBoss_Armadillo_Brain::Build_PhaseTree(_int iPhase)
             });
         };
 
-    // ---- 잡기 (간소판: 명중 시 껴안았다 내던지기) ----
+    // 잡기
     auto MakeCatch = [&]() -> CBTNode* {
-        auto bOn = make_shared<bool>(false);
-        auto* pCatchRush = CBTAction::Create(
-            [this, bOn, fSpd](CBlackboard*, _float) -> BT_STATUS {
-                auto* pArma = static_cast<CBoss_Armadillo*>(m_pOwner);
-                CAnimator* pAnim = m_pOwner->Get_BodyAnimator();
-                if (!*bOn) {
-                    *bOn = true;
-                    pArma->Reset_CatchHit();
-                    pAnim->Play("CatchAttack", false, true, 0.1f, fSpd);
-                    pArma->Get_HitBoxPart()->Enable_HitBox(CBoss_Armadillo_Body::AHB_CATCH, true);
-                }
-                if (pArma->Is_CatchHit() || pAnim->Is_Finished()) {
-                    pArma->Get_HitBoxPart()->Enable_HitBox(CBoss_Armadillo_Body::AHB_CATCH, false);
-                    *bOn = false;
-                    return BT_STATUS::SUCCESS;
-                }
-                // 전진하며 덮치기
-                CTransform* pTf = m_pOwner->Get_Transform();
-                _float3 vFwd;
-                XMStoreFloat3(&vFwd, XMVector3Normalize(XMVectorSetY(pTf->Get_State(STATE::LOOK), 0.f)));
-                m_pOwner->Add_MoveDir(vFwd);
-                return BT_STATUS::RUNNING;
-            },
-            [this, bOn]() {
-                *bOn = false;
-                static_cast<CBoss*>(m_pOwner)->Get_HitBoxPart()
-                    ->Enable_HitBox(CBoss_Armadillo_Body::AHB_CATCH, false);
-            });
 
-        return CBTSequence::Create({
-            PlayFacing("CatchAttackStart"),
-            pCatchRush,
-            CBTSelector::Create({
-                CBTSequence::Create({
-                    CBTCondition::Create([this](CBlackboard*) {
-                        return static_cast<CBoss_Armadillo*>(m_pOwner)->Is_CatchHit(); }),
-                    OneShot("CatchSuccess"),
-                    HoldLoop("CatchSuccessWait", 0.8f),
-                    HitBox(CBoss_Armadillo_Body::AHB_THROW, true),
-                    OneShot("CatchThrow"),
-                    HitBox(CBoss_Armadillo_Body::AHB_THROW, false),
+        // 한 사이클
+        auto MakeCatchOnce = [&](shared_ptr<bool> pThrown) -> CBTNode* {
+
+            // (1) Walk 루프로 커비 추격, 사거리 안이면 SUCCESS (너무 오래 끌면 타임아웃)
+            auto bWalk = make_shared<bool>(false);
+            auto fWalkT = make_shared<_float>(0.f);
+            const _float fSwingRange = 6.f;      // 이 거리 안이면 잡기 스윙
+            const _float fChaseTimeout = 5.f;
+            auto* pWalkChase = CBTAction::Create(
+                [this, bWalk, fWalkT, fSpd, fWalkSpeed, fTurnSpeedDeg, fSwingRange, fChaseTimeout](CBlackboard* pBB, _float dt) -> BT_STATUS {
+                    if (!*bWalk) {
+                        m_pOwner->Get_BodyAnimator()->Play("Walk", true, true, 0.1f, fSpd);
+                        m_pOwner->Get_Movement()->Set_MoveSpeed(fWalkSpeed);
+                        *fWalkT = 0.f; *bWalk = true;
+                    }
+                    *fWalkT += dt;
+
+                    _float fDist = pBB->Get<_float>("DistToTarget", FLT_MAX);
+                    if (fDist <= fSwingRange || *fWalkT >= fChaseTimeout) { *bWalk = false; return BT_STATUS::SUCCESS; }
+
+                    _float3 vDir = pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 0.f));
+                    _vector vToTgt = XMLoadFloat3(&vDir);
+                    if (!XMVector3Equal(vToTgt, XMVectorZero())) {
+                        m_pOwner->Add_MoveDir(vDir);
+                        CTransform* pTf = m_pOwner->Get_Transform();
+                        _vector vLook = XMVector3Normalize(XMVectorSetY(pTf->Get_State(STATE::LOOK), 0.f));
+                        _float fDot = XMVectorGetX(XMVector3Dot(vLook, vToTgt));
+                        _float fCross = XMVectorGetZ(vLook) * XMVectorGetX(vToTgt)
+                            - XMVectorGetX(vLook) * XMVectorGetZ(vToTgt);
+                        _float fYaw = atan2f(fCross, fDot);
+                        _float fStep = XMConvertToRadians(fTurnSpeedDeg) * dt;
+                        _float fApply = (fabsf(fYaw) <= fStep) ? fYaw : (fYaw > 0.f ? fStep : -fStep);
+                        pTf->Rotate(XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fApply));
+                    }
+                    return BT_STATUS::RUNNING;
+                },
+                [bWalk]() { *bWalk = false; });
+
+            // (2) CatchAttack: 잡기 콜라이더 on, 히트나 종료까지 전진
+            auto bOn = make_shared<bool>(false);
+            auto* pCatchRush = CBTAction::Create(
+                [this, bOn, fSpd](CBlackboard*, _float) -> BT_STATUS {
+                    auto* pArma = static_cast<CBoss_Armadillo*>(m_pOwner);
+                    CAnimator* pAnim = m_pOwner->Get_BodyAnimator();
+                    if (!*bOn) {
+                        *bOn = true;
+                        pArma->Reset_CatchHit();
+                        pAnim->Play("CatchAttack", false, true, 0.1f, fSpd * 1.5f);
+                        pArma->Get_HitBoxPart()->Enable_HitBox(CBoss_Armadillo_Body::AHB_CATCH, true);
+                    }
+
+                    if (pArma->Is_CatchHit())
+                        pArma->Get_HitBoxPart()->Enable_HitBox(CBoss_Armadillo_Body::AHB_CATCH, false);
+
+                    if (pAnim->Is_Finished()) {
+                        pArma->Get_HitBoxPart()->Enable_HitBox(CBoss_Armadillo_Body::AHB_CATCH, false);
+                        *bOn = false;
+                        return BT_STATUS::SUCCESS;
+                    }
+                    return BT_STATUS::RUNNING;
+                },
+                [this, bOn]() {
+                    *bOn = false;
+                    static_cast<CBoss*>(m_pOwner)->Get_HitBoxPart()
+                        ->Enable_HitBox(CBoss_Armadillo_Body::AHB_CATCH, false);
+                });
+
+            // (3) QTE 대기: CatchSuccessWait 루프 5초. 탈출 성공->SUCCESS, 시간초과->FAILURE
+            auto bWaitOn = make_shared<bool>(false);
+            const _float fQTETime = 5.f;      // CatchSuccessWait 도달 후 탈출 제한시간
+            auto* pQTEWait = CBTAction::Create(
+                [this, bWaitOn, fQTETime, fSpd](CBlackboard*, _float dt) -> BT_STATUS {
+                    auto* pArma = static_cast<CBoss_Armadillo*>(m_pOwner);
+                    if (!*bWaitOn) {
+                        *bWaitOn = true;
+                        pArma->Begin_QTE(fQTETime);   // 여기서 판정 시작(타이머 세팅 + escape 리셋 + QTE_Show)
+                        m_pOwner->Get_BodyAnimator()->Play("CatchSuccessWait", true, true, 0.1f, fSpd);
+                    }
+                    if (pArma->Is_QTEEscaped()) { *bWaitOn = false; pArma->End_QTE(); return BT_STATUS::SUCCESS; }
+                    if (pArma->Tick_QTETimer(dt)) { *bWaitOn = false; pArma->End_QTE(); return BT_STATUS::FAILURE; }
+                    return BT_STATUS::RUNNING;
+                },
+                [this, bWaitOn]() { *bWaitOn = false; static_cast<CBoss_Armadillo*>(m_pOwner)->End_QTE(); });
+
+            auto* pReleaseEscape = CBTAction::Create([this](CBlackboard*, _float) {
+                static_cast<CBoss_Armadillo*>(m_pOwner)->Fire_Release(KIRBY_ATTACHMENT_END_REASON::GORILLA_COMBAT_ESCAPE);
+                return BT_STATUS::SUCCESS; });
+
+            // CatchThrow: 던지기 재생 후 커비 SLAM 상태로 릴리즈
+            auto bThrowOn = make_shared<bool>(false);
+            auto* pThrow = CBTAction::Create(
+                [this, bThrowOn, fSpd](CBlackboard*, _float) -> BT_STATUS {
+                    CAnimator* pAnim = m_pOwner->Get_BodyAnimator();
+                    if (!*bThrowOn) {
+                        *bThrowOn = true;
+                        pAnim->Play("CatchThrow", false, true, 0.1f, fSpd);
+                    }
+                    if (pAnim->Is_Finished()) {
+                        *bThrowOn = false;
+                        static_cast<CBoss_Armadillo*>(m_pOwner)->Fire_Release(KIRBY_ATTACHMENT_END_REASON::GORILLA_COMBAT_THROWN);
+                        return BT_STATUS::SUCCESS;
+                    }
+                    return BT_STATUS::RUNNING;
+                },
+                [bThrowOn]() { *bThrowOn = false; });
+
+            return CBTSequence::Create({
+                // 결과 플래그 리셋(루프 재진입 대비)
+                CBTAction::Create([pThrown](CBlackboard*, _float) {
+                    *pThrown = false; return BT_STATUS::SUCCESS; }),
+                pWalkChase,
+                PlayFacing("CatchAttackStart", 120.f, 2.f),
+                pCatchRush,
+                CBTSelector::Create({
+                    // 잡힘 -> CatchSuccess -> QTE
+                    CBTSequence::Create({
+                        CBTCondition::Create([this](CBlackboard*) {
+                            return static_cast<CBoss_Armadillo*>(m_pOwner)->Is_CatchHit(); }),
+                        OneShot("CatchSuccess"),
+                        CBTSelector::Create({
+                            // 탈출 성공(pQTEWait SUCCESS) -> CatchRelease (계속)
+                            CBTSequence::Create({ pQTEWait, pReleaseEscape, OneShot("CatchRelease") }),
+                            // 시간초과(pQTEWait FAILURE) -> CatchThrow -> 던짐 표시(종료)
+                            CBTSequence::Create({
+                                pThrow,
+                                CBTAction::Create([pThrown](CBlackboard*, _float) {
+                                    *pThrown = true; return BT_STATUS::SUCCESS; }),
+                                }),
+                            }),
+                        }),
+                        // 미스 -> CatchFailure (계속)
+                        OneShot("CatchFailure"),
+                        }),
+                });
+            };
+
+            auto bThrown1 = make_shared<bool>(false);
+            auto bThrown2 = make_shared<bool>(false);
+
+            return CBTSequence::Create({
+                CBTAction::Create([this](CBlackboard*, _float) {
+                    static_cast<CBoss_Armadillo*>(m_pOwner)->Show_Cage();
+                    return BT_STATUS::SUCCESS; }),
+                OneShot("CarryStart"),
+
+                    // 1번째 잡기
+                    MakeCatchOnce(bThrown1),
+                    CBTSelector::Create({
+                    // 잡힘+QTE실패(던짐) -> 즉시 종료 (CarryEnd 없음, 케이지는 CatchThrow 애님이벤트로 숨김)
+                    CBTCondition::Create([bThrown1](CBlackboard*) { return *bThrown1; }),
+
+                    // 탈출 성공 or 미스 -> 2번째 잡기
+                    CBTSequence::Create({
+                        MakeCatchOnce(bThrown2),
+                        CBTSelector::Create({
+                            // 2번째도 던짐 -> 즉시 종료 (CarryEnd 없음)
+                            CBTCondition::Create([bThrown2](CBlackboard*) { return *bThrown2; }),
+                            // 2번째 탈출/미스 -> 정상 종료 (CarryEnd + 케이지 숨김)
+                            CBTSequence::Create({
+                                OneShot("CarryEnd"),
+                                CBTAction::Create([this](CBlackboard*, _float) {
+                                    static_cast<CBoss_Armadillo*>(m_pOwner)->Hide_Cage();
+                                    return BT_STATUS::SUCCESS; }),
+                                }),
+                            }),
+                        }),
                     }),
-                OneShot("CatchFailure"),            // 빗나감: 후딜 개방
-                }),
-            });
+                });
         };
 
     // ---- 조립 ----
@@ -372,8 +505,10 @@ CBTNode* CBoss_Armadillo_Brain::Build_PhaseTree(_int iPhase)
         Rest(),
         CBTSelector::Create({
             CBTSequence::Create({
-                CBTCondition::Create([fCatchRange](CBlackboard* pBB) {
-                    return pBB->Get<_float>("DistToTarget", FLT_MAX) <= fCatchRange; }),
+                /*CBTCondition::Create([](CBlackboard* pBB) {
+                    return pBB->Get<_float>("DistToTarget", FLT_MAX) <= 25.f; }),*/
+                CBTCondition::Create([](CBlackboard* pBB) {
+                    return true; }),          // [임시]
                 MakeCatch(),
                 }),
             CBTSequence::Create({

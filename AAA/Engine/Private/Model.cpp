@@ -268,6 +268,14 @@ void CModel::Set_AnimationIndex(_uint iIndex, _bool isLoop, _bool isRestart, _fl
 	m_Animations[m_iBlendTargetAnimIndex]->Reset_TrackPosition();
 }
 
+void CModel::Set_BindPose()
+{
+	for (auto& pBone : m_Bones)
+		pBone->Set_TransformationMatrix(XMLoadFloat4x4(pBone->Get_BindPoseMatrixPtr()));
+
+	Update_Combined();
+}
+
 _int CModel::Get_AnimationIndex(const string& strName) const
 {
 	for (_uint i = 0; i < m_iNumAnimations; ++i)

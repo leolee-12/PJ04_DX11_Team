@@ -1123,6 +1123,9 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Part\Cage">
+      <UniqueIdentifier>{d89edda3-be28-4ced-bcb0-9e63ba29b3ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -2232,6 +2235,9 @@
     <ClInclude Include="..\Public\WalkSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Boss_Armadillo_Cage.h">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Part\Cage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -3259,6 +3265,9 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Armadillo_Cage.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Part\Cage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

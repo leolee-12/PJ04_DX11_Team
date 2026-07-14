@@ -83,6 +83,9 @@ _bool CKirby_QTE_Grabbed::Handle_Command(CKirby* pKirby, CKirby_Command* pComman
             if (!pCommand->IsDown())
                 return false;
 
+            if (!m_bQTEStart)
+                return true;
+
             ++m_iQTE_InputCount;
 
             return true;
@@ -137,6 +140,13 @@ void CKirby_QTE_Grabbed::Enter_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE
 
             CAnimator* pAnimator = pBody->Get_Animator();
             pAnimator->Play("Damage", true, false, 0.1f, 2.f);
+
+            m_tEventHandle = m_pGameInstance_Proxy->Subscribe(EventTag::QTE_Show,
+                [this](void*) {
+                    m_iQTE_InputCount = 0;
+                    m_bPublishedEvent = false;
+                    m_bQTEStart = true;
+                });
 
             break;
         }
@@ -278,6 +288,8 @@ void CKirby_QTE_Grabbed::Exit_QTEGrabbedState(CKirby* pKirby, QTE_GRABBED_STATE 
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Set_UseGravity(true);
             pMovement->Sync_To_Controller();
+
+            m_pGameInstance_Proxy->UnSubscribe(m_tEventHandle);
 
             pKirby->Set_AbilityPartsActive(pKirby->Get_KirbyAbility()->Get_AbilityType(), true, true);
             break;
