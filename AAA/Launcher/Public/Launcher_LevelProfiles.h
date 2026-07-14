@@ -18,6 +18,12 @@ struct LAUNCHER_LEVEL_PROFILES final
 		L"../../Resources/YSH/Level_Manifest/Level_Town_Step1.json";
 	static constexpr const _tchar* LEVEL_BOSS_STAGE1 =
 		L"../../Resources/YSH/Level_Manifest/Level_Boss_Stage1.json";
+	static constexpr const _tchar* LEVEL_STAGE1_STEP1 =
+		L"../../Resources/YSH/Level_Manifest/Level_Stage1_Step1.json";
+	static constexpr const _tchar* LEVEL_STAGE1_STEP2 =
+		L"../../Resources/YSH/Level_Manifest/Level_Stage1_Step2.json";
+	static constexpr const _tchar* LEVEL_STAGE1_STEP3 =
+		L"../../Resources/YSH/Level_Manifest/Level_Stage1_Step3.json";
 
 	static constexpr const _tchar* LEVEL_TEST =
 		L"../../Resources/YSH/Level_Manifest/Level_Test.json";
