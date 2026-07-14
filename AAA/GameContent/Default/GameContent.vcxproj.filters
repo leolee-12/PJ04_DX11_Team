@@ -127,11 +127,14 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\CopyEssence">
       <UniqueIdentifier>{97a43dad-cc91-46a7-82f3-88e81c2782ad}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\14. FlowerPetals">
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\14. Env">
       <UniqueIdentifier>{226d0445-b5ec-4f92-ade0-210ed72ccd46}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\15. Split">
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\14. Env\Split">
       <UniqueIdentifier>{6fc60edd-b034-4d2e-b974-b555d698dd72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\16. Kirby_SwordTrail">
+      <UniqueIdentifier>{a31c6265-e519-49a8-9abc-68d8e557c0b2}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\97. SwordChargeEffect">
       <UniqueIdentifier>{337bfefa-886b-4153-b3e4-87d81d98e19b}</UniqueIdentifier>
@@ -1120,9 +1123,6 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\16. Kirby_SwordTrail">
-      <UniqueIdentifier>{a31c6265-e519-49a8-9abc-68d8e557c0b2}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -1202,6 +1202,9 @@
     </ClInclude>
     <ClInclude Include="..\public\BossNamePlate.h">
       <Filter>00. GameObject\07. Boss\BossNamePlate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BreakWallEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BrontoBurt.h">
       <Filter>00. GameObject\06. Monster\07. BrontoBurt</Filter>
@@ -1402,7 +1405,7 @@
       <Filter>00. GameObject\09. AbilityBubble\Containers\Essence</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\FlowerPetals.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. FlowerPetals</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\GameContent_AnimEvents.h">
       <Filter>99. Defines</Filter>
@@ -1628,6 +1631,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_SwordHat.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_SwordTrail.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\16. Kirby_SwordTrail</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Wait.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait</Filter>
@@ -1965,12 +1971,6 @@
     <ClInclude Include="..\Public\RectParticleCommon.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\02. RectParticleCommon</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\TrailCommon.h">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\06. TrailCommon</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Kirby_SwordTrail.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\16. Kirby_SwordTrail</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\ResourceData.h">
       <Filter>97. DataSystem\Header</Filter>
     </ClInclude>
@@ -2041,13 +2041,13 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\11. SpitObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Split_Bush.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Split_Starblock.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Split_Stone.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Star2DParticle.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\97. Star2DParticle</Filter>
@@ -2117,6 +2117,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\TornadoSpinReverse.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\07. TornadoSpinReverse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TrailCommon.h">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\06. TrailCommon</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UI_BossStatus.h">
       <Filter>00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus</Filter>
@@ -2309,6 +2312,9 @@
     <ClCompile Include="..\private\BossNamePlate.cpp">
       <Filter>00. GameObject\07. Boss\BossNamePlate</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\BreakWallEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\BrontoBurt.cpp">
       <Filter>00. GameObject\06. Monster\07. BrontoBurt</Filter>
     </ClCompile>
@@ -2490,7 +2496,7 @@
       <Filter>00. GameObject\09. AbilityBubble\Containers\Essence</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\FlowerPetals.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. FlowerPetals</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\GameContent_Log.cpp">
       <Filter>99. Defines</Filter>
@@ -2689,6 +2695,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_SwordHat.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts\01. SwordHat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_SwordTrail.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\16. Kirby_SwordTrail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Wait.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait</Filter>
@@ -3005,12 +3014,6 @@
     <ClCompile Include="..\Private\RectParticleCommon.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\02. RectParticleCommon</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\TrailCommon.cpp">
-      <Filter>00. GameObject\03. Effect\01. Effect_Part\06. TrailCommon</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Kirby_SwordTrail.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\16. Kirby_SwordTrail</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\RockBounce.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\06. Gorilla_EffectContainer\04. Gorilla_RockBounce</Filter>
     </ClCompile>
@@ -3075,13 +3078,13 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\11. SpitObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Split_Bush.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Split_Starblock.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Split_Stone.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Split</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Star2DParticle.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\97. Star2DParticle</Filter>
@@ -3151,6 +3154,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\TornadoSpinReverse.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\07. TornadoSpinReverse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TrailCommon.cpp">
+      <Filter>00. GameObject\03. Effect\01. Effect_Part\06. TrailCommon</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UI_BossStatus.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\UI_GaugeBar\BossStatus</Filter>

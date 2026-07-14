@@ -1,6 +1,7 @@
 #include "MapEvent_BreakWall.h"
 #include "GameContrnt_Events.h"
 #include "Shader_PassMeta.h"
+#include "Effect_Loader.h"
 
 #include "GameInstance.h"
 #include "Geometry_Utils.h"
@@ -9,6 +10,8 @@ namespace
 {
 	constexpr _float BREAK_FRAGMENT_GRAVITY = -15.f;
 	constexpr _float BREAK_FRAGMENT_DESPAWN_FALL_DISTANCE = 30.f;
+	constexpr const _tchar* BREAK_WALL_EFFECT_ID = L"Split_Stone_Ultra";
+	constexpr _float BREAK_WALL_EFFECT_HEIGHT_RATIO = 0.5f;
 
 	struct BREAK_FRAGMENT_BIND
 	{
@@ -409,6 +412,26 @@ void CMapEvent_BreakWall::Start_Break()
 	m_bRenderable = true;
 
 	m_pBoostTrigger->Set_Enabled(false);
+
+	_float3 vMin{};
+	_float3 vMax{};
+	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
+
+	if (GeometryUtils::Is_ValidAABB(vMin, vMax))
+	{
+		const _float3 vLocalEffectPosition = {
+				(vMin.x + vMax.x) * 0.5f,
+				vMin.y + (vMax.y - vMin.y) * BREAK_WALL_EFFECT_HEIGHT_RATIO,
+				(vMin.z + vMax.z) * 0.5f
+		};
+
+		_float3 vEffectPosition{};
+		XMStoreFloat3(&vEffectPosition, XMVector3TransformCoord(
+			XMLoadFloat3(&vLocalEffectPosition),
+			XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr())));
+
+		CEffect_Loader::GetInstance()->Spawn(BREAK_WALL_EFFECT_ID, Get_LevelIndex(), vEffectPosition);
+	}
 
 	m_pGameInstance_Proxy->Publish(EventTag::Stage1_Step2_CarBreakMap, nullptr);
 
