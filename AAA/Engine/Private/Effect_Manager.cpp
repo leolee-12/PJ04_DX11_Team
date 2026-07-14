@@ -21,6 +21,10 @@ HRESULT CEffect_Manager::Initialize()
     if (m_pMeshShader == nullptr)
         return E_FAIL;
 
+    m_pTrailShader = CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_Effect_Trail.hlsl"), VTXTRAIL::Elements, VTXTRAIL::iNumElements);
+    if (m_pTrailShader == nullptr)
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -78,6 +82,7 @@ void CEffect_Manager::Free()
     m_Dormant.clear();             // 약참조라 Release 금지, clear만
     Safe_Release(m_p2DShader);
     Safe_Release(m_pMeshShader);
+    Safe_Release(m_pTrailShader);
     Safe_Release(m_pContext);
     Safe_Release(m_pDevice);
     Safe_Release(m_pGameInstance_Proxy);

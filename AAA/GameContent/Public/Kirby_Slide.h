@@ -19,7 +19,7 @@ private:
 
 private:
 	static constexpr _float s_fSlideGroundFriction = 30.f;
-	static constexpr _float s_fMaxSlideHorizontalSpeed = 27.f;
+	static constexpr _float s_fMaxSlideHorizontalSpeed = 23.f;
 	static constexpr _float s_fMaxSlideTime = 0.6f;
 
 private:

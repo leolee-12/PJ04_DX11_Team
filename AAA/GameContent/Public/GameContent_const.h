@@ -85,6 +85,9 @@ namespace ProtoDesc
 	inline constexpr TEXTURE_DESC Texture_Common_SpinSlash_2 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_SpinSlash_2"), TEXT("../../Resources/YSE/Effect/Common_SpinSlash/SpinSlash_2.png"), 1 };
 	// SpinSlashTrail
 	inline constexpr TEXTURE_DESC Texture_Common_SpinSlashTrail = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_SpinSlashTrail"), TEXT("../../Resources/YSE/Effect/Common_SpinSlashTrail/common_ring02.png"), 1 };
+	// SwordTrail
+	inline constexpr TEXTURE_DESC Texture_SwordTrail = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SwordTrail"), TEXT("../../Resources/YSE/Effect/SwordTrail/SwordTrail.png"), 1 };
+
 	// Charge
 	inline constexpr TEXTURE_DESC Texture_ChargeNoise = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_ChargeNoise"), TEXT("../../Resources/YSE/Effect/SwordCharge/ChargeNoise.png"), 1 };
 	// MilkyWayMask

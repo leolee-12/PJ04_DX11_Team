@@ -5,12 +5,14 @@
 NS_BEGIN(Engine)
 
 class CVIBuffer_Rect;
+namespace EffectRect { struct VALUES; }
 
 class ENGINE_DLL CEffect_RectEmitter abstract : public CEffect_Emitter
 {
     GENERATED_BODY_ABSTRACT(CEffect_RectEmitter)
 
 PROPERTY(_bool, m_bBillboard, L"Billboard", L"Effect");
+PROPERTY(_bool, m_bUseParticleRoll, L"Use Particle Roll", L"Rect Animation");
 
 // Sprite Animation Texture
 PROPERTY(_bool, m_bSpriteAniTexture, L"Sprite Animation Texture", L"Sprite Animation");
@@ -49,8 +51,8 @@ public:
 
 private:
     HRESULT Ready_Components();
-    HRESULT Bind_ShaderResources();
-    HRESULT Bind_ShaderValue(_float fLocalRatio);
+    HRESULT Bind_ShaderValue();
+    HRESULT Bind_EmitterRectValue(const EMITTER_PARTICLE& Particle);
 
 private:
     CVIBuffer_Rect* m_pVIBuffer{};
@@ -69,6 +71,7 @@ private:
     _float2 m_fCurMaskAniSize{};
 
 private:
+    EffectRect::VALUES Make_RectValues();
     void Init_PropertyValue();
 };
 
