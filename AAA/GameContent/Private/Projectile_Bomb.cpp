@@ -236,9 +236,6 @@ void CProjectile_Bomb::Tick_Visual(_float fTimeDelta)
         constexpr _int iSlot = 1;
         m_fBurnRatio = m_pAnimatorCom->Get_LayerProgress(iSlot);
 
-        _vector vCur = XMLoadFloat3(&m_vGlow);
-        XMStoreFloat3(&m_vGlow, vCur);
-
         if (m_fBurnRatio >= 1.f)
             Bomb_Explode();
     }
@@ -269,11 +266,8 @@ void CProjectile_Bomb::Spawn_FuseFx()
 
     if (nullptr == m_pFuseFx)
     {
-        CEffect_Loader::GetInstance()->Spawn(
-            L"BombFuseEffect", Get_LevelIndex(),
-            _float3(0.f, 0.f, 0.f),
-            _float3(0.f, 0.f, 0.f),
-            _float3(0.f, 0.f, 0.f),
+        CEffect_Loader::GetInstance()->Spawn(L"BombFuseEffect", Get_LevelIndex(),
+            _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
             &m_matFuseWorld, &m_pFuseFx);
     }
 }

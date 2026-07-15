@@ -66,6 +66,8 @@ protected:
 	virtual const _char*	Get_FuseBoneName() const { return "EffectL"; }
 	virtual const _char*	Get_RollBoneName() const { return "RotL"; }
 
+	void					Roll_ByMovement(_float fTimeDelta);
+
 	// 두 폭탄 공통 클립/레이어 규약
 protected:
 	static constexpr const _char*	ANIM_FUSE = "FuseBurning";
@@ -74,7 +76,6 @@ protected:
 
 private:
 	HRESULT					Bind_ShaderResources();
-	void					Roll_ByMovement(_float fTimeDelta);
 
 protected:
 	CShader*				m_pShaderCom = { nullptr };

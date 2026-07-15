@@ -8,12 +8,13 @@ class CKirbyBomb final : public CProjectile_Bomb
 	GENERATED_BODY(CKirbyBomb)
 
 private:
-	enum class BOMB_STATE
+	enum class KIRBYBOMB_STATE
 	{
 		NONE,
-		HELD,			// 몬스터 손에 부착(심지 이동 정지)
-		FLYING,			// 투척(심지 점화)
-		DANGER,			// 첫 바운드 후 (붉은색 발광 효과)
+		HELD,
+		THROW,
+		DANGER,
+		EXPLODEPRE
 	};
 
 public:
@@ -32,8 +33,9 @@ public:
 protected:
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void	Update(_float fTimeDelta) override;
+	virtual void	Tick_Visual(_float fTimeDelta) override;
+
 	virtual HRESULT Ready_Visual() override;
-	virtual HRESULT Ready_AnimEvents() override;
 	virtual HRESULT Ready_HitBox() override;
 
 	// 활성화/발사/바운드 
@@ -42,13 +44,16 @@ protected:
 	virtual void On_Bounce(_int iCount) override;
 
 private:
-	void Change_State(BOMB_STATE eNext);
-	void Enter_State(BOMB_STATE eState);
+	void Change_State(KIRBYBOMB_STATE eNext);
+	void Enter_State(KIRBYBOMB_STATE eState);
 	void Update_State(_float fTimeDelta);
-	void Exit_State(BOMB_STATE eState);
+	void Exit_State(KIRBYBOMB_STATE eState);
 
 private:
-	BOMB_STATE m_eState = { BOMB_STATE::NONE };
+	KIRBYBOMB_STATE m_eState = { KIRBYBOMB_STATE::NONE };
+
+	static constexpr _int s_iMaxExplodeAniPlayCount = { 5 };
+	_int m_iExplodeAniPlayCount{};
 
 public:
 	static CKirbyBomb* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -34,6 +34,12 @@ void CKirbyBomb::Update(_float fTimeDelta)
 	__super::Update(fTimeDelta);
 }
 
+void CKirbyBomb::Tick_Visual(_float fTimeDelta)
+{
+	Roll_ByMovement(fTimeDelta);
+	m_pAnimatorCom->Update(fTimeDelta);
+}
+
 HRESULT CKirbyBomb::Ready_Visual()
 {
 	if (FAILED(__super::Ready_Visual()))
@@ -55,24 +61,24 @@ HRESULT CKirbyBomb::Ready_Visual()
 
 void CKirbyBomb::On_Activated()
 {
-	m_eState = BOMB_STATE::NONE;	// 풀 재사용 리셋
+	m_eState = KIRBYBOMB_STATE::NONE;
 
 	if (m_bCarried)
-		Change_State(BOMB_STATE::HELD);
+		Change_State(KIRBYBOMB_STATE::HELD);
 }
 
 void CKirbyBomb::On_Launched()
 {
-	Change_State(BOMB_STATE::FLYING);
+	Change_State(KIRBYBOMB_STATE::THROW);
 }
 
 void CKirbyBomb::On_Bounce(_int iCount)
 {
 	if (iCount == 1)
-		Change_State(BOMB_STATE::DANGER);
+		Change_State(KIRBYBOMB_STATE::DANGER);
 }
 
-void CKirbyBomb::Change_State(BOMB_STATE eNext)
+void CKirbyBomb::Change_State(KIRBYBOMB_STATE eNext)
 {
 	if (m_eState == eNext)
 		return;
@@ -84,28 +90,37 @@ void CKirbyBomb::Change_State(BOMB_STATE eNext)
 	Enter_State(eNext);
 }
 
-void CKirbyBomb::Enter_State(BOMB_STATE eState)
+void CKirbyBomb::Enter_State(KIRBYBOMB_STATE eState)
 {
 	switch (eState)
 	{
-		case BOMB_STATE::HELD:
+		case KIRBYBOMB_STATE::HELD:
 		{
 			Reset_BombVisual();
 			Play_BodyAnim(ANIM_FUSE, false);
-			Start_Fuse();		// Overlay
-			Pause_Fuse();		// Overlay Pause
+			Start_Fuse(0.25f);		// Overlay
+			Pause_Fuse();			// Overlay Pause
 			Update_Socket();
 			Spawn_FuseFx();
 			break;
 		}
-		case BOMB_STATE::FLYING:
+		case KIRBYBOMB_STATE::THROW:
 		{
 			Resume_Fuse(); // Overlay 다시 재생
 			break;
 		}
-		case BOMB_STATE::DANGER:
+		case KIRBYBOMB_STATE::DANGER:
 		{
-			Play_DangerGlow();
+			Play_BodyAnim(ANIM_DANGER, true, 2.f, false);
+			break;
+		}
+		case KIRBYBOMB_STATE::EXPLODEPRE:
+		{
+			m_iExplodeAniPlayCount = s_iMaxExplodeAniPlayCount;
+			Play_BodyAnim("ExplodePre", false, 2.f, true);
+			--m_iExplodeAniPlayCount;
+
+			Pause_Fuse();
 			break;
 		}
 	}
@@ -113,38 +128,75 @@ void CKirbyBomb::Enter_State(BOMB_STATE eState)
 
 void CKirbyBomb::Update_State(_float fTimeDelta)
 {
-	//switch (m_eState)
-	//{
+	switch (m_eState)
+	{
+		case KIRBYBOMB_STATE::HELD:
+		{
+			break;
+		}
+		case KIRBYBOMB_STATE::THROW:
+		{
+			break;
+		}
+		case KIRBYBOMB_STATE::DANGER:
+		{
+			constexpr _int iSlot = 1;
+			m_fBurnRatio = m_pAnimatorCom->Get_LayerProgress(iSlot);
 
-	//}
+			if (m_fBurnRatio >= 1.f)
+				Change_State(KIRBYBOMB_STATE::EXPLODEPRE);
+			break;
+		}
+		case KIRBYBOMB_STATE::EXPLODEPRE:
+		{
+			if(m_pAnimatorCom->Is_Finished())
+			{
+				if(m_iExplodeAniPlayCount <= 0)
+				{
+					Bomb_Explode();
+					return;
+				}
+
+				Play_BodyAnim("ExplodePre", false, 2.f, true);
+				--m_iExplodeAniPlayCount;
+			}
+
+			const _int iCompletedCount = s_iMaxExplodeAniPlayCount - m_iExplodeAniPlayCount;
+
+			const _float fCurAnimRatio = m_pAnimatorCom->Get_Progress();
+
+			_float fTotalRatio = (static_cast<_float>(iCompletedCount) + fCurAnimRatio) /
+				static_cast<_float>(s_iMaxExplodeAniPlayCount);
+
+			Helper::FloatClamp(fTotalRatio, 0.f, 1.f);
+			m_vGlow.x = fTotalRatio / 2.f;
+
+			break;
+		}
+	}
 }
 
-void CKirbyBomb::Exit_State(BOMB_STATE eState)
+void CKirbyBomb::Exit_State(KIRBYBOMB_STATE eState)
 {
-	//switch (m_eState)
-	//{
-	
-	//}
-}
-
-HRESULT CKirbyBomb::Ready_AnimEvents()
-{
-	//m_pAnimatorCom->Set_EventCallback(
-	//	[this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase)
-	//	{
-	//		switch (static_cast<EANIM_EVENT>(e.iEventType))
-	//		{
-	//		case EANIM_EVENT::SetBody:
-	//			if (phase == ANIM_EVENT_PHASE::POINT)
-	//				m_vGlow = _float3(e.vOffset.x, e.vOffset.y, e.vOffset.z);
-	//			break;
-	//		default:
-	//			break;
-	//		}
-	//	}
-	//);
-
-	return S_OK;
+	switch (m_eState)
+	{
+		case KIRBYBOMB_STATE::HELD:
+		{
+			break;
+		}
+		case KIRBYBOMB_STATE::THROW:
+		{
+			break;
+		}
+		case KIRBYBOMB_STATE::DANGER:
+		{
+			break;
+		}
+		case KIRBYBOMB_STATE::EXPLODEPRE:
+		{
+			break;
+		}
+	}
 }
 
 HRESULT CKirbyBomb::Ready_HitBox()
