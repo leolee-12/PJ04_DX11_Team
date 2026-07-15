@@ -1030,6 +1030,9 @@
     <Filter Include="03. SystemObject\Kirby SpawnPoint">
       <UniqueIdentifier>{7d4ea5e9-6555-47f7-ae04-007b1bcfcab8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03. SystemObject\MissionManager">
+      <UniqueIdentifier>{e0d34630-b576-4457-a2ab-631e6dd9009e}</UniqueIdentifier>
+    </Filter>
     <Filter Include="03. SystemObject\SequencePlayer">
       <UniqueIdentifier>{3ba1b310-8431-447a-884a-81d9b62168a3}</UniqueIdentifier>
     </Filter>
@@ -1047,6 +1050,9 @@
     </Filter>
     <Filter Include="97. DataSystem\LevelDesignLoader">
       <UniqueIdentifier>{ac90f625-f08a-4a8a-89fd-03d9fa0dc850}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97. DataSystem\LevelLight">
+      <UniqueIdentifier>{07f47be9-0809-449c-a534-e6f9de324a23}</UniqueIdentifier>
     </Filter>
     <Filter Include="97. DataSystem\MapLoader">
       <UniqueIdentifier>{077c1198-d891-486e-b491-c184ad619dd7}</UniqueIdentifier>
@@ -1086,12 +1092,6 @@
     </Filter>
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03. SystemObject\MissionManager">
-      <UniqueIdentifier>{e0d34630-b576-4457-a2ab-631e6dd9009e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="97. DataSystem\LevelLight">
-      <UniqueIdentifier>{07f47be9-0809-449c-a534-e6f9de324a23}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1716,6 +1716,9 @@
     <ClInclude Include="..\Public\LevelDesignObject.h">
       <Filter>00. GameObject\96. LevelDesign</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\LevelLight_DB.h">
+      <Filter>97. DataSystem\LevelLight</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Loader_Prototype.h">
       <Filter>97. DataSystem\DataLoader</Filter>
     </ClInclude>
@@ -2171,9 +2174,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\WalkSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\LevelLight_DB.h">
-      <Filter>97. DataSystem\LevelLight</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2741,6 +2741,9 @@
     <ClCompile Include="..\Private\LevelDesignObject.cpp">
       <Filter>00. GameObject\96. LevelDesign</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\LevelLight_DB.cpp">
+      <Filter>97. DataSystem\LevelLight</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Loader_Prototype.cpp">
       <Filter>97. DataSystem\DataLoader</Filter>
     </ClCompile>
@@ -3172,9 +3175,6 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\LevelLight_DB.cpp">
-      <Filter>97. DataSystem\LevelLight</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
