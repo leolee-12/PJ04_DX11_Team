@@ -20,6 +20,9 @@ public:
 	static constexpr const wchar_t* Kirby_PartTag = L"Deform_Cylinder_Demo";
 
 private:
+	enum DEFORMCYLINDER_DEMO_MESH { BODY_A, BODY_B, LIMBS, DEFORMCYLINDER_DEMO_MESH_END };
+
+private:
 	CKirby_DeformCylinder_Demo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CKirby_DeformCylinder_Demo(const CKirby_DeformCylinder_Demo& Prototype);
 	virtual ~CKirby_DeformCylinder_Demo() = default;
@@ -36,6 +39,10 @@ public:
 
 private:
 	HRESULT Ready_Components();
+
+private:
+	_bool m_bBodyAOn{};
+	_bool m_bBodyBOn{};
 
 public:
 	static CKirby_DeformCylinder_Demo* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

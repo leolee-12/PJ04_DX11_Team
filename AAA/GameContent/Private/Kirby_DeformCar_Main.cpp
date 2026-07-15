@@ -92,11 +92,11 @@ HRESULT CKirby_DeformCar_Main::Render()
     if (FAILED(m_pKirbyShaderCom->Begin(ETOUI(KIRBY_SHADER_PASS::KIRBY))))
         return E_FAIL;
 
-    if (FAILED(m_pModelCom->Render(MESH_KIRBY)))
+    if (FAILED(m_pModelCom->Render(DEFORMCAR_MAIN_MESH::MESH_KIRBY)))
         return E_FAIL;
 
     // Mesh 2: Tires
-    if (FAILED(RenderPartMesh(MESH_TIRES)))
+    if (FAILED(RenderPartMesh(DEFORMCAR_MAIN_MESH::MESH_TIRES)))
         return E_FAIL;
 
     return S_OK;

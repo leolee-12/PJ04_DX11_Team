@@ -20,6 +20,9 @@ public:
 	static constexpr const wchar_t* Kirby_PartTag = L"Deform_Cylinder_Main";
 
 private:
+	enum DEFORM_CYLINDER_MESH { MESH_KIRBY, MESH_CYLINDER, MESH_END };
+
+private:
 	CKirby_DeformCylinder_Main(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CKirby_DeformCylinder_Main(const CKirby_DeformCylinder_Main& Prototype);
 	virtual ~CKirby_DeformCylinder_Main() = default;

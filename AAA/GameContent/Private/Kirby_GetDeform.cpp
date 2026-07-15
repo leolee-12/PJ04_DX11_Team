@@ -45,8 +45,8 @@ void CKirby_GetDeform::Enter(CKirby* pKirby, _int iFlag)
         return;
     }
     m_eDeformType = pDeformable->Get_DeformType();
-
-    // 
+    //m_eDeformType = DEFORM_TYPE::CYLINDER;   // Debug
+ 
     pDeformable->Request_Deform(pKirby->Get_Transform()->Get_WorldMatrixPtr());
 
     m_eDeformState = DEFORM_STATE::DEFORM_STATE_END;
@@ -157,7 +157,7 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
             CKirby_Deform_Model* pDeformModel_Main = pKirby->Get_DeformPart_Model(m_eDeformType, KIRBY_DEFORM_MODEL_TYPE::MAIN);
             pDeformModel_Main->Set_Active(true);
 
-            pDeformModel_Main->Get_Animator()->Play("DemoEndFirst", false, false, 0.f, 3.5f);
+            pDeformModel_Main->Get_Animator()->Play("DemoEndFirst", false, true, 0.f, 3.5f);
 
             COPY_ABILITY_TYPE m_eAbilityType = pKirby->Get_KirbyAbility()->Get_AbilityType();
             pKirby->Change_HatSocketMatrix(m_eAbilityType, pDeformModel_Main->Get_HatBoneMatirx());

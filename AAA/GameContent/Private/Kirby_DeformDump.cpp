@@ -104,6 +104,7 @@ void CKirby_DeformDump::Enter_DeformDumpState(CKirby* pKirby, DEFORM_DUMP_STATE 
             COPY_ABILITY_TYPE m_eAbilityType = pKirby->Get_KirbyAbility()->Get_AbilityType();
             pKirby->Change_HatSocketMatrix(m_eAbilityType, pBody->Get_HatBoneMatirx());
 
+            //eDeformType = DEFORM_TYPE::CYLINDER;  // Debug
             // ptr
             CLD_DeformObject::Spawn_Released(m_pGameInstance_Proxy, eDeformType,
                 pKirby->Get_LevelIndex(), pKirby->Get_Transform()->Get_WorldMatrixPtr());

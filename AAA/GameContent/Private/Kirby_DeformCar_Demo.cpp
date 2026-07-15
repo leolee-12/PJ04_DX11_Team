@@ -16,6 +16,7 @@ CKirby_DeformCar_Demo::CKirby_DeformCar_Demo(const CKirby_DeformCar_Demo& Protot
 HRESULT CKirby_DeformCar_Demo::Initialize_Prototype()
 {
     m_eProjType = PROJ_TYPE::PERSPEC;
+
     return S_OK;
 }
 
@@ -143,7 +144,6 @@ HRESULT CKirby_DeformCar_Demo::Ready_Components()
     AnimDesc.strDataFile = TEXT("../../Resources/YSE/DeformCar/Demo_AnimEvents.json");
 
     m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
-
     if (m_pAnimatorCom == nullptr || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
         return E_FAIL;
 
