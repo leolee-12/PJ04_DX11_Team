@@ -1066,6 +1066,9 @@
     <Filter Include="02. Component\01. Monster_Movement\00. Rail">
       <UniqueIdentifier>{bc260f59-12f2-4b10-855a-455fabc6411e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. Component\02. BubbleMovement">
+      <UniqueIdentifier>{d9aecc5b-d40c-43a5-81b3-4562126d1455}</UniqueIdentifier>
+    </Filter>
     <Filter Include="03. SystemObject">
       <UniqueIdentifier>{3db9cd73-2e4f-465d-b038-4ca8426ce6f2}</UniqueIdentifier>
     </Filter>
@@ -1140,9 +1143,6 @@
     </Filter>
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. Component\02. BubbleMovement">
-      <UniqueIdentifier>{d9aecc5b-d40c-43a5-81b3-4562126d1455}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1247,6 +1247,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\BubbleAura.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\BubbleAura</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BubbleMovement.h">
+      <Filter>02. Component\02. BubbleMovement</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Cage_WaddleDee.h">
       <Filter>00. GameObject\07. Boss\BossCage\Part\WaddleDee</Filter>
@@ -2268,9 +2271,6 @@
     <ClInclude Include="..\Public\WalkSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BubbleMovement.h">
-      <Filter>02. Component\02. BubbleMovement</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -2371,6 +2371,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\BubbleAura.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\BubbleAura</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BubbleMovement.cpp">
+      <Filter>02. Component\02. BubbleMovement</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Cage_WaddleDee.cpp">
       <Filter>00. GameObject\07. Boss\BossCage\Part\WaddleDee</Filter>
@@ -3313,9 +3316,6 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\BubbleMovement.cpp">
-      <Filter>02. Component\02. BubbleMovement</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
