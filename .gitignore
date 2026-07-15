@@ -504,3 +504,4 @@ AAA/Editor/Bin/ShaderFiles/Shader_World_Anim.hlsl.fxbin_d
 AAA/Editor/Bin/ShaderFiles/Shader_Armadillo.hlsl.fxbin_d
 AAA/Editor/Bin/ShaderFiles/Shader_AbillityModel.hlsl.fxbin_d
 *.fxbin_d
+*.fxbin
