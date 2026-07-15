@@ -124,7 +124,7 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\BubbleAura">
       <UniqueIdentifier>{34e8c8a7-dd40-4972-a48a-81234410bfab}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\CopyEssence">
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\EssenceAura">
       <UniqueIdentifier>{97a43dad-cc91-46a7-82f3-88e81c2782ad}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\14. Env">
@@ -135,6 +135,15 @@
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\16. Kirby_SwordTrail">
       <UniqueIdentifier>{a31c6265-e519-49a8-9abc-68d8e557c0b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect">
+      <UniqueIdentifier>{ccffdbd9-77db-4df6-a788-59b7612dc334}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight">
+      <UniqueIdentifier>{78f6f4c8-6e46-4f00-9923-d27496ac8a3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\SwordTrail">
+      <UniqueIdentifier>{0f342911-1dd7-4639-9632-28ffd15c4a89}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\97. SwordChargeEffect">
       <UniqueIdentifier>{337bfefa-886b-4153-b3e4-87d81d98e19b}</UniqueIdentifier>
@@ -682,6 +691,9 @@
     <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Part\Body">
       <UniqueIdentifier>{f592afe4-7daf-4d78-b808-f02a5080bc6f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Part\Cage">
+      <UniqueIdentifier>{d89edda3-be28-4ced-bcb0-9e63ba29b3ee}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Projectile">
       <UniqueIdentifier>{92f525a8-d5f1-48fe-80ae-d34c47d8657c}</UniqueIdentifier>
     </Filter>
@@ -771,6 +783,15 @@
     </Filter>
     <Filter Include="00. GameObject\09. AbilityBubble\Parts\Ability_Model">
       <UniqueIdentifier>{bf263cb2-3a5a-4cae-a1c3-3f631a883bff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\10. DropStar">
+      <UniqueIdentifier>{a2ce7ff0-d14e-4cba-8c17-c4e9803da0ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\10. DropStar\Manager">
+      <UniqueIdentifier>{ddcdbe58-47b2-43b5-be2c-e7ddacc4272e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\10. DropStar\Parts">
+      <UniqueIdentifier>{1b0611e1-ea78-4e51-8d4b-905c94dccc2b}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\95. Interface">
       <UniqueIdentifier>{3f986a95-5219-485c-8719-2667dcade916}</UniqueIdentifier>
@@ -1048,6 +1069,9 @@
     <Filter Include="02. Component\01. Monster_Movement\00. Rail">
       <UniqueIdentifier>{bc260f59-12f2-4b10-855a-455fabc6411e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. Component\02. BubbleMovement">
+      <UniqueIdentifier>{d9aecc5b-d40c-43a5-81b3-4562126d1455}</UniqueIdentifier>
+    </Filter>
     <Filter Include="03. SystemObject">
       <UniqueIdentifier>{3db9cd73-2e4f-465d-b038-4ca8426ce6f2}</UniqueIdentifier>
     </Filter>
@@ -1123,9 +1147,6 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\07. Boss\Boss\Armadillo\Part\Cage">
-      <UniqueIdentifier>{d89edda3-be28-4ced-bcb0-9e63ba29b3ee}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -1178,6 +1199,9 @@
     </ClInclude>
     <ClInclude Include="..\public\Boss_Armadillo_Brain.h">
       <Filter>00. GameObject\07. Boss\Boss\Armadillo\Brain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Armadillo_Cage.h">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Part\Cage</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Boss_Brain.h">
       <Filter>00. GameObject\07. Boss\Boss</Filter>
@@ -1232,6 +1256,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\BubbleAura.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\BubbleAura</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BubbleMovement.h">
+      <Filter>02. Component\02. BubbleMovement</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Cage_WaddleDee.h">
       <Filter>00. GameObject\07. Boss\BossCage\Part\WaddleDee</Filter>
@@ -1350,6 +1377,15 @@
     <ClInclude Include="..\Public\DroppedBubble.h">
       <Filter>00. GameObject\09. AbilityBubble\Containers\Dropped</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\DropStar.h">
+      <Filter>00. GameObject\10. DropStar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DropStar_Body.h">
+      <Filter>00. GameObject\10. DropStar\Parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DropStar_Manager.h">
+      <Filter>00. GameObject\10. DropStar\Manager</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Editable.h">
       <Filter>00. GameObject\95. Interface</Filter>
     </ClInclude>
@@ -1403,6 +1439,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\EnvVolume_Light.h">
       <Filter>00. GameObject\02. EnvObject\EnvTrigger\Volume</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EssenceAura.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\EssenceAura</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EssenceBubble.h">
       <Filter>00. GameObject\09. AbilityBubble\Containers\Essence</Filter>
@@ -1475,6 +1514,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\InhaleEffect.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\06. InhaleEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ItemEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kabu.h">
       <Filter>00. GameObject\06. Monster\05. Kabu</Filter>
@@ -2082,6 +2124,9 @@
     <ClInclude Include="..\Public\SwordSlash1.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SwordTrail_BK.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Terrain.h">
       <Filter>00. GameObject\Test\Terrain</Filter>
     </ClInclude>
@@ -2238,12 +2283,6 @@
     <ClInclude Include="..\Public\WalkSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\ItemEffect.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Boss_Armadillo_Cage.h">
-      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Part\Cage</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -2293,6 +2332,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Boss_Armadillo_Brain.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Armadillo\Brain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Armadillo_Cage.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Part\Cage</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Boss_Brain.cpp">
       <Filter>00. GameObject\07. Boss\Boss</Filter>
@@ -2347,6 +2389,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\BubbleAura.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\BubbleAura</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BubbleMovement.cpp">
+      <Filter>02. Component\02. BubbleMovement</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Cage_WaddleDee.cpp">
       <Filter>00. GameObject\07. Boss\BossCage\Part\WaddleDee</Filter>
@@ -2453,6 +2498,15 @@
     <ClCompile Include="..\Private\DroppedBubble.cpp">
       <Filter>00. GameObject\09. AbilityBubble\Containers\Dropped</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\DropStar.cpp">
+      <Filter>00. GameObject\10. DropStar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DropStar_Body.cpp">
+      <Filter>00. GameObject\10. DropStar\Parts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DropStar_Manager.cpp">
+      <Filter>00. GameObject\10. DropStar\Manager</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\Effect_Loader.cpp">
       <Filter>97. DataSystem\EffectLoader</Filter>
     </ClCompile>
@@ -2500,6 +2554,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\EnvVolume_Light.cpp">
       <Filter>00. GameObject\02. EnvObject\EnvTrigger\Volume</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EssenceAura.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\13. AbilityBubbleEffect\EssenceAura</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EssenceBubble.cpp">
       <Filter>00. GameObject\09. AbilityBubble\Containers\Essence</Filter>
@@ -2551,6 +2608,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\InhaleEffect.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\06. InhaleEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ItemEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kabu.cpp">
       <Filter>00. GameObject\06. Monster\05. Kabu</Filter>
@@ -3125,6 +3185,9 @@
     <ClCompile Include="..\Private\SwordSlash1.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\SwordTrail_BK.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Terrain.cpp">
       <Filter>00. GameObject\Test\Terrain</Filter>
     </ClCompile>
@@ -3274,12 +3337,6 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\ItemEffect.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Boss_Armadillo_Cage.cpp">
-      <Filter>00. GameObject\07. Boss\Boss\Armadillo\Part\Cage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

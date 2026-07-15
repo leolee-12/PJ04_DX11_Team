@@ -2,16 +2,21 @@
 #include "Projectile_Bomb.h"
 #include "Inhalable.h"
 
-NS_BEGIN(Engine)
-class CEffect_Container;
-NS_END
-
-
 NS_BEGIN(Client)
 
 class CEnemyBomb final : public CProjectile_Bomb, public IInhalable
 {
 	GENERATED_BODY(CEnemyBomb)
+
+private:
+	enum class BOMB_STATE
+	{
+		NONE, 
+		HELD,			// 몬스터 손에 부착(심지 이동 정지)
+		FLYING,			// 투척(심지 점화)
+		DANGER,			// 첫 바운드 후 (붉은색 발광 효과)
+		CAPTURED		// 커비 흡입
+	};
 
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_EnemyBomb";
@@ -35,38 +40,40 @@ public:
 
 	virtual COPY_ABILITY_TYPE	Get_CopyAbility() const override
 	{
-		return COPY_ABILITY_TYPE::NONE;		// TODO : BOMB 능력 구현 시 변경
+		return COPY_ABILITY_TYPE::BOMB;		
 	}
 
 	virtual CGameObject*		Get_GameObject() override { return this; }
 
 	void						On_Swallowed();
 
-	virtual void				Despawn() override;
 
 protected:
+	virtual HRESULT				Initialize(void* pArg) override;
 	virtual void				Update(_float fTimeDelta) override;
 	virtual HRESULT				Ready_Visual() override;
-
-	virtual void				On_Activated() override;
-
-	virtual void				On_Bounce(_int iCount) override;
-
-	virtual void				On_Explode() override;
-
 	virtual HRESULT				Ready_AnimEvents() override;
 
+	// 활성화/발사/바운드 
+	virtual void				On_Activated() override;
+	virtual void				On_Launched() override;
+	virtual void				On_Bounce(_int iCount) override;
+
 private:
+	// 상태 관련
+	void						Change_State(BOMB_STATE eNext);
+	void						Enter_State(BOMB_STATE eState);
+	void						Update_State(_float fTimeDelta);
+	void						Exit_State(BOMB_STATE eState);
+
 	void						Update_Captured(_float fTimeDelta);	
-	void						Update_FuseSocket();
+
 
 private:
-	CGameObject*				m_pCaptor = { nullptr };
-	CEffect_Container*			m_pFuseFx = { nullptr };
-	_float4x4					m_matFuseWorld{};
-	const _float4x4*			m_pFuseBone = { nullptr };
+	BOMB_STATE					m_eState = { BOMB_STATE::NONE };
 
-	_bool						m_bCaptured = { false };
+	CGameObject*				m_pCaptor = { nullptr };
+
 	_float						m_fPullSpeed = { 0.f };
 	_float3						m_vBaseScale = {};
 	_float						m_fScaleRatio = { 1.f };
