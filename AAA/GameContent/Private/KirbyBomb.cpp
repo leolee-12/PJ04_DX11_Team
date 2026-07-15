@@ -174,12 +174,13 @@ void CKirbyBomb::Update_BombMovement(_float fTimeDelta)
 	if (nullptr == m_pBombMovement || fTimeDelta <= 0.f)
 		return;
 
-	const _bool bWasGrounded = m_pBombMovement->Is_Grounded();
 	const _bool bGrounded = m_pBombMovement->Update_RigidBody(fTimeDelta);
 
-	// Bounce 한 번만 호출
-	if (!bWasGrounded && bGrounded && 0 == m_iBounceCount)
-		On_Bounce(++m_iBounceCount);
+	if (bGrounded && m_iBounceCount == 0)
+	{
+		++m_iBounceCount;
+		On_Bounce(m_iBounceCount);
+	}
 }
 
 void CKirbyBomb::Roll_ByBombMovement(_float fTimeDelta)
@@ -208,6 +209,8 @@ void CKirbyBomb::Roll_ByBombMovement(_float fTimeDelta)
 
 void CKirbyBomb::Kill()
 {
+	m_pTransformCom->Set_Scale(1.f, 1.f, 1.f);
+
 	m_pBombMovement->Stop();
 	m_pBombMovement->Clear_Forces();
 
@@ -230,35 +233,37 @@ void CKirbyBomb::Enter_State(KIRBYBOMB_STATE eState)
 {
 	switch (eState)
 	{
-	case KIRBYBOMB_STATE::HELD:
-	{
-		Reset_BombVisual();
-		Play_BodyAnim(ANIM_FUSE, false);
-		Start_Fuse(0.25f);		// Overlay
-		Pause_Fuse();			// Overlay Pause
-		Update_Socket();
-		Spawn_FuseFx();
-		break;
-	}
-	case KIRBYBOMB_STATE::THROW:
-	{
-		Resume_Fuse(); // Overlay 다시 재생
-		break;
-	}
-	case KIRBYBOMB_STATE::DANGER:
-	{
-		Play_BodyAnim(ANIM_DANGER, true, 2.f, false);
-		break;
-	}
-	case KIRBYBOMB_STATE::EXPLODEPRE:
-	{
-		m_iExplodeAniPlayCount = s_iMaxExplodeAniPlayCount;
-		Play_BodyAnim("ExplodePre", false, 2.f, true);
-		--m_iExplodeAniPlayCount;
+		case KIRBYBOMB_STATE::HELD:
+		{
+			Reset_BombVisual();
+			Play_BodyAnim(ANIM_FUSE, false);
+			Start_Fuse(0.25f);		// Overlay
+			Pause_Fuse();			// Overlay Pause
+			Update_Socket();
+			Spawn_FuseFx();
+			break;
+		}
+		case KIRBYBOMB_STATE::THROW:
+		{
+			Resume_Fuse(); // Overlay 다시 재생
+			break;
+		}
+		case KIRBYBOMB_STATE::DANGER:
+		{
+			constexpr _float fSize = 1.3f;
+			m_pTransformCom->Set_Scale(fSize, fSize, fSize);
+			Play_BodyAnim(ANIM_DANGER, true, 2.f, false);
+			break;
+		}
+		case KIRBYBOMB_STATE::EXPLODEPRE:
+		{
+			m_iExplodeAniPlayCount = s_iMaxExplodeAniPlayCount;
+			Play_BodyAnim("ExplodePre", false, 2.f, true);
+			--m_iExplodeAniPlayCount;
 
-		Pause_Fuse();
-		break;
-	}
+			Pause_Fuse();
+			break;
+		}
 	}
 }
 
@@ -339,8 +344,8 @@ HRESULT CKirbyBomb::Ready_HitBox()
 {
 	CCollider::COLLIDER_DESC desc{};
 	desc.pOwner = this;
-	desc.fHeight = m_fHitHeight * 1.1f;
-	desc.fRadius = m_fHitRadius * 1.1f;
+	desc.fHeight = m_fHitHeight;
+	desc.fRadius = m_fHitRadius;
 	desc.vCenter = m_vCenterOffset;
 	desc.vRadians = m_vRadians;
 
