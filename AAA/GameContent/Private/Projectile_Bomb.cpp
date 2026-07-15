@@ -180,8 +180,9 @@ void CProjectile_Bomb::Tick_Visual(_float fTimeDelta)
     if (m_pAnimatorCom)
     {
         m_pAnimatorCom->Update(fTimeDelta);
-        m_fBurnRatio =
-            m_pAnimatorCom->Get_LayerProgress(1);
+
+        constexpr _int iSlot = 1;
+        m_fBurnRatio = m_pAnimatorCom->Get_LayerProgress(iSlot);
 
         _vector vCur = XMLoadFloat3(&m_vGlow);
         XMStoreFloat3(&m_vGlow, vCur);

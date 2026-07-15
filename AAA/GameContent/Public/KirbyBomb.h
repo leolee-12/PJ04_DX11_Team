@@ -31,6 +31,7 @@ protected:
 	virtual HRESULT Ready_HitBox() override;
 
 	virtual HRESULT	Ready_Visual() override;
+
 	virtual void	On_Activated() override;
 	virtual void	On_Bounce(_int iCount) override;
 	virtual void	On_Explode() override;
@@ -41,11 +42,12 @@ public:
 
 private:
 	void Update_FuseSocket();
+	void Stop_Fuse();
 
 private:
-	CEffect_Container*	m_pFuseFx = { nullptr };
+	CEffect_Container*  m_pFuseFx{};
+	const _float4x4*	m_pFuseBone{};
 	_float4x4			m_matFuseWorld{};
-	const _float4x4*	m_pFuseBone = { nullptr };
 
 public:
 	static CKirbyBomb* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

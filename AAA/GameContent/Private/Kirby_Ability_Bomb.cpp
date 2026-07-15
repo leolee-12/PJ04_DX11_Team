@@ -289,16 +289,23 @@ void CKirby_Ability_Bomb::Spawn_Bomb(CKirby* pKirby)
 
 void CKirby_Ability_Bomb::Throw_Bomb(CKirby* pKirby)
 {
-    CTransform* pTransform = pKirby->Get_Transform();    
-    _vector vKirbyPos = pTransform->Get_State(STATE::POSITION);
-    _vector vKirbyLook = pTransform->Get_State(STATE::LOOK);
+    _vector vPos = m_pBomb->Get_Transform()->Get_State(STATE::POSITION);
 
-    _float3 vPos{};
-    XMStoreFloat3(&vPos, vKirbyPos);
-    _float3 vLook{};
-    XMStoreFloat3(&vLook, vKirbyLook);
+    _vector vLook = pKirby->Get_Transform()->Get_State(STATE::LOOK);
+    vLook = XMVector3Normalize(XMVectorSetY(vLook, 0.f));
 
-    m_pBomb->Launch(vPos, vLook);
+    constexpr _float fLaunchAngle = 45.f;
+    _float fRadian = XMConvertToRadians(fLaunchAngle);
+    _vector vDir = vLook * cosf(fRadian) + XMVectorSet(0.f, 1.f, 0.f, 0.f) * sinf(fRadian);
+
+    _float3 vLaunchPos{};
+    _float3 vLaunchDir{};
+
+    XMStoreFloat3(&vLaunchPos, vPos);
+    XMStoreFloat3(&vLaunchDir, vDir);
+
+    m_pBomb->Launch(vLaunchPos, vLaunchDir);
+    m_pBomb = nullptr;
 }
 
 CKirby_Ability_Bomb* CKirby_Ability_Bomb::Create()

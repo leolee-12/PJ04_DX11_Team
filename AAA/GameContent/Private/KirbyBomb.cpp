@@ -45,7 +45,7 @@ void CKirbyBomb::Update(_float fTimeDelta)
 
 	__super::Update(fTimeDelta);
 
-	//Update_FuseSocket();
+	Update_FuseSocket();
 }
 
 HRESULT CKirbyBomb::Ready_Visual()
@@ -69,37 +69,97 @@ HRESULT CKirbyBomb::Ready_Visual()
 
 void CKirbyBomb::On_Activated()
 {
-	// Launch, Attach 때 불림
-	__super::On_Activated();
+	if (nullptr == m_pAnimatorCom)
+		return;
+
+	m_fRollAngle = 0.f;
+	m_vGlow = { 0.f, 0.f, 0.f };
+	m_pAnimatorCom->Clear_Overlay(1);
+
+	m_pAnimatorCom->Play("FuseBurning", false, true);		// 크래쉬 안나게 설정
+
+	// Overlay Animation 
+	CAnimator::LAYER_PLAY_INFO LayerInfo{};
+	LayerInfo.iSlot = 1;
+	LayerInfo.tAnim.strAniName = "FuseBurning";
+	LayerInfo.tAnim.bLoop = false;		// 해당 애니메이션 끝나면 수명 끝이므로 false
+	LayerInfo.tAnim.bRestart = true;
+	LayerInfo.tAnim.fSpeed = 1.f;
+	LayerInfo.Roots = { "EffectL" };
+
+	m_pAnimatorCom->Apply_Overlay(LayerInfo);
+
+	if (m_bCarried)
+	{
+		m_pAnimatorCom->Pause_Mask(1);
+		Update_Socket();
+	}
+
+	if (m_pFuseBone == nullptr)
+		m_pFuseBone = m_pModelCom->Get_BoneMatrixPtr("EffectL");
+
+	Update_FuseSocket();
+
+	if (m_pFuseFx == nullptr)
+	{
+		CEffect_Loader::GetInstance()->Spawn(L"BombFuseEffect", Get_LevelIndex(),
+			_float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+			&m_matFuseWorld, &m_pFuseFx);
+	}
 }
 
 void CKirbyBomb::On_Bounce(_int iCount)
 {
-	// 바닥에 닿았을 때
+	if (iCount != 1 || nullptr == m_pAnimatorCom)
+		return;
+
+	CAnimator::ANI_PLAY_INFO AniInfo{};
+	AniInfo.strAniName = "DangerGlow";
+	AniInfo.bLoop = true;
+	AniInfo.fSpeed = 2.f;
+
+	m_pAnimatorCom->Play(&AniInfo);
+	m_pAnimatorCom->Resume_Mask(1);
 }
 
 void CKirbyBomb::On_Explode()
 {
-	// HitBox 충돌
-	// 심지 애니메이션이 끝났을 때
-	// 직접 호출 가능
-	
-	// 호출됨
-	// On_Impact()
-	// Bomb_Explode()
-	// On_Explode()
-	// Kill()
+	_float3 vPos{};
+	XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+	CEffect_Loader::GetInstance()->Spawn(L"BombExplosion", Get_LevelIndex(),
+		vPos, _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f));
+
+	if (m_pFuseFx)
+	{
+		m_pFuseFx->EffectContainer_StopAfterEmission();
+		m_pFuseFx = nullptr;
+	}
 
 	Despawn();
 }
 
 void CKirbyBomb::Update_FuseSocket()
 {
+	if (!m_pFuseBone)
+		return;
+
+	_matrix matWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+	_matrix matBoneWorld = XMLoadFloat4x4(m_pFuseBone) * matWorld;
+
+	_matrix matSocket = XMMatrixIdentity();
+	matSocket.r[3] = matBoneWorld.r[3];
+
+	XMStoreFloat4x4(&m_matFuseWorld, matSocket);
 }
 
 void CKirbyBomb::Despawn()
 {
-	// 즉시 제거 함수
+	if (m_pFuseFx)
+	{
+		m_pFuseFx->EffectContainer_StopAfterEmission();
+		m_pFuseFx = nullptr;
+	}
 
 	__super::Despawn();  // Kill
 }
@@ -127,21 +187,28 @@ HRESULT CKirbyBomb::Ready_HitBox()
 		{
 			if (!m_bAlive)
 				return;
-			if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup()) return;
+
+			if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
+				return;
+
 			if (auto* pVictim = dynamic_cast<IDamageable*>(pOther->Get_Owner()))
 			{
-				ATTACK_INFO atk{};
-				atk.fDamage = m_fDamage; atk.fKnockback = m_fKnockback;
-				XMStoreFloat3(&atk.vAttackerPos, m_pTransformCom->Get_State(STATE::POSITION));
-				atk.pAttacker = this;
-				pVictim->Damaged(atk);
+				ATTACK_INFO tAttackInfo{};
+				tAttackInfo.eHitType = HIT_TYPE::BOMB;
+				tAttackInfo.fDamage = m_fDamage;
+				tAttackInfo.fKnockback = m_fKnockback;
+				XMStoreFloat3(&tAttackInfo.vAttackerPos, m_pTransformCom->Get_State(STATE::POSITION));
+				tAttackInfo.pAttacker = this;
+				pVictim->Damaged(tAttackInfo);
 			}
+
 			On_Impact();
 		}
 	);
 
 	m_pHitBox->Set_Enabled(false);
 	m_pGameInstance_Proxy->Register_Collider(m_pHitBox, ETOUI(COLLISION_LAYER::PLAYER_HIT));
+
 	return S_OK;
 }
 

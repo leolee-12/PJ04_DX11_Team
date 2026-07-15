@@ -66,7 +66,6 @@ void CEnemyBomb::Despawn()
 	if (m_pFuseFx)
 	{
 		m_pFuseFx->EffectContainer_StopAfterEmission();
-
 		m_pFuseFx = nullptr;
 	}
 
@@ -183,8 +182,6 @@ void CEnemyBomb::On_Explode()
 	if (m_pFuseFx)
 	{
 		m_pFuseFx->EffectContainer_StopAfterEmission();
-		//m_pFuseFx->EffectContainer_Stop();
-
 		m_pFuseFx = nullptr;
 	}
 
