@@ -24,8 +24,9 @@ struct LD_OBJECT_DESC : public CGameObject::GAMEOBJECT_DESC
 	_wstring strThrowLv;
 
 	_uint iUid = 0;
-	_uint iEventReceiverId = LD_INVALID_ID;
-	_uint iEventSenderId = LD_INVALID_ID;
+	_wstring strPublishEventTag;
+	_wstring strReceiveEventTag;
+
 	_uint iTargetRailUid = 0;
 	_int  iTargetLandGroupIndex = -1;
 

@@ -627,8 +627,8 @@ PS_OUT PS_UKWN(PS_IN In)
         return PS_UKWN_LayerEx(In);
     
     PS_OUT Out;
-    float2 vBaseUV = Apply_MapUVTransform(Select_MapUV(In, g_iBase_UVIndex), g_vUVTransform);
-    float4 vBase = g_UnknownTexture.Sample(LinearSampler, vBaseUV);
+    float2 vUnknownUV = Apply_MapUVTransform(Select_MapUV(In, g_iUnknown_UVIndex), g_vUVTransform);
+    float4 vBase = g_UnknownTexture.Sample(LinearSampler, vUnknownUV);
     if (vBase.a < 0.1f)
         discard;
 
@@ -730,7 +730,16 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DMN_MASK();
     }
-    pass DISCARD // 8
+    pass UKWN // 8
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_UKWN();
+    }
+    pass DISCARD // 9
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);

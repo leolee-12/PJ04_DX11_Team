@@ -60,6 +60,12 @@ struct EDIT_OBJECT_COMMON_OVERRIDE
 
 	_bool bHasWorldMatrix = { false };
 	_float4x4 matWorld = {};
+
+	_bool bHasPublishEvent = { false };
+	_wstring strPublishEventTag;
+
+	_bool bHasReceiveEvent = { false };
+	_wstring strReceiveEventTag;
 };
 
 struct EDIT_MAPSECTION_OVERRIDE

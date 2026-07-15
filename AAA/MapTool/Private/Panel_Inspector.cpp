@@ -12,6 +12,7 @@
 #include "LevelDesign_Bush.h"
 #include "Editable.h"
 #include "EffectPart_Enum.h"
+#include "GameContrnt_Events.h"
 
 #include "GameInstance.h"
 #include "ContainerObject.h"
@@ -42,6 +43,20 @@ namespace
 			return nullptr;
 
 		return g_MapShaderPassMetas[idx].szName;
+	}
+
+	_wstring Normalize_LevelDesignEventTag(const string& strTag)
+	{
+		string strNormalized = strTag;
+		strNormalized.erase(std::remove(strNormalized.begin(), strNormalized.end(), '\r'), strNormalized.end());
+		strNormalized.erase(std::remove(strNormalized.begin(), strNormalized.end(), '\n'), strNormalized.end());
+
+		const size_t iFirst = strNormalized.find_first_not_of(" \t");
+		if (string::npos == iFirst)
+			return {};
+
+		const size_t iLast = strNormalized.find_last_not_of(" \t");
+		return StrToWstr(strNormalized.substr(iFirst, iLast - iFirst + 1));
 	}
 
 	_bool Is_EnvImportantTexType(MTEX_TYPE eType)
@@ -369,6 +384,12 @@ void CPanel_Inspector::Render()
 	{
 		ImGui::Separator();
 		Draw_MapSectionEditPanel(pLevel, nullptr, pSelected);
+	}
+
+	if (dynamic_cast<CLevelDesignObject*>(pSelected))
+	{
+		ImGui::Separator();
+		Draw_LevelDesignEventPanel(pLevel, pSelected);
 	}
 
 	ImGui::Separator();
@@ -942,6 +963,200 @@ void CPanel_Inspector::Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* 
 			pLevel->Load_MapPreviewStage(static_cast<_uint>(iPresetIndex));
 			return;
 		}
+	}
+}
+
+void CPanel_Inspector::Draw_LevelDesignEventPanel(CLevel_Edit* pLevel, CGameObject* pObject)
+{
+	CLevelDesignObject* pLDObject = dynamic_cast<CLevelDesignObject*>(pObject);
+	if (nullptr == pLevel || nullptr == pLDObject)
+		return;
+
+	if (!ImGui::CollapsingHeader("LevelDesign Event##LDEvent", ImGuiTreeNodeFlags_DefaultOpen))
+		return;
+
+	const LD_OBJECT_DESC& Desc = pLDObject->Get_LevelDesignDesc();
+
+	_wstring strHierarchyObjectName = Desc.strObjectName;
+	_bool bFoundHierarchyObjectName = false;
+
+	for (const auto& LayerPair : pLevel->Get_Layers())
+	{
+		for (const CLevel_Edit::EDITOR_OBJECT_HANDLE& Handle : LayerPair.second)
+		{
+			if (Handle.pObject != pObject)
+				continue;
+
+			strHierarchyObjectName = Handle.strName;
+			bFoundHierarchyObjectName = true;
+			break;
+		}
+
+		if (bFoundHierarchyObjectName)
+			break;
+	}
+
+	const string strObjectName = WstrToStr(strHierarchyObjectName);
+	_char szObjectName[256] = {};
+	strncpy_s(szObjectName, strObjectName.c_str(), _TRUNCATE);
+	ImGui::InputText("Object Name##LDEvent", szObjectName, sizeof(szObjectName), ImGuiInputTextFlags_ReadOnly);
+
+	const _wstring strStableKey = CMap_EditFile::Make_LevelDesignKey(Desc);
+
+	auto IterDraft = m_LevelDesignEventDrafts.find(strStableKey);
+	if (IterDraft == m_LevelDesignEventDrafts.end())
+	{
+		_wstring strPublishEventTag = Desc.strPublishEventTag;
+		_wstring strReceiveEventTag = Desc.strReceiveEventTag;
+
+		EDIT_OBJECT_OVERRIDE_DESC SavedEdit{};
+		if (pLevel->Try_GetMapPreviewLevelDesignEdit(pObject, &SavedEdit))
+		{
+			if (SavedEdit.Common.bHasPublishEvent)
+				strPublishEventTag = SavedEdit.Common.strPublishEventTag;
+
+			if (SavedEdit.Common.bHasReceiveEvent)
+				strReceiveEventTag = SavedEdit.Common.strReceiveEventTag;
+		}
+
+		IterDraft = m_LevelDesignEventDrafts.emplace(
+			strStableKey,
+			make_pair(WstrToStr(strPublishEventTag), WstrToStr(strReceiveEventTag))).first;
+	}
+
+	pair<string, string>& Draft = IterDraft->second;
+
+	_char szPublishEvent[256] = {};
+	_char szReceiveEvent[256] = {};
+	strncpy_s(szPublishEvent, Draft.first.c_str(), _TRUNCATE);
+	strncpy_s(szReceiveEvent, Draft.second.c_str(), _TRUNCATE);
+
+	if (ImGui::InputText("Publish Event##LDEvent", szPublishEvent, sizeof(szPublishEvent)))
+		Draft.first = szPublishEvent;
+
+	if (ImGui::InputText("Receive Event##LDEvent", szReceiveEvent, sizeof(szReceiveEvent)))
+		Draft.second = szReceiveEvent;
+
+	unordered_set<_wstring> PublishEventCandidates;
+
+	for (const auto& LayerPair : pLevel->Get_Layers())
+	{
+		for (const CLevel_Edit::EDITOR_OBJECT_HANDLE& Handle : LayerPair.second)
+		{
+			if (nullptr == Handle.pObject || !pLevel->Is_MapPreviewObject(Handle.pObject))
+				continue;
+
+			CLevelDesignObject* pCandidateObject = dynamic_cast<CLevelDesignObject*>(Handle.pObject);
+			if (nullptr == pCandidateObject)
+				continue;
+
+			const LD_OBJECT_DESC& CandidateDesc = pCandidateObject->Get_LevelDesignDesc();
+			const _wstring strCandidateKey = CMap_EditFile::Make_LevelDesignKey(CandidateDesc);
+			_wstring strPublishEventTag = CandidateDesc.strPublishEventTag;
+
+			const auto IterCandidateDraft = m_LevelDesignEventDrafts.find(strCandidateKey);
+			if (IterCandidateDraft != m_LevelDesignEventDrafts.end())
+			{
+				strPublishEventTag = Normalize_LevelDesignEventTag(IterCandidateDraft->second.first);
+			}
+			else
+			{
+				EDIT_OBJECT_OVERRIDE_DESC CandidateEdit{};
+				if (pLevel->Try_GetMapPreviewLevelDesignEdit(Handle.pObject, &CandidateEdit)
+					&& CandidateEdit.Common.bHasPublishEvent)
+				{
+					strPublishEventTag = CandidateEdit.Common.strPublishEventTag;
+				}
+			}
+
+			strPublishEventTag = Normalize_LevelDesignEventTag(WstrToStr(strPublishEventTag));
+			if (!strPublishEventTag.empty())
+				PublishEventCandidates.insert(strPublishEventTag);
+		}
+	}
+
+	if (ImGui::BeginCombo("Receive Candidate##LDEvent", "Select Event..."))
+	{
+		ImGui::TextDisabled("Map Publish Events");
+
+		if (PublishEventCandidates.empty())
+		{
+			ImGui::TextDisabled("(None)");
+		}
+		else
+		{
+			for (const _wstring& strEventTag : PublishEventCandidates)
+			{
+				const string strEventLabel = WstrToStr(strEventTag);
+				if (ImGui::Selectable(strEventLabel.c_str()))
+					Draft.second = strEventLabel;
+			}
+		}
+
+		ImGui::Separator();
+		ImGui::TextDisabled("Known Global Events");
+
+		const string strBossDied = WstrToStr(Client::EventTag::Boss_Died);
+		if (ImGui::Selectable((strBossDied + "##KnownGlobalBossDied").c_str()))
+			Draft.second = strBossDied;
+
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("MiniBoss also publishes Boss.Died. It may open the boundary earlier than intended.");
+
+		ImGui::EndCombo();
+	}
+
+	ImGui::TextDisabled("Apply stores values in the edit session.");
+	ImGui::TextDisabled("Reload Map Preview to apply runtime event bindings.");
+
+	auto CommitEventEdit = [&]() -> _bool
+		{
+			const _wstring strPublishEventTag = Normalize_LevelDesignEventTag(Draft.first);
+			const _wstring strReceiveEventTag = Normalize_LevelDesignEventTag(Draft.second);
+
+			Draft.first = WstrToStr(strPublishEventTag);
+			Draft.second = WstrToStr(strReceiveEventTag);
+
+			EDIT_OBJECT_OVERRIDE_DESC Edit{};
+			Edit.eKind = EDITABLE_OBJECT_KIND::LEVEL_DESIGN_OBJECT;
+			pLevel->Try_GetMapPreviewLevelDesignEdit(pObject, &Edit);
+
+			Edit.Common.bHasPublishEvent = !strPublishEventTag.empty();
+			Edit.Common.strPublishEventTag = strPublishEventTag;
+			Edit.Common.bHasReceiveEvent = !strReceiveEventTag.empty();
+			Edit.Common.strReceiveEventTag = strReceiveEventTag;
+
+			return pLevel->Track_EditedMapPreviewLevelDesignObject(pObject, Edit);
+		};
+
+	if (ImGui::Button("Apply Events##LDEvent"))
+	{
+		if (!CommitEventEdit())
+			MSG_BOX("LEVEL DESIGN EVENT APPLY FAILED");
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Save Override Now##LDEvent"))
+	{
+		if (!CommitEventEdit())
+		{
+			MSG_BOX("LEVEL DESIGN EVENT APPLY FAILED");
+		}
+		else if (FAILED(pLevel->Save_MapOverride()))
+		{
+			MSG_BOX("OBJECT OVERRIDE SAVE FAILED");
+		}
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Clear Events##LDEvent"))
+	{
+		Draft = {};
+
+		if (!CommitEventEdit())
+			MSG_BOX("LEVEL DESIGN EVENT CLEAR FAILED");
 	}
 }
 

@@ -69,6 +69,7 @@ namespace Client
         
         // 맵 
         inline constexpr const _tchar* Stage1_Step2_CarBreakMap = L"Stage1-2.CarBreakMap";
+        inline constexpr const _tchar* Level_BossDefeated = L"Level.BossDefeated";
 
         // 포인터 질의
         inline constexpr const _tchar* Query_Player = L"Query_Player";
