@@ -51,6 +51,7 @@ void CKirby_Deform_Car::Enter_Deform(CKirby* pKirby)
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_RotationSpeed(s_fDeformCar_Rot_Speed_Degree);
     pMovement->Set_MaxHorizontalSpeed(s_fCarSpeed);
+    pMovement->Set_MaxFallVelocity(s_fMaxCarFallVelocity);
 
     pKirby->Set_CollisionSize(s_fCar_CCT_Radius, s_fCar_CCT_Height);
 }
@@ -60,6 +61,7 @@ void CKirby_Deform_Car::Exit_Deform(CKirby* pKirby)
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
+    pMovement->Set_MaxFallVelocity(CKirby::s_fMaxFallVelocity);
 
     pKirby->Set_CollisionSize(CKirby::s_fCCT_Radius, CKirby::s_fCCT_Height);
 }

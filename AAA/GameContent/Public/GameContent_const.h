@@ -83,6 +83,7 @@ namespace ProtoDesc
 	// SpinSlash
 	inline constexpr TEXTURE_DESC Texture_Common_SpinSlash_1 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_SpinSlash_1"), TEXT("../../Resources/YSE/Effect/Common_SpinSlash/common_ring02.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_Common_SpinSlash_2 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_SpinSlash_2"), TEXT("../../Resources/YSE/Effect/Common_SpinSlash/SpinSlash_2.png"), 1 };
+
 	// SpinSlashTrail
 	inline constexpr TEXTURE_DESC Texture_Common_SpinSlashTrail = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Common_SpinSlashTrail"), TEXT("../../Resources/YSE/Effect/Common_SpinSlashTrail/common_ring02.png"), 1 };
 	// SwordTrail
@@ -113,13 +114,17 @@ namespace ProtoDesc
 
 
 	//sky
-	inline constexpr COMPONENT_DESC Model_SkyTest = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_SkyTest") };
+	inline constexpr COMPONENT_DESC Model_SkyDefault = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_SkyDefault") };
+	inline constexpr COMPONENT_DESC Model_SkyVolcano = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_SkyVolcano") };
 
 	// Collider
 	inline constexpr COMPONENT_DESC Collider_Sphere = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Sphere") };
 	inline constexpr COMPONENT_DESC Collider_AABB = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB") };
 	inline constexpr COMPONENT_DESC Collider_OBB = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB") };
 	inline constexpr COMPONENT_DESC Collider_Capsule = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Capsule") };
+
+	// Monster Effect
+	inline constexpr TEXTURE_DESC Texture_BK_CommonSlash = { ETOUI(LEVEL::STATIC),  TEXT("Prototype_Component_Texture_BK_CommonSlash"),  TEXT("../../Resources/CHJ/Effect/Monster/BladeKnight/common_slash.png"), 1 };
 }
 
 using namespace ProtoDesc;

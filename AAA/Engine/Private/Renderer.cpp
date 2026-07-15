@@ -561,6 +561,14 @@ HRESULT CRenderer::Render_Lights()
     if (FAILED(m_pVIBuffer->Bind_Resources()))
         return E_FAIL;
 
+    if (FAILED(m_pGameInstance_Proxy->Bind_ShaderGlobals(m_pShaderDeferred,
+        { "g_vLightDir", "g_vLightDiffuse", "g_vLightAmbient", "g_vLightSpecular" })))
+        return E_FAIL;
+    if (FAILED(m_pShaderDeferred->Begin(ETOUI(DEFERRED::DIRECTIONAL))))
+        return E_FAIL;
+    if (FAILED(m_pVIBuffer->Render()))
+        return E_FAIL;
+
     if (FAILED(m_pGameInstance_Proxy->Render_Light(m_pShaderDeferred, m_pVIBuffer)))
         return E_FAIL;
 
@@ -844,19 +852,8 @@ HRESULT CRenderer::Render_VolumetricFog()
     if (nullptr == pEnable || pEnable->x < 0.5f)
         return S_OK;
 
-    /* 1) 디렉셔널 라이트 검색 */
-    const LIGHT_DESC* pDirLight = nullptr;
-    for (_uint i = 0; ; ++i)
-    {
-        const LIGHT_DESC* pDesc = m_pGameInstance_Proxy->Get_LightDesc(i);
-        if (nullptr == pDesc)
-            break;
-        if (LIGHT::DIRECTIONAL == pDesc->eType)
-        {
-            pDirLight = pDesc;
-            break;
-        }
-    }
+    const _float4* pSunDir = m_pGameInstance_Proxy->Get_ShaderGlobal("g_vLightDir");
+    const _float4* pSunColor = m_pGameInstance_Proxy->Get_ShaderGlobal("g_vLightDiffuse");
 
     m_fFogTime += 0.016f; // 노이즈 스크롤용 (정밀 타이밍 불필요)
 
@@ -872,16 +869,8 @@ HRESULT CRenderer::Render_VolumetricFog()
     cb->mShadowProj = *m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ);
     cb->vCamPos = *m_pGameInstance_Proxy->Get_CamPosition();
 
-    if (nullptr != pDirLight)
-    {
-        cb->vLightDir = pDirLight->vDirection;
-        cb->vLightColor = pDirLight->vDiffuse;   // 강도는 Diffuse에 포함된다고 가정
-    }
-    else
-    {
-        cb->vLightDir = _float4(0.f, -1.f, 0.f, 0.f);
-        cb->vLightColor = _float4(0.f, 0.f, 0.f, 0.f);
-    }
+    cb->vLightDir = pSunDir ? *pSunDir : _float4(0.f, -1.f, 0.f, 0.f);
+    cb->vLightColor = pSunColor ? *pSunColor : _float4(0.f, 0.f, 0.f, 0.f);
 
     const _float4* pFogLI = m_pGameInstance_Proxy->Get_ShaderGlobal("g_fFogLightIntensity");
     const _float fFogLI = (nullptr != pFogLI) ? pFogLI->x : 1.f;
@@ -898,7 +887,7 @@ HRESULT CRenderer::Render_VolumetricFog()
     _float4 vColor = Fog("g_vFogColor");
 
     cb->vFogScatter = _float4(vColor.x, vColor.y, vColor.z, Fog("g_fFogDensity").x);
-    cb->vFogParams = _float4(fFogNear, Fog("g_fFogFar").x, Fog("g_fFogHeightFalloff").x, Fog("g_fFogBaseHeight").x);
+    cb->vFogParams  = _float4(fFogNear, Fog("g_fFogFar").x, Fog("g_fFogHeightFalloff").x, Fog("g_fFogBaseHeight").x);
     cb->vFogParams2 = _float4(Fog("g_fFogAnisotropy").x, Fog("g_fFogAmbient").x, m_fFogTime,
         Fog("g_fFogShadowStrength").x);
     cb->vGridParams = _float4((_float)FROXEL_W, (_float)FROXEL_H, (_float)FROXEL_D, 0.f);

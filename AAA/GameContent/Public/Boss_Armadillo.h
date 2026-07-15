@@ -19,6 +19,9 @@ public:
 
     static constexpr const _char* GRAB_BONE = "RHaveL";
 
+    static constexpr _float DEATH_PAUSE_SEC = 0.7f;
+    static constexpr _float DEATH_SHAKE_SEC = 0.7f;
+
 private:
     CBoss_Armadillo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     CBoss_Armadillo(const CBoss_Armadillo& Prototype);
@@ -67,6 +70,8 @@ protected:
     virtual _bool          Is_Intro_Finished() const override;
     virtual void           Play_Death() override;
     virtual _bool          Is_Death_Finished() const override;
+    virtual void           On_Enter_Corpse() override;
+    virtual _float         Get_CorpseLinger() const override { return 0.f; }
 
     virtual const vector<_float>& Get_PhaseThresholds() const override { return s_Thresholds; }
     virtual const _tchar* Get_AppearEventTag() const override { return TEXT("Armadillo_Appear"); }
@@ -96,6 +101,12 @@ private:
     _bool  m_bQTEEscaped = { false };
     _float m_fQTETimer = { 0.f };
 
+    enum class EDEATH { POSE_WAIT, PAUSING, PLAYING };
+    _bool   m_bDeathSeq = { false };
+    EDEATH  m_eDeathStep = { EDEATH::POSE_WAIT };
+    _int    m_iDeathPoseDelay = { 0 };
+    _float  m_fDeathPauseTimer = { 0.f };
+
 #ifdef _DEBUG
     mutable _bool m_bDebugWallHit = { false };
 #endif
@@ -103,6 +114,7 @@ private:
 private:
     void Update_BodyOffset(_float fTimeDelta);
     void Fire_CatchCamera(const _tchar* szTrack);
+    void Tick_DeathSequence(_float fTimeDelta);
 
 public:
     static CBoss_Armadillo* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

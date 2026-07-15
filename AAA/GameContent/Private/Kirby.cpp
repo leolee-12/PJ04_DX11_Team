@@ -20,6 +20,8 @@
 
 #include "Kirby_DeformCar_Demo.h"
 #include "Kirby_DeformCar_Main.h"
+#include "Kirby_DeformCylinder_Demo.h"
+#include "Kirby_DeformCylinder_Main.h"
 
 #include "Kirby_InputManager.h"
 #include "Kirby_Controller.h"
@@ -34,12 +36,16 @@
 
 // Deform
 #include "Kirby_Deform_Car.h"
+#include "Kirby_Deform_Cylinder.h"
 
 // Ladder
 #include "LevelDesign_Ladder.h"
 
 #include "EssenceBubble.h"
 #include "LD_DeformObject.h"
+
+// 임시
+#include "DropStar_Manager.h"
 
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCharacter{ pDevice, pContext }
@@ -146,6 +152,57 @@ void CKirby::Update(_float fTimeDelta)
             Get_LevelIndex(), m_strLayerTag.c_str(), Is_Active() ? 1 : 0);
         OutputDebugStringW(szBuf);
     }
+
+    //if (m_pGameInstance_Proxy->Key_Down(DIK_I))
+    //{
+    //    // 고르르뭄바 돌 탄착 별무리
+    //    CDropStar_Manager::STAR_SPAWN_DESC desc{};
+    //    desc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+    //    desc.iCount = 4;
+    //    desc.fRange = 3.f;
+    //    desc.fStartDeg = 120.f;   
+    //    desc.fSweepDeg = -240.f;
+    //    desc.fDelayStart = 0.f;
+    //    desc.fDelayStep = 0.05f;
+    //    desc.vLocalOffset = { 0.f, 0.5f, 0.f };
+    //    desc.fLaunchSpeed = 0.75f;
+
+    //    CDropStar_Manager::GetInstance()->Spawn_Pattern(Get_LevelIndex(),
+    //        XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()), desc);
+    //}
+
+    //if (m_pGameInstance_Proxy->Key_Down(DIK_O))
+    //{
+    //    // 고르르뭄바 팔 휘두를 때 별무리
+    //    CDropStar_Manager::STAR_SPAWN_DESC desc{};
+    //    desc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+    //    desc.iCount = 8;
+    //    desc.fRange = 10.f;
+    //    desc.fStartDeg = 90.f;
+    //    desc.fSweepDeg = -160.f;
+    //    desc.fDelayStart = 0.f;
+    //    desc.fDelayStep = 0.35f;
+    //    desc.vLocalOffset = { 0.f, 0.5f, 0.f };
+    //    desc.fLaunchSpeed = 0.5f;
+
+    //    CDropStar_Manager::GetInstance()->Spawn_Pattern(Get_LevelIndex(),
+    //        XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()), desc);
+    //}
+
+    //if (m_pGameInstance_Proxy->Key_Down(DIK_P))
+    //{
+    //    // 잘못 만들었지만 랜덤 스폰 필요하면 활용
+    //    CDropStar_Manager::STAR_SPAWN_DESC desc{};
+    //    desc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::CIRCLE;
+    //    desc.iCount = 4;
+    //    desc.fRange = 4.f;
+    //    desc.fDelayStart = 0.f;
+    //    desc.fDelayStep = 0.08f;
+    //    desc.vLocalOffset = { 0.f, 0.5f, 0.f };
+
+    //    CDropStar_Manager::GetInstance()->Spawn_Pattern(Get_LevelIndex(),
+    //        XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()), desc);
+    //}
 #endif
 }
 
@@ -275,6 +332,17 @@ CKirby_Deform_Model* CKirby::Get_DeformPart_Model(DEFORM_TYPE eDeformType, KIRBY
 
             case KIRBY_DEFORM_MODEL_TYPE::MAIN:
                 return Find_DeformModel(CKirby_DeformCar_Main::Kirby_PartTag);
+            }
+            break;
+
+        case DEFORM_TYPE::CYLINDER:
+            switch (eDeformModelType)
+            {
+            case KIRBY_DEFORM_MODEL_TYPE::DEMO:
+                return Find_DeformModel(CKirby_DeformCylinder_Demo::Kirby_PartTag);
+
+            case KIRBY_DEFORM_MODEL_TYPE::MAIN:
+                return Find_DeformModel(CKirby_DeformCylinder_Main::Kirby_PartTag);
             }
             break;
     }
@@ -496,6 +564,7 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::ENV_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::DROPPED_BUBBLE));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::DROP_STAR));
 
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HIT));
@@ -555,6 +624,26 @@ HRESULT CKirby::Ready_PartObjects()
     DeformCar_Main_Desc.pHitFlashColor = Get_HitFlashColorPtr();
 
     if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_DeformCar_Main::PROTOTYPE_TAG, CKirby_DeformCar_Main::Kirby_PartTag, &DeformCar_Main_Desc)))
+        return E_FAIL;
+
+    // DeformCylinder_Demo
+    CKirby_DeformCylinder_Demo::KIRBY_DEFORMCYLINDER_DEMO_DESC DeformCylinder_Demo_Desc{};
+    DeformCylinder_Demo_Desc.pParentMatrix = &m_RenderWorldMatrix;
+    DeformCylinder_Demo_Desc.pHitFlashIntensity = Get_HitFlashPtr();
+    DeformCylinder_Demo_Desc.pHitFlashColor = Get_HitFlashColorPtr();
+
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_DeformCylinder_Demo::PROTOTYPE_TAG,
+        CKirby_DeformCylinder_Demo::Kirby_PartTag, &DeformCylinder_Demo_Desc)))
+        return E_FAIL;
+
+    // DeformCylinder_Main
+    CKirby_DeformCylinder_Main::KIRBY_DEFORMCYLINDER_MAIN_DESC DeformCylinder_Main_Desc{};
+    DeformCylinder_Main_Desc.pParentMatrix = &m_RenderWorldMatrix;
+    DeformCylinder_Main_Desc.pHitFlashIntensity = Get_HitFlashPtr();
+    DeformCylinder_Main_Desc.pHitFlashColor = Get_HitFlashColorPtr();
+
+    if (FAILED(Add_PartObject(m_iPrototypeLevel, CKirby_DeformCylinder_Main::PROTOTYPE_TAG,
+        CKirby_DeformCylinder_Main::Kirby_PartTag, &DeformCylinder_Main_Desc)))
         return E_FAIL;
 
 
@@ -656,7 +745,8 @@ HRESULT CKirby::Ready_Deform()
             return S_OK;
         };
 
-    if (FAILED(Register_Deform(DEFORM_TYPE::CAR, CKirby_Deform_Car::Create()))) return E_FAIL;
+    if (FAILED(Register_Deform(DEFORM_TYPE::CAR, CKirby_Deform_Car::Create())))             return E_FAIL;
+    if (FAILED(Register_Deform(DEFORM_TYPE::CYLINDER, CKirby_Deform_Cylinder::Create())))   return E_FAIL;
 
     return S_OK;
 }
@@ -750,7 +840,6 @@ HRESULT CKirby::Ready_Events()
             //Clear_CutsceneAttachTarget();
             Clear_Ladder();
             Set_TriggerDeformObj(nullptr);
-            Set_HeldDeformObj(nullptr);
         }
     );
 
@@ -800,6 +889,12 @@ HRESULT CKirby::Ready_AnimEvents()
         return E_FAIL;
 
     if (FAILED(Get_DeformPart_Model(DEFORM_TYPE::CAR, KIRBY_DEFORM_MODEL_TYPE::MAIN)->Ready_AnimEvents(this)))
+        return E_FAIL;
+
+    if (FAILED(Get_DeformPart_Model(DEFORM_TYPE::CYLINDER, KIRBY_DEFORM_MODEL_TYPE::DEMO)->Ready_AnimEvents(this)))
+        return E_FAIL;
+
+    if (FAILED(Get_DeformPart_Model(DEFORM_TYPE::CYLINDER, KIRBY_DEFORM_MODEL_TYPE::MAIN)->Ready_AnimEvents(this)))
         return E_FAIL;
 
     return S_OK;

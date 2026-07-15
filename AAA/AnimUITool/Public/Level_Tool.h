@@ -44,8 +44,8 @@ public:
 
     CGameObject*                Load_Preview(const _wstring& strYshPath);
     CGameObject*                Load_Kirby();
-    CGameObject*                Load_DeformCar();
-    CGameObject*                Load_DeformCar_Demo();
+    CGameObject*                Load_DeformCylinder();
+    CGameObject*                Load_DeformCylinder_Demo();
     void                        Clear_Preview();
     void                        Recalc_CameraProj();
 

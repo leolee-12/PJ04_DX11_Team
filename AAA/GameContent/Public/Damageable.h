@@ -14,6 +14,7 @@ enum class HIT_TYPE : _uint
     SLIDE,
     SWORD_DEFAULT, SWORD_SPIN, UPWARD_SLASH,
     CAR_BOOSTER_HIT,
+    BOMB
 };
 
 struct ATTACK_INFO

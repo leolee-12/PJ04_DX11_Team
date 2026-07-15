@@ -7,10 +7,6 @@
 #include "SmokeLowPoly.h"
 #include "SmokeTail.h"
 
-#include "TestParticle.h"
-#include "TestMeshParticle.h"
-#include "TestMeshEmitter.h"
-
 CWalkSmoke::CWalkSmoke(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CEffect_Container(pDevice, pContext)
 {

@@ -15,6 +15,8 @@ public:
     static constexpr const _tchar* MODEL_PROTO_TAG = L"Prototype_Component_Model_ArmadilloPartner";
     static constexpr const _tchar* POOL_KEY = L"ArmadilloPartner";
 
+    static constexpr _float ANIM_SPEED = 1.5f;
+
     enum class STATE { CARRIED, FLYING, BREAKING };
 
 private:
@@ -28,7 +30,7 @@ public:
     virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOut) override { pOut->strPrototypeTag = PROTOTYPE_TAG; }
 
 public:
-    void Play_Anim(const _char* szClip, _bool bLoop);     // 보스가 패턴에 맞춰 클립 동기화
+    void Play_Anim(const _char* szClip, _bool bLoop, _float fSpeed = ANIM_SPEED);
     void Enable_SpinHitBox(_bool b);                      // 트윈롤링 중 자체 판정
     void Despawn() { Kill(); }                            // 보스 사망 등 외부 정리용
 
@@ -36,8 +38,8 @@ protected:
     virtual HRESULT Ready_Visual() override;
     virtual void    On_Activated() override;              // 부착 = Appear 재생
     virtual void    On_Launched() override;               // 발사 = TwinRolling 회전 재활용
-    virtual void    On_Bounce(_int iCount) override;      // 바닥에 닿으면 즉시 파괴
-    virtual void    On_Impact() override;                 // 명중/착탄: 캐리 중엔 무시
+    virtual void    On_Bounce(_int iCount) override {}
+    virtual void    On_Impact() override {}
     virtual void    Update_Terminal(_float dt) override;  // Break 끝나면 풀 반환
     virtual void    Tick_Visual(_float dt) override;
 

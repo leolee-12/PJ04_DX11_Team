@@ -19,6 +19,8 @@ private:
 	static constexpr _float s_fMaxBoostSpeed = 20.f;
 	static constexpr _float s_fBoostAcceleration = 180.f;
 
+	static constexpr _float s_fMaxCarFallVelocity = -19.f;
+
 	// Controller
 	static constexpr _float s_fCar_CCT_Radius = 1.8f;
 	static constexpr _float s_fCar_CCT_Height = 0.05f;

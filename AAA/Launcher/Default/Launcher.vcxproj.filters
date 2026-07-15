@@ -75,6 +75,9 @@
     <ClInclude Include="..\Public\Launcher_LevelProfiles.h">
       <Filter>99. Defines</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Level_Defines.h">
+      <Filter>01. Levels</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Level_FirstLoading.h">
       <Filter>01. Levels\01. FirstLoading</Filter>
     </ClInclude>

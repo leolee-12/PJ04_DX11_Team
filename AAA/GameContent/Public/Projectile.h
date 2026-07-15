@@ -54,14 +54,7 @@ protected:
     virtual void            On_Activated() {}
     virtual void            On_Impact() { Kill(); }
 
-    void Update_Socket()
-    {
-        if (!m_pSocketBone || !m_pSocketOwnerWorld) return;
-        _matrix mat = XMLoadFloat4x4(&m_SocketOffset)
-            * XMLoadFloat4x4(m_pSocketBone)
-            * XMLoadFloat4x4(m_pSocketOwnerWorld);
-        m_pTransformCom->Set_WorldMatrix(mat);
-    }
+    void Update_Socket();
 
 protected:
     CCollider* m_pHitBox = { nullptr };

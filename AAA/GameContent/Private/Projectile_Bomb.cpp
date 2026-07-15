@@ -1,7 +1,7 @@
 #include "Projectile_Bomb.h"
 #include "GameInstance.h"
 #include "GameContent_const.h"
-#include "Animator.h"
+#include "Effect_Loader.h"
 #include "Projectile_Movement.h"
 
 CProjectile_Bomb::CProjectile_Bomb(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -35,8 +35,8 @@ void CProjectile_Bomb::Update(_float fTimeDelta)
 
     if (m_bCarried)
     {
-        //Update_Socket();
         Tick_Visual(fTimeDelta);
+        Update_FuseSocket();
         return;
     }
 
@@ -52,6 +52,8 @@ void CProjectile_Bomb::Update(_float fTimeDelta)
 
     if (m_pHitBox && m_pHitBox->Is_Enabled())
         m_pHitBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+
+    Update_FuseSocket();
 }
 
 void CProjectile_Bomb::Late_Update(_float fTimeDelta)
@@ -153,6 +155,56 @@ void CProjectile_Bomb::Despawn()
     Kill();
 }
 
+_matrix CProjectile_Bomb::Get_PreRotInverse() const
+{
+    return XMMatrixInverse(nullptr,
+        XMMatrixRotationX(XMConvertToRadians(90.f)) *
+        XMMatrixRotationY(XMConvertToRadians(180.f)));
+}
+
+void CProjectile_Bomb::Ignite()
+{
+    Start_Fuse();
+
+    if (m_bCarried)
+    {
+        Pause_Fuse();
+        Update_Socket();
+    }
+
+    Spawn_FuseFx();
+}
+
+void CProjectile_Bomb::Start_Fuse(_float fSpeed)
+{
+    if (nullptr == m_pAnimatorCom)
+        return;
+
+    m_pAnimatorCom->Clear_Overlay(FUSE_LAYER);
+
+    CAnimator::LAYER_PLAY_INFO LayerInfo{};
+    LayerInfo.iSlot = FUSE_LAYER;
+    LayerInfo.tAnim.strAniName = ANIM_FUSE;
+    LayerInfo.tAnim.bLoop = false;
+    LayerInfo.tAnim.bRestart = true;
+    LayerInfo.tAnim.fSpeed = fSpeed;
+    LayerInfo.Roots = { Get_FuseBoneName() };
+
+    m_pAnimatorCom->Apply_Overlay(LayerInfo);
+}
+
+void CProjectile_Bomb::Pause_Fuse()
+{
+    if (m_pAnimatorCom)
+        m_pAnimatorCom->Pause_Mask(FUSE_LAYER);
+}
+
+void CProjectile_Bomb::Resume_Fuse()
+{
+    if (m_pAnimatorCom)
+        m_pAnimatorCom->Resume_Mask(FUSE_LAYER);
+}
+
 void CProjectile_Bomb::Bomb_Explode()
 {
     if (!m_bAlive)
@@ -180,15 +232,18 @@ void CProjectile_Bomb::Tick_Visual(_float fTimeDelta)
     if (m_pAnimatorCom)
     {
         m_pAnimatorCom->Update(fTimeDelta);
-        m_fBurnRatio =
-            m_pAnimatorCom->Get_LayerProgress(1);
 
-        _vector vCur = XMLoadFloat3(&m_vGlow);
-        XMStoreFloat3(&m_vGlow, vCur);
+        constexpr _int iSlot = 1;
+        m_fBurnRatio = m_pAnimatorCom->Get_LayerProgress(iSlot);
 
         if (m_fBurnRatio >= 1.f)
             Bomb_Explode();
     }
+}
+
+void CProjectile_Bomb::On_Explode()
+{
+    Play_ExplodeFx();
 }
 
 void CProjectile_Bomb::On_Impact()
@@ -196,31 +251,117 @@ void CProjectile_Bomb::On_Impact()
     Bomb_Explode();
 }
 
+void CProjectile_Bomb::Kill()
+{
+    Stop_FuseFx();
+    __super::Kill();
+}
+
+void CProjectile_Bomb::Spawn_FuseFx()
+{
+    if (nullptr == m_pFuseBone && m_pModelCom)
+        m_pFuseBone = m_pModelCom->Get_BoneMatrixPtr(Get_FuseBoneName());
+
+    Update_FuseSocket();
+
+    if (nullptr == m_pFuseFx)
+    {
+        CEffect_Loader::GetInstance()->Spawn(L"BombFuseEffect", Get_LevelIndex(),
+            _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+            &m_matFuseWorld, &m_pFuseFx);
+    }
+}
+
+void CProjectile_Bomb::Stop_FuseFx()
+{
+    if (nullptr == m_pFuseFx)
+        return;
+
+    m_pFuseFx->EffectContainer_StopAfterEmission();
+    m_pFuseFx = nullptr;
+}
+
+void CProjectile_Bomb::Update_FuseSocket()
+{
+    if (!m_pFuseBone)	
+        return;
+    _matrix matBoneWorld =
+        XMLoadFloat4x4(m_pFuseBone) *
+        XMLoadFloat4x4(Get_Transform()->Get_WorldMatrixPtr());
+
+    _matrix matSocket = XMMatrixIdentity();   // 회전=월드 정렬
+    matSocket.r[3] = matBoneWorld.r[3];
+
+    XMStoreFloat4x4(&m_matFuseWorld, matSocket);
+}
+
+void CProjectile_Bomb::Play_BodyAnim(const _char* szClip, _bool bLoop, _float fSpeed, _bool bRestart)
+{
+    if (nullptr == m_pAnimatorCom)
+        return;
+
+    CAnimator::ANI_PLAY_INFO Info{};
+    Info.strAniName = szClip;
+    Info.bLoop = bLoop;
+    Info.fSpeed = fSpeed;
+    Info.bRestart = bRestart;
+
+    m_pAnimatorCom->Play(&Info);
+}
+
+void CProjectile_Bomb::Play_DangerGlow(_float fSpeed)
+{
+    Play_BodyAnim(ANIM_DANGER, true, fSpeed, false);
+}
+
+void CProjectile_Bomb::Apply_RollPose()
+{
+    if (m_pAnimatorCom)
+        m_pAnimatorCom->SetBoneRotation(Get_RollBoneName(),
+            m_fRollAngle, XMLoadFloat3(&m_vRollAxis));
+}
+
+void CProjectile_Bomb::Play_ExplodeFx()
+{
+    _float3 vPos{};
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+    m_pGameInstance_Proxy->Play_SFX3D(Get_ExplodeSFXKey(), XMLoadFloat3(&vPos));
+
+    CEffect_Loader::GetInstance()->Spawn(L"BombExplosion", Get_LevelIndex(),
+                                        vPos, _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),  nullptr);
+}
+
+void CProjectile_Bomb::Reset_BombVisual()
+{
+    m_fRollAngle = 0.f;
+    m_vGlow = { 0.f, 0.f, 0.f };
+}
+
 void CProjectile_Bomb::Roll_ByMovement(_float fTimeDelta)
 {
-    if (m_bCarried || !m_bFlying || nullptr == m_pAnimatorCom || nullptr == m_pMovement)
+    if (m_bCarried || !m_bFlying ||
+        nullptr == m_pAnimatorCom || nullptr == m_pMovement)
         return;
 
     _float3 v = m_pMovement->Get_Velocity();
-    _vector vFwd = XMVectorSet(v.x, 0.f, v.z, 0.f);     // 수평 진행방향
+    _vector vFwd = XMVectorSet(v.x, 0.f, v.z, 0.f);
     _float fHoriz = XMVectorGetX(XMVector3Length(vFwd));
-
-    static const _matrix matInv = XMMatrixInverse(nullptr, 
-                                    XMMatrixRotationX(XMConvertToRadians(90.f)) *
-                                    XMMatrixRotationY(XMConvertToRadians(180.f)));
 
     if (fHoriz > 0.01f)
     {
         vFwd = XMVector3Normalize(vFwd);
-        _vector vAxisWorld = XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vFwd); // 방향 뒤집히면 vUp, vFwd 순서 바꾸기
-        _vector vAxisLocal = XMVector3TransformNormal(vAxisWorld, matInv);
+        _vector vAxisWorld = XMVector3Cross(
+            XMVectorSet(0.f, 1.f, 0.f, 0.f), vFwd);
+        _vector vAxisLocal = XMVector3TransformNormal(
+            vAxisWorld, Get_PreRotInverse());
         XMStoreFloat3(&m_vRollAxis, vAxisLocal);
     }
 
     m_fRollAngle += fHoriz * ROLL_DEG_PER_SPEED * fTimeDelta;
     m_fRollAngle = fmodf(m_fRollAngle, 360.f);
 
-    m_pAnimatorCom->SetBoneRotation("RotL", m_fRollAngle, XMLoadFloat3(&m_vRollAxis));      // KirbyBomb의 회전 본 이름 동일 해야 함 
+    Apply_RollPose();
 }
 
 HRESULT	CProjectile_Bomb::Bind_ShaderResources()

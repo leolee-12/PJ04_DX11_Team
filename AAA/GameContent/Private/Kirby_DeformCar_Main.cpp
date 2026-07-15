@@ -92,11 +92,11 @@ HRESULT CKirby_DeformCar_Main::Render()
     if (FAILED(m_pKirbyShaderCom->Begin(ETOUI(KIRBY_SHADER_PASS::KIRBY))))
         return E_FAIL;
 
-    if (FAILED(m_pModelCom->Render(MESH_KIRBY)))
+    if (FAILED(m_pModelCom->Render(DEFORMCAR_MAIN_MESH::MESH_KIRBY)))
         return E_FAIL;
 
     // Mesh 2: Tires
-    if (FAILED(RenderPartMesh(MESH_TIRES)))
+    if (FAILED(RenderPartMesh(DEFORMCAR_MAIN_MESH::MESH_TIRES)))
         return E_FAIL;
 
     return S_OK;
@@ -151,7 +151,7 @@ HRESULT CKirby_DeformCar_Main::Ready_Components()
     CCollider::COLLIDER_DESC WallBreakerDesc{};
     WallBreakerDesc.pOwner = this;
     WallBreakerDesc.vCenter = _float3(0.f, 1.5f, 1.5f);
-    WallBreakerDesc.fRadius = 2.3f;
+    WallBreakerDesc.fRadius = 2.5f;
 
     m_pHitBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag,
         TEXT("WallBreakerCollider_Com"), &WallBreakerDesc);
