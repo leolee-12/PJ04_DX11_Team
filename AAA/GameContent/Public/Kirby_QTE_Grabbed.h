@@ -58,6 +58,10 @@ private:
 
 	_bool m_bDidSmallJump{};
 
+	_bool m_bQTEStart = { false };
+
+	SUBHANDLE m_tEventHandle{};
+
 public:
 	static CKirby_QTE_Grabbed* Create();
 private:

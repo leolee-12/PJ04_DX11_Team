@@ -15,6 +15,10 @@
 #include "Town_Step1.h"
 #include "Boss_Stage1.h"
 
+#include "Stage1_Step1.h"
+#include "Stage1_Step2.h"
+#include "Stage1_Step3.h"
+
 CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel{ pDevice, pContext }
 {
@@ -65,6 +69,15 @@ void CLevel_Loading::Update(_float fTimeDelta)
             break;
         case LEVEL::BOSS_STAGE1:
             pNextLevel = CBoss_Stage1::Create(m_pDevice, m_pContext);
+            break;
+        case LEVEL::STAGE1_STEP1:
+            pNextLevel = CStage1_Step1::Create(m_pDevice, m_pContext);
+            break;
+        case LEVEL::STAGE1_STEP2:
+            pNextLevel = CStage1_Step2::Create(m_pDevice, m_pContext);
+            break;
+        case LEVEL::STAGE1_STEP3:
+            pNextLevel = CStage1_Step3::Create(m_pDevice, m_pContext);
             break;
         }
 
