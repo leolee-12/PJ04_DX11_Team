@@ -715,6 +715,9 @@
     <Filter Include="00. GameObject\07. Boss\Boss\Leopard">
       <UniqueIdentifier>{746fae67-6a99-4b4e-bef8-b91f1b3b2cd5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Part">
+      <UniqueIdentifier>{68c80ce0-dd15-457a-8fcf-a8858f37f553}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\07. Boss\BossCage">
       <UniqueIdentifier>{e77c861a-2b81-4e49-a7e4-26ef8eb371d1}</UniqueIdentifier>
     </Filter>
@@ -1190,6 +1193,12 @@
     </ClInclude>
     <ClInclude Include="..\public\Boss_Gorilla_RockHole.h">
       <Filter>00. GameObject\07. Boss\Boss\Gorilla\Part\RockHole</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Leopard.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Leopard_Body.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Part</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BossBase.h">
       <Filter>00. GameObject\07. Boss</Filter>
@@ -2287,6 +2296,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Boss_Gorilla_RockHole.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Gorilla\Part\RockHole</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Leopard.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Leopard_Body.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Part</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BossBase.cpp">
       <Filter>00. GameObject\07. Boss</Filter>

@@ -159,6 +159,9 @@
 #include "Projectile_Partner.h"
 #include "Boss_Armadillo_Cage.h"
 
+#include "Boss_Leopard.h"
+#include "Boss_Leopard_Body.h"
+
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
 #include "LevelDesign_Starblock.h"
@@ -1188,6 +1191,17 @@ void CGameObject_Factory::Register_MainBoss()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Armadillo_Cage::PROTOTYPE_TAG,
                 CBoss_Armadillo_Cage::Create(pDevice, pContext));
         )
+    );
+
+    Register(CBoss_Leopard::PROTOTYPE_TAG, TEXT("MainBoss"),
+        CREATOR(CBoss_Leopard),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Leopard_Body::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Leopard/body/Body.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Leopard_Body::PROTOTYPE_TAG, CBoss_Leopard_Body::Create(pDevice, pContext));
+                )
     );
 }
 
