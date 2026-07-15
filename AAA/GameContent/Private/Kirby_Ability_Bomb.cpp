@@ -37,7 +37,7 @@ void CKirby_Ability_Bomb::Enter_AttackState(CKirby* pKirby, _int iFlag)
     _bool bIsGround = pMovement->Is_Grounded();
 
     if(!bIsGround)
-        Change_BombState(pKirby, BOMB_STATE::FALL_CHARGE_START);
+        Change_BombState(pKirby, BOMB_STATE::CHARGE_START_FALL);
     else if(pKirby->Has_MoveDir())
         Change_BombState(pKirby, BOMB_STATE::MOVE_THROW);
     else
@@ -140,27 +140,39 @@ void CKirby_Ability_Bomb::Enter_BombState(CKirby* pKirby, BOMB_STATE eState)
             if (!Handle_ReserveAttack(pKirby))
                 m_bReqEndAttackState = true;
             break;
+
         case BOMB_STATE::MOVE_THROW:
             pAnimator->Play("BombShoot", false, true, 0.1f, 2.f);
+            Spawn_Bomb(pKirby);
             break;
+
         case BOMB_STATE::CHARGE_START:
             pAnimator->Play("BombThrowCharge", true, false, 0.1f, 1.5f);
             Spawn_Bomb(pKirby);
             break;
-        case BOMB_STATE::CHARGE:
+        case BOMB_STATE::CHARGING:
             pAnimator->Play("BombThrowCharge", true, false, 0.1f, 1.5f);
             break;
-        case BOMB_STATE::FALL_CHARGE_START:
+
+        case BOMB_STATE::CHARGE_START_FALL:
+            pAnimator->Play("BombFall", false, false, 0.1f, 1.5f);
+            Spawn_Bomb(pKirby);
+            break;
+        case BOMB_STATE::CHARGING_FALL:
             pAnimator->Play("BombFall", false, false, 0.1f, 1.5f);
             break;
-        case BOMB_STATE::FALL_CHARGE:
-            break;
-        case BOMB_STATE::CHARGE_LANDING:
+
+        case BOMB_STATE::CHARGING_LANDING:
             pAnimator->Play("BombLanding", false, false, 0.1f, 1.5f);
             break;
+
         case BOMB_STATE::THROW:
             pAnimator->Play("BombThrow", false, false, 0.1f, 2.5f);
-            Throw_Bomb(pKirby);
+            Throw_Bomb(pKirby, 70.f, 15.f);
+            break;
+        case BOMB_STATE::CHARGING_THROW: // 임시
+            pAnimator->Play("BombThrow", false, false, 0.1f, 2.5f);
+            Throw_Bomb(pKirby, 70.f, 25.f);
             break;
     }
 }
@@ -176,6 +188,9 @@ void CKirby_Ability_Bomb::Update_BombState(CKirby* pKirby, _float fTimeDelta)
     {
         case BOMB_STATE::MOVE_THROW:
         {
+            if (pAnimator->Get_Progress() >= 0.35f)
+                Throw_Bomb(pKirby, 5.f, 20.f);
+
             if (pAnimator->Is_Finished())
                 Change_BombState(pKirby, BOMB_STATE::BOMB_STATE_END);
             break;
@@ -187,48 +202,54 @@ void CKirby_Ability_Bomb::Update_BombState(CKirby* pKirby, _float fTimeDelta)
                 if(m_bKeyUp)
                     Change_BombState(pKirby, BOMB_STATE::THROW);
                 else 
-                    Change_BombState(pKirby, BOMB_STATE::CHARGE);
+                    Change_BombState(pKirby, BOMB_STATE::CHARGING);
             }
             break;
         }
-        case BOMB_STATE::CHARGE:
+        case BOMB_STATE::CHARGING:
         {
             if (m_bKeyUp)
-                Change_BombState(pKirby, BOMB_STATE::THROW);
+                Change_BombState(pKirby, BOMB_STATE::CHARGING_THROW);
             break;
         }
-        case BOMB_STATE::FALL_CHARGE_START:
+        case BOMB_STATE::CHARGE_START_FALL:
         {
             if (!pAnimator->Is_Blending())
             {
                 if (m_bKeyUp)
                     Change_BombState(pKirby, BOMB_STATE::THROW);
                 else
-                    Change_BombState(pKirby, BOMB_STATE::FALL_CHARGE);
+                    Change_BombState(pKirby, BOMB_STATE::CHARGING_FALL);
             }
             else if(IsGround)
             {
-                Change_BombState(pKirby, BOMB_STATE::CHARGE_LANDING);
+                Change_BombState(pKirby, BOMB_STATE::CHARGING_LANDING);
             }
             break;
         }
-        case BOMB_STATE::FALL_CHARGE:
+        case BOMB_STATE::CHARGING_FALL:
         {
             if (m_bKeyUp)
-                Change_BombState(pKirby, BOMB_STATE::THROW);
+                Change_BombState(pKirby, BOMB_STATE::CHARGING_THROW);
             else if (IsGround)
-                Change_BombState(pKirby, BOMB_STATE::CHARGE_LANDING);
+                Change_BombState(pKirby, BOMB_STATE::CHARGING_LANDING);
             break;
         }
-        case BOMB_STATE::CHARGE_LANDING:
+        case BOMB_STATE::CHARGING_LANDING:
         {
             if (m_bKeyUp)
-                Change_BombState(pKirby, BOMB_STATE::THROW);
+                Change_BombState(pKirby, BOMB_STATE::CHARGING_THROW);
             else if (pAnimator->Is_Finished())
-                Change_BombState(pKirby, BOMB_STATE::CHARGE);
+                Change_BombState(pKirby, BOMB_STATE::CHARGING);
             break;
         }
         case BOMB_STATE::THROW:
+        {
+            if (pAnimator->Is_Finished())
+                Change_BombState(pKirby, BOMB_STATE::BOMB_STATE_END);
+            break;
+        }
+        case BOMB_STATE::CHARGING_THROW: // 임시
         {
             if (pAnimator->Is_Finished())
                 Change_BombState(pKirby, BOMB_STATE::BOMB_STATE_END);
@@ -245,9 +266,13 @@ void CKirby_Ability_Bomb::Exit_BombState(CKirby* pKirby, BOMB_STATE eState)
             break;
         case BOMB_STATE::CHARGE_START:
             break;
-        case BOMB_STATE::CHARGE:
+        case BOMB_STATE::CHARGING:
             break;
         case BOMB_STATE::THROW:
+            break;
+        case BOMB_STATE::CHARGING_LANDING:
+            break;
+        case BOMB_STATE::CHARGING_THROW:
             break;
     }
 }
@@ -269,6 +294,9 @@ _bool CKirby_Ability_Bomb::Handle_ReserveAttack(CKirby* pKirby)
 
 void CKirby_Ability_Bomb::Spawn_Bomb(CKirby* pKirby)
 {
+    if (m_pBomb != nullptr)
+        return;
+
     CProjectile* pProjectile{};
 
     if (FAILED(CProjectile_Manager::GetInstance()->Spawn(pKirby->Get_PrototypeLevelIndex(), pKirby->Get_LevelIndex(),
@@ -287,15 +315,17 @@ void CKirby_Ability_Bomb::Spawn_Bomb(CKirby* pKirby)
     m_pBomb = pBomb;
 }
 
-void CKirby_Ability_Bomb::Throw_Bomb(CKirby* pKirby)
+void CKirby_Ability_Bomb::Throw_Bomb(CKirby* pKirby, _float fDegree, _float fSpeed)
 {
+    if (m_pBomb == nullptr)
+        return;
+
     _vector vPos = m_pBomb->Get_Transform()->Get_State(STATE::POSITION);
 
     _vector vLook = pKirby->Get_Transform()->Get_State(STATE::LOOK);
     vLook = XMVector3Normalize(XMVectorSetY(vLook, 0.f));
 
-    constexpr _float fLaunchAngle = 45.f;
-    _float fRadian = XMConvertToRadians(fLaunchAngle);
+    _float fRadian = XMConvertToRadians(fDegree);
     _vector vDir = vLook * cosf(fRadian) + XMVectorSet(0.f, 1.f, 0.f, 0.f) * sinf(fRadian);
 
     _float3 vLaunchPos{};
@@ -304,7 +334,7 @@ void CKirby_Ability_Bomb::Throw_Bomb(CKirby* pKirby)
     XMStoreFloat3(&vLaunchPos, vPos);
     XMStoreFloat3(&vLaunchDir, vDir);
 
-    m_pBomb->Launch(vLaunchPos, vLaunchDir);
+    m_pBomb->Launch(vLaunchPos, vLaunchDir, fSpeed);
     m_pBomb = nullptr;
 }
 

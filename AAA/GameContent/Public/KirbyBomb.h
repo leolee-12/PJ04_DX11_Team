@@ -3,6 +3,8 @@
 
 NS_BEGIN(Client)
 
+class CMovement_Child;
+
 class CKirbyBomb final : public CProjectile_Bomb
 {
 	GENERATED_BODY(CKirbyBomb)
@@ -29,16 +31,20 @@ private:
 
 public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOut) override { pOut->strPrototypeTag = PROTOTYPE_TAG; }
+	virtual void Launch(const _float3& vPos, const _float3& vDir) override;
+	void Launch(const _float3& vPos, const _float3& vDir, _float fLaunchSpeed);
 
 protected:
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void	Update(_float fTimeDelta) override;
 	virtual void	Tick_Visual(_float fTimeDelta) override;
 
+	virtual HRESULT Ready_Movement() override;
 	virtual HRESULT Ready_Visual() override;
 	virtual HRESULT Ready_HitBox() override;
+	virtual void Kill() override;
 
-	// 활성화/발사/바운드 
+	// 활성화/발사/바운드
 	virtual void On_Activated() override;
 	virtual void On_Launched() override;
 	virtual void On_Bounce(_int iCount) override;
@@ -48,8 +54,12 @@ private:
 	void Enter_State(KIRBYBOMB_STATE eState);
 	void Update_State(_float fTimeDelta);
 	void Exit_State(KIRBYBOMB_STATE eState);
+	void Update_BombMovement(_float fTimeDelta);
+	void Roll_ByBombMovement(_float fTimeDelta);
 
 private:
+	CMovement_Child* m_pBombMovement = { nullptr };
+
 	KIRBYBOMB_STATE m_eState = { KIRBYBOMB_STATE::NONE };
 
 	static constexpr _int s_iMaxExplodeAniPlayCount = { 5 };

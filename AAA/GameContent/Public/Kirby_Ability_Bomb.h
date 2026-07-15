@@ -13,9 +13,11 @@ private:
 	enum BOMB_STATE
 	{ 
 		MOVE_THROW,
-		CHARGE_START, CHARGE,
-		FALL_CHARGE_START, FALL_CHARGE, CHARGE_LANDING,
-		THROW, BOMB_STATE_END
+		CHARGE_START, CHARGING,
+		CHARGE_START_FALL, CHARGING_FALL,
+		CHARGING_LANDING,
+		THROW, CHARGING_THROW,
+		BOMB_STATE_END
 	};
 
 private:
@@ -47,7 +49,7 @@ private:
 	_bool Handle_ReserveAttack(CKirby* pKirby);
 
 	void Spawn_Bomb(CKirby* pKirby);
-	void Throw_Bomb(CKirby* pKirby);
+	void Throw_Bomb(CKirby* pKirby, _float fDegree, _float fSpeed);
 
 private:
 	BOMB_STATE m_eBombState{};
