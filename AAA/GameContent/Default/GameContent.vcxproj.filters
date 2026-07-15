@@ -1671,7 +1671,7 @@
     <ClInclude Include="..\Public\SmokeCollection.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\15. SmokeCollection</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\SmokeDefault.h">
+    <ClInclude Include="..\Public\SmokeSphereOriginalEmitter.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\15. SmokeCollection</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Wait.h">
@@ -2738,7 +2738,7 @@
     <ClCompile Include="..\Private\SmokeCollection.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\15. SmokeCollection</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\SmokeDefault.cpp">
+    <ClCompile Include="..\Private\SmokeSphereOriginalEmitter.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\15. SmokeCollection</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Wait.cpp">

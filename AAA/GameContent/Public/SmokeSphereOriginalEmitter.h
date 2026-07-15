@@ -4,17 +4,17 @@
 
 NS_BEGIN(Client)
 
-class CSmokeDefault final : public CEffect_Container
+class CSmokeSphereOriginalEmitter final : public CEffect_Container
 {
-	GENERATED_BODY(CSmokeDefault)
+	GENERATED_BODY(CSmokeSphereOriginalEmitter)
 
 public:
-	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_SmokeDefault";
+	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_SmokeSphereOriginalEmitter";
 
 private:
-	CSmokeDefault(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CSmokeDefault(const CSmokeDefault& Prototype);
-	virtual ~CSmokeDefault() = default;
+	CSmokeSphereOriginalEmitter(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CSmokeSphereOriginalEmitter(const CSmokeSphereOriginalEmitter& Prototype);
+	virtual ~CSmokeSphereOriginalEmitter() = default;
 
 protected:
 	virtual HRESULT Initialize_Prototype() override;
@@ -34,7 +34,7 @@ private:
 	HRESULT Ready_EffectPartObjects();
 
 public:
-	static CSmokeDefault* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CSmokeSphereOriginalEmitter* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 
 private:

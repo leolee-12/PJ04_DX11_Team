@@ -94,6 +94,8 @@ _bool CKirby_Deform_Model::Handle_AnimEventParent(CKirby* pKirby, const ANIM_EVE
 
 _bool CKirby_Deform_Model::Handle_AnimEventFx(CKirby* pKirby, const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 {
+    // Begin, End는 Emitter 지속 이펙트용
+
     if (static_cast<EANIM_EVENT>(e.iEventType) != EANIM_EVENT::Fx)
         return false;
 
@@ -120,63 +122,69 @@ _bool CKirby_Deform_Model::Handle_AnimEventFx(CKirby* pKirby, const ANIM_EVENT& 
     if (ePhase != ANIM_EVENT_PHASE::POINT && ePhase != ANIM_EVENT_PHASE::BEGIN)
         return true;
 
+    if (ePhase == ANIM_EVENT_PHASE::BEGIN &&
+        m_AnimEventEffects.find(wstrEffectKey) != m_AnimEventEffects.end())
+        return true;
+
     CTransform* pKirbyTransform = pKirby->Get_Transform();
 
     const _vector vForward = XMVector3Normalize(XMVectorSetY(pKirbyTransform->Get_State(STATE::LOOK), 0.f));
     const _vector vRight = XMVector3Normalize(XMVectorSetY(pKirbyTransform->Get_State(STATE::RIGHT), 0.f));
     const _vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 
-    _float3 vPos{};
-    XMStoreFloat3(&vPos, pKirbyTransform->Get_State(STATE::POSITION) +
-        vRight * e.vOffset.x + vUp * e.vOffset.y + vForward * e.vOffset.z);
-
-    _vector vSpawnLook = XMVectorZero();
+    _vector vLocalLook = XMVectorZero();
 
     switch (static_cast<KIRBY_FX_DIRECTION>(e.iIntParam))
     {
         case KIRBY_FX_DIRECTION::NONE:
             break;
         case KIRBY_FX_DIRECTION::FORWARD:
-            vSpawnLook = vForward;
+            vLocalLook = XMVectorSet(0.f, 0.f, 1.f, 0.f);
             break;
         case KIRBY_FX_DIRECTION::BACKWARD:
-            vSpawnLook = -vForward;
+            vLocalLook = XMVectorSet(0.f, 0.f, -1.f, 0.f);
             break;
         case KIRBY_FX_DIRECTION::RIGHT:
-            vSpawnLook = vRight;
+            vLocalLook = XMVectorSet(1.f, 0.f, 0.f, 0.f);
             break;
         case KIRBY_FX_DIRECTION::LEFT:
-            vSpawnLook = -vRight;
+            vLocalLook = XMVectorSet(-1.f, 0.f, 0.f, 0.f);
             break;
         case KIRBY_FX_DIRECTION::BACKWARD_RIGHT:
-            vSpawnLook = XMVector3Normalize(-vForward + vRight);
+            vLocalLook = XMVector3Normalize(XMVectorSet(1.f, 0.f, -1.f, 0.f));
             break;
         case KIRBY_FX_DIRECTION::BACKWARD_LEFT:
-            vSpawnLook = XMVector3Normalize(-vForward - vRight);
+            vLocalLook = XMVector3Normalize(XMVectorSet(-1.f, 0.f, -1.f, 0.f));
             break;
     }
 
-    _float3 vLook{};
-    XMStoreFloat3(&vLook, vSpawnLook);
-
     if (ePhase == ANIM_EVENT_PHASE::POINT)
     {
+        _float3 vPos{};
+        XMStoreFloat3(&vPos, pKirbyTransform->Get_State(STATE::POSITION) +
+            vRight * e.vOffset.x + vUp * e.vOffset.y + vForward * e.vOffset.z);
+
+        _float3 vLook{};
+        XMStoreFloat3(&vLook,
+            vRight * XMVectorGetX(vLocalLook) +
+            vUp * XMVectorGetY(vLocalLook) +
+            vForward * XMVectorGetZ(vLocalLook));
+
         CEffect_Loader::GetInstance()->Spawn(wstrEffectKey, pKirby->Get_LevelIndex(), vPos, vLook);
         return true;
     }
 
-    if (m_AnimEventEffects.find(wstrEffectKey) == m_AnimEventEffects.end())
-    {
-        CEffect_Container* pEffect = nullptr;
+    _float3 vLocalLookFloat{};
+    XMStoreFloat3(&vLocalLookFloat, vLocalLook);
 
-        const HRESULT hr = CEffect_Loader::GetInstance()->Spawn(wstrEffectKey, pKirby->Get_LevelIndex(),
-            vPos, vLook, _float3{}, nullptr, &pEffect);
+    CEffect_Container* pEffect = nullptr;
+    const HRESULT hr = CEffect_Loader::GetInstance()->Spawn(wstrEffectKey, pKirby->Get_LevelIndex(),
+        e.vOffset, vLocalLookFloat, _float3{}, pKirbyTransform->Get_WorldMatrixPtr(), &pEffect);
 
-        if (FAILED(hr) || pEffect == nullptr)
-            return true;
+    if (FAILED(hr) || pEffect == nullptr)
+        return true;
 
-        m_AnimEventEffects.emplace(wstrEffectKey, pEffect);
-    }
+    m_AnimEventEffects.emplace(wstrEffectKey, pEffect);
 
     return true;
 }

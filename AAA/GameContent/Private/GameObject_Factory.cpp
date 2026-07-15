@@ -81,7 +81,7 @@
 #include "BubbleAura.h"
 #include "Kirby_SwordTrail.h"
 #include "SmokeCollection.h"
-#include "SmokeDefault.h"
+#include "SmokeSphereOriginalEmitter.h"
 #include "SwordTrail_BK.h"
 
 // Effect_Part
@@ -885,13 +885,13 @@ void CGameObject_Factory::Register_Effect()
                     "../../Resources/Test/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
         ));
 
-    // SmokeDefault
-    Register(CSmokeDefault::PROTOTYPE_TAG, TEXT("Effect_Container"),
-        CREATOR(CSmokeDefault),
+    // SmokeSphereOriginalEmitter
+    Register(CSmokeSphereOriginalEmitter::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CSmokeSphereOriginalEmitter),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
-                CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG,
+                CMeshEmitterCommon::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
                 CModel::Create(pDevice, pContext, MODEL::NONANIM,
                     "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
