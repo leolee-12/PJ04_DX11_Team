@@ -90,7 +90,7 @@ HRESULT CBubble_Manager::Spawn(_uint iTargetLevel, BUBBLE_KIND eKind, COPY_ABILI
     if (nullptr == Model_Of(eAbility))
     {
 #ifdef _DEBUG
-        OutputDebugStringA("Spawn Failed : UnSupported Ability\n"); 
+        OutputDebugStringA("[Bubble_Manager] Ability Bubble Spawn Failed : UnSupported Ability\n"); 
 #endif
         return E_FAIL;
     }

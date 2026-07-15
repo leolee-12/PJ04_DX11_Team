@@ -1602,17 +1602,17 @@
     <ClInclude Include="..\Public\Kirby_DeformCar_Demo.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\01. DeformCar_Demo</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Kirby_DeformCylinder_Demo.h">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\02. DeformCylinder_Demo</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Kirby_DeformCar_Main.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model\02. DeformCar_Main</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Kirby_DeformCylinder_Main.h">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model\03. DeformCylinder_Main</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Kirby_DeformCarBridge.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\DeformCarBridge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_DeformCylinder_Demo.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\02. DeformCylinder_Demo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_DeformCylinder_Main.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model\03. DeformCylinder_Main</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_DeformDump.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\DeformDump</Filter>
@@ -2678,17 +2678,17 @@
     <ClCompile Include="..\Private\Kirby_DeformCar_Demo.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\01. DeformCar_Demo</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Kirby_DeformCylinder_Demo.cpp">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\02. DeformCylinder_Demo</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Kirby_DeformCar_Main.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model\02. DeformCar_Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Kirby_DeformCylinder_Main.cpp">
-      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model\03. DeformCylinder_Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Kirby_DeformCarBridge.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\DeformCarBridge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_DeformCylinder_Demo.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\02. DeformCylinder_Demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_DeformCylinder_Main.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model\03. DeformCylinder_Main</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_DeformDump.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\DeformDump</Filter>
