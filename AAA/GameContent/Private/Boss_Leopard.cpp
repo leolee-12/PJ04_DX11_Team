@@ -3,6 +3,7 @@
 #include "Boss_Leopard_Body.h"
 #include "Animator.h"
 #include "Effect_Loader.h"
+#include "Boss_Leopard_Brain.h"
 
 const vector<_float> CBoss_Leopard::s_Thresholds = {};
 
@@ -19,9 +20,11 @@ HRESULT CBoss_Leopard::Initialize(void* pArg)
 {
     if (FAILED(__super::Initialize(pArg))) return E_FAIL;
 
-    m_strBossName = L"레오파드";
+    m_strBossName = L"캐롤라인";
     m_fMaxHP = 100.f;
     m_fCurHP = m_fMaxHP;
+
+    Set_Active(true);
     return S_OK;
 }
 
@@ -43,6 +46,11 @@ HRESULT CBoss_Leopard::Ready_PartObjects()
         CBoss_Leopard_Body::PROTOTYPE_TAG, CBoss_Leopard_Body::PART_TAG);
     if (!m_pBody) return E_FAIL;
     return S_OK;
+}
+
+CMonsterBrain* CBoss_Leopard::Create_Brain()
+{
+    return CBoss_Leopard_Brain::Create(this);
 }
 
 void CBoss_Leopard::Play_Intro()

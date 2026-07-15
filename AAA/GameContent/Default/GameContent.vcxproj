@@ -24,6 +24,7 @@
     <ClInclude Include="..\Public\Ancor_WorkingDirectory.h" />
     <ClInclude Include="..\public\Boss_Leopard.h" />
     <ClInclude Include="..\public\Boss_Leopard_Body.h" />
+    <ClInclude Include="..\public\Boss_Leopard_Brain.h" />
     <ClInclude Include="..\Public\BubbleMovement.h" />
     <ClInclude Include="..\Public\DropStar.h" />
     <ClInclude Include="..\Public\DropStar_Body.h" />
@@ -396,6 +397,7 @@
     <ClCompile Include="..\Private\Ability_Model.cpp" />
     <ClCompile Include="..\private\Boss_Leopard.cpp" />
     <ClCompile Include="..\private\Boss_Leopard_Body.cpp" />
+    <ClCompile Include="..\private\Boss_Leopard_Brain.cpp" />
     <ClCompile Include="..\Private\BubbleMovement.cpp" />
     <ClCompile Include="..\Private\DropStar.cpp" />
     <ClCompile Include="..\Private\DropStar_Body.cpp" />

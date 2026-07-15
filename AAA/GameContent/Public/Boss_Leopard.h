@@ -33,7 +33,7 @@ public:
     virtual CMultiHitBoxPart* Get_HitBoxPart() const override;
 
 protected:
-    virtual CMonsterBrain* Create_Brain() override { return nullptr; }   // TODO: 전투 브레인 나중에
+    virtual CMonsterBrain* Create_Brain() override;
     virtual void           Play_Intro() override;
     virtual _bool          Is_Intro_Finished() const override;
     virtual void           Play_Death() override;

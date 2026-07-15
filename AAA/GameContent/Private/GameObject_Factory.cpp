@@ -1198,10 +1198,10 @@ void CGameObject_Factory::Register_MainBoss()
         LOADER
         (
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Leopard_Body::MODEL_PROTO_TAG,
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Leopard/body/Body.ysh",
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Leopard/Body/Model_Anim.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Leopard_Body::PROTOTYPE_TAG, CBoss_Leopard_Body::Create(pDevice, pContext));
-                )
+        )
     );
 }
 
