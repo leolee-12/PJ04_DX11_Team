@@ -42,6 +42,8 @@
 #include "Kirby_Body.h"
 #include "Kirby_DeformCar_Demo.h"
 #include "Kirby_DeformCar_Main.h"
+#include "Kirby_DeformCylinder_Demo.h"
+#include "Kirby_DeformCylinder_Main.h"
 #include "Kirby_BombHat.h"
 #include "Kirby_IceHat.h"
 #include "Kirby_Sword.h"
@@ -187,6 +189,7 @@
 // Projectile
 #include "Projectile_Boulder.h"
 #include "EnemyBomb.h"
+#include "KirbyBomb.h"
 #include "Spit_Projectile.h"
 
 // Ability Bubble
@@ -343,7 +346,6 @@ void CGameObject_Factory::Register_Container()
             // Kirby_DeformCar_Demo
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_DeformCar_Demo::PROTOTYPE_TAG,
                 CKirby_DeformCar_Demo::Create(pDevice, pContext));
-
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Kirby_DeformCar_Demo"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/DeformCar/Demo.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
@@ -351,29 +353,43 @@ void CGameObject_Factory::Register_Container()
             // Kirby_DeformCar_Main
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_DeformCar_Main::PROTOTYPE_TAG,
                 CKirby_DeformCar_Main::Create(pDevice, pContext));
-
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Kirby_DeformCar_Main"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/DeformCar/Main.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
 
+            // Kirby_DeformCylinder_Demo
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_DeformCylinder_Demo::PROTOTYPE_TAG,
+                CKirby_DeformCylinder_Demo::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Kirby_DeformCylinder_Demo"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/DeformCylinder/Demo/Demo.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            // Kirby_DeformCylinder_Main
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_DeformCylinder_Main::PROTOTYPE_TAG,
+                CKirby_DeformCylinder_Main::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Kirby_DeformCylinder_Main"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/DeformCylinder/Model/Main.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+
             // Ability
             // Sword
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_Sword::PROTOTYPE_TAG,
-                CKirby_Sword::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_Sword::PROTOTYPE_TAG, CKirby_Sword::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Sword"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Sword/Sword.ysh"));
-
             // Sword Hat
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_SwordHat::PROTOTYPE_TAG,
-                CKirby_SwordHat::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_SwordHat::PROTOTYPE_TAG, CKirby_SwordHat::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SwordHat"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Sword/Hat/SwordHat.ysh"));
 
             // Bomb Hat
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_BombHat::PROTOTYPE_TAG,
-                CKirby_BombHat::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_BombHat::PROTOTYPE_TAG, CKirby_BombHat::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BombHat"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/Bomb/Hat/BombHat.ysh"));
+            // Bomb
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirbyBomb::PROTOTYPE_TAG, CKirbyBomb::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirbyBomb::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/AnimModel/KirbyBomb/KirbyBomb.ysh", 
+                    XMMatrixRotationX(XMConvertToRadians(90.f)) * XMMatrixRotationY(XMConvertToRadians(180.f))));
 
             // Ice Hat
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_IceHat::PROTOTYPE_TAG,

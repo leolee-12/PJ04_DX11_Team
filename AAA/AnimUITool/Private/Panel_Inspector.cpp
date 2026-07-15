@@ -8,8 +8,8 @@
 #include "Property.h"
 #include "EffectPart_Enum.h"
 #include "Preview_Kirby.h"
-#include "Preview_DeformCar_Main.h"
-#include "Preview_DeformCar_Demo.h"
+#include "Preview_DeformCylinder_Main.h"
+#include "Preview_DeformCylinder_Demo.h"
 #include "Kirby_States.h"
 #include "UIPartObject.h"
 #include "UIContainerObject.h"
@@ -556,50 +556,50 @@ void CPanel_Inspector::Render_Meshs()
     ANIM_CONTEXT& ctx = m_pPanel_Manager->Get_Context();
 
     CPreview_Actor* pActor = dynamic_cast<CPreview_Actor*>(ctx.pOwner);
-    CPreview_DeformCar_Main* pDeformCarMain = dynamic_cast<CPreview_DeformCar_Main*>(ctx.pOwner);
-    CPreview_DeformCar_Demo* pDeformCarDemo = dynamic_cast<CPreview_DeformCar_Demo*>(ctx.pOwner);
+    CPreview_DeformCylinder_Main* pDeformCylinderMain = dynamic_cast<CPreview_DeformCylinder_Main*>(ctx.pOwner);
+    CPreview_DeformCylinder_Demo* pDeformCylinderDemo = dynamic_cast<CPreview_DeformCylinder_Demo*>(ctx.pOwner);
     CModel* pModel = ctx.pModel;
 
-    if ((!pActor && !pDeformCarMain && !pDeformCarDemo) || !pModel)
+    if ((!pActor && !pDeformCylinderMain && !pDeformCylinderDemo) || !pModel)
         return;
 
-    auto IsMeshVisible = [pActor, pDeformCarMain, pDeformCarDemo](_uint iMesh)
+    auto IsMeshVisible = [pActor, pDeformCylinderMain, pDeformCylinderDemo](_uint iMesh)
         {
             if (pActor)
                 return pActor->Is_MeshVisible(iMesh);
-            if (pDeformCarMain)
-                return pDeformCarMain->Is_MeshVisible(iMesh);
-            return pDeformCarDemo->Is_MeshVisible(iMesh);
+            if (pDeformCylinderMain)
+                return pDeformCylinderMain->Is_MeshVisible(iMesh);
+            return pDeformCylinderDemo->Is_MeshVisible(iMesh);
         };
 
-    auto SetMeshVisible = [pActor, pDeformCarMain, pDeformCarDemo](_uint iMesh, _bool bVisible)
+    auto SetMeshVisible = [pActor, pDeformCylinderMain, pDeformCylinderDemo](_uint iMesh, _bool bVisible)
         {
             if (pActor)
                 pActor->Set_MeshVisible(iMesh, bVisible);
-            else if (pDeformCarMain)
-                pDeformCarMain->Set_MeshVisible(iMesh, bVisible);
+            else if (pDeformCylinderMain)
+                pDeformCylinderMain->Set_MeshVisible(iMesh, bVisible);
             else
-                pDeformCarDemo->Set_MeshVisible(iMesh, bVisible);
+                pDeformCylinderDemo->Set_MeshVisible(iMesh, bVisible);
         };
 
-    auto SetAllMeshVisible = [pActor, pDeformCarMain, pDeformCarDemo](_bool bVisible)
+    auto SetAllMeshVisible = [pActor, pDeformCylinderMain, pDeformCylinderDemo](_bool bVisible)
         {
             if (pActor)
                 pActor->Set_AllMeshVisible(bVisible);
-            else if (pDeformCarMain)
-                pDeformCarMain->Set_AllMeshVisible(bVisible);
+            else if (pDeformCylinderMain)
+                pDeformCylinderMain->Set_AllMeshVisible(bVisible);
             else
-                pDeformCarDemo->Set_AllMeshVisible(bVisible);
+                pDeformCylinderDemo->Set_AllMeshVisible(bVisible);
         };
 
-    auto SetSoloMesh = [pActor, pDeformCarMain, pDeformCarDemo](_uint iMesh)
+    auto SetSoloMesh = [pActor, pDeformCylinderMain, pDeformCylinderDemo](_uint iMesh)
         {
             if (pActor)
                 pActor->Set_SoloMesh(iMesh);
-            else if (pDeformCarMain)
-                pDeformCarMain->Set_SoloMesh(iMesh);
+            else if (pDeformCylinderMain)
+                pDeformCylinderMain->Set_SoloMesh(iMesh);
             else
-                pDeformCarDemo->Set_SoloMesh(iMesh);
+                pDeformCylinderDemo->Set_SoloMesh(iMesh);
         };
 
     if (!ImGui::CollapsingHeader("Meshes", ImGuiTreeNodeFlags_DefaultOpen))

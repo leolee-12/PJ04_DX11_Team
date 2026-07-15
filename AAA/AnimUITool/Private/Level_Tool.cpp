@@ -7,8 +7,8 @@
 #include "Model.h"
 #include "Preview_Actor.h"
 #include "Preview_Kirby.h"
-#include "Preview_DeformCar_Main.h"
-#include "Preview_DeformCar_Demo.h"
+#include "Preview_DeformCylinder_Main.h"
+#include "Preview_DeformCylinder_Demo.h"
 #include "GameContent_const.h"
 #include "GameObject_Factory.h"
 #include "Loader_Prototype.h"
@@ -1424,7 +1424,7 @@ CGameObject* CLevel_Tool::Load_Kirby()
     return pObj;
 }
 
-CGameObject* CLevel_Tool::Load_DeformCar()
+CGameObject* CLevel_Tool::Load_DeformCylinder()
 {
     const _uint iLevel = ETOUI(TOOL_LEVEL::STATIC);
 
@@ -1444,43 +1444,43 @@ CGameObject* CLevel_Tool::Load_DeformCar()
             return nullptr;
     }
 
-    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, L"Proto_Model_DeformCar"))
+    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, L"Proto_Model_DeformCylinder"))
     {
         if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
             iLevel,
-            L"Proto_Model_DeformCar",
+            L"Proto_Model_DeformCylinder",
             CModel::Create(
                 m_pDevice,
                 m_pContext,
                 MODEL::ANIM,
-                "../../Resources/YSE/DeformCar/Main.ysh",
+                "../../Resources/YSE/DeformCylinder/Model/Main.ysh",
                 XMMatrixRotationY(XMConvertToRadians(180.f))))))
             return nullptr;
     }
 
-    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, CPreview_DeformCar_Main::PROTOTYPE_TAG))
+    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, CPreview_DeformCylinder_Main::PROTOTYPE_TAG))
     {
         if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
             iLevel,
-            CPreview_DeformCar_Main::PROTOTYPE_TAG,
-            CPreview_DeformCar_Main::Create(m_pDevice, m_pContext))))
+            CPreview_DeformCylinder_Main::PROTOTYPE_TAG,
+            CPreview_DeformCylinder_Main::Create(m_pDevice, m_pContext))))
             return nullptr;
     }
 
-    CPreview_DeformCar_Main::PREVIEW_DEFORMCAR_DESC Desc{};
+    CPreview_DeformCylinder_Main::PREVIEW_DEFORMCYLINDER_DESC Desc{};
     Desc.iProtoLevel = iLevel;
     Desc.szKirbyShaderTag = L"Proto_Shader_Kirby";
     Desc.szPBRShaderTag = L"Proto_Shader_AnimMesh";
-    Desc.szModelTag = L"Proto_Model_DeformCar";
+    Desc.szModelTag = L"Proto_Model_DeformCylinder";
 
     CGameObject* pObject = nullptr;
     if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(
         &pObject,
         iLevel,
-        CPreview_DeformCar_Main::PROTOTYPE_TAG,
+        CPreview_DeformCylinder_Main::PROTOTYPE_TAG,
         ETOUI(TOOL_LEVEL::EDIT),
         L"Layer_Preview",
-        L"Preview_DeformCar",
+        L"Preview_DeformCylinder",
         &Desc)))
         return nullptr;
 
@@ -1488,7 +1488,7 @@ CGameObject* CLevel_Tool::Load_DeformCar()
     return pObject;
 }
 
-CGameObject* CLevel_Tool::Load_DeformCar_Demo()
+CGameObject* CLevel_Tool::Load_DeformCylinder_Demo()
 {
     const _uint iLevel = ETOUI(TOOL_LEVEL::STATIC);
 
@@ -1508,42 +1508,42 @@ CGameObject* CLevel_Tool::Load_DeformCar_Demo()
             return nullptr;
     }
 
-    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, L"Proto_Model_DeformCar_Demo"))
+    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, L"Proto_Model_DeformCylinder_Demo"))
     {
         if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
             iLevel,
-            L"Proto_Model_DeformCar_Demo",
+            L"Proto_Model_DeformCylinder_Demo",
             CModel::Create(
                 m_pDevice,
                 m_pContext,
                 MODEL::ANIM,
-                "../../Resources/YSE/DeformCar/Demo.ysh",
+                "../../Resources/YSE/DeformCylinder/Demo/Demo.ysh",
                 XMMatrixRotationY(XMConvertToRadians(180.f))))))
             return nullptr;
     }
 
-    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, CPreview_DeformCar_Demo::PROTOTYPE_TAG))
+    if (!m_pGameInstance_Proxy->Has_Prototype(iLevel, CPreview_DeformCylinder_Demo::PROTOTYPE_TAG))
     {
         if (FAILED(m_pGameInstance_Proxy->Add_Prototype(
             iLevel,
-            CPreview_DeformCar_Demo::PROTOTYPE_TAG,
-            CPreview_DeformCar_Demo::Create(m_pDevice, m_pContext))))
+            CPreview_DeformCylinder_Demo::PROTOTYPE_TAG,
+            CPreview_DeformCylinder_Demo::Create(m_pDevice, m_pContext))))
             return nullptr;
     }
 
-    CPreview_DeformCar_Demo::PREVIEW_DEFORMCAR_DEMO_DESC Desc{};
+    CPreview_DeformCylinder_Demo::PREVIEW_DEFORMCYLINDER_DEMO_DESC Desc{};
     Desc.iProtoLevel = iLevel;
     Desc.szKirbyShaderTag = L"Proto_Shader_Kirby";
-    Desc.szModelTag = L"Proto_Model_DeformCar_Demo";
+    Desc.szModelTag = L"Proto_Model_DeformCylinder_Demo";
 
     CGameObject* pObject = nullptr;
     if (FAILED(m_pGameInstance_Proxy->Add_GameObject_Return(
         &pObject,
         iLevel,
-        CPreview_DeformCar_Demo::PROTOTYPE_TAG,
+        CPreview_DeformCylinder_Demo::PROTOTYPE_TAG,
         ETOUI(TOOL_LEVEL::EDIT),
         L"Layer_Preview",
-        L"Preview_DeformCar_Demo",
+        L"Preview_DeformCylinder_Demo",
         &Desc)))
         return nullptr;
 

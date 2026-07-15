@@ -1,30 +1,27 @@
-#include "Kirby_DeformCar_Demo.h"
+#include "Kirby_DeformCylinder_Demo.h"
 
 #include "GameInstance.h"
 
-#include "Kirby.h"
-
-CKirby_DeformCar_Demo::CKirby_DeformCar_Demo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CKirby_DeformCylinder_Demo::CKirby_DeformCylinder_Demo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CKirby_Deform_Model(pDevice, pContext)
 {
 }
 
-CKirby_DeformCar_Demo::CKirby_DeformCar_Demo(const CKirby_DeformCar_Demo& Prototype)
-    : CKirby_Deform_Model(Prototype) {
+CKirby_DeformCylinder_Demo::CKirby_DeformCylinder_Demo(const CKirby_DeformCylinder_Demo& Prototype)
+    : CKirby_Deform_Model(Prototype)
+{
 }
 
-HRESULT CKirby_DeformCar_Demo::Initialize_Prototype()
+HRESULT CKirby_DeformCylinder_Demo::Initialize_Prototype()
 {
     m_eProjType = PROJ_TYPE::PERSPEC;
 
     return S_OK;
 }
 
-HRESULT CKirby_DeformCar_Demo::Initialize(void* pArg)
+HRESULT CKirby_DeformCylinder_Demo::Initialize(void* pArg)
 {
-    KIRBY_DEFORMCAR_DEMO_DESC* pDesc = static_cast<KIRBY_DEFORMCAR_DEMO_DESC*>(pArg);
-
-    if (FAILED(__super::Initialize(pDesc)))
+    if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
@@ -38,9 +35,9 @@ HRESULT CKirby_DeformCar_Demo::Initialize(void* pArg)
     return S_OK;
 }
 
-HRESULT CKirby_DeformCar_Demo::Render()
+HRESULT CKirby_DeformCylinder_Demo::Render()
 {
-    if (m_pModelCom->Get_NumMeshes() < DEFORMCAR_DEMO_MESH_END)
+    if (m_pModelCom->Get_NumMeshes() < DEFORMCYLINDER_DEMO_MESH_END)
         return E_FAIL;
 
     if (FAILED(Bind_CommonShaderResources(m_pKirbyShaderCom)))
@@ -86,7 +83,7 @@ HRESULT CKirby_DeformCar_Demo::Render()
     return S_OK;
 }
 
-HRESULT CKirby_DeformCar_Demo::Ready_AnimEvents(CKirby* pKirby)
+HRESULT CKirby_DeformCylinder_Demo::Ready_AnimEvents(CKirby* pKirby)
 {
     m_pAnimatorCom->Set_EventCallback(
         [this](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
@@ -96,18 +93,18 @@ HRESULT CKirby_DeformCar_Demo::Ready_AnimEvents(CKirby* pKirby)
 
             switch (static_cast<EANIM_EVENT>(e.iEventType))
             {
-            case EANIM_EVENT::OnOffMesh:
-                if (e.iIntParam == 0)
-                {
-                    m_bBodyAOn = true;
-                    m_bBodyBOn = false;
-                }
-                else if (e.iIntParam == 1)
-                {
-                    m_bBodyAOn = false;
-                    m_bBodyBOn = true;
-                }
-                break;
+                case EANIM_EVENT::OnOffMesh:
+                    if (e.iIntParam == 0)
+                    {
+                        m_bBodyAOn = true;
+                        m_bBodyBOn = false;
+                    }
+                    else if (e.iIntParam == 1)
+                    {
+                        m_bBodyAOn = false;
+                        m_bBodyBOn = true;
+                    }
+                    break;
             }
         }
     );
@@ -115,7 +112,7 @@ HRESULT CKirby_DeformCar_Demo::Ready_AnimEvents(CKirby* pKirby)
     return S_OK;
 }
 
-HRESULT CKirby_DeformCar_Demo::Ready_Components()
+HRESULT CKirby_DeformCylinder_Demo::Ready_Components()
 {
     /* For.Com_Shader */
     m_pKirbyShaderCom = Add_Component<CShader>(Shader_Kirby.iLevelID, Shader_Kirby.szProtoTag, TEXT("Com_Shader_Kirby"));
@@ -123,25 +120,26 @@ HRESULT CKirby_DeformCar_Demo::Ready_Components()
         return E_FAIL;
 
     /* For.Com_Model */
-    m_pModelCom = Add_Component<CModel>(m_iPrototypeLevel, TEXT("Prototype_Component_Model_Kirby_DeformCar_Demo"), TEXT("Com_Model"));
+    m_pModelCom = Add_Component<CModel>(m_iPrototypeLevel, TEXT("Prototype_Component_Model_Kirby_DeformCylinder_Demo"), TEXT("Com_Model"));
     if (m_pModelCom == nullptr)
         return E_FAIL;
 
-    // Eye
+    /* For.Com_EyeTexture */
     m_pEyeTextureCom = Add_Component<CTexture>(TEXT("Com_EyeTexture"),
-        CTexture::Create(m_pDevice, m_pContext, L"../../Resources/YSE/DeformCar/KirbyEye.%02d.dds", ETOUI(KIRBY_EYE_STATE::END)));
+        CTexture::Create(m_pDevice,m_pContext, L"../../Resources/YSE/DeformCylinder/Demo/KirbyEye.%02d.dds", ETOUI(KIRBY_EYE_STATE::END)));
     if (m_pEyeTextureCom == nullptr)
         return E_FAIL;
 
+    /* For.Com_EyeMaskTexture */
     m_pEyeMaskTextureCom = Add_Component<CTexture>(TEXT("Com_EyeMaskTexture"),
-        CTexture::Create(m_pDevice, m_pContext, L"../../Resources/YSE/DeformCar/KirbyEyeMask.%02d.dds", ETOUI(KIRBY_EYE_STATE::END)));
+        CTexture::Create( m_pDevice, m_pContext, L"../../Resources/YSE/DeformCylinder/Demo/KirbyEyeMask.%02d.dds", ETOUI(KIRBY_EYE_STATE::END)));
     if (m_pEyeMaskTextureCom == nullptr)
         return E_FAIL;
 
     /* For.Com_Animator */
     CAnimator::ANIMATOR_DESC AnimDesc{};
     AnimDesc.pModel = m_pModelCom;
-    AnimDesc.strDataFile = TEXT("../../Resources/YSE/DeformCar/Demo_AnimEvents.json");
+    AnimDesc.strDataFile = TEXT("../../Resources/YSE/DeformCylinder/Demo/Demo_AnimEvents.json");
 
     m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
     if (m_pAnimatorCom == nullptr || FAILED(m_pAnimatorCom->Initialize(&AnimDesc)))
@@ -150,33 +148,33 @@ HRESULT CKirby_DeformCar_Demo::Ready_Components()
     return S_OK;
 }
 
-CKirby_DeformCar_Demo* CKirby_DeformCar_Demo::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CKirby_DeformCylinder_Demo* CKirby_DeformCylinder_Demo::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CKirby_DeformCar_Demo* pInstance = new CKirby_DeformCar_Demo(pDevice, pContext);
+    CKirby_DeformCylinder_Demo* pInstance = new CKirby_DeformCylinder_Demo(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX("Failed to Created: CKirby_DeformCar_Demo");
+        MSG_BOX("Failed to Created: CKirby_DeformCylinder_Demo");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CKirby_DeformCar_Demo::Clone(void* pArg)
+CGameObject* CKirby_DeformCylinder_Demo::Clone(void* pArg)
 {
-    CKirby_DeformCar_Demo* pInstance = new CKirby_DeformCar_Demo(*this);
+    CKirby_DeformCylinder_Demo* pInstance = new CKirby_DeformCylinder_Demo(*this);
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX("Failed to Cloned: CKirby_DeformCar_Demo");
+        MSG_BOX("Failed to Cloned: CKirby_DeformCylinder_Demo");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CKirby_DeformCar_Demo::Free()
+void CKirby_DeformCylinder_Demo::Free()
 {
     __super::Free();
 }

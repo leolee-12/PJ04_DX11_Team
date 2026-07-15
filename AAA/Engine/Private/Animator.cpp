@@ -306,6 +306,11 @@ _bool CAnimator::Has_Bone(const _char* szBone) const
     return m_pModel->Get_BoneIndex(szBone) >= 0;
 }
 
+_bool CAnimator::Is_Blending()
+{
+    return m_pModel->Is_Blending();
+}
+
 // ── Update: 재생 + 이벤트 판정 ──
 void CAnimator::Update(_float fTimeDelta)
 {

@@ -30,6 +30,7 @@ public:
 	void					Bomb_Explode();			// 즉시 폭발 
 	virtual void			Despawn();				// 연출 없이 회수
 
+	virtual _matrix			Get_PreRotInverse() const;
 
 protected:
 	void					Ignite();
@@ -65,7 +66,7 @@ protected:
 	virtual const _char*	Get_FuseBoneName() const { return "EffectL"; }
 	virtual const _char*	Get_RollBoneName() const { return "RotL"; }
 
-	virtual _matrix			Get_PreRotInverse() const;
+	void					Roll_ByMovement(_float fTimeDelta);
 
 	// 두 폭탄 공통 클립/레이어 규약
 protected:
@@ -75,7 +76,6 @@ protected:
 
 private:
 	HRESULT					Bind_ShaderResources();
-	void					Roll_ByMovement(_float fTimeDelta);
 
 protected:
 	CShader*				m_pShaderCom = { nullptr };

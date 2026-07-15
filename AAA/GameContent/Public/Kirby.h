@@ -59,7 +59,7 @@ public:
 	static constexpr _float s_fMaxHorizontalSpeed = 8.5f;
 
 	static constexpr _float s_fLinearDrag = 0.9f;
-	static constexpr _float s_fFallVelocityY = -7.f;
+	static constexpr _float s_fFallTransitionVelocityY = -7.f;
 	static constexpr _float s_fMaxFallVelocity = -15.f;
 
 	static constexpr _float s_fRot_Speed_Degree = 720.f;
@@ -167,9 +167,6 @@ public:
 	void Set_TriggerDeformObj(IDeformable* pTriggerDeformObj) { m_pTriggerDeformObj = pTriggerDeformObj; }
 	_bool IsTriggerDeformObj() { return m_pTriggerDeformObj != nullptr; }
 
-	IDeformable* Get_HeldDeformObj() { return m_pHeldDeformObj; }
-	void Set_HeldDeformObj(IDeformable* pHeldDeformObj) { m_pHeldDeformObj = pHeldDeformObj; }
-
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_PartObjects();
@@ -252,7 +249,6 @@ private:
 
 	//Deform Object
 	IDeformable* m_pTriggerDeformObj{};
-	IDeformable* m_pHeldDeformObj{};
 
 	_float4x4 m_RenderWorldMatrix{};
 	_float3 m_vRenderGroundNormal{ 0.f, 1.f, 0.f };
