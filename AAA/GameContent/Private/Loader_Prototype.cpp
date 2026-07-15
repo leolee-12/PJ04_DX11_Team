@@ -90,17 +90,17 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
 
     static const ENV_ENTRY g_EnvTable[] = {
       { 
-        TEXT("Grass"), 
+        TEXT("Default"), 
         TEXT("../../Resources/YSH/Env/IBL/Stage0_Step1/Diffuse.dds"), 
         TEXT("../../Resources/YSH/Env/IBL/Stage0_Step1/Specular.dds"),
         TEXT("../../Resources/YSH/Env/LUT/Grass01.dds"),
         1.f 
       },
         {
-        TEXT("Default"),
-        TEXT("../../Resources/YSH/Env/IBL/Default/Diffuse.dds"),
-        TEXT("../../Resources/YSH/Env/IBL/Default/Specular.dds"),
-        TEXT("../../Resources/YSH/Env/LUT/Default01_01.dds"),
+        TEXT("Volcano"),
+        TEXT("../../Resources/YSH/Env/IBL/Stage1/Diffuse.dds"),
+        TEXT("../../Resources/YSH/Env/IBL/Stage1/Specular.dds"),
+        TEXT("../../Resources/YSH/Env/LUT/Volcano01.dds"),
         1.f
       },
         // 맵 추가 = 행 추가
@@ -111,9 +111,11 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
 
 
     //sky Sphere
-
-    if (FAILED(pProxy->Add_Prototype(Model_SkyTest.iLevelID, Model_SkyTest.szProtoTag,
-        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Sky/Test/Model.ysh"))))
+    if (FAILED(pProxy->Add_Prototype(Model_SkyDefault.iLevelID, Model_SkyDefault.szProtoTag,
+        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Sky/Default/Model.ysh"))))
+        return E_FAIL;
+    if (FAILED(pProxy->Add_Prototype(Model_SkyVolcano.iLevelID, Model_SkyVolcano.szProtoTag,
+        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Sky/Stage1/Model.ysh"))))
         return E_FAIL;
 
     if (FAILED(pProxy->Add_Prototype(ETOUI(LEVEL::STATIC),

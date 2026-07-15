@@ -40,9 +40,13 @@ HRESULT CLight_Manager::Render(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
 {
     for (auto& pLight : m_Lights)
     {
+        if (LIGHT::DIRECTIONAL == pLight->Get_LightDesc()->eType)
+            continue;   // Á÷»ç±¤Àº ¼ÎÀÌ´õ ±Û·Î¹ú·Î ÀÌ°üµÊ
+
         if (FAILED(pLight->Render(pShader, pVIBuffer)))
             return E_FAIL;
     }
+    return S_OK;
 
     return S_OK;
 }

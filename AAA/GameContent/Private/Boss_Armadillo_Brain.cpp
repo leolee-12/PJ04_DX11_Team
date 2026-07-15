@@ -11,18 +11,16 @@ CBTNode* CBoss_Armadillo_Brain::Build_PhaseTree(_int iPhase)
 {
     UNREFERENCED_PARAMETER(iPhase);
 
-#ifdef _DEBUG
-    m_bOpeningDone = true;
-#endif
-
     // ---- 튜닝 상수 ----
     const _float fSpd = 1.5f;
     const _float fCatchRange = 8.f;      // 루프에서 잡기를 고르는 거리
     const _float fTurnSpeedDeg = 120.f;
     const _float fWalkSpeed = 4.f;      // 기본 이동 속도 (Initialize와 일치)
+    const _float fCatchMoveSpeed = 8.f;
     const _float fRollSpeed = 14.f;     // 구르기 돌진 속도
+    const _float fSoloRollSpeed = 30.f;
     const _float fWallProbe = 3.5f;     // 전방 벽 감지 스윕 거리
-    const _float fRestTime = 0.8f;     // 패턴 사이 숨 고르기
+    const _float fRestTime = 0.8f;      // 패턴 사이 숨 고르기
     const _float fGroggyTime = 5.f;
 
     // ---- 공용 헬퍼 ----
@@ -158,18 +156,18 @@ CBTNode* CBoss_Armadillo_Brain::Build_PhaseTree(_int iPhase)
         const _int   iGroggyHits = 3;
         const _float fSegTimeMax = 4.f;    // 한 돌진이 벽을 못 만나면 이 시간 후 안전 종료
         const _float fReAimTime = 0.5f;
-        const _float fSnapTurnDeg = 720.f;
+        const _float fSnapTurnDeg = 1080.f;
         const _float fBounceBackSpeed = 8.f;
         const _float fBounceUpSpeed = 10.f;
 
         auto* pRush = CBTAction::Create(
             [this, bOn, bGroggy, iState, iWallHits, fSegT, fAimT, vDir,
-            fSpd, fRollSpeed, fWalkSpeed, fWallProbe, iGroggyHits, fSegTimeMax, fReAimTime, fSnapTurnDeg
+            fSpd, fRollSpeed, fSoloRollSpeed, fWalkSpeed, fWallProbe, iGroggyHits, fSegTimeMax, fReAimTime, fSnapTurnDeg
             , fBounceBackSpeed, fBounceUpSpeed](CBlackboard* pBB, _float dt) -> BT_STATUS {
                 auto* pArma = static_cast<CBoss_Armadillo*>(m_pOwner);
                 if (!*bOn) {
                     m_pOwner->Get_BodyAnimator()->Play("RollAttack", true, true, 0.1f, fSpd);
-                    m_pOwner->Get_Movement()->Set_MoveSpeed(fRollSpeed);
+                    m_pOwner->Get_Movement()->Set_MoveSpeed(fSoloRollSpeed);
                     *vDir = pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 1.f));
                     *iState = 0; *iWallHits = 0; *fSegT = 0.f; *bGroggy = false; *bOn = true;
                 }
@@ -325,10 +323,10 @@ CBTNode* CBoss_Armadillo_Brain::Build_PhaseTree(_int iPhase)
             const _float fSwingRange = 6.f;      // 이 거리 안이면 잡기 스윙
             const _float fChaseTimeout = 5.f;
             auto* pWalkChase = CBTAction::Create(
-                [this, bWalk, fWalkT, fSpd, fWalkSpeed, fTurnSpeedDeg, fSwingRange, fChaseTimeout](CBlackboard* pBB, _float dt) -> BT_STATUS {
+                [this, bWalk, fWalkT, fSpd, fCatchMoveSpeed, fTurnSpeedDeg, fSwingRange, fChaseTimeout](CBlackboard* pBB, _float dt) -> BT_STATUS {
                     if (!*bWalk) {
                         m_pOwner->Get_BodyAnimator()->Play("Walk", true, true, 0.1f, fSpd);
-                        m_pOwner->Get_Movement()->Set_MoveSpeed(fWalkSpeed);
+                        m_pOwner->Get_Movement()->Set_MoveSpeed(fCatchMoveSpeed);
                         *fWalkT = 0.f; *bWalk = true;
                     }
                     *fWalkT += dt;
@@ -505,10 +503,10 @@ CBTNode* CBoss_Armadillo_Brain::Build_PhaseTree(_int iPhase)
         Rest(),
         CBTSelector::Create({
             CBTSequence::Create({
-                /*CBTCondition::Create([](CBlackboard* pBB) {
-                    return pBB->Get<_float>("DistToTarget", FLT_MAX) <= 25.f; }),*/
                 CBTCondition::Create([](CBlackboard* pBB) {
-                    return true; }),          // [임시]
+                    return pBB->Get<_float>("DistToTarget", FLT_MAX) <= 25.f; }),
+                //CBTCondition::Create([](CBlackboard* pBB) {
+                //    return true; }),          // [임시]
                 MakeCatch(),
                 }),
             CBTSequence::Create({
