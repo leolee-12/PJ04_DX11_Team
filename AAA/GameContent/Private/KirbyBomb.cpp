@@ -23,10 +23,10 @@ HRESULT CKirbyBomb::Initialize_Prototype()
 HRESULT CKirbyBomb::Initialize(void* pArg)
 {
 	// Launch 초기 속도
-	m_fSpeed = 25.f;
-	m_fDamage = 2.f;
-	m_fKnockback = 4.f;
-	m_fHitRadius = 0.60f;
+	//m_fSpeed = 25.f;
+	//m_fDamage = 2.f;
+	//m_fKnockback = 4.f;
+	//m_fHitRadius = 0.60f;
 
 	// Transform, Movement, HitBox, Shader 생성 
 	// Model Animator 생성
@@ -69,99 +69,25 @@ HRESULT CKirbyBomb::Ready_Visual()
 
 void CKirbyBomb::On_Activated()
 {
-	if (nullptr == m_pAnimatorCom)
-		return;
-
-	m_fRollAngle = 0.f;
-	m_vGlow = { 0.f, 0.f, 0.f };
-	m_pAnimatorCom->Clear_Overlay(1);
-
-	m_pAnimatorCom->Play("FuseBurning", false, true);		// 크래쉬 안나게 설정
-
-	// Overlay Animation 
-	CAnimator::LAYER_PLAY_INFO LayerInfo{};
-	LayerInfo.iSlot = 1;
-	LayerInfo.tAnim.strAniName = "FuseBurning";
-	LayerInfo.tAnim.bLoop = false;		// 해당 애니메이션 끝나면 수명 끝이므로 false
-	LayerInfo.tAnim.bRestart = true;
-	LayerInfo.tAnim.fSpeed = 1.f;
-	LayerInfo.Roots = { "EffectL" };
-
-	m_pAnimatorCom->Apply_Overlay(LayerInfo);
-
-	if (m_bCarried)
-	{
-		m_pAnimatorCom->Pause_Mask(1);
-		Update_Socket();
-	}
-
-	if (m_pFuseBone == nullptr)
-		m_pFuseBone = m_pModelCom->Get_BoneMatrixPtr("EffectL");
-
-	Update_FuseSocket();
-
-	if (m_pFuseFx == nullptr)
-	{
-		CEffect_Loader::GetInstance()->Spawn(L"BombFuseEffect", Get_LevelIndex(),
-			_float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
-			&m_matFuseWorld, &m_pFuseFx);
-	}
 }
 
 void CKirbyBomb::On_Bounce(_int iCount)
 {
-	if (iCount != 1 || nullptr == m_pAnimatorCom)
-		return;
-
-	CAnimator::ANI_PLAY_INFO AniInfo{};
-	AniInfo.strAniName = "DangerGlow";
-	AniInfo.bLoop = true;
-	AniInfo.fSpeed = 2.f;
-
-	m_pAnimatorCom->Play(&AniInfo);
-	m_pAnimatorCom->Resume_Mask(1);
 }
 
 void CKirbyBomb::On_Explode()
 {
-	_float3 vPos{};
-	XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
 
-	CEffect_Loader::GetInstance()->Spawn(L"BombExplosion", Get_LevelIndex(),
-		vPos, _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f));
-
-	if (m_pFuseFx)
-	{
-		m_pFuseFx->EffectContainer_StopAfterEmission();
-		m_pFuseFx = nullptr;
-	}
-
-	Despawn();
 }
 
 void CKirbyBomb::Update_FuseSocket()
 {
-	if (!m_pFuseBone)
-		return;
 
-	_matrix matWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
-	_matrix matBoneWorld = XMLoadFloat4x4(m_pFuseBone) * matWorld;
-
-	_matrix matSocket = XMMatrixIdentity();
-	matSocket.r[3] = matBoneWorld.r[3];
-
-	XMStoreFloat4x4(&m_matFuseWorld, matSocket);
 }
 
 void CKirbyBomb::Despawn()
 {
-	if (m_pFuseFx)
-	{
-		m_pFuseFx->EffectContainer_StopAfterEmission();
-		m_pFuseFx = nullptr;
-	}
 
-	__super::Despawn();  // Kill
 }
 
 HRESULT CKirbyBomb::Ready_AnimEvents()
