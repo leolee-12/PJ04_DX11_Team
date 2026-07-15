@@ -145,7 +145,7 @@ void CKirby_Ability_Bomb::Enter_BombState(CKirby* pKirby, BOMB_STATE eState)
             break;
         case BOMB_STATE::CHARGE_START:
             pAnimator->Play("BombThrowCharge", true, false, 0.1f, 1.5f);
-            //Spawn_Bomb(pKirby);
+            Spawn_Bomb(pKirby);
             break;
         case BOMB_STATE::CHARGE:
             pAnimator->Play("BombThrowCharge", true, false, 0.1f, 1.5f);
@@ -160,7 +160,7 @@ void CKirby_Ability_Bomb::Enter_BombState(CKirby* pKirby, BOMB_STATE eState)
             break;
         case BOMB_STATE::THROW:
             pAnimator->Play("BombThrow", false, false, 0.1f, 2.5f);
-            //Throw_Bomb(pKirby);
+            Throw_Bomb(pKirby);
             break;
     }
 }
@@ -282,7 +282,7 @@ void CKirby_Ability_Bomb::Spawn_Bomb(CKirby* pKirby)
 
     const _float4x4* pSocketBone = pKirby->Get_Body()->Get_BoneMatrixPtr("RHaveL");
 
-    pBomb->Attach_To_Socket(pSocketBone, pKirby->Get_Transform()->Get_WorldMatrixPtr(), XMMatrixIdentity());
+    pBomb->Attach_To_Socket(pSocketBone, pKirby->Get_Transform()->Get_WorldMatrixPtr(), pBomb->Get_PreRotInverse());
 
     m_pBomb = pBomb;
 }

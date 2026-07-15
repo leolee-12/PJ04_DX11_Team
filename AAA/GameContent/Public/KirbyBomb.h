@@ -1,19 +1,24 @@
 #pragma once
 #include "Projectile_Bomb.h"
 
-NS_BEGIN(Engine)
-class CEffect_Container;
-NS_END
-
 NS_BEGIN(Client)
 
 class CKirbyBomb final : public CProjectile_Bomb
 {
 	GENERATED_BODY(CKirbyBomb)
 
+private:
+	enum class BOMB_STATE
+	{
+		NONE,
+		HELD,			// 몬스터 손에 부착(심지 이동 정지)
+		FLYING,			// 투척(심지 점화)
+		DANGER,			// 첫 바운드 후 (붉은색 발광 효과)
+	};
+
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_KirbyBomb";
-	static constexpr const _tchar* MODEL_PROTO_TAG = L"Prototype_Component_Model_KirbyBomb";
+	static constexpr const _tchar* MODEL_PROTO_TAG = L"Prototype_Component_Model_KribyBomb";
 	static constexpr const _tchar* POOL_KEY = L"KirbyBomb";
 
 private:
@@ -22,32 +27,28 @@ private:
 	virtual ~CKirbyBomb() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype() override;
-	virtual HRESULT Initialize(void* pArg) override;
+	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOut) override { pOut->strPrototypeTag = PROTOTYPE_TAG; }
 
 protected:
+	virtual HRESULT Initialize(void* pArg) override;
 	virtual void	Update(_float fTimeDelta) override;
-	virtual HRESULT	Ready_AnimEvents() override;
+	virtual HRESULT Ready_Visual() override;
+	virtual HRESULT Ready_AnimEvents() override;
 	virtual HRESULT Ready_HitBox() override;
 
-	virtual HRESULT	Ready_Visual() override;
-
-	virtual void	On_Activated() override;
-	virtual void	On_Bounce(_int iCount) override;
-	virtual void	On_Explode() override;
-
-public:
-	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOut) override { pOut->strPrototypeTag = PROTOTYPE_TAG; }
-	virtual void Despawn() override;
+	// 활성화/발사/바운드 
+	virtual void On_Activated() override;
+	virtual void On_Launched() override;
+	virtual void On_Bounce(_int iCount) override;
 
 private:
-	void Update_FuseSocket();
-	void Stop_Fuse();
+	void Change_State(BOMB_STATE eNext);
+	void Enter_State(BOMB_STATE eState);
+	void Update_State(_float fTimeDelta);
+	void Exit_State(BOMB_STATE eState);
 
 private:
-	CEffect_Container*  m_pFuseFx{};
-	const _float4x4*	m_pFuseBone{};
-	_float4x4			m_matFuseWorld{};
+	BOMB_STATE m_eState = { BOMB_STATE::NONE };
 
 public:
 	static CKirbyBomb* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -71,7 +71,7 @@ HRESULT CEnemyBomb::Ready_Visual()
 		return E_FAIL;
 
 	m_pModelCom = Add_Component<CModel>(
-		m_iPrototypeLevel, MODEL_PROTO_TAG, TEXT("Com_Model"));
+m_iPrototypeLevel, MODEL_PROTO_TAG, TEXT("Com_Model"));
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
 
@@ -126,6 +126,7 @@ void CEnemyBomb::Enter_State(BOMB_STATE eState)
 		Play_BodyAnim(ANIM_FUSE, false);
 		Start_Fuse();
 		Pause_Fuse();
+
 		Update_Socket();
 		Spawn_FuseFx();
 	}

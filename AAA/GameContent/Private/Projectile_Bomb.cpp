@@ -155,6 +155,13 @@ void CProjectile_Bomb::Despawn()
     Kill();
 }
 
+_matrix CProjectile_Bomb::Get_PreRotInverse() const
+{
+    return XMMatrixInverse(nullptr,
+        XMMatrixRotationX(XMConvertToRadians(90.f)) *
+        XMMatrixRotationY(XMConvertToRadians(180.f)));
+}
+
 void CProjectile_Bomb::Ignite()
 {
     Start_Fuse();
@@ -361,13 +368,6 @@ void CProjectile_Bomb::Roll_ByMovement(_float fTimeDelta)
     m_fRollAngle = fmodf(m_fRollAngle, 360.f);
 
     Apply_RollPose();
-}
-
-_matrix CProjectile_Bomb::Get_PreRotInverse() const
-{
-    return XMMatrixInverse(nullptr,
-        XMMatrixRotationX(XMConvertToRadians(90.f)) *
-        XMMatrixRotationY(XMConvertToRadians(180.f)));
 }
 
 HRESULT	CProjectile_Bomb::Bind_ShaderResources()
