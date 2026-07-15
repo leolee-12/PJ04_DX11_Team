@@ -12,7 +12,7 @@
 CProjectile_Partner::CProjectile_Partner(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPhysicsProjectile{ pDevice, pContext }
 {
-    m_fSpeed = 18.f; m_fLifeTime = 4.f; m_fDamage = 5.f; m_fKnockback = 12.f;
+    m_fSpeed = 18.f; m_fLifeTime = 10.f; m_fDamage = 5.f; m_fKnockback = 12.f;
     m_fHitRadius = 1.2f; m_fHitHeight = 1.5f;
     m_vCenterOffset = { 0.f, 1.f, 0.f };
 }
@@ -59,18 +59,6 @@ void CProjectile_Partner::On_Launched()
         m_pAnimatorCom->Play("TwinRolling", true, true);
 }
 
-void CProjectile_Partner::On_Impact()
-{
-    if (m_bCarried) return;
-    Enter_Break();
-}
-
-void CProjectile_Partner::On_Bounce(_int iCount)
-{
-    UNREFERENCED_PARAMETER(iCount);
-    Enter_Break();
-}
-
 void CProjectile_Partner::Enter_Break()
 {
     if (m_eState == STATE::BREAKING) return;
@@ -85,7 +73,6 @@ void CProjectile_Partner::Enter_Break()
 
     if (m_pAnimatorCom)
         m_pAnimatorCom->Play("Break", false, true);
-    // TODO: ÂøÅº ÀÌÆåÆ® / SFX (ÀÌÆåÆ® Å° È®Á¤µÇ¸é CEffect_Loader::Spawn)
 }
 
 void CProjectile_Partner::Update_Terminal(_float dt)
@@ -109,21 +96,9 @@ void CProjectile_Partner::Update(_float fTimeDelta)
     if (m_bCarried && m_pHitBox && m_pHitBox->Is_Enabled())
         m_pHitBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
 
-    if (m_eState == STATE::FLYING && !m_bCarried)
-    {
-        _vector vVel = XMVectorSetY(XMLoadFloat3(&m_vVelocity), 0.f);
-        if (XMVectorGetX(XMVector3LengthSq(vVel)) > 1e-6f)
-        {
-            _float3 vDir; XMStoreFloat3(&vDir, XMVector3Normalize(vVel));
-            _float3 vPos; XMStoreFloat3(&vPos, m_pTransformCom->Get_State(Engine::STATE::POSITION));
-            vPos.y += 1.f;
-
-            _float3 vN{};
-            if (m_pGameInstance_Proxy->Sweep_Sphere(vPos, 1.f, vDir, 1.5f, &vN)
-                && fabsf(vN.y) < 0.5f)
-                Enter_Break();
-        }
-    }
+    constexpr _float fBreakTime = 3.5f;
+    if (m_eState == STATE::FLYING && !m_bCarried && m_fAccLife >= fBreakTime)
+        Enter_Break();
 }
 
 void CProjectile_Partner::Play_Anim(const _char* szClip, _bool bLoop)
@@ -157,6 +132,9 @@ HRESULT CProjectile_Partner::Render()
     const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
     for (_uint i = 0; i < iNumMeshes; ++i)
     {
+        if (m_eState == STATE::BREAKING && (i == 1 || i == 3))
+            continue;
+
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_DiffuseTexture", i, MTEX_TYPE::DIFFUSE, 0)))   return E_FAIL;
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_NormalTexture", i, MTEX_TYPE::NORMALS, 0)))    return E_FAIL;
         if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, "g_MRATexture", i, MTEX_TYPE::METALNESS, 0)))     return E_FAIL;

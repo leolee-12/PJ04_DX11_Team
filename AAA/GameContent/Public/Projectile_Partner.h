@@ -36,8 +36,8 @@ protected:
     virtual HRESULT Ready_Visual() override;
     virtual void    On_Activated() override;              // 부착 = Appear 재생
     virtual void    On_Launched() override;               // 발사 = TwinRolling 회전 재활용
-    virtual void    On_Bounce(_int iCount) override;      // 바닥에 닿으면 즉시 파괴
-    virtual void    On_Impact() override;                 // 명중/착탄: 캐리 중엔 무시
+    virtual void    On_Bounce(_int iCount) override {}
+    virtual void    On_Impact() override {}
     virtual void    Update_Terminal(_float dt) override;  // Break 끝나면 풀 반환
     virtual void    Tick_Visual(_float dt) override;
 

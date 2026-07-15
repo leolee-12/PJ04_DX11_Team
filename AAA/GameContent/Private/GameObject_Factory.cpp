@@ -3,22 +3,8 @@
 #include "GameInstance.h"
 #include "GameObject.h"
 #include "Camera_Free.h"
-#include "Terrain.h"
-#include "TestFiona.h"
-#include "TestNonAnim.h"
-#include "TestRect.h"
-#include "TestEffectQuad.h"
-#include "TestMap.h"
-#include "TestMarb1e.h"
-#include "TestMarb1eMap.h"
-#include "TestTriggerBox.h"
-#include "TestParticle.h"
-#include "TestMeshEmitter.h"
-#include "TestMeshParticle.h"
-#include "Material_Object.h"
 
 //UI Container
-#include "UI_TestImageContainer.h"
 #include "UI_Title.h"
 #include "UI_GenericContainer.h"
 #include "UI_PointStar.h"
@@ -327,228 +313,6 @@ void CGameObject_Factory::Register_Camera()
 
 void CGameObject_Factory::Register_Test()
 {
-    Register(TEXT("Proto_TestFiona"), TEXT("TEST_OBJECT"),
-        CREATOR(CTestFiona),
-        LOADER(
-            pProxy->Add_Prototype(iLevelIndex, TEXT("Prototype_Component_Model_Fiona"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Test/Test/Aligator/Aligator_Anim.ysh"
-                    //, XMMatrixRotationY(XMConvertToRadians(180.f))
-                ))
-        )
-    );
-
-
-    Register(TEXT("Proto_TestNonAnim"), TEXT("TEST_OBJECT"),
-        CREATOR(CTestNonAnim),
-        LOADER
-        (
-            pProxy->Add_Prototype(iLevelIndex, TEXT("Prototype_Component_Model_NonAnim"),
-                CModel::Create(pDevice, pContext, MODEL::MAP, "../../Resources/Test/Test/Marb1e/Land_GsAllBuilding_0.ysh"))
-        )
-    );
-
-    Register(CTestRect::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
-        CREATOR(CTestRect),
-        LOADER()
-    );
-
-    Register(CTestEffectQuad::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
-        CREATOR(CTestEffectQuad),
-        LOADER(
-            TRY_ADD_PROTO(pProxy, Texture_Common_Flash02.iLevelID, Texture_Common_Flash02.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Common_Flash02.szFileTag, Texture_Common_Flash02.iNumTex));
-
-            TRY_ADD_PROTO(pProxy, Texture_TestMask.iLevelID, Texture_TestMask.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_TestMask.szFileTag, Texture_TestMask.iNumTex));
-        )
-    );
-
-
-    Register(CTestMarb1e::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
-        CREATOR(CTestMarb1e),
-        LOADER(
-            pProxy->Add_Prototype(iLevelIndex, TEXT("Prototype_Component_Model_Marb1e"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/Test/Test/Aligator/Aligator_Anim.ysh"
-                    //, XMMatrixRotationY(XMConvertToRadians(180.f))
-                ))
-        )
-    );
-
-    Register(CTestMarb1eMap::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
-        CREATOR(CTestMarb1eMap),
-        LOADER(
-            pProxy->Add_Prototype(iLevelIndex, TEXT("Prototype_Component_Model_Map"),
-                CModel::Create(pDevice, pContext, MODEL::MAP, "../../Resources/Test/Test/Marb1e/Land_GsAllBuilding_0.ysh"))
-        )
-    );
-
-    Register(CMaterial_Object::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
-        CREATOR(CMaterial_Object),
-        LOADER(
-            pProxy->Add_Prototype(iLevelIndex, TEXT("Prototype_Component_Model_MaterialObject"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Shader_Test_Object/Model_SmokeSphereOriginal.ysh"))
-        )
-    );
-
-
-
-
-    Register(CSkySphere::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
-        CREATOR(CSkySphere),
-        LOADER()
-    );
-
-    // Effect_Container
-    // 0. WalkSmoke
-    Register(CWalkSmoke::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CWalkSmoke),
-        LOADER
-        (
-            // SmokeSphereOriginal
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeSphereOriginal::PROTOTYPE_TAG,
-                CSmokeSphereOriginal::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
-            // SmokeLowPoly
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeLowPoly::PROTOTYPE_TAG,
-                CSmokeLowPoly::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeLowPoly"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
-            // SmokeTail
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeTail::PROTOTYPE_TAG,
-                CSmokeTail::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeTail"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeTail/Model_SmokeTail.ysh"));
-        )
-    );
-
-    // 1. InhaleContainer
-    Register(CInhaleContainer::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CInhaleContainer),
-        LOADER
-        (           
-            // InhaleEffect
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CInhaleEffect::PROTOTYPE_TAG,
-                CInhaleEffect::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_InhaleEffect"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/InhaleEffect2M/Common_00_InhaleEffect2M.ysh",
-                    XMMatrixRotationX(XMConvertToRadians(90.f))));
-            TRY_ADD_PROTO(pProxy, Texture_Wind01.iLevelID, Texture_Wind01.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Wind01.szFileTag, Texture_Wind01.iNumTex));
-            TRY_ADD_PROTO(pProxy, Texture_Wind02.iLevelID, Texture_Wind02.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Wind02.szFileTag, Texture_Wind02.iNumTex));
-
-            // Vacuum
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CVacuum::PROTOTYPE_TAG,
-                CVacuum::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_00_Vacuum"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Vacuum/Common_00_Vacuum.ysh",
-                    XMMatrixRotationY(XMConvertToRadians(180.f))));
-
-            //// Tornado Spin Reverse
-            //TRY_ADD_PROTO(pProxy, iLevelIndex, CTornadoSpinReverse::PROTOTYPE_TAG,
-            //    CTornadoSpinReverse::Create(pDevice, pContext));
-            //TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_TornadoSpinReverse"),
-            //    CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/TornadoSpinReverse/Tornado_00_TornadoSpinReverse.ysh",
-            //        XMMatrixRotationX(XMConvertToRadians(90.f))
-            //    ));
-        )
-    );
-
-    // 2. SwordSlash
-    Register(CSwordSlash1::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSwordSlash1),
-        LOADER
-        (
-            // Common_Ring03
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_Ring03::PROTOTYPE_TAG,
-                CCommon_Ring03::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_Ring03"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_Ring03/Model_Common_Ring03.ysh",
-                    XMMatrixRotationX(XMConvertToRadians(-90.f))));
-            TRY_ADD_PROTO(pProxy, Texture_Common_Ring02.iLevelID, Texture_Common_Ring02.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Common_Ring02.szFileTag, Texture_Common_Ring02.iNumTex));
-
-            TRY_ADD_PROTO(pProxy, Texture_SwordSlash2.iLevelID, Texture_SwordSlash2.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_SwordSlash2.szFileTag, Texture_SwordSlash2.iNumTex));
-        )
-    );
-
-    // 3. JumpSlash
-    Register(CSword_JumpSlash::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSword_JumpSlash),
-        LOADER
-        (
-            // Common_JumpSlash
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_JumpSlash::PROTOTYPE_TAG,
-                CCommon_JumpSlash::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_JumpSlash"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_JumpSlash/Model_Common_JumpSlash.ysh"));
-            TRY_ADD_PROTO(pProxy, Texture_Common_JumpSlash.iLevelID, Texture_Common_JumpSlash.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Common_JumpSlash.szFileTag, Texture_Common_JumpSlash.iNumTex));
-
-            // Common_Curve03
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_Curve03::PROTOTYPE_TAG,
-                CCommon_Curve03::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_Curve03"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_Curve03/Model_Common_Curve03.ysh",
-                    XMMatrixRotationY(XMConvertToRadians(90.f))));
-            TRY_ADD_PROTO(pProxy, Texture_Common_Flash02.iLevelID, Texture_Common_Flash02.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Common_Flash02.szFileTag, Texture_Common_Flash02.iNumTex));
-        )
-    );
-
-    // 4. SpinSlash
-    Register(CSword_SpinSlash::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSword_SpinSlash),
-        LOADER
-        (
-            // Common_SpinSlash
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_SpinSlash::PROTOTYPE_TAG,
-                CCommon_SpinSlash::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_SpinSlash"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_SpinSlash/Model_Common_SpinSlash.ysh",
-                    XMMatrixRotationX(XMConvertToRadians(90.f))));
-            TRY_ADD_PROTO(pProxy, Texture_Common_SpinSlash_1.iLevelID, Texture_Common_SpinSlash_1.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Common_SpinSlash_1.szFileTag, Texture_Common_SpinSlash_1.iNumTex));
-
-            TRY_ADD_PROTO(pProxy, Texture_Common_SpinSlash_2.iLevelID, Texture_Common_SpinSlash_2.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Common_SpinSlash_2.szFileTag, Texture_Common_SpinSlash_2.iNumTex));
-        )
-    );
-
-    // 5. SpinSlashTrail
-    Register(CSword_SpinSlashTrail::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSword_SpinSlashTrail),
-        LOADER
-        (
-            // Common_SpinSlashTrail
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_SpinSlashTrail::PROTOTYPE_TAG,
-                CCommon_SpinSlashTrail::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_SpinSlashTrail"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_SpinSlashTrail/Model_Common_SpinSlashTrail.ysh",
-                    XMMatrixRotationX(XMConvertToRadians(90.f))));
-            TRY_ADD_PROTO(pProxy, Texture_Common_SpinSlashTrail.iLevelID, Texture_Common_SpinSlashTrail.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_Common_SpinSlashTrail.szFileTag, Texture_Common_SpinSlashTrail.iNumTex));
-        )
-    );
-
-
-
-    Register(CTestTriggerBox::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
-        CREATOR(CTestTriggerBox),
-        LOADER()
-    );
-
-    Register(CBoss_Cage::PROTOTYPE_TAG, TEXT("TEST_OBJECT"),
-        CREATOR(CBoss_Cage),
-        LOADER(
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::MODEL_PROTO_TAG,
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/WaddleDee/Body/Model_Anim.ysh"
-                    , XMMatrixRotationY(XMConvertToRadians(180.f))
-                ));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::PROTOTYPE_TAG, CCage_WaddleDee::Create(pDevice, pContext));
-
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Cage_Body::MODEL_PROTO_TAG,
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Gimmick/CaptiveCage/CageL/CageL_Anim_TopL.ysh",
-                    XMMatrixRotationY(XMConvertToRadians(180.f))));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Cage_Body::PROTOTYPE_TAG, CBoss_Cage_Body::Create(pDevice, pContext));
-        )
-    );
 }
 
 void CGameObject_Factory::Register_Container()
@@ -735,7 +499,6 @@ void CGameObject_Factory::Register_Container()
 
 void CGameObject_Factory::Register_UIContainer()
 {
-    Register(CUI_TestImageContainer::PROTOTYPE_TAG, TEXT("UI_CONTAINER_TEST"), CREATOR(CUI_TestImageContainer), LOADER());
     Register(CUI_Title::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_Title), LOADER());
     Register(CUI_GenericContainer::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_GenericContainer), LOADER());
     Register(CUI_PointStar::PROTOTYPE_TAG, TEXT("UI_CONTAINER"), CREATOR(CUI_PointStar), LOADER());
@@ -1141,6 +904,126 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, Texture_ItemSparkle03.iLevelID, Texture_ItemSparkle03.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_ItemSparkle03.szFileTag, Texture_ItemSparkle03.iNumTex));
         ));
+
+    // 0. WalkSmoke
+    Register(CWalkSmoke::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CWalkSmoke),
+        LOADER
+        (
+            // SmokeSphereOriginal
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeSphereOriginal::PROTOTYPE_TAG,
+                CSmokeSphereOriginal::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+            // SmokeLowPoly
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeLowPoly::PROTOTYPE_TAG,
+                CSmokeLowPoly::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeLowPoly"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
+            // SmokeTail
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeTail::PROTOTYPE_TAG,
+                CSmokeTail::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeTail"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeTail/Model_SmokeTail.ysh"));
+        )
+    );
+
+    // 1. InhaleContainer
+    Register(CInhaleContainer::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CInhaleContainer),
+        LOADER
+        (
+            // InhaleEffect
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CInhaleEffect::PROTOTYPE_TAG,
+                CInhaleEffect::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_InhaleEffect"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/InhaleEffect2M/Common_00_InhaleEffect2M.ysh",
+                    XMMatrixRotationX(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, Texture_Wind01.iLevelID, Texture_Wind01.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Wind01.szFileTag, Texture_Wind01.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_Wind02.iLevelID, Texture_Wind02.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Wind02.szFileTag, Texture_Wind02.iNumTex));
+
+            // Vacuum
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CVacuum::PROTOTYPE_TAG,
+                CVacuum::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_00_Vacuum"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Vacuum/Common_00_Vacuum.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
+    // 2. SwordSlash
+    Register(CSwordSlash1::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSwordSlash1),
+        LOADER
+        (
+            // Common_Ring03
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_Ring03::PROTOTYPE_TAG,
+                CCommon_Ring03::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_Ring03"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_Ring03/Model_Common_Ring03.ysh",
+                    XMMatrixRotationX(XMConvertToRadians(-90.f))));
+            TRY_ADD_PROTO(pProxy, Texture_Common_Ring02.iLevelID, Texture_Common_Ring02.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Common_Ring02.szFileTag, Texture_Common_Ring02.iNumTex));
+
+            TRY_ADD_PROTO(pProxy, Texture_SwordSlash2.iLevelID, Texture_SwordSlash2.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_SwordSlash2.szFileTag, Texture_SwordSlash2.iNumTex));
+        )
+    );
+
+    // 3. JumpSlash
+    Register(CSword_JumpSlash::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSword_JumpSlash),
+        LOADER
+        (
+            // Common_JumpSlash
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_JumpSlash::PROTOTYPE_TAG,
+                CCommon_JumpSlash::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_JumpSlash"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_JumpSlash/Model_Common_JumpSlash.ysh"));
+            TRY_ADD_PROTO(pProxy, Texture_Common_JumpSlash.iLevelID, Texture_Common_JumpSlash.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Common_JumpSlash.szFileTag, Texture_Common_JumpSlash.iNumTex));
+
+            // Common_Curve03
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_Curve03::PROTOTYPE_TAG,
+                CCommon_Curve03::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_Curve03"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_Curve03/Model_Common_Curve03.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, Texture_Common_Flash02.iLevelID, Texture_Common_Flash02.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Common_Flash02.szFileTag, Texture_Common_Flash02.iNumTex));
+        )
+    );
+
+    // 4. SpinSlash
+    Register(CSword_SpinSlash::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSword_SpinSlash),
+        LOADER
+        (
+            // Common_SpinSlash
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_SpinSlash::PROTOTYPE_TAG,
+                CCommon_SpinSlash::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_SpinSlash"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_SpinSlash/Model_Common_SpinSlash.ysh",
+                    XMMatrixRotationX(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, Texture_Common_SpinSlash_1.iLevelID, Texture_Common_SpinSlash_1.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Common_SpinSlash_1.szFileTag, Texture_Common_SpinSlash_1.iNumTex));
+
+            TRY_ADD_PROTO(pProxy, Texture_Common_SpinSlash_2.iLevelID, Texture_Common_SpinSlash_2.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Common_SpinSlash_2.szFileTag, Texture_Common_SpinSlash_2.iNumTex));
+        )
+    );
+
+    // 5. SpinSlashTrail
+    Register(CSword_SpinSlashTrail::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSword_SpinSlashTrail),
+        LOADER
+        (
+            // Common_SpinSlashTrail
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCommon_SpinSlashTrail::PROTOTYPE_TAG,
+                CCommon_SpinSlashTrail::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Common_SpinSlashTrail"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/Common_SpinSlashTrail/Model_Common_SpinSlashTrail.ysh",
+                    XMMatrixRotationX(XMConvertToRadians(90.f))));
+            TRY_ADD_PROTO(pProxy, Texture_Common_SpinSlashTrail.iLevelID, Texture_Common_SpinSlashTrail.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_Common_SpinSlashTrail.szFileTag, Texture_Common_SpinSlashTrail.iNumTex));
+        )
+    );
 }
 
 void CGameObject_Factory::Register_Bubble()
@@ -1308,6 +1191,7 @@ void CGameObject_Factory::Register_SystemObject()
     Register(CCameraDirector::PROTOTYPE_TAG, TEXT("System_Object"), CREATOR(CCameraDirector), LOADER());
     Register(CDialogue_Director::PROTOTYPE_TAG, TEXT("System_Object"), CREATOR(CDialogue_Director), LOADER());
     Register(CDialogue_Arranger::PROTOTYPE_TAG, TEXT("System_Object"), CREATOR(CDialogue_Arranger), LOADER());
+    Register(CSkySphere::PROTOTYPE_TAG, TEXT("TEST_OBJECT"), CREATOR(CSkySphere), LOADER());
 }
 
 void CGameObject_Factory::Free()

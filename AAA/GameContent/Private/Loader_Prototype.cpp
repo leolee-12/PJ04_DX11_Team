@@ -107,9 +107,11 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
 
 
     //sky Sphere
-
-    if (FAILED(pProxy->Add_Prototype(Model_SkyTest.iLevelID, Model_SkyTest.szProtoTag,
-        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Sky/Test/Model.ysh"))))
+    if (FAILED(pProxy->Add_Prototype(Model_SkyDefault.iLevelID, Model_SkyDefault.szProtoTag,
+        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Sky/Default/Model.ysh"))))
+        return E_FAIL;
+    if (FAILED(pProxy->Add_Prototype(Model_SkyVolcano.iLevelID, Model_SkyVolcano.szProtoTag,
+        CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Sky/Stage1/Model.ysh"))))
         return E_FAIL;
 
     if (FAILED(pProxy->Add_Prototype(ETOUI(LEVEL::STATIC),

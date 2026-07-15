@@ -74,6 +74,11 @@ void CBoss_Armadillo::Play_Intro()
 {
     if (CAnimator* pAnim = Get_BodyAnimator())
         pAnim->Play("Angry", false, true, 0.f, 1.5f);
+
+    BOSSCAM_CONFIG_DESC cfg{};
+    cfg.fAimHeight = 4.f;    
+    cfg.fShoulderOffset = 0.f;
+    m_pGameInstance_Proxy->Publish(EventTag::BossCam_Config, &cfg);
 }
 
 _bool CBoss_Armadillo::Is_Intro_Finished() const

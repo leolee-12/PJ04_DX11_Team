@@ -2,5 +2,5 @@
 
 namespace Client
 {
-	enum class SKYTYPE { TEST , END};
+	enum class SKYTYPE { DEFAULT, VOLCANO, END};
 }

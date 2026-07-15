@@ -104,6 +104,19 @@ HRESULT CCamera_Boss::Ready_Events()
             m_pFocusOverride = nullptr;
         });
 
+    Subscribe_Event(EventTag::BossCam_Config, [this](void* p) {
+        if (auto* d = static_cast<BOSSCAM_CONFIG_DESC*>(p))
+        {
+            m_fBackDist = d->fBackDist;
+            m_fHeight = d->fHeight;
+            m_fShoulderOffset = d->fShoulderOffset;
+            m_fAimBias = d->fAimBias;
+            m_fAimHeight = d->fAimHeight;
+            m_fSmoothTime = d->fSmoothTime;
+            m_fFovDeg = d->fFovDeg;
+        }
+        });
+
     return Ready_ShakeEvents();
 }
 

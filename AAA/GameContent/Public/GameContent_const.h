@@ -113,7 +113,8 @@ namespace ProtoDesc
 
 
 	//sky
-	inline constexpr COMPONENT_DESC Model_SkyTest = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_SkyTest") };
+	inline constexpr COMPONENT_DESC Model_SkyDefault = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_SkyDefault") };
+	inline constexpr COMPONENT_DESC Model_SkyVolcano = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Model_SkyVolcano") };
 
 	// Collider
 	inline constexpr COMPONENT_DESC Collider_Sphere = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Sphere") };
