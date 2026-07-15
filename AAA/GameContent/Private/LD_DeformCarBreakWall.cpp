@@ -14,8 +14,12 @@ namespace
 	inline constexpr const _char*	ANIM_END = "DeformCarGetEnd";
 	inline constexpr const _char*	DEFORM_CAR_BREAK_WALL_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_FIRST, ANIM_END, "", "" };
 	inline constexpr const _tchar*	BREAK_WALL_EFFECT_ID = L"BreakWallEffect";
-	inline constexpr const _float3  BREAK_WALL_EFFECT_OFFSET = { 0.f, 7.5f, 0.f };
-
+	inline constexpr const _float3  BREAK_WALL_EFFECT_OFFSET[] = {
+		{-3.7f, 8.4f, -2.75f},
+		{+3.5f, 9.0f, -2.75f},
+		{-3.4f, 9.6f, -2.75f},
+	};
+	
 	inline constexpr _float DEFORM_CAR_BREAK_WALL_ANIM_SPEED = 1.5f;
 	inline constexpr const _uint DEFORM_CAR_BREAK_WALL_MESH_COUNT = 31u;
 	inline constexpr const _uint DEFORM_CAR_BREAK_WALL_COLLIMESH_INDEX = 10u;
@@ -26,7 +30,7 @@ namespace
 	inline constexpr const _uint OFF_TO_ON_MESH_INDICES[] = { 3,4,5,6,7,8,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30 };
 	
 	inline constexpr const _uint ON_TO_OFF_AT_FRAME_MESH_INDICES[] = { 9,10 };
-	inline constexpr const _float MESH_HIDE_TRACK_FRAME = 1.f;
+	inline constexpr const _float MESH_HIDE_TRACK_FRAME = 2.f;
 }
 
 NS_BEGIN(Client)
@@ -346,9 +350,15 @@ void CLD_DeformCarBreakWall::On_Event()
 	}
 	else
 		XMStoreFloat3(&vEffectPos, m_pTransformCom->Get_State(Engine::STATE::POSITION));
-
-	vEffectPos = BREAK_WALL_EFFECT_OFFSET;
-	CEffect_Loader::GetInstance()->Spawn(BREAK_WALL_EFFECT_ID, Get_LevelIndex(), vEffectPos);
+	
+	for (_uint i = 0; i < 3; ++i)
+	{
+		_float3 vPos = vEffectPos;
+		vPos.x += BREAK_WALL_EFFECT_OFFSET[i].x;
+		vPos.y += BREAK_WALL_EFFECT_OFFSET[i].y;
+		vPos.z += BREAK_WALL_EFFECT_OFFSET[i].z;
+		CEffect_Loader::GetInstance()->Spawn(BREAK_WALL_EFFECT_ID, Get_LevelIndex(), vPos);
+	}
 
 	for (_uint iMeshIndex : ON_TO_OFF_MESH_INDICES)
 		Set_MeshVisible(iMeshIndex, false);

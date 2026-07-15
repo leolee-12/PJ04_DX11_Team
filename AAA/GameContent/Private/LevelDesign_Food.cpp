@@ -86,8 +86,15 @@ HRESULT CLevelDesign_Food::Initialize(void* pArg)
 
 	m_bUseShadow = true;
 
-	if (FAILED(Ready_Effect()))
+	if (!m_tFoodDesc.strReceiveEventTag.empty())
+	{
+		Set_Active(false);
+		m_pHurtBox->Set_Enabled(false);
+	}
+	else if (FAILED(Ready_Effect()))
+	{
 		return E_FAIL;
+	}
 
 	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
@@ -216,6 +223,25 @@ _bool CLevelDesign_Food::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json
 CGameObject* CLevelDesign_Food::Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	return CLevelDesign_Food::Create(pDevice, pContext);
+}
+
+void CLevelDesign_Food::On_LDEventReceived(const _wstring& strEventTag)
+{
+	UNREFERENCED_PARAMETER(strEventTag);
+
+	if (m_bPickingUp || Is_Dead() || Is_Active())
+		return;
+
+	if (nullptr == m_pItemEffect && FAILED(Ready_Effect()))
+		return;
+
+	Set_Active(true);
+
+	if (nullptr != m_pHurtBox)
+	{
+		m_pHurtBox->Set_Enabled(true);
+		m_pHurtBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+	}
 }
 
 HRESULT CLevelDesign_Food::Ready_Components()

@@ -61,7 +61,7 @@ inline constexpr MAP_SHADER_PASS_META g_MapShaderPassMetas[] =
 	{ MAP_PASS::DN,			"DN",		DIFF | NORM },
 	{ MAP_PASS::DMN,		"DMN",		DIFF | NORM | MRA },
 	{ MAP_PASS::DMNU,		"DMNU",		DIFF | NORM | MRA | UKWN },
-	{ MAP_PASS::TOP,		"FRONT",		DIFF | NORM | MRA },
+	{ MAP_PASS::TOP,		"FRONT",	DIFF | NORM | MRA },
 	{ MAP_PASS::MASK,		"MASK",		DIFF | NORM | MRA },
 	{ MAP_PASS::UKWN,		"UKWN",		UKWN },
 	{ MAP_PASS::DISCARD,	"DISCARD",	0 },
@@ -187,7 +187,7 @@ inline constexpr WORLD_SHADER_PASS_META g_WorldShaderPassMetas[] =
 	{ WORLD_PASS::UMN,					"UMN",					UKWN | MRA | NORM },
 
 	{ WORLD_PASS::DMNU,					"DMNU",					DIFF | MRA | NORM | UKWN },
-	{ WORLD_PASS::TREESHADOW,			"TREESHADOW",			UKWN },
+	{ WORLD_PASS::TREESHADOW,			"TREESHADOW",			DIFF },
 	{ WORLD_PASS::GRASS_FUR,			"GRASS_FUR",			DIFF | MRA | NORM },
 	{ WORLD_PASS::COLOR,				"COLOR",				MRA | NORM },
 	{ WORLD_PASS::DISCARD,				"DISCARD",				0 },

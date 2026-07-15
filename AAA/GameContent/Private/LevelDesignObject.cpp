@@ -90,6 +90,32 @@ void CLevelDesignObject::Add_EditModelSlot(vector<EDITABLE_MODEL_SLOT>* pOutSlot
 	pOutSlots->push_back(Slot);
 }
 
+HRESULT CLevelDesignObject::Ready_Events()
+{
+	if (FAILED(__super::Ready_Events()))
+		return E_FAIL;
+
+	if (m_tLevelDesignDesc.strReceiveEventTag.empty())
+		return S_OK;
+
+	const _wstring strReceiveEventTag = m_tLevelDesignDesc.strReceiveEventTag;
+
+	Subscribe_Event(strReceiveEventTag, [this, strReceiveEventTag](void*)
+		{
+#ifdef _DEBUG
+			const _wstring strLog = L"[LD Event] Receive Object="
+				+ m_tLevelDesignDesc.strObjectName
+				+ L" Uid=" + to_wstring(m_tLevelDesignDesc.iUid)
+				+ L" Tag=" + strReceiveEventTag + L"\n";
+			OutputDebugStringW(strLog.c_str());
+#endif
+
+			On_LDEventReceived(strReceiveEventTag);
+		});
+
+	return S_OK;
+}
+
 void CLevelDesignObject::Build_EditCapabilities(_uint* pOutCaps, EDIT_OBJECT_POLICY* pOutPolicy) const
 {
 	if (nullptr != pOutCaps)
@@ -361,6 +387,22 @@ _bool CLevelDesignObject::Compute_EffectSpawnPosition(CModel* pModel, _float fHe
 		XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr())));
 
 	return true;
+}
+
+void CLevelDesignObject::Publish_LDEvent()
+{
+	if (m_tLevelDesignDesc.strPublishEventTag.empty())
+		return;
+
+	m_pGameInstance_Proxy->Publish(m_tLevelDesignDesc.strPublishEventTag, nullptr);
+
+#ifdef _DEBUG
+	const _wstring strLog = L"[LD Event] Publish Object="
+		+ m_tLevelDesignDesc.strObjectName
+		+ L" Uid=" + to_wstring(m_tLevelDesignDesc.iUid)
+		+ L" Tag=" + m_tLevelDesignDesc.strPublishEventTag + L"\n";
+	OutputDebugStringW(strLog.c_str());
+#endif
 }
 
 void CLevelDesignObject::Free()

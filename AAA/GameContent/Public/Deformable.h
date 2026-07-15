@@ -13,6 +13,7 @@ struct DEFORM_ACQUIRED_EVENT
 {
     DEFORM_TYPE eType = { DEFORM_TYPE::NONE };
     IDeformable* pSource = { nullptr };
+    _float4x4 PreDeformWorld = {};
 };
 
 enum class DEFORM_OBJECT_KIND

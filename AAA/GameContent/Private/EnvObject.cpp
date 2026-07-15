@@ -10,7 +10,7 @@ NS_BEGIN(Client)
 
 namespace
 {
-	constexpr _bool		ENABLE_ENV_OBJECT_SHADOW = true;
+	constexpr _bool	ENABLE_ENV_OBJECT_SHADOW = true;
 
 	void Log_EnvPhysicsWarning(const string& strMessage)
 	{

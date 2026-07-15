@@ -1058,7 +1058,37 @@ HRESULT CLevel_Edit::Load_LDPreview(_uint iPresetIndex)
 		return E_FAIL;
 	}
 
-	Clear_LDPreview();
+	_bool bPresetChanged = false;
+
+	if (nullptr != m_pMapPreviewSession)
+	{
+		const MAP_EDIT_DATA& MapContentDesc = m_pMapPreviewSession->Get_EditData();
+		bPresetChanged = !MapContentDesc.bHasMapContent
+			|| MapContentDesc.iPresetIndex != static_cast<_int>(iPresetIndex);
+
+		if (bPresetChanged)
+			m_pMapPreviewSession->Reset();
+	}
+	else
+	{
+		const MAP_EDIT_DATA MapContentDesc = Build_MapPreviewContentDescSnapshot();
+		bPresetChanged = MapContentDesc.iPresetIndex != static_cast<_int>(iPresetIndex);
+	}
+
+	if (bPresetChanged)
+		Clear_MapPreview();
+	else
+		Clear_LDPreview();
+
+	if (FAILED(Prepare_MapContentForPreviewLoad(
+		iPresetIndex,
+		bPresetChanged,
+		!bPresetChanged)))
+	{
+		Set_MapPreviewStatus(L"Map edit file parse failed.");
+		Sync_MapPreviewRuntimeStateToSession();
+		return E_FAIL;
+	}
 
 	MAP_EDIT_DATA MapContentDesc = Build_MapPreviewContentDescSnapshot();
 

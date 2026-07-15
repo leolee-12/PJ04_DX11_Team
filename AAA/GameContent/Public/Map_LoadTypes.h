@@ -172,6 +172,8 @@ inline _bool Has_AnyEdit(const EDIT_OBJECT_OVERRIDE_DESC& Edit)
 {
 	return 0u != Edit.Common.iPolicyMask
 		|| Edit.Common.bHasWorldMatrix
+		|| Edit.Common.bHasPublishEvent
+		|| Edit.Common.bHasReceiveEvent
 		|| Has_AnyClassOverride(Edit.ClassOverride);
 }
 

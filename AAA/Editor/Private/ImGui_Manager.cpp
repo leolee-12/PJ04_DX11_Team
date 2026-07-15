@@ -23,6 +23,7 @@
 #include "MapObject.h"
 #include "EnvObject.h"
 #include "Map_EditSession.h"
+#include "LD_DeformObject.h"
 
 IMPLEMENT_SINGLETON(CImGui_Manager)
 
@@ -1006,6 +1007,9 @@ void CImGui_Manager::Draw_Palette()
         {
             for (auto& strTag : tags)
             {
+                if (category == L"LEVELDESIGN_OBJECT" && strTag == CLD_DeformObject::PROTOTYPE_TAG)
+                    continue;
+
                 string strLabel = WstrToStr(strTag);
                 if (ImGui::Button(strLabel.c_str())) {
                     if (category == L"UI_OBJECT" || category == L"UI_CONTAINER_OBJECT")

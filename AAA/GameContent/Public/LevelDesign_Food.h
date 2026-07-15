@@ -57,6 +57,8 @@ private:
 	_float3				m_vPickupTargetPos = {};
 
 private:
+	virtual void  On_LDEventReceived(const _wstring& strEventTag) override;
+
 	HRESULT			Ready_Components();
 	HRESULT			Ready_RenderComponents();
 	HRESULT			Ready_Effect();

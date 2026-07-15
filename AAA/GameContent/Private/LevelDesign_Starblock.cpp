@@ -241,6 +241,7 @@ void CLevelDesign_Starblock::Damaged(const ATTACK_INFO& tInfo)
 	Enable_Colliders(false);
 	Release_RigidStatic();
 	Set_Active(false);
+	Publish_LDEvent();
 }
 #pragma endregion
 
@@ -252,6 +253,8 @@ void CLevelDesign_Starblock::Be_Captured(CGameObject* pInhaler)
 	__super::Be_Captured(pInhaler);
 
 	m_bCullTransformDynamic = true;
+
+	Publish_LDEvent();
 }
 
 void CLevelDesign_Starblock::On_SpatEnd()

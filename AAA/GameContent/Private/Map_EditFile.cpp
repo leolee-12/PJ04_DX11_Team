@@ -228,6 +228,12 @@ namespace
 			CGameObject::GAMEOBJECT_DESC& BaseDesc = static_cast<CGameObject::GAMEOBJECT_DESC&>(*pOutDesc);
 			Apply_WorldMatrixToGameObjectDesc(&BaseDesc, Common.matWorld);
 		}
+
+		if (Common.bHasPublishEvent)
+			pOutDesc->strPublishEventTag = Common.strPublishEventTag;
+
+		if (Common.bHasReceiveEvent)
+			pOutDesc->strReceiveEventTag = Common.strReceiveEventTag;
 	}
 
 	void Apply_ClassOverrideToEnvDesc(ENV_OBJECT_DESC* pOutDesc, const EDIT_CLASS_OVERRIDE& ClassOverride)
@@ -547,6 +553,8 @@ namespace
 		}
 
 		if (Common.bHasWorldMatrix)	jCommon["WorldMatrix"] = Save_Float4x4(Common.matWorld);
+		if (Common.bHasPublishEvent)  jCommon["PublishEvent"] = WstrToStr(Common.strPublishEventTag);
+		if (Common.bHasReceiveEvent)  jCommon["ReceiveEvent"] = WstrToStr(Common.strReceiveEventTag);
 
 		return jCommon;
 	}
@@ -595,7 +603,25 @@ namespace
 
 			pOutCommon->bHasWorldMatrix = true;
 		}
+		const auto IterPublishEvent = jCommon.find("PublishEvent");
+		if (IterPublishEvent != jCommon.end())
+		{
+			if (!IterPublishEvent->is_string())
+				return E_FAIL;
 
+			pOutCommon->bHasPublishEvent = true;
+			pOutCommon->strPublishEventTag = StrToWstr(IterPublishEvent->get<string>());
+		}
+
+		const auto IterReceiveEvent = jCommon.find("ReceiveEvent");
+		if (IterReceiveEvent != jCommon.end())
+		{
+			if (!IterReceiveEvent->is_string())
+				return E_FAIL;
+
+			pOutCommon->bHasReceiveEvent = true;
+			pOutCommon->strReceiveEventTag = StrToWstr(IterReceiveEvent->get<string>());
+		}
 		return S_OK;
 	}
 
@@ -743,7 +769,10 @@ namespace
 		json jEdit = json::object();
 		jEdit["Kind"] = Get_ObjectKindName(Edit.eKind);
 
-		if (0u != Edit.Common.iPolicyMask || Edit.Common.bHasWorldMatrix)
+		if (0u != Edit.Common.iPolicyMask
+			|| Edit.Common.bHasWorldMatrix
+			|| Edit.Common.bHasPublishEvent
+			|| Edit.Common.bHasReceiveEvent)
 		{
 			const json jCommon = Save_CommonOverride(Edit.Common);
 			if (!jCommon.empty())
