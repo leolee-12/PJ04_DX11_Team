@@ -80,6 +80,8 @@
 #include "BreakWallEffect.h"
 #include "BubbleAura.h"
 #include "Kirby_SwordTrail.h"
+#include "SmokeCollection.h"
+#include "SmokeDefault.h"
 #include "SwordTrail_BK.h"
 
 // Effect_Part
@@ -856,7 +858,7 @@ void CGameObject_Factory::Register_Effect()
 
         ));
 
-    // Generic Trail Container
+    // CKirby_SwordTrail
     Register(CKirby_SwordTrail::PROTOTYPE_TAG, TEXT("Effect_Container"),
         CREATOR(CKirby_SwordTrail),
         LOADER
@@ -864,6 +866,35 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CTrailCommon::PROTOTYPE_TAG, CTrailCommon::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, Texture_SwordTrail.iLevelID, Texture_SwordTrail.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_SwordTrail.szFileTag, Texture_SwordTrail.iNumTex));
+        ));
+
+    // SmokeCollection
+    Register(CSmokeCollection::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CSmokeCollection),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
+                CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeLowPoly::PROTOTYPE_TAG,
+                CSmokeLowPoly::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeLowPoly"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/Test/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
+        ));
+
+    // SmokeDefault
+    Register(CSmokeDefault::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CSmokeDefault),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
+                CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
         ));
 
     // 8

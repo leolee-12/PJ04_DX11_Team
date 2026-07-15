@@ -129,6 +129,8 @@
     <ClInclude Include="..\Public\RectEmitterCommon.h" />
     <ClInclude Include="..\Public\TrailCommon.h" />
     <ClInclude Include="..\Public\Kirby_SwordTrail.h" />
+    <ClInclude Include="..\Public\SmokeCollection.h" />
+    <ClInclude Include="..\Public\SmokeDefault.h" />
     <ClInclude Include="..\public\Mission_Manager.h" />
     <ClInclude Include="..\Public\Monster_State_Flatten.h" />
     <ClInclude Include="..\Public\Monster_State_Spat.h" />
@@ -504,6 +506,8 @@
     <ClCompile Include="..\Private\RectEmitterCommon.cpp" />
     <ClCompile Include="..\Private\TrailCommon.cpp" />
     <ClCompile Include="..\Private\Kirby_SwordTrail.cpp" />
+    <ClCompile Include="..\Private\SmokeCollection.cpp" />
+    <ClCompile Include="..\Private\SmokeDefault.cpp" />
     <ClCompile Include="..\private\Mission_Manager.cpp" />
     <ClCompile Include="..\Private\Monster_State_Flatten.cpp" />
     <ClCompile Include="..\Private\Monster_State_Spat.cpp" />

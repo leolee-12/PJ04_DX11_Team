@@ -164,6 +164,12 @@ HRESULT CKirby_Body::Ready_AnimEvents(CKirby* pKirby)
                         case KIRBY_FX_DIRECTION::LEFT:
                             vSpawnLook = -vRight;
                             break;
+                        case KIRBY_FX_DIRECTION::BACKWARD_RIGHT:
+                            vSpawnLook = XMVector3Normalize(-vForward + vRight);
+                            break;
+                        case KIRBY_FX_DIRECTION::BACKWARD_LEFT:
+                            vSpawnLook = XMVector3Normalize(-vForward - vRight);
+                            break;
                     }
 
                     _float3 vLook{};

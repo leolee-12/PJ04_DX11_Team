@@ -25,7 +25,9 @@ enum class KIRBY_FX_DIRECTION : _int
 	FORWARD,
 	BACKWARD,
 	RIGHT,
-	LEFT
+	LEFT,
+	BACKWARD_RIGHT,
+	BACKWARD_LEFT
 };
 
 class CKirby_Deform_Model abstract : public CPartObject
