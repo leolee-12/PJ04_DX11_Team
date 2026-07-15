@@ -4,6 +4,7 @@
 NS_BEGIN(Client)
 
 class CBoss_Leopard_Body;
+class CProjectile_Nail;
 
 class CBoss_Leopard final : public CBoss
 {
@@ -17,6 +18,10 @@ public:
 
     static constexpr _float DEATH_PAUSE_SEC = 0.7f;
     static constexpr _float DEATH_SHAKE_SEC = 0.7f;
+
+    static constexpr _int NAIL_COUNT = 5;
+
+    enum PILLAR : _int { PILLAR_FL, PILLAR_FR, PILLAR_BR, PILLAR_BL, PILLAR_COUNT };
 
 private:
     CBoss_Leopard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -53,6 +58,14 @@ protected:
     virtual HRESULT Ready_PartObjects() override;
     virtual HRESULT Ready_AnimEvents() override;
 
+public:
+    const _float3& Get_CurPillarPos() const { return s_vPillarPos[m_iCurPillar]; }
+    void  Set_CurPillar(PILLAR e) { m_iCurPillar = e; }
+    _int  Advance_ToAdjacentPillar();
+
+    void Spawn_HandNails();
+    void Launch_HandNails();
+
 private:
     CBoss_Leopard_Body* m_pBody = { nullptr };
     static const vector<_float> s_Thresholds;
@@ -62,6 +75,11 @@ private:
     EDEATH  m_eDeathStep = { EDEATH::POSE_WAIT };
     _int    m_iDeathPoseDelay = { 0 };
     _float  m_fDeathPauseTimer = { 0.f };
+
+    static const _float3 s_vPillarPos[PILLAR_COUNT];
+    _int m_iCurPillar = { PILLAR_FL };
+
+    CProjectile_Nail* m_pNails[NAIL_COUNT] = {};
 
 private:
     void Tick_DeathSequence(_float fTimeDelta);

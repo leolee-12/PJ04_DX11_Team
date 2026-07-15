@@ -1,12 +1,20 @@
 #include "Boss_Leopard.h"
-#include "GameInstance.h"
 #include "Boss_Leopard_Body.h"
-#include "Animator.h"
 #include "Effect_Loader.h"
 #include "Boss_Leopard_Brain.h"
 #include "GameContent_AnimEvents.h"
 
+#include "Projectile_Nail.h"
+#include "Projectile_Manager.h"
+
 const vector<_float> CBoss_Leopard::s_Thresholds = {};
+
+const _float3 CBoss_Leopard::s_vPillarPos[CBoss_Leopard::PILLAR_COUNT] = {
+    /* FL */ { 706.5f, 89.852f, 183.79f },
+    /* FR */ { 706.4f, 89.852f, 219.8f },
+    /* BR */ { 742.2f, 89.852f, 219.8f },
+    /* BL */ { 742.3f, 89.852f, 184.f },
+};
 
 CBoss_Leopard::CBoss_Leopard(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CBoss(pDevice, pContext) {
@@ -71,10 +79,53 @@ HRESULT CBoss_Leopard::Ready_AnimEvents()
                 m_pBody->Set_ClawState(static_cast<CBoss_Leopard_Body::CLAW>(e.iIntParam));
                 break;
 
+            case EANIM_EVENT::Projectile:      // iIntParam: 0=생성/부착, 1=발사(다음 단계)
+                if (e.iIntParam == 0) Spawn_HandNails();
+                // else Launch_HandNails();
+                break;
+
             default: break;
         }
         });
     return S_OK;
+}
+
+_int CBoss_Leopard::Advance_ToAdjacentPillar()
+{
+    const _int iDir = m_pGameInstance_Proxy->RandomInt(0, 1) ? +1 : -1;
+    m_iCurPillar = (m_iCurPillar + iDir + PILLAR_COUNT) % PILLAR_COUNT;
+    return iDir;
+}
+
+void CBoss_Leopard::Spawn_HandNails()
+{
+    if (!m_pBody) return;
+
+    const _float4x4* pBone = m_pBody->Get_BoneMatrixPtr("RHaveL");
+    const _float4x4* pOwnerWorld = m_pBody->Get_CombinedWorldMatrixPtr();
+    if (!pBone || !pOwnerWorld) return;
+
+    const _float fTotalDeg = 80.f;   
+    for (_int i = 0; i < NAIL_COUNT; ++i)
+    {
+        if (m_pNails[i]) continue;   
+
+        CProjectile* p = nullptr;
+        CProjectile_Manager::GetInstance()->Spawn(Get_PrototypeLevelIndex(), Get_LevelIndex(),
+            CProjectile_Nail::POOL_KEY, CProjectile_Nail::PROTOTYPE_TAG, &p);
+        if (!p) continue;
+
+        _float t = (NAIL_COUNT == 1) ? 0.f : (_float)i / (NAIL_COUNT - 1);   
+        _float deg = -fTotalDeg * 0.5f + fTotalDeg * t;                      
+        _matrix matOffset = XMMatrixRotationY(XMConvertToRadians(deg + 90.f));      
+
+        p->Attach_To_Socket(pBone, pOwnerWorld, matOffset);
+        m_pNails[i] = static_cast<CProjectile_Nail*>(p);
+    }
+}
+
+void CBoss_Leopard::Launch_HandNails()
+{
 }
 
 CMonsterBrain* CBoss_Leopard::Create_Brain()

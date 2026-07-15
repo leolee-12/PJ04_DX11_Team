@@ -29,6 +29,7 @@
     <ClInclude Include="..\Public\DropStar.h" />
     <ClInclude Include="..\Public\DropStar_Body.h" />
     <ClInclude Include="..\Public\DropStar_Manager.h" />
+    <ClInclude Include="..\public\Projectile_Nail.h" />
     <ClInclude Include="..\Public\SwordTrail_BK.h" />
     <ClInclude Include="..\Public\BladeKnight_Body.h" />
     <ClInclude Include="..\Public\BladeKnight_Brain.h" />
@@ -405,6 +406,7 @@
     <ClCompile Include="..\Private\DropStar.cpp" />
     <ClCompile Include="..\Private\DropStar_Body.cpp" />
     <ClCompile Include="..\Private\DropStar_Manager.cpp" />
+    <ClCompile Include="..\private\Projectile_Nail.cpp" />
     <ClCompile Include="..\Private\SwordTrail_BK.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Body.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Brain.cpp" />

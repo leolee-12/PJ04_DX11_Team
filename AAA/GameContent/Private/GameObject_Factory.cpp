@@ -163,6 +163,7 @@
 
 #include "Boss_Leopard.h"
 #include "Boss_Leopard_Body.h"
+#include "Projectile_Nail.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
@@ -1217,6 +1218,12 @@ void CGameObject_Factory::Register_MainBoss()
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Leopard/Body/Model_Anim.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Leopard_Body::PROTOTYPE_TAG, CBoss_Leopard_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Nail::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Nail/Nail.ysh"
+                    , XMMatrixTranslation(0.f, 0.f, -0.8f)));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Nail::PROTOTYPE_TAG,
+                CProjectile_Nail::Create(pDevice, pContext));
         )
     );
 }
