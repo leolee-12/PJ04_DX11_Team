@@ -8,6 +8,9 @@ namespace
 {
 	constexpr const _tchar* POINTSTAR_PICKUP_SOUND = L"ItemPointStar_YellowCatched.wav";
 	constexpr _float s_fPointRotationPerSec = 360.f;
+	constexpr _float s_fPointPickupDuration = 0.75f;
+	constexpr _float s_fPointPickupHeight = 3.f;
+	constexpr _float s_fPointPickupTurnCount = 3.f;
 
 	struct LD_POINT_CATALOG
 	{
@@ -122,8 +125,17 @@ void CLevelDesign_Point::Late_Update(_float fTimeDelta)
 	if (!m_bActive || Is_Dead())
 		return;
 
-	if (m_bRotate)
-		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
+	if (m_bPickingUp)
+	{
+		Update_Pickup(fTimeDelta);
+
+		if (!m_bActive)
+			return;
+	}
+	else if (m_bRotate)
+	{
+		m_pTransformCom->Turn(XMVector3Normalize(m_pTransformCom->Get_State(STATE::UP)), fTimeDelta);
+	}
 
 	if (m_pHurtBox->Is_Enabled())
 	{
@@ -335,8 +347,15 @@ void CLevelDesign_Point::Handle_Pickup(CCollider* pOther)
 		return;
 	if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
 		return;
-	if (Is_Dead())
+	if (Is_Dead() || m_bPickingUp)
 		return;
+
+	CGameObject* pPlayer = pOther->Get_Owner();
+	if (nullptr == pPlayer)
+		return;
+
+	_float3 vStartPosition{};
+	XMStoreFloat3(&vStartPosition, pPlayer->Get_Transform()->Get_State(STATE::POSITION));
 
 	KIRBY_POINTSTAR_GAINED_DESC Desc{};
 	Desc.iAmount = static_cast<_uint>(m_tPointDesc.iValue);
@@ -348,7 +367,48 @@ void CLevelDesign_Point::Handle_Pickup(CCollider* pOther)
 	if (m_pHurtBox)
 		m_pHurtBox->Set_Enabled(false);
 
-	Set_Active(false);
+	if (!m_bRotate)
+	{
+		Set_Active(false);
+		return;
+	}
+
+	Begin_Pickup(vStartPosition);
+}
+
+void CLevelDesign_Point::Begin_Pickup(const _float3& vPickupStartPos)
+{
+	const _float3 vScale = m_pTransformCom->Get_Scaled();
+	const _vector vStartPos = XMVectorSetW(XMLoadFloat3(&vPickupStartPos), 1.f);
+	const _vector vTargetPos = vStartPos + XMVectorSet(0.f, s_fPointPickupHeight, 0.f, 0.f);
+
+	XMStoreFloat3(&m_vPickupStartPos, vStartPos);
+	XMStoreFloat3(&m_vPickupTargetPos, vTargetPos);
+
+	m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(vScale.x, 0.f, 0.f, 0.f));
+	m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, vScale.y, 0.f, 0.f));
+	m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, vScale.z, 0.f));
+	m_pTransformCom->Set_State(STATE::POSITION, vStartPos);
+
+	m_fPickupElapsed = 0.f;
+	m_bPickingUp = true;
+}
+
+void CLevelDesign_Point::Update_Pickup(_float fTimeDelta)
+{
+	m_fPickupElapsed = min(m_fPickupElapsed + fTimeDelta, s_fPointPickupDuration);
+
+	const _float fRatio = m_fPickupElapsed / s_fPointPickupDuration;
+	const _float fEaseRatio = 1.f - powf(1.f - fRatio, 3.f);
+	const _float fRotationRadian = XM_2PI * s_fPointPickupTurnCount * fEaseRatio;
+
+	const _vector vStartPos = XMVectorSetW(XMLoadFloat3(&m_vPickupStartPos), 1.f);
+	const _vector vTargetPos = XMVectorSetW(XMLoadFloat3(&m_vPickupTargetPos), 1.f);
+	m_pTransformCom->Set_State(STATE::POSITION, XMVectorLerp(vStartPos, vTargetPos, fEaseRatio));
+	m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), fRotationRadian);
+
+	if (fRatio >= 1.f)
+		Set_Active(false);
 }
 
 CLevelDesign_Point* CLevelDesign_Point::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

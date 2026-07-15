@@ -45,6 +45,7 @@
     <ClInclude Include="..\public\Boss_Gorilla_Body.h" />
     <ClInclude Include="..\public\Boss_Gorilla_Brain.h" />
     <ClInclude Include="..\public\Boss_Gorilla_RockHole.h" />
+    <ClInclude Include="..\Public\BreakWallEffect.h" />
     <ClInclude Include="..\Public\BrontoBurt.h" />
     <ClInclude Include="..\Public\BrontoBurt_Body.h" />
     <ClInclude Include="..\Public\BrontoBurt_Brain.h" />
@@ -85,6 +86,7 @@
     <ClInclude Include="..\Public\EnvVolume_Culling.h" />
     <ClInclude Include="..\Public\EnvVolume_Effect.h" />
     <ClInclude Include="..\Public\EnvVolume_Light.h" />
+    <ClInclude Include="..\Public\ItemEffect.h" />
     <ClInclude Include="..\public\KirbySpawnPoint.h" />
     <ClInclude Include="..\Public\Kirby_DeformDump.h" />
     <ClInclude Include="..\public\Dialogue_Arranger.h" />
@@ -419,6 +421,7 @@
     <ClCompile Include="..\private\Boss_Gorilla_Body.cpp" />
     <ClCompile Include="..\private\Boss_Gorilla_Brain.cpp" />
     <ClCompile Include="..\private\Boss_Gorilla_RockHole.cpp" />
+    <ClCompile Include="..\Private\BreakWallEffect.cpp" />
     <ClCompile Include="..\Private\BrontoBurt.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_Body.cpp" />
     <ClCompile Include="..\Private\BrontoBurt_Brain.cpp" />
@@ -452,6 +455,7 @@
     <ClCompile Include="..\Private\EnvVolume_Culling.cpp" />
     <ClCompile Include="..\Private\EnvVolume_Effect.cpp" />
     <ClCompile Include="..\Private\EnvVolume_Light.cpp" />
+    <ClCompile Include="..\Private\ItemEffect.cpp" />
     <ClCompile Include="..\private\KirbySpawnPoint.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformDump.cpp" />
     <ClCompile Include="..\private\Dialogue_Arranger.cpp" />

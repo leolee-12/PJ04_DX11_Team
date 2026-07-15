@@ -2,17 +2,20 @@
 #include "LevelDesign_Registry.h"
 #include "Parsing_Utils.h"
 #include "GameContent_const.h"
-
-#include "Geometry_Utils.h"
+#include "Effect_Loader.h"
 
 #include "GameInstance.h"
+#include "Geometry_Utils.h"
 
 namespace
 {
-	inline constexpr const _char* DEFORM_CAR_BREAK_WALL_MODEL_PATH = "../../Resources/Map/Gimmick/Anim/DeformCarBreakWall/DeformCarBreakWall.ysh";
-	inline constexpr const _char* ANIM_FIRST = "DeformCarGetFirst";
-	inline constexpr const _char* ANIM_END = "DeformCarGetEnd";
-	inline constexpr const _char* DEFORM_CAR_BREAK_WALL_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_FIRST, ANIM_END, "", "" };
+	inline constexpr const _char*	DEFORM_CAR_BREAK_WALL_MODEL_PATH = "../../Resources/Map/Gimmick/Anim/DeformCarBreakWall/DeformCarBreakWall.ysh";
+	inline constexpr const _char*	ANIM_FIRST = "DeformCarGetFirst";
+	inline constexpr const _char*	ANIM_END = "DeformCarGetEnd";
+	inline constexpr const _char*	DEFORM_CAR_BREAK_WALL_ANIM_NAMES[LD_ANIM_SLOT_COUNT] = { ANIM_FIRST, ANIM_END, "", "" };
+	inline constexpr const _tchar*	BREAK_WALL_EFFECT_ID = L"BreakWallEffect";
+	inline constexpr const _float3  BREAK_WALL_EFFECT_OFFSET = { 0.f, 7.5f, 0.f };
+
 	inline constexpr _float DEFORM_CAR_BREAK_WALL_ANIM_SPEED = 1.5f;
 	inline constexpr const _uint DEFORM_CAR_BREAK_WALL_MESH_COUNT = 31u;
 	inline constexpr const _uint DEFORM_CAR_BREAK_WALL_COLLIMESH_INDEX = 10u;
@@ -330,6 +333,22 @@ void CLD_DeformCarBreakWall::On_Event()
 		return;
 
 	Play_Anim(ANIM_FIRST);
+
+	_float3 vEffectPos{};
+	_float3 vEffectMin{}, vEffectMax{};
+	m_pModelCom->Get_MeshAABB(DEFORM_CAR_BREAK_WALL_COLLIMESH_INDEX, &vEffectMin, &vEffectMax);
+
+	if (GeometryUtils::Is_ValidAABB(vEffectMin, vEffectMax))
+	{
+		const BoundingBox EffectBounds = GeometryUtils::Make_AABB_FromMinMax(vEffectMin, vEffectMax);
+		XMStoreFloat3(&vEffectPos, XMVector3TransformCoord(
+			XMLoadFloat3(&EffectBounds.Center), XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr())));
+	}
+	else
+		XMStoreFloat3(&vEffectPos, m_pTransformCom->Get_State(Engine::STATE::POSITION));
+
+	vEffectPos = BREAK_WALL_EFFECT_OFFSET;
+	CEffect_Loader::GetInstance()->Spawn(BREAK_WALL_EFFECT_ID, Get_LevelIndex(), vEffectPos);
 
 	for (_uint iMeshIndex : ON_TO_OFF_MESH_INDICES)
 		Set_MeshVisible(iMeshIndex, false);

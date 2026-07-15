@@ -6,7 +6,7 @@
 #include "Kirby_Body.h"
 #include "Kirby_Ability.h"
 
-#include "Deformable.h"
+#include "LD_DeformObject.h"
 #include "Kirby_Deform.h"
 
 #include "Movement_CHild.h"
@@ -105,8 +105,10 @@ void CKirby_DeformDump::Enter_DeformDumpState(CKirby* pKirby, DEFORM_DUMP_STATE 
             pKirby->Change_HatSocketMatrix(m_eAbilityType, pBody->Get_HatBoneMatirx());
 
             // ptr
-            pKirby->Get_HeldDeformObj()->End_Deform(pKirby->Get_Transform()->Get_WorldMatrixPtr());
-            pKirby->Set_HeldDeformObj(nullptr);
+            //pKirby->Get_HeldDeformObj()->End_Deform(pKirby->Get_Transform()->Get_WorldMatrixPtr());
+            //pKirby->Set_HeldDeformObj(nullptr);
+            CLD_DeformObject::Spawn_Released(m_pGameInstance_Proxy, m_eDeformType,
+                pKirby->Get_LevelIndex(), pKirby->Get_Transform()->Get_WorldMatrixPtr());
 
             pKirby->Reset_KirbyDeform();
 
