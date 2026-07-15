@@ -23,6 +23,7 @@
 #include "Bubble_Manager.h"
 #include "Map_Loader.h"
 #include "LD_DeformObject.h"
+#include "DropStar_Manager.h"
 
 NS_BEGIN(Client)
 
@@ -39,6 +40,9 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
         return E_FAIL;
 
     if (FAILED(CBubble_Manager::GetInstance()->Initialize(pDevice, pContext)))
+        return E_FAIL;
+
+    if (FAILED(CDropStar_Manager::GetInstance()->Initialize(pDevice, pContext)))
         return E_FAIL;
 
     if (FAILED(CLD_DeformObject::Register_StaticPrototype(pProxy, pDevice, pContext)))

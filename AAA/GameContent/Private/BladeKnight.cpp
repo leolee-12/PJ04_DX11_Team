@@ -1,7 +1,6 @@
 #include "BladeKnight.h"
 #include "GameInstance.h"
 #include "Monster_Movement.h"
-#include "Animator.h"
 #include "GameContent_AnimEvents.h"
 
 #include "BladeKnight_Body.h"
@@ -28,7 +27,8 @@
 #include "BladeKnight_State_DoubleAttack.h"
 #include "BladeKnight_State_TornadoAttack.h"
 
-#include "Transform.h"
+#include "Effect_Loader.h"
+#include "Effect_Container.h"
 
 CBladeKnight::CBladeKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster{ pDevice, pContext }
@@ -216,6 +216,27 @@ HRESULT CBladeKnight::Ready_AnimEvents()
                         m_pSword->Set_HitBox(false);
                 }
                 break;
+            case EANIM_EVENT::Fx:
+            {
+                if (ePhase == ANIM_EVENT_PHASE::BEGIN)
+                {
+                    if (m_pSwordTrail)                                         // 이전 스윙 미종료시 정리
+                        m_pSwordTrail->EffectContainer_StopAfterEmission();
+
+                    CEffect_Loader::GetInstance()->Spawn(L"SwordTrail_BK", Get_LevelIndex(),
+                                                        _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 0.f),
+                                                        m_pSword->Get_CombinedWorldMatrixPtr(), &m_pSwordTrail);
+                }
+                else if (ePhase == ANIM_EVENT_PHASE::END)
+                {
+                    if (m_pSwordTrail)
+                    {
+                        m_pSwordTrail->EffectContainer_StopAfterEmission();
+                        m_pSwordTrail = nullptr;
+                    }
+                }
+                break;
+            }
             case EANIM_EVENT::MoveWindow:
             {
                 auto& BB = Get_BlackBoard();

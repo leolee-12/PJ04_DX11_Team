@@ -4,6 +4,7 @@
 #include "Projectile_Manager.h"
 #include "Mission_Manager.h"
 #include "Bubble_Manager.h"
+#include "DropStar_Manager.h"
 
 
 void CSingleton_Destroyer::Destroy_GameContent_Singletons()
@@ -13,4 +14,5 @@ void CSingleton_Destroyer::Destroy_GameContent_Singletons()
 	CProjectile_Manager::DestroyInstance();
 	CMissionManager::DestroyInstance();
 	CBubble_Manager::DestroyInstance();
+	CDropStar_Manager::DestroyInstance();
 }
