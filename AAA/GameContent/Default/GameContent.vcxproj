@@ -22,6 +22,11 @@
     <ClInclude Include="..\Public\Ability_Bubble.h" />
     <ClInclude Include="..\Public\Ability_Model.h" />
     <ClInclude Include="..\Public\Ancor_WorkingDirectory.h" />
+    <ClInclude Include="..\Public\BubbleMovement.h" />
+    <ClInclude Include="..\Public\DropStar.h" />
+    <ClInclude Include="..\Public\DropStar_Body.h" />
+    <ClInclude Include="..\Public\DropStar_Manager.h" />
+    <ClInclude Include="..\Public\SwordTrail_BK.h" />
     <ClInclude Include="..\Public\BladeKnight_Body.h" />
     <ClInclude Include="..\Public\BladeKnight_Brain.h" />
     <ClInclude Include="..\Public\BladeKnight_State_Attack.h" />
@@ -87,6 +92,7 @@
     <ClInclude Include="..\Public\EnvVolume_Effect.h" />
     <ClInclude Include="..\Public\EnvVolume_Light.h" />
     <ClInclude Include="..\Public\ItemEffect.h" />
+    <ClInclude Include="..\Public\EssenceAura.h" />
     <ClInclude Include="..\public\KirbySpawnPoint.h" />
     <ClInclude Include="..\Public\Kirby_DeformDump.h" />
     <ClInclude Include="..\public\Dialogue_Arranger.h" />
@@ -386,6 +392,11 @@
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp" />
     <ClCompile Include="..\Private\Ability_Model.cpp" />
+    <ClCompile Include="..\Private\BubbleMovement.cpp" />
+    <ClCompile Include="..\Private\DropStar.cpp" />
+    <ClCompile Include="..\Private\DropStar_Body.cpp" />
+    <ClCompile Include="..\Private\DropStar_Manager.cpp" />
+    <ClCompile Include="..\Private\SwordTrail_BK.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Body.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Brain.cpp" />
     <ClCompile Include="..\Private\BladeKnight_State_Attack.cpp" />
@@ -444,6 +455,7 @@
     <ClCompile Include="..\Private\EnvVolume_Effect.cpp" />
     <ClCompile Include="..\Private\EnvVolume_Light.cpp" />
     <ClCompile Include="..\Private\ItemEffect.cpp" />
+    <ClCompile Include="..\Private\EssenceAura.cpp" />
     <ClCompile Include="..\private\KirbySpawnPoint.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformDump.cpp" />
     <ClCompile Include="..\private\Dialogue_Arranger.cpp" />

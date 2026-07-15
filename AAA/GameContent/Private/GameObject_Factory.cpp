@@ -78,6 +78,7 @@
 #include "BreakWallEffect.h"
 #include "BubbleAura.h"
 #include "Kirby_SwordTrail.h"
+#include "SwordTrail_BK.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -199,6 +200,9 @@
 
 // CutSceneActor
 #include "DialogueDee.h"
+
+#include "DropStar.h"
+#include "DropStar_Body.h"
 
 IMPLEMENT_SINGLETON(CGameObject_Factory)
 
@@ -493,6 +497,21 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Cappy_Hat"),
                     CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Cappy/Hat/Cappy_Hat.ysh",
                         XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
+    // Drop Star
+    Register
+    (
+        CDropStar::PROTOTYPE_TAG, TEXT("ETC"),
+        CREATOR(CDropStar),
+        LOADER
+        (
+                TRY_ADD_PROTO(pProxy, iLevelIndex, CDropStar_Body::PROTOTYPE_TAG, CDropStar_Body::Create(pDevice, pContext));
+   
+                TRY_ADD_PROTO(pProxy, iLevelIndex,  CDropStar_Body::MODEL_PROTO_TAG,
+                                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/DropStar/DropStar.ysh",
+                                    XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 }
@@ -879,6 +898,15 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
+    Register(CSwordTrail_BK::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CSwordTrail_BK),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CTrailCommon::PROTOTYPE_TAG, CTrailCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, Texture_BK_CommonSlash.iLevelID, Texture_BK_CommonSlash.szProtoTag,
+                            CTexture::Create(pDevice, pContext, Texture_BK_CommonSlash.szFileTag, Texture_BK_CommonSlash.iNumTex));
+        ));
+
     // 12
     Register(CBreakWallEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CBreakWallEffect),
         LOADER
@@ -1031,7 +1059,7 @@ void CGameObject_Factory::Register_Bubble()
     //Ability Bubble - DroppedBubble
     Register
     (
-        CDroppedBubble::PROTOTYPE_TAG, TEXT("Bubble"),
+        CDroppedBubble::PROTOTYPE_TAG, TEXT("ETC"),
         CREATOR(CDroppedBubble),
         LOADER
         (
@@ -1042,7 +1070,7 @@ void CGameObject_Factory::Register_Bubble()
     //Ability Bubble - EssenceBubble
     Register
     (
-        CEssenceBubble::PROTOTYPE_TAG, TEXT("Bubble"),
+        CEssenceBubble::PROTOTYPE_TAG, TEXT("ETC"),
         CREATOR(CEssenceBubble),
         LOADER
         (

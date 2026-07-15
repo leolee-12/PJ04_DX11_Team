@@ -41,6 +41,9 @@
 #include "EssenceBubble.h"
 #include "LD_DeformObject.h"
 
+// юс╫ц
+#include "DropStar_Manager.h"
+
 CKirby::CKirby(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCharacter{ pDevice, pContext }
 {
@@ -145,6 +148,16 @@ void CKirby::Update(_float fTimeDelta)
         swprintf_s(szBuf, L"[Kirby] LevelIndex=%u, Layer=%s, Active=%d\n",
             Get_LevelIndex(), m_strLayerTag.c_str(), Is_Active() ? 1 : 0);
         OutputDebugStringW(szBuf);
+    }
+
+    if (m_pGameInstance_Proxy->Key_Down(DIK_P))
+    {
+        _vector vPos =
+            m_pTransformCom->Get_State(STATE::POSITION)
+            + m_pTransformCom->Get_State(STATE::LOOK) * 3.f;
+
+        CDropStar_Manager::GetInstance()->Spawn(
+            Get_LevelIndex(), vPos, 0.5f);
     }
 #endif
 }
@@ -496,6 +509,7 @@ HRESULT CKirby::Ready_Components()
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::ENV_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::DROPPED_BUBBLE));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_INHALE), ETOUI(COLLISION_LAYER::DROP_STAR));
 
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_HURT), ETOUI(COLLISION_LAYER::MONSTER_HIT));
