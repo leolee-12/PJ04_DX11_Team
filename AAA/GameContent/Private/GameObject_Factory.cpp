@@ -88,6 +88,8 @@
 #include "Split_Starblock.h"
 #include "Split_Stone.h"
 #include "Split_Bush.h"
+#include "Split_Coaster.h"
+#include "Split_Cylinder.h"
 #include "ItemEffect.h"
 #include "BreakWallEffect.h"
 #include "BubbleAura.h"
@@ -1140,6 +1142,33 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, Texture_ItemSparkle03.iLevelID, Texture_ItemSparkle03.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_ItemSparkle03.szFileTag, Texture_ItemSparkle03.iNumTex));
         ));
+
+    // 14
+    Register(CSplit_Coaster::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSplit_Coaster),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Coaster_Bar"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/CoasterBreak/Coaster_Bar.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Coaster_Jet"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/CoasterBreak/Coaster_Jet.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Coaster_Tip01L"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/CoasterBreak/Coaster_Tip01L.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Coaster_Tip02L"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/CoasterBreak/Coaster_Tip02L.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Coaster_Tire"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/CoasterBreak/Coaster_Tire.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Coaster_WingA"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/CoasterBreak/Coaster_WingA.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Coaster_WingB"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/CoasterBreak/Coaster_WingB.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    // 15
+    Register(CSplit_Cylinder::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CSplit_Cylinder),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Cylinder_DrainM"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/CylinderBreak/DrainM.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Cylinder_PieceM"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/CylinderBreak/PieceM.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
 }
 
 void CGameObject_Factory::Register_Bubble()

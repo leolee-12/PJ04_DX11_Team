@@ -1473,6 +1473,9 @@
     <ClInclude Include="..\Public\InhaleEffect.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\06. InhaleEffect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\ItemEffect.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Kabu.h">
       <Filter>00. GameObject\06. Monster\05. Kabu</Filter>
     </ClInclude>
@@ -2043,6 +2046,12 @@
     <ClInclude Include="..\Public\Split_Bush.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Split_Coaster.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Split_Cylinder.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Split_Starblock.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
     </ClInclude>
@@ -2234,9 +2243,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\WalkSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\ItemEffect.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2545,6 +2551,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\InhaleEffect.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\06. InhaleEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ItemEffect.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kabu.cpp">
       <Filter>00. GameObject\06. Monster\05. Kabu</Filter>
@@ -3083,6 +3092,12 @@
     <ClCompile Include="..\Private\Split_Bush.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Split_Coaster.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Split_Cylinder.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Split_Starblock.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env\Split</Filter>
     </ClCompile>
@@ -3268,9 +3283,6 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\ItemEffect.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
