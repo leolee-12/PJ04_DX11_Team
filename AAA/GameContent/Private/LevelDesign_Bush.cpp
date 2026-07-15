@@ -275,6 +275,7 @@ void CLevelDesign_Bush::Damaged(const ATTACK_INFO& tInfo)
 
 	m_eState = BUSH_STATE::CUT;
 	m_pHurtBox->Set_Enabled(false);
+	Publish_LDEvent();
 }
 
 void CLevelDesign_Bush::Register_LevelDesignSpecs()

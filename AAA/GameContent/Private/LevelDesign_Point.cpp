@@ -88,6 +88,12 @@ HRESULT CLevelDesign_Point::Initialize(void* pArg)
 	if (FAILED(Ready_CullingState(m_pModelCom, 0.f, true)))
 		return E_FAIL;
 
+	if (!m_tPointDesc.strReceiveEventTag.empty())
+	{
+		Set_Active(false);
+		m_pHurtBox->Set_Enabled(false);
+	}
+
 	m_bUseShadow = true;
 
 	if (FAILED(Validate_Initialized()))
@@ -217,6 +223,22 @@ _bool CLevelDesign_Point::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const jso
 CGameObject* CLevelDesign_Point::Create_Prototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	return CLevelDesign_Point::Create(pDevice, pContext);
+}
+
+void CLevelDesign_Point::On_LDEventReceived(const _wstring& strEventTag)
+{
+	UNREFERENCED_PARAMETER(strEventTag);
+
+	if (m_bPickingUp || Is_Dead() || Is_Active())
+		return;
+
+	Set_Active(true);
+
+	if (nullptr != m_pHurtBox)
+	{
+		m_pHurtBox->Set_Enabled(true);
+		m_pHurtBox->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
+	}
 }
 
 HRESULT CLevelDesign_Point::Ready_Components()
@@ -356,6 +378,8 @@ void CLevelDesign_Point::Handle_Pickup(CCollider* pOther)
 
 	_float3 vStartPosition{};
 	XMStoreFloat3(&vStartPosition, pPlayer->Get_Transform()->Get_State(STATE::POSITION));
+
+	m_bPickingUp = true;
 
 	KIRBY_POINTSTAR_GAINED_DESC Desc{};
 	Desc.iAmount = static_cast<_uint>(m_tPointDesc.iValue);

@@ -269,8 +269,6 @@ void CLevelDesign_Parser::Fill_Common(const json& jEntry, LD_OBJECT_DESC* pDesc)
 
 	JsonUtils::Try_ReadUInt(jEntry, "Basic.RailUser.TargetRailUid", &pDesc->iTargetRailUid);
 	JsonUtils::Try_ReadInt(jEntry, "TargetLandGroupIndex", &pDesc->iTargetLandGroupIndex);
-	JsonUtils::Try_ReadUInt(jEntry, "EventReceiverId", &pDesc->iEventReceiverId);
-	JsonUtils::Try_ReadUInt(jEntry, "EventSenderId", &pDesc->iEventSenderId);
 
 	pDesc->jRaw = jEntry;
 	Build_TransformDesc(pDesc);

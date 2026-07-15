@@ -34,10 +34,13 @@ private:
 	physx::PxTriangleMesh* m_pCollisionMesh = { nullptr };
 
 private:
+	virtual HRESULT On_EditTransformChanged() override;
+	virtual void On_LDEventReceived(const _wstring& strEventTag) override;
+
 	HRESULT Ready_Components(const LD_PARSED_OBJECT& Desc);
 	HRESULT Ready_RigidStatic(const LD_PARSED_OBJECT& Desc);
 	HRESULT Ready_RigidStatic_FromPoints(const LD_PARSED_OBJECT& Desc);
-	HRESULT Ready_RigidStatic_FromBox(const LD_PARSED_OBJECT& Desc);
+	HRESULT Ready_RigidStatic_FromBox();
 	void    Release_RigidStatic();
 
 public:
