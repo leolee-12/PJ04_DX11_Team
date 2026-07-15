@@ -2,8 +2,10 @@
 #include "GameInstance.h"
 #include "GameContent_const.h"
 #include "GameContrnt_Events.h"
+#include "Controller.h"
 #include "DropStar_Body.h"
 #include "DropStar_Manager.h"
+#include "BubbleMovement.h"
 
 CDropStar::CDropStar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CContainerObject { pDevice,  pContext }
@@ -34,6 +36,9 @@ HRESULT CDropStar::Initialize(void* pArg)
 	if (FAILED(Ready_Collider()))
 		return E_FAIL;
 
+	if (FAILED(Ready_Movement()))
+		return E_FAIL;
+
 	m_vBaseScale = m_pTransformCom->Get_Scaled();
 
 	return S_OK;
@@ -44,23 +49,37 @@ void CDropStar::Update(_float fTimeDelta)
 	if (!m_bActive)
 		return;
 
+	if (m_eState == DROPSTAR_STATE::DELAY)
+	{
+		m_fDelay -= fTimeDelta;
+		if (m_fDelay <= 0.f)
+			Reveal();
+		return;
+	}
+
 	__super::Update(fTimeDelta);
 
-	if (m_bCaptured)
+	if (m_eState == DROPSTAR_STATE::CAPTURED)
 	{
 		Update_Captured(fTimeDelta);
 		return;
 	}
 
-	// 물리는 보류 
+	if (m_eState == DROPSTAR_STATE::SPAT)
+		return;								// Spit Projectile이 Transform 구동
+
+	if (m_pMovement)
+		m_pMovement->Tick(fTimeDelta);
+
 	m_fTimer += fTimeDelta;
+
 	if (m_fTimer >= s_fDeSpawnTime)
 		Despawn();
 }
 
 void CDropStar::Late_Update(_float fTimeDelta)
 {
-	if (!m_bActive)
+	if (!m_bActive || m_eState == DROPSTAR_STATE::DELAY)
 		return;
 
 	__super::Late_Update(fTimeDelta);
@@ -68,25 +87,25 @@ void CDropStar::Late_Update(_float fTimeDelta)
 	if (m_pCollider && m_pCollider->Is_Enabled())
 	{
 		m_pCollider->Update(XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()));
-	}
 #ifdef _DEBUG
 	m_pGameInstance_Proxy->Add_DebugComponent(m_pCollider);
 #endif
+	}
 }
 
 void CDropStar::Set_Pool(CDropStar_Manager* pPool, _uint iLevel, const _wstring& strKey)
 {
-	m_pPool = pPool;
-	m_iPoolLevel = iLevel;
-	m_strPoolKey = strKey;
+	m_pPool			= pPool;
+	m_iPoolLevel	= iLevel;
+	m_strPoolKey	= strKey;
 }
 
 void CDropStar::Activate(const _float3& vPos, _float fDelay)
 {
 	m_bActive = true;
 	m_bAvailable = true;
-	m_bCaptured = false;
 	m_pCaptor = nullptr;
+	m_eState = DROPSTAR_STATE::DELAY;
 
 	m_fDelay = fDelay;      
 	m_fTimer = 0.f;
@@ -98,28 +117,50 @@ void CDropStar::Activate(const _float3& vPos, _float fDelay)
 	m_pTransformCom->Set_Scale(m_vBaseScale.x,
 		m_vBaseScale.y, m_vBaseScale.z);
 
+	if (m_pMovement)
+		m_pMovement->Stop();
+	if (m_pController)
+		m_pController->Set_Enabled(false);
 	if (m_pCollider)
-		m_pCollider->Set_Enabled(true);
+		m_pCollider->Set_Enabled(false);
 }
 
 void CDropStar::Launch(const _float3& vDir)
 {
-	
+	if (nullptr == m_pMovement)
+		return;
+
+	_vector v = XMLoadFloat3(&vDir);
+	if (XMVectorGetX(XMVector3LengthSq(v)) > 1e-4f)
+	{
+		v = XMVector3Normalize(v) * s_fLaunchSpeed;
+		v = XMVectorSetY(v,	XMVectorGetY(v) + s_fPopUpSpeed);
+	}
+	else
+	{
+		v = XMVectorSet(0.f, s_fPopUpSpeed, 0.f, 0.f);
+	}
+
+	m_pMovement->Launch(v);
 }
 
 _bool CDropStar::Can_BeInhaled(const INHALE_QUERY& q) const
 {
-	return m_bAvailable && !m_bCaptured;
+	return m_bAvailable && m_eState == DROPSTAR_STATE::LIVE;
 }
 
 void CDropStar::Be_Captured(CGameObject* pInhaler)
 {
-	if (m_bCaptured)
+	if (m_eState == DROPSTAR_STATE::CAPTURED)
 		return;
 
-	m_bCaptured = true;
+	m_eState = DROPSTAR_STATE::CAPTURED;
 	m_pCaptor = pInhaler;
 
+	if (m_pMovement)
+		m_pMovement->Stop();
+	if (m_pController)
+		m_pController->Set_Enabled(false);
 	if (m_pCollider)
 		m_pCollider->Set_Enabled(false);
 
@@ -130,21 +171,31 @@ void CDropStar::Be_Captured(CGameObject* pInhaler)
 void CDropStar::On_SpatBegin()
 {
 	m_pCaptor = nullptr;
-	m_bCaptured = false;
+	m_eState = DROPSTAR_STATE::SPAT;
 
 	Set_Active(true);
 
+	if (m_pMovement)
+		m_pMovement->Stop();
+	if (m_pController)
+		m_pController->Set_Enabled(false);
 	if (m_pCollider)
 		m_pCollider->Set_Enabled(false);
 
-	m_pTransformCom->Set_Scale(m_vBaseScale.x,
-		m_vBaseScale.y, m_vBaseScale.z);
+	m_pTransformCom->Set_Scale(m_vBaseScale.x, m_vBaseScale.y, m_vBaseScale.z);
 }
 
 void CDropStar::On_SpatEnd()
 {
 	m_pCaptor = nullptr;
 	m_bAvailable = false;
+
+	if (m_pMovement)
+		m_pMovement->Stop();
+	if (m_pController)
+		m_pController->Set_Enabled(false);
+	if (m_pCollider)
+		m_pCollider->Set_Enabled(false);
 
 	Set_Active(false);
 	Return_ToPool();
@@ -166,6 +217,31 @@ HRESULT CDropStar::Ready_Collider()
 	return S_OK;
 }
 
+HRESULT CDropStar::Ready_Movement()
+{
+	CController::CONTROLLER_DESC cd{};
+	cd.pOwner = this;
+	cd.fRadius = 0.5f;
+	cd.fHeight = 0.01f;
+	cd.vFootPos = { 0.f, 0.f, 0.f };
+
+	m_pController = Add_Component<CController>(TEXT("Com_DropStarController"), CController::Create(m_pDevice, m_pContext));
+	if (nullptr == m_pController)
+		return E_FAIL;
+	if (FAILED(m_pController->Initialize(&cd)))
+		return E_FAIL;
+	m_pController->Set_Enabled(false);
+
+	m_pMovement = Add_Component<CBubbleMovement>(TEXT("Com_Movement"), CBubbleMovement::Create(m_pDevice, m_pContext));
+	if (nullptr == m_pMovement)
+		return E_FAIL;
+
+	m_pMovement->Set_Refs(m_pTransformCom, m_pController);
+	m_pMovement->Set_Physics(s_fGravity, s_fRestitution, s_fHorizDamp);
+
+	return S_OK;
+}
+
 HRESULT CDropStar::Ready_PartObjects()
 {
 	CDropStar_Body::DROPSTAR_BODY_DESC desc{};
@@ -181,6 +257,24 @@ HRESULT CDropStar::Ready_PartObjects()
 	m_pBody = pBody;
 
 	return S_OK;
+}
+
+void CDropStar::Reveal()
+{
+	m_eState = DROPSTAR_STATE::LIVE;
+	m_fTimer = 0.f;
+
+	if (m_pController)
+	{
+		m_pController->Set_Enabled(true);
+		m_pController->Set_Solid(false);
+		m_pController->Set_FootPosition(m_pTransformCom->Get_State(STATE::POSITION));
+	}
+
+	Launch(_float3(0.f, 0.f, 0.f));    
+
+	if (m_pCollider)
+		m_pCollider->Set_Enabled(true);
 }
 
 void CDropStar::Update_Captured(_float fTimeDelta)
@@ -218,8 +312,7 @@ void CDropStar::Update_Captured(_float fTimeDelta)
 void CDropStar::On_Swallowed()
 {
 	SWALLOW_EVENT payload{ this };
-	m_pGameInstance_Proxy->Publish(
-		EventTag::Swallowed, &payload);
+	m_pGameInstance_Proxy->Publish(EventTag::Swallowed, &payload);
 
 	m_pCaptor = nullptr;
 
@@ -238,6 +331,10 @@ void CDropStar::Despawn()
 
 	Set_Active(false);
 
+	if (m_pMovement)
+		m_pMovement->Stop();
+	if (m_pController)
+		m_pController->Set_Enabled(false);
 	if (m_pCollider)
 		m_pCollider->Set_Enabled(false);
 

@@ -1,15 +1,17 @@
 #pragma once
 #include "ContainerObject.h"
-#include "Inhalable.h"
 #include "GameContent_Defines.h"
+#include "Inhalable.h"
 
 NS_BEGIN(Engine)
 class CCollider;
+class CController;
 NS_END
 
 NS_BEGIN(Client)
 class CDropStar_Manager;
 class CDropStar_Body;
+class CBubbleMovement;
 
 class CDropStar final : public CContainerObject, public IInhalable
 {
@@ -43,16 +45,20 @@ public:
     // Inhalable 
     virtual _bool               Can_BeInhaled(const INHALE_QUERY& q) const override;
     virtual void                Be_Captured(CGameObject* pInhaler) override;
-    virtual COPY_ABILITY_TYPE   Get_CopyAbility() const override  { return COPY_ABILITY_TYPE::NONE;  }
+    virtual COPY_ABILITY_TYPE   Get_CopyAbility() const override  { return COPY_ABILITY_TYPE::NONE; }
     virtual CGameObject*        Get_GameObject() override { return this; }
     virtual _float3             Get_SpatPivotOffset() const override  {  return _float3(0.f, 0.f, 0.f);  }
     virtual void                On_SpatBegin() override;
     virtual void                On_SpatEnd() override;
 
 private:
+    enum class DROPSTAR_STATE { DELAY, LIVE, CAPTURED, SPAT };
+
     HRESULT                     Ready_Collider();
+    HRESULT                     Ready_Movement();
     HRESULT                     Ready_PartObjects();
 
+    void                        Reveal();
     void                        Update_Captured(_float fTimeDelta);
     void                        On_Swallowed();
     void                        Despawn();
@@ -61,6 +67,8 @@ private:
 private:
     CDropStar_Body*             m_pBody = { nullptr };
     CCollider*                  m_pCollider = { nullptr };   // »Ì¿‘ ∞®¡ˆ hurtbox
+    CController*                m_pController = { nullptr };
+    CBubbleMovement*            m_pMovement = { nullptr };
 
     CDropStar_Manager*          m_pPool = { nullptr };
     _uint                       m_iPoolLevel = {};
@@ -69,19 +77,25 @@ private:
     CGameObject*                m_pCaptor = { nullptr };
     
     COLLISION_LAYER             m_eCollLayer = { COLLISION_LAYER::DROP_STAR };     
+    DROPSTAR_STATE              m_eState = { DROPSTAR_STATE::DELAY };
 
     _float3                     m_vBaseScale = {};
     _float                      m_fDelay = { 0.f };     
     _float                      m_fTimer = { 0.f };
     _float                      m_fPullSpeed = { 0.f };
     _float                      m_fScaleRatio = { 1.f };
-    _bool                       m_bCaptured = { false };
     _bool                       m_bAvailable = { true };
 
     static constexpr _float     s_fPullAccel = { 40.f };
     static constexpr _float     s_fMinScaleRatio = { 0.45f };
     static constexpr _float     s_fShrinkLerp = { 2.f };
     static constexpr _float     s_fDeSpawnTime = { 10.f };
+
+    static constexpr _float     s_fGravity = { -12.f };
+    static constexpr _float     s_fRestitution = { 0.8f };
+    static constexpr _float     s_fHorizDamp = { 0.85f };
+    static constexpr _float     s_fLaunchSpeed = { 4.f };
+    static constexpr _float     s_fPopUpSpeed = { 6.f };
 
 public:
     static CDropStar*           Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
