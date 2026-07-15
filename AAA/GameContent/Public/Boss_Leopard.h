@@ -62,6 +62,7 @@ private:
     _int    m_iDeathPoseDelay = { 0 };
     _float  m_fDeathPauseTimer = { 0.f };
 
+private:
     void Tick_DeathSequence(_float fTimeDelta);
 
 public:

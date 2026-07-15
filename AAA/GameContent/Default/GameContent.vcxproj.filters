@@ -1129,6 +1129,9 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="98. ShaderFiles\Marb1e\Boss">
+      <UniqueIdentifier>{422a56fc-373b-4d5f-b1cf-167f581eebb6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -3292,16 +3295,10 @@
     <None Include="..\ShaderFiles\Shader_AnimMesh_PBR.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
-    <None Include="..\ShaderFiles\Shader_Armadillo.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
-    </None>
     <None Include="..\ShaderFiles\Shader_Bomb.hlsl">
       <Filter>98. ShaderFiles\Hojun</Filter>
     </None>
     <None Include="..\ShaderFiles\Shader_EffectRock.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
-    </None>
-    <None Include="..\ShaderFiles\Shader_Gorilla.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
     <None Include="..\ShaderFiles\Shader_Kirby.hlsl">
@@ -3346,5 +3343,16 @@
     <None Include="..\ShaderFiles\Shader_World_Technique.hlsli">
       <Filter>98. ShaderFiles\Leo</Filter>
     </None>
+    <None Include="..\ShaderFiles\Shader_Gorilla.hlsl">
+      <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
+    </None>
+    <None Include="..\ShaderFiles\Shader_Armadillo.hlsl">
+      <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_Leopard.hlsl">
+      <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
