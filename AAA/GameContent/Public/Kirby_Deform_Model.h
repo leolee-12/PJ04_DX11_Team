@@ -19,6 +19,15 @@ class CKirby;
 
 enum class KIRBY_EYE_STATE { IDLE, DOUBT, BLINK, CLOSE, ANGRY, SURPRISED, SADNESS, END };
 
+enum class KIRBY_FX_DIRECTION : _int
+{
+	NONE,
+	FORWARD,
+	BACKWARD,
+	RIGHT,
+	LEFT
+};
+
 class CKirby_Deform_Model abstract : public CPartObject
 {
 	GENERATED_BODY_ABSTRACT(CKirby_Deform_Model)

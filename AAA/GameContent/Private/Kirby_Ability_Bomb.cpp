@@ -189,7 +189,7 @@ void CKirby_Ability_Bomb::Update_BombState(CKirby* pKirby, _float fTimeDelta)
         case BOMB_STATE::MOVE_THROW:
         {
             if (pAnimator->Get_Progress() >= 0.35f)
-                Throw_Bomb(pKirby, 5.f, 20.f);
+                Throw_Bomb(pKirby, 10.f, 20.f);
 
             if (pAnimator->Is_Finished())
                 Change_BombState(pKirby, BOMB_STATE::BOMB_STATE_END);

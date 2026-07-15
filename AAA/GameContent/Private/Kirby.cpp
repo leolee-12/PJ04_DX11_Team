@@ -546,7 +546,7 @@ HRESULT CKirby::Ready_Components()
 
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BOMB), ETOUI(COLLISION_LAYER::MONSTER_HURT));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BOMB), ETOUI(COLLISION_LAYER::ENV_HURT));
-    //m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BOMB), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
+    m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BOMB), ETOUI(COLLISION_LAYER::ENV_FOLIAGE));
     m_pGameInstance_Proxy->Add_CollisionPool(ETOUI(COLLISION_LAYER::PLAYER_BOMB), ETOUI(COLLISION_LAYER::PLAYER_BOMB));
 
     // Kirby_DeformCar_Main
