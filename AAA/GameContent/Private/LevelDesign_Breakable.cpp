@@ -118,7 +118,7 @@ HRESULT CLevelDesign_Breakable::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	if (FAILED(Ready_CullBounds(m_pModelCom, BREAKABLE_CULL_MARGIN)))
+	if (FAILED(Ready_CullingState(m_pModelCom, BREAKABLE_CULL_MARGIN)))
 		return E_FAIL;
 
 	m_bUseShadow = true;
@@ -223,13 +223,13 @@ HRESULT CLevelDesign_Breakable::Render()
 			MESH_LAYER_BIND_CONTEXT Ctx{};
 			Ctx.pShader = m_pShaderCom;
 			Ctx.pModel = m_pModelCom;
+			Ctx.pCullingState = m_pCullingState;
 			Ctx.pGI_Proxy = m_pGameInstance_Proxy;
 			Ctx.iMesh = i;
 			Ctx.pLayer = &Layer;
 			Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_ANIM;
 			Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
 			Ctx.iFallbackPass = ETOUI(WORLD_PASS::DMN);
-			Ctx.fDissolve = 0.f;
 
 			MESH_LAYER_BIND_RESULT Result{};
 			if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
@@ -249,13 +249,13 @@ HRESULT CLevelDesign_Breakable::Render()
 			MESH_LAYER_BIND_CONTEXT Ctx{};
 			Ctx.pShader = m_pShaderCom;
 			Ctx.pModel = m_pModelCom;
+			Ctx.pCullingState = m_pCullingState;
 			Ctx.pGI_Proxy = m_pGameInstance_Proxy;
 			Ctx.iMesh = i;
 			Ctx.pLayer = &Layer;
 			Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
 			Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
 			Ctx.iFallbackPass = ETOUI(WORLD_PASS::DMN);
-			Ctx.fDissolve = 0.f;
 
 			MESH_LAYER_BIND_RESULT Result{};
 			if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))

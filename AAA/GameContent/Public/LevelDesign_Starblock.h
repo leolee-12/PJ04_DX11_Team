@@ -44,6 +44,8 @@ public:
 	virtual HRESULT Render_Shadow() override;
 	virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
+	void			Spawn_DestroyEffects();
+
 	// Damageable
 	virtual void Damaged(const ATTACK_INFO& tInfo) override;
 

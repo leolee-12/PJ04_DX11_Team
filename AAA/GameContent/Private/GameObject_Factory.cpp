@@ -88,6 +88,8 @@
 #include "Split_Starblock.h"
 #include "Split_Stone.h"
 #include "Split_Bush.h"
+#include "ItemEffect.h"
+#include "BreakWallEffect.h"
 #include "BubbleAura.h"
 #include "Kirby_SwordTrail.h"
 
@@ -1112,6 +1114,32 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BushLeafS"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Bush/BasicS.ysh"));
         )
     );
+
+    // 12
+    Register(CBreakWallEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CBreakWallEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_StoneDust"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/Stone/StoneDust.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+        )
+    );
+
+    // 13
+    Register(CItemEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CItemEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG, CRectCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectEmitterCommon::PROTOTYPE_TAG, CRectEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_ItemCircle.iLevelID, Texture_ItemCircle.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_ItemCircle.szFileTag, Texture_ItemCircle.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_ItemSparkle01.iLevelID, Texture_ItemSparkle01.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_ItemSparkle01.szFileTag, Texture_ItemSparkle01.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_ItemSparkle02.iLevelID, Texture_ItemSparkle02.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_ItemSparkle02.szFileTag, Texture_ItemSparkle02.iNumTex));
+            TRY_ADD_PROTO(pProxy, Texture_ItemSparkle03.iLevelID, Texture_ItemSparkle03.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_ItemSparkle03.szFileTag, Texture_ItemSparkle03.iNumTex));
+        ));
 }
 
 void CGameObject_Factory::Register_Bubble()

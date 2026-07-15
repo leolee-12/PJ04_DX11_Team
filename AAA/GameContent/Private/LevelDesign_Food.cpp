@@ -2,6 +2,7 @@
 #include "LevelDesign_Registry.h"
 #include "MeshLayer_Binder.h"
 #include "Parsing_Utils.h"
+#include "Effect_Loader.h"
 #include "Kirby.h"
 
 #include "GameInstance.h"
@@ -10,6 +11,10 @@ namespace
 {
 	constexpr _float s_fFoodFloatHeight = 0.25f;
 	constexpr _float s_fFoodRotationPerSec = 360.f;
+	constexpr _float s_fFoodPickupDuration = 0.75f;
+	constexpr _float s_fFoodPickupHeight = 3.f;
+	constexpr _float s_fFoodPickupTurnCount = 1.f;
+	constexpr const _tchar* ITEM_EFFECT_ID = L"ItemEffect";
 
 	struct LD_FOOD_CATALOG
 	{
@@ -76,10 +81,13 @@ HRESULT CLevelDesign_Food::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	if (FAILED(Ready_CullBounds_RotationInvariant(m_pModelCom)))
+	if (FAILED(Ready_CullingState(m_pModelCom, 0.f, true)))
 		return E_FAIL;
 
 	m_bUseShadow = true;
+
+	if (FAILED(Ready_Effect()))
+		return E_FAIL;
 
 	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
@@ -116,7 +124,17 @@ void CLevelDesign_Food::Late_Update(_float fTimeDelta)
 	if (!m_bActive || Is_Dead())
 		return;
 
-	m_pTransformCom->Turn(XMVector3Normalize(XMVectorSet(0.f, 1.f, 0.f, 0.f)), fTimeDelta);
+	if (m_bPickingUp)
+	{
+		Update_Pickup(fTimeDelta);
+
+		if (!m_bActive)
+			return;
+	}
+	else
+	{
+		m_pTransformCom->Turn(XMVector3Normalize(m_pTransformCom->Get_State(STATE::UP)), fTimeDelta);
+	}
 
 	if (m_pHurtBox->Is_Enabled())
 	{
@@ -230,6 +248,33 @@ HRESULT CLevelDesign_Food::Ready_RenderComponents()
 	return S_OK;
 }
 
+HRESULT CLevelDesign_Food::Ready_Effect()
+{
+	_float3 vEffectPosition{};
+	XMStoreFloat3(&vEffectPosition, m_pTransformCom->Get_State(STATE::POSITION));
+	vEffectPosition.y += s_fFoodFloatHeight * 1.5f;
+
+	if (FAILED(CEffect_Loader::GetInstance()->Spawn(
+		ITEM_EFFECT_ID,
+		Get_LevelIndex(),
+		vEffectPosition,
+		_float3(0.f, 0.f, 0.f),
+		_float3(0.f, 0.f, 0.f),
+		nullptr,
+		&m_pItemEffect)))
+	{
+		m_pItemEffect = nullptr;
+		return E_FAIL;
+	}
+	else
+	{
+		const _float3 vFoodScale = m_pTransformCom->Get_Scaled();
+		m_pItemEffect->Get_Transform()->Set_Scale(vFoodScale.x, vFoodScale.y, vFoodScale.z);
+	}
+
+	return S_OK;
+}
+
 HRESULT CLevelDesign_Food::Bind_ShaderResources()
 {
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
@@ -262,6 +307,7 @@ HRESULT CLevelDesign_Food::Render_Model()
 		MESH_LAYER_BIND_CONTEXT Ctx{};
 		Ctx.pShader = m_pShaderCom;
 		Ctx.pModel = m_pModelCom;
+		Ctx.pCullingState = m_pCullingState;
 		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
 		Ctx.iMesh = i;
 		Ctx.pLayer = &Layer;
@@ -332,19 +378,63 @@ void CLevelDesign_Food::Handle_Pickup(CCollider* pOther)
 		return;
 	if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
 		return;
-	if (Is_Dead())
+	if (Is_Dead() || m_bPickingUp)
 		return;
 
 	CKirby* pKirby = dynamic_cast<CKirby*>(pOther->Get_Owner());
 	if (nullptr == pKirby)
 		return;
 
+	_float3 vStartPos{};
+	XMStoreFloat3(&vStartPos, pKirby->Get_Transform()->Get_State(STATE::POSITION));
+
 	pKirby->Add_HP(m_tFoodDesc.fHealAmount);
+
+	if (m_pItemEffect)
+	{
+		m_pItemEffect->EffectContainer_Stop();
+		m_pItemEffect = nullptr;
+	}
 
 	if (m_pHurtBox)
 		m_pHurtBox->Set_Enabled(false);
 
-	Set_Active(false);
+	Begin_Pickup(vStartPos);
+}
+
+void CLevelDesign_Food::Begin_Pickup(const _float3& vPickupStartPos)
+{
+	const _float3 vScale = m_pTransformCom->Get_Scaled();
+	const _vector vStartPos = XMVectorSetW(XMLoadFloat3(&vPickupStartPos), 1.f);
+	const _vector vTargetPos = vStartPos + XMVectorSet(0.f, s_fFoodPickupHeight, 0.f, 0.f);
+
+	XMStoreFloat3(&m_vPickupStartPos, vStartPos);
+	XMStoreFloat3(&m_vPickupTargetPos, vTargetPos);
+
+	m_pTransformCom->Set_State(STATE::RIGHT, XMVectorSet(vScale.x, 0.f, 0.f, 0.f));
+	m_pTransformCom->Set_State(STATE::UP, XMVectorSet(0.f, vScale.y, 0.f, 0.f));
+	m_pTransformCom->Set_State(STATE::LOOK, XMVectorSet(0.f, 0.f, vScale.z, 0.f));
+	m_pTransformCom->Set_State(STATE::POSITION, vStartPos);
+
+	m_fPickupElapsed = 0.f;
+	m_bPickingUp = true;
+}
+
+void CLevelDesign_Food::Update_Pickup(_float fTimeDelta)
+{
+	m_fPickupElapsed = min(m_fPickupElapsed + fTimeDelta, s_fFoodPickupDuration);
+
+	const _float fRatio = m_fPickupElapsed / s_fFoodPickupDuration;
+	const _float fEaseRatio = 1.f - powf(1.f - fRatio, 3.f);
+	const _float fRotationRadian = XM_2PI * s_fFoodPickupTurnCount * fEaseRatio;
+
+	const _vector vStartPos = XMVectorSetW(XMLoadFloat3(&m_vPickupStartPos), 1.f);
+	const _vector vTargetPos = XMVectorSetW(XMLoadFloat3(&m_vPickupTargetPos), 1.f);
+	m_pTransformCom->Set_State(STATE::POSITION, XMVectorLerp(vStartPos, vTargetPos, fEaseRatio));
+	m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), fRotationRadian);
+
+	if (fRatio >= 1.f)
+		Set_Active(false);
 }
 
 CLevelDesign_Food* CLevelDesign_Food::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

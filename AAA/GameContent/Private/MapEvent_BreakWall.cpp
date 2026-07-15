@@ -1,6 +1,7 @@
 #include "MapEvent_BreakWall.h"
 #include "GameContrnt_Events.h"
 #include "Shader_PassMeta.h"
+#include "Effect_Loader.h"
 
 #include "GameInstance.h"
 #include "Geometry_Utils.h"
@@ -9,6 +10,10 @@ namespace
 {
 	constexpr _float BREAK_FRAGMENT_GRAVITY = -15.f;
 	constexpr _float BREAK_FRAGMENT_DESPAWN_FALL_DISTANCE = 30.f;
+	constexpr const _tchar* BREAK_WALL_EFFECT_ID = L"Split_Stone_Ultra";
+	constexpr _float BREAK_WALL_EFFECT_HEIGHT_RATIO = 1.f;
+	constexpr _float BREAK_WALL_EFFECT_FRONT_RATIO = -0.5f;
+
 
 	struct BREAK_FRAGMENT_BIND
 	{
@@ -192,9 +197,7 @@ HRESULT CMapEvent_BreakWall::Render_Shadow()
 		return S_OK;
 	}
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
+	if (FAILED(Bind_ShadowTransforms()))
 		return E_FAIL;
 
 	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
@@ -210,11 +213,7 @@ HRESULT CMapEvent_BreakWall::Render_Shadow()
 
 		const _float4x4 WorldMatrix = Build_FragmentWorldMatrix(*pFragment, BreakWallWorld);
 
-		if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &WorldMatrix)))
-			return E_FAIL;
-		if (FAILED(m_pShaderCom->Begin(ETOI(MAP_PASS::SHADOW))))
-			return E_FAIL;
-		if (FAILED(m_pModelCom->Render(i)))
+		if (FAILED(Render_ShadowMesh(i, &WorldMatrix)))
 			return E_FAIL;
 	}
 
@@ -304,22 +303,13 @@ HRESULT CMapEvent_BreakWall::Ready_BoostTrigger()
 	if (m_Fragments.empty())
 		return E_FAIL;
 
-	const _float3 vFirstPivot = {
-			m_Fragments.front().vPivot.x,
-			m_Fragments.front().vPivot.y,
-			-m_Fragments.front().vPivot.z
-	};
-
+	const _float3 vFirstPivot = GeometryUtils::Flip_Axis(STATE::LOOK, m_Fragments.front().vPivot);
 	_float3 vMin = vFirstPivot;
 	_float3 vMax = vFirstPivot;
 
 	for (const BREAK_FRAGMENT& Fragment : m_Fragments)
 	{
-		const _float3 vPivot = {
-				Fragment.vPivot.x,
-				Fragment.vPivot.y,
-				-Fragment.vPivot.z
-		};
+		const _float3 vPivot = GeometryUtils::Flip_Axis(STATE::LOOK, Fragment.vPivot);
 
 		vMin.x = min(vMin.x, vPivot.x);
 		vMin.y = min(vMin.y, vPivot.y);
@@ -425,6 +415,36 @@ void CMapEvent_BreakWall::Start_Break()
 
 	m_pBoostTrigger->Set_Enabled(false);
 
+	// 이펙트 위치는 파편/트리거와 동일하게 Flip_Axis(pivot) 기준으로 계산한다.
+	// (Get_ModelAABB는 메시 로컬이 원점이라 실제 벽 위치와 어긋나 이펙트가 빈 공간에서 재생됨)
+	if (!m_Fragments.empty())
+	{
+		const _float3 vFirstPivot = GeometryUtils::Flip_Axis(STATE::LOOK, m_Fragments.front().vPivot);
+		_float3 vMin = vFirstPivot;
+		_float3 vMax = vFirstPivot;
+
+		for (const BREAK_FRAGMENT& Fragment : m_Fragments)
+		{
+			const _float3 vPivot = GeometryUtils::Flip_Axis(STATE::LOOK, Fragment.vPivot);
+
+			vMin.x = min(vMin.x, vPivot.x); vMin.y = min(vMin.y, vPivot.y); vMin.z = min(vMin.z, vPivot.z);
+			vMax.x = max(vMax.x, vPivot.x); vMax.y = max(vMax.y, vPivot.y); vMax.z = max(vMax.z, vPivot.z);
+		}
+
+		const _float3 vLocalEffectPosition = {
+						(vMin.x + vMax.x) * 0.5f,
+						vMin.y + (vMax.y - vMin.y) * BREAK_WALL_EFFECT_HEIGHT_RATIO,
+						vMin.z + (vMax.z - vMin.z) * BREAK_WALL_EFFECT_FRONT_RATIO
+		};
+
+		_float3 vEffectPosition{};
+		XMStoreFloat3(&vEffectPosition, XMVector3TransformCoord(
+			XMLoadFloat3(&vLocalEffectPosition),
+			XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr())));
+
+		CEffect_Loader::GetInstance()->Spawn(BREAK_WALL_EFFECT_ID, Get_LevelIndex(), vEffectPosition);
+	}
+
 	m_pGameInstance_Proxy->Publish(EventTag::Stage1_Step2_CarBreakMap, nullptr);
 
 	CAMERA_SHAKE_DESC ShakeDesc{};
@@ -452,7 +472,7 @@ void CMapEvent_BreakWall::Start_Break()
 
 _float4x4 CMapEvent_BreakWall::Build_FragmentWorldMatrix(const BREAK_FRAGMENT& Fragment, _fmatrix BreakWallWorld) const
 {
-	const _float3 vEnginePivot = { Fragment.vPivot.x, Fragment.vPivot.y, -Fragment.vPivot.z };
+	const _float3 vEnginePivot = GeometryUtils::Flip_Axis(STATE::LOOK, Fragment.vPivot);
 
 	const _matrix Rotation = XMMatrixRotationQuaternion(XMLoadFloat4(&Fragment.vRotation));
 	const _matrix Translation = XMMatrixTranslation(

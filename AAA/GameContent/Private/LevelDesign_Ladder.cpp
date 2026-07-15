@@ -355,7 +355,7 @@ HRESULT CLevelDesign_Ladder::Bind_ShaderResources(const _float4x4& WorldMatrix)
 
 HRESULT CLevelDesign_Ladder::Ready_LadderCullBounds()
 {
-	BoundingBox LadderBounds{};
+	BoundingBox CullBounds{};
 	_bool bHasBounds = false;
 
 	for (_uint i = 0; i < m_tLadderDesc.iLength; ++i)
@@ -374,8 +374,8 @@ HRESULT CLevelDesign_Ladder::Ready_LadderCullBounds()
 
 		SegmentBounds.Center.y += m_fSegmentStepY * static_cast<_float>(i);
 
-		LadderBounds = bHasBounds
-			? GeometryUtils::Merge_AABB(LadderBounds, SegmentBounds)
+		CullBounds = bHasBounds
+			? GeometryUtils::Merge_AABB(CullBounds, SegmentBounds)
 			: SegmentBounds;
 		bHasBounds = true;
 	}
@@ -383,8 +383,7 @@ HRESULT CLevelDesign_Ladder::Ready_LadderCullBounds()
 	if (!bHasBounds)
 		return E_FAIL;
 
-	Set_CullLocalBounds(LadderBounds);
-	return S_OK;
+	return Ready_CullingState(CullBounds);
 }
 
 HRESULT CLevelDesign_Ladder::Render_Model(CModel* pModel)
@@ -398,6 +397,7 @@ HRESULT CLevelDesign_Ladder::Render_Model(CModel* pModel)
 		MESH_LAYER_BIND_CONTEXT Ctx{};
 		Ctx.pShader = m_pShaderCom;
 		Ctx.pModel = pModel;
+		Ctx.pCullingState = m_pCullingState;
 		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
 		Ctx.iMesh = i;
 		Ctx.pLayer = &Layer;

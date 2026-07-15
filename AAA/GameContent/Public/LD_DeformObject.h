@@ -4,6 +4,7 @@
 
 NS_BEGIN(Engine)
 class CCollider;
+class CGameInstance_Proxy;
 NS_END
 
 NS_BEGIN(Client)
@@ -43,11 +44,14 @@ public:
 	HRESULT		On_DeformAcquired();
 	HRESULT		On_DeformReleased(const _float3& vWorldPosition, const _float3& vTargetPosition);
 
+	static HRESULT  Register_StaticPrototype(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static HRESULT  Spawn_Released(CGameInstance_Proxy* pProxy, DEFORM_TYPE eType, _uint iTargetLevel, const _float4x4* AnchorWorld);
+	void            Begin_Released(const _float4x4* AnchorWorld);
+
 #pragma region Deformable
 	virtual DEFORM_TYPE				Get_DeformType() const override { return m_tDeformObjectDesc.eDeformType; }
 	virtual DEFORM_OBJECT_KIND		Get_DeformKind() const override { return m_eKind; }
 	virtual _bool					Request_Deform(const _float4x4* AnchorWorld) override;
-	virtual void					End_Deform(const _float4x4* AnchorWorld) override;
 #pragma endregion
 
 private:

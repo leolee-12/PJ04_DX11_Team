@@ -5,6 +5,7 @@
 NS_BEGIN(Engine)
 class CShader;
 class CModel;
+class CCullingState; 
 class CGameInstance_Proxy;
 NS_END
 
@@ -14,6 +15,7 @@ struct MESH_LAYER_BIND_CONTEXT
 {
 	CShader* pShader = { nullptr };
 	CModel* pModel = { nullptr };
+	CCullingState* pCullingState = { nullptr };
 	CGameInstance_Proxy* pGI_Proxy = { nullptr };
 
 	_uint iMesh = { 0 };

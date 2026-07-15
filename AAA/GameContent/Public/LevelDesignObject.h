@@ -5,9 +5,11 @@
 NS_BEGIN(Engine)
 class CShader;
 class CModel;
+class CCullingState;
 NS_END
 
 NS_BEGIN(Client)
+struct MESH_LAYER_BIND_CONTEXT;
 enum class MESH_LAYER_PROFILE : _uint;
 
 class CLevelDesignObject abstract : public CGameObject, public IEditable
@@ -26,6 +28,8 @@ protected:
 
 public:
 	const LD_OBJECT_DESC& Get_LevelDesignDesc() const { return m_tLevelDesignDesc; }
+	virtual _bool Is_CullingEnabled() const { return true; }
+	virtual _bool Is_CullTransformDynamic() const { return false; }
 
 #pragma region Editable
 public:
@@ -37,18 +41,12 @@ public:
 #pragma endregion
 
 protected:
-	LD_OBJECT_DESC	m_tLevelDesignDesc = {};
+	LD_OBJECT_DESC  m_tLevelDesignDesc = {};
+	CCullingState* m_pCullingState = { nullptr };
 
-	_bool			m_bUseShadow = { false };
-	_bool			m_bUseCullDistance = { true };
-	_bool			m_bUseCullFrustum = { true };
-	_bool			m_bVisible = { true };
-	_bool			m_bVisibleShadow = { false };
-	_bool			m_bHasCullBounds = { false };
-	_bool			m_bUseRotationInvariantCullBounds = { false };
-	_uint			m_iCullCheckCounter = { 0u };
-	BoundingBox		m_LocalBounds = {};
-	BoundingBox		m_WorldBounds = {};
+	_bool	m_bVisible = { true };
+	_bool	m_bVisibleShadow = { false };
+	_bool	m_bUseShadow = { false };
 
 protected:
 	void Add_EditModelSlot(vector<EDITABLE_MODEL_SLOT>* pOutSlots, const _tchar* pLabel, EDITABLE_MODEL_KIND eKind, CModel* pModel) const;
@@ -56,12 +54,10 @@ protected:
 	virtual void Collect_EditModelSlots(vector<EDITABLE_MODEL_SLOT>* pOutSlots) const;
 	virtual HRESULT On_ApplyEditPolicy(const EDIT_OBJECT_POLICY& Policy);
 
-	HRESULT	Ready_CullBounds(CModel* pModel, _float fBoundsMargin = 0.f);
-	HRESULT	Ready_CullBounds_RotationInvariant(CModel* pModel, _float fBoundsMargin = 0.f);
-	void	Set_CullLocalBounds(const BoundingBox& LocalBounds);
-	void	Refresh_WorldBounds();
+	HRESULT Ready_CullingState(CModel* pModel, _float fBoundsMargin = 0.f, _bool bRotationInvariant = false);
+	HRESULT Ready_CullingState(const BoundingBox& LocalBounds, _bool bRotationInvariant = false);
 	void	Check_Visible();
-	void	Submit_RenderGroups(RENDERID eMainID = RENDERID::NONBLEND);
+	void    Submit_RenderGroups(RENDERID eMainID = RENDERID::NONBLEND);
 	HRESULT Bind_ShadowTransforms(CShader* pShader, const _float4x4* pWorldOverride = nullptr) const;
 	HRESULT Render_ShadowMesh(CShader* pShader, CModel* pModel, _uint iMeshIndex, MESH_LAYER_PROFILE eProfile) const;	// Anim 개별 구현용
 	HRESULT Render_ShadowModel(CShader* pShader, CModel* pModel, MESH_LAYER_PROFILE eProfile, const _float4x4* pWorldOverride = nullptr) const;	// NonAnim 공통

@@ -242,9 +242,7 @@ void CMapStage::Submit_VisibleSections()
 
 		const _bool bVisibleMain =
 			!pSection->Is_Culling()
-			|| !m_pGameInstance_Proxy->Should_CullAABB(
-				CULLING_VIEW::MAIN_CAMERA,
-				pSection->Get_WorldBounds());
+			|| !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, pSection->Get_WorldBounds());
 
 		if (bVisibleMain)
 		{
@@ -252,10 +250,14 @@ void CMapStage::Submit_VisibleSections()
 			m_pGameInstance_Proxy->Add_RenderGroup(eRenderID, pSection);
 		}
 
-		// ESM policy:
-		// Map sections must always submit their complete depth to the shadow pass.
-		// Main-camera culling must not remove shadow casters, because off-camera sections can still affect visible shadow results.
-		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pSection);
+		// Main-camera culling must not remove shadow casters.
+		// Shadow-direction frustum culling is evaluated independently.
+		const _bool bVisibleShadow =
+			!pSection->Is_Culling()
+			|| !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, pSection->Get_WorldBounds());
+
+		if (bVisibleShadow)
+			m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pSection);
 	}
 }
 

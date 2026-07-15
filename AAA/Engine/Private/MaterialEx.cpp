@@ -1,5 +1,4 @@
 #include "MaterialEx.h"
-#include "Texture_Hub.h"
 #include "GameInstance.h"
 
 #include <filesystem>
@@ -18,15 +17,27 @@ HRESULT CMaterialEx::Initialize(const MATERIAL_DATA& data)
 	{
 		for (const _string& strTextureName : data.TextureNames[i])
 		{
-			const _string strTextureId = CTexture_Hub::Normalize_TextureName(strTextureName);
-			if (strTextureId.empty())
+			const _wstring strLookupName = StrToWstr(strTextureName);
+			if (strLookupName.empty())
+			{
+#ifdef _DEBUG
+				OutputDebugStringA("[TextureHub] CMaterialEx invalid texture name: ");
+				OutputDebugStringA(strTextureName.c_str());
+				OutputDebugStringA("\n");
+#endif
 				return E_FAIL;
-
-			const _wstring strLookupName = StrToWstr(strTextureId);
+			}
 
 			TEXTURE_HANDLE Handle = INVALID_TEXTURE_HANDLE;
 			if (FAILED(m_pProxy->Get_TextureFromHub(strLookupName.c_str(), &Handle)))
+			{
+#ifdef _DEBUG
+				OutputDebugStringA("[TextureHub] CMaterialEx texture lookup failed: ");
+				OutputDebugStringA(strTextureName.c_str());
+				OutputDebugStringA("\n");
+#endif
 				return E_FAIL;
+			}
 
 			m_MaterialHandles[i].push_back(Handle);
 		}
