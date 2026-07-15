@@ -35,6 +35,8 @@ public:
     void            Set_MoveSpeed(_float fMoveSpeed) { m_fMoveSpeed = fMoveSpeed; }
     _float          Get_MoveSpeed() const { return m_fMoveSpeed; }
     void            Set_RotSpeed(_float fRotSpeedDeg) { m_fRotSpeedDeg = fRotSpeedDeg; }
+    _float          Get_Accel() const { return m_fAccel; }
+    _float          Get_Decel() const { return m_fDecel; }
     _float          Get_VerticalVelocity() { return m_fVerticalVelocity; }
     _bool           Move(_fvector vWishDir, _float fTimeDelta);
     void            Jump();

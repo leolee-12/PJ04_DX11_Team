@@ -224,6 +224,18 @@ HRESULT CLoader::Ready_WorkQueue()
         if (FAILED(Read_Manifest(LAUNCHER_LEVEL_PROFILES::LEVEL_BOSS_STAGE1, LEVEL::BOSS_STAGE1)))
             return E_FAIL;
         break;
+    case LEVEL::STAGE1_STEP1:
+        if (FAILED(Read_Manifest(LAUNCHER_LEVEL_PROFILES::LEVEL_STAGE1_STEP1, LEVEL::STAGE1_STEP1)))
+            return E_FAIL;
+        break;
+    case LEVEL::STAGE1_STEP2:
+        if (FAILED(Read_Manifest(LAUNCHER_LEVEL_PROFILES::LEVEL_STAGE1_STEP2, LEVEL::STAGE1_STEP2)))
+            return E_FAIL;
+        break;
+    case LEVEL::STAGE1_STEP3:
+        if (FAILED(Read_Manifest(LAUNCHER_LEVEL_PROFILES::LEVEL_STAGE1_STEP3, LEVEL::STAGE1_STEP3)))
+            return E_FAIL;
+        break;
     case LEVEL::END:
         break;
     default:

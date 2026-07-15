@@ -37,6 +37,7 @@
     <ClInclude Include="..\public\Boss_Armadillo.h" />
     <ClInclude Include="..\public\Boss_Armadillo_Body.h" />
     <ClInclude Include="..\public\Boss_Armadillo_Brain.h" />
+    <ClInclude Include="..\public\Boss_Armadillo_Cage.h" />
     <ClInclude Include="..\public\Boss_Brain.h" />
     <ClInclude Include="..\public\Boss_Cage.h" />
     <ClInclude Include="..\public\Boss_Cage_Body.h" />
@@ -412,6 +413,7 @@
     <ClCompile Include="..\private\Boss_Armadillo.cpp" />
     <ClCompile Include="..\private\Boss_Armadillo_Body.cpp" />
     <ClCompile Include="..\private\Boss_Armadillo_Brain.cpp" />
+    <ClCompile Include="..\private\Boss_Armadillo_Cage.cpp" />
     <ClCompile Include="..\private\Boss_Brain.cpp" />
     <ClCompile Include="..\private\Boss_Cage.cpp" />
     <ClCompile Include="..\private\Boss_Cage_Body.cpp" />

@@ -32,7 +32,7 @@ HRESULT CProjectile_Boulder::Ready_Visual()
     m_pAnimatorCom = Add_Component<CAnimator>(TEXT("Com_Animator"), CAnimator::Create(m_pDevice, m_pContext));
     if (nullptr == m_pAnimatorCom || FAILED(m_pAnimatorCom->Initialize(&ad))) return E_FAIL;
 
-    if (m_pMovement) m_pMovement->Set_Physics(-45.f, RESTITUTION, HORIZ_DAMP);  // ºÎ¸ð ¹«ºê¸ÕÆ® Æ©´×
+    if (m_pMovement) m_pMovement->Set_Physics(-45.f, RESTITUTION, HORIZ_DAMP);
     return S_OK;
 }
 
