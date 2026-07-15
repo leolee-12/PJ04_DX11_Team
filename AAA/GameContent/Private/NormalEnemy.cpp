@@ -48,7 +48,8 @@ HRESULT CNormalEnemy::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	m_eCopyAbility = COPY_ABILITY_TYPE::NONE;
+	m_eCopyAbility	= COPY_ABILITY_TYPE::NONE;
+	m_fCullDist		= 60.f;
 
 	if (m_pTransformCom)
 		m_pTransformCom->Set_RotationPerSec(360.f);

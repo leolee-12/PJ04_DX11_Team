@@ -51,7 +51,8 @@ HRESULT CPoppyBrosJr::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	m_eCopyAbility = COPY_ABILITY_TYPE::NONE;		// TODO : BOMB 능력 구현 시 변경
+	m_eCopyAbility = COPY_ABILITY_TYPE::BOMB;		
+	m_fCullDist = 95.f;
 
 	if (m_pTransformCom)
 		m_pTransformCom->Set_RotationPerSec(180.f);

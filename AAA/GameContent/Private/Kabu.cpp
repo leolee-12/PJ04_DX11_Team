@@ -42,6 +42,7 @@ HRESULT CKabu::Initialize(void* pArg)
         return E_FAIL;
 
     m_eCopyAbility = COPY_ABILITY_TYPE::NONE;
+    m_fCullDist = 95.f;
 
     return S_OK;
 }

@@ -43,6 +43,8 @@ HRESULT CMonster::Initialize_Prototype()
 
 HRESULT CMonster::Initialize(void* pArg)
 {
+	m_iCullPhase = rand() % 8;
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
@@ -93,6 +95,7 @@ void CMonster::Update(_float fTimeDelta)
 	if (!m_bActive) return;
 
 	fTimeDelta = Filter_TimeDelta(fTimeDelta);
+	Update_CullGrade(fTimeDelta);
 #ifdef _DEBUG
 	if (m_pGameInstance_Proxy->Is_EditMode())
 	{
@@ -535,6 +538,69 @@ void CMonster::Perceive(_float fTimeDelta)
 
 	m_BlackBoard.bCanSeeTarget = true;
 	m_BlackBoard.vLastKnownPos = m_BlackBoard.vTargetPos;
+}
+
+void CMonster::Update_CullGrade(_float fTimeDelta)
+{
+	if (m_fCullDist <= 0.f)
+	{
+		m_CullState = {};
+		m_CullState.fAnimDt = fTimeDelta;
+		return;
+	}
+
+	BoundingSphere tSphere{};
+	XMStoreFloat3(&tSphere.Center,
+		m_pTransformCom->Get_State(STATE::POSITION));
+	tSphere.Radius = Get_CapsuleHeight() * 0.5f
+		+ Get_CapsuleRadius();
+
+	const CULLING_FADE_RESULT tFade =
+		m_pGameInstance_Proxy->Evaluate_DistanceFade(
+			tSphere, m_fCullDist, m_fFadeRange);
+
+	if (FLT_MAX == tFade.fBoundaryDistance)
+	{   // fail-open: treat as FULL
+		m_CullState = {};
+		m_CullState.fAnimDt = fTimeDelta;
+		return;
+	}
+
+	m_CullState.fDissolve = tFade.fDissolve;
+	m_CullState.bRenderCull = tFade.bCulled;
+
+	if (m_pGameInstance_Proxy->Is_EditMode())
+	{   // keep visibility fresh, no dt accum
+		m_fAnimAccum = 0.f;
+		m_CullState.bAnimTick = false;
+		m_CullState.fAnimDt = 0.f;
+		return;
+	}
+
+	const _uint iPeriod =
+		Calc_AnimPeriod(tFade.fBoundaryDistance);
+
+	m_fAnimAccum += fTimeDelta;
+	++m_iCullFrame;
+
+	m_CullState.bAnimTick = (iPeriod <= 1)
+		|| (0 == ((m_iCullFrame + m_iCullPhase) % iPeriod));
+
+	if (m_CullState.bAnimTick)
+	{
+		m_CullState.fAnimDt = m_fAnimAccum;
+		m_fAnimAccum = 0.f;
+	}
+}
+
+_uint CMonster::Calc_AnimPeriod(_float fDist) const
+{
+	const _uint* P = s_bUseAnimURO ? s_iPeriodB : s_iPeriodA;
+
+	if (m_CullState.bRenderCull)		return P[3];
+	if (fDist >= m_fBandQuarter)		return P[2];
+	if (fDist >= m_fBandHalf)			return P[1];
+	return P[0];
 }
 
 _bool CMonster::Handle_SharedAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)

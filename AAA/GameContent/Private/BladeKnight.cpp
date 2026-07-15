@@ -52,6 +52,7 @@ HRESULT CBladeKnight::Initialize(void* pArg)
         return E_FAIL;
 
     m_eCopyAbility = COPY_ABILITY_TYPE::SWORD;
+    m_fCullDist = 95.f;
 
     if (m_pTransformCom)
         m_pTransformCom->Set_RotationPerSec(180.f);     // 직렬화 되면 전부 초기값 0으로 덮어씌어짐 
