@@ -11,10 +11,14 @@ namespace
 {
     LEVEL Resolve_DebugLevel(const _wstring& strLevelTag)
     {
-        if (strLevelTag == L"STAGE0_STEP1" || strLevelTag == L"Stage0_Step1" || strLevelTag == L"Stage1-1") return LEVEL::STAGE0_STEP1;
-        if (strLevelTag == L"STAGE0_STEP2" || strLevelTag == L"Stage0_Step2" || strLevelTag == L"Stage1-2") return LEVEL::STAGE0_STEP2;
-        if (strLevelTag == L"TOWN_STEP1" || strLevelTag == L"Town_Step1") return LEVEL::TOWN_STEP1;
-        if (strLevelTag == L"BOSS_STAGE1" || strLevelTag == L"Boss_Stage1" || strLevelTag == L"BossMap1") return LEVEL::BOSS_STAGE1;
+        if (strLevelTag == L"STAGE0_STEP1") return LEVEL::STAGE0_STEP1;
+        if (strLevelTag == L"STAGE0_STEP2") return LEVEL::STAGE0_STEP2;
+        if (strLevelTag == L"TOWN_STEP1") return LEVEL::TOWN_STEP1;
+        if (strLevelTag == L"TOWN_STEP2") return LEVEL::TOWN_STEP2;
+        if (strLevelTag == L"BOSS_STAGE1" ) return LEVEL::BOSS_STAGE1;
+        if (strLevelTag == L"STAGE1_STEP1") return LEVEL::STAGE1_STEP1;
+        if (strLevelTag == L"STAGE1_STEP2") return LEVEL::STAGE1_STEP2;
+        if (strLevelTag == L"STAGE1_STEP3") return LEVEL::STAGE1_STEP3;
         if (strLevelTag == L"TEST" || strLevelTag == L"Test") return LEVEL::TEST;
         return LEVEL::END;
     }
@@ -101,18 +105,18 @@ HRESULT CStage0_Step1::Render()
 HRESULT CStage0_Step1::Ready_Events()
 {
     Subscribe_Event(TEXT("FadeOut_Done"), [this](void* p) {
-        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::STAGE0_STEP2);
-        if (pLoadingLevel)
-        {
-            m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
-            return;
-        }
-        //CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::TOWN_STEP1);
+        //CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::STAGE0_STEP2);
         //if (pLoadingLevel)
         //{
         //    m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
         //    return;
         //}
+        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::STAGE1_STEP1);
+        if (pLoadingLevel)
+        {
+            m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
+            return;
+        }
         });
 
 #ifdef _DEBUG

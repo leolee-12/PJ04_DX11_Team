@@ -78,6 +78,7 @@ public:
 
 public:
 	void			Set_AnimationIndex(_uint iIndex, _bool isLoop = false, _bool isRestart = false, _float fBlendDuration = 0.2f);
+	void			Set_BindPose();
 	_int			Get_AnimationIndex(const string& strName) const;
 	const string&	Get_CurrentAnimName() const;
 	void			Seek_Animation(_float fProgress);

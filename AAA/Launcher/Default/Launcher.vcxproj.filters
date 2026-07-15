@@ -34,6 +34,18 @@
     <Filter Include="01. Levels\02. Stage\Stage0\Step2">
       <UniqueIdentifier>{6d55a08f-131c-4560-a1b6-3bd1f7f8b9ac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Levels\02. Stage\Stage1">
+      <UniqueIdentifier>{06985dac-141f-4434-aa61-c7258f882ca9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\02. Stage\Stage1\Step1">
+      <UniqueIdentifier>{d9c71d7a-1fa7-4d2a-ab06-20cf0171bbfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\02. Stage\Stage1\Step2">
+      <UniqueIdentifier>{7d635cf2-26a5-40a6-af0a-29a68827dc75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\02. Stage\Stage1\Step3">
+      <UniqueIdentifier>{8c2569c1-b0da-4935-9ed8-d2d5460b56cf}</UniqueIdentifier>
+    </Filter>
     <Filter Include="01. Levels\02. Stage\Town">
       <UniqueIdentifier>{81fad0a1-e0d1-4ac4-ae20-35684e0b277a}</UniqueIdentifier>
     </Filter>
@@ -83,6 +95,15 @@
     </ClInclude>
     <ClInclude Include="..\public\Stage0_Step2.h">
       <Filter>01. Levels\02. Stage\Stage0\Step2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Stage1_Step1.h">
+      <Filter>01. Levels\02. Stage\Stage1\Step1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Stage1_Step2.h">
+      <Filter>01. Levels\02. Stage\Stage1\Step2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Stage1_Step3.h">
+      <Filter>01. Levels\02. Stage\Stage1\Step3</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Town_Step1.h">
       <Filter>01. Levels\02. Stage\Town\Step1</Filter>
@@ -137,6 +158,15 @@
     </ClCompile>
     <ClCompile Include="..\private\Stage0_Step2.cpp">
       <Filter>01. Levels\02. Stage\Stage0\Step2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Stage1_Step1.cpp">
+      <Filter>01. Levels\02. Stage\Stage1\Step1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Stage1_Step2.cpp">
+      <Filter>01. Levels\02. Stage\Stage1\Step2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Stage1_Step3.cpp">
+      <Filter>01. Levels\02. Stage\Stage1\Step3</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Town_Step1.cpp">
       <Filter>01. Levels\02. Stage\Town\Step1</Filter>

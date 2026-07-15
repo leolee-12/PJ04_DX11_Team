@@ -172,6 +172,7 @@
 #include "Boss_Armadillo.h"
 #include "Boss_Armadillo_Body.h"
 #include "Projectile_Partner.h"
+#include "Boss_Armadillo_Cage.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
@@ -1298,6 +1299,12 @@ void CGameObject_Factory::Register_MainBoss()
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Armadillo/Partner/PartnerModel_Anim.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Partner::PROTOTYPE_TAG,
                 CProjectile_Partner::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Armadillo_Cage::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Armadillo/Cage/Cage_Anim.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Armadillo_Cage::PROTOTYPE_TAG,
+                CBoss_Armadillo_Cage::Create(pDevice, pContext));
         )
     );
 }
