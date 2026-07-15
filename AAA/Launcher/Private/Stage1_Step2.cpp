@@ -1,4 +1,4 @@
-#include "Stage0_Step1.h"
+#include "Stage1_Step2.h"
 
 #include "GameInstance.h"
 #include "Loader_Prototype.h"
@@ -6,35 +6,20 @@
 #include "Launcher_LevelProfiles.h"
 #include "Level_Loading.h"
 
-#ifdef _DEBUG
-namespace
-{
-    LEVEL Resolve_DebugLevel(const _wstring& strLevelTag)
-    {
-        if (strLevelTag == L"STAGE0_STEP1" || strLevelTag == L"Stage0_Step1" || strLevelTag == L"Stage1-1") return LEVEL::STAGE0_STEP1;
-        if (strLevelTag == L"STAGE0_STEP2" || strLevelTag == L"Stage0_Step2" || strLevelTag == L"Stage1-2") return LEVEL::STAGE0_STEP2;
-        if (strLevelTag == L"TOWN_STEP1" || strLevelTag == L"Town_Step1") return LEVEL::TOWN_STEP1;
-        if (strLevelTag == L"BOSS_STAGE1" || strLevelTag == L"Boss_Stage1" || strLevelTag == L"BossMap1") return LEVEL::BOSS_STAGE1;
-        if (strLevelTag == L"TEST" || strLevelTag == L"Test") return LEVEL::TEST;
-        return LEVEL::END;
-    }
-}
-#endif
-
-CStage0_Step1::CStage0_Step1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CLevel { pDevice, pContext }
+CStage1_Step2::CStage1_Step2(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+    : CLevel{ pDevice, pContext }
 {
 }
 
-HRESULT CStage0_Step1::Initialize()
+HRESULT CStage1_Step2::Initialize()
 {
     if (FAILED(__super::Initialize()))
         return E_FAIL;
 
-    _uint iLevel = ETOUI(LEVEL::STAGE0_STEP1);
+    _uint iLevel = ETOUI(LEVEL::STAGE1_STEP2);
 
     LEVEL_MANIFEST Manifest{};
-    if (FAILED(Load_LevelManifest(LAUNCHER_LEVEL_PROFILES::LEVEL_STAGE0_STEP1, &Manifest)))
+    if (FAILED(Load_LevelManifest(LAUNCHER_LEVEL_PROFILES::LEVEL_STAGE1_STEP2, &Manifest)))
         return E_FAIL;
 
     MAP_LOAD_RESULT MapReport{};
@@ -77,11 +62,12 @@ HRESULT CStage0_Step1::Initialize()
     if (FAILED(Ready_Lights()))
         return E_FAIL;
 
+    m_pGameInstance_Proxy->Play_BGM_Fade(L"K15_Grassland1.marker.wav", 5.f, 0.15f);
 
     return S_OK;
 }
 
-void CStage0_Step1::Update(_float fTimeDelta)
+void CStage1_Step2::Update(_float fTimeDelta)
 {
 #ifdef  _DEBUG
     if (m_pGameInstance_Proxy->Key_Down(DIK_F1))
@@ -90,61 +76,30 @@ void CStage0_Step1::Update(_float fTimeDelta)
     {
         m_pGameInstance_Proxy->Toggle_DebugRender();
     }
+    if (m_pGameInstance_Proxy->Key_Down(DIK_0))
+        m_pGameInstance_Proxy->Publish(TEXT("Armadillo_Appear"), nullptr);
 #endif //  _DEBUG
 }
 
-HRESULT CStage0_Step1::Render()
+HRESULT CStage1_Step2::Render()
 {
     return S_OK;
 }
 
-HRESULT CStage0_Step1::Ready_Events()
+HRESULT CStage1_Step2::Ready_Events()
 {
     Subscribe_Event(TEXT("FadeOut_Done"), [this](void* p) {
-        //CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::STAGE0_STEP2);
-        //if (pLoadingLevel)
-        //{
-        //    m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
-        //    return;
-        //}
-        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::STAGE1_STEP1);
+        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::STAGE1_STEP3);
         if (pLoadingLevel)
         {
             m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
             return;
         }
         });
-
-#ifdef _DEBUG
-    Subscribe_Event(TEXT("Debug Level Change"), [this](void* p){
-        const TRIGGER_EVENT_PAYLOAD* pPayload = static_cast<const TRIGGER_EVENT_PAYLOAD*>(p);
-        if (nullptr == pPayload)
-        {
-            OutputDebugStringW(L"[Stage0_Step1] Debug Level Change payload is null.\n");
-            return;
-        }
-
-        const LEVEL eNextLevel = Resolve_DebugLevel(pPayload->strPayload);
-        if (LEVEL::END == eNextLevel)
-        {
-            const _wstring strLog = L"[Stage0_Step1] Unknown debug level payload: " + pPayload->strPayload + L"\n";
-            OutputDebugStringW(strLog.c_str());
-            return;
-        }
-
-        CLevel_Loading* pLoadingLevel = CLevel_Loading::Create(m_pDevice, m_pContext, eNextLevel);
-        if (pLoadingLevel)
-        {
-            m_pGameInstance_Proxy->Change_Level(ETOUI(LEVEL::LOADING), pLoadingLevel);
-            return;
-        }
-        });
-#endif
-
     return S_OK;
 }
 
-HRESULT CStage0_Step1::Ready_Lights()
+HRESULT CStage1_Step2::Ready_Lights()
 {
     LIGHT_DESC LightDesc{};
 
@@ -161,20 +116,20 @@ HRESULT CStage0_Step1::Ready_Lights()
     return S_OK;
 }
 
-CStage0_Step1* CStage0_Step1::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CStage1_Step2* CStage1_Step2::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CStage0_Step1* pInstance = new CStage0_Step1(pDevice, pContext);
+    CStage1_Step2* pInstance = new CStage1_Step2(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize()))
     {
-        MSG_BOX("Failed to Created : CStage0_Step1");
+        MSG_BOX("Failed to Created : CStage1_Step2");
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CStage0_Step1::Free()
+void CStage1_Step2::Free()
 {
     if (m_pGameInstance_Proxy)
         m_pGameInstance_Proxy->Set_TimeScale(1.f);

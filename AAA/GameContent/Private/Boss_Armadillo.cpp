@@ -3,7 +3,8 @@
 #include "Monster_Movement.h"
 #include "Boss_Armadillo_Brain.h"
 #include "Boss_Armadillo_Body.h"
-#include "Animator.h"
+#include "Boss_Armadillo_Cage.h"
+
 #include "Projectile_Partner.h"
 #include "Projectile_Manager.h"
 
@@ -37,6 +38,8 @@ HRESULT CBoss_Armadillo::Initialize(void* pArg)
         m_pMovement->Set_RotSpeed(120.f);
     }
 
+    Subscribe_Event(EventTag::QTE_Success, [this](void*) { m_bQTEEscaped = true; });
+
     return S_OK;
 }
 
@@ -50,8 +53,11 @@ void CBoss_Armadillo::Update(_float fTimeDelta)
     }
     if (m_pGameInstance_Proxy->Key_Down(DIK_0))
         Appear();
+    if (m_pGameInstance_Proxy->Key_Down(DIK_9))
+        m_bDebugWallHit = true;
 #endif
     __super::Update(fTimeDelta);
+    Update_BodyOffset(fTimeDelta);
 }
 
 void CBoss_Armadillo::Late_Update(_float fTimeDelta)
@@ -82,6 +88,8 @@ void CBoss_Armadillo::Play_Death()
     if (auto* p = Get_HitBoxPart())
         p->Enable_AllHitBoxes(false);
 
+    Hide_Cage();
+
     if (m_pPartner) { m_pPartner->Despawn(); m_pPartner = nullptr; }
 
     if (CAnimator* pAnim = Get_BodyAnimator())
@@ -111,8 +119,52 @@ CMultiHitBoxPart* CBoss_Armadillo::Get_HitBoxPart() const
     return m_pBody;
 }
 
+void CBoss_Armadillo::Begin_QTE(_float fSeconds)
+{
+    m_bQTEEscaped = false;
+    m_fQTETimer = fSeconds;
+    m_pGameInstance_Proxy->Publish(EventTag::QTE_Show, nullptr);
+}
+
+void CBoss_Armadillo::End_QTE()
+{
+    m_pGameInstance_Proxy->Publish(EventTag::QTE_Hide, nullptr);
+}
+
+void CBoss_Armadillo::Fire_Grab()
+{
+    if (nullptr == m_pBody)
+        return;
+
+    KIRBY_ATTACHMENT_BEGIN_DESC grab{};
+    grab.pBoneMatrix = m_pBody->Get_BoneMatrixPtr(GRAB_BONE);
+    grab.pSourceWorld = m_pTransformCom->Get_WorldMatrixPtr();
+    grab.eType = KIRBY_ATTACHMENT_CONTEXT::GORILLA_COMBAT;
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentBegin, &grab);
+}
+
+void CBoss_Armadillo::Fire_Release(KIRBY_ATTACHMENT_END_REASON eType)
+{
+    KIRBY_ATTACHMENT_END_DESC desc{ eType };
+    m_pGameInstance_Proxy->Publish(EventTag::Kirby_AttachmentEnd, &desc);
+}
+
 _bool CBoss_Armadillo::Sweep_Wall(const _float3& vDir, _float fDist, _float3* pOutNormal) const
 {
+#ifdef _DEBUG
+    if (m_bDebugWallHit)
+    {
+        m_bDebugWallHit = false;  
+        if (pOutNormal)
+        {
+            _vector d = XMVector3Normalize(XMVectorSetY(XMLoadFloat3(&vDir), 0.f));
+            _float fJitter = XMConvertToRadians(((rand() % 81) - 40) * 1.f);
+            XMStoreFloat3(pOutNormal, XMVector3Transform(-d, XMMatrixRotationY(fJitter)));
+        }
+        return true;
+    }
+#endif
+
     _float3 vPos;
     XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
     vPos.y += s_fCCT_Height * 0.5f;   // 몸통 중심 높이에서 쏨
@@ -128,6 +180,23 @@ _bool CBoss_Armadillo::Sweep_Wall(const _float3& vDir, _float fDist, _float3* pO
     return true;
 }
 
+void CBoss_Armadillo::Set_TwinDanceOffset(_bool bOn)
+{
+    if (!m_pBody) return;
+
+    if (bOn)
+    {
+        const _float4x4* pBone = m_pBody->Get_BoneMatrixPtr("Partner1L");
+        if (!pBone) return;
+        m_vBodyOffsetTarget = _float3(-pBone->_41 * 0.5f, 0.f, -pBone->_43 * 0.5f);
+    }
+    else
+        m_vBodyOffsetTarget = _float3(0.f, 0.f, 0.f);
+
+    XMStoreFloat3(&m_vBodyOffsetStart, m_pBody->Get_Transform()->Get_State(STATE::POSITION));
+    m_fBodyOffsetT = 0.f;
+}
+
 void CBoss_Armadillo::Summon_Partner()
 {
     if (m_pPartner) return;
@@ -138,7 +207,7 @@ void CBoss_Armadillo::Summon_Partner()
     if (!p) return;
 
     p->Attach_To_Socket(m_pBody->Get_BoneMatrixPtr("Partner1L"),
-        m_pTransformCom->Get_WorldMatrixPtr(), XMMatrixIdentity());
+        m_pBody->Get_CombinedWorldMatrixPtr(), XMMatrixIdentity());
     m_pPartner = static_cast<CProjectile_Partner*>(p);
 }
 
@@ -174,6 +243,18 @@ void CBoss_Armadillo::Play_PartnerAnim(const _char* szClip, _bool bLoop)
     if (m_pPartner) m_pPartner->Play_Anim(szClip, bLoop);
 }
 
+void CBoss_Armadillo::Show_Cage()
+{
+    if (m_pCage)
+        m_pCage->Set_Active(true);
+}
+
+void CBoss_Armadillo::Hide_Cage()
+{
+    if (m_pCage)
+        m_pCage->Set_Active(false);
+}
+
 HRESULT CBoss_Armadillo::Ready_AnimEvents()
 {
     CAnimator* pAnim = Get_BodyAnimator();
@@ -195,6 +276,32 @@ HRESULT CBoss_Armadillo::Ready_AnimEvents()
                     Fire_PartnerThrow();
                 break;
             }
+            case EANIM_EVENT::OnOffPart:
+            {
+                if (phase != ANIM_EVENT_PHASE::POINT) break;
+
+                if (e.iIntParam == 0)
+                    Hide_Cage();
+
+                break;
+            }
+            case EANIM_EVENT::CamTrack:
+            {
+                if (phase != ANIM_EVENT_PHASE::POINT) break;
+
+                if (!e.strParam.empty())
+                {
+                    wstring w = StrToWstr(e.strParam);
+                    Fire_CatchCamera(w.c_str());
+                }
+                else
+                {
+                    CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
+                    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+                }
+
+                break;
+            }
         }
         });
     return S_OK;
@@ -206,11 +313,49 @@ HRESULT CBoss_Armadillo::Ready_PartObjects()
         CBoss_Armadillo_Body::PROTOTYPE_TAG, CBoss_Armadillo_Body::PART_TAG);
     if (!m_pBody) return E_FAIL;
 
-    // 잡기 명중 판정
+    m_pCage = Add_MonsterPart<CBoss_Armadillo_Cage>(
+        CBoss_Armadillo_Cage::PROTOTYPE_TAG, CBoss_Armadillo_Cage::PART_TAG,
+        m_pBody->Get_BoneMatrixPtr("RHaveL"));
+    if (!m_pCage) return E_FAIL;
+
     m_pBody->Set_HitBox_OnEnter(CBoss_Armadillo_Body::AHB_CATCH,
-        [this](CCollider*) { m_bCatchHit = true; });
+        [this](CCollider* pOther)
+        {
+            if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
+                return;
+            if (m_bCatchHit)
+                return;
+
+            m_bCatchHit = true;
+            m_pBody->Enable_HitBox(CBoss_Armadillo_Body::AHB_CATCH, false);
+            Fire_Grab();
+        });
 
     return S_OK;
+}
+
+void CBoss_Armadillo::Update_BodyOffset(_float fTimeDelta)
+{
+    if (!m_pBody || m_fBodyOffsetT >= 1.f)
+        return;
+
+    m_fBodyOffsetT = min(m_fBodyOffsetT + fTimeDelta / s_fBodyOffsetBlendTime, 1.f);
+
+    _float t = m_fBodyOffsetT * m_fBodyOffsetT * (3.f - 2.f * m_fBodyOffsetT);
+
+    _vector vPos = XMVectorLerp(XMLoadFloat3(&m_vBodyOffsetStart),
+        XMLoadFloat3(&m_vBodyOffsetTarget), t);
+    m_pBody->Get_Transform()->Set_State(STATE::POSITION, XMVectorSetW(vPos, 1.f));
+}
+
+void CBoss_Armadillo::Fire_CatchCamera(const _tchar* szTrack)
+{
+    CUTSCENE_CAMERA_DESC cam{};
+    cam.eCam = ECutsceneCam::Cutscene;
+    cam.szTrack = szTrack;
+    cam.pProgress = Get_BodyAnimator();                      
+    cam.pAnchorWorld = m_pTransformCom->Get_WorldMatrixPtr();
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
 }
 
 CBoss_Armadillo* CBoss_Armadillo::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

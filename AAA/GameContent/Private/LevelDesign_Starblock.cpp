@@ -214,6 +214,20 @@ void CLevelDesign_Starblock::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
 }
 
+void CLevelDesign_Starblock::Spawn_DestroyEffects()
+{
+	_float3 vPos{};
+	if (!Compute_EffectSpawnPosition(m_pModelCom, DESTROY_EFFECT_HEIGHT_RATIO, &vPos))
+		XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+	const LD_STARBLOCK_CATALOG* pCatalog = Find_StarblockCatalog(m_tBreakableDesc.strObjectName);
+
+	if (nullptr != pCatalog && nullptr != pCatalog->pDestroyEffectId)
+		CEffect_Loader::GetInstance()->Spawn(pCatalog->pDestroyEffectId, Get_LevelIndex(), vPos);
+
+	m_pGameInstance_Proxy->Play_SFX(L"GimmickBasic_BlockCrash.wav", 0.3f);
+}
+
 #pragma region Damageable
 void CLevelDesign_Starblock::Damaged(const ATTACK_INFO& tInfo)
 {
@@ -222,25 +236,7 @@ void CLevelDesign_Starblock::Damaged(const ATTACK_INFO& tInfo)
 	if (!m_bActive)
 		return;
 
-	const _float4* pCamLook = m_pGameInstance_Proxy->Get_CamLook();
-
-	_float3 vFaceCam{};
-	XMStoreFloat3(&vFaceCam, XMVectorNegate(XMLoadFloat4(pCamLook)));
-
-	_float3 vPos{};
-	if (!Compute_EffectSpawnPosition(m_pModelCom, DESTROY_EFFECT_HEIGHT_RATIO, &vPos))
-		XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
-
-	const LD_STARBLOCK_CATALOG* pCatalog = Find_StarblockCatalog(m_tBreakableDesc.strObjectName);
-
-	CEffect_Loader::GetInstance()->Spawn(L"CommonHit", Get_LevelIndex(), vPos, vFaceCam, _float3(0.f, 0.f, 0.f), nullptr);
-
-	if (nullptr != pCatalog && nullptr != pCatalog->pDestroyEffectId)
-		CEffect_Loader::GetInstance()->Spawn(pCatalog->pDestroyEffectId, Get_LevelIndex(), vPos);
-
-	// (임시 연결)
-	// TODO : 어택 타입에 따른 사운드 분기
-	m_pGameInstance_Proxy->Play_SFX(L"GimmickBasic_BlockCrash.wav", 0.3f);
+	Spawn_DestroyEffects();
 
 	Enable_Colliders(false);
 	Release_RigidStatic();
@@ -260,6 +256,9 @@ void CLevelDesign_Starblock::Be_Captured(CGameObject* pInhaler)
 
 void CLevelDesign_Starblock::On_SpatEnd()
 {
+	if (m_bActive)
+		Spawn_DestroyEffects();
+
 	__super::On_SpatEnd();
 	m_bCullTransformDynamic = false;
 }
@@ -288,9 +287,6 @@ HRESULT CLevelDesign_Starblock::Ready_Components()
 	m_pModelCom = Add_Component<CModel>(m_tBreakableDesc.iModelProtoLevel, pModelProtoTag,
 		TEXT("Com_Model"));
 	if (nullptr == m_pModelCom)
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
 		return E_FAIL;
 
 	if (FAILED(Ready_RigidStatic()))
@@ -356,6 +352,9 @@ HRESULT CLevelDesign_Starblock::Bind_ShaderResources()
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
 		return E_FAIL;
 
 	const _float4 vEmissiveColor = { 0.f, 0.f, 0.f, 0.f };

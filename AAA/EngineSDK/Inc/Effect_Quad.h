@@ -5,6 +5,7 @@
 NS_BEGIN(Engine)
 
 class CVIBuffer_Rect;
+namespace EffectRect { struct VALUES; }
 
 class ENGINE_DLL CEffect_Quad abstract : public CEffect_NonParticle
 {
@@ -72,6 +73,7 @@ private:
     _float2 m_fCurMaskAniSize{};
 
 private:
+    EffectRect::VALUES Make_RectValues();
     void Init_PropertyValue();
 };
 
