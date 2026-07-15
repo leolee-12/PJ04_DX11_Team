@@ -57,6 +57,9 @@ void CDropStar::Update(_float fTimeDelta)
 		return;
 	}
 
+	if (m_eState == DROPSTAR_STATE::LIVE)
+		Apply_Roll(fTimeDelta);
+
 	__super::Update(fTimeDelta);
 
 	if (m_eState == DROPSTAR_STATE::CAPTURED)
@@ -106,6 +109,9 @@ void CDropStar::Activate(const _float3& vPos, _float fDelay)
 	m_bAvailable = true;
 	m_pCaptor = nullptr;
 	m_eState = DROPSTAR_STATE::DELAY;
+
+	if (m_pBody && m_pBody->Get_Animator())
+		m_pBody->Get_Animator()->Play("NormalPosition", true, true);
 
 	m_fDelay = fDelay;      
 	m_fTimer = 0.f;
@@ -175,6 +181,8 @@ void CDropStar::On_SpatBegin()
 
 	Set_Active(true);
 
+	Update_SpatPivot_FromBone();
+
 	if (m_pMovement)
 		m_pMovement->Stop();
 	if (m_pController)
@@ -205,8 +213,8 @@ HRESULT CDropStar::Ready_Collider()
 {
 	CCollider::COLLIDER_DESC ColliderDesc{};
 	ColliderDesc.pOwner = this;
-	ColliderDesc.vCenter = { 0.f, 0.5f, 0.f };
-	ColliderDesc.fRadius = 1.0f;
+	ColliderDesc.vCenter = { 0.f, 0.85f, 0.f };
+	ColliderDesc.fRadius = 0.85f;
 
 	m_pCollider = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, TEXT("Com_DropStarCollider"), &ColliderDesc);
 	if (nullptr == m_pCollider)
@@ -221,7 +229,7 @@ HRESULT CDropStar::Ready_Movement()
 {
 	CController::CONTROLLER_DESC cd{};
 	cd.pOwner = this;
-	cd.fRadius = 0.5f;
+	cd.fRadius = 0.85f;
 	cd.fHeight = 0.01f;
 	cd.vFootPos = { 0.f, 0.f, 0.f };
 
@@ -263,6 +271,9 @@ void CDropStar::Reveal()
 {
 	m_eState = DROPSTAR_STATE::LIVE;
 	m_fTimer = 0.f;
+	if (m_pBody && m_pBody->Get_Animator())
+		m_pBody->Get_Animator()->Play("BoundlPosition", true, true);
+
 
 	if (m_pController)
 	{
@@ -309,6 +320,18 @@ void CDropStar::Update_Captured(_float fTimeDelta)
 		m_vBaseScale.z * m_fScaleRatio);
 }
 
+void CDropStar::Update_SpatPivot_FromBone()
+{
+	if (nullptr == m_pBody)
+		return;
+
+	const _float4x4* pBone = m_pBody->Get_BoneMatrixPtr("CenterL");
+	if (nullptr == pBone)
+		return;
+
+	m_vSpatPivot = _float3(pBone->_41, pBone->_42, pBone->_43);
+}
+
 void CDropStar::On_Swallowed()
 {
 	SWALLOW_EVENT payload{ this };
@@ -345,6 +368,19 @@ void CDropStar::Return_ToPool()
 {
 	if (m_pPool)
 		m_pPool->Return(m_iPoolLevel, m_strPoolKey, this);
+}
+
+void CDropStar::Apply_Roll(_float fTimeDelta)
+{
+	if (m_pBody == nullptr)
+		return;
+
+	CAnimator* pAnim = m_pBody->Get_Animator();
+	if (pAnim == nullptr)
+		return;
+
+	m_fRollAngle = fmodf(m_fRollAngle + s_fRollSpeed * fTimeDelta, 360.f);
+	pAnim->SetBoneRotation("CenterL", m_fRollAngle, XMVectorSet(0.f, 1.f, 0.f, 0.f));
 }
 
 CDropStar* CDropStar::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

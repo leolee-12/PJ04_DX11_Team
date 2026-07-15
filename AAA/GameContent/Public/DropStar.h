@@ -41,13 +41,12 @@ public:
     void                        Activate(const _float3& vPos, _float fDelay = 0.f);
     void                        Launch(const _float3& vDir);
 
-
     // Inhalable 
     virtual _bool               Can_BeInhaled(const INHALE_QUERY& q) const override;
     virtual void                Be_Captured(CGameObject* pInhaler) override;
     virtual COPY_ABILITY_TYPE   Get_CopyAbility() const override  { return COPY_ABILITY_TYPE::NONE; }
     virtual CGameObject*        Get_GameObject() override { return this; }
-    virtual _float3             Get_SpatPivotOffset() const override  {  return _float3(0.f, 0.f, 0.f);  }
+    virtual _float3             Get_SpatPivotOffset() const override { return m_vSpatPivot; }
     virtual void                On_SpatBegin() override;
     virtual void                On_SpatEnd() override;
 
@@ -60,9 +59,12 @@ private:
 
     void                        Reveal();
     void                        Update_Captured(_float fTimeDelta);
+    void                        Update_SpatPivot_FromBone();
     void                        On_Swallowed();
     void                        Despawn();
     void                        Return_ToPool();
+
+    void                        Apply_Roll(_float fTimeDelta);
 
 private:
     CDropStar_Body*             m_pBody = { nullptr };
@@ -80,11 +82,14 @@ private:
     DROPSTAR_STATE              m_eState = { DROPSTAR_STATE::DELAY };
 
     _float3                     m_vBaseScale = {};
+    _float3                     m_vSpatPivot = { 0.f, 0.f, 0.f };
     _float                      m_fDelay = { 0.f };     
     _float                      m_fTimer = { 0.f };
     _float                      m_fPullSpeed = { 0.f };
     _float                      m_fScaleRatio = { 1.f };
     _bool                       m_bAvailable = { true };
+
+    _float                      m_fRollAngle = { 0.f };
 
     static constexpr _float     s_fPullAccel = { 40.f };
     static constexpr _float     s_fMinScaleRatio = { 0.45f };
@@ -96,6 +101,7 @@ private:
     static constexpr _float     s_fHorizDamp = { 0.85f };
     static constexpr _float     s_fLaunchSpeed = { 4.f };
     static constexpr _float     s_fPopUpSpeed = { 6.f };
+    static constexpr _float     s_fRollSpeed = { 180.f };
 
 public:
     static CDropStar*           Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

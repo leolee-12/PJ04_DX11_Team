@@ -27,6 +27,8 @@ HRESULT CDropStar_Body::Initialize(void* pArg)
 
 	if (m_pAnimatorCom)
 		m_pAnimatorCom->Play("NormalPosition", true, true);
+		//m_pAnimatorCom->Play("BoundlPosition", true, true);
+
 
 	return S_OK;
 }
@@ -106,6 +108,14 @@ HRESULT CDropStar_Body::Render_Shadow()
 	}
 
 	return S_OK;
+}
+
+const _float4x4* CDropStar_Body::Get_BoneMatrixPtr(const _string& strBone) const
+{
+	if (nullptr == m_pModelCom)
+		return nullptr;
+
+	return m_pModelCom->Get_BoneMatrixPtr(strBone);
 }
 
 HRESULT CDropStar_Body::Ready_Components()

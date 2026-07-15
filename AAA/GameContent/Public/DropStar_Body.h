@@ -41,6 +41,7 @@ public:
 	}
 
 	CAnimator*				Get_Animator() const { return m_pAnimatorCom; }
+	const _float4x4*		Get_BoneMatrixPtr(const _string& strBone) const;
 
 protected:
 	HRESULT					Ready_Components();
