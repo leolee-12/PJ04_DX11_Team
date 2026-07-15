@@ -64,7 +64,7 @@ public:
     _int  Advance_ToAdjacentPillar();
 
     void Spawn_HandNails();
-    void Launch_HandNails();
+    void Launch_NextHandNail();
 
 private:
     CBoss_Leopard_Body* m_pBody = { nullptr };

@@ -14,6 +14,24 @@ CProjectile_Nail::CProjectile_Nail(const CProjectile_Nail& Prototype)
     : CProjectile(Prototype) {
 }
 
+void CProjectile_Nail::Launch_At(const _float3& vTargetPos)
+{
+    _vector vPos = m_pTransformCom->Get_State(Engine::STATE::POSITION);   
+
+    _vector vDir = XMLoadFloat3(&vTargetPos) - vPos;
+    if (XMVectorGetX(XMVector3LengthSq(vDir)) < 1e-6f)
+        vDir = m_pTransformCom->Get_State(Engine::STATE::LOOK);           
+    vDir = XMVector3Normalize(vDir);
+
+    _float3 vP, vD;
+    XMStoreFloat3(&vP, vPos);
+    XMStoreFloat3(&vD, vDir);
+
+    Launch(vP, vD);                    
+    m_pTransformCom->LookTo(vDir);     
+    m_eState = STATE::FLYING;
+}
+
 HRESULT CProjectile_Nail::Ready_Visual()
 {
     m_pShaderCom = Add_Component<CShader>(Shader_NonAnimMesh_PBR.iLevelID,

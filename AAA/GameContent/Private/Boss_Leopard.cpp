@@ -81,7 +81,7 @@ HRESULT CBoss_Leopard::Ready_AnimEvents()
 
             case EANIM_EVENT::Projectile:      // iIntParam: 0=생성/부착, 1=발사(다음 단계)
                 if (e.iIntParam == 0) Spawn_HandNails();
-                // else Launch_HandNails();
+                else                  Launch_NextHandNail();
                 break;
 
             default: break;
@@ -124,8 +124,17 @@ void CBoss_Leopard::Spawn_HandNails()
     }
 }
 
-void CBoss_Leopard::Launch_HandNails()
+void CBoss_Leopard::Launch_NextHandNail()
 {
+    const _float3 vTarget = Get_BlackBoard().vTargetPos;   
+
+    for (_int i = 0; i < NAIL_COUNT; ++i)
+    {
+        if (!m_pNails[i]) continue;
+        m_pNails[i]->Launch_At(vTarget);
+        m_pNails[i] = nullptr;
+        return;                   
+    }
 }
 
 CMonsterBrain* CBoss_Leopard::Create_Brain()
@@ -224,6 +233,8 @@ void CBoss_Leopard::On_Enter_Corpse()
     _float3 vPos{};
     XMStoreFloat3(&vPos, vPosV);
     CEffect_Loader::GetInstance()->Spawn(L"DeathSmoke", m_iPrototypeLevel, vPos);
+
+    m_pGameInstance_Proxy->Publish(EventTag::Level_BossDefeated, nullptr);
 }
 
 _bool CBoss_Leopard::Get_HurtBoxDesc(CAPSULE_DESC& Out) const

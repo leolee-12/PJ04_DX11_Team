@@ -135,6 +135,8 @@ void CBoss_Armadillo::On_Enter_Corpse()
     _float3 vPos{};
     XMStoreFloat3(&vPos, vPosV);
     CEffect_Loader::GetInstance()->Spawn(L"DeathSmoke", m_iPrototypeLevel, vPos);
+
+    m_pGameInstance_Proxy->Publish(EventTag::Level_BossDefeated, nullptr);
 }
 
 _bool CBoss_Armadillo::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
