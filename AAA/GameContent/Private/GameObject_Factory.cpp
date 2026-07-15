@@ -56,6 +56,8 @@
 #include "Kirby_Body.h"
 #include "Kirby_DeformCar_Demo.h"
 #include "Kirby_DeformCar_Main.h"
+#include "Kirby_DeformCylinder_Demo.h"
+#include "Kirby_DeformCylinder_Main.h"
 #include "Kirby_BombHat.h"
 #include "Kirby_IceHat.h"
 #include "Kirby_Sword.h"
@@ -581,6 +583,20 @@ void CGameObject_Factory::Register_Container()
                 CKirby_DeformCar_Main::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Kirby_DeformCar_Main"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/DeformCar/Main.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            // Kirby_DeformCylinder_Demo
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_DeformCylinder_Demo::PROTOTYPE_TAG,
+                CKirby_DeformCylinder_Demo::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Kirby_DeformCylinder_Demo"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/DeformCylinder/Demo/Demo.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            // Kirby_DeformCylinder_Main
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKirby_DeformCylinder_Main::PROTOTYPE_TAG,
+                CKirby_DeformCylinder_Main::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Kirby_DeformCylinder_Main"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSE/DeformCylinder/Model/Main.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
 
             // Ability

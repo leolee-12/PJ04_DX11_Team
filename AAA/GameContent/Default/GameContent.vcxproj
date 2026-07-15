@@ -144,6 +144,9 @@
     <ClInclude Include="..\Public\Kirby_DeformCar_Demo.h" />
     <ClInclude Include="..\Public\Kirby_DeformCar_Main.h" />
     <ClInclude Include="..\Public\Kirby_Deform_Car.h" />
+    <ClInclude Include="..\Public\Kirby_DeformCylinder_Demo.h" />
+    <ClInclude Include="..\Public\Kirby_DeformCylinder_Main.h" />
+    <ClInclude Include="..\Public\Kirby_Deform_Cylinder.h" />
     <ClInclude Include="..\Public\Kirby_Deform.h" />
     <ClInclude Include="..\Public\Kirby_Deform_Model.h" />
     <ClInclude Include="..\Public\Kirby_DeformCarBridge.h" />
@@ -519,6 +522,9 @@
     <ClCompile Include="..\Private\Kirby_DeformCar_Demo.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCar_Main.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform_Car.cpp" />
+    <ClCompile Include="..\Private\Kirby_DeformCylinder_Demo.cpp" />
+    <ClCompile Include="..\Private\Kirby_DeformCylinder_Main.cpp" />
+    <ClCompile Include="..\Private\Kirby_Deform_Cylinder.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform.cpp" />
     <ClCompile Include="..\Private\Kirby_Deform_Model.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformCarBridge.cpp" />
