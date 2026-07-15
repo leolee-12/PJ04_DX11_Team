@@ -41,6 +41,9 @@ void CPanel_Palette::Render()
 		{
 			for (auto& strTag : tags)
 			{
+				if (category == L"LEVELDESIGN_OBJECT" && strTag == CLD_DeformObject::PROTOTYPE_TAG)
+					continue;
+
 				string strLabel = WstrToStr(strTag);
 				if (ImGui::Button(strLabel.c_str()))
 				{
@@ -62,9 +65,9 @@ void CPanel_Palette::Render()
 					{
 						pLevel->Begin_PlaceMode(strTag, CLD_AudioArea::LAYER_TAG);
 					}
-					else if (category == L"LEVELDESIGN_OBJECT" && strTag == CLD_DeformObject::PROTOTYPE_TAG)
+					else if (category == L"DEFORM_OBJECT")
 					{
-							pLevel->Begin_PlaceMode(strTag, CLD_DeformObject::LAYER_TAG);
+						pLevel->Begin_PlaceMode(strTag, CLD_DeformObject::LAYER_TAG);
 					}
 
 				}

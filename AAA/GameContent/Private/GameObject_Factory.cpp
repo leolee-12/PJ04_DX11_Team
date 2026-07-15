@@ -779,6 +779,39 @@ void CGameObject_Factory::Register_NonAnimObject()
 
 void CGameObject_Factory::Register_AnimObject()
 {
+    const ResourceLoader DeformObjectLoader = LOADER(
+        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Proto_Component_Model_DeformCar"),
+            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/DeformCar/DeformCar.ysh",
+                true, XMMatrixRotationY(XMConvertToRadians(180.f))));
+        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Proto_Component_Model_DeformCoaster"),
+            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/DeformCoaster/DeformCoaster.ysh",
+                true, XMMatrixRotationY(XMConvertToRadians(180.f))));
+        TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Proto_Component_Model_DeformCylinder"),
+            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/DeformCylinder/DeformCylinder.ysh",
+                true, XMMatrixRotationY(XMConvertToRadians(180.f))));
+            );
+
+    Register(CLD_DeformObject::PROTOTYPE_TAG_CAR, TEXT("DEFORM_OBJECT"),
+        [](ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+        {
+            return dynamic_cast<CBase*>(CLD_DeformObject::Create_ByType(pDevice, pContext, DEFORM_TYPE::CAR));
+        },
+        DeformObjectLoader);
+
+    Register(CLD_DeformObject::PROTOTYPE_TAG_COASTER, TEXT("DEFORM_OBJECT"),
+        [](ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+        {
+            return dynamic_cast<CBase*>(CLD_DeformObject::Create_ByType(pDevice, pContext, DEFORM_TYPE::COASTER));
+        },
+        DeformObjectLoader);
+
+    Register(CLD_DeformObject::PROTOTYPE_TAG_CYLINDER, TEXT("DEFORM_OBJECT"),
+        [](ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+        {
+            return dynamic_cast<CBase*>(CLD_DeformObject::Create_ByType(pDevice, pContext, DEFORM_TYPE::CYLINDER));
+        },
+        DeformObjectLoader);
+
     Register(CLD_Stage1BossDemo::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_Stage1BossDemo),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_Stage1BossDemo::MODEL_PROTO_TAG,
             Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/Level1BossDemoBg/Level1BossDemoBg.ysh", true));));
