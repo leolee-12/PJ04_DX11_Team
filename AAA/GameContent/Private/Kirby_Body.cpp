@@ -2,8 +2,6 @@
 
 #include "GameInstance.h"
 
-#include "Effect_Loader.h"
-
 #include "kirby.h"
 
 CKirby_Body::CKirby_Body(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -91,7 +89,7 @@ HRESULT CKirby_Body::Ready_AnimEvents(CKirby* pKirby)
     m_pAnimatorCom->Set_EventCallback(
         [this, pKirby](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
         {
-            if (Handle_AnimEventParent(e, ePhase) == true)
+            if (Handle_AnimEventParent(pKirby, e, ePhase) == true)
                 return;
 
             if (pKirby->Dispatch_BodyAnimEventToAbility(e, ePhase) == true)
@@ -128,57 +126,6 @@ HRESULT CKirby_Body::Ready_AnimEvents(CKirby* pKirby)
                     break;
                 }
 
-                case EANIM_EVENT::Fx:
-                {
-                    if (ePhase != ANIM_EVENT_PHASE::POINT)
-                        break;
-
-                    if (e.strParam.empty())
-                        break;
-
-                    CTransform* pKirbyTransform = pKirby->Get_Transform();
-
-                    const _vector vForward = XMVector3Normalize(XMVectorSetY(pKirbyTransform->Get_State(STATE::LOOK), 0.f));
-                    const _vector vRight = XMVector3Normalize(XMVectorSetY(pKirbyTransform->Get_State(STATE::RIGHT), 0.f));
-                    const _vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
-
-                    _float3 vPos{};
-                    XMStoreFloat3(&vPos, pKirbyTransform->Get_State(STATE::POSITION) +
-                        vRight * e.vOffset.x + vUp * e.vOffset.y + vForward * e.vOffset.z);
-
-                    _vector vSpawnLook = XMVectorZero();
-
-                    switch (static_cast<KIRBY_FX_DIRECTION>(e.iIntParam))
-                    {
-                        case KIRBY_FX_DIRECTION::NONE:
-                            break;
-                        case KIRBY_FX_DIRECTION::FORWARD:
-                            vSpawnLook = vForward;
-                            break;
-                        case KIRBY_FX_DIRECTION::BACKWARD:
-                            vSpawnLook = -vForward;
-                            break;
-                        case KIRBY_FX_DIRECTION::RIGHT:
-                            vSpawnLook = vRight;
-                            break;
-                        case KIRBY_FX_DIRECTION::LEFT:
-                            vSpawnLook = -vRight;
-                            break;
-                        case KIRBY_FX_DIRECTION::BACKWARD_RIGHT:
-                            vSpawnLook = XMVector3Normalize(-vForward + vRight);
-                            break;
-                        case KIRBY_FX_DIRECTION::BACKWARD_LEFT:
-                            vSpawnLook = XMVector3Normalize(-vForward - vRight);
-                            break;
-                    }
-
-                    _float3 vLook{};
-                    XMStoreFloat3(&vLook, vSpawnLook);
-
-                    CEffect_Loader::GetInstance()->Spawn(StrToWstr(e.strParam), pKirby->Get_LevelIndex(), vPos, vLook);
-
-                    break;
-                }
             }
         }
     );
