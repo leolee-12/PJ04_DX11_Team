@@ -120,6 +120,9 @@
     <ClInclude Include="targetver.h">
       <Filter>98. Default</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Level_Defines.h">
+      <Filter>01. Levels</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Launcher.ico">

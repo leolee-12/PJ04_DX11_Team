@@ -1033,9 +1033,6 @@
     <Filter Include="03. SystemObject\SequencePlayer">
       <UniqueIdentifier>{3ba1b310-8431-447a-884a-81d9b62168a3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="95. MissionManager">
-      <UniqueIdentifier>{e0d34630-b576-4457-a2ab-631e6dd9009e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="97. DataSystem">
       <UniqueIdentifier>{2bc4e55e-b3fc-4cf9-af28-7e79ae4f5749}</UniqueIdentifier>
     </Filter>
@@ -1089,6 +1086,12 @@
     </Filter>
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. SystemObject\MissionManager">
+      <UniqueIdentifier>{e0d34630-b576-4457-a2ab-631e6dd9009e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97. DataSystem\LevelLight">
+      <UniqueIdentifier>{07f47be9-0809-449c-a534-e6f9de324a23}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1783,7 +1786,7 @@
       <Filter>00. GameObject\07. Boss\MiniBoss</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Mission_Manager.h">
-      <Filter>95. MissionManager</Filter>
+      <Filter>03. SystemObject\MissionManager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Monster.h">
       <Filter>00. GameObject\06. Monster</Filter>
@@ -2168,6 +2171,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\WalkSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LevelLight_DB.h">
+      <Filter>97. DataSystem\LevelLight</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2799,7 +2805,7 @@
       <Filter>00. GameObject\07. Boss\MiniBoss</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Mission_Manager.cpp">
-      <Filter>95. MissionManager</Filter>
+      <Filter>03. SystemObject\MissionManager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Monster.cpp">
       <Filter>00. GameObject\06. Monster</Filter>
@@ -3166,6 +3172,9 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LevelLight_DB.cpp">
+      <Filter>97. DataSystem\LevelLight</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,10 +1,6 @@
 #include "Town_Step1.h"
 
-#include "GameInstance.h"
-#include "Loader_Prototype.h"
-#include "Map_Loader.h"
-#include "Launcher_LevelProfiles.h"
-#include "Level_Loading.h"
+#include "Level_Defines.h"
 
 CTown_Step1::CTown_Step1(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel{ pDevice, pContext }
@@ -97,17 +93,7 @@ HRESULT CTown_Step1::Ready_Events()
 
 HRESULT CTown_Step1::Ready_Lights()
 {
-    LIGHT_DESC LightDesc{};
-
-    LightDesc.eType = LIGHT::DIRECTIONAL;
-    LightDesc.vDiffuse = _float4(6.2f, 6.15f, 5.76f, 1.f);
-    //LightDesc.vAmbient = _float4(1.72f, 0.82f, 0.41f, 1.f);
-    LightDesc.vAmbient = _float4(0.f, 0.f, 0.f, 1.f);
-    LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
-    LightDesc.vDirection = _float4(0.557f, -0.766f, 0.321f, 0.f);
-
-    if (FAILED(m_pGameInstance_Proxy->Add_Light(LightDesc)))
-        return E_FAIL;
+    CLevelLight_DB::Apply(m_pGameInstance_Proxy, LEVEL::TOWN_STEP1);
 
     return S_OK;
 }

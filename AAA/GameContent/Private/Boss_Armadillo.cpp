@@ -8,7 +8,8 @@
 #include "Projectile_Partner.h"
 #include "Projectile_Manager.h"
 
-// 보스러쉬용: 페이즈 구분 없음 (Brain의 Get_PhaseCount = 1과 일치)
+#include "Effect_Loader.h"
+
 const vector<_float> CBoss_Armadillo::s_Thresholds = {};
 
 CBoss_Armadillo::CBoss_Armadillo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -29,7 +30,8 @@ HRESULT CBoss_Armadillo::Initialize(void* pArg)
         return E_FAIL;
 
     m_strBossName = L"아르마파라파";
-    m_fMaxHP = 1000.f;
+    //m_fMaxHP = 1000.f;
+    m_fMaxHP = 100.f;
     m_fCurHP = m_fMaxHP;
 
     if (m_pMovement)
@@ -57,6 +59,7 @@ void CBoss_Armadillo::Update(_float fTimeDelta)
         m_bDebugWallHit = true;
 #endif
     __super::Update(fTimeDelta);
+    Tick_DeathSequence(fTimeDelta);
     Update_BodyOffset(fTimeDelta);
 }
 
@@ -89,22 +92,49 @@ _bool CBoss_Armadillo::Is_Intro_Finished() const
 
 void CBoss_Armadillo::Play_Death()
 {
-    Enable_Colliders(false);              // 메인보스: 즉시 콜라이더 off
+    Enable_Colliders(false);
     if (auto* p = Get_HitBoxPart())
         p->Enable_AllHitBoxes(false);
 
     Hide_Cage();
-
     if (m_pPartner) { m_pPartner->Despawn(); m_pPartner = nullptr; }
 
+    _vector vDir = XMVectorSetY(
+        XMLoadFloat3(&Get_BlackBoard().vTargetPos) - m_pTransformCom->Get_State(STATE::POSITION), 0.f);
+    if (XMVectorGetX(XMVector3LengthSq(vDir)) > 1e-6f)
+        m_pTransformCom->LookTo(XMVector3Normalize(vDir));
+
     if (CAnimator* pAnim = Get_BodyAnimator())
-        pAnim->Play("DeathDamage", false, true, 0.f, 1.f);   // DeathWait/Death 클립도 있음. 연출 늘릴 때 사용
+        pAnim->Play("Death", false, true, 0.f, 1.5f);
+
+    m_pGameInstance_Proxy->Publish(EventTag::FullScreen_Flash, nullptr);
+
+    m_bDeathSeq = true;
+    m_eDeathStep = EDEATH::POSE_WAIT;
+    m_iDeathPoseDelay = 2;
 }
 
 _bool CBoss_Armadillo::Is_Death_Finished() const
 {
     CAnimator* pAnim = Get_BodyAnimator();
-    return pAnim ? pAnim->Is_Finished() : true;
+    if (!pAnim) return true;
+    if (m_bDeathSeq) return false;
+    return pAnim->Is_Finished();
+}
+
+void CBoss_Armadillo::On_Enter_Corpse()
+{
+    __super::On_Enter_Corpse();
+
+    _vector vPosV = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vLookV = XMVector3Normalize(m_pTransformCom->Get_State(STATE::LOOK));
+
+    vPosV -= vLookV * 2.5f;     
+    vPosV = XMVectorSetY(vPosV, XMVectorGetY(vPosV) + 1.f);
+
+    _float3 vPos{};
+    XMStoreFloat3(&vPos, vPosV);
+    CEffect_Loader::GetInstance()->Spawn(L"DeathSmoke", m_iPrototypeLevel, vPos);
 }
 
 _bool CBoss_Armadillo::Get_HurtBoxDesc(CAPSULE_DESC& Out) const
@@ -361,6 +391,41 @@ void CBoss_Armadillo::Fire_CatchCamera(const _tchar* szTrack)
     cam.pProgress = Get_BodyAnimator();                      
     cam.pAnchorWorld = m_pTransformCom->Get_WorldMatrixPtr();
     m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+}
+
+void CBoss_Armadillo::Tick_DeathSequence(_float fTimeDelta)
+{
+    if (!m_bDeathSeq) return;
+    CAnimator* pAnim = Get_BodyAnimator();
+    if (!pAnim) { m_bDeathSeq = false; return; }
+
+    switch (m_eDeathStep)
+    {
+        case EDEATH::POSE_WAIT:
+            if (--m_iDeathPoseDelay <= 0)
+            {
+                pAnim->Pause();                       
+                m_fDeathPauseTimer = DEATH_PAUSE_SEC;
+
+                Play_OneShotSFX(TEXT("CharaBasic_DeadBigEnemy.wav"));
+
+                CAMERA_SHAKE_DESC shake{ 0.8f, DEATH_SHAKE_SEC };
+                m_pGameInstance_Proxy->Publish(EventTag::Camera_Shake, &shake);
+                m_eDeathStep = EDEATH::PAUSING;
+            }
+            break;
+
+        case EDEATH::PAUSING:
+            m_fDeathPauseTimer -= fTimeDelta;
+            if (m_fDeathPauseTimer <= 0.f)
+            {
+                pAnim->Resume();
+                m_eDeathStep = EDEATH::PLAYING;
+                m_bDeathSeq = false;
+            }
+            break;
+        default: break;
+    }
 }
 
 CBoss_Armadillo* CBoss_Armadillo::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

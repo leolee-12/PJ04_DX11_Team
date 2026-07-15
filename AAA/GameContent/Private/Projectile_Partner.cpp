@@ -46,7 +46,7 @@ void CProjectile_Partner::On_Activated()
         Update_Socket();
         if (m_pAnimatorCom)
         {
-            m_pAnimatorCom->Play("AppearShort2", false, true, 0.f, 1.f);
+            m_pAnimatorCom->Play("AppearShort2", false, true, 0.f, ANIM_SPEED);
             m_pAnimatorCom->Update(0.f);
         }
     }
@@ -56,7 +56,7 @@ void CProjectile_Partner::On_Launched()
 {
     m_eState = STATE::FLYING;
     if (m_pAnimatorCom)
-        m_pAnimatorCom->Play("TwinRolling", true, true);
+        m_pAnimatorCom->Play("TwinRolling", true, true, 0.2f, ANIM_SPEED);
 }
 
 void CProjectile_Partner::Enter_Break()
@@ -101,10 +101,10 @@ void CProjectile_Partner::Update(_float fTimeDelta)
         Enter_Break();
 }
 
-void CProjectile_Partner::Play_Anim(const _char* szClip, _bool bLoop)
+void CProjectile_Partner::Play_Anim(const _char* szClip, _bool bLoop, _float fSpeed)
 {
     if (m_pAnimatorCom)
-        m_pAnimatorCom->Play(szClip, bLoop, true, 0.1f, 1.f);
+        m_pAnimatorCom->Play(szClip, bLoop, true, 0.1f, fSpeed);
 }
 
 void CProjectile_Partner::Enable_SpinHitBox(_bool b)

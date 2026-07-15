@@ -15,6 +15,8 @@ public:
     static constexpr const _tchar* MODEL_PROTO_TAG = L"Prototype_Component_Model_ArmadilloPartner";
     static constexpr const _tchar* POOL_KEY = L"ArmadilloPartner";
 
+    static constexpr _float ANIM_SPEED = 1.5f;
+
     enum class STATE { CARRIED, FLYING, BREAKING };
 
 private:
@@ -28,7 +30,7 @@ public:
     virtual void    Copy_PrototypeName(ENGINE_OBJECT_DATA* pOut) override { pOut->strPrototypeTag = PROTOTYPE_TAG; }
 
 public:
-    void Play_Anim(const _char* szClip, _bool bLoop);     // 보스가 패턴에 맞춰 클립 동기화
+    void Play_Anim(const _char* szClip, _bool bLoop, _float fSpeed = ANIM_SPEED);
     void Enable_SpinHitBox(_bool b);                      // 트윈롤링 중 자체 판정
     void Despawn() { Kill(); }                            // 보스 사망 등 외부 정리용
 

@@ -1,10 +1,6 @@
 #include "Level_Test.h"
 
-#include "GameInstance.h"
-#include "Loader_Prototype.h"
-#include "Map_Loader.h"
-#include "Launcher_LevelProfiles.h"
-#include "Level_Loading.h"
+#include "Level_Defines.h"
 
 CLevel_Test::CLevel_Test(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CLevel (pDevice, pContext)
