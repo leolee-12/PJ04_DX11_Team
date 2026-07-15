@@ -13,16 +13,15 @@ NS_END
 
 NS_BEGIN(AnimUITool)
 
-class CPreview_DeformCar_Main final : public CGameObject
+class CPreview_DeformCylinder_Main final : public CGameObject
 {
-	GENERATED_BODY(CPreview_DeformCar_Main)
+	GENERATED_BODY(CPreview_DeformCylinder_Main)
 
 public:
-	enum DEFORM_CAR_MESH : _uint
+	enum DEFORM_CYLINDER_MESH : _uint
 	{
-		MESH_CAR = 0,
-		MESH_KIRBY = 1,
-		MESH_TIRES = 2,
+		MESH_KIRBY = 0,
+		MESH_CYLINDER = 1,
 		MESH_END
 	};
 
@@ -40,21 +39,21 @@ private:
 	}
 
 public:
-	typedef struct tagPreviewDeformCarDesc : public CGameObject::GAMEOBJECT_DESC
+	typedef struct tagPreviewDeformCylinderDesc : public CGameObject::GAMEOBJECT_DESC
 	{
 		const _tchar* szKirbyShaderTag = { L"Proto_Shader_Kirby" };
 		const _tchar* szPBRShaderTag = { L"Proto_Shader_AnimMesh" };
-		const _tchar* szModelTag = { L"Proto_Model_DeformCar" };
+		const _tchar* szModelTag = { L"Proto_Model_DeformCylinder" };
 		_uint iProtoLevel = { 0 };
 		_wstring strAnimEvents = {};
-	} PREVIEW_DEFORMCAR_DESC;
+	} PREVIEW_DEFORMCYLINDER_DESC;
 
-	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_Preview_DeformCar";
+	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_Preview_DeformCylinder";
 
 protected:
-	CPreview_DeformCar_Main(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CPreview_DeformCar_Main(const CPreview_DeformCar_Main& Prototype);
-	virtual ~CPreview_DeformCar_Main() = default;
+	CPreview_DeformCylinder_Main(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CPreview_DeformCylinder_Main(const CPreview_DeformCylinder_Main& Prototype);
+	virtual ~CPreview_DeformCylinder_Main() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -82,7 +81,7 @@ private:
 
 	CAnimator* m_pAnimatorCom = { nullptr };
 
-	PREVIEW_DEFORMCAR_DESC m_Desc{};
+	PREVIEW_DEFORMCYLINDER_DESC m_Desc{};
 	KIRBY_EYE_STATE m_eEye = { KIRBY_EYE_STATE::IDLE };
 	vector<_bool> m_MeshVisible;
 
@@ -98,7 +97,7 @@ private:
 	HRESULT Render_KirbyMesh(_uint iMeshIndex);
 
 public:
-	static CPreview_DeformCar_Main* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CPreview_DeformCylinder_Main* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 
 protected:

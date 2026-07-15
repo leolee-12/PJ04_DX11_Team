@@ -55,6 +55,7 @@ namespace Client
         inline constexpr const _tchar* Camera_Shake = L"Camera.Shake";
         inline constexpr const _tchar* Camera_Rumble = L"Camera.Rumble";
         inline constexpr const _tchar* BossCam_Focus = L"BossCam_Focus";
+        inline constexpr const _tchar* BossCam_Config = L"BossCam_Config";
 
         // Screen Fx
         inline constexpr const _tchar* FullScreen_Flash = L"Fx.FullScreenFlashOn";
@@ -168,6 +169,17 @@ namespace Client
     {
         CGameObject* pTarget = { nullptr };
         _float       fAimHeight = { 2.f };   // 타겟별 시선 높이
+    };
+
+    struct BOSSCAM_CONFIG_DESC
+    {
+        _float fBackDist = { 14.0f };        // 커비 뒤로 거리
+        _float fHeight = { 4.f };            // 카메라 높이
+        _float fShoulderOffset = { -1.8f };  // 양수=오른쪽 어깨
+        _float fAimBias = { 0.65f };         // 0=커비 / 1=보스
+        _float fAimHeight = { 6.f };         // 시선 높이(보스 크면 키움)
+        _float fSmoothTime = { 0.18f };      // 따라오는 부드러움
+        _float fFovDeg = { 50.f };           // FOV
     };
 #pragma endregion
 

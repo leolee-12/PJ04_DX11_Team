@@ -3,12 +3,12 @@
 #include "GameContrnt_Events.h"
 
 CEnemyBomb::CEnemyBomb(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CProjectile_Bomb { pDevice , pContext }
+	: CProjectile_Bomb{ pDevice , pContext }
 {
 }
 
 CEnemyBomb::CEnemyBomb(const CEnemyBomb& Prototype)
-	: CProjectile_Bomb ( Prototype ) 
+	: CProjectile_Bomb(Prototype)
 {
 }
 
@@ -71,7 +71,7 @@ HRESULT CEnemyBomb::Ready_Visual()
 		return E_FAIL;
 
 	m_pModelCom = Add_Component<CModel>(
-		m_iPrototypeLevel, MODEL_PROTO_TAG, TEXT("Com_Model"));
+m_iPrototypeLevel, MODEL_PROTO_TAG, TEXT("Com_Model"));
 	if (nullptr == m_pModelCom)
 		return E_FAIL;
 
@@ -126,10 +126,11 @@ void CEnemyBomb::Enter_State(BOMB_STATE eState)
 		Play_BodyAnim(ANIM_FUSE, false);
 		Start_Fuse();
 		Pause_Fuse();
+
 		Update_Socket();
 		Spawn_FuseFx();
 	}
-		break;
+	break;
 
 	case BOMB_STATE::FLYING:
 	{
@@ -138,14 +139,14 @@ void CEnemyBomb::Enter_State(BOMB_STATE eState)
 		Start_Fuse();
 		Spawn_FuseFx();
 	}
-		break;
+	break;
 
 	case BOMB_STATE::DANGER:
 	{
 		Play_DangerGlow();
 		Resume_Fuse();
 	}
-		break;
+	break;
 
 	case BOMB_STATE::CAPTURED:
 	{
@@ -159,7 +160,7 @@ void CEnemyBomb::Enter_State(BOMB_STATE eState)
 		m_vBaseScale = m_pTransformCom->Get_Scaled();
 		m_fScaleRatio = 1.f;
 	}
-		break;
+	break;
 
 	default:
 		break;
@@ -211,8 +212,8 @@ void CEnemyBomb::Update_Captured(_float fTimeDelta)
 
 	CTransform* pCapT = m_pCaptor->Get_Transform();
 	_vector vMouth = pCapT->Get_State(STATE::POSITION)
-						+ pCapT->Get_State(STATE::LOOK) * 0.6f
-						+ pCapT->Get_State(STATE::UP) * 0.6f;
+		+ pCapT->Get_State(STATE::LOOK) * 0.6f
+		+ pCapT->Get_State(STATE::UP) * 0.6f;
 
 	_vector vSelf = m_pTransformCom->Get_State(STATE::POSITION);
 	_vector vDir = vMouth - vSelf;
@@ -237,7 +238,7 @@ void CEnemyBomb::Update_Captured(_float fTimeDelta)
 
 	if (m_pAnimatorCom)
 	{
-		Apply_RollPose();		
+		Apply_RollPose();
 		m_pAnimatorCom->Update(fTimeDelta);
 	}
 }
@@ -270,5 +271,3 @@ void CEnemyBomb::Free()
 {
 	__super::Free();
 }
-
-

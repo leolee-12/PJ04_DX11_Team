@@ -76,9 +76,13 @@ HRESULT CSkySphere::Ready_Components()
 {
 	m_pShaderCom = Add_Component<CShader>(Shader_SkySphere.iLevelID, Shader_SkySphere.szProtoTag, TEXT("Com_Shader"));
 
-	m_pSphereModels[ETOUI(SKYTYPE::TEST)] = Add_Component<CModel>(Model_SkyTest.iLevelID, Model_SkyTest.szProtoTag, TEXT("Com_Model"));
-	if (m_pSphereModels[ETOUI(SKYTYPE::TEST)] == nullptr)
+	m_pSphereModels[ETOUI(SKYTYPE::DEFAULT)] = Add_Component<CModel>(Model_SkyDefault.iLevelID, Model_SkyDefault.szProtoTag, TEXT("Com_Model_Default"));
+	if (m_pSphereModels[ETOUI(SKYTYPE::DEFAULT)] == nullptr)
 		return E_FAIL;
+
+    m_pSphereModels[ETOUI(SKYTYPE::VOLCANO)] = Add_Component<CModel>(Model_SkyVolcano.iLevelID, Model_SkyVolcano.szProtoTag, TEXT("Com_Model_Volcano"));
+    if (m_pSphereModels[ETOUI(SKYTYPE::VOLCANO)] == nullptr)
+        return E_FAIL;
 
 	return S_OK;
 }

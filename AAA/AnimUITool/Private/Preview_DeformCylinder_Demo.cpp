@@ -1,4 +1,4 @@
-#include "Preview_DeformCar_Demo.h"
+#include "Preview_DeformCylinder_Demo.h"
 
 #include "Animator.h"
 #include "GameContent_AnimEvents.h"
@@ -7,29 +7,29 @@
 #include "Shader.h"
 #include "Texture.h"
 
-CPreview_DeformCar_Demo::CPreview_DeformCar_Demo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CPreview_DeformCylinder_Demo::CPreview_DeformCylinder_Demo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CGameObject( pDevice, pContext )
 	, m_eEye( KIRBY_EYE_STATE::IDLE )
 {
 }
 
-CPreview_DeformCar_Demo::CPreview_DeformCar_Demo(const CPreview_DeformCar_Demo& Prototype)
+CPreview_DeformCylinder_Demo::CPreview_DeformCylinder_Demo(const CPreview_DeformCylinder_Demo& Prototype)
 	: CGameObject( Prototype )
 	, m_eEye( Prototype.m_eEye )
 {
 }
 
-HRESULT CPreview_DeformCar_Demo::Initialize_Prototype()
+HRESULT CPreview_DeformCylinder_Demo::Initialize_Prototype()
 {
 	m_eProjType = PROJ_TYPE::PERSPEC;
 
 	return S_OK;
 }
 
-HRESULT CPreview_DeformCar_Demo::Initialize(void* pArg)
+HRESULT CPreview_DeformCylinder_Demo::Initialize(void* pArg)
 {
 	if (nullptr != pArg)
-		m_Desc = *static_cast<PREVIEW_DEFORMCAR_DEMO_DESC*>(pArg);
+		m_Desc = *static_cast<PREVIEW_DEFORMCYLINDER_DEMO_DESC*>(pArg);
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -42,7 +42,7 @@ HRESULT CPreview_DeformCar_Demo::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CPreview_DeformCar_Demo::Update(_float fTimeDelta)
+void CPreview_DeformCylinder_Demo::Update(_float fTimeDelta)
 {
 	if (!m_bActive)
 		return;
@@ -50,7 +50,7 @@ void CPreview_DeformCar_Demo::Update(_float fTimeDelta)
 	m_pAnimatorCom->Update(fTimeDelta);
 }
 
-void CPreview_DeformCar_Demo::Late_Update(_float fTimeDelta)
+void CPreview_DeformCylinder_Demo::Late_Update(_float fTimeDelta)
 {
 	if (!m_bActive)
 		return;
@@ -58,7 +58,7 @@ void CPreview_DeformCar_Demo::Late_Update(_float fTimeDelta)
 	m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
 }
 
-HRESULT CPreview_DeformCar_Demo::Render()
+HRESULT CPreview_DeformCylinder_Demo::Render()
 {
 	if (m_pModelCom->Get_NumMeshes() < MESH_END)
 		return E_FAIL;
@@ -78,7 +78,7 @@ HRESULT CPreview_DeformCar_Demo::Render()
 	return S_OK;
 }
 
-HRESULT CPreview_DeformCar_Demo::Ready_Components()
+HRESULT CPreview_DeformCylinder_Demo::Ready_Components()
 {
 	m_pKirbyShaderCom = Add_Component<CShader>(m_Desc.iProtoLevel, m_Desc.szKirbyShaderTag, TEXT("Com_Shader_Kirby"));
 	if (nullptr == m_pKirbyShaderCom)
@@ -89,6 +89,8 @@ HRESULT CPreview_DeformCar_Demo::Ready_Components()
 		return E_FAIL;
 
 	m_MeshVisible.assign(m_pModelCom->Get_NumMeshes(), true);
+	if (m_MeshVisible.size() > MESH_BODY_B)
+		m_MeshVisible[MESH_BODY_B] = false;
 
 	if (FAILED(Ready_EyeTextures()))
 		return E_FAIL;
@@ -109,13 +111,19 @@ HRESULT CPreview_DeformCar_Demo::Ready_Components()
 
 			if (EANIM_EVENT::SetEye == static_cast<EANIM_EVENT>(Event.iEventType))
 				Set_Eye(static_cast<KIRBY_EYE_STATE>(Event.iIntParam));
+			else if (EANIM_EVENT::OnOffMesh == static_cast<EANIM_EVENT>(Event.iEventType))
+			{
+				const _bool bBodyAOn = Event.iIntParam == 0;
+				Set_MeshVisible(MESH_BODY_A, bBodyAOn);
+				Set_MeshVisible(MESH_BODY_B, !bBodyAOn);
+			}
 		}
 	);
 
 	return S_OK;
 }
 
-_bool CPreview_DeformCar_Demo::Is_MeshVisible(_uint iMeshIndex) const
+_bool CPreview_DeformCylinder_Demo::Is_MeshVisible(_uint iMeshIndex) const
 {
 	if (iMeshIndex >= m_MeshVisible.size())
 		return false;
@@ -123,7 +131,7 @@ _bool CPreview_DeformCar_Demo::Is_MeshVisible(_uint iMeshIndex) const
 	return m_MeshVisible[iMeshIndex];
 }
 
-void CPreview_DeformCar_Demo::Set_MeshVisible(_uint iMeshIndex, _bool bVisible)
+void CPreview_DeformCylinder_Demo::Set_MeshVisible(_uint iMeshIndex, _bool bVisible)
 {
 	if (iMeshIndex >= m_MeshVisible.size())
 		return;
@@ -131,13 +139,13 @@ void CPreview_DeformCar_Demo::Set_MeshVisible(_uint iMeshIndex, _bool bVisible)
 	m_MeshVisible[iMeshIndex] = bVisible;
 }
 
-void CPreview_DeformCar_Demo::Set_AllMeshVisible(_bool bVisible)
+void CPreview_DeformCylinder_Demo::Set_AllMeshVisible(_bool bVisible)
 {
 	for (auto&& bMeshVisible : m_MeshVisible)
 		bMeshVisible = bVisible;
 }
 
-void CPreview_DeformCar_Demo::Set_SoloMesh(_uint iMeshIndex)
+void CPreview_DeformCylinder_Demo::Set_SoloMesh(_uint iMeshIndex)
 {
 	if (iMeshIndex >= m_MeshVisible.size())
 		return;
@@ -146,22 +154,22 @@ void CPreview_DeformCar_Demo::Set_SoloMesh(_uint iMeshIndex)
 		m_MeshVisible[i] = (i == iMeshIndex);
 }
 
-HRESULT CPreview_DeformCar_Demo::Ready_EyeTextures()
+HRESULT CPreview_DeformCylinder_Demo::Ready_EyeTextures()
 {
 	m_pEyeTextureCom = Add_Component<CTexture>(TEXT("Com_EyeTexture"), CTexture::Create(m_pDevice, m_pContext,
-		L"../../Resources/YSE/DeformCar/KirbyEye.%02d.dds", ETOUI(KIRBY_EYE_STATE::END)));
+		L"../../Resources/YSE/DeformCylinder/Demo/KirbyEye.%02d.dds", ETOUI(KIRBY_EYE_STATE::END)));
 	if (nullptr == m_pEyeTextureCom)
 		return E_FAIL;
 
 	m_pEyeMaskTextureCom = Add_Component<CTexture>(TEXT("Com_EyeMaskTexture"), CTexture::Create(m_pDevice, m_pContext,
-		L"../../Resources/YSE/DeformCar/KirbyEyeMask.%02d.dds", ETOUI(KIRBY_EYE_STATE::END)));
+		L"../../Resources/YSE/DeformCylinder/Demo/KirbyEyeMask.%02d.dds", ETOUI(KIRBY_EYE_STATE::END)));
 	if (nullptr == m_pEyeMaskTextureCom)
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CPreview_DeformCar_Demo::Bind_ShaderResources()
+HRESULT CPreview_DeformCylinder_Demo::Bind_ShaderResources()
 {
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pKirbyShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
@@ -175,7 +183,7 @@ HRESULT CPreview_DeformCar_Demo::Bind_ShaderResources()
 	return S_OK;
 }
 
-HRESULT CPreview_DeformCar_Demo::Render_KirbyMesh(_uint iMeshIndex)
+HRESULT CPreview_DeformCylinder_Demo::Render_KirbyMesh(_uint iMeshIndex)
 {
 	if (FAILED(m_pEyeTextureCom->Bind_ShaderResource(m_pKirbyShaderCom, "g_EyeTexture", ETOUI(m_eEye))))
 		return E_FAIL;
@@ -207,33 +215,33 @@ HRESULT CPreview_DeformCar_Demo::Render_KirbyMesh(_uint iMeshIndex)
 	return m_pModelCom->Render(iMeshIndex);
 }
 
-CPreview_DeformCar_Demo* CPreview_DeformCar_Demo::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CPreview_DeformCylinder_Demo* CPreview_DeformCylinder_Demo::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-	CPreview_DeformCar_Demo* pInstance = new CPreview_DeformCar_Demo(pDevice, pContext);
+	CPreview_DeformCylinder_Demo* pInstance = new CPreview_DeformCylinder_Demo(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created : CPreview_DeformCar_Demo");
+		MSG_BOX("Failed to Created : CPreview_DeformCylinder_Demo");
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject* CPreview_DeformCar_Demo::Clone(void* pArg)
+CGameObject* CPreview_DeformCylinder_Demo::Clone(void* pArg)
 {
-	CPreview_DeformCar_Demo* pInstance = new CPreview_DeformCar_Demo(*this);
+	CPreview_DeformCylinder_Demo* pInstance = new CPreview_DeformCylinder_Demo(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX("Failed to Cloned : CPreview_DeformCar_Demo");
+		MSG_BOX("Failed to Cloned : CPreview_DeformCylinder_Demo");
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CPreview_DeformCar_Demo::Free()
+void CPreview_DeformCylinder_Demo::Free()
 {
 	__super::Free();
 }

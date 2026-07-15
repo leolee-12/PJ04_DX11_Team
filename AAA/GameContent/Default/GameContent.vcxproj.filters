@@ -409,6 +409,9 @@
     <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\00. Deform_Car">
       <UniqueIdentifier>{b600ded8-bf65-4554-b846-776c35549114}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\01. Deform_Cylinder">
+      <UniqueIdentifier>{d7c7228e-2d75-4e9c-8e42-b4fd9a76a101}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts">
       <UniqueIdentifier>{ce8838df-6dca-44f5-99b6-21707344efd7}</UniqueIdentifier>
     </Filter>
@@ -421,11 +424,17 @@
     <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\01. DeformCar_Demo">
       <UniqueIdentifier>{bf99796d-3273-432e-a337-ddc43bb3ee3e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\02. DeformCylinder_Demo">
+      <UniqueIdentifier>{61353b47-0911-422f-a94e-3454f21909a5}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model">
       <UniqueIdentifier>{722bacb3-e3c5-48a6-b789-5ccdbd86c13f}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model\02. DeformCar_Main">
       <UniqueIdentifier>{30e6faec-8ca3-4f51-a179-3a72f1929f83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model\03. DeformCylinder_Main">
+      <UniqueIdentifier>{ee54d883-8d4f-4a92-9b53-3c45a377fe02}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\05. Kirby\03. Parts\KirbyOnOffParts">
       <UniqueIdentifier>{8c7ca4c1-aab7-415a-8406-92a604372a55}</UniqueIdentifier>
@@ -994,42 +1003,6 @@
     <Filter Include="00. GameObject\Test\Shader_Material">
       <UniqueIdentifier>{8e7d8120-ea3e-4545-ace5-aafa6c62179d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\Test\Terrain">
-      <UniqueIdentifier>{61edf243-83b4-4191-9339-07578a04f915}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestEffectQuad">
-      <UniqueIdentifier>{0d1ac5b9-9bf3-49d1-848a-61300fc9ce8b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestFiona">
-      <UniqueIdentifier>{0916bd2f-10ca-4681-a8f8-5b4d19f31718}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestImageContainer">
-      <UniqueIdentifier>{7f906e56-5e2d-404b-824c-cb4f519151e7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestMap">
-      <UniqueIdentifier>{63727501-0cde-4d54-ba7a-2748b3341edb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestMarb1e">
-      <UniqueIdentifier>{840c0faf-b354-4895-adb2-a5936fb65b71}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestMarb1eMap">
-      <UniqueIdentifier>{867f635d-c832-4d05-b596-a899a327f1a6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestMeshEmitter">
-      <UniqueIdentifier>{d07256ff-a017-43f1-a4ae-0d9b7af3dc98}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestMeshParticle">
-      <UniqueIdentifier>{8cd5923d-467a-464c-b4e8-7f7307487329}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestNonAnim">
-      <UniqueIdentifier>{cb877a97-6b0e-4817-bb69-d7e6836d721f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestParticle">
-      <UniqueIdentifier>{c3b2a3c6-b5a8-4b4a-82ac-7f8fd01b5452}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\Test\TestRect">
-      <UniqueIdentifier>{e586cfae-6cf8-428a-b68e-29fbbff687e2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01. Projectile">
       <UniqueIdentifier>{4eb96df4-f91b-4738-8689-7bb698826703}</UniqueIdentifier>
     </Filter>
@@ -1087,11 +1060,11 @@
     <Filter Include="03. SystemObject\Kirby SpawnPoint">
       <UniqueIdentifier>{7d4ea5e9-6555-47f7-ae04-007b1bcfcab8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03. SystemObject\MissionManager">
+      <UniqueIdentifier>{e0d34630-b576-4457-a2ab-631e6dd9009e}</UniqueIdentifier>
+    </Filter>
     <Filter Include="03. SystemObject\SequencePlayer">
       <UniqueIdentifier>{3ba1b310-8431-447a-884a-81d9b62168a3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="95. MissionManager">
-      <UniqueIdentifier>{e0d34630-b576-4457-a2ab-631e6dd9009e}</UniqueIdentifier>
     </Filter>
     <Filter Include="97. DataSystem">
       <UniqueIdentifier>{2bc4e55e-b3fc-4cf9-af28-7e79ae4f5749}</UniqueIdentifier>
@@ -1107,6 +1080,9 @@
     </Filter>
     <Filter Include="97. DataSystem\LevelDesignLoader">
       <UniqueIdentifier>{ac90f625-f08a-4a8a-89fd-03d9fa0dc850}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="97. DataSystem\LevelLight">
+      <UniqueIdentifier>{07f47be9-0809-449c-a534-e6f9de324a23}</UniqueIdentifier>
     </Filter>
     <Filter Include="97. DataSystem\MapLoader">
       <UniqueIdentifier>{077c1198-d891-486e-b491-c184ad619dd7}</UniqueIdentifier>
@@ -1596,14 +1572,23 @@
     <ClInclude Include="..\Public\Kirby_Deform_Car.h">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\00. Deform_Car</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_Deform_Cylinder.h">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\01. Deform_Cylinder</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Kirby_Deform_Model.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_DeformCar_Demo.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\01. DeformCar_Demo</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_DeformCylinder_Demo.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\02. DeformCylinder_Demo</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Kirby_DeformCar_Main.h">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model\02. DeformCar_Main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Kirby_DeformCylinder_Main.h">
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model\03. DeformCylinder_Main</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_DeformCarBridge.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\DeformCarBridge</Filter>
@@ -1785,6 +1770,9 @@
     <ClInclude Include="..\Public\LevelDesignObject.h">
       <Filter>00. GameObject\96. LevelDesign</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\LevelLight_DB.h">
+      <Filter>97. DataSystem\LevelLight</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Loader_Prototype.h">
       <Filter>97. DataSystem\DataLoader</Filter>
     </ClInclude>
@@ -1855,7 +1843,7 @@
       <Filter>00. GameObject\07. Boss\MiniBoss</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Mission_Manager.h">
-      <Filter>95. MissionManager</Filter>
+      <Filter>03. SystemObject\MissionManager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Monster.h">
       <Filter>00. GameObject\06. Monster</Filter>
@@ -2127,42 +2115,6 @@
     <ClInclude Include="..\Public\SwordTrail_BK.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Terrain.h">
-      <Filter>00. GameObject\Test\Terrain</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\TestEffectQuad.h">
-      <Filter>00. GameObject\Test\TestEffectQuad</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\TestFiona.h">
-      <Filter>00. GameObject\Test\TestFiona</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\TestMap.h">
-      <Filter>00. GameObject\Test\TestMap</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\TestMarb1e.h">
-      <Filter>00. GameObject\Test\TestMarb1e</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\TestMarb1eMap.h">
-      <Filter>00. GameObject\Test\TestMarb1eMap</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\TestMeshEmitter.h">
-      <Filter>00. GameObject\Test\TestMeshEmitter</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\TestMeshParticle.h">
-      <Filter>00. GameObject\Test\TestMeshParticle</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\TestNonAnim.h">
-      <Filter>00. GameObject\Test\TestNonAnim</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\TestParticle.h">
-      <Filter>00. GameObject\Test\TestParticle</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\TestRect.h">
-      <Filter>00. GameObject\Test\TestRect</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\TestTriggerBox.h">
-      <Filter>00. GameObject\Test\TestRect</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\TornadoSpinReverse.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\07. TornadoSpinReverse</Filter>
     </ClInclude>
@@ -2261,9 +2213,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\UI_Structs.h">
       <Filter>99. Defines\Hojun\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\UI_TestImageContainer.h">
-      <Filter>00. GameObject\Test\TestImageContainer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\UI_Text.h">
       <Filter>00. GameObject\97. UI\UIPart\Text</Filter>
@@ -2687,14 +2636,23 @@
     <ClCompile Include="..\Private\Kirby_Deform_Car.cpp">
       <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\00. Deform_Car</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kirby_Deform_Cylinder.cpp">
+      <Filter>00. GameObject\05. Kirby\02. AttackMode\Kirby_Deform\01. Deform_Cylinder</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Kirby_Deform_Model.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_DeformCar_Demo.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\01. DeformCar_Demo</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Kirby_DeformCylinder_Demo.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\02. DeformCylinder_Demo</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Kirby_DeformCar_Main.cpp">
       <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model\02. DeformCar_Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Kirby_DeformCylinder_Main.cpp">
+      <Filter>00. GameObject\05. Kirby\03. Parts\Kirby_Deform\99. HitBox_Model\03. DeformCylinder_Main</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_DeformCarBridge.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\CutScene\DeformCarBridge</Filter>
@@ -2864,6 +2822,9 @@
     <ClCompile Include="..\Private\LevelDesignObject.cpp">
       <Filter>00. GameObject\96. LevelDesign</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\LevelLight_DB.cpp">
+      <Filter>97. DataSystem\LevelLight</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Loader_Prototype.cpp">
       <Filter>97. DataSystem\DataLoader</Filter>
     </ClCompile>
@@ -2928,7 +2889,7 @@
       <Filter>00. GameObject\07. Boss\MiniBoss</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Mission_Manager.cpp">
-      <Filter>95. MissionManager</Filter>
+      <Filter>03. SystemObject\MissionManager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Monster.cpp">
       <Filter>00. GameObject\06. Monster</Filter>
@@ -3188,42 +3149,6 @@
     <ClCompile Include="..\Private\SwordTrail_BK.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Terrain.cpp">
-      <Filter>00. GameObject\Test\Terrain</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\TestEffectQuad.cpp">
-      <Filter>00. GameObject\Test\TestEffectQuad</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\TestFiona.cpp">
-      <Filter>00. GameObject\Test\TestFiona</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\TestMap.cpp">
-      <Filter>00. GameObject\Test\TestMap</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\TestMarb1e.cpp">
-      <Filter>00. GameObject\Test\TestMarb1e</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\TestMarb1eMap.cpp">
-      <Filter>00. GameObject\Test\TestMarb1eMap</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\TestMeshEmitter.cpp">
-      <Filter>00. GameObject\Test\TestMeshEmitter</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\TestMeshParticle.cpp">
-      <Filter>00. GameObject\Test\TestMeshParticle</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\TestNonAnim.cpp">
-      <Filter>00. GameObject\Test\TestNonAnim</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\TestParticle.cpp">
-      <Filter>00. GameObject\Test\TestParticle</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\TestRect.cpp">
-      <Filter>00. GameObject\Test\TestRect</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\TestTriggerBox.cpp">
-      <Filter>00. GameObject\Test\TestRect</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\TornadoSpinReverse.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\07. TornadoSpinReverse</Filter>
     </ClCompile>
@@ -3313,9 +3238,6 @@
     </ClCompile>
     <ClCompile Include="..\private\UI_StageClear.cpp">
       <Filter>00. GameObject\97. UI\UIContainer\GenericContainer\StageClear</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\UI_TestImageContainer.cpp">
-      <Filter>00. GameObject\Test\TestImageContainer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\UI_Text.cpp">
       <Filter>00. GameObject\97. UI\UIPart\Text</Filter>

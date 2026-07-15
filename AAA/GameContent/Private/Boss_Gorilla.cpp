@@ -37,7 +37,6 @@ HRESULT CBoss_Gorilla::Initialize(void* pArg)
     m_strBossName = L"°í¸£¸£¹³¹Ù";
     m_fMaxHP = 1000.f;    
     m_fCurHP = m_fMaxHP;
-    m_TraitFlags &= ~MT_BODYCHECK_DAMAGE;
 
     if (m_pController) 
         m_pController->Set_Solid(false);

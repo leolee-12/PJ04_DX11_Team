@@ -48,6 +48,8 @@ float g_fAtmosStart, g_fAtmosEnd, g_fAtmosStrength;
 
 float g_fESMConst = 80.f;
 float g_fESMBleed = 0.2f;
+float g_fShadowNormalOffset = 0.08f;
+float g_fShadowDepthBias = 0.002f;
 
 static const float PI = 3.14159265f;
 
@@ -250,7 +252,9 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
 
     float4 dd = g_DepthTexture.Sample(LinearSampler, In.vTexcoord);
     float3 wp = RecoverWorldPos(In.vTexcoord, dd.x, g_ProjMatrixInverse, g_ViewMatrixInverse);
-    float4 lc = mul(float4(wp, 1.f), g_ShadowLightViewMatrix);
+
+    float3 wpShadow = wp + N * g_fShadowNormalOffset;
+    float4 lc = mul(float4(wpShadow, 1.f), g_ShadowLightViewMatrix);
     lc = mul(lc, g_ShadowLightProjMatrix);
     float2 suv = float2(lc.x / lc.w * 0.5f + 0.5f, lc.y / lc.w * -0.5f + 0.5f);
     float pz = lc.z / lc.w;
@@ -258,7 +262,7 @@ float4 PS_MAIN_COMBINED(PS_IN In) : SV_TARGET0
     if (pz <= 1.f && suv.x >= 0.f && suv.x <= 1.f && suv.y >= 0.f && suv.y <= 1.f)
     {
         float esm = g_LightDepthTexture.Sample(BorderSampler, suv).r;
-        float shadow = saturate(exp(-g_fESMConst * pz) * esm);
+        float shadow = saturate(exp(-g_fESMConst * (pz - g_fShadowDepthBias)) * esm);
         shadow = saturate((shadow - g_fESMBleed) / (1.f - g_fESMBleed));
 
         float2 e = abs(suv - 0.5f) * 2.f;
