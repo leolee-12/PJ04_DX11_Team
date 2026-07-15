@@ -136,9 +136,6 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\16. Kirby_SwordTrail">
       <UniqueIdentifier>{a31c6265-e519-49a8-9abc-68d8e557c0b2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\15. SmokeCollection">
-      <UniqueIdentifier>{b61bc410-72bb-4bf3-a7d8-705301a4aee9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect">
       <UniqueIdentifier>{ccffdbd9-77db-4df6-a788-59b7612dc334}</UniqueIdentifier>
     </Filter>
@@ -1126,6 +1123,9 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\15. Smoke">
+      <UniqueIdentifier>{b61bc410-72bb-4bf3-a7d8-705301a4aee9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -1669,10 +1669,10 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\16. Kirby_SwordTrail</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SmokeCollection.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. SmokeCollection</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Smoke</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SmokeSphereOriginalEmitter.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. SmokeCollection</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Smoke</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Kirby_Wait.h">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait</Filter>
@@ -2736,10 +2736,10 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\16. Kirby_SwordTrail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SmokeCollection.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. SmokeCollection</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Smoke</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SmokeSphereOriginalEmitter.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. SmokeCollection</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. Smoke</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Kirby_Wait.cpp">
       <Filter>00. GameObject\05. Kirby\01. StateMachine\State\ControllableState\Wait</Filter>
