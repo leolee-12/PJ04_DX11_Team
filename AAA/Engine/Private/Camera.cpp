@@ -175,15 +175,6 @@ void CCamera::Update_ShadowFit()
 {
 	if (!m_bDriveShadowFit) return;
 
-	const LIGHT_DESC* pDir = nullptr;
-	for (_uint i = 0; ; ++i)
-	{
-		const LIGHT_DESC* p = m_pGameInstance_Proxy->Get_LightDesc(i);
-		if (nullptr == p) break;
-		if (LIGHT::DIRECTIONAL == p->eType) { pDir = p; break; }
-	}
-	if (nullptr == pDir) return;
-
 	_float4 vShadowDir = _float4(m_vShadowDir.x, m_vShadowDir.y, m_vShadowDir.z, 0.f);
 	SHADOW_LIGHT_DESC desc = Make_CameraFit_Shadow(
 		vShadowDir, m_fShadowRange, m_fShadowPadding, m_iShadowRes);

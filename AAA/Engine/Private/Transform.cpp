@@ -299,9 +299,9 @@ void CTransform::LookAt(_fvector vAt)
 
     _float3         vScaled = Get_Scaled();
 
-    Set_State(STATE::RIGHT, XMVector3Normalize(vRight) * vScaled.x);
-    Set_State(STATE::UP, XMVector3Normalize(vUp) * vScaled.y);
-    Set_State(STATE::LOOK, XMVector3Normalize(vLook) * vScaled.z);
+    Set_State(STATE::RIGHT, XMVectorSetW(XMVector3Normalize(vRight) * vScaled.x, 0.f));
+    Set_State(STATE::UP,    XMVectorSetW(XMVector3Normalize(vUp) * vScaled.y, 0.f));
+    Set_State(STATE::LOOK,  XMVectorSetW(XMVector3Normalize(vLook) * vScaled.z, 0.f));
 }
 
 _bool CTransform::LookAt_Smooth(_fvector vAt, _float fTimeDelta)
@@ -373,9 +373,9 @@ void CTransform::LookTo(_fvector vLookDir, _fvector vUpDir)
     _vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vLook));
     vUp = XMVector3Normalize(XMVector3Cross(vLook, vRight));
 
-    Set_State(STATE::RIGHT, vRight * vScaled.x);
-    Set_State(STATE::UP, vUp * vScaled.y);
-    Set_State(STATE::LOOK, vLook * vScaled.z);
+    Set_State(STATE::RIGHT, XMVectorSetW(vRight * vScaled.x, 0.f));
+    Set_State(STATE::UP,    XMVectorSetW(vUp * vScaled.y, 0.f));
+    Set_State(STATE::LOOK,  XMVectorSetW(vLook * vScaled.z, 0.f));
 }
 
 void CTransform::LookTo(_fvector vLookDir)

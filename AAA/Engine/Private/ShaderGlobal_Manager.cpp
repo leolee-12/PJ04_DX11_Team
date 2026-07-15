@@ -8,6 +8,11 @@ CShaderGlobal_Manager::CShaderGlobal_Manager()
 HRESULT CShaderGlobal_Manager::Initialize()
 {
     /* 기본 전역 등록 파라미터 추가 시 여기 한 줄 + 셰이더 변수만 늘리면 에디터 UI까지 자동 */
+    Register({ "g_vLightDir",      "Sun Direction", GVAL::FLOAT4, { 0.557f, -0.766f, 0.321f, 0.f }, { -1.f, 1.f } });
+    Register({ "g_vLightDiffuse",  "Sun Diffuse",   GVAL::FLOAT4, { 6.2f, 6.15f, 5.76f, 1.f },       { 0.f, 8.f } });
+    Register({ "g_vLightAmbient",  "Sun Ambient",   GVAL::FLOAT4, { 0.f, 0.f, 0.f, 1.f },            { 0.f, 2.f } });
+    Register({ "g_vLightSpecular", "Sun Specular",  GVAL::FLOAT4, { 1.f, 1.f, 1.f, 1.f },            { 0.f, 4.f } });
+
     Register({ "g_fSSAORadius",     "SSAO Radius",     GVAL::FLOAT, { 5.f,   0.f, 0.f, 0.f }, { 0.f,  5.f } });
     Register({ "g_fSSAOBias",       "SSAO Bias",       GVAL::FLOAT, { 0.1f, 0.f, 0.f, 0.f }, { 0.f,  0.1f } });
     Register({ "g_fSSAOPower",      "SSAO Power",      GVAL::FLOAT, { 2.4f,   0.f, 0.f, 0.f }, { 0.5f, 4.f } });
