@@ -5,9 +5,19 @@
 NS_BEGIN(Client)
 
 class CKirby;
+class CKirbyBomb;
 
 class CLIENT_DLL CKirby_Ability_Bomb final : public CKirby_Ability
 {
+private:
+	enum BOMB_STATE
+	{ 
+		MOVE_THROW,
+		CHARGE_START, CHARGE,
+		FALL_CHARGE_START, FALL_CHARGE, CHARGE_LANDING,
+		THROW, BOMB_STATE_END
+	};
+
 private:
 	CKirby_Ability_Bomb();
 	virtual ~CKirby_Ability_Bomb() = default;
@@ -27,6 +37,27 @@ public:
 	virtual _bool Enter_Attack_KeyDown(CKirby* pKirby) override;
 	virtual _bool Enter_Attack_KeyPress(CKirby* pKirby) override;
 	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) override;
+
+private:
+	void Change_BombState(CKirby* pKirby, BOMB_STATE eNext);
+	void Enter_BombState(CKirby* pKirby, BOMB_STATE eState);
+	void Update_BombState(CKirby* pKirby, _float fTimeDelta);
+	void Exit_BombState(CKirby* pKirby, BOMB_STATE eState);
+
+	_bool Handle_ReserveAttack(CKirby* pKirby);
+
+	void Spawn_Bomb(CKirby* pKirby);
+	void Throw_Bomb(CKirby* pKirby);
+
+private:
+	BOMB_STATE m_eBombState{};
+
+	_bool m_bKeyUp{};
+
+	_bool m_bReserveAttack{};
+
+private:
+	CKirbyBomb* m_pBomb{};
 
 public:
 	static CKirby_Ability_Bomb* Create();

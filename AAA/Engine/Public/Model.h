@@ -67,6 +67,8 @@ public:
 
 	_float Get_CurrentAnimProgress() const;
 
+	_bool Is_Blending() { return m_isBlending; }
+
 public:
 	_bool Pick_Mesh(_uint iMeshIndex, _fvector vOrigin, _fvector vDir, _fmatrix WorldMatrix, _float3* pOutHit, float* pOutDist = nullptr);
 	physx::PxTriangleMesh* Get_CollisionMesh() const { return m_pCollisionMesh; }

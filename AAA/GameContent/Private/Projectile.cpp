@@ -65,6 +65,16 @@ HRESULT CProjectile::Ready_HitBox()
     return S_OK;
 }
 
+void CProjectile::Update_Socket()
+{
+    if (!m_pSocketBone || !m_pSocketOwnerWorld)
+        return;
+    _matrix mat = XMLoadFloat4x4(&m_SocketOffset)
+        * XMLoadFloat4x4(m_pSocketBone)
+        * XMLoadFloat4x4(m_pSocketOwnerWorld);
+    m_pTransformCom->Set_WorldMatrix(mat);
+}
+
 void CProjectile::Launch(const _float3& vPos, const _float3& vDir)
 {
     const _bool bWasCarried = m_bCarried;

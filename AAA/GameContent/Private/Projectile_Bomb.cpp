@@ -155,6 +155,13 @@ void CProjectile_Bomb::Despawn()
     Kill();
 }
 
+_matrix CProjectile_Bomb::Get_PreRotInverse() const
+{
+    return XMMatrixInverse(nullptr,
+        XMMatrixRotationX(XMConvertToRadians(90.f)) *
+        XMMatrixRotationY(XMConvertToRadians(180.f)));
+}
+
 void CProjectile_Bomb::Ignite()
 {
     Start_Fuse();
@@ -225,11 +232,9 @@ void CProjectile_Bomb::Tick_Visual(_float fTimeDelta)
     if (m_pAnimatorCom)
     {
         m_pAnimatorCom->Update(fTimeDelta);
-        m_fBurnRatio =
-            m_pAnimatorCom->Get_LayerProgress(1);
 
-        _vector vCur = XMLoadFloat3(&m_vGlow);
-        XMStoreFloat3(&m_vGlow, vCur);
+        constexpr _int iSlot = 1;
+        m_fBurnRatio = m_pAnimatorCom->Get_LayerProgress(iSlot);
 
         if (m_fBurnRatio >= 1.f)
             Bomb_Explode();
@@ -261,11 +266,8 @@ void CProjectile_Bomb::Spawn_FuseFx()
 
     if (nullptr == m_pFuseFx)
     {
-        CEffect_Loader::GetInstance()->Spawn(
-            L"BombFuseEffect", Get_LevelIndex(),
-            _float3(0.f, 0.f, 0.f),
-            _float3(0.f, 0.f, 0.f),
-            _float3(0.f, 0.f, 0.f),
+        CEffect_Loader::GetInstance()->Spawn(L"BombFuseEffect", Get_LevelIndex(),
+            _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
             &m_matFuseWorld, &m_pFuseFx);
     }
 }
@@ -360,13 +362,6 @@ void CProjectile_Bomb::Roll_ByMovement(_float fTimeDelta)
     m_fRollAngle = fmodf(m_fRollAngle, 360.f);
 
     Apply_RollPose();
-}
-
-_matrix CProjectile_Bomb::Get_PreRotInverse() const
-{
-    return XMMatrixInverse(nullptr,
-        XMMatrixRotationX(XMConvertToRadians(90.f)) *
-        XMMatrixRotationY(XMConvertToRadians(180.f)));
 }
 
 HRESULT	CProjectile_Bomb::Bind_ShaderResources()

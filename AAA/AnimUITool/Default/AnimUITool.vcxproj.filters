@@ -22,13 +22,13 @@
     <Filter Include="02. Objects\Preview_Actor">
       <UniqueIdentifier>{fe46b911-fdf0-4e5e-8db9-2dd3c9ff0956}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. Objects\Preview_DeformCar_Demo">
+    <Filter Include="02. Objects\Preview_DeformCylinder_Demo">
       <UniqueIdentifier>{d4db8ab4-b15b-4088-9d4b-48d09b299337}</UniqueIdentifier>
     </Filter>
     <Filter Include="02. Objects\Preview_Kirby">
       <UniqueIdentifier>{e1d3aae1-6727-4935-acac-12d6279558fe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. Objects\PreviewDeformCar">
+    <Filter Include="02. Objects\PreviewDeformCylinder">
       <UniqueIdentifier>{e25fb557-88d9-49e2-ab97-98a81dee4b2a}</UniqueIdentifier>
     </Filter>
     <Filter Include="03. Panels">
@@ -138,11 +138,11 @@
     <ClInclude Include="..\Public\Preview_Actor.h">
       <Filter>02. Objects\Preview_Actor</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Preview_DeformCar_Demo.h">
-      <Filter>02. Objects\Preview_DeformCar_Demo</Filter>
+    <ClInclude Include="..\Public\Preview_DeformCylinder_Demo.h">
+      <Filter>02. Objects\Preview_DeformCylinder_Demo</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Preview_DeformCar_Main.h">
-      <Filter>02. Objects\PreviewDeformCar</Filter>
+    <ClInclude Include="..\Public\Preview_DeformCylinder_Main.h">
+      <Filter>02. Objects\PreviewDeformCylinder</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Preview_Kirby.h">
       <Filter>02. Objects\Preview_Kirby</Filter>
@@ -209,11 +209,11 @@
     <ClCompile Include="..\Private\Preview_Actor.cpp">
       <Filter>02. Objects\Preview_Actor</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Preview_DeformCar_Demo.cpp">
-      <Filter>02. Objects\Preview_DeformCar_Demo</Filter>
+    <ClCompile Include="..\Private\Preview_DeformCylinder_Demo.cpp">
+      <Filter>02. Objects\Preview_DeformCylinder_Demo</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Preview_DeformCar_Main.cpp">
-      <Filter>02. Objects\PreviewDeformCar</Filter>
+    <ClCompile Include="..\Private\Preview_DeformCylinder_Main.cpp">
+      <Filter>02. Objects\PreviewDeformCylinder</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Preview_Kirby.cpp">
       <Filter>02. Objects\Preview_Kirby</Filter>
