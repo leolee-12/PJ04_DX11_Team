@@ -4,6 +4,7 @@
 #include "Animator.h"
 #include "Effect_Loader.h"
 #include "Boss_Leopard_Brain.h"
+#include "GameContent_AnimEvents.h"
 
 const vector<_float> CBoss_Leopard::s_Thresholds = {};
 
@@ -45,6 +46,34 @@ HRESULT CBoss_Leopard::Ready_PartObjects()
     m_pBody = Add_MonsterPart<CBoss_Leopard_Body>(
         CBoss_Leopard_Body::PROTOTYPE_TAG, CBoss_Leopard_Body::PART_TAG);
     if (!m_pBody) return E_FAIL;
+    return S_OK;
+}
+
+HRESULT CBoss_Leopard::Ready_AnimEvents()
+{
+    CAnimator* pAnim = Get_BodyAnimator();
+    if (!pAnim) return E_FAIL;
+
+    pAnim->Set_EventCallback([this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase) {
+        if (Handle_SharedAnimEvent(e, phase))
+            return;
+        if (phase != ANIM_EVENT_PHASE::POINT)
+            return;
+        if (!m_pBody)
+            return;
+        switch (static_cast<EANIM_EVENT>(e.iEventType))
+        {
+            case EANIM_EVENT::SetEye:    // iIntParam: 0=Angry 1=Normal 2=Open 3=Close
+                m_pBody->Set_EyeState(static_cast<CBoss_Leopard_Body::EYE>(e.iIntParam));
+                break;
+
+            case EANIM_EVENT::OnOffMesh:   // iIntParam: 0=Normal 1=Attack
+                m_pBody->Set_ClawState(static_cast<CBoss_Leopard_Body::CLAW>(e.iIntParam));
+                break;
+
+            default: break;
+        }
+        });
     return S_OK;
 }
 

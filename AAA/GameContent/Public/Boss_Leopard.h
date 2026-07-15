@@ -51,6 +51,7 @@ protected:
     virtual _bool  Is_Touch_Harmful() const override { return false; }
 
     virtual HRESULT Ready_PartObjects() override;
+    virtual HRESULT Ready_AnimEvents() override;
 
 private:
     CBoss_Leopard_Body* m_pBody = { nullptr };
