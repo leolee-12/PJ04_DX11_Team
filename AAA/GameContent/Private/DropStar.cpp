@@ -103,7 +103,7 @@ void CDropStar::Set_Pool(CDropStar_Manager* pPool, _uint iLevel, const _wstring&
 	m_strPoolKey	= strKey;
 }
 
-void CDropStar::Activate(const _float3& vPos, _float fDelay)
+void CDropStar::Activate(const _float3& vPos, const _float3& vLook, const _float3& vDir, _float fDelay)
 {
 	m_bActive = true;
 	m_bAvailable = true;
@@ -117,9 +117,15 @@ void CDropStar::Activate(const _float3& vPos, _float fDelay)
 	m_fTimer = 0.f;
 	m_fPullSpeed = 0.f;
 	m_fScaleRatio = 1.f;
+	m_fRollAngle = 0.f;
 
 	m_pTransformCom->Set_State(STATE::POSITION,
 		XMVectorSetW(XMLoadFloat3(&vPos), 1.f));
+
+	Set_Orientation(vLook);
+
+	m_vLaunchDir = vDir;
+
 	m_pTransformCom->Set_Scale(m_vBaseScale.x,
 		m_vBaseScale.y, m_vBaseScale.z);
 
@@ -129,25 +135,6 @@ void CDropStar::Activate(const _float3& vPos, _float fDelay)
 		m_pController->Set_Enabled(false);
 	if (m_pCollider)
 		m_pCollider->Set_Enabled(false);
-}
-
-void CDropStar::Launch(const _float3& vDir)
-{
-	if (nullptr == m_pMovement)
-		return;
-
-	_vector v = XMLoadFloat3(&vDir);
-	if (XMVectorGetX(XMVector3LengthSq(v)) > 1e-4f)
-	{
-		v = XMVector3Normalize(v) * s_fLaunchSpeed;
-		v = XMVectorSetY(v,	XMVectorGetY(v) + s_fPopUpSpeed);
-	}
-	else
-	{
-		v = XMVectorSet(0.f, s_fPopUpSpeed, 0.f, 0.f);
-	}
-
-	m_pMovement->Launch(v);
 }
 
 _bool CDropStar::Can_BeInhaled(const INHALE_QUERY& q) const
@@ -282,7 +269,7 @@ void CDropStar::Reveal()
 		m_pController->Set_FootPosition(m_pTransformCom->Get_State(STATE::POSITION));
 	}
 
-	Launch(_float3(0.f, 0.f, 0.f));    
+	Launch();    
 
 	if (m_pCollider)
 		m_pCollider->Set_Enabled(true);
@@ -370,6 +357,46 @@ void CDropStar::Return_ToPool()
 		m_pPool->Return(m_iPoolLevel, m_strPoolKey, this);
 }
 
+void CDropStar::Set_Orientation(const _float3& vLook)
+{
+	_vector vL = XMLoadFloat3(&vLook);
+
+	if (XMVectorGetX(XMVector3LengthSq(vL)) < 1e-4f)
+	{
+		m_pTransformCom->Set_State(STATE::RIGHT,
+			XMVectorSet(1.f, 0.f, 0.f, 0.f));
+		m_pTransformCom->Set_State(STATE::UP,
+			XMVectorSet(0.f, 1.f, 0.f, 0.f));
+		m_pTransformCom->Set_State(STATE::LOOK,
+			XMVectorSet(0.f, 0.f, 1.f, 0.f));
+		return;
+	}
+
+	vL = XMVector3Normalize(vL);
+
+	_vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+	_vector vR = XMVector3Cross(vUp, vL);
+	if (XMVectorGetX(XMVector3LengthSq(vR)) < 1e-4f)   
+		vR = XMVectorSet(1.f, 0.f, 0.f, 0.f);
+	vR = XMVector3Normalize(vR);
+
+	_vector vU = XMVector3Cross(vL, vR);
+
+	m_pTransformCom->Set_State(STATE::RIGHT, vR);
+	m_pTransformCom->Set_State(STATE::UP, vU);
+	m_pTransformCom->Set_State(STATE::LOOK, vL);
+}
+
+void CDropStar::Launch()
+{
+	if (m_pMovement == nullptr)
+		return;
+
+	_vector v = XMLoadFloat3(&m_vLaunchDir);
+	v = XMVectorSetY(v, s_fPopUpSpeed);
+	m_pMovement->Launch(v);
+}
+
 void CDropStar::Apply_Roll(_float fTimeDelta)
 {
 	if (m_pBody == nullptr)
@@ -380,7 +407,7 @@ void CDropStar::Apply_Roll(_float fTimeDelta)
 		return;
 
 	m_fRollAngle = fmodf(m_fRollAngle + s_fRollSpeed * fTimeDelta, 360.f);
-	pAnim->SetBoneRotation("CenterL", m_fRollAngle, XMVectorSet(0.f, 1.f, 0.f, 0.f));
+	pAnim->SetBoneRotation("CenterL", m_fRollAngle, XMVectorSet(0.f, 0.f, 1.f, 0.f));
 }
 
 CDropStar* CDropStar::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
