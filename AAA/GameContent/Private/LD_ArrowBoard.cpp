@@ -265,19 +265,19 @@ HRESULT CLD_ArrowBoard::Ready_HurtBox()
 	};
 
 	_float fRadius = vSize.x;
-	if (fRadius < vSize.y)
-		fRadius = vSize.y;
 	if (fRadius < vSize.z)
 		fRadius = vSize.z;
 
 	fRadius = max(fRadius * 0.5f, ARROWBOARD_MIN_HURT_RADIUS);
+	const _float fHeight = max(vSize.y - fRadius * 2.f, 0.f);
 
 	CCollider::COLLIDER_DESC ColliderDesc{};
 	ColliderDesc.pOwner = this;
-	ColliderDesc.vCenter = { (vMin.x + vMax.x) * 0.5f, (vMin.y + vMax.y) * 0.5f, (vMin.z + vMax.z) * 0.5f };
+	ColliderDesc.vCenter = { (vMin.x + vMax.x) * 0.5f, vMin.y, (vMin.z + vMax.z) * 0.5f };
 	ColliderDesc.fRadius = fRadius;
+	ColliderDesc.fHeight = fHeight;
 
-	m_pHurtBox = Add_Component<CCollider>(Collider_Sphere.iLevelID, Collider_Sphere.szProtoTag, TEXT("Com_HurtBox"), &ColliderDesc);
+	m_pHurtBox = Add_Component<CCollider>(Collider_Capsule.iLevelID, Collider_Capsule.szProtoTag, TEXT("Com_HurtBox"), &ColliderDesc);
 	if (nullptr == m_pHurtBox)
 		return E_FAIL;
 

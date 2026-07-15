@@ -19,7 +19,7 @@ namespace
         if (strLevelTag == L"STAGE1_STEP1") return LEVEL::STAGE1_STEP1;
         if (strLevelTag == L"STAGE1_STEP2") return LEVEL::STAGE1_STEP2;
         if (strLevelTag == L"STAGE1_STEP3") return LEVEL::STAGE1_STEP3;
-        if (strLevelTag == L"TEST" || strLevelTag == L"Test") return LEVEL::TEST;
+        if (strLevelTag == L"TEST") return LEVEL::TEST;
         return LEVEL::END;
     }
 }
