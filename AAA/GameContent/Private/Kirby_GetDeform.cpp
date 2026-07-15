@@ -37,9 +37,13 @@ void CKirby_GetDeform::Enter(CKirby* pKirby, _int iFlag)
     __super::Enter(pKirby, iFlag);
 
     Subscribe_DeformEvent(pKirby);
-    
-    pKirby->Set_HeldDeformObj(pKirby->Get_TriggerDeformObj());    
-    IDeformable* pDeformable = pKirby->Get_HeldDeformObj();
+      
+    IDeformable* pDeformable = pKirby->Get_TriggerDeformObj();
+    if (pDeformable == nullptr)
+    {
+        assert(false);
+        return;
+    }
     m_eDeformType = pDeformable->Get_DeformType();
 
     // 
@@ -141,7 +145,7 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
 
             CKirby_Deform_Model* pDeformModel_Demo = pKirby->Get_DeformPart_Model(m_eDeformType, KIRBY_DEFORM_MODEL_TYPE::DEMO);
             pDeformModel_Demo->Set_Active(true);
-            pDeformModel_Demo->Get_Animator()->Play("Deform", false, false, 0.1f, 1.8f);
+            pDeformModel_Demo->Get_Animator()->Play("Deform", false, true, 0.1f, 1.8f);
 
             pKirby->Change_HatSocketMatrix(pKirby->Get_KirbyAbility()->Get_AbilityType(),
                 pDeformModel_Demo->Get_HatBoneMatirx());

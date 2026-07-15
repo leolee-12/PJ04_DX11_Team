@@ -89,9 +89,9 @@ void CKirby_DeformDump::Enter_DeformDumpState(CKirby* pKirby, DEFORM_DUMP_STATE 
 
             // Deform Model
             CKirby_Deform* pKirbyDeform = pKirby->Get_KirbyDeform();
-            DEFORM_TYPE m_eDeformType = pKirbyDeform->Get_DeformType();
+            DEFORM_TYPE eDeformType = pKirbyDeform->Get_DeformType();
 
-            CKirby_Deform_Model* pDeformModel = pKirby->Get_DeformPart_Model(m_eDeformType);
+            CKirby_Deform_Model* pDeformModel = pKirby->Get_DeformPart_Model(eDeformType);
             pDeformModel->Set_Active(false);
 
             // Body
@@ -105,9 +105,7 @@ void CKirby_DeformDump::Enter_DeformDumpState(CKirby* pKirby, DEFORM_DUMP_STATE 
             pKirby->Change_HatSocketMatrix(m_eAbilityType, pBody->Get_HatBoneMatirx());
 
             // ptr
-            //pKirby->Get_HeldDeformObj()->End_Deform(pKirby->Get_Transform()->Get_WorldMatrixPtr());
-            //pKirby->Set_HeldDeformObj(nullptr);
-            CLD_DeformObject::Spawn_Released(m_pGameInstance_Proxy, m_eDeformType,
+            CLD_DeformObject::Spawn_Released(m_pGameInstance_Proxy, eDeformType,
                 pKirby->Get_LevelIndex(), pKirby->Get_Transform()->Get_WorldMatrixPtr());
 
             pKirby->Reset_KirbyDeform();

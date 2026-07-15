@@ -750,7 +750,6 @@ HRESULT CKirby::Ready_Events()
             //Clear_CutsceneAttachTarget();
             Clear_Ladder();
             Set_TriggerDeformObj(nullptr);
-            Set_HeldDeformObj(nullptr);
         }
     );
 
