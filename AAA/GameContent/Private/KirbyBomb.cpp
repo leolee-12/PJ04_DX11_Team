@@ -115,7 +115,71 @@ void CKirbyBomb::Launch_Velocity(const _float3& vStart, const _float3& vVelocity
 
 _bool CKirbyBomb::Predict_Trajectory(const _float3& vStart, const _float3& vInitialVelocity, vector<_float3>& OutPoints, _float3& vOutHitPos, _float3& vOutHitNormal)
 {
-	return _bool();
+	constexpr _float fStepTime = 1.f / 60.f; // 물리 시뮬레이션의 고정 시간 간격
+	constexpr _int iMaxStepCount = 180; // 최대 3초 동안 궤적을 계산
+
+	OutPoints.clear();
+	OutPoints.push_back(vStart); // 궤적의 첫 지점으로 시작 위치 저장
+	vOutHitPos = {};
+	vOutHitNormal = {};
+
+	_vector vCurrentFootPos = XMLoadFloat3(&vStart); // 캡슐 하단 기준 현재 위치
+	_vector vVelocity = XMLoadFloat3(&vInitialVelocity);
+
+	const _float fRadius = m_fHitRadius;
+	const _float fHalfHeight = m_fHitHeight * 0.5f;
+	const _float fCenterOffset = fRadius + fHalfHeight; // 하단 위치에서 캡슐 중심까지의 거리
+
+	for (_int i = 0; i < iMaxStepCount; ++i)
+	{
+		// 중력을 적용하고 최대 낙하 속도를 제한
+		vVelocity = XMVectorAdd(vVelocity, XMVectorSet(0.f, BOMB_GRAVITY * fStepTime, 0.f, 0.f));
+		if (XMVectorGetY(vVelocity) < BOMB_MAX_FALL_SPEED)
+			vVelocity = XMVectorSetY(vVelocity, BOMB_MAX_FALL_SPEED);
+
+		// 이번 프레임에 이동할 방향과 거리 계산
+		_vector vMovement = vVelocity * fStepTime;
+		const _float fMoveDistance = XMVectorGetX(XMVector3Length(vMovement));
+		if (fMoveDistance <= Helper::fEpsilon)
+			continue;
+
+		_vector vMoveDir = XMVector3Normalize(vMovement);
+		_vector vCurrentCenter = XMVectorAdd(vCurrentFootPos, XMVectorSet(0.f, fCenterOffset, 0.f, 0.f));
+
+		_float3 vCenter{};
+		_float3 vDirection{};
+		_float3 vHitNormal{};
+		_float fHitDistance{};
+
+		XMStoreFloat3(&vCenter, vCurrentCenter);
+		XMStoreFloat3(&vDirection, vMoveDir);
+
+		// 현재 위치에서 예상 이동 거리만큼 캡슐 스윕 충돌 검사
+		if (m_pGameInstance_Proxy->Sweep_Capsule(vCenter, fRadius, fHalfHeight, vDirection,
+			fMoveDistance, &vHitNormal, &fHitDistance, true, false))
+		{
+			_vector vNormal = XMLoadFloat3(&vHitNormal);
+			_vector vHitCenter = vCurrentCenter + vMoveDir * fHitDistance; // 충돌 순간의 캡슐 중심
+
+			// 충돌 법선 방향의 캡슐 표면까지 거리를 계산하여 실제 접촉 위치 산출
+			const _float fSurfaceOffset = fRadius + fHalfHeight * fabsf(vHitNormal.y);
+			_vector vHitPosition = vHitCenter - vNormal * fSurfaceOffset;
+
+			XMStoreFloat3(&vOutHitPos, vHitPosition);
+			vOutHitNormal = vHitNormal;
+			OutPoints.push_back(vOutHitPos);
+			return true;
+		}
+
+		// 충돌하지 않았다면 현재 위치를 갱신하고 궤적 지점으로 저장
+		vCurrentFootPos += vMovement;
+
+		_float3 vPoint{};
+		XMStoreFloat3(&vPoint, vCurrentFootPos);
+		OutPoints.push_back(vPoint);
+	}
+
+	return false; // 최대 계산 시간 내에 충돌하지 않음
 }
 
 void CKirbyBomb::Update(_float fTimeDelta)

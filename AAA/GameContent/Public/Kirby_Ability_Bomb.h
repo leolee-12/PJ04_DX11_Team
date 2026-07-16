@@ -74,6 +74,13 @@ private:
 
 	_float3 m_vAimLaunchVelocity{};
 
+
+	// Effect
+	vector<_float3> m_PredictedPathPoints;
+	_float3 m_vPredictedHitPosition{};
+	_float3 m_vPredictedHitNormal{};
+	_bool m_bPredictedHit{};
+
 public:
 	static CKirby_Ability_Bomb* Create();
 

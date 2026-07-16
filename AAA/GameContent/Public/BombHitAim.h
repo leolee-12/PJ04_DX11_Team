@@ -4,17 +4,17 @@
 
 NS_BEGIN(Client)
 
-class CJumpEffect final : public CEffect_Container
+class CBombHitAim final : public CEffect_Container
 {
-	GENERATED_BODY(CJumpEffect)
+	GENERATED_BODY(CBombHitAim)
 
 public:
-	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_JumpEffect";
+	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_BombHitAim";
 
 private:
-	CJumpEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CJumpEffect(const CJumpEffect& Prototype);
-	virtual ~CJumpEffect() = default;
+	CBombHitAim(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CBombHitAim(const CBombHitAim& Prototype);
+	virtual ~CBombHitAim() = default;
 
 protected:
 	virtual HRESULT Initialize_Prototype() override;
@@ -34,7 +34,7 @@ private:
 	HRESULT Ready_EffectPartObjects();
 
 public:
-	static CJumpEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CBombHitAim* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 
 private:

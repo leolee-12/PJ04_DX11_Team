@@ -92,7 +92,7 @@
     <ClInclude Include="..\Public\EnvVolume_Effect.h" />
     <ClInclude Include="..\Public\EnvVolume_Light.h" />
     <ClInclude Include="..\Public\ItemEffect.h" />
-    <ClInclude Include="..\Public\JumpEffect.h" />
+    <ClInclude Include="..\Public\BombHitAim.h" />
     <ClInclude Include="..\Public\EssenceAura.h" />
     <ClInclude Include="..\public\KirbySpawnPoint.h" />
     <ClInclude Include="..\Public\Kirby_DeformDump.h" />
@@ -461,7 +461,7 @@
     <ClCompile Include="..\Private\EnvVolume_Effect.cpp" />
     <ClCompile Include="..\Private\EnvVolume_Light.cpp" />
     <ClCompile Include="..\Private\ItemEffect.cpp" />
-    <ClCompile Include="..\Private\JumpEffect.cpp" />
+    <ClCompile Include="..\Private\BombHitAim.cpp" />
     <ClCompile Include="..\Private\EssenceAura.cpp" />
     <ClCompile Include="..\private\KirbySpawnPoint.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformDump.cpp" />

@@ -332,6 +332,7 @@ void CKirby_Ability_Bomb::Spawn_Bomb(CKirby* pKirby)
     pBomb->Attach_To_Socket(pSocketBone, pKirby->Get_Transform()->Get_WorldMatrixPtr(), pBomb->Get_PreRotInverse());
 
     m_pBomb = pBomb;
+    m_bPredictedHit = false;
 }
 
 void CKirby_Ability_Bomb::Throw_Bomb(CKirby* pKirby, _float fDegree, _float fSpeed)
@@ -367,6 +368,7 @@ void CKirby_Ability_Bomb::Throw_BombToAim()
 
     m_pBomb->Launch_Velocity(vStart, m_vAimLaunchVelocity);  
     m_pBomb = nullptr;
+    m_bPredictedHit = false;
 }
 
 void CKirby_Ability_Bomb::Reset_Aim(CKirby* pKirby)
@@ -433,6 +435,10 @@ void CKirby_Ability_Bomb::Update_AimLaunch()
 
     constexpr _float fArcHeight = 5.f;
     m_vAimLaunchVelocity = m_pBomb->Cal_LaunchVelocity(vHorizontalDir, fHorizontalSpeed, fArcHeight);
+
+    // Effect
+    m_bPredictedHit = m_pBomb->Predict_Trajectory(vStart, m_vAimLaunchVelocity,
+        m_PredictedPathPoints, m_vPredictedHitPosition, m_vPredictedHitNormal);
 }
 
 CKirby_Ability_Bomb* CKirby_Ability_Bomb::Create()

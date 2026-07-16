@@ -77,7 +77,7 @@
 #include "Split_Stone.h"
 #include "Split_Bush.h"
 #include "ItemEffect.h"
-#include "JumpEffect.h"
+#include "BombHitAim.h"
 #include "BreakWallEffect.h"
 #include "BubbleAura.h"
 #include "Kirby_SwordTrail.h"
@@ -981,14 +981,14 @@ void CGameObject_Factory::Register_Effect()
                 CTexture::Create(pDevice, pContext, Texture_ItemSparkle03.szFileTag, Texture_ItemSparkle03.iNumTex));
         ));
 
-    Register(CJumpEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CJumpEffect),
+    Register(CBombHitAim::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CBombHitAim),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG,
-                CRectCommon::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, Texture_JumpEffect.iLevelID, Texture_JumpEffect.szProtoTag,
-                CTexture::Create(pDevice, pContext, Texture_JumpEffect.szFileTag,
-                    Texture_JumpEffect.iNumTex));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
+                CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BombHitAim"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSE/Effect/BombHitAim/Bom_AimHit.ysh"));
         ));
     // 0. WalkSmoke
     Register(CWalkSmoke::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CWalkSmoke),
