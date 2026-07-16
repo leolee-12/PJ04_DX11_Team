@@ -26,6 +26,7 @@ struct CAM_AREA {
     _bool   useRail = false;
     _uint   railUid = 0;
     _float3 scrollDead = { 0.f, 0.f, 0.f };  // 월드축 스크롤 데드존 half-extent
+    _float  smoothBase = 0.35f;
     CAM_FRAME frame;      // 비레일 프레이밍 / 레일 start
     CAM_FRAME frameEnd;   // 레일 영역 end (레일 진행도 t로 frame→frameEnd 보간)
     _int    gazeMode = 0;     // 0=Kirby, 1=Point, 2=Object
@@ -63,6 +64,7 @@ public:
     }
     _int   Cur_GazeMode() const { return (m_curArea >= 0) ? m_areas[m_curArea].gazeMode : 0; }
     string Cur_GazeTag() const { return (m_curArea >= 0) ? m_areas[m_curArea].gazeTag : string(); }
+    _float Cur_SmoothBase() const { return (m_curArea >= 0) ? m_areas[m_curArea].smoothBase : 0.35f; }
 
 private:
     _int    Resolve_Area(_fvector vKirby) const;

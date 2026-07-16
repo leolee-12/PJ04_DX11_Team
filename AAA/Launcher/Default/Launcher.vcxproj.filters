@@ -111,6 +111,9 @@
     <ClInclude Include="..\public\Town_Step1.h">
       <Filter>01. Levels\02. Stage\Town\Step1</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Town_Step2.h">
+      <Filter>01. Levels\02. Stage\Town\Step2</Filter>
+    </ClInclude>
     <ClInclude Include="framework.h">
       <Filter>98. Default</Filter>
     </ClInclude>
@@ -173,6 +176,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Town_Step1.cpp">
       <Filter>01. Levels\02. Stage\Town\Step1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Town_Step2.cpp">
+      <Filter>01. Levels\02. Stage\Town\Step2</Filter>
     </ClCompile>
     <ClCompile Include="Launcher.cpp">
       <Filter>98. Default</Filter>

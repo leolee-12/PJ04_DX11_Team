@@ -220,6 +220,10 @@ HRESULT CLoader::Ready_WorkQueue()
         if (FAILED(Read_Manifest(LAUNCHER_LEVEL_PROFILES::LEVEL_TOWN_STEP1, LEVEL::TOWN_STEP1)))
             return E_FAIL;
         break;
+    case LEVEL::TOWN_STEP2:
+        if (FAILED(Read_Manifest(LAUNCHER_LEVEL_PROFILES::LEVEL_TOWN_STEP2, LEVEL::TOWN_STEP2)))
+            return E_FAIL;
+        break;
     case LEVEL::BOSS_STAGE1:
         if (FAILED(Read_Manifest(LAUNCHER_LEVEL_PROFILES::LEVEL_BOSS_STAGE1, LEVEL::BOSS_STAGE1)))
             return E_FAIL;

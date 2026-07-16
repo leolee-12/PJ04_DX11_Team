@@ -150,6 +150,7 @@
 
 //MainBoss
 #include "Boss_Gorilla.h"
+#include "Boss_GorillaRush.h"
 #include "Boss_Gorilla_Body.h"
 #include "CutsceneGorilla.h"
 #include "GorillaNamePlate.h"
@@ -162,6 +163,10 @@
 #include "Boss_Armadillo_Body.h"
 #include "Projectile_Partner.h"
 #include "Boss_Armadillo_Cage.h"
+
+#include "Boss_Leopard.h"
+#include "Boss_Leopard_Body.h"
+#include "Projectile_Nail.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
@@ -1265,6 +1270,35 @@ void CGameObject_Factory::Register_MainBoss()
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Armadillo_Cage::PROTOTYPE_TAG,
                 CBoss_Armadillo_Cage::Create(pDevice, pContext));
+        )
+    );
+
+    Register(CBoss_Leopard::PROTOTYPE_TAG, TEXT("MainBoss"),
+        CREATOR(CBoss_Leopard),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Leopard_Body::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Leopard/Body/Model_Anim.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Leopard_Body::PROTOTYPE_TAG, CBoss_Leopard_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Nail::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Nail/Nail.ysh"
+                    , XMMatrixTranslation(0.f, 0.f, -0.8f)));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Nail::PROTOTYPE_TAG,
+                CProjectile_Nail::Create(pDevice, pContext));
+        )
+    );
+
+    Register(CBoss_GorillaRush::PROTOTYPE_TAG, TEXT("MainBoss"),
+        CREATOR(CBoss_GorillaRush),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Boss_Gorilla_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Gorilla/Body/Gorilla.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Gorilla_Body::PROTOTYPE_TAG,
+                CBoss_Gorilla_Body::Create(pDevice, pContext));
         )
     );
 }

@@ -68,8 +68,9 @@ void CCamera_AreaCam::Priority_Update(_float fTimeDelta)
     m_lastArea = curArea;
 
     _float fBlend = (m_blendDur > 0.f) ? (m_blendTimer / m_blendDur) : 0.f; // 1¡æ0
-    _float fEase = fBlend * fBlend * (3.f - 2.f * fBlend);                 // smoothstep
-    _float smoothT = m_smoothBase + (m_smoothTrans - m_smoothBase) * fEase;
+    _float fEase = fBlend * fBlend * (3.f - 2.f * fBlend);             
+    _float sb = m_solver.Cur_SmoothBase();                 
+    _float smoothT = sb + (m_smoothTrans - sb) * fEase;
     if (m_blendTimer > 0.f) m_blendTimer = max(0.f, m_blendTimer - fTimeDelta);
 
     const CAM_POSE& pose = m_solver.Cur_Pose();
