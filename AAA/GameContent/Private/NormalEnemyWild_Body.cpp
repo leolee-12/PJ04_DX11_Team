@@ -16,7 +16,6 @@ HRESULT CNormalEnemyWild_Body::Ready_Components()
     PART_SETUP t{};
     t.tShader = Shader_Monster;
     t.szModelProtoTag = TEXT("Prototype_Component_Model_NormalEnemyWild_Body");
-    t.szAnimEventFile = TEXT("");
     t.szAnimEventFile = TEXT("../../Resources/CHJ/Monster/NormalEnemyWild/Body/NormalEnemyWild_AnimEvents.json");
     if (FAILED(Ready_MeshPart(t)))
         return E_FAIL;
