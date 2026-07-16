@@ -1,6 +1,7 @@
 #include "BombHitAim.h"
+#include "GameContent_const.h"
 
-#include "MeshCommon.h"
+#include "RectCommon.h"
 
 CBombHitAim::CBombHitAim(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CEffect_Container{ pDevice, pContext }
@@ -8,7 +9,7 @@ CBombHitAim::CBombHitAim(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 }
 
 CBombHitAim::CBombHitAim(const CBombHitAim& Prototype)
-	: CEffect_Container{ Prototype }
+	: CEffect_Container(Prototype)
 {
 }
 
@@ -50,16 +51,16 @@ HRESULT CBombHitAim::Render()
 
 HRESULT CBombHitAim::Ready_EffectPartObjects()
 {
-	CMeshCommon::MESH_COMMON_DESC tDesc{};
-	tDesc.iModelLevel = m_iPrototypeLevel;
-	tDesc.wstrModelTag = L"Prototype_Component_Model_BombHitAim";
-	tDesc.bUseDiffuseTexture = false;
-	tDesc.bUseUnknownTexture = true;
-	tDesc.bUseTextureCom = false;
+	CRectCommon::RECT_COMMON_DESC tDesc{};
+	tDesc.iVIBufferLevel = VI_Rect.iLevelID;
+	tDesc.wstrVIBufferTag = VI_Rect.szProtoTag;
+	tDesc.bUseTextureCom = true;
+	tDesc.iTextureLevel = Texture_BombHitAim.iLevelID;
+	tDesc.wstrTextureTag = Texture_BombHitAim.szProtoTag;
 	tDesc.bUseMaskCom = false;
 	tDesc.bCustomShader = false;
 
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshCommon::PROTOTYPE_TAG,
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectCommon::PROTOTYPE_TAG,
 		L"BombHitAim", &tDesc)))
 		return E_FAIL;
 

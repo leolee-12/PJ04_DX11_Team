@@ -10,6 +10,8 @@
 #include "Projectile_Manager.h"
 #include "KirbyBomb.h"
 
+#include "Effect_Loader.h"
+
 CKirby_Ability_Bomb::CKirby_Ability_Bomb()
 {
 }
@@ -126,6 +128,23 @@ _bool CKirby_Ability_Bomb::Enter_Attack_KeyUp(CKirby* pKirby)
     return true;
 }
 
+void CKirby_Ability_Bomb::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo)
+{
+    __super::On_Damaged_KirbyState(pKirby, tInfo);
+
+    if (m_pBomb != nullptr)
+    {
+        m_pBomb->Despawn();
+        m_pBomb = nullptr;
+    }
+
+    if (m_pBombHitAim != nullptr)
+    {
+        m_pBombHitAim->EffectContainer_Stop();
+        m_pBombHitAim = nullptr;
+    }
+}
+
 void CKirby_Ability_Bomb::Change_BombState(CKirby* pKirby, BOMB_STATE eNext)
 {
     if (m_eBombState == eNext)
@@ -219,7 +238,7 @@ void CKirby_Ability_Bomb::Update_BombState(CKirby* pKirby, _float fTimeDelta)
         case BOMB_STATE::CHARGING:
         {
             Cal_Aim(fTimeDelta);
-            Update_AimLaunch();
+            Update_AimPrediction();
 
             if (m_bKeyUp)
                 Change_BombState(pKirby, BOMB_STATE::CHARGING_THROW);
@@ -243,7 +262,7 @@ void CKirby_Ability_Bomb::Update_BombState(CKirby* pKirby, _float fTimeDelta)
         case BOMB_STATE::CHARGING_FALL:
         {
             Cal_Aim(fTimeDelta);
-            Update_AimLaunch();
+            Update_AimPrediction();
 
             if (m_bKeyUp)
                 Change_BombState(pKirby, BOMB_STATE::CHARGING_THROW);
@@ -254,7 +273,7 @@ void CKirby_Ability_Bomb::Update_BombState(CKirby* pKirby, _float fTimeDelta)
         case BOMB_STATE::CHARGING_LANDING:
         {
             Cal_Aim(fTimeDelta);
-            Update_AimLaunch();
+            Update_AimPrediction();
 
             if (m_bKeyUp)
                 Change_BombState(pKirby, BOMB_STATE::CHARGING_THROW);
@@ -369,6 +388,8 @@ void CKirby_Ability_Bomb::Throw_BombToAim()
     m_pBomb->Launch_Velocity(vStart, m_vAimLaunchVelocity);  
     m_pBomb = nullptr;
     m_bPredictedHit = false;
+
+    Despawn_BombHitAim();
 }
 
 void CKirby_Ability_Bomb::Reset_Aim(CKirby* pKirby)
@@ -395,7 +416,8 @@ void CKirby_Ability_Bomb::Acc_AimInput(const _float3& vInputDir)
 
 void CKirby_Ability_Bomb::Cal_Aim(_float fTimeDelta)
 {
-    // 나중에 거리 제한 추가 필요
+    if (m_pBomb == nullptr)
+        return;
 
     _vector vInput = XMLoadFloat3(&m_vAimInput);
 
@@ -405,8 +427,27 @@ void CKirby_Ability_Bomb::Cal_Aim(_float fTimeDelta)
 
         _vector vTarget = XMLoadFloat3(&m_vAimTargetPos);
 
-        constexpr _float fSpeed = 8.f;
+        constexpr _float fSpeed = 10.f;
         vTarget += vInput * fSpeed * fTimeDelta;
+
+        constexpr _float fMin = 0.7f;
+        constexpr _float fMax = 10.f;
+
+        _vector vBombPos = m_pBomb->Get_Transform()->Get_State(STATE::POSITION);
+        _vector vBombToTargetXZ = XMVectorSetY(vTarget - vBombPos, 0.f);
+        _float fLengthSq = XMVectorGetX(XMVector3LengthSq(vBombToTargetXZ));
+        _float fTargetY = XMVectorGetY(vTarget);
+
+        if (fLengthSq > fMax * fMax)
+        {
+            vBombToTargetXZ = XMVector3Normalize(vBombToTargetXZ) * fMax;
+            vTarget = XMVectorSetY(vBombPos + vBombToTargetXZ, fTargetY);
+        }
+        else if (fLengthSq < fMin * fMin && fLengthSq > Helper::fEpsilon)
+        {
+            vBombToTargetXZ = XMVector3Normalize(vBombToTargetXZ) * fMin;
+            vTarget = XMVectorSetY(vBombPos + vBombToTargetXZ, fTargetY);
+        }
 
         XMStoreFloat3(&m_vAimTargetPos, vTarget);
     }
@@ -414,7 +455,7 @@ void CKirby_Ability_Bomb::Cal_Aim(_float fTimeDelta)
     m_vAimInput = {};
 }
 
-void CKirby_Ability_Bomb::Update_AimLaunch()
+void CKirby_Ability_Bomb::Update_AimPrediction()
 {
     if (m_pBomb == nullptr)
         return;
@@ -438,7 +479,62 @@ void CKirby_Ability_Bomb::Update_AimLaunch()
 
     // Effect
     m_bPredictedHit = m_pBomb->Predict_Trajectory(vStart, m_vAimLaunchVelocity,
-        m_PredictedPathPoints, m_vPredictedHitPosition, m_vPredictedHitNormal);
+        m_PredictedPathPoints, m_vPredictedHitPos, m_vPredictedHitNormal);
+
+    Update_BombHitAim();
+}
+
+void CKirby_Ability_Bomb::Update_BombHitAim()
+{
+    if (m_pBomb == nullptr || m_bPredictedHit == false)
+    {
+        Effect_Stop(m_pBombHitAim);
+        return;
+    }
+
+    _vector vNormal = XMLoadFloat3(&m_vPredictedHitNormal);
+    if (XMVectorGetX(XMVector3LengthSq(vNormal)) > Helper::fEpsilon)
+        vNormal = XMVector3Normalize(vNormal);
+    else
+        vNormal = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+    _vector vPos = XMLoadFloat3(&m_vPredictedHitPos) + vNormal * 0.07f;
+
+    if (m_pBombHitAim == nullptr)
+    {
+        _float3 vSpawnPos{};
+        XMStoreFloat3(&vSpawnPos, vPos);
+        CEffect_Loader::GetInstance()->Spawn(L"BombHitAim", m_pBomb->Get_LevelIndex(),
+            vSpawnPos, _float3{}, _float3{}, nullptr, &m_pBombHitAim);
+    }
+
+    if (m_pBombHitAim == nullptr)
+        return;
+
+    _vector vWorldUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+    _vector vRightCrossAxis{};
+    _float fUpDot = fabsf(XMVectorGetX(XMVector3Dot(vNormal, vWorldUp)));
+
+    if (fUpDot > 0.99f)
+        vRightCrossAxis = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+    else
+        vRightCrossAxis = vWorldUp;
+
+    _vector vRight = XMVector3Normalize(XMVector3Cross(vRightCrossAxis, vNormal));
+    _vector vUp = XMVector3Normalize(XMVector3Cross(vNormal, vRight));
+
+    CTransform* pTransform = m_pBombHitAim->Get_Transform();
+    pTransform->Set_State(STATE::POSITION, XMVectorSetW(vPos, 1.f));
+    pTransform->LookTo(vNormal, vUp);
+}
+
+void CKirby_Ability_Bomb::Despawn_BombHitAim()
+{
+    if (m_pBombHitAim == nullptr)
+        return;
+
+    Effect_Stop(m_pBombHitAim);
+    m_pBombHitAim = nullptr;
 }
 
 CKirby_Ability_Bomb* CKirby_Ability_Bomb::Create()

@@ -2,6 +2,10 @@
 
 #include "Kirby_Ability.h"
 
+NS_BEGIN(Engine)
+class CEffect_Container;
+NS_END
+
 NS_BEGIN(Client)
 
 class CKirby;
@@ -40,6 +44,9 @@ public:
 	virtual _bool Enter_Attack_KeyPress(CKirby* pKirby) override;
 	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) override;
 
+public:
+	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
+
 private:
 	void Change_BombState(CKirby* pKirby, BOMB_STATE eNext);
 	void Enter_BombState(CKirby* pKirby, BOMB_STATE eState);
@@ -57,7 +64,10 @@ private:
 	void Acc_AimInput(const _float3& vInputDir);
 	void Cal_Aim(_float fTimeDelta);
 
-	void Update_AimLaunch();
+	void Update_AimPrediction();
+
+	void Update_BombHitAim();
+	void Despawn_BombHitAim();
 
 private:
 	BOMB_STATE m_eBombState{};
@@ -77,9 +87,11 @@ private:
 
 	// Effect
 	vector<_float3> m_PredictedPathPoints;
-	_float3 m_vPredictedHitPosition{};
+	_float3 m_vPredictedHitPos{};
 	_float3 m_vPredictedHitNormal{};
 	_bool m_bPredictedHit{};
+
+	CEffect_Container* m_pBombHitAim{};
 
 public:
 	static CKirby_Ability_Bomb* Create();

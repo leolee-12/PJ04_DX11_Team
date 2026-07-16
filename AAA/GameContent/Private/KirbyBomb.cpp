@@ -24,7 +24,7 @@ CKirbyBomb::CKirbyBomb(const CKirbyBomb& Prototype)
 HRESULT CKirbyBomb::Initialize(void* pArg)
 {
 	m_fSpeed = 25.f;
-	m_fDamage = 2.f;
+	m_fDamage = 50.f;
 	m_fKnockback = 4.f;
 	m_fHitHeight = 0.01f;
 	m_fHitRadius = 0.60f;
@@ -484,16 +484,13 @@ HRESULT CKirbyBomb::Ready_HitBox()
 					tAttackInfo.pAttacker = this;
 
 					pDamageable->Damaged(tAttackInfo);
+					On_Impact();
 				}
-
-				return;
 			}
 			else if (iRenderGroup == ETOUI(COLLISION_LAYER::PLAYER_BOMB))
 			{
-				int a = 10;
+				On_Impact();
 			}
-
-			On_Impact();
 		});
 
 	m_pHitBox->Set_Enabled(false);

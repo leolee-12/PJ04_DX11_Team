@@ -984,11 +984,11 @@ void CGameObject_Factory::Register_Effect()
     Register(CBombHitAim::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CBombHitAim),
         LOADER
         (
-            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
-                CMeshCommon::Create(pDevice, pContext));
-            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BombHitAim"),
-                CModel::Create(pDevice, pContext, MODEL::NONANIM,
-                    "../../Resources/YSE/Effect/BombHitAim/Bom_AimHit.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG,
+                CRectCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_BombHitAim.iLevelID, Texture_BombHitAim.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_BombHitAim.szFileTag,
+                    Texture_BombHitAim.iNumTex));
         ));
     // 0. WalkSmoke
     Register(CWalkSmoke::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CWalkSmoke),
