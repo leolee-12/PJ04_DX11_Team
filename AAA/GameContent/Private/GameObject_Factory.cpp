@@ -80,9 +80,14 @@
 #include "Split_Cylinder.h"
 #include "LensFlare.h"
 #include "ItemEffect.h"
+#include "BombHitAim.h"
+#include "BombAimDot.h"
 #include "BreakWallEffect.h"
 #include "BubbleAura.h"
 #include "Kirby_SwordTrail.h"
+#include "SmokeCollection.h"
+#include "CarLanding.h"
+#include "SmokeSphereOriginalEmitter.h"
 #include "SwordTrail_BK.h"
 
 // Effect_Part
@@ -151,6 +156,7 @@
 
 //MainBoss
 #include "Boss_Gorilla.h"
+#include "Boss_GorillaRush.h"
 #include "Boss_Gorilla_Body.h"
 #include "CutsceneGorilla.h"
 #include "GorillaNamePlate.h"
@@ -163,6 +169,10 @@
 #include "Boss_Armadillo_Body.h"
 #include "Projectile_Partner.h"
 #include "Boss_Armadillo_Cage.h"
+
+#include "Boss_Leopard.h"
+#include "Boss_Leopard_Body.h"
+#include "Projectile_Nail.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
@@ -909,7 +919,7 @@ void CGameObject_Factory::Register_Effect()
 
         ));
 
-    // Generic Trail Container
+    // CKirby_SwordTrail
     Register(CKirby_SwordTrail::PROTOTYPE_TAG, TEXT("Effect_Container"),
         CREATOR(CKirby_SwordTrail),
         LOADER
@@ -917,6 +927,50 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CTrailCommon::PROTOTYPE_TAG, CTrailCommon::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, Texture_SwordTrail.iLevelID, Texture_SwordTrail.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_SwordTrail.szFileTag, Texture_SwordTrail.iNumTex));
+        ));
+
+    // SmokeCollection
+    Register(CSmokeCollection::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CSmokeCollection),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG,
+                CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSmokeLowPoly::PROTOTYPE_TAG,
+                CSmokeLowPoly::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeLowPoly"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/Test/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
+        ));
+
+    // CarLanding
+    Register(CCarLanding::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CCarLanding),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshParticleCommon::PROTOTYPE_TAG,
+                CMeshParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeLowPoly"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/Test/Effect/SmokeLowPoly/Model_SmokeLowPoly.ysh"));
+        ));
+
+    // SmokeSphereOriginalEmitter
+    Register(CSmokeSphereOriginalEmitter::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CSmokeSphereOriginalEmitter),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG,
+                CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
         ));
 
     // 8
@@ -1000,6 +1054,25 @@ void CGameObject_Factory::Register_Effect()
                 CTexture::Create(pDevice, pContext, Texture_ItemSparkle02.szFileTag, Texture_ItemSparkle02.iNumTex));
             TRY_ADD_PROTO(pProxy, Texture_ItemSparkle03.iLevelID, Texture_ItemSparkle03.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_ItemSparkle03.szFileTag, Texture_ItemSparkle03.iNumTex));
+        ));
+
+    Register(CBombHitAim::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CBombHitAim),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG,
+                CRectCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_BombHitAim.iLevelID, Texture_BombHitAim.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_BombHitAim.szFileTag,
+                    Texture_BombHitAim.iNumTex));
+        ));
+    Register(CBombAimDot::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CBombAimDot),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG,
+                CRectCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_BombAimDot.iLevelID, Texture_BombAimDot.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_BombAimDot.szFileTag,
+                    Texture_BombAimDot.iNumTex));
         ));
 
     // 14
@@ -1302,6 +1375,35 @@ void CGameObject_Factory::Register_MainBoss()
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Armadillo_Cage::PROTOTYPE_TAG,
                 CBoss_Armadillo_Cage::Create(pDevice, pContext));
+        )
+    );
+
+    Register(CBoss_Leopard::PROTOTYPE_TAG, TEXT("MainBoss"),
+        CREATOR(CBoss_Leopard),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Leopard_Body::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Leopard/Body/Model_Anim.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Leopard_Body::PROTOTYPE_TAG, CBoss_Leopard_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Nail::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Nail/Nail.ysh"
+                    , XMMatrixTranslation(0.f, 0.f, -0.8f)));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CProjectile_Nail::PROTOTYPE_TAG,
+                CProjectile_Nail::Create(pDevice, pContext));
+        )
+    );
+
+    Register(CBoss_GorillaRush::PROTOTYPE_TAG, TEXT("MainBoss"),
+        CREATOR(CBoss_GorillaRush),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Boss_Gorilla_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/Boss/Gorilla/Body/Gorilla.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CBoss_Gorilla_Body::PROTOTYPE_TAG,
+                CBoss_Gorilla_Body::Create(pDevice, pContext));
         )
     );
 }

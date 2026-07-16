@@ -250,6 +250,16 @@ void CMonster_Movement::Apply_Facing(_fvector vFaceDir, _float fTimeDelta)
 	__super::Apply_Facing(vFaceDir, fTimeDelta);
 }
 
+void CMonster_Movement::Calc_Vertical(_float fTimeDelta)
+{
+	if (!m_bGravityEnabled)
+	{
+		m_fVerticalVelocity = 0.f;
+		return;
+	}
+	__super::Calc_Vertical(fTimeDelta);
+}
+
 void CMonster_Movement::Start_Launch(_fvector vAttackerPos, _float fStrength, _float fUpRatio)
 {
 	if (nullptr == m_pTransform)

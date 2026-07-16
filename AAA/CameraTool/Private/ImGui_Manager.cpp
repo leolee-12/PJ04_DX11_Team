@@ -233,6 +233,7 @@ void CImGui_Manager::Draw_AreaInspector(CAM_AREA& A, _int idx)
     ImGui::DragFloat4("rot (OBB¸¸)", &A.rot.x, 0.01f);
     ImGui::InputInt("priority", &A.priority);
     ImGui::DragFloat3("scrollDead", &A.scrollDead.x, 0.1f, 0.f, 1000.f);
+    ImGui::DragFloat("smoothBase", &A.smoothBase, 0.01f, 0.02f, 2.f);
 
     const char* gazes[] = { "Kirby", "Point", "Object" };
     ImGui::Combo("gazeMode", &A.gazeMode, gazes, 3);

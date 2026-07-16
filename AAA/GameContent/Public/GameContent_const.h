@@ -40,6 +40,7 @@ namespace ProtoDesc
 	inline constexpr SHADER_DESC Shader_Kirby = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Kirby"), TEXT("../Bin/ShaderFiles/Shader_Kirby.hlsl") };
 	inline constexpr SHADER_DESC Shader_Gorilla = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Gorilla"), TEXT("../Bin/ShaderFiles/Shader_Gorilla.hlsl") };
 	inline constexpr SHADER_DESC Shader_Armadillo = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Armadillo"), TEXT("../Bin/ShaderFiles/Shader_Armadillo.hlsl") };
+	inline constexpr SHADER_DESC Shader_Leopard = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Leopard"), TEXT("../Bin/ShaderFiles/Shader_Leopard.hlsl") };
 	inline constexpr SHADER_DESC Shader_Monster = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Monster"), TEXT("../Bin/ShaderFiles/Shader_Monster.hlsl") };
 	inline constexpr SHADER_DESC Shader_WaddleDee = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_WaddleDee"), TEXT("../Bin/ShaderFiles/Shader_WaddleDee.hlsl") };
 	inline constexpr SHADER_DESC Shader_Bomb = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Bomb"), TEXT("../Bin/ShaderFiles/Shader_Bomb.hlsl") };
@@ -97,6 +98,10 @@ namespace ProtoDesc
 
 	// Star2D
 	inline constexpr TEXTURE_DESC Texture_Star2D = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Star2D"), TEXT("../../Resources/YSE/Effect/Star2D/common_star01.png"), 1 };
+
+	// BombHitAim
+	inline constexpr TEXTURE_DESC Texture_BombHitAim = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_BombHitAim"), TEXT("../../Resources/YSE/Effect/BombHitAim/BombOrbit._836491528.dds"), 1 };
+	inline constexpr TEXTURE_DESC Texture_BombAimDot = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_BombAimDot"), TEXT("../../Resources/YSE/Effect/BombHitAim/BombAimDot.png"), 1 };
 
 	// Hit 
 	inline constexpr TEXTURE_DESC Texture_CommonHit01 = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_CommonHit01"), TEXT("../../Resources/CHJ/Effect/Damage/common_hit01.png"), 1 };

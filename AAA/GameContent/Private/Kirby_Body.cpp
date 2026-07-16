@@ -2,8 +2,6 @@
 
 #include "GameInstance.h"
 
-#include "Effect_Loader.h"
-
 #include "kirby.h"
 
 CKirby_Body::CKirby_Body(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -91,7 +89,7 @@ HRESULT CKirby_Body::Ready_AnimEvents(CKirby* pKirby)
     m_pAnimatorCom->Set_EventCallback(
         [this, pKirby](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
         {
-            if (Handle_AnimEventParent(e, ePhase) == true)
+            if (Handle_AnimEventParent(pKirby, e, ePhase) == true)
                 return;
 
             if (pKirby->Dispatch_BodyAnimEventToAbility(e, ePhase) == true)
@@ -99,40 +97,6 @@ HRESULT CKirby_Body::Ready_AnimEvents(CKirby* pKirby)
 
             switch (static_cast<EANIM_EVENT>(e.iEventType))
             { 
-                case EANIM_EVENT::Fx:
-                {
-                    if (ePhase != ANIM_EVENT_PHASE::POINT)
-                        break;
-
-                    if (e.strParam.empty())
-                        break;
-
-                    switch (e.iIntParam)
-                    {
-                        case 0: // 캐릭터 중심 이펙트 Spawn
-                        {
-                            _float3 vPos{};
-                            XMStoreFloat3(&vPos, pKirby->Get_Transform()->Get_State(STATE::POSITION) +
-                                XMVectorSet(0.f, 1.f, 0.f, 0.f));
-                            CEffect_Loader::GetInstance()->Spawn(StrToWstr(e.strParam), pKirby->Get_LevelIndex(), vPos);
-                            break;
-                        }
-                        case 10: // Spit Air 조동아리 앞 오프셋 이펙트
-                        {
-                            _float3 vPos{}, vLook{};
-                            _vector vNormLook = XMVector3Normalize(pKirby->Get_Transform()->Get_State(STATE::LOOK));
-                            XMStoreFloat3(&vLook, vNormLook);
-                            vNormLook *= 2.f;
-                            vNormLook.m128_f32[1] = 0.6f;
-                            XMStoreFloat3(&vPos, pKirby->Get_Transform()->Get_State(STATE::POSITION) + vNormLook);
-                            CEffect_Loader::GetInstance()->Spawn(StrToWstr(e.strParam), pKirby->Get_LevelIndex(), vPos, vLook);
-                            break;
-                        }
-                    }
-
-                    break;
-                }
-
                 case EANIM_EVENT::SetBody:
                 {
                     if (ePhase != ANIM_EVENT_PHASE::POINT)
@@ -140,13 +104,12 @@ HRESULT CKirby_Body::Ready_AnimEvents(CKirby* pKirby)
 
                     switch (static_cast<KIRBY_BODY_STATE>(e.iIntParam))
                     {
-                        case KIRBY_BODY_STATE::NORMAL:  Set_KirbyBody(KIRBY_BODY_STATE::NORMAL);  break;
-                        case KIRBY_BODY_STATE::STUFFED: Set_KirbyBody(KIRBY_BODY_STATE::STUFFED); break;
-                        case KIRBY_BODY_STATE::INHALE:  Set_KirbyBody(KIRBY_BODY_STATE::INHALE);  break;
+                    case KIRBY_BODY_STATE::NORMAL:  Set_KirbyBody(KIRBY_BODY_STATE::NORMAL);  break;
+                    case KIRBY_BODY_STATE::STUFFED: Set_KirbyBody(KIRBY_BODY_STATE::STUFFED); break;
+                    case KIRBY_BODY_STATE::INHALE:  Set_KirbyBody(KIRBY_BODY_STATE::INHALE);  break;
                     }
                     break;
                 }
-
                 case EANIM_EVENT::SetMouth:
                 {
                     if (ePhase != ANIM_EVENT_PHASE::POINT)
@@ -163,33 +126,6 @@ HRESULT CKirby_Body::Ready_AnimEvents(CKirby* pKirby)
                     break;
                 }
 
-                case EANIM_EVENT::WalkSmoke:
-                {
-                    if (ePhase != ANIM_EVENT_PHASE::POINT)
-                        break;
-
-                    const _float fBackOffset = 1.f;
-                    const _float fSideOffset = 0.25f;
-
-                    CTransform* pKirbyTransform = pKirby->Get_Transform();
-
-                    _vector vBackDir = -XMVector3Normalize(
-                        XMVectorSetY(pKirbyTransform->Get_State(STATE::LOOK), 0.f));
-
-                    _vector vRightDir = XMVector3Normalize(
-                        XMVectorSetY(pKirbyTransform->Get_State(STATE::RIGHT), 0.f));
-
-                    _float3 fPos{};
-                    XMStoreFloat3(&fPos, pKirbyTransform->Get_State(STATE::POSITION) + XMVectorSet(0.f, 0.2f, 0.f, 0.f) +
-                        vBackDir * fBackOffset + vRightDir * fSideOffset * static_cast<_float>(e.iIntParam));
-
-                    _float3 vSpawnLook{};
-                    XMStoreFloat3(&vSpawnLook, vBackDir);
-
-                    CEffect_Loader::GetInstance()->Spawn(L"WalkSmoke", Get_LevelIndex(), fPos, vSpawnLook, _float3(0.f, 0.f, 0.f));
-
-                    break;
-                }
             }
         }
     );

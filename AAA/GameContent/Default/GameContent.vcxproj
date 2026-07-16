@@ -22,10 +22,16 @@
     <ClInclude Include="..\Public\Ability_Bubble.h" />
     <ClInclude Include="..\Public\Ability_Model.h" />
     <ClInclude Include="..\Public\Ancor_WorkingDirectory.h" />
+    <ClInclude Include="..\public\Boss_GorillaRush.h" />
+    <ClInclude Include="..\public\Boss_GorillaRush_Brain.h" />
+    <ClInclude Include="..\public\Boss_Leopard.h" />
+    <ClInclude Include="..\public\Boss_Leopard_Body.h" />
+    <ClInclude Include="..\public\Boss_Leopard_Brain.h" />
     <ClInclude Include="..\Public\BubbleMovement.h" />
     <ClInclude Include="..\Public\DropStar.h" />
     <ClInclude Include="..\Public\DropStar_Body.h" />
     <ClInclude Include="..\Public\DropStar_Manager.h" />
+    <ClInclude Include="..\public\Projectile_Nail.h" />
     <ClInclude Include="..\Public\LensFlare.h" />
     <ClInclude Include="..\Public\SwordTrail_BK.h" />
     <ClInclude Include="..\Public\BladeKnight_Body.h" />
@@ -93,6 +99,8 @@
     <ClInclude Include="..\Public\EnvVolume_Effect.h" />
     <ClInclude Include="..\Public\EnvVolume_Light.h" />
     <ClInclude Include="..\Public\ItemEffect.h" />
+    <ClInclude Include="..\Public\BombHitAim.h" />
+    <ClInclude Include="..\Public\BombAimDot.h" />
     <ClInclude Include="..\Public\EssenceAura.h" />
     <ClInclude Include="..\public\KirbySpawnPoint.h" />
     <ClInclude Include="..\Public\Kirby_DeformDump.h" />
@@ -133,6 +141,9 @@
     <ClInclude Include="..\Public\TownCondition_Utils.h" />
     <ClInclude Include="..\Public\TrailCommon.h" />
     <ClInclude Include="..\Public\Kirby_SwordTrail.h" />
+    <ClInclude Include="..\Public\SmokeCollection.h" />
+    <ClInclude Include="..\Public\CarLanding.h" />
+    <ClInclude Include="..\Public\SmokeSphereOriginalEmitter.h" />
     <ClInclude Include="..\public\Mission_Manager.h" />
     <ClInclude Include="..\Public\Monster_State_Flatten.h" />
     <ClInclude Include="..\Public\Monster_State_Spat.h" />
@@ -401,10 +412,16 @@
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp" />
     <ClCompile Include="..\Private\Ability_Model.cpp" />
+    <ClCompile Include="..\private\Boss_GorillaRush.cpp" />
+    <ClCompile Include="..\private\Boss_GorillaRush_Brain.cpp" />
+    <ClCompile Include="..\private\Boss_Leopard.cpp" />
+    <ClCompile Include="..\private\Boss_Leopard_Body.cpp" />
+    <ClCompile Include="..\private\Boss_Leopard_Brain.cpp" />
     <ClCompile Include="..\Private\BubbleMovement.cpp" />
     <ClCompile Include="..\Private\DropStar.cpp" />
     <ClCompile Include="..\Private\DropStar_Body.cpp" />
     <ClCompile Include="..\Private\DropStar_Manager.cpp" />
+    <ClCompile Include="..\private\Projectile_Nail.cpp" />
     <ClCompile Include="..\Private\LensFlare.cpp" />
     <ClCompile Include="..\Private\SwordTrail_BK.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Body.cpp" />
@@ -465,6 +482,8 @@
     <ClCompile Include="..\Private\EnvVolume_Effect.cpp" />
     <ClCompile Include="..\Private\EnvVolume_Light.cpp" />
     <ClCompile Include="..\Private\ItemEffect.cpp" />
+    <ClCompile Include="..\Private\BombHitAim.cpp" />
+    <ClCompile Include="..\Private\BombAimDot.cpp" />
     <ClCompile Include="..\Private\EssenceAura.cpp" />
     <ClCompile Include="..\private\KirbySpawnPoint.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformDump.cpp" />
@@ -513,6 +532,9 @@
     <ClCompile Include="..\Private\Split_Cylinder.cpp" />
     <ClCompile Include="..\Private\TrailCommon.cpp" />
     <ClCompile Include="..\Private\Kirby_SwordTrail.cpp" />
+    <ClCompile Include="..\Private\SmokeCollection.cpp" />
+    <ClCompile Include="..\Private\CarLanding.cpp" />
+    <ClCompile Include="..\Private\SmokeSphereOriginalEmitter.cpp" />
     <ClCompile Include="..\private\Mission_Manager.cpp" />
     <ClCompile Include="..\Private\Monster_State_Flatten.cpp" />
     <ClCompile Include="..\Private\Monster_State_Spat.cpp" />
@@ -824,6 +846,9 @@
     <None Include="..\ShaderFiles\Shader_AbillityModel.hlsl">
       <FileType>Document</FileType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_Leopard.hlsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
