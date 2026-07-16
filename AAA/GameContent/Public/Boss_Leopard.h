@@ -13,13 +13,15 @@ class CBoss_Leopard final : public CBoss
 public:
     static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_Boss_Leopard";
 
-    static constexpr _float s_fCCT_Radius = 3.f;   // TODO: 레오파드 크기
+    static constexpr _float s_fCCT_Radius = 3.f;
     static constexpr _float s_fCCT_Height = 6.f;
 
     static constexpr _float DEATH_PAUSE_SEC = 0.7f;
     static constexpr _float DEATH_SHAKE_SEC = 0.7f;
 
     static constexpr _int NAIL_COUNT = 5;
+
+    static constexpr _float BASE_ANIM_SPEED = 1.5f;
 
     enum PILLAR : _int { PILLAR_FL, PILLAR_FR, PILLAR_BR, PILLAR_BL, PILLAR_COUNT };
 
@@ -66,6 +68,10 @@ public:
     void Spawn_HandNails();
     void Launch_NextHandNail();
 
+    void  Enter_PillarMode();
+    void  Exit_PillarMode(); 
+    _bool Is_PillarMode() const { return m_bPillarMode; }
+
 private:
     CBoss_Leopard_Body* m_pBody = { nullptr };
     static const vector<_float> s_Thresholds;
@@ -81,8 +87,13 @@ private:
 
     CProjectile_Nail* m_pNails[NAIL_COUNT] = {};
 
+    _bool m_bPillarMode = { false };
+
 private:
     void Tick_DeathSequence(_float fTimeDelta);
+#ifdef _DEBUG
+    void Debug_KeyInput();
+#endif
 
 public:
     static CBoss_Leopard* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

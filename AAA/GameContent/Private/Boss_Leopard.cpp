@@ -7,6 +7,8 @@
 #include "Projectile_Nail.h"
 #include "Projectile_Manager.h"
 
+#include "Monster_Movement.h"
+
 const vector<_float> CBoss_Leopard::s_Thresholds = {};
 
 const _float3 CBoss_Leopard::s_vPillarPos[CBoss_Leopard::PILLAR_COUNT] = {
@@ -39,6 +41,10 @@ HRESULT CBoss_Leopard::Initialize(void* pArg)
 
 void CBoss_Leopard::Update(_float fTimeDelta)
 {
+#ifdef _DEBUG
+    Debug_KeyInput();
+#endif
+
     __super::Update(fTimeDelta);
     Tick_DeathSequence(fTimeDelta);
 }
@@ -137,6 +143,52 @@ void CBoss_Leopard::Launch_NextHandNail()
     }
 }
 
+void CBoss_Leopard::Enter_PillarMode()
+{
+    if (m_bPillarMode) return;
+    m_bPillarMode = true;
+
+    //_float fBackDist = { 14.0f };        // 커비 뒤로 거리
+    //_float fHeight = { 4.f };            // 카메라 높이
+    //_float fShoulderOffset = { -1.8f };  // 양수=오른쪽 어깨
+    //_float fAimBias = { 0.65f };         // 0=커비 / 1=보스
+    //_float fAimHeight = { 6.f };         // 시선 높이(보스 크면 키움)
+    //_float fSmoothTime = { 0.18f };      // 따라오는 부드러움
+    //_float fFovDeg = { 50.f };           // FOV
+
+    BOSSCAM_CONFIG_DESC cfg{};
+    cfg.fAimHeight = -3.f;
+    cfg.fShoulderOffset = 0.f;
+    cfg.fHeight = 2.f;
+    m_pGameInstance_Proxy->Publish(EventTag::BossCam_Config, &cfg);
+
+    Enable_Controller(false);
+    if (m_pMovement)
+    {
+        m_pMovement->Set_GravityEnabled(false);
+        m_pMovement->Sync_To_Controller();
+    }
+}
+
+void CBoss_Leopard::Exit_PillarMode()
+{
+    if (!m_bPillarMode) return;
+    m_bPillarMode = false;
+
+    BOSSCAM_CONFIG_DESC cfg{};
+    cfg.fAimHeight = 3.f;
+    cfg.fShoulderOffset = 0.f;
+    cfg.fHeight = 2.f;
+    m_pGameInstance_Proxy->Publish(EventTag::BossCam_Config, &cfg);
+
+    Enable_Controller(true);
+    if (m_pMovement)
+    {
+        m_pMovement->Set_GravityEnabled(true);
+        m_pMovement->Sync_To_Controller();       
+    }
+}
+
 CMonsterBrain* CBoss_Leopard::Create_Brain()
 {
     return CBoss_Leopard_Brain::Create(this);
@@ -145,11 +197,15 @@ CMonsterBrain* CBoss_Leopard::Create_Brain()
 void CBoss_Leopard::Play_Intro()
 {
     if (CAnimator* pAnim = Get_BodyAnimator())
-        pAnim->Play("Angry", false, true, 0.f, 1.5f);   // TODO: 레오파드 등장 클립
+        pAnim->Play("Anger", false, true, 0.f, BASE_ANIM_SPEED);
+
+    CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
 
     BOSSCAM_CONFIG_DESC cfg{};
-    cfg.fAimHeight = 4.f;
+    cfg.fAimHeight = 3.f;
     cfg.fShoulderOffset = 0.f;
+    cfg.fHeight = 2.f;
     m_pGameInstance_Proxy->Publish(EventTag::BossCam_Config, &cfg);
 }
 
@@ -165,14 +221,13 @@ void CBoss_Leopard::Play_Death()
     if (auto* p = Get_HitBoxPart())
         p->Enable_AllHitBoxes(false);
 
-    // 커비를 바라보고 죽음 (수평만, LookTo는 이제 w-safe)
     _vector vDir = XMVectorSetY(
         XMLoadFloat3(&Get_BlackBoard().vTargetPos) - m_pTransformCom->Get_State(STATE::POSITION), 0.f);
     if (XMVectorGetX(XMVector3LengthSq(vDir)) > 1e-6f)
         m_pTransformCom->LookTo(XMVector3Normalize(vDir));
 
     if (CAnimator* pAnim = Get_BodyAnimator())
-        pAnim->Play("DeathDamage", false, true, 0.f, 1.f);   // TODO: 레오파드 Death 클립
+        pAnim->Play("Death", false, true, 0.f, BASE_ANIM_SPEED);
 
     m_pGameInstance_Proxy->Publish(EventTag::FullScreen_Flash, nullptr);
 
@@ -220,6 +275,16 @@ void CBoss_Leopard::Tick_DeathSequence(_float fTimeDelta)
         default: break;
     }
 }
+
+#ifdef _DEBUG
+void CBoss_Leopard::Debug_KeyInput()
+{
+    if (m_pGameInstance_Proxy->Key_Down(DIK_0))
+        Appear();
+    if (m_pGameInstance_Proxy->Key_Down(DIK_9)) 
+        Die();
+}
+#endif
 
 void CBoss_Leopard::On_Enter_Corpse()
 {

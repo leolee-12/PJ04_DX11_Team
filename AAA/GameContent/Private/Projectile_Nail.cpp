@@ -27,8 +27,9 @@ void CProjectile_Nail::Launch_At(const _float3& vTargetPos)
     XMStoreFloat3(&vP, vPos);
     XMStoreFloat3(&vD, vDir);
 
-    Launch(vP, vD);                    
-    m_pTransformCom->LookTo(vDir);     
+    Launch(vP, vD);
+    _vector vAt = vPos - vDir;
+    m_pTransformCom->LookAt(vAt);
     m_eState = STATE::FLYING;
 }
 
@@ -58,8 +59,6 @@ void CProjectile_Nail::Update(_float fTimeDelta)
 
     if (m_eState == STATE::FLYING)
     {
-        Spin(fTimeDelta);
-
         _vector vVel = XMLoadFloat3(&m_vVelocity);
         if (XMVectorGetX(XMVector3LengthSq(vVel)) > 1e-6f)
         {
