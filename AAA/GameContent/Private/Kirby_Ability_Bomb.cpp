@@ -71,11 +71,19 @@ _bool CKirby_Ability_Bomb::Handle_Command(CKirby* pKirby, CKirby_Command* pComma
             if (!pCommand->IsPress())
                 return false;
 
-            if (m_eBombState != BOMB_STATE::MOVE_THROW)
-                return true;
-
             Move_Command* pMoveCommand = static_cast<Move_Command*>(pCommand);
-            pKirby->Add_MoveDir(pMoveCommand->Get_Dir());
+            if (m_eBombState == BOMB_STATE::MOVE_THROW)
+            {
+                pKirby->Add_MoveDir(pMoveCommand->Get_Dir());
+                return true;
+            }
+            else if (m_eBombState == BOMB_STATE::CHARGING ||
+                m_eBombState == BOMB_STATE::CHARGING_FALL ||
+                m_eBombState == BOMB_STATE::CHARGING_LANDING)
+            {
+                Acc_AimInput(pMoveCommand->Get_Dir());
+                return true;
+            }
 
             return true;
         }
@@ -148,6 +156,7 @@ void CKirby_Ability_Bomb::Enter_BombState(CKirby* pKirby, BOMB_STATE eState)
 
         case BOMB_STATE::CHARGE_START:
             pAnimator->Play("BombThrowCharge", true, false, 0.1f, 1.5f);
+            Reset_Aim(pKirby);
             Spawn_Bomb(pKirby);
             break;
         case BOMB_STATE::CHARGING:
@@ -156,6 +165,7 @@ void CKirby_Ability_Bomb::Enter_BombState(CKirby* pKirby, BOMB_STATE eState)
 
         case BOMB_STATE::CHARGE_START_FALL:
             pAnimator->Play("BombFall", false, false, 0.1f, 1.5f);
+            Reset_Aim(pKirby);
             Spawn_Bomb(pKirby);
             break;
         case BOMB_STATE::CHARGING_FALL:
@@ -208,6 +218,9 @@ void CKirby_Ability_Bomb::Update_BombState(CKirby* pKirby, _float fTimeDelta)
         }
         case BOMB_STATE::CHARGING:
         {
+            Cal_Aim(fTimeDelta);
+            Find_LandingPointFromAim();
+
             if (m_bKeyUp)
                 Change_BombState(pKirby, BOMB_STATE::CHARGING_THROW);
             break;
@@ -229,6 +242,9 @@ void CKirby_Ability_Bomb::Update_BombState(CKirby* pKirby, _float fTimeDelta)
         }
         case BOMB_STATE::CHARGING_FALL:
         {
+            Cal_Aim(fTimeDelta);
+            Find_LandingPointFromAim();
+
             if (m_bKeyUp)
                 Change_BombState(pKirby, BOMB_STATE::CHARGING_THROW);
             else if (IsGround)
@@ -237,6 +253,9 @@ void CKirby_Ability_Bomb::Update_BombState(CKirby* pKirby, _float fTimeDelta)
         }
         case BOMB_STATE::CHARGING_LANDING:
         {
+            Cal_Aim(fTimeDelta);
+            Find_LandingPointFromAim();
+
             if (m_bKeyUp)
                 Change_BombState(pKirby, BOMB_STATE::CHARGING_THROW);
             else if (pAnimator->Is_Finished())
@@ -336,6 +355,65 @@ void CKirby_Ability_Bomb::Throw_Bomb(CKirby* pKirby, _float fDegree, _float fSpe
 
     m_pBomb->Launch(vLaunchPos, vLaunchDir, fSpeed);
     m_pBomb = nullptr;
+}
+
+void CKirby_Ability_Bomb::Reset_Aim(CKirby* pKirby)
+{
+    _vector vKirbyPos = pKirby->Get_Transform()->Get_State(STATE::POSITION);
+
+    _vector vLook = pKirby->Get_Transform()->Get_State(STATE::LOOK);
+    vLook = XMVector3Normalize(XMVectorSetY(vLook, 0.f));
+
+    constexpr _float fDist = 4.f;
+    _vector vTarget = vKirbyPos + vLook * fDist;
+
+    XMStoreFloat3(&m_vAimTargetPos, vTarget);
+}
+
+void CKirby_Ability_Bomb::Acc_AimInput(const _float3& vInputDir)
+{
+    _vector vInput = XMLoadFloat3(&m_vAimInput) + XMLoadFloat3(&vInputDir);
+    XMStoreFloat3(&m_vAimInput, vInput);
+}
+
+void CKirby_Ability_Bomb::Cal_Aim(_float fTimeDelta)
+{
+    // 나중에 거리 제한 추가 필요
+
+    _vector vInput = XMLoadFloat3(&m_vAimInput);
+
+    if (XMVectorGetX(XMVector3LengthSq(vInput)) > Helper::fEpsilon)
+    {
+        vInput = XMVector3Normalize(vInput);
+
+        _vector vTarget = XMLoadFloat3(&m_vAimTargetPos);
+
+        constexpr _float fSpeed = 8.f;
+        vTarget += vInput * fSpeed * fTimeDelta;
+
+        XMStoreFloat3(&m_vAimTargetPos, vTarget);
+    }
+
+    m_vAimInput = {};
+}
+
+void CKirby_Ability_Bomb::Find_LandingPointFromAim()
+{
+    _float3 vOrigin = m_vAimTargetPos;
+    vOrigin.y += 10.f;
+
+    _float3 vMoveDir = { 0.f, -1.f, 0.f };
+    _float3 vNormal{};
+    _float fDistance{};
+
+    constexpr _float fRadius = 0.05f;
+    constexpr _float fMaxDist = 30.f;
+    if (m_pGameInstance_Proxy->Sweep_Sphere(vOrigin, fRadius, vMoveDir, fMaxDist,
+        &vNormal, &fDistance,
+        true, false))
+    {
+        m_vAimTargetPos.y = vOrigin.y - fDistance - fRadius;
+    }
 }
 
 CKirby_Ability_Bomb* CKirby_Ability_Bomb::Create()
