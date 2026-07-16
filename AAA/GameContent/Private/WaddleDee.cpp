@@ -1,19 +1,29 @@
 #include "WaddleDee.h"
 #include "WaddleDee_Body.h"
 #include "LevelDesign_LoadTypes.h"
+#include "GameContrnt_Events.h"
 
-#include "Animator.h"
+#include "GameInstance.h"
 #include "Parsing_Utils.h"
+
+namespace
+{
+    constexpr const _char* s_szGreetClip = "WaveHand";
+    constexpr _ubyte s_byInteractKey = DIK_F;
+    constexpr _float s_fGreetCooldown = 1.5f;
+}
 
 CWaddleDee::CWaddleDee(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CCharacter(pDevice, pContext)
 {
     m_strFixedAnim = L"";
+    m_fInteractRadius = 2.f;
 }
 
 CWaddleDee::CWaddleDee(const CWaddleDee& Prototype)
     : CCharacter(Prototype)
     , m_strFixedAnim(Prototype.m_strFixedAnim)
+    , m_fInteractRadius(Prototype.m_fInteractRadius)
 {
 }
 
@@ -43,10 +53,22 @@ void CWaddleDee::Update(_float fTimeDelta)
 
     __super::Update(fTimeDelta);
 
+    const _bool bEditMode = m_pGameInstance_Proxy->Is_EditMode();
+
+    if (!bEditMode && m_fGreetCooldown > 0.f)
+        m_fGreetCooldown = max(0.f, m_fGreetCooldown - fTimeDelta);
+
     switch (m_eState)
     {
     case WADDLEDEE_STATE::IDLE:
         Update_Idle();
+        if (!bEditMode)
+            Check_Interact();
+        break;
+
+    case WADDLEDEE_STATE::GREET:
+        if (!bEditMode)
+            Update_Greet();
         break;
     }
 }
@@ -63,6 +85,8 @@ void CWaddleDee::On_Deserialized()
 {
     __super::On_Deserialized();
 
+    m_fGreetCooldown = 0.f;
+    m_pPlayer = nullptr;
     m_strAppliedFixedAnim.clear();
     Change_State(WADDLEDEE_STATE::IDLE);
 }
@@ -95,7 +119,45 @@ void CWaddleDee::Change_State(WADDLEDEE_STATE eState)
     case WADDLEDEE_STATE::IDLE:
         Play_Idle();
         break;
+
+    case WADDLEDEE_STATE::GREET:
+        m_pBody->Get_Animator()->Play(s_szGreetClip, false, true);
+        break;
     }
+}
+
+void CWaddleDee::Check_Interact()
+{
+    if (m_fGreetCooldown > 0.f || m_fInteractRadius <= 0.f || !Find_Player())
+        return;
+
+    _vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vPlayerPosition = m_pPlayer->Get_Transform()->Get_State(STATE::POSITION);
+    _vector vToPlayer = XMVectorSetY(vPlayerPosition - vPosition, 0.f);
+    const _float fDistanceSq = XMVectorGetX(XMVector3LengthSq(vToPlayer));
+
+    if (fDistanceSq > m_fInteractRadius * m_fInteractRadius)
+        return;
+
+    if (!m_pGameInstance_Proxy->Key_Down(s_byInteractKey))
+        return;
+
+    if (fDistanceSq > FLT_EPSILON)
+        m_pTransformCom->LookAt(vPosition + vToPlayer);
+
+    Change_State(WADDLEDEE_STATE::GREET);
+}
+
+_bool CWaddleDee::Find_Player()
+{
+    if (nullptr != m_pPlayer)
+        return true;
+
+    PLAYER_QUERY PlayerQuery{};
+    m_pGameInstance_Proxy->Publish(EventTag::Query_Player, &PlayerQuery);
+    m_pPlayer = PlayerQuery.pPlayer;
+
+    return nullptr != m_pPlayer;
 }
 
 void CWaddleDee::Update_Idle()
@@ -110,6 +172,15 @@ void CWaddleDee::Play_Idle()
 
     m_pBody->Get_Animator()->Play(strClip, true, true, 0.f);
     m_strAppliedFixedAnim = m_strFixedAnim;
+}
+
+void CWaddleDee::Update_Greet()
+{
+    if (!m_pBody->Get_Animator()->Is_Finished())
+        return;
+
+    m_fGreetCooldown = s_fGreetCooldown;
+    Change_State(WADDLEDEE_STATE::IDLE);
 }
 
 CWaddleDee* CWaddleDee::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
