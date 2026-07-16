@@ -5,10 +5,10 @@
 CProjectile_Nail::CProjectile_Nail(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CProjectile{ pDevice, pContext }
 {
-    m_fSpeed = 26.f; m_fLifeTime = 8.f;      // 8s = 안전망(지형 못 맞고 날아가면 소멸)
-    m_fDamage = 4.f; m_fKnockback = 6.f;
-    m_fHitRadius = 0.4f; m_fHitHeight = 0.4f;
-    m_vCenterOffset = { 0.f, 0.5f, 0.f };
+    m_fSpeed = 40.f; m_fLifeTime = 8.f;      // 8s = 안전망(지형 못 맞고 날아가면 소멸)
+    m_fDamage = 10.f; m_fKnockback = 6.f;
+    m_fHitRadius = 1.f; m_fHitHeight = 0.4f;
+    m_vCenterOffset = { 0.f, 0.f, 0.8f };
 }
 CProjectile_Nail::CProjectile_Nail(const CProjectile_Nail& Prototype)
     : CProjectile(Prototype) {
@@ -65,7 +65,7 @@ void CProjectile_Nail::Update(_float fTimeDelta)
             _float3 vDir; XMStoreFloat3(&vDir, XMVector3Normalize(vVel));
             _float3 vPos; XMStoreFloat3(&vPos, m_pTransformCom->Get_State(Engine::STATE::POSITION));
             _float3 vN{};
-            if (m_pGameInstance_Proxy->Sweep_Sphere(vPos, m_fHitRadius, vDir, m_fHitRadius + 0.3f, &vN))
+            if (m_pGameInstance_Proxy->Sweep_Sphere(vPos, 0.4f, vDir, 0.7f, &vN))
                 Enter_Stuck(vN);
         }
     }
@@ -75,14 +75,6 @@ void CProjectile_Nail::Update(_float fTimeDelta)
         if (m_fStuckTimer <= 0.f)
             Kill();
     }
-}
-
-void CProjectile_Nail::Spin(_float dt)
-{
-    _vector vAxis = XMLoadFloat3(&m_vVelocity);
-    if (XMVectorGetX(XMVector3LengthSq(vAxis)) < 1e-6f) return;
-    vAxis = XMVector3Normalize(vAxis);
-    m_pTransformCom->Rotate(XMQuaternionRotationAxis(vAxis, SPIN_SPEED * dt));  // 진행축 기준 회전
 }
 
 void CProjectile_Nail::Enter_Stuck(const _float3& vNormal)

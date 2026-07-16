@@ -65,8 +65,8 @@ public:
     void  Set_CurPillar(PILLAR e) { m_iCurPillar = e; }
     _int  Advance_ToAdjacentPillar();
 
-    void Spawn_HandNails();
-    void Launch_NextHandNail();
+    void  Spawn_HandNails();
+    void  Launch_NextHandNail();
 
     void  Enter_PillarMode();
     void  Exit_PillarMode(); 

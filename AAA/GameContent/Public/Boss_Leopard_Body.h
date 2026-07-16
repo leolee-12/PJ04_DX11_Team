@@ -8,7 +8,7 @@ class CBoss_Leopard_Body final : public CMultiHitBoxPart
     GENERATED_BODY(CBoss_Leopard_Body)
 
 public:
-    enum LEOPARD_HITBOX { LHB_BODY, LHB_END };
+    enum LEOPARD_HITBOX { LHB_DROP, LHB_LCLAW, LHB_RCLAW, LHB_ASSAULT, LHB_END };
     enum class EYE : _uint { ANGRY, NORMAL, OPEN, CLOSE };
     enum class CLAW : _uint { NORMAL, ATTACK };
 

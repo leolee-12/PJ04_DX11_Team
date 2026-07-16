@@ -16,10 +16,14 @@ HRESULT CBoss_Leopard_Body::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg))) return E_FAIL;
     if (FAILED(Ready_Components()))        return E_FAIL;
 
-    // TODO: 레오파드 리그에 맞는 본/사이즈로 조정 (지금은 몸통 허트/샘플 하나)
-    Add_HitBox(LHB_BODY, "Spine1J", COLLIDER::SPHERE, 4.f, 0.f, 0.f, 0.f);
+    Add_HitBox(LHB_DROP, "TopL", COLLIDER::SPHERE, 0.75f, 0.f, 10.f, 5.f);
+    Add_HitBox(LHB_LCLAW, "LHaveL", COLLIDER::SPHERE, 1.f, 0.f, 10.f, 5.f);
+    Add_HitBox(LHB_RCLAW, "RHaveL", COLLIDER::SPHERE, 1.f, 0.f, 10.f, 5.f);
+    Add_HitBox(LHB_ASSAULT, "C_BustFurJ", COLLIDER::SPHERE, 2.f, 0.f, 10.f, 5.f);
 
-    m_pAnimatorCom->Play("Wait", false);   // TODO: 레오파드 대기 클립명 확인
+    Enable_AllHitBoxes(false);
+
+    m_pAnimatorCom->Play("Wait", false);
     m_iShadowPassIdx = PASS_SHADOW;
     return S_OK;
 }

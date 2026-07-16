@@ -1269,10 +1269,7 @@ void CKirby::Damaged(const ATTACK_INFO& tInfo)
         return;
 
     if (Block_Hit(tInfo))
-    {
-        m_pGameInstance_Proxy->Play_SFX(L"CharaBasic_DamageReact_Normal.wav", 0.5f);
         return;
-    }
 
     On_Damaged(tInfo);
 

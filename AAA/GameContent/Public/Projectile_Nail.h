@@ -30,10 +30,9 @@ public:
 
 protected:
     virtual HRESULT Ready_Visual() override;
-    virtual void    On_Impact() override {}   // 커비 히트로는 안 사라짐(관통, 데미지만)
+    virtual void    On_Impact() override {}
 
 private:
-    void    Spin(_float dt);
     void    Enter_Stuck(const _float3& vNormal);
     HRESULT Bind_ShaderResources();
 
