@@ -73,8 +73,8 @@ private:
 	BOMB_STATE m_eBombState{};
 
 	_bool m_bKeyUp{};
-
 	_bool m_bReserveAttack{};
+	_bool m_bReserveKeyUp{};
 
 private:
 	CKirbyBomb* m_pBomb{};
@@ -92,6 +92,17 @@ private:
 	_bool m_bPredictedHit{};
 
 	CEffect_Container* m_pBombHitAim{};
+
+
+
+	void Update_BombAimDots(_float fTimeDelta);
+	void Despawn_BombAimDots();
+
+	static constexpr _uint s_iBombAimDotCount = 32;
+	static constexpr _uint s_iBombAimDotInterval = 6;
+
+	CEffect_Container* m_pBombAimDots[s_iBombAimDotCount]{};
+	_float m_fBombAimDotStep{};
 
 public:
 	static CKirby_Ability_Bomb* Create();

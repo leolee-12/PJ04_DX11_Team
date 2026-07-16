@@ -19,7 +19,9 @@ namespace
     {
         { TEXT("WalkSmoke"),              TEXT("../../Resources/YSE/EffectContainer/WalkSmoke_7_01.json") },
         { TEXT("LandingSmoke"),           TEXT("../../Resources/YSE/EffectContainer/LandingSmoke.JSON") },
+        { TEXT("CarLanding"),             TEXT("../../Resources/YSE/EffectContainer/CarLanding.JSON") },
         { TEXT("BombHitAim"),             TEXT("../../Resources/YSE/EffectContainer/BombHitAim.JSON") },
+        { TEXT("BombAimDot"),             TEXT("../../Resources/YSE/EffectContainer/BombAimDot.JSON") },
         { TEXT("SlideSmoke"),             TEXT("../../Resources/LevelData/SlideSmoke.JSON") },
         { TEXT("InhaleContainer"),        TEXT("../../Resources/YSE/EffectContainer/Inhale_6_24.json") },
 

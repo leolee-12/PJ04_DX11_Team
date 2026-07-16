@@ -33,6 +33,10 @@ COPY_ABILITY_TYPE CKirby_Ability_Bomb::Get_AbilityType()
 
 void CKirby_Ability_Bomb::Enter_AttackState(CKirby* pKirby, _int iFlag)
 {
+    m_bKeyUp = false;
+    m_bReserveAttack = false;
+    m_bReserveKeyUp = false;
+
     m_eBombState = BOMB_STATE::BOMB_STATE_END;
     
     CMovement_Child* pMovement = pKirby->Get_Movement();
@@ -55,6 +59,9 @@ void CKirby_Ability_Bomb::Update_AttackState(CKirby* pKirby, _float fTimeDelta)
 
 void CKirby_Ability_Bomb::Exit_AttackState(CKirby* pKirby)
 {
+    m_bKeyUp = false;
+    m_bReserveAttack = false;
+    m_bReserveKeyUp = false;
 }
 
 _bool CKirby_Ability_Bomb::Handle_Command(CKirby* pKirby, CKirby_Command* pCommand)
@@ -93,12 +100,18 @@ _bool CKirby_Ability_Bomb::Handle_Command(CKirby* pKirby, CKirby_Command* pComma
         {
             if (pCommand->IsUp())
             {
-                m_bKeyUp = true;
+                if (m_bReserveAttack == true)
+                    m_bReserveKeyUp = true;
+                else 
+                    m_bKeyUp = true;
             }
             else if (pCommand->IsDown())
             {
-                m_bReserveAttack = true;
-                m_bKeyUp = false;
+                if (!m_bReserveAttack)
+                {
+                    m_bReserveAttack = true;
+                    m_bReserveKeyUp = false;
+                }
             }
             return true;
         }
@@ -138,11 +151,8 @@ void CKirby_Ability_Bomb::On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INF
         m_pBomb = nullptr;
     }
 
-    if (m_pBombHitAim != nullptr)
-    {
-        m_pBombHitAim->EffectContainer_Stop();
-        m_pBombHitAim = nullptr;
-    }
+    Despawn_BombHitAim();
+    Despawn_BombAimDots();
 }
 
 void CKirby_Ability_Bomb::Change_BombState(CKirby* pKirby, BOMB_STATE eNext)
@@ -239,6 +249,7 @@ void CKirby_Ability_Bomb::Update_BombState(CKirby* pKirby, _float fTimeDelta)
         {
             Cal_Aim(fTimeDelta);
             Update_AimPrediction();
+            Update_BombAimDots(fTimeDelta);
 
             if (m_bKeyUp)
                 Change_BombState(pKirby, BOMB_STATE::CHARGING_THROW);
@@ -263,6 +274,7 @@ void CKirby_Ability_Bomb::Update_BombState(CKirby* pKirby, _float fTimeDelta)
         {
             Cal_Aim(fTimeDelta);
             Update_AimPrediction();
+            Update_BombAimDots(fTimeDelta);
 
             if (m_bKeyUp)
                 Change_BombState(pKirby, BOMB_STATE::CHARGING_THROW);
@@ -274,6 +286,7 @@ void CKirby_Ability_Bomb::Update_BombState(CKirby* pKirby, _float fTimeDelta)
         {
             Cal_Aim(fTimeDelta);
             Update_AimPrediction();
+            Update_BombAimDots(fTimeDelta);
 
             if (m_bKeyUp)
                 Change_BombState(pKirby, BOMB_STATE::CHARGING_THROW);
@@ -320,12 +333,14 @@ _bool CKirby_Ability_Bomb::Handle_ReserveAttack(CKirby* pKirby)
     if (!m_bReserveAttack)
         return false;
 
+    m_bKeyUp = m_bReserveKeyUp;
+    m_bReserveAttack = false;
+    m_bReserveKeyUp = false;
+
     if (pKirby->Has_MoveDir())
         Change_BombState(pKirby, BOMB_STATE::MOVE_THROW);
     else
         Change_BombState(pKirby, BOMB_STATE::CHARGE_START);
-
-    m_bReserveAttack = false;
 
     return true;
 }
@@ -390,6 +405,7 @@ void CKirby_Ability_Bomb::Throw_BombToAim()
     m_bPredictedHit = false;
 
     Despawn_BombHitAim();
+    Despawn_BombAimDots();
 }
 
 void CKirby_Ability_Bomb::Reset_Aim(CKirby* pKirby)
@@ -535,6 +551,60 @@ void CKirby_Ability_Bomb::Despawn_BombHitAim()
 
     Effect_Stop(m_pBombHitAim);
     m_pBombHitAim = nullptr;
+}
+
+void CKirby_Ability_Bomb::Update_BombAimDots(_float fTimeDelta)
+{
+    if (m_pBomb == nullptr || !m_bPredictedHit || m_PredictedPathPoints.empty())
+    {
+        Despawn_BombAimDots();
+        return;
+    }
+
+    m_fBombAimDotStep += 60.f * fTimeDelta;
+
+    while (m_fBombAimDotStep >= static_cast<_float>(s_iBombAimDotInterval))
+        m_fBombAimDotStep -= static_cast<_float>(s_iBombAimDotInterval);
+
+    const _uint iMoveIndex = static_cast<_uint>(m_fBombAimDotStep);
+
+    for (_uint i = 0; i < s_iBombAimDotCount; ++i)
+    {
+        const _uint iPathIndex = iMoveIndex + i * s_iBombAimDotInterval;
+        CEffect_Container*& pDot = m_pBombAimDots[i];
+
+        if (m_PredictedPathPoints.size() <= 1 || iPathIndex >= m_PredictedPathPoints.size() - 1)
+        {
+            if (pDot != nullptr)
+                pDot->Set_Active(false);
+
+            continue;
+        }
+
+        const _float3& vDotPos = m_PredictedPathPoints[iPathIndex];
+
+        if (pDot == nullptr)
+            CEffect_Loader::GetInstance()->Spawn(L"BombAimDot", m_pBomb->Get_LevelIndex(), vDotPos, _float3{}, _float3{}, nullptr, &pDot);
+
+        if (pDot == nullptr)
+            continue;
+
+        pDot->Set_Active(true);
+        pDot->Get_Transform()->Set_State(STATE::POSITION, XMVectorSetW(XMLoadFloat3(&vDotPos), 1.f));
+    }
+}
+
+void CKirby_Ability_Bomb::Despawn_BombAimDots()
+{
+    for (_uint i = 0; i < s_iBombAimDotCount; ++i)
+    {
+        if (m_pBombAimDots[i] != nullptr)
+            m_pBombAimDots[i]->Set_Active(true);
+
+        Effect_Stop(m_pBombAimDots[i]);
+    }
+
+    m_fBombAimDotStep = 0.f;
 }
 
 CKirby_Ability_Bomb* CKirby_Ability_Bomb::Create()

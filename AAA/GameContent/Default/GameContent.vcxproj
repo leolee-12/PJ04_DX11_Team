@@ -93,6 +93,7 @@
     <ClInclude Include="..\Public\EnvVolume_Light.h" />
     <ClInclude Include="..\Public\ItemEffect.h" />
     <ClInclude Include="..\Public\BombHitAim.h" />
+    <ClInclude Include="..\Public\BombAimDot.h" />
     <ClInclude Include="..\Public\EssenceAura.h" />
     <ClInclude Include="..\public\KirbySpawnPoint.h" />
     <ClInclude Include="..\Public\Kirby_DeformDump.h" />
@@ -131,6 +132,7 @@
     <ClInclude Include="..\Public\TrailCommon.h" />
     <ClInclude Include="..\Public\Kirby_SwordTrail.h" />
     <ClInclude Include="..\Public\SmokeCollection.h" />
+    <ClInclude Include="..\Public\CarLanding.h" />
     <ClInclude Include="..\Public\SmokeSphereOriginalEmitter.h" />
     <ClInclude Include="..\public\Mission_Manager.h" />
     <ClInclude Include="..\Public\Monster_State_Flatten.h" />
@@ -462,6 +464,7 @@
     <ClCompile Include="..\Private\EnvVolume_Light.cpp" />
     <ClCompile Include="..\Private\ItemEffect.cpp" />
     <ClCompile Include="..\Private\BombHitAim.cpp" />
+    <ClCompile Include="..\Private\BombAimDot.cpp" />
     <ClCompile Include="..\Private\EssenceAura.cpp" />
     <ClCompile Include="..\private\KirbySpawnPoint.cpp" />
     <ClCompile Include="..\Private\Kirby_DeformDump.cpp" />
@@ -509,6 +512,7 @@
     <ClCompile Include="..\Private\TrailCommon.cpp" />
     <ClCompile Include="..\Private\Kirby_SwordTrail.cpp" />
     <ClCompile Include="..\Private\SmokeCollection.cpp" />
+    <ClCompile Include="..\Private\CarLanding.cpp" />
     <ClCompile Include="..\Private\SmokeSphereOriginalEmitter.cpp" />
     <ClCompile Include="..\private\Mission_Manager.cpp" />
     <ClCompile Include="..\Private\Monster_State_Flatten.cpp" />
