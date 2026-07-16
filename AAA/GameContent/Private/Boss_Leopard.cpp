@@ -35,6 +35,8 @@ HRESULT CBoss_Leopard::Initialize(void* pArg)
     m_fMaxHP = 100.f;
     m_fCurHP = m_fMaxHP;
 
+    m_pBody->Get_Animator()->Play("Wait", true, false, 0.f, 1.5f);
+
     Set_Active(true);
     return S_OK;
 }

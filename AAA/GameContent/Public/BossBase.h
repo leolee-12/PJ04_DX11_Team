@@ -53,9 +53,9 @@ protected:
     virtual void   On_Hit_Reaction(const ATTACK_INFO& tInfo) {}
     virtual void   On_Death_Reaction(const ATTACK_INFO& tInfo) {}
 
-    CGameObject* Find_Player() const;
-    void         Publish_Boss_Appeared();
-    void         Publish_HP();
+    CGameObject*   Find_Player() const;
+    void           Publish_Boss_Appeared();
+    void           Publish_HP();
 
     _float       Get_HPRatio() const { return m_fMaxHP > 0.f ? m_fCurHP / m_fMaxHP : 0.f; }
 

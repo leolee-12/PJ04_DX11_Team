@@ -66,6 +66,7 @@ _bool CAreaCameraSolver::Load(const wstring& path)
             A.useRail = a.value("useRail", false);
             A.railUid = (_uint)a.value("railUid", (int64_t)0);
             if (a.contains("scrollDead")) A.scrollDead = RV3(a["scrollDead"]);
+            A.smoothBase = a.value("smoothBase", 0.35f);
             A.gazeMode = a.value("gazeMode", 0);
             A.gazeTag = a.value("gazeTag", string());
             A.frame = RD_Frame(a.contains("frame") ? a["frame"] : json::object());
@@ -95,6 +96,7 @@ _bool CAreaCameraSolver::Save(const wstring& path) const
         a["priority"] = A.priority;
         a["useRail"] = A.useRail; a["railUid"] = A.railUid;
         a["scrollDead"] = WV3(A.scrollDead);
+        a["smoothBase"] = A.smoothBase;
         a["gazeMode"] = A.gazeMode; a["gazeTag"] = A.gazeTag;
         a["frame"] = WR_Frame(A.frame);
         a["frameEnd"] = WR_Frame(A.frameEnd);

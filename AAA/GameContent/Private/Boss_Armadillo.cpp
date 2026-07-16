@@ -34,13 +34,14 @@ HRESULT CBoss_Armadillo::Initialize(void* pArg)
     m_fMaxHP = 100.f;
     m_fCurHP = m_fMaxHP;
 
-    if (m_pMovement)
-    {
-        m_pMovement->Set_MoveSpeed(4.f);
-        m_pMovement->Set_RotSpeed(120.f);
-    }
+    m_pMovement->Set_MoveSpeed(4.f);
+    m_pMovement->Set_RotSpeed(120.f);
+
+    m_pBody->Get_Animator()->Play("Wait", true, false, 0.f, 1.5f);
 
     Subscribe_Event(EventTag::QTE_Success, [this](void*) { m_bQTEEscaped = true; });
+
+    Set_Active(true);
 
     return S_OK;
 }

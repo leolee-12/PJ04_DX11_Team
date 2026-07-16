@@ -134,11 +134,11 @@ void CBoss_Gorilla::Play_Death()
     CAnimator* pAnim = Get_BodyAnimator();
     if (!pAnim) return;
 
-    pAnim->Play("DeathDown", false, true, 0.f, 1.5f);   // HP0 순간 블렌딩 없이 즉시 컷
+    pAnim->Play("DeathDown", false, true, 0.f, 1.5f);
 
     m_pGameInstance_Proxy->Publish(EventTag::FullScreen_Flash, nullptr);
 
-    m_bDeathSeq = true;                                   // 포즈 적용 후 정지하도록 예약
+    m_bDeathSeq = true;
     m_eDeathStep = EDEATH::POSE_WAIT;
     m_iDeathPoseDelay = 2;
 }
@@ -364,6 +364,7 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
 
                 m_pGameInstance_Proxy->Publish(StrToWstr(e.strParam), nullptr);
             }
+                break;
             default: 
                 break;
         }
