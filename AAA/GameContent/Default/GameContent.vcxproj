@@ -22,10 +22,16 @@
     <ClInclude Include="..\Public\Ability_Bubble.h" />
     <ClInclude Include="..\Public\Ability_Model.h" />
     <ClInclude Include="..\Public\Ancor_WorkingDirectory.h" />
+    <ClInclude Include="..\public\Boss_GorillaRush.h" />
+    <ClInclude Include="..\public\Boss_GorillaRush_Brain.h" />
+    <ClInclude Include="..\public\Boss_Leopard.h" />
+    <ClInclude Include="..\public\Boss_Leopard_Body.h" />
+    <ClInclude Include="..\public\Boss_Leopard_Brain.h" />
     <ClInclude Include="..\Public\BubbleMovement.h" />
     <ClInclude Include="..\Public\DropStar.h" />
     <ClInclude Include="..\Public\DropStar_Body.h" />
     <ClInclude Include="..\Public\DropStar_Manager.h" />
+    <ClInclude Include="..\public\Projectile_Nail.h" />
     <ClInclude Include="..\Public\SwordTrail_BK.h" />
     <ClInclude Include="..\Public\BladeKnight_Body.h" />
     <ClInclude Include="..\Public\BladeKnight_Brain.h" />
@@ -129,6 +135,8 @@
     <ClInclude Include="..\Public\RectParticleCommon.h" />
     <ClInclude Include="..\Public\MeshParticleCommon.h" />
     <ClInclude Include="..\Public\RectEmitterCommon.h" />
+    <ClInclude Include="..\Public\Split_Coaster.h" />
+    <ClInclude Include="..\Public\Split_Cylinder.h" />
     <ClInclude Include="..\Public\TrailCommon.h" />
     <ClInclude Include="..\Public\Kirby_SwordTrail.h" />
     <ClInclude Include="..\Public\SmokeCollection.h" />
@@ -400,10 +408,16 @@
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp" />
     <ClCompile Include="..\Private\Ability_Model.cpp" />
+    <ClCompile Include="..\private\Boss_GorillaRush.cpp" />
+    <ClCompile Include="..\private\Boss_GorillaRush_Brain.cpp" />
+    <ClCompile Include="..\private\Boss_Leopard.cpp" />
+    <ClCompile Include="..\private\Boss_Leopard_Body.cpp" />
+    <ClCompile Include="..\private\Boss_Leopard_Brain.cpp" />
     <ClCompile Include="..\Private\BubbleMovement.cpp" />
     <ClCompile Include="..\Private\DropStar.cpp" />
     <ClCompile Include="..\Private\DropStar_Body.cpp" />
     <ClCompile Include="..\Private\DropStar_Manager.cpp" />
+    <ClCompile Include="..\private\Projectile_Nail.cpp" />
     <ClCompile Include="..\Private\SwordTrail_BK.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Body.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Brain.cpp" />
@@ -509,6 +523,8 @@
     <ClCompile Include="..\Private\RectParticleCommon.cpp" />
     <ClCompile Include="..\Private\MeshParticleCommon.cpp" />
     <ClCompile Include="..\Private\RectEmitterCommon.cpp" />
+    <ClCompile Include="..\Private\Split_Coaster.cpp" />
+    <ClCompile Include="..\Private\Split_Cylinder.cpp" />
     <ClCompile Include="..\Private\TrailCommon.cpp" />
     <ClCompile Include="..\Private\Kirby_SwordTrail.cpp" />
     <ClCompile Include="..\Private\SmokeCollection.cpp" />
@@ -823,6 +839,9 @@
     <None Include="..\ShaderFiles\Shader_AbillityModel.hlsl">
       <FileType>Document</FileType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_Leopard.hlsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

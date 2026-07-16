@@ -153,15 +153,56 @@ void CKirby::Update(_float fTimeDelta)
         OutputDebugStringW(szBuf);
     }
 
-    if (m_pGameInstance_Proxy->Key_Down(DIK_P))
-    {
-        _vector vPos =
-            m_pTransformCom->Get_State(STATE::POSITION)
-            + m_pTransformCom->Get_State(STATE::LOOK) * 3.f;
+    //if (m_pGameInstance_Proxy->Key_Down(DIK_I))
+    //{
+    //    // 고르르뭄바 돌 탄착 별무리
+    //    CDropStar_Manager::STAR_SPAWN_DESC desc{};
+    //    desc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+    //    desc.iCount = 4;
+    //    desc.fRange = 3.f;
+    //    desc.fStartDeg = 120.f;   
+    //    desc.fSweepDeg = -240.f;
+    //    desc.fDelayStart = 0.f;
+    //    desc.fDelayStep = 0.05f;
+    //    desc.vLocalOffset = { 0.f, 0.5f, 0.f };
+    //    desc.fLaunchSpeed = 0.75f;
 
-        CDropStar_Manager::GetInstance()->Spawn(
-            Get_LevelIndex(), vPos, 0.5f);
-    }
+    //    CDropStar_Manager::GetInstance()->Spawn_Pattern(Get_LevelIndex(),
+    //        XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()), desc);
+    //}
+
+    //if (m_pGameInstance_Proxy->Key_Down(DIK_O))
+    //{
+    //    // 고르르뭄바 팔 휘두를 때 별무리
+    //    CDropStar_Manager::STAR_SPAWN_DESC desc{};
+    //    desc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::SWEEP;
+    //    desc.iCount = 8;
+    //    desc.fRange = 10.f;
+    //    desc.fStartDeg = 90.f;
+    //    desc.fSweepDeg = -160.f;
+    //    desc.fDelayStart = 0.f;
+    //    desc.fDelayStep = 0.35f;
+    //    desc.vLocalOffset = { 0.f, 0.5f, 0.f };
+    //    desc.fLaunchSpeed = 0.5f;
+
+    //    CDropStar_Manager::GetInstance()->Spawn_Pattern(Get_LevelIndex(),
+    //        XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()), desc);
+    //}
+
+    //if (m_pGameInstance_Proxy->Key_Down(DIK_P))
+    //{
+    //    // 잘못 만들었지만 랜덤 스폰 필요하면 활용
+    //    CDropStar_Manager::STAR_SPAWN_DESC desc{};
+    //    desc.eType = CDropStar_Manager::STAR_SPAWN_TYPE::CIRCLE;
+    //    desc.iCount = 4;
+    //    desc.fRange = 4.f;
+    //    desc.fDelayStart = 0.f;
+    //    desc.fDelayStep = 0.08f;
+    //    desc.vLocalOffset = { 0.f, 0.5f, 0.f };
+
+    //    CDropStar_Manager::GetInstance()->Spawn_Pattern(Get_LevelIndex(),
+    //        XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr()), desc);
+    //}
 #endif
 }
 
@@ -1233,10 +1274,7 @@ void CKirby::Damaged(const ATTACK_INFO& tInfo)
         return;
 
     if (Block_Hit(tInfo))
-    {
-        m_pGameInstance_Proxy->Play_SFX(L"CharaBasic_DamageReact_Normal.wav", 0.5f);
         return;
-    }
 
     On_Damaged(tInfo);
 

@@ -49,10 +49,10 @@ protected:
 	_bool	m_bUseShadow = { false };
 
 protected:
-	void Add_EditModelSlot(vector<EDITABLE_MODEL_SLOT>* pOutSlots, const _tchar* pLabel, EDITABLE_MODEL_KIND eKind, CModel* pModel) const;
-	virtual void Build_EditCapabilities(_uint* pOutCaps, EDIT_OBJECT_POLICY* pOutPolicy) const;
-	virtual void Collect_EditModelSlots(vector<EDITABLE_MODEL_SLOT>* pOutSlots) const;
-	virtual HRESULT On_ApplyEditPolicy(const EDIT_OBJECT_POLICY& Policy);
+	virtual HRESULT	Ready_Events() override;
+	virtual void	Build_EditCapabilities(_uint* pOutCaps, EDIT_OBJECT_POLICY* pOutPolicy) const;
+	virtual void	Collect_EditModelSlots(vector<EDITABLE_MODEL_SLOT>* pOutSlots) const;
+	virtual HRESULT	On_ApplyEditPolicy(const EDIT_OBJECT_POLICY& Policy);
 
 	HRESULT Ready_CullingState(CModel* pModel, _float fBoundsMargin = 0.f, _bool bRotationInvariant = false);
 	HRESULT Ready_CullingState(const BoundingBox& LocalBounds, _bool bRotationInvariant = false);
@@ -61,8 +61,11 @@ protected:
 	HRESULT Bind_ShadowTransforms(CShader* pShader, const _float4x4* pWorldOverride = nullptr) const;
 	HRESULT Render_ShadowMesh(CShader* pShader, CModel* pModel, _uint iMeshIndex, MESH_LAYER_PROFILE eProfile) const;	// Anim 개별 구현용
 	HRESULT Render_ShadowModel(CShader* pShader, CModel* pModel, MESH_LAYER_PROFILE eProfile, const _float4x4* pWorldOverride = nullptr) const;	// NonAnim 공통
+	void	Add_EditModelSlot(vector<EDITABLE_MODEL_SLOT>* pOutSlots, const _tchar* pLabel, EDITABLE_MODEL_KIND eKind, CModel* pModel) const;
+	_bool	Compute_EffectSpawnPosition(CModel* pModel, _float fHeightRatio, _float3* pOutPosition) const;
 
-	_bool Compute_EffectSpawnPosition(CModel* pModel, _float fHeightRatio, _float3* pOutPosition) const;
+	void    Publish_LDEvent();
+	virtual void On_LDEventReceived(const _wstring&) {}
 
 protected:
 	virtual void Free() override;

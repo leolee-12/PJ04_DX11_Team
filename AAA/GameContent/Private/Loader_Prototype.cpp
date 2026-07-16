@@ -184,6 +184,12 @@ HRESULT Ready_Prototype_Shaders(CGameInstance_Proxy* pProxy, ID3D11Device* pDevi
     if (FAILED(pProxy->Add_Prototype(Shader_Gorilla.iLevelID, Shader_Gorilla.szProtoTag,
         CShader::Create(pDevice, pContext, Shader_Gorilla.szFileTag, VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
         return E_FAIL;
+    if (FAILED(pProxy->Add_Prototype(Shader_Armadillo.iLevelID, Shader_Armadillo.szProtoTag,
+        CShader::Create(pDevice, pContext, Shader_Armadillo.szFileTag, VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
+        return E_FAIL;
+    if (FAILED(pProxy->Add_Prototype(Shader_Leopard.iLevelID, Shader_Leopard.szProtoTag,
+        CShader::Create(pDevice, pContext, Shader_Leopard.szFileTag, VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
+        return E_FAIL;
 
     if (FAILED(pProxy->Add_Prototype(Shader_Bomb.iLevelID, Shader_Bomb.szProtoTag,
         CShader::Create(pDevice, pContext, Shader_Bomb.szFileTag, VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
@@ -204,13 +210,11 @@ HRESULT Ready_Prototype_Shaders(CGameInstance_Proxy* pProxy, ID3D11Device* pDevi
         CShader::Create(pDevice, pContext, Shader_WaddleDee.szFileTag, VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
         return E_FAIL;
 
-    if (FAILED(pProxy->Add_Prototype(Shader_Armadillo.iLevelID, Shader_Armadillo.szProtoTag,
-        CShader::Create(pDevice, pContext, Shader_Armadillo.szFileTag, VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
-        return E_FAIL;
-
     if (FAILED(pProxy->Add_Prototype(Shader_AbillityModel.iLevelID, Shader_AbillityModel.szProtoTag,
         CShader::Create(pDevice, pContext, Shader_AbillityModel.szFileTag, VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
         return E_FAIL;
+
+    
 
     return S_OK;
 }

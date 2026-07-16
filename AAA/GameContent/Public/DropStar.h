@@ -38,8 +38,7 @@ public:
     }
 
     void                        Set_Pool(CDropStar_Manager* pPool, _uint iLevel, const _wstring& strKey);
-    void                        Activate(const _float3& vPos, _float fDelay = 0.f);
-    void                        Launch(const _float3& vDir);
+    void                        Activate(const _float3& vPos, const _float3& vLook = { 0.f, 0.f, 0.f }, const _float3& vDir = { 0.f, 0.f, 0.f }, _float fDelay = 0.f);
 
     // Inhalable 
     virtual _bool               Can_BeInhaled(const INHALE_QUERY& q) const override;
@@ -64,6 +63,9 @@ private:
     void                        Despawn();
     void                        Return_ToPool();
 
+    void                        Set_Orientation(const _float3& vLook);
+    void                        Launch();
+
     void                        Apply_Roll(_float fTimeDelta);
 
 private:
@@ -83,6 +85,7 @@ private:
 
     _float3                     m_vBaseScale = {};
     _float3                     m_vSpatPivot = { 0.f, 0.f, 0.f };
+    _float3                     m_vLaunchDir = { 0.f, 0.f, 0.f };
     _float                      m_fDelay = { 0.f };     
     _float                      m_fTimer = { 0.f };
     _float                      m_fPullSpeed = { 0.f };

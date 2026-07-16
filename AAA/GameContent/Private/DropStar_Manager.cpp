@@ -34,19 +34,16 @@ HRESULT CDropStar_Manager::Register_At_Static(const _tchar* szProtoTag, ID3D11De
 	return m_pGameInstance_Proxy->Add_Prototype(iStatic, szProtoTag, pReg->CreatorFunc(pDevice, pContext));
 }
 
-HRESULT CDropStar_Manager::Spawn(_uint iTargetLevel, _fvector vPos, _float fDelay, CDropStar** ppOut)
+HRESULT CDropStar_Manager::Spawn(_uint iTargetLevel, const _float3& vPos, const _float3& vLook, const _float3& vDir, _float fDelay , CDropStar** ppOut)
 {
     const _wstring strKey = CDropStar::PROTOTYPE_TAG;
-
-    _float3 vPosition{};
-    XMStoreFloat3(&vPosition, vPos);
 
     auto it = m_Dormant.find(POOL_KEY{ iTargetLevel, strKey });
     if (it != m_Dormant.end() && !it->second.empty())
     {
         CDropStar* p = it->second.back();
         it->second.pop_back();
-        p->Activate(vPosition, fDelay);
+        p->Activate(vPos, vLook, vDir, fDelay);
         if (ppOut) *ppOut = p;
         return S_OK;
     }
@@ -68,9 +65,55 @@ HRESULT CDropStar_Manager::Spawn(_uint iTargetLevel, _fvector vPos, _float fDela
     }
 
     pStar->Set_Pool(this, iTargetLevel, strKey);
-    pStar->Activate(vPosition, fDelay);
-    if (ppOut) 
+    pStar->Activate(vPos, vLook, vDir, fDelay);
+    if (ppOut)
         *ppOut = pStar;
+
+    return S_OK;
+}
+
+HRESULT CDropStar_Manager::Spawn_Pattern(_uint iLayerLevel, _fmatrix matCaster, const STAR_SPAWN_DESC& Desc)
+{
+    if (Desc.iCount == 0)
+        return S_OK;
+
+    _vector vCenter = XMVector3TransformCoord(XMLoadFloat3(&Desc.vLocalOffset), matCaster);
+    _vector vLook = XMVector3Normalize(matCaster.r[2]);
+
+    //XMStoreFloat3(&vFace, XMVectorNegate(
+    //    XMLoadFloat4(m_pGameInstance_Proxy->Get_CamLook())));
+
+    _float3 vFace{};
+    XMStoreFloat3(&vFace, vLook);
+
+    for (_uint i = 0; i < Desc.iCount; ++i)
+    {
+        _vector vPos = Compute_StarPos(vCenter, vLook, Desc, i);
+
+        _float fDelay =
+            (Desc.eType == STAR_SPAWN_TYPE::CIRCLE)
+            ? Desc.fDelayStart
+            + m_pGameInstance_Proxy->RandomFloat(
+                0.f, Desc.fDelayStep * Desc.iCount)
+            : Desc.fDelayStart + Desc.fDelayStep * i;
+
+        _float3 vPos3{};
+        XMStoreFloat3(&vPos3, vPos);
+
+        _float3 vLaunch{};
+        if (Desc.fLaunchSpeed != 0.f)
+        {
+            _vector vOut = vPos - vCenter;
+            vOut = XMVectorSetY(vOut, 0.f);
+            if (XMVectorGetX(XMVector3LengthSq(vOut)) > 1e-4f)
+            {
+                vOut = XMVector3Normalize(vOut) * Desc.fLaunchSpeed;
+                XMStoreFloat3(&vLaunch, vOut);
+            }
+        }
+
+        Spawn(iLayerLevel, vPos3, vFace, vLaunch, fDelay);
+    }
 
     return S_OK;
 }
@@ -84,6 +127,35 @@ void CDropStar_Manager::Clear_Level(_uint iLevel)
 {
 	for (auto it = m_Dormant.begin(); it != m_Dormant.end(); )
 		it = (it->first.iLevel == iLevel) ? m_Dormant.erase(it)  : std::next(it);
+}
+
+_vector CDropStar_Manager::Compute_StarPos(_fvector vCenter, _fvector vLook, const CDropStar_Manager::STAR_SPAWN_DESC& Desc, _uint iIndex)
+{
+    // CIRCLE ( 원 내부 면적에 균일하게 살포 )
+    if (Desc.eType == STAR_SPAWN_TYPE::CIRCLE)
+    {
+        _float fR = Desc.fRange * sqrtf(m_pGameInstance_Proxy->RandomFloat(0.f, 1.f));
+        _float fAngle = m_pGameInstance_Proxy->RandomFloat(0.f, XM_2PI);
+        _float fSin = 0.f, fCos = 0.f;
+        XMScalarSinCos(&fSin, &fCos, fAngle);
+
+        return vCenter + XMVectorSet(1.f, 0.f, 0.f, 0.f) * (fR * fCos) + XMVectorSet(0.f, 0.f, 1.f, 0.f) * (fR * fSin);
+    }
+
+    // SWEEP : LOOK 기준 fStartDeg에서 시작 + fSweepDeg CW/CCW 살포
+    _float fT = (Desc.iCount > 1)
+        ? static_cast<_float>(iIndex) / (Desc.iCount - 1)
+        : 0.f;
+
+    _float fDeg = Desc.fStartDeg + fT * Desc.fSweepDeg;
+
+    _matrix matRot = XMMatrixRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(fDeg));
+    _vector vDir = XMVector3Normalize(XMVector3TransformNormal(vLook, matRot));
+
+    _float fJitter = m_pGameInstance_Proxy->RandomFloat(
+        -Desc.fJitter, Desc.fJitter);
+
+    return vCenter + vDir * (Desc.fRange + fJitter);
 }
 
 void CDropStar_Manager::Free()

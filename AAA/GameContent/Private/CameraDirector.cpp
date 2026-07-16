@@ -23,6 +23,7 @@ namespace
             case LEVEL::STAGE0_STEP1:  return L"../../Resources/YSH/CameraData/Level0_Stage1_Step01_cam.json";
             case LEVEL::STAGE0_STEP2:  return L"../../Resources/YSH/CameraData/Level0_Stage1_Step02_cam.json";
             case LEVEL::TOWN_STEP1:    return L"../../Resources/YSH/CameraData/Town_Step1_cam.json";
+            case LEVEL::TOWN_STEP2:    return L"../../Resources/YSH/CameraData/Town_Step1_cam.json";
             case LEVEL::BOSS_STAGE1:   return L"../../Resources/YSH/CameraData/Level1_Stage5_Step01_cam.json";
             case LEVEL::STAGE1_STEP1:  return L"../../Resources/YSH/CameraData/Level6_Stage4_Step01_cam.json";
             case LEVEL::STAGE1_STEP2:  return L"../../Resources/YSH/CameraData/Level6_Stage4_Step02_cam.json";

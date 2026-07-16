@@ -58,6 +58,8 @@ private:
 	_float3			m_vPickupTargetPos = {};
 
 private:
+	virtual void On_LDEventReceived(const _wstring& strEventTag) override;
+
 	HRESULT			Ready_Components();
 	HRESULT			Ready_RenderComponents();
 	HRESULT			Bind_ShaderResources();
@@ -74,7 +76,7 @@ public:
 	static CLevelDesign_Point* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 
-protected:
+private:
 	virtual void Free() override;
 };
 

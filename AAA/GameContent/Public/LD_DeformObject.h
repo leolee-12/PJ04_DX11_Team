@@ -19,8 +19,10 @@ class CLD_DeformObject final
 
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_LevelDesign_DeformObject";
+	static constexpr const _tchar* PROTOTYPE_TAG_CAR = L"Proto_LevelDesign_DeformCar";
+	static constexpr const _tchar* PROTOTYPE_TAG_COASTER = L"Proto_LevelDesign_DeformCoaster";
+	static constexpr const _tchar* PROTOTYPE_TAG_CYLINDER = L"Proto_LevelDesign_DeformCylinder";
 	static constexpr const _tchar* LAYER_TAG = L"Layer_LevelDesign_Gimmick";
-
 
 private:
 	CLD_DeformObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -65,9 +67,11 @@ private:
 
 	DEFORM_OBJECT_STATE m_eState = { DEFORM_OBJECT_STATE::IDLE };
 	DEFORM_OBJECT_KIND m_eKind = { DEFORM_OBJECT_KIND::MOBILE };
+	_float4x4 m_PreDeformWorld = {};
 	_float4x4 m_AnchorWorld = {};
 	_bool m_bAlignDone = { false };
 	_float m_fPullSpeed = { 0.f };
+	_float m_fCapturedTime = { 0.f };
 	_float m_fVerticalVelocity = { 0.f };
 	_float3 m_vReleaseTargetPosition = {};
 	BoundingBox m_LocalCollisionBounds = {};
@@ -75,15 +79,19 @@ private:
 private:
 	virtual HRESULT Ready_Components() override;
 	virtual void On_Deserialized() override;
+	virtual void On_LDEventReceived(const _wstring& strEventTag) override;
 	HRESULT Ready_Trigger();
 
 	void Set_TriggerEnabled(_bool bEnabled);
 	void Change_State(DEFORM_OBJECT_STATE eState);
+	void Complete_DeformAcquired();
 	void Update_Captured(_float fTimeDelta);
+	void Update_CapturedFixed(_float fTimeDelta);
 	void Update_Falling(_float fTimeDelta);
 
 public:
 	static CLD_DeformObject* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CLD_DeformObject* Create_ByType(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, DEFORM_TYPE eType);
 	virtual CGameObject* Clone(void* pArg) override;
 
 protected:
