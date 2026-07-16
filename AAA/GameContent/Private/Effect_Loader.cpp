@@ -18,7 +18,8 @@ namespace
     static constexpr EFFECT_DB_ENTRY s_EffectDB[] =
     {
         { TEXT("WalkSmoke"),              TEXT("../../Resources/YSE/EffectContainer/WalkSmoke_7_01.json") },
-        { TEXT("JumpSmoke"),              TEXT("../../Resources/YSE/EffectContainer/JumpSmoke.JSON") },
+        { TEXT("LandingSmoke"),           TEXT("../../Resources/YSE/EffectContainer/LandingSmoke.JSON") },
+        { TEXT("JumpEffect"),             TEXT("../../Resources/LevelData/JumpEffect.JSON") },
         { TEXT("SlideSmoke"),             TEXT("../../Resources/LevelData/SlideSmoke.JSON") },
         { TEXT("InhaleContainer"),        TEXT("../../Resources/YSE/EffectContainer/Inhale_6_24.json") },
 

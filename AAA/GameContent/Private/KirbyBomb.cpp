@@ -113,6 +113,11 @@ void CKirbyBomb::Launch_Velocity(const _float3& vStart, const _float3& vVelocity
 	Launch(vStart, vLaunchDir, fLaunchSpeed);
 }
 
+_bool CKirbyBomb::Predict_Trajectory(const _float3& vStart, const _float3& vInitialVelocity, vector<_float3>& OutPoints, _float3& vOutHitPos, _float3& vOutHitNormal)
+{
+	return _bool();
+}
+
 void CKirbyBomb::Update(_float fTimeDelta)
 {
 	if (!m_bAlive)

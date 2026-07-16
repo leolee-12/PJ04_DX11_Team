@@ -38,6 +38,8 @@ public:
 	_float3 Cal_LaunchVelocity(const _float3& vHorizontalDir, _float fHorizontalSpeed, _float fArcHeight);
 	void Launch_Velocity(const _float3& vStart, const _float3& vVelocity);
 
+	_bool Predict_Trajectory(const _float3& vStart, const _float3& vInitialVelocity, vector<_float3>& OutPoints, _float3& vOutHitPos, _float3& vOutHitNormal);
+
 protected:
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void	Update(_float fTimeDelta) override;

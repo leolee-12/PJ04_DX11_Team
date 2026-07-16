@@ -77,6 +77,7 @@
 #include "Split_Stone.h"
 #include "Split_Bush.h"
 #include "ItemEffect.h"
+#include "JumpEffect.h"
 #include "BreakWallEffect.h"
 #include "BubbleAura.h"
 #include "Kirby_SwordTrail.h"
@@ -980,6 +981,15 @@ void CGameObject_Factory::Register_Effect()
                 CTexture::Create(pDevice, pContext, Texture_ItemSparkle03.szFileTag, Texture_ItemSparkle03.iNumTex));
         ));
 
+    Register(CJumpEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CJumpEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG,
+                CRectCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_JumpEffect.iLevelID, Texture_JumpEffect.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_JumpEffect.szFileTag,
+                    Texture_JumpEffect.iNumTex));
+        ));
     // 0. WalkSmoke
     Register(CWalkSmoke::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CWalkSmoke),
         LOADER
