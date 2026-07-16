@@ -101,6 +101,56 @@ void CLevelDesign_Boundary::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
 }
 
+HRESULT CLevelDesign_Boundary::On_EditTransformChanged()
+{
+	if (FAILED(__super::On_EditTransformChanged()))
+		return E_FAIL;
+
+	if (!Is_Active() || nullptr == m_pRigidStatic)
+		return S_OK;
+
+	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom)
+		return E_FAIL;
+
+	const _matrix WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+	physx::PxRigidStatic* pNewRigidStatic = nullptr;
+
+	if (nullptr != m_pCollisionMesh)
+	{
+		pNewRigidStatic = m_pGameInstance_Proxy->Create_StaticActor(m_pCollisionMesh, WorldMatrix);
+	}
+	else
+	{
+		const _float3 vLocalCenter = { 0.f, 0.f, 0.f };
+		const _float3 vLocalHalfExtents = { 0.5f, 0.5f, 0.5f };
+
+		pNewRigidStatic = m_pGameInstance_Proxy->Create_StaticBox(
+			vLocalCenter,
+			vLocalHalfExtents,
+			WorldMatrix);
+	}
+
+	if (nullptr == pNewRigidStatic)
+		return E_FAIL;
+
+	m_pGameInstance_Proxy->Remove_StaticActor(m_pRigidStatic);
+	m_pRigidStatic = pNewRigidStatic;
+
+	return S_OK;
+}
+
+void CLevelDesign_Boundary::On_LDEventReceived(const _wstring& strEventTag)
+{
+	UNREFERENCED_PARAMETER(strEventTag);
+
+	if (!Is_Active())
+		return;
+
+	Release_RigidStatic();
+	Set_Active(false);
+}
+
 HRESULT CLevelDesign_Boundary::Ready_Components(const LD_PARSED_OBJECT& Desc)
 {
 	if (FAILED(Ready_RigidStatic(Desc)))
@@ -117,7 +167,7 @@ HRESULT CLevelDesign_Boundary::Ready_RigidStatic(const LD_PARSED_OBJECT& Desc)
 		return Ready_RigidStatic_FromPoints(Desc);
 
 	if (Has_UsableBoxSize(Desc.Volume.vAreaSize))
-		return Ready_RigidStatic_FromBox(Desc);
+		return Ready_RigidStatic_FromBox();
 
 	return E_FAIL;
 }
@@ -127,8 +177,15 @@ HRESULT CLevelDesign_Boundary::Ready_RigidStatic_FromPoints(const LD_PARSED_OBJE
 	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom)
 		return E_FAIL;
 
-	const _matrix WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
-	const _matrix InvWorldMatrix = XMMatrixInverse(nullptr, WorldMatrix);
+	const _float3& vSourceScale = Desc.vParsedScale;
+	const _float4& qSourceRotation = Desc.qParsedRotation;
+	const _float3& vSourcePosition = Desc.vParsedPosition;
+
+	const _matrix SourceWorldMatrix =
+		XMMatrixScaling(vSourceScale.x, vSourceScale.y, vSourceScale.z)
+		* XMMatrixRotationQuaternion(XMLoadFloat4(&qSourceRotation))
+		* XMMatrixTranslation(vSourcePosition.x, vSourcePosition.y, vSourcePosition.z);
+	const _matrix InvSourceWorldMatrix = XMMatrixInverse(nullptr, SourceWorldMatrix);
 
 	vector<_float3> LocalPositions;
 	LocalPositions.reserve(Desc.Volume.Points.size());
@@ -138,7 +195,7 @@ HRESULT CLevelDesign_Boundary::Ready_RigidStatic_FromPoints(const LD_PARSED_OBJE
 		_float3 vPointLocal{};
 		XMStoreFloat3(
 			&vPointLocal,
-			XMVector3TransformCoord(XMLoadFloat3(&vPointWorld), InvWorldMatrix));
+			XMVector3TransformCoord(XMLoadFloat3(&vPointWorld), InvSourceWorldMatrix));
 		LocalPositions.push_back(vPointLocal);
 	}
 
@@ -158,7 +215,9 @@ HRESULT CLevelDesign_Boundary::Ready_RigidStatic_FromPoints(const LD_PARSED_OBJE
 	if (nullptr == m_pCollisionMesh)
 		return E_FAIL;
 
-	m_pRigidStatic = m_pGameInstance_Proxy->Create_StaticActor(m_pCollisionMesh, WorldMatrix);
+	const _matrix CurrentWorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+
+	m_pRigidStatic = m_pGameInstance_Proxy->Create_StaticActor(m_pCollisionMesh, CurrentWorldMatrix);
 	if (nullptr == m_pRigidStatic)
 	{
 		m_pCollisionMesh->release();
@@ -169,24 +228,18 @@ HRESULT CLevelDesign_Boundary::Ready_RigidStatic_FromPoints(const LD_PARSED_OBJE
 	return S_OK;
 }
 
-HRESULT CLevelDesign_Boundary::Ready_RigidStatic_FromBox(const LD_PARSED_OBJECT& Desc)
+HRESULT CLevelDesign_Boundary::Ready_RigidStatic_FromBox()
 {
-	if (nullptr == m_pGameInstance_Proxy)
+	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom)
 		return E_FAIL;
 
 	const _float3 vLocalCenter = { 0.f, 0.f, 0.f };
-	const _float3 vHalfExtents = Make_HalfExtents(Desc.Volume.vAreaSize);
-
-	const _float4& qAreaRot = Desc.Volume.qAreaRot;
-	const _float3& vAreaCenter = Desc.Volume.vAreaCenter;
-
-	const _matrix WorldMatrix =
-		XMMatrixRotationQuaternion(XMLoadFloat4(&qAreaRot))
-		* XMMatrixTranslation(vAreaCenter.x, vAreaCenter.y, vAreaCenter.z);
+	const _float3 vLocalHalfExtents = { 0.5f, 0.5f, 0.5f };
+	const _matrix WorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
 
 	m_pRigidStatic = m_pGameInstance_Proxy->Create_StaticBox(
 		vLocalCenter,
-		vHalfExtents,
+		vLocalHalfExtents,
 		WorldMatrix);
 
 	return (nullptr != m_pRigidStatic) ? S_OK : E_FAIL;

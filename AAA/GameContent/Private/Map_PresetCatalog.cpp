@@ -29,6 +29,7 @@ namespace
 
 		{ "Town", L"Town", },
 		{ "WMap", L"WMap", },
+		{ "Town2", L"Town2", },
 	};
 
 	const MAP_PRESET_CATALOG_ENTRY* Get_PresetEntry(_uint iPresetIndex)

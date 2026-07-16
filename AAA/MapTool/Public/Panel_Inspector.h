@@ -31,6 +31,7 @@ private:
 	void    Draw_EditableObjectPolicyPanel(CGameObject* pObject);
 	void    Draw_EnvObjectEditPanel(CLevel_Edit* pLevel, CGameObject* pObject);
 	void    Draw_MapSectionEditPanel(CLevel_Edit* pLevel, CMapStage* pMapStage, CGameObject* pObject);
+	void    Draw_LevelDesignEventPanel(CLevel_Edit* pLevel, CGameObject* pObject);
 	void    Draw_MeshLayerPanel(CGameObject* pObject);
 	void    Draw_MapStageSections(CMapStage* pMapStage);
 	void    Draw_MapSectionRenderOptions(CMapSection* pSection);
@@ -45,6 +46,7 @@ private:
 	unordered_map<_wstring, _uint> m_SelectedModelSlotByEditableKey;
 	unordered_map<_wstring, _int> m_SelectedMeshByEditableSlotKey;
 	unordered_map<_wstring, EDIT_OBJECT_POLICY> m_EditablePolicyDrafts;
+	unordered_map<_wstring, pair<string, string>> m_LevelDesignEventDrafts;
 
 	CMapSection* m_pFocusedMapSection = { nullptr };
 

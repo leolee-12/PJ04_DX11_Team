@@ -67,6 +67,8 @@ namespace
         { TEXT("Split_Stone_Big"),        TEXT("../../Resources/Map/Effect/Proto_Split_Stone_Big.JSON") },
         { TEXT("Split_Stone_Ultra"),      TEXT("../../Resources/Map/Effect/Proto_Split_Stone_Ultra.JSON") },
         { TEXT("Split_Bush"),             TEXT("../../Resources/Map/Effect/Proto_Split_Bush_0.JSON") },
+        { TEXT("Split_Coaster"),          TEXT("../../Resources/Map/Effect/Proto_Split_Coaster_0.JSON") },
+        { TEXT("Split_Cylinder"),         TEXT("../../Resources/Map/Effect/Proto_Split_Cylinder_1.JSON") },
         { TEXT("BreakWallEffect"),        TEXT("../../Resources/Map/Effect/Proto_BreakWallEffect_0.JSON") },
         { TEXT("ItemEffect"),             TEXT("../../Resources/Map/Effect/Proto_ItemEffect_0.JSON") },
         { TEXT("BubbleAura"),             TEXT("../../Resources/CHJ/Effect/BubbleAura.JSON") },

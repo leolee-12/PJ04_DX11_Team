@@ -347,6 +347,8 @@ void CLevelDesign_Breakable::Damaged(const ATTACK_INFO& tInfo)
 	Release_RigidStatic();
 	m_pHurtBox->Set_Enabled(false);
 
+	Publish_LDEvent();
+
 	if (MODEL::ANIM == m_tBreakableDesc.eModelType)
 	{
 		m_eState = BREAKABLE_STATE::BREAKING;
