@@ -79,6 +79,11 @@ void CBoss_Armadillo::Play_Intro()
     if (CAnimator* pAnim = Get_BodyAnimator())
         pAnim->Play("Angry", false, true, 0.f, 1.5f);
 
+    m_pController->Set_Solid(false);
+
+    CUTSCENE_CAMERA_DESC cam{ ECutsceneCam::Boss };
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
+
     BOSSCAM_CONFIG_DESC cfg{};
     cfg.fAimHeight = 4.f;    
     cfg.fShoulderOffset = 0.f;
