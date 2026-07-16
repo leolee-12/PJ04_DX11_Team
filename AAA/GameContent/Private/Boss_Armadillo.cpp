@@ -137,6 +137,10 @@ void CBoss_Armadillo::On_Enter_Corpse()
     CEffect_Loader::GetInstance()->Spawn(L"DeathSmoke", m_iPrototypeLevel, vPos);
 
     m_pGameInstance_Proxy->Publish(EventTag::Level_BossDefeated, nullptr);
+
+    CUTSCENE_CAMERA_DESC cam{};
+    cam.eCam = ECutsceneCam::Area;
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
 }
 
 _bool CBoss_Armadillo::Get_HurtBoxDesc(CAPSULE_DESC& Out) const

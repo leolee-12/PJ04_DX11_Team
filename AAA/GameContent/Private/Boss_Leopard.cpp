@@ -96,6 +96,12 @@ HRESULT CBoss_Leopard::Ready_AnimEvents()
     return S_OK;
 }
 
+void CBoss_Leopard::On_Deserialized()
+{
+    __super::On_Deserialized();
+    m_pTransformCom->Set_Scale(1.5f, 1.5f, 1.5f);
+}
+
 _int CBoss_Leopard::Advance_ToAdjacentPillar()
 {
     const _int iDir = m_pGameInstance_Proxy->RandomInt(0, 1) ? +1 : -1;
@@ -300,6 +306,10 @@ void CBoss_Leopard::On_Enter_Corpse()
     CEffect_Loader::GetInstance()->Spawn(L"DeathSmoke", m_iPrototypeLevel, vPos);
 
     m_pGameInstance_Proxy->Publish(EventTag::Level_BossDefeated, nullptr);
+
+    CUTSCENE_CAMERA_DESC cam{};
+    cam.eCam = ECutsceneCam::Area;
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
 }
 
 _bool CBoss_Leopard::Get_HurtBoxDesc(CAPSULE_DESC& Out) const

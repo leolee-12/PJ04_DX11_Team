@@ -359,8 +359,8 @@ CBTNode* CBoss_Leopard_Brain::Build_PhaseTree(_int iPhase)
     auto MakeAssaultSlash = [&]() -> CBTNode* {
         struct SL { _float3 vDir{}; bool started = false; _float prevSpd = 0.f; _float t = 0.f;};
         auto s = make_shared<SL>();
-        const _float fDashSpeed = 30.f;  
-        const _float fDashTime = 1.5f;
+        const _float fDashSpeed = 55.f;
+        const _float fDashTime = 1.f;
 
         auto* pSlash = CBTAction::Create(
             [this, s, fDashSpeed, fDashTime, fSpd](CBlackboard*, _float dt) -> BT_STATUS {
@@ -440,11 +440,24 @@ CBTNode* CBoss_Leopard_Brain::Build_PhaseTree(_int iPhase)
             });
         };
 
+    auto bFirstCycle = make_shared<bool>(true);
+    auto* pLeadIn = CBTSelector::Create({
+        CBTSequence::Create({
+            CBTCondition::Create([bFirstCycle](CBlackboard*) { return *bFirstCycle; }),
+            MakeTurn(), MakeThrow(), MakeIdleHold(0.4f),
+            MakeTurn(), MakeThrow(), MakeIdleHold(0.4f),
+            CBTAction::Create([bFirstCycle](CBlackboard*, _float) { *bFirstCycle = false; return BT_STATUS::SUCCESS; }),
+            }),
+            CBTSequence::Create({
+                MakeTurn(), MakeThrow(), MakeIdleHold(0.4f),
+                MakeAdjacentJump(),
+                }),
+        });
+
     // ---- ∑Á∆Æ ----
     return CBTSequence::Create({
         pMountFirst,
-        MakeTurn(), MakeThrow(), MakeIdleHold(0.4f),
-        MakeTurn(), MakeThrow(), MakeIdleHold(0.4f),
+        pLeadIn,
         MakeChargeDash(),                           
         MakeGroundPhase(),                          
         MakeRemount(),                              

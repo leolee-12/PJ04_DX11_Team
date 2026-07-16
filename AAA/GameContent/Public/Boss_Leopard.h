@@ -13,8 +13,8 @@ class CBoss_Leopard final : public CBoss
 public:
     static constexpr const wchar_t* PROTOTYPE_TAG = L"Proto_Boss_Leopard";
 
-    static constexpr _float s_fCCT_Radius = 3.f;
-    static constexpr _float s_fCCT_Height = 6.f;
+    static constexpr _float s_fCCT_Radius = 1.2f;
+    static constexpr _float s_fCCT_Height = 0.8f;
 
     static constexpr _float DEATH_PAUSE_SEC = 0.7f;
     static constexpr _float DEATH_SHAKE_SEC = 0.7f;
@@ -59,6 +59,8 @@ protected:
 
     virtual HRESULT Ready_PartObjects() override;
     virtual HRESULT Ready_AnimEvents() override;
+
+    virtual void    On_Deserialized() override;
 
 public:
     const _float3& Get_CurPillarPos() const { return s_vPillarPos[m_iCurPillar]; }

@@ -178,6 +178,8 @@ void CBoss_Gorilla::On_Enter_Corpse()
         m_pGameInstance_Proxy->Add_GameObject_Instance(m_pCage, m_iLevelIndex, m_strLayerTag, L"Boss_Cage");
         m_pCage = nullptr;
     }
+
+    m_pGameInstance_Proxy->Publish(EventTag::Level_BossDefeated, nullptr);
 }
 
 // yse Ãß°¡
