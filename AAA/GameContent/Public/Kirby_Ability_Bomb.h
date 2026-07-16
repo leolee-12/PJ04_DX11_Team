@@ -51,11 +51,13 @@ private:
 private:
 	void Spawn_Bomb(CKirby* pKirby);
 	void Throw_Bomb(CKirby* pKirby, _float fDegree, _float fSpeed);
+	void Throw_BombToAim();
 
 	void Reset_Aim(CKirby* pKirby);
 	void Acc_AimInput(const _float3& vInputDir);
 	void Cal_Aim(_float fTimeDelta);
-	void Find_LandingPointFromAim();
+
+	void Update_AimLaunch();
 
 private:
 	BOMB_STATE m_eBombState{};
@@ -69,6 +71,8 @@ private:
 
 	_float3 m_vAimInput{};
 	_float3 m_vAimTargetPos{};
+
+	_float3 m_vAimLaunchVelocity{};
 
 public:
 	static CKirby_Ability_Bomb* Create();

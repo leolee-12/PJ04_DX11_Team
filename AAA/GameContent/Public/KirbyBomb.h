@@ -32,7 +32,11 @@ private:
 public:
 	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOut) override { pOut->strPrototypeTag = PROTOTYPE_TAG; }
 	virtual void Launch(const _float3& vPos, const _float3& vDir) override;
+
 	void Launch(const _float3& vPos, const _float3& vDir, _float fLaunchSpeed);
+
+	_float3 Cal_LaunchVelocity(const _float3& vHorizontalDir, _float fHorizontalSpeed, _float fArcHeight);
+	void Launch_Velocity(const _float3& vStart, const _float3& vVelocity);
 
 protected:
 	virtual HRESULT Initialize(void* pArg) override;

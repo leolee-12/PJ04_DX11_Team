@@ -74,6 +74,45 @@ void CKirbyBomb::Launch(const _float3& vPos, const _float3& vDir, _float fLaunch
 	On_Launched();
 }
 
+_float3 CKirbyBomb::Cal_LaunchVelocity(const _float3& vHorizontalDir, _float fHorizontalSpeed, _float fArcHeight)
+{
+	_vector vDir = XMVectorSetY(XMLoadFloat3(&vHorizontalDir), 0.f);
+	const _float fVelocityY = sqrtf(-2.f * BOMB_GRAVITY * fArcHeight);
+
+	if (XMVectorGetX(XMVector3LengthSq(vDir)) <= Helper::fEpsilon)
+	{
+		_float3 vResult{};
+		XMStoreFloat3(&vResult, XMVectorSet(0.f, fVelocityY, 0.f, 0.f));
+		return vResult;
+	}
+
+	vDir = XMVector3Normalize(vDir);
+
+	_float3 vResult{};
+	XMStoreFloat3(&vResult, XMVectorSetY(vDir * fHorizontalSpeed, fVelocityY));
+	return vResult;
+}
+
+void CKirbyBomb::Launch_Velocity(const _float3& vStart, const _float3& vVelocity)
+{
+	_vector vLaunchVelocity = XMLoadFloat3(&vVelocity);
+	const _float fLaunchSpeed = XMVectorGetX(XMVector3Length(vLaunchVelocity));
+
+	if (fLaunchSpeed <= Helper::fEpsilon)
+	{
+		constexpr _float3 vUp = { 0.f, 1.f, 0.f };
+		constexpr _float fUpDist = 1.f;
+		const _float fUpSpeed = sqrtf(-2.f * BOMB_GRAVITY * fUpDist);
+		Launch(vStart, vUp, fUpSpeed);
+		return;
+	}
+
+	_float3 vLaunchDir{};
+	XMStoreFloat3(&vLaunchDir, XMVector3Normalize(vLaunchVelocity));
+
+	Launch(vStart, vLaunchDir, fLaunchSpeed);
+}
+
 void CKirbyBomb::Update(_float fTimeDelta)
 {
 	if (!m_bAlive)
