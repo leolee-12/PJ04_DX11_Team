@@ -1,6 +1,7 @@
 #include "LevelDesign_Parser.h"
 #include "DataLoader.h"
 #include "Parsing_Utils.h"
+#include "TownCondition_Utils.h"
 #include "LevelDesign_Registry.h"
 
 #include <exception>
@@ -175,6 +176,11 @@ void CLevelDesign_Parser::Parse_ObjectSection(
 	for (auto Iter = jSection.begin(); Iter != jSection.end(); ++Iter)
 	{
 		if (!Iter.value().is_object())
+			continue;
+
+		if (!TownConditionUtils::Passes_AllUnlocked(Iter.value()))
+			continue;
+		if (!TownConditionUtils::Passes_TalkWaddlePatternA(Iter.value()))
 			continue;
 
 		LD_OBJECT_DESC CommonDesc = Make_BaseDesc(

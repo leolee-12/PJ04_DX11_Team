@@ -78,6 +78,7 @@
 #include "Split_Bush.h"
 #include "Split_Coaster.h"
 #include "Split_Cylinder.h"
+#include "LensFlare.h"
 #include "ItemEffect.h"
 #include "BreakWallEffect.h"
 #include "BubbleAura.h"
@@ -205,6 +206,10 @@
 
 // CutSceneActor
 #include "DialogueDee.h"
+
+// NPC
+#include "WaddleDee.h"
+#include "WaddleDee_Body.h"
 
 #include "DropStar.h"
 #include "DropStar_Body.h"
@@ -515,6 +520,19 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Cappy_Hat"),
                     CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Cappy/Hat/Cappy_Hat.ysh",
                         XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
+    // NPC
+    Register
+    (
+        CWaddleDee::PROTOTYPE_TAG, TEXT("NPC"),
+        CREATOR(CWaddleDee),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CWaddleDee_Body::PROTOTYPE_TAG, CWaddleDee_Body::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/WaddleDee/Body/Model_Anim.ysh", XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 
@@ -1010,6 +1028,25 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
         )
     );
+
+    // 16
+    Register(CLensFlare::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CLensFlare),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectEmitterCommon::PROTOTYPE_TAG, CRectEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_LensFlare_Common_Circle01"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/LensFlare/Common_Circle01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_LensFlare_Common_Ring01"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/LensFlare/Common_Ring01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_CircleGlow2"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/circleglow2.png"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_Common_Circle06"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/common_circle06.png"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_CircleGradation"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/circlegradation.png"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_ThunderRoot2"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/thunderroot2.png"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_Common_Ring08"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/common_ring08.png"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_Common_Circle11"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/common_circle11.png"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_Common_Circle01"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/common_circle01.png"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_Common_Circle02"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/common_circle02.png"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_Common_Circle04"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/common_circle04.png"), 1));
+        ));
 
     // 0. WalkSmoke
     Register(CWalkSmoke::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CWalkSmoke),
