@@ -5,6 +5,12 @@
 #include "Math_Utils.h"
 #include "Model.h"
 
+namespace
+{
+	constexpr _float CULL_DISTANCE = 175.f;
+	constexpr _float DISTANCE_FADE_WIDTH = 10.f;
+}
+
 CCullingState::CCullingState(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent(pDevice, pContext)
 {
@@ -118,65 +124,29 @@ void CCullingState::Evaluate(const CULLING_EVALUATION_INPUT& Desc)
 	const _bool bEvaluateMainDistance = Desc.bEvaluateMain && Desc.Main.bUseDistance;
 	const _bool bEvaluateShadowDistance = Desc.bEvaluateShadow && Desc.Shadow.bUseDistance;
 
-	CULLING_FADE_RESULT MainDistanceResult{};
-	CULLING_FADE_RESULT ShadowDistanceResult{};
-	_bool bHasMainDistanceResult = false;
-	_bool bHasShadowDistanceResult = false;
+	CULLING_FADE_RESULT DistanceResult{};
+	_bool bHasDistanceResult = false;
 
 	if (bEvaluateMainDistance || bEvaluateShadowDistance)
 	{
 		const _float fSurfaceDistance = m_pGameInstance_Proxy->Compute_SurfaceDistance(m_WorldSphere);
-		const _bool bHasSurfaceDistance = MathUtils::Is_FiniteFloat(fSurfaceDistance) && fSurfaceDistance >= 0.f;
 
-		if (bHasSurfaceDistance)
+		if (MathUtils::Is_FiniteFloat(fSurfaceDistance) && fSurfaceDistance >= 0.f)
 		{
-			const _bool bShareDistanceResult =
-				bEvaluateMainDistance
-				&& bEvaluateShadowDistance
-				&& Desc.Main.fCullDistance == Desc.Shadow.fCullDistance
-				&& Desc.Main.fDistanceFadeWidth == Desc.Shadow.fDistanceFadeWidth;
-
-			if (bShareDistanceResult)
-			{
-				MainDistanceResult = m_pGameInstance_Proxy->Evaluate_DistanceFade(
-					fSurfaceDistance,
-					Desc.Main.fCullDistance,
-					Desc.Main.fDistanceFadeWidth);
-				ShadowDistanceResult = MainDistanceResult;
-				bHasMainDistanceResult = true;
-				bHasShadowDistanceResult = true;
-			}
-			else
-			{
-				if (bEvaluateMainDistance)
-				{
-					MainDistanceResult = m_pGameInstance_Proxy->Evaluate_DistanceFade(
-						fSurfaceDistance,
-						Desc.Main.fCullDistance,
-						Desc.Main.fDistanceFadeWidth);
-					bHasMainDistanceResult = true;
-				}
-
-				if (bEvaluateShadowDistance)
-				{
-					ShadowDistanceResult = m_pGameInstance_Proxy->Evaluate_DistanceFade(
-						fSurfaceDistance,
-						Desc.Shadow.fCullDistance,
-						Desc.Shadow.fDistanceFadeWidth);
-					bHasShadowDistanceResult = true;
-				}
-			}
+			DistanceResult = m_pGameInstance_Proxy->Evaluate_DistanceFade(
+				fSurfaceDistance,
+				CULL_DISTANCE,
+				DISTANCE_FADE_WIDTH);
+			bHasDistanceResult = true;
 		}
 	}
 
 	if (Desc.bEvaluateMain)
-		Evaluate_Channel(CHANNEL::MAIN, Desc.Main, bHasMainDistanceResult ? &MainDistanceResult : nullptr);
+		Evaluate_Channel(CHANNEL::MAIN, Desc.Main, bEvaluateMainDistance && bHasDistanceResult ? &DistanceResult : nullptr);
 
 	if (Desc.bEvaluateShadow)
-		Evaluate_Channel(CHANNEL::SHADOW, Desc.Shadow, bHasShadowDistanceResult ? &ShadowDistanceResult :
-			nullptr);
+		Evaluate_Channel(CHANNEL::SHADOW, Desc.Shadow, bEvaluateShadowDistance && bHasDistanceResult ? &DistanceResult : nullptr);
 }
-
 
 void CCullingState::Reset_Channel(CHANNEL eChannel)
 {
@@ -251,7 +221,6 @@ void CCullingState::Evaluate_Channel(CHANNEL eChannel, const CULLING_CHANNEL_QUE
 			m_pGameInstance_Proxy->Evaluate_FrustumFadeAABB(
 				Query.eView,
 				m_WorldBounds,
-				Query.fFrustumFadeWidth,
 				CCulling_Manager::CULLING_PLANE_MASK_MAIN_SIDE);
 
 		Result.fDissolve = max(Result.fDissolve, FrustumResult.fDissolve);

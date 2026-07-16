@@ -33,7 +33,6 @@ public:
 	virtual void	Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override;
 
 public:
-	void	Refresh_WorldBounds();
 	void	Set_ParentMatrix(const _float4x4* pParentMatrix);
 	void	Refresh_CombinedWorldMatrix();
 
@@ -50,7 +49,6 @@ public:
 	// Creation descriptor baseline for MapTool policy and transform overrides.
 	const MAP_SECTION_DESC& Get_Desc() const { return m_tDesc; }
 
-	const BoundingBox&		Get_WorldBounds() const { return m_WorldBounds; }
 	MAP_SECTION_TYPE		Get_SectionType() const { return m_eSectionType; }
 	RENDERID				Get_RenderID() const { return m_eRenderID; }
 	_bool					Is_Culling() const { return m_bEnableCulling; }
@@ -81,8 +79,6 @@ private:
 	_uint				m_iModelProtoLevel = {};
 	MAP_SECTION_TYPE	m_eSectionType = { MAP_SECTION_TYPE::UNKNOWN };
 	RENDERID			m_eRenderID = { RENDERID::NONBLEND };
-	BoundingBox			m_LocalBounds = {};
-	BoundingBox			m_WorldBounds = {};
 	const _float4x4*	m_pParentMatrix = {};
 	_float4x4			m_CombinedWorldMatrix = {};
 	MAP_SECTION_DESC	m_tDesc = {};
@@ -102,7 +98,6 @@ private:
 	virtual const _tchar*	Get_ModelProtoTag() const override;
 	virtual _uint			Get_ModelProtoLevel() const override;
 	virtual HRESULT			Bind_WorldMatrix() override;
-	void					Update_LocalBounds();
 	void					Refresh_ColliderPose();
 	void					Rebuild_ColliderActor();
 

@@ -480,14 +480,6 @@ _bool CGameInstance_Proxy::Should_CullAABB(CULLING_VIEW eView, const BoundingBox
 	return m_pOwner->Should_CullAABB(eView, WorldBounds);
 }
 
-_bool CGameInstance_Proxy::Should_CullByDistance(const BoundingBox& WorldBounds, _float fCullDistance) const
-{
-	if (!IsConnected())
-		return false;
-
-	return m_pOwner->Should_CullByDistance(WorldBounds, fCullDistance);
-}
-
 _float CGameInstance_Proxy::Compute_SurfaceDistance(const BoundingSphere& WorldBounds) const
 {
 	if (!IsConnected())
@@ -496,23 +488,12 @@ _float CGameInstance_Proxy::Compute_SurfaceDistance(const BoundingSphere& WorldB
 	return m_pOwner->Compute_SurfaceDistance(WorldBounds);
 }
 
-CULLING_FADE_RESULT CGameInstance_Proxy::Evaluate_FrustumFadeAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds, _float fFadeWidth, _uint iPlaneMask) const
+CULLING_FADE_RESULT CGameInstance_Proxy::Evaluate_FrustumFadeAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds, _uint iPlaneMask) const
 {
 	if (!IsConnected())
 		return {};
 
-	return m_pOwner->Evaluate_FrustumFadeAABB(eView, WorldBounds, fFadeWidth, iPlaneMask);
-}
-
-CULLING_FADE_RESULT CGameInstance_Proxy::Evaluate_DistanceFade(
-	const BoundingSphere& WorldBounds,
-	_float fCullDistance,
-	_float fFadeWidth) const
-{
-	if (!IsConnected())
-		return {};
-
-	return m_pOwner->Evaluate_DistanceFade(WorldBounds, fCullDistance, fFadeWidth);
+	return m_pOwner->Evaluate_FrustumFadeAABB(eView, WorldBounds, iPlaneMask);
 }
 
 CULLING_FADE_RESULT CGameInstance_Proxy::Evaluate_DistanceFade(
@@ -527,22 +508,6 @@ CULLING_FADE_RESULT CGameInstance_Proxy::Evaluate_DistanceFade(
 		fSurfaceDistance,
 		fCullDistance,
 		fFadeWidth);
-}
-
-_bool XM_CALLCONV CGameInstance_Proxy::IsIn_CullingView_WorldSpace(CULLING_VIEW eView,	_fvector vWorldPos,	_float fRange) const
-{
-	if (!IsConnected())
-		return true;
-
-	return m_pOwner->IsIn_CullingView_WorldSpace(eView, vWorldPos, fRange);
-}
-
-_bool CGameInstance_Proxy::IsIn_CullingView_AABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const
-{
-	if (!IsConnected())
-		return true;
-
-	return m_pOwner->IsIn_CullingView_AABB(eView, WorldBounds);
 }
 #pragma endregion
 

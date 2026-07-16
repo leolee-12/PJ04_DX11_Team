@@ -199,6 +199,10 @@ HRESULT CEnvObject::Render_Decal()
 	if (!m_bRenderable)
 		return S_OK;
 
+	const _float fDissolve = Get_FinalMainDissolve();
+	if (fDissolve >= 0.999f)
+		return S_OK;
+
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
@@ -248,6 +252,10 @@ HRESULT CEnvObject::Render_Decal()
 		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_NONANIM;
 		Ctx.eKind = MESH_LAYER_RENDER_KIND::DECAL;
 		Ctx.iFallbackPass = ETOUI(WORLD_PASS::DECAL);
+		Ctx.fDissolve = fDissolve;
+
+		if (fDissolve > 0.f)
+			Ctx.iExtraFlags |= WorldShaderFlags::Dither;
 
 		MESH_LAYER_BIND_RESULT Result{};
 		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))

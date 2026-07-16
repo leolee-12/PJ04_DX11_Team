@@ -31,10 +31,6 @@ public:
 		_bool   bUseDistance = { true };
 		_bool   bUseFrustum = { true };
 		_bool   bUseFrustumFade = { true };
-
-		_float  fCullDistance = { 175.f };
-		_float  fDistanceFadeWidth = { 10.f };
-		_float  fFrustumFadeWidth = { 1.5f };
 	};
 
 	struct CULLING_EVALUATION_INPUT
