@@ -603,7 +603,7 @@ _uint CMonster::Calc_AnimPeriod(_float fDist) const
 	return P[0];
 }
 
-_bool CMonster::Handle_SharedAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+_bool CMonster::Handle_SoundAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 {
 	switch (static_cast<EANIM_EVENT>(e.iEventType))
 	{
@@ -629,6 +629,49 @@ _bool CMonster::Handle_SharedAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePh
 	default:
 		return false;		// 몬스터 고유 이벤트로 넘김
 	}
+}
+
+_bool CMonster::Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+{
+	if (static_cast<EANIM_EVENT>(e.iEventType) != EANIM_EVENT::Fx)
+		return false;
+
+	const _wstring strFx = StrToWstr(e.strParam);
+	if (strFx.empty())
+		return true;
+
+	_int iEffectVariation = e.iIntParam;
+	_float3 vPos{}, vLook{0.f, 0.f, 1.f}, vRotDeg{};
+
+	switch(iEffectVariation)
+	{
+	case 1:		vPos = e.vOffset;													break;		// 위치 오프셋
+	case 2:		vLook = e.vOffset;													break;		// 커스텀 LOOK
+	case 3:		XMStoreFloat3(&vLook, m_pTransformCom->Get_State(STATE::LOOK));		break;		// 몬스터의 LOOK(FX가 Parent가 없을 때)
+	case 4:		vRotDeg = e.vOffset;												break;		// 회전(도)
+	default:																		break;
+	}
+
+	if (ePhase == ANIM_EVENT_PHASE::BEGIN)
+	{
+		CEffect_Container*& pSlot = m_Effects[strFx];
+		if (pSlot)
+			pSlot->EffectContainer_StopAfterEmission();
+
+		
+		CEffect_Loader::GetInstance()->Spawn(strFx, Get_LevelIndex(),
+			vPos, vLook, vRotDeg, Get_FxParentMatrix(strFx), &pSlot);
+	}
+	else if (ePhase == ANIM_EVENT_PHASE::END)
+	{
+		auto it = m_Effects.find(strFx);
+		if (it != m_Effects.end() && it->second)
+		{
+			it->second->Start_FadeOut(0.4f);
+			it->second = nullptr;
+		}
+	}
+	return true;
 }
 
 void CMonster::Play_DeathFX()

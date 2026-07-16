@@ -201,7 +201,7 @@ HRESULT CNormalEnemy::Ready_AnimEvents()
 	pAnim->Set_EventCallback(
 		[this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase)
 		{
-			if (Handle_SharedAnimEvent(e, phase))
+			if (Handle_SoundAnimEvent(e, phase))
 				return;
 
 			switch (static_cast<EANIM_EVENT>(e.iEventType))
@@ -255,8 +255,7 @@ void CNormalEnemy::On_Exit(MONSTER_STATE_TYPE eNextState)
 HRESULT	CNormalEnemy::Ready_PartObjects()
 {
 	// Body 
-	m_pBody = Add_MonsterPart<CNormalEnemy_Body>(
-		CNormalEnemy_Body::PROTOTYPE_TAG, TEXT("Body"));
+	m_pBody = Add_MonsterPart<CNormalEnemy_Body>(CNormalEnemy_Body::PROTOTYPE_TAG, TEXT("Body"));
 	if (nullptr == m_pBody)
 		return E_FAIL;
 

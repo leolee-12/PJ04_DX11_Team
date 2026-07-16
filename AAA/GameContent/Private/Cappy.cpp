@@ -228,7 +228,7 @@ HRESULT CCappy::Ready_AnimEvents()
 	pAnimator->Set_EventCallback(
 		[this](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 		{
-			if (Handle_SharedAnimEvent(e, ePhase))
+			if (Handle_SoundAnimEvent(e, ePhase))
 				return;
 
 			switch (static_cast<EANIM_EVENT>(e.iEventType))

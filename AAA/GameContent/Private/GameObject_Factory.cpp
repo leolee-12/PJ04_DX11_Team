@@ -83,6 +83,7 @@
 #include "BubbleAura.h"
 #include "Kirby_SwordTrail.h"
 #include "SwordTrail_BK.h"
+#include "Tornado_BK.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -141,6 +142,8 @@
 #include "Cappy.h"
 #include "Cappy_Body.h"
 #include "Cappy_Hat.h"
+#include "NormalEnemyWild.h"
+#include "NormalEnemyWild_Body.h"
 
 //Miniboss
 #include "GigantEdge.h"
@@ -402,7 +405,7 @@ void CGameObject_Factory::Register_Container()
         )
     ); 
 
-    // Monster
+#pragma region 몬스터
     
     // 1. BladeKnight(Sword)
     Register
@@ -416,14 +419,14 @@ void CGameObject_Factory::Register_Container()
                 CBladeKnight_Body::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BladeKnight_Body"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/BladeKnight/BladeKnight.ysh",
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/BladeKnight/Body/BladeKnight.ysh",
                 XMMatrixRotationY(XMConvertToRadians(180.f))));
 
             // BladeKnight Sword
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBladeKnight_Sword::PROTOTYPE_TAG, CBladeKnight_Sword::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BladeKnight_Sword"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/BladeKnight/BladeKnight_Sword.ysh"));
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/BladeKnight/Sword/BladeKnight_Sword.ysh"));
          )
     );
 
@@ -439,7 +442,7 @@ void CGameObject_Factory::Register_Container()
                 CNormalEnemy_Body::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_NormalEnemy_Body"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/NormalEnemy/NormalEnemy.ysh",
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/NormalEnemy/Body/NormalEnemy.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
@@ -454,7 +457,7 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CKabu_Body::PROTOTYPE_TAG, CKabu_Body::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Kabu_Body"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Kabu/Kabu.ysh",
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Kabu/Body/Kabu.ysh",
                     XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
@@ -469,7 +472,7 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CBrontoBurt_Body::PROTOTYPE_TAG, CBrontoBurt_Body::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_BrontoBurt_Body"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/BrontoBurt/BrontoBurt.ysh",
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/BrontoBurt/Body/BrontoBurt.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
@@ -484,7 +487,7 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CPoppyBrosJr_Body::PROTOTYPE_TAG, CPoppyBrosJr_Body::Create(pDevice, pContext));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_PoppyBrosJr_Body"),
-                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/PoppyBrosJr/Model/PoppyBrosJr.ysh",
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/PoppyBrosJr/Body/PoppyBrosJr.ysh",
                 XMMatrixRotationY(XMConvertToRadians(180.f))));
 
             TRY_ADD_PROTO(pProxy, iLevelIndex, CEnemyBomb::PROTOTYPE_TAG,
@@ -517,6 +520,24 @@ void CGameObject_Factory::Register_Container()
                         XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
+
+    // 7. NormalEnemyWild
+    Register
+    (
+        CNormalEnemyWild::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CNormalEnemyWild),
+        LOADER
+        (
+            // NormalEnemy_Body
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CNormalEnemyWild_Body::PROTOTYPE_TAG, CNormalEnemyWild_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_NormalEnemyWild_Body"),
+                    CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/NormalEnemyWild/Body/NormalEnemyWild.ysh",
+                        XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
+#pragma endregion
 
     // Drop Star
     Register
@@ -949,6 +970,9 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
+#pragma region 몬스터 이펙트
+    
+    // BladeKnight
     Register(CSwordTrail_BK::PROTOTYPE_TAG, TEXT("Effect_Container"),
         CREATOR(CSwordTrail_BK),
         LOADER(
@@ -957,6 +981,25 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, Texture_BK_CommonSlash.iLevelID, Texture_BK_CommonSlash.szProtoTag,
                             CTexture::Create(pDevice, pContext, Texture_BK_CommonSlash.szFileTag, Texture_BK_CommonSlash.iNumTex));
         ));
+
+    Register(CTornado_BK::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CTornado_BK),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex,
+                TEXT("Prototype_Component_Model_BK_TornadoRing_Spin01"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/CHJ/Effect/Monster/BladeKnight/Mesh/Spin01/Common_Ring03.ysh"));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex,
+                TEXT("Prototype_Component_Model_BK_TornadoRing_Spin02"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/CHJ/Effect/Monster/BladeKnight/Mesh/Spin02/Common_Ring03.ysh"));
+        ));
+
+
+#pragma endregion
 
     // 12
     Register(CBreakWallEffect::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CBreakWallEffect),

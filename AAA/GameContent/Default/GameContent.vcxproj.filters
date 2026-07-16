@@ -145,6 +145,9 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\SwordTrail">
       <UniqueIdentifier>{0f342911-1dd7-4639-9632-28ffd15c4a89}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\99. Shared">
+      <UniqueIdentifier>{b7c14fa3-38b2-43a9-af3c-999355c26591}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\97. SwordChargeEffect">
       <UniqueIdentifier>{337bfefa-886b-4153-b3e4-87d81d98e19b}</UniqueIdentifier>
     </Filter>
@@ -673,6 +676,96 @@
     <Filter Include="00. GameObject\06. Monster\07. BrontoBurt\State\Return">
       <UniqueIdentifier>{1c459d47-b212-490f-a2b8-c351c910c80c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\08. NormalEnemy_Wild">
+      <UniqueIdentifier>{ceb564bf-5560-4489-8b3d-ec15cb90ac47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\08. NormalEnemy_Wild\Brain">
+      <UniqueIdentifier>{50081a5a-e9a7-4c96-89ee-bdd64f35b362}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\08. NormalEnemy_Wild\Parts">
+      <UniqueIdentifier>{7612ba8c-6067-44d4-b564-89cb8e45e1fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\08. NormalEnemy_Wild\State">
+      <UniqueIdentifier>{77bfeaa6-e364-4efe-a93e-8776b4a6b3b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\09. Dekabu">
+      <UniqueIdentifier>{a3ead1d2-cc33-4dfb-8521-752407aaa258}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\09. Dekabu\Brain">
+      <UniqueIdentifier>{29f33c36-2860-4e15-bfa3-706500d6a62d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\09. Dekabu\Parts">
+      <UniqueIdentifier>{f811f61b-6d70-4039-848b-c16c51d4676f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\09. Dekabu\State">
+      <UniqueIdentifier>{a40b3ae4-d50a-4484-bb90-2ef22bd254b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\10. Bouncy">
+      <UniqueIdentifier>{b196f359-42a0-4126-b378-92eced678f10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\10. Bouncy\Brain">
+      <UniqueIdentifier>{5d0cadb4-775a-4267-a5c8-1a08e205e71c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\10. Bouncy\Parts">
+      <UniqueIdentifier>{50db9364-75dc-4714-98b3-42178479ba94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\10. Bouncy\State">
+      <UniqueIdentifier>{412fdb9c-38a7-4181-ba8a-c181f1feaddb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\11. Scarfy">
+      <UniqueIdentifier>{94e610fe-842e-4cb8-8ab7-8cfc18f75c05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\11. Scarfy\Brain">
+      <UniqueIdentifier>{aada4240-56ec-4428-8340-93bf18dc5aa2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\11. Scarfy\Parts">
+      <UniqueIdentifier>{228b24ab-6634-431d-8b2e-16d85dba86ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\11. Scarfy\State">
+      <UniqueIdentifier>{2cf343ed-c4c2-4a81-96d0-335e1c5f3787}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\12. RangerEnemy%28Ranger%29">
+      <UniqueIdentifier>{4a5a98bb-b79a-44be-be87-51b4d7da26f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\12. RangerEnemy%28Ranger%29\Brain">
+      <UniqueIdentifier>{5a01d663-3ee0-4889-a401-ebfe4934ba49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\12. RangerEnemy%28Ranger%29\Parts">
+      <UniqueIdentifier>{fe7e052f-51ba-469b-9f31-530f697b2eba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\12. RangerEnemy%28Ranger%29\State">
+      <UniqueIdentifier>{d15d51a9-910b-478d-b4e0-64426bf72ff6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\13. RabbitEnemy">
+      <UniqueIdentifier>{1792aa42-8612-4e73-b47b-c1976b4cbd34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\13. RabbitEnemy\Brain">
+      <UniqueIdentifier>{b1b5bcf6-b8a0-4a3c-8520-e34893ddff4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\13. RabbitEnemy\Parts">
+      <UniqueIdentifier>{d251df6c-404f-46bd-ac07-dde542dc673b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\13. RabbitEnemy\State">
+      <UniqueIdentifier>{1e642da8-508c-4050-a06e-0488b1efa3c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\14. SirKibble%28Cutter%29">
+      <UniqueIdentifier>{718a3379-8dbd-482d-bfdf-c467b909a130}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\14. SirKibble%28Cutter%29\Brain">
+      <UniqueIdentifier>{d408160e-b231-45e3-9fcc-52d0491ae694}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\14. SirKibble%28Cutter%29\Parts">
+      <UniqueIdentifier>{ce482e86-e093-4609-a0e6-efb22570872b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\14. SirKibble%28Cutter%29\State">
+      <UniqueIdentifier>{0e61f2dc-a669-4eed-be50-a2ea74f8a588}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\15. Gigatzo">
+      <UniqueIdentifier>{1fd4df8a-0665-4b79-a7b8-4db91c6f5721}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\15. Gigatzo\Parts">
+      <UniqueIdentifier>{a7e33fe9-d4ee-43f8-ae01-d21f0d5df3d7}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\06. Monster\99. Monster_PartBase">
       <UniqueIdentifier>{de6fdd7b-10fb-45d6-ad3d-ed06421c157b}</UniqueIdentifier>
     </Filter>
@@ -1122,6 +1215,12 @@
     </Filter>
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\Tornado_BK">
+      <UniqueIdentifier>{a77fdec9-73fc-4018-b9e1-7d6ba5837648}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\08. NormalEnemy_Wild\Parts\Body">
+      <UniqueIdentifier>{47d00f87-d7cd-4fc1-ae5b-3c13cbd8ccf2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -2121,6 +2220,9 @@
     <ClInclude Include="..\Public\SwordTrail_BK.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Tornado_BK.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\TornadoSpinReverse.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\07. TornadoSpinReverse</Filter>
     </ClInclude>
@@ -2237,6 +2339,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\WalkSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\NormalEnemyWild.h">
+      <Filter>00. GameObject\06. Monster\08. NormalEnemy_Wild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\NormalEnemyWild_Body.h">
+      <Filter>00. GameObject\06. Monster\08. NormalEnemy_Wild\Parts\Body</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -3161,6 +3269,9 @@
     <ClCompile Include="..\Private\SwordTrail_BK.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Tornado_BK.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\TornadoSpinReverse.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\07. TornadoSpinReverse</Filter>
     </ClCompile>
@@ -3271,6 +3382,12 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\NormalEnemyWild.cpp">
+      <Filter>00. GameObject\06. Monster\08. NormalEnemy_Wild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\NormalEnemyWild_Body.cpp">
+      <Filter>00. GameObject\06. Monster\08. NormalEnemy_Wild\Parts\Body</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -8,10 +8,9 @@ NS_END
 
 NS_BEGIN(Client)
 
-// Part 들 전방선언
 class CNormalEnemy_Body;
 
-class CNormalEnemy final : public CMonster
+class CNormalEnemy : public CMonster
 {
 	GENERATED_BODY(CNormalEnemy)
 
@@ -23,7 +22,7 @@ public:
 
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_NormalEnemy";
 
-private:
+protected:
 	CNormalEnemy(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CNormalEnemy(const CNormalEnemy& Prototype);
 	virtual ~CNormalEnemy() = default;
@@ -54,13 +53,12 @@ protected:
 
 	virtual void				On_Exit(MONSTER_STATE_TYPE eNextState) override;
 
-private:
+protected:
 	HRESULT						Ready_PartObjects();
 
 	virtual void				On_Deserialized() override;
 
-private:
-	// Body 추가 
+protected:
 	CNormalEnemy_Body*			m_pBody = { nullptr };
 
 public:

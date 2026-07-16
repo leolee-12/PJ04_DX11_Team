@@ -197,7 +197,7 @@ HRESULT CBoss_Gorilla::Ready_AnimEvents()
     if (!pAnim) return E_FAIL;
 
     pAnim->Set_EventCallback([this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase) {
-        if (Handle_SharedAnimEvent(e, phase))
+        if (Handle_SoundAnimEvent(e, phase))
             return;
 
         switch (static_cast<EANIM_EVENT>(e.iEventType))

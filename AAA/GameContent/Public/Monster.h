@@ -11,6 +11,7 @@ class CCollider;
 class CController;
 class CAnimator;
 class CSound_Handle;
+class CEffect_Container;
 NS_END
 
 NS_BEGIN(Client)
@@ -129,6 +130,8 @@ protected:
 	
 	CSound_Handle				m_ActionLoopSnd;
 
+	unordered_map<_wstring, CEffect_Container*> m_Effects;
+
 	// 이번 프레임에 이동하고 싶은 방향
 	_float3						m_vWishDir = {};
 
@@ -194,7 +197,11 @@ protected:
 
 	virtual void				Apply_AIVariation(const _wstring& strVariation) {}
 
-	_bool						Handle_SharedAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
+	_bool						Handle_SoundAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
+	_bool						Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
+
+	virtual const _float4x4*	Get_FxParentMatrix(const _wstring& strFx) const { return nullptr; }
+
 	void						Play_DeathFX();
 	void						Compute_SpatPivot();
 	void                        Open_BodyCheckBlock();
