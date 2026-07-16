@@ -414,7 +414,7 @@ _bool CKirby_Ability_Sword::Handle_BodyAnimEvent(CKirby* pKirby, const ANIM_EVEN
             return false;
     }
 
-    if (static_cast<EANIM_EVENT>(e.iEventType) == EANIM_EVENT::Fx)
+    if (static_cast<EANIM_EVENT>(e.iEventType) == EANIM_EVENT::AbilityFx)
     {
         if (ePhase == ANIM_EVENT_PHASE::BEGIN)
         {
