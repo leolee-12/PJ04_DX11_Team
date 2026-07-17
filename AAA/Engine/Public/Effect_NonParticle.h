@@ -110,6 +110,7 @@ protected:
 
 protected:
     virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;
+    virtual _bool Use_LocalRotationAxis() const { return false; }
 
     void Update_Alpha(const _float fTimeDelta, const _float fRatio);
     void Update_Size(const _float fTimeDelta, const _float fRatio);

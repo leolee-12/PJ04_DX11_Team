@@ -106,6 +106,8 @@ void CEffect_Quad::Update_Core(const _float fTimeDelta, const _float fRatio)
 
 void CEffect_Quad::Init_PropertyValue()
 {
+    m_iRotationAxisSpace = 0;
+
     auto Values = Make_RectValues();
     EffectRect::Initialize_DefaultValues(Values);
 }
