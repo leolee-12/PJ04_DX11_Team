@@ -157,6 +157,9 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\99. Shared">
       <UniqueIdentifier>{b7c14fa3-38b2-43a9-af3c-999355c26591}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\99. Shared\00. LaunchSmoke">
+      <UniqueIdentifier>{0f76e55c-3e9a-4580-9f83-ecdbc545094a}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\18. BombHitAim">
       <UniqueIdentifier>{b8bb5558-323f-41ac-b336-122a065fc73b}</UniqueIdentifier>
     </Filter>
@@ -1872,6 +1875,9 @@
     <ClInclude Include="..\Public\KoKabu.h">
       <Filter>01. Projectile\00. PhysicsProjectile\02. KoKabu</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LaunchSmoke.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\99. Shared\00. LaunchSmoke</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\LD_ArrowBoard.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\04. ArrowBoard</Filter>
     </ClInclude>
@@ -3007,6 +3013,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\KoKabu.cpp">
       <Filter>01. Projectile\00. PhysicsProjectile\02. KoKabu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LaunchSmoke.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\99. Shared\00. LaunchSmoke</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_ArrowBoard.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\04. ArrowBoard</Filter>

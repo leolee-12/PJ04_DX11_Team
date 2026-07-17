@@ -77,6 +77,7 @@ namespace
         { TEXT("BreakWallEffect"),        TEXT("../../Resources/Map/Effect/Proto_BreakWallEffect_0.JSON") },
         { TEXT("ItemEffect"),             TEXT("../../Resources/Map/Effect/Proto_ItemEffect_0.JSON") },
         { TEXT("BubbleAura"),             TEXT("../../Resources/CHJ/Effect/BubbleAura.JSON") },
+        { TEXT("LaunchSmoke"),            TEXT("../../Resources/CHJ/Effect/LaunchSmoke.JSON") },
 
         { TEXT("SwordTrail_BK"),          TEXT("../../Resources/CHJ/Effect/SwordTrail_BK.JSON") },
         { TEXT("Tornado_BK"),             TEXT("../../Resources/CHJ/Effect/Tornado_BK.JSON") },
