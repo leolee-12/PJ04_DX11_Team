@@ -131,6 +131,18 @@ namespace Engine
 		return Items;
 	}
 
+	inline const EFFECTPART_ENUM_ITEMS& Get_PropertyEnum_UVEdgeFadeAxis()
+	{
+		static const EFFECTPART_ENUM_ITEMS Items =
+		{
+			{ 0, L"U / X" },
+			{ 1, L"V / Y" },
+			{ 2, L"Both" },
+		};
+
+		return Items;
+	}
+
 	inline const wstring* Find_EffectPartEnumName(const EFFECTPART_ENUM_ITEMS& Items, int iValue)
 	{
 		for (const auto& Item : Items)
@@ -189,6 +201,13 @@ namespace Engine
 			(Name == L"Linear Axis_U" && Category == L"Unknown"))
 		{
 			return &Get_PropertyEnum_UVAxis();
+		}
+
+		if ((Name == L"Edge Fade Axis_T" && Category == L"Texture Com") ||
+			(Name == L"Edge Fade Axis_D" && Category == L"Diffuse") ||
+			(Name == L"Edge Fade Axis_U" && Category == L"Unknown"))
+		{
+			return &Get_PropertyEnum_UVEdgeFadeAxis();
 		}
 
 		return nullptr;
