@@ -28,6 +28,7 @@ struct LD_OBJECT_DESC : public CGameObject::GAMEOBJECT_DESC
 	_wstring strReceiveEventTag;
 
 	_uint iTargetRailUid = 0;
+	_uint iTargetRailNodeIndex = 0;
 	_int  iTargetLandGroupIndex = -1;
 
 	_float3 vParsedPosition = {};
@@ -64,8 +65,19 @@ struct LD_RAIL_NODE_DESC
 	_float fBezierControlLength = 0.f;
 };
 
+enum class LD_RAIL_TYPE : _uint
+{
+	LINE,
+	BEZIER,
+	CIRCLE,
+	UNKNOWN,
+	END
+};
+
 struct LD_RAIL_DESC
 {
+	LD_RAIL_TYPE eType = LD_RAIL_TYPE::UNKNOWN;
+
 	_uint iNodeCount = 0;
 	_float3 vCenterPos = {};
 	_float fRadius = 0.f;

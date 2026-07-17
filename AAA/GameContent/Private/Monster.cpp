@@ -556,8 +556,7 @@ void CMonster::Update_CullGrade(_float fTimeDelta)
 		+ Get_CapsuleRadius();
 
 	const CULLING_FADE_RESULT tFade =
-		m_pGameInstance_Proxy->Evaluate_DistanceFade(
-			tSphere, m_fCullDist, m_fFadeRange);
+		m_pGameInstance_Proxy->Evaluate_DistanceFade(tSphere, m_fCullDist, m_fFadeRange);
 
 	if (FLT_MAX == tFade.fBoundaryDistance)
 	{   // fail-open: treat as FULL

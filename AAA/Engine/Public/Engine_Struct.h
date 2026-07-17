@@ -158,18 +158,6 @@ namespace Engine
 		float  fBoundaryDistance = { FLT_MAX };
 	};
 
-#ifdef _DEBUG
-	struct FRUSTUM_CULLING_STATS
-	{
-		unsigned int   iTestedAABB = {};
-		unsigned int   iCulledAABB = {};
-		unsigned int   iPassedAABB = {};
-		unsigned int   iDisabledPolicy = {};
-		unsigned int   iInvalidViewFailOpen = {};
-		unsigned int   iInvalidBoundsFailOpen = {};
-	};
-#endif
-
 	typedef struct tagAnimEvent
 	{
 		int         iEventType = 0;          // 의미는 클라이언트 enum(EANIM_EVENT)이 결정

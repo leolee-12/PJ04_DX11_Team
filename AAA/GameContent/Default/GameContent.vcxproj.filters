@@ -142,34 +142,34 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. CarLanding">
       <UniqueIdentifier>{b817f195-327b-4c7f-957f-56e368b950d2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect">
-      <UniqueIdentifier>{ccffdbd9-77db-4df6-a788-59b7612dc334}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight">
-      <UniqueIdentifier>{78f6f4c8-6e46-4f00-9923-d27496ac8a3e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\SwordTrail">
-      <UniqueIdentifier>{0f342911-1dd7-4639-9632-28ffd15c4a89}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\Tornado_BK">
-      <UniqueIdentifier>{a77fdec9-73fc-4018-b9e1-7d6ba5837648}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\99. Shared">
-      <UniqueIdentifier>{b7c14fa3-38b2-43a9-af3c-999355c26591}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\99. Shared\00. LaunchSmoke">
-      <UniqueIdentifier>{0f76e55c-3e9a-4580-9f83-ecdbc545094a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\18. BombHitAim">
       <UniqueIdentifier>{b8bb5558-323f-41ac-b336-122a065fc73b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\18. PickUpEffect">
-      <UniqueIdentifier>{eebc5f58-6478-4521-ad10-575ce43c2890}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\19. BombAimDot">
       <UniqueIdentifier>{4d6324c8-1634-4bd9-9325-d8d4db88a743}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. DropStarEffect">
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect">
+      <UniqueIdentifier>{ccffdbd9-77db-4df6-a788-59b7612dc334}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight">
+      <UniqueIdentifier>{78f6f4c8-6e46-4f00-9923-d27496ac8a3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\SwordTrail">
+      <UniqueIdentifier>{0f342911-1dd7-4639-9632-28ffd15c4a89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\Tornado_BK">
+      <UniqueIdentifier>{a77fdec9-73fc-4018-b9e1-7d6ba5837648}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared">
+      <UniqueIdentifier>{b7c14fa3-38b2-43a9-af3c-999355c26591}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\00. LaunchSmoke">
+      <UniqueIdentifier>{0f76e55c-3e9a-4580-9f83-ecdbc545094a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\21. PickUpEffect">
+      <UniqueIdentifier>{eebc5f58-6478-4521-ad10-575ce43c2890}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\22. DropStarEffect">
       <UniqueIdentifier>{6ae61bed-b980-4de6-ba9b-8c5c5c37d3c2}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\96. SmokeSphereOriginalEmitter">
@@ -949,6 +949,9 @@
     <Filter Include="00. GameObject\10. DropStar\Parts">
       <UniqueIdentifier>{1b0611e1-ea78-4e51-8d4b-905c94dccc2b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\11. WaddleDee">
+      <UniqueIdentifier>{28f1e19d-7639-4e84-b992-8ed2dceda685}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\95. Interface">
       <UniqueIdentifier>{3f986a95-5219-485c-8719-2667dcade916}</UniqueIdentifier>
     </Filter>
@@ -1009,8 +1012,11 @@
     <Filter Include="00. GameObject\96. LevelDesign\Visible\99. EventObject\ForBossMap1">
       <UniqueIdentifier>{a1998211-a419-40ce-9907-dcb0b25d085a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2">
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2">
       <UniqueIdentifier>{1accfe0f-f5c1-4443-96d0-fc2ebc97200d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-1">
+      <UniqueIdentifier>{8fa87f9a-d5b2-4510-9414-6ecd7a6891f3}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\Visible\Inhalable">
       <UniqueIdentifier>{8a10359e-c77f-49f9-9ed3-900989557393}</UniqueIdentifier>
@@ -1555,7 +1561,7 @@
       <Filter>00. GameObject\10. DropStar\Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\DropStarEffect.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. DropStarEffect</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\22. DropStarEffect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Editable.h">
       <Filter>00. GameObject\95. Interface</Filter>
@@ -1876,7 +1882,7 @@
       <Filter>01. Projectile\00. PhysicsProjectile\02. KoKabu</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LaunchSmoke.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\99. Shared\00. LaunchSmoke</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\00. LaunchSmoke</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_ArrowBoard.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\04. ArrowBoard</Filter>
@@ -1888,7 +1894,7 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\07. CopyEssence</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_DeformCarBreakWall.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_DeformObject.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\DeformObject</Filter>
@@ -1897,7 +1903,7 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_GarageRadio.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
     </ClInclude>
     <ClInclude Include="..\public\LD_Inhalable.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
@@ -1906,13 +1912,19 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\01. PopFlower</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_SlopeBoardA.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_SlopeBoardB.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-1</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_SlopeBoardC.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_Stage1BossDemo.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForBossMap1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LensFlare.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelData.h">
       <Filter>97. DataSystem\Header</Filter>
@@ -1927,7 +1939,7 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\06. Bush</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Defines.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_FallBorder.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\02. FallBorder</Filter>
@@ -2164,7 +2176,7 @@
       <Filter>01. Projectile\00. PhysicsProjectile</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PickUpEffect.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\18. PickUpEffect</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\21. PickUpEffect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PoppyBrosJr.h">
       <Filter>00. GameObject\06. Monster\06. PoppyBrosJr</Filter>
@@ -2341,13 +2353,16 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SwordTrail_BK.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Tornado_BK.h">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TornadoSpinReverse.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\07. TornadoSpinReverse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TownCondition_Utils.h">
+      <Filter>97. DataSystem\MapLoader</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TrailCommon.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\06. TrailCommon</Filter>
@@ -2459,6 +2474,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Vacuum.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\03. Vacuum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\WaddleDee.h">
+      <Filter>00. GameObject\11. WaddleDee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\WaddleDee_Body.h">
+      <Filter>00. GameObject\11. WaddleDee</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\WalkSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
@@ -2727,7 +2748,7 @@
       <Filter>00. GameObject\10. DropStar\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\DropStarEffect.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. DropStarEffect</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\22. DropStarEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Effect_Loader.cpp">
       <Filter>97. DataSystem\EffectLoader</Filter>
@@ -3015,7 +3036,7 @@
       <Filter>01. Projectile\00. PhysicsProjectile\02. KoKabu</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LaunchSmoke.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\99. Shared\00. LaunchSmoke</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\99. Shared\00. LaunchSmoke</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_ArrowBoard.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\04. ArrowBoard</Filter>
@@ -3027,7 +3048,7 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\07. CopyEssence</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_DeformCarBreakWall.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_DeformObject.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\DeformObject</Filter>
@@ -3036,7 +3057,7 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_GarageRadio.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
     </ClCompile>
     <ClCompile Include="..\private\LD_Inhalable.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
@@ -3045,13 +3066,19 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\01. PopFlower</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_SlopeBoardA.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_SlopeBoardB.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-1</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_SlopeBoardC.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForBossMap1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LensFlare.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Boundary.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\00. Boundary</Filter>
@@ -3282,7 +3309,7 @@
       <Filter>01. Projectile\00. PhysicsProjectile</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PickUpEffect.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\18. PickUpEffect</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\21. PickUpEffect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PoppyBrosJr.cpp">
       <Filter>00. GameObject\06. Monster\06. PoppyBrosJr</Filter>
@@ -3322,9 +3349,6 @@
     </ClCompile>
     <ClCompile Include="..\private\Projectile_Partner.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Armadillo\Projectile</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\RailRideable.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\RailTrack.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
@@ -3453,10 +3477,10 @@
       <Filter>00. GameObject\03. Effect\00. EffectContainer\02 .SwordSlash1</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SwordTrail_BK.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\SwordTrail</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Tornado_BK.cpp">
-      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. MonsterEffect\00. BladeKnight\Tornado_BK</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TornadoSpinReverse.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\07. TornadoSpinReverse</Filter>
@@ -3562,6 +3586,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Vacuum.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\03. Vacuum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\WaddleDee.cpp">
+      <Filter>00. GameObject\11. WaddleDee</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\WaddleDee_Body.cpp">
+      <Filter>00. GameObject\11. WaddleDee</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\WalkSmoke.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>

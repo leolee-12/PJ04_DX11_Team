@@ -233,6 +233,7 @@ void CEffect_Mesh::Update_UVScroll(const _float fTimeDelta, const _float fRatio)
 
 void CEffect_Mesh::Init_PropertyValue()
 {
+    m_iRotationAxisSpace = 0;
     m_bBillboard = false;
 
     auto Values = Make_MeshValues();
