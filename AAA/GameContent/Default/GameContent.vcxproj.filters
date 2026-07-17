@@ -133,8 +133,14 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\14. Env\Split">
       <UniqueIdentifier>{6fc60edd-b034-4d2e-b974-b555d698dd72}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\15. SmokeCollection">
+      <UniqueIdentifier>{b61bc410-72bb-4bf3-a7d8-705301a4aee9}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\16. Kirby_SwordTrail">
       <UniqueIdentifier>{a31c6265-e519-49a8-9abc-68d8e557c0b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. CarLanding">
+      <UniqueIdentifier>{b817f195-327b-4c7f-957f-56e368b950d2}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect">
       <UniqueIdentifier>{ccffdbd9-77db-4df6-a788-59b7612dc334}</UniqueIdentifier>
@@ -151,8 +157,17 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\17. MonsterEffect\99. Shared">
       <UniqueIdentifier>{b7c14fa3-38b2-43a9-af3c-999355c26591}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\18. BombHitAim">
+      <UniqueIdentifier>{b8bb5558-323f-41ac-b336-122a065fc73b}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\18. PickUpEffect">
       <UniqueIdentifier>{eebc5f58-6478-4521-ad10-575ce43c2890}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\19. BombAimDot">
+      <UniqueIdentifier>{4d6324c8-1634-4bd9-9325-d8d4db88a743}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\96. SmokeSphereOriginalEmitter">
+      <UniqueIdentifier>{9d0fc513-6eee-432b-8b54-b472bfb1fc04}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\97. SwordChargeEffect">
       <UniqueIdentifier>{337bfefa-886b-4153-b3e4-87d81d98e19b}</UniqueIdentifier>
@@ -820,8 +835,26 @@
     <Filter Include="00. GameObject\07. Boss\Boss\Gorilla\Part\RockHole">
       <UniqueIdentifier>{aa2f0431-38a5-4836-b306-ff8619edda25}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\GorillaRush">
+      <UniqueIdentifier>{b6efb2cd-9811-42f7-b9b7-c31d5debcb99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\GorillaRush\Brain">
+      <UniqueIdentifier>{796d5a2f-5b3d-4591-9fbc-3f40e5a1fe5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\GorillaRush\Part">
+      <UniqueIdentifier>{fc7a7cdb-d3e7-4154-a5a7-88ce5f8ffd21}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\07. Boss\Boss\Leopard">
       <UniqueIdentifier>{746fae67-6a99-4b4e-bef8-b91f1b3b2cd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Brain">
+      <UniqueIdentifier>{e1c1248b-14dc-412a-a309-7824f9496b95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Part">
+      <UniqueIdentifier>{68c80ce0-dd15-457a-8fcf-a8858f37f553}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\07. Boss\Boss\Leopard\Projectile">
+      <UniqueIdentifier>{ccfbab45-1092-4a5d-853b-db52dd4420ae}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\07. Boss\BossCage">
       <UniqueIdentifier>{e77c861a-2b81-4e49-a7e4-26ef8eb371d1}</UniqueIdentifier>
@@ -1204,6 +1237,9 @@
     <Filter Include="98. ShaderFiles\Marb1e">
       <UniqueIdentifier>{c5ab5b79-8b3c-4a71-af78-735b22243355}</UniqueIdentifier>
     </Filter>
+    <Filter Include="98. ShaderFiles\Marb1e\Boss">
+      <UniqueIdentifier>{422a56fc-373b-4d5f-b1cf-167f581eebb6}</UniqueIdentifier>
+    </Filter>
     <Filter Include="98. ShaderFiles\Ring">
       <UniqueIdentifier>{e216c804-3688-4394-920e-d1effa7ea6ce}</UniqueIdentifier>
     </Filter>
@@ -1254,11 +1290,17 @@
     <ClInclude Include="..\Public\BladeKnight_Sword.h">
       <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\Parts\Weapon</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BombAimDot.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\19. BombAimDot</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\BombExplosion.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BombFuseEffect.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\12. BombFuseEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BombHitAim.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\18. BombHitAim</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BoostGas.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. BoostGas</Filter>
@@ -1298,6 +1340,21 @@
     </ClInclude>
     <ClInclude Include="..\public\Boss_Gorilla_RockHole.h">
       <Filter>00. GameObject\07. Boss\Boss\Gorilla\Part\RockHole</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_GorillaRush.h">
+      <Filter>00. GameObject\07. Boss\Boss\GorillaRush</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_GorillaRush_Brain.h">
+      <Filter>00. GameObject\07. Boss\Boss\GorillaRush\Brain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Leopard.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Leopard_Body.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Part</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Boss_Leopard_Brain.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Brain</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BossBase.h">
       <Filter>00. GameObject\07. Boss</Filter>
@@ -1388,6 +1445,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Car_00_MilkyWay.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\98. Car_00_MilkyWay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CarLanding.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. CarLanding</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\CarMilkyWay.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\99. CarMilkyWay</Filter>
@@ -2100,6 +2160,9 @@
     <ClInclude Include="..\public\Projectile_Movement.h">
       <Filter>01. Projectile\Movement</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Projectile_Nail.h">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Projectile</Filter>
+    </ClInclude>
     <ClInclude Include="..\public\Projectile_Partner.h">
       <Filter>00. GameObject\07. Boss\Boss\Armadillo\Projectile</Filter>
     </ClInclude>
@@ -2154,6 +2217,9 @@
     <ClInclude Include="..\Public\SkySphere.h">
       <Filter>00. GameObject\01. Map\SkySphere</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SmokeCollection.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. SmokeCollection</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\SmokeEmitter.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\99. SmokeEmitter</Filter>
     </ClInclude>
@@ -2165,6 +2231,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\SmokeSphereOriginal.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\00. SmokeSphereOriginal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SmokeSphereOriginalEmitter.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\96. SmokeSphereOriginalEmitter</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SmokeTail.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\02. SmokeTail</Filter>
@@ -2384,11 +2453,17 @@
     <ClCompile Include="..\Private\BladeKnight_Sword.cpp">
       <Filter>00. GameObject\06. Monster\02. BladeKnight%28Sword%29\Parts\Weapon</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\BombAimDot.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\19. BombAimDot</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\BombExplosion.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\09. BombExplosion</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BombFuseEffect.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\12. BombFuseEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BombHitAim.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\18. BombHitAim</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BoostGas.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\08. BoostGas</Filter>
@@ -2428,6 +2503,21 @@
     </ClCompile>
     <ClCompile Include="..\private\Boss_Gorilla_RockHole.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Gorilla\Part\RockHole</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_GorillaRush.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\GorillaRush</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_GorillaRush_Brain.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\GorillaRush\Brain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Leopard.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Leopard_Body.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Part</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Boss_Leopard_Brain.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Brain</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BossBase.cpp">
       <Filter>00. GameObject\07. Boss</Filter>
@@ -2518,6 +2608,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Car_00_MilkyWay.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\98. Car_00_MilkyWay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CarLanding.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\17. CarLanding</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\CarMilkyWay.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\99. CarMilkyWay</Filter>
@@ -3164,6 +3257,9 @@
     <ClCompile Include="..\private\Projectile_Movement.cpp">
       <Filter>01. Projectile\Movement</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Projectile_Nail.cpp">
+      <Filter>00. GameObject\07. Boss\Boss\Leopard\Projectile</Filter>
+    </ClCompile>
     <ClCompile Include="..\private\Projectile_Partner.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Armadillo\Projectile</Filter>
     </ClCompile>
@@ -3212,6 +3308,9 @@
     <ClCompile Include="..\Private\SkySphere.cpp">
       <Filter>00. GameObject\01. Map\SkySphere</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\SmokeCollection.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\15. SmokeCollection</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\SmokeEmitter.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\99. SmokeEmitter</Filter>
     </ClCompile>
@@ -3223,6 +3322,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\SmokeSphereOriginal.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\00. SmokeSphereOriginal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SmokeSphereOriginalEmitter.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\96. SmokeSphereOriginalEmitter</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SmokeTail.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\02. SmokeTail</Filter>
@@ -3416,7 +3518,7 @@
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
     <None Include="..\ShaderFiles\Shader_Armadillo.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
+      <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
     </None>
     <None Include="..\ShaderFiles\Shader_Bomb.hlsl">
       <Filter>98. ShaderFiles\Hojun</Filter>
@@ -3425,7 +3527,7 @@
       <Filter>98. ShaderFiles\Marb1e</Filter>
     </None>
     <None Include="..\ShaderFiles\Shader_Gorilla.hlsl">
-      <Filter>98. ShaderFiles\Marb1e</Filter>
+      <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
     </None>
     <None Include="..\ShaderFiles\Shader_Kirby.hlsl">
       <Filter>98. ShaderFiles\Marb1e</Filter>
@@ -3469,5 +3571,10 @@
     <None Include="..\ShaderFiles\Shader_World_Technique.hlsli">
       <Filter>98. ShaderFiles\Leo</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\ShaderFiles\Shader_Leopard.hlsl">
+      <Filter>98. ShaderFiles\Marb1e\Boss</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

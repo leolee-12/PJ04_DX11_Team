@@ -10,9 +10,13 @@
 #include "Loader_Prototype.h"
 
 #include "Level_Test.h"
+
 #include "Stage0_Step1.h"
 #include "Stage0_Step2.h"
+
 #include "Town_Step1.h"
+#include "Town_Step2.h"
+
 #include "Boss_Stage1.h"
 
 #include "Stage1_Step1.h"
@@ -66,6 +70,9 @@ void CLevel_Loading::Update(_float fTimeDelta)
             break;
         case LEVEL::TOWN_STEP1:
             pNextLevel = CTown_Step1::Create(m_pDevice, m_pContext);
+            break;
+        case LEVEL::TOWN_STEP2:
+            pNextLevel = CTown_Step2::Create(m_pDevice, m_pContext);
             break;
         case LEVEL::BOSS_STAGE1:
             pNextLevel = CBoss_Stage1::Create(m_pDevice, m_pContext);

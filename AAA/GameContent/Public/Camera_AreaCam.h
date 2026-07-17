@@ -52,8 +52,6 @@ private:
     _float3 m_eyeCur = {}, m_atCur = {}, m_eyeVel = {}, m_atVel = {};
     _float m_fFovCurDeg = { -1.f };
 
-    //_float  m_smoothTime = 0.35f;
-    _float m_smoothBase = { 0.35f };
     _float m_smoothTrans = { 0.90f };
     _float m_blendDur = { 0.60f };
     _float m_blendTimer = { 0.f };

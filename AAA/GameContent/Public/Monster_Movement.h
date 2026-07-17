@@ -41,12 +41,16 @@ public:
 	_bool						Is_KO()       const { return m_bKO; }
 	_bool						Is_Bouncing() const { return m_bBouncing; }
 
+	void						Set_GravityEnabled(_bool b) { m_bGravityEnabled = b; }
+	_bool						Is_GravityEnabled() const { return m_bGravityEnabled; }
+
 public:
 	static CMonster_Movement*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CComponent*			Clone(void* pArg) override;
 
 protected:
 	virtual void				Apply_Facing(_fvector vFaceDir, _float fTimeDelta) override;
+	virtual void				Calc_Vertical(_float fTimeDelta) override;
 
 private:
 	_bool						m_bLockFacing = { false };
@@ -68,6 +72,8 @@ private:
 	_float						m_fJumpDur = { 0.f };
 	_float						m_fJumpHeight = { 0.f };
 	_float						m_fJumpT = { 0.f };
+
+	_bool						m_bGravityEnabled = { true };
 
 	static constexpr _float		s_fKB_MaxStrength = { 16.f };
 	static constexpr _float		s_fKO_MinStrength = { 12.f };

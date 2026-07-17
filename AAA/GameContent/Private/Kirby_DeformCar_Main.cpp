@@ -105,9 +105,9 @@ HRESULT CKirby_DeformCar_Main::Render()
 HRESULT CKirby_DeformCar_Main::Ready_AnimEvents(CKirby* pKirby)
 {
     m_pAnimatorCom->Set_EventCallback(
-        [this](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+        [this, pKirby](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
         {
-            if (Handle_AnimEventParent(e, ePhase) == true)
+            if (Handle_AnimEventParent(pKirby, e, ePhase) == true)
                 return;
         }
     );

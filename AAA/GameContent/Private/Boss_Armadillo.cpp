@@ -34,13 +34,14 @@ HRESULT CBoss_Armadillo::Initialize(void* pArg)
     m_fMaxHP = 100.f;
     m_fCurHP = m_fMaxHP;
 
-    if (m_pMovement)
-    {
-        m_pMovement->Set_MoveSpeed(4.f);
-        m_pMovement->Set_RotSpeed(120.f);
-    }
+    m_pMovement->Set_MoveSpeed(4.f);
+    m_pMovement->Set_RotSpeed(120.f);
+
+    m_pBody->Get_Animator()->Play("Wait", true, false, 0.f, 1.5f);
 
     Subscribe_Event(EventTag::QTE_Success, [this](void*) { m_bQTEEscaped = true; });
+
+    Set_Active(true);
 
     return S_OK;
 }
@@ -135,6 +136,12 @@ void CBoss_Armadillo::On_Enter_Corpse()
     _float3 vPos{};
     XMStoreFloat3(&vPos, vPosV);
     CEffect_Loader::GetInstance()->Spawn(L"DeathSmoke", m_iPrototypeLevel, vPos);
+
+    m_pGameInstance_Proxy->Publish(EventTag::Level_BossDefeated, nullptr);
+
+    CUTSCENE_CAMERA_DESC cam{};
+    cam.eCam = ECutsceneCam::Area;
+    m_pGameInstance_Proxy->Publish(EventTag::Cutscene_CameraChange, &cam);
 }
 
 _bool CBoss_Armadillo::Get_HurtBoxDesc(CAPSULE_DESC& Out) const

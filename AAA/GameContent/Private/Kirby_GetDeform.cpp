@@ -45,7 +45,7 @@ void CKirby_GetDeform::Enter(CKirby* pKirby, _int iFlag)
         return;
     }
     m_eDeformType = pDeformable->Get_DeformType();
-    //m_eDeformType = DEFORM_TYPE::CYLINDER;   // Debug
+    m_eDeformType = DEFORM_TYPE::CAR;   // Debug
  
     pDeformable->Request_Deform(pKirby->Get_Transform()->Get_WorldMatrixPtr());
 

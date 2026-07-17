@@ -73,13 +73,6 @@ HRESULT CWalkSmoke::Ready_EffectPartObjects()
     if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeTail::PROTOTYPE_TAG, TEXT("Prototype_Component_Model_SmokeTail"))))
         return E_FAIL;
 
-    //if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CTestMeshEmitter::PROTOTYPE_TAG, TEXT("Test_MeshEmitter"))))
-    //    return E_FAIL;
-    //if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CTestParticle::PROTOTYPE_TAG, TEXT("Test_Paticle"))))
-    //    return E_FAIL;
-    //if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CTestMeshParticle::PROTOTYPE_TAG, TEXT("Test_MeshPaticle"))))
-    //    return E_FAIL;
-
     return S_OK;
 }
 
