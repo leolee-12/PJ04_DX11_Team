@@ -86,6 +86,7 @@
 #include "Kirby_SwordTrail.h"
 #include "SmokeCollection.h"
 #include "CarLanding.h"
+#include "PickUpEffect.h"
 #include "SmokeSphereOriginalEmitter.h"
 #include "SwordTrail_BK.h"
 #include "Tornado_BK.h"
@@ -259,7 +260,7 @@ namespace
     {
         TRY_ADD_PROTO(pProxy, iLevelIndex, CAbility_Model::PROTOTYPE_TAG, CAbility_Model::Create(pDevice, pContext));
         
-        // ´É·Â Ãß°¡µÉ ¶§¸¶´Ù ¾Æ·¡¿¡ Ãß°¡
+        // ï¿½É·ï¿½ ï¿½ß°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Æ·ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
         
         // Sword
         TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Ability_Model_Sword"),
@@ -417,7 +418,7 @@ void CGameObject_Factory::Register_Container()
         )
     ); 
 
-#pragma region ¸ó½ºÅÍ
+#pragma region ï¿½ï¿½ï¿½ï¿½
     
     // 1. BladeKnight(Sword)
     Register
@@ -902,7 +903,7 @@ void CGameObject_Factory::Register_Effect()
 
         ));
 
-    // 7 Bubble Aura (EssenceBubble / DorppedBubble °ø¿ë)
+    // 7 Bubble Aura (EssenceBubble / DorppedBubble ï¿½ï¿½ï¿½ï¿½)
     Register(CBubbleAura::PROTOTYPE_TAG, TEXT("Effect_Container"),
         CREATOR(CBubbleAura),
         LOADER
@@ -918,6 +919,22 @@ void CGameObject_Factory::Register_Effect()
             
             TRY_ADD_PROTO(pProxy, Texture_Star2D.iLevelID, Texture_Star2D.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_Star2D.szFileTag, Texture_Star2D.iNumTex));
+
+            TRY_ADD_PROTO(pProxy, Texture_CommonSparkle01.iLevelID, Texture_CommonSparkle01.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_CommonSparkle01.szFileTag, Texture_CommonSparkle01.iNumTex));
+
+        ));
+
+    Register(CPickUpEffect::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CPickUpEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG, CRectCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectParticleCommon::PROTOTYPE_TAG, CRectParticleCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, Texture_CommonRing01.iLevelID, Texture_CommonRing01.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_CommonRing01.szFileTag, Texture_CommonRing01.iNumTex));
 
             TRY_ADD_PROTO(pProxy, Texture_CommonSparkle01.iLevelID, Texture_CommonSparkle01.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_CommonSparkle01.szFileTag, Texture_CommonSparkle01.iNumTex));
@@ -1026,7 +1043,7 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
-#pragma region ¸ó½ºÅÍ ÀÌÆåÆ®
+#pragma region ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®
     
     // BladeKnight
     Register(CSwordTrail_BK::PROTOTYPE_TAG, TEXT("Effect_Container"),

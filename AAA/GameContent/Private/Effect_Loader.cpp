@@ -10,11 +10,11 @@ namespace
 {
     struct EFFECT_DB_ENTRY
     {
-        const _tchar* szEffectId;    // ½ºÆù Å°
-        const _tchar* szConfigPath;  // Æ©´× json (µ¥ÀÌÅÍ·Î À¯Áö)
+        const _tchar* szEffectId;    // ï¿½ï¿½ï¿½ï¿½ Å°
+        const _tchar* szConfigPath;  // Æ©ï¿½ï¿½ json (ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½ ï¿½ï¿½ï¿½ï¿½)
     };
 
-    // === ÀÌÆåÆ® DB : »õ ÀÌÆåÆ®´Â ¿©±â¿¡ ÇÑ ÁÙ Ãß°¡ ===
+    // === ï¿½ï¿½ï¿½ï¿½Æ® DB : ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½â¿¡ ï¿½ï¿½ ï¿½ï¿½ ï¿½ß°ï¿½ ===
     static constexpr EFFECT_DB_ENTRY s_EffectDB[] =
     {
         { TEXT("WalkSmoke"),              TEXT("../../Resources/YSE/EffectContainer/WalkSmoke_7_01.json") },
@@ -81,6 +81,7 @@ namespace
         { TEXT("SwordTrail_BK"),          TEXT("../../Resources/CHJ/Effect/SwordTrail_BK.JSON") },
         { TEXT("Tornado_BK"),             TEXT("../../Resources/CHJ/Effect/Tornado_BK.JSON") },
         { TEXT("EssenceAura"),            TEXT("../../Resources/CHJ/Effect/EssenceAura.JSON") },
+        { TEXT("PickUpEffect"),           TEXT("../../Resources/CHJ/Effect/PickUpEffect.JSON") },
     };
 }
 
@@ -102,7 +103,7 @@ HRESULT CEffect_Loader::Ready(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice
 
         const _wstring strProtoTag = StrToWstr(jEffect["Prototype_Tag"].get<string>());
 
-        // ÇÁ·ÎÅäÅ¸ÀÔ STATIC 1È¸ µî·Ï
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¸ï¿½ï¿½ STATIC 1È¸ ï¿½ï¿½ï¿½
         if (!pProxy->Has_Prototype(ETOUI(LEVEL::STATIC), strProtoTag))
         {
             auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(strProtoTag);
