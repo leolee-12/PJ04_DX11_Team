@@ -9,6 +9,14 @@ NS_END
 
 NS_BEGIN(Client)
 
+struct FX_HANDLE
+{
+    Engine::CEffect_Container* p = { nullptr };
+    _uint64 iEpoch = {};
+
+    void Clear() { p = nullptr; iEpoch = 0; }
+};
+
 class CLIENT_DLL CEffect_Loader final : public CBase
 {
     DECLARE_SINGLETON(CEffect_Loader)
@@ -23,7 +31,10 @@ public:
         const _float3& vLook = { 0.f, 0.f, 0.f },
         const _float3& vRotDeg = { 0.f, 0.f, 0.f },
         const _float4x4* pParent = nullptr,
-        Engine::CEffect_Container** ppOut = nullptr);
+        CEffect_Container** ppOut = nullptr,
+        FX_HANDLE* pOutHandle = nullptr);
+
+    _bool Is_Current(const FX_HANDLE& h) const;
 
 private:
     CEffect_Loader() = default;
@@ -32,6 +43,9 @@ private:
     struct EFFECT_ASSET { _wstring strProtoTag; json Config; };
     unordered_map<_wstring, EFFECT_ASSET> m_Assets;     // effectId ¡æ asset
     CGameInstance_Proxy* m_pProxy{};
+
+    unordered_map<CEffect_Container*, _uint64> m_Epochs;
+    _uint64 m_iEpochCounter = {};
 
 public:
     virtual void Free() override;
