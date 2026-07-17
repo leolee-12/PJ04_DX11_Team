@@ -192,6 +192,10 @@
 #include "Armadillo_WallImpact.h"
 
 #include "Leopard_Slash.h"
+#include "Leopard_Meteo.h"
+#include "Nail_Trail.h"
+#include "Leopard_Afterimage_Assault.h"
+#include "Leopard_Afterimage_Jump.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
@@ -1589,6 +1593,21 @@ void CGameObject_Factory::Leopard_Effect()
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Ring/BossLeopard_00_Common_Ring02.ysh"));
             TRY_ADD_PROTO(pProxy, iLevelIndex, Texture_LeoSlash.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_LeoSlash.szFileTag, Texture_LeoSlash.iNumTex));
+        )
+    );
+    Register(CLeopard_Meteo::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CLeopard_Meteo),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_Meteo::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Meteo/BossLeopard_00_Common_MeteoSpere.ysh"));
+        )
+    );
+    Register(CNail_Trail::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CNail_Trail), 
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CTrailCommon::PROTOTYPE_TAG, CTrailCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, Texture_NailTrail.iLevelID, Texture_NailTrail.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_NailTrail.szFileTag, Texture_NailTrail.iNumTex));
         )
     );
 }

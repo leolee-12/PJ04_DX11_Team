@@ -44,8 +44,11 @@
     <ClInclude Include="..\Public\DropStar_Manager.h" />
     <ClInclude Include="..\Public\EssenceCrown.h" />
     <ClInclude Include="..\Public\KoKabu.h" />
+    <ClInclude Include="..\public\Leopard_Afterimage_Assault.h" />
+    <ClInclude Include="..\public\Leopard_Afterimage_Jump.h" />
     <ClInclude Include="..\public\Leopard_Meteo.h" />
     <ClInclude Include="..\public\Leopard_Slash.h" />
+    <ClInclude Include="..\public\Nail_Trail.h" />
     <ClInclude Include="..\Public\NormalEnemyWild.h" />
     <ClInclude Include="..\Public\NormalEnemyWild_Body.h" />
     <ClInclude Include="..\Public\PickUpEffect.h" />
@@ -449,8 +452,11 @@
     <ClCompile Include="..\Private\DropStar_Manager.cpp" />
     <ClCompile Include="..\Private\EssenceCrown.cpp" />
     <ClCompile Include="..\Private\KoKabu.cpp" />
+    <ClCompile Include="..\private\Leopard_Afterimage_Assault.cpp" />
+    <ClCompile Include="..\private\Leopard_Afterimage_Jump.cpp" />
     <ClCompile Include="..\private\Leopard_Meteo.cpp" />
     <ClCompile Include="..\private\Leopard_Slash.cpp" />
+    <ClCompile Include="..\private\Nail_Trail.cpp" />
     <ClCompile Include="..\Private\NormalEnemyWild.cpp" />
     <ClCompile Include="..\Private\NormalEnemyWild_Body.cpp" />
     <ClCompile Include="..\Private\PickUpEffect.cpp" />

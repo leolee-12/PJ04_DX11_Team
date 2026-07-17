@@ -105,6 +105,8 @@ namespace
         //Leopard
         { TEXT("LeoSlash_L"),             TEXT("../../Resources/YSH/Effects/Leopard/LeoSlash_L.JSON") },
         { TEXT("LeoSlash_R"),             TEXT("../../Resources/YSH/Effects/Leopard/LeoSlash_R.JSON") },
+        { TEXT("Leopard_Meteo"),          TEXT("../../Resources/YSH/Effects/Leopard/Leopard_Meteo.JSON") },
+        { TEXT("Nail_Trail"),             TEXT("../../Resources/YSH/Effects/Leopard/Nail_Trail.JSON") },
     };
 }
 

@@ -4,18 +4,18 @@
 
 NS_BEGIN(Client)
 
-class CLeopard_Meteo final : public CEffect_Container
+class CLeopard_Afterimage_Jump final : public CEffect_Container
 {
-	GENERATED_BODY(CLeopard_Meteo)
+	GENERATED_BODY(CLeopard_Afterimage_Jump)
 
 public:
-	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_Leopard_Meteo";
-	static constexpr const _tchar* MODEL_PROTO_TAG = L"Prototype_Component_Model_Leopard_Meteo";
+	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_Leopard_Afterimage_Jump";
+	static constexpr const _tchar* MODEL_PROTO_TAG = L"Prototype_Component_Model_Leopard_Afterimage_Jump";
 
 private:
-	CLeopard_Meteo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CLeopard_Meteo(const CLeopard_Meteo& Prototype);
-	virtual ~CLeopard_Meteo() = default;
+	CLeopard_Afterimage_Jump(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CLeopard_Afterimage_Jump(const CLeopard_Afterimage_Jump& Prototype);
+	virtual ~CLeopard_Afterimage_Jump() = default;
 
 protected:
 	virtual HRESULT Initialize_Prototype() override;
@@ -35,7 +35,7 @@ private:
 	HRESULT Ready_EffectPartObjects();
 
 public:
-	static CLeopard_Meteo* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CLeopard_Afterimage_Jump* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 
 private:
