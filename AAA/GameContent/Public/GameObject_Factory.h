@@ -74,6 +74,7 @@ private:
 	void Register_NonAnimObject();
     void Register_AnimObject();
 	void Register_Effect();
+    void Register_BossEffect();
     void Register_Bubble();
 
     void Register_MiniBoss();

@@ -64,6 +64,8 @@ public:
     void Show_Cage();
     void Hide_Cage();
 
+    void Set_RutTrail(_bool bOn);
+
 protected:
     virtual CMonsterBrain* Create_Brain() override;
     virtual void           Play_Intro() override;
@@ -107,6 +109,12 @@ private:
     _int    m_iDeathPoseDelay = { 0 };
     _float  m_fDeathPauseTimer = { 0.f };
 
+    _bool   m_bRutTrail = { false };
+    _float3 m_vRutLastPos = { 0.f, 0.f, 0.f };
+    _int    m_iRutToggle = { 0 };
+
+    static constexpr _float s_fRutInterval = 2.f;
+
 #ifdef _DEBUG
     mutable _bool m_bDebugWallHit = { false };
 #endif
@@ -115,6 +123,7 @@ private:
     void Update_BodyOffset(_float fTimeDelta);
     void Fire_CatchCamera(const _tchar* szTrack);
     void Tick_DeathSequence(_float fTimeDelta);
+    void Update_RutTrail(_float fTimeDelta);
 
 public:
     static CBoss_Armadillo* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

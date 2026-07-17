@@ -36,7 +36,7 @@ HRESULT Ready_Prototype_SharedResources(CGameInstance_Proxy* pProxy, ID3D11Devic
         return E_FAIL;
 
     // 셰어드 리소스 준비 직후 1회
-    if (FAILED(CEffect_Loader::GetInstance()->Ready(pProxy, pDevice, pContext)))
+    if (FAILED(CEffect_Loader::GetInstance()->Ready(pProxy, pDevice, pContext, ETOUI(LEVEL::STATIC))))
         return E_FAIL;
 
     if (FAILED(CBubble_Manager::GetInstance()->Initialize(pDevice, pContext)))

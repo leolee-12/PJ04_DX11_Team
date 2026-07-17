@@ -15,7 +15,7 @@ class CLIENT_DLL CEffect_Loader final : public CBase
 
 public:
     // 시작 시 1회: STATIC 프로토 등록 + 작성값 캐시
-    HRESULT Ready(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    HRESULT Ready(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _uint iLevel);
 
     // 이펙트 스폰해줘
     HRESULT Spawn(const _wstring& strEffectId, _uint iTargetLevel,

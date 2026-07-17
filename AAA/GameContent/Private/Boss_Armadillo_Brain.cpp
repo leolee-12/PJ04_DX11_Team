@@ -135,6 +135,7 @@ CBTNode* CBoss_Armadillo_Brain::Make_Roll()
                 m_pOwner->Get_Movement()->Set_MoveSpeed(SOLO_ROLL_SPEED);
                 *vDir = pBB->Get<_float3>("DirToTarget", _float3(0.f, 0.f, 1.f));
                 *iState = 0; *iWallHits = 0; *fSegT = 0.f; *bGroggy = false; *bOn = true;
+                pArma->Set_RutTrail(true);
             }
             if (*iState == 0) {
                 *fSegT += dt; m_pOwner->Add_MoveDir(*vDir);
@@ -146,12 +147,14 @@ CBTNode* CBoss_Armadillo_Brain::Make_Roll()
                         m_pOwner->Get_Movement()->Launch(vBounce, fBounceBackSpeed, fBounceUpSpeed);
                         m_pOwner->Get_Movement()->Set_MoveSpeed(WALK_SPEED);
                         *bGroggy = true; *bOn = false; return BT_STATUS::SUCCESS;
+                        pArma->Set_RutTrail(false);
                     }
                     *iState = 1; *fAimT = 0.f;
                 }
                 else if (*fSegT >= fSegTimeMax) {
                     m_pOwner->Get_Movement()->Set_MoveSpeed(WALK_SPEED);
                     *bOn = false; return BT_STATUS::SUCCESS;
+                    pArma->Set_RutTrail(false);
                 }
             }
             else {
@@ -170,7 +173,11 @@ CBTNode* CBoss_Armadillo_Brain::Make_Roll()
             }
             return BT_STATUS::RUNNING;
         },
-        [this, bOn]() { *bOn = false; m_pOwner->Get_Movement()->Set_MoveSpeed(WALK_SPEED); });
+        [this, bOn]() { 
+            *bOn = false; 
+            m_pOwner->Get_Movement()->Set_MoveSpeed(WALK_SPEED); 
+            static_cast<CBoss_Armadillo*>(m_pOwner)->Set_RutTrail(false);
+        });
 
     auto bFallOn = make_shared<bool>(false);
     auto fFallT = make_shared<_float>(0.f);

@@ -173,6 +173,10 @@
 #include "Boss_Leopard_Body.h"
 #include "Projectile_Nail.h"
 
+//Boss Effect
+#include "Armadillo_RutA.h"
+#include "Armadillo_RutB.h"
+
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
 #include "LevelDesign_Starblock.h"
@@ -304,6 +308,7 @@ void CGameObject_Factory::RegisterAll()
     Register_NonAnimObject();
     Register_AnimObject();
     Register_Effect();
+    Register_BossEffect();
     Register_Bubble();
 
 
@@ -1201,6 +1206,28 @@ void CGameObject_Factory::Register_Effect()
                     XMMatrixRotationX(XMConvertToRadians(90.f))));
             TRY_ADD_PROTO(pProxy, Texture_Common_SpinSlashTrail.iLevelID, Texture_Common_SpinSlashTrail.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_Common_SpinSlashTrail.szFileTag, Texture_Common_SpinSlashTrail.iNumTex));
+        )
+    );
+}
+
+void CGameObject_Factory::Register_BossEffect()
+{
+    Register(CArmadillo_RutA::PROTOTYPE_TAG, TEXT("Boss_EffectContainer"), CREATOR(CArmadillo_RutA),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CArmadillo_RutA::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Armadillo/Floor/EffectModel_RollingRutA.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+    Register(CArmadillo_RutB::PROTOTYPE_TAG, TEXT("Boss_EffectContainer"), CREATOR(CArmadillo_RutB),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CArmadillo_RutB::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Armadillo/Floor/EffectModel_RollingRutB.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 }

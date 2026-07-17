@@ -4,6 +4,14 @@
 #include "Effect_Container.h"
 #include "DataLoader.h"
 
+#include "RectCommon.h"
+#include "MeshCommon.h"
+#include "RectParticleCommon.h"
+#include "MeshParticleCommon.h"
+#include "RectEmitterCommon.h"
+#include "MeshEmitterCommon.h"
+#include "TrailCommon.h"
+
 IMPLEMENT_SINGLETON(CEffect_Loader)
 
 namespace
@@ -78,11 +86,14 @@ namespace
         { TEXT("ItemEffect"),             TEXT("../../Resources/Map/Effect/Proto_ItemEffect_0.JSON") },
         { TEXT("BubbleAura"),             TEXT("../../Resources/CHJ/Effect/BubbleAura.JSON") },
 
-        { TEXT("SwordTrail_BK"),      TEXT("../../Resources/CHJ/Effect/SwordTrail_BK.JSON") },
+        { TEXT("SwordTrail_BK"),          TEXT("../../Resources/CHJ/Effect/SwordTrail_BK.JSON") },
+
+        { TEXT("RutA"),                   TEXT("../../Resources/YSH/Effects/RutA.JSON") },
+        { TEXT("RutB"),                   TEXT("../../Resources/YSH/Effects/RutB.JSON") },
     };
 }
 
-HRESULT CEffect_Loader::Ready(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+HRESULT CEffect_Loader::Ready(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _uint iLevel)
 {
     m_pProxy = pProxy;
 
@@ -101,18 +112,33 @@ HRESULT CEffect_Loader::Ready(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice
         const _wstring strProtoTag = StrToWstr(jEffect["Prototype_Tag"].get<string>());
 
         // 프로토타입 STATIC 1회 등록
-        if (!pProxy->Has_Prototype(ETOUI(LEVEL::STATIC), strProtoTag))
+        if (!pProxy->Has_Prototype(iLevel, strProtoTag))
         {
             auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(strProtoTag);
             if (!pReg)
                 continue;
-            pReg->ResourceLoader(pProxy, pDevice, pContext, ETOUI(LEVEL::STATIC));
-            pProxy->Add_Prototype(ETOUI(LEVEL::STATIC), strProtoTag.c_str(),
+            pReg->ResourceLoader(pProxy, pDevice, pContext, iLevel);
+            pProxy->Add_Prototype(iLevel, strProtoTag.c_str(),
                 pReg->CreatorFunc(pDevice, pContext));
         }
 
         m_Assets[strEffectId] = EFFECT_ASSET{ strProtoTag, std::move(jEffect) };
     }
+
+    if (FAILED(pProxy->Add_Prototype(iLevel, CRectCommon::PROTOTYPE_TAG, CRectCommon::Create(pDevice, pContext))))
+        return E_FAIL;
+    if (FAILED(pProxy->Add_Prototype(iLevel, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext))))
+        return E_FAIL;
+    if (FAILED(pProxy->Add_Prototype(iLevel, CRectParticleCommon::PROTOTYPE_TAG, CRectParticleCommon::Create(pDevice, pContext))))
+        return E_FAIL;
+    if (FAILED(pProxy->Add_Prototype(iLevel, CMeshParticleCommon::PROTOTYPE_TAG, CMeshParticleCommon::Create(pDevice, pContext))))
+        return E_FAIL;
+    if (FAILED(pProxy->Add_Prototype(iLevel, CRectEmitterCommon::PROTOTYPE_TAG, CRectEmitterCommon::Create(pDevice, pContext))))
+        return E_FAIL;
+    if (FAILED(pProxy->Add_Prototype(iLevel, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext))))
+        return E_FAIL;
+    if (FAILED(pProxy->Add_Prototype(iLevel, CTrailCommon::PROTOTYPE_TAG, CTrailCommon::Create(pDevice, pContext))))
+        return E_FAIL;
 
     return S_OK;
 }
