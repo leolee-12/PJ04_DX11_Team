@@ -49,8 +49,7 @@ void CWaddleDee_Body::Update(_float fTimeDelta)
     if (!m_bActive)
         return;
 
-    if (m_pAnimatorCom)
-        m_pAnimatorCom->Update(fTimeDelta);
+    m_pAnimatorCom->Update(fTimeDelta);
 }
 
 void CWaddleDee_Body::Late_Update(_float fTimeDelta)
@@ -126,6 +125,14 @@ HRESULT CWaddleDee_Body::Render_Shadow()
     }
 
     return S_OK;
+}
+
+_bool CWaddleDee_Body::Has_Animation(const _char* pAnimName) const
+{
+    if (nullptr == m_pModelCom || nullptr == pAnimName)
+        return false;
+
+    return 0 <= m_pModelCom->Get_AnimationIndex(pAnimName);
 }
 
 const _float4x4* CWaddleDee_Body::Get_BoneMatrixPtr(const _char* pBoneName) const

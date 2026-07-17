@@ -1,6 +1,10 @@
 #pragma once
 #include "Character.h"
 
+NS_BEGIN(Engine)
+class CCollider;
+NS_END
+
 NS_BEGIN(Client)
 
 class CWaddleDee_Body;
@@ -11,6 +15,9 @@ class CWaddleDee final : public CCharacter
 
 	PROPERTY(_wstring, m_strFixedAnim, L"FixedAnim", L"NPC")
 	PROPERTY(_float, m_fInteractRadius, L"InteractRadius", L"NPC")
+	PROPERTY(_bool, m_bWander, L"Wander", L"NPC")
+	PROPERTY(_float, m_fWanderRadius, L"WanderRadius", L"NPC")
+	PROPERTY(_float, m_fWalkSpeed, L"WalkSpeed", L"NPC")
 
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_WaddleDee";
@@ -18,7 +25,9 @@ public:
 	enum class WADDLEDEE_STATE : _uint
 	{
 		IDLE,
-		GREET
+		WALK,
+		GREET,
+		HIT
 	};
 
 private:
@@ -30,30 +39,41 @@ public:
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
-
-	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override
-	{
-		pOutData->strPrototypeTag = PROTOTYPE_TAG;
-	}
+	virtual void Damaged(const ATTACK_INFO& tInfo) override;
+	virtual void Set_Active(_bool bActive) override;
+	virtual void Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData) override { pOutData->strPrototypeTag = PROTOTYPE_TAG; }
 
 private:
 	virtual void On_Deserialized() override;
 
 	HRESULT Ready_PartObjects();
+	HRESULT Ready_HurtBox();
+	HRESULT Validate_Initialized();
+
 	void Change_State(WADDLEDEE_STATE eState);
 	_bool Find_Player();
 	void Check_Interact();
 
-	void Update_Idle();
+	void Update_Idle(_float fTimeDelta);
+	void Update_Walk(_float fTimeDelta);
 	void Play_Idle();
+	void Pick_WalkTarget();
 	void Update_Greet();
+	void Update_Hit();
 
 private:
 	CWaddleDee_Body* m_pBody = { nullptr };
+	CCollider* m_pHurtBox = { nullptr };
 
 	WADDLEDEE_STATE m_eState = { WADDLEDEE_STATE::IDLE };
+	_float m_fStateTimer = { 0.f };
 	_wstring m_strAppliedFixedAnim = {};
 	_float m_fGreetCooldown = { 0.f };
+
+	_bool m_bBasePosCaptured = { false };
+	_float3 m_vBasePos = {};
+	_float3 m_vWalkTarget = {};
+
 	CGameObject* m_pPlayer = { nullptr };
 
 public:

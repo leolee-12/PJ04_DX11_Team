@@ -39,6 +39,7 @@ public:
 
 public:
 	CAnimator* Get_Animator() const { return m_pAnimatorCom; }
+	_bool Has_Animation(const _char* pAnimName) const;
 	const _float4x4* Get_BoneMatrixPtr(const _char* pBoneName) const;
 
 private:
