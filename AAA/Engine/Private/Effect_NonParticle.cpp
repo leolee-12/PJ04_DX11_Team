@@ -190,6 +190,9 @@ void CEffect_NonParticle::Update_Rot(const _float fTimeDelta, const _float fRati
         XMConvertToRadians(m_vBaseRotationDegree.y),
         XMConvertToRadians(m_vBaseRotationDegree.z));
 
+    if (Use_LocalRotationAxis() == true)
+        vAxis = XMVector3Normalize(XMVector3TransformNormal(vAxis, matBaseRot));
+
     _matrix matAnimRot = XMMatrixRotationAxis(
         vAxis,
         XMConvertToRadians(fAnimDegree));
