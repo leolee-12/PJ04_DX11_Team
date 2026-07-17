@@ -78,14 +78,14 @@ HRESULT CNormalEnemy_Body::Ready_Components()
 	PART_SETUP t{};
 	t.tShader = Shader_Monster;
 	t.szModelProtoTag = TEXT("Prototype_Component_Model_NormalEnemy_Body");
-	t.szAnimEventFile =	TEXT("../../Resources/CHJ/Monster/NormalEnemy/NormalEnemy_AnimEvents.json");
+	t.szAnimEventFile =	TEXT("../../Resources/CHJ/Monster/NormalEnemy/Body/NormalEnemy_AnimEvents.json");
 	if (FAILED(Ready_MeshPart(t)))
 		return E_FAIL;
 
 	// 눈 표정 텍스처 배열
 	m_pEyeTextureCom = Add_Component<CTexture>(TEXT("Com_EyeTexture"),
 		CTexture::Create(m_pDevice, m_pContext,
-			L"../../Resources/CHJ/Monster/NormalEnemy/NormalEnemyEye.%02d.dds", EYE_COUNT));
+			L"../../Resources/CHJ/Monster/NormalEnemy/Body/NormalEnemyEye.%02d.dds", EYE_COUNT));
 	if (nullptr == m_pEyeTextureCom)
 		return E_FAIL;
 

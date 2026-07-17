@@ -43,6 +43,7 @@ HRESULT CCappy::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_eCopyAbility = COPY_ABILITY_TYPE::NONE;
+	m_fCullDist = 95.f;
 
 	if (m_pTransformCom)
 		m_pTransformCom->Set_RotationPerSec(180.f);
@@ -227,7 +228,7 @@ HRESULT CCappy::Ready_AnimEvents()
 	pAnimator->Set_EventCallback(
 		[this](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 		{
-			if (Handle_SharedAnimEvent(e, ePhase))
+			if (Handle_SoundAnimEvent(e, ePhase))
 				return;
 
 			switch (static_cast<EANIM_EVENT>(e.iEventType))

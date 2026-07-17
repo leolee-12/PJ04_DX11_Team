@@ -52,6 +52,7 @@ HRESULT CBladeKnight::Initialize(void* pArg)
         return E_FAIL;
 
     m_eCopyAbility = COPY_ABILITY_TYPE::SWORD;
+    m_fCullDist = 95.f;
 
     if (m_pTransformCom)
         m_pTransformCom->Set_RotationPerSec(180.f);     // 직렬화 되면 전부 초기값 0으로 덮어씌어짐 
@@ -202,7 +203,10 @@ HRESULT CBladeKnight::Ready_AnimEvents()
     pAnimator->Set_EventCallback(
         [this](const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
         {
-            if (Handle_SharedAnimEvent(e, ePhase))
+            if (Handle_SoundAnimEvent(e, ePhase))
+                return;
+
+            if (Handle_FxAnimEvent(e, ePhase))
                 return;
 
             switch (static_cast<EANIM_EVENT>(e.iEventType))
@@ -216,27 +220,6 @@ HRESULT CBladeKnight::Ready_AnimEvents()
                         m_pSword->Set_HitBox(false);
                 }
                 break;
-            case EANIM_EVENT::Fx:
-            {
-                if (ePhase == ANIM_EVENT_PHASE::BEGIN)
-                {
-                    if (m_pSwordTrail)                                         // 이전 스윙 미종료시 정리
-                        m_pSwordTrail->EffectContainer_StopAfterEmission();
-
-                    CEffect_Loader::GetInstance()->Spawn(L"SwordTrail_BK", Get_LevelIndex(),
-                                                        _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 1.f), _float3(0.f, 0.f, 0.f),
-                                                        m_pSword->Get_CombinedWorldMatrixPtr(), &m_pSwordTrail);
-                }
-                else if (ePhase == ANIM_EVENT_PHASE::END)
-                {
-                    if (m_pSwordTrail)
-                    {
-                        m_pSwordTrail->EffectContainer_StopAfterEmission();
-                        m_pSwordTrail = nullptr;
-                    }
-                }
-                break;
-            }
             case EANIM_EVENT::MoveWindow:
             {
                 auto& BB = Get_BlackBoard();
@@ -287,6 +270,16 @@ HRESULT CBladeKnight::Ready_PartObjects()
 void CBladeKnight::On_Deserialized()
 {
     __super::On_Deserialized();
+}
+
+const _float4x4* CBladeKnight::Get_FxParentMatrix(const _wstring& strFx) const
+{
+    if (strFx == L"Tornado_BK")
+        return m_pTransformCom->Get_WorldMatrixPtr();       
+    else if (strFx == L"SwordTrail_BK")
+        return m_pSword->Get_CombinedWorldMatrixPtr();
+
+    return nullptr;
 }
 
 CBladeKnight* CBladeKnight::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -11,6 +11,8 @@ class ENGINE_DLL CEffect_Mesh abstract : public CEffect_NonParticle
 {
     GENERATED_BODY_ABSTRACT(CEffect_Mesh)
 
+    PROPERTY(_bool, m_bBillboard, L"Billboard", L"Effect");
+
     // Diffuse
     PROPERTY(_bool, m_bUseDiffuseTexture,           L"Use Diffuse Textrue_D",     L"Diffuse");
     PROPERTY(_float2, m_vDiffuseTiling,             L"Tiling_D",                  L"Diffuse");

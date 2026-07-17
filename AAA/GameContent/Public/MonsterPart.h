@@ -8,6 +8,13 @@ class CShader; class CModel; class CAnimator;
 NS_END
 
 NS_BEGIN(Client)
+struct MONSTER_CULL_STATE
+{
+    _bool   bAnimTick = { true };
+    _float  fAnimDt = { 0.f };      
+    _bool   bRenderCull = { false };
+    _float  fDissolve = { 0.f };        // 0 : Show / 1 : Gone
+};
 
 // 몬스터/보스 메쉬 파츠 공통 베이스
 class CMonsterPart abstract : public CPartObject
@@ -20,6 +27,7 @@ public:
         const _float4x4* pSocketBoneMatrix = { nullptr }; // 소켓 부착 파츠만 사용(없으면 부모행렬)
         const _float* pHitFlash = { nullptr }; 
         const _float3* pHitFlashColor = { nullptr };
+        const MONSTER_CULL_STATE* pCullState = { nullptr };
     };
 
 protected:
@@ -61,6 +69,7 @@ protected:
 
     const _float* m_pHitFlash = { nullptr };
     const _float3* m_pHitFlashColor = { nullptr };
+    const MONSTER_CULL_STATE* m_pCullState = { nullptr };
 
     _int m_iShadowPassIdx = { -1 };
 

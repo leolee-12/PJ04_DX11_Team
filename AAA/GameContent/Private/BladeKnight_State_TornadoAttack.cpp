@@ -31,7 +31,7 @@ void CBladeKnight_State_TornadoAttack::Play_AttackAnimation()
 		m_pAnimator->Play(&AniInfo); // Queue 클리어 + 시작
 
 		AniInfo.strAniName = "TornadoAttack";
-		AniInfo.fSpeed = 1.50f;
+		AniInfo.fSpeed = 1.0f;
 		m_pAnimator->Enqueue(AniInfo);
 	}
 }
