@@ -18,7 +18,7 @@ private:
 	enum class KOKABU_STATE
 	{
 		IDLE, EJECTED, FALLING, LANDED,
-		HIT, CAPTURED, SPAT, DISAPPEARING, END
+		HIT, DEATH, CAPTURED, SPAT, DISAPPEARING, END
 	};
 
 public:
@@ -64,6 +64,8 @@ protected:
 	virtual	void				On_Launched() override;
 	virtual void				On_Impact() override;
 
+	virtual HRESULT				Ready_HitBox() override;
+
 private:
 	// »óÅÂ °ü·Ã
 	void						Change_State(KOKABU_STATE eNext);
@@ -85,6 +87,7 @@ private:
 
 	KOKABU_STATE				m_eState = { KOKABU_STATE::IDLE };
 	CGameObject*				m_pCaptor = { nullptr };
+	_float3						m_vHitFrom = { 0.f, 0.f, 0.f };
 
 	_float3                     m_vSpatPivot = { 0.f, 0.f, 0.f };
 	_float						m_fSpinAngle = { 0.f };
@@ -97,6 +100,8 @@ private:
 	static constexpr _float     s_fSpinSpeedDeg = { 720.f };
 	static constexpr _float     s_fHitReactTime = { 0.6f };
 	static constexpr _float     s_fDisappearTime = { 0.5f };
+	static constexpr _float		s_fHitKnockback = { 8.f };
+	static constexpr _float		s_fHitKnockUp = { 4.f };
 	static constexpr _float		s_fPullAccel = { 40.f };
 	static constexpr _float		s_fMinScaleRatio = { 0.45f };		// º¸¸é¼­ Æ©´×
 	static constexpr _float		s_fShrinkLerp = { 2.f };

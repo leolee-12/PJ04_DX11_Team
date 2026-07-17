@@ -958,7 +958,6 @@ void CMonster::Update_AI(_float fTimeDelta)
 
 void CMonster::Free()
 {
-	Stop_AllFx(true);
 	Stop_ActionLoopSFX();
 
 	Safe_Release(m_pBrain);

@@ -3,6 +3,8 @@
 #include "GameContent_Const.h"
 #include "GameContrnt_Events.h"
 #include "Projectile_Movement.h"
+#include "Collider.h"
+#include "Effect_Loader.h"
 
 
 CKokabu::CKokabu(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -35,6 +37,8 @@ void CKokabu::Be_Captured(CGameObject* pInhaler)
 void CKokabu::On_SpatBegin()
 {
 	m_pCaptor = nullptr;
+
+	m_bAlive = true;                    
 	Change_State(KOKABU_STATE::SPAT);
 
 	Update_SpatPivot_FromBone();
@@ -51,19 +55,21 @@ void CKokabu::On_SpatEnd()
 
 void CKokabu::On_Swallowed()
 {
-	m_pTransformCom->Set_Scale(
-		m_vBaseScale.x, m_vBaseScale.y, m_vBaseScale.z);
-
 	SWALLOW_EVENT payload{ this };
 	m_pGameInstance_Proxy->Publish(EventTag::Swallowed, &payload);
 
 	m_pCaptor = nullptr;
-	Despawn();
+
+	if (m_pHitBox)     m_pHitBox->Set_Enabled(false);
+	if (m_pController) m_pController->Set_Enabled(false);
+	if (m_pMovement)   m_pMovement->Stop();
+
+	m_bAlive = false;
 }
 
 HRESULT CKokabu::Initialize(void* pArg)
 {
-	m_fSpeed = 20.f;
+	m_fSpeed = 6.f;
 	m_fDamage = 10.f;
 	m_fKnockback = 4.f;
 	m_fHitRadius = 0.6f;		// º¸°í Æ©´×
@@ -105,7 +111,7 @@ void CKokabu::Update(_float fTimeDelta)
 
 	// EJECTED / FALLING / LANDED / HIT
 	m_fAccLife += fTimeDelta;
-	if (m_fAccLife >= m_fLifeTime)
+	if (m_fAccLife >= m_fLifeTime && KOKABU_STATE::HIT != m_eState)
 	{
 		Change_State(KOKABU_STATE::DISAPPEARING);
 		return;
@@ -120,12 +126,19 @@ void CKokabu::Update(_float fTimeDelta)
 				|| KOKABU_STATE::FALLING == m_eState
 				|| KOKABU_STATE::LANDED == m_eState))
 		{
+			// wall: no attacker object -> knockback opposite to LOOK
+			_float3 vVel = m_pMovement->Get_Velocity();
+			XMStoreFloat3(&m_vHitFrom,
+				m_pTransformCom->Get_State(STATE::POSITION)	+ XMLoadFloat3(&vVel));
 			Change_State(KOKABU_STATE::HIT);
 		}
 	}
 
 	Update_State(fTimeDelta);
-	Update_Spin(fTimeDelta);
+	if (!m_bAlive) return;
+
+	if (m_eState == KOKABU_STATE::EJECTED)
+			Update_Spin(fTimeDelta);
 
 	if (m_pAnimatorCom)
 		m_pAnimatorCom->Update(fTimeDelta);
@@ -198,12 +211,48 @@ void CKokabu::On_Launched()
 void CKokabu::On_Impact()
 {
 	if (KOKABU_STATE::HIT == m_eState
+		|| KOKABU_STATE::DEATH == m_eState
 		|| KOKABU_STATE::CAPTURED == m_eState
 		|| KOKABU_STATE::SPAT == m_eState
 		|| KOKABU_STATE::DISAPPEARING == m_eState)
 		return;
 
 	Change_State(KOKABU_STATE::HIT);
+}
+
+HRESULT CKokabu::Ready_HitBox()
+{
+	if (FAILED(__super::Ready_HitBox()))
+		return E_FAIL;
+
+	// re-wire OnEnter to capture attacker position
+	if (m_pHitBox)
+	{
+		m_pHitBox->Set_OnEnter([this](CCollider* pOther) {
+			if (!m_bAlive)
+				return;
+			if (ETOUI(COLLISION_LAYER::PLAYER_HURT) != pOther->Get_RegisteredGroup())
+				return;
+
+			CGameObject* pAtk = pOther->Get_Owner();
+			if (auto* pVictim = dynamic_cast<IDamageable*>(pAtk))
+			{
+				ATTACK_INFO atk{};
+				atk.fDamage = m_fDamage;
+				atk.fKnockback = m_fKnockback;
+				XMStoreFloat3(&atk.vAttackerPos, m_pTransformCom->Get_State(STATE::POSITION));
+				atk.pAttacker = this;
+				pVictim->Damaged(atk);
+			}
+
+			if (pAtk)
+				XMStoreFloat3(&m_vHitFrom,
+					pAtk->Get_Transform()->Get_State(STATE::POSITION));
+			On_Impact();
+		});
+	}
+
+	return S_OK;
 }
 
 void CKokabu::Change_State(KOKABU_STATE eNext)
@@ -237,20 +286,44 @@ void CKokabu::Enter_State(KOKABU_STATE eState)
 
 	case KOKABU_STATE::HIT:
 	{
-		if (m_pHitBox)
-			m_pHitBox->Set_Enabled(false);
+		if (m_pHitBox)     m_pHitBox->Set_Enabled(false);
 
-		_vector vBack = XMVectorNegate(
-			m_pTransformCom->Get_State(STATE::LOOK));
-		vBack = XMVector3Normalize(vBack) * 6.f;
-		vBack = XMVectorSetY(vBack, 5.f);
-		if (m_pMovement)
-			m_pMovement->Launch(vBack);
+		_vector vSelf = m_pTransformCom->Get_State(STATE::POSITION);
+		_vector vDir = vSelf - XMLoadFloat3(&m_vHitFrom);
+		vDir = XMVectorSetY(vDir, 0.f);
+		if (XMVectorGetX(XMVector3LengthSq(vDir)) < 1e-6f)
+			vDir = XMVectorNegate(m_pTransformCom->Get_State(STATE::LOOK));
+		vDir = XMVector3Normalize(vDir) * s_fHitKnockback;
+		vDir = XMVectorSetY(vDir, s_fHitKnockUp);
 
-		if (m_pAnimatorCom)
-			m_pAnimatorCom->Play("Damage", false, true);
+		if (m_pMovement)    m_pMovement->Launch(vDir);
+		if (m_pAnimatorCom) m_pAnimatorCom->Play("Damage", false, true);
 
 		m_fStateTimer = s_fHitReactTime;
+		break;
+	}
+
+	case KOKABU_STATE::DEATH:
+	{
+		if (m_pHitBox)     m_pHitBox->Set_Enabled(false);
+		if (m_pController) m_pController->Set_Enabled(false);
+		if (m_pMovement)   m_pMovement->Stop();
+
+		m_pGameInstance_Proxy->Play_SFX(L"CharaBasic_Dead.wav", 0.3f);
+
+		const _float4* pCamLook = m_pGameInstance_Proxy->Get_CamLook();
+		_float3 vFaceCam{};
+		XMStoreFloat3(&vFaceCam,
+			XMVectorNegate(XMLoadFloat4(pCamLook)));
+		_float3 vPos{};
+		XMStoreFloat3(&vPos,
+			m_pTransformCom->Get_State(STATE::POSITION));
+
+		CEffect_Loader::GetInstance()->Spawn(
+			L"DespawnEffect", Get_LevelIndex(),
+			vPos, vFaceCam, _float3(0.f, 0.f, 0.f), nullptr);
+
+		Despawn();
 		break;
 	}
 
@@ -276,7 +349,8 @@ void CKokabu::Enter_State(KOKABU_STATE eState)
 		if (m_pHitBox)     m_pHitBox->Set_Enabled(false);
 		if (m_pController) m_pController->Set_Enabled(false);
 		if (m_pMovement)   m_pMovement->Stop();
-		m_fStateTimer = s_fDisappearTime;
+		if (m_pAnimatorCom)
+			m_pAnimatorCom->Play("Warp1", false, true);
 		break;
 
 	default:
@@ -311,12 +385,11 @@ void CKokabu::Update_State(_float fTimeDelta)
 	case KOKABU_STATE::HIT:
 		m_fStateTimer -= fTimeDelta;
 		if (m_fStateTimer <= 0.f)
-			Change_State(KOKABU_STATE::DISAPPEARING);
+			Change_State(KOKABU_STATE::DEATH);
 		break;
 
 	case KOKABU_STATE::DISAPPEARING:
-		m_fStateTimer -= fTimeDelta;
-		if (m_fStateTimer <= 0.f)
+		if (m_pAnimatorCom && m_pAnimatorCom->Is_Finished())
 			Despawn();
 		break;
 
