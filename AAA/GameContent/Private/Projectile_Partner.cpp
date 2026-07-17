@@ -40,6 +40,8 @@ HRESULT CProjectile_Partner::Ready_Visual()
 
 void CProjectile_Partner::On_Activated()
 {
+    m_fFxTimer = 0.f;
+
     if (m_bCarried)
     {
         m_eState = STATE::CARRIED;
@@ -54,6 +56,7 @@ void CProjectile_Partner::On_Activated()
 
 void CProjectile_Partner::On_Launched()
 {
+    m_fFxTimer = 0.f;
     m_eState = STATE::FLYING;
     if (m_pAnimatorCom)
         m_pAnimatorCom->Play("TwinRolling", true, true, 0.2f, ANIM_SPEED);
@@ -99,6 +102,8 @@ void CProjectile_Partner::Update(_float fTimeDelta)
     constexpr _float fBreakTime = 3.5f;
     if (m_eState == STATE::FLYING && !m_bCarried && m_fAccLife >= fBreakTime)
         Enter_Break();
+
+    Tick_LaunchFx(fTimeDelta);
 }
 
 void CProjectile_Partner::Play_Anim(const _char* szClip, _bool bLoop, _float fSpeed)
@@ -121,6 +126,23 @@ HRESULT CProjectile_Partner::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType)))) return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType)))) return E_FAIL;
     return S_OK;
+}
+
+void CProjectile_Partner::Tick_LaunchFx(_float fTimeDelta)
+{
+    if (m_eState != STATE::FLYING || m_bCarried)
+        return;
+
+    m_fFxTimer -= fTimeDelta;
+    if (m_fFxTimer > 0.f)
+        return;
+
+    m_fFxTimer = FX_INTERVAL;
+
+    CEffect_Loader::GetInstance()->Spawn(
+        L"PartnerWind", Get_LevelIndex(),
+        _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+        m_pTransformCom->Get_WorldMatrixPtr());
 }
 
 HRESULT CProjectile_Partner::Render()

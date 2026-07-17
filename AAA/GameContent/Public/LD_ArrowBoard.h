@@ -15,7 +15,7 @@ struct LD_SPAWN_SPEC;
 
 class CLD_ArrowBoard final : public CLevelDesignObject, public IDamageable
 {
-	GENERATED_BODY(CLD_ArrowBoard);
+	GENERATED_BODY(CLD_ArrowBoard)
 
 public:
 	static constexpr const _tchar* OBJECT_NAME = L"ArrowBoard";

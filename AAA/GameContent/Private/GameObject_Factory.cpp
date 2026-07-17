@@ -183,6 +183,8 @@
 #include "Armadillo_RutB.h"
 #include "Armadillo_Dust.h"
 #include "Armadillo_RollWind.h"
+#include "Armadillo_SpinWind.h"
+#include "Armadillo_WallImpact.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
@@ -1302,6 +1304,26 @@ void CGameObject_Factory::Register_BossEffect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CArmadillo_RollWind::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Armadillo/Effect/Rolling/BossArmadillo_00_Common_SphereRolling.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+    Register(CArmadillo_SpinWind::PROTOTYPE_TAG, TEXT("Boss_EffectContainer"), CREATOR(CArmadillo_SpinWind),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpinWind::PROTOTYPE_TAG,
+                CSpinWind::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSpinWind::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/YSH/Boss/Gorilla/ArmSpinWind/BossGorilla_00_TornadoPieceMedium.ysh"));
+        )
+    );
+    Register(CArmadillo_WallImpact::PROTOTYPE_TAG, TEXT("Boss_EffectContainer"), CREATOR(CArmadillo_WallImpact),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CSwordCharge::PROTOTYPE_TAG, CSwordCharge::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SwordCharge"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSE/Effect/SwordCharge/Model_Common_Ring03.ysh"));
+            TRY_ADD_PROTO(pProxy, Texture_ChargeNoise.iLevelID, Texture_ChargeNoise.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_ChargeNoise.szFileTag, Texture_ChargeNoise.iNumTex));
         )
     );
 }

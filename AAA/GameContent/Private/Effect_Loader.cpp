@@ -96,6 +96,9 @@ namespace
         { TEXT("Dust_Landing"),           TEXT("../../Resources/YSH/Effects/Dust_Landing.JSON") },
         { TEXT("TwinDust"),               TEXT("../../Resources/YSH/Effects/TwinDust.JSON") },
         { TEXT("RollWind"),               TEXT("../../Resources/YSH/Effects/RollWind.JSON") },
+        { TEXT("TwinSpinWind"),           TEXT("../../Resources/YSH/Effects/TwinSpinWind.JSON") },
+        { TEXT("PartnerWind"),            TEXT("../../Resources/YSH/Effects/PartnerWind.JSON") },
+        { TEXT("WallImpact"),             TEXT("../../Resources/YSH/Effects/WallImpact.JSON") },
     };
 }
 

@@ -144,6 +144,7 @@ CBTNode* CBoss_Armadillo_Brain::Make_Roll()
                     ++(*iWallHits);
                     if (*iWallHits >= iGroggyHits) {
                         _vector vBounce = XMVector3Normalize(XMVectorSetY(XMLoadFloat3(&vN), 0.f));
+                        pArma->Play_WallImpact();
                         m_pOwner->Get_Movement()->Launch(vBounce, fBounceBackSpeed, fBounceUpSpeed);
                         m_pOwner->Get_Movement()->Set_MoveSpeed(WALK_SPEED);
                         pArma->Set_RollFx(false);

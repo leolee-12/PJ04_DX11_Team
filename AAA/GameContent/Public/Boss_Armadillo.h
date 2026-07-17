@@ -65,6 +65,7 @@ public:
     void Hide_Cage();
 
     void Set_RollFx(_bool bOn);
+    void Play_WallImpact();
 
 protected:
     virtual CMonsterBrain* Create_Brain() override;
@@ -86,7 +87,7 @@ protected:
 
     virtual HRESULT Ready_AnimEvents() override;
     virtual HRESULT Ready_PartObjects() override;
-    virtual const _float4x4* Get_FxParentMatrix(const _wstring& strFx) const override { return nullptr; }
+    virtual const _float4x4* Get_FxParentMatrix(const _wstring& strFx) const override;
 
 private:
     CBoss_Armadillo_Body* m_pBody = { nullptr };

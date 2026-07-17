@@ -26,6 +26,8 @@
     <ClInclude Include="..\public\Armadillo_RollWind.h" />
     <ClInclude Include="..\public\Armadillo_RutA.h" />
     <ClInclude Include="..\public\Armadillo_RutB.h" />
+    <ClInclude Include="..\public\Armadillo_SpinWind.h" />
+    <ClInclude Include="..\public\Armadillo_WallImpact.h" />
     <ClInclude Include="..\public\Boss_GorillaRush.h" />
     <ClInclude Include="..\public\Boss_GorillaRush_Brain.h" />
     <ClInclude Include="..\public\Boss_Leopard.h" />
@@ -422,6 +424,8 @@
     <ClCompile Include="..\private\Armadillo_RollWind.cpp" />
     <ClCompile Include="..\private\Armadillo_RutA.cpp" />
     <ClCompile Include="..\private\Armadillo_RutB.cpp" />
+    <ClCompile Include="..\private\Armadillo_SpinWind.cpp" />
+    <ClCompile Include="..\private\Armadillo_WallImpact.cpp" />
     <ClCompile Include="..\private\Boss_GorillaRush.cpp" />
     <ClCompile Include="..\private\Boss_GorillaRush_Brain.cpp" />
     <ClCompile Include="..\private\Boss_Leopard.cpp" />

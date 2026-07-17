@@ -642,6 +642,7 @@ _bool CMonster::Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 
 	_int iEffectVariation = e.iIntParam;
 	_float3 vPos{}, vLook{0.f, 0.f, 1.f}, vRotDeg{};
+	const _float4x4* vAncorMat = { nullptr };
 
 	switch(iEffectVariation)
 	{
@@ -650,13 +651,14 @@ _bool CMonster::Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 	case 3:		XMStoreFloat3(&vLook, m_pTransformCom->Get_State(STATE::LOOK));		break;		// 몬스터의 LOOK(FX가 Parent가 없을 때)
 	case 4:		vRotDeg = e.vOffset;												break;		// 회전(도)
 	case 5:		XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));	break;
+	case 6:     vAncorMat = Get_FxParentMatrix(strFx);								break;
 	default:																		break;
 	}
 
 	if (ePhase == ANIM_EVENT_PHASE::POINT)
 	{
 		CEffect_Loader::GetInstance()->Spawn(strFx, Get_LevelIndex(),
-			vPos, vLook, vRotDeg, Get_FxParentMatrix(strFx), nullptr);
+			vPos, vLook, vRotDeg, vAncorMat, nullptr);
 	}
 	else if (ePhase == ANIM_EVENT_PHASE::BEGIN)
 	{

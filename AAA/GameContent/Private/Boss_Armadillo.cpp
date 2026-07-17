@@ -330,6 +330,16 @@ void CBoss_Armadillo::Set_RollFx(_bool bOn)
     }
 }
 
+void CBoss_Armadillo::Play_WallImpact()
+{
+    _float3 vPos{}, vLook{};
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+    XMStoreFloat3(&vLook,
+        XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f)));
+
+    CEffect_Loader::GetInstance()->Spawn(L"WallImpact", Get_LevelIndex(), vPos, vLook);
+}
+
 HRESULT CBoss_Armadillo::Ready_AnimEvents()
 {
     CAnimator* pAnim = Get_BodyAnimator();
@@ -409,6 +419,11 @@ HRESULT CBoss_Armadillo::Ready_PartObjects()
         });
 
     return S_OK;
+}
+
+const _float4x4* CBoss_Armadillo::Get_FxParentMatrix(const _wstring& strFx) const
+{
+    return m_pTransformCom->Get_WorldMatrixPtr();
 }
 
 void CBoss_Armadillo::Update_BodyOffset(_float fTimeDelta)
