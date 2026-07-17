@@ -93,8 +93,7 @@ void CKirby_Deform_Car::Exit_AttackState(CKirby* pKirby)
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pKirby->Get_Movement()->Set_MaxHorizontalSpeed(s_fCarSpeed);
 
-    Effect_Stop(m_pBoostGas1);
-    Effect_Stop(m_pBoostGas2);
+    Effect_Stop(m_pBoostGas);
     Effect_Stop(m_pBoostWind);
 }
 
@@ -225,7 +224,7 @@ void CKirby_Deform_Car::Enter_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eS
             CMovement_Child* pMovement = pKirby->Get_Movement();
             pMovement->Set_MaxHorizontalSpeed(s_fMaxBoostSpeed);
 
-            BoostEffectStart(pKirby, m_pBoostGas1, m_pBoostGas2, L"BoostGas");
+            BoostEffectStart(pKirby, m_pBoostGas, L"BoostGas");
 
             CKirby_HitBox_Model* pCarMainModel =
                 static_cast<CKirby_HitBox_Model*>(pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR));
@@ -347,8 +346,7 @@ void CKirby_Deform_Car::Exit_DeformCarState(CKirby* pKirby, DEFORM_CAR_STATE eSt
                 static_cast<CKirby_HitBox_Model*>(pKirby->Get_DeformPart_Model(DEFORM_TYPE::CAR));
             pCarMainModel->Set_HitBoxEnabled(false);
 
-            Effect_Stop(m_pBoostGas1);
-            Effect_Stop(m_pBoostGas2);
+            Effect_Stop(m_pBoostGas);
             Effect_Stop(m_pBoostWind);
 
             pModel->Stop_SoundHandle();
@@ -462,15 +460,11 @@ void CKirby_Deform_Car::Exit_BoostJumpState(CKirby* pKirby, BOOST_JUMP_STATE eSt
     }
 }
 
-void CKirby_Deform_Car::BoostEffectStart(CKirby* pKirby, CEffect_Container*& pContainer1, CEffect_Container*& pContainer2, const _tchar* EffectTag)
+void CKirby_Deform_Car::BoostEffectStart(CKirby* pKirby, CEffect_Container*& pContainer, const _tchar* EffectTag)
 {
     CEffect_Loader::GetInstance()->Spawn(EffectTag, pKirby->Get_LevelIndex(),
-        _float3(1.f, 0.5f, -2.8f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
-        pKirby->Get_Transform()->Get_WorldMatrixPtr(), &pContainer1);
-
-    CEffect_Loader::GetInstance()->Spawn(EffectTag, pKirby->Get_LevelIndex(),
-        _float3(-1.f, 0.5f, -2.8f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
-        pKirby->Get_Transform()->Get_WorldMatrixPtr(), &pContainer2);
+        _float3(0.f, 0.35f, -3.3f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+        pKirby->Get_Transform()->Get_WorldMatrixPtr(), &pContainer);
 }
 
 _bool CKirby_Deform_Car::Check_FrontCollision(CKirby* pKirby)

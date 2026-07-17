@@ -65,8 +65,7 @@ private:
 
 	_float3 m_vRotDir{};
 
-	CEffect_Container* m_pBoostGas1{};
-	CEffect_Container* m_pBoostGas2{};
+	CEffect_Container* m_pBoostGas{};
 	CEffect_Container* m_pBoostWind{};
 
 private:
@@ -80,7 +79,7 @@ private:
 	void Update_BoostJumpState(CKirby* pKirby, _float fTimeDelta);
 	void Exit_BoostJumpState(CKirby* pKirby, BOOST_JUMP_STATE eStaten);
 
-	void BoostEffectStart(CKirby* pKirby, CEffect_Container*& pContainer1, CEffect_Container*& pContainer2, const _tchar* EffectTag);
+	void BoostEffectStart(CKirby* pKirby, CEffect_Container*& pContainer, const _tchar* EffectTag);
 
 	_bool Check_FrontCollision(CKirby* pKirby);
 

@@ -37,6 +37,7 @@ namespace
 
         { TEXT("RockFloor"),              TEXT("../../Resources/YSH/Effects/Proto_RockBurst_0.json") },
         { TEXT("BoostGas"),               TEXT("../../Resources/YSE/EffectContainer/BoostGas.json") },
+        { TEXT("MoveGas"),               TEXT("../../Resources/YSE/EffectContainer/MoveGas.json") },
         { TEXT("CarMilkyWay"),            TEXT("../../Resources/YSE/EffectContainer/CarMilkyWay_Final2.json") },
 
         { TEXT("GetAbilityEffect"),       TEXT("../../Resources/YSH/Effects/GetAbilityEffect.json") },

@@ -57,7 +57,9 @@ HRESULT CBoostGas::Render()
 
 HRESULT CBoostGas::Ready_EffectPartObjects()
 {
-    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeEmitter::PROTOTYPE_TAG, CSmokeEmitter::PROTOTYPE_TAG)))
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeEmitter::PROTOTYPE_TAG, L"Gas1")))
+        return E_FAIL;
+    if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CSmokeEmitter::PROTOTYPE_TAG, L"Gas2")))
         return E_FAIL;
  
     return S_OK;
