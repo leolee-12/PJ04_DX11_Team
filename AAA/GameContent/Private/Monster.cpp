@@ -653,7 +653,15 @@ _bool CMonster::Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 	case 4:     vRotDeg = e.vOffset;													break;
 	case 5:    	XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));		break;
 	case 6:		vAncorMat = Get_FxParentMatrix(strFx);									break;
-	default:																			break;
+	case 7:		// 몬스터 기준 월드 스폰: 위치=월드행렬×오프셋, LOOK=몬스터 LOOK
+	{
+		XMStoreFloat3(&vPos, XMVector3TransformCoord(XMLoadFloat3(&e.vOffset),
+			XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr())));
+		XMStoreFloat3(&vLook, m_pTransformCom->Get_State(STATE::LOOK));
+	}
+		break;
+	default:
+		break;
 	}
 
 	auto pLoader = CEffect_Loader::GetInstance();

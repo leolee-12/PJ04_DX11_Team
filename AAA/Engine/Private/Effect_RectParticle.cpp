@@ -133,6 +133,14 @@ EffectRect::VALUES CEffect_RectParticle::Make_RectValues()
 {
 	return {
 		m_bBillboard,
+		m_bTextureColorToAlpha,
+		{
+			m_bUseTextureUVEdgeFade,
+			m_iTextureUVEdgeFadeAxis,
+			m_fTextureUVEdgeFadeStartRange,
+			m_fTextureUVEdgeFadeEndRange,
+			m_fTextureUVEdgeFadePower
+		},
 		m_bSpriteAniTexture, m_iTexFrameX, m_iTexFrameY, m_fCurTexAniUV, m_fCurTexAniSize,
 		m_bSpriteAniMask, m_iMaskFrameX, m_iMaskFrameY, m_fCurMaskAniUV, m_fCurMaskAniSize
 	};

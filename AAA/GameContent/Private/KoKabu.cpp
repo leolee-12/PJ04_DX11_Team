@@ -28,6 +28,14 @@ void CKokabu::Be_Captured(CGameObject* pInhaler)
 	Change_State(KOKABU_STATE::CAPTURED);
 }
 
+void CKokabu::On_SpatBegin()
+{
+}
+
+void CKokabu::On_SpatEnd()
+{
+}
+
 void CKokabu::On_Swallowed()
 {
 	m_pTransformCom->Set_Scale(
@@ -53,6 +61,11 @@ void CKokabu::Update(_float fTimeDelta)
 {
 }
 
+HRESULT CKokabu::Render()
+{
+	return E_NOTIMPL;
+}
+
 HRESULT CKokabu::Ready_Visual()
 {
 	m_pShaderCom = Add_Component<CShader>(Shader_Monster.iLevelID, Shader_Bomb.szProtoTag, TEXT("Com_Shader"));
@@ -61,6 +74,10 @@ HRESULT CKokabu::Ready_Visual()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CKokabu::On_Launched()
+{
 }
 
 void CKokabu::On_Impact()
@@ -119,6 +136,15 @@ void CKokabu::Update_Captured(_float fTimeDelta)
 void CKokabu::Update_Spin(_float fTimeDelta)
 {
 
+}
+
+void CKokabu::Update_SpatPivot_FromBone()
+{
+
+}
+
+void CKokabu::Despawn()
+{
 }
 
 CKokabu* CKokabu::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -177,6 +177,26 @@ HRESULT CEffect_Part::Bind_ViewProjectionMatrices()
     return S_OK;
 }
 
+_float4x4 CEffect_Part::Make_BillboardWorldMatrix(const _float4x4& WorldMatrix) const
+{
+    _matrix BillboardMatrix = XMLoadFloat4x4(&WorldMatrix);
+    const _matrix InverseViewMatrix = XMMatrixInverse(
+        nullptr,
+        XMLoadFloat4x4(m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType)));
+
+    const _float fScaleX = XMVectorGetX(XMVector3Length(BillboardMatrix.r[0]));
+    const _float fScaleY = XMVectorGetX(XMVector3Length(BillboardMatrix.r[1]));
+    const _float fScaleZ = XMVectorGetX(XMVector3Length(BillboardMatrix.r[2]));
+
+    BillboardMatrix.r[0] = XMVectorSetW(XMVector3Normalize(InverseViewMatrix.r[0]) * fScaleX, 0.f);
+    BillboardMatrix.r[1] = XMVectorSetW(XMVector3Normalize(InverseViewMatrix.r[1]) * fScaleY, 0.f);
+    BillboardMatrix.r[2] = XMVectorSetW(XMVector3Normalize(InverseViewMatrix.r[2]) * fScaleZ, 0.f);
+
+    _float4x4 Result{};
+    XMStoreFloat4x4(&Result, BillboardMatrix);
+    return Result;
+}
+
 void CEffect_Part::Evaluate_SpriteFrame(_int iFrameX, _int iFrameY, _float fRatio, _float2& vOutUV, _float2& vOutSize)
 {
     if (iFrameX < 1)
