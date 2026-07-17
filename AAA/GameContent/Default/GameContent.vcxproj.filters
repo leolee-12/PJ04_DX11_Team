@@ -169,6 +169,9 @@
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. Armadillo_Effect">
       <UniqueIdentifier>{5ed7fbfe-ccc7-4a10-9bab-44a1c7666254}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. Armadillo_Effect\Dust">
+      <UniqueIdentifier>{05f7ee4c-c91c-4832-8609-33ac078ddd05}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\03. Effect\00. EffectContainer\20. Armadillo_Effect\RutA">
       <UniqueIdentifier>{d5d3be5e-92c7-4f16-933f-efdf0ccfb101}</UniqueIdentifier>
     </Filter>
@@ -1277,6 +1280,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Ancor_WorkingDirectory.h">
       <Filter>97. DataSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Armadillo_Dust.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. Armadillo_Effect\Dust</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Armadillo_RutA.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\20. Armadillo_Effect\RutA</Filter>
@@ -2446,6 +2452,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Ability_Model.cpp">
       <Filter>00. GameObject\09. AbilityBubble\Parts\Ability_Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Armadillo_Dust.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\20. Armadillo_Effect\Dust</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Armadillo_RutA.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\20. Armadillo_Effect\RutA</Filter>
