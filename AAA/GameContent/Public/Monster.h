@@ -134,6 +134,9 @@ protected:
 
 	unordered_map<_wstring, FX_HANDLE> m_Effects;
 
+    FX_HANDLE                   m_LaunchSmokeFx = {};
+    _float4x4                   m_matLaunchSmokeWorld = {};
+
 	// 이번 프레임에 이동하고 싶은 방향
 	_float3						m_vWishDir = {};
 
@@ -178,6 +181,10 @@ protected:
 	HRESULT						Ready_Movement();
 	HRESULT						Ready_AI();
 	void						Check_AirborneReflex(_float fTimeDelta);
+    void                        Start_LaunchSmokeFx();
+    void                        Stop_LaunchSmokeFx(_bool bImmediate = false);
+    void                        Update_LaunchSmokeFx();
+    void                        Update_LaunchSmokeSocket();
 
 	virtual CMonsterBrain*		Create_Brain();		//기본: FSM Brain
 	virtual HRESULT				Create_Movement();	// 기본 : Monster_Movement - 별도 무브먼트 필요할 때 상속받아서 쓸 것 

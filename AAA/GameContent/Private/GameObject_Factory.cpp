@@ -83,6 +83,7 @@
 #include "BombAimDot.h"
 #include "BreakWallEffect.h"
 #include "BubbleAura.h"
+#include "LaunchSmoke.h"
 #include "Kirby_SwordTrail.h"
 #include "SmokeCollection.h"
 #include "CarLanding.h"
@@ -951,6 +952,18 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, Texture_CommonSparkle01.iLevelID, Texture_CommonSparkle01.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_CommonSparkle01.szFileTag, Texture_CommonSparkle01.iNumTex));
 
+        ));
+
+    Register(CLaunchSmoke::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CLaunchSmoke),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectEmitterCommon::PROTOTYPE_TAG,
+                CRectEmitterCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LaunchSmoke"),
+                CTexture::Create(pDevice, pContext,
+                    TEXT("../../Resources/CHJ/Effect/Bomb/common_smoke06.png"), 1));
         ));
 
     Register(CPickUpEffect::PROTOTYPE_TAG, TEXT("Effect_Container"),
