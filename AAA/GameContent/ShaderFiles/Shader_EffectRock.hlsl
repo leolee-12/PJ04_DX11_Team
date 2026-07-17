@@ -189,7 +189,10 @@ void Apply_LinearUVAnim(float2 vTexcoord, bool bUse, float fRatio, int iAxis, bo
 float4 ApplyColorToAlpha(float4 vTextureValue, bool bUseColorToAlpha)
 {
     if (bUseColorToAlpha == true)
+    {
         vTextureValue.a *= dot(saturate(vTextureValue.rgb), float3(0.299f, 0.587f, 0.114f));
+        vTextureValue.rgb = float3(1.f, 1.f, 1.f);
+    }
 
     return vTextureValue;
 }
