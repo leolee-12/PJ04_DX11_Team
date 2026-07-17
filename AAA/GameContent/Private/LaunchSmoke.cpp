@@ -1,7 +1,6 @@
 #include "LaunchSmoke.h"
 
-#include "GameContent_const.h"
-#include "RectEmitterCommon.h"
+#include "MeshEmitterCommon.h"
 
 CLaunchSmoke::CLaunchSmoke(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CEffect_Container{ pDevice, pContext }
@@ -51,16 +50,22 @@ HRESULT CLaunchSmoke::Render()
 
 HRESULT CLaunchSmoke::Ready_EffectPartObjects()
 {
-	CRectEmitterCommon::RECT_EMITTER_COMMON_DESC tDesc{};
-	tDesc.iVIBufferLevel = VI_Rect.iLevelID;
-	tDesc.wstrVIBufferTag = VI_Rect.szProtoTag;
-	tDesc.bUseTextureCom = true;
-	tDesc.iTextureLevel = m_iPrototypeLevel;
-	tDesc.wstrTextureTag = L"Prototype_Component_Texture_LaunchSmoke";
+	CMeshEmitterCommon::MESH_EMITTER_COMMON_DESC tDesc{};
+	tDesc.iModelLevel = m_iPrototypeLevel;
+	tDesc.wstrModelTag = L"Prototype_Component_Model_SmokeSphereOriginal";
+	tDesc.bUseDiffuseTexture = false;
+	tDesc.bUseUnknownTexture = true;
+	tDesc.bUseNormalTexture = false;
+	tDesc.bUseMRATexture = false;
+	tDesc.bUseTextureCom = false;
+	tDesc.iTextureLevel = 0;
+	tDesc.wstrTextureTag = L"";
 	tDesc.bUseMaskCom = false;
+	tDesc.iMaskLevel = 0;
+	tDesc.wstrMaskTag = L"";
 	tDesc.bCustomShader = false;
 
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectEmitterCommon::PROTOTYPE_TAG, L"Smoke", &tDesc)))
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CMeshEmitterCommon::PROTOTYPE_TAG, L"Smoke", &tDesc)))
 		return E_FAIL;
 
 	return S_OK;

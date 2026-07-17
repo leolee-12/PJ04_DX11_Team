@@ -115,6 +115,8 @@ public:
 	void						Play_ActionLoopSFX(const _tchar* pKey);
 	void						Stop_ActionLoopSFX();
 	void						Stop_AllFx(_bool bImmediate);
+	void						Start_LaunchSmokeFx();
+	void						Stop_LaunchSmokeFx(_bool bImmediate = false);
 	void						Play_OneShotSFX(const _tchar* pKey, _float fVolume = 1.0f, ESoundBus eBus = ESoundBus::SFX);
 	void						Play_OneShotSFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
 
@@ -133,9 +135,6 @@ protected:
 	CSound_Handle				m_ActionLoopSnd;
 
 	unordered_map<_wstring, FX_HANDLE> m_Effects;
-
-    FX_HANDLE                   m_LaunchSmokeFx = {};
-    _float4x4                   m_matLaunchSmokeWorld = {};
 
 	// 이번 프레임에 이동하고 싶은 방향
 	_float3						m_vWishDir = {};
@@ -181,10 +180,6 @@ protected:
 	HRESULT						Ready_Movement();
 	HRESULT						Ready_AI();
 	void						Check_AirborneReflex(_float fTimeDelta);
-    void                        Start_LaunchSmokeFx();
-    void                        Stop_LaunchSmokeFx(_bool bImmediate = false);
-    void                        Update_LaunchSmokeFx();
-    void                        Update_LaunchSmokeSocket();
 
 	virtual CMonsterBrain*		Create_Brain();		//기본: FSM Brain
 	virtual HRESULT				Create_Movement();	// 기본 : Monster_Movement - 별도 무브먼트 필요할 때 상속받아서 쓸 것 

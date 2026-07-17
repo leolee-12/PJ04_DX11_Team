@@ -13,16 +13,6 @@
 
 #include "Monster_State_Flatten.h"
 
-namespace
-{
-    _bool Is_LaunchSmokeState(MONSTER_STATE_TYPE eState)
-    {
-        return eState == MONSTER_STATE_TYPE::KNOCK_BACK ||
-            eState == MONSTER_STATE_TYPE::KNOCK_BACK_DEATH ||
-            eState == MONSTER_STATE_TYPE::KNOCK_OUT;
-    }
-}
-
 //#pragma warning(push, 0)
 //#ifdef new
 //#undef new
@@ -116,7 +106,6 @@ void CMonster::Update(_float fTimeDelta)
 
 	Update_AI(fTimeDelta);
 	__super::Update(fTimeDelta);
-    Update_LaunchSmokeFx();
 }
 
 void CMonster::Late_Update(_float fTimeDelta)
@@ -211,18 +200,10 @@ void CMonster::Clear_MoveDir()
 
 _bool CMonster::Change_State(MONSTER_STATE_TYPE eNewState, _bool bStateReenter)
 {
-    if (nullptr == m_pStateMachine)
-        return false;
+	if (nullptr == m_pStateMachine)
+		return false;
 
-    if (!m_pStateMachine->Change_State(eNewState, bStateReenter))
-        return false;
-
-    if (Is_LaunchSmokeState(Get_StateType()))
-        Start_LaunchSmokeFx();
-    else
-        Stop_LaunchSmokeFx();
-
-    return true;
+	return m_pStateMachine->Change_State(eNewState, bStateReenter);
 }
 
 _bool	CMonster::Has_State(MONSTER_STATE_TYPE eState) const
@@ -718,83 +699,43 @@ _bool CMonster::Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 
 void CMonster::Start_LaunchSmokeFx()
 {
-    if (!m_bActive)
-        return;
+	if (!m_bActive || nullptr == m_pTransformCom)
+		return;
 
-    auto pLoader = CEffect_Loader::GetInstance();
-    if (pLoader->Is_Current(m_LaunchSmokeFx))
-        return;
+	auto pLoader = CEffect_Loader::GetInstance();
+	FX_HANDLE& hSlot = m_Effects[L"LaunchSmoke"];
+	if (pLoader->Is_Current(hSlot))
+		return;
 
-    m_LaunchSmokeFx.Clear();
-    Update_LaunchSmokeSocket();
+	_float3 vFaceCam{};
+	XMStoreFloat3(&vFaceCam, 
+		XMVectorNegate(XMLoadFloat4(m_pGameInstance_Proxy->Get_CamLook())));
 
-    pLoader->Spawn(L"LaunchSmoke", Get_LevelIndex(),
-        _float3(0.f, 0.f, 0.f),
-        _float3(0.f, 0.f, 0.f),
-        _float3(0.f, 0.f, 0.f),
-        &m_matLaunchSmokeWorld, nullptr, &m_LaunchSmokeFx);
+	hSlot.Clear();
+	pLoader->Spawn(L"LaunchSmoke", Get_LevelIndex(),
+		_float3(0.f, 0.f, 0.f),
+		vFaceCam,
+		_float3(0.f, 0.f, 0.f),
+		m_pTransformCom->Get_WorldMatrixPtr(), nullptr, &hSlot);
 }
 
 void CMonster::Stop_LaunchSmokeFx(_bool bImmediate)
 {
-    auto pLoader = CEffect_Loader::GetInstance();
-    if (pLoader->Is_Current(m_LaunchSmokeFx))
-    {
-        if (bImmediate)
-            m_LaunchSmokeFx.p->EffectContainer_Stop();
-        else
-            m_LaunchSmokeFx.p->EffectContainer_StopAfterEmission();
-    }
+	auto it = m_Effects.find(L"LaunchSmoke");
+	if (it == m_Effects.end())
+		return;
 
-    m_LaunchSmokeFx.Clear();
-}
+	auto pLoader = CEffect_Loader::GetInstance();
+	FX_HANDLE& hSlot = it->second;
+	if (pLoader->Is_Current(hSlot))
+	{
+		if (bImmediate)
+			hSlot.p->EffectContainer_Stop();
+		else
+			hSlot.p->EffectContainer_StopAfterEmission();
+	}
 
-void CMonster::Update_LaunchSmokeFx()
-{
-    if (!m_bActive || !Is_LaunchSmokeState(Get_StateType()) ||
-        nullptr == m_pMovement || !m_pMovement->Is_Launched())
-    {
-        Stop_LaunchSmokeFx();
-        return;
-    }
-
-    auto pLoader = CEffect_Loader::GetInstance();
-    if (!pLoader->Is_Current(m_LaunchSmokeFx))
-    {
-        m_LaunchSmokeFx.Clear();
-        Start_LaunchSmokeFx();
-        return;
-    }
-
-    Update_LaunchSmokeSocket();
-}
-
-void CMonster::Update_LaunchSmokeSocket()
-{
-    _matrix matSocket = XMMatrixIdentity();
-
-    auto it = m_PartObjects.find(L"Body");
-    if (it != m_PartObjects.end())
-    {
-        CMonsterPart* pBody = dynamic_cast<CMonsterPart*>(it->second);
-        if (pBody)
-        {
-            const _float4x4* pBone = pBody->Get_BoneMatrixPtr("CenterL");
-            if (pBone)
-            {
-                _matrix matBoneWorld =
-                    XMLoadFloat4x4(pBone) *
-                    XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
-
-                matSocket.r[3] = matBoneWorld.r[3];
-                XMStoreFloat4x4(&m_matLaunchSmokeWorld, matSocket);
-                return;
-            }
-        }
-    }
-
-    matSocket.r[3] = m_pTransformCom->Get_State(STATE::POSITION);
-    XMStoreFloat4x4(&m_matLaunchSmokeWorld, matSocket);
+	hSlot.Clear();
 }
 
 void CMonster::Stop_AllFx(_bool bImmediate)
@@ -919,7 +860,7 @@ void CMonster::Enable_Colliders(_bool bEnable)
 
 void CMonster::On_Swallowed()
 {
-    Stop_LaunchSmokeFx();
+	Stop_AllFx(true);
 	SWALLOW_EVENT payload{ this };
 	m_pGameInstance_Proxy->Publish(EventTag::Swallowed, &payload);
 	m_pCaptor = nullptr;
@@ -946,7 +887,6 @@ void CMonster::On_SpatEnd()
 
 void CMonster::Despawn()
 {
-    Stop_LaunchSmokeFx();
 	Stop_AllFx(false);
 	Play_DeathFX();
 
@@ -1018,7 +958,7 @@ void CMonster::Update_AI(_float fTimeDelta)
 
 void CMonster::Free()
 {
-    Stop_LaunchSmokeFx(true);
+	Stop_AllFx(true);
 	Stop_ActionLoopSFX();
 
 	Safe_Release(m_pBrain);
