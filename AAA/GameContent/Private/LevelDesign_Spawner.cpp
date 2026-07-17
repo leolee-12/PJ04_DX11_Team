@@ -2,11 +2,19 @@
 #include "LevelDesign_Registry.h"
 #include "LevelDesign_Rail.h"
 #include "RailRideable.h"
+#include "Deformable.h"
 
 #include "GameInstance.h"
 
 namespace
 {
+	struct PENDING_RAIL_BINDING
+	{
+		IRailRideable* pReceiver = nullptr;
+		_uint iRailUid = 0u;
+		_uint iNodeIndex = 0u;
+	};
+
 	void Apply_ModelProtoLevel(LD_OBJECT_ENTRY* pEntry, _uint iModelProtoLevel)
 	{
 		if (nullptr == pEntry)
@@ -48,7 +56,8 @@ HRESULT CLevelDesign_Spawner::Spawn(const LD_PACKAGE& Package, const LD_SPAWN_RE
 		pOutReport->iSpawnCandidateCount = static_cast<_uint>(Package.ObjectDescs.size());
 	}
 
-	vector<pair<IRailRideable*, _uint>> PendingRailBindings;
+	vector<PENDING_RAIL_BINDING> PendingRailBindings;
+	vector<_uint> PendingRailVisuals;
 	HRESULT hrFinal = S_OK;
 
 	for (const LD_OBJECT_ENTRY& Desc : Package.ObjectDescs)
@@ -65,24 +74,64 @@ HRESULT CLevelDesign_Spawner::Spawn(const LD_PACKAGE& Package, const LD_SPAWN_RE
 		if (0 == BaseDesc.iTargetRailUid || nullptr == pCreatedObject)
 			continue;
 
+		IDeformable* pDeformable = dynamic_cast<IDeformable*>(pCreatedObject);
+		if (nullptr != pDeformable && DEFORM_TYPE::COASTER == pDeformable->Get_DeformType())
+			PendingRailVisuals.push_back(BaseDesc.iTargetRailUid);
+
 		IRailRideable* pReceiver = dynamic_cast<IRailRideable*>(pCreatedObject);
 		if (nullptr != pReceiver)
-			PendingRailBindings.emplace_back(pReceiver, BaseDesc.iTargetRailUid);
+			PendingRailBindings.push_back({ pReceiver, BaseDesc.iTargetRailUid, BaseDesc.iTargetRailNodeIndex });
 	}
 
-	for (const auto& [pReceiver, iRailUid] : PendingRailBindings)
+	for (const PENDING_RAIL_BINDING& Binding : PendingRailBindings)
 	{
-		const CLevelDesign_Rail* pRail = CLevelDesign_Rail::Find_ByUid(m_pProxy, Request.iPlaceLevel, iRailUid);
-		if (nullptr != pRail)
+		const CLevelDesign_Rail* pRail = CLevelDesign_Rail::Find_ByUid(m_pProxy, Request.iPlaceLevel, Binding.iRailUid);
+		if (nullptr == pRail)
 		{
-			pReceiver->Set_RailDesc(pRail->Get_RailDesc());
+#ifdef _DEBUG
+			const _wstring strMessage = L"[LevelDesign_Spawner] Rail not found: " + to_wstring(Binding.iRailUid) + L"\n";
+			OutputDebugStringW(strMessage.c_str());
+#endif
 			continue;
 		}
 
+		RAIL_BIND_CONTEXT Context{};
+		Context.pRailDesc = &pRail->Get_RailDesc();
+		Context.pRailTrack = pRail->Get_RailTrack();
+		Context.iRailUid = Binding.iRailUid;
+		Context.iStartNodeIndex = Binding.iNodeIndex;
+
+		if (FAILED(Binding.pReceiver->Bind_Rail(Context)))
+		{
 #ifdef _DEBUG
-		const _wstring strMessage = L"[LevelDesign_Spawner] Rail not found: " + to_wstring(iRailUid) + L"\n";
-		OutputDebugStringW(strMessage.c_str());
+			const _wstring strMessage = L"[LevelDesign_Spawner] Rail bind failed: "
+				+ to_wstring(Binding.iRailUid)
+				+ L" NodeIndex=" + to_wstring(Binding.iNodeIndex)
+				+ L"\n";
+			OutputDebugStringW(strMessage.c_str());
 #endif
+		}
+	}
+
+	for (const _uint iRailUid : PendingRailVisuals)
+	{
+		CLevelDesign_Rail* pRail = CLevelDesign_Rail::Find_ByUid(m_pProxy, Request.iPlaceLevel, iRailUid);
+		if (nullptr == pRail)
+		{
+#ifdef _DEBUG
+			const _wstring strMessage = L"[LevelDesign_Spawner] Visual Rail not found: " + to_wstring(iRailUid) + L"\n";
+			OutputDebugStringW(strMessage.c_str());
+#endif
+			continue;
+		}
+
+		if (FAILED(pRail->Enable_Visual(CLevelDesign_Rail::RAIL_VISUAL_TYPE::COASTER, Request.Levels.iModelPrototypeLevel)))
+		{
+#ifdef _DEBUG
+			const _wstring strMessage = L"[LevelDesign_Spawner] Rail visual enable failed: " + to_wstring(iRailUid) + L"\n";
+			OutputDebugStringW(strMessage.c_str());
+#endif
+		}
 	}
 
 	return hrFinal;

@@ -12,8 +12,20 @@ class ENGINE_DLL CEffect_MeshEmitter abstract : public CEffect_Emitter
     GENERATED_BODY_ABSTRACT(CEffect_MeshEmitter)
 
 PROPERTY(_bool, m_bBillboard, L"Billboard", L"Effect");
+PROPERTY(_bool, m_bTextureColorToAlpha, L"Color To Alpha_T", L"Texture Com");
+PROPERTY(_bool, m_bUseTextureUVEdgeFade, L"Use UV Edge Fade_T", L"Texture Com");
+PROPERTY(_int, m_iTextureUVEdgeFadeAxis, L"Edge Fade Axis_T", L"Texture Com");
+PROPERTY(_float, m_fTextureUVEdgeFadeStartRange, L"Edge Fade Start Range_T", L"Texture Com");
+PROPERTY(_float, m_fTextureUVEdgeFadeEndRange, L"Edge Fade End Range_T", L"Texture Com");
+PROPERTY(_float, m_fTextureUVEdgeFadePower, L"Edge Fade Power_T", L"Texture Com");
 
 // Diffuse
+PROPERTY(_bool, m_bDiffuseColorToAlpha,         L"Color To Alpha_D",          L"Diffuse");
+PROPERTY(_bool, m_bUseDiffuseUVEdgeFade,        L"Use UV Edge Fade_D",        L"Diffuse");
+PROPERTY(_int, m_iDiffuseUVEdgeFadeAxis,        L"Edge Fade Axis_D",          L"Diffuse");
+PROPERTY(_float, m_fDiffuseUVEdgeFadeStartRange, L"Edge Fade Start Range_D", L"Diffuse");
+PROPERTY(_float, m_fDiffuseUVEdgeFadeEndRange,   L"Edge Fade End Range_D",   L"Diffuse");
+PROPERTY(_float, m_fDiffuseUVEdgeFadePower,      L"Edge Fade Power_D",        L"Diffuse");
 PROPERTY(_bool, m_bUseDiffuseTexture,           L"Use Diffuse Textrue_D",     L"Diffuse");
 PROPERTY(_float2, m_vDiffuseTiling,             L"Tiling_D",                  L"Diffuse");
 PROPERTY(_float2, m_vDiffuseOffset,             L"Offset_D",                  L"Diffuse");
@@ -28,6 +40,12 @@ PROPERTY(_bool, m_bUseNormalTexture,            L"Use Normal Textrue_N",      L"
 PROPERTY(_bool, m_bUseMRATexture,               L"Use Material Textrue_M",    L"Material");
 
 // Unknown
+PROPERTY(_bool, m_bUnknownColorToAlpha,         L"Color To Alpha_U",          L"Unknown");
+PROPERTY(_bool, m_bUseUnknownUVEdgeFade,        L"Use UV Edge Fade_U",        L"Unknown");
+PROPERTY(_int, m_iUnknownUVEdgeFadeAxis,        L"Edge Fade Axis_U",          L"Unknown");
+PROPERTY(_float, m_fUnknownUVEdgeFadeStartRange, L"Edge Fade Start Range_U", L"Unknown");
+PROPERTY(_float, m_fUnknownUVEdgeFadeEndRange,   L"Edge Fade End Range_U",   L"Unknown");
+PROPERTY(_float, m_fUnknownUVEdgeFadePower,      L"Edge Fade Power_U",        L"Unknown");
 PROPERTY(_bool, m_bUseUnknownTexture,           L"Use Unknown Textrue_U",     L"Unknown");
 PROPERTY(_float2, m_vUnknownTiling,             L"Tiling_U",                  L"Unknown");
 PROPERTY(_float2, m_vUnknownOffset,             L"Offset_U",                  L"Unknown");

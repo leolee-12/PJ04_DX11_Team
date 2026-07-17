@@ -5,6 +5,7 @@
 #include "Inhalable.h"
 #include "MonsterPart.h"
 #include "Sound_Handle.h"
+#include "Effect_Loader.h"
 
 NS_BEGIN(Engine)
 class CCollider;
@@ -113,6 +114,7 @@ public:
 
 	void						Play_ActionLoopSFX(const _tchar* pKey);
 	void						Stop_ActionLoopSFX();
+	void						Stop_AllFx(_bool bImmediate);
 	void						Play_OneShotSFX(const _tchar* pKey, _float fVolume = 1.0f, ESoundBus eBus = ESoundBus::SFX);
 	void						Play_OneShotSFX3D(const TCHAR* pSoundKey, _fvector vSoundPos, float fVolume = 1.f, ESoundBus eBus = ESoundBus::SFX);
 
@@ -130,7 +132,7 @@ protected:
 	
 	CSound_Handle				m_ActionLoopSnd;
 
-	unordered_map<_wstring, CEffect_Container*> m_Effects;
+	unordered_map<_wstring, FX_HANDLE> m_Effects;
 
 	// 이번 프레임에 이동하고 싶은 방향
 	_float3						m_vWishDir = {};

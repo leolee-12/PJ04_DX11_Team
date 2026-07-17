@@ -62,10 +62,10 @@ void CPanel_Profiler::Render()
 			Counter(Engine::EPROFILE_COUNTER::FRUSTUM_TESTED),
 			Counter(Engine::EPROFILE_COUNTER::FRUSTUM_VISIBLE),
 			Counter(Engine::EPROFILE_COUNTER::FRUSTUM_CULLED));
-		ImGui::Text("  fail-open view %u / bounds %u / disabled %u",
+
+		ImGui::Text("  fail-open view %u / bounds %u",
 			Counter(Engine::EPROFILE_COUNTER::FRUSTUM_FAIL_OPEN_INVALID_VIEW),
-			Counter(Engine::EPROFILE_COUNTER::FRUSTUM_FAIL_OPEN_INVALID_BOUNDS),
-			Counter(Engine::EPROFILE_COUNTER::FRUSTUM_DISABLED_POLICY));
+			Counter(Engine::EPROFILE_COUNTER::FRUSTUM_FAIL_OPEN_INVALID_BOUNDS));
 
 		ImGui::Separator();
 		ImGui::Text("Engine Distance:");

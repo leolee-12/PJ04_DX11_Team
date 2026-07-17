@@ -106,6 +106,8 @@ void CEffect_Quad::Update_Core(const _float fTimeDelta, const _float fRatio)
 
 void CEffect_Quad::Init_PropertyValue()
 {
+    m_iRotationAxisSpace = 0;
+
     auto Values = Make_RectValues();
     EffectRect::Initialize_DefaultValues(Values);
 }
@@ -114,6 +116,14 @@ EffectRect::VALUES CEffect_Quad::Make_RectValues()
 {
     return {
         m_bBillboard,
+        m_bTextureColorToAlpha,
+        {
+            m_bUseTextureUVEdgeFade,
+            m_iTextureUVEdgeFadeAxis,
+            m_fTextureUVEdgeFadeStartRange,
+            m_fTextureUVEdgeFadeEndRange,
+            m_fTextureUVEdgeFadePower
+        },
         m_bSpriteAniTexture, m_iTexFrameX, m_iTexFrameY, m_fCurTexAniUV, m_fCurTexAniSize,
         m_bSpriteAniMask, m_iMaskFrameX, m_iMaskFrameY, m_fCurMaskAniUV, m_fCurMaskAniSize
     };

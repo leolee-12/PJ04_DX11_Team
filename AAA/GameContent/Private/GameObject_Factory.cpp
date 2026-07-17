@@ -78,6 +78,7 @@
 #include "Split_Bush.h"
 #include "Split_Coaster.h"
 #include "Split_Cylinder.h"
+#include "LensFlare.h"
 #include "ItemEffect.h"
 #include "BombHitAim.h"
 #include "BombAimDot.h"
@@ -86,6 +87,7 @@
 #include "Kirby_SwordTrail.h"
 #include "SmokeCollection.h"
 #include "CarLanding.h"
+#include "PickUpEffect.h"
 #include "SmokeSphereOriginalEmitter.h"
 #include "SwordTrail_BK.h"
 #include "Tornado_BK.h"
@@ -136,21 +138,25 @@
 
 // Monster
 #include "BladeKnight.h"
+#include "NormalEnemy.h"
+#include "Kabu.h"
+#include "BrontoBurt.h"
+#include "PoppyBrosJr.h"
+#include "Cappy.h"
+#include "NormalEnemyWild.h"
+#include "Dekabu.h"
+
+// MonsterPart
 #include "BladeKnight_Body.h"
 #include "BladeKnight_Sword.h"
-#include "NormalEnemy.h"
 #include "NormalEnemy_Body.h"
-#include "Kabu.h"
 #include "Kabu_Body.h"
-#include "BrontoBurt.h"
 #include "BrontoBurt_Body.h"
-#include "PoppyBrosJr.h"
 #include "PoppyBrosJr_Body.h"
-#include "Cappy.h"
 #include "Cappy_Body.h"
 #include "Cappy_Hat.h"
-#include "NormalEnemyWild.h"
 #include "NormalEnemyWild_Body.h"
+#include "Dekabu_Body.h"
 
 //Miniboss
 #include "GigantEdge.h"
@@ -185,6 +191,7 @@
 #include "LD_AudioArea.h"
 #include "LD_Stage1BossDemo.h"
 #include "LD_SlopeBoardA.h"
+#include "LD_SlopeBoardB.h"
 #include "LD_SlopeBoardC.h"
 #include "LD_DeformCarBreakWall.h"
 #include "LD_GarageRadio.h"
@@ -205,6 +212,7 @@
 #include "EnemyBomb.h"
 #include "KirbyBomb.h"
 #include "Spit_Projectile.h"
+#include "KoKabu.h"
 
 // Ability Bubble
 #include "EssenceBubble.h"
@@ -220,6 +228,10 @@
 
 // CutSceneActor
 #include "DialogueDee.h"
+
+// NPC
+#include "WaddleDee.h"
+#include "WaddleDee_Body.h"
 
 #include "DropStar.h"
 #include "DropStar_Body.h"
@@ -259,7 +271,7 @@ namespace
     {
         TRY_ADD_PROTO(pProxy, iLevelIndex, CAbility_Model::PROTOTYPE_TAG, CAbility_Model::Create(pDevice, pContext));
         
-        // ´É·Â Ãß°¡µÉ ¶§¸¶´Ù ¾Æ·¡¿¡ Ãß°¡
+        // ï¿½É·ï¿½ ï¿½ß°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Æ·ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
         
         // Sword
         TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Ability_Model_Sword"),
@@ -417,7 +429,7 @@ void CGameObject_Factory::Register_Container()
         )
     ); 
 
-#pragma region ¸ó½ºÅÍ
+#pragma region ï¿½ï¿½ï¿½ï¿½
     
     // 1. BladeKnight(Sword)
     Register
@@ -549,7 +561,42 @@ void CGameObject_Factory::Register_Container()
         )
     );
 
+    // 8. Dekabu 
+    Register
+    (
+        CDekabu::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CDekabu),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDekabu_Body::PROTOTYPE_TAG, CDekabu_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Dekabu_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Dekabu/Body/Dekabu.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            // KoKabu(Projectile) - Model : Kabu ¿Í µ¿ÀÏ
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKokabu::PROTOTYPE_TAG, CKokabu::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKokabu::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Kabu/Body/Kabu.ysh",
+                    XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
 #pragma endregion
+
+    // NPC
+    Register
+    (
+        CWaddleDee::PROTOTYPE_TAG, TEXT("NPC"),
+        CREATOR(CWaddleDee),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CWaddleDee_Body::PROTOTYPE_TAG, CWaddleDee_Body::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CCage_WaddleDee::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/YSH/WaddleDee/Body/Model_Anim.ysh", XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
 
     // Drop Star
     Register
@@ -650,6 +697,10 @@ void CGameObject_Factory::Register_AnimObject()
     Register(CLD_SlopeBoardA::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_SlopeBoardA),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_SlopeBoardA::MODEL_PROTO_TAG,
             Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardA.ysh", false));));
+
+    Register(CLD_SlopeBoardB::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_SlopeBoardB),
+        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_SlopeBoardB::MODEL_PROTO_TAG,
+            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardB.ysh", false));));
 
     Register(CLD_SlopeBoardC::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_SlopeBoardC),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_SlopeBoardC::MODEL_PROTO_TAG,
@@ -902,7 +953,7 @@ void CGameObject_Factory::Register_Effect()
 
         ));
 
-    // 7 Bubble Aura (EssenceBubble / DorppedBubble °ø¿ë)
+    // 7 Bubble Aura (EssenceBubble / DorppedBubble ï¿½ï¿½ï¿½ï¿½)
     Register(CBubbleAura::PROTOTYPE_TAG, TEXT("Effect_Container"),
         CREATOR(CBubbleAura),
         LOADER
@@ -918,6 +969,22 @@ void CGameObject_Factory::Register_Effect()
             
             TRY_ADD_PROTO(pProxy, Texture_Star2D.iLevelID, Texture_Star2D.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_Star2D.szFileTag, Texture_Star2D.iNumTex));
+
+            TRY_ADD_PROTO(pProxy, Texture_CommonSparkle01.iLevelID, Texture_CommonSparkle01.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_CommonSparkle01.szFileTag, Texture_CommonSparkle01.iNumTex));
+
+        ));
+
+    Register(CPickUpEffect::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CPickUpEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG, CRectCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectParticleCommon::PROTOTYPE_TAG, CRectParticleCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, Texture_CommonRing01.iLevelID, Texture_CommonRing01.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_CommonRing01.szFileTag, Texture_CommonRing01.iNumTex));
 
             TRY_ADD_PROTO(pProxy, Texture_CommonSparkle01.iLevelID, Texture_CommonSparkle01.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_CommonSparkle01.szFileTag, Texture_CommonSparkle01.iNumTex));
@@ -1026,7 +1093,7 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
-#pragma region ¸ó½ºÅÍ ÀÌÆåÆ®
+#pragma region ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®
     
     // BladeKnight
     Register(CSwordTrail_BK::PROTOTYPE_TAG, TEXT("Effect_Container"),
@@ -1128,6 +1195,25 @@ void CGameObject_Factory::Register_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_SmokeSphereOriginal"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Test/Effect/SmokeSphereOriginal/Model_SmokeSphereOriginal.ysh"));
         )
     );
+
+    // 16
+    Register(CLensFlare::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CLensFlare),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectEmitterCommon::PROTOTYPE_TAG, CRectEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshEmitterCommon::PROTOTYPE_TAG, CMeshEmitterCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_LensFlare_Common_Circle01"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/LensFlare/Common_Circle01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_LensFlare_Common_Ring01"), CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/Map/Effect/LensFlare/Common_Ring01.ysh"));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_CircleGlow2"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/circleglow2.png"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_Common_Circle06"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/common_circle06.png"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_CircleGradation"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/circlegradation.png"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_ThunderRoot2"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/thunderroot2.png"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_Common_Ring08"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/common_ring08.png"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_Common_Circle11"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/common_circle11.png"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_Common_Circle01"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/common_circle01.png"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_Common_Circle02"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/common_circle02.png"), 1));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Texture_LensFlare_Common_Circle04"), CTexture::Create(pDevice, pContext, TEXT("../../Resources/Map/Effect/LensFlare/common_circle04.png"), 1));
+        ));
 
     // 0. WalkSmoke
     Register(CWalkSmoke::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CWalkSmoke),

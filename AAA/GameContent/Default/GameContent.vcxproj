@@ -29,15 +29,22 @@
     <ClInclude Include="..\public\Boss_Leopard_Brain.h" />
     <ClInclude Include="..\Public\BubbleMovement.h" />
     <ClInclude Include="..\Public\Dekabu.h" />
+    <ClInclude Include="..\Public\Dekabu_Body.h" />
+    <ClInclude Include="..\Public\Dekabu_Brain.h" />
+    <ClInclude Include="..\Public\Dekabu_State_Alert.h" />
+    <ClInclude Include="..\Public\Dekabu_State_Attack.h" />
     <ClInclude Include="..\Public\DropStar.h" />
     <ClInclude Include="..\Public\DropStar_Body.h" />
     <ClInclude Include="..\Public\DropStar_Manager.h" />
     <ClInclude Include="..\Public\EssenceCrown.h" />
     <ClInclude Include="..\Public\Kirby_DeformContext.h" />
+    <ClInclude Include="..\Public\KoKabu.h" />
+    <ClInclude Include="..\Public\LD_SlopeBoardB.h" />
     <ClInclude Include="..\Public\NormalEnemyWild.h" />
     <ClInclude Include="..\Public\NormalEnemyWild_Body.h" />
     <ClInclude Include="..\Public\PickUpEffect.h" />
     <ClInclude Include="..\public\Projectile_Nail.h" />
+    <ClInclude Include="..\Public\LensFlare.h" />
     <ClInclude Include="..\Public\SwordTrail_BK.h" />
     <ClInclude Include="..\Public\BladeKnight_Body.h" />
     <ClInclude Include="..\Public\BladeKnight_Brain.h" />
@@ -144,6 +151,7 @@
     <ClInclude Include="..\Public\Split_Coaster.h" />
     <ClInclude Include="..\Public\Split_Cylinder.h" />
     <ClInclude Include="..\Public\Tornado_BK.h" />
+    <ClInclude Include="..\Public\TownCondition_Utils.h" />
     <ClInclude Include="..\Public\TrailCommon.h" />
     <ClInclude Include="..\Public\Kirby_SwordTrail.h" />
     <ClInclude Include="..\Public\SmokeCollection.h" />
@@ -410,6 +418,8 @@
     <ClInclude Include="..\public\UI_TitleLogo.h" />
     <ClInclude Include="..\Public\Vacuum.h" />
     <ClInclude Include="..\Public\InhaleContainer.h" />
+    <ClInclude Include="..\Public\WaddleDee.h" />
+    <ClInclude Include="..\Public\WaddleDee_Body.h" />
     <ClInclude Include="..\Public\WalkSmoke.h" />
   </ItemGroup>
   <ItemGroup>
@@ -422,14 +432,21 @@
     <ClCompile Include="..\private\Boss_Leopard_Brain.cpp" />
     <ClCompile Include="..\Private\BubbleMovement.cpp" />
     <ClCompile Include="..\Private\Dekabu.cpp" />
+    <ClCompile Include="..\Private\Dekabu_Body.cpp" />
+    <ClCompile Include="..\Private\Dekabu_Brain.cpp" />
+    <ClCompile Include="..\Private\Dekabu_State_Alert.cpp" />
+    <ClCompile Include="..\Private\Dekabu_State_Attack.cpp" />
     <ClCompile Include="..\Private\DropStar.cpp" />
     <ClCompile Include="..\Private\DropStar_Body.cpp" />
     <ClCompile Include="..\Private\DropStar_Manager.cpp" />
     <ClCompile Include="..\Private\EssenceCrown.cpp" />
+    <ClCompile Include="..\Private\KoKabu.cpp" />
+    <ClCompile Include="..\Private\LD_SlopeBoardB.cpp" />
     <ClCompile Include="..\Private\NormalEnemyWild.cpp" />
     <ClCompile Include="..\Private\NormalEnemyWild_Body.cpp" />
     <ClCompile Include="..\Private\PickUpEffect.cpp" />
     <ClCompile Include="..\private\Projectile_Nail.cpp" />
+    <ClCompile Include="..\Private\LensFlare.cpp" />
     <ClCompile Include="..\Private\SwordTrail_BK.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Body.cpp" />
     <ClCompile Include="..\Private\BladeKnight_Brain.cpp" />
@@ -714,7 +731,6 @@
     <ClCompile Include="..\Private\NormalEnemy_Brain.cpp" />
     <ClCompile Include="..\Private\NormalEnemy_State_Brake.cpp" />
     <ClCompile Include="..\Private\PoppyBrosJr.cpp" />
-    <ClCompile Include="..\Private\RailRideable.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />
     <ClCompile Include="..\private\UI_BossStatus.cpp" />
     <ClCompile Include="..\private\UI_Curtain.cpp" />
@@ -778,6 +794,8 @@
     <ClCompile Include="..\Private\UI_TitleLogo.cpp" />
     <ClCompile Include="..\Private\Vacuum.cpp" />
     <ClCompile Include="..\Private\InhaleContainer.cpp" />
+    <ClCompile Include="..\Private\WaddleDee.cpp" />
+    <ClCompile Include="..\Private\WaddleDee_Body.cpp" />
     <ClCompile Include="..\Private\WalkSmoke.cpp" />
     <ClCompile Include="..\public\Dialogue_Director.cpp" />
   </ItemGroup>

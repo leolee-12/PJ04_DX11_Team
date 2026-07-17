@@ -240,24 +240,8 @@ void CMapStage::Submit_VisibleSections()
 		if (!pSection->Is_Renderable())
 			continue;
 
-		const _bool bVisibleMain =
-			!pSection->Is_Culling()
-			|| !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::MAIN_CAMERA, pSection->Get_WorldBounds());
-
-		if (bVisibleMain)
-		{
-			const RENDERID eRenderID = pSection->Get_RenderID();
-			m_pGameInstance_Proxy->Add_RenderGroup(eRenderID, pSection);
-		}
-
-		// Main-camera culling must not remove shadow casters.
-		// Shadow-direction frustum culling is evaluated independently.
-		const _bool bVisibleShadow =
-			!pSection->Is_Culling()
-			|| !m_pGameInstance_Proxy->Should_CullAABB(CULLING_VIEW::SHADOW_DIR, pSection->Get_WorldBounds());
-
-		if (bVisibleShadow)
-			m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pSection);
+		m_pGameInstance_Proxy->Add_RenderGroup(pSection->Get_RenderID(), pSection);
+		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, pSection);
 	}
 }
 

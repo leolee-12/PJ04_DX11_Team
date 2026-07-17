@@ -71,6 +71,7 @@ private:
 	static void Register_Core();
 	static void Register_Volumes();
 	static void Register_GuideAudio();
+	static void Register_NPCs();
 	static void Register_ItemsAndBreakables();
 	static void Register_EnemiesAndGimmicks();
 };

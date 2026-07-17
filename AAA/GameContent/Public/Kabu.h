@@ -46,6 +46,7 @@ public:
 
     // IRailRideable
     virtual void            Set_RailDesc(const LD_RAIL_DESC& Desc) override;
+    virtual HRESULT         Bind_Rail(const RAIL_BIND_CONTEXT& Context) override;
 
     _bool                   Is_Visible() const { return m_bVisible; }
     void                    Set_Visible(_bool bVisible);

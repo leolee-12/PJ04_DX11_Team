@@ -551,6 +551,11 @@ void CLD_AudioArea::Free()
 	if (m_bBgmPaused && m_BgmHandle.Is_Valid())
 		m_BgmHandle.Stop();
 
+	if (nullptr != m_pTrigger)
+	{
+		m_pTrigger->Clear_Callbacks();
+	}
+
 	__super::Free();
 }
 
