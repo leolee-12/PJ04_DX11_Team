@@ -145,6 +145,8 @@ public:
 	void Change_KirbyDeform(DEFORM_TYPE eDeformType);
 	void Reset_KirbyDeform();
 
+	CKirby_Deform* Find_KirbyDeform(DEFORM_TYPE eType);
+
 	// Collider
 	CCollider* Get_Collider(KIRBY_COLLIDER eKirbyCollider);
 

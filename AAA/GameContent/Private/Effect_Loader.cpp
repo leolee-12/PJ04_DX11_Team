@@ -22,7 +22,7 @@ namespace
         { TEXT("CarLanding"),             TEXT("../../Resources/YSE/EffectContainer/CarLanding.JSON") },
         { TEXT("BombHitAim"),             TEXT("../../Resources/YSE/EffectContainer/BombHitAim.JSON") },
         { TEXT("BombAimDot"),             TEXT("../../Resources/YSE/EffectContainer/BombAimDot.JSON") },
-        { TEXT("SlideSmoke"),             TEXT("../../Resources/LevelData/SlideSmoke.JSON") },
+        { TEXT("SlideSmoke"),             TEXT("../../Resources/YSE/EffectContainer/SlideSmoke.JSON") },
         { TEXT("InhaleContainer"),        TEXT("../../Resources/YSE/EffectContainer/Inhale_6_24.json") },
 
         { TEXT("SwordSlash1"),            TEXT("../../Resources/YSE/EffectContainer/SwordSlash1_Alpha_Color.json") },

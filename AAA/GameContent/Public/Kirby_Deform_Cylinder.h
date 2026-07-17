@@ -35,6 +35,11 @@ public:
 	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) override;
 
 public:
+	virtual void Enter_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) override;
+	virtual _bool Update_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta) override;
+	virtual void Exit_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) override;
+
+public:
 	static CKirby_Deform_Cylinder* Create();
 
 private:

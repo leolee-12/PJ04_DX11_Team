@@ -53,6 +53,7 @@ public:
 #pragma region Deformable
 	virtual DEFORM_TYPE				Get_DeformType() const override { return m_tDeformObjectDesc.eDeformType; }
 	virtual DEFORM_OBJECT_KIND		Get_DeformKind() const override { return m_eKind; }
+	virtual CGameObject*			Get_GameObject() override { return this; }
 	virtual _bool					Request_Deform(const _float4x4* AnchorWorld) override;
 #pragma endregion
 

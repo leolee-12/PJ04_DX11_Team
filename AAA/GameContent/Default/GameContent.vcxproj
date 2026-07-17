@@ -33,6 +33,7 @@
     <ClInclude Include="..\Public\DropStar_Body.h" />
     <ClInclude Include="..\Public\DropStar_Manager.h" />
     <ClInclude Include="..\Public\EssenceCrown.h" />
+    <ClInclude Include="..\Public\Kirby_DeformContext.h" />
     <ClInclude Include="..\Public\NormalEnemyWild.h" />
     <ClInclude Include="..\Public\NormalEnemyWild_Body.h" />
     <ClInclude Include="..\Public\PickUpEffect.h" />

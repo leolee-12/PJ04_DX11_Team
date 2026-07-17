@@ -1251,6 +1251,16 @@ void CKirby::Reset_KirbyDeform()
     m_pKirby_Deform = nullptr;
 }
 
+CKirby_Deform* CKirby::Find_KirbyDeform(DEFORM_TYPE eType)
+{
+    auto iter = m_Deformations.find(eType);
+
+    if (iter == m_Deformations.end())
+        return nullptr;
+
+    return iter->second;
+}
+
 CCollider* CKirby::Get_Collider(KIRBY_COLLIDER eKirbyCollider)
 {
     return m_KirbyColliders[eKirbyCollider];

@@ -2424,6 +2424,9 @@
     <ClInclude Include="..\Public\WalkSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Kirby_DeformContext.h">
+      <Filter>00. GameObject\05. Kirby\01. StateMachine\State\Else\GetDeform</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
