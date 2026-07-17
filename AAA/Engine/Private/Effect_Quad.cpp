@@ -114,6 +114,7 @@ EffectRect::VALUES CEffect_Quad::Make_RectValues()
 {
     return {
         m_bBillboard,
+        m_bTextureColorToAlpha,
         m_bSpriteAniTexture, m_iTexFrameX, m_iTexFrameY, m_fCurTexAniUV, m_fCurTexAniSize,
         m_bSpriteAniMask, m_iMaskFrameX, m_iMaskFrameY, m_fCurMaskAniUV, m_fCurMaskAniSize
     };

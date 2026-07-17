@@ -12,8 +12,10 @@ class ENGINE_DLL CEffect_MeshParticle abstract : public CEffect_Particle
     GENERATED_BODY_ABSTRACT(CEffect_MeshParticle)
 
 PROPERTY(_bool, m_bBillboard, L"Billboard", L"Effect");
+PROPERTY(_bool, m_bTextureColorToAlpha, L"Color To Alpha_T", L"Texture Com");
 
 // Diffuse
+PROPERTY(_bool, m_bDiffuseColorToAlpha,         L"Color To Alpha_D",          L"Diffuse");
 PROPERTY(_bool, m_bUseDiffuseTexture,           L"Use Diffuse Textrue_D",     L"Diffuse");
 PROPERTY(_float2, m_vDiffuseTiling,             L"Tiling_D",                  L"Diffuse");
 PROPERTY(_float2, m_vDiffuseOffset,             L"Offset_D",                  L"Diffuse");

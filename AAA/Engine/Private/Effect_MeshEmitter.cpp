@@ -18,6 +18,7 @@ CEffect_MeshEmitter::CEffect_MeshEmitter(const CEffect_MeshEmitter& Prototype)
 EffectMesh::VALUES CEffect_MeshEmitter::Make_MeshValues()
 {
     return {
+        m_bTextureColorToAlpha,
         {
             m_bUseDiffuseTexture,
             m_vDiffuseTiling,
@@ -26,6 +27,7 @@ EffectMesh::VALUES CEffect_MeshEmitter::Make_MeshValues()
             m_vDiffuseUVScrollCount,
             m_vCurDiffuseUVOffset
         },
+        m_bDiffuseColorToAlpha,
         m_bUseNormalTexture,
         m_bUseMRATexture,
         {

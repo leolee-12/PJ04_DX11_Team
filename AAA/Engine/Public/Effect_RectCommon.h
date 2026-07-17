@@ -12,6 +12,7 @@ namespace EffectRect
     struct VALUES               // Non-owning references to the Effect object's members.
     {
         _bool& bBillboard;
+        _bool& bTextureColorToAlpha;
 
         _bool& bSpriteAniTexture;
         _int& iTexFrameX;
