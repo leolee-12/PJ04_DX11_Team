@@ -1,5 +1,8 @@
 #include "KoKabu.h"
+#include "GameInstance.h"
 #include "GameContent_Const.h"
+#include "GameContrnt_Events.h"
+#include "Projectile_Movement.h"
 
 
 CKokabu::CKokabu(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -14,9 +17,10 @@ CKokabu::CKokabu(const CKokabu& Prototype)
 
 _bool CKokabu::Can_BeInhaled(const INHALE_QUERY& q) const
 {
-	return m_bAlive
-		&& KOKABU_STATE::CAPTURED != m_eState
-		&& KOKABU_STATE::DISAPPEARING != m_eState;
+	return m_bAlive 
+		&&		(KOKABU_STATE::EJECTED == m_eState
+		||		KOKABU_STATE::FALLING == m_eState
+		||		KOKABU_STATE::LANDED == m_eState);
 }
 
 void CKokabu::Be_Captured(CGameObject* pInhaler)
@@ -30,10 +34,19 @@ void CKokabu::Be_Captured(CGameObject* pInhaler)
 
 void CKokabu::On_SpatBegin()
 {
+	m_pCaptor = nullptr;
+	Change_State(KOKABU_STATE::SPAT);
+
+	Update_SpatPivot_FromBone();
+
+	m_pTransformCom->Set_Scale(
+		m_vBaseScale.x, m_vBaseScale.y, m_vBaseScale.z);
 }
 
 void CKokabu::On_SpatEnd()
 {
+	m_pCaptor = nullptr;
+	Despawn();
 }
 
 void CKokabu::On_Swallowed()
@@ -53,7 +66,20 @@ HRESULT CKokabu::Initialize(void* pArg)
 	m_fSpeed = 20.f;
 	m_fDamage = 10.f;
 	m_fKnockback = 4.f;
-	m_fHitRadius = 1.f;		// º¸°í Æ©´×
+	m_fHitRadius = 0.6f;		// º¸°í Æ©´×
+	m_fLifeTime = 3.0f;
+
+	m_eProjType = PROJ_TYPE::PERSPEC;
+
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
+
+	m_vBaseScale = m_pTransformCom->Get_Scaled();
+
+	// ground slide: no bounce, no horizontal damp
+	if (m_pMovement)
+		m_pMovement->Set_Physics(-45.f, 0.f, 1.0f);
+
 	return S_OK;
 }
 
@@ -63,15 +89,31 @@ void CKokabu::Update(_float fTimeDelta)
 
 HRESULT CKokabu::Render()
 {
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 HRESULT CKokabu::Ready_Visual()
 {
-	m_pShaderCom = Add_Component<CShader>(Shader_Monster.iLevelID, Shader_Bomb.szProtoTag, TEXT("Com_Shader"));
+	m_pShaderCom = Add_Component<CShader>(Shader_Monster.iLevelID, Shader_Monster.szProtoTag, TEXT("Com_Shader"));
 
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
+
+	m_pModelCom = Add_Component<CModel>(
+		m_iPrototypeLevel, MODEL_PROTO_TAG, TEXT("Com_Model"));
+	if (nullptr == m_pModelCom)
+		return E_FAIL;
+
+	CAnimator::ANIMATOR_DESC ad{};
+	ad.pModel = m_pModelCom;
+	m_pAnimatorCom = Add_Component<CAnimator>(
+		TEXT("Com_Animator"),
+		CAnimator::Create(m_pDevice, m_pContext));
+	if (nullptr == m_pAnimatorCom
+		|| FAILED(m_pAnimatorCom->Initialize(&ad)))
+		return E_FAIL;
+
+	m_pAnimatorCom->Play("Wait", true, true);
 
 	return S_OK;
 }
@@ -145,6 +187,11 @@ void CKokabu::Update_SpatPivot_FromBone()
 
 void CKokabu::Despawn()
 {
+}
+
+HRESULT CKokabu::Bind_ShaderResources()
+{
+	return E_NOTIMPL;
 }
 
 CKokabu* CKokabu::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

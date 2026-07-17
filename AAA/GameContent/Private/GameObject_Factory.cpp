@@ -266,7 +266,7 @@ namespace
     {
         TRY_ADD_PROTO(pProxy, iLevelIndex, CAbility_Model::PROTOTYPE_TAG, CAbility_Model::Create(pDevice, pContext));
         
-        // ï¿½É·ï¿½ ï¿½ß°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Æ·ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
+        // ´É·Â Ãß°¡µÉ ¶§¸¶´Ù ¾Æ·¡¿¡ Ãß°¡
         
         // Sword
         TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Ability_Model_Sword"),
@@ -424,7 +424,7 @@ void CGameObject_Factory::Register_Container()
         )
     ); 
 
-#pragma region ï¿½ï¿½ï¿½ï¿½
+#pragma region ¸ó½ºÅÍ
     
     // 1. BladeKnight(Sword)
     Register
@@ -931,7 +931,7 @@ void CGameObject_Factory::Register_Effect()
 
         ));
 
-    // 7 Bubble Aura (EssenceBubble / DorppedBubble ï¿½ï¿½ï¿½ï¿½)
+    // 7 Bubble Aura (EssenceBubble / DorppedBubble °ø¿ë)
     Register(CBubbleAura::PROTOTYPE_TAG, TEXT("Effect_Container"),
         CREATOR(CBubbleAura),
         LOADER
@@ -1082,7 +1082,7 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
-#pragma region ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®
+#pragma region ¸ó½ºÅÍ ÀÌÆåÆ®
     
     // BladeKnight
     Register(CSwordTrail_BK::PROTOTYPE_TAG, TEXT("Effect_Container"),
