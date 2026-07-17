@@ -1,5 +1,6 @@
 #include "LevelDesign_Registry.h"
 #include "LevelDesign_MonsterCatalog.h"
+#include "WaddleDee.h"
 
 #include "LevelDesign_Unsupported.h"
 #include "LevelDesign_Boundary.h"
@@ -19,10 +20,13 @@
 #include "LD_DeformObject.h"
 #include "LD_Stage1BossDemo.h"
 #include "LD_SlopeBoardA.h"
+#include "LD_SlopeBoardB.h"
 #include "LD_SlopeBoardC.h"
 #include "LD_DeformCarBreakWall.h"
 #include "LD_GarageRadio.h"
 #include "LD_CopyEssence.h"
+
+#include "Parsing_Utils.h"
 
 #include <mutex>
 
@@ -34,6 +38,29 @@ namespace
 	unordered_map<_wstring, LD_SPAWN_SPEC> g_Specs;
 	LD_SPAWN_SPEC g_FallbackSpec = {};
 
+	_bool Build_WaddleDeeDesc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
+	{
+		if (nullptr == pOutEntry || Spec.eCategory != LD_CATEGORY::META)
+			return false;
+
+		LD_PARSED_OBJECT Desc{};
+		static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
+		Desc.eCategory = Spec.eCategory;
+
+		if (JsonUtils::Equals_NoCase(CommonDesc.strObjectName.c_str(), L"TalkWaddleDee"))
+		{
+			_wstring strVariation;
+			if (JsonUtils::Try_ReadString(jEntry, "Chara.TalkWaddleDee.Variation.VariationType", &strVariation))
+				Desc.strAIVariation = CWaddleDee::Resolve_FixedAnim(strVariation);
+		}
+
+		XMStoreFloat4(&Desc.vRight, XMVectorNegate(XMLoadFloat4(&Desc.vRight)));
+		XMStoreFloat4(&Desc.vLook, XMVectorNegate(XMLoadFloat4(&Desc.vLook)));
+
+		*pOutEntry = std::move(Desc);
+		return true;
+	}
+
 	_wstring Make_Key(const _wstring& strValue)
 	{
 		_wstring Result = strValue;
@@ -41,6 +68,11 @@ namespace
 			ch = static_cast<wchar_t>(towlower(ch));
 
 		return Result;
+	}
+
+	CGameObject* Create_WaddleDeePrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	{
+		return CWaddleDee::Create(pDevice, pContext);
 	}
 
 	CGameObject* Create_BoundaryPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -106,6 +138,7 @@ void CLevelDesign_Registry::Initialize()
 			Register_Core();
 			Register_Volumes();
 			Register_GuideAudio();
+			Register_NPCs();
 			Register_ItemsAndBreakables();
 			Register_EnemiesAndGimmicks();
 		});
@@ -203,6 +236,7 @@ _bool CLevelDesign_Registry::Is_LevelDesignLayer(const _wstring& strLayerTag)
 		|| strLayerTag == L"Layer_LevelDesign_Audio"
 		|| strLayerTag == L"Layer_LevelDesign_Item"
 		|| strLayerTag == L"Layer_LevelDesign_Enemy"
+		|| strLayerTag == L"Layer_LevelDesign_NPC"
 		|| strLayerTag == L"Layer_LevelDesign_Gimmick"
 		|| strLayerTag == L"Layer_LevelDesign_Unsupported";
 }
@@ -218,6 +252,11 @@ void CLevelDesign_Registry::Register_Core()
 	RailSpec.strLayerTag = CLevelDesign_Rail::LAYER_TAG;
 	RailSpec.eCategory = LD_CATEGORY::RAIL;
 	RailSpec.pPrototypeFactory = &Create_RailPrototype;
+	RailSpec.ModelRequirements =
+	{
+			{ CLevelDesign_Rail::COASTER_RAIL_MODEL_PROTO_TAG,
+			"../../Resources/Map/Gimmick/NonAnim/CoasterRail/CoasterRail.ysh", MODEL::NONANIM, false }
+	};
 	Register(CLevelDesign_Rail::OBJECT_NAME, RailSpec);
 }
 
@@ -236,6 +275,29 @@ void CLevelDesign_Registry::Register_GuideAudio()
 	Register_Unsupported(L"IntroductionDemo", LD_CATEGORY::GUIDE_AREA, L"Layer_LevelDesign_Guide");
 
 	CLD_AudioArea::Register_LevelDesignSpecs();
+}
+
+void CLevelDesign_Registry::Register_NPCs()
+{
+	const _tchar* ObjectNames[] =
+	{
+			L"MerchantWaddleDee",
+			L"TalkWaddleDee"
+	};
+
+	for (const _tchar* pObjectName : ObjectNames)
+	{
+		LD_SPAWN_SPEC Spec{};
+		Spec.strObjectName = pObjectName;
+		Spec.strPrototypeTag = CWaddleDee::PROTOTYPE_TAG;
+		Spec.strLayerTag = L"Layer_LevelDesign_NPC";
+		Spec.eCategory = LD_CATEGORY::META;
+		Spec.pPrototypeFactory = &Create_WaddleDeePrototype;
+		Spec.pBuildDesc = &Build_WaddleDeeDesc;
+		Spec.bUseFactoryResourceLoader = true;
+
+		Register(Spec.strObjectName, Spec);
+	}
 }
 
 void CLevelDesign_Registry::Register_ItemsAndBreakables()
@@ -260,6 +322,7 @@ void CLevelDesign_Registry::Register_EnemiesAndGimmicks()
 	CLD_DeformObject::Register_LevelDesignSpecs();
 	CLD_Stage1BossDemo::Register_LevelDesignSpecs();
 	CLD_SlopeBoardA::Register_LevelDesignSpecs();
+	CLD_SlopeBoardB::Register_LevelDesignSpecs();
 	CLD_SlopeBoardC::Register_LevelDesignSpecs();
 	CLD_DeformCarBreakWall::Register_LevelDesignSpecs();
 	CLD_GarageRadio::Register_LevelDesignSpecs();

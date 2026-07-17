@@ -68,6 +68,15 @@ void CKabu::Set_RailDesc(const LD_RAIL_DESC& Desc)
     static_cast<CMonster_RailMovement*>(m_pMovement)->Set_Rail(Desc);
 }
 
+HRESULT CKabu::Bind_Rail(const RAIL_BIND_CONTEXT& Context)
+{
+    if (nullptr == Context.pRailDesc || nullptr == m_pMovement)
+        return E_FAIL;
+
+    Set_RailDesc(*Context.pRailDesc);
+    return S_OK;
+}
+
 void  CKabu::Set_Visible(_bool bVisible)
 {
     m_bVisible = bVisible;

@@ -1,7 +1,11 @@
 #include "LevelDesign_Rail.h"
+#include "GameContent_const.h"
+#include "RailTrack.h"
+#include "MeshLayer_Binder.h"
 
 #include "DebugDraw.h"
 #include "GameInstance_Proxy.h"
+#include "Geometry_Utils.h"
 
 namespace
 {
@@ -34,25 +38,6 @@ namespace
 
 		return XMVectorGetX(XMVector3LengthSq(vDirection)) > 1e-8f ? XMVector3Normalize(vDirection) : XMVectorZero();
 	}
-
-	_bool Is_CircleRail(const LD_RAIL_DESC& RailDesc)
-	{
-		return RailDesc.fRadius > 0.001f;
-	}
-
-	_bool Is_BezierRail(const LD_RAIL_DESC& RailDesc)
-	{
-		if (Is_CircleRail(RailDesc))
-			return false;
-
-		for (const LD_RAIL_NODE_DESC& Node : RailDesc.Nodes)
-		{
-			if (Node.fBezierControlLength > 0.001f)
-				return true;
-		}
-
-		return false;
-	}
 }
 
 NS_BEGIN(Client)
@@ -64,7 +49,8 @@ CLevelDesign_Rail::CLevelDesign_Rail(ID3D11Device* pDevice, ID3D11DeviceContext*
 
 CLevelDesign_Rail::CLevelDesign_Rail(const CLevelDesign_Rail& Prototype)
 	: CLevelDesignObject(Prototype)
-	, m_tRailDesc(Prototype.m_tRailDesc)
+	, m_tRailDesc{ Prototype.m_tRailDesc }
+	, m_pRailTrack{ nullptr }
 {
 }
 
@@ -78,8 +64,7 @@ HRESULT CLevelDesign_Rail::Initialize(void* pArg)
 	if (nullptr == pArg)
 		return E_FAIL;
 
-	const LD_PARSED_OBJECT* pParsedDesc =
-		static_cast<const LD_PARSED_OBJECT*>(pArg);
+	const LD_PARSED_OBJECT* pParsedDesc = static_cast<const LD_PARSED_OBJECT*>(pArg);
 
 	m_tRailDesc = pParsedDesc->Rail;
 
@@ -87,6 +72,12 @@ HRESULT CLevelDesign_Rail::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_tLevelDesignDesc.eCategory = LD_CATEGORY::RAIL;
+
+	m_pRailTrack = CRailTrack::Create();
+	if (nullptr == m_pRailTrack)
+		return E_FAIL;
+
+	m_pRailTrack->Build(m_tRailDesc);
 
 #ifdef _DEBUG
 	if (FAILED(Ready_DebugResources()))
@@ -99,20 +90,66 @@ HRESULT CLevelDesign_Rail::Initialize(void* pArg)
 	return S_OK;
 }
 
+HRESULT CLevelDesign_Rail::Validate_Initialized()
+{
+	if (FAILED(__super::Validate_Initialized()))
+		return E_FAIL;
+
+	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom || nullptr == m_pRailTrack)
+		return E_FAIL;
+	if (LD_CATEGORY::RAIL != m_tLevelDesignDesc.eCategory)
+		return E_FAIL;
+	if (m_tLevelDesignDesc.strObjectName.empty())
+		return E_FAIL;
+
+	if (m_tRailDesc.fRadius < 0.f || m_tRailDesc.fBezierControlLength < 0.f)
+		return E_FAIL;
+	if (0 == Get_SegmentCount(m_tRailDesc))
+		return E_FAIL;
+	if (!m_pRailTrack->Is_Valid())
+		return E_FAIL;
+
+	for (const LD_RAIL_NODE_DESC& Node : m_tRailDesc.Nodes)
+	{
+		if (Node.fBezierControlLength < 0.f)
+			return E_FAIL;
+	}
+
+#ifdef _DEBUG
+	if (nullptr == m_pBatch || nullptr == m_pEffect || nullptr == m_pInputLayout)
+		return E_FAIL;
+#endif
+
+	return S_OK;
+}
+
 void CLevelDesign_Rail::Late_Update(_float fTimeDelta)
 {
 	UNREFERENCED_PARAMETER(fTimeDelta);
 
+	if (m_bVisualReady)
+	{
+		Check_Visible();
+		Submit_RenderGroups();
+		return;
+	}
+
 #ifdef _DEBUG
 	if (m_tRailDesc.Nodes.size() >= 2 && m_pGameInstance_Proxy->IsOn_DebugRender())
-	{
 		m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONLIGHT, this);
-	}
 #endif
 }
 
 HRESULT CLevelDesign_Rail::Render()
 {
+	if (m_bVisualReady)
+	{
+		if (FAILED(Bind_ShaderResources()))
+			return E_FAIL;
+
+		return Render_Model();
+	}
+
 #ifdef _DEBUG
 	return Render_Rail();
 #else
@@ -120,8 +157,55 @@ HRESULT CLevelDesign_Rail::Render()
 #endif
 }
 
-void CLevelDesign_Rail::Copy_PrototypeName(
-	ENGINE_OBJECT_DATA* pOutData)
+HRESULT CLevelDesign_Rail::Render_Shadow()
+{
+	if (!m_bVisualReady)
+		return S_OK;
+
+	if (nullptr == m_pShaderCom || nullptr == m_pModelCom || nullptr == m_pInstanceBuffer || nullptr == m_pGameInstance_Proxy || m_Instances.empty())
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::VIEW))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Shadow_Transform(D3DTS::PROJ))))
+		return E_FAIL;
+
+	const _uint iInstanceCount = static_cast<_uint>(m_Instances.size());
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
+
+		MESH_LAYER_BIND_CONTEXT Ctx{};
+		Ctx.pShader = m_pShaderCom;
+		Ctx.pModel = m_pModelCom;
+		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+		Ctx.iMesh = i;
+		Ctx.pLayer = &Layer;
+		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_INSTANCE;
+		Ctx.eKind = MESH_LAYER_RENDER_KIND::SHADOW;
+		Ctx.iFallbackPass = ETOUI(WORLD_PASS::SHADOW);
+
+		MESH_LAYER_BIND_RESULT Result{};
+		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
+			return E_FAIL;
+
+		if (Result.bSkipMesh)
+			continue;
+
+		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+			return E_FAIL;
+
+		if (FAILED(m_pModelCom->Render_Instanced(i, m_pInstanceBuffer, sizeof(COASTER_RAIL_INSTANCE_DATA), iInstanceCount)))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+void CLevelDesign_Rail::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 {
 	if (nullptr == pOutData)
 		return;
@@ -129,7 +213,248 @@ void CLevelDesign_Rail::Copy_PrototypeName(
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
 }
 
-const CLevelDesign_Rail* CLevelDesign_Rail::Find_ByUid(CGameInstance_Proxy* pProxy, _uint iLevelIndex, _uint iRailUid)
+HRESULT CLevelDesign_Rail::Ready_RenderComponents(_uint iModelPrototypeLevel)
+{
+	if (nullptr == m_pShaderCom)
+	{
+		m_pShaderCom = Add_Component<CShader>(Shader_World_Instance.iLevelID, Shader_World_Instance.szProtoTag, TEXT("Com_Shader"));
+		if (nullptr == m_pShaderCom)
+			return E_FAIL;
+	}
+
+	if (nullptr == m_pModelCom)
+	{
+		m_pModelCom = Add_Component<CModel>(iModelPrototypeLevel, COASTER_RAIL_MODEL_PROTO_TAG, TEXT("Com_Model"));
+		if (nullptr == m_pModelCom)
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Rail::Ready_InstanceData()
+{
+	if (!m_Instances.empty())
+		return S_OK;
+
+	if (nullptr == m_pRailTrack || !m_pRailTrack->Is_Valid() || nullptr == m_pModelCom)
+		return E_FAIL;
+
+	_float3 vMin{};
+	_float3 vMax{};
+	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
+
+	const _float fPieceLength = vMax.z - vMin.z;
+	const _float fRailLength = m_pRailTrack->Get_Length();
+
+	if (fPieceLength <= 0.001f || fRailLength <= 0.001f)
+		return E_FAIL;
+
+	constexpr _float fOverlap = 0.05f;
+	const _float fStep = max(fPieceLength - fOverlap, 0.01f);
+	const _vector vRight = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+
+	m_Instances.reserve(static_cast<size_t>(ceilf(fRailLength / fStep)));
+
+	for (_float fDistance = 0.f; fDistance < fRailLength; fDistance += fStep)
+	{
+		const _float fNextDistance = min(fDistance + fPieceLength, fRailLength);
+
+		if (fNextDistance - fDistance <= 0.0001f)
+			break;
+
+		_float3 vStart{};
+		_float3 vMiddle{};
+		_float3 vEnd{};
+		_float3 vTangent{};
+
+		if (!m_pRailTrack->Sample(fDistance, &vStart)
+			|| !m_pRailTrack->Sample((fDistance + fNextDistance) * 0.5f, &vMiddle, &vTangent)
+			|| !m_pRailTrack->Sample(fNextDistance, &vEnd))
+		{
+			m_Instances.clear();
+			return E_FAIL;
+		}
+
+		const _vector vSegment = XMLoadFloat3(&vEnd) - XMLoadFloat3(&vStart);
+		const _float fActualLength = XMVectorGetX(XMVector3Length(vSegment));
+		const _vector vTangentVector = XMLoadFloat3(&vTangent);
+
+		if (fActualLength <= 0.0001f || XMVectorGetX(XMVector3LengthSq(vTangentVector)) <= 1e-8f)
+		{
+			m_Instances.clear();
+			return E_FAIL;
+		}
+
+		const _float fScaleZ = fActualLength / fPieceLength;
+		const _vector vLook = XMVector3Normalize(vTangentVector);
+		const _vector vUp = XMVector3Normalize(XMVector3Cross(vLook, vRight));
+		const _matrix World = XMMATRIX(vRight, vUp, vLook * fScaleZ, XMVectorSet(vMiddle.x, vMiddle.y, vMiddle.z, 1.f));
+
+		COASTER_RAIL_INSTANCE_DATA InstanceData{};
+		XMStoreFloat4x4(&InstanceData.matWorld, World);
+		m_Instances.emplace_back(InstanceData);
+	}
+
+	return m_Instances.empty() ? E_FAIL : S_OK;
+}
+
+HRESULT CLevelDesign_Rail::Ready_InstanceBuffer()
+{
+	if (nullptr != m_pInstanceBuffer)
+		return S_OK;
+
+	if (m_Instances.empty())
+		return E_FAIL;
+
+	D3D11_BUFFER_DESC tDesc{};
+	tDesc.ByteWidth = static_cast<_uint>(sizeof(COASTER_RAIL_INSTANCE_DATA) * m_Instances.size());
+	tDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	tDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	tDesc.StructureByteStride = sizeof(COASTER_RAIL_INSTANCE_DATA);
+
+	D3D11_SUBRESOURCE_DATA InitialData{};
+	InitialData.pSysMem = m_Instances.data();
+
+	if (FAILED(m_pDevice->CreateBuffer(&tDesc, &InitialData, &m_pInstanceBuffer)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Rail::Ready_VisualCullBounds()
+{
+	if (nullptr == m_pModelCom || nullptr == m_pTransformCom || m_Instances.empty())
+		return E_FAIL;
+
+	_float3 vMin{};
+	_float3 vMax{};
+	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
+
+	if (!GeometryUtils::Is_ValidAABB(vMin, vMax))
+		return E_FAIL;
+
+	const BoundingBox ModelBounds = GeometryUtils::Make_AABB_FromMinMax(vMin, vMax);
+	const _matrix RailWorldMatrix = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr());
+	const _float fDeterminant = XMVectorGetX(XMMatrixDeterminant(RailWorldMatrix));
+
+	if (fabsf(fDeterminant) <= 1e-8f)
+		return E_FAIL;
+
+	const _matrix InverseRailWorldMatrix = XMMatrixInverse(nullptr, RailWorldMatrix);
+
+	BoundingBox CullBounds{};
+	_bool bHasBounds = false;
+
+	for (const COASTER_RAIL_INSTANCE_DATA& InstanceData : m_Instances)
+	{
+		const _matrix InstanceLocalMatrix = XMLoadFloat4x4(&InstanceData.matWorld) * InverseRailWorldMatrix;
+
+		BoundingBox InstanceBounds{};
+		if (!GeometryUtils::Transform_AABB(ModelBounds, InstanceLocalMatrix, &InstanceBounds))
+			return E_FAIL;
+
+		if (!GeometryUtils::Is_ValidAABB(InstanceBounds))
+			return E_FAIL;
+
+		CullBounds = bHasBounds ? GeometryUtils::Merge_AABB(CullBounds, InstanceBounds) : InstanceBounds;
+		bHasBounds = true;
+	}
+
+	if (!bHasBounds)
+		return E_FAIL;
+
+	return Ready_CullingState(CullBounds);
+}
+
+HRESULT CLevelDesign_Rail::Bind_ShaderResources()
+{
+	if (nullptr == m_pShaderCom || nullptr == m_pGameInstance_Proxy)
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::VIEW, m_eProjType))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance_Proxy->Get_Matrix(D3DTS::PROJ, m_eProjType))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_iMaterialID", &m_iMaterialID, sizeof(_uint))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Rail::Render_Model()
+{
+	if (nullptr == m_pShaderCom || nullptr == m_pModelCom || nullptr == m_pInstanceBuffer || m_Instances.empty())
+		return E_FAIL;
+
+	const _uint iInstanceCount = static_cast<_uint>(m_Instances.size());
+	const _uint iNumMeshes = static_cast<_uint>(m_pModelCom->Get_NumMeshes());
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		const MESH_LAYER_IDX& Layer = m_pModelCom->Get_MeshLayer(i);
+		const _bool bUseColorPass = (0u == m_pModelCom->Get_MeshTextureCount(i, MTEX_TYPE::DIFFUSE));
+
+		MESH_LAYER_BIND_CONTEXT Ctx{};
+		Ctx.pShader = m_pShaderCom;
+		Ctx.pModel = m_pModelCom;
+		Ctx.pCullingState = m_pCullingState;
+		Ctx.pGI_Proxy = m_pGameInstance_Proxy;
+		Ctx.iMesh = i;
+		Ctx.pLayer = &Layer;
+		Ctx.eProfile = MESH_LAYER_PROFILE::WORLD_INSTANCE;
+		Ctx.eKind = MESH_LAYER_RENDER_KIND::MAIN;
+		Ctx.iFallbackPass = bUseColorPass ? ETOUI(WORLD_PASS::COLOR_CONST_MRA) : ETOUI(WORLD_PASS::DMN);
+
+		MESH_LAYER_BIND_RESULT Result{};
+		if (FAILED(MeshLayerBinder::Bind(Ctx, &Result)))
+			return E_FAIL;
+
+		if (Result.bSkipMesh)
+			continue;
+
+		if (FAILED(m_pShaderCom->Begin(Result.iPass)))
+			return E_FAIL;
+
+		if (FAILED(m_pModelCom->Render_Instanced(i, m_pInstanceBuffer, sizeof(COASTER_RAIL_INSTANCE_DATA), iInstanceCount)))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Rail::Enable_Visual(RAIL_VISUAL_TYPE eType, _uint iModelPrototypeLevel)
+{
+	if (RAIL_VISUAL_TYPE::NONE == eType)
+		return S_OK;
+
+	if (RAIL_VISUAL_TYPE::COASTER != eType)
+		return E_FAIL;
+
+	if (m_bVisualReady)
+		return m_eVisualType == eType ? S_OK : E_FAIL;
+
+	if (FAILED(Ready_RenderComponents(iModelPrototypeLevel)))
+		return E_FAIL;
+
+	if (FAILED(Ready_InstanceData()))
+		return E_FAIL;
+
+	if (FAILED(Ready_VisualCullBounds()))
+		return E_FAIL;
+
+	if (FAILED(Ready_InstanceBuffer()))
+		return E_FAIL;
+
+	m_eVisualType = eType;
+	m_bUseShadow = true;
+	m_bVisualReady = true;
+	return S_OK;
+}
+
+CLevelDesign_Rail* CLevelDesign_Rail::Find_ByUid(CGameInstance_Proxy* pProxy, _uint iLevelIndex, _uint iRailUid)
 {
 	if (nullptr == pProxy || 0 == iRailUid)
 		return nullptr;
@@ -140,14 +465,21 @@ const CLevelDesign_Rail* CLevelDesign_Rail::Find_ByUid(CGameInstance_Proxy* pPro
 
 _uint CLevelDesign_Rail::Get_SegmentCount(const LD_RAIL_DESC& RailDesc)
 {
-	if (Is_CircleRail(RailDesc))
-		return RailDesc.fRadius > 0.001f ? 1 : 0;
+	switch (RailDesc.eType)
+	{
+	case LD_RAIL_TYPE::LINE:
+	case LD_RAIL_TYPE::BEZIER:
+		if (RailDesc.Nodes.size() < 2)
+			return 0;
 
-	if (RailDesc.Nodes.size() < 2)
+		return static_cast<_uint>(RailDesc.Nodes.size() - 1 + (RailDesc.bClose && RailDesc.Nodes.size() > 2 ? 1 : 0));
+
+	case LD_RAIL_TYPE::CIRCLE:
+		return RailDesc.fRadius > 0.001f ? 1u : 0u;
+
+	default:
 		return 0;
-
-	const _bool bClose = RailDesc.bClose && RailDesc.Nodes.size() > 2;
-	return static_cast<_uint>(RailDesc.Nodes.size() - 1 + (bClose ? 1 : 0));
+	}
 }
 
 _bool CLevelDesign_Rail::Evaluate_Segment(const LD_RAIL_DESC& RailDesc, _uint iSegmentIndex, _float fT, _float3* pOutPosition, _float3* pOutTangent)
@@ -161,7 +493,7 @@ _bool CLevelDesign_Rail::Evaluate_Segment(const LD_RAIL_DESC& RailDesc, _uint iS
 
 	const _float fClampedT = std::clamp(fT, 0.f, 1.f);
 
-	if (!Is_CircleRail(RailDesc) && !Is_BezierRail(RailDesc))
+	if (LD_RAIL_TYPE::LINE == RailDesc.eType)
 	{
 		const _uint iStartIndex = iSegmentIndex;
 		const _uint iEndIndex = iSegmentIndex + 1 < RailDesc.Nodes.size() ? iSegmentIndex + 1 : 0;
@@ -182,7 +514,7 @@ _bool CLevelDesign_Rail::Evaluate_Segment(const LD_RAIL_DESC& RailDesc, _uint iS
 		return true;
 	}
 
-	if (Is_BezierRail(RailDesc))
+	if (LD_RAIL_TYPE::BEZIER == RailDesc.eType)
 	{
 		const _uint iStartIndex = iSegmentIndex;
 		const _uint iEndIndex = iSegmentIndex + 1 < RailDesc.Nodes.size() ? iSegmentIndex + 1 : 0;
@@ -221,7 +553,7 @@ _bool CLevelDesign_Rail::Evaluate_Segment(const LD_RAIL_DESC& RailDesc, _uint iS
 		return true;
 	}
 
-	if (Is_CircleRail(RailDesc))
+	if (LD_RAIL_TYPE::CIRCLE == RailDesc.eType)
 	{
 		_float fStartAngle = 0.f;
 
@@ -252,39 +584,7 @@ _bool CLevelDesign_Rail::Evaluate_Segment(const LD_RAIL_DESC& RailDesc, _uint iS
 	return false;
 }
 
-HRESULT CLevelDesign_Rail::Validate_Initialized()
-{
-	if (FAILED(__super::Validate_Initialized()))
-		return E_FAIL;
-
-	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom)
-		return E_FAIL;
-	if (LD_CATEGORY::RAIL != m_tLevelDesignDesc.eCategory)
-		return E_FAIL;
-	if (m_tLevelDesignDesc.strObjectName.empty())
-		return E_FAIL;
-
-	if (m_tRailDesc.fRadius < 0.f || m_tRailDesc.fBezierControlLength < 0.f)
-		return E_FAIL;
-	if (0 == Get_SegmentCount(m_tRailDesc))
-		return E_FAIL;
-
-	for (const LD_RAIL_NODE_DESC& Node : m_tRailDesc.Nodes)
-	{
-		if (Node.fBezierControlLength < 0.f)
-			return E_FAIL;
-	}
-
 #ifdef _DEBUG
-	if (nullptr == m_pBatch || nullptr == m_pEffect || nullptr == m_pInputLayout)
-		return E_FAIL;
-#endif
-
-	return S_OK;
-}
-
-#ifdef _DEBUG
-
 HRESULT CLevelDesign_Rail::Ready_DebugResources()
 {
 	m_pBatch =
@@ -339,7 +639,7 @@ HRESULT CLevelDesign_Rail::Render_Rail()
 
 	const _float4 vRailColor = { 1.f, 0.85f, 0.15f, 1.f };
 	const _float4 vNodeColor = { 1.f, 0.85f, 0.15f, 1.f };
-	const _bool bCircle = Is_CircleRail(m_tRailDesc);
+	const _bool bCircle = LD_RAIL_TYPE::CIRCLE == m_tRailDesc.eType;
 
 	m_pBatch->Begin();
 
@@ -355,7 +655,7 @@ HRESULT CLevelDesign_Rail::Render_Rail()
 	{
 		vector<VertexPositionColor> Vertices;
 
-		if (Is_BezierRail(m_tRailDesc))
+		if (LD_RAIL_TYPE::BEZIER == m_tRailDesc.eType)
 		{
 			constexpr _uint iSamplesPerSegment = 16;
 			const _uint iSegmentCount = Get_SegmentCount(m_tRailDesc);
@@ -414,7 +714,6 @@ HRESULT CLevelDesign_Rail::Render_Rail()
 
 	return S_OK;
 }
-
 #endif
 
 CLevelDesign_Rail* CLevelDesign_Rail::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -445,6 +744,9 @@ CGameObject* CLevelDesign_Rail::Clone(void* pArg)
 
 void CLevelDesign_Rail::Free()
 {
+	Safe_Release(m_pInstanceBuffer);
+	Safe_Release(m_pRailTrack);
+
 #ifdef _DEBUG
 	Safe_Release(m_pInputLayout);
 	Safe_Delete(m_pEffect);

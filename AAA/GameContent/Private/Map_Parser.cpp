@@ -4,6 +4,7 @@
 
 #include "DataLoader.h"
 #include "Parsing_Utils.h"
+#include "TownCondition_Utils.h"
 
 #include <cctype>
 #include <exception>
@@ -453,6 +454,9 @@ void CMap_Parser::Parse_SectionObject(
 	for (auto Iter = jSection.begin(); Iter != jSection.end(); ++Iter)
 	{
 		if (!Iter.value().is_object())
+			continue;
+
+		if (!TownConditionUtils::Passes_AllUnlocked(Iter.value()))
 			continue;
 
 		const wstring wstrEntryKey = StrToWstr(Iter.key());

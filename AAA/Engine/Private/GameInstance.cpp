@@ -637,28 +637,12 @@ _bool CGameInstance::Should_CullAABB(CULLING_VIEW eView, const BoundingBox& Worl
     return m_pCulling_Manager->Should_CullAABB(eView, WorldBounds);
 }
 
-_bool CGameInstance::Should_CullByDistance(const BoundingBox& WorldBounds, _float fCullDistance) const
-{
-    if (nullptr == m_pCulling_Manager)
-        return false;
-
-    return m_pCulling_Manager->Should_CullByDistance(WorldBounds, fCullDistance);
-}
-
-_float CGameInstance::Compute_SurfaceDistance(const BoundingSphere& WorldBounds) const
-{
-    if (nullptr == m_pCulling_Manager)
-        return -1.f;
-
-    return m_pCulling_Manager->Compute_SurfaceDistance(WorldBounds);
-}
-
-CULLING_FADE_RESULT CGameInstance::Evaluate_FrustumFadeAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds, _float fFadeWidth, _uint iPlaneMask) const
+CULLING_FADE_RESULT CGameInstance::Evaluate_FrustumFadeAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds, _uint iPlaneMask) const
 {
     if (nullptr == m_pCulling_Manager)
         return {};
 
-    return m_pCulling_Manager->Evaluate_FrustumFadeAABB(eView, WorldBounds, fFadeWidth, iPlaneMask);
+    return m_pCulling_Manager->Evaluate_FrustumFadeAABB(eView, WorldBounds, iPlaneMask);
 }
 
 CULLING_FADE_RESULT CGameInstance::Evaluate_DistanceFade(const BoundingSphere& WorldBounds, _float fCullDistance, _float fFadeWidth) const
@@ -667,30 +651,6 @@ CULLING_FADE_RESULT CGameInstance::Evaluate_DistanceFade(const BoundingSphere& W
         return {};
 
     return m_pCulling_Manager->Evaluate_DistanceFade(WorldBounds, fCullDistance, fFadeWidth);
-}
-
-CULLING_FADE_RESULT CGameInstance::Evaluate_DistanceFade(_float fSurfaceDistance, _float fCullDistance, _float fFadeWidth) const
-{
-    if (nullptr == m_pCulling_Manager)
-        return {};
-
-    return m_pCulling_Manager->Evaluate_DistanceFade(fSurfaceDistance, fCullDistance, fFadeWidth);
-}
-
-_bool XM_CALLCONV CGameInstance::IsIn_CullingView_WorldSpace(CULLING_VIEW eView, _fvector vWorldPos, _float fRange) const
-{
-    if (nullptr == m_pCulling_Manager)
-        return true;
-
-    return m_pCulling_Manager->IsIn_WorldSpace(eView, vWorldPos, fRange);
-}
-
-_bool CGameInstance::IsIn_CullingView_AABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const
-{
-    if (nullptr == m_pCulling_Manager)
-        return true;
-
-    return m_pCulling_Manager->IsIn_WorldSpace_AABB(eView, WorldBounds);
 }
 #pragma endregion
 

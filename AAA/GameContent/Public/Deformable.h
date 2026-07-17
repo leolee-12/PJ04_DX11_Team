@@ -14,6 +14,10 @@ struct DEFORM_ACQUIRED_EVENT
     DEFORM_TYPE eType = { DEFORM_TYPE::NONE };
     IDeformable* pSource = { nullptr };
     _float4x4 PreDeformWorld = {};
+
+    // COASTER일 때만 유효. 0 == iRailUid이면 Rail 없음.
+    _uint iRailUid = 0u;
+    _uint iStartNodeIndex = 0u;
 };
 
 enum class DEFORM_OBJECT_KIND
