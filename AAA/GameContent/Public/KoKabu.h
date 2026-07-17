@@ -54,18 +54,16 @@ public:
 	virtual void				On_SpatBegin() override;
 	virtual void				On_SpatEnd()   override;
 
-
 	void						On_Swallowed();
 
-
-
-	void						Despawn();
 
 protected:
 	virtual HRESULT				Initialize(void* pArg) override;
 	virtual void				Update(_float fTimeDelta) override;
+	virtual HRESULT				Render() override;
 	virtual HRESULT				Ready_Visual() override;
 
+	virtual	void				On_Launched() override;
 	virtual void				On_Impact() override;
 
 private:
@@ -77,6 +75,10 @@ private:
 
 	void						Update_Captured(_float fTimeDelta);
 	void						Update_Spin(_float fTimeDelta);
+	void						Update_SpatPivot_FromBone();
+	void						Despawn();
+
+	HRESULT						Bind_ShaderResources();
 
 private:
 	KOKABU_STATE				m_eState = { KOKABU_STATE::IDLE };
@@ -85,6 +87,7 @@ private:
 
 	// Inhale
 	CGameObject*				m_pCaptor = { nullptr };
+	_float3                     m_vSpatPivot = { 0.f, 0.f, 0.f };
 
 	_float						m_fPullSpeed = { 0.f };
 	_float3						m_vBaseScale = {};
