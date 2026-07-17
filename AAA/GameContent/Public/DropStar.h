@@ -6,6 +6,7 @@
 NS_BEGIN(Engine)
 class CCollider;
 class CController;
+class CEffect_Container;
 NS_END
 
 NS_BEGIN(Client)
@@ -55,6 +56,9 @@ private:
     HRESULT                     Ready_Collider();
     HRESULT                     Ready_Movement();
     HRESULT                     Ready_PartObjects();
+    void                        Start_HaloFx();
+    void                        Stop_HaloFx();
+    void                        Update_HaloSocket();
 
     void                        Reveal();
     void                        Update_Captured(_float fTimeDelta);
@@ -73,6 +77,9 @@ private:
     CCollider*                  m_pCollider = { nullptr };   // »Ì¿‘ ∞®¡ˆ hurtbox
     CController*                m_pController = { nullptr };
     CBubbleMovement*            m_pMovement = { nullptr };
+    Engine::CEffect_Container*  m_pHaloFx = { nullptr };
+    _float4x4                   m_matHaloWorld = {};
+    _uint64                     m_iHaloFxEpoch = {};
 
     CDropStar_Manager*          m_pPool = { nullptr };
     _uint                       m_iPoolLevel = {};

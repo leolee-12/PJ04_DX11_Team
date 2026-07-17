@@ -82,6 +82,7 @@ namespace
         { TEXT("Tornado_BK"),             TEXT("../../Resources/CHJ/Effect/Tornado_BK.JSON") },
         { TEXT("EssenceAura"),            TEXT("../../Resources/CHJ/Effect/EssenceAura.JSON") },
         { TEXT("PickUpEffect"),           TEXT("../../Resources/CHJ/Effect/PickUpEffect.JSON") },
+        { TEXT("DropStarEffect"),         TEXT("../../Resources/CHJ/Effect/DropStarEffect.JSON") },
     };
 }
 
@@ -103,7 +104,7 @@ HRESULT CEffect_Loader::Ready(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice
 
         const _wstring strProtoTag = StrToWstr(jEffect["Prototype_Tag"].get<string>());
 
-        // ������Ÿ�� STATIC 1ȸ ���
+        // ������Ÿ�� STATIC 1ȸ ���?
         if (!pProxy->Has_Prototype(ETOUI(LEVEL::STATIC), strProtoTag))
         {
             auto* pReg = CGameObject_Factory::GetInstance()->Get_Registration(strProtoTag);

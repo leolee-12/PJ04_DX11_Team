@@ -87,6 +87,7 @@
 #include "SmokeCollection.h"
 #include "CarLanding.h"
 #include "PickUpEffect.h"
+#include "DropStarEffect.h"
 #include "SmokeSphereOriginalEmitter.h"
 #include "SwordTrail_BK.h"
 #include "Tornado_BK.h"
@@ -965,6 +966,17 @@ void CGameObject_Factory::Register_Effect()
 
             TRY_ADD_PROTO(pProxy, Texture_CommonSparkle01.iLevelID, Texture_CommonSparkle01.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_CommonSparkle01.szFileTag, Texture_CommonSparkle01.iNumTex));
+
+        ));
+
+    Register(CDropStarEffect::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CDropStarEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG, CRectCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, Texture_CommonRing01.iLevelID, Texture_CommonRing01.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_CommonRing01.szFileTag, Texture_CommonRing01.iNumTex));
 
         ));
 
