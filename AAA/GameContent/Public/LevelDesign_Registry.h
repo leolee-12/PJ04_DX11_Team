@@ -21,6 +21,7 @@ struct LD_SPAWN_SPEC
 	_wstring strObjectName;
 	_wstring strPrototypeTag;
 	_wstring strLayerTag;
+	_wstring strVariationOwnerName;
 	LD_CATEGORY eCategory = { LD_CATEGORY::UNSUPPORTED };
 	_wstring wstrModelProtoTag;
 	MODEL eModelType = { MODEL::NONANIM };

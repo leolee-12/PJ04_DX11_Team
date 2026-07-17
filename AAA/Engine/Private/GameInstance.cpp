@@ -637,14 +637,6 @@ _bool CGameInstance::Should_CullAABB(CULLING_VIEW eView, const BoundingBox& Worl
     return m_pCulling_Manager->Should_CullAABB(eView, WorldBounds);
 }
 
-_float CGameInstance::Compute_SurfaceDistance(const BoundingSphere& WorldBounds) const
-{
-    if (nullptr == m_pCulling_Manager)
-        return -1.f;
-
-    return m_pCulling_Manager->Compute_SurfaceDistance(WorldBounds);
-}
-
 CULLING_FADE_RESULT CGameInstance::Evaluate_FrustumFadeAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds, _uint iPlaneMask) const
 {
     if (nullptr == m_pCulling_Manager)
@@ -653,12 +645,12 @@ CULLING_FADE_RESULT CGameInstance::Evaluate_FrustumFadeAABB(CULLING_VIEW eView, 
     return m_pCulling_Manager->Evaluate_FrustumFadeAABB(eView, WorldBounds, iPlaneMask);
 }
 
-CULLING_FADE_RESULT CGameInstance::Evaluate_DistanceFade(_float fSurfaceDistance, _float fCullDistance, _float fFadeWidth) const
+CULLING_FADE_RESULT CGameInstance::Evaluate_DistanceFade(const BoundingSphere& WorldBounds, _float fCullDistance, _float fFadeWidth) const
 {
     if (nullptr == m_pCulling_Manager)
         return {};
 
-    return m_pCulling_Manager->Evaluate_DistanceFade(fSurfaceDistance, fCullDistance, fFadeWidth);
+    return m_pCulling_Manager->Evaluate_DistanceFade(WorldBounds, fCullDistance, fFadeWidth);
 }
 #pragma endregion
 

@@ -135,9 +135,8 @@ private:
 #pragma region CULLING_MANAGER
 	_bool Update_CullingView(CULLING_VIEW eView, const CULLING_VIEW_DESC& Desc);
 	_bool Should_CullAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds) const;
-	_float Compute_SurfaceDistance(const BoundingSphere& WorldBounds) const;
 	CULLING_FADE_RESULT Evaluate_FrustumFadeAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds, _uint iPlaneMask) const; 
-	CULLING_FADE_RESULT Evaluate_DistanceFade(_float fSurfaceDistance, _float fCullDistance, _float fFadeWidth) const;
+	CULLING_FADE_RESULT Evaluate_DistanceFade(const BoundingSphere& WorldBounds, _float fCullDistance, _float fFadeWidth) const;
 #pragma endregion
 
 #pragma region LIGHT_MANAGER

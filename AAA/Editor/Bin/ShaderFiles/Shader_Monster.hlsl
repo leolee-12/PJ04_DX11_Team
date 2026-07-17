@@ -25,6 +25,28 @@ float4 g_vConstantEmissive = float4(0.f, 0.f, 0.f, 1.f);
 
 float g_fHitFlash = 0.f;
 float3 g_vHitFlashColor = float3(1.f, 1.f, 1.f);
+float g_fDissolve = 0.f;
+
+static const float Bayer4x4[16] =
+{
+        0.0 / 16.0, 8.0 / 16.0, 2.0 / 16.0, 10.0 / 16.0,
+      12.0 / 16.0, 4.0 / 16.0, 14.0 / 16.0, 6.0 / 16.0,
+       3.0 / 16.0, 11.0 / 16.0, 1.0 / 16.0, 9.0 / 16.0,
+      15.0 / 16.0, 7.0 / 16.0, 13.0 / 16.0, 5.0 / 16
+};
+
+void Apply_Dither(float4 vScreenPos, float fDissolve)
+{
+    [branch]
+    if (fDissolve <= 0.0001f)
+        return;
+    
+    float fVisibility = 1.f - saturate(fDissolve);
+    int2 px = int2(vScreenPos.xy) & 3;
+    
+    if (fVisibility <= Bayer4x4[px.y * 4 + px.x])
+        discard;
+}
 
 struct VS_IN
 {
@@ -164,6 +186,8 @@ struct PS_OUT
 PS_OUT PS_MAIN(PS_IN In)
 {
     PS_OUT Out;
+    
+    Apply_Dither(In.vPosition, g_fDissolve);
 
     vector vEye = g_UnknownTexture.Sample(ClampSampler, In.vTexcoord);
     vector vBase = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord1);
@@ -202,6 +226,8 @@ PS_OUT PS_NONEYE(PS_IN In)
 {
     PS_OUT Out;
 
+    Apply_Dither(In.vPosition, g_fDissolve);
+
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord1);
     
     float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord1).rgb;
@@ -235,6 +261,7 @@ PS_OUT PS_NONEYE(PS_IN In)
 PS_OUT PS_CONSTANT_MATERIAL(PS_IN In)
 {
     PS_OUT Out;
+    Apply_Dither(In.vPosition, g_fDissolve);
 
     Out.vDiffuse = g_vConstantDiffuse;
     Out.vNormal = float4(normalize(In.vNormal).xyz * 0.5f + 0.5f, 0.f);
@@ -251,7 +278,8 @@ PS_OUT PS_CONSTANT_MATERIAL(PS_IN In)
 PS_OUT PS_EYE_WITHOUTNORMAL(PS_IN In)
 {
     PS_OUT Out;
-    
+    Apply_Dither(In.vPosition, g_fDissolve);
+
     vector vEye = g_UnknownTexture.Sample(ClampSampler, In.vTexcoord);
     vector vBase = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord1);
     float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord1).rgb;
@@ -278,6 +306,7 @@ PS_OUT PS_EYE_WITHOUTNORMAL(PS_IN In)
 PS_OUT PS_NONEYE_WITHOUTNORMAL(PS_IN In)
 {
     PS_OUT Out;
+    Apply_Dither(In.vPosition, g_fDissolve);
 
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord1);
     
@@ -303,6 +332,7 @@ PS_OUT PS_NONEYE_WITHOUTNORMAL(PS_IN In)
 PS_OUT PS_BLADEKNIGHT(PS_IN In)
 {
     PS_OUT Out;
+    Apply_Dither(In.vPosition, g_fDissolve);
 
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord);
     float2 nrg = g_NormalTexture.Sample(LinearSampler, In.vTexcoord1).rg;
@@ -341,7 +371,8 @@ PS_OUT PS_BLADEKNIGHT(PS_IN In)
 PS_OUT PS_POPPYFACE(PS_IN In)
 {
     PS_OUT Out;
-    
+    Apply_Dither(In.vPosition, g_fDissolve);
+
     vector vEye = g_UnknownTexture.Sample(ClampSampler, In.vTexcoord);
     vector vBase = g_DiffuseTexture.Sample(LinearSampler, In.vTexcoord1);
     float3 mra = g_MRATexture.Sample(LinearSampler, In.vTexcoord1).rgb;

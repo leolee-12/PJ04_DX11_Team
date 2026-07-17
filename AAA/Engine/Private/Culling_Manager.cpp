@@ -344,6 +344,16 @@ CULLING_FADE_RESULT CCulling_Manager::Evaluate_FrustumFadeAABB(CULLING_VIEW eVie
 	return Result;
 }
 
+CULLING_FADE_RESULT CCulling_Manager::Evaluate_DistanceFade(const BoundingSphere& WorldBounds, _float fCullDistance, _float fFadeWidth) const
+{
+	const _float fSurfaceDistance = Compute_SurfaceDistance(WorldBounds);
+
+	if (!MathUtils::Is_FiniteFloat(fSurfaceDistance) || fSurfaceDistance < 0.f)
+		return {};
+
+	return Evaluate_DistanceFade(fSurfaceDistance, fCullDistance, fFadeWidth);
+}
+
 CULLING_FADE_RESULT CCulling_Manager::Evaluate_DistanceFade(
 	_float fSurfaceDistance,
 	_float fCullDistance,

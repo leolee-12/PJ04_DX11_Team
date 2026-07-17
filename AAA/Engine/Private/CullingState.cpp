@@ -2,7 +2,6 @@
 
 #include "Culling_Manager.h"
 #include "GameInstance_Proxy.h"
-#include "Math_Utils.h"
 #include "Model.h"
 
 namespace
@@ -129,16 +128,12 @@ void CCullingState::Evaluate(const CULLING_EVALUATION_INPUT& Desc)
 
 	if (bEvaluateMainDistance || bEvaluateShadowDistance)
 	{
-		const _float fSurfaceDistance = m_pGameInstance_Proxy->Compute_SurfaceDistance(m_WorldSphere);
+		DistanceResult = m_pGameInstance_Proxy->Evaluate_DistanceFade(
+			m_WorldSphere,
+			CULL_DISTANCE,
+			DISTANCE_FADE_WIDTH);
 
-		if (MathUtils::Is_FiniteFloat(fSurfaceDistance) && fSurfaceDistance >= 0.f)
-		{
-			DistanceResult = m_pGameInstance_Proxy->Evaluate_DistanceFade(
-				fSurfaceDistance,
-				CULL_DISTANCE,
-				DISTANCE_FADE_WIDTH);
-			bHasDistanceResult = true;
-		}
+		bHasDistanceResult = FLT_MAX != DistanceResult.fBoundaryDistance;
 	}
 
 	if (Desc.bEvaluateMain)

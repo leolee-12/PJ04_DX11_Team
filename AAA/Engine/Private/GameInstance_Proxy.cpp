@@ -480,14 +480,6 @@ _bool CGameInstance_Proxy::Should_CullAABB(CULLING_VIEW eView, const BoundingBox
 	return m_pOwner->Should_CullAABB(eView, WorldBounds);
 }
 
-_float CGameInstance_Proxy::Compute_SurfaceDistance(const BoundingSphere& WorldBounds) const
-{
-	if (!IsConnected())
-		return -1.f;
-
-	return m_pOwner->Compute_SurfaceDistance(WorldBounds);
-}
-
 CULLING_FADE_RESULT CGameInstance_Proxy::Evaluate_FrustumFadeAABB(CULLING_VIEW eView, const BoundingBox& WorldBounds, _uint iPlaneMask) const
 {
 	if (!IsConnected())
@@ -496,18 +488,12 @@ CULLING_FADE_RESULT CGameInstance_Proxy::Evaluate_FrustumFadeAABB(CULLING_VIEW e
 	return m_pOwner->Evaluate_FrustumFadeAABB(eView, WorldBounds, iPlaneMask);
 }
 
-CULLING_FADE_RESULT CGameInstance_Proxy::Evaluate_DistanceFade(
-	_float fSurfaceDistance,
-	_float fCullDistance,
-	_float fFadeWidth) const
+CULLING_FADE_RESULT CGameInstance_Proxy::Evaluate_DistanceFade(const BoundingSphere& WorldBounds, _float fCullDistance, _float fFadeWidth) const
 {
 	if (!IsConnected())
 		return {};
 
-	return m_pOwner->Evaluate_DistanceFade(
-		fSurfaceDistance,
-		fCullDistance,
-		fFadeWidth);
+	return m_pOwner->Evaluate_DistanceFade(WorldBounds, fCullDistance, fFadeWidth);
 }
 #pragma endregion
 

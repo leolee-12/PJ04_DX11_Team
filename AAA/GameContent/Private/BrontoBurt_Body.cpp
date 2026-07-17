@@ -90,7 +90,7 @@ HRESULT CBrontoBurt_Body::Ready_Components()
     t.tShader = Shader_Monster;
     t.szModelProtoTag =
         TEXT("Prototype_Component_Model_BrontoBurt_Body");
-    t.szAnimEventFile = TEXT("../../Resources/CHJ/Monster/BrontoBurt/BrontoBurt_AnimEvents.json");
+    t.szAnimEventFile = TEXT("../../Resources/CHJ/Monster/BrontoBurt/Body/BrontoBurt_AnimEvents.json");
 
     if (FAILED(Ready_MeshPart(t)))
         return E_FAIL;
@@ -98,7 +98,7 @@ HRESULT CBrontoBurt_Body::Ready_Components()
     // 눈 표정 텍스처 배열
     m_pEyeTextureCom = Add_Component<CTexture>(TEXT("Com_EyeTexture"),
         CTexture::Create(m_pDevice, m_pContext,
-            L"../../Resources/CHJ/Monster/BrontoBurt/Face.%02d.dds", EYE_COUNT));
+            L"../../Resources/CHJ/Monster/BrontoBurt/Body/Face.%02d.dds", EYE_COUNT));
     if (nullptr == m_pEyeTextureCom)
         return E_FAIL;
 
