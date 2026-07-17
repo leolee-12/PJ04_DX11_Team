@@ -12,11 +12,22 @@ uint g_iMaterialID = 0;
 Texture2D g_DiffuseTexture;
 bool g_bUseDiffuseTexture = { false };
 bool g_bDiffuseColorToAlpha = { false };
+bool g_bUseDiffuseUVEdgeFade = { false };
+int g_iDiffuseUVEdgeFadeAxis = { 0 };
+float g_fDiffuseUVEdgeFadeStartRange = { 0.1f };
+float g_fDiffuseUVEdgeFadeEndRange = { 0.1f };
+float g_fDiffuseUVEdgeFadePower = { 1.f };
 float2 g_vDiffuseTiling = { 1.f, 1.f };
 float2 g_vDiffuseOffset = { 0.f, 0.f };
 
 Texture2D g_UnknownTexture;
 bool g_bUseUnknownTexture = { false };
+bool g_bUnknownColorToAlpha = { false };
+bool g_bUseUnknownUVEdgeFade = { false };
+int g_iUnknownUVEdgeFadeAxis = { 0 };
+float g_fUnknownUVEdgeFadeStartRange = { 0.1f };
+float g_fUnknownUVEdgeFadeEndRange = { 0.1f };
+float g_fUnknownUVEdgeFadePower = { 1.f };
 float2 g_vUnknownTiling = { 1.f, 1.f };
 float2 g_vUnknownOffset = { 0.f, 0.f };
 
@@ -29,6 +40,11 @@ bool g_bUseMRATexture = { false };
 Texture2D g_Texture;
 bool g_bUseTexture = { false };
 bool g_bTextureColorToAlpha = { false };
+bool g_bUseTextureUVEdgeFade = { false };
+int g_iTextureUVEdgeFadeAxis = { 0 };
+float g_fTextureUVEdgeFadeStartRange = { 0.1f };
+float g_fTextureUVEdgeFadeEndRange = { 0.1f };
+float g_fTextureUVEdgeFadePower = { 1.f };
 float2 g_vTextureTiling = { 1.f, 1.f };
 float2 g_vTextureOffset = { 0.f, 0.f };
 
@@ -237,6 +253,35 @@ float4 ApplyColorToAlpha(float4 vTextureValue, bool bUseColorToAlpha)
     return vTextureValue;
 }
 
+float ComputeUVEdgeFade1D(float fCoord, float fStartRange, float fEndRange)
+{
+    fCoord = saturate(fCoord);
+    fStartRange = saturate(fStartRange);
+    fEndRange = saturate(fEndRange);
+
+    float fStartFade = fStartRange > 0.0001f
+        ? smoothstep(0.f, fStartRange, fCoord) : 1.f;
+    float fEndFade = fEndRange > 0.0001f
+        ? smoothstep(0.f, fEndRange, 1.f - fCoord) : 1.f;
+
+    return fStartFade * fEndFade;
+}
+
+float4 ApplyUVEdgeFade(
+    float4 vTextureValue, float2 vTexcoord, bool bUseEdgeFade,
+    int iAxis, float fStartRange, float fEndRange, float fPower)
+{
+    if (bUseEdgeFade == false)
+        return vTextureValue;
+
+    float fFadeX = ComputeUVEdgeFade1D(vTexcoord.x, fStartRange, fEndRange);
+    float fFadeY = ComputeUVEdgeFade1D(vTexcoord.y, fStartRange, fEndRange);
+    float fFade = iAxis == 0 ? fFadeX : (iAxis == 1 ? fFadeY : fFadeX * fFadeY);
+
+    vTextureValue.a *= pow(saturate(fFade), clamp(fPower, 0.1f, 8.f));
+    return vTextureValue;
+}
+
 float4 ComposeEffectColor(float2 vTexcoord, SamplerState EffectSampler)
 {
     float4 vColor = float4(1.f, 1.f, 1.f, 1.f);
@@ -261,8 +306,13 @@ float4 ComposeEffectColor(float2 vTexcoord, SamplerState EffectSampler)
         Apply_LinearUVAnim(vTexcoord, g_bUseLinearUVAnim_T, g_fLinearUVRatio_T, g_iLinearUVAxis_T, g_bLinearUVReverse_T);
 
         float2 vUV = g_vTextureOffset + vTexcoord * g_vTextureTiling + vUVDistortion;
-        vColor *= ApplyColorToAlpha(
+        float4 vTextureValue = ApplyColorToAlpha(
             g_Texture.Sample(EffectSampler, vUV), g_bTextureColorToAlpha);
+        vTextureValue = ApplyUVEdgeFade(
+            vTextureValue, vTexcoord, g_bUseTextureUVEdgeFade,
+            g_iTextureUVEdgeFadeAxis, g_fTextureUVEdgeFadeStartRange,
+            g_fTextureUVEdgeFadeEndRange, g_fTextureUVEdgeFadePower);
+        vColor *= vTextureValue;
     }
 
     if (g_bUseDiffuseTexture == true)
@@ -271,8 +321,13 @@ float4 ComposeEffectColor(float2 vTexcoord, SamplerState EffectSampler)
         Apply_LinearUVAnim(vTexcoord, g_bUseLinearUVAnim_D, g_fLinearUVRatio_D, g_iLinearUVAxis_D, g_bLinearUVReverse_D);
         
         float2 vUV = g_vDiffuseOffset + vTexcoord * g_vDiffuseTiling + vUVDistortion;
-        vColor *= ApplyColorToAlpha(
+        float4 vDiffuseValue = ApplyColorToAlpha(
             g_DiffuseTexture.Sample(EffectSampler, vUV), g_bDiffuseColorToAlpha);
+        vDiffuseValue = ApplyUVEdgeFade(
+            vDiffuseValue, vTexcoord, g_bUseDiffuseUVEdgeFade,
+            g_iDiffuseUVEdgeFadeAxis, g_fDiffuseUVEdgeFadeStartRange,
+            g_fDiffuseUVEdgeFadeEndRange, g_fDiffuseUVEdgeFadePower);
+        vColor *= vDiffuseValue;
     }
 
     if (g_bUseUnknownTexture == true)
@@ -281,7 +336,13 @@ float4 ComposeEffectColor(float2 vTexcoord, SamplerState EffectSampler)
         Apply_LinearUVAnim(vTexcoord, g_bUseLinearUVAnim_U, g_fLinearUVRatio_U, g_iLinearUVAxis_U, g_bLinearUVReverse_U);
 
         float2 vUV = g_vUnknownOffset + vTexcoord * g_vUnknownTiling + vUVDistortion;
-        vColor *= g_UnknownTexture.Sample(EffectSampler, vUV);
+        float4 vUnknownValue = ApplyColorToAlpha(
+            g_UnknownTexture.Sample(EffectSampler, vUV), g_bUnknownColorToAlpha);
+        vUnknownValue = ApplyUVEdgeFade(
+            vUnknownValue, vTexcoord, g_bUseUnknownUVEdgeFade,
+            g_iUnknownUVEdgeFadeAxis, g_fUnknownUVEdgeFadeStartRange,
+            g_fUnknownUVEdgeFadeEndRange, g_fUnknownUVEdgeFadePower);
+        vColor *= vUnknownValue;
     }
 
     if (g_bUseMask == true)

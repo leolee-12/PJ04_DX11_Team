@@ -93,7 +93,23 @@ namespace
 HRESULT Engine::EffectMesh::Bind_ShaderValues(CShader* pShader, const VALUES& Values, _bool bBindUnknownBeforePBR)
 {
     if (FAILED(pShader->Bind_RawValue("g_bTextureColorToAlpha", &Values.bTextureColorToAlpha, sizeof(_bool))) ||
-        FAILED(pShader->Bind_RawValue("g_bDiffuseColorToAlpha", &Values.bDiffuseColorToAlpha, sizeof(_bool))))
+        FAILED(pShader->Bind_RawValue("g_bUseTextureUVEdgeFade", &Values.TextureEdgeFade.bUse, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_iTextureUVEdgeFadeAxis", &Values.TextureEdgeFade.iAxis, sizeof(_int))) ||
+        FAILED(pShader->Bind_RawValue("g_fTextureUVEdgeFadeStartRange", &Values.TextureEdgeFade.fStartRange, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_fTextureUVEdgeFadeEndRange", &Values.TextureEdgeFade.fEndRange, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_fTextureUVEdgeFadePower", &Values.TextureEdgeFade.fPower, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_bDiffuseColorToAlpha", &Values.bDiffuseColorToAlpha, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_bUseDiffuseUVEdgeFade", &Values.DiffuseEdgeFade.bUse, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_iDiffuseUVEdgeFadeAxis", &Values.DiffuseEdgeFade.iAxis, sizeof(_int))) ||
+        FAILED(pShader->Bind_RawValue("g_fDiffuseUVEdgeFadeStartRange", &Values.DiffuseEdgeFade.fStartRange, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_fDiffuseUVEdgeFadeEndRange", &Values.DiffuseEdgeFade.fEndRange, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_fDiffuseUVEdgeFadePower", &Values.DiffuseEdgeFade.fPower, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_bUnknownColorToAlpha", &Values.bUnknownColorToAlpha, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_bUseUnknownUVEdgeFade", &Values.UnknownEdgeFade.bUse, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_iUnknownUVEdgeFadeAxis", &Values.UnknownEdgeFade.iAxis, sizeof(_int))) ||
+        FAILED(pShader->Bind_RawValue("g_fUnknownUVEdgeFadeStartRange", &Values.UnknownEdgeFade.fStartRange, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_fUnknownUVEdgeFadeEndRange", &Values.UnknownEdgeFade.fEndRange, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_fUnknownUVEdgeFadePower", &Values.UnknownEdgeFade.fPower, sizeof(_float))))
         return E_FAIL;
 
     if (FAILED(BindDiffuseValues(pShader, Values)))
@@ -188,11 +204,27 @@ void Engine::EffectMesh::Update_UVAnimations(VALUES& Values, _float fRatio)
 void Engine::EffectMesh::Initialize_DefaultValues(VALUES& Values)
 {
     Values.bTextureColorToAlpha = false;
+    Values.TextureEdgeFade.bUse = false;
+    Values.TextureEdgeFade.iAxis = 0;
+    Values.TextureEdgeFade.fStartRange = 0.1f;
+    Values.TextureEdgeFade.fEndRange = 0.1f;
+    Values.TextureEdgeFade.fPower = 1.f;
     InitializeTexture(Values.Diffuse);
     Values.bDiffuseColorToAlpha = false;
+    Values.DiffuseEdgeFade.bUse = false;
+    Values.DiffuseEdgeFade.iAxis = 0;
+    Values.DiffuseEdgeFade.fStartRange = 0.1f;
+    Values.DiffuseEdgeFade.fEndRange = 0.1f;
+    Values.DiffuseEdgeFade.fPower = 1.f;
     Values.bUseNormalTexture = false;
     Values.bUseMRATexture = false;
     InitializeTexture(Values.Unknown);
+    Values.bUnknownColorToAlpha = false;
+    Values.UnknownEdgeFade.bUse = false;
+    Values.UnknownEdgeFade.iAxis = 0;
+    Values.UnknownEdgeFade.fStartRange = 0.1f;
+    Values.UnknownEdgeFade.fEndRange = 0.1f;
+    Values.UnknownEdgeFade.fPower = 1.f;
 
     InitializeCircle(Values.TextureCircle);
     InitializeCircle(Values.MaskCircle);
