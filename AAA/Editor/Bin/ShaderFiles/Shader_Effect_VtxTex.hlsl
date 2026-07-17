@@ -9,6 +9,7 @@ uint g_iMaterialID = 0;
 
 Texture2D g_Texture;
 bool g_bUseTexture = { false };
+bool g_bTextureColorToAlpha = { false };
 float2 g_vTextureTiling = { 1.f, 1.f };
 float2 g_vTextureOffset = { 0.f, 0.f };
 
@@ -148,6 +149,14 @@ float4 ApplyMaskBlend(float4 vColor, float4 vMaskValue)
     return vColor * lerp(float4(1.f, 1.f, 1.f, 1.f), vMaskValue, saturate(fStrength));
 }
 
+float4 ApplyColorToAlpha(float4 vTextureValue, bool bUseColorToAlpha)
+{
+    if (bUseColorToAlpha == true)
+        vTextureValue.a *= dot(saturate(vTextureValue.rgb), float3(0.299f, 0.587f, 0.114f));
+
+    return vTextureValue;
+}
+
 float4 ComposeEffectBaseColor(PS_IN In, SamplerState EffectSampler)
 {
     if (In.vTexcoord.x > (1.f - g_fUVCutRight) || In.vTexcoord.x < g_fUVCutLeft)
@@ -191,7 +200,8 @@ float4 ComposeEffectBaseColor(PS_IN In, SamplerState EffectSampler)
         else
             vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling + vUVDistortion;
         
-        vColor *= g_Texture.Sample(EffectSampler, vUV);
+        vColor *= ApplyColorToAlpha(
+            g_Texture.Sample(EffectSampler, vUV), g_bTextureColorToAlpha);
     }
     
     if (g_bUseMask == true)

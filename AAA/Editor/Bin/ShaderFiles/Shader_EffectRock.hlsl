@@ -6,6 +6,7 @@ float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
 
 Texture2D g_DiffuseTexture;
 bool g_bUseDiffuseTexture = { false };
+bool g_bDiffuseColorToAlpha = { false };
 float2 g_vDiffuseTiling = { 1.f, 1.f };
 float2 g_vDiffuseOffset = { 0.f, 0.f };
 
@@ -22,6 +23,7 @@ bool g_bUseMRATexture = { false };
 
 Texture2D g_Texture;
 bool g_bUseTexture = { false };
+bool g_bTextureColorToAlpha = { false };
 float2 g_vTextureTiling = { 1.f, 1.f };
 float2 g_vTextureOffset = { 0.f, 0.f };
 
@@ -184,6 +186,14 @@ void Apply_LinearUVAnim(float2 vTexcoord, bool bUse, float fRatio, int iAxis, bo
         discard;
 }
 
+float4 ApplyColorToAlpha(float4 vTextureValue, bool bUseColorToAlpha)
+{
+    if (bUseColorToAlpha == true)
+        vTextureValue.a *= dot(saturate(vTextureValue.rgb), float3(0.299f, 0.587f, 0.114f));
+
+    return vTextureValue;
+}
+
 float4 ComposeEffectColor_Linear(float2 vTexcoord)
 {
     float4 vColor = float4(1.f, 1.f, 1.f, 1.f);
@@ -194,7 +204,8 @@ float4 ComposeEffectColor_Linear(float2 vTexcoord)
         Apply_LinearUVAnim(vTexcoord, g_bUseLinearUVAnim_T, g_fLinearUVRatio_T, g_iLinearUVAxis_T, g_bLinearUVReverse_T);
 
         float2 vUV = g_vTextureOffset + vTexcoord * g_vTextureTiling;
-        vColor *= g_Texture.Sample(LinearSampler, vUV);
+        vColor *= ApplyColorToAlpha(
+            g_Texture.Sample(LinearSampler, vUV), g_bTextureColorToAlpha);
     }
 
     if (g_bUseMask == true)
@@ -212,7 +223,8 @@ float4 ComposeEffectColor_Linear(float2 vTexcoord)
         Apply_LinearUVAnim(vTexcoord, g_bUseLinearUVAnim_D, g_fLinearUVRatio_D, g_iLinearUVAxis_D, g_bLinearUVReverse_D);
 
         float2 vUV = g_vDiffuseOffset + vTexcoord * g_vDiffuseTiling;
-        vColor *= g_DiffuseTexture.Sample(LinearSampler, vUV);
+        vColor *= ApplyColorToAlpha(
+            g_DiffuseTexture.Sample(LinearSampler, vUV), g_bDiffuseColorToAlpha);
     }
 
     if (g_bUseUnknownTexture == true)
@@ -240,7 +252,8 @@ float4 ComposeEffectColor_Mirror(float2 vTexcoord)
         Apply_LinearUVAnim(vTexcoord, g_bUseLinearUVAnim_T, g_fLinearUVRatio_T, g_iLinearUVAxis_T, g_bLinearUVReverse_T);
 
         float2 vUV = g_vTextureOffset + vTexcoord * g_vTextureTiling;
-        vColor *= g_Texture.Sample(MirrorSampler, vUV);
+        vColor *= ApplyColorToAlpha(
+            g_Texture.Sample(MirrorSampler, vUV), g_bTextureColorToAlpha);
     }
 
     if (g_bUseMask == true)
@@ -258,7 +271,8 @@ float4 ComposeEffectColor_Mirror(float2 vTexcoord)
         Apply_LinearUVAnim(vTexcoord, g_bUseLinearUVAnim_D, g_fLinearUVRatio_D, g_iLinearUVAxis_D, g_bLinearUVReverse_D);
 
         float2 vUV = g_vDiffuseOffset + vTexcoord * g_vDiffuseTiling;
-        vColor *= g_DiffuseTexture.Sample(MirrorSampler, vUV);
+        vColor *= ApplyColorToAlpha(
+            g_DiffuseTexture.Sample(MirrorSampler, vUV), g_bDiffuseColorToAlpha);
     }
 
     if (g_bUseUnknownTexture == true)

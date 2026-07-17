@@ -39,6 +39,7 @@ HRESULT Engine::EffectRect::Bind_ShaderValues(CShader* pShader, const VALUES& Va
 HRESULT Engine::EffectRect::Bind_StaticShaderValues(CShader* pShader, const VALUES& Values)
 {
     if (FAILED(pShader->Bind_RawValue("g_bBillboard", &Values.bBillboard, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_bTextureColorToAlpha", &Values.bTextureColorToAlpha, sizeof(_bool))) ||
         FAILED(pShader->Bind_RawValue("g_bSpriteAniTexture", &Values.bSpriteAniTexture, sizeof(_bool))) ||
         FAILED(pShader->Bind_RawValue("g_bSpriteAniMask", &Values.bSpriteAniMask, sizeof(_bool))))
         return E_FAIL;
@@ -111,6 +112,7 @@ void Engine::EffectRect::Update_SpriteAnimations(VALUES& Values, _float fRatio, 
 void Engine::EffectRect::Initialize_DefaultValues(VALUES& Values)
 {
     Values.bBillboard = false;
+    Values.bTextureColorToAlpha = false;
 
     Values.bSpriteAniTexture = false;
     Values.iTexFrameX = 1;
