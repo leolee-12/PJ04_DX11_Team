@@ -50,11 +50,11 @@ private:
 	HRESULT Ready_PartObjects();
 	HRESULT Ready_HurtBox();
 	HRESULT Validate_Initialized();
+	_bool Is_Sitting() const;
 
 	void Change_State(WADDLEDEE_STATE eState);
 	_bool Find_Player();
 	void Check_Interact();
-	void Turn_ToPlayer(_float fTimeDelta);
 
 	void Update_Idle(_float fTimeDelta);
 	void Update_Walk(_float fTimeDelta);
@@ -70,16 +70,20 @@ private:
 
 	WADDLEDEE_STATE m_eState = { WADDLEDEE_STATE::IDLE };
 	_float m_fStateTimer = { 0.f };
+	_string m_strInteractClip = {};
 	_wstring m_strAppliedFixedAnim = {};
 	_float m_fGreetCooldown = { 0.f };
 
 	_bool m_bBasePosCaptured = { false };
 	_float3 m_vBasePos = {};
 	_float3 m_vWalkTarget = {};
+	_float3 m_vLookOrigin = {};
+	_float3 m_vLookTarget = {};
 
 	CGameObject* m_pPlayer = { nullptr };
 
 public:
+	static _wstring Resolve_FixedAnim(const _wstring& strVariation);
 	static CWaddleDee* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 

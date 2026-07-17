@@ -37,8 +37,6 @@ namespace
 	unordered_map<_wstring, LD_SPAWN_SPEC> g_Specs;
 	LD_SPAWN_SPEC g_FallbackSpec = {};
 
-	constexpr _uint WADDLEDEE_PREVIEW_UID = 2098698672u;
-
 	_bool Build_WaddleDeeDesc(const LD_OBJECT_DESC& CommonDesc, const json& jEntry, const LD_SPAWN_SPEC& Spec, LD_OBJECT_ENTRY* pOutEntry)
 	{
 		if (nullptr == pOutEntry || Spec.eCategory != LD_CATEGORY::META)
@@ -50,15 +48,13 @@ namespace
 
 		if (JsonUtils::Equals_NoCase(CommonDesc.strObjectName.c_str(), L"TalkWaddleDee"))
 		{
-			if (CommonDesc.iUid != WADDLEDEE_PREVIEW_UID)
-			{
-				Desc.strObjectName = L"TalkWaddleDee_Skipped";
-			}
-			else
-			{
-				JsonUtils::Try_ReadString(jEntry, "Chara.TalkWaddleDee.Variation.VariationType", &Desc.strAIVariation);
-			}
+			_wstring strVariation;
+			if (JsonUtils::Try_ReadString(jEntry, "Chara.TalkWaddleDee.Variation.VariationType", &strVariation))
+				Desc.strAIVariation = CWaddleDee::Resolve_FixedAnim(strVariation);
 		}
+
+		XMStoreFloat4(&Desc.vRight, XMVectorNegate(XMLoadFloat4(&Desc.vRight)));
+		XMStoreFloat4(&Desc.vLook, XMVectorNegate(XMLoadFloat4(&Desc.vLook)));
 
 		*pOutEntry = std::move(Desc);
 		return true;
@@ -255,6 +251,11 @@ void CLevelDesign_Registry::Register_Core()
 	RailSpec.strLayerTag = CLevelDesign_Rail::LAYER_TAG;
 	RailSpec.eCategory = LD_CATEGORY::RAIL;
 	RailSpec.pPrototypeFactory = &Create_RailPrototype;
+	RailSpec.ModelRequirements =
+	{
+			{ CLevelDesign_Rail::COASTER_RAIL_MODEL_PROTO_TAG,
+			"../../Resources/Map/Gimmick/NonAnim/CoasterRail/CoasterRail.ysh", MODEL::NONANIM, false }
+	};
 	Register(CLevelDesign_Rail::OBJECT_NAME, RailSpec);
 }
 
