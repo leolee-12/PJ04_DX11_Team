@@ -195,6 +195,7 @@ protected:
 
 protected:
     void Compute_CombinedWorldMatrix();
+    _float4x4 Make_BillboardWorldMatrix(const _float4x4& WorldMatrix) const;
     void Set_LocalPositionFromProperty();
     void Update_Orbit(const _float fRatio);
     void Set_UseGBufferOutput(_bool bUseGBufferOutput) { m_bUseGBufferOutput = bUseGBufferOutput; }

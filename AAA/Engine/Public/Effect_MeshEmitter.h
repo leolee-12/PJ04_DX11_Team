@@ -11,6 +11,8 @@ class ENGINE_DLL CEffect_MeshEmitter abstract : public CEffect_Emitter
 {
     GENERATED_BODY_ABSTRACT(CEffect_MeshEmitter)
 
+PROPERTY(_bool, m_bBillboard, L"Billboard", L"Effect");
+
 // Diffuse
 PROPERTY(_bool, m_bUseDiffuseTexture,           L"Use Diffuse Textrue_D",     L"Diffuse");
 PROPERTY(_float2, m_vDiffuseTiling,             L"Tiling_D",                  L"Diffuse");
