@@ -182,6 +182,7 @@
 #include "Armadillo_RutA.h"
 #include "Armadillo_RutB.h"
 #include "Armadillo_Dust.h"
+#include "Armadillo_RollWind.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
@@ -1292,6 +1293,15 @@ void CGameObject_Factory::Register_BossEffect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CRectParticleCommon::PROTOTYPE_TAG, CRectParticleCommon::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CArmadillo_Dust::TEX_PROTOTAG,
                 CTexture::Create(pDevice, pContext, L"../../Resources/YSH/Boss/Armadillo/Floor/smoke02.png", 1));
+        )
+    );
+    Register(CArmadillo_RollWind::PROTOTYPE_TAG, TEXT("Boss_EffectContainer"), CREATOR(CArmadillo_RollWind),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CArmadillo_RollWind::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Armadillo/Effect/Rolling/BossArmadillo_00_Common_SphereRolling.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 }

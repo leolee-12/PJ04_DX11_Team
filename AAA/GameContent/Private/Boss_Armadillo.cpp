@@ -303,7 +303,7 @@ void CBoss_Armadillo::Hide_Cage()
         m_pCage->Set_Active(false);
 }
 
-void CBoss_Armadillo::Set_RutTrail(_bool bOn)
+void CBoss_Armadillo::Set_RollFx(_bool bOn)
 {
     if (m_bRutTrail == bOn)
         return;
@@ -314,6 +314,19 @@ void CBoss_Armadillo::Set_RutTrail(_bool bOn)
     {
         XMStoreFloat3(&m_vRutLastPos, m_pTransformCom->Get_State(STATE::POSITION));
         m_iRutToggle = 0;
+
+        CEffect_Loader::GetInstance()->Spawn(
+            L"RollWind", Get_LevelIndex(),
+            _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f), _float3(0.f, 0.f, 0.f),
+            m_pTransformCom->Get_WorldMatrixPtr(), &m_pRollWind);
+    }
+    else
+    {
+        if (m_pRollWind)
+        {
+            m_pRollWind->Start_FadeOut(0.3f);
+            m_pRollWind = nullptr;      // 핸들은 즉시 놓는다. 아래 주석 참고
+        }
     }
 }
 

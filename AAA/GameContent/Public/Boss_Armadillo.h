@@ -64,7 +64,7 @@ public:
     void Show_Cage();
     void Hide_Cage();
 
-    void Set_RutTrail(_bool bOn);
+    void Set_RollFx(_bool bOn);
 
 protected:
     virtual CMonsterBrain* Create_Brain() override;
@@ -115,6 +115,8 @@ private:
     _int    m_iRutToggle = { 0 };
 
     static constexpr _float s_fRutInterval = 2.f;
+
+    CEffect_Container* m_pRollWind = { nullptr };
 
 #ifdef _DEBUG
     mutable _bool m_bDebugWallHit = { false };

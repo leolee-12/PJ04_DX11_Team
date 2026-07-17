@@ -94,6 +94,8 @@ namespace
         { TEXT("RutB"),                   TEXT("../../Resources/YSH/Effects/RutB.JSON") },
         { TEXT("Dust"),                   TEXT("../../Resources/YSH/Effects/Dust.JSON") },
         { TEXT("Dust_Landing"),           TEXT("../../Resources/YSH/Effects/Dust_Landing.JSON") },
+        { TEXT("TwinDust"),               TEXT("../../Resources/YSH/Effects/TwinDust.JSON") },
+        { TEXT("RollWind"),               TEXT("../../Resources/YSH/Effects/RollWind.JSON") },
     };
 }
 
