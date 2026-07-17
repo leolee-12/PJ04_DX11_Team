@@ -682,8 +682,10 @@ void CKirby_Ability_Bomb::Update_BombAimDots(_float fTimeDelta)
 
         if (m_PredictedPathPoints.size() <= 1 || iPathIndex >= m_PredictedPathPoints.size() - 1)
         {
-            if (pDot != nullptr)
-                pDot->Set_Active(false);
+            //if (pDot != nullptr)
+            //    pDot->Set_Active(false);
+
+            Effect_Stop(pDot);
 
             continue;
         }
@@ -705,10 +707,10 @@ void CKirby_Ability_Bomb::Despawn_BombAimDots()
 {
     for (_uint i = 0; i < s_iBombAimDotCount; ++i)
     {
-        if (m_pBombAimDots[i] != nullptr)
-            m_pBombAimDots[i]->Set_Active(true);
+        for (_uint i = 0; i < s_iBombAimDotCount; ++i)
+            Effect_Stop(m_pBombAimDots[i]);
 
-        Effect_Stop(m_pBombAimDots[i]);
+        m_fBombAimDotStep = 0.f;
     }
 
     m_fBombAimDotStep = 0.f;
