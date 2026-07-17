@@ -46,6 +46,7 @@ float3 g_vDecalBoundsCenter = float3(0.f, 0.f, 0.f);
 float3 g_vDecalBoundsExtents = float3(0.5f, 0.5f, 0.5f);
 float g_fDecalAlpha = 1.f;
 
+float g_fDecalUseUnknown = 0.f;
 float g_fDecalHasNormal = 0.f;
 float g_fDecalHasMRA = 0.f;
 
@@ -107,7 +108,7 @@ void Apply_DitherIfNeeded(float4 vScreenPos)
         Apply_Dither(vScreenPos, g_fDissolve);
 }
 
-void Apply_DitherIfNeeded(PS_IN In)
+void Apply_DitherFromPixelInput(PS_IN In)
 {
       [branch]
     if (0u != g_iUseInstanceDissolve)
@@ -240,7 +241,7 @@ PS_OUT Make_GBufferOutput(PS_IN In, float4 vDiffuse, float3 vNormal, float4 vMRA
 
 PS_OUT PS_WHITE(PS_IN In)
 {
-    Apply_DitherIfNeeded(In);
+    Apply_DitherFromPixelInput(In);
     
     return Make_GBufferOutput(
           In,
@@ -252,7 +253,7 @@ PS_OUT PS_WHITE(PS_IN In)
 
 PS_OUT PS_DIFF_SAMPLE(PS_IN In, float2 vUV)
 {
-    Apply_DitherIfNeeded(In);
+    Apply_DitherFromPixelInput(In);
 
     float4 vDiffuse = g_DiffuseTexture.Sample(LinearSampler, vUV);
     if (vDiffuse.a < 0.1f)
@@ -268,7 +269,7 @@ PS_OUT PS_DIFF_SAMPLE(PS_IN In, float2 vUV)
 
 PS_OUT PS_DMN_SAMPLE(PS_IN In, float2 vBaseUV, float2 vNormalUV, float2 vMaterialUV)
 {
-    Apply_DitherIfNeeded(In);
+    Apply_DitherFromPixelInput(In);
 
     float4 vDiffuse = g_DiffuseTexture.Sample(LinearSampler, vBaseUV);
     if (vDiffuse.a < 0.1f)
@@ -287,7 +288,7 @@ PS_OUT PS_DMN_SAMPLE(PS_IN In, float2 vBaseUV, float2 vNormalUV, float2 vMateria
 
 PS_OUT PS_UKWN_SAMPLE(PS_IN In, float2 vUV)
 {
-    Apply_DitherIfNeeded(In);
+    Apply_DitherFromPixelInput(In);
 
     float4 vDiffuse = g_UnknownTexture.Sample(LinearSampler, vUV);
     if (vDiffuse.a < 0.1f)
@@ -303,7 +304,7 @@ PS_OUT PS_UKWN_SAMPLE(PS_IN In, float2 vUV)
 
 PS_OUT PS_UMN_SAMPLE(PS_IN In, float2 vUnknownUV, float2 vNormalUV, float2 vMaterialUV)
 {
-    Apply_DitherIfNeeded(In);
+    Apply_DitherFromPixelInput(In);
 
     float4 vDiffuse = g_UnknownTexture.Sample(LinearSampler, vUnknownUV);
     if (vDiffuse.a < 0.1f)
@@ -360,7 +361,7 @@ PS_OUT PS_TREESHADOW(PS_IN In)
 
 PS_OUT PS_GRASS_FUR(PS_IN In)
 {
-    Apply_DitherIfNeeded(In);
+    Apply_DitherFromPixelInput(In);
 
     float4 vMask = g_DiffuseTexture.Sample(LinearSampler, Get_BaseUV(In));
     if (vMask.a < 0.1f)
@@ -380,7 +381,7 @@ PS_OUT PS_GRASS_FUR(PS_IN In)
 
 PS_OUT PS_COLOR(PS_IN In)
 {
-    Apply_DitherIfNeeded(In);
+    Apply_DitherFromPixelInput(In);
 
     float3 vMRA = g_MRATexture.Sample(LinearSampler, Get_MaterialUV(In)).rgb;
     float3 vNormal = Reconstruct_Normal(In, Get_NormalUV(In));
@@ -401,7 +402,7 @@ PS_OUT PS_DISCARD(PS_IN In)
 
 PS_OUT PS_COLOR_CONST_MRA(PS_IN In)
 {
-    Apply_DitherIfNeeded(In);
+    Apply_DitherFromPixelInput(In);
 
     float3 vNormal = Reconstruct_Normal(In, Get_NormalUV(In));
 
@@ -415,7 +416,7 @@ PS_OUT PS_COLOR_CONST_MRA(PS_IN In)
 
 PS_OUT PS_ARROWBOARD_OPAQUE(PS_IN In)
 {
-    Apply_DitherIfNeeded(In);
+    Apply_DitherFromPixelInput(In);
   
     float4 vDiffuse = g_DiffuseTexture.Sample(LinearSampler, Get_BaseUV(In));
     float3 vMRA = g_MRATexture.Sample(LinearSampler, Get_MaterialUV(In)).rgb;
@@ -432,7 +433,7 @@ PS_OUT PS_ARROWBOARD_OPAQUE(PS_IN In)
 
 PS_OUT PS_DMN_OPAQUE(PS_IN In)
 {
-    Apply_DitherIfNeeded(In);
+    Apply_DitherFromPixelInput(In);
 
     float3 vDiffuse = g_DiffuseTexture.Sample(LinearSampler, Get_BaseUV(In)).rgb;
     float3 vMRA = g_MRATexture.Sample(LinearSampler, Get_MaterialUV(In)).rgb;
@@ -448,7 +449,7 @@ PS_OUT PS_DMN_OPAQUE(PS_IN In)
 
 float4 PS_UKWN_BLACK_OVERLAY(PS_IN In) : SV_TARGET0
 {
-    Apply_DitherIfNeeded(In);
+    Apply_DitherFromPixelInput(In);
 
     float3 vUnknown = g_UnknownTexture.Sample(LinearSampler, Get_UnknownUV(In)).rgb;
     float fBrightness = saturate(max(vUnknown.r, max(vUnknown.g, vUnknown.b)));
@@ -528,22 +529,35 @@ PS_DECAL_OUT Make_DecalOutput(float2 vUV, float3 vTangent, float3 vNormal, float
 {
     PS_DECAL_OUT Out = (PS_DECAL_OUT) 0;
 
-    float4 vColor = g_DiffuseTexture.Sample(LinearSampler, vUV);
-    if (vColor.a <= 0.f)
-        discard;
+    float4 vColor = float4(0.f, 0.f, 0.f, 1.f);
+    float fCoverage = 0.f;
 
-    float fCoverage = vColor.a * g_fDecalAlpha;
+      [branch]
+    if (0.f < g_fDecalUseUnknown)
+    {
+        float3 vUnknown = g_UnknownTexture.Sample(LinearSampler, vUV).rgb;
+        float fBrightness = saturate(max(vUnknown.r, max(vUnknown.g, vUnknown.b)));
+        fCoverage = saturate(fBrightness * max(g_MaskStrength, 0.f)) * g_fDecalAlpha;
+    }
+    else
+    {
+        vColor = g_DiffuseTexture.Sample(LinearSampler, vUV);
+        if (vColor.a <= 0.f)
+            discard;
+
+        fCoverage = vColor.a * g_fDecalAlpha;
+    }
 
     Out.vDiffuse = float4(vColor.rgb, fCoverage);
 
-    [branch]
+      [branch]
     if (0.f < g_fDecalHasNormal)
     {
         float3 vWorldNormal = Decode_DecalNormal(vUV, vTangent, vNormal, vBinormal);
         Out.vNormal = float4(vWorldNormal * 0.5f + 0.5f, fCoverage * g_fDecalHasNormal);
     }
 
-    [branch]
+      [branch]
     if (0.f < g_fDecalHasMRA)
     {
         float3 vMRA = g_MRATexture.Sample(LinearSampler, vUV).rgb;

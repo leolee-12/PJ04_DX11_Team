@@ -85,6 +85,8 @@ VS_DECAL_OUT VS_DECAL(VS_IN In)
 
 PS_DECAL_OUT PS_DECAL(VS_DECAL_OUT In)
 {
+    Apply_DitherIfNeeded(In.vPosition);
+
     float2 vScreenUV = Get_ScreenUV(In.vProjPos);
     float fSceneDepth = Sample_SceneDepth(vScreenUV);
     float3 vWorldPosition = Recover_SceneWorldPosition(vScreenUV, fSceneDepth);

@@ -381,6 +381,9 @@ _bool CLD_DeformObject::Build_Desc(const LD_OBJECT_DESC& CommonDesc, const json&
 
 	Apply_DeformObjectCatalog(*pCatalog, &Desc);
 
+	XMStoreFloat4(&Desc.vRight, XMVectorNegate(XMLoadFloat4(&Desc.vRight)));
+	XMStoreFloat4(&Desc.vLook, XMVectorNegate(XMLoadFloat4(&Desc.vLook)));
+
 	*pOutEntry = Desc;
 	return true;
 }
@@ -802,6 +805,11 @@ void CLD_DeformObject::Complete_DeformAcquired()
 	Payload.eType = Get_DeformType();
 	Payload.pSource = this;
 	Payload.PreDeformWorld = m_PreDeformWorld;
+
+	const LD_OBJECT_DESC& BaseDesc = Get_LevelDesignDesc();
+	Payload.iRailUid = BaseDesc.iTargetRailUid;
+	Payload.iStartNodeIndex = BaseDesc.iTargetRailNodeIndex;
+
 	m_pGameInstance_Proxy->Publish(EventTag::Deform_Acquired, &Payload);
 }
 

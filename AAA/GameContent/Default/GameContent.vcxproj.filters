@@ -943,6 +943,9 @@
     <Filter Include="00. GameObject\10. DropStar\Parts">
       <UniqueIdentifier>{1b0611e1-ea78-4e51-8d4b-905c94dccc2b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\11. WaddleDee">
+      <UniqueIdentifier>{28f1e19d-7639-4e84-b992-8ed2dceda685}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\95. Interface">
       <UniqueIdentifier>{3f986a95-5219-485c-8719-2667dcade916}</UniqueIdentifier>
     </Filter>
@@ -1003,8 +1006,11 @@
     <Filter Include="00. GameObject\96. LevelDesign\Visible\99. EventObject\ForBossMap1">
       <UniqueIdentifier>{a1998211-a419-40ce-9907-dcb0b25d085a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2">
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2">
       <UniqueIdentifier>{1accfe0f-f5c1-4443-96d0-fc2ebc97200d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-1">
+      <UniqueIdentifier>{8fa87f9a-d5b2-4510-9414-6ecd7a6891f3}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\96. LevelDesign\Visible\Inhalable">
       <UniqueIdentifier>{8a10359e-c77f-49f9-9ed3-900989557393}</UniqueIdentifier>
@@ -1876,7 +1882,7 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\07. CopyEssence</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_DeformCarBreakWall.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_DeformObject.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\DeformObject</Filter>
@@ -1885,7 +1891,7 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_GarageRadio.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
     </ClInclude>
     <ClInclude Include="..\public\LD_Inhalable.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
@@ -1894,13 +1900,19 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\01. PopFlower</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_SlopeBoardA.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LD_SlopeBoardB.h">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-1</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_SlopeBoardC.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_Stage1BossDemo.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForBossMap1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LensFlare.h">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelData.h">
       <Filter>97. DataSystem\Header</Filter>
@@ -1915,7 +1927,7 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\06. Bush</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_Defines.h">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LevelDesign_FallBorder.h">
       <Filter>00. GameObject\96. LevelDesign\Invisible\02. FallBorder</Filter>
@@ -2337,6 +2349,9 @@
     <ClInclude Include="..\Public\TornadoSpinReverse.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\07. TornadoSpinReverse</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\TownCondition_Utils.h">
+      <Filter>97. DataSystem\MapLoader</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\TrailCommon.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\06. TrailCommon</Filter>
     </ClInclude>
@@ -2447,6 +2462,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Vacuum.h">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\03. Vacuum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\WaddleDee.h">
+      <Filter>00. GameObject\11. WaddleDee</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\WaddleDee_Body.h">
+      <Filter>00. GameObject\11. WaddleDee</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\WalkSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
@@ -3009,7 +3030,7 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\07. CopyEssence</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_DeformCarBreakWall.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_DeformObject.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\DeformObject</Filter>
@@ -3018,7 +3039,7 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_GarageRadio.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
     </ClCompile>
     <ClCompile Include="..\private\LD_Inhalable.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\Inhalable</Filter>
@@ -3027,13 +3048,19 @@
       <Filter>00. GameObject\96. LevelDesign\Visible\01. PopFlower</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_SlopeBoardA.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LD_SlopeBoardB.cpp">
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-1</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_SlopeBoardC.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage1-2</Filter>
+      <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForStage0-2</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_Stage1BossDemo.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\99. EventObject\ForBossMap1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LensFlare.cpp">
+      <Filter>00. GameObject\03. Effect\00. EffectContainer\14. Env</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LevelDesign_Boundary.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\00. Boundary</Filter>
@@ -3305,9 +3332,6 @@
     <ClCompile Include="..\private\Projectile_Partner.cpp">
       <Filter>00. GameObject\07. Boss\Boss\Armadillo\Projectile</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\RailRideable.cpp">
-      <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\RailTrack.cpp">
       <Filter>00. GameObject\96. LevelDesign\Invisible\01. Rail</Filter>
     </ClCompile>
@@ -3544,6 +3568,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Vacuum.cpp">
       <Filter>00. GameObject\03. Effect\01. Effect_Part\Pre\03. Vacuum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\WaddleDee.cpp">
+      <Filter>00. GameObject\11. WaddleDee</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\WaddleDee_Body.cpp">
+      <Filter>00. GameObject\11. WaddleDee</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\WalkSmoke.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>

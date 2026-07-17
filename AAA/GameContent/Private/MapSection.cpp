@@ -3,7 +3,6 @@
 #include "Map_EditFile.h"
 
 #include "GameInstance.h"
-#include "Geometry_Utils.h"
 
 NS_BEGIN(Client)
 
@@ -41,8 +40,6 @@ HRESULT CMapSection::Initialize(void* pArg)
 	m_bUseCollMesh = m_bUseCollMesh && m_bHasCollMesh;
 
 	m_CombinedWorldMatrix = *m_pTransformCom->Get_WorldMatrixPtr();
-	Update_LocalBounds();
-	Refresh_WorldBounds();
 	Rebuild_ColliderActor();
 
 	if (FAILED(Validate_Initialized()))
@@ -102,13 +99,6 @@ void CMapSection::Copy_PrototypeName(ENGINE_OBJECT_DATA* pOutData)
 	pOutData->strPrototypeTag = PROTOTYPE_TAG;
 }
 
-void CMapSection::Refresh_WorldBounds()
-{
-	m_LocalBounds.Transform(
-		m_WorldBounds,
-		XMLoadFloat4x4(&m_CombinedWorldMatrix));
-}
-
 void CMapSection::Set_ParentMatrix(const _float4x4* pParentMatrix)
 {
 	m_pParentMatrix = pParentMatrix;
@@ -121,7 +111,6 @@ void CMapSection::Refresh_CombinedWorldMatrix()
 		CombinedWorld *= XMLoadFloat4x4(m_pParentMatrix);
 
 	XMStoreFloat4x4(&m_CombinedWorldMatrix, CombinedWorld);
-	Refresh_WorldBounds();
 	Refresh_ColliderPose();
 }
 
@@ -276,20 +265,6 @@ _uint CMapSection::Get_ModelProtoLevel() const
 HRESULT CMapSection::Bind_WorldMatrix()
 {
 	return m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix);
-}
-
-void CMapSection::Update_LocalBounds()
-{
-	_float3 vMin{}, vMax{};
-	m_pModelCom->Get_ModelAABB(&vMin, &vMax);
-
-	if (!GeometryUtils::Is_ValidAABB(vMin, vMax))
-	{
-		m_LocalBounds = GeometryUtils::Make_DefaultAABB();
-		return;
-	}
-
-	m_LocalBounds = GeometryUtils::Make_AABB_FromMinMax(vMin, vMax);
 }
 
 void CMapSection::Refresh_ColliderPose()
