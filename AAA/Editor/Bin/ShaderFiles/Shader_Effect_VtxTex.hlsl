@@ -10,6 +10,11 @@ uint g_iMaterialID = 0;
 Texture2D g_Texture;
 bool g_bUseTexture = { false };
 bool g_bTextureColorToAlpha = { false };
+bool g_bUseTextureUVEdgeFade = { false };
+int g_iTextureUVEdgeFadeAxis = { 0 };
+float g_fTextureUVEdgeFadeStartRange = { 0.1f };
+float g_fTextureUVEdgeFadeEndRange = { 0.1f };
+float g_fTextureUVEdgeFadePower = { 1.f };
 float2 g_vTextureTiling = { 1.f, 1.f };
 float2 g_vTextureOffset = { 0.f, 0.f };
 
@@ -160,6 +165,35 @@ float4 ApplyColorToAlpha(float4 vTextureValue, bool bUseColorToAlpha)
     return vTextureValue;
 }
 
+float ComputeUVEdgeFade1D(float fCoord, float fStartRange, float fEndRange)
+{
+    fCoord = saturate(fCoord);
+    fStartRange = saturate(fStartRange);
+    fEndRange = saturate(fEndRange);
+
+    float fStartFade = fStartRange > 0.0001f
+        ? smoothstep(0.f, fStartRange, fCoord) : 1.f;
+    float fEndFade = fEndRange > 0.0001f
+        ? smoothstep(0.f, fEndRange, 1.f - fCoord) : 1.f;
+
+    return fStartFade * fEndFade;
+}
+
+float4 ApplyUVEdgeFade(
+    float4 vTextureValue, float2 vTexcoord, bool bUseEdgeFade,
+    int iAxis, float fStartRange, float fEndRange, float fPower)
+{
+    if (bUseEdgeFade == false)
+        return vTextureValue;
+
+    float fFadeX = ComputeUVEdgeFade1D(vTexcoord.x, fStartRange, fEndRange);
+    float fFadeY = ComputeUVEdgeFade1D(vTexcoord.y, fStartRange, fEndRange);
+    float fFade = iAxis == 0 ? fFadeX : (iAxis == 1 ? fFadeY : fFadeX * fFadeY);
+
+    vTextureValue.a *= pow(saturate(fFade), clamp(fPower, 0.1f, 8.f));
+    return vTextureValue;
+}
+
 float4 ComposeEffectBaseColor(PS_IN In, SamplerState EffectSampler)
 {
     if (In.vTexcoord.x > (1.f - g_fUVCutRight) || In.vTexcoord.x < g_fUVCutLeft)
@@ -203,8 +237,13 @@ float4 ComposeEffectBaseColor(PS_IN In, SamplerState EffectSampler)
         else
             vUV = g_vTextureOffset + In.vTexcoord * g_vTextureTiling + vUVDistortion;
         
-        vColor *= ApplyColorToAlpha(
+        float4 vTextureValue = ApplyColorToAlpha(
             g_Texture.Sample(EffectSampler, vUV), g_bTextureColorToAlpha);
+        vTextureValue = ApplyUVEdgeFade(
+            vTextureValue, In.vTexcoord, g_bUseTextureUVEdgeFade,
+            g_iTextureUVEdgeFadeAxis, g_fTextureUVEdgeFadeStartRange,
+            g_fTextureUVEdgeFadeEndRange, g_fTextureUVEdgeFadePower);
+        vColor *= vTextureValue;
     }
     
     if (g_bUseMask == true)
