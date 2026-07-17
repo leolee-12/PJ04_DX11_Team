@@ -7,6 +7,7 @@
 #include "BrontoBurt.h"
 #include "PoppyBrosJr.h"
 #include "Cappy.h"
+#include "NormalEnemyWild.h"
 #include "Parsing_Utils.h"
 
 NS_BEGIN(Client)
@@ -18,6 +19,7 @@ namespace
 		const _tchar* pObjectName;
 		const _tchar* pPrototypeTag;
 		LD_OBJECT_PROTO_FACTORY pPrototypeFactory;
+		const _tchar* pVariationOwnerName = nullptr;
 	};
 
 	CGameObject* Create_BladeKnightPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -50,14 +52,20 @@ namespace
 		return CCappy::Create(pDevice, pContext);
 	}
 
+	CGameObject* Create_NormalEnemyWildPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	{
+		return CNormalEnemyWild::Create(pDevice, pContext);
+	}
+
 	static const LD_MONSTER_CATALOG g_MonsterCatalog[] =
 	{
-			{ L"BladeKnight",	CBladeKnight::PROTOTYPE_TAG,	&Create_BladeKnightPrototype },
-			{ L"NormalEnemy",	CNormalEnemy::PROTOTYPE_TAG,	&Create_NormalEnemyPrototype },
-			{ L"Kabu",			CKabu::PROTOTYPE_TAG,			&Create_KabuPrototype },
-			{ L"BrontoBurt",	CBrontoBurt::PROTOTYPE_TAG,		&Create_BrontoBurtPrototype },
-			{ L"PoppyBrosJr",	CPoppyBrosJr::PROTOTYPE_TAG,	&Create_PoppyBrosJrPrototype },
-			{ L"Cappy",			CCappy::PROTOTYPE_TAG,			&Create_CappyPrototype },
+			{ L"BladeKnight",		CBladeKnight::PROTOTYPE_TAG,		&Create_BladeKnightPrototype },
+			{ L"NormalEnemy",		CNormalEnemy::PROTOTYPE_TAG,		&Create_NormalEnemyPrototype },
+			{ L"Kabu",				CKabu::PROTOTYPE_TAG,				&Create_KabuPrototype },
+			{ L"BrontoBurt",		CBrontoBurt::PROTOTYPE_TAG,			&Create_BrontoBurtPrototype },
+			{ L"PoppyBrosJr",		CPoppyBrosJr::PROTOTYPE_TAG,		&Create_PoppyBrosJrPrototype },
+			{ L"Cappy",				CCappy::PROTOTYPE_TAG,				&Create_CappyPrototype },
+			{ L"NormalEnemyWild",	CNormalEnemyWild::PROTOTYPE_TAG,	&Create_NormalEnemyWildPrototype, L"NormalEnemy"},
 	};
 }
 
@@ -73,6 +81,7 @@ void CLevelDesign_MonsterCatalog::Register_LevelDesignSpecs()
 		Spec.pPrototypeFactory = Entry.pPrototypeFactory;
 		Spec.pBuildDesc = &Build_Desc;
 		Spec.bUseFactoryResourceLoader = true;
+		Spec.strVariationOwnerName = Entry.pVariationOwnerName ? Entry.pVariationOwnerName : L"";
 
 		CLevelDesign_Registry::Register(Spec.strObjectName, Spec);
 	}
@@ -89,7 +98,8 @@ _bool CLevelDesign_MonsterCatalog::Build_Desc(const LD_OBJECT_DESC& CommonDesc, 
 	static_cast<LD_OBJECT_DESC&>(Desc) = CommonDesc;
 	Desc.eCategory = Spec.eCategory;
 
-	const _string strBase = "Chara." + WstrToStr(Spec.strObjectName) + ".Variation.";
+	const _wstring& strOwner = Spec.strVariationOwnerName.empty() ? Spec.strObjectName : Spec.strVariationOwnerName;
+	const _string strBase = "Chara." + WstrToStr(strOwner) + ".Variation.";
 	if (!JsonUtils::Try_ReadString(jEntry, strBase + "VariationType", &Desc.strAIVariation))
 		JsonUtils::Try_ReadString(jEntry, strBase + "TypeStr", &Desc.strAIVariation);
 

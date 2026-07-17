@@ -4,7 +4,6 @@
 
 NS_BEGIN(Engine)
 class CAnimator;
-class CEffect_Container;
 NS_END
 
 NS_BEGIN(Client)
@@ -60,13 +59,12 @@ protected:
 
 private:
 	virtual HRESULT				Ready_PartObjects() override;
-
 	virtual void				On_Deserialized() override;
+	virtual const _float4x4*	Get_FxParentMatrix(const _wstring& strFx) const override;
 
 private:
 	CBladeKnight_Body*			m_pBody = { nullptr };
 	CBladeKnight_Sword*			m_pSword = { nullptr };
-	CEffect_Container*			m_pSwordTrail = { nullptr };
 
 public:
 	static CBladeKnight*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext); 

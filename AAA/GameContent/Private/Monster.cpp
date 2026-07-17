@@ -43,6 +43,8 @@ HRESULT CMonster::Initialize_Prototype()
 
 HRESULT CMonster::Initialize(void* pArg)
 {
+	m_iCullPhase = rand() % 8;
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
@@ -93,6 +95,7 @@ void CMonster::Update(_float fTimeDelta)
 	if (!m_bActive) return;
 
 	fTimeDelta = Filter_TimeDelta(fTimeDelta);
+	Update_CullGrade(fTimeDelta);
 #ifdef _DEBUG
 	if (m_pGameInstance_Proxy->Is_EditMode())
 	{
@@ -537,7 +540,70 @@ void CMonster::Perceive(_float fTimeDelta)
 	m_BlackBoard.vLastKnownPos = m_BlackBoard.vTargetPos;
 }
 
-_bool CMonster::Handle_SharedAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+void CMonster::Update_CullGrade(_float fTimeDelta)
+{
+	if (m_fCullDist <= 0.f)
+	{
+		m_CullState = {};
+		m_CullState.fAnimDt = fTimeDelta;
+		return;
+	}
+
+	BoundingSphere tSphere{};
+	XMStoreFloat3(&tSphere.Center,
+		m_pTransformCom->Get_State(STATE::POSITION));
+	tSphere.Radius = Get_CapsuleHeight() * 0.5f
+		+ Get_CapsuleRadius();
+
+	const CULLING_FADE_RESULT tFade =
+		m_pGameInstance_Proxy->Evaluate_DistanceFade(
+			tSphere, m_fCullDist, m_fFadeRange);
+
+	if (FLT_MAX == tFade.fBoundaryDistance)
+	{   // fail-open: treat as FULL
+		m_CullState = {};
+		m_CullState.fAnimDt = fTimeDelta;
+		return;
+	}
+
+	m_CullState.fDissolve = tFade.fDissolve;
+	m_CullState.bRenderCull = tFade.bCulled;
+
+	if (m_pGameInstance_Proxy->Is_EditMode())
+	{   // keep visibility fresh, no dt accum
+		m_fAnimAccum = 0.f;
+		m_CullState.bAnimTick = false;
+		m_CullState.fAnimDt = 0.f;
+		return;
+	}
+
+	const _uint iPeriod =
+		Calc_AnimPeriod(tFade.fBoundaryDistance);
+
+	m_fAnimAccum += fTimeDelta;
+	++m_iCullFrame;
+
+	m_CullState.bAnimTick = (iPeriod <= 1)
+		|| (0 == ((m_iCullFrame + m_iCullPhase) % iPeriod));
+
+	if (m_CullState.bAnimTick)
+	{
+		m_CullState.fAnimDt = m_fAnimAccum;
+		m_fAnimAccum = 0.f;
+	}
+}
+
+_uint CMonster::Calc_AnimPeriod(_float fDist) const
+{
+	const _uint* P = s_bUseAnimURO ? s_iPeriodB : s_iPeriodA;
+
+	if (m_CullState.bRenderCull)		return P[3];
+	if (fDist >= m_fBandQuarter)		return P[2];
+	if (fDist >= m_fBandHalf)			return P[1];
+	return P[0];
+}
+
+_bool CMonster::Handle_SoundAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 {
 	switch (static_cast<EANIM_EVENT>(e.iEventType))
 	{
@@ -563,6 +629,49 @@ _bool CMonster::Handle_SharedAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePh
 	default:
 		return false;		// 몬스터 고유 이벤트로 넘김
 	}
+}
+
+_bool CMonster::Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+{
+	if (static_cast<EANIM_EVENT>(e.iEventType) != EANIM_EVENT::Fx)
+		return false;
+
+	const _wstring strFx = StrToWstr(e.strParam);
+	if (strFx.empty())
+		return true;
+
+	_int iEffectVariation = e.iIntParam;
+	_float3 vPos{}, vLook{0.f, 0.f, 1.f}, vRotDeg{};
+
+	switch(iEffectVariation)
+	{
+	case 1:		vPos = e.vOffset;													break;		// 위치 오프셋
+	case 2:		vLook = e.vOffset;													break;		// 커스텀 LOOK
+	case 3:		XMStoreFloat3(&vLook, m_pTransformCom->Get_State(STATE::LOOK));		break;		// 몬스터의 LOOK(FX가 Parent가 없을 때)
+	case 4:		vRotDeg = e.vOffset;												break;		// 회전(도)
+	default:																		break;
+	}
+
+	if (ePhase == ANIM_EVENT_PHASE::BEGIN)
+	{
+		CEffect_Container*& pSlot = m_Effects[strFx];
+		if (pSlot)
+			pSlot->EffectContainer_StopAfterEmission();
+
+		
+		CEffect_Loader::GetInstance()->Spawn(strFx, Get_LevelIndex(),
+			vPos, vLook, vRotDeg, Get_FxParentMatrix(strFx), &pSlot);
+	}
+	else if (ePhase == ANIM_EVENT_PHASE::END)
+	{
+		auto it = m_Effects.find(strFx);
+		if (it != m_Effects.end() && it->second)
+		{
+			it->second->Start_FadeOut(0.4f);
+			it->second = nullptr;
+		}
+	}
+	return true;
 }
 
 void CMonster::Play_DeathFX()

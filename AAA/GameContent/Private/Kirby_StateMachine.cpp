@@ -45,7 +45,7 @@ HRESULT CKirby_StateMachine::Initialize(CKirby* pKirby)
     if (FAILED(Init_State()))
         return E_FAIL;
 
-    Change_State(KIRBY_STATE_TYPE::WAIT);
+    //Change_State(KIRBY_STATE_TYPE::WAIT);
 
     if(m_pGameInstance_Proxy->Is_EditMode())
         Change_State(KIRBY_STATE_TYPE::WAIT);

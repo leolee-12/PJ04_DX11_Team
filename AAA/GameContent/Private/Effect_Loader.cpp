@@ -87,6 +87,8 @@ namespace
         { TEXT("BubbleAura"),             TEXT("../../Resources/CHJ/Effect/BubbleAura.JSON") },
 
         { TEXT("SwordTrail_BK"),          TEXT("../../Resources/CHJ/Effect/SwordTrail_BK.JSON") },
+        { TEXT("Tornado_BK"),             TEXT("../../Resources/CHJ/Effect/Tornado_BK.JSON") },
+        { TEXT("EssenceAura"),            TEXT("../../Resources/CHJ/Effect/EssenceAura.JSON") },
 
         { TEXT("RutA"),                   TEXT("../../Resources/YSH/Effects/RutA.JSON") },
         { TEXT("RutB"),                   TEXT("../../Resources/YSH/Effects/RutB.JSON") },

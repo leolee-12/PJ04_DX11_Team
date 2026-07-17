@@ -11,6 +11,7 @@ class CCollider;
 class CController;
 class CAnimator;
 class CSound_Handle;
+class CEffect_Container;
 NS_END
 
 NS_BEGIN(Client)
@@ -129,6 +130,8 @@ protected:
 	
 	CSound_Handle				m_ActionLoopSnd;
 
+	unordered_map<_wstring, CEffect_Container*> m_Effects;
+
 	// 이번 프레임에 이동하고 싶은 방향
 	_float3						m_vWishDir = {};
 
@@ -152,6 +155,20 @@ protected:
 
 	static constexpr _float     s_fBodyCheckOffDuration = 0.2f;         // 피격 후 몸박 차단 시간
 
+	// Distance Culling 
+	MONSTER_CULL_STATE          m_CullState = {};
+	_float                      m_fCullDist = { 0.f };
+	_float                      m_fFadeRange = { 8.f };
+	_float                      m_fBandHalf = { 65.f };					// 30 프레임 
+	_float                      m_fBandQuarter = { 80.f };				// 15 프레임 
+	_float                      m_fAnimAccum = { 0.f };
+	_uint                       m_iCullFrame = { 0 };
+	_uint                       m_iCullPhase = { 0 };
+
+	static constexpr _bool		s_bUseAnimURO = { true };
+	static constexpr _uint		s_iPeriodA[4] = { 1, 1, 1, 1 };
+	static constexpr _uint		s_iPeriodB[4] = { 1, 2, 4, 8 };
+
 protected:
 	// 부모가 관리할 공통 파이프라인
 	HRESULT						Ready_Collider();
@@ -172,13 +189,19 @@ protected:
 
 	virtual _bool				Block_Hit(const ATTACK_INFO& tInfo) override;
 
-	//윤석현 수정 
 	virtual void				Update_AI(_float fTimeDelta);
 	virtual void				Perceive(_float fTimeDelta);
 
+	void						Update_CullGrade(_float fTimeDelta);
+	_uint						Calc_AnimPeriod(_float fDist) const;
+
 	virtual void				Apply_AIVariation(const _wstring& strVariation) {}
 
-	_bool						Handle_SharedAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
+	_bool						Handle_SoundAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
+	_bool						Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase);
+
+	virtual const _float4x4*	Get_FxParentMatrix(const _wstring& strFx) const { return nullptr; }
+
 	void						Play_DeathFX();
 	void						Compute_SpatPivot();
 	void                        Open_BodyCheckBlock();
@@ -193,6 +216,7 @@ protected:
 		Desc.pSocketBoneMatrix = pSocketBone;
 		Desc.pHitFlash = Get_HitFlashPtr();
 		Desc.pHitFlashColor = Get_HitFlashColorPtr();
+		Desc.pCullState = &m_CullState;
 
 		if (FAILED(Add_PartObject(m_iPrototypeLevel, szProtoTag, szPartTag, &Desc)))
 		{

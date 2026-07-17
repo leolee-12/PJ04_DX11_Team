@@ -51,7 +51,8 @@ HRESULT CPoppyBrosJr::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	m_eCopyAbility = COPY_ABILITY_TYPE::NONE;		// TODO : BOMB 능력 구현 시 변경
+	m_eCopyAbility = COPY_ABILITY_TYPE::BOMB;		
+	m_fCullDist = 95.f;
 
 	if (m_pTransformCom)
 		m_pTransformCom->Set_RotationPerSec(180.f);
@@ -196,7 +197,7 @@ HRESULT CPoppyBrosJr::Ready_AnimEvents()
 	pAnim->Set_EventCallback(
 		[this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase)
 		{
-			if (Handle_SharedAnimEvent(e, phase))
+			if (Handle_SoundAnimEvent(e, phase))
 				return;
 
 			switch (static_cast<EANIM_EVENT>(e.iEventType))
