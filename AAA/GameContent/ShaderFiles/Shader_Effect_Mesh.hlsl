@@ -11,6 +11,7 @@ uint g_iMaterialID = 0;
 
 Texture2D g_DiffuseTexture;
 bool g_bUseDiffuseTexture = { false };
+bool g_bDiffuseColorToAlpha = { false };
 float2 g_vDiffuseTiling = { 1.f, 1.f };
 float2 g_vDiffuseOffset = { 0.f, 0.f };
 
@@ -27,6 +28,7 @@ bool g_bUseMRATexture = { false };
 
 Texture2D g_Texture;
 bool g_bUseTexture = { false };
+bool g_bTextureColorToAlpha = { false };
 float2 g_vTextureTiling = { 1.f, 1.f };
 float2 g_vTextureOffset = { 0.f, 0.f };
 
@@ -224,6 +226,14 @@ float4 ApplyMaskBlend(float4 vColor, float4 vMaskValue)
     return vColor * lerp(float4(1.f, 1.f, 1.f, 1.f), vMaskValue, saturate(fStrength));
 }
 
+float4 ApplyColorToAlpha(float4 vTextureValue, bool bUseColorToAlpha)
+{
+    if (bUseColorToAlpha == true)
+        vTextureValue.a *= dot(saturate(vTextureValue.rgb), float3(0.299f, 0.587f, 0.114f));
+
+    return vTextureValue;
+}
+
 float4 ComposeEffectColor(float2 vTexcoord, SamplerState EffectSampler)
 {
     float4 vColor = float4(1.f, 1.f, 1.f, 1.f);
@@ -248,7 +258,8 @@ float4 ComposeEffectColor(float2 vTexcoord, SamplerState EffectSampler)
         Apply_LinearUVAnim(vTexcoord, g_bUseLinearUVAnim_T, g_fLinearUVRatio_T, g_iLinearUVAxis_T, g_bLinearUVReverse_T);
 
         float2 vUV = g_vTextureOffset + vTexcoord * g_vTextureTiling + vUVDistortion;
-        vColor *= g_Texture.Sample(EffectSampler, vUV);
+        vColor *= ApplyColorToAlpha(
+            g_Texture.Sample(EffectSampler, vUV), g_bTextureColorToAlpha);
     }
 
     if (g_bUseDiffuseTexture == true)
@@ -257,7 +268,8 @@ float4 ComposeEffectColor(float2 vTexcoord, SamplerState EffectSampler)
         Apply_LinearUVAnim(vTexcoord, g_bUseLinearUVAnim_D, g_fLinearUVRatio_D, g_iLinearUVAxis_D, g_bLinearUVReverse_D);
         
         float2 vUV = g_vDiffuseOffset + vTexcoord * g_vDiffuseTiling + vUVDistortion;
-        vColor *= g_DiffuseTexture.Sample(EffectSampler, vUV);
+        vColor *= ApplyColorToAlpha(
+            g_DiffuseTexture.Sample(EffectSampler, vUV), g_bDiffuseColorToAlpha);
     }
 
     if (g_bUseUnknownTexture == true)

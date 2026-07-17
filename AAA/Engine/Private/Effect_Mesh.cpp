@@ -18,6 +18,7 @@ CEffect_Mesh::CEffect_Mesh(const CEffect_Mesh& Prototype)
 EffectMesh::VALUES CEffect_Mesh::Make_MeshValues()
 {
     return {
+        m_bTextureColorToAlpha,
         {
             m_bUseDiffuseTexture,
             m_vDiffuseTiling,
@@ -26,6 +27,7 @@ EffectMesh::VALUES CEffect_Mesh::Make_MeshValues()
             m_vDiffuseUVScrollCount,
             m_vCurDiffuseUVOffset
         },
+        m_bDiffuseColorToAlpha,
         m_bUseNormalTexture,
         m_bUseMRATexture,
         {
@@ -177,7 +179,11 @@ HRESULT CEffect_Mesh::Ready_Components()
 
 HRESULT CEffect_Mesh::Bind_ShaderResources()
 {
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
+    const _float4x4 WorldMatrix = m_bBillboard == true
+        ? Make_BillboardWorldMatrix(m_CombinedWorldMatrix)
+        : m_CombinedWorldMatrix;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &WorldMatrix)))
         return E_FAIL;
 
     if (FAILED(Bind_ViewProjectionMatrices()))
@@ -205,6 +211,8 @@ void CEffect_Mesh::Update_UVScroll(const _float fTimeDelta, const _float fRatio)
 
 void CEffect_Mesh::Init_PropertyValue()
 {
+    m_bBillboard = false;
+
     auto Values = Make_MeshValues();
     EffectMesh::Initialize_DefaultValues(Values);
 }

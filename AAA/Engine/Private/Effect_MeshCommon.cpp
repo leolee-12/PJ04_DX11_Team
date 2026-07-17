@@ -92,6 +92,10 @@ namespace
 
 HRESULT Engine::EffectMesh::Bind_ShaderValues(CShader* pShader, const VALUES& Values, _bool bBindUnknownBeforePBR)
 {
+    if (FAILED(pShader->Bind_RawValue("g_bTextureColorToAlpha", &Values.bTextureColorToAlpha, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_bDiffuseColorToAlpha", &Values.bDiffuseColorToAlpha, sizeof(_bool))))
+        return E_FAIL;
+
     if (FAILED(BindDiffuseValues(pShader, Values)))
         return E_FAIL;
 
@@ -183,7 +187,9 @@ void Engine::EffectMesh::Update_UVAnimations(VALUES& Values, _float fRatio)
 
 void Engine::EffectMesh::Initialize_DefaultValues(VALUES& Values)
 {
+    Values.bTextureColorToAlpha = false;
     InitializeTexture(Values.Diffuse);
+    Values.bDiffuseColorToAlpha = false;
     Values.bUseNormalTexture = false;
     Values.bUseMRATexture = false;
     InitializeTexture(Values.Unknown);

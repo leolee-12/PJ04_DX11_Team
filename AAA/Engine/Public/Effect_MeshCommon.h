@@ -41,7 +41,9 @@ namespace EffectMesh
 
     struct VALUES
     {
+        _bool& bTextureColorToAlpha;
         TEXTURE_VALUES Diffuse;
+        _bool& bDiffuseColorToAlpha;
         _bool& bUseNormalTexture;
         _bool& bUseMRATexture;
         TEXTURE_VALUES Unknown;
