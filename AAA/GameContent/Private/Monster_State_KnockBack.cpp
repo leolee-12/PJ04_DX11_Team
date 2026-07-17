@@ -33,12 +33,22 @@ void CMonster_State_KnockBack::Enter(MONSTER_STATE_TYPE ePrevState)
 		const CMonster::HIT_REACTION& LastHit = m_pOwner->Get_LastHit();
 		m_pMovement->Knockback(XMLoadFloat3(&LastHit.vAttackerPos), LastHit.fKnockBack);
 	}
+
+	if (m_pMovement && m_pMovement->Is_Launched())
+		m_pOwner->Start_LaunchSmokeFx();
+	else
+		m_pOwner->Stop_LaunchSmokeFx();
 }
 
 void CMonster_State_KnockBack::Update(_float fTimeDelta)
 {
 	if (m_pOwner == nullptr)
 		return;
+
+	if (m_pMovement && m_pMovement->Is_Launched())
+		m_pOwner->Start_LaunchSmokeFx();
+	else
+		m_pOwner->Stop_LaunchSmokeFx();
 
 	m_fTimer += fTimeDelta;
 
@@ -61,6 +71,8 @@ void CMonster_State_KnockBack::Exit(MONSTER_STATE_TYPE eNextState)
 {
 	if (m_pOwner == nullptr)
 		return;
+
+	m_pOwner->Stop_LaunchSmokeFx();
 }
 
 CMonster_State_KnockBack* CMonster_State_KnockBack::Create(const ANI_PLAY_INFO& tInfo, _float fSpeed)

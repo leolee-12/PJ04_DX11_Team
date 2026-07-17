@@ -473,6 +473,7 @@ AAA/*.zip
 AAA/AnimUITool/Default/AnimUITool_imgui.ini
 AAA/EngineSDK/lib/Engine.lib
 /build_logs/*
+/codex_jobs/*
 
 # Backups made by AAA/SortFilters.bat (sort_vcxproj_filters.py --backup)
 *.vcxproj.filters.bak

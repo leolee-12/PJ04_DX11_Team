@@ -17,10 +17,8 @@ class CKokabu final : public CPhysicsProjectile, public IInhalable
 private:
 	enum class KOKABU_STATE
 	{
-		IDLE, EJECTED, CAPTURED,
-		HIT, FALLING, LANDED,				
-		DISAPPEARING,		
-		END
+		IDLE, EJECTED, FALLING, LANDED,
+		HIT, DEATH, CAPTURED, SPAT, DISAPPEARING, END
 	};
 
 public:
@@ -66,6 +64,8 @@ protected:
 	virtual	void				On_Launched() override;
 	virtual void				On_Impact() override;
 
+	virtual HRESULT				Ready_HitBox() override;
+
 private:
 	// »óÅÂ °ü·Ã
 	void						Change_State(KOKABU_STATE eNext);
@@ -81,18 +81,27 @@ private:
 	HRESULT						Bind_ShaderResources();
 
 private:
-	KOKABU_STATE				m_eState = { KOKABU_STATE::IDLE };
 	CShader*					m_pShaderCom = { nullptr };
 	CModel*						m_pModelCom = { nullptr };
+	CAnimator*					m_pAnimatorCom = { nullptr };
 
-	// Inhale
+	KOKABU_STATE				m_eState = { KOKABU_STATE::IDLE };
 	CGameObject*				m_pCaptor = { nullptr };
+	_float3						m_vHitFrom = { 0.f, 0.f, 0.f };
+
 	_float3                     m_vSpatPivot = { 0.f, 0.f, 0.f };
+	_float						m_fSpinAngle = { 0.f };
+	_float						m_fStateTimer = { 0.f };
 
 	_float						m_fPullSpeed = { 0.f };
 	_float3						m_vBaseScale = {};
 	_float						m_fScaleRatio = { 1.f };
 
+	static constexpr _float     s_fSpinSpeedDeg = { 720.f };
+	static constexpr _float     s_fHitReactTime = { 0.6f };
+	static constexpr _float     s_fDisappearTime = { 0.5f };
+	static constexpr _float		s_fHitKnockback = { 8.f };
+	static constexpr _float		s_fHitKnockUp = { 4.f };
 	static constexpr _float		s_fPullAccel = { 40.f };
 	static constexpr _float		s_fMinScaleRatio = { 0.45f };		// º¸¸é¼­ Æ©´×
 	static constexpr _float		s_fShrinkLerp = { 2.f };
