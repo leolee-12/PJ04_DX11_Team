@@ -706,7 +706,6 @@
     <ClCompile Include="..\Private\NormalEnemy_Brain.cpp" />
     <ClCompile Include="..\Private\NormalEnemy_State_Brake.cpp" />
     <ClCompile Include="..\Private\PoppyBrosJr.cpp" />
-    <ClCompile Include="..\Private\RailRideable.cpp" />
     <ClCompile Include="..\Private\UIAnimatorCom.cpp" />
     <ClCompile Include="..\private\UI_BossStatus.cpp" />
     <ClCompile Include="..\private\UI_Curtain.cpp" />

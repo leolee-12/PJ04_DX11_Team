@@ -274,6 +274,7 @@ void CLevelDesign_Parser::Fill_Common(const json& jEntry, LD_OBJECT_DESC* pDesc)
 		JsonUtils::Try_ReadFloat3Array(jEntry, "Scale", &pDesc->vParsedScale);
 
 	JsonUtils::Try_ReadUInt(jEntry, "Basic.RailUser.TargetRailUid", &pDesc->iTargetRailUid);
+	JsonUtils::Try_ReadUInt(jEntry, "Basic.RailUser.NodeIndex", &pDesc->iTargetRailNodeIndex);
 	JsonUtils::Try_ReadInt(jEntry, "TargetLandGroupIndex", &pDesc->iTargetLandGroupIndex);
 
 	pDesc->jRaw = jEntry;
@@ -317,19 +318,28 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 		JsonUtils::Try_ReadString(jEntry, "ErpType", &strErp);
 		const _tchar* szErp = strErp.c_str();
 
-		_bool bLine =
-			JsonUtils::Equals_NoCase(szErp, L"Line");
-		_bool bCircle =
-			JsonUtils::Equals_NoCase(szErp, L"Circle");
+		const _bool bLine = JsonUtils::Equals_NoCase(szErp, L"Line");
+		const _bool bBezier = JsonUtils::Equals_NoCase(szErp, L"Bezier");
+		const _bool bCircle = JsonUtils::Equals_NoCase(szErp, L"Circle");
 
 		if (bLine)
 		{
+			pDesc->Rail.eType = LD_RAIL_TYPE::LINE;
 			pDesc->Rail.fRadius = 0.f;
 			pDesc->Rail.fBezierControlLength = 0.f;
 		}
+		else if (bBezier)
+		{
+			pDesc->Rail.eType = LD_RAIL_TYPE::BEZIER;
+		}
 		else if (bCircle)
 		{
+			pDesc->Rail.eType = LD_RAIL_TYPE::CIRCLE;
 			pDesc->Rail.fBezierControlLength = 0.f;
+		}
+		else
+		{
+			pDesc->Rail.eType = LD_RAIL_TYPE::UNKNOWN;
 		}
 
 		Try_ReadRailNodes(jEntry, pDesc->Rail.fBezierControlLength, &pDesc->Rail.Nodes);

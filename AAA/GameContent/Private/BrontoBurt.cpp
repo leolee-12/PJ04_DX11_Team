@@ -69,6 +69,15 @@ void CBrontoBurt::Set_RailDesc(const LD_RAIL_DESC& Desc)
 	pRail->Snap_ToPath();
 }
 
+HRESULT CBrontoBurt::Bind_Rail(const RAIL_BIND_CONTEXT& Context)
+{
+	if (nullptr == Context.pRailDesc || nullptr == m_pMovement)
+		return E_FAIL;
+
+	Set_RailDesc(*Context.pRailDesc);
+	return S_OK;
+}
+
 CMonsterBrain* CBrontoBurt::Create_Brain()
 {
 	return CBrontoBurt_Brain::Create(this);

@@ -2,6 +2,7 @@
 
 #include "DebugDraw.h"
 #include "GameInstance_Proxy.h"
+#include "RailTrack.h"
 
 namespace
 {
@@ -34,25 +35,6 @@ namespace
 
 		return XMVectorGetX(XMVector3LengthSq(vDirection)) > 1e-8f ? XMVector3Normalize(vDirection) : XMVectorZero();
 	}
-
-	_bool Is_CircleRail(const LD_RAIL_DESC& RailDesc)
-	{
-		return RailDesc.fRadius > 0.001f;
-	}
-
-	_bool Is_BezierRail(const LD_RAIL_DESC& RailDesc)
-	{
-		if (Is_CircleRail(RailDesc))
-			return false;
-
-		for (const LD_RAIL_NODE_DESC& Node : RailDesc.Nodes)
-		{
-			if (Node.fBezierControlLength > 0.001f)
-				return true;
-		}
-
-		return false;
-	}
 }
 
 NS_BEGIN(Client)
@@ -64,7 +46,8 @@ CLevelDesign_Rail::CLevelDesign_Rail(ID3D11Device* pDevice, ID3D11DeviceContext*
 
 CLevelDesign_Rail::CLevelDesign_Rail(const CLevelDesign_Rail& Prototype)
 	: CLevelDesignObject(Prototype)
-	, m_tRailDesc(Prototype.m_tRailDesc)
+	, m_tRailDesc{ Prototype.m_tRailDesc }
+	, m_pRailTrack{ nullptr }
 {
 }
 
@@ -88,6 +71,12 @@ HRESULT CLevelDesign_Rail::Initialize(void* pArg)
 
 	m_tLevelDesignDesc.eCategory = LD_CATEGORY::RAIL;
 
+	m_pRailTrack = CRailTrack::Create();
+	if (nullptr == m_pRailTrack)
+		return E_FAIL;
+
+	m_pRailTrack->Build(m_tRailDesc);
+
 #ifdef _DEBUG
 	if (FAILED(Ready_DebugResources()))
 		return E_FAIL;
@@ -95,6 +84,39 @@ HRESULT CLevelDesign_Rail::Initialize(void* pArg)
 
 	if (FAILED(Validate_Initialized()))
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevelDesign_Rail::Validate_Initialized()
+{
+	if (FAILED(__super::Validate_Initialized()))
+		return E_FAIL;
+
+	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom || nullptr == m_pRailTrack)
+		return E_FAIL;
+	if (LD_CATEGORY::RAIL != m_tLevelDesignDesc.eCategory)
+		return E_FAIL;
+	if (m_tLevelDesignDesc.strObjectName.empty())
+		return E_FAIL;
+
+	if (m_tRailDesc.fRadius < 0.f || m_tRailDesc.fBezierControlLength < 0.f)
+		return E_FAIL;
+	if (0 == Get_SegmentCount(m_tRailDesc))
+		return E_FAIL;
+	if (!m_pRailTrack->Is_Valid())
+		return E_FAIL;
+
+	for (const LD_RAIL_NODE_DESC& Node : m_tRailDesc.Nodes)
+	{
+		if (Node.fBezierControlLength < 0.f)
+			return E_FAIL;
+	}
+
+#ifdef _DEBUG
+	if (nullptr == m_pBatch || nullptr == m_pEffect || nullptr == m_pInputLayout)
+		return E_FAIL;
+#endif
 
 	return S_OK;
 }
@@ -140,14 +162,21 @@ const CLevelDesign_Rail* CLevelDesign_Rail::Find_ByUid(CGameInstance_Proxy* pPro
 
 _uint CLevelDesign_Rail::Get_SegmentCount(const LD_RAIL_DESC& RailDesc)
 {
-	if (Is_CircleRail(RailDesc))
-		return RailDesc.fRadius > 0.001f ? 1 : 0;
+	switch (RailDesc.eType)
+	{
+	case LD_RAIL_TYPE::LINE:
+	case LD_RAIL_TYPE::BEZIER:
+		if (RailDesc.Nodes.size() < 2)
+			return 0;
 
-	if (RailDesc.Nodes.size() < 2)
+		return static_cast<_uint>(RailDesc.Nodes.size() - 1 + (RailDesc.bClose && RailDesc.Nodes.size() > 2 ? 1 : 0));
+
+	case LD_RAIL_TYPE::CIRCLE:
+		return RailDesc.fRadius > 0.001f ? 1u : 0u;
+
+	default:
 		return 0;
-
-	const _bool bClose = RailDesc.bClose && RailDesc.Nodes.size() > 2;
-	return static_cast<_uint>(RailDesc.Nodes.size() - 1 + (bClose ? 1 : 0));
+	}
 }
 
 _bool CLevelDesign_Rail::Evaluate_Segment(const LD_RAIL_DESC& RailDesc, _uint iSegmentIndex, _float fT, _float3* pOutPosition, _float3* pOutTangent)
@@ -161,7 +190,7 @@ _bool CLevelDesign_Rail::Evaluate_Segment(const LD_RAIL_DESC& RailDesc, _uint iS
 
 	const _float fClampedT = std::clamp(fT, 0.f, 1.f);
 
-	if (!Is_CircleRail(RailDesc) && !Is_BezierRail(RailDesc))
+	if (LD_RAIL_TYPE::LINE == RailDesc.eType)
 	{
 		const _uint iStartIndex = iSegmentIndex;
 		const _uint iEndIndex = iSegmentIndex + 1 < RailDesc.Nodes.size() ? iSegmentIndex + 1 : 0;
@@ -182,7 +211,7 @@ _bool CLevelDesign_Rail::Evaluate_Segment(const LD_RAIL_DESC& RailDesc, _uint iS
 		return true;
 	}
 
-	if (Is_BezierRail(RailDesc))
+	if (LD_RAIL_TYPE::BEZIER == RailDesc.eType)
 	{
 		const _uint iStartIndex = iSegmentIndex;
 		const _uint iEndIndex = iSegmentIndex + 1 < RailDesc.Nodes.size() ? iSegmentIndex + 1 : 0;
@@ -221,7 +250,7 @@ _bool CLevelDesign_Rail::Evaluate_Segment(const LD_RAIL_DESC& RailDesc, _uint iS
 		return true;
 	}
 
-	if (Is_CircleRail(RailDesc))
+	if (LD_RAIL_TYPE::CIRCLE == RailDesc.eType)
 	{
 		_float fStartAngle = 0.f;
 
@@ -250,37 +279,6 @@ _bool CLevelDesign_Rail::Evaluate_Segment(const LD_RAIL_DESC& RailDesc, _uint iS
 	}
 
 	return false;
-}
-
-HRESULT CLevelDesign_Rail::Validate_Initialized()
-{
-	if (FAILED(__super::Validate_Initialized()))
-		return E_FAIL;
-
-	if (nullptr == m_pGameInstance_Proxy || nullptr == m_pTransformCom)
-		return E_FAIL;
-	if (LD_CATEGORY::RAIL != m_tLevelDesignDesc.eCategory)
-		return E_FAIL;
-	if (m_tLevelDesignDesc.strObjectName.empty())
-		return E_FAIL;
-
-	if (m_tRailDesc.fRadius < 0.f || m_tRailDesc.fBezierControlLength < 0.f)
-		return E_FAIL;
-	if (0 == Get_SegmentCount(m_tRailDesc))
-		return E_FAIL;
-
-	for (const LD_RAIL_NODE_DESC& Node : m_tRailDesc.Nodes)
-	{
-		if (Node.fBezierControlLength < 0.f)
-			return E_FAIL;
-	}
-
-#ifdef _DEBUG
-	if (nullptr == m_pBatch || nullptr == m_pEffect || nullptr == m_pInputLayout)
-		return E_FAIL;
-#endif
-
-	return S_OK;
 }
 
 #ifdef _DEBUG
@@ -339,7 +337,7 @@ HRESULT CLevelDesign_Rail::Render_Rail()
 
 	const _float4 vRailColor = { 1.f, 0.85f, 0.15f, 1.f };
 	const _float4 vNodeColor = { 1.f, 0.85f, 0.15f, 1.f };
-	const _bool bCircle = Is_CircleRail(m_tRailDesc);
+	const _bool bCircle = LD_RAIL_TYPE::CIRCLE == m_tRailDesc.eType;
 
 	m_pBatch->Begin();
 
@@ -355,7 +353,7 @@ HRESULT CLevelDesign_Rail::Render_Rail()
 	{
 		vector<VertexPositionColor> Vertices;
 
-		if (Is_BezierRail(m_tRailDesc))
+		if (LD_RAIL_TYPE::BEZIER == m_tRailDesc.eType)
 		{
 			constexpr _uint iSamplesPerSegment = 16;
 			const _uint iSegmentCount = Get_SegmentCount(m_tRailDesc);
@@ -445,6 +443,8 @@ CGameObject* CLevelDesign_Rail::Clone(void* pArg)
 
 void CLevelDesign_Rail::Free()
 {
+	Safe_Release(m_pRailTrack);
+
 #ifdef _DEBUG
 	Safe_Release(m_pInputLayout);
 	Safe_Delete(m_pEffect);

@@ -45,6 +45,7 @@ public:
 
     // IRailRideable
     virtual void            Set_RailDesc(const LD_RAIL_DESC& Desc) override;
+    virtual HRESULT         Bind_Rail(const RAIL_BIND_CONTEXT& Context) override;
 
 protected:
     virtual CMonsterBrain*  Create_Brain() override;

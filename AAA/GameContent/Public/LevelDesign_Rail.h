@@ -2,6 +2,7 @@
 #include "LevelDesignObject.h"
 
 NS_BEGIN(Client)
+class CRailTrack;
 
 class CLevelDesign_Rail final : public CLevelDesignObject
 {
@@ -26,12 +27,15 @@ public:
 
 public:
 	const LD_RAIL_DESC& Get_RailDesc() const { return m_tRailDesc; }
+	const CRailTrack* Get_RailTrack() const { return m_pRailTrack; }
+	
 	static const CLevelDesign_Rail* Find_ByUid(CGameInstance_Proxy* pProxy, _uint iLevelIndex, _uint iRailUid);
 	static _uint Get_SegmentCount(const LD_RAIL_DESC& RailDesc);
 	static _bool Evaluate_Segment(const LD_RAIL_DESC& RailDesc, _uint iSegmentIndex, _float fT, _float3* pOutPosition, _float3* pOutTangent = nullptr);
 
 private:
 	LD_RAIL_DESC m_tRailDesc = {};
+	CRailTrack* m_pRailTrack = nullptr;
 
 private:
 	virtual HRESULT Validate_Initialized() override;
