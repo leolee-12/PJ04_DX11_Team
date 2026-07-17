@@ -152,7 +152,10 @@ float4 ApplyMaskBlend(float4 vColor, float4 vMaskValue)
 float4 ApplyColorToAlpha(float4 vTextureValue, bool bUseColorToAlpha)
 {
     if (bUseColorToAlpha == true)
+    {
         vTextureValue.a *= dot(saturate(vTextureValue.rgb), float3(0.299f, 0.587f, 0.114f));
+        vTextureValue.rgb = float3(1.f, 1.f, 1.f);
+    }
 
     return vTextureValue;
 }
