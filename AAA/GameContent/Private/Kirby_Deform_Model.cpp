@@ -2,6 +2,10 @@
 
 #include "GameInstance.h"
 
+#include "Effect_Container.h"
+#include "Effect_Loader.h"
+#include "Kirby.h"
+
 CKirby_Deform_Model::CKirby_Deform_Model(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPartObject(pDevice, pContext)
 {
@@ -74,7 +78,7 @@ const _float4x4* CKirby_Deform_Model::Get_HatBoneMatirx()
     return Get_BoneMatrixPtr("HatL");;
 }
 
-_bool CKirby_Deform_Model::Handle_AnimEventParent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+_bool CKirby_Deform_Model::Handle_AnimEventParent(CKirby* pKirby, const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 {
     if (Handle_AnimEventEye(e, ePhase) == true)
         return true;
@@ -82,7 +86,107 @@ _bool CKirby_Deform_Model::Handle_AnimEventParent(const ANIM_EVENT& e, ANIM_EVEN
     if (Handle_AnimEventSound(e, ePhase) == true)
         return true;
 
+    if (Handle_AnimEventFx(pKirby, e, ePhase) == true)
+        return true;
+
     return false;
+}
+
+_bool CKirby_Deform_Model::Handle_AnimEventFx(CKirby* pKirby, const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
+{
+    // Begin, End는 Emitter 지속 이펙트용
+
+    if (static_cast<EANIM_EVENT>(e.iEventType) != EANIM_EVENT::Fx)
+        return false;
+
+    if (e.strParam.empty())
+        return true;
+
+    const _wstring wstrEffectKey = StrToWstr(e.strParam);
+
+    if (ePhase == ANIM_EVENT_PHASE::END)
+    {
+        auto iter = m_AnimEventEffects.find(wstrEffectKey);
+
+        if (iter != m_AnimEventEffects.end())
+        {
+            if (iter->second != nullptr)
+                iter->second->EffectContainer_StopAfterEmission();
+
+            m_AnimEventEffects.erase(iter);
+        }
+
+        return true;
+    }
+
+    if (ePhase != ANIM_EVENT_PHASE::POINT && ePhase != ANIM_EVENT_PHASE::BEGIN)
+        return true;
+
+    if (ePhase == ANIM_EVENT_PHASE::BEGIN &&
+        m_AnimEventEffects.find(wstrEffectKey) != m_AnimEventEffects.end())
+        return true;
+
+    CTransform* pKirbyTransform = pKirby->Get_Transform();
+
+    const _vector vForward = XMVector3Normalize(XMVectorSetY(pKirbyTransform->Get_State(STATE::LOOK), 0.f));
+    const _vector vRight = XMVector3Normalize(XMVectorSetY(pKirbyTransform->Get_State(STATE::RIGHT), 0.f));
+    const _vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+    _vector vLocalLook = XMVectorZero();
+
+    switch (static_cast<KIRBY_FX_DIRECTION>(e.iIntParam))
+    {
+        case KIRBY_FX_DIRECTION::NONE:
+            break;
+        case KIRBY_FX_DIRECTION::FORWARD:
+            vLocalLook = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+            break;
+        case KIRBY_FX_DIRECTION::BACKWARD:
+            vLocalLook = XMVectorSet(0.f, 0.f, -1.f, 0.f);
+            break;
+        case KIRBY_FX_DIRECTION::RIGHT:
+            vLocalLook = XMVectorSet(1.f, 0.f, 0.f, 0.f);
+            break;
+        case KIRBY_FX_DIRECTION::LEFT:
+            vLocalLook = XMVectorSet(-1.f, 0.f, 0.f, 0.f);
+            break;
+        case KIRBY_FX_DIRECTION::BACKWARD_RIGHT:
+            vLocalLook = XMVector3Normalize(XMVectorSet(1.f, 0.f, -1.f, 0.f));
+            break;
+        case KIRBY_FX_DIRECTION::BACKWARD_LEFT:
+            vLocalLook = XMVector3Normalize(XMVectorSet(-1.f, 0.f, -1.f, 0.f));
+            break;
+    }
+
+    if (ePhase == ANIM_EVENT_PHASE::POINT)
+    {
+        _float3 vPos{};
+        XMStoreFloat3(&vPos, pKirbyTransform->Get_State(STATE::POSITION) +
+            vRight * e.vOffset.x + vUp * e.vOffset.y + vForward * e.vOffset.z);
+
+        _float3 vLook{};
+        XMStoreFloat3(&vLook,
+            vRight * XMVectorGetX(vLocalLook) +
+            vUp * XMVectorGetY(vLocalLook) +
+            vForward * XMVectorGetZ(vLocalLook));
+
+        CEffect_Loader::GetInstance()->Spawn(wstrEffectKey, pKirby->Get_LevelIndex(), vPos, vLook);
+        return true;
+    }
+
+    _float3 vLocalLookFloat{};
+    XMStoreFloat3(&vLocalLookFloat, vLocalLook);
+
+    CEffect_Container* pEffect = nullptr;
+    const HRESULT hr = CEffect_Loader::GetInstance()->Spawn(wstrEffectKey, pKirby->Get_LevelIndex(),
+        e.vOffset, vLocalLookFloat, _float3{}, pKirbyTransform->Get_WorldMatrixPtr(), &pEffect);
+
+    if (FAILED(hr) || pEffect == nullptr)
+        return true;
+
+    m_AnimEventEffects.emplace(wstrEffectKey, pEffect);
+
+    return true;
 }
 
 _bool CKirby_Deform_Model::Handle_AnimEventEye(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
@@ -211,6 +315,7 @@ HRESULT CKirby_Deform_Model::Bind_CommonShaderResources(CShader* pShader)
 
 void CKirby_Deform_Model::Free()
 {
+    m_AnimEventEffects.clear();
     Stop_SoundHandle();
 
     __super::Free();

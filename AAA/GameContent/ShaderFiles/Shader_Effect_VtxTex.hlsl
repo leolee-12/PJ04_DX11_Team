@@ -264,7 +264,7 @@ technique11 DefaultTechnique
 {
     pass DefaultPass
     {
-        SetRasterizerState(RS_Default);
+        SetRasterizerState(RS_Cull_None);
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
@@ -275,7 +275,7 @@ technique11 DefaultTechnique
 
     pass AlphaBlend
     {
-        SetRasterizerState(RS_Default);
+        SetRasterizerState(RS_Cull_None);
         SetDepthStencilState(DSS_NoWrite, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
@@ -286,7 +286,7 @@ technique11 DefaultTechnique
 
     pass Additive
     {
-        SetRasterizerState(RS_Default);
+        SetRasterizerState(RS_Cull_None);
         SetDepthStencilState(DSS_NoWrite, 0);
         SetBlendState(BS_Additive, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
@@ -297,7 +297,7 @@ technique11 DefaultTechnique
 
     pass DefaultPass_Mirror
     {
-        SetRasterizerState(RS_Default);
+        SetRasterizerState(RS_Cull_None);
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
@@ -308,7 +308,7 @@ technique11 DefaultTechnique
 
     pass AlphaBlend_Mirror
     {
-        SetRasterizerState(RS_Default);
+        SetRasterizerState(RS_Cull_None);
         SetDepthStencilState(DSS_NoWrite, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
@@ -319,7 +319,7 @@ technique11 DefaultTechnique
 
     pass Additive_Mirror
     {
-        SetRasterizerState(RS_Default);
+        SetRasterizerState(RS_Cull_None);
         SetDepthStencilState(DSS_NoWrite, 0);
         SetBlendState(BS_Additive, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
@@ -330,7 +330,7 @@ technique11 DefaultTechnique
 
     pass DefaultPass_DepthIgnore
     {
-        SetRasterizerState(RS_Default);
+        SetRasterizerState(RS_Cull_None);
         SetDepthStencilState(DSS_Z_Disable, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
@@ -341,7 +341,7 @@ technique11 DefaultTechnique
 
     pass AlphaBlend_DepthIgnore
     {
-        SetRasterizerState(RS_Default);
+        SetRasterizerState(RS_Cull_None);
         SetDepthStencilState(DSS_Z_Disable, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
@@ -352,7 +352,7 @@ technique11 DefaultTechnique
 
     pass Additive_DepthIgnore
     {
-        SetRasterizerState(RS_Default);
+        SetRasterizerState(RS_Cull_None);
         SetDepthStencilState(DSS_Z_Disable, 0);
         SetBlendState(BS_Additive, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
@@ -363,7 +363,7 @@ technique11 DefaultTechnique
 
     pass DefaultPass_Mirror_DepthIgnore
     {
-        SetRasterizerState(RS_Default);
+        SetRasterizerState(RS_Cull_None);
         SetDepthStencilState(DSS_Z_Disable, 0);
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
@@ -374,7 +374,7 @@ technique11 DefaultTechnique
 
     pass AlphaBlend_Mirror_DepthIgnore
     {
-        SetRasterizerState(RS_Default);
+        SetRasterizerState(RS_Cull_None);
         SetDepthStencilState(DSS_Z_Disable, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
@@ -385,7 +385,7 @@ technique11 DefaultTechnique
 
     pass Additive_Mirror_DepthIgnore
     {
-        SetRasterizerState(RS_Default);
+        SetRasterizerState(RS_Cull_None);
         SetDepthStencilState(DSS_Z_Disable, 0);
         SetBlendState(BS_Additive, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 

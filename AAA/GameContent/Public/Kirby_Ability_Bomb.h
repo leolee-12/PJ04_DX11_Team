@@ -2,6 +2,10 @@
 
 #include "Kirby_Ability.h"
 
+NS_BEGIN(Engine)
+class CEffect_Container;
+NS_END
+
 NS_BEGIN(Client)
 
 class CKirby;
@@ -13,9 +17,11 @@ private:
 	enum BOMB_STATE
 	{ 
 		MOVE_THROW,
-		CHARGE_START, CHARGE,
-		FALL_CHARGE_START, FALL_CHARGE, CHARGE_LANDING,
-		THROW, BOMB_STATE_END
+		CHARGE_START, CHARGING,
+		CHARGE_START_FALL, CHARGING_FALL,
+		CHARGING_LANDING,
+		THROW, CHARGING_THROW,
+		BOMB_STATE_END
 	};
 
 private:
@@ -38,6 +44,9 @@ public:
 	virtual _bool Enter_Attack_KeyPress(CKirby* pKirby) override;
 	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) override;
 
+public:
+	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
+
 private:
 	void Change_BombState(CKirby* pKirby, BOMB_STATE eNext);
 	void Enter_BombState(CKirby* pKirby, BOMB_STATE eState);
@@ -46,18 +55,54 @@ private:
 
 	_bool Handle_ReserveAttack(CKirby* pKirby);
 
+private:
 	void Spawn_Bomb(CKirby* pKirby);
-	void Throw_Bomb(CKirby* pKirby);
+	void Throw_Bomb(CKirby* pKirby, _float fDegree, _float fSpeed);
+	void Throw_BombToAim();
+
+	void Reset_Aim(CKirby* pKirby);
+	void Acc_AimInput(const _float3& vInputDir);
+	void Cal_Aim(_float fTimeDelta);
+
+	void Update_AimPrediction();
+
+	void Update_BombHitAim();
+	void Despawn_BombHitAim();
 
 private:
 	BOMB_STATE m_eBombState{};
 
 	_bool m_bKeyUp{};
-
 	_bool m_bReserveAttack{};
+	_bool m_bReserveKeyUp{};
 
 private:
 	CKirbyBomb* m_pBomb{};
+
+	_float3 m_vAimInput{};
+	_float3 m_vAimTargetPos{};
+
+	_float3 m_vAimLaunchVelocity{};
+
+
+	// Effect
+	vector<_float3> m_PredictedPathPoints;
+	_float3 m_vPredictedHitPos{};
+	_float3 m_vPredictedHitNormal{};
+	_bool m_bPredictedHit{};
+
+	CEffect_Container* m_pBombHitAim{};
+
+
+
+	void Update_BombAimDots(_float fTimeDelta);
+	void Despawn_BombAimDots();
+
+	static constexpr _uint s_iBombAimDotCount = 32;
+	static constexpr _uint s_iBombAimDotInterval = 6;
+
+	CEffect_Container* m_pBombAimDots[s_iBombAimDotCount]{};
+	_float m_fBombAimDotStep{};
 
 public:
 	static CKirby_Ability_Bomb* Create();
