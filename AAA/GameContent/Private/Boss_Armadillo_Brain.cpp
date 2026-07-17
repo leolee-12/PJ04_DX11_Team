@@ -146,15 +146,15 @@ CBTNode* CBoss_Armadillo_Brain::Make_Roll()
                         _vector vBounce = XMVector3Normalize(XMVectorSetY(XMLoadFloat3(&vN), 0.f));
                         m_pOwner->Get_Movement()->Launch(vBounce, fBounceBackSpeed, fBounceUpSpeed);
                         m_pOwner->Get_Movement()->Set_MoveSpeed(WALK_SPEED);
-                        *bGroggy = true; *bOn = false; return BT_STATUS::SUCCESS;
                         pArma->Set_RutTrail(false);
+                        *bGroggy = true; *bOn = false; return BT_STATUS::SUCCESS;
                     }
                     *iState = 1; *fAimT = 0.f;
                 }
                 else if (*fSegT >= fSegTimeMax) {
                     m_pOwner->Get_Movement()->Set_MoveSpeed(WALK_SPEED);
-                    *bOn = false; return BT_STATUS::SUCCESS;
                     pArma->Set_RutTrail(false);
+                    *bOn = false; return BT_STATUS::SUCCESS;
                 }
             }
             else {

@@ -86,6 +86,7 @@ protected:
 
     virtual HRESULT Ready_AnimEvents() override;
     virtual HRESULT Ready_PartObjects() override;
+    virtual const _float4x4* Get_FxParentMatrix(const _wstring& strFx) const override { return nullptr; }
 
 private:
     CBoss_Armadillo_Body* m_pBody = { nullptr };

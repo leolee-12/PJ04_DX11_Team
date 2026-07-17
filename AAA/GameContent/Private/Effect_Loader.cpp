@@ -93,6 +93,7 @@ namespace
         { TEXT("RutA"),                   TEXT("../../Resources/YSH/Effects/RutA.JSON") },
         { TEXT("RutB"),                   TEXT("../../Resources/YSH/Effects/RutB.JSON") },
         { TEXT("Dust"),                   TEXT("../../Resources/YSH/Effects/Dust.JSON") },
+        { TEXT("Dust_Landing"),           TEXT("../../Resources/YSH/Effects/Dust_Landing.JSON") },
     };
 }
 

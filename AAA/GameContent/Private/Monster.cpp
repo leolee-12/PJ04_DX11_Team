@@ -649,10 +649,16 @@ _bool CMonster::Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 	case 2:		vLook = e.vOffset;													break;		// 커스텀 LOOK
 	case 3:		XMStoreFloat3(&vLook, m_pTransformCom->Get_State(STATE::LOOK));		break;		// 몬스터의 LOOK(FX가 Parent가 없을 때)
 	case 4:		vRotDeg = e.vOffset;												break;		// 회전(도)
+	case 5:		XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));	break;
 	default:																		break;
 	}
 
-	if (ePhase == ANIM_EVENT_PHASE::BEGIN)
+	if (ePhase == ANIM_EVENT_PHASE::POINT)
+	{
+		CEffect_Loader::GetInstance()->Spawn(strFx, Get_LevelIndex(),
+			vPos, vLook, vRotDeg, Get_FxParentMatrix(strFx), nullptr);
+	}
+	else if (ePhase == ANIM_EVENT_PHASE::BEGIN)
 	{
 		CEffect_Container*& pSlot = m_Effects[strFx];
 		if (pSlot)
