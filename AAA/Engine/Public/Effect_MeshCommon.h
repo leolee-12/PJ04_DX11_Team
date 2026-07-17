@@ -39,12 +39,27 @@ namespace EffectMesh
         _bool& bReverse;
     };
 
+    struct UV_EDGE_FADE_VALUES
+    {
+        _bool& bUse;
+        _int& iAxis;
+        _float& fStartRange;
+        _float& fEndRange;
+        _float& fPower;
+    };
+
     struct VALUES
     {
+        _bool& bTextureColorToAlpha;
+        UV_EDGE_FADE_VALUES TextureEdgeFade;
         TEXTURE_VALUES Diffuse;
+        _bool& bDiffuseColorToAlpha;
+        UV_EDGE_FADE_VALUES DiffuseEdgeFade;
         _bool& bUseNormalTexture;
         _bool& bUseMRATexture;
         TEXTURE_VALUES Unknown;
+        _bool& bUnknownColorToAlpha;
+        UV_EDGE_FADE_VALUES UnknownEdgeFade;
 
         CIRCLE_UV_VALUES TextureCircle;
         CIRCLE_UV_VALUES MaskCircle;

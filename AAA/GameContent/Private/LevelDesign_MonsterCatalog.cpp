@@ -8,6 +8,7 @@
 #include "PoppyBrosJr.h"
 #include "Cappy.h"
 #include "NormalEnemyWild.h"
+#include "Dekabu.h"
 #include "Parsing_Utils.h"
 
 NS_BEGIN(Client)
@@ -57,6 +58,11 @@ namespace
 		return CNormalEnemyWild::Create(pDevice, pContext);
 	}
 
+	CGameObject* Create_DekabuPrototype(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	{
+		return CDekabu::Create(pDevice, pContext);
+	}
+
 	static const LD_MONSTER_CATALOG g_MonsterCatalog[] =
 	{
 			{ L"BladeKnight",		CBladeKnight::PROTOTYPE_TAG,		&Create_BladeKnightPrototype },
@@ -66,6 +72,7 @@ namespace
 			{ L"PoppyBrosJr",		CPoppyBrosJr::PROTOTYPE_TAG,		&Create_PoppyBrosJrPrototype },
 			{ L"Cappy",				CCappy::PROTOTYPE_TAG,				&Create_CappyPrototype },
 			{ L"NormalEnemyWild",	CNormalEnemyWild::PROTOTYPE_TAG,	&Create_NormalEnemyWildPrototype, L"NormalEnemy"},
+			{ L"Dekabu",			CDekabu::PROTOTYPE_TAG,				&Create_DekabuPrototype},
 	};
 }
 

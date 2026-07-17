@@ -9,9 +9,20 @@ class CVIBuffer_Rect;
 
 namespace EffectRect
 {
+    struct UV_EDGE_FADE_VALUES
+    {
+        _bool& bUse;
+        _int& iAxis;
+        _float& fStartRange;
+        _float& fEndRange;
+        _float& fPower;
+    };
+
     struct VALUES               // Non-owning references to the Effect object's members.
     {
         _bool& bBillboard;
+        _bool& bTextureColorToAlpha;
+        UV_EDGE_FADE_VALUES TextureEdgeFade;
 
         _bool& bSpriteAniTexture;
         _int& iTexFrameX;

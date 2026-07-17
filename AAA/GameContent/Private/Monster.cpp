@@ -635,42 +635,83 @@ _bool CMonster::Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 	if (static_cast<EANIM_EVENT>(e.iEventType) != EANIM_EVENT::Fx)
 		return false;
 
+	if (ePhase == ANIM_EVENT_PHASE::TICK)
+		return true;
+
 	const _wstring strFx = StrToWstr(e.strParam);
 	if (strFx.empty())
 		return true;
 
-	_int iEffectVariation = e.iIntParam;
-	_float3 vPos{}, vLook{0.f, 0.f, 1.f}, vRotDeg{};
-
-	switch(iEffectVariation)
+	_float3 vPos{}, vLook{ 0.f, 0.f, 1.f }, vRotDeg{};
+	const _float4x4* vAncorMat = { nullptr };
+	switch (e.iIntParam)
 	{
-	case 1:		vPos = e.vOffset;													break;		// 위치 오프셋
-	case 2:		vLook = e.vOffset;													break;		// 커스텀 LOOK
-	case 3:		XMStoreFloat3(&vLook, m_pTransformCom->Get_State(STATE::LOOK));		break;		// 몬스터의 LOOK(FX가 Parent가 없을 때)
-	case 4:		vRotDeg = e.vOffset;												break;		// 회전(도)
-	default:																		break;
+	case 1:     vPos = e.vOffset;														break;
+	case 2:    	vLook = e.vOffset;														break;
+	case 3:    	XMStoreFloat3(&vLook, m_pTransformCom->Get_State(STATE::LOOK));			break;
+	case 4:     vRotDeg = e.vOffset;													break;
+	case 5:    	XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));		break;
+	case 6:		vAncorMat = Get_FxParentMatrix(strFx);									break;
+	case 7:		// 몬스터 기준 월드 스폰: 위치=월드행렬×오프셋, LOOK=몬스터 LOOK
+	{
+		XMStoreFloat3(&vPos, XMVector3TransformCoord(XMLoadFloat3(&e.vOffset),
+			XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrixPtr())));
+		XMStoreFloat3(&vLook, m_pTransformCom->Get_State(STATE::LOOK));
+	}
+		break;
+	default:
+		break;
+	}
+
+	auto pLoader = CEffect_Loader::GetInstance();
+
+	if (ePhase == ANIM_EVENT_PHASE::POINT)
+	{   
+		pLoader->Spawn(strFx, Get_LevelIndex(),
+			vPos, vLook, vRotDeg, vAncorMat);
+		return true;
 	}
 
 	if (ePhase == ANIM_EVENT_PHASE::BEGIN)
 	{
-		CEffect_Container*& pSlot = m_Effects[strFx];
-		if (pSlot)
-			pSlot->EffectContainer_StopAfterEmission();
+		FX_HANDLE& hSlot = m_Effects[strFx];
+		if (pLoader->Is_Current(hSlot))
+			hSlot.p->EffectContainer_StopAfterEmission();
+		hSlot.Clear();
 
-		
-		CEffect_Loader::GetInstance()->Spawn(strFx, Get_LevelIndex(),
-			vPos, vLook, vRotDeg, Get_FxParentMatrix(strFx), &pSlot);
+		pLoader->Spawn(strFx, Get_LevelIndex(),
+			vPos, vLook, vRotDeg, Get_FxParentMatrix(strFx),
+			nullptr, &hSlot);
 	}
 	else if (ePhase == ANIM_EVENT_PHASE::END)
 	{
 		auto it = m_Effects.find(strFx);
-		if (it != m_Effects.end() && it->second)
+		if (it != m_Effects.end())
 		{
-			it->second->Start_FadeOut(0.4f);
-			it->second = nullptr;
+			if (pLoader->Is_Current(it->second))
+				it->second.p->Start_FadeOut(0.4f);
+			it->second.Clear();
 		}
 	}
 	return true;
+}
+
+void CMonster::Stop_AllFx(_bool bImmediate)
+{
+	auto pLoader = CEffect_Loader::GetInstance();
+
+	for (auto& Pair : m_Effects)
+	{
+		FX_HANDLE& h = Pair.second;
+		if (pLoader->Is_Current(h))
+		{
+			if (bImmediate)
+				h.p->EffectContainer_Stop();
+			else
+				h.p->Start_FadeOut(0.4f);
+		}
+		h.Clear();
+	}
 }
 
 void CMonster::Play_DeathFX()
@@ -803,6 +844,7 @@ void CMonster::On_SpatEnd()
 
 void CMonster::Despawn()
 {
+	Stop_AllFx(false);
 	Play_DeathFX();
 
 	Enable_Colliders(false);

@@ -11,7 +11,14 @@ class ENGINE_DLL CEffect_Quad abstract : public CEffect_NonParticle
 {
     GENERATED_BODY_ABSTRACT(CEffect_Quad)
 
+    PROPERTY(_int, m_iRotationAxisSpace, L"Rotation Axis Space_R", L"Rot");
     PROPERTY(_bool, m_bBillboard, L"Billboard", L"Effect");
+    PROPERTY(_bool, m_bTextureColorToAlpha, L"Color To Alpha_T", L"Texture Com");
+    PROPERTY(_bool, m_bUseTextureUVEdgeFade, L"Use UV Edge Fade_T", L"Texture Com");
+    PROPERTY(_int, m_iTextureUVEdgeFadeAxis, L"Edge Fade Axis_T", L"Texture Com");
+    PROPERTY(_float, m_fTextureUVEdgeFadeStartRange, L"Edge Fade Start Range_T", L"Texture Com");
+    PROPERTY(_float, m_fTextureUVEdgeFadeEndRange, L"Edge Fade End Range_T", L"Texture Com");
+    PROPERTY(_float, m_fTextureUVEdgeFadePower, L"Edge Fade Power_T", L"Texture Com");
 
     // Sprite Animation Texture
     PROPERTY(_bool, m_bSpriteAniTexture, L"Sprite Animation Texture", L"Sprite Animation");
@@ -50,6 +57,7 @@ public:
 
 protected:
     virtual void Update_Core(const _float fTimeDelta, const _float fRatio) override;
+    virtual _bool Use_LocalRotationAxis() const override { return 1 == m_iRotationAxisSpace; }
 
 private:
     HRESULT Ready_Components();

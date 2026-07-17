@@ -18,6 +18,14 @@ CEffect_MeshEmitter::CEffect_MeshEmitter(const CEffect_MeshEmitter& Prototype)
 EffectMesh::VALUES CEffect_MeshEmitter::Make_MeshValues()
 {
     return {
+        m_bTextureColorToAlpha,
+        {
+            m_bUseTextureUVEdgeFade,
+            m_iTextureUVEdgeFadeAxis,
+            m_fTextureUVEdgeFadeStartRange,
+            m_fTextureUVEdgeFadeEndRange,
+            m_fTextureUVEdgeFadePower
+        },
         {
             m_bUseDiffuseTexture,
             m_vDiffuseTiling,
@@ -25,6 +33,14 @@ EffectMesh::VALUES CEffect_MeshEmitter::Make_MeshValues()
             m_vDiffuseUVScroll,
             m_vDiffuseUVScrollCount,
             m_vCurDiffuseUVOffset
+        },
+        m_bDiffuseColorToAlpha,
+        {
+            m_bUseDiffuseUVEdgeFade,
+            m_iDiffuseUVEdgeFadeAxis,
+            m_fDiffuseUVEdgeFadeStartRange,
+            m_fDiffuseUVEdgeFadeEndRange,
+            m_fDiffuseUVEdgeFadePower
         },
         m_bUseNormalTexture,
         m_bUseMRATexture,
@@ -35,6 +51,14 @@ EffectMesh::VALUES CEffect_MeshEmitter::Make_MeshValues()
             m_vUnknownUVScroll,
             m_vUnknownUVScrollCount,
             m_vCurUnknownUVOffset
+        },
+        m_bUnknownColorToAlpha,
+        {
+            m_bUseUnknownUVEdgeFade,
+            m_iUnknownUVEdgeFadeAxis,
+            m_fUnknownUVEdgeFadeStartRange,
+            m_fUnknownUVEdgeFadeEndRange,
+            m_fUnknownUVEdgeFadePower
         },
         {
             m_bTextureCircleUVAnim,
@@ -146,6 +170,8 @@ HRESULT CEffect_MeshEmitter::Render()
             continue;
 
         _float4x4 ParticleWorld = Make_EmitterParticleWorldMatrix(Particle);
+        if (m_bBillboard == true)
+            ParticleWorld = Make_BillboardWorldMatrix(ParticleWorld);
 
         if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &ParticleWorld)))
             return E_FAIL;
@@ -216,6 +242,8 @@ void CEffect_MeshEmitter::Update_UVScroll(const _float fTimeDelta, const _float 
 
 void CEffect_MeshEmitter::Init_PropertyValue()
 {
+    m_bBillboard = false;
+
     auto Values = Make_MeshValues();
     EffectMesh::Initialize_DefaultValues(Values);
 }

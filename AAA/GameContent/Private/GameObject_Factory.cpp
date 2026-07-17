@@ -87,6 +87,7 @@
 #include "Kirby_SwordTrail.h"
 #include "SmokeCollection.h"
 #include "CarLanding.h"
+#include "PickUpEffect.h"
 #include "SmokeSphereOriginalEmitter.h"
 #include "SwordTrail_BK.h"
 #include "Tornado_BK.h"
@@ -137,21 +138,25 @@
 
 // Monster
 #include "BladeKnight.h"
+#include "NormalEnemy.h"
+#include "Kabu.h"
+#include "BrontoBurt.h"
+#include "PoppyBrosJr.h"
+#include "Cappy.h"
+#include "NormalEnemyWild.h"
+#include "Dekabu.h"
+
+// MonsterPart
 #include "BladeKnight_Body.h"
 #include "BladeKnight_Sword.h"
-#include "NormalEnemy.h"
 #include "NormalEnemy_Body.h"
-#include "Kabu.h"
 #include "Kabu_Body.h"
-#include "BrontoBurt.h"
 #include "BrontoBurt_Body.h"
-#include "PoppyBrosJr.h"
 #include "PoppyBrosJr_Body.h"
-#include "Cappy.h"
 #include "Cappy_Body.h"
 #include "Cappy_Hat.h"
-#include "NormalEnemyWild.h"
 #include "NormalEnemyWild_Body.h"
+#include "Dekabu_Body.h"
 
 //Miniboss
 #include "GigantEdge.h"
@@ -207,6 +212,7 @@
 #include "EnemyBomb.h"
 #include "KirbyBomb.h"
 #include "Spit_Projectile.h"
+#include "KoKabu.h"
 
 // Ability Bubble
 #include "EssenceBubble.h"
@@ -265,7 +271,7 @@ namespace
     {
         TRY_ADD_PROTO(pProxy, iLevelIndex, CAbility_Model::PROTOTYPE_TAG, CAbility_Model::Create(pDevice, pContext));
         
-        // ´É·Â Ãß°¡µÉ ¶§¸¶´Ù ¾Æ·¡¿¡ Ãß°¡
+        // ï¿½É·ï¿½ ï¿½ß°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Æ·ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
         
         // Sword
         TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Ability_Model_Sword"),
@@ -423,7 +429,7 @@ void CGameObject_Factory::Register_Container()
         )
     ); 
 
-#pragma region ¸ó½ºÅÍ
+#pragma region ï¿½ï¿½ï¿½ï¿½
     
     // 1. BladeKnight(Sword)
     Register
@@ -552,6 +558,28 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_NormalEnemyWild_Body"),
                     CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/NormalEnemyWild/Body/NormalEnemyWild.ysh",
                         XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
+    // 8. Dekabu 
+    Register
+    (
+        CDekabu::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CDekabu),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDekabu_Body::PROTOTYPE_TAG, CDekabu_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Dekabu_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Dekabu/Body/Dekabu.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            // KoKabu(Projectile) - Model : Kabu ¿Í µ¿ÀÏ
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKokabu::PROTOTYPE_TAG, CKokabu::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKokabu::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Kabu/Body/Kabu.ysh",
+                    XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 
@@ -925,7 +953,7 @@ void CGameObject_Factory::Register_Effect()
 
         ));
 
-    // 7 Bubble Aura (EssenceBubble / DorppedBubble °ø¿ë)
+    // 7 Bubble Aura (EssenceBubble / DorppedBubble ï¿½ï¿½ï¿½ï¿½)
     Register(CBubbleAura::PROTOTYPE_TAG, TEXT("Effect_Container"),
         CREATOR(CBubbleAura),
         LOADER
@@ -941,6 +969,22 @@ void CGameObject_Factory::Register_Effect()
             
             TRY_ADD_PROTO(pProxy, Texture_Star2D.iLevelID, Texture_Star2D.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_Star2D.szFileTag, Texture_Star2D.iNumTex));
+
+            TRY_ADD_PROTO(pProxy, Texture_CommonSparkle01.iLevelID, Texture_CommonSparkle01.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_CommonSparkle01.szFileTag, Texture_CommonSparkle01.iNumTex));
+
+        ));
+
+    Register(CPickUpEffect::PROTOTYPE_TAG, TEXT("Effect_Container"),
+        CREATOR(CPickUpEffect),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectCommon::PROTOTYPE_TAG, CRectCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectParticleCommon::PROTOTYPE_TAG, CRectParticleCommon::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, Texture_CommonRing01.iLevelID, Texture_CommonRing01.szProtoTag,
+                CTexture::Create(pDevice, pContext, Texture_CommonRing01.szFileTag, Texture_CommonRing01.iNumTex));
 
             TRY_ADD_PROTO(pProxy, Texture_CommonSparkle01.iLevelID, Texture_CommonSparkle01.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_CommonSparkle01.szFileTag, Texture_CommonSparkle01.iNumTex));
@@ -1049,7 +1093,7 @@ void CGameObject_Factory::Register_Effect()
         )
     );
 
-#pragma region ¸ó½ºÅÍ ÀÌÆåÆ®
+#pragma region ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®
     
     // BladeKnight
     Register(CSwordTrail_BK::PROTOTYPE_TAG, TEXT("Effect_Container"),
