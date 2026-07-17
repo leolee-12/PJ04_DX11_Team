@@ -27,7 +27,8 @@ public:
 		IDLE,
 		WALK,
 		GREET,
-		HIT
+		HIT,
+		ANGRY
 	};
 
 private:
@@ -53,13 +54,15 @@ private:
 	void Change_State(WADDLEDEE_STATE eState);
 	_bool Find_Player();
 	void Check_Interact();
+	void Turn_ToPlayer(_float fTimeDelta);
 
 	void Update_Idle(_float fTimeDelta);
 	void Update_Walk(_float fTimeDelta);
 	void Play_Idle();
 	void Pick_WalkTarget();
-	void Update_Greet();
-	void Update_Hit();
+	void Update_Greet(_float fTimeDelta);
+	void Update_Hit(_float fTimeDelta);
+	void Update_Angry(_float fTimeDelta);
 
 private:
 	CWaddleDee_Body* m_pBody = { nullptr };

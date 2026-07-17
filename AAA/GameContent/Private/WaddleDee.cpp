@@ -10,12 +10,14 @@
 
 namespace
 {
-	constexpr const _char* s_szIdleClip = "Wait";
-	constexpr const _char* s_szWalkClip = "Walk";
-	constexpr const _char* s_szGreetClip = "WaveHand";
-	constexpr const _char* s_szHitClip = "Surprise";
+	constexpr const _char* s_strIdleClip = "Wait";
+	constexpr const _char* s_strWalkClip = "Walk";
+	constexpr const _char* s_strGreetClip = "WaveHand";
+	constexpr const _char* s_strHitClip = "Surprise";
+	constexpr const _char* s_strAngryClip = "Anger";
 	constexpr _ubyte s_byInteractKey = DIK_F;
 
+	constexpr _float s_fRotationPerSec = 180.f;
 	constexpr _float s_fWalkTimeLimit = 6.f;
 	constexpr _float s_fArriveDistance = 0.15f;
 	constexpr _float s_fWanderDelayMin = 2.f;
@@ -25,6 +27,7 @@ namespace
 	constexpr _float s_fHurtBoxRadius = 0.6f;
 	constexpr _float s_fHurtBoxHeight = 0.25f;
 
+	static_assert(s_fRotationPerSec > 0.f);
 	static_assert(s_fHurtBoxRadius > 0.f);
 	static_assert(s_fHurtBoxHeight >= 0.f);
 }
@@ -53,6 +56,8 @@ HRESULT CWaddleDee::Initialize(void* pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
+
+	m_pTransformCom->Set_RotationPerSec(s_fRotationPerSec);
 
 	if (nullptr != pArg)
 	{
@@ -106,16 +111,24 @@ void CWaddleDee::Update(_float fTimeDelta)
 
 	case WADDLEDEE_STATE::GREET:
 		if (!bEditMode)
-			Update_Greet();
+			Update_Greet(fTimeDelta);
 		break;
 
 	case WADDLEDEE_STATE::HIT:
 		if (!bEditMode)
-			Update_Hit();
+			Update_Hit(fTimeDelta);
+		break;
+
+	case WADDLEDEE_STATE::ANGRY:
+		if (!bEditMode)
+			Update_Angry(fTimeDelta);
 		break;
 	}
 
-	if (!bEditMode && WADDLEDEE_STATE::GREET != m_eState && WADDLEDEE_STATE::HIT != m_eState)
+	if (!bEditMode
+		&& WADDLEDEE_STATE::GREET != m_eState
+		&& WADDLEDEE_STATE::HIT != m_eState
+		&& WADDLEDEE_STATE::ANGRY != m_eState)
 		Check_Interact();
 }
 
@@ -136,18 +149,13 @@ void CWaddleDee::Late_Update(_float fTimeDelta)
 	}
 }
 
-void CWaddleDee::Damaged(const ATTACK_INFO& tInfo)
+void CWaddleDee::Damaged(const ATTACK_INFO&)
 {
 	if (!m_bActive || m_pGameInstance_Proxy->Is_EditMode())
 		return;
 
-	const _vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
-	const _vector vAttackerPosition = XMLoadFloat3(&tInfo.vAttackerPos);
-	const _vector vToAttacker = XMVectorSetY(vAttackerPosition - vPosition, 0.f);
-	const _float fDistanceSq = XMVectorGetX(XMVector3LengthSq(vToAttacker));
-
-	if (fDistanceSq > FLT_EPSILON)
-		m_pTransformCom->LookAt(vPosition + vToAttacker);
+	if (WADDLEDEE_STATE::HIT == m_eState || WADDLEDEE_STATE::ANGRY == m_eState)
+		return;
 
 	Change_State(WADDLEDEE_STATE::HIT);
 }
@@ -248,10 +256,11 @@ HRESULT CWaddleDee::Validate_Initialized()
 	if (nullptr == m_pBody || nullptr == m_pBody->Get_Animator() || nullptr == m_pHurtBox)
 		return E_FAIL;
 
-	if (!m_pBody->Has_Animation(s_szIdleClip)
-		|| !m_pBody->Has_Animation(s_szWalkClip)
-		|| !m_pBody->Has_Animation(s_szGreetClip)
-		|| !m_pBody->Has_Animation(s_szHitClip))
+	if (!m_pBody->Has_Animation(s_strIdleClip)
+		|| !m_pBody->Has_Animation(s_strWalkClip)
+		|| !m_pBody->Has_Animation(s_strGreetClip)
+		|| !m_pBody->Has_Animation(s_strHitClip)
+		|| !m_pBody->Has_Animation(s_strAngryClip))
 		return E_FAIL;
 
 	if (!m_strFixedAnim.empty())
@@ -287,15 +296,19 @@ void CWaddleDee::Change_State(WADDLEDEE_STATE eState)
 	case WADDLEDEE_STATE::WALK:
 		m_fStateTimer = s_fWalkTimeLimit;
 		Pick_WalkTarget();
-		m_pBody->Get_Animator()->Play(s_szWalkClip, true, true, 0.f);
+		m_pBody->Get_Animator()->Play(s_strWalkClip, true, true, 0.f);
 		break;
 
 	case WADDLEDEE_STATE::GREET:
-		m_pBody->Get_Animator()->Play(s_szGreetClip, false, true);
+		m_pBody->Get_Animator()->Play(s_strGreetClip, false, true);
 		break;
 
 	case WADDLEDEE_STATE::HIT:
-		m_pBody->Get_Animator()->Play(s_szHitClip, false, true);
+		m_pBody->Get_Animator()->Play(s_strHitClip, false, true);
+		break;
+
+	case WADDLEDEE_STATE::ANGRY:
+		m_pBody->Get_Animator()->Play(s_strAngryClip, false, true);
 		break;
 	}
 }
@@ -316,9 +329,6 @@ void CWaddleDee::Check_Interact()
 	if (!m_pGameInstance_Proxy->Key_Down(s_byInteractKey))
 		return;
 
-	if (fDistanceSq > FLT_EPSILON)
-		m_pTransformCom->LookAt(vPosition + vToPlayer);
-
 	Change_State(WADDLEDEE_STATE::GREET);
 }
 
@@ -332,6 +342,14 @@ _bool CWaddleDee::Find_Player()
 	m_pPlayer = PlayerQuery.pPlayer;
 
 	return nullptr != m_pPlayer;
+}
+
+void CWaddleDee::Turn_ToPlayer(_float fTimeDelta)
+{
+	if (!Find_Player())
+		return;
+
+	m_pTransformCom->LookAt_Smooth(m_pPlayer->Get_Transform()->Get_State(STATE::POSITION), fTimeDelta);
 }
 
 void CWaddleDee::Update_Idle(_float fTimeDelta)
@@ -354,7 +372,7 @@ void CWaddleDee::Update_Idle(_float fTimeDelta)
 
 void CWaddleDee::Play_Idle()
 {
-	const _string strClip = m_strFixedAnim.empty() ? s_szIdleClip : WstrToStr(m_strFixedAnim);
+	const _string strClip = m_strFixedAnim.empty() ? s_strIdleClip : WstrToStr(m_strFixedAnim);
 
 	m_pBody->Get_Animator()->Play(strClip, true, true, 0.f);
 	m_strAppliedFixedAnim = m_strFixedAnim;
@@ -409,8 +427,10 @@ void CWaddleDee::Update_Walk(_float fTimeDelta)
 		Change_State(WADDLEDEE_STATE::IDLE);
 }
 
-void CWaddleDee::Update_Greet()
+void CWaddleDee::Update_Greet(_float fTimeDelta)
 {
+	Turn_ToPlayer(fTimeDelta);
+
 	if (!m_pBody->Get_Animator()->Is_Finished())
 		return;
 
@@ -418,8 +438,18 @@ void CWaddleDee::Update_Greet()
 	Change_State(WADDLEDEE_STATE::IDLE);
 }
 
-void CWaddleDee::Update_Hit()
+void CWaddleDee::Update_Hit(_float fTimeDelta)
 {
+	if (!m_pBody->Get_Animator()->Is_Finished())
+		return;
+
+	Change_State(WADDLEDEE_STATE::ANGRY);
+}
+
+void CWaddleDee::Update_Angry(_float fTimeDelta)
+{
+	Turn_ToPlayer(fTimeDelta);
+
 	if (!m_pBody->Get_Animator()->Is_Finished())
 		return;
 
