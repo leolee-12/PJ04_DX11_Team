@@ -39,6 +39,7 @@
     <ClInclude Include="..\Public\DropStar_Manager.h" />
     <ClInclude Include="..\Public\EssenceCrown.h" />
     <ClInclude Include="..\Public\KoKabu.h" />
+    <ClInclude Include="..\Public\LaunchSmoke.h" />
     <ClInclude Include="..\Public\NormalEnemyWild.h" />
     <ClInclude Include="..\Public\NormalEnemyWild_Body.h" />
     <ClInclude Include="..\Public\PickUpEffect.h" />
@@ -437,6 +438,7 @@
     <ClCompile Include="..\Private\DropStar_Manager.cpp" />
     <ClCompile Include="..\Private\EssenceCrown.cpp" />
     <ClCompile Include="..\Private\KoKabu.cpp" />
+    <ClCompile Include="..\Private\LaunchSmoke.cpp" />
     <ClCompile Include="..\Private\NormalEnemyWild.cpp" />
     <ClCompile Include="..\Private\NormalEnemyWild_Body.cpp" />
     <ClCompile Include="..\Private\PickUpEffect.cpp" />
