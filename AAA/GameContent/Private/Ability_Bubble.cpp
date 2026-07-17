@@ -5,7 +5,7 @@
 
 #include "Ability_Model.h"
 #include "Effect_Loader.h"
-#include "Effect_Container.h";
+#include "Effect_Container.h"
 
 
 CAbility_Bubble::CAbility_Bubble(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -718,8 +718,17 @@
     <Filter Include="00. GameObject\06. Monster\09. Dekabu\Parts">
       <UniqueIdentifier>{f811f61b-6d70-4039-848b-c16c51d4676f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. GameObject\06. Monster\09. Dekabu\Parts\Body">
+      <UniqueIdentifier>{60521a6f-e554-4e3e-b75e-64e1b561edaf}</UniqueIdentifier>
+    </Filter>
     <Filter Include="00. GameObject\06. Monster\09. Dekabu\State">
       <UniqueIdentifier>{a40b3ae4-d50a-4484-bb90-2ef22bd254b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\09. Dekabu\State\Alert">
+      <UniqueIdentifier>{e0612fe1-ef50-414d-b15d-fcc88d47cf63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. GameObject\06. Monster\09. Dekabu\State\Attack">
+      <UniqueIdentifier>{ef8678f2-c017-4808-8823-fc44990ce5d3}</UniqueIdentifier>
     </Filter>
     <Filter Include="00. GameObject\06. Monster\10. Bouncy">
       <UniqueIdentifier>{b196f359-42a0-4126-b378-92eced678f10}</UniqueIdentifier>
@@ -1258,15 +1267,6 @@
     <Filter Include="99. Defines\pch">
       <UniqueIdentifier>{b0766aac-5d8e-4c7e-8f5e-209cca6dee40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. GameObject\06. Monster\09. Dekabu\Parts\Body">
-      <UniqueIdentifier>{60521a6f-e554-4e3e-b75e-64e1b561edaf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\09. Dekabu\State\Alert">
-      <UniqueIdentifier>{e0612fe1-ef50-414d-b15d-fcc88d47cf63}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. GameObject\06. Monster\09. Dekabu\State\Attack">
-      <UniqueIdentifier>{ef8678f2-c017-4808-8823-fc44990ce5d3}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Ability_Bubble.h">
@@ -1508,6 +1508,18 @@
     </ClInclude>
     <ClInclude Include="..\Public\Dekabu.h">
       <Filter>00. GameObject\06. Monster\09. Dekabu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Dekabu_Body.h">
+      <Filter>00. GameObject\06. Monster\09. Dekabu\Parts\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Dekabu_Brain.h">
+      <Filter>00. GameObject\06. Monster\09. Dekabu\Brain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Dekabu_State_Alert.h">
+      <Filter>00. GameObject\06. Monster\09. Dekabu\State\Alert</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Dekabu_State_Attack.h">
+      <Filter>00. GameObject\06. Monster\09. Dekabu\State\Attack</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\DespawnEffect.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\07. DespawnEffect</Filter>
@@ -2433,18 +2445,6 @@
     <ClInclude Include="..\Public\WalkSmoke.h">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\00. WalkSmoke</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Dekabu_Body.h">
-      <Filter>00. GameObject\06. Monster\09. Dekabu\Parts\Body</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Dekabu_Brain.h">
-      <Filter>00. GameObject\06. Monster\09. Dekabu\Brain</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Dekabu_State_Alert.h">
-      <Filter>00. GameObject\06. Monster\09. Dekabu\State\Alert</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Dekabu_State_Attack.h">
-      <Filter>00. GameObject\06. Monster\09. Dekabu\State\Attack</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Ability_Bubble.cpp">
@@ -2674,6 +2674,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\Dekabu.cpp">
       <Filter>00. GameObject\06. Monster\09. Dekabu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Dekabu_Body.cpp">
+      <Filter>00. GameObject\06. Monster\09. Dekabu\Parts\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Dekabu_Brain.cpp">
+      <Filter>00. GameObject\06. Monster\09. Dekabu\Brain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Dekabu_State_Alert.cpp">
+      <Filter>00. GameObject\06. Monster\09. Dekabu\State\Alert</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Dekabu_State_Attack.cpp">
+      <Filter>00. GameObject\06. Monster\09. Dekabu\State\Attack</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\DespawnEffect.cpp">
       <Filter>00. GameObject\03. Effect\00. EffectContainer\07. DespawnEffect</Filter>
@@ -3529,18 +3541,6 @@
     </ClCompile>
     <ClCompile Include="..\public\Dialogue_Director.cpp">
       <Filter>03. SystemObject\Dialogue Director</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Dekabu_Body.cpp">
-      <Filter>00. GameObject\06. Monster\09. Dekabu\Parts\Body</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Dekabu_Brain.cpp">
-      <Filter>00. GameObject\06. Monster\09. Dekabu\Brain</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Dekabu_State_Alert.cpp">
-      <Filter>00. GameObject\06. Monster\09. Dekabu\State\Alert</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Dekabu_State_Attack.cpp">
-      <Filter>00. GameObject\06. Monster\09. Dekabu\State\Attack</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

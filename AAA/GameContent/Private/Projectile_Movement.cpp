@@ -39,6 +39,7 @@ _bool CProjectile_Movement::Tick(_float fTimeDelta)
     m_pTransform->Set_State(STATE::POSITION, m_pController->Get_FootPosition()); // 동기(오프셋은 소비자 조정)
 
     m_bGrounded = (iFlags & physx::PxControllerCollisionFlag::eCOLLISION_DOWN) != 0;
+    m_bHitWall = (iFlags & physx::PxControllerCollisionFlag::eCOLLISION_SIDES) != 0;
 
     if (m_bGrounded && m_vVelocity.y < 0.f)
     {

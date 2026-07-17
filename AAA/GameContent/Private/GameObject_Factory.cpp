@@ -209,6 +209,7 @@
 #include "EnemyBomb.h"
 #include "KirbyBomb.h"
 #include "Spit_Projectile.h"
+#include "KoKabu.h"
 
 // Ability Bubble
 #include "EssenceBubble.h"
@@ -565,6 +566,13 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Dekabu_Body"),
                 CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Dekabu/Body/Dekabu.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
+
+            // KoKabu(Projectile) - Model : Kabu ¿Í µ¿ÀÏ
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKokabu::PROTOTYPE_TAG, CKokabu::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CKokabu::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Kabu/Body/Kabu.ysh",
+                    XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 
