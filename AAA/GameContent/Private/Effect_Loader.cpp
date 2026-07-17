@@ -78,7 +78,9 @@ namespace
         { TEXT("ItemEffect"),             TEXT("../../Resources/Map/Effect/Proto_ItemEffect_0.JSON") },
         { TEXT("BubbleAura"),             TEXT("../../Resources/CHJ/Effect/BubbleAura.JSON") },
 
-        { TEXT("SwordTrail_BK"),      TEXT("../../Resources/CHJ/Effect/SwordTrail_BK.JSON") },
+        { TEXT("SwordTrail_BK"),          TEXT("../../Resources/CHJ/Effect/SwordTrail_BK.JSON") },
+        { TEXT("Tornado_BK"),             TEXT("../../Resources/CHJ/Effect/Tornado_BK.JSON") },
+        { TEXT("EssenceAura"),            TEXT("../../Resources/CHJ/Effect/EssenceAura.JSON") },
     };
 }
 

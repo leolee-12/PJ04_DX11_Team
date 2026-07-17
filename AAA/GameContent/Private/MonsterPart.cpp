@@ -18,6 +18,7 @@ HRESULT CMonsterPart::Initialize(void* pArg)
         m_pSocketBoneMatrix = pDesc->pSocketBoneMatrix;
         m_pHitFlash = pDesc->pHitFlash;        
         m_pHitFlashColor = pDesc->pHitFlashColor;  
+        m_pCullState = pDesc->pCullState;
     }
 
     m_iShadowPassIdx = 7;
@@ -30,8 +31,13 @@ void CMonsterPart::Update(_float fTimeDelta)
     if (!m_bActive || m_pGameInstance_Proxy->Is_EditMode())
         return;
 
-    if (m_pAnimatorCom)
+    if (m_pAnimatorCom == nullptr)
+        return;
+
+    if (nullptr == m_pCullState)
         m_pAnimatorCom->Update(fTimeDelta);
+    else if (m_pCullState->bAnimTick)
+        m_pAnimatorCom->Update(m_pCullState->fAnimDt);
 }
 
 void CMonsterPart::Late_Update(_float fTimeDelta)
@@ -44,6 +50,10 @@ void CMonsterPart::Late_Update(_float fTimeDelta)
         LocalWorld = LocalWorld * XMLoadFloat4x4(m_pSocketBoneMatrix);
 
     Compute_CombinedWorldMatrix(LocalWorld);          // 내부에서 부모행렬까지 곱함
+
+    if (m_pCullState && m_pCullState->bRenderCull)
+        return;
+
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::NONBLEND, this);
     m_pGameInstance_Proxy->Add_RenderGroup(RENDERID::SHADOW, this);
 }
@@ -152,6 +162,10 @@ HRESULT CMonsterPart::Bind_ShaderResources()
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vHitFlashColor", &vFlashCol, sizeof(_float3))))
         return E_FAIL;
+
+    const _float fDissolve = m_pCullState ? m_pCullState->fDissolve : 0.f;
+    m_pShaderCom->Bind_RawValue("g_fDissolve", &fDissolve, sizeof(_float));
+
     return S_OK;
 }
 
