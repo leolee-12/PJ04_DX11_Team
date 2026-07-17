@@ -20,6 +20,7 @@
 #include "LD_DeformObject.h"
 #include "LD_Stage1BossDemo.h"
 #include "LD_SlopeBoardA.h"
+#include "LD_SlopeBoardB.h"
 #include "LD_SlopeBoardC.h"
 #include "LD_DeformCarBreakWall.h"
 #include "LD_GarageRadio.h"
@@ -321,6 +322,7 @@ void CLevelDesign_Registry::Register_EnemiesAndGimmicks()
 	CLD_DeformObject::Register_LevelDesignSpecs();
 	CLD_Stage1BossDemo::Register_LevelDesignSpecs();
 	CLD_SlopeBoardA::Register_LevelDesignSpecs();
+	CLD_SlopeBoardB::Register_LevelDesignSpecs();
 	CLD_SlopeBoardC::Register_LevelDesignSpecs();
 	CLD_DeformCarBreakWall::Register_LevelDesignSpecs();
 	CLD_GarageRadio::Register_LevelDesignSpecs();

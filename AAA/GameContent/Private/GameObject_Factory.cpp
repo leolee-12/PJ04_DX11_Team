@@ -186,6 +186,7 @@
 #include "LD_AudioArea.h"
 #include "LD_Stage1BossDemo.h"
 #include "LD_SlopeBoardA.h"
+#include "LD_SlopeBoardB.h"
 #include "LD_SlopeBoardC.h"
 #include "LD_DeformCarBreakWall.h"
 #include "LD_GarageRadio.h"
@@ -668,6 +669,10 @@ void CGameObject_Factory::Register_AnimObject()
     Register(CLD_SlopeBoardA::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_SlopeBoardA),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_SlopeBoardA::MODEL_PROTO_TAG,
             Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardA.ysh", false));));
+
+    Register(CLD_SlopeBoardB::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_SlopeBoardB),
+        LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_SlopeBoardB::MODEL_PROTO_TAG,
+            Create_TextureHubModel(pDevice, pContext, MODEL::ANIM, "../../Resources/Map/Gimmick/Anim/SlopeBoard/SlopeBoardB.ysh", false));));
 
     Register(CLD_SlopeBoardC::PROTOTYPE_TAG, TEXT("LEVELDESIGN_OBJECT"), CREATOR(CLD_SlopeBoardC),
         LOADER(TRY_ADD_PROTO(pProxy, iLevelIndex, CLD_SlopeBoardC::MODEL_PROTO_TAG,
