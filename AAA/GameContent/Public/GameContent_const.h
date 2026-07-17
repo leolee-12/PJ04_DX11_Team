@@ -48,7 +48,6 @@ namespace ProtoDesc
 	inline constexpr SHADER_DESC Shader_Ring = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Ring"), TEXT("../Bin/ShaderFiles/Shader_Ring.hlsl") };
 	inline constexpr SHADER_DESC Shader_AbillityModel = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_AbillityModel"), TEXT("../Bin/ShaderFiles/Shader_AbillityModel.hlsl") };
 
-
 	inline constexpr SHADER_DESC Shader_AnimMesh_PBR = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_AnimMesh_PBR"), TEXT("../Bin/ShaderFiles/Shader_AnimMesh_PBR.hlsl") };
 	inline constexpr SHADER_DESC Shader_NonAnimMesh_PBR = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_NonAnimMesh_PBR"), TEXT("../Bin/ShaderFiles/Shader_NonAnim_PBR.hlsl") };
 	inline constexpr SHADER_DESC Shader_Map = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Map"), TEXT("../Bin/ShaderFiles/Shader_Map.hlsl") };
@@ -116,6 +115,9 @@ namespace ProtoDesc
 	inline constexpr TEXTURE_DESC Texture_ItemSparkle01	= { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_ItemSparkle01"), TEXT("../../Resources/Map/Effect/Textures/Item_sparkle01.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_ItemSparkle02	= { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_ItemSparkle02"), TEXT("../../Resources/Map/Effect/Textures/Item_sparkle02.png"), 1 };
 	inline constexpr TEXTURE_DESC Texture_ItemSparkle03	= { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_ItemSparkle03"), TEXT("../../Resources/Map/Effect/Textures/Item_sparkle03.png"), 1 };
+
+	//Marb1e
+	inline constexpr TEXTURE_DESC Texture_LeoSlash = { ETOUI(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LeoSlash"), TEXT("../../Resources/YSH/Boss/Leopard/Effect/Ring/spin01.png"), 1 };
 
 
 	//sky

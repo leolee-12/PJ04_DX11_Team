@@ -82,6 +82,11 @@ private:
     void Register_Cutscene();
     void Register_SystemObject();
 
+private:
+    void Gorilla_Effect();
+    void Armadillo_Effect();
+    void Leopard_Effect();
+
 public:
     virtual void Free() override;
 };

@@ -73,6 +73,9 @@ HRESULT CBoss_Leopard::Ready_AnimEvents()
     pAnim->Set_EventCallback([this](const ANIM_EVENT& e, ANIM_EVENT_PHASE phase) {
         if (Handle_SoundAnimEvent(e, phase))
             return;
+        if (Handle_FxAnimEvent(e, phase))
+            return;
+
         if (phase != ANIM_EVENT_PHASE::POINT)
             return;
         if (!m_pBody)

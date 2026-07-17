@@ -643,7 +643,7 @@ _bool CMonster::Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 	if (strFx.empty())
 		return true;
 
-	_float3 vPos{}, vLook{ 0.f, 0.f, 1.f }, vRotDeg{};
+	_float3 vPos{}, vLook{}, vRotDeg{};
 	const _float4x4* vAncorMat = { nullptr };
 	switch (e.iIntParam)
 	{

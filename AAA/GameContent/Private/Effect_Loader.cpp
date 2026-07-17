@@ -91,6 +91,7 @@ namespace
         { TEXT("EssenceAura"),            TEXT("../../Resources/CHJ/Effect/EssenceAura.JSON") },
         { TEXT("PickUpEffect"),           TEXT("../../Resources/CHJ/Effect/PickUpEffect.JSON") },
 
+        // Armadillo
         { TEXT("RutA"),                   TEXT("../../Resources/YSH/Effects/RutA.JSON") },
         { TEXT("RutB"),                   TEXT("../../Resources/YSH/Effects/RutB.JSON") },
         { TEXT("Dust"),                   TEXT("../../Resources/YSH/Effects/Dust.JSON") },
@@ -100,6 +101,10 @@ namespace
         { TEXT("TwinSpinWind"),           TEXT("../../Resources/YSH/Effects/TwinSpinWind.JSON") },
         { TEXT("PartnerWind"),            TEXT("../../Resources/YSH/Effects/PartnerWind.JSON") },
         { TEXT("WallImpact"),             TEXT("../../Resources/YSH/Effects/WallImpact.JSON") },
+
+        //Leopard
+        { TEXT("LeoSlash_L"),             TEXT("../../Resources/YSH/Effects/Leopard/LeoSlash_L.JSON") },
+        { TEXT("LeoSlash_R"),             TEXT("../../Resources/YSH/Effects/Leopard/LeoSlash_R.JSON") },
     };
 }
 
