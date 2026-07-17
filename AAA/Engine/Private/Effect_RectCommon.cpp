@@ -39,6 +39,12 @@ HRESULT Engine::EffectRect::Bind_ShaderValues(CShader* pShader, const VALUES& Va
 HRESULT Engine::EffectRect::Bind_StaticShaderValues(CShader* pShader, const VALUES& Values)
 {
     if (FAILED(pShader->Bind_RawValue("g_bBillboard", &Values.bBillboard, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_bTextureColorToAlpha", &Values.bTextureColorToAlpha, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_bUseTextureUVEdgeFade", &Values.TextureEdgeFade.bUse, sizeof(_bool))) ||
+        FAILED(pShader->Bind_RawValue("g_iTextureUVEdgeFadeAxis", &Values.TextureEdgeFade.iAxis, sizeof(_int))) ||
+        FAILED(pShader->Bind_RawValue("g_fTextureUVEdgeFadeStartRange", &Values.TextureEdgeFade.fStartRange, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_fTextureUVEdgeFadeEndRange", &Values.TextureEdgeFade.fEndRange, sizeof(_float))) ||
+        FAILED(pShader->Bind_RawValue("g_fTextureUVEdgeFadePower", &Values.TextureEdgeFade.fPower, sizeof(_float))) ||
         FAILED(pShader->Bind_RawValue("g_bSpriteAniTexture", &Values.bSpriteAniTexture, sizeof(_bool))) ||
         FAILED(pShader->Bind_RawValue("g_bSpriteAniMask", &Values.bSpriteAniMask, sizeof(_bool))))
         return E_FAIL;
@@ -111,6 +117,12 @@ void Engine::EffectRect::Update_SpriteAnimations(VALUES& Values, _float fRatio, 
 void Engine::EffectRect::Initialize_DefaultValues(VALUES& Values)
 {
     Values.bBillboard = false;
+    Values.bTextureColorToAlpha = false;
+    Values.TextureEdgeFade.bUse = false;
+    Values.TextureEdgeFade.iAxis = 0;
+    Values.TextureEdgeFade.fStartRange = 0.1f;
+    Values.TextureEdgeFade.fEndRange = 0.1f;
+    Values.TextureEdgeFade.fPower = 1.f;
 
     Values.bSpriteAniTexture = false;
     Values.iTexFrameX = 1;
