@@ -1162,6 +1162,9 @@
     <Filter Include="01. Projectile\00. PhysicsProjectile\01. Bomb\KirbyBomb">
       <UniqueIdentifier>{7f0b4568-6d0e-492a-b4d1-6b3a075651e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Projectile\00. PhysicsProjectile\02. KoKabu">
+      <UniqueIdentifier>{bd02d882-8d9d-4bb9-acde-f8024bf59fc0}</UniqueIdentifier>
+    </Filter>
     <Filter Include="01. Projectile\01. Kirby_Spit">
       <UniqueIdentifier>{13343d6f-6325-403c-a289-3544da5b6a8f}</UniqueIdentifier>
     </Filter>
@@ -1859,6 +1862,9 @@
     </ClInclude>
     <ClInclude Include="..\public\KirbySpawnPoint.h">
       <Filter>03. SystemObject\Kirby SpawnPoint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KoKabu.h">
+      <Filter>01. Projectile\00. PhysicsProjectile\02. KoKabu</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\LD_ArrowBoard.h">
       <Filter>00. GameObject\96. LevelDesign\Visible\04. ArrowBoard</Filter>
@@ -2989,6 +2995,9 @@
     </ClCompile>
     <ClCompile Include="..\private\KirbySpawnPoint.cpp">
       <Filter>03. SystemObject\Kirby SpawnPoint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KoKabu.cpp">
+      <Filter>01. Projectile\00. PhysicsProjectile\02. KoKabu</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\LD_ArrowBoard.cpp">
       <Filter>00. GameObject\96. LevelDesign\Visible\04. ArrowBoard</Filter>
