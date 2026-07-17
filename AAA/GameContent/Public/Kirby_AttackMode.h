@@ -58,11 +58,12 @@ public:
 	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo);
 
 public:
-	void Clear_Overlay(CKirby* pKirby, _uint iSlot = 1, _float fOverlayBlendTime = 0.1f);
-
-	void Effect_Stop(CEffect_Container*& pContainer1);
-
 	const _wstring& Get_AttackModeName() { return m_wstrAttackModeName; }
+	virtual _bool Should_ForceEnterAttackState() { return false; }
+
+public:
+	void Clear_Overlay(CKirby* pKirby, _uint iSlot = 1, _float fOverlayBlendTime = 0.1f);
+	void Effect_Stop(CEffect_Container*& pContainer1);
 
 protected:
 	CGameInstance_Proxy* m_pGameInstance_Proxy{};

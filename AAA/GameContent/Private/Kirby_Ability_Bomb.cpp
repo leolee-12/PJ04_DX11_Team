@@ -370,6 +370,7 @@ void CKirby_Ability_Bomb::Exit_BombState(CKirby* pKirby, BOMB_STATE eState)
         break;
 
     case BOMB_STATE::THROW:
+        pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
         break;
 
     case BOMB_STATE::CHARGING_THROW:

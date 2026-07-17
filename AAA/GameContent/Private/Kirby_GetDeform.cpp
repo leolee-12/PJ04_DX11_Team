@@ -185,7 +185,10 @@ void CKirby_GetDeform::Enter_GetDeformState(CKirby* pKirby, DEFORM_STATE eState)
         {
             pKirby->Change_KirbyDeform(m_eDeformType);
 
-            Transition_Fall_OR_Wait_OR_Run_Immediate(pKirby);
+            if (pPendingDeform->Should_ForceEnterAttackState())
+                pKirby->Change_State(KIRBY_STATE_TYPE::ATTACK);
+            else
+                Transition_Fall_OR_Wait_OR_Run_Immediate(pKirby);
             break;
         }
     }
