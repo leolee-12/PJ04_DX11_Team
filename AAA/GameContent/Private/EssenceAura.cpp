@@ -2,28 +2,7 @@
 #include "GameInstance.h"
 #include "GameContent_const.h"
 
-#include "RectCommon.h"
-#include "RectEmitterCommon.h"
-#include "RectParticleCommon.h"
-
-namespace
-{
-	CRectCommon::RECT_COMMON_DESC Make_RectDesc(const TEXTURE_DESC& tex)
-	{
-		CRectCommon::RECT_COMMON_DESC tRect{};
-		tRect.iVIBufferLevel = VI_Rect.iLevelID;
-		tRect.wstrVIBufferTag = VI_Rect.szProtoTag;
-
-		tRect.bUseTextureCom = true;
-		tRect.iTextureLevel = tex.iLevelID;
-		tRect.wstrTextureTag = tex.szProtoTag;
-
-		tRect.bUseMaskCom = false;
-		tRect.bCustomShader = false;
-
-		return tRect;
-	}
-}
+#include "EssenceCrown.h"
 
 CEssenceAura::CEssenceAura(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CEffect_Container{ pDevice, pContext }
@@ -76,44 +55,10 @@ HRESULT CEssenceAura::Render()
 
 HRESULT CEssenceAura::Ready_EffectPartObjects()
 {
-	CRectCommon::RECT_COMMON_DESC tRing = Make_RectDesc(Texture_CommonRing01);
-
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectCommon::PROTOTYPE_TAG, L"RingHalo", &tRing)))
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CEssenceCrown::PROTOTYPE_TAG, L"Crown00")))
 		return E_FAIL;
 
-	CRectCommon::RECT_COMMON_DESC tStar = Make_RectDesc(Texture_Star2D);
-
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectCommon::PROTOTYPE_TAG, L"OribitStar00", &tStar)))
-		return E_FAIL;
-
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectCommon::PROTOTYPE_TAG, L"OribitStar01", &tStar)))
-		return E_FAIL;
-
-	CRectEmitterCommon::RECT_EMITTER_COMMON_DESC tStarEmit{};
-	tStarEmit.iVIBufferLevel = VI_Rect.iLevelID;
-	tStarEmit.wstrVIBufferTag = VI_Rect.szProtoTag;
-	tStarEmit.bUseTextureCom = true;
-	tStarEmit.iTextureLevel = Texture_Star2D.iLevelID;
-	tStarEmit.wstrTextureTag = Texture_Star2D.szProtoTag;
-	tStarEmit.bUseMaskCom = false;
-	tStarEmit.bCustomShader = false;
-
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectEmitterCommon::PROTOTYPE_TAG, L"StarMilkyWay00", &tStarEmit)))
-		return E_FAIL;
-
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectEmitterCommon::PROTOTYPE_TAG, L"StarMilkyWay01", &tStarEmit)))
-		return E_FAIL;
-
-	CRectParticleCommon::RECT_PARTICLE_COMMON_DESC tSparkle{};
-	tSparkle.iVIBufferLevel = VI_Rect.iLevelID;
-	tSparkle.wstrVIBufferTag = VI_Rect.szProtoTag;
-	tSparkle.bUseTextureCom = true;
-	tSparkle.iTextureLevel = Texture_CommonSparkle01.iLevelID;
-	tSparkle.wstrTextureTag = Texture_CommonSparkle01.szProtoTag;
-	tSparkle.bUseMaskCom = false;
-	tSparkle.bCustomShader = false;
-
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectParticleCommon::PROTOTYPE_TAG, L"Sparkle", &tSparkle)))
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CEssenceCrown::PROTOTYPE_TAG, L"Crown01")))
 		return E_FAIL;
 
 	return S_OK;

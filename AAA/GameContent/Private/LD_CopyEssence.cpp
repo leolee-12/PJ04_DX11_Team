@@ -4,6 +4,7 @@
 #include "GameContent_const.h"
 #include "EssenceBubble.h"
 #include "Bubble_Manager.h"
+#include "Effect_Loader.h"
 
 #include "GameInstance.h"
 
@@ -357,6 +358,9 @@ void CLD_CopyEssence::Spawn_AbilityBubble()
 
 	_float3 vPos{};
 	XMStoreFloat3(&vPos, matSocket.r[3]);
+
+	CEffect_Loader::GetInstance()->Spawn(
+		TEXT("EssenceAura"), m_iLevelIndex, vPos);
 
 	auto* pMgr = CBubble_Manager::GetInstance();
 	auto eKind = CBubble_Manager::BUBBLE_KIND::ESSENCE;

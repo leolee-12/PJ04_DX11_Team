@@ -84,6 +84,7 @@
 #include "Kirby_SwordTrail.h"
 #include "SwordTrail_BK.h"
 #include "Tornado_BK.h"
+#include "EssenceAura.h"
 
 // Effect_Part
 #include "SmokeSphereOriginal.h"
@@ -123,6 +124,7 @@
 #include "MeshParticleCommon.h"
 #include "RectEmitterCommon.h"
 #include "TrailCommon.h"
+#include "EssenceCrown.h"
 
 //sky
 #include "SkySphere.h"
@@ -1171,6 +1173,16 @@ void CGameObject_Factory::Register_Effect()
                     XMMatrixRotationX(XMConvertToRadians(90.f))));
             TRY_ADD_PROTO(pProxy, Texture_Common_SpinSlashTrail.iLevelID, Texture_Common_SpinSlashTrail.szProtoTag,
                 CTexture::Create(pDevice, pContext, Texture_Common_SpinSlashTrail.szFileTag, Texture_Common_SpinSlashTrail.iNumTex));
+        )
+    );
+    
+    Register(CEssenceAura::PROTOTYPE_TAG, TEXT("Effect_Container"), CREATOR(CEssenceAura),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CEssenceCrown::PROTOTYPE_TAG, CEssenceCrown::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_EssenceCrown"),
+                CModel::Create(pDevice, pContext, MODEL::NONANIM,
+                    "../../Resources/CHJ/Effect/CopyEssence/Ring01/Common_Ring03.ysh"));
         )
     );
 }
