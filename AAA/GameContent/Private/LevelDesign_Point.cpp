@@ -3,6 +3,7 @@
 #include "Parsing_Utils.h"
 #include "MeshLayer_Binder.h"
 #include "GameInstance.h"
+#include "Effect_Loader.h"
 
 namespace
 {
@@ -10,6 +11,7 @@ namespace
 	constexpr _float s_fPointRotationPerSec = 360.f;
 	constexpr _float s_fPointPickupDuration = 0.75f;
 	constexpr _float s_fPointPickupHeight = 3.f;
+	constexpr _float3 s_vPickupEffectOffset = { 0.f, 2.f, 0.f };
 	constexpr _float s_fPointPickupTurnCount = 3.f;
 
 	struct LD_POINT_CATALOG
@@ -387,6 +389,9 @@ void CLevelDesign_Point::Handle_Pickup(CCollider* pOther)
 
 	_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
 	m_pGameInstance_Proxy->Play_SFX3D(POINTSTAR_PICKUP_SOUND, vPos, 0.5f);
+
+	const _float3 vEffectPosition = { vStartPosition.x + s_vPickupEffectOffset.x, vStartPosition.y + s_vPickupEffectOffset.y, vStartPosition.z + s_vPickupEffectOffset.z };
+	CEffect_Loader::GetInstance()->Spawn(TEXT("PickUpEffect"), m_iLevelIndex, vEffectPosition);
 
 	if (m_pHurtBox)
 		m_pHurtBox->Set_Enabled(false);

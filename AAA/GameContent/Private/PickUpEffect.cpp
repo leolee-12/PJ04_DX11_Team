@@ -90,7 +90,10 @@ HRESULT CPickUpEffect::Ready_EffectPartObjects()
 	tSparkle.bUseMaskCom = false;
 	tSparkle.bCustomShader = false;
 
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectParticleCommon::PROTOTYPE_TAG, L"Sparkle", &tSparkle)))
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectParticleCommon::PROTOTYPE_TAG, L"Sparkle00", &tSparkle)))
+		return E_FAIL;
+
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectParticleCommon::PROTOTYPE_TAG, L"Sparkle01", &tSparkle)))
 		return E_FAIL;
 
 	return S_OK;

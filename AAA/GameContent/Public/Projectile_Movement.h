@@ -38,6 +38,7 @@ public:
     _bool Tick(_float fTimeDelta);
 
     _bool  Is_Grounded() const { return m_bGrounded; }
+    _bool   Is_HitWall() const { return m_bHitWall; }
     _float3 Get_Velocity() const { return m_vVelocity; }
 
     void  Begin_Arc(_fvector vStart, _fvector vTarget, _float fDur, _float fHeight)
@@ -58,6 +59,7 @@ private:
 
     _float3 m_vVelocity = { 0.f, 0.f, 0.f };
     _bool   m_bGrounded = { false };
+    _bool   m_bHitWall = { false };
 
     _float  m_fGravity = { -45.f };
     _float  m_fRestitution = { 0.5f };
