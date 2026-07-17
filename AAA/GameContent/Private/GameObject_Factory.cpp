@@ -136,21 +136,25 @@
 
 // Monster
 #include "BladeKnight.h"
+#include "NormalEnemy.h"
+#include "Kabu.h"
+#include "BrontoBurt.h"
+#include "PoppyBrosJr.h"
+#include "Cappy.h"
+#include "NormalEnemyWild.h"
+#include "Dekabu.h"
+
+// MonsterPart
 #include "BladeKnight_Body.h"
 #include "BladeKnight_Sword.h"
-#include "NormalEnemy.h"
 #include "NormalEnemy_Body.h"
-#include "Kabu.h"
 #include "Kabu_Body.h"
-#include "BrontoBurt.h"
 #include "BrontoBurt_Body.h"
-#include "PoppyBrosJr.h"
 #include "PoppyBrosJr_Body.h"
-#include "Cappy.h"
 #include "Cappy_Body.h"
 #include "Cappy_Hat.h"
-#include "NormalEnemyWild.h"
 #include "NormalEnemyWild_Body.h"
+#include "Dekabu_Body.h"
 
 //Miniboss
 #include "GigantEdge.h"
@@ -546,6 +550,21 @@ void CGameObject_Factory::Register_Container()
             TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_NormalEnemyWild_Body"),
                     CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/NormalEnemyWild/Body/NormalEnemyWild.ysh",
                         XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+
+    // 8. Dekabu 
+    Register
+    (
+        CDekabu::PROTOTYPE_TAG, TEXT("Monster"),
+        CREATOR(CDekabu),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CDekabu_Body::PROTOTYPE_TAG, CDekabu_Body::Create(pDevice, pContext));
+
+            TRY_ADD_PROTO(pProxy, iLevelIndex, TEXT("Prototype_Component_Model_Dekabu_Body"),
+                CModel::Create(pDevice, pContext, MODEL::ANIM, "../../Resources/CHJ/Monster/Dekabu/Body/Dekabu.ysh",
+                    XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 

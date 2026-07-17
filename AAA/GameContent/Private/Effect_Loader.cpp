@@ -121,7 +121,8 @@ HRESULT CEffect_Loader::Ready(CGameInstance_Proxy* pProxy, ID3D11Device* pDevice
 
 HRESULT CEffect_Loader::Spawn(const _wstring& strEffectId, _uint iTargetLevel,
     const _float3& vPos, const _float3& vLook, const _float3& vRotDeg,
-    const _float4x4* pParent, Engine::CEffect_Container** ppOut)
+    const _float4x4* pParent, Engine::CEffect_Container** ppOut,
+    FX_HANDLE* pOutHandle)
 {
     auto it = m_Assets.find(strEffectId);
     if (it == m_Assets.end())
@@ -152,14 +153,29 @@ HRESULT CEffect_Loader::Spawn(const _wstring& strEffectId, _uint iTargetLevel,
         pFx->Get_Transform()->Set_State(STATE::LOOK, XMVector3Normalize(matRot.r[2]) * vScale.z);
     }
 
+    m_Epochs[pFx] = ++m_iEpochCounter;
+
     if (ppOut)
         *ppOut = pFx;
 
+    if (pOutHandle)
+        *pOutHandle = { pFx, m_iEpochCounter };
+
     return S_OK;
+}
+
+_bool CEffect_Loader::Is_Current(const FX_HANDLE& h) const
+{
+    if (nullptr == h.p)
+        return false;
+
+    auto it = m_Epochs.find(h.p);
+    return it != m_Epochs.end() && it->second == h.iEpoch;
 }
 
 void CEffect_Loader::Free()
 {
     m_Assets.clear();
+    m_Epochs.clear();
     __super::Free();
 }

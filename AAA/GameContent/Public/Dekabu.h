@@ -38,7 +38,7 @@ public:
 
     virtual _float          Get_CapsuleRadius() const override { return 1.0f; }
     virtual _float          Get_CapsuleHeight() const override { return 0.6f; }
-    virtual _float          Get_InteractRadius() const override { return 0.f; }
+    virtual _float          Get_InteractRadius() const override { return 20.f; }
     virtual _bool           Get_HurtBoxDesc(CAPSULE_DESC& Out) const override;
 
     virtual CAnimator*      Get_BodyAnimator() const override;
@@ -54,7 +54,7 @@ private:
     CDekabu_Body*           m_pBody = { nullptr };
 
 public:
-    static CDekabu*         Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)override;
+    static CDekabu*         Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual CGameObject*    Clone(void* pArg) override;
 
 protected:

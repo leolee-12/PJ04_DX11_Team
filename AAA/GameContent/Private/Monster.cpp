@@ -654,24 +654,45 @@ _bool CMonster::Handle_FxAnimEvent(const ANIM_EVENT& e, ANIM_EVENT_PHASE ePhase)
 
 	if (ePhase == ANIM_EVENT_PHASE::BEGIN)
 	{
-		CEffect_Container*& pSlot = m_Effects[strFx];
-		if (pSlot)
-			pSlot->EffectContainer_StopAfterEmission();
+		FX_HANDLE& hSlot = m_Effects[strFx];
+		if (CEffect_Loader::GetInstance()->Is_Current(hSlot))
+			hSlot.p->EffectContainer_StopAfterEmission();
+		hSlot.Clear();
 
 		
 		CEffect_Loader::GetInstance()->Spawn(strFx, Get_LevelIndex(),
-			vPos, vLook, vRotDeg, Get_FxParentMatrix(strFx), &pSlot);
+			vPos, vLook, vRotDeg, Get_FxParentMatrix(strFx),
+			nullptr, &hSlot);
 	}
 	else if (ePhase == ANIM_EVENT_PHASE::END)
 	{
 		auto it = m_Effects.find(strFx);
-		if (it != m_Effects.end() && it->second)
+		if (it != m_Effects.end())
 		{
-			it->second->Start_FadeOut(0.4f);
-			it->second = nullptr;
+			if (CEffect_Loader::GetInstance()->Is_Current(it->second))
+				it->second.p->Start_FadeOut(0.4f);
+			it->second.Clear();
 		}
 	}
 	return true;
+}
+
+void CMonster::Stop_AllFx(_bool bImmediate)
+{
+	auto pLoader = CEffect_Loader::GetInstance();
+
+	for (auto& Pair : m_Effects)
+	{
+		FX_HANDLE& h = Pair.second;
+		if (pLoader->Is_Current(h))
+		{
+			if (bImmediate)
+				h.p->EffectContainer_Stop();
+			else
+				h.p->Start_FadeOut(0.4f);
+		}
+		h.Clear();
+	}
 }
 
 void CMonster::Play_DeathFX()
@@ -804,6 +825,7 @@ void CMonster::On_SpatEnd()
 
 void CMonster::Despawn()
 {
+	Stop_AllFx(false);
 	Play_DeathFX();
 
 	Enable_Colliders(false);

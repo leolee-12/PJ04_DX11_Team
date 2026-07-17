@@ -13,6 +13,8 @@
 #include "Monster_State_KnockOut.h"
 #include "Monster_State_Captured.h"
 #include "Monster_State_Spat.h"
+#include "Dekabu_State_Alert.h"
+#include "Dekabu_State_Attack.h"
 
 CDekabu::CDekabu(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CMonster{ pDevice, pContext }
@@ -110,6 +112,14 @@ HRESULT CDekabu::Ready_State()
         return E_FAIL;
 
     if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::SPAT, CMonster_State_Spat::Create(Info))))
+        return E_FAIL;
+
+    // WINDUP = ALERT 
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::WINDUP, CDekabu_State_Alert::Create())))
+        return E_FAIL;
+
+    // ATTACK 
+    if (FAILED(m_pStateMachine->Register_State(MONSTER_STATE_TYPE::ATTACK, CDekabu_State_Attack::Create())))
         return E_FAIL;
 
     return S_OK;
