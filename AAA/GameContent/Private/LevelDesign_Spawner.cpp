@@ -2,6 +2,7 @@
 #include "LevelDesign_Registry.h"
 #include "LevelDesign_Rail.h"
 #include "RailRideable.h"
+#include "Deformable.h"
 
 #include "GameInstance.h"
 
@@ -56,6 +57,7 @@ HRESULT CLevelDesign_Spawner::Spawn(const LD_PACKAGE& Package, const LD_SPAWN_RE
 	}
 
 	vector<PENDING_RAIL_BINDING> PendingRailBindings;
+	vector<_uint> PendingRailVisuals;
 	HRESULT hrFinal = S_OK;
 
 	for (const LD_OBJECT_ENTRY& Desc : Package.ObjectDescs)
@@ -71,6 +73,10 @@ HRESULT CLevelDesign_Spawner::Spawn(const LD_PACKAGE& Package, const LD_SPAWN_RE
 
 		if (0 == BaseDesc.iTargetRailUid || nullptr == pCreatedObject)
 			continue;
+
+		IDeformable* pDeformable = dynamic_cast<IDeformable*>(pCreatedObject);
+		if (nullptr != pDeformable && DEFORM_TYPE::COASTER == pDeformable->Get_DeformType())
+			PendingRailVisuals.push_back(BaseDesc.iTargetRailUid);
 
 		IRailRideable* pReceiver = dynamic_cast<IRailRideable*>(pCreatedObject);
 		if (nullptr != pReceiver)
@@ -102,6 +108,27 @@ HRESULT CLevelDesign_Spawner::Spawn(const LD_PACKAGE& Package, const LD_SPAWN_RE
 				+ to_wstring(Binding.iRailUid)
 				+ L" NodeIndex=" + to_wstring(Binding.iNodeIndex)
 				+ L"\n";
+			OutputDebugStringW(strMessage.c_str());
+#endif
+		}
+	}
+
+	for (const _uint iRailUid : PendingRailVisuals)
+	{
+		CLevelDesign_Rail* pRail = CLevelDesign_Rail::Find_ByUid(m_pProxy, Request.iPlaceLevel, iRailUid);
+		if (nullptr == pRail)
+		{
+#ifdef _DEBUG
+			const _wstring strMessage = L"[LevelDesign_Spawner] Visual Rail not found: " + to_wstring(iRailUid) + L"\n";
+			OutputDebugStringW(strMessage.c_str());
+#endif
+			continue;
+		}
+
+		if (FAILED(pRail->Enable_Visual(CLevelDesign_Rail::RAIL_VISUAL_TYPE::COASTER, Request.Levels.iModelPrototypeLevel)))
+		{
+#ifdef _DEBUG
+			const _wstring strMessage = L"[LevelDesign_Spawner] Rail visual enable failed: " + to_wstring(iRailUid) + L"\n";
 			OutputDebugStringW(strMessage.c_str());
 #endif
 		}
