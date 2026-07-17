@@ -74,7 +74,9 @@ HRESULT CArmadillo_Dust::Ready_EffectPartObjects()
 	tTex.iLevelID = m_iPrototypeLevel;
 	tTex.szProtoTag = TEX_PROTOTAG;
 
-	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectParticleCommon::PROTOTYPE_TAG, L"Dust", &Make_RectDesc(tTex))))
+	CRectParticleCommon::RECT_PARTICLE_COMMON_DESC tRect = Make_RectDesc(tTex);
+
+	if (FAILED(Add_Effect_PartObject(m_iPrototypeLevel, CRectParticleCommon::PROTOTYPE_TAG, L"Dust", &tRect)))
 		return E_FAIL;
 
 	return S_OK;

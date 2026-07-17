@@ -181,6 +181,7 @@
 //Boss Effect
 #include "Armadillo_RutA.h"
 #include "Armadillo_RutB.h"
+#include "Armadillo_Dust.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
@@ -1283,6 +1284,14 @@ void CGameObject_Factory::Register_BossEffect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CArmadillo_RutB::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Armadillo/Floor/EffectModel_RollingRutB.ysh",
                     XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+    Register(CArmadillo_Dust::PROTOTYPE_TAG, TEXT("Boss_EffectContainer"), CREATOR(CArmadillo_Dust),
+        LOADER
+        (
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CRectParticleCommon::PROTOTYPE_TAG, CRectParticleCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CArmadillo_Dust::TEX_PROTOTAG,
+                CTexture::Create(pDevice, pContext, L"../../Resources/YSH/Boss/Armadillo/Floor/smoke02.png", 1));
         )
     );
 }
