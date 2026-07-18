@@ -170,14 +170,25 @@ namespace
 
 		const _uint iUVIndex = (Layer.iUVIndex <= 3u) ? Layer.iUVIndex : 0u;
 		const _uint iUnknownUVIndex = (Layer.iUnknownUVIndex <= 3u) ? Layer.iUnknownUVIndex : 0u;
+		_float2 vOffset = Layer.bUseUVTransform
+			? _float2{ Layer.vUVOffset.x, Layer.vUVOffset.y }
+			: _float2{ 0.f, 0.f };
+
+		if (Layer.bUseUVTransform && Layer.bUseUVScroll)
+		{
+			const _double dGameTime = Ctx.pGI_Proxy->Get_GameTime();
+			vOffset.x += static_cast<_float>(fmod(dGameTime * Layer.vUVScrollSpeed.x, 1.0));
+			vOffset.y += static_cast<_float>(fmod(dGameTime * Layer.vUVScrollSpeed.y, 1.0));
+		}
+
 		const _float4 vUVTransform = Layer.bUseUVTransform
-			? _float4{ Layer.vUVScale.x, Layer.vUVScale.y, Layer.vUVOffset.x, Layer.vUVOffset.y }
+			? _float4{ Layer.vUVScale.x, Layer.vUVScale.y, vOffset.x, vOffset.y }
 			: _float4{ 1.f, 1.f, 0.f, 0.f };
 		const _float4 vUVTransformNormal = Layer.bUseUVTransform
-			? _float4{ Layer.vUVScaleNormal.x, Layer.vUVScaleNormal.y, Layer.vUVOffset.x, Layer.vUVOffset.y }
+			? _float4{ Layer.vUVScaleNormal.x, Layer.vUVScaleNormal.y, vOffset.x, vOffset.y }
 			: _float4{ 1.f, 1.f, 0.f, 0.f };
 		const _float4 vUVTransformMaterial = Layer.bUseUVTransform
-			? _float4{ Layer.vUVScaleMaterial.x, Layer.vUVScaleMaterial.y, Layer.vUVOffset.x, Layer.vUVOffset.y }
+			? _float4{ Layer.vUVScaleMaterial.x, Layer.vUVScaleMaterial.y, vOffset.x, vOffset.y }
 			: _float4{ 1.f, 1.f, 0.f, 0.f };
 		const _float4 vUVTransformUnknown = vUVTransform;
 		const _float fUVRotate = Layer.bUseUVTransform ? Layer.fUVRotate : 0.f;

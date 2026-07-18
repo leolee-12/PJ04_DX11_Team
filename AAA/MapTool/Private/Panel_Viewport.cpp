@@ -2,7 +2,7 @@
 #include "EditInstance.h"
 #include "Level_Edit.h"
 
-#include "GameContrnt_Events.h"     // UI_RBTN_PROBE / WORLD_RBTN_DOWN
+#include "GameContent_Events.h"     // UI_RBTN_PROBE / WORLD_RBTN_DOWN
 #include "Editable.h"
 
 #include "GameInstance.h"

@@ -493,6 +493,10 @@ HRESULT CKirbyBomb::Ready_HitBox()
 			{
 				On_Impact();
 			}
+			else if (iRenderGroup == ETOUI(COLLISION_LAYER::ENV_HURT))
+			{
+				On_Impact();
+			}
 		});
 
 	m_pHitBox->Set_Enabled(false);

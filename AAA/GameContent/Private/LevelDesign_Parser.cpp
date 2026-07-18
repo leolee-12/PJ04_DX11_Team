@@ -419,6 +419,30 @@ void CLevelDesign_Parser::Fill_SpecialFields(const json& jEntry, LD_PARSED_OBJEC
 		return;
 	}
 
+	if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"LensFlare"))
+	{
+		pDesc->eCategory = LD_CATEGORY::GUIDE_AREA;
+
+		const _string strMainPath = "Gimmick.LensFlare.MainComponent";
+
+		if (!JsonUtils::Try_ReadFloat3Array(jEntry, strMainPath + ".AreaCenter", &pDesc->EffectArea.vAreaCenter))
+			pDesc->EffectArea.vAreaCenter = pDesc->vParsedPosition;
+
+		if (!JsonUtils::Try_ReadFloat4Array(jEntry, strMainPath + ".AreaRot", &pDesc->EffectArea.qAreaRot))
+			pDesc->EffectArea.qAreaRot = pDesc->qParsedRotation;
+
+		if (!JsonUtils::Try_ReadFloat3Array(jEntry, strMainPath + ".AreaSize", &pDesc->EffectArea.vAreaSize))
+			pDesc->EffectArea.vAreaSize = pDesc->vParsedScale;
+
+		pDesc->EffectArea.bHasEffectPos =
+			JsonUtils::Try_ReadFloat3Array(jEntry, strMainPath + ".EffectPos", &pDesc->EffectArea.vEffectPos);
+
+		pDesc->EffectArea.bHasEffectRot =
+			JsonUtils::Try_ReadFloat4Array(jEntry, strMainPath + ".EffectRot", &pDesc->EffectArea.qEffectRot);
+
+		return;
+	}
+
 	if (JsonUtils::Equals_NoCase(strObjectName.c_str(), L"GuideMovieArea")
 		|| JsonUtils::Equals_NoCase(strObjectName.c_str(), L"SlideInfoArea"))
 	{
