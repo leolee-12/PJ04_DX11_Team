@@ -14,8 +14,14 @@ class CLIENT_DLL CKirby_Deform_Cylinder final : public CKirby_Deform
 private:
 	static constexpr _float s_fCylinderMaxHorizontalSpeed = 35.f;
 
+	// Controller
+	static constexpr _float s_fCylinder_CCT_Radius = 1.4f;
+	static constexpr _float s_fCylinder_CCT_Height = 0.05f;
+
 private:
 	enum DEFORM_CYLINDER_STATE { ROT_MOVEDIR, ROLL, CYLINDER_STATE_END };
+
+	enum ROLL_STATE { MOVE, JUMP, FALL, LANDING, ROLL_STATE_END };
 
 private:
 	CKirby_Deform_Cylinder();
@@ -41,6 +47,9 @@ public:
 	virtual _bool Enter_Attack_KeyUp(CKirby* pKirby) override;
 
 public:
+	virtual void On_Damaged_KirbyState(CKirby* pKirby, const ATTACK_INFO& tInfo) override;
+
+public:
 	virtual void Enter_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) override;
 	virtual _bool Update_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext, _float fTimeDelta) override;
 	virtual void Exit_Deform(CKirby* pKirby, const POST_DEFORM_END_CONTEXT& DeformContext) override;
@@ -58,8 +67,18 @@ private:
 	void Roll(CKirby* pKirby, _float fTimeDelta);
 
 private:
+	void Change_RollState(CKirby* pKirby, ROLL_STATE eNext);
+	void Enter_RollState(CKirby* pKirby, ROLL_STATE eState);
+	void Update_RollState(CKirby* pKirby, _float fTimeDelta);
+	void Exit_RollState(CKirby* pKirby, ROLL_STATE eState);
+
+private:
 	_float3 m_fMoveDir{};
 	DEFORM_CYLINDER_STATE m_eCylinderState{};
+
+private:
+	ROLL_STATE m_eRollState{};
+	_bool m_bTryJump{};
 
 public:
 	static CKirby_Deform_Cylinder* Create();
