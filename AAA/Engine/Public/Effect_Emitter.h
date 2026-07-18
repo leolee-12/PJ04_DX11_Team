@@ -24,9 +24,12 @@ PROPERTY(_bool, m_bEmitterRandomLifeTime, L"Random Life Time_E", L"Emitter - Lif
 PROPERTY(_float2, m_vEmitterLifeTimeRange, L"Life Time Range_E", L"Emitter - Lifetime");
 
 // Emitter Shape
-PROPERTY(_int, m_iEmitterShapeType, L"Shape Type_E", L"Emitter Shape"); // 0 Point, 1 Sphere, 2 Circle, 3 Box
-PROPERTY(_float, m_fEmitterShapeRadius, L"Radius_E", L"Emitter Shape - Sphere Circle");
-PROPERTY(_bool, m_bEmitterShapeRandomRadius, L"Random Radius_E", L"Emitter Shape - Sphere Circle");
+PROPERTY(_int, m_iEmitterShapeType, L"Shape Type_E", L"Emitter Shape"); // 0 Point, 1 Sphere, 2 Circle, 3 Box, 4 Fan
+PROPERTY(_float, m_fEmitterShapeRadius, L"Radius_E", L"Emitter Shape - Sphere Circle Fan");
+PROPERTY(_bool, m_bEmitterShapeRandomRadius, L"Random Radius_E", L"Emitter Shape - Sphere Circle Fan");
+
+PROPERTY(_float, m_fEmitterFanAngle, L"Angle_E", L"Emitter Shape - Fan");
+PROPERTY(_float, m_fEmitterFanDirectionDegree, L"Direction Degree_E", L"Emitter Shape - Fan"); // 0 degrees = +X, positive toward +Z
 
 PROPERTY(_float3, m_vEmitterBoxSize, L"Box Size_E", L"Emitter Shape - Box");
 PROPERTY(_int, m_iEmitterBoxSpawnMode, L"Box Spawn Mode_E", L"Emitter Shape - Box"); // 0 Volume, 1 Top
@@ -160,6 +163,7 @@ protected:
         EMITTER_SHAPE_SPHERE,
         EMITTER_SHAPE_CIRCLE,
         EMITTER_SHAPE_BOX,
+        EMITTER_SHAPE_FAN,
         EMITTER_SHAPE_END
     };
 
