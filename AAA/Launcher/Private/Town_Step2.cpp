@@ -14,46 +14,9 @@ HRESULT CTown_Step2::Initialize()
 
     _uint iLevel = ETOUI(LEVEL::TOWN_STEP2);
 
-    LEVEL_MANIFEST Manifest{};
-    if (FAILED(Load_LevelManifest(LAUNCHER_LEVEL_PROFILES::LEVEL_TOWN_STEP2, &Manifest)))
+    LEVEL_LOAD_CONTEXT ctx{ m_pGameInstance_Proxy, m_pDevice, m_pContext };
+    if (FAILED(Load_Level_FromManifest(ctx, LAUNCHER_LEVEL_PROFILES::LEVEL_TOWN_STEP2, iLevel)))
         return E_FAIL;
-
-    MAP_LOAD_RESULT MapReport{};
-    CMapStage* pMapStage = nullptr;
-
-    if (FAILED(CMap_Loader::Spawn_Map(
-        m_pDevice,
-        m_pContext,
-        Manifest.strMapManifest,
-        Manifest.strObjectsFile,
-        iLevel,
-        &MapReport,
-        &pMapStage)))
-    {
-        return E_FAIL;
-    }
-
-    if (FAILED(Load_Level(m_pGameInstance_Proxy, m_pDevice, m_pContext,
-        Manifest.strObjectsFile.c_str(), iLevel)))
-        return E_FAIL;
-
-#ifdef _DEBUG
-    const _wstring strDebugMessage =
-        L"[MapLoad][LevelDesign] json=" + to_wstring(MapReport.iLevelDesignJsonLoadedCount) +
-        L", parsed=" + to_wstring(MapReport.iLevelDesignParsedObjectCount) +
-        L", created=" + to_wstring(MapReport.iLevelDesignCreatedCount) +
-        L", fallback=" + to_wstring(MapReport.iLevelDesignFallbackSpecCount) +
-        L", failed=" + to_wstring(MapReport.iLevelDesignSkippedCreateFailedCount) + L"\n";
-
-    OutputDebugStringW(strDebugMessage.c_str());
-#endif
-
-    if (!Manifest.strUIFile.empty())
-    {
-        if (FAILED(Load_Level_UI(m_pGameInstance_Proxy, m_pDevice, m_pContext,
-            Manifest.strUIFile.c_str(), iLevel)))
-            return E_FAIL;
-    }
 
     if (FAILED(Ready_Lights()))
         return E_FAIL;

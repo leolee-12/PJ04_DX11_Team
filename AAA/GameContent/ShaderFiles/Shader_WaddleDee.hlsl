@@ -21,6 +21,8 @@ float g_fHullThickness;
 
 float4 g_vEmissiveColor = float4(0.f, 0.f, 0.f, 0.f);
 
+float g_fDissolve;
+
 uint g_iMaterialID = 0;
 
 float4 g_vConstantDiffuse = float4(1.f, 1.f, 1.f, 1.f);

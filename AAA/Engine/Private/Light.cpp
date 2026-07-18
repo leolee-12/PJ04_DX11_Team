@@ -27,6 +27,17 @@ HRESULT CLight::Render(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
 
         iPassIndex = ETOUI(DEFERRED::DIRECTIONAL);
     }
+    else if (LIGHT::SPOT == m_LightDesc.eType)
+    {
+        pShader->Bind_RawValue("g_vLightPos", &m_LightDesc.vPosition, sizeof m_LightDesc.vPosition);
+        pShader->Bind_RawValue("g_fLightRange", &m_LightDesc.fRange, sizeof m_LightDesc.fRange);
+        pShader->Bind_RawValue("g_vLightDir", &m_LightDesc.vDirection, sizeof m_LightDesc.vDirection); // ฤÜ รเ
+
+        _float4 vSpot = { m_LightDesc.fInnerCos, m_LightDesc.fOuterCos, 0.f, 0.f };
+        pShader->Bind_RawValue("g_vSpotParams", &vSpot, sizeof vSpot);
+
+        iPassIndex = ETOUI(DEFERRED::SPOT);
+    }
     else
     {
         if (FAILED(pShader->Bind_RawValue("g_vLightPos", &m_LightDesc.vPosition, sizeof m_LightDesc.vPosition)))

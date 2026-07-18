@@ -12,7 +12,7 @@ struct LD_SPAWN_SPEC;
 
 class CLevelDesign_Food : public CLevelDesignObject
 {
-	GENERATED_BODY(CLevelDesign_Food);
+	GENERATED_BODY(CLevelDesign_Food)
 
 public:
 	static constexpr const _tchar* PROTOTYPE_TAG = L"Proto_LevelDesign_Food";
