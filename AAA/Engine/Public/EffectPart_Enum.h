@@ -93,6 +93,7 @@ namespace Engine
 			{ 1, L"Sphere" },
 			{ 2, L"Circle" },
 			{ 3, L"Box" },
+			{ 4, L"Fan" },
 		};
 
 		return Items;
