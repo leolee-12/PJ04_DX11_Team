@@ -166,6 +166,7 @@ protected:
         PARTICLE_SHAPE_SPHERE,
         PARTICLE_SHAPE_CIRCLE,
         PARTICLE_SHAPE_BOX,
+        PARTICLE_SHAPE_FAN,
         PARTICLE_SHAPE_END
     };
 

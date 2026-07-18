@@ -49,6 +49,7 @@ void CBoss_Leopard::Update(_float fTimeDelta)
 
     __super::Update(fTimeDelta);
     Tick_DeathSequence(fTimeDelta);
+    Update_Afterimage(fTimeDelta);
 }
 
 CAnimator* CBoss_Leopard::Get_BodyAnimator() const
@@ -200,6 +201,20 @@ void CBoss_Leopard::Exit_PillarMode()
     }
 }
 
+void CBoss_Leopard::Set_AfterimageFx(_bool bOn, const _wstring& strEffectId)
+{
+    if (m_bAfterimageFx == bOn)
+        return;
+    m_bAfterimageFx = bOn;
+
+    if (bOn)
+    {
+        m_strAfterimageId = strEffectId;   
+        m_fAfterimageAccum = 0.f;
+        Spawn_Afterimage();                 
+    }
+}
+
 CMonsterBrain* CBoss_Leopard::Create_Brain()
 {
     return CBoss_Leopard_Brain::Create(this);
@@ -285,6 +300,33 @@ void CBoss_Leopard::Tick_DeathSequence(_float fTimeDelta)
             break;
         default: break;
     }
+}
+
+void CBoss_Leopard::Update_Afterimage(_float fTimeDelta)
+{
+    if (!m_bAfterimageFx)
+        return;
+
+    m_fAfterimageAccum += fTimeDelta;
+    while (m_fAfterimageAccum >= s_fAfterimageInterval)
+    {
+        m_fAfterimageAccum -= s_fAfterimageInterval;
+        Spawn_Afterimage();
+    }
+}
+
+void CBoss_Leopard::Spawn_Afterimage()
+{
+    if (m_strAfterimageId.empty())
+        return;
+
+    _float3 vPos{}, vLook{};
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+    XMStoreFloat3(&vLook,
+        XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f)));
+
+    CEffect_Loader::GetInstance()->Spawn(
+        m_strAfterimageId, Get_LevelIndex(), vPos, vLook);
 }
 
 #ifdef _DEBUG

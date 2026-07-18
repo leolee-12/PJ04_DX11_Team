@@ -199,6 +199,8 @@
 #include "Nail_Trail.h"
 #include "Leopard_Afterimage_Assault.h"
 #include "Leopard_Afterimage_Jump.h"
+#include "Leopard_ClawAssault.h"
+#include "Leopard_ClawJump.h"
 
 // LevelDesign
 #include "LevelDesign_Unsupported.h"
@@ -1682,7 +1684,7 @@ void CGameObject_Factory::Leopard_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_Afterimage_Assault::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Afterimage/BossLeopard_00_AssaultSlashEffectModel.ysh"
-            , XMMatrixRotationY(XMConvertToRadians(180.f))));
+            , XMMatrixScaling(1.5f, 1.5f, 1.5f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
     Register(CLeopard_Afterimage_Jump::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CLeopard_Afterimage_Jump),
@@ -1690,7 +1692,23 @@ void CGameObject_Factory::Leopard_Effect()
             TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
             TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_Afterimage_Jump::MODEL_PROTO_TAG,
                 CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Afterimage/BossLeopard_00_JumpAttackLeopardModel.ysh"
-            , XMMatrixRotationY(XMConvertToRadians(180.f))));
+            , XMMatrixScaling(1.5f, 1.5f, 1.5f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+    Register(CLeopard_ClawAssault::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CLeopard_ClawAssault),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_ClawAssault::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Claw/BossLeopard_00_AssultSlashClawModel.ysh"
+                    , XMMatrixScaling(1.5f, 1.5f, 1.5f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
+        )
+    );
+    Register(CLeopard_ClawJump::PROTOTYPE_TAG, TEXT("00.Leopard_Effect"), CREATOR(CLeopard_ClawJump),
+        LOADER(
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CMeshCommon::PROTOTYPE_TAG, CMeshCommon::Create(pDevice, pContext));
+            TRY_ADD_PROTO(pProxy, iLevelIndex, CLeopard_ClawJump::MODEL_PROTO_TAG,
+                CModel::Create(pDevice, pContext, MODEL::NONANIM, "../../Resources/YSH/Boss/Leopard/Effect/Claw/BossLeopard_00_JumpAttackClawModel.ysh"
+                    , XMMatrixScaling(1.5f, 1.5f, 1.5f) * XMMatrixRotationY(XMConvertToRadians(180.f))));
         )
     );
 }

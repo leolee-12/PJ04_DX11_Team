@@ -109,6 +109,10 @@ namespace
         { TEXT("LeoSlash_R"),             TEXT("../../Resources/YSH/Effects/Leopard/LeoSlash_R.JSON") },
         { TEXT("Leopard_Meteo"),          TEXT("../../Resources/YSH/Effects/Leopard/Leopard_Meteo.JSON") },
         { TEXT("Nail_Trail"),             TEXT("../../Resources/YSH/Effects/Leopard/Nail_Trail.JSON") },
+        { TEXT("Afterimage_Assault"),     TEXT("../../Resources/YSH/Effects/Leopard/Afterimage_Assault.JSON") },
+        { TEXT("Afterimage_Jump"),        TEXT("../../Resources/YSH/Effects/Leopard/Afterimage_Jump.JSON") },
+        { TEXT("ClawAssault"),            TEXT("../../Resources/YSH/Effects/Leopard/ClawAssault.JSON") },
+        { TEXT("ClawJump"),               TEXT("../../Resources/YSH/Effects/Leopard/ClawJump.JSON") },
     };
 }
 

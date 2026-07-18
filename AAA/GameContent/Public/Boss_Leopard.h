@@ -39,6 +39,20 @@ public:
     virtual CAnimator* Get_BodyAnimator() const override;
     virtual CMultiHitBoxPart* Get_HitBoxPart() const override;
 
+public:
+    const _float3& Get_CurPillarPos() const { return s_vPillarPos[m_iCurPillar]; }
+    void  Set_CurPillar(PILLAR e) { m_iCurPillar = e; }
+    _int  Advance_ToAdjacentPillar();
+
+    void  Spawn_HandNails();
+    void  Launch_NextHandNail();
+
+    void  Enter_PillarMode();
+    void  Exit_PillarMode(); 
+    _bool Is_PillarMode() const { return m_bPillarMode; }
+
+    void  Set_AfterimageFx(_bool bOn, const _wstring& strEffectId = L"");
+
 protected:
     virtual CMonsterBrain* Create_Brain() override;
     virtual void           Play_Intro() override;
@@ -61,18 +75,10 @@ protected:
     virtual HRESULT Ready_AnimEvents() override;
 
     virtual void    On_Deserialized() override;
-
-public:
-    const _float3& Get_CurPillarPos() const { return s_vPillarPos[m_iCurPillar]; }
-    void  Set_CurPillar(PILLAR e) { m_iCurPillar = e; }
-    _int  Advance_ToAdjacentPillar();
-
-    void  Spawn_HandNails();
-    void  Launch_NextHandNail();
-
-    void  Enter_PillarMode();
-    void  Exit_PillarMode(); 
-    _bool Is_PillarMode() const { return m_bPillarMode; }
+    virtual const   _float4x4* Get_FxParentMatrix(const _wstring& strFx) const
+    {
+        return m_pTransformCom->Get_WorldMatrixPtr();
+    }
 
 private:
     CBoss_Leopard_Body* m_pBody = { nullptr };
@@ -91,8 +97,15 @@ private:
 
     _bool m_bPillarMode = { false };
 
+    static constexpr _float s_fAfterimageInterval = 0.02f;
+    _bool  m_bAfterimageFx = { false };
+    _float m_fAfterimageAccum = { 0.f };
+    _wstring m_strAfterimageId;
+
 private:
     void Tick_DeathSequence(_float fTimeDelta);
+    void  Update_Afterimage(_float fTimeDelta);
+    void  Spawn_Afterimage();
 #ifdef _DEBUG
     void Debug_KeyInput();
 #endif

@@ -143,8 +143,10 @@ CBTNode* CBoss_Leopard_Brain::Make_Dash()
     const vector<string> clips = { "JumpAttackMove", "JumpAttack" };
     return CBTAction::Create(
         [this, d, fDashSpeed, fMaxTime, clips](CBlackboard*, _float dt) -> BT_STATUS {
-            CTransform* pTf = m_pOwner->Get_Transform(); auto* mv = m_pOwner->Get_Movement();
-            CAnimator* pAnim = Anim();
+            CTransform* pTf = m_pOwner->Get_Transform(); 
+            CAnimator* pAnim = Anim(); 
+            auto* mv = m_pOwner->Get_Movement();
+            auto Leo = static_cast<CBoss_Leopard*>(m_pOwner);
             if (!d->started) {
                 _vector vSelf = pTf->Get_State(STATE::POSITION);
                 _float3 vTgt = m_pOwner->Get_BlackBoard().vTargetPos; d->groundY = vTgt.y;
@@ -155,6 +157,7 @@ CBTNode* CBoss_Leopard_Brain::Make_Dash()
                 mv->Face_Instant(XMLoadFloat3(&vTgt)); pAnim->Play(clips[0], false, true, 0.1f, SPD);
                 Enable_Hit(CBoss_Leopard_Body::LHB_LCLAW, true);
                 Enable_Hit(CBoss_Leopard_Body::LHB_RCLAW, true);
+                Leo->Set_AfterimageFx(true, L"Afterimage_Jump");
             }
             if (pAnim->Is_Finished() && d->idx + 1 < (int)clips.size())
                 pAnim->Play(clips[++d->idx], false, true, 0.1f, SPD);
@@ -166,6 +169,7 @@ CBTNode* CBoss_Leopard_Brain::Make_Dash()
                 pTf->Set_State(STATE::POSITION, XMLoadFloat3(&p)); mv->Sync_To_Controller();
                 Enable_Hit(CBoss_Leopard_Body::LHB_LCLAW, false);
                 Enable_Hit(CBoss_Leopard_Body::LHB_RCLAW, false);
+                Leo->Set_AfterimageFx(false);
                 d->started = false; return BT_STATUS::SUCCESS;
             }
             return BT_STATUS::RUNNING;
@@ -173,6 +177,7 @@ CBTNode* CBoss_Leopard_Brain::Make_Dash()
             d->started = false;
             Enable_Hit(CBoss_Leopard_Body::LHB_LCLAW, false);
             Enable_Hit(CBoss_Leopard_Body::LHB_RCLAW, false);
+            static_cast<CBoss_Leopard*>(m_pOwner)->Set_AfterimageFx(false);
             });
 }
 
@@ -255,6 +260,7 @@ CBTNode* CBoss_Leopard_Brain::Make_AssaultSlash()
     auto* pSlash = CBTAction::Create(
         [this, s, fDashSpeed, fDashTime](CBlackboard*, _float dt) -> BT_STATUS {
             auto* mv = m_pOwner->Get_Movement(); CAnimator* pAnim = Anim();
+            auto  Leo = static_cast<CBoss_Leopard*>(m_pOwner);
             if (!s->started) {
                 _vector vSelf = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
                 _vector vTgt = XMLoadFloat3(&m_pOwner->Get_BlackBoard().vTargetPos);
@@ -266,11 +272,13 @@ CBTNode* CBoss_Leopard_Brain::Make_AssaultSlash()
                 pAnim->Play("AssaultSlash", false, true, 0.1f, SPD);
                 Enable_Hit(CBoss_Leopard_Body::LHB_ASSAULT, true);
                 s->started = true; s->t = 0.f;
+                Leo->Set_AfterimageFx(true, L"Afterimage_Assault");
             }
             m_pOwner->Add_MoveDir(s->vDir); s->t += dt;
             if (s->t >= fDashTime) {
                 mv->Set_MoveSpeed(s->prevSpd);
                 Enable_Hit(CBoss_Leopard_Body::LHB_ASSAULT, false);
+                Leo->Set_AfterimageFx(false);
                 s->started = false; return BT_STATUS::SUCCESS;
             }
             return BT_STATUS::RUNNING;
@@ -279,6 +287,7 @@ CBTNode* CBoss_Leopard_Brain::Make_AssaultSlash()
             auto* mv = m_pOwner->Get_Movement();
             if (mv && s->prevSpd > 0.f) mv->Set_MoveSpeed(s->prevSpd);
             Enable_Hit(CBoss_Leopard_Body::LHB_ASSAULT, false);
+            static_cast<CBoss_Leopard*>(m_pOwner)->Set_AfterimageFx(false);
             });
         return CBTSequence::Create({
             FaceWindup("Ready", TURN_DEG, SPD),

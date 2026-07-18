@@ -47,6 +47,9 @@
     <ClInclude Include="..\Public\KoKabu.h" />
     <ClInclude Include="..\public\Leopard_Afterimage_Assault.h" />
     <ClInclude Include="..\public\Leopard_Afterimage_Jump.h" />
+    <ClInclude Include="..\public\Leopard_ClawAssault.h" />
+    <ClInclude Include="..\public\Leopard_ClawJump.h" />
+    <ClInclude Include="..\public\Leopard_Flash.h" />
     <ClInclude Include="..\public\Leopard_Meteo.h" />
     <ClInclude Include="..\public\Leopard_Slash.h" />
     <ClInclude Include="..\public\Nail_Trail.h" />
@@ -462,6 +465,9 @@
     <ClCompile Include="..\Private\KoKabu.cpp" />
     <ClCompile Include="..\private\Leopard_Afterimage_Assault.cpp" />
     <ClCompile Include="..\private\Leopard_Afterimage_Jump.cpp" />
+    <ClCompile Include="..\private\Leopard_ClawAssault.cpp" />
+    <ClCompile Include="..\private\Leopard_ClawJump.cpp" />
+    <ClCompile Include="..\private\Leopard_Flash.cpp" />
     <ClCompile Include="..\private\Leopard_Meteo.cpp" />
     <ClCompile Include="..\private\Leopard_Slash.cpp" />
     <ClCompile Include="..\private\Nail_Trail.cpp" />
