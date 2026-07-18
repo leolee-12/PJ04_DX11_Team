@@ -204,6 +204,20 @@ BlendState BS_Additive
     BlendOpAlpha = Add; // dstA = srcA + dstA
 };
 
+BlendState BS_Max
+{
+    BlendEnable[0] = true;
+    BlendEnable[1] = true;
+
+    SrcBlend = One;
+    DestBlend = One;
+    BlendOp = Max;
+
+    SrcBlendAlpha = One;
+    DestBlendAlpha = One;
+    BlendOpAlpha = Max;
+};
+
 // Ä¿Æ° RT ¿ë
 BlendState BS_CurtainOver
 {
