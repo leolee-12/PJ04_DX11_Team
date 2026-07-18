@@ -63,6 +63,8 @@ void CKirby_Ability_Bomb::Exit_AttackState(CKirby* pKirby)
 {
     CMovement_Child* pMovement = pKirby->Get_Movement();
     pMovement->Set_MaxHorizontalSpeed(CKirby::s_fMaxHorizontalSpeed);
+    pMovement->Set_MaxFallVelocity(CKirby::s_fMaxFallVelocity);
+    pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
 
     m_bKeyUp = false;
     m_bReserveAttack = false;
@@ -230,19 +232,21 @@ void CKirby_Ability_Bomb::Enter_BombState(CKirby* pKirby, BOMB_STATE eState)
         case BOMB_STATE::CHARGING_LANDING:
         {
             pMovement->Set_MaxFallVelocity(CKirby::s_fMaxFallVelocity);
-
             pAnimator->Play("BombLanding", false, false, 0.1f, 1.5f);
             break;
         }
-
         case BOMB_STATE::THROW:
+        {
             pAnimator->Play("BombThrow", false, false, 0.1f, 2.5f);
             Throw_Bomb(pKirby, 70.f, 15.f);
             break;
-        case BOMB_STATE::CHARGING_THROW: // юс╫ц
+        }
+        case BOMB_STATE::CHARGING_THROW:
+        {
             pAnimator->Play("BombThrow", false, false, 0.1f, 2.5f);
             Throw_BombToAim();
             break;
+        }
     }
 }
 
@@ -361,8 +365,8 @@ void CKirby_Ability_Bomb::Exit_BombState(CKirby* pKirby, BOMB_STATE eState)
         break;
 
     case BOMB_STATE::CHARGE_START_FALL:
-
         break;
+
     case BOMB_STATE::CHARGING_FALL:
         break;
 
@@ -370,11 +374,9 @@ void CKirby_Ability_Bomb::Exit_BombState(CKirby* pKirby, BOMB_STATE eState)
         break;
 
     case BOMB_STATE::THROW:
-        pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
-        break;
-
     case BOMB_STATE::CHARGING_THROW:
         pMovement->Set_RotationSpeed(CKirby::s_fRot_Speed_Degree);
+        pMovement->Set_MaxFallVelocity(CKirby::s_fMaxFallVelocity);
         break;
     }
 }
